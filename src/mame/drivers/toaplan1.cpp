@@ -2872,10 +2872,10 @@ ROM_END
 
 ROM_START( samesamech )
 	ROM_REGION( 0x080000, "maincpu", 0 )    /* Main 68K code */
-	ROM_LOAD16_BYTE( "o17-09-h2.8j",0x000000, 0x08000, CRC(fc8c2420) SHA1(cf8333d3749213f2007467d3a80bd36ff7b4ce92) )
-	ROM_LOAD16_BYTE( "o17_10-h2.8l",0x000001, 0x08000, CRC(cc0ffbeb) SHA1(1cf85f68b4e368294069053ba8f5710d6c557ede) )
-	ROM_LOAD16_BYTE( "o17-11-2.7j", 0x040000, 0x20000, CRC(6beac378) SHA1(041ba98a89a4bac32575858db8a061bdf7804594) )
-	ROM_LOAD16_BYTE( "o17-12-2.7l", 0x040001, 0x20000, CRC(6adb6eb5) SHA1(9b6e63aa50d271c2bb0b4cf822fc6f3684f10230) )
+	ROM_LOAD16_BYTE( "o17-09-h2.8j",0x000000, 0x08000, CRC(fc8c2420) SHA1(cf8333d3749213f2007467d3a80bd36ff7b4ce92) ) /* The actual label is stamped with the letter "H" and separate "2" */
+	ROM_LOAD16_BYTE( "o17_10-h2.8l",0x000001, 0x08000, CRC(cc0ffbeb) SHA1(1cf85f68b4e368294069053ba8f5710d6c557ede) ) /* The actual label is stamped with the letter "H" and separate "2" */
+	ROM_LOAD16_BYTE( "o17-11-2.7j", 0x040000, 0x20000, CRC(6beac378) SHA1(041ba98a89a4bac32575858db8a061bdf7804594) ) /* The actual label is stamped with the number "2" */
+	ROM_LOAD16_BYTE( "o17-12-2.7l", 0x040001, 0x20000, CRC(6adb6eb5) SHA1(9b6e63aa50d271c2bb0b4cf822fc6f3684f10230) ) /* The actual label is stamped with the number "2" */
 
 	ROM_REGION( 0x8000, "audiocpu", 0 )    /* Sound HD647180 code */
 	ROM_LOAD( "hd647180.017",  0x00000, 0x08000, CRC(43523032) SHA1(1b94003a00e7bf6bdf1b1b946f42ff5d04629949) )
