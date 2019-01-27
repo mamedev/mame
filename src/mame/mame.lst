@@ -33221,6 +33221,7 @@ rastsagab                       // B04 (c) 1987 Taito Corporation (Japan)
 @source:rastersp.cpp
 fbcrazy                         // 1997
 rotr                            // 1994
+rotra                           // 1994
 
 @source:ravens.cpp
 ravens                          //
