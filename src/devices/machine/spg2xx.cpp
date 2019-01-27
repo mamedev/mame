@@ -1025,38 +1025,6 @@ void spg2xx_device::uart_rx(uint8_t data)
 	}
 }
 
-static uint16_t prng_mul(uint16_t a, uint16_t b)
-{
-	uint16_t d = 0;
-	if (a >= 0x8000) a &= 0x7fff;
-	if (b >= 0x8000) b &= 0x7fff;
-	for (int i = 0; i < 16; i++)
-	{
-		d = (d > 0x4000) ? ((d << 1) - 0x8000) : (d << 1);
-		if (a & 0x8000)
-			d += b;
-		if (d >= 0x8000)
-			d -= 0x8000;
-		a <<= 1;
-	}
-	return d;
-}
-
-static uint16_t prng_pow(uint16_t value, uint16_t exponent)
-{
-	uint16_t r = 1;
-	while (exponent > 0)
-	{
-		if (exponent & 1)
-		{
-			r = prng_mul(r, value);
-		}
-		exponent >>= 1;
-		value = prng_mul(value, value);
-	}
-	return r;
-}
-
 READ16_MEMBER(spg2xx_device::io_r)
 {
 	static const char *const gpioregs[] = { "GPIO Data Port", "GPIO Buffer Port", "GPIO Direction Port", "GPIO Attribute Port", "GPIO IRQ/Latch Port" };
@@ -1134,16 +1102,14 @@ READ16_MEMBER(spg2xx_device::io_r)
 	case 0x2c: // PRNG 0
 	{
 		const uint16_t value = m_io_regs[0x2c];
-		const uint16_t pow14 = prng_pow(value, 14);
-		m_io_regs[0x2c] = (pow14*value + pow14 + 1) & 0x7fff;
+		m_io_regs[0x2c] = ((value << 1) | (BIT(value, 14) ^ BIT(value, 13))) & 0x7fff;
 		return value;
 	}
 
 	case 0x2d: // PRNG 1
 	{
 		const uint16_t value = m_io_regs[0x2d];
-		const uint16_t pow14 = prng_pow(value, 14);
-		m_io_regs[0x2d] = (pow14*value + pow14 + 1) & 0x7fff;
+		m_io_regs[0x2d] = ((value << 1) | (BIT(value, 14) ^ BIT(value, 13))) & 0x7fff;
 		return value;
 	}
 
@@ -1711,6 +1677,16 @@ WRITE16_MEMBER(spg2xx_device::io_w)
 		LOGMASKED(LOG_IO_WRITES, "      %s\n", buf);
 		break;
 	}
+
+	case 0x2c: // PRNG 0 seed
+		LOGMASKED(LOG_IO_WRITES, "io_w: PRNG 0 seed = %04x\n", data & 0x7fff);
+		m_io_regs[offset] = data & 0x7fff;
+		break;
+
+	case 0x2d: // PRNG 1 seed
+		LOGMASKED(LOG_IO_WRITES, "io_w: PRNG 1 seed = %04x\n", data & 0x7fff);
+		m_io_regs[offset] = data & 0x7fff;
+		break;
 
 	case 0x2e: // FIQ Source Select
 	{
