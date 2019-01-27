@@ -2779,7 +2779,7 @@ ROM_START( fantzonee )
 	ROM_LOAD( "epr-7535a.12", 0x0000, 0x8000, CRC(bc1374fa) SHA1(ed2c87ae024dc251e175239f1bccc728fc096548) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-0016.key", 0x0000, 0x2000, BAD_DUMP CRC(16869a2c) SHA1(112b044d0b1b76620a7d75d6f4c4a16eca37e343) ) // hand-crafted needs a propper redump
+	ROM_LOAD( "317-0016.key", 0x0000, 0x2000, BAD_DUMP CRC(16869a2c) SHA1(112b044d0b1b76620a7d75d6f4c4a16eca37e343) ) // hand-crafted needs a proper redump
 ROM_END
 
 //*************************************************************************************************************************
