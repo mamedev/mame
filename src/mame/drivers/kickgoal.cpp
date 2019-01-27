@@ -166,9 +166,9 @@ void kickgoal_state::program_map(address_map &map)
 	map(0x880000, 0x89ffff).nopw(); // during startup
 
 	map(0x900000, 0x90ffff).nopw(); // during startup
-	map(0x900001, 0x900001).lw8("eeprom_cs_w", [this](u8 data){ m_eeprom->cs_write((data & 0x0001) ? ASSERT_LINE : CLEAR_LINE); });
-	map(0x900003, 0x900003).lw8("eeprom_clk_w", [this](u8 data){ m_eeprom->clk_write((data & 0x0001) ? ASSERT_LINE : CLEAR_LINE); });
-	map(0x900005, 0x900005).lw8("eeprom_di_w", [this](u8 data){ m_eeprom->di_write(data & 0x0001); });
+	map(0x900001, 0x900001).lw8("eeprom_cs_w", [this](u8 data){ m_eeprom->cs_write(BIT(data, 0) ? ASSERT_LINE : CLEAR_LINE); });
+	map(0x900003, 0x900003).lw8("eeprom_clk_w", [this](u8 data){ m_eeprom->clk_write(BIT(data, 0) ? ASSERT_LINE : CLEAR_LINE); });
+	map(0x900005, 0x900005).lw8("eeprom_di_w", [this](u8 data){ m_eeprom->di_write(BIT(data, 0)); });
 	map(0x900007, 0x900007).lr8("eeprom_r", [this](){ return m_eeprom->do_read(); });
 
 	map(0xa00000, 0xa03fff).ram().w(FUNC(kickgoal_state::fgram_w)).share("fgram"); /* FG Layer */
