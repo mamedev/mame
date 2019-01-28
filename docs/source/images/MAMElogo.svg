@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1207.16" height="340.656" viewBox="0 0 1207.16 340.656">
+  <defs>
+    <style>
+      .cls-1 {
+        stroke-linejoin: miter;
+        stroke-opacity: 0.75;
+        stroke-width: 5px;
+        fill-rule: evenodd;
+        stroke: url(#linear-gradient);
+        filter: url(#filter);
+      }
+    </style>
+    <linearGradient id="linear-gradient" x1="1213.16" y1="299.328" x2="11" y2="299.328" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#68cafb"/>
+      <stop offset="1" stop-color="#00274f"/>
+    </linearGradient>
+    <filter id="filter" x="11" y="131.5" width="1202.16" height="335.656" filterUnits="userSpaceOnUse">
+      <feImage preserveAspectRatio="none" x="11" y="131.5" width="1202.16" height="335.656" result="image" xlink:href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iMTIwMi4xNiIgaGVpZ2h0PSIzMzUuNjU2IiB2aWV3Qm94PSIwIDAgMTIwMi4xNiAzMzUuNjU2Ij4KICA8ZGVmcz4KICAgIDxzdHlsZT4KICAgICAgLmNscy0xIHsKICAgICAgICBmaWxsOiB1cmwoI2xpbmVhci1ncmFkaWVudCk7CiAgICAgIH0KICAgIDwvc3R5bGU+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImxpbmVhci1ncmFkaWVudCIgeTE9IjE2Ny44MjgiIHgyPSIxMjAyLjE2IiB5Mj0iMTY3LjgyOCIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiM2OGNhZmIiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMDAyNzRmIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cmVjdCBjbGFzcz0iY2xzLTEiIHdpZHRoPSIxMjAyLjE2IiBoZWlnaHQ9IjMzNS42NTYiLz4KPC9zdmc+Cg=="/>
+      <feComposite result="composite" operator="in" in2="SourceGraphic"/>
+      <feBlend result="blend" in2="SourceGraphic"/>
+    </filter>
+  </defs>
+  <g transform="translate(-8.5 -129)" style="fill: ; filter: url(#filter)">
+    <path id="Color_Fill_1" data-name="Color Fill 1" class="cls-1" d="M11,384.167L262.167,132.5V241.833L372,132.5v176l176.667-177V330l198.5-198.5V241.833L856.833,132.5V301.333l164.667-165h191.67l-61.84,61.834h-97.66l-28,28h50.83l-64.33,65.166H960l-29,28.5h169.83L1036,384.167H776.167L791.833,367V297.333L699,388.667v-106l-101.667,101.5h-114.5V298.333L314,467.167H214l93-93.334v-75.5l-93,92.334v-110l-103,103.5H11Z" style="stroke: inherit; filter: none; fill: inherit"/>
+  </g>
+  <use transform="translate(-8.5 -129)" xlink:href="#Color_Fill_1" style="stroke: url(#linear-gradient); filter: none; fill: none"/>
+</svg>
