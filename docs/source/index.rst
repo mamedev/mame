@@ -3,7 +3,7 @@
    contain the root `toctree` directive.
 
 .. image:: images/MAMElogo.svg
-    :width: 800px
+    :width: 100%
     :align: center
     :alt: MAME
 
