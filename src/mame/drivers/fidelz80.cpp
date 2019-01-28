@@ -517,8 +517,8 @@ expect that the software reads these once on startup only.
 class fidelz80_state : public fidelbase_state
 {
 public:
-	fidelz80_state(const machine_config &mconfig, device_type type, const char *tag)
-		: fidelbase_state(mconfig, type, tag),
+	fidelz80_state(const machine_config &mconfig, device_type type, const char *tag) :
+		fidelbase_state(mconfig, type, tag),
 		m_mcu(*this, "mcu"),
 		m_z80pio(*this, "z80pio"),
 		m_ppi8255(*this, "ppi8255"),
@@ -570,9 +570,7 @@ private:
 	// BCC, BKC
 	DECLARE_READ8_MEMBER(bcc_input_r);
 	DECLARE_WRITE8_MEMBER(bcc_control_w);
-	DECLARE_WRITE8_MEMBER(bkc_control_w);
 	void bcc_io(address_map &map);
-	void bkc_io(address_map &map);
 	void bcc_map(address_map &map);
 
 	// SCC
@@ -901,24 +899,21 @@ WRITE8_MEMBER(fidelz80_state::cc10_ppi_porta_w)
 
 // TTL
 
-WRITE8_MEMBER(fidelz80_state::bkc_control_w)
+WRITE8_MEMBER(fidelz80_state::bcc_control_w)
 {
 	// a0-a2,d7: digit segment data via NE591
 	u8 mask = 1 << (offset & 7);
 	m_7seg_data = (m_7seg_data & ~mask) | ((data & 0x80) ? mask : 0);
+
+	// BCC: NE591 Q7 is speaker out
+	if (m_dac != nullptr)
+		m_dac->write(BIT(m_7seg_data, 7));
 
 	// d0-d3: led select, input mux
 	// d4,d5: upper leds(direct)
 	set_display_segmask(0xf, 0x7f);
 	display_matrix(8, 6, m_7seg_data, data & 0x3f);
 	m_inp_mux = data & 0xf;
-}
-
-WRITE8_MEMBER(fidelz80_state::bcc_control_w)
-{
-	// same as BKC, and NE591 Q7 is speaker out
-	bkc_control_w(space, offset, data);
-	m_dac->write(BIT(m_7seg_data, 7));
 }
 
 READ8_MEMBER(fidelz80_state::bcc_input_r)
@@ -1181,12 +1176,6 @@ void fidelz80_state::bcc_io(address_map &map)
 {
 	map.global_mask(0x07);
 	map(0x00, 0x07).rw(FUNC(fidelz80_state::bcc_input_r), FUNC(fidelz80_state::bcc_control_w));
-}
-
-void fidelz80_state::bkc_io(address_map &map)
-{
-	map.global_mask(0x07);
-	map(0x00, 0x07).rw(FUNC(fidelz80_state::bcc_input_r), FUNC(fidelz80_state::bkc_control_w));
 }
 
 
@@ -1703,7 +1692,7 @@ INPUT_PORTS_END
     Machine Drivers
 ******************************************************************************/
 
-void fidelz80_state::bcc(machine_config &config)
+void fidelz80_state::bkc(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 3.579545_MHz_XTAL);
@@ -1711,6 +1700,12 @@ void fidelz80_state::bcc(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &fidelz80_state::bcc_io);
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
+	config.set_default_layout(layout_fidel_bkc);
+}
+
+void fidelz80_state::bcc(machine_config &config)
+{
+	bkc(config);
 	config.set_default_layout(layout_fidel_bcc);
 
 	/* sound hardware */
@@ -1719,17 +1714,6 @@ void fidelz80_state::bcc(machine_config &config)
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
 	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-}
-
-void fidelz80_state::bkc(machine_config &config)
-{
-	/* basic machine hardware */
-	Z80(config, m_maincpu, 3.579545_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &fidelz80_state::bcc_map);
-	m_maincpu->set_addrmap(AS_IO, &fidelz80_state::bkc_io);
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_fidel_bkc);
 }
 
 void fidelz80_state::scc(machine_config &config)
