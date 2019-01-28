@@ -558,7 +558,7 @@ MACHINE_CONFIG_START(osbexec_state::osbexec)
 	m_pia[0]->irqa_handler().set("mainirq", FUNC(input_merger_device::in_w<0>));
 	m_pia[0]->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
 
-	MCFG_DEVICE_ADD(m_pia[1], PIA6821, 0)
+	PIA6821(config, m_pia[1], 0);
 	m_pia[1]->irqa_handler().set("mainirq", FUNC(input_merger_device::in_w<2>));
 	m_pia[1]->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<3>));
 
@@ -601,8 +601,8 @@ MACHINE_CONFIG_START(osbexec_state::osbexec)
 
 	MB8877(config, m_mb8877, MAIN_CLOCK/24);
 	m_mb8877->intrq_wr_callback().set(m_pia[1], FUNC(pia6821_device::cb1_w));
-	MCFG_FLOPPY_DRIVE_ADD("mb8877:0", osborne2_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("mb8877:1", osborne2_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, "mb8877:0", osborne2_floppies, "525ssdd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "mb8877:1", osborne2_floppies, "525ssdd", floppy_image_device::default_floppy_formats);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("136K"); /* 128KB Main RAM + RAM in ROM bank (8) */

@@ -254,10 +254,10 @@ MACHINE_CONFIG_START(prof180x_state::prof180x)
 
 	/* devices */
 	UPD765A(config, FDC9268_TAG, 8'000'000, false, true);
-	MCFG_FLOPPY_DRIVE_ADD(FDC9268_TAG ":0", prof180x_floppies, "35dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC9268_TAG ":1", prof180x_floppies, "35dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC9268_TAG ":2", prof180x_floppies, "35dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC9268_TAG ":3", prof180x_floppies, "35dd", floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, FDC9268_TAG ":0", prof180x_floppies, "35dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, FDC9268_TAG ":1", prof180x_floppies, "35dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, FDC9268_TAG ":2", prof180x_floppies, "35dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, FDC9268_TAG ":3", prof180x_floppies, "35dd", floppy_image_device::default_floppy_formats);
 
 	//MCFG_RTC8583_ADD(MK3835_TAG, rtc_intf)
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")

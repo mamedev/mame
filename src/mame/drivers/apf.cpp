@@ -577,10 +577,8 @@ MACHINE_CONFIG_START(apf_state::apfimag)
 	m_cass->set_interface("apf_cass");
 
 	FD1771(config, m_fdc, 1000000); // guess
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", apf_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", apf_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, "fdc:0", apf_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", apf_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
 
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "apfimag_cass")
 MACHINE_CONFIG_END

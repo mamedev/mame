@@ -266,23 +266,21 @@ MACHINE_CONFIG_START(kaypro_state::kayproii)
 	m_fdc->intrq_wr_callback().set(FUNC(kaypro_state::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(kaypro_state::fdc_drq_w));
 	m_fdc->set_force_ready(true);
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", kaypro_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", kaypro_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, "fdc:0", kaypro_floppies, "525ssdd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", kaypro_floppies, "525ssdd", floppy_image_device::default_floppy_formats).enable_sound(true);
 	MCFG_SOFTWARE_LIST_ADD("flop_list","kayproii")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(kaypro_state::kayproiv)
+void kaypro_state::kayproiv(machine_config &config)
+{
 	kayproii(config);
 	m_pio_s->set_clock(2500000);
 	m_pio_s->out_pa_callback().set(FUNC(kaypro_state::kayproiv_pio_system_w));
-	MCFG_DEVICE_REMOVE("fdc:0")
-	MCFG_DEVICE_REMOVE("fdc:1")
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", kaypro_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", kaypro_floppies, "525dd", floppy_image_device::default_floppy_formats)
-MACHINE_CONFIG_END
+	config.device_remove("fdc:0");
+	config.device_remove("fdc:1");
+	FLOPPY_CONNECTOR(config, "fdc:0", kaypro_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", kaypro_floppies, "525dd", floppy_image_device::default_floppy_formats);
+}
 
 MACHINE_CONFIG_START(kaypro_state::kaypro484)
 	/* basic machine hardware */
@@ -361,32 +359,31 @@ MACHINE_CONFIG_START(kaypro_state::kaypro484)
 	m_fdc->intrq_wr_callback().set(FUNC(kaypro_state::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(kaypro_state::fdc_drq_w));
 	m_fdc->set_force_ready(true);
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", kaypro_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", kaypro_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, "fdc:0", kaypro_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", kaypro_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(kaypro_state::kaypro10)
+void kaypro_state::kaypro10(machine_config &config)
+{
 	kaypro484(config);
-	MCFG_DEVICE_REMOVE("fdc:1")  // only has 1 floppy drive
+	config.device_remove("fdc:1");  // only has 1 floppy drive
 	// need to add hard drive & controller
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(kaypro_state::kaypronew2)
+void kaypro_state::kaypronew2(machine_config &config)
+{
 	kaypro484(config);
-	MCFG_DEVICE_REMOVE("fdc:1")  // only has 1 floppy drive
-MACHINE_CONFIG_END
+	config.device_remove("fdc:1");  // only has 1 floppy drive
+}
 
-MACHINE_CONFIG_START(kaypro_state::kaypro284)
+void kaypro_state::kaypro284(machine_config &config)
+{
 	kaypro484(config);
-	MCFG_DEVICE_REMOVE("fdc:0")
-	MCFG_DEVICE_REMOVE("fdc:1")
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", kaypro_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", kaypro_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-MACHINE_CONFIG_END
+	config.device_remove("fdc:0");
+	config.device_remove("fdc:1");
+	FLOPPY_CONNECTOR(config, "fdc:0", kaypro_floppies, "525ssdd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", kaypro_floppies, "525ssdd", floppy_image_device::default_floppy_formats).enable_sound(true);
+}
 
 MACHINE_CONFIG_START(kaypro_state::omni2)
 	kayproiv(config);

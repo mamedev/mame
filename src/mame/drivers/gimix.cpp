@@ -499,8 +499,8 @@ MACHINE_CONFIG_START(gimix_state::gimix)
 	m_fdc->intrq_wr_callback().set(FUNC(gimix_state::fdc_irq_w));
 	m_fdc->drq_wr_callback().set(FUNC(gimix_state::fdc_drq_w));
 	m_fdc->set_force_ready(true);
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", gimix_floppies, "525hd", gimix_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", gimix_floppies, "525hd", gimix_state::floppy_formats)
+	FLOPPY_CONNECTOR(config, "fdc:0", gimix_floppies, "525hd", gimix_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", gimix_floppies, "525hd", gimix_state::floppy_formats);
 
 	/* parallel ports */
 	pia6821_device &pia1(PIA6821(config, "pia1", 2'000'000));

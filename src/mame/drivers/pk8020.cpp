@@ -246,10 +246,10 @@ MACHINE_CONFIG_START(pk8020_state::pk8020)
 	FD1793(config, m_wd1793, 20_MHz_XTAL / 20);
 	m_wd1793->intrq_wr_callback().set(m_pic8259, FUNC(pic8259_device::ir7_w));
 
-	MCFG_FLOPPY_DRIVE_ADD("wd1793:0", pk8020_floppies, "qd", pk8020_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("wd1793:1", pk8020_floppies, "qd", pk8020_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("wd1793:2", pk8020_floppies, "qd", pk8020_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("wd1793:3", pk8020_floppies, "qd", pk8020_state::floppy_formats)
+	FLOPPY_CONNECTOR(config, "wd1793:0", pk8020_floppies, "qd", pk8020_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "wd1793:1", pk8020_floppies, "qd", pk8020_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "wd1793:2", pk8020_floppies, "qd", pk8020_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "wd1793:3", pk8020_floppies, "qd", pk8020_state::floppy_formats);
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "korvet_flop")
 

@@ -1408,10 +1408,8 @@ MACHINE_CONFIG_START(hp64k_state::hp64k)
 	m_fdc->set_force_ready(true); // should be able to get rid of this when fdc issue is fixed
 	m_fdc->intrq_wr_callback().set(FUNC(hp64k_state::hp64k_flp_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(hp64k_state::hp64k_flp_drq_w));
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", hp64k_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_SLOT_FIXED(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", hp64k_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_SLOT_FIXED(true)
+	FLOPPY_CONNECTOR(config, "fdc:0", hp64k_floppies, "525dd", floppy_image_device::default_floppy_formats, true);
+	FLOPPY_CONNECTOR(config, "fdc:1", hp64k_floppies, "525dd", floppy_image_device::default_floppy_formats, true);
 
 	TTL74123(config, m_ss0, 0);
 	m_ss0->set_connection_type(TTL74123_NOT_GROUNDED_NO_DIODE);

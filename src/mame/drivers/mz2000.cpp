@@ -903,10 +903,10 @@ MACHINE_CONFIG_START(mz2000_state::mz2000)
 
 	MB8877(config, m_mb8877a, 1_MHz_XTAL);
 
-	MCFG_FLOPPY_DRIVE_ADD("mb8877a:0", mz2000_floppies, "dd", mz2000_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("mb8877a:1", mz2000_floppies, "dd", mz2000_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("mb8877a:2", mz2000_floppies, "dd", mz2000_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("mb8877a:3", mz2000_floppies, "dd", mz2000_state::floppy_formats)
+	FLOPPY_CONNECTOR(config, "mb8877a:0", mz2000_floppies, "dd", mz2000_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "mb8877a:1", mz2000_floppies, "dd", mz2000_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "mb8877a:2", mz2000_floppies, "dd", mz2000_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "mb8877a:3", mz2000_floppies, "dd", mz2000_state::floppy_formats);
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "mz2000_flop")
 

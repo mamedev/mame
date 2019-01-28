@@ -499,7 +499,7 @@ MACHINE_CONFIG_START(pcxt_state::filetto)
 	MCFG_DEVICE_PROGRAM_MAP(filetto_map)
 	MCFG_DEVICE_IO_MAP(filetto_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
-	MCFG_PCNOPPI_MOTHERBOARD_ADD("mb","maincpu")
+	PCNOPPI_MOTHERBOARD(config, "mb", 0).set_cputag(m_maincpu);
 	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", filetto_isa8_cards, "filetto", true) // FIXME: determine ISA bus clock
 
 	MCFG_DEVICE_ADD("voice", HC55516, 8000000/4)//8923S-UM5100 is a HC55536 with ROM hook-up
@@ -515,7 +515,7 @@ MACHINE_CONFIG_START(pcxt_state::tetriskr)
 	MCFG_DEVICE_PROGRAM_MAP(tetriskr_map)
 	MCFG_DEVICE_IO_MAP(tetriskr_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
-	MCFG_PCNOPPI_MOTHERBOARD_ADD("mb","maincpu")
+	PCNOPPI_MOTHERBOARD(config, "mb", 0).set_cputag(m_maincpu);
 
 	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", filetto_isa8_cards, "tetriskr", true) // FIXME: determine ISA bus clock
 

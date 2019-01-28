@@ -604,10 +604,8 @@ MACHINE_CONFIG_START(excali64_state::excali64)
 
 	WD2793(config, m_fdc, 16_MHz_XTAL / 16);
 	m_fdc->drq_wr_callback().set(m_dma, FUNC(z80dma_device::rdy_w));
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", excali64_floppies, "525qd", excali64_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", excali64_floppies, "525qd", excali64_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, "fdc:0", excali64_floppies, "525qd", excali64_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", excali64_floppies, "525qd", excali64_state::floppy_formats).enable_sound(true);
 
 	Z80DMA(config, m_dma, 16_MHz_XTAL / 4);
 	m_dma->out_busreq_callback().set(FUNC(excali64_state::busreq_w));

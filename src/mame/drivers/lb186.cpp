@@ -151,10 +151,10 @@ MACHINE_CONFIG_START(lb186_state::lb186)
 	WD1772(config, m_fdc, 16_MHz_XTAL / 2);
 	m_fdc->intrq_wr_callback().set(m_maincpu, FUNC(i80186_cpu_device::int2_w));
 	m_fdc->drq_wr_callback().set(m_maincpu, FUNC(i80186_cpu_device::drq0_w));
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", lb186_floppies, "525dd", lb186_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", lb186_floppies, nullptr, lb186_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:2", lb186_floppies, nullptr, lb186_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:3", lb186_floppies, nullptr, lb186_state::floppy_formats)
+	FLOPPY_CONNECTOR(config, "fdc:0", lb186_floppies, "525dd", lb186_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", lb186_floppies, nullptr, lb186_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:2", lb186_floppies, nullptr, lb186_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:3", lb186_floppies, nullptr, lb186_state::floppy_formats);
 
 	MCFG_NSCSI_BUS_ADD("scsibus")
 	MCFG_NSCSI_ADD("scsibus:0", scsi_devices, "harddisk", false)

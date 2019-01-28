@@ -384,7 +384,7 @@ MACHINE_CONFIG_START(unixpc_state::unixpc)
 	WD2797(config, m_wd2797, 40_MHz_XTAL / 40); // 1PCK (CPU clock) divided by custom DMA chip
 	m_wd2797->intrq_wr_callback().set(FUNC(unixpc_state::wd2797_intrq_w));
 	m_wd2797->drq_wr_callback().set(FUNC(unixpc_state::wd2797_drq_w));
-	MCFG_FLOPPY_DRIVE_ADD("wd2797:0", unixpc_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, "wd2797:0", unixpc_floppies, "525dd", floppy_image_device::default_floppy_formats);
 
 	upd7201_new_device& mpsc(UPD7201_NEW(config, "mpsc", 19.6608_MHz_XTAL / 8));
 	mpsc.out_txda_callback().set("rs232", FUNC(rs232_port_device::write_txd));

@@ -492,10 +492,8 @@ MACHINE_CONFIG_START(sorcerer_state::sorcererd)
 	m_fdc2->set_force_ready(true); // should be able to get rid of this when fdc issue is fixed
 	m_fdc2->intrq_wr_callback().set(FUNC(sorcerer_state::intrq_w));
 	m_fdc2->drq_wr_callback().set(FUNC(sorcerer_state::drq_w));
-	MCFG_FLOPPY_DRIVE_ADD("fdc2:0", floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc2:1", floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, "fdc2:0", floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc2:1", floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list","sorcerer_flop")
 MACHINE_CONFIG_END

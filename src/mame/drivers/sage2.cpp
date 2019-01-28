@@ -479,8 +479,8 @@ MACHINE_CONFIG_START(sage2_state::sage2)
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", sage2_floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", sage2_floppies, "525qd", floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":0", sage2_floppies, "525qd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":1", sage2_floppies, "525qd", floppy_image_device::default_floppy_formats);
 	MCFG_IEEE488_BUS_ADD()
 
 	// internal ram

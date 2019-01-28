@@ -339,10 +339,8 @@ MACHINE_CONFIG_START(proteus_state::proteus)
 	m_fdc->hld_wr_callback().set(FUNC(proteus_state::motor_w));
 	m_fdc->set_force_ready(true);
 
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", proteus_floppies, "8dssd", proteus_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", proteus_floppies, "8dssd", proteus_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, "fdc:0", proteus_floppies, "8dssd", proteus_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", proteus_floppies, "8dssd", proteus_state::floppy_formats).enable_sound(true);
 
 	/* ram */
 	RAM(config, RAM_TAG).set_default_size("64K");

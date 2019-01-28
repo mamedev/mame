@@ -223,10 +223,8 @@ MACHINE_CONFIG_START(zorba_state::zorba)
 	FD1793(config, m_fdc, 24_MHz_XTAL / 24);
 	m_fdc->intrq_wr_callback().set("irq2", FUNC(input_merger_device::in_w<0>));
 	m_fdc->drq_wr_callback().set("irq2", FUNC(input_merger_device::in_w<1>));
-	MCFG_FLOPPY_DRIVE_ADD(m_floppy0, zorba_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD(m_floppy1, zorba_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, m_floppy0, zorba_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy1, zorba_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
 
 	// J1 IEEE-488
 	MCFG_IEEE488_BUS_ADD()

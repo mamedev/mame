@@ -356,7 +356,8 @@ MACHINE_CONFIG_START(poly_state::poly2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(polydev_state::polydev)
+void polydev_state::polydev(machine_config &config)
+{
 	poly(config);
 
 	/* fdc */
@@ -364,15 +365,13 @@ MACHINE_CONFIG_START(polydev_state::polydev)
 	m_fdc->hld_wr_callback().set(FUNC(polydev_state::motor_w));
 	m_fdc->set_force_ready(true);
 
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", poly_floppies, "525sd", polydev_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", poly_floppies, nullptr, polydev_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, "fdc:0", poly_floppies, "525sd", polydev_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", poly_floppies, nullptr, polydev_state::floppy_formats).enable_sound(true);
 
 	/* remove devices*/
-	//MCFG_DEVICE_REMOVE("netup")
-	//MCFG_DEVICE_REMOVE("netdown")
-MACHINE_CONFIG_END
+	//config.device_remove("netup");
+	//config.device_remove("netdown");
+}
 
 
 /* ROM definition */

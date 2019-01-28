@@ -747,7 +747,7 @@ MACHINE_CONFIG_START(hp_ipc_state::hp_ipc_base)
 	// XXX when floppy code correctly handles 600 rpm drives.
 	WD2797(config, m_fdc, 2_MHz_XTAL);
 	m_fdc->intrq_wr_callback().set(FUNC(hp_ipc_state::irq_5));
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", hp_ipc_floppies, "35dd", hp_ipc_state::floppy_formats)
+	FLOPPY_CONNECTOR(config, "fdc:0", hp_ipc_floppies, "35dd", hp_ipc_state::floppy_formats);
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list","hp_ipc")
 

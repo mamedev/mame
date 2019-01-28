@@ -755,8 +755,8 @@ MACHINE_CONFIG_START(alphatro_state::alphatro)
 	UPD765A(config, m_fdc, 16_MHz_XTAL / 2, true, true); // clocked through SED-9420C
 	m_fdc->intrq_wr_callback().set(FUNC(alphatro_state::fdc_irq_w));
 	m_fdc->drq_wr_callback().set(m_dmac, FUNC(i8257_device::dreq2_w));
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", alphatro_floppies, "525dd", alphatro_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", alphatro_floppies, "525dd", alphatro_state::floppy_formats)
+	FLOPPY_CONNECTOR(config, "fdc:0", alphatro_floppies, "525dd", alphatro_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", alphatro_floppies, "525dd", alphatro_state::floppy_formats);
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "alphatro_flop")
 
 	I8257(config, m_dmac, 16_MHz_XTAL / 4);

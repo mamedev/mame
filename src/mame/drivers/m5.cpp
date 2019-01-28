@@ -1445,7 +1445,7 @@ MACHINE_CONFIG_START(m5_state::m5)
 
 	UPD765A(config, m_fdc, 8'000'000, true, true);
 	m_fdc->intrq_wr_callback().set_inputline(m_fd5cpu, INPUT_LINE_IRQ0);
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", m5_floppies, "525dd", m5_state::floppy_formats)
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":0", m5_floppies, "525dd", m5_state::floppy_formats);
 
 	// cartridge
 	MCFG_M5_CARTRIDGE_ADD("cartslot1", m5_cart, nullptr)
@@ -1520,10 +1520,8 @@ MACHINE_CONFIG_START(brno_state::brno)
 
 	// floppy
 	WD2797(config, m_fdc, 1_MHz_XTAL);
-	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG":0", brno_floppies, "35hd", brno_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG":1", brno_floppies, "35hd", brno_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, WD2797_TAG":0", brno_floppies, "35hd", brno_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, WD2797_TAG":1", brno_floppies, "35hd", brno_state::floppy_formats).enable_sound(true);
 	// only one floppy drive
 	//MCFG_DEVICE_REMOVE(WD2797_TAG":1")
 

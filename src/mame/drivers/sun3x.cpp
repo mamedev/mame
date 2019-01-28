@@ -626,7 +626,7 @@ MACHINE_CONFIG_START(sun3x_state::sun3_80)
 	NCR539X(config, ESP_TAG, 20000000/2).set_scsi_port("scsi");
 
 	N82077AA(config, m_fdc, n82077aa_device::MODE_PS2);
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", sun_floppies, "35hd", sun3x_state::floppy_formats)
+	FLOPPY_CONNECTOR(config, "fdc:0", sun_floppies, "35hd", sun3x_state::floppy_formats);
 
 	// the timekeeper has no interrupt output, so 3/80 includes a dedicated timer circuit
 	TIMER(config, "timer").configure_periodic(FUNC(sun3x_state::sun380_timer), attotime::from_hz(100));

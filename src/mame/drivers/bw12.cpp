@@ -644,8 +644,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(bw12_state::bw12)
 	common(config);
 	/* floppy drives */
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", bw12_floppies, "525dd", bw12_state::bw12_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":2", bw12_floppies, "525dd", bw12_state::bw12_floppy_formats)
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":1", bw12_floppies, "525dd", bw12_state::bw12_floppy_formats);
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":2", bw12_floppies, "525dd", bw12_state::bw12_floppy_formats);
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "bw12")
@@ -657,8 +657,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(bw12_state::bw14)
 	common(config);
 	/* floppy drives */
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", bw14_floppies, "525dd", bw12_state::bw14_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":2", bw14_floppies, "525dd", bw12_state::bw14_floppy_formats)
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":1", bw14_floppies, "525dd", bw12_state::bw14_floppy_formats);
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":2", bw14_floppies, "525dd", bw12_state::bw14_floppy_formats);
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "bw14")

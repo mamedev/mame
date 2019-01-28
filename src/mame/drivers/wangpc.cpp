@@ -1330,8 +1330,8 @@ MACHINE_CONFIG_START(wangpc_state::wangpc)
 	UPD765A(config, m_fdc, 8'000'000, false, false);
 	m_fdc->intrq_wr_callback().set(FUNC(wangpc_state::fdc_irq));
 	m_fdc->drq_wr_callback().set(FUNC(wangpc_state::fdc_drq));
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", wangpc_floppies, "525dd", wangpc_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", wangpc_floppies, "525dd", wangpc_state::floppy_formats)
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":0", wangpc_floppies, "525dd", wangpc_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":1", wangpc_floppies, "525dd", wangpc_state::floppy_formats);
 
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer");
 	m_centronics->set_data_input_buffer(m_cent_data_in);

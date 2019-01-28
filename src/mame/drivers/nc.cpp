@@ -1484,8 +1484,8 @@ MACHINE_CONFIG_START(nc200_state::nc200)
 
 	UPD765A(config, m_fdc, 8'000'000, true, true);
 	m_fdc->intrq_wr_callback().set(FUNC(nc200_state::nc200_fdc_interrupt));
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", ibmpc_floppies, "525dd", ibmpc_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", ibmpc_floppies, "525dd", ibmpc_floppy_formats)
+	FLOPPY_CONNECTOR(config, "upd765:0", ibmpc_floppies, "525dd", ibmpc_floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765:1", ibmpc_floppies, "525dd", ibmpc_floppy_formats);
 
 	MCFG_DEVICE_ADD("mc", MC146818, 4.194304_MHz_XTAL)
 

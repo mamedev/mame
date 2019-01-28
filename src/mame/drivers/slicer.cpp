@@ -117,10 +117,10 @@ MACHINE_CONFIG_START(slicer_state::slicer)
 	FD1797(config, m_fdc, 16_MHz_XTAL / 2 / 8);
 	m_fdc->intrq_wr_callback().set("maincpu", FUNC(i80186_cpu_device::int1_w));
 	m_fdc->drq_wr_callback().set("maincpu", FUNC(i80186_cpu_device::drq0_w));
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", slicer_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", slicer_floppies, nullptr, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:2", slicer_floppies, nullptr, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:3", slicer_floppies, nullptr, floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, "fdc:0", slicer_floppies, "525dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", slicer_floppies, nullptr, floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:2", slicer_floppies, nullptr, floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:3", slicer_floppies, nullptr, floppy_image_device::default_floppy_formats);
 
 	ls259_device &drivelatch(LS259(config, "drivelatch")); // U29
 	drivelatch.q_out_cb<0>().set("sasi", FUNC(scsi_port_device::write_sel));

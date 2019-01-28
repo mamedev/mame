@@ -575,10 +575,8 @@ MACHINE_CONFIG_START(aussiebyte_state::aussiebyte)
 	WD2797(config, m_fdc, 16_MHz_XTAL / 16);
 	m_fdc->intrq_wr_callback().set(FUNC(aussiebyte_state::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(aussiebyte_state::fdc_drq_w));
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", aussiebyte_floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", aussiebyte_floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, "fdc:0", aussiebyte_floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", aussiebyte_floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
 
 	/* devices */
 	SY6545_1(config, m_crtc, 16_MHz_XTAL / 8);

@@ -349,8 +349,7 @@ MACHINE_CONFIG_START(v6809_state::v6809)
 	rtc.set_day1(1);   // monday
 
 	MB8876(config, m_fdc, 16_MHz_XTAL / 16);
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", v6809_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, "fdc:0", v6809_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
 MACHINE_CONFIG_END
 
 /* ROM definition */

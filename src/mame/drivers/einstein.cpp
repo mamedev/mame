@@ -658,10 +658,10 @@ MACHINE_CONFIG_START(einstein_state::einstein)
 	// floppy
 	WD1770(config, m_fdc, XTAL_X002);
 
-	MCFG_FLOPPY_DRIVE_ADD(IC_I042 ":0", einstein_floppies, "3ss", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(IC_I042 ":1", einstein_floppies, "3ss", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(IC_I042 ":2", einstein_floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(IC_I042 ":3", einstein_floppies, "525qd", floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, IC_I042 ":0", einstein_floppies, "3ss", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, IC_I042 ":1", einstein_floppies, "3ss", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, IC_I042 ":2", einstein_floppies, "525qd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, IC_I042 ":3", einstein_floppies, "525qd", floppy_image_device::default_floppy_formats);
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("disk_list","einstein")

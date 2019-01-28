@@ -1063,8 +1063,8 @@ MACHINE_CONFIG_START(pcw16_state::pcw16)
 
 	PC_FDC_SUPERIO(config, m_fdc, 48_MHz_XTAL / 2);
 	m_fdc->intrq_wr_callback().set(FUNC(pcw16_state::fdc_interrupt));
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pcw16_floppies, "35hd", pcw16_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pcw16_floppies, "35hd", pcw16_state::floppy_formats)
+	FLOPPY_CONNECTOR(config, "fdc:0", pcw16_floppies, "35hd", pcw16_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", pcw16_floppies, "35hd", pcw16_state::floppy_formats);
 
 	MCFG_SOFTWARE_LIST_ADD("disk_list","pcw16")
 

@@ -742,10 +742,8 @@ MACHINE_CONFIG_START(atom_state::atom)
 	I8271(config, m_fdc, 0);
 	m_fdc->intrq_wr_callback().set(FUNC(atom_state::atom_8271_interrupt_callback));
 	m_fdc->hdl_wr_callback().set(FUNC(atom_state::motor_w));
-	MCFG_FLOPPY_DRIVE_ADD(I8271_TAG ":0", atom_floppies, "525sssd", atom_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD(I8271_TAG ":1", atom_floppies, "525sssd", atom_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, I8271_TAG ":0", atom_floppies, "525sssd", atom_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, I8271_TAG ":1", atom_floppies, "525sssd", atom_state::floppy_formats).enable_sound(true);
 
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(R6522_TAG, via6522_device, write_ca1))

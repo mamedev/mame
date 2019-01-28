@@ -226,8 +226,8 @@ MACHINE_CONFIG_START(compc_state::compc)
 	MCFG_DEVICE_IO_MAP(compc_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 
-	MCFG_PCNOPPI_MOTHERBOARD_ADD("mb", "maincpu")
-	MCFG_DEVICE_REMOVE("mb:pit8253")
+	PCNOPPI_MOTHERBOARD(config, "mb", 0).set_cputag(m_maincpu);
+	config.device_remove("mb:pit8253");
 	fe2010_pit_device &pit(FE2010_PIT(config, "mb:pit8253", 0));
 	pit.set_clk<0>(XTAL(14'318'181)/12.0); /* heartbeat IRQ */
 	pit.out_handler<0>().set("mb:pic8259", FUNC(pic8259_device::ir0_w));

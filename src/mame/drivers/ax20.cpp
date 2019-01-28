@@ -153,7 +153,7 @@ MACHINE_CONFIG_START(ax20_state::ax20)
 	I8272A(config, m_fdc, 8'000'000, true);
 
 	/* Devices */
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ax20_floppies, "525dd", isa8_fdc_device::floppy_formats)
+	FLOPPY_CONNECTOR(config, "fdc:0", ax20_floppies, "525dd", isa8_fdc_device::floppy_formats);
 MACHINE_CONFIG_END
 
 /* ROM definition */

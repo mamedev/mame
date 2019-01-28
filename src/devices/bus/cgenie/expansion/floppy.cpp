@@ -77,10 +77,10 @@ MACHINE_CONFIG_START(cgenie_fdc_device::device_add_mconfig)
 	FD1793(config, m_fdc, 1_MHz_XTAL);
 	m_fdc->intrq_wr_callback().set(FUNC(cgenie_fdc_device::intrq_w));
 
-	MCFG_FLOPPY_DRIVE_ADD("fd1793:0", cgenie_floppies, "ssdd", cgenie_fdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd1793:1", cgenie_floppies, "ssdd", cgenie_fdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd1793:2", cgenie_floppies, nullptr,   cgenie_fdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd1793:3", cgenie_floppies, nullptr,   cgenie_fdc_device::floppy_formats)
+	FLOPPY_CONNECTOR(config, "fd1793:0", cgenie_floppies, "ssdd", cgenie_fdc_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fd1793:1", cgenie_floppies, "ssdd", cgenie_fdc_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fd1793:2", cgenie_floppies, nullptr, cgenie_fdc_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fd1793:3", cgenie_floppies, nullptr, cgenie_fdc_device::floppy_formats);
 
 //  MCFG_SOFTWARE_LIST_ADD("floppy_list", "cgenie_flop")
 

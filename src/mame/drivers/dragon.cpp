@@ -331,14 +331,10 @@ MACHINE_CONFIG_START(dragon_alpha_state::dgnalpha)
 	m_fdc->intrq_wr_callback().set(FUNC(dragon_alpha_state::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(dragon_alpha_state::fdc_drq_w));
 
-	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":0", dragon_alpha_floppies, "dd", dragon_alpha_state::dragon_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":1", dragon_alpha_floppies, "dd", dragon_alpha_state::dragon_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":2", dragon_alpha_floppies, nullptr, dragon_alpha_state::dragon_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":3", dragon_alpha_floppies, nullptr, dragon_alpha_state::dragon_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, WD2797_TAG ":0", dragon_alpha_floppies, "dd", dragon_alpha_state::dragon_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, WD2797_TAG ":1", dragon_alpha_floppies, "dd", dragon_alpha_state::dragon_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, WD2797_TAG ":2", dragon_alpha_floppies, nullptr, dragon_alpha_state::dragon_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, WD2797_TAG ":3", dragon_alpha_floppies, nullptr, dragon_alpha_state::dragon_formats).enable_sound(true);
 
 	// sound hardware
 	ay8912_device &ay8912(AY8912(config, AY8912_TAG, 1000000));

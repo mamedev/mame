@@ -2385,8 +2385,8 @@ MACHINE_CONFIG_START(pc8801_state::pc8801)
 	i8251.txd_handler().set(FUNC(pc8801_state::txdata_callback));
 	i8251.rts_handler().set(FUNC(pc8801_state::rxrdy_w));
 
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", pc88_floppies, "525hd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", pc88_floppies, "525hd", floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, "upd765:0", pc88_floppies, "525hd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765:1", pc88_floppies, "525hd", floppy_image_device::default_floppy_formats);
 	MCFG_SOFTWARE_LIST_ADD("disk_list","pc8801_flop")
 
 	/* video hardware */

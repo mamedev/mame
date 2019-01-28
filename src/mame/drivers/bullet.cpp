@@ -1149,14 +1149,14 @@ MACHINE_CONFIG_START(bullet_state::bullet)
 	MB8877(config, m_fdc, 16_MHz_XTAL / 16);
 	m_fdc->intrq_wr_callback().set(m_dart, FUNC(z80dart_device::dcda_w));
 	m_fdc->drq_wr_callback().set(FUNC(bullet_state::fdc_drq_w));
-	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":0", bullet_525_floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":1", bullet_525_floppies, nullptr,    floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":2", bullet_525_floppies, nullptr,    floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":3", bullet_525_floppies, nullptr,    floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":4", bullet_8_floppies, nullptr,      floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":5", bullet_8_floppies, nullptr,      floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":6", bullet_8_floppies, nullptr,      floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":7", bullet_8_floppies, nullptr,      floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, MB8877_TAG":0", bullet_525_floppies, "525qd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, MB8877_TAG":1", bullet_525_floppies, nullptr,    floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, MB8877_TAG":2", bullet_525_floppies, nullptr,    floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, MB8877_TAG":3", bullet_525_floppies, nullptr,    floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, MB8877_TAG":4", bullet_8_floppies, nullptr,      floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, MB8877_TAG":5", bullet_8_floppies, nullptr,      floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, MB8877_TAG":6", bullet_8_floppies, nullptr,      floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, MB8877_TAG":7", bullet_8_floppies, nullptr,      floppy_image_device::default_floppy_formats);
 
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, bullet_state, write_centronics_busy))
@@ -1230,16 +1230,16 @@ MACHINE_CONFIG_START(bulletf_state::bulletf)
 	MB8877(config, m_fdc, 16_MHz_XTAL / 16);
 	m_fdc->intrq_wr_callback().set(m_dart, FUNC(z80dart_device::rib_w));
 	m_fdc->drq_wr_callback().set(FUNC(bullet_state::fdc_drq_w));
-	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":0", bullet_525_floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":1", bullet_525_floppies, nullptr,    floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":2", bullet_525_floppies, nullptr,    floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":3", bullet_525_floppies, nullptr,    floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":4", bullet_8_floppies, nullptr, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":5", bullet_8_floppies, nullptr, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":6", bullet_8_floppies, nullptr, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":7", bullet_8_floppies, nullptr, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":8", bullet_35_floppies, nullptr, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":9", bullet_35_floppies, nullptr, floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, MB8877_TAG":0", bullet_525_floppies, "525qd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, MB8877_TAG":1", bullet_525_floppies, nullptr,    floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, MB8877_TAG":2", bullet_525_floppies, nullptr,    floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, MB8877_TAG":3", bullet_525_floppies, nullptr,    floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, MB8877_TAG":4", bullet_8_floppies, nullptr, floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, MB8877_TAG":5", bullet_8_floppies, nullptr, floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, MB8877_TAG":6", bullet_8_floppies, nullptr, floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, MB8877_TAG":7", bullet_8_floppies, nullptr, floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, MB8877_TAG":8", bullet_35_floppies, nullptr, floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, MB8877_TAG":9", bullet_35_floppies, nullptr, floppy_image_device::default_floppy_formats);
 
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, bullet_state, write_centronics_busy))

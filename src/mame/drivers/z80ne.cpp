@@ -566,10 +566,10 @@ MACHINE_CONFIG_START(z80netf_state::z80netf)
 	// other lines not connected
 
 	FD1771(config, m_wd1771, 2_MHz_XTAL / 2);
-	MCFG_FLOPPY_DRIVE_ADD("wd1771:0", z80ne_floppies, "sssd", z80ne_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("wd1771:1", z80ne_floppies, "sssd", z80ne_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("wd1771:2", z80ne_floppies, nullptr,   z80ne_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("wd1771:3", z80ne_floppies, nullptr,   z80ne_state::floppy_formats)
+	FLOPPY_CONNECTOR(config, "wd1771:0", z80ne_floppies, "sssd", z80ne_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "wd1771:1", z80ne_floppies, "sssd", z80ne_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "wd1771:2", z80ne_floppies, nullptr,   z80ne_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "wd1771:3", z80ne_floppies, nullptr,   z80ne_state::floppy_formats);
 
 	config.set_default_layout(layout_z80netf);
 

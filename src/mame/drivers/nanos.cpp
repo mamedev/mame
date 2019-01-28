@@ -517,7 +517,7 @@ MACHINE_CONFIG_START(nanos_state::nanos)
 
 	/* UPD765 */
 	UPD765A(config, m_fdc, 8'000'000, false, true);
-	MCFG_FLOPPY_DRIVE_ADD(m_floppy, nanos_floppies, "525hd", nanos_state::floppy_formats)
+	FLOPPY_CONNECTOR(config, m_floppy, nanos_floppies, "525hd", nanos_state::floppy_formats);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K");

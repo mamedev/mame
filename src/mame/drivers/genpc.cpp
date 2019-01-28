@@ -61,7 +61,7 @@ MACHINE_CONFIG_START(genpc_state::pcmda)
 	MCFG_DEVICE_IO_MAP(pc8_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 
-	MCFG_IBM5160_MOTHERBOARD_ADD("mb","maincpu")
+	IBM5160_MOTHERBOARD(config, "mb", 0).set_cputag(m_maincpu);
 
 	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "mda", false) // FIXME: determine ISA bus clock
 	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "com", false)
@@ -90,8 +90,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(genpc_state::pccga)
 	pcmda(config);
-	MCFG_DEVICE_MODIFY("mb")
-	MCFG_DEVICE_INPUT_DEFAULTS(cga)
+	subdevice<ibm5160_mb_device>("mb")->set_input_default(DEVICE_INPUT_DEFAULTS_NAME(cga));
 	MCFG_DEVICE_MODIFY("isa1")
 	MCFG_DEVICE_SLOT_INTERFACE(pc_isa8_cards, "cga", false)
 MACHINE_CONFIG_END
@@ -101,8 +100,7 @@ MACHINE_CONFIG_START(genpc_state::pcega)
 	pccga(config);
 	MCFG_DEVICE_MODIFY("isa1")
 	MCFG_DEVICE_SLOT_INTERFACE(pc_isa8_cards, "ega", false)
-	MCFG_DEVICE_MODIFY("mb")
-	MCFG_DEVICE_INPUT_DEFAULTS(vga)
+	subdevice<ibm5160_mb_device>("mb")->set_input_default(DEVICE_INPUT_DEFAULTS_NAME(vga));
 MACHINE_CONFIG_END
 
 

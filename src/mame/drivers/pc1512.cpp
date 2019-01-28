@@ -1213,8 +1213,8 @@ MACHINE_CONFIG_START(pc1512_state::pc1512)
 	PC_FDC_XT(config, m_fdc, 0);
 	m_fdc->intrq_wr_callback().set(FUNC(pc1512_state::fdc_int_w));
 	m_fdc->drq_wr_callback().set(FUNC(pc1512_state::fdc_drq_w));
-	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":0", pc1512_floppies, "525dd", pc1512_base_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":1", pc1512_floppies, nullptr,    pc1512_base_state::floppy_formats)
+	FLOPPY_CONNECTOR(config, PC_FDC_XT_TAG ":0", pc1512_floppies, "525dd", pc1512_base_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, PC_FDC_XT_TAG ":1", pc1512_floppies, nullptr, pc1512_base_state::floppy_formats);
 
 	INS8250(config, m_uart, 1.8432_MHz_XTAL);
 	m_uart->out_tx_callback().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
@@ -1345,8 +1345,8 @@ MACHINE_CONFIG_START(pc1640_state::pc1640)
 	PC_FDC_XT(config, m_fdc, 0);
 	m_fdc->intrq_wr_callback().set(FUNC(pc1512_base_state::fdc_int_w));
 	m_fdc->drq_wr_callback().set(FUNC(pc1512_base_state::fdc_drq_w));
-	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":0", pc1512_floppies, "525dd", pc1512_base_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":1", pc1512_floppies, nullptr,    pc1512_base_state::floppy_formats)
+	FLOPPY_CONNECTOR(config, PC_FDC_XT_TAG ":0", pc1512_floppies, "525dd", pc1512_base_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, PC_FDC_XT_TAG ":1", pc1512_floppies, nullptr, pc1512_base_state::floppy_formats);
 
 	INS8250(config, m_uart, 1.8432_MHz_XTAL);
 	m_uart->out_tx_callback().set(RS232_TAG, FUNC(rs232_port_device::write_txd));

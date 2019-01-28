@@ -595,8 +595,8 @@ MACHINE_CONFIG_START(bw2_state::bw2)
 	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_fdc->drq_wr_callback().set(FUNC(bw2_state::fdc_drq_w));
 
-	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG":0", bw2_floppies, "35dd", bw2_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG":1", bw2_floppies, nullptr,   bw2_state::floppy_formats)
+	FLOPPY_CONNECTOR(config, WD2797_TAG":0", bw2_floppies, "35dd", bw2_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, WD2797_TAG":1", bw2_floppies, nullptr, bw2_state::floppy_formats);
 	MCFG_BW2_EXPANSION_SLOT_ADD(BW2_EXPANSION_SLOT_TAG, 16_MHz_XTAL, bw2_expansion_cards, nullptr)
 
 	// software list

@@ -264,7 +264,7 @@ MACHINE_CONFIG_START(tosh1000_state::tosh1000)
 
 	MCFG_MACHINE_RESET_OVERRIDE(tosh1000_state, tosh1000)
 
-	MCFG_IBM5160_MOTHERBOARD_ADD("mb", "maincpu")
+	IBM5160_MOTHERBOARD(config, "mb", 0).set_cputag(m_maincpu);
 
 	TC8521(config, "rtc", XTAL(32'768));
 

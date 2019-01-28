@@ -4263,7 +4263,7 @@ MACHINE_CONFIG_START(apple2e_state::apple2cp)
 
 	config.device_remove("sl4");
 	config.device_remove("sl6");
-	MCFG_IWM_ADD(IICP_IWM_TAG, a2cp_interface)
+	IWM(config, m_iicpiwm, &a2cp_interface);
 	MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(floppy_interface,15,16)
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADDITIONAL_ADD(apple2cp_floppy35_floppy_interface)
 
@@ -4303,7 +4303,7 @@ MACHINE_CONFIG_START(apple2e_state::laser128)
 	M65C02(config.replace(), m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::laser128_map);
 
-	MCFG_APPLEFDC_ADD(LASER128_UDC_TAG, fdc_interface)
+	APPLEFDC(config, m_laserudc, &fdc_interface);
 	MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(floppy_interface,15,16)
 
 	config.device_remove("sl4");
@@ -4325,7 +4325,7 @@ MACHINE_CONFIG_START(apple2e_state::laser128ex2)
 	M65C02(config.replace(), m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::laser128_map);
 
-	MCFG_APPLEFDC_ADD(LASER128_UDC_TAG, fdc_interface)
+	APPLEFDC(config, m_laserudc, &fdc_interface);
 	MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(floppy_interface,15,16)
 
 	config.device_remove("sl4");

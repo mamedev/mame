@@ -1246,17 +1246,18 @@ MACHINE_CONFIG_START(alphatp_12_state::alphatp2)
 	m_fdc->intrq_wr_callback().set(FUNC(alphatp_12_state::fdcirq_w));
 	m_fdc->drq_wr_callback().set(FUNC(alphatp_12_state::fdcdrq_w));
 	m_fdc->hld_wr_callback().set(FUNC(alphatp_12_state::fdchld_w));
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", alphatp2_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", alphatp2_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, "fdc:0", alphatp2_floppies, "525ssdd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", alphatp2_floppies, "525ssdd", floppy_image_device::default_floppy_formats);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(alphatp_12_state::alphatp2u)
+void alphatp_12_state::alphatp2u(machine_config &config)
+{
 	alphatp2(config);
-	MCFG_DEVICE_REMOVE("fdc:0")
-	MCFG_DEVICE_REMOVE("fdc:1")
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", alphatp2su_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", alphatp2su_floppies, "525dd", floppy_image_device::default_floppy_formats)
-MACHINE_CONFIG_END
+	config.device_remove("fdc:0");
+	config.device_remove("fdc:1");
+	FLOPPY_CONNECTOR(config, "fdc:0", alphatp2su_floppies, "525dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", alphatp2su_floppies, "525dd", floppy_image_device::default_floppy_formats);
+}
 
 
 //**************************************************************************
@@ -1322,8 +1323,8 @@ MACHINE_CONFIG_START(alphatp_34_state::alphatp3)
 	m_fdc->intrq_wr_callback().set(FUNC(alphatp_34_state::fdcirq_w));
 	m_fdc->drq_wr_callback().set(FUNC(alphatp_34_state::fdcdrq_w));
 	m_fdc->hld_wr_callback().set(FUNC(alphatp_34_state::fdchld_w));
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", alphatp3_floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", alphatp3_floppies, "525qd", floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, "fdc:0", alphatp3_floppies, "525qd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", alphatp3_floppies, "525qd", floppy_image_device::default_floppy_formats);
 MACHINE_CONFIG_END
 
 void alphatp_34_state::alphatp30(machine_config &config)

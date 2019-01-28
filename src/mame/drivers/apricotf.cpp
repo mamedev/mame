@@ -386,8 +386,8 @@ MACHINE_CONFIG_START(f1_state::act_f1)
 	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	m_fdc->drq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_TEST);
 
-	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":0", apricotf_floppies, "d32w", f1_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":1", apricotf_floppies, "d32w", f1_state::floppy_formats)
+	FLOPPY_CONNECTOR(config, WD2797_TAG ":0", apricotf_floppies, "d32w", f1_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, WD2797_TAG ":1", apricotf_floppies, "d32w", f1_state::floppy_formats);
 MACHINE_CONFIG_END
 
 

@@ -374,8 +374,7 @@ MACHINE_CONFIG_START(tavernie_state::ivg09)
 	m_pia_ivg->cb2_handler().set("beeper", FUNC(beep_device::set_state));
 
 	FD1795(config, m_fdc, 8_MHz_XTAL / 8);
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ifd09_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, "fdc:0", ifd09_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
 MACHINE_CONFIG_END
 
 /* ROM definition */

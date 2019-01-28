@@ -680,8 +680,8 @@ MACHINE_CONFIG_START(thomson_state::to7_base)
 	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(*this, thomson_state, fdc_index_3_w))
 
 	WD2793(config, m_wd2793_fdc, 16_MHz_XTAL / 16);
-	MCFG_FLOPPY_DRIVE_ADD("wd2793:0", cd90_640_floppies, "dd", thomson_state::cd90_640_formats)
-	MCFG_FLOPPY_DRIVE_ADD("wd2793:1", cd90_640_floppies, "dd", thomson_state::cd90_640_formats)
+	FLOPPY_CONNECTOR(config, "wd2793:0", cd90_640_floppies, "dd", thomson_state::cd90_640_formats);
+	FLOPPY_CONNECTOR(config, "wd2793:1", cd90_640_floppies, "dd", thomson_state::cd90_640_formats);
 
 
 /* network */

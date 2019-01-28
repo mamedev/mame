@@ -416,10 +416,8 @@ MACHINE_CONFIG_START(duet16_state::duet16)
 	UPD765A(config, m_fdc, 8_MHz_XTAL, true, false);
 	m_fdc->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq0_w));
 	m_fdc->intrq_wr_callback().set(m_pic, FUNC(pic8259_device::ir3_w)); // INT4
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", duet16_floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_SLOT_FIXED(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", duet16_floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_SLOT_FIXED(true)
+	FLOPPY_CONNECTOR(config, "fdc:0", duet16_floppies, "525qd", floppy_image_device::default_floppy_formats, true);
+	FLOPPY_CONNECTOR(config, "fdc:1", duet16_floppies, "525qd", floppy_image_device::default_floppy_formats, true);
 
 	h46505_device &crtc(H46505(config, "crtc", 2000000));
 	crtc.set_char_width(8);

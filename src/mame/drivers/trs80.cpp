@@ -539,14 +539,10 @@ MACHINE_CONFIG_START(trs80_state::model1)      // model I, level II
 	FD1793(config, m_fdc, 4_MHz_XTAL / 4); // todo: should be fd1771
 	m_fdc->intrq_wr_callback().set(FUNC(trs80_state::intrq_w));
 
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", trs80_floppies, "sssd", trs80_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", trs80_floppies, "sssd", trs80_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:2", trs80_floppies, "", trs80_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:3", trs80_floppies, "", trs80_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, "fdc:0", trs80_floppies, "sssd", trs80_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", trs80_floppies, "sssd", trs80_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:2", trs80_floppies, "", trs80_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:3", trs80_floppies, "", trs80_state::floppy_formats).enable_sound(true);
 
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit7))

@@ -122,8 +122,8 @@ MACHINE_CONFIG_START(asst128_state::asst128)
 
 	PC_FDC_XT(config, m_fdc, 0);
 	m_fdc->intrq_wr_callback().set("mb:pic8259", FUNC(pic8259_device::ir6_w));
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", asst128_floppies, "525ssqd", asst128_state::asst128_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", asst128_floppies, "525ssqd", asst128_state::asst128_formats)
+	FLOPPY_CONNECTOR(config, "fdc:0", asst128_floppies, "525ssqd", asst128_state::asst128_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", asst128_floppies, "525ssqd", asst128_state::asst128_formats);
 
 	PC_JOY(config, "pc_joy");
 

@@ -222,10 +222,8 @@ MACHINE_CONFIG_START(dps1_state::dps1)
 	UPD765A(config, m_fdc, 16_MHz_XTAL / 2, false, true);
 	//m_fdc->intrq_wr_callback().set(FUNC(dps1_state::fdc_int_w)); // doesn't appear to be used
 	m_fdc->drq_wr_callback().set(FUNC(dps1_state::fdc_drq_w));
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", floppies, "floppy0", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	//MCFG_FLOPPY_DRIVE_ADD("fdc:1", floppies, "floppy1", floppy_image_device::default_floppy_formats)
-	//MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, "fdc:0", floppies, "floppy0", floppy_image_device::default_floppy_formats).enable_sound(true);
+	//FLOPPY_CONNECTOR(config, "fdc:1", floppies, "floppy1", floppy_image_device::default_floppy_formats).enable_sound(true);
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "dps1")

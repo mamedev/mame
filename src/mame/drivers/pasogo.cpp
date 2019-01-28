@@ -554,7 +554,7 @@ MACHINE_CONFIG_START(pasogo_state::pasogo)
 
 	ADDRESS_MAP_BANK(config, "ems").set_map(&pasogo_state::emsbank_map).set_options(ENDIANNESS_LITTLE, 16, 32, 0x4000);
 
-	MCFG_IBM5160_MOTHERBOARD_ADD("mb", "maincpu")
+	IBM5160_MOTHERBOARD(config, "mb", 0).set_cputag(m_maincpu);
 
 	RAM(config, RAM_TAG).set_default_size("512K");
 

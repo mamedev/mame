@@ -749,8 +749,8 @@ MACHINE_CONFIG_START(tiki100_state::tiki100)
 	TIMER(config, "ctc").configure_periodic(FUNC(tiki100_state::ctc_tick), attotime::from_hz(8_MHz_XTAL / 4));
 
 	FD1797(config, m_fdc, 8_MHz_XTAL / 8); // FD1767PL-02 or FD1797-PL
-	MCFG_FLOPPY_DRIVE_ADD(FD1797_TAG":0", tiki100_floppies, "525qd", tiki100_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FD1797_TAG":1", tiki100_floppies, "525qd", tiki100_state::floppy_formats)
+	FLOPPY_CONNECTOR(config, FD1797_TAG":0", tiki100_floppies, "525qd", tiki100_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, FD1797_TAG":1", tiki100_floppies, "525qd", tiki100_state::floppy_formats);
 
 	rs232_port_device &rs232a(RS232_PORT(config, RS232_A_TAG, default_rs232_devices, nullptr));
 	rs232a.rxd_handler().set(m_dart, FUNC(z80dart_device::rxa_w));

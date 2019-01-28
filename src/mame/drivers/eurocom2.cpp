@@ -475,10 +475,8 @@ MACHINE_CONFIG_START(eurocom2_state::eurocom2)
 
 	FD1793(config, m_fdc, 2_MHz_XTAL / 2);
 //  m_fdc->intrq_wr_callback().set_inputline(m_maincpu, M6809_IRQ_LINE);
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", eurocom_floppies, "525qd", eurocom2_state::floppy_formats)
-//  MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", eurocom_floppies, "525qd", eurocom2_state::floppy_formats)
-//  MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, "fdc:0", eurocom_floppies, "525qd", eurocom2_state::floppy_formats);// enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", eurocom_floppies, "525qd", eurocom2_state::floppy_formats);// enable_sound(true);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(waveterm_state::waveterm)

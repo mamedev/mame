@@ -1058,7 +1058,7 @@ MACHINE_CONFIG_START(next_state::next_fdc_base)
 	N82077AA(config, fdc, n82077aa_device::MODE_PS2);
 	fdc->intrq_wr_callback().set(FUNC(next_state::fdc_irq));
 	fdc->drq_wr_callback().set(FUNC(next_state::fdc_drq));
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", next_floppies, "35ed", next_state::floppy_formats)
+	FLOPPY_CONNECTOR(config, "fdc:0", next_floppies, "35ed", next_state::floppy_formats);
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "next")

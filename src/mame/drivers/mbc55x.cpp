@@ -300,10 +300,10 @@ MACHINE_CONFIG_START(mbc55x_state::mbc55x)
 	FD1793(config, m_fdc, 14.318181_MHz_XTAL / 14); // M5W1793-02P (clock is nominally 1 MHz)
 	m_fdc->intrq_wr_callback().set(m_pic, FUNC(pic8259_device::ir5_w));
 
-	MCFG_FLOPPY_DRIVE_ADD(m_floppy[0], mbc55x_floppies, "qd", mbc55x_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(m_floppy[1], mbc55x_floppies, "qd", mbc55x_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(m_floppy[2], mbc55x_floppies, "", mbc55x_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(m_floppy[3], mbc55x_floppies, "", mbc55x_state::floppy_formats)
+	FLOPPY_CONNECTOR(config, m_floppy[0], mbc55x_floppies, "qd", mbc55x_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[1], mbc55x_floppies, "qd", mbc55x_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[2], mbc55x_floppies, "", mbc55x_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[3], mbc55x_floppies, "", mbc55x_state::floppy_formats);
 
 	/* Software list */
 	MCFG_SOFTWARE_LIST_ADD("disk_list","mbc55x")

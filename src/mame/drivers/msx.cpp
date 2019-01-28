@@ -1320,18 +1320,21 @@ void msx_state::msx_microsol(machine_config &config)
 	fdc.set_force_ready(true);
 }
 
-MACHINE_CONFIG_START(msx_state::msx_1_35_ssdd_drive)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", msx_floppies, "35ssdd", msx_state::floppy_formats)
-MACHINE_CONFIG_END
+void msx_state::msx_1_35_ssdd_drive(machine_config &config)
+{
+	FLOPPY_CONNECTOR(config, "fdc:0", msx_floppies, "35ssdd", msx_state::floppy_formats);
+}
 
-MACHINE_CONFIG_START(msx_state::msx_1_35_dd_drive)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", msx_floppies, "35dd", msx_state::floppy_formats)
-MACHINE_CONFIG_END
+void msx_state::msx_1_35_dd_drive(machine_config &config)
+{
+	FLOPPY_CONNECTOR(config, "fdc:0", msx_floppies, "35dd", msx_state::floppy_formats);
+}
 
-MACHINE_CONFIG_START(msx_state::msx_2_35_dd_drive)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", msx_floppies, "35dd", msx_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", msx_floppies, "35dd", msx_state::floppy_formats)
-MACHINE_CONFIG_END
+void msx_state::msx_2_35_dd_drive(machine_config &config)
+{
+	FLOPPY_CONNECTOR(config, "fdc:0", msx_floppies, "35dd", msx_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", msx_floppies, "35dd", msx_state::floppy_formats);
+}
 
 MACHINE_CONFIG_START(msx2_state::msx_ym2413)
 	MCFG_DEVICE_ADD("ym2413", YM2413, 21.477272_MHz_XTAL / 6)
