@@ -34,6 +34,11 @@
 
     Information and programs can be found at http://chip8.com/?page=78
 
+    2019-01-29: Noticed that when you try to enter the 4-digit address, it
+    runs into the weeds when the 2nd digit is pressed. Unable to locate a
+    version where it ever worked, even though the above text insinuates that
+    it once did. Marked as MNW until the problem can be resolved. The rest of
+    the machine appears to work fine.  (Robbbert)
 
 **********************************************************************************/
 
@@ -441,4 +446,4 @@ ROM_START( d6800 )
 ROM_END
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY          FULLNAME      FLAGS
-COMP( 1979, d6800, 0,      0,      d6800,   d6800, d6800_state, empty_init, "Michael Bauer", "Dream 6800", 0 )
+COMP( 1979, d6800, 0,      0,      d6800,   d6800, d6800_state, empty_init, "Michael Bauer", "Dream 6800", MACHINE_NOT_WORKING )
