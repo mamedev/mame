@@ -7,6 +7,10 @@
     It is possible this shares some video features with spg110 and
     can be made a derived device
 
+    0032xx looks like it could be the same as 003d00 on spg2xx
+	but the video seems quite different?
+
+
 **********************************************************************/
 
 #include "emu.h"
@@ -16,8 +20,99 @@ DEFINE_DEVICE_TYPE(SPG110, spg110_device, "spg110", "SPG110 System-on-a-Chip")
 
 spg110_device::spg110_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock),
-	m_cpu(*this, finder_base::DUMMY_TAG)
+	device_memory_interface(mconfig, *this),
+	m_space_config("spg110", ENDIANNESS_BIG, 16, 32, 0, address_map_constructor(FUNC(spg110_device::map_video), this)),
+	m_cpu(*this, finder_base::DUMMY_TAG),
+	m_palette(*this, "palette"),
+	m_gfxdecode(*this, "gfxdecode"),
+	m_bg_videoram(*this, "bg_videoram"),
+	m_fg_videoram(*this, "fg_videoram"),
+	m_bg_attrram(*this, "bg_attrram"),
+	m_fg_attrram(*this, "fg_attrram")
 {
+}
+
+WRITE16_MEMBER(spg110_device::bg_videoram_w)
+{
+	COMBINE_DATA(&m_bg_videoram[offset]);
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+WRITE16_MEMBER(spg110_device::fg_videoram_w)
+{
+	COMBINE_DATA(&m_fg_videoram[offset]);
+	m_fg_tilemap->mark_tile_dirty(offset);
+}
+
+WRITE16_MEMBER(spg110_device::bg_attrram_w)
+{
+	COMBINE_DATA(&m_bg_attrram[offset]);
+	m_bg_tilemap->mark_tile_dirty(offset/2);
+}
+
+WRITE16_MEMBER(spg110_device::fg_attrram_w)
+{
+	COMBINE_DATA(&m_fg_attrram[offset]);
+	m_fg_tilemap->mark_tile_dirty(offset/2);
+}
+
+
+/* correct, 4bpp gfxs */
+static const gfx_layout charlayout =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	4,
+	{ STEP4(0,1) },
+	{ 0*4,1*4,2*4,3*4,4*4,5*4,6*4,7*4 },
+	{ STEP8(0,4*8) },
+	8*8*4
+};
+
+static const gfx_layout char16layout =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	4,
+	{ STEP4(0,1) },
+	{ 0*4,1*4,2*4,3*4,4*4,5*4,6*4,7*4, 8*4,9*4,10*4,11*4,12*4,13*4,14*4,15*4 },
+	{ STEP16(0,4*16) },
+	16*16*4
+};
+
+static const gfx_layout char32layout =
+{
+	32,32,
+	RGN_FRAC(1,1),
+	4,
+	{ STEP4(0,1) },
+	{ STEP32(0,4) },
+	{ STEP32(0,4*32) },
+	32*32*4
+};
+
+
+
+static GFXDECODE_START( gfx )
+	GFXDECODE_ENTRY( ":maincpu", 0, charlayout, 0, 16 )
+	GFXDECODE_ENTRY( ":maincpu", 0, char16layout, 0, 16 )
+	GFXDECODE_ENTRY( ":maincpu", 0, char32layout, 0, 16 )
+GFXDECODE_END
+
+
+
+MACHINE_CONFIG_START(spg110_device::device_add_mconfig)
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x100);
+
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx);
+MACHINE_CONFIG_END
+
+
+device_memory_interface::space_config_vector spg110_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(0, &m_space_config)
+	};
 }
 
 spg110_device::spg110_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -120,8 +215,27 @@ WRITE16_MEMBER(spg110_device::spg110_2066_w) { COMBINE_DATA(&m_2066_inner); }
 
 WRITE16_MEMBER(spg110_device::spg110_2062_w)
 {
+	int length = (data-1) & 0xff;
+
 	// this is presumably a counter that underflows to 0x1fff, because that's what the wait loop waits for?
-	logerror("%s: trigger (%04x) with values (written outer) %04x %04x %04x %04x | (written inner) %04x %04x\n", machine().describe_context(), data, m_2061_outer, m_2064_outer, m_2067_outer, m_2068_outer, m_2060_inner, m_2066_inner);
+	logerror("%s: trigger (%04x) with values (written outer) %04x %04x %04x %04x | (written inner) %04x (ram source?) %04x\n", machine().describe_context(), data, m_2061_outer, m_2064_outer, m_2067_outer, m_2068_outer, m_2060_inner, m_2066_inner);
+
+	int source = m_2066_inner;
+	int dest = m_2060_inner;
+	//logerror("[ ");
+	for (int i = 0; i <= length; i++)
+	{
+		address_space &mem = m_cpu->space(AS_PROGRAM);
+		uint16_t val = mem.read_word(m_2066_inner + i);
+
+		this->space(0).write_word(dest*2, val, 0xffff);
+
+		source++;
+		dest++;
+
+	//	logerror("%04x, ", val);
+	}
+//	logerror(" ]\n");
 }
 
 READ16_MEMBER(spg110_device::spg110_2062_r)
@@ -204,7 +318,7 @@ void spg110_device::map(address_map &map)
 
 	map(0x002045, 0x002045).w(FUNC(spg110_device::spg110_2045_w));
 
-	// sound?
+	// seems to be 16 entries for.. something?
 	map(0x002050, 0x002050).w(FUNC(spg110_device::spg110_2050_w));
 	map(0x002051, 0x002051).w(FUNC(spg110_device::spg110_2051_w));
 	map(0x002052, 0x002052).w(FUNC(spg110_device::spg110_2052_w));
@@ -232,9 +346,9 @@ void spg110_device::map(address_map &map)
 	map(0x002067, 0x002067).w(FUNC(spg110_device::spg110_2067_w));
 	map(0x002068, 0x002068).w(FUNC(spg110_device::spg110_2068_w));
 
-	map(0x002200, 0x0022ff).ram(); // looks like per-pen brightness? or should be palette but missing data
+	map(0x002200, 0x0022ff).ram(); // looks like per-pen brightness or similar? strange because palette isn't memory mapped here
 	
-	map(0x003000, 0x00307f).ram(); // sprites? or maybe sound registers, seems to be 8 long entries, only uses up to 0x7f?
+	map(0x003000, 0x00307f).ram(); // sound registers? seems to be 8 long entries, only uses up to 0x7f?
 	map(0x003080, 0x0030ff).ram(); 
 
 	map(0x003100, 0x003100).w(FUNC(spg110_device::spg110_3100_w));
@@ -275,15 +389,46 @@ void spg110_device::map(address_map &map)
 	map(0x00322f, 0x00322f).rw(FUNC(spg110_device::datasegment_r),FUNC(spg110_device::datasegment_w));
 }
 
+// this seems to be a different, non-cpu mapped space only accessible via the DMA?
+void spg110_device::map_video(address_map &map)
+{
+	// are these addresses hardcoded, or can they move (in which case tilemap system isn't really suitable)
+	map(0x00000, 0x00fff).ram().w(FUNC(spg110_device::bg_videoram_w)).share("bg_videoram");
+	map(0x01000, 0x017ff).ram().w(FUNC(spg110_device::bg_attrram_w)).share("bg_attrram");
+	map(0x01800, 0x027ff).ram().w(FUNC(spg110_device::fg_videoram_w)).share("fg_videoram");
+	map(0x02800, 0x02fff).ram().w(FUNC(spg110_device::fg_attrram_w)).share("fg_attrram");
+
+	map(0x04000, 0x04fff).ram(); // seems to be 3 blocks
+
+	map(0x08000, 0x081ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // probably? format unknown tho
+}
+
+
 /*
 TIMER_CALLBACK_MEMBER(spg110_device::test_timer)
 {
     //
 }
 */
+
+TILE_GET_INFO_MEMBER(spg110_device::get_bg_tile_info)
+{
+	int tileno = m_bg_videoram[tile_index] *2;
+	SET_TILE_INFO_MEMBER(0, tileno, 0, 0);
+}
+
+TILE_GET_INFO_MEMBER(spg110_device::get_fg_tile_info)
+{
+	int tileno = m_fg_videoram[tile_index] + 0x7b60;
+	SET_TILE_INFO_MEMBER(0, tileno, 0, 0);
+}
+
 void spg110_device::device_start()
 {
 //  m_test_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spg110_device::test_timer), this));
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(spg110_device::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(spg110_device::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_fg_tilemap->set_transparent_pen(0);
 }
 
 void spg110_device::device_reset()
@@ -293,6 +438,8 @@ void spg110_device::device_reset()
 
 uint32_t spg110_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 

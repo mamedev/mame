@@ -8,8 +8,11 @@
 
 //#include "spg2xx.h"
 #include "cpu/unsp/unsp.h"
+#include "emupal.h"
 
-class spg110_device : public device_t
+
+class spg110_device : public device_t, public device_memory_interface
+
 {
 public:
 	spg110_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -23,6 +26,7 @@ public:
 	}
 
 	void map(address_map &map);
+	void map_video(address_map &map);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank);
@@ -31,10 +35,35 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	virtual void device_add_mconfig(machine_config &config) override;
+
+	virtual space_config_vector memory_space_config() const override;
+
+	address_space_config        m_space_config;
+
 private:
 	required_device<unsp_device> m_cpu;
+	required_device<palette_device> m_palette;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_shared_ptr<uint16_t> m_bg_videoram;
+	required_shared_ptr<uint16_t> m_fg_videoram;
+	required_shared_ptr<uint16_t> m_bg_attrram;
+	required_shared_ptr<uint16_t> m_fg_attrram;
+
+	tilemap_t    *m_bg_tilemap;
+	tilemap_t    *m_fg_tilemap;
+
 	//TIMER_CALLBACK_MEMBER(test_timer);
 	//emu_timer *m_test_timer;
+
+	DECLARE_WRITE16_MEMBER(bg_videoram_w);
+	DECLARE_WRITE16_MEMBER(bg_attrram_w);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+
+	DECLARE_WRITE16_MEMBER(fg_videoram_w);
+	DECLARE_WRITE16_MEMBER(fg_attrram_w);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+
 
 	DECLARE_READ16_MEMBER(spg110_2013_r);
 	DECLARE_READ16_MEMBER(spg110_2019_r);
