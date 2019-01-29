@@ -146,6 +146,14 @@ private:
 
 	DECLARE_READ16_MEMBER(spg110_310f_r);
 
+
+	uint16_t m_2068_outer;
+	uint16_t m_2064_outer;
+	uint16_t m_2061_outer;
+	uint16_t m_2067_outer;
+
+	uint16_t m_2060_inner;
+	uint16_t m_2066_inner;
 };
 
 DECLARE_DEVICE_TYPE(SPG110, spg110_device)

@@ -25,11 +25,6 @@ spg110_device::spg110_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-READ16_MEMBER(spg110_device::spg110_2062_r)
-{
-	return 0x1fff; // DMA related?
-}
-
 // irq source or similar?
 READ16_MEMBER(spg110_device::spg110_2063_r)
 {
@@ -114,13 +109,26 @@ WRITE16_MEMBER(spg110_device::spg110_205d_w) { }
 WRITE16_MEMBER(spg110_device::spg110_205e_w) { }
 WRITE16_MEMBER(spg110_device::spg110_205f_w) { }
 
-WRITE16_MEMBER(spg110_device::spg110_2060_w) { }
-WRITE16_MEMBER(spg110_device::spg110_2061_w) { }
-WRITE16_MEMBER(spg110_device::spg110_2062_w) { }
-WRITE16_MEMBER(spg110_device::spg110_2064_w) { }
-WRITE16_MEMBER(spg110_device::spg110_2066_w) { }
-WRITE16_MEMBER(spg110_device::spg110_2067_w) { }
-WRITE16_MEMBER(spg110_device::spg110_2068_w) { }
+WRITE16_MEMBER(spg110_device::spg110_2061_w) { COMBINE_DATA(&m_2061_outer); }
+WRITE16_MEMBER(spg110_device::spg110_2064_w) { COMBINE_DATA(&m_2064_outer); }
+WRITE16_MEMBER(spg110_device::spg110_2067_w) { COMBINE_DATA(&m_2067_outer); }
+WRITE16_MEMBER(spg110_device::spg110_2068_w) { COMBINE_DATA(&m_2068_outer); }
+
+WRITE16_MEMBER(spg110_device::spg110_2060_w) { COMBINE_DATA(&m_2060_inner); }
+WRITE16_MEMBER(spg110_device::spg110_2066_w) { COMBINE_DATA(&m_2066_inner); }
+
+
+WRITE16_MEMBER(spg110_device::spg110_2062_w)
+{
+	// this is presumably a counter that underflows to 0x1fff, because that's what the wait loop waits for?
+	logerror("%s: trigger (%04x) with values (written outer) %04x %04x %04x %04x | (written inner) %04x %04x\n", machine().describe_context(), data, m_2061_outer, m_2064_outer, m_2067_outer, m_2068_outer, m_2060_inner, m_2066_inner);
+}
+
+READ16_MEMBER(spg110_device::spg110_2062_r)
+{
+	return 0x1fff; // DMA related?
+}
+
 
 READ16_MEMBER(spg110_device::spg110_2013_r) { return 0x0000; }
 READ16_MEMBER(spg110_device::spg110_2019_r) { return 0x0000; }
@@ -214,11 +222,11 @@ void spg110_device::map(address_map &map)
 	map(0x00205e, 0x00205e).w(FUNC(spg110_device::spg110_205e_w));
 	map(0x00205f, 0x00205f).w(FUNC(spg110_device::spg110_205f_w));
 
-	// dma?
+	// everything (dma? and interrupt flag?!)
 	map(0x002060, 0x002060).w(FUNC(spg110_device::spg110_2060_w));
 	map(0x002061, 0x002061).w(FUNC(spg110_device::spg110_2061_w));
 	map(0x002062, 0x002062).rw(FUNC(spg110_device::spg110_2062_r),FUNC(spg110_device::spg110_2062_w));
-	map(0x002063, 0x002063).rw(FUNC(spg110_device::spg110_2063_r),FUNC(spg110_device::spg110_2063_w));
+	map(0x002063, 0x002063).rw(FUNC(spg110_device::spg110_2063_r),FUNC(spg110_device::spg110_2063_w)); // this looks like interrupt stuff and is checked in the irq like an irq source, but why in the middle of what otherwise look like some kind of DMA?
 	map(0x002064, 0x002064).w(FUNC(spg110_device::spg110_2064_w));
 	map(0x002066, 0x002066).w(FUNC(spg110_device::spg110_2066_w));
 	map(0x002067, 0x002067).w(FUNC(spg110_device::spg110_2067_w));
@@ -226,8 +234,9 @@ void spg110_device::map(address_map &map)
 
 	map(0x002200, 0x0022ff).ram(); // looks like per-pen brightness? or should be palette but missing data
 	
-	map(0x003000, 0x0030ff).ram(); // sprites?
-	
+	map(0x003000, 0x00307f).ram(); // sprites? or maybe sound registers, seems to be 8 long entries, only uses up to 0x7f?
+	map(0x003080, 0x0030ff).ram(); 
+
 	map(0x003100, 0x003100).w(FUNC(spg110_device::spg110_3100_w));
 	map(0x003101, 0x003101).w(FUNC(spg110_device::spg110_3101_w));
 	map(0x003102, 0x003102).w(FUNC(spg110_device::spg110_3102_w));
