@@ -1377,14 +1377,15 @@ MACHINE_CONFIG_START(msx_state::msx)
 	m_ay8910->add_route(ALL_OUTPUTS, "speaker", 0.3);
 
 	/* printer */
-	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit1))
+	centronics_device &centronics(CENTRONICS(config, "centronics", centronics_devices, "printer"));
+	centronics.busy_handler().set("cent_status_in", FUNC(input_buffer_device::write_bit1));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
-	MCFG_DEVICE_ADD("cent_status_in", INPUT_BUFFER, 0)
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	centronics.set_output_latch(cent_data_out);
+	INPUT_BUFFER(config, "cent_status_in");
 
-	MCFG_DEVICE_ADD("cent_ctrl_out", OUTPUT_LATCH, 0)
-	MCFG_OUTPUT_LATCH_BIT1_HANDLER(WRITELINE("centronics", centronics_device, write_strobe))
+	output_latch_device &cent_ctrl_out(OUTPUT_LATCH(config, "cent_ctrl_out"));
+	cent_ctrl_out.bit_handler<1>().set(centronics, FUNC(centronics_device::write_strobe));
 
 	/* cassette */
 	CASSETTE(config, m_cassette);
@@ -1447,14 +1448,15 @@ MACHINE_CONFIG_START(msx2_state::msx2)
 	m_ay8910->add_route(ALL_OUTPUTS, "speaker", 0.3);
 
 	/* printer */
-	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit1))
+	centronics_device &centronics(CENTRONICS(config, "centronics", centronics_devices, "printer"));
+	centronics.busy_handler().set("cent_status_in", FUNC(input_buffer_device::write_bit1));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
-	MCFG_DEVICE_ADD("cent_status_in", INPUT_BUFFER, 0)
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	centronics.set_output_latch(cent_data_out);
+	INPUT_BUFFER(config, "cent_status_in");
 
-	MCFG_DEVICE_ADD("cent_ctrl_out", OUTPUT_LATCH, 0)
-	MCFG_OUTPUT_LATCH_BIT1_HANDLER(WRITELINE("centronics", centronics_device, write_strobe))
+	output_latch_device &cent_ctrl_out(OUTPUT_LATCH(config, "cent_ctrl_out"));
+	cent_ctrl_out.bit_handler<1>().set(centronics, FUNC(centronics_device::write_strobe));
 
 	/* cassette */
 	CASSETTE(config, m_cassette);
@@ -1508,14 +1510,15 @@ MACHINE_CONFIG_START(msx2_state::msx2p)
 	m_ay8910->add_route(ALL_OUTPUTS, "speaker", 0.3);
 
 	/* printer */
-	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit1))
+	centronics_device &centronics(CENTRONICS(config, "centronics", centronics_devices, "printer"));
+	centronics.busy_handler().set("cent_status_in", FUNC(input_buffer_device::write_bit1));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
-	MCFG_DEVICE_ADD("cent_status_in", INPUT_BUFFER, 0)
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	centronics.set_output_latch(cent_data_out);
+	INPUT_BUFFER(config, "cent_status_in");
 
-	MCFG_DEVICE_ADD("cent_ctrl_out", OUTPUT_LATCH, 0)
-	MCFG_OUTPUT_LATCH_BIT1_HANDLER(WRITELINE("centronics", centronics_device, write_strobe))
+	output_latch_device &cent_ctrl_out(OUTPUT_LATCH(config, "cent_ctrl_out"));
+	cent_ctrl_out.bit_handler<1>().set(centronics, FUNC(centronics_device::write_strobe));
 
 	/* cassette */
 	CASSETTE(config, m_cassette);

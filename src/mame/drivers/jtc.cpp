@@ -827,8 +827,8 @@ MACHINE_CONFIG_START(jtc_state::basic)
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* printer */
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, jtc_state, write_centronics_busy))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(jtc_state::write_centronics_busy));
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", jtc_state, jtc, "jtc,bin", 2)

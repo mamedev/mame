@@ -1515,11 +1515,12 @@ MACHINE_CONFIG_START(px4_state::px4)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
 
 	// centronics printer
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, px4_state, centronics_busy_w))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, px4_state, centronics_perror_w))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(px4_state::centronics_busy_w));
+	m_centronics->perror_handler().set(FUNC(px4_state::centronics_perror_w));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	output_latch_device &latch(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(latch);
 
 	// external cassette
 	CASSETTE(config, m_ext_cas);

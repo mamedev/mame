@@ -654,9 +654,10 @@ MACHINE_CONFIG_START(sf7000_state::sf7000)
 	UPD765A(config, m_fdc, 8'000'000, false, false);
 	FLOPPY_CONNECTOR(config, UPD765_TAG ":0", sf7000_floppies, "3ssdd", sf7000_state::floppy_formats);
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
 
 	/* sf7000 (sc3000) has all sk1100 features built-in, so add it as a fixed slot */
 	MCFG_SG1000_EXPANSION_ADD(EXPSLOT_TAG, sg1000_expansion_devices, "sk1100", true)

@@ -950,8 +950,8 @@ MACHINE_CONFIG_START(amstrad_state::amstrad_base)
 	m_ay->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* printer */
-	MCFG_DEVICE_ADD("centronics", CENTRONICS, amstrad_centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, amstrad_state, write_centronics_busy))
+	CENTRONICS(config, m_centronics, amstrad_centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(amstrad_state::write_centronics_busy));
 
 	/* snapshot */
 	MCFG_SNAPSHOT_ADD("snapshot", amstrad_state, amstrad, "sna", 0)
@@ -1071,8 +1071,8 @@ MACHINE_CONFIG_START(amstrad_state::cpcplus)
 	m_ay->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* printer */
-	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, amstrad_state, write_centronics_busy))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(amstrad_state::write_centronics_busy));
 
 	/* snapshot */
 	MCFG_SNAPSHOT_ADD("snapshot", amstrad_state, amstrad, "sna", 0)

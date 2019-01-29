@@ -522,7 +522,8 @@ MACHINE_CONFIG_START(aussiebyte_state::aussiebyte)
 	m_centronics->set_data_input_buffer("cent_data_in");
 	m_centronics->busy_handler().set(FUNC(aussiebyte_state::write_centronics_busy));
 	INPUT_BUFFER(config, "cent_data_in");
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
 
 	Z80CTC(config, m_ctc, 16_MHz_XTAL / 4);
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);

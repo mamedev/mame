@@ -745,11 +745,12 @@ MACHINE_CONFIG_START(atom_state::atom)
 	FLOPPY_CONNECTOR(config, I8271_TAG ":0", atom_floppies, "525sssd", atom_state::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, I8271_TAG ":1", atom_floppies, "525sssd", atom_state::floppy_formats).enable_sound(true);
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(R6522_TAG, via6522_device, write_ca1))
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(R6522_TAG, via6522_device, write_pa7))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->ack_handler().set(R6522_TAG, FUNC(via6522_device::write_ca1));
+	m_centronics->busy_handler().set(R6522_TAG, FUNC(via6522_device::write_pa7));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(atom_cassette_formats);
@@ -814,10 +815,11 @@ MACHINE_CONFIG_END
     MACHINE_DRIVER( atombb )
 -------------------------------------------------*/
 
-MACHINE_CONFIG_START(atom_state::atombb)
+void atom_state::atombb(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(SY6502_TAG, M6502, X2/4)
-	MCFG_DEVICE_PROGRAM_MAP(atombb_mem)
+	M6502(config, m_maincpu, X2/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &atom_state::atombb_mem);
 
 	/* video hardware */
 	SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER);
@@ -828,8 +830,7 @@ MACHINE_CONFIG_START(atom_state::atombb)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* devices */
 	TIMER(config, "hz2400").configure_periodic(FUNC(atom_state::cassette_output_tick), attotime::from_hz(4806));
@@ -845,11 +846,12 @@ MACHINE_CONFIG_START(atom_state::atombb)
 	ppi.in_pc_callback().set(FUNC(atom_state::ppi_pc_r));
 	ppi.out_pc_callback().set(FUNC(atom_state::ppi_pc_w));
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(R6522_TAG, via6522_device, write_ca1))
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(R6522_TAG, via6522_device, write_pa7))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->ack_handler().set(R6522_TAG, FUNC(via6522_device::write_ca1));
+	m_centronics->busy_handler().set(R6522_TAG, FUNC(via6522_device::write_pa7));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(atom_cassette_formats);
@@ -858,7 +860,7 @@ MACHINE_CONFIG_START(atom_state::atombb)
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("8K,12K");
-MACHINE_CONFIG_END
+}
 
 /*-------------------------------------------------
     MACHINE_DRIVER( prophet2 )

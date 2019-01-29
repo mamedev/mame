@@ -767,12 +767,14 @@ MACHINE_CONFIG_START(trs80m2_state::trs80m2)
 	z80sio0_device& sio(Z80SIO0(config, Z80SIO_TAG, 8_MHz_XTAL / 2));
 	sio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(m_pio, z80pio_device, strobe_b))
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, trs80m2_state, write_centronics_busy))
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, trs80m2_state, write_centronics_fault))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, trs80m2_state, write_centronics_perror))
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->ack_handler().set(m_pio, FUNC(z80pio_device::strobe_b));
+	m_centronics->busy_handler().set(FUNC(trs80m2_state::write_centronics_busy));
+	m_centronics->fault_handler().set(FUNC(trs80m2_state::write_centronics_fault));
+	m_centronics->perror_handler().set(FUNC(trs80m2_state::write_centronics_perror));
+
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
 
 	TRS80M2_KEYBOARD(config, m_kb, 0);
 	m_kb->clock_wr_callback().set(FUNC(trs80m2_state::kb_clock_w));
@@ -859,12 +861,14 @@ MACHINE_CONFIG_START(trs80m16_state::trs80m16)
 	AM9519(config, m_uic, 0);
 	m_uic->out_int_callback().set_inputline(M68000_TAG, M68K_IRQ_5);
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(m_pio, z80pio_device, strobe_b))
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, trs80m2_state, write_centronics_busy))
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, trs80m2_state, write_centronics_fault))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, trs80m2_state, write_centronics_perror))
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->ack_handler().set(m_pio, FUNC(z80pio_device::strobe_b));
+	m_centronics->busy_handler().set(FUNC(trs80m2_state::write_centronics_busy));
+	m_centronics->fault_handler().set(FUNC(trs80m2_state::write_centronics_fault));
+	m_centronics->perror_handler().set(FUNC(trs80m2_state::write_centronics_perror));
+
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
 
 	TRS80M2_KEYBOARD(config, m_kb, 0);
 	m_kb->clock_wr_callback().set(FUNC(trs80m2_state::kb_clock_w));

@@ -391,21 +391,22 @@ MACHINE_CONFIG_START(unixpc_state::unixpc)
 	mpsc.out_dtra_callback().set("rs232", FUNC(rs232_port_device::write_dtr));
 	mpsc.out_rtsa_callback().set("rs232", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("kbc", ACIA6850, 0)
+	ACIA6850(config, "kbc", 0);
 
 	// TODO: HDC
-	//MCFG_DEVICE_ADD("hdc", WD1010, 40_MHz_XTAL / 8)
+	//WD1010(config, "hdc", 40_MHz_XTAL / 8);
 
 	// TODO: RTC
-	//MCFG_DEVICE_ADD("rtc", TC8250, 32.768_kHz_XTAL)
+	//TC8250(config, "rtc", 32.768_kHz_XTAL);
 
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
 	rs232.rxd_handler().set("mpsc", FUNC(upd7201_new_device::rxa_w));
 	rs232.dsr_handler().set("mpsc", FUNC(upd7201_new_device::dcda_w));
 	rs232.cts_handler().set("mpsc", FUNC(upd7201_new_device::ctsa_w));
 
-	MCFG_DEVICE_ADD("printer", CENTRONICS, centronics_devices, nullptr)
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("printlatch", "printer")
+	centronics_device &printer(CENTRONICS(config, "printer", centronics_devices, nullptr));
+	output_latch_device &printlatch(OUTPUT_LATCH(config, "printlatch"));
+	printer.set_output_latch(printlatch);
 MACHINE_CONFIG_END
 
 

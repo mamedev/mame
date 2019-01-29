@@ -1008,9 +1008,9 @@ MACHINE_CONFIG_START(octopus_state::octopus)
 	serial_b.cts_handler().set(m_serial, FUNC(z80sio_device::ctsb_w)).invert();
 	//serial_b.ri_handler().set(m_serial, FUNC(z80sio_device::rib_w)).invert();
 
-	MCFG_DEVICE_ADD(m_parallel, CENTRONICS, octopus_centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, octopus_state, parallel_busy_w))
-	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(*this, octopus_state, parallel_slctout_w))
+	CENTRONICS(config, m_parallel, octopus_centronics_devices, "printer");
+	m_parallel->busy_handler().set(FUNC(octopus_state::parallel_busy_w));
+	m_parallel->select_handler().set(FUNC(octopus_state::parallel_slctout_w));
 	// TODO: Winchester HD controller (Xebec/SASI compatible? uses TTL logic)
 
 	/* video hardware */

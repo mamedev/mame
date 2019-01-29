@@ -677,9 +677,11 @@ MACHINE_CONFIG_START(fp1100_state::fp1100)
 	m_crtc->set_update_row_callback(FUNC(fp1100_state::crtc_update_row), this);
 
 	/* Printer */
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, fp1100_state, centronics_busy_w))
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(fp1100_state::centronics_busy_w));
+
+	output_latch_device &latch(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(latch);
 
 	/* Cassette */
 	CASSETTE(config, m_cass);

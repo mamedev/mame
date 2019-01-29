@@ -1333,7 +1333,7 @@ MACHINE_CONFIG_START(wangpc_state::wangpc)
 	FLOPPY_CONNECTOR(config, UPD765_TAG ":0", wangpc_floppies, "525dd", wangpc_state::floppy_formats);
 	FLOPPY_CONNECTOR(config, UPD765_TAG ":1", wangpc_floppies, "525dd", wangpc_state::floppy_formats);
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer");
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->set_data_input_buffer(m_cent_data_in);
 	m_centronics->ack_handler().set(FUNC(wangpc_state::write_centronics_ack));
 	m_centronics->busy_handler().set(FUNC(wangpc_state::write_centronics_busy));
@@ -1341,7 +1341,9 @@ MACHINE_CONFIG_START(wangpc_state::wangpc)
 	m_centronics->perror_handler().set(FUNC(wangpc_state::write_centronics_perror));
 
 	INPUT_BUFFER(config, m_cent_data_in);
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+
+	OUTPUT_LATCH(config, m_cent_data_out);
+	m_centronics->set_output_latch(*m_cent_data_out);
 
 	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
 	rs232.rxd_handler().set(m_epci, FUNC(mc2661_device::rx_w));

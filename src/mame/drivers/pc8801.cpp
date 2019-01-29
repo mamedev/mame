@@ -2375,7 +2375,7 @@ MACHINE_CONFIG_START(pc8801_state::pc8801)
 	I8214(config, I8214_TAG, MASTER_CLOCK);
 	#endif
 	UPD1990A(config, m_rtc);
-	//MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	//CENTRONICS(config, "centronics", centronics_devices, "printer");
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
 

@@ -238,12 +238,14 @@ MACHINE_CONFIG_START(zorba_state::zorba)
 	rs232.dsr_handler().set(m_uart0, FUNC(i8251_device::write_dsr));
 
 	// J3 Parallel printer
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("parprndata", "parprn")
 	centronics_device &parprn(CENTRONICS(config, "parprn", centronics_devices, "printer"));
 	parprn.busy_handler().set(m_uart1, FUNC(i8251_device::write_cts));
 	parprn.busy_handler().append(m_uart1, FUNC(i8251_device::write_dsr)); // TODO: shared with serial CTS
 	parprn.fault_handler().set(FUNC(zorba_state::printer_fault_w));
 	parprn.select_handler().set(FUNC(zorba_state::printer_select_w));
+
+	output_latch_device &parprndata(OUTPUT_LATCH(config, "parprndata"));
+	parprn.set_output_latch(parprndata);
 
 	// J3 Serial printer
 	rs232_port_device &serprn(RS232_PORT(config, "serprn", default_rs232_devices, nullptr));

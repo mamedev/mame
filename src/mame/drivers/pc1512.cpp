@@ -1222,13 +1222,15 @@ MACHINE_CONFIG_START(pc1512_state::pc1512)
 	m_uart->out_rts_callback().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
 	m_uart->out_int_callback().set(m_pic, FUNC(pic8259_device::ir4_w));
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, pc1512_state, write_centronics_ack))
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, pc1512_state, write_centronics_busy))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, pc1512_state, write_centronics_perror))
-	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(*this, pc1512_state, write_centronics_select))
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, pc1512_state, write_centronics_fault))
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->ack_handler().set(FUNC(pc1512_state::write_centronics_ack));
+	m_centronics->busy_handler().set(FUNC(pc1512_state::write_centronics_busy));
+	m_centronics->perror_handler().set(FUNC(pc1512_state::write_centronics_perror));
+	m_centronics->select_handler().set(FUNC(pc1512_state::write_centronics_select));
+	m_centronics->fault_handler().set(FUNC(pc1512_state::write_centronics_fault));
+
+	OUTPUT_LATCH(config, m_cent_data_out);
+	m_centronics->set_output_latch(*m_cent_data_out);
 
 	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
 	rs232.rxd_handler().set(m_uart, FUNC(ins8250_uart_device::rx_w));
@@ -1354,13 +1356,15 @@ MACHINE_CONFIG_START(pc1640_state::pc1640)
 	m_uart->out_rts_callback().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
 	m_uart->out_int_callback().set(m_pic, FUNC(pic8259_device::ir4_w));
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, pc1512_base_state, write_centronics_ack))
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, pc1512_base_state, write_centronics_busy))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, pc1512_base_state, write_centronics_perror))
-	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(*this, pc1512_base_state, write_centronics_select))
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, pc1512_base_state, write_centronics_fault))
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->ack_handler().set(FUNC(pc1512_state::write_centronics_ack));
+	m_centronics->busy_handler().set(FUNC(pc1512_state::write_centronics_busy));
+	m_centronics->perror_handler().set(FUNC(pc1512_state::write_centronics_perror));
+	m_centronics->select_handler().set(FUNC(pc1512_state::write_centronics_select));
+	m_centronics->fault_handler().set(FUNC(pc1512_state::write_centronics_fault));
+
+	OUTPUT_LATCH(config, m_cent_data_out);
+	m_centronics->set_output_latch(*m_cent_data_out);
 
 	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
 	rs232.rxd_handler().set(m_uart, FUNC(ins8250_uart_device::rx_w));

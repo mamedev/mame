@@ -364,9 +364,10 @@ MACHINE_CONFIG_START(proteus_state::proteus)
 	m_pia->irqa_handler().set("irqs", FUNC(input_merger_device::in_w<2>));
 	m_pia->irqb_handler().set("irqs", FUNC(input_merger_device::in_w<3>));
 
-	MCFG_DEVICE_ADD("parallel", CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE("pia", pia6821_device, ca1_w))
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "parallel")
+	centronics_device &parallel(CENTRONICS(config, "parallel", centronics_devices, "printer"));
+	parallel.ack_handler().set(m_pia, FUNC(pia6821_device::ca1_w));
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	parallel.set_output_latch(cent_data_out);
 
 	/* terminal port */
 	ACIA6850(config, m_acia[0], 0);

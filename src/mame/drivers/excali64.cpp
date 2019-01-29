@@ -623,9 +623,11 @@ MACHINE_CONFIG_START(excali64_state::excali64)
 	m_u12->set_clear_pin_value(1);                  /* Clear pin - pulled high */
 	m_u12->out_cb().set(FUNC(excali64_state::motor_w));
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, excali64_state, cent_busy_w))
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(excali64_state::cent_busy_w));
+
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -1083,7 +1083,9 @@ MACHINE_CONFIG_START(cat_state::cat)
 	CENTRONICS(config, m_ctx, centronics_devices, "printer");
 	m_ctx->ack_handler().set(FUNC(cat_state::prn_ack_ff));
 	m_ctx->busy_handler().set(m_duart, FUNC(mc68681_device::ip4_w)).invert();
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("ctx_data_out", "ctx")
+
+	OUTPUT_LATCH(config, m_ctx_data_out);
+	m_ctx->set_output_latch(*m_ctx_data_out);
 
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 1.00);

@@ -633,13 +633,14 @@ MACHINE_CONFIG_START(einstein_state::einstein)
 	adc.ch4_callback().set_ioport("analogue_2_y");
 
 	/* printer */
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(IC_I063, z80pio_device, strobe_a))
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, einstein_state, write_centronics_busy))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, einstein_state, write_centronics_perror))
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, einstein_state, write_centronics_fault))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->ack_handler().set(IC_I063, FUNC(z80pio_device::strobe_a));
+	m_centronics->busy_handler().set(FUNC(einstein_state::write_centronics_busy));
+	m_centronics->perror_handler().set(FUNC(einstein_state::write_centronics_perror));
+	m_centronics->fault_handler().set(FUNC(einstein_state::write_centronics_fault));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
 
 	TIMER(config, m_strobe_timer).configure_generic(FUNC(einstein_state::strobe_callback));
 

@@ -259,10 +259,12 @@ MACHINE_CONFIG_START(prof180x_state::prof180x)
 	FLOPPY_CONNECTOR(config, FDC9268_TAG ":2", prof180x_floppies, "35dd", floppy_image_device::default_floppy_formats);
 	FLOPPY_CONNECTOR(config, FDC9268_TAG ":3", prof180x_floppies, "35dd", floppy_image_device::default_floppy_formats);
 
-	//MCFG_RTC8583_ADD(MK3835_TAG, rtc_intf)
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
+	//RTC8583(config, MK3835_TAG, rtc_intf);
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+
+	output_latch_device &latch(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(latch);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("128K").set_extra_options("256K,512K");

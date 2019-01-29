@@ -802,8 +802,10 @@ MACHINE_CONFIG_START(ace_state::ace)
 	m_z80pio->out_pa_callback().set(FUNC(ace_state::pio_pa_w));
 	m_z80pio->out_pb_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("1K").set_extra_options("16K,32K,48K");

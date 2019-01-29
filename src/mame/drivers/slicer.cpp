@@ -132,17 +132,18 @@ MACHINE_CONFIG_START(slicer_state::slicer)
 	drivelatch.q_out_cb<6>().set(FUNC(slicer_state::drive_size_w));
 	drivelatch.q_out_cb<7>().set("fdc", FUNC(fd1797_device::dden_w));
 
-	MCFG_DEVICE_ADD("sasi", SCSI_PORT, 0)
-	MCFG_SCSI_DATA_INPUT_BUFFER("sasi_data_in")
-	MCFG_SCSI_BSY_HANDLER(WRITELINE("sasi_ctrl_in", input_buffer_device, write_bit3))
-	MCFG_SCSI_MSG_HANDLER(WRITELINE("sasi_ctrl_in", input_buffer_device, write_bit4))
-	MCFG_SCSI_CD_HANDLER(WRITELINE("sasi_ctrl_in", input_buffer_device, write_bit5))
-	MCFG_SCSI_REQ_HANDLER(WRITELINE("sasi_ctrl_in", input_buffer_device, write_bit6))
-	MCFG_SCSI_IO_HANDLER(WRITELINE("sasi_ctrl_in", input_buffer_device, write_bit7))
+	SCSI_PORT(config, m_sasi, 0);
+	m_sasi->set_data_input_buffer("sasi_data_in");
+	m_sasi->bsy_handler().set("sasi_ctrl_in", FUNC(input_buffer_device::write_bit3));
+	m_sasi->msg_handler().set("sasi_ctrl_in", FUNC(input_buffer_device::write_bit4));
+	m_sasi->cd_handler().set("sasi_ctrl_in", FUNC(input_buffer_device::write_bit5));
+	m_sasi->req_handler().set("sasi_ctrl_in", FUNC(input_buffer_device::write_bit6));
+	m_sasi->io_handler().set("sasi_ctrl_in", FUNC(input_buffer_device::write_bit7));
 
-	MCFG_SCSI_OUTPUT_LATCH_ADD("sasi_data_out", "sasi")
-	MCFG_DEVICE_ADD("sasi_data_in", INPUT_BUFFER, 0)
-	MCFG_DEVICE_ADD("sasi_ctrl_in", INPUT_BUFFER, 0)
+	output_latch_device &sasi_data_out(OUTPUT_LATCH(config, "sasi_data_out"));
+	m_sasi->set_output_latch(sasi_data_out);
+	INPUT_BUFFER(config, "sasi_data_in");
+	INPUT_BUFFER(config, "sasi_ctrl_in");
 MACHINE_CONFIG_END
 
 ROM_START( slicer )

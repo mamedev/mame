@@ -593,7 +593,8 @@ MACHINE_CONFIG_START(elwro800_state::elwro800)
 	m_centronics->ack_handler().set(FUNC(elwro800_state::write_centronics_ack));
 
 	INPUT_BUFFER(config, "cent_data_in");
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
 
 	I8251(config, m_i8251, 14_MHz_XTAL / 4);
 

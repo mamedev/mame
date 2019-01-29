@@ -230,10 +230,11 @@ MACHINE_CONFIG_START(kaypro_state::kayproii)
 	kbd.rxd_cb().set("sio", FUNC(z80sio_device::rxb_w));
 	kbd.rxd_cb().append("sio", FUNC(z80sio_device::syncb_w));
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, kaypro_state, write_centronics_busy))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(kaypro_state::write_centronics_busy));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	output_latch_device &latch(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(latch);
 
 	rs232_port_device &serial(RS232_PORT(config, "serial", default_rs232_devices, nullptr));
 	serial.rxd_handler().set("sio", FUNC(z80sio_device::rxa_w));
@@ -322,10 +323,11 @@ MACHINE_CONFIG_START(kaypro_state::kaypro484)
 
 	CLOCK(config, "kbdtxrxc", 4800).signal_handler().set("sio_1", FUNC(z80sio_device::rxtxcb_w));
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, kaypro_state, write_centronics_busy))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(kaypro_state::write_centronics_busy));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	output_latch_device &latch(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(latch);
 
 	rs232_port_device &modem(RS232_PORT(config, "modem", default_rs232_devices, nullptr));
 	modem.rxd_handler().set("sio_1", FUNC(z80sio_device::rxa_w));

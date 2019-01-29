@@ -642,7 +642,8 @@ MACHINE_CONFIG_START(fp_state::fp)
 	m_centronics->fault_handler().set(FUNC(fp_state::write_centronics_fault));
 	m_centronics->perror_handler().set(FUNC(fp_state::write_centronics_perror));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("256K").set_extra_options("512K,1M");

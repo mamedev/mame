@@ -2075,14 +2075,15 @@ MACHINE_CONFIG_START(fm7_state::fm7)
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list","fm7_disk")
 
-	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
-	MCFG_SLOT_OPTION_ADD( "dsjoy", DEMPA_SHINBUNSHA_JOYSTICK )
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, fm7_state, write_centronics_busy))
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, fm7_state, write_centronics_fault))
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, fm7_state, write_centronics_ack))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, fm7_state, write_centronics_perror))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->option_add("dsjoy", DEMPA_SHINBUNSHA_JOYSTICK);
+	m_centronics->busy_handler().set(FUNC(fm7_state::write_centronics_busy));
+	m_centronics->fault_handler().set(FUNC(fm7_state::write_centronics_fault));
+	m_centronics->ack_handler().set(FUNC(fm7_state::write_centronics_ack));
+	m_centronics->perror_handler().set(FUNC(fm7_state::write_centronics_perror));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	OUTPUT_LATCH(config, m_cent_data_out);
+	m_centronics->set_output_latch(*m_cent_data_out);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fm7_state::fm8)
@@ -2122,13 +2123,14 @@ MACHINE_CONFIG_START(fm7_state::fm8)
 	FLOPPY_CONNECTOR(config, m_floppy0, fm7_floppies, "qd", floppy_image_device::default_floppy_formats);
 	FLOPPY_CONNECTOR(config, m_floppy1, fm7_floppies, "qd", floppy_image_device::default_floppy_formats);
 
-	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, fm7_state, write_centronics_busy))
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, fm7_state, write_centronics_fault))
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, fm7_state, write_centronics_ack))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, fm7_state, write_centronics_perror))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(fm7_state::write_centronics_busy));
+	m_centronics->fault_handler().set(FUNC(fm7_state::write_centronics_fault));
+	m_centronics->ack_handler().set(FUNC(fm7_state::write_centronics_ack));
+	m_centronics->perror_handler().set(FUNC(fm7_state::write_centronics_perror));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	OUTPUT_LATCH(config, m_cent_data_out);
+	m_centronics->set_output_latch(*m_cent_data_out);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fm7_state::fm77av)
@@ -2184,13 +2186,14 @@ MACHINE_CONFIG_START(fm7_state::fm77av)
 	MCFG_SOFTWARE_LIST_ADD("av_flop_list", "fm77av")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("flop_list", "fm7_disk")
 
-	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, fm7_state, write_centronics_busy))
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, fm7_state, write_centronics_fault))
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, fm7_state, write_centronics_ack))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, fm7_state, write_centronics_perror))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(fm7_state::write_centronics_busy));
+	m_centronics->fault_handler().set(FUNC(fm7_state::write_centronics_fault));
+	m_centronics->ack_handler().set(FUNC(fm7_state::write_centronics_ack));
+	m_centronics->perror_handler().set(FUNC(fm7_state::write_centronics_perror));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	OUTPUT_LATCH(config, m_cent_data_out);
+	m_centronics->set_output_latch(*m_cent_data_out);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fm7_state::fm11)
@@ -2239,13 +2242,14 @@ MACHINE_CONFIG_START(fm7_state::fm11)
 	FLOPPY_CONNECTOR(config, m_floppy0, fm7_floppies, "qd", floppy_image_device::default_floppy_formats);
 	FLOPPY_CONNECTOR(config, m_floppy1, fm7_floppies, "qd", floppy_image_device::default_floppy_formats);
 
-	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, fm7_state, write_centronics_busy))
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, fm7_state, write_centronics_fault))
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, fm7_state, write_centronics_ack))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, fm7_state, write_centronics_perror))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(fm7_state::write_centronics_busy));
+	m_centronics->fault_handler().set(FUNC(fm7_state::write_centronics_fault));
+	m_centronics->ack_handler().set(FUNC(fm7_state::write_centronics_ack));
+	m_centronics->perror_handler().set(FUNC(fm7_state::write_centronics_perror));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	OUTPUT_LATCH(config, m_cent_data_out);
+	m_centronics->set_output_latch(*m_cent_data_out);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fm7_state::fm16beta)
@@ -2285,13 +2289,14 @@ MACHINE_CONFIG_START(fm7_state::fm16beta)
 	FLOPPY_CONNECTOR(config, m_floppy0, fm7_floppies, "qd", floppy_image_device::default_floppy_formats);
 	FLOPPY_CONNECTOR(config, m_floppy1, fm7_floppies, "qd", floppy_image_device::default_floppy_formats);
 
-	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, fm7_state, write_centronics_busy))
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, fm7_state, write_centronics_fault))
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, fm7_state, write_centronics_ack))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, fm7_state, write_centronics_perror))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(fm7_state::write_centronics_busy));
+	m_centronics->fault_handler().set(FUNC(fm7_state::write_centronics_fault));
+	m_centronics->ack_handler().set(FUNC(fm7_state::write_centronics_ack));
+	m_centronics->perror_handler().set(FUNC(fm7_state::write_centronics_perror));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	OUTPUT_LATCH(config, m_cent_data_out);
+	m_centronics->set_output_latch(*m_cent_data_out);
 MACHINE_CONFIG_END
 
 /* ROM definition */

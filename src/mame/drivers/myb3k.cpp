@@ -1005,12 +1005,15 @@ MACHINE_CONFIG_START(myb3k_state::myb3k)
 	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "isa", stepone_isa_cards, nullptr, false)
 
 	/* Centronics */
-	MCFG_DEVICE_ADD (m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER (WRITELINE (*this, myb3k_state, centronics_ack_w))
-	MCFG_CENTRONICS_BUSY_HANDLER (WRITELINE (*this, myb3k_state, centronics_busy_w))
-	MCFG_CENTRONICS_PERROR_HANDLER (WRITELINE (*this, myb3k_state, centronics_perror_w))
-	MCFG_CENTRONICS_SELECT_HANDLER (WRITELINE (*this, myb3k_state, centronics_select_w))
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD ("cent_data_out", "centronics")
+
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->ack_handler().set(FUNC(myb3k_state::centronics_ack_w));
+	m_centronics->busy_handler().set(FUNC(myb3k_state::centronics_busy_w));
+	m_centronics->perror_handler().set(FUNC(myb3k_state::centronics_perror_w));
+	m_centronics->select_handler().set(FUNC(myb3k_state::centronics_select_w));
+
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
 
 	/* Sound */
 	SPEAKER(config, "mono").front_center();

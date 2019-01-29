@@ -705,7 +705,8 @@ MACHINE_CONFIG_START(kdt6_state::psi98)
 	m_centronics->select_handler().set("pio", FUNC(z80pio_device::pa5_w));
 
 	INPUT_BUFFER(config, "cent_data_in");
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	output_latch_device &latch(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(latch);
 
 	UPD1990A(config, m_rtc);
 

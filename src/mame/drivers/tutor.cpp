@@ -743,7 +743,8 @@ static INPUT_PORTS_START(pyuutajr)
 		PORT_BIT(0xff, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(tutor_state::tutor)
+void tutor_state::tutor(machine_config &config)
+{
 	// basic machine hardware
 	// TMS9995 CPU @ 10.7 MHz
 	// No lines connected yet
@@ -763,7 +764,8 @@ MACHINE_CONFIG_START(tutor_state::tutor)
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer").busy_handler().set(FUNC(tutor_state::write_centronics_busy));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	OUTPUT_LATCH(config, m_cent_data_out);
+	m_centronics->set_output_latch(*m_cent_data_out);
 
 	// Cassette
 	SPEAKER(config, "cass_out").front_center();
@@ -775,15 +777,15 @@ MACHINE_CONFIG_START(tutor_state::tutor)
 	// software lists
 	SOFTWARE_LIST(config, "cart_list").set_type("tutor", SOFTWARE_LIST_ORIGINAL_SYSTEM);
 
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(tutor_state::pyuutajr)
+void tutor_state::pyuutajr(machine_config &config)
+{
 	tutor(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(pyuutajr_mem)
-	//MCFG_DEVICE_REMOVE("centronics")
-	//MCFG_DEVICE_REMOVE("cassette")
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &tutor_state::pyuutajr_mem);
+	//config.device_remove("centronics");
+	//config.device_remove("cassette");
+}
 
 /*
   ROM loading

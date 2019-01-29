@@ -376,10 +376,11 @@ MACHINE_CONFIG_START(f1_state::act_f1)
 	m_ctc->zc_callback<1>().set(FUNC(f1_state::ctc_z1_w));
 	m_ctc->zc_callback<2>().set(FUNC(f1_state::ctc_z2_w));
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(m_sio, z80sio_device, ctsa_w))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(m_sio, FUNC(z80sio_device::ctsa_w));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+	OUTPUT_LATCH(config, m_cent_data_out);
+	m_centronics->set_output_latch(*m_cent_data_out);
 
 	// floppy
 	WD2797(config, m_fdc, 4_MHz_XTAL / 2 /* ? */);

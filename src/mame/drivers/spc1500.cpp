@@ -921,10 +921,13 @@ MACHINE_CONFIG_START(spc1500_state::spc1500)
 	m_sound->add_route(ALL_OUTPUTS, "mono", 1.00);
 	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, spc1500_state, centronics_busy_w))
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
-	MCFG_DEVICE_ADD("cent_status_in", INPUT_BUFFER, 0)
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(spc1500_state::centronics_busy_w));
+
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
+
+	INPUT_BUFFER(config, "cent_status_in");
 
 	CASSETTE(config, m_cass);
 	m_cass->set_formats(spc1000_cassette_formats);

@@ -904,11 +904,12 @@ MACHINE_CONFIG_START(applix_state::applix)
 	m_via->writepb_handler().set(FUNC(applix_state::applix_pb_w));
 	m_via->irq_handler().set_inputline("maincpu", M68K_IRQ_2);
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE("via6522", via6522_device, write_ca1))
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("via6522", via6522_device, write_pa0))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->ack_handler().set(m_via, FUNC(via6522_device::write_ca1));
+	m_centronics->busy_handler().set(m_via, FUNC(via6522_device::write_pa0));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	OUTPUT_LATCH(config, m_cent_data_out);
+	m_centronics->set_output_latch(*m_cent_data_out);
 
 	CASSETTE(config, m_cass);
 	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);

@@ -526,12 +526,13 @@ MACHINE_CONFIG_START(xor100_state::xor100)
 	FLOPPY_CONNECTOR(config, WD1795_TAG":2", xor100_floppies, nullptr,    floppy_image_device::default_floppy_formats);
 	FLOPPY_CONNECTOR(config, WD1795_TAG":3", xor100_floppies, nullptr,    floppy_image_device::default_floppy_formats);
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(I8255A_TAG, i8255_device, pc4_w))
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, xor100_state, write_centronics_busy))
-	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(*this, xor100_state, write_centronics_select))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->ack_handler().set(I8255A_TAG, FUNC(i8255_device::pc4_w));
+	m_centronics->busy_handler().set(FUNC(xor100_state::write_centronics_busy));
+	m_centronics->select_handler().set(FUNC(xor100_state::write_centronics_select));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
 
 	// S-100
 	MCFG_DEVICE_ADD(S100_TAG, S100_BUS, 8_MHz_XTAL / 4)
