@@ -247,7 +247,7 @@ WRITE16_MEMBER(spg110_device::spg110_2062_w)
 	}
 	*/
 	//logerror("[ ");
-	for (int i = 0; i <= length; i++)
+	for (int i = 0; i < length; i++)
 	{
 		if (m_2068_outer & 1)
 		{
