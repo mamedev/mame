@@ -18,7 +18,6 @@
     - VBRC card scanner
     - VBRC MCU T1 is unknown
     - Z80 WAIT pin is not fully emulated, affecting VBRC speech busy state
-    - DSC: what controls the 2 middle leds? or unused?
 
     Read the official manual(s) on how to play.
 
