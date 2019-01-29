@@ -458,7 +458,14 @@ TILE_GET_INFO_MEMBER(spg110_device::get_bg_tile_info)
 TILE_GET_INFO_MEMBER(spg110_device::get_fg_tile_info)
 {
 	int tileno = m_fg_videoram[tile_index];
-	SET_TILE_INFO_MEMBER(0, tileno, 0, 0);
+
+	int attr = m_fg_attrram[tile_index/2];
+	if (tile_index&1) attr = (attr & 0xff00)>>8;
+	else attr = attr & 0x00ff;
+
+	int pal = attr & 0x0f;
+
+	SET_TILE_INFO_MEMBER(0, tileno, pal, 0);
 }
 
 void spg110_device::device_start()
