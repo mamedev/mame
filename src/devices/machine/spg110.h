@@ -28,6 +28,7 @@ public:
 	void map(address_map &map);
 	void map_video(address_map &map);
 
+	double hue2rgb(double p, double q, double t);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank);
 
@@ -49,6 +50,7 @@ private:
 	required_shared_ptr<uint16_t> m_fg_videoram;
 	required_shared_ptr<uint16_t> m_bg_attrram;
 	required_shared_ptr<uint16_t> m_fg_attrram;
+	required_shared_ptr<uint16_t> m_palram;
 
 	tilemap_t    *m_bg_tilemap;
 	tilemap_t    *m_fg_tilemap;

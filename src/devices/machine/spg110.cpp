@@ -28,7 +28,8 @@ spg110_device::spg110_device(const machine_config &mconfig, device_type type, co
 	m_bg_videoram(*this, "bg_videoram"),
 	m_fg_videoram(*this, "fg_videoram"),
 	m_bg_attrram(*this, "bg_attrram"),
-	m_fg_attrram(*this, "fg_attrram")
+	m_fg_attrram(*this, "fg_attrram"),
+	m_palram(*this, "palram")
 {
 }
 
@@ -114,10 +115,12 @@ GFXDECODE_END
 
 
 MACHINE_CONFIG_START(spg110_device::device_add_mconfig)
-	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x100);
+//	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x100);
 //	PALETTE(config, m_palette).set_format(palette_device::RGB_565, 0x100);
 //	PALETTE(config, m_palette).set_format(palette_device::IRGB_4444, 0x100);
 //	PALETTE(config, m_palette).set_format(palette_device::RGBI_4444, 0x100);
+//	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x100);
+	PALETTE(config, m_palette, palette_device::BLACK, 256);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx);
 MACHINE_CONFIG_END
@@ -431,7 +434,8 @@ void spg110_device::map_video(address_map &map)
 
 	map(0x04000, 0x04fff).ram(); // seems to be 3 blocks, almost certainly spritelist
 
-	map(0x08000, 0x081ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // probably? format unknown tho
+//	map(0x08000, 0x081ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // probably? format unknown tho
+	map(0x08000, 0x081ff).ram().share("palram");
 }
 
 
@@ -466,9 +470,53 @@ void spg110_device::device_reset()
 {
 }
 
+double spg110_device::hue2rgb(double p, double q, double t)
+{
+	if (t < 0) t += 1;
+	if (t > 1) t -= 1;
+	if (t < 1 / 6.0f) return p + (q - p) * 6 * t;
+	if (t < 1 / 2.0f) return q;
+	if (t < 2 / 3.0f) return p + (q - p) * (2 / 3.0f - t) * 6;
+	return p;
+}
 
 uint32_t spg110_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	// Palette
+	int offs = 0;
+	for (int index = 0;index < 256; index++)
+	{
+		uint16_t dat = m_palram[offs++];
+
+		// llll lsss --hh hhhh
+		int l_raw =  (dat & 0xf800) >> 11;
+		int sl_raw = (dat & 0x0700) >> 8;
+		int h_raw =  (dat & 0x003f) >> 0;
+
+		double l = (double)l_raw / 31.0f;
+		double s = (double)sl_raw / 7.0f;
+		double h = (double)h_raw / 47.0f;
+
+		double r, g, b;
+
+		if (s == 0) {
+			r = g = b = l; // greyscale
+		} else {
+			double q = l < 0.5f ? l * (1 + s) : l + s - l * s;
+			double p = 2 * l - q;
+			r = hue2rgb(p, q, h + 1/3.0f);
+			g = hue2rgb(p, q, h);
+			b = hue2rgb(p, q, h - 1/3.0f);
+		}
+
+		int r_real = r * 255.0f;
+		int g_real = g * 255.0f;
+		int b_real = b * 255.0f;
+
+		m_palette->set_pen_color(index, r_real, g_real, b_real);
+	}
+
+
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
