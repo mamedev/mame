@@ -43,6 +43,17 @@ WRITE16_MEMBER(spg110_device::spg110_2063_w)
 	m_cpu->set_state_unsynced(UNSP_IRQ0_LINE, CLEAR_LINE);
 }
 
+READ16_MEMBER(spg110_device::datasegment_r)
+{
+	uint16_t val = m_cpu->get_ds();
+	return val;
+}
+
+WRITE16_MEMBER(spg110_device::datasegment_w)
+{
+	m_cpu->set_ds(data & 0x3f);
+}
+
 void spg110_device::map(address_map &map)
 {
 	map(0x000000, 0x000fff).ram();
@@ -55,6 +66,8 @@ void spg110_device::map(address_map &map)
 
 	map(0x002200, 0x0022ff).ram();
 	map(0x003000, 0x0030ff).ram();
+
+	map(0x00322f, 0x00322f).rw(FUNC(spg110_device::datasegment_r),FUNC(spg110_device::datasegment_w));
 }
 
 /*
