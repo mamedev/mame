@@ -375,7 +375,7 @@ MACHINE_CONFIG_START(alg_state::picmatic)
 	MCFG_DEVICE_REPLACE("maincpu", M68000, amiga_state::CLK_7M_PAL)
 	MCFG_DEVICE_PROGRAM_MAP(main_map_picmatic)
 
-	MCFG_DEVICE_REMOVE("screen")
+	config.device_remove("screen");
 	pal_video(config);
 
 	MCFG_DEVICE_MODIFY("amiga")

@@ -537,10 +537,11 @@ MACHINE_CONFIG_START(gundealr_state::yamyam)
 	TIMER(config, "mcusim").configure_periodic(FUNC(gundealr_state::yamyam_mcu_sim), attotime::from_hz(6000000/60)); /* 6mhz confirmed */
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(gundealr_state::gundealrbl)
+void gundealr_state::gundealrbl(machine_config &config)
+{
 	yamyam(config);
-	MCFG_DEVICE_REMOVE("mcusim")
-MACHINE_CONFIG_END
+	config.device_remove("mcusim");
+}
 
 
 /***************************************************************************

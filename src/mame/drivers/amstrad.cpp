@@ -1166,7 +1166,7 @@ MACHINE_CONFIG_START(amstrad_state::aleste)
 	m_palette->set_entries(32+64);
 	m_palette->set_init(FUNC(amstrad_state::aleste_palette));
 
-	MCFG_DEVICE_ADD("rtc", MC146818, 4.194304_MHz_XTAL)
+	MC146818(config, m_rtc, 4.194304_MHz_XTAL);
 
 	I8272A(config.replace(), m_fdc, 16_MHz_XTAL / 4, true);
 
@@ -1180,7 +1180,7 @@ MACHINE_CONFIG_START(amstrad_state::aleste)
 	FLOPPY_CONNECTOR(config, "upd765:0", aleste_floppies, "35dd", amstrad_state::aleste_floppy_formats);
 	FLOPPY_CONNECTOR(config, "upd765:1", aleste_floppies, "35dd", amstrad_state::aleste_floppy_formats);
 
-	MCFG_DEVICE_REMOVE("flop_list")
+	config.device_remove("flop_list");
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "aleste")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("cpc_list", "cpc_flop")
 

@@ -685,14 +685,14 @@ MACHINE_CONFIG_START(fastfred_state::jumpcoas)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(jumpcoas_map)
 
-	MCFG_DEVICE_REMOVE("audiocpu")
+	config.device_remove("audiocpu");
 
 	/* video hardware */
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_jumpcoas);
 
 	/* sound hardware */
-	MCFG_DEVICE_REMOVE("soundlatch")
-	MCFG_DEVICE_REMOVE("ay8910.2")
+	config.device_remove("soundlatch");
+	config.device_remove("ay8910.2");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fastfred_state::imago)

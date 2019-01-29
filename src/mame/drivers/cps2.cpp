@@ -1342,11 +1342,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cps2_state::gigaman2)
 	cps2(config);
 
-	MCFG_DEVICE_REMOVE("audiocpu")
+	config.device_remove("audiocpu");
 	// gigaman2 has an AT89C4051 (8051) MCU as an audio cpu, no qsound.
-	MCFG_DEVICE_REMOVE("qsound")
-
-	MCFG_DEVICE_MODIFY("maincpu")
+	config.device_remove("qsound");
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(32'000'000)/32, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)

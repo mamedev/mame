@@ -775,7 +775,7 @@ MACHINE_CONFIG_START(tandy1000_state::t1000tx)
 	MCFG_DEVICE_MODIFY( "maincpu" )
 	MCFG_DEVICE_IO_MAP(tandy1000tx_io)
 
-	MCFG_DEVICE_REMOVE("pc_keyboard")
+	config.device_remove("pc_keyboard");
 	tandy1000_90key(config);
 MACHINE_CONFIG_END
 

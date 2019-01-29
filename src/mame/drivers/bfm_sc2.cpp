@@ -3787,21 +3787,23 @@ MACHINE_CONFIG_START(bfm_sc2_awp_state::scorpion2)
 MACHINE_CONFIG_END
 
 #if 0
-MACHINE_CONFIG_START(bfm_sc2_awp_state::scorpion2_3m)
+void bfm_sc2_awp_state::scorpion2_3m(machine_config &config)
+{
 	scorpion2(config);
 
-	MCFG_DEVICE_REMOVE("meters")
+	config.device_remove("meters");
 	_3meters(config);
-MACHINE_CONFIG_END
+}
 #endif
 
 /* machine driver for scorpion3 board */
-MACHINE_CONFIG_START(bfm_sc2_awp_state::scorpion3)
+void bfm_sc2_awp_state::scorpion3(machine_config &config)
+{
 	scorpion2(config);
 
-	MCFG_DEVICE_REMOVE("meters")
+	config.device_remove("meters");
 	_5meters(config);
-MACHINE_CONFIG_END
+}
 
 
 /* machine driver for scorpion2 board + matrix board */
@@ -3844,17 +3846,19 @@ MACHINE_CONFIG_START(bfm_sc2_dmd_state::scorpion2_dm01)
 	_8meters(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(bfm_sc2_dmd_state::scorpion2_dm01_3m)
+void bfm_sc2_dmd_state::scorpion2_dm01_3m(machine_config &config)
+{
 	scorpion2_dm01(config);
-	MCFG_DEVICE_REMOVE("meters")
+	config.device_remove("meters");
 	_3meters(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(bfm_sc2_dmd_state::scorpion2_dm01_5m)
+void bfm_sc2_dmd_state::scorpion2_dm01_5m(machine_config &config)
+{
 	scorpion2_dm01(config);
-	MCFG_DEVICE_REMOVE("meters")
+	config.device_remove("meters");
 	_5meters(config);
-MACHINE_CONFIG_END
+}
 
 void bfm_sc2_novid_state::sc2awp_common_init(int reels, int decrypt)
 {

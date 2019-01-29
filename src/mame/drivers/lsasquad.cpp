@@ -615,7 +615,7 @@ MACHINE_CONFIG_START(lsasquad_state::storming)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(storming_map)
 
-	MCFG_DEVICE_REMOVE("bmcu")
+	config.device_remove("bmcu");
 
 	AY8910(config.replace(), "aysnd", MASTER_CLOCK / 8).add_route(ALL_OUTPUTS, "mono", 0.12); // AY-3-8910A
 MACHINE_CONFIG_END

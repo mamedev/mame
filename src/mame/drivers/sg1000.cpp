@@ -570,7 +570,7 @@ MACHINE_CONFIG_START(sg1000_state::omv)
 	MCFG_DEVICE_PROGRAM_MAP(omv_map)
 	MCFG_DEVICE_IO_MAP(omv_io_map)
 
-	MCFG_DEVICE_REMOVE(CARTSLOT_TAG)
+	config.device_remove(CARTSLOT_TAG);
 	MCFG_OMV_CARTRIDGE_ADD(CARTSLOT_TAG, sg1000_cart, nullptr)
 
 	m_ram->set_default_size("2K");

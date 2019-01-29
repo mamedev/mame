@@ -2098,9 +2098,9 @@ void segas16a_state::system16a_no7751p(machine_config &config)
 /*
 static MACHINE_CONFIG_START( system16a_i8751_no7751 )
     system16a_i8751(config);
-    MCFG_DEVICE_REMOVE("n7751")
-    MCFG_DEVICE_REMOVE("dac")
-    MCFG_DEVICE_REMOVE("vref")
+    config.device_remove("n7751");
+    config.device_remove("dac");
+    config.device_remove("vref");
 
     MCFG_DEVICE_REPLACE("ymsnd", YM2151, 4000000)
     MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)

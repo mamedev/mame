@@ -177,8 +177,8 @@ MACHINE_CONFIG_START(wscolor_state::wscolor)
 	palette.set_init(FUNC(wscolor_state::wscolor_palette));
 
 	/* software lists */
-	MCFG_DEVICE_REMOVE("cart_list")
-	MCFG_DEVICE_REMOVE("wsc_list")
+	config.device_remove("cart_list");
+	config.device_remove("wsc_list");
 	MCFG_SOFTWARE_LIST_ADD("cart_list","wscolor")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("ws_list","wswan")
 MACHINE_CONFIG_END

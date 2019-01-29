@@ -592,7 +592,7 @@ MACHINE_CONFIG_START(mc10_state::alice90)
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_MODIFY("cass_list", "alice90")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("alice32_cass", "alice32")
-	MCFG_DEVICE_REMOVE("mc10_cass")
+	config.device_remove("mc10_cass");
 MACHINE_CONFIG_END
 
 }

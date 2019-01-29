@@ -1408,7 +1408,7 @@ MACHINE_CONFIG_START(arkanoid_state::bootleg)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(bootleg_map)
 
-	MCFG_DEVICE_REMOVE("mcu")
+	config.device_remove("mcu");
 MACHINE_CONFIG_END
 
 void arkanoid_state::aysnd(machine_config &config)

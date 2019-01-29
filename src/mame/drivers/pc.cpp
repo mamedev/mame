@@ -330,7 +330,7 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(pc_state::bondwell)
 	pccga(config);
-	MCFG_DEVICE_REMOVE("maincpu")
+	config.device_remove("maincpu");
 	MCFG_CPU_PC(pc8, pc8, I8088, 4772720) // turbo?
 MACHINE_CONFIG_END
 
@@ -486,7 +486,7 @@ Options: 8087 FPU, EagleNet File server, EightPort serial card, High Resolution 
 
 MACHINE_CONFIG_START(pc_state::eagle1600)
 	pccga(config);
-	MCFG_DEVICE_REMOVE("maincpu")
+	config.device_remove("maincpu");
 	MCFG_CPU_PC(pc16, pc16, I8086, 8000000)
 MACHINE_CONFIG_END
 
@@ -556,7 +556,7 @@ void pc_state::epc_io(address_map &map)
 
 MACHINE_CONFIG_START(pc_state::epc)
 	pccga(config);
-	MCFG_DEVICE_REMOVE("maincpu")
+	config.device_remove("maincpu");
 	MCFG_CPU_PC(pc8, epc, I8088, 4772720)
 	MCFG_DEVICE_MODIFY("isa1")
 	MCFG_SLOT_DEFAULT_OPTION("ega")
@@ -823,7 +823,7 @@ Options: 8087 FPU
 
 MACHINE_CONFIG_START(pc_state::olytext30)
 	pccga(config);
-	MCFG_DEVICE_REMOVE("maincpu")
+	config.device_remove("maincpu");
 	MCFG_CPU_PC(pc8, pc8, V20, XTAL(14'318'181)/3) /* 4,77 MHz */
 	MCFG_DEVICE_MODIFY("isa2")
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc_xt", cfg_single_720K)

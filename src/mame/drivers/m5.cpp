@@ -1524,7 +1524,7 @@ MACHINE_CONFIG_START(brno_state::brno)
 	FLOPPY_CONNECTOR(config, WD2797_TAG":0", brno_floppies, "35hd", brno_state::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, WD2797_TAG":1", brno_floppies, "35hd", brno_state::floppy_formats).enable_sound(true);
 	// only one floppy drive
-	//MCFG_DEVICE_REMOVE(WD2797_TAG":1")
+	//config.device_remove(WD2797_TAG":1");
 
 	//MCFG_SNAPSHOT_ADD("snapshot", brno_state, brno, "rmd", 0)
 

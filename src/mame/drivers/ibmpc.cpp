@@ -327,7 +327,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(ibmpc_state::ibm5140)
 	ibm5150(config);
 	/* software lists */
-	MCFG_DEVICE_REMOVE( "disk_list" )
+	config.device_remove( "disk_list" );
 	MCFG_SOFTWARE_LIST_ADD("disk_list","ibm5140")
 MACHINE_CONFIG_END
 

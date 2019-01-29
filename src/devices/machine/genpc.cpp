@@ -910,12 +910,13 @@ pc_noppi_mb_device::pc_noppi_mb_device(const machine_config &mconfig, device_typ
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(pc_noppi_mb_device::device_add_mconfig)
+void pc_noppi_mb_device::device_add_mconfig(machine_config &config)
+{
 	ibm5160_mb_device::device_add_mconfig(config);
 
-	MCFG_DEVICE_REMOVE("pc_kbdc")
-	MCFG_DEVICE_REMOVE("ppi8255")
-MACHINE_CONFIG_END
+	config.device_remove("pc_kbdc");
+	config.device_remove("ppi8255");
+}
 
 static INPUT_PORTS_START( pc_noppi_mb )
 INPUT_PORTS_END

@@ -530,11 +530,11 @@ MACHINE_CONFIG_START(sprint2_state::sprint1)
 	sprint2(config);
 
 	/* sound hardware */
-	MCFG_DEVICE_REMOVE("lspeaker")
-	MCFG_DEVICE_REMOVE("rspeaker")
+	config.device_remove("lspeaker");
+	config.device_remove("rspeaker");
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_REMOVE("discrete")
+	config.device_remove("discrete");
 
 	MCFG_DEVICE_ADD("discrete", DISCRETE, sprint1_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -545,11 +545,11 @@ MACHINE_CONFIG_START(sprint2_state::dominos)
 	sprint2(config);
 
 	/* sound hardware */
-	MCFG_DEVICE_REMOVE("lspeaker")
-	MCFG_DEVICE_REMOVE("rspeaker")
+	config.device_remove("lspeaker");
+	config.device_remove("rspeaker");
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_REMOVE("discrete")
+	config.device_remove("discrete");
 
 	MCFG_DEVICE_ADD("discrete", DISCRETE, dominos_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

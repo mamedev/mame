@@ -537,7 +537,7 @@ MACHINE_CONFIG_START(sauro_state::saurob)
 	MCFG_DEVICE_PROGRAM_MAP(saurob_sound_map)
 
 	/* sound hardware */
-	MCFG_DEVICE_REMOVE("speech")
+	config.device_remove("speech");
 
 MACHINE_CONFIG_END
 

@@ -1044,10 +1044,10 @@ MACHINE_CONFIG_START(keirinou_state::keirinou)
 	ay2.port_b_write_callback().set(FUNC(witch_state::yscroll_w));
 	ay2.add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	MCFG_DEVICE_REMOVE("essnd")
-	MCFG_DEVICE_REMOVE("msm")
-	MCFG_DEVICE_REMOVE("ym1")
-	MCFG_DEVICE_REMOVE("ym2")
+	config.device_remove("essnd");
+	config.device_remove("msm");
+	config.device_remove("ym1");
+	config.device_remove("ym2");
 MACHINE_CONFIG_END
 
 ROM_START( witch )

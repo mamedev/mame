@@ -827,8 +827,8 @@ MACHINE_CONFIG_START(mbee_state::mbee256)
 	MCFG_DEVICE_IO_MAP(mbee256_io)
 	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee256)
 
-	MCFG_DEVICE_REMOVE("fdc:0")
-	MCFG_DEVICE_REMOVE("fdc:1")
+	config.device_remove("fdc:0");
+	config.device_remove("fdc:1");
 	FLOPPY_CONNECTOR(config, m_floppy0, mbee_floppies, "35dd", floppy_image_device::default_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppy1, mbee_floppies, "35dd", floppy_image_device::default_floppy_formats).enable_sound(true);
 MACHINE_CONFIG_END
@@ -839,8 +839,8 @@ MACHINE_CONFIG_START(mbee_state::mbeett)
 	MCFG_DEVICE_PROGRAM_MAP(mbeett_mem)
 	MCFG_DEVICE_IO_MAP(mbeett_io)
 	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbeett)
-	MCFG_DEVICE_REMOVE("quickload")
-	MCFG_DEVICE_REMOVE("quickload2")
+	config.device_remove("quickload");
+	config.device_remove("quickload2");
 	SCC8530(config, "scc", 4000000); // clock unknown
 MACHINE_CONFIG_END
 

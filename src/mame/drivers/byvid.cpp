@@ -813,7 +813,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(by133_state::granny)
 	babypac(config);
-	MCFG_DEVICE_REMOVE("videocpu")
+	config.device_remove("videocpu");
 	MCFG_DEVICE_ADD("videocpu", MC6809, XTAL(8'000'000)) // MC68B09P (XTAL value hard to read)
 	MCFG_DEVICE_PROGRAM_MAP(granny_map)
 

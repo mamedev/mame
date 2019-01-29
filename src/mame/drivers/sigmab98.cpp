@@ -2898,7 +2898,7 @@ MACHINE_CONFIG_START(sigmab98_state::dashhero)
 	MCFG_DEVICE_PROGRAM_MAP( gegege_mem_map )
 	MCFG_DEVICE_IO_MAP( dashhero_io_map )
 
-	MCFG_DEVICE_REMOVE("nvram") // FIXME: does not survive between sessions otherwise
+	config.device_remove("nvram"); // FIXME: does not survive between sessions otherwise
 MACHINE_CONFIG_END
 
 

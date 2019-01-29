@@ -343,7 +343,7 @@ MACHINE_CONFIG_START(amsterd_state::dallas32)
 	MCFG_DEVICE_REPLACE("maincpu", M68020, 14_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(dallas32_mem)
 
-	MCFG_DEVICE_REMOVE("nmi_timer")
+	config.device_remove("nmi_timer");
 	TIMER(config, "nmi_timer").configure_periodic(FUNC(amsterd_state::update_nmi32), attotime::from_hz(50));
 MACHINE_CONFIG_END
 

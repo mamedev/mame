@@ -999,7 +999,7 @@ MACHINE_CONFIG_START(slapfght_state::tigerhb1)
 	MCFG_DEVICE_PROGRAM_MAP(tigerhb1_map)
 	MCFG_DEVICE_IO_MAP(io_map_nomcu)
 
-	MCFG_DEVICE_REMOVE("bmcu")
+	config.device_remove("bmcu");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(slapfght_state::tigerhb2)
@@ -1072,7 +1072,7 @@ MACHINE_CONFIG_START(slapfght_state::slapfighb1)
 	MCFG_DEVICE_PROGRAM_MAP(slapfighb1_map)
 	MCFG_DEVICE_IO_MAP(io_map_nomcu)
 
-	MCFG_DEVICE_REMOVE("bmcu")
+	config.device_remove("bmcu");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(slapfght_state::slapfighb2)

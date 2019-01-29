@@ -785,7 +785,7 @@ MACHINE_CONFIG_START(g7400_state::g7400)
 	m_i8244->add_route(ALL_OUTPUTS, "mono", 0.40);
 
 	odyssey2_cartslot(config);
-	MCFG_DEVICE_REMOVE("cart_list")
+	config.device_remove("cart_list");
 	MCFG_SOFTWARE_LIST_ADD("cart_list","g7400")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("ody2_list","odyssey2")
 MACHINE_CONFIG_END
@@ -832,7 +832,7 @@ MACHINE_CONFIG_START(g7400_state::odyssey3)
 	m_i8244->add_route(ALL_OUTPUTS, "mono", 0.40);
 
 	odyssey2_cartslot(config);
-	MCFG_DEVICE_REMOVE("cart_list")
+	config.device_remove("cart_list");
 	MCFG_SOFTWARE_LIST_ADD("cart_list","g7400")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("ody2_list","odyssey2")
 MACHINE_CONFIG_END

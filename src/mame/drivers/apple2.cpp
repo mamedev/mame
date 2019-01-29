@@ -1478,9 +1478,9 @@ static MACHINE_CONFIG_START( laba2p )
 	apple2p(config);
 	MCFG_MACHINE_START_OVERRIDE(apple2_state,laba2p)
 
-	MCFG_DEVICE_REMOVE("sl0")
-	MCFG_DEVICE_REMOVE("sl3")
-	MCFG_DEVICE_REMOVE("sl6")
+	config.device_remove("sl0");
+	config.device_remove("sl3");
+	config.device_remove("sl6");
 
 //  A2BUS_LAB_80COL("sl3", A2BUS_LAB_80COL).set_onboard(m_a2bus);
 	A2BUS_IWM_FDC("sl6", A2BUS_IWM_FDC).set_onboard(m_a2bus);

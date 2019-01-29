@@ -1306,7 +1306,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(highvdeo_state::ciclone)
 	tv_tcf(config);
 
-	MCFG_DEVICE_REMOVE("maincpu")
+	config.device_remove("maincpu");
 
 	MCFG_DEVICE_ADD("maincpu", I80186, 20000000 )    // ?
 	MCFG_DEVICE_PROGRAM_MAP(tv_tcf_map)

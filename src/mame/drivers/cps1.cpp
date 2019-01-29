@@ -3476,14 +3476,14 @@ MACHINE_CONFIG_START(cps_state::qsound)
 	EEPROM_93C46_8BIT(config, "eeprom");
 
 	/* sound hardware */
-	MCFG_DEVICE_REMOVE("mono")
+	config.device_remove("mono");
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_REMOVE("soundlatch")
-	MCFG_DEVICE_REMOVE("soundlatch2")
-	MCFG_DEVICE_REMOVE("2151")
-	MCFG_DEVICE_REMOVE("oki")
+	config.device_remove("soundlatch");
+	config.device_remove("soundlatch2");
+	config.device_remove("2151");
+	config.device_remove("oki");
 
 	MCFG_DEVICE_ADD("qsound", QSOUND)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)

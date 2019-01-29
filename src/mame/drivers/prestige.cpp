@@ -837,7 +837,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(prestige_state::princ)
 	prestige_base(config);
 
-	MCFG_DEVICE_REMOVE("cartslot")
+	config.device_remove("cartslot");
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "princ_cart")
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "princ")
 MACHINE_CONFIG_END

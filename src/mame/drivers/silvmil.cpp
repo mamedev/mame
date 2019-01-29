@@ -450,13 +450,13 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(silvmil_state::puzzlove)
 	silvmil(config);
-	MCFG_DEVICE_REMOVE("audiocpu")
+	config.device_remove("audiocpu");
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(4'000'000)) /* Verified */
 	MCFG_DEVICE_PROGRAM_MAP(silvmil_sound_map)
 
 	m_sprgen->set_bootleg_type(1);
 
-	MCFG_DEVICE_REMOVE("oki")
+	config.device_remove("oki");
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(4'000'000)/4, okim6295_device::PIN7_HIGH) /* Verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END

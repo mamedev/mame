@@ -788,7 +788,7 @@ MACHINE_CONFIG_START(atomeb_state::atomeb)
 	MCFG_DEVICE_PROGRAM_MAP(atomeb_mem)
 
 	/* cartridges */
-	MCFG_DEVICE_REMOVE("cartslot")
+	config.device_remove("cartslot");
 
 	MCFG_ATOM_ROM_ADD("rom_a0", ext_load<0x0>)
 	MCFG_ATOM_ROM_ADD("rom_a1", ext_load<0x1>)
@@ -873,9 +873,9 @@ void atom_state::atombb(machine_config &config)
 //  MCFG_DEVICE_PROGRAM_MAP(prophet_mem)
 //
 //  /* fdc */
-//  MCFG_DEVICE_REMOVE(I8271_TAG)
-//  MCFG_DEVICE_REMOVE(I8271_TAG ":0")
-//  MCFG_DEVICE_REMOVE(I8271_TAG ":1")
+//  config.device_remove(I8271_TAG);
+//  config.device_remove(I8271_TAG ":0");
+//  config.device_remove(I8271_TAG ":1");
 //
 //  /* internal ram */
 //  MCFG_RAM_MODIFY(RAM_TAG)

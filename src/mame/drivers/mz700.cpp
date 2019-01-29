@@ -431,7 +431,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mz_state::mz800)
 	mz700(config);
-	MCFG_DEVICE_REMOVE("banke")
+	config.device_remove("banke");
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
@@ -449,7 +449,7 @@ MACHINE_CONFIG_START(mz_state::mz800)
 	MCFG_DEVICE_ADD("sn76489n", SN76489, XTAL(17'734'470)/5)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_DEVICE_REMOVE("cass_list")
+	config.device_remove("cass_list");
 	MCFG_SOFTWARE_LIST_ADD("cass_list","mz800_cass")
 
 	/* devices */

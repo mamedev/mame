@@ -299,7 +299,7 @@ GFXDECODE_END
 MACHINE_CONFIG_START(spectrum_state::spectrum_128)
 	spectrum(config);
 
-	MCFG_DEVICE_REMOVE("maincpu")
+	config.device_remove("maincpu");
 
 	MCFG_DEVICE_ADD("maincpu", Z80, X1_128_SINCLAIR / 5)
 	MCFG_DEVICE_PROGRAM_MAP(spectrum_128_mem)

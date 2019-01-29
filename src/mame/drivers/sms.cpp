@@ -638,8 +638,8 @@ MACHINE_CONFIG_START(smssdisp_state::sms_sdisp)
 	/* Both CPUs seem to communicate with the VDP etc? */
 	MCFG_DEVICE_IO_MAP(sms_io)
 
-	MCFG_DEVICE_REMOVE("mycard")
-	MCFG_DEVICE_REMOVE("smsexp")
+	config.device_remove("mycard");
+	config.device_remove("smsexp");
 
 	MCFG_SMS_CARTRIDGE_ADD("slot2", sms_cart, nullptr)
 	MCFG_SMS_CARTRIDGE_ADD("slot3", sms_cart, nullptr)
@@ -902,7 +902,7 @@ MACHINE_CONFIG_START(sms_state::sms2_kr)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(smskr_io)
 
-	MCFG_DEVICE_REMOVE("slot")
+	config.device_remove("slot");
 	MCFG_SG1000MK3_CARTRIDGE_ADD("slot", sg1000mk3_cart, nullptr)
 	MCFG_SOFTWARE_LIST_ADD("cart_list2","sg1000")
 
@@ -917,9 +917,9 @@ MACHINE_CONFIG_START(sms_state::sms1_kr)
 
 	// need to replace the cartridge slot with the Japanese version, so to
 	// keep the usual media order, remove and reinsert all of them.
-	MCFG_DEVICE_REMOVE("slot")
-	MCFG_DEVICE_REMOVE("mycard")
-	MCFG_DEVICE_REMOVE("smsexp")
+	config.device_remove("slot");
+	config.device_remove("mycard");
+	config.device_remove("smsexp");
 	MCFG_SG1000MK3_CARTRIDGE_ADD("slot", sg1000mk3_cart, nullptr)
 	MCFG_SMS_CARD_ADD("mycard", sms_cart, nullptr)
 	MCFG_SMS_EXPANSION_ADD("smsexp", sms_expansion_devices, nullptr)
@@ -954,9 +954,9 @@ MACHINE_CONFIG_START(sms_state::sg1000m3)
 
 	// Remove and reinsert all media slots, as done with the sms1_kr config,
 	// and also replace the expansion slot with the SG-1000 version.
-	MCFG_DEVICE_REMOVE("slot")
-	MCFG_DEVICE_REMOVE("mycard")
-	MCFG_DEVICE_REMOVE("smsexp")
+	config.device_remove("slot");
+	config.device_remove("mycard");
+	config.device_remove("smsexp");
 	MCFG_SG1000MK3_CARTRIDGE_ADD("slot", sg1000mk3_cart, nullptr)
 	MCFG_SMS_CARD_ADD("mycard", sms_cart, nullptr)
 	MCFG_SG1000_EXPANSION_ADD("sgexp", sg1000_expansion_devices, nullptr, false)

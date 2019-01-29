@@ -435,7 +435,7 @@ MACHINE_CONFIG_START(gng_state::diamond)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(diamond_map)
 
-	MCFG_DEVICE_REMOVE("mainlatch")
+	config.device_remove("mainlatch");
 MACHINE_CONFIG_END
 
 

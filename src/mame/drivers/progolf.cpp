@@ -459,7 +459,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(progolf_state::progolfa)
 	progolf(config);
-	MCFG_DEVICE_REMOVE("maincpu") /* different encrypted cpu to progolf */
+	config.device_remove("maincpu"); /* different encrypted cpu to progolf */
 	MCFG_DEVICE_ADD("maincpu", DECO_CPU6, 3000000/2) /* guess, 3 Mhz makes the game to behave worse? */
 	MCFG_DEVICE_PROGRAM_MAP(main_cpu)
 MACHINE_CONFIG_END

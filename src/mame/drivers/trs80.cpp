@@ -571,7 +571,7 @@ MACHINE_CONFIG_START(trs80_state::sys80)
 	model1(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(sys80_io)
-	MCFG_DEVICE_REMOVE("brg")
+	config.device_remove("brg");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(trs80_state::ht1080z)

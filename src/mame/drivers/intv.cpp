@@ -507,7 +507,7 @@ MACHINE_CONFIG_START(intv_state::intvoice)
 	MCFG_DEVICE_MODIFY( "maincpu" )
 	MCFG_DEVICE_PROGRAM_MAP(intvoice_mem)
 
-	MCFG_DEVICE_REMOVE("cartslot")
+	config.device_remove("cartslot");
 	MCFG_DEVICE_ADD("voice", INTV_ROM_VOICE, 0)
 MACHINE_CONFIG_END
 
@@ -516,7 +516,7 @@ MACHINE_CONFIG_START(intv_state::intvecs)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(intvecs_mem)
 
-	MCFG_DEVICE_REMOVE("cartslot")
+	config.device_remove("cartslot");
 	MCFG_DEVICE_ADD("ecs", INTV_ROM_ECS, 0)
 
 	sp0256_device &speech(SP0256(config, "speech", 3120000));
@@ -527,8 +527,8 @@ MACHINE_CONFIG_START(intv_state::intvecs)
 	//CASSETTE(config, "cassette");
 
 	/* software lists */
-	MCFG_DEVICE_REMOVE("cart_list")
-	MCFG_DEVICE_REMOVE("ecs_list")
+	config.device_remove("cart_list");
+	config.device_remove("ecs_list");
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "intvecs")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("intv_list", "intv")
 MACHINE_CONFIG_END

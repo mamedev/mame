@@ -972,7 +972,7 @@ MACHINE_CONFIG_START(cninja_state::cninjabl2)
 
 	m_ioprot->soundlatch_irq_cb().set_inputline(m_audiocpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_REMOVE("ymsnd")
+	config.device_remove("ymsnd");
 
 	MCFG_DEVICE_REPLACE("oki1", OKIM6295, XTAL(32'220'000) / 32, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

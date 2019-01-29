@@ -2419,7 +2419,7 @@ MACHINE_CONFIG_START(seta2_state::ablastb)
 	MCFG_DEVICE_PROGRAM_MAP(ablastb_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta2_state, irq2_line_hold)
 
-	MCFG_DEVICE_REMOVE("tmp68301")
+	config.device_remove("tmp68301");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seta2_state::reelquak)

@@ -3961,7 +3961,7 @@ MACHINE_CONFIG_START(namcos22_state::namcos22s)
 	TIMER(config, "mcu_irq").configure_scanline(FUNC(namcos22_state::mcu_irq), "screen", 0, 240);
 	MCFG_QUANTUM_TIME(attotime::from_hz(9000)) // erratic inputs otherwise, probably mcu vs maincpu shareram
 
-	MCFG_DEVICE_REMOVE("iomcu")
+	config.device_remove("iomcu");
 
 	MB87078(config, m_mb87078);
 	m_mb87078->gain_changed().set(FUNC(namcos22_state::mb87078_gain_changed));

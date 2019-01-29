@@ -201,10 +201,11 @@ MACHINE_CONFIG_START(mrdo_state::mrdo)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(mrdo_state::mrlo)
+void mrdo_state::mrlo(machine_config &config)
+{
 	mrdo(config);
-	//MCFG_DEVICE_REMOVE("pal16r6")
-MACHINE_CONFIG_END
+	//config.device_remove("pal16r6");
+}
 
 
 

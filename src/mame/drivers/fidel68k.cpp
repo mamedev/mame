@@ -694,8 +694,8 @@ MACHINE_CONFIG_START(fidel68k_state::eagv11)
 	MCFG_DEVICE_PROGRAM_MAP(eagv11_map)
 
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(fidel68k_state, irq2_line_hold, 600)
-	MCFG_DEVICE_REMOVE("irq_on") // 8.25us is too long
-	MCFG_DEVICE_REMOVE("irq_off")
+	config.device_remove("irq_on"); // 8.25us is too long
+	config.device_remove("irq_off");
 MACHINE_CONFIG_END
 
 

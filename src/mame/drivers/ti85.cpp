@@ -645,7 +645,7 @@ MACHINE_CONFIG_START(ti85_state::ti81v2)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(ti81v2_io)
 
-	MCFG_DEVICE_REMOVE("linkport")
+	config.device_remove("linkport");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ti85_state::ti83)
@@ -748,11 +748,12 @@ MACHINE_CONFIG_START(ti85_state::ti84pse)
 	MCFG_MACHINE_START_OVERRIDE(ti85_state, ti84pse )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(ti85_state::ti73)
+void ti85_state::ti73(machine_config &config)
+{
 	ti83p(config);
-	MCFG_DEVICE_REMOVE("linkport")
-	//MCFG_TI73SERIAL_ADD( "tiserial" )
-MACHINE_CONFIG_END
+	config.device_remove("linkport");
+	//TI73SERIAL(config, "tiserial");
+}
 
 ROM_START (ti73)
 	ROM_REGION (0x80000, "flash",0)

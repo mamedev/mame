@@ -427,7 +427,7 @@ MACHINE_CONFIG_START(trs80m3_state::model4p)
 	m_m4p_bank->set_addr_width(19);
 	m_m4p_bank->set_stride(0x10000);
 
-	MCFG_DEVICE_REMOVE("quickload")
+	config.device_remove("quickload");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(trs80m3_state::cp500)

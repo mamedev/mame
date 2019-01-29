@@ -481,7 +481,7 @@ MACHINE_CONFIG_START(retofinv_state::retofinvb_nomcu)
 
 	m_mainlatch->q_out_cb<3>().set_nop();
 
-	MCFG_DEVICE_REMOVE("68705")
+	config.device_remove("68705");
 MACHINE_CONFIG_END
 
 /* bootleg which has different pallete clut and also has no mcu */
@@ -492,7 +492,7 @@ MACHINE_CONFIG_START(retofinv_state::retofinvb1_nomcu)
 
 	m_mainlatch->q_out_cb<3>().set_nop();
 
-	MCFG_DEVICE_REMOVE("68705")
+	config.device_remove("68705");
 MACHINE_CONFIG_END
 
 /***************************************************************************

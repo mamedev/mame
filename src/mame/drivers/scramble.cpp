@@ -1452,8 +1452,8 @@ MACHINE_CONFIG_START(scramble_state::hotshock)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(hotshock_map)
 
-	MCFG_DEVICE_REMOVE( "ppi8255_0" )
-	MCFG_DEVICE_REMOVE( "ppi8255_1" )
+	config.device_remove( "ppi8255_0" );
+	config.device_remove( "ppi8255_1" );
 
 	MCFG_DEVICE_MODIFY("audiocpu")
 	MCFG_DEVICE_IO_MAP(hotshock_sound_io_map)
@@ -1504,9 +1504,9 @@ MACHINE_CONFIG_START(scramble_state::triplep)
 	MCFG_DEVICE_PROGRAM_MAP(triplep_map)
 	MCFG_DEVICE_IO_MAP(triplep_io_map)
 
-	MCFG_DEVICE_REMOVE("audiocpu")
-	MCFG_DEVICE_REMOVE("ppi8255_1")
-	MCFG_DEVICE_REMOVE("konami_7474")
+	config.device_remove("audiocpu");
+	config.device_remove("ppi8255_1");
+	config.device_remove("konami_7474");
 
 	/* video hardware */
 	m_palette->set_entries(32+64+2+0); // 32 for characters, 64 for stars, 2 for bullets
@@ -1520,7 +1520,7 @@ MACHINE_CONFIG_START(scramble_state::triplep)
 	MCFG_SOUND_ROUTES_RESET()
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_DEVICE_REMOVE("8910.2")
+	config.device_remove("8910.2");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(scramble_state::mariner)

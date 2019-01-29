@@ -911,7 +911,7 @@ MACHINE_CONFIG_START(hx20_state::cm6000)
 	m_maincpu->set_addrmap(AS_PROGRAM, &hx20_state::cm6000_mem);
 
 	// optional rom
-	MCFG_DEVICE_REMOVE("optrom")
+	config.device_remove("optrom");
 
 	// software lists
 	MCFG_SOFTWARE_LIST_REMOVE("epson_cpm_list")
