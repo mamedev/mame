@@ -69,6 +69,17 @@ static const gfx_layout charlayout =
 	8*8*4
 };
 
+static const gfx_layout charlayout6 =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	6,
+	{ 0,1,2,3,4,5 },
+	{ STEP8(0,6) },
+	{ STEP8(0,6*8) },
+	8*8*6
+};
+
 static const gfx_layout char16layout =
 {
 	16,16,
@@ -97,6 +108,7 @@ static GFXDECODE_START( gfx )
 	GFXDECODE_ENTRY( ":maincpu", 0, charlayout, 0, 16 )
 	GFXDECODE_ENTRY( ":maincpu", 0, char16layout, 0, 16 )
 	GFXDECODE_ENTRY( ":maincpu", 0, char32layout, 0, 16 )
+	GFXDECODE_ENTRY( ":maincpu", 0, charlayout6, 0, 16 ) // correct for lots of the tiles inc. startup text
 GFXDECODE_END
 
 
@@ -398,7 +410,7 @@ void spg110_device::map_video(address_map &map)
 	map(0x01800, 0x027ff).ram().w(FUNC(spg110_device::fg_videoram_w)).share("fg_videoram");
 	map(0x02800, 0x02fff).ram().w(FUNC(spg110_device::fg_attrram_w)).share("fg_attrram");
 
-	map(0x04000, 0x04fff).ram(); // seems to be 3 blocks
+	map(0x04000, 0x04fff).ram(); // seems to be 3 blocks, almost certainly spritelist
 
 	map(0x08000, 0x081ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // probably? format unknown tho
 }
@@ -413,13 +425,13 @@ TIMER_CALLBACK_MEMBER(spg110_device::test_timer)
 
 TILE_GET_INFO_MEMBER(spg110_device::get_bg_tile_info)
 {
-	int tileno = m_bg_videoram[tile_index] *2;
-	SET_TILE_INFO_MEMBER(0, tileno, 0, 0);
+	int tileno = m_bg_videoram[tile_index];
+	SET_TILE_INFO_MEMBER(3, tileno, 0, 0);
 }
 
 TILE_GET_INFO_MEMBER(spg110_device::get_fg_tile_info)
 {
-	int tileno = m_fg_videoram[tile_index] + 0x7b60;
+	int tileno = m_fg_videoram[tile_index];
 	SET_TILE_INFO_MEMBER(0, tileno, 0, 0);
 }
 
