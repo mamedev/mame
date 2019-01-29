@@ -617,16 +617,15 @@ MACHINE_CONFIG_START(decstation_state::kn02ba)
 	rs232b.dcd_handler().set(m_scc0, FUNC(z80scc_device::dcdb_w));
 	rs232b.cts_handler().set(m_scc0, FUNC(z80scc_device::ctsb_w));
 
-	MCFG_NSCSI_BUS_ADD("scsibus")
-	MCFG_NSCSI_ADD("scsibus:0", dec_scsi_devices, "harddisk", false)
-	MCFG_NSCSI_ADD("scsibus:1", dec_scsi_devices, "cdrom", false)
-	MCFG_NSCSI_ADD("scsibus:2", dec_scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:3", dec_scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:4", dec_scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:5", dec_scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:6", dec_scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:7", dec_scsi_devices, "asc", true)
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("asc", [this] (device_t *device) { ncr5394(device); })
+	NSCSI_BUS(config, "scsibus");
+	NSCSI_CONNECTOR(config, "scsibus:0", dec_scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "scsibus:1", dec_scsi_devices, "cdrom");
+	NSCSI_CONNECTOR(config, "scsibus:2", dec_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:3", dec_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:4", dec_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:5", dec_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:6", dec_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:7", dec_scsi_devices, "asc", true).set_option_machine_config("asc", [this] (device_t *device) { ncr5394(device); });
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( decstation )

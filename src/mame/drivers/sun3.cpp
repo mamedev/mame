@@ -1061,16 +1061,15 @@ MACHINE_CONFIG_START(sun3_state::sun3)
 
 	AM79C90(config, m_lance, 10'000'000); // clock is a guess
 
-	MCFG_NSCSI_BUS_ADD("scsibus")
-	MCFG_NSCSI_ADD("scsibus:0", scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:1", scsi_devices, "harddisk", false)
-	MCFG_NSCSI_ADD("scsibus:2", scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:3", scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:4", scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:5", scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:6", scsi_devices, "cdrom", false)
-	MCFG_NSCSI_ADD("scsibus:7", scsi_devices, "ncr5380", true)
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("ncr5380", [this] (device_t *device) { ncr5380(device); })
+	NSCSI_BUS(config, "scsibus");
+	NSCSI_CONNECTOR(config, "scsibus:0", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:1", scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "scsibus:2", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:3", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:4", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:5", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:6", scsi_devices, "cdrom");
+	NSCSI_CONNECTOR(config, "scsibus:7", scsi_devices, "ncr5380", true).set_option_machine_config("ncr5380", [this] (device_t *device) { ncr5380(device); });
 MACHINE_CONFIG_END
 
 // Sun 3/60
@@ -1162,16 +1161,15 @@ MACHINE_CONFIG_START(sun3_state::sun3_50)
 	rs232b.dcd_handler().set(m_scc2, FUNC(z80scc_device::dcdb_w));
 	rs232b.cts_handler().set(m_scc2, FUNC(z80scc_device::ctsb_w));
 
-	MCFG_NSCSI_BUS_ADD("scsibus")
-	MCFG_NSCSI_ADD("scsibus:0", scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:1", scsi_devices, "harddisk", false)
-	MCFG_NSCSI_ADD("scsibus:2", scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:3", scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:4", scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:5", scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:6", scsi_devices, "cdrom", false)
-	MCFG_NSCSI_ADD("scsibus:7", scsi_devices, "ncr5380", true)
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("ncr5380", [this] (device_t *device) { ncr5380(device); })
+	NSCSI_BUS(config, "scsibus");
+	NSCSI_CONNECTOR(config, "scsibus:0", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:1", scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "scsibus:2", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:3", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:4", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:5", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:6", scsi_devices, "cdrom");
+	NSCSI_CONNECTOR(config, "scsibus:7", scsi_devices, "ncr5380", true).set_option_machine_config("ncr5380", [this] (device_t *device) { ncr5380(device); });
 MACHINE_CONFIG_END
 
 /* ROM definition */
