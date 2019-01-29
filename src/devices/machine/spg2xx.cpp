@@ -125,8 +125,8 @@ void spg2xx_device::device_start()
 	m_porta_in.resolve_safe(0);
 	m_portb_in.resolve_safe(0);
 	m_portc_in.resolve_safe(0);
-	m_adc_in[0].resolve_safe(0);
-	m_adc_in[1].resolve_safe(0);
+	m_adc_in[0].resolve_safe(0x0fff);
+	m_adc_in[1].resolve_safe(0x0fff);
 	m_eeprom_w.resolve_safe();
 	m_eeprom_r.resolve_safe(0);
 	m_uart_tx.resolve_safe();
