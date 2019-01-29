@@ -115,6 +115,9 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(spg110_device::device_add_mconfig)
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x100);
+//	PALETTE(config, m_palette).set_format(palette_device::RGB_565, 0x100);
+//	PALETTE(config, m_palette).set_format(palette_device::IRGB_4444, 0x100);
+//	PALETTE(config, m_palette).set_format(palette_device::RGBI_4444, 0x100);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx);
 MACHINE_CONFIG_END
@@ -227,27 +230,43 @@ WRITE16_MEMBER(spg110_device::spg110_2066_w) { COMBINE_DATA(&m_2066_inner); }
 
 WRITE16_MEMBER(spg110_device::spg110_2062_w)
 {
-	int length = (data-1) & 0xff;
+//	int length = (data - 1) & 0xff;
+	int length = data & 0x1fff;
 
 	// this is presumably a counter that underflows to 0x1fff, because that's what the wait loop waits for?
 	logerror("%s: trigger (%04x) with values (written outer) %04x %04x %04x %04x | (written inner) %04x (ram source?) %04x\n", machine().describe_context(), data, m_2061_outer, m_2064_outer, m_2067_outer, m_2068_outer, m_2060_inner, m_2066_inner);
 
 	int source = m_2066_inner;
 	int dest = m_2060_inner;
+
+	// maybe
+	/*
+	if (!(m_2068_outer & 1))
+	{
+		length = length * 4;
+	}
+	*/
 	//logerror("[ ");
 	for (int i = 0; i <= length; i++)
 	{
-		address_space &mem = m_cpu->space(AS_PROGRAM);
-		uint16_t val = mem.read_word(m_2066_inner + i);
+		if (m_2068_outer & 1)
+		{
+			address_space &mem = m_cpu->space(AS_PROGRAM);
+			uint16_t val = mem.read_word(m_2066_inner + i);
 
-		this->space(0).write_word(dest*2, val, 0xffff);
+			this->space(0).write_word(dest * 2, val, 0xffff);
+		}
+		else // guess, it needs to clear layers somehow
+		{
+			this->space(0).write_word(dest * 2, 0x0000, 0xffff);
+		}
 
 		source++;
 		dest++;
 
-	//	logerror("%04x, ", val);
+		//	logerror("%04x, ", val);
 	}
-//	logerror(" ]\n");
+	//	logerror(" ]\n");
 }
 
 READ16_MEMBER(spg110_device::spg110_2062_r)
