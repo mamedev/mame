@@ -185,6 +185,9 @@ private:
 
 	uint16_t m_2060_inner;
 	uint16_t m_2066_inner;
+
+	uint16_t m_2011_scroll;
+	uint16_t m_2036_scroll;
 };
 
 DECLARE_DEVICE_TYPE(SPG110, spg110_device)

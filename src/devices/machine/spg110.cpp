@@ -171,7 +171,7 @@ WRITE16_MEMBER(spg110_device::spg110_3223_w) { }
 WRITE16_MEMBER(spg110_device::spg110_3225_w) { }
 
 WRITE16_MEMBER(spg110_device::spg110_2010_w) { }
-WRITE16_MEMBER(spg110_device::spg110_2011_w) { }
+WRITE16_MEMBER(spg110_device::spg110_2011_w) { COMBINE_DATA(&m_2011_scroll); }
 WRITE16_MEMBER(spg110_device::spg110_2012_w) { }
 WRITE16_MEMBER(spg110_device::spg110_2013_w) { }
 WRITE16_MEMBER(spg110_device::spg110_2014_w) { }
@@ -190,7 +190,7 @@ WRITE16_MEMBER(spg110_device::spg110_2032_w) { }
 WRITE16_MEMBER(spg110_device::spg110_2033_w) { }
 WRITE16_MEMBER(spg110_device::spg110_2034_w) { }
 WRITE16_MEMBER(spg110_device::spg110_2035_w) { }
-WRITE16_MEMBER(spg110_device::spg110_2036_w) { }
+WRITE16_MEMBER(spg110_device::spg110_2036_w) { COMBINE_DATA(&m_2036_scroll); }
 WRITE16_MEMBER(spg110_device::spg110_2039_w) { }
 WRITE16_MEMBER(spg110_device::spg110_2037_w) { }
 WRITE16_MEMBER(spg110_device::spg110_203c_w) { }
@@ -314,6 +314,8 @@ void spg110_device::map(address_map &map)
 {
 	map(0x000000, 0x000fff).ram();
 	
+	//map(0x002010, 0x00205f).ram();
+
 	// vregs are at 2000?
 	map(0x002010, 0x002010).w(FUNC(spg110_device::spg110_2010_w));
 	map(0x002011, 0x002011).w(FUNC(spg110_device::spg110_2011_w)); // possible scroll register?
@@ -327,7 +329,7 @@ void spg110_device::map(address_map &map)
 	map(0x002019, 0x002019).rw(FUNC(spg110_device::spg110_2019_r), FUNC(spg110_device::spg110_2019_w));
 	map(0x00201a, 0x00201a).w(FUNC(spg110_device::spg110_201a_w));
 	map(0x00201b, 0x00201b).w(FUNC(spg110_device::spg110_201b_w));
-	map(0x00201c, 0x00201c).w(FUNC(spg110_device::spg110_201c_w)); // possible scroll register?
+	map(0x00201c, 0x00201c).w(FUNC(spg110_device::spg110_201c_w));
 	
 	map(0x002020, 0x002020).w(FUNC(spg110_device::spg110_2020_w));
 
@@ -369,6 +371,7 @@ void spg110_device::map(address_map &map)
 	map(0x00205d, 0x00205d).w(FUNC(spg110_device::spg110_205d_w));
 	map(0x00205e, 0x00205e).w(FUNC(spg110_device::spg110_205e_w));
 	map(0x00205f, 0x00205f).w(FUNC(spg110_device::spg110_205f_w));
+
 
 	// everything (dma? and interrupt flag?!)
 	map(0x002060, 0x002060).w(FUNC(spg110_device::spg110_2060_w));
@@ -464,10 +467,27 @@ void spg110_device::device_start()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(spg110_device::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(spg110_device::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_fg_tilemap->set_transparent_pen(0);
+
+	save_item(NAME(m_2068_outer));
+	save_item(NAME(m_2064_outer));
+	save_item(NAME(m_2061_outer));
+	save_item(NAME(m_2067_outer));
+	save_item(NAME(m_2060_inner));
+	save_item(NAME(m_2066_inner));
+	save_item(NAME(m_2011_scroll));
+	save_item(NAME(m_2036_scroll));
 }
 
 void spg110_device::device_reset()
 {
+	m_2068_outer = 0;
+	m_2064_outer = 0;
+	m_2061_outer = 0;
+	m_2067_outer = 0;
+	m_2060_inner = 0;
+	m_2066_inner = 0;
+	m_2011_scroll = 0;
+	m_2036_scroll = 0;
 }
 
 double spg110_device::hue2rgb(double p, double q, double t)
@@ -482,19 +502,19 @@ double spg110_device::hue2rgb(double p, double q, double t)
 
 uint32_t spg110_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	// Palette
+	// Palette, this is still wrong!
 	int offs = 0;
 	for (int index = 0;index < 256; index++)
 	{
 		uint16_t dat = m_palram[offs++];
 
-		// llll lsss --hh hhhh
+		// llll lsss sshh hhhh
 		int l_raw =  (dat & 0xf800) >> 11;
-		int sl_raw = (dat & 0x0700) >> 8;
+		int sl_raw = (dat & 0x07c0) >> 6;
 		int h_raw =  (dat & 0x003f) >> 0;
 
 		double l = (double)l_raw / 31.0f;
-		double s = (double)sl_raw / 7.0f;
+		double s = (double)sl_raw / 31.0f;
 		double h = (double)h_raw / 47.0f;
 
 		double r, g, b;
@@ -516,6 +536,11 @@ uint32_t spg110_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 		m_palette->set_pen_color(index, r_real, g_real, b_real);
 	}
 
+	m_bg_tilemap->set_scrolly(0, m_2011_scroll);
+
+	m_fg_tilemap->set_scrollx(0, 8); // where does this come from?
+
+	// what is 2036 used for, also looks like scrolling, maybe some sprite offset? or zoom?
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
