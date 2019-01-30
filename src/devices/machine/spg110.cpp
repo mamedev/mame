@@ -4,12 +4,8 @@
 
     SunPlus SPG110-series SoC peripheral emulation
 
-    It is possible this shares some video features with spg110 and
-    can be made a derived device
-
-    0032xx looks like it could be the same as 003d00 on spg2xx
+    0032xx looks like it could be the same as 003dxx on spg2xx
 	but the video seems quite different?
-
 
 **********************************************************************/
 
@@ -170,8 +166,8 @@ WRITE16_MEMBER(spg110_device::spg110_3221_w)
 WRITE16_MEMBER(spg110_device::spg110_3223_w) { }
 WRITE16_MEMBER(spg110_device::spg110_3225_w) { }
 
-WRITE16_MEMBER(spg110_device::spg110_2010_w) { }
-WRITE16_MEMBER(spg110_device::spg110_2011_w) { COMBINE_DATA(&m_2011_scroll); }
+WRITE16_MEMBER(spg110_device::spg110_bg_scrollx_w) { COMBINE_DATA(&m_bg_scrollx); }
+WRITE16_MEMBER(spg110_device::spg110_bg_scrolly_w) { COMBINE_DATA(&m_bg_scrolly); }
 WRITE16_MEMBER(spg110_device::spg110_2012_w) { }
 WRITE16_MEMBER(spg110_device::spg110_2013_w) { }
 WRITE16_MEMBER(spg110_device::spg110_2014_w) { }
@@ -261,6 +257,7 @@ WRITE16_MEMBER(spg110_device::spg110_2062_w)
 		}
 		else // guess, it needs to clear layers somehow
 		{
+			// is there a fill mode to fill other values?
 			this->space(0).write_word(dest * 2, 0x0000, 0xffff);
 		}
 
@@ -315,11 +312,10 @@ void spg110_device::map(address_map &map)
 {
 	map(0x000000, 0x000fff).ram();
 	
-	//map(0x002010, 0x00205f).ram();
-
+	
 	// vregs are at 2000?
-	map(0x002010, 0x002010).w(FUNC(spg110_device::spg110_2010_w));
-	map(0x002011, 0x002011).w(FUNC(spg110_device::spg110_2011_w)); // possible scroll register?
+	map(0x002010, 0x002010).w(FUNC(spg110_device::spg110_bg_scrollx_w));
+	map(0x002011, 0x002011).w(FUNC(spg110_device::spg110_bg_scrolly_w));
 	map(0x002012, 0x002012).w(FUNC(spg110_device::spg110_2012_w));
 	map(0x002013, 0x002013).rw(FUNC(spg110_device::spg110_2013_r),FUNC(spg110_device::spg110_2013_w));
 	map(0x002014, 0x002014).w(FUNC(spg110_device::spg110_2014_w));
@@ -372,7 +368,8 @@ void spg110_device::map(address_map &map)
 	map(0x00205d, 0x00205d).w(FUNC(spg110_device::spg110_205d_w));
 	map(0x00205e, 0x00205e).w(FUNC(spg110_device::spg110_205e_w));
 	map(0x00205f, 0x00205f).w(FUNC(spg110_device::spg110_205f_w));
-
+	
+	//map(0x002010, 0x00205f).ram();
 
 	// everything (dma? and interrupt flag?!)
 	map(0x002060, 0x002060).w(FUNC(spg110_device::spg110_2060_w));
@@ -453,7 +450,14 @@ TIMER_CALLBACK_MEMBER(spg110_device::test_timer)
 TILE_GET_INFO_MEMBER(spg110_device::get_bg_tile_info)
 {
 	int tileno = m_bg_videoram[tile_index];
+
+	int attr = m_bg_attrram[tile_index/2];
+	if (tile_index&1) attr = (attr & 0xff00)>>8;
+	else attr = attr & 0x00ff;
+
 	SET_TILE_INFO_MEMBER(3, tileno, 0, 0);
+	tileinfo.category   =   (attr >> 4) & 0x0f; // very likely wrong, complete guess
+
 }
 
 TILE_GET_INFO_MEMBER(spg110_device::get_fg_tile_info)
@@ -467,6 +471,7 @@ TILE_GET_INFO_MEMBER(spg110_device::get_fg_tile_info)
 	int pal = attr & 0x0f;
 
 	SET_TILE_INFO_MEMBER(0, tileno, pal, 0);
+	tileinfo.category   =   (attr >> 4) & 0x0f; // very likely wrong, complete guess
 }
 
 void spg110_device::device_start()
@@ -482,7 +487,8 @@ void spg110_device::device_start()
 	save_item(NAME(m_2067_outer));
 	save_item(NAME(m_2060_inner));
 	save_item(NAME(m_2066_inner));
-	save_item(NAME(m_2011_scroll));
+	save_item(NAME(m_bg_scrollx));
+	save_item(NAME(m_bg_scrolly));
 	save_item(NAME(m_2036_scroll));
 }
 
@@ -494,7 +500,8 @@ void spg110_device::device_reset()
 	m_2067_outer = 0;
 	m_2060_inner = 0;
 	m_2066_inner = 0;
-	m_2011_scroll = 0;
+	m_bg_scrollx = 0;
+	m_bg_scrolly = 0;
 	m_2036_scroll = 0;
 }
 
@@ -544,14 +551,18 @@ uint32_t spg110_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 		m_palette->set_pen_color(index, r_real, g_real, b_real);
 	}
 
-	m_bg_tilemap->set_scrolly(0, m_2011_scroll);
+	m_bg_tilemap->set_scrollx(0, m_bg_scrollx);
+	m_bg_tilemap->set_scrolly(0, m_bg_scrolly);
 
 	m_fg_tilemap->set_scrollx(0, 8); // where does this come from?
 
-	// what is 2036 used for, also looks like scrolling, maybe some sprite offset? or zoom?
+	// what is 2036 used for, also looks like scrolling, maybe some sprite offset? or zoom? (reference videos suggest maybe start logo text zooms?)
 
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	for (int pri = 0; pri < 0x10; pri++) // priority is probably not correct, this is just using a random tile attribute with single use case
+	{
+		m_bg_tilemap->draw(screen, bitmap, cliprect, pri, pri, 0);
+		m_fg_tilemap->draw(screen, bitmap, cliprect, pri, pri, 0);
+	}
 	return 0;
 }
 

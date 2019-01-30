@@ -70,8 +70,8 @@ private:
 	DECLARE_READ16_MEMBER(spg110_2013_r);
 	DECLARE_READ16_MEMBER(spg110_2019_r);
 
-	DECLARE_WRITE16_MEMBER(spg110_2010_w);
-	DECLARE_WRITE16_MEMBER(spg110_2011_w);
+	DECLARE_WRITE16_MEMBER(spg110_bg_scrollx_w);
+	DECLARE_WRITE16_MEMBER(spg110_bg_scrolly_w);
 	DECLARE_WRITE16_MEMBER(spg110_2012_w);
 	DECLARE_WRITE16_MEMBER(spg110_2013_w);
 	DECLARE_WRITE16_MEMBER(spg110_2014_w);
@@ -186,7 +186,8 @@ private:
 	uint16_t m_2060_inner;
 	uint16_t m_2066_inner;
 
-	uint16_t m_2011_scroll;
+	uint16_t m_bg_scrollx;
+	uint16_t m_bg_scrolly;
 	uint16_t m_2036_scroll;
 };
 
