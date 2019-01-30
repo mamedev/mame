@@ -106,7 +106,7 @@
 	</element>
 	<element name="text_spk">
 		<disk><color red="0.81" green="0.8" blue="0.79" /></disk>
-		<text string="spk"><color red="0.17" green="0.15" blue="0.15" /></text>
+		<text string="&#x1f50a;"><color red="0.17" green="0.15" blue="0.15" /></text>
 	</element>
 	<element name="text_pv">
 		<disk><color red="0.81" green="0.8" blue="0.79" /></disk>

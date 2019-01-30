@@ -115,7 +115,7 @@
 	<element name="text_r61"><text string="&#x265f;"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 
 	<element name="text_r12"><text string="RESET" align="1"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_r22"><text string="spk" align="1"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_r22"><text string="&#x1f50a;" align="1"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_r32"><text string="PB" align="1"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_r42"><text string="PV" align="1"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_r52"><text string="TM" align="1"><color red="0.81" green="0.8" blue="0.79" /></text></element>

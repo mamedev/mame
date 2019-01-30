@@ -111,7 +111,7 @@
 
 	<element name="text_b1"><text string="GAME"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_b1a"><text string="CONTROL"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_b2"><text string="spk"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_b2"><text string="&#x1f50a;"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_b3"><text string="PB"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_b4"><text string="PV"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_b5"><text string="TM"><color red="0.81" green="0.8" blue="0.79" /></text></element>

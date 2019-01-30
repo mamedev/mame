@@ -12,40 +12,26 @@
 		<led14seg><color red="0.2" green="1.0" blue="0.85" /></led14seg>
 	</element>
 
-	<element name="led" defstate="0">
-		<disk state="1"><color red="1.0" green="0.1" blue="0.15" /></disk>
-		<disk state="0"><color red="0.1" green="0.01" blue="0.015" /></disk>
-	</element>
-
-	<element name="text_l1"><text string="N"><color red="0.7" green="0.7" blue="0.7" /></text></element>
-	<element name="text_l2"><text string="E"><color red="0.7" green="0.7" blue="0.7" /></text></element>
-	<element name="text_l3"><text string="S"><color red="0.7" green="0.7" blue="0.7" /></text></element>
-	<element name="text_l4"><text string="W"><color red="0.7" green="0.7" blue="0.7" /></text></element>
-	<element name="text_l5"><text string="&#x2195;V"><color red="0.7" green="0.7" blue="0.7" /></text></element>
-	<element name="text_l6"><text string="&#x2194;V"><color red="0.7" green="0.7" blue="0.7" /></text></element>
-	<element name="text_l7"><text string="DB"><color red="0.7" green="0.7" blue="0.7" /></text></element>
-	<element name="text_l8"><text string="RD"><color red="0.7" green="0.7" blue="0.7" /></text></element>
-
-	<element name="text_b1"><text string="RE"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_b1"><text string="RESET"><color red="0.7" green="0.7" blue="0.7" /></text></element>
 	<element name="text_b2"><text string="&#x1f50a;"><color red="0.7" green="0.7" blue="0.7" /></text></element>
-	<element name="text_b3"><text string="CL"><color red="0.7" green="0.7" blue="0.7" /></text></element>
-	<element name="text_b4"><text string="EN"><color red="0.7" green="0.7" blue="0.7" /></text></element>
-	<element name="text_b5"><text string="BR"><color red="0.7" green="0.7" blue="0.7" /></text></element>
-	<element name="text_b6"><text string="PB"><color red="0.7" green="0.7" blue="0.7" /></text></element>
-	<element name="text_b7"><text string="DB"><color red="0.7" green="0.7" blue="0.7" /></text></element>
-	<element name="text_b8"><text string="SC"><color red="0.7" green="0.7" blue="0.7" /></text></element>
-	<element name="text_b9"><text string="DL"><color red="0.7" green="0.7" blue="0.7" /></text></element>
-	<element name="text_b10"><text string="CV"><color red="0.7" green="0.7" blue="0.7" /></text></element>
-	<element name="text_b11"><text string="VL"><color red="0.7" green="0.7" blue="0.7" /></text></element>
-	<element name="text_b12"><text string="PL"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_b3"><text string="CLEAR"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_b4"><text string="YES/ENTER"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_b5"><text string="REVIEW"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_b6"><text string="AUTO"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_b7"><text string="DOUBLE"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_b8"><text string="NO/PASS"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_b9"><text string="DEALER"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_b10"><text string="CONV"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_b11"><text string="SCORE"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_b12"><text string="PLAYER"><color red="0.7" green="0.7" blue="0.7" /></text></element>
 	<element name="text_b13"><text string="&#x2663;"><color red="0.7" green="0.7" blue="0.7" /></text></element>
 	<element name="text_b14"><text string="&#x2666;"><color red="0.7" green="0.7" blue="0.7" /></text></element>
 	<element name="text_b15"><text string="&#x2665;"><color red="0.7" green="0.7" blue="0.7" /></text></element>
 	<element name="text_b16"><text string="&#x2660;"><color red="0.7" green="0.7" blue="0.7" /></text></element>
-	<element name="text_b17"><text string="J"><color red="0.7" green="0.7" blue="0.7" /></text></element>
-	<element name="text_b18"><text string="Q"><color red="0.7" green="0.7" blue="0.7" /></text></element>
-	<element name="text_b19"><text string="K"><color red="0.7" green="0.7" blue="0.7" /></text></element>
-	<element name="text_b20"><text string="A"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_b17"><text string="JACK"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_b18"><text string="QUEEN"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_b19"><text string="KING"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_b20"><text string="ACE"><color red="0.7" green="0.7" blue="0.7" /></text></element>
 	<element name="text_b21"><text string="7"><color red="0.7" green="0.7" blue="0.7" /></text></element>
 	<element name="text_b22"><text string="8"><color red="0.7" green="0.7" blue="0.7" /></text></element>
 	<element name="text_b23"><text string="9"><color red="0.7" green="0.7" blue="0.7" /></text></element>
@@ -54,8 +40,8 @@
 	<element name="text_b26"><text string="4"><color red="0.7" green="0.7" blue="0.7" /></text></element>
 	<element name="text_b27"><text string="5"><color red="0.7" green="0.7" blue="0.7" /></text></element>
 	<element name="text_b28"><text string="6"><color red="0.7" green="0.7" blue="0.7" /></text></element>
-	<element name="text_b29"><text string="NT"><color red="0.7" green="0.7" blue="0.7" /></text></element>
-	<element name="text_b30"><text string="P"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_b29"><text string="NOTRUMP"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_b30"><text string="QUIT"><color red="0.7" green="0.7" blue="0.7" /></text></element>
 	<element name="text_b31"><text string="1"><color red="0.7" green="0.7" blue="0.7" /></text></element>
 	<element name="text_b32"><text string="2"><color red="0.7" green="0.7" blue="0.7" /></text></element>
 
@@ -63,27 +49,7 @@
 <!-- build screen -->
 
 	<view name="Internal Layout">
-		<bounds left="-1" right="53" top="6" bottom="39" />
-
-	<!-- leds -->
-
-		<bezel name="7.15" element="led"><bounds x="1.25" y="8.5" width="1.5" height="1.5" /></bezel>
-		<bezel name="6.15" element="led"><bounds x="8.11" y="8.5" width="1.5" height="1.5" /></bezel>
-		<bezel name="5.15" element="led"><bounds x="14.96" y="8.5" width="1.5" height="1.5" /></bezel>
-		<bezel name="4.15" element="led"><bounds x="21.82" y="8.5" width="1.5" height="1.5" /></bezel>
-		<bezel name="3.15" element="led"><bounds x="28.68" y="8.5" width="1.5" height="1.5" /></bezel>
-		<bezel name="2.15" element="led"><bounds x="35.54" y="8.5" width="1.5" height="1.5" /></bezel>
-		<bezel name="1.15" element="led"><bounds x="42.39" y="8.5" width="1.5" height="1.5" /></bezel>
-		<bezel name="0.15" element="led"><bounds x="49.25" y="8.5" width="1.5" height="1.5" /></bezel>
-
-		<bezel element="text_l1"><bounds x="-0.75" y="7" width="5.5" height="1.4" /></bezel>
-		<bezel element="text_l2"><bounds x="6.11" y="7" width="5.5" height="1.4" /></bezel>
-		<bezel element="text_l3"><bounds x="12.96" y="7" width="5.5" height="1.4" /></bezel>
-		<bezel element="text_l4"><bounds x="19.82" y="7" width="5.5" height="1.4" /></bezel>
-		<bezel element="text_l5"><bounds x="26.68" y="7" width="5.5" height="1.4" /></bezel>
-		<bezel element="text_l6"><bounds x="33.54" y="7" width="5.5" height="1.4" /></bezel>
-		<bezel element="text_l7"><bounds x="40.39" y="7" width="5.5" height="1.4" /></bezel>
-		<bezel element="text_l8"><bounds x="47.25" y="7" width="5.5" height="1.4" /></bezel>
+		<bounds left="-1" right="53" top="11" bottom="39" />
 
 	<!-- vfd -->
 
