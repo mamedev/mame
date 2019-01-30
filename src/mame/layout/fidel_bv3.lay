@@ -13,7 +13,7 @@
 	</element>
 
 	<element name="text_b1"><text string="RESET"><color red="0.7" green="0.7" blue="0.7" /></text></element>
-	<element name="text_b2"><text string="&#x1f50a;"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_b2"><text string="spk"><color red="0.7" green="0.7" blue="0.7" /></text></element>
 	<element name="text_b3"><text string="CLEAR"><color red="0.7" green="0.7" blue="0.7" /></text></element>
 	<element name="text_b4"><text string="YES/ENTER"><color red="0.7" green="0.7" blue="0.7" /></text></element>
 	<element name="text_b5"><text string="REVIEW"><color red="0.7" green="0.7" blue="0.7" /></text></element>
