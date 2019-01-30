@@ -70,7 +70,7 @@ number, but the contents are identical.
 
 Memory map (VCC):
 -----------
-0000-0FFF: 4K 2332 ROM 101-32103
+0000-0FFF: 4K 2332 ROM 101-32013
 1000-1FFF: 4K 2332 ROM VCC2
 2000-2FFF: 4K 2332 ROM VCC3
 4000-5FFF: 1K RAM (2114 SRAM x2)
