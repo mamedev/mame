@@ -10,43 +10,6 @@
 #pragma once
 
 
-
-
-//**************************************************************************
-//  CONSTANTS
-//**************************************************************************
-
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_PC9801CBUS_CPU(_cputag) \
-	downcast<pc9801_slot_device &>(*device).set_cpu_tag(_cputag);
-
-#define MCFG_PC9801CBUS_INT0_CALLBACK(_devcb) \
-	downcast<pc9801_slot_device &>(*device).set_int_callback<0>(DEVCB_##_devcb);
-
-#define MCFG_PC9801CBUS_INT1_CALLBACK(_devcb) \
-	downcast<pc9801_slot_device &>(*device).set_int_callback<1>(DEVCB_##_devcb);
-
-#define MCFG_PC9801CBUS_INT2_CALLBACK(_devcb) \
-	downcast<pc9801_slot_device &>(*device).set_int_callback<2>(DEVCB_##_devcb);
-
-#define MCFG_PC9801CBUS_INT3_CALLBACK(_devcb) \
-	downcast<pc9801_slot_device &>(*device).set_int_callback<3>(DEVCB_##_devcb);
-
-#define MCFG_PC9801CBUS_INT4_CALLBACK(_devcb) \
-	downcast<pc9801_slot_device &>(*device).set_int_callback<4>(DEVCB_##_devcb);
-
-#define MCFG_PC9801CBUS_INT5_CALLBACK(_devcb) \
-	downcast<pc9801_slot_device &>(*device).set_int_callback<5>(DEVCB_##_devcb);
-
-#define MCFG_PC9801CBUS_INT6_CALLBACK(_devcb) \
-	downcast<pc9801_slot_device &>(*device).set_int_callback<6>(DEVCB_##_devcb);
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
