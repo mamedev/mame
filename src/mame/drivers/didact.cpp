@@ -23,27 +23,26 @@
  * http://elektronikforumet.com/forum/viewtopic.php?f=2&t=79576&start=150#p1203915
  *
  *  TODO:
- *  Didact designs:    mp68a, md6802, Modulab, Esselte 100
- * -------------------------------------------------------
- *  - Add PCB layouts   OK     OK     OK         OK
- *  - Dump ROM:s,       OK     OK     OK         rev2
- *  - Keyboard          OK     OK     OK         rev2
- *  - Display/CRT       OK     OK     OK         OK
+ *  Didact designs:    mp68a, md6802, Modulab
+ * ------------------------------------------
+ *  - Add PCB layouts   OK     OK     OK     
+ *  - Dump ROM:s,       OK     OK     OK     
+ *  - Keyboard          OK     OK     OK     
+ *  - Display/CRT       OK     OK     OK     
  *  - Clickable Artwork RQ     RQ     OK
  *  - Sound             NA     NA
- *  - Cassette i/f                               OK
+ *  - Cassette i/f                      
  *  - Expansion bus
  *  - Expansion overlay
- *  - Interrupts        OK                       OK
- *  - Serial                   XX                XX
+ *  - Interrupts        OK              
+ *  - Serial                   XX       
  *   XX = needs debug
- ****************************************************************************/
+ *********************************************/
 
 #include "emu.h"
-#include "cpu/m6800/m6800.h" // For mp68a, md6802
+#include "cpu/m6800/m6800.h" // For all boards
 #include "machine/6821pia.h" // For all boards
 #include "machine/74145.h"   // For the md6802
-#include "machine/timer.h"
 #include "video/dm9368.h"    // For the mp68a
 #include "machine/ins8154.h" // For the modulab
 #include "machine/mm74c922.h"// For the modulab
@@ -63,19 +62,19 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define LOG_SETUP   (1U <<  1)
-#define LOG_READ    (1U <<  2)
-#define LOG_DISPLAY (1U <<  3)
-#define LOG_RESET   (1U <<  4)
+#define LOG_SETUP    (1U <<  1)
+#define LOG_READ     (1U <<  2)
+#define LOG_DISPLAY  (1U <<  3)
+#define LOG_KEYBOARD (1U <<  4)
 
-//#define VERBOSE (LOG_RESET)
+//#define VERBOSE (LOG_KEYBOARD)
 //#define LOG_OUTPUT_FUNC printf
 #include "logmacro.h"
 
-#define LOGSETUP(...)   LOGMASKED(LOG_SETUP,   __VA_ARGS__)
-#define LOGREAD(...)    LOGMASKED(LOG_READ,    __VA_ARGS__)
-#define LOGDISPLAY(...) LOGMASKED(LOG_DISPLAY, __VA_ARGS__)
-#define LOGRESET(...)   LOGMASKED(LOG_RESET, __VA_ARGS__)
+#define LOGSETUP(...)   LOGMASKED(LOG_SETUP,    __VA_ARGS__)
+#define LOGREAD(...)    LOGMASKED(LOG_READ,     __VA_ARGS__)
+#define LOGDISPLAY(...) LOGMASKED(LOG_DISPLAY,  __VA_ARGS__)
+#define LOGKBD(...)     LOGMASKED(LOG_KEYBOARD, __VA_ARGS__)
 
 #ifdef _MSC_VER
 #define FUNCNAME __func__
@@ -97,23 +96,21 @@ class didact_state : public driver_device
 		: driver_device(mconfig, type, tag)
 		, m_io_lines(*this, "LINE%u", 0U)
 		, m_lines{ 0, 0, 0, 0 }
-		, m_led(0)
 		, m_rs232(*this, "rs232")
-		, m_leds(*this, "led%u", 0U)
+		, m_led(*this, "led1")
 	{ }
 
-	TIMER_DEVICE_CALLBACK_MEMBER(scan_artwork);
-
+	DECLARE_INPUT_CHANGED_MEMBER(trigger_reset);
+	DECLARE_INPUT_CHANGED_MEMBER(trigger_shift);
 protected:
-	virtual void machine_start() override { m_leds.resolve(); }
+	virtual void machine_start() override { m_led.resolve(); }
 
 	required_ioport_array<5> m_io_lines;
 	uint8_t m_lines[4];
 	uint8_t m_reset;
 	uint8_t m_shift;
-	uint8_t m_led;
 	optional_device<rs232_port_device> m_rs232;
-	output_finder<2> m_leds;
+	output_finder<1> m_led;
 };
 
 
@@ -211,7 +208,7 @@ READ8_MEMBER( md6802_state::pia2_kbA_r )
 	if (m_shift)
 	{
 		pa &= 0x7f;   // Clear shift bit if button being pressed (PA7) to ground (internal pullup)
-		LOG("SHIFT is pressed\n");
+		LOGKBD("SHIFT is pressed\n");
 	}
 
 	// Serial IN - needs debug/verification
@@ -250,8 +247,8 @@ WRITE8_MEMBER( md6802_state::pia2_kbB_w )
 
 WRITE_LINE_MEMBER( md6802_state::pia2_ca2_w )
 {
-	LOG("--->%s(%02x) LED is connected through resisitor to +5v so logical 0 will lit it\n", FUNCNAME, state);
-	m_leds[m_led] = state ? 0 :1;
+	LOGKBD("--->%s(%02x) LED is connected through resisitor to +5v so logical 0 will lit it\n", FUNCNAME, state);
+	m_led[0] = state ? 0 :1;
 
 	// Serial Out - needs debug/verification
 	m_rs232->write_txd(state);
@@ -268,13 +265,11 @@ void md6802_state::machine_start()
 
 	save_item(NAME(m_reset));
 	save_item(NAME(m_shift));
-	save_item(NAME(m_led));
 }
 
 void md6802_state::machine_reset()
 {
 	LOG("--->%s()\n", FUNCNAME);
-	m_led = 1;
 	m_maincpu->reset();
 }
 
@@ -364,6 +359,20 @@ protected:
 	required_device<pia6820_device> m_pia2;
 };
 
+INPUT_CHANGED_MEMBER(didact_state::trigger_shift)
+{
+	if (newval == CLEAR_LINE)
+	{
+		LOGKBD("SHIFT is released\n");
+	}
+	else
+	{
+		LOGKBD("SHIFT is pressed\n");
+		m_shift = 1;
+		m_led[0] = 1;
+	} 
+}
+
 READ8_MEMBER( mp68a_state::pia2_kbA_r )
 {
 	LOG("--->%s\n", FUNCNAME);
@@ -400,7 +409,7 @@ READ8_MEMBER( mp68a_state::pia2_kbB_r )
 {
 	uint8_t a012, line, pb;
 
-	LOG("--->%s %02x %02x %02x %02x %02x => ", FUNCNAME, m_lines[0], m_lines[1], m_lines[2], m_lines[3], m_shift);
+	LOGKBD("--->%s %02x %02x %02x %02x %02x => ", FUNCNAME, m_lines[0], m_lines[1], m_lines[2], m_lines[3], m_shift);
 
 	a012 = 0;
 	if ((line = (m_lines[0] | m_lines[1])) != 0)
@@ -421,11 +430,11 @@ READ8_MEMBER( mp68a_state::pia2_kbB_r )
 	{
 		pb |= 0x80;   // Set shift bit (PB7)
 		m_shift = 0;  // Reset flip flop
-		m_leds[m_led] = m_shift ? 1 : 0;
-		LOG("SHIFT is released\n");
+		m_led[0] = 0;
+		LOGKBD(" SHIFT is released\n");
 	}
 
-	LOG("%02x\n", pb);
+	LOGKBD("%02x\n", pb);
 
 	return pb;
 }
@@ -463,7 +472,6 @@ void mp68a_state::machine_start()
 
 	/* register for state saving */
 	save_item(NAME(m_shift));
-	save_item(NAME(m_led));
 	save_item(NAME(m_reset));
 }
 
@@ -538,12 +546,12 @@ class modulab_state : public didact_state
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	void modulab(machine_config &config);
-	void modulab_map(address_map &map);
 protected:
 	DECLARE_READ8_MEMBER( io_r );
 	DECLARE_WRITE8_MEMBER( io_w );
 	DECLARE_WRITE_LINE_MEMBER( da_w );
 private:
+	void modulab_map(address_map &map);
 	// Offsets for display and keyboard i/o
 	enum
 	{
@@ -631,7 +639,6 @@ void modulab_state::machine_start()
 
 	/* register for state saving */
 	save_item(NAME(m_shift));
-	save_item(NAME(m_led));
 	save_item(NAME(m_reset));
 }
 
@@ -681,7 +688,7 @@ static INPUT_PORTS_START( modulab )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("C/B") PORT_CODE(KEYCODE_X) PORT_CHAR('X')
 
 	PORT_START("LINE4") /* Special KEY ROW for reset key */
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_F12)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_F12) PORT_CHANGED_MEMBER(DEVICE_SELF, modulab_state, trigger_reset, nullptr)
 	PORT_BIT(0xfb, 0x00, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -715,8 +722,8 @@ static INPUT_PORTS_START( md6802 )
 	PORT_BIT(0xf0, 0x00, IPT_UNUSED )
 
 	PORT_START("LINE4") /* Special KEY ROW for reset and Shift/'*' keys */
-	PORT_BIT(0x08, 0x00, IPT_KEYBOARD) PORT_NAME("*") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR('*')
-	PORT_BIT(0x04, 0x00, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_F12)
+	PORT_BIT(0x08, 0x00, IPT_KEYBOARD) PORT_NAME("*") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR('*') PORT_CHANGED_MEMBER(DEVICE_SELF, md6802_state, trigger_shift, nullptr)
+	PORT_BIT(0x04, 0x00, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_F12) PORT_CHANGED_MEMBER(DEVICE_SELF, md6802_state, trigger_reset, nullptr)
 	PORT_BIT(0xf3, 0x00, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -749,42 +756,24 @@ static INPUT_PORTS_START( mp68a )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("3") PORT_CODE(KEYCODE_3)    PORT_CHAR('3')
 	PORT_BIT(0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("LINE4") /* Special KEY ROW for reset and Shift/'*' keys */
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("*") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR('*')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_F12)
+	PORT_START("LINE4") /* Special KEY ROW for reset and Shift/'*' keys, they are hard wired */
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("*") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR('*') PORT_CHANGED_MEMBER(DEVICE_SELF, mp68a_state, trigger_shift, nullptr)
+	//PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_F12)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_F12) PORT_CHANGED_MEMBER(DEVICE_SELF, mp68a_state, trigger_reset, nullptr)
 	PORT_BIT(0xf3, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-// TODO: Fix shift led for mp68a correctly, workaround doesn't work anymore! Shift works though...
-TIMER_DEVICE_CALLBACK_MEMBER(didact_state::scan_artwork)
+INPUT_CHANGED_MEMBER(didact_state::trigger_reset)
 {
-	//  LOG("--->%s()\n", FUNCNAME);
-
-	// Poll the artwork Reset key
-	if (m_io_lines[4]->read() & 0x04)
+	if (newval == CLEAR_LINE)
 	{
-		LOGRESET("RESET is pressed\n");
+		LOGKBD("RESET is released, resetting the CPU\n");
+		machine_reset();
 		m_shift = 0;
-		m_leds[m_led] = 0; // For mp68a only
-		m_reset = 1;
-	}
-	else if (m_io_lines[4]->read() & 0x08)
-	{
-		// Poll the artwork SHIFT/* key
-		LOGRESET("%s", !m_shift ? "SHIFT is set\n" : "");
-		m_shift = 1;
-		m_leds[m_led] = m_shift ? 1 : 0; // For mp68a only
-	}
-	else
-	{
-		if (m_reset == 1 && !(m_io_lines[4]->read() & 0x04))
-		{
-			LOGRESET("RESET is released, resetting the CPU\n");
-			machine_reset();
-			m_reset = 0; // Enable reset again
-		}
+		m_led[0] = 0;
 	}
 }
+
 
 void modulab_state::modulab(machine_config &config)
 {
@@ -806,8 +795,6 @@ void modulab_state::modulab(machine_config &config)
 	INS8154(config, m_pia1);
 	//m_ins8154->in_a().set(FUNC(modulab_state::ins8154_pa_r));
 	//m_ins8154->out_a().set(FUNC(modulab_state::ins8154_pa_w));
-
-  	TIMER(config, "artwork_timer").configure_periodic(FUNC(modulab_state::scan_artwork), attotime::from_hz(10));
 
 	//RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
 }
@@ -841,8 +828,6 @@ void md6802_state::md6802(machine_config &config)
 	m_pia2->writepb_handler().set(FUNC(md6802_state::pia2_kbB_w));
 	m_pia2->readpb_handler().set(FUNC(md6802_state::pia2_kbB_r));
 	m_pia2->ca2_handler().set(FUNC(md6802_state::pia2_ca2_w));
-
-	TIMER(config, "artwork_timer").configure_periodic(FUNC(md6802_state::scan_artwork), attotime::from_hz(10));
 
 	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
 }
@@ -899,8 +884,6 @@ void mp68a_state::mp68a(machine_config &config)
 	DM9368(config, m_digits[3], 0).update_cb().set(FUNC(mp68a_state::digit_w<3>));
 	DM9368(config, m_digits[4], 0).update_cb().set(FUNC(mp68a_state::digit_w<4>));
 	DM9368(config, m_digits[5], 0).update_cb().set(FUNC(mp68a_state::digit_w<5>));
-
-	TIMER(config, "artwork_timer").configure_periodic(FUNC(mp68a_state::scan_artwork), attotime::from_hz(10));
 }
 
 ROM_START( modulab )
