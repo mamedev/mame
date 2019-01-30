@@ -265,7 +265,8 @@ WRITE16_MEMBER(spg110_device::spg110_2062_w)
 		}
 
 		source++;
-		dest++;
+		// m_2064_outer is usually 1, but sometimes 0x20/0x40
+		dest+=m_2064_outer;
 
 		//	logerror("%04x, ", val);
 	}
