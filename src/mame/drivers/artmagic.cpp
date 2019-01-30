@@ -809,8 +809,8 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(artmagic_state::artmagic)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK_25MHz/2)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	M68000(config, m_maincpu, MASTER_CLOCK_25MHz/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &artmagic_state::main_map);
 
 	TMS34010(config, m_tms, MASTER_CLOCK_40MHz);
 	m_tms->set_addrmap(AS_PROGRAM, &artmagic_state::tms_map);
@@ -822,7 +822,7 @@ MACHINE_CONFIG_START(artmagic_state::artmagic)
 	m_tms->set_shiftreg_in_callback(FUNC(artmagic_state::to_shiftreg));
 	m_tms->set_shiftreg_out_callback(FUNC(artmagic_state::from_shiftreg));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	EEPROM_2816(config, "eeprom").write_time(attotime::from_usec(1)); // FIXME: false-readback polling should make this unnecessary
 
@@ -864,19 +864,19 @@ MACHINE_CONFIG_START(artmagic_state::stonebal)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(artmagic_state::shtstar)
+void artmagic_state::shtstar(machine_config &config)
+{
 	artmagic(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(shtstar_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &artmagic_state::shtstar_map);
 
-	MCFG_DEVICE_ADD("mainduart", MC68681, 3686400)
+	MC68681(config, "mainduart", 3686400);
 
 	/* sub cpu*/
-	MCFG_DEVICE_ADD("subcpu", M68000, MASTER_CLOCK_25MHz/2)
-	MCFG_DEVICE_PROGRAM_MAP(shtstar_subcpu_map)
+	m68000_device &subcpu(M68000(config, "subcpu", MASTER_CLOCK_25MHz/2));
+	subcpu.set_addrmap(AS_PROGRAM, &artmagic_state::shtstar_subcpu_map);
 
-	MCFG_DEVICE_ADD("subduart", MC68681, 3686400)
+	MC68681(config, "subduart", 3686400);
 
 	YM2149(config, "aysnd", 3686400/2).add_route(ALL_OUTPUTS, "mono", 0.10);
 
@@ -885,7 +885,7 @@ MACHINE_CONFIG_START(artmagic_state::shtstar)
 	guncpu.set_addrmap(AS_PROGRAM, &artmagic_state::shtstar_guncpu_map);
 	guncpu.set_addrmap(AS_IO, &artmagic_state::shtstar_guncpu_io_map);
 	guncpu.port_in_cb<1>().set_constant(0); // ?
-MACHINE_CONFIG_END
+}
 
 
 

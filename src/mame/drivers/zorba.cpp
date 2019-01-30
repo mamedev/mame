@@ -149,12 +149,9 @@ MACHINE_CONFIG_START(zorba_state::zorba)
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beep, 800).add_route(ALL_OUTPUTS, "mono", 1.00); // should be horizontal frequency / 16, so depends on CRTC parameters
 
-	MCFG_INPUT_MERGER_ANY_HIGH("irq0")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(*this, zorba_state, irq_w<0>))
-	MCFG_INPUT_MERGER_ANY_HIGH("irq1")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(*this, zorba_state, irq_w<1>))
-	MCFG_INPUT_MERGER_ANY_HIGH("irq2")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(*this, zorba_state, irq_w<2>))
+	INPUT_MERGER_ANY_HIGH(config, "irq0").output_handler().set(FUNC(zorba_state::irq_w<0>));
+	INPUT_MERGER_ANY_HIGH(config, "irq1").output_handler().set(FUNC(zorba_state::irq_w<1>));
+	INPUT_MERGER_ANY_HIGH(config, "irq2").output_handler().set(FUNC(zorba_state::irq_w<2>));
 
 	/* devices */
 	Z80DMA(config, m_dma, 24_MHz_XTAL / 6);
@@ -226,10 +223,8 @@ MACHINE_CONFIG_START(zorba_state::zorba)
 	FD1793(config, m_fdc, 24_MHz_XTAL / 24);
 	m_fdc->intrq_wr_callback().set("irq2", FUNC(input_merger_device::in_w<0>));
 	m_fdc->drq_wr_callback().set("irq2", FUNC(input_merger_device::in_w<1>));
-	MCFG_FLOPPY_DRIVE_ADD(m_floppy0, zorba_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD(m_floppy1, zorba_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, m_floppy0, zorba_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy1, zorba_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
 
 	// J1 IEEE-488
 	MCFG_IEEE488_BUS_ADD()
@@ -243,12 +238,14 @@ MACHINE_CONFIG_START(zorba_state::zorba)
 	rs232.dsr_handler().set(m_uart0, FUNC(i8251_device::write_dsr));
 
 	// J3 Parallel printer
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("parprndata", "parprn")
 	centronics_device &parprn(CENTRONICS(config, "parprn", centronics_devices, "printer"));
 	parprn.busy_handler().set(m_uart1, FUNC(i8251_device::write_cts));
 	parprn.busy_handler().append(m_uart1, FUNC(i8251_device::write_dsr)); // TODO: shared with serial CTS
 	parprn.fault_handler().set(FUNC(zorba_state::printer_fault_w));
 	parprn.select_handler().set(FUNC(zorba_state::printer_select_w));
+
+	output_latch_device &parprndata(OUTPUT_LATCH(config, "parprndata"));
+	parprn.set_output_latch(parprndata);
 
 	// J3 Serial printer
 	rs232_port_device &serprn(RS232_PORT(config, "serprn", default_rs232_devices, nullptr));

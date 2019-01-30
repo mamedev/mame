@@ -186,7 +186,7 @@ GFXDECODE_END
 MACHINE_CONFIG_START(namco_de_pcbstack_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("maincpu", M68000,12288000) /* Master */
 	MCFG_DEVICE_PROGRAM_MAP(driveyes_master_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namco_de_pcbstack_device, screen_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(namco_de_pcbstack_device::screen_scanline), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD("slave", M68000,12288000) /* Slave */
 	MCFG_DEVICE_PROGRAM_MAP(driveyes_slave_map)
@@ -201,7 +201,7 @@ MACHINE_CONFIG_START(namco_de_pcbstack_device::device_add_mconfig)
 	NAMCOS21_DSP(config, m_namcos21_dsp, 0);
 	m_namcos21_dsp->set_renderer_tag("namcos21_3d");
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* 100 CPU slices per frame */
+	config.m_minimum_quantum = attotime::from_hz(6000); /* 100 CPU slices per frame */
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 

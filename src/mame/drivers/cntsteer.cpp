@@ -947,8 +947,8 @@ MACHINE_CONFIG_START(cntsteer_state::cntsteer)
 	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI); // ?
 	screen.screen_vblank().append(FUNC(cntsteer_state::subcpu_vblank_irq)); // ?
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
-	MCFG_QUANTUM_PERFECT_CPU("subcpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.m_perfect_cpu_quantum = subtag("subcpu");
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cntsteer);
 	PALETTE(config, m_palette).set_entries(256);
@@ -985,7 +985,7 @@ MACHINE_CONFIG_START(cntsteer_state::zerotrgt)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(cntsteer_state, sound_interrupt,  480)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	MCFG_MACHINE_START_OVERRIDE(cntsteer_state,zerotrgt)
 	MCFG_MACHINE_RESET_OVERRIDE(cntsteer_state,zerotrgt)

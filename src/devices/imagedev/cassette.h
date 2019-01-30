@@ -129,25 +129,4 @@ DECLARE_DEVICE_TYPE(CASSETTE, cassette_image_device)
 // device iterator
 typedef device_type_iterator<cassette_image_device> cassette_device_iterator;
 
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-#define MCFG_CASSETTE_ADD(_tag)    \
-	MCFG_DEVICE_ADD(_tag, CASSETTE, 0)
-
-#define MCFG_CASSETTE_MODIFY(_tag) \
-	MCFG_DEVICE_MODIFY(_tag)
-
-#define MCFG_CASSETTE_FORMATS(_formats) \
-	downcast<cassette_image_device &>(*device).set_formats(_formats);
-
-#define MCFG_CASSETTE_CREATE_OPTS(_create_opts) \
-	downcast<cassette_image_device &>(*device).set_create_opts(_create_opts);
-
-#define MCFG_CASSETTE_DEFAULT_STATE(_state) \
-	downcast<cassette_image_device &>(*device).set_default_state((cassette_state) (_state));
-
-#define MCFG_CASSETTE_INTERFACE(_interface) \
-	downcast<cassette_image_device &>(*device).set_interface(_interface);
-
 #endif // MAME_DEVICES_IMAGEDEV_CASSETTE_H

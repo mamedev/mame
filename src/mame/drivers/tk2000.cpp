@@ -570,8 +570,8 @@ MACHINE_CONFIG_START(tk2000_state::tk2000)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD(A2_CPU_TAG, M6502, 1021800)     /* close to actual CPU frequency of 1.020484 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(apple2_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", tk2000_state, apple2_interrupt, "screen", 0, 1)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	TIMER(config, "scantimer").configure_scanline(FUNC(tk2000_state::apple2_interrupt), "screen", 0, 1);
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	APPLE2_VIDEO(config, m_video, XTAL(14'318'181));
 
@@ -593,8 +593,8 @@ MACHINE_CONFIG_START(tk2000_state::tk2000)
 
 	RAM(config, RAM_TAG).set_default_size("64K");
 
-	MCFG_CASSETTE_ADD(A2_CASSETTE_TAG)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED);
 MACHINE_CONFIG_END
 
 /***************************************************************************

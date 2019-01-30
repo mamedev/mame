@@ -981,11 +981,11 @@ void nmg5_state::machine_reset()
 MACHINE_CONFIG_START(nmg5_state::nmg5)
 
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 16000000);	/* 16 MHz */
+	M68000(config, m_maincpu, 16000000);    /* 16 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &nmg5_state::nmg5_map);
 	m_maincpu->set_vblank_int("screen", FUNC(nmg5_state::irq6_line_hold));
 
-	Z80(config, m_soundcpu, 4000000);		/* 4 MHz */
+	Z80(config, m_soundcpu, 4000000);       /* 4 MHz */
 	m_soundcpu->set_addrmap(AS_PROGRAM, &nmg5_state::nmg5_sound_map);
 	m_soundcpu->set_addrmap(AS_IO, &nmg5_state::sound_io_map);
 

@@ -324,7 +324,7 @@ MACHINE_CONFIG_START(espial_state::espial)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", Z80, 3072000)   /* 3.072 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(espial_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", espial_state, espial_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(espial_state::espial_scanline), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, 3072000)  /* 2 MHz?????? */
 	MCFG_DEVICE_PROGRAM_MAP(espial_sound_map)

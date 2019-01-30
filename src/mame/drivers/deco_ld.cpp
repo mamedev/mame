@@ -473,7 +473,7 @@ MACHINE_CONFIG_START(deco_ld_state::rblaster)
 	MCFG_DEVICE_PROGRAM_MAP(rblaster_sound_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(deco_ld_state, sound_interrupt,  640)
 
-//  MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+//  config.m_minimum_quantum = attotime::from_hz(6000);
 
 	MCFG_LASERDISC_LDP1000_ADD("laserdisc")
 	MCFG_LASERDISC_OVERLAY_DRIVER(256, 256, deco_ld_state, screen_update_rblaster)

@@ -752,7 +752,7 @@ MACHINE_CONFIG_START(liberate_state::liberate_base)
 	MCFG_DEVICE_PROGRAM_MAP(liberate_sound_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(liberate_state, nmi_line_pulse, 16*60) /* ??? */
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
+	config.m_minimum_quantum = attotime::from_hz(12000);
 
 	MCFG_MACHINE_START_OVERRIDE(liberate_state,liberate)
 	MCFG_MACHINE_RESET_OVERRIDE(liberate_state,liberate)
@@ -817,7 +817,7 @@ MACHINE_CONFIG_START(liberate_state::prosoccr)
 	MCFG_DEVICE_CLOCK(10000000/8) //xtal is 12 Mhz, divider is unknown
 	MCFG_DEVICE_PROGRAM_MAP(prosoccr_sound_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
+	config.m_minimum_quantum = attotime::from_hz(12000);
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 0*8, 32*8-1)
@@ -839,7 +839,7 @@ MACHINE_CONFIG_START(liberate_state::prosport)
 	MCFG_DEVICE_PROGRAM_MAP(liberate_sound_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(liberate_state, nmi_line_pulse, 16*60) /* ??? */
 
-//  MCFG_QUANTUM_TIME(attotime::from_hz(12000))
+//  config.m_minimum_quantum = attotime::from_hz(12000);
 
 	MCFG_MACHINE_START_OVERRIDE(liberate_state,liberate)
 	MCFG_MACHINE_RESET_OVERRIDE(liberate_state,liberate)

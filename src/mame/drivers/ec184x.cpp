@@ -230,7 +230,7 @@ MACHINE_CONFIG_START(ec184x_state::ec1840)
 	MCFG_DEVICE_IO_MAP(ec1840_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 
-	MCFG_IBM5150_MOTHERBOARD_ADD("mb","maincpu")
+	IBM5150_MOTHERBOARD(config, "mb", 0).set_cputag(m_maincpu);
 
 	// FIXME: determine ISA bus clock
 	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", ec184x_isa8_cards, "ec1840.0002", false)
@@ -240,7 +240,7 @@ MACHINE_CONFIG_START(ec184x_state::ec1840)
 	MCFG_DEVICE_ADD("isa5", ISA8_SLOT, 0, "mb:isa", ec184x_isa8_cards, nullptr, false)
 	MCFG_DEVICE_ADD("isa6", ISA8_SLOT, 0, "mb:isa", ec184x_isa8_cards, nullptr, false)
 
-	MCFG_SOFTWARE_LIST_ADD("flop_list","ec1841")
+	SOFTWARE_LIST(config, "flop_list").set_original("ec1841");
 
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_EC_1841)
 
@@ -255,7 +255,7 @@ MACHINE_CONFIG_START(ec184x_state::ec1841)
 
 	MCFG_MACHINE_RESET_OVERRIDE(ec184x_state, ec1841)
 
-	MCFG_EC1841_MOTHERBOARD_ADD("mb", "maincpu")
+	EC1841_MOTHERBOARD(config, "mb", 0).set_cputag(m_maincpu);
 
 	// FIXME: determine ISA bus clock
 	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", ec184x_isa8_cards, "ec1841.0002", false)   // cga
@@ -265,7 +265,7 @@ MACHINE_CONFIG_START(ec184x_state::ec1841)
 	MCFG_DEVICE_ADD("isa5", ISA8_SLOT, 0, "mb:isa", ec184x_isa8_cards, nullptr, false)
 	MCFG_DEVICE_ADD("isa6", ISA8_SLOT, 0, "mb:isa", ec184x_isa8_cards, nullptr, false)
 
-	MCFG_SOFTWARE_LIST_ADD("flop_list","ec1841")
+	SOFTWARE_LIST(config, "flop_list").set_original("ec1841");
 
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_EC_1841)
 
@@ -279,7 +279,7 @@ MACHINE_CONFIG_START(ec184x_state::ec1847)
 	MCFG_DEVICE_IO_MAP(ec1847_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 
-	MCFG_IBM5160_MOTHERBOARD_ADD("mb","maincpu")
+	IBM5160_MOTHERBOARD(config, "mb", 0).set_cputag(m_maincpu);
 
 	// FIXME: determine ISA bus clock
 	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "hercules", false)  // cga, ega and vga(?) are options too

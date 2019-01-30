@@ -222,7 +222,7 @@ MACHINE_CONFIG_START(horizon_state::horizon)
 	MCFG_S100_SLOT_ADD("s100:12", horizon_s100_cards, nullptr)
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "horizon")
+	SOFTWARE_LIST(config, "flop_list").set_original("horizon");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(horizon_state::horizon2mhz)

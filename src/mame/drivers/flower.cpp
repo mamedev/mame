@@ -507,7 +507,7 @@ MACHINE_CONFIG_START(flower_state::flower)
 	MCFG_DEVICE_PROGRAM_MAP(audio_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(flower_state, irq0_line_hold, 90)
 
-	MCFG_QUANTUM_PERFECT_CPU("mastercpu")
+	config.m_perfect_cpu_quantum = subtag("mastercpu");
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(flower_state, screen_update)

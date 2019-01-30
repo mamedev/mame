@@ -781,7 +781,7 @@ MACHINE_CONFIG_START(by133_state::babypac)
 	m_pia_u10->cb2_handler().set(FUNC(by133_state::u10_cb2_w));
 	m_pia_u10->irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 	m_pia_u10->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("babypac1", by133_state, u10_timer, attotime::from_hz(120)) // mains freq*2
+	TIMER(config, "babypac1").configure_periodic(FUNC(by133_state::u10_timer), attotime::from_hz(120)); // mains freq*2
 
 	PIA6821(config, m_pia_u11, 0);
 	m_pia_u11->readpa_handler().set(FUNC(by133_state::u11_a_r));
@@ -792,7 +792,7 @@ MACHINE_CONFIG_START(by133_state::babypac)
 	m_pia_u11->cb2_handler().set(FUNC(by133_state::u11_cb2_w));
 	m_pia_u11->irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 	m_pia_u11->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("babypac2", by133_state, u11_timer, attotime::from_hz(634)) // 555 timer*2
+	TIMER(config, "babypac2").configure_periodic(FUNC(by133_state::u11_timer), attotime::from_hz(634)); // 555 timer*2
 
 	/* video hardware */
 	TMS9928A(config, m_crtc, XTAL(10'738'635)).set_screen("screen");
@@ -813,7 +813,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(by133_state::granny)
 	babypac(config);
-	MCFG_DEVICE_REMOVE("videocpu")
+	config.device_remove("videocpu");
 	MCFG_DEVICE_ADD("videocpu", MC6809, XTAL(8'000'000)) // MC68B09P (XTAL value hard to read)
 	MCFG_DEVICE_PROGRAM_MAP(granny_map)
 

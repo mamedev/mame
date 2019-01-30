@@ -337,7 +337,7 @@ MACHINE_CONFIG_START(zaccaria_state::zaccaria)
 	MCFG_DEVICE_ADD("maincpu", Z80,XTAL(18'432'000)/6)   /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-//  MCFG_QUANTUM_TIME(attotime::from_hz(1000000))
+//  config.m_minimum_quantum = attotime::from_hz(1000000);
 
 	WATCHDOG_TIMER(config, "watchdog");
 

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Curt Coder
+// copyright-holders:Curt Coder, AJR
 /**********************************************************************
 
     Zilog Z8 Single-Chip MCU emulation
@@ -32,7 +32,7 @@ protected:
 		Z8_IMR, Z8_IRQ, Z8_IPR,
 		Z8_P0, Z8_P1, Z8_P2, Z8_P3,
 		Z8_P01M, Z8_P3M, Z8_P2M,
-		Z8_PRE0, Z8_T0, Z8_PRE1, Z8_T1, Z8_TMR,
+		Z8_PRE0, Z8_T0, Z8_PRE1, Z8_T1, Z8_TMR, Z8_TOUT,
 
 		Z8_R0, Z8_R1, Z8_R2, Z8_R3, Z8_R4, Z8_R5, Z8_R6, Z8_R7, Z8_R8, Z8_R9, Z8_R10, Z8_R11, Z8_R12, Z8_R13, Z8_R14, Z8_R15
 	};
@@ -101,18 +101,33 @@ private:
 	uint8_t m_p01m;             // port 0/1 mode
 	uint8_t m_p2m;              // port 2 mode
 	uint8_t m_p3m;              // port 3 mode
+	uint8_t m_p3_output;        // port 3 output (alternate functions included)
 
 	// timer registers
 	uint8_t m_tmr;              // timer mode
 	uint8_t m_t[2];             // initial values
 	uint8_t m_count[2];         // current counts
 	uint8_t m_pre[2];           // prescalers
+	uint8_t m_pre_count[2];     // prescaler counts
+	bool m_tout;                // toggle output
+
+	// serial transmitter registers
+	uint16_t m_transmit_sr;     // transmitter shift register
+	uint8_t m_transmit_count;   // counter for transmitter timing
+	bool m_transmit_parity;     // transmitter parity calculation
+
+	// serial receiver registers
+	uint8_t m_receive_buffer;   // received character
+	uint16_t m_receive_sr;      // receiver shift register
+	uint8_t m_receive_count;    // counter for receiver timing
+	bool m_receive_parity;      // receiver parity calculation
+	bool m_receive_started;     // true if receiver has seen start bit
 
 	// fake registers
 	uint8_t m_fake_r[16];       // fake working registers
 
 	// interrupts
-	int m_irq_line[4];          // IRQ line state
+	int m_irq_line[4];
 	bool m_irq_taken;
 	bool m_irq_initialized;     // IRQ must be unlocked by EI after reset
 
@@ -120,11 +135,20 @@ private:
 	int32_t m_icount;           // instruction counter
 
 	// timers
-	emu_timer *m_t0_timer;
-	emu_timer *m_t1_timer;
+	emu_timer *m_internal_timer[2];
 
-	TIMER_CALLBACK_MEMBER( t0_tick );
-	TIMER_CALLBACK_MEMBER( t1_tick );
+	bool get_serial_in();
+	void sio_receive();
+	void sio_transmit();
+
+	template <int T> void timer_start();
+	template <int T> void timer_stop();
+	template <int T> void timer_end();
+	void t1_trigger();
+	void tout_init();
+	void tout_toggle();
+
+	template <int T> TIMER_CALLBACK_MEMBER(timeout);
 
 	void request_interrupt(int irq);
 	void take_interrupt(int irq);
@@ -138,6 +162,7 @@ private:
 	void p2_write(uint8_t data);
 	uint8_t p3_read();
 	void p3_write(uint8_t data);
+	void p3_update_output();
 	uint8_t sio_read();
 	void sio_write(uint8_t data);
 	uint8_t tmr_read();
@@ -173,8 +198,8 @@ private:
 	inline uint16_t register_pair_read(uint8_t offset);
 	inline void register_write(uint8_t offset, uint8_t data) { m_regs->write_byte(offset, data); }
 	inline void register_pair_write(uint8_t offset, uint16_t data);
-	inline uint8_t get_working_register(int offset);
-	inline uint8_t get_register(uint8_t offset);
+	inline uint8_t get_working_register(int offset) const;
+	inline uint8_t get_register(uint8_t offset) const;
 	inline uint8_t get_intermediate_register(int offset);
 	inline void stack_push_byte(uint8_t src);
 	inline void stack_push_word(uint16_t src);
@@ -396,6 +421,16 @@ public:
 };
 
 
+class z8682_device : public z8_device
+{
+public:
+	z8682_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	const tiny_rom_entry *device_rom_region() const override;
+};
+
+
 // Zilog Z8601
 DECLARE_DEVICE_TYPE(Z8601, z8601_device)
 
@@ -410,5 +445,8 @@ DECLARE_DEVICE_TYPE(Z8671, z8671_device)
 
 // Zilog Z8681 ROMless
 DECLARE_DEVICE_TYPE(Z8681, z8681_device)
+
+// Zilog Z8682 ROMless (boot to 0812H)
+DECLARE_DEVICE_TYPE(Z8682, z8682_device)
 
 #endif // MAME_CPU_Z8_Z8_H

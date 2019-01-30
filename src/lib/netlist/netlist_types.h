@@ -12,12 +12,40 @@
 #include "nl_config.h"
 #include "plib/pchrono.h"
 #include "plib/pstring.h"
+#include "plib/pfmtlog.h"
 
 #include <cstdint>
 #include <unordered_map>
 
 namespace netlist
 {
+	/*! @brief netlist_sig_t is the type used for logic signals.
+	 *
+	 *  This may be any of bool, uint8_t, uint16_t, uin32_t and uint64_t.
+	 *  The choice has little to no impact on performance.
+	 */
+	using netlist_sig_t = std::uint32_t;
+
+	/**
+	 * @brief Interface definition for netlist callbacks into calling code
+	 *
+	 * A class inheriting from netlist_callbacks_t has to be passed to the netlist_t
+	 * constructor. Netlist does processing during construction and thus needs
+	 * the object passed completely constructed.
+	 *
+	 */
+	class callbacks_t
+	{
+	public:
+		virtual ~callbacks_t() {}
+
+		/* logging callback */
+		virtual void vlog(const plib::plog_level &l, const pstring &ls) const = 0;
+	};
+
+	using log_type =  plib::plog_base<callbacks_t, NL_DEBUG>;
+
+
 	//============================================================
 	//  Performance tracking
 	//============================================================

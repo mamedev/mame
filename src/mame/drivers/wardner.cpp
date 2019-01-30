@@ -382,13 +382,13 @@ void wardner_state::machine_reset()
 void wardner_state::wardner(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(24'000'000) / 4);	/* 6MHz */
+	Z80(config, m_maincpu, XTAL(24'000'000) / 4);   /* 6MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &wardner_state::main_program_map);
 	m_maincpu->set_addrmap(AS_IO, &wardner_state::main_io_map);
 
 	ADDRESS_MAP_BANK(config, "membank").set_map(&wardner_state::main_bank_map).set_options(ENDIANNESS_LITTLE, 8, 18, 0x8000);
 
-	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(14'000'000) / 4));	/* 3.5MHz */
+	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(14'000'000) / 4));    /* 3.5MHz */
 	audiocpu.set_addrmap(AS_PROGRAM, &wardner_state::sound_program_map);
 	audiocpu.set_addrmap(AS_IO, &wardner_state::sound_io_map);
 
@@ -398,7 +398,7 @@ void wardner_state::wardner(machine_config &config)
 	m_dsp->set_addrmap(AS_IO, &wardner_state::dsp_io_map);
 	m_dsp->bio().set(FUNC(wardner_state::twincobr_bio_r));
 
-	config.m_minimum_quantum = attotime::from_hz(6000);	/* 100 CPU slices per frame */
+	config.m_minimum_quantum = attotime::from_hz(6000); /* 100 CPU slices per frame */
 
 	ls259_device &mainlatch(LS259(config, "mainlatch"));
 	mainlatch.q_out_cb<2>().set(FUNC(wardner_state::int_enable_w));

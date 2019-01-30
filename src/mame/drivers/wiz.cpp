@@ -858,7 +858,7 @@ MACHINE_CONFIG_START(wiz_state::stinger)
 	MCFG_SCREEN_UPDATE_DRIVER(wiz_state, screen_update_stinger)
 
 	/* sound hardware */
-	MCFG_DEVICE_REMOVE("8910.3")
+	config.device_remove("8910.3");
 
 	MCFG_DEVICE_ADD("discrete", DISCRETE, stinger_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)

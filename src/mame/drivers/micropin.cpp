@@ -332,7 +332,7 @@ MACHINE_CONFIG_START(micropin_state::micropin)
 	//m_pia51->ca2_handler().set(FUNC(micropin_state::p51ca2_w));
 	//m_pia51->cb2_handler().set(FUNC(micropin_state::p51cb2_w));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_a", micropin_state, timer_a, attotime::from_hz(100))
+	TIMER(config, "timer_a").configure_periodic(FUNC(micropin_state::timer_a), attotime::from_hz(100));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(micropin_state::pentacup2)

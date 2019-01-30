@@ -20,7 +20,7 @@ namespace netlist { namespace factory
 class NETLIB_NAME(wrapper) : public device_t
 {
 public:
-	NETLIB_NAME(wrapper)(netlist_t &anetlist, const pstring &name)
+	NETLIB_NAME(wrapper)(netlist_base_t &anetlist, const pstring &name)
 	: device_t(anetlist, name)
 	{
 	}
@@ -91,12 +91,12 @@ factory::element_t * list_t::factory_by_name(const pstring &devname)
 // factory_lib_entry_t: factory class to wrap macro based chips/elements
 // -----------------------------------------------------------------------------
 
-plib::owned_ptr<device_t> library_element_t::Create(netlist_t &anetlist, const pstring &name)
+plib::owned_ptr<device_t> library_element_t::Create(netlist_base_t &anetlist, const pstring &name)
 {
 	return plib::owned_ptr<device_t>::Create<NETLIB_NAME(wrapper)>(anetlist, name);
 }
 
-void library_element_t::macro_actions(netlist_t &anetlist, const pstring &name)
+void library_element_t::macro_actions(netlist_base_t &anetlist, const pstring &name)
 {
 	anetlist.setup().namespace_push(name);
 	anetlist.setup().include(this->name());

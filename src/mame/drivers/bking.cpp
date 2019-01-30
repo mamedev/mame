@@ -451,7 +451,7 @@ MACHINE_CONFIG_START(bking_state::bking3)
 	MCFG_MACHINE_START_OVERRIDE(bking_state,bking3)
 	MCFG_MACHINE_RESET_OVERRIDE(bking_state,bking3)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 MACHINE_CONFIG_END
 
 

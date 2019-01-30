@@ -16,10 +16,10 @@
 #include "ps2vu.h"
 #include <cmath>
 
-#define ENABLE_OVERFLOWS        	(0)
-#define ENABLE_EE_ELF_LOADER    	(0)
-#define ENABLE_EE_DECI2         	(0)
-#define DELAY_SLOT_EXCEPTION_HACK	(0)
+#define ENABLE_OVERFLOWS            (0)
+#define ENABLE_EE_ELF_LOADER        (0)
+#define ENABLE_EE_DECI2             (0)
+#define DELAY_SLOT_EXCEPTION_HACK   (0)
 
 /***************************************************************************
     HELPER MACROS
@@ -166,6 +166,7 @@ mips3_device::mips3_device(const machine_config &mconfig, device_type type, cons
 	, m_dword_xor(data_bits == 64 ? (m_bigendian ? DWORD_XOR_BE(0) : DWORD_XOR_LE(0)) : 0)
 	, c_icache_size(0)
 	, c_dcache_size(0)
+	, c_secondary_cache_line_size(0)
 	, m_fastram_select(0)
 	, m_debugger_temp(0)
 	, m_drc_cache(DRC_CACHE_SIZE + sizeof(internal_mips3_state) + 0x800000)
@@ -342,6 +343,7 @@ void mips3_device::generate_exception(int exception, int backup)
     if ((CAUSE & 0x7f) == 0)
         logerror("Took interrupt -- Cause = %08X, PC =  %08X\n", (uint32_t)CAUSE, m_core->pc);
 */
+	debugger_exception_hook(exception);
 }
 
 

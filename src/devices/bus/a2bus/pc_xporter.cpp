@@ -122,7 +122,7 @@ MACHINE_CONFIG_START(a2bus_pcxporter_device::device_add_mconfig)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
 	MCFG_DEVICE_DISABLE()
 
-	PIT8253(config, m_pit8253, 0);
+	PIT8253(config, m_pit8253);
 	m_pit8253->set_clk<0>(A2BUS_7M_CLOCK / 6.0); // heartbeat IRQ
 	m_pit8253->out_handler<0>().set(m_pic8259, FUNC(pic8259_device::ir0_w));
 	m_pit8253->set_clk<1>(A2BUS_7M_CLOCK / 6.0); // DRAM refresh
@@ -147,11 +147,12 @@ MACHINE_CONFIG_START(a2bus_pcxporter_device::device_add_mconfig)
 	m_dma8237->out_dack_callback<2>().set(FUNC(a2bus_pcxporter_device::pc_dack2_w));
 	m_dma8237->out_dack_callback<3>().set(FUNC(a2bus_pcxporter_device::pc_dack3_w));
 
-	PIC8259(config, m_pic8259, 0);
+	PIC8259(config, m_pic8259);
 	m_pic8259->out_int_callback().set_inputline(m_v30, 0);
 
 	ISA8(config, m_isabus, 0);
-	m_isabus->set_cputag(m_v30);
+	m_isabus->set_memspace(m_v30, AS_PROGRAM);
+	m_isabus->set_iospace(m_v30, AS_IO);
 	m_isabus->irq2_callback().set(m_pic8259, FUNC(pic8259_device::ir2_w));
 	m_isabus->irq3_callback().set(m_pic8259, FUNC(pic8259_device::ir3_w));
 	m_isabus->irq4_callback().set(m_pic8259, FUNC(pic8259_device::ir4_w));
@@ -631,5 +632,12 @@ WRITE_LINE_MEMBER( a2bus_pcxporter_device::keyboard_data_w )
 WRITE8_MEMBER( a2bus_pcxporter_device::nmi_enable_w )
 {
 	m_nmi_enabled = BIT(data,7);
-	m_isabus->set_nmi_state(m_nmi_enabled);
+	if (!m_nmi_enabled)
+		m_v30->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER( a2bus_pcxporter_device::iochck_w )
+{
+	if (m_nmi_enabled && !state)
+		m_v30->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }

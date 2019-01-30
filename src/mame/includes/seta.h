@@ -80,6 +80,7 @@ public:
 	void blandiap(machine_config &config);
 	void wits(machine_config &config);
 	void msgundam(machine_config &config);
+	void msgundamb(machine_config &config);
 	void extdwnhl(machine_config &config);
 	void pairlove(machine_config &config);
 	void zingzip(machine_config &config);
@@ -297,6 +298,7 @@ protected:
 	void magspeed_map(address_map &map);
 	void metafox_sub_map(address_map &map);
 	void msgundam_map(address_map &map);
+	void msgundamb_map(address_map &map);
 	void oisipuzl_map(address_map &map);
 	void orbs_map(address_map &map);
 	void pairlove_map(address_map &map);

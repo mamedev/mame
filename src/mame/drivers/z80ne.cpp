@@ -427,13 +427,13 @@ MACHINE_CONFIG_START(z80ne_state::z80ne)
 	m_uart->set_tx_clock(4800.0);
 	m_uart->set_rx_clock(4800.0);
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("z80ne_cass")
+	CASSETTE(config, m_cassette1);
+	m_cassette1->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette1->set_interface("z80ne_cass");
 
-	MCFG_CASSETTE_ADD( "cassette2" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("z80ne_cass")
+	CASSETTE(config, m_cassette2);
+	m_cassette2->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette2->set_interface("z80ne_cass");
 
 	config.set_default_layout(layout_z80ne);
 
@@ -441,7 +441,7 @@ MACHINE_CONFIG_START(z80ne_state::z80ne)
 	RAM(config, m_ram).set_default_size("32K");
 
 	// all known tapes require LX.388 expansion
-	//MCFG_SOFTWARE_LIST_ADD("cass_list","z80ne_cass")
+	//SOFTWARE_LIST(config, "cass_list").set_original("z80ne_cass");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(z80ne_state::z80net)
@@ -467,10 +467,11 @@ MACHINE_CONFIG_START(z80ne_state::z80net)
 	m_lx387_kr2376->control().set(FUNC(z80ne_state::lx387_control_r));
 
 	/* video hardware */
-	MCFG_SCREEN_MC6847_PAL_ADD("lx388", "mc6847")
+	SCREEN(config, "lx388", SCREEN_TYPE_RASTER);
 
-	MCFG_DEVICE_ADD("mc6847", MC6847_PAL, 4.433619_MHz_XTAL)
-	MCFG_MC6847_INPUT_CALLBACK(READ8(*this, z80ne_state, lx388_mc6847_videoram_r))
+	MC6847_PAL(config, m_vdg, 4.433619_MHz_XTAL);
+	m_vdg->set_screen("lx388");
+	m_vdg->input_callback().set(FUNC(z80ne_state::lx388_mc6847_videoram_r));
 	// AG = GND, GM2 = GND, GM1 = GND, GM0 = GND, CSS = GND
 	// other lines not connected
 
@@ -479,7 +480,7 @@ MACHINE_CONFIG_START(z80ne_state::z80net)
 	/* internal ram */
 	m_ram->set_default_size("32K").set_extra_options("1K");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list","z80ne_cass")
+	SOFTWARE_LIST(config, "cass_list").set_original("z80ne_cass");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(z80ne_state::z80netb)
@@ -495,13 +496,13 @@ MACHINE_CONFIG_START(z80ne_state::z80netb)
 	m_uart->set_tx_clock(4800.0);
 	m_uart->set_rx_clock(4800.0);
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("z80ne_cass")
+	CASSETTE(config, m_cassette1);
+	m_cassette1->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette1->set_interface("z80ne_cass");
 
-	MCFG_CASSETTE_ADD( "cassette2" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("z80ne_cass")
+	CASSETTE(config, m_cassette2);
+	m_cassette2->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette2->set_interface("z80ne_cass");
 
 	KR2376_ST(config, m_lx387_kr2376, 50000);
 	m_lx387_kr2376->x<0>().set_ioport("X0");
@@ -516,10 +517,11 @@ MACHINE_CONFIG_START(z80ne_state::z80netb)
 	m_lx387_kr2376->control().set(FUNC(z80ne_state::lx387_control_r));
 
 	/* video hardware */
-	MCFG_SCREEN_MC6847_PAL_ADD("lx388", "mc6847")
+	SCREEN(config, "lx388", SCREEN_TYPE_RASTER);
 
-	MCFG_DEVICE_ADD("mc6847", MC6847_PAL, 4.433619_MHz_XTAL)
-	MCFG_MC6847_INPUT_CALLBACK(READ8(*this, z80ne_state, lx388_mc6847_videoram_r))
+	MC6847_PAL(config, m_vdg, 4.433619_MHz_XTAL);
+	m_vdg->set_screen("lx388");
+	m_vdg->input_callback().set(FUNC(z80ne_state::lx388_mc6847_videoram_r));
 	// AG = GND, GM2 = GND, GM1 = GND, GM0 = GND, CSS = GND
 	// other lines not connected
 
@@ -528,7 +530,7 @@ MACHINE_CONFIG_START(z80ne_state::z80netb)
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("32K").set_extra_options("1K");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list","z80ne_cass")
+	SOFTWARE_LIST(config, "cass_list").set_original("z80ne_cass");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(z80netf_state::z80netf)
@@ -544,37 +546,38 @@ MACHINE_CONFIG_START(z80netf_state::z80netf)
 	m_uart->set_tx_clock(4800.0);
 	m_uart->set_rx_clock(4800.0);
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("z80ne_cass")
+	CASSETTE(config, m_cassette1);
+	m_cassette1->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette1->set_interface("z80ne_cass");
 
-	MCFG_CASSETTE_ADD( "cassette2" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("z80ne_cass")
+	CASSETTE(config, m_cassette2);
+	m_cassette2->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette2->set_interface("z80ne_cass");
 
 	KR2376_ST(config, m_lx387_kr2376, 50000);
 
 	/* video hardware */
-	MCFG_SCREEN_MC6847_PAL_ADD("lx388", "mc6847")
+	SCREEN(config, "lx388", SCREEN_TYPE_RASTER);
 
-	MCFG_DEVICE_ADD("mc6847", MC6847_PAL, 4.433619_MHz_XTAL)
-	MCFG_MC6847_INPUT_CALLBACK(READ8(*this, z80ne_state, lx388_mc6847_videoram_r))
+	MC6847_PAL(config, m_vdg, 4.433619_MHz_XTAL);
+	m_vdg->set_screen("lx388");
+	m_vdg->input_callback().set(FUNC(z80ne_state::lx388_mc6847_videoram_r));
 	// AG = GND, GM2 = GND, GM1 = GND, GM0 = GND, CSS = GND
 	// other lines not connected
 
 	FD1771(config, m_wd1771, 2_MHz_XTAL / 2);
-	MCFG_FLOPPY_DRIVE_ADD("wd1771:0", z80ne_floppies, "sssd", z80ne_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("wd1771:1", z80ne_floppies, "sssd", z80ne_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("wd1771:2", z80ne_floppies, nullptr,   z80ne_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("wd1771:3", z80ne_floppies, nullptr,   z80ne_state::floppy_formats)
+	FLOPPY_CONNECTOR(config, "wd1771:0", z80ne_floppies, "sssd", z80ne_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "wd1771:1", z80ne_floppies, "sssd", z80ne_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "wd1771:2", z80ne_floppies, nullptr,   z80ne_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "wd1771:3", z80ne_floppies, nullptr,   z80ne_state::floppy_formats);
 
 	config.set_default_layout(layout_z80netf);
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("56K");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list","z80ne_cass")
-	MCFG_SOFTWARE_LIST_ADD("flop_list","z80ne_flop")
+	SOFTWARE_LIST(config, "cass_list").set_original("z80ne_cass");
+	SOFTWARE_LIST(config, "flop_list").set_original("z80ne_flop");
 MACHINE_CONFIG_END
 
 /******************************************************************************

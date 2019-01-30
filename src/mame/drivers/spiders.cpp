@@ -549,8 +549,7 @@ MACHINE_CONFIG_START(spiders_state::spiders)
 	m_pia[2]->irqa_handler().set("mainirq", FUNC(input_merger_device::in_w<3>));
 	m_pia[2]->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<4>));
 
-	MCFG_INPUT_MERGER_ANY_HIGH("mainirq")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
+	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 
 	PIA6821(config, m_pia[3], 0);
 	m_pia[3]->writepa_handler().set(FUNC(spiders_state::spiders_audio_a_w));

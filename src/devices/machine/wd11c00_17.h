@@ -39,6 +39,7 @@ public:
 	DECLARE_READ8_MEMBER( io_r );
 	DECLARE_WRITE8_MEMBER( io_w );
 
+	DECLARE_WRITE_LINE_MEMBER( dack3_w );
 	uint8_t dack_r();
 	void dack_w(uint8_t data);
 

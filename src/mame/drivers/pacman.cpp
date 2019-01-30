@@ -3741,7 +3741,7 @@ MACHINE_CONFIG_START(pacman_state::vanvan)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pacman_state, vblank_nmi))
 
 	/* sound hardware */
-	MCFG_DEVICE_REMOVE("namco")
+	config.device_remove("namco");
 	MCFG_DEVICE_ADD("sn1", SN76496, 1789750)
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
@@ -3799,7 +3799,7 @@ MACHINE_CONFIG_START(pacman_state::s2650games)
 	MCFG_VIDEO_START_OVERRIDE(pacman_state,s2650games)
 
 	/* sound hardware */
-	MCFG_DEVICE_REMOVE("namco")
+	config.device_remove("namco");
 	MCFG_DEVICE_ADD("sn1", SN76496, MASTER_CLOCK/6)    /* 1H */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END

@@ -429,7 +429,7 @@ MACHINE_CONFIG_START(retofinv_state::retofinv)
 
 	MCFG_DEVICE_ADD("68705", TAITO68705_MCU, XTAL(18'432'000)/6)    /* XTAL and divider verified, 3.072 MHz */
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - enough for the sound CPU to read all commands */
+	config.m_minimum_quantum = attotime::from_hz(6000);  /* 100 CPU slices per frame - enough for the sound CPU to read all commands */
 
 	LS259(config, m_mainlatch); // IC72 - probably shared between CPUs
 	m_mainlatch->q_out_cb<0>().set(FUNC(retofinv_state::irq0_ack_w));
@@ -481,7 +481,7 @@ MACHINE_CONFIG_START(retofinv_state::retofinvb_nomcu)
 
 	m_mainlatch->q_out_cb<3>().set_nop();
 
-	MCFG_DEVICE_REMOVE("68705")
+	config.device_remove("68705");
 MACHINE_CONFIG_END
 
 /* bootleg which has different pallete clut and also has no mcu */
@@ -492,7 +492,7 @@ MACHINE_CONFIG_START(retofinv_state::retofinvb1_nomcu)
 
 	m_mainlatch->q_out_cb<3>().set_nop();
 
-	MCFG_DEVICE_REMOVE("68705")
+	config.device_remove("68705");
 MACHINE_CONFIG_END
 
 /***************************************************************************

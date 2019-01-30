@@ -400,10 +400,9 @@ MACHINE_CONFIG_START(divebomb_state::divebomb)
 	MCFG_DEVICE_PROGRAM_MAP(divebomb_rozcpu_map)
 	MCFG_DEVICE_IO_MAP(divebomb_rozcpu_iomap)
 
-	MCFG_QUANTUM_PERFECT_CPU("fgcpu")
+	config.m_perfect_cpu_quantum = subtag("fgcpu");
 
-	MCFG_INPUT_MERGER_ANY_HIGH("fgcpu_irq")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("fgcpu", INPUT_LINE_IRQ0))
+	INPUT_MERGER_ANY_HIGH(config, m_fgcpu_irq).output_handler().set_inputline(m_fgcpu, INPUT_LINE_IRQ0);
 
 	GENERIC_LATCH_8(config, "fg2spr").data_pending_callback().set_inputline(m_spritecpu, INPUT_LINE_IRQ0);
 

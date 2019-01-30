@@ -268,7 +268,7 @@ MACHINE_CONFIG_START(ksayakyu_state::ksayakyu)
 	MCFG_DEVICE_PROGRAM_MAP(soundcpu_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(ksayakyu_state, irq0_line_hold, 60) //guess, controls music tempo
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
+	config.m_minimum_quantum = attotime::from_hz(60000);
 
 
 	/* video hardware */

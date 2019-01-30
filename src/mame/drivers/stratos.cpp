@@ -359,7 +359,7 @@ MACHINE_CONFIG_START(stratos_state::stratos)
 	MCFG_SCREEN_VISIBLE_AREA(0, 239, 0, 63)
 	MCFG_SCREEN_UPDATE_DRIVER(stratos_state, screen_update)
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq", stratos_state, irq_timer, attotime::from_hz(1000))
+	TIMER(config, "irq").configure_periodic(FUNC(stratos_state::irq_timer), attotime::from_hz(1000));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END

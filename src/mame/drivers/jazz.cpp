@@ -117,6 +117,10 @@ void jazz_state::jazz(machine_config &config)
 	m_ram->set_extra_options("16M,32M,64M,128M,256M");
 	m_ram->set_default_value(0);
 
+	RAM(config, m_vram);
+	m_vram->set_default_size("2M");
+	m_vram->set_default_value(0);
+
 	// FIXME: may require big and little endian variants
 	JAZZ_MCT_ADR(config, m_mct_adr, 0);
 
@@ -168,7 +172,16 @@ void jazz_state::jazz(machine_config &config)
 	m_kbdc->kbd_clk().set(kbdc, FUNC(pc_kbdc_device::clock_write_from_mb));
 	m_kbdc->kbd_data().set(kbdc, FUNC(pc_kbdc_device::data_write_from_mb));
 
-	G364(config, m_ramdac, 0);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(78643200, 1280, 0, 1280, 1024, 0, 1024);
+	m_screen->set_screen_update("g364", FUNC(g364_device::screen_update));
+
+	G364(config, m_ramdac, 5_MHz_XTAL); // FIXME: guessed clock
+	m_ramdac->set_screen(m_screen);
+	m_ramdac->set_vram(m_vram);
+
+	DP83932C(config, m_network, 20_MHz_XTAL);
+	m_network->set_ram(RAM_TAG);
 }
 
 void jazz_state::mmr4000be(machine_config &config)
@@ -176,8 +189,6 @@ void jazz_state::mmr4000be(machine_config &config)
 	R4000BE(config, m_maincpu, 50_MHz_XTAL);
 
 	jazz(config);
-
-	DP83932C_BE(config, m_network, 20_MHz_XTAL);
 }
 
 void jazz_state::mmr4000le(machine_config &config)
@@ -185,8 +196,6 @@ void jazz_state::mmr4000le(machine_config &config)
 	R4000LE(config, m_maincpu, 50_MHz_XTAL);
 
 	jazz(config);
-
-	DP83932C_LE(config, m_network, 20_MHz_XTAL);
 }
 
 ROM_START(mmr4000be)

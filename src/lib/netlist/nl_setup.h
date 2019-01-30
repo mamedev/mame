@@ -12,10 +12,12 @@
 #include "plib/putil.h"
 #include "plib/pstream.h"
 #include "plib/pparser.h"
+#include "plib/pstate.h"
 
 #include "nl_factory.h"
 #include "nl_config.h"
 #include "netlist_types.h"
+#include "nl_errstr.h"
 
 #include <stack>
 #include <vector>
@@ -126,6 +128,7 @@ namespace netlist
 	class core_device_t;
 	class param_t;
 	class setup_t;
+	class netlist_state_t;
 	class netlist_t;
 	class logic_family_desc_t;
 	class terminal_t;
@@ -206,15 +209,18 @@ namespace netlist
 		explicit setup_t(netlist_t &netlist);
 		~setup_t();
 
-		netlist_t &netlist() { return m_netlist; }
-		const netlist_t &netlist() const { return m_netlist; }
+
+		netlist_state_t &netlist();
+		const netlist_state_t &netlist() const;
+
+		netlist_t &exec() { return m_netlist; }
+		const netlist_t &exec() const { return m_netlist; }
 
 		pstring build_fqn(const pstring &obj_name) const;
 
 		void register_param(const pstring &name, param_t &param);
-		pstring get_initial_param_val(const pstring &name, const pstring &def);
-		double get_initial_param_val(const pstring &name, const double def);
-		int get_initial_param_val(const pstring &name, const int def);
+
+		pstring get_initial_param_val(const pstring &name, const pstring &def) const;
 
 		void register_term(detail::core_terminal_t &obj);
 
@@ -245,7 +251,7 @@ namespace netlist
 
 		param_t *find_param(const pstring &param_in, bool required = true) const;
 
-		void start_devices();
+		void register_dynamic_log_devices();
 		void resolve_inputs();
 
 		/* handle namespace */
@@ -259,7 +265,7 @@ namespace netlist
 
 		std::unique_ptr<plib::pistream> get_data_stream(const pstring &name);
 
-		bool parse_stream(plib::putf8_reader &istrm, const pstring &name);
+		bool parse_stream(std::unique_ptr<plib::pistream> istrm, const pstring &name);
 
 		/* register a source */
 
@@ -288,8 +294,8 @@ namespace netlist
 		/* helper - also used by nltool */
 		const pstring resolve_alias(const pstring &name) const;
 
-		plib::plog_base<netlist_t, NL_DEBUG> &log();
-		const plib::plog_base<netlist_t, NL_DEBUG> &log() const;
+		log_type &log();
+		const log_type &log() const;
 
 		//std::vector<std::pair<pstring, factory::element_t *>> m_device_factory;
 		std::unordered_map<pstring, factory::element_t *> m_device_factory;
@@ -300,6 +306,14 @@ namespace netlist
 
 		/* needed by proxy */
 		detail::core_terminal_t *find_terminal(const pstring &outname_in, const detail::terminal_type atype, bool required = true);
+
+		/* core net handling */
+
+		void delete_empty_nets();
+
+		/* run preparation */
+
+		void prepare_to_run();
 
 	private:
 
@@ -331,12 +345,11 @@ namespace netlist
 
 		unsigned m_proxy_cnt;
 		unsigned m_frontier_cnt;
-};
+	};
 
 	// ----------------------------------------------------------------------------------------
 	// base sources
 	// ----------------------------------------------------------------------------------------
-
 
 	class source_string_t : public source_t
 	{
@@ -399,6 +412,10 @@ namespace netlist
 		void (*m_setup_func)(setup_t &);
 		pstring m_setup_func_name;
 	};
+
+	// -----------------------------------------------------------------------------
+	// inline implementations
+	// -----------------------------------------------------------------------------
 
 }
 

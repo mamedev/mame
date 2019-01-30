@@ -1311,14 +1311,14 @@ MACHINE_CONFIG_START(vboy_state::vboy)
 	MCFG_DEVICE_ADD( "maincpu", V810, XTAL(20'000'000) )
 	MCFG_DEVICE_PROGRAM_MAP(vboy_mem)
 	MCFG_DEVICE_IO_MAP(vboy_io)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer_l", vboy_state, vboy_scanlineL, "3dleft", 0, 1)
-	//MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer_r", vboy_state, vboy_scanlineR, "3dright", 0, 1)
+	TIMER(config, "scantimer_l").configure_scanline(FUNC(vboy_state::vboy_scanlineL), "3dleft", 0, 1);
+	//TIMER(config, "scantimer_r").configure_scanline(FUNC(vboy_state::vboy_scanlineR), "3dright", 0, 1);
 
 	// programmable timer
-	MCFG_TIMER_DRIVER_ADD("timer_main", vboy_state, timer_main_tick)
+	TIMER(config, m_maintimer).configure_generic(FUNC(vboy_state::timer_main_tick));
 
 	// pad ready, which should be once per VBL
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_pad", vboy_state, timer_pad_tick, attotime::from_hz(50.038029f))
+	TIMER(config, "timer_pad").configure_periodic(FUNC(vboy_state::timer_pad_tick), attotime::from_hz(50.038029f));
 
 	/* video hardware */
 	config.set_default_layout(layout_vboy);
@@ -1340,7 +1340,7 @@ MACHINE_CONFIG_START(vboy_state::vboy)
 	MCFG_VBOY_CARTRIDGE_ADD("cartslot", vboy_cart, nullptr)
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","vboy")
+	SOFTWARE_LIST(config, "cart_list").set_original("vboy");
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

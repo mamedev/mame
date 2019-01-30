@@ -554,7 +554,7 @@ MACHINE_CONFIG_START(markham_state::markham)
 	MCFG_DEVICE_PROGRAM_MAP(markham_slave_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", markham_state, irq0_line_hold)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -579,12 +579,12 @@ MACHINE_CONFIG_START(markham_state::strnskil)
 
 	markham(config);
 	/* basic machine hardware */
-	MCFG_DEVICE_REMOVE("maincpu")
+	config.device_remove("maincpu");
 	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK/2) /* 4.000MHz */
 	MCFG_DEVICE_PROGRAM_MAP(strnskil_master_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", markham_state, strnskil_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(markham_state::strnskil_scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_REMOVE("subcpu")
+	config.device_remove("subcpu");
 	MCFG_DEVICE_ADD("subcpu", Z80, CPU_CLOCK/2) /* 4.000MHz */
 	MCFG_DEVICE_PROGRAM_MAP(strnskil_slave_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(markham_state, irq0_line_hold, 2*(PIXEL_CLOCK/HTOTAL/VTOTAL))

@@ -336,7 +336,7 @@ MACHINE_CONFIG_START(juicebox_state::juicebox)
 	SMARTMEDIA(config, m_smartmedia, 0);
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","juicebox")
+	SOFTWARE_LIST(config, "cart_list").set_original("juicebox");
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( juicebox )

@@ -249,9 +249,10 @@ remote488_device::remote488_device(const machine_config &mconfig, const char *ta
 {
 }
 
-MACHINE_CONFIG_START(remote488_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("stream", BITBANGER, 0)
-MACHINE_CONFIG_END
+void remote488_device::device_add_mconfig(machine_config &config)
+{
+	BITBANGER(config, m_stream, 0);
+}
 
 void remote488_device::ieee488_eoi(int state)
 {

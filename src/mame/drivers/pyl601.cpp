@@ -572,9 +572,9 @@ MACHINE_CONFIG_START(pyl601_state::pyl601)
 	crtc.set_update_row_callback(FUNC(pyl601_state::pyl601_update_row), this);
 
 	UPD765A(config, m_fdc, 8'000'000, true, true);
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", pyl601_floppies, "525hd", pyl601_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", pyl601_floppies, "525hd", pyl601_state::floppy_formats)
-	MCFG_SOFTWARE_LIST_ADD("flop_list","pyl601")
+	FLOPPY_CONNECTOR(config, "upd765:0", pyl601_floppies, "525hd", pyl601_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765:1", pyl601_floppies, "525hd", pyl601_state::floppy_formats);
+	SOFTWARE_LIST(config, "flop_list").set_original("pyl601");
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("576K"); // 64 + 512

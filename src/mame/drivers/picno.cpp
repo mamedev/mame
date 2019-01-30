@@ -78,7 +78,7 @@ MACHINE_CONFIG_START(picno_state::picno)
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "picno_cart")
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "picno")
+	SOFTWARE_LIST(config, "cart_list").set_original("picno");
 MACHINE_CONFIG_END
 
 ROM_START( picno )

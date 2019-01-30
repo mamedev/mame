@@ -772,7 +772,7 @@ MACHINE_CONFIG_START(nakajies_state::nakajies210)
 	/* rtc */
 	RP5C01(config, "rtc", XTAL(32'768));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("kb_timer", nakajies_state, kb_timer, attotime::from_hz(250))
+	TIMER(config, "kb_timer").configure_periodic(FUNC(nakajies_state::kb_timer), attotime::from_hz(250));
 MACHINE_CONFIG_END
 
 void nakajies_state::dator3k(machine_config &config)

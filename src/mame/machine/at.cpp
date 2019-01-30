@@ -46,12 +46,13 @@ void at_mb_device::device_start()
 		downcast<i80286_cpu_device *>(m_maincpu.target())->set_a20_callback(i80286_cpu_device::a20_cb(&at_mb_device::a20_286, this));
 }
 
-MACHINE_CONFIG_START(at_mb_device::at_softlists)
+void at_mb_device::at_softlists(machine_config &config)
+{
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("pc_disk_list","ibm5150")
-	MCFG_SOFTWARE_LIST_ADD("at_disk_list","ibm5170")
-	MCFG_SOFTWARE_LIST_ADD("at_cdrom_list","ibm5170_cdrom")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "pc_disk_list").set_original("ibm5150");
+	SOFTWARE_LIST(config, "at_disk_list").set_original("ibm5170");
+	SOFTWARE_LIST(config, "at_cdrom_list").set_original("ibm5170_cdrom");
+}
 
 MACHINE_CONFIG_START(at_mb_device::device_add_mconfig)
 	PIT8254(config, m_pit8254, 0);
@@ -105,7 +106,8 @@ MACHINE_CONFIG_START(at_mb_device::device_add_mconfig)
 	m_pic8259_slave->in_sp_callback().set_constant(0);
 
 	ISA16(config, m_isabus, 0);
-	m_isabus->set_cputag(":maincpu");
+	m_isabus->set_memspace(":maincpu", AS_PROGRAM);
+	m_isabus->set_iospace(":maincpu", AS_IO);
 	m_isabus->irq2_callback().set(m_pic8259_slave, FUNC(pic8259_device::ir2_w)); // in place of irq 2 on at irq 9 is used
 	m_isabus->irq3_callback().set("pic8259_master", FUNC(pic8259_device::ir3_w));
 	m_isabus->irq4_callback().set("pic8259_master", FUNC(pic8259_device::ir4_w));
@@ -124,6 +126,7 @@ MACHINE_CONFIG_START(at_mb_device::device_add_mconfig)
 	m_isabus->drq5_callback().set(m_dma8237_2, FUNC(am9517a_device::dreq1_w));
 	m_isabus->drq6_callback().set(m_dma8237_2, FUNC(am9517a_device::dreq2_w));
 	m_isabus->drq7_callback().set(m_dma8237_2, FUNC(am9517a_device::dreq3_w));
+	m_isabus->iochck_callback().set(FUNC(at_mb_device::iochck_w));
 
 	MC146818(config, m_mc146818, 32.768_kHz_XTAL);
 	m_mc146818->irq().set(m_pic8259_slave, FUNC(pic8259_device::ir0_w));
@@ -364,7 +367,8 @@ WRITE8_MEMBER( at_mb_device::write_rtc )
 {
 	if (offset==0) {
 		m_nmi_enabled = BIT(data,7);
-		m_isabus->set_nmi_state((m_nmi_enabled==0) && (m_channel_check==0));
+		if (!m_nmi_enabled)
+			m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 		m_mc146818->write(space,0,data);
 	}
 	else {
@@ -413,5 +417,12 @@ WRITE8_MEMBER( at_mb_device::portb_w )
 	m_pit8254->write_gate2(BIT(data, 0));
 	speaker_set_spkrdata( BIT(data, 1));
 	m_channel_check = BIT(data, 3);
-	m_isabus->set_nmi_state((m_nmi_enabled==0) && (m_channel_check==0));
+	if (m_channel_check)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER( at_mb_device::iochck_w )
+{
+	if (!state && m_nmi_enabled && !m_channel_check)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }

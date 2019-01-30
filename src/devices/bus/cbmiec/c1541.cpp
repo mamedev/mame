@@ -161,17 +161,17 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(C1540,                      c1540_device,                      "c1540",    "C1540 Disk Drive")
-DEFINE_DEVICE_TYPE(C1541,                      c1541_device,                      "c1541",    "C1541 Disk Drive")
-DEFINE_DEVICE_TYPE(C1541C,                     c1541c_device,                     "c1541c",   "C1541C Disk Drive")
-DEFINE_DEVICE_TYPE(C1541II,                    c1541ii_device,                    "c1541ii",  "C1541-II Disk Drive")
+DEFINE_DEVICE_TYPE(C1540,                      c1540_device,                      "c1540",    "Commodore 1540 Disk Drive")
+DEFINE_DEVICE_TYPE(C1541,                      c1541_device,                      "c1541",    "Commodore 1541 Disk Drive")
+DEFINE_DEVICE_TYPE(C1541C,                     c1541c_device,                     "c1541c",   "Commodore 1541C Disk Drive")
+DEFINE_DEVICE_TYPE(C1541II,                    c1541ii_device,                    "c1541ii",  "Commodore 1541-II Disk Drive")
 DEFINE_DEVICE_TYPE(SX1541,                     sx1541_device,                     "sx1541",   "SX1541 Disk Drive")
 DEFINE_DEVICE_TYPE(FSD1,                       fsd1_device,                       "fsd1",     "FSD-1 Disk Drive")
 DEFINE_DEVICE_TYPE(FSD2,                       fsd2_device,                       "fsd2",     "FSD-2 Disk Drive")
 DEFINE_DEVICE_TYPE(CSD1,                       csd1_device,                       "csd1",     "CSD-1 Disk Drive")
-DEFINE_DEVICE_TYPE(C1541_DOLPHIN_DOS,          c1541_dolphin_dos_device,          "c1541dd",  "C1541 Dolphin-DOS 2.0 Disk Drive")
-DEFINE_DEVICE_TYPE(C1541_PROFESSIONAL_DOS_V1,  c1541_professional_dos_v1_device,  "c1541pd",  "C1541 Professional-DOS v1 Disk Drive")
-DEFINE_DEVICE_TYPE(C1541_PROLOGIC_DOS_CLASSIC, c1541_prologic_dos_classic_device, "c1541pdc", "C1541 ProLogic-DOS Classic Disk Drive")
+DEFINE_DEVICE_TYPE(C1541_DOLPHIN_DOS,          c1541_dolphin_dos_device,          "c1541dd",  "Commodore 1541 Dolphin-DOS 2.0 Disk Drive")
+DEFINE_DEVICE_TYPE(C1541_PROFESSIONAL_DOS_V1,  c1541_professional_dos_v1_device,  "c1541pd",  "Commodore 1541 Professional-DOS v1 Disk Drive")
+DEFINE_DEVICE_TYPE(C1541_PROLOGIC_DOS_CLASSIC, c1541_prologic_dos_classic_device, "c1541pdc", "Commodore 1541 ProLogic-DOS Classic Disk Drive")
 DEFINE_DEVICE_TYPE(INDUS_GT,                   indus_gt_device,                   "indusgt",  "Indus GT Disk Drive")
 
 

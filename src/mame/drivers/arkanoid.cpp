@@ -1356,7 +1356,7 @@ MACHINE_CONFIG_START(arkanoid_state::arkanoid)
 	ARKANOID_68705P5(config, m_mcuintf, 12_MHz_XTAL / 4); // verified on PCB
 	m_mcuintf->portb_r_cb().set_ioport("MUX");
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))                  // 100 CPU slices per second to synchronize between the MCU and the main CPU
+	config.m_minimum_quantum = attotime::from_hz(6000);                  // 100 CPU slices per second to synchronize between the MCU and the main CPU
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1408,7 +1408,7 @@ MACHINE_CONFIG_START(arkanoid_state::bootleg)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(bootleg_map)
 
-	MCFG_DEVICE_REMOVE("mcu")
+	config.device_remove("mcu");
 MACHINE_CONFIG_END
 
 void arkanoid_state::aysnd(machine_config &config)

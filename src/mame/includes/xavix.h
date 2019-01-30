@@ -18,7 +18,8 @@
 
 #include "machine/xavix_mtrk_wheel.h"
 #include "machine/xavix_madfb_ball.h"
-
+#include "machine/xavix2002_io.h"
+#include "machine/xavix_io.h"
 
 class xavix_sound_device : public device_t, public device_sound_interface
 {
@@ -99,7 +100,8 @@ public:
 		m_palette(*this, "palette"),
 		m_region(*this, "REGION"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_sound(*this, "xavix_sound")
+		m_sound(*this, "xavix_sound"),
+		m_xavix2002io(*this, "xavix2002io")
 	{ }
 
 	void xavix(machine_config &config);
@@ -107,6 +109,8 @@ public:
 	void xavix2000(machine_config &config);
 	void xavix_nv(machine_config &config);
 	void xavix2000_nv(machine_config &config);
+
+	void xavix2002(machine_config &config);
 
 	void init_xavix();
 
@@ -205,7 +209,7 @@ private:
 
 	virtual void video_start() override;
 
-	virtual DECLARE_READ8_MEMBER(opcodes_000000_r)
+	virtual uint8_t opcodes_000000_r(offs_t offset)
 	{
 		if (offset & 0x8000)
 		{
@@ -213,24 +217,24 @@ private:
 		}
 		else
 		{
-			return m_lowbus->read8(space, offset & 0x7fff);
+			return m_lowbus->read8(offset & 0x7fff);
 		}
 	}
 
-	virtual DECLARE_READ8_MEMBER(opcodes_800000_r)
+	virtual uint8_t opcodes_800000_r(offs_t offset)
 	{
 		// rad_fb, rad_madf confirm that for >0x800000 the CPU only sees ROM when executing opcodes
 		return m_rgn[(offset) & (m_rgnlen - 1)];
 	}
 
-	virtual DECLARE_READ8_MEMBER(extbus_r) { return m_rgn[(offset) & (m_rgnlen - 1)]; }
-	virtual DECLARE_WRITE8_MEMBER(extbus_w)
+	virtual uint8_t extbus_r(offs_t offset) { return m_rgn[(offset) & (m_rgnlen - 1)]; }
+	virtual void extbus_w(offs_t offset, uint8_t data)
 	{
-		logerror("%s: write to external bus %06x %02x\n", machine().describe_context(), offset, data);	
+		logerror("%s: write to external bus %06x %02x\n", machine().describe_context(), offset, data);
 	}
 
 
-	DECLARE_READ8_MEMBER(sample_read)
+	uint8_t sample_read(offs_t offset)
 	{
 		return read_full_data_sp_bypass(offset);
 	};
@@ -276,7 +280,7 @@ private:
 	DECLARE_WRITE8_MEMBER(mouse_7b01_w);
 	DECLARE_WRITE8_MEMBER(mouse_7b10_w);
 	DECLARE_WRITE8_MEMBER(mouse_7b11_w);
-	
+
 	DECLARE_READ8_MEMBER(adc_7b80_r);
 	DECLARE_WRITE8_MEMBER(adc_7b80_w);
 	DECLARE_READ8_MEMBER(adc_7b81_r);
@@ -563,7 +567,20 @@ private:
 	int get_current_address_byte();
 
 	required_device<xavix_sound_device> m_sound;
+
+
 	DECLARE_READ8_MEMBER(sound_regram_read_cb);
+
+protected:
+	optional_device<xavix2002_io_device> m_xavix2002io;
+
+	// additional SuperXaviX / XaviX2002 stuff
+
+	uint8_t m_sx_extended_extbus[3];
+
+	DECLARE_WRITE8_MEMBER(extended_extbus_reg0_w);
+	DECLARE_WRITE8_MEMBER(extended_extbus_reg1_w);
+	DECLARE_WRITE8_MEMBER(extended_extbus_reg2_w);
 };
 
 class xavix_i2c_state : public xavix_state
@@ -578,10 +595,13 @@ public:
 
 	void xavix_i2c_24lc02(machine_config &config);
 	void xavix_i2c_24lc04(machine_config &config);
+	void xavix_i2c_24c02(machine_config &config);
 	void xavix_i2c_24c08(machine_config &config);
 
 	void xavix2000_i2c_24c04(machine_config &config);
 	void xavix2000_i2c_24c02(machine_config &config);
+
+	void xavix2002_i2c_24c04(machine_config &config);
 
 	void init_epo_efdx()
 	{
@@ -589,8 +609,10 @@ public:
 		hackaddress1 = 0x958a;
 		hackaddress2 = 0x8524;
 	}
+
+	DECLARE_CUSTOM_INPUT_MEMBER(i2c_r);
+
 protected:
-	virtual uint8_t read_io1(uint8_t direction) override;
 	virtual void write_io1(uint8_t data, uint8_t direction) override;
 
 	required_device<i2cmem_device> m_i2cmem;
@@ -600,6 +622,25 @@ private:
 	int hackaddress2;
 };
 
+class xavix_i2c_jmat_state : public xavix_i2c_state
+{
+public:
+	xavix_i2c_jmat_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_i2c_state(mconfig, type, tag)
+	{ }
+
+	void xavix2002_i2c_jmat(machine_config &config);
+
+private:
+	READ8_MEMBER(read_extended_io0);
+	READ8_MEMBER(read_extended_io1);
+	READ8_MEMBER(read_extended_io2);
+	WRITE8_MEMBER(write_extended_io0);
+	WRITE8_MEMBER(write_extended_io1);
+	WRITE8_MEMBER(write_extended_io2);
+};
+
+
 class xavix_i2c_lotr_state : public xavix_i2c_state
 {
 public:
@@ -607,9 +648,20 @@ public:
 		: xavix_i2c_state(mconfig, type, tag)
 	{ }
 
+	DECLARE_CUSTOM_INPUT_MEMBER(camera_r);
+
 protected:
-	virtual uint8_t read_io1(uint8_t direction) override;
 	//virtual void write_io1(uint8_t data, uint8_t direction) override;
+};
+
+class xavix_i2c_bowl_state : public xavix_i2c_state
+{
+public:
+	xavix_i2c_bowl_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_i2c_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_CUSTOM_INPUT_MEMBER(camera_r);
 };
 
 
@@ -663,7 +715,7 @@ protected:
 
 	// for Cart cases this memory bypass becomes more complex
 
-	virtual DECLARE_READ8_MEMBER(opcodes_000000_r) override
+	virtual uint8_t opcodes_000000_r(offs_t offset) override
 	{
 		if (offset & 0x8000)
 		{
@@ -685,11 +737,11 @@ protected:
 		}
 		else
 		{
-			return m_lowbus->read8(space, offset & 0x7fff);
+			return m_lowbus->read8(offset & 0x7fff);
 		}
 	}
 
-	virtual DECLARE_READ8_MEMBER(opcodes_800000_r) override
+	virtual uint8_t opcodes_800000_r(offs_t offset) override
 	{
 		if (offset & 0x400000)
 		{
@@ -708,7 +760,7 @@ protected:
 		}
 	}
 
-	virtual DECLARE_READ8_MEMBER(extbus_r) override
+	virtual uint8_t extbus_r(offs_t offset) override
 	{
 		if (m_extbusctrl[1] & 0x08)
 		{
@@ -734,7 +786,7 @@ protected:
 			}
 		}
 	}
-	virtual DECLARE_WRITE8_MEMBER(extbus_w) override
+	virtual void extbus_w(offs_t offset, uint8_t data) override
 	{
 		if (m_extbusctrl[0] & 0x08)
 		{
@@ -816,8 +868,9 @@ public:
 
 	void xavix_i2c_taiko(machine_config &config);
 
+	DECLARE_CUSTOM_INPUT_MEMBER(i2c_r);
+
 protected:
-	virtual uint8_t read_io1(uint8_t direction) override;
 	virtual void write_io1(uint8_t data, uint8_t direction) override;
 
 	required_device<i2cmem_device> m_i2cmem;
@@ -835,14 +888,16 @@ public:
 		m_extraiowrite(0)
 	{ }
 
-//	void xavix_ekara(machine_config &config);
+	DECLARE_CUSTOM_INPUT_MEMBER(ekara_multi0_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(ekara_multi1_r);
+
+//  void xavix_ekara(machine_config &config);
 
 protected:
 
 	required_ioport m_extra0;
 	required_ioport m_extra1;
 
-	virtual uint8_t read_io1(uint8_t direction) override;
 	virtual void write_io0(uint8_t data, uint8_t direction) override;
 	virtual void write_io1(uint8_t data, uint8_t direction) override;
 

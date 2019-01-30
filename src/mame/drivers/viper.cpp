@@ -2425,7 +2425,7 @@ MACHINE_CONFIG_START(viper_state::viper)
 	PALETTE(config, "palette").set_entries(65536);
 
 	TIMER(config, "ds2430_timer2", 0);
-	//MCFG_TIMER_ADD_NONE("ds2430_timer2")
+	//TIMER(config, "ds2430_timer2").configure_generic(timer_device::expired_delegate());
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

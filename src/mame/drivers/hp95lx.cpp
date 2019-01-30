@@ -732,7 +732,8 @@ MACHINE_CONFIG_START(hp95lx_state::hp95lx)
 	m_pic8259->out_int_callback().set_inputline(m_maincpu, 0);
 
 	ISA8(config, m_isabus, 0);
-	m_isabus->set_cputag("maincpu");
+	m_isabus->set_memspace("maincpu", AS_PROGRAM);
+	m_isabus->set_iospace("maincpu", AS_IO);
 
 	MCFG_DEVICE_ADD("board0", ISA8_SLOT, 0, "isa", pc_isa8_cards, "com", true)
 

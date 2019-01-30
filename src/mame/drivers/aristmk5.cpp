@@ -6689,6 +6689,33 @@ ROM_START( qniled )
 ROM_END
 
 
+// 0101670V / 602/4 / 25, 50 Credit / 20 Line Multiline
+// Queen Of The Nile - Fast Lane / Qld QCOM / E - 17/08/01
+// Fast Lane Hyperlink game
+ROM_START( qnilefl )
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
+	/*
+	    Checksum code found at 0x000ad0
+	    0x000000-0x086cbb is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x3297c26b
+	        Calculated Checksum 0x3297c26b  (OK)
+	    0x086cbc-0x2aecd3 is the non-Checksummed range (unusual endpoint)
+	*/
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD( "0101670v.u7",  0x000000, 0x80000, CRC(71817007) SHA1(90cd928894044b629e03aa2c1d533eb6aed4c7af) )
+	ROM_LOAD32_WORD( "0101670v.u11", 0x000002, 0x80000, CRC(53006d14) SHA1(00d99e74433023d007f6a401d0081decb36a32dc) )
+	ROM_LOAD32_WORD( "0101670v.u8",  0x100000, 0x80000, CRC(ffd13e39) SHA1(d0fd0efc968fc4c8c81b0824eb9773462b88acb4) )
+	ROM_LOAD32_WORD( "0101670v.u12", 0x100002, 0x80000, CRC(d918d776) SHA1(aa3729d712a43b777d648c840b3e3de21d76ab50) )
+	ROM_LOAD32_WORD( "0101670v.u9",  0x200000, 0x80000, CRC(d8c46bd8) SHA1(ae9427f668fe109573915ca0408450137f75ade0) )
+	ROM_LOAD32_WORD( "0101670v.u13", 0x200002, 0x80000, CRC(715e7789) SHA1(b734aa88e7e65fba988e7fffd711039c4f554b2c) )
+
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
+	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+ROM_END
+
+
 // 0401072V / 602/4 / 25 Credit Multiplier / 20 Line Multiline
 // QUEEN OF THE NILE / NSW/ACT / D - 18/06/99
 // Maximillions Hyperlink game
@@ -6757,6 +6784,31 @@ ROM_START( qnilenz )
 	ROM_LOAD32_WORD( "0300785v.u12", 0x100002, 0x80000, CRC(b938825c) SHA1(137abb5573fe120ca9cb1fa181bd8591889420d0) )
 	ROM_LOAD32_WORD( "0300785v.u9",  0x200000, 0x80000, CRC(35244a36) SHA1(2529ee5d2d8419d050dc1af501adba24f8e1fbcb) )
 	ROM_LOAD32_WORD( "0300785v.u13", 0x200002, 0x80000, CRC(b267d25a) SHA1(8065601190540e5f0b4a91fed1deffcdb2606f94) )
+
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
+	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+ROM_END
+
+
+// 0201200V / 602/4 / 25 Credit Multiplier / 20 Line Multiline
+// Queen Of The Nile / Qld QCOM / D - 18/06/99
+ROM_START( qnileql )
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
+	/*
+	    Checksum code found at 0x000ad0
+	    0x000000-0x0807ff is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x36105c3f
+	        Calculated Checksum 0x36105c3f  (OK)
+	    0x080800-0x1aa743 is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x080800-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
+	*/
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD( "0201200v.u7",  0x000000, 0x80000, CRC(093b575c) SHA1(3139e1f1e94f752e2162af8064ab7d62f0b15b07) )
+	ROM_LOAD32_WORD( "0201200v.u11", 0x000002, 0x80000, CRC(2a356826) SHA1(4c9ae643570fceff7138e1a7bb780de9eaa272b0) )
+	ROM_LOAD32_WORD( "0201200v.u8",  0x100000, 0x80000, CRC(8b3dd4cb) SHA1(b57494001bfd6a7b933214b62f5c93cb8c21fdca) )
+	ROM_LOAD32_WORD( "0201200v.u12", 0x100002, 0x80000, CRC(38332f4e) SHA1(53c90103df06e5a28bbaf32504a0984b7c65bec7) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
 	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
@@ -6961,6 +7013,33 @@ ROM_START( reelrock )
 	ROM_LOAD32_WORD( "0100779v.u11", 0x000002, 0x80000, CRC(57e341d0) SHA1(9b0d50763bb74ca5fe404c9cd526633721cf6677) )
 	ROM_LOAD32_WORD( "0100779v.u8",  0x100000, 0x80000, CRC(57eec667) SHA1(5f3888d75f48b6148f451d7ebb7f99e1a0939f3c) )
 	ROM_LOAD32_WORD( "0100779v.u12", 0x100002, 0x80000, CRC(4ac20679) SHA1(0ac732ffe6a33806e4a06e87ec875a3e1314e06b) )
+
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
+	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+ROM_END
+
+
+// 0101460V / 628/2 / 10, 25 & 50 Credit Multiplier / 20 Line Multiline
+// Reelin 'n Rockin / QLD / E - 20/12/00
+// ROM says 'Reelin 'n Rockin', artwork says 'Reelin-n-Rockin'
+ROM_START( reelrockql )
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
+	/*
+	    Checksum code found at 0x000ad0
+	    0x000000-0x08737b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x962948fb
+	        Calculated Checksum 0x962948fb  (OK)
+	    0x08737c-0x2b2beb is the non-Checksummed range (unusual endpoint)
+	*/
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD( "0101460v.u7",  0x000000, 0x80000, CRC(6781085a) SHA1(8fbd8cddada944ca3fd633bdc3b5dc3c0a14736d) )
+	ROM_LOAD32_WORD( "0101460v.u11", 0x000002, 0x80000, CRC(43525988) SHA1(705c0114300ea099c7eb96c5035233753534d28d) )
+	ROM_LOAD32_WORD( "0101460v.u8",  0x100000, 0x80000, CRC(21767926) SHA1(cbfc3304aab6ef4988652071b263a814804f5f6b) )
+	ROM_LOAD32_WORD( "0101460v.u12", 0x100002, 0x80000, NO_DUMP )
+	ROM_LOAD32_WORD( "0101460v.u9",  0x200000, 0x80000, CRC(324f6fd8) SHA1(c6d689447eb15a57046bcdecc5dbd67b716112f5) )
+	ROM_LOAD32_WORD( "0101460v.u13", 0x200002, 0x80000, NO_DUMP )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
 	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
@@ -8409,8 +8488,10 @@ GAMEL( 1997, qnileb,      qnile,    aristmk5,           qnile,        aristmk5_s
 GAMEL( 2002, qnilebr,     qnile,    aristmk5,           goldpyrb,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile (0101707V, Brazil)",                 0,                   layout_goldpyrb )        // MV4162, A - 21/08/02
 GAMEL( 1997, qnilec,      qnile,    aristmk5,           qnilec,       aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile (0300440V, NSW/ACT)",                MACHINE_NOT_WORKING, layout_qnilec )          // 602/3, B - 13/05/97, Rev 5
 GAMEL( 1999, qniled,      qnile,    aristmk5,           checkma5,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile (0101139V, NSW/ACT)",                MACHINE_NOT_WORKING, layout_qniled )          // 602/16, A - 11/10/99, Rev 14
+GAMEL( 2001, qnilefl,     qnile,    aristmk5,           trstrove,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile - Fast Lane (0101670V, Queensland)", MACHINE_NOT_WORKING, layout_trstrove )        // 602/4, E - 17/08/01
 GAMEL( 2000, qnilenl,     qnile,    aristmk5,           qnilenl,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile (0301059V, Holland)",                0,                   layout_qnilenl )         // 602/5, G - 10/04/00
 GAMEL( 1998, qnilenz,     qnile,    aristmk5,           cashcatnz,    aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile (0300785V, New Zealand)",            0,                   layout_cashcatnz )       // MV4068, A - 31/8/98, Rev 20
+GAMEL( 1999, qnileql,     qnile,    aristmk5,           trstrove,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile (0201200V, Queensland)",             MACHINE_NOT_WORKING, layout_trstrove )        // 602/4, D - 18/06/99
 GAMEL( 1997, qnileu,      qnile,    aristmk5_usa,       dolphntru,    aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile (GHG4091-02, US)",                   MACHINE_NOT_WORKING, layout_aristmk5_us )     // MV4091, B - 13/05/97
 GAMEL( 1997, qnileua,     qnile,    aristmk5_usa,       dolphntru,    aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile (GHG4091-03, US)",                   MACHINE_NOT_WORKING, layout_aristmk5_us )     // MV4091, B - 13/05/97
 GAMEL( 1997, qnilev,      qnile,    aristmk5,           aristmk5_9,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile (04J00784, Venezuela)",              MACHINE_NOT_WORKING, layout_dolphntrb )       // 602/3, B - 13/05/97, Rev 6
@@ -8422,6 +8503,7 @@ GAMEL( 1994, qtbird,      aristmk5, aristmk5,           qtbird,       aristmk5_s
 GAMEL( 2000, rainwrce,    aristmk5, aristmk5,           adonisce,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Rainbow Warriors - Cash Express (0101332V, NSW/ACT)",  MACHINE_NOT_WORKING, layout_aristmk5 )        // 655, B - 02/03/00, Rev 25
 GAMEL( 1998, reelpwr,     aristmk5, aristmk5,           wizways,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Reel Power (0100400V, NSW/ACT)",                       0,                   layout_wizways )         // 598/2, A - 01/11/96, Rev 1.23.8.0
 GAMEL( 1998, reelrock,    aristmk5, aristmk5,           reelrock,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Reelin-n-Rockin (0100779V, NSW/ACT)",                  MACHINE_NOT_WORKING, layout_reelrock )        // 628, A - 13/07/98, Rev 5
+GAMEL( 2000, reelrockql,  reelrock, aristmk5,           trstrove,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Reelin-n-Rockin (0101460V, Queensland)",               MACHINE_NOT_WORKING, layout_trstrove )        // 628/2, E - 20/12/00
 GAMEL( 1997, retrsam,     aristmk5, aristmk5,           retrsam,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Return of the Samurai (0400549V, NSW/ACT)",            MACHINE_NOT_WORKING, layout_sbuk3 )           // 608, A - 17/04/97, Rev 5
 GAMEL( 1997, retrsama,    retrsam,  aristmk5,           retrsam,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Return of the Samurai (0200549V, NSW/ACT)",            0,                   layout_sbuk3 )           // 608, A - 17/04/97, Rev 1.26.25.3
 GAMEL( 1997, retrsamb,    retrsam,  aristmk5,           retrsamb,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Return of the Samurai (0200506V, NSW/ACT)",            0,                   layout_retrsamb )        // 608, A - 17/04/97, Rev 1.26.25.3

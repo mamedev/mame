@@ -549,17 +549,17 @@ MACHINE_CONFIG_START(adp_state::quickjac)
 	MCFG_MACHINE_START_OVERRIDE(adp_state,skattv)
 	MCFG_MACHINE_RESET_OVERRIDE(adp_state,skattv)
 
-	MCFG_DEVICE_ADD( "duart", MC68681, XTAL(8'664'000) / 2 )
-	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_4))
-	MCFG_MC68681_A_TX_CALLBACK(WRITELINE("microtouch", microtouch_device, rx))
-	MCFG_MC68681_INPORT_CALLBACK(IOPORT("DSW1"))
+	MC68681(config, m_duart, XTAL(8'664'000) / 2);
+	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_4);
+	m_duart->a_tx_cb().set(m_microtouch, FUNC(microtouch_device::rx));
+	m_duart->inport_cb().set_ioport("DSW1");
 
-	MCFG_MICROTOUCH_ADD( "microtouch", 9600, WRITELINE("duart", mc68681_device, rx_a_w) )
+	MICROTOUCH(config, m_microtouch, 9600).stx().set(m_duart, FUNC(mc68681_device::rx_a_w));
 
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_NONE);
 
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
-	//MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(*this, adp_state, rtc_irq))
+	MSM6242(config, "rtc", XTAL(32'768));
+	//rtc.out_int_handler().set(FUNC(adp_state::rtc_irq));
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

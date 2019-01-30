@@ -753,7 +753,7 @@ MACHINE_CONFIG_START(vixen_state::vixen)
 	MCFG_SCREEN_UPDATE_DRIVER(vixen_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(23.9616_MHz_XTAL / 2, 96*8, 0*8, 81*8, 27*10, 0*10, 26*10)
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("vsync", vixen_state, vsync_tick, SCREEN_TAG, 26*10, 27*10)
+	TIMER(config, "vsync").configure_scanline(FUNC(vixen_state::vsync_tick), SCREEN_TAG, 26*10, 27*10);
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
@@ -787,16 +787,14 @@ MACHINE_CONFIG_START(vixen_state::vixen)
 
 	FD1797(config, m_fdc, 23.9616_MHz_XTAL / 24);
 	m_fdc->intrq_wr_callback().set(FUNC(vixen_state::fdc_intrq_w));
-	MCFG_FLOPPY_DRIVE_ADD(FDC1797_TAG":0", vixen_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD(FDC1797_TAG":1", vixen_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, FDC1797_TAG":0", vixen_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, FDC1797_TAG":1", vixen_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
 	MCFG_IEEE488_BUS_ADD()
 	MCFG_IEEE488_SRQ_CALLBACK(WRITELINE(*this, vixen_state, srq_w))
 	MCFG_IEEE488_ATN_CALLBACK(WRITELINE(*this, vixen_state, atn_w))
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("disk_list", "vixen")
+	SOFTWARE_LIST(config, "disk_list").set_original("vixen");
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("64K");

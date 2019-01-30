@@ -315,7 +315,7 @@ MACHINE_CONFIG_START(pce_state::pce_common)
 	m_maincpu->add_route(0, "lspeaker", 1.00);
 	m_maincpu->add_route(1, "rspeaker", 1.00);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	MCFG_MACHINE_START_OVERRIDE(pce_state, pce )
 	MCFG_MACHINE_RESET_OVERRIDE(pce_state, mess_pce )
@@ -341,21 +341,21 @@ MACHINE_CONFIG_START(pce_state::pce_common)
 
 	PCE_CD(config, m_cd, 0);
 
-	MCFG_SOFTWARE_LIST_ADD("cd_list","pcecd")
+	SOFTWARE_LIST(config, "cd_list").set_original("pcecd");
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(pce_state::pce)
 	pce_common(config);
 	MCFG_PCE_CARTRIDGE_ADD("cartslot", pce_cart, nullptr)
-	MCFG_SOFTWARE_LIST_ADD("cart_list","pce")
+	SOFTWARE_LIST(config, "cart_list").set_original("pce");
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(pce_state::tg16)
 	pce_common(config);
 	MCFG_TG16_CARTRIDGE_ADD("cartslot", pce_cart, nullptr)
-	MCFG_SOFTWARE_LIST_ADD("cart_list","tg16")
+	SOFTWARE_LIST(config, "cart_list").set_original("tg16");
 MACHINE_CONFIG_END
 
 
@@ -369,7 +369,7 @@ MACHINE_CONFIG_START(pce_state::sgx)
 	m_maincpu->add_route(0, "lspeaker", 1.00);
 	m_maincpu->add_route(1, "rspeaker", 1.00);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	MCFG_MACHINE_START_OVERRIDE(pce_state, pce )
 	MCFG_MACHINE_RESET_OVERRIDE(pce_state, mess_pce )
@@ -412,12 +412,12 @@ MACHINE_CONFIG_START(pce_state::sgx)
 	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_PCE_CARTRIDGE_ADD("cartslot", pce_cart, nullptr)
-	MCFG_SOFTWARE_LIST_ADD("cart_list","sgx")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("pce_list","pce")
+	SOFTWARE_LIST(config, "cart_list").set_original("sgx");
+	SOFTWARE_LIST(config, "pce_list").set_compatible("pce");
 
 	PCE_CD(config, m_cd, 0);
 
-	MCFG_SOFTWARE_LIST_ADD("cd_list","pcecd")
+	SOFTWARE_LIST(config, "cd_list").set_original("pcecd");
 MACHINE_CONFIG_END
 
 /***************************************************************************

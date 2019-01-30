@@ -1892,8 +1892,8 @@ MACHINE_CONFIG_START(supracan_state::supracan)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", supracan_state,  supracan_sound_irq)
 
 #if !(SOUNDCPU_BOOT_HACK)
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
-	MCFG_QUANTUM_PERFECT_CPU("soundcpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.m_perfect_cpu_quantum = subtag("soundcpu");
 #endif
 
 	MCFG_SCREEN_ADD( "screen", RASTER )
@@ -1910,7 +1910,7 @@ MACHINE_CONFIG_START(supracan_state::supracan)
 	MCFG_GENERIC_ENDIAN(ENDIANNESS_BIG)
 	MCFG_GENERIC_LOAD(supracan_state, supracan_cart)
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list","supracan")
+	SOFTWARE_LIST(config, "cart_list").set_original("supracan");
 MACHINE_CONFIG_END
 
 

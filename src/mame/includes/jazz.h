@@ -40,6 +40,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "cpu")
 		, m_ram(*this, "ram")
+		, m_vram(*this, "vram")
 		, m_mct_adr(*this, "mct_adr")
 		, m_scsibus(*this, "scsi")
 		, m_scsi(*this, "scsi:7:host")
@@ -49,6 +50,7 @@ public:
 		, m_flash(*this, "flash")
 		, m_kbdc(*this, "kbdc")
 		, m_network(*this, "net")
+		, m_screen(*this, "screen")
 		, m_ramdac(*this, "g364")
 	{
 	}
@@ -73,6 +75,7 @@ protected:
 	// devices
 	required_device<mips3_device> m_maincpu;
 	required_device<ram_device> m_ram;
+	required_device<ram_device> m_vram;
 	required_device<jazz_mct_adr_device> m_mct_adr;
 	required_device<nscsi_bus_device> m_scsibus;
 	required_device<ncr5390_device> m_scsi;
@@ -82,7 +85,7 @@ protected:
 	required_device<amd_28f020_device> m_flash;
 	required_device<at_keyboard_controller_device> m_kbdc;
 	required_device<dp83932c_device> m_network;
-	//required_device<screen_device> m_screen;
+	required_device<screen_device> m_screen;
 	required_device<g364_device> m_ramdac;
 
 	// helpers

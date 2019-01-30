@@ -948,7 +948,7 @@ MACHINE_CONFIG_START(turbo_state::buckrog)
 	MCFG_DEVICE_PROGRAM_MAP(buckrog_cpu2_map)
 	MCFG_DEVICE_IO_MAP(buckrog_cpu2_portmap)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	config.m_minimum_quantum = attotime::from_hz(600);
 	MCFG_MACHINE_RESET_OVERRIDE(turbo_state,buckrog)
 
 	I8255(config, m_i8255_0);

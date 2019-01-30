@@ -52,7 +52,7 @@ READ8_MEMBER(ncr5390_device::read)
 		case 6:  return seq_step_r(space, 0);
 		case 7:  return fifo_flags_r(space, 0);
 		case 8:  return conf_r(space, 0);
-		default: return 0;
+		default: return 0xff;
 	}
 }
 
@@ -184,10 +184,7 @@ void ncr5390_device::device_start()
 	m_irq_handler.resolve_safe();
 	m_drq_handler.resolve_safe();
 
-	tcount = 0;
-	tcounter = 0;
 	config = 0;
-	status = 0;
 	bus_id = 0;
 	select_timeout = 0;
 	tm = timer_alloc(0);
@@ -203,26 +200,28 @@ void ncr5390_device::device_reset()
 	sync_offset = 0;
 	seq = 0;
 	config &= 7;
-	status &= 0x90;
+	status = 0;
 	istatus = 0;
 	irq = false;
 	m_irq_handler(irq);
-	reset_soft();
-}
 
-void ncr5390_device::reset_soft()
-{
 	state = IDLE;
 	scsi_bus->ctrl_wait(scsi_refid, S_SEL|S_BSY|S_RST, S_ALL);
-	status &= 0xef;
 	drq = false;
 	test_mode = false;
 	m_drq_handler(drq);
+
+	scsi_bus->ctrl_w(scsi_refid, 0, S_RST);
+	tcount = 0;
+	tcounter = 0;
+
 	reset_disconnect();
 }
 
 void ncr5390_device::reset_disconnect()
 {
+	scsi_bus->ctrl_w(scsi_refid, 0, ~S_RST);
+
 	command_pos = 0;
 	command_length = 0;
 	memset(command, 0, sizeof(command));
@@ -263,6 +262,17 @@ void ncr5390_device::step(bool timeout)
 	}
 	switch(state & SUB_MASK ? state & SUB_MASK : state & STATE_MASK) {
 	case IDLE:
+		break;
+
+	case BUSRESET_WAIT_INT:
+		state = IDLE;
+		scsi_bus->ctrl_w(scsi_refid, 0, S_RST);
+		reset_disconnect();
+
+		if (!(config & 0x40)) {
+			istatus |= I_SCSI_RESET;
+			check_irq();
+		}
 		break;
 
 	case ARB_COMPLETE << SUB_SHIFT: {
@@ -420,8 +430,8 @@ void ncr5390_device::step(bool timeout)
 			break;
 		}
 
-		// "with atn" variants have a message byte before the command descriptor
-		command_length = (c == CD_SELECT) ? derive_msg_size(fifo[0]) : 1;
+		command_length = fifo_pos + tcounter;
+		logerror("command_length %d\n", command_length);
 		state = DISC_SEL_ARBITRATION;
 		step(false);
 		break;
@@ -455,7 +465,6 @@ void ncr5390_device::step(bool timeout)
 			seq = 1;
 			function_bus_complete();
 		} else {
-			command_length = derive_msg_size(fifo[0]);
 			state = DISC_SEL_WAIT_REQ;
 		}
 		break;
@@ -466,6 +475,8 @@ void ncr5390_device::step(bool timeout)
 		if((ctrl & S_PHASE_MASK) != S_PHASE_COMMAND) {
 			if(!command_length)
 				seq = 4;
+			else
+				seq = 2;
 			scsi_bus->ctrl_wait(scsi_refid, 0, S_REQ);
 			function_bus_complete();
 			break;
@@ -838,6 +849,8 @@ void ncr5390_device::start_command()
 		// clear transfer count zero flag when counter is reloaded
 		status &= ~S_TC0;
 	}
+	else
+		tcounter = 0;
 
 	switch(c) {
 	case CM_NOP:
@@ -858,13 +871,9 @@ void ncr5390_device::start_command()
 
 	case CM_RESET_BUS:
 		LOGMASKED(LOG_COMMAND, "Reset SCSI bus\n");
-		reset_soft();
-		// FIXME: this interrupt should be generated when the reset is reflected
-		// back into the device, and not when the device starts the scsi reset
-		if (!(config & 0x40)) {
-			istatus = I_SCSI_RESET;
-			check_irq();
-		}
+		state = BUSRESET_WAIT_INT;
+		scsi_bus->ctrl_w(scsi_refid, S_RST, S_RST);
+		delay(130);
 		break;
 
 	case CD_RESELECT:
@@ -963,12 +972,6 @@ bool ncr5390_device::check_valid_command(uint8_t cmd)
 	case 1: return mode == MODE_I && (subcmd <= 2 || subcmd == 8 || subcmd == 10);
 	}
 	return false;
-}
-
-int ncr5390_device::derive_msg_size(uint8_t msg_id)
-{
-	const static int sizes[8] = { 6, 10, 6, 6, 6, 12, 6, 10 };
-	return sizes[msg_id >> 5];
 }
 
 void ncr5390_device::arbitrate()
@@ -1162,11 +1165,11 @@ void ncr53c90a_device::device_start()
 	ncr5390_device::device_start();
 }
 
-void ncr53c90a_device::reset_soft()
+void ncr53c90a_device::device_reset()
 {
 	config2 = 0;
 
-	ncr5390_device::reset_soft();
+	ncr5390_device::device_reset();
 }
 
 READ8_MEMBER(ncr53c90a_device::status_r)
@@ -1200,11 +1203,11 @@ void ncr53c94_device::device_start()
 	ncr53c90a_device::device_start();
 }
 
-void ncr53c94_device::reset_soft()
+void ncr53c94_device::device_reset()
 {
 	config3 = 0;
 
-	ncr53c90a_device::reset_soft();
+	ncr53c90a_device::device_reset();
 }
 
 u16 ncr53c94_device::dma16_r()

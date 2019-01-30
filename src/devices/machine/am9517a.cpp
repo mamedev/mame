@@ -39,6 +39,18 @@
 
 */
 
+/*
+ * The EISA_DMA device represents the 82C37A-compatible DMA devices present in
+ * EISA bus systems, in particular those embedded within the i82357 Integrated
+ * System Peripheral. The device supports 32 bit addressing, 32 bit data sizes,
+ * and 24 bit transfer counts, allowing DMA across 64k boundaries. It also adds
+ * stop registers, supporting ring-buffer memory arrangements.
+ *
+ * TODO
+ *   - stop registers
+ *   - 16/32-bit transfer sizes
+ */
+
 #include "emu.h"
 #include "am9517a.h"
 
@@ -54,6 +66,7 @@
 DEFINE_DEVICE_TYPE(AM9517A,      am9517a_device,      "am9517a",  "AM9517A")
 DEFINE_DEVICE_TYPE(V5X_DMAU,     v5x_dmau_device,     "v5x_dmau", "V5X DMAU")
 DEFINE_DEVICE_TYPE(PCXPORT_DMAC, pcxport_dmac_device, "pcx_dmac", "PC Transporter DMAC")
+DEFINE_DEVICE_TYPE(EISA_DMA,     eisa_dma_device,     "eisa_dma", "EISA DMA")
 
 
 //**************************************************************************
@@ -290,8 +303,6 @@ inline void am9517a_device::dma_advance()
 {
 	bool msb_changed = false;
 
-	m_channel[m_current_channel].m_count--;
-
 	if (m_current_channel || !COMMAND_MEM_TO_MEM || !COMMAND_CH0_ADDRESS_HOLD)
 	{
 		if (MODE_ADDRESS_DECREMENT)
@@ -316,7 +327,7 @@ inline void am9517a_device::dma_advance()
 		}
 	}
 
-	if (m_channel[m_current_channel].m_count == 0xffff)
+	if (m_channel[m_current_channel].m_count-- == 0)
 	{
 		end_of_process();
 	}
@@ -1297,4 +1308,18 @@ void pcxport_dmac_device::end_of_process()
 	set_dack();
 
 	m_state = STATE_SI;
+}
+
+eisa_dma_device::eisa_dma_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: am9517a_device(mconfig, EISA_DMA, tag, owner, clock)
+{
+}
+
+void eisa_dma_device::device_start()
+{
+	am9517a_device::device_start();
+
+	m_address_mask = 0xffffffffU;
+
+	save_item(NAME(m_stop));
 }

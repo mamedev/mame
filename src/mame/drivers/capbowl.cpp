@@ -332,7 +332,7 @@ MACHINE_CONFIG_START(capbowl_state::capbowl)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_RANDOM);
 
-	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
+	TICKET_DISPENSER(config, "ticket", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

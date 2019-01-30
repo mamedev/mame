@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods
+// copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods, Vas Crabb
 /***************************************************************************
 
     ui/selmenu.h
@@ -7,7 +7,6 @@
     MAME system/software selection menu.
 
 ***************************************************************************/
-
 #ifndef MAME_FRONTEND_UI_SELMENU_H
 #define MAME_FRONTEND_UI_SELMENU_H
 
@@ -34,6 +33,8 @@ public:
 	virtual ~menu_select_launch() override;
 
 protected:
+	static constexpr std::size_t MAX_ICONS_RENDER = 128;
+	static constexpr std::size_t MAX_VISIBLE_SEARCH = 200;
 
 	// tab navigation
 	enum class focused_menu
@@ -43,6 +44,20 @@ protected:
 		RIGHTTOP,
 		RIGHTBOTTOM
 	};
+
+	struct texture_and_bitmap
+	{
+		template <typename T>
+		texture_and_bitmap(T &&tex) : texture(std::forward<T>(tex)) { }
+		texture_and_bitmap(texture_and_bitmap &&that) = default;
+		texture_and_bitmap &operator=(texture_and_bitmap &&that) = default;
+
+		texture_ptr     texture;
+		bitmap_argb32   bitmap;
+	};
+
+	template <typename Key, typename Compare = std::less<Key> >
+	using texture_lru = util::lru_cache_map<Key, texture_and_bitmap, Compare>;
 
 	class system_flags
 	{
@@ -93,6 +108,8 @@ protected:
 
 	focused_menu get_focus() const { return m_focus; }
 	void set_focus(focused_menu focus) { m_focus = focus; }
+	void next_image_view();
+	void previous_image_view();
 
 	bool dismiss_error();
 	void set_error(reset_options ropt, std::string &&message);
@@ -121,6 +138,14 @@ protected:
 			typename Filter::type current,
 			std::map<typename Filter::type, typename Filter::ptr> const &filters,
 			float x1, float y1, float x2, float y2);
+
+	// icon helpers
+	void check_for_icons(char const *listname);
+	std::string make_icon_paths(char const *listname) const;
+	bool scale_icon(bitmap_argb32 &&src, texture_and_bitmap &dst) const;
+
+	// forcing refresh
+	void set_switch_image() { m_switch_image = true; }
 
 	template <typename T> bool select_bios(T const &driver, bool inlist);
 	bool select_part(software_info const &info, ui_software_info const &ui_info);
@@ -188,9 +213,6 @@ private:
 	using cache_ptr_map = std::map<running_machine *, cache_ptr>;
 
 	using flags_cache = util::lru_cache_map<game_driver const *, system_flags>;
-	using icon_cache = util::lru_cache_map<game_driver const *, std::pair<texture_ptr, bitmap_argb32> >;
-
-	static constexpr std::size_t MAX_ICONS_RENDER = 128;
 
 	void reset_pressed() { m_pressed = false; m_repeat = 0; }
 	bool mouse_pressed() const { return (osd_ticks() >= m_repeat); }
@@ -230,7 +252,8 @@ private:
 
 	void draw_toolbar(float x1, float y1, float x2, float y2);
 	void draw_star(float x0, float y0);
-	float draw_icon(int linenum, void *selectedref, float x1, float y1);
+	void draw_icon(int linenum, void *selectedref, float x1, float y1);
+	virtual render_texture *get_icon_texture(int linenum, void *selectedref) = 0;
 
 	void get_title_search(std::string &title, std::string &search);
 
@@ -289,8 +312,11 @@ private:
 
 	int                     m_right_visible_lines;  // right box lines
 
+	bool                    m_has_icons;
+	bool                    m_switch_image;
+	bool                    m_default_image;
+	uint8_t                 m_image_view;
 	flags_cache             m_flags;
-	icon_cache              m_icons;
 
 	static std::mutex       s_cache_guard;
 	static cache_ptr_map    s_caches;

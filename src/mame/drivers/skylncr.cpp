@@ -1666,7 +1666,7 @@ MACHINE_CONFIG_START(skylncr_state::skylncr)
 	ppi1.in_pb_callback().set_ioport("IN3");
 	ppi1.in_pc_callback().set_ioport("IN4");
 
-	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

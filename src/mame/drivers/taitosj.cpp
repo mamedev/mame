@@ -1802,11 +1802,9 @@ MACHINE_CONFIG_START(taitosj_state::nomcu)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE("soundnmi2", input_merger_device, in_w<0>))
+	INPUT_MERGER_ALL_HIGH(config, m_soundnmi).output_handler().set(m_soundnmi2, FUNC(input_merger_device::in_w<0>));
 
-	MCFG_INPUT_MERGER_ANY_HIGH("soundnmi2")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	INPUT_MERGER_ANY_HIGH(config, m_soundnmi2).output_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	AY8910(config, m_ay1, XTAL(6'000'000)/4); // 6mhz/4 on GAME board, AY-3-8910 @ IC53 (this is the only AY which uses proper mixing resistors, the 3 below have outputs tied together)
 	m_ay1->port_a_read_callback().set_ioport("DSW2");
@@ -1858,7 +1856,7 @@ MACHINE_CONFIG_START(taitosj_state::mcu)
 	m_mcu->m68intrq_cb().set(FUNC(taitosj_state::mcu_intrq_w));
 	m_mcu->busrq_cb().set(FUNC(taitosj_state::mcu_busrq_w));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 MACHINE_CONFIG_END
 
 

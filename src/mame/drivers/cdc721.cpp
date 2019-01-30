@@ -397,8 +397,7 @@ MACHINE_CONFIG_START(cdc721_state::cdc721)
 	chb.cts_handler().set("pbuart", FUNC(ins8250_device::cts_w));
 	chb.ri_handler().set("pbuart", FUNC(ins8250_device::ri_w));
 
-	MCFG_INPUT_MERGER_ANY_HIGH("int2") // 74S05 (open collector)
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(*this, cdc721_state, int_w<2>))
+	INPUT_MERGER_ANY_HIGH(config, "int2").output_handler().set(FUNC(cdc721_state::int_w<2>)); // 74S05 (open collector)
 MACHINE_CONFIG_END
 
 ROM_START( cdc721 )

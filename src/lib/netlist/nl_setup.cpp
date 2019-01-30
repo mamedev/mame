@@ -31,7 +31,6 @@ setup_t::setup_t(netlist_t &netlist)
 	, m_proxy_cnt(0)
 	, m_frontier_cnt(0)
 {
-	devices::initialize_factory(m_factory);
 }
 
 setup_t::~setup_t()
@@ -44,6 +43,16 @@ setup_t::~setup_t()
 
 	m_sources.clear();
 }
+
+netlist_state_t &setup_t::netlist()
+{
+	return m_netlist.nlstate();
+}
+const netlist_state_t &setup_t::netlist() const
+{
+	return m_netlist.nlstate();
+}
+
 
 pstring setup_t::build_fqn(const pstring &obj_name) const
 {
@@ -145,44 +154,11 @@ pstring setup_t::termtype_as_str(detail::core_terminal_t &in) const
 	return pstring("Error");
 }
 
-pstring setup_t::get_initial_param_val(const pstring &name, const pstring &def)
+pstring setup_t::get_initial_param_val(const pstring &name, const pstring &def) const
 {
 	auto i = m_param_values.find(name);
 	if (i != m_param_values.end())
 		return i->second;
-	else
-		return def;
-}
-
-double setup_t::get_initial_param_val(const pstring &name, const double def)
-{
-	auto i = m_param_values.find(name);
-	if (i != m_param_values.end())
-	{
-		bool err = false;
-		double vald = plib::pstonum_ne<double>(i->second, err);
-		if (err)
-			log().fatal(MF_2_INVALID_NUMBER_CONVERSION_1_2, name, i->second);
-		return vald;
-	}
-	else
-		return def;
-}
-
-int setup_t::get_initial_param_val(const pstring &name, const int def)
-{
-	auto i = m_param_values.find(name);
-	if (i != m_param_values.end())
-	{
-		bool err;
-		double vald = plib::pstonum_ne<double>(i->second, err);
-		if (err)
-			log().fatal(MF_2_INVALID_NUMBER_CONVERSION_1_2, name, i->second);
-		if (vald - std::floor(vald) != 0.0)
-			log().fatal(MF_2_INVALID_NUMBER_CONVERSION_1_2, name, i->second);
-
-		return static_cast<int>(vald);
-	}
 	else
 		return def;
 }
@@ -278,7 +254,10 @@ void setup_t::register_frontier(const pstring &attach, const double r_IN, const 
 
 void setup_t::register_param(const pstring &param, const double value)
 {
-	register_param(param, plib::pfmt("{1:.9}").e(value));
+	if (std::abs(value - std::floor(value)) > 1e-30 || std::abs(value) > 1e9)
+		register_param(param, plib::pfmt("{1:.9}").e(value));
+	else
+		register_param(param, plib::pfmt("{1}")(static_cast<long>(value)));
 }
 
 void setup_t::register_param(const pstring &param, const pstring &value)
@@ -411,7 +390,7 @@ devices::nld_base_proxy *setup_t::get_d_a_proxy(detail::core_terminal_t &out)
 
 		proxy = new_proxy.get();
 
-		netlist().register_dev(std::move(new_proxy));
+		m_netlist.nlstate().add_dev(std::move(new_proxy));
 	}
 	return proxy;
 }
@@ -450,7 +429,7 @@ devices::nld_base_proxy *setup_t::get_a_d_proxy(detail::core_terminal_t &inp)
 			inp.net().m_core_terms.clear(); // clear the list
 		}
 		ret->out().net().add_terminal(inp);
-		netlist().register_dev(std::move(new_proxy));
+		m_netlist.nlstate().add_dev(std::move(new_proxy));
 		return ret;
 	}
 }
@@ -574,7 +553,7 @@ void setup_t::connect_terminals(detail::core_terminal_t &t1, detail::core_termin
 		log().debug("adding analog net ...\n");
 		// FIXME: Nets should have a unique name
 		auto anet = plib::palloc<analog_net_t>(netlist(),"net." + t1.name());
-		netlist().m_nets.push_back(plib::owned_ptr<analog_net_t>(anet, true));
+		netlist().register_net(plib::owned_ptr<analog_net_t>(anet, true));
 		t1.set_net(anet);
 		anet->add_terminal(t2);
 		anet->add_terminal(t1);
@@ -717,18 +696,7 @@ void setup_t::resolve_inputs()
 
 	// delete empty nets
 
-	netlist().m_nets.erase(
-			std::remove_if(netlist().m_nets.begin(), netlist().m_nets.end(),
-					[](plib::owned_ptr<detail::net_t> &x)
-					{
-						if (x->num_cons() == 0)
-						{
-							x->netlist().log().verbose("Deleting net {1} ...", x->name());
-							return true;
-						}
-						else
-							return false;
-					}), netlist().m_nets.end());
+	delete_empty_nets();
 
 	pstring errstr("");
 
@@ -749,7 +717,7 @@ void setup_t::resolve_inputs()
 
 }
 
-void setup_t::start_devices()
+void setup_t::register_dynamic_log_devices()
 {
 	pstring env = plib::util::environment("NL_LOGS", "");
 
@@ -763,16 +731,16 @@ void setup_t::start_devices()
 			auto nc = factory().factory_by_name("LOG")->Create(netlist(), name);
 			register_link(name + ".I", ll);
 			log().debug("    dynamic link {1}: <{2}>\n",ll, name);
-			netlist().register_dev(std::move(nc));
+			m_netlist.nlstate().add_dev(std::move(nc));
 		}
 	}
 }
 
-plib::plog_base<netlist_t, NL_DEBUG> &setup_t::log()
+log_type &setup_t::log()
 {
 	return netlist().log();
 }
-const plib::plog_base<netlist_t, NL_DEBUG> &setup_t::log() const
+const log_type &setup_t::log() const
 {
 	return netlist().log();
 }
@@ -882,17 +850,17 @@ class logic_family_std_proxy_t : public logic_family_desc_t
 {
 public:
 	logic_family_std_proxy_t() { }
-	virtual plib::owned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist,
+	virtual plib::owned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_base_t &anetlist,
 			const pstring &name, logic_output_t *proxied) const override;
-	virtual plib::owned_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_t &anetlist, const pstring &name, logic_input_t *proxied) const override;
+	virtual plib::owned_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_base_t &anetlist, const pstring &name, logic_input_t *proxied) const override;
 };
 
-plib::owned_ptr<devices::nld_base_d_to_a_proxy> logic_family_std_proxy_t::create_d_a_proxy(netlist_t &anetlist,
+plib::owned_ptr<devices::nld_base_d_to_a_proxy> logic_family_std_proxy_t::create_d_a_proxy(netlist_base_t &anetlist,
 		const pstring &name, logic_output_t *proxied) const
 {
 	return plib::owned_ptr<devices::nld_base_d_to_a_proxy>::Create<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
 }
-plib::owned_ptr<devices::nld_base_a_to_d_proxy> logic_family_std_proxy_t::create_a_d_proxy(netlist_t &anetlist, const pstring &name, logic_input_t *proxied) const
+plib::owned_ptr<devices::nld_base_a_to_d_proxy> logic_family_std_proxy_t::create_a_d_proxy(netlist_base_t &anetlist, const pstring &name, logic_input_t *proxied) const
 {
 	return plib::owned_ptr<devices::nld_base_a_to_d_proxy>::Create<devices::nld_a_to_d_proxy>(anetlist, name, proxied);
 }
@@ -939,6 +907,11 @@ void setup_t::tt_factory_create(tt_desc &desc, const pstring &sourcefile)
 // Sources
 // ----------------------------------------------------------------------------------------
 
+bool setup_t::parse_stream(std::unique_ptr<plib::pistream> istrm, const pstring &name)
+{
+	return parser_t(std::move(plib::ppreprocessor(&m_defines).process(std::move(istrm))), *this).parse(name);
+}
+
 void setup_t::include(const pstring &netlist_name)
 {
 	for (auto &source : m_sources)
@@ -964,18 +937,6 @@ std::unique_ptr<plib::pistream> setup_t::get_data_stream(const pstring &name)
 	return std::unique_ptr<plib::pistream>(nullptr);
 }
 
-
-bool setup_t::parse_stream(plib::putf8_reader &istrm, const pstring &name)
-{
-	plib::pomemstream ostrm;
-	plib::putf8_writer owrt(ostrm);
-
-	plib::ppreprocessor(&m_defines).process(istrm, owrt);
-	plib::pimemstream istrm2(ostrm);
-	plib::putf8_reader reader2(istrm2);
-	return parser_t(reader2, *this).parse(name);
-}
-
 void setup_t::register_define(const pstring &defstr)
 {
 	auto p = defstr.find("=");
@@ -983,6 +944,123 @@ void setup_t::register_define(const pstring &defstr)
 		register_define(plib::left(defstr, p), defstr.substr(p+1));
 	else
 		register_define(defstr, "1");
+}
+
+// ----------------------------------------------------------------------------------------
+// Device handling
+// ----------------------------------------------------------------------------------------
+
+void setup_t::delete_empty_nets()
+{
+	netlist().nets().erase(
+		std::remove_if(netlist().nets().begin(), netlist().nets().end(),
+			[](plib::owned_ptr<detail::net_t> &x)
+			{
+				if (x->num_cons() == 0)
+				{
+					x->state().log().verbose("Deleting net {1} ...", x->name());
+					return true;
+				}
+				else
+					return false;
+			}), netlist().nets().end());
+}
+
+// ----------------------------------------------------------------------------------------
+// Run preparation
+// ----------------------------------------------------------------------------------------
+
+void setup_t::prepare_to_run()
+{
+	register_dynamic_log_devices();
+
+	/* load the library ... */
+
+	/* make sure the solver and parameters are started first! */
+
+	for (auto & e : m_device_factory)
+	{
+		if ( factory().is_class<devices::NETLIB_NAME(solver)>(e.second)
+				|| factory().is_class<devices::NETLIB_NAME(netlistparams)>(e.second))
+		{
+			auto dev = plib::owned_ptr<device_t>(e.second->Create(netlist(), e.first));
+			m_netlist.nlstate().add_dev(std::move(dev));
+		}
+	}
+
+	log().debug("Searching for solver and parameters ...\n");
+
+	auto solver = netlist().get_single_device<devices::NETLIB_NAME(solver)>("solver");
+	netlist().m_params = netlist().get_single_device<devices::NETLIB_NAME(netlistparams)>("parameter");
+
+	/* create devices */
+
+	log().debug("Creating devices ...\n");
+	for (auto & e : m_device_factory)
+	{
+		if ( !factory().is_class<devices::NETLIB_NAME(solver)>(e.second)
+				&& !factory().is_class<devices::NETLIB_NAME(netlistparams)>(e.second))
+		{
+			auto dev = plib::owned_ptr<device_t>(e.second->Create(netlist(), e.first));
+			m_netlist.nlstate().add_dev(std::move(dev));
+		}
+	}
+
+	bool use_deactivate = (netlist().m_params->m_use_deactivate() ? true : false);
+
+	for (auto &d : netlist().devices())
+	{
+		if (use_deactivate)
+		{
+			auto p = m_param_values.find(d->name() + ".HINT_NO_DEACTIVATE");
+			if (p != m_param_values.end())
+			{
+				//FIXME: check for errors ...
+				double v = plib::pstonum<double>(p->second);
+				if (std::abs(v - std::floor(v)) > 1e-6 )
+					log().fatal(MF_1_HND_VAL_NOT_SUPPORTED, p->second);
+				d->set_hint_deactivate(v == 0.0);
+			}
+		}
+		else
+			d->set_hint_deactivate(false);
+	}
+
+	/* resolve inputs */
+	resolve_inputs();
+
+	log().verbose("looking for two terms connected to rail nets ...");
+	for (auto & t : m_netlist.nlstate().get_device_list<analog::NETLIB_NAME(twoterm)>())
+	{
+		if (t->m_N.net().isRailNet() && t->m_P.net().isRailNet())
+		{
+			log().warning(MW_3_REMOVE_DEVICE_1_CONNECTED_ONLY_TO_RAILS_2_3,
+				t->name(), t->m_N.net().name(), t->m_P.net().name());
+			t->m_N.net().remove_terminal(t->m_N);
+			t->m_P.net().remove_terminal(t->m_P);
+			m_netlist.nlstate().remove_dev(t);
+		}
+	}
+
+	log().verbose("initialize solver ...\n");
+
+	if (solver == nullptr)
+	{
+		for (auto &p : netlist().nets())
+			if (p->is_analog())
+				log().fatal(MF_0_NO_SOLVER);
+	}
+	else
+		solver->post_start();
+
+	for (auto &n : netlist().nets())
+		for (auto & term : n->m_core_terms)
+		{
+			//core_device_t *dev = reinterpret_cast<core_device_t *>(term->m_delegate.object());
+			core_device_t *dev = &term->device();
+			dev->set_default_delegate(*term);
+		}
+
 }
 
 // ----------------------------------------------------------------------------------------
@@ -995,9 +1073,7 @@ bool source_t::parse(const pstring &name)
 		return false;
 	else
 	{
-		auto rstream = stream(name);
-		plib::putf8_reader reader(*rstream);
-		return m_setup.parse_stream(reader, name);
+		return m_setup.parse_stream(stream(name), name);
 	}
 }
 

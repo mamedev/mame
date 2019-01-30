@@ -33,8 +33,8 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(C1563, c1563_device, "c1563", "C1563 Disk Drive")
-DEFINE_DEVICE_TYPE(C1581, c1581_device, "c1581", "C1581 Disk Drive")
+DEFINE_DEVICE_TYPE(C1563, c1563_device, "c1563", "Commodore 1563 3.5 Disk Drive")
+DEFINE_DEVICE_TYPE(C1581, c1581_device, "c1581", "Commodore 1581 3.5 Disk Drive")
 
 
 //-------------------------------------------------
@@ -267,22 +267,23 @@ FLOPPY_FORMATS_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(c1581_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(M6502_TAG, M6502, 16_MHz_XTAL / 8)
-	MCFG_DEVICE_PROGRAM_MAP(c1581_mem)
+void c1581_device::device_add_mconfig(machine_config &config)
+{
+	M6502(config, m_maincpu, 16_MHz_XTAL / 8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &c1581_device::c1581_mem);
 
-	MCFG_DEVICE_ADD(M8520_TAG, MOS8520, 16_MHz_XTAL / 8)
-	MCFG_MOS6526_IRQ_CALLBACK(INPUTLINE(M6502_TAG, INPUT_LINE_IRQ0))
-	MCFG_MOS6526_CNT_CALLBACK(WRITELINE(*this, c1581_device, cnt_w))
-	MCFG_MOS6526_SP_CALLBACK(WRITELINE(*this, c1581_device, sp_w))
-	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(*this, c1581_device, cia_pa_r))
-	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(*this, c1581_device, cia_pa_w))
-	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(*this, c1581_device, cia_pb_r))
-	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(*this, c1581_device, cia_pb_w))
+	MOS8520(config, m_cia, 16_MHz_XTAL / 8);
+	m_cia->irq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_cia->cnt_wr_callback().set(FUNC(c1581_device::cnt_w));
+	m_cia->sp_wr_callback().set(FUNC(c1581_device::sp_w));
+	m_cia->pa_rd_callback().set(FUNC(c1581_device::cia_pa_r));
+	m_cia->pa_wr_callback().set(FUNC(c1581_device::cia_pa_w));
+	m_cia->pb_rd_callback().set(FUNC(c1581_device::cia_pb_r));
+	m_cia->pb_wr_callback().set(FUNC(c1581_device::cia_pb_w));
 
 	WD1772(config, m_fdc, 16_MHz_XTAL / 2);
 	FLOPPY_CONNECTOR(config, WD1772_TAG":0", c1581_floppies, "35dd", c1581_device::floppy_formats, true);
-MACHINE_CONFIG_END
+}
 
 
 //-------------------------------------------------

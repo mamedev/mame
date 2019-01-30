@@ -145,8 +145,11 @@ a2bus_device::a2bus_device(const machine_config &mconfig, const char *tag, devic
 
 a2bus_device::a2bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, m_maincpu(*this, finder_base::DUMMY_TAG), m_maincpu_space(nullptr)
-	, m_out_irq_cb(*this) , m_out_nmi_cb(*this), m_out_inh_cb(*this)
+	, m_maincpu_space(*this, finder_base::DUMMY_TAG, -1)
+	, m_out_irq_cb(*this)
+	, m_out_nmi_cb(*this)
+	, m_out_inh_cb(*this)
+	, m_out_dma_cb(*this)
 	, m_slot_irq_mask(0), m_slot_nmi_mask(0)
 {
 }
@@ -157,12 +160,11 @@ a2bus_device::a2bus_device(const machine_config &mconfig, device_type type, cons
 
 void a2bus_device::device_resolve_objects()
 {
-	m_maincpu_space = &m_maincpu->space(AS_PROGRAM);
-
 	// resolve callbacks
 	m_out_irq_cb.resolve_safe();
 	m_out_nmi_cb.resolve_safe();
 	m_out_inh_cb.resolve_safe();
+	m_out_dma_cb.resolve_safe();
 }
 
 void a2bus_device::device_start()
@@ -239,9 +241,9 @@ void a2bus_device::set_nmi_line(int state, int slot)
 	}
 }
 
-void a2bus_device::set_maincpu_halt(int state)
+void a2bus_device::set_dma_line(int state)
 {
-	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
+	m_out_dma_cb(state);
 }
 
 uint8_t a2bus_device::dma_r(uint16_t offset)

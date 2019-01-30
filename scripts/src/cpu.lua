@@ -13,7 +13,7 @@
 -- Dynamic recompiler objects
 --------------------------------------------------
 
-DRC_CPUS = { "E1", "SH", "MIPS3", "POWERPC", "RSP", "ARM7", "ADSP21062", "MB86235", "DSP16" }
+DRC_CPUS = { "E1", "SH", "MIPS3", "POWERPC", "RSP", "ARM7", "ADSP21062", "MB86235", "DSP16", "UNSP" }
 CPU_INCLUDE_DRC = false
 for i, v in ipairs(DRC_CPUS) do
 	if (CPUS[v]~=null) then
@@ -2157,6 +2157,10 @@ if (CPUS["UNSP"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/cpu/unsp/unsp.cpp",
 		MAME_DIR .. "src/devices/cpu/unsp/unsp.h",
+		MAME_DIR .. "src/devices/cpu/unsp/unspdefs.h",
+		MAME_DIR .. "src/devices/cpu/unsp/unspdrc.cpp",
+		MAME_DIR .. "src/devices/cpu/unsp/unspfe.cpp",
+		MAME_DIR .. "src/devices/cpu/unsp/unspfe.h",
 	}
 end
 
@@ -2775,4 +2779,21 @@ end
 if (_OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/nuon/nuondasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/nuon/nuondasm.h")
+end
+
+--------------------------------------------------
+-- DEC Alpha (EV4/EV5/EV6/EV7) series
+--@src/devices/cpu/alpha/alpha.h,CPUS["ALPHA"] = true
+--------------------------------------------------
+
+if (CPUS["ALPHA"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/cpu/alpha/alpha.cpp",
+		MAME_DIR .. "src/devices/cpu/alpha/alpha.h",
+	}
+end
+
+if (CPUS["ALPHA"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/alpha/alphad.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/alpha/alphad.h")
 end

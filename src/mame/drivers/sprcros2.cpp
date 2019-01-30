@@ -459,14 +459,14 @@ MACHINE_CONFIG_START(sprcros2_state::sprcros2)
 	MCFG_DEVICE_PROGRAM_MAP(master_map)
 	MCFG_DEVICE_IO_MAP(master_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sprcros2_state,  master_vblank_irq)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", sprcros2_state, master_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(sprcros2_state::master_scanline), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD("slave_cpu",Z80,MAIN_CLOCK/4)
 	MCFG_DEVICE_PROGRAM_MAP(slave_map)
 	MCFG_DEVICE_IO_MAP(slave_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sprcros2_state,  slave_vblank_irq)
 
-	MCFG_QUANTUM_PERFECT_CPU("master_cpu")
+	config.m_perfect_cpu_quantum = subtag("master_cpu");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

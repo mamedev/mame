@@ -201,14 +201,14 @@ MACHINE_CONFIG_START(galaxy_state::galaxy)
 	MCFG_SNAPSHOT_ADD("snapshot", galaxy_state, galaxy, "gal", 0)
 
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(gtp_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
-	MCFG_CASSETTE_INTERFACE("galaxy_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(gtp_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cassette->set_interface("galaxy_cass");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list","galaxy")
+	SOFTWARE_LIST(config, "cass_list").set_original("galaxy");
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("6K").set_extra_options("2K,22K,38K,54K");
@@ -244,12 +244,12 @@ MACHINE_CONFIG_START(galaxy_state::galaxyp)
 	AY8910(config, "ay8910", XTAL/4); // FIXME: really no output routes for this AY?
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(gtp_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
-	MCFG_CASSETTE_INTERFACE("galaxy_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(gtp_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cassette->set_interface("galaxy_cass");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list","galaxy")
+	SOFTWARE_LIST(config, "cass_list").set_original("galaxy");
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("38K");

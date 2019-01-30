@@ -193,7 +193,7 @@ MACHINE_CONFIG_START(gamate_state::gamate)
 
 	MCFG_GAMATE_CARTRIDGE_ADD("cartslot", gamate_cart, nullptr)
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list","gamate")
+	SOFTWARE_LIST(config, "cart_list").set_original("gamate");
 MACHINE_CONFIG_END
 
 

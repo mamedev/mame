@@ -637,7 +637,7 @@ MACHINE_CONFIG_START(joystand_state::joystand)
 
 	// devices
 	EEPROM_93C46_16BIT(config, "eeprom");
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
+	MSM6242(config, "rtc", XTAL(32'768));
 MACHINE_CONFIG_END
 
 

@@ -256,9 +256,9 @@ MACHINE_CONFIG_START(volfied_state::volfied)
 	m_cchip->in_ad_callback().set_ioport("F0000D");
 	m_cchip->out_pb_callback().set(FUNC(volfied_state::counters_w));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(1200))
+	config.m_minimum_quantum = attotime::from_hz(1200);
 
-	MCFG_TIMER_DRIVER_ADD("cchip_irq_clear", volfied_state, cchip_irq_clear_cb)
+	TIMER(config, m_cchip_irq_clear).configure_generic(FUNC(volfied_state::cchip_irq_clear_cb));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

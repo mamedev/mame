@@ -2162,12 +2162,12 @@ MACHINE_CONFIG_START(cmi_state::cmi2x)
 	MCFG_DEVICE_ADD("maincpu1", MC6809E, Q209_CPU_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(maincpu1_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(cmi_state, cpu1_interrupt_callback)
-	MCFG_QUANTUM_PERFECT_CPU("maincpu1")
+	config.m_perfect_cpu_quantum = subtag("maincpu1");
 
 	MCFG_DEVICE_ADD("maincpu2", MC6809E, Q209_CPU_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(maincpu2_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(cmi_state, cpu2_interrupt_callback)
-	MCFG_QUANTUM_PERFECT_CPU("maincpu2")
+	config.m_perfect_cpu_quantum = subtag("maincpu2");
 
 	MCFG_DEVICE_ADD("muskeys", M6802, 4_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(muskeys_map)
@@ -2238,8 +2238,8 @@ MACHINE_CONFIG_START(cmi_state::cmi2x)
 	m_cmi02_ptm->o2_callback().set(FUNC(cmi_state::cmi02_ptm_o2));
 	m_cmi02_ptm->irq_callback().set(FUNC(cmi_state::cmi02_ptm_irq));
 
-	MCFG_DEVICE_ADD("mkbd_acia_clock", CLOCK, 1.8432_MHz_XTAL / 12)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, cmi_state, mkbd_acia_clock))
+	clock_device &mkbd_acia_clock(CLOCK(config, "mkbd_acia_clock", 1.8432_MHz_XTAL / 12));
+	mkbd_acia_clock.signal_handler().set(FUNC(cmi_state::mkbd_acia_clock));
 
 	for (auto &acia : m_q133_acia)
 		MOS6551(config, acia, 1.8432_MHz_XTAL).set_xtal(1.8432_MHz_XTAL);
@@ -2265,8 +2265,7 @@ MACHINE_CONFIG_START(cmi_state::cmi2x)
 	m_acia_mkbd_kbd->rts_handler().set("ank_pia", FUNC(pia6821_device::ca2_w));
 	m_acia_mkbd_kbd->irq_handler().set(FUNC(cmi_state::mkbd_kbd_acia_int));
 
-	MCFG_INPUT_MERGER_ANY_HIGH("irqs")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("alphakeys", M6802_IRQ_LINE))
+	INPUT_MERGER_ANY_HIGH(config, "irqs").output_handler().set_inputline(m_alphakeyscpu, M6802_IRQ_LINE);
 
 	m_ank_pia->readpa_handler().set(FUNC(cmi_state::ank_col_r));
 	m_ank_pia->readcb1_handler().set(FUNC(cmi_state::ank_rts_r));
@@ -2275,8 +2274,8 @@ MACHINE_CONFIG_START(cmi_state::cmi2x)
 	m_ank_pia->irqa_handler().set("irqs", FUNC(input_merger_device::in_w<0>));
 	m_ank_pia->irqb_handler().set("irqs", FUNC(input_merger_device::in_w<1>));
 
-	MCFG_DEVICE_ADD("ank_pia_clock", CLOCK, 9600)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("ank_pia", pia6821_device, ca1_w))
+	clock_device &ank_pia_clock(CLOCK(config, "ank_pia_clock", 9600));
+	ank_pia_clock.signal_handler().set(m_ank_pia, FUNC(pia6821_device::ca1_w));
 
 	PTM6840(config, m_cmi07_ptm, 2000000); // ptm_cmi07_config TODO
 	m_cmi07_ptm->irq_callback().set(FUNC(cmi_state::cmi07_irq));
@@ -2284,8 +2283,8 @@ MACHINE_CONFIG_START(cmi_state::cmi2x)
 	FD1791(config, m_wd1791, 16_MHz_XTAL / 8); // wd1791_interface
 	m_wd1791->intrq_wr_callback().set(FUNC(cmi_state::wd1791_irq));
 	m_wd1791->drq_wr_callback().set(FUNC(cmi_state::wd1791_drq));
-	MCFG_FLOPPY_DRIVE_ADD("wd1791:0", cmi2x_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("wd1791:1", cmi2x_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, "wd1791:0", cmi2x_floppies, "8dsdd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "wd1791:1", cmi2x_floppies, "8dsdd", floppy_image_device::default_floppy_formats);
 
 	/* Musical keyboard */
 	PIA6821(config, m_cmi10_pia_u20, 0);

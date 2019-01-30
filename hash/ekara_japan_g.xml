@@ -32,7 +32,7 @@
 	(more? what's the G highest number?)
 
 	-->
-	
+
 	<software name="gc0001">
 		<description>BAT Volume 1 (Japan) (GC0001-BAT)</description>
 		<year>2000</year>
@@ -65,7 +65,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="gc0004">
 		<description>BHT Volume 2 (Japan) (GC0004-BHT)</description>
 		<year>2000</year>
@@ -76,7 +76,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="gc0006">
 		<description>BHT Volume 3 (Japan) (GC0006-BHT)</description>
 		<year>2000</year>
@@ -87,18 +87,18 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- Notes from Sean
- 
+
 	    G10 has a 24LC02, but no 74HC125, and pin 2 isn't connected.
 
-		G10 is very odd; the SEEPROM's SDA is tied high with a 4.7K resistor and connected to pin 4 through a 220 ohm resistor.
-		Pin 4 on the other carts I've looked at is VCC, also connected to pins 21 and 35, but on this one, it isn't.
-		Likewise, SCL is tied low with a 47K resistor and connected to pin 32, which on all the other carts is connected to pins 1 and 44, which are ground.
-	
-		e-Kara units, Popira, Taiko de Popira and DDR all of them have pin 4 of the cart connector going to VCC and pin 32 going to ground.  So none of them can communicate with the SEEPROM in G10
+	    G10 is very odd; the SEEPROM's SDA is tied high with a 4.7K resistor and connected to pin 4 through a 220 ohm resistor.
+	    Pin 4 on the other carts I've looked at is VCC, also connected to pins 21 and 35, but on this one, it isn't.
+	    Likewise, SCL is tied low with a 47K resistor and connected to pin 32, which on all the other carts is connected to pins 1 and 44, which are ground.
 
-		Unless Popira 2 is different (unlikely) it doesn't look like the SEEPROM in this cartridge can be used (unfinished design?) -->
+	    e-Kara units, Popira, Taiko de Popira and DDR all of them have pin 4 of the cart connector going to VCC and pin 32 going to ground.  So none of them can communicate with the SEEPROM in G10
+
+	    Unless Popira 2 is different (unlikely) it doesn't look like the SEEPROM in this cartridge can be used (unfinished design?) -->
 	<software name="gc0010">
 		<description>BAT Volume 4 (Japan) (GC0010-BAT)</description>
 		<year>2002</year>
@@ -109,9 +109,9 @@
 				<rom name="gc0010-bat.u1" size="0x100000" crc="c08be376" sha1="28cb6baacf64e0382fd9c8bb7167d7fdd96f57ee" offset="0" />
 			</dataarea>
 		</part>
-	</software>		
-	
-	
+	</software>
+
+
 	<!-- G15 looks like G16- 74HC125 and 24LC02. -->
 	<software name="gc0015">
 		<description>BAT Volume 5 (Japan) (GC0015-BAT)</description>
@@ -123,8 +123,8 @@
 				<rom name="gc0015-bat.u1" size="0x100000" crc="a839b745" sha1="a02bd29383baf1f92b3573aaa6343cc309a6f589" offset="0" />
 			</dataarea>
 		</part>
-	</software>		
-		
+	</software>
+
 	<software name="gc0016">
 		<description>TV Pop Volume 5 (Japan) (GC0016-TPJ)</description>
 		<year>2002</year>
@@ -135,6 +135,6 @@
 				<rom name="gc0016-tpj.u1" size="0x100000" crc="52d81c55" sha1="c2fad86a2507589625cb507c3e1395cb662f9e34" offset="0" />
 			</dataarea>
 		</part>
-	</software>	
-	
+	</software>
+
 </softwarelist>

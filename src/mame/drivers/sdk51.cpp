@@ -45,9 +45,9 @@ private:
 	void datamem_map(address_map &map);
 	void mem0_map(address_map &map);
 
-	DECLARE_READ8_MEMBER(psen_r);
-	DECLARE_READ8_MEMBER(datamem_r);
-	DECLARE_WRITE8_MEMBER(datamem_w);
+	u8 psen_r(offs_t offset);
+	u8 datamem_r(offs_t offset);
+	void datamem_w(offs_t offset, u8 data);
 
 	u8 brkmem_r(offs_t offset);
 	void brkmem_w(offs_t offset, u8 data);
@@ -73,19 +73,19 @@ private:
 	bool m_display_clock;
 };
 
-READ8_MEMBER(sdk51_state::psen_r)
+u8 sdk51_state::psen_r(offs_t offset)
 {
-	return m_progmem->read8(space, offset);
+	return m_progmem->read8(offset);
 }
 
-READ8_MEMBER(sdk51_state::datamem_r)
+u8 sdk51_state::datamem_r(offs_t offset)
 {
-	return m_datamem->read8(space, offset);
+	return m_datamem->read8(offset);
 }
 
-WRITE8_MEMBER(sdk51_state::datamem_w)
+void sdk51_state::datamem_w(offs_t offset, u8 data)
 {
-	m_datamem->write8(space, offset, data);
+	m_datamem->write8(offset, data);
 }
 
 u8 sdk51_state::brkmem_r(offs_t offset)

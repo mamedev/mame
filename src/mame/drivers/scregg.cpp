@@ -274,7 +274,7 @@ MACHINE_CONFIG_START(scregg_state::dommy)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(12'000'000)/8)
 	MCFG_DEVICE_PROGRAM_MAP(dommy_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("irq", scregg_state, scregg_interrupt, "screen", 0, 8)
+	TIMER(config, "irq").configure_scanline(FUNC(scregg_state::scregg_interrupt), "screen", 0, 8);
 
 	MCFG_MACHINE_START_OVERRIDE(scregg_state,scregg)
 	MCFG_MACHINE_RESET_OVERRIDE(scregg_state,scregg)
@@ -302,7 +302,7 @@ MACHINE_CONFIG_START(scregg_state::scregg)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(12'000'000)/8)
 	MCFG_DEVICE_PROGRAM_MAP(eggs_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("irq", scregg_state, scregg_interrupt, "screen", 0, 8)
+	TIMER(config, "irq").configure_scanline(FUNC(scregg_state::scregg_interrupt), "screen", 0, 8);
 
 	MCFG_MACHINE_START_OVERRIDE(scregg_state,scregg)
 	MCFG_MACHINE_RESET_OVERRIDE(scregg_state,scregg)

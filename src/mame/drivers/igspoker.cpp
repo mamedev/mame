@@ -1927,7 +1927,7 @@ MACHINE_CONFIG_START(igspoker_state::igspoker)
 	MCFG_DEVICE_ADD("maincpu",Z80, 3579545)
 	MCFG_DEVICE_PROGRAM_MAP(igspoker_prg_map)
 	MCFG_DEVICE_IO_MAP(igspoker_io_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igspoker_state, igs_interrupt, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(igspoker_state::igs_interrupt), "screen", 0, 1);
 
 	i8255_device &ppi(I8255A(config, "ppi"));
 	ppi.out_pa_callback().set(FUNC(igspoker_state::igs_nmi_and_coins_w));
@@ -1974,7 +1974,7 @@ MACHINE_CONFIG_START(igspoker_state::number10)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(number10_io_map)
 
-	MCFG_DEVICE_REMOVE("ppi")
+	config.device_remove("ppi");
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(igspoker_state, screen_update_cpokerpk)

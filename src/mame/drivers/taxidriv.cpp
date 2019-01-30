@@ -348,7 +348,7 @@ MACHINE_CONFIG_START(taxidriv_state::taxidriv)
 	MCFG_DEVICE_IO_MAP(cpu3_port_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taxidriv_state,  irq0_line_hold)   /* ??? */
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - an high value to ensure proper */
+	config.m_minimum_quantum = attotime::from_hz(6000);  /* 100 CPU slices per frame - a high value to ensure proper */
 							/* synchronization of the CPUs */
 
 	i8255_device &ppi0(I8255A(config, "ppi8255_0"));

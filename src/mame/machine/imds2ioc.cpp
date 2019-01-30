@@ -563,11 +563,12 @@ static void imds2_floppies(device_slot_interface &device)
 	device.option_add("8sssd", FLOPPY_8_SSSD);
 }
 
-MACHINE_CONFIG_START(imds2ioc_device::device_add_mconfig)
+void imds2ioc_device::device_add_mconfig(machine_config &config)
+{
 	I8080A(config, m_ioccpu, IOC_XTAL_Y2 / 18);     // 2.448 MHz but running at 50% (due to wait states & DMA usage of bus)
 	m_ioccpu->set_addrmap(AS_PROGRAM, &imds2ioc_device::mem_map);
 	m_ioccpu->set_addrmap(AS_IO, &imds2ioc_device::io_map);
-	MCFG_QUANTUM_TIME(attotime::from_hz(100))
+	config.m_minimum_quantum = attotime::from_hz(100);
 
 	// The IOC CRT hw is a bit complex, as the character clock (CCLK) to i8275
 	// is varied according to the part of the video frame being scanned and according to
@@ -623,8 +624,7 @@ MACHINE_CONFIG_START(imds2ioc_device::device_add_mconfig)
 
 	I8271(config, m_iocfdc, IOC_XTAL_Y1 / 2);
 	m_iocfdc->drq_wr_callback().set(m_iocdma, FUNC(i8257_device::dreq1_w));
-	MCFG_FLOPPY_DRIVE_ADD("iocfdc:0", imds2_floppies, "8sssd", floppy_image_device::default_floppy_formats)
-	MCFG_SLOT_FIXED(true)
+	FLOPPY_CONNECTOR(config, "iocfdc:0", imds2_floppies, "8sssd", floppy_image_device::default_floppy_formats, true);
 
 	I8041(config, m_iocpio, IOC_XTAL_Y3);
 	m_iocpio->p1_in_cb().set(FUNC(imds2ioc_device::pio_port_p1_r));
@@ -642,7 +642,7 @@ MACHINE_CONFIG_START(imds2ioc_device::device_add_mconfig)
 	m_centronics->ack_handler().set(FUNC(imds2ioc_device::pio_lpt_ack_w));
 	m_centronics->busy_handler().set(FUNC(imds2ioc_device::pio_lpt_busy_w));
 	m_centronics->perror_handler().set(FUNC(imds2ioc_device::pio_lpt_select_w));
-MACHINE_CONFIG_END
+}
 
 ROM_START(imds2ioc)
 	// ROM definition of IOC cpu (8080A)

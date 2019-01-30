@@ -1933,7 +1933,7 @@ void halleys_state::machine_reset()
 MACHINE_CONFIG_START(halleys_state::halleys)
 	MCFG_DEVICE_ADD("maincpu", MC6809E, XTAL(19'968'000)/12) /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(halleys_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", halleys_state, halleys_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(halleys_state::halleys_scanline), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(6'000'000)/2) /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
@@ -1973,8 +1973,8 @@ MACHINE_CONFIG_START(halleys_state::benberob)
 	halleys(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(XTAL(19'968'000)/12) /* not verified but pcb identical to halley's comet */
-	MCFG_TIMER_MODIFY("scantimer")
-	MCFG_TIMER_DRIVER_CALLBACK(halleys_state, benberob_scanline)
+
+	subdevice<timer_device>("scantimer")->set_callback(FUNC(halleys_state::benberob_scanline));
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(halleys_state, screen_update_benberob)

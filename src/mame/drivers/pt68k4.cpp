@@ -408,11 +408,11 @@ MACHINE_CONFIG_START(pt68k4_state::pt68k2)
 	MCFG_DEVICE_ADD(M68K_TAG, M68000, 16_MHz_XTAL / 2)    // 68k2 came in 8, 10, and 12 MHz versions
 	MCFG_DEVICE_PROGRAM_MAP(pt68k2_mem)
 
-	MCFG_DEVICE_ADD("duart1", MC68681, 3.6864_MHz_XTAL)
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, pt68k4_state, duart1_irq))
-	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, pt68k4_state, duart1_out))
+	MC68681(config, m_duart1, 3.6864_MHz_XTAL);
+	m_duart1->irq_cb().set(FUNC(pt68k4_state::duart1_irq));
+	m_duart1->outport_cb().set(FUNC(pt68k4_state::duart1_out));
 
-	MCFG_DEVICE_ADD("duart2", MC68681, 3.6864_MHz_XTAL)
+	MC68681(config, m_duart2, 3.6864_MHz_XTAL);
 
 	MCFG_DEVICE_ADD(KBDC_TAG, PC_KBDC, 0)
 	MCFG_PC_KBDC_OUT_CLOCK_CB(WRITELINE(*this, pt68k4_state, keyboard_clock_w))
@@ -422,11 +422,10 @@ MACHINE_CONFIG_START(pt68k4_state::pt68k2)
 	MCFG_DEVICE_ADD(TIMEKEEPER_TAG, M48T02, 0)
 
 	WD1772(config, m_wdfdc, 16_MHz_XTAL / 2);
-	MCFG_FLOPPY_DRIVE_ADD(m_floppy_connector[0], pt68k_floppies, "525dd", pt68k4_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(m_floppy_connector[1], pt68k_floppies, "525dd", pt68k4_state::floppy_formats)
+	FLOPPY_CONNECTOR(config, m_floppy_connector[0], pt68k_floppies, "525dd", pt68k4_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy_connector[1], pt68k_floppies, "525dd", pt68k4_state::floppy_formats);
 
 	ISA8(config, m_isa, 0);
-	m_isa->set_cputag(M68K_TAG);
 	m_isa->set_custom_spaces();
 	m_isa->irq5_callback().set(FUNC(pt68k4_state::irq5_w));
 
@@ -441,7 +440,7 @@ MACHINE_CONFIG_START(pt68k4_state::pt68k2)
 	MCFG_DEVICE_ADD(SPEAKER_TAG, SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_SOFTWARE_LIST_ADD("flop525_list", "pt68k2")
+	SOFTWARE_LIST(config, "flop525_list").set_original("pt68k2");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pt68k4_state::pt68k4)
@@ -450,11 +449,11 @@ MACHINE_CONFIG_START(pt68k4_state::pt68k4)
 	MCFG_DEVICE_PROGRAM_MAP(pt68k4_mem)
 
 	// add the DUARTS.  first one has the console on channel A at 19200.
-	MCFG_DEVICE_ADD("duart1", MC68681, XTAL(16'000'000) / 4)
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, pt68k4_state, duart1_irq))
-	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, pt68k4_state, duart1_out))
+	MC68681(config, m_duart1, XTAL(16'000'000) / 4);
+	m_duart1->irq_cb().set(FUNC(pt68k4_state::duart1_irq));
+	m_duart1->outport_cb().set(FUNC(pt68k4_state::duart1_out));
 
-	MCFG_DEVICE_ADD("duart2", MC68681, XTAL(16'000'000) / 4)
+	MC68681(config, m_duart2, XTAL(16'000'000) / 4);
 
 	MCFG_DEVICE_ADD(KBDC_TAG, PC_KBDC, 0)
 	MCFG_PC_KBDC_OUT_CLOCK_CB(WRITELINE(*this, pt68k4_state, keyboard_clock_w))
@@ -464,7 +463,6 @@ MACHINE_CONFIG_START(pt68k4_state::pt68k4)
 	MCFG_DEVICE_ADD(TIMEKEEPER_TAG, M48T02, 0)
 
 	ISA8(config, m_isa, 0);
-	m_isa->set_cputag(M68K_TAG);
 	m_isa->set_custom_spaces();
 
 	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, ISABUS_TAG, pt68k4_isa8_cards, "fdc_at", false) // FIXME: determine ISA bus clock
@@ -479,7 +477,7 @@ MACHINE_CONFIG_START(pt68k4_state::pt68k4)
 	MCFG_DEVICE_ADD(SPEAKER_TAG, SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_SOFTWARE_LIST_ADD("flop525_list", "pt68k2")
+	SOFTWARE_LIST(config, "flop525_list").set_original("pt68k2");
 MACHINE_CONFIG_END
 
 /* ROM definition */

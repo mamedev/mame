@@ -216,7 +216,7 @@ MACHINE_CONFIG_START(contra_state::contra)
 	MCFG_DEVICE_ADD("audiocpu", MC6809E, XTAL(24'000'000)/8) /* 3000000? (HD68B09EP) */
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* enough for the sound CPU to read all commands */
+	config.m_minimum_quantum = attotime::from_hz(6000);  /* enough for the sound CPU to read all commands */
 
 
 	/* video hardware */

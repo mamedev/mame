@@ -234,7 +234,7 @@ MACHINE_CONFIG_START(superchs_state::superchs)
 	MCFG_DEVICE_PROGRAM_MAP(superchs_cpub_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", superchs_state,  irq4_line_hold)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(480)) /* Need to interleave CPU 1 & 3 */
+	config.m_minimum_quantum = attotime::from_hz(480); /* Need to interleave CPU 1 & 3 */
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 

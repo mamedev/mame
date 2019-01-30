@@ -146,6 +146,7 @@ private:
 	DECLARE_WRITE8_MEMBER(at_page8_w);
 	DECLARE_READ8_MEMBER(at_portb_r);
 	DECLARE_WRITE8_MEMBER(at_portb_w);
+	DECLARE_WRITE_LINE_MEMBER(iochck_w);
 	DECLARE_READ8_MEMBER(ide_read_cs1_r);
 	DECLARE_WRITE8_MEMBER(ide_write_cs1_w);
 	DECLARE_READ8_MEMBER(ide2_read_cs1_r);

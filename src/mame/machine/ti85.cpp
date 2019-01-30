@@ -269,7 +269,7 @@ MACHINE_RESET_MEMBER(ti85_state,ti85)
 	m_PCR = 0xc0;
 }
 
-READ8_MEMBER(ti85_state::ti83p_membank2_r)
+uint8_t ti85_state::ti83p_membank2_r(offs_t offset)
 {
 	/// http://wikiti.brandonw.net/index.php?title=83Plus:State_of_the_calculator_at_boot
 	/// should only trigger when fetching opcodes
@@ -287,10 +287,10 @@ READ8_MEMBER(ti85_state::ti83p_membank2_r)
 		}
 	}
 
-	return m_membank2->read8(space, offset);
+	return m_membank2->read8(offset);
 }
 
-READ8_MEMBER(ti85_state::ti83p_membank3_r)
+uint8_t ti85_state::ti83p_membank3_r(offs_t offset)
 {
 	/// http://wikiti.brandonw.net/index.php?title=83Plus:State_of_the_calculator_at_boot
 	/// should only trigger when fetching opcodes
@@ -309,7 +309,7 @@ READ8_MEMBER(ti85_state::ti83p_membank3_r)
 		}
 	}
 
-	return m_membank3->read8(space, offset);
+	return m_membank3->read8(offset);
 }
 
 MACHINE_RESET_MEMBER(ti85_state,ti83p)

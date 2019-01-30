@@ -146,10 +146,10 @@ MACHINE_CONFIG_START(tim011_state::tim011)
 	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ2);
 
 	/* floppy drives */
-	MCFG_FLOPPY_DRIVE_ADD(FDC9266_TAG ":0", tim011_floppies, "35dd", tim011_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC9266_TAG ":1", tim011_floppies, "35dd", tim011_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC9266_TAG ":2", tim011_floppies, "35dd", tim011_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC9266_TAG ":3", tim011_floppies, "35dd", tim011_floppy_formats)
+	FLOPPY_CONNECTOR(config, FDC9266_TAG ":0", tim011_floppies, "35dd", tim011_floppy_formats);
+	FLOPPY_CONNECTOR(config, FDC9266_TAG ":1", tim011_floppies, "35dd", tim011_floppy_formats);
+	FLOPPY_CONNECTOR(config, FDC9266_TAG ":2", tim011_floppies, "35dd", tim011_floppy_formats);
+	FLOPPY_CONNECTOR(config, FDC9266_TAG ":3", tim011_floppies, "35dd", tim011_floppy_formats);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

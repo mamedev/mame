@@ -545,7 +545,7 @@ MACHINE_CONFIG_START(thedealr_state::thedealr)
 	// basic machine hardware
 	MCFG_DEVICE_ADD("maincpu", R65C02, XTAL(16'000'000)/8)   // 2 MHz?
 	MCFG_DEVICE_PROGRAM_MAP(thedealr)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", thedealr_state, thedealr_interrupt, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(thedealr_state::thedealr_interrupt), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD("subcpu", R65C02, XTAL(16'000'000)/8)    // 2 MHz?
 	MCFG_DEVICE_PROGRAM_MAP(thedealr_sub)

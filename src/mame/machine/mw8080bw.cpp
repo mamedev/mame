@@ -45,19 +45,16 @@ int mw8080bw_state::vysnc_chain_counter_to_vpos( uint8_t counter, int vblank )
 }
 
 
-TIMER_CALLBACK_MEMBER(mw8080bw_state::mw8080bw_interrupt_callback)
+TIMER_CALLBACK_MEMBER(mw8080bw_state::interrupt_trigger)
 {
-	uint8_t next_counter;
-	int next_vpos;
-	int next_vblank;
-
-	/* compute vector and set the interrupt line */
 	int vpos = m_screen->vpos();
 	uint8_t counter = vpos_to_vysnc_chain_counter(vpos);
-	uint8_t vector = 0xc7 | ((counter & 0x40) >> 2) | ((~counter & 0x40) >> 3);
-	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, vector);
+
+	m_maincpu->set_input_line(0, ASSERT_LINE);
 
 	/* set up for next interrupt */
+	uint8_t next_counter;
+	int next_vblank;
 	if (counter == MW8080BW_INT_TRIGGER_COUNT_1)
 	{
 		next_counter = MW8080BW_INT_TRIGGER_COUNT_2;
@@ -69,14 +66,25 @@ TIMER_CALLBACK_MEMBER(mw8080bw_state::mw8080bw_interrupt_callback)
 		next_vblank = MW8080BW_INT_TRIGGER_VBLANK_1;
 	}
 
-	next_vpos = vysnc_chain_counter_to_vpos(next_counter, next_vblank);
+	int next_vpos = vysnc_chain_counter_to_vpos(next_counter, next_vblank);
 	m_interrupt_timer->adjust(m_screen->time_until_pos(next_vpos));
+}
+
+
+IRQ_CALLBACK_MEMBER(mw8080bw_state::interrupt_vector)
+{
+	int vpos = m_screen->vpos();
+	uint8_t counter = vpos_to_vysnc_chain_counter(vpos);
+	uint8_t vector = 0xc7 | ((counter & 0x40) >> 2) | ((~counter & 0x40) >> 3);
+
+	m_maincpu->set_input_line(0, CLEAR_LINE);
+	return vector;
 }
 
 
 void mw8080bw_state::mw8080bw_create_interrupt_timer(  )
 {
-	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mw8080bw_state::mw8080bw_interrupt_callback),this));
+	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mw8080bw_state::interrupt_trigger),this));
 }
 
 

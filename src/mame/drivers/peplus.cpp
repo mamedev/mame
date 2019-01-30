@@ -978,10 +978,10 @@ void peplus_state::peplus_palette(palette_device &palette) const
 	uint8_t const *const color_prom = memregion("proms")->base();
 	uint32_t const proms_size = memregion("proms")->bytes();
 	/*  prom bits
-		7654 3210
-		---- -xxx   red component.
-		--xx x---   green component.
-		xx-- ----   blue component.
+	    7654 3210
+	    ---- -xxx   red component.
+	    --xx x---   green component.
+	    xx-- ----   blue component.
 	*/
 
 	for (int i = 0; i < palette.entries(); i++)

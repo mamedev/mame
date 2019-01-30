@@ -295,10 +295,10 @@ WRITE_LINE_MEMBER(hyperspt_state::vblank_irq)
 void hyperspt_state::hyperspt(machine_config &config)
 {
 	/* basic machine hardware */
-	KONAMI1(config, m_maincpu, XTAL(18'432'000)/12);	/* verified on pcb */
+	KONAMI1(config, m_maincpu, XTAL(18'432'000)/12);    /* verified on pcb */
 	m_maincpu->set_addrmap(AS_PROGRAM, &hyperspt_state::hyperspt_map);
 
-	Z80(config, m_audiocpu, XTAL(14'318'181)/4);		/* verified on pcb */
+	Z80(config, m_audiocpu, XTAL(14'318'181)/4);        /* verified on pcb */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &hyperspt_state::hyperspt_sound_map);
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // F2
@@ -340,10 +340,10 @@ void hyperspt_state::hyperspt(machine_config &config)
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
-	SN76496(config, m_sn, XTAL(14'318'181)/8);	/* verified on pcb */
+	SN76496(config, m_sn, XTAL(14'318'181)/8);  /* verified on pcb */
 	m_sn->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	VLM5030(config, m_vlm, XTAL(3'579'545));	/* verified on pcb */
+	VLM5030(config, m_vlm, XTAL(3'579'545));    /* verified on pcb */
 	m_vlm->add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
@@ -377,7 +377,7 @@ void hyperspt_state::hypersptb(machine_config &config)
 
 	m_audiocpu->set_addrmap(AS_PROGRAM, address_map_constructor(&std::remove_pointer_t<decltype(this)>::soundb_map, tag(), this));
 
-	M6802(config, "adpcm", XTAL(14'318'181)/8)	/* unknown clock */
+	M6802(config, "adpcm", XTAL(14'318'181)/8)  /* unknown clock */
 		.set_addrmap(AS_PROGRAM, &hyperspt_state::hyprolyb_adpcm_map);
 
 	GENERIC_LATCH_8(config, "soundlatch2");
@@ -385,8 +385,8 @@ void hyperspt_state::hypersptb(machine_config &config)
 	HYPROLYB_ADPCM(config, "hyprolyb_adpcm", 0);
 
 	msm5205_device &msm(MSM5205(config, "msm", 384000));
-	msm.vck_legacy_callback().set("hyprolyb_adpcm", FUNC(hyprolyb_adpcm_device::vck_callback));	/* VCK function */
-	msm.set_prescaler_selector(msm5205_device::S96_4B);	/* 4 kHz */
+	msm.vck_legacy_callback().set("hyprolyb_adpcm", FUNC(hyprolyb_adpcm_device::vck_callback)); /* VCK function */
+	msm.set_prescaler_selector(msm5205_device::S96_4B); /* 4 kHz */
 	msm.add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 

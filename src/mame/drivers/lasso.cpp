@@ -501,7 +501,7 @@ MACHINE_CONFIG_START(lasso_state::base)
 	MCFG_DEVICE_ADD("audiocpu", M6502, 600000)
 	MCFG_DEVICE_PROGRAM_MAP(lasso_audio_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -599,8 +599,8 @@ MACHINE_CONFIG_START(lasso_state::pinbo)
 	MCFG_SCREEN_UPDATE_DRIVER(lasso_state, screen_update_chameleo)
 
 	/* sound hardware */
-	MCFG_DEVICE_REMOVE("sn76489.1")
-	MCFG_DEVICE_REMOVE("sn76489.2")
+	config.device_remove("sn76489.1");
+	config.device_remove("sn76489.2");
 
 	AY8910(config, "ay1", XTAL(18'000'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.55);
 	AY8910(config, "ay2", XTAL(18'000'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.55);

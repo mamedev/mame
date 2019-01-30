@@ -102,16 +102,16 @@ protected:
 private:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
-	DECLARE_READ8_MEMBER(iodecode_r);
-	DECLARE_WRITE8_MEMBER(iodecode_w);
+	uint8_t iodecode_r(offs_t offset);
+	void iodecode_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER(vram_page_r);
-	DECLARE_WRITE8_MEMBER(vram_page_w);
-	DECLARE_READ8_MEMBER(game_io_r);
-	DECLARE_WRITE8_MEMBER(game_io_w);
-	DECLARE_READ8_MEMBER(printer_status_r);
-	DECLARE_WRITE8_MEMBER(printer_data_w);
-	DECLARE_WRITE8_MEMBER(disk_select_w);
+	uint8_t vram_page_r();
+	void vram_page_w(uint8_t data);
+	uint8_t game_io_r();
+	void game_io_w(uint8_t data);
+	uint8_t printer_status_r();
+	void printer_data_w(uint8_t data);
+	void disk_select_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(printer_busy_w);
 	DECLARE_WRITE_LINE_MEMBER(printer_paper_end_w);
 	DECLARE_WRITE_LINE_MEMBER(printer_select_w);

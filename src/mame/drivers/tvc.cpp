@@ -798,10 +798,11 @@ MACHINE_CONFIG_START(tvc_state::tvc)
 	m_sound->sndint_wr_callback().set(FUNC(tvc_state::int_ff_set));
 	m_sound->add_route(ALL_OUTPUTS, "mono", 0.75);
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, tvc_state, centronics_ack))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->ack_handler().set(FUNC(tvc_state::centronics_ack));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "tvc_cart")
@@ -826,18 +827,18 @@ MACHINE_CONFIG_START(tvc_state::tvc)
 	MCFG_TVCEXP_SLOT_OUT_NMI_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(tvc64_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED)
-	MCFG_CASSETTE_INTERFACE("tvc_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(tvc64_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED);
+	m_cassette->set_interface("tvc_cass");
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", tvc_state, tvc64, "cas", 6)
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "tvc_cart")
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "tvc_cass")
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "tvc_flop")
+	SOFTWARE_LIST(config, "cart_list").set_original("tvc_cart");
+	SOFTWARE_LIST(config, "cass_list").set_original("tvc_cass");
+	SOFTWARE_LIST(config, "flop_list").set_original("tvc_flop");
 MACHINE_CONFIG_END
 
 /* ROM definition */

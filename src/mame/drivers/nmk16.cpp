@@ -41,7 +41,7 @@ Action is simply a hack of USSAF Mustang.
 The NMK004 CPU is a Toshiba TMP90C840 with internal ROM.
 The dumped internal ROM has a date string of 900315 in ROM and a version number of V-00
 
-The later games (from GunNail onwards) have an higher resolution (384x224 instead
+The later games (from GunNail onwards) have a higher resolution (384x224 instead
 of 256x224) but the hardware is pretty much the same. It's obvious that the higher
 res is an afterthought, because the tilemap layout is weird (the left 8 screen
 columns have to be taken from the rightmost 8 columns of the tilemap), and the

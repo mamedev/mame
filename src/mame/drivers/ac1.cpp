@@ -157,7 +157,7 @@ MACHINE_CONFIG_START(ac1_state::ac1)
 	SPEAKER(config, "mono").front_center();
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_CASSETTE_ADD( "cassette" )
+	CASSETTE(config, m_cassette);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ac1_state::ac1_32)

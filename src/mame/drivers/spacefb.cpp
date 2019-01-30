@@ -344,7 +344,7 @@ MACHINE_CONFIG_START(spacefb_state::spacefb)
 	m_audiocpu->t0_in_cb().set(FUNC(spacefb_state::audio_t0_r));
 	m_audiocpu->t1_in_cb().set(FUNC(spacefb_state::audio_t1_r));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(180))
+	config.m_minimum_quantum = attotime::from_hz(180);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

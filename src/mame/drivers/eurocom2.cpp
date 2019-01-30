@@ -475,10 +475,8 @@ MACHINE_CONFIG_START(eurocom2_state::eurocom2)
 
 	FD1793(config, m_fdc, 2_MHz_XTAL / 2);
 //  m_fdc->intrq_wr_callback().set_inputline(m_maincpu, M6809_IRQ_LINE);
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", eurocom_floppies, "525qd", eurocom2_state::floppy_formats)
-//  MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", eurocom_floppies, "525qd", eurocom2_state::floppy_formats)
-//  MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, "fdc:0", eurocom_floppies, "525qd", eurocom2_state::floppy_formats);// enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", eurocom_floppies, "525qd", eurocom2_state::floppy_formats);// enable_sound(true);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(waveterm_state::waveterm)
@@ -503,14 +501,15 @@ MACHINE_CONFIG_START(waveterm_state::waveterm)
 
 	MCFG_DEVICE_ADD("ptm", PTM6840, 0)
 
-	MCFG_SOFTWARE_LIST_ADD("disk_list", "waveterm")
+	SOFTWARE_LIST(config, "disk_list").set_original("waveterm");
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(eurocom2_state::microtrol)
+void eurocom2_state::microtrol(machine_config &config)
+{
 	eurocom2(config);
 
 	// TODO: Second board has WD2793A FDC and what looks like a RAM disk
-MACHINE_CONFIG_END
+}
 
 
 ROM_START(eurocom2)

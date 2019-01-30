@@ -819,8 +819,7 @@ MACHINE_CONFIG_START(savquest_state::savquest)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
 	pcat_common(config);
-	MCFG_DEVICE_REMOVE("rtc")
-	MCFG_DS12885_ADD("rtc")
+	DS12885(config.replace(), "rtc");
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
 	MCFG_PCI_BUS_LEGACY_DEVICE(0, DEVICE_SELF, savquest_state, intel82439tx_pci_r, intel82439tx_pci_w)
@@ -836,7 +835,8 @@ MACHINE_CONFIG_START(savquest_state::savquest)
 	/* sound hardware */
 
 	isa16_device &isa(ISA16(config, "isa", 0)); // FIXME: determine ISA bus clock
-	isa.set_cputag("maincpu");
+	isa.set_memspace("maincpu", AS_PROGRAM);
+	isa.set_iospace("maincpu", AS_IO);
 	MCFG_DEVICE_ADD("isa1", ISA16_SLOT, 0, "isa", savquest_isa16_cards, "sb16", false)
 
 	/* video hardware */

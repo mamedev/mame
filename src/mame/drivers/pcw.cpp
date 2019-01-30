@@ -1242,7 +1242,7 @@ void pcw_state::pcw(machine_config &config)
 	m_keyboard_mcu->t0_in_cb().set(FUNC(pcw_state::mcu_kb_t0_r));
 	m_keyboard_mcu->bus_in_cb().set(FUNC(pcw_state::mcu_kb_data_r));
 
-//  MCFG_QUANTUM_TIME(attotime::from_hz(50))
+//  config.m_minimum_quantum = attotime::from_hz(50);
 	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	/* video hardware */

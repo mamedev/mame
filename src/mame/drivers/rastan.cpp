@@ -368,14 +368,14 @@ void rastan_state::machine_reset()
 void rastan_state::rastan(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(16'000'000)/2);	/* verified on pcb */
+	M68000(config, m_maincpu, XTAL(16'000'000)/2);  /* verified on pcb */
 	m_maincpu->set_addrmap(AS_PROGRAM, &rastan_state::rastan_map);
 	m_maincpu->set_vblank_int("screen", FUNC(rastan_state::irq5_line_hold));
 
-	Z80(config, m_audiocpu, XTAL(16'000'000)/4);	/* verified on pcb */
+	Z80(config, m_audiocpu, XTAL(16'000'000)/4);    /* verified on pcb */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &rastan_state::rastan_s_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
+	config.m_minimum_quantum = attotime::from_hz(600);  /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -410,7 +410,7 @@ void rastan_state::rastan(machine_config &config)
 
 	MSM5205(config, m_msm, XTAL(384'000)); /* verified on pcb */
 	m_msm->vck_legacy_callback().set(FUNC(rastan_state::rastan_msm5205_vck)); /* VCK function */
-	m_msm->set_prescaler_selector(msm5205_device::S48_4B);	/* 8 kHz */
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  /* 8 kHz */
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.60);
 
 	LS157(config, m_adpcm_sel, 0);

@@ -123,7 +123,8 @@ public:
 	isa8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration
-	template <typename T> void set_cputag(T &&tag) { m_maincpu.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_memspace(T &&tag, int spacenum) { m_memspace.set_tag(std::forward<T>(tag), spacenum); }
+	template <typename T> void set_iospace(T &&tag, int spacenum) { m_iospace.set_tag(std::forward<T>(tag), spacenum); }
 	auto iochck_callback() { return m_write_iochck.bind(); }
 	auto irq2_callback() { return m_out_irq2_cb.bind(); }
 	auto irq3_callback() { return m_out_irq3_cb.bind(); }
@@ -156,7 +157,7 @@ public:
 	bool is_option_rom_space_available(offs_t start, int size);
 
 	// FIXME: shouldn't need to expose this
-	address_space &memspace() const { return m_maincpu->space(AS_PROGRAM); }
+	address_space &memspace() const { return *m_memspace; }
 
 	DECLARE_WRITE_LINE_MEMBER( irq2_w );
 	DECLARE_WRITE_LINE_MEMBER( irq3_w );
@@ -176,11 +177,11 @@ public:
 	DECLARE_WRITE8_MEMBER(io_w);
 
 	uint8_t dack_r(int line);
-	void dack_w(int line,uint8_t data);
+	void dack_w(int line, uint8_t data);
+	void dack_line_w(int line, int state);
 	void eop_w(int channels, int state);
 
 	void nmi();
-	void set_nmi_state(bool enabled) { m_nmi_enabled = enabled; }
 
 	virtual void set_dma_channel(uint8_t channel, device_isa8_card_interface *dev, bool do_eop);
 
@@ -196,15 +197,14 @@ protected:
 	template<typename R, typename W> void install_space(int spacenum, offs_t start, offs_t end, R rhandler, W whandler);
 
 	// device-level overrides
+	virtual void device_config_complete() override;
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	// internal state
-	required_device<cpu_device> m_maincpu;
-
 	// address spaces
-	address_space *m_iospace, *m_memspace;
-	int m_iowidth, m_memwidth;
+	required_address_space m_memspace, m_iospace;
+	int m_memwidth, m_iowidth;
 	bool m_allocspaces;
 
 	devcb_write_line    m_out_irq2_cb;
@@ -219,7 +219,6 @@ protected:
 
 	device_isa8_card_interface *m_dma_device[8];
 	bool                        m_dma_eop[8];
-	bool                        m_nmi_enabled;
 	std::forward_list<device_slot_interface *> m_slot_list;
 
 private:
@@ -246,7 +245,8 @@ public:
 	void set_isa_device();
 	// configuration access
 	virtual uint8_t dack_r(int line);
-	virtual void dack_w(int line,uint8_t data);
+	virtual void dack_w(int line, uint8_t data);
+	virtual void dack_line_w(int line, int state);
 	virtual void eop_w(int state);
 
 	virtual void remap(int space_id, offs_t start, offs_t end) {}
@@ -325,7 +325,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( drq7_w );
 
 	uint16_t dack16_r(int line);
-	void dack16_w(int line,uint16_t data);
+	void dack16_w(int line, uint16_t data);
 	virtual void remap(int space_id, offs_t start, offs_t end) override;
 
 	// 16 bit accessors for ISA-defined address spaces
@@ -370,7 +370,7 @@ public:
 	// construction/destruction
 	virtual ~device_isa16_card_interface();
 	virtual uint16_t dack16_r(int line);
-	virtual void dack16_w(int line,uint16_t data);
+	virtual void dack16_w(int line, uint16_t data);
 
 	void set_isa_device();
 

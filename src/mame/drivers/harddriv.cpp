@@ -2093,14 +2093,14 @@ void harddriv_new_state::racedriv_panorama_machine(machine_config &config)
 	RACEDRIVC_PANORAMA_SIDE_BOARD(config, "leftpcb", 0);
 	RACEDRIVC_PANORAMA_SIDE_BOARD(config, "rightpcb", 0);
 
-//  MCFG_QUANTUM_TIME(attotime::from_hz(100000))
+//  config.m_minimum_quantum = attotime::from_hz(100000);
 	subdevice<mc68681_device>("mainpcb:duartn68681")->a_tx_cb().set(FUNC(harddriv_new_state::tx_a));
 
 	// boots with 'PROGRAM OK' when using standard Hard Drivin' board type (needs 137412-115 slapstic)
 	subdevice<atari_slapstic_device>("mainpcb:slapstic")->set_chipnum(115);
 
 	TIMER(config, "hack_timer").configure_periodic(FUNC(harddriv_new_state::hack_timer), attotime::from_hz(60));
-//  MCFG_QUANTUM_TIME(attotime::from_hz(60000))
+//  config.m_minimum_quantum = attotime::from_hz(60000);
 }
 
 // this is an ugly hack, otherwise MAME's core can't seem to handle partial updates if you have multiple screens with different update frequencies.

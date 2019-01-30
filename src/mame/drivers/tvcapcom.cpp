@@ -62,7 +62,7 @@ MACHINE_CONFIG_START(tvcapcom_state::tvcapcom)
 	MCFG_DEVICE_PROGRAM_MAP(gc_map)
 	MCFG_DEVICE_DISABLE()
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 
 	/* video hardware */

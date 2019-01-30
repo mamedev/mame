@@ -242,7 +242,7 @@ MACHINE_CONFIG_START(myvision_state::myvision)
 	//MCFG_GENERIC_MANDATORY
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","myvision")
+	SOFTWARE_LIST(config, "cart_list").set_original("myvision");
 MACHINE_CONFIG_END
 
 /* ROM definition */

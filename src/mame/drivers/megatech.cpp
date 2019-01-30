@@ -796,7 +796,7 @@ MACHINE_CONFIG_START(mtech_state::megatech_multislot)
 	MCFG_MEGATECH_CARTSLOT_ADD("mt_slot7", mt_cart7)
 	MCFG_MEGATECH_CARTSLOT_ADD("mt_slot8", mt_cart8)
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list","megatech")
+	SOFTWARE_LIST(config, "cart_list").set_original("megatech");
 MACHINE_CONFIG_END
 
 

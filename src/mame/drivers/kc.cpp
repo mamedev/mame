@@ -103,7 +103,7 @@ MACHINE_CONFIG_START(kc_state::kc85_3)
 	m_maincpu->set_addrmap(AS_IO, &kc_state::kc85_3_io);
 	m_maincpu->set_daisy_config(kc85_daisy_chain);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	Z80PIO(config, m_z80pio, KC85_3_CLOCK);
 	m_z80pio->out_int_callback().set_inputline(m_maincpu, 0);
@@ -125,7 +125,7 @@ MACHINE_CONFIG_START(kc_state::kc85_3)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(28'375'160)/2, 908, 0, 320, 312, 0, 256)
 	MCFG_SCREEN_UPDATE_DRIVER(kc_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kc_state, kc_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(kc_state::kc_scanline), "screen", 0, 1);
 
 	PALETTE(config, "palette", FUNC(kc_state::kc85_palette), KC85_PALETTE_SIZE);
 
@@ -134,16 +134,16 @@ MACHINE_CONFIG_START(kc_state::kc85_3)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* devices */
 	MCFG_QUICKLOAD_ADD("quickload", kc_state, kc, "kcc", 2)
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(kc_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
-	MCFG_CASSETTE_INTERFACE("kc_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(kc_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_PLAY);
+	m_cassette->set_interface("kc_cass");
 
 	/* cartridge slot */
 	MCFG_DEVICE_ADD("m8", KCCART_SLOT, 0)
@@ -168,9 +168,9 @@ MACHINE_CONFIG_START(kc_state::kc85_3)
 	MCFG_KCEXP_SLOT_OUT_HALT_CB(INPUTLINE("maincpu", INPUT_LINE_HALT))
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "kc_cart")
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "kc_flop")
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "kc_cass")
+	SOFTWARE_LIST(config, "cart_list").set_original("kc_cart");
+	SOFTWARE_LIST(config, "flop_list").set_original("kc_flop");
+	SOFTWARE_LIST(config, "cass_list").set_original("kc_cass");
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("16K");
@@ -183,7 +183,7 @@ MACHINE_CONFIG_START(kc85_4_state::kc85_4)
 	m_maincpu->set_addrmap(AS_PROGRAM, &kc85_4_state::kc85_4_mem);
 	m_maincpu->set_addrmap(AS_IO, &kc85_4_state::kc85_4_io);
 	m_maincpu->set_daisy_config(kc85_daisy_chain);
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	Z80PIO(config, m_z80pio, KC85_4_CLOCK);
 	m_z80pio->out_int_callback().set_inputline(m_maincpu, 0);
@@ -205,7 +205,7 @@ MACHINE_CONFIG_START(kc85_4_state::kc85_4)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(28'375'160)/2, 908, 0, 320, 312, 0, 256)
 	MCFG_SCREEN_UPDATE_DRIVER(kc85_4_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kc85_4_state, kc_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(kc85_4_state::kc_scanline), "screen", 0, 1);
 
 	PALETTE(config, "palette", FUNC(kc85_4_state::kc85_palette), KC85_PALETTE_SIZE);
 
@@ -214,16 +214,16 @@ MACHINE_CONFIG_START(kc85_4_state::kc85_4)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* devices */
 	MCFG_QUICKLOAD_ADD("quickload", kc_state, kc, "kcc", 2)
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(kc_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
-	MCFG_CASSETTE_INTERFACE("kc_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(kc_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_PLAY);
+	m_cassette->set_interface("kc_cass");
 
 	/* cartridge slot */
 	MCFG_DEVICE_ADD("m8", KCCART_SLOT, 0)
@@ -248,9 +248,9 @@ MACHINE_CONFIG_START(kc85_4_state::kc85_4)
 	MCFG_KCEXP_SLOT_OUT_HALT_CB(INPUTLINE("maincpu", INPUT_LINE_HALT))
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "kc_cart")
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "kc_flop")
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "kc_cass")
+	SOFTWARE_LIST(config, "cart_list").set_original("kc_cart");
+	SOFTWARE_LIST(config, "flop_list").set_original("kc_flop");
+	SOFTWARE_LIST(config, "cass_list").set_original("kc_cass");
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("64K");

@@ -12,6 +12,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <type_traits>
 #include "../plib/pconfig.h"
 
 #if 0
@@ -36,103 +37,84 @@ private:
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #endif
 
-template<typename T, std::size_t N>
-inline static void vec_set (const std::size_t n, const T scalar, T (& RESTRICT v)[N])
+template<typename VT, typename T>
+void vec_set_scalar (const std::size_t n, VT &v, const T & scalar)
 {
-	if (n != N)
-		for ( std::size_t i = 0; i < n; i++ )
-			v[i] = scalar;
-	else
-		for ( std::size_t i = 0; i < N; i++ )
-			v[i] = scalar;
+	for ( std::size_t i = 0; i < n; i++ )
+		v[i] = scalar;
 }
 
-template<typename T, std::size_t N>
-inline static T vec_mult (const std::size_t n, const T (& RESTRICT v1)[N], const T (& RESTRICT v2)[N] )
+template<typename VT, typename VS>
+void vec_set (const std::size_t n, VT &v, const VS & source)
+{
+	for ( std::size_t i = 0; i < n; i++ )
+		v[i] = source [i];
+}
+
+template<typename T, typename V1, typename V2>
+T vec_mult (const std::size_t n, const V1 & v1, const V2 & v2 )
 {
 	T value = 0.0;
-	if (n != N)
-		for ( std::size_t i = 0; i < n; i++ )
-			value += v1[i] * v2[i];
-	else
-		for ( std::size_t i = 0; i < N; i++ )
-			value += v1[i] * v2[i];
+	for ( std::size_t i = 0; i < n; i++ )
+		value += v1[i] * v2[i];
 	return value;
 }
 
-template<typename T, std::size_t N>
-inline static T vec_mult2 (const std::size_t n, const T (& RESTRICT v)[N])
+template<typename T, typename VT>
+T vec_mult2 (const std::size_t n, const VT &v)
 {
 	T value = 0.0;
-	if (n != N)
-		for ( std::size_t i = 0; i < n; i++ )
-			value += v[i] * v[i];
-	else
-		for ( std::size_t i = 0; i < N; i++ )
-			value += v[i] * v[i];
+	for ( std::size_t i = 0; i < n; i++ )
+		value += v[i] * v[i];
 	return value;
 }
 
-template<typename T, std::size_t N>
-inline static void vec_mult_scalar (const std::size_t n, const T (& RESTRICT v)[N], const T & scalar, T (& RESTRICT result)[N])
+template<typename VV, typename T, typename VR>
+void vec_mult_scalar (const std::size_t n, const VV & v, const T & scalar, VR & result)
 {
-	if (n != N)
-		for ( std::size_t i = 0; i < n; i++ )
-			result[i] = scalar * v[i];
-	else
-		for ( std::size_t i = 0; i < N; i++ )
-			result[i] = scalar * v[i];
+	for ( std::size_t i = 0; i < n; i++ )
+		result[i] = scalar * v[i];
 }
 
-template<typename T, std::size_t N>
-inline static void vec_add_mult_scalar (const std::size_t n, const T (& RESTRICT v)[N], const T scalar, T (& RESTRICT result)[N])
+template<typename VV, typename T, typename VR>
+void vec_add_mult_scalar (const std::size_t n, const VV & v, const T scalar, VR & result)
 {
-	if (n != N)
-		for ( std::size_t i = 0; i < n; i++ )
-			result[i] = result[i] + scalar * v[i];
-	else
-		for ( std::size_t i = 0; i < N; i++ )
-			result[i] = result[i] + scalar * v[i];
+	for ( std::size_t i = 0; i < n; i++ )
+		result[i] = result[i] + scalar * v[i];
 }
 
 template<typename T>
-inline static void vec_add_mult_scalar_p(const std::size_t & n, const T * RESTRICT v, const T scalar, T * RESTRICT result)
+void vec_add_mult_scalar_p(const std::size_t & n, const T * RESTRICT v, const T scalar, T * RESTRICT result)
 {
 	for ( std::size_t i = 0; i < n; i++ )
 		result[i] += scalar * v[i];
 }
 
-inline static void vec_add_ip(const std::size_t n, const double * RESTRICT v, double * RESTRICT result)
+template<typename V, typename R>
+void vec_add_ip(const std::size_t n, const V & v, R & result)
 {
 	for ( std::size_t i = 0; i < n; i++ )
 		result[i] += v[i];
 }
 
-template<typename T, std::size_t N>
-inline void vec_sub(const std::size_t n, const T (& RESTRICT v1)[N], const T (& RESTRICT v2)[N], T (& RESTRICT result)[N])
+template<typename V1, typename V2, typename VR>
+void vec_sub(const std::size_t n, const V1 &v1, const V2 & v2, VR & result)
 {
-	if (n != N)
-		for ( std::size_t i = 0; i < n; i++ )
-			result[i] = v1[i] - v2[i];
-	else
-		for ( std::size_t i = 0; i < N; i++ )
-			result[i] = v1[i] - v2[i];
+	for ( std::size_t i = 0; i < n; i++ )
+		result[i] = v1[i] - v2[i];
 }
 
-template<typename T, std::size_t N>
-inline void vec_scale(const std::size_t n, T (& RESTRICT v)[N], const T scalar)
+template<typename V, typename T>
+void vec_scale(const std::size_t n, V & v, const T scalar)
 {
-	if (n != N)
-		for ( std::size_t i = 0; i < n; i++ )
-			v[i] = scalar * v[i];
-	else
-		for ( std::size_t i = 0; i < N; i++ )
-			v[i] = scalar * v[i];
+	for ( std::size_t i = 0; i < n; i++ )
+		v[i] = scalar * v[i];
 }
 
-inline double vec_maxabs(const std::size_t n, const double * RESTRICT v)
+template<typename T, typename V>
+T vec_maxabs(const std::size_t n, const V & v)
 {
-	double ret = 0.0;
+	T ret = 0.0;
 	for ( std::size_t i = 0; i < n; i++ )
 		ret = std::max(ret, std::abs(v[i]));
 

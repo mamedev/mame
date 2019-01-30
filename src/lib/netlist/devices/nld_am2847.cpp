@@ -116,7 +116,7 @@ namespace netlist
 		/* do nothing */
 	}
 
-	inline NETLIB_FUNC_VOID(Am2847_shifter, shift, (void))
+	NETLIB_FUNC_VOID(Am2847_shifter, shift, (void))
 	{
 		uint32_t out = m_buffer[0] & 1;
 		uint32_t in = (m_RC() ? out : m_IN());

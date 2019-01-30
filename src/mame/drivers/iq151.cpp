@@ -421,11 +421,11 @@ MACHINE_CONFIG_START(iq151_state::iq151)
 	ppi.in_pc_callback().set(FUNC(iq151_state::ppi_portc_r));
 	ppi.out_pc_callback().set(FUNC(iq151_state::ppi_portc_w));
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
-	MCFG_CASSETTE_INTERFACE("iq151_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED);
+	m_cassette->set_interface("iq151_cass");
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("cassette_timer", iq151_state, cassette_timer, attotime::from_hz(2000))
+	TIMER(config, "cassette_timer").configure_periodic(FUNC(iq151_state::cassette_timer), attotime::from_hz(2000));
 
 	/* cartridge */
 	MCFG_DEVICE_ADD("slot1", IQ151CART_SLOT, 0)
@@ -470,8 +470,8 @@ MACHINE_CONFIG_START(iq151_state::iq151)
 	MCFG_IQ151CART_SLOT_OUT_IRQ4_CB(WRITELINE(m_pic, pic8259_device, ir4_w))
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "iq151_cart")
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "iq151_flop")
+	SOFTWARE_LIST(config, "cart_list").set_original("iq151_cart");
+	SOFTWARE_LIST(config, "flop_list").set_original("iq151_flop");
 MACHINE_CONFIG_END
 
 /* ROM definition */

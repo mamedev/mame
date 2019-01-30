@@ -1009,7 +1009,7 @@ READ8_MEMBER( x1_state::x1_ex_gfxram_r )
 	if (!machine().side_effects_disabled())
 	{
 		m_iobank->set_bank(0); // any read disables the extended mode
-		return m_iobank->read8(space, offset);
+		return m_iobank->read8(offset);
 	}
 	else
 	{
@@ -2242,12 +2242,12 @@ MACHINE_CONFIG_START(x1_state::x1)
 	// TODO: guesswork, try to implicitly start the motor
 	m_fdc->hld_wr_callback().set(FUNC(x1_state::hdl_w));
 
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", x1_floppies, "dd", x1_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", x1_floppies, "dd", x1_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:2", x1_floppies, "dd", x1_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:3", x1_floppies, "dd", x1_state::floppy_formats)
+	FLOPPY_CONNECTOR(config, "fdc:0", x1_floppies, "dd", x1_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", x1_floppies, "dd", x1_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:2", x1_floppies, "dd", x1_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:3", x1_floppies, "dd", x1_state::floppy_formats);
 
-	MCFG_SOFTWARE_LIST_ADD("flop_list","x1_flop")
+	SOFTWARE_LIST(config, "flop_list").set_original("x1_flop");
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "x1_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
@@ -2263,17 +2263,17 @@ MACHINE_CONFIG_START(x1_state::x1)
 	ay.add_route(0, "rspeaker", 0.25);
 	ay.add_route(1, "lspeaker", 0.5);
 	ay.add_route(2, "rspeaker", 0.5);
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "lspeaker", 0.25).add_route(ALL_OUTPUTS, "rspeaker", 0.10);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "lspeaker", 0.25).add_route(ALL_OUTPUTS, "rspeaker", 0.10);
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_FORMATS(x1_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("x1_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(x1_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_interface("x1_cass");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list","x1_cass")
+	SOFTWARE_LIST(config, "cass_list").set_original("x1_cass");
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", x1_state, x1_keyboard_callback, attotime::from_hz(250))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("cmt_wind_timer", x1_state, x1_cmt_wind_timer, attotime::from_hz(16))
+	TIMER(config, "keyboard_timer").configure_periodic(FUNC(x1_state::x1_keyboard_callback), attotime::from_hz(250));
+	TIMER(config, "cmt_wind_timer").configure_periodic(FUNC(x1_state::x1_cmt_wind_timer), attotime::from_hz(16));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(x1_state::x1turbo)

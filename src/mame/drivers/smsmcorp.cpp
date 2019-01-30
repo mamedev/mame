@@ -558,7 +558,7 @@ MACHINE_CONFIG_START(smsmfg_state::sms)
 	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(16'000'000)/8)
 	MCFG_DEVICE_PROGRAM_MAP(sub_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
 	ppi0.out_pa_callback().set(FUNC(smsmfg_state::ppi0_a_w));

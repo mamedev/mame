@@ -34,6 +34,11 @@
 
     Information and programs can be found at http://chip8.com/?page=78
 
+    2019-01-29: Noticed that when you try to enter the 4-digit address, it
+    runs into the weeds when the 2nd digit is pressed. Unable to locate a
+    version where it ever worked, even though the above text insinuates that
+    it once did. Marked as MNW until the problem can be resolved. The rest of
+    the machine appears to work fine.  (Robbbert)
 
 **********************************************************************************/
 
@@ -406,7 +411,7 @@ MACHINE_CONFIG_START(d6800_state::d6800)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.50);
+	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.50);
 	BEEP(config, "beeper", 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* devices */
@@ -419,11 +424,11 @@ MACHINE_CONFIG_START(d6800_state::d6800)
 	m_pia->irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 	m_pia->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
+	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("d6800_c", d6800_state, d6800_c, attotime::from_hz(4800))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("d6800_p", d6800_state, d6800_p, attotime::from_hz(40000))
+	TIMER(config, "d6800_c").configure_periodic(FUNC(d6800_state::d6800_c), attotime::from_hz(4800));
+	TIMER(config, "d6800_p").configure_periodic(FUNC(d6800_state::d6800_p), attotime::from_hz(40000));
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", d6800_state, d6800, "bin,c8,ch8", 1)
@@ -441,4 +446,4 @@ ROM_START( d6800 )
 ROM_END
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY          FULLNAME      FLAGS
-COMP( 1979, d6800, 0,      0,      d6800,   d6800, d6800_state, empty_init, "Michael Bauer", "Dream 6800", 0 )
+COMP( 1979, d6800, 0,      0,      d6800,   d6800, d6800_state, empty_init, "Michael Bauer", "Dream 6800", MACHINE_NOT_WORKING )

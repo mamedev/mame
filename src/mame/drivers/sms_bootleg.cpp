@@ -279,7 +279,7 @@ MACHINE_CONFIG_START(smsbootleg_state::sms_supergame)
 	MCFG_DEVICE_PROGRAM_MAP(sms_supergame_map)
 	MCFG_DEVICE_IO_MAP(sms_supergame_io)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -294,7 +294,7 @@ MACHINE_CONFIG_START(smsbootleg_state::sms_supergame)
 	MCFG_SCREEN_REFRESH_RATE(XTAL(10'738'635)/2 / (sega315_5124_device::WIDTH * sega315_5124_device::HEIGHT_NTSC))
 	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms)
 
- 	SEGA315_5246(config, m_vdp, 0);
+	SEGA315_5246(config, m_vdp, 0);
 	m_vdp->set_screen(m_main_scr);
 	m_vdp->set_is_pal(false);
 	m_vdp->irq().set_inputline(m_maincpu, 0);

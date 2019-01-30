@@ -207,13 +207,13 @@ MACHINE_CONFIG_START(aim65_state::aim65)
 
 	/* Sound - wave sound only */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cassette1).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* other devices */
-	MCFG_DEVICE_ADD("riot", MOS6532_NEW, AIM65_CLOCK)
-	MCFG_MOS6530n_OUT_PA_CB(WRITE8(*this, aim65_state, aim65_riot_a_w))
-	MCFG_MOS6530n_IN_PB_CB(READ8(*this, aim65_state, aim65_riot_b_r))
-	MCFG_MOS6530n_IRQ_CB(INPUTLINE("maincpu", M6502_IRQ_LINE))
+	mos6532_new_device &riot(MOS6532_NEW(config, "riot", AIM65_CLOCK));
+	riot.pa_wr_callback().set(FUNC(aim65_state::aim65_riot_a_w));
+	riot.pb_rd_callback().set(FUNC(aim65_state::aim65_riot_b_r));
+	riot.irq_wr_callback().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
 	via6522_device &via0(VIA6522(config, "via6522_0", AIM65_CLOCK));
 	via0.readpb_handler().set(FUNC(aim65_state::aim65_pb_r));
@@ -232,12 +232,12 @@ MACHINE_CONFIG_START(aim65_state::aim65)
 	pia.writepb_handler().set(FUNC(aim65_state::aim65_pia_b_w));
 
 	// Deck 1 can play and record
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
+	CASSETTE(config, m_cassette1);
+	m_cassette1->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 
 	// Deck 2 can only record
-	MCFG_CASSETTE_ADD( "cassette2" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_RECORD | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
+	CASSETTE(config, m_cassette2);
+	m_cassette2->set_default_state(CASSETTE_RECORD | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED);
 
 	MCFG_GENERIC_SOCKET_ADD("z26", generic_plain_slot, "aim65_z26_cart")
 	MCFG_GENERIC_EXTENSIONS("z26")
@@ -272,7 +272,7 @@ MACHINE_CONFIG_START(aim65_state::aim65)
 	RAM(config, RAM_TAG).set_default_size("4K").set_extra_options("1K,2K,3K");
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","aim65_cart")
+	SOFTWARE_LIST(config, "cart_list").set_original("aim65_cart");
 MACHINE_CONFIG_END
 
 

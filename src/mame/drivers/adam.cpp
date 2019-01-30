@@ -1042,7 +1042,7 @@ void adam_state::adam(machine_config &config)
 	m_netcpu->out_p3_cb().set(FUNC(adam_state::m6801_p3_w));
 	m_netcpu->out_p4_cb().set(FUNC(adam_state::m6801_p4_w));
 	m_netcpu->out_sc2_cb().set(FUNC(adam_state::os3_w));
-	MCFG_QUANTUM_PERFECT_CPU(M6801_TAG)
+	config.m_perfect_cpu_quantum = subtag(M6801_TAG);
 
 	// video hardware
 	TMS9928A(config, m_vdc, XTAL(10'738'635)).set_screen("screen");

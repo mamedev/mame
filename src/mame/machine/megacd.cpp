@@ -305,10 +305,10 @@ MACHINE_CONFIG_START(sega_segacd_device::device_add_mconfig)
 	m_lc89510_temp->set_cdc_do_dma_callback(FUNC(sega_segacd_device::SegaCD_CDC_Do_DMA), this); // hack
 
 
-	MCFG_TIMER_ADD_NONE("sw_timer") //stopwatch timer
-	MCFG_TIMER_DRIVER_ADD("stamp_timer", sega_segacd_device, stamp_timer_callback)
-	MCFG_TIMER_DRIVER_ADD("irq3_timer", sega_segacd_device, irq3_timer_callback)
-	MCFG_TIMER_DRIVER_ADD("dma_timer", sega_segacd_device, dma_timer_callback)
+	TIMER(config, m_stopwatch_timer).configure_generic(timer_device::expired_delegate()); //stopwatch timer
+	TIMER(config, m_stamp_timer).configure_generic(FUNC(sega_segacd_device::stamp_timer_callback));
+	TIMER(config, m_irq3_timer).configure_generic(FUNC(sega_segacd_device::irq3_timer_callback));
+	TIMER(config, m_dma_timer).configure_generic(FUNC(sega_segacd_device::dma_timer_callback));
 
 	config.set_default_layout(layout_megacd);
 
@@ -319,7 +319,7 @@ MACHINE_CONFIG_START(sega_segacd_device::device_add_mconfig)
 
 	NVRAM(config, "backupram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_QUANTUM_PERFECT_CPU("segacd_68k") // perfect sync to the fastest cpu
+	config.m_perfect_cpu_quantum = subtag("segacd_68k"); // perfect sync to the fastest cpu
 MACHINE_CONFIG_END
 
 

@@ -202,7 +202,7 @@ MACHINE_CONFIG_START(channelf_state::channelf_cart)
 	MCFG_CHANNELF_CARTRIDGE_ADD("cartslot", cf_cart, nullptr)
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","channelf")
+	SOFTWARE_LIST(config, "cart_list").set_original("channelf");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(channelf_state::channelf)
@@ -210,7 +210,7 @@ MACHINE_CONFIG_START(channelf_state::channelf)
 	MCFG_DEVICE_ADD("maincpu", F8, 3579545/2)        /* Colorburst/2 */
 	MCFG_DEVICE_PROGRAM_MAP(channelf_map)
 	MCFG_DEVICE_IO_MAP(channelf_io)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -236,7 +236,7 @@ MACHINE_CONFIG_START(channelf_state::sabavdpl)
 	MCFG_DEVICE_ADD("maincpu", F8, MASTER_CLOCK_PAL)        /* PAL speed */
 	MCFG_DEVICE_PROGRAM_MAP(channelf_map)
 	MCFG_DEVICE_IO_MAP(channelf_io)
-	MCFG_QUANTUM_TIME(attotime::from_hz(50))
+	config.m_minimum_quantum = attotime::from_hz(50);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -263,7 +263,7 @@ MACHINE_CONFIG_START(channelf_state::channlf2)
 	MCFG_DEVICE_ADD("maincpu", F8, 3579545/2)        /* Colorburst / 2 */
 	MCFG_DEVICE_PROGRAM_MAP(channelf_map)
 	MCFG_DEVICE_IO_MAP(channelf_io)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -290,7 +290,7 @@ MACHINE_CONFIG_START(channelf_state::sabavpl2)
 	MCFG_DEVICE_ADD("maincpu", F8, MASTER_CLOCK_PAL)        /* PAL speed */
 	MCFG_DEVICE_PROGRAM_MAP(channelf_map)
 	MCFG_DEVICE_IO_MAP(channelf_io)
-	MCFG_QUANTUM_TIME(attotime::from_hz(50))
+	config.m_minimum_quantum = attotime::from_hz(50);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

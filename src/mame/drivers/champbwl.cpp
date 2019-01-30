@@ -565,7 +565,7 @@ MACHINE_CONFIG_START(champbwl_state::doraemon)
 	SETA001_SPRITE(config, m_seta001, 0);
 	m_seta001->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(2000), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(2000), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW );
 
 	MCFG_MACHINE_START_OVERRIDE(champbwl_state,doraemon)
 

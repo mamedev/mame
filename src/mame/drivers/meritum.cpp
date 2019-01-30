@@ -438,7 +438,7 @@ MACHINE_CONFIG_START(meritum_state::meritum)
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* devices */
-	MCFG_CASSETTE_ADD("cassette")
+	CASSETTE(config, m_cassette);
 	MCFG_QUICKLOAD_ADD("quickload", meritum_state, trs80_cmd, "cmd", 1.0)
 MACHINE_CONFIG_END
 

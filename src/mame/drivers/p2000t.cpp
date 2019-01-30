@@ -254,7 +254,7 @@ MACHINE_CONFIG_START(p2000m_state::p2000m)
 	MCFG_DEVICE_PROGRAM_MAP(p2000m_mem)
 	MCFG_DEVICE_IO_MAP(p2000t_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", p2000m_state,  p2000_interrupt)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

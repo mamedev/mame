@@ -530,13 +530,13 @@ DEFINE_DEVICE_TYPE(ISA8_EGA, isa8_ega_device, "ega", "IBM Enhanced Graphics Adap
 
 MACHINE_CONFIG_START(isa8_ega_device::device_add_mconfig)
 	MCFG_SCREEN_ADD(EGA_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_RAW_PARAMS(16257000,912,0,640,262,0,200)
+	MCFG_SCREEN_RAW_PARAMS(16.257_MHz_XTAL, 912, 0, 640, 262, 0, 200)
 	MCFG_SCREEN_UPDATE_DEVICE(EGA_CRTC_NAME, crtc_ega_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD( "palette", 64 )
 
-	CRTC_EGA(config, m_crtc_ega, 16257000/8);
+	CRTC_EGA(config, m_crtc_ega, 16.257_MHz_XTAL/8);
 	m_crtc_ega->set_screen(EGA_SCREEN_NAME);
 	m_crtc_ega->config_set_hpixels_per_column(8);
 	m_crtc_ega->set_row_update_callback(FUNC(isa8_ega_device::ega_update_row), this);

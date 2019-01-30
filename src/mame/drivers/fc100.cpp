@@ -522,19 +522,20 @@ MACHINE_CONFIG_START(fc100_state::fc100)
 	MCFG_DEVICE_IO_MAP(fc100_io)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("vdg", M5C6847P1, XTAL(7'159'090)/3)  // Clock not verified
-	MCFG_MC6847_INPUT_CALLBACK(READ8(*this, fc100_state, mc6847_videoram_r))
-	MCFG_MC6847_CHARROM_CALLBACK(fc100_state, get_char_rom)
-	MCFG_MC6847_FIXED_MODE(m5c6847p1_device::MODE_INTEXT)
+	M5C6847P1(config, m_vdg, XTAL(7'159'090)/3);  // Clock not verified
+	m_vdg->set_screen("screen");
+	m_vdg->input_callback().set(FUNC(fc100_state::mc6847_videoram_r));
+	m_vdg->set_get_char_rom(FUNC(fc100_state::get_char_rom));
+	m_vdg->set_get_fixed_mode(m5c6847p1_device::MODE_INTEXT);
 	// other lines not connected
 
-	MCFG_SCREEN_MC6847_NTSC_ADD("screen", "vdg")
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "f4palette", gfx_fc100)
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	GFXDECODE(config, "gfxdecode", "f4palette", gfx_fc100);
 	PALETTE(config, "f4palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
+	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.05);
 	ay8910_device &psg(AY8910(config, "psg", XTAL(7'159'090)/3/2));  /* AY-3-8910 - clock not verified */
 	psg.port_a_read_callback().set_ioport("JOY0");
 	psg.port_b_read_callback().set_ioport("JOY1");
@@ -543,9 +544,9 @@ MACHINE_CONFIG_START(fc100_state::fc100)
 	psg.add_route(ALL_OUTPUTS, "mono", 1.50);
 
 	/* Devices */
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_FORMATS(fc100_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
+	CASSETTE(config, m_cass);
+	m_cass->set_formats(fc100_cassette_formats);
+	m_cass->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 
 	I8251(config, m_uart, 0);
 	m_uart->txd_handler().set(FUNC(fc100_state::txdata_callback));
@@ -553,17 +554,20 @@ MACHINE_CONFIG_START(fc100_state::fc100)
 	uart_clock.signal_handler().set(m_uart, FUNC(i8251_device::write_txc));
 	uart_clock.signal_handler().append(m_uart, FUNC(i8251_device::write_rxc));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_c", fc100_state, timer_c, attotime::from_hz(4800)) // cass write
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_p", fc100_state, timer_p, attotime::from_hz(40000)) // cass read
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_k", fc100_state, timer_k, attotime::from_hz(300)) // keyb scan
+	TIMER(config, "timer_c").configure_periodic(FUNC(fc100_state::timer_c), attotime::from_hz(4800)); // cass write
+	TIMER(config, "timer_p").configure_periodic(FUNC(fc100_state::timer_p), attotime::from_hz(40000)); // cass read
+	TIMER(config, "timer_k").configure_periodic(FUNC(fc100_state::timer_k), attotime::from_hz(300)); // keyb scan
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "fc100_cart")
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit4))
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit5))
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
-	MCFG_DEVICE_ADD("cent_status_in", INPUT_BUFFER, 0)
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->ack_handler().set("cent_status_in", FUNC(input_buffer_device::write_bit4));
+	m_centronics->busy_handler().set("cent_status_in", FUNC(input_buffer_device::write_bit5));
+
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
+
+	INPUT_BUFFER(config, "cent_status_in");
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -980,7 +980,7 @@ MACHINE_CONFIG_START(kingdrby_state::kingdrby)
 	MCFG_DEVICE_IO_MAP(sound_io_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(kingdrby_state, irq0_line_hold, 1000) /* guess, controls ay8910 tempo.*/
 
-	MCFG_QUANTUM_PERFECT_CPU("master")
+	config.m_perfect_cpu_quantum = subtag("master");
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

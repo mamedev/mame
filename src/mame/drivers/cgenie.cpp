@@ -465,12 +465,12 @@ MACHINE_CONFIG_START(cgenie_state::cgenie)
 	ay8910.port_b_write_callback().set("par", FUNC(cg_parallel_slot_device::pb_w));
 	ay8910.add_route(ALL_OUTPUTS, "mono", 0.75);
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_FORMATS(cgenie_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
-	MCFG_CASSETTE_INTERFACE("cgenie_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(cgenie_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_STOPPED);
+	m_cassette->set_interface("cgenie_cass");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "cgenie_cass")
+	SOFTWARE_LIST(config, "cass_list").set_original("cgenie_cass");
 
 	// serial port
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));

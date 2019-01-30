@@ -751,7 +751,7 @@ void ninjaw_state::ninjaw(machine_config &config)
 	//       Let's use a better timer (was 6000 before) based off actual CPU timing.
 	//       Might as well bump the divider in case the bug still occurs before resorting to perfect CPU.
 	config.m_minimum_quantum = attotime::from_hz(16000000/1024);  /* CPU slices */
-	//MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	//config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	tc0040ioc_device &tc0040ioc(TC0040IOC(config, "tc0040ioc", 0));
 	tc0040ioc.read_0_callback().set_ioport("DSWA");

@@ -95,9 +95,9 @@ protected:
 	struct
 	{
 		uint32_t m_address;
-		uint16_t m_count;
+		uint32_t m_count;
 		uint32_t m_base_address;
-		uint16_t m_base_count;
+		uint32_t m_base_count;
 		uint8_t m_mode;
 	} m_channel[4];
 
@@ -186,11 +186,50 @@ protected:
 	virtual void end_of_process() override;
 };
 
+class eisa_dma_device : public am9517a_device
+{
+public:
+	eisa_dma_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	template <unsigned Channel> u8 get_address_page() { return m_channel[Channel].m_address >> 16; }
+	template <unsigned Channel> void set_address_page(u8 data)
+	{
+		m_channel[Channel].m_base_address = (m_channel[Channel].m_base_address & 0x0000ffffU) | (u32(data) << 16);
+		m_channel[Channel].m_address = (m_channel[Channel].m_address & 0x0000ffffU) | (u32(data) << 16);
+	}
+
+	template <unsigned Channel> u8 get_address_page_high() { return m_channel[Channel].m_address >> 24; }
+	template <unsigned Channel> void set_address_page_high(u8 data)
+	{
+		m_channel[Channel].m_base_address = (m_channel[Channel].m_base_address & 0x00ffffffU) | (u32(data) << 24);
+		m_channel[Channel].m_address = (m_channel[Channel].m_address & 0x00ffffffU) | (u32(data) << 24);
+	}
+
+	template <unsigned Channel> u8 get_count_high() { return m_channel[Channel].m_count >> 16; }
+	template <unsigned Channel> void set_count_high(u8 data)
+	{
+		m_channel[Channel].m_base_count = (m_channel[Channel].m_base_count & 0x0000ffffU) | (u32(data) << 16);
+		m_channel[Channel].m_count = (m_channel[Channel].m_count & 0x0000ffffU) | (u32(data) << 16);
+	}
+
+	template <unsigned Channel> u32 get_stop() { return m_stop[Channel]; }
+	template <unsigned Channel> void set_stop(offs_t offset, u32 data, u32 mem_mask)
+	{
+		mem_mask &= 0x00fffffcU;
+		COMBINE_DATA(&m_stop[Channel]);
+	}
+
+protected:
+	virtual void device_start() override;
+
+private:
+	u32 m_stop[4];
+};
 
 // device type definition
 DECLARE_DEVICE_TYPE(AM9517A,      am9517a_device)
 DECLARE_DEVICE_TYPE(V5X_DMAU,     v5x_dmau_device)
 DECLARE_DEVICE_TYPE(PCXPORT_DMAC, pcxport_dmac_device)
+DECLARE_DEVICE_TYPE(EISA_DMA,     eisa_dma_device)
 
 #endif // MAME_MACHINE_AM9517_H

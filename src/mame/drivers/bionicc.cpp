@@ -393,7 +393,7 @@ MACHINE_CONFIG_START(bionicc_state::bionicc)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000) / 2) /* 12 MHz - verified in schematics */
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", bionicc_state, scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(bionicc_state::scanline), "screen", 0, 1);
 
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(14'318'181) / 4)   /* EXO3 C,B=GND, A=5V ==> Divisor 2^2 */

@@ -579,7 +579,7 @@ MACHINE_CONFIG_START(srmp5_state::srmp5)
 	MCFG_DEVICE_IO_MAP(st0016_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", srmp5_state,  irq0_line_hold)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

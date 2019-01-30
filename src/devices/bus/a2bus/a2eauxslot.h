@@ -32,8 +32,7 @@
 	MCFG_DEVICE_ADD(_tag, A2EAUXSLOT_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
 	downcast<a2eauxslot_slot_device &>(*device).set_a2eauxslot_slot(_nbtag, _tag);
-#define MCFG_A2EAUXSLOT_SLOT_REMOVE(_tag)    \
-	MCFG_DEVICE_REMOVE(_tag)
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS

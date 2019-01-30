@@ -2173,7 +2173,7 @@ void system1_state::sys1ppi(machine_config &config)
 
 	TIMER(config, "soundirq", 0).configure_scanline(FUNC(system1_state::soundirq_gen), "screen", 32, 64);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	I8255A(config, m_ppi8255);
 	m_ppi8255->out_pa_callback().set(FUNC(system1_state::soundport_w));

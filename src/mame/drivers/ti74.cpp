@@ -550,7 +550,7 @@ MACHINE_CONFIG_START(ti74_state::ti74)
 	MCFG_GENERIC_EXTENSIONS("bin,rom,256")
 	MCFG_GENERIC_LOAD(ti74_state, ti74_cartridge)
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "ti74_cart")
+	SOFTWARE_LIST(config, "cart_list").set_original("ti74_cart");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ti74_state::ti95)
@@ -585,7 +585,7 @@ MACHINE_CONFIG_START(ti74_state::ti95)
 	MCFG_GENERIC_EXTENSIONS("bin,rom,256")
 	MCFG_GENERIC_LOAD(ti74_state, ti74_cartridge)
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "ti95_cart")
+	SOFTWARE_LIST(config, "cart_list").set_original("ti95_cart");
 MACHINE_CONFIG_END
 
 

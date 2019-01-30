@@ -1015,7 +1015,7 @@ MACHINE_CONFIG_START(pcw16_state::pcw16)
 	MCFG_DEVICE_ADD("maincpu", Z80, 16000000)
 	MCFG_DEVICE_PROGRAM_MAP(pcw16_map)
 	MCFG_DEVICE_IO_MAP(pcw16_io)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	ns16550_device &uart1(NS16550(config, "ns16550_1", XTAL(1'843'200)));     /* TODO: Verify uart model */
 	uart1.out_tx_callback().set("serport1", FUNC(rs232_port_device::write_txd));
@@ -1063,10 +1063,10 @@ MACHINE_CONFIG_START(pcw16_state::pcw16)
 
 	PC_FDC_SUPERIO(config, m_fdc, 48_MHz_XTAL / 2);
 	m_fdc->intrq_wr_callback().set(FUNC(pcw16_state::fdc_interrupt));
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pcw16_floppies, "35hd", pcw16_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pcw16_floppies, "35hd", pcw16_state::floppy_formats)
+	FLOPPY_CONNECTOR(config, "fdc:0", pcw16_floppies, "35hd", pcw16_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", pcw16_floppies, "35hd", pcw16_state::floppy_formats);
 
-	MCFG_SOFTWARE_LIST_ADD("disk_list","pcw16")
+	SOFTWARE_LIST(config, "disk_list").set_original("pcw16");
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("2M");
@@ -1077,9 +1077,9 @@ MACHINE_CONFIG_START(pcw16_state::pcw16)
 	MCFG_AT_KEYB_ADD("at_keyboard", 3, WRITELINE(*this, pcw16_state, pcw16_keyboard_callback))
 
 	/* video ints */
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("video_timer", pcw16_state, pcw16_timer_callback, attotime::from_usec(5830))
+	TIMER(config, "video_timer").configure_periodic(FUNC(pcw16_state::pcw16_timer_callback), attotime::from_usec(5830));
 	/* rtc timer */
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("rtc_timer", pcw16_state, rtc_timer_callback, attotime::from_hz(256))
+	TIMER(config, "rtc_timer").configure_periodic(FUNC(pcw16_state::rtc_timer_callback), attotime::from_hz(256));
 MACHINE_CONFIG_END
 
 /***************************************************************************

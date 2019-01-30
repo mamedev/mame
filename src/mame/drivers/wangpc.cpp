@@ -1280,7 +1280,7 @@ MACHINE_CONFIG_START(wangpc_state::wangpc)
 	MCFG_DEVICE_PROGRAM_MAP(wangpc_mem)
 	MCFG_DEVICE_IO_MAP(wangpc_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE(I8259A_TAG, pic8259_device, inta_cb)
-	//MCFG_QUANTUM_PERFECT_CPU(I8086_TAG)
+	//config.m_perfect_cpu_quantum = subtag(I8086_TAG);
 
 	// devices
 	AM9517A(config, m_dmac, 4000000);
@@ -1330,10 +1330,10 @@ MACHINE_CONFIG_START(wangpc_state::wangpc)
 	UPD765A(config, m_fdc, 8'000'000, false, false);
 	m_fdc->intrq_wr_callback().set(FUNC(wangpc_state::fdc_irq));
 	m_fdc->drq_wr_callback().set(FUNC(wangpc_state::fdc_drq));
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", wangpc_floppies, "525dd", wangpc_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", wangpc_floppies, "525dd", wangpc_state::floppy_formats)
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":0", wangpc_floppies, "525dd", wangpc_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":1", wangpc_floppies, "525dd", wangpc_state::floppy_formats);
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer");
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->set_data_input_buffer(m_cent_data_in);
 	m_centronics->ack_handler().set(FUNC(wangpc_state::write_centronics_ack));
 	m_centronics->busy_handler().set(FUNC(wangpc_state::write_centronics_busy));
@@ -1341,7 +1341,9 @@ MACHINE_CONFIG_START(wangpc_state::wangpc)
 	m_centronics->perror_handler().set(FUNC(wangpc_state::write_centronics_perror));
 
 	INPUT_BUFFER(config, m_cent_data_in);
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+
+	OUTPUT_LATCH(config, m_cent_data_out);
+	m_centronics->set_output_latch(*m_cent_data_out);
 
 	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
 	rs232.rxd_handler().set(m_epci, FUNC(mc2661_device::rx_w));
@@ -1370,7 +1372,7 @@ MACHINE_CONFIG_START(wangpc_state::wangpc)
 	RAM(config, RAM_TAG).set_default_size("128K");
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "wangpc")
+	SOFTWARE_LIST(config, "flop_list").set_original("wangpc");
 MACHINE_CONFIG_END
 
 

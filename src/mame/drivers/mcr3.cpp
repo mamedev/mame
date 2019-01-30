@@ -1085,7 +1085,7 @@ MACHINE_CONFIG_START(mcr3_state::mcrmono)
 	m_maincpu->set_addrmap(AS_IO, &mcr3_state::mcrmono_portmap);
 	m_maincpu->set_daisy_config(mcr_daisy_chain);
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mcr3_state, mcr_interrupt, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(mcr3_state::mcr_interrupt), "screen", 0, 1);
 
 	Z80CTC(config, m_ctc, MASTER_CLOCK/4 /* same as "maincpu" */);
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);

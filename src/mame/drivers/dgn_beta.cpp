@@ -373,14 +373,10 @@ MACHINE_CONFIG_START(dgn_beta_state::dgnbeta)
 	m_fdc->intrq_wr_callback().set(FUNC(dgn_beta_state::dgnbeta_fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(dgn_beta_state::dgnbeta_fdc_drq_w));
 
-	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":0", dgnbeta_floppies, "dd", dgn_beta_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":1", dgnbeta_floppies, "dd", dgn_beta_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":2", dgnbeta_floppies, nullptr, dgn_beta_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":3", dgnbeta_floppies, nullptr, dgn_beta_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, FDC_TAG ":0", dgnbeta_floppies, "dd", dgn_beta_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, FDC_TAG ":1", dgnbeta_floppies, "dd", dgn_beta_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, FDC_TAG ":2", dgnbeta_floppies, nullptr, dgn_beta_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, FDC_TAG ":3", dgnbeta_floppies, nullptr, dgn_beta_state::floppy_formats).enable_sound(true);
 
 	HD6845(config, m_mc6845, 12.288_MHz_XTAL / 16);    //XTAL is guessed
 	m_mc6845->set_screen("screen");
@@ -398,7 +394,7 @@ MACHINE_CONFIG_START(dgn_beta_state::dgnbeta)
 	/* in blocks of 128K up to this maximum.                                                    */
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "dgnbeta_flop")
+	SOFTWARE_LIST(config, "flop_list").set_original("dgnbeta_flop");
 MACHINE_CONFIG_END
 
 ROM_START(dgnbeta)

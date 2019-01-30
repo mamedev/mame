@@ -136,8 +136,8 @@ MACHINE_CONFIG_START(instantm_state::instantm)
 	MCFG_DEVICE_IO_MAP(sub_io)
 
 	// all guesswork
-	MCFG_DEVICE_ADD("voice_clock", CLOCK, 24000)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, instantm_state, clock_w))
+	clock_device &voice_clock(CLOCK(config, "voice_clock", 24000));
+	voice_clock.signal_handler().set(FUNC(instantm_state::clock_w));
 
 	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)

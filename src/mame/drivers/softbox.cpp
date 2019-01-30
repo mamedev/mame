@@ -407,7 +407,7 @@ MACHINE_CONFIG_START(softbox_state::softbox)
 	MCFG_IMI7000_BUS_ADD("imi5000h", nullptr, nullptr, nullptr)
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "softbox")
+	SOFTWARE_LIST(config, "flop_list").set_original("softbox");
 MACHINE_CONFIG_END
 
 

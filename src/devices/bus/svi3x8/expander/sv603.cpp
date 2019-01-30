@@ -46,7 +46,7 @@ MACHINE_CONFIG_START(sv603_device::device_add_mconfig)
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "coleco_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,rom,col")
 	MCFG_GENERIC_LOAD(sv603_device, cartridge)
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "coleco")
+	SOFTWARE_LIST(config, "cart_list").set_original("coleco");
 MACHINE_CONFIG_END
 
 

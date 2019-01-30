@@ -22,7 +22,7 @@
 
 #define VERBOSE_MDA 0       /* MDA (Monochrome Display Adapter) */
 
-#define MDA_CLOCK   16257000
+#define MDA_CLOCK   16.257_MHz_XTAL
 
 #define MDA_LOG(N,M,A) \
 	do { \

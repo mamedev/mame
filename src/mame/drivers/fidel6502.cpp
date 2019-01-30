@@ -534,10 +534,10 @@ private:
 	// common
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE); }
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE); }
-	TIMER_DEVICE_CALLBACK_MEMBER(dummy) { ; } // MCFG_QUANTUM_PERFECT_CPU("maincpu") didn't work
+	TIMER_DEVICE_CALLBACK_MEMBER(dummy) { ; } // config.m_perfect_cpu_quantum = subtag("maincpu"); didn't work
 
-	DECLARE_WRITE8_MEMBER(div_trampoline_w);
-	DECLARE_READ8_MEMBER(div_trampoline_r);
+	void div_trampoline_w(offs_t offset, u8 data);
+	u8 div_trampoline_r(offs_t offset);
 	void div_set_cpu_freq(offs_t offset);
 	void div_trampoline(address_map &map);
 	u16 m_div_status;
@@ -670,18 +670,18 @@ void fidel6502_state::div_set_cpu_freq(offs_t offset)
 	m_div_status = status;
 }
 
-WRITE8_MEMBER(fidel6502_state::div_trampoline_w)
+void fidel6502_state::div_trampoline_w(offs_t offset, u8 data)
 {
 	div_set_cpu_freq(offset);
-	m_mainmap->write8(space, offset, data);
+	m_mainmap->write8(offset, data);
 }
 
-READ8_MEMBER(fidel6502_state::div_trampoline_r)
+u8 fidel6502_state::div_trampoline_r(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
 		div_set_cpu_freq(offset);
 
-	return m_mainmap->read8(space, offset);
+	return m_mainmap->read8(offset);
 }
 
 void fidel6502_state::div_trampoline(address_map &map)
@@ -2296,7 +2296,7 @@ ROM_END
 
 ROM_START( csc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("101-64109", 0x2000, 0x2000, CRC(08a3577c) SHA1(69fe379d21a9d4b57c84c3832d7b3e7431eec341) )
+	ROM_LOAD("101-64019", 0x2000, 0x2000, CRC(08a3577c) SHA1(69fe379d21a9d4b57c84c3832d7b3e7431eec341) )
 	ROM_LOAD("1025a03",   0xa000, 0x2000, CRC(63982c07) SHA1(5ed4356323d5c80df216da55994abe94ba4aa94c) )
 	ROM_LOAD("1025a02",   0xc000, 0x2000, CRC(9e6e7c69) SHA1(4f1ed9141b6596f4d2b1217d7a4ba48229f3f1b0) )
 	ROM_LOAD("1025a01",   0xe000, 0x2000, CRC(57f068c3) SHA1(7d2ac4b9a2fba19556782863bdd89e2d2d94e97b) )
@@ -2309,7 +2309,7 @@ ROM_END
 
 ROM_START( cscsp )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("101-64109", 0x2000, 0x2000, CRC(08a3577c) SHA1(69fe379d21a9d4b57c84c3832d7b3e7431eec341) )
+	ROM_LOAD("101-64019", 0x2000, 0x2000, CRC(08a3577c) SHA1(69fe379d21a9d4b57c84c3832d7b3e7431eec341) )
 	ROM_LOAD("1025a03",   0xa000, 0x2000, CRC(63982c07) SHA1(5ed4356323d5c80df216da55994abe94ba4aa94c) )
 	ROM_LOAD("1025a02",   0xc000, 0x2000, CRC(9e6e7c69) SHA1(4f1ed9141b6596f4d2b1217d7a4ba48229f3f1b0) )
 	ROM_LOAD("1025a01",   0xe000, 0x2000, CRC(57f068c3) SHA1(7d2ac4b9a2fba19556782863bdd89e2d2d94e97b) )
@@ -2321,7 +2321,7 @@ ROM_END
 
 ROM_START( cscg )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("101-64109", 0x2000, 0x2000, CRC(08a3577c) SHA1(69fe379d21a9d4b57c84c3832d7b3e7431eec341) )
+	ROM_LOAD("101-64019", 0x2000, 0x2000, CRC(08a3577c) SHA1(69fe379d21a9d4b57c84c3832d7b3e7431eec341) )
 	ROM_LOAD("1025a03",   0xa000, 0x2000, CRC(63982c07) SHA1(5ed4356323d5c80df216da55994abe94ba4aa94c) )
 	ROM_LOAD("1025a02",   0xc000, 0x2000, CRC(9e6e7c69) SHA1(4f1ed9141b6596f4d2b1217d7a4ba48229f3f1b0) )
 	ROM_LOAD("1025a01",   0xe000, 0x2000, CRC(57f068c3) SHA1(7d2ac4b9a2fba19556782863bdd89e2d2d94e97b) )
@@ -2333,7 +2333,7 @@ ROM_END
 
 ROM_START( cscfr )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("101-64109", 0x2000, 0x2000, CRC(08a3577c) SHA1(69fe379d21a9d4b57c84c3832d7b3e7431eec341) )
+	ROM_LOAD("101-64019", 0x2000, 0x2000, CRC(08a3577c) SHA1(69fe379d21a9d4b57c84c3832d7b3e7431eec341) )
 	ROM_LOAD("1025a03",   0xa000, 0x2000, CRC(63982c07) SHA1(5ed4356323d5c80df216da55994abe94ba4aa94c) )
 	ROM_LOAD("1025a02",   0xc000, 0x2000, CRC(9e6e7c69) SHA1(4f1ed9141b6596f4d2b1217d7a4ba48229f3f1b0) )
 	ROM_LOAD("1025a01",   0xe000, 0x2000, CRC(57f068c3) SHA1(7d2ac4b9a2fba19556782863bdd89e2d2d94e97b) )

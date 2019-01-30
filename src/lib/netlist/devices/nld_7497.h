@@ -22,8 +22,8 @@
  *
  *  When the rate input is binary 0 (all rate inputs low), Z remains high [and Y low].
  *
- *  The unity/cascade input, when connected to the clock input, passes 
- *    clock frequency (inverted) to the Y output when the rate input/decoding 
+ *  The unity/cascade input, when connected to the clock input, passes
+ *    clock frequency (inverted) to the Y output when the rate input/decoding
  *    gates are inhibited by the strobe.
  *
  *  When CLR is H, states of CLK and STRB can affect Y and Z.  Default are

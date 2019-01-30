@@ -233,7 +233,7 @@ DEVICE_IMAGE_UNLOAD_MEMBER( nascom_state, nascom1_cassette )
 
 SNAPSHOT_LOAD_MEMBER( nascom_state, nascom1 )
 {
-	uint8_t line[28];
+	uint8_t line[29];
 
 	while (image.fread(&line, sizeof(line)) == sizeof(line))
 	{
@@ -264,7 +264,7 @@ SNAPSHOT_LOAD_MEMBER( nascom_state, nascom1 )
 
 SNAPSHOT_LOAD_MEMBER(nascom_state, charrom)
 {
-	uint8_t line[28];
+	uint8_t line[29];
 
 	while (image.fread(&line, sizeof(line)) == sizeof(line))
 	{

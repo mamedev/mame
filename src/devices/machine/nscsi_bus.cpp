@@ -564,16 +564,16 @@ void nscsi_full_device::scsi_status_complete(uint8_t st)
 
 void nscsi_full_device::scsi_data_in(int buf, int size)
 {
-	if(VERBOSE & LOG_DATA_SENT) {
+	if((VERBOSE & LOG_DATA_SENT) && buf == 0) {
 		std::string dt = "";
 		int sz = size;
 		if(sz > 50)
 			sz = 50;
-		for(int i=0; i<size; i++)
+		for(int i=0; i<sz; i++)
 			dt += util::string_format(" %02x", scsi_cmdbuf[i]);
 		if(size > sz)
 			dt += " ...";
-		LOGMASKED(LOG_DATA_SENT, "Sending data%s\n", dt);
+		LOGMASKED(LOG_DATA_SENT, "Sending data (%d)%s\n", size, dt);
 	}
 	control *c;
 	c = buf_control_push();

@@ -72,9 +72,9 @@ with MSYS2 and the **pacman** package manager.
   ``/etc/pacman.d/mirrorlist.mame`` for locations.
 * Install packages necessary to build MAME.  At the very least, you'll need
   ``bash``, ``git``, ``make``.
-* For 64-bit builds you'll need ``mingw-w64-i686-gcc`` and
+* For 64-bit builds you'll need ``mingw-w64-x86_64-gcc`` and
   ``mingw-w64-x86_64-python2``.
-* For 32-bit builds you'll need ``mingw-w64-x86_64-gcc`` and
+* For 32-bit builds you'll need ``mingw-w64-i686-gcc`` and
   ``mingw-w64-i686-python2``.
 * For debugging you may want to install ``gdb``.
 * To build against the portable SDL interfaces, you'll need
@@ -319,10 +319,10 @@ ARCHOPTS_CXX
    source files.
 ARCHOPTS_OBJC
    Additional command-line options to pass to the compiler when compiling
-   Objecive-C source files.
+   Objective-C source files.
 ARCHOPTS_OBJCXX
    Additional command-line options to pass to the compiler when compiling
-   Objecive-C++ source files.
+   Objective-C++ source files.
 
 Library/framework locations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -392,8 +392,8 @@ Issues with specific compiler versions
   Adding **DEPRECATED=0** to your build options works around this by disabling
   deprecation warnings.
 * MinGW GCC 7 for Windows i386 produces spurious out-of-bounds access warnings.
-  Adding **NOWERROR=1** to your build options works around this by disabling
-  deprecation warnings.
+  Adding **NOWERROR=1** to your build options works around this by not treating
+  warnings as errors.
 * Initial versions of GNU libstdc++ 6 have a broken ``std::unique_ptr``
   implementation.  If you encounter errors with ``std::unique_ptr`` you need to
   upgrade to a newer version of libstdc++ that fixes the issue.

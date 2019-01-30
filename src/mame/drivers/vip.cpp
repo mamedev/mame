@@ -739,12 +739,12 @@ MACHINE_CONFIG_START(vip_state::vip)
 
 	// devices
 	MCFG_QUICKLOAD_ADD("quickload", vip_state, vip, "bin,c8,c8x", 0)
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
-	MCFG_CASSETTE_INTERFACE("vip_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
+	m_cassette->set_interface("vip_cass");
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "vip")
+	SOFTWARE_LIST(config, "cass_list").set_original("vip");
 
 	// internal ram
 	RAM(config, m_ram).set_default_size("2K").set_extra_options("4K");

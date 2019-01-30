@@ -539,7 +539,7 @@ MACHINE_CONFIG_START(ti68k_state::ti89)
 
 	SHARP_UNK128MBIT(config, "flash");  //should be LH28F320 for ti89t and v200 and LH28F160S3T for other models
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("ti68k_timer", ti68k_state, ti68k_timer_callback, attotime::from_hz(1<<14))
+	TIMER(config, "ti68k_timer").configure_periodic(FUNC(ti68k_state::ti68k_timer_callback), attotime::from_hz(1<<14));
 MACHINE_CONFIG_END
 
 

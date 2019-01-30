@@ -467,10 +467,10 @@ MACHINE_CONFIG_START(mstation_state::mstation)
 	SST_28SF040(config, "flash1");
 
 	// IRQ 4 is generated every second, used for auto power off
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("1hz_timer", mstation_state, mstation_1hz_timer, attotime::from_hz(1))
+	TIMER(config, "1hz_timer").configure_periodic(FUNC(mstation_state::mstation_1hz_timer), attotime::from_hz(1));
 
 	// IRQ 1 is used for scan the kb and for cursor blinking
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("kb_timer", mstation_state, mstation_kb_timer, attotime::from_hz(50))
+	TIMER(config, "kb_timer").configure_periodic(FUNC(mstation_state::mstation_kb_timer), attotime::from_hz(50));
 
 	rp5c01_device &rtc(RP5C01(config, "rtc", XTAL(32'768)));
 	rtc.out_alarm_callback().set(FUNC(mstation_state::rtc_irq));

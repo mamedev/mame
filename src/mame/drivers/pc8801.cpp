@@ -2353,8 +2353,8 @@ MACHINE_CONFIG_START(pc8801_state::pc8801)
 	MCFG_DEVICE_PROGRAM_MAP(pc8801fdc_mem)
 	MCFG_DEVICE_IO_MAP(pc8801fdc_io)
 
-	//MCFG_QUANTUM_TIME(attotime::from_hz(300000))
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	//config.m_minimum_quantum = attotime::from_hz(300000);
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	i8255_device &d8255_master(I8255(config, "d8255_master"));
 	d8255_master.in_pa_callback().set("d8255_slave", FUNC(i8255_device::pb_r));
@@ -2375,19 +2375,19 @@ MACHINE_CONFIG_START(pc8801_state::pc8801)
 	I8214(config, I8214_TAG, MASTER_CLOCK);
 	#endif
 	UPD1990A(config, m_rtc);
-	//MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
+	//CENTRONICS(config, "centronics", centronics_devices, "printer");
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
 
-	MCFG_SOFTWARE_LIST_ADD("tape_list","pc8801_cass")
+	SOFTWARE_LIST(config, "tape_list").set_original("pc8801_cass");
 
 	i8251_device &i8251(I8251(config, I8251_TAG, 0));
 	i8251.txd_handler().set(FUNC(pc8801_state::txdata_callback));
 	i8251.rts_handler().set(FUNC(pc8801_state::rxrdy_w));
 
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", pc88_floppies, "525hd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", pc88_floppies, "525hd", floppy_image_device::default_floppy_formats)
-	MCFG_SOFTWARE_LIST_ADD("disk_list","pc8801_flop")
+	FLOPPY_CONNECTOR(config, "upd765:0", pc88_floppies, "525hd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765:1", pc88_floppies, "525hd", floppy_image_device::default_floppy_formats);
+	SOFTWARE_LIST(config, "disk_list").set_original("pc8801_flop");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2417,7 +2417,7 @@ MACHINE_CONFIG_START(pc8801_state::pc8801)
 	MCFG_DEVICE_ADD("beeper", BEEP, 2400)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("rtc_timer", pc8801_state, pc8801_rtc_irq, attotime::from_hz(600))
+	TIMER(config, "rtc_timer").configure_periodic(FUNC(pc8801_state::pc8801_rtc_irq), attotime::from_hz(600));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pc8801_state::pc8801fh)

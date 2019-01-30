@@ -302,11 +302,11 @@ GFXDECODE_END
 void matmania_state::matmania(machine_config &config)
 {
 	/* basic machine hardware */
-	M6502(config, m_maincpu, 1500000);	/* 1.5 MHz ???? */
+	M6502(config, m_maincpu, 1500000);  /* 1.5 MHz ???? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &matmania_state::matmania_map);
 	m_maincpu->set_vblank_int("screen", FUNC(matmania_state::irq0_line_hold));
 
-	M6502(config, m_audiocpu, 1200000);	/* 1.2 MHz ???? */
+	M6502(config, m_audiocpu, 1200000); /* 1.2 MHz ???? */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &matmania_state::matmania_sound_map);
 	m_audiocpu->set_periodic_int(FUNC(matmania_state::nmi_line_pulse), attotime::from_hz(15*60)); /* ???? */
 

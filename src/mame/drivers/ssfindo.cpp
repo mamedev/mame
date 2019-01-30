@@ -824,7 +824,7 @@ MACHINE_CONFIG_START(ssfindo_state::ppcar)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(ppcar_map)
 
-	MCFG_DEVICE_REMOVE("i2cmem")
+	config.device_remove("i2cmem");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ssfindo_state::tetfight)

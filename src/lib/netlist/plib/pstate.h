@@ -40,7 +40,7 @@ public:
 
 	template<typename T> struct datatype_f
 	{
-		static inline const datatype_t f()
+		static const datatype_t f()
 		{
 			return datatype_t(sizeof(T),
 					plib::is_integral<T>::value || std::is_enum<T>::value,
@@ -103,7 +103,7 @@ public:
 	template<typename C>
 	void save_item(const void *owner, std::vector<C> &v, const pstring &stname)
 	{
-		save_state(v.data(), owner, stname, v.size());
+		save_state_ptr(owner, stname, datatype_f<C>::f(), v.size(), v.data());
 	}
 
 	void pre_save();

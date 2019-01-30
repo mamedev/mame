@@ -304,7 +304,7 @@ void goal92_state::goal92(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(goal92_state::irq6_line_hold)); /* VBL */
 
 	Z80(config, m_audiocpu, 2500000);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &goal92_state::sound_cpu);	/* IRQs are triggered by the main CPU */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &goal92_state::sound_cpu);  /* IRQs are triggered by the main CPU */
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

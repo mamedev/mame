@@ -927,8 +927,8 @@ MACHINE_CONFIG_START(ibm6580_state::ibm6580)
 	m_fdc->intrq_wr_callback().set(FUNC(ibm6580_state::floppy_intrq));
 //  m_fdc->intrq_wr_callback().append(m_pic8259, FUNC(pic8259_device::ir4_w));
 	m_fdc->drq_wr_callback().set(m_dma8257, FUNC(i8257_device::dreq0_w));
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", dw_floppies, "8sssd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", dw_floppies, "8sssd", floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":0", dw_floppies, "8sssd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":1", dw_floppies, "8sssd", floppy_image_device::default_floppy_formats);
 
 	i8251_device &upd8251a(I8251(config, "upd8251a", 0));
 	upd8251a.txd_handler().set("rs232a", FUNC(rs232_port_device::write_txd));
@@ -954,7 +954,7 @@ MACHINE_CONFIG_START(ibm6580_state::ibm6580)
 	rs232b.dsr_handler().set("upd8251b", FUNC(i8251_device::write_dsr));
 	rs232b.cts_handler().set("upd8251b", FUNC(i8251_device::write_cts));
 
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "ibm6580")
+	SOFTWARE_LIST(config, "flop_list").set_original("ibm6580");
 MACHINE_CONFIG_END
 
 /* ROM definition */

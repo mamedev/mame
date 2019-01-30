@@ -255,8 +255,7 @@ MACHINE_CONFIG_START(poly_state::poly)
 
 	ADDRESS_MAP_BANK(config, "bankdev").set_map(&poly_state::poly_bank).set_options(ENDIANNESS_LITTLE, 8, 17, 0x10000);
 
-	MCFG_INPUT_MERGER_ANY_HIGH("irqs")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
+	INPUT_MERGER_ANY_HIGH(config, "irqs").output_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -346,18 +345,20 @@ MACHINE_CONFIG_START(poly_state::poly)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(poly_state::poly2)
+void poly_state::poly2(machine_config &config)
+{
 	poly(config);
 
 	/* internal ram */
 	m_ram->set_default_size("128K");
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_FILTER("flop_list", "POLY2")
-MACHINE_CONFIG_END
+	subdevice<software_list_device>("flop_list")->set_filter("POLY2");
+}
 
 
-MACHINE_CONFIG_START(polydev_state::polydev)
+void polydev_state::polydev(machine_config &config)
+{
 	poly(config);
 
 	/* fdc */
@@ -365,15 +366,13 @@ MACHINE_CONFIG_START(polydev_state::polydev)
 	m_fdc->hld_wr_callback().set(FUNC(polydev_state::motor_w));
 	m_fdc->set_force_ready(true);
 
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", poly_floppies, "525sd", polydev_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", poly_floppies, nullptr, polydev_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, "fdc:0", poly_floppies, "525sd", polydev_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", poly_floppies, nullptr, polydev_state::floppy_formats).enable_sound(true);
 
 	/* remove devices*/
-	//MCFG_DEVICE_REMOVE("netup")
-	//MCFG_DEVICE_REMOVE("netdown")
-MACHINE_CONFIG_END
+	//config.device_remove("netup");
+	//config.device_remove("netdown");
+}
 
 
 /* ROM definition */

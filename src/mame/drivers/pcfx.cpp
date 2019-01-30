@@ -445,7 +445,7 @@ MACHINE_CONFIG_START(pcfx_state::pcfx)
 
 	HUC6271(config, "huc6271", XTAL(21'477'272));
 
-	MCFG_SOFTWARE_LIST_ADD("cd_list", "pcfx")
+	SOFTWARE_LIST(config, "cd_list").set_original("pcfx");
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

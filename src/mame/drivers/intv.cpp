@@ -462,7 +462,7 @@ MACHINE_CONFIG_START(intv_state::intv)
 	MCFG_DEVICE_ADD("maincpu", CP1610, XTAL(3'579'545)/4)        /* Colorburst/4 */
 	MCFG_DEVICE_PROGRAM_MAP(intv_mem)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", intv_state,  intv_interrupt)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("stic", STIC, XTAL(3'579'545))
@@ -492,8 +492,8 @@ MACHINE_CONFIG_START(intv_state::intv)
 	MCFG_INTV_CARTRIDGE_ADD("cartslot", intv_cart, nullptr)
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "intv")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("ecs_list", "intvecs")
+	SOFTWARE_LIST(config, "cart_list").set_original("intv");
+	SOFTWARE_LIST(config, "ecs_list").set_compatible("intvecs");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(intv_state::intv2)
@@ -507,7 +507,7 @@ MACHINE_CONFIG_START(intv_state::intvoice)
 	MCFG_DEVICE_MODIFY( "maincpu" )
 	MCFG_DEVICE_PROGRAM_MAP(intvoice_mem)
 
-	MCFG_DEVICE_REMOVE("cartslot")
+	config.device_remove("cartslot");
 	MCFG_DEVICE_ADD("voice", INTV_ROM_VOICE, 0)
 MACHINE_CONFIG_END
 
@@ -516,7 +516,7 @@ MACHINE_CONFIG_START(intv_state::intvecs)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(intvecs_mem)
 
-	MCFG_DEVICE_REMOVE("cartslot")
+	config.device_remove("cartslot");
 	MCFG_DEVICE_ADD("ecs", INTV_ROM_ECS, 0)
 
 	sp0256_device &speech(SP0256(config, "speech", 3120000));
@@ -524,13 +524,12 @@ MACHINE_CONFIG_START(intv_state::intvecs)
 	speech.add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* cassette */
-	//MCFG_CASSETTE_ADD( "cassette" )
+	//CASSETTE(config, "cassette");
 
 	/* software lists */
-	MCFG_DEVICE_REMOVE("cart_list")
-	MCFG_DEVICE_REMOVE("ecs_list")
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "intvecs")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("intv_list", "intv")
+	config.device_remove("ecs_list");
+	SOFTWARE_LIST(config.replace(), "cart_list").set_original("intvecs");
+	SOFTWARE_LIST(config, "intv_list").set_compatible("intv");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(intv_state::intvkbd)
@@ -542,7 +541,7 @@ MACHINE_CONFIG_START(intv_state::intvkbd)
 	MCFG_DEVICE_PROGRAM_MAP(intvkbd2_mem)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", intv_state,  intv_interrupt2)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	/* video hardware */
 	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_intvkbd)

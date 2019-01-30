@@ -642,7 +642,7 @@ MACHINE_CONFIG_START(z88_state::z88)
 	MCFG_Z88CART_SLOT_OUT_FLP_CB(WRITELINE("blink", upd65031_device, flp_w))
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "z88_cart")
+	SOFTWARE_LIST(config, "cart_list").set_original("z88_cart");
 MACHINE_CONFIG_END
 
 

@@ -657,13 +657,12 @@ MACHINE_CONFIG_START(pcjr_state::ibmpcjr)
 	PC_JOY(config, "pc_joy");
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 
 	UPD765A(config, m_fdc, 8'000'000, false, false);
 
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pcjr_floppies, "525dd", isa8_fdc_device::floppy_formats)
-	MCFG_SLOT_FIXED(true)
+	FLOPPY_CONNECTOR(config, "fdc:0", pcjr_floppies, "525dd", isa8_fdc_device::floppy_formats, true);
 
 	MCFG_PC_KEYB_ADD("pc_keyboard", WRITELINE(*this, pcjr_state, keyb_interrupt))
 
@@ -680,9 +679,9 @@ MACHINE_CONFIG_START(pcjr_state::ibmpcjr)
 	RAM(config, m_ram).set_default_size("640K").set_extra_options("128K, 256K, 512K");
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","ibmpcjr_cart")
-	MCFG_SOFTWARE_LIST_ADD("flop_list","ibmpcjr_flop")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("pc_list","ibm5150")
+	SOFTWARE_LIST(config, "cart_list").set_original("ibmpcjr_cart");
+	SOFTWARE_LIST(config, "flop_list").set_original("ibmpcjr_flop");
+	SOFTWARE_LIST(config, "pc_list").set_compatible("ibm5150");
 MACHINE_CONFIG_END
 
 static GFXDECODE_START( gfx_ibmpcjx )
@@ -690,24 +689,22 @@ static GFXDECODE_START( gfx_ibmpcjx )
 	GFXDECODE_ENTRY( "kanji", 0x0000, kanji_layout, 3, 1 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(pcjr_state::ibmpcjx)
+void pcjr_state::ibmpcjx(machine_config &config)
+{
 	ibmpcjr(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(ibmpcjx_map)
-	MCFG_DEVICE_IO_MAP(ibmpcjx_io)
+	m_maincpu->set_addrmap(AS_PROGRAM, &pcjr_state::ibmpcjx_map);
+	m_maincpu->set_addrmap(AS_IO, &pcjr_state::ibmpcjx_io);
 
-	MCFG_DEVICE_REMOVE("fdc:0");
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pcjr_floppies, "35dd", isa8_fdc_device::floppy_formats)
-	MCFG_SLOT_FIXED(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pcjr_floppies, "35dd", isa8_fdc_device::floppy_formats)
-	MCFG_SLOT_FIXED(true)
+	config.device_remove("fdc:0");
+	FLOPPY_CONNECTOR(config, "fdc:0", pcjr_floppies, "35dd", isa8_fdc_device::floppy_formats, true);
+	FLOPPY_CONNECTOR(config, "fdc:1", pcjr_floppies, "35dd", isa8_fdc_device::floppy_formats, true);
 
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_ibmpcjx);
 
 	/* internal ram */
 	m_ram->set_default_size("512K").set_extra_options(""); // only boots with 512k currently
-MACHINE_CONFIG_END
+}
 
 
 
