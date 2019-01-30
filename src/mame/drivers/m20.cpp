@@ -851,7 +851,7 @@ MACHINE_CONFIG_START(m20_state::m20)
 
 	MCFG_DEVICE_ADD("apb", M20_8086, "maincpu", m_i8259, RAM_TAG)
 
-	MCFG_SOFTWARE_LIST_ADD("flop_list","m20")
+	SOFTWARE_LIST(config, "flop_list").set_original("m20");
 MACHINE_CONFIG_END
 
 ROM_START(m20)

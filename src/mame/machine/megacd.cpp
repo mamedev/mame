@@ -319,7 +319,7 @@ MACHINE_CONFIG_START(sega_segacd_device::device_add_mconfig)
 
 	NVRAM(config, "backupram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_QUANTUM_PERFECT_CPU("segacd_68k") // perfect sync to the fastest cpu
+	config.m_perfect_cpu_quantum = subtag("segacd_68k"); // perfect sync to the fastest cpu
 MACHINE_CONFIG_END
 
 

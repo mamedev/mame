@@ -319,17 +319,17 @@ MACHINE_CONFIG_START(ibmpc_state::ibm5150)
 	RAM(config, RAM_TAG).set_default_size("640K").set_extra_options("64K, 128K, 256K, 512K");
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("disk_list","ibm5150")
-	MCFG_SOFTWARE_LIST_ADD("cass_list","ibm5150_cass")
+	SOFTWARE_LIST(config, "disk_list").set_original("ibm5150");
+	SOFTWARE_LIST(config, "cass_list").set_original("ibm5150_cass");
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(ibmpc_state::ibm5140)
+void ibmpc_state::ibm5140(machine_config &config)
+{
 	ibm5150(config);
 	/* software lists */
-	config.device_remove( "disk_list" );
-	MCFG_SOFTWARE_LIST_ADD("disk_list","ibm5140")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config.replace(), "disk_list").set_original("ibm5140");
+}
 
 
 MACHINE_CONFIG_START(ibmpc_state::ibm5160)
@@ -359,7 +359,7 @@ MACHINE_CONFIG_START(ibmpc_state::ibm5160)
 	RAM(config, RAM_TAG).set_default_size("640K").set_extra_options("64K, 128K, 256K, 512K");
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("pc_disk_list","ibm5150")
+	SOFTWARE_LIST(config, "pc_disk_list").set_original("ibm5150");
 MACHINE_CONFIG_END
 
 

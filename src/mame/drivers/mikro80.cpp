@@ -196,7 +196,7 @@ MACHINE_CONFIG_START(mikro80_state::mikro80)
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
 	m_cassette->set_interface("mikro80_cass");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "mikro80")
+	SOFTWARE_LIST(config, "cass_list").set_original("mikro80");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mikro80_state::radio99)

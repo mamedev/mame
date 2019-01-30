@@ -305,7 +305,7 @@ MACHINE_CONFIG_START(pentagon_state::pentagon)
 
 	config.device_remove("exp");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list_pen","pentagon_cass")
+	SOFTWARE_LIST(config, "cass_list_pen").set_original("pentagon_cass");
 MACHINE_CONFIG_END
 
 void pentagon_state::pent1024(machine_config &config)

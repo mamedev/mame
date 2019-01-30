@@ -509,7 +509,7 @@ MACHINE_CONFIG_START(svision_state::svision_base)
 	MCFG_GENERIC_MANDATORY
 	MCFG_GENERIC_LOAD(svision_state, svision_cart)
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "svision")
+	SOFTWARE_LIST(config, "cart_list").set_original("svision");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(svision_state::svision)

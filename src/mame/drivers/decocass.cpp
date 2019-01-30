@@ -966,7 +966,7 @@ MACHINE_CONFIG_START(decocass_state::decocass)
 	m_mcu->p2_in_cb().set(FUNC(decocass_state::i8041_p2_r));
 	m_mcu->p2_out_cb().set(FUNC(decocass_state::i8041_p2_w));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(4200))              /* interleave CPUs */
+	config.m_minimum_quantum = attotime::from_hz(4200);              /* interleave CPUs */
 
 	WATCHDOG_TIMER(config, m_watchdog);
 

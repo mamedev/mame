@@ -328,7 +328,7 @@ MACHINE_CONFIG_START(leapster_state::leapster)
 	MCFG_GENERIC_LOAD(leapster_state, leapster_cart)
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "leapster")
+	SOFTWARE_LIST(config, "cart_list").set_original("leapster");
 MACHINE_CONFIG_END
 
 #define ROM_LOAD_BIOS(bios,name,offset,length,hash) \

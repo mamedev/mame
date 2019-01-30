@@ -412,8 +412,7 @@ MACHINE_CONFIG_START(proteus_state::proteus)
 	acia2_clock.signal_handler().append(m_acia[2], FUNC(acia6850_device::write_rxc));
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "poly_flop")
-	MCFG_SOFTWARE_LIST_FILTER("flop_list", "PROTEUS")
+	SOFTWARE_LIST(config, "flop_list").set_original("poly_flop").set_filter("PROTEUS");
 MACHINE_CONFIG_END
 
 

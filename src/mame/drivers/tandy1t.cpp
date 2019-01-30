@@ -684,8 +684,8 @@ MACHINE_CONFIG_START(tandy1000_state::tandy1000_common)
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("640K");
 
-	MCFG_SOFTWARE_LIST_ADD("disk_list","t1000")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("pc_list","ibm5150")
+	SOFTWARE_LIST(config, "disk_list").set_original("t1000");
+	SOFTWARE_LIST(config, "pc_list").set_compatible("ibm5150");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(tandy1000_state::tandy1000_90key)

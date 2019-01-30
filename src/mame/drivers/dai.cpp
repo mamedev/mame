@@ -193,7 +193,7 @@ MACHINE_CONFIG_START(dai_state::dai)
 	MCFG_DEVICE_PROGRAM_MAP(dai_mem)
 	MCFG_DEVICE_IO_MAP(dai_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(dai_state,int_ack)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	PIT8253(config, m_pit, 0);
 	m_pit->set_clk<0>(2000000);
@@ -240,7 +240,7 @@ MACHINE_CONFIG_START(dai_state::dai)
 	RAM(config, RAM_TAG).set_default_size("48K");
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "dai_cass")
+	SOFTWARE_LIST(config, "cass_list").set_original("dai_cass");
 MACHINE_CONFIG_END
 
 

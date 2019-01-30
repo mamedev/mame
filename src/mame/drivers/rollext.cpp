@@ -553,7 +553,7 @@ MACHINE_CONFIG_START(rollext_state::rollext)
 	MCFG_DEVICE_ADD("pp0", TMS32082_PP, 60000000)
 	MCFG_DEVICE_PROGRAM_MAP(memmap);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(100))
+	config.m_minimum_quantum = attotime::from_hz(100);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

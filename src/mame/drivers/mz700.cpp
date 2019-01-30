@@ -422,7 +422,7 @@ MACHINE_CONFIG_START(mz_state::mz700)
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->set_interface("mz_cass");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list","mz700_cass")
+	SOFTWARE_LIST(config, "cass_list").set_original("mz700_cass");
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K");
@@ -450,7 +450,7 @@ MACHINE_CONFIG_START(mz_state::mz800)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	config.device_remove("cass_list");
-	MCFG_SOFTWARE_LIST_ADD("cass_list","mz800_cass")
+	SOFTWARE_LIST(config, "cass_list").set_original("mz800_cass");
 
 	/* devices */
 	m_pit->set_clk<0>(XTAL(17'734'470)/16);

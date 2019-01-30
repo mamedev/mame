@@ -264,7 +264,7 @@ MACHINE_CONFIG_START(ikki_state::ikki)
 	MCFG_DEVICE_PROGRAM_MAP(ikki_cpu2)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(ikki_state, irq0_line_hold, 2*(PIXEL_CLOCK/HTOTAL/VTOTAL))
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 
 	/* video hardware */

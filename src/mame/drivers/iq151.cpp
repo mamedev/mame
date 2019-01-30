@@ -470,8 +470,8 @@ MACHINE_CONFIG_START(iq151_state::iq151)
 	MCFG_IQ151CART_SLOT_OUT_IRQ4_CB(WRITELINE(m_pic, pic8259_device, ir4_w))
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "iq151_cart")
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "iq151_flop")
+	SOFTWARE_LIST(config, "cart_list").set_original("iq151_cart");
+	SOFTWARE_LIST(config, "flop_list").set_original("iq151_flop");
 MACHINE_CONFIG_END
 
 /* ROM definition */

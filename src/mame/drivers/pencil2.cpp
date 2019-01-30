@@ -345,7 +345,7 @@ MACHINE_CONFIG_START(pencil2_state::pencil2)
 	m_centronics->set_output_latch(cent_data_out);
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "pencil2")
+	SOFTWARE_LIST(config, "cart_list").set_original("pencil2");
 MACHINE_CONFIG_END
 
 /* ROM definition */

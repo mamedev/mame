@@ -650,7 +650,7 @@ MACHINE_CONFIG_START(hvyunit_state::hvyunit)
 
 	GENERIC_LATCH_8(config, m_slavelatch);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)

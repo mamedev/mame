@@ -631,7 +631,7 @@ MACHINE_CONFIG_START(hp9825_state::hp9825b)
 	m_cpu->pa_changed_cb().set(m_io_sys , FUNC(hp98x5_io_sys_device::pa_w));
 
 	// Needed when 98035 RTC module is connected or time advances at about 1/4 the correct speed (NP misses a lot of 1kHz interrupts)
-	MCFG_QUANTUM_TIME(attotime::from_hz(5000));
+	config.m_minimum_quantum = attotime::from_hz(5000);
 
 	HP98X5_IO_SYS(config , m_io_sys , 0);
 	m_io_sys->irl().set_inputline(m_cpu, HPHYBRID_IRL);

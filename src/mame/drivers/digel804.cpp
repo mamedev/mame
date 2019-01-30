@@ -636,7 +636,7 @@ MACHINE_CONFIG_START(digel804_state::digel804)
 	MCFG_DEVICE_ADD(m_maincpu, Z80, 3.6864_MHz_XTAL/2) /* Z80A, X1(aka E0 on schematics): 3.6864Mhz */
 	MCFG_DEVICE_PROGRAM_MAP(z80_mem_804_1_4)
 	MCFG_DEVICE_IO_MAP(z80_io_1_4)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	ROC10937(config, m_vfd); // RIGHT_TO_LEFT
 

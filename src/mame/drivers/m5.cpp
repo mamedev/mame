@@ -1453,9 +1453,9 @@ MACHINE_CONFIG_START(m5_state::m5)
 	MCFG_M5_CARTRIDGE_ADD("cartslot2", m5_cart, nullptr)
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "m5_cart")
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "m5_cass")
-	//MCFG_SOFTWARE_LIST_ADD("flop_list", "m5_flop")
+	SOFTWARE_LIST(config, "cart_list").set_original("m5_cart");
+	SOFTWARE_LIST(config, "cass_list").set_original("m5_cass");
+	//SOFTWARE_LIST(config, "flop_list").set_original("m5_flop");
 
 	// internal ram
 	//68K is not possible, 'cos internal ram always overlays any expansion memory in that area
@@ -1499,7 +1499,8 @@ void m5_state::pal(machine_config &config)
 //-------------------------------------------------
 
 
-MACHINE_CONFIG_START(brno_state::brno)
+void brno_state::brno(machine_config &config)
+{
 	m5(config);
 
 	// basic machine hardware
@@ -1529,9 +1530,8 @@ MACHINE_CONFIG_START(brno_state::brno)
 	//MCFG_SNAPSHOT_ADD("snapshot", brno_state, brno, "rmd", 0)
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("flop_list","m5_flop")
-
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "flop_list").set_original("m5_flop");
+}
 
 
 //**************************************************************************

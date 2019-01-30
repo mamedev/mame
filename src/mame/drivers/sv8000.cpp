@@ -412,7 +412,7 @@ MACHINE_CONFIG_START(sv8000_state::sv8000)
 	MCFG_GENERIC_LOAD(sv8000_state, cart)
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","sv8000")
+	SOFTWARE_LIST(config, "cart_list").set_original("sv8000");
 MACHINE_CONFIG_END
 
 /* ROM definition */

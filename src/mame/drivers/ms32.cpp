@@ -1712,7 +1712,7 @@ MACHINE_CONFIG_START(ms32_state::ms32)
 	MCFG_DEVICE_ADD("audiocpu", Z80, 8000000) // Z0840008PSC, Clock from notes
 	MCFG_DEVICE_PROGRAM_MAP(ms32_sound_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
+	config.m_minimum_quantum = attotime::from_hz(60000);
 
 
 	/* video hardware */

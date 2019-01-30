@@ -1789,7 +1789,7 @@ void segaxbd_new_state_double::sega_xboard_fd1094_double(machine_config &config)
 	SEGA_XBD_FD1094(config, "mainpcb", 0);
 	SEGA_XBD_FD1094(config, "subpcb", 0);
 
-	//MCFG_QUANTUM_PERFECT_CPU("mainpcb:maincpu") // doesn't help..
+	//config.m_perfect_cpu_quantum = subtag("mainpcb:maincpu"); // doesn't help..
 }
 
 

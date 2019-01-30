@@ -272,7 +272,7 @@ MACHINE_CONFIG_START(aim65_state::aim65)
 	RAM(config, RAM_TAG).set_default_size("4K").set_extra_options("1K,2K,3K");
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","aim65_cart")
+	SOFTWARE_LIST(config, "cart_list").set_original("aim65_cart");
 MACHINE_CONFIG_END
 
 

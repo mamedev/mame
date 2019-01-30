@@ -786,7 +786,7 @@ MACHINE_CONFIG_START(dmv_state::dmv)
 	kbmcu.p1_out_cb().set(FUNC(dmv_state::kb_mcu_port1_w)); // bit 1 data to kb
 	kbmcu.p2_out_cb().set(FUNC(dmv_state::kb_mcu_port2_w));
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	DMV_KEYBOARD(config, m_keyboard, 0);
 
@@ -879,7 +879,7 @@ MACHINE_CONFIG_START(dmv_state::dmv)
 	MCFG_DMVCART_SLOT_OUT_INT_CB(WRITELINE(*this, dmv_state, busint7a_w))
 	MCFG_DMVCART_SLOT_OUT_IRQ_CB(WRITELINE(*this, dmv_state, irq7a_w))
 
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "dmv")
+	SOFTWARE_LIST(config, "flop_list").set_original("dmv");
 
 	MCFG_QUICKLOAD_ADD("quickload", dmv_state, dmv, "com,cpm", 3)
 

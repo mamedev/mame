@@ -244,7 +244,7 @@ MACHINE_CONFIG_START(b2m_state::b2m)
 
 	FLOPPY_CONNECTOR(config, "fd0", b2m_floppies, "525qd", b2m_state::b2m_floppy_formats);
 	FLOPPY_CONNECTOR(config, "fd1", b2m_floppies, "525qd", b2m_state::b2m_floppy_formats);
-	MCFG_SOFTWARE_LIST_ADD("flop_list","b2m")
+	SOFTWARE_LIST(config, "flop_list").set_original("b2m");
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("128K").set_default_value(0x00);

@@ -2201,7 +2201,7 @@ MACHINE_CONFIG_START(vicdual_state::carnival)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(carnival_io_map)
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();

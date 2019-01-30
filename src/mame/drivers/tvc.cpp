@@ -836,9 +836,9 @@ MACHINE_CONFIG_START(tvc_state::tvc)
 	MCFG_QUICKLOAD_ADD("quickload", tvc_state, tvc64, "cas", 6)
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "tvc_cart")
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "tvc_cass")
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "tvc_flop")
+	SOFTWARE_LIST(config, "cart_list").set_original("tvc_cart");
+	SOFTWARE_LIST(config, "cass_list").set_original("tvc_cass");
+	SOFTWARE_LIST(config, "flop_list").set_original("tvc_flop");
 MACHINE_CONFIG_END
 
 /* ROM definition */

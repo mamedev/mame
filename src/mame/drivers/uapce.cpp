@@ -316,7 +316,7 @@ MACHINE_CONFIG_START(uapce_state::uapce)
 	MCFG_DEVICE_ADD("sub", Z80, 1400000)
 	MCFG_DEVICE_PROGRAM_MAP(z80_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

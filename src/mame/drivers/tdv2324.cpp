@@ -305,7 +305,7 @@ MACHINE_CONFIG_START(tdv2324_state::tdv2324)
 	RAM(config, RAM_TAG).set_default_size("64K");
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "tdv2324")
+	SOFTWARE_LIST(config, "flop_list").set_original("tdv2324");
 MACHINE_CONFIG_END
 
 

@@ -576,7 +576,7 @@ MACHINE_CONFIG_START(europc_pc_state::europc)
 	RAM(config, m_ram).set_default_size("512K").set_extra_options("256K, 640K");
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("disk_list", "ibm5150")
+	SOFTWARE_LIST(config, "disk_list").set_original("ibm5150");
 MACHINE_CONFIG_END
 
 //Euro PC II

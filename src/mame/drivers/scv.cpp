@@ -676,7 +676,7 @@ MACHINE_CONFIG_START(scv_state::scv)
 	MCFG_SCV_CARTRIDGE_ADD("cartslot", scv_cart, nullptr)
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","scv")
+	SOFTWARE_LIST(config, "cart_list").set_original("scv");
 MACHINE_CONFIG_END
 
 

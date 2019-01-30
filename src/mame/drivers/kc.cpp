@@ -103,7 +103,7 @@ MACHINE_CONFIG_START(kc_state::kc85_3)
 	m_maincpu->set_addrmap(AS_IO, &kc_state::kc85_3_io);
 	m_maincpu->set_daisy_config(kc85_daisy_chain);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	Z80PIO(config, m_z80pio, KC85_3_CLOCK);
 	m_z80pio->out_int_callback().set_inputline(m_maincpu, 0);
@@ -168,9 +168,9 @@ MACHINE_CONFIG_START(kc_state::kc85_3)
 	MCFG_KCEXP_SLOT_OUT_HALT_CB(INPUTLINE("maincpu", INPUT_LINE_HALT))
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "kc_cart")
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "kc_flop")
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "kc_cass")
+	SOFTWARE_LIST(config, "cart_list").set_original("kc_cart");
+	SOFTWARE_LIST(config, "flop_list").set_original("kc_flop");
+	SOFTWARE_LIST(config, "cass_list").set_original("kc_cass");
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("16K");
@@ -183,7 +183,7 @@ MACHINE_CONFIG_START(kc85_4_state::kc85_4)
 	m_maincpu->set_addrmap(AS_PROGRAM, &kc85_4_state::kc85_4_mem);
 	m_maincpu->set_addrmap(AS_IO, &kc85_4_state::kc85_4_io);
 	m_maincpu->set_daisy_config(kc85_daisy_chain);
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	Z80PIO(config, m_z80pio, KC85_4_CLOCK);
 	m_z80pio->out_int_callback().set_inputline(m_maincpu, 0);
@@ -248,9 +248,9 @@ MACHINE_CONFIG_START(kc85_4_state::kc85_4)
 	MCFG_KCEXP_SLOT_OUT_HALT_CB(INPUTLINE("maincpu", INPUT_LINE_HALT))
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "kc_cart")
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "kc_flop")
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "kc_cass")
+	SOFTWARE_LIST(config, "cart_list").set_original("kc_cart");
+	SOFTWARE_LIST(config, "flop_list").set_original("kc_flop");
+	SOFTWARE_LIST(config, "cass_list").set_original("kc_cass");
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("64K");

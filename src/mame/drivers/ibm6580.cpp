@@ -954,7 +954,7 @@ MACHINE_CONFIG_START(ibm6580_state::ibm6580)
 	rs232b.dsr_handler().set("upd8251b", FUNC(i8251_device::write_dsr));
 	rs232b.cts_handler().set("upd8251b", FUNC(i8251_device::write_cts));
 
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "ibm6580")
+	SOFTWARE_LIST(config, "flop_list").set_original("ibm6580");
 MACHINE_CONFIG_END
 
 /* ROM definition */

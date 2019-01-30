@@ -896,8 +896,8 @@ MACHINE_CONFIG_START(hx20_state::hx20)
 	MCFG_GENERIC_LOAD(hx20_state, optrom_load)
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("hx20_opt_list", "hx20_rom")
-	MCFG_SOFTWARE_LIST_ADD("epson_cpm_list", "epson_cpm")
+	SOFTWARE_LIST(config, "hx20_opt_list").set_original("hx20_rom");
+	SOFTWARE_LIST(config, "epson_cpm_list").set_original("epson_cpm");
 MACHINE_CONFIG_END
 
 
@@ -905,7 +905,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( hx20 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(hx20_state::cm6000)
+void hx20_state::cm6000(machine_config &config)
+{
 	hx20(config);
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &hx20_state::cm6000_mem);
@@ -914,9 +915,9 @@ MACHINE_CONFIG_START(hx20_state::cm6000)
 	config.device_remove("optrom");
 
 	// software lists
-	MCFG_SOFTWARE_LIST_REMOVE("epson_cpm_list")
-	MCFG_SOFTWARE_LIST_REMOVE("hx20_opt_list")
-MACHINE_CONFIG_END
+	config.device_remove("epson_cpm_list");
+	config.device_remove("hx20_opt_list");
+}
 
 
 //**************************************************************************

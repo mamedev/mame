@@ -934,7 +934,7 @@ MACHINE_CONFIG_START(spc1500_state::spc1500)
 	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_MUTED | CASSETTE_MOTOR_DISABLED);
 	m_cass->set_interface("spc1500_cass");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "spc1500_cass")
+	SOFTWARE_LIST(config, "cass_list").set_original("spc1500_cass");
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K");

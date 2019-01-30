@@ -1029,11 +1029,11 @@ MACHINE_CONFIG_START(v1050_state::v1050)
 	MCFG_DEVICE_IO_MAP(v1050_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(v1050_state,v1050_int_ack)
 
-	MCFG_QUANTUM_PERFECT_CPU(Z80_TAG)
+	config.m_perfect_cpu_quantum = subtag(Z80_TAG);
 
 	MCFG_DEVICE_ADD(M6502_TAG, M6502, 15.36_MHz_XTAL/16)
 	MCFG_DEVICE_PROGRAM_MAP(v1050_crt_mem)
-	MCFG_QUANTUM_PERFECT_CPU(M6502_TAG)
+	config.m_perfect_cpu_quantum = subtag(M6502_TAG);
 
 	// keyboard HACK
 	TIMER(config, "keyboard").configure_periodic(FUNC(v1050_state::v1050_keyboard_tick), attotime::from_hz(60));
@@ -1125,8 +1125,8 @@ MACHINE_CONFIG_START(v1050_state::v1050)
 	TIMER(config, m_timer_rst).configure_generic(FUNC(v1050_state::sasi_rst_tick));
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "v1050_flop")
-	MCFG_SOFTWARE_LIST_ADD("hdd_list", "v1050_hdd")
+	SOFTWARE_LIST(config, "flop_list").set_original("v1050_flop");
+	SOFTWARE_LIST(config, "hdd_list").set_original("v1050_hdd");
 
 	// printer
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");

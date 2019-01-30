@@ -685,7 +685,7 @@ MACHINE_CONFIG_START(dc_cons_state::dc)
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("gdrom", gdrom_config)
 	MCFG_SLOT_DEFAULT_OPTION("gdrom")
 
-	MCFG_SOFTWARE_LIST_ADD("cd_list","dc")
+	SOFTWARE_LIST(config, "cd_list").set_original("dc");
 MACHINE_CONFIG_END
 
 

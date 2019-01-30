@@ -1531,8 +1531,8 @@ MACHINE_CONFIG_START(x07_state::x07)
 	m_cassette->set_interface("x07_cass");
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("card_list", "x07_card")
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "x07_cass")
+	SOFTWARE_LIST(config, "card_list").set_original("x07_card");
+	SOFTWARE_LIST(config, "cass_list").set_original("x07_cass");
 MACHINE_CONFIG_END
 
 /* ROM definition */

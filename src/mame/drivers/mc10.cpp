@@ -537,7 +537,7 @@ MACHINE_CONFIG_START(mc10_state::mc10)
 	RAM(config, m_ram).set_default_size("20K").set_extra_options("4K");
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "mc10")
+	SOFTWARE_LIST(config, "cass_list").set_original("mc10");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mc10_state::alice32)
@@ -579,21 +579,22 @@ MACHINE_CONFIG_START(mc10_state::alice32)
 	RAM(config, m_ram).set_default_size("24K").set_extra_options("8K");
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "alice32")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("mc10_cass", "mc10")
+	SOFTWARE_LIST(config, "cass_list").set_original("alice32");
+	SOFTWARE_LIST(config, "mc10_cass").set_compatible("mc10");
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(mc10_state::alice90)
+void mc10_state::alice90(machine_config &config)
+{
 	alice32(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mc10_state::alice90_mem);
 
 	m_ram->set_default_size("32K");
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_MODIFY("cass_list", "alice90")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("alice32_cass", "alice32")
+	subdevice<software_list_device>("cass_list")->set_original("alice90");
+	SOFTWARE_LIST(config, "alice32_cass").set_compatible("alice32");
 	config.device_remove("mc10_cass");
-MACHINE_CONFIG_END
+}
 
 }
 

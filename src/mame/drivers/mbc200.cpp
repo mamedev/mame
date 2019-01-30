@@ -355,7 +355,7 @@ MACHINE_CONFIG_START(mbc200_state::mbc200)
 	keyboard.set_keyboard_callback(FUNC(mbc200_state::kbd_put));
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "mbc200")
+	SOFTWARE_LIST(config, "flop_list").set_original("mbc200");
 MACHINE_CONFIG_END
 
 /* ROM definition */

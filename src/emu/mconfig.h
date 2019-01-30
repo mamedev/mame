@@ -245,19 +245,11 @@ Ends a machine_config.
 /** @name Core machine config options */
 //*************************************************************************/
 
-// scheduling parameters
-#define MCFG_QUANTUM_TIME(_time) \
-	config.m_minimum_quantum = _time;
-#define MCFG_QUANTUM_PERFECT_CPU(_cputag) \
-	config.m_perfect_cpu_quantum = subtag(_cputag);
-
 // add/remove devices
 #define MCFG_DEVICE_ADD(_tag, ...) \
 	device = emu::detail::device_add_impl(config, _tag, __VA_ARGS__);
 #define MCFG_DEVICE_REPLACE(_tag, ...) \
 	device = emu::detail::device_replace_impl(config, _tag, __VA_ARGS__);
-#define MCFG_DEVICE_REMOVE(_tag) \
-	device = config.device_remove(_tag);
 #define MCFG_DEVICE_MODIFY(_tag)    \
 	device = config.device_find(this, _tag);
 

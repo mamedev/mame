@@ -642,31 +642,33 @@ MACHINE_CONFIG_START(bw12_state::common)
 	m_centronics->set_output_latch(cent_data_out);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(bw12_state::bw12)
+void bw12_state::bw12(machine_config &config)
+{
 	common(config);
 	/* floppy drives */
 	FLOPPY_CONNECTOR(config, UPD765_TAG ":1", bw12_floppies, "525dd", bw12_state::bw12_floppy_formats);
 	FLOPPY_CONNECTOR(config, UPD765_TAG ":2", bw12_floppies, "525dd", bw12_state::bw12_floppy_formats);
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "bw12")
+	SOFTWARE_LIST(config, "flop_list").set_original("bw12");
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(bw12_state::bw14)
+void bw12_state::bw14(machine_config &config)
+{
 	common(config);
 	/* floppy drives */
 	FLOPPY_CONNECTOR(config, UPD765_TAG ":1", bw14_floppies, "525dd", bw12_state::bw14_floppy_formats);
 	FLOPPY_CONNECTOR(config, UPD765_TAG ":2", bw14_floppies, "525dd", bw12_state::bw14_floppy_formats);
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "bw14")
+	SOFTWARE_LIST(config, "flop_list").set_original("bw14");
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("128K");
-MACHINE_CONFIG_END
+	}
 
 /* ROMs */
 

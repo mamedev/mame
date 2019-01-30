@@ -208,7 +208,7 @@ MACHINE_CONFIG_START(galaxy_state::galaxy)
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
 	m_cassette->set_interface("galaxy_cass");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list","galaxy")
+	SOFTWARE_LIST(config, "cass_list").set_original("galaxy");
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("6K").set_extra_options("2K,22K,38K,54K");
@@ -249,7 +249,7 @@ MACHINE_CONFIG_START(galaxy_state::galaxyp)
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
 	m_cassette->set_interface("galaxy_cass");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list","galaxy")
+	SOFTWARE_LIST(config, "cass_list").set_original("galaxy");
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("38K");

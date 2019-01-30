@@ -1698,7 +1698,7 @@ MACHINE_CONFIG_START(gp32_state::gp32)
 
 	SMARTMEDIA(config, m_smartmedia, 0);
 
-	MCFG_SOFTWARE_LIST_ADD("memc_list","gp32")
+	SOFTWARE_LIST(config, "memc_list").set_original("gp32");
 MACHINE_CONFIG_END
 
 ROM_START( gp32 )

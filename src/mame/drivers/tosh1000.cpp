@@ -277,7 +277,7 @@ MACHINE_CONFIG_START(tosh1000_state::tosh1000)
 	MCFG_DEVICE_ADD("isa5", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
 	MCFG_DEVICE_ADD("isa6", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
 
-//  MCFG_SOFTWARE_LIST_ADD("flop_list","tosh1000")
+//  SOFTWARE_LIST(config, "flop_list").set_original("tosh1000");
 
 	// uses a 80C50 instead of 8042 for KBDC
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270)

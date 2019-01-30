@@ -401,7 +401,7 @@ MACHINE_CONFIG_START(tourvision_state::tourvision)
 	m_maincpu->add_route(0, "lspeaker", 1.00);
 	m_maincpu->add_route(1, "rspeaker", 1.00);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	MCFG_DEVICE_ADD("subcpu", I8085A, 18000000/3 /*?*/)
 	MCFG_DEVICE_PROGRAM_MAP(tourvision_8085_map)
@@ -436,7 +436,7 @@ MACHINE_CONFIG_START(tourvision_state::tourvision)
 	MCFG_GENERIC_LOAD(tourvision_state, tourvision_cart)
 	MCFG_GENERIC_MANDATORY
 
-	MCFG_SOFTWARE_LIST_ADD("tv_list","pce_tourvision")
+	SOFTWARE_LIST(config, "tv_list").set_original("pce_tourvision");
 
 
 MACHINE_CONFIG_END

@@ -699,7 +699,7 @@ MACHINE_CONFIG_START(spectrum_state::ts2068)
 	MCFG_DEVICE_PROGRAM_MAP(ts2068_mem)
 	MCFG_DEVICE_IO_MAP(ts2068_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", spectrum_state,  spec_interrupt)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	MCFG_MACHINE_RESET_OVERRIDE(spectrum_state, ts2068 )
 
@@ -724,7 +724,7 @@ MACHINE_CONFIG_START(spectrum_state::ts2068)
 	MCFG_GENERIC_LOAD(spectrum_state, timex_cart)
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "timex_dock")
+	SOFTWARE_LIST(config, "cart_list").set_original("timex_dock");
 
 	/* internal ram */
 	m_ram->set_default_size("48K");

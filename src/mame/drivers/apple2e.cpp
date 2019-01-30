@@ -4058,7 +4058,7 @@ MACHINE_CONFIG_START(apple2e_state::apple2e)
 	MCFG_A2EAUXSLOT_OUT_NMI_CB(WRITELINE(*this, apple2e_state, a2bus_nmi_w))
 	MCFG_A2EAUXSLOT_SLOT_ADD(A2_AUXSLOT_TAG, "aux", apple2eaux_cards, "ext80")   // default to an extended 80-column card
 
-	MCFG_SOFTWARE_LIST_ADD("flop525_list","apple2")
+	SOFTWARE_LIST(config, "flop525_list").set_original("apple2");
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED);

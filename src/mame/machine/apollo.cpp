@@ -1142,7 +1142,7 @@ MACHINE_CONFIG_START(apollo_state::common)
 	MCFG_DEVICE_ADD("isa6", ISA16_SLOT, 0, APOLLO_ISA_TAG, apollo_isa_cards, nullptr, false)
 	MCFG_DEVICE_ADD("isa7", ISA16_SLOT, 0, APOLLO_ISA_TAG, apollo_isa_cards, nullptr, false)
 
-	MCFG_SOFTWARE_LIST_ADD("ctape_list", "apollo_ctape")
+	SOFTWARE_LIST(config, "ctape_list").set_original("apollo_ctape");
 MACHINE_CONFIG_END
 
 // for machines with the keyboard and a graphics head

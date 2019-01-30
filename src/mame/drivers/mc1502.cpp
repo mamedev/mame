@@ -307,8 +307,8 @@ MACHINE_CONFIG_START(mc1502_state::mc1502)
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 
-	MCFG_SOFTWARE_LIST_ADD("flop_list","mc1502_flop")
-//  MCFG_SOFTWARE_LIST_ADD("cass_list","mc1502_cass")
+	SOFTWARE_LIST(config, "flop_list").set_original("mc1502_flop");
+//  SOFTWARE_LIST(config, "cass_list").set_original("mc1502_cass");
 
 	RAM(config, RAM_TAG).set_default_size("608K").set_extra_options("96K"); /* 96 base + 512 on expansion card */
 MACHINE_CONFIG_END

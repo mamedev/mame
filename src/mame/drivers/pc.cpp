@@ -221,7 +221,7 @@ MACHINE_CONFIG_START(pc_state::pccga)
 	RAM(config, RAM_TAG).set_default_size("640K").set_extra_options("64K, 128K, 256K, 512K");
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("disk_list","ibm5150")
+	SOFTWARE_LIST(config, "disk_list").set_original("ibm5150");
 MACHINE_CONFIG_END
 
 
@@ -1082,7 +1082,7 @@ MACHINE_CONFIG_START(pc_state::laser_turbo_xt)
 	RAM(config, RAM_TAG).set_default_size("640K").set_extra_options("512K,768K,896K,1024K,1408K,1536K,1664K");
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("disk_list","ibm5150")
+	SOFTWARE_LIST(config, "disk_list").set_original("ibm5150");
 MACHINE_CONFIG_END
 
 ROM_START( laser_turbo_xt )
@@ -1158,7 +1158,7 @@ MACHINE_CONFIG_START(pc_state::zenith)
 	RAM(config, RAM_TAG).set_default_size("640K").set_extra_options("128K, 256K, 512K");
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("disk_list","ibm5150")
+	SOFTWARE_LIST(config, "disk_list").set_original("ibm5150");
 MACHINE_CONFIG_END
 
 ROM_START( zdsupers )

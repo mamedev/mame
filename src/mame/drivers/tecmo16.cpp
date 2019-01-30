@@ -364,7 +364,7 @@ MACHINE_CONFIG_START(tecmo16_state::fstarfrc)
 	MCFG_DEVICE_ADD("audiocpu", Z80,MASTER_CLOCK/6)         /* 4MHz */
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 								/* NMIs are triggered by the main CPU */
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	config.m_minimum_quantum = attotime::from_hz(600);
 
 	/* video hardware */
 	BUFFERED_SPRITERAM16(config, m_spriteram);

@@ -198,7 +198,7 @@ MACHINE_CONFIG_START(orao_state::orao)
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
 	m_cassette->set_interface("orao_cass");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list","orao")
+	SOFTWARE_LIST(config, "cass_list").set_original("orao");
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -495,11 +495,9 @@ MACHINE_CONFIG_START(coco12_state::coco)
 	coco_floating(config);
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("coco_cart_list", "coco_cart")
-	MCFG_SOFTWARE_LIST_FILTER("coco_cart_list", "COCO")
-	MCFG_SOFTWARE_LIST_ADD("coco_flop_list", "coco_flop")
-	MCFG_SOFTWARE_LIST_FILTER("coco_flop_list", "COCO")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("dragon_cart_list", "dragon_cart")
+	SOFTWARE_LIST(config, "coco_cart_list").set_original("coco_cart").set_filter("COCO");
+	SOFTWARE_LIST(config, "coco_flop_list").set_original("coco_flop").set_filter("COCO");
+	SOFTWARE_LIST(config, "dragon_cart_list").set_compatible("dragon_cart");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(coco12_state::cocoh)

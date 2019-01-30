@@ -308,11 +308,12 @@ void phc25_state::video_start()
 
 /* Machine Driver */
 
-MACHINE_CONFIG_START(phc25_state::phc25)
+void phc25_state::phc25(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(phc25_mem)
-	MCFG_DEVICE_IO_MAP(phc25_io)
+	Z80(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &phc25_state::phc25_mem);
+	m_maincpu->set_addrmap(AS_IO, &phc25_state::phc25_io);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -338,8 +339,8 @@ MACHINE_CONFIG_START(phc25_state::phc25)
 	RAM(config, RAM_TAG).set_default_size("16K");
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "phc25_cass")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cass_list").set_original("phc25_cass");
+}
 
 void phc25_state::pal(machine_config &config)
 {

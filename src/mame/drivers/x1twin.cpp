@@ -485,7 +485,7 @@ MACHINE_CONFIG_START(x1twin_state::x1twin)
 	FLOPPY_CONNECTOR(config, "fdc:2", x1_floppies, "dd", x1_state::floppy_formats);
 	FLOPPY_CONNECTOR(config, "fdc:3", x1_floppies, "dd", x1_state::floppy_formats);
 
-	MCFG_SOFTWARE_LIST_ADD("flop_list","x1_flop")
+	SOFTWARE_LIST(config, "flop_list").set_original("x1_flop");
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "x1_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
@@ -513,7 +513,7 @@ MACHINE_CONFIG_START(x1twin_state::x1twin)
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->set_interface("x1_cass");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list","x1_cass")
+	SOFTWARE_LIST(config, "cass_list").set_original("x1_cass");
 
 	TIMER(config, "keyboard_timer").configure_periodic(FUNC(x1twin_state::x1_keyboard_callback), attotime::from_hz(250));
 	TIMER(config, "cmt_wind_timer").configure_periodic(FUNC(x1twin_state::x1_cmt_wind_timer), attotime::from_hz(16));

@@ -665,7 +665,7 @@ MACHINE_CONFIG_START(einstein_state::einstein)
 	FLOPPY_CONNECTOR(config, IC_I042 ":3", einstein_floppies, "525qd", floppy_image_device::default_floppy_formats);
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("disk_list","einstein")
+	SOFTWARE_LIST(config, "disk_list").set_original("einstein");
 
 	/* RAM is provided by 8k DRAM ICs i009, i010, i011, i012, i013, i014, i015 and i016 */
 	/* internal ram */

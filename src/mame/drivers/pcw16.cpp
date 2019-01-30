@@ -1015,7 +1015,7 @@ MACHINE_CONFIG_START(pcw16_state::pcw16)
 	MCFG_DEVICE_ADD("maincpu", Z80, 16000000)
 	MCFG_DEVICE_PROGRAM_MAP(pcw16_map)
 	MCFG_DEVICE_IO_MAP(pcw16_io)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	ns16550_device &uart1(NS16550(config, "ns16550_1", XTAL(1'843'200)));     /* TODO: Verify uart model */
 	uart1.out_tx_callback().set("serport1", FUNC(rs232_port_device::write_txd));
@@ -1066,7 +1066,7 @@ MACHINE_CONFIG_START(pcw16_state::pcw16)
 	FLOPPY_CONNECTOR(config, "fdc:0", pcw16_floppies, "35hd", pcw16_state::floppy_formats);
 	FLOPPY_CONNECTOR(config, "fdc:1", pcw16_floppies, "35hd", pcw16_state::floppy_formats);
 
-	MCFG_SOFTWARE_LIST_ADD("disk_list","pcw16")
+	SOFTWARE_LIST(config, "disk_list").set_original("pcw16");
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("2M");

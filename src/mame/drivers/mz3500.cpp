@@ -820,7 +820,7 @@ MACHINE_CONFIG_START(mz3500_state::mz3500)
 	MCFG_DEVICE_PROGRAM_MAP(mz3500_slave_map)
 	MCFG_DEVICE_IO_MAP(mz3500_slave_io)
 
-	MCFG_QUANTUM_PERFECT_CPU("master")
+	config.m_perfect_cpu_quantum = subtag("master");
 
 	i8255_device &ppi(I8255A(config, "i8255"));
 	ppi.out_pa_callback().set(FUNC(mz3500_state::mz3500_pa_w));

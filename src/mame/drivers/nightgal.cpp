@@ -799,7 +799,7 @@ MACHINE_CONFIG_START(nightgal_state::royalqn)
 	MCFG_DEVICE_ADD("sub", NSC8105, MASTER_CLOCK / 8)
 	MCFG_DEVICE_PROGRAM_MAP(royalqn_nsc_map)
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	JANGOU_BLITTER(config, m_blitter, MASTER_CLOCK/4);
 

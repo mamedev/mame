@@ -463,8 +463,8 @@ MACHINE_CONFIG_START(sorcerer_state::sorcerer)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","sorcerer_cart")
-	MCFG_SOFTWARE_LIST_ADD("cass_list","sorcerer_cass")
+	SOFTWARE_LIST(config, "cart_list").set_original("sorcerer_cart");
+	SOFTWARE_LIST(config, "cass_list").set_original("sorcerer_cass");
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("48K").set_extra_options("8K,16K,32K");
@@ -494,7 +494,7 @@ MACHINE_CONFIG_START(sorcerer_state::sorcererd)
 	FLOPPY_CONNECTOR(config, "fdc2:0", floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc2:1", floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
 
-	MCFG_SOFTWARE_LIST_ADD("flop_list","sorcerer_flop")
+	SOFTWARE_LIST(config, "flop_list").set_original("sorcerer_flop");
 MACHINE_CONFIG_END
 
 

@@ -387,7 +387,7 @@ MACHINE_CONFIG_START(md_cons_state::ms_megadriv)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, md_cons_state, screen_vblank_console))
 
 	MCFG_MD_CARTRIDGE_ADD("mdslot", md_cart, nullptr)
-	MCFG_SOFTWARE_LIST_ADD("cart_list","megadriv")
+	SOFTWARE_LIST(config, "cart_list").set_original("megadriv");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(md_cons_state::ms_megadpal)
@@ -400,13 +400,14 @@ MACHINE_CONFIG_START(md_cons_state::ms_megadpal)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, md_cons_state, screen_vblank_console))
 
 	MCFG_MD_CARTRIDGE_ADD("mdslot", md_cart, nullptr)
-	MCFG_SOFTWARE_LIST_ADD("cart_list","megadriv")
+	SOFTWARE_LIST(config, "cart_list").set_original("megadriv");
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(md_cons_state::genesis_tmss)
+void md_cons_state::genesis_tmss(machine_config &config)
+{
 	ms_megadriv(config);
-	MCFG_SOFTWARE_LIST_FILTER("cart_list","TMSS")
-MACHINE_CONFIG_END
+	subdevice<software_list_device>("cart_list")->set_filter("TMSS");
+}
 
 MACHINE_CONFIG_START(md_cons_state::dcat16_megadriv)
 	dcat16_megadriv_base(config);
@@ -419,7 +420,7 @@ MACHINE_CONFIG_START(md_cons_state::dcat16_megadriv)
 
 //  has SD card slot instead?
 //  MCFG_MD_CARTRIDGE_ADD("mdslot", md_cart, nullptr)
-//  MCFG_SOFTWARE_LIST_ADD("cart_list","megadriv")
+//  SOFTWARE_LIST(config, "cart_list").set_original("megadriv");
 MACHINE_CONFIG_END
 
 /*************************************
@@ -630,8 +631,7 @@ MACHINE_CONFIG_START(md_cons_state::genesis_32x)
 	MCFG_GENERIC_MANDATORY
 	MCFG_GENERIC_LOAD(md_cons_state, _32x_cart)
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list","32x")
-	MCFG_SOFTWARE_LIST_FILTER("cart_list","NTSC-U")
+	SOFTWARE_LIST(config, "cart_list").set_original("32x").set_filter("NTSC-U");
 MACHINE_CONFIG_END
 
 
@@ -667,8 +667,7 @@ MACHINE_CONFIG_START(md_cons_state::mdj_32x)
 	MCFG_GENERIC_MANDATORY
 	MCFG_GENERIC_LOAD(md_cons_state, _32x_cart)
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list","32x")
-	MCFG_SOFTWARE_LIST_FILTER("cart_list","NTSC-J")
+	SOFTWARE_LIST(config, "cart_list").set_original("32x").set_filter("NTSC-J");
 MACHINE_CONFIG_END
 
 
@@ -704,8 +703,7 @@ MACHINE_CONFIG_START(md_cons_state::md_32x)
 	MCFG_GENERIC_MANDATORY
 	MCFG_GENERIC_LOAD(md_cons_state, _32x_cart)
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list","32x")
-	MCFG_SOFTWARE_LIST_FILTER("cart_list","PAL")
+	SOFTWARE_LIST(config, "cart_list").set_original("32x").set_filter("PAL");
 MACHINE_CONFIG_END
 
 
@@ -755,7 +753,7 @@ MACHINE_CONFIG_START(md_cons_state::genesis_scd)
 
 	CDROM(config, "cdrom").set_interface("scd_cdrom");
 
-	MCFG_SOFTWARE_LIST_ADD("cd_list","segacd")
+	SOFTWARE_LIST(config, "cd_list").set_original("segacd");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(md_cons_state::md_scd)
@@ -772,7 +770,7 @@ MACHINE_CONFIG_START(md_cons_state::md_scd)
 
 	CDROM(config, "cdrom").set_interface("scd_cdrom");
 
-	MCFG_SOFTWARE_LIST_ADD("cd_list","megacd")
+	SOFTWARE_LIST(config, "cd_list").set_original("megacd");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(md_cons_state::mdj_scd)
@@ -789,7 +787,7 @@ MACHINE_CONFIG_START(md_cons_state::mdj_scd)
 
 	CDROM(config, "cdrom").set_interface("scd_cdrom");
 
-	MCFG_SOFTWARE_LIST_ADD("cd_list","megacdj")
+	SOFTWARE_LIST(config, "cd_list").set_original("megacdj");
 MACHINE_CONFIG_END
 
 /******************SEGA CD + 32X****************************/
@@ -809,8 +807,8 @@ MACHINE_CONFIG_START(md_cons_state::genesis_32x_scd)
 	MCFG_GENERIC_EXTENSIONS("32x,bin")
 	MCFG_GENERIC_LOAD(md_cons_state, _32x_cart)
 
-	//MCFG_QUANTUM_PERFECT_CPU("32x_master_sh2")
-	MCFG_SOFTWARE_LIST_ADD("cd_list", "segacd")
+	//config.m_perfect_cpu_quantum = subtag("32x_master_sh2");
+	SOFTWARE_LIST(config, "cd_list").set_original("segacd");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(md_cons_state::md_32x_scd)
@@ -828,8 +826,8 @@ MACHINE_CONFIG_START(md_cons_state::md_32x_scd)
 	MCFG_GENERIC_EXTENSIONS("32x,bin")
 	MCFG_GENERIC_LOAD(md_cons_state, _32x_cart)
 
-	//MCFG_QUANTUM_PERFECT_CPU("32x_master_sh2")
-	MCFG_SOFTWARE_LIST_ADD("cd_list", "megacd")
+	//config.m_perfect_cpu_quantum = subtag("32x_master_sh2");
+	SOFTWARE_LIST(config, "cd_list").set_original("megacd");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(md_cons_state::mdj_32x_scd)
@@ -847,8 +845,8 @@ MACHINE_CONFIG_START(md_cons_state::mdj_32x_scd)
 	MCFG_GENERIC_EXTENSIONS("32x,bin")
 	MCFG_GENERIC_LOAD(md_cons_state, _32x_cart)
 
-	//MCFG_QUANTUM_PERFECT_CPU("32x_master_sh2")
-	MCFG_SOFTWARE_LIST_ADD("cd_list", "megacdj")
+	//config.m_perfect_cpu_quantum = subtag("32x_master_sh2");
+	SOFTWARE_LIST(config, "cd_list").set_original("megacdj");
 MACHINE_CONFIG_END
 
 /* We need proper names for most of these BIOS ROMs! */

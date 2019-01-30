@@ -486,7 +486,7 @@ MACHINE_CONFIG_START(xain_state::xsleena)
 
 	TAITO68705_MCU(config, m_mcu, MCU_CLOCK);
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	// video hardware
 	MCFG_SCREEN_ADD(m_screen, RASTER)

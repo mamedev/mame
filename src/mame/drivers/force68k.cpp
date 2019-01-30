@@ -510,7 +510,7 @@ MACHINE_CONFIG_START(force68k_state::fccpu1_eprom_sockets)
 	MCFG_GENERIC_WIDTH(GENERIC_ROM16_WIDTH)
 	MCFG_GENERIC_ENDIAN(ENDIANNESS_BIG)
 	MCFG_GENERIC_LOAD(force68k_state, exp1_load)
-//  MCFG_SOFTWARE_LIST_ADD("cart_list", "fccpu1_cart")
+//  SOFTWARE_LIST(config, "cart_list").set_original("fccpu1_cart");
 MACHINE_CONFIG_END
 
 /***************************

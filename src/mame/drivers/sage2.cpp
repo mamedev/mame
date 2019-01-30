@@ -488,7 +488,7 @@ MACHINE_CONFIG_START(sage2_state::sage2)
 	RAM(config, RAM_TAG).set_default_size("512K");
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "sage2")
+	SOFTWARE_LIST(config, "flop_list").set_original("sage2");
 MACHINE_CONFIG_END
 
 

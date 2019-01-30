@@ -240,11 +240,12 @@ void kim1_state::machine_reset()
 //  MACHINE DRIVERS
 //**************************************************************************
 
-MACHINE_CONFIG_START(kim1_state::kim1)
+void kim1_state::kim1(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", M6502, 1000000)        /* 1 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(kim1_map)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	M6502(config, m_maincpu, 1000000);        /* 1 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &kim1_state::kim1_map);
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	// video hardware
 	config.set_default_layout(layout_kim1);
@@ -267,9 +268,8 @@ MACHINE_CONFIG_START(kim1_state::kim1)
 	TIMER(config, "cassette_timer").configure_periodic(FUNC(kim1_state::kim1_cassette_input), attotime::from_hz(44100));
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD ("cass_list", "kim1_cass")
-
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cass_list").set_original("kim1_cass");
+}
 
 //**************************************************************************
 //  ROM DEFINITIONS

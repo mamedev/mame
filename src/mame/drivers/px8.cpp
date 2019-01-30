@@ -787,8 +787,8 @@ MACHINE_CONFIG_START(px8_state::px8)
 	RAM(config, RAM_TAG).set_default_size("64K");
 
 	// software
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "px8_cart")
-	MCFG_SOFTWARE_LIST_ADD("epson_cpm_list", "epson_cpm")
+	SOFTWARE_LIST(config, "cart_list").set_original("px8_cart");
+	SOFTWARE_LIST(config, "epson_cpm_list").set_original("epson_cpm");
 MACHINE_CONFIG_END
 
 /***************************************************************************

@@ -1552,7 +1552,7 @@ static void keyboard_devices(device_slot_interface &device)
 }
 
 MACHINE_CONFIG_START(x68k_state::x68000_base)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	/* device hardware */
 	MC68901(config, m_mfpdev, 16_MHz_XTAL / 4);

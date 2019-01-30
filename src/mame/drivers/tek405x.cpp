@@ -1134,7 +1134,7 @@ MACHINE_CONFIG_START(tek4052_state::tek4052)
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot2", generic_plain_slot, "tek4050_cart")
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "tek4052_cart")
+	SOFTWARE_LIST(config, "cart_list").set_original("tek4052_cart");
 MACHINE_CONFIG_END
 
 

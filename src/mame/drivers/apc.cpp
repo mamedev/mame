@@ -979,7 +979,7 @@ MACHINE_CONFIG_START(apc_state::apc)
 	m_fdc->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq1_w));
 	FLOPPY_CONNECTOR(config, m_fdc_connector[0], apc_floppies, "8", apc_floppy_formats);
 	FLOPPY_CONNECTOR(config, m_fdc_connector[1], apc_floppies, "8", apc_floppy_formats);
-	MCFG_SOFTWARE_LIST_ADD("disk_list","apc")
+	SOFTWARE_LIST(config, "disk_list").set_original("apc");
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

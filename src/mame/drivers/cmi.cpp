@@ -2162,12 +2162,12 @@ MACHINE_CONFIG_START(cmi_state::cmi2x)
 	MCFG_DEVICE_ADD("maincpu1", MC6809E, Q209_CPU_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(maincpu1_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(cmi_state, cpu1_interrupt_callback)
-	MCFG_QUANTUM_PERFECT_CPU("maincpu1")
+	config.m_perfect_cpu_quantum = subtag("maincpu1");
 
 	MCFG_DEVICE_ADD("maincpu2", MC6809E, Q209_CPU_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(maincpu2_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(cmi_state, cpu2_interrupt_callback)
-	MCFG_QUANTUM_PERFECT_CPU("maincpu2")
+	config.m_perfect_cpu_quantum = subtag("maincpu2");
 
 	MCFG_DEVICE_ADD("muskeys", M6802, 4_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(muskeys_map)

@@ -186,7 +186,7 @@ MACHINE_CONFIG_START(ultraman_state::ultraman)
 
 	INPUT_MERGER_ALL_HIGH(config, "soundnmi").output_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	config.m_minimum_quantum = attotime::from_hz(600);
 
 	WATCHDOG_TIMER(config, "watchdog");
 

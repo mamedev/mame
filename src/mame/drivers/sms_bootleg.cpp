@@ -279,7 +279,7 @@ MACHINE_CONFIG_START(smsbootleg_state::sms_supergame)
 	MCFG_DEVICE_PROGRAM_MAP(sms_supergame_map)
 	MCFG_DEVICE_IO_MAP(sms_supergame_io)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

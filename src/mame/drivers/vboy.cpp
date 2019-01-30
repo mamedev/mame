@@ -1340,7 +1340,7 @@ MACHINE_CONFIG_START(vboy_state::vboy)
 	MCFG_VBOY_CARTRIDGE_ADD("cartslot", vboy_cart, nullptr)
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","vboy")
+	SOFTWARE_LIST(config, "cart_list").set_original("vboy");
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

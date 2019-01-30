@@ -82,13 +82,13 @@ MACHINE_CONFIG_START(cgenie_fdc_device::device_add_mconfig)
 	FLOPPY_CONNECTOR(config, "fd1793:2", cgenie_floppies, nullptr, cgenie_fdc_device::floppy_formats);
 	FLOPPY_CONNECTOR(config, "fd1793:3", cgenie_floppies, nullptr, cgenie_fdc_device::floppy_formats);
 
-//  MCFG_SOFTWARE_LIST_ADD("floppy_list", "cgenie_flop")
+//  SOFTWARE_LIST(config, "floppy_list").set_original("cgenie_flop");
 
 	MCFG_GENERIC_SOCKET_ADD("socket", generic_plain_slot, "cgenie_flop_rom")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 	MCFG_GENERIC_LOAD(cgenie_fdc_device, socket_load)
 
-	MCFG_SOFTWARE_LIST_ADD("rom_list", "cgenie_flop_rom")
+	SOFTWARE_LIST(config, "rom_list").set_original("cgenie_flop_rom");
 MACHINE_CONFIG_END
 
 

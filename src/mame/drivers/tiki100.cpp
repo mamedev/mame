@@ -785,7 +785,7 @@ MACHINE_CONFIG_START(tiki100_state::tiki100)
 	RAM(config, RAM_TAG).set_default_size("64K");
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "tiki100")
+	SOFTWARE_LIST(config, "flop_list").set_original("tiki100");
 MACHINE_CONFIG_END
 
 /* ROMs */

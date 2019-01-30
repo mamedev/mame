@@ -665,7 +665,7 @@ MACHINE_CONFIG_START(xerox820_state::xerox820)
 	RAM(config, m_ram).set_default_size("64K");
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "xerox820")
+	SOFTWARE_LIST(config, "flop_list").set_original("xerox820");
 	MCFG_QUICKLOAD_ADD("quickload", xerox820_state, xerox820, "com,cpm", 3)
 MACHINE_CONFIG_END
 
@@ -770,7 +770,7 @@ MACHINE_CONFIG_START(xerox820ii_state::xerox820ii)
 	RAM(config, m_ram).set_default_size("64K");
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "xerox820ii")
+	SOFTWARE_LIST(config, "flop_list").set_original("xerox820ii");
 	MCFG_QUICKLOAD_ADD("quickload", xerox820_state, xerox820, "com,cpm", 3)
 MACHINE_CONFIG_END
 

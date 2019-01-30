@@ -201,7 +201,7 @@ MACHINE_CONFIG_START(decodmd_type1_device::device_add_mconfig)
 	MCFG_DEVICE_PROGRAM_MAP(decodmd1_map)
 	MCFG_DEVICE_IO_MAP(decodmd1_io_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(50))
+	config.m_minimum_quantum = attotime::from_hz(50);
 
 	TIMER(config, "nmi_timer").configure_periodic(FUNC(decodmd_type1_device::dmd_nmi), attotime::from_hz(2000));  // seems a lot
 

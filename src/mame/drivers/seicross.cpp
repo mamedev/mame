@@ -406,7 +406,7 @@ MACHINE_CONFIG_START(seicross_state::no_nvram)
 	MCFG_DEVICE_ADD("mcu", NSC8105, XTAL(18'432'000) / 6)   /* ??? */
 	MCFG_DEVICE_PROGRAM_MAP(mcu_no_nvram_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(1200))  /* 20 CPU slices per frame - an high value to ensure proper */
+	config.m_minimum_quantum = attotime::from_hz(1200);  /* 20 CPU slices per frame - a high value to ensure proper */
 						/* synchronization of the CPUs */
 
 	WATCHDOG_TIMER(config, "watchdog");

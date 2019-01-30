@@ -481,10 +481,11 @@ static void gimix_floppies(device_slot_interface &device)
 	device.option_add("8dd", FLOPPY_8_DSDD);
 }
 
-MACHINE_CONFIG_START(gimix_state::gimix)
+void gimix_state::gimix(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", MC6809, 8_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(gimix_mem)
+	MC6809(config, m_maincpu, 8_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gimix_state::gimix_mem);
 
 	/* rtc */
 	mm58167_device &rtc(MM58167(config, "rtc", 32.768_kHz_XTAL));
@@ -559,12 +560,12 @@ MACHINE_CONFIG_START(gimix_state::gimix)
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("128K").set_extra_options("56K,256K,512K");
 
-	MCFG_SOFTWARE_LIST_ADD("flop_list","gimix")
+	SOFTWARE_LIST(config, "flop_list").set_original("gimix");
 
 	// uncomment this timer to use a hack that generates a regular IRQ, this will get OS-9 to boot
 	// for some unknown reason, OS-9 does not touch the 6840, and only clears/disables IRQs on the RTC
 	//TIMER(config, "test_timer").configure_periodic(FUNC(gimix_state::test_timer_w), attotime::from_msec(100));
-MACHINE_CONFIG_END
+}
 
 ROM_START( gimix )
 	ROM_REGION( 0x10000, "roms", 0)

@@ -528,7 +528,8 @@ static const z80_daisy_config osbexec_daisy_config[] =
 };
 
 
-MACHINE_CONFIG_START(osbexec_state::osbexec)
+void osbexec_state::osbexec(machine_config &config)
+{
 	Z80(config, m_maincpu, MAIN_CLOCK/6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &osbexec_state::osbexec_mem);
 	m_maincpu->set_addrmap(AS_IO, &osbexec_state::osbexec_io);
@@ -545,8 +546,7 @@ MACHINE_CONFIG_START(osbexec_state::osbexec)
 	PALETTE(config, "palette", palette_device::MONOCHROME_HIGHLIGHT);
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(m_speaker, SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	PIA6821(config, m_pia[0], 0);
 	m_pia[0]->readpa_handler().set(FUNC(osbexec_state::osbexec_pia0_a_r));
@@ -608,8 +608,8 @@ MACHINE_CONFIG_START(osbexec_state::osbexec)
 	RAM(config, RAM_TAG).set_default_size("136K"); /* 128KB Main RAM + RAM in ROM bank (8) */
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "osborne2")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "flop_list").set_original("osborne2");
+}
 
 
 ROM_START( osbexec )

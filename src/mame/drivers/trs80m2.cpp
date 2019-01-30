@@ -785,7 +785,7 @@ MACHINE_CONFIG_START(trs80m2_state::trs80m2)
 	RAM(config, RAM_TAG).set_default_size("64K").set_extra_options("32K,96K,128K,160K,192K,224K,256K,288K,320K,352K,384K,416K,448K,480K,512K");
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "trs80m2")
+	SOFTWARE_LIST(config, "flop_list").set_original("trs80m2");
 MACHINE_CONFIG_END
 
 
@@ -879,7 +879,7 @@ MACHINE_CONFIG_START(trs80m16_state::trs80m16)
 	RAM(config, RAM_TAG).set_default_size("256K").set_extra_options("512K,768K,1M");
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "trs80m2")
+	SOFTWARE_LIST(config, "flop_list").set_original("trs80m2");
 MACHINE_CONFIG_END
 
 

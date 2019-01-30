@@ -240,7 +240,7 @@ MACHINE_CONFIG_START(ec184x_state::ec1840)
 	MCFG_DEVICE_ADD("isa5", ISA8_SLOT, 0, "mb:isa", ec184x_isa8_cards, nullptr, false)
 	MCFG_DEVICE_ADD("isa6", ISA8_SLOT, 0, "mb:isa", ec184x_isa8_cards, nullptr, false)
 
-	MCFG_SOFTWARE_LIST_ADD("flop_list","ec1841")
+	SOFTWARE_LIST(config, "flop_list").set_original("ec1841");
 
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_EC_1841)
 
@@ -265,7 +265,7 @@ MACHINE_CONFIG_START(ec184x_state::ec1841)
 	MCFG_DEVICE_ADD("isa5", ISA8_SLOT, 0, "mb:isa", ec184x_isa8_cards, nullptr, false)
 	MCFG_DEVICE_ADD("isa6", ISA8_SLOT, 0, "mb:isa", ec184x_isa8_cards, nullptr, false)
 
-	MCFG_SOFTWARE_LIST_ADD("flop_list","ec1841")
+	SOFTWARE_LIST(config, "flop_list").set_original("ec1841");
 
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_EC_1841)
 

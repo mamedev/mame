@@ -61,7 +61,7 @@ void s11c_bg_device::data_w(uint8_t data)
 MACHINE_CONFIG_START(s11c_bg_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("bgcpu", MC6809E, XTAL(8'000'000) / 4) // MC68B09E
 	MCFG_DEVICE_PROGRAM_MAP(s11c_bg_map)
-	MCFG_QUANTUM_TIME(attotime::from_hz(50))
+	config.m_minimum_quantum = attotime::from_hz(50);
 
 	YM2151(config, m_ym2151, XTAL(3'579'545)); // "3.58 MHz" on schematics and parts list
 	m_ym2151->irq_handler().set(FUNC(s11c_bg_device::ym2151_irq_w));

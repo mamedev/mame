@@ -726,7 +726,7 @@ MACHINE_CONFIG_START(c65_state::c65)
 	// 2x 8580 SID
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "c65_flop")
+	SOFTWARE_LIST(config, "flop_list").set_original("c65_flop");
 MACHINE_CONFIG_END
 
 

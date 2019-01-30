@@ -1238,36 +1238,42 @@ WRITE_LINE_MEMBER(msx2_state::turbo_w)
 #define MSX_VISIBLE_YBORDER_PIXELS  24
 
 
-MACHINE_CONFIG_START(msx_state::msx1_cartlist)
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "msx1_cart")
-MACHINE_CONFIG_END
+void msx_state::msx1_cartlist(machine_config &config)
+{
+	SOFTWARE_LIST(config, "cart_list").set_original("msx1_cart");
+}
 
-MACHINE_CONFIG_START(msx_state::msx1_floplist)
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "msx1_flop")
-MACHINE_CONFIG_END
+void msx_state::msx1_floplist(machine_config &config)
+{
+	SOFTWARE_LIST(config, "flop_list").set_original("msx1_flop");
+}
 
-MACHINE_CONFIG_START(msx2_state::msx2_cartlist)
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "msx2_cart")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("msx1_crt_l", "msx1_cart")
-MACHINE_CONFIG_END
+void msx2_state::msx2_cartlist(machine_config &config)
+{
+	SOFTWARE_LIST(config, "cart_list").set_original("msx2_cart");
+	SOFTWARE_LIST(config, "msx1_crt_l").set_compatible("msx1_cart");
+}
 
-MACHINE_CONFIG_START(msx2_state::msx2_floplist)
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "msx2_flop")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("msx1_flp_l", "msx1_flop")
-MACHINE_CONFIG_END
+void msx2_state::msx2_floplist(machine_config &config)
+{
+	SOFTWARE_LIST(config, "flop_list").set_original("msx2_flop");
+	SOFTWARE_LIST(config, "msx1_flp_l").set_compatible("msx1_flop");
+}
 
-MACHINE_CONFIG_START(msx2_state::msx2p_floplist)
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "msx2p_flop")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("msx2_flp_l", "msx2_flop")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("msx1_flp_l", "msx1_flop")    // maybe not?
-MACHINE_CONFIG_END
+void msx2_state::msx2p_floplist(machine_config &config)
+{
+	SOFTWARE_LIST(config, "flop_list").set_original("msx2p_flop");
+	SOFTWARE_LIST(config, "msx2_flp_l").set_compatible("msx2_flop");
+	SOFTWARE_LIST(config, "msx1_flp_l").set_compatible("msx1_flop");    // maybe not?
+}
 
-MACHINE_CONFIG_START(msx2_state::msxr_floplist)
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "msxr_flop")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("msx2p_flp_l", "msx2p_flop")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("msx2_flp_l", "msx2_flop")    // maybe not?
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("msx1_flp_l", "msx1_flop")    // maybe not?
-MACHINE_CONFIG_END
+void msx2_state::msxr_floplist(machine_config &config)
+{
+	SOFTWARE_LIST(config, "flop_list").set_original("msxr_flop");
+	SOFTWARE_LIST(config, "msx2p_flp_l").set_compatible("msx2p_flop");
+	SOFTWARE_LIST(config, "msx2_flp_l").set_compatible("msx2_flop");    // maybe not?
+	SOFTWARE_LIST(config, "msx1_flp_l").set_compatible("msx1_flop");    // maybe not?
+}
 
 FLOPPY_FORMATS_MEMBER( msx_state::floppy_formats )
 	FLOPPY_MSX_FORMAT,
@@ -1352,7 +1358,7 @@ MACHINE_CONFIG_START(msx_state::msx)
 	MCFG_DEVICE_PROGRAM_MAP(msx_memory_map)
 	MCFG_DEVICE_IO_MAP(msx_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", msx_state,  msx_interrupt) /* Needed for mouse updates */
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline("maincpu", INPUT_LINE_IRQ0);
 
@@ -1394,7 +1400,7 @@ MACHINE_CONFIG_START(msx_state::msx)
 	m_cassette->set_interface("msx_cass");
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cass_list","msx1_cass")
+	SOFTWARE_LIST(config, "cass_list").set_original("msx1_cass");
 MACHINE_CONFIG_END
 
 
@@ -1416,7 +1422,7 @@ MACHINE_CONFIG_START(msx2_state::msx2)
 	MCFG_DEVICE_ADD("maincpu", Z80, 21.477272_MHz_XTAL / 6)       /* 3.579545 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(msx_memory_map)
 	MCFG_DEVICE_IO_MAP(msx2_io_map)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline("maincpu", INPUT_LINE_IRQ0);
 
@@ -1468,8 +1474,8 @@ MACHINE_CONFIG_START(msx2_state::msx2)
 	RP5C01(config, m_rtc, 32.768_kHz_XTAL);
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "msx2_cass")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("msx1_cas_l", "msx1_cass")
+	SOFTWARE_LIST(config, "cass_list").set_original("msx2_cass");
+	SOFTWARE_LIST(config, "msx1_cas_l").set_compatible("msx1_cass");
 MACHINE_CONFIG_END
 
 
@@ -1478,7 +1484,7 @@ MACHINE_CONFIG_START(msx2_state::msx2p)
 	MCFG_DEVICE_ADD("maincpu", Z80, 21.477272_MHz_XTAL / 6)       /* 3.579545 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(msx_memory_map)
 	MCFG_DEVICE_IO_MAP(msx2p_io_map)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline("maincpu", INPUT_LINE_IRQ0);
 
@@ -1530,8 +1536,8 @@ MACHINE_CONFIG_START(msx2_state::msx2p)
 	RP5C01(config, m_rtc, 32.768_kHz_XTAL);
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "msx2_cass")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("msx1_cas_l", "msx1_cass")
+	SOFTWARE_LIST(config, "cass_list").set_original("msx2_cass");
+	SOFTWARE_LIST(config, "msx1_cas_l").set_compatible("msx1_cass");
 MACHINE_CONFIG_END
 
 

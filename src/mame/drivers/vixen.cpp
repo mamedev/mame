@@ -794,7 +794,7 @@ MACHINE_CONFIG_START(vixen_state::vixen)
 	MCFG_IEEE488_ATN_CALLBACK(WRITELINE(*this, vixen_state, atn_w))
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("disk_list", "vixen")
+	SOFTWARE_LIST(config, "disk_list").set_original("vixen");
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("64K");

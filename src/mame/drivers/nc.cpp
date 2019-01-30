@@ -1380,7 +1380,7 @@ MACHINE_CONFIG_START(nc_state::nc_base)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", Z80, /*6000000*/ 4606000)        /* Russell Marks says this is more accurate */
 	MCFG_DEVICE_PROGRAM_MAP(nc_map)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)

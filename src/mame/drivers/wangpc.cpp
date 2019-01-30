@@ -1280,7 +1280,7 @@ MACHINE_CONFIG_START(wangpc_state::wangpc)
 	MCFG_DEVICE_PROGRAM_MAP(wangpc_mem)
 	MCFG_DEVICE_IO_MAP(wangpc_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE(I8259A_TAG, pic8259_device, inta_cb)
-	//MCFG_QUANTUM_PERFECT_CPU(I8086_TAG)
+	//config.m_perfect_cpu_quantum = subtag(I8086_TAG);
 
 	// devices
 	AM9517A(config, m_dmac, 4000000);
@@ -1372,7 +1372,7 @@ MACHINE_CONFIG_START(wangpc_state::wangpc)
 	RAM(config, RAM_TAG).set_default_size("128K");
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "wangpc")
+	SOFTWARE_LIST(config, "flop_list").set_original("wangpc");
 MACHINE_CONFIG_END
 
 

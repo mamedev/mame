@@ -505,7 +505,7 @@ MACHINE_CONFIG_START(djboy_state::djboy)
 	m_beast->port_in_cb<3>().set(FUNC(djboy_state::beast_p3_r));
 	m_beast->port_out_cb<3>().set(FUNC(djboy_state::beast_p3_w));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	GENERIC_LATCH_8(config, m_slavelatch);
 

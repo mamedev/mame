@@ -3544,7 +3544,7 @@ MACHINE_CONFIG_START(hp9845_state::hp9845a)
 	MCFG_SCREEN_SIZE(560, 455)
 	MCFG_SCREEN_VISIBLE_AREA(0, 560-1, 0, 455-1)
 
-	MCFG_SOFTWARE_LIST_ADD("optrom_list", "hp9845a_rom")
+	SOFTWARE_LIST(config, "optrom_list").set_original("hp9845a_rom");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp9845_state::hp9835a)
@@ -3559,7 +3559,7 @@ MACHINE_CONFIG_START(hp9845_state::hp9835a)
 	MCFG_SCREEN_SIZE(560, 455)
 	MCFG_SCREEN_VISIBLE_AREA(0, 560-1, 0, 455-1)
 
-	MCFG_SOFTWARE_LIST_ADD("optrom_list", "hp9835a_rom")
+	SOFTWARE_LIST(config, "optrom_list").set_original("hp9835a_rom");
 MACHINE_CONFIG_END
 
 /*
@@ -3725,7 +3725,7 @@ MACHINE_CONFIG_START(hp9845b_state::hp9845b)
 
 	config.set_default_layout(layout_hp9845b);
 
-	MCFG_SOFTWARE_LIST_ADD("optrom_list", "hp9845b_rom")
+	SOFTWARE_LIST(config, "optrom_list").set_original("hp9845b_rom");
 
 MACHINE_CONFIG_END
 
@@ -3739,7 +3739,7 @@ MACHINE_CONFIG_START(hp9845c_state::hp9845c)
 	MCFG_PALETTE_ADD("palette", 24)
 	TIMER(config, "scantimer").configure_scanline(FUNC(hp9845c_state::scanline_timer), "screen", 0, 1);
 
-	MCFG_SOFTWARE_LIST_ADD("optrom_list", "hp9845b_rom")
+	SOFTWARE_LIST(config, "optrom_list").set_original("hp9845b_rom");
 
 MACHINE_CONFIG_END
 
@@ -3754,7 +3754,7 @@ MACHINE_CONFIG_START(hp9845t_state::hp9845t)
 	MCFG_PALETTE_ADD("palette", 5)
 	TIMER(config, "scantimer").configure_scanline(FUNC(hp9845t_state::scanline_timer), "screen", 0, 1);
 
-	MCFG_SOFTWARE_LIST_ADD("optrom_list", "hp9845b_rom")
+	SOFTWARE_LIST(config, "optrom_list").set_original("hp9845b_rom");
 
 MACHINE_CONFIG_END
 

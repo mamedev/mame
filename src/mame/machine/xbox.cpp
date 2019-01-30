@@ -845,7 +845,7 @@ MACHINE_CONFIG_START(xbox_base_state::xbox_base)
 	MCFG_DEVICE_IO_MAP(xbox_base_map_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(xbox_base_state, irq_callback)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	PCI_ROOT(config,        ":pci", 0);
 	NV2A_HOST(config,       ":pci:00.0", 0, m_maincpu);

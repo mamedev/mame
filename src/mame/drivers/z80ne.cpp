@@ -441,7 +441,7 @@ MACHINE_CONFIG_START(z80ne_state::z80ne)
 	RAM(config, m_ram).set_default_size("32K");
 
 	// all known tapes require LX.388 expansion
-	//MCFG_SOFTWARE_LIST_ADD("cass_list","z80ne_cass")
+	//SOFTWARE_LIST(config, "cass_list").set_original("z80ne_cass");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(z80ne_state::z80net)
@@ -480,7 +480,7 @@ MACHINE_CONFIG_START(z80ne_state::z80net)
 	/* internal ram */
 	m_ram->set_default_size("32K").set_extra_options("1K");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list","z80ne_cass")
+	SOFTWARE_LIST(config, "cass_list").set_original("z80ne_cass");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(z80ne_state::z80netb)
@@ -530,7 +530,7 @@ MACHINE_CONFIG_START(z80ne_state::z80netb)
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("32K").set_extra_options("1K");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list","z80ne_cass")
+	SOFTWARE_LIST(config, "cass_list").set_original("z80ne_cass");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(z80netf_state::z80netf)
@@ -576,8 +576,8 @@ MACHINE_CONFIG_START(z80netf_state::z80netf)
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("56K");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list","z80ne_cass")
-	MCFG_SOFTWARE_LIST_ADD("flop_list","z80ne_flop")
+	SOFTWARE_LIST(config, "cass_list").set_original("z80ne_cass");
+	SOFTWARE_LIST(config, "flop_list").set_original("z80ne_flop");
 MACHINE_CONFIG_END
 
 /******************************************************************************

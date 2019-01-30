@@ -457,7 +457,7 @@ MACHINE_CONFIG_START(chessmst_state::chessmstdm)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "chessmstdm_cart")
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "chessmstdm")
+	SOFTWARE_LIST(config, "cart_list").set_original("chessmstdm");
 MACHINE_CONFIG_END
 
 

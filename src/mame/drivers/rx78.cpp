@@ -508,7 +508,7 @@ MACHINE_CONFIG_START(rx78_state::rx78)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","rx78")
+	SOFTWARE_LIST(config, "cart_list").set_original("rx78");
 MACHINE_CONFIG_END
 
 /* ROM definition */

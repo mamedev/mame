@@ -1127,7 +1127,7 @@ MACHINE_CONFIG_START(attache_state::attache)
 	m_maincpu->set_addrmap(AS_IO, &attache_state::attache_io);
 	m_maincpu->set_daisy_config(attache_daisy_chain);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_RAW_PARAMS(12.324_MHz_XTAL, 784, 0, 640, 262, 0, 240)
@@ -1194,7 +1194,7 @@ MACHINE_CONFIG_START(attache_state::attache)
 
 	RAM(config, RAM_TAG).set_default_size("64K");
 
-	MCFG_SOFTWARE_LIST_ADD("disk_list","attache")
+	SOFTWARE_LIST(config, "disk_list").set_original("attache");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(attache816_state::attache816)
@@ -1203,12 +1203,12 @@ MACHINE_CONFIG_START(attache816_state::attache816)
 	m_maincpu->set_addrmap(AS_IO, &attache816_state::attache_io);
 	m_maincpu->set_daisy_config(attache_daisy_chain);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	MCFG_DEVICE_ADD("extcpu", I8086, 24_MHz_XTAL / 3)
 	MCFG_DEVICE_PROGRAM_MAP(attache_x86_map)
 	MCFG_DEVICE_IO_MAP(attache_x86_io)
-	MCFG_QUANTUM_PERFECT_CPU("extcpu")
+	config.m_perfect_cpu_quantum = subtag("extcpu");
 
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_RAW_PARAMS(12.324_MHz_XTAL, 784, 0, 640, 262, 0, 240)
@@ -1282,7 +1282,7 @@ MACHINE_CONFIG_START(attache816_state::attache816)
 
 	RAM(config, RAM_TAG).set_default_size("64K");
 
-	MCFG_SOFTWARE_LIST_ADD("disk_list","attache")
+	SOFTWARE_LIST(config, "disk_list").set_original("attache");
 MACHINE_CONFIG_END
 
 ROM_START( attache )

@@ -258,7 +258,7 @@ MACHINE_CONFIG_START(amspdwy_state::amspdwy)
 	MCFG_DEVICE_ADD("audiocpu", Z80, 3000000)
 	MCFG_DEVICE_PROGRAM_MAP(amspdwy_sound_map)
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

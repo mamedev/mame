@@ -398,7 +398,7 @@ MACHINE_CONFIG_START(spectrum_state::spectrum_plus3)
 	MCFG_DEVICE_MODIFY("exp")
 	MCFG_DEVICE_SLOT_INTERFACE(specpls3_expansion_devices, nullptr, false)
 
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "specpls3_flop")
+	SOFTWARE_LIST(config, "flop_list").set_original("specpls3_flop");
 MACHINE_CONFIG_END
 
 /***************************************************************************

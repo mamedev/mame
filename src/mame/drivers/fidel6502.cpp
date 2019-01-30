@@ -534,7 +534,7 @@ private:
 	// common
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE); }
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE); }
-	TIMER_DEVICE_CALLBACK_MEMBER(dummy) { ; } // MCFG_QUANTUM_PERFECT_CPU("maincpu") didn't work
+	TIMER_DEVICE_CALLBACK_MEMBER(dummy) { ; } // config.m_perfect_cpu_quantum = subtag("maincpu"); didn't work
 
 	void div_trampoline_w(offs_t offset, u8 data);
 	u8 div_trampoline_r(offs_t offset);

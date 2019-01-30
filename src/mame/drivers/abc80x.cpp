@@ -1110,8 +1110,8 @@ MACHINE_CONFIG_START(abc800_state::common)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "abc800")
-	MCFG_SOFTWARE_LIST_ADD("hdd_list", "abc800_hdd")
+	SOFTWARE_LIST(config, "flop_list").set_original("abc800");
+	SOFTWARE_LIST(config, "hdd_list").set_original("abc800_hdd");
 
 	// quickload
 	MCFG_QUICKLOAD_ADD("quickload", abc800_state, bac, "bac", 2)
@@ -1230,7 +1230,7 @@ MACHINE_CONFIG_START(abc806_state::abc806)
 	RAM(config, RAM_TAG).set_default_size("160K").set_extra_options("544K");
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("flop_list2", "abc806")
+	SOFTWARE_LIST(config, "flop_list2").set_original("abc806");
 MACHINE_CONFIG_END
 
 

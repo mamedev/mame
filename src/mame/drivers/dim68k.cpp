@@ -346,7 +346,7 @@ MACHINE_CONFIG_START(dim68k_state::dim68k)
 	keyboard.set_keyboard_callback(FUNC(dim68k_state::kbd_put));
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "dim68k")
+	SOFTWARE_LIST(config, "flop_list").set_original("dim68k");
 MACHINE_CONFIG_END
 
 /*

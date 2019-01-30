@@ -658,7 +658,7 @@ MACHINE_CONFIG_START(firefox_state::firefox)
 	MCFG_DEVICE_ADD("audiocpu", M6502, MASTER_XTAL/8)
 	MCFG_DEVICE_PROGRAM_MAP(audio_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
+	config.m_minimum_quantum = attotime::from_hz(60000);
 
 	adc0809_device &adc(ADC0809(config, "adc", MASTER_XTAL/16)); // nominally 900 kHz
 	adc.in_callback<0>().set_ioport("PITCH");

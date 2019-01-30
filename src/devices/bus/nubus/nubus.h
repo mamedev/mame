@@ -44,8 +44,6 @@
 	MCFG_DEVICE_ADD(_tag, NUBUS_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
 	downcast<nubus_slot_device &>(*device).set_nubus_slot(_nbtag, _tag);
-#define MCFG_NUBUS_SLOT_REMOVE(_tag)    \
-	MCFG_DEVICE_REMOVE(_tag)
 
 #define MCFG_NUBUS_ONBOARD_ADD(_nbtag, _tag, _dev_type, _def_inp) \
 	MCFG_DEVICE_ADD(_tag, _dev_type, 0) \

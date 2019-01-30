@@ -270,7 +270,7 @@ MACHINE_CONFIG_START(prof180x_state::prof180x)
 	RAM(config, RAM_TAG).set_default_size("128K").set_extra_options("256K,512K");
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "prof180")
+	SOFTWARE_LIST(config, "flop_list").set_original("prof180");
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -139,7 +139,7 @@ MACHINE_CONFIG_START(wswan_state::wswan)
 
 	config.set_default_layout(layout_wswan);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -158,17 +158,17 @@ MACHINE_CONFIG_START(wswan_state::wswan)
 	MCFG_DEVICE_ADD(m_cart, WS_CART_SLOT, 3.072_MHz_XTAL / 8, wswan_cart, nullptr)
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","wswan")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("wsc_list","wscolor")
+	SOFTWARE_LIST(config, "cart_list").set_original("wswan");
+	SOFTWARE_LIST(config, "wsc_list").set_compatible("wscolor");
 
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("pc2_list","pockchalv2")
+	SOFTWARE_LIST(config, "pc2_list").set_compatible("pockchalv2");
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(wscolor_state::wscolor)
+void wscolor_state::wscolor(machine_config &config)
+{
 	wswan(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(wscolor_mem)
+	m_maincpu->set_addrmap(AS_PROGRAM, &wscolor_state::wscolor_mem);
 
 	m_vdp->set_vdp_type(VDP_TYPE_WSC);
 
@@ -177,11 +177,10 @@ MACHINE_CONFIG_START(wscolor_state::wscolor)
 	palette.set_init(FUNC(wscolor_state::wscolor_palette));
 
 	/* software lists */
-	config.device_remove("cart_list");
 	config.device_remove("wsc_list");
-	MCFG_SOFTWARE_LIST_ADD("cart_list","wscolor")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("ws_list","wswan")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config.replace(), "cart_list").set_original("wscolor");
+	SOFTWARE_LIST(config, "ws_list").set_compatible("wswan");
+}
 
 /***************************************************************************
 

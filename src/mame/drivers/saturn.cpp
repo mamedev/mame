@@ -878,11 +878,10 @@ MACHINE_CONFIG_START(sat_console_state::saturnus)
 	saturn(config);
 	MCFG_DEVICE_ADD("saturn_cdb", SATURN_CDB, 16000000)
 
-	MCFG_SOFTWARE_LIST_ADD("cd_list","saturn")
-	MCFG_SOFTWARE_LIST_FILTER("cd_list","NTSC-U")
+	SOFTWARE_LIST(config, "cd_list").set_original("saturn").set_filter("NTSC-U");
 
 	MCFG_SATURN_CARTRIDGE_ADD("exp", saturn_cart, nullptr)
-	MCFG_SOFTWARE_LIST_ADD("cart_list","sat_cart")
+	SOFTWARE_LIST(config, "cart_list").set_original("sat_cart");
 
 	MCFG_DEVICE_MODIFY("smpc")
 	downcast<smpc_hle_device &>(*device).set_region_code(4);
@@ -893,11 +892,10 @@ MACHINE_CONFIG_START(sat_console_state::saturneu)
 	saturn(config);
 	MCFG_DEVICE_ADD("saturn_cdb", SATURN_CDB, 16000000)
 
-	MCFG_SOFTWARE_LIST_ADD("cd_list","saturn")
-	MCFG_SOFTWARE_LIST_FILTER("cd_list","PAL")
+	SOFTWARE_LIST(config, "cd_list").set_original("saturn").set_filter("PAL");
 
 	MCFG_SATURN_CARTRIDGE_ADD("exp", saturn_cart, nullptr)
-	MCFG_SOFTWARE_LIST_ADD("cart_list","sat_cart")
+	SOFTWARE_LIST(config, "cart_list").set_original("sat_cart");
 
 	MCFG_DEVICE_MODIFY("smpc")
 	downcast<smpc_hle_device &>(*device).set_region_code(12);
@@ -907,11 +905,10 @@ MACHINE_CONFIG_START(sat_console_state::saturnjp)
 	saturn(config);
 	MCFG_DEVICE_ADD("saturn_cdb", SATURN_CDB, 16000000)
 
-	MCFG_SOFTWARE_LIST_ADD("cd_list","saturn")
-	MCFG_SOFTWARE_LIST_FILTER("cd_list","NTSC-J")
+	SOFTWARE_LIST(config, "cd_list").set_original("saturn").set_filter("NTSC-J");
 
 	MCFG_SATURN_CARTRIDGE_ADD("exp", saturn_cart, nullptr)
-	MCFG_SOFTWARE_LIST_ADD("cart_list","sat_cart")
+	SOFTWARE_LIST(config, "cart_list").set_original("sat_cart");
 
 	MCFG_DEVICE_MODIFY("smpc")
 	downcast<smpc_hle_device &>(*device).set_region_code(1);

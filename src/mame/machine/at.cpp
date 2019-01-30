@@ -46,12 +46,13 @@ void at_mb_device::device_start()
 		downcast<i80286_cpu_device *>(m_maincpu.target())->set_a20_callback(i80286_cpu_device::a20_cb(&at_mb_device::a20_286, this));
 }
 
-MACHINE_CONFIG_START(at_mb_device::at_softlists)
+void at_mb_device::at_softlists(machine_config &config)
+{
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("pc_disk_list","ibm5150")
-	MCFG_SOFTWARE_LIST_ADD("at_disk_list","ibm5170")
-	MCFG_SOFTWARE_LIST_ADD("at_cdrom_list","ibm5170_cdrom")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "pc_disk_list").set_original("ibm5150");
+	SOFTWARE_LIST(config, "at_disk_list").set_original("ibm5170");
+	SOFTWARE_LIST(config, "at_cdrom_list").set_original("ibm5170_cdrom");
+}
 
 MACHINE_CONFIG_START(at_mb_device::device_add_mconfig)
 	PIT8254(config, m_pit8254, 0);

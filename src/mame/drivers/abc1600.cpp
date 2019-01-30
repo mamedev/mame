@@ -973,7 +973,7 @@ MACHINE_CONFIG_START(abc1600_state::abc1600)
 	RAM(config, RAM_TAG).set_default_size("1M");
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "abc1600")
+	SOFTWARE_LIST(config, "flop_list").set_original("abc1600");
 MACHINE_CONFIG_END
 
 

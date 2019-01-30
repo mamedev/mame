@@ -526,7 +526,7 @@ MACHINE_CONFIG_START(lastbank_state::lastbank)
 	MCFG_DEVICE_IO_MAP(lastbank_audio_io)
 	// yes, we have no interrupts
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	//MCFG_MACHINE_START_OVERRIDE(lastbank_state,lastbank)
 	//MCFG_MACHINE_RESET_OVERRIDE(lastbank_state,lastbank)

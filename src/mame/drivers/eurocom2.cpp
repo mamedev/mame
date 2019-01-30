@@ -501,14 +501,15 @@ MACHINE_CONFIG_START(waveterm_state::waveterm)
 
 	MCFG_DEVICE_ADD("ptm", PTM6840, 0)
 
-	MCFG_SOFTWARE_LIST_ADD("disk_list", "waveterm")
+	SOFTWARE_LIST(config, "disk_list").set_original("waveterm");
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(eurocom2_state::microtrol)
+void eurocom2_state::microtrol(machine_config &config)
+{
 	eurocom2(config);
 
 	// TODO: Second board has WD2793A FDC and what looks like a RAM disk
-MACHINE_CONFIG_END
+}
 
 
 ROM_START(eurocom2)

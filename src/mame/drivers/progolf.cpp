@@ -426,7 +426,7 @@ MACHINE_CONFIG_START(progolf_state::progolf)
 	MCFG_DEVICE_ADD("audiocpu", M6502, 500000)
 	MCFG_DEVICE_PROGRAM_MAP(sound_cpu)
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	generic_latch_8_device &soundlatch(GENERIC_LATCH_8(config, "soundlatch"));
 	soundlatch.data_pending_callback().set_inputline(m_audiocpu, 0);

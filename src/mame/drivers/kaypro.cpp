@@ -269,7 +269,7 @@ MACHINE_CONFIG_START(kaypro_state::kayproii)
 	m_fdc->set_force_ready(true);
 	FLOPPY_CONNECTOR(config, "fdc:0", kaypro_floppies, "525ssdd", floppy_image_device::default_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:1", kaypro_floppies, "525ssdd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	MCFG_SOFTWARE_LIST_ADD("flop_list","kayproii")
+	SOFTWARE_LIST(config, "flop_list").set_original("kayproii");
 MACHINE_CONFIG_END
 
 void kaypro_state::kayproiv(machine_config &config)

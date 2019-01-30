@@ -1260,8 +1260,8 @@ MACHINE_CONFIG_START(pc1512_state::pc1512)
 	RAM(config, RAM_TAG).set_default_size("512K").set_extra_options("544K,576K,608K,640K");
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "pc1512_flop")
-	MCFG_SOFTWARE_LIST_ADD("hdd_list", "pc1512_hdd")
+	SOFTWARE_LIST(config, "flop_list").set_original("pc1512_flop");
+	SOFTWARE_LIST(config, "hdd_list").set_original("pc1512_hdd");
 MACHINE_CONFIG_END
 
 
@@ -1396,8 +1396,8 @@ MACHINE_CONFIG_START(pc1640_state::pc1640)
 	RAM(config, RAM_TAG).set_default_size("640K");
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "pc1640_flop")
-	MCFG_SOFTWARE_LIST_ADD("hdd_list", "pc1640_hdd")
+	SOFTWARE_LIST(config, "flop_list").set_original("pc1640_flop");
+	SOFTWARE_LIST(config, "hdd_list").set_original("pc1640_hdd");
 MACHINE_CONFIG_END
 
 

@@ -1209,7 +1209,7 @@ MACHINE_CONFIG_START(alphatp_12_state::alphatp2)
 	MCFG_DEVICE_PROGRAM_MAP(alphatp2_mem)
 	MCFG_DEVICE_IO_MAP(alphatp2_io)
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	I8041(config, m_kbdmcu, 12.8544_MHz_XTAL / 2);
 	m_kbdmcu->t0_in_cb().set(FUNC(alphatp_12_state::kbd_matrix_r));
@@ -1287,7 +1287,7 @@ MACHINE_CONFIG_START(alphatp_34_state::alphatp3)
 	MCFG_DEVICE_PROGRAM_MAP(alphatp3_mem)
 	MCFG_DEVICE_IO_MAP(alphatp3_io)
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	I8041(config, m_kbdmcu, 12.8544_MHz_XTAL /2);
 	m_kbdmcu->t0_in_cb().set(FUNC(alphatp_34_state::kbd_matrix_r));

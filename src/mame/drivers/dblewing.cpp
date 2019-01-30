@@ -366,7 +366,7 @@ MACHINE_CONFIG_START(dblewing_state::dblewing)
 
 	INPUT_MERGER_ANY_HIGH(config, "soundirq").output_handler().set_inputline(m_audiocpu, 0);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 
 	/* video hardware */

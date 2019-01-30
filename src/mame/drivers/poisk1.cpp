@@ -689,8 +689,8 @@ MACHINE_CONFIG_START(p1_state::poisk1)
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 
-	MCFG_SOFTWARE_LIST_ADD("flop_list","poisk1_flop")
-//  MCFG_SOFTWARE_LIST_ADD("cass_list","poisk1_cass")
+	SOFTWARE_LIST(config, "flop_list").set_original("poisk1_flop");
+//  SOFTWARE_LIST(config, "cass_list").set_original("poisk1_cass");
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD( "speaker", SPEAKER_SOUND )

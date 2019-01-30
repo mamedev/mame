@@ -627,7 +627,7 @@ MACHINE_CONFIG_START(undrfire_state::cbombers)
 	MCFG_DEVICE_PROGRAM_MAP(cbombers_cpub_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", undrfire_state,  irq4_line_hold)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(480))   /* CPU slices - Need to interleave Cpu's 1 & 3 */
+	config.m_minimum_quantum = attotime::from_hz(480);   /* CPU slices - Need to interleave Cpu's 1 & 3 */
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 

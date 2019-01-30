@@ -154,14 +154,15 @@ ioport_constructor sega_sk1100_device::device_input_ports() const
 }
 
 
-MACHINE_CONFIG_START(sega_sk1100_device::device_add_mconfig)
+void sega_sk1100_device::device_add_mconfig(machine_config &config)
+{
 	/* devices */
 	I8255(config, m_ppi);
 	m_ppi->in_pa_callback().set(FUNC(sega_sk1100_device::ppi_pa_r));
 	m_ppi->in_pb_callback().set(FUNC(sega_sk1100_device::ppi_pb_r));
 	m_ppi->out_pc_callback().set(FUNC(sega_sk1100_device::ppi_pc_w));
 
-//  MCFG_PRINTER_ADD("sp400") /* serial printer */
+//  PRINTER(config, "sp400", 0); /* serial printer */
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(sc3000_cassette_formats);
@@ -169,9 +170,9 @@ MACHINE_CONFIG_START(sega_sk1100_device::device_add_mconfig)
 	m_cassette->set_interface("sc3000_cass");
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("sc3k_cart_list","sc3000_cart")
-	MCFG_SOFTWARE_LIST_ADD("cass_list","sc3000_cass")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "sc3k_cart_list").set_original("sc3000_cart");
+	SOFTWARE_LIST(config, "cass_list").set_original("sc3000_cass");
+}
 
 //**************************************************************************
 //  LIVE DEVICE

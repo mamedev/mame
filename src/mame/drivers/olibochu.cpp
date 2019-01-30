@@ -470,7 +470,7 @@ MACHINE_CONFIG_START(olibochu_state::olibochu)
 	MCFG_DEVICE_PROGRAM_MAP(olibochu_sound_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(olibochu_state, irq0_line_hold, 60) //???
 
-//  MCFG_QUANTUM_PERFECT_CPU("maincpu")
+//  config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

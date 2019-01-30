@@ -412,7 +412,7 @@ MACHINE_CONFIG_START(vg5k_state::vg5k)
 	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("32K,48K");
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "vg5k")
+	SOFTWARE_LIST(config, "cass_list").set_original("vg5k");
 MACHINE_CONFIG_END
 
 /* ROM definition */

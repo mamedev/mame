@@ -418,7 +418,7 @@ MACHINE_CONFIG_START(pv2000_state::pv2000)
 	MCFG_GENERIC_LOAD(pv2000_state, pv2000_cart)
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","pv2000")
+	SOFTWARE_LIST(config, "cart_list").set_original("pv2000");
 MACHINE_CONFIG_END
 
 

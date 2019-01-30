@@ -617,7 +617,7 @@ MACHINE_CONFIG_START(apple1_state::apple1)
 
 	MCFG_SNAPSHOT_ADD("snapshot", apple1_state, apple1, "snp", 0)
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "apple1")
+	SOFTWARE_LIST(config, "cass_list").set_original("apple1");
 
 	RAM(config, RAM_TAG).set_default_size("48K").set_extra_options("4K,8K,12K,16K,20K,24K,28K,32K,36K,40K,44K");
 MACHINE_CONFIG_END

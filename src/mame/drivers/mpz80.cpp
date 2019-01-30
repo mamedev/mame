@@ -742,7 +742,7 @@ MACHINE_CONFIG_START(mpz80_state::mpz80)
 	RAM(config, RAM_TAG).set_default_size("65K"); // 65K???
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "mpz80")
+	SOFTWARE_LIST(config, "flop_list").set_original("mpz80");
 MACHINE_CONFIG_END
 
 

@@ -821,7 +821,7 @@ MACHINE_CONFIG_START(bnstars_state::bnstars)
 	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000) // Unverified; it's possibly higher than 4MHz
 	MCFG_DEVICE_PROGRAM_MAP(bnstars_sound_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
+	config.m_minimum_quantum = attotime::from_hz(60000);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bnstars)
 

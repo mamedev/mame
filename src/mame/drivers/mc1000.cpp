@@ -582,7 +582,7 @@ MACHINE_CONFIG_START(mc1000_state::mc1000)
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->set_interface("mc1000_cass");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "mc1000_cass")
+	SOFTWARE_LIST(config, "cass_list").set_original("mc1000_cass");
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->busy_handler().set(FUNC(mc1000_state::write_centronics_busy));

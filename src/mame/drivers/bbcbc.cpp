@@ -118,7 +118,8 @@ static const z80_daisy_config bbcbc_daisy_chain[] =
 };
 
 
-MACHINE_CONFIG_START(bbcbc_state::bbcbc)
+void bbcbc_state::bbcbc(machine_config &config)
+{
 	Z80(config, m_maincpu, 10.6875_MHz_XTAL / 3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &bbcbc_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &bbcbc_state::io_map);
@@ -136,9 +137,9 @@ MACHINE_CONFIG_START(bbcbc_state::bbcbc)
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	// Software on ROM cartridges
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "bbcbc_cart")
-	MCFG_SOFTWARE_LIST_ADD("cart_list","bbcbc")
-MACHINE_CONFIG_END
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "bbcbc_cart");
+	SOFTWARE_LIST(config, "cart_list").set_original("bbcbc");
+}
 
 
 void bbcbc_state::machine_start()

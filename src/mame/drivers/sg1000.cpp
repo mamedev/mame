@@ -554,7 +554,7 @@ MACHINE_CONFIG_START(sg1000_state::sg1000)
 	MCFG_SG1000_CARTRIDGE_ADD(CARTSLOT_TAG, sg1000_cart, nullptr)
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","sg1000")
+	SOFTWARE_LIST(config, "cart_list").set_original("sg1000");
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("1K");
@@ -606,7 +606,7 @@ MACHINE_CONFIG_START(sc3000_state::sc3000)
 	MCFG_SC3000_CARTRIDGE_ADD(CARTSLOT_TAG, sg1000_cart, nullptr)
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","sg1000")
+	SOFTWARE_LIST(config, "cart_list").set_original("sg1000");
 	/* the sk1100 device will add sc3000 cart and cass lists */
 
 	/* internal ram */
@@ -663,7 +663,7 @@ MACHINE_CONFIG_START(sf7000_state::sf7000)
 	MCFG_SG1000_EXPANSION_ADD(EXPSLOT_TAG, sg1000_expansion_devices, "sk1100", true)
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("flop_list","sf7000")
+	SOFTWARE_LIST(config, "flop_list").set_original("sf7000");
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("64K");

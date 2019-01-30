@@ -1344,8 +1344,8 @@ MACHINE_CONFIG_START(snes_console_state::snes)
 	MCFG_DEVICE_ADD("soundcpu", SPC700, XTAL(24'576'000) / 12)
 	MCFG_DEVICE_PROGRAM_MAP(spc_map)
 
-	//MCFG_QUANTUM_TIME(attotime::from_hz(48000))
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	//config.m_minimum_quantum = attotime::from_hz(48000);
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1372,9 +1372,9 @@ MACHINE_CONFIG_START(snes_console_state::snes)
 	SNS_CART_SLOT(config, m_cartslot, MCLK_NTSC, snes_cart, nullptr);
 	m_cartslot->irq_callback().set_inputline(m_maincpu, G65816_LINE_IRQ);
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list","snes")
-	MCFG_SOFTWARE_LIST_ADD("bsx_list","snes_bspack")
-	MCFG_SOFTWARE_LIST_ADD("st_list","snes_strom")
+	SOFTWARE_LIST(config, "cart_list").set_original("snes");
+	SOFTWARE_LIST(config, "bsx_list").set_original("snes_bspack");
+	SOFTWARE_LIST(config, "st_list").set_original("snes_strom");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(snes_console_state::snespal)

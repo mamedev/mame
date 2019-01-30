@@ -344,9 +344,9 @@ MACHINE_CONFIG_START(mtx_state::mtx512)
 	MCFG_GENERIC_LOAD(mtx_state, rompak_load)
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "mtx_cass")
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "mtx_cart")
-	MCFG_SOFTWARE_LIST_ADD("rom_list", "mtx_rom")
+	SOFTWARE_LIST(config, "cass_list").set_original("mtx_cass");
+	SOFTWARE_LIST(config, "cart_list").set_original("mtx_cart");
+	SOFTWARE_LIST(config, "rom_list").set_original("mtx_rom");
 MACHINE_CONFIG_END
 
 void mtx_state::mtx500(machine_config &config)

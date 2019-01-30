@@ -537,8 +537,8 @@ MACHINE_CONFIG_START(abc80_state::abc80)
 	RAM(config, RAM_TAG).set_default_size("16K");
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "abc80_cass")
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "abc80_flop")
+	SOFTWARE_LIST(config, "cass_list").set_original("abc80_cass");
+	SOFTWARE_LIST(config, "flop_list").set_original("abc80_flop");
 MACHINE_CONFIG_END
 
 

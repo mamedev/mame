@@ -1969,7 +1969,7 @@ MACHINE_CONFIG_START(cischeat_state::bigrun)
 	// timing set by the YM irqhandler
 //  MCFG_DEVICE_PERIODIC_INT_DRIVER(cischeat_state, irq4_line_hold, 16*30)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(1200))
+	config.m_minimum_quantum = attotime::from_hz(1200);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2095,7 +2095,7 @@ MACHINE_CONFIG_START(cischeat_state::f1gpstr2)
 	MCFG_DEVICE_ADD("cpu5", M68000, 10000000)
 	MCFG_DEVICE_PROGRAM_MAP(f1gpstr2_io_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
+	config.m_minimum_quantum = attotime::from_hz(12000);
 MACHINE_CONFIG_END
 
 

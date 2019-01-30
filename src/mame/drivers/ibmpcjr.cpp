@@ -679,9 +679,9 @@ MACHINE_CONFIG_START(pcjr_state::ibmpcjr)
 	RAM(config, m_ram).set_default_size("640K").set_extra_options("128K, 256K, 512K");
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","ibmpcjr_cart")
-	MCFG_SOFTWARE_LIST_ADD("flop_list","ibmpcjr_flop")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("pc_list","ibm5150")
+	SOFTWARE_LIST(config, "cart_list").set_original("ibmpcjr_cart");
+	SOFTWARE_LIST(config, "flop_list").set_original("ibmpcjr_flop");
+	SOFTWARE_LIST(config, "pc_list").set_compatible("ibm5150");
 MACHINE_CONFIG_END
 
 static GFXDECODE_START( gfx_ibmpcjx )

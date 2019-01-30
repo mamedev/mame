@@ -574,7 +574,7 @@ MACHINE_CONFIG_START(pyl601_state::pyl601)
 	UPD765A(config, m_fdc, 8'000'000, true, true);
 	FLOPPY_CONNECTOR(config, "upd765:0", pyl601_floppies, "525hd", pyl601_state::floppy_formats);
 	FLOPPY_CONNECTOR(config, "upd765:1", pyl601_floppies, "525hd", pyl601_state::floppy_formats);
-	MCFG_SOFTWARE_LIST_ADD("flop_list","pyl601")
+	SOFTWARE_LIST(config, "flop_list").set_original("pyl601");
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("576K"); // 64 + 512

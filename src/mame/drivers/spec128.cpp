@@ -305,7 +305,7 @@ MACHINE_CONFIG_START(spectrum_state::spectrum_128)
 	MCFG_DEVICE_PROGRAM_MAP(spectrum_128_mem)
 	MCFG_DEVICE_IO_MAP(spectrum_128_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", spectrum_state, spec_interrupt)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	MCFG_MACHINE_RESET_OVERRIDE(spectrum_state, spectrum_128 )
 

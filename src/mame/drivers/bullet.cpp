@@ -1106,7 +1106,8 @@ void bulletf_state::machine_reset()
 //  MACHINE_CONFIG( bullet )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(bullet_state::bullet)
+void bullet_state::bullet(machine_config &config)
+{
 	// basic machine hardware
 	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &bullet_state::bullet_mem);
@@ -1175,11 +1176,11 @@ MACHINE_CONFIG_START(bullet_state::bullet)
 	rs232b.rxd_handler().set(m_dart, FUNC(z80dart_device::rxb_w));
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "wmbullet")
+	SOFTWARE_LIST(config, "flop_list").set_original("wmbullet");
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("128K");
-MACHINE_CONFIG_END
+}
 
 
 //-------------------------------------------------
@@ -1271,7 +1272,7 @@ MACHINE_CONFIG_START(bulletf_state::bulletf)
 	MCFG_SCSIDEV_ADD(SCSIBUS_TAG ":" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_0)
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "wmbullet")
+	SOFTWARE_LIST(config, "flop_list").set_original("wmbullet");
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("128K");

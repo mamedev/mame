@@ -359,7 +359,7 @@ MACHINE_CONFIG_START(blueprnt_state::blueprnt)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(blueprnt_state, irq0_line_hold,  4*60) // IRQs connected to 32V
 									// NMIs are caused by the main CPU
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	WATCHDOG_TIMER(config, "watchdog");
 

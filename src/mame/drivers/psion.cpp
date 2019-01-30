@@ -602,7 +602,7 @@ MACHINE_CONFIG_START(psion_state::psion_2lines)
 	PSION_DATAPACK(config, m_pack2, 0);
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("pack_list", "psion2")
+	SOFTWARE_LIST(config, "pack_list").set_original("psion2");
 MACHINE_CONFIG_END
 
 /* basic configuration for 4 lines display */
@@ -632,8 +632,7 @@ MACHINE_CONFIG_START(psion1_state::psion1)
 	m_lcdc->set_pixel_update_cb(FUNC(psion1_state::psion1_pixel_update), this);
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_REMOVE("pack_list")
-	MCFG_SOFTWARE_LIST_ADD("pack_list", "psion1")
+	SOFTWARE_LIST(config.replace(), "pack_list").set_original("psion1");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(psion_state::psioncm)

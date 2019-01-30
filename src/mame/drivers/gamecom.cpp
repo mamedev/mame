@@ -263,7 +263,7 @@ MACHINE_CONFIG_START(gamecom_state::gamecom)
 	m_maincpu->timer_cb().set(FUNC(gamecom_state::gamecom_update_timers));
 	m_maincpu->set_vblank_int("screen", FUNC(gamecom_state::gamecom_interrupt));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	//NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -299,7 +299,7 @@ MACHINE_CONFIG_START(gamecom_state::gamecom)
 	MCFG_GENERIC_EXTENSIONS("bin,tgc")
 	MCFG_GENERIC_LOAD(gamecom_state, gamecom_cart2)
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list","gamecom")
+	SOFTWARE_LIST(config, "cart_list").set_original("gamecom");
 MACHINE_CONFIG_END
 
 ROM_START( gamecom )

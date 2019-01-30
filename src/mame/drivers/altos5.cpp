@@ -473,7 +473,7 @@ MACHINE_CONFIG_START(altos5_state::altos5)
 	FLOPPY_CONNECTOR(config, "fdc:0", altos5_floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:1", altos5_floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
 
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "altos5")
+	SOFTWARE_LIST(config, "flop_list").set_original("altos5");
 	MCFG_QUICKLOAD_ADD("quickload", altos5_state, altos5, "com,cpm", 3)
 MACHINE_CONFIG_END
 

@@ -544,7 +544,7 @@ MACHINE_CONFIG_START(champbas_state::talbot)
 	m_mainlatch->q_out_cb<7>().set(FUNC(champbas_state::mcu_switch_w));
 
 	MCFG_DEVICE_ADD("alpha_8201", ALPHA_8201, XTAL(18'432'000)/6/8)
-	MCFG_QUANTUM_PERFECT_CPU("alpha_8201:mcu")
+	config.m_perfect_cpu_quantum = subtag("alpha_8201:mcu");
 
 	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 0x10);
 
@@ -624,7 +624,7 @@ MACHINE_CONFIG_START(champbas_state::champbasj)
 	m_mainlatch->q_out_cb<7>().set(FUNC(champbas_state::mcu_switch_w));
 
 	MCFG_DEVICE_ADD("alpha_8201", ALPHA_8201, XTAL(18'432'000)/6/8) // note: 8302 rom on champbb2 (same device!)
-	MCFG_QUANTUM_PERFECT_CPU("alpha_8201:mcu")
+	config.m_perfect_cpu_quantum = subtag("alpha_8201:mcu");
 MACHINE_CONFIG_END
 
 
@@ -696,7 +696,7 @@ MACHINE_CONFIG_START(exctsccr_state::exctsccr)
 	exc_snd_irq.set_start_delay(attotime::from_hz(75));
 
 	MCFG_DEVICE_ADD("alpha_8201", ALPHA_8201, XTAL(18'432'000)/6/8) // note: 8302 rom, or 8303 on exctscc2 (same device!)
-	MCFG_QUANTUM_PERFECT_CPU("alpha_8201:mcu")
+	config.m_perfect_cpu_quantum = subtag("alpha_8201:mcu");
 
 	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 0x10);
 
@@ -754,7 +754,7 @@ MACHINE_CONFIG_START(exctsccr_state::exctsccrb)
 	MCFG_DEVICE_PROGRAM_MAP(champbas_sound_map)
 
 	MCFG_DEVICE_ADD("alpha_8201", ALPHA_8201, XTAL(18'432'000)/6/8) // champbasj 8201 on pcb, though unused
-	MCFG_QUANTUM_PERFECT_CPU("alpha_8201:mcu")
+	config.m_perfect_cpu_quantum = subtag("alpha_8201:mcu");
 
 	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 0x10);
 

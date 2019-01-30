@@ -394,7 +394,7 @@ MACHINE_CONFIG_START(dgn_beta_state::dgnbeta)
 	/* in blocks of 128K up to this maximum.                                                    */
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "dgnbeta_flop")
+	SOFTWARE_LIST(config, "flop_list").set_original("dgnbeta_flop");
 MACHINE_CONFIG_END
 
 ROM_START(dgnbeta)

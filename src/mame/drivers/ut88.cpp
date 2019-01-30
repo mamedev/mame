@@ -226,7 +226,7 @@ MACHINE_CONFIG_START(ut88_state::ut88)
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
 	m_cassette->set_interface("ut88_cass");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list","ut88")
+	SOFTWARE_LIST(config, "cass_list").set_original("ut88");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ut88_state::ut88mini)
@@ -249,7 +249,7 @@ MACHINE_CONFIG_START(ut88_state::ut88mini)
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
 	m_cassette->set_interface("ut88_cass");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list","ut88")
+	SOFTWARE_LIST(config, "cass_list").set_original("ut88");
 MACHINE_CONFIG_END
 
 /* ROM definition */

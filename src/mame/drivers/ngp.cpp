@@ -873,8 +873,8 @@ MACHINE_CONFIG_START(ngp_state::ngp)
 	MCFG_GENERIC_UNLOAD(ngp_state, ngp_cart)
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","ngp")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("ngpc_list","ngpc")
+	SOFTWARE_LIST(config, "cart_list").set_original("ngp");
+	SOFTWARE_LIST(config, "ngpc_list").set_compatible("ngpc");
 MACHINE_CONFIG_END
 
 
@@ -893,8 +893,8 @@ MACHINE_CONFIG_START(ngp_state::ngpc)
 	MCFG_GENERIC_UNLOAD(ngp_state, ngp_cart)
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","ngpc")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("ngp_list","ngp")
+	SOFTWARE_LIST(config, "cart_list").set_original("ngpc");
+	SOFTWARE_LIST(config, "ngp_list").set_compatible("ngp");
 MACHINE_CONFIG_END
 
 

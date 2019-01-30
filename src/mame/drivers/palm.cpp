@@ -188,7 +188,7 @@ MACHINE_CONFIG_START(palm_state::palm)
 	MCFG_DEVICE_PROGRAM_MAP( palm_map)
 	MCFG_DEVICE_DISASSEMBLE_OVERRIDE(palm_state, palm_dasm_override)
 
-	MCFG_QUANTUM_TIME( attotime::from_hz(60) )
+	config.m_minimum_quantum =  attotime::from_hz(60);
 
 	MCFG_SCREEN_ADD( "screen", LCD )
 	MCFG_SCREEN_REFRESH_RATE( 60 )

@@ -1052,7 +1052,8 @@ MACHINE_CONFIG_START(next_state::next)
 	MCFG_DEVICE_PROGRAM_MAP(next_0b_m_nofdc_mem)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(next_state::next_fdc_base)
+void next_state::next_fdc_base(machine_config &config)
+{
 	next_base(config);
 	N82077AA(config, fdc, n82077aa_device::MODE_PS2);
 	fdc->intrq_wr_callback().set(FUNC(next_state::fdc_irq));
@@ -1060,8 +1061,8 @@ MACHINE_CONFIG_START(next_state::next_fdc_base)
 	FLOPPY_CONNECTOR(config, "fdc:0", next_floppies, "35ed", next_state::floppy_formats);
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "next")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "flop_list").set_original("next");
+}
 
 MACHINE_CONFIG_START(next_state::nexts)
 	next_fdc_base(config);

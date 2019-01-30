@@ -326,11 +326,9 @@ MACHINE_CONFIG_START(coco3_state::coco3)
 	coco_floating(config);
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("cart_list","coco_cart")
-	MCFG_SOFTWARE_LIST_FILTER("cart_list","COCO3")
+	SOFTWARE_LIST(config, "cart_list").set_original("coco_cart").set_filter("COCO3");
 
-	MCFG_SOFTWARE_LIST_ADD("flop_list","coco_flop")
-	MCFG_SOFTWARE_LIST_FILTER("flop_list","COCO3")
+	SOFTWARE_LIST(config, "flop_list").set_original("coco_flop").set_filter("COCO3");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(coco3_state::coco3p)

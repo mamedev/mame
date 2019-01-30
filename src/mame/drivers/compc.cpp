@@ -248,7 +248,7 @@ MACHINE_CONFIG_START(compc_state::compc)
 	RAM(config, RAM_TAG).set_default_size("256K").set_extra_options("512K, 640K");
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("disk_list", "ibm5150")
+	SOFTWARE_LIST(config, "disk_list").set_original("ibm5150");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(compc_state::pc10iii)

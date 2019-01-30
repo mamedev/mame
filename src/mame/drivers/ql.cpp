@@ -966,9 +966,9 @@ MACHINE_CONFIG_START(ql_state::ql)
 	m_qimi->extint_wr_callback().set(FUNC(ql_state::qimi_extintl_w));
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "ql_cart")
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "ql_cass")
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "ql_flop")
+	SOFTWARE_LIST(config, "cart_list").set_original("ql_cart");
+	SOFTWARE_LIST(config, "cass_list").set_original("ql_cass");
+	SOFTWARE_LIST(config, "flop_list").set_original("ql_flop");
 
 	// internal ram
 	RAM(config, m_ram).set_default_size("128K");

@@ -1621,11 +1621,11 @@ MACHINE_CONFIG_START(amiga_state::amiga_base)
 	m_centronics->set_output_latch(cent_data_out);
 
 	// software
-	MCFG_SOFTWARE_LIST_ADD("wb_list", "amiga_workbench")
-	MCFG_SOFTWARE_LIST_ADD("hardware_list", "amiga_hardware")
-	MCFG_SOFTWARE_LIST_ADD("apps_list", "amiga_apps")
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "amiga_flop")
-	MCFG_SOFTWARE_LIST_ADD("ocs_list", "amigaocs_flop")
+	SOFTWARE_LIST(config, "wb_list").set_original("amiga_workbench");
+	SOFTWARE_LIST(config, "hardware_list").set_original("amiga_hardware");
+	SOFTWARE_LIST(config, "apps_list").set_original("amiga_apps");
+	SOFTWARE_LIST(config, "flop_list").set_original("amiga_flop");
+	SOFTWARE_LIST(config, "ocs_list").set_original("amigaocs_flop");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(a1000_state::a1000)
@@ -1647,7 +1647,7 @@ MACHINE_CONFIG_START(a1000_state::a1000)
 	ADDRESS_MAP_BANK(config, "overlay").set_map(&a1000_state::a1000_overlay_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
 	ADDRESS_MAP_BANK(config, "bootrom").set_map(&a1000_state::a1000_bootrom_map).set_options(ENDIANNESS_BIG, 16, 19, 0x40000);
 
-	MCFG_SOFTWARE_LIST_ADD("a1000_list", "amiga_a1000")
+	SOFTWARE_LIST(config, "a1000_list").set_original("amiga_a1000");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(a1000_state::a1000n)
@@ -1810,7 +1810,7 @@ MACHINE_CONFIG_START(cdtv_state::cdtv)
 	m_cdrom->dten_handler().set("u36", FUNC(amiga_dmac_device::xdreq_w));
 
 	// software
-	MCFG_SOFTWARE_LIST_ADD("cd_list", "cdtv")
+	SOFTWARE_LIST(config, "cd_list").set_original("cdtv");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cdtv_state::cdtvn)
@@ -1849,8 +1849,8 @@ MACHINE_CONFIG_START(a3000_state::a3000)
 	// todo: zorro3 slots, super dmac, scsi
 
 	// software
-	MCFG_SOFTWARE_LIST_ADD("a3000_list", "amiga_a3000")
-	MCFG_SOFTWARE_LIST_ADD("ecs_list", "amigaecs_flop")
+	SOFTWARE_LIST(config, "a3000_list").set_original("amiga_a3000");
+	SOFTWARE_LIST(config, "ecs_list").set_original("amigaecs_flop");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(a3000_state::a3000n)
@@ -1885,7 +1885,7 @@ MACHINE_CONFIG_START(a500p_state::a500p)
 	MCFG_EXPANSION_SLOT_ADD("maincpu", a500_expansion_cards, nullptr)
 
 	// software
-	MCFG_SOFTWARE_LIST_ADD("ecs_list", "amigaecs_flop")
+	SOFTWARE_LIST(config, "ecs_list").set_original("amigaecs_flop");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(a500p_state::a500pn)
@@ -1931,7 +1931,7 @@ MACHINE_CONFIG_START(a600_state::a600)
 	// todo: pcmcia
 
 	// software
-	MCFG_SOFTWARE_LIST_ADD("ecs_list", "amigaecs_flop")
+	SOFTWARE_LIST(config, "ecs_list").set_original("amigaecs_flop");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(a600_state::a600n)
@@ -1993,8 +1993,8 @@ MACHINE_CONFIG_START(a1200_state::a1200)
 	// todo: pcmcia
 
 	// software
-	MCFG_SOFTWARE_LIST_ADD("aga_list", "amigaaga_flop")
-	MCFG_SOFTWARE_LIST_ADD("ecs_list", "amigaecs_flop")
+	SOFTWARE_LIST(config, "aga_list").set_original("amigaaga_flop");
+	SOFTWARE_LIST(config, "ecs_list").set_original("amigaecs_flop");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(a1200_state::a1200n)
@@ -2048,8 +2048,8 @@ MACHINE_CONFIG_START(a4000_state::a4000)
 	// todo: zorro3
 
 	// software
-	MCFG_SOFTWARE_LIST_ADD("aga_list", "amigaaga_flop")
-	MCFG_SOFTWARE_LIST_ADD("ecs_list", "amigaecs_flop")
+	SOFTWARE_LIST(config, "aga_list").set_original("amigaaga_flop");
+	SOFTWARE_LIST(config, "ecs_list").set_original("amigaecs_flop");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(a4000_state::a4000n)
@@ -2128,7 +2128,7 @@ MACHINE_CONFIG_START(cd32_state::cd32)
 	m_cia_0->sp_wr_callback().set_nop();
 
 	CDROM(config, "cdrom").set_interface("cd32_cdrom");
-	MCFG_SOFTWARE_LIST_ADD("cd_list", "cd32")
+	SOFTWARE_LIST(config, "cd_list").set_original("cd32");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cd32_state::cd32n)

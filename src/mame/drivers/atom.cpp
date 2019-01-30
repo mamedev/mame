@@ -768,9 +768,9 @@ MACHINE_CONFIG_START(atom_state::atom)
 	RAM(config, RAM_TAG).set_default_size("32K").set_extra_options("2K,4K,6K,8K,10K,12K").set_default_value(0x00);
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("rom_list","atom_rom")
-	MCFG_SOFTWARE_LIST_ADD("cass_list","atom_cass")
-	MCFG_SOFTWARE_LIST_ADD("flop_list","atom_flop")
+	SOFTWARE_LIST(config, "rom_list").set_original("atom_rom");
+	SOFTWARE_LIST(config, "cass_list").set_original("atom_cass");
+	SOFTWARE_LIST(config, "flop_list").set_original("atom_flop");
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
@@ -882,8 +882,8 @@ void atom_state::atombb(machine_config &config)
 //  MCFG_RAM_DEFAULT_SIZE("32K")
 
 //  /* Software lists */
-//  MCFG_SOFTWARE_LIST_REMOVE("rom_list")
-//  MCFG_SOFTWARE_LIST_REMOVE("flop_list")
+//  config.device_remove("rom_list");
+//  config.device_remove("flop_list");
 //MACHINE_CONFIG_END
 
 /*-------------------------------------------------
@@ -901,19 +901,20 @@ void atom_state::atombb(machine_config &config)
 //  MCFG_RAM_DEFAULT_SIZE("32K")
 
 //  /* Software lists */
-//  MCFG_SOFTWARE_LIST_REMOVE("rom_list")
+//  config.device_remove("rom_list");
 //MACHINE_CONFIG_END
 
 /*-------------------------------------------------
     MACHINE_DRIVER( atommc )
 -------------------------------------------------*/
 
-//static MACHINE_CONFIG_START( atommc )
+//void atom_state::atommc(machine_config &config)
+//{
 //  atom(config);
 //  /* Software lists */
-//  MCFG_SOFTWARE_LIST_ADD("mmc_list","atom_mmc")
-//  MCFG_SOFTWARE_LIST_REMOVE("flop_list")
-//MACHINE_CONFIG_END
+//  SOFTWARE_LIST(config, "mmc_list").set_original("atom_mmc");
+//  config.device_remove("flop_list");
+//}
 
 /***************************************************************************
     ROMS

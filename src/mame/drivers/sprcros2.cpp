@@ -466,7 +466,7 @@ MACHINE_CONFIG_START(sprcros2_state::sprcros2)
 	MCFG_DEVICE_IO_MAP(slave_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sprcros2_state,  slave_vblank_irq)
 
-	MCFG_QUANTUM_PERFECT_CPU("master_cpu")
+	config.m_perfect_cpu_quantum = subtag("master_cpu");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -1545,8 +1545,8 @@ MACHINE_CONFIG_START(px4_state::px4)
 	MCFG_GENERIC_CARTSLOT_ADD("capsule2", generic_plain_slot, "px4_cart")
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "px4_cart")
-	MCFG_SOFTWARE_LIST_ADD("epson_cpm_list", "epson_cpm")
+	SOFTWARE_LIST(config, "cart_list").set_original("px4_cart");
+	SOFTWARE_LIST(config, "epson_cpm_list").set_original("epson_cpm");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(px4p_state::px4p)

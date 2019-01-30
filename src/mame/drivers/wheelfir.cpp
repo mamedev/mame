@@ -740,7 +740,7 @@ MACHINE_CONFIG_START(wheelfir_state::wheelfir)
 	MCFG_DEVICE_ADD("subcpu", M68000, 32000000/2)
 	MCFG_DEVICE_PROGRAM_MAP(wheelfir_sub)
 
-	//MCFG_QUANTUM_TIME(attotime::from_hz(12000))
+	//config.m_minimum_quantum = attotime::from_hz(12000);
 
 	adc0808_device &adc(ADC0808(config, "adc", 500000)); // unknown clock
 	adc.eoc_ff_callback().set(FUNC(wheelfir_state::adc_eoc_w));

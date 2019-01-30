@@ -545,7 +545,7 @@ MACHINE_CONFIG_START(pegasus_state::pegasus)
 	m_cass->set_default_state(CASSETTE_STOPPED|CASSETTE_MOTOR_ENABLED);
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "pegasus_cart")
+	SOFTWARE_LIST(config, "cart_list").set_original("pegasus_cart");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pegasus_state::pegasusm)

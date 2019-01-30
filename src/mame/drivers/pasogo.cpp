@@ -572,7 +572,7 @@ MACHINE_CONFIG_START(pasogo_state::pasogo)
 	MCFG_GENERIC_WIDTH(GENERIC_ROM16_WIDTH)
 	MCFG_GENERIC_MANDATORY
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list","pasogo")
+	SOFTWARE_LIST(config, "cart_list").set_original("pasogo");
 
 	TIMER(config, "vg230_timer").configure_periodic(FUNC(pasogo_state::vg230_timer), attotime::from_hz(1));
 MACHINE_CONFIG_END

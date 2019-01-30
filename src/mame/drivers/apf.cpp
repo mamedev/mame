@@ -553,7 +553,7 @@ MACHINE_CONFIG_START(apf_state::apfm1000)
 	MCFG_APF_CARTRIDGE_ADD("cartslot", apf_cart, nullptr)
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "apfm1000")
+	SOFTWARE_LIST(config, "cart_list").set_original("apfm1000");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(apf_state::apfimag)
@@ -580,7 +580,7 @@ MACHINE_CONFIG_START(apf_state::apfimag)
 	FLOPPY_CONNECTOR(config, "fdc:0", apf_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:1", apf_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "apfimag_cass")
+	SOFTWARE_LIST(config, "cass_list").set_original("apfimag_cass");
 MACHINE_CONFIG_END
 
 

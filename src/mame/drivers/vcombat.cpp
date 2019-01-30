@@ -583,8 +583,8 @@ MACHINE_CONFIG_START(vcombat_state::vcombat)
 
 /* Temporary hack for experimenting with timing. */
 #if 0
-	//MCFG_QUANTUM_TIME(attotime::from_hz(1200))
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	//config.m_minimum_quantum = attotime::from_hz(1200);
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 #endif
 
 	TLC34076(config, m_tlc34076, tlc34076_device::TLC34076_6_BIT);

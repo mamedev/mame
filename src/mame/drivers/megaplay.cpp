@@ -674,7 +674,7 @@ MACHINE_CONFIG_START(mplay_state::megaplay)
 	MCFG_DEVICE_PROGRAM_MAP(megaplay_bios_map)
 	MCFG_DEVICE_IO_MAP(megaplay_bios_io_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	cxd1095_device &io1(CXD1095(config, "io1", 0));
 	io1.in_porta_cb().set_ioport("DSW0");

@@ -345,15 +345,16 @@ MACHINE_CONFIG_START(poly_state::poly)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(poly_state::poly2)
+void poly_state::poly2(machine_config &config)
+{
 	poly(config);
 
 	/* internal ram */
 	m_ram->set_default_size("128K");
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_FILTER("flop_list", "POLY2")
-MACHINE_CONFIG_END
+	subdevice<software_list_device>("flop_list")->set_filter("POLY2");
+}
 
 
 void polydev_state::polydev(machine_config &config)

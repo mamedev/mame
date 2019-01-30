@@ -494,7 +494,7 @@ MACHINE_CONFIG_START(st0016_state::mayjinsn)
 	MCFG_DEVICE_IO_MAP(st0016_m2_io)
 	MCFG_DEVICE_ADD("sub", V810, 10000000)//25 Mhz ?
 	MCFG_DEVICE_PROGRAM_MAP(v810_mem)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(st0016_state::renju)

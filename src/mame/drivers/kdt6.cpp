@@ -716,7 +716,7 @@ MACHINE_CONFIG_START(kdt6_state::psi98)
 	FLOPPY_CONNECTOR(config, "fdc:0", kdt6_floppies, "fd55f", floppy_image_device::default_floppy_formats);
 	FLOPPY_CONNECTOR(config, "fdc:1", kdt6_floppies, "fd55f", floppy_image_device::default_floppy_formats);
 
-	MCFG_SOFTWARE_LIST_ADD("floppy_list", "psi98")
+	SOFTWARE_LIST(config, "floppy_list").set_original("psi98");
 
 	MCFG_PSI_KEYBOARD_INTERFACE_ADD("kbd", "hle")
 	MCFG_PSI_KEYBOARD_RX_HANDLER(WRITELINE(*this, kdt6_state, keyboard_rx_w))

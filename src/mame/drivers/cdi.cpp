@@ -830,8 +830,7 @@ MACHINE_CONFIG_START(cdi_state::cdimono2)
 	MCFG_DEVICE_PROGRAM_MAP(cdimono2_slave_mem)
 
 	CDROM(config, "cdrom").set_interface("cdi_cdrom");
-	MCFG_SOFTWARE_LIST_ADD("cd_list","cdi")
-	MCFG_SOFTWARE_LIST_FILTER("cd_list","!DVC")
+	SOFTWARE_LIST(config, "cd_list").set_original("cdi").set_filter("!DVC");
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -884,8 +883,7 @@ MACHINE_CONFIG_START(cdi_state::cdi910)
 	MCFG_DEVICE_PROGRAM_MAP(cdimono2_slave_mem)
 
 	CDROM(config, "cdrom").set_interface("cdi_cdrom");
-	MCFG_SOFTWARE_LIST_ADD("cd_list","cdi")
-	MCFG_SOFTWARE_LIST_FILTER("cd_list","!DVC")
+	SOFTWARE_LIST(config, "cd_list").set_original("cdi").set_filter("!DVC");
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -910,8 +908,7 @@ MACHINE_CONFIG_START(cdi_state::cdimono1)
 	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, cdimono1)
 
 	CDROM(config, "cdrom").set_interface("cdi_cdrom");
-	MCFG_SOFTWARE_LIST_ADD("cd_list","cdi")
-	MCFG_SOFTWARE_LIST_FILTER("cd_list","!DVC")
+	SOFTWARE_LIST(config, "cd_list").set_original("cdi").set_filter("!DVC");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cdi_state::quizard)

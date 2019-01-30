@@ -559,13 +559,13 @@ MACHINE_CONFIG_START(svi3x8_state::svi318)
 	m_cassette->set_formats(svi_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED);
 	m_cassette->set_interface("svi318_cass");
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "svi318_cass")
+	SOFTWARE_LIST(config, "cass_list").set_original("svi318_cass");
 
 	// cartridge slot
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "svi318_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 	MCFG_GENERIC_LOAD(svi3x8_state, cartridge)
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "svi318_cart")
+	SOFTWARE_LIST(config, "cart_list").set_original("svi318_cart");
 
 	// expander bus
 	MCFG_SVI_EXPANDER_BUS_ADD("exp")

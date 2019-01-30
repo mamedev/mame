@@ -894,9 +894,9 @@ MACHINE_CONFIG_START(dectalk_state::dectalk)
 	m_dsp->bio().set(FUNC(dectalk_state::spc_semaphore_r)); //read infifo-has-data-in-it fifo readable status
 
 #ifdef USE_LOOSE_TIMING
-	MCFG_QUANTUM_TIME(attotime::from_hz(100))
+	config.m_minimum_quantum = attotime::from_hz(100);
 #else
-	MCFG_QUANTUM_PERFECT_CPU("dsp")
+	config.m_perfect_cpu_quantum = subtag("dsp");
 #endif
 
 	X2212(config, "x2212");

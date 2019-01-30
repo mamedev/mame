@@ -370,7 +370,7 @@ MACHINE_CONFIG_START(chaknpop_state::chaknpop)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", chaknpop_state,  irq0_line_hold)
 
 	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, XTAL(18'000'000) / 6)    // Verified on PCB
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
+	config.m_minimum_quantum = attotime::from_hz(6000);  // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

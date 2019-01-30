@@ -601,7 +601,7 @@ MACHINE_CONFIG_START(bw2_state::bw2)
 	MCFG_BW2_EXPANSION_SLOT_ADD(BW2_EXPANSION_SLOT_TAG, 16_MHz_XTAL, bw2_expansion_cards, nullptr)
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("flop_list","bw2")
+	SOFTWARE_LIST(config, "flop_list").set_original("bw2");
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("64K").set_extra_options("96K,128K,160K,192K,224K");

@@ -165,7 +165,7 @@ void bwidow_state::bwidow_audio(machine_config &config)
 
 	DISCRETE(config, "discrete", bwidow_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	//MCFG_QUANTUM_PERFECT_CPU("pokey1")
+	//config.m_perfect_cpu_quantum = subtag("pokey1");
 }
 
 void bwidow_state::gravitar_audio(machine_config &config)

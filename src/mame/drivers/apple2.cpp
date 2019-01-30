@@ -1369,7 +1369,8 @@ static void apple2_cards(device_slot_interface &device)
 //  device.option_add("magicmusician", A2BUS_MAGICMUSICIAN);    /* Magic Musician Card */
 }
 
-MACHINE_CONFIG_START(apple2_state::apple2_common)
+void apple2_state::apple2_common(machine_config &config)
+{
 	/* basic machine hardware */
 	M6502(config, m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2_state::apple2_map);
@@ -1438,14 +1439,14 @@ MACHINE_CONFIG_START(apple2_state::apple2_common)
 	A2BUS_SLOT(config, "sl6", m_a2bus, apple2_cards, "diskiing");
 	A2BUS_SLOT(config, "sl7", m_a2bus, apple2_cards, nullptr);
 
-	MCFG_SOFTWARE_LIST_ADD("flop525_list","apple2")
+	SOFTWARE_LIST(config, "flop525_list").set_original("apple2");
 	SOFTWARE_LIST(config, "flop525_orig").set_compatible("apple2_flop_orig").set_filter("A2");
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "apple2_cass")
+	SOFTWARE_LIST(config, "cass_list").set_original("apple2_cass");
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED);
 	m_cassette->set_interface("apple2_cass");
-MACHINE_CONFIG_END
+}
 
 void apple2_state::apple2(machine_config &config)
 {

@@ -592,7 +592,7 @@ MACHINE_CONFIG_START(triforce_state::triforce_base)
 	MCFG_DEVICE_ADD("maincpu", PPC603, 64000000) /* Correct CPU is a PowerPC 750 (what Apple called "G3") with paired-single vector instructions added */
 	MCFG_DEVICE_PROGRAM_MAP(gc_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 
 	/* video hardware */

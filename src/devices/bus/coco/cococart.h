@@ -225,7 +225,4 @@ private:
 	MCFG_DEVICE_ADD(_tag, COCOCART_SLOT, DERIVED_CLOCK(1, 1)) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
-#define MCFG_COCO_CARTRIDGE_REMOVE(_tag)        \
-	MCFG_DEVICE_REMOVE(_tag)
-
 #endif // MAME_BUS_COCO_COCOCART_H

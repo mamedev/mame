@@ -251,7 +251,7 @@ MACHINE_CONFIG_START(pk8020_state::pk8020)
 	FLOPPY_CONNECTOR(config, "wd1793:2", pk8020_floppies, "qd", pk8020_state::floppy_formats);
 	FLOPPY_CONNECTOR(config, "wd1793:3", pk8020_floppies, "qd", pk8020_state::floppy_formats);
 
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "korvet_flop")
+	SOFTWARE_LIST(config, "flop_list").set_original("korvet_flop");
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();

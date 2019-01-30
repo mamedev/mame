@@ -389,7 +389,7 @@ MACHINE_CONFIG_START(aquarius_state::aquarius)
 	RAM(config, RAM_TAG).set_default_size("4K").set_extra_options("8K,20K,36K");
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","aquarius")
+	SOFTWARE_LIST(config, "cart_list").set_original("aquarius");
 MACHINE_CONFIG_END
 
 

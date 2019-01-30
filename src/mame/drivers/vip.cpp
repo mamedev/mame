@@ -744,7 +744,7 @@ MACHINE_CONFIG_START(vip_state::vip)
 	m_cassette->set_interface("vip_cass");
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "vip")
+	SOFTWARE_LIST(config, "cass_list").set_original("vip");
 
 	// internal ram
 	RAM(config, m_ram).set_default_size("2K").set_extra_options("4K");

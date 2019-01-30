@@ -654,13 +654,14 @@ MACHINE_CONFIG_START(fidel68k_state::eag_base)
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "fidel_scc")
 	MCFG_GENERIC_EXTENSIONS("bin,dat")
 	MCFG_GENERIC_LOAD(fidelbase_state, scc_cartridge)
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "fidel_scc")
+	SOFTWARE_LIST(config, "cart_list").set_original("fidel_scc");
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(fidel68k_state::eag)
+void fidel68k_state::eag(machine_config &config)
+{
 	eag_base(config);
 	RAM(config, "ram").set_default_size("1M").set_extra_options("128K, 512K, 1M");
-MACHINE_CONFIG_END
+}
 
 MACHINE_CONFIG_START(fidel68k_state::eagv7)
 	eag_base(config);

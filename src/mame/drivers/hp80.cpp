@@ -1398,7 +1398,7 @@ MACHINE_CONFIG_START(hp85_state::hp85)
 	BITBANGER(config, m_prt_graph_out, 0);
 	BITBANGER(config, m_prt_alpha_out, 0);
 
-	MCFG_SOFTWARE_LIST_ADD("optrom_list" , "hp85_rom")
+	SOFTWARE_LIST(config, "optrom_list").set_original("hp85_rom");
 MACHINE_CONFIG_END
 
 ROM_START(hp85)

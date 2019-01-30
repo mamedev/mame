@@ -1058,7 +1058,7 @@ MACHINE_CONFIG_START(portfolio_state::portfolio)
 	TIMER(config, "keyboard").configure_periodic(FUNC(portfolio_state::keyboard_tick), attotime::from_usec(2500));
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "pofo")
+	SOFTWARE_LIST(config, "cart_list").set_original("pofo");
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("128K");

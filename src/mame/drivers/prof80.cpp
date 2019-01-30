@@ -507,7 +507,7 @@ MACHINE_CONFIG_START(prof80_state::prof80)
 	RAM(config, RAM_TAG).set_default_size("128K");
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "prof80")
+	SOFTWARE_LIST(config, "flop_list").set_original("prof80");
 MACHINE_CONFIG_END
 
 

@@ -978,7 +978,7 @@ MACHINE_CONFIG_START(octopus_state::octopus)
 	m_fdc->drq_wr_callback().set(m_dma2, FUNC(am9517a_device::dreq1_w));
 	FLOPPY_CONNECTOR(config, "fdc:0", octopus_floppies, "525dd", floppy_image_device::default_floppy_formats);
 	FLOPPY_CONNECTOR(config, "fdc:1", octopus_floppies, "525dd", floppy_image_device::default_floppy_formats);
-	MCFG_SOFTWARE_LIST_ADD("fd_list","octopus")
+	SOFTWARE_LIST(config, "fd_list").set_original("octopus");
 
 	PIT8253(config, m_pit, 0);
 	m_pit->set_clk<0>(4.9152_MHz_XTAL / 2);  // DART channel A

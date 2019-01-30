@@ -257,8 +257,8 @@ MACHINE_CONFIG_START(mikrosha_state::mikrosha)
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "mikrosha_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "mikrosha_cass")
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "mikrosha_cart")
+	SOFTWARE_LIST(config, "cass_list").set_original("mikrosha_cass");
+	SOFTWARE_LIST(config, "cart_list").set_original("mikrosha_cart");
 MACHINE_CONFIG_END
 
 

@@ -392,7 +392,7 @@ MACHINE_CONFIG_START(i7000_state::i7000)
 	MCFG_GENERIC_LOAD(i7000_state, i7000_card)
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("card_list", "i7000_card")
+	SOFTWARE_LIST(config, "card_list").set_original("i7000_card");
 MACHINE_CONFIG_END
 
 ROM_START( i7000 )

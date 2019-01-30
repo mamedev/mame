@@ -269,7 +269,7 @@ MACHINE_CONFIG_START(ddribble_state::ddribble)
 	MCFG_DEVICE_ADD("cpu2", MC6809E, XTAL(18'432'000)/12)  /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(cpu2_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* we need heavy synch */
+	config.m_minimum_quantum = attotime::from_hz(6000);  /* we need heavy synch */
 
 	WATCHDOG_TIMER(config, "watchdog");
 

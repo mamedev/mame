@@ -650,7 +650,7 @@ MACHINE_CONFIG_START(microvision_state::microvision)
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(0)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	MCFG_SCREEN_UPDATE_DRIVER(microvision_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, microvision_state, screen_vblank))
@@ -671,7 +671,7 @@ MACHINE_CONFIG_START(microvision_state::microvision)
 	MCFG_GENERIC_LOAD(microvision_state, microvsn_cart)
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","microvision")
+	SOFTWARE_LIST(config, "cart_list").set_original("microvision");
 MACHINE_CONFIG_END
 
 
