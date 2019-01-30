@@ -15,8 +15,7 @@
     TODO:
     - Source organization is a big mess. Each machine family could be in its own
       sub driverclass, and separate files.
-    - VBRC card scanner
-    - VBRC MCU T1 is unknown
+    - card games aren't playable without the barcode scanner
     - Z80 WAIT pin is not fully emulated, affecting VBRC speech busy state
 
     Read the official manual(s) on how to play.
@@ -495,6 +494,7 @@ expect that the software reads these once on startup only.
 
 #include "cpu/z80/z80.h"
 #include "cpu/mcs48/mcs48.h"
+#include "machine/clock.h"
 #include "machine/i8255.h"
 #include "machine/i8243.h"
 #include "machine/z80pio.h"
@@ -525,7 +525,8 @@ public:
 		m_i8243(*this, "i8243"),
 		m_beeper_off(*this, "beeper_off"),
 		m_beeper(*this, "beeper"),
-		m_irq_on(*this, "irq_on")
+		m_irq_on(*this, "irq_on"),
+		m_barcode(*this, "BARCODE")
 	{ }
 
 	void cc10(machine_config &config);
@@ -534,6 +535,8 @@ public:
 	void bkc(machine_config &config);
 	void scc(machine_config &config);
 	void vsc(machine_config &config);
+	void brc_base(machine_config &config);
+	void ubc(machine_config &config);
 	void vbrc(machine_config &config);
 	void bv3(machine_config &config);
 	void dsc(machine_config &config);
@@ -549,6 +552,7 @@ private:
 	optional_device<timer_device> m_beeper_off;
 	optional_device<beep_device> m_beeper;
 	optional_device<timer_device> m_irq_on;
+	optional_ioport m_barcode;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE); }
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE); }
@@ -593,16 +597,18 @@ private:
 	void vsc_io(address_map &map);
 	void vsc_map(address_map &map);
 
-	// VBRC, BV3
+	// VBRC/UBC, BV3
 	void vbrc_prepare_display();
 	DECLARE_WRITE8_MEMBER(vbrc_speech_w);
 	DECLARE_WRITE8_MEMBER(vbrc_mcu_p1_w);
 	DECLARE_READ_LINE_MEMBER(vbrc_mcu_t0_r);
 	DECLARE_READ_LINE_MEMBER(vbrc_mcu_t1_r);
+	DECLARE_WRITE_LINE_MEMBER(vbrc_clock_w);
 	DECLARE_READ8_MEMBER(vbrc_mcu_p2_r);
 	template<int P> void vbrc_ioexp_port_w(uint8_t data);
 	void vbrc_main_io(address_map &map);
 	void vbrc_main_map(address_map &map);
+	int m_vbrc_t1;
 
 	// DSC
 	void dsc_prepare_display();
@@ -610,6 +616,9 @@ private:
 	DECLARE_WRITE8_MEMBER(dsc_select_w);
 	DECLARE_READ8_MEMBER(dsc_input_r);
 	void dsc_map(address_map &map);
+
+protected:
+	virtual void machine_start() override;
 };
 
 
@@ -653,6 +662,17 @@ void fidelbase_state::machine_start()
 
 void fidelbase_state::machine_reset()
 {
+}
+
+void fidelz80_state::machine_start()
+{
+	fidelbase_state::machine_start();
+
+	// zerofill
+	m_vbrc_t1 = 0;
+
+	// register for savestates
+	save_item(NAME(m_vbrc_t1));
 }
 
 
@@ -1033,23 +1053,28 @@ WRITE8_MEMBER(fidelz80_state::vsc_pio_portb_w)
 
 
 /******************************************************************************
-    VBRC, BV3
+    VBRC/UBC, BV3
 ******************************************************************************/
 
 // misc handlers
 
 void fidelz80_state::vbrc_prepare_display()
 {
-	// 14seg led segments, d15 is extra led
+	// 14seg led segments, d15(12) is extra led
 	u16 outdata = bitswap<16>(m_7seg_data,12,13,1,6,5,2,0,7,15,11,10,14,4,3,9,8);
 	set_display_segmask(0xff, 0x3fff);
 	display_matrix(16, 8, outdata, m_led_select);
 
-	// d14 is tone (not on speech model)
+	// d14(13) is tone (not on speech model)
+	if (m_dac != nullptr)
+		m_dac->write(BIT(outdata, 14));
 }
 
 WRITE8_MEMBER(fidelz80_state::vbrc_speech_w)
 {
+	if (m_speech == nullptr)
+		return;
+
 	m_speech->data_w(space, 0, data & 0x3f);
 	m_speech->start_w(1);
 	m_speech->start_w(0);
@@ -1085,14 +1110,19 @@ READ8_MEMBER(fidelz80_state::vbrc_mcu_p2_r)
 
 READ_LINE_MEMBER(fidelz80_state::vbrc_mcu_t0_r)
 {
-	// T0: card scanner?
-	return 0;
+	// T0: card scanner
+	return m_barcode->read();
 }
 
 READ_LINE_MEMBER(fidelz80_state::vbrc_mcu_t1_r)
 {
-	// T1: ? (locks up on const 0 or 1)
-	return machine().rand() & 1;
+	// T1: master clock / 4
+	return m_vbrc_t1;
+}
+
+WRITE_LINE_MEMBER(fidelz80_state::vbrc_clock_w)
+{
+	m_vbrc_t1 = state;
 }
 
 
@@ -1234,7 +1264,7 @@ void fidelz80_state::vsc_io(address_map &map)
 }
 
 
-// VBRC, BV3
+// VBRC/UBC, BV3
 
 void fidelz80_state::vbrc_main_map(address_map &map)
 {
@@ -1446,6 +1476,9 @@ static INPUT_PORTS_START( vbrc )
 
 	PORT_START("RESET") // is not on matrix IN.7 d0
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, fidelz80_state, reset_button, nullptr) PORT_NAME("RE")
+
+	PORT_START("BARCODE")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CODE(KEYCODE_F1) PORT_NAME("Card Scanner")
 INPUT_PORTS_END
 
 
@@ -1500,6 +1533,9 @@ static INPUT_PORTS_START( bv3 )
 
 	PORT_START("RESET") // is not on matrix IN.7 d0
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, fidelz80_state, reset_button, nullptr) PORT_NAME("Reset")
+
+	PORT_START("BARCODE")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CODE(KEYCODE_F1) PORT_NAME("Card Scanner")
 INPUT_PORTS_END
 
 
@@ -1873,7 +1909,7 @@ void fidelz80_state::vsc(machine_config &config)
 	m_speech->add_route(ALL_OUTPUTS, "speaker", 0.75);
 }
 
-void fidelz80_state::vbrc(machine_config &config)
+void fidelz80_state::brc_base(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 5_MHz_XTAL/2);
@@ -1889,6 +1925,8 @@ void fidelz80_state::vbrc(machine_config &config)
 	m_mcu->t0_in_cb().set(FUNC(fidelz80_state::vbrc_mcu_t0_r));
 	m_mcu->t1_in_cb().set(FUNC(fidelz80_state::vbrc_mcu_t1_r));
 
+	CLOCK(config, "t1_clock", 5_MHz_XTAL/4).signal_handler().set(FUNC(fidelz80_state::vbrc_clock_w));
+
 	I8243(config, m_i8243);
 	m_i8243->p4_out_cb().set(FUNC(fidelz80_state::vbrc_ioexp_port_w<0>));
 	m_i8243->p5_out_cb().set(FUNC(fidelz80_state::vbrc_ioexp_port_w<1>));
@@ -1897,6 +1935,23 @@ void fidelz80_state::vbrc(machine_config &config)
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_fidel_vbrc);
+}
+
+void fidelz80_state::ubc(machine_config &config)
+{
+	brc_base(config);
+
+	/* sound hardware */
+	SPEAKER(config, "speaker").front_center();
+	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+}
+
+void fidelz80_state::vbrc(machine_config &config)
+{
+	brc_base(config);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -2043,8 +2098,8 @@ ROM_END
 
 ROM_START( vsc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("101-64108", 0x0000, 0x2000, CRC(c9c98490) SHA1(e6db883df088d60463e75db51433a4b01a3e7626) )
-	ROM_LOAD("101-64109", 0x2000, 0x2000, CRC(08a3577c) SHA1(69fe379d21a9d4b57c84c3832d7b3e7431eec341) )
+	ROM_LOAD("101-64018", 0x0000, 0x2000, CRC(c9c98490) SHA1(e6db883df088d60463e75db51433a4b01a3e7626) )
+	ROM_LOAD("101-64019", 0x2000, 0x2000, CRC(08a3577c) SHA1(69fe379d21a9d4b57c84c3832d7b3e7431eec341) )
 	ROM_LOAD("101-32024", 0x4000, 0x1000, CRC(2a078676) SHA1(db2f0aba7e8ac0f84a17bae7155210cdf0813afb) )
 
 	ROM_REGION( 0x2000, "speech", 0 )
@@ -2054,8 +2109,8 @@ ROM_END
 
 ROM_START( vscsp )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("101-64108", 0x0000, 0x2000, CRC(c9c98490) SHA1(e6db883df088d60463e75db51433a4b01a3e7626) )
-	ROM_LOAD("101-64109", 0x2000, 0x2000, CRC(08a3577c) SHA1(69fe379d21a9d4b57c84c3832d7b3e7431eec341) )
+	ROM_LOAD("101-64018", 0x0000, 0x2000, CRC(c9c98490) SHA1(e6db883df088d60463e75db51433a4b01a3e7626) )
+	ROM_LOAD("101-64019", 0x2000, 0x2000, CRC(08a3577c) SHA1(69fe379d21a9d4b57c84c3832d7b3e7431eec341) )
 	ROM_LOAD("101-32024", 0x4000, 0x1000, CRC(2a078676) SHA1(db2f0aba7e8ac0f84a17bae7155210cdf0813afb) )
 
 	ROM_REGION( 0x2000, "speech", 0 )
@@ -2064,8 +2119,8 @@ ROM_END
 
 ROM_START( vscg )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("101-64108", 0x0000, 0x2000, CRC(c9c98490) SHA1(e6db883df088d60463e75db51433a4b01a3e7626) )
-	ROM_LOAD("101-64109", 0x2000, 0x2000, CRC(08a3577c) SHA1(69fe379d21a9d4b57c84c3832d7b3e7431eec341) )
+	ROM_LOAD("101-64018", 0x0000, 0x2000, CRC(c9c98490) SHA1(e6db883df088d60463e75db51433a4b01a3e7626) )
+	ROM_LOAD("101-64019", 0x2000, 0x2000, CRC(08a3577c) SHA1(69fe379d21a9d4b57c84c3832d7b3e7431eec341) )
 	ROM_LOAD("101-32024", 0x4000, 0x1000, CRC(2a078676) SHA1(db2f0aba7e8ac0f84a17bae7155210cdf0813afb) )
 
 	ROM_REGION( 0x2000, "speech", 0 )
@@ -2074,8 +2129,8 @@ ROM_END
 
 ROM_START( vscfr )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("101-64108", 0x0000, 0x2000, CRC(c9c98490) SHA1(e6db883df088d60463e75db51433a4b01a3e7626) )
-	ROM_LOAD("101-64109", 0x2000, 0x2000, CRC(08a3577c) SHA1(69fe379d21a9d4b57c84c3832d7b3e7431eec341) )
+	ROM_LOAD("101-64018", 0x0000, 0x2000, CRC(c9c98490) SHA1(e6db883df088d60463e75db51433a4b01a3e7626) )
+	ROM_LOAD("101-64019", 0x2000, 0x2000, CRC(08a3577c) SHA1(69fe379d21a9d4b57c84c3832d7b3e7431eec341) )
 	ROM_LOAD("101-32024", 0x4000, 0x1000, CRC(2a078676) SHA1(db2f0aba7e8ac0f84a17bae7155210cdf0813afb) )
 
 	ROM_REGION( 0x2000, "speech", 0 )
@@ -2094,6 +2149,16 @@ ROM_START( vbrc ) // model VBRC aka 7002
 
 	ROM_REGION( 0x1000, "speech", 0 )
 	ROM_LOAD("101-32118", 0x0000, 0x1000, CRC(a0b8bb8f) SHA1(f56852108928d5c6caccfc8166fa347d6760a740) )
+ROM_END
+
+ROM_START( bridgeca ) // model UBC
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("101-64108", 0x0000, 0x2000, CRC(08472223) SHA1(859865b13c908dbb474333263dc60f6a32461141) )
+	ROM_LOAD("101-64109", 0x2000, 0x2000, CRC(320afa0f) SHA1(90edfe0ac19b108d232cda376b03a3a24befad4c) )
+	ROM_LOAD("101-64110", 0x4000, 0x2000, CRC(3040d0bd) SHA1(caa55fc8d9196e408fb41e7171a68e5099519813) )
+
+	ROM_REGION( 0x0400, "mcu", 0 )
+	ROM_LOAD("100-1009", 0x0000, 0x0400, CRC(60eb343f) SHA1(8a63e95ebd62e123bdecc330c0484a47c354bd1a) )
 ROM_END
 
 
@@ -2144,7 +2209,8 @@ CONS( 1980, vscsp,    vsc,     0, vsc,    vscsp, fidelz80_state, empty_init, "Fi
 CONS( 1980, vscg,     vsc,     0, vsc,    vscg,  fidelz80_state, empty_init, "Fidelity Electronics", "Voice Sensory Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 CONS( 1980, vscfr,    vsc,     0, vsc,    vscfr, fidelz80_state, empty_init, "Fidelity Electronics", "Voice Sensory Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 
-CONS( 1979, vbrc,     0,       0, vbrc,   vbrc,  fidelz80_state, empty_init, "Fidelity Electronics", "Voice Bridge Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NOT_WORKING )
+CONS( 1980, vbrc,     0,       0, vbrc,   vbrc,  fidelz80_state, empty_init, "Fidelity Electronics", "Voice Bridge Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NOT_WORKING )
+CONS( 1980, bridgeca, vbrc,    0, ubc,    vbrc,  fidelz80_state, empty_init, "Fidelity Electronics", "Advanced Bridge Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NOT_WORKING )
 CONS( 1982, bridgec3, 0,       0, bv3,    bv3,   fidelz80_state, empty_init, "Fidelity Electronics", "Bridge Challenger III", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NOT_WORKING )
 
 CONS( 1981, damesc,   0,       0, dsc,    dsc,   fidelz80_state, empty_init, "Fidelity Electronics", "Dame Sensory Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
