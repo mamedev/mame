@@ -110,12 +110,14 @@ class proxied_analog_output_t : public analog_output_t
 {
 public:
 
-	proxied_analog_output_t(core_device_t &dev, const pstring &aname)
+	proxied_analog_output_t(core_device_t &dev, const pstring &aname, analog_net_t *pnet)
 	: analog_output_t(dev, aname)
-	, m_proxied_net(nullptr)
+	, m_proxied_net(pnet)
 	{ }
 	virtual ~proxied_analog_output_t();
 
+	analog_net_t *proxied_net() const { return m_proxied_net;}
+private:
 	analog_net_t *m_proxied_net; // only for proxy nets in analog input logic
 };
 
@@ -129,7 +131,9 @@ public:
 	{
 		NOSORT,
 		ASCENDING,
-		DESCENDING
+		DESCENDING,
+		PREFER_IDENTITY_TOP_LEFT,
+		PREFER_BAND_MATRIX
 	};
 
 	virtual ~matrix_solver_t() override;
@@ -162,6 +166,8 @@ public:
 
 public:
 	int get_net_idx(detail::net_t *net);
+	std::pair<int, int> get_left_right_of_diag(std::size_t row, std::size_t diag);
+	double get_weight_around_diag(std::size_t row, std::size_t diag);
 
 	virtual void log_stats();
 
@@ -176,7 +182,9 @@ public:
 protected:
 
 	matrix_solver_t(netlist_base_t &anetlist, const pstring &name,
-			const eSortType sort, const solver_parameters_t *params);
+			eSortType sort, const solver_parameters_t *params);
+
+	void sort_terms(eSortType sort);
 
 	void setup_base(analog_net_t::list_t &nets);
 	void update_dynamic();
@@ -259,7 +267,7 @@ void matrix_solver_t::build_LE_A(T &child)
 	typedef typename T::float_type float_type;
 	static_assert(std::is_base_of<matrix_solver_t, T>::value, "T must derive from matrix_solver_t");
 
-	const std::size_t iN = child.N();
+	const std::size_t iN = child.size();
 	for (std::size_t k = 0; k < iN; k++)
 	{
 		terms_for_net_t *terms = m_terms[k].get();
@@ -294,7 +302,7 @@ void matrix_solver_t::build_LE_RHS(T &child)
 	static_assert(std::is_base_of<matrix_solver_t, T>::value, "T must derive from matrix_solver_t");
 	typedef typename T::float_type float_type;
 
-	const std::size_t iN = child.N();
+	const std::size_t iN = child.size();
 	for (std::size_t k = 0; k < iN; k++)
 	{
 		float_type rhsk_a = 0.0;

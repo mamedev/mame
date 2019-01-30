@@ -44,7 +44,7 @@
 
 #include "nld_solver.h"
 #include "nld_matrix_solver.h"
-#include "vector_base.h"
+#include "../plib/vector_ops.h"
 
 namespace netlist
 {
@@ -74,7 +74,7 @@ protected:
 	virtual unsigned vsolve_non_dynamic(const bool newton_raphson) override;
 	unsigned solve_non_dynamic(const bool newton_raphson);
 
-	constexpr std::size_t N() const { return m_dim; }
+	constexpr std::size_t size() const { return m_dim; }
 
 	void LE_invert();
 
@@ -97,7 +97,6 @@ protected:
 	template <typename T1, typename T2>
 	float_ext_type &lA(const T1 &r, const T2 &c) { return m_lA[r][c]; }
 
-	float_type m_last_RHS[storage_N]; // right hand side - contains currents
 
 private:
 	static constexpr std::size_t m_pitch  = (((  storage_N) + 7) / 8) * 8;
@@ -136,9 +135,7 @@ void matrix_solver_w_t<FT, SIZE>::vsetup(analog_net_t::list_t &nets)
 {
 	matrix_solver_t::setup_base(nets);
 
-	state().save(*this, m_last_RHS, "m_last_RHS");
-
-	for (unsigned k = 0; k < N(); k++)
+	for (unsigned k = 0; k < size(); k++)
 		state().save(*this, RHS(k), plib::pfmt("RHS.{1}")(k));
 }
 
@@ -147,7 +144,7 @@ void matrix_solver_w_t<FT, SIZE>::vsetup(analog_net_t::list_t &nets)
 template <typename FT, int SIZE>
 void matrix_solver_w_t<FT, SIZE>::LE_invert()
 {
-	const std::size_t kN = N();
+	const std::size_t kN = size();
 
 	for (std::size_t i = 0; i < kN; i++)
 	{
@@ -211,7 +208,7 @@ template <typename T>
 void matrix_solver_w_t<FT, SIZE>::LE_compute_x(
 		T * RESTRICT x)
 {
-	const std::size_t kN = N();
+	const std::size_t kN = size();
 
 	for (std::size_t i=0; i<kN; i++)
 		x[i] = 0.0;
@@ -229,11 +226,11 @@ void matrix_solver_w_t<FT, SIZE>::LE_compute_x(
 template <typename FT, int SIZE>
 unsigned matrix_solver_w_t<FT, SIZE>::solve_non_dynamic(const bool newton_raphson)
 {
-	const auto iN = N();
+	const auto iN = size();
 
 	float_type new_V[storage_N]; // = { 0.0 };
 
-	if ((m_cnt % 100) == 0)
+	if ((m_cnt % 50) == 0)
 	{
 		/* complete calculation */
 		this->LE_invert();
@@ -369,9 +366,6 @@ unsigned matrix_solver_w_t<FT, SIZE>::vsolve_non_dynamic(const bool newton_raphs
 	this->build_LE_A(*this);
 	this->build_LE_RHS(*this);
 
-	for (std::size_t i=0, iN=N(); i < iN; i++)
-		m_last_RHS[i] = RHS(i);
-
 	this->m_stat_calculations++;
 	return this->solve_non_dynamic(newton_raphson);
 }
@@ -379,14 +373,10 @@ unsigned matrix_solver_w_t<FT, SIZE>::vsolve_non_dynamic(const bool newton_raphs
 template <typename FT, int SIZE>
 matrix_solver_w_t<FT, SIZE>::matrix_solver_w_t(netlist_base_t &anetlist, const pstring &name,
 		const solver_parameters_t *params, const std::size_t size)
-: matrix_solver_t(anetlist, name, NOSORT, params)
-	,m_cnt(0)
+	: matrix_solver_t(anetlist, name, NOSORT, params)
+	, m_cnt(0)
 	, m_dim(size)
 {
-	for (std::size_t k = 0; k < N(); k++)
-	{
-		m_last_RHS[k] = 0.0;
-	}
 }
 
 	} //namespace devices

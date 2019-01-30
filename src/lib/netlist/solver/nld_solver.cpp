@@ -301,7 +301,7 @@ void NETLIB_NAME(solver)::post_start()
 				else
 					ms = create_solver<double, 2>(2, sname);
 				break;
-#if 1
+#if 0
 			case 3:
 				ms = create_solver<double, 3>(3, sname);
 				break;

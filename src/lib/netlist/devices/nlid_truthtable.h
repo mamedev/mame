@@ -29,17 +29,9 @@
 
 namespace netlist
 {
-	namespace devices
-	{
+namespace devices
+{
 
-#if 0
-	template<unsigned bits> struct uint_for_size { typedef uint_least32_t type; };
-	template<unsigned bits>
-	struct need_bytes_for_bits
-	{
-		enum { value = 4 };
-	};
-#else
 	template<unsigned bits>
 	struct need_bytes_for_bits
 	{
@@ -56,7 +48,6 @@ namespace netlist
 	template<> struct uint_for_size<2> { typedef uint_least16_t type; };
 	template<> struct uint_for_size<4> { typedef uint_least32_t type; };
 	template<> struct uint_for_size<8> { typedef uint_least64_t type; };
-#endif
 
 	template<std::size_t NUM, typename R>
 	struct aa
@@ -270,7 +261,7 @@ namespace netlist
 
 	void tt_factory_create(setup_t &setup, tt_desc &desc, const pstring &sourcefile);
 
-	} //namespace devices
+} //namespace devices
 } // namespace netlist
 
 
