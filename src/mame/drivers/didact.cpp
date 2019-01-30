@@ -810,7 +810,7 @@ void modulab_state::modulab(machine_config &config)
   	TIMER(config, "artwork_timer").configure_periodic(FUNC(modulab_state::scan_artwork), attotime::from_hz(10));
 
 	//RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
-MACHINE_CONFIG_END
+}
 
 void md6802_state::md6802(machine_config &config)
 {
@@ -845,7 +845,7 @@ void md6802_state::md6802(machine_config &config)
 	TIMER(config, "artwork_timer").configure_periodic(FUNC(md6802_state::scan_artwork), attotime::from_hz(10));
 
 	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
-MACHINE_CONFIG_END
+}
 
 void mp68a_state::mp68a(machine_config &config)
 {
