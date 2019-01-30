@@ -144,20 +144,20 @@ Esselte Studium Modulab layout
 	</element>
 
 	<element name="amp">
-	  <rect><bounds x="115" y="0" width="175" height="905" /><color red="0.1" green="0.1" blue="0.1" /></rect><!-- body -->
+	  <rect><bounds x="115" y="0" width="175" height="905" /><color red="0.1" green="0.1" blue="0.1" /></rect> <!-- body -->
 	  
-	  <rect><bounds x="0" y="0" width="125" height="50" /><color red="0.1" green="0.1" blue="0.1" /></rect><!-- upper jaw -->
+	  <rect><bounds x="0" y="0" width="125" height="50" /><color red="0.1" green="0.1" blue="0.1" /></rect>    <!-- upper jaw -->
 	  
-	  <rect><bounds x="90" y="0" width="25" height="155" /><color red="0.1" green="0.1" blue="0.1" /></rect><!-- upper parts -->
+	  <rect><bounds x="90" y="0" width="25" height="155" /><color red="0.1" green="0.1" blue="0.1" /></rect>   <!-- upper parts -->
 	  <rect><bounds x="90" y="200" width="25" height="230" /><color red="0.1" green="0.1" blue="0.1" /></rect>
 	  
 	  <rect><bounds x="115" y="430" width="100" height="55" /><color red="0.3" green="0.3" blue="0.3" /></rect><!-- mid gap -->
-	  <rect><bounds x="100" y="453" width="115" height="7" /><color red="0.9" green="0.9" blue="0.9" /></rect><!-- pin -->
+	  <rect><bounds x="100" y="453" width="115" height="7" /><color red="0.9" green="0.9" blue="0.9" /></rect> <!-- pin -->
 
-	  <rect><bounds x="90" y="485" width="25" height="230" /><color red="0.1" green="0.1" blue="0.1" /></rect><!-- lower parts -->
+	  <rect><bounds x="90" y="485" width="25" height="230" /><color red="0.1" green="0.1" blue="0.1" /></rect> <!-- lower parts -->
 	  <rect><bounds x="90" y="750" width="25" height="155" /><color red="0.1" green="0.1" blue="0.1" /></rect>
 	  
-	  <rect><bounds x="0" y="855" width="125" height="50" /><color red="0.1" green="0.1" blue="0.1" /></rect><!-- lower jaw -->
+	  <rect><bounds x="0" y="855" width="125" height="50" /><color red="0.1" green="0.1" blue="0.1" /></rect>  <!-- lower jaw -->
 	</element>
 
 	<element name="xtal">
@@ -219,7 +219,7 @@ Esselte Studium Modulab layout
 	</element>
 	
 	<group name="hood">
-	  <bezel element="plexi" /><!-- bounds x="0" y="0"  width="800" height="600" /></bezel -->
+	  <bezel element="plexi" />
 	</group>
 
 	<group name="pcb">
@@ -340,18 +340,18 @@ Esselte Studium Modulab layout
 	    <param name="t" value="text_6116"/>
 	    <param name="th" value="40"/>
 	    <param name="tw" value="240"/>
-	    <group ref="hdip"><bounds x="725" y="1875" width="~w~" height="~h~" /></group><!-- RAM -->
+	    <group ref="hdip"><bounds x="725" y="1875" width="~w~" height="~h~" /></group> <!-- RAM -->
 	    <param name="col" value="brown"/>
 	    <param name="c" value="14"/>
 	    <param name="w" value="490"/>
 	    <param name="t" value="text_2764"/>
-	    <group ref="hdip"><bounds x="655" y="1600" width="~w~" height="~h~" /></group><!-- ROM -->
+	    <group ref="hdip"><bounds x="655" y="1600" width="~w~" height="~h~" /></group> <!-- ROM -->
 	    <param name="c" value="20"/>
 	    <param name="w" value="700"/>
 	    <param name="t" value="text_6802"/>
-	    <group ref="hdip"><bounds x="655" y="1240" width="~w~" height="~h~" /></group><!-- CPU -->
+	    <group ref="hdip"><bounds x="655" y="1240" width="~w~" height="~h~" /></group> <!-- CPU -->
 	    <param name="t" value="text_8154"/>
-	    <group ref="hdip"><bounds x="655" y="900" width="~w~" height="~h~" /></group><!-- INS8154 -->
+	    <group ref="hdip"><bounds x="655" y="900" width="~w~" height="~h~" /></group>  <!-- INS8154 -->
 
 
 	    <!-- descrete components -->
@@ -415,10 +415,15 @@ Esselte Studium Modulab layout
 	    <group ref="screw"><bounds x="1170" y="630"  width="75" height="75" /></group>
 	  </group>
 
-	  <view name="Full Artwork">
-	  <group ref="pcb"><bounds x="0" y="0" width="800" height="600" /></group>
-	  <group ref="hood"><bounds x="0" y="0" width="800" height="600"/> <color alpha="0.2" /></group>
-	  <group ref="screws"><bounds x="0" y="0" width="800" height="600"/> <!--color alpha="1.0" /--></group>
-	  <!--bezel element="hood"><bounds x="0" y="0"  width="800" height="600" /><color alpha="0.2" /></bezel -->
-	</view>
+	  <view name="Base Artwork">
+	    <group ref="pcb"><bounds x="0" y="0" width="800" height="600" /></group>
+	    <group ref="hood"><bounds x="0" y="0" width="800" height="600"/> <color alpha="0.2" /></group>
+	    <group ref="screws"><bounds x="0" y="0" width="800" height="600"/></group>
+	  </view>
+	  
+	  <view name="Leds and Buttons Artwork">
+	    <group ref="pcb"><bounds x="0" y="0" width="800" height="600" /></group>
+	    <!-- group ref="hood"><bounds x="0" y="0" width="800" height="600"/> <color alpha="0.2" /></group>
+	    <group ref="screws"><bounds x="0" y="0" width="800" height="600"/></group -->
+	  </view>
 </mamelayout>
