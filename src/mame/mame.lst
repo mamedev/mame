@@ -35513,6 +35513,7 @@ snespal                         // Nintendo Super Nintendo PAL
 
 @source:snesb.cpp
 denseib                         // bootleg
+denseib2                        // bootleg
 endless                         // bootleg
 ffight2b                        // bootleg
 iron                            // bootleg
