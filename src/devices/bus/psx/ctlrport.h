@@ -77,11 +77,6 @@ private:
 	required_ioport m_pad1;
 };
 
-#define MCFG_PSX_CONTROLLER_PORTS_DSR_HANDLER(_devcb) \
-	downcast<psxcontrollerports_device &>(*device).set_dsr_handler(DEVCB_##_devcb);
-
-#define MCFG_PSX_CONTROLLER_PORTS_RXD_HANDLER(_devcb) \
-	downcast<psxcontrollerports_device &>(*device).set_rxd_handler(DEVCB_##_devcb);
 
 class psxcontrollerports_device : public device_t
 {

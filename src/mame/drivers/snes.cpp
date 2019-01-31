@@ -1356,11 +1356,11 @@ MACHINE_CONFIG_START(snes_console_state::snes)
 	m_ppu->open_bus_callback().set([this] { return snes_open_bus_r(); }); // lambda because overloaded function name
 	m_ppu->set_screen("screen");
 
-	MCFG_SNES_CONTROL_PORT_ADD("ctrl1", snes_control_port_devices, "joypad")
-	MCFG_SNESCTRL_ONSCREEN_CB(snes_console_state, onscreen_cb)
-	MCFG_SNES_CONTROL_PORT_ADD("ctrl2", snes_control_port_devices, "joypad")
-	MCFG_SNESCTRL_ONSCREEN_CB(snes_console_state, onscreen_cb)
-	MCFG_SNESCTRL_GUNLATCH_CB(snes_console_state, gun_latch_cb)
+	SNES_CONTROL_PORT(config, m_ctrl1, snes_control_port_devices, "joypad");
+	m_ctrl1->set_onscreen_callback(FUNC(snes_console_state::onscreen_cb), this);
+	SNES_CONTROL_PORT(config, m_ctrl2, snes_control_port_devices, "joypad");
+	m_ctrl2->set_onscreen_callback(FUNC(snes_console_state::onscreen_cb), this);
+	m_ctrl2->set_gunlatch_callback(FUNC(snes_console_state::gun_latch_cb), this);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

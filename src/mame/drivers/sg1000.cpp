@@ -548,7 +548,7 @@ MACHINE_CONFIG_START(sg1000_state::sg1000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* expansion slot */
-	MCFG_SG1000_EXPANSION_ADD(EXPSLOT_TAG, sg1000_expansion_devices, nullptr, false)
+	SG1000_EXPANSION_SLOT(config, m_sgexpslot, sg1000_expansion_devices, nullptr, false);
 
 	/* cartridge */
 	MCFG_SG1000_CARTRIDGE_ADD(CARTSLOT_TAG, sg1000_cart, nullptr)
@@ -600,7 +600,7 @@ MACHINE_CONFIG_START(sc3000_state::sc3000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* sc3000 has all sk1100 features built-in, so add it as a fixed slot */
-	MCFG_SG1000_EXPANSION_ADD(EXPSLOT_TAG, sg1000_expansion_devices, "sk1100", true)
+	SG1000_EXPANSION_SLOT(config, m_sgexpslot, sg1000_expansion_devices, "sk1100", true);
 
 	/* cartridge */
 	MCFG_SC3000_CARTRIDGE_ADD(CARTSLOT_TAG, sg1000_cart, nullptr)
@@ -660,7 +660,7 @@ MACHINE_CONFIG_START(sf7000_state::sf7000)
 	m_centronics->set_output_latch(cent_data_out);
 
 	/* sf7000 (sc3000) has all sk1100 features built-in, so add it as a fixed slot */
-	MCFG_SG1000_EXPANSION_ADD(EXPSLOT_TAG, sg1000_expansion_devices, "sk1100", true)
+	SG1000_EXPANSION_SLOT(config, m_sgexpslot, sg1000_expansion_devices, "sk1100", true);
 
 	/* software lists */
 	SOFTWARE_LIST(config, "flop_list").set_original("sf7000");

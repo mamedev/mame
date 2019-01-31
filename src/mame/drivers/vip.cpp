@@ -728,14 +728,15 @@ MACHINE_CONFIG_START(vip_state::vip)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD(DISCRETE_TAG, DISCRETE, vip_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	DISCRETE(config, m_beeper, vip_discrete);
+	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_VIP_BYTEIO_PORT_ADD(VIP_BYTEIO_PORT_TAG, vip_byteio_cards, nullptr, WRITELINE(*this, vip_state, byteio_inst_w))
-	MCFG_VIP_EXPANSION_SLOT_ADD(VIP_EXPANSION_SLOT_TAG, 3.52128_MHz_XTAL / 2, vip_expansion_cards, nullptr)
-	MCFG_VIP_EXPANSION_SLOT_INT_CALLBACK(WRITELINE(*this, vip_state, exp_int_w))
-	MCFG_VIP_EXPANSION_SLOT_DMA_OUT_CALLBACK(WRITELINE(*this, vip_state, exp_dma_out_w))
-	MCFG_VIP_EXPANSION_SLOT_DMA_IN_CALLBACK(WRITELINE(*this, vip_state, exp_dma_in_w))
+	VIP_BYTEIO_PORT(config, m_byteio, vip_byteio_cards, nullptr);
+	m_byteio->inst_callback().set(FUNC(vip_state::byteio_inst_w));
+	VIP_EXPANSION_SLOT(config, m_exp, 3.52128_MHz_XTAL / 2, vip_expansion_cards, nullptr);
+	m_exp->int_wr_callback().set(FUNC(vip_state::exp_int_w));
+	m_exp->dma_out_wr_callback().set(FUNC(vip_state::exp_dma_out_w));
+	m_exp->dma_in_wr_callback().set(FUNC(vip_state::exp_dma_in_w));
 
 	// devices
 	MCFG_QUICKLOAD_ADD("quickload", vip_state, vip, "bin,c8,c8x", 0)

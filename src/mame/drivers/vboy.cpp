@@ -1337,7 +1337,7 @@ MACHINE_CONFIG_START(vboy_state::vboy)
 	MCFG_SCREEN_PALETTE(m_palette)
 
 	/* cartridge */
-	MCFG_VBOY_CARTRIDGE_ADD("cartslot", vboy_cart, nullptr)
+	VBOY_CART_SLOT(config, m_cart, vboy_cart, nullptr);
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("vboy");

@@ -21,30 +21,6 @@
 #define CBM_IEC_TAG         "iec_bus"
 
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_CBM_IEC_BUS_ADD() \
-	MCFG_DEVICE_ADD(CBM_IEC_TAG, CBM_IEC, 0)
-
-
-#define MCFG_CBM_IEC_SLOT_ADD(_tag, _address, _slot_intf, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, CBM_IEC_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-	downcast<cbm_iec_slot_device *>(device)->set_address(_address);
-
-
-#define MCFG_CBM_IEC_ADD(_default_drive) \
-	MCFG_CBM_IEC_SLOT_ADD("iec4", 4, cbm_iec_devices, nullptr) \
-	MCFG_CBM_IEC_SLOT_ADD("iec8", 8, cbm_iec_devices, _default_drive) \
-	MCFG_CBM_IEC_SLOT_ADD("iec9", 9, cbm_iec_devices, nullptr) \
-	MCFG_CBM_IEC_SLOT_ADD("iec10", 10, cbm_iec_devices, nullptr) \
-	MCFG_CBM_IEC_SLOT_ADD("iec11", 11, cbm_iec_devices, nullptr) \
-	MCFG_CBM_IEC_BUS_ADD()
-
-
 void cbm_iec_devices(device_slot_interface &device);
 
 //**************************************************************************

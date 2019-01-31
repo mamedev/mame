@@ -73,22 +73,6 @@
 
 #define X68K_EXP_SLOT_TAG       "x68kexp"
 
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_X68K_EXPANSION_SLOT_OUT_IRQ2_CB(_devcb) \
-	downcast<x68k_expansion_slot_device &>(*device).set_out_irq2_callback(DEVCB_##_devcb);
-
-#define MCFG_X68K_EXPANSION_SLOT_OUT_IRQ4_CB(_devcb) \
-	downcast<x68k_expansion_slot_device &>(*device).set_out_irq4_callback(DEVCB_##_devcb);
-
-#define MCFG_X68K_EXPANSION_SLOT_OUT_NMI_CB(_devcb) \
-	downcast<x68k_expansion_slot_device &>(*device).set_out_nmi_callback(DEVCB_##_devcb);
-
-#define MCFG_X68K_EXPANSION_SLOT_OUT_RESET_CB(_devcb) \
-	downcast<x68k_expansion_slot_device &>(*device).set_out_reset_callback(DEVCB_##_devcb);
-
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -123,13 +107,22 @@ class x68k_expansion_slot_device : public device_t, public device_slot_interface
 {
 public:
 	// construction/destruction
-	x68k_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T>
+	x68k_expansion_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
+		: x68k_expansion_slot_device(mconfig, tag, owner, 0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
+	x68k_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~x68k_expansion_slot_device();
 
-	template <class Object> devcb_base &set_out_irq2_callback(Object &&cb) { return m_out_irq2_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_irq4_callback(Object &&cb) { return m_out_irq4_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_nmi_callback(Object &&cb) { return m_out_nmi_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_reset_callback(Object &&cb) { return m_out_reset_cb.set_callback(std::forward<Object>(cb)); }
+	auto out_irq2_callback() { return m_out_irq2_cb.bind(); }
+	auto out_irq4_callback() { return m_out_irq4_cb.bind(); }
+	auto out_nmi_callback() { return m_out_nmi_cb.bind(); }
+	auto out_reset_callback() { return m_out_reset_cb.bind(); }
 
 
 	DECLARE_WRITE_LINE_MEMBER( irq2_w );

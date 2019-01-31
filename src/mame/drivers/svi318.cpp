@@ -568,13 +568,13 @@ MACHINE_CONFIG_START(svi3x8_state::svi318)
 	SOFTWARE_LIST(config, "cart_list").set_original("svi318_cart");
 
 	// expander bus
-	MCFG_SVI_EXPANDER_BUS_ADD("exp")
-	MCFG_SVI_EXPANDER_INT_HANDLER(WRITELINE(*this, svi3x8_state, intexp_w))
-	MCFG_SVI_EXPANDER_ROMDIS_HANDLER(WRITELINE(*this, svi3x8_state, romdis_w))
-	MCFG_SVI_EXPANDER_RAMDIS_HANDLER(WRITELINE(*this, svi3x8_state, ramdis_w))
-	MCFG_SVI_EXPANDER_CTRL1_HANDLER(WRITELINE(*this, svi3x8_state, ctrl1_w))
-	MCFG_SVI_EXPANDER_EXCSR_HANDLER(READ8(*this, svi3x8_state, excs_r))
-	MCFG_SVI_EXPANDER_EXCSW_HANDLER(WRITE8(*this, svi3x8_state, excs_w))
+	SVI_EXPANDER(config, m_expander, svi_expander_modules);
+	m_expander->int_handler().set(FUNC(svi3x8_state::intexp_w));
+	m_expander->romdis_handler().set(FUNC(svi3x8_state::romdis_w));
+	m_expander->ramdis_handler().set(FUNC(svi3x8_state::ramdis_w));
+	m_expander->ctrl1_handler().set(FUNC(svi3x8_state::ctrl1_w));
+	m_expander->excsr_handler().set(FUNC(svi3x8_state::excs_r));
+	m_expander->excsw_handler().set(FUNC(svi3x8_state::excs_w));
 MACHINE_CONFIG_END
 
 void svi3x8_state::svi318p(machine_config &config)

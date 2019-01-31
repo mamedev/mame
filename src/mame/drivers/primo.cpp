@@ -279,7 +279,7 @@ MACHINE_CONFIG_START(primo_state::primoa32)
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED);
 
 	/* floppy from serial bus */
-	MCFG_CBM_IEC_ADD(nullptr)
+	cbm_iec_slot_device::add(config, m_iec, nullptr);
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot1", generic_plain_slot, nullptr)

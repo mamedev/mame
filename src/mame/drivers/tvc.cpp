@@ -809,22 +809,18 @@ MACHINE_CONFIG_START(tvc_state::tvc)
 	MCFG_GENERIC_EXTENSIONS("bin,rom,crt")
 
 	/* expansion interface */
-	MCFG_DEVICE_ADD("exp1", TVCEXP_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(tvc_exp , nullptr, false)
-	MCFG_TVCEXP_SLOT_OUT_IRQ_CB(INPUTLINE("maincpu", 0))
-	MCFG_TVCEXP_SLOT_OUT_NMI_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
-	MCFG_DEVICE_ADD("exp2", TVCEXP_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(tvc_exp , nullptr, false)
-	MCFG_TVCEXP_SLOT_OUT_IRQ_CB(INPUTLINE("maincpu", 0))
-	MCFG_TVCEXP_SLOT_OUT_NMI_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
-	MCFG_DEVICE_ADD("exp3", TVCEXP_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(tvc_exp , nullptr, false)
-	MCFG_TVCEXP_SLOT_OUT_IRQ_CB(INPUTLINE("maincpu", 0))
-	MCFG_TVCEXP_SLOT_OUT_NMI_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
-	MCFG_DEVICE_ADD("exp4", TVCEXP_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(tvc_exp , nullptr, false)
-	MCFG_TVCEXP_SLOT_OUT_IRQ_CB(INPUTLINE("maincpu", 0))
-	MCFG_TVCEXP_SLOT_OUT_NMI_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	TVCEXP_SLOT(config, m_expansions[0], tvc_exp , nullptr);
+	m_expansions[0]->out_irq_callback().set_inputline(m_maincpu, 0);
+	m_expansions[0]->out_nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	TVCEXP_SLOT(config, m_expansions[1], tvc_exp , nullptr);
+	m_expansions[1]->out_irq_callback().set_inputline(m_maincpu, 0);
+	m_expansions[1]->out_nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	TVCEXP_SLOT(config, m_expansions[2], tvc_exp , nullptr);
+	m_expansions[2]->out_irq_callback().set_inputline(m_maincpu, 0);
+	m_expansions[2]->out_nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	TVCEXP_SLOT(config, m_expansions[3], tvc_exp , nullptr);
+	m_expansions[3]->out_irq_callback().set_inputline(m_maincpu, 0);
+	m_expansions[3]->out_nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	/* cassette */
 	CASSETTE(config, m_cassette);

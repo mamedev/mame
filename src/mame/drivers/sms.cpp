@@ -501,13 +501,13 @@ MACHINE_CONFIG_START(sms_state::sms_base)
 
 	SOFTWARE_LIST(config, "cart_list").set_original("sms");
 
-	MCFG_SMS_CONTROL_PORT_ADD(CONTROL1_TAG, sms_control_port_devices, "joypad")
-	MCFG_SMS_CONTROL_PORT_TH_INPUT_HANDLER(WRITELINE(*this, sms_state, sms_ctrl1_th_input))
-	MCFG_SMS_CONTROL_PORT_PIXEL_HANDLER(READ32(*this, sms_state, sms_pixel_color))
+	SMS_CONTROL_PORT(config, m_port_ctrl1, sms_control_port_devices, "joypad");
+	m_port_ctrl1->th_input_handler().set(FUNC(sms_state::sms_ctrl1_th_input));
+	m_port_ctrl1->pixel_handler().set(FUNC(sms_state::sms_pixel_color));
 
-	MCFG_SMS_CONTROL_PORT_ADD(CONTROL2_TAG, sms_control_port_devices, "joypad")
-	MCFG_SMS_CONTROL_PORT_TH_INPUT_HANDLER(WRITELINE(*this, sms_state, sms_ctrl2_th_input))
-	MCFG_SMS_CONTROL_PORT_PIXEL_HANDLER(READ32(*this, sms_state, sms_pixel_color))
+	SMS_CONTROL_PORT(config, m_port_ctrl2, sms_control_port_devices, "joypad");
+	m_port_ctrl2->th_input_handler().set(FUNC(sms_state::sms_ctrl2_th_input));
+	m_port_ctrl2->pixel_handler().set(FUNC(sms_state::sms_pixel_color));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sms_state::sms_ntsc_base)
@@ -622,7 +622,7 @@ MACHINE_CONFIG_START(sms_state::sms1_ntsc)
 
 	// card and expansion slots, not present in Master System II
 	MCFG_SMS_CARD_ADD("mycard", sms_cart, nullptr)
-	MCFG_SMS_EXPANSION_ADD("smsexp", sms_expansion_devices, nullptr)
+	SMS_EXPANSION_SLOT(config, "smsexp", sms_expansion_devices, nullptr);
 
 	m_has_bios_full = true;
 	m_has_pwr_led = true;
@@ -744,7 +744,7 @@ MACHINE_CONFIG_START(sms_state::sms1_pal)
 
 	// card and expansion slots, not present in Master System II
 	MCFG_SMS_CARD_ADD("mycard", sms_cart, nullptr)
-	MCFG_SMS_EXPANSION_ADD("smsexp", sms_expansion_devices, nullptr)
+	SMS_EXPANSION_SLOT(config, "smsexp", sms_expansion_devices, nullptr);
 
 	m_has_bios_full = true;
 	m_has_pwr_led = true;
@@ -816,7 +816,7 @@ MACHINE_CONFIG_START(sms_state::sms1_paln)
 
 	// card and expansion slots, not present in Tec Toy Master System III
 	MCFG_SMS_CARD_ADD("mycard", sms_cart, nullptr)
-	MCFG_SMS_EXPANSION_ADD("smsexp", sms_expansion_devices, nullptr)
+	SMS_EXPANSION_SLOT(config, "smsexp", sms_expansion_devices, nullptr);
 
 	m_has_bios_full = true;
 	m_has_pwr_led = true;
@@ -890,7 +890,7 @@ MACHINE_CONFIG_START(sms_state::sms1_br)
 
 	// card and expansion slots, not present in Tec Toy Master System III
 	MCFG_SMS_CARD_ADD("mycard", sms_cart, nullptr)
-	MCFG_SMS_EXPANSION_ADD("smsexp", sms_expansion_devices, nullptr)
+	SMS_EXPANSION_SLOT(config, "smsexp", sms_expansion_devices, nullptr);
 
 	m_has_bios_full = true;
 	m_has_pwr_led = true;
@@ -922,7 +922,7 @@ MACHINE_CONFIG_START(sms_state::sms1_kr)
 	config.device_remove("smsexp");
 	MCFG_SG1000MK3_CARTRIDGE_ADD("slot", sg1000mk3_cart, nullptr)
 	MCFG_SMS_CARD_ADD("mycard", sms_cart, nullptr)
-	MCFG_SMS_EXPANSION_ADD("smsexp", sms_expansion_devices, nullptr)
+	SMS_EXPANSION_SLOT(config, "smsexp", sms_expansion_devices, nullptr);
 
 	SOFTWARE_LIST(config, "cart_list2").set_original("sg1000");
 
@@ -959,15 +959,13 @@ MACHINE_CONFIG_START(sms_state::sg1000m3)
 	config.device_remove("smsexp");
 	MCFG_SG1000MK3_CARTRIDGE_ADD("slot", sg1000mk3_cart, nullptr)
 	MCFG_SMS_CARD_ADD("mycard", sms_cart, nullptr)
-	MCFG_SG1000_EXPANSION_ADD("sgexp", sg1000_expansion_devices, nullptr, false)
+	SG1000_EXPANSION_SLOT(config, "sgexp", sg1000_expansion_devices, nullptr, false);
 
 	SOFTWARE_LIST(config, "cart_list2").set_original("sg1000");
 
 	// Mark III does not have TH connected.
-	MCFG_SMS_CONTROL_PORT_MODIFY(CONTROL1_TAG)
-	MCFG_SMS_CONTROL_PORT_TH_INPUT_HANDLER(NOOP)
-	MCFG_SMS_CONTROL_PORT_MODIFY(CONTROL2_TAG)
-	MCFG_SMS_CONTROL_PORT_TH_INPUT_HANDLER(NOOP)
+	m_port_ctrl1->th_input_handler().set_nop();
+	m_port_ctrl2->th_input_handler().set_nop();
 
 	m_has_bios_full = false;
 	m_is_mark_iii = true;

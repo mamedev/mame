@@ -425,7 +425,7 @@ MACHINE_CONFIG_START(vidbrain_state::vidbrain)
 	m_smi->int_req_callback().set_inputline(F3850_TAG, F8_INPUT_LINE_INT_REQ);
 
 	// cartridge
-	MCFG_VIDEOBRAIN_EXPANSION_SLOT_ADD(VIDEOBRAIN_EXPANSION_SLOT_TAG, vidbrain_expansion_cards, nullptr)
+	VIDEOBRAIN_EXPANSION_SLOT(config, VIDEOBRAIN_EXPANSION_SLOT_TAG, vidbrain_expansion_cards, nullptr);
 
 	// software lists
 	SOFTWARE_LIST(config, "cart_list").set_original("vidbrain");
