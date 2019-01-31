@@ -3056,6 +3056,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/4dpi.cpp",
 	MAME_DIR .. "src/mame/drivers/indigo.cpp",
 	MAME_DIR .. "src/mame/drivers/indy_indigo2.cpp",
+	MAME_DIR .. "src/mame/video/light.cpp",
+	MAME_DIR .. "src/mame/video/light.h",
 	MAME_DIR .. "src/mame/video/newport.cpp",
 	MAME_DIR .. "src/mame/video/newport.h",
 	MAME_DIR .. "src/mame/video/crime.cpp",
