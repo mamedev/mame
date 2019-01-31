@@ -1476,23 +1476,23 @@ WRITE8_MEMBER(pc8801_state::pc8801_rtc_w)
 READ8_MEMBER(pc8801_state::pc8801_sound_board_r)
 {
 	if(m_has_opna)
-		return m_opna->read(space, offset);
+		return m_opna->read(offset);
 
-	return (offset & 2) ? 0xff : m_opn->read(space, offset);
+	return (offset & 2) ? 0xff : m_opn->read(offset);
 }
 
 WRITE8_MEMBER(pc8801_state::pc8801_sound_board_w)
 {
 	if(m_has_opna)
-		m_opna->write(space, offset,data);
+		m_opna->write(offset,data);
 	else if((offset & 2) == 0)
-		m_opn->write(space, offset, data);
+		m_opn->write(offset, data);
 }
 
 READ8_MEMBER(pc8801_state::pc8801_opna_r)
 {
 	if(m_has_opna && (offset & 2) == 0)
-		return m_opna->read(space, (offset & 1) | ((offset & 4) >> 1));
+		return m_opna->read((offset & 1) | ((offset & 4) >> 1));
 
 	return 0xff;
 }
@@ -1500,7 +1500,7 @@ READ8_MEMBER(pc8801_state::pc8801_opna_r)
 WRITE8_MEMBER(pc8801_state::pc8801_opna_w)
 {
 	if(m_has_opna && (offset & 2) == 0)
-		m_opna->write(space, (offset & 1) | ((offset & 4) >> 1),data);
+		m_opna->write((offset & 1) | ((offset & 4) >> 1),data);
 	else if(m_has_opna && offset == 2)
 	{
 		m_sound_irq_mask = ((data & 0x80) == 0);

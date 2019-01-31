@@ -122,10 +122,10 @@ WRITE8_MEMBER(sega_fm_unit_device::peripheral_w)
 	switch (offset)
 	{
 		case 0: // register port
-			m_ym->write(space, 0, data & 0x3f);
+			m_ym->write(0, data & 0x3f);
 			break;
 		case 1: // data port
-			m_ym->write(space, 1, data);
+			m_ym->write(1, data);
 			break;
 		case 2: // control port
 		case 3: // mirror

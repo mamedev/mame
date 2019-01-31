@@ -1547,7 +1547,7 @@ WRITE8_MEMBER(x1_state::io_write_byte)
 
 READ8_MEMBER(x1_state::ym_r)
 {
-	uint8_t result = m_ym->read(space, offset);
+	uint8_t result = m_ym->read(offset);
 	if (!BIT(offset, 0))
 		result = (result & 0x7f) | (m_sound_sw->read() & 0x80);
 	return result;

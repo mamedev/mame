@@ -50,7 +50,7 @@ READ8_MEMBER(md_base_state::megadriv_68k_YM2612_read)
 	//osd_printf_debug("megadriv_68k_YM2612_read %02x %04x\n",offset,mem_mask);
 	if ((m_genz80.z80_has_bus == 0) && (m_genz80.z80_is_reset == 0))
 	{
-		return m_ymsnd->read(space, offset);
+		return m_ymsnd->read(offset);
 	}
 	else
 	{
@@ -68,7 +68,7 @@ WRITE8_MEMBER(md_base_state::megadriv_68k_YM2612_write)
 	//osd_printf_debug("megadriv_68k_YM2612_write %02x %04x %04x\n",offset,data,mem_mask);
 	if ((m_genz80.z80_has_bus == 0) && (m_genz80.z80_is_reset == 0))
 	{
-		m_ymsnd->write(space, offset, data);
+		m_ymsnd->write(offset, data);
 	}
 	else
 	{

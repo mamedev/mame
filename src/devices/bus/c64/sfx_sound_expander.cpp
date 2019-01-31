@@ -219,7 +219,7 @@ uint8_t c64_sfx_sound_expander_cartridge_device::c64_cd_r(address_space &space, 
 
 		if (BIT(offset, 5))
 		{
-			data = m_opl->read(space, BIT(offset, 4));
+			data = m_opl->read(BIT(offset, 4));
 		}
 	}
 
@@ -235,7 +235,7 @@ void c64_sfx_sound_expander_cartridge_device::c64_cd_w(address_space &space, off
 {
 	if (!io2 && sphi2)
 	{
-		m_opl->write(space, BIT(offset, 4), data);
+		m_opl->write(BIT(offset, 4), data);
 	}
 
 	m_exp->cd_w(space, get_offset(offset, 0), data, sphi2, ba, roml, romh, io1, io2);

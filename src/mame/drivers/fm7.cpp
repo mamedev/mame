@@ -883,21 +883,21 @@ void fm7_state::fm7_update_psg()
 				break;
 			case 0x01:
 				// Data read
-				m_psg_data = m_ym->read(space, 1);
+				m_psg_data = m_ym->read(1);
 				break;
 			case 0x02:
 				// Data write
-				m_ym->write(space, 1,m_psg_data);
+				m_ym->write(1,m_psg_data);
 				logerror("YM: data write 0x%02x\n",m_psg_data);
 				break;
 			case 0x03:
 				// Address latch
-				m_ym->write(space, 0,m_psg_data);
+				m_ym->write(0,m_psg_data);
 				logerror("YM: address latch 0x%02x\n",m_psg_data);
 				break;
 			case 0x04:
 				// Status register
-				m_psg_data = m_ym->read(space, 0);
+				m_psg_data = m_ym->read(0);
 				break;
 			case 0x09:
 				// Joystick port read
