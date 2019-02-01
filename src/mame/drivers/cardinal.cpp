@@ -73,7 +73,7 @@ u32 cardinal_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 
 u8 cardinal_state::p1_r()
 {
-	return 0x9f | (m_eeprom->do_read() << 5) | (m_rs232->cts_r() << 6);
+	return 0x9f | (m_eeprom->do_read() << 5) | (0 /*m_rs232->cts_r()*/ << 6);
 }
 
 void cardinal_state::p1_w(u8 data)
@@ -110,7 +110,16 @@ void cardinal_state::ext_map(address_map &map)
 
 
 static INPUT_PORTS_START(cardinal)
+	PORT_START("P3")
+	PORT_DIPNAME(0x10, 0x00, "Keyboard Baud Rate")
+	PORT_DIPSETTING(0x10, "300")
+	PORT_DIPSETTING(0x00, "600")
+	PORT_BIT(0xef, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
+
+static DEVICE_INPUT_DEFAULTS_START(keyboard)
+	DEVICE_INPUT_DEFAULTS("RS232_TXBAUD", 0xff, RS232_BAUD_600)
+DEVICE_INPUT_DEFAULTS_END
 
 
 void cardinal_state::cardinal(machine_config &config)
@@ -120,11 +129,13 @@ void cardinal_state::cardinal(machine_config &config)
 	maincpu.set_addrmap(AS_IO, &cardinal_state::ext_map);
 	maincpu.port_in_cb<1>().set(FUNC(cardinal_state::p1_r));
 	maincpu.port_out_cb<1>().set(FUNC(cardinal_state::p1_w));
+	maincpu.port_in_cb<3>().set_ioport("P3");
 
 	EEPROM_93C06_16BIT(config, m_eeprom);
 
 	//CRT9028_000(config, m_vtlc, 10.92_MHz_XTAL);
 	//m_vtlc->set_screen("screen");
+	//m_vtlc->vsync_callback().set_inputline("maincpu", MCS51_INT0_LINE);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(10.92_MHz_XTAL, 700, 0, 560, 260, 0, 240);
@@ -134,6 +145,10 @@ void cardinal_state::cardinal(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
+
+	rs232_port_device &kb(RS232_PORT(config, "kb", default_rs232_devices, "keyboard"));
+	kb.set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(keyboard));
+	kb.rxd_handler().set_inputline("maincpu", MCS51_INT1_LINE).invert();
 }
 
 
