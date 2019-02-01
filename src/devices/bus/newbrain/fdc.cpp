@@ -104,10 +104,11 @@ static void newbrain_floppies(device_slot_interface &device)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(newbrain_fdc_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(newbrain_fdc_mem)
-	MCFG_DEVICE_IO_MAP(newbrain_fdc_io)
+void newbrain_fdc_device::device_add_mconfig(machine_config &config)
+{
+	Z80(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &newbrain_fdc_device::newbrain_fdc_mem);
+	m_maincpu->set_addrmap(AS_IO, &newbrain_fdc_device::newbrain_fdc_io);
 
 	UPD765A(config, m_fdc, 8'000'000, false, true);
 	m_fdc->intrq_wr_callback().set(FUNC(newbrain_fdc_device::fdc_int_w));
@@ -117,8 +118,8 @@ MACHINE_CONFIG_START(newbrain_fdc_device::device_add_mconfig)
 	FLOPPY_CONNECTOR(config, UPD765_TAG ":2", newbrain_floppies, nullptr, floppy_image_device::default_floppy_formats);
 	FLOPPY_CONNECTOR(config, UPD765_TAG ":3", newbrain_floppies, nullptr, floppy_image_device::default_floppy_formats);
 
-	MCFG_NEWBRAIN_EXPANSION_SLOT_ADD(NEWBRAIN_EXPANSION_SLOT_TAG, XTAL(16'000'000)/8, newbrain_expansion_cards, nullptr)
-MACHINE_CONFIG_END
+	NEWBRAIN_EXPANSION_SLOT(config, m_exp, XTAL(16'000'000)/8, newbrain_expansion_cards, nullptr);
+}
 
 
 //**************************************************************************

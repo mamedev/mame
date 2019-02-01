@@ -673,11 +673,12 @@ GFXDECODE_END
 
 
 
-MACHINE_CONFIG_START(odyssey2_state::odyssey2_cartslot)
-	MCFG_O2_CARTRIDGE_ADD("cartslot", o2_cart, nullptr)
+void odyssey2_state::odyssey2_cartslot(machine_config &config)
+{
+	O2_CART_SLOT(config, m_cart, o2_cart, nullptr);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("odyssey2");
-MACHINE_CONFIG_END
+}
 
 
 MACHINE_CONFIG_START(odyssey2_state::odyssey2)

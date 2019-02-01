@@ -1009,10 +1009,10 @@ MACHINE_CONFIG_START(sms_state::gamegear)
 
 	SOFTWARE_LIST(config, "cart_list").set_original("gamegear");
 
-	MCFG_GG_EXT_PORT_ADD("ext", gg_ext_port_devices, nullptr)
-	MCFG_GG_EXT_PORT_TH_INPUT_HANDLER(WRITELINE(*this, sms_state, gg_ext_th_input))
+	GG_EXT_PORT(config, m_port_gg_ext, gg_ext_port_devices, nullptr);
+	m_port_gg_ext->th_input_handler().set(FUNC(sms_state::gg_ext_th_input));
 	// only for GG-TV mod (may be simulated with a driver modified with SMS screen settings)
-	//MCFG_GG_EXT_PORT_PIXEL_HANDLER(READ32(*this, sms_state, sms_pixel_color))
+	//m_port_gg_ext->pixel_handler().set(FUNC(sms_state::sms_pixel_color));
 
 	m_is_gamegear = true;
 	m_has_bios_0400 = true;

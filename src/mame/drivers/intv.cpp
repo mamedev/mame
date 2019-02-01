@@ -478,8 +478,8 @@ MACHINE_CONFIG_START(intv_state::intv)
 
 	PALETTE(config, m_palette, FUNC(intv_state::intv_palette), 0x400, 32);
 
-	MCFG_INTV_CONTROL_PORT_ADD("iopt_right_ctrl", intv_control_port_devices, "handctrl")
-	MCFG_INTV_CONTROL_PORT_ADD("iopt_left_ctrl", intv_control_port_devices, "handctrl")
+	INTV_CONTROL_PORT(config, "iopt_right_ctrl", intv_control_port_devices, "handctrl");
+	INTV_CONTROL_PORT(config, "iopt_left_ctrl", intv_control_port_devices, "handctrl");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -489,7 +489,7 @@ MACHINE_CONFIG_START(intv_state::intv)
 	m_sound->add_route(ALL_OUTPUTS, "mono", 0.33);
 
 	/* cartridge */
-	MCFG_INTV_CARTRIDGE_ADD("cartslot", intv_cart, nullptr)
+	INTV_CART_SLOT(config, m_cart, intv_cart, nullptr);
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("intv");

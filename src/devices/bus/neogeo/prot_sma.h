@@ -9,15 +9,12 @@
 
 DECLARE_DEVICE_TYPE(NG_SMA_PROT, sma_prot_device)
 
-#define MCFG_SMA_PROT_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, NG_SMA_PROT, 0)
-
 
 class sma_prot_device : public device_t
 {
 public:
 	// construction/destruction
-	sma_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sma_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	//DECLARE_WRITE16_MEMBER( kof99_bankswitch_w );
 	//DECLARE_WRITE16_MEMBER( garou_bankswitch_w );

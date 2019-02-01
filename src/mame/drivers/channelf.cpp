@@ -197,13 +197,14 @@ static void cf_cart(device_slot_interface &device)
 }
 
 
-MACHINE_CONFIG_START(channelf_state::channelf_cart)
+void channelf_state::channelf_cart(machine_config &config)
+{
 	/* cartridge */
-	MCFG_CHANNELF_CARTRIDGE_ADD("cartslot", cf_cart, nullptr)
+	CHANF_CART_SLOT(config, m_cart, cf_cart, nullptr);
 
 	/* Software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("channelf");
-MACHINE_CONFIG_END
+}
 
 MACHINE_CONFIG_START(channelf_state::channelf)
 	/* basic machine hardware */

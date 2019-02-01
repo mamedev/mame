@@ -41,7 +41,17 @@ class intv_control_port_device : public device_t,
 {
 public:
 	// construction/destruction
-	intv_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T>
+	intv_control_port_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
+		: intv_control_port_device(mconfig, tag, owner, 0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
+
+	intv_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~intv_control_port_device();
 
 	DECLARE_READ8_MEMBER( ctrl_r ) { return read_ctrl(); }
@@ -57,17 +67,6 @@ protected:
 
 // device type definition
 DECLARE_DEVICE_TYPE(INTV_CONTROL_PORT, intv_control_port_device)
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_INTV_CONTROL_PORT_ADD(_tag, _slot_intf, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, INTV_CONTROL_PORT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-
-
 
 void intv_control_port_devices(device_slot_interface &device);
 

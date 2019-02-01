@@ -67,7 +67,8 @@ const tiny_rom_entry *newbrain_eim_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(newbrain_eim_device::device_add_mconfig)
+void newbrain_eim_device::device_add_mconfig(machine_config &config)
+{
 	// devices
 	Z80CTC(config, m_ctc, XTAL(16'000'000)/8);
 	m_ctc->zc_callback<0>().set(m_acia, FUNC(acia6850_device::write_rxc));
@@ -92,11 +93,11 @@ MACHINE_CONFIG_START(newbrain_eim_device::device_add_mconfig)
 
 	RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr);
 
-	MCFG_NEWBRAIN_EXPANSION_SLOT_ADD(NEWBRAIN_EXPANSION_SLOT_TAG, XTAL(16'000'000)/8, newbrain_expansion_cards, "fdc")
+	NEWBRAIN_EXPANSION_SLOT(config, m_exp, XTAL(16'000'000)/8, newbrain_expansion_cards, "fdc");
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("96K");
-MACHINE_CONFIG_END
+}
 
 
 //**************************************************************************
