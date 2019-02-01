@@ -114,7 +114,7 @@ namespace netlist
 
 	}
 
-	NETLIB_DEVICE_IMPL_DEPRECATED(MM5837_dip)
+	NETLIB_DEVICE_IMPL(MM5837_dip, "MM5837_DIP", "")
 
 	} //namespace devices
 } // namespace netlist

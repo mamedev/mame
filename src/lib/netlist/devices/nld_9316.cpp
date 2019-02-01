@@ -167,8 +167,8 @@ namespace netlist
 	}
 
 
-	NETLIB_DEVICE_IMPL_DEPRECATED(9316)
-	NETLIB_DEVICE_IMPL_DEPRECATED(9316_dip)
+	NETLIB_DEVICE_IMPL(9316,     "TTL_9316",     "+CLK,+ENP,+ENT,+CLRQ,+LOADQ,+A,+B,+C,+D")
+	NETLIB_DEVICE_IMPL(9316_dip, "TTL_9316_DIP", "")
 
 	} //namespace devices
 } // namespace netlist

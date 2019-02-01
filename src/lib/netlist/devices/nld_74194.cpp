@@ -116,8 +116,8 @@ namespace netlist
 			m_Q[i].push((q >> i) & 1, NLTIME_FROM_NS(26)); // FIXME: Timing
 	}
 
-	NETLIB_DEVICE_IMPL_DEPRECATED(74194)
-	NETLIB_DEVICE_IMPL_DEPRECATED(74194_dip)
+	NETLIB_DEVICE_IMPL(74194, 	 "TTL_74194",     "+CLK,+S0,+S1,+SRIN,+A,+B,+C,+D,+SLIN,+CLRQ")
+	NETLIB_DEVICE_IMPL(74194_dip, "TTL_74194_DIP", "")
 
 	} //namespace devices
 } // namespace netlist

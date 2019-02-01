@@ -430,8 +430,8 @@ NETLIB_UPDATE_PARAM(QBJT_EB)
 	} //namespace analog
 
 	namespace devices {
-		NETLIB_DEVICE_IMPL_NS(analog, QBJT_EB)
-		NETLIB_DEVICE_IMPL_NS(analog, QBJT_switch)
+		NETLIB_DEVICE_IMPL_NS(analog, QBJT_EB, "QBJT_EB", "MODEL")
+		NETLIB_DEVICE_IMPL_NS(analog, QBJT_switch, "QBJT_SW", "MODEL")
 	}
 
 } // namespace netlist

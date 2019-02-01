@@ -79,7 +79,7 @@ namespace netlist
 		}
 	}
 
-	NETLIB_DEVICE_IMPL_DEPRECATED(CD4066_GATE)
+	NETLIB_DEVICE_IMPL(CD4066_GATE,         "CD4066_GATE",            "")
 
 	} //namespace devices
 } // namespace netlist

@@ -51,6 +51,6 @@ namespace netlist { namespace devices {
 		m_R.m_P.schedule_solve_after(NLTIME_FROM_NS(1));
 	}
 
-	NETLIB_DEVICE_IMPL_DEPRECATED(CD4316_GATE)
+	NETLIB_DEVICE_IMPL(CD4316_GATE, "CD4316_GATE", "")
 
 } } // namesapce netlist::devices

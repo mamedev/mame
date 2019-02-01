@@ -136,7 +136,7 @@ namespace netlist
 	} //namespace analog
 
 	namespace devices {
-		NETLIB_DEVICE_IMPL_NS(analog, switch1)
-		NETLIB_DEVICE_IMPL_NS(analog, switch2)
+		NETLIB_DEVICE_IMPL_NS(analog, switch1, "SWITCH",  "")
+		NETLIB_DEVICE_IMPL_NS(analog, switch2, "SWITCH2", "")
 	}
 } // namespace netlist

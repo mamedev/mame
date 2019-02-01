@@ -79,8 +79,8 @@ namespace netlist
 			m_O[i].push((o >> i) & 1, delay);
 	}
 
-	NETLIB_DEVICE_IMPL_DEPRECATED(82S126)
-	NETLIB_DEVICE_IMPL_DEPRECATED(82S126_dip)
+	NETLIB_DEVICE_IMPL(82S126,     "PROM_82S126",     "+CE1Q,+CE2Q,+A0,+A1,+A2,+A3,+A4,+A5,+A6,+A7")
+	NETLIB_DEVICE_IMPL(82S126_dip, "PROM_82S126_DIP", "")
 
 	} //namespace devices
 } // namespace netlist

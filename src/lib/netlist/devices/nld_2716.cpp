@@ -92,8 +92,8 @@ namespace netlist
 			m_D[i].push((d >> i) & 1, delay);
 	}
 
-	NETLIB_DEVICE_IMPL_DEPRECATED(2716)
-	NETLIB_DEVICE_IMPL_DEPRECATED(2716_dip)
+	NETLIB_DEVICE_IMPL(2716, "EPROM_2716", "+GQ,+EPQ,+A0,+A1,+A2,+A3,+A4,+A5,+A6,+A7,+A8,+A9,+A10")
+	NETLIB_DEVICE_IMPL(2716_dip, "EPROM_2716_DIP",         "")
 
 	} //namespace devices
 } // namespace netlist

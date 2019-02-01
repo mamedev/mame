@@ -113,7 +113,8 @@ namespace netlist
 			m_Q[i].push((cnt >> i) & 1, out_delayQn[i]);
 	}
 
-	NETLIB_DEVICE_IMPL_DEPRECATED(CD4020)
+	NETLIB_DEVICE_IMPL(CD4020,         "CD4020", "")
+	NETLIB_DEVICE_IMPL_ALIAS(CD4020_WI, CD4020, "CD4020_WI", "+IP,+RESET,+VDD,+VSS")
 
 	} //namespace devices
 } // namespace netlist

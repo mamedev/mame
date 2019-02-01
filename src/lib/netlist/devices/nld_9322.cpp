@@ -111,8 +111,8 @@ namespace netlist
 		m_4.update();
 	}
 
-	NETLIB_DEVICE_IMPL_DEPRECATED(9322)
-	NETLIB_DEVICE_IMPL_DEPRECATED(9322_dip)
+	NETLIB_DEVICE_IMPL(9322,     "TTL_9322",     "+SELECT,+A1,+B1,+A2,+B2,+A3,+B3,+A4,+B4,+STROBE")
+	NETLIB_DEVICE_IMPL(9322_dip, "TTL_9322_DIP", "")
 
 	} //namespace devices
 } // namespace netlist

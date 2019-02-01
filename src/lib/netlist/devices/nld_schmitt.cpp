@@ -125,7 +125,7 @@ namespace netlist
 			bool m_is_timestep;
 		};
 
-		NETLIB_DEVICE_IMPL_DEPRECATED(schmitt_trigger)
+		NETLIB_DEVICE_IMPL(schmitt_trigger, "SCHMITT_TRIGGER", "MODEL")
 
 	} // namespace devices
 } // namespace netlist

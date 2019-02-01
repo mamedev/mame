@@ -116,9 +116,9 @@ NETLIB_RESET(VCVS)
 	} //namespace analog
 
 	namespace devices {
-		NETLIB_DEVICE_IMPL_NS(analog, VCVS)
-		NETLIB_DEVICE_IMPL_NS(analog, VCCS)
-		NETLIB_DEVICE_IMPL_NS(analog, CCCS)
-		NETLIB_DEVICE_IMPL_NS(analog, LVCCS)
+		NETLIB_DEVICE_IMPL_NS(analog, VCVS,  "VCVS",  "")
+		NETLIB_DEVICE_IMPL_NS(analog, VCCS,  "VCCS",  "")
+		NETLIB_DEVICE_IMPL_NS(analog, CCCS,  "CCCS",  "")
+		NETLIB_DEVICE_IMPL_NS(analog, LVCCS, "LVCCS", "")
 	}
 } // namespace netlist

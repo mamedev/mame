@@ -49,7 +49,7 @@ namespace netlist
 	} //namespace analog
 
 	namespace devices {
-		NETLIB_DEVICE_IMPL_NS(analog, r2r_dac)
+		NETLIB_DEVICE_IMPL_NS(analog, r2r_dac, "R2R_DAC", "VIN,R,N")
 	}
 
 } // namespace netlist

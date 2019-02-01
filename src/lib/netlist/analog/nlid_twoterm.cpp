@@ -271,14 +271,14 @@ NETLIB_UPDATE_TERMINALS(D)
 	} //namespace analog
 
 	namespace devices {
-		NETLIB_DEVICE_IMPL_NS(analog, R)
-		NETLIB_DEVICE_IMPL_NS(analog, POT)
-		NETLIB_DEVICE_IMPL_NS(analog, POT2)
-		NETLIB_DEVICE_IMPL_NS(analog, C)
-		NETLIB_DEVICE_IMPL_NS(analog, L)
-		NETLIB_DEVICE_IMPL_NS(analog, D)
-		NETLIB_DEVICE_IMPL_NS(analog, VS)
-		NETLIB_DEVICE_IMPL_NS(analog, CS)
+		NETLIB_DEVICE_IMPL_NS(analog, R,    "RES",   "R")
+		NETLIB_DEVICE_IMPL_NS(analog, POT,  "POT",   "R")
+		NETLIB_DEVICE_IMPL_NS(analog, POT2, "POT2",  "R")
+		NETLIB_DEVICE_IMPL_NS(analog, C,    "CAP",   "C")
+		NETLIB_DEVICE_IMPL_NS(analog, L,    "IND",   "L")
+		NETLIB_DEVICE_IMPL_NS(analog, D,    "DIODE", "MODEL")
+		NETLIB_DEVICE_IMPL_NS(analog, VS,   "VS",    "V")
+		NETLIB_DEVICE_IMPL_NS(analog, CS,   "CS",    "I")
 	}
 
 } // namespace netlist

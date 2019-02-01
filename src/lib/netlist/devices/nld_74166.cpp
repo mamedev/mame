@@ -121,8 +121,8 @@ namespace netlist
 		m_QH.push(qh, delay); //FIXME
 	}
 
-	NETLIB_DEVICE_IMPL_DEPRECATED(74166)
-	NETLIB_DEVICE_IMPL_DEPRECATED(74166_dip)
+	NETLIB_DEVICE_IMPL(74166,    "TTL_74166", "+CLK,+CLKINH,+SH_LDQ,+SER,+A,+B,+C,+D,+E,+F,+G,+H,+CLRQ")
+	NETLIB_DEVICE_IMPL(74166_dip,"TTL_74166_DIP", "")
 
 	} //namespace devices
 } // namespace netlist

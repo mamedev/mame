@@ -9,35 +9,28 @@
 #ifndef NLFACTORY_H_
 #define NLFACTORY_H_
 
+#include <vector>
+
 #include "plib/palloc.h"
 #include "plib/ptypes.h"
 
-// deprecated!
-#define NETLIB_DEVICE_IMPL_DEPRECATED(chip) \
-	static std::unique_ptr<factory::element_t> NETLIB_NAME(chip ## _c)( \
-			const pstring &name, const pstring &classname, const pstring &def_param) \
-	{ \
-		return std::unique_ptr<factory::element_t>(plib::palloc<factory::device_element_t<NETLIB_NAME(chip)>>(name, classname, def_param, pstring(__FILE__))); \
-	} \
-	factory::constructor_ptr_t decl_ ## chip = NETLIB_NAME(chip ## _c);
+#define NETLIB_DEVICE_IMPL_ALIAS(p_alias, chip, p_name, p_def_param) \
+	NETLIB_DEVICE_IMPL_BASE(devices, p_alias, chip, p_name, p_def_param) \
 
-// the new way ...
 #define NETLIB_DEVICE_IMPL(chip, p_name, p_def_param) \
-	static std::unique_ptr<factory::element_t> NETLIB_NAME(chip ## _c)( \
-			const pstring &name, const pstring &classname, const pstring &def_param) \
-	{ \
-		return std::unique_ptr<factory::element_t>(plib::palloc<factory::device_element_t<NETLIB_NAME(chip)>>(p_name, classname, p_def_param, pstring(__FILE__))); \
-	} \
-	factory::constructor_ptr_t decl_ ## chip = NETLIB_NAME(chip ## _c);
+	NETLIB_DEVICE_IMPL_NS(devices, chip, p_name, p_def_param)
 
-#define NETLIB_DEVICE_IMPL_NS(ns, chip) \
-	static std::unique_ptr<factory::element_t> NETLIB_NAME(chip ## _c)( \
-			const pstring &name, const pstring &classname, const pstring &def_param) \
+#define NETLIB_DEVICE_IMPL_NS(ns, chip, p_name, p_def_param) \
+	NETLIB_DEVICE_IMPL_BASE(ns, chip, chip, p_name, p_def_param) \
+
+#define NETLIB_DEVICE_IMPL_BASE(ns, p_alias, chip, p_name, p_def_param) \
+	static std::unique_ptr<factory::element_t> NETLIB_NAME(p_alias ## _c) \
+			(const pstring &classname) \
 	{ \
-		return std::unique_ptr<factory::element_t>(plib::palloc<factory::device_element_t<ns :: NETLIB_NAME(chip)>>(name, classname, def_param, pstring(__FILE__))); \
+		return std::unique_ptr<factory::element_t>(plib::palloc<factory::device_element_t<ns :: NETLIB_NAME(chip)>>(p_name, classname, p_def_param, pstring(__FILE__))); \
 	} \
 	\
-	factory::constructor_ptr_t decl_ ## chip = NETLIB_NAME(chip ## _c);
+	factory::constructor_ptr_t decl_ ## p_alias = NETLIB_NAME(p_alias ## _c);
 
 namespace netlist {
 	class device_t;
@@ -121,8 +114,7 @@ namespace factory {
 	// factory_creator_ptr_t
 	// -----------------------------------------------------------------------------
 
-	using constructor_ptr_t = std::unique_ptr<element_t> (*)(const pstring &name, const pstring &classname,
-			const pstring &def_param);
+	using constructor_ptr_t = std::unique_ptr<element_t> (*)(const pstring &classname);
 
 	template <typename T>
 	std::unique_ptr<element_t> constructor_t(const pstring &name, const pstring &classname,

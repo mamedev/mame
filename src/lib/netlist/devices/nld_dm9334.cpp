@@ -143,8 +143,8 @@ namespace netlist
 			m_Q[i].push((q >> i) & 1, delay);
 	}
 
-	NETLIB_DEVICE_IMPL_DEPRECATED(9334)
-	NETLIB_DEVICE_IMPL_DEPRECATED(9334_dip)
+	NETLIB_DEVICE_IMPL(9334,     "TTL_9334",     "+CQ,+EQ,+D,+A0,+A1,+A2")
+	NETLIB_DEVICE_IMPL(9334_dip, "TTL_9334_DIP", "")
 
 	} //namespace devices
 } // namespace netlist

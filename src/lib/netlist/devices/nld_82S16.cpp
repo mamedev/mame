@@ -130,8 +130,8 @@ namespace netlist
 		m_enq = 0;
 	}
 
-	NETLIB_DEVICE_IMPL_DEPRECATED(82S16)
-	NETLIB_DEVICE_IMPL_DEPRECATED(82S16_dip)
+	NETLIB_DEVICE_IMPL(82S16,     "TTL_82S16",     "")
+	NETLIB_DEVICE_IMPL(82S16_dip, "TTL_82S16_DIP", "")
 
 	} //namespace devices
 } // namespace netlist

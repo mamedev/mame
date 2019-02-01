@@ -239,6 +239,6 @@ namespace netlist
 	} //namespace analog
 
 	namespace devices {
-		NETLIB_DEVICE_IMPL_NS(analog, opamp)
+		NETLIB_DEVICE_IMPL_NS(analog, opamp, "OPAMP", "MODEL")
 	}
 } // namespace netlist

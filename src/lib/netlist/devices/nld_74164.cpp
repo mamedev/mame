@@ -97,8 +97,8 @@ namespace netlist
 		}
 	}
 
-	NETLIB_DEVICE_IMPL_DEPRECATED(74164)
-	NETLIB_DEVICE_IMPL_DEPRECATED(74164_dip)
+	NETLIB_DEVICE_IMPL(74164, "TTL_74164", "+A,+B,+CLRQ,+CLK")
+	NETLIB_DEVICE_IMPL(74164_dip, "TTL_74164_DIP", "")
 
 	} //namespace devices
 } // namespace netlist

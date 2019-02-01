@@ -177,8 +177,8 @@ namespace netlist
 		m_last_out = out;
 	}
 
-	NETLIB_DEVICE_IMPL_DEPRECATED(NE555)
-	NETLIB_DEVICE_IMPL_DEPRECATED(NE555_dip)
+	NETLIB_DEVICE_IMPL(NE555, 	  "NE555", "")
+	NETLIB_DEVICE_IMPL(NE555_dip, "NE555_DIP", "")
 
 	} //namespace devices
 } // namespace netlist

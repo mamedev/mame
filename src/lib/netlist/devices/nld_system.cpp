@@ -104,17 +104,19 @@ namespace netlist
 	}
 
 
-	NETLIB_DEVICE_IMPL_DEPRECATED(dummy_input)
-	NETLIB_DEVICE_IMPL_DEPRECATED(frontier)
-	NETLIB_DEVICE_IMPL_DEPRECATED(function)
-	NETLIB_DEVICE_IMPL_DEPRECATED(logic_input)
-	NETLIB_DEVICE_IMPL_DEPRECATED(analog_input)
-	NETLIB_DEVICE_IMPL_DEPRECATED(clock)
-	NETLIB_DEVICE_IMPL_DEPRECATED(extclock)
-	NETLIB_DEVICE_IMPL_DEPRECATED(res_sw)
-	NETLIB_DEVICE_IMPL_DEPRECATED(mainclock)
-	NETLIB_DEVICE_IMPL_DEPRECATED(gnd)
-	NETLIB_DEVICE_IMPL_DEPRECATED(netlistparams)
+	NETLIB_DEVICE_IMPL(dummy_input, "DUMMY_INPUT",            "")
+	NETLIB_DEVICE_IMPL(frontier, "FRONTIER_DEV",           "+I,+G,+Q")
+	NETLIB_DEVICE_IMPL(function, "AFUNC",                  "N,FUNC")
+	NETLIB_DEVICE_IMPL(analog_input,        "ANALOG_INPUT",           "IN")
+	NETLIB_DEVICE_IMPL(clock,               "CLOCK",                  "FREQ")
+	NETLIB_DEVICE_IMPL(extclock,            "EXTCLOCK",               "FREQ,PATTERN")
+	NETLIB_DEVICE_IMPL(res_sw,              "RES_SWITCH",             "+IN,+P1,+P2")
+	NETLIB_DEVICE_IMPL(mainclock,           "MAINCLOCK",              "FREQ")
+	NETLIB_DEVICE_IMPL(gnd,                 "GND",                    "")
+	NETLIB_DEVICE_IMPL(netlistparams,       "PARAMETER",              "")
+
+	NETLIB_DEVICE_IMPL(logic_input, "LOGIC_INPUT", "IN,FAMILY")
+	NETLIB_DEVICE_IMPL_ALIAS(logic_input_ttl, logic_input, "TTL_INPUT", "IN")
 
 	} //namespace devices
 } // namespace netlist

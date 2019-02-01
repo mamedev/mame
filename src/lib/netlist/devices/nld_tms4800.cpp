@@ -97,8 +97,8 @@ namespace netlist
 		}
 	}
 
-	NETLIB_DEVICE_IMPL_DEPRECATED(TMS4800)
-	NETLIB_DEVICE_IMPL_DEPRECATED(TMS4800_dip)
+	NETLIB_DEVICE_IMPL(TMS4800, 	"ROM_TMS4800",     "+AR,+OE1,+OE2,+A0,+A1,+A2,+A3,+A4,+A5,+A6,+A7,+A8,+A9,+A10")
+	NETLIB_DEVICE_IMPL(TMS4800_dip, "ROM_TMS4800_DIP", "")
 
 	} //namespace devices
 } // namespace netlist
