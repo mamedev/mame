@@ -676,7 +676,7 @@ WRITE8_MEMBER( atari_jsa_i_device::tms5220_voice )
 READ8_MEMBER( atari_jsa_i_device::pokey_r )
 {
 	if (m_pokey != nullptr)
-		return m_pokey->read(space, offset);
+		return m_pokey->read(offset);
 	return 0xff;
 }
 
@@ -689,7 +689,7 @@ READ8_MEMBER( atari_jsa_i_device::pokey_r )
 WRITE8_MEMBER( atari_jsa_i_device::pokey_w )
 {
 	if (m_pokey != nullptr)
-		m_pokey->write(space, offset, data);
+		m_pokey->write(offset, data);
 }
 
 

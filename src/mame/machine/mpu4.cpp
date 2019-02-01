@@ -1333,7 +1333,7 @@ WRITE_LINE_MEMBER(mpu4_state::pia_ic8_cb2_w)
 WRITE8_MEMBER(mpu4_state::pia_gb_porta_w)
 {
 	LOG_SS(("%s: GAMEBOARD: PIA Port A Set to %2x\n", machine().describe_context(),data));
-	m_msm6376->write(space, 0, data);
+	m_msm6376->write(data);
 }
 
 WRITE8_MEMBER(mpu4_state::pia_gb_portb_w)
