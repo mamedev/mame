@@ -364,11 +364,11 @@ READ8_MEMBER( atari_jsa_oki_base_device::oki_r )
 {
 	// JSA IIIs selects the 2nd OKI via the low bit, so select it
 	if (m_oki2 != nullptr && offset == 1)
-		return m_oki2->read(space, offset);
+		return m_oki2->read();
 
 	// OKI may not be populated at all
 	else if (m_oki1 != nullptr)
-		return m_oki1->read(space, offset);
+		return m_oki1->read();
 
 	// if not present, return all 0xff
 	return 0xff;
@@ -384,11 +384,11 @@ WRITE8_MEMBER( atari_jsa_oki_base_device::oki_w )
 {
 	// JSA IIIs selects the 2nd OKI via the low bit, so select it
 	if (m_oki2 != nullptr && offset == 1)
-		m_oki2->write(space, offset, data);
+		m_oki2->write(data);
 
 	// OKI may not be populated at all
 	else if (m_oki1 != nullptr)
-		m_oki1->write(space, offset, data);
+		m_oki1->write(data);
 }
 
 

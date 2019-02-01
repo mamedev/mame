@@ -273,7 +273,7 @@ READ8_MEMBER(limenko_state::spotty_sound_r)
 	if(m_spotty_sound_cmd == 0xf7)
 		return m_soundlatch->read(space,0);
 	else
-		return m_oki->read(space,0);
+		return m_oki->read();
 }
 
 /*****************************************************************************************************

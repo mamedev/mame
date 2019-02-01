@@ -4106,12 +4106,13 @@ void taito_f3_state::init_bubsymph()
 
 READ32_MEMBER(taito_f3_state::bubsympb_oki_r)
 {
-	return m_oki->read(space,0);
+	return m_oki->read();
 }
+
 WRITE32_MEMBER(taito_f3_state::bubsympb_oki_w)
 {
 	//printf("write %08x %08x\n",data,mem_mask);
-	if (ACCESSING_BITS_0_7) m_oki->write(space, 0,data&0xff);
+	if (ACCESSING_BITS_0_7) m_oki->write(data&0xff);
 	//if (mem_mask==0x000000ff) downcast<okim6295_device *>(device)->write(0,data&0xff);
 	if (ACCESSING_BITS_16_23)
 	{

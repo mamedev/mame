@@ -318,7 +318,7 @@ READ8_MEMBER(tatsumi_state::tatsumi_hack_ym2151_r)
 
 READ8_MEMBER(cyclwarr_state::oki_status_xor_r)
 {
-	int r = m_oki->read(space,0);
+	int r = m_oki->read();
 
 	// Cycle Warriors and Big Fight access this with reversed activeness.
 	// this is particularly noticeable with the "We got em" sample played in CW at stage clear:

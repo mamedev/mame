@@ -377,7 +377,7 @@ WRITE8_MEMBER(metro_state::upd7810_portb_w)
 	{
 		/* write */
 		if (!BIT(data, 4))
-			m_oki->write(space, 0, m_porta);
+			m_oki->write(m_porta);
 	}
 
 	m_portb = data;
@@ -426,14 +426,14 @@ WRITE8_MEMBER(metro_state::daitorid_portb_w)
 	{
 		/* write */
 		if (!BIT(data, 4))
-			m_oki->write(space, 0, m_porta);
+			m_oki->write(m_porta);
 	}
 
 	if (BIT(m_portb, 3) && !BIT(data, 3))   /* clock 1->0 */
 	{
 		/* read */
 		if (!BIT(data, 4))
-			m_porta = m_oki->read(space, 0);
+			m_porta = m_oki->read();
 	}
 
 	m_portb = data;

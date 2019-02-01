@@ -501,7 +501,7 @@ READ8_MEMBER(megasys1_state::oki_status_r)
 	if (m_ignore_oki_status == 1)
 		return 0;
 	else
-		return m_oki[Chip]->read_status();
+		return m_oki[Chip]->read();
 }
 
 /***************************************************************************

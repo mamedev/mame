@@ -243,7 +243,7 @@ READ16_MEMBER(kaneko16_berlwall_state::berlwall_oki_r)
 		mem_mask >>= 8;
 	}
 
-	ret = m_oki[0]->read(space, offset, mem_mask);
+	ret = m_oki[0]->read();
 	ret = ret | ret << 8;
 
 	return ret;
@@ -257,7 +257,7 @@ WRITE16_MEMBER(kaneko16_berlwall_state::berlwall_oki_w)
 		mem_mask >>= 8;
 	}
 
-	m_oki[0]->write(space, offset, data, mem_mask);
+	m_oki[0]->write(data);
 }
 
 READ16_MEMBER(kaneko16_berlwall_state::berlwall_spriteram_r)

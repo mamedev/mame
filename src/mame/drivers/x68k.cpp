@@ -1045,12 +1045,12 @@ WRITE8_MEMBER(x68k_state::adpcm_w)
 {
 	switch(offset)
 	{
-		case 0x00:
-			m_okim6258->ctrl_w(space,0,data);
-			break;
-		case 0x01:
-			m_okim6258->data_w(space,0,data);
-			break;
+	case 0x00:
+		m_okim6258->ctrl_w(data);
+		break;
+	case 0x01:
+		m_okim6258->data_w(data);
+		break;
 	}
 }
 
