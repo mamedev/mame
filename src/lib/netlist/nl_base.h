@@ -129,9 +129,9 @@ class NETLIB_NAME(name) : public device_t
 
 #define NETLIB_UPDATE_TERMINALSI() public: virtual void update_terminals() override
 #define NETLIB_HANDLERI(name) private: virtual void name() NL_NOEXCEPT
-#define NETLIB_UPDATEI() protected: virtual void update() NL_NOEXCEPT override
+#define NETLIB_UPDATEI() public: virtual void update() NL_NOEXCEPT override
 #define NETLIB_UPDATE_PARAMI() public: virtual void update_param() override
-#define NETLIB_RESETI() protected: virtual void reset() override
+#define NETLIB_RESETI() public: virtual void reset() override
 
 #define NETLIB_TIMESTEP(chip) void NETLIB_NAME(chip) :: timestep(const nl_double step)
 
@@ -1080,12 +1080,6 @@ namespace netlist
 
 		virtual ~core_device_t();
 
-		// FIXME: useless trampoline
-		void update_dev() NL_NOEXCEPT
-		{
-			do_update();
-		}
-
 		void do_inc_active() NL_NOEXCEPT
 		{
 			if (m_hint_deactivate)
@@ -1101,7 +1095,6 @@ namespace netlist
 				dec_active();
 		}
 
-		void do_reset() { reset(); }
 		void set_hint_deactivate(bool v) { m_hint_deactivate = v; }
 		bool get_hint_deactivate() { return m_hint_deactivate; }
 
@@ -1112,18 +1105,13 @@ namespace netlist
 		nperfcount_t<NL_KEEP_STATISTICS> m_stat_call_count;
 		nperfcount_t<NL_KEEP_STATISTICS> m_stat_inc_active;
 
+		virtual void update() NL_NOEXCEPT { }
+		virtual void reset() { }
 
 	protected:
 
-		virtual void update() NL_NOEXCEPT { }
 		virtual void inc_active() NL_NOEXCEPT {  }
 		virtual void dec_active() NL_NOEXCEPT {  }
-		virtual void reset() { }
-
-		void do_update() NL_NOEXCEPT
-		{
-			update();
-		}
 
 		log_type & log();
 

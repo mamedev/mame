@@ -100,7 +100,7 @@ namespace netlist
 		{
 			m_R_FC.set_R(90000.0);
 			m_R_RNG.set_R(90000.0);
-			m_clock.do_reset();
+			m_clock.reset();
 		}
 		NETLIB_UPDATEI();
 
@@ -148,8 +148,8 @@ namespace netlist
 
 		NETLIB_RESETI()
 		{
-			m_1.do_reset();
-			m_2.do_reset();
+			m_1.reset();
+			m_2.reset();
 		}
 
 	private:

@@ -105,10 +105,10 @@ namespace netlist
 
 	NETLIB_UPDATE(9322)
 	{
-		m_1.update_dev();
-		m_2.update_dev();
-		m_3.update_dev();
-		m_4.update_dev();
+		m_1.update();
+		m_2.update();
+		m_3.update();
+		m_4.update();
 	}
 
 	NETLIB_DEVICE_IMPL_DEPRECATED(9322)

@@ -72,7 +72,7 @@ namespace netlist
 			// We only need to update the net first if this is a time stepping net
 			if ((0)) // m_R->m_P.net().as_analog().solver()->is_timestep())
 			{
-				m_R.update_dev();
+				m_R.update();
 				m_R.set_R(R);
 				m_R.m_P.schedule_solve_after(NLTIME_FROM_NS(1));
 			}
@@ -80,7 +80,7 @@ namespace netlist
 			{
 				m_R.set_R(R);
 				m_R.m_P.schedule_solve_after(NLTIME_FROM_NS(1));
-				//m_R->update_dev();
+				//m_R->update();
 			}
 		}
 	}

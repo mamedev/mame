@@ -43,7 +43,7 @@ namespace netlist { namespace devices {
 
 	NETLIB_UPDATE(CD4316_GATE)
 	{
-		m_R.update_dev();
+		m_R.update();
 		if (m_S() && !m_E())
 			m_R.set_R(m_base_r());
 		else

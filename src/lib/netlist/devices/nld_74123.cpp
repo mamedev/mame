@@ -257,8 +257,8 @@ namespace netlist
 	{
 		m_KP = 1.0 / (1.0 + exp(m_K()));
 
-		m_RP.do_reset();
-		m_RN.do_reset();
+		m_RP.reset();
+		m_RN.reset();
 
 		//m_RP.set_R(R_OFF);
 		//m_RN.set_R(R_OFF);
@@ -276,8 +276,8 @@ namespace netlist
 
 	NETLIB_RESET(74123_dip)
 	{
-		//m_1.do_reset();
-		//m_2.do_reset();
+		//m_1.reset();
+		//m_2.reset();
 	}
 
 	NETLIB_UPDATE(9602_dip)
@@ -289,8 +289,8 @@ namespace netlist
 
 	NETLIB_RESET(9602_dip)
 	{
-		//m_1.do_reset();
-		//m_2.do_reset();
+		//m_1.reset();
+		//m_2.reset();
 	}
 
 	NETLIB_UPDATE(4538_dip)
@@ -302,8 +302,8 @@ namespace netlist
 
 	NETLIB_RESET(4538_dip)
 	{
-		m_1.do_reset();
-		m_2.do_reset();
+		m_1.reset();
+		m_2.reset();
 	}
 
 	NETLIB_DEVICE_IMPL_DEPRECATED(74123)

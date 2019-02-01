@@ -78,9 +78,11 @@ NETLIB_OBJECT(twoterm)
 
 	//NETLIB_UPDATE_TERMINALSI() { }
 	//NETLIB_RESETI() { }
-	NETLIB_UPDATEI();
 
 public:
+
+	NETLIB_UPDATEI();
+
 	void solve_now();
 
 	void set(const nl_double G, const nl_double V, const nl_double I)

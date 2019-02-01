@@ -341,7 +341,7 @@ void netlist_t::reset()
 	if (m_mainclock != nullptr)
 		m_mainclock->m_Q.net().set_time(netlist_time::zero());
 	//if (m_solver != nullptr)
-	//  m_solver->do_reset();
+	//  m_solver->reset();
 
 	m_state->reset();
 }
@@ -359,7 +359,7 @@ void netlist_state_t::reset()
 	// Reset all devices once !
 	log().verbose("Call reset on all devices:");
 	for (auto & dev : m_devices)
-		dev->do_reset();
+		dev->reset();
 
 	// Make sure everything depending on parameters is set
 	// Currently analog input and logic input also
@@ -409,14 +409,14 @@ void netlist_state_t::reset()
 			log().verbose("Using brute force backward startup strategy");
 			std::size_t i = m_devices.size();
 			while (i>0)
-				m_devices[--i]->update_dev();
+				m_devices[--i]->update();
 		}
 		break;
 		case 2:     // brute force forward
 		{
 			log().verbose("Using brute force forward startup strategy");
 			for (auto &d : m_devices)
-				d->update_dev();
+				d->update();
 		}
 		break;
 	}

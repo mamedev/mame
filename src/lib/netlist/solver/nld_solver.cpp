@@ -71,7 +71,7 @@ namespace netlist
 NETLIB_RESET(solver)
 {
 	for (std::size_t i = 0; i < m_mat_solvers.size(); i++)
-		m_mat_solvers[i]->do_reset();
+		m_mat_solvers[i]->reset();
 }
 
 void NETLIB_NAME(solver)::stop()

@@ -140,8 +140,8 @@ namespace netlist
 
 	NETLIB_RESET(9310)
 	{
-		sub.do_reset();
-		subABCD.do_reset();
+		sub.reset();
+		subABCD.reset();
 	}
 
 	NETLIB_RESET(9310_subABCD)
