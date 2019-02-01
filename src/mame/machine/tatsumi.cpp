@@ -307,7 +307,7 @@ WRITE16_MEMBER(tatsumi_state::tatsumi_v30_68000_w)
 // self-test in Tatsumi games.  Needs fixed, but hack it here for now.
 READ8_MEMBER(tatsumi_state::tatsumi_hack_ym2151_r)
 {
-	int r=m_ym2151->status_r(space,0);
+	int r=m_ym2151->status_r();
 
 	if (m_audiocpu->pc()==0x2aca || m_audiocpu->pc()==0x29fe
 		|| m_audiocpu->pc()==0xf9721

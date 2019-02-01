@@ -353,10 +353,10 @@ WRITE8_MEMBER(homedata_state::reikaids_upd7807_portc_w)
 	machine().bookkeeping().coin_counter_w(0, ~data & 0x80);
 
 	if (BIT(m_upd7807_portc, 5) && !BIT(data, 5))   /* write clock 1->0 */
-		m_ymsnd->write(space, BIT(data, 3), m_upd7807_porta);
+		m_ymsnd->write(BIT(data, 3), m_upd7807_porta);
 
 	if (BIT(m_upd7807_portc, 4) && !BIT(data, 4))   /* read clock 1->0 */
-		m_upd7807_porta = m_ymsnd->read(space, BIT(data, 3));
+		m_upd7807_porta = m_ymsnd->read(BIT(data, 3));
 
 	m_upd7807_portc = data;
 }

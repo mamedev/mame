@@ -321,7 +321,7 @@ READ8_MEMBER(taitol_1cpu_state::extport_select_and_ym2203_r)
 {
 	for (auto &mux : m_mux)
 		mux->select_w((offset >> 1) & 1);
-	return m_ymsnd->read(space, offset & 1);
+	return m_ymsnd->read(offset & 1);
 }
 
 WRITE8_MEMBER(taitol_state::mcu_control_w)

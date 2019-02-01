@@ -2115,12 +2115,12 @@ READ8_MEMBER(mpu4_state::bwb_characteriser_r)
 
 WRITE8_MEMBER(mpu4_state::mpu4_ym2413_w)
 {
-	if (m_ym2413) m_ym2413->write(space,offset,data);
+	if (m_ym2413) m_ym2413->write(offset,data);
 }
 
 READ8_MEMBER(mpu4_state::mpu4_ym2413_r)
 {
-//  if (m_ym2413) return m_ym2413->read(space,offset);
+//  if (m_ym2413) return m_ym2413->read(offset);
 	return 0xff;
 }
 

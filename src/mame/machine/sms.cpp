@@ -515,14 +515,14 @@ READ8_MEMBER(sms_state::smsj_audio_control_r)
 
 WRITE8_MEMBER(sms_state::smsj_ym2413_register_port_w)
 {
-	m_ym->write(space, 0, data & 0x3f);
+	m_ym->write(0, data & 0x3f);
 }
 
 
 WRITE8_MEMBER(sms_state::smsj_ym2413_data_port_w)
 {
 	//logerror("data_port_w %x %x\n", offset, data);
-	m_ym->write(space, 1, data);
+	m_ym->write(1, data);
 }
 
 

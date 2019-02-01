@@ -197,7 +197,7 @@ void pc9801_86_device::device_reset()
 READ8_MEMBER(pc9801_86_device::opna_r)
 {
 	if((offset & 1) == 0)
-		return m_opna->read(space, offset >> 1);
+		return m_opna->read(offset >> 1);
 	else // odd
 	{
 		logerror("PC9801-86: Read to undefined port [%02x]\n",offset+0x188);
@@ -208,7 +208,7 @@ READ8_MEMBER(pc9801_86_device::opna_r)
 WRITE8_MEMBER(pc9801_86_device::opna_w)
 {
 	if((offset & 1) == 0)
-		m_opna->write(space, offset >> 1,data);
+		m_opna->write(offset >> 1,data);
 	else // odd
 		logerror("PC9801-86: Write to undefined port [%02x] %02x\n",offset+0x188,data);
 }
@@ -419,7 +419,7 @@ void pc9801_speakboard_device::device_reset()
 READ8_MEMBER(pc9801_speakboard_device::opna_slave_r)
 {
 	if((offset & 1) == 0)
-		return m_opna_slave->read(space, offset >> 1);
+		return m_opna_slave->read(offset >> 1);
 	else // odd
 	{
 		logerror("PC9801-SPB: Read to undefined port [%02x]\n",offset+0x588);
@@ -430,7 +430,7 @@ READ8_MEMBER(pc9801_speakboard_device::opna_slave_r)
 WRITE8_MEMBER(pc9801_speakboard_device::opna_slave_w)
 {
 	if((offset & 1) == 0)
-		m_opna_slave->write(space, offset >> 1,data);
+		m_opna_slave->write(offset >> 1,data);
 	else // odd
 		logerror("PC9801-SPB: Write to undefined port [%02x] %02x\n",offset+0x588,data);
 }

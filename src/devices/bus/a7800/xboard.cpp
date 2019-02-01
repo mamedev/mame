@@ -205,7 +205,7 @@ READ8_MEMBER(a78_xm_device::read_04xx)
 	if (BIT(m_reg, 4) && offset >= 0x50 && offset < 0x60)
 		return m_pokey->read(space, offset & 0x0f);
 	else if (m_ym_enabled && offset >= 0x60 && offset <= 0x61)
-		return m_ym->read(space, offset & 1);
+		return m_ym->read(offset & 1);
 	else if (BIT(m_reg, 4) && offset >= 0x60 && offset < 0x70)
 		return m_xbslot->read_04xx(space, offset - 0x10);   // access second POKEY
 	else
@@ -217,7 +217,7 @@ WRITE8_MEMBER(a78_xm_device::write_04xx)
 	if (BIT(m_reg, 4) && offset >= 0x50 && offset < 0x60)
 		m_pokey->write(space, offset & 0x0f, data);
 	else if (m_ym_enabled && offset >= 0x60 && offset <= 0x61)
-		m_ym->write(space, offset & 1, data);
+		m_ym->write(offset & 1, data);
 	else if (BIT(m_reg, 4) && offset >= 0x60 && offset < 0x70)
 		m_xbslot->write_04xx(space, offset - 0x10, data);   // access second POKEY
 	else if (offset >= 0x70 && offset < 0x80)

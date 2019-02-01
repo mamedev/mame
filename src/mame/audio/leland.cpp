@@ -739,7 +739,7 @@ READ16_MEMBER( leland_80186_sound_device::peripheral_r )
 					return m_pit[1]->read(offset & 3);
 			}
 			else if (m_type == TYPE_WSF)
-				return m_ymsnd->read(space, offset);
+				return m_ymsnd->read(offset);
 			break;
 
 		case 4:
@@ -784,7 +784,7 @@ WRITE16_MEMBER( leland_80186_sound_device::peripheral_w )
 					m_pit[1]->write(offset & 3, data);
 			}
 			else if(m_type == TYPE_WSF)
-				m_ymsnd->write(space, offset, data);
+				m_ymsnd->write(offset, data);
 			break;
 
 		case 4:
