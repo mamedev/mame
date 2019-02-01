@@ -434,7 +434,7 @@ READ16_MEMBER(joystand_state::cart_r)
 {
 	int which = offset / 0x80000;
 	int addr  = offset & 0x7ffff;
-	return (m_cart_flash[which * 2 + 0]->read(space, addr) << 8) | m_cart_flash[which * 2 + 1]->read(space, addr);
+	return (m_cart_flash[which * 2 + 0]->read(addr) << 8) | m_cart_flash[which * 2 + 1]->read(addr);
 }
 
 WRITE16_MEMBER(joystand_state::cart_w)
@@ -443,9 +443,9 @@ WRITE16_MEMBER(joystand_state::cart_w)
 	int addr  = offset & 0x7ffff;
 
 	if (ACCESSING_BITS_0_7)
-		m_cart_flash[which * 2 + 1]->write(space, addr, data & 0xff);
+		m_cart_flash[which * 2 + 1]->write(addr, data & 0xff);
 	if (ACCESSING_BITS_8_15)
-		m_cart_flash[which * 2 + 0]->write(space, addr, data >> 8);
+		m_cart_flash[which * 2 + 0]->write(addr, data >> 8);
 
 	bg15_tiles_dirty = true;
 }

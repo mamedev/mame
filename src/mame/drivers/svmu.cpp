@@ -75,9 +75,9 @@ WRITE8_MEMBER(svmu_state::page_w)
 READ8_MEMBER(svmu_state::prog_r)
 {
 	if (m_page == 1)
-		return m_flash->read(space, offset);
+		return m_flash->read(offset);
 	else if (m_page == 2)
-		return m_flash->read(space, 0x10000 + offset);
+		return m_flash->read(0x10000 + offset);
 	else
 		return m_bios[offset];
 }
@@ -85,9 +85,9 @@ READ8_MEMBER(svmu_state::prog_r)
 WRITE8_MEMBER(svmu_state::prog_w)
 {
 	if (m_page == 1)
-		m_flash->write(space, offset, data);
+		m_flash->write(offset, data);
 	else if (m_page == 2)
-		m_flash->write(space, 0x10000 + offset, data);
+		m_flash->write(0x10000 + offset, data);
 }
 
 /*

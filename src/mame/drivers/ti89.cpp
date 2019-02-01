@@ -147,14 +147,14 @@ WRITE16_MEMBER ( ti68k_state::flash_w )
 {
 	// verification if it is flash memory
 	if (m_flash_mem)
-		m_flash->write(space, offset, data);
+		m_flash->write(offset, data);
 }
 
 READ16_MEMBER ( ti68k_state::flash_r )
 {
 	if (m_flash_mem)
 	{
-		return m_flash->read(space, offset);
+		return m_flash->read(offset);
 	}
 	else
 	{

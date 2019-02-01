@@ -1823,8 +1823,8 @@ void naomi_state::naomi_port(address_map &map)
 
 READ64_MEMBER(atomiswave_state::aw_flash_r)
 {
-	return (uint64_t)m_awflash->read(space, offset*8) | (uint64_t)m_awflash->read(space, (offset*8)+1)<<8 | (uint64_t)m_awflash->read(space, (offset*8)+2)<<16 | (uint64_t)m_awflash->read(space, (offset*8)+3)<<24 |
-			(uint64_t)m_awflash->read(space, (offset*8)+4)<<32 | (uint64_t)m_awflash->read(space, (offset*8)+5)<<40 | (uint64_t)m_awflash->read(space, (offset*8)+6)<<48 | (uint64_t)m_awflash->read(space, (offset*8)+7)<<56;
+	return (uint64_t)m_awflash->read(offset*8) | (uint64_t)m_awflash->read((offset*8)+1)<<8 | (uint64_t)m_awflash->read((offset*8)+2)<<16 | (uint64_t)m_awflash->read((offset*8)+3)<<24 |
+			(uint64_t)m_awflash->read((offset*8)+4)<<32 | (uint64_t)m_awflash->read((offset*8)+5)<<40 | (uint64_t)m_awflash->read((offset*8)+6)<<48 | (uint64_t)m_awflash->read((offset*8)+7)<<56;
 }
 
 WRITE64_MEMBER(atomiswave_state::aw_flash_w)
@@ -1843,7 +1843,7 @@ WRITE64_MEMBER(atomiswave_state::aw_flash_w)
 
 	data >>= (i*8);
 
-	m_awflash->write(space, addr, data);
+	m_awflash->write(addr, data);
 }
 
 // TODO: don't we have a common function for this?

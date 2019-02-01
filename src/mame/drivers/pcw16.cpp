@@ -167,11 +167,11 @@ uint8_t pcw16_state::read_bank_data(uint8_t type, uint16_t offset)
 		}
 		if(type < 0x40)  // first flash
 		{
-			return m_flash0->read(machine().dummy_space(), ((type & 0x3f)*0x4000)+offset);
+			return m_flash0->read(((type & 0x3f)*0x4000)+offset);
 		}
 		else  // second flash
 		{
-			return m_flash1->read(machine().dummy_space(), ((type & 0x3f)*0x4000)+offset);
+			return m_flash1->read(((type & 0x3f)*0x4000)+offset);
 		}
 	}
 }
@@ -188,11 +188,11 @@ void pcw16_state::write_bank_data(uint8_t type, uint16_t offset, uint8_t data)
 			return;  // first four sectors are write protected
 		if(type < 0x40)  // first flash
 		{
-			m_flash0->write(machine().dummy_space(), ((type & 0x3f)*0x4000)+offset, data);
+			m_flash0->write(((type & 0x3f)*0x4000)+offset, data);
 		}
 		else  // second flash
 		{
-			m_flash1->write(machine().dummy_space(), ((type & 0x3f)*0x4000)+offset, data);
+			m_flash1->write(((type & 0x3f)*0x4000)+offset, data);
 		}
 	}
 }
