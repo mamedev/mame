@@ -1417,6 +1417,29 @@ configuration { "winphone8* or winstore8*" }
 	linkoptions {
 		"/ignore:4264" -- LNK4264: archiving object file compiled with /ZW into a static library; note that when authoring Windows Runtime types it is not recommended to link with a static library that contains Windows Runtime metadata
 	}
+configuration { "llvm" }
+		buildoptions {
+			"-Wno-tautological-constant-out-of-range-compare",
+			"-Wno-ignored-qualifiers",
+			"-Wno-missing-field-initializers",
+			"-Wno-ignored-pragma-optimize",
+			"-Wno-unknown-warning-option",
+			"-Wno-unused-function",
+			"-Wno-unused-label",
+			"-Wno-unused-local-typedef",
+			"-Wno-unused-const-variable",
+			"-Wno-unneeded-internal-declaration",
+			"-Wno-unused-private-field",
+			"-Wno-missing-braces",
+			"-Wno-unused-variable",
+			"-Wno-tautological-pointer-compare",
+			"-Wno-nonportable-include-path",
+			"-Wno-enum-conversion",
+			"-Wno-pragma-pack",
+			"-Wno-new-returns-null",
+			"-Wno-switch",
+			"-Wno-tautological-undefined-compare",
+		}
 
 
 -- adding this till we sort out asserts in debug mode
