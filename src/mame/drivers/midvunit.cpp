@@ -280,14 +280,14 @@ WRITE32_MEMBER(midvunit_state::tms32031_control_w)
 
 READ32_MEMBER(midvunit_state::crusnwld_serial_status_r)
 {
-	uint16_t in1 = (m_in1->read() & 0x7fff) | (m_midway_serial_pic->status_r(space,0) << 15);
+	uint16_t in1 = (m_in1->read() & 0x7fff) | (m_midway_serial_pic->status_r() << 15);
 	return in1 | in1 << 16;
 }
 
 
 READ32_MEMBER(midvunit_state::crusnwld_serial_data_r)
 {
-	return m_midway_serial_pic->read(space,0) << 16;
+	return m_midway_serial_pic->read() << 16;
 }
 
 
@@ -298,7 +298,7 @@ WRITE32_MEMBER(midvunit_state::crusnwld_serial_data_w)
 		m_midway_serial_pic->reset_w(1);
 		m_midway_serial_pic->reset_w(0);
 	}
-	m_midway_serial_pic->write(space,0,data >> 16);
+	m_midway_serial_pic->write(data >> 16);
 }
 
 
@@ -342,20 +342,20 @@ WRITE32_MEMBER(midvunit_state::bit_reset_w)
 
 READ32_MEMBER(midvunit_state::offroadc_serial_status_r)
 {
-	uint16_t in1 = (m_in1->read() & 0x7fff) | (m_midway_serial_pic2->status_r(space,0) << 15);
+	uint16_t in1 = (m_in1->read() & 0x7fff) | (m_midway_serial_pic2->status_r() << 15);
 	return in1 | in1 << 16;
 }
 
 
 READ32_MEMBER(midvunit_state::offroadc_serial_data_r)
 {
-	return m_midway_serial_pic2->read(space, 0) << 16;
+	return m_midway_serial_pic2->read() << 16;
 }
 
 
 WRITE32_MEMBER(midvunit_state::offroadc_serial_data_w)
 {
-	m_midway_serial_pic2->write(space, 0, data >> 16);
+	m_midway_serial_pic2->write(data >> 16);
 }
 
 READ32_MEMBER(midvunit_state::midvunit_wheel_board_r)
