@@ -16,10 +16,16 @@
     The cassette has no checksum, header or blocks. It is simply a stream
     of pulses. The successful loading of a tape is therefore a matter of luck.
 
+    To modify memory, press RST, then enter the 4-digit address (nothing happens
+    until the 4th digit is pressed), then press FN, then 0, then the 2 digit data.
+    It will enter the data (you won't see anything), then the address will increment.
+    Enter the data for this new address. If you want to skip this address, press FN.
+    When you're done, press RST. NOTE!!! Do NOT change any of these addresses:
+    0000,0001,0006-007F, or the system may crash. It's recommended to start all
+    your programs at 0200.
+
     Function keys:
-    FN 0 - Modify memory - firstly enter a 4-digit address, then 2-digit data
-                    the address will increment by itself, enter the next byte.
-                    FN by itself will step to the next address.
+    FN 0 - Modify memory - see above paragraph.
 
     FN 1 - Tape load. You must have entered the start address at 0002, and
            the end address+1 at 0004 (big-endian).
@@ -27,18 +33,13 @@
     FN 2 - Tape save. You must have entered the start address at 0002, and
            the end address+1 at 0004 (big-endian).
 
-    FN 3 - Run. You must have entered the 4-digit go address first.
+    FN 3 - Run. To use, press RST, then enter the 4-digit start address
+           (nothing happens until the 4th digit is pressed), then FN, then 3.
 
-    All CHIP-8 programs load at 0x200 (max size 4k), and exec address
+    All CHIP-8 programs load at 0200 (max size 4k), and exec address
     is C000.
 
     Information and programs can be found at http://chip8.com/?page=78
-
-    2019-01-29: Noticed that when you try to enter the 4-digit address, it
-    runs into the weeds when the 2nd digit is pressed. Unable to locate a
-    version where it ever worked, even though the above text insinuates that
-    it once did. Marked as MNW until the problem can be resolved. The rest of
-    the machine appears to work fine.  (Robbbert)
 
 **********************************************************************************/
 
@@ -79,6 +80,8 @@ public:
 
 
 	void d6800(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 
 private:
 	DECLARE_READ8_MEMBER( d6800_cassette_r );
@@ -190,13 +193,23 @@ static INPUT_PORTS_START( d6800 )
 	PORT_START("SHIFT")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("FN") PORT_CODE(KEYCODE_LSHIFT)
 
+	PORT_START("RESET")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RST") PORT_CODE(KEYCODE_LALT) PORT_CHANGED_MEMBER(DEVICE_SELF, d6800_state, reset_button, nullptr)
+
 	PORT_START("VS")
 	/* vblank */
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_VBLANK("screen")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
-/* Video */
+INPUT_CHANGED_MEMBER(d6800_state::reset_button)
+{
+	// RESET button wired to POR on the mc6875, which activates the Reset output pin which in turn connects to the CPU's Reset pin.
+	if (newval)
+		m_pia->reset();
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
+}
 
+/* Video */
 uint32_t d6800_state::screen_update_d6800(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	uint8_t x,y,gfx=0;
@@ -446,4 +459,4 @@ ROM_START( d6800 )
 ROM_END
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY          FULLNAME      FLAGS
-COMP( 1979, d6800, 0,      0,      d6800,   d6800, d6800_state, empty_init, "Michael Bauer", "Dream 6800", MACHINE_NOT_WORKING )
+COMP( 1979, d6800, 0,      0,      d6800,   d6800, d6800_state, empty_init, "Michael Bauer", "Dream 6800", 0 )
