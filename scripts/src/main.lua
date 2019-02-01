@@ -256,6 +256,7 @@ end
 		"utils",
 		ext_lib("expat"),
 		"softfloat",
+		"softfloat3",
 		ext_lib("jpeg"),
 		"7z",
 	}

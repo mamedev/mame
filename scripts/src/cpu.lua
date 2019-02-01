@@ -1297,6 +1297,7 @@ end
 --------------------------------------------------
 -- MIPS R4000 (MIPS III/IV) series
 --@src/devices/cpu/mips/mips3.h,CPUS["MIPS3"] = true
+--@src/devices/cpu/mips/r4000.h,CPUS["MIPS3"] = true
 --------------------------------------------------
 
 if (CPUS["MIPS3"]~=null) then
@@ -1313,6 +1314,8 @@ if (CPUS["MIPS3"]~=null) then
 		MAME_DIR .. "src/devices/cpu/mips/ps2vu.h",
 		MAME_DIR .. "src/devices/cpu/mips/ps2vif1.cpp",
 		MAME_DIR .. "src/devices/cpu/mips/ps2vif1.h",
+		MAME_DIR .. "src/devices/cpu/mips/r4000.cpp",
+		MAME_DIR .. "src/devices/cpu/mips/r4000.h",
 	}
 end
 
