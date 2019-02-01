@@ -340,6 +340,7 @@ The Maze of the Kings (prototype)               no cart  *       21 (64Mb)   pre
 Tokyo Bus Guide (Rev A)                       840-0045C  23468A  18 (64Mb)   present  315-6206  317-0290-COM  requires 837-13844 JVS IO
 Virtua Athletics (prototype)                    no cart  none    21*(64Mb)   present  315-6206  present       * only first 14 flash roms contain game data, have Japan text label "Overseas sales (NA & EU)"
 Virtua NBA (prototype)                          no cart  *       21 (64Mb)   present  315-6206  317-0271-COM  * instead of EPROM have tiny PCB with 2 flashroms on it
+Virtua NBA (prototype, 15.11)                   no cart  *       21 (64Mb)   present  315-6206  317-0271-COM  * instead of EPROM have tiny PCB with 2 flashroms on it
 Virtua Tennis / Power Smash (prototype)         no cart  *       21 (64Mb)   present  315-6206  317-0263-COM  * flash-PCB, title screen have label "SOFT R&D Dept.#3", not dumped but known to exist
 Wave Runner GP (USA, Rev A)                   840-0064C  23725A  12 (64Mb)   present  315-6206  317-0306-COM  PCB s/n is 840-0064B-01
 
@@ -6570,6 +6571,39 @@ ROM_START( virnbap )
 	ROM_PARAMETER( ":rom_board:segam2crypt:key", "28068b58" )
 ROM_END
 
+// IC22 ROM header contains IC1-21 sums which match regular mask ROM data, however actual 1-21 ROMs contain quite different data, probably from earlier version.
+ROM_START( virnbapa )
+	NAOMI_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0xb000000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD("11-15.ic22",  0x0000000, 0x0400000, CRC(b389295a) SHA1(9c96cd85373fa69c99085c1f1591e7df02861bac) )
+	ROM_LOAD("rom1.ic1s",   0x0800000, 0x0800000, CRC(f77b588d) SHA1(6f1cdd48e1d1f60bb95253ed204346d8fdc06265) )
+	ROM_LOAD("rom2.ic2s",   0x1000000, 0x0800000, CRC(90851aa4) SHA1(6f60956e70a315c619d07d7635f9136f0e4f6563) )
+	ROM_LOAD("rom3.ic3s",   0x1800000, 0x0800000, CRC(1fc5cd0d) SHA1(0249fc398e93ed4871c53aec585e49ac42924b9a) )
+	ROM_LOAD("rom4.ic4s",   0x2000000, 0x0800000, CRC(bb0922b1) SHA1(77597298e8a0ec9b33b4b776f0bebe41b9d07029) )
+	ROM_LOAD("rom5.ic5s",   0x2800000, 0x0800000, CRC(ba187afe) SHA1(0a951ba7feae31f439b37c970fe0f7bf3bacdd79) )
+	ROM_LOAD("rom6.ic6s",   0x3000000, 0x0800000, CRC(91c452ab) SHA1(9239cb0d49f8f8cb6cbc2aa57c3037d71a832bee) )
+	ROM_LOAD("rom7.ic7s",   0x3800000, 0x0800000, CRC(11e4c24b) SHA1(ef78e093ed4eae1659513e3fd7d26d313fca4943) )
+	ROM_LOAD("rom8.ic8s",   0x4000000, 0x0800000, CRC(72629663) SHA1(735590adfc837d399d6b2f3763299018215adab6) )
+	ROM_LOAD("rom9.ic9s",   0x4800000, 0x0800000, CRC(54b660e6) SHA1(34c1f46fb8eb92a21b94c9a4e9952cc13413fe99) )
+	ROM_LOAD("rom10.ic10s", 0x5000000, 0x0800000, CRC(8fc00425) SHA1(61da4ad778ce627f7e76d8f583edf6a8822cc98f) )
+	ROM_LOAD("rom11.ic11s", 0x5800000, 0x0800000, CRC(352eacfa) SHA1(9588f3abcdc11afb19facf84e937650faf672432) )
+	ROM_LOAD("rom12.ic12s", 0x6000000, 0x0800000, CRC(4b42b46d) SHA1(7893ed9412e69ba6ee075ff8721c0d7e8558091a) )
+	ROM_LOAD("rom13.ic13s", 0x6800000, 0x0800000, CRC(6edbb058) SHA1(f00047b910033fc198dd3876a7c1fa7402d8d38a) )
+	ROM_LOAD("rom14.ic14s", 0x7000000, 0x0800000, CRC(aa3885d5) SHA1(7280927ff7493fd1810c445b27e7de22528d545f) )
+	ROM_LOAD("rom15.ic15s", 0x7800000, 0x0800000, CRC(293293d8) SHA1(0cbc4df3e958c3c3bae06afcf04f73823b888fec) )
+	ROM_LOAD("rom16.ic16s", 0x8000000, 0x0800000, CRC(83ea7a33) SHA1(8be818d12382c74f85c95bf55f3cacf6c0a5cfaf) )
+	ROM_LOAD("rom17.ic17s", 0x8800000, 0x0800000, CRC(97be8db7) SHA1(ef4cf816c78cc6a9f9fbc80f42d7de1fd0434039) )
+	ROM_LOAD("rom18.ic18s", 0x9000000, 0x0800000, CRC(20c2bc4d) SHA1(b3c94bda80ec821c3bd16f69be11313612f3d484) )
+	ROM_LOAD("rom19.ic19s", 0x9800000, 0x0800000, CRC(195d646f) SHA1(43add13d4a96fb2a23e1c8d8a2b143bdc22a64c7) )
+	ROM_LOAD("rom20.ic20s", 0xa000000, 0x0800000, CRC(df62f303) SHA1(c5ad85d86079efa3dd233e10a68442ca03e532f1) )
+	ROM_LOAD("rom21.ic21s", 0xa800000, 0x0800000, CRC(194594f2) SHA1(aa19dfa37b90bb00362808d1319a29bf55d7d3eb) )
+
+	// 840-0021    2000     317-0271-COM   Naomi
+	ROM_PARAMETER( ":rom_board:segam2crypt:key", "28068b58" )
+ROM_END
+
 // 1999/07/01 07:48
 ROM_START( vs2_2ko )
 	NAOMI_BIOS
@@ -11021,7 +11055,8 @@ ROM_END
 /* 0020    */ GAME( 1999, sambaa,    samba,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Samba De Amigo (Rev A)", GAME_FLAGS )
 /* 0020    */ GAME( 1999, samba,     naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Samba De Amigo (Rev B)", GAME_FLAGS )
 /* none    */ GAME( 1999, sambap,    samba,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Samba De Amigo (USA, prototype)", GAME_FLAGS )
-/* none    */ GAME( 2000, virnbap,   virnba,   naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Virtua NBA (prototype)", GAME_FLAGS )
+/* none    */ GAME( 1999, virnbap,   virnba,   naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Virtua NBA (prototype)", GAME_FLAGS )
+/* none    */ GAME( 1999, virnbapa,  virnba,   naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Virtua NBA (prototype, 15.11)", GAME_FLAGS )
 /* 0021    */ GAME( 2000, virnbao,   virnba,   naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Virtua NBA", GAME_FLAGS )
 /* 0021-01 */ GAME( 2000, virnba,    naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Virtua NBA (USA)", GAME_FLAGS )
 /* 0022    */ GAME( 2000, tduno2,    naomi,    naomim1, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Touch de Uno! 2 (Japan)", GAME_FLAGS )
