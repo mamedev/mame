@@ -104,7 +104,10 @@ namespace netlist
 		}
 		NETLIB_UPDATEI();
 
-		NETLIB_UPDATE_PARAMI() { update_dev(); }
+		NETLIB_UPDATE_PARAMI()
+		{
+			/* update param may be called from anywhere, update_dev(time) is not a good idea */
+		}
 
 	public:
 		NETLIB_SUB(SN74LS629clk) m_clock;

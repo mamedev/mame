@@ -168,7 +168,7 @@ void detail::queue_t::on_pre_save()
 {
 	state().log().debug("on_pre_save\n");
 	m_qsize = this->size();
-	state().log().debug("current time {1} qsize {2}\n", exec().time().as_double(), m_qsize);
+	state().log().debug("qsize {1}\n", m_qsize);
 	for (std::size_t i = 0; i < m_qsize; i++ )
 	{
 		m_times[i] =  this->listptr()[i].m_exec_time.as_raw();
@@ -180,7 +180,7 @@ void detail::queue_t::on_pre_save()
 void detail::queue_t::on_post_load()
 {
 	this->clear();
-	state().log().debug("current time {1} qsize {2}\n", exec().time().as_double(), m_qsize);
+	state().log().debug("qsize {1}\n", m_qsize);
 	for (std::size_t i = 0; i < m_qsize; i++ )
 	{
 		detail::net_t *n = state().nets()[m_net_ids[i]].get();
@@ -352,14 +352,20 @@ void netlist_state_t::reset()
 	std::unordered_map<core_device_t *, bool> m;
 
 	// Reset all nets once !
+	log().verbose("Call reset on all nets:");
 	for (auto & n : nets())
 		n->reset();
 
 	// Reset all devices once !
+	log().verbose("Call reset on all devices:");
 	for (auto & dev : m_devices)
 		dev->do_reset();
 
 	// Make sure everything depending on parameters is set
+	// Currently analog input and logic input also
+	// push their outputs to queue.
+
+	log().verbose("Call update_param on all devices:");
 	for (auto & dev : m_devices)
 		dev->update_param();
 
@@ -391,17 +397,6 @@ void netlist_state_t::reset()
 						if (!plib::container::contains(d, dev))
 							d.push_back(dev);
 					}
-			log().verbose("Call update on devices which need parameter update:");
-			for (auto & dev : m_devices)
-				if (dev->needs_update_after_param_change())
-				{
-					if (!plib::container::contains(d, dev.get()))
-					{
-						d.push_back(dev.get());
-						log().verbose("\t ...{1}", dev->name());
-						dev->update_dev();
-					}
-				}
 			log().verbose("Devices not yet updated:");
 			for (auto &dev : m_devices)
 				if (!plib::container::contains(d, dev.get()))
@@ -1061,8 +1056,6 @@ param_t::param_type_t param_t::param_type() const
 void param_t::update_param()
 {
 	device().update_param();
-	if (device().needs_update_after_param_change())
-		device().update_dev();
 }
 
 pstring param_t::get_initial(const device_t &dev, bool *found)

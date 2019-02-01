@@ -165,7 +165,6 @@ void nl_convert_base_t::dump_nl()
 		net_t * net = i.second.get();
 		if (!net->is_no_export())
 		{
-			//printf("Net {}\n", net->name().c_str());
 			out("NET_C({}", net->terminals()[0].c_str() );
 			for (std::size_t j=1; j<net->terminals().size(); j++)
 			{

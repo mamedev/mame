@@ -161,11 +161,9 @@ unsigned matrix_solver_SOR_mat_t<FT, SIZE>::vsolve_non_dynamic(const bool newton
 				lambda1 = akk;
 	#endif
 		}
-		//printf("lambda: %f %f\n", lambda, 2.0 / (1.0 + 2 * sqrt(lambda)) );
 
 		//ws = 2.0 / (2.0 - lambdaN - lambda1);
 		m_omega = 2.0 / (2.0 - lambda1);
-		//printf("%f %f %f\n", m_omega, lambda1, lambdaN);
 	}
 #endif
 

@@ -8,6 +8,7 @@
 #include "pconfig.h"
 #include "palloc.h"
 #include "pfmtlog.h"
+#include "pexception.h"
 
 #include <algorithm>
 
@@ -91,7 +92,7 @@ void mempool::free(void *ptr)
 	auto i = reinterpret_cast<info *>(p - mininfosize());
 	block *b = i->m_block;
 	if (b->m_num_alloc == 0)
-		fprintf(stderr, "Argh .. double free\n");
+		plib::pexception("mempool::free - double free was called\n");
 	else
 	{
 		//b->m_free = m_min_alloc;

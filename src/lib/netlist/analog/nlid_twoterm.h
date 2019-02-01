@@ -81,6 +81,8 @@ NETLIB_OBJECT(twoterm)
 	NETLIB_UPDATEI();
 
 public:
+	void solve_now();
+
 	void set(const nl_double G, const nl_double V, const nl_double I)
 	{
 		/*      GO, GT, I                */
@@ -125,7 +127,7 @@ public:
 
 protected:
 	NETLIB_RESETI();
-	NETLIB_UPDATEI();
+	//NETLIB_UPDATEI();
 
 };
 
@@ -233,7 +235,7 @@ public:
 
 protected:
 	NETLIB_RESETI();
-	NETLIB_UPDATEI();
+	//NETLIB_UPDATEI();
 	NETLIB_UPDATE_PARAMI();
 
 private:
@@ -265,7 +267,7 @@ public:
 
 protected:
 	NETLIB_RESETI();
-	NETLIB_UPDATEI();
+	//NETLIB_UPDATEI();
 	NETLIB_UPDATE_PARAMI();
 
 private:
@@ -381,7 +383,7 @@ public:
 
 protected:
 	NETLIB_RESETI();
-	NETLIB_UPDATEI();
+	//NETLIB_UPDATEI();
 	NETLIB_UPDATE_PARAMI();
 
 	generic_diode m_D;
@@ -398,6 +400,7 @@ NETLIB_OBJECT_DERIVED(VS, twoterm)
 {
 public:
 	NETLIB_CONSTRUCTOR_DERIVED(VS, twoterm)
+	, m_t(*this, "m_t", 0.0)
 	, m_R(*this, "R", 0.1)
 	, m_V(*this, "V", 0.0)
 	, m_func(*this,"FUNC", "")
@@ -410,12 +413,26 @@ public:
 	}
 
 	NETLIB_IS_TIMESTEP(m_func() != "")
-	NETLIB_TIMESTEPI();
+
+	NETLIB_TIMESTEPI()
+	{
+		m_t += step;
+		this->set(1.0 / m_R(),
+				m_compiled.evaluate(std::vector<double>({m_t})),
+				0.0);
+	}
 
 protected:
-	NETLIB_UPDATEI();
-	NETLIB_RESETI();
+	// NETLIB_UPDATEI() { 	NETLIB_NAME(twoterm)::update(time); }
 
+	NETLIB_RESETI()
+	{
+		NETLIB_NAME(twoterm)::reset();
+		this->set(1.0 / m_R(), m_V(), 0.0);
+	}
+
+private:
+	state_var<double> m_t;
 	param_double_t m_R;
 	param_double_t m_V;
 	param_str_t m_func;
@@ -430,6 +447,7 @@ NETLIB_OBJECT_DERIVED(CS, twoterm)
 {
 public:
 	NETLIB_CONSTRUCTOR_DERIVED(CS, twoterm)
+	, m_t(*this, "m_t", 0.0)
 	, m_I(*this, "I", 1.0)
 	, m_func(*this,"FUNC", "")
 	, m_compiled(this->name() + ".FUNCC", this, this->state().run_state_manager())
@@ -441,12 +459,26 @@ public:
 	}
 
 	NETLIB_IS_TIMESTEP(m_func() != "")
-	NETLIB_TIMESTEPI();
+	NETLIB_TIMESTEPI()
+	{
+		m_t += step;
+		const double I = m_compiled.evaluate(std::vector<double>({m_t}));
+		set_mat(0.0, 0.0, -I,
+				0.0, 0.0,  I);
+	}
+
 protected:
 
-	NETLIB_UPDATEI();
-	NETLIB_RESETI();
+	//NETLIB_UPDATEI() { NETLIB_NAME(twoterm)::update(time); }
+	NETLIB_RESETI()
+	{
+		NETLIB_NAME(twoterm)::reset();
+		set_mat(0.0, 0.0, -m_I(),
+				0.0, 0.0,  m_I());
+	}
 
+private:
+	state_var<double> m_t;
 	param_double_t m_I;
 	param_str_t m_func;
 	plib::pfunction m_compiled;

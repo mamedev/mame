@@ -2,7 +2,7 @@
 // copyright-holders:Andrew Gardner, Couriersud
 #include "netlist/devices/net_lib.h"
 
-#define USE_FRONTIERS 0
+#define USE_FRONTIERS 1
 #define USE_FIXED_STV 1
 
 /* ----------------------------------------------------------------------------
@@ -326,8 +326,8 @@ NETLIST_START(kidniki)
 	PARAM(Solver.ACCURACY, 1e-7)
 	PARAM(Solver.NR_LOOPS, 100)
 	PARAM(Solver.GS_LOOPS, 300)
-	//PARAM(Solver.METHOD, "MAT_CR")
-	PARAM(Solver.METHOD, "GMRES")
+	PARAM(Solver.METHOD, "MAT_CR")
+	//PARAM(Solver.METHOD, "GMRES")
 	//PARAM(Solver.SOR_FACTOR, 1.73)
 	//PARAM(Solver.METHOD, "SOR")
 #endif

@@ -187,11 +187,9 @@ namespace netlist
 			set_logic_family(setup().family_from_model(m_FAMILY()));
 		}
 
-		NETLIB_UPDATE_AFTER_PARAM_CHANGE()
-
-		NETLIB_UPDATEI();
-		NETLIB_RESETI();
-		NETLIB_UPDATE_PARAMI();
+		NETLIB_UPDATEI() { }
+		NETLIB_RESETI() { m_Q.initial(0); }
+		NETLIB_UPDATE_PARAMI() { m_Q.push(m_IN() & 1, netlist_time::from_nsec(1)); }
 
 	protected:
 		logic_output_t m_Q;
@@ -207,11 +205,11 @@ namespace netlist
 		, m_IN(*this, "IN", 0.0)
 		{
 		}
-		NETLIB_UPDATE_AFTER_PARAM_CHANGE()
 
-		NETLIB_UPDATEI();
-		NETLIB_RESETI();
-		NETLIB_UPDATE_PARAMI();
+		NETLIB_UPDATEI() { 	}
+		NETLIB_RESETI() { m_Q.initial(0.0); }
+		NETLIB_UPDATE_PARAMI() { m_Q.push(m_IN()); }
+
 	protected:
 		analog_output_t m_Q;
 		param_double_t m_IN;

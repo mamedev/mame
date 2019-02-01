@@ -117,7 +117,6 @@ void pfunction::compile_infix(const std::vector<pstring> &inputs, const pstring 
 	std::stack<pstring> opstk;
 	std::vector<pstring> postfix;
 
-	//printf("dbg: %s\n", expr.c_str());
 	for (unsigned i = 0; i < sexpr.size(); i++)
 	{
 		pstring &s = sexpr[i];

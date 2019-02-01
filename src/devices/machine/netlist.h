@@ -110,7 +110,7 @@ public:
 	ATTR_HOT inline netlist_mame_t &netlist() { return *m_netlist; }
 
 	ATTR_HOT inline const netlist::netlist_time last_time_update() { return m_old; }
-	ATTR_HOT void update_icount();
+	ATTR_HOT void update_icount(netlist::netlist_time time);
 	ATTR_HOT void check_mame_abort_slice();
 
 	static void register_memregion_source(netlist::setup_t &setup, const char *name);

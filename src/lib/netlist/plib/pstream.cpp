@@ -169,7 +169,6 @@ void pofilestream::vwrite(const value_type *buf, const pos_type n)
 	std::size_t r = fwrite(buf, 1, n, static_cast<FILE *>(m_file));
 	if (r < n)
 	{
-		//printf("%ld %ld %s\n", r, n, strerror(errno));
 		if (ferror(static_cast<FILE *>(m_file)))
 			throw file_write_e(m_filename);
 	}

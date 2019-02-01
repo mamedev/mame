@@ -33,10 +33,10 @@ namespace plib
 
 		const pstring environment(const pstring &var, const pstring &default_val)
 		{
-			if (getenv(var.c_str()) == nullptr)
+			if (std::getenv(var.c_str()) == nullptr)
 				return default_val;
 			else
-				return pstring(getenv(var.c_str()));
+				return pstring(std::getenv(var.c_str()));
 		}
 	}
 

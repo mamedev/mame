@@ -429,7 +429,7 @@ void matrix_solver_t::reset()
 
 void matrix_solver_t::update() NL_NOEXCEPT
 {
-	const netlist_time new_timestep = solve();
+	const netlist_time new_timestep = solve(exec().time());
 	update_inputs();
 
 	if (m_params.m_dynamic_ts && has_timestep_devices() && new_timestep > netlist_time::zero())
@@ -438,9 +438,15 @@ void matrix_solver_t::update() NL_NOEXCEPT
 	}
 }
 
+/* update_forced is called from within param_update
+ *
+ * this should only occur outside of execution and thus
+ * using time should be safe.
+ *
+ */
 void matrix_solver_t::update_forced()
 {
-	const netlist_time new_timestep = solve();
+	const netlist_time new_timestep = solve(exec().time());
 	plib::unused_var(new_timestep);
 
 	update_inputs();
@@ -458,7 +464,7 @@ void matrix_solver_t::step(const netlist_time &delta)
 		m_step_devices[k]->timestep(dd);
 }
 
-void matrix_solver_t::solve_base()
+void matrix_solver_t::solve_base(netlist_time time)
 {
 	++m_stat_vsolver_calls;
 	if (has_dynamic_devices())
@@ -487,9 +493,8 @@ void matrix_solver_t::solve_base()
 	}
 }
 
-const netlist_time matrix_solver_t::solve()
+const netlist_time matrix_solver_t::solve(netlist_time now)
 {
-	const netlist_time now = exec().time();
 	const netlist_time delta = now - m_last_step;
 
 	// We are already up to date. Avoid oscillations.
@@ -500,7 +505,7 @@ const netlist_time matrix_solver_t::solve()
 	/* update all terminals for new time step */
 	m_last_step = now;
 	step(delta);
-	solve_base();
+	solve_base(now);
 	const netlist_time next_time_step = compute_next_timestep(delta.as_double());
 
 	return next_time_step;
@@ -614,7 +619,6 @@ netlist_time matrix_solver_t::compute_next_timestep(const double cur_ts)
 			const nl_double DD_n = (n->Q_Analog() - t->m_last_V);
 			const nl_double hn = cur_ts;
 
-			//printf("%f %f %f %f\n", DD_n, t->m_DD_n_m_1, hn, t->m_h_n_m_1);
 			nl_double DD2 = (DD_n / hn - t->m_DD_n_m_1 / t->m_h_n_m_1) / (hn + t->m_h_n_m_1);
 			nl_double new_net_timestep;
 

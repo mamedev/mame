@@ -693,10 +693,6 @@ int tool_app_t::execute()
 	plib::fpsignalenabler::global_enable(true);
 	plib::fpsignalenabler sigen(plib::FP_ALL & ~plib::FP_INEXACT & ~plib::FP_UNDERFLOW);
 
-	//perr("{}", "WARNING: This is Work In Progress! - It may fail anytime\n");
-	//perr("Update dispatching using method {}\n", pmf_verbose[NL_PMF_TYPE]);
-	//printf("test2 %f\n", std::exp(-14362.38064713));
-
 	if (opt_help())
 	{
 		pout(usage());

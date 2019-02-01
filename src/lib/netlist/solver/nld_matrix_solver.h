@@ -143,12 +143,12 @@ public:
 		vsetup(nets);
 	}
 
-	void solve_base();
+	void solve_base(netlist_time time);
 
 	/* after every call to solve, update inputs must be called.
 	 * this can be done as well as a batch to ease parallel processing.
 	 */
-	const netlist_time solve();
+	const netlist_time solve(netlist_time now);
 	void update_inputs();
 
 	bool has_dynamic_devices() const { return m_dynamic_devices.size() > 0; }

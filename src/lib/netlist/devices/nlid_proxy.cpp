@@ -126,11 +126,6 @@ namespace netlist
 			log().warning(MW_1_NO_POWER_TERMINALS_ON_DEVICE_1, out_proxied->device().name());
 		else
 			log().verbose("D/A Proxy: Found power terminals on device {1}", out_proxied->device().name());
-#if (0)
-		printf("%s %s\n", out_proxied->name().c_str(), out_proxied->device().name().c_str());
-		auto x = netlist().setup().find_terminal(out_proxied->name(), detail::device_object_t::terminal_type::OUTPUT, false);
-		if (x) printf("==> %s\n", x->name().c_str());
-#endif
 	}
 
 

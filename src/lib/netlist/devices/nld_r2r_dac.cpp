@@ -39,7 +39,7 @@ namespace netlist
 
 	NETLIB_UPDATE_PARAM(r2r_dac)
 	{
-		update_dev();
+		solve_now();
 
 		double V = m_VIN() / static_cast<double>(1 << m_num())
 				* static_cast<double>(m_val());

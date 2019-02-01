@@ -101,7 +101,7 @@ namespace netlist
 	{
 		unsigned start_q = m_last_Q;
 
-		NETLIB_PARENT_UPDATE(7477);
+		NETLIB_NAME(7477)::update();
 
 		for (std::size_t i=0; i<4; i++)
 		{

@@ -83,14 +83,20 @@ void generic_diode::update_diode(const nl_double nVd)
 // nld_twoterm
 // ----------------------------------------------------------------------------------------
 
-NETLIB_UPDATE(twoterm)
+void NETLIB_NAME(twoterm)::solve_now()
 {
-	/* only called if connected to a rail net ==> notify the solver to recalculate */
 	/* we only need to call the non-rail terminal */
 	if (m_P.has_net() && !m_P.net().isRailNet())
 		m_P.solve_now();
 	else if (m_N.has_net() && !m_N.net().isRailNet())
 		m_N.solve_now();
+}
+
+
+NETLIB_UPDATE(twoterm)
+{
+	/* only called if connected to a rail net ==> notify the solver to recalculate */
+	solve_now();
 }
 
 // ----------------------------------------------------------------------------------------
@@ -103,18 +109,13 @@ NETLIB_RESET(R_base)
 	set_R(1.0 / exec().gmin());
 }
 
-NETLIB_UPDATE(R_base)
-{
-	NETLIB_NAME(twoterm)::update();
-}
-
 // ----------------------------------------------------------------------------------------
 // nld_R
 // ----------------------------------------------------------------------------------------
 
 NETLIB_UPDATE_PARAM(R)
 {
-	update_dev();
+	solve_now();
 	set_R(std::max(m_R(), exec().gmin()));
 }
 
@@ -140,8 +141,8 @@ NETLIB_RESET(POT)
 
 NETLIB_UPDATE_PARAM(POT)
 {
-	m_R1.update_dev();
-	m_R2.update_dev();
+	m_R1.solve_now();
+	m_R2.solve_now();
 
 	nl_double v = m_Dial();
 	if (m_DialIsLog())
@@ -170,7 +171,7 @@ NETLIB_RESET(POT2)
 
 NETLIB_UPDATE_PARAM(POT2)
 {
-	m_R1.update_dev();
+	m_R1.solve_now();
 
 	nl_double v = m_Dial();
 
@@ -195,11 +196,6 @@ NETLIB_RESET(C)
 NETLIB_UPDATE_PARAM(C)
 {
 	m_GParallel = exec().gmin();
-}
-
-NETLIB_UPDATE(C)
-{
-	NETLIB_NAME(twoterm)::update();
 }
 
 NETLIB_TIMESTEP(C)
@@ -228,11 +224,6 @@ NETLIB_RESET(L)
 
 NETLIB_UPDATE_PARAM(L)
 {
-}
-
-NETLIB_UPDATE(L)
-{
-	NETLIB_NAME(twoterm)::update();
 }
 
 NETLIB_TIMESTEP(L)
@@ -266,11 +257,6 @@ NETLIB_UPDATE_PARAM(D)
 	m_D.set_param(Is, n, exec().gmin());
 }
 
-NETLIB_UPDATE(D)
-{
-	NETLIB_NAME(twoterm)::update();
-}
-
 NETLIB_UPDATE_TERMINALS(D)
 {
 	m_D.update_diode(deltaV());
@@ -281,53 +267,6 @@ NETLIB_UPDATE_TERMINALS(D)
 	//set(m_D.G(), 0.0, m_D.Ieq());
 }
 
-// ----------------------------------------------------------------------------------------
-// nld_VS
-// ----------------------------------------------------------------------------------------
-
-NETLIB_RESET(VS)
-{
-	NETLIB_NAME(twoterm)::reset();
-	this->set(1.0 / m_R(), m_V(), 0.0);
-}
-
-NETLIB_UPDATE(VS)
-{
-	NETLIB_NAME(twoterm)::update();
-}
-
-NETLIB_TIMESTEP(VS)
-{
-	this->set(1.0 / m_R(),
-			m_compiled.evaluate(std::vector<double>({exec().time().as_double()})),
-			0.0);
-}
-
-// ----------------------------------------------------------------------------------------
-// nld_CS
-// ----------------------------------------------------------------------------------------
-
-NETLIB_RESET(CS)
-{
-	NETLIB_NAME(twoterm)::reset();
-	const nl_double I = m_I();
-
-	set_mat(0.0, 0.0, -I,
-			0.0, 0.0,  I);
-	//this->set(0.0, 0.0, m_I());
-}
-
-NETLIB_UPDATE(CS)
-{
-	NETLIB_NAME(twoterm)::update();
-}
-
-NETLIB_TIMESTEP(CS)
-{
-	const double I = m_compiled.evaluate(std::vector<double>({exec().time().as_double()}));
-	set_mat(0.0, 0.0, -I,
-			0.0, 0.0,  I);
-}
 
 	} //namespace analog
 

@@ -209,15 +209,6 @@ namespace netlist
 		}
 
 		m_ign = 0;
-
-#if 0
-		printf("%s\n", name().c_str());
-		for (int j=0; j < m_size; j++)
-			printf("%05x %04x %04x %04x\n", j, m_ttp->m_out_state[j] & ((1 << m_NO)-1),
-					m_ttp->m_out_state[j] >> m_NO, m_ttp->m_timing[j * m_NO + 0]);
-		for (int k=0; m_ttp->m_timing_nt[k] != netlist_time::zero(); k++)
-			printf("%d %f\n", k, m_ttp->m_timing_nt[k].as_double() * 1000000.0);
-#endif
 	}
 
 	// ----------------------------------------------------------------------------------------

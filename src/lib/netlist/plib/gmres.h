@@ -213,7 +213,6 @@ namespace plib
 				const float_type rho_to_accuracy = std::sqrt(vec_mult2<FT>(n, Ax)) / accuracy;
 
 				rho_delta = accuracy * rho_to_accuracy;
-				//printf("%e %e\n", rho_delta, accuracy * std::sqrt(static_cast<FT>(n)));
 			}
 			else
 				rho_delta = accuracy * std::sqrt(static_cast<FT>(n));

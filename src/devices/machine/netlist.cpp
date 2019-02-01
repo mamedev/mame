@@ -144,7 +144,7 @@ public:
 		// avoid calls due to noise
 		if (std::fabs(cur - m_last) > 1e-6)
 		{
-			m_cpu_device->update_icount();
+			m_cpu_device->update_icount(exec().time());
 			m_callback(cur, m_cpu_device->local_time());
 			m_cpu_device->check_mame_abort_slice();
 			m_last = cur;
@@ -192,7 +192,7 @@ public:
 		// avoid calls due to noise
 		if (cur != m_last)
 		{
-			m_cpu_device->update_icount();
+			m_cpu_device->update_icount(exec().time());
 			m_callback(cur, m_cpu_device->local_time());
 			m_cpu_device->check_mame_abort_slice();
 			m_last = cur;
@@ -933,9 +933,9 @@ ATTR_COLD void netlist_mame_device::device_pre_save()
 	netlist().run_state_manager().pre_save();
 }
 
-void netlist_mame_device::update_icount()
+void netlist_mame_device::update_icount(netlist::netlist_time time)
 {
-	const netlist::netlist_time newt(netlist().time());
+	const netlist::netlist_time newt(time);
 	const netlist::netlist_time delta(newt - m_old + m_rem);
 	const uint64_t d = delta / m_div;
 	m_old = newt;
@@ -1061,13 +1061,13 @@ ATTR_HOT void netlist_mame_cpu_device::execute_run()
 			m_genPC &= 255;
 			debugger_instruction_hook(m_genPC);
 			netlist().process_queue(m_div);
-			update_icount();
+			update_icount(netlist().time());
 		}
 	}
 	else
 	{
 		netlist().process_queue(m_div * m_icount);
-		update_icount();
+		update_icount(netlist().time());
 	}
 }
 
