@@ -1982,6 +1982,18 @@ ROM_START( magmerm )
 ROM_END
 
 
+ROM_START( magician )
+	ARISTMK6_BIOS
+	ROM_REGION( 0x4000000, "game_rom", ROMREGION_ERASEFF)
+	ROM_LOAD32_WORD("20210111.u86", 0x0000000, 0x0400000, CRC(d5763bfa) SHA1(c8363f855bc1962588e35acf11c847e1c3c1775b) )
+	ROM_LOAD32_WORD("20210111.u73", 0x0000002, 0x0400000, CRC(6198b73e) SHA1(1459212376c25df9f3120dc4e3567dfd30b8dd96) )
+	ROM_LOAD32_WORD("20210111.u85", 0x0800000, 0x0400000, CRC(ae216d29) SHA1(d40ee5d9a6f96d7cc6b38ccbe1dc9b2f543a35f3) )
+	ROM_LOAD32_WORD("20210111.u72", 0x0800002, 0x0400000, CRC(7fb305d3) SHA1(c79bae5a62bb3aa9090fd6cac91d35a950300146) )
+	ROM_LOAD32_WORD("20210111.u84", 0x1000000, 0x0400000, CRC(dbb4f1ee) SHA1(f4064ba792a5705209b3221ceb2f3d828c73df1c) )
+	ROM_LOAD32_WORD("20210111.u71", 0x1000002, 0x0400000, CRC(67a0906d) SHA1(3f0f8f17dfcc5d1fe38e0737cd623594076bbd2d) )
+ROM_END
+
+
 ROM_START( metestrm )
 	ARISTMK6_BIOS
 	ROM_REGION( 0x4000000, "game_rom", ROMREGION_ERASEFF)
@@ -3458,6 +3470,7 @@ GAME( 2007, lucky88,    aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init
 GAME( 2007, luigibal,   aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Luigi's Ball (10235411, NSW/ACT)",              MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 822,    D  - 19/03/07
 GAME( 2005, magforst,   aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Magic Forest (0151139, US)",                    MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // US141,    D - 02/01/05
 GAME( 2003, magmerm,    aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Magic Mermaid (0251331, US)",                   MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // JB013/20,    F - 10/13/03
+GAME( 2006, magician,   aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "The Magician (20210111, NSW/ACT)",              MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 801,     C - 01/03/06
 GAME( 2007, metestrm,   aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Meteor Storm (0152162, US)",                    MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // US217,    A - 03/19/07
 GAME( 2007, milkin,     aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Milkin' It (10251911, NSW/ACT)",                MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 816,    B - 13/08/07
 GAME( 2005, mskitty,    aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Miss Kitty (10216611, NSW/ACT)",                MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 778,    C - 18/04/05
