@@ -16,10 +16,12 @@
 
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
-//#include "bus/rs232/rs232.h"
+#include "bus/rs232/rs232.h"
 #include "machine/eepromser.h"
+#include "sound/spkrdev.h"
 //#include "video/crt9028.h"
 #include "screen.h"
+#include "speaker.h"
 
 class cardinal_state : public driver_device
 {
@@ -27,6 +29,8 @@ public:
 	cardinal_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_eeprom(*this, "eeprom")
+		, m_speaker(*this, "speaker")
+		, m_rs232(*this, "rs232")
 		, m_address_select(false)
 	{
 	}
@@ -50,6 +54,8 @@ private:
 
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	//required_device<crt9028_device> m_vtlc;
+	required_device<speaker_sound_device> m_speaker;
+	required_device<rs232_port_device> m_rs232;
 
 	bool m_address_select;
 };
@@ -67,7 +73,7 @@ u32 cardinal_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 
 u8 cardinal_state::p1_r()
 {
-	return 0xdf | (m_eeprom->do_read() << 5);
+	return 0x9f | (m_eeprom->do_read() << 5) | (m_rs232->cts_r() << 6);
 }
 
 void cardinal_state::p1_w(u8 data)
@@ -77,6 +83,9 @@ void cardinal_state::p1_w(u8 data)
 	m_eeprom->clk_write(BIT(data, 3));
 
 	m_address_select = BIT(data, 1);
+
+	m_speaker->level_w(!BIT(data, 2));
+	m_rs232->write_rts(BIT(data, 7));
 }
 
 u8 cardinal_state::vtlc_r()
@@ -96,7 +105,7 @@ void cardinal_state::prog_map(address_map &map)
 
 void cardinal_state::ext_map(address_map &map)
 {
-	map(0xff00, 0xff00).mirror(0xff).rw(FUNC(cardinal_state::vtlc_r), FUNC(cardinal_state::vtlc_w));
+	map(0, 0).mirror(0xffff).rw(FUNC(cardinal_state::vtlc_r), FUNC(cardinal_state::vtlc_w));
 }
 
 
@@ -120,6 +129,11 @@ void cardinal_state::cardinal(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(10.92_MHz_XTAL, 700, 0, 560, 260, 0, 240);
 	screen.set_screen_update(FUNC(cardinal_state::screen_update));
+
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.05);
+
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
 }
 
 
