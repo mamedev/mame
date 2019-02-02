@@ -33105,6 +33105,8 @@ rad_bb3
 rad_bb3p
 rad_hnt3
 rad_hnt3p
+rad_bask
+rad_baskp
 
 @source:rad_eu3a05.cpp
 rad_sinv
