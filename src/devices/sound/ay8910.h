@@ -164,6 +164,7 @@ private:
 	uint32_t m_env_volume;
 	uint8_t m_hold,m_alternate,m_attack,m_holding;
 	int32_t m_rng;
+	uint8_t m_mode;
 	uint8_t m_env_step_mask;
 	/* init parameters ... */
 	int m_step;
