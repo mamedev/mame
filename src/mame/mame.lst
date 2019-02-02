@@ -907,6 +907,9 @@ adam                            // Coleco Adam
 @source:adm23.cpp
 adm23                           //
 
+@source:adm31.cpp
+adm31                           //
+
 @source:adp.cpp
 fashiong                        // (c) 1997
 fashiong2                       // (c) 1997
