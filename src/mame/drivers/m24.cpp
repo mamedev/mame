@@ -356,7 +356,7 @@ void m24_state::alt_w(u8 data)
 
 WRITE_LINE_MEMBER(m24_state::chck_w)
 {
-	m_chck_active = (state == ASSERT_LINE);
+	m_chck_active = (state == 0);
 	if (m_chck_active)
 	{
 		if (!BIT(m_ctrlport_b, 6))
@@ -568,7 +568,8 @@ void m24_state::olivetti(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	ISA8(config, m_isabus, 24_MHz_XTAL / 6);
-	m_isabus->set_cputag(m_maincpu);
+	m_isabus->set_memspace(m_maincpu, AS_PROGRAM);
+	m_isabus->set_iospace(m_maincpu, AS_IO);
 	m_isabus->irq2_callback().set(m_pic, FUNC(pic8259_device::ir2_w));
 	m_isabus->irq3_callback().set(m_pic, FUNC(pic8259_device::ir3_w));
 	m_isabus->irq4_callback().set(m_pic, FUNC(pic8259_device::ir4_w));
@@ -589,8 +590,8 @@ void m24_state::olivetti(machine_config &config)
 	ISA8_SLOT(config, "isa2", 0, m_isabus, pc_isa8_cards, nullptr, false);
 	ISA8_SLOT(config, "isa3", 0, m_isabus, pc_isa8_cards, nullptr, false);
 
-	/* internal ram */
-	RAM(config, m_ram).set_default_size("640K").set_extra_options("64K, 128K, 256K, 512K");
+	// 2 banks of 16 64Kx1 or 256Kx1 DRAMs on motherboard
+	RAM(config, m_ram).set_default_size("640K").set_extra_options("128K, 256K, 512K");
 
 	TMS7000(config, m_kbc, 24_MHz_XTAL / 6);
 	m_kbc->set_addrmap(AS_PROGRAM, &m24_state::kbc_map);

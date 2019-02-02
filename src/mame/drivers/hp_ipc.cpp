@@ -753,7 +753,7 @@ MACHINE_CONFIG_START(hp_ipc_state::hp_ipc_base)
 
 	mm58167_device &rtc(MM58167(config, "rtc", 32.768_kHz_XTAL));
 	rtc.irq().set(FUNC(hp_ipc_state::irq_1));
-//  rtc.standby_irq().set(FUNC(hp_ipc_state::irq_6)); 
+//  rtc.standby_irq().set(FUNC(hp_ipc_state::irq_6));
 
 	hp_hil_mlc_device &mlc(HP_HIL_MLC(config, "mlc", XTAL(15'920'000)/2));
 	mlc.int_callback().set(FUNC(hp_ipc_state::irq_2));

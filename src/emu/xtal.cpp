@@ -137,6 +137,7 @@ const double XTAL::known_xtals[] = {
 	  8'867'238, /* 8.867238_MHz_XTAL      ETI-660 (~2x PAL subcarrier) */
 	  8'945'000, /* 8.945_MHz_XTAL         Hit Me */
 	  9'216'000, /* 9.216_MHz_XTAL         Conitec PROF-180X */
+	  9'600'000, /* 9.6_MHz_XTAL           WD37C65 second clock (for 300 KB/sec rate) */
 	  9'828'000, /* 9.828_MHz_XTAL         Universal PCBs */
 	  9'830'400, /* 9.8304_MHz_XTAL        Epson PX-8 */
 	  9'832'000, /* 9.832_MHz_XTAL         Robotron A7150 */
@@ -213,6 +214,7 @@ const double XTAL::known_xtals[] = {
 	 15'400'000, /* 15.4_MHz_XTAL          DVK KSM */
 	 15'468'480, /* 15.46848_MHz_XTAL      Bank Panic h/w, Sega G80 */
 	 15'582'000, /* 15.582_MHz_XTAL        Zentec Zephyr */
+	 15'667'200, /* 15.6672_MHz_XTAL       Apple Macintosh */
 	 15'700'000, /* 15.700_MHz_XTAL        Motogonki */
 	 15'897'600, /* 15.8976_MHz_XTAL       IAI Swyft */
 	 15'920'000, /* 15.92_MHz_XTAL         HP Integral PC */
@@ -220,6 +222,7 @@ const double XTAL::known_xtals[] = {
 	 16'000'000, /* 16_MHz_XTAL            Extremely common, used on 100's of PCBs */
 	 16'097'280, /* 16.09728_MHz_XTAL      DEC VT240 (1024 * 262 * 60) */
 	 16'128'000, /* 16.128_MHz_XTAL        Fujitsu FM-7 */
+	 16'257'000, /* 16.257_MHz_XTAL        IBM PC MDA & EGA */
 	 16'364'000, /* 16.364_MHz_XTAL        Corvus Concept */
 	 16'384'000, /* 16.384_MHz_XTAL        - */
 	 16'400'000, /* 16.4_MHz_XTAL          MS 6102 */
@@ -279,6 +282,7 @@ const double XTAL::known_xtals[] = {
 	 24'883'200, /* 24.8832_MHz_XTAL       DEC VT100 */
 	 25'000'000, /* 25_MHz_XTAL            Namco System 22, Taito GNET, Dogyuun h/w */
 	 25'174'800, /* 25.1748_MHz_XTAL       Sega System 16A/16B (1600x NTSC line rate) */
+	 25'175'000, /* 25.175_MHz_XTAL        IBM MCGA/VGA 320/640-pixel graphics */
 	 25'200'000, /* 25.2_MHz_XTAL          Tektronix 4404 video clock */
 	 25'398'360, /* 25.39836_MHz_XTAL      Tandberg TDV 2324 */
 	 25'400'000, /* 25.4_MHz_XTAL          PC9801-86 PCM base clock */
@@ -337,6 +341,7 @@ const double XTAL::known_xtals[] = {
 	 39'710'000, /* 39.71_MHz_XTAL         Wyse WY-60 132-column display clock */
 	 40'000'000, /* 40_MHz_XTAL            - */
 	 40'210'000, /* 40.21_MHz_XTAL         Fairlight CMI IIx */
+	 41'539'000, /* 41.539_MHz_XTAL        IBM PS/2 132-column text mode */
 	 42'000'000, /* 42_MHz_XTAL            BMC A-00211 - Popo Bear */
 	 42'105'200, /* 42.1052_MHz_XTAL       NEC PC-88xx */
 	 42'954'545, /* 42.954545_MHz_XTAL     CPS3 (12x NTSC subcarrier)*/
@@ -344,6 +349,7 @@ const double XTAL::known_xtals[] = {
 	 44'100'000, /* 44.1_MHz_XTAL          Subsino's Bishou Jan */
 	 44'236'800, /* 44.2368_MHz_XTAL       ReCo6502, Fortune 32:16 */
 	 44'452'800, /* 44.4528_MHz_XTAL       TeleVideo 965 */
+	 44'900'000, /* 44.9_MHz_XTAL          IBM 8514 1024x768 43.5Hz graphics */
 	 45'000'000, /* 45_MHz_XTAL            Eolith with Hyperstone CPUs */
 	 45'158'000, /* 45.158_MHz_XTAL        Sega Model 2A video board, Model 3 CPU board */
 	 45'619'200, /* 45.6192_MHz_XTAL       DEC VK100 */

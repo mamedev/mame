@@ -52,8 +52,8 @@ protected:
 	device_vsmile_cart_interface(const machine_config &mconfig, device_t &device);
 
 	// internal state
-	uint16_t *m_rom;		// this points to the cart rom region
-	uint32_t m_rom_size;	// this is the actual game size, not the rom region size!
+	uint16_t *m_rom;        // this points to the cart rom region
+	uint32_t m_rom_size;    // this is the actual game size, not the rom region size!
 	std::vector<uint16_t> m_nvram;
 };
 

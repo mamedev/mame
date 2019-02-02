@@ -583,12 +583,12 @@ uint32_t _5clown_state::screen_update_fclown(screen_device &screen, bitmap_ind16
 void _5clown_state::_5clown_palette(palette_device &palette) const
 {
 	/*
-		7654 3210
-		---- ---x   RED component.
-		---- --x-   GREEN component.
-		---- -x--   BLUE component.
-		---- x---   background killer.
-		xxxx ----   unused.
+	    7654 3210
+	    ---- ---x   RED component.
+	    ---- --x-   GREEN component.
+	    ---- -x--   BLUE component.
+	    ---- x---   background killer.
+	    xxxx ----   unused.
 	*/
 
 	/* 0000KBGR */

@@ -527,6 +527,7 @@ p2000t.cpp
 p8k.cpp
 palm.cpp
 palmz22.cpp
+palestra.cpp
 partner.cpp
 paso1600.cpp
 pasogo.cpp
@@ -833,6 +834,7 @@ votrtnt.cpp
 vp415.cpp
 vp60.cpp
 vsmile.cpp
+vsmileb.cpp
 vsmilepro.cpp
 vt100.cpp
 vt220.cpp

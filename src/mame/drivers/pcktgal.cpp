@@ -261,7 +261,7 @@ void pcktgal_state::pcktgal(machine_config &config)
 
 	MSM5205(config, m_msm, 384000);
 	m_msm->vck_legacy_callback().set(FUNC(pcktgal_state::adpcm_int));
-	m_msm->set_prescaler_selector(msm5205_device::S48_4B);	// 8kHz
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  // 8kHz
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.70);
 }
 

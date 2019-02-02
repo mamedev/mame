@@ -54,7 +54,7 @@ public:
 	auto portb_in() { return m_portb_in.bind(); }
 	auto portc_in() { return m_portc_in.bind(); }
 
-	auto adc_in() { return m_adc_in.bind(); }
+	template <size_t Line> auto adc_in() { return m_adc_in[Line].bind(); }
 
 	auto eeprom_w() { return m_eeprom_w.bind(); }
 	auto eeprom_r() { return m_eeprom_r.bind(); }
@@ -506,7 +506,7 @@ protected:
 	devcb_read16 m_portb_in;
 	devcb_read16 m_portc_in;
 
-	devcb_read16 m_adc_in;
+	devcb_read16 m_adc_in[2];
 
 	devcb_write8 m_eeprom_w;
 	devcb_read8 m_eeprom_r;

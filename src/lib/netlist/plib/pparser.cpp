@@ -318,14 +318,14 @@ pstream::size_type ppreprocessor::vread(value_type *buf, const pstream::size_typ
 }
 
 #define CHECKTOK2(p_op, p_prio) \
-	else if (tok == # p_op)							\
-	{ 												\
-		if (prio < p_prio) 							\
-			return val; 							\
-		start++; 									\
-		const auto v2 = expr(sexpr, start, p_prio);	\
-		val = (val p_op v2);						\
-	} 												\
+	else if (tok == # p_op)                         \
+	{                                               \
+		if (prio < p_prio)                          \
+			return val;                             \
+		start++;                                    \
+		const auto v2 = expr(sexpr, start, p_prio); \
+		val = (val p_op v2);                        \
+	}                                               \
 
 // Operator precedence see https://en.cppreference.com/w/cpp/language/operator_precedence
 

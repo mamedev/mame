@@ -238,7 +238,7 @@ MACHINE_CONFIG_START(mc1502_state::mc1502)
 	MCFG_MACHINE_START_OVERRIDE( mc1502_state, mc1502 )
 	MCFG_MACHINE_RESET_OVERRIDE( mc1502_state, mc1502 )
 
-	PIT8253(config, m_pit8253, 0);
+	PIT8253(config, m_pit8253);
 	m_pit8253->set_clk<0>(XTAL(16'000'000)/12); /* heartbeat IRQ */
 	m_pit8253->out_handler<0>().set(m_pic8259, FUNC(pic8259_device::ir0_w));
 	m_pit8253->set_clk<1>(XTAL(16'000'000)/12); /* serial port */
@@ -246,7 +246,7 @@ MACHINE_CONFIG_START(mc1502_state::mc1502)
 	m_pit8253->set_clk<2>(XTAL(16'000'000)/12); /* pio port c pin 4, and speaker polling enough */
 	m_pit8253->out_handler<2>().set(FUNC(mc1502_state::mc1502_pit8253_out2_changed));
 
-	PIC8259(config, m_pic8259, 0);
+	PIC8259(config, m_pic8259);
 	m_pic8259->out_int_callback().set_inputline(m_maincpu, 0);
 
 	I8255(config, m_ppi8255n1);
@@ -276,7 +276,8 @@ MACHINE_CONFIG_START(mc1502_state::mc1502)
 	rs232.cts_handler().set(m_upd8251, FUNC(i8251_device::write_cts));
 
 	isa8_device &isa(ISA8(config, "isa", 0));
-	isa.set_cputag("maincpu");
+	isa.set_memspace("maincpu", AS_PROGRAM);
+	isa.set_iospace("maincpu", AS_IO);
 	isa.irq2_callback().set(m_pic8259, FUNC(pic8259_device::ir2_w));
 	isa.irq3_callback().set(m_pic8259, FUNC(pic8259_device::ir3_w));
 	isa.irq4_callback().set(m_pic8259, FUNC(pic8259_device::ir4_w));

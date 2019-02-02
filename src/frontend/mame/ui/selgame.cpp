@@ -40,13 +40,16 @@
 #include <mutex>
 #include <thread>
 
-namespace {
-    constexpr uint32_t FLAGS_UI = ui::menu::FLAG_LEFT_ARROW | ui::menu::FLAG_RIGHT_ARROW;
-} // anonymous namespace
 
 extern const char UI_VERSION_TAG[];
 
 namespace ui {
+
+namespace {
+
+constexpr uint32_t FLAGS_UI = ui::menu::FLAG_LEFT_ARROW | ui::menu::FLAG_RIGHT_ARROW;
+
+} // anonymous namespace
 
 class menu_select_game::persistent_data
 {

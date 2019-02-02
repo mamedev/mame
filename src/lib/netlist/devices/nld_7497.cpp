@@ -167,7 +167,7 @@ namespace netlist
 	};
 
 
-	NETLIB_DEVICE_IMPL(7497, 		"TTL_7497", 	"+CLK,+STRBQ,+ENQ,+UNITYQ,+CLR,+B0,+B1,+B2,+B3,+B4,+B5")
+	NETLIB_DEVICE_IMPL(7497,        "TTL_7497",     "+CLK,+STRBQ,+ENQ,+UNITYQ,+CLR,+B0,+B1,+B2,+B3,+B4,+B5")
 	NETLIB_DEVICE_IMPL(7497_dip,  "TTL_7497_DIP", "")
 
 	} //namespace devices

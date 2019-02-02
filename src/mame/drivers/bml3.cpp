@@ -107,9 +107,6 @@ public:
 	DECLARE_WRITE8_MEMBER(bml3_firq_mask_w);
 	DECLARE_READ8_MEMBER(bml3_firq_status_r);
 	DECLARE_WRITE8_MEMBER(relay_w);
-	DECLARE_WRITE_LINE_MEMBER(bml3bus_nmi_w);
-	DECLARE_WRITE_LINE_MEMBER(bml3bus_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(bml3bus_firq_w);
 	DECLARE_WRITE_LINE_MEMBER(bml3_acia_tx_w);
 	DECLARE_WRITE_LINE_MEMBER(bml3_acia_rts_w);
 	DECLARE_WRITE_LINE_MEMBER(bml3_acia_irq_w);
@@ -384,21 +381,6 @@ READ8_MEMBER( bml3_state::bml3_firq_status_r )
 	m_firq_status = 0;
 	m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 	return res;
-}
-
-WRITE_LINE_MEMBER(bml3_state::bml3bus_nmi_w)
-{
-	m_maincpu->set_input_line(INPUT_LINE_NMI, state);
-}
-
-WRITE_LINE_MEMBER(bml3_state::bml3bus_irq_w)
-{
-	m_maincpu->set_input_line(M6809_IRQ_LINE, state);
-}
-
-WRITE_LINE_MEMBER(bml3_state::bml3bus_firq_w)
-{
-	m_maincpu->set_input_line(M6809_FIRQ_LINE, state);
 }
 
 
@@ -959,7 +941,7 @@ static void bml3_cards(device_slot_interface &device)
 
 MACHINE_CONFIG_START(bml3_state::bml3_common)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",M6809, CPU_CLOCK)
+	MCFG_DEVICE_ADD(m_maincpu, MC6809, CPU_EXT_CLOCK)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bml3_state,  bml3_timer_firq)
 //  MCFG_DEVICE_PERIODIC_INT_DRIVER(bml3_state, bml3_firq, 45)
 
@@ -1008,11 +990,11 @@ MACHINE_CONFIG_START(bml3_state::bml3_common)
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* slot devices */
-	MCFG_DEVICE_ADD("bml3bus", BML3BUS, 0)
-	MCFG_BML3BUS_CPU("maincpu")
-	MCFG_BML3BUS_OUT_NMI_CB(WRITELINE(*this, bml3_state, bml3bus_nmi_w))
-	MCFG_BML3BUS_OUT_IRQ_CB(WRITELINE(*this, bml3_state, bml3bus_irq_w))
-	MCFG_BML3BUS_OUT_FIRQ_CB(WRITELINE(*this, bml3_state, bml3bus_firq_w))
+	bml3bus_device &bus(BML3BUS(config, "bml3bus", 0));
+	bus.set_space(m_maincpu, AS_PROGRAM);
+	bus.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	bus.irq_callback().set_inputline(m_maincpu, M6809_IRQ_LINE);
+	bus.firq_callback().set_inputline(m_maincpu, M6809_FIRQ_LINE);
 	/* Default to MP-1805 disk (3" or 5.25" SS/SD), as our MB-6892 ROM dump includes
 	   the MP-1805 ROM.
 	   User may want to switch this to MP-1802 (5.25" DS/DD).

@@ -202,8 +202,8 @@ void wicat_state::video_io(address_map &map)
 
 void wicat_state::wd1000_mem(address_map &map)
 {
-	map(0x0000, 0x17ff).rom().region("wd3", 0x0000);
-	map(0x1800, 0x1fff).noprw();
+	map(0x0000, 0x0bff).rom().region("wd3", 0x0000);
+	map(0x0c00, 0x0fff).noprw();
 }
 
 void wicat_state::wd1000_io(address_map &map)

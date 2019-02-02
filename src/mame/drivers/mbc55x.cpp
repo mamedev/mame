@@ -264,7 +264,7 @@ MACHINE_CONFIG_START(mbc55x_state::mbc55x)
 	m_kb_uart->rts_handler().set(m_printer, FUNC(centronics_device::write_init)).invert();
 	m_kb_uart->rxrdy_handler().set(m_pic, FUNC(pic8259_device::ir3_w));
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->out_handler<0>().set(m_pic, FUNC(pic8259_device::ir0_w));
 	m_pit->out_handler<0>().append(m_pit, FUNC(pit8253_device::write_clk1));
 	m_pit->out_handler<1>().set(m_pic, FUNC(pic8259_device::ir1_w));
@@ -278,7 +278,7 @@ MACHINE_CONFIG_START(mbc55x_state::mbc55x)
 	clk_78_6khz.signal_handler().append(m_kb_uart, FUNC(i8251_device::write_txc));
 	clk_78_6khz.signal_handler().append(m_kb_uart, FUNC(i8251_device::write_rxc));
 
-	PIC8259(config, m_pic, 0);
+	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	I8255(config, m_ppi);
@@ -309,9 +309,10 @@ MACHINE_CONFIG_START(mbc55x_state::mbc55x)
 	MCFG_SOFTWARE_LIST_ADD("disk_list","mbc55x")
 
 	isa8_device &isa(ISA8(config, "isa", 14.318181_MHz_XTAL / 4));
-	isa.set_cputag(m_maincpu);
+	isa.set_memspace(m_maincpu, AS_PROGRAM);
+	isa.set_iospace(m_maincpu, AS_IO);
 	isa.irq7_callback().set(m_pic, FUNC(pic8259_device::ir7_w)); // all other IRQ and DRQ lines are NC
-	//isa.iochck_callback().set_inputline(m_maincpu, INPUT_LINE_NMI));
+	isa.iochck_callback().set_inputline(m_maincpu, INPUT_LINE_NMI).invert();
 
 	ISA8_SLOT(config, "external", 0, "isa", pc_isa8_cards, nullptr, false);
 

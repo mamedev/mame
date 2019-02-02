@@ -953,21 +953,21 @@ MACHINE_CONFIG_START(abc1600_state::abc1600)
 	MCFG_ABC_KEYBOARD_OUT_TRXC_HANDLER(WRITELINE(m_dart, z80dart_device, rxtxcb_w))
 	MCFG_ABC_KEYBOARD_OUT_KEYDOWN_HANDLER(WRITELINE(m_dart, z80dart_device, dcdb_w))
 
-	MCFG_ABCBUS_SLOT_ADD("bus0i", abc1600bus_cards, nullptr)
-	MCFG_ABCBUS_SLOT_IRQ_CALLBACK(WRITELINE(m_cio, z8536_device, pa7_w))
-	MCFG_ABCBUS_SLOT_ADD("bus0x", abc1600bus_cards, nullptr)
-	MCFG_ABCBUS_SLOT_IRQ_CALLBACK(WRITELINE(m_cio, z8536_device, pa6_w))
-	MCFG_ABCBUS_SLOT_NMI_CALLBACK(WRITELINE(*this, abc1600_state, nmi_w))
-	MCFG_ABCBUS_SLOT_XINT2_CALLBACK(WRITELINE(m_cio, z8536_device, pa2_w))
-	MCFG_ABCBUS_SLOT_XINT3_CALLBACK(WRITELINE(m_cio, z8536_device, pa3_w))
-	MCFG_ABCBUS_SLOT_XINT4_CALLBACK(WRITELINE(m_cio, z8536_device, pa4_w))
-	MCFG_ABCBUS_SLOT_XINT5_CALLBACK(WRITELINE(m_cio, z8536_device, pa5_w))
-	MCFG_ABCBUS_SLOT_ADD("bus1", abc1600bus_cards, nullptr)
-	MCFG_ABCBUS_SLOT_IRQ_CALLBACK(WRITELINE(m_cio, z8536_device, pa1_w))
-	MCFG_ABCBUS_SLOT_ADD("bus2", abc1600bus_cards, "4105")
-	MCFG_ABCBUS_SLOT_IRQ_CALLBACK(WRITELINE(m_cio, z8536_device, pa0_w))
-	//MCFG_ABCBUS_SLOT_PREN_CALLBACK(WRITELINE(Z8410AB1_2_TAG, z80dma_device, iei_w))
-	MCFG_ABCBUS_SLOT_TRRQ_CALLBACK(WRITELINE(Z8410AB1_2_TAG, z80dma_device, rdy_w))
+	abcbus_slot_device &bus0i(ABCBUS_SLOT(config, "bus0i", 64_MHz_XTAL / 16, abc1600bus_cards, nullptr));
+	bus0i.irq_callback().set(m_cio, FUNC(z8536_device::pa7_w));
+	abcbus_slot_device &bus0x(ABCBUS_SLOT(config, "bus0x", 64_MHz_XTAL / 16, abc1600bus_cards, nullptr));
+	bus0x.irq_callback().set(m_cio, FUNC(z8536_device::pa6_w));
+	bus0x.nmi_callback().set(FUNC(abc1600_state::nmi_w));
+	bus0x.xint2_callback().set(m_cio, FUNC(z8536_device::pa2_w));
+	bus0x.xint3_callback().set(m_cio, FUNC(z8536_device::pa3_w));
+	bus0x.xint4_callback().set(m_cio, FUNC(z8536_device::pa4_w));
+	bus0x.xint5_callback().set(m_cio, FUNC(z8536_device::pa5_w));
+	abcbus_slot_device &bus1(ABCBUS_SLOT(config, "bus1", 64_MHz_XTAL / 16, abc1600bus_cards, nullptr));
+	bus1.irq_callback().set(m_cio, FUNC(z8536_device::pa1_w));
+	abcbus_slot_device &bus2(ABCBUS_SLOT(config, "bus2", 64_MHz_XTAL / 16, abc1600bus_cards, "4105"));
+	bus2.irq_callback().set(m_cio, FUNC(z8536_device::pa0_w));
+	//bus2.pren_callback().set(Z8410AB1_2_TAG, FUNC(z80dma_device::iei_w));
+	bus2.trrq_callback().set(Z8410AB1_2_TAG, FUNC(z80dma_device::rdy_w));
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("1M");

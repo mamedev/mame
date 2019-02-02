@@ -1138,10 +1138,10 @@ GFXDECODE_END
 void srmp2_state::srmp2(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 16000000/2);	/* 8.00 MHz */
+	M68000(config, m_maincpu, 16000000/2);  /* 8.00 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &srmp2_state::srmp2_map);
 	m_maincpu->set_vblank_int("screen", FUNC(srmp2_state::irq4_line_assert));
-	m_maincpu->set_periodic_int(FUNC(srmp2_state::irq2_line_assert), attotime::from_hz(15*60));	/* Interrupt times is not understood */
+	m_maincpu->set_periodic_int(FUNC(srmp2_state::irq2_line_assert), attotime::from_hz(15*60)); /* Interrupt times is not understood */
 
 	MCFG_MACHINE_START_OVERRIDE(srmp2_state,srmp2)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -1170,15 +1170,15 @@ void srmp2_state::srmp2(machine_config &config)
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.40);
 
 	MSM5205(config, m_msm, 384000);
-	m_msm->vck_legacy_callback().set(FUNC(srmp2_state::adpcm_int));	/* IRQ handler */
-	m_msm->set_prescaler_selector(msm5205_device::S48_4B);	/* 8 KHz, 4 Bits  */
+	m_msm->vck_legacy_callback().set(FUNC(srmp2_state::adpcm_int)); /* IRQ handler */
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  /* 8 KHz, 4 Bits  */
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.45);
 }
 
 void srmp2_state::srmp3(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 3500000);	/* 3.50 MHz? or 4.00 MHz? */
+	Z80(config, m_maincpu, 3500000);    /* 3.50 MHz? or 4.00 MHz? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &srmp2_state::srmp3_map);
 	m_maincpu->set_addrmap(AS_IO, &srmp2_state::srmp3_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(srmp2_state::irq0_line_assert));
@@ -1211,8 +1211,8 @@ void srmp2_state::srmp3(machine_config &config)
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.20);
 
 	MSM5205(config, m_msm, 384000);
-	m_msm->vck_legacy_callback().set(FUNC(srmp2_state::adpcm_int));	/* IRQ handler */
-	m_msm->set_prescaler_selector(msm5205_device::S48_4B);	/* 8 KHz, 4 Bits */
+	m_msm->vck_legacy_callback().set(FUNC(srmp2_state::adpcm_int)); /* IRQ handler */
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  /* 8 KHz, 4 Bits */
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.45);
 }
 
@@ -1229,10 +1229,10 @@ void srmp2_state::rmgoldyh(machine_config &config)
 void srmp2_state::mjyuugi(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 16000000/2);	/* 8.00 MHz */
+	M68000(config, m_maincpu, 16000000/2);  /* 8.00 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &srmp2_state::mjyuugi_map);
 	m_maincpu->set_vblank_int("screen", FUNC(srmp2_state::irq4_line_assert));
-	m_maincpu->set_periodic_int(FUNC(srmp2_state::irq2_line_assert), attotime::from_hz(15*60));	/* Interrupt times is not understood */
+	m_maincpu->set_periodic_int(FUNC(srmp2_state::irq2_line_assert), attotime::from_hz(15*60)); /* Interrupt times is not understood */
 
 	MCFG_MACHINE_START_OVERRIDE(srmp2_state,mjyuugi)
 
@@ -1263,8 +1263,8 @@ void srmp2_state::mjyuugi(machine_config &config)
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.20);
 
 	MSM5205(config, m_msm, 384000);
-	m_msm->vck_legacy_callback().set(FUNC(srmp2_state::adpcm_int));	/* IRQ handler */
-	m_msm->set_prescaler_selector(msm5205_device::S48_4B);	/* 8 KHz, 4 Bits */
+	m_msm->vck_legacy_callback().set(FUNC(srmp2_state::adpcm_int)); /* IRQ handler */
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  /* 8 KHz, 4 Bits */
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.45);
 }
 

@@ -4,10 +4,10 @@
 
     Short Description:
 
-		die markings show
+        die markings show
 
-		"SunPlus PA7801" ( known as Sunplus SPG110? )
-		Classic Arcade Pinball
+        "SunPlus PA7801" ( known as Sunplus SPG110? )
+        Classic Arcade Pinball
 
 *******************************************************************************/
 
@@ -67,8 +67,8 @@ void spg110_game_state::spg110_base(machine_config &config)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-//	m_spg->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-//	m_spg->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+//  m_spg->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
+//  m_spg->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
 
 	SPG110(config, m_spg, XTAL(27'000'000), "maincpu");
 }

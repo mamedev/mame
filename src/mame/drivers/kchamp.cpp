@@ -407,12 +407,12 @@ void kchamp_state::machine_reset()
 void kchamp_state::kchampvs(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(12'000'000)/4);		/* verified on pcb */
+	Z80(config, m_maincpu, XTAL(12'000'000)/4);     /* verified on pcb */
 	m_maincpu->set_addrmap(AS_PROGRAM, &kchamp_state::kchampvs_map);
 	m_maincpu->set_addrmap(AS_IO, &kchamp_state::kchampvs_io_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &kchamp_state::decrypted_opcodes_map);
 
-	Z80(config, m_audiocpu, XTAL(12'000'000)/4);	/* verified on pcb */
+	Z80(config, m_audiocpu, XTAL(12'000'000)/4);    /* verified on pcb */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &kchamp_state::kchampvs_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &kchamp_state::kchampvs_sound_io_map);
 	/* IRQs triggered from main CPU */
@@ -451,8 +451,8 @@ void kchamp_state::kchampvs(machine_config &config)
 	m_adpcm_select->out_callback().set("msm", FUNC(msm5205_device::data_w));
 
 	MSM5205(config, m_msm, 375000);  /* verified on pcb, discrete circuit clock */
-	m_msm->vck_callback().set(FUNC(kchamp_state::msmint));	/* interrupt function */
-	m_msm->set_prescaler_selector(msm5205_device::S96_4B);	/* 1 / 96 = 3906.25Hz playback */
+	m_msm->vck_callback().set(FUNC(kchamp_state::msmint));  /* interrupt function */
+	m_msm->set_prescaler_selector(msm5205_device::S96_4B);  /* 1 / 96 = 3906.25Hz playback */
 	m_msm->add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
@@ -463,11 +463,11 @@ void kchamp_state::kchampvs(machine_config &config)
 void kchamp_state::kchamp(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(12'000'000)/4);		/* 12MHz / 4 = 3.0 MHz */
+	Z80(config, m_maincpu, XTAL(12'000'000)/4);     /* 12MHz / 4 = 3.0 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &kchamp_state::kchamp_map);
 	m_maincpu->set_addrmap(AS_IO, &kchamp_state::kchamp_io_map);
 
-	Z80(config, m_audiocpu, XTAL(12'000'000)/4);	/* 12MHz / 4 = 3.0 MHz */
+	Z80(config, m_audiocpu, XTAL(12'000'000)/4);    /* 12MHz / 4 = 3.0 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &kchamp_state::kchamp_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &kchamp_state::kchamp_sound_io_map);
 	m_audiocpu->set_periodic_int(FUNC(kchamp_state::sound_int), attotime::from_hz(125)); /* Hz */

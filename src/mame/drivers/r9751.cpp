@@ -972,8 +972,8 @@ void r9751_state::scsi_devices(device_slot_interface &device)
 void r9751_state::wd33c93(device_t *device)
 {
 	device->set_clock(10000000);
-	//	downcast<wd33c93a_device *>(device)->irq_cb().set(*this, FUNC(r9751_state::scsi_irq_w));
-	//	downcast<wd33c93a_device *>(device)->drq_cb().set(*this, FUNC(r9751_state::scsi_drq_w));
+	//  downcast<wd33c93a_device *>(device)->irq_cb().set(*this, FUNC(r9751_state::scsi_irq_w));
+	//  downcast<wd33c93a_device *>(device)->drq_cb().set(*this, FUNC(r9751_state::scsi_drq_w));
 }
 
 MACHINE_CONFIG_START(r9751_state::r9751)

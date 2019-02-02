@@ -16,7 +16,7 @@
     gynotai TODOs:
     - printer (disable it in service mode to suppress POST error);
     - ball sensors aren't understood;
-    - Seems to dislike our YGV608 row/colscroll handling 
+    - Seems to dislike our YGV608 row/colscroll handling
       (for example vertical bounding box is halved offset & size wise for Pac-Man goal stage);
 
     To make abcheck run when the EEPROM is clear:

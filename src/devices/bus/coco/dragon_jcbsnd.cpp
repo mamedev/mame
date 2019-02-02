@@ -22,7 +22,7 @@
 
 
 ROM_START( dragon_jcbsnd )
-	ROM_REGION(0x8000, "eprom", ROMREGION_ERASE00)
+	ROM_REGION(0x1000, "eprom", ROMREGION_ERASE00)
 	ROM_LOAD("d32sem.rom", 0x0000, 0x1000, CRC(4cd0f30b) SHA1(d07bb9272e3d3928059853730ff656905a80b68e))
 ROM_END
 
@@ -66,6 +66,15 @@ void dragon_jcbsnd_device::device_start()
 uint8_t* dragon_jcbsnd_device::get_cart_base()
 {
 	return memregion("eprom")->base();
+}
+
+//-------------------------------------------------
+//  dragon_jcbsnd_device::get_cart_memregion
+//-------------------------------------------------
+
+memory_region* dragon_jcbsnd_device::get_cart_memregion()
+{
+	return memregion("eprom");
 }
 
 //-------------------------------------------------

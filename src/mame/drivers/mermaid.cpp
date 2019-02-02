@@ -422,7 +422,7 @@ WRITE_LINE_MEMBER(mermaid_state::rougien_adpcm_int)
 void mermaid_state::mermaid(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 4000000);	// ???
+	Z80(config, m_maincpu, 4000000);    // ???
 	m_maincpu->set_addrmap(AS_PROGRAM, &mermaid_state::mermaid_map);
 
 	LS259(config, m_latch[0]);

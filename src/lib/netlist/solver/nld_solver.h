@@ -102,7 +102,7 @@ private:
 
 	solver_parameters_t m_params;
 
-	template <std::size_t m_N, std::size_t storage_N>
+	template <typename FT, int SIZE>
 	matrix_solver_t * create_solver(std::size_t size, const pstring &solvername);
 };
 

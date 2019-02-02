@@ -41,10 +41,10 @@ DEFINE_DEVICE_TYPE(SPG28X, spg28x_device, "spg28x", "SPG280-series System-on-a-C
 #define LOG_PPU_READS       (1U << 22)
 #define LOG_PPU_WRITES      (1U << 23)
 #define LOG_UNKNOWN_PPU     (1U << 24)
-#define LOG_FIQ				(1U << 25)
+#define LOG_FIQ             (1U << 25)
 #define LOG_SIO             (1U << 26)
-#define LOG_EXT_MEM			(1U << 27)
-#define LOG_EXTINT			(1U << 28)
+#define LOG_EXT_MEM         (1U << 27)
+#define LOG_EXTINT          (1U << 28)
 #define LOG_IO              (LOG_IO_READS | LOG_IO_WRITES | LOG_IRQS | LOG_GPIO | LOG_UART | LOG_I2C | LOG_DMA | LOG_TIMERS | LOG_UNKNOWN_IO)
 #define LOG_CHANNELS        (LOG_CHANNEL_READS | LOG_CHANNEL_WRITES)
 #define LOG_SPU             (LOG_SPU_READS | LOG_SPU_WRITES | LOG_UNKNOWN_SPU | LOG_CHANNEL_READS | LOG_CHANNEL_WRITES \
@@ -52,8 +52,7 @@ DEFINE_DEVICE_TYPE(SPG28X, spg28x_device, "spg28x", "SPG280-series System-on-a-C
 #define LOG_PPU             (LOG_PPU_READS | LOG_PPU_WRITES | LOG_UNKNOWN_PPU)
 #define LOG_ALL             (LOG_IO | LOG_SPU | LOG_PPU | LOG_VLINES | LOG_SEGMENT | LOG_FIQ)
 
-#define VERBOSE             (LOG_ALL & ~LOG_SPU)
-//#define VERBOSE             (0)
+//#define VERBOSE             (LOG_ALL & ~LOG_SPU)
 #include "logmacro.h"
 
 #define SPG_DEBUG_VIDEO     (0)
@@ -73,7 +72,7 @@ spg2xx_device::spg2xx_device(const machine_config &mconfig, device_type type, co
 	, m_porta_in(*this)
 	, m_portb_in(*this)
 	, m_portc_in(*this)
-	, m_adc_in(*this)
+	, m_adc_in{{*this}, {*this}}
 	, m_eeprom_w(*this)
 	, m_eeprom_r(*this)
 	, m_uart_tx(*this)
@@ -116,8 +115,8 @@ void spg2xx_device::device_start()
 	for (uint16_t i = 0; i < 0x8000; i++)
 	{
 		m_rgb555_to_rgb888[i] = (m_rgb5_to_rgb8[(i >> 10) & 0x1f] << 16) |
-		                        (m_rgb5_to_rgb8[(i >>  5) & 0x1f] <<  8) |
-		                        (m_rgb5_to_rgb8[(i >>  0) & 0x1f] <<  0);
+								(m_rgb5_to_rgb8[(i >>  5) & 0x1f] <<  8) |
+								(m_rgb5_to_rgb8[(i >>  0) & 0x1f] <<  0);
 	}
 	m_porta_out.resolve_safe();
 	m_portb_out.resolve_safe();
@@ -125,7 +124,8 @@ void spg2xx_device::device_start()
 	m_porta_in.resolve_safe(0);
 	m_portb_in.resolve_safe(0);
 	m_portc_in.resolve_safe(0);
-	m_adc_in.resolve_safe(0x0fff);
+	m_adc_in[0].resolve_safe(0x0fff);
+	m_adc_in[1].resolve_safe(0x0fff);
 	m_eeprom_w.resolve_safe();
 	m_eeprom_r.resolve_safe(0);
 	m_uart_tx.resolve_safe();
@@ -237,6 +237,9 @@ void spg2xx_device::device_reset()
 	m_timer_b_tick_rate = 0;
 
 	m_io_regs[0x23] = 0x0028;
+	m_io_regs[0x2c] = 0x1418;
+	m_io_regs[0x2d] = 0x1658;
+
 	m_uart_rx_available = false;
 	memset(m_uart_rx_fifo, 0, ARRAY_LENGTH(m_uart_rx_fifo));
 	m_uart_rx_fifo_start = 0;
@@ -324,13 +327,13 @@ void spg2xx_device::blit(const rectangle &cliprect, uint32_t line, uint32_t xoff
 	if (yy >= 0x01c0)
 		yy -= 0x0200;
 
-    if (yy > 240 || yy < 0)
-        return;
+	if (yy > 240 || yy < 0)
+		return;
 
-    if (SPG_DEBUG_VIDEO && m_debug_blit)
+	if (SPG_DEBUG_VIDEO && m_debug_blit)
 		printf("%3d:\n", yy);
 
-    int y_index = yy * 320;
+	int y_index = yy * 320;
 
 	for (int32_t x = FlipX ? (w - 1) : 0; FlipX ? x >= 0 : x < w; FlipX ? x-- : x++)
 	{
@@ -377,8 +380,8 @@ void spg2xx_device::blit(const rectangle &cliprect, uint32_t line, uint32_t xoff
 					if (SPG_DEBUG_VIDEO && m_debug_blit)
 						printf("M\n");
 					m_screenbuf[pix_index] = (mix_channel((uint8_t)(m_screenbuf[pix_index] >> 16), m_rgb5_to_rgb8[(rgb >> 10) & 0x1f]) << 16) |
-					                         (mix_channel((uint8_t)(m_screenbuf[pix_index] >>  8), m_rgb5_to_rgb8[(rgb >> 5) & 0x1f]) << 8) |
-					                         (mix_channel((uint8_t)(m_screenbuf[pix_index] >>  0), m_rgb5_to_rgb8[rgb & 0x1f]));
+											 (mix_channel((uint8_t)(m_screenbuf[pix_index] >>  8), m_rgb5_to_rgb8[(rgb >> 5) & 0x1f]) << 8) |
+											 (mix_channel((uint8_t)(m_screenbuf[pix_index] >>  0), m_rgb5_to_rgb8[rgb & 0x1f]));
 				}
 				else
 				{
@@ -627,8 +630,8 @@ void spg2xx_device::apply_saturation(const rectangle &cliprect)
 			const int integer_g = (int)floor(adjusted_g * 255.0f);
 			const int integer_b = (int)floor(adjusted_b * 255.0f);
 			*src++ = (integer_r > 255 ? 0xff0000 : (integer_r < 0 ? 0 : ((uint8_t)integer_r << 16))) |
-			         (integer_g > 255 ? 0x00ff00 : (integer_g < 0 ? 0 : ((uint8_t)integer_g << 8))) |
-			         (integer_b > 255 ? 0x0000ff : (integer_b < 0 ? 0 : (uint8_t)integer_b));
+					 (integer_g > 255 ? 0x00ff00 : (integer_g < 0 ? 0 : ((uint8_t)integer_g << 8))) |
+					 (integer_b > 255 ? 0x0000ff : (integer_b < 0 ? 0 : (uint8_t)integer_b));
 		}
 	}
 }
@@ -649,8 +652,8 @@ void spg2xx_device::apply_fade(const rectangle &cliprect)
 			const uint8_t g = src_g - fade_offset;
 			const uint8_t b = src_b - fade_offset;
 			*src++ = (r > src_r ? 0 : (r << 16)) |
-			         (g > src_g ? 0 : (g <<  8)) |
-			         (b > src_b ? 0 : (b <<  0));
+					 (g > src_g ? 0 : (g <<  8)) |
+					 (b > src_b ? 0 : (b <<  0));
 		}
 	}
 }
@@ -1096,10 +1099,19 @@ READ16_MEMBER(spg2xx_device::io_r)
 		LOGMASKED(LOG_IO_READS, "io_r: NTSC/PAL = %04x\n", m_pal_flag);
 		return m_pal_flag;
 
-	case 0x2c: case 0x2d: // PRNG 0/1
-		val = machine().rand() & 0x0000ffff;
-		LOGMASKED(LOG_IO_READS, "io_r: PRNG %d = %04x\n", offset - 0x2c, val);
-		break;
+	case 0x2c: // PRNG 0
+	{
+		const uint16_t value = m_io_regs[0x2c];
+		m_io_regs[0x2c] = ((value << 1) | (BIT(value, 14) ^ BIT(value, 13))) & 0x7fff;
+		return value;
+	}
+
+	case 0x2d: // PRNG 1
+	{
+		const uint16_t value = m_io_regs[0x2d];
+		m_io_regs[0x2d] = ((value << 1) | (BIT(value, 14) ^ BIT(value, 13))) & 0x7fff;
+		return value;
+	}
 
 	case 0x2e: // FIQ Source Select
 		LOGMASKED(LOG_FIQ, "io_r: FIQ Source Select = %04x\n", val);
@@ -1622,9 +1634,13 @@ WRITE16_MEMBER(spg2xx_device::io_w)
 	{
 		LOGMASKED(LOG_IO_WRITES, "%s: io_w: ADC Control = %04x\n", machine().describe_context(), data);
 		m_io_regs[offset] = data & ~0x1000;
+		if (BIT(data, 0))
+		{
+			m_io_regs[0x27] = 0x8000 | (m_adc_in[BIT(data, 5)]() & 0x7fff);
+			m_io_regs[0x25] |= 0x2000;
+		}
 		if (BIT(data, 12) && !BIT(m_io_regs[offset], 1))
 		{
-			m_io_regs[0x27] = 0x8000 | (m_adc_in() & 0x7fff);
 			const uint16_t old = IO_IRQ_STATUS;
 			IO_IRQ_STATUS |= 0x2000;
 			const uint16_t changed = (old & IO_IRQ_ENABLE) ^ (IO_IRQ_STATUS & IO_IRQ_ENABLE);
@@ -1665,6 +1681,16 @@ WRITE16_MEMBER(spg2xx_device::io_w)
 		LOGMASKED(LOG_IO_WRITES, "      %s\n", buf);
 		break;
 	}
+
+	case 0x2c: // PRNG 0 seed
+		LOGMASKED(LOG_IO_WRITES, "io_w: PRNG 0 seed = %04x\n", data & 0x7fff);
+		m_io_regs[offset] = data & 0x7fff;
+		break;
+
+	case 0x2d: // PRNG 1 seed
+		LOGMASKED(LOG_IO_WRITES, "io_w: PRNG 1 seed = %04x\n", data & 0x7fff);
+		m_io_regs[offset] = data & 0x7fff;
+		break;
 
 	case 0x2e: // FIQ Source Select
 	{

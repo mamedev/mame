@@ -249,9 +249,9 @@ void klax_state::klax2bl(machine_config &config)
 
 	// guess, probably something like this
 	// 2 x msm at least on bootleg set 2 (ic18 and ic19)
-	MSM5205(config, "msm", 375000);		/* ? */
-//  msm.vck_legacy_callback().set(FUNC(klax_state::m5205_int1));	/* interrupt function */
-//  msm.set_prescaler_selector(msm5205_device::MSM5205_S96_4B);		/* 4KHz 4-bit */
+	MSM5205(config, "msm", 375000);     /* ? */
+//  msm.vck_legacy_callback().set(FUNC(klax_state::m5205_int1));    /* interrupt function */
+//  msm.set_prescaler_selector(msm5205_device::MSM5205_S96_4B);     /* 4KHz 4-bit */
 //  msm.add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 

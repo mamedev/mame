@@ -133,12 +133,12 @@ matrix_solver_t * create_it(netlist_base_t &nl, pstring name, solver_parameters_
 	return plib::palloc<C>(nl, name, &params, size);
 }
 
-template <std::size_t m_N, std::size_t storage_N>
+template <typename FT, int SIZE>
 matrix_solver_t * NETLIB_NAME(solver)::create_solver(std::size_t size, const pstring &solvername)
 {
 	if (m_method() == "SOR_MAT")
 	{
-		return create_it<matrix_solver_SOR_mat_t<m_N, storage_N>>(state(), solvername, m_params, size);
+		return create_it<matrix_solver_SOR_mat_t<FT, SIZE>>(state(), solvername, m_params, size);
 		//typedef matrix_solver_SOR_mat_t<m_N,storage_N> solver_sor_mat;
 		//return plib::make_unique<solver_sor_mat>(state(), solvername, &m_params, size);
 	}
@@ -146,34 +146,34 @@ matrix_solver_t * NETLIB_NAME(solver)::create_solver(std::size_t size, const pst
 	{
 		if (size > 0) // GCR always outperforms MAT solver
 		{
-			return create_it<matrix_solver_GCR_t<m_N, storage_N>>(state(), solvername, m_params, size);
+			return create_it<matrix_solver_GCR_t<FT, SIZE>>(state(), solvername, m_params, size);
 		}
 		else
 		{
-			return create_it<matrix_solver_direct_t<m_N, storage_N>>(state(), solvername, m_params, size);
+			return create_it<matrix_solver_direct_t<FT, SIZE>>(state(), solvername, m_params, size);
 		}
 	}
 	else if (m_method() == "MAT")
 	{
-		return create_it<matrix_solver_direct_t<m_N, storage_N>>(state(), solvername, m_params, size);
+		return create_it<matrix_solver_direct_t<FT, SIZE>>(state(), solvername, m_params, size);
 	}
 	else if (m_method() == "SM")
 	{
 		/* Sherman-Morrison Formula */
-		return create_it<matrix_solver_sm_t<m_N, storage_N>>(state(), solvername, m_params, size);
+		return create_it<matrix_solver_sm_t<FT, SIZE>>(state(), solvername, m_params, size);
 	}
 	else if (m_method() == "W")
 	{
 		/* Woodbury Formula */
-		return create_it<matrix_solver_w_t<m_N, storage_N>>(state(), solvername, m_params, size);
+		return create_it<matrix_solver_w_t<FT, SIZE>>(state(), solvername, m_params, size);
 	}
 	else if (m_method() == "SOR")
 	{
-		return create_it<matrix_solver_SOR_t<m_N, storage_N>>(state(), solvername, m_params, size);
+		return create_it<matrix_solver_SOR_t<FT, SIZE>>(state(), solvername, m_params, size);
 	}
 	else if (m_method() == "GMRES")
 	{
-		return create_it<matrix_solver_GMRES_t<m_N, storage_N>>(state(), solvername, m_params, size);
+		return create_it<matrix_solver_GMRES_t<FT, SIZE>>(state(), solvername, m_params, size);
 	}
 	else
 	{
@@ -288,64 +288,64 @@ void NETLIB_NAME(solver)::post_start()
 
 		switch (net_count)
 		{
-#if 0
+#if 1
 			case 1:
 				if (use_specific)
-					ms = plib::palloc<matrix_solver_direct1_t>(state(), sname, &m_params);
+					ms = plib::palloc<matrix_solver_direct1_t<double>>(state(), sname, &m_params);
 				else
-					ms = create_solver<1,1>(1, sname);
+					ms = create_solver<double, 1>(1, sname);
 				break;
 			case 2:
 				if (use_specific)
-					ms =  plib::palloc<matrix_solver_direct2_t>(state(), sname, &m_params);
+					ms =  plib::palloc<matrix_solver_direct2_t<double>>(state(), sname, &m_params);
 				else
-					ms = create_solver<2,2>(2, sname);
+					ms = create_solver<double, 2>(2, sname);
 				break;
 #if 1
 			case 3:
-				ms = create_solver<3,3>(3, sname);
+				ms = create_solver<double, 3>(3, sname);
 				break;
 			case 4:
-				ms = create_solver<4,4>(4, sname);
+				ms = create_solver<double, 4>(4, sname);
 				break;
 			case 5:
-				ms = create_solver<5,5>(5, sname);
+				ms = create_solver<double, 5>(5, sname);
 				break;
 			case 6:
-				ms = create_solver<6,6>(6, sname);
+				ms = create_solver<double, 6>(6, sname);
 				break;
 			case 7:
-				ms = create_solver<7,7>(7, sname);
+				ms = create_solver<double, 7>(7, sname);
 				break;
 			case 8:
-				ms = create_solver<8,8>(8, sname);
+				ms = create_solver<double, 8>(8, sname);
 				break;
 			case 9:
-				ms = create_solver<9,9>(9, sname);
+				ms = create_solver<double, 9>(9, sname);
 				break;
 			case 10:
-				ms = create_solver<10,10>(10, sname);
+				ms = create_solver<double, 10>(10, sname);
 				break;
 			case 11:
-				ms = create_solver<11,11>(11, sname);
+				ms = create_solver<double, 11>(11, sname);
 				break;
 			case 12:
-				ms = create_solver<12,12>(12, sname);
+				ms = create_solver<double, 12>(12, sname);
 				break;
 			case 15:
-				ms = create_solver<15,15>(15, sname);
+				ms = create_solver<double, 15>(15, sname);
 				break;
 			case 31:
-				ms = create_solver<31,31>(31, sname);
+				ms = create_solver<double, 31>(31, sname);
 				break;
 			case 35:
-				ms = create_solver<35,35>(35, sname);
+				ms = create_solver<double, 35>(35, sname);
 				break;
 			case 43:
-				ms = create_solver<43,43>(43, sname);
+				ms = create_solver<double, 43>(43, sname);
 				break;
 			case 49:
-				ms = create_solver<49,49>(49, sname);
+				ms = create_solver<double, 49>(49, sname);
 				break;
 #endif
 #if 0
@@ -358,32 +358,31 @@ void NETLIB_NAME(solver)::post_start()
 				log().warning(MW_1_NO_SPECIFIC_SOLVER, net_count);
 				if (net_count <= 8)
 				{
-					ms = create_solver<0, 8>(net_count, sname);
+					ms = create_solver<double, -8>(net_count, sname);
 				}
 				else if (net_count <= 16)
 				{
-					ms = create_solver<0,16>(net_count, sname);
+					ms = create_solver<double, -16>(net_count, sname);
 				}
 				else if (net_count <= 32)
 				{
-					ms = create_solver<0,32>(net_count, sname);
+					ms = create_solver<double, -32>(net_count, sname);
 				}
 				else
 					if (net_count <= 64)
 				{
-					ms = create_solver<0,64>(net_count, sname);
+					ms = create_solver<double, -64>(net_count, sname);
 				}
 				else
 					if (net_count <= 128)
 				{
-					ms = create_solver<0,128>(net_count, sname);
+					ms = create_solver<double, -128>(net_count, sname);
 				}
 				else
 				{
 					log().fatal(MF_1_NETGROUP_SIZE_EXCEEDED_1, 128);
 					ms = nullptr; /* tease compilers */
 				}
-
 				break;
 		}
 

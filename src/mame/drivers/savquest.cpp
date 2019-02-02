@@ -835,7 +835,8 @@ MACHINE_CONFIG_START(savquest_state::savquest)
 	/* sound hardware */
 
 	isa16_device &isa(ISA16(config, "isa", 0)); // FIXME: determine ISA bus clock
-	isa.set_cputag("maincpu");
+	isa.set_memspace("maincpu", AS_PROGRAM);
+	isa.set_iospace("maincpu", AS_IO);
 	MCFG_DEVICE_ADD("isa1", ISA16_SLOT, 0, "isa", savquest_isa16_cards, "sb16", false)
 
 	/* video hardware */

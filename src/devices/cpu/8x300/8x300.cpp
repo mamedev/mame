@@ -44,7 +44,7 @@ DEFINE_DEVICE_TYPE(N8X305, n8x305_cpu_device, "8x305", "Signetics 8X305")
 
 n8x300_cpu_device::n8x300_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, type, tag, owner, clock)
-	, m_program_config("program", ENDIANNESS_BIG, 16, 14, 0)
+	, m_program_config("program", ENDIANNESS_BIG, 16, 13, -1)
 	, m_io_config("io", ENDIANNESS_BIG, 8, 9, 0)
 	, m_sc_callback(*this)
 {
@@ -154,7 +154,7 @@ void n8x300_cpu_device::device_resolve_objects()
 void n8x300_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_cache = m_program->cache<1, 0, ENDIANNESS_BIG>();
+	m_cache = m_program->cache<1, -1, ENDIANNESS_BIG>();
 	m_io = &space(AS_IO);
 
 	save_item(NAME(m_PC));
@@ -229,8 +229,8 @@ void n8x300_cpu_device::device_start()
 	state_add( _8X300_OVF,  "OVF",  m_OVF).mask(0x01).formatstr("%01X");
 	state_add( _8X300_IVL,  "IVL",  m_IVL).mask(0xff).formatstr("%02X");
 	state_add( _8X300_IVR,  "IVR",  m_IVR).mask(0xff).formatstr("%02X");
-	state_add(STATE_GENPC, "GENPC", m_genPC).mask(0x3ffe).callimport().noshow();
-	state_add(STATE_GENPCBASE, "CURPC", m_genPC).mask(0x3ffe).callimport().noshow();
+	state_add(STATE_GENPC, "GENPC", m_genPC).mask(0x1fff).callimport().noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_genPC).mask(0x1fff).callimport().noshow();
 
 	set_icountptr(m_icount);
 }
@@ -246,12 +246,12 @@ void n8x300_cpu_device::state_import(const device_state_entry &entry)
 	{
 	case _8X300_PC:
 		m_AR = m_PC;
-		m_genPC = m_AR << 1;
+		m_genPC = m_AR;
 		m_increment_pc = true;
 		break;
 
 	case _8X300_AR:
-		m_genPC = m_AR << 1;
+		m_genPC = m_AR;
 		m_increment_pc = false;
 		break;
 
@@ -284,7 +284,7 @@ void n8x300_cpu_device::execute_run()
 		uint8_t mask;
 
 		/* fetch the opcode */
-		m_genPC = m_AR << 1;
+		m_genPC = m_AR;
 		debugger_instruction_hook(m_genPC);
 		opcode = FETCHOP(m_genPC);
 

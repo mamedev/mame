@@ -357,6 +357,8 @@ if (BUSES["BBC_1MHZBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/m2000.h",
 		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/opus3.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/opus3.h",
+		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/sprite.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/sprite.h",
 		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/cfa3000opt.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/cfa3000opt.h",
 	}
@@ -1190,6 +1192,8 @@ if (BUSES["ISA"]~=null) then
 		MAME_DIR .. "src/devices/bus/isa/hdc.h",
 		MAME_DIR .. "src/devices/bus/isa/ibm_mfc.cpp",
 		MAME_DIR .. "src/devices/bus/isa/ibm_mfc.h",
+		MAME_DIR .. "src/devices/bus/isa/cl_sh260.cpp",
+		MAME_DIR .. "src/devices/bus/isa/cl_sh260.h",
 		MAME_DIR .. "src/devices/bus/isa/mpu401.cpp",
 		MAME_DIR .. "src/devices/bus/isa/mpu401.h",
 		MAME_DIR .. "src/devices/bus/isa/sblaster.cpp",
@@ -1280,6 +1284,8 @@ if (BUSES["ISA"]~=null) then
 		MAME_DIR .. "src/devices/bus/isa/eis_sad8852.h",
 		MAME_DIR .. "src/devices/bus/isa/lbaenhancer.cpp",
 		MAME_DIR .. "src/devices/bus/isa/lbaenhancer.h",
+		MAME_DIR .. "src/devices/bus/isa/np600.cpp",
+		MAME_DIR .. "src/devices/bus/isa/np600.h",
 	}
 end
 

@@ -78,7 +78,7 @@ protected:
 	DECLARE_WRITE32_MEMBER(pio_config_w);
 
 	void do_pbus_dma(uint32_t channel);
-    void do_scsi_dma(int channel);
+	void do_scsi_dma(int channel);
 
 	void dump_chain(uint32_t base);
 	void fetch_chain(int channel);
@@ -154,7 +154,7 @@ protected:
 		uint32_t m_length;
 		uint32_t m_next;
 		bool m_irq;
-        bool m_drq;
+		bool m_drq;
 		bool m_big_endian;
 		bool m_to_device;
 		bool m_active;

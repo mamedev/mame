@@ -275,7 +275,7 @@ netlist_state_t::netlist_state_t(const pstring &aname,
 : m_params(nullptr)
 , m_name(aname)
 , m_state()
-, m_callbacks(std::move(callbacks))	// Order is important here
+, m_callbacks(std::move(callbacks)) // Order is important here
 , m_log(*m_callbacks)
 , m_setup(std::move(setup))
 {

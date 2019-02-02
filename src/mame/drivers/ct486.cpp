@@ -145,7 +145,8 @@ MACHINE_CONFIG_START(ct486_state::ct486)
 	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL)
 
 	ISA16(config, m_isabus, 0);
-	m_isabus->set_cputag("maincpu");
+	m_isabus->set_memspace(m_maincpu, AS_PROGRAM);
+	m_isabus->set_iospace(m_maincpu, AS_IO);
 	m_isabus->iochck_callback().set(m_cs4031, FUNC(cs4031_device::iochck_w));
 	m_isabus->irq2_callback().set(m_cs4031, FUNC(cs4031_device::irq09_w));
 	m_isabus->irq3_callback().set(m_cs4031, FUNC(cs4031_device::irq03_w));

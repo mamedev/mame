@@ -426,7 +426,6 @@ MACHINE_CONFIG_START(pt68k4_state::pt68k2)
 	MCFG_FLOPPY_DRIVE_ADD(m_floppy_connector[1], pt68k_floppies, "525dd", pt68k4_state::floppy_formats)
 
 	ISA8(config, m_isa, 0);
-	m_isa->set_cputag(M68K_TAG);
 	m_isa->set_custom_spaces();
 	m_isa->irq5_callback().set(FUNC(pt68k4_state::irq5_w));
 
@@ -464,7 +463,6 @@ MACHINE_CONFIG_START(pt68k4_state::pt68k4)
 	MCFG_DEVICE_ADD(TIMEKEEPER_TAG, M48T02, 0)
 
 	ISA8(config, m_isa, 0);
-	m_isa->set_cputag(M68K_TAG);
 	m_isa->set_custom_spaces();
 
 	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, ISABUS_TAG, pt68k4_isa8_cards, "fdc_at", false) // FIXME: determine ISA bus clock

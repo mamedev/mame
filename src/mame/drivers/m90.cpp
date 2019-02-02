@@ -1140,7 +1140,7 @@ ROM_START( newapunk )
 ROM_END
 
 //PCB is marked: "BOMBER LORD 030" and "lc" on component side ("LC" is the Italian for "Lato Componenti" which translates to "Components Side")
-//PCB is marked: "BOMBER LORD 030" and "ls" on solder side ("LS" is the Italian for "Lato Saldature" which translates to "Solders Side") 
+//PCB is marked: "BOMBER LORD 030" and "ls" on solder side ("LS" is the Italian for "Lato Saldature" which translates to "Solders Side")
 ROM_START( bomblord )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "27c020_3.u6",  0x00001, 0x40000, CRC(65d5c54a) SHA1(f794a193d5927b5fb838ab2351c176d8cbd37236) )

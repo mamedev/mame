@@ -704,11 +704,11 @@ void taitoair_state::machine_reset()
 void taitoair_state::airsys(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(12'000'000));	// MC68000P12
+	M68000(config, m_maincpu, XTAL(12'000'000));    // MC68000P12
 	m_maincpu->set_addrmap(AS_PROGRAM, &taitoair_state::airsys_map);
 	m_maincpu->set_vblank_int("screen", FUNC(taitoair_state::irq5_line_hold));
 
-	Z80(config, m_audiocpu, XTAL(16'000'000) / 4);	// Z8400AB1
+	Z80(config, m_audiocpu, XTAL(16'000'000) / 4);  // Z8400AB1
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taitoair_state::sound_map);
 
 	TMS32025(config, m_dsp, XTAL(36'000'000)); // Unverified

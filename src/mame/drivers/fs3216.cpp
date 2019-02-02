@@ -445,7 +445,7 @@ void fs3216_state::clb_map(address_map &map)
 
 void fs3216_state::wdcpu_prog_map(address_map &map)
 {
-	map(0x000, 0x7ff).rom().region("wdcpu", 0);
+	map(0x0000, 0x03ff).rom().region("wdcpu", 0);
 }
 
 void fs3216_state::wdcpu_bank_map(address_map &map)

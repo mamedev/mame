@@ -322,11 +322,11 @@ namespace netlist
 				const T &value          //!< Initial value after construction
 				);
 		//! Copy Constructor.
-		constexpr state_var(const state_var &rhs) noexcept = default;
+		constexpr state_var(const state_var &rhs) = default;
 		//! Move Constructor.
 		constexpr state_var(state_var &&rhs) noexcept = default;
 		//! Assignment operator to assign value of a state var.
-		C14CONSTEXPR state_var &operator=(const state_var &rhs) noexcept = default;
+		C14CONSTEXPR state_var &operator=(const state_var &rhs) = default;
 		//! Assignment move operator to assign value of a state var.
 		C14CONSTEXPR state_var &operator=(state_var &&rhs) noexcept = default;
 		//! Assignment operator to assign value of type T.
@@ -1346,13 +1346,13 @@ namespace netlist
 		pstring                             m_name;
 		std::unique_ptr<plib::dynlib>       m_lib; // external lib needs to be loaded as long as netlist exists
 		plib::state_manager_t               m_state;
-		std::unique_ptr<callbacks_t> 		m_callbacks;
-		log_type							m_log;
+		std::unique_ptr<callbacks_t>        m_callbacks;
+		log_type                            m_log;
 		std::unique_ptr<setup_t>            m_setup;
 
-		nets_collection_type 			    m_nets;
+		nets_collection_type                m_nets;
 		/* sole use is to manage lifetime of net objects */
-		devices_collection_type 		    m_devices;
+		devices_collection_type             m_devices;
 
 	};
 
@@ -1405,7 +1405,7 @@ namespace netlist
 		void print_stats() const;
 
 	private:
-		std::unique_ptr<netlist_state_t>	m_state;
+		std::unique_ptr<netlist_state_t>    m_state;
 
 		/* mostly rw */
 		netlist_time                        m_time;

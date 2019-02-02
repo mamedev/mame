@@ -1114,7 +1114,6 @@ MACHINE_CONFIG_START(apollo_state::common)
 	m_sio2->irq_cb().set(FUNC(apollo_state::sio2_irq_handler));
 
 	ISA16(config, m_isa, 0);
-	m_isa->set_cputag(MAINCPU);
 	m_isa->set_custom_spaces();
 	m_isa->irq2_callback().set(m_pic8259_slave, FUNC(pic8259_device::ir2_w)); // in place of irq 2 on at irq 9 is used
 	m_isa->irq3_callback().set(m_pic8259_master, FUNC(pic8259_device::ir3_w));

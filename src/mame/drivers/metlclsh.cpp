@@ -278,11 +278,11 @@ void metlclsh_state::machine_reset()
 void metlclsh_state::metlclsh(machine_config &config)
 {
 	/* basic machine hardware */
-	M6809(config, m_maincpu, 1500000);	// ?
+	M6809(config, m_maincpu, 1500000);  // ?
 	m_maincpu->set_addrmap(AS_PROGRAM, &metlclsh_state::metlclsh_master_map);
 	// IRQ by YM3526, NMI by CPU #2
 
-	M6809(config, m_subcpu, 1500000);	// ?
+	M6809(config, m_subcpu, 1500000);   // ?
 	m_subcpu->set_addrmap(AS_PROGRAM, &metlclsh_state::metlclsh_slave_map);
 	// IRQ by CPU #1, NMI by coin insertion
 

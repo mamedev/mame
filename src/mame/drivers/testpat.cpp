@@ -5,11 +5,11 @@
 TV test pattern generators
 
 Radio, 1983, N5
-	http://radioway.ru/1983/05/generator_telesignalov.html
-	http://radioway.ru/1984/04/generator_telesignalov.html
+    http://radioway.ru/1983/05/generator_telesignalov.html
+    http://radioway.ru/1984/04/generator_telesignalov.html
 
 Radio, 1985, N6
-	http://radioway.ru/1985/06/generator_ispytatelnyh_signalov.html
+    http://radioway.ru/1985/06/generator_ispytatelnyh_signalov.html
 
 ***************************************************************************/
 
@@ -31,7 +31,7 @@ Radio, 1985, N6
 
 #define MASTER_CLOCK    (4000000)
 #define V_TOTAL_PONG    315
-#define H_TOTAL_PONG    256		// tbc
+#define H_TOTAL_PONG    256     // tbc
 
 class tp1983_state : public driver_device
 {
@@ -141,5 +141,5 @@ ROM_START( tp1985 ) /* dummy to satisfy game entry*/
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
 
-SYST(  1983, tp1983, 0, 0, tp1983,   tp1983,    tp1983_state,   empty_init, "Radio", "TV Test Pattern Generator 1983", MACHINE_NO_SOUND_HW)
+SYST(  1983, tp1983, 0, 0, tp1983,   tp1983,    tp1983_state,   empty_init, "Radio", "TV Test Pattern Generator 1983", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
 SYST(  1985, tp1985, 0, 0, tp1985,   tp1985,    tp1985_state,   empty_init, "Radio", "TV Test Pattern Generator 1985", MACHINE_NO_SOUND_HW)

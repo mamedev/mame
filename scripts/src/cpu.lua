@@ -2780,3 +2780,20 @@ if (_OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/nuon/nuondasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/nuon/nuondasm.h")
 end
+
+--------------------------------------------------
+-- DEC Alpha (EV4/EV5/EV6/EV7) series
+--@src/devices/cpu/alpha/alpha.h,CPUS["ALPHA"] = true
+--------------------------------------------------
+
+if (CPUS["ALPHA"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/cpu/alpha/alpha.cpp",
+		MAME_DIR .. "src/devices/cpu/alpha/alpha.h",
+	}
+end
+
+if (CPUS["ALPHA"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/alpha/alphad.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/alpha/alphad.h")
+end

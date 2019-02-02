@@ -400,6 +400,48 @@ void nscsi_harddisk_device::scsi_command()
 		scsi_status_complete(SS_GOOD);
 		break;
 
+	case SC_RECIEVE_DIAG_RES: {
+		LOG("command RECIEVE DIAGNOSTICS RESULTS");
+		int size = (scsi_cmdbuf[3] << 8) | scsi_cmdbuf[4];
+		int pos = 0;
+		scsi_cmdbuf[pos++] = 0;
+		scsi_cmdbuf[pos++] = 6;
+		scsi_cmdbuf[pos++] = 0; // ROM is OK
+		scsi_cmdbuf[pos++] = 0; // RAM is OK
+		scsi_cmdbuf[pos++] = 0; // Data buffer is OK
+		scsi_cmdbuf[pos++] = 0; // Interface is OK
+		scsi_cmdbuf[pos++] = 0;
+		if(size > pos)
+			size = pos;
+		scsi_data_in(0, size);
+		scsi_status_complete(SS_GOOD);
+		break;
+	}
+
+	case SC_SEND_DIAGNOSTICS: {
+		LOG("command SEND DIAGNOSTICS");
+		int size = (scsi_cmdbuf[3] << 8) | scsi_cmdbuf[4];
+		if(scsi_cmdbuf[1] & 4) {
+			// Self-test
+			scsi_status_complete(SS_GOOD);
+			break;
+		}
+		int pos = 0;
+		scsi_cmdbuf[pos++] = 0;
+		scsi_cmdbuf[pos++] = 6;
+		scsi_cmdbuf[pos++] = 0; // ROM is OK
+		scsi_cmdbuf[pos++] = 0; // RAM is OK
+		scsi_cmdbuf[pos++] = 0; // Data buffer is OK
+		scsi_cmdbuf[pos++] = 0; // Interface is OK
+		scsi_cmdbuf[pos++] = 0;
+		scsi_cmdbuf[pos++] = 0;
+		if(size > pos)
+			size = pos;
+		scsi_data_in(0, size);
+		scsi_status_complete(SS_GOOD);
+		break;
+	}
+
 	case SC_READ_CAPACITY: {
 		LOG("command READ CAPACITY\n");
 

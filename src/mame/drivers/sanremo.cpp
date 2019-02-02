@@ -202,15 +202,15 @@ WRITE8_MEMBER(sanremo_state::lamps_w)
 {
 	/*  LAMPS:
 
-		7654 3210
-		---- ---x  DISCARD 1
-		---- --x-  DISCARD 2
-		---- -x--  DISCARD 3
-		---- x---  DISCARD 4
-		---x ----  DISCARD 5
-		--x- ----  START
-		-x-- ----  BET
-		x--- ----  (always on)
+	    7654 3210
+	    ---- ---x  DISCARD 1
+	    ---- --x-  DISCARD 2
+	    ---- -x--  DISCARD 3
+	    ---- x---  DISCARD 4
+	    ---x ----  DISCARD 5
+	    --x- ----  START
+	    -x-- ----  BET
+	    x--- ----  (always on)
 	*/
 	for (int n = 0; n < 7; n++)
 		m_lamps[n] = BIT(data, n);
@@ -220,9 +220,9 @@ WRITE8_MEMBER(sanremo_state::banksel_w)
 {
 	/*  GFX banks selector.
 
-		7654 3210
-		---x xxxx  GFX banks selector
-		xxx- ----  unknown
+	    7654 3210
+	    ---x xxxx  GFX banks selector
+	    xxx- ----  unknown
 	*/
 	m_banksel = data & 0x1f;
 }

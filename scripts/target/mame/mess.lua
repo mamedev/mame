@@ -136,6 +136,7 @@ CPUS["MB86901"] = true
 CPUS["NANOPROCESSOR"] = true
 CPUS["CLIPPER"] = true
 CPUS["CAPRICORN"] = true
+CPUS["ALPHA"] = true
 --CPUS["DSPP"] = true
 
 --------------------------------------------------
@@ -3500,6 +3501,10 @@ files {
 	MAME_DIR .. "src/mame/machine/xavix_mtrk_wheel.h",
 	MAME_DIR .. "src/mame/machine/xavix_madfb_ball.cpp",
 	MAME_DIR .. "src/mame/machine/xavix_madfb_ball.h",
+	MAME_DIR .. "src/mame/machine/xavix_io.cpp",
+	MAME_DIR .. "src/mame/machine/xavix_io.h",
+	MAME_DIR .. "src/mame/machine/xavix2002_io.cpp",
+	MAME_DIR .. "src/mame/machine/xavix2002_io.h",
 }
 
 createMESSProjects(_target, _subtarget, "ultimachine")
@@ -3937,6 +3942,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/testpat.cpp",
 	MAME_DIR .. "src/mame/machine/nl_tp1983.cpp",
 	MAME_DIR .. "src/mame/machine/nl_tp1985.cpp",
+	MAME_DIR .. "src/mame/drivers/palestra.cpp",
+	MAME_DIR .. "src/mame/machine/nl_palestra.cpp",
 }
 
 end

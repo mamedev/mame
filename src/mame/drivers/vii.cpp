@@ -6,17 +6,17 @@
 
         Systems which run on the SPG243 SoC
 
-		die markings show
-		"SunPlus QL8041" ( known as Sunplus SPG240? )
-		JAKKS WWE
-		Fantastic 4
-		Justice League
-		Dora the Explorer
-		Mattel Classic Sports
+        die markings show
+        "SunPlus QL8041" ( known as Sunplus SPG240? )
+        JAKKS WWE
+        Fantastic 4
+        Justice League
+        Dora the Explorer
+        Mattel Classic Sports
 
-		"SunPlus QL8041C" ( known as Sunplus SPG2?? ) see clickstart.cpp instead
+        "SunPlus QL8041C" ( known as Sunplus SPG2?? ) see clickstart.cpp instead
 
-		"SunPlus PA7801" ( known as Sunplus SPG110? ) see spg110.cpp instead
+        "SunPlus PA7801" ( known as Sunplus SPG110? ) see spg110.cpp instead
 
     Status:
 
@@ -35,9 +35,9 @@
             Game seems unhappy with NVRAM, clears contents on each boot.
         rad_skat:
             Palette issues on the High Score screen.
-		rad_fb2:
-			sometimes when selecting QB training camp the sprites don't appear
-			controls are not properly mapped
+        rad_fb2:
+            sometimes when selecting QB training camp the sprites don't appear
+            controls are not properly mapped
         vii:
             When loading a cart from file manager, sometimes MAME will crash.
             The "MOTOR" option in the diagnostic menu does nothing when selected.
@@ -45,17 +45,17 @@
             On 'vii_vc1' & 'vii_vc2' cart, the left-right keys are transposed with the up-down keys.
             - This is not a bug per se, as the games are played with the controller physically rotated 90 degrees.
 
-	Note:
-		Cricket, Skateboarder, Skannerz and Football 2 list a 32-bit checksum at the start of ROM.
-		This is the byte sum of the file, excluding the first 16 byte (where the checksum is stored)
+    Note:
+        Cricket, Skateboarder, Skannerz and Football 2 list a 32-bit checksum at the start of ROM.
+        This is the byte sum of the file, excluding the first 16 byte (where the checksum is stored)
 
-		Test Modes:
-		Justice League : press UP, DOWN, LEFT, BT3 on the JAKKS logo in that order, quickly, to get test menu
-		WWE : press UP, BT1, BT2 together during startup logos
+        Test Modes:
+        Justice League : press UP, DOWN, LEFT, BT3 on the JAKKS logo in that order, quickly, to get test menu
+        WWE : press UP, BT1, BT2 together during startup logos
 
 
-	TODO:
-		Work out how to access the hidden TEST menus for all games (most JAKKS games should have one at least)
+    TODO:
+        Work out how to access the hidden TEST menus for all games (most JAKKS games should have one at least)
 
     Also on this hardware:
 
@@ -172,6 +172,7 @@ public:
 	void jakks_gkr_2m(machine_config &config);
 	void jakks_gkr_nk(machine_config &config);
 	void jakks_gkr_dy(machine_config &config);
+	void jakks_gkr_sw(machine_config &config);
 
 private:
 	virtual void machine_start() override;
@@ -349,7 +350,7 @@ READ16_MEMBER(jakks_gkr_state::jakks_porta_key_io_r)
 
 WRITE16_MEMBER(jakks_gkr_state::jakks_porta_key_io_w)
 {
-	//logerror("%s: jakks_porta_key_io_w %04x\n", machine().describe_context(), data);
+	logerror("%s: jakks_porta_key_io_w %04x\n", machine().describe_context(), data);
 	// only seen 0xffff and 0x0000 written here.. writes 0xffff before the 2nd part of the port a gamekey check read.
 	if (data == 0xffff)
 	{
@@ -442,11 +443,28 @@ static INPUT_PORTS_START( walle )
 	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_BUTTON1 )        PORT_PLAYER(1) PORT_NAME("A Button")
 	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_BUTTON2 )        PORT_PLAYER(1) PORT_NAME("B Button")
 
-	PORT_START("C")
+	PORT_START("P3")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, spg2xx_game_state,i2c_r, nullptr)
 	PORT_BIT( 0xfffe, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( jak_sith )
+	PORT_START("P1")
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON3 )
+	PORT_BIT( 0xf3df, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P3")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, spg2xx_game_state,i2c_r, nullptr)
+	PORT_BIT( 0xfffe, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("JOYX")
+	PORT_BIT(0x0fff, 0x0000, IPT_AD_STICK_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_MINMAX(0x00,0x0fff)
+
+	PORT_START("JOYY")
+	PORT_BIT(0x0fff, 0x0000, IPT_AD_STICK_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_MINMAX(0x00,0x0fff)
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( jak_gkr )
 	PORT_START("P1")
@@ -459,7 +477,7 @@ static INPUT_PORTS_START( jak_gkr )
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON3 )
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON4 )
 
-	PORT_START("C")
+	PORT_START("P3")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, spg2xx_game_state,i2c_r, nullptr)
 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
@@ -930,6 +948,7 @@ void jakks_gkr_state::jakks_gkr(machine_config &config)
 
 	m_spg->porta_in().set(FUNC(jakks_gkr_state::jakks_porta_key_io_r));
 	m_spg->porta_out().set(FUNC(jakks_gkr_state::jakks_porta_key_io_w));
+	//m_spg->portb_in().set_ioport("P2");
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "jakks_gamekey");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
@@ -962,12 +981,21 @@ void jakks_gkr_state::jakks_gkr_dy(machine_config &config)
 	SOFTWARE_LIST(config, "jakks_gamekey_dy").set_original("jakks_gamekey_dy");
 }
 
+void jakks_gkr_state::jakks_gkr_sw(machine_config &config)
+{
+	jakks_gkr(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &jakks_gkr_state::mem_map_1m);
+	m_spg->adc_in<0>().set_ioport("JOYX");
+	m_spg->adc_in<1>().set_ioport("JOYY");
+	SOFTWARE_LIST(config, "jakks_gamekey_sw").set_original("jakks_gamekey_sw");
+}
+
 
 void spg2xx_game_state::walle(machine_config &config)
 {
 	jakks(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_state::mem_map_2m);
-	m_spg->portc_in().set_ioport("C");
+	m_spg->portc_in().set_ioport("P3");
 	m_spg->portc_out().set(FUNC(spg2xx_game_state::walle_portc_w));
 }
 
@@ -1066,6 +1094,10 @@ ROM_START( jak_sdoo )
 	ROM_LOAD16_WORD_SWAP( "jakksscoobydoogkr.bin", 0x000000, 0x400000, CRC(61062ce5) SHA1(9d21767fd855385ef83e4209c429ecd4bf7e5384) )
 ROM_END
 
+ROM_START( jak_sith )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jakksstarwarsgkr.bin", 0x000000, 0x200000, CRC(932cde19) SHA1(b88b748c235e9eeeda574e4d5b4077ae9da6fbd0) )
+ROM_END
 
 
 ROM_START( zone40 )
@@ -1260,17 +1292,17 @@ CONS( 2004, jak_batm, 0, 0, jakks, batman, spg2xx_game_state, empty_init, "JAKKS
 CONS( 2008, jak_wall, 0, 0, walle, walle,  spg2xx_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "Wall-E (JAKKS Pacific TV Game)",              MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // 'Game-Key Ready' JAKKS games (these can also take per-game specific expansion cartridges, although not all games had them released)  Some of these were available in versions without Game-Key ports, it is unconfirmed if code was the same unless otherwise stated
-CONS( 2005, jak_wwe,  0, 0, jakks_gkr_1m, jak_gkr,jakks_gkr_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",          "WWE (JAKKS Pacific TV Game, Game-Key Ready)",            MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // WW (no game-keys released)
-CONS( 2005, jak_fan4, 0, 0, jakks_gkr_1m, jak_gkr,jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Digital Eclipse",     "Fantastic Four (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // F4 (no game-keys released)
-CONS( 2005, jak_just, 0, 0, jakks_gkr_1m, jak_gkr,jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Taniko",              "Justice League (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // DC (no game-keys released)
-CONS( 2005, jak_dora, 0, 0, jakks_gkr_nk, jak_gkr,jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Handheld Games",      "Dora the Explorer - Race To Play Park (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // uses NK keys (same as Nicktoons & Spongebob) (3+ released)
-CONS( 2005, jak_sdoo, 0, 0, jakks_gkr_2m, jak_gkr,jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Jolliford Management","Scooby-Doo! and the Mystery of the Castle (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) //  SD (no game-keys released)
-CONS( 2005, jak_disf, 0, 0, jakks_gkr_dy, jak_gkr,jakks_gkr_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",          "Disney Friends (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // uses DY keys (3 released)
+CONS( 2005, jak_wwe,  0, 0, jakks_gkr_1m, jak_gkr,  jakks_gkr_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",          "WWE (JAKKS Pacific TV Game, Game-Key Ready)",            MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // WW (no game-keys released)
+CONS( 2005, jak_fan4, 0, 0, jakks_gkr_1m, jak_gkr,  jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Digital Eclipse",     "Fantastic Four (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // F4 (no game-keys released)
+CONS( 2005, jak_just, 0, 0, jakks_gkr_1m, jak_gkr,  jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Taniko",              "Justice League (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // DC (no game-keys released)
+CONS( 2005, jak_dora, 0, 0, jakks_gkr_nk, jak_gkr,  jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Handheld Games",      "Dora the Explorer - Race To Play Park (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // uses NK keys (same as Nicktoons & Spongebob) (3+ released)
+CONS( 2005, jak_sdoo, 0, 0, jakks_gkr_2m, jak_gkr,  jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Jolliford Management","Scooby-Doo! and the Mystery of the Castle (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) //  SD (no game-keys released)
+CONS( 2005, jak_disf, 0, 0, jakks_gkr_dy, jak_gkr,  jakks_gkr_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",          "Disney Friends (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // uses DY keys (3 released)
+CONS( 2005, jak_sith, 0, 0, jakks_gkr_sw, jak_sith, jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Griptonite Games",    "Star Wars - Revenge of the Sith (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // uses SW keys (1 released)
 
 // Nicktoons                                   NK (3? keys available) (same keys as Dora the Explorer)
 // SpongeBob SquarePants: The Fry Cook Games   NK (3? keys available)  ^^
 // Namco Ms. Pac-Man                           NM (3 keys available [Dig Dug, New Rally-X], [Rally-X, Pac-Man, Bosconian], [Pac-Man, Bosconian])
-// Star Wars                                   SW (1 key available)
 // Disney Princess                             DP (? keys available)
 // Spider-Man                                  MV (1? key available)
 
