@@ -181,7 +181,7 @@ WRITE16_MEMBER(mcr68_state::archrivl_control_w)
 {
 	COMBINE_DATA(&m_control_word);
 	m_cvsd_sound->reset_write(~m_control_word & 0x0400);
-	m_cvsd_sound->write(space, 0, m_control_word & 0x3ff);
+	m_cvsd_sound->write(m_control_word & 0x3ff);
 }
 
 
