@@ -294,15 +294,11 @@ namespace netlist
 		/* helper - also used by nltool */
 		const pstring resolve_alias(const pstring &name) const;
 
+		/* needed by nltool */
+		std::vector<pstring> get_terminals_for_device_name(const pstring &devname);
+
 		log_type &log();
 		const log_type &log() const;
-
-		//std::vector<std::pair<pstring, factory::element_t *>> m_device_factory;
-		std::unordered_map<pstring, factory::element_t *> m_device_factory;
-
-		std::unordered_map<pstring, pstring> m_alias;
-		std::unordered_map<pstring, pstring> m_param_values;
-		std::unordered_map<pstring, detail::core_terminal_t *> m_terminals;
 
 		/* needed by proxy */
 		detail::core_terminal_t *find_terminal(const pstring &outname_in, const detail::terminal_type atype, bool required = true);
@@ -332,6 +328,13 @@ namespace netlist
 
 		devices::nld_base_proxy *get_d_a_proxy(detail::core_terminal_t &out);
 		devices::nld_base_proxy *get_a_d_proxy(detail::core_terminal_t &inp);
+
+		//std::vector<std::pair<pstring, factory::element_t *>> m_device_factory;
+		std::unordered_map<pstring, factory::element_t *> m_device_factory;
+
+		std::unordered_map<pstring, pstring> m_alias;
+		std::unordered_map<pstring, pstring> m_param_values;
+		std::unordered_map<pstring, detail::core_terminal_t *> m_terminals;
 
 		netlist_t                                   &m_netlist;
 		std::unordered_map<pstring, param_ref_t>    m_params;

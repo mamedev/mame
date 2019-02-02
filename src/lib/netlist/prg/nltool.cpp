@@ -31,21 +31,30 @@ public:
 		opt_quiet(*this,    "q", "quiet",                   "be quiet - no warnings"),
 		opt_version(*this,  "",  "version",                 "display version and exit"),
 		opt_help(*this,     "h", "help",                    "display help and exit"),
+
 		opt_grp2(*this,     "Options for run and static commands",   "These options apply to run and static commands."),
 		opt_name(*this,     "n", "name",        "",         "the netlist in file specified by ""-f"" option to run; default is first one"),
+
 		opt_grp3(*this,     "Options for run command",      "These options are only used by the run command."),
 		opt_ttr (*this,     "t", "time_to_run", 1.0,        "time to run the emulation (seconds)"),
 		opt_logs(*this,     "l", "log" ,                    "define terminal to log. This option may be specified repeatedly."),
 		opt_inp(*this,      "i", "input",       "",         "input file to process (default is none)"),
 		opt_loadstate(*this,"",  "loadstate",   "",         "load state from file and continue from there"),
 		opt_savestate(*this,"",  "savestate",   "",         "save state to file at end of run"),
+
 		opt_grp4(*this,     "Options for convert command",  "These options are only used by the convert command."),
 		opt_type(*this,     "y", "type",        0,          std::vector<pstring>({"spice","eagle","rinf"}), "type of file to be converted: spice,eagle,rinf"),
+
+		opt_grp5(*this,     "Options for header command",  "These options are only used by the header command."),
+		opt_tabwidth(*this, "", "tab-width", 4,          "Tab width for output."),
+		opt_linewidth(*this,"", "line-width", 72,       "Line width for output."),
 
 		opt_ex1(*this,     "nltool -c run -t 3.5 -f nl_examples/cdelay.c -n cap_delay",
 				"Run netlist \"cap_delay\" from file nl_examples/cdelay.c for 3.5 seconds"),
 		opt_ex2(*this,     "nltool --cmd=listdevices",
-				"List all known devices.")
+				"List all known devices."),
+		opt_ex3(*this,     "nltool --cmd=header --tab-width=8 --line-width=80",
+				"Create the header file needed for including netlists as code.")
 		{}
 
 	plib::option_group  opt_grp1;
@@ -67,8 +76,12 @@ public:
 	plib::option_str    opt_savestate;
 	plib::option_group  opt_grp4;
 	plib::option_str_limit<unsigned> opt_type;
+	plib::option_group  opt_grp5;
+	plib::option_num<unsigned> opt_tabwidth;
+	plib::option_num<unsigned> opt_linewidth;
 	plib::option_example opt_ex1;
 	plib::option_example opt_ex2;
+	plib::option_example opt_ex3;
 
 	int execute();
 	pstring usage();
@@ -261,7 +274,6 @@ void netlist_tool_callbacks_t::vlog(const plib::plog_level &l, const pstring &ls
 		throw netlist::nl_exception(err);
 }
 
-
 struct input_t
 {
 	input_t(const netlist::setup_t &setup, const pstring &line)
@@ -429,13 +441,26 @@ void tool_app_t::static_compile()
 
 void tool_app_t::mac_out(const pstring &s, const bool cont)
 {
-	static constexpr unsigned RIGHT = 72;
 	if (cont)
 	{
-		unsigned adj = 0;
+		unsigned pos = 0;
+		pstring r;
 		for (const auto &x : s)
-			adj += (x == '\t' ? 3 : 0);
-		pout("{1}\\\n", plib::rpad(s, pstring(" "), RIGHT-1-adj));
+		{
+			if (x == '\t')
+			{
+				auto pos_mod_4 = pos % opt_tabwidth();
+				auto tab_adj = opt_tabwidth() - pos_mod_4;
+				r += plib::rpad(pstring(""), pstring(" "), tab_adj);
+				pos += tab_adj;
+			}
+			else
+			{
+				r += x;
+				pos++;
+			}
+		}
+		pout("{1}\\\n", plib::rpad(r, pstring(" "), opt_linewidth()-1));
 	}
 	else
 		pout("{1}\n", s);
@@ -604,42 +629,12 @@ void tool_app_t::listdevices()
 	for (auto & f : list)
 	{
 		pstring out = plib::pfmt("{1:-20} {2}(<id>")(f->classname())(f->name());
-		std::vector<pstring> terms;
 
 		f->macro_actions(nt.setup().netlist(), f->name() + "_lc");
 		auto d = f->Create(nt.setup().netlist(), f->name() + "_lc");
 		// get the list of terminals ...
 
-		for (auto & t : nt.setup().m_terminals)
-		{
-			if (plib::startsWith(t.second->name(), d->name()))
-			{
-				pstring tn(t.second->name().substr(d->name().length()+1));
-				if (tn.find(".") == pstring::npos)
-					terms.push_back(tn);
-			}
-		}
-
-		for (auto & t : nt.setup().m_alias)
-		{
-			if (plib::startsWith(t.first, d->name()))
-			{
-				pstring tn(t.first.substr(d->name().length()+1));
-				//printf("\t%s %s %s\n", t.first.c_str(), t.second.c_str(), tn.c_str());
-				if (tn.find(".") == pstring::npos)
-				{
-					terms.push_back(tn);
-					pstring resolved = nt.setup().resolve_alias(t.first);
-					//printf("\t%s %s %s\n", t.first.c_str(), t.second.c_str(), resolved.c_str());
-					if (resolved != t.first)
-					{
-						auto found = std::find(terms.begin(), terms.end(), resolved.substr(d->name().length()+1));
-						if (found!=terms.end())
-							terms.erase(found);
-					}
-				}
-			}
-		}
+		std::vector<pstring> terms(nt.setup().get_terminals_for_device_name(d->name()));
 
 		out += "," + f->param_desc();
 		for (auto p : plib::psplit(f->param_desc(),",") )

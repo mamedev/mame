@@ -136,9 +136,7 @@ namespace netlist
 			{
 				if (QueueOp::equal(*i, elem))
 				{
-					--m_end;
-					for (;i < m_end; ++i)
-						*i = std::move(*(i+1));
+					std::copy(i+1, m_end--, i);
 					return;
 				}
 			}

@@ -295,6 +295,42 @@ const pstring setup_t::resolve_alias(const pstring &name) const
 	return ret;
 }
 
+std::vector<pstring> setup_t::get_terminals_for_device_name(const pstring &devname)
+{
+	std::vector<pstring> terms;
+	for (auto & t : m_terminals)
+	{
+		if (plib::startsWith(t.second->name(), devname))
+		{
+			pstring tn(t.second->name().substr(devname.length()+1));
+			if (tn.find(".") == pstring::npos)
+				terms.push_back(tn);
+		}
+	}
+
+	for (auto & t : m_alias)
+	{
+		if (plib::startsWith(t.first, devname))
+		{
+			pstring tn(t.first.substr(devname.length()+1));
+			//printf("\t%s %s %s\n", t.first.c_str(), t.second.c_str(), tn.c_str());
+			if (tn.find(".") == pstring::npos)
+			{
+				terms.push_back(tn);
+				pstring resolved = resolve_alias(t.first);
+				//printf("\t%s %s %s\n", t.first.c_str(), t.second.c_str(), resolved.c_str());
+				if (resolved != t.first)
+				{
+					auto found = std::find(terms.begin(), terms.end(), resolved.substr(devname.length()+1));
+					if (found!=terms.end())
+						terms.erase(found);
+				}
+			}
+		}
+	}
+	return terms;
+}
+
 detail::core_terminal_t *setup_t::find_terminal(const pstring &terminal_in, bool required)
 {
 	const pstring &tname = resolve_alias(terminal_in);
@@ -371,9 +407,6 @@ devices::nld_base_proxy *setup_t::get_d_a_proxy(detail::core_terminal_t &out)
 		auto new_proxy =
 				out_cast.logic_family()->create_d_a_proxy(netlist(), x, &out_cast);
 		m_proxy_cnt++;
-
-		//new_proxy->start_dev();
-
 		/* connect all existing terminals to new net */
 
 		for (auto & p : out.net().m_core_terms)
