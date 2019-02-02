@@ -987,7 +987,7 @@ void ay8910_device::ay8910_write_reg(int r, int v)
 				if ((m_mode & 0xa) == 0xa) // AY8930 expanded mode
 					logerror("warning: activated unemulated extended mode at %s, bank %02x\n", name(), m_mode & 1);
 				else if (m_mode & 0xf)
-					logerror("warning: activated unknown mode %02x at %s", m_mode & 0xf, name());
+					logerror("warning: activated unknown mode %02x at %s\n", m_mode & 0xf, name());
 			}
 			if ( (v & 0x0f) > 0)
 				osd_printf_verbose("EShape\n");
