@@ -1463,8 +1463,8 @@ void konamim2_state::install_m48t58()
 
 void konamim2_state::install_ymz280b()
 {
-	read8_delegate read_delegate(FUNC(ymz280b_device::read), &(*m_ymz280b));
-	write8_delegate write_delegate(FUNC(ymz280b_device::write), &(*m_ymz280b));
+	read8sm_delegate read_delegate(FUNC(ymz280b_device::read), &(*m_ymz280b));
+	write8sm_delegate write_delegate(FUNC(ymz280b_device::write), &(*m_ymz280b));
 
 	m_ppc1->space(AS_PROGRAM).install_readwrite_handler(0x3e800000, 0x3e80000f, read_delegate, write_delegate, 0xff00ff0000000000ULL);
 	m_ppc2->space(AS_PROGRAM).install_readwrite_handler(0x3e800000, 0x3e80000f, read_delegate, write_delegate, 0xff00ff0000000000ULL);
