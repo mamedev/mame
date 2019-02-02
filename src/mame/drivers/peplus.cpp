@@ -1399,7 +1399,7 @@ MACHINE_CONFIG_START(peplus_state::peplus)
 	m_crtc->set_on_update_addr_change_callback(FUNC(peplus_state::crtc_addr), this);
 	m_crtc->out_vsync_callback().set(FUNC(peplus_state::crtc_vsync));
 
-	X2404P(config, m_i2cmem);
+	I2C_X2404P(config, m_i2cmem);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

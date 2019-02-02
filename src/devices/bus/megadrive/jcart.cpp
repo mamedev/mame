@@ -81,13 +81,15 @@ md_seprom_mm96_device::md_seprom_mm96_device(const machine_config &mconfig, cons
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(md_seprom_codemast_device::device_add_mconfig)
-	MCFG_24C08_ADD("i2cmem")
-MACHINE_CONFIG_END
+void md_seprom_codemast_device::device_add_mconfig(machine_config &config)
+{
+	I2C_24C08(config, m_i2cmem);
+}
 
-MACHINE_CONFIG_START(md_seprom_mm96_device::device_add_mconfig)
-	MCFG_24C16A_ADD("i2cmem")
-MACHINE_CONFIG_END
+void md_seprom_mm96_device::device_add_mconfig(machine_config &config)
+{
+	I2C_24C16A(config, m_i2cmem);
+}
 
 
 static INPUT_PORTS_START( jcart_ipt )
