@@ -984,7 +984,9 @@ void ay8910_device::ay8910_write_reg(int r, int v)
 			if (chip_type == AY8930)
 			{
 				if ((v & 0xa0) == 0xa0) // AY8930 expanded mode
-					logerror("warning: activated unemulated extended mode at %s, bank %02x\n", name(), v & 1);
+					logerror("warning: activated unemulated extended mode at %s, bank %02x\n", name(), (v >> 4) & 1);
+				else if (v & 0xf0)
+					logerror("warning: activated unknown mode %02x at %s", (v >> 4) & 0xf, name());
 			}
 			if ( (v & 0x0f) > 0)
 				osd_printf_verbose("EShape\n");
