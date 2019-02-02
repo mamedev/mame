@@ -37440,32 +37440,34 @@ ti74                            // 1985 TI-74
 ti95                            // 1986 TI-95
 
 @source:ti85.cpp
-ti73                            // 1998 TI-73 Explorer
-ti73b                           // 20?? TI-73 Explorer (Bootleg)
-ti81                            // 1990 TI-81 (Z80 2 MHz)
-ti81v2                          // 1994 TI-81 v2.0 (Z80 2 MHz)
-ti82                            // 1993 TI-82 (Z80 6 MHz)
-ti83                            // 1996 TI-83 (Z80 6 MHz)
-ti83p                           // 1999 TI-83 Plus (Boot Code 1.00) (Z80 6 MHz)
-ti83pb                          // 20?? TI-83 Plus (Bootleg) (Z80 6 MHz)
-ti83pse                         // 2001 TI-83 Plus Silver Edition (Boot Code 1.00)
-ti83pseb                        // 20?? TI-83 Plus Silver Edition (Bootleg)
-ti84p                           // 2004 TI-84 Plus (Boot Code 1.00)
-ti84pv2                         // 200? TI-84 Plus (Boot Code 1.02)
-ti84pv3                         // 2011 TI-84 Plus (Boot Code 1.03)
-ti84pb                          // 20?? TI-84 Plus (Bootleg)
-ti84pse                         // 2004 TI-84 Plus Silver Edition (Boot Code 1.00)
-ti84psev3                       // 2011 TI-84 Plus Silver Edition (Boot Code 1.03)
-ti84pseb                        // 20?? TI-84 Plus Silver Edition (Bootleg)
-ti84pob                         // 201? TI-84 Plus Orion (Bootleg)
-ti84pov2                        // 201? TI-84 Plus Orion (Boot Code 1.02)
-ti84pov3                        // 201? TI-84 Plus Orion (Boot Code 1.03)
-ti84pcse                        // 20?? TI-84 Plus Color Silver Edition (Boot Code 4.0)
-ti84pce                         // 2015 TI-84 Plus Color Edition (Boot Code 5.00)
-ti84pcev15                      // 2016 TI-84 Plus Color Edition (Boot Code 5.15)
-ti84pcev30                      // 2017 TI-84 Plus Color Edition (Boot Code 5.30)
-ti85                            // 1992 TI-85 (Z80 6 MHz)
-ti86                            // 1997 TI-86 (Z80 6 MHz)
+ti84pob                         //
+ti84pov2                        //
+ti84pov3                        //
+ti73                            //
+ti73b                           //
+ti81                            //
+ti81v2                          //
+ti82                            //
+ti83                            //
+ti83p                           //
+ti83pb                          //
+ti83pse                         //
+ti83pseb                        //
+ti83pcev15                      //
+ti84p                           //
+ti84pv2                         //
+ti84pv3                         //
+ti84pb                          //
+ti84pcse                        //
+ti84pcsev2                      //
+ti84pce                         //
+ti84pcev15                      //
+ti84pcev30                      //
+ti84pse                         //
+ti84psev3                       //
+ti84pseb                        //
+ti85                            //
+ti86                            //
 
 @source:ti89.cpp
 ti89                            // 1998 TI-89
