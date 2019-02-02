@@ -103,7 +103,7 @@ void pingpong_state::pingpong_map(address_map &map)
 	map(0xa980, 0xa980).portr("DSW2");
 	map(0xa000, 0xa000).w(FUNC(pingpong_state::coin_w));   /* coin counters + irq enables */
 	map(0xa200, 0xa200).nopw();        /* SN76496 data latch */
-	map(0xa400, 0xa400).w("snsnd", FUNC(sn76496_device::command_w));    /* trigger read */
+	map(0xa400, 0xa400).w("snsnd", FUNC(sn76496_device::write));    /* trigger read */
 	map(0xa600, 0xa600).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 }
 
@@ -125,7 +125,7 @@ void pingpong_state::merlinmm_map(address_map &map)
 	map(0xa100, 0xa100).portr("IN2");
 	map(0xa180, 0xa180).portr("IN3");
 	map(0xa200, 0xa200).nopw();        /* SN76496 data latch */
-	map(0xa400, 0xa400).w("snsnd", FUNC(sn76496_device::command_w));    /* trigger read */
+	map(0xa400, 0xa400).w("snsnd", FUNC(sn76496_device::write));    /* trigger read */
 	map(0xa600, 0xa600).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 }
 

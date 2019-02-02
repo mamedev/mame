@@ -985,7 +985,7 @@ void centiped_state::bullsdrt_port_map(address_map &map)
 
 void centiped_state::bullsdrt_data_map(address_map &map)
 {
-	map(S2650_DATA_PORT, S2650_DATA_PORT).r(FUNC(centiped_state::bullsdrt_data_port_r)).w("snsnd", FUNC(sn76496_device::command_w));
+	map(S2650_DATA_PORT, S2650_DATA_PORT).r(FUNC(centiped_state::bullsdrt_data_port_r)).w("snsnd", FUNC(sn76496_device::write));
 }
 
 

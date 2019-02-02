@@ -298,7 +298,7 @@ void rx78_state::rx78_io(address_map &map)
 	map(0xf5, 0xfb).w(FUNC(rx78_state::vdp_reg_w)); //vdp
 	map(0xfc, 0xfc).w(FUNC(rx78_state::vdp_bg_reg_w)); //vdp
 	map(0xfe, 0xfe).w(FUNC(rx78_state::vdp_pri_mask_w));
-	map(0xff, 0xff).w("sn1", FUNC(sn76489a_device::command_w)); //psg
+	map(0xff, 0xff).w("sn1", FUNC(sn76489a_device::write)); //psg
 }
 
 /* Input ports */

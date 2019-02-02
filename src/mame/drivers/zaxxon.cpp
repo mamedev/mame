@@ -500,9 +500,9 @@ void zaxxon_state::congo_sound_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x4000, 0x47ff).mirror(0x1800).ram();
-	map(0x6000, 0x6000).mirror(0x1fff).w("sn1", FUNC(sn76489a_device::command_w));
+	map(0x6000, 0x6000).mirror(0x1fff).w("sn1", FUNC(sn76489a_device::write));
 	map(0x8000, 0x8003).mirror(0x1ffc).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xa000, 0xa000).mirror(0x1fff).w("sn2", FUNC(sn76489a_device::command_w));
+	map(0xa000, 0xa000).mirror(0x1fff).w("sn2", FUNC(sn76489a_device::write));
 }
 
 

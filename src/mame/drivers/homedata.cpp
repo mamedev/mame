@@ -501,7 +501,7 @@ void homedata_state::mrokumei_map(address_map &map)
 	map(0x8000, 0x8000).w(FUNC(homedata_state::mrokumei_blitter_start_w)); // in some games also ROM bank switch to access service ROM
 	map(0x8001, 0x8001).w(FUNC(homedata_state::mrokumei_keyboard_select_w));
 	map(0x8002, 0x8002).w(FUNC(homedata_state::mrokumei_sound_cmd_w));
-	map(0x8003, 0x8003).w(m_sn, FUNC(sn76489a_device::command_w));
+	map(0x8003, 0x8003).w(m_sn, FUNC(sn76489a_device::write));
 	map(0x8006, 0x8006).w(FUNC(homedata_state::homedata_blitter_param_w));
 	map(0x8007, 0x8007).w(FUNC(homedata_state::mrokumei_blitter_bank_w));
 	map(0x8000, 0xffff).rom();

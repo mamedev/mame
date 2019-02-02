@@ -189,7 +189,7 @@ void mz_state::mz800_io(address_map &map)
 	map(0xeb, 0xeb).w(FUNC(mz_state::mz800_ramaddr_w));
 	map(0xf0, 0xf0).portr("atari_joy1").w(FUNC(mz_state::mz800_palette_w));
 	map(0xf1, 0xf1).portr("atari_joy2");
-	map(0xf2, 0xf2).w("sn76489n", FUNC(sn76489_device::command_w));
+	map(0xf2, 0xf2).w("sn76489n", FUNC(sn76489_device::write));
 	map(0xfc, 0xff).rw("z80pio", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 }
 

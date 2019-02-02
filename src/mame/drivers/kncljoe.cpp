@@ -57,8 +57,8 @@ void kncljoe_state::main_map(address_map &map)
 	map(0xd804, 0xd804).portr("DSWB");
 	map(0xd800, 0xd800).w(FUNC(kncljoe_state::sound_cmd_w));
 	map(0xd801, 0xd801).w(FUNC(kncljoe_state::kncljoe_control_w));
-	map(0xd802, 0xd802).w("sn1", FUNC(sn76489_device::command_w));
-	map(0xd803, 0xd803).w("sn2", FUNC(sn76489_device::command_w));
+	map(0xd802, 0xd802).w("sn1", FUNC(sn76489_device::write));
+	map(0xd803, 0xd803).w("sn2", FUNC(sn76489_device::write));
 	map(0xd807, 0xd807).nopr();     /* unknown read */
 	map(0xd817, 0xd817).nopr();     /* unknown read */
 	map(0xe800, 0xefff).ram().share("spriteram");

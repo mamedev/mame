@@ -242,8 +242,8 @@ void markham_state::markham_slave_map(address_map &map)
 	map(0x0000, 0x5fff).rom();
 	map(0x8000, 0x87ff).ram().share("share1");
 
-	map(0xc000, 0xc000).w("sn1", FUNC(sn76496_device::command_w));
-	map(0xc001, 0xc001).w("sn2", FUNC(sn76496_device::command_w));
+	map(0xc000, 0xc000).w("sn1", FUNC(sn76496_device::write));
+	map(0xc001, 0xc001).w("sn2", FUNC(sn76496_device::write));
 
 	map(0xc002, 0xc002).nopw(); /* unknown */
 	map(0xc003, 0xc003).nopw(); /* unknown */
@@ -255,8 +255,8 @@ void markham_state::strnskil_slave_map(address_map &map)
 	map(0xc000, 0xc7ff).ram().share("spriteram");
 	map(0xc800, 0xcfff).ram().share("share1");
 
-	map(0xd801, 0xd801).w("sn1", FUNC(sn76496_device::command_w));
-	map(0xd802, 0xd802).w("sn2", FUNC(sn76496_device::command_w));
+	map(0xd801, 0xd801).w("sn1", FUNC(sn76496_device::write));
+	map(0xd802, 0xd802).w("sn2", FUNC(sn76496_device::write));
 }
 
 /****************************************************************************/

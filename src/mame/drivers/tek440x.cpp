@@ -159,7 +159,7 @@ void tek440x_state::maincpu_map(address_map &map)
 	map(0x780000, 0x781fff).ram(); // map registers
 	// 782000-783fff: video address registers
 	// 784000-785fff: video control registers
-	map(0x788000, 0x788000).w("snsnd", FUNC(sn76496_device::command_w));
+	map(0x788000, 0x788000).w("snsnd", FUNC(sn76496_device::write));
 	// 78a000-78bfff: NS32081 FPU
 	map(0x78c000, 0x78c007).rw("aica", FUNC(mos6551_device::read), FUNC(mos6551_device::write)).umask16(0xff00);
 	// 7b1000-7b2fff: diagnostic registers

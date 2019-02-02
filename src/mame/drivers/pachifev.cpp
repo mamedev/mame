@@ -157,8 +157,8 @@ void pachifev_state::pachifev_map(address_map &map)
 	map(0xff08, 0xff08).portr("DSW3");
 	map(0xff10, 0xff10).rw("tms9928a", FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));
 	map(0xff12, 0xff12).rw("tms9928a", FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));
-	map(0xff20, 0xff20).w("y2404_1", FUNC(y2404_device::command_w));
-	map(0xff30, 0xff30).w("y2404_2", FUNC(y2404_device::command_w));
+	map(0xff20, 0xff20).w("y2404_1", FUNC(y2404_device::write));
+	map(0xff30, 0xff30).w("y2404_2", FUNC(y2404_device::write));
 	map(0xff40, 0xff40).w(FUNC(pachifev_state::controls_w));
 	map(0xff50, 0xff50).nopw(); /* unknown */
 	map(0xfffa, 0xfffb).noprw(); /* decrementer */

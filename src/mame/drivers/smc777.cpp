@@ -755,7 +755,7 @@ void smc777_state::smc777_io(address_map &map)
 	// TODO: address bit 8 selects joy port 2
 	map(0x51, 0x51).mirror(0xff00).portr("JOY_1P").w(FUNC(smc777_state::color_mode_w));
 	map(0x52, 0x52).select(0xff00).w(FUNC(smc777_state::ramdac_w));
-	map(0x53, 0x53).mirror(0xff00).w("sn1", FUNC(sn76489a_device::command_w));
+	map(0x53, 0x53).mirror(0xff00).w("sn1", FUNC(sn76489a_device::write));
 //  map(0x54, 0x59) vrt controller
 //  map(0x5a, 0x5b) ram banking
 //  map(0x70, 0x70) auto-start ROM (ext-ROM)

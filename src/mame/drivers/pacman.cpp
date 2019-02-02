@@ -1376,8 +1376,8 @@ void pacman_state::writeport(address_map &map)
 void pacman_state::vanvan_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x01, 0x01).w("sn1", FUNC(sn76496_device::command_w));
-	map(0x02, 0x02).w("sn2", FUNC(sn76496_device::command_w));
+	map(0x01, 0x01).w("sn1", FUNC(sn76496_device::write));
+	map(0x02, 0x02).w("sn2", FUNC(sn76496_device::write));
 }
 
 void pacman_state::dremshpr_portmap(address_map &map)
@@ -1417,7 +1417,7 @@ void pacman_state::bigbucks_portmap(address_map &map)
 
 void pacman_state::s2650games_dataport(address_map &map)
 {
-	map(S2650_DATA_PORT, S2650_DATA_PORT).w("sn1", FUNC(sn76496_device::command_w));
+	map(S2650_DATA_PORT, S2650_DATA_PORT).w("sn1", FUNC(sn76496_device::write));
 }
 
 void pacman_state::drivfrcp_portmap(address_map &map)

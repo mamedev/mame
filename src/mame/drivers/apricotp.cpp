@@ -446,7 +446,7 @@ void fp_state::fp_io(address_map &map)
 	map(0x020, 0x020).w("cent_data_out", FUNC(output_latch_device::bus_w));
 	map(0x022, 0x022).w(FUNC(fp_state::pint_clr_w));
 	map(0x024, 0x024).r(FUNC(fp_state::prtr_snd_r));
-	map(0x026, 0x026).w(SN76489AN_TAG, FUNC(sn76489a_device::command_w));
+	map(0x026, 0x026).w(SN76489AN_TAG, FUNC(sn76489a_device::write));
 	map(0x028, 0x028).w(FUNC(fp_state::contrast_w));
 	map(0x02a, 0x02a).w(FUNC(fp_state::palette_w));
 	map(0x02e, 0x02f).w(FUNC(fp_state::video_w));

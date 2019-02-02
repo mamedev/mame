@@ -166,9 +166,9 @@ void senjyo_state::senjyo_sound_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x4000, 0x43ff).ram();
-	map(0x8000, 0x8000).w("sn1", FUNC(sn76496_device::command_w));
-	map(0x9000, 0x9000).w("sn2", FUNC(sn76496_device::command_w));
-	map(0xa000, 0xa000).w("sn3", FUNC(sn76496_device::command_w));
+	map(0x8000, 0x8000).w("sn1", FUNC(sn76496_device::write));
+	map(0x9000, 0x9000).w("sn2", FUNC(sn76496_device::write));
+	map(0xa000, 0xa000).w("sn3", FUNC(sn76496_device::write));
 	map(0xd000, 0xd000).w(FUNC(senjyo_state::volume_w));
 }
 
@@ -231,9 +231,9 @@ void senjyo_state::starforb_sound_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x4000, 0x43ff).ram();
-	map(0x8000, 0x8000).w("sn1", FUNC(sn76496_device::command_w));
-	map(0x9000, 0x9000).w("sn2", FUNC(sn76496_device::command_w));
-	map(0xa000, 0xa000).w("sn3", FUNC(sn76496_device::command_w));
+	map(0x8000, 0x8000).w("sn1", FUNC(sn76496_device::write));
+	map(0x9000, 0x9000).w("sn2", FUNC(sn76496_device::write));
+	map(0xa000, 0xa000).w("sn3", FUNC(sn76496_device::write));
 	map(0xd000, 0xd000).w(FUNC(senjyo_state::volume_w));
 	map(0xf000, 0xffff).ram();
 }

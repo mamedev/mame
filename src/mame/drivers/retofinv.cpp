@@ -220,8 +220,8 @@ void retofinv_state::sound_map(address_map &map)
 	map(0x2000, 0x27ff).ram(); /* 6116 sram at IC28 */
 	map(0x4000, 0x4000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x6000, 0x6000).w(FUNC(retofinv_state::cpu2_m6000_w));
-	map(0x8000, 0x8000).w("sn1", FUNC(sn76489a_device::command_w));
-	map(0xa000, 0xa000).w("sn2", FUNC(sn76489a_device::command_w));
+	map(0x8000, 0x8000).w("sn1", FUNC(sn76489a_device::write));
+	map(0xa000, 0xa000).w("sn2", FUNC(sn76489a_device::write));
 	map(0xe000, 0xffff).rom();         /* space for diagnostic ROM */
 }
 

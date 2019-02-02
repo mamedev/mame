@@ -123,8 +123,8 @@ void sbugger_state::sbugger_map(address_map &map)
 void sbugger_state::sbugger_io_map(address_map &map)
 {
 	map(0xe0, 0xe7).rw("i8156", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
-	map(0xe8, 0xe8).w("sn76489.1", FUNC(sn76489_device::command_w));
-	map(0xe9, 0xe9).w("sn76489.2", FUNC(sn76489_device::command_w));
+	map(0xe8, 0xe8).w("sn76489.1", FUNC(sn76489_device::write));
+	map(0xe9, 0xe9).w("sn76489.2", FUNC(sn76489_device::write));
 }
 
 

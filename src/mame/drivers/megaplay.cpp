@@ -617,7 +617,7 @@ READ8_MEMBER(mplay_state::vdp1_count_r)
 void mplay_state::megaplay_bios_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x7f, 0x7f).w("sn2", FUNC(sn76496_device::command_w));
+	map(0x7f, 0x7f).w("sn2", FUNC(sn76496_device::write));
 
 	map(0x40, 0x41).mirror(0x3e).r(FUNC(mplay_state::vdp1_count_r));
 	map(0x80, 0x80).mirror(0x3e).rw(m_vdp1, FUNC(sega315_5124_device::data_read), FUNC(sega315_5124_device::data_write));

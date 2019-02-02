@@ -102,7 +102,7 @@ void wico_state::hcpu_map(address_map &map)
 	map(0x1fe2, 0x1fe2).w(FUNC(wico_state::muxen_w));
 	//AM_RANGE(0x1fe3, 0x1fe3) AM_WRITE(csols_w)
 	map(0x1fe4, 0x1fe4).noprw();
-	map(0x1fe5, 0x1fe5).w("sn76494", FUNC(sn76494_device::command_w));
+	map(0x1fe5, 0x1fe5).w("sn76494", FUNC(sn76494_device::write));
 	map(0x1fe6, 0x1fe6).w(FUNC(wico_state::wdogcl_w));
 	map(0x1fe7, 0x1fe7).w(FUNC(wico_state::zcres_w));
 	map(0x1fe8, 0x1fe8).w(FUNC(wico_state::dled0_w));
@@ -125,7 +125,7 @@ void wico_state::ccpu_map(address_map &map)
 	map(0x1fe2, 0x1fe2).w(FUNC(wico_state::muxen_w)); // digit to display on diagnostic LED; d0=L will disable main displays
 	map(0x1fe3, 0x1fe3).w(FUNC(wico_state::csols_w)); // solenoid column
 	map(0x1fe4, 0x1fe4).w(FUNC(wico_state::msols_w)); // solenoid row
-	map(0x1fe5, 0x1fe5).w("sn76494", FUNC(sn76494_device::command_w));
+	map(0x1fe5, 0x1fe5).w("sn76494", FUNC(sn76494_device::write));
 	map(0x1fe6, 0x1fe6).w(FUNC(wico_state::wdogcl_w)); // watchdog clear
 	map(0x1fe7, 0x1fe7).w(FUNC(wico_state::zcres_w)); // enable IRQ on hcpu
 	map(0x1fe8, 0x1fe8).w(FUNC(wico_state::dled0_w)); // turn off diagnostic LED

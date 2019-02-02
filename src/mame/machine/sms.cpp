@@ -543,7 +543,7 @@ WRITE8_MEMBER(sms_state::gg_psg_stereo_w)
 	if (m_cartslot->exists() && m_cartslot->get_sms_mode())
 		return;
 
-	m_psg_gg->stereo_w(space, offset, data, mem_mask);
+	m_psg_gg->stereo_w(data);
 }
 
 

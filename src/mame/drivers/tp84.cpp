@@ -242,9 +242,9 @@ void tp84_state::audio_map(address_map &map)
 	map(0x8000, 0x8000).r(FUNC(tp84_state::tp84_sh_timer_r));
 	map(0xa000, 0xa1ff).w(FUNC(tp84_state::tp84_filter_w));
 	map(0xc000, 0xc000).nopw();
-	map(0xc001, 0xc001).w("y2404_1", FUNC(y2404_device::command_w));
-	map(0xc003, 0xc003).w("y2404_2", FUNC(y2404_device::command_w));
-	map(0xc004, 0xc004).w("y2404_3", FUNC(y2404_device::command_w));
+	map(0xc001, 0xc001).w("y2404_1", FUNC(y2404_device::write));
+	map(0xc003, 0xc003).w("y2404_2", FUNC(y2404_device::write));
+	map(0xc004, 0xc004).w("y2404_3", FUNC(y2404_device::write));
 }
 
 
