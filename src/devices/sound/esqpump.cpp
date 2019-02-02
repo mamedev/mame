@@ -63,13 +63,14 @@ void esq_5505_5510_pump_device::device_stop()
 
 void esq_5505_5510_pump_device::device_reset()
 {
-	m_timer->adjust(attotime::zero);
+	m_timer->adjust(attotime::zero, 0, attotime::from_hz(clock()));
 	m_timer->enable(true);
 }
 
 void esq_5505_5510_pump_device::device_clock_changed()
 {
 	m_stream->set_sample_rate(clock());
+	m_timer->adjust(attotime::zero, 0, attotime::from_hz(clock()));
 }
 
 void esq_5505_5510_pump_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
@@ -177,5 +178,4 @@ void esq_5505_5510_pump_device::sound_stream_update(sound_stream &stream, stream
 void esq_5505_5510_pump_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) {
 	// ecery time there's a new sample period, update the stream!
 	m_stream->update();
-	m_timer->adjust(attotime::from_hz(clock()));
 }
