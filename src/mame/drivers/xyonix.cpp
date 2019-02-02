@@ -173,8 +173,8 @@ void xyonix_state::main_map(address_map &map)
 void xyonix_state::port_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x20, 0x20).nopr().w("sn1", FUNC(sn76496_device::command_w));   /* SN76496 ready signal */
-	map(0x21, 0x21).nopr().w("sn2", FUNC(sn76496_device::command_w));
+	map(0x20, 0x20).nopr().w("sn1", FUNC(sn76496_device::write));   /* SN76496 ready signal */
+	map(0x21, 0x21).nopr().w("sn2", FUNC(sn76496_device::write));
 	map(0x40, 0x40).w(FUNC(xyonix_state::nmiack_w));
 	map(0x50, 0x50).w(FUNC(xyonix_state::irqack_w));
 	map(0x60, 0x61).nopw();        /* mc6845 */

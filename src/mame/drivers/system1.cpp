@@ -835,8 +835,8 @@ void system1_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).mirror(0x1800).ram();
-	map(0xa000, 0xa000).mirror(0x1fff).w("sn1", FUNC(sn76489a_device::command_w));
-	map(0xc000, 0xc000).mirror(0x1fff).w("sn2", FUNC(sn76489a_device::command_w));
+	map(0xa000, 0xa000).mirror(0x1fff).w("sn1", FUNC(sn76489a_device::write));
+	map(0xc000, 0xc000).mirror(0x1fff).w("sn2", FUNC(sn76489a_device::write));
 	map(0xe000, 0xe000).mirror(0x1fff).r(FUNC(system1_state::sound_data_r));
 }
 

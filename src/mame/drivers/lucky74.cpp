@@ -937,11 +937,11 @@ void lucky74_state::lucky74_map(address_map &map)
 	map(0xf000, 0xf003).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));           // Input Ports 0 & 1
 	map(0xf080, 0xf083).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));           // DSW 1, 2 & 3
 	map(0xf0c0, 0xf0c3).rw("ppi8255_3", FUNC(i8255_device::read), FUNC(i8255_device::write));           // DSW 4
-	map(0xf100, 0xf100).w("sn1", FUNC(sn76489_device::command_w));                                      // SN76489 #1
+	map(0xf100, 0xf100).w("sn1", FUNC(sn76489_device::write));                                      // SN76489 #1
 	map(0xf200, 0xf203).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));           // Input Ports 2 & 4
-	map(0xf300, 0xf300).w("sn2", FUNC(sn76489_device::command_w));                                      // SN76489 #2
+	map(0xf300, 0xf300).w("sn2", FUNC(sn76489_device::write));                                      // SN76489 #2
 	map(0xf400, 0xf400).w("aysnd", FUNC(ay8910_device::address_w));                                     // YM2149 control
-	map(0xf500, 0xf500).w("sn3", FUNC(sn76489_device::command_w));                                      // SN76489 #3
+	map(0xf500, 0xf500).w("sn3", FUNC(sn76489_device::write));                                      // SN76489 #3
 	map(0xf600, 0xf600).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));          // YM2149 (Input Port 1)
 	map(0xf700, 0xf701).rw(FUNC(lucky74_state::usart_8251_r), FUNC(lucky74_state::usart_8251_w));       // USART 8251 port
 	map(0xf800, 0xf803).rw(FUNC(lucky74_state::copro_sm7831_r), FUNC(lucky74_state::copro_sm7831_w));   // SM7831 Co-Processor

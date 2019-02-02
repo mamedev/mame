@@ -562,7 +562,7 @@ void tutor_state::tutor_memmap(address_map &map)
 	map(0xe000, 0xe000).rw("tms9928a", FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));    /*VDP data*/
 	map(0xe002, 0xe002).rw("tms9928a", FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));/*VDP status*/
 	map(0xe100, 0xe1ff).rw(FUNC(tutor_state::tutor_mapper_r), FUNC(tutor_state::tutor_mapper_w));   /*cartridge mapper*/
-	map(0xe200, 0xe200).w("sn76489a", FUNC(sn76489a_device::command_w));    /*sound chip*/
+	map(0xe200, 0xe200).w("sn76489a", FUNC(sn76489a_device::write));    /*sound chip*/
 	map(0xe800, 0xe8ff).rw(FUNC(tutor_state::tutor_printer_r), FUNC(tutor_state::tutor_printer_w)); /*printer*/
 	map(0xee00, 0xeeff).nopr().w(FUNC(tutor_state::tutor_cassette_w));     /*cassette interface*/
 
@@ -579,7 +579,7 @@ void tutor_state::pyuutajr_mem(address_map &map)
 	map(0xe000, 0xe000).rw("tms9928a", FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));    /*VDP data*/
 	map(0xe002, 0xe002).rw("tms9928a", FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));/*VDP status*/
 	map(0xe100, 0xe1ff).rw(FUNC(tutor_state::tutor_mapper_r), FUNC(tutor_state::tutor_mapper_w));   /*cartridge mapper*/
-	map(0xe200, 0xe200).w("sn76489a", FUNC(sn76489a_device::command_w));    /*sound chip*/
+	map(0xe200, 0xe200).w("sn76489a", FUNC(sn76489a_device::write));    /*sound chip*/
 	map(0xe800, 0xe800).portr("LINE0");
 	map(0xea00, 0xea00).portr("LINE1");
 	map(0xec00, 0xec00).portr("LINE2");

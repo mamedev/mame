@@ -37,8 +37,8 @@ void shaolins_state::shaolins_map(address_map &map)
 	map(0x0000, 0x0000).w(FUNC(shaolins_state::nmi_w));   /* bit 0 = flip screen, bit 1 = nmi enable, bit 2 = ? */
 														/* bit 3, bit 4 = coin counters */
 	map(0x0100, 0x0100).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x0300, 0x0300).w("sn1", FUNC(sn76489a_device::command_w)); /* trigger chip to read from latch. The program always */
-	map(0x0400, 0x0400).w("sn2", FUNC(sn76489a_device::command_w)); /* writes the same number as the latch, so we don't */
+	map(0x0300, 0x0300).w("sn1", FUNC(sn76489a_device::write)); /* trigger chip to read from latch. The program always */
+	map(0x0400, 0x0400).w("sn2", FUNC(sn76489a_device::write)); /* writes the same number as the latch, so we don't */
 															/* bother emulating them. */
 	map(0x0500, 0x0500).portr("DSW1");
 	map(0x0600, 0x0600).portr("DSW2");

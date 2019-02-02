@@ -122,8 +122,8 @@ void ladybug_state::ladybug_map(address_map &map)
 	map(0x9002, 0x9002).portr("DSW0");
 	map(0x9003, 0x9003).portr("DSW1");
 	map(0xa000, 0xa007).w("videolatch", FUNC(ls259_device::write_d0));
-	map(0xb000, 0xbfff).w("sn1", FUNC(sn76489_device::command_w));
-	map(0xc000, 0xcfff).w("sn2", FUNC(sn76489_device::command_w));
+	map(0xb000, 0xbfff).w("sn1", FUNC(sn76489_device::write));
+	map(0xc000, 0xcfff).w("sn2", FUNC(sn76489_device::write));
 	map(0xd000, 0xd7ff).rw(m_video, FUNC(ladybug_video_device::bg_r), FUNC(ladybug_video_device::bg_w));
 	map(0xe000, 0xe000).portr("IN2");
 }
@@ -165,11 +165,11 @@ void sraider_state::sraider_cpu2_map(address_map &map)
 void sraider_state::sraider_cpu2_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w("sn1", FUNC(sn76489_device::command_w));
-	map(0x08, 0x08).w("sn2", FUNC(sn76489_device::command_w));
-	map(0x10, 0x10).w("sn3", FUNC(sn76489_device::command_w));
-	map(0x18, 0x18).w("sn4", FUNC(sn76489_device::command_w));
-	map(0x20, 0x20).w("sn5", FUNC(sn76489_device::command_w));
+	map(0x00, 0x00).w("sn1", FUNC(sn76489_device::write));
+	map(0x08, 0x08).w("sn2", FUNC(sn76489_device::write));
+	map(0x10, 0x10).w("sn3", FUNC(sn76489_device::write));
+	map(0x18, 0x18).w("sn4", FUNC(sn76489_device::write));
+	map(0x20, 0x20).w("sn5", FUNC(sn76489_device::write));
 	map(0x28, 0x3f).w(FUNC(sraider_state::sraider_misc_w));  // lots unknown
 }
 

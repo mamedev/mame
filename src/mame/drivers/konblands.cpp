@@ -160,7 +160,7 @@ void konblands_state::konblands_map(address_map &map)
 	map(0x1005, 0x1005).nopw(); // enable audio
 	map(0x1006, 0x1006).w(FUNC(konblands_state::irq_enable_w));
 	map(0x1007, 0x1007).w(FUNC(konblands_state::firq_enable_w));
-	map(0x1800, 0x1800).portr("INPUTS").w("sn", FUNC(sn76496_device::command_w));
+	map(0x1800, 0x1800).portr("INPUTS").w("sn", FUNC(sn76496_device::write));
 	map(0x4000, 0x47ff).ram().share("vram");
 	map(0x4800, 0x4bff).ram();
 	map(0x5800, 0x5800).nopw(); // watchdog
@@ -178,7 +178,7 @@ void konblands_state::konblandsh_map(address_map &map)
 	map(0x0807, 0x0807).nopr().w(FUNC(konblands_state::firq_enable_w));
 	map(0x0c00, 0x0c00).portr("INPUTS");
 	map(0x1000, 0x1000).portr("DSW1");
-	map(0x1400, 0x1400).w("sn", FUNC(sn76496_device::command_w));
+	map(0x1400, 0x1400).w("sn", FUNC(sn76496_device::write));
 	map(0x1800, 0x1800).nopw(); // sn latch
 	map(0x2000, 0x27ff).ram().share("vram");
 	map(0x2800, 0x2fff).ram();

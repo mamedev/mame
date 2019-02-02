@@ -87,9 +87,9 @@ void drmicro_state::drmicro_map(address_map &map)
 void drmicro_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).portr("P1").w("sn1", FUNC(sn76496_device::command_w));
-	map(0x01, 0x01).portr("P2").w("sn2", FUNC(sn76496_device::command_w));
-	map(0x02, 0x02).w("sn3", FUNC(sn76496_device::command_w));
+	map(0x00, 0x00).portr("P1").w("sn1", FUNC(sn76496_device::write));
+	map(0x01, 0x01).portr("P2").w("sn2", FUNC(sn76496_device::write));
+	map(0x02, 0x02).w("sn3", FUNC(sn76496_device::write));
 	map(0x03, 0x03).portr("DSW1").w(FUNC(drmicro_state::pcm_set_w));
 	map(0x04, 0x04).portr("DSW2").w(FUNC(drmicro_state::nmi_enable_w));
 	map(0x05, 0x05).noprw(); // unused? / watchdog?

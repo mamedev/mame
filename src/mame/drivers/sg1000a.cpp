@@ -324,7 +324,7 @@ void sg1000a_state::decrypted_opcodes_map(address_map &map)
 void sg1000a_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x7f, 0x7f).w("snsnd", FUNC(sn76489a_device::command_w));
+	map(0x7f, 0x7f).w("snsnd", FUNC(sn76489a_device::write));
 	map(0xbe, 0xbe).rw("tms9928a", FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));
 	map(0xbf, 0xbf).rw("tms9928a", FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));
 	map(0xdc, 0xdf).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
@@ -333,7 +333,7 @@ void sg1000a_state::io_map(address_map &map)
 void sg1000a_state::sderby_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x40, 0x40).mirror(0x3f).w("snsnd", FUNC(sn76489a_device::command_w));
+	map(0x40, 0x40).mirror(0x3f).w("snsnd", FUNC(sn76489a_device::write));
 	map(0x80, 0x80).mirror(0x3e).rw("tms9928a", FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));
 	map(0x81, 0x81).mirror(0x3e).rw("tms9928a", FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));
 //  map(0xc0, 0xc1).mirror(0x06) NEC D8251AC UART

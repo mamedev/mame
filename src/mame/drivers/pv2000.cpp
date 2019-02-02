@@ -205,7 +205,7 @@ void pv2000_state::pv2000_io_map(address_map &map)
 	map(0x20, 0x20).rw(FUNC(pv2000_state::keys_lo_r), FUNC(pv2000_state::keys_w));
 
 	//sn76489a
-	map(0x40, 0x40).r(FUNC(pv2000_state::keys_mod_r)).w("sn76489a", FUNC(sn76489a_device::command_w));
+	map(0x40, 0x40).r(FUNC(pv2000_state::keys_mod_r)).w("sn76489a", FUNC(sn76489a_device::write));
 
 	/* Cassette input. Gets hit a lot after a GLOAD command */
 	map(0x60, 0x60).rw(FUNC(pv2000_state::cass_in), FUNC(pv2000_state::cass_out));
