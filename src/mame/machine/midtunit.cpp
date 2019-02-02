@@ -546,7 +546,7 @@ WRITE16_MEMBER(midtunit_state::midtunit_sound_w)
 			case SOUND_ADPCM:
 			case SOUND_ADPCM_LARGE:
 				m_adpcm_sound->reset_write(~data & 0x100);
-				m_adpcm_sound->write(space, offset, data & 0xff);
+				m_adpcm_sound->write(data & 0xff);
 
 				/* the games seem to check for $82 loops, so this should be just barely enough */
 				m_fake_sound_state = 128;

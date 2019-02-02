@@ -155,13 +155,13 @@ WRITE8_MEMBER(midyunit_state::yawdim_oki_bank_w)
 
 CUSTOM_INPUT_MEMBER(midyunit_state::narc_talkback_strobe_r)
 {
-	return (m_narc_sound->read(machine().dummy_space(), 0) >> 8) & 1;
+	return (m_narc_sound->read() >> 8) & 1;
 }
 
 
 CUSTOM_INPUT_MEMBER(midyunit_state::narc_talkback_data_r)
 {
-	return m_narc_sound->read(machine().dummy_space(), 0) & 0xff;
+	return m_narc_sound->read() & 0xff;
 }
 
 
