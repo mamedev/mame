@@ -242,6 +242,7 @@ const double XTAL::known_xtals[] = {
 	 17'734'472, /* 17.734472_MHz_XTAL     actually ~4x PAL subcarrier */
 	 17'971'200, /* 17.9712_MHz_XTAL       Compucolor II, Hazeltine Esprit III */
 	 18'000'000, /* 18_MHz_XTAL            S.A.R, Ikari Warriors 3 */
+	 18'414'000, /* 18.414_MHz_XTAL        Ann Arbor Ambassador */
 	 18'432'000, /* 18.432_MHz_XTAL        Extremely common, used on 100's of PCBs (48000 * 384) */
 	 18'480'000, /* 18.48_MHz_XTAL         Wyse WY-100 video */
 	 18'575'000, /* 18.575_MHz_XTAL        Visual 102, Visual 220 */
