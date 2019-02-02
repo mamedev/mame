@@ -105,9 +105,12 @@ public:
 	{ }
 
 	void xavix(machine_config &config);
-	void xavixp(machine_config &config);
-	void xavix2000(machine_config &config);
 	void xavix_nv(machine_config &config);
+	
+	void xavixp(machine_config &config);
+	void xavixp_nv(machine_config &config);
+	
+	void xavix2000(machine_config &config);
 	void xavix2000_nv(machine_config &config);
 
 	void xavix2002(machine_config &config);

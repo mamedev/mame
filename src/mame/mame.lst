@@ -33107,6 +33107,8 @@ rad_bb3
 rad_bb3p
 rad_hnt3
 rad_hnt3p
+rad_bask
+rad_baskp
 
 @source:rad_eu3a05.cpp
 rad_sinv
@@ -36295,7 +36297,10 @@ humlan                          // (c) 2001 Subsino & Truemax
 mtrain                          // (c) 1996 Subsino
 new2001                         // (c) 2000 Subsino
 ptrain                          // (c) 1999 Subsino
-queenbee                        // (c) 2001 Subsino
+queenbee                        // (c) 2001 American Alpha
+queenbeeb                       // (c) 2001 Subsino
+queenbeei                       // (c) 2001 Subsino
+queenbeesa                      // (c) 2001 Subsino
 saklove                         // (c) 1998 Subsino
 squeenb                         // (c) 2002 Subsino
 wtrnymph                        // (c) 1996 Subsino
@@ -39803,6 +39808,10 @@ epo_sdb                         //
 epo_guru                        //
 epo_dmon                        //
 rad_rh                          //
+rad_ssx                         //
+rad_ssxp                        //
+rad_sbw                         //
+rad_bdp                         //
 has_wamg                        //
 ekara                           //
 ekaraa                          //

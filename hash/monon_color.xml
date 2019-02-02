@@ -58,13 +58,25 @@
   </software>
 
   <software name="mechcycl"> <!-- 103 - Mech Cyclone: Fighting Masters -->
-	<description>Jī jiǎ xuànfēng-gédòu dàshī</description>
+	<description>Jī jiǎ xuànfēng-gédòu dàshī (set 1)</description>
 	<year>2011</year>
 	<publisher>M&amp;D</publisher>
 	<info name="alt_title" value="机甲旋风-格斗大师"/>
 	<part name="cart" interface="monon_color_cart">
 	  <dataarea name="rom" size="0x1000000">
 		<rom name="103.bin" size="0x0800000" crc="441d5f9d" sha1="2ec85c5225b7ed0291b13f5d3bc57a9ef0153b5e" offset="0" />
+	  </dataarea>
+	</part>
+  </software>
+
+  <software name="mechcycla" cloneof="mechcycl"> <!-- 103 - Mech Cyclone: Fighting Masters -->
+	<description>Jī jiǎ xuànfēng-gédòu dàshī (set 2)</description>
+	<year>2011</year>
+	<publisher>M&amp;D</publisher>
+	<info name="alt_title" value="机甲旋风-格斗大师"/>
+	<part name="cart" interface="monon_color_cart">
+	  <dataarea name="rom" size="0x1000000">
+		<rom name="103_alt.bin" size="0x0800000" crc="63bc84fb" sha1="e90e5a60f15d7ebfb83976ccb0183ecc723b5eb4" offset="0" />
 	  </dataarea>
 	</part>
   </software>
