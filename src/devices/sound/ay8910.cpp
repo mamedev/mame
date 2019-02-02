@@ -983,10 +983,11 @@ void ay8910_device::ay8910_write_reg(int r, int v)
 		case AY_ESHAPE:
 			if (chip_type == AY8930)
 			{
-				if ((v & 0xa0) == 0xa0) // AY8930 expanded mode
-					logerror("warning: activated unemulated extended mode at %s, bank %02x\n", name(), (v >> 4) & 1);
-				else if (v & 0xf0)
-					logerror("warning: activated unknown mode %02x at %s", (v >> 4) & 0xf, name());
+				m_mode = (v >> 4) & 0xf;
+				if ((m_mode & 0xa) == 0xa) // AY8930 expanded mode
+					logerror("warning: activated unemulated extended mode at %s, bank %02x\n", name(), m_mode & 1);
+				else if (m_mode & 0xf)
+					logerror("warning: activated unknown mode %02x at %s", m_mode & 0xf, name());
 			}
 			if ( (v & 0x0f) > 0)
 				osd_printf_verbose("EShape\n");
@@ -1233,6 +1234,7 @@ void ay8910_device::ay8910_statesave()
 	save_item(NAME(m_attack));
 	save_item(NAME(m_holding));
 	save_item(NAME(m_rng));
+	save_item(NAME(m_mode));
 }
 
 //-------------------------------------------------
@@ -1541,6 +1543,7 @@ ay8910_device::ay8910_device(const machine_config &mconfig, device_type type, co
 		m_attack(0),
 		m_holding(0),
 		m_rng(0),
+		m_mode(0),
 		m_env_step_mask(psg_type == PSG_TYPE_AY ? 0x0f : 0x1f),
 		m_step(         psg_type == PSG_TYPE_AY ? 2 : 1),
 		m_zero_is_off(  psg_type == PSG_TYPE_AY ? 1 : 0),
