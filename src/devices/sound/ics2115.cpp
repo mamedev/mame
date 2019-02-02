@@ -15,7 +15,7 @@
 //#define ICS2115_ISOLATE 6
 
 // device type definition
-DEFINE_DEVICE_TYPE(ICS2115, ics2115_device, "ics2115", "ICS2115 WaveFront Synthsizer")
+DEFINE_DEVICE_TYPE(ICS2115, ics2115_device, "ics2115", "ICS2115 WaveFront Synthesizer")
 
 ics2115_device::ics2115_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, ICS2115, tag, owner, clock),
@@ -49,9 +49,9 @@ void ics2115_device::device_start()
 	//u-Law table as per MIL-STD-188-113
 	u16 lut[8];
 	u16 lut_initial = 33 << 2;   //shift up 2-bits for 16-bit range.
-	for(int i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 		lut[i] = (lut_initial << i) - lut_initial;
-	for(int i = 0; i < 256; i++)
+	for (int i = 0; i < 256; i++)
 	{
 		u8 exponent = (~i >> 4) & 0x07;
 		u8 mantissa = ~i & 0x0f;
@@ -73,7 +73,7 @@ void ics2115_device::device_start()
 	save_item(NAME(m_active_osc));
 	save_item(NAME(m_vmode));
 
-	for(int i = 0; i < 32; i++)
+	for (int i = 0; i < 32; i++)
 	{
 		save_item(NAME(m_voice[i].osc_conf.value), i);
 		save_item(NAME(m_voice[i].state.value), i);
@@ -109,14 +109,14 @@ void ics2115_device::device_reset()
 	m_vmode = 0;
 	m_irq_on = false;
 	memset(m_voice, 0, sizeof(m_voice));
-	for(auto & elem : m_timer)
+	for (auto & elem : m_timer)
 	{
 		elem.timer->adjust(attotime::never);
 		elem.period = 0;
 		elem.scale = 0;
 		elem.preset = 0;
 	}
-	for(auto & elem : m_voice)
+	for (auto & elem : m_voice)
 	{
 		elem.osc_conf.value = 2;
 		elem.osc.fc = 0;
@@ -379,7 +379,7 @@ void ics2115_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 	memset(outputs[1], 0, samples * sizeof(stream_sample_t));
 
 	bool irq_invalid = false;
-	for(int osc = 0; osc <= m_active_osc; osc++)
+	for (int osc = 0; osc <= m_active_osc; osc++)
 	{
 		ics2115_voice& voice = m_voice[osc];
 
@@ -957,7 +957,7 @@ void ics2115_device::recalc_irq()
 {
 	//Suspect
 	bool irq = (m_irq_pending & m_irq_enabled);
-	for(int i = 0; (!irq) && (i < 32); i++)
+	for (int i = 0; (!irq) && (i < 32); i++)
 		irq |=  m_voice[i].vol_ctrl.bitflags.irq_pending && m_voice[i].osc_conf.bitflags.irq_pending;
 	m_irq_on = irq;
 	if (!m_irq_cb.isnull())
