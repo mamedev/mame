@@ -367,11 +367,12 @@ INPUT_PORTS_END
  * IRQ6 8087
  * IRQ7 ring
  */
-MACHINE_CONFIG_START(gridcomp_state::grid1101)
-	MCFG_DEVICE_ADD("maincpu", I8086, XTAL(15'000'000) / 3)
-	MCFG_DEVICE_PROGRAM_MAP(grid1101_map)
-	MCFG_DEVICE_IO_MAP(grid1101_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(gridcomp_state, irq_callback)
+void gridcomp_state::grid1101(machine_config &config)
+{
+	I8086(config, m_maincpu, XTAL(15'000'000) / 3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gridcomp_state::grid1101_map);
+	m_maincpu->set_addrmap(AS_IO, &gridcomp_state::grid1101_io);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(gridcomp_state::irq_callback));
 
 	MCFG_MACHINE_START_OVERRIDE(gridcomp_state, gridcomp)
 	MCFG_MACHINE_RESET_OVERRIDE(gridcomp_state, gridcomp)
@@ -380,14 +381,14 @@ MACHINE_CONFIG_START(gridcomp_state::grid1101)
 	m_osp->irq().set_inputline("maincpu", 0);
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	MCFG_SCREEN_ADD_MONOCHROME("screen", LCD, rgb_t::amber()) // actually a kind of EL display
-	MCFG_SCREEN_UPDATE_DRIVER(gridcomp_state, screen_update_110x)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(15'000'000)/2, 424, 0, 320, 262, 0, 240) // XXX 66 Hz refresh
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(I80130_TAG, i80130_device, ir3_w))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD)); // actually a kind of EL display
+	screen.set_color(rgb_t::amber());
+	screen.set_screen_update(FUNC(gridcomp_state::screen_update_110x));
+	screen.set_raw(XTAL(15'000'000)/2, 424, 0, 320, 262, 0, 240); // XXX 66 Hz refresh
+	screen.screen_vblank().set(m_osp, FUNC(i80130_device::ir3_w));
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
@@ -411,23 +412,24 @@ MACHINE_CONFIG_START(gridcomp_state::grid1101)
 	hpib.srq_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_srq_w));
 	hpib.atn_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_atn_w));
 	hpib.ren_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_ren_w));
-	MCFG_IEEE488_BUS_ADD()
-	MCFG_IEEE488_EOI_CALLBACK(WRITELINE("hpib", tms9914_device, eoi_w))
-	MCFG_IEEE488_DAV_CALLBACK(WRITELINE("hpib", tms9914_device, dav_w))
-	MCFG_IEEE488_NRFD_CALLBACK(WRITELINE("hpib", tms9914_device, nrfd_w))
-	MCFG_IEEE488_NDAC_CALLBACK(WRITELINE("hpib", tms9914_device, ndac_w))
-	MCFG_IEEE488_IFC_CALLBACK(WRITELINE("hpib", tms9914_device, ifc_w))
-	MCFG_IEEE488_SRQ_CALLBACK(WRITELINE("hpib", tms9914_device, srq_w))
-	MCFG_IEEE488_ATN_CALLBACK(WRITELINE("hpib", tms9914_device, atn_w))
-	MCFG_IEEE488_REN_CALLBACK(WRITELINE("hpib", tms9914_device, ren_w))
-	MCFG_IEEE488_SLOT_ADD("ieee_rem", 0, remote488_devices, nullptr)
+
+	ieee488_device &ieee(IEEE488(config, IEEE488_TAG));
+	ieee.eoi_callback().set("hpib", FUNC(tms9914_device::eoi_w));
+	ieee.dav_callback().set("hpib", FUNC(tms9914_device::dav_w));
+	ieee.nrfd_callback().set("hpib", FUNC(tms9914_device::nrfd_w));
+	ieee.ndac_callback().set("hpib", FUNC(tms9914_device::ndac_w));
+	ieee.ifc_callback().set("hpib", FUNC(tms9914_device::ifc_w));
+	ieee.srq_callback().set("hpib", FUNC(tms9914_device::srq_w));
+	ieee.atn_callback().set("hpib", FUNC(tms9914_device::atn_w));
+	ieee.ren_callback().set("hpib", FUNC(tms9914_device::ren_w));
+	IEEE488_SLOT(config, "ieee_rem", 0, remote488_devices, nullptr);
 
 	I8274_NEW(config, m_uart8274, XTAL(4'032'000));
 
-	MCFG_DEVICE_ADD("modem", I8255, 0)
+	I8255(config, "modem", 0);
 
 	RAM(config, m_ram).set_default_size("256K").set_default_value(0);
-MACHINE_CONFIG_END
+}
 
 void gridcomp_state::grid1109(machine_config &config)
 {
@@ -435,12 +437,12 @@ void gridcomp_state::grid1109(machine_config &config)
 	m_ram->set_default_size("512K");
 }
 
-MACHINE_CONFIG_START(gridcomp_state::grid1121)
+void gridcomp_state::grid1121(machine_config &config)
+{
 	grid1101(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(XTAL(24'000'000) / 3) // XXX
-	MCFG_DEVICE_PROGRAM_MAP(grid1121_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_clock(XTAL(24'000'000) / 3); // XXX
+	m_maincpu->set_addrmap(AS_PROGRAM, &gridcomp_state::grid1121_map);
+}
 
 void gridcomp_state::grid1129(machine_config &config)
 {
@@ -448,12 +450,12 @@ void gridcomp_state::grid1129(machine_config &config)
 	m_ram->set_default_size("512K");
 }
 
-MACHINE_CONFIG_START(gridcomp_state::grid1131)
+void gridcomp_state::grid1131(machine_config &config)
+{
 	grid1121(config);
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(gridcomp_state, screen_update_113x)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(15'000'000)/2, 720, 0, 512, 262, 0, 240) // XXX
-MACHINE_CONFIG_END
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(gridcomp_state::screen_update_113x));
+	subdevice<screen_device>("screen")->set_raw(XTAL(15'000'000)/2, 720, 0, 512, 262, 0, 240); // XXX
+}
 
 void gridcomp_state::grid1139(machine_config &config)
 {

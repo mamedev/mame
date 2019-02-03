@@ -737,9 +737,10 @@ static void hp_ipc_floppies(device_slot_interface &device)
  *  2   HP-HIL devices (keyboard, mouse)
  *  1   Real-time clock
  */
-MACHINE_CONFIG_START(hp_ipc_state::hp_ipc_base)
-	MCFG_DEVICE_ADD("maincpu", M68000, 15.92_MHz_XTAL / 2)
-	MCFG_DEVICE_PROGRAM_MAP(hp_ipc_mem_outer)
+void hp_ipc_state::hp_ipc_base(machine_config &config)
+{
+	M68000(config, m_maincpu, 15.92_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &hp_ipc_state::hp_ipc_mem_outer);
 
 	HP1LL3(config , m_gpu , 24_MHz_XTAL / 8).set_screen("screen");
 
@@ -774,21 +775,23 @@ MACHINE_CONFIG_START(hp_ipc_state::hp_ipc_base)
 	hpib.srq_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_srq_w));
 	hpib.atn_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_atn_w));
 	hpib.ren_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_ren_w));
-	MCFG_IEEE488_BUS_ADD()
-	MCFG_IEEE488_EOI_CALLBACK(WRITELINE("hpib" , tms9914_device , eoi_w))
-	MCFG_IEEE488_DAV_CALLBACK(WRITELINE("hpib" , tms9914_device , dav_w))
-	MCFG_IEEE488_NRFD_CALLBACK(WRITELINE("hpib" , tms9914_device , nrfd_w))
-	MCFG_IEEE488_NDAC_CALLBACK(WRITELINE("hpib" , tms9914_device , ndac_w))
-	MCFG_IEEE488_IFC_CALLBACK(WRITELINE("hpib" , tms9914_device , ifc_w))
-	MCFG_IEEE488_SRQ_CALLBACK(WRITELINE("hpib" , tms9914_device , srq_w))
-	MCFG_IEEE488_ATN_CALLBACK(WRITELINE("hpib" , tms9914_device , atn_w))
-	MCFG_IEEE488_REN_CALLBACK(WRITELINE("hpib" , tms9914_device , ren_w))
-	MCFG_IEEE488_SLOT_ADD("ieee_rem" , 0 , remote488_devices , nullptr)
+
+	ieee488_device &ieee(IEEE488(config, IEEE488_TAG));
+	ieee.eoi_callback().set("hpib" , FUNC(tms9914_device::eoi_w));
+	ieee.dav_callback().set("hpib" , FUNC(tms9914_device::dav_w));
+	ieee.nrfd_callback().set("hpib" , FUNC(tms9914_device::nrfd_w));
+	ieee.ndac_callback().set("hpib" , FUNC(tms9914_device::ndac_w));
+	ieee.ifc_callback().set("hpib" , FUNC(tms9914_device::ifc_w));
+	ieee.srq_callback().set("hpib" , FUNC(tms9914_device::srq_w));
+	ieee.atn_callback().set("hpib" , FUNC(tms9914_device::atn_w));
+	ieee.ren_callback().set("hpib" , FUNC(tms9914_device::ren_w));
+	IEEE488_SLOT(config , "ieee_rem" , 0 , remote488_devices , nullptr);
 
 	RAM(config, RAM_TAG).set_default_size("512K").set_extra_options("768K,1M,1576K,2M,3M,4M,5M,6M,7M,7680K");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(hp_ipc_state::hp_ipc)
+void hp_ipc_state::hp_ipc(machine_config &config)
+{
 	hp_ipc_base(config);
 
 	ADDRESS_MAP_BANK(config, "bankdev").set_map(&hp_ipc_state::hp_ipc_mem_inner_9807a).set_options(ENDIANNESS_BIG, 16, 25, 0x1000000);
@@ -807,9 +810,10 @@ MACHINE_CONFIG_START(hp_ipc_state::hp_ipc)
 	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(hp_ipc_state::hp9808a)
+void hp_ipc_state::hp9808a(machine_config &config)
+{
 	hp_ipc_base(config);
 
 	ADDRESS_MAP_BANK(config, "bankdev").set_map(&hp_ipc_state::hp_ipc_mem_inner_9808a).set_options(ENDIANNESS_BIG, 16, 25, 0x1000000);
@@ -825,7 +829,7 @@ MACHINE_CONFIG_START(hp_ipc_state::hp9808a)
 	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
-MACHINE_CONFIG_END
+}
 
 
 ROM_START(hp_ipc)
