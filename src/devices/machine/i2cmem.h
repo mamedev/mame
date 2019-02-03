@@ -23,28 +23,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_I2CMEM_ADD( _tag ) \
-	MCFG_DEVICE_ADD( _tag, I2CMEM, 0 )
-
-#define MCFG_I2CMEM_ADDRESS( address ) \
-	downcast<i2cmem_device &>(*device).set_address(address);
-#define MCFG_I2CMEM_PAGE_SIZE( page_size ) \
-	downcast<i2cmem_device &>(*device).set_page_size(page_size);
-#define MCFG_I2CMEM_DATA_SIZE(data_size) \
-	downcast<i2cmem_device &>(*device).set_data_size(data_size);
-#define MCFG_I2CMEM_E0(e0) \
-	downcast<i2cmem_device &>(*device).set_e0(e0);
-#define MCFG_I2CMEM_E1(e1) \
-	downcast<i2cmem_device &>(*device).set_e1(e1);
-#define MCFG_I2CMEM_E2(e2) \
-	downcast<i2cmem_device &>(*device).set_e2(e2);
-#define MCFG_I2CMEM_WC(wc) \
-	downcast<i2cmem_device &>(*device).set_wc(wc);
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
