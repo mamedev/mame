@@ -384,6 +384,7 @@ protected:
 	virtual DECLARE_READ16_MEMBER(io_r);
 	virtual DECLARE_WRITE16_MEMBER(io_w);
 
+	void check_extint_irq(int channel);
 	void check_irqs(const uint16_t changed);
 	inline void check_video_irq();
 

@@ -45,7 +45,7 @@ DEFINE_DEVICE_TYPE(SPG28X, spg28x_device, "spg28x", "SPG280-series System-on-a-C
 #define LOG_SIO             (1U << 26)
 #define LOG_EXT_MEM         (1U << 27)
 #define LOG_EXTINT          (1U << 28)
-#define LOG_IO              (LOG_IO_READS | LOG_IO_WRITES | LOG_IRQS | LOG_GPIO | LOG_UART | LOG_I2C | LOG_DMA | LOG_TIMERS | LOG_UNKNOWN_IO)
+#define LOG_IO              (LOG_IO_READS | LOG_IO_WRITES | LOG_IRQS | LOG_GPIO | LOG_UART | LOG_I2C | LOG_DMA | LOG_TIMERS | LOG_EXTINT | LOG_UNKNOWN_IO)
 #define LOG_CHANNELS        (LOG_CHANNEL_READS | LOG_CHANNEL_WRITES)
 #define LOG_SPU             (LOG_SPU_READS | LOG_SPU_WRITES | LOG_UNKNOWN_SPU | LOG_CHANNEL_READS | LOG_CHANNEL_WRITES \
 							| LOG_ENVELOPES | LOG_SAMPLES | LOG_RAMPDOWN | LOG_BEAT)
@@ -1587,6 +1587,11 @@ WRITE16_MEMBER(spg2xx_device::io_w)
 		const uint16_t old = IO_IRQ_STATUS;
 		IO_IRQ_STATUS &= ~data;
 		const uint16_t changed = (old & IO_IRQ_ENABLE) ^ (IO_IRQ_STATUS & IO_IRQ_ENABLE);
+		if (m_uart_rx_irq || m_uart_tx_irq)
+		{
+			LOGMASKED(LOG_IRQS | LOG_UART, "Re-setting UART IRQ due to still-unacknowledged Rx or Tx.\n");
+			IO_IRQ_STATUS |= 0x0100;
+		}
 		if (changed)
 			check_irqs(changed);
 		break;
@@ -2033,19 +2038,24 @@ void spg2xx_device::extint_w(int channel, bool state)
 	m_extint[channel] = state;
 	if (old != state)
 	{
-		LOGMASKED(LOG_EXTINT, "extint state changed, so %sing interrupt\n", state ? "rais" : "lower");
-		const uint16_t mask = (channel == 0) ? 0x0200 : 0x1000;
-		const uint16_t old_irq = IO_IRQ_STATUS;
-		if (state)
-			IO_IRQ_STATUS |= mask;
-		else
-			IO_IRQ_STATUS &= ~mask;
+		check_extint_irq(channel);
+	}
+}
 
-		if (old_irq != IO_IRQ_STATUS)
-		{
-			LOGMASKED(LOG_EXTINT, "extint IRQ changed, so checking interrupts\n");
-			check_irqs(mask);
-		}
+void spg2xx_device::check_extint_irq(int channel)
+{
+	LOGMASKED(LOG_EXTINT, "%sing extint %d interrupt\n", m_extint[channel] ? "rais" : "lower", channel + 1);
+	const uint16_t mask = (channel == 0) ? 0x0200 : 0x1000;
+	const uint16_t old_irq = IO_IRQ_STATUS;
+	if (m_extint[channel])
+		IO_IRQ_STATUS |= mask;
+	else
+		IO_IRQ_STATUS &= ~mask;
+
+	if (old_irq != IO_IRQ_STATUS)
+	{
+		LOGMASKED(LOG_EXTINT, "extint IRQ changed, so checking interrupts\n");
+		check_irqs(mask);
 	}
 }
 

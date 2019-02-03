@@ -33,10 +33,13 @@ public:
 	virtual DECLARE_READ16_MEMBER(bank1_r) { return 0; }
 	virtual DECLARE_READ16_MEMBER(bank2_r) { return 0; }
 	virtual DECLARE_READ16_MEMBER(bank3_r) { return 0; }
-	virtual DECLARE_WRITE16_MEMBER(bank0_w) { printf("0 %08x = %04x\n", offset, data); }
-	virtual DECLARE_WRITE16_MEMBER(bank1_w) { printf("1 %08x = %04x\n", offset, data); }
-	virtual DECLARE_WRITE16_MEMBER(bank2_w) { printf("2 %08x = %04x\n", offset, data); }
-	virtual DECLARE_WRITE16_MEMBER(bank3_w) { printf("3 %08x = %04x\n", offset, data); }
+	virtual DECLARE_WRITE16_MEMBER(bank0_w) { }
+	virtual DECLARE_WRITE16_MEMBER(bank1_w) { }
+	virtual DECLARE_WRITE16_MEMBER(bank2_w) { }
+	virtual DECLARE_WRITE16_MEMBER(bank3_w) { }
+
+	// banking
+	virtual void set_cs2(bool cs2) = 0;
 
 	void rom_alloc(uint32_t size, const char *tag);
 	void nvram_alloc(uint32_t size);
@@ -110,6 +113,9 @@ public:
 	virtual DECLARE_WRITE16_MEMBER(bank1_w);
 	virtual DECLARE_WRITE16_MEMBER(bank2_w);
 	virtual DECLARE_WRITE16_MEMBER(bank3_w);
+
+	// banking
+	void set_cs2(bool cs2);
 
 protected:
 	int m_type;
