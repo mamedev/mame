@@ -336,10 +336,10 @@ WRITE_LINE_MEMBER(bitgraph_state::system_clock_write)
 WRITE16_MEMBER(bitgraph_state::baud_write)
 {
 	DBG_LOG(1,"Baud", ("%04X\n", data));
-	m_dbrgb->write_str(data & 15);      // 2 DBG
-	m_dbrga->write_stt((data >> 4) & 15);   // 1 KBD
-	m_dbrgb->write_stt((data >> 8) & 15);   // 3 PNT
-	m_dbrga->write_str((data >> 12) & 15);  // 0 HOST
+	m_dbrgb->str_w(data & 15);      // 2 DBG
+	m_dbrga->stt_w((data >> 4) & 15);   // 1 KBD
+	m_dbrgb->stt_w((data >> 8) & 15);   // 3 PNT
+	m_dbrga->str_w((data >> 12) & 15);  // 0 HOST
 }
 
 WRITE_LINE_MEMBER(bitgraph_state::com8116_a_fr_w)

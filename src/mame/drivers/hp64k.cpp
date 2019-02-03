@@ -430,7 +430,7 @@ void hp64k_state::machine_reset()
 	m_floppy0_wpt = false;
 	m_floppy1_wpt = false;
 	m_beeper->set_state(0);
-	m_baud_rate->write_str((m_s5_sw->read() >> 1) & 0xf);
+	m_baud_rate->str_w((m_s5_sw->read() >> 1) & 0xf);
 	m_16x_clk = (m_rs232_sw->read() & 0x02) != 0;
 	m_loopback = false;
 	m_txd_state = true;

@@ -251,8 +251,8 @@ INPUT_PORTS_END
 void icebox_state::machine_reset()
 {
 	u8 data = ioport("BAUD")->read();
-	m_brg->write_str(data & 15); // Terminal
-	m_brg->write_stt((data >> 4) & 15); // Printer
+	m_brg->str_w(data & 15); // Terminal
+	m_brg->stt_w((data >> 4) & 15); // Printer
 	m_maincpu->set_pc(0xf000);
 	m_f1 = 0;
 }

@@ -36,15 +36,17 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_acia(*this, "acia%u", 1U)
+		, m_brg(*this, "brg")
 		, m_vtac(*this, "vtac")
 		, m_chargen(*this, "chargen")
+		, m_baud(*this, "BAUD")
 	{
 	}
 
 	void adm31(machine_config &mconfig);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -53,13 +55,17 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device_array<acia6850_device, 2> m_acia;
+	required_device<com8116_device> m_brg;
 	required_device<crt5027_device> m_vtac;
 	required_region_ptr<u8> m_chargen;
+	required_ioport m_baud;
 };
 
 
-void adm31_state::machine_start()
+void adm31_state::machine_reset()
 {
+	// Baud rate switches read by CPU on ADM-42, but not on ADM-31?
+	m_brg->stt_str_w(m_baud->read());
 }
 
 
@@ -274,6 +280,40 @@ static INPUT_PORTS_START(adm31)
 	PORT_DIPNAME(0x80, 0x80, "Polling Option") PORT_DIPLOCATION("S6:8")
 	PORT_DIPSETTING(0x80, "Disable")
 	PORT_DIPSETTING(0x00, "Enable")
+
+	PORT_START("BAUD")
+	PORT_DIPNAME(0x0f, 0x0e, "Modem Baud Rate") PORT_DIPLOCATION("BS1:1,2,3,4")
+	PORT_DIPSETTING(0x00, "50")
+	PORT_DIPSETTING(0x01, "75")
+	PORT_DIPSETTING(0x02, "110")
+	PORT_DIPSETTING(0x03, "134.5")
+	PORT_DIPSETTING(0x04, "150")
+	PORT_DIPSETTING(0x05, "300")
+	PORT_DIPSETTING(0x06, "600")
+	PORT_DIPSETTING(0x07, "1200")
+	PORT_DIPSETTING(0x08, "1800")
+	PORT_DIPSETTING(0x09, "2000")
+	PORT_DIPSETTING(0x0a, "2400")
+	PORT_DIPSETTING(0x0b, "3600")
+	PORT_DIPSETTING(0x0c, "4800")
+	PORT_DIPSETTING(0x0d, "7200")
+	PORT_DIPSETTING(0x0e, "9600")
+	PORT_DIPNAME(0x0f, 0x07, "Printer Baud Rate") PORT_DIPLOCATION("BS2:1,2,3,4")
+	PORT_DIPSETTING(0x00, "50")
+	PORT_DIPSETTING(0x01, "75")
+	PORT_DIPSETTING(0x02, "110")
+	PORT_DIPSETTING(0x03, "134.5")
+	PORT_DIPSETTING(0x04, "150")
+	PORT_DIPSETTING(0x05, "300")
+	PORT_DIPSETTING(0x06, "600")
+	PORT_DIPSETTING(0x07, "1200")
+	PORT_DIPSETTING(0x08, "1800")
+	PORT_DIPSETTING(0x09, "2000")
+	PORT_DIPSETTING(0x0a, "2400")
+	PORT_DIPSETTING(0x0b, "3600")
+	PORT_DIPSETTING(0x0c, "4800")
+	PORT_DIPSETTING(0x0d, "7200")
+	PORT_DIPSETTING(0x0e, "9600")
 INPUT_PORTS_END
 
 void adm31_state::adm31(machine_config &config)
@@ -291,11 +331,11 @@ void adm31_state::adm31(machine_config &config)
 	ACIA6850(config, m_acia[1]);
 	m_acia[0]->irq_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
 
-	com8116_device &brg(COM8116(config, "brg", 5.0688_MHz_XTAL));
-	brg.fr_handler().set(m_acia[0], FUNC(acia6850_device::write_rxc));
-	brg.fr_handler().append(m_acia[0], FUNC(acia6850_device::write_txc));
-	brg.ft_handler().set(m_acia[1], FUNC(acia6850_device::write_rxc));
-	brg.ft_handler().append(m_acia[1], FUNC(acia6850_device::write_txc));
+	COM8116(config, m_brg, 5.0688_MHz_XTAL);
+	m_brg->fr_handler().set(m_acia[0], FUNC(acia6850_device::write_rxc));
+	m_brg->fr_handler().append(m_acia[0], FUNC(acia6850_device::write_txc));
+	m_brg->ft_handler().set(m_acia[1], FUNC(acia6850_device::write_rxc));
+	m_brg->ft_handler().append(m_acia[1], FUNC(acia6850_device::write_txc));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(19.584_MHz_XTAL, 1020, 0, 800, 320, 0, 288);

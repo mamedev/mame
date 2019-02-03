@@ -381,6 +381,6 @@ void softbox_device::ieee488_ifc(int state)
 
 WRITE8_MEMBER( softbox_device::dbrg_w )
 {
-	m_dbrg->write_str(data & 0x0f);
-	m_dbrg->write_stt(data >> 4);
+	m_dbrg->str_w(data & 0x0f);
+	m_dbrg->stt_w(data >> 4);
 }

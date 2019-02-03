@@ -1417,10 +1417,10 @@ WRITE_LINE_MEMBER(rainbow_state::mpsc_irq)
 // PORT 0x06 : Communication bit rates (see page 21 of PC 100 SPEC)
 WRITE8_MEMBER(rainbow_state::comm_bitrate_w)
 {
-	m_dbrg->write_str(data & 0x0f);  // PDF is wrong, low nibble is RECEIVE clock (verified in SETUP).
+	m_dbrg->str_w(data & 0x0f);  // PDF is wrong, low nibble is RECEIVE clock (verified in SETUP).
 	logerror("\n(COMM.) receive bitrate = %d ($%02x)\n", comm_rates[data & 0x0f] , data & 0x0f);
 
-	m_dbrg->write_stt( ((data & 0xf0) >> 4) );
+	m_dbrg->stt_w( ((data & 0xf0) >> 4) );
 	logerror("(COMM.) transmit bitrate = %d ($%02x)\n", comm_rates[((data & 0xf0) >> 4)] ,(data & 0xf0) >> 4);
 }
 
