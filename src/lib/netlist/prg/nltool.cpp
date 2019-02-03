@@ -17,6 +17,8 @@
 
 #include <cstring>
 
+#define NLTOOL_VERSION	20190202
+
 class tool_app_t : public plib::app
 {
 public:
@@ -36,7 +38,7 @@ public:
 		opt_name(*this,     "n", "name",        "",         "the netlist in file specified by ""-f"" option to run; default is first one"),
 
 		opt_grp3(*this,     "Options for run command",      "These options are only used by the run command."),
-		opt_ttr (*this,     "t", "time_to_run", 1.0,        "time to run the emulation (seconds)"),
+		opt_ttr (*this,     "t", "time_to_run", 1.0,        "time to run the emulation (seconds)\n\n  abc def\n\n xyz"),
 		opt_logs(*this,     "l", "log" ,                    "define terminal to log. This option may be specified repeatedly."),
 		opt_inp(*this,      "i", "input",       "",         "input file to process (default is none)"),
 		opt_loadstate(*this,"",  "loadstate",   "",         "load state from file and continue from there"),
@@ -98,6 +100,8 @@ private:
 	void create_docheader();
 
 	void listdevices();
+
+	std::vector<pstring> m_options;
 
 };
 
@@ -186,7 +190,7 @@ public:
 		// read the netlist ...
 
 		for (auto & d : defines)
-			setup().register_define(d);
+			setup().add_define(d);
 
 		for (auto & r : roms)
 			setup().register_source(plib::make_unique_base<netlist::source_t, netlist_data_folder_t>(setup(), r));
@@ -347,7 +351,7 @@ void tool_app_t::run()
 
 	nt.read_netlist(opt_file(), opt_name(),
 			opt_logs(),
-			opt_defines(), opt_rfolders());
+			m_options, opt_rfolders());
 
 	std::vector<input_t> inps = read_input(nt.setup(), opt_inp());
 
@@ -423,7 +427,7 @@ void tool_app_t::static_compile()
 
 	nt.read_netlist(opt_file(), opt_name(),
 			opt_logs(),
-			opt_defines(), opt_rfolders());
+			m_options, opt_rfolders());
 
 	plib::putf8_writer w(&pout_strm);
 	std::map<pstring, pstring> mp;
@@ -543,9 +547,9 @@ void tool_app_t::create_header()
 		if (last_source != e->sourcefile())
 		{
 			last_source = e->sourcefile();
-			pout("{1}\n", plib::rpad(pstring("// "), pstring("-"), 72));
+			pout("{1}\n", plib::rpad(pstring("// "), pstring("-"), opt_linewidth()));
 			pout("{1}{2}\n", pstring("// Source: "), plib::replace_all(e->sourcefile(), "../", ""));
-			pout("{1}\n", plib::rpad(pstring("// "), pstring("-"), 72));
+			pout("{1}\n", plib::rpad(pstring("// "), pstring("-"), opt_linewidth()));
 		}
 		cmac(e.get());
 	}
@@ -697,7 +701,7 @@ int tool_app_t::execute()
 	if (opt_version())
 	{
 		pout(
-			"nltool (netlist) 0.1\n"
+			"nltool (netlist) " PSTRINGIFY(NLTOOL_VERSION) "\n"
 			"Copyright (C) 2019 Couriersud\n"
 			"License GPLv2+: GNU GPL version 2 or later <http://gnu.org/licenses/gpl.html>.\n"
 			"This is free software: you are free to change and redistribute it.\n"
@@ -705,6 +709,9 @@ int tool_app_t::execute()
 			"Written by Couriersud.\n");
 		return 0;
 	}
+
+	m_options = opt_defines();
+	m_options.push_back("NLTOOL_VERSION=" PSTRINGIFY(NLTOOL_VERSION));
 
 	try
 	{

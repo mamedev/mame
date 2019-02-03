@@ -179,7 +179,7 @@ namespace devices
 						m_I[i].activate();
 						//nstate |= (m_I[i]() ? (1 << i) : 0);
 						nstate |= (m_I[i]() << i);
-						mt = std::max(this->m_I[i].net().time(), mt);
+						mt = std::max(this->m_I[i].net().next_scheduled_time(), mt);
 					}
 				else
 					for (std::size_t i = 0; i < m_NI; i++)
@@ -208,7 +208,7 @@ namespace devices
 					{
 						//nstate |= (m_I[i]() ? (1 << i) : 0);
 						nstate |= (m_I[i]() << i);
-						mt = std::max(this->m_I[i].net().time(), mt);
+						mt = std::max(this->m_I[i].net().next_scheduled_time(), mt);
 					}
 				else
 					for (std::size_t i = 0; i < m_NI; i++)

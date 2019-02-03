@@ -152,9 +152,10 @@ public:
 	void remove(const LC *elem) noexcept
 	{
 		auto p = &m_head;
-		for ( ; *p != elem; p = &((*p)->m_next))
+		while(*p != elem)
 		{
 			//nl_assert(*p != nullptr);
+			p = &((*p)->m_next);
 		}
 		(*p) = elem->m_next;
 	}

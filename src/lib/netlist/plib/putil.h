@@ -14,6 +14,10 @@
 #include <algorithm>
 #include <vector> // <<= needed by windows build
 
+#define PSTRINGIFY_HELP(y) # y
+#define PSTRINGIFY(x) PSTRINGIFY_HELP(x)
+
+
 namespace plib
 {
 

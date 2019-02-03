@@ -219,7 +219,7 @@ namespace plib {
 	}
 
 	pstring options::help(pstring description, pstring usage,
-			unsigned width, unsigned indent)
+			unsigned width, unsigned indent) const
 	{
 		pstring ret;
 
@@ -293,7 +293,7 @@ namespace plib {
 		return ret;
 	}
 
-	option *options::getopt_short(pstring arg)
+	option *options::getopt_short(pstring arg) const
 	{
 		for (auto & optbase : m_opts)
 		{
@@ -303,7 +303,7 @@ namespace plib {
 		}
 		return nullptr;
 	}
-	option *options::getopt_long(pstring arg)
+	option *options::getopt_long(pstring arg) const
 	{
 		for (auto & optbase : m_opts)
 		{

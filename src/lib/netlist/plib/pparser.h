@@ -163,7 +163,9 @@ public:
 		pstring m_replace;
 	};
 
-	explicit ppreprocessor(std::vector<define_t> *defines = nullptr);
+	using defines_map_type = std::unordered_map<pstring, define_t>;
+
+	explicit ppreprocessor(defines_map_type *defines = nullptr);
 	virtual ~ppreprocessor() override {}
 
 	template <typename T>
@@ -214,7 +216,7 @@ private:
 	pstring process_line(pstring line);
 	pstring process_comments(pstring line);
 
-	std::unordered_map<pstring, define_t> m_defines;
+	defines_map_type m_defines;
 	std::vector<pstring> m_expr_sep;
 
 	std::uint_least64_t m_ifflag; // 31 if levels

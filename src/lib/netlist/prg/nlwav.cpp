@@ -381,11 +381,11 @@ public:
 	nlwav_app() :
 		plib::app(),
 		opt_fmt(*this,  "f", "format",      0,       std::vector<pstring>({"wav","vcda","vcdd"}),
-			"output format. Available options are wav|vcda|vcdd.\n"
-			"wav  : multichannel wav output\n"
-			"vcda : analog VCD output\n"
-			"vcdd : digital VCD output\n"
-			"Digital signals are created using the high and low options"
+			"output format. Available options are wav|vcda|vcdd."
+			" wav  : multichannel wav output"
+			" vcda : analog VCD output"
+			" vcdd : digital VCD output"
+			" Digital signals are created using the --high and --low options"
 			),
 		opt_out(*this,  "o", "output",      "-",     "output file"),
 		opt_rate(*this, "r", "rate",   48000,        "sample rate of output file"),

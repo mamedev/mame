@@ -732,8 +732,8 @@ namespace netlist
 
 		void update_devs() NL_NOEXCEPT;
 
-		const netlist_time time() const noexcept { return m_time; }
-		void set_time(netlist_time ntime) noexcept { m_time = ntime; }
+		const netlist_time next_scheduled_time() const noexcept { return m_next_scheduled_time; }
+		void set_next_scheduled_time(netlist_time ntime) noexcept { m_next_scheduled_time = ntime; }
 
 		bool isRailNet() const noexcept { return !(m_railterminal == nullptr); }
 		core_terminal_t & railterminal() const noexcept { return *m_railterminal; }
@@ -761,7 +761,7 @@ namespace netlist
 		state_var<netlist_sig_t> m_cur_Q;
 		state_var<queue_status>  m_in_queue;    /* 0: not in queue, 1: in queue, 2: last was taken */
 
-		state_var<netlist_time>  m_time;
+		state_var<netlist_time>  m_next_scheduled_time;
 
 	private:
 		plib::linkedlist_t<core_terminal_t> m_list_active;
@@ -803,7 +803,7 @@ namespace netlist
 			if (newQ != m_new_Q)
 			{
 				m_in_queue = QS_DELAYED_DUE_TO_INACTIVE;
-				m_time = at;
+				m_next_scheduled_time = at;
 			}
 			m_cur_Q = m_new_Q = newQ;
 		}
@@ -1204,8 +1204,8 @@ namespace netlist
 	protected:
 
 		void register_state(plib::state_manager_t &manager, const pstring &module) override;
-		void on_pre_save() override;
-		void on_post_load() override;
+		void on_pre_save(plib::state_manager_t &manager) override;
+		void on_post_load(plib::state_manager_t &manager) override;
 
 	private:
 		std::size_t m_qsize;
@@ -1271,8 +1271,6 @@ namespace netlist
 
 		template <typename T>
 		void register_net(plib::owned_ptr<T> &&net) { m_nets.push_back(std::move(net)); }
-
-		devices::NETLIB_NAME(netlistparams) *m_params;
 
 		template<class device_class>
 		inline std::vector<device_class *> get_device_list()
@@ -1387,11 +1385,10 @@ namespace netlist
 		void print_stats() const;
 
 	private:
-		std::unique_ptr<netlist_state_t>    m_state;
-
 		/* mostly rw */
 		netlist_time                        m_time;
 		devices::NETLIB_NAME(mainclock) *   m_mainclock;
+		std::unique_ptr<netlist_state_t>    m_state;
 		detail::queue_t                     m_queue;
 
 		devices::NETLIB_NAME(solver) *      m_solver;
@@ -1517,13 +1514,48 @@ namespace netlist
 	{
 		if ((num_cons() != 0))
 		{
+			auto &lexec(exec());
+			auto &q(lexec.queue());
+			auto nst(lexec.time() + delay);
+
 			if (is_queued())
-				exec().queue().remove(this);
-			m_time = exec().time() + delay;
+				q.remove(this);
 			m_in_queue = (!m_list_active.empty()) ? QS_QUEUED : QS_DELAYED_DUE_TO_INACTIVE;    /* queued ? */
 			if (m_in_queue == QS_QUEUED)
-				exec().queue().push(queue_t::entry_t(m_time, this));
+				q.push(queue_t::entry_t(nst, this));
+			m_next_scheduled_time = nst;
 		}
+	}
+
+	inline void detail::net_t::add_to_active_list(core_terminal_t &term) NL_NOEXCEPT
+	{
+		if (m_list_active.empty())
+		{
+			m_list_active.push_front(&term);
+			railterminal().device().do_inc_active();
+			if (m_in_queue == QS_DELAYED_DUE_TO_INACTIVE)
+			{
+				if (m_next_scheduled_time > exec().time())
+				{
+					m_in_queue = QS_QUEUED;     /* pending */
+					exec().queue().push({m_next_scheduled_time, this});
+				}
+				else
+				{
+					m_in_queue = QS_DELIVERED;
+					m_cur_Q = m_new_Q;
+				}
+			}
+		}
+		else
+			m_list_active.push_front(&term);
+	}
+
+	inline void detail::net_t::remove_from_active_list(core_terminal_t &term) NL_NOEXCEPT
+	{
+		m_list_active.remove(&term);
+		if (m_list_active.empty())
+			railterminal().device().do_dec_active();
 	}
 
 	inline const analog_net_t & analog_t::net() const NL_NOEXCEPT
@@ -1582,6 +1614,7 @@ namespace netlist
 	{
 		return m_device.exec();
 	}
+
 
 	inline const netlist_t &detail::device_object_t::exec() const NL_NOEXCEPT
 	{

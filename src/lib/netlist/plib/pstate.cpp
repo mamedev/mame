@@ -48,13 +48,13 @@ void state_manager_t::remove_save_items(const void *owner)
 void state_manager_t::pre_save()
 {
 	for (auto & s : m_custom)
-		s->m_callback->on_pre_save();
+		s->m_callback->on_pre_save(*this);
 }
 
 void state_manager_t::post_load()
 {
 	for (auto & s : m_custom)
-		s->m_callback->on_post_load();
+		s->m_callback->on_post_load(*this);
 }
 
 template<> void state_manager_t::save_item(const void *owner, callback_t &state, const pstring &stname)

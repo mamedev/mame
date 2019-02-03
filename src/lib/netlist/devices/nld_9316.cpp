@@ -105,27 +105,15 @@ namespace netlist
 
 	NETLIB_HANDLER(9316, clk)
 	{
+		auto cnt(m_cnt);
 		if (m_LOADQ())
 		{
-			++m_cnt &= MAXCNT;
-			//m_RC.push(m_ENT() && (m_cnt == MAXCNT), NLTIME_FROM_NS(27));
-#if 0
-			if (m_cnt == MAXCNT)
-			{
-				m_RC.push(m_ENT(), NLTIME_FROM_NS(27));
-				update_outputs_all(MAXCNT, NLTIME_FROM_NS(20));
-			}
-			else if (m_cnt == 0)
-			{
-				m_RC.push(0, NLTIME_FROM_NS(27));
-				update_outputs_all(0, NLTIME_FROM_NS(20));
-			}
-			else
-				update_outputs_all(m_cnt, NLTIME_FROM_NS(20));
-#else
-			if (m_cnt > 0 && m_cnt < MAXCNT)
-				update_outputs_all(m_cnt, NLTIME_FROM_NS(20));
-			else if (m_cnt == 0)
+			++cnt &= MAXCNT;
+			//m_RC.push(m_ENT() && (cnt == MAXCNT), NLTIME_FROM_NS(27));
+
+			if (cnt > 0 && cnt < MAXCNT)
+				update_outputs_all(cnt, NLTIME_FROM_NS(20));
+			else if (cnt == 0)
 			{
 				m_RC.push(0, NLTIME_FROM_NS(27));
 				update_outputs_all(0, NLTIME_FROM_NS(20));
@@ -135,14 +123,14 @@ namespace netlist
 				m_RC.push(m_ENT(), NLTIME_FROM_NS(27));
 				update_outputs_all(MAXCNT, NLTIME_FROM_NS(20));
 			}
-#endif
 		}
 		else
 		{
-			m_cnt = m_abcd;
-			m_RC.push(m_ENT() && (m_cnt == MAXCNT), NLTIME_FROM_NS(27));
-			update_outputs_all(m_cnt, NLTIME_FROM_NS(22));
+			cnt = m_abcd;
+			m_RC.push(m_ENT() && (cnt == MAXCNT), NLTIME_FROM_NS(27));
+			update_outputs_all(cnt, NLTIME_FROM_NS(22));
 		}
+		m_cnt = cnt;
 	}
 
 	NETLIB_UPDATE(9316)

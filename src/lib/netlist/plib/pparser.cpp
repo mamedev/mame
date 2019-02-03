@@ -268,7 +268,7 @@ void ptokenizer::error(const pstring &errs)
 // A simple preprocessor
 // ----------------------------------------------------------------------------------------
 
-ppreprocessor::ppreprocessor(std::vector<define_t> *defines)
+ppreprocessor::ppreprocessor(defines_map_type *defines)
 : pistream()
 , m_ifflag(0)
 , m_level(0)
@@ -292,12 +292,7 @@ ppreprocessor::ppreprocessor(std::vector<define_t> *defines)
 
 	m_defines.insert({"__PLIB_PREPROCESSOR__", define_t("__PLIB_PREPROCESSOR__", "1")});
 	if (defines != nullptr)
-	{
-		for (auto & p : *defines)
-		{
-			m_defines.insert({p.m_name, p});
-		}
-	}
+		m_defines = *defines;
 }
 
 void ppreprocessor::error(const pstring &err)
@@ -524,7 +519,10 @@ pstring  ppreprocessor::process_line(pstring line)
 			}
 		}
 		else
-			error(pfmt("unknown directive on line {1}: {2}")(m_lineno)(line));
+		{
+			if (m_ifflag == 0)
+				error(pfmt("unknown directive on line {1}: {2}")(m_lineno)(replace_macros(line)));
+		}
 	}
 	else
 	{

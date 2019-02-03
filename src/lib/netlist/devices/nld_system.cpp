@@ -40,7 +40,23 @@ namespace netlist
 	{
 		m_cnt = 0;
 		m_off = netlist_time::from_double(m_offset());
+		m_feedback.m_delegate = NETLIB_DELEGATE(extclock, update);
+
+		//m_feedback.m_delegate .set(&NETLIB_NAME(extclock)::update, this);
 		//m_Q.initial(0);
+	}
+
+	NETLIB_HANDLER(extclock, clk2)
+	{
+		m_Q.push((m_cnt & 1) ^ 1, m_inc[m_cnt]);
+		if (++m_cnt >= m_size)
+			m_cnt = 0;
+	}
+
+	NETLIB_HANDLER(extclock, clk2_pow2)
+	{
+		m_Q.push((m_cnt & 1) ^ 1, m_inc[m_cnt]);
+		m_cnt = (++m_cnt) & (m_size-1);
 	}
 
 	NETLIB_UPDATE(extclock)
@@ -49,6 +65,13 @@ namespace netlist
 		m_off = netlist_time::zero();
 		if (++m_cnt >= m_size)
 			m_cnt = 0;
+
+		// continue with optimized clock handlers ....
+
+		if ((m_size & (m_size-1)) == 0) // power of 2?
+			m_feedback.m_delegate.set(&NETLIB_NAME(extclock)::clk2_pow2, this);
+		else
+			m_feedback.m_delegate.set(&NETLIB_NAME(extclock)::clk2, this);
 	}
 
 	// -----------------------------------------------------------------------------
