@@ -366,7 +366,7 @@ offs_t z8_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_
 			case 0xf2:      illegal;                                                break;
 			case 0xf3:      mnemonic("LD"); arg_Ir(B0H); arg_r(B0L); bytes(2);      break;
 			case 0xf4:      illegal;                                                break;
-			case 0xf5:      mnemonic("LD"); arg_IR(B0); arg_R(B1); bytes(3);        break;
+			case 0xf5:      mnemonic("LD"); arg_IR(B1); arg_R(B0); bytes(3);        break;
 			case 0xf6:      illegal;                                                break;
 			case 0xf7:      illegal;                                                break;
 			case 0xf8:      mnemonic("LD"); arg_r(OPH); arg_R(B0); bytes(2);        break;
