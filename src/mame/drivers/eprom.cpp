@@ -83,9 +83,9 @@ READ8_MEMBER(eprom_state::adc_r)
 	if (!m_adc.found())
 		return 0xff;
 
-	uint8_t result = m_adc->data_r(space, 0);
+	uint8_t result = m_adc->data_r();
 	if (!machine().side_effects_disabled())
-		m_adc->address_offset_start_w(space, offset, 0);
+		m_adc->address_offset_start_w(offset, 0);
 	return result;
 }
 
