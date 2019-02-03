@@ -1205,6 +1205,23 @@ Game cartridges
 		<description>Disney's The Lion King - Simba's Big Adventure (USA)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="pcb" value="92060" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM --> <!-- 2 globs, uses /CS2 for 2nd glob -->
+			<feature name="u2" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="0x0800000">
+				<rom name="vsmile92100.blob1.bin" size="0x0400000" crc="8a2317fb" sha1="44d397ada00f1fedb48622e716189f4a129ff5a7" offset="0x0000000" />
+				<rom name="vsmile92100.blob2.bin" size="0x0200000" crc="dded069c" sha1="29f1f464f9f5c8fa06410d54538b984f3fc52f01" offset="0x0400000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- where did the last 2MB in this come from? the cart is confirmed as having a 4MB blob and a 2MB blob -->
+	<software name="lionkinga" cloneof="lionking" supported="yes">
+		<description>Disney's The Lion King - Simba's Big Adventure (USA) (alt)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
 		<info name="serial" value="80-092100(US)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
@@ -2111,6 +2128,22 @@ Game cartridges
 	</software>
 
 	<software name="pooh" supported="yes">
+		<description>Disneys Winnie the Pooh - The Honey Hunt (US)</description>
+		<year>2004?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="pcb" value="92060" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM --> <!-- 2 globs, uses /CS2 for 2nd glob -->
+			<feature name="u2" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="0x0800000">
+				<rom name="vsmile92060.blob1.bin" size="0x0400000" crc="c34fd808" sha1="2800b89068e3c09a66223392e11982dd2193244b" offset="0x0000000" />
+				<rom name="vsmile92060.blob2.bin" size="0x0200000" crc="b7261f74" sha1="40bc8d9284a2f307023502ec67f8fc8e974966ea" offset="0x0400000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="poohg" cloneof="pooh" supported="yes">
 		<description>Disneys Winnie Puuh - Die Honigjagd (Ger)</description>
 		<year>2004?</year>
 		<publisher>VTech</publisher>

@@ -111,6 +111,7 @@ bw12.cpp
 bw2.cpp
 c10.cpp
 c128.cpp
+c2color.cpp
 c64.cpp
 c64dtv.cpp
 c65.cpp
@@ -378,6 +379,7 @@ laser3k.cpp
 lb186.cpp
 lc80.cpp
 lcmate2.cpp
+leapfrog_leappad.cpp
 leapster.cpp
 learnwin.cpp
 lee1214.cpp

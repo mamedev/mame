@@ -9267,6 +9267,9 @@ c128dcrp                        //
 c128dp                          //
 c128p                           //
 
+@source:c2color.cpp
+c2color
+
 @source:c64.cpp
 c64                             //
 c64_jp                          // Commodore 64 (Japan)
@@ -18146,6 +18149,10 @@ lckydraw                        // (c) 1979 Mirco
 
 @source:lcmate2.cpp
 lcmate2                         //
+
+@source:leapfrog_leappad.cpp
+leappad
+mfleappad
 
 @source:leapster.cpp
 leapster                        //
@@ -30340,6 +30347,7 @@ mc_aa2
 mc_105te
 mc_sp69
 polmega
+silv35
 mc_dcat8
 mc_dcat8a
 pjoyn50

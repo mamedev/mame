@@ -405,6 +405,22 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 		</part>
 	</software>
 
+	<software name="shrekfa" supported="no">
+		<description>Shrek Forever After (US)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084500(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="84500 E" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM --> <!-- 2 globs, uses /CS2 for 2nd glob -->
+			<feature name="u2" value="" /> <!-- EPOXY BLOB ROM --> 
+			<dataarea name="rom" size="0x1000000">
+				<rom name="vsmile84500.blob1.bin" size="0x0800000" crc="175117f1" sha1="48231caf853e27856eb033d14937b7eb7e74198c" offset="0x0000000" />
+				<rom name="vsmile84500.blob2.bin" size="0x0800000" crc="5dc681ea" sha1="1a3a2ff08bd52ad74183b09059082b492000e571" offset="0x0800000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="spidermn" supported="no">
 		<description>Spider-Man &amp; Freunde - Geheime Missionen (Ger)</description>
 		<year>2010</year>
