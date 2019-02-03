@@ -95,7 +95,7 @@ class ieee488_device : public device_t
 {
 public:
 	// construction/destruction
-	ieee488_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ieee488_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	template <class Object> devcb_base &set_eoi_callback(Object &&cb) { return m_write_eoi.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_dav_callback(Object &&cb) { return m_write_dav.set_callback(std::forward<Object>(cb)); }
