@@ -113,17 +113,18 @@ void leapfrog_leappad_state::leapfrog_mfleappad(machine_config &config)
 	SOFTWARE_LIST(config, "cart_list").set_original("leapfrog_mfleappad_cart");
 }
 
+// both of these contain the string "Have you copied our ROM?" near the date codes
+
 ROM_START( leappad )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "leappadbios.bin", 0x000000, 0x400000, NO_DUMP )
+	ROM_LOAD( "leappadbios.bin", 0x000000, 0x100000, CRC(c886cddc) SHA1(f8a83b156feb28315d2321758678e141600a0d4e) ) // contains "Aug 06 2001.16:33:16.155-00450.LeapPad ILA2 Universal Base ROM" and "Copyright (c) 1998-2001 Knowledge Kids Enterprises, Inc."
 ROM_END
-
 
 ROM_START( mfleappad )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "myfirstleappadbios.bin", 0x000000, 0x400000, CRC(19174c16) SHA1(e0ba644fdf38fd5f91ab8c4b673c4a658cc3e612) ) // "ToolPad V2.3.2 MFLeapPad FullBase V1.1.2.COOPER.mgm" string contained within
+	ROM_LOAD( "myfirstleappadbios.bin", 0x000000, 0x400000, CRC(19174c16) SHA1(e0ba644fdf38fd5f91ab8c4b673c4a658cc3e612) ) // contains "Feb 13 2004.10:58:53.152-10573.MFLP US Base ROM - 2004" and "Copyright (c) 2004 LeapFrog Enterprises, Inc."
 ROM_END
 
 //    year, name,         parent,  compat, machine,      input,        class,              init,       company,  fullname,                             flags
-CONS( 200?, leappad,      0,       0,      leapfrog_leappad,   leapfrog_leappad, leapfrog_leappad_state, empty_init, "LeapFrog", "LeapPad", MACHINE_IS_SKELETON )
-CONS( 200?, mfleappad,    0,       0,      leapfrog_mfleappad, leapfrog_leappad, leapfrog_leappad_state, empty_init, "LeapFrog", "My First LeapPad", MACHINE_IS_SKELETON )
+CONS( 2001, leappad,      0,       0,      leapfrog_leappad,   leapfrog_leappad, leapfrog_leappad_state, empty_init, "LeapFrog", "LeapPad", MACHINE_IS_SKELETON )
+CONS( 2004, mfleappad,    0,       0,      leapfrog_mfleappad, leapfrog_leappad, leapfrog_leappad_state, empty_init, "LeapFrog", "My First LeapPad", MACHINE_IS_SKELETON )
