@@ -334,92 +334,60 @@ void karnov_state::chelnov_i8751_w( int data )
  *
  *************************************/
 
-WRITE16_MEMBER(karnov_state::karnov_control_w)
+WRITE16_MEMBER(karnov_state::mcu_ack_w)
 {
-	/* Mnemonics filled in from the schematics, brackets are my comments */
-	switch (offset << 1)
+	m_maincpu->set_input_line(6, CLEAR_LINE);
+
+	if (m_i8751_needs_ack)
 	{
-		case 0: /* SECLR (Interrupt ack for Level 6 i8751 interrupt) */
-			m_maincpu->set_input_line(6, CLEAR_LINE);
-
-			if (m_i8751_needs_ack)
-			{
-				/* If a command and coin insert happen at once, then the i8751 will queue the coin command until the previous command is ACK'd */
-				if (m_i8751_coin_pending)
-				{
-					m_i8751_return = m_i8751_coin_pending;
-					m_maincpu->set_input_line(6, HOLD_LINE);
-					m_i8751_coin_pending = 0;
-				}
-				else if (m_i8751_command_queue)
-				{
-					/* Pending control command - just write it back as SECREQ */
-					m_i8751_needs_ack = 0;
-					karnov_control_w(space, 3, m_i8751_command_queue, 0xffff);
-					m_i8751_command_queue = 0;
-				}
-				else
-				{
-					m_i8751_needs_ack = 0;
-				}
-			}
-			return;
-
-		case 2: /* SONREQ (Sound CPU byte) */
-			m_soundlatch->write(space, 0, data & 0xff);
-			break;
-
-		case 4: /* DM (DMA to buffer spriteram) */
-			m_spriteram->copy();
-			break;
-
-		case 6: /* SECREQ (Interrupt & Data to i8751) */
-			if (m_microcontroller_id == KARNOV || m_microcontroller_id == KARNOVJ)
-				karnov_i8751_w(data);
-			if (m_microcontroller_id == CHELNOV || m_microcontroller_id == CHELNOVU || m_microcontroller_id == CHELNOVJ)
-				chelnov_i8751_w(data);
-			if (m_microcontroller_id == WNDRPLNT)
-				wndrplnt_i8751_w(data);
-			break;
-
-		case 8: /* HSHIFT (9 bits) - Top bit indicates video flip */
-			COMBINE_DATA(&m_scroll[0]);
-			karnov_flipscreen_w(data >> 15);
-			break;
-
-		case 0xa: /* VSHIFT */
-			COMBINE_DATA(&m_scroll[1]);
-			break;
-
-		case 0xc: /* SECR (Reset i8751) */
-			logerror("Reset i8751\n");
-			m_i8751_needs_ack = 0;
+		/* If a command and coin insert happen at once, then the i8751 will queue the coin command until the previous command is ACK'd */
+		if (m_i8751_coin_pending)
+		{
+			m_i8751_return = m_i8751_coin_pending;
+			m_maincpu->set_input_line(6, HOLD_LINE);
 			m_i8751_coin_pending = 0;
+		}
+		else if (m_i8751_command_queue)
+		{
+			/* Pending control command - just write it back as SECREQ */
+			m_i8751_needs_ack = 0;
+			mcu_w(m_i8751_command_queue);
 			m_i8751_command_queue = 0;
-			m_i8751_return = 0;
-			break;
-
-		case 0xe: /* INTCLR (Interrupt ack for Level 7 vbl interrupt) */
-			m_maincpu->set_input_line(7, CLEAR_LINE);
-			break;
+		}
+		else
+		{
+			m_i8751_needs_ack = 0;
+		}
 	}
 }
 
-READ16_MEMBER(karnov_state::karnov_control_r)
+u16 karnov_state::mcu_r()
 {
-	switch (offset << 1)
-	{
-		case 0:
-			return ioport("P1_P2")->read();
-		case 2: /* Start buttons & VBL */
-			return ioport("SYSTEM")->read();
-		case 4:
-			return ioport("DSW")->read();
-		case 6: /* i8751 return values */
-			return m_i8751_return;
-	}
+	return m_i8751_return;
+}
 
-	return ~0;
+void karnov_state::mcu_w(u16 data)
+{
+	if (m_microcontroller_id == KARNOV || m_microcontroller_id == KARNOVJ)
+		karnov_i8751_w(data);
+	if (m_microcontroller_id == CHELNOV || m_microcontroller_id == CHELNOVU || m_microcontroller_id == CHELNOVJ)
+		chelnov_i8751_w(data);
+	if (m_microcontroller_id == WNDRPLNT)
+		wndrplnt_i8751_w(data);
+}
+
+WRITE16_MEMBER(karnov_state::mcu_reset_w)
+{
+	logerror("Reset i8751\n");
+	m_i8751_needs_ack = 0;
+	m_i8751_coin_pending = 0;
+	m_i8751_command_queue = 0;
+	m_i8751_return = 0;
+}
+
+WRITE16_MEMBER(karnov_state::vint_ack_w)
+{
+	m_maincpu->set_input_line(7, CLEAR_LINE);
 }
 
 /*************************************
@@ -433,12 +401,19 @@ void karnov_state::karnov_map(address_map &map)
 	map(0x000000, 0x05ffff).rom();
 	map(0x060000, 0x063fff).ram().share("ram");
 	map(0x080000, 0x080fff).ram().share("spriteram");
-	map(0x0a0000, 0x0a07ff).ram().w(FUNC(karnov_state::karnov_videoram_w)).share("videoram");
-	map(0x0a0800, 0x0a0fff).w(FUNC(karnov_state::karnov_videoram_w)); /* Wndrplnt Mirror */
-	map(0x0a1000, 0x0a17ff).writeonly().share("pf_data");
-	map(0x0a1800, 0x0a1fff).w(FUNC(karnov_state::karnov_playfield_swap_w));
-	map(0x0c0000, 0x0c0007).r(FUNC(karnov_state::karnov_control_r));
-	map(0x0c0000, 0x0c000f).w(FUNC(karnov_state::karnov_control_w));
+	map(0x0a0000, 0x0a07ff).ram().w(FUNC(karnov_state::videoram_w)).share("videoram");
+	map(0x0a0800, 0x0a0fff).w(FUNC(karnov_state::videoram_w)); /* Wndrplnt Mirror */
+	map(0x0a1000, 0x0a17ff).w(FUNC(karnov_state::playfield_w)).share("pf_data");
+	map(0x0a1800, 0x0a1fff).lw16("pf_col_w", [this](offs_t offset, u16 data, u16 mem_mask)
+							{ playfield_w(((offset & 0x1f) << 5) | ((offset & 0x3e0) >> 5), data, mem_mask); });
+	map(0x0c0000, 0x0c0001).portr("P1_P2").w(FUNC(karnov_state::mcu_ack_w));
+	map(0x0c0002, 0x0c0003).portr("SYSTEM");
+	map(0x0c0003, 0x0c0003).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x0c0004, 0x0c0005).portr("DSW").w(m_spriteram, FUNC(buffered_spriteram16_device::write));
+	map(0x0c0006, 0x0c0007).rw(FUNC(karnov_state::mcu_r), FUNC(karnov_state::mcu_w));
+	map(0x0c0008, 0x0c000b).writeonly().share("scroll");
+	map(0x0c000c, 0x0c000d).w(FUNC(karnov_state::mcu_reset_w));
+	map(0x0c000e, 0x0c000f).w(FUNC(karnov_state::vint_ack_w));
 }
 
 
@@ -694,44 +669,30 @@ INPUT_PORTS_END
 static const gfx_layout chars =
 {
 	8,8,
-	1024,
+	RGN_FRAC(1,4),
 	3,
-	{ 0x6000*8,0x4000*8,0x2000*8 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	{ RGN_FRAC(3,4),RGN_FRAC(2,4),RGN_FRAC(1,4) },
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
 	8*8 /* every sprite takes 8 consecutive bytes */
 };
-
-static const gfx_layout sprites =
-{
-	16,16,
-	4096,
-	4,
-	{ 0x60000*8,0x00000*8,0x20000*8,0x40000*8 },
-	{ 16*8, 1+(16*8), 2+(16*8), 3+(16*8), 4+(16*8), 5+(16*8), 6+(16*8), 7+(16*8),
-	0,1,2,3,4,5,6,7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 ,8*8,9*8,10*8,11*8,12*8,13*8,14*8,15*8},
-	16*16
-};
-
 
 /* 16x16 tiles, 4 Planes, each plane is 0x10000 bytes */
 static const gfx_layout tiles =
 {
 	16,16,
-	2048,
+	RGN_FRAC(1,4),
 	4,
-	{ 0x30000*8,0x00000*8,0x10000*8,0x20000*8 },
-	{ 16*8, 1+(16*8), 2+(16*8), 3+(16*8), 4+(16*8), 5+(16*8), 6+(16*8), 7+(16*8),
-	0,1,2,3,4,5,6,7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 ,8*8,9*8,10*8,11*8,12*8,13*8,14*8,15*8},
+	{ RGN_FRAC(3,4),0,RGN_FRAC(1,4),RGN_FRAC(2,4) },
+	{ STEP8(16*8,1), STEP8(0,1) },
+	{ STEP16(0,8) },
 	16*16
 };
 
 static GFXDECODE_START( gfx_karnov )
-	GFXDECODE_ENTRY( "gfx1", 0, chars,     0,  4 )  /* colors 0-31 */
-	GFXDECODE_ENTRY( "gfx2", 0, tiles,   512, 16 )  /* colors 512-767 */
-	GFXDECODE_ENTRY( "gfx3", 0, sprites, 256, 16 )  /* colors 256-511 */
+	GFXDECODE_ENTRY( "gfx1", 0, chars,   0,  4 )  /* colors 0-31 */
+	GFXDECODE_ENTRY( "gfx2", 0, tiles, 512, 16 )  /* colors 512-767 */
+	GFXDECODE_ENTRY( "gfx3", 0, tiles, 256, 16 )  /* colors 256-511 */
 GFXDECODE_END
 
 
@@ -780,9 +741,6 @@ WRITE_LINE_MEMBER(karnov_state::vbint_w)
 
 void karnov_state::machine_start()
 {
-	save_item(NAME(m_flipscreen));
-	save_item(NAME(m_scroll));
-
 	save_item(NAME(m_i8751_return));
 	save_item(NAME(m_i8751_needs_ack));
 	save_item(NAME(m_i8751_coin_pending));
@@ -803,71 +761,70 @@ void karnov_state::machine_reset()
 	m_i8751_level = 0;
 //  m_latch = 0;
 
-	m_flipscreen = 0;
 	m_scroll[0] = 0;
 	m_scroll[1] = 0;
 }
 
 
-MACHINE_CONFIG_START(karnov_state::karnov)
-
+void karnov_state::karnov(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 10000000)   /* 10 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(karnov_map)
+	M68000(config, m_maincpu, 10000000);    /* 10 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &karnov_state::karnov_map);
 
-	MCFG_DEVICE_ADD("audiocpu", M6502, 1500000)    /* Accurate */
-	MCFG_DEVICE_PROGRAM_MAP(karnov_sound_map)
-
+	M6502(config, m_audiocpu, 1500000);     /* Accurate */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &karnov_state::karnov_sound_map);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
+	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(karnov_state, screen_update_karnov)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, karnov_state, vbint_w))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(karnov_state::screen_update));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(karnov_state::vbint_w));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_karnov)
-	MCFG_DECO_RMC3_ADD_PROMS("palette","proms",1024) // xxxxBBBBGGGGRRRR with custom weighting
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_karnov);
+	DECO_RMC3(config, m_palette, 0, 1024); // xxxxBBBBGGGGRRRR with custom weighting
+	m_palette->set_prom_region("proms");
+	m_palette->set_init("palette", FUNC(deco_rmc3_device::palette_init_proms));
 
-	MCFG_DEVICE_ADD("spritegen", DECO_KARNOVSPRITES, 0)
-	MCFG_DECO_KARNOVSPRITES_GFX_REGION(2)
-	MCFG_DECO_KARNOVSPRITES_GFXDECODE("gfxdecode")
+	DECO_KARNOVSPRITES(config, m_spritegen, 0);
+	m_spritegen->set_gfx_region(2);
+	m_spritegen->set_gfxdecode_tag(m_gfxdecode);
 
 	MCFG_VIDEO_START_OVERRIDE(karnov_state,karnov)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ym1", YM2203, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ym2203_device &ym1(YM2203(config, "ym1", 1500000));
+	ym1.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ym2", YM3526, 3000000)
-	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	ym3526_device &ym2(YM3526(config, "ym2", 3000000));
+	ym2.irq_handler().set_inputline(m_audiocpu, M6502_IRQ_LINE);
+	ym2.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-MACHINE_CONFIG_START(karnov_state::karnovjbl)
+void karnov_state::karnovjbl(machine_config &config)
+{
 	karnov(config);
 	/* X-TALs:
 	Top board next to #9 is 20.000 MHz
 	Top board next to the microcontroller is 6.000 MHz
 	Bottom board next to the ribbon cable is 12.000 MHz*/
-	MCFG_DEVICE_MODIFY("audiocpu")
-	MCFG_DEVICE_PROGRAM_MAP(karnovjbl_sound_map)
+	m_audiocpu->set_addrmap(AS_PROGRAM, &karnov_state::karnovjbl_sound_map);
 
-	MCFG_DEVICE_REPLACE("ym2", YM3812, 3000000)
-	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
-MACHINE_CONFIG_END
+	ym3812_device &ym2(YM3812(config.replace(), "ym2", 3000000));
+	ym2.irq_handler().set_inputline(m_audiocpu, M6502_IRQ_LINE);
+	ym2.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 void karnov_state::chelnovjbl_mcu_map(address_map &map)
 {
@@ -875,62 +832,62 @@ void karnov_state::chelnovjbl_mcu_map(address_map &map)
 }
 
 
-MACHINE_CONFIG_START(karnov_state::chelnovjbl)
+void karnov_state::chelnovjbl(machine_config &config)
+{
 	karnov(config);
-	MCFG_DEVICE_ADD("mcu", I8031, 2000000) // ??mhz
-	MCFG_DEVICE_PROGRAM_MAP(chelnovjbl_mcu_map)
-//  MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, karnov_state, p1_r))
-//  MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, karnov_state, p1_w))
-//  MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, karnov_state, p3_r))
-//  MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, karnov_state, p3_w))
-MACHINE_CONFIG_END
+	i8031_device &mcu(I8031(config, "mcu", 2000000)); // ??mhz
+	mcu.set_addrmap(AS_PROGRAM, &karnov_state::chelnovjbl_mcu_map);
+//  mcu.port_in_cb<1>().set(FUNC(karnov_state::p1_r));
+//  mcu.port_out_cb<1>().set(FUNC(karnov_state::p1_w));
+//  mcu.port_in_cb<3>().set(FUNC(karnov_state::p3_r));
+//  mcu.port_out_cb<3>().set(FUNC(karnov_state::p3_w));
+}
 
-
-
-MACHINE_CONFIG_START(karnov_state::wndrplnt)
-
+void karnov_state::wndrplnt(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 10000000)   /* 10 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(karnov_map)
+	M68000(config, m_maincpu, 10000000);   /* 10 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &karnov_state::karnov_map);
 
-	MCFG_DEVICE_ADD("audiocpu", M6502, 1500000)    /* Accurate */
-	MCFG_DEVICE_PROGRAM_MAP(karnov_sound_map)
-
+	M6502(config, m_audiocpu, 1500000);    /* Accurate */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &karnov_state::karnov_sound_map);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
+	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(karnov_state, screen_update_karnov)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, karnov_state, vbint_w))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(karnov_state::screen_update));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(karnov_state::vbint_w));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_karnov)
-	MCFG_DECO_RMC3_ADD_PROMS("palette","proms",1024) // xxxxBBBBGGGGRRRR with custom weighting
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_karnov);
+	DECO_RMC3(config, m_palette, 0, 1024); // xxxxBBBBGGGGRRRR with custom weighting
+	m_palette->set_prom_region("proms");
+	m_palette->set_init("palette", FUNC(deco_rmc3_device::palette_init_proms));
 
-	MCFG_DEVICE_ADD("spritegen", DECO_KARNOVSPRITES, 0)
-	MCFG_DECO_KARNOVSPRITES_GFX_REGION(2)
-	MCFG_DECO_KARNOVSPRITES_GFXDECODE("gfxdecode")
+	DECO_KARNOVSPRITES(config, m_spritegen, 0);
+	m_spritegen->set_gfx_region(2);
+	m_spritegen->set_gfxdecode_tag(m_gfxdecode);
 
 	MCFG_VIDEO_START_OVERRIDE(karnov_state,wndrplnt)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ym1", YM2203, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ym2203_device &ym1(YM2203(config, "ym1", 1500000));
+	ym1.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ym2", YM3526, 3000000)
-	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	ym3526_device &ym2(YM3526(config, "ym2", 3000000));
+	ym2.irq_handler().set_inputline(m_audiocpu, M6502_IRQ_LINE);
+	ym2.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 /*************************************
@@ -963,15 +920,15 @@ ROM_START( karnov )
 	ROM_LOAD( "dn03-",        0x20000, 0x10000, CRC(90d9dd9c) SHA1(00a3bed276927f099d57e90f28fd77bd41a3c360) )
 	ROM_LOAD( "dn02-",        0x30000, 0x10000, CRC(1e04d7b9) SHA1(a2c6fde42569a52cc6d9a86715dea4a8bea80092) )
 
-	ROM_REGION( 0x80000, "gfx3", 0 )
+	ROM_REGION( 0x60000, "gfx3", 0 )
 	ROM_LOAD( "dn12-",        0x00000, 0x10000, CRC(9806772c) SHA1(01f17fa033262a3e64e0675cc4e20b3c3f4b254d) )  /* Sprites - 2 sets of 4, interleaved here */
 	ROM_LOAD( "dn14-5",       0x10000, 0x08000, CRC(ac9e6732) SHA1(6f61344eb8a13349471145dee252a01aadb8cdf0) )
-	ROM_LOAD( "dn13-",        0x20000, 0x10000, CRC(a03308f9) SHA1(1d450725a5c488332c83d8f64a73a750ce7fe4c7) )
-	ROM_LOAD( "dn15-5",       0x30000, 0x08000, CRC(8933fcb8) SHA1(0dbda4b032ed3776d7633264f39e6f00ace7a238) )
-	ROM_LOAD( "dn16-",        0x40000, 0x10000, CRC(55e63a11) SHA1(3ef0468fa02ac5382007428122216917ad5eaa0e) )
-	ROM_LOAD( "dn17-5",       0x50000, 0x08000, CRC(b70ae950) SHA1(1ec833bdad12710ea846ef48dddbe2e1ae6b8ce1) )
-	ROM_LOAD( "dn18-",        0x60000, 0x10000, CRC(2ad53213) SHA1(f22696920bf3d74fb0e28e2d7cb31be5e183c6b4) )
-	ROM_LOAD( "dn19-5",       0x70000, 0x08000, CRC(8fd4fa40) SHA1(1870fb0c5c64fbc53a10115f0f3c7624cf2465db) )
+	ROM_LOAD( "dn13-",        0x18000, 0x10000, CRC(a03308f9) SHA1(1d450725a5c488332c83d8f64a73a750ce7fe4c7) )
+	ROM_LOAD( "dn15-5",       0x28000, 0x08000, CRC(8933fcb8) SHA1(0dbda4b032ed3776d7633264f39e6f00ace7a238) )
+	ROM_LOAD( "dn16-",        0x30000, 0x10000, CRC(55e63a11) SHA1(3ef0468fa02ac5382007428122216917ad5eaa0e) )
+	ROM_LOAD( "dn17-5",       0x40000, 0x08000, CRC(b70ae950) SHA1(1ec833bdad12710ea846ef48dddbe2e1ae6b8ce1) )
+	ROM_LOAD( "dn18-",        0x48000, 0x10000, CRC(2ad53213) SHA1(f22696920bf3d74fb0e28e2d7cb31be5e183c6b4) )
+	ROM_LOAD( "dn19-5",       0x58000, 0x08000, CRC(8fd4fa40) SHA1(1870fb0c5c64fbc53a10115f0f3c7624cf2465db) )
 
 	ROM_REGION( 0x0800, "proms", 0 )
 	ROM_LOAD( "karnprom.21",  0x0000, 0x0400, CRC(aab0bb93) SHA1(545707fbb1007fca1fe297c5fce61e485e7084fc) )
@@ -1002,15 +959,15 @@ ROM_START( karnova )
 	ROM_LOAD( "dn03-",        0x20000, 0x10000, CRC(90d9dd9c) SHA1(00a3bed276927f099d57e90f28fd77bd41a3c360) )
 	ROM_LOAD( "dn02-",        0x30000, 0x10000, CRC(1e04d7b9) SHA1(a2c6fde42569a52cc6d9a86715dea4a8bea80092) )
 
-	ROM_REGION( 0x80000, "gfx3", 0 )
+	ROM_REGION( 0x60000, "gfx3", 0 )
 	ROM_LOAD( "dn12-",        0x00000, 0x10000, CRC(9806772c) SHA1(01f17fa033262a3e64e0675cc4e20b3c3f4b254d) )  /* Sprites - 2 sets of 4, interleaved here */
 	ROM_LOAD( "dn14-5",       0x10000, 0x08000, CRC(ac9e6732) SHA1(6f61344eb8a13349471145dee252a01aadb8cdf0) )
-	ROM_LOAD( "dn13-",        0x20000, 0x10000, CRC(a03308f9) SHA1(1d450725a5c488332c83d8f64a73a750ce7fe4c7) )
-	ROM_LOAD( "dn15-5",       0x30000, 0x08000, CRC(8933fcb8) SHA1(0dbda4b032ed3776d7633264f39e6f00ace7a238) )
-	ROM_LOAD( "dn16-",        0x40000, 0x10000, CRC(55e63a11) SHA1(3ef0468fa02ac5382007428122216917ad5eaa0e) )
-	ROM_LOAD( "dn17-5",       0x50000, 0x08000, CRC(b70ae950) SHA1(1ec833bdad12710ea846ef48dddbe2e1ae6b8ce1) )
-	ROM_LOAD( "dn18-",        0x60000, 0x10000, CRC(2ad53213) SHA1(f22696920bf3d74fb0e28e2d7cb31be5e183c6b4) )
-	ROM_LOAD( "dn19-5",       0x70000, 0x08000, CRC(8fd4fa40) SHA1(1870fb0c5c64fbc53a10115f0f3c7624cf2465db) )
+	ROM_LOAD( "dn13-",        0x18000, 0x10000, CRC(a03308f9) SHA1(1d450725a5c488332c83d8f64a73a750ce7fe4c7) )
+	ROM_LOAD( "dn15-5",       0x28000, 0x08000, CRC(8933fcb8) SHA1(0dbda4b032ed3776d7633264f39e6f00ace7a238) )
+	ROM_LOAD( "dn16-",        0x30000, 0x10000, CRC(55e63a11) SHA1(3ef0468fa02ac5382007428122216917ad5eaa0e) )
+	ROM_LOAD( "dn17-5",       0x40000, 0x08000, CRC(b70ae950) SHA1(1ec833bdad12710ea846ef48dddbe2e1ae6b8ce1) )
+	ROM_LOAD( "dn18-",        0x48000, 0x10000, CRC(2ad53213) SHA1(f22696920bf3d74fb0e28e2d7cb31be5e183c6b4) )
+	ROM_LOAD( "dn19-5",       0x58000, 0x08000, CRC(8fd4fa40) SHA1(1870fb0c5c64fbc53a10115f0f3c7624cf2465db) )
 
 	ROM_REGION( 0x0800, "proms", 0 )
 	ROM_LOAD( "karnprom.21",  0x0000, 0x0400, CRC(aab0bb93) SHA1(545707fbb1007fca1fe297c5fce61e485e7084fc) )
@@ -1041,15 +998,15 @@ ROM_START( karnovj )
 	ROM_LOAD( "dn03-",        0x20000, 0x10000, CRC(90d9dd9c) SHA1(00a3bed276927f099d57e90f28fd77bd41a3c360) )
 	ROM_LOAD( "dn02-",        0x30000, 0x10000, CRC(1e04d7b9) SHA1(a2c6fde42569a52cc6d9a86715dea4a8bea80092) )
 
-	ROM_REGION( 0x80000, "gfx3", 0 )
+	ROM_REGION( 0x60000, "gfx3", 0 )
 	ROM_LOAD( "dn12-",        0x00000, 0x10000, CRC(9806772c) SHA1(01f17fa033262a3e64e0675cc4e20b3c3f4b254d) )  /* Sprites - 2 sets of 4, interleaved here */
 	ROM_LOAD( "kar14",        0x10000, 0x08000, CRC(c6b39595) SHA1(3bc2d0a613cc1b5d255cccc3b26e21ea1c23e75b) )
-	ROM_LOAD( "dn13-",        0x20000, 0x10000, CRC(a03308f9) SHA1(1d450725a5c488332c83d8f64a73a750ce7fe4c7) )
-	ROM_LOAD( "kar15",        0x30000, 0x08000, CRC(2f72cac0) SHA1(a71e61eea77ecd3240c5217ae84e7aa3ef21288a) )
-	ROM_LOAD( "dn16-",        0x40000, 0x10000, CRC(55e63a11) SHA1(3ef0468fa02ac5382007428122216917ad5eaa0e) )
-	ROM_LOAD( "kar17",        0x50000, 0x08000, CRC(7851c70f) SHA1(47b7a64dd8230e95cd7ae7f661c7586c7598c356) )
-	ROM_LOAD( "dn18-",        0x60000, 0x10000, CRC(2ad53213) SHA1(f22696920bf3d74fb0e28e2d7cb31be5e183c6b4) )
-	ROM_LOAD( "kar19",        0x70000, 0x08000, CRC(7bc174bb) SHA1(d8bc320169fc3a9cdd3f271ea523fb0486abae2c) )
+	ROM_LOAD( "dn13-",        0x18000, 0x10000, CRC(a03308f9) SHA1(1d450725a5c488332c83d8f64a73a750ce7fe4c7) )
+	ROM_LOAD( "kar15",        0x28000, 0x08000, CRC(2f72cac0) SHA1(a71e61eea77ecd3240c5217ae84e7aa3ef21288a) )
+	ROM_LOAD( "dn16-",        0x30000, 0x10000, CRC(55e63a11) SHA1(3ef0468fa02ac5382007428122216917ad5eaa0e) )
+	ROM_LOAD( "kar17",        0x40000, 0x08000, CRC(7851c70f) SHA1(47b7a64dd8230e95cd7ae7f661c7586c7598c356) )
+	ROM_LOAD( "dn18-",        0x48000, 0x10000, CRC(2ad53213) SHA1(f22696920bf3d74fb0e28e2d7cb31be5e183c6b4) )
+	ROM_LOAD( "kar19",        0x58000, 0x08000, CRC(7bc174bb) SHA1(d8bc320169fc3a9cdd3f271ea523fb0486abae2c) )
 
 	ROM_REGION( 0x0800, "proms", 0 )
 	ROM_LOAD( "karnprom.21",  0x0000, 0x0400, CRC(aab0bb93) SHA1(545707fbb1007fca1fe297c5fce61e485e7084fc) )
@@ -1086,15 +1043,15 @@ ROM_START( karnovjbl )
 	ROM_LOAD( "15.bin",       0x30000, 0x08000, CRC(04551cc8) SHA1(d0b89b55b8e139e11b79efd26edeffd8022ee385) )
 	ROM_LOAD( "16.bin",       0x38000, 0x08000, CRC(12bc9e09) SHA1(d2f527138d475fc7d798aaf48e08b133be090543) )
 
-	ROM_REGION( 0x80000, "gfx3", 0 )
+	ROM_REGION( 0x60000, "gfx3", 0 )
 	ROM_LOAD( "17.bin",       0x00000, 0x10000, CRC(9806772c) SHA1(01f17fa033262a3e64e0675cc4e20b3c3f4b254d) )  /* Sprites - 2 sets of 4, interleaved here */
 	ROM_LOAD( "19.bin",       0x10000, 0x08000, CRC(c6b39595) SHA1(3bc2d0a613cc1b5d255cccc3b26e21ea1c23e75b) )
-	ROM_LOAD( "18.bin",       0x20000, 0x10000, CRC(a03308f9) SHA1(1d450725a5c488332c83d8f64a73a750ce7fe4c7) )
-	ROM_LOAD( "20.bin",       0x30000, 0x08000, CRC(2f72cac0) SHA1(a71e61eea77ecd3240c5217ae84e7aa3ef21288a) )
-	ROM_LOAD( "21.bin",       0x40000, 0x10000, CRC(55e63a11) SHA1(3ef0468fa02ac5382007428122216917ad5eaa0e) )
-	ROM_LOAD( "22.bin",       0x50000, 0x08000, CRC(7851c70f) SHA1(47b7a64dd8230e95cd7ae7f661c7586c7598c356) )
-	ROM_LOAD( "23.bin",       0x60000, 0x10000, CRC(2ad53213) SHA1(f22696920bf3d74fb0e28e2d7cb31be5e183c6b4) )
-	ROM_LOAD( "24.bin",       0x70000, 0x08000, CRC(7bc174bb) SHA1(d8bc320169fc3a9cdd3f271ea523fb0486abae2c) )
+	ROM_LOAD( "18.bin",       0x18000, 0x10000, CRC(a03308f9) SHA1(1d450725a5c488332c83d8f64a73a750ce7fe4c7) )
+	ROM_LOAD( "20.bin",       0x28000, 0x08000, CRC(2f72cac0) SHA1(a71e61eea77ecd3240c5217ae84e7aa3ef21288a) )
+	ROM_LOAD( "21.bin",       0x30000, 0x10000, CRC(55e63a11) SHA1(3ef0468fa02ac5382007428122216917ad5eaa0e) )
+	ROM_LOAD( "22.bin",       0x40000, 0x08000, CRC(7851c70f) SHA1(47b7a64dd8230e95cd7ae7f661c7586c7598c356) )
+	ROM_LOAD( "23.bin",       0x48000, 0x10000, CRC(2ad53213) SHA1(f22696920bf3d74fb0e28e2d7cb31be5e183c6b4) )
+	ROM_LOAD( "24.bin",       0x58000, 0x08000, CRC(7bc174bb) SHA1(d8bc320169fc3a9cdd3f271ea523fb0486abae2c) )
 
 	ROM_REGION( 0x0800, "proms", 0 ) // not dumped for this set
 	ROM_LOAD( "karnprom.21",  0x0000, 0x0400, CRC(aab0bb93) SHA1(545707fbb1007fca1fe297c5fce61e485e7084fc) )
@@ -1164,11 +1121,11 @@ ROM_START( chelnov )
 	ROM_LOAD( "ee03-.d15",    0x20000, 0x10000, CRC(7178e182) SHA1(e8f03bda417e8f2f0508df40057d39ce6ee74f16) )
 	ROM_LOAD( "ee02-.c18",    0x30000, 0x10000, CRC(9d7c45ae) SHA1(014dfafa6898e5fd0d124391e698b4f76d38fa94) )
 
-	ROM_REGION( 0x80000, "gfx3", 0 )
+	ROM_REGION( 0x40000, "gfx3", 0 )
 	ROM_LOAD( "ee12-.f8",     0x00000, 0x10000, CRC(9b1c53a5) SHA1(b0fdc89dc7fd0931fa4bca3bbc20fc88f637ec74) )  /* Sprites */
-	ROM_LOAD( "ee13-.f9",     0x20000, 0x10000, CRC(72b8ae3e) SHA1(535dfd70e6d13296342d96917a57d46bdb28a59e) )
-	ROM_LOAD( "ee14-.f13",    0x40000, 0x10000, CRC(d8f4bbde) SHA1(1f2d336dd97c9cc39e124c18cae634afb0ef3316) )
-	ROM_LOAD( "ee15-.f15",    0x60000, 0x10000, CRC(81e3e68b) SHA1(1059c70b8bfe09c212a19767cfe23efa22afc196) )
+	ROM_LOAD( "ee13-.f9",     0x10000, 0x10000, CRC(72b8ae3e) SHA1(535dfd70e6d13296342d96917a57d46bdb28a59e) )
+	ROM_LOAD( "ee14-.f13",    0x20000, 0x10000, CRC(d8f4bbde) SHA1(1f2d336dd97c9cc39e124c18cae634afb0ef3316) )
+	ROM_LOAD( "ee15-.f15",    0x30000, 0x10000, CRC(81e3e68b) SHA1(1059c70b8bfe09c212a19767cfe23efa22afc196) )
 
 	ROM_REGION( 0x0800, "proms", 0 )
 	ROM_LOAD( "ee21.k8",      0x0000, 0x0400, CRC(b1db6586) SHA1(a7ecfcb4cf0f7450900820b3dfad8813efedfbea) )    /* different from the other set; */
@@ -1200,11 +1157,11 @@ ROM_START( chelnovu )
 	ROM_LOAD( "ee03-.d15",    0x20000, 0x10000, CRC(7178e182) SHA1(e8f03bda417e8f2f0508df40057d39ce6ee74f16) )
 	ROM_LOAD( "ee02-.c18",    0x30000, 0x10000, CRC(9d7c45ae) SHA1(014dfafa6898e5fd0d124391e698b4f76d38fa94) )
 
-	ROM_REGION( 0x80000, "gfx3", 0 )
+	ROM_REGION( 0x40000, "gfx3", 0 )
 	ROM_LOAD( "ee12-.f8",     0x00000, 0x10000, CRC(9b1c53a5) SHA1(b0fdc89dc7fd0931fa4bca3bbc20fc88f637ec74) )  /* Sprites */
-	ROM_LOAD( "ee13-.f9",     0x20000, 0x10000, CRC(72b8ae3e) SHA1(535dfd70e6d13296342d96917a57d46bdb28a59e) )
-	ROM_LOAD( "ee14-.f13",    0x40000, 0x10000, CRC(d8f4bbde) SHA1(1f2d336dd97c9cc39e124c18cae634afb0ef3316) )
-	ROM_LOAD( "ee15-.f15",    0x60000, 0x10000, CRC(81e3e68b) SHA1(1059c70b8bfe09c212a19767cfe23efa22afc196) )
+	ROM_LOAD( "ee13-.f9",     0x10000, 0x10000, CRC(72b8ae3e) SHA1(535dfd70e6d13296342d96917a57d46bdb28a59e) )
+	ROM_LOAD( "ee14-.f13",    0x20000, 0x10000, CRC(d8f4bbde) SHA1(1f2d336dd97c9cc39e124c18cae634afb0ef3316) )
+	ROM_LOAD( "ee15-.f15",    0x30000, 0x10000, CRC(81e3e68b) SHA1(1059c70b8bfe09c212a19767cfe23efa22afc196) )
 
 	ROM_REGION( 0x0800, "proms", 0 )
 	ROM_LOAD( "ee21.k8",      0x0000, 0x0400, CRC(b1db6586) SHA1(a7ecfcb4cf0f7450900820b3dfad8813efedfbea) )    /* different from the other set; */
@@ -1236,11 +1193,11 @@ ROM_START( chelnovj )
 	ROM_LOAD( "ee03-.d15",    0x20000, 0x10000, CRC(7178e182) SHA1(e8f03bda417e8f2f0508df40057d39ce6ee74f16) )
 	ROM_LOAD( "ee02-.c18",    0x30000, 0x10000, CRC(9d7c45ae) SHA1(014dfafa6898e5fd0d124391e698b4f76d38fa94) )
 
-	ROM_REGION( 0x80000, "gfx3", 0 )
+	ROM_REGION( 0x40000, "gfx3", 0 )
 	ROM_LOAD( "ee12-.f8",     0x00000, 0x10000, CRC(9b1c53a5) SHA1(b0fdc89dc7fd0931fa4bca3bbc20fc88f637ec74) )  /* Sprites */
-	ROM_LOAD( "ee13-.f9",     0x20000, 0x10000, CRC(72b8ae3e) SHA1(535dfd70e6d13296342d96917a57d46bdb28a59e) )
-	ROM_LOAD( "ee14-.f13",    0x40000, 0x10000, CRC(d8f4bbde) SHA1(1f2d336dd97c9cc39e124c18cae634afb0ef3316) )
-	ROM_LOAD( "ee15-.f15",    0x60000, 0x10000, CRC(81e3e68b) SHA1(1059c70b8bfe09c212a19767cfe23efa22afc196) )
+	ROM_LOAD( "ee13-.f9",     0x10000, 0x10000, CRC(72b8ae3e) SHA1(535dfd70e6d13296342d96917a57d46bdb28a59e) )
+	ROM_LOAD( "ee14-.f13",    0x20000, 0x10000, CRC(d8f4bbde) SHA1(1f2d336dd97c9cc39e124c18cae634afb0ef3316) )
+	ROM_LOAD( "ee15-.f15",    0x30000, 0x10000, CRC(81e3e68b) SHA1(1059c70b8bfe09c212a19767cfe23efa22afc196) )
 
 	ROM_REGION( 0x0800, "proms", 0 )
 	ROM_LOAD( "a-k7.bin",     0x0000, 0x0400, CRC(309c49d8) SHA1(7220002f6ef97514b4e6f61706fc16061120dafa) )    /* different from the parent set; - might be bad */
@@ -1277,11 +1234,11 @@ ROM_START( chelnovjbl ) // code is the same as the regular chelnovj set
 	ROM_LOAD( "4.bin",    0x30000, 0x08000, CRC(276a46de) SHA1(5b8932dec0e10be128f5ed41798a8928c0aa506b) )
 	ROM_LOAD( "5.bin",    0x38000, 0x08000, CRC(99cee6cd) SHA1(b2cd0a1aef04fd63ad27ac8a61d17a6bb4c8b600) )
 
-	ROM_REGION( 0x80000, "gfx3", 0 ) /* Sprites */
+	ROM_REGION( 0x40000, "gfx3", 0 ) /* Sprites */
 	ROM_LOAD( "17.bin",       0x00000, 0x10000, CRC(47c857f8) SHA1(59f50365cee266c0e4075c989dc7fde50e43667a) ) // probably bad (1st half is 99.996948% match)
-	ROM_LOAD( "ee13-.f9",     0x20000, 0x10000, CRC(72b8ae3e) SHA1(535dfd70e6d13296342d96917a57d46bdb28a59e) )
-	ROM_LOAD( "ee14-.f13",    0x40000, 0x10000, CRC(d8f4bbde) SHA1(1f2d336dd97c9cc39e124c18cae634afb0ef3316) )
-	ROM_LOAD( "ee15-.f15",    0x60000, 0x10000, CRC(81e3e68b) SHA1(1059c70b8bfe09c212a19767cfe23efa22afc196) )
+	ROM_LOAD( "ee13-.f9",     0x10000, 0x10000, CRC(72b8ae3e) SHA1(535dfd70e6d13296342d96917a57d46bdb28a59e) )
+	ROM_LOAD( "ee14-.f13",    0x20000, 0x10000, CRC(d8f4bbde) SHA1(1f2d336dd97c9cc39e124c18cae634afb0ef3316) )
+	ROM_LOAD( "ee15-.f15",    0x30000, 0x10000, CRC(81e3e68b) SHA1(1059c70b8bfe09c212a19767cfe23efa22afc196) )
 
 	ROM_REGION( 0x0800, "proms", 0 )
 	ROM_LOAD( "a-k7.bin",     0x0000, 0x0400, CRC(309c49d8) SHA1(7220002f6ef97514b4e6f61706fc16061120dafa) )    /* different from the parent set; - might be bad (comment from chelnovj, not dumped here) */
@@ -1329,11 +1286,11 @@ ROM_START( chelnovjbla )
 	ROM_LOAD( "4.bin",    0x30000, 0x08000, CRC(276a46de) SHA1(5b8932dec0e10be128f5ed41798a8928c0aa506b) )
 	ROM_LOAD( "5.bin",    0x38000, 0x08000, CRC(99cee6cd) SHA1(b2cd0a1aef04fd63ad27ac8a61d17a6bb4c8b600) )
 
-	ROM_REGION( 0x80000, "gfx3", 0 )
+	ROM_REGION( 0x40000, "gfx3", 0 )
 	ROM_LOAD( "ee12-.f8",     0x00000, 0x10000, CRC(9b1c53a5) SHA1(b0fdc89dc7fd0931fa4bca3bbc20fc88f637ec74) )  /* Sprites */
-	ROM_LOAD( "ee13-.f9",     0x20000, 0x10000, CRC(72b8ae3e) SHA1(535dfd70e6d13296342d96917a57d46bdb28a59e) )
-	ROM_LOAD( "ee14-.f13",    0x40000, 0x10000, CRC(d8f4bbde) SHA1(1f2d336dd97c9cc39e124c18cae634afb0ef3316) )
-	ROM_LOAD( "ee15-.f15",    0x60000, 0x10000, CRC(81e3e68b) SHA1(1059c70b8bfe09c212a19767cfe23efa22afc196) )
+	ROM_LOAD( "ee13-.f9",     0x10000, 0x10000, CRC(72b8ae3e) SHA1(535dfd70e6d13296342d96917a57d46bdb28a59e) )
+	ROM_LOAD( "ee14-.f13",    0x20000, 0x10000, CRC(d8f4bbde) SHA1(1f2d336dd97c9cc39e124c18cae634afb0ef3316) )
+	ROM_LOAD( "ee15-.f15",    0x30000, 0x10000, CRC(81e3e68b) SHA1(1059c70b8bfe09c212a19767cfe23efa22afc196) )
 
 	ROM_REGION( 0x0800, "proms", 0 )
 	ROM_LOAD( "a-k7.bin",     0x0000, 0x0400, CRC(309c49d8) SHA1(7220002f6ef97514b4e6f61706fc16061120dafa) )    /* different from the parent set; - might be bad (comment from chelnovj, not dumped here) */

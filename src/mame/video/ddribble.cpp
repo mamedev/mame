@@ -12,19 +12,18 @@
 #include "includes/ddribble.h"
 
 
-PALETTE_INIT_MEMBER(ddribble_state, ddribble)
+void ddribble_state::ddribble_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
+	uint8_t const *const color_prom = memregion("proms")->base();
 
-	for (i = 0x10; i < 0x40; i++)
+	for (int i = 0x10; i < 0x40; i++)
 		palette.set_pen_indirect(i, i);
 
-	/* sprite #2 uses pens 0x00-0x0f */
-	for (i = 0x40; i < 0x140; i++)
+	// sprite #2 uses pens 0x00-0x0f
+	for (int i = 0x0; i < 0x100; i++)
 	{
-		uint8_t ctabentry = color_prom[i - 0x40] & 0x0f;
-		palette.set_pen_indirect(i, ctabentry);
+		uint8_t const ctabentry = color_prom[i] & 0x0f;
+		palette.set_pen_indirect(i + 0x40, ctabentry);
 	}
 }
 

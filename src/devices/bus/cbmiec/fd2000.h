@@ -14,6 +14,7 @@
 #include "cbmiec.h"
 #include "cpu/m6502/m65c02.h"
 #include "formats/d81_dsk.h"
+#include "imagedev/floppy.h"
 #include "machine/6522via.h"
 #include "machine/upd765.h"
 
@@ -63,6 +64,8 @@ protected:
 	void cbm_iec_atn(int state) override;
 	void cbm_iec_data(int state) override;
 	void cbm_iec_reset(int state) override;
+
+	void add_common_devices(machine_config &config);
 
 	required_device<m65c02_device> m_maincpu;
 	required_device<upd765_family_device> m_fdc;

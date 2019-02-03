@@ -45,6 +45,7 @@ TODO:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/keyboard.h"
@@ -151,13 +152,11 @@ void mbc200_state::mbc200_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	//AM_RANGE(0xe0, 0xe0) AM_DEVREADWRITE("uart1", i8251_device, data_r, data_w)
-	//AM_RANGE(0xe1, 0xe1) AM_DEVREADWRITE("uart1", i8251_device, status_r, control_w)
+	//map(0xe0, 0xe1).rw("uart1", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0xe0, 0xe1).r(FUNC(mbc200_state::keyboard_r)).nopw();
 	map(0xe4, 0xe7).rw(m_fdc, FUNC(mb8876_device::read), FUNC(mb8876_device::write));
 	map(0xe8, 0xeb).rw(m_ppi_m, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xec, 0xec).rw("uart2", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xed, 0xed).rw("uart2", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xec, 0xed).rw("uart2", FUNC(i8251_device::read), FUNC(i8251_device::write));
 }
 
 
@@ -321,12 +320,13 @@ MACHINE_CONFIG_START(mbc200_state::mbc200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", h46505_device, screen_update)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mbc200)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", 8_MHz_XTAL / 4) // HD46505SP
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(mbc200_state, update_row)
+	H46505(config, m_crtc, 8_MHz_XTAL / 4); // HD46505SP
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(mbc200_state::update_row), this);
 
 	// sound
 	SPEAKER(config, "mono").front_center();
@@ -335,32 +335,27 @@ MACHINE_CONFIG_START(mbc200_state::mbc200)
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_DEVICE_ADD("ppi_1", I8255, 0)
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mbc200_state, p1_portc_w))
+	I8255(config, "ppi_1").out_pc_callback().set(FUNC(mbc200_state::p1_portc_w));
+	I8255(config, "ppi_2").in_pa_callback().set(FUNC(mbc200_state::p2_porta_r));
 
-	MCFG_DEVICE_ADD("ppi_2", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, mbc200_state, p2_porta_r))
+	I8255(config, m_ppi_m);
+	m_ppi_m->out_pa_callback().set(FUNC(mbc200_state::pm_porta_w));
+	m_ppi_m->out_pb_callback().set(FUNC(mbc200_state::pm_portb_w));
 
-	MCFG_DEVICE_ADD("ppi_m", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, mbc200_state, pm_porta_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, mbc200_state, pm_portb_w))
+	I8251(config, "uart1", 0); // INS8251N
 
-	MCFG_DEVICE_ADD("uart1", I8251, 0) // INS8251N
+	I8251(config, "uart2", 0); // INS8251A
 
-	MCFG_DEVICE_ADD("uart2", I8251, 0) // INS8251A
-
-	MCFG_DEVICE_ADD("fdc", MB8876, 8_MHz_XTAL / 8) // guess
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", mbc200_floppies, "qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", mbc200_floppies, "qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	MB8876(config, m_fdc, 8_MHz_XTAL / 8); // guess
+	FLOPPY_CONNECTOR(config, "fdc:0", mbc200_floppies, "qd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", mbc200_floppies, "qd", floppy_image_device::default_floppy_formats).enable_sound(true);
 
 	/* Keyboard */
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(mbc200_state, kbd_put))
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(mbc200_state::kbd_put));
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "mbc200")
+	SOFTWARE_LIST(config, "flop_list").set_original("mbc200");
 MACHINE_CONFIG_END
 
 /* ROM definition */

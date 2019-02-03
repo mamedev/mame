@@ -33,8 +33,10 @@
 #ifndef MAME_INCLUDES_POLY_H
 #define MAME_INCLUDES_POLY_H
 
-#include "emu.h"
+#pragma once
+
 #include "cpu/m6809/m6809.h"
+#include "imagedev/floppy.h"
 #include "machine/6821pia.h"
 #include "machine/6840ptm.h"
 #include "machine/6850acia.h"
@@ -61,6 +63,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_bankdev(*this, "bankdev")
+		, m_ram(*this, RAM_TAG)
 		, m_trom(*this, "saa5050_%u", 1)
 		, m_pia(*this, "pia%u", 0)
 		, m_adlc(*this, "mc6854")
@@ -121,6 +124,7 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<address_map_bank_device> m_bankdev;
+	required_device<ram_device> m_ram;
 	required_device_array<saa5050_device, 2> m_trom;
 	required_device_array<pia6821_device, 2> m_pia;
 	required_device<mc6854_device> m_adlc;
@@ -177,4 +181,4 @@ private:
 	floppy_image_device *m_current_floppy;
 };
 
-#endif /* MAME_INCLUDES_POLY_H */
+#endif // MAME_INCLUDES_POLY_H

@@ -18,45 +18,43 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(mrjong_state, mrjong)
+void mrjong_state::mrjong_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
+	uint8_t const *color_prom = memregion("proms")->base();
 
-	/* create a lookup table for the palette */
-	for (i = 0; i < 0x10; i++)
+	// create a lookup table for the palette
+	for (int i = 0; i < 0x10; i++)
 	{
 		int bit0, bit1, bit2;
-		int r, g, b;
 
-		/* red component */
+		// red component
 		bit0 = BIT(color_prom[i], 0);
 		bit1 = BIT(color_prom[i], 1);
 		bit2 = BIT(color_prom[i], 2);
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		/* green component */
+		// green component
 		bit0 = BIT(color_prom[i], 3);
 		bit1 = BIT(color_prom[i], 4);
 		bit2 = BIT(color_prom[i], 5);
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		/* blue component */
+		// blue component
 		bit0 = 0;
 		bit1 = BIT(color_prom[i], 6);
 		bit2 = BIT(color_prom[i], 7);
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
-	/* color_prom now points to the beginning of the lookup table */
+	// color_prom now points to the beginning of the lookup table
 	color_prom += 0x20;
 
-	/* characters/sprites */
-	for (i = 0; i < 0x80; i++)
+	// characters/sprites
+	for (int i = 0; i < 0x80; i++)
 	{
-		uint8_t ctabentry = color_prom[i] & 0x0f;
+		uint8_t const ctabentry = color_prom[i] & 0x0f;
 		palette.set_pen_indirect(i, ctabentry);
 	}
 }

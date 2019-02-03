@@ -10,22 +10,25 @@
 
     Known to be on this hardware
 
-    Golden Tee Golf Home Edition (developed by FarSight Studios)
-    Connectv Football (developed by Medialink)
-
-    Also on this hardware
-
-    name                        PCB ID      ROM width   TSOP pads   ROM size        SEEPROM         die markings
-
-    Real Swing Golf             74037       x16         48          not dumped      no              ELAN EU3A14
-    Play TV Basketball          75029       x16         48          not dumped      no              ELAN EU3A14
-    Baseball 3                  ?           x16         48          not dumped      no              ELAN EU3A14
-
-    Huntin’3                    ?           x16         48          not dumped      no              Elan ?
+    name                          PCB ID      ROM width   TSOP pads   ROM size        SEEPROM         die markings
+    Golden Tee Golf Home Edition  ?           x16         48          4MB             no              ELAN EU3A14   (developed by FarSight Studios)
+    Real Swing Golf               74037       x16         48          4MB             no              ELAN EU3A14   (developed by FarSight Studios)
+    Baseball 3                    ?           x16         48          4MB             no              ELAN EU3A14   (developed by FarSight Studios)
+    Connectv Football             ?           x16         48          4MB             no              ELAN EU3A14   (developed by Medialink)
+    Huntin’3                      ?           x16         48          4MB             no              Elan ?        (developed by V-Tac Technology Co Ltd.)
+    Play TV Basketball            75029       x16         48          4MB             no              ELAN EU3A14
 
     In many ways this is similar to the rad_eu3a05.cpp hardware
     but the video system has changed, here the sprites are more traditional non-tile based, rather
     than coming from 'pages'
+
+    --
+
+    Compared to the XaviXport games camera hookups, Real Swing Golf just has 6 wires, Its camera PCB is the only one with a ceramic resonator.
+    Maybe the CU5502 chip offloads some processing from the CPU?
+
+    The Basketball camera also uses an ETOMS CU5502.  It’s different from the others (XaviXport + Real Swing Golf) in that the sensor is on a small PCB with
+    a 3.58MHz resonator with 16 wires going to another small PCB that has a glob and a 4MHz resonator.  6 wires go from that PCB to the main game PCB.
 
 */
 
@@ -73,24 +76,29 @@ public:
 	radica_eu3a14_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_mainregion(*this, "maincpu"),
 		m_palram(*this, "palram"),
 		m_scrollregs(*this, "scrollregs"),
 		m_tilecfg(*this, "tilecfg"),
 		m_tilebase(*this, "tilebase"),
+		m_spriteaddr(*this, "spriteaddr"),
 		m_spritebase(*this, "spritebase"),
 		m_mainram(*this, "mainram"),
 		m_dmaparams(*this, "dmaparams"),
 		m_bank(*this, "bank"),
 		m_palette(*this, "palette"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_tvtype(*this, "TV")
 	{ }
 
 
 	void radica_eu3a14(machine_config &config);
 	void radica_eu3a14_adc(machine_config &config);
+	void radica_eu3a14p(machine_config &config);
 
 	void init_rad_gtg();
 	void init_rad_foot();
+	void init_rad_hnt3();
 
 private:
 	READ8_MEMBER(irq_vector_r);
@@ -112,6 +120,17 @@ private:
 	DECLARE_WRITE8_MEMBER(radicasi_rombank_lo_w);
 	DECLARE_WRITE8_MEMBER(radicasi_rombank_hi_w);
 
+	DECLARE_WRITE8_MEMBER(porta_dir_w);
+	DECLARE_WRITE8_MEMBER(portb_dir_w);
+	DECLARE_WRITE8_MEMBER(portc_dir_w);
+
+	DECLARE_WRITE8_MEMBER(porta_dat_w);
+	DECLARE_WRITE8_MEMBER(portb_dat_w);
+	DECLARE_WRITE8_MEMBER(portc_dat_w);
+
+
+	DECLARE_READ8_MEMBER(radica_5009_unk_r) { return machine().rand(); };
+
 	DECLARE_READ8_MEMBER(random_r) { return machine().rand(); };
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
@@ -131,25 +150,35 @@ private:
 	double hue2rgb(double p, double q, double t);
 
 	required_device<cpu_device> m_maincpu;
+	required_region_ptr<uint8_t> m_mainregion;
 	required_shared_ptr<uint8_t> m_palram;
 	required_shared_ptr<uint8_t> m_scrollregs;
 	required_shared_ptr<uint8_t> m_tilecfg;
 	required_shared_ptr<uint8_t> m_tilebase;
+	required_shared_ptr<uint8_t> m_spriteaddr;
 	required_shared_ptr<uint8_t> m_spritebase;
 	required_shared_ptr<uint8_t> m_mainram;
 	required_shared_ptr<uint8_t> m_dmaparams;
 	required_device<address_map_bank_device> m_bank;
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_ioport m_tvtype;
 
 	uint8_t m_rombank_hi;
 	uint8_t m_rombank_lo;
 	int m_tilerambase;
 	int m_spriterambase;
+	int m_pagewidth;
+	int m_pageheight;
+	int m_bytespertile;
 
+	uint8_t m_portdir[3];
+
+	void draw_tile(bitmap_ind16 &bitmap, const rectangle &cliprect, int gfxno, int tileno, int base, int palette, int flipx, int flipy, int xpos, int ypos, int transpen, int size);
 	void handle_palette(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_page(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int xbase, int ybase, int size);
 	void draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprite_line(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int offset, int count, int pal, int flipx, int xpos, int ypos, int gfxno);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
@@ -207,42 +236,117 @@ void radica_eu3a14_state::handle_palette(screen_device &screen, bitmap_ind16 &bi
 	}
 }
 
+void radica_eu3a14_state::draw_tile(bitmap_ind16 &bitmap, const rectangle &cliprect, int gfxno, int tileno, int base, int palette, int flipx, int flipy, int xpos, int ypos, int transpen, int size)
+{
+	int bppdiv = 1;
+	int baseaddr = base * 256;
+
+	switch (gfxno)
+	{
+	case 0x03: bppdiv = 1; baseaddr += tileno * 256; break; // 16x16 8bpp
+	case 0x04: bppdiv = 2; baseaddr += tileno * 128; break; // 16x16 4bpp
+	case 0x05: bppdiv = 1; baseaddr += tileno * 64;  break; // 8x8 8bpp
+	case 0x06: bppdiv = 2; baseaddr += tileno * 64;  break; // 8x8 4bpp
+	default: break;
+	}
+	const uint8_t *gfxdata = &m_mainregion[baseaddr & 0x3fffff];
+
+	int xstride = size / bppdiv;
+
+	int count = 0;
+	for (int y = 0; y < size; y++)
+	{
+		int realy = ypos + y;
+		uint16_t* dst = &bitmap.pix16(ypos + y);
+
+		for (int x = 0; x < xstride; x++)
+		{
+			int pix = gfxdata[count];
+
+			if (realy >= cliprect.min_y && realy <= cliprect.max_y)
+			{
+				if (bppdiv == 1) // 8bpp
+				{
+					int realx = x + xpos;
+					if (realx >= cliprect.min_x && realx <= cliprect.max_x)
+					{
+						if (pix)
+							dst[realx] = pix;
+					}
+				}
+				else if (bppdiv == 2) // 4bpp
+				{
+					int realx = (x * 2) + xpos;
+					if (realx >= cliprect.min_x && realx <= cliprect.max_x)
+					{
+						if (pix & 0xf0)
+							dst[realx] = (pix & 0xf0) >> 4;
+					}
+
+					realx++;
+
+					if (realx >= cliprect.min_x && realx <= cliprect.max_x)
+					{
+						if (pix & 0x0f)
+							dst[realx] = pix & 0x0f;
+					}
+				}
+			}
+			count++;
+		}
+	}
+}
+
 void radica_eu3a14_state::draw_page(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int xbase, int ybase, int size)
 {
-	gfx_element *gfx;
+	int gfxno = 0;
+
+	int pagesize = m_pagewidth * m_pageheight * 2;
 
 	int base = (m_tilebase[1] << 8) | m_tilebase[0];
-	if (m_tilecfg[2] & 0x04)
+	if (m_tilecfg[2] & 0x04) // 4bpp selection
 	{
-		gfx = m_gfxdecode->gfx(4);
-		base <<= 1;
+		gfxno = 4; // 16x16 4bpp
 
 		if (size == 8)
 		{
-			gfx = m_gfxdecode->gfx(5);
-			base <<= 2;
+			gfxno = 6; // 8x8 4bpp
 		}
 	}
-	else
+	else // 8bpp selection
 	{
-		gfx = m_gfxdecode->gfx(3);
+		gfxno = 3; // 16x16 8bpp
+
+		if (size == 8)
+		{
+			gfxno = 5; // 8x8 8bpp
+		}
 	}
 
 	int xdraw = xbase;
 	int ydraw = ybase;
 	int count = 0;
 
-	for (int i = m_tilerambase+0x1c0*which; i < m_tilerambase+0x1c0*(which+1); i+=2)
+	for (int i = m_tilerambase + pagesize * which; i < m_tilerambase + pagesize * (which + 1); i += m_bytespertile)
 	{
-		int tile = m_mainram[i+0] | (m_mainram[i+1] << 8);
+		int tile = 0;
+		if (m_bytespertile == 2)
+		{
+			tile = m_mainram[i + 0] | (m_mainram[i + 1] << 8);
+		}
+		else if (m_bytespertile == 4) // rad_foot hidden test mode, rad_hnt3 shooting range (not yet correct)
+		{
+			tile = m_mainram[i + 0] | (m_mainram[i + 1] << 8);// | (m_mainram[i + 2] << 16) |  | (m_mainram[i + 3] << 24);
+		}
 
-		gfx->transpen(bitmap, cliprect, tile+base, 0, 0, 0, xdraw, ydraw, 0);
-		xdraw+=size;
+		draw_tile(bitmap, cliprect, gfxno, tile, base, 0, 0, 0, xdraw, ydraw, 0, size);
+
+		xdraw += size;
 
 		count++;
-		if (((count % 16) == 0))
+		if (((count % m_pagewidth) == 0))
 		{
-			xdraw -= size*16;
+			xdraw -= size * m_pagewidth;
 			ydraw += size;
 		}
 	}
@@ -253,33 +357,86 @@ void radica_eu3a14_state::draw_background(screen_device &screen, bitmap_ind16 &b
 	int xscroll = m_scrollregs[0] | (m_scrollregs[1] << 8);
 	int yscroll = m_scrollregs[2] | (m_scrollregs[3] << 8);
 
-	int size = 16;
-	// or 0x10?
-	if (m_tilecfg[0] & 0x80)
+	int size;
+
+	// m_tilecfg[0]   b-as ?-hh    b = bytes per tile  s = tilesize / page size?  a = always set when tilemaps are in use - check? h = related to page positions, when set uses 2x2 pages? ? = used
+	// m_tilecfg[1]   ---- ---?    ? = used foot
+	// m_tilecfg[2]   ---- -B--    B = 4bpp tiles
+
+	if (m_tilecfg[0] & 0x10)
 	{
 		size = 8;
+		m_pagewidth = 32;
+		m_pageheight = 28;
+	}
+	else
+	{
+		size = 16;
+		m_pagewidth = 16;
+		m_pageheight = 14;
 	}
 
-	draw_page(screen, bitmap, cliprect, 0, 0 - xscroll, 0 - yscroll, size);
-	draw_page(screen, bitmap, cliprect, 1, (size * 16) - xscroll, 0 - yscroll, size);
-	draw_page(screen, bitmap, cliprect, 2, 0 - xscroll, (size * 14) - yscroll, size);
-	draw_page(screen, bitmap, cliprect, 3, (size * 16) - xscroll, (size * 14) - yscroll, size);
+	if (m_tilecfg[0] & 0x80)
+	{
+		m_bytespertile = 4;
+	}
+	else
+	{
+		m_bytespertile = 2;
+	}
 
-	draw_page(screen, bitmap, cliprect, 0, (size * 16 * 2) + 0 - xscroll, 0 - yscroll, size);
-	draw_page(screen, bitmap, cliprect, 1, (size * 16 * 3) - xscroll, 0 - yscroll, size);
-	draw_page(screen, bitmap, cliprect, 2, (size * 16 * 2) + 0 - xscroll, (size * 14) - yscroll, size);
-	draw_page(screen, bitmap, cliprect, 3, (size * 16 * 3) - xscroll, (size * 14) - yscroll, size);
 
-	draw_page(screen, bitmap, cliprect, 0, 0 - xscroll, (size * 14 * 2) + 0 - yscroll, size);
-	draw_page(screen, bitmap, cliprect, 1, (size * 16) - xscroll, (size * 14 * 2) + 0 - yscroll, size);
-	draw_page(screen, bitmap, cliprect, 2, 0 - xscroll, (size * 14 * 3) - yscroll, size);
-	draw_page(screen, bitmap, cliprect, 3, (size * 16) - xscroll, (size * 14 * 3) - yscroll, size);
+	if ((m_tilecfg[0] & 0x03) == 0x00) // tilemaps arranged as 2x2 pages?
+	{
+		// normal
+		draw_page(screen, bitmap, cliprect, 0, 0 - xscroll, 0 - yscroll, size);
+		draw_page(screen, bitmap, cliprect, 1, (size * m_pagewidth) - xscroll, 0 - yscroll, size);
+		draw_page(screen, bitmap, cliprect, 2, 0 - xscroll, (size * m_pageheight) - yscroll, size);
+		draw_page(screen, bitmap, cliprect, 3, (size * m_pagewidth) - xscroll, (size * m_pageheight) - yscroll, size);
 
-	draw_page(screen, bitmap, cliprect, 0, (size * 16 * 2) + 0 - xscroll, (size * 14 * 2) + 0 - yscroll, size);
-	draw_page(screen, bitmap, cliprect, 1, (size * 16 * 3) - xscroll, (size * 14 * 2) + 0 - yscroll, size);
-	draw_page(screen, bitmap, cliprect, 2, (size * 16 * 2) + 0 - xscroll, (size * 14 * 3) - yscroll, size);
-	draw_page(screen, bitmap, cliprect, 3, (size * 16 * 3) - xscroll, (size * 14 * 3) - yscroll, size);
+		// wrap x
+		draw_page(screen, bitmap, cliprect, 0, (size * m_pagewidth * 2) + 0 - xscroll, 0 - yscroll, size);
+		draw_page(screen, bitmap, cliprect, 1, (size * m_pagewidth * 3) - xscroll, 0 - yscroll, size);
+		draw_page(screen, bitmap, cliprect, 2, (size * m_pagewidth * 2) + 0 - xscroll, (size * m_pageheight) - yscroll, size);
+		draw_page(screen, bitmap, cliprect, 3, (size * m_pagewidth * 3) - xscroll, (size * m_pageheight) - yscroll, size);
+
+		// wrap y
+		draw_page(screen, bitmap, cliprect, 0, 0 - xscroll, (size * m_pageheight * 2) + 0 - yscroll, size);
+		draw_page(screen, bitmap, cliprect, 1, (size * m_pagewidth) - xscroll, (size * m_pageheight * 2) + 0 - yscroll, size);
+		draw_page(screen, bitmap, cliprect, 2, 0 - xscroll, (size * m_pageheight * 3) - yscroll, size);
+		draw_page(screen, bitmap, cliprect, 3, (size * m_pagewidth) - xscroll, (size * m_pageheight * 3) - yscroll, size);
+
+		// wrap x+y
+		draw_page(screen, bitmap, cliprect, 0, (size * m_pagewidth * 2) + 0 - xscroll, (size * m_pageheight * 2) + 0 - yscroll, size);
+		draw_page(screen, bitmap, cliprect, 1, (size * m_pagewidth * 3) - xscroll, (size * m_pageheight * 2) + 0 - yscroll, size);
+		draw_page(screen, bitmap, cliprect, 2, (size * m_pagewidth * 2) + 0 - xscroll, (size * m_pageheight * 3) - yscroll, size);
+		draw_page(screen, bitmap, cliprect, 3, (size * m_pagewidth * 3) - xscroll, (size * m_pageheight * 3) - yscroll, size);
+	}
+	else if ((m_tilecfg[0] & 0x03) == 0x03) // individual tilemaps? multiple layers?
+	{
+		// normal
+		draw_page(screen, bitmap, cliprect, 0, 0 - xscroll, 0 - yscroll, size);
+		// wrap x
+		draw_page(screen, bitmap, cliprect, 0, (size * m_pagewidth) + 0 - xscroll, 0 - yscroll, size);
+		// wrap y
+		draw_page(screen, bitmap, cliprect, 0, 0 - xscroll, (size * m_pageheight) + 0 - yscroll, size);
+		// wrap x+y
+		draw_page(screen, bitmap, cliprect, 0, (size * m_pagewidth) + 0 - xscroll, (size * m_pageheight) + 0 - yscroll, size);
+	}
+	else
+	{
+		popmessage("m_tilecfg[0] & 0x03 unknown config");
+	}
+
 }
+
+void radica_eu3a14_state::draw_sprite_line(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int offset, int count, int pal, int flipx, int xpos, int ypos, int gfxno)
+{
+	int tileno = offset + count;
+	gfx_element *gfx = m_gfxdecode->gfx(gfxno);
+	gfx->transpen(bitmap, cliprect, tileno, pal, flipx, 0, xpos, ypos, 0);
+}
+
 
 void radica_eu3a14_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -343,8 +500,7 @@ void radica_eu3a14_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitm
 
 		int offset = ((m_mainram[i + 5] << 8) + (m_mainram[i + 4] << 0));
 		int extra = m_mainram[i + 6];
-		gfx_element *gfx;
-		gfx = m_gfxdecode->gfx(1);
+		int gfxno = 1;
 
 		int spritebase = (m_spritebase[1] << 8) | m_spritebase[0];
 
@@ -357,16 +513,17 @@ void radica_eu3a14_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitm
 		case 0x00: // 8bpp
 		case 0x07: // 8bpp
 			offset >>= 1;
-			gfx = m_gfxdecode->gfx(2);
+			gfxno = 2;
 			break;
 
 		case 0x02: // 2bpp
 			offset <<= 1;
-			gfx = m_gfxdecode->gfx(0);
+			gfxno = 0;
 			pal = 0;
 			break;
 
 		case 0x04: // 4bpp
+			gfxno = 1;
 			break;
 
 		case 0x01: // unknowns
@@ -386,7 +543,7 @@ void radica_eu3a14_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitm
 			{
 				for (int xx = 0; xx < width; xx++)
 				{
-					gfx->transpen(bitmap, cliprect, offset + count, pal, flipx, 0, x + xx * 8, y + yy, 0);
+					draw_sprite_line(screen, bitmap, cliprect, offset, count, pal, flipx, x + xx * 8, y + yy, gfxno);
 					count++;
 				}
 			}
@@ -398,6 +555,8 @@ void radica_eu3a14_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitm
 
 uint32_t radica_eu3a14_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	m_spriterambase = (m_spriteaddr[0] * 0x200) - 0x200;
+
 	bitmap.fill(0, cliprect);
 
 	handle_palette(screen, bitmap, cliprect);
@@ -473,9 +632,40 @@ READ8_MEMBER(radica_eu3a14_state::radicasi_pal_ntsc_r)
 	// how best to handle this, we probably need to run the PAL machine at 50hz
 	// the text under the radica logo differs between regions
 	logerror("%s: radicasi_pal_ntsc_r (region + more?)\n", machine().describe_context());
-	return 0xff; // NTSC
-	//return 0x00; // PAL
+	return m_tvtype->read();
 }
+
+WRITE8_MEMBER(radica_eu3a14_state::porta_dir_w)
+{
+	m_portdir[0] = data;
+	// update state
+}
+
+WRITE8_MEMBER(radica_eu3a14_state::portb_dir_w)
+{
+	m_portdir[1] = data;
+	// update state
+}
+
+WRITE8_MEMBER(radica_eu3a14_state::portc_dir_w)
+{
+	m_portdir[2] = data;
+	// update state
+}
+
+WRITE8_MEMBER(radica_eu3a14_state::porta_dat_w)
+{
+}
+
+WRITE8_MEMBER(radica_eu3a14_state::portb_dat_w)
+{
+}
+
+WRITE8_MEMBER(radica_eu3a14_state::portc_dat_w)
+{
+}
+
+
 
 void radica_eu3a14_state::bank_map(address_map &map)
 {
@@ -490,9 +680,12 @@ void radica_eu3a14_state::radica_eu3a14_map(address_map &map)
 	map(0x4800, 0x4bff).ram().share("palram");
 
 	// similar to eu3a05, at least for pal flags and rom banking
+	// 5001 write
+	// 5004 write
+	// 5006 write
 	map(0x5007, 0x5007).noprw();
-	map(0x5008, 0x5008).nopw(); // startup
-	map(0x5009, 0x5009).noprw();
+	map(0x5008, 0x5008).nopw(); // startup (read too)
+	map(0x5009, 0x5009).r(FUNC(radica_eu3a14_state::radica_5009_unk_r)); // rad_hnt3 polls this on startup
 	map(0x500a, 0x500a).nopw(); // startup
 	map(0x500b, 0x500b).r(FUNC(radica_eu3a14_state::radicasi_pal_ntsc_r)).nopw(); // PAL / NTSC flag at least
 	map(0x500c, 0x500c).w(FUNC(radica_eu3a14_state::radicasi_rombank_hi_w));
@@ -501,17 +694,22 @@ void radica_eu3a14_state::radica_eu3a14_map(address_map &map)
 	// DMA is similar to, but not the same as eu3a05
 	map(0x500f, 0x5017).ram().share("dmaparams");
 	map(0x5018, 0x5018).rw(FUNC(radica_eu3a14_state::dma_trigger_r), FUNC(radica_eu3a14_state::dma_trigger_w));
+	// 5019 - 46 on startup (hnt3) 22 (bb3, foot) na (gtg) 09    (rsg)
+	// 501a - 01 on startup (hnt3) 03 (bb3, foot) na (gtg) 02,01 (rsg)
 
 	// probably GPIO like eu3a05, although it access 47/48 as unknown instead of 48/49/4a
-	map(0x5040, 0x5040).nopw();
-	map(0x5041, 0x5041).portr("IN0");
-	map(0x5042, 0x5042).nopw();
-	map(0x5043, 0x5043).noprw();
-	map(0x5044, 0x5044).nopw();
-	map(0x5045, 0x5045).portr("IN1").nopw();
+	map(0x5040, 0x5040).w(FUNC(radica_eu3a14_state::porta_dir_w));
+	map(0x5041, 0x5041).portr("IN0").w(FUNC(radica_eu3a14_state::porta_dat_w));
+	map(0x5042, 0x5042).w(FUNC(radica_eu3a14_state::portb_dir_w));
+	map(0x5043, 0x5043).portr("IN1").w(FUNC(radica_eu3a14_state::portb_dat_w));
+	map(0x5044, 0x5044).w(FUNC(radica_eu3a14_state::portc_dir_w));
+	map(0x5045, 0x5045).portr("IN2").w(FUNC(radica_eu3a14_state::portc_dat_w));
+
 	map(0x5046, 0x5046).nopw();
 	map(0x5047, 0x5047).nopw();
 	map(0x5048, 0x5048).nopw();
+
+	// 5060 - 506e  r/w during startup on foot
 
 	// sound appears to be the same as eu3a05
 	map(0x5080, 0x5091).rw("6ch_sound", FUNC(radica6502_sound_device::radicasi_sound_addr_r), FUNC(radica6502_sound_device::radicasi_sound_addr_w));
@@ -521,19 +719,22 @@ void radica_eu3a14_state::radica_eu3a14_map(address_map &map)
 	map(0x50a6, 0x50a6).nopw(); // startup
 	map(0x50a7, 0x50a7).nopw(); // startup
 	map(0x50a8, 0x50a8).r("6ch_sound", FUNC(radica6502_sound_device::radicasi_50a8_r));
-	map(0x50a9, 0x50a9).nopw(); // startup
+	map(0x50a9, 0x50a9).nopw(); // startup, read foot
 
 	// video regs are here this time
 	map(0x5100, 0x5100).ram();
+	map(0x5101, 0x5101).ram();
+	map(0x5102, 0x5102).ram();
 	map(0x5103, 0x5106).ram();
 	map(0x5107, 0x5107).ram(); // on transitions, maybe layer disables?
-
 	map(0x5110, 0x5112).ram().share("tilecfg");
 	map(0x5113, 0x5113).ram(); // written with tilebase?
 	map(0x5114, 0x5115).ram().share("tilebase");
 	map(0x5116, 0x5117).ram();
 	map(0x5121, 0x5124).ram().share("scrollregs");
-	map(0x5150, 0x5150).ram(); // startup
+
+	map(0x5140, 0x5140).ram();
+	map(0x5150, 0x5150).ram().share("spriteaddr"); // startup 01 bb3,gtg,rsg, (na) foot 0c hnt3
 	map(0x5151, 0x5152).ram().share("spritebase");
 	map(0x5153, 0x5153).ram(); // startup
 
@@ -589,10 +790,36 @@ static INPUT_PORTS_START( rad_gtg )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) // up and down in the menus should be the trackball, maybe these are leftovers from real swing golf or just from development?
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) // up and down in the menus should be the trackball
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 
 	PORT_START("IN1")
+	PORT_DIPNAME( 0x01, 0x01, "IN1" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN2")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x08, 0x08, "Track Y test" ) // trackball up/down direction bit? (read in interrupt, increases / decreases a counter)
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
@@ -602,10 +829,93 @@ static INPUT_PORTS_START( rad_gtg )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("TV")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( rad_rsg ) // base unit just has 4 directions + enter and a sensor to swing the club over
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) // aiming
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) // select in menus?
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) // previous in menus?
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) // next in menus?
+	PORT_DIPNAME( 0x20, 0x20, "IN0" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN1")
+	PORT_DIPNAME( 0x01, 0x01, "IN1" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN2")
+	PORT_DIPNAME( 0x01, 0x01, "IN2" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("TV")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( rad_rsgp )
+	PORT_INCLUDE(rad_rsg)
+
+	PORT_MODIFY("TV")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 // hold enter and left during power on for test mode
-static INPUT_PORTS_START( radica_eu3a14 )
+static INPUT_PORTS_START( radica_foot )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
@@ -651,6 +961,268 @@ static INPUT_PORTS_START( radica_eu3a14 )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN2")
+	PORT_DIPNAME( 0x01, 0x01, "IN2" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("TV")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( radica_hnt3 )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Menu Previous")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Menu Next")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Menu Select")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON4 ) // pause?
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Fire Gun") // maybe
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Safety") PORT_TOGGLE
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Fire Gun (alt)") // maybe
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN2")
+	PORT_DIPNAME( 0x01, 0x01, "IN2" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("TV")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( radica_hnt3p )
+	PORT_INCLUDE(radica_hnt3)
+
+	PORT_MODIFY("TV")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( radica_bask )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_DIPNAME( 0x08, 0x08, "IN0" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN1")
+	PORT_DIPNAME( 0x01, 0x01, "IN1" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN2")
+	PORT_DIPNAME( 0x01, 0x01, "IN2" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("TV")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( radica_baskp )
+	PORT_INCLUDE(radica_bask)
+
+	PORT_MODIFY("TV")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( radica_bb3 )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN1")
+	PORT_DIPNAME( 0x01, 0x01, "IN1" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN2")
+	PORT_DIPNAME( 0x01, 0x01, "IN2" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("TV")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( radica_bb3p )
+	PORT_INCLUDE(radica_bb3)
+
+	PORT_MODIFY("TV")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 void radica_eu3a14_state::machine_start()
@@ -663,6 +1235,12 @@ void radica_eu3a14_state::machine_reset()
 	m_maincpu->set_state_int(M6502_S, 0x1ff);
 
 	m_bank->set_bank(0x01);
+
+	m_portdir[0] = 0x00;
+	m_portdir[1] = 0x00;
+	m_portdir[2] = 0x00;
+
+	m_spriteaddr[0] = 0x14; // ?? rad_foot never writes, other games seem to use it to se sprite location
 }
 
 
@@ -752,6 +1330,17 @@ static const gfx_layout helper16x16x4_layout =
 	16 * 16 * 4
 };
 
+static const gfx_layout helper8x8x8_layout =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	8,
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
+	{ STEP8(0,8*8)  },
+	8 * 8 * 8
+};
+
 static const gfx_layout helper8x8x4_layout =
 {
 	8,8,
@@ -768,8 +1357,10 @@ static GFXDECODE_START( gfx_helper )
 	GFXDECODE_ENTRY( "maincpu", 0, helper8x1x2_layout,    0x0, 128  )
 	GFXDECODE_ENTRY( "maincpu", 0, helper8x1x4_layout,    0x0, 32  )
 	GFXDECODE_ENTRY( "maincpu", 0, helper8x1x8_layout,    0x0, 2  )
+	// standard decodes
 	GFXDECODE_ENTRY( "maincpu", 0, helper16x16x8_layout,  0x0, 2  )
 	GFXDECODE_ENTRY( "maincpu", 0, helper16x16x4_layout,  0x0, 32  )
+	GFXDECODE_ENTRY( "maincpu", 0, helper8x8x8_layout,    0x0, 2  )
 	GFXDECODE_ENTRY( "maincpu", 0, helper8x8x4_layout,    0x0, 32  )
 GFXDECODE_END
 
@@ -781,12 +1372,7 @@ MACHINE_CONFIG_START(radica_eu3a14_state::radica_eu3a14)
 	MCFG_DEVICE_PROGRAM_MAP(radica_eu3a14_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", radica_eu3a14_state,  interrupt)
 
-	MCFG_DEVICE_ADD("bank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(bank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(24)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000)
+	ADDRESS_MAP_BANK(config, "bank").set_map(&radica_eu3a14_state::bank_map).set_options(ENDIANNESS_LITTLE, 8, 24, 0x8000);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_helper)
 
@@ -804,44 +1390,110 @@ MACHINE_CONFIG_START(radica_eu3a14_state::radica_eu3a14)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("6ch_sound", RADICA6502_SOUND, 8000)
-	MCFG_RADICA6502_SOUND_SPACE_READ_CB(READ8(*this, radica_eu3a14_state, read_full_space))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	radica6502_sound_device &sound(RADICA6502_SOUND(config, "6ch_sound", 8000));
+	sound.space_read_callback().set(FUNC(radica_eu3a14_state::read_full_space));
+	sound.add_route(ALL_OUTPUTS, "mono", 1.0);
 
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(radica_eu3a14_state::radica_eu3a14_adc)
 	radica_eu3a14(config);
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", radica_eu3a14_state, scanline_cb, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(radica_eu3a14_state::scanline_cb), "screen", 0, 1);
 MACHINE_CONFIG_END
+
+
+MACHINE_CONFIG_START(radica_eu3a14_state::radica_eu3a14p) // TODO, clocks differ too, what are they on PAL?
+	radica_eu3a14(config);
+
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_REFRESH_RATE(50)
+MACHINE_CONFIG_END
+
 
 void radica_eu3a14_state::init_rad_gtg()
 {
 	// must be registers to control this
 	m_tilerambase = 0x0a00 - 0x200;
-	m_spriterambase = 0x0220 - 0x200;
 }
 
 void radica_eu3a14_state::init_rad_foot()
 {
 	// must be registers to control this
 	m_tilerambase = 0x0200 - 0x200;
-	m_spriterambase = 0x2800 - 0x200;
+}
+
+void radica_eu3a14_state::init_rad_hnt3()
+{
+	// must be registers to control this
+	m_tilerambase = 0x0200 - 0x200;
 }
 
 
 ROM_START( rad_gtg )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "goldentee.bin", 0x000000, 0x400000, CRC(b1985c63) SHA1(c42a59fcb665eb801d9ca5312b90e39333e52de4) )
+	ROM_LOAD( "goldentee.bin", 0x000000, 0x400000, CRC(2d6cdb85) SHA1(ce6ed39d692ff16ea407f39c37b6e731f952b9d5) )
 ROM_END
+
+ROM_START( rad_rsg )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "realswinggolf.bin", 0x000000, 0x400000, CRC(89e5b6a6) SHA1(0b14aa84d7e7ae7190cd64e3eb125de2104342bc) )
+ROM_END
+
+ROM_START( rad_rsgp )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "realswinggolf.bin", 0x000000, 0x400000, CRC(89e5b6a6) SHA1(0b14aa84d7e7ae7190cd64e3eb125de2104342bc) )
+ROM_END
+
 
 ROM_START( rad_foot )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "connectvfootball.bin", 0x000000, 0x400000, CRC(00ac4fc0) SHA1(2b60ae5c6bc7e9ef7cdbd3f6a0a0657ed3ab5afe) )
 ROM_END
 
-CONS( 2006, rad_gtg,  0, 0, radica_eu3a14_adc, rad_gtg,       radica_eu3a14_state, init_rad_gtg,  "Radica (licensed from Incredible Technologies)", "Golden Tee Golf: Home Edition", MACHINE_NOT_WORKING )
+ROM_START( rad_bb3 )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "baseball3.bin", 0x000000, 0x400000, CRC(af86aab0) SHA1(5fed48a295f045ca839f87b0f9b78ecc51104cdc) )
+ROM_END
+
+ROM_START( rad_bb3p )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "baseball3.bin", 0x000000, 0x400000, CRC(af86aab0) SHA1(5fed48a295f045ca839f87b0f9b78ecc51104cdc) )
+ROM_END
+
+ROM_START( rad_hnt3 )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "huntin3.bin", 0x000000, 0x400000, CRC(c8e3e40b) SHA1(81eb16ac5ab6d93525fcfadbc6703b2811d7de7f) )
+ROM_END
+
+ROM_START( rad_hnt3p )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "huntin3.bin", 0x000000, 0x400000, CRC(c8e3e40b) SHA1(81eb16ac5ab6d93525fcfadbc6703b2811d7de7f) )
+ROM_END
+
+ROM_START( rad_bask )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "basketball.bin", 0x000000, 0x400000, CRC(7d6ff53c) SHA1(1c75261d55e0107a3b8e8d4c1eb2854750f2d0e8) )
+ROM_END
+
+ROM_START( rad_baskp )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "basketball.bin", 0x000000, 0x400000, CRC(7d6ff53c) SHA1(1c75261d55e0107a3b8e8d4c1eb2854750f2d0e8) )
+ROM_END
+
+CONS( 2006, rad_gtg,  0,        0, radica_eu3a14_adc, rad_gtg,       radica_eu3a14_state, init_rad_gtg,  "Radica / FarSight Studios (licensed from Incredible Technologies)", "Golden Tee Golf: Home Edition", MACHINE_NOT_WORKING )
+
+CONS( 2005, rad_rsg,  0,        0, radica_eu3a14,     rad_rsg,       radica_eu3a14_state, init_rad_gtg,  "Radica / FarSight Studios",                                         "Play TV Real Swing Golf", MACHINE_NOT_WORKING )
+CONS( 2005, rad_rsgp, rad_rsg,  0, radica_eu3a14p,    rad_rsgp,      radica_eu3a14_state, init_rad_gtg,  "Radica / FarSight Studios",                                         "Connectv Real Swing Golf", MACHINE_NOT_WORKING )
 
 // also has a Connectv Real Soccer logo in the roms, apparently unused, maybe that was to be the US title (without the logo being changed to Play TV) but Play TV Soccer ended up being a different game licensed from Epoch instead.
-CONS( 2006, rad_foot, 0, 0, radica_eu3a14,     radica_eu3a14, radica_eu3a14_state, init_rad_foot, "Radica", "Connectv Football", MACHINE_NOT_WORKING )
+CONS( 2006, rad_foot, 0,        0, radica_eu3a14p,    radica_foot,   radica_eu3a14_state, init_rad_foot, "Radica / Medialink",                                                "Connectv Football", MACHINE_NOT_WORKING )
+
+CONS( 2005, rad_bb3,  0,        0, radica_eu3a14,     radica_bb3,    radica_eu3a14_state, init_rad_gtg,  "Radica / FarSight Studios",                                         "Play TV Baseball 3", MACHINE_NOT_WORKING )
+CONS( 2005, rad_bb3p, rad_bb3,  0, radica_eu3a14p,    radica_bb3p,   radica_eu3a14_state, init_rad_gtg,  "Radica / FarSight Studios",                                         "Connectv Baseball 3", MACHINE_NOT_WORKING )
+
+CONS( 2005, rad_hnt3, 0,        0, radica_eu3a14,     radica_hnt3,   radica_eu3a14_state, init_rad_hnt3, "Radica / V-Tac Technology Co Ltd.",                                 "Play TV Huntin' 3", MACHINE_NOT_WORKING )
+CONS( 2005, rad_hnt3p,rad_hnt3, 0, radica_eu3a14p,    radica_hnt3p,  radica_eu3a14_state, init_rad_hnt3, "Radica / V-Tac Technology Co Ltd.",                                 "Connectv Huntin' 3", MACHINE_NOT_WORKING )
+
+CONS( 2005, rad_bask, 0,        0, radica_eu3a14,     radica_bask,   radica_eu3a14_state, init_rad_gtg,  "Radica / FarSight Studios",                                         "Play TV Basketball", MACHINE_NOT_WORKING )
+CONS( 2005, rad_baskp,rad_bask, 0, radica_eu3a14,     radica_baskp,  radica_eu3a14_state, init_rad_gtg,  "Radica / FarSight Studios",                                         "Connectv Basketball", MACHINE_NOT_WORKING )

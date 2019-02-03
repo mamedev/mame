@@ -29,6 +29,7 @@ class tim100_state : public driver_device
 public:
 	tim100_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_charmap(*this, "chargen")
 		, m_p_videoram(*this, "videoram")
 		, m_maincpu(*this, "maincpu")
 		, m_palette(*this, "palette")
@@ -46,12 +47,13 @@ private:
 	void tim100_mem(address_map &map);
 
 	virtual void machine_start() override;
-	uint8_t *m_charmap;
+
 	uint16_t m_dma_adr;
+	required_region_ptr<uint8_t> m_charmap;
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
-	required_device<i8275_device> m_crtc;
+	required_device<i8276_device> m_crtc;
 };
 
 void tim100_state::tim100_mem(address_map &map)
@@ -59,12 +61,10 @@ void tim100_state::tim100_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x1fff).rom(); // 2764 at U16
 	map(0x2000, 0x27ff).ram().share("videoram"); // 2KB static ram CDM6116A at U15
-	map(0x6000, 0x6000).rw("uart_u17", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x6001, 0x6001).rw("uart_u17", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x8000, 0x8000).rw("uart_u18", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x8001, 0x8001).rw("uart_u18", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x6000, 0x6001).rw("uart_u17", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x8000, 0x8001).rw("uart_u18", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0xa000, 0xa000).nopw();   // continuously writes 00 here
-	map(0xc000, 0xc001).rw(m_crtc, FUNC(i8275_device::read), FUNC(i8275_device::write)); // i8276
+	map(0xc000, 0xc001).rw(m_crtc, FUNC(i8276_device::read), FUNC(i8276_device::write)); // i8276
 }
 
 void tim100_state::tim100_io(address_map &map)
@@ -95,8 +95,7 @@ static const rgb_t tim100_palette[3] = {
 
 void tim100_state::machine_start()
 {
-	m_charmap = memregion("chargen")->base();
-	m_palette->set_pen_colors(0, tim100_palette, ARRAY_LENGTH(tim100_palette));
+	m_palette->set_pen_colors(0, tim100_palette);
 }
 
 const gfx_layout tim100_charlayout =
@@ -170,7 +169,7 @@ MACHINE_CONFIG_START(tim100_state::tim100)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", i8275_device, screen_update)
+	MCFG_SCREEN_UPDATE_DEVICE("crtc", i8276_device, screen_update)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(600, 352)
@@ -178,42 +177,42 @@ MACHINE_CONFIG_START(tim100_state::tim100)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tim100 )
 
-	MCFG_DEVICE_ADD("crtc", I8275, XTAL(4'915'200))
-	MCFG_I8275_CHARACTER_WIDTH(12)
-	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(tim100_state, crtc_display_pixels)
-	MCFG_I8275_DRQ_CALLBACK(WRITELINE(*this, tim100_state, drq_w))
-	MCFG_I8275_IRQ_CALLBACK(WRITELINE(*this, tim100_state, irq_w))
-	MCFG_VIDEO_SET_SCREEN("screen")
+	I8276(config, m_crtc, XTAL(4'915'200));
+	m_crtc->set_character_width(12);
+	m_crtc->set_display_callback(FUNC(tim100_state::crtc_display_pixels), this);
+	m_crtc->drq_wr_callback().set(FUNC(tim100_state::drq_w));
+	m_crtc->irq_wr_callback().set(FUNC(tim100_state::irq_w));
+	m_crtc->set_screen("screen");
 
 	MCFG_PALETTE_ADD("palette", 3)
 
-	MCFG_DEVICE_ADD("uart_u17", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
+	i8251_device &uart_u17(I8251(config, "uart_u17", 0));
+	uart_u17.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	uart_u17.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
+	uart_u17.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "keyboard")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("uart_u17", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("uart_u17", i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("uart_u17", i8251_device, write_cts))
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("keyboard", tim100)
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "keyboard"));
+	rs232.rxd_handler().set("uart_u17", FUNC(i8251_device::write_rxd));
+	rs232.dsr_handler().set("uart_u17", FUNC(i8251_device::write_dsr));
+	rs232.cts_handler().set("uart_u17", FUNC(i8251_device::write_cts));
+	rs232.set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(tim100));
 
-	MCFG_DEVICE_ADD("uart_u18", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232a", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(WRITELINE("rs232a", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE("rs232a", rs232_port_device, write_rts))
+	i8251_device &uart_u18(I8251(config, "uart_u18", 0));
+	uart_u18.txd_handler().set("rs232a", FUNC(rs232_port_device::write_txd));
+	uart_u18.dtr_handler().set("rs232a", FUNC(rs232_port_device::write_dtr));
+	uart_u18.rts_handler().set("rs232a", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("rs232a", RS232_PORT, default_rs232_devices, "terminal") //"keyboard")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("uart_u18", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("uart_u18", i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("uart_u18", i8251_device, write_cts))
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", tim100)
+	rs232_port_device &rs232a(RS232_PORT(config, "rs232a", default_rs232_devices, "terminal")); //"keyboard"));
+	rs232a.rxd_handler().set("uart_u18", FUNC(i8251_device::write_rxd));
+	rs232a.dsr_handler().set("uart_u18", FUNC(i8251_device::write_dsr));
+	rs232a.cts_handler().set("uart_u18", FUNC(i8251_device::write_cts));
+	rs232a.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(tim100));
 
-	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("uart_u17", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart_u17", i8251_device, write_rxc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart_u18", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart_u18", i8251_device, write_rxc))
+	clock_device &uart_clock(CLOCK(config, "uart_clock", 153'600));
+	uart_clock.signal_handler().set("uart_u17", FUNC(i8251_device::write_txc));
+	uart_clock.signal_handler().append("uart_u17", FUNC(i8251_device::write_rxc));
+	uart_clock.signal_handler().append("uart_u18", FUNC(i8251_device::write_txc));
+	uart_clock.signal_handler().append("uart_u18", FUNC(i8251_device::write_rxc));
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -10,13 +10,13 @@
 
 
 #include "emu.h"
-#include "includes/xbox.h"
+#include "machine/pci.h"
 #include "includes/xbox_pci.h"
+#include "includes/xbox.h"
 
 #include "cpu/i386/i386.h"
 #include "machine/atapicdr.h"
 #include "machine/idehd.h"
-#include "machine/pit8253.h"
 
 #include "debug/debugcmd.h"
 #include "debug/debugcon.h"
@@ -33,7 +33,7 @@ class xbox_state : public xbox_base_state
 public:
 	xbox_state(const machine_config &mconfig, device_type type, const char *tag)
 		: xbox_base_state(mconfig, type, tag)
-		, m_ide(*this, "ide")
+		, m_ide(*this, "pci:09.0:ide")
 		, m_devh(*this, "pci:09.0:ide:0:hdd")
 		, m_devc(*this, "pci:09.0:ide:1:cdrom")
 	{ }
@@ -181,15 +181,13 @@ MACHINE_CONFIG_START(xbox_state::xbox)
 	MCFG_DEVICE_MODIFY(":pci:09.0:ide:1")
 	MCFG_DEVICE_SLOT_INTERFACE(xbox_ata_devices, "cdrom", true)
 
-	MCFG_USB_PORT_ADD(":pci:02.0:port1", usb_xbox, nullptr, false)
-	MCFG_USB_PORT_ADD(":pci:02.0:port2", usb_xbox, nullptr, false)
-	MCFG_USB_PORT_ADD(":pci:02.0:port3", usb_xbox, "xbox_controller", false)
-	MCFG_USB_PORT_ADD(":pci:02.0:port4", usb_xbox, nullptr, false)
+	OHCI_USB_CONNECTOR(config, ":pci:02.0:port1", usb_xbox, nullptr, false);
+	OHCI_USB_CONNECTOR(config, ":pci:02.0:port2", usb_xbox, nullptr, false);
+	OHCI_USB_CONNECTOR(config, ":pci:02.0:port3", usb_xbox, "xbox_controller", false);
+	OHCI_USB_CONNECTOR(config, ":pci:02.0:port4", usb_xbox, nullptr, false);
 
 /* sound hardware */
 	SPEAKER(config, "mono").front_center();
-//  MCFG_DEVICE_ADD("aysnd", AY8910, MAIN_CLOCK/4)
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MCFG_DEVICE_ADD("ohci_gamepad", OHCI_GAME_CONTROLLER, 0)
 MACHINE_CONFIG_END

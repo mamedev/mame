@@ -5,6 +5,10 @@
     Konami Battlantis Hardware
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_BATTLNTS_H
+#define MAME_INCLUDES_BATTLNTS_H
+
+#pragma once
 
 #include "video/k007342.h"
 #include "video/k007420.h"
@@ -12,14 +16,15 @@
 class battlnts_state : public driver_device
 {
 public:
-	battlnts_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	battlnts_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_k007342(*this, "k007342"),
 		m_k007420(*this, "k007420"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_rombank(*this, "rombank") { }
+		m_rombank(*this, "rombank")
+	{ }
 
 	/* video-related */
 	int m_spritebank;
@@ -45,3 +50,5 @@ public:
 	void battlnts_map(address_map &map);
 	void battlnts_sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_BATTLNTS_H

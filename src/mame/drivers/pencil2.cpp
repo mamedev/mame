@@ -152,7 +152,7 @@ void pencil2_state::io_map(address_map &map)
 	map(0xa0, 0xa0).mirror(0x1e).rw("tms9928a", FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));
 	map(0xa1, 0xa1).mirror(0x1e).rw("tms9928a", FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));
 	map(0xc0, 0xdf).w(FUNC(pencil2_state::portc0_w));
-	map(0xe0, 0xff).w("sn76489a", FUNC(sn76489a_device::command_w));
+	map(0xe0, 0xff).w("sn76489a", FUNC(sn76489a_device::write));
 	map(0xe0, 0xe0).portr("E0");
 	map(0xe1, 0xe1).portr("E1");
 	map(0xe2, 0xe2).r(FUNC(pencil2_state::porte2_r));
@@ -318,33 +318,34 @@ MACHINE_CONFIG_START(pencil2_state::pencil2)
 	MCFG_DEVICE_IO_MAP(io_map)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD( "tms9928a", TMS9929A, XTAL(10'738'635) / 2 )
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
-	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
+	tms9929a_device &vdp(TMS9929A(config, "tms9928a", XTAL(10'738'635)));
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("sn76489a", SN76489A, XTAL(10'738'635)/3) // guess
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
+	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "pencil2_cart")
 
 	/* printer */
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, pencil2_state, write_centronics_ack))
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, pencil2_state, write_centronics_busy))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->ack_handler().set(FUNC(pencil2_state::write_centronics_ack));
+	m_centronics->busy_handler().set(FUNC(pencil2_state::write_centronics_busy));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "pencil2")
+	SOFTWARE_LIST(config, "cart_list").set_original("pencil2");
 MACHINE_CONFIG_END
 
 /* ROM definition */

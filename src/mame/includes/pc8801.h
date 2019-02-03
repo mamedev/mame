@@ -3,17 +3,18 @@
 /********************************************************************************************
 
     PC-8801 (c) 1981 NEC
-	
+
 ********************************************************************************************/
+#ifndef MAME_INCLUDES_PC8801_H
+#define MAME_INCLUDES_PC8801_H
 
 #pragma once
 
-#ifndef MAME_INCLUDES_PC8801_H
-#define MAME_INCLUDES_PC8801_H
 
 #include "cpu/z80/z80.h"
 #include "bus/centronics/ctronics.h"
 #include "imagedev/cassette.h"
+#include "imagedev/floppy.h"
 #include "machine/i8214.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
@@ -34,49 +35,50 @@
 #define UPD1990A_TAG    "upd1990a"
 #define I8251_TAG       "i8251"
 
-struct crtc_t
-{
-	uint8_t cmd,param_count,cursor_on,status,irq_mask;
-	uint8_t param[8][5];
-	uint8_t inverse;
-};
-
-struct mouse_t
-{
-	uint8_t phase;
-	uint8_t x,y;
-	attotime time;
-};
-
 class pc8801_state : public driver_device
 {
 public:
 	pc8801_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_screen(*this, "screen"),
-			m_fdccpu(*this, "fdccpu"),
-			m_fdc(*this, "upd765"),
-			m_fdd(*this, "upd765:%u", 0U),
-			m_pic(*this, I8214_TAG),
-			m_rtc(*this, UPD1990A_TAG),
-			m_cassette(*this, "cassette"),
-			m_beeper(*this, "beeper"),
-			m_opna(*this, "opna"),
-			m_opn(*this, "opn"),
-			m_palette(*this, "palette")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_screen(*this, "screen")
+		, m_fdccpu(*this, "fdccpu")
+		, m_fdc(*this, "upd765")
+		, m_fdd(*this, "upd765:%u", 0U)
+		, m_pic(*this, I8214_TAG)
+		, m_rtc(*this, UPD1990A_TAG)
+		, m_cassette(*this, "cassette")
+		, m_beeper(*this, "beeper")
+		, m_opna(*this, "opna")
+		, m_opn(*this, "opn")
+		, m_palette(*this, "palette")
 	{ }
+
 	void pc8801mc(machine_config &config);
 	void pc8801fh(machine_config &config);
 	void pc8801(machine_config &config);
 	void pc8801ma(machine_config &config);
-protected:
 
+protected:
 	virtual void video_start() override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 private:
+	struct crtc_t
+	{
+		uint8_t cmd,param_count,cursor_on,status,irq_mask;
+		uint8_t param[8][5];
+		uint8_t inverse;
+	};
+
+	struct mouse_t
+	{
+		uint8_t phase;
+		uint8_t x,y;
+		attotime time;
+	};
+
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<cpu_device> m_fdccpu;
@@ -235,7 +237,7 @@ private:
 	void draw_text(bitmap_ind16 &bitmap,int y_size, uint8_t width);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_PALETTE_INIT(pc8801);
+	void pc8801_palette(palette_device &palette) const;
 	void pc8801_io(address_map &map);
 	void pc8801_mem(address_map &map);
 	void pc8801fdc_io(address_map &map);
@@ -256,5 +258,4 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(pc8801_sound_irq);
 };
 
-
-#endif
+#endif // MAME_INCLUDES_PC8801_H

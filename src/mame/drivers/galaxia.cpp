@@ -147,9 +147,9 @@ void galaxia_state::galaxia_mem_map(address_map &map)
 {
 	map(0x0000, 0x13ff).rom();
 	map(0x1400, 0x14ff).mirror(0x6000).ram().share("bullet_ram");
-	map(0x1500, 0x15ff).mirror(0x6000).rw(m_s2636_0, FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
-	map(0x1600, 0x16ff).mirror(0x6000).rw(m_s2636_1, FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
-	map(0x1700, 0x17ff).mirror(0x6000).rw(m_s2636_2, FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
+	map(0x1500, 0x15ff).mirror(0x6000).rw(m_s2636[0], FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
+	map(0x1600, 0x16ff).mirror(0x6000).rw(m_s2636[1], FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
+	map(0x1700, 0x17ff).mirror(0x6000).rw(m_s2636[2], FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
 	map(0x1800, 0x1bff).mirror(0x6000).r(FUNC(galaxia_state::cvs_video_or_color_ram_r)).w(FUNC(galaxia_state::galaxia_video_w)).share("video_ram");
 	map(0x1c00, 0x1fff).mirror(0x6000).ram();
 	map(0x2000, 0x33ff).rom();
@@ -160,7 +160,7 @@ void galaxia_state::astrowar_mem_map(address_map &map)
 {
 	map(0x0000, 0x13ff).rom();
 	map(0x1400, 0x14ff).mirror(0x6000).ram();
-	map(0x1500, 0x15ff).mirror(0x6000).rw(m_s2636_0, FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
+	map(0x1500, 0x15ff).mirror(0x6000).rw(m_s2636[0], FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
 	map(0x1800, 0x1bff).mirror(0x6000).r(FUNC(galaxia_state::cvs_video_or_color_ram_r)).w(FUNC(galaxia_state::galaxia_video_w)).share("video_ram");
 	map(0x1c00, 0x1cff).mirror(0x6000).ram().share("bullet_ram");
 	map(0x2000, 0x33ff).rom();
@@ -300,84 +300,81 @@ static GFXDECODE_START( gfx_astrowar )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(galaxia_state::galaxia)
-
+void galaxia_state::galaxia(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", S2650, XTAL(14'318'181)/8)
-	MCFG_DEVICE_PROGRAM_MAP(galaxia_mem_map)
-	MCFG_DEVICE_IO_MAP(galaxia_io_map)
-	MCFG_DEVICE_DATA_MAP(galaxia_data_map)
-	MCFG_S2650_SENSE_INPUT(READLINE("screen", screen_device, vblank))
-	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, cvs_state, write_s2650_flag))
+	S2650(config, m_maincpu, XTAL(14'318'181)/8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &galaxia_state::galaxia_mem_map);
+	m_maincpu->set_addrmap(AS_IO, &galaxia_state::galaxia_io_map);
+	m_maincpu->set_addrmap(AS_DATA, &galaxia_state::galaxia_data_map);
+	m_maincpu->sense_handler().set("screen", FUNC(screen_device::vblank));
+	m_maincpu->flag_handler().set(FUNC(galaxia_state::write_s2650_flag));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_SCREEN_REFRESH_RATE(60) // wrong
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 30*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(galaxia_state, screen_update_galaxia)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, galaxia_state, vblank_irq))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
+	m_screen->set_refresh_hz(60); // wrong
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_size(256, 256);
+	m_screen->set_visarea(0*8, 30*8-1, 2*8, 32*8-1);
+	m_screen->set_screen_update(FUNC(galaxia_state::screen_update_galaxia));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(galaxia_state::vblank_irq));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_galaxia)
-	MCFG_PALETTE_ADD("palette", 0x18+2)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_galaxia);
+	PALETTE(config, m_palette, FUNC(galaxia_state::galaxia_palette), 0x18+2);
 
-	MCFG_PALETTE_INIT_OWNER(galaxia_state,galaxia)
 	MCFG_VIDEO_START_OVERRIDE(galaxia_state,galaxia)
 
-	MCFG_DEVICE_ADD("s2636_0", S2636, 0)
-	MCFG_S2636_OFFSETS(-13, -26)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	S2636(config, m_s2636[0], 0);
+	m_s2636[0]->set_offsets(-13, -26);
+	m_s2636[0]->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("s2636_1", S2636, 0)
-	MCFG_S2636_OFFSETS(-13, -26)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	S2636(config, m_s2636[1], 0);
+	m_s2636[1]->set_offsets(-13, -26);
+	m_s2636[1]->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("s2636_2", S2636, 0)
-	MCFG_S2636_OFFSETS(-13, -26)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	S2636(config, m_s2636[2], 0);
+	m_s2636[2]->set_offsets(-13, -26);
+	m_s2636[2]->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(galaxia_state::astrowar)
-
+void galaxia_state::astrowar(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", S2650, XTAL(14'318'181)/8)
-	MCFG_DEVICE_PROGRAM_MAP(astrowar_mem_map)
-	MCFG_DEVICE_IO_MAP(galaxia_io_map)
-	MCFG_DEVICE_DATA_MAP(galaxia_data_map)
-	MCFG_S2650_SENSE_INPUT(READLINE("screen", screen_device, vblank))
-	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, cvs_state, write_s2650_flag))
+	S2650(config, m_maincpu, XTAL(14'318'181)/8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &galaxia_state::astrowar_mem_map);
+	m_maincpu->set_addrmap(AS_IO, &galaxia_state::galaxia_io_map);
+	m_maincpu->set_addrmap(AS_DATA, &galaxia_state::galaxia_data_map);
+	m_maincpu->sense_handler().set("screen", FUNC(screen_device::vblank));
+	m_maincpu->flag_handler().set(FUNC(galaxia_state::write_s2650_flag));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(galaxia_state, screen_update_astrowar)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, galaxia_state, vblank_irq))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_size(256, 256);
+	m_screen->set_visarea(1*8, 31*8-1, 2*8, 32*8-1);
+	m_screen->set_screen_update(FUNC(galaxia_state::screen_update_astrowar));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(galaxia_state::vblank_irq));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_astrowar)
-	MCFG_PALETTE_ADD("palette", 0x18+2)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_astrowar);
+	PALETTE(config, m_palette, FUNC(galaxia_state::astrowar_palette), 0x18+2);
 
-	MCFG_PALETTE_INIT_OWNER(galaxia_state,astrowar)
 	MCFG_VIDEO_START_OVERRIDE(galaxia_state,astrowar)
 
-	MCFG_DEVICE_ADD("s2636_0", S2636, 0)
-	MCFG_S2636_OFFSETS(-13, -8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	S2636(config, m_s2636[0], 0);
+	m_s2636[0]->set_offsets(-13, -8);
+	m_s2636[0]->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************
@@ -480,7 +477,7 @@ ROM_START( astrowar )
 	ROM_LOAD( "astro.8i",  0x01000, 0x0400, CRC(ab87fbfc) SHA1(34b670f96c260f186c643e588995ae5d80377784) )
 	ROM_LOAD( "astro.10i", 0x02000, 0x0400, CRC(533675c1) SHA1(69cc066e1874a135a53a21b7b2461bda456504f1) )
 	ROM_LOAD( "astro.11i", 0x02400, 0x0400, CRC(59cf8901) SHA1(e849d4c99350b7e3453c156d91618b71b5be1163) )
-	ROM_LOAD( "astro.13i", 0x02800, 0x0400, CRC(5149c121) SHA1(232ba594e283fb25c31d8ae0b7d8315a81852a71) )
+	ROM_LOAD( "astro.13i", 0x02800, 0x0400, CRC(5149c121) SHA1(232ba594e283fb25c31d8ae0b7d8315a81852a71) BAD_DUMP ) // suspected bad byte at 0x2a00
 	ROM_LOAD( "astro.11l", 0x02c00, 0x0400, CRC(29f52f57) SHA1(5cb50b82e09c537eeaeae167351fca686fde8228) )
 	ROM_LOAD( "astro.13l", 0x03000, 0x0400, CRC(882cdb87) SHA1(062ee8d296316cbce2eb62e72774aa4181e9847d) )
 

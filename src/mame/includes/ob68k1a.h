@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#pragma once
-
 #ifndef MAME_INCLUDES_OB68K1A_H
 #define MAME_INCLUDES_OB68K1A_H
+
+#pragma once
 
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
@@ -27,16 +27,16 @@ class ob68k1a_state : public driver_device
 {
 public:
 	ob68k1a_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, MC68000L10_TAG),
-			m_dbrg(*this, COM8116_TAG),
-			m_acia0(*this, MC6850_0_TAG),
-			m_acia1(*this, MC6850_1_TAG),
-			m_pia0(*this, MC6821_0_TAG),
-			m_pia1(*this, MC6821_1_TAG),
-			m_rs232a(*this, RS232_A_TAG),
-			m_rs232b(*this, RS232_B_TAG),
-			m_ram(*this, RAM_TAG)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, MC68000L10_TAG)
+		, m_dbrg(*this, COM8116_TAG)
+		, m_acia0(*this, MC6850_0_TAG)
+		, m_acia1(*this, MC6850_1_TAG)
+		, m_pia0(*this, MC6821_0_TAG)
+		, m_pia1(*this, MC6821_1_TAG)
+		, m_rs232a(*this, RS232_A_TAG)
+		, m_rs232b(*this, RS232_B_TAG)
+		, m_ram(*this, RAM_TAG)
 	{ }
 
 	void ob68k1a(machine_config &config);

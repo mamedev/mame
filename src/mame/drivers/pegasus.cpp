@@ -493,7 +493,7 @@ MACHINE_CONFIG_START(pegasus_state::pegasus)
 	MCFG_DEVICE_ADD("maincpu", MC6809, XTAL(4'000'000))  // actually a 6809C - 4MHZ clock coming in, 1MHZ internally
 	MCFG_DEVICE_PROGRAM_MAP(pegasus_mem)
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("pegasus_firq", pegasus_state, pegasus_firq, attotime::from_hz(400))
+	TIMER(config, "pegasus_firq").configure_periodic(FUNC(pegasus_state::pegasus_firq), attotime::from_hz(400));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -504,27 +504,27 @@ MACHINE_CONFIG_START(pegasus_state::pegasus)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 16*16-1)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pegasus)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
+	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* devices */
-	MCFG_DEVICE_ADD("pia_s", PIA6821, 0)
-	MCFG_PIA_READPB_HANDLER(READ8(*this, pegasus_state, pegasus_keyboard_r))
-	MCFG_PIA_READCA1_HANDLER(READLINE(*this, pegasus_state, pegasus_cassette_r))
-	MCFG_PIA_READCB1_HANDLER(READLINE(*this, pegasus_state, pegasus_keyboard_irq))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, pegasus_state, pegasus_keyboard_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, pegasus_state, pegasus_controls_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, pegasus_state, pegasus_cassette_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, pegasus_state, pegasus_firq_clr))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
+	PIA6821(config, m_pia_s, 0);
+	m_pia_s->readpb_handler().set(FUNC(pegasus_state::pegasus_keyboard_r));
+	m_pia_s->readca1_handler().set(FUNC(pegasus_state::pegasus_cassette_r));
+	m_pia_s->readcb1_handler().set(FUNC(pegasus_state::pegasus_keyboard_irq));
+	m_pia_s->writepa_handler().set(FUNC(pegasus_state::pegasus_keyboard_w));
+	m_pia_s->writepb_handler().set(FUNC(pegasus_state::pegasus_controls_w));
+	m_pia_s->ca2_handler().set(FUNC(pegasus_state::pegasus_cassette_w));
+	m_pia_s->cb2_handler().set(FUNC(pegasus_state::pegasus_firq_clr));
+	m_pia_s->irqa_handler().set_inputline("maincpu", M6809_IRQ_LINE);
+	m_pia_s->irqb_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 
-	MCFG_DEVICE_ADD("pia_u", PIA6821, 0)
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
+	PIA6821(config, m_pia_u, 0);
+	m_pia_u->irqa_handler().set_inputline("maincpu", M6809_IRQ_LINE);
+	m_pia_u->irqb_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 
 	MCFG_GENERIC_SOCKET_ADD("exp00", generic_plain_slot, "pegasus_cart")
 	MCFG_GENERIC_LOAD(pegasus_state, exp00_load)
@@ -541,11 +541,11 @@ MACHINE_CONFIG_START(pegasus_state::pegasus)
 	MCFG_GENERIC_SOCKET_ADD("exp0d", generic_plain_slot, "pegasus_cart")
 	MCFG_GENERIC_LOAD(pegasus_state, exp0d_load)
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED|CASSETTE_MOTOR_ENABLED)
+	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_STOPPED|CASSETTE_MOTOR_ENABLED);
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "pegasus_cart")
+	SOFTWARE_LIST(config, "cart_list").set_original("pegasus_cart");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pegasus_state::pegasusm)

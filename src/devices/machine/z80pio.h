@@ -38,32 +38,6 @@
 
 
 //**************************************************************************
-//  DEVICE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_Z80PIO_OUT_INT_CB(_devcb) \
-	devcb = &downcast<z80pio_device &>(*device).set_out_int_callback(DEVCB_##_devcb);
-
-#define MCFG_Z80PIO_IN_PA_CB(_devcb) \
-	devcb = &downcast<z80pio_device &>(*device).set_in_pa_callback(DEVCB_##_devcb);
-
-#define MCFG_Z80PIO_OUT_PA_CB(_devcb) \
-	devcb = &downcast<z80pio_device &>(*device).set_out_pa_callback(DEVCB_##_devcb);
-
-#define MCFG_Z80PIO_OUT_ARDY_CB(_devcb) \
-	devcb = &downcast<z80pio_device &>(*device).set_out_ardy_callback(DEVCB_##_devcb);
-
-#define MCFG_Z80PIO_IN_PB_CB(_devcb) \
-	devcb = &downcast<z80pio_device &>(*device).set_in_pb_callback(DEVCB_##_devcb);
-
-#define MCFG_Z80PIO_OUT_PB_CB(_devcb) \
-	devcb = &downcast<z80pio_device &>(*device).set_out_pb_callback(DEVCB_##_devcb);
-
-#define MCFG_Z80PIO_OUT_BRDY_CB(_devcb) \
-	devcb = &downcast<z80pio_device &>(*device).set_out_brdy_callback(DEVCB_##_devcb);
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -84,13 +58,14 @@ public:
 	// construction/destruction
 	z80pio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_out_int_callback(Object &&cb) { return m_out_int_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_in_pa_callback(Object &&cb) { return m_in_pa_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_pa_callback(Object &&cb) { return m_out_pa_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_ardy_callback(Object &&cb) { return m_out_ardy_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_in_pb_callback(Object &&cb) { return m_in_pb_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_pb_callback(Object &&cb) { return m_out_pb_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_brdy_callback(Object &&cb) { return m_out_brdy_cb.set_callback(std::forward<Object>(cb)); }
+	auto out_int_callback() { return m_out_int_cb.bind(); }
+	auto in_pa_callback() { return m_in_pa_cb.bind(); }
+	auto out_pa_callback() { return m_out_pa_cb.bind(); }
+	auto out_ardy_callback() { return m_out_ardy_cb.bind(); }
+	auto in_pb_callback() { return m_in_pb_cb.bind(); }
+	auto out_pb_callback() { return m_out_pb_cb.bind(); }
+	auto out_brdy_callback() { return m_out_brdy_cb.bind(); }
+
 
 	// I/O line access
 	int rdy(int which) { return m_port[which].rdy(); }

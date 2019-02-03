@@ -42,14 +42,8 @@ DEFINE_DEVICE_TYPE(M50741, m50741_device, "m50741", "Mitsubishi M50741")
 m5074x_device::m5074x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_map) :
 	m740_device(mconfig, type, tag, owner, clock),
 	m_program_config("program", ENDIANNESS_LITTLE, 8, 13, 0, internal_map),
-	read_p0(*this),
-	read_p1(*this),
-	read_p2(*this),
-	read_p3(*this),
-	write_p0(*this),
-	write_p1(*this),
-	write_p2(*this),
-	write_p3(*this),
+	m_read_p{{*this}, {*this}, {*this}, {*this}},
+	m_write_p{{*this}, {*this}, {*this}, {*this}},
 	m_intctrl(0),
 	m_tmrctrl(0),
 	m_tmr12pre(0),
@@ -70,14 +64,11 @@ m5074x_device::m5074x_device(const machine_config &mconfig, device_type type, co
 
 void m5074x_device::device_start()
 {
-	read_p0.resolve_safe(0);
-	read_p1.resolve_safe(0);
-	read_p2.resolve_safe(0);
-	read_p3.resolve_safe(0);
-	write_p0.resolve_safe();
-	write_p1.resolve_safe();
-	write_p2.resolve_safe();
-	write_p3.resolve_safe();
+	for (int i = 0; i < 4; i++)
+	{
+		m_read_p[i].resolve_safe(0);
+		m_write_p[i].resolve_safe();
+	}
 
 	for (int i = 0; i < NUM_TIMERS; i++)
 	{
@@ -289,48 +280,12 @@ void m5074x_device::recalc_timer(int timer)
 
 void m5074x_device::send_port(address_space &space, uint8_t offset, uint8_t data)
 {
-	switch (offset)
-	{
-		case 0:
-			write_p0(data);
-			break;
-
-		case 1:
-			write_p1(data);
-			break;
-
-		case 2:
-			write_p2(data);
-			break;
-
-		case 3:
-			write_p3(data);
-			break;
-	}
+	m_write_p[offset](data);
 }
 
 uint8_t m5074x_device::read_port(uint8_t offset)
 {
-	uint8_t incoming = 0;
-
-	switch (offset)
-	{
-		case 0:
-			incoming = read_p0();
-			break;
-
-		case 1:
-			incoming = read_p1();
-			break;
-
-		case 2:
-			incoming = read_p2();
-			break;
-
-		case 3:
-			incoming = read_p3();
-			break;
-	}
+	uint8_t incoming = m_read_p[offset]();
 
 	// apply data direction registers
 	incoming &= (m_ddrs[offset] ^ 0xff);
@@ -517,7 +472,7 @@ void m50741_device::m50741_map(address_map &map)
 }
 
 m50741_device::m50741_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	m50741_device(mconfig, M50740, tag, owner, clock)
+	m50741_device(mconfig, M50741, tag, owner, clock)
 {
 }
 

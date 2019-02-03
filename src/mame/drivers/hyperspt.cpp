@@ -292,60 +292,60 @@ WRITE_LINE_MEMBER(hyperspt_state::vblank_irq)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
-MACHINE_CONFIG_START(hyperspt_state::hyperspt)
-
+void hyperspt_state::hyperspt(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, KONAMI1, XTAL(18'432'000)/12)   /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(hyperspt_map)
+	KONAMI1(config, m_maincpu, XTAL(18'432'000)/12);    /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &hyperspt_state::hyperspt_map);
 
-	MCFG_DEVICE_ADD(m_audiocpu, Z80,XTAL(14'318'181)/4) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(hyperspt_sound_map)
+	Z80(config, m_audiocpu, XTAL(14'318'181)/4);        /* verified on pcb */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &hyperspt_state::hyperspt_sound_map);
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // F2
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, hyperspt_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(m_soundbrd, trackfld_audio_device, sh_irqtrigger_w)) // SOUND ON
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // END
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, hyperspt_state, coin_counter_1_w)) // COIN 1
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, hyperspt_state, coin_counter_2_w)) // COIN 2
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // SA
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, hyperspt_state, irq_mask_w)) // INT
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // F2
+	mainlatch.q_out_cb<0>().set(FUNC(hyperspt_state::flipscreen_w));
+	mainlatch.q_out_cb<1>().set(m_soundbrd, FUNC(trackfld_audio_device::sh_irqtrigger_w)); // SOUND ON
+	mainlatch.q_out_cb<2>().set_nop(); // END
+	mainlatch.q_out_cb<3>().set(FUNC(hyperspt_state::coin_counter_1_w)); // COIN 1
+	mainlatch.q_out_cb<4>().set(FUNC(hyperspt_state::coin_counter_2_w)); // COIN 2
+	mainlatch.q_out_cb<5>().set_nop(); // SA
+	mainlatch.q_out_cb<7>().set(FUNC(hyperspt_state::irq_mask_w)); // INT
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(hyperspt_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, hyperspt_state, vblank_irq))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(hyperspt_state::screen_update));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(hyperspt_state::vblank_irq));
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_hyperspt)
-	MCFG_PALETTE_ADD(m_palette, 16*16+16*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(hyperspt_state, hyperspt)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_hyperspt);
+	PALETTE(config, m_palette, FUNC(hyperspt_state::hyperspt_palette), 16*16+16*16, 32);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD(m_soundbrd, TRACKFLD_AUDIO, 0, m_audiocpu, m_vlm)
+	TRACKFLD_AUDIO(config, m_soundbrd, 0, m_audiocpu, m_vlm);
 
-	MCFG_DEVICE_ADD(m_dac, DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
-	MCFG_DEVICE_ADD(m_sn, SN76496, XTAL(14'318'181)/8) /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	SN76496(config, m_sn, XTAL(14'318'181)/8);  /* verified on pcb */
+	m_sn->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	MCFG_DEVICE_ADD(m_vlm, VLM5030, XTAL(3'579'545)) /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-MACHINE_CONFIG_END
+	VLM5030(config, m_vlm, XTAL(3'579'545));    /* verified on pcb */
+	m_vlm->add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
 
 void hyperspt_state::hyprolyb_adpcm_map(address_map &map)
 {
@@ -370,28 +370,28 @@ void hyperspt_state::hyprolyb_adpcm_map(address_map &map)
 	map(0x8000, 0xffff).rom();
 }
 
-
-MACHINE_CONFIG_START(hyperspt_state::hypersptb)
+void hyperspt_state::hypersptb(machine_config &config)
+{
 	hyperspt(config);
-	MCFG_DEVICE_REMOVE("vlm")
+	config.device_remove("vlm");
 
 	m_audiocpu->set_addrmap(AS_PROGRAM, address_map_constructor(&std::remove_pointer_t<decltype(this)>::soundb_map, tag(), this));
 
-	MCFG_DEVICE_ADD("adpcm", M6802, XTAL(14'318'181)/8)    /* unknown clock */
-	MCFG_DEVICE_PROGRAM_MAP(hyprolyb_adpcm_map)
+	M6802(config, "adpcm", XTAL(14'318'181)/8)  /* unknown clock */
+		.set_addrmap(AS_PROGRAM, &hyperspt_state::hyprolyb_adpcm_map);
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, "soundlatch2");
 
-	MCFG_DEVICE_ADD("hyprolyb_adpcm", HYPROLYB_ADPCM, 0)
+	HYPROLYB_ADPCM(config, "hyprolyb_adpcm", 0);
 
-	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE("hyprolyb_adpcm", hyprolyb_adpcm_device, vck_callback)) /* VCK function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)      /* 4 kHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
-MACHINE_CONFIG_END
+	msm5205_device &msm(MSM5205(config, "msm", 384000));
+	msm.vck_legacy_callback().set("hyprolyb_adpcm", FUNC(hyprolyb_adpcm_device::vck_callback)); /* VCK function */
+	msm.set_prescaler_selector(msm5205_device::S96_4B); /* 4 kHz */
+	msm.add_route(ALL_OUTPUTS, "speaker", 0.5);
+}
 
-
-MACHINE_CONFIG_START(hyperspt_state::roadf)
+void hyperspt_state::roadf(machine_config &config)
+{
 	hyperspt(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, address_map_constructor(&std::remove_pointer_t<decltype(this)>::roadf_map, tag(), this));
@@ -400,8 +400,8 @@ MACHINE_CONFIG_START(hyperspt_state::roadf)
 
 	MCFG_VIDEO_START_OVERRIDE(hyperspt_state,roadf)
 
-	MCFG_DEVICE_REMOVE("vlm")
-MACHINE_CONFIG_END
+	config.device_remove("vlm");
+}
 
 
 /***************************************************************************

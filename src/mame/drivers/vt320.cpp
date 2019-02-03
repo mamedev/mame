@@ -108,11 +108,10 @@ MACHINE_CONFIG_START(vt320_state::vt320)
 	MCFG_SCREEN_UPDATE_DRIVER(vt320_state, screen_update_vt320)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16K")
+	RAM(config, RAM_TAG).set_default_size("16K");
 MACHINE_CONFIG_END
 
 /* ROM definition */

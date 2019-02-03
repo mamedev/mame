@@ -195,26 +195,23 @@ MACHINE_CONFIG_START(galaxy_state::galaxy)
 	MCFG_SCREEN_UPDATE_DRIVER(galaxy_state, screen_update_galaxy)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_galaxy)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
-
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* snapshot */
 	MCFG_SNAPSHOT_ADD("snapshot", galaxy_state, galaxy, "gal", 0)
 
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(gtp_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
-	MCFG_CASSETTE_INTERFACE("galaxy_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(gtp_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cassette->set_interface("galaxy_cass");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list","galaxy")
+	SOFTWARE_LIST(config, "cass_list").set_original("galaxy");
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("6K")
-	MCFG_RAM_EXTRA_OPTIONS("2K,22K,38K,54K")
+	RAM(config, RAM_TAG).set_default_size("6K").set_extra_options("2K,22K,38K,54K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(galaxy_state::galaxyp)
@@ -236,7 +233,7 @@ MACHINE_CONFIG_START(galaxy_state::galaxyp)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 208-1)
 	MCFG_SCREEN_UPDATE_DRIVER(galaxy_state, screen_update_galaxy)
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 
 	/* snapshot */
@@ -244,19 +241,18 @@ MACHINE_CONFIG_START(galaxy_state::galaxyp)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ay8910", AY8910, XTAL/4) // FIXME: really no output routes for this AY?
+	AY8910(config, "ay8910", XTAL/4); // FIXME: really no output routes for this AY?
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(gtp_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
-	MCFG_CASSETTE_INTERFACE("galaxy_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(gtp_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cassette->set_interface("galaxy_cass");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list","galaxy")
+	SOFTWARE_LIST(config, "cass_list").set_original("galaxy");
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("38K")
+	RAM(config, RAM_TAG).set_default_size("38K");
 MACHINE_CONFIG_END
 
 ROM_START (galaxy)

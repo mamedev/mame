@@ -293,7 +293,7 @@ private:
 	bool m_hack_self_test_is_second_read; // temp variable for hack below
 
 	required_device<m68000_base_device> m_maincpu;
-	required_device<cpu_device> m_dsp;
+	required_device<tms32010_device> m_dsp;
 	required_device<scn2681_device> m_duart;
 	required_device<x2212_device> m_nvram;
 	required_device<dac_word_interface> m_dac;
@@ -880,24 +880,26 @@ MACHINE_CONFIG_START(dectalk_state::dectalk)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(20'000'000)/2) /* E74 20MHz OSC (/2) */
 	MCFG_DEVICE_PROGRAM_MAP(m68k_mem)
-	MCFG_DEVICE_ADD("duart", SCN2681, XTAL(3'686'400)) // MC2681 DUART ; Y3 3.6864MHz xtal */
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, dectalk_state, duart_irq_handler))
-	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(*this, dectalk_state, duart_txa))
-	MCFG_MC68681_B_TX_CALLBACK(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_MC68681_INPORT_CALLBACK(READ8(*this, dectalk_state, duart_input))
-	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, dectalk_state, duart_output))
 
-	MCFG_DEVICE_ADD("dsp", TMS32010, XTAL(20'000'000)) /* Y1 20MHz xtal */
-	MCFG_DEVICE_PROGRAM_MAP(tms32010_mem)
-	MCFG_DEVICE_IO_MAP(tms32010_io)
-	MCFG_TMS32010_BIO_IN_CB(READLINE(*this, dectalk_state, spc_semaphore_r)) //read infifo-has-data-in-it fifo readable status
+	SCN2681(config, m_duart, XTAL(3'686'400)); // MC2681 DUART ; Y3 3.6864MHz xtal */
+	m_duart->irq_cb().set(FUNC(dectalk_state::duart_irq_handler));
+	m_duart->a_tx_cb().set(FUNC(dectalk_state::duart_txa));
+	m_duart->b_tx_cb().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_duart->inport_cb().set(FUNC(dectalk_state::duart_input));
+	m_duart->outport_cb().set(FUNC(dectalk_state::duart_output));
+
+	TMS32010(config, m_dsp, XTAL(20'000'000)); /* Y1 20MHz xtal */
+	m_dsp->set_addrmap(AS_PROGRAM, &dectalk_state::tms32010_mem);
+	m_dsp->set_addrmap(AS_IO, &dectalk_state::tms32010_io);
+	m_dsp->bio().set(FUNC(dectalk_state::spc_semaphore_r)); //read infifo-has-data-in-it fifo readable status
+
 #ifdef USE_LOOSE_TIMING
-	MCFG_QUANTUM_TIME(attotime::from_hz(100))
+	config.m_minimum_quantum = attotime::from_hz(100);
 #else
-	MCFG_QUANTUM_PERFECT_CPU("dsp")
+	config.m_perfect_cpu_quantum = subtag("dsp");
 #endif
 
-	MCFG_X2212_ADD("x2212")
+	X2212(config, "x2212");
 
 	/* video hardware */
 
@@ -909,8 +911,8 @@ MACHINE_CONFIG_START(dectalk_state::dectalk)
 
 	/* Y2 is a 3.579545 MHz xtal for the dtmf decoder chip */
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("duart", scn2681_device, rx_b_w))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set(m_duart, FUNC(scn2681_device::rx_b_w));
 MACHINE_CONFIG_END
 
 

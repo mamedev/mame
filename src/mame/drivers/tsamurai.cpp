@@ -732,12 +732,12 @@ MACHINE_CONFIG_START(tsamurai_state::tsamurai)
 
 	MCFG_MACHINE_START_OVERRIDE(tsamurai_state,tsamurai)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, tsamurai_state, flip_screen_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, tsamurai_state, nmi_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, tsamurai_state, textbank1_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, tsamurai_state, coin1_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, tsamurai_state, coin2_counter_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch"));
+	mainlatch.q_out_cb<0>().set(FUNC(tsamurai_state::flip_screen_w));
+	mainlatch.q_out_cb<1>().set(FUNC(tsamurai_state::nmi_enable_w));
+	mainlatch.q_out_cb<2>().set(FUNC(tsamurai_state::textbank1_w));
+	mainlatch.q_out_cb<3>().set(FUNC(tsamurai_state::coin1_counter_w));
+	mainlatch.q_out_cb<4>().set(FUNC(tsamurai_state::coin2_counter_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -746,18 +746,17 @@ MACHINE_CONFIG_START(tsamurai_state::tsamurai)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 16, 255-16)
 	MCFG_SCREEN_UPDATE_DRIVER(tsamurai_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tsamurai_state, vblank_irq))
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tsamurai)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 	MCFG_VIDEO_START_OVERRIDE(tsamurai_state,tsamurai)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(24'000'000)/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
+	AY8910(config,"aysnd", XTAL(24'000'000)/8).add_route(ALL_OUTPUTS, "speaker", 0.1);
 
 	MCFG_DEVICE_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1) // unknown DAC
 	MCFG_DEVICE_ADD("dac2", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1) // unknown DAC
@@ -780,12 +779,12 @@ MACHINE_CONFIG_START(tsamurai_state::vsgongf)
 
 	MCFG_MACHINE_START_OVERRIDE(tsamurai_state,vsgongf)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 4L
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // vreg? always 0
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, tsamurai_state, nmi_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, tsamurai_state, coin1_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, tsamurai_state, coin2_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, tsamurai_state, textbank1_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // 4L
+	mainlatch.q_out_cb<0>().set_nop(); // vreg? always 0
+	mainlatch.q_out_cb<1>().set(FUNC(tsamurai_state::nmi_enable_w));
+	mainlatch.q_out_cb<2>().set(FUNC(tsamurai_state::coin1_counter_w));
+	mainlatch.q_out_cb<3>().set(FUNC(tsamurai_state::coin2_counter_w));
+	mainlatch.q_out_cb<4>().set(FUNC(tsamurai_state::textbank1_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -794,20 +793,19 @@ MACHINE_CONFIG_START(tsamurai_state::vsgongf)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 16, 255-16)
 	MCFG_SCREEN_UPDATE_DRIVER(tsamurai_state, screen_update_vsgongf)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tsamurai_state, vblank_irq))
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tsamurai)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 	MCFG_VIDEO_START_OVERRIDE(tsamurai_state,vsgongf)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(24'000'000)/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
+	AY8910(config,"aysnd", XTAL(24'000'000)/8).add_route(ALL_OUTPUTS, "speaker", 0.1);
 
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
@@ -834,34 +832,33 @@ MACHINE_CONFIG_START(tsamurai_state::m660)
 
 	MCFG_MACHINE_START_OVERRIDE(tsamurai_state,m660)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, tsamurai_state, flip_screen_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, tsamurai_state, nmi_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, tsamurai_state, textbank1_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, tsamurai_state, coin1_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, tsamurai_state, coin2_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, tsamurai_state, textbank2_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch"));
+	mainlatch.q_out_cb<0>().set(FUNC(tsamurai_state::flip_screen_w));
+	mainlatch.q_out_cb<1>().set(FUNC(tsamurai_state::nmi_enable_w));
+	mainlatch.q_out_cb<2>().set(FUNC(tsamurai_state::textbank1_w));
+	mainlatch.q_out_cb<3>().set(FUNC(tsamurai_state::coin1_counter_w));
+	mainlatch.q_out_cb<4>().set(FUNC(tsamurai_state::coin2_counter_w));
+	mainlatch.q_out_cb<7>().set(FUNC(tsamurai_state::textbank2_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 255, 16, 255-16)
-	MCFG_SCREEN_UPDATE_DRIVER(tsamurai_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tsamurai_state, vblank_irq))
-	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("audio3", INPUT_LINE_NMI))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0, 255, 16, 255-16);
+	screen.set_screen_update(FUNC(tsamurai_state::screen_update));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(tsamurai_state::vblank_irq));
+	screen.screen_vblank().append_inputline(m_audio3, INPUT_LINE_NMI);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tsamurai)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 	MCFG_VIDEO_START_OVERRIDE(tsamurai_state,m660)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(24'000'000)/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
+	AY8910(config,"aysnd", XTAL(24'000'000)/8).add_route(ALL_OUTPUTS, "speaker", 0.1);
 
 	MCFG_DEVICE_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1) // unknown DAC
 	MCFG_DEVICE_ADD("dac2", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1) // unknown DAC

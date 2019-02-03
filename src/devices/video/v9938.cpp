@@ -73,7 +73,7 @@ enum
 
 #define EXPMEM_OFFSET 0x20000
 
-#define LONG_WIDTH (512 + 32)
+#define V9938_LONG_WIDTH (512 + 32)
 
 static const char *const v9938_modes[] = {
 	"TEXT 1", "MULTICOLOR", "GRAPHIC 1", "GRAPHIC 2", "GRAPHIC 3",
@@ -108,6 +108,7 @@ v99x8_device::v99x8_device(const machine_config &mconfig, device_type type, cons
 	device_video_interface(mconfig, *this),
 	m_space_config("vram", ENDIANNESS_BIG, 8, 18),
 	m_model(model),
+	m_pal_config(false),
 	m_offset_x(0),
 	m_offset_y(0),
 	m_visible_y(0),
@@ -150,6 +151,25 @@ device_memory_interface::space_config_vector v99x8_device::memory_space_config()
 	return space_config_vector {
 		std::make_pair(AS_DATA, &m_space_config)
 	};
+}
+
+
+void v99x8_device::device_config_complete()
+{
+	if (!has_screen())
+		return;
+
+	if (!screen().refresh_attoseconds())
+		screen().set_raw(clock(),
+			HTOTAL,
+			0,
+			HVISIBLE - 1,
+			(m_pal_config ? VTOTAL_PAL : VTOTAL_NTSC) * 2,
+			VERTICAL_ADJUST * 2,
+			(m_pal_config ? VVISIBLE_PAL : VVISIBLE_NTSC) * 2 - 1 - VERTICAL_ADJUST * 2);
+
+	if (!screen().has_screen_update())
+		screen().set_screen_update(screen_update_rgb32_delegate(FUNC(v99x8_device::screen_update), this));
 }
 
 
@@ -889,7 +909,7 @@ void v99x8_device::default_border(uint32_t *ln)
 	int i;
 
 	pen = pen16(m_cont_reg[7] & 0x0f);
-	i = LONG_WIDTH;
+	i = V9938_LONG_WIDTH;
 	while (i--) *ln++ = pen;
 }
 
@@ -899,7 +919,7 @@ void v99x8_device::graphic7_border(uint32_t *ln)
 	int i;
 
 	pen = pen256(m_cont_reg[7]);
-	i = LONG_WIDTH;
+	i = V9938_LONG_WIDTH;
 	while (i--) *ln++ = pen;
 }
 
@@ -911,7 +931,7 @@ void v99x8_device::graphic5_border(uint32_t *ln)
 
 	pen1 = pen16(m_cont_reg[7] & 0x03);
 	pen0 = pen16((m_cont_reg[7] >> 2) & 0x03);
-	i = LONG_WIDTH / 2;
+	i = V9938_LONG_WIDTH / 2;
 	while (i--) { *ln++ = pen0; *ln++ = pen1; }
 }
 

@@ -57,25 +57,20 @@
 
 constexpr unsigned HP_NANO_IE_DC   = 7;   // DC line used as interrupt enable/mask (DC7)
 
-// DC changed callback
-// The callback receives a 8-bit word holding the state of all DC lines.
-// DC0 is in bit 0, DC1 in bit 1 and so on.
-// Keep in mind that DC7 usually masks the interrupt signal.
-#define MCFG_HP_NANO_DC_CHANGED(_devcb)                                 \
-	devcb = &downcast<hp_nanoprocessor_device &>(*device).set_dc_changed_func(DEVCB_##_devcb);
-
-// Callback to read the input state of DC lines
-// All lines that are not in input are to be reported at "1"
-#define MCFG_HP_NANO_READ_DC_CB(_devcb)                                 \
-	devcb = &downcast<hp_nanoprocessor_device &>(*device).set_read_dc_func(DEVCB_##_devcb);
-
 class hp_nanoprocessor_device : public cpu_device
 {
 public:
 	hp_nanoprocessor_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_dc_changed_func(Object &&cb) { return m_dc_changed_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_read_dc_func(Object &&cb) { return m_read_dc_func.set_callback(std::forward<Object>(cb)); }
+	// DC changed callback
+	// The callback receives a 8-bit word holding the state of all DC lines.
+	// DC0 is in bit 0, DC1 in bit 1 and so on.
+	// Keep in mind that DC7 usually masks the interrupt signal.
+	auto dc_changed() { return m_dc_changed_func.bind(); }
+
+	// Callback to read the input state of DC lines
+	// All lines that are not in input are to be reported at "1"
+	auto read_dc() { return m_read_dc_func.bind(); }
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const override { return 2; }

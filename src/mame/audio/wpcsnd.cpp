@@ -35,7 +35,7 @@ void wpcsnd_device::wpcsnd_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
 	map(0x2000, 0x2000).mirror(0x03ff).w(FUNC(wpcsnd_device::rombank_w));
-	map(0x2400, 0x2401).mirror(0x03fe).rw("ym2151", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x2400, 0x2401).mirror(0x03fe).rw(m_ym2151, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x2800, 0x2800).mirror(0x03ff).w("dac", FUNC(dac_byte_interface::data_w));
 	map(0x2c00, 0x2fff).w(FUNC(wpcsnd_device::bg_speech_digit_w));
 	map(0x3000, 0x33ff).r(FUNC(wpcsnd_device::latch_r));
@@ -72,11 +72,11 @@ uint8_t wpcsnd_device::data_r()
 MACHINE_CONFIG_START(wpcsnd_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("bgcpu", MC6809E, XTAL(8'000'000) / 4) // MC68B09E
 	MCFG_DEVICE_PROGRAM_MAP(wpcsnd_map)
-	MCFG_QUANTUM_TIME(attotime::from_hz(50))
+	config.m_minimum_quantum = attotime::from_hz(50);
 
-	MCFG_DEVICE_ADD("ym2151", YM2151, 3580000)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(*this, wpcsnd_device, ym2151_irq_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, *this, 0.25)
+	YM2151(config, m_ym2151, 3580000);
+	m_ym2151->irq_handler().set(FUNC(wpcsnd_device::ym2151_irq_w));
+	m_ym2151->add_route(ALL_OUTPUTS, *this, 0.25);
 
 	MCFG_DEVICE_ADD("dac", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, *this, 0.25)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)

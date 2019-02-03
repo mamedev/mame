@@ -24,23 +24,26 @@
 #define ACIA_1_TAG   "acia1"
 #define VIA_0_TAG    "via6522_0"
 #define KBD_ACIA_TAG "kbacia"
-#define SPEAKER_TAG  "spkr"
 
 class concept_state : public driver_device
 {
 public:
-	concept_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	concept_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_acia0(*this, ACIA_0_TAG),
 		m_acia1(*this, ACIA_1_TAG),
 		m_via0(*this, VIA_0_TAG),
 		m_kbdacia(*this, KBD_ACIA_TAG),
-		m_speaker(*this, SPEAKER_TAG),
+		m_speaker(*this, "spkr"),
 		m_mm58274(*this,"mm58274c"),
 		m_a2bus(*this, "a2bus"),
-		m_videoram(*this,"videoram") { }
+		m_videoram(*this,"videoram")
+	{ }
 
+	void concept(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<mos6551_device> m_acia0;
 	required_device<mos6551_device> m_acia1;
@@ -54,12 +57,12 @@ public:
 	uint8_t m_pending_interrupts;
 	bool m_clock_enable;
 	uint8_t m_clock_address;
-	DECLARE_READ16_MEMBER(concept_io_r);
-	DECLARE_WRITE16_MEMBER(concept_io_w);
+	DECLARE_READ8_MEMBER(io_r);
+	DECLARE_WRITE8_MEMBER(io_w);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	uint32_t screen_update_concept(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER(via_in_a);
 	DECLARE_WRITE8_MEMBER(via_out_a);
@@ -67,8 +70,9 @@ public:
 	DECLARE_WRITE8_MEMBER(via_out_b);
 	DECLARE_WRITE_LINE_MEMBER(via_out_cb2);
 	DECLARE_WRITE_LINE_MEMBER(via_irq_func);
+	DECLARE_WRITE_LINE_MEMBER(ioc_interrupt);
 	void concept_set_interrupt(int level, int state);
-	void concept(machine_config &config);
+
 	void concept_memmap(address_map &map);
 };
 

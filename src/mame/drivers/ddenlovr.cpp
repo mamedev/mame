@@ -160,15 +160,12 @@ static const int ddenlovr_commands[8]   = { BLIT_NEXT, BLIT_LINE,       BLIT_COP
 static const int hanakanz_commands[8]   = { BLIT_NEXT, BLIT_CHANGE_PEN, BLIT_CHANGE_NUM,    BLIT_UNKNOWN,   BLIT_SKIP,      BLIT_COPY,          BLIT_LINE,          BLIT_STOP   };
 static const int mjflove_commands[8]    = { BLIT_STOP, BLIT_CHANGE_PEN, BLIT_CHANGE_NUM,    BLIT_UNKNOWN,   BLIT_SKIP,      BLIT_COPY,          BLIT_LINE,          BLIT_NEXT   };
 
-// TODO: make this a proper device callback once the blitter becomes a device
-#define MCFG_DDENLOVR_BLITTER_IRQ(_class, _func) \
-	set_blitter_irq(write_line_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)nullptr));
-
 class ddenlovr_state : public dynax_state
 {
 public:
 	ddenlovr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: dynax_state(mconfig, type, tag)
+		, m_blitter_irq_handler(*this)
 		, m_protection1(*this, "protection1")
 		, m_protection2(*this, "protection2")
 		, m_soundlatch(*this, "soundlatch")
@@ -219,8 +216,14 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(nettoqc_special_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(mjflove_blitter_r);
 
+protected:
+	virtual void device_resolve_objects() override
+	{
+		m_blitter_irq_handler.resolve_safe();
+	}
+
 private:
-	void set_blitter_irq(write_line_delegate &&handler) { m_blitter_irq_handler = std::move(handler); }
+	auto blitter_irq() { return m_blitter_irq_handler.bind(); }
 
 	DECLARE_MACHINE_START(ddenlovr);
 	DECLARE_MACHINE_RESET(ddenlovr);
@@ -257,7 +260,6 @@ private:
 	DECLARE_WRITE8_MEMBER(ddenlovr_layer_enable2_w);
 	DECLARE_WRITE8_MEMBER(hanakanz_blitter_reg_w);
 	DECLARE_WRITE8_MEMBER(hanakanz_blitter_data_w);
-	DECLARE_WRITE_LINE_MEMBER(rongrong_blitter_irq);
 	DECLARE_WRITE8_MEMBER(ddenlovr_blitter_w);
 	DECLARE_WRITE_LINE_MEMBER(ddenlovr_blitter_irq);
 	DECLARE_WRITE_LINE_MEMBER(ddenlovr_blitter_irq_ack_w);
@@ -336,7 +338,6 @@ private:
 	DECLARE_READ8_MEMBER(mjmyster_keyb_r);
 	DECLARE_READ8_MEMBER(mjmyster_dsw_r);
 	DECLARE_WRITE8_MEMBER(mjmyster_coincounter_w);
-	DECLARE_WRITE_LINE_MEMBER(mjmyster_blitter_irq);
 	DECLARE_WRITE8_MEMBER(hginga_rombank_w);
 	DECLARE_READ8_MEMBER(hginga_protection_r);
 	DECLARE_WRITE8_MEMBER(hginga_input_w);
@@ -385,7 +386,6 @@ private:
 	DECLARE_WRITE8_MEMBER(daimyojn_blitter_data_palette_w);
 	DECLARE_READ8_MEMBER(daimyojn_year_hack_r);
 	DECLARE_WRITE8_MEMBER(janshinp_coincounter_w);
-	DECLARE_WRITE_LINE_MEMBER(seljan2_blitter_irq);
 	DECLARE_WRITE8_MEMBER(seljan2_rombank_w);
 	DECLARE_WRITE8_MEMBER(seljan2_palette_enab_w);
 	DECLARE_WRITE8_MEMBER(seljan2_palette_w);
@@ -479,7 +479,7 @@ private:
 	void sryudens_portmap(address_map &map);
 	void ultrchmp_map(address_map &map);
 
-	write_line_delegate m_blitter_irq_handler;
+	devcb_write_line m_blitter_irq_handler;
 
 	optional_shared_ptr<uint16_t> m_protection1;
 	optional_shared_ptr<uint16_t> m_protection2;
@@ -542,8 +542,6 @@ private:
 
 VIDEO_START_MEMBER(ddenlovr_state,ddenlovr)
 {
-	m_blitter_irq_handler.bind_relative_to(*this);
-
 	for (int i = 0; i < 8; i++)
 	{
 		m_ddenlovr_pixmap[i] = std::make_unique<uint8_t[]>(512 * 512);
@@ -1557,13 +1555,6 @@ g_profiler.stop();
 }
 
 
-WRITE_LINE_MEMBER(ddenlovr_state::rongrong_blitter_irq)
-{
-	auto &cpu = downcast<tmpz84c015_device &>(*m_maincpu);
-	cpu.trg0(state);
-	cpu.trg1(state);
-}
-
 WRITE8_MEMBER(ddenlovr_state::ddenlovr_blitter_w)
 {
 	blitter_w(0, offset, data);
@@ -1633,9 +1624,9 @@ void ddenlovr_state::copylayer(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 
 	if (((m_ddenlovr_layer_enable2 << 4) | m_ddenlovr_layer_enable) & (1 << layer))
 	{
-		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+		for (y = cliprect.top(); y <= cliprect.bottom(); y++)
 		{
-			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+			for (x = cliprect.left(); x <= cliprect.right(); x++)
 			{
 				int pen = m_ddenlovr_pixmap[layer][512 * ((y + scrolly) & 0x1ff) + ((x + scrollx) & 0x1ff)];
 				if ((pen & transmask) != transpen)
@@ -3173,13 +3164,6 @@ WRITE8_MEMBER(ddenlovr_state::mjmyster_coincounter_w)
 	}
 }
 
-WRITE_LINE_MEMBER(ddenlovr_state::mjmyster_blitter_irq)
-{
-	auto &cpu = downcast<tmpz84c015_device &>(*m_maincpu);
-	cpu.trg1(state);
-	cpu.trg2(state);
-}
-
 void ddenlovr_state::mjmyster_portmap(address_map &map)
 {
 	map.global_mask(0xff);
@@ -4105,12 +4089,6 @@ void ddenlovr_state::janshinp_portmap(address_map &map)
                              Return Of Sel Jan II
 ***************************************************************************/
 
-WRITE_LINE_MEMBER(ddenlovr_state::seljan2_blitter_irq)
-{
-	// PA bit 7 = blitter busy
-	downcast<tmpz84c015_device &>(*m_maincpu).pa7_w(!state);
-}
-
 WRITE8_MEMBER(ddenlovr_state::seljan2_rombank_w)
 {
 	membank("bank1")->set_entry(data & 0x0f);   // disable palette?
@@ -4356,66 +4334,64 @@ void dynax_state::htengoku_banked_map(address_map &map)
 MACHINE_CONFIG_START(ddenlovr_state::htengoku)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80,20000000 / 4)
-	MCFG_DEVICE_PROGRAM_MAP(htengoku_mem_map)
-	MCFG_DEVICE_IO_MAP(htengoku_io_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mainirq", rst_pos_buffer_device, inta_cb)   // IM 0 needs an opcode on the data bus
+	Z80(config, m_maincpu, 20000000 / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ddenlovr_state::htengoku_mem_map);
+	m_maincpu->set_addrmap(AS_IO, &ddenlovr_state::htengoku_io_map);
+	m_maincpu->set_irq_acknowledge_callback("mainirq", FUNC(rst_pos_buffer_device::inta_cb)); // IM 0 needs an opcode on the data bus
 
-	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(htengoku_banked_map)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(20)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000)
+	ADDRESS_MAP_BANK(config, m_bankdev, 0);
+	m_bankdev->set_addrmap(0, &ddenlovr_state::htengoku_banked_map);
+	m_bankdev->set_data_width(8);
+	m_bankdev->set_addr_width(20);
+	m_bankdev->set_stride(0x8000);
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,dynax)
 	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,dynax)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("mainirq", RST_POS_BUFFER, 0)
-	MCFG_RST_BUFFER_INT_CALLBACK(INPUTLINE("maincpu", 0))
+	RST_POS_BUFFER(config, "mainirq", 0).int_callback().set_inputline(m_maincpu, 0);
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, dynax_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, dynax_state, layer_half_w))  // half of the interleaved layer to write to
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, dynax_state, layer_half2_w)) //
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, dynax_state, blitter_ack_w))        // Blitter IRQ Ack
+	LS259(config, m_mainlatch);
+	m_mainlatch->q_out_cb<0>().set(FUNC(dynax_state::flipscreen_w));
+	m_mainlatch->q_out_cb<1>().set(FUNC(dynax_state::layer_half_w));  // half of the interleaved layer to write to
+	m_mainlatch->q_out_cb<2>().set(FUNC(dynax_state::layer_half2_w)); //
+	m_mainlatch->q_out_cb<5>().set(FUNC(dynax_state::blitter_ack_w));        // Blitter IRQ Ack
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 336-1, 0+8, 256-1-8)
-	MCFG_SCREEN_UPDATE_DRIVER(ddenlovr_state, screen_update_htengoku)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ddenlovr_state, sprtmtch_vblank_w))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(512, 256);
+	m_screen->set_visarea(0, 336-1, 0+8, 256-1-8);
+	m_screen->set_screen_update(FUNC(ddenlovr_state::screen_update_htengoku));
+	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(ddenlovr_state::sprtmtch_vblank_w));
 
-	MCFG_DEVICE_ADD(m_blitter, DYNAX_BLITTER_REV2, 0)
-	MCFG_DYNAX_BLITTER_REV2_VRAM_OUT_CB(WRITE8(*this, dynax_state, hnoridur_blit_pixel_w))
-	MCFG_DYNAX_BLITTER_REV2_SCROLLX_CB(WRITE8(*this, dynax_state, dynax_blit_scrollx_w))
-	MCFG_DYNAX_BLITTER_REV2_SCROLLY_CB(WRITE8(*this, dynax_state, dynax_blit_scrolly_w))
-	MCFG_DYNAX_BLITTER_REV2_READY_CB(WRITELINE(*this, dynax_state, sprtmtch_blitter_irq_w))
+	DYNAX_BLITTER_REV2(config, m_blitter, 0);
+	m_blitter->vram_out_cb().set(FUNC(dynax_state::hnoridur_blit_pixel_w));
+	m_blitter->scrollx_cb().set(FUNC(dynax_state::dynax_blit_scrollx_w));
+	m_blitter->scrolly_cb().set(FUNC(dynax_state::dynax_blit_scrolly_w));
+	m_blitter->ready_cb().set(FUNC(dynax_state::sprtmtch_blitter_irq_w));
 
-	MCFG_PALETTE_ADD("palette", 16*256)
+	PALETTE(config, m_palette).set_entries(16*256);
 
 	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,htengoku)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 20000000 / 16)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, ddenlovr_state, htengoku_dsw_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, ddenlovr_state, htengoku_dsw_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	ay8910_device &aysnd(AY8910(config, "aysnd", 20000000 / 16));
+	aysnd.port_a_read_callback().set(FUNC(ddenlovr_state::htengoku_dsw_r));
+	aysnd.port_b_write_callback().set(FUNC(ddenlovr_state::htengoku_dsw_w));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.20);
 
-	MCFG_DEVICE_ADD("ym2413", YM2413, 3579545)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	YM2413(config, "ym2413", 3579545).add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	/* devices */
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
-	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE("mainirq", rst_pos_buffer_device, rst1_w))
+	msm6242_device &rtc(MSM6242(config, "rtc", XTAL(32'768)));
+	rtc.out_int_handler().set("mainirq", FUNC(rst_pos_buffer_device::rst1_w));
 MACHINE_CONFIG_END
 
 
@@ -9637,71 +9613,71 @@ MACHINE_RESET_MEMBER(ddenlovr_state,ddenlovr)
 
 MACHINE_START_MEMBER(ddenlovr_state,rongrong)
 {
-	uint8_t *ROM = memregion("maincpu")->base();
-	membank("bank1")->configure_entries(0, 0x20, &ROM[0x010000], 0x8000);
-	membank("bank2")->configure_entries(0, 8,    &ROM[0x110000], 0x1000);
+	uint8_t *rom = memregion("maincpu")->base();
+	membank("bank1")->configure_entries(0, 0x20, &rom[0x010000], 0x8000);
+	membank("bank2")->configure_entries(0, 8,    &rom[0x110000], 0x1000);
 
 	MACHINE_START_CALL_MEMBER(ddenlovr);
 }
 
 MACHINE_START_MEMBER(ddenlovr_state,mmpanic)
 {
-	uint8_t *ROM = memregion("maincpu")->base();
-	membank("bank1")->configure_entries(0, 8,    &ROM[0x10000], 0x8000);
+	uint8_t *rom = memregion("maincpu")->base();
+	membank("bank1")->configure_entries(0, 8, &rom[0x10000], 0x8000);
 
 	MACHINE_START_CALL_MEMBER(ddenlovr);
 }
 
 MACHINE_START_MEMBER(ddenlovr_state,funkyfig)
 {
-	uint8_t *ROM = memregion("maincpu")->base();
-	membank("bank1")->configure_entries(0, 0x10, &ROM[0x10000], 0x8000);
-	membank("bank2")->configure_entries(0, 8,    &ROM[0x90000], 0x1000);
+	uint8_t *rom = memregion("maincpu")->base();
+	membank("bank1")->configure_entries(0, 0x10, &rom[0x10000], 0x8000);
+	membank("bank2")->configure_entries(0, 8,    &rom[0x90000], 0x1000);
 
 	MACHINE_START_CALL_MEMBER(ddenlovr);
 }
 
 MACHINE_START_MEMBER(ddenlovr_state,hanakanz)
 {
-	uint8_t *ROM = memregion("maincpu")->base();
-	membank("bank1")->configure_entries(0, 0x10, &ROM[0x10000], 0x8000);
-	membank("bank2")->configure_entries(0, 0x10, &ROM[0x90000], 0x1000);
+	uint8_t *rom = memregion("maincpu")->base();
+	membank("bank1")->configure_entries(0, 0x10, &rom[0x10000], 0x8000);
+	membank("bank2")->configure_entries(0, 0x10, &rom[0x90000], 0x1000);
 
 	MACHINE_START_CALL_MEMBER(ddenlovr);
 }
 
 MACHINE_START_MEMBER(ddenlovr_state,mjmyster)
 {
-	uint8_t *ROM = memregion("maincpu")->base();
-	membank("bank1")->configure_entries(0, 8,    &ROM[0x10000], 0x8000);
-	membank("bank2")->configure_entries(0, 8,    &ROM[0x90000], 0x1000);
+	uint8_t *rom = memregion("maincpu")->base();
+	membank("bank1")->configure_entries(0, 8, &rom[0x10000], 0x8000);
+	membank("bank2")->configure_entries(0, 8, &rom[0x90000], 0x1000);
 
 	MACHINE_START_CALL_MEMBER(ddenlovr);
 }
 
 MACHINE_START_MEMBER(ddenlovr_state,hparadis)
 {
-	uint8_t *ROM = memregion("maincpu")->base();
-	membank("bank1")->configure_entries(0, 8,    &ROM[0x10000], 0x8000);
-	membank("bank2")->configure_entries(0, 8,    &ROM[0x50000], 0x1000);
+	uint8_t *rom = memregion("maincpu")->base();
+	membank("bank1")->configure_entries(0, 8, &rom[0x10000], 0x8000);
+	membank("bank2")->configure_entries(0, 8, &rom[0x50000], 0x1000);
 
 	MACHINE_START_CALL_MEMBER(ddenlovr);
 }
 
 MACHINE_START_MEMBER(ddenlovr_state,mjflove)
 {
-	uint8_t *ROM = memregion("maincpu")->base();
-	membank("bank1")->configure_entries(0, 0x10, &ROM[0x10000], 0x8000);
-	membank("bank2")->configure_entries(0, 8,    &ROM[0x90000], 0x1000);
+	uint8_t *rom = memregion("maincpu")->base();
+	membank("bank1")->configure_entries(0, 0x10, &rom[0x10000], 0x8000);
+	membank("bank2")->configure_entries(0, 8,    &rom[0x90000], 0x1000);
 
 	MACHINE_START_CALL_MEMBER(ddenlovr);
 }
 
 MACHINE_START_MEMBER(ddenlovr_state,sryudens)
 {
-	uint8_t *ROM = memregion("maincpu")->base();
-	membank("bank1")->configure_entries(0, 0x10, &ROM[0x10000], 0x8000);
-	membank("bank2")->configure_entries(0, 0x10, &ROM[0x90000], 0x1000);
+	uint8_t *rom = memregion("maincpu")->base();
+	membank("bank1")->configure_entries(0, 0x10, &rom[0x10000], 0x8000);
+	membank("bank2")->configure_entries(0, 0x10, &rom[0x90000], 0x1000);
 
 	MACHINE_START_CALL_MEMBER(ddenlovr);
 }
@@ -9719,119 +9695,116 @@ WRITE_LINE_MEMBER(ddenlovr_state::ddenlovr_irq)
 MACHINE_CONFIG_START(ddenlovr_state::ddenlovr)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",M68000, XTAL(24'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(ddenlovr_map)
+	M68000(config, m_maincpu, XTAL(24'000'000) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ddenlovr_state::ddenlovr_map);
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, ddenlovr_state, ddenlovr_blitter_irq_ack_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, ddenlovr_state, ddenlovr_coincounter_0_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, ddenlovr_state, ddenlovr_coincounter_1_w))
+	LS259(config, m_mainlatch);
+	m_mainlatch->q_out_cb<1>().set(FUNC(ddenlovr_state::ddenlovr_blitter_irq_ack_w));
+	m_mainlatch->q_out_cb<4>().set(FUNC(ddenlovr_state::ddenlovr_coincounter_0_w));
+	m_mainlatch->q_out_cb<5>().set(FUNC(ddenlovr_state::ddenlovr_coincounter_1_w));
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,ddenlovr)
 	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(336, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 336-1, 5, 256-16+5-1)
-	MCFG_SCREEN_UPDATE_DRIVER(ddenlovr_state, screen_update_ddenlovr)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ddenlovr_state, ddenlovr_irq))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(336, 256);
+	m_screen->set_visarea(0, 336-1, 5, 256-16+5-1);
+	m_screen->set_screen_update(FUNC(ddenlovr_state::screen_update_ddenlovr));
+	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(ddenlovr_state::ddenlovr_irq));
 
-	MCFG_PALETTE_ADD("palette", 0x100)
+	PALETTE(config, m_palette).set_entries(0x100);
 
-	MCFG_DDENLOVR_BLITTER_IRQ(ddenlovr_state, ddenlovr_blitter_irq)
+	blitter_irq().set(FUNC(ddenlovr_state::ddenlovr_blitter_irq));
 
 	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,ddenlovr)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ym2413", YM2413, XTAL(28'636'363) / 8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	YM2413(config, "ym2413", XTAL(28'636'363) / 8).add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("aysnd", YMZ284, XTAL(28'636'363) / 16)  // or /8 ?
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	YMZ284(config, "aysnd", XTAL(28'636'363) / 16).add_route(ALL_OUTPUTS, "mono", 0.30);  // or /8 ?
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(28'636'363) / 28, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL(28'636'363) / 28, okim6295_device::PIN7_HIGH));
+	oki.add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	/* devices */
-	MCFG_DEVICE_ADD("rtc", RTC72421, XTAL(32'768)) // internal oscillator
+	RTC72421(config, "rtc", XTAL(32'768)); // internal oscillator
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ddenlovr_state::ddenlovj)
 	ddenlovr(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(ddenlovj_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &ddenlovr_state::ddenlovj_map);
 
-	MCFG_DEVICE_REPLACE("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, ddenlovr_state, ddenlovr_blitter_irq_ack_w))
+	m_mainlatch->q_out_cb<1>().set_nop();
+	m_mainlatch->q_out_cb<4>().set_nop();
+	m_mainlatch->q_out_cb<5>().set(FUNC(ddenlovr_state::ddenlovr_blitter_irq_ack_w));
 
-	MCFG_DEVICE_REPLACE("rtc", RTC62421, XTAL(32'768)) // internal oscillator
+	RTC62421(config.replace(), "rtc", XTAL(32'768)); // internal oscillator
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(ddenlovr_state::ddenlovrk)
+void ddenlovr_state::ddenlovrk(machine_config &config)
+{
 	ddenlovr(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(ddenlovrk_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &ddenlovr_state::ddenlovrk_map);
+}
 
-MACHINE_CONFIG_START(ddenlovr_state::akamaru)
+void ddenlovr_state::akamaru(machine_config &config)
+{
 	ddenlovr(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(akamaru_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &ddenlovr_state::akamaru_map);
 
-	MCFG_DEVICE_MODIFY("mainlatch")
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, ddenlovr_state, akamaru_dsw2_sel_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, ddenlovr_state, akamaru_dsw1_sel_w))
-MACHINE_CONFIG_END
+	m_mainlatch->q_out_cb<2>().set(FUNC(ddenlovr_state::akamaru_dsw2_sel_w));
+	m_mainlatch->q_out_cb<3>().set(FUNC(ddenlovr_state::akamaru_dsw1_sel_w));
+}
 
-MACHINE_CONFIG_START(ddenlovr_state::quiz365)
+void ddenlovr_state::quiz365(machine_config &config)
+{
 	ddenlovj(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(quiz365_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &ddenlovr_state::quiz365_map);
 
-	MCFG_DEVICE_MODIFY("mainlatch") // 7D has wire mod connecting to sample ROM at 1F
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, ddenlovr_state, quiz365_oki_bank1_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, ddenlovr_state, quiz365_oki_bank2_w))
+	// 7D has wire mod connecting to sample ROM at 1F
+	m_mainlatch->q_out_cb<1>().set(FUNC(ddenlovr_state::quiz365_oki_bank1_w));
+	m_mainlatch->q_out_cb<6>().set(FUNC(ddenlovr_state::quiz365_oki_bank2_w));
 
-	MCFG_DEVICE_REPLACE("aysnd", YM2149, XTAL(28'636'363) / 16)  // or /8 ?
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, ddenlovr_state, quiz365_input_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, ddenlovr_state, ddenlovr_select_w))
+	ym2149_device &aysnd(YM2149(config.replace(), "aysnd", XTAL(28'636'363) / 16));  // or /8 ?
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.30);
+	aysnd.port_a_read_callback().set(FUNC(ddenlovr_state::quiz365_input_r));
+	aysnd.port_b_write_callback().set(FUNC(ddenlovr_state::ddenlovr_select_w));
 
-	MCFG_DEVICE_REPLACE("rtc", MSM6242, XTAL(32'768))
-MACHINE_CONFIG_END
+	MSM6242(config.replace(), "rtc", XTAL(32'768));
+}
 
-MACHINE_CONFIG_START(ddenlovr_state::nettoqc)
+void ddenlovr_state::nettoqc(machine_config &config)
+{
 	ddenlovj(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(nettoqc_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &ddenlovr_state::nettoqc_map);
+}
 
-MACHINE_CONFIG_START(ddenlovr_state::ultrchmp)
+void ddenlovr_state::ultrchmp(machine_config &config)
+{
 	ddenlovr(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(ultrchmp_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &ddenlovr_state::ultrchmp_map);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,mjflove)
-MACHINE_CONFIG_END
+}
 
 /***************************************************************************
                                 Rong Rong
@@ -9845,58 +9818,59 @@ MACHINE_CONFIG_END
    0xfc is from the 6242RTC
  */
 
-MACHINE_CONFIG_START(ddenlovr_state::quizchq)
-
+void ddenlovr_state::quizchq(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMPZ84C015, XTAL(16'000'000)/2)  /* Verified */
-	MCFG_DEVICE_PROGRAM_MAP(quizchq_map)
-	MCFG_DEVICE_IO_MAP(quizchq_portmap)
-	MCFG_TMPZ84C015_IN_PA_CB(READ8(*this, ddenlovr_state, rongrong_input_r))
-	MCFG_TMPZ84C015_OUT_PB_CB(WRITE8(*this, ddenlovr_state, rongrong_select_w))
+	tmpz84c015_device &maincpu(TMPZ84C015(config, m_maincpu, XTAL(16'000'000)/2));  /* Verified */
+	maincpu.set_addrmap(AS_PROGRAM, &ddenlovr_state::quizchq_map);
+	maincpu.set_addrmap(AS_IO, &ddenlovr_state::quizchq_portmap);
+	maincpu.in_pa_callback().set(FUNC(ddenlovr_state::rongrong_input_r));
+	maincpu.out_pb_callback().set(FUNC(ddenlovr_state::rongrong_select_w));
 	// bit 5 of 0x1b (SIO CTSB?) = blitter busy
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,rongrong)
 	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(336, 256+22)
-	MCFG_SCREEN_VISIBLE_AREA(0, 336-1, 5, 256-16+5-1)
-	MCFG_SCREEN_UPDATE_DRIVER(ddenlovr_state, screen_update_ddenlovr)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("maincpu", tmpz84c015_device, strobe_a)) MCFG_DEVCB_INVERT
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(336, 256+22);
+	m_screen->set_visarea(0, 336-1, 5, 256-16+5-1);
+	m_screen->set_screen_update(FUNC(ddenlovr_state::screen_update_ddenlovr));
+	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(m_maincpu, FUNC(tmpz84c015_device::strobe_a)).invert();
 
-	MCFG_PALETTE_ADD("palette", 0x100)
+	PALETTE(config, m_palette).set_entries(0x100);
 
-	MCFG_DDENLOVR_BLITTER_IRQ(ddenlovr_state, rongrong_blitter_irq)
+	blitter_irq().set("maincpu", FUNC(tmpz84c015_device::trg0));
+	blitter_irq().append("maincpu", FUNC(tmpz84c015_device::trg1));
 
 	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,ddenlovr)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ym2413", YM2413, XTAL(28'636'363)/8) // 3.579545Mhz, verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.50)
+	// 3.579545Mhz, verified
+	YM2413(config, "ym2413", XTAL(28'636'363) / 8).add_route(ALL_OUTPUTS, "mono", 1.50);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(28'636'363)/28, okim6295_device::PIN7_HIGH) // clock frequency verified 1.022MHz, pin 7 verified high
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	// clock frequency verified 1.022MHz, pin 7 verified high
+	OKIM6295(config, m_oki, XTAL(28'636'363)/28, okim6295_device::PIN7_HIGH);
+	m_oki->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* devices */
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
-	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE("maincpu", tmpz84c015_device, trg2)) MCFG_DEVCB_INVERT
-MACHINE_CONFIG_END
+	MSM6242(config, "rtc", 32.768_kHz_XTAL).out_int_handler().set(m_maincpu, FUNC(tmpz84c015_device::trg2)).invert();
+}
 
-MACHINE_CONFIG_START(ddenlovr_state::rongrong)
+void ddenlovr_state::rongrong(machine_config &config)
+{
 	quizchq(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(rongrong_map)
-	MCFG_DEVICE_IO_MAP(rongrong_portmap)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &ddenlovr_state::rongrong_map);
+	m_maincpu->set_addrmap(AS_IO, &ddenlovr_state::rongrong_portmap);
+}
 
 /***************************************************************************
 
@@ -9933,56 +9907,54 @@ WRITE_LINE_MEMBER(ddenlovr_state::mmpanic_rtc_irq)
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xdf); // RST 18, clock
 }
 
-MACHINE_CONFIG_START(ddenlovr_state::mmpanic)
-
+void ddenlovr_state::mmpanic(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 8000000)
-	MCFG_DEVICE_PROGRAM_MAP(mmpanic_map)
-	MCFG_DEVICE_IO_MAP(mmpanic_portmap)
+	Z80(config, m_maincpu, 8000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ddenlovr_state::mmpanic_map);
+	m_maincpu->set_addrmap(AS_IO, &ddenlovr_state::mmpanic_portmap);
 
-	MCFG_DEVICE_ADD("soundcpu", Z80, 3579545)
-	MCFG_DEVICE_PROGRAM_MAP(mmpanic_sound_map)
-	MCFG_DEVICE_IO_MAP(mmpanic_sound_portmap)
+	Z80(config, m_soundcpu, 3579545);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &ddenlovr_state::mmpanic_sound_map);
+	m_soundcpu->set_addrmap(AS_IO, &ddenlovr_state::mmpanic_sound_portmap);
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,mmpanic)
 	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(336, 256+22)
-	MCFG_SCREEN_VISIBLE_AREA(0, 336-1, 5, 256-16+5-1)
-	MCFG_SCREEN_UPDATE_DRIVER(ddenlovr_state, screen_update_ddenlovr)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ddenlovr_state, mmpanic_irq))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(336, 256+22);
+	m_screen->set_visarea(0, 336-1, 5, 256-16+5-1);
+	m_screen->set_screen_update(FUNC(ddenlovr_state::screen_update_ddenlovr));
+	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(ddenlovr_state::mmpanic_irq));
 
-	MCFG_PALETTE_ADD("palette", 0x100)
+	PALETTE(config, m_palette).set_entries(0x100);
 
-	MCFG_DDENLOVR_BLITTER_IRQ(ddenlovr_state, mmpanic_blitter_irq)
+	blitter_irq().set(FUNC(ddenlovr_state::mmpanic_blitter_irq));
 
 	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,mmpanic)  // extra layers
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ym2413", YM2413, 3579545)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	YM2413(config, "ym2413", 3579545).add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 3579545)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	AY8910(config, "aysnd", 3579545).add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1022720, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	OKIM6295(config, m_oki, 1022720, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	m_oki->add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	/* devices */
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
-	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(*this, ddenlovr_state, mmpanic_rtc_irq))
-MACHINE_CONFIG_END
+	msm6242_device &rtc(MSM6242(config, "rtc", XTAL(32'768)));
+	rtc.out_int_handler().set(FUNC(ddenlovr_state::mmpanic_rtc_irq));
+}
 
 
 /***************************************************************************
@@ -10025,108 +9997,104 @@ WRITE_LINE_MEMBER(ddenlovr_state::hanakanz_rtc_irq)
 	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xe2);
 }
 
-MACHINE_CONFIG_START(ddenlovr_state::hanakanz)
-
+void ddenlovr_state::hanakanz(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80,8000000) // KL5C80A12
-	MCFG_DEVICE_PROGRAM_MAP(hanakanz_map)
-	MCFG_DEVICE_IO_MAP(hanakanz_portmap)
+	Z80(config, m_maincpu, 8000000); // KL5C80A12
+	m_maincpu->set_addrmap(AS_PROGRAM, &ddenlovr_state::hanakanz_map);
+	m_maincpu->set_addrmap(AS_IO, &ddenlovr_state::hanakanz_portmap);
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,hanakanz)
 	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(336, 256+22)
-	MCFG_SCREEN_VISIBLE_AREA(0, 336-1, 5, 256-11-1)
-	MCFG_SCREEN_UPDATE_DRIVER(ddenlovr_state, screen_update_ddenlovr)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ddenlovr_state, hanakanz_irq))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(336, 256+22);
+	m_screen->set_visarea(0, 336-1, 5, 256-11-1);
+	m_screen->set_screen_update(FUNC(ddenlovr_state::screen_update_ddenlovr));
+	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(ddenlovr_state::hanakanz_irq));
 
-	MCFG_PALETTE_ADD("palette", 0x200)
+	PALETTE(config, m_palette).set_entries(0x200);
 
 	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,hanakanz) // blitter commands in the roms are shuffled around
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ym2413", YM2413, 3579545)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	YM2413(config, "ym2413", 3579545).add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1022720, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	OKIM6295(config, m_oki, 1022720, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	m_oki->add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	/* devices */
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
-	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(*this, ddenlovr_state, hanakanz_rtc_irq))
-MACHINE_CONFIG_END
+	msm6242_device &rtc(MSM6242(config, "rtc", XTAL(32'768)));
+	rtc.out_int_handler().set(FUNC(ddenlovr_state::hanakanz_rtc_irq));
+}
 
-MACHINE_CONFIG_START(ddenlovr_state::hkagerou)
+void ddenlovr_state::hkagerou(machine_config &config)
+{
 	hanakanz(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(hkagerou_portmap)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_IO, &ddenlovr_state::hkagerou_portmap);
+}
 
-MACHINE_CONFIG_START(ddenlovr_state::kotbinyo)
-
+void ddenlovr_state::kotbinyo(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(20'000'000) / 2) // !! KL5C80A12CFP @ 10MHz? (actually 4 times faster than Z80) !!
-	MCFG_DEVICE_PROGRAM_MAP(hanakanz_map)
-	MCFG_DEVICE_IO_MAP(kotbinyo_portmap)
+	Z80(config, m_maincpu, XTAL(20'000'000) / 2); // !! KL5C80A12CFP @ 10MHz? (actually 4 times faster than Z80) !!
+	m_maincpu->set_addrmap(AS_PROGRAM, &ddenlovr_state::hanakanz_map);
+	m_maincpu->set_addrmap(AS_IO, &ddenlovr_state::kotbinyo_portmap);
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,hanakanz)
 	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60.1656)   // HSync 15.1015kHz
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(336, 256+22)
-	MCFG_SCREEN_VISIBLE_AREA(0, 336-1-1, 1+4, 256-15-1+4)
-	MCFG_SCREEN_UPDATE_DRIVER(ddenlovr_state, screen_update_ddenlovr)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ddenlovr_state, hanakanz_irq))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60.1656);   // HSync 15.1015kHz
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(336, 256+22);
+	m_screen->set_visarea(0, 336-1-1, 1+4, 256-15-1+4);
+	m_screen->set_screen_update(FUNC(ddenlovr_state::screen_update_ddenlovr));
+	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
+	m_screen->set_palette("palette");
+	m_screen->screen_vblank().set(FUNC(ddenlovr_state::hanakanz_irq));
 
-	MCFG_PALETTE_ADD("palette", 0x200)
+	PALETTE(config, m_palette).set_entries(0x200);
 
 	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,hanakanz) // blitter commands in the roms are shuffled around
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ym2413", YM2413, XTAL(28'375'160) / 8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	YM2413(config, "ym2413", XTAL(28'375'160) / 8).add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(28'375'160) / 28, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	OKIM6295(config, m_oki, XTAL(28'375'160) / 28, okim6295_device::PIN7_HIGH);
+	m_oki->add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	/* devices */
-//  MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
-//  MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(*this, ddenlovr_state, hanakanz_rtc_irq))
-MACHINE_CONFIG_END
+//  MSM6242(config, "rtc", XTAL(32'768)).out_int_handler().set(FUNC(ddenlovr_state::hanakanz_rtc_irq));
+}
 
-MACHINE_CONFIG_START(ddenlovr_state::kotbinsp)
+void ddenlovr_state::kotbinsp(machine_config &config)
+{
 	kotbinyo(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(kotbinsp_portmap)
+	m_maincpu->set_addrmap(AS_IO, &ddenlovr_state::kotbinsp_portmap);
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(ddenlovr_state::mjreach1)
+void ddenlovr_state::mjreach1(machine_config &config)
+{
 	hanakanz(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(mjreach1_portmap)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_IO, &ddenlovr_state::mjreach1_portmap);
+}
 
 
 /***************************************************************************
@@ -10138,25 +10106,23 @@ MACHINE_CONFIG_END
     0xf8 is vblank
     0xfa is from the 6242RTC
  */
-MACHINE_CONFIG_START(ddenlovr_state::mjchuuka)
+void ddenlovr_state::mjchuuka(machine_config &config)
+{
 	hanakanz(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REPLACE("maincpu", TMPZ84C015, 8000000)
-	MCFG_DEVICE_PROGRAM_MAP(hanakanz_map)
-	MCFG_DEVICE_IO_MAP(mjchuuka_portmap)
-	MCFG_TMPZ84C015_OUT_PA_CB(WRITE8(*this, ddenlovr_state, hanakanz_rombank_w))
-	MCFG_TMPZ84C015_OUT_PB_CB(WRITE8(*this, ddenlovr_state, mjchuuka_oki_bank_w))
+	tmpz84c015_device &tmpz(TMPZ84C015(config.replace(), m_maincpu, 8000000));
+	tmpz.set_addrmap(AS_PROGRAM, &ddenlovr_state::hanakanz_map);
+	tmpz.set_addrmap(AS_IO, &ddenlovr_state::mjchuuka_portmap);
+	tmpz.out_pa_callback().set(FUNC(ddenlovr_state::hanakanz_rombank_w));
+	tmpz.out_pb_callback().set(FUNC(ddenlovr_state::mjchuuka_oki_bank_w));
 
-	MCFG_DEVICE_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("maincpu", tmpz84c015_device, trg0))
+	m_screen->screen_vblank().set("maincpu", FUNC(tmpz84c015_device::trg0));
 
-	MCFG_DEVICE_MODIFY("rtc")
-	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE("maincpu", tmpz84c015_device, trg1))
+	subdevice<msm6242_device>("rtc")->out_int_handler().set(m_maincpu, FUNC(tmpz84c015_device::trg1));
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 1789772)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	AY8910(config, "aysnd", 1789772).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 WRITE_LINE_MEMBER(ddenlovr_state::funkyfig_sound_irq)
@@ -10165,81 +10131,77 @@ WRITE_LINE_MEMBER(ddenlovr_state::funkyfig_sound_irq)
 		m_soundcpu->set_input_line(0, HOLD_LINE);   // NMI by main cpu
 }
 
-MACHINE_CONFIG_START(ddenlovr_state::funkyfig)
+void ddenlovr_state::funkyfig(machine_config &config)
+{
 	mmpanic(config);
-	MCFG_DEVICE_REPLACE("maincpu", TMPZ84C015, 8000000)
-	MCFG_DEVICE_PROGRAM_MAP(funkyfig_map)
-	MCFG_DEVICE_IO_MAP(funkyfig_portmap)
-	MCFG_TMPZ84C015_IN_PA_CB(READ8(*this, ddenlovr_state, funkyfig_dsw_r))
-	MCFG_TMPZ84C015_OUT_PB_CB(WRITE8(*this, ddenlovr_state, funkyfig_rombank_w))
+	tmpz84c015_device &tmpz(TMPZ84C015(config.replace(), m_maincpu, 8000000));
+	tmpz.set_addrmap(AS_PROGRAM, &ddenlovr_state::funkyfig_map);
+	tmpz.set_addrmap(AS_IO, &ddenlovr_state::funkyfig_portmap);
+	tmpz.in_pa_callback().set(FUNC(ddenlovr_state::funkyfig_dsw_r));
+	tmpz.out_pb_callback().set(FUNC(ddenlovr_state::funkyfig_rombank_w));
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,funkyfig)
 
-	MCFG_DEVICE_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("maincpu", tmpz84c015_device, trg0))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, ddenlovr_state, funkyfig_sound_irq))
+	m_screen->screen_vblank().set(m_maincpu, FUNC(tmpz84c015_device::trg0));
+	m_screen->screen_vblank().append(FUNC(ddenlovr_state::funkyfig_sound_irq));
 
-	MCFG_DEVICE_MODIFY("rtc")
-	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE("maincpu", tmpz84c015_device, trg1)) MCFG_DEVCB_INVERT
+	subdevice<msm6242_device>("rtc")->out_int_handler().set(m_maincpu, FUNC(tmpz84c015_device::trg1)).invert();
 
-	MCFG_DDENLOVR_BLITTER_IRQ(ddenlovr_state, funkyfig_blitter_irq)
+	blitter_irq().set(FUNC(ddenlovr_state::funkyfig_blitter_irq));
 
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_DEVICE_IO_MAP(funkyfig_sound_portmap)
+	m_soundcpu->set_addrmap(AS_IO, &ddenlovr_state::funkyfig_sound_portmap);
 
 	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,ddenlovr) // no extra layers?
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************
      Mahjong Super Dai Chuuka Ken
 ***************************************************************************/
 
-MACHINE_CONFIG_START(ddenlovr_state::mjschuka)
-
+void ddenlovr_state::mjschuka(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMPZ84C015, XTAL(16'000'000)/2)
-	MCFG_DEVICE_PROGRAM_MAP(mjmyster_map)
-	MCFG_DEVICE_IO_MAP(mjschuka_portmap)
-	MCFG_TMPZ84C015_OUT_PA_CB(WRITE8(*this, ddenlovr_state, sryudens_rambank_w))
-	MCFG_TMPZ84C015_OUT_PB_CB(WRITE8(*this, ddenlovr_state, mjflove_rombank_w))
+	tmpz84c015_device &tmpz(TMPZ84C015(config, "maincpu", XTAL(16'000'000)/2));
+	tmpz.set_addrmap(AS_PROGRAM, &ddenlovr_state::mjmyster_map);
+	tmpz.set_addrmap(AS_IO, &ddenlovr_state::mjschuka_portmap);
+	tmpz.out_pa_callback().set(FUNC(ddenlovr_state::sryudens_rambank_w));
+	tmpz.out_pb_callback().set(FUNC(ddenlovr_state::mjflove_rombank_w));
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,hanakanz)
 	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(336, 256+22)
-	MCFG_SCREEN_VISIBLE_AREA(0, 336-1, 5, 256-11-1)
-	MCFG_SCREEN_UPDATE_DRIVER(ddenlovr_state, screen_update_ddenlovr)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("maincpu", tmpz84c015_device, trg0))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(336, 256+22);
+	m_screen->set_visarea(0, 336-1, 5, 256-11-1);
+	m_screen->set_screen_update(FUNC(ddenlovr_state::screen_update_ddenlovr));
+	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set("maincpu", FUNC(tmpz84c015_device::trg0));
 
-	MCFG_PALETTE_ADD("palette", 0x200)
+	PALETTE(config, m_palette).set_entries(0x200);
 
-	MCFG_DDENLOVR_BLITTER_IRQ(ddenlovr_state, mjmyster_blitter_irq)
+	blitter_irq().set("maincpu", FUNC(tmpz84c015_device::trg1));
+	blitter_irq().append("maincpu", FUNC(tmpz84c015_device::trg2));
 
 	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,mjflove)  // blitter commands in the roms are shuffled around
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ym2413", YM2413, XTAL(28'636'363) / 8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	YM2413(config, "ym2413", XTAL(28'636'363) / 8).add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(28'636'363) / 8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	AY8910(config, "aysnd", XTAL(28'636'363) / 8).add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(28'636'363) / 28, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	OKIM6295(config, m_oki, XTAL(28'636'363) / 28, okim6295_device::PIN7_HIGH);
+	m_oki->add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	/* devices */
-	MCFG_DEVICE_ADD("rtc", RTC62421, XTAL(32'768)) // internal oscillator
-	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE("maincpu", tmpz84c015_device, pa7_w)) MCFG_DEVCB_INVERT
-MACHINE_CONFIG_END
+	RTC62421(config, "rtc", 32.768_kHz_XTAL).out_int_handler().set(m_maincpu, FUNC(tmpz84c015_device::pa7_w)).invert(); // internal oscillator
+}
 
 
 /***************************************************************************
@@ -10253,31 +10215,31 @@ MACHINE_CONFIG_END
     NMI triggered by the RTC
  */
 
-MACHINE_CONFIG_START(ddenlovr_state::mjmyster)
+void ddenlovr_state::mjmyster(machine_config &config)
+{
 	quizchq(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(mjmyster_map)
-	MCFG_DEVICE_IO_MAP(mjmyster_portmap)
-	MCFG_TMPZ84C015_IN_PA_CB(CONSTANT(0))
-	MCFG_TMPZ84C015_OUT_PA_CB(WRITE8(*this, ddenlovr_state, mjmyster_rambank_w))
-	MCFG_TMPZ84C015_OUT_PB_CB(WRITE8(*this, ddenlovr_state, mmpanic_rombank_w))
+	tmpz84c015_device &maincpu(*subdevice<tmpz84c015_device>("maincpu"));
+	maincpu.set_addrmap(AS_PROGRAM, &ddenlovr_state::mjmyster_map);
+	maincpu.set_addrmap(AS_IO, &ddenlovr_state::mjmyster_portmap);
+	maincpu.in_pa_callback().set_constant(0);
+	maincpu.out_pa_callback().set(FUNC(ddenlovr_state::mjmyster_rambank_w));
+	maincpu.out_pb_callback().set(FUNC(ddenlovr_state::mmpanic_rombank_w));
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("maincpu", tmpz84c015_device, trg0)) MCFG_DEVCB_INVERT
+	m_screen->screen_vblank().set(m_maincpu, FUNC(tmpz84c015_device::trg0)).invert();
 
-	MCFG_DEVICE_MODIFY("rtc")
-	MCFG_MSM6242_OUT_INT_HANDLER(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	subdevice<msm6242_device>("rtc")->out_int_handler().set_inputline("maincpu", INPUT_LINE_NMI);
 
-	MCFG_DDENLOVR_BLITTER_IRQ(ddenlovr_state, mjmyster_blitter_irq)
+	blitter_irq().set("maincpu", FUNC(tmpz84c015_device::trg1));
+	blitter_irq().append("maincpu", FUNC(tmpz84c015_device::trg2));
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,mjmyster)
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 3579545)
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, ddenlovr_state, ddenlovr_select_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_CONFIG_END
+	ay8910_device &aysnd(AY8910(config, "aysnd", 3579545));
+	aysnd.port_b_write_callback().set(FUNC(ddenlovr_state::ddenlovr_select_w));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.30);
+}
 
 /***************************************************************************
                             Hanafuda Hana Ginga
@@ -10291,133 +10253,132 @@ MACHINE_CONFIG_END
  */
 
 
-MACHINE_CONFIG_START(ddenlovr_state::hginga)
+void ddenlovr_state::hginga(machine_config &config)
+{
 	quizchq(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(hginga_map)
-	MCFG_DEVICE_IO_MAP(hginga_portmap)
-	MCFG_TMPZ84C015_IN_PA_CB(CONSTANT(0))
-	MCFG_TMPZ84C015_OUT_PA_CB(WRITE8(*this, ddenlovr_state, mjmyster_rambank_w))
-	MCFG_TMPZ84C015_OUT_PB_CB(WRITE8(*this, ddenlovr_state, hginga_rombank_w))
+	tmpz84c015_device &maincpu(*subdevice<tmpz84c015_device>("maincpu"));
+	maincpu.set_addrmap(AS_PROGRAM, &ddenlovr_state::hginga_map);
+	maincpu.set_addrmap(AS_IO, &ddenlovr_state::hginga_portmap);
+	maincpu.in_pa_callback().set_constant(0);
+	maincpu.out_pa_callback().set(FUNC(ddenlovr_state::mjmyster_rambank_w));
+	maincpu.out_pb_callback().set(FUNC(ddenlovr_state::hginga_rombank_w));
 
-	MCFG_DEVICE_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("maincpu", tmpz84c015_device, trg0))
+	m_screen->screen_vblank().set("maincpu", FUNC(tmpz84c015_device::trg0));
 
-	MCFG_DEVICE_MODIFY("rtc")
-	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE("maincpu", tmpz84c015_device, pa7_w)) MCFG_DEVCB_INVERT
+	subdevice<msm6242_device>("rtc")->out_int_handler().set(m_maincpu, FUNC(tmpz84c015_device::pa7_w)).invert();
 
-	MCFG_DDENLOVR_BLITTER_IRQ(ddenlovr_state, mjmyster_blitter_irq)
+	blitter_irq().set("maincpu", FUNC(tmpz84c015_device::trg1));
+	blitter_irq().append("maincpu", FUNC(tmpz84c015_device::trg2));
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,mjmyster)
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 3579545)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, ddenlovr_state, hginga_dsw_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, ddenlovr_state, ddenlovr_select_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_CONFIG_END
+	ay8910_device &aysnd(AY8910(config, "aysnd", 3579545));
+	aysnd.port_a_read_callback().set(FUNC(ddenlovr_state::hginga_dsw_r));
+	aysnd.port_b_write_callback().set(FUNC(ddenlovr_state::ddenlovr_select_w));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.30);
+}
 
-MACHINE_CONFIG_START(ddenlovr_state::hgokou)
+void ddenlovr_state::hgokou(machine_config &config)
+{
 	quizchq(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(hgokou_map)
-	MCFG_DEVICE_IO_MAP(hgokou_portmap)
-	MCFG_TMPZ84C015_IN_PA_CB(CONSTANT(0))
-	MCFG_TMPZ84C015_OUT_PA_CB(WRITE8(*this, ddenlovr_state, mjmyster_rambank_w))
-	MCFG_TMPZ84C015_OUT_PB_CB(WRITE8(*this, ddenlovr_state, hginga_rombank_w))
+	tmpz84c015_device &maincpu(*subdevice<tmpz84c015_device>("maincpu"));
+	maincpu.set_addrmap(AS_PROGRAM, &ddenlovr_state::hgokou_map);
+	maincpu.set_addrmap(AS_IO, &ddenlovr_state::hgokou_portmap);
+	maincpu.in_pa_callback().set_constant(0);
+	maincpu.out_pa_callback().set(FUNC(ddenlovr_state::mjmyster_rambank_w));
+	maincpu.out_pb_callback().set(FUNC(ddenlovr_state::hginga_rombank_w));
 
-	MCFG_DEVICE_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("maincpu", tmpz84c015_device, trg0))
+	m_screen->screen_vblank().set("maincpu", FUNC(tmpz84c015_device::trg0));
 
-	MCFG_DEVICE_MODIFY("rtc")
-	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE("maincpu", tmpz84c015_device, pa7_w)) MCFG_DEVCB_INVERT
+	subdevice<msm6242_device>("rtc")->out_int_handler().set(m_maincpu, FUNC(tmpz84c015_device::pa7_w)).invert();
 
-	MCFG_DDENLOVR_BLITTER_IRQ(ddenlovr_state, mjmyster_blitter_irq)
+	blitter_irq().set("maincpu", FUNC(tmpz84c015_device::trg1));
+	blitter_irq().append("maincpu", FUNC(tmpz84c015_device::trg2));
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,mjmyster)
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 3579545)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, ddenlovr_state, hginga_dsw_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, ddenlovr_state, ddenlovr_select_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_CONFIG_END
+	ay8910_device &aysnd(AY8910(config, "aysnd", 3579545));
+	aysnd.port_a_read_callback().set(FUNC(ddenlovr_state::hginga_dsw_r));
+	aysnd.port_b_write_callback().set(FUNC(ddenlovr_state::ddenlovr_select_w));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.30);
+}
 
-MACHINE_CONFIG_START(ddenlovr_state::hgokbang)
+void ddenlovr_state::hgokbang(machine_config &config)
+{
 	hgokou(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(hgokbang_portmap)
-MACHINE_CONFIG_END
+	subdevice<tmpz84c015_device>("maincpu")->set_addrmap(AS_IO, &ddenlovr_state::hgokbang_portmap);
+}
 
-MACHINE_CONFIG_START(ddenlovr_state::mjmywrld)
+void ddenlovr_state::mjmywrld(machine_config &config)
+{
 	mjmyster(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(hginga_map)
-	MCFG_DEVICE_IO_MAP(mjmywrld_portmap)
-	MCFG_TMPZ84C015_OUT_PA_CB(WRITE8(*this, ddenlovr_state, mjmyster_rambank_w))
-	MCFG_TMPZ84C015_OUT_PB_CB(WRITE8(*this, ddenlovr_state, hginga_rombank_w))
-MACHINE_CONFIG_END
+	tmpz84c015_device &maincpu(*subdevice<tmpz84c015_device>("maincpu"));
+	maincpu.set_addrmap(AS_PROGRAM, &ddenlovr_state::hginga_map);
+	maincpu.set_addrmap(AS_IO, &ddenlovr_state::mjmywrld_portmap);
+	maincpu.out_pa_callback().set(FUNC(ddenlovr_state::mjmyster_rambank_w));
+	maincpu.out_pb_callback().set(FUNC(ddenlovr_state::hginga_rombank_w));
+}
 
-MACHINE_CONFIG_START(ddenlovr_state::mjmyuniv)
+void ddenlovr_state::mjmyuniv(machine_config &config)
+{
 	quizchq(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(mjmyster_map)
-	MCFG_DEVICE_IO_MAP(mjmyster_portmap)
-	MCFG_TMPZ84C015_IN_PA_CB(CONSTANT(0))
-	MCFG_TMPZ84C015_OUT_PA_CB(WRITE8(*this, ddenlovr_state, mjmyster_rambank_w))
-	MCFG_TMPZ84C015_OUT_PB_CB(WRITE8(*this, ddenlovr_state, mmpanic_rombank_w))
+	tmpz84c015_device &maincpu(*subdevice<tmpz84c015_device>("maincpu"));
+	maincpu.set_addrmap(AS_PROGRAM, &ddenlovr_state::mjmyster_map);
+	maincpu.set_addrmap(AS_IO, &ddenlovr_state::mjmyster_portmap);
+	maincpu.in_pa_callback().set_constant(0);
+	maincpu.out_pa_callback().set(FUNC(ddenlovr_state::mjmyster_rambank_w));
+	maincpu.out_pb_callback().set(FUNC(ddenlovr_state::mmpanic_rombank_w));
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("maincpu", tmpz84c015_device, trg0)) MCFG_DEVCB_INVERT
+	m_screen->screen_vblank().set(m_maincpu, FUNC(tmpz84c015_device::trg0)).invert();
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,mjmyster)
 
-	MCFG_DEVICE_MODIFY("rtc")
-	MCFG_MSM6242_OUT_INT_HANDLER(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	subdevice<msm6242_device>("rtc")->out_int_handler().set_inputline("maincpu", INPUT_LINE_NMI);
 
-	MCFG_DDENLOVR_BLITTER_IRQ(ddenlovr_state, mjmyster_blitter_irq)
+	blitter_irq().set("maincpu", FUNC(tmpz84c015_device::trg1));
+	blitter_irq().append("maincpu", FUNC(tmpz84c015_device::trg2));
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 1789772)
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, ddenlovr_state, ddenlovr_select_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_CONFIG_END
+	ay8910_device &aysnd(AY8910(config, "aysnd", 1789772));
+	aysnd.port_b_write_callback().set(FUNC(ddenlovr_state::ddenlovr_select_w));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.30);
+}
 
-MACHINE_CONFIG_START(ddenlovr_state::mjmyornt)
+void ddenlovr_state::mjmyornt(machine_config &config)
+{
 	quizchq(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(quizchq_map)
-	MCFG_DEVICE_IO_MAP(mjmyster_portmap)
-	MCFG_TMPZ84C015_IN_PA_CB(CONSTANT(0))
-	MCFG_TMPZ84C015_OUT_PA_CB(WRITE8(*this, ddenlovr_state, mjmyster_rambank_w))
-	MCFG_TMPZ84C015_OUT_PB_CB(WRITE8(*this, ddenlovr_state, mmpanic_rombank_w))
+	tmpz84c015_device &maincpu(*subdevice<tmpz84c015_device>("maincpu"));
+	maincpu.set_addrmap(AS_PROGRAM, &ddenlovr_state::quizchq_map);
+	maincpu.set_addrmap(AS_IO, &ddenlovr_state::mjmyster_portmap);
+	maincpu.in_pa_callback().set_constant(0);
+	maincpu.out_pa_callback().set(FUNC(ddenlovr_state::mjmyster_rambank_w));
+	maincpu.out_pb_callback().set(FUNC(ddenlovr_state::mmpanic_rombank_w));
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("maincpu", tmpz84c015_device, trg0)) MCFG_DEVCB_INVERT
-
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, 336-1, 4, 256-16+4-1)
+	m_screen->screen_vblank().set(m_maincpu, FUNC(tmpz84c015_device::trg0)).invert();
+	m_screen->set_visarea(0, 336-1, 4, 256-16+4-1);
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,mjmyster)
 
-	MCFG_DEVICE_MODIFY("rtc")
-	MCFG_MSM6242_OUT_INT_HANDLER(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	subdevice<msm6242_device>("rtc")->out_int_handler().set_inputline("maincpu", INPUT_LINE_NMI);
 
-	MCFG_DDENLOVR_BLITTER_IRQ(ddenlovr_state, mjmyster_blitter_irq)
+	blitter_irq().set("maincpu", FUNC(tmpz84c015_device::trg1));
+	blitter_irq().append("maincpu", FUNC(tmpz84c015_device::trg2));
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 1789772)
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, ddenlovr_state, ddenlovr_select_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_CONFIG_END
+	ay8910_device &aysnd(AY8910(config, "aysnd", 1789772));
+	aysnd.port_b_write_callback().set(FUNC(ddenlovr_state::ddenlovr_select_w));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.30);
+}
 
 
 WRITE_LINE_MEMBER(ddenlovr_state::mjflove_irq)
@@ -10445,50 +10406,46 @@ WRITE_LINE_MEMBER(ddenlovr_state::mjflove_blitter_irq)
 }
 
 
-MACHINE_CONFIG_START(ddenlovr_state::mjflove)
+void ddenlovr_state::mjflove(machine_config &config)
+{
 	quizchq(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(rongrong_map)
-	MCFG_DEVICE_IO_MAP(mjflove_portmap)
-	MCFG_TMPZ84C015_IN_PA_CB(IOPORT("DSW2"))
-	MCFG_TMPZ84C015_OUT_PB_CB(WRITE8(*this, ddenlovr_state, hanakanz_keyb_w))
+	tmpz84c015_device &maincpu(*subdevice<tmpz84c015_device>("maincpu"));
+	maincpu.set_addrmap(AS_PROGRAM, &ddenlovr_state::rongrong_map);
+	maincpu.set_addrmap(AS_IO, &ddenlovr_state::mjflove_portmap);
+	maincpu.in_pa_callback().set_ioport("DSW2");
+	maincpu.out_pb_callback().set(FUNC(ddenlovr_state::hanakanz_keyb_w));
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,mjflove)
 
-	MCFG_DEVICE_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ddenlovr_state, mjflove_irq))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("maincpu", tmpz84c015_device, trg0)) // frame counter?
+	m_screen->screen_vblank().set(FUNC(ddenlovr_state::mjflove_irq));
+	m_screen->screen_vblank().append(m_maincpu, FUNC(tmpz84c015_device::trg0)); // frame counter?
 
-	MCFG_DEVICE_REPLACE("rtc", RTC72421, XTAL(32'768))
-	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(*this, ddenlovr_state, mjflove_rtc_irq))
+	RTC72421(config.replace(), "rtc", 32.768_kHz_XTAL).out_int_handler().set(FUNC(ddenlovr_state::mjflove_rtc_irq));
 
-	MCFG_DDENLOVR_BLITTER_IRQ(ddenlovr_state, mjflove_blitter_irq)
+	blitter_irq().set(FUNC(ddenlovr_state::mjflove_blitter_irq));
 
 	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,mjflove)  // blitter commands in the roms are shuffled around
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 28636363/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_CONFIG_END
+	AY8910(config, "aysnd", 28636363/8).add_route(ALL_OUTPUTS, "mono", 0.30);
+}
 
 MACHINE_CONFIG_START(ddenlovr_state::hparadis)
 	quizchq(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(hparadis_map)
-	MCFG_DEVICE_IO_MAP(hparadis_portmap)
-	MCFG_TMPZ84C015_IN_PA_CB(READ8(*this, ddenlovr_state, hparadis_dsw_r))
-	MCFG_TMPZ84C015_OUT_PB_CB(WRITE8(*this, ddenlovr_state, hparadis_select_w))
+	tmpz84c015_device &maincpu(*subdevice<tmpz84c015_device>("maincpu"));
+	maincpu.set_addrmap(AS_PROGRAM, &ddenlovr_state::hparadis_map);
+	maincpu.set_addrmap(AS_IO, &ddenlovr_state::hparadis_portmap);
+	maincpu.in_pa_callback().set(FUNC(ddenlovr_state::hparadis_dsw_r));
+	maincpu.out_pb_callback().set(FUNC(ddenlovr_state::hparadis_select_w));
 
 	// the RTC seems unused
-	MCFG_DEVICE_REMOVE("rtc")
+	config.device_remove("rtc");
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,hparadis)
 MACHINE_CONFIG_END
-
-
 
 MACHINE_CONFIG_START(ddenlovr_state::jongtei)
 
@@ -10513,22 +10470,20 @@ MACHINE_CONFIG_START(ddenlovr_state::jongtei)
 
 	MCFG_PALETTE_ADD("palette", 0x200)
 
-	MCFG_DDENLOVR_BLITTER_IRQ(ddenlovr_state, mjflove_blitter_irq)
+	blitter_irq().set(FUNC(ddenlovr_state::mjflove_blitter_irq));
 
 	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,hanakanz) // blitter commands in the roms are shuffled around
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ym2413", YM2413, XTAL(28'636'363) / 8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	YM2413(config, "ym2413", XTAL(28'636'363) / 8).add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(28'636'363) / 28, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
-	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(*this, ddenlovr_state, hanakanz_rtc_irq))
+	MSM6242(config, "rtc", XTAL(32'768)).out_int_handler().set(FUNC(ddenlovr_state::hanakanz_rtc_irq));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ddenlovr_state::mjgnight)
@@ -10548,11 +10503,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(ddenlovr_state::sryudens)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMPZ84C015, XTAL(16'000'000) / 2) // ?
-	MCFG_DEVICE_PROGRAM_MAP(sryudens_map)
-	MCFG_DEVICE_IO_MAP(sryudens_portmap)
-	MCFG_TMPZ84C015_OUT_PA_CB(WRITE8(*this, ddenlovr_state, sryudens_rambank_w))
-	MCFG_TMPZ84C015_OUT_PB_CB(WRITE8(*this, ddenlovr_state, mjflove_rombank_w))
+	tmpz84c015_device &maincpu(TMPZ84C015(config, m_maincpu, XTAL(16'000'000) / 2)); // ?
+	maincpu.set_addrmap(AS_PROGRAM, &ddenlovr_state::sryudens_map);
+	maincpu.set_addrmap(AS_IO, &ddenlovr_state::sryudens_portmap);
+	maincpu.out_pa_callback().set(FUNC(ddenlovr_state::sryudens_rambank_w));
+	maincpu.out_pb_callback().set(FUNC(ddenlovr_state::mjflove_rombank_w));
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,sryudens)
 	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
@@ -10570,25 +10525,22 @@ MACHINE_CONFIG_START(ddenlovr_state::sryudens)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 
-	MCFG_DDENLOVR_BLITTER_IRQ(ddenlovr_state, mjflove_blitter_irq)
+	blitter_irq().set(FUNC(ddenlovr_state::mjflove_blitter_irq));
 
 	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,mjflove)  // blitter commands in the roms are shuffled around
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ym2413", YM2413, XTAL(28'636'363) / 8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	YM2413(config, "ym2413", XTAL(28'636'363) / 8).add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("aysnd", YMZ284, XTAL(28'636'363) / 8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	YMZ284(config, "aysnd", XTAL(28'636'363) / 8).add_route(ALL_OUTPUTS, "mono", 0.30);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(28'636'363) / 28, okim6295_device::PIN7_HIGH) // ?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
-	MCFG_DEVICE_ADD("rtc", RTC62421, XTAL(32'768)) // internal oscillator
-	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE("maincpu", tmpz84c015_device, trg1))
+	RTC62421(config, "rtc", XTAL(32'768)).out_int_handler().set(m_maincpu, FUNC(tmpz84c015_device::trg1)); // internal oscillator
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -10599,11 +10551,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(ddenlovr_state::janshinp)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMPZ84C015, XTAL(16'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(janshinp_map)
-	MCFG_DEVICE_IO_MAP(janshinp_portmap)
-	MCFG_TMPZ84C015_OUT_PA_CB(WRITE8(*this, ddenlovr_state, sryudens_rambank_w))
-	MCFG_TMPZ84C015_OUT_PB_CB(WRITE8(*this, ddenlovr_state, mjflove_rombank_w))
+	tmpz84c015_device &maincpu(TMPZ84C015(config, m_maincpu, XTAL(16'000'000) / 2));
+	maincpu.set_addrmap(AS_PROGRAM, &ddenlovr_state::janshinp_map);
+	maincpu.set_addrmap(AS_IO, &ddenlovr_state::janshinp_portmap);
+	maincpu.out_pa_callback().set(FUNC(ddenlovr_state::sryudens_rambank_w));
+	maincpu.out_pb_callback().set(FUNC(ddenlovr_state::mjflove_rombank_w));
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,hanakanz)
 	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
@@ -10621,33 +10573,31 @@ MACHINE_CONFIG_START(ddenlovr_state::janshinp)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 
-	MCFG_DDENLOVR_BLITTER_IRQ(ddenlovr_state, mjflove_blitter_irq)
+	blitter_irq().set(FUNC(ddenlovr_state::mjflove_blitter_irq));
 
 	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,ddenlovr)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ym2413", YM2413, XTAL(28'636'363) / 8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	YM2413(config, "ym2413", XTAL(28'636'363) / 8).add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("aysnd", YMZ284, XTAL(28'636'363) / 8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	YMZ284(config, "aysnd", XTAL(28'636'363) / 8).add_route(ALL_OUTPUTS, "mono", 0.30);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(28'636'363) / 28, okim6295_device::PIN7_HIGH) // ?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
-	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE("maincpu", tmpz84c015_device, trg1))
+	MSM6242(config, "rtc", XTAL(32'768)).out_int_handler().set(m_maincpu, FUNC(tmpz84c015_device::trg1));
 MACHINE_CONFIG_END
 
 // Same PCB as janshinp
-MACHINE_CONFIG_START(ddenlovr_state::dtoyoken)
+void ddenlovr_state::dtoyoken(machine_config &config)
+{
 	janshinp(config);
 
 	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,mjflove)  // blitter commands in the roms are shuffled around
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************
@@ -10671,11 +10621,11 @@ MACHINE_START_MEMBER(ddenlovr_state,seljan2)
 MACHINE_CONFIG_START(ddenlovr_state::seljan2)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMPZ84C015, XTAL(16'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(seljan2_map)
-	MCFG_DEVICE_IO_MAP(seljan2_portmap)
-	MCFG_TMPZ84C015_OUT_PA_CB(WRITE8(*this, ddenlovr_state, hanakanz_keyb_w))
-	MCFG_TMPZ84C015_OUT_PB_CB(WRITE8(*this, ddenlovr_state, sryudens_coincounter_w))
+	tmpz84c015_device &maincpu(TMPZ84C015(config, m_maincpu, XTAL(16'000'000) / 2));
+	maincpu.set_addrmap(AS_PROGRAM, &ddenlovr_state::seljan2_map);
+	maincpu.set_addrmap(AS_IO, &ddenlovr_state::seljan2_portmap);
+	maincpu.out_pa_callback().set(FUNC(ddenlovr_state::hanakanz_keyb_w));
+	maincpu.out_pb_callback().set(FUNC(ddenlovr_state::sryudens_coincounter_w));
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,seljan2)
 	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
@@ -10693,27 +10643,25 @@ MACHINE_CONFIG_START(ddenlovr_state::seljan2)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 
-	MCFG_DDENLOVR_BLITTER_IRQ(ddenlovr_state, seljan2_blitter_irq)
+	blitter_irq().set("maincpu", FUNC(tmpz84c015_device::pa7_w)).invert(); // PA bit 7 = blitter busy
 
 	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,mjflove)  // blitter commands in the roms are shuffled around
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ym2413", YM2413, XTAL(28'636'363) / 8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	YM2413(config, "ym2413", XTAL(28'636'363) / 8).add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(28'636'363) / 8)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, ddenlovr_state, seljan2_dsw_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, ddenlovr_state, ddenlovr_select_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL(28'636'363) / 8));
+	aysnd.port_a_read_callback().set(FUNC(ddenlovr_state::seljan2_dsw_r));
+	aysnd.port_b_write_callback().set(FUNC(ddenlovr_state::ddenlovr_select_w));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.30);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(28'636'363) / 28, okim6295_device::PIN7_HIGH) // ?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
-	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE("maincpu", tmpz84c015_device, trg1))
+	MSM6242(config, "rtc", XTAL(32'768)).out_int_handler().set(m_maincpu, FUNC(tmpz84c015_device::trg1));
 MACHINE_CONFIG_END
 
 
@@ -10750,15 +10698,13 @@ MACHINE_CONFIG_START(ddenlovr_state::daimyojn)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ym2413", YM2413, XTAL(28'636'363) / 8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	YM2413(config, "ym2413", XTAL(28'636'363) / 8).add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(28'636'363) / 28, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
-	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(*this, ddenlovr_state, hanakanz_rtc_irq))
+	MSM6242(config, "rtc", XTAL(32'768)).out_int_handler().set(FUNC(ddenlovr_state::hanakanz_rtc_irq));
 MACHINE_CONFIG_END
 
 

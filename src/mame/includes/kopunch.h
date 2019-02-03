@@ -5,6 +5,10 @@
   Sega KO Punch
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_KOPUNCH_H
+#define MAME_INCLUDES_KOPUNCH_H
+
+#pragma once
 
 #include "emupal.h"
 
@@ -40,7 +44,7 @@ private:
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	DECLARE_PALETTE_INIT(kopunch);
+	void kopunch_palette(palette_device &palette) const;
 	uint32_t screen_update_kopunch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void kopunch_io_map(address_map &map);
@@ -65,3 +69,5 @@ private:
 	uint8_t m_gfxbank;
 	uint8_t m_scrollx;
 };
+
+#endif // MAME_INCLUDES_KOPUNCH_H

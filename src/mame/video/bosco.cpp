@@ -17,64 +17,58 @@
 #define STARS_COLOR_BASE (64*4+64*4+4)
 #define VIDEO_RAM_SIZE 0x400
 
-PALETTE_INIT_MEMBER(bosco_state,bosco)
+void bosco_state::bosco_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
 
-	/* core palette */
-	for (i = 0;i < 32;i++)
+	// core palette
+	for (int i = 0; i < 32; i++)
 	{
-		int bit0,bit1,bit2,r,g,b;
+		int bit0, bit1, bit2;
 
-
-		bit0 = ((*color_prom) >> 0) & 0x01;
-		bit1 = ((*color_prom) >> 1) & 0x01;
-		bit2 = ((*color_prom) >> 2) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		bit0 = ((*color_prom) >> 3) & 0x01;
-		bit1 = ((*color_prom) >> 4) & 0x01;
-		bit2 = ((*color_prom) >> 5) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = BIT(*color_prom, 0);
+		bit1 = BIT(*color_prom, 1);
+		bit2 = BIT(*color_prom, 2);
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = BIT(*color_prom, 3);
+		bit1 = BIT(*color_prom, 4);
+		bit2 = BIT(*color_prom, 5);
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 		bit0 = 0;
-		bit1 = ((*color_prom) >> 6) & 0x01;
-		bit2 = ((*color_prom) >> 7) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit1 = BIT(*color_prom, 6);
+		bit2 = BIT(*color_prom, 7);
+		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette.set_indirect_color(i,rgb_t(r,g,b));
+		palette.set_indirect_color(i, rgb_t(r, g, b));
 		color_prom++;
 	}
 
-	/* palette for the stars */
-	for (i = 0;i < 64;i++)
+	// palette for the stars
+	for (int i = 0; i < 64; i++)
 	{
-		int bits,r,g,b;
-		static const int map[4] = { 0x00, 0x47, 0x97 ,0xde };
+		static constexpr int map[4] = { 0x00, 0x47, 0x97 ,0xde };
 
-		bits = (i >> 0) & 0x03;
-		r = map[bits];
-		bits = (i >> 2) & 0x03;
-		g = map[bits];
-		bits = (i >> 4) & 0x03;
-		b = map[bits];
+		int const r = map[(i >> 0) & 0x03];
+		int const g = map[(i >> 2) & 0x03];
+		int const b = map[(i >> 4) & 0x03];
 
-		palette.set_indirect_color(32 + i,rgb_t(r,g,b));
+		palette.set_indirect_color(32 + i, rgb_t(r, g, b));
 	}
 
-	/* characters / sprites */
-	for (i = 0;i < 64*4;i++)
+	// characters / sprites
+	for (int i = 0; i < 64*4; i++)
 	{
-		palette.set_pen_indirect(i, (color_prom[i] & 0x0f) + 0x10); /* chars */
-		palette.set_pen_indirect(i+64*4, color_prom[i] & 0x0f); /* sprites */
+		palette.set_pen_indirect(i, (color_prom[i] & 0x0f) | 0x10); // chars
+		palette.set_pen_indirect(i + 64*4, color_prom[i] & 0x0f); // sprites
 	}
 
-	/* bullets lookup table */
-	/* they use colors 28-31, I think - PAL 5A controls it */
-	for (i = 0;i < 4;i++)
-		palette.set_pen_indirect(64*4+64*4+i, 31-i);
+	// bullets lookup table
+	// they use colors 28-31, I think - PAL 5A controls it
+	for (int i = 0; i < 4; i++)
+		palette.set_pen_indirect(64*4+64*4+i, 31 - i);
 
-	/* now the stars */
-	for (i = 0;i < 64;i++)
+	// now the stars
+	for (int i = 0; i < 64; i++)
 		palette.set_pen_indirect(64*4+64*4+4+i, 32 + i);
 }
 
@@ -246,18 +240,18 @@ void bosco_state::draw_stars(bitmap_ind16 &bitmap, const rectangle &cliprect, in
 		{
 			int x,y;
 
-			if ( (set_a == m_star_seed_tab[star_cntr].set) || ( set_b == m_star_seed_tab[star_cntr].set) )
+			if ((set_a == s_star_seed_tab[star_cntr].set) || (set_b == s_star_seed_tab[star_cntr].set))
 			{
-				x = (m_star_seed_tab[star_cntr].x + m_stars_scrollx) % 256;
-				y = (m_star_seed_tab[star_cntr].y + m_stars_scrolly) % 256;
+				x = (s_star_seed_tab[star_cntr].x + m_stars_scrollx) % 256;
+				y = (s_star_seed_tab[star_cntr].y + m_stars_scrolly) % 256;
 
 				/* don't draw the stars that are off the screen */
-				if ( x < 224 )
+				if (x < 224)
 				{
 					if (flip) x += 64;
 
 					if (cliprect.contains(x, y))
-						bitmap.pix16(y, x) = STARS_COLOR_BASE + m_star_seed_tab[star_cntr].col;
+						bitmap.pix16(y, x) = STARS_COLOR_BASE + s_star_seed_tab[star_cntr].col;
 				}
 			}
 		}

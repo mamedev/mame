@@ -145,12 +145,13 @@ Dip locations added based on the notes above.
 class ppmast93_state : public driver_device
 {
 public:
-	ppmast93_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	ppmast93_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_bgram(*this, "bgram"),
-		m_fgram(*this, "fgram") { }
+		m_fgram(*this, "fgram")
+	{ }
 
 	void ppmast93(machine_config &config);
 
@@ -395,12 +396,12 @@ MACHINE_CONFIG_START(ppmast93_state::ppmast93)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ppmast93)
 
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 0x100)
+	PALETTE(config, "palette", palette_device::RGB_444_PROMS, "proms", 0x100);
 
 
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD("ymsnd", YM2413, 5000000/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)

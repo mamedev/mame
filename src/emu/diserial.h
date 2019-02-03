@@ -105,8 +105,8 @@ protected:
 
 	u8 serial_helper_get_parity(u8 data) { return m_serial_parity_table[data]; }
 
-	bool is_receive_register_full();
-	bool is_transmit_register_empty();
+	bool is_receive_register_full() const { return m_rcv_flags & RECEIVE_REGISTER_FULL; }
+	bool is_transmit_register_empty() const { return m_tra_flags & TRANSMIT_REGISTER_EMPTY; }
 	bool is_receive_register_synchronized() const { return m_rcv_flags & RECEIVE_REGISTER_SYNCHRONISED; }
 	bool is_receive_register_shifting() const { return m_rcv_bit_count_received > 0; }
 	bool is_receive_framing_error() const { return m_rcv_framing_error; }
@@ -188,6 +188,16 @@ class device_buffered_serial_interface : public device_serial_interface
 protected:
 	using device_serial_interface::device_serial_interface;
 
+	void interface_post_start() override
+	{
+		device_serial_interface::interface_post_start();
+
+		device().save_item(NAME(m_fifo));
+		device().save_item(NAME(m_head));
+		device().save_item(NAME(m_tail));
+		device().save_item(NAME(m_empty));
+	}
+
 	virtual void tra_complete() override
 	{
 		assert(!m_empty || (m_head == m_tail));
@@ -236,20 +246,14 @@ protected:
 		}
 	}
 
+	bool fifo_empty() const
+	{
+		return m_empty;
+	}
+
 	bool fifo_full() const
 	{
 		return !m_empty && (m_head == m_tail);
-	}
-
-protected:
-	void interface_post_start() override
-	{
-		device_serial_interface::interface_post_start();
-
-		device().save_item(NAME(m_fifo));
-		device().save_item(NAME(m_head));
-		device().save_item(NAME(m_tail));
-		device().save_item(NAME(m_empty));
 	}
 
 private:

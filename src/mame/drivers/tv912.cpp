@@ -62,7 +62,7 @@
 #include "screen.h"
 #include "speaker.h"
 
-#define CHAR_WIDTH 14
+#define TV912_CH_WIDTH 14
 #define CHARSET_TEST 0
 
 class tv912_state : public driver_device
@@ -255,7 +255,7 @@ void tv912_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 			if (!BIT(sel, b))
 			{
 				unsigned divisor = 11 * (b < 9 ? 1 << b : 176);
-				m_baudgen_timer->adjust(attotime::from_hz(XTAL(23'814'000) / 3.5 / divisor), !param);
+				m_baudgen_timer->adjust(attotime::from_hz(23.814_MHz_XTAL / 3.5 / divisor), !param);
 				break;
 			}
 		}
@@ -272,7 +272,7 @@ u32 tv912_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, cons
 		return 0;
 	}
 
-	u8 *dispram = static_cast<u8 *>(m_dispram_bank->base());
+	const u8 *dispram = static_cast<u8 *>(m_dispram_bank->base());
 	ioport_value videoctrl = m_video_control->read();
 
 	rectangle curs;
@@ -306,7 +306,7 @@ u32 tv912_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, cons
 					dots ^= 0xff;
 			}
 
-			for (int d = 0; d < CHAR_WIDTH / 2; d++)
+			for (int d = 0; d < TV912_CH_WIDTH / 2; d++)
 			{
 				if (x >= cliprect.left() && x <= cliprect.right())
 					bitmap.pix(y, x) = BIT(dots, 7) ? rgb_t::white() : rgb_t::black();
@@ -872,43 +872,44 @@ static INPUT_PORTS_START( tv912c )
 	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(tv912_state::tv912)
-	MCFG_DEVICE_ADD("maincpu", I8035, XTAL(23'814'000) / 4) // nominally +6MHz, actually 5.9535 MHz
-	MCFG_DEVICE_PROGRAM_MAP(prog_map)
-	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, tv912_state, p1_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, tv912_state, p2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, tv912_state, p2_w))
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE("rs232", rs232_port_device, cts_r))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE("crtc", tms9927_device, bl_r)) MCFG_DEVCB_INVERT
-	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE("uart", ay51013_device, write_xr)) MCFG_DEVCB_INVERT
+void tv912_state::tv912(machine_config &config)
+{
+	i8035_device &maincpu(I8035(config, m_maincpu, 23.814_MHz_XTAL / 4)); // nominally +6MHz, actually 5.9535 MHz
+	maincpu.set_addrmap(AS_PROGRAM, &tv912_state::prog_map);
+	maincpu.set_addrmap(AS_IO, &tv912_state::io_map);
+	maincpu.p1_out_cb().set(FUNC(tv912_state::p1_w));
+	maincpu.p2_in_cb().set(FUNC(tv912_state::p2_r));
+	maincpu.p2_out_cb().set(FUNC(tv912_state::p2_w));
+	maincpu.t0_in_cb().set(m_rs232, FUNC(rs232_port_device::cts_r));
+	maincpu.t1_in_cb().set(m_crtc, FUNC(tms9927_device::bl_r)).invert();
+	maincpu.prog_out_cb().set(m_uart, FUNC(ay51013_device::write_xr)).invert();
 
-	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(bank_map)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(12)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x100)
+	ADDRESS_MAP_BANK(config, m_bankdev);
+	m_bankdev->set_addrmap(0, &tv912_state::bank_map);
+	m_bankdev->set_data_width(8);
+	m_bankdev->set_addr_width(12);
+	m_bankdev->set_stride(0x100);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(23'814'000), 105 * CHAR_WIDTH, 0, 80 * CHAR_WIDTH, 270, 0, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(tv912_state, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(23.814_MHz_XTAL, 105 * TV912_CH_WIDTH, 0, 80 * TV912_CH_WIDTH, 270, 0, 240);
+	screen.set_screen_update(FUNC(tv912_state::screen_update));
 
-	MCFG_DEVICE_ADD("crtc", TMS9927, XTAL(23'814'000) / CHAR_WIDTH)
-	MCFG_TMS9927_CHAR_WIDTH(CHAR_WIDTH)
-	MCFG_TMS9927_VSYN_CALLBACK(INPUTLINE("maincpu", MCS48_INPUT_IRQ))
-	MCFG_VIDEO_SET_SCREEN("screen")
+	TMS9927(config, m_crtc, 23.814_MHz_XTAL / TV912_CH_WIDTH);
+	m_crtc->set_char_width(TV912_CH_WIDTH);
+	m_crtc->vsyn_callback().set_inputline(m_maincpu, MCS48_INPUT_IRQ);
+	m_crtc->set_screen("screen");
 
-	MCFG_DEVICE_ADD("uart", AY51013, 0)
-	MCFG_AY51013_READ_SI_CB(READLINE("rs232", rs232_port_device, rxd_r))
-	MCFG_AY51013_WRITE_SO_CB(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_AY51013_AUTO_RDAV(true)
+	AY51013(config, m_uart);
+	m_uart->read_si_callback().set(m_rs232, FUNC(rs232_port_device::rxd_r));
+	m_uart->write_so_callback().set(m_rs232, FUNC(rs232_port_device::write_txd));
+	m_uart->set_auto_rdav(true);
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "loopback")
+	RS232_PORT(config, m_rs232, default_rs232_devices, "loopback");
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("beep", BEEP, XTAL(23'814'000) / 7 / 11 / 256) // nominally 1200 Hz
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	BEEP(config, m_beep, 23.814_MHz_XTAL / 7 / 11 / 256); // nominally 1200 Hz
+	m_beep->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 /**************************************************************************************************************
 

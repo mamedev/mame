@@ -313,12 +313,12 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(amu880_state::amu880)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(10'000'000)/4) // U880D
-	MCFG_DEVICE_PROGRAM_MAP(amu880_mem)
-	MCFG_DEVICE_IO_MAP(amu880_io)
-	MCFG_Z80_DAISY_CHAIN(amu880_daisy_chain)
+	Z80(config, m_maincpu, XTAL(10'000'000)/4); // U880D
+	m_maincpu->set_addrmap(AS_PROGRAM, &amu880_state::amu880_mem);
+	m_maincpu->set_addrmap(AS_IO, &amu880_state::amu880_io);
+	m_maincpu->set_daisy_config(amu880_daisy_chain);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", amu880_state, keyboard_tick, attotime::from_hz(1500))
+	TIMER(config, "keyboard").configure_periodic(FUNC(amu880_state::keyboard_tick), attotime::from_hz(1500));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
@@ -326,33 +326,32 @@ MACHINE_CONFIG_START(amu880_state::amu880)
 	MCFG_SCREEN_RAW_PARAMS(9000000, 576, 0*6, 64*6, 320, 0*10, 24*10)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_amu880)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* devices */
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL(10'000'000)/4)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, amu880_state, ctc_z0_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(Z80SIO_TAG, z80dart_device, rxtxcb_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, amu880_state, ctc_z2_w))
+	z80ctc_device& ctc(Z80CTC(config, Z80CTC_TAG, XTAL(10'000'000)/4));
+	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	ctc.zc_callback<0>().set(FUNC(amu880_state::ctc_z0_w));
+	ctc.zc_callback<1>().set(m_z80sio, FUNC(z80dart_device::rxtxcb_w));
+	ctc.zc_callback<2>().set(FUNC(amu880_state::ctc_z2_w));
 
-	MCFG_DEVICE_ADD(Z80PIO1_TAG, Z80PIO, XTAL(10'000'000)/4)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	z80pio_device& pio1(Z80PIO(config, Z80PIO1_TAG, XTAL(10'000'000)/4));
+	pio1.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD(Z80PIO2_TAG, Z80PIO, XTAL(10'000'000)/4)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	z80pio_device& pio2(Z80PIO(config, Z80PIO2_TAG, XTAL(10'000'000)/4));
+	pio2.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD(Z80SIO_TAG, Z80SIO0, XTAL(10'000'000)/4) // U856
-	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE(*this, amu880_state, cassette_w))
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	Z80SIO0(config, m_z80sio, XTAL(10'000'000)/4); // U856
+	m_z80sio->out_txda_callback().set(FUNC(amu880_state::cassette_w));
+	m_z80sio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("tape", amu880_state, tape_tick, attotime::from_hz(44100))
+	TIMER(config, "tape").configure_periodic(FUNC(amu880_state::tape_tick), attotime::from_hz(44100));
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 MACHINE_CONFIG_END
 
 /* ROMs */

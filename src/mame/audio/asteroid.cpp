@@ -283,7 +283,7 @@ DISCRETE_SOUND_END
 
 WRITE8_MEMBER(asteroid_state::asteroid_explode_w)
 {
-	m_discrete->write(space,ASTEROID_EXPLODE_DATA,(data&0x3c)>>2);                // Volume
+	m_discrete->write(ASTEROID_EXPLODE_DATA,(data&0x3c)>>2);                // Volume
 	/* We will modify the pitch data to send the divider value. */
 	switch ((data&0xc0))
 	{
@@ -300,43 +300,43 @@ WRITE8_MEMBER(asteroid_state::asteroid_explode_w)
 			data = 5;
 			break;
 	}
-	m_discrete->write(space, ASTEROID_EXPLODE_PITCH, data);
+	m_discrete->write(ASTEROID_EXPLODE_PITCH, data);
 }
 
 WRITE8_MEMBER(asteroid_state::asteroid_thump_w)
 {
-	m_discrete->write(space, ASTEROID_THUMP_EN,   data & 0x10);
-	m_discrete->write(space, ASTEROID_THUMP_DATA, data & 0x0f);
+	m_discrete->write(ASTEROID_THUMP_EN,   data & 0x10);
+	m_discrete->write(ASTEROID_THUMP_DATA, data & 0x0f);
 }
 
 WRITE8_MEMBER(asteroid_state::asteroid_noise_reset_w)
 {
-	m_discrete->write(space, ASTEROID_NOISE_RESET, 0);
+	m_discrete->write(ASTEROID_NOISE_RESET, 0);
 }
 
 
-MACHINE_CONFIG_START(asteroid_state::asteroid_sound)
+void asteroid_state::asteroid_sound(machine_config &config)
+{
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE, asteroid_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.4)
+	DISCRETE(config, m_discrete, asteroid_discrete).add_route(ALL_OUTPUTS, "mono", 1.4);
 
-	MCFG_DEVICE_ADD("audiolatch", LS259, 0) // M10
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE("discrete", discrete_device, write_line<ASTEROID_SAUCER_SND_EN>))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE("discrete", discrete_device, write_line<ASTEROID_SAUCER_FIRE_EN>))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE("discrete", discrete_device, write_line<ASTEROID_SAUCER_SEL>))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE("discrete", discrete_device, write_line<ASTEROID_THRUST_EN>))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE("discrete", discrete_device, write_line<ASTEROID_SHIP_FIRE_EN>))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE("discrete", discrete_device, write_line<ASTEROID_LIFE_EN>))
-MACHINE_CONFIG_END
+	ls259_device &audiolatch(LS259(config, "audiolatch")); // M10
+	audiolatch.q_out_cb<0>().set("discrete", FUNC(discrete_device::write_line<ASTEROID_SAUCER_SND_EN>));
+	audiolatch.q_out_cb<1>().set("discrete", FUNC(discrete_device::write_line<ASTEROID_SAUCER_FIRE_EN>));
+	audiolatch.q_out_cb<2>().set("discrete", FUNC(discrete_device::write_line<ASTEROID_SAUCER_SEL>));
+	audiolatch.q_out_cb<3>().set("discrete", FUNC(discrete_device::write_line<ASTEROID_THRUST_EN>));
+	audiolatch.q_out_cb<4>().set("discrete", FUNC(discrete_device::write_line<ASTEROID_SHIP_FIRE_EN>));
+	audiolatch.q_out_cb<5>().set("discrete", FUNC(discrete_device::write_line<ASTEROID_LIFE_EN>));
+}
 
 
-MACHINE_CONFIG_START(asteroid_state::astdelux_sound)
+void asteroid_state::astdelux_sound(machine_config &config)
+{
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE, astdelux_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	DISCRETE(config, m_discrete, astdelux_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("audiolatch", LS259, 0) // M10
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE("discrete", discrete_device, write_line<ASTEROID_THRUST_EN>))
-MACHINE_CONFIG_END
+	ls259_device &audiolatch(LS259(config, "audiolatch")); // M10
+	audiolatch.q_out_cb<3>().set("discrete", FUNC(discrete_device::write_line<ASTEROID_THRUST_EN>));
+}

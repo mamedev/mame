@@ -44,10 +44,9 @@ WRITE_LINE_MEMBER(runaway_state::tile_bank_w)
 {
 	if (state != m_tile_bank)
 	{
+		m_tile_bank = state;
 		m_bg_tilemap->mark_all_dirty();
 	}
-
-	m_tile_bank = state;
 }
 
 

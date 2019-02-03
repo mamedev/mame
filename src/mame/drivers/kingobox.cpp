@@ -465,28 +465,27 @@ void kingofb_state::machine_reset()
 MACHINE_CONFIG_START(kingofb_state::kingofb)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)        /* 4.0 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(kingobox_map)
+	Z80(config, m_maincpu, 4000000);        // 4.0 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &kingofb_state::kingobox_map);
 
-	MCFG_DEVICE_ADD("video", Z80, 4000000)        /* 4.0 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(kingobox_video_map)
+	Z80(config, m_video_cpu, 4000000);      // 4.0 MHz
+	m_video_cpu->set_addrmap(AS_PROGRAM, &kingofb_state::kingobox_video_map);
 
-	MCFG_DEVICE_ADD("sprite", Z80, 4000000)        /* 4.0 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(kingobox_sprite_map)
+	Z80(config, m_sprite_cpu, 4000000);     // 4.0 MHz
+	m_sprite_cpu->set_addrmap(AS_PROGRAM, &kingofb_state::kingobox_sprite_map);
 
-	MCFG_INPUT_MERGER_ALL_HIGH("nmigate")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", INPUT_LINE_NMI))
-	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("video", INPUT_LINE_NMI))
-	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("sprite", INPUT_LINE_NMI))
+	INPUT_MERGER_ALL_HIGH(config, m_nmigate);
+	m_nmigate->output_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_nmigate->output_handler().append_inputline(m_video_cpu, INPUT_LINE_NMI);
+	m_nmigate->output_handler().append_inputline(m_sprite_cpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)        /* 4.0 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(kingobox_sound_map)
-	MCFG_DEVICE_IO_MAP(kingobox_sound_io_map)
+	Z80(config, m_audiocpu, 4000000);       // 4.0 MHz
+	m_audiocpu->set_addrmap(AS_PROGRAM, &kingofb_state::kingobox_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &kingofb_state::kingobox_sound_io_map);
 
-	MCFG_DEVICE_ADD("soundnmi", CLOCK, 6000)  /* Hz */
-	MCFG_CLOCK_SIGNAL_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	CLOCK(config, "soundnmi", 6000).signal_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* We really need heavy synching among the processors */
+	config.m_minimum_quantum = attotime::from_hz(6000); // We really need heavy synching among the processors
 
 
 	/* video hardware */
@@ -496,23 +495,21 @@ MACHINE_CONFIG_START(kingofb_state::kingofb)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(kingofb_state, screen_update_kingofb)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("nmigate", input_merger_device, in_w<0>))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_kingobox)
-	MCFG_PALETTE_ADD("palette", 256+8*2)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256+8)
-	MCFG_PALETTE_INIT_OWNER(kingofb_state,kingofb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_kingobox)
+	PALETTE(config, m_palette, FUNC(kingofb_state::kingofb_palette), 256+8*2, 256+8);
 	MCFG_VIDEO_START_OVERRIDE(kingofb_state,kingofb)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 1500000)
-	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	ay8910_device &aysnd(AY8910(config, "aysnd", 1500000));
+	aysnd.port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
+	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.25);
 
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.125) // 100K (R30-44 even)/200K (R31-45 odd) ladder network
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
@@ -524,28 +521,27 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(kingofb_state::ringking)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)        /* 4.0 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(ringking_map)
+	Z80(config, m_maincpu, 4000000);        // 4.0 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &kingofb_state::ringking_map);
 
-	MCFG_DEVICE_ADD("video", Z80, 4000000)        /* 4.0 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(ringking_video_map)
+	Z80(config, m_video_cpu, 4000000);      // 4.0 MHz
+	m_video_cpu->set_addrmap(AS_PROGRAM, &kingofb_state::ringking_video_map);
 
-	MCFG_DEVICE_ADD("sprite", Z80, 4000000)        /* 4.0 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(ringking_sprite_map)
+	Z80(config, m_sprite_cpu, 4000000);     // 4.0 MHz
+	m_sprite_cpu->set_addrmap(AS_PROGRAM, &kingofb_state::ringking_sprite_map);
 
-	MCFG_INPUT_MERGER_ALL_HIGH("nmigate")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", INPUT_LINE_NMI))
-	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("video", INPUT_LINE_NMI))
-	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("sprite", INPUT_LINE_NMI))
+	INPUT_MERGER_ALL_HIGH(config, m_nmigate);
+	m_nmigate->output_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_nmigate->output_handler().append_inputline(m_video_cpu, INPUT_LINE_NMI);
+	m_nmigate->output_handler().append_inputline(m_sprite_cpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)        /* 4.0 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(kingobox_sound_map)
-	MCFG_DEVICE_IO_MAP(ringking_sound_io_map)
+	Z80(config, m_audiocpu, 4000000);       // 4.0 MHz
+	m_audiocpu->set_addrmap(AS_PROGRAM, &kingofb_state::kingobox_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &kingofb_state::ringking_sound_io_map);
 
-	MCFG_DEVICE_ADD("soundnmi", CLOCK, 6000)  /* Hz */
-	MCFG_CLOCK_SIGNAL_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	CLOCK(config, "soundnmi", 6000).signal_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* We really need heavy synching among the processors */
+	config.m_minimum_quantum = attotime::from_hz(6000); // We really need heavy synching among the processors
 
 
 	/* video hardware */
@@ -555,23 +551,21 @@ MACHINE_CONFIG_START(kingofb_state::ringking)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(kingofb_state, screen_update_ringking)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("nmigate", input_merger_device, in_w<0>))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rk)
-	MCFG_PALETTE_ADD("palette", 256+8*2)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256+8)
-	MCFG_PALETTE_INIT_OWNER(kingofb_state,ringking)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_rk)
+	PALETTE(config, m_palette, FUNC(kingofb_state::ringking_palette), 256+8*2, 256+8);
 	MCFG_VIDEO_START_OVERRIDE(kingofb_state,ringking)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 1500000)
-	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	ay8910_device &aysnd(AY8910(config, "aysnd", 1500000));
+	aysnd.port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
+	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.25);
 
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.125) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)

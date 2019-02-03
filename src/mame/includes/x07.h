@@ -5,6 +5,10 @@
     includes/x07.h
 
 *********************************************************************/
+#ifndef MAME_INCLUDES_X07_H
+#define MAME_INCLUDES_X07_H
+
+#pragma once
 
 #include "cpu/z80/z80.h"
 #include "sound/beep.h"
@@ -18,7 +22,6 @@
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "emupal.h"
-#include "rendlay.h"
 
 //default value for user defined keys, taken for official documentation
 static const char *const udk_ini[12] = {
@@ -162,16 +165,16 @@ class x07_state : public driver_device
 {
 public:
 	x07_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_printer(*this, "printer"),
-			m_beep(*this, "beeper"),
-			m_ram(*this, RAM_TAG),
-			m_nvram1(*this, "nvram1"),
-			m_nvram2(*this, "nvram2"),
-			m_cassette(*this, "cassette"),
-			m_card(*this, "cardslot"),
-			m_warm_start(1)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_printer(*this, "printer")
+		, m_beep(*this, "beeper")
+		, m_ram(*this, RAM_TAG)
+		, m_nvram1(*this, "nvram1")
+		, m_nvram2(*this, "nvram2")
+		, m_cassette(*this, "cassette")
+		, m_card(*this, "cardslot")
+		, m_warm_start(1)
 	{ }
 
 	void x07(machine_config &config);
@@ -280,7 +283,7 @@ private:
 	uint8_t m_prn_char_code;
 	uint8_t m_prn_buffer[0x100];
 	uint8_t m_prn_size;
-	DECLARE_PALETTE_INIT(x07);
+	void x07_palette(palette_device &palette) const;
 	TIMER_CALLBACK_MEMBER(cassette_tick);
 	TIMER_CALLBACK_MEMBER(cassette_poll);
 	TIMER_CALLBACK_MEMBER(rsta_clear);
@@ -291,3 +294,5 @@ private:
 	void x07_io(address_map &map);
 	void x07_mem(address_map &map);
 };
+
+#endif // MAME_INCLUDES_X07_H

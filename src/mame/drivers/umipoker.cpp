@@ -100,11 +100,12 @@ public:
 
 	void saiyukip(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+
 private:
 	DECLARE_WRITE16_MEMBER(lamps_w);
 	DECLARE_WRITE16_MEMBER(saiyu_counters_w);
-
-	virtual void machine_start() override;
 
 	void saiyukip_map(address_map &map);
 
@@ -689,56 +690,53 @@ GFXDECODE_END
 
 void saiyukip_state::machine_start()
 {
+	umipoker_state::machine_start();
+
 	m_lamps.resolve();
 }
 
 // TODO: Verify clocks (XTALs are 14.3181 and 2.000MHz)
-MACHINE_CONFIG_START(umipoker_state::umipoker)
-
+void umipoker_state::umipoker(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",M68000, XTAL(14'318'181)) // TMP68HC000-16
-	MCFG_DEVICE_PROGRAM_MAP(umipoker_map)
+	M68000(config, m_maincpu, XTAL(14'318'181)); // TMP68HC000-16
+	m_maincpu->set_addrmap(AS_PROGRAM, &umipoker_state::umipoker_map);
 
-	MCFG_DEVICE_ADD("audiocpu",Z80, XTAL(14'318'181)/4) // 3.579545MHz
-	MCFG_DEVICE_PROGRAM_MAP(umipoker_audio_map)
-	MCFG_DEVICE_IO_MAP(umipoker_audio_io_map)
+	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(14'318'181) / 4)); // 3.579545MHz
+	audiocpu.set_addrmap(AS_PROGRAM, &umipoker_state::umipoker_audio_map);
+	audiocpu.set_addrmap(AS_IO, &umipoker_state::umipoker_audio_io_map);
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
-
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(8*8, 48*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(umipoker_state, screen_update_umipoker)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(ASSERTLINE("maincpu", 6))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(8*8, 48*8-1, 2*8, 32*8-1);
+	screen.set_screen_update(FUNC(umipoker_state::screen_update_umipoker));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set_inputline("maincpu", 6, ASSERT_LINE);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_umipoker)
-
-	MCFG_PALETTE_ADD("palette", 0x400)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_umipoker);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x400);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ym", YM3812, XTAL(14'318'181)/4) // 3.579545MHz
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
+	ym3812_device &ym(YM3812(config, "ym", XTAL(14'318'181) / 4)); // 3.579545MHz
+	ym.irq_handler().set_inputline("audiocpu", 0);
+	ym.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(2'000'000), okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL(2'000'000), okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
+	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-MACHINE_CONFIG_START(saiyukip_state::saiyukip)
+void saiyukip_state::saiyukip(machine_config &config)
+{
 	umipoker(config);
-
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(saiyukip_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &saiyukip_state::saiyukip_map);
+}
 
 
 /***************************************************************************

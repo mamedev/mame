@@ -777,117 +777,113 @@ void ufo_state::machine_start()
 	save_item(NAME(m_stepper));
 }
 
-MACHINE_CONFIG_START(ufo_state::newufo)
-
+void ufo_state::newufo(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(16'000'000)/2)
-	MCFG_DEVICE_PROGRAM_MAP(ufo_map)
-	MCFG_DEVICE_IO_MAP(ufo_portmap)
+	Z80(config, m_maincpu, XTAL(16'000'000)/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ufo_state::ufo_map);
+	m_maincpu->set_addrmap(AS_IO, &ufo_state::ufo_portmap);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("motor_timer", ufo_state, simulate_xyz, attotime::from_hz(MOTOR_SPEED))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("update_timer", ufo_state, update_info, attotime::from_hz(60))
+	TIMER(config, "motor_timer").configure_periodic(FUNC(ufo_state::simulate_xyz), attotime::from_hz(MOTOR_SPEED));
+	TIMER(config, "update_timer").configure_periodic(FUNC(ufo_state::update_info), attotime::from_hz(60));
 
-	MCFG_DEVICE_ADD("io1", SEGA_315_5296, XTAL(16'000'000))
+	SEGA_315_5296(config, m_io1, XTAL(16'000'000));
 	// all ports set to input
-	MCFG_315_5296_IN_PORTA_CB(READ8(*this, ufo_state, crane_limits_r))
-	MCFG_315_5296_IN_PORTB_CB(READ8(*this, ufo_state, crane_limits_r))
-	MCFG_315_5296_IN_PORTE_CB(IOPORT("IN1"))
-	MCFG_315_5296_IN_PORTF_CB(IOPORT("DSW1"))
-	MCFG_315_5296_IN_PORTG_CB(IOPORT("DSW2"))
-	MCFG_315_5296_IN_PORTH_CB(IOPORT("IN2"))
+	m_io1->in_pa_callback().set(FUNC(ufo_state::crane_limits_r));
+	m_io1->in_pb_callback().set(FUNC(ufo_state::crane_limits_r));
+	m_io1->in_pe_callback().set_ioport("IN1");
+	m_io1->in_pf_callback().set_ioport("DSW1");
+	m_io1->in_pg_callback().set_ioport("DSW2");
+	m_io1->in_ph_callback().set_ioport("IN2");
 
-	MCFG_DEVICE_ADD("io2", SEGA_315_5296, XTAL(16'000'000))
+	SEGA_315_5296(config, m_io2, XTAL(16'000'000));
 	// all ports set to output
-	MCFG_315_5296_OUT_PORTA_CB(WRITE8(*this, ufo_state, stepper_w))
-	MCFG_315_5296_OUT_PORTB_CB(WRITE8(*this, ufo_state, cp_lamps_w))
-	MCFG_315_5296_OUT_PORTC_CB(WRITE8(*this, ufo_state, cp_digits_w))
-	MCFG_315_5296_OUT_PORTD_CB(WRITE8(*this, ufo_state, cp_digits_w))
-	MCFG_315_5296_OUT_PORTE_CB(WRITE8(*this, ufo_state, crane_xyz_w))
-	MCFG_315_5296_OUT_PORTF_CB(WRITE8(*this, ufo_state, crane_xyz_w))
-	MCFG_315_5296_OUT_PORTG_CB(WRITE8(*this, ufo_state, ufo_lamps_w))
+	m_io2->out_pa_callback().set(FUNC(ufo_state::stepper_w));
+	m_io2->out_pb_callback().set(FUNC(ufo_state::cp_lamps_w));
+	m_io2->out_pc_callback().set(FUNC(ufo_state::cp_digits_w));
+	m_io2->out_pd_callback().set(FUNC(ufo_state::cp_digits_w));
+	m_io2->out_pe_callback().set(FUNC(ufo_state::crane_xyz_w));
+	m_io2->out_pf_callback().set(FUNC(ufo_state::crane_xyz_w));
+	m_io2->out_pg_callback().set(FUNC(ufo_state::ufo_lamps_w));
 
-	MCFG_DEVICE_ADD("pit", PIT8254, XTAL(16'000'000)/2) // uPD71054C, configuration is unknown
-	MCFG_PIT8253_CLK0(XTAL(16'000'000)/2/256)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, ufo_state, pit_out0))
-	MCFG_PIT8253_CLK1(XTAL(16'000'000)/2/256)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, ufo_state, pit_out1))
-	MCFG_PIT8253_CLK2(XTAL(16'000'000)/2/256)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, ufo_state, pit_out2))
+	pit8254_device &pit(PIT8254(config, "pit", XTAL(16'000'000)/2)); // uPD71054C, configuration is unknown
+	pit.set_clk<0>(XTAL(16'000'000)/2/256);
+	pit.out_handler<0>().set(FUNC(ufo_state::pit_out0));
+	pit.set_clk<1>(XTAL(16'000'000)/2/256);
+	pit.out_handler<1>().set(FUNC(ufo_state::pit_out1));
+	pit.set_clk<2>(XTAL(16'000'000)/2/256);
+	pit.out_handler<2>().set(FUNC(ufo_state::pit_out2));
 
 	/* no video! */
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ym", YM3438, XTAL(16'000'000)/2)
-	MCFG_YM2612_IRQ_HANDLER(INPUTLINE("maincpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.40)
-	MCFG_SOUND_ROUTE(1, "mono", 0.40)
-MACHINE_CONFIG_END
+	ym3438_device &ym(YM3438(config, "ym", XTAL(16'000'000)/2));
+	ym.irq_handler().set_inputline("maincpu", 0);
+	ym.add_route(0, "mono", 0.40);
+	ym.add_route(1, "mono", 0.40);
+}
 
-MACHINE_CONFIG_START(ufo_state::ufomini)
+void ufo_state::ufomini(machine_config &config)
+{
 	newufo(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("io1")
-	MCFG_315_5296_IN_PORTC_CB(IOPORT("IN1"))
-	MCFG_315_5296_IN_PORTE_CB(NOOP)
-	MCFG_315_5296_IN_PORTH_CB(NOOP)
-MACHINE_CONFIG_END
+	m_io1->in_pc_callback().set_ioport("IN1");
+	m_io1->in_pe_callback().set_constant(0);
+	m_io1->in_ph_callback().set_constant(0);
+}
 
 
-MACHINE_CONFIG_START(ufo_state::ufo21)
+void ufo_state::ufo21(machine_config &config)
+{
 	newufo(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(ex_ufo21_portmap)
+	m_maincpu->set_addrmap(AS_IO, &ufo_state::ex_ufo21_portmap);
 
-	MCFG_DEVICE_MODIFY("io1")
-	MCFG_315_5296_IN_PORTA_CB(READ8(*this, ufo_state, ex_crane_limits_r))
-	MCFG_315_5296_IN_PORTB_CB(READ8(*this, ufo_state, ex_crane_limits_r))
-	MCFG_315_5296_IN_PORTC_CB(READ8(*this, ufo_state, ex_crane_open_r))
+	m_io1->in_pa_callback().set(FUNC(ufo_state::ex_crane_limits_r));
+	m_io1->in_pb_callback().set(FUNC(ufo_state::ex_crane_limits_r));
+	m_io1->in_pc_callback().set(FUNC(ufo_state::ex_crane_open_r));
 
-	MCFG_DEVICE_MODIFY("io2")
-	MCFG_315_5296_OUT_PORTA_CB(WRITE8(*this, ufo_state, ex_stepper_w))
-	MCFG_315_5296_OUT_PORTB_CB(WRITE8(*this, ufo_state, ex_cp_lamps_w))
-	MCFG_315_5296_OUT_PORTE_CB(WRITE8(*this, ufo_state, ex_crane_xyz_w))
-	MCFG_315_5296_OUT_PORTF_CB(WRITE8(*this, ufo_state, ex_crane_xyz_w))
-	MCFG_315_5296_OUT_PORTG_CB(NOOP)
+	m_io2->out_pa_callback().set(FUNC(ufo_state::ex_stepper_w));
+	m_io2->out_pb_callback().set(FUNC(ufo_state::ex_cp_lamps_w));
+	m_io2->out_pe_callback().set(FUNC(ufo_state::ex_crane_xyz_w));
+	m_io2->out_pf_callback().set(FUNC(ufo_state::ex_crane_xyz_w));
+	m_io2->out_pg_callback().set_nop();
 
-	MCFG_DEVICE_ADD("io3", SEGA_315_5338A, 0)
-	MCFG_315_5338A_OUT_PA_CB(WRITE8(*this, ufo_state, ex_upd_start_w))
-	MCFG_315_5338A_IN_PB_CB(READ8(*this, ufo_state, ex_upd_busy_r))
-	MCFG_315_5338A_OUT_PE_CB(WRITE8(*this, ufo_state, ex_ufo21_lamps1_w))
-	MCFG_315_5338A_OUT_PF_CB(WRITE8(*this, ufo_state, ex_ufo21_lamps2_w))
+	sega_315_5338a_device &io3(SEGA_315_5338A(config, "io3", 0));
+	io3.out_pa_callback().set(FUNC(ufo_state::ex_upd_start_w));
+	io3.in_pb_callback().set(FUNC(ufo_state::ex_upd_busy_r));
+	io3.out_pe_callback().set(FUNC(ufo_state::ex_ufo21_lamps1_w));
+	io3.out_pf_callback().set(FUNC(ufo_state::ex_ufo21_lamps2_w));
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("upd", UPD7759)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-MACHINE_CONFIG_END
+	UPD7759(config, m_upd);
+	m_upd->add_route(ALL_OUTPUTS, "mono", 0.75);
+}
 
-MACHINE_CONFIG_START(ufo_state::ufo800)
+void ufo_state::ufo800(machine_config &config)
+{
 	newufo(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(ex_ufo800_portmap)
+	m_maincpu->set_addrmap(AS_IO, &ufo_state::ex_ufo800_portmap);
 
-	MCFG_DEVICE_MODIFY("io1")
-	MCFG_315_5296_IN_PORTA_CB(READ8(*this, ufo_state, ex_crane_limits_r))
-	MCFG_315_5296_IN_PORTB_CB(IOPORT("IN2"))
-	MCFG_315_5296_IN_PORTC_CB(READ8(*this, ufo_state, ex_crane_open_r))
-	MCFG_315_5296_IN_PORTD_CB(IOPORT("IN1"))
-	MCFG_315_5296_IN_PORTE_CB(NOOP)
-	MCFG_315_5296_IN_PORTH_CB(NOOP)
+	m_io1->in_pa_callback().set(FUNC(ufo_state::ex_crane_limits_r));
+	m_io1->in_pb_callback().set_ioport("IN2");
+	m_io1->in_pc_callback().set(FUNC(ufo_state::ex_crane_open_r));
+	m_io1->in_pd_callback().set_ioport("IN1");
+	m_io1->in_pe_callback().set_constant(0);
+	m_io1->in_ph_callback().set_constant(0);
 
-	MCFG_DEVICE_MODIFY("io2")
-	MCFG_315_5296_OUT_PORTA_CB(WRITE8(*this, ufo_state, ex_stepper_w))
-	MCFG_315_5296_OUT_PORTB_CB(WRITE8(*this, ufo_state, ex_cp_lamps_w))
-	MCFG_315_5296_OUT_PORTE_CB(WRITE8(*this, ufo_state, ex_crane_xyz_w))
-	MCFG_315_5296_OUT_PORTF_CB(WRITE8(*this, ufo_state, ex_ufo800_lamps_w))
-	MCFG_315_5296_OUT_PORTG_CB(NOOP)
-MACHINE_CONFIG_END
+	m_io2->out_pa_callback().set(FUNC(ufo_state::ex_stepper_w));
+	m_io2->out_pb_callback().set(FUNC(ufo_state::ex_cp_lamps_w));
+	m_io2->out_pe_callback().set(FUNC(ufo_state::ex_crane_xyz_w));
+	m_io2->out_pf_callback().set(FUNC(ufo_state::ex_ufo800_lamps_w));
+	m_io2->out_pg_callback().set_nop();
+}
 
 
 

@@ -6,20 +6,6 @@
 //
 //============================================================
 
-// only for oslog callback
-#include <functional>
-
-// standard windows headers
-#include <windows.h>
-#include <commctrl.h>
-#include <mmsystem.h>
-#include <tchar.h>
-#include <io.h>
-
-// standard C headers
-#include <ctype.h>
-#include <stdarg.h>
-
 // MAME headers
 #include "emu.h"
 #include "emuopts.h"
@@ -33,6 +19,18 @@
 #include "winfile.h"
 #include "modules/diagnostics/diagnostics_module.h"
 #include "modules/monitor/monitor_common.h"
+
+// standard C headers
+#include <ctype.h>
+#include <stdarg.h>
+#include <stdio.h>
+
+// standard windows headers
+#include <windows.h>
+#include <commctrl.h>
+#include <mmsystem.h>
+#include <tchar.h>
+#include <io.h>
 
 #if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 #include <wrl/client.h>
@@ -170,10 +168,10 @@ const options_entry windows_options::s_option_entries[] =
 
 	// post-processing options
 	{ nullptr,                                                  nullptr,             OPTION_HEADER,     "DIRECT3D POST-PROCESSING OPTIONS" },
-	{ WINOPTION_HLSLPATH,                                       "hlsl",              OPTION_STRING,     "path to hlsl files" },
-	{ WINOPTION_HLSL_ENABLE";hlsl",                             "0",                 OPTION_BOOLEAN,    "enables HLSL post-processing (PS3.0 required)" },
-	{ WINOPTION_HLSL_OVERSAMPLING,                              "0",                 OPTION_BOOLEAN,    "enables HLSL oversampling" },
-	{ WINOPTION_HLSL_WRITE,                                     OSDOPTVAL_AUTO,      OPTION_STRING,     "enables HLSL AVI writing (huge disk bandwidth suggested)" },
+	{ WINOPTION_HLSLPATH,                                       "hlsl",              OPTION_STRING,     "path to HLSL support files" },
+	{ WINOPTION_HLSL_ENABLE";hlsl",                             "0",                 OPTION_BOOLEAN,    "enable HLSL post-processing (PS3.0 required)" },
+	{ WINOPTION_HLSL_OVERSAMPLING,                              "0",                 OPTION_BOOLEAN,    "enable HLSL oversampling" },
+	{ WINOPTION_HLSL_WRITE,                                     OSDOPTVAL_AUTO,      OPTION_STRING,     "enable HLSL AVI writing (huge disk bandwidth suggested)" },
 	{ WINOPTION_HLSL_SNAP_WIDTH,                                "2048",              OPTION_STRING,     "HLSL upscaled-snapshot width" },
 	{ WINOPTION_HLSL_SNAP_HEIGHT,                               "1536",              OPTION_STRING,     "HLSL upscaled-snapshot height" },
 	{ WINOPTION_SHADOW_MASK_TILE_MODE,                          "0",                 OPTION_INTEGER,    "shadow mask tile mode (0 for screen based, 1 for source based)" },
@@ -216,52 +214,62 @@ const options_entry windows_options::s_option_entries[] =
 	{ WINOPTION_POWER";fs_power",                               "1.0,1.0,1.0",       OPTION_STRING,     "signal power value (exponential)" },
 	{ WINOPTION_FLOOR";fs_floor",                               "0.0,0.0,0.0",       OPTION_STRING,     "signal floor level" },
 	{ WINOPTION_PHOSPHOR";fs_phosphor",                         "0.0,0.0,0.0",       OPTION_STRING,     "phosphorescence decay rate (0.0 is instant, 1.0 is forever)" },
+	{ WINOPTION_CHROMA_MODE,                                    "3",                 OPTION_INTEGER,    "number of phosphors to use: 1 - monochrome, 2 - dichrome, 3 - trichrome (color)" },
+	{ WINOPTION_CHROMA_CONVERSION_GAIN,                         "0.299,0.587,0.114", OPTION_STRING,     "gain to be applied when summing RGB signal for monochrome and dichrome modes" },
+	{ WINOPTION_CHROMA_A,                                       "0.64,0.33",         OPTION_STRING,     "chromaticity coordinate for first phosphor" },
+	{ WINOPTION_CHROMA_B,                                       "0.30,0.60",         OPTION_STRING,     "chromaticity coordinate for second phosphor" },
+	{ WINOPTION_CHROMA_C,                                       "0.15,0.06",         OPTION_STRING,     "chromaticity coordinate for third phosphor" },
+	{ WINOPTION_CHROMA_Y_GAIN,                                  "0.2126,0.7152,0.0722", OPTION_STRING,  "gain to be applied for each phosphor" },
 	/* NTSC simulation below this line */
 	{ nullptr,                                                  nullptr,             OPTION_HEADER,     "NTSC POST-PROCESSING OPTIONS" },
-	{ WINOPTION_YIQ_ENABLE";yiq",                               "0",                 OPTION_BOOLEAN,    "enables YIQ-space HLSL post-processing" },
-	{ WINOPTION_YIQ_JITTER";yiqj",                              "0.0",               OPTION_FLOAT,      "Jitter for the NTSC signal processing" },
-	{ WINOPTION_YIQ_CCVALUE";yiqcc",                            "3.57954545",        OPTION_FLOAT,      "Color Carrier frequency for NTSC signal processing" },
+	{ WINOPTION_YIQ_ENABLE";yiq",                               "0",                 OPTION_BOOLEAN,    "enable YIQ-space HLSL post-processing" },
+	{ WINOPTION_YIQ_JITTER";yiqj",                              "0.0",               OPTION_FLOAT,      "jitter for the NTSC signal processing" },
+	{ WINOPTION_YIQ_CCVALUE";yiqcc",                            "3.57954545",        OPTION_FLOAT,      "color carrier frequency for NTSC signal processing" },
 	{ WINOPTION_YIQ_AVALUE";yiqa",                              "0.5",               OPTION_FLOAT,      "A value for NTSC signal processing" },
 	{ WINOPTION_YIQ_BVALUE";yiqb",                              "0.5",               OPTION_FLOAT,      "B value for NTSC signal processing" },
-	{ WINOPTION_YIQ_OVALUE";yiqo",                              "0.0",               OPTION_FLOAT,      "Outgoing Color Carrier phase offset for NTSC signal processing" },
-	{ WINOPTION_YIQ_PVALUE";yiqp",                              "1.0",               OPTION_FLOAT,      "Incoming Pixel Clock scaling value for NTSC signal processing" },
+	{ WINOPTION_YIQ_OVALUE";yiqo",                              "0.0",               OPTION_FLOAT,      "outgoing Color Carrier phase offset for NTSC signal processing" },
+	{ WINOPTION_YIQ_PVALUE";yiqp",                              "1.0",               OPTION_FLOAT,      "incoming Pixel Clock scaling value for NTSC signal processing" },
 	{ WINOPTION_YIQ_NVALUE";yiqn",                              "1.0",               OPTION_FLOAT,      "Y filter notch width for NTSC signal processing" },
 	{ WINOPTION_YIQ_YVALUE";yiqy",                              "6.0",               OPTION_FLOAT,      "Y filter cutoff frequency for NTSC signal processing" },
 	{ WINOPTION_YIQ_IVALUE";yiqi",                              "1.2",               OPTION_FLOAT,      "I filter cutoff frequency for NTSC signal processing" },
 	{ WINOPTION_YIQ_QVALUE";yiqq",                              "0.6",               OPTION_FLOAT,      "Q filter cutoff frequency for NTSC signal processing" },
-	{ WINOPTION_YIQ_SCAN_TIME";yiqsc",                          "52.6",              OPTION_FLOAT,      "Horizontal scanline duration for NTSC signal processing (in usec)" },
-	{ WINOPTION_YIQ_PHASE_COUNT";yiqpc",                        "2",                 OPTION_INTEGER,    "Phase Count value for NTSC signal processing" },
+	{ WINOPTION_YIQ_SCAN_TIME";yiqsc",                          "52.6",              OPTION_FLOAT,      "horizontal scanline duration for NTSC signal processing (microseconds)" },
+	{ WINOPTION_YIQ_PHASE_COUNT";yiqpc",                        "2",                 OPTION_INTEGER,    "phase count value for NTSC signal processing" },
 	/* Vector simulation below this line */
 	{ nullptr,                                                  nullptr,             OPTION_HEADER,     "VECTOR POST-PROCESSING OPTIONS" },
-	{ WINOPTION_VECTOR_BEAM_SMOOTH";vecsmooth",                 "0.0",               OPTION_FLOAT,      "The vector beam smoothness" },
-	{ WINOPTION_VECTOR_LENGTH_SCALE";vecscale",                 "0.5",               OPTION_FLOAT,      "The maximum vector attenuation" },
-	{ WINOPTION_VECTOR_LENGTH_RATIO";vecratio",                 "0.5",               OPTION_FLOAT,      "The minimum vector length (vector length to screen size ratio) that is affected by the attenuation" },
+	{ WINOPTION_VECTOR_BEAM_SMOOTH";vecsmooth",                 "0.0",               OPTION_FLOAT,      "vector beam smoothness" },
+	{ WINOPTION_VECTOR_LENGTH_SCALE";vecscale",                 "0.5",               OPTION_FLOAT,      "maximum vector attenuation" },
+	{ WINOPTION_VECTOR_LENGTH_RATIO";vecratio",                 "0.5",               OPTION_FLOAT,      "minimum vector length affected by attenuation (vector length to screen size ratio)" },
 	/* Bloom below this line */
 	{ nullptr,                                                  nullptr,             OPTION_HEADER,     "BLOOM POST-PROCESSING OPTIONS" },
 	{ WINOPTION_BLOOM_BLEND_MODE,                               "0",                 OPTION_INTEGER,    "bloom blend mode (0 for brighten, 1 for darken)" },
-	{ WINOPTION_BLOOM_SCALE,                                    "0.0",               OPTION_FLOAT,      "Intensity factor for bloom" },
-	{ WINOPTION_BLOOM_OVERDRIVE,                                "1.0,1.0,1.0",       OPTION_STRING,     "Overdrive factor for bloom" },
-	{ WINOPTION_BLOOM_LEVEL0_WEIGHT,                            "1.0",               OPTION_FLOAT,      "Bloom level 0 weight (full-size target)" },
-	{ WINOPTION_BLOOM_LEVEL1_WEIGHT,                            "0.64",              OPTION_FLOAT,      "Bloom level 1 weight (1/4 smaller that level 0 target)" },
-	{ WINOPTION_BLOOM_LEVEL2_WEIGHT,                            "0.32",              OPTION_FLOAT,      "Bloom level 2 weight (1/4 smaller that level 1 target)" },
-	{ WINOPTION_BLOOM_LEVEL3_WEIGHT,                            "0.16",              OPTION_FLOAT,      "Bloom level 3 weight (1/4 smaller that level 2 target)" },
-	{ WINOPTION_BLOOM_LEVEL4_WEIGHT,                            "0.08",              OPTION_FLOAT,      "Bloom level 4 weight (1/4 smaller that level 3 target)" },
-	{ WINOPTION_BLOOM_LEVEL5_WEIGHT,                            "0.06",              OPTION_FLOAT,      "Bloom level 5 weight (1/4 smaller that level 4 target)" },
-	{ WINOPTION_BLOOM_LEVEL6_WEIGHT,                            "0.04",              OPTION_FLOAT,      "Bloom level 6 weight (1/4 smaller that level 5 target)" },
-	{ WINOPTION_BLOOM_LEVEL7_WEIGHT,                            "0.02",              OPTION_FLOAT,      "Bloom level 7 weight (1/4 smaller that level 6 target)" },
-	{ WINOPTION_BLOOM_LEVEL8_WEIGHT,                            "0.01",              OPTION_FLOAT,      "Bloom level 8 weight (1/4 smaller that level 7 target)" },
+	{ WINOPTION_BLOOM_SCALE,                                    "0.0",               OPTION_FLOAT,      "intensity factor for bloom" },
+	{ WINOPTION_BLOOM_OVERDRIVE,                                "1.0,1.0,1.0",       OPTION_STRING,     "overdrive factor for bloom" },
+	{ WINOPTION_BLOOM_LEVEL0_WEIGHT,                            "1.0",               OPTION_FLOAT,      "bloom level 0 weight (full-size target)" },
+	{ WINOPTION_BLOOM_LEVEL1_WEIGHT,                            "0.64",              OPTION_FLOAT,      "bloom level 1 weight (1/4 smaller that level 0 target)" },
+	{ WINOPTION_BLOOM_LEVEL2_WEIGHT,                            "0.32",              OPTION_FLOAT,      "bloom level 2 weight (1/4 smaller that level 1 target)" },
+	{ WINOPTION_BLOOM_LEVEL3_WEIGHT,                            "0.16",              OPTION_FLOAT,      "bloom level 3 weight (1/4 smaller that level 2 target)" },
+	{ WINOPTION_BLOOM_LEVEL4_WEIGHT,                            "0.08",              OPTION_FLOAT,      "bloom level 4 weight (1/4 smaller that level 3 target)" },
+	{ WINOPTION_BLOOM_LEVEL5_WEIGHT,                            "0.06",              OPTION_FLOAT,      "bloom level 5 weight (1/4 smaller that level 4 target)" },
+	{ WINOPTION_BLOOM_LEVEL6_WEIGHT,                            "0.04",              OPTION_FLOAT,      "bloom level 6 weight (1/4 smaller that level 5 target)" },
+	{ WINOPTION_BLOOM_LEVEL7_WEIGHT,                            "0.02",              OPTION_FLOAT,      "bloom level 7 weight (1/4 smaller that level 6 target)" },
+	{ WINOPTION_BLOOM_LEVEL8_WEIGHT,                            "0.01",              OPTION_FLOAT,      "bloom level 8 weight (1/4 smaller that level 7 target)" },
+	{ WINOPTION_LUT_TEXTURE,                                    "",                  OPTION_STRING,     "3D LUT texture filename for screen, PNG format" },
+	{ WINOPTION_LUT_ENABLE,                                     "0",                 OPTION_BOOLEAN,    "Enables 3D LUT to be applied to screen after post-processing" },
+	{ WINOPTION_UI_LUT_TEXTURE,                                 "",                  OPTION_STRING,     "3D LUT texture filename of UI, PNG format" },
+	{ WINOPTION_UI_LUT_ENABLE,                                  "0",                 OPTION_BOOLEAN,    "enable 3D LUT to be applied to UI and artwork after post-processing" },
 
 	// full screen options
 	{ nullptr,                                        nullptr,    OPTION_HEADER,     "FULL SCREEN OPTIONS" },
-	{ WINOPTION_TRIPLEBUFFER ";tb",                   "0",        OPTION_BOOLEAN,    "enables triple buffering" },
+	{ WINOPTION_TRIPLEBUFFER ";tb",                   "0",        OPTION_BOOLEAN,    "enable triple buffering" },
 	{ WINOPTION_FULLSCREENBRIGHTNESS ";fsb(0.1-2.0)", "1.0",      OPTION_FLOAT,      "brightness value in full screen mode" },
 	{ WINOPTION_FULLSCREENCONTRAST ";fsc(0.1-2.0)",   "1.0",      OPTION_FLOAT,      "contrast value in full screen mode" },
 	{ WINOPTION_FULLSCREENGAMMA ";fsg(0.1-3.0)",      "1.0",      OPTION_FLOAT,      "gamma value in full screen mode" },
 
 	// input options
 	{ nullptr,                                        nullptr,    OPTION_HEADER,     "INPUT DEVICE OPTIONS" },
-	{ WINOPTION_GLOBAL_INPUTS,                        "0",        OPTION_BOOLEAN,    "enables global inputs" },
-	{ WINOPTION_DUAL_LIGHTGUN ";dual",                "0",        OPTION_BOOLEAN,    "enables dual lightgun input" },
+	{ WINOPTION_GLOBAL_INPUTS,                        "0",        OPTION_BOOLEAN,    "enable global inputs" },
+	{ WINOPTION_DUAL_LIGHTGUN ";dual",                "0",        OPTION_BOOLEAN,    "enable dual lightgun input" },
 
 	{ nullptr }
 };
@@ -465,6 +473,8 @@ void windows_osd_interface::output_oslog(const char *buffer)
 {
 	if (IsDebuggerPresent())
 		win_output_debug_string_utf8(buffer);
+	else
+		fputs(buffer, stderr);
 }
 
 
@@ -563,10 +573,7 @@ void windows_osd_interface::init(running_machine &machine)
 
 	// hook up the debugger log
 	if (options.oslog())
-	{
-		using namespace std::placeholders;
-		machine.add_logerror_callback(std::bind(&windows_osd_interface::output_oslog, this, _1));
-	}
+		machine.add_logerror_callback(&windows_osd_interface::output_oslog);
 
 #if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 	// crank up the multimedia timer resolution to its max
@@ -648,4 +655,3 @@ static int is_double_click_start(int argc)
 }
 
 #endif // WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
-

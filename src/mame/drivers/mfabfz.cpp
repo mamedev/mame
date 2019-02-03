@@ -78,18 +78,15 @@ void mfabfz_state::mfabfz_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0xbe, 0xbe).rw("uart1", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xbf, 0xbf).rw("uart1", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0xfe, 0xfe).rw("uart2", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xff, 0xff).rw("uart2", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xbe, 0xbf).rw("uart1", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0xfe, 0xff).rw("uart2", FUNC(i8251_device::read), FUNC(i8251_device::write));
 }
 
 void mfabfz_state::mfabfz85_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0xfe, 0xfe).rw("uart2", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xff, 0xff).rw("uart2", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xfe, 0xff).rw("uart2", FUNC(i8251_device::read), FUNC(i8251_device::write));
 }
 
 /* Input ports */
@@ -102,30 +99,31 @@ void mfabfz_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(mfabfz_state::mfabfz)
+void mfabfz_state::mfabfz(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",I8085A, XTAL(4'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(mfabfz_mem)
-	MCFG_DEVICE_IO_MAP(mfabfz_io)
+	I8085A(config, m_maincpu, 4_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mfabfz_state::mfabfz_mem);
+	m_maincpu->set_addrmap(AS_IO, &mfabfz_state::mfabfz_io);
 
 	// uart1 - terminal - clock hardware unknown
-	MCFG_DEVICE_ADD("uart1_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("uart1", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart1", i8251_device, write_rxc))
+	clock_device &uart1_clock(CLOCK(config, "uart1_clock", 153600));
+	uart1_clock.signal_handler().set("uart1", FUNC(i8251_device::write_txc));
+	uart1_clock.signal_handler().append("uart1", FUNC(i8251_device::write_rxc));
 
-	MCFG_DEVICE_ADD("uart1", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
+	i8251_device &uart1(I8251(config, "uart1", 0));
+	uart1.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	uart1.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
+	uart1.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("uart1", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("uart1", i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("uart1", i8251_device, write_cts))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set("uart1", FUNC(i8251_device::write_rxd));
+	rs232.dsr_handler().set("uart1", FUNC(i8251_device::write_dsr));
+	rs232.cts_handler().set("uart1", FUNC(i8251_device::write_cts));
 
 	// uart2 - cassette - clock comes from 2MHz through a divider consisting of 4 chips and some jumpers.
-	MCFG_DEVICE_ADD("uart2", I8251, 0)
-MACHINE_CONFIG_END
+	I8251(config, "uart2", 0);
+}
 
 static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_4800 )
@@ -136,17 +134,20 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
 DEVICE_INPUT_DEFAULTS_END
 
-MACHINE_CONFIG_START(mfabfz_state::mfabfz85)
+void mfabfz_state::mfabfz85(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",I8085A, XTAL(4'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(mfabfz_mem)
-	MCFG_DEVICE_IO_MAP(mfabfz85_io)
-	MCFG_I8085A_SID(READLINE("rs232", rs232_port_device, rxd_r))
-	MCFG_I8085A_SOD(WRITELINE("rs232", rs232_port_device, write_txd)) MCFG_DEVCB_INVERT
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
-	MCFG_DEVICE_ADD("uart2", I8251, 0)
-MACHINE_CONFIG_END
+	i8085a_cpu_device &maincpu(I8085A(config, m_maincpu, 4_MHz_XTAL / 2));
+	maincpu.set_addrmap(AS_PROGRAM, &mfabfz_state::mfabfz_mem);
+	maincpu.set_addrmap(AS_IO, &mfabfz_state::mfabfz85_io);
+	maincpu.in_sid_func().set("rs232", FUNC(rs232_port_device::rxd_r));
+	maincpu.out_sod_func().set("rs232", FUNC(rs232_port_device::write_txd)).invert();
+
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
+
+	I8251(config, "uart2", 0);
+}
 
 
 /* ROM definition */
@@ -166,9 +167,9 @@ ROM_START( mfabfz85 )
 	ROMX_LOAD( "mfa_mat_4_1800.bin", 0x1800, 0x0800, CRC(649cd7f0) SHA1(e92f29c053234b36f22d525fe92e61bf24476f14), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "16k_set1", "MAT85+ 16k set1" )
 	ROMX_LOAD( "mfa_mat85_0x0000-0x07ff.bin", 0x0000, 0x0800, CRC(73b588ea) SHA1(2b9570fe44c3c19d6aa7c7c11ecf390fa5d48998), ROM_BIOS(2) )
-	ROMX_LOAD( "mfa_mat85_0x0800-0x0fff.bin", 0x0800, 0x0800, CRC(13f5be91) SHA1(2B9D64600679BAB319A37381FC84E874C3B2A877), ROM_BIOS(2) )
+	ROMX_LOAD( "mfa_mat85_0x0800-0x0fff.bin", 0x0800, 0x0800, CRC(13f5be91) SHA1(2b9d64600679bab319a37381fc84e874c3b2a877), ROM_BIOS(2) )
 	ROMX_LOAD( "mfa_mat85_0x1000-0x17ff.bin", 0x1000, 0x0800, CRC(c9b91bb4) SHA1(ef829964f507b1f6bbcf3c557c274fe728636efe), ROM_BIOS(2) )
-	ROMX_LOAD( "mfa_mat85_0x1800-0x1fff.bin", 0x1800, 0x0800, CRC(649CD7F0) SHA1(e92f29c053234b36f22d525fe92e61bf24476f14), ROM_BIOS(2) )
+	ROMX_LOAD( "mfa_mat85_0x1800-0x1fff.bin", 0x1800, 0x0800, CRC(649cd7f0) SHA1(e92f29c053234b36f22d525fe92e61bf24476f14), ROM_BIOS(2) )
 	ROMX_LOAD( "mfa_mat85_0x2000-0x27ff.bin", 0x2000, 0x0800, CRC(d3592915) SHA1(68daec6c5c63692bc147b1710b9c45ca780f2c7b), ROM_BIOS(2) )
 	ROMX_LOAD( "mfa_mat85_0x2800-0x2fff.bin", 0x2800, 0x0800, CRC(9a6aafa9) SHA1(af897e91cc2ce5d6e49fa88c920ad85e1f0209bf), ROM_BIOS(2) )
 	ROMX_LOAD( "mfa_mat85_0x3000-0x37ff.bin", 0x3000, 0x0800, CRC(eae4e3d5) SHA1(f7112965874417bbfc4a32f31f84e1db83249ab7), ROM_BIOS(2) )

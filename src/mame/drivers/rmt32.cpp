@@ -196,15 +196,17 @@ public:
 
 	void mt32(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	required_device<i8x9x_device> cpu;
 	required_device<ram_device> ram;
 	optional_device<sed1200d0a_device> lcd;
 	required_device<timer_device> midi_timer;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(mt32);
+	void mt32_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -220,7 +222,6 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(midi_timer_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(samples_timer_cb);
 
-	void mt32_io(address_map &map);
 	void mt32_map(address_map &map);
 
 	uint8_t lcd_data_buffer[256];
@@ -329,7 +330,7 @@ WRITE8_MEMBER(mt32_state::so_w)
 	//  logerror("so: x1=%d bank=%d led=%d\n", (data >> 5) & 1, (data >> 1) & 3, data & 1);
 }
 
-PALETTE_INIT_MEMBER(mt32_state, mt32)
+void mt32_state::mt32_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(0, 0, 0));
 	palette.set_pen_color(1, rgb_t(0, 255, 0));
@@ -348,20 +349,14 @@ void mt32_state::mt32_map(address_map &map)
 	map(0xc000, 0xffff).bankrw("fixed");
 }
 
-void mt32_state::mt32_io(address_map &map)
-{
-	map(i8x9x_device::A7, i8x9x_device::A7).portr("A7");
-	map(i8x9x_device::SERIAL, i8x9x_device::SERIAL).w(FUNC(mt32_state::midi_w));
-	map(i8x9x_device::P0, i8x9x_device::P0).r(FUNC(mt32_state::port0_r));
-}
-
 MACHINE_CONFIG_START(mt32_state::mt32)
-	MCFG_DEVICE_ADD( "maincpu", P8098, XTAL(12'000'000) )
-	MCFG_DEVICE_PROGRAM_MAP( mt32_map )
-	MCFG_DEVICE_IO_MAP( mt32_io )
+	i8x9x_device &maincpu(P8098(config, "maincpu", 12_MHz_XTAL));
+	maincpu.set_addrmap(AS_PROGRAM, &mt32_state::mt32_map);
+	maincpu.ach7_cb().set_ioport("A7");
+	maincpu.serial_tx_cb().set(FUNC(mt32_state::midi_w));
+	maincpu.in_p0_cb().set(FUNC(mt32_state::port0_r));
 
-	MCFG_RAM_ADD( "ram" )
-	MCFG_RAM_DEFAULT_SIZE( "32K" )
+	RAM( config, "ram" ).set_default_size( "32K" );
 
 	MCFG_SCREEN_ADD( "screen", LCD )
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -371,14 +366,13 @@ MACHINE_CONFIG_START(mt32_state::mt32)
 	MCFG_SCREEN_VISIBLE_AREA(0, 20*6-2, 0, (20*6-1)*3/4-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(mt32_state, mt32)
+	PALETTE(config, "palette", FUNC(mt32_state::mt32_palette), 2);
 
-	MCFG_SED1200D0A_ADD( "lcd" )
+	SED1200D0A(config, lcd, 0);
 
-	MCFG_TIMER_DRIVER_ADD( "midi_timer", mt32_state, midi_timer_cb )
+	TIMER(config, midi_timer).configure_generic(FUNC(mt32_state::midi_timer_cb));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC( "samples_timer", mt32_state, samples_timer_cb, attotime::from_hz(32000*2) )
+	TIMER(config, "samples_timer").configure_periodic(FUNC(mt32_state::samples_timer_cb), attotime::from_hz(32000*2));
 MACHINE_CONFIG_END
 
 ROM_START( mt32 )

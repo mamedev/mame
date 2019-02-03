@@ -90,29 +90,33 @@
       - Then do EXT DIR with a Lynx-formatted disk, or EXT BOOT with a CP/M disk.
       - Then, on a Lynx-formatted disk, do EXT LOAD "name" or EXT MLOAD "name".
 
-    To Do:
+    TODO:
     - printer
     - joysticks
     - UART type COM8017 (48k,96k only) (not used by any programs)
     - There's a few games that are not perfectly perfect, but it runs at least
       as well as any other Lynx emulator.
+    - Racer - Sideways scrolling incorrect.
+    - Nuclear Invaders - User defined characters fail to be defined.
+    - Card Index - Not enough RAM detected.
 
     Game bugs (reproducible in Jynx):
     - 3D Monster Craze: When attacked, garbage on screen
     - 3D Monster Craze: When you find the key, the game freezes
-    - YNXVADERS: Colours of top 2 rows of invaders should be white and yellow
+    - Ynxvaders: Colours of top 2 rows of invaders should be white and yellow
       but they show as magenta and red. After game ends, title screen has wrong
       colours.
 
-      Game Hints:
+    Game Hints:
       Most games have instructions or are quite obvious.
-      - Power Blaster. Using debug.exe, change byte 1965 from FE to F2 to fix
-        the loading. Then, arrows to turn, Shift to clean out a whole row of dots.
-        You can then move into the vacated areas. Even though it says you have
-        3 lives, you actually only have 1.
-      - Backgammon. This is just the instructions. The game is missing.
-      - LogiChess. The page at http://www.nascomhomepage.com/games/logichess.html
-        should provide enough clues to enable you to work out how to play.
+    - Power Blaster: Using debug.exe, change byte 1865 from FE to F2 to fix
+      the loading. Then, arrows to turn, Shift to clean out a whole row of dots.
+      You can then move into the vacated areas. Even though it says you have
+      3 lives, you actually only have 1.
+    - Treasure Island: Doesn't auto-run after loading main program, type RUN.
+    - Backgammon: This is just the instructions. The game is missing.
+    - LogiChess: The page at http://www.nascomhomepage.com/games/logichess.html
+      should provide enough clues to enable you to work out how to play.
 
     Alternate ROMs for Lynx 96k:
     - Scorpion EXTensions
@@ -157,6 +161,7 @@
 
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
+#include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
@@ -751,15 +756,15 @@ MC6845_UPDATE_ROW( camplynx_state::lynx48k_update_row )
 
 	// determine green bank
 	if (BIT(m_port80, 4))
-		green_bank = 0x38000+mem; // alt green
+		green_bank = 0x38000 + mem; // alt green
 	else
-		green_bank = 0x3c000+mem; // normal green
+		green_bank = 0x3c000 + mem; // normal green
 
 	for (x = 0; x < x_count; x++)
 	{
-		r = m_p_ram[0x2c000+mem+x];
-		b = m_p_ram[0x28000+mem+x];
-		g = m_p_ram[green_bank+x];
+		r = m_p_ram[0x2c000 + mem + x];
+		b = m_p_ram[0x28000 + mem + x];
+		g = m_p_ram[green_bank + x];
 
 		*p++ = m_palette->pen_color((BIT(b, 7) << 2) | (BIT(g, 7) << 1) | (BIT(r, 7)));
 		*p++ = m_palette->pen_color((BIT(b, 6) << 2) | (BIT(g, 6) << 1) | (BIT(r, 6)));
@@ -844,31 +849,30 @@ static void camplynx_floppies(device_slot_interface &device)
 	device.option_add("525qd", FLOPPY_525_QD);
 }
 
-MACHINE_CONFIG_START(camplynx_state::lynx_common)
-	MCFG_PALETTE_ADD_3BIT_RGB("palette")
+void camplynx_state::lynx_common(machine_config &config)
+{
+	PALETTE(config, m_palette, palette_device::RGB_3BIT);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.375) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	DAC_6BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.375); // unknown DAC
+	VOLTAGE_REGULATOR(config, "vref").set_output(5.0)
+			.add_route(0, m_dac, 1.0, DAC_VREF_POS_INPUT).add_route(0, m_dac, -1.0, DAC_VREF_NEG_INPUT);
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "speaker", 0.02);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(camplynx_state::lynx_disk)
-	MCFG_DEVICE_ADD("fdc", FD1793, 24_MHz_XTAL / 24)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", camplynx_floppies, "525qd", camplynx_state::camplynx_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", camplynx_floppies, "525qd", camplynx_state::camplynx_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-MACHINE_CONFIG_END
+void camplynx_state::lynx_disk(machine_config &config)
+{
+	FD1793(config, m_fdc, 24_MHz_XTAL / 24);
+	FLOPPY_CONNECTOR(config, m_floppy0, camplynx_floppies, "525qd", camplynx_state::camplynx_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy1, camplynx_floppies, "525qd", camplynx_state::camplynx_floppy_formats).enable_sound(true);
+}
 
 MACHINE_CONFIG_START(camplynx_state::lynx48k)
-
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 24_MHz_XTAL / 6)
-	MCFG_DEVICE_PROGRAM_MAP(lynx48k_mem)
-	MCFG_DEVICE_IO_MAP(lynx48k_io)
+	Z80(config, m_maincpu, 24_MHz_XTAL / 6);
+	m_maincpu->set_addrmap(AS_PROGRAM, &camplynx_state::lynx48k_mem);
+	m_maincpu->set_addrmap(AS_IO, &camplynx_state::lynx48k_io);
 
 	MCFG_MACHINE_RESET_OVERRIDE(camplynx_state, lynx48k)
 
@@ -882,38 +886,40 @@ MACHINE_CONFIG_START(camplynx_state::lynx48k)
 
 	lynx_common(config);
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_FORMATS(lynx48k_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED)
-	MCFG_CASSETTE_INTERFACE("camplynx_cass")
+	CASSETTE(config, m_cass);
+	m_cass->set_formats(lynx48k_cassette_formats);
+	m_cass->set_default_state(CASSETTE_PLAY | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED);
+	m_cass->set_interface("camplynx_cass");
 
 	/* devices */
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 12_MHz_XTAL / 8 )
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(camplynx_state, lynx48k_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MC6845(config, m_crtc, 12_MHz_XTAL / 8);
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(camplynx_state::lynx48k_update_row), this);
+	m_crtc->out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+
+	/* software lists */
+	SOFTWARE_LIST(config, "cass_list").set_original("camplynx_cass");
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(camplynx_state::lynx96k)
+void camplynx_state::lynx96k(machine_config &config)
+{
 	lynx48k(config);
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(lynx96k_io)
+	m_maincpu->set_addrmap(AS_IO, &camplynx_state::lynx96k_io);
 
 	lynx_disk(config);
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "camplynx_flop")
-	MCFG_SOFTWARE_LIST_FILTER("flop_list", "96K")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "flop_list").set_original("camplynx_flop").set_filter("96K");
+}
 
 MACHINE_CONFIG_START(camplynx_state::lynx128k)
-
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 24_MHz_XTAL / 4)
-	MCFG_DEVICE_PROGRAM_MAP(lynx128k_mem)
-	MCFG_DEVICE_IO_MAP(lynx128k_io)
+	Z80(config, m_maincpu, 24_MHz_XTAL / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &camplynx_state::lynx128k_mem);
+	m_maincpu->set_addrmap(AS_IO, &camplynx_state::lynx128k_io);
 
 	MCFG_MACHINE_RESET_OVERRIDE(camplynx_state, lynx128k)
 
@@ -927,23 +933,24 @@ MACHINE_CONFIG_START(camplynx_state::lynx128k)
 
 	lynx_common(config);
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_FORMATS(lynx128k_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED)
-	MCFG_CASSETTE_INTERFACE("camplynx_cass")
+	CASSETTE(config, m_cass);
+	m_cass->set_formats(lynx128k_cassette_formats);
+	m_cass->set_default_state(CASSETTE_PLAY | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED);
+	m_cass->set_interface("camplynx_cass");
 
 	/* devices */
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 12_MHz_XTAL / 8 )
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(camplynx_state, lynx128k_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MC6845(config, m_crtc, 12_MHz_XTAL / 8);
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(camplynx_state::lynx128k_update_row), this);
+	m_crtc->out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	lynx_disk(config);
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "camplynx_flop")
-	MCFG_SOFTWARE_LIST_FILTER("flop_list", "128K")
+	SOFTWARE_LIST(config, "cass_list").set_original("camplynx_cass");
+	SOFTWARE_LIST(config, "flop_list").set_original("camplynx_flop").set_filter("128K");
 MACHINE_CONFIG_END
 
 void camplynx_state::init_lynx48k()

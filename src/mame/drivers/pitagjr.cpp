@@ -154,7 +154,6 @@
 #include "cpu/m6805/m6805.h"
 
 #include "emupal.h"
-#include "rendlay.h"
 #include "screen.h"
 
 
@@ -169,12 +168,14 @@ public:
 
 	void pitajr(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_memory_bank m_rombank;
 
-	virtual void machine_start() override;
-	DECLARE_PALETTE_INIT(pitagjr);
+	void pitagjr_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void pitajr_mem(address_map &map);
 };
@@ -197,7 +198,7 @@ void pitagjr_state::machine_start()
 	m_rombank->set_entry(1);
 }
 
-PALETTE_INIT_MEMBER(pitagjr_state, pitagjr)
+void pitagjr_state::pitagjr_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
@@ -222,10 +223,7 @@ MACHINE_CONFIG_START(pitagjr_state::pitajr)
 	MCFG_SCREEN_VISIBLE_AREA( 0, 200-1, 0, 100-1 )
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
-
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(pitagjr_state, pitagjr)
+	PALETTE(config, "palette", FUNC(pitagjr_state::pitagjr_palette), 2);
 MACHINE_CONFIG_END
 
 /* ROM definition */

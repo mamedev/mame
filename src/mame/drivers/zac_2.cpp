@@ -45,7 +45,7 @@ private:
 	uint8_t m_out_offs;
 	virtual void machine_reset() override;
 	virtual void machine_start() override { m_digits.resolve(); }
-	required_device<cpu_device> m_maincpu;
+	required_device<s2650_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_p_ram;
 	required_ioport_array<6> m_row;
 	output_finder<78> m_digits;
@@ -211,22 +211,23 @@ TIMER_DEVICE_CALLBACK_MEMBER(zac_2_state::zac_2_outtimer)
 	}
 }
 
-MACHINE_CONFIG_START(zac_2_state::zac_2)
+void zac_2_state::zac_2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", S2650, 6000000/2)
-	MCFG_DEVICE_PROGRAM_MAP(zac_2_map)
-	MCFG_DEVICE_IO_MAP(zac_2_io)
-	MCFG_DEVICE_DATA_MAP(zac_2_data)
-	MCFG_S2650_SENSE_INPUT(READLINE(*this, zac_2_state, serial_r))
-	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, zac_2_state, serial_w))
-	MCFG_NVRAM_ADD_0FILL("ram")
+	S2650(config, m_maincpu, 6000000/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &zac_2_state::zac_2_map);
+	m_maincpu->set_addrmap(AS_IO, &zac_2_state::zac_2_io);
+	m_maincpu->set_addrmap(AS_DATA, &zac_2_state::zac_2_data);
+	m_maincpu->sense_handler().set(FUNC(zac_2_state::serial_r));
+	m_maincpu->flag_handler().set(FUNC(zac_2_state::serial_w));
+	NVRAM(config, "ram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("zac_2_inttimer", zac_2_state, zac_2_inttimer, attotime::from_hz(200))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("zac_2_outtimer", zac_2_state, zac_2_outtimer, attotime::from_hz(187500))
+	TIMER(config, "zac_2_inttimer").configure_periodic(FUNC(zac_2_state::zac_2_inttimer), attotime::from_hz(200));
+	TIMER(config, "zac_2_outtimer").configure_periodic(FUNC(zac_2_state::zac_2_outtimer), attotime::from_hz(187500));
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_zac_2)
-MACHINE_CONFIG_END
+	config.set_default_layout(layout_zac_2);
+}
 
 /*--------------------------------
 / Black Belt (03/86)
@@ -244,6 +245,54 @@ ROM_START(bbeltzac)
 
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("bbz-e.snd", 0xa000, 0x2000, CRC(1fe045d2) SHA1(d17d7dbcafe9f8644cbe393a56ff6b45d9d40155))
+	ROM_LOAD("bbz-f.snd", 0xc000, 0x4000, CRC(9f58f369) SHA1(32472d93284c0f1fc2875714b40428406dcf6325))
+ROM_END
+
+ROM_START(bbeltzaci)
+	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_LOAD ( "bbz-1.fil", 0x0000, 0x0800, CRC(2e7e1575) SHA1(1b9e6e4ff461962f4c7249bd2a748444cb658c30))
+	ROM_CONTINUE(0x2000, 0x0800)
+	ROM_CONTINUE(0x4000, 0x0800)
+	ROM_CONTINUE(0x6000, 0x0800)
+	ROM_LOAD ( "bbz-2.fil", 0x0800, 0x0800, CRC(dbec92ae) SHA1(7a1c6e5ac81d3cfcbb135a1c8b69e55296fffcc5))
+	ROM_CONTINUE(0x2800, 0x0800)
+	ROM_CONTINUE(0x1000, 0x0800)
+	ROM_CONTINUE(0x3000, 0x0800)
+
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("bbelt_it.1e", 0xa000, 0x2000, CRC(fab5b89f) SHA1(9a2c2ae0a2035762b11cbd84fe3cddbde4572f18))
+	ROM_LOAD("bbz-f.snd", 0xc000, 0x4000, CRC(9f58f369) SHA1(32472d93284c0f1fc2875714b40428406dcf6325))
+ROM_END
+
+ROM_START(bbeltzacg)
+	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_LOAD ( "bbz-1.fil", 0x0000, 0x0800, CRC(2e7e1575) SHA1(1b9e6e4ff461962f4c7249bd2a748444cb658c30))
+	ROM_CONTINUE(0x2000, 0x0800)
+	ROM_CONTINUE(0x4000, 0x0800)
+	ROM_CONTINUE(0x6000, 0x0800)
+	ROM_LOAD ( "bbz-2.fil", 0x0800, 0x0800, CRC(dbec92ae) SHA1(7a1c6e5ac81d3cfcbb135a1c8b69e55296fffcc5))
+	ROM_CONTINUE(0x2800, 0x0800)
+	ROM_CONTINUE(0x1000, 0x0800)
+	ROM_CONTINUE(0x3000, 0x0800)
+
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("bbelt_de.1e", 0xa000, 0x2000, CRC(f343103d) SHA1(d0ee91c873a10049f9aae6e762637d0384ff052a))
+	ROM_LOAD("bbz-f.snd", 0xc000, 0x4000, CRC(9f58f369) SHA1(32472d93284c0f1fc2875714b40428406dcf6325))
+ROM_END
+
+ROM_START(bbeltzacf)
+	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_LOAD ( "bbz-1.fil", 0x0000, 0x0800, CRC(2e7e1575) SHA1(1b9e6e4ff461962f4c7249bd2a748444cb658c30))
+	ROM_CONTINUE(0x2000, 0x0800)
+	ROM_CONTINUE(0x4000, 0x0800)
+	ROM_CONTINUE(0x6000, 0x0800)
+	ROM_LOAD ( "bbz-2.fil", 0x0800, 0x0800, CRC(dbec92ae) SHA1(7a1c6e5ac81d3cfcbb135a1c8b69e55296fffcc5))
+	ROM_CONTINUE(0x2800, 0x0800)
+	ROM_CONTINUE(0x1000, 0x0800)
+	ROM_CONTINUE(0x3000, 0x0800)
+
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("bbelt_fr.1e", 0xa000, 0x2000, CRC(81e89d96) SHA1(f38610ffc2b12601b2b2f6871645bd4186d9b229))
 	ROM_LOAD("bbz-f.snd", 0xc000, 0x4000, CRC(9f58f369) SHA1(32472d93284c0f1fc2875714b40428406dcf6325))
 ROM_END
 
@@ -500,6 +549,29 @@ ROM_START(nstrphnx)
 	ROM_LOAD("snd_ic40.bin", 0x0000, 0x8000, CRC(974ceb9c) SHA1(3665af9170a2afbe26f68e8f3cedb0d177f476c4))
 ROM_END
 
+ROM_START(nstrphnxf)
+	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_LOAD ( "strphnx1.cpu", 0x0000, 0x0800, CRC(2a31b7da) SHA1(05f2173783e686cc8774bed6eb59b41f7af88d11))
+	ROM_CONTINUE(0x2000, 0x0800)
+	ROM_CONTINUE(0x4000, 0x0800)
+	ROM_CONTINUE(0x6000, 0x0800)
+	ROM_LOAD ( "strphnx2.cpu", 0x0800, 0x0800, CRC(db830505) SHA1(55d6d6e12e2861fec81b46fb90c29aad5ad922aa))
+	ROM_CONTINUE(0x2800, 0x0800)
+	ROM_CONTINUE(0x1000, 0x0800)
+	ROM_CONTINUE(0x3000, 0x0800)
+
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("snd_ic24.bin", 0x0000, 0x8000, CRC(158d6f83) SHA1(281e1b13be43025be1b33dcd366cec0b36f29e5c))
+	ROM_LOAD("snd_ic25.bin", 0x8000, 0x8000, CRC(b1c9238e) SHA1(88c9df1fca94d32a0fa5d75312dabff257e867dd))
+
+	ROM_REGION(0x10000, "cpu3", 0)
+	ROM_LOAD("snd_ic05.bin", 0x0000, 0x8000, CRC(74cc4902) SHA1(e2f46bcf5446f98d098c49f8c2416292401265b9))
+	ROM_LOAD("snd_ic06.bin", 0x8000, 0x8000, CRC(a0400411) SHA1(da9de6105639c4f6174f5bc92f44e02c339a2bc3))
+
+	ROM_REGION(0x10000, "cpu4", 0)
+	ROM_LOAD("sndf_ic40.bin", 0x0000, 0x8000, CRC(1b40de42) SHA1(cfebab38a493edab1dfd0e5f591ccb9658da80c6))
+ROM_END
+
 /*--------------------------------
 / Pinball Champ (04/83)
 /-------------------------------*/
@@ -619,28 +691,15 @@ ROM_END
 
 ROM_START(poolchami)
 	ROM_REGION(0x8000, "maincpu", 0)
-	ROM_LOAD ( "poolcham.ic1", 0x0000, 0x0800, CRC(fca2a2b2) SHA1(9a0d9c495e38628c5e0bc10f6335100eb934f153))
+	ROM_LOAD ( "poolchai.ic1", 0x0000, 0x0800, CRC(fca2a2b2) SHA1(9a0d9c495e38628c5e0bc10f6335100eb934f153))
 	ROM_CONTINUE(0x2000, 0x0800)
-	ROM_LOAD ( "poolcham.ic2", 0x0800, 0x0800, CRC(267a2a02) SHA1(049ada7bfcf0d8560ac03effd3fbb02ead51933c))
+	ROM_LOAD ( "poolchai.ic2", 0x0800, 0x0800, CRC(267a2a02) SHA1(049ada7bfcf0d8560ac03effd3fbb02ead51933c))
 	ROM_CONTINUE(0x2800, 0x0800)
 	ROM_CONTINUE(0x1000, 0x0800)
 	ROM_CONTINUE(0x3000, 0x0800)
 
 	ROM_REGION(0x10000, "cpu2", 0)
-	ROM_LOAD("poolc_it.1f", 0xc000, 0x2000, CRC(1dc8308c) SHA1(a69f1e5fe9db5ff9fbcd08504e79ab39009efb85))
-	ROM_LOAD("poolc_it.1e", 0xe000, 0x2000, CRC(28a3e5ee) SHA1(c090c81c78d3296e91ce12e1170ee2c71ba07177))
-ROM_END
-
-ROM_START(poolchama)
-	ROM_REGION(0x8000, "maincpu", 0)
-	ROM_LOAD ( "poolcham.ic1", 0x0000, 0x0800, CRC(fca2a2b2) SHA1(9a0d9c495e38628c5e0bc10f6335100eb934f153))
-	ROM_CONTINUE(0x2000, 0x0800)
-	ROM_LOAD ( "poolcham.ic2", 0x0800, 0x0800, CRC(267a2a02) SHA1(049ada7bfcf0d8560ac03effd3fbb02ead51933c))
-	ROM_CONTINUE(0x2800, 0x0800)
-	ROM_CONTINUE(0x1000, 0x0800)
-	ROM_CONTINUE(0x3000, 0x0800)
-
-	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("poolc_it.1e", 0xa000, 0x2000, CRC(28a3e5ee) SHA1(c090c81c78d3296e91ce12e1170ee2c71ba07177))
 	ROM_LOAD("sound1.f", 0xc000, 0x4000, CRC(b4b4e31e) SHA1(bcd1c4c7f6f079655a9c37d0b978d997f95b93ad))
 ROM_END
 
@@ -869,6 +928,29 @@ ROM_START(strsphnx)
 	ROM_LOAD("snd_ic40.bin", 0x0000, 0x8000, CRC(974ceb9c) SHA1(3665af9170a2afbe26f68e8f3cedb0d177f476c4))
 ROM_END
 
+ROM_START(strsphnxf)
+	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_LOAD ( "strphnx1.cpu", 0x0000, 0x0800, CRC(2a31b7da) SHA1(05f2173783e686cc8774bed6eb59b41f7af88d11))
+	ROM_CONTINUE(0x2000, 0x0800)
+	ROM_CONTINUE(0x4000, 0x0800)
+	ROM_CONTINUE(0x6000, 0x0800)
+	ROM_LOAD ( "strphnx2.cpu", 0x0800, 0x0800, CRC(db830505) SHA1(55d6d6e12e2861fec81b46fb90c29aad5ad922aa))
+	ROM_CONTINUE(0x2800, 0x0800)
+	ROM_CONTINUE(0x1000, 0x0800)
+	ROM_CONTINUE(0x3000, 0x0800)
+
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("snd_ic24.bin", 0x0000, 0x8000, CRC(158d6f83) SHA1(281e1b13be43025be1b33dcd366cec0b36f29e5c))
+	ROM_LOAD("snd_ic25.bin", 0x8000, 0x8000, CRC(b1c9238e) SHA1(88c9df1fca94d32a0fa5d75312dabff257e867dd))
+
+	ROM_REGION(0x10000, "cpu3", 0)
+	ROM_LOAD("snd_ic05.bin", 0x0000, 0x8000, CRC(74cc4902) SHA1(e2f46bcf5446f98d098c49f8c2416292401265b9))
+	ROM_LOAD("snd_ic06.bin", 0x8000, 0x8000, CRC(a0400411) SHA1(da9de6105639c4f6174f5bc92f44e02c339a2bc3))
+
+	ROM_REGION(0x10000, "cpu4", 0)
+	ROM_LOAD("sndf_ic40.bin", 0x0000, 0x8000, CRC(1b40de42) SHA1(cfebab38a493edab1dfd0e5f591ccb9658da80c6))
+ROM_END
+
 /*--------------------------------
 / Thunder Man (1987)
 /-------------------------------*/
@@ -979,6 +1061,9 @@ ROM_START(zankor)
 ROM_END
 
 GAME(1986,  bbeltzac,   0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Black Belt (Zaccaria)",                   MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1986,  bbeltzaci,  bbeltzac, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Black Belt (Zaccaria, Italian speech)",   MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1986,  bbeltzacg,  bbeltzac, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Black Belt (Zaccaria, German speech)",    MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1986,  bbeltzacf,  bbeltzac, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Black Belt (Zaccaria, French speech)",    MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1985,  clown,      0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Clown",                                   MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1984,  dvlrider,   0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Devil Riders",                            MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1984,  dvlrideri,  dvlrider, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Devil Riders (Italian speech)",           MACHINE_IS_SKELETON_MECHANICAL)
@@ -993,6 +1078,7 @@ GAME(1984,  mcastleg,   mcastle,  zac_2,  zac_2, zac_2_state, empty_init, ROT0, 
 GAME(1984,  mcastlef,   mcastle,  zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Magic Castle (French speech)",            MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1986,  mexico,     0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Mexico 86 (German speech)",               MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1987,  nstrphnx,   0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "New Star's Phoenix (Italian speech)",     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1987,  nstrphnxf,  nstrphnx, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "New Star's Phoenix (French speech)",      MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1983,  pinchamp,   0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Pinball Champ",                           MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1983,  pinchampg,  pinchamp, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Pinball Champ (German speech)",           MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1983,  pinchampi,  pinchamp, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Pinball Champ (Italian speech)",          MACHINE_IS_SKELETON_MECHANICAL)
@@ -1001,7 +1087,6 @@ GAME(1983,  pinchamp7g, pinchamp, zac_2,  zac_2, zac_2_state, empty_init, ROT0, 
 GAME(1983,  pinchamp7i, pinchamp, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Pinball Champ (7 digits Italian speech)", MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1985,  poolcham,   0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Pool Champion",                           MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1985,  poolchami,  poolcham, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Pool Champion (Italian speech)",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1985,  poolchama,  poolcham, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Pool Champion (alternate sound)",         MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1985,  robot,      0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Robot (Zaccaria)",                        MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1985,  roboti,     robot,    zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Robot (Zaccaria, Italian speech)",        MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1985,  robotg,     robot,    zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Robot (Zaccaria, German speech)",         MACHINE_IS_SKELETON_MECHANICAL)
@@ -1014,6 +1099,7 @@ GAME(1982,  socrkingg,  socrking, zac_2,  zac_2, zac_2_state, empty_init, ROT0, 
 GAME(1987,  spookyp,    0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Spooky",                                  MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1987,  spookyi,    spookyp,  zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Spooky (Italian speech)",                 MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1987,  strsphnx,   0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Star's Phoenix (Italian speech)",         MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1987,  strsphnxf,  strsphnx, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Star's Phoenix (French speech)",          MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1987,  thndrman,   0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Apple Time",  "Thunder Man",                             MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1983,  tmachzac,   0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Time Machine (Zaccaria)",                 MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1983,  tmachzacg,  tmachzac, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Time Machine (Zaccaria, German speech)",  MACHINE_IS_SKELETON_MECHANICAL)

@@ -71,30 +71,33 @@
 class nsmpoker_state : public driver_device
 {
 public:
-	nsmpoker_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	nsmpoker_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode")
+	{ }
 
 	void nsmpoker(machine_config &config);
 
+protected:
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 	tilemap_t *m_bg_tilemap;
+	required_device<tms9995_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+
 	DECLARE_WRITE8_MEMBER(nsmpoker_videoram_w);
 	DECLARE_WRITE8_MEMBER(nsmpoker_colorram_w);
 	DECLARE_READ8_MEMBER(debug_r);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(nsmpoker);
-	virtual void machine_reset() override;
+	void nsmpoker_palette(palette_device &palette) const;
 	uint32_t screen_update_nsmpoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(nsmpoker_interrupt);
-	required_device<tms9995_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
 	void nsmpoker_map(address_map &map);
 	void nsmpoker_portmap(address_map &map);
 };
@@ -149,7 +152,7 @@ uint32_t nsmpoker_state::screen_update_nsmpoker(screen_device &screen, bitmap_in
 }
 
 
-PALETTE_INIT_MEMBER(nsmpoker_state, nsmpoker)
+void nsmpoker_state::nsmpoker_palette(palette_device &palete) const
 {
 }
 
@@ -419,8 +422,10 @@ void nsmpoker_state::machine_reset()
 MACHINE_CONFIG_START(nsmpoker_state::nsmpoker)
 
 	// CPU TMS9995, standard variant; no line connections
-	MCFG_TMS99xx_ADD("maincpu", TMS9995, MASTER_CLOCK/2, nsmpoker_map, nsmpoker_portmap)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", nsmpoker_state,  nsmpoker_interrupt)
+	TMS9995(config, m_maincpu, MASTER_CLOCK/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nsmpoker_state::nsmpoker_map);
+	m_maincpu->set_addrmap(AS_IO, &nsmpoker_state::nsmpoker_portmap);
+	m_maincpu->set_vblank_int("screen", FUNC(nsmpoker_state::nsmpoker_interrupt));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -431,10 +436,8 @@ MACHINE_CONFIG_START(nsmpoker_state::nsmpoker)
 	MCFG_SCREEN_UPDATE_DRIVER(nsmpoker_state, screen_update_nsmpoker)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nsmpoker)
-
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(nsmpoker_state, nsmpoker)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_nsmpoker);
+	PALETTE(config, "palette", FUNC(nsmpoker_state::nsmpoker_palette), 16);
 
 MACHINE_CONFIG_END
 

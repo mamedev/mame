@@ -61,20 +61,21 @@ void concept_state::video_start()
 {
 }
 
-uint32_t concept_state::screen_update_concept(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t concept_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* resolution is 720*560 */
-	uint16_t *videoram = m_videoram;
-	int x, y;
-	uint16_t *line;
-
-	for (y = 0; y < 560; y++)
+	for (int y = 0; y < 560; y++)
 	{
-		line = &bitmap.pix16(560-1-y);
-		for (x = 0; x < 720; x++)
-			line[720-1-x] = (videoram[(x+48+y*768)>>4] & (0x8000 >> ((x+48+y*768) & 0xf))) ? 1 : 0;
+		uint16_t *line = &bitmap.pix16(560-1-y);
+		for (int x = 0; x < 720; x++)
+			line[720-1-x] = (m_videoram[(x+48+y*768)>>4] & (0x8000 >> ((x+48+y*768) & 0xf))) ? 1 : 0;
 	}
 	return 0;
+}
+
+WRITE_LINE_MEMBER(concept_state::ioc_interrupt)
+{
+	concept_set_interrupt(IOCINT_level, state);
 }
 
 void concept_state::concept_set_interrupt(int level, int state)
@@ -168,11 +169,8 @@ WRITE_LINE_MEMBER(concept_state::via_irq_func)
 	concept_set_interrupt(TIMINT_level, state);
 }
 
-READ16_MEMBER(concept_state::concept_io_r)
+READ8_MEMBER(concept_state::io_r)
 {
-	if (! ACCESSING_BITS_0_7)
-		return 0;
-
 	switch ((offset >> 8) & 7)
 	{
 	case 0:
@@ -220,7 +218,7 @@ READ16_MEMBER(concept_state::concept_io_r)
 	case 5:
 		/* slot status */
 		LOG(("concept_io_r: Slot status read at address 0x03%4.4x\n", offset << 1));
-		break;
+		return (~m_a2bus->get_a2bus_nmi_mask() & 0x0f) | (~m_a2bus->get_a2bus_irq_mask() & 0x0f) << 4;
 
 	case 6:
 		/* calendar R/W */
@@ -249,7 +247,7 @@ READ16_MEMBER(concept_state::concept_io_r)
 			/* NVIA versatile system interface */
 //  LOG(("concept_io_r: VIA read at address 0x03%4.4x\n", offset << 1));
 			{
-				return m_via0->read(space, offset & 0xf);
+				return m_via0->read(offset & 0xf);
 			}
 
 		case 4:
@@ -279,13 +277,8 @@ READ16_MEMBER(concept_state::concept_io_r)
 	return 0;
 }
 
-WRITE16_MEMBER(concept_state::concept_io_w)
+WRITE8_MEMBER(concept_state::io_w)
 {
-	if (! ACCESSING_BITS_0_7)
-		return;
-
-	data &= 0xff;
-
 	switch ((offset >> 8) & 7)
 	{
 	case 0:
@@ -362,7 +355,7 @@ WRITE16_MEMBER(concept_state::concept_io_w)
 		case 3:
 			/* NVIA versatile system interface */
 			{
-				m_via0->write(space, offset & 0xf, data);
+				m_via0->write(offset & 0xf, data);
 			}
 			break;
 

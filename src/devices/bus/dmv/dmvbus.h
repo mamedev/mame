@@ -111,16 +111,16 @@ DECLARE_DEVICE_TYPE(DMVCART_SLOT, dmvcart_slot_device)
 ***************************************************************************/
 
 #define MCFG_DMVCART_SLOT_PROGRAM_READWRITE_CB(_read_devcb, _write_devcb) \
-	devcb = &downcast<dmvcart_slot_device &>(*device).set_prog_read_callback(DEVCB_##_read_devcb); \
-	devcb = &downcast<dmvcart_slot_device &>(*device).set_prog_write_callback(DEVCB_##_write_devcb);
+	downcast<dmvcart_slot_device &>(*device).set_prog_read_callback(DEVCB_##_read_devcb); \
+	downcast<dmvcart_slot_device &>(*device).set_prog_write_callback(DEVCB_##_write_devcb);
 
 #define MCFG_DMVCART_SLOT_OUT_INT_CB(_devcb) \
-	devcb = &downcast<dmvcart_slot_device &>(*device).set_out_int_callback(DEVCB_##_devcb);
+	downcast<dmvcart_slot_device &>(*device).set_out_int_callback(DEVCB_##_devcb);
 
 #define MCFG_DMVCART_SLOT_OUT_IRQ_CB(_devcb) \
-	devcb = &downcast<dmvcart_slot_device &>(*device).set_out_irq_callback(DEVCB_##_devcb);
+	downcast<dmvcart_slot_device &>(*device).set_out_irq_callback(DEVCB_##_devcb);
 
 #define MCFG_DMVCART_SLOT_OUT_THOLD_CB(_devcb) \
-	devcb = &downcast<dmvcart_slot_device &>(*device).set_out_thold_callback(DEVCB_##_devcb);
+	downcast<dmvcart_slot_device &>(*device).set_out_thold_callback(DEVCB_##_devcb);
 
 #endif // MAME_BUS_DMV_DMVBUS_H

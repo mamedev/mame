@@ -79,7 +79,7 @@ public:
 	void aim65_40(machine_config &config);
 
 private:
-	void aim65_40_mem(address_map &map);
+	void mem_map(address_map &map);
 	// devices
 	//device_t *m_via0;
 	//device_t *m_via1;
@@ -93,7 +93,7 @@ private:
     ADDRESS MAPS
 ***************************************************************************/
 
-void aim65_40_state::aim65_40_mem(address_map &map)
+void aim65_40_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x3fff).ram();
 	map(0xa000, 0xcfff).rom().region("roms", 0);
@@ -116,32 +116,34 @@ INPUT_PORTS_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-MACHINE_CONFIG_START(aim65_40_state::aim65_40)
+void aim65_40_state::aim65_40(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(M6502_TAG, M6502, 1000000)
-	MCFG_DEVICE_PROGRAM_MAP(aim65_40_mem)
+	m6502_device &cpu(M6502(config, M6502_TAG, 1000000));
+	cpu.set_addrmap(AS_PROGRAM, &aim65_40_state::mem_map);
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_aim65_40)
+	config.set_default_layout(layout_aim65_40);
 
 	/* sound hardware */
 
 	/* devices */
-	MCFG_DEVICE_ADD(M6522_0_TAG, VIA6522, 1000000)
-	MCFG_DEVICE_ADD(M6522_1_TAG, VIA6522, 1000000)
-	MCFG_DEVICE_ADD(M6522_2_TAG, VIA6522, 1000000)
-	MCFG_DEVICE_ADD(M6551_TAG, MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL(1'843'200))
-	MCFG_MOS6551_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_MOS6551_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_MOS6551_DTR_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
+	VIA6522(config, M6522_0_TAG, 1000000);
+	VIA6522(config, M6522_1_TAG, 1000000);
+	VIA6522(config, M6522_2_TAG, 1000000);
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE(M6551_TAG, mos6551_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(M6551_TAG, mos6551_device, write_dcd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(M6551_TAG, mos6551_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(M6551_TAG, mos6551_device, write_cts))
-MACHINE_CONFIG_END
+	mos6551_device &acia(MOS6551(config, M6551_TAG, 0));
+	acia.set_xtal(1.8432_MHz_XTAL);
+	acia.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	acia.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
+	acia.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
+
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set(M6551_TAG, FUNC(mos6551_device::write_rxd));
+	rs232.dcd_handler().set(M6551_TAG, FUNC(mos6551_device::write_dcd));
+	rs232.dsr_handler().set(M6551_TAG, FUNC(mos6551_device::write_dsr));
+	rs232.cts_handler().set(M6551_TAG, FUNC(mos6551_device::write_cts));
+}
 
 /***************************************************************************
     ROM DEFINITIONS

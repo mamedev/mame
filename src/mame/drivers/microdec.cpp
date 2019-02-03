@@ -28,6 +28,7 @@ ToDo:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/upd765.h"
 #include "machine/clock.h"
 #include "machine/i8251.h"
@@ -96,6 +97,7 @@ READ8_MEMBER( microdec_state::portf6_r )
 READ8_MEMBER( microdec_state::portf7_r )
 {
 	m_fdc->tc_w(1);
+	m_fdc->tc_w(0);
 	return 0xff;
 }
 
@@ -141,10 +143,8 @@ void microdec_state::microdec_io(address_map &map)
 	map(0xf7, 0xf7).rw(FUNC(microdec_state::portf7_r), FUNC(microdec_state::portf7_w));
 	map(0xf8, 0xf8).w(FUNC(microdec_state::portf8_w));
 	map(0xfa, 0xfb).m(m_fdc, FUNC(upd765a_device::map));
-	map(0xfc, 0xfc).rw("uart1", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xfd, 0xfd).rw("uart1", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0xfe, 0xfe).rw("uart2", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xff, 0xff).rw("uart2", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xfc, 0xfd).rw("uart1", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0xfe, 0xff).rw("uart2", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	// AM_RANGE(0xf0, 0xf3) 8253 PIT (md3 only) used as a baud rate generator for serial ports
 	// AM_RANGE(0xf4, 0xf4) Centronics data
 	// AM_RANGE(0xf5, 0xf5) motor check (md1/2)
@@ -188,51 +188,52 @@ void microdec_state::init_microdec()
 	membank("bankr0")->configure_entry(1, &main[0x0000]);
 	membank("bankr0")->configure_entry(0, &main[0x1000]);
 	membank("bankw0")->configure_entry(0, &main[0x1000]);
+	m_fdc->set_ready_line_connected(1);
+	m_fdc->set_unscaled_clock(4000000); // 4MHz for minifloppy
 }
 
-MACHINE_CONFIG_START(microdec_state::microdec)
+void microdec_state::microdec(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(16'000'000) / 4)
-	MCFG_DEVICE_PROGRAM_MAP(microdec_mem)
-	MCFG_DEVICE_IO_MAP(microdec_io)
+	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &microdec_state::microdec_mem);
+	m_maincpu->set_addrmap(AS_IO, &microdec_state::microdec_io);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("uart1", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart1", i8251_device, write_rxc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart2", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart2", i8251_device, write_rxc))
+	clock_device &uart_clock(CLOCK(config, "uart_clock", 153600));
+	uart_clock.signal_handler().set("uart1", FUNC(i8251_device::write_txc));
+	uart_clock.signal_handler().append("uart1", FUNC(i8251_device::write_rxc));
+	uart_clock.signal_handler().append("uart2", FUNC(i8251_device::write_txc));
+	uart_clock.signal_handler().append("uart2", FUNC(i8251_device::write_rxc));
 
-	MCFG_DEVICE_ADD("uart1", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232a", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(WRITELINE("rs232a", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE("rs232a", rs232_port_device, write_rts))
+	i8251_device &uart1(I8251(config, "uart1", 0));
+	uart1.txd_handler().set("rs232a", FUNC(rs232_port_device::write_txd));
+	uart1.dtr_handler().set("rs232a", FUNC(rs232_port_device::write_dtr));
+	uart1.rts_handler().set("rs232a", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("rs232a", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("uart1", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("uart1", i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("uart1", i8251_device, write_cts))
+	rs232_port_device &rs232a(RS232_PORT(config, "rs232a", default_rs232_devices, "terminal"));
+	rs232a.rxd_handler().set("uart1", FUNC(i8251_device::write_rxd));
+	rs232a.dsr_handler().set("uart1", FUNC(i8251_device::write_dsr));
+	rs232a.cts_handler().set("uart1", FUNC(i8251_device::write_cts));
 
-	MCFG_DEVICE_ADD("uart2", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232b", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(WRITELINE("rs232b", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE("rs232b", rs232_port_device, write_rts))
+	i8251_device &uart2(I8251(config, "uart2", 0));
+	uart2.txd_handler().set("rs232b", FUNC(rs232_port_device::write_txd));
+	uart2.dtr_handler().set("rs232b", FUNC(rs232_port_device::write_dtr));
+	uart2.rts_handler().set("rs232b", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("rs232b", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("uart2", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("uart2", i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("uart2", i8251_device, write_cts))
+	rs232_port_device &rs232b(RS232_PORT(config, "rs232b", default_rs232_devices, nullptr));
+	rs232b.rxd_handler().set("uart2", FUNC(i8251_device::write_rxd));
+	rs232b.dsr_handler().set("uart2", FUNC(i8251_device::write_dsr));
+	rs232b.cts_handler().set("uart2", FUNC(i8251_device::write_cts));
 
-	MCFG_UPD765A_ADD("fdc", true, true)
-	MCFG_UPD765_INTRQ_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", microdec_floppies, "525hd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	//MCFG_FLOPPY_DRIVE_ADD("fdc:1", microdec_floppies, "525hd", floppy_image_device::default_floppy_formats)
-	//MCFG_FLOPPY_DRIVE_SOUND(true)
+	UPD765A(config, m_fdc, 8'000'000, true, true);
+	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	FLOPPY_CONNECTOR(config, "fdc:0", microdec_floppies, "525hd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	//FLOPPY_CONNECTOR(config, "fdc:1", microdec_floppies, "525hd", floppy_image_device::default_floppy_formats).enable_sound(true);
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "md2_flop")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "flop_list").set_original("md2_flop");
+}
 
 /* ROM definition */
 ROM_START( md2 )

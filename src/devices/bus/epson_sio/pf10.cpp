@@ -35,12 +35,6 @@ void epson_pf10_device::cpu_mem(address_map &map)
 	map(0xe000, 0xffff).rom().region("maincpu", 0);
 }
 
-void epson_pf10_device::cpu_io(address_map &map)
-{
-	map(M6801_PORT1, M6801_PORT1).rw(FUNC(epson_pf10_device::port1_r), FUNC(epson_pf10_device::port1_w));
-	map(M6801_PORT2, M6801_PORT2).rw(FUNC(epson_pf10_device::port2_r), FUNC(epson_pf10_device::port2_w));
-}
-
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -67,13 +61,16 @@ static void pf10_floppies(device_slot_interface &device)
 }
 
 MACHINE_CONFIG_START(epson_pf10_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("maincpu", HD6303Y, XTAL(4'915'200)) // HD63A03XF
-	MCFG_DEVICE_PROGRAM_MAP(cpu_mem)
-	MCFG_DEVICE_IO_MAP(cpu_io)
-	MCFG_M6801_SER_TX(WRITELINE(DEVICE_SELF, epson_pf10_device, hd6303_tx_w))
+	HD6303Y(config, m_cpu, XTAL(4'915'200)); // HD63A03XF
+	m_cpu->set_addrmap(AS_PROGRAM, &epson_pf10_device::cpu_mem);
+	m_cpu->in_p1_cb().set(FUNC(epson_pf10_device::port1_r));
+	m_cpu->out_p1_cb().set(FUNC(epson_pf10_device::port1_w));
+	m_cpu->in_p2_cb().set(FUNC(epson_pf10_device::port2_r));
+	m_cpu->out_p2_cb().set(FUNC(epson_pf10_device::port2_w));
+	m_cpu->out_ser_tx_cb().set(FUNC(epson_pf10_device::hd6303_tx_w));
 
-	MCFG_UPD765A_ADD("upd765a", false, true)
-	MCFG_FLOPPY_DRIVE_ADD("upd765a:0", pf10_floppies, "smd165", floppy_image_device::default_floppy_formats)
+	UPD765A(config, m_fdc, 4'000'000, false, true);
+	FLOPPY_CONNECTOR(config, m_floppy, pf10_floppies, "smd165", floppy_image_device::default_floppy_formats);
 
 	MCFG_EPSON_SIO_ADD("sio", nullptr)
 	MCFG_EPSON_SIO_RX(WRITELINE(DEVICE_SELF, epson_pf10_device, rxc_w))
@@ -94,7 +91,9 @@ epson_pf10_device::epson_pf10_device(const machine_config &mconfig, const char *
 	device_epson_sio_interface(mconfig, *this),
 	m_cpu(*this, "maincpu"),
 	m_fdc(*this, "upd765a"),
-	m_sio_output(*this, "sio"), m_floppy(nullptr), m_timer(nullptr),
+	m_sio_output(*this, "sio"),
+	m_floppy(*this, "upd765a:0"),
+	m_timer(nullptr),
 	m_port1(0xff),
 	m_port2(0xff),
 	m_rxc(1), m_hd6303_tx(0), m_pinc(0)
@@ -110,7 +109,6 @@ epson_pf10_device::epson_pf10_device(const machine_config &mconfig, const char *
 void epson_pf10_device::device_start()
 {
 	m_timer = timer_alloc(0, nullptr);
-	m_floppy = subdevice<floppy_connector>("upd765a:0")->get_device();
 }
 
 //-------------------------------------------------
@@ -160,7 +158,8 @@ READ8_MEMBER( epson_pf10_device::port2_r )
 
 WRITE8_MEMBER( epson_pf10_device::port2_w )
 {
-	m_floppy->mon_w(data & PORT2_MON);
+	if (m_floppy->get_device() != nullptr)
+		m_floppy->get_device()->mon_w(data & PORT2_MON);
 	logerror("%s: port2_w(%02x)\n", tag(), data);
 }
 

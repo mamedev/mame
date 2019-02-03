@@ -62,7 +62,7 @@ private:
 	unsigned char row_selection;
 	void fpga_send(unsigned char cmd);
 	virtual void machine_start() override { m_digits.resolve(); m_lamps.resolve(); }
-	required_device<cpu_device> m_maincpu;
+	required_device<i8051_device> m_maincpu;
 	output_finder<4> m_digits;
 	output_finder<16> m_lamps;
 };
@@ -309,14 +309,14 @@ READ8_MEMBER(barata_state::port2_r)
 
 MACHINE_CONFIG_START(barata_state::barata)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8051, CPU_CLOCK)
-	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(*this, barata_state, port0_w))
-	MCFG_MCS51_PORT_P1_IN_CB(IOPORT("PORT1"))
-	MCFG_MCS51_PORT_P2_IN_CB(READ8(*this, barata_state, port2_r))
-	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, barata_state, port2_w))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, barata_state, fpga_w))
+	I8051(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->port_out_cb<0>().set(FUNC(barata_state::port0_w));
+	m_maincpu->port_in_cb<1>().set_ioport("PORT1");
+	m_maincpu->port_in_cb<2>().set(FUNC(barata_state::port2_r));
+	m_maincpu->port_out_cb<2>().set(FUNC(barata_state::port2_w));
+	m_maincpu->port_out_cb<3>().set(FUNC(barata_state::fpga_w));
 
-	MCFG_DEFAULT_LAYOUT( layout_barata )
+	config.set_default_layout(layout_barata);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

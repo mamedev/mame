@@ -242,9 +242,9 @@ void tp84_state::audio_map(address_map &map)
 	map(0x8000, 0x8000).r(FUNC(tp84_state::tp84_sh_timer_r));
 	map(0xa000, 0xa1ff).w(FUNC(tp84_state::tp84_filter_w));
 	map(0xc000, 0xc000).nopw();
-	map(0xc001, 0xc001).w("y2404_1", FUNC(y2404_device::command_w));
-	map(0xc003, 0xc003).w("y2404_2", FUNC(y2404_device::command_w));
-	map(0xc004, 0xc004).w("y2404_3", FUNC(y2404_device::command_w));
+	map(0xc001, 0xc001).w("y2404_1", FUNC(y2404_device::write));
+	map(0xc003, 0xc003).w("y2404_2", FUNC(y2404_device::write));
+	map(0xc004, 0xc004).w("y2404_3", FUNC(y2404_device::write));
 }
 
 
@@ -341,17 +341,17 @@ MACHINE_CONFIG_START(tp84_state::tp84)
 	MCFG_DEVICE_ADD("audiocpu", Z80,XTAL(14'318'181)/4) /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(audio_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - an high value to ensure proper */
+	config.m_minimum_quantum = attotime::from_hz(6000);  /* 100 CPU slices per frame - a high value to ensure proper */
 							/* synchronization of the CPUs */
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 3B
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, tp84_state, irq_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, tp84_state, coin_counter_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, tp84_state, coin_counter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, tp84_state, flip_screen_x_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, tp84_state, flip_screen_y_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch", 0)); // 3B
+	mainlatch.q_out_cb<0>().set(FUNC(tp84_state::irq_enable_w));
+	mainlatch.q_out_cb<1>().set(FUNC(tp84_state::coin_counter_2_w));
+	mainlatch.q_out_cb<2>().set(FUNC(tp84_state::coin_counter_1_w));
+	mainlatch.q_out_cb<4>().set(FUNC(tp84_state::flip_screen_x_w));
+	mainlatch.q_out_cb<5>().set(FUNC(tp84_state::flip_screen_y_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -360,18 +360,16 @@ MACHINE_CONFIG_START(tp84_state::tp84)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tp84_state, screen_update_tp84)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tp84_state, vblank_irq))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tp84)
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(tp84_state, tp84)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tp84);
+	PALETTE(config, m_palette, FUNC(tp84_state::tp84_palette), 4096, 256);
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD("y2404_1", Y2404, XTAL(14'318'181)/8) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter1", 0.75)
@@ -382,12 +380,8 @@ MACHINE_CONFIG_START(tp84_state::tp84)
 	MCFG_DEVICE_ADD("y2404_3", Y2404, XTAL(14'318'181)/8) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter3", 0.75)
 
-	MCFG_DEVICE_ADD("filter1", FILTER_RC)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADD("filter2", FILTER_RC)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADD("filter3", FILTER_RC)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	for (auto &filter : m_filter)
+		FILTER_RC(config, filter).add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(tp84_state::tp84b)

@@ -14,42 +14,42 @@
 
 /**************************** PALETTES for super80m and super80v ******************************************/
 
-PALETTE_INIT_MEMBER( super80_state, super80m )
+void super80_state::super80m_palette(palette_device &palette) const
 {
 	// RGB
-	m_palette->set_pen_color(0, rgb_t(0x00, 0x00, 0x00));   /*  0 Black     */
-	m_palette->set_pen_color(1, rgb_t(0x00, 0x00, 0x00));   /*  1 Black     */
-	m_palette->set_pen_color(2, rgb_t(0x00, 0x00, 0x7f));   /*  2 Blue      */
-	m_palette->set_pen_color(3, rgb_t(0x00, 0x00, 0xff));   /*  3 Light Blue    */
-	m_palette->set_pen_color(4, rgb_t(0x00, 0x7f, 0x00));   /*  4 Green     */
-	m_palette->set_pen_color(5, rgb_t(0x00, 0xff, 0x00));   /*  5 Bright Green  */
-	m_palette->set_pen_color(6, rgb_t(0x00, 0x7f, 0x7f));   /*  6 Cyan      */
-	m_palette->set_pen_color(7, rgb_t(0x00, 0xff, 0xff));   /*  7 Turquoise     */
-	m_palette->set_pen_color(8, rgb_t(0x7f, 0x00, 0x00));   /*  8 Dark Red      */
-	m_palette->set_pen_color(9, rgb_t(0xff, 0x00, 0x00));   /*  9 Red       */
-	m_palette->set_pen_color(10, rgb_t(0x7f, 0x00, 0x7f));   /* 10 Purple        */
-	m_palette->set_pen_color(11, rgb_t(0xff, 0x00, 0xff));   /* 11 Magenta       */
-	m_palette->set_pen_color(12, rgb_t(0x7f, 0x7f, 0x00));   /* 12 Lime      */
-	m_palette->set_pen_color(13, rgb_t(0xff, 0xff, 0x00));   /* 13 Yellow        */
-	m_palette->set_pen_color(14, rgb_t(0xbf, 0xbf, 0xbf));   /* 14 Off White     */
-	m_palette->set_pen_color(15, rgb_t(0xff, 0xff, 0xff));   /* 15 White     */
+	palette.set_pen_color( 0, rgb_t(0x00, 0x00, 0x00));   //  0 Black
+	palette.set_pen_color( 1, rgb_t(0x00, 0x00, 0x00));   //  1 Black
+	palette.set_pen_color( 2, rgb_t(0x00, 0x00, 0x7f));   //  2 Blue
+	palette.set_pen_color( 3, rgb_t(0x00, 0x00, 0xff));   //  3 Light Blue
+	palette.set_pen_color( 4, rgb_t(0x00, 0x7f, 0x00));   //  4 Green
+	palette.set_pen_color( 5, rgb_t(0x00, 0xff, 0x00));   //  5 Bright Green
+	palette.set_pen_color( 6, rgb_t(0x00, 0x7f, 0x7f));   //  6 Cyan
+	palette.set_pen_color( 7, rgb_t(0x00, 0xff, 0xff));   //  7 Turquoise
+	palette.set_pen_color( 8, rgb_t(0x7f, 0x00, 0x00));   //  8 Dark Red
+	palette.set_pen_color( 9, rgb_t(0xff, 0x00, 0x00));   //  9 Red
+	palette.set_pen_color(10, rgb_t(0x7f, 0x00, 0x7f));   // 10 Purple
+	palette.set_pen_color(11, rgb_t(0xff, 0x00, 0xff));   // 11 Magenta
+	palette.set_pen_color(12, rgb_t(0x7f, 0x7f, 0x00));   // 12 Lime
+	palette.set_pen_color(13, rgb_t(0xff, 0xff, 0x00));   // 13 Yellow
+	palette.set_pen_color(14, rgb_t(0xbf, 0xbf, 0xbf));   // 14 Off White
+	palette.set_pen_color(15, rgb_t(0xff, 0xff, 0xff));   // 15 White
 	// Composite
-	m_palette->set_pen_color(16, rgb_t(0x00, 0x00, 0x00));   /*  0 Black     */
-	m_palette->set_pen_color(17, rgb_t(0x80, 0x80, 0x80));   /*  1 Grey      */
-	m_palette->set_pen_color(18, rgb_t(0x00, 0x00, 0xff));   /*  2 Blue      */
-	m_palette->set_pen_color(19, rgb_t(0xff, 0xff, 0x80));   /*  3 Light Yellow  */
-	m_palette->set_pen_color(20, rgb_t(0x00, 0xff, 0x00));   /*  4 Green     */
-	m_palette->set_pen_color(21, rgb_t(0xff, 0x80, 0xff));   /*  5 Light Magenta */
-	m_palette->set_pen_color(22, rgb_t(0x00, 0xff, 0xff));   /*  6 Cyan      */
-	m_palette->set_pen_color(23, rgb_t(0xff, 0x40, 0x40));   /*  7 Light Red     */
-	m_palette->set_pen_color(24, rgb_t(0xff, 0x00, 0x00));   /*  8 Red       */
-	m_palette->set_pen_color(25, rgb_t(0x00, 0x80, 0x80));   /*  9 Dark Cyan     */
-	m_palette->set_pen_color(26, rgb_t(0xff, 0x00, 0xff));   /* 10 Magenta       */
-	m_palette->set_pen_color(27, rgb_t(0x80, 0xff, 0x80));   /* 11 Light Green   */
-	m_palette->set_pen_color(28, rgb_t(0xff, 0xff, 0x00));   /* 12 Yellow        */
-	m_palette->set_pen_color(29, rgb_t(0x00, 0x00, 0x80));   /* 13 Dark Blue     */
-	m_palette->set_pen_color(30, rgb_t(0xff, 0xff, 0xff));   /* 14 White     */
-	m_palette->set_pen_color(31, rgb_t(0x00, 0x00, 0x00));   /* 15 Black     */
+	palette.set_pen_color(16, rgb_t(0x00, 0x00, 0x00));   //  0 Black
+	palette.set_pen_color(17, rgb_t(0x80, 0x80, 0x80));   //  1 Grey
+	palette.set_pen_color(18, rgb_t(0x00, 0x00, 0xff));   //  2 Blue
+	palette.set_pen_color(19, rgb_t(0xff, 0xff, 0x80));   //  3 Light Yellow
+	palette.set_pen_color(20, rgb_t(0x00, 0xff, 0x00));   //  4 Green
+	palette.set_pen_color(21, rgb_t(0xff, 0x80, 0xff));   //  5 Light Magenta
+	palette.set_pen_color(22, rgb_t(0x00, 0xff, 0xff));   //  6 Cyan
+	palette.set_pen_color(23, rgb_t(0xff, 0x40, 0x40));   //  7 Light Red
+	palette.set_pen_color(24, rgb_t(0xff, 0x00, 0x00));   //  8 Red
+	palette.set_pen_color(25, rgb_t(0x00, 0x80, 0x80));   //  9 Dark Cyan
+	palette.set_pen_color(26, rgb_t(0xff, 0x00, 0xff));   // 10 Magenta
+	palette.set_pen_color(27, rgb_t(0x80, 0xff, 0x80));   // 11 Light Green
+	palette.set_pen_color(28, rgb_t(0xff, 0xff, 0x00));   // 12 Yellow
+	palette.set_pen_color(29, rgb_t(0x00, 0x00, 0x80));   // 13 Dark Blue
+	palette.set_pen_color(30, rgb_t(0xff, 0xff, 0xff));   // 14 White
+	palette.set_pen_color(31, rgb_t(0x00, 0x00, 0x00));   // 15 Black
 }
 
 

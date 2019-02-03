@@ -3,7 +3,7 @@
 // thanks-to: 'Re-Animator'
 /****************************************************************************************
 
-    bfm_sc2.c
+    bfm_sc2.cpp
 
     Bellfruit scorpion2/3 driver, (under heavy construction !!!)
 
@@ -375,10 +375,9 @@ protected:
 	void memmap_no_vid(address_map &map);
 
 	optional_device<bfm_dm01_device> m_dm01;
-
-private:
 	optional_device_array<stepper_device, 6> m_reel;
 
+private:
 	int m_optic_pattern;
 	int m_reels;
 };
@@ -796,7 +795,7 @@ WRITE8_MEMBER(bfm_sc2_state::volume_override_w)
 WRITE8_MEMBER(bfm_sc2_state::nec_reset_w)
 {
 	m_upd7759->start_w(0);
-	m_upd7759->reset_w(data);
+	m_upd7759->reset_w(data != 0);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -808,9 +807,9 @@ WRITE8_MEMBER(bfm_sc2_state::nec_latch_w)
 	if ( data & 0x80 )         bank |= 0x01;
 	if ( m_expansion_latch & 2 ) bank |= 0x02;
 
-	m_upd7759->set_bank_base(bank*0x20000);
+	m_upd7759->set_rom_bank(bank);
 
-	m_upd7759->port_w(space, 0, data&0x3F);    // setup sample
+	m_upd7759->port_w(data & 0x3f);    // setup sample
 	m_upd7759->start_w(0);
 	m_upd7759->start_w(1);
 }
@@ -2249,20 +2248,20 @@ INPUT_PORTS_END
 // machine config fragments for different meters numbers //////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-MACHINE_CONFIG_START(bfm_sc2_state::_3meters)
-	MCFG_DEVICE_ADD("meters", METERS, 0)
-	MCFG_METERS_NUMBER(3)
-MACHINE_CONFIG_END
+void bfm_sc2_state::_3meters(machine_config &config)
+{
+	METERS(config, m_meters, 0).set_number(3);
+}
 
-MACHINE_CONFIG_START(bfm_sc2_state::_5meters)
-	MCFG_DEVICE_ADD("meters", METERS, 0)
-	MCFG_METERS_NUMBER(5)
-MACHINE_CONFIG_END
+void bfm_sc2_state::_5meters(machine_config &config)
+{
+	METERS(config, m_meters, 0).set_number(5);
+}
 
-MACHINE_CONFIG_START(bfm_sc2_state::_8meters)
-	MCFG_DEVICE_ADD("meters", METERS, 0)
-	MCFG_METERS_NUMBER(8)
-MACHINE_CONFIG_END
+void bfm_sc2_state::_8meters(machine_config &config)
+{
+	METERS(config, m_meters, 0).set_number(8);
+}
 
 ///////////////////////////////////////////////////////////////////////////
 // machine driver for scorpion2 board + adder2 expansion //////////////////
@@ -2282,19 +2281,18 @@ MACHINE_CONFIG_START(bfm_sc2_vid_state::scorpion2_vid)
 	MCFG_DEVICE_ADD("maincpu", M6809, MASTER_CLOCK/4 ) // 6809 CPU at 2 Mhz
 	MCFG_DEVICE_PROGRAM_MAP(memmap_vid)                    // setup scorpion2 board memorymap
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(bfm_sc2_vid_state, timer_irq,  1000)           // generate 1000 IRQ's per second
-	MCFG_QUANTUM_TIME(attotime::from_hz(960))                                   // needed for serial communication !!
+	config.m_minimum_quantum = attotime::from_hz(960);                                   // needed for serial communication !!
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_MONOSTABLE(120000,100e-9))
+	WATCHDOG_TIMER(config, "watchdog").set_time(PERIOD_OF_555_MONOSTABLE(120000,100e-9));
 
-	MCFG_BFMBD1_ADD("vfd0",0)
-	MCFG_BFMBD1_ADD("vfd1",1)
+	BFM_BD1(config, m_vfd0, 60, 0);
+	BFM_BD1(config, m_vfd1, 60, 1);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_NVRAM_ADD_CUSTOM_DRIVER("e2ram", bfm_sc2_vid_state, e2ram_init)
-	MCFG_DEFAULT_LAYOUT(layout_sc2_vid)
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, "e2ram").set_custom_handler(FUNC(bfm_sc2_vid_state::e2ram_init));
+	config.set_default_layout(layout_sc2_vid);
 
-	MCFG_BFM_ADDER2_ADD("adder2")
+	BFM_ADDER2(config, "adder2", 0);
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("upd", UPD7759)
@@ -3754,11 +3752,10 @@ MACHINE_CONFIG_START(bfm_sc2_awp_state::scorpion2)
 	MCFG_DEVICE_PROGRAM_MAP(memmap_no_vid)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(bfm_sc2_awp_state, timer_irq,  1000)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_MONOSTABLE(120000,100e-9))
+	WATCHDOG_TIMER(config, "watchdog").set_time(PERIOD_OF_555_MONOSTABLE(120000,100e-9));
 
-	MCFG_BFMBD1_ADD("vfd0",0)
-	MCFG_BFMBD1_ADD("vfd1",1)
+	BFM_BD1(config, m_vfd0, 60, 0);
+	BFM_BD1(config, m_vfd1, 60, 1);
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("upd",UPD7759)
@@ -3767,55 +3764,56 @@ MACHINE_CONFIG_START(bfm_sc2_awp_state::scorpion2)
 	MCFG_DEVICE_ADD("ymsnd",YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_NVRAM_ADD_CUSTOM_DRIVER("e2ram", bfm_sc2_awp_state, e2ram_init)
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, "e2ram").set_custom_handler(FUNC(bfm_sc2_awp_state::e2ram_init));
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_sc2_vfd)
+	config.set_default_layout(layout_sc2_vfd);
 
-	MCFG_DEVICE_ADD("reel0", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc2_awp_state, reel_optic_cb<0>))
-	MCFG_DEVICE_ADD("reel1", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc2_awp_state, reel_optic_cb<1>))
-	MCFG_DEVICE_ADD("reel2", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc2_awp_state, reel_optic_cb<2>))
-	MCFG_DEVICE_ADD("reel3", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc2_awp_state, reel_optic_cb<3>))
-	MCFG_DEVICE_ADD("reel4", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc2_awp_state, reel_optic_cb<4>))
-	MCFG_DEVICE_ADD("reel5", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc2_awp_state, reel_optic_cb<5>))
+	REEL(config, m_reel[0], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	m_reel[0]->optic_handler().set(FUNC(bfm_sc2_awp_state::reel_optic_cb<0>));
+	REEL(config, m_reel[1], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	m_reel[1]->optic_handler().set(FUNC(bfm_sc2_awp_state::reel_optic_cb<1>));
+	REEL(config, m_reel[2], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	m_reel[2]->optic_handler().set(FUNC(bfm_sc2_awp_state::reel_optic_cb<2>));
+	REEL(config, m_reel[3], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	m_reel[3]->optic_handler().set(FUNC(bfm_sc2_awp_state::reel_optic_cb<3>));
+	REEL(config, m_reel[4], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	m_reel[4]->optic_handler().set(FUNC(bfm_sc2_awp_state::reel_optic_cb<4>));
+	REEL(config, m_reel[5], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	m_reel[5]->optic_handler().set(FUNC(bfm_sc2_awp_state::reel_optic_cb<5>));
 
 	_8meters(config);
 MACHINE_CONFIG_END
 
 #if 0
-MACHINE_CONFIG_START(bfm_sc2_awp_state::scorpion2_3m)
+void bfm_sc2_awp_state::scorpion2_3m(machine_config &config)
+{
 	scorpion2(config);
 
-	MCFG_DEVICE_REMOVE("meters")
+	config.device_remove("meters");
 	_3meters(config);
-MACHINE_CONFIG_END
+}
 #endif
 
 /* machine driver for scorpion3 board */
-MACHINE_CONFIG_START(bfm_sc2_awp_state::scorpion3)
+void bfm_sc2_awp_state::scorpion3(machine_config &config)
+{
 	scorpion2(config);
 
-	MCFG_DEVICE_REMOVE("meters")
+	config.device_remove("meters");
 	_5meters(config);
-MACHINE_CONFIG_END
+}
 
 
 /* machine driver for scorpion2 board + matrix board */
 MACHINE_CONFIG_START(bfm_sc2_dmd_state::scorpion2_dm01)
-	MCFG_QUANTUM_TIME(attotime::from_hz(960))                                   // needed for serial communication !!
+	config.m_minimum_quantum = attotime::from_hz(960);                                   // needed for serial communication !!
 	MCFG_DEVICE_ADD("maincpu", M6809, MASTER_CLOCK/4 )
 	MCFG_DEVICE_PROGRAM_MAP(memmap_no_vid)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(bfm_sc2_dmd_state, timer_irq,  1000)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_MONOSTABLE(120000,100e-9))
+	WATCHDOG_TIMER(config, "watchdog").set_time(PERIOD_OF_555_MONOSTABLE(120000,100e-9));
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("ymsnd",YM2413, XTAL(3'579'545))
@@ -3824,41 +3822,43 @@ MACHINE_CONFIG_START(bfm_sc2_dmd_state::scorpion2_dm01)
 	MCFG_DEVICE_ADD("upd",UPD7759)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_NVRAM_ADD_CUSTOM_DRIVER("e2ram", bfm_sc2_dmd_state, e2ram_init)
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, "e2ram").set_custom_handler(FUNC(bfm_sc2_dmd_state::e2ram_init));
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_sc2_dmd)
-	MCFG_DEVICE_ADD("dm01", BFM_DM01, 0)
-	MCFG_BFM_DM01_BUSY_CB(WRITELINE(*this, bfm_sc2_dmd_state, bfmdm01_busy))
+	config.set_default_layout(layout_sc2_dmd);
+	BFM_DM01(config, m_dm01, 0);
+	m_dm01->busy_callback().set(FUNC(bfm_sc2_dmd_state::bfmdm01_busy));
 
-	MCFG_DEVICE_ADD("reel0", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc2_dmd_state, reel_optic_cb<0>))
-	MCFG_DEVICE_ADD("reel1", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc2_dmd_state, reel_optic_cb<1>))
-	MCFG_DEVICE_ADD("reel2", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc2_dmd_state, reel_optic_cb<2>))
-	MCFG_DEVICE_ADD("reel3", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc2_dmd_state, reel_optic_cb<3>))
-	MCFG_DEVICE_ADD("reel4", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc2_dmd_state, reel_optic_cb<4>))
-	MCFG_DEVICE_ADD("reel5", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc2_dmd_state, reel_optic_cb<5>))
+	REEL(config, m_reel[0], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	m_reel[0]->optic_handler().set(FUNC(bfm_sc2_dmd_state::reel_optic_cb<0>));
+	REEL(config, m_reel[1], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	m_reel[1]->optic_handler().set(FUNC(bfm_sc2_dmd_state::reel_optic_cb<1>));
+	REEL(config, m_reel[2], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	m_reel[2]->optic_handler().set(FUNC(bfm_sc2_dmd_state::reel_optic_cb<2>));
+	REEL(config, m_reel[3], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	m_reel[3]->optic_handler().set(FUNC(bfm_sc2_dmd_state::reel_optic_cb<3>));
+	REEL(config, m_reel[4], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	m_reel[4]->optic_handler().set(FUNC(bfm_sc2_dmd_state::reel_optic_cb<4>));
+	REEL(config, m_reel[5], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	m_reel[5]->optic_handler().set(FUNC(bfm_sc2_dmd_state::reel_optic_cb<5>));
 
 	_8meters(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(bfm_sc2_dmd_state::scorpion2_dm01_3m)
+void bfm_sc2_dmd_state::scorpion2_dm01_3m(machine_config &config)
+{
 	scorpion2_dm01(config);
-	MCFG_DEVICE_REMOVE("meters")
+	config.device_remove("meters");
 	_3meters(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(bfm_sc2_dmd_state::scorpion2_dm01_5m)
+void bfm_sc2_dmd_state::scorpion2_dm01_5m(machine_config &config)
+{
 	scorpion2_dm01(config);
-	MCFG_DEVICE_REMOVE("meters")
+	config.device_remove("meters");
 	_5meters(config);
-MACHINE_CONFIG_END
+}
 
 void bfm_sc2_novid_state::sc2awp_common_init(int reels, int decrypt)
 {
@@ -7113,8 +7113,6 @@ ROM_START( sc2scshxgman )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "scxgm10.bin", 0x0000, 0x010000, CRC(f8c5bac8) SHA1(7858b2c8442b80b69598244870620d45042b7abb) )
 	ROM_REGION( 0x200000, "altrevs", ROMREGION_ERASE00 )
-	ROM_LOAD( "scxgm10a.bin", 0x0000, 0x010000, CRC(deab7e4e) SHA1(472a55b0ba289b0f4e538bb4c8b826dede3a40bb) )
-//scxgm10b.bin identical
 	ROM_LOAD( "scxhiv1.gmn", 0x0000, 0x010000, CRC(c43c2f43) SHA1(8bd8b2a71f19d6fd1f96d6032d1b60bb75dcaeb8) )
 	ROM_LOAD( "scxhiv2.gmn", 0x0000, 0x010000, CRC(83a1ecc9) SHA1(b0176b25c97739442f3743136833d0e5fe51c03f) )
 	ROM_LOAD( "scxlov1.gm", 0x0000, 0x010000, CRC(e305ff5a) SHA1(0bbc1cfaf7c7aaf324c65fd22148437e2bd4ca1e) )

@@ -18,7 +18,7 @@
 #include "formats/vdk_dsk.h"
 #include "formats/dmk_dsk.h"
 #include "formats/sdf_dsk.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 
 #include "bus/coco/dragon_fdc.h"
 #include "bus/coco/dragon_jcbsnd.h"
@@ -196,40 +196,41 @@ MACHINE_CONFIG_START(dragon_state::dragon_base)
 	MCFG_DEVICE_PROGRAM_MAP(dragon_mem)
 
 	// devices
-	MCFG_DEVICE_ADD(PIA0_TAG, PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, coco_state, pia0_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, coco_state, pia0_pb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, coco_state, pia0_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, coco_state, pia0_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, coco_state, pia0_irq_a))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, coco_state, pia0_irq_b))
+	pia6821_device &pia0(PIA6821(config, PIA0_TAG, 0));
+	pia0.writepa_handler().set(FUNC(coco_state::pia0_pa_w));
+	pia0.writepb_handler().set(FUNC(coco_state::pia0_pb_w));
+	pia0.ca2_handler().set(FUNC(coco_state::pia0_ca2_w));
+	pia0.cb2_handler().set(FUNC(coco_state::pia0_cb2_w));
+	pia0.irqa_handler().set(FUNC(coco_state::pia0_irq_a));
+	pia0.irqb_handler().set(FUNC(coco_state::pia0_irq_b));
 
-	MCFG_DEVICE_ADD(PIA1_TAG, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, coco_state, pia1_pa_r))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, coco_state, pia1_pb_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, coco_state, pia1_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, coco_state, pia1_pb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, coco_state, pia1_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, coco_state, pia1_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, coco_state, pia1_firq_a))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, coco_state, pia1_firq_b))
+	pia6821_device &pia1(PIA6821(config, PIA1_TAG, 0));
+	pia1.readpa_handler().set(FUNC(coco_state::pia1_pa_r));
+	pia1.readpb_handler().set(FUNC(coco_state::pia1_pb_r));
+	pia1.writepa_handler().set(FUNC(coco_state::pia1_pa_w));
+	pia1.writepb_handler().set(FUNC(coco_state::pia1_pb_w));
+	pia1.ca2_handler().set(FUNC(coco_state::pia1_ca2_w));
+	pia1.cb2_handler().set(FUNC(coco_state::pia1_cb2_w));
+	pia1.irqa_handler().set(FUNC(coco_state::pia1_firq_a));
+	pia1.irqb_handler().set(FUNC(coco_state::pia1_firq_b));
 
-	MCFG_DEVICE_ADD(SAM_TAG, SAM6883, 14.218_MHz_XTAL, MAINCPU_TAG)
-	MCFG_SAM6883_RES_CALLBACK(READ8(*this, dragon_state, sam_read))
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_FORMATS(coco_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
-	MCFG_CASSETTE_INTERFACE("dragon_cass")
+	SAM6883(config, m_sam, 14.218_MHz_XTAL, m_maincpu);
+	m_sam->res_rd_callback().set(FUNC(dragon_state::sam_read));
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(coco_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED);
+	m_cassette->set_interface("dragon_cass");
 
-	MCFG_DEVICE_ADD(PRINTER_TAG, PRINTER, 0)
+	PRINTER(config, m_printer, 0);
 
 	// video hardware
-	MCFG_SCREEN_MC6847_PAL_ADD(SCREEN_TAG, VDG_TAG)
+	SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER);
 
-	MCFG_DEVICE_ADD(VDG_TAG, MC6847_PAL, 4.433619_MHz_XTAL)
-	MCFG_MC6847_HSYNC_CALLBACK(WRITELINE(*this, dragon_state, horizontal_sync))
-	MCFG_MC6847_FSYNC_CALLBACK(WRITELINE(*this, dragon_state, field_sync))
-	MCFG_MC6847_INPUT_CALLBACK(READ8(SAM_TAG, sam6883_device, display_read))
+	MC6847_PAL(config, m_vdg, 4.433619_MHz_XTAL);
+	m_vdg->set_screen(SCREEN_TAG);
+	m_vdg->hsync_wr_callback().set(FUNC(dragon_state::horizontal_sync));
+	m_vdg->fsync_wr_callback().set(FUNC(dragon_state::field_sync));
+	m_vdg->input_callback().set(m_sam, FUNC(sam6883_device::display_read));
 
 	// sound hardware
 	coco_sound(config);
@@ -238,62 +239,59 @@ MACHINE_CONFIG_START(dragon_state::dragon_base)
 	coco_floating(config);
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("dragon_cart_list", "dragon_cart")
-	MCFG_SOFTWARE_LIST_ADD("dragon_cass_list", "dragon_cass")
-	MCFG_SOFTWARE_LIST_ADD("dragon_flop_list", "dragon_flop")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("coco_cart_list", "coco_cart")
+	SOFTWARE_LIST(config, "dragon_cart_list").set_original("dragon_cart");
+	SOFTWARE_LIST(config, "dragon_cass_list").set_original("dragon_cass");
+	SOFTWARE_LIST(config, "dragon_flop_list").set_original("dragon_flop");
+	SOFTWARE_LIST(config, "coco_cart_list").set_compatible("coco_cart");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dragon_state::dragon32)
 	dragon_base(config);
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32K")
-	MCFG_RAM_EXTRA_OPTIONS("64K")
+	RAM(config, m_ram).set_default_size("32K").set_extra_options("64K");
 
 	// cartridge
-	MCFG_COCO_CARTRIDGE_ADD(CARTRIDGE_TAG, dragon_cart, "dragon_fdc")
-	MCFG_COCO_CARTRIDGE_CART_CB(WRITELINE(*this, coco_state, cart_w))
-	MCFG_COCO_CARTRIDGE_NMI_CB(INPUTLINE(MAINCPU_TAG, INPUT_LINE_NMI))
-	MCFG_COCO_CARTRIDGE_HALT_CB(INPUTLINE(MAINCPU_TAG, INPUT_LINE_HALT))
+	cococart_slot_device &cartslot(COCOCART_SLOT(config, CARTRIDGE_TAG, DERIVED_CLOCK(1, 1), dragon_cart, "dragon_fdc"));
+	cartslot.cart_callback().set([this] (int state) { cart_w(state != 0); }); // lambda because name is overloaded
+	cartslot.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	cartslot.halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(dragon64_state::dragon64)
+void dragon64_state::dragon64(machine_config &config)
+{
 	dragon_base(config);
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, m_ram).set_default_size("64K");
 
 	// cartridge
-	MCFG_COCO_CARTRIDGE_ADD(CARTRIDGE_TAG, dragon_cart, "dragon_fdc")
-	MCFG_COCO_CARTRIDGE_CART_CB(WRITELINE(*this, coco_state, cart_w))
-	MCFG_COCO_CARTRIDGE_NMI_CB(INPUTLINE(MAINCPU_TAG, INPUT_LINE_NMI))
-	MCFG_COCO_CARTRIDGE_HALT_CB(INPUTLINE(MAINCPU_TAG, INPUT_LINE_HALT))
+	cococart_slot_device &cartslot(COCOCART_SLOT(config, CARTRIDGE_TAG, DERIVED_CLOCK(1, 1), dragon_cart, "dragon_fdc"));
+	cartslot.cart_callback().set([this] (int state) { cart_w(state != 0); }); // lambda because name is overloaded
+	cartslot.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	cartslot.halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
 
 	// acia
-	MCFG_DEVICE_ADD("acia", MOS6551, 0)
-	MCFG_MOS6551_XTAL(1.8432_MHz_XTAL)
+	mos6551_device &acia(MOS6551(config, "acia", 0));
+	acia.set_xtal(1.8432_MHz_XTAL);
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("dragon_flex_list", "dragon_flex")
-	MCFG_SOFTWARE_LIST_ADD("dragon_os9_list", "dragon_os9")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "dragon_flex_list").set_original("dragon_flex");
+	SOFTWARE_LIST(config, "dragon_os9_list").set_original("dragon_os9");
+}
 
 MACHINE_CONFIG_START(dragon64_state::dragon64h)
 	dragon64(config);
 	// Replace M6809 with HD6309
 	MCFG_DEVICE_REPLACE(MAINCPU_TAG, HD6309E, DERIVED_CLOCK(1, 1))
 	MCFG_DEVICE_PROGRAM_MAP(dragon_mem)
-	MCFG_DEVICE_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	m_ram->set_default_size("64K");
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(dragon200e_state::dragon200e)
+void dragon200e_state::dragon200e(machine_config &config)
+{
 	dragon64(config);
 	// video hardware
-	MCFG_DEVICE_MODIFY(VDG_TAG)
-	MCFG_MC6847_CHARROM_CALLBACK(dragon200e_state, char_rom_r)
-MACHINE_CONFIG_END
+	m_vdg->set_get_char_rom(FUNC(dragon200e_state::char_rom_r));
+}
 
 MACHINE_CONFIG_START(d64plus_state::d64plus)
 	dragon64(config);
@@ -304,71 +302,73 @@ MACHINE_CONFIG_START(d64plus_state::d64plus)
 	MCFG_SCREEN_SIZE(640, 264)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 264-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", hd6845_device, screen_update)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	// crtc
-	MCFG_MC6845_ADD("crtc", HD6845, "plus_screen", 14.218_MHz_XTAL / 4 / 2)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(d64plus_state, crtc_update_row)
+	HD6845(config, m_crtc, 14.218_MHz_XTAL / 4 / 2);
+	m_crtc->set_screen("plus_screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(d64plus_state::crtc_update_row), this);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(dragon_alpha_state::dgnalpha)
+void dragon_alpha_state::dgnalpha(machine_config &config)
+{
 	dragon_base(config);
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 
 	// cartridge
-	MCFG_COCO_CARTRIDGE_ADD(CARTRIDGE_TAG, dragon_cart, nullptr)
-	MCFG_COCO_CARTRIDGE_CART_CB(WRITELINE(*this, coco_state, cart_w))
-	MCFG_COCO_CARTRIDGE_NMI_CB(INPUTLINE(MAINCPU_TAG, INPUT_LINE_NMI))
-	MCFG_COCO_CARTRIDGE_HALT_CB(INPUTLINE(MAINCPU_TAG, INPUT_LINE_HALT))
+	cococart_slot_device &cartslot(COCOCART_SLOT(config, CARTRIDGE_TAG, DERIVED_CLOCK(1, 1), dragon_cart, nullptr));
+	cartslot.cart_callback().set([this] (int state) { cart_w(state != 0); }); // lambda because name is overloaded
+	cartslot.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	cartslot.halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
 
 	// acia
-	MCFG_DEVICE_ADD("acia", MOS6551, 0)
-	MCFG_MOS6551_XTAL(1.8432_MHz_XTAL)
+	mos6551_device &acia(MOS6551(config, "acia", 0));
+	acia.set_xtal(1.8432_MHz_XTAL);
 
 	// floppy
-	MCFG_DEVICE_ADD(WD2797_TAG, WD2797, 1_MHz_XTAL)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, dragon_alpha_state, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, dragon_alpha_state, fdc_drq_w))
+	WD2797(config, m_fdc, 1_MHz_XTAL);
+	m_fdc->intrq_wr_callback().set(FUNC(dragon_alpha_state::fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(dragon_alpha_state::fdc_drq_w));
 
-	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":0", dragon_alpha_floppies, "dd", dragon_alpha_state::dragon_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":1", dragon_alpha_floppies, "dd", dragon_alpha_state::dragon_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":2", dragon_alpha_floppies, nullptr, dragon_alpha_state::dragon_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":3", dragon_alpha_floppies, nullptr, dragon_alpha_state::dragon_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, WD2797_TAG ":0", dragon_alpha_floppies, "dd", dragon_alpha_state::dragon_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, WD2797_TAG ":1", dragon_alpha_floppies, "dd", dragon_alpha_state::dragon_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, WD2797_TAG ":2", dragon_alpha_floppies, nullptr, dragon_alpha_state::dragon_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, WD2797_TAG ":3", dragon_alpha_floppies, nullptr, dragon_alpha_state::dragon_formats).enable_sound(true);
 
 	// sound hardware
-	MCFG_DEVICE_ADD(AY8912_TAG, AY8912, 1000000)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, dragon_alpha_state, psg_porta_read))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, dragon_alpha_state, psg_porta_write))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75)
+	ay8912_device &ay8912(AY8912(config, AY8912_TAG, 1000000));
+	ay8912.port_a_read_callback().set(FUNC(dragon_alpha_state::psg_porta_read));
+	ay8912.port_a_write_callback().set(FUNC(dragon_alpha_state::psg_porta_write));
+	ay8912.add_route(ALL_OUTPUTS, "speaker", 0.75);
 
 	// pia 2
-	MCFG_DEVICE_ADD( PIA2_TAG, PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, dragon_alpha_state, pia2_pa_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, dragon_alpha_state, pia2_firq_a))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, dragon_alpha_state, pia2_firq_b))
+	pia6821_device &pia2(PIA6821(config, PIA2_TAG, 0));
+	pia2.writepa_handler().set(FUNC(dragon_alpha_state::pia2_pa_w));
+	pia2.irqa_handler().set(FUNC(dragon_alpha_state::pia2_firq_a));
+	pia2.irqb_handler().set(FUNC(dragon_alpha_state::pia2_firq_b));
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("dgnalpha_flop_list", "dgnalpha_flop")
-	MCFG_SOFTWARE_LIST_ADD("dragon_flex_list", "dragon_flex")
-	MCFG_SOFTWARE_LIST_ADD("dragon_os9_list", "dragon_os9")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "dgnalpha_flop_list").set_original("dgnalpha_flop");
+	SOFTWARE_LIST(config, "dragon_flex_list").set_original("dragon_flex");
+	SOFTWARE_LIST(config, "dragon_os9_list").set_original("dragon_os9");
+}
 
 MACHINE_CONFIG_START(dragon64_state::tanodr64)
 	dragon64(config);
 	MCFG_DEVICE_MODIFY(":")
-	MCFG_DEVICE_CLOCK(14.318181_MHz_XTAL / 4)
+	MCFG_DEVICE_CLOCK(14.318181_MHz_XTAL / 16)
+
+	m_sam->set_clock(14.318181_MHz_XTAL);
 
 	// video hardware
-	MCFG_SCREEN_MODIFY(SCREEN_TAG)
-	MCFG_SCREEN_REFRESH_RATE(60)
+	MC6847_NTSC(config.replace(), m_vdg, 14.318181_MHz_XTAL / 4);
+	m_vdg->set_screen(SCREEN_TAG);
+	m_vdg->hsync_wr_callback().set(FUNC(dragon_state::horizontal_sync));
+	m_vdg->fsync_wr_callback().set(FUNC(dragon_state::field_sync));
+	m_vdg->input_callback().set(m_sam, FUNC(sam6883_device::display_read));
 
 	// cartridge
 	MCFG_DEVICE_MODIFY(CARTRIDGE_TAG)
@@ -380,8 +380,7 @@ MACHINE_CONFIG_START(dragon64_state::tanodr64h)
 	// Replace M6809 CPU with HD6309 CPU
 	MCFG_DEVICE_REPLACE(MAINCPU_TAG, HD6309E, DERIVED_CLOCK(1, 1))
 	MCFG_DEVICE_PROGRAM_MAP(dragon_mem)
-	MCFG_DEVICE_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	m_ram->set_default_size("64K");
 MACHINE_CONFIG_END
 
 /***************************************************************************

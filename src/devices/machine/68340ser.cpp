@@ -38,12 +38,12 @@ void mc68340_serial_module_device::device_start()
 	mc68340_duart_device::device_start();
 }
 
-READ8_MEMBER( mc68340_serial_module_device::read )
+uint8_t mc68340_serial_module_device::read(offs_t offset)
 {
 	LOG("%s\n", FUNCNAME);
 	int val = 0;
 
-	LOGR("%08x %s %08x, (%08x)\n", m_cpu->pcbase(), FUNCNAME, offset, mem_mask);
+	LOGR("%08x %s %08x\n", m_cpu->pcbase(), FUNCNAME, offset);
 
 	/*Setting the STP bit stops all clocks within the serial module (including the crystal
 	  or external clock and SCLK), except for the clock from the IMB. The clock from the IMB
@@ -60,19 +60,19 @@ READ8_MEMBER( mc68340_serial_module_device::read )
 	{
 	case REG_MCRH:
 		val = m_mcrh;
-		LOGSERIAL("- %08x %s %04x, %04x (%04x) (MCRH - Module Configuration Register High byte)\n", m_cpu->pcbase(), FUNCNAME, offset, val, mem_mask);
+		LOGSERIAL("- %08x %s %04x, %04x (MCRH - Module Configuration Register High byte)\n", m_cpu->pcbase(), FUNCNAME, offset, val);
 		break;
 	case REG_MCRL:
 		val = m_mcrl;
-		LOGSERIAL("- %08x %s %04x, %04x (%04x) (MCRL - Module Configuration Register Low byte)\n", m_cpu->pcbase(), FUNCNAME, offset, val, mem_mask);
+		LOGSERIAL("- %08x %s %04x, %04x (MCRL - Module Configuration Register Low byte)\n", m_cpu->pcbase(), FUNCNAME, offset, val);
 		break;
 	case REG_ILR:
 		val = m_ilr;
-		LOGSERIAL("- %08x %s %04x, %04x (%04x) (ILR - Interrupt Level Register)\n", m_cpu->pcbase(), FUNCNAME, offset, val, mem_mask);
+		LOGSERIAL("- %08x %s %04x, %04x (ILR - Interrupt Level Register)\n", m_cpu->pcbase(), FUNCNAME, offset, val);
 		break;
 	case REG_IVR:
 		val = m_ivr;
-		LOGSERIAL("- %08x %s %04x, %04x (%04x) (IVR - Interrupt Vector  Register)\n", m_cpu->pcbase(), FUNCNAME, offset, val, mem_mask);
+		LOGSERIAL("- %08x %s %04x, %04x (IVR - Interrupt Vector Register)\n", m_cpu->pcbase(), FUNCNAME, offset, val);
 		break;
 	}
 
@@ -87,10 +87,10 @@ READ8_MEMBER( mc68340_serial_module_device::read )
 		 "MR1B", "SRB",  "n/a",  "RBB",  "n/a",  "IP",   "n/a",  "n/a",  // 0x18 - 0x1f
 		 "MR2A", "MR2B" }}[offset]);                                     // 0x20 - 0x21
 
-	return offset >= 0x10 && offset < 0x22 ? mc68340_duart_device::read(space, offset - 0x10, mem_mask) : val;
+	return offset >= 0x10 && offset < 0x22 ? mc68340_duart_device::read(offset - 0x10) : val;
 }
 
-WRITE8_MEMBER( mc68340_serial_module_device::write )
+void mc68340_serial_module_device::write(offs_t offset, uint8_t data)
 {
 	LOG("\n%s\n", FUNCNAME);
 	LOGSETUP(" * Reg %02x <- %02x - %s\n", offset, data,
@@ -118,29 +118,30 @@ WRITE8_MEMBER( mc68340_serial_module_device::write )
 	{
 	case REG_MCRH:
 		m_mcrh = data;
-		LOGSERIAL("PC: %08x %s %04x, %04x (%04x) (MCRH - Module Configuration Register High byte)\n", m_cpu->pcbase(), FUNCNAME, offset, data, mem_mask);
+		LOGSERIAL("PC: %08x %s %04x, %04x (MCRH - Module Configuration Register High byte)\n", m_cpu->pcbase(), FUNCNAME, offset, data);
 		LOGSERIAL("- Clocks are %s\n", data & REG_MCRH_STP ? "stopped" : "running");
 		LOGSERIAL("- Freeze signal %s - not implemented\n", data & REG_MCRH_FRZ1 ? "stops at character boundary" : "is ignored");
 		LOGSERIAL("- CTS capture clock: %s - not implemented\n", data & REG_MCRH_ICCS ? "SCLK" : "Crystal");
 		break;
 	case REG_MCRL:
 		m_mcrl = data;
-		LOGSERIAL("PC: %08x %s %04x, %04x (%04x) (MCRL - Module Configuration Register Low byte)\n", m_cpu->pcbase(), FUNCNAME, offset, data, mem_mask);
+		LOGSERIAL("PC: %08x %s %04x, %04x (MCRL - Module Configuration Register Low byte)\n", m_cpu->pcbase(), FUNCNAME, offset, data);
 		LOGSERIAL("- Supervisor registers %s - not implemented\n", data & REG_MCRL_SUPV ? "requries supervisor privileges" : "can be accessed by user privileged software");
-		LOGSERIAL("- Interrupt Arbitration level: %02x - not implemented\n", data & REG_MCRL_ARBLV);
+		LOGSERIAL("- Interrupt Arbitration level: %02x\n", data & REG_MCRL_ARBLV);
 		break;
 	case REG_ILR:
 		m_ilr = data;
-		LOGSERIAL("PC: %08x %s %04x, %04x (%04x) (ILR - Interrupt Level Register)\n", m_cpu->pcbase(), FUNCNAME, offset, data, mem_mask);
+		LOGSERIAL("PC: %08x %s %04x, %04x (ILR - Interrupt Level Register)\n", m_cpu->pcbase(), FUNCNAME, offset, data);
 		LOGSERIAL("- Interrupt Level: %02x\n", data & REG_ILR_MASK);
+		m_cpu->update_ipl();
 		break;
 	case REG_IVR:
 		m_ivr = data;
-		LOGSERIAL("PC: %08x %s %04x, %04x (%04x) (IVR - Interrupt Vector Register)\n", m_cpu->pcbase(), FUNCNAME, offset, data, mem_mask);
+		LOGSERIAL("PC: %08x %s %04x, %04x (IVR - Interrupt Vector Register)\n", m_cpu->pcbase(), FUNCNAME, offset, data);
 		LOGSERIAL("- Interrupt Vector: %02x\n", data);
 		break;
 	default:
-		if (offset >= 0x10 && offset < 0x22) mc68340_duart_device::write(space, offset - 0x10, data, mem_mask);
+		if (offset >= 0x10 && offset < 0x22) mc68340_duart_device::write(offset - 0x10, data);
 	}
 
 }
@@ -148,19 +149,7 @@ WRITE8_MEMBER( mc68340_serial_module_device::write )
 WRITE_LINE_MEMBER( mc68340_serial_module_device::irq_w )
 {
 	LOGINT("IRQ!\n%s\n", FUNCNAME);
-	if (m_ilr > 0)
-	{
-		if (((m_cpu->m_m68340SIM->m_avr_rsr >> (8 + m_ilr)) & 1) != 0) // use autovector ?
-		{
-			LOGINT("- Autovector level %d\n", m_ilr);
-			m_cpu->set_input_line(m_ilr, HOLD_LINE);
-		}
-		else // otherwise not...
-		{
-			LOGINT("- Vector %02x level %d\n", m_ivr, m_ilr);
-			m_cpu->set_input_line_and_vector(m_ilr, HOLD_LINE, m_ivr);
-		}
-	}
+	m_cpu->update_ipl();
 }
 
 mc68340_serial_module_device::mc68340_serial_module_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

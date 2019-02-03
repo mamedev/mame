@@ -265,8 +265,8 @@ void smsbootleg_state::sms_supergame_io(address_map &map)
 	map(0x18, 0x18).w(FUNC(smsbootleg_state::port18_w));
 
 	map(0x40, 0x7f).rw(FUNC(smsbootleg_state::sms_count_r), FUNC(smsbootleg_state::sms_psg_w));
-	map(0x80, 0x80).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::vram_read), FUNC(sega315_5124_device::vram_write));
-	map(0x81, 0x81).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::register_read), FUNC(sega315_5124_device::register_write));
+	map(0x80, 0x80).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::data_read), FUNC(sega315_5124_device::data_write));
+	map(0x81, 0x81).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::control_read), FUNC(sega315_5124_device::control_write));
 
 	map(0xdc, 0xdc).portr("IN2");
 }
@@ -279,7 +279,7 @@ MACHINE_CONFIG_START(smsbootleg_state::sms_supergame)
 	MCFG_DEVICE_PROGRAM_MAP(sms_supergame_map)
 	MCFG_DEVICE_IO_MAP(sms_supergame_io)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -294,11 +294,11 @@ MACHINE_CONFIG_START(smsbootleg_state::sms_supergame)
 	MCFG_SCREEN_REFRESH_RATE(XTAL(10'738'635)/2 / (sega315_5124_device::WIDTH * sega315_5124_device::HEIGHT_NTSC))
 	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms)
 
-	MCFG_DEVICE_ADD("sms_vdp", SEGA315_5246, 0)
-	MCFG_SEGA315_5246_SET_SCREEN("screen")
-	MCFG_SEGA315_5246_IS_PAL(false)
-	MCFG_SEGA315_5246_INT_CB(INPUTLINE("maincpu", 0))
-	MCFG_SEGA315_5246_PAUSE_CB(WRITELINE(*this, sms_state, sms_pause_callback))
+	SEGA315_5246(config, m_vdp, 0);
+	m_vdp->set_screen(m_main_scr);
+	m_vdp->set_is_pal(false);
+	m_vdp->irq().set_inputline(m_maincpu, 0);
+	m_vdp->pause().set(FUNC(sms_state::sms_pause_callback));
 
 MACHINE_CONFIG_END
 

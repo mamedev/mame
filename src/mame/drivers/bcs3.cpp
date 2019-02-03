@@ -96,7 +96,7 @@ private:
 	u8 s_rows;
 	u8 s_cols;
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
 	required_region_ptr<u8> m_p_chargen;
 	required_shared_ptr<u8> m_p_videoram;
@@ -387,10 +387,10 @@ void bcs3_state::init_bcs3d()
 MACHINE_CONFIG_START(bcs3_state::bcs3)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(5'000'000) /2)
-	MCFG_DEVICE_PROGRAM_MAP(bcs3_mem)
-	MCFG_DEVICE_IO_MAP(bcs3_io)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain_intf)
+	Z80(config, m_maincpu, XTAL(5'000'000) /2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bcs3_state::bcs3_mem);
+	m_maincpu->set_addrmap(AS_IO, &bcs3_state::bcs3_io);
+	m_maincpu->set_daisy_config(daisy_chain_intf);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -401,23 +401,23 @@ MACHINE_CONFIG_START(bcs3_state::bcs3)
 	MCFG_SCREEN_UPDATE_DRIVER(bcs3_state, screen_update_bcs3)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bcs3)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(5'000'000) / 2)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, bcs3_state, ctc_z0_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, bcs3_state, ctc_z1_w))
+	Z80CTC(config, m_ctc, XTAL(5'000'000) / 2);
+	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc->zc_callback<0>().set(FUNC(bcs3_state::ctc_z0_w));
+	m_ctc->zc_callback<1>().set(FUNC(bcs3_state::ctc_z1_w));
 
-	MCFG_CASSETTE_ADD( "cassette" )
+	CASSETTE(config, m_cass);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(bcs3_state::bcs3a)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(7'000'000) /2)
-	MCFG_DEVICE_PROGRAM_MAP(bcs3a_mem)
-	MCFG_DEVICE_IO_MAP(bcs3_io)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain_intf)
+	Z80(config, m_maincpu, XTAL(7'000'000) /2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bcs3_state::bcs3a_mem);
+	m_maincpu->set_addrmap(AS_IO, &bcs3_state::bcs3_io);
+	m_maincpu->set_daisy_config(daisy_chain_intf);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -428,14 +428,14 @@ MACHINE_CONFIG_START(bcs3_state::bcs3a)
 	MCFG_SCREEN_UPDATE_DRIVER(bcs3_state, screen_update_bcs3a)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bcs3)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(7'000'000) / 2)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, bcs3_state, ctc_z0_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, bcs3_state, ctc_z1_w))
+	Z80CTC(config, m_ctc, XTAL(7'000'000) / 2);
+	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc->zc_callback<0>().set(FUNC(bcs3_state::ctc_z0_w));
+	m_ctc->zc_callback<1>().set(FUNC(bcs3_state::ctc_z1_w));
 
-	MCFG_CASSETTE_ADD( "cassette" )
+	CASSETTE(config, m_cass);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(bcs3_state::bcs3b)

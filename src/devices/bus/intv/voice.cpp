@@ -69,15 +69,16 @@ void intv_voice_device::late_subslot_setup()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(intv_voice_device::device_add_mconfig)
+void intv_voice_device::device_add_mconfig(machine_config &config)
+{
 	SPEAKER(config, "mono_voice").front_center();
 
-	MCFG_DEVICE_ADD("sp0256_speech", SP0256, 3120000)
+	SP0256(config, m_speech, 3120000);
 	/* The Intellivoice uses a speaker with its own volume control so the relative volumes to use are subjective */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono_voice", 1.00)
+	m_speech->add_route(ALL_OUTPUTS, "mono_voice", 1.00);
 
-	MCFG_INTV_CARTRIDGE_ADD("subslot", intv_cart, nullptr)
-MACHINE_CONFIG_END
+	INTV_CART_SLOT(config, m_subslot, intv_cart, nullptr);
+}
 
 
 ROM_START( intellivoice )
@@ -98,7 +99,7 @@ const tiny_rom_entry *intv_voice_device::device_rom_region() const
 READ16_MEMBER(intv_voice_device::read_speech)
 {
 	if (ACCESSING_BITS_0_7)
-		return m_speech->spb640_r(space, offset, mem_mask);
+		return m_speech->spb640_r(offset);
 	else
 		return 0xff;
 }
@@ -110,7 +111,7 @@ READ16_MEMBER(intv_voice_device::read_speech)
 WRITE16_MEMBER(intv_voice_device::write_speech)
 {
 	if (ACCESSING_BITS_0_7)
-		return m_speech->spb640_w(space, offset, data, mem_mask);
+		return m_speech->spb640_w(offset, data);
 }
 
 

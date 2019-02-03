@@ -18,71 +18,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_MODEL1IO2_READ_CB(_devcb) \
-	devcb = &downcast<model1io2_device &>(*device).set_read_callback(DEVCB_##_devcb);
-
-#define MCFG_MODEL1IO2_WRITE_CB(_devcb) \
-	devcb = &downcast<model1io2_device &>(*device).set_write_callback(DEVCB_##_devcb);
-
-#define MCFG_MODEL1IO2_IN0_CB(_devcb) \
-	devcb = &downcast<model1io2_device &>(*device).set_in_callback<0>(DEVCB_##_devcb);
-
-#define MCFG_MODEL1IO2_IN1_CB(_devcb) \
-	devcb = &downcast<model1io2_device &>(*device).set_in_callback<1>(DEVCB_##_devcb);
-
-#define MCFG_MODEL1IO2_IN2_CB(_devcb) \
-	devcb = &downcast<model1io2_device &>(*device).set_in_callback<2>(DEVCB_##_devcb);
-
-#define MCFG_MODEL1IO2_DRIVE_READ_CB(_devcb) \
-	devcb = &downcast<model1io2_device &>(*device).set_drive_read_callback(DEVCB_##_devcb);
-
-#define MCFG_MODEL1IO2_DRIVE_WRITE_CB(_devcb) \
-	devcb = &downcast<model1io2_device &>(*device).set_drive_write_callback(DEVCB_##_devcb);
-
-#define MCFG_MODEL1IO2_AN0_CB(_devcb) \
-	devcb = &downcast<model1io2_device &>(*device).set_an_callback<0>(DEVCB_##_devcb);
-
-#define MCFG_MODEL1IO2_AN1_CB(_devcb) \
-	devcb = &downcast<model1io2_device &>(*device).set_an_callback<1>(DEVCB_##_devcb);
-
-#define MCFG_MODEL1IO2_AN2_CB(_devcb) \
-	devcb = &downcast<model1io2_device &>(*device).set_an_callback<2>(DEVCB_##_devcb);
-
-#define MCFG_MODEL1IO2_AN3_CB(_devcb) \
-	devcb = &downcast<model1io2_device &>(*device).set_an_callback<3>(DEVCB_##_devcb);
-
-#define MCFG_MODEL1IO2_AN4_CB(_devcb) \
-	devcb = &downcast<model1io2_device &>(*device).set_an_callback<4>(DEVCB_##_devcb);
-
-#define MCFG_MODEL1IO2_AN5_CB(_devcb) \
-	devcb = &downcast<model1io2_device &>(*device).set_an_callback<5>(DEVCB_##_devcb);
-
-#define MCFG_MODEL1IO2_AN6_CB(_devcb) \
-	devcb = &downcast<model1io2_device &>(*device).set_an_callback<6>(DEVCB_##_devcb);
-
-#define MCFG_MODEL1IO2_AN7_CB(_devcb) \
-	devcb = &downcast<model1io2_device &>(*device).set_an_callback<7>(DEVCB_##_devcb);
-
-#define MCFG_MODEL1IO2_OUTPUT_CB(_devcb) \
-	devcb = &downcast<model1io2_device &>(*device).set_output_callback(DEVCB_##_devcb);
-
-#define MCFG_MODEL1IO2_LIGHTGUN_P1Y_TAG(_tag) \
-	downcast<model1io2_device &>(*device).set_lightgun_tag<0>(_tag);
-
-#define MCFG_MODEL1IO2_LIGHTGUN_P1X_TAG(_tag) \
-	downcast<model1io2_device &>(*device).set_lightgun_tag<1>(_tag);
-
-#define MCFG_MODEL1IO2_LIGHTGUN_P2Y_TAG(_tag) \
-	downcast<model1io2_device &>(*device).set_lightgun_tag<2>(_tag);
-
-#define MCFG_MODEL1IO2_LIGHTGUN_P2X_TAG(_tag) \
-	downcast<model1io2_device &>(*device).set_lightgun_tag<3>(_tag);
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -93,36 +28,26 @@ public:
 	model1io2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	template <class Object> devcb_base &set_read_callback(Object &&cb)
-	{ return m_read_cb.set_callback(std::forward<Object>(cb)); }
+	auto read_callback() { return m_read_cb.bind(); }
+	auto write_callback() { return m_write_cb.bind(); }
+	template <unsigned N> auto in_callback() { return m_in_cb[N].bind(); }
+	auto drive_read_callback() { return m_drive_read_cb.bind(); }
+	auto drive_write_callback() { return m_drive_write_cb.bind(); }
+	template <unsigned N> auto an_callback() { return m_an_cb[N].bind(); }
+	auto output_callback() { return m_output_cb.bind(); }
 
-	template <class Object> devcb_base &set_write_callback(Object &&cb)
-	{ return m_write_cb.set_callback(std::forward<Object>(cb)); }
+	template <typename T> void set_lightgun_p1y_tag(T && tag) { m_lightgun_ports[0].set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_lightgun_p1x_tag(T && tag) { m_lightgun_ports[1].set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_lightgun_p2y_tag(T && tag) { m_lightgun_ports[2].set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_lightgun_p2x_tag(T && tag) { m_lightgun_ports[3].set_tag(std::forward<T>(tag)); }
 
-	template <int Index, class Object> devcb_base &set_in_callback(Object &&cb)
-	{ return m_in_cb[Index].set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> devcb_base &set_drive_read_callback(Object &&cb)
-	{ return m_drive_read_cb.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> devcb_base &set_drive_write_callback(Object &&cb)
-	{ return m_drive_write_cb.set_callback(std::forward<Object>(cb)); }
-
-	template <int Index, class Object> devcb_base &set_an_callback(Object &&cb)
-	{ return m_an_cb[Index].set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> devcb_base &set_output_callback(Object &&cb)
-	{ return m_output_cb.set_callback(std::forward<Object>(cb)); }
-
-	template <int Index> void set_lightgun_tag(const char *tag) { m_lightgun_ports[Index].set_tag(tag); }
-
+protected:
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
 
-	DECLARE_PALETTE_INIT(lcd);
+	void lcd_palette(palette_device &palette) const;
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
 
-protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;

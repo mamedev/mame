@@ -74,11 +74,12 @@ fe2010_pit_device::fe2010_pit_device(const machine_config &mconfig, const char *
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(pit8253_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("counter0", PIT_COUNTER, 0)
-	MCFG_DEVICE_ADD("counter1", PIT_COUNTER, 0)
-	MCFG_DEVICE_ADD("counter2", PIT_COUNTER, 0)
-MACHINE_CONFIG_END
+void pit8253_device::device_add_mconfig(machine_config &config)
+{
+	PIT_COUNTER(config, "counter0", 0);
+	PIT_COUNTER(config, "counter1", 0);
+	PIT_COUNTER(config, "counter2", 0);
+}
 
 
 //-------------------------------------------------
@@ -809,7 +810,7 @@ uint8_t pit_counter_device::read()
 	return data;
 }
 
-READ8_MEMBER( pit8253_device::read )
+uint8_t pit8253_device::read(offs_t offset)
 {
 	offset &= 3;
 
@@ -1023,7 +1024,7 @@ void pit_counter_device::count_w(uint8_t data)
 	}
 }
 
-WRITE8_MEMBER( pit8253_device::write )
+void pit8253_device::write(offs_t offset, uint8_t data)
 {
 	offset &= 3;
 

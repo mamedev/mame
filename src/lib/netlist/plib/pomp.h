@@ -9,6 +9,8 @@
 #ifndef POMP_H_
 #define POMP_H_
 
+#include <cstddef>
+
 #include "pconfig.h"
 
 #if HAS_OPENMP
@@ -18,29 +20,37 @@
 namespace plib {
 namespace omp {
 
-template <class T>
-void for_static(const int start, const int end, const T &what)
+template <typename I, class T>
+void for_static(const I start, const I end, const T &what)
 {
 #if HAS_OPENMP && USE_OPENMP
 	#pragma omp parallel
 #endif
 	{
 #if HAS_OPENMP && USE_OPENMP
-		#pragma omp for schedule(static)
+		#pragma omp for //schedule(static)
 #endif
-		for (int i = start; i <  end; i++)
+		for (I i = start; i <  end; i++)
 			what(i);
 	}
 }
 
-inline void set_num_threads(const int threads)
+template <typename I, class T>
+void for_static_np(const I start, const I end, const T &what)
+{
+	for (I i = start; i <  end; i++)
+		what(i);
+}
+
+
+inline void set_num_threads(const std::size_t threads)
 {
 #if HAS_OPENMP && USE_OPENMP
 	omp_set_num_threads(threads);
 #endif
 }
 
-inline int get_max_threads()
+inline std::size_t get_max_threads()
 {
 #if HAS_OPENMP && USE_OPENMP
 	return omp_get_max_threads();

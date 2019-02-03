@@ -1476,23 +1476,23 @@ WRITE8_MEMBER(pc8801_state::pc8801_rtc_w)
 READ8_MEMBER(pc8801_state::pc8801_sound_board_r)
 {
 	if(m_has_opna)
-		return m_opna->read(space, offset);
+		return m_opna->read(offset);
 
-	return (offset & 2) ? 0xff : m_opn->read(space, offset);
+	return (offset & 2) ? 0xff : m_opn->read(offset);
 }
 
 WRITE8_MEMBER(pc8801_state::pc8801_sound_board_w)
 {
 	if(m_has_opna)
-		m_opna->write(space, offset,data);
+		m_opna->write(offset,data);
 	else if((offset & 2) == 0)
-		m_opn->write(space, offset, data);
+		m_opn->write(offset, data);
 }
 
 READ8_MEMBER(pc8801_state::pc8801_opna_r)
 {
 	if(m_has_opna && (offset & 2) == 0)
-		return m_opna->read(space, (offset & 1) | ((offset & 4) >> 1));
+		return m_opna->read((offset & 1) | ((offset & 4) >> 1));
 
 	return 0xff;
 }
@@ -1500,7 +1500,7 @@ READ8_MEMBER(pc8801_state::pc8801_opna_r)
 WRITE8_MEMBER(pc8801_state::pc8801_opna_w)
 {
 	if(m_has_opna && (offset & 2) == 0)
-		m_opna->write(space, (offset & 1) | ((offset & 4) >> 1),data);
+		m_opna->write((offset & 1) | ((offset & 4) >> 1),data);
 	else if(m_has_opna && offset == 2)
 	{
 		m_sound_irq_mask = ((data & 0x80) == 0);
@@ -1553,8 +1553,7 @@ void pc8801_state::pc8801_io(address_map &map)
 	map(0x0f, 0x0f).portr("KEY15");
 	map(0x00, 0x02).w(FUNC(pc8801_state::pc8801_pcg8100_w));
 	map(0x10, 0x10).w(FUNC(pc8801_state::pc8801_rtc_w));
-	map(0x20, 0x20).mirror(0x0e).rw(I8251_TAG, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w)); /* RS-232C and CMT */
-	map(0x21, 0x21).mirror(0x0e).rw(I8251_TAG, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x20, 0x21).mirror(0x0e).rw(I8251_TAG, FUNC(i8251_device::read), FUNC(i8251_device::write)); /* RS-232C and CMT */
 	map(0x30, 0x30).portr("DSW1").w(FUNC(pc8801_state::pc8801_txt_cmt_ctrl_w));
 	map(0x31, 0x31).portr("DSW2").w(FUNC(pc8801_state::pc8801_gfx_ctrl_w));
 	map(0x32, 0x32).rw(FUNC(pc8801_state::pc8801_misc_ctrl_r), FUNC(pc8801_state::pc8801_misc_ctrl_w));
@@ -1686,7 +1685,7 @@ void pc8801_state::pc8801fdc_io(address_map &map)
 	map(0xf4, 0xf4).w(FUNC(pc8801_state::fdc_drive_mode_w)); // Drive mode, 2d, 2dd, 2hd
 	map(0xf7, 0xf7).nopw(); // printer port output
 	map(0xf8, 0xf8).rw(FUNC(pc8801_state::upd765_tc_r), FUNC(pc8801_state::upd765_mc_w)); // (R) Terminal Count Port (W) Motor Control Port
-	map(0xfa, 0xfb).m("upd765", FUNC(upd765a_device::map));
+	map(0xfa, 0xfb).m(m_fdc, FUNC(upd765a_device::map));
 	map(0xfc, 0xff).rw("d8255_slave", FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
 
@@ -2304,11 +2303,9 @@ MACHINE_RESET_MEMBER(pc8801_state,pc8801_cdrom)
 	}
 }
 
-PALETTE_INIT_MEMBER(pc8801_state, pc8801)
+void pc8801_state::pc8801_palette(palette_device &palette) const
 {
-	int i;
-
-	for(i=0;i<0x10;i++) //text + bitmap
+	for(int i = 0; i< 0x10; i++) //text + bitmap
 		palette.set_pen_color(i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
 }
 
@@ -2352,76 +2349,75 @@ MACHINE_CONFIG_START(pc8801_state::pc8801)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(pc8801_state,pc8801_irq_callback)
 
 	/* sub CPU(5 inch floppy drive) */
-	MCFG_DEVICE_ADD("fdccpu", Z80, MASTER_CLOCK)       /* 4 MHz */
+	MCFG_DEVICE_ADD(m_fdccpu, Z80, MASTER_CLOCK)       /* 4 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(pc8801fdc_mem)
 	MCFG_DEVICE_IO_MAP(pc8801fdc_io)
 
-	//MCFG_QUANTUM_TIME(attotime::from_hz(300000))
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	//config.m_minimum_quantum = attotime::from_hz(300000);
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
-	MCFG_DEVICE_ADD("d8255_master", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8("d8255_slave", i8255_device, pb_r))
-	MCFG_I8255_IN_PORTB_CB(READ8("d8255_slave", i8255_device, pa_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, pc8801_state, cpu_8255_c_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pc8801_state, cpu_8255_c_w))
+	i8255_device &d8255_master(I8255(config, "d8255_master"));
+	d8255_master.in_pa_callback().set("d8255_slave", FUNC(i8255_device::pb_r));
+	d8255_master.in_pb_callback().set("d8255_slave", FUNC(i8255_device::pa_r));
+	d8255_master.in_pc_callback().set(FUNC(pc8801_state::cpu_8255_c_r));
+	d8255_master.out_pc_callback().set(FUNC(pc8801_state::cpu_8255_c_w));
 
-	MCFG_DEVICE_ADD("d8255_slave", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8("d8255_master", i8255_device, pb_r))
-	MCFG_I8255_IN_PORTB_CB(READ8("d8255_master", i8255_device, pa_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, pc8801_state, fdc_8255_c_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pc8801_state, fdc_8255_c_w))
+	i8255_device &d8255_slave(I8255(config, "d8255_slave"));
+	d8255_slave.in_pa_callback().set("d8255_master", FUNC(i8255_device::pb_r));
+	d8255_slave.in_pb_callback().set("d8255_master", FUNC(i8255_device::pa_r));
+	d8255_slave.in_pc_callback().set(FUNC(pc8801_state::fdc_8255_c_r));
+	d8255_slave.out_pc_callback().set(FUNC(pc8801_state::fdc_8255_c_w));
 
-	MCFG_UPD765A_ADD("upd765", true, true)
-	MCFG_UPD765_INTRQ_CALLBACK(INPUTLINE("fdccpu", INPUT_LINE_IRQ0))
+	UPD765A(config, m_fdc, 8'000'000, true, true);
+	m_fdc->intrq_wr_callback().set_inputline(m_fdccpu, INPUT_LINE_IRQ0);
 
 	#if USE_PROPER_I8214
-	MCFG_I8214_ADD(I8214_TAG, MASTER_CLOCK, pic_intf)
+	I8214(config, I8214_TAG, MASTER_CLOCK);
 	#endif
-	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL(32'768), NOOP, NOOP)
-	//MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
+	UPD1990A(config, m_rtc);
+	//CENTRONICS(config, "centronics", centronics_devices, "printer");
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
 
-	MCFG_SOFTWARE_LIST_ADD("tape_list","pc8801_cass")
+	SOFTWARE_LIST(config, "tape_list").set_original("pc8801_cass");
 
-	MCFG_DEVICE_ADD(I8251_TAG, I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE(*this, pc8801_state, txdata_callback))
-	MCFG_I8251_RTS_HANDLER(WRITELINE(*this, pc8801_state, rxrdy_w))
+	i8251_device &i8251(I8251(config, I8251_TAG, 0));
+	i8251.txd_handler().set(FUNC(pc8801_state::txdata_callback));
+	i8251.rts_handler().set(FUNC(pc8801_state::rxrdy_w));
 
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", pc88_floppies, "525hd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", pc88_floppies, "525hd", floppy_image_device::default_floppy_formats)
-	MCFG_SOFTWARE_LIST_ADD("disk_list","pc8801_flop")
+	FLOPPY_CONNECTOR(config, "upd765:0", pc88_floppies, "525hd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765:1", pc88_floppies, "525hd", floppy_image_device::default_floppy_formats);
+	SOFTWARE_LIST(config, "disk_list").set_original("pc8801_flop");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK_24KHz,848,0,640,448,0,400)
 	MCFG_SCREEN_UPDATE_DRIVER(pc8801_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pc8801)
-	MCFG_PALETTE_ADD("palette", 0x10)
-	MCFG_PALETTE_INIT_OWNER(pc8801_state, pc8801)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_pc8801);
+	PALETTE(config, m_palette, FUNC(pc8801_state::pc8801_palette), 0x10);
 
 //  MCFG_VIDEO_START_OVERRIDE(pc8801_state,pc8801)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("opn", YM2203, MASTER_CLOCK)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(*this, pc8801_state, pc8801_sound_irq))
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, pc8801_state, opn_porta_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, pc8801_state, opn_portb_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	YM2203(config, m_opn, MASTER_CLOCK);
+	m_opn->irq_handler().set(FUNC(pc8801_state::pc8801_sound_irq));
+	m_opn->port_a_read_callback().set(FUNC(pc8801_state::opn_porta_r));
+	m_opn->port_b_read_callback().set(FUNC(pc8801_state::opn_portb_r));
+	m_opn->add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	MCFG_DEVICE_ADD("opna", YM2608, MASTER_CLOCK*2)
-	MCFG_YM2608_IRQ_HANDLER(WRITELINE(*this, pc8801_state, pc8801_sound_irq))
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, pc8801_state, opn_porta_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, pc8801_state, opn_portb_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	YM2608(config, m_opna, MASTER_CLOCK*2);
+	m_opna->irq_handler().set(FUNC(pc8801_state::pc8801_sound_irq));
+	m_opna->port_a_read_callback().set(FUNC(pc8801_state::opn_porta_r));
+	m_opna->port_b_read_callback().set(FUNC(pc8801_state::opn_portb_r));
+	m_opna->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	MCFG_DEVICE_ADD("beeper", BEEP, 2400)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("rtc_timer", pc8801_state, pc8801_rtc_irq, attotime::from_hz(600))
+	TIMER(config, "rtc_timer").configure_periodic(FUNC(pc8801_state::pc8801_rtc_irq), attotime::from_hz(600));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pc8801_state::pc8801fh)

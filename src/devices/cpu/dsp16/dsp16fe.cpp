@@ -816,7 +816,7 @@ void dsp16_device_base::frontend::describe_x(opcode_desc &desc, u16 op)
 
 void dsp16_device_base::frontend::describe_y(opcode_desc &desc, u16 op, bool read, bool write)
 {
-	u32 const r(REG_BIT_YAAU_R0 + ((op >> 2) && 0x0003U));
+	u32 const r(REG_BIT_YAAU_R0 + ((op >> 2) & 0x0003U));
 	if (read)
 		desc.flags |= OPFLAG_READS_MEMORY;
 	if (write)
@@ -844,7 +844,7 @@ void dsp16_device_base::frontend::describe_y(opcode_desc &desc, u16 op, bool rea
 
 void dsp16_device_base::frontend::describe_z(opcode_desc &desc, u16 op)
 {
-	u32 const r(REG_BIT_YAAU_R0 + ((op >> 2) && 0x0003U));
+	u32 const r(REG_BIT_YAAU_R0 + ((op >> 2) & 0x0003U));
 	desc.flags |= OPFLAG_READS_MEMORY | OPFLAG_WRITES_MEMORY;
 	flag_output_reg(desc, r);
 	switch (op & 0x0003U)

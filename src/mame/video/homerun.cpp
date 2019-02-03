@@ -12,13 +12,13 @@
 
 /**************************************************************************/
 
-CUSTOM_INPUT_MEMBER(homerun_state::homerun_sprite0_r)
+CUSTOM_INPUT_MEMBER(homerun_state::sprite0_r)
 {
 	// sprite-0 vs background collision status, similar to NES
 	return (m_screen->vpos() > (m_spriteram[0] - 16 + 1)) ? 1 : 0;
 }
 
-WRITE8_MEMBER(homerun_state::homerun_scrollhi_w)
+WRITE8_MEMBER(homerun_state::scrollhi_w)
 {
 	// d0: scroll y high bit
 	// d1: scroll x high bit
@@ -27,40 +27,49 @@ WRITE8_MEMBER(homerun_state::homerun_scrollhi_w)
 	m_scrollx = (m_scrollx & 0xff) | (data << 7 & 0x100);
 }
 
-WRITE8_MEMBER(homerun_state::homerun_scrolly_w)
+WRITE8_MEMBER(homerun_state::scrolly_w)
 {
 	m_scrolly = (m_scrolly & 0xff00) | data;
 }
 
-WRITE8_MEMBER(homerun_state::homerun_scrollx_w)
+WRITE8_MEMBER(homerun_state::scrollx_w)
 {
 	m_scrollx = (m_scrollx & 0xff00) | data;
 }
 
-WRITE8_MEMBER(homerun_state::homerun_banking_w)
+void homerun_state::banking_w(u8 data)
 {
-	// games do mid-screen gfx bank switching
-	int vpos = m_screen->vpos();
-	m_screen->update_partial(vpos);
+	u8 const old = m_gfx_ctrl;
+	if (old ^ data)
+	{
+		if ((old ^ data) & 3)
+		{
+			// games do mid-screen gfx bank switching
+			int vpos = m_screen->vpos();
+			m_screen->update_partial(vpos);
+		}
 
-	// d0-d1: gfx bank
-	// d2-d4: ?
-	// d5-d7: prg bank
-	m_gfx_ctrl = data;
-	m_tilemap->mark_all_dirty();
-	membank("bank1")->set_entry(data >> 5 & 7);
+		// d0-d1: gfx bank
+		// d2-d4: ?
+		// d5-d7: prg bank
+		m_gfx_ctrl = data;
+		if ((old ^ m_gfx_ctrl) & 1)
+			m_tilemap->mark_all_dirty();
+
+		if ((old ^ m_gfx_ctrl) >> 5 & 7)
+			m_mainbank->set_entry(m_gfx_ctrl >> 5 & 7);
+
+	}
 }
 
-WRITE8_MEMBER(homerun_state::homerun_videoram_w)
+WRITE8_MEMBER(homerun_state::videoram_w)
 {
 	m_videoram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset & 0xfff);
 }
 
-WRITE8_MEMBER(homerun_state::homerun_color_w)
+rgb_t homerun_state::homerun_RGB332(u32 raw)
 {
-	m_colorram[offset] = data;
-
 	/* from PCB photo:
 	    bit 7:  470 ohm resistor \
 	    bit 6:  220 ohm resistor -  --> 470 ohm resistor  --> blue
@@ -73,32 +82,30 @@ WRITE8_MEMBER(homerun_state::homerun_color_w)
 	*/
 
 	// let's implement it the old fashioned way until it's found out how exactly the resnet is hooked up
-	int r, g, b;
-	int bit0, bit1, bit2;
+	u8 bit0, bit1, bit2;
 
-	bit0 = (data >> 0) & 0x01;
-	bit1 = (data >> 1) & 0x01;
-	bit2 = (data >> 2) & 0x01;
-	r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-	bit0 = (data >> 3) & 0x01;
-	bit1 = (data >> 4) & 0x01;
-	bit2 = (data >> 5) & 0x01;
-	g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+	bit0 = (raw >> 0) & 0x01;
+	bit1 = (raw >> 1) & 0x01;
+	bit2 = (raw >> 2) & 0x01;
+	int r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+	bit0 = (raw >> 3) & 0x01;
+	bit1 = (raw >> 4) & 0x01;
+	bit2 = (raw >> 5) & 0x01;
+	int g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 	bit0 = 0;
-	bit1 = (data >> 6) & 0x01;
-	bit2 = (data >> 7) & 0x01;
-	b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+	bit1 = (raw >> 6) & 0x01;
+	bit2 = (raw >> 7) & 0x01;
+	int b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-	m_palette->set_pen_color(offset, rgb_t(r,g,b));
+	return rgb_t(r, g, b);
 }
-
 
 /**************************************************************************/
 
-TILE_GET_INFO_MEMBER(homerun_state::get_homerun_tile_info)
+TILE_GET_INFO_MEMBER(homerun_state::get_tile_info)
 {
-	int tileno = (m_videoram[tile_index]) | ((m_videoram[tile_index | 0x1000] & 0x38) << 5) | ((m_gfx_ctrl & 1) << 11);
-	int palno = (m_videoram[tile_index | 0x1000] & 0x07);
+	u32 const tileno = (m_videoram[tile_index]) | ((m_videoram[tile_index | 0x1000] & 0x38) << 5) | ((m_gfx_ctrl & 1) << 11);
+	u16 const palno = (m_videoram[tile_index | 0x1000] & 0x07);
 
 	SET_TILE_INFO_MEMBER(0, tileno, palno, 0);
 }
@@ -106,26 +113,27 @@ TILE_GET_INFO_MEMBER(homerun_state::get_homerun_tile_info)
 
 void homerun_state::video_start()
 {
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(homerun_state::get_homerun_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(homerun_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+
+	save_item(NAME(m_gfx_ctrl));
+	save_item(NAME(m_scrolly));
+	save_item(NAME(m_scrollx));
 }
 
 
-void homerun_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
+void homerun_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t *spriteram = m_spriteram;
-	int offs;
-
-	for (offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
+	for (int offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
-		if (spriteram[offs + 0] == 0)
+		if (m_spriteram[offs + 0] == 0)
 			continue;
 
-		int sy = spriteram[offs + 0] - 16 + 1;
-		int sx = spriteram[offs + 3];
-		int code = (spriteram[offs + 1]) | ((spriteram[offs + 2] & 0x8) << 5) | ((m_gfx_ctrl & 3) << 9);
-		int color = (spriteram[offs + 2] & 0x07) | 8;
-		int flipx = (spriteram[offs + 2] & 0x40) >> 6;
-		int flipy = (spriteram[offs + 2] & 0x80) >> 7;
+		int const sy     = m_spriteram[offs + 0] - 16 + 1;
+		int const sx     = m_spriteram[offs + 3];
+		u32 const code   = (m_spriteram[offs + 1]) | ((m_spriteram[offs + 2] & 0x8) << 5) | ((m_gfx_ctrl & 3) << 9);
+		u32 const color  = (m_spriteram[offs + 2] & 0x07) | 8;
+		bool const flipx = (m_spriteram[offs + 2] & 0x40) >> 6;
+		bool const flipy = (m_spriteram[offs + 2] & 0x80) >> 7;
 
 		if (sy >= 0)
 		{
@@ -137,7 +145,7 @@ void homerun_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 	}
 }
 
-uint32_t homerun_state::screen_update_homerun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 homerun_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_tilemap->set_scrolly(0, m_scrolly);
 	m_tilemap->set_scrollx(0, m_scrollx);

@@ -14,6 +14,7 @@ namespace netlist
 {
 	namespace devices
 	{
+	//FIXME: Convert sub devices into NETDEV_DELEGATE logic
 	NETLIB_OBJECT(9310_subABCD)
 	{
 		NETLIB_CONSTRUCTOR(9310_subABCD)
@@ -139,8 +140,8 @@ namespace netlist
 
 	NETLIB_RESET(9310)
 	{
-		sub.do_reset();
-		subABCD.do_reset();
+		sub.reset();
+		subABCD.reset();
 	}
 
 	NETLIB_RESET(9310_subABCD)
@@ -262,8 +263,8 @@ namespace netlist
 	#endif
 	}
 
-	NETLIB_DEVICE_IMPL(9310)
-	NETLIB_DEVICE_IMPL(9310_dip)
+	NETLIB_DEVICE_IMPL(9310,     "TTL_9310",     "")
+	NETLIB_DEVICE_IMPL(9310_dip, "TTL_9310_DIP", "")
 
 	} //namespace devices
 } // namespace netlist

@@ -61,15 +61,16 @@ TODO:
 class enigma2_state : public driver_device
 {
 public:
-	enigma2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	enigma2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_colors(*this, "colors"),
-		m_stars(*this, "stars"){ }
+		m_stars(*this, "stars")
+	{ }
 
 	void enigma2(machine_config &config);
 	void enigma2a(machine_config &config);
@@ -620,15 +621,15 @@ MACHINE_CONFIG_START(enigma2_state::enigma2)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(enigma2_state, screen_update_enigma2)
 
-	MCFG_PALETTE_ADD_3BIT_BGR("palette")
+	PALETTE(config, m_palette, palette_device::BGR_3BIT);
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, AY8910_CLOCK)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, enigma2_state, sound_latch_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, enigma2_state, protection_data_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ay8910_device &aysnd(AY8910(config, "aysnd", AY8910_CLOCK));
+	aysnd.port_a_read_callback().set(FUNC(enigma2_state::sound_latch_r));
+	aysnd.port_b_write_callback().set(FUNC(enigma2_state::protection_data_w));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 
@@ -652,10 +653,10 @@ MACHINE_CONFIG_START(enigma2_state::enigma2a)
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, AY8910_CLOCK)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, enigma2_state, sound_latch_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, enigma2_state, protection_data_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ay8910_device &aysnd(AY8910(config, "aysnd", AY8910_CLOCK));
+	aysnd.port_a_read_callback().set(FUNC(enigma2_state::sound_latch_r));
+	aysnd.port_b_write_callback().set(FUNC(enigma2_state::protection_data_w));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 

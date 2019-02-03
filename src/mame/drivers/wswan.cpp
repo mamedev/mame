@@ -62,6 +62,11 @@ void wswan_state::wswan_io(address_map &map)
 	map(0x00, 0xff).rw(FUNC(wswan_state::port_r), FUNC(wswan_state::port_w));   // I/O ports
 }
 
+void wswan_state::wswan_snd(address_map &map)
+{
+	map(0x00000, 0x03fff).r(m_vdp, FUNC(wswan_video_device::vram_r));
+}
+
 static INPUT_PORTS_START( wswan )
 	PORT_START("CURSX")
 	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_NAME("X1 - Up")
@@ -85,22 +90,22 @@ static GFXDECODE_START( gfx_wswan )
 GFXDECODE_END
 
 /* WonderSwan can display 16 shades of grey */
-PALETTE_INIT_MEMBER(wswan_state, wswan)
+void wswan_state::wswan_palette(palette_device &palette) const
 {
 	for (int i = 0; i < 16; i++)
 	{
-		uint8_t shade = i * (256 / 16);
+		uint8_t const shade = i * (256 / 16);
 		palette.set_pen_color(15 - i, shade, shade, shade);
 	}
 }
 
-PALETTE_INIT_MEMBER(wscolor_state, wscolor)
+void wscolor_state::wscolor_palette(palette_device &palette) const
 {
 	for (int i = 0; i < 4096; i++)
 	{
-		int r = (i & 0x0f00) >> 8;
-		int g = (i & 0x00f0) >> 4;
-		int b = i & 0x000f;
+		int const r = (i & 0x0f00) >> 8;
+		int const g = (i & 0x00f0) >> 4;
+		int const b = i & 0x000f;
 		palette.set_pen_color(i, r << 4, g << 4, b << 4);
 	}
 }
@@ -118,10 +123,10 @@ MACHINE_CONFIG_START(wswan_state::wswan)
 	MCFG_DEVICE_PROGRAM_MAP(wswan_mem)
 	MCFG_DEVICE_IO_MAP(wswan_io)
 
-	MCFG_DEVICE_ADD(m_vdp, WSWAN_VIDEO, 0)
-	MCFG_WSWAN_VIDEO_TYPE(VDP_TYPE_WSWAN)
-	MCFG_WSWAN_VIDEO_IRQ_CB(wswan_state, set_irq_line)
-	MCFG_WSWAN_VIDEO_DMASND_CB(wswan_state, dma_sound_cb)
+	WSWAN_VIDEO(config, m_vdp, 0);
+	m_vdp->set_vdp_type(VDP_TYPE_WSWAN);
+	m_vdp->set_irq_callback(FUNC(wswan_state::set_irq_line), this);
+	m_vdp->set_dmasnd_callback(FUNC(wswan_state::dma_sound_cb), this);
 
 	MCFG_SCREEN_ADD("screen", LCD)
 //  MCFG_SCREEN_REFRESH_RATE(75)
@@ -132,20 +137,20 @@ MACHINE_CONFIG_START(wswan_state::wswan)
 	MCFG_SCREEN_RAW_PARAMS(3.072_MHz_XTAL, 256, 0, WSWAN_X_PIXELS, 159, 0, WSWAN_Y_PIXELS)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEFAULT_LAYOUT(layout_wswan)
+	config.set_default_layout(layout_wswan);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wswan)
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(wswan_state, wswan)
+	PALETTE(config, "palette", FUNC(wswan_state::wswan_palette), 16);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD(m_sound, WSWAN_SND, 0)
+	MCFG_DEVICE_ADD(m_sound, WSWAN_SND, 3.072_MHz_XTAL)
+	MCFG_DEVICE_ADDRESS_MAP(0, wswan_snd)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
@@ -153,31 +158,29 @@ MACHINE_CONFIG_START(wswan_state::wswan)
 	MCFG_DEVICE_ADD(m_cart, WS_CART_SLOT, 3.072_MHz_XTAL / 8, wswan_cart, nullptr)
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","wswan")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("wsc_list","wscolor")
+	SOFTWARE_LIST(config, "cart_list").set_original("wswan");
+	SOFTWARE_LIST(config, "wsc_list").set_compatible("wscolor");
 
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("pc2_list","pockchalv2")
+	SOFTWARE_LIST(config, "pc2_list").set_compatible("pockchalv2");
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(wscolor_state::wscolor)
+void wscolor_state::wscolor(machine_config &config)
+{
 	wswan(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(wscolor_mem)
+	m_maincpu->set_addrmap(AS_PROGRAM, &wscolor_state::wscolor_mem);
 
-	MCFG_DEVICE_MODIFY("vdp")
-	MCFG_WSWAN_VIDEO_TYPE(VDP_TYPE_WSC)
+	m_vdp->set_vdp_type(VDP_TYPE_WSC);
 
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(4096)
-	MCFG_PALETTE_INIT_OWNER(wscolor_state, wscolor)
+	auto &palette(*subdevice<palette_device>("palette"));
+	palette.set_entries(4096);
+	palette.set_init(FUNC(wscolor_state::wscolor_palette));
 
 	/* software lists */
-	MCFG_DEVICE_REMOVE("cart_list")
-	MCFG_DEVICE_REMOVE("wsc_list")
-	MCFG_SOFTWARE_LIST_ADD("cart_list","wscolor")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("ws_list","wswan")
-MACHINE_CONFIG_END
+	config.device_remove("wsc_list");
+	SOFTWARE_LIST(config.replace(), "cart_list").set_original("wscolor");
+	SOFTWARE_LIST(config, "ws_list").set_compatible("wswan");
+}
 
 /***************************************************************************
 
@@ -187,12 +190,12 @@ MACHINE_CONFIG_END
 
 ROM_START( wswan )
 	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
-//  ROM_LOAD_OPTIONAL( "ws_bios.bin", 0x0000, 0x0001, NO_DUMP )
+//  ROM_LOAD( "ws_bios.bin", 0x0000, 0x0001, NO_DUMP )
 ROM_END
 
 ROM_START( wscolor )
 	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
-//  ROM_LOAD_OPTIONAL( "wsc_bios.bin", 0x0000, 0x0001, NO_DUMP )
+//  ROM_LOAD( "wsc_bios.bin", 0x0000, 0x0001, NO_DUMP )
 ROM_END
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS          INIT        COMPANY   FULLNAME

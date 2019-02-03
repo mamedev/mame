@@ -57,14 +57,6 @@ DEFINE_DEVICE_TYPE(A2BUS_HSSCSI, a2bus_hsscsi_device, "a2hsscsi", "Apple II High
 #define SCSI_BUS_TAG     "scsibus"
 #define SCSI_5380_TAG    "scsibus:7:ncr5380"
 
-void a2bus_hsscsi_device::ncr5380(device_t *device)
-{
-	devcb_base *devcb;
-	(void)devcb;
-	MCFG_DEVICE_CLOCK(10000000)
-	MCFG_NCR5380N_DRQ_HANDLER(WRITELINE("^^", a2bus_hsscsi_device, drq_w))
-}
-
 static void hsscsi_devices(device_slot_interface &device)
 {
 	device.option_add("cdrom", NSCSI_CDROM);
@@ -85,18 +77,21 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(a2bus_hsscsi_device::device_add_mconfig)
-	MCFG_NSCSI_BUS_ADD(SCSI_BUS_TAG)
-	MCFG_NSCSI_ADD("scsibus:0", hsscsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:1", hsscsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:2", hsscsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:3", hsscsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:4", hsscsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:5", hsscsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:6", hsscsi_devices, "harddisk", false)
-	MCFG_NSCSI_ADD("scsibus:7", hsscsi_devices, "ncr5380", true)
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("ncr5380", ncr5380)
-MACHINE_CONFIG_END
+void a2bus_hsscsi_device::device_add_mconfig(machine_config &config)
+{
+	NSCSI_BUS(config, m_scsibus);
+	NSCSI_CONNECTOR(config, "scsibus:0", hsscsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsibus:1", hsscsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsibus:2", hsscsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsibus:3", hsscsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsibus:4", hsscsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsibus:5", hsscsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsibus:6", hsscsi_devices, "harddisk", false);
+	NSCSI_CONNECTOR(config, "scsibus:7", hsscsi_devices, "ncr5380", true).set_option_machine_config("ncr5380", [this](device_t *device) {
+		device->set_clock(10000000);
+		downcast<ncr5380n_device &>(*device).drq_handler().set(*this, FUNC(a2bus_hsscsi_device::drq_w));
+	});
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

@@ -38,7 +38,7 @@ IC22 (1F4*2 bytes starting @ 0x0c0000, code at 0x0000069E) \ Tested as 0x3e8 (10
 IC23 (1F4*2 bytes starting @ 0x0c0001, code at 0x000006AA) / Cleared at 0x00000440 as 0x4000 bytes.
 IC24 (1F4*2 bytes starting @ 0x100001, code at 0x000006B8) > Shared RAM
 
-The shared ram is tested and cleared almost the same as the other RAM,
+The shared RAM is tested and cleared almost the same as the other RAM,
 and is mapped into the master at E0000. Only every odd byte is used.
 
 The first 0x10 bytes are used heavily as registers
@@ -198,8 +198,17 @@ public:
 		m_traverse_io(*this, "TRAVERSE"),
 		m_elevate_io(*this, "ELEVATE"),
 		m_accel_io(*this, "ACCEL"),
-		m_handle_io(*this, "HANDLE")  { }
+		m_handle_io(*this, "HANDLE")
+	{ }
 
+	void init_cybertnk();
+
+	void cybertnk(machine_config &config);
+
+protected:
+	virtual void video_start() override;
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -228,15 +237,12 @@ public:
 	DECLARE_READ8_MEMBER(mux_r);
 	DECLARE_WRITE8_MEMBER(irq_ack_w);
 	DECLARE_WRITE8_MEMBER(cnt_w);
-	void init_cybertnk();
 	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
-	virtual void video_start() override;
 	void draw_road(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int screen_shift, int pri);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int screen_shift);
 	uint32_t update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int screen_shift);
 	uint32_t screen_update_cybertnk_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cybertnk_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void cybertnk(machine_config &config);
 	void master_mem(address_map &map);
 	void slave_mem(address_map &map);
 	void sound_mem(address_map &map);
@@ -825,10 +831,10 @@ MACHINE_CONFIG_START(cybertnk_state::cybertnk)
 	MCFG_DEVICE_ADD("audiocpu", Z80,XTAL(3'579'545))
 	MCFG_DEVICE_PROGRAM_MAP(sound_mem)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60000))//arbitrary value,needed to get the communication to work
+	config.m_minimum_quantum = attotime::from_hz(60000); //arbitrary value, needed to get the communication to work
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+	config.set_default_layout(layout_dualhsxs);
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -836,7 +842,7 @@ MACHINE_CONFIG_START(cybertnk_state::cybertnk)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cybertnk_state, screen_update_cybertnk_left)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -844,18 +850,17 @@ MACHINE_CONFIG_START(cybertnk_state::cybertnk)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cybertnk_state, screen_update_cybertnk_right)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cybertnk)
-	MCFG_PALETTE_ADD("palette", 0x4000)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cybertnk);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x4000);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(HOLDLINE("audiocpu", 0))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0, HOLD_LINE);
 
 	// Splited output per chip
 	MCFG_DEVICE_ADD("ym1", Y8950, XTAL(3'579'545))

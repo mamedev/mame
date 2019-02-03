@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Roberto Fresca
+#ifndef MAME_INCLUDES_SNOOKR10_H
+#define MAME_INCLUDES_SNOOKR10_H
+
+#pragma once
 
 #include "emupal.h"
 
@@ -30,11 +34,11 @@ private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(apple10_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(crystalc_get_bg_tile_info);
-	DECLARE_PALETTE_INIT(snookr10);
+	void snookr10_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(apple10);
 	DECLARE_VIDEO_START(crystalc);
-	DECLARE_PALETTE_INIT(apple10);
-	DECLARE_PALETTE_INIT(crystalc);
+	void apple10_palette(palette_device &palette) const;
+	void crystalc_palette(palette_device &palette) const;
 	uint32_t screen_update_snookr10(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void crystalc_map(address_map &map);
 	void snookr10_map(address_map &map);
@@ -58,3 +62,5 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	output_finder<7> m_lamps;
 };
+
+#endif // MAME_INCLUDES_SNOOKR10_H

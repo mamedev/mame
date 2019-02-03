@@ -12,8 +12,8 @@
 
 DEFINE_DEVICE_TYPE(PC_LPT, pc_lpt_device, "pc_lpt", "PC LPT")
 
-pc_lpt_device::pc_lpt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PC_LPT, tag, owner, clock),
+pc_lpt_device::pc_lpt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, PC_LPT, tag, owner, clock),
 	m_irq(1),
 	m_data(0xff), m_control(0),
 	m_irq_enabled(1),
@@ -46,33 +46,35 @@ void pc_lpt_device::device_reset()
 	m_cent_ctrl_out->write(m_control);
 }
 
-MACHINE_CONFIG_START(pc_lpt_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_DATA_INPUT_BUFFER("cent_data_in")
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit3))
-	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit4))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit5))
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, pc_lpt_device, write_centronics_ack))
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit7))
+void pc_lpt_device::device_add_mconfig(machine_config &config)
+{
+	centronics_device &centronics(CENTRONICS(config, "centronics", centronics_devices, "printer"));
+	centronics.set_data_input_buffer(m_cent_data_in);
+	centronics.fault_handler().set(m_cent_status_in, FUNC(input_buffer_device::write_bit3));
+	centronics.select_handler().set(m_cent_status_in, FUNC(input_buffer_device::write_bit4));
+	centronics.perror_handler().set(m_cent_status_in, FUNC(input_buffer_device::write_bit5));
+	centronics.ack_handler().set(FUNC(pc_lpt_device::write_centronics_ack));
+	centronics.busy_handler().set(m_cent_status_in, FUNC(input_buffer_device::write_bit7));
 
-	MCFG_CENTRONICS_STROBE_HANDLER(WRITELINE("cent_ctrl_in", input_buffer_device, write_bit0))
-	MCFG_CENTRONICS_AUTOFD_HANDLER(WRITELINE("cent_ctrl_in", input_buffer_device, write_bit1))
-	MCFG_CENTRONICS_INIT_HANDLER(WRITELINE("cent_ctrl_in", input_buffer_device, write_bit2))
-	MCFG_CENTRONICS_SELECT_IN_HANDLER(WRITELINE("cent_ctrl_in", input_buffer_device, write_bit3))
+	centronics.strobe_handler().set(m_cent_ctrl_in, FUNC(input_buffer_device::write_bit0));
+	centronics.autofd_handler().set(m_cent_ctrl_in, FUNC(input_buffer_device::write_bit1));
+	centronics.init_handler().set(m_cent_ctrl_in, FUNC(input_buffer_device::write_bit2));
+	centronics.select_in_handler().set(m_cent_ctrl_in, FUNC(input_buffer_device::write_bit3));
 
-	MCFG_DEVICE_ADD("cent_data_in", INPUT_BUFFER, 0)
-	MCFG_DEVICE_ADD("cent_ctrl_in", INPUT_BUFFER, 0)
-	MCFG_DEVICE_ADD("cent_status_in", INPUT_BUFFER, 0)
+	INPUT_BUFFER(config, m_cent_data_in);
+	INPUT_BUFFER(config, m_cent_ctrl_in);
+	INPUT_BUFFER(config, m_cent_status_in);
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	OUTPUT_LATCH(config, m_cent_data_out);
+	centronics.set_output_latch(*m_cent_data_out);
 
-	MCFG_DEVICE_ADD("cent_ctrl_out", OUTPUT_LATCH, 0)
-	MCFG_OUTPUT_LATCH_BIT0_HANDLER(WRITELINE("centronics", centronics_device, write_strobe))
-	MCFG_OUTPUT_LATCH_BIT1_HANDLER(WRITELINE("centronics", centronics_device, write_autofd))
-	MCFG_OUTPUT_LATCH_BIT2_HANDLER(WRITELINE("centronics", centronics_device, write_init))
-	MCFG_OUTPUT_LATCH_BIT3_HANDLER(WRITELINE("centronics", centronics_device, write_select_in))
-	MCFG_OUTPUT_LATCH_BIT4_HANDLER(WRITELINE(*this, pc_lpt_device, write_irq_enabled))
-MACHINE_CONFIG_END
+	OUTPUT_LATCH(config, m_cent_ctrl_out);
+	m_cent_ctrl_out->bit_handler<0>().set("centronics", FUNC(centronics_device::write_strobe));
+	m_cent_ctrl_out->bit_handler<1>().set("centronics", FUNC(centronics_device::write_autofd));
+	m_cent_ctrl_out->bit_handler<2>().set("centronics", FUNC(centronics_device::write_init));
+	m_cent_ctrl_out->bit_handler<3>().set("centronics", FUNC(centronics_device::write_select_in));
+	m_cent_ctrl_out->bit_handler<4>().set(FUNC(pc_lpt_device::write_irq_enabled));
+}
 
 
 READ8_MEMBER( pc_lpt_device::data_r )

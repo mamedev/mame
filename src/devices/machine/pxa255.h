@@ -21,14 +21,6 @@
 
 #include "pxa255defs.h"
 
-#define MCFG_PXA255_GPIO0_SET_CALLBACK(_devcb) \
-	devcb = &downcast<pxa255_periphs_device &>(*device).set_gpio0_set_cb(DEVCB_##_devcb);
-
-#define MCFG_PXA255_GPIO0_CLEAR_CALLBACK(_devcb) \
-	devcb = &downcast<pxa255_periphs_device &>(*device).set_gpio0_clear_cb(DEVCB_##_devcb);
-
-#define MCFG_PXA255_GPIO0_IN_CALLBACK(_devcb) \
-	devcb = &downcast<pxa255_periphs_device &>(*device).set_gpio0_in_cb(DEVCB_##_devcb);
 
 class pxa255_periphs_device : public device_t
 {
@@ -42,9 +34,9 @@ public:
 
 	pxa255_periphs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_gpio0_set_cb(Object &&cb) { return m_gpio0_set_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_gpio0_clear_cb(Object &&cb) { return m_gpio0_clear_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_gpio0_in_cb(Object &&cb) { return m_gpio0_in_func.set_callback(std::forward<Object>(cb)); }
+	auto gpio0_set_cb() { return m_gpio0_set_func.bind(); }
+	auto gpio0_clear_cb() { return m_gpio0_clear_func.bind(); }
+	auto gpio0_in_cb() { return m_gpio0_in_func.bind(); }
 
 	DECLARE_READ32_MEMBER(pxa255_i2s_r);
 	DECLARE_WRITE32_MEMBER(pxa255_i2s_w);

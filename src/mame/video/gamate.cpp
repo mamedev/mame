@@ -26,7 +26,6 @@
 
 #include "emu.h"
 #include "video/gamate.h"
-#include "rendlay.h"
 #include "screen.h"
 
 DEFINE_DEVICE_TYPE(GAMATE_VIDEO, gamate_video_device, "gamate_vid", "Gamate Video Hardware")
@@ -262,13 +261,13 @@ int gamate_video_device::get_pixel_from_vram(int x, int y)
 
 uint32_t gamate_video_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		//printf("updating scanline %d\n", y);
 		int real_x, real_y;
 		get_real_x_and_y(real_x, real_y, y);
 
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			int pix = get_pixel_from_vram(x + real_x, real_y);
 
@@ -294,7 +293,7 @@ static const unsigned char palette_gamate[] = {
 	0x6B, 0xA6, 0x4A, 0x43, 0x7A, 0x63, 0x25, 0x59, 0x55, 0x12, 0x42, 0x4C
 };
 
-PALETTE_INIT_MEMBER(gamate_video_device, gamate)
+void gamate_video_device::gamate_palette(palette_device &palette) const
 {
 	for (int i = 0; i < 4; i++)
 		palette.set_pen_color(i, palette_gamate[i * 3 + 0], palette_gamate[i * 3 + 1], palette_gamate[i * 3 + 2]);
@@ -316,10 +315,7 @@ MACHINE_CONFIG_START(gamate_video_device::device_add_mconfig)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE) // close approximate until we use timers to emulate exact video update
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
-
-	MCFG_PALETTE_ADD("palette", 4)
-	MCFG_PALETTE_INIT_OWNER(gamate_video_device,gamate)
+	PALETTE(config, "palette", FUNC(gamate_video_device::gamate_palette), 4);
 MACHINE_CONFIG_END
 
 void gamate_video_device::device_start()

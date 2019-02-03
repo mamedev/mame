@@ -189,7 +189,7 @@ void mz_state::mz800_io(address_map &map)
 	map(0xeb, 0xeb).w(FUNC(mz_state::mz800_ramaddr_w));
 	map(0xf0, 0xf0).portr("atari_joy1").w(FUNC(mz_state::mz800_palette_w));
 	map(0xf1, 0xf1).portr("atari_joy2");
-	map(0xf2, 0xf2).w("sn76489n", FUNC(sn76489_device::command_w));
+	map(0xf2, 0xf2).w("sn76489n", FUNC(sn76489_device::write));
 	map(0xfc, 0xff).rw("z80pio", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 }
 
@@ -377,12 +377,8 @@ MACHINE_CONFIG_START(mz_state::mz700)
 	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(17'734'470)/5)
 	MCFG_DEVICE_PROGRAM_MAP(mz700_mem)
 	MCFG_DEVICE_IO_MAP(mz700_io)
-	MCFG_DEVICE_ADD("banke", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(mz700_banke)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
+
+	ADDRESS_MAP_BANK(config, "banke").set_map(&mz_state::mz700_banke).set_options(ENDIANNESS_LITTLE, 8, 16, 0x2000);
 
 	MCFG_MACHINE_RESET_OVERRIDE(mz_state, mz700)
 
@@ -390,10 +386,10 @@ MACHINE_CONFIG_START(mz_state::mz700)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(17'734'470)/2, 568, 0, 40*8, 312, 0, 25*8)
 	MCFG_SCREEN_UPDATE_DRIVER(mz_state, screen_update_mz700)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_PALETTE_ADD_3BIT_RGB("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mz700)
+	PALETTE(config, m_palette, palette_device::RGB_3BIT);
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_mz700);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -401,56 +397,51 @@ MACHINE_CONFIG_START(mz_state::mz700)
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* ne556 timers */
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("cursor", mz_state, ne556_cursor_callback, attotime::from_hz(1.5))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("other", mz_state, ne556_other_callback, attotime::from_hz(34.5))
+	TIMER(config, "cursor").configure_periodic(FUNC(mz_state::ne556_cursor_callback), attotime::from_hz(1.5));
+	TIMER(config, "other").configure_periodic(FUNC(mz_state::ne556_other_callback), attotime::from_hz(34.5));
 
 	/* devices */
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(17'734'470)/20)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, mz_state, pit_out0_changed))
-	MCFG_PIT8253_CLK1(15611.0)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("pit8253", pit8253_device, write_clk2))
-	MCFG_PIT8253_CLK2(0)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, mz_state, pit_irq_2))
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(XTAL(17'734'470)/20);
+	m_pit->out_handler<0>().set(FUNC(mz_state::pit_out0_changed));
+	m_pit->set_clk<1>(15611.0);
+	m_pit->out_handler<1>().set(m_pit, FUNC(pit8253_device::write_clk2));
+	m_pit->set_clk<2>(0);
+	m_pit->out_handler<2>().set(FUNC(mz_state::pit_irq_2));
 
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, mz_state, pio_port_a_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, mz_state, pio_port_b_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, mz_state, pio_port_c_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mz_state, pio_port_c_w))
+	I8255(config, m_ppi);
+	m_ppi->out_pa_callback().set(FUNC(mz_state::pio_port_a_w));
+	m_ppi->in_pb_callback().set(FUNC(mz_state::pio_port_b_r));
+	m_ppi->in_pc_callback().set(FUNC(mz_state::pio_port_c_r));
+	m_ppi->out_pc_callback().set(FUNC(mz_state::pio_port_c_w));
 
-	MCFG_DEVICE_ADD("ls145", TTL74145, 0)
+	TTL74145(config, m_ls145);
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(mz700_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("mz_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(mz700_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_interface("mz_cass");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list","mz700_cass")
+	SOFTWARE_LIST(config, "cass_list").set_original("mz700_cass");
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(mz_state::mz800)
 	mz700(config);
-	MCFG_DEVICE_REMOVE("banke")
+	config.device_remove("banke");
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(mz800_mem)
 	MCFG_DEVICE_IO_MAP(mz800_io)
-	MCFG_DEVICE_ADD("bankf", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(mz800_bankf)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
+
+	ADDRESS_MAP_BANK(config, "bankf").set_map(&mz_state::mz800_bankf).set_options(ENDIANNESS_LITTLE, 8, 16, 0x2000);
 
 	MCFG_MACHINE_RESET_OVERRIDE(mz_state, mz800)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_mz800)
+	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_mz800);
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(mz_state, screen_update_mz800)
@@ -458,22 +449,22 @@ MACHINE_CONFIG_START(mz_state::mz800)
 	MCFG_DEVICE_ADD("sn76489n", SN76489, XTAL(17'734'470)/5)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_DEVICE_REMOVE("cass_list")
-	MCFG_SOFTWARE_LIST_ADD("cass_list","mz800_cass")
+	config.device_remove("cass_list");
+	SOFTWARE_LIST(config, "cass_list").set_original("mz800_cass");
 
 	/* devices */
-	MCFG_DEVICE_MODIFY("pit8253")
-	MCFG_PIT8253_CLK0(XTAL(17'734'470)/16)
+	m_pit->set_clk<0>(XTAL(17'734'470)/16);
 
-	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL(17'734'470)/5)
-	MCFG_Z80PIO_OUT_INT_CB(WRITELINE(*this, mz_state, mz800_z80pio_irq))
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, mz_state, mz800_z80pio_port_a_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, mz_state, mz800_z80pio_port_a_w))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
+	z80pio_device& pio(Z80PIO(config, "z80pio", XTAL(17'734'470)/5));
+	pio.out_int_callback().set(FUNC(mz_state::mz800_z80pio_irq));
+	pio.in_pa_callback().set(FUNC(mz_state::mz800_z80pio_port_a_r));
+	pio.out_pa_callback().set(FUNC(mz_state::mz800_z80pio_port_a_w));
+	pio.out_pb_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
 MACHINE_CONFIG_END
 
 

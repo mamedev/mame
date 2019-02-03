@@ -21,8 +21,8 @@
 class polepos_state : public driver_device
 {
 public:
-	polepos_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	polepos_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
 		m_subcpu2(*this, "sub2"),
@@ -36,7 +36,8 @@ public:
 		m_view16_memory(*this, "view16_memory"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	DECLARE_CUSTOM_INPUT_MEMBER(auto_start_r);
 
@@ -114,7 +115,7 @@ private:
 	DECLARE_WRITE8_MEMBER(bootleg_soundlatch_w);
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	TILE_GET_INFO_MEMBER(tx_get_tile_info);
-	DECLARE_PALETTE_INIT(polepos);
+	void polepos_palette(palette_device &palette);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 	void draw_road(bitmap_ind16 &bitmap);

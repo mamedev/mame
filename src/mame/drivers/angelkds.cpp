@@ -13,7 +13,7 @@ Both games appear to be joint Sega / Nasco efforts
  but I think that has something to do with Nasco   )
 
 Space Position is encrypted, the main processor is
-D317-0005 (NEC Z80 Custom), see machine/segacrpt.c
+D317-0005 (NEC Z80 Custom), see machine/segacrpt.cpp
 for details on this encryption scheme
 
 */
@@ -517,71 +517,70 @@ void angelkds_state::machine_reset()
 	m_bgtopbank = 0;
 }
 
-MACHINE_CONFIG_START(angelkds_state::angelkds)
+void angelkds_state::angelkds(machine_config &config)
+{
+	Z80(config, m_maincpu, XTAL(6'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &angelkds_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &angelkds_state::main_portmap);
+	m_maincpu->set_vblank_int("screen", FUNC(angelkds_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(6'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_IO_MAP(main_portmap)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", angelkds_state,  irq0_line_hold)
+	Z80(config, m_subcpu, XTAL(4'000'000));
+	m_subcpu->set_addrmap(AS_PROGRAM, &angelkds_state::sub_map);
+	m_subcpu->set_addrmap(AS_IO, &angelkds_state::sub_portmap);
 
-	MCFG_DEVICE_ADD("sub", Z80, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(sub_map)
-	MCFG_DEVICE_IO_MAP(sub_portmap)
+	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
+	ppi0.in_pa_callback().set_ioport("I40");
+	ppi0.in_pb_callback().set_ioport("I41");
+	ppi0.in_pc_callback().set(FUNC(angelkds_state::angeklds_ff_r)); // or left inputs don't work
+	ppi0.out_pc_callback().set(FUNC(angelkds_state::angelkds_cpu_bank_write));
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("I40"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("I41"))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, angelkds_state, angeklds_ff_r)) // or left inputs don't work
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, angelkds_state, angelkds_cpu_bank_write))
+	i8255_device &ppi1(I8255A(config, "ppi8255_1"));
+	ppi1.in_pa_callback().set_ioport("I80");
+	ppi1.in_pb_callback().set_ioport("I81");
+	ppi1.in_pc_callback().set_ioport("I82");
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("I80"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("I81"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("I82"))
-
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(angelkds_state, screen_update_angelkds)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(angelkds_state::screen_update_angelkds));
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_angelkds)
-	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
-
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_angelkds);
+	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 0x100);
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(4'000'000))
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("sub", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.65)
-	MCFG_SOUND_ROUTE(1, "mono", 0.65)
-	MCFG_SOUND_ROUTE(2, "mono", 0.65)
-	MCFG_SOUND_ROUTE(3, "mono", 0.45)
+	ym2203_device &ym1(YM2203(config, "ym1", XTAL(4'000'000)));
+	ym1.irq_handler().set_inputline(m_subcpu, 0);
+	ym1.add_route(0, "mono", 0.65);
+	ym1.add_route(1, "mono", 0.65);
+	ym1.add_route(2, "mono", 0.65);
+	ym1.add_route(3, "mono", 0.45);
 
-	MCFG_DEVICE_ADD("ym2", YM2203, XTAL(4'000'000))
-	MCFG_SOUND_ROUTE(0, "mono", 0.65)
-	MCFG_SOUND_ROUTE(1, "mono", 0.65)
-	MCFG_SOUND_ROUTE(2, "mono", 0.65)
-	MCFG_SOUND_ROUTE(3, "mono", 0.45)
-MACHINE_CONFIG_END
+	ym2203_device &ym2(YM2203(config, "ym2", XTAL(4'000'000)));
+	ym2.add_route(0, "mono", 0.65);
+	ym2.add_route(1, "mono", 0.65);
+	ym2.add_route(2, "mono", 0.65);
+	ym2.add_route(3, "mono", 0.45);
+}
 
-MACHINE_CONFIG_START(angelkds_state::spcpostn)
+void angelkds_state::spcpostn(machine_config &config)
+{
 	angelkds(config);
-	/* encryption */
-	MCFG_DEVICE_REPLACE("maincpu", SEGA_317_0005, XTAL(6'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_IO_MAP(main_portmap)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", angelkds_state,  irq0_line_hold)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
 
-MACHINE_CONFIG_END
+	/* encryption */
+	sega_317_0005_device &maincpu(SEGA_317_0005(config.replace(), m_maincpu, XTAL(6'000'000)));
+	maincpu.set_addrmap(AS_PROGRAM, &angelkds_state::main_map);
+	maincpu.set_addrmap(AS_IO, &angelkds_state::main_portmap);
+	maincpu.set_vblank_int("screen", FUNC(angelkds_state::irq0_line_hold));
+	maincpu.set_addrmap(AS_OPCODES, &angelkds_state::decrypted_opcodes_map);
+	maincpu.set_decrypted_tag(m_decrypted_opcodes);
+}
 
 /*** Rom Loading
 

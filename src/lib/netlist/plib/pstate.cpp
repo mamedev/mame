@@ -59,7 +59,6 @@ void state_manager_t::post_load()
 
 template<> void state_manager_t::save_item(const void *owner, callback_t &state, const pstring &stname)
 {
-	//save_state_ptr(stname, DT_CUSTOM, 0, 1, &state);
 	callback_t *state_p = &state;
 	auto p = plib::make_unique<entry_t>(stname, owner, state_p);
 	m_custom.push_back(std::move(p));

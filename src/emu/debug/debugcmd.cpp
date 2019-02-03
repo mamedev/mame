@@ -160,6 +160,7 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	m_console.register_command("ge",        CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_go_exception, this, _1, _2));
 	m_console.register_command("gtime",     CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_go_time, this, _1, _2));
 	m_console.register_command("gt",        CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_go_time, this, _1, _2));
+	m_console.register_command("gp",        CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_go_privilege, this, _1, _2));
 	m_console.register_command("next",      CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_commands::execute_next, this, _1, _2));
 	m_console.register_command("n",         CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_commands::execute_next, this, _1, _2));
 	m_console.register_command("focus",     CMDFLAG_NONE, 0, 1, 1, std::bind(&debugger_commands::execute_focus, this, _1, _2));
@@ -294,7 +295,7 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	/* set up the initial debugscript if specified */
 	const char* name = m_machine.options().debug_script();
 	if (name[0] != 0)
-		m_cpu.source_script(name);
+		m_console.source_script(name);
 
 	m_cheat.cpu[0] = m_cheat.cpu[1] = 0;
 }
@@ -656,6 +657,18 @@ int debugger_commands::mini_printf(char *buffer, const char *format, int params,
 					param++;
 					params--;
 					break;
+				case 'C':
+				case 'c':
+					if (params == 0)
+					{
+						m_console.printf("Not enough parameters for format!\n");
+						return 0;
+					}
+					p += sprintf(p, "%c", char(*param));
+					param++;
+					params--;
+					break;
+
 			}
 		}
 
@@ -898,6 +911,19 @@ void debugger_commands::execute_go_time(int ref, const std::vector<std::string> 
 	m_cpu.get_visible_cpu()->debug()->go_milliseconds(milliseconds);
 }
 
+
+
+/*-------------------------------------------------
+    execute_go_privilege - execute the gp command
+-------------------------------------------------*/
+void debugger_commands::execute_go_privilege(int ref, const std::vector<std::string> &params)
+{
+	parsed_expression condition(&m_cpu.get_visible_cpu()->debug()->symtable());
+	if (params.size() > 0 && !debug_command_parameter_expression(params[0], condition))
+		return;
+
+	m_cpu.get_visible_cpu()->debug()->go_privilege((condition.is_empty()) ? "1" : condition.original_string());
+}
 
 /*-------------------------------------------------
     execute_next - execute the next command
@@ -3094,7 +3120,7 @@ void debugger_commands::execute_snap(int ref, const std::vector<std::string> &pa
 
 void debugger_commands::execute_source(int ref, const std::vector<std::string> &params)
 {
-	m_cpu.source_script(params[0].c_str());
+	m_console.source_script(params[0].c_str());
 }
 
 
@@ -3162,7 +3188,7 @@ void debugger_commands::execute_memdump(int ref, const std::vector<std::string> 
 					address_space &sp = memory.space(space);
 					bool octal = sp.is_octal();
 					int nc = octal ? (sp.addr_width() + 2) / 3 : (sp.addr_width() + 3) / 4;
-						
+
 					std::vector<memory_entry> entries[2];
 					sp.dump_maps(entries[0], entries[1]);
 					for (int mode = 0; mode < 2; mode ++)

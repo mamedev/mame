@@ -1860,73 +1860,74 @@ MACHINE_RESET_MEMBER(seibuspi_state,spi)
 	m_z80_prg_transfer_pos = 0;
 }
 
-MACHINE_CONFIG_START(seibuspi_state::spi)
-
+void seibuspi_state::spi(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I386, 50_MHz_XTAL / 2) // AMD or Intel 386DX, 25MHz
-	MCFG_DEVICE_PROGRAM_MAP(spi_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seibuspi_state, spi_interrupt)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(seibuspi_state,spi_irq_callback)
+	I386(config, m_maincpu, 50_MHz_XTAL / 2); // AMD or Intel 386DX, 25MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &seibuspi_state::spi_map);
+	m_maincpu->set_vblank_int("screen", FUNC(seibuspi_state::spi_interrupt));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(seibuspi_state::spi_irq_callback));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 28.636363_MHz_XTAL / 4) // Z84C0008PEC, 7.159MHz
-	MCFG_DEVICE_PROGRAM_MAP(spi_soundmap)
+	Z80(config, m_audiocpu, 28.636363_MHz_XTAL / 4); // Z84C0008PEC, 7.159MHz
+	m_audiocpu->set_addrmap(AS_PROGRAM, &seibuspi_state::spi_soundmap);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
+	config.m_minimum_quantum = attotime::from_hz(12000);
 
 	MCFG_MACHINE_RESET_OVERRIDE(seibuspi_state, spi)
 
-	MCFG_DEVICE_ADD("ds2404", DS2404, 32.768_kHz_XTAL)
-	MCFG_DS2404_REF_YEAR(1995)
-	MCFG_DS2404_REF_MONTH(1)
-	MCFG_DS2404_REF_DAY(1)
+	ds2404_device &rtc(DS2404(config, "ds2404", 32.768_kHz_XTAL));
+	rtc.ref_year(1995);
+	rtc.ref_month(1);
+	rtc.ref_day(1);
 
-	MCFG_INTEL_E28F008SA_ADD("soundflash1") // Sharp LH28F008 on newer mainboard revision
-	MCFG_INTEL_E28F008SA_ADD("soundflash2") // "
+	INTEL_E28F008SA(config, "soundflash1"); // Sharp LH28F008 on newer mainboard revision
+	INTEL_E28F008SA(config, "soundflash2"); // "
 
-	MCFG_FIFO7200_ADD("soundfifo1", 0x200) // LH5496D, but on single board hw it's one CY7C421
-	MCFG_FIFO7200_ADD("soundfifo2", 0x200) // "
+	FIFO7200(config, m_soundfifo[0], 0x200); // LH5496D, but on single board hw it's one CY7C421
+	FIFO7200(config, m_soundfifo[1], 0x200); // "
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, SPI_HTOTAL, SPI_HBEND, SPI_HBSTART, SPI_VTOTAL, SPI_VBEND, SPI_VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(seibuspi_state, screen_update_spi)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(PIXEL_CLOCK, SPI_HTOTAL, SPI_HBEND, SPI_HBSTART, SPI_VTOTAL, SPI_VBEND, SPI_VBSTART);
+	screen.set_screen_update(FUNC(seibuspi_state::screen_update_spi));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_spi)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_spi);
 
-	MCFG_PALETTE_ADD_INIT_BLACK("palette", 6144)
+	PALETTE(config, m_palette, palette_device::BLACK, 6144);
 
-	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
-	MCFG_SEIBU_CRTC_DECRYPT_KEY_CB(WRITE16(*this, seibuspi_state, tile_decrypt_key_w))
-	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, seibuspi_state, spi_layer_enable_w))
-	MCFG_SEIBU_CRTC_REG_1A_CB(WRITE16(*this, seibuspi_state, spi_layer_bank_w))
-	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, seibuspi_state, scroll_w))
+	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
+	crtc.decrypt_key_callback().set(FUNC(seibuspi_state::tile_decrypt_key_w));
+	crtc.layer_en_callback().set(FUNC(seibuspi_state::spi_layer_enable_w));
+	crtc.reg_1a_callback().set(FUNC(seibuspi_state::spi_layer_bank_w));
+	crtc.layer_scroll_callback().set(FUNC(seibuspi_state::scroll_w));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymf", YMF271, 16.9344_MHz_XTAL)
-	MCFG_YMF271_IRQ_HANDLER(WRITELINE(*this, seibuspi_state, ymf_irqhandler))
-	MCFG_DEVICE_ADDRESS_MAP(0, spi_ymf271_map)
+	ymf271_device &ymf(YMF271(config, "ymf", 16.9344_MHz_XTAL));
+	ymf.irq_handler().set(FUNC(seibuspi_state::ymf_irqhandler));
+	ymf.set_addrmap(0, &seibuspi_state::spi_ymf271_map);
 
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-//  MCFG_SOUND_ROUTE(2, "lspeaker", 1.0) Output 2/3 not used?
-//  MCFG_SOUND_ROUTE(3, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	ymf.add_route(0, "lspeaker", 1.0);
+	ymf.add_route(1, "rspeaker", 1.0);
+//  ymf.add_route(2, "lspeaker", 1.0); Output 2/3 not used?
+//  ymf.add_route(3, "rspeaker", 1.0);
+}
 
-MACHINE_CONFIG_START(seibuspi_state::ejanhs)
+void seibuspi_state::ejanhs(machine_config &config)
+{
 	spi(config);
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(seibuspi_state, ejanhs)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(seibuspi_state::rdft2)
+void seibuspi_state::rdft2(machine_config &config)
+{
 	spi(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(rdft2_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &seibuspi_state::rdft2_map);
+}
 
 
 /* single boards */
@@ -1938,104 +1939,99 @@ MACHINE_RESET_MEMBER(seibuspi_state,sxx2e)
 	m_sb_coin_latch = 0;
 }
 
-MACHINE_CONFIG_START(seibuspi_state::sxx2e)
+void seibuspi_state::sxx2e(machine_config &config)
+{
 	spi(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(sxx2e_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &seibuspi_state::sxx2e_map);
 
-	MCFG_DEVICE_MODIFY("audiocpu")
-	MCFG_DEVICE_PROGRAM_MAP(sxx2e_soundmap)
+	m_audiocpu->set_addrmap(AS_PROGRAM, &seibuspi_state::sxx2e_soundmap);
 
 	MCFG_MACHINE_RESET_OVERRIDE(seibuspi_state, sxx2e)
 
-	MCFG_DEVICE_REMOVE("soundflash1")
-	MCFG_DEVICE_REMOVE("soundflash2")
+	config.device_remove("soundflash1");
+	config.device_remove("soundflash2");
 
-	MCFG_DEVICE_REMOVE("soundfifo2")
+	config.device_remove("soundfifo2");
 
 	/* sound hardware */
 	 // Single PCBs only output mono sound, SXX2E : unverified
-	MCFG_DEVICE_REMOVE("lspeaker")
-	MCFG_DEVICE_REMOVE("rspeaker")
+	config.device_remove("lspeaker");
+	config.device_remove("rspeaker");
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_REPLACE("ymf", YMF271, 16.9344_MHz_XTAL)
-	MCFG_YMF271_IRQ_HANDLER(WRITELINE(*this, seibuspi_state, ymf_irqhandler))
+	ymf271_device &ymf(YMF271(config.replace(), "ymf", 16.9344_MHz_XTAL));
+	ymf.irq_handler().set(FUNC(seibuspi_state::ymf_irqhandler));
+	ymf.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(seibuspi_state::sxx2f)
+void seibuspi_state::sxx2f(machine_config &config)
+{
 	sxx2e(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(sxx2f_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &seibuspi_state::sxx2f_map);
 
-	MCFG_DEVICE_REMOVE("ds2404")
+	config.device_remove("ds2404");
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	// Z80 is Z84C0006PCS instead of Z84C0008PEC
 	// clock is unknown, possibly slower than 7.159MHz
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(seibuspi_state::sxx2g) // clocks differ, but otherwise same hw as sxx2f
+void seibuspi_state::sxx2g(machine_config &config) // clocks differ, but otherwise same hw as sxx2f
+{
 	sxx2f(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu") // AMD AM386DX/DX-40, 28.63636MHz
-	MCFG_DEVICE_CLOCK(28.636363_MHz_XTAL)
-
-	MCFG_DEVICE_MODIFY("audiocpu") // Z84C0004PCS, 4.9152MHz
-	MCFG_DEVICE_CLOCK(4.9512_MHz_XTAL)
+	m_maincpu->set_clock(28.636363_MHz_XTAL); // AMD AM386DX/DX-40, 28.63636MHz
+	m_audiocpu->set_clock(4.9512_MHz_XTAL); // Z84C0004PCS, 4.9152MHz
 
 	/* sound hardware */
-	MCFG_DEVICE_REPLACE("ymf", YMF271, 16.384_MHz_XTAL) // 16.384MHz(!)
-	MCFG_YMF271_IRQ_HANDLER(WRITELINE(*this, seibuspi_state, ymf_irqhandler))
-
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	ymf271_device &ymf(YMF271(config.replace(), "ymf", 16.384_MHz_XTAL)); // 16.384MHz(!)
+	ymf.irq_handler().set(FUNC(seibuspi_state::ymf_irqhandler));
+	ymf.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 /* SYS386I */
 
-MACHINE_CONFIG_START(seibuspi_state::sys386i)
-
+void seibuspi_state::sys386i(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I386, 40_MHz_XTAL) // AMD 386DX, 40MHz
-	MCFG_DEVICE_PROGRAM_MAP(sys386i_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seibuspi_state, spi_interrupt)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(seibuspi_state,spi_irq_callback)
+	I386(config, m_maincpu, 40_MHz_XTAL); // AMD 386DX, 40MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &seibuspi_state::sys386i_map);
+	m_maincpu->set_vblank_int("screen", FUNC(seibuspi_state::spi_interrupt));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(seibuspi_state::spi_irq_callback));
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, SPI_HTOTAL, SPI_HBEND, SPI_HBSTART, SPI_VTOTAL, SPI_VBEND, SPI_VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(seibuspi_state, screen_update_spi)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(PIXEL_CLOCK, SPI_HTOTAL, SPI_HBEND, SPI_HBSTART, SPI_VTOTAL, SPI_VBEND, SPI_VBSTART);
+	screen.set_screen_update(FUNC(seibuspi_state::screen_update_spi));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_spi)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_spi);
 
-	MCFG_PALETTE_ADD_INIT_BLACK("palette", 6144)
+	PALETTE(config, m_palette, palette_device::BLACK, 6144);
 
-	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
-	MCFG_SEIBU_CRTC_DECRYPT_KEY_CB(WRITE16(*this, seibuspi_state, tile_decrypt_key_w))
-	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, seibuspi_state, spi_layer_enable_w))
-	MCFG_SEIBU_CRTC_REG_1A_CB(WRITE16(*this, seibuspi_state, spi_layer_bank_w))
-	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, seibuspi_state, scroll_w))
+	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
+	crtc.decrypt_key_callback().set(FUNC(seibuspi_state::tile_decrypt_key_w));
+	crtc.layer_en_callback().set(FUNC(seibuspi_state::spi_layer_enable_w));
+	crtc.reg_1a_callback().set(FUNC(seibuspi_state::spi_layer_bank_w));
+	crtc.layer_scroll_callback().set(FUNC(seibuspi_state::scroll_w));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, 28.636363_MHz_XTAL / 20, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	OKIM6295(config, m_oki[0], 28.636363_MHz_XTAL / 20, okim6295_device::PIN7_HIGH);
+	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, 28.636363_MHz_XTAL / 20, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki[1], 28.636363_MHz_XTAL / 20, okim6295_device::PIN7_HIGH);
+	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
 /* SYS386F */
@@ -2058,27 +2054,27 @@ void seibuspi_state::init_sys386f()
 	}
 }
 
-MACHINE_CONFIG_START(seibuspi_state::sys386f)
-
+void seibuspi_state::sys386f(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I386, XTAL(50'000'000)/2) // Intel i386DX, 25MHz
-	MCFG_DEVICE_PROGRAM_MAP(sys386f_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seibuspi_state, spi_interrupt)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(seibuspi_state,spi_irq_callback)
+	I386(config, m_maincpu, XTAL(50'000'000)/2); // Intel i386DX, 25MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &seibuspi_state::sys386f_map);
+	m_maincpu->set_vblank_int("screen", FUNC(seibuspi_state::spi_interrupt));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(seibuspi_state::spi_irq_callback));
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57.59)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seibuspi_state, screen_update_sys386f)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(57.59);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 0*8, 30*8-1);
+	screen.set_screen_update(FUNC(seibuspi_state::screen_update_sys386f));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sys386f)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sys386f);
 
-	MCFG_PALETTE_ADD_INIT_BLACK("palette", 8192)
+	PALETTE(config, m_palette, palette_device::BLACK, 8192);
 
 	MCFG_VIDEO_START_OVERRIDE(seibuspi_state, sys386f)
 
@@ -2086,9 +2082,8 @@ MACHINE_CONFIG_START(seibuspi_state::sys386f)
 	 // Single PCBs only output mono sound
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymz", YMZ280B, XTAL(16'384'000))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	YMZ280B(config, "ymz", XTAL(16'384'000)).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 /*****************************************************************************/
@@ -3522,6 +3517,43 @@ ROM_START( rdft2jb ) /* SPI Cart, Japan */
 	ROM_LOAD("flash0_blank_region01.u1053", 0x000000, 0x100000, CRC(7ae7ab76) SHA1(a2b196f470bf64af94002fc4e2640fadad00418f) )
 ROM_END
 
+ROM_START( rdft2jc ) /* SPI SXX2C ROM SUB8 Cart, Japan */
+	ROM_REGION32_LE( 0x200000, "maincpu", 0 ) /* i386 program */
+	ROM_LOAD32_BYTE("seibu_1.u0211", 0x000000, 0x80000, CRC(36b6407c) SHA1(b3f5bb3c582aca71e0c7d9da5951b30c7389cc24) )
+	ROM_LOAD32_BYTE("seibu_2.u0212", 0x000001, 0x80000, CRC(65ee556e) SHA1(13311850aabba9fc373adfd5cd590c114505933f) )
+	ROM_LOAD32_BYTE("seibu_3.u0221", 0x000002, 0x80000, CRC(d2458358) SHA1(18a9cfee77a6a09584bc3fb0073c822d12de5bf1) )
+	ROM_LOAD32_BYTE("seibu_4.u0220", 0x000003, 0x80000, CRC(5c4412f9) SHA1(c72603bee3ce14f40d4bf5e3ae3f041b923edd57) )
+
+	ROM_REGION( 0x40000, "audiocpu", ROMREGION_ERASE00 ) /* 256K RAM, ROM from Z80 point-of-view */
+
+	ROM_REGION( 0x30000, "gfx1", ROMREGION_ERASEFF ) /* text layer roms */
+	ROM_LOAD24_BYTE("fix0.u0524", 0x000001, 0x10000, CRC(6fdf4cf6) SHA1(7e9d4a49e829dfdc373c0f5acfbe8c7a91ac115b) )
+	ROM_LOAD24_BYTE("fix1.u0518", 0x000000, 0x10000, CRC(69b7899b) SHA1(d3cacd4ef4d2c95d803403101beb9d4be75fae61) )
+	ROM_LOAD24_BYTE("fixp.u0514", 0x000002, 0x10000, CRC(99a5fece) SHA1(44ae95d650ed6e00202d3438f5f91a5e52e319cb) )
+
+	ROM_REGION( 0xc00000, "gfx2", ROMREGION_ERASEFF ) /* background layer roms */
+	ROM_LOAD24_WORD("bg-1d.u0535", 0x000000, 0x400000, CRC(6143f576) SHA1(c034923d0663d9ef24357a03098b8cb81dbab9f8) )
+	ROM_LOAD24_BYTE("bg-1p.u0537", 0x000002, 0x200000, CRC(55e64ef7) SHA1(aae991268948d07342ee8ba1b3761bd180aab8ec) )
+	ROM_LOAD24_WORD("bg-2d.u0536", 0x600000, 0x400000, CRC(c607a444) SHA1(dc1aa96a42e9394ca6036359670a4ec6f830c96d) )
+	ROM_LOAD24_BYTE("bg-2p.u0538", 0x600002, 0x200000, CRC(f0830248) SHA1(6075df96b49e70d2243fef691e096119e7a4d044) )
+
+	ROM_REGION( 0x1200000, "gfx3", 0 ) /* sprites */
+	ROM_LOAD("obj3.u0434",  0x0000000, 0x400000, CRC(e08f42dc) SHA1(5188d71d4355eaf43ea8893b4cfc4fe80cc24f41) )
+	ROM_LOAD("obj3b.u0433", 0x0400000, 0x200000, CRC(1b6a523c) SHA1(99a420dbc8e22e7832ccda7cec9fa661a2a2687a) )
+	ROM_LOAD("obj2.u0431",  0x0600000, 0x400000, CRC(7aeadd8e) SHA1(47103c0579240c5b1add4d0b164eaf76f5fa97f0) )
+	ROM_LOAD("obj2b.u0432", 0x0a00000, 0x200000, CRC(5d790a5d) SHA1(1ed5d4ad4c9a7e505ce35dcc90d184c26ce891dc) )
+	ROM_LOAD("obj1.u0429",  0x0c00000, 0x400000, CRC(c2c50f02) SHA1(b81397b5800c6d49f58b7ac7ff6eac56da3c5257) )
+	ROM_LOAD("obj1b.u0430", 0x1000000, 0x200000, CRC(5259321f) SHA1(3c70c1147e49f81371d0f60f7108d9718d56faf4) )
+
+	ROM_REGION32_LE( 0xa00000, "sound01", ROMREGION_ERASE00 ) /* sound roms */
+	ROM_LOAD32_WORD("pcm.u0217",    0x000000, 0x100000, CRC(2edc30b5) SHA1(c25d690d633657fc3687636b9070f36bd305ae06) )
+	ROM_CONTINUE(                   0x400000, 0x100000 )
+	ROM_LOAD32_BYTE("sound1.u0222", 0x800000, 0x080000, CRC(b7bd3703) SHA1(6427a7e6de10d6743d6e64b984a1d1c647f5643a) )
+
+	ROM_REGION( 0x100000, "soundflash1", 0 ) /* on SPI motherboard */
+	ROM_LOAD("flash0_blank_region01.u1053", 0x000000, 0x100000, CRC(7ae7ab76) SHA1(a2b196f470bf64af94002fc4e2640fadad00418f) )
+ROM_END
+
 ROM_START( rdft2it ) /* SPI Cart, Italy */
 	ROM_REGION32_LE( 0x200000, "maincpu", 0 ) /* i386 program */
 	ROM_LOAD32_BYTE("seibu1.bin",0x000000, 0x80000, CRC(501b92a9) SHA1(3e1c5cc63906ec7b97a3478557ec2638c515d726) )
@@ -4144,6 +4176,7 @@ GAME( 1997, rdft2aa,    rdft2,    rdft2,   spi_2button, seibuspi_state, init_rdf
 GAME( 1997, rdft2it,    rdft2,    rdft2,   spi_2button, seibuspi_state, init_rdft2,    ROT270, "Seibu Kaihatsu",                         "Raiden Fighters 2 - Operation Hell Dive (Italy)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 // these are unique
 GAME( 1997, rdft2jb,    rdft2,    rdft2,   spi_2button, seibuspi_state, init_rdft2,    ROT270, "Seibu Kaihatsu",                         "Raiden Fighters 2 - Operation Hell Dive (Japan set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, rdft2jc,    rdft2,    rdft2,   spi_2button, seibuspi_state, init_rdft2,    ROT270, "Seibu Kaihatsu",                         "Raiden Fighters 2 - Operation Hell Dive (Japan set 4)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, rdft2t,     rdft2,    rdft2,   spi_2button, seibuspi_state, init_rdft2,    ROT270, "Seibu Kaihatsu",                         "Raiden Fighters 2 - Operation Hell Dive (Taiwan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, rdft2u,     rdft2,    rdft2,   spi_2button, seibuspi_state, init_rdft2,    ROT270, "Seibu Kaihatsu (Fabtek license)",        "Raiden Fighters 2 - Operation Hell Dive (US)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 

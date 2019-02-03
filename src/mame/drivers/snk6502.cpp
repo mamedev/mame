@@ -819,19 +819,18 @@ MACHINE_CONFIG_START(snk6502_state::sasuke)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(snk6502_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sasuke)
-	MCFG_PALETTE_ADD("palette", 32)
-
-	MCFG_PALETTE_INIT_OWNER(snk6502_state,satansat)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sasuke);
+	PALETTE(config, m_palette, FUNC(snk6502_state::satansat_palette), 32);
 	MCFG_VIDEO_START_OVERRIDE(snk6502_state,satansat)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK / 16)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	mc6845_device &crtc(MC6845(config, "crtc", MASTER_CLOCK / 16));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("sasuke_timer", snk6502_state, sasuke_update_counter, attotime::from_hz(MASTER_CLOCK / 8))
+	TIMER(config, "sasuke_timer").configure_periodic(FUNC(snk6502_state::sasuke_update_counter), attotime::from_hz(MASTER_CLOCK / 8));
 
 	// sound hardware
 	MCFG_DEVICE_ADD("snk6502", SASUKE_SOUND, 0)
@@ -839,12 +838,13 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(snk6502_state::satansat)
 	sasuke(config);
+
 	// basic machine hardware
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(satansat_map)
 
 	// video hardware
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_satansat)
+	m_gfxdecode->set_info(gfx_satansat);
 
 	// sound hardware
 	MCFG_DEVICE_REPLACE("snk6502", SATANSAT_SOUND, 0)
@@ -865,17 +865,16 @@ MACHINE_CONFIG_START(snk6502_state::vanguard)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(snk6502_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vanguard)
-	MCFG_PALETTE_ADD("palette", 64)
-
-	MCFG_PALETTE_INIT_OWNER(snk6502_state,snk6502)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_vanguard);
+	PALETTE(config, m_palette, FUNC(snk6502_state::snk6502_palette), 64);
 	MCFG_VIDEO_START_OVERRIDE(snk6502_state,snk6502)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK / 16)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	mc6845_device &crtc(MC6845(config, "crtc", MASTER_CLOCK / 16));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
 
 	// sound hardware
 	MCFG_DEVICE_ADD("snk6502", VANGUARD_SOUND, 0)

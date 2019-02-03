@@ -31,18 +31,21 @@ class photon_state : public pk8000_base_state
 {
 public:
 	photon_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pk8000_base_state(mconfig, type, tag),
-		m_speaker(*this, "speaker") { }
+		: pk8000_base_state(mconfig, type, tag)
+		, m_speaker(*this, "speaker")
+		, m_banks(*this, "bank%u", 1U)
+	{ }
 
 	void photon(machine_config &config);
+
+protected:
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 private:
 	DECLARE_WRITE8_MEMBER(_80_porta_w);
 	DECLARE_READ8_MEMBER(_80_portb_r);
 	DECLARE_WRITE8_MEMBER(_80_portc_w);
-
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -50,71 +53,76 @@ private:
 	IRQ_CALLBACK_MEMBER(irq_callback);
 	void set_bank(uint8_t data);
 
-	required_device<speaker_sound_device> m_speaker;
 	void pk8000_io(address_map &map);
 	void pk8000_mem(address_map &map);
+
+	required_device<speaker_sound_device> m_speaker;
+	required_memory_bank_array<8> m_banks;
 };
 
 
 void photon_state::set_bank(uint8_t data)
 {
-	uint8_t *rom = memregion("maincpu")->base();
-	uint8_t *ram = memregion("maincpu")->base();
-	uint8_t block1 = data & 3;
-	uint8_t block2 = (data >> 2) & 3;
-	uint8_t block3 = (data >> 4) & 3;
-	uint8_t block4 = (data >> 6) & 3;
+	uint8_t *const rom = memregion("maincpu")->base();
+	uint8_t *const ram = memregion("maincpu")->base();
+	uint8_t const block1 = data & 3;
+	uint8_t const block2 = (data >> 2) & 3;
+	uint8_t const block3 = (data >> 4) & 3;
+	uint8_t const block4 = (data >> 6) & 3;
 
 	switch(block1) {
-		case 0:
-				membank("bank1")->set_base(rom + 0x10000);
-				membank("bank5")->set_base(ram);
-				break;
-		case 1: break;
-		case 2: break;
-		case 3:
-				membank("bank1")->set_base(ram);
-				membank("bank5")->set_base(ram);
-				break;
+	case 0:
+		m_banks[0]->set_base(rom + 0x10000);
+		m_banks[4]->set_base(ram);
+		break;
+	case 1: break;
+	case 2: break;
+	case 3:
+		m_banks[0]->set_base(ram);
+		m_banks[4]->set_base(ram);
+		break;
 	}
 
 	switch(block2) {
-		case 0:
-				membank("bank2")->set_base(rom + 0x14000);
-				membank("bank6")->set_base(ram + 0x4000);
-				break;
-		case 1: break;
-		case 2: break;
-		case 3:
-				membank("bank2")->set_base(ram + 0x4000);
-				membank("bank6")->set_base(ram + 0x4000);
-				break;
+	case 0:
+		m_banks[1]->set_base(rom + 0x14000);
+		m_banks[5]->set_base(ram + 0x4000);
+		break;
+	case 1: break;
+	case 2: break;
+	case 3:
+		m_banks[1]->set_base(ram + 0x4000);
+		m_banks[5]->set_base(ram + 0x4000);
+		break;
 	}
+
 	switch(block3) {
-		case 0:
-				membank("bank3")->set_base(rom + 0x18000);
-				membank("bank7")->set_base(ram + 0x8000);
-				break;
-		case 1: break;
-		case 2: break;
-		case 3:
-				membank("bank3")->set_base(ram + 0x8000);
-				membank("bank7")->set_base(ram + 0x8000);
-				break;
+	case 0:
+		m_banks[2]->set_base(rom + 0x18000);
+		m_banks[6]->set_base(ram + 0x8000);
+		break;
+	case 1: break;
+	case 2: break;
+	case 3:
+		m_banks[2]->set_base(ram + 0x8000);
+		m_banks[6]->set_base(ram + 0x8000);
+		break;
 	}
+
 	switch(block4) {
-		case 0:
-				membank("bank4")->set_base(rom + 0x1c000);
-				membank("bank8")->set_base(ram + 0xc000);
-				break;
-		case 1: break;
-		case 2: break;
-		case 3:
-				membank("bank4")->set_base(ram + 0xc000);
-				membank("bank8")->set_base(ram + 0xc000);
-				break;
+	case 0:
+		m_banks[3]->set_base(rom + 0x1c000);
+		m_banks[7]->set_base(ram + 0xc000);
+		break;
+	case 1: break;
+	case 2: break;
+	case 3:
+		m_banks[3]->set_base(ram + 0xc000);
+		m_banks[7]->set_base(ram + 0xc000);
+		break;
 	}
 }
+
 WRITE8_MEMBER(photon_state::_80_porta_w)
 {
 	set_bank(data);
@@ -127,7 +135,7 @@ READ8_MEMBER(photon_state::_80_portb_r)
 
 WRITE8_MEMBER(photon_state::_80_portc_w)
 {
-	m_speaker->level_w(BIT(data,7));
+	m_speaker->level_w(BIT(data, 7));
 }
 
 void photon_state::pk8000_mem(address_map &map)
@@ -182,11 +190,15 @@ IRQ_CALLBACK_MEMBER(photon_state::irq_callback)
 
 void photon_state::machine_reset()
 {
+	pk8000_base_state::machine_reset();
+
 	set_bank(0);
 }
 
 void photon_state::video_start()
 {
+	pk8000_base_state::video_start();
+
 	save_item(NAME(m_text_start));
 	save_item(NAME(m_chargen_start));
 	save_item(NAME(m_video_start));
@@ -220,23 +232,21 @@ MACHINE_CONFIG_START(photon_state::photon)
 	MCFG_SCREEN_UPDATE_DRIVER(photon_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(pk8000_base_state, pk8000)
+	PALETTE(config, "palette", FUNC(photon_state::pk8000_palette), 16);
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, photon_state, _80_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, photon_state, _80_portb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, photon_state, _80_portc_w))
+	i8255_device &ppi1(I8255(config, "ppi8255_1"));
+	ppi1.out_pa_callback().set(FUNC(photon_state::_80_porta_w));
+	ppi1.in_pb_callback().set(FUNC(photon_state::_80_portb_r));
+	ppi1.out_pc_callback().set(FUNC(photon_state::_80_portc_w));
 
-	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, pk8000_base_state, _84_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pk8000_base_state, _84_porta_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pk8000_base_state, _84_portc_w))
+	i8255_device &ppi2(I8255(config, "ppi8255_2"));
+	ppi2.in_pa_callback().set(FUNC(pk8000_base_state::_84_porta_r));
+	ppi2.out_pa_callback().set(FUNC(pk8000_base_state::_84_porta_w));
+	ppi2.out_pc_callback().set(FUNC(pk8000_base_state::_84_portc_w));
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
 /*

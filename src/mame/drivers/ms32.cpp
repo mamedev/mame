@@ -1707,12 +1707,12 @@ MACHINE_CONFIG_START(ms32_state::ms32)
 	MCFG_DEVICE_PROGRAM_MAP(ms32_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(ms32_state,irq_callback)
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ms32_state, ms32_interrupt, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(ms32_state::ms32_interrupt), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, 8000000) // Z0840008PSC, Clock from notes
 	MCFG_DEVICE_PROGRAM_MAP(ms32_sound_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
+	config.m_minimum_quantum = attotime::from_hz(60000);
 
 
 	/* video hardware */
@@ -1723,16 +1723,16 @@ MACHINE_CONFIG_START(ms32_state::ms32)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ms32_state, screen_update_ms32)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ms32)
-	MCFG_PALETTE_ADD("palette", 0x10000)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ms32);
+	PALETTE(config, m_palette).set_entries(0x10000);
 
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	MCFG_DEVICE_ADD("ymf", YMF271, 16934400)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -1748,7 +1748,7 @@ MACHINE_CONFIG_START(ms32_state::f1superb)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(f1superb_map)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_f1superb)
+	m_gfxdecode->set_info(gfx_f1superb);
 
 	MCFG_VIDEO_START_OVERRIDE(ms32_state,f1superb)
 MACHINE_CONFIG_END
@@ -2634,4 +2634,4 @@ GAME( 1997, bnstars,   bnstars1, ms32, suchie2,  ms32_state, init_bnstars,    RO
 GAME( 1996, wpksocv2,  0,        ms32, wpksocv2, ms32_state, init_ss92046_01, ROT0,   "Jaleco",         "World PK Soccer V2 (ver 1.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 /* these boot and show something */
-GAME( 1994, f1superb, 0,        f1superb, f1superb, ms32_state, init_f1superb, ROT0,   "Jaleco",        "F1 Super Battle", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, f1superb, 0,        f1superb, f1superb, ms32_state, init_f1superb, ROT0,   "Jaleco",        "F-1 Super Battle", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

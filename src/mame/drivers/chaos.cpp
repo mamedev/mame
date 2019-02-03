@@ -156,8 +156,8 @@ MACHINE_CONFIG_START(chaos_state::chaos)
 	MCFG_DEVICE_DATA_MAP(data_map)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(chaos_state, kbd_put))
+	GENERIC_TERMINAL(config, m_terminal, 0);
+	m_terminal->set_keyboard_callback(FUNC(chaos_state::kbd_put));
 MACHINE_CONFIG_END
 
 /* ROM definition */

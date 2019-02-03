@@ -234,24 +234,24 @@ MACHINE_CONFIG_START(superchs_state::superchs)
 	MCFG_DEVICE_PROGRAM_MAP(superchs_cpub_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", superchs_state,  irq4_line_hold)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(480)) /* Need to interleave CPU 1 & 3 */
+	config.m_minimum_quantum = attotime::from_hz(480); /* Need to interleave CPU 1 & 3 */
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_DEVICE_ADD("adc", ADC0809, 500000) // unknown clock
-	MCFG_ADC0808_EOC_FF_CB(INPUTLINE("maincpu", 3))
-	MCFG_ADC0808_IN0_CB(IOPORT("WHEEL"))
-	MCFG_ADC0808_IN1_CB(IOPORT("ACCEL"))
-	MCFG_ADC0808_IN2_CB(READ8(*this, superchs_state, volume_r))
+	adc0809_device &adc(ADC0809(config, "adc", 500000)); // unknown clock
+	adc.eoc_ff_callback().set_inputline("maincpu", 3);
+	adc.in_callback<0>().set_ioport("WHEEL");
+	adc.in_callback<1>().set_ioport("ACCEL");
+	adc.in_callback<2>().set(FUNC(superchs_state::volume_r));
 
-	MCFG_DEVICE_ADD("tc0510nio", TC0510NIO, 0)
-	MCFG_TC0510NIO_READ_1_CB(IOPORT("COINS"))
-	MCFG_TC0510NIO_READ_2_CB(IOPORT("SWITCHES"))
-	MCFG_TC0510NIO_READ_3_CB(READLINE("eeprom", eeprom_serial_93cxx_device, do_read)) MCFG_DEVCB_BIT(7)
-	MCFG_TC0510NIO_WRITE_3_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write)) MCFG_DEVCB_BIT(5)
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("eeprom", eeprom_serial_93cxx_device, di_write)) MCFG_DEVCB_BIT(6)
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write)) MCFG_DEVCB_BIT(4)
-	MCFG_TC0510NIO_WRITE_4_CB(WRITE8(*this, superchs_state, coin_word_w))
+	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio", 0));
+	tc0510nio.read_1_callback().set_ioport("COINS");
+	tc0510nio.read_2_callback().set_ioport("SWITCHES");
+	tc0510nio.read_3_callback().set(m_eeprom, FUNC(eeprom_serial_93cxx_device::do_read)).lshift(7);
+	tc0510nio.write_3_callback().set(m_eeprom, FUNC(eeprom_serial_93cxx_device::clk_write)).bit(5);
+	tc0510nio.write_3_callback().append(m_eeprom, FUNC(eeprom_serial_93cxx_device::di_write)).bit(6);
+	tc0510nio.write_3_callback().append(m_eeprom, FUNC(eeprom_serial_93cxx_device::cs_write)).bit(4);
+	tc0510nio.write_4_callback().set(FUNC(superchs_state::coin_word_w));
 	// there are 'vibration' control bits somewhere!
 
 	/* video hardware */
@@ -261,21 +261,20 @@ MACHINE_CONFIG_START(superchs_state::superchs)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(superchs_state, screen_update_superchs)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_superchs)
-	MCFG_PALETTE_ADD("palette", 8192)
-	MCFG_PALETTE_FORMAT(XRGB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_superchs);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 8192);
 
-	MCFG_DEVICE_ADD("tc0480scp", TC0480SCP, 0)
-	MCFG_TC0480SCP_GFX_REGION(1)
-	MCFG_TC0480SCP_TX_REGION(2)
-	MCFG_TC0480SCP_OFFSETS(0x20, 0x08)
-	MCFG_TC0480SCP_OFFSETS_TX(-1, 0)
-	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
+	TC0480SCP(config, m_tc0480scp, 0);
+	m_tc0480scp->set_gfx_region(1);
+	m_tc0480scp->set_tx_region(2);
+	m_tc0480scp->set_offsets(0x20, 0x08);
+	m_tc0480scp->set_offsets_tx(-1, 0);
+	m_tc0480scp->set_gfxdecode_tag(m_gfxdecode);
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("taito_en", TAITO_EN, 0)
+	TAITO_EN(config, "taito_en", 0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(superchs_state::chase3)

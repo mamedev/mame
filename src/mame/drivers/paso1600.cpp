@@ -325,16 +325,17 @@ MACHINE_CONFIG_START(paso1600_state::paso1600)
 //  MCFG_PALETTE_INIT(black_and_white)
 
 	/* Devices */
-	MCFG_MC6845_ADD("crtc", H46505, "screen", 16000000/4)    /* unknown clock, hand tuned to get ~60 fps */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	h46505_device &crtc(H46505(config, "crtc", 16000000/4));    /* unknown clock, hand tuned to get ~60 fps */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
 
-	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	PIC8259(config, m_pic, 0);
+	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
 
-	MCFG_DEVICE_ADD("8237dma", AM9517A, 16000000/4)
-	MCFG_I8237_IN_MEMR_CB(READ8(*this, paso1600_state, pc_dma_read_byte))
-	MCFG_I8237_OUT_MEMW_CB(WRITE8(*this, paso1600_state, pc_dma_write_byte))
+	AM9517A(config, m_dma, 16000000/4);
+	m_dma->in_memr_callback().set(FUNC(paso1600_state::pc_dma_read_byte));
+	m_dma->out_memw_callback().set(FUNC(paso1600_state::pc_dma_write_byte));
 MACHINE_CONFIG_END
 
 ROM_START( paso1600 )

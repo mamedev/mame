@@ -33,15 +33,14 @@ TODO:
 #include "cpu/m6809/m6809.h"
 #include "sound/beep.h"
 #include "emupal.h"
-#include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
 
 class destiny_state : public driver_device
 {
 public:
-	destiny_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	destiny_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_beeper(*this, "beeper")
 	{ }
@@ -280,16 +279,15 @@ MACHINE_CONFIG_START(destiny_state::destiny)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(6*16, 9*2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 6*16-1, 0, 9*2-1)
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_SCREEN_UPDATE_DRIVER(destiny_state, screen_update_destiny)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("beeper", BEEP, 800) // TODO: determine exact frequency thru schematics
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
+	BEEP(config, m_beeper, 800); // TODO: determine exact frequency thru schematics
+	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
 

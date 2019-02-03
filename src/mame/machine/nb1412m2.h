@@ -12,18 +12,6 @@ Nichibutsu 1412M2 device emulation
 #pragma once
 
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_NB1412M2_ADD(tag, freq) \
-		MCFG_DEVICE_ADD((tag), NB1412M2, (freq))
-
-#define MCFG_NB1412M2_DAC_CB(_devcb) \
-	devcb = &downcast<nb1412m2_device &>(*device).set_dac_callback(DEVCB_##_devcb);
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -53,8 +41,7 @@ public:
 	DECLARE_WRITE8_MEMBER( dac_address_w );
 	DECLARE_WRITE8_MEMBER( dac_timer_w );
 
-	template <class Object> devcb_base &set_dac_callback(Object &&cb)
-	{ return m_dac_cb.set_callback(std::forward<Object>(cb)); }
+	auto dac_callback() { return m_dac_cb.bind(); }
 
 
 	void nb1412m2_map(address_map &map);

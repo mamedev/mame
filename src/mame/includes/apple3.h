@@ -11,6 +11,8 @@
 #ifndef MAME_INCLUDES_APPLE3_H
 #define MAME_INCLUDES_APPLE3_H
 
+#pragma once
+
 #include "cpu/m6502/m6502.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
@@ -38,8 +40,8 @@
 class apple3_state : public driver_device
 {
 public:
-	apple3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	apple3_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, RAM_TAG),
 		m_via(*this, "via6522_%u", 0),
@@ -92,19 +94,15 @@ public:
 	DECLARE_READ8_MEMBER(apple3_c0xx_r);
 	DECLARE_WRITE8_MEMBER(apple3_c0xx_w);
 	void init_apple3();
-	DECLARE_MACHINE_RESET(apple3);
-	DECLARE_VIDEO_START(apple3);
-	uint32_t screen_update_apple3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(apple3_interrupt);
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(scanstart_cb);
 	TIMER_CALLBACK_MEMBER(scanend_cb);
-	DECLARE_WRITE_LINE_MEMBER(apple3_acia_irq_func);
 	DECLARE_WRITE8_MEMBER(apple3_via_0_out_a);
 	DECLARE_WRITE8_MEMBER(apple3_via_0_out_b);
 	DECLARE_WRITE8_MEMBER(apple3_via_1_out_a);
 	DECLARE_WRITE8_MEMBER(apple3_via_1_out_b);
-	DECLARE_WRITE_LINE_MEMBER(apple3_via_0_irq_func);
-	DECLARE_WRITE_LINE_MEMBER(apple3_via_1_irq_func);
 	void apple3_write_charmem();
 	void text40(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void text80(bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -118,17 +116,17 @@ public:
 	void apple3_via_out(uint8_t *var, uint8_t data);
 	uint8_t *apple3_get_indexed_addr(offs_t offset);
 	TIMER_DEVICE_CALLBACK_MEMBER(apple3_c040_tick);
-	DECLARE_PALETTE_INIT(apple3);
-	void apple3_irq_update();
+	void palette_init(palette_device &palette) const;
 	DECLARE_READ_LINE_MEMBER(ay3600_shift_r);
 	DECLARE_READ_LINE_MEMBER(ay3600_control_r);
 	DECLARE_WRITE_LINE_MEMBER(ay3600_data_ready_w);
-	void apple3_postload();
+	virtual void device_post_load() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(paddle_timer);
 	void pdl_handler(int offset);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	DECLARE_WRITE_LINE_MEMBER(a2bus_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(a2bus_nmi_w);
+	DECLARE_WRITE_LINE_MEMBER(vbl_w);
 
 	// these need to be public for now
 	uint32_t m_flags;
@@ -137,13 +135,10 @@ public:
 	void apple3(machine_config &config);
 	void apple3_map(address_map &map);
 private:
-	int m_acia_irq;
 	uint8_t m_via_0_a;
 	uint8_t m_via_0_b;
 	uint8_t m_via_1_a;
 	uint8_t m_via_1_b;
-	int m_via_0_irq;
-	int m_via_1_irq;
 	offs_t m_zpa;
 	uint8_t m_last_n;
 	uint8_t m_char_mem[0x800];
@@ -161,6 +156,7 @@ private:
 	int m_c040_time;
 	uint16_t m_lastchar, m_strobe;
 	uint8_t m_transchar;
+	bool m_charwrt;
 
 	emu_timer *m_scanstart, *m_scanend;
 

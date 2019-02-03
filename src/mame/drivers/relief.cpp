@@ -27,20 +27,8 @@
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
 #include "sound/ym2413.h"
+#include "emupal.h"
 #include "speaker.h"
-
-
-/*************************************
- *
- *  Interrupt handling
- *
- *************************************/
-
-void relief_state::update_interrupts()
-{
-	m_maincpu->set_input_line(4, m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 
 
 /*************************************
@@ -51,8 +39,6 @@ void relief_state::update_interrupts()
 
 void relief_state::machine_reset()
 {
-	atarigen_state::machine_reset();
-
 	m_adpcm_bank = 0;
 	m_okibank->set_entry(m_adpcm_bank);
 	m_ym2413_volume = 15;
@@ -70,7 +56,7 @@ void relief_state::machine_reset()
 READ16_MEMBER(relief_state::special_port2_r)
 {
 	int result = ioport("260010")->read();
-	if (!(result & 0x0080) || get_hblank(*m_screen)) result ^= 0x0001;
+	if (!(result & 0x0080) || m_screen->hblank()) result ^= 0x0001;
 	return result;
 }
 
@@ -136,7 +122,7 @@ void relief_state::main_map(address_map &map)
 	map(0x260010, 0x260011).r(FUNC(relief_state::special_port2_r));
 	map(0x260012, 0x260013).portr("260012");
 	map(0x2a0000, 0x2a0001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0x3e0000, 0x3e0fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x3e0000, 0x3e0fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x3effc0, 0x3effff).rw(m_vad, FUNC(atari_vad_device::control_read), FUNC(atari_vad_device::control_write));
 	map(0x3f0000, 0x3f1fff).ram().w(m_vad, FUNC(atari_vad_device::playfield2_latched_msb_w)).share("vad:playfield2");
 	map(0x3f2000, 0x3f3fff).ram().w(m_vad, FUNC(atari_vad_device::playfield_latched_lsb_w)).share("vad:playfield");
@@ -272,40 +258,39 @@ GFXDECODE_END
 MACHINE_CONFIG_START(relief_state::relief)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
+	MCFG_DEVICE_ADD("maincpu", M68000, 14.318181_MHz_XTAL/2)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_EEPROM_2816_ADD("eeprom")
-	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
+	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_relief)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
+	PALETTE(config, "palette").set_format(palette_device::IRGB_1555, 2048);
 
-	MCFG_ATARI_VAD_ADD("vad", "screen", WRITELINE(*this, relief_state, scanline_int_write_line))
-	MCFG_ATARI_VAD_PLAYFIELD(relief_state, "gfxdecode", get_playfield_tile_info)
-	MCFG_ATARI_VAD_PLAYFIELD2(relief_state, "gfxdecode", get_playfield2_tile_info)
-	MCFG_ATARI_VAD_MOB(relief_state::s_mob_config, "gfxdecode")
+	ATARI_VAD(config, m_vad, 0, m_screen);
+	m_vad->scanline_int_cb().set_inputline(m_maincpu, M68K_IRQ_4);
+	TILEMAP(config, "vad:playfield", m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64).set_info_callback(DEVICE_SELF_OWNER, FUNC(relief_state::get_playfield_tile_info));
+	TILEMAP(config, "vad:playfield2", m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64, 0).set_info_callback(DEVICE_SELF_OWNER, FUNC(relief_state::get_playfield2_tile_info));
+	ATARI_MOTION_OBJECTS(config, "vad:mob", 0, m_screen, relief_state::s_mob_config).set_gfxdecode(m_gfxdecode);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses a VAD chip to generate video signals */
-	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
+	MCFG_SCREEN_RAW_PARAMS(14.318181_MHz_XTAL/2, 456, 0, 336, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(relief_state, screen_update_relief)
 	MCFG_SCREEN_PALETTE("palette")
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, ATARI_CLOCK_14MHz/4/3, okim6295_device::PIN7_LOW)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 14.318181_MHz_XTAL/4/3, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 
-	MCFG_DEVICE_ADD("ymsnd", YM2413, ATARI_CLOCK_14MHz/4)
+	MCFG_DEVICE_ADD("ymsnd", YM2413, 14.318181_MHz_XTAL/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

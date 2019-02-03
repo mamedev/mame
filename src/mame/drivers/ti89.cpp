@@ -23,7 +23,6 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/intelfsh.h"
 #include "machine/nvram.h"
-#include "rendlay.h"
 #include "screen.h"
 
 
@@ -148,14 +147,14 @@ WRITE16_MEMBER ( ti68k_state::flash_w )
 {
 	// verification if it is flash memory
 	if (m_flash_mem)
-		m_flash->write(space, offset, data);
+		m_flash->write(offset, data);
 }
 
 READ16_MEMBER ( ti68k_state::flash_r )
 {
 	if (m_flash_mem)
 	{
-		return m_flash->read(space, offset);
+		return m_flash->read(offset);
 	}
 	else
 	{
@@ -514,7 +513,7 @@ uint32_t ti68k_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(ti68k_state, ti68k)
+void ti68k_state::ti68k_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
@@ -525,7 +524,7 @@ MACHINE_CONFIG_START(ti68k_state::ti89)
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(10'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(ti89_mem)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -536,13 +535,11 @@ MACHINE_CONFIG_START(ti68k_state::ti89)
 	MCFG_SCREEN_VISIBLE_AREA(0, 160-1, 0, 100-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(ti68k_state, ti68k)
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	PALETTE(config, "palette", FUNC(ti68k_state::ti68k_palette), 2);
 
-	MCFG_SHARP_UNK128MBIT_ADD("flash")  //should be LH28F320 for ti89t and v200 and LH28F160S3T for other models
+	SHARP_UNK128MBIT(config, "flash");  //should be LH28F320 for ti89t and v200 and LH28F160S3T for other models
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("ti68k_timer", ti68k_state, ti68k_timer_callback, attotime::from_hz(1<<14))
+	TIMER(config, "ti68k_timer").configure_periodic(FUNC(ti68k_state::ti68k_timer_callback), attotime::from_hz(1<<14));
 MACHINE_CONFIG_END
 
 

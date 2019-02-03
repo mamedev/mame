@@ -327,8 +327,7 @@ MACHINE_CONFIG_START(ohmygod_state::ohmygod)
 	MCFG_DEVICE_PROGRAM_MAP(ohmygod_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ohmygod_state,  irq1_line_hold)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(3));  /* a guess, and certainly wrong */
 
 
 	/* video hardware */
@@ -338,12 +337,11 @@ MACHINE_CONFIG_START(ohmygod_state::ohmygod)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(12*8, (64-12)*8-1, 0*8, 30*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(ohmygod_state, screen_update_ohmygod)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ohmygod)
 
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
+	PALETTE(config, m_palette).set_format(palette_device::xGRB_555, 1024);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

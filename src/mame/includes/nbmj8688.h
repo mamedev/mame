@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Takahiro Nogi
+#ifndef MAME_INCLUDES_NBMJ8688_H
+#define MAME_INCLUDES_NBMJ8688_H
+
+#pragma once
+
 #include "video/hd61830.h"
 #include "machine/nb1413m3.h"
 #include "emupal.h"
@@ -120,12 +125,12 @@ private:
 	DECLARE_WRITE8_MEMBER(barline_output_w);
 
 	DECLARE_VIDEO_START(mbmj8688_pure_12bit);
-	DECLARE_PALETTE_INIT(mbmj8688_12bit);
+	void mbmj8688_12bit(palette_device &palette) const;
 	DECLARE_VIDEO_START(mbmj8688_pure_16bit_LCD);
-	DECLARE_PALETTE_INIT(mbmj8688_16bit);
-	DECLARE_PALETTE_INIT(mbmj8688_lcd);
+	void mbmj8688_16bit(palette_device &palette) const;
+	void mbmj8688_lcd(palette_device &palette) const;
 	DECLARE_VIDEO_START(mbmj8688_8bit);
-	DECLARE_PALETTE_INIT(mbmj8688_8bit);
+	void mbmj8688_8bit(palette_device &palette) const;
 	DECLARE_VIDEO_START(mbmj8688_hybrid_16bit);
 	DECLARE_VIDEO_START(mbmj8688_hybrid_12bit);
 	DECLARE_VIDEO_START(mbmj8688_pure_16bit);
@@ -156,3 +161,5 @@ private:
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
+
+#endif // MAME_INCLUDES_NBMJ8688_H

@@ -26,8 +26,9 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6502/m6502.h"
 #include "includes/bsktball.h"
+
+#include "cpu/m6502/m6502.h"
 #include "machine/74259.h"
 #include "sound/discrete.h"
 #include "screen.h"
@@ -40,17 +41,15 @@
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(bsktball_state, bsktball)
+void bsktball_state::bsktball_palette(palette_device &palette) const
 {
-	int i;
-
-	palette.set_indirect_color(0,rgb_t(0x00,0x00,0x00)); /* BLACK */
-	palette.set_indirect_color(1,rgb_t(0x80,0x80,0x80)); /* LIGHT GREY */
-	palette.set_indirect_color(2,rgb_t(0x50,0x50,0x50)); /* DARK GREY */
-	palette.set_indirect_color(3,rgb_t(0xff,0xff,0xff)); /* WHITE */
+	palette.set_indirect_color(0,rgb_t(0x00,0x00,0x00)); // BLACK
+	palette.set_indirect_color(1,rgb_t(0x80,0x80,0x80)); // LIGHT GREY
+	palette.set_indirect_color(2,rgb_t(0x50,0x50,0x50)); // DARK GREY
+	palette.set_indirect_color(3,rgb_t(0xff,0xff,0xff)); // WHITE
 
 	/* playfield */
-	for (i = 0; i < 2; i++)
+	for (int i = 0; i < 2; i++)
 	{
 		palette.set_pen_indirect(i*4 + 0, 1);
 		palette.set_pen_indirect(i*4 + 1, 3 * i);
@@ -59,7 +58,7 @@ PALETTE_INIT_MEMBER(bsktball_state, bsktball)
 	}
 
 	/* motion */
-	for (i = 0; i < 4*4*4; i++)
+	for (int i = 0; i < 4*4*4; i++)
 	{
 		palette.set_pen_indirect(2*4 + i*4 + 0, 1);
 		palette.set_pen_indirect(2*4 + i*4 + 1, (i >> 2) & 3);
@@ -244,16 +243,16 @@ MACHINE_CONFIG_START(bsktball_state::bsktball)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M6502,750000)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", bsktball_state, bsktball_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(bsktball_state::bsktball_scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("outlatch", F9334, 0) // M6
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(NOOP) // Coin Counter
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(OUTPUT("led0")) // LED 1
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(OUTPUT("led1")) // LED 2
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, bsktball_state, ld1_w)) // LD 1
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, bsktball_state, ld2_w)) // LD 2
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE("discrete", discrete_device, write_line<BSKTBALL_NOISE_EN>)) // Noise Reset
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, bsktball_state, nmion_w)) // NMI On
+	f9334_device &outlatch(F9334(config, "outlatch")); // M6
+	outlatch.q_out_cb<1>().set_nop(); // Coin Counter
+	outlatch.q_out_cb<2>().set_output("led0"); // LED 1
+	outlatch.q_out_cb<3>().set_output("led1"); // LED 2
+	outlatch.q_out_cb<4>().set(FUNC(bsktball_state::ld1_w)); // LD 1
+	outlatch.q_out_cb<5>().set(FUNC(bsktball_state::ld2_w)); // LD 2
+	outlatch.q_out_cb<6>().set("discrete", FUNC(discrete_device::write_line<BSKTBALL_NOISE_EN>)); // Noise Reset
+	outlatch.q_out_cb<7>().set(FUNC(bsktball_state::nmion_w)); // NMI On
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -262,18 +261,15 @@ MACHINE_CONFIG_START(bsktball_state::bsktball)
 	MCFG_SCREEN_SIZE(32*8, 28*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(bsktball_state, screen_update_bsktball)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bsktball)
-	MCFG_PALETTE_ADD("palette", 2*4 + 4*4*4*4)
-	MCFG_PALETTE_INDIRECT_ENTRIES(4)
-	MCFG_PALETTE_INIT_OWNER(bsktball_state, bsktball)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_bsktball)
+	PALETTE(config, m_palette, FUNC(bsktball_state::bsktball_palette), 2*4 + 4*4*4*4, 4);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE, bsktball_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	DISCRETE(config, m_discrete, bsktball_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 

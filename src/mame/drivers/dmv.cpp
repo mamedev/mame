@@ -13,6 +13,7 @@
 
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/am9517a.h"
 #include "machine/dmv_keyb.h"
 #include "machine/pit8253.h"
@@ -780,14 +781,14 @@ MACHINE_CONFIG_START(dmv_state::dmv)
 	MCFG_DEVICE_PROGRAM_MAP(dmv_mem)
 	MCFG_DEVICE_IO_MAP(dmv_io)
 
-	MCFG_DEVICE_ADD("kb_ctrl_mcu", I8741, XTAL(6'000'000))
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, dmv_state, kb_mcu_port1_r)) // bit 0 data from kb
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, dmv_state, kb_mcu_port1_w)) // bit 1 data to kb
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, dmv_state, kb_mcu_port2_w))
+	i8741_device &kbmcu(I8741(config, "kb_ctrl_mcu", XTAL(6'000'000)));
+	kbmcu.p1_in_cb().set(FUNC(dmv_state::kb_mcu_port1_r)); // bit 0 data from kb
+	kbmcu.p1_out_cb().set(FUNC(dmv_state::kb_mcu_port1_w)); // bit 1 data to kb
+	kbmcu.p2_out_cb().set(FUNC(dmv_state::kb_mcu_port2_w));
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
-	MCFG_DMV_KEYBOARD_ADD("keyboard")
+	DMV_KEYBOARD(config, m_keyboard, 0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -797,41 +798,41 @@ MACHINE_CONFIG_START(dmv_state::dmv)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dmv)
-	MCFG_PALETTE_ADD_3BIT_RGB("palette")
-	MCFG_DEFAULT_LAYOUT(layout_dmv)
+	PALETTE(config, m_palette, palette_device::RGB_3BIT);
+	config.set_default_layout(layout_dmv);
 
 	// devices
-	MCFG_DEVICE_ADD("upd7220", UPD7220, XTAL(5'000'000)/2) // unk clock
-	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_map)
-	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(dmv_state, hgdc_display_pixels)
-	MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(dmv_state, hgdc_draw_text)
+	UPD7220(config, m_hgdc, XTAL(5'000'000)/2); // unk clock
+	m_hgdc->set_addrmap(0, &dmv_state::upd7220_map);
+	m_hgdc->set_display_pixels_callback(FUNC(dmv_state::hgdc_display_pixels), this);
+	m_hgdc->set_draw_text_callback(FUNC(dmv_state::hgdc_draw_text), this);
 
-	MCFG_DEVICE_ADD( "dma8237", AM9517A, XTAL(4'000'000) )
-	MCFG_I8237_OUT_HREQ_CB(WRITELINE(*this, dmv_state, dma_hrq_changed))
-	MCFG_I8237_OUT_EOP_CB(WRITELINE(*this, dmv_state, dmac_eop))
-	MCFG_I8237_IN_MEMR_CB(READ8(*this, dmv_state, program_r))
-	MCFG_I8237_OUT_MEMW_CB(WRITE8(*this, dmv_state, program_w))
-	MCFG_I8237_IN_IOR_0_CB(LOGGER("Read DMA CH1"))
-	MCFG_I8237_OUT_IOW_0_CB(LOGGER("Write DMA CH1"))
-	MCFG_I8237_IN_IOR_1_CB(LOGGER("Read DMA CH2"))
-	MCFG_I8237_OUT_IOW_1_CB(LOGGER("Write DMA CH2"))
-	MCFG_I8237_IN_IOR_2_CB(READ8("upd7220", upd7220_device, dack_r))
-	MCFG_I8237_OUT_IOW_2_CB(WRITE8("upd7220", upd7220_device, dack_w))
-	MCFG_I8237_IN_IOR_3_CB(READ8("i8272", i8272a_device, mdma_r))
-	MCFG_I8237_OUT_IOW_3_CB(WRITE8("i8272", i8272a_device, mdma_w))
-	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(*this, dmv_state, dmac_dack3))
+	AM9517A(config, m_dmac, 4_MHz_XTAL);
+	m_dmac->out_hreq_callback().set(FUNC(dmv_state::dma_hrq_changed));
+	m_dmac->out_eop_callback().set(FUNC(dmv_state::dmac_eop));
+	m_dmac->in_memr_callback().set(FUNC(dmv_state::program_r));
+	m_dmac->out_memw_callback().set(FUNC(dmv_state::program_w));
+	m_dmac->in_ior_callback<0>().set_log("Read DMA CH1");
+	m_dmac->out_iow_callback<0>().set_log("Write DMA CH1");
+	m_dmac->in_ior_callback<1>().set_log("Read DMA CH2");
+	m_dmac->out_iow_callback<1>().set_log("Write DMA CH2");
+	m_dmac->in_ior_callback<2>().set(m_hgdc, FUNC(upd7220_device::dack_r));
+	m_dmac->out_iow_callback<2>().set(m_hgdc, FUNC(upd7220_device::dack_w));
+	m_dmac->in_ior_callback<3>().set(m_fdc, FUNC(i8272a_device::mdma_r));
+	m_dmac->out_iow_callback<3>().set(m_fdc, FUNC(i8272a_device::mdma_w));
+	m_dmac->out_dack_callback<3>().set(FUNC(dmv_state::dmac_dack3));
 
-	MCFG_I8272A_ADD( "i8272", true )
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, dmv_state, fdc_irq))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE("dma8237", am9517a_device, dreq3_w))
-	MCFG_FLOPPY_DRIVE_ADD("i8272:0", dmv_floppies, "525dd", dmv_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("i8272:1", dmv_floppies, "525dd", dmv_state::floppy_formats)
+	I8272A(config, m_fdc, 8'000'000, true);
+	m_fdc->intrq_wr_callback().set(FUNC(dmv_state::fdc_irq));
+	m_fdc->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq3_w));
+	FLOPPY_CONNECTOR(config, "i8272:0", dmv_floppies, "525dd", dmv_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "i8272:1", dmv_floppies, "525dd", dmv_state::floppy_formats);
 
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(50)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, dmv_state, pit_out0))
-	MCFG_PIT8253_CLK2(XTAL(24'000'000) / 3 / 16)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, dmv_state, timint_w))
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(50);
+	m_pit->out_handler<0>().set(FUNC(dmv_state::pit_out0));
+	m_pit->set_clk<2>(XTAL(24'000'000) / 3 / 16);
+	m_pit->out_handler<2>().set(FUNC(dmv_state::timint_w));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -878,7 +879,7 @@ MACHINE_CONFIG_START(dmv_state::dmv)
 	MCFG_DMVCART_SLOT_OUT_INT_CB(WRITELINE(*this, dmv_state, busint7a_w))
 	MCFG_DMVCART_SLOT_OUT_IRQ_CB(WRITELINE(*this, dmv_state, irq7a_w))
 
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "dmv")
+	SOFTWARE_LIST(config, "flop_list").set_original("dmv");
 
 	MCFG_QUICKLOAD_ADD("quickload", dmv_state, dmv, "com,cpm", 3)
 

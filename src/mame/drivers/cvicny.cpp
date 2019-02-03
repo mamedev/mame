@@ -141,7 +141,7 @@ MACHINE_CONFIG_START(cvicny_state::cvicny)
 	MCFG_DEVICE_PROGRAM_MAP(cvicny_mem)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_cvicny)
+	config.set_default_layout(layout_cvicny);
 MACHINE_CONFIG_END
 
 /* ROM definition */

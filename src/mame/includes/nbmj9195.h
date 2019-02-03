@@ -5,6 +5,10 @@
     nbmj9195 - Nichibutsu Mahjong games for years 1991-1995
 
 ******************************************************************************/
+#ifndef MAME_INCLUDES_NBMJ9195_H
+#define MAME_INCLUDES_NBMJ9195_H
+
+#pragma once
 
 #include "cpu/z80/tmpz84c011.h"
 #include "machine/nb1413m3.h"      // needed for mahjong input controller
@@ -26,8 +30,8 @@ public:
 		TIMER_BLITTER
 	};
 
-	nbmj9195_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+	nbmj9195_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
@@ -186,3 +190,5 @@ private:
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
+
+#endif // MAME_INCLUDES_NBMJ9195_H

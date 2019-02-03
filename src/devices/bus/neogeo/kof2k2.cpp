@@ -3,7 +3,7 @@
 /***********************************************************************************************************
 
  Neo Geo cart emulation
- The King of Fighers 2002 cart type (CMC + PCM2 + Additional CPU encryption)
+ The King of Fighters 2002 cart type (CMC + PCM2 + Additional CPU encryption)
 
  ***********************************************************************************************************/
 
@@ -50,11 +50,12 @@ void neogeo_kof2k2type_cart_device::device_reset()
  mapper specific handlers
  -------------------------------------------------*/
 
-MACHINE_CONFIG_START(neogeo_kof2k2type_cart_device::device_add_mconfig)
-	MCFG_CMC_PROT_ADD("cmc_prot")
-	MCFG_PCM2_PROT_ADD("pcm2_prot")
-	MCFG_KOF2002_PROT_ADD("kof2002_prot")
-MACHINE_CONFIG_END
+void neogeo_kof2k2type_cart_device::device_add_mconfig(machine_config &config)
+{
+	NG_CMC_PROT(config, m_cmc_prot);
+	NG_PCM2_PROT(config, m_pcm2_prot);
+	NG_KOF2002_PROT(config, m_kof2k2_prot);
+}
 
 
 /*************************************************

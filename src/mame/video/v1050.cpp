@@ -110,11 +110,12 @@ void v1050_state::video_start()
 /* Machine Drivers */
 
 MACHINE_CONFIG_START(v1050_state::v1050_video)
-	MCFG_MC6845_ADD(H46505_TAG, H46505, SCREEN_TAG, 15.36_MHz_XTAL/8)
-	MCFG_MC6845_SHOW_BORDER_AREA(true)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(v1050_state, crtc_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, v1050_state, crtc_vs_w))
+	H46505(config, m_crtc, 15.36_MHz_XTAL/8);
+	m_crtc->set_screen(SCREEN_TAG);
+	m_crtc->set_show_border_area(true);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(v1050_state::crtc_update_row), this);
+	m_crtc->out_vsync_callback().set(FUNC(v1050_state::crtc_vs_w));
 
 	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
 	MCFG_SCREEN_UPDATE_DEVICE(H46505_TAG, h46505_device, screen_update)
@@ -123,5 +124,5 @@ MACHINE_CONFIG_START(v1050_state::v1050_video)
 	MCFG_SCREEN_SIZE(640, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0,640-1, 0, 400-1)
 
-	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
 MACHINE_CONFIG_END

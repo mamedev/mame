@@ -42,6 +42,7 @@
 
 #include "emu.h"
 #include "includes/atari400.h"
+
 #include "cpu/m6502/m6502.h"
 #include "machine/6821pia.h"
 #include "machine/ram.h"
@@ -50,9 +51,11 @@
 #include "sound/dac.h"
 #include "sound/pokey.h"
 #include "sound/volt_reg.h"
+
 #include "bus/a800/a800_slot.h"
 #include "bus/a800/a800_carts.h"
 #include "bus/a800/a8sio.h"
+
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -249,17 +252,15 @@
 class a400_state : public atari_common_state
 {
 public:
-	a400_state(const machine_config &mconfig, device_type type, const char *tag)
-		: atari_common_state(mconfig, type, tag),
+	a400_state(const machine_config &mconfig, device_type type, const char *tag) :
+		atari_common_state(mconfig, type, tag),
 		m_ram(*this, RAM_TAG),
 		m_pia(*this, "pia"),
 		m_dac(*this, "dac"),
 		m_region_maincpu(*this, "maincpu"),
-		m_0000(*this, "0000"),
-		m_8000(*this, "8000"),
-		m_a000(*this, "a000"),
 		m_cart(*this, "cartleft"),
-		m_cart2(*this, "cartright") { }
+		m_cart2(*this, "cartright")
+	{ }
 
 	void atari_common_nodac(machine_config &config);
 	void atari_common(machine_config &config);
@@ -280,7 +281,7 @@ private:
 	DECLARE_MACHINE_START(a800);
 	DECLARE_MACHINE_START(a800xl);
 	DECLARE_MACHINE_START(a5200);
-	DECLARE_PALETTE_INIT(a400);
+	void a400_palette(palette_device &palette) const;
 
 	DECLARE_MACHINE_RESET(a400);
 
@@ -328,9 +329,9 @@ private:
 	required_device<pia6821_device> m_pia;
 	optional_device<dac_bit_interface> m_dac;
 	required_memory_region m_region_maincpu;
-	optional_memory_bank m_0000;
-	optional_memory_bank m_8000;
-	optional_memory_bank m_a000;
+	memory_bank *m_0000 = nullptr;
+	memory_bank *m_8000 = nullptr;
+	memory_bank *m_a000 = nullptr;
 	optional_device<a800_cart_slot_device> m_cart;
 	optional_device<a800_cart_slot_device> m_cart2;
 
@@ -338,7 +339,7 @@ private:
 	int m_last_offs;
 	uint8_t m_mmu, m_ext_bank;
 
-	void setup_ram(int bank,uint32_t size);
+	void setup_ram(int bank, uint32_t size);
 	void setup_cart(a800_cart_slot_device *slot);
 };
 
@@ -1034,7 +1035,7 @@ dependent upon display type.
  *
  **************************************************************/
 
-static const uint8_t atari_palette[256*3] =
+static const uint8_t atari_colors[256*3] =
 {
 	/* Grey */
 	0x00,0x00,0x00, 0x11,0x11,0x11, 0x22,0x22,0x22, 0x33,0x33,0x33,
@@ -1120,12 +1121,10 @@ static const uint8_t atari_palette[256*3] =
 
 
 /* Initialise the palette */
-PALETTE_INIT_MEMBER(a400_state, a400)
+void a400_state::a400_palette(palette_device &palette) const
 {
-	for (int i = 0; i < sizeof(atari_palette) / 3; i++ )
-	{
-		palette.set_pen_color(i, atari_palette[i*3], atari_palette[i*3+1], atari_palette[i*3+2]);
-	}
+	for (unsigned i = 0; i < ARRAY_LENGTH(atari_colors) / 3; i++)
+		palette.set_pen_color(i, atari_colors[i * 3], atari_colors[i * 3 + 1], atari_colors[i * 3 + 2]);
 }
 /******************************************************************
     PALETTE - PHASE 24.7 SHIFT
@@ -1739,33 +1738,38 @@ void a400_state::setup_ram(int bank, uint32_t size)
 
 	switch (bank)
 	{
-		case 0: // 0x0000-0x7fff
-			ram_top = std::min(size, uint32_t(0x8000)) - 1;
-			m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0x0000, ram_top, "0000");
-			if (m_0000 == nullptr)
-				m_0000.findit(false);
-			m_0000->set_base(m_ram->pointer());
-			break;
-		case 1: // 0x8000-0x9fff
-			ram_top = std::min(size, uint32_t(0xa000)) - 1;
-			if (ram_top > 0x8000)
-			{
-				m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0x8000, ram_top, "8000");
-				if (m_8000 == nullptr)
-					m_8000.findit(false);
-				m_8000->set_base(m_ram->pointer() + 0x8000);
-			}
-			break;
-		case 2: // 0xa000-0xbfff
-			ram_top = std::min(size, uint32_t(0xc000)) - 1;
-			if (ram_top > 0xa000)
-			{
-				m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0xa000, ram_top, "a000");
-				if (m_a000 == nullptr)
-					m_a000.findit(false);
-				m_a000->set_base(m_ram->pointer() + 0xa000);
-			}
-			break;
+	case 0: // 0x0000-0x7fff
+		ram_top = std::min(size, uint32_t(0x8000)) - 1;
+		m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0x0000, ram_top, "0000");
+		m_0000 = membank("0000");
+		m_0000->set_base(m_ram->pointer());
+		break;
+	case 1: // 0x8000-0x9fff
+		ram_top = std::min(size, uint32_t(0xa000)) - 1;
+		if (ram_top > 0x8000)
+		{
+			m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0x8000, ram_top, "8000");
+			m_8000 = membank("8000");
+			m_8000->set_base(m_ram->pointer() + 0x8000);
+		}
+		else
+		{
+			m_8000 = nullptr;
+		}
+		break;
+	case 2: // 0xa000-0xbfff
+		ram_top = std::min(size, uint32_t(0xc000)) - 1;
+		if (ram_top > 0xa000)
+		{
+			m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0xa000, ram_top, "a000");
+			m_a000 = membank("a000");
+			m_a000->set_base(m_ram->pointer() + 0xa000);
+		}
+		else
+		{
+			m_a000 = nullptr;
+		}
+		break;
 	}
 }
 
@@ -1832,76 +1836,76 @@ WRITE8_MEMBER(a400_state::disable_cart)
 	{
 		switch (m_cart->get_cart_type())
 		{
-			case A800_PHOENIX:
-			case A800_BLIZZARD:
-				if (!m_cart_disabled)
-					m_cart_disabled = 1;
-				break;
-			case A800_OSS034M:
-			case A800_OSS043M:
-			case A800_EXPRESS:
-			case A800_DIAMOND:
-			case A800_WILLIAMS:
-				// use m_cart_disabled & m_last_offs to avoid continuous remapping of
-				// the memory space in some games (e.g. dropzone)
-				if (offset & 0x8 && !m_cart_disabled)
-					m_cart_disabled = 1;
-				else if (!(offset & 0x8))
-				{
-					if (m_cart_disabled)
-						m_cart_disabled = 0;
-
-					if ((offset & 0x7) != m_last_offs)
-					{
-						// we enter here only if we are writing to a different offset than last time
-						m_last_offs = offset & 0x7;
-						m_cart->write_d5xx(space, offset, data);
-					}
-				}
-				break;
-			case A800_TURBO64:
-			case A800_TURBO128:
-				if (offset & 0x10 && !m_cart_disabled)
-					m_cart_disabled = 1;
-				else if (!(offset & 0x10))
-				{
-					if (m_cart_disabled)
-						m_cart_disabled = 0;
-
-					if ((offset & 0x0f) != m_last_offs)
-					{
-						// we enter here only if we are writing to a different offset than last time
-						m_last_offs = offset & 0x0f;
-						m_cart->write_d5xx(space, offset & 0x0f, data);
-					}
-				}
-				break;
-			case A800_SPARTADOS:
-				// writes with offset & 8 are also used to enable/disable the subcart, so they go through!
-				m_cart->write_d5xx(space, offset, data);
-				break;
-			case A800_OSSM091:
-			case A800_OSS8K:
-				if ((offset & 0x9) == 0x08)
-					m_cart_disabled = 1;
-				else
-				{
+		case A800_PHOENIX:
+		case A800_BLIZZARD:
+			if (!m_cart_disabled)
+				m_cart_disabled = 1;
+			break;
+		case A800_OSS034M:
+		case A800_OSS043M:
+		case A800_EXPRESS:
+		case A800_DIAMOND:
+		case A800_WILLIAMS:
+			// use m_cart_disabled & m_last_offs to avoid continuous remapping of
+			// the memory space in some games (e.g. dropzone)
+			if (offset & 0x8 && !m_cart_disabled)
+				m_cart_disabled = 1;
+			else if (!(offset & 0x8))
+			{
+				if (m_cart_disabled)
 					m_cart_disabled = 0;
+
+				if ((offset & 0x7) != m_last_offs)
+				{
+					// we enter here only if we are writing to a different offset than last time
+					m_last_offs = offset & 0x7;
 					m_cart->write_d5xx(space, offset, data);
 				}
-				break;
-			case A800_MICROCALC:
-				m_cart_helper = (m_cart_helper + 1) % 5;
-				if (m_cart_helper == 4)
-					m_cart_disabled = 1;
-				else
-				{
+			}
+			break;
+		case A800_TURBO64:
+		case A800_TURBO128:
+			if (offset & 0x10 && !m_cart_disabled)
+				m_cart_disabled = 1;
+			else if (!(offset & 0x10))
+			{
+				if (m_cart_disabled)
 					m_cart_disabled = 0;
-					m_cart->write_d5xx(space, offset, m_cart_helper);
+
+				if ((offset & 0x0f) != m_last_offs)
+				{
+					// we enter here only if we are writing to a different offset than last time
+					m_last_offs = offset & 0x0f;
+					m_cart->write_d5xx(space, offset & 0x0f, data);
 				}
-				break;
-			default:
-				break;
+			}
+			break;
+		case A800_SPARTADOS:
+			// writes with offset & 8 are also used to enable/disable the subcart, so they go through!
+			m_cart->write_d5xx(space, offset, data);
+			break;
+		case A800_OSSM091:
+		case A800_OSS8K:
+			if ((offset & 0x9) == 0x08)
+				m_cart_disabled = 1;
+			else
+			{
+				m_cart_disabled = 0;
+				m_cart->write_d5xx(space, offset, data);
+			}
+			break;
+		case A800_MICROCALC:
+			m_cart_helper = (m_cart_helper + 1) % 5;
+			if (m_cart_helper == 4)
+				m_cart_disabled = 1;
+			else
+			{
+				m_cart_disabled = 0;
+				m_cart->write_d5xx(space, offset, m_cart_helper);
+			}
+			break;
+		default:
+			break;
 		}
 	}
 }
@@ -1915,83 +1919,83 @@ void a400_state::setup_cart(a800_cart_slot_device *slot)
 	{
 		switch (slot->get_cart_type())
 		{
-			case A800_8K:
-				m_maincpu->space(AS_PROGRAM).install_read_handler(0xa000, 0xbfff, read8_delegate(FUNC(a800_cart_slot_device::read_80xx),(a800_cart_slot_device*)slot));
-				m_maincpu->space(AS_PROGRAM).unmap_write(0xa000, 0xbfff);
-				break;
-			case A800_8K_RIGHT:
-				m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0x9fff, read8_delegate(FUNC(a800_cart_slot_device::read_80xx),(a800_cart_slot_device*)slot));
-				m_maincpu->space(AS_PROGRAM).unmap_write(0x8000, 0x9fff);
-				break;
-			case A800_16K:
-				m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0xbfff, read8_delegate(FUNC(a800_cart_slot_device::read_80xx),(a800_cart_slot_device*)slot));
-				m_maincpu->space(AS_PROGRAM).unmap_write(0x8000, 0xbfff);
-				break;
-			case A800_BBSB:
-				m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0xbfff, read8_delegate(FUNC(a800_cart_slot_device::read_80xx),(a800_cart_slot_device*)slot));
-				m_maincpu->space(AS_PROGRAM).install_write_handler(0x8000, 0x9fff, write8_delegate(FUNC(a800_cart_slot_device::write_80xx),(a800_cart_slot_device*)slot));
-				m_maincpu->space(AS_PROGRAM).unmap_write(0xa000, 0xbfff);
-				break;
-			case A800_OSS034M:
-			case A800_OSS043M:
-			case A800_OSSM091:
-			case A800_OSS8K:
-			case A800_TURBO64:
-			case A800_TURBO128:
-			case A800_PHOENIX:
-				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa000, 0xbfff, read8_delegate(FUNC(a400_state::special_read_a000), this), write8_delegate(FUNC(a400_state::special_write_a000), this));
-				m_maincpu->space(AS_PROGRAM).install_write_handler(0xd500, 0xd5ff, write8_delegate(FUNC(a400_state::disable_cart), this));
-				break;
-			case A800_EXPRESS:
-				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa000, 0xbfff, read8_delegate(FUNC(a400_state::special_read_a000), this), write8_delegate(FUNC(a400_state::special_write_a000), this));
-				m_maincpu->space(AS_PROGRAM).install_write_handler(0xd570, 0xd57f, write8_delegate(FUNC(a400_state::disable_cart), this));
-				break;
-			case A800_DIAMOND:
-				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa000, 0xbfff, read8_delegate(FUNC(a400_state::special_read_a000), this), write8_delegate(FUNC(a400_state::special_write_a000), this));
-				m_maincpu->space(AS_PROGRAM).install_write_handler(0xd5d0, 0xd5df, write8_delegate(FUNC(a400_state::disable_cart), this));
-				break;
-			case A800_WILLIAMS:
-				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa000, 0xbfff, read8_delegate(FUNC(a400_state::special_read_a000), this), write8_delegate(FUNC(a400_state::special_write_a000), this));
-				m_maincpu->space(AS_PROGRAM).install_write_handler(0xd500, 0xd50f, write8_delegate(FUNC(a400_state::disable_cart), this));
-				break;
-			case A800_SPARTADOS:
-				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa000, 0xbfff, read8_delegate(FUNC(a400_state::special_read_a000), this), write8_delegate(FUNC(a400_state::special_write_a000), this));
-				m_maincpu->space(AS_PROGRAM).install_write_handler(0xd5e0, 0xd5ef, write8_delegate(FUNC(a400_state::disable_cart), this));
-				break;
-			case A800_BLIZZARD:
-				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x8000, 0xbfff, read8_delegate(FUNC(a400_state::special_read_8000), this), write8_delegate(FUNC(a400_state::special_write_8000), this));
-				m_maincpu->space(AS_PROGRAM).install_write_handler(0xd500, 0xd5ff, write8_delegate(FUNC(a400_state::disable_cart), this));
-				break;
-			case A800_MICROCALC:
-				// this can also disable ROM when reading in 0xd500-0xd5ff
-				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa000, 0xbfff, read8_delegate(FUNC(a400_state::special_read_a000), this), write8_delegate(FUNC(a400_state::special_write_a000), this));
-				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xd500, 0xd5ff, read8_delegate(FUNC(a400_state::read_d5xx), this), write8_delegate(FUNC(a400_state::disable_cart), this));
-				break;
-			case A800_TELELINK2:
-				m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0xbfff, read8_delegate(FUNC(a800_cart_slot_device::read_80xx),(a800_cart_slot_device*)slot));
-				m_maincpu->space(AS_PROGRAM).install_write_handler(0x9000, 0x90ff, write8_delegate(FUNC(a800_cart_slot_device::write_80xx),(a800_cart_slot_device*)slot));
-				m_maincpu->space(AS_PROGRAM).unmap_write(0xa000, 0xbfff);
-				m_maincpu->space(AS_PROGRAM).install_read_handler(0xd501, 0xd501, read8_delegate(FUNC(a800_cart_slot_device::read_d5xx),(a800_cart_slot_device*)slot));
-				m_maincpu->space(AS_PROGRAM).install_write_handler(0xd502, 0xd502, write8_delegate(FUNC(a800_cart_slot_device::write_d5xx),(a800_cart_slot_device*)slot));
-				break;
-			case A800_XEGS:
-				m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0xbfff, read8_delegate(FUNC(a800_cart_slot_device::read_80xx),(a800_cart_slot_device*)slot));
-				m_maincpu->space(AS_PROGRAM).unmap_write(0x8000, 0xbfff);
-				m_maincpu->space(AS_PROGRAM).install_write_handler(0xd500, 0xd5ff, write8_delegate(FUNC(a800_cart_slot_device::write_d5xx),(a800_cart_slot_device*)slot));
-				break;
-			case A5200_4K:
-			case A5200_8K:
-			case A5200_16K:
-			case A5200_32K:
-			case A5200_16K_2CHIPS:
-				m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0xbfff, read8_delegate(FUNC(a800_cart_slot_device::read_80xx),(a800_cart_slot_device*)slot));
-				m_maincpu->space(AS_PROGRAM).unmap_write(0x4000, 0xbfff);
-				break;
-			case A5200_BBSB:
-				m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0xbfff, read8_delegate(FUNC(a800_cart_slot_device::read_80xx),(a800_cart_slot_device*)slot));
-				m_maincpu->space(AS_PROGRAM).install_write_handler(0x4000, 0x5fff, write8_delegate(FUNC(a800_cart_slot_device::write_80xx),(a800_cart_slot_device*)slot));
-				m_maincpu->space(AS_PROGRAM).unmap_write(0x6000, 0xbfff);
-				break;
+		case A800_8K:
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0xa000, 0xbfff, read8_delegate(FUNC(a800_cart_slot_device::read_80xx),(a800_cart_slot_device*)slot));
+			m_maincpu->space(AS_PROGRAM).unmap_write(0xa000, 0xbfff);
+			break;
+		case A800_8K_RIGHT:
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0x9fff, read8_delegate(FUNC(a800_cart_slot_device::read_80xx),(a800_cart_slot_device*)slot));
+			m_maincpu->space(AS_PROGRAM).unmap_write(0x8000, 0x9fff);
+			break;
+		case A800_16K:
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0xbfff, read8_delegate(FUNC(a800_cart_slot_device::read_80xx),(a800_cart_slot_device*)slot));
+			m_maincpu->space(AS_PROGRAM).unmap_write(0x8000, 0xbfff);
+			break;
+		case A800_BBSB:
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0xbfff, read8_delegate(FUNC(a800_cart_slot_device::read_80xx),(a800_cart_slot_device*)slot));
+			m_maincpu->space(AS_PROGRAM).install_write_handler(0x8000, 0x9fff, write8_delegate(FUNC(a800_cart_slot_device::write_80xx),(a800_cart_slot_device*)slot));
+			m_maincpu->space(AS_PROGRAM).unmap_write(0xa000, 0xbfff);
+			break;
+		case A800_OSS034M:
+		case A800_OSS043M:
+		case A800_OSSM091:
+		case A800_OSS8K:
+		case A800_TURBO64:
+		case A800_TURBO128:
+		case A800_PHOENIX:
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa000, 0xbfff, read8_delegate(FUNC(a400_state::special_read_a000), this), write8_delegate(FUNC(a400_state::special_write_a000), this));
+			m_maincpu->space(AS_PROGRAM).install_write_handler(0xd500, 0xd5ff, write8_delegate(FUNC(a400_state::disable_cart), this));
+			break;
+		case A800_EXPRESS:
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa000, 0xbfff, read8_delegate(FUNC(a400_state::special_read_a000), this), write8_delegate(FUNC(a400_state::special_write_a000), this));
+			m_maincpu->space(AS_PROGRAM).install_write_handler(0xd570, 0xd57f, write8_delegate(FUNC(a400_state::disable_cart), this));
+			break;
+		case A800_DIAMOND:
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa000, 0xbfff, read8_delegate(FUNC(a400_state::special_read_a000), this), write8_delegate(FUNC(a400_state::special_write_a000), this));
+			m_maincpu->space(AS_PROGRAM).install_write_handler(0xd5d0, 0xd5df, write8_delegate(FUNC(a400_state::disable_cart), this));
+			break;
+		case A800_WILLIAMS:
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa000, 0xbfff, read8_delegate(FUNC(a400_state::special_read_a000), this), write8_delegate(FUNC(a400_state::special_write_a000), this));
+			m_maincpu->space(AS_PROGRAM).install_write_handler(0xd500, 0xd50f, write8_delegate(FUNC(a400_state::disable_cart), this));
+			break;
+		case A800_SPARTADOS:
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa000, 0xbfff, read8_delegate(FUNC(a400_state::special_read_a000), this), write8_delegate(FUNC(a400_state::special_write_a000), this));
+			m_maincpu->space(AS_PROGRAM).install_write_handler(0xd5e0, 0xd5ef, write8_delegate(FUNC(a400_state::disable_cart), this));
+			break;
+		case A800_BLIZZARD:
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x8000, 0xbfff, read8_delegate(FUNC(a400_state::special_read_8000), this), write8_delegate(FUNC(a400_state::special_write_8000), this));
+			m_maincpu->space(AS_PROGRAM).install_write_handler(0xd500, 0xd5ff, write8_delegate(FUNC(a400_state::disable_cart), this));
+			break;
+		case A800_MICROCALC:
+			// this can also disable ROM when reading in 0xd500-0xd5ff
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa000, 0xbfff, read8_delegate(FUNC(a400_state::special_read_a000), this), write8_delegate(FUNC(a400_state::special_write_a000), this));
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xd500, 0xd5ff, read8_delegate(FUNC(a400_state::read_d5xx), this), write8_delegate(FUNC(a400_state::disable_cart), this));
+			break;
+		case A800_TELELINK2:
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0xbfff, read8_delegate(FUNC(a800_cart_slot_device::read_80xx),(a800_cart_slot_device*)slot));
+			m_maincpu->space(AS_PROGRAM).install_write_handler(0x9000, 0x90ff, write8_delegate(FUNC(a800_cart_slot_device::write_80xx),(a800_cart_slot_device*)slot));
+			m_maincpu->space(AS_PROGRAM).unmap_write(0xa000, 0xbfff);
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0xd501, 0xd501, read8_delegate(FUNC(a800_cart_slot_device::read_d5xx),(a800_cart_slot_device*)slot));
+			m_maincpu->space(AS_PROGRAM).install_write_handler(0xd502, 0xd502, write8_delegate(FUNC(a800_cart_slot_device::write_d5xx),(a800_cart_slot_device*)slot));
+			break;
+		case A800_XEGS:
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0xbfff, read8_delegate(FUNC(a800_cart_slot_device::read_80xx),(a800_cart_slot_device*)slot));
+			m_maincpu->space(AS_PROGRAM).unmap_write(0x8000, 0xbfff);
+			m_maincpu->space(AS_PROGRAM).install_write_handler(0xd500, 0xd5ff, write8_delegate(FUNC(a800_cart_slot_device::write_d5xx),(a800_cart_slot_device*)slot));
+			break;
+		case A5200_4K:
+		case A5200_8K:
+		case A5200_16K:
+		case A5200_32K:
+		case A5200_16K_2CHIPS:
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0xbfff, read8_delegate(FUNC(a800_cart_slot_device::read_80xx),(a800_cart_slot_device*)slot));
+			m_maincpu->space(AS_PROGRAM).unmap_write(0x4000, 0xbfff);
+			break;
+		case A5200_BBSB:
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0xbfff, read8_delegate(FUNC(a800_cart_slot_device::read_80xx),(a800_cart_slot_device*)slot));
+			m_maincpu->space(AS_PROGRAM).install_write_handler(0x4000, 0x5fff, write8_delegate(FUNC(a800_cart_slot_device::write_80xx),(a800_cart_slot_device*)slot));
+			m_maincpu->space(AS_PROGRAM).unmap_write(0x6000, 0xbfff);
+			break;
 		}
 	}
 }
@@ -2014,7 +2018,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( a400_state::a5200_interrupt )
 
 MACHINE_RESET_MEMBER( a400_state, a400 )
 {
-	subdevice<pokey_device>("pokey")->write(machine().dummy_space(), 15, 0);
+	m_pokey->write(15, 0);
 }
 
 
@@ -2106,310 +2110,273 @@ WRITE8_MEMBER(a400_state::a800xl_pia_pb_w)
  **************************************************************/
 
 
-MACHINE_CONFIG_START(a400_state::atari_common_nodac)
+void a400_state::atari_common_nodac(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, pokey_device::FREQ_17_EXACT)
+	M6502(config, m_maincpu, pokey_device::FREQ_17_EXACT);
 
 	MCFG_MACHINE_RESET_OVERRIDE( a400_state, a400 )
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1))
-	MCFG_SCREEN_VISIBLE_AREA_ANTIC()
-	MCFG_SCREEN_UPDATE_DEVICE("antic", antic_device, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1));
+	m_screen->set_visarea(antic_device::MIN_X, antic_device::MAX_X, antic_device::MIN_Y, antic_device::MAX_Y);
+	m_screen->set_screen_update("antic", FUNC(antic_device::screen_update));
+	m_screen->set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", sizeof(atari_palette) / 3)
-	MCFG_PALETTE_INIT_OWNER(a400_state, a400)
+	PALETTE(config, "palette", FUNC(a400_state::a400_palette), ARRAY_LENGTH(atari_colors) / 3);
 
-	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("djoy_0_1"))
-	MCFG_PIA_READPB_HANDLER(IOPORT("djoy_2_3"))
-	MCFG_PIA_CA2_HANDLER(WRITELINE("a8sio", a8sio_device, motor_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE("fdc", atari_fdc_device, pia_cb2_w))
+	PIA6821(config, m_pia, 0);
+	m_pia->readpa_handler().set_ioport("djoy_0_1");
+	m_pia->readpb_handler().set_ioport("djoy_2_3");
+	m_pia->ca2_handler().set("a8sio", FUNC(a8sio_device::motor_w));
+	m_pia->cb2_handler().set("fdc", FUNC(atari_fdc_device::pia_cb2_w));
 
-	MCFG_DEVICE_ADD("a8sio", A8SIO, 0)
-	MCFG_A8SIO_DATA_IN_CB(WRITELINE("pokey", pokey_device, sid_w))
-	MCFG_A8SIO_SLOT_ADD("a8sio", "sio", nullptr)
+	A8SIO(config, "a8sio", 0).data_in().set("pokey", FUNC(pokey_device::sid_w));
+	A8SIO_SLOT(config, "sio", nullptr).set_a8sio_slot("a8sio", "sio");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("pokey", POKEY, pokey_device::FREQ_17_EXACT)
-	MCFG_POKEY_POT0_R_CB(IOPORT("analog_0"))
-	MCFG_POKEY_POT1_R_CB(IOPORT("analog_1"))
-	MCFG_POKEY_POT2_R_CB(IOPORT("analog_2"))
-	MCFG_POKEY_POT3_R_CB(IOPORT("analog_3"))
-	MCFG_POKEY_POT4_R_CB(IOPORT("analog_4"))
-	MCFG_POKEY_POT5_R_CB(IOPORT("analog_5"))
-	MCFG_POKEY_POT6_R_CB(IOPORT("analog_6"))
-	MCFG_POKEY_POT7_R_CB(IOPORT("analog_7"))
-	MCFG_POKEY_SERIN_R_CB(READ8("fdc", atari_fdc_device, serin_r))
-	MCFG_POKEY_SEROUT_W_CB(WRITE8("fdc", atari_fdc_device, serout_w))
-	MCFG_POKEY_KEYBOARD_CB(a400_state, a800_keyboard)
-	MCFG_POKEY_INTERRUPT_CB(a400_state, interrupt_cb)
+	POKEY(config, m_pokey, pokey_device::FREQ_17_EXACT);
+	m_pokey->pot_r<0>().set_ioport("analog_0");
+	m_pokey->pot_r<1>().set_ioport("analog_1");
+	m_pokey->pot_r<2>().set_ioport("analog_2");
+	m_pokey->pot_r<3>().set_ioport("analog_3");
+	m_pokey->pot_r<4>().set_ioport("analog_4");
+	m_pokey->pot_r<5>().set_ioport("analog_5");
+	m_pokey->pot_r<6>().set_ioport("analog_6");
+	m_pokey->pot_r<7>().set_ioport("analog_7");
+	m_pokey->serin_r().set("fdc", FUNC(atari_fdc_device::serin_r));
+	m_pokey->serout_w().set("fdc", FUNC(atari_fdc_device::serout_w));
+	m_pokey->set_keyboard_callback(FUNC(a400_state::a800_keyboard));
+	m_pokey->set_interrupt_callback(FUNC(a400_state::interrupt_cb));
+	m_pokey->add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
 
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(a400_state::atari_common)
+void a400_state::atari_common(machine_config &config)
+{
 	atari_common_nodac(config);
-	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.03)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+
+	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.03);
+	VOLTAGE_REGULATOR(config, "vref", 0).set_output(5.0).add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("48K")
+	RAM(config, m_ram).set_default_size("48K");
 
-	MCFG_DEVICE_ADD("gtia", ATARI_GTIA, 0)
-	MCFG_GTIA_READ_CB(IOPORT("console"))
-	MCFG_GTIA_WRITE_CB(WRITE8(*this, a400_state, gtia_cb))
+	ATARI_GTIA(config, m_gtia, 0);
+	m_gtia->read_callback().set_ioport("console");
+	m_gtia->write_callback().set(FUNC(a400_state::gtia_cb));
 
-	MCFG_DEVICE_ADD("antic", ATARI_ANTIC, 0)
-	MCFG_ANTIC_GTIA("gtia")
+	ATARI_ANTIC(config, m_antic, 0);
+	m_antic->set_gtia_tag(m_gtia);
 
 	/* devices */
-	MCFG_DEVICE_ADD("fdc", ATARI_FDC, 0)
+	ATARI_FDC(config, "fdc", 0);
 
-	MCFG_A800_CARTRIDGE_ADD("cartleft", a800_left, nullptr)
+	A800_CART_SLOT(config, "cartleft", a800_left, nullptr);
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("flop_list","a800_flop")
-	MCFG_SOFTWARE_LIST_ADD("cart_list","a800")
-	MCFG_SOFTWARE_LIST_ADD("xegs_list","xegs")
-MACHINE_CONFIG_END
-
+	SOFTWARE_LIST(config, "flop_list").set_original("a800_flop");
+	SOFTWARE_LIST(config, "cart_list").set_original("a800");
+	SOFTWARE_LIST(config, "xegs_list").set_original("xegs");
+}
 
 // memory map A400 + NTSC screen
-MACHINE_CONFIG_START(a400_state::a400)
+void a400_state::a400(machine_config &config)
+{
 	atari_common(config);
 
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP(a400_mem)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", a400_state, a400_interrupt, "screen", 0, 1)
+	m_maincpu->set_addrmap(AS_PROGRAM, &a400_state::a400_mem);
+	TIMER(config, "scantimer").configure_scanline(FUNC(a400_state::a400_interrupt), "screen", 0, 1);
 
 	MCFG_MACHINE_START_OVERRIDE( a400_state, a400 )
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE_ANTIC_60HZ()
-	MCFG_SCREEN_SIZE_ANTIC_60HZ()
+	m_screen->set_refresh_hz(antic_device::FRAME_RATE_60HZ);
+	m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_60HZ);
 
-	MCFG_DEVICE_MODIFY("gtia")
-	MCFG_GTIA_REGION(GTIA_NTSC)
-MACHINE_CONFIG_END
-
+	m_gtia->set_region(GTIA_NTSC);
+}
 
 // memory map A400 + PAL screen
-MACHINE_CONFIG_START(a400_state::a400pal)
+void a400_state::a400pal(machine_config &config)
+{
 	atari_common(config);
 
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP(a400_mem)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", a400_state, a400_interrupt, "screen", 0, 1)
+	m_maincpu->set_addrmap(AS_PROGRAM, &a400_state::a400_mem);
+	TIMER(config, "scantimer").configure_scanline(FUNC(a400_state::a400_interrupt), "screen", 0, 1);
 
 	MCFG_MACHINE_START_OVERRIDE( a400_state, a400 )
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE_ANTIC_50HZ()
-	MCFG_SCREEN_SIZE_ANTIC_50HZ()
+	m_screen->set_refresh_hz(antic_device::FRAME_RATE_50HZ);
+	m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_50HZ);
 
-	MCFG_DEVICE_MODIFY("gtia")
-	MCFG_GTIA_REGION(GTIA_PAL)
-MACHINE_CONFIG_END
-
+	m_gtia->set_region(GTIA_PAL);
+}
 
 // memory map A800 + NTSC screen + Right cartslot
-MACHINE_CONFIG_START(a400_state::a800)
+void a400_state::a800(machine_config &config)
+{
 	atari_common(config);
 
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP(a400_mem)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", a400_state, a400_interrupt, "screen", 0, 1)
+	m_maincpu->set_addrmap(AS_PROGRAM, &a400_state::a400_mem);
+	TIMER(config, "scantimer").configure_scanline(FUNC(a400_state::a400_interrupt), "screen", 0, 1);
 
 	MCFG_MACHINE_START_OVERRIDE( a400_state, a800 )
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE_ANTIC_60HZ()
-	MCFG_SCREEN_SIZE_ANTIC_60HZ()
+	m_screen->set_refresh_hz(antic_device::FRAME_RATE_60HZ);
+	m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_60HZ);
 
-	MCFG_DEVICE_MODIFY("gtia")
-	MCFG_GTIA_REGION(GTIA_NTSC)
+	m_gtia->set_region(GTIA_NTSC);
 
-	MCFG_A800_CARTRIDGE_ADD("cartright", a800_right, nullptr)
-MACHINE_CONFIG_END
+	A800_CART_SLOT(config, "cartright", a800_right, nullptr);
+}
 
 
 // memory map A800 + PAL screen + Right cartslot
-MACHINE_CONFIG_START(a400_state::a800pal)
+void a400_state::a800pal(machine_config &config)
+{
 	atari_common(config);
 
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP(a400_mem)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", a400_state, a400_interrupt, "screen", 0, 1)
+	m_maincpu->set_addrmap(AS_PROGRAM, &a400_state::a400_mem);
+	TIMER(config, "scantimer").configure_scanline(FUNC(a400_state::a400_interrupt), "screen", 0, 1);
 
 	MCFG_MACHINE_START_OVERRIDE( a400_state, a800 )
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE_ANTIC_50HZ()
-	MCFG_SCREEN_SIZE_ANTIC_50HZ()
+	m_screen->set_refresh_hz(antic_device::FRAME_RATE_50HZ);
+	m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_50HZ);
 
-	MCFG_DEVICE_MODIFY("gtia")
-	MCFG_GTIA_REGION(GTIA_PAL)
+	m_gtia->set_region(GTIA_PAL);
 
-	MCFG_A800_CARTRIDGE_ADD("cartright", a800_right, nullptr)
-MACHINE_CONFIG_END
+	A800_CART_SLOT(config, "cartright", a800_right, nullptr);
+}
 
 
 // memory map A600XL (same as 800XL but less RAM) + NTSC screen + MMU via PIA portB
-MACHINE_CONFIG_START(a400_state::a600xl)
+void a400_state::a600xl(machine_config &config)
+{
 	atari_common(config);
 
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP(a600xl_mem)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", a400_state, a800xl_interrupt, "screen", 0, 1)
+	m_maincpu->set_addrmap(AS_PROGRAM, &a400_state::a600xl_mem);
+	TIMER(config, "scantimer").configure_scanline(FUNC(a400_state::a800xl_interrupt), "screen", 0, 1);
 
-	MCFG_DEVICE_MODIFY("pia")
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, a400_state, a600xl_pia_pb_w))
+	m_pia->writepb_handler().set(FUNC(a400_state::a600xl_pia_pb_w));
 
 	MCFG_MACHINE_START_OVERRIDE( a400_state, a800xl )
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE_ANTIC_60HZ()
-	MCFG_SCREEN_SIZE_ANTIC_60HZ()
+	m_screen->set_refresh_hz(antic_device::FRAME_RATE_60HZ);
+	m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_60HZ);
 
-	MCFG_DEVICE_MODIFY("gtia")
-	MCFG_GTIA_REGION(GTIA_NTSC)
+	m_gtia->set_region(GTIA_NTSC);
 
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16K")
-MACHINE_CONFIG_END
-
+	m_ram->set_default_size("16K");
+}
 
 // memory map A800XL + NTSC screen + MMU via PIA portB
-MACHINE_CONFIG_START(a400_state::a800xl)
+void a400_state::a800xl(machine_config &config)
+{
 	atari_common(config);
 
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP(a800xl_mem)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", a400_state, a800xl_interrupt, "screen", 0, 1)
+	m_maincpu->set_addrmap(AS_PROGRAM, &a400_state::a800xl_mem);
+	TIMER(config, "scantimer").configure_scanline(FUNC(a400_state::a800xl_interrupt), "screen", 0, 1);
 
-	MCFG_DEVICE_MODIFY("pia")
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, a400_state, a800xl_pia_pb_w))
+	m_pia->writepb_handler().set(FUNC(a400_state::a800xl_pia_pb_w));
 
 	MCFG_MACHINE_START_OVERRIDE( a400_state, a800xl )
 
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	m_ram->set_default_size("64K");
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE_ANTIC_60HZ()
-	MCFG_SCREEN_SIZE_ANTIC_60HZ()
+	m_screen->set_refresh_hz(antic_device::FRAME_RATE_60HZ);
+	m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_60HZ);
 
-	MCFG_DEVICE_MODIFY("gtia")
-	MCFG_GTIA_REGION(GTIA_NTSC)
-MACHINE_CONFIG_END
+	m_gtia->set_region(GTIA_NTSC);
+}
 
 
 // memory map A800XL + PAL screen + MMU via PIA portB
-MACHINE_CONFIG_START(a400_state::a800xlpal)
+void a400_state::a800xlpal(machine_config &config)
+{
 	a800xl(config);
 
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_CLOCK( 1773000 )
+	m_maincpu->set_clock(1773000);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE_ANTIC_50HZ()
-	MCFG_SCREEN_SIZE_ANTIC_50HZ()
+	m_screen->set_refresh_hz(antic_device::FRAME_RATE_50HZ);
+	m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_50HZ);
 
-	MCFG_DEVICE_MODIFY("gtia")
-	MCFG_GTIA_REGION(GTIA_PAL)
+	m_gtia->set_region(GTIA_PAL);
 
-	MCFG_DEVICE_MODIFY("pokey")
-	MCFG_DEVICE_CLOCK(1773000)
-MACHINE_CONFIG_END
+	m_pokey->set_clock(1773000);
+}
 
 
 // memory map A1200XL+ MMU via PIA portB
-MACHINE_CONFIG_START(a400_state::a1200xl)
+void a400_state::a1200xl(machine_config &config)
+{
 	a800xl(config);
 
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP(a1200xl_mem)
-
-	MCFG_DEVICE_MODIFY("pia")
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, a400_state, a800xl_pia_pb_w))
-MACHINE_CONFIG_END
-
+	m_maincpu->set_addrmap(AS_PROGRAM, &a400_state::a1200xl_mem);
+	m_pia->writepb_handler().set(FUNC(a400_state::a800xl_pia_pb_w));
+}
 
 // memory map A130XE (extra RAM only partially emulated)
-MACHINE_CONFIG_START(a400_state::a130xe)
+void a400_state::a130xe(machine_config &config)
+{
 	a800xl(config);
 
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP(a130xe_mem)
-
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
-MACHINE_CONFIG_END
-
+	m_maincpu->set_addrmap(AS_PROGRAM, &a400_state::a130xe_mem);
+	m_ram->set_default_size("128K");
+}
 
 // memory map XEGS, only XEGS bankswitch supported
-MACHINE_CONFIG_START(a400_state::xegs)
+void a400_state::xegs(machine_config &config)
+{
 	a800xl(config);
 
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP(xegs_mem)
+	m_maincpu->set_addrmap(AS_PROGRAM, &a400_state::xegs_mem);
 
-	MCFG_DEVICE_REMOVE("cartleft")
-	MCFG_DEVICE_REMOVE("cart_list")
+	config.device_remove("cartleft");
+	config.device_remove("cart_list");
 
-	MCFG_XEGS_CARTRIDGE_ADD("cartleft", xegs_carts, nullptr)
-MACHINE_CONFIG_END
-
+	XEGS_CART_SLOT(config, "cartleft", xegs_carts, nullptr);
+}
 
 // memory map A5200, different ports, less RAM
-MACHINE_CONFIG_START(a400_state::a5200)
+void a400_state::a5200(machine_config &config)
+{
 	atari_common_nodac(config);
 
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP(a5200_mem)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", a400_state, a5200_interrupt, "screen", 0, 1)
+	m_maincpu->set_addrmap(AS_PROGRAM, &a400_state::a5200_mem);
+	TIMER(config, "scantimer").configure_scanline(FUNC(a400_state::a5200_interrupt), "screen", 0, 1);
 
 	// FIXME: should there be anything connected where other system have the fdc?
-	MCFG_DEVICE_MODIFY("pokey")
-	MCFG_POKEY_SERIN_R_CB(CONSTANT(0))
-	MCFG_POKEY_SEROUT_W_CB(NOOP)
-	MCFG_POKEY_KEYBOARD_CB(a400_state, a5200_keypads)
-	MCFG_POKEY_INTERRUPT_CB(a400_state, interrupt_cb)
+	m_pokey->serin_r().set_constant(0);
+	m_pokey->serout_w().set_nop();
+	m_pokey->set_keyboard_callback(FUNC(a400_state::a5200_keypads));
+	m_pokey->set_interrupt_callback(FUNC(a400_state::interrupt_cb));
+	m_pokey->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	ATARI_GTIA(config, m_gtia, 0);
+	m_gtia->set_region(GTIA_NTSC);
 
-	MCFG_DEVICE_ADD("gtia", ATARI_GTIA, 0)
-	MCFG_GTIA_REGION(GTIA_NTSC)
+	ATARI_ANTIC(config, m_antic, 0);
+	m_antic->set_gtia_tag(m_gtia);
 
-	MCFG_DEVICE_ADD("antic", ATARI_ANTIC, 0)
-	MCFG_ANTIC_GTIA("gtia")
-
-	MCFG_DEVICE_MODIFY("pia")
-	MCFG_PIA_READPA_HANDLER(CONSTANT(0)) // FIXME: is there anything connected here
-	MCFG_PIA_READPB_HANDLER(CONSTANT(0)) // FIXME: is there anything connected here
-	MCFG_PIA_CB2_HANDLER(NOOP) // FIXME: is there anything connected here
+	m_pia->readpa_handler().set_constant(0); // FIXME: is there anything connected here
+	m_pia->readpb_handler().set_constant(0); // FIXME: is there anything connected here
+	m_pia->cb2_handler().set_nop(); // FIXME: is there anything connected here
 
 	MCFG_MACHINE_START_OVERRIDE( a400_state, a5200 )
 
-	MCFG_SCREEN_MODIFY( "screen" )
-	MCFG_SCREEN_REFRESH_RATE_ANTIC_60HZ()
-	MCFG_SCREEN_SIZE_ANTIC_60HZ()
+	m_screen->set_refresh_hz(antic_device::FRAME_RATE_60HZ);
+	m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_60HZ);
 
-	MCFG_A5200_CARTRIDGE_ADD("cartleft", a5200_carts, nullptr)
+	A5200_CART_SLOT(config, "cartleft", a5200_carts, nullptr);
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","a5200")
+	SOFTWARE_LIST(config, "cart_list").set_original("a5200");
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16K")
-MACHINE_CONFIG_END
+	RAM(config, m_ram).set_default_size("16K");
+}
 
 
 /**************************************************************

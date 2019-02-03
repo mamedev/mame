@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "cpu/mcs51/mcs51.h"
 #include "machine/gen_latch.h"
 #include "machine/input_merger.h"
 #include "sound/msm5205.h"
@@ -13,6 +14,7 @@
 #include "video/deckarn.h"
 #include "video/decmxc06.h"
 #include "video/decrmc3.h"
+#include "screen.h"
 
 class dec8_state : public driver_device
 {
@@ -36,6 +38,7 @@ public:
 		m_spritegen_krn(*this, "spritegen_krn"),
 		m_spritegen_mxc(*this, "spritegen_mxc"),
 		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
 		m_videoram(*this, "videoram"),
@@ -64,7 +67,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_subcpu;
 	required_device<cpu_device> m_audiocpu;
-	optional_device<cpu_device> m_mcu;
+	optional_device<i8751_device> m_mcu;
 	optional_device<input_merger_device> m_nmigate;
 	required_device<buffered_spriteram8_device> m_spriteram;
 	optional_device<msm5205_device> m_msm;
@@ -72,6 +75,7 @@ private:
 	optional_device<deco_karnovsprites_device> m_spritegen_krn;
 	optional_device<deco_mxc06_device> m_spritegen_mxc;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
 	required_device<deco_rmc3_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
@@ -133,7 +137,6 @@ private:
 	DECLARE_WRITE8_MEMBER(csilver_i8751_w);
 	DECLARE_WRITE8_MEMBER(dec8_bank_w);
 	DECLARE_WRITE8_MEMBER(ghostb_bank_w);
-	DECLARE_WRITE_LINE_MEMBER(ghostb_nmi_w);
 	DECLARE_WRITE8_MEMBER(csilver_control_w);
 	DECLARE_WRITE8_MEMBER(dec8_sound_w);
 	DECLARE_WRITE8_MEMBER(csilver_adpcm_data_w);
@@ -200,6 +203,7 @@ private:
 	void srdarwin_draw_sprites(  bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
 	DECLARE_WRITE_LINE_MEMBER(csilver_adpcm_int);
 
+	void set_screen_raw_params_data_east(machine_config &config);
 
 	void cobra_map(address_map &map);
 	void csilver_map(address_map &map);

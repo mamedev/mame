@@ -91,6 +91,7 @@ class towns_state : public driver_device
 	public:
 	towns_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_ram(*this, RAM_TAG)
 		, m_maincpu(*this, "maincpu")
 		, m_speaker(*this, "speaker")
 		, m_pic_master(*this, "pic8259_master")
@@ -99,7 +100,6 @@ class towns_state : public driver_device
 		, m_dma(*this, "dma_%u", 1U)
 		, m_palette(*this, "palette256")
 		, m_palette16(*this, "palette16_%u", 0U)
-		, m_ram(*this, RAM_TAG)
 		, m_fdc(*this, "fdc")
 		, m_flop(*this, "fdc:%u", 0U)
 		, m_icmemcard(*this, "icmemcard")
@@ -154,9 +154,11 @@ protected:
 
 	virtual void driver_start() override;
 
+	required_device<ram_device> m_ram;
+	required_device<cpu_device> m_maincpu;
+
 private:
 	/* devices */
-	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<pic8259_device> m_pic_master;
 	required_device<pic8259_device> m_pic_slave;
@@ -164,7 +166,6 @@ private:
 	required_device_array<upd71071_device, 2> m_dma;
 	required_device<palette_device> m_palette;
 	required_device_array<palette_device, 2> m_palette16;
-	required_device<ram_device> m_ram;
 	required_device<mb8877_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_flop;
 	required_device<fmt_icmem_device> m_icmemcard;

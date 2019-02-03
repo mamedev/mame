@@ -132,6 +132,7 @@ public:
 		offs_t               m_start_address[3];         // the start addresses of the checks to install
 		offs_t               m_end_address[3];           // the end addresses
 		u64                  m_masks[3];                 // the access masks
+		bool                 m_installing;               // prevent recursive multiple installs
 		void install(read_or_write mode);
 		void triggered(read_or_write type, offs_t address, u64 data, u64 mem_mask);
 	};
@@ -181,6 +182,7 @@ public:
 	void stop_hook();
 	void interrupt_hook(int irqline);
 	void exception_hook(int exception);
+	void privilege_hook();
 	void instruction_hook(offs_t curpc);
 
 	// hooks into our operations
@@ -205,6 +207,7 @@ public:
 	void go_interrupt(int irqline = -1);
 	void go_exception(int exception);
 	void go_milliseconds(u64 milliseconds);
+	void go_privilege(const char *condition);
 	void go_next_device();
 
 	template <typename Format, typename... Params>
@@ -324,6 +327,7 @@ private:
 	attotime                m_stoptime;                 // stop time for DEBUG_FLAG_STOP_TIME
 	int                     m_stopirq;                  // stop IRQ number for DEBUG_FLAG_STOP_INTERRUPT
 	int                     m_stopexception;            // stop exception number for DEBUG_FLAG_STOP_EXCEPTION
+	std::unique_ptr<parsed_expression> m_privilege_condition;      // expression to evaluate on privilege change
 	attotime                m_endexectime;              // ending time of the current execution
 	u64                     m_total_cycles;             // current total cycles
 	u64                     m_last_total_cycles;        // last total cycles
@@ -459,11 +463,13 @@ private:
 	static constexpr u32 DEBUG_FLAG_STOP_TIME       = 0x00002000;       // there is a pending stop at cpu->stoptime
 	static constexpr u32 DEBUG_FLAG_SUSPENDED       = 0x00004000;       // CPU currently suspended
 	static constexpr u32 DEBUG_FLAG_LIVE_BP         = 0x00010000;       // there are live breakpoints for this CPU
+	static constexpr u32 DEBUG_FLAG_STOP_PRIVILEGE  = 0x00020000;       // run until execution level changes
 
 	static constexpr u32 DEBUG_FLAG_STEPPING_ANY    = DEBUG_FLAG_STEPPING | DEBUG_FLAG_STEPPING_OVER | DEBUG_FLAG_STEPPING_OUT;
 	static constexpr u32 DEBUG_FLAG_TRACING_ANY     = DEBUG_FLAG_TRACING | DEBUG_FLAG_TRACING_OVER;
 	static constexpr u32 DEBUG_FLAG_TRANSIENT       = DEBUG_FLAG_STEPPING_ANY | DEBUG_FLAG_STOP_PC |
-			DEBUG_FLAG_STOP_INTERRUPT | DEBUG_FLAG_STOP_EXCEPTION | DEBUG_FLAG_STOP_VBLANK | DEBUG_FLAG_STOP_TIME;
+			DEBUG_FLAG_STOP_INTERRUPT | DEBUG_FLAG_STOP_EXCEPTION | DEBUG_FLAG_STOP_VBLANK |
+			DEBUG_FLAG_STOP_TIME | DEBUG_FLAG_STOP_PRIVILEGE;
 };
 
 //**************************************************************************
@@ -502,12 +508,6 @@ public:
 
 	/* return the locally-visible symbol table */
 	symbol_table *get_visible_symtable();
-
-
-	/* ----- misc debugger functions ----- */
-
-	/* specifies a debug command script to execute */
-	void source_script(const char *file);
 
 
 	/* ----- debugger comment helpers ----- */
@@ -581,7 +581,6 @@ public:
 	void halt_on_next_instruction(device_t *device, util::format_argument_pack<std::ostream> &&args);
 	void ensure_comments_loaded();
 	void reset_transient_flags();
-	void process_source_file();
 
 private:
 	static const size_t NUM_TEMP_VARIABLES;
@@ -610,8 +609,6 @@ private:
 	device_t *  m_livecpu;
 	device_t *  m_visiblecpu;
 	device_t *  m_breakcpu;
-
-	std::unique_ptr<std::istream> m_source_file;        // script source file
 
 	std::unique_ptr<symbol_table> m_symtable;           // global symbol table
 

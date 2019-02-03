@@ -257,10 +257,9 @@ MACHINE_CONFIG_START(pirates_state::pirates)
 	MCFG_DEVICE_PROGRAM_MAP(pirates_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pirates_state,  irq1_line_hold)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pirates)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pirates);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -268,11 +267,9 @@ MACHINE_CONFIG_START(pirates_state::pirates)
 	MCFG_SCREEN_SIZE(36*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pirates_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 0x2000)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x2000);
 
 	SPEAKER(config, "mono").front_center();
 

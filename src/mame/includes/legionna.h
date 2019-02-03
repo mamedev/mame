@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:David Graves, Angelo Salese, David Haywood, Tomasz Slanina
+#ifndef MAME_INCLUDES_LEGIONNA_H
+#define MAME_INCLUDES_LEGIONNA_H
+
+#pragma once
 
 #include "sound/okim6295.h"
 #include "audio/seibu.h"
@@ -8,25 +12,25 @@
 #include "video/seibu_crtc.h"
 #include "emupal.h"
 
-class legionna_state : public driver_device, protected seibu_sound_common
+class legionna_state : public driver_device, public seibu_sound_common
 {
 public:
 	legionna_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_spriteram(*this, "spriteram"),
-			m_swappal(*this, "swappal"),
-			m_layer_disable(0),
-			m_back_gfx_bank(0),
-			m_fore_gfx_bank(0),
-			m_mid_gfx_bank(0),
-			m_maincpu(*this, "maincpu"),
-			m_audiocpu(*this, "audiocpu"),
-			m_seibu_sound(*this, "seibu_sound"),
-			m_oki(*this, "oki"),
-			m_gfxdecode(*this, "gfxdecode"),
-			m_palette(*this, "palette"),
-			m_crtc(*this, "crtc"),
-			m_raiden2cop(*this, "raiden2cop")
+		: driver_device(mconfig, type, tag)
+		, m_spriteram(*this, "spriteram")
+		, m_swappal(*this, "swappal")
+		, m_layer_disable(0)
+		, m_back_gfx_bank(0)
+		, m_fore_gfx_bank(0)
+		, m_mid_gfx_bank(0)
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_seibu_sound(*this, "seibu_sound")
+		, m_oki(*this, "oki")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_crtc(*this, "crtc")
+		, m_raiden2cop(*this, "raiden2cop")
 	{
 		memset(scrollvals, 0, sizeof(uint16_t)*6);
 	}
@@ -80,7 +84,7 @@ private:
 	DECLARE_WRITE16_MEMBER(legionna_midground_w);
 	DECLARE_WRITE16_MEMBER(legionna_foreground_w);
 	DECLARE_WRITE16_MEMBER(legionna_text_w);
-	DECLARE_READ8_MEMBER(denjinmk_sound_comms_r);
+	u8 denjinmk_sound_comms_r(offs_t offset);
 	DECLARE_WRITE8_MEMBER(godzilla_oki_bank_w);
 	DECLARE_WRITE16_MEMBER(denjinmk_setgfxbank);
 	DECLARE_WRITE16_MEMBER(heatbrl_setgfxbank);
@@ -126,3 +130,5 @@ private:
 	void legionna_map(address_map &map);
 	void godzilla_sound_io_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_LEGIONNA_H

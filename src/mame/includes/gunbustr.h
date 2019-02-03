@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail, David Graves
+#ifndef MAME_INCLUDES_GUNBUSTR_H
+#define MAME_INCLUDES_GUNBUSTR_H
+
+#pragma once
+
 #include "machine/eepromser.h"
 #include "video/tc0480scp.h"
 #include "emupal.h"
@@ -17,8 +22,8 @@ struct gb_tempsprite
 class gunbustr_state : public driver_device
 {
 public:
-	gunbustr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	gunbustr_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_tc0480scp(*this, "tc0480scp"),
 		m_ram(*this,"ram"),
@@ -68,3 +73,5 @@ private:
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
+
+#endif // MAME_INCLUDES_GUNBUSTR_H

@@ -41,16 +41,6 @@ WRITE8_MEMBER(gng_state::gng_bankswitch_w)
 		membank("bank1")->set_entry((data & 0x03));
 }
 
-WRITE_LINE_MEMBER(gng_state::coin_counter_1_w)
-{
-	machine().bookkeeping().coin_counter_w(0, state);
-}
-
-WRITE_LINE_MEMBER(gng_state::coin_counter_2_w)
-{
-	machine().bookkeeping().coin_counter_w(1, state);
-}
-
 WRITE_LINE_MEMBER(gng_state::ym_reset_w)
 {
 	if (!state)
@@ -399,12 +389,12 @@ MACHINE_CONFIG_START(gng_state::gng)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(gng_state, irq0_line_hold, 4*60)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 9B on A board
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, gng_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(INPUTLINE("audiocpu", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, gng_state, ym_reset_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, gng_state, coin_counter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, gng_state, coin_counter_2_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // 9B on A board
+	mainlatch.q_out_cb<0>().set(FUNC(gng_state::flipscreen_w));
+	mainlatch.q_out_cb<1>().set_inputline("audiocpu", INPUT_LINE_RESET).invert();
+	mainlatch.q_out_cb<1>().append(FUNC(gng_state::ym_reset_w));
+	mainlatch.q_out_cb<2>().set([this] (int state) { machine().bookkeeping().coin_counter_w(0, state); });
+	mainlatch.q_out_cb<3>().set([this] (int state) { machine().bookkeeping().coin_counter_w(1, state); });
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
@@ -416,17 +406,16 @@ MACHINE_CONFIG_START(gng_state::gng)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gng_state, screen_update_gng)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gng)
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(12'000'000)/8)     /* verified on pcb */
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)
@@ -446,7 +435,7 @@ MACHINE_CONFIG_START(gng_state::diamond)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(diamond_map)
 
-	MCFG_DEVICE_REMOVE("mainlatch")
+	config.device_remove("mainlatch");
 MACHINE_CONFIG_END
 
 

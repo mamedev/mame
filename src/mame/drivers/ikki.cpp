@@ -82,8 +82,8 @@ void ikki_state::ikki_cpu2(address_map &map)
 	map(0x0000, 0x1fff).rom();
 	map(0xc000, 0xc7ff).ram().share("spriteram");
 	map(0xc800, 0xcfff).ram().share("share1");
-	map(0xd801, 0xd801).w("sn1", FUNC(sn76496_device::command_w));
-	map(0xd802, 0xd802).w("sn2", FUNC(sn76496_device::command_w));
+	map(0xd801, 0xd801).w("sn1", FUNC(sn76496_device::write));
+	map(0xd802, 0xd802).w("sn2", FUNC(sn76496_device::write));
 }
 
 
@@ -258,25 +258,23 @@ MACHINE_CONFIG_START(ikki_state::ikki)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", Z80,CPU_CLOCK/2) /* 4.000MHz */
 	MCFG_DEVICE_PROGRAM_MAP(ikki_cpu1)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ikki_state, ikki_irq, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(ikki_state::ikki_irq), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD("sub", Z80,CPU_CLOCK/2) /* 4.000MHz */
 	MCFG_DEVICE_PROGRAM_MAP(ikki_cpu2)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(ikki_state, irq0_line_hold, 2*(PIXEL_CLOCK/HTOTAL/VTOTAL))
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(ikki_state, screen_update_ikki)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ikki)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256+1)
-	MCFG_PALETTE_INIT_OWNER(ikki_state, ikki)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ikki);
+	PALETTE(config, m_palette, FUNC(ikki_state::ikki_palette), 1024, 256 + 1);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

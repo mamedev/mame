@@ -291,7 +291,6 @@
 #include "screen.h"
 #include "machine/ins8250.h"
 #include "bus/rs232/rs232.h"
-#include "machine/terminal.h"
 
 #include "sf2049.lh"
 
@@ -325,7 +324,6 @@ public:
 		m_ethernet(*this, "ethernet"),
 		m_dcs(*this, "dcs"),
 		m_ioasic(*this, "ioasic"),
-		m_uart0(*this, "uart0"),
 		m_uart1(*this, "uart1"),
 		m_uart2(*this, "uart2"),
 		m_io_analog(*this, "AN.%u", 0U),
@@ -386,7 +384,6 @@ private:
 	required_device<smc91c94_device> m_ethernet;
 	required_device<dcs_audio_device> m_dcs;
 	required_device<midway_ioasic_device> m_ioasic;
-	optional_device<generic_terminal_device> m_uart0;
 	optional_device<ns16550_device> m_uart1;
 	optional_device<ns16550_device> m_uart2;
 	optional_ioport_array<8> m_io_analog;
@@ -581,7 +578,7 @@ WRITE32_MEMBER( vegas_state::timekeeper_w )
 		if (ACCESSING_BITS_24_31)
 			m_timekeeper->write(space, offset * 4 + 3, data >> 24, 0xff);
 		if (offset*4 >= 0x7ff0)
-			if (LOG_TIMEKEEPER) logerror("timekeeper_w(%04X & %08X) = %08X\n", offset*4, mem_mask, data);
+			if (LOG_TIMEKEEPER) logerror("%s timekeeper_w(%04X & %08X) = %08X\n", machine().describe_context(), offset*4, mem_mask, data);
 		m_cmos_unlocked = 0;
 	}
 	else
@@ -1104,15 +1101,14 @@ CUSTOM_INPUT_MEMBER(vegas_state::i40_r)
 *************************************/
 WRITE32_MEMBER(vegas_state::wheel_board_w)
 {
-	/* two writes in pairs. bit 11 high, bit 10 flag, flag off first, on second. arg remains the same. */
-	bool valid = (data & (1 << 11));
-	bool flag = (data & (1 << 10));
+	bool chip_select = BIT(data, 11);
+	bool latch_clk = BIT(data, 10);
 	uint8_t op = (data >> 8) & 0x3;
 	uint8_t arg = data & 0xff;
 
 	//logerror("wheel_board_w: data = %08x op: %02x arg: %02x\n", data, op, arg);
 
-	if (valid && flag)
+	if (chip_select && latch_clk)
 	{
 		switch (op)
 		{
@@ -1126,7 +1122,7 @@ WRITE32_MEMBER(vegas_state::wheel_board_w)
 				m_lamps[bit] = BIT(arg, bit);
 
 			/* leader lamp bit is included in every write, for some reason. */
-			m_lamps[8] = BIT(arg, 12);
+			m_lamps[8] = BIT(data, 12);
 			break;
 
 		case 0x2:
@@ -1306,9 +1302,11 @@ static INPUT_PORTS_START( gauntleg )
 	PORT_DIPNAME( 0x0001, 0x0001, "PM Dump" )
 	PORT_DIPSETTING(      0x0001, "Watchdog resets only" )
 	PORT_DIPSETTING(      0x0000, "All resets" )
-	PORT_DIPNAME( 0x0040, 0x0040, "Boot ROM Test" )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00c0, 0x00c0, "Test Mode" )
+	PORT_DIPSETTING(      0x00c0, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0040, "Disk-based Test" )
+	PORT_DIPSETTING(      0x0080, "EPROM-based Test" )
+	PORT_DIPSETTING(      0x0000, "Interactive Diagnostics" )
 	PORT_DIPNAME( 0x0800, 0x0800, "SIO Rev" )
 	PORT_DIPSETTING(      0x0800, "1 or later")
 	PORT_DIPSETTING(      0x0000, "0")
@@ -1743,49 +1741,47 @@ void vegas_state::vegas_cs8_map(address_map &map)
 
 MACHINE_CONFIG_START(vegas_state::vegascore)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, R5000LE, vegas_state::SYSTEM_CLOCK*2)
-	MCFG_MIPS3_ICACHE_SIZE(16384)
-	MCFG_MIPS3_DCACHE_SIZE(16384)
-	MCFG_MIPS3_SYSTEM_CLOCK(vegas_state::SYSTEM_CLOCK)
+	R5000LE(config, m_maincpu, vegas_state::SYSTEM_CLOCK * 2);
+	m_maincpu->set_icache_size(16384);
+	m_maincpu->set_dcache_size(16384);
+	m_maincpu->set_system_clock(vegas_state::SYSTEM_CLOCK);
 
 	// PCI Bus Devices
-	MCFG_DEVICE_ADD(":pci", PCI_ROOT, 0)
+	PCI_ROOT(config, ":pci", 0);
 
-	MCFG_DEVICE_ADD(PCI_ID_NILE, VRC5074, 0, m_maincpu)
-	MCFG_VRC5074_SET_SDRAM(0, 0x00800000)
-	MCFG_VRC5074_SET_CS(2, vegas_state::vegas_cs2_map)
-	MCFG_VRC5074_SET_CS(3, vegas_state::vegas_cs3_map)
-	MCFG_VRC5074_SET_CS(4, vegas_state::vegas_cs4_map)
-	MCFG_VRC5074_SET_CS(5, vegas_state::vegas_cs5_map)
-	MCFG_VRC5074_SET_CS(6, vegas_state::vegas_cs6_map)
-	MCFG_VRC5074_SET_CS(7, vegas_state::vegas_cs7_map)
+	VRC5074(config, m_nile, 100000000, m_maincpu);
+	m_nile->set_sdram_size(0, 0x00800000);
+	m_nile->set_map(2, address_map_constructor(&vegas_state::vegas_cs2_map, "vegas_cs2_map", this), this);
+	m_nile->set_map(3, address_map_constructor(&vegas_state::vegas_cs3_map, "vegas_cs3_map", this), this);
+	m_nile->set_map(4, address_map_constructor(&vegas_state::vegas_cs4_map, "vegas_cs4_map", this), this);
+	m_nile->set_map(5, address_map_constructor(&vegas_state::vegas_cs5_map, "vegas_cs5_map", this), this);
+	m_nile->set_map(6, address_map_constructor(&vegas_state::vegas_cs6_map, "vegas_cs6_map", this), this);
+	m_nile->set_map(7, address_map_constructor(&vegas_state::vegas_cs7_map, "vegas_cs7_map", this), this);
 
-	MCFG_DEVICE_ADD(PCI_ID_IDE, IDE_PCI, 0, 0x10950646, 0x05, 0x0)
-	MCFG_IDE_PCI_IRQ_HANDLER(WRITELINE(PCI_ID_NILE, vrc5074_device, pci_intr_d))
-	//MCFG_IDE_PCI_SET_PIF(0x8f)
-
-	MCFG_DEVICE_ADD(PCI_ID_VIDEO, VOODOO_2_PCI, 0, m_maincpu, "screen")
-	MCFG_VOODOO_PCI_FBMEM(2)
-	MCFG_VOODOO_PCI_TMUMEM(4, 4)
-	MCFG_DEVICE_MODIFY(PCI_ID_VIDEO":voodoo")
-	MCFG_VOODOO_VBLANK_CB(WRITELINE(*this, vegas_state, vblank_assert))
-
-	MCFG_DEVICE_ADD(m_timekeeper, M48T37, 0)
-	MCFG_M48T37_RESET_HANDLER(WRITELINE(*this, vegas_state, watchdog_reset))
-	MCFG_M48T37_IRQ_HANDLER(WRITELINE(*this, vegas_state, watchdog_irq))
-
-	MCFG_SMC91C94_ADD(m_ethernet)
-	MCFG_SMC91C94_IRQ_CALLBACK(WRITELINE(*this, vegas_state, ethernet_interrupt))
+	ide_pci_device &ide(IDE_PCI(config, PCI_ID_IDE, 0, 0x10950646, 0x05, 0x0));
+	ide.irq_handler().set(PCI_ID_NILE, FUNC(vrc5074_device::pci_intr_d));
+	//ide.set_pif(0x8f);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	// Screeen size and timing is re-calculated later in voodoo card
-	MCFG_SCREEN_REFRESH_RATE(57)
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
-	MCFG_SCREEN_UPDATE_DEVICE(PCI_ID_VIDEO, voodoo_pci_device, screen_update)
+	voodoo_2_pci_device &voodoo(VOODOO_2_PCI(config, PCI_ID_VIDEO, 0, m_maincpu, "screen"));
+	voodoo.set_fbmem(2);
+	voodoo.set_tmumem(4, 4);
+	subdevice<voodoo_device>(PCI_ID_VIDEO":voodoo")->vblank_callback().set(FUNC(vegas_state::vblank_assert));
 
-	/* sound hardware */
+	M48T37(config, m_timekeeper);
+	m_timekeeper->reset_cb().set(FUNC(vegas_state::watchdog_reset));
+	m_timekeeper->irq_cb().set(FUNC(vegas_state::watchdog_irq));
+
+	SMC91C94(config, m_ethernet, 0);
+	m_ethernet->irq_handler().set(FUNC(vegas_state::ethernet_interrupt));
+
+	/* screen */
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	// Screeen size and timing is re-calculated later in voodoo card
+	screen.set_refresh_hz(57);
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 640 - 1, 0, 480 - 1);
+	screen.set_screen_update(PCI_ID_VIDEO, FUNC(voodoo_pci_device::screen_update));
 MACHINE_CONFIG_END
 
 
@@ -1796,83 +1792,77 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vegas_state::vegas250)
 	vegascore(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(vegas_state::SYSTEM_CLOCK*2.5)
+	m_maincpu->set_clock(vegas_state::SYSTEM_CLOCK*2.5);
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(vegas_state::vegas32m)
 	vegas250(config);
-	MCFG_DEVICE_MODIFY(PCI_ID_NILE)
-	MCFG_VRC5074_SET_SDRAM(0, 0x02000000)
+	m_nile->set_sdram_size(0, 0x02000000);
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(vegas_state::vegasban)
 	vegas32m(config);
-	MCFG_DEVICE_REPLACE(PCI_ID_VIDEO, VOODOO_BANSHEE_PCI, 0, m_maincpu, "screen")
-	MCFG_VOODOO_PCI_FBMEM(16)
-	MCFG_DEVICE_MODIFY(PCI_ID_VIDEO":voodoo")
-	MCFG_VOODOO_VBLANK_CB(WRITELINE(*this, vegas_state, vblank_assert))
+	voodoo_banshee_pci_device &voodoo(VOODOO_BANSHEE_PCI(config.replace(), PCI_ID_VIDEO, 0, m_maincpu, "screen"));
+	voodoo.set_fbmem(16);
+	subdevice<voodoo_device>(PCI_ID_VIDEO":voodoo")->vblank_callback().set(FUNC(vegas_state::vblank_assert));
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(vegas_state::vegasv3)
 	vegas32m(config);
-	MCFG_DEVICE_REPLACE("maincpu", RM7000LE, vegas_state::SYSTEM_CLOCK*2.5)
-	MCFG_MIPS3_ICACHE_SIZE(16384)
-	MCFG_MIPS3_DCACHE_SIZE(16384)
-	MCFG_MIPS3_SYSTEM_CLOCK(vegas_state::SYSTEM_CLOCK)
+	RM7000LE(config.replace(), m_maincpu, vegas_state::SYSTEM_CLOCK * 2.5);
+	m_maincpu->set_icache_size(16384);
+	m_maincpu->set_dcache_size(16384);
+	m_maincpu->set_system_clock(vegas_state::SYSTEM_CLOCK);
 
-	MCFG_DEVICE_REPLACE(PCI_ID_VIDEO, VOODOO_3_PCI, 0, m_maincpu, "screen")
-	MCFG_VOODOO_PCI_FBMEM(16)
-	MCFG_DEVICE_MODIFY(PCI_ID_VIDEO":voodoo")
-	MCFG_VOODOO_VBLANK_CB(WRITELINE(*this, vegas_state, vblank_assert))
+	voodoo_3_pci_device &voodoo(VOODOO_3_PCI(config.replace(), PCI_ID_VIDEO, 0, m_maincpu, "screen"));
+	voodoo.set_fbmem(16);
+	subdevice<voodoo_device>(PCI_ID_VIDEO":voodoo")->vblank_callback().set(FUNC(vegas_state::vblank_assert));
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(vegas_state::denver)
 	vegascore(config);
-	MCFG_DEVICE_REPLACE(m_maincpu, RM7000LE, vegas_state::SYSTEM_CLOCK*2.5)
-	MCFG_MIPS3_ICACHE_SIZE(16384)
-	MCFG_MIPS3_DCACHE_SIZE(16384)
-	MCFG_MIPS3_SYSTEM_CLOCK(vegas_state::SYSTEM_CLOCK)
+	RM7000LE(config.replace(), m_maincpu, vegas_state::SYSTEM_CLOCK * 2.5);
 
-	MCFG_DEVICE_MODIFY(PCI_ID_NILE)
-	MCFG_VRC5074_SET_SDRAM(0, 0x02000000)
-	MCFG_VRC5074_SET_CS(8, vegas_state::vegas_cs8_map)
+	m_maincpu->set_icache_size(16384);
+	m_maincpu->set_dcache_size(16384);
+	m_maincpu->set_system_clock(vegas_state::SYSTEM_CLOCK);
+	m_nile->set_sdram_size(0, 0x02000000);
+	m_nile->set_map(8, address_map_constructor(&vegas_state::vegas_cs8_map, "vegas_cs8_map", this), this);
 
-	MCFG_DEVICE_REPLACE(PCI_ID_VIDEO, VOODOO_3_PCI, 0, m_maincpu, "screen")
-	MCFG_VOODOO_PCI_FBMEM(16)
-	MCFG_DEVICE_MODIFY(PCI_ID_VIDEO":voodoo")
-	MCFG_VOODOO_VBLANK_CB(WRITELINE(*this, vegas_state, vblank_assert))
+	voodoo_3_pci_device &voodoo(VOODOO_3_PCI(config.replace(), PCI_ID_VIDEO, 0, m_maincpu, "screen"));
+	voodoo.set_fbmem(16);
+	subdevice<voodoo_device>(PCI_ID_VIDEO":voodoo")->vblank_callback().set(FUNC(vegas_state::vblank_assert));
 
 	// TL16C552 UART
-	MCFG_DEVICE_ADD(m_uart1, NS16550, XTAL(1'843'200))
-	MCFG_INS8250_OUT_TX_CB(WRITELINE("ttys01", rs232_port_device, write_txd))
-	MCFG_INS8250_OUT_DTR_CB(WRITELINE("ttys01", rs232_port_device, write_dtr))
-	MCFG_INS8250_OUT_RTS_CB(WRITELINE("ttys01", rs232_port_device, write_rts))
-	MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, vegas_state, duart_irq_cb))
+	NS16550(config, m_uart1, XTAL(1'843'200));
+	m_uart1->out_tx_callback().set("ttys01", FUNC(rs232_port_device::write_txd));
+	m_uart1->out_dtr_callback().set("ttys01", FUNC(rs232_port_device::write_dtr));
+	m_uart1->out_rts_callback().set("ttys01", FUNC(rs232_port_device::write_rts));
+	m_uart1->out_int_callback().set(FUNC(vegas_state::duart_irq_cb));
 
-	MCFG_DEVICE_ADD(m_uart2, NS16550, XTAL(1'843'200))
-	MCFG_INS8250_OUT_TX_CB(WRITELINE("ttys02", rs232_port_device, write_txd))
-	MCFG_INS8250_OUT_DTR_CB(WRITELINE("ttys02", rs232_port_device, write_dtr))
-	MCFG_INS8250_OUT_RTS_CB(WRITELINE("ttys02", rs232_port_device, write_rts))
-	MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, vegas_state, duart_irq_cb))
+	NS16550(config, m_uart2, XTAL(1'843'200));
+	m_uart1->out_tx_callback().set("ttys02", FUNC(rs232_port_device::write_txd));
+	m_uart1->out_dtr_callback().set("ttys02", FUNC(rs232_port_device::write_dtr));
+	m_uart1->out_rts_callback().set("ttys02", FUNC(rs232_port_device::write_rts));
+	m_uart1->out_int_callback().set(FUNC(vegas_state::duart_irq_cb));
 
-	MCFG_DEVICE_ADD("ttys01", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_uart1, ins8250_uart_device, rx_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_uart1, ins8250_uart_device, dcd_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(m_uart1, ins8250_uart_device, dsr_w))
-	MCFG_RS232_RI_HANDLER(WRITELINE(m_uart1, ins8250_uart_device, ri_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_uart1, ins8250_uart_device, cts_w))
+	rs232_port_device &ttys01(RS232_PORT(config, "ttys01", 0));
+	ttys01.rxd_handler().set(m_uart1, FUNC(ins8250_uart_device::rx_w));
+	ttys01.dcd_handler().set(m_uart1, FUNC(ins8250_uart_device::dcd_w));
+	ttys01.dsr_handler().set(m_uart1, FUNC(ins8250_uart_device::dsr_w));
+	ttys01.ri_handler().set(m_uart1, FUNC(ins8250_uart_device::ri_w));
+	ttys01.cts_handler().set(m_uart1, FUNC(ins8250_uart_device::cts_w));
 
-	MCFG_DEVICE_ADD("ttys02", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_uart2, ins8250_uart_device, rx_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_uart2, ins8250_uart_device, dcd_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(m_uart2, ins8250_uart_device, dsr_w))
-	MCFG_RS232_RI_HANDLER(WRITELINE(m_uart2, ins8250_uart_device, ri_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_uart2, ins8250_uart_device, cts_w))
+	rs232_port_device &ttys02(RS232_PORT(config, "ttys02", 0));
+	ttys02.rxd_handler().set(m_uart2, FUNC(ins8250_uart_device::rx_w));
+	ttys02.dcd_handler().set(m_uart2, FUNC(ins8250_uart_device::dcd_w));
+	ttys02.dsr_handler().set(m_uart2, FUNC(ins8250_uart_device::dsr_w));
+	ttys02.ri_handler().set(m_uart2, FUNC(ins8250_uart_device::ri_w));
+	ttys02.cts_handler().set(m_uart2, FUNC(ins8250_uart_device::cts_w));
 
 MACHINE_CONFIG_END
 
@@ -1880,177 +1870,183 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vegas_state::gauntleg)
 	vegas(config);
-	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)
-	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
-	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0b5d)
+	dcs2_audio_2104_device &dcs(DCS2_AUDIO_2104(config, "dcs", 0));
+	dcs.set_dram_in_mb(4);
+	dcs.set_polling_offset(0x0b5d);
 
-	MCFG_DEVICE_ADD(m_ioasic, MIDWAY_IOASIC, 0)
-	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_CALSPEED)
-	MCFG_MIDWAY_IOASIC_UPPER(340/* 340=39", 322=27", others? */)
-	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
-	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(*this, vegas_state, ioasic_irq))
-	MCFG_MIDWAY_IOASIC_AUTO_ACK(1)
+	MIDWAY_IOASIC(config, m_ioasic, 0);
+	m_ioasic->set_shuffle(MIDWAY_IOASIC_CALSPEED);
+	m_ioasic->set_upper(340/* 340=39", 322=27", others? */);
+	m_ioasic->set_yearoffs(80);
+	m_ioasic->irq_handler().set(FUNC(vegas_state::ioasic_irq));
+	m_ioasic->set_auto_ack(1);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vegas_state::gauntdl)
 	vegas(config);
-	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)
-	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
-	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0b5d)
+	dcs2_audio_2104_device &dcs(DCS2_AUDIO_2104(config, "dcs", 0));
+	dcs.set_dram_in_mb(4);
+	dcs.set_polling_offset(0x0b5d);
 
-	MCFG_DEVICE_ADD(m_ioasic, MIDWAY_IOASIC, 0)
-	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_GAUNTDL)
-	MCFG_MIDWAY_IOASIC_UPPER(346/* 347, others? */)
-	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
-	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(*this, vegas_state, ioasic_irq))
-	MCFG_MIDWAY_IOASIC_AUTO_ACK(1)
+	MIDWAY_IOASIC(config, m_ioasic, 0);
+	m_ioasic->set_shuffle(MIDWAY_IOASIC_GAUNTDL);
+	m_ioasic->set_upper(346/* 347, others? */);
+	m_ioasic->set_yearoffs(80);
+	m_ioasic->irq_handler().set(FUNC(vegas_state::ioasic_irq));
+	m_ioasic->set_auto_ack(1);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vegas_state::warfa)
 	vegas250(config);
-	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)
-	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
-	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0b5d)
+	dcs2_audio_2104_device &dcs(DCS2_AUDIO_2104(config, "dcs", 0));
+	dcs.set_dram_in_mb(4);
+	dcs.set_polling_offset(0x0b5d);
 
-	MCFG_DEVICE_ADD(m_ioasic, MIDWAY_IOASIC, 0)
-	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_MACE)
-	MCFG_MIDWAY_IOASIC_UPPER(337/* others? */)
-	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
-	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(*this, vegas_state, ioasic_irq))
-	MCFG_MIDWAY_IOASIC_AUTO_ACK(1)
+	MIDWAY_IOASIC(config, m_ioasic, 0);
+	m_ioasic->set_shuffle(MIDWAY_IOASIC_MACE);
+	m_ioasic->set_upper(337/* others? */);
+	m_ioasic->set_yearoffs(80);
+	m_ioasic->irq_handler().set(FUNC(vegas_state::ioasic_irq));
+	m_ioasic->set_auto_ack(1);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vegas_state::tenthdeg)
 	vegas(config);
-	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
-	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
-	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0afb)
+	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
+	dcs.set_dram_in_mb(4);
+	dcs.set_polling_offset(0x0afb);
 
-	MCFG_DEVICE_ADD(m_ioasic, MIDWAY_IOASIC, 0)
-	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_GAUNTDL)
-	MCFG_MIDWAY_IOASIC_UPPER(330/* others? */)
-	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
-	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(*this, vegas_state, ioasic_irq))
-	MCFG_MIDWAY_IOASIC_AUTO_ACK(1)
+	MIDWAY_IOASIC(config, m_ioasic, 0);
+	m_ioasic->set_shuffle(MIDWAY_IOASIC_GAUNTDL);
+	m_ioasic->set_upper(330/* others? */);
+	m_ioasic->set_yearoffs(80);
+	m_ioasic->irq_handler().set(FUNC(vegas_state::ioasic_irq));
+	m_ioasic->set_auto_ack(1);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vegas_state::roadburn)
 	vegas32m(config);
-	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_DSIO, 0)
-	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
-	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0ddd)
+	dcs2_audio_dsio_device &dcs(DCS2_AUDIO_DSIO(config, "dcs", 0));
+	dcs.set_dram_in_mb(4);
+	dcs.set_polling_offset(0x0ddd);
 
-	MCFG_DEVICE_ADD(m_ioasic, MIDWAY_IOASIC, 0)
-	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_STANDARD)
-	MCFG_MIDWAY_IOASIC_UPPER(325/* others? */)
-	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
-	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(*this, vegas_state, ioasic_irq))
-	MCFG_MIDWAY_IOASIC_AUTO_ACK(1)
+	MIDWAY_IOASIC(config, m_ioasic, 0);
+	m_ioasic->set_shuffle(MIDWAY_IOASIC_STANDARD);
+	m_ioasic->set_upper(325/* others? */);
+	m_ioasic->set_yearoffs(80);
+	m_ioasic->irq_handler().set(FUNC(vegas_state::ioasic_irq));
+	m_ioasic->set_auto_ack(1);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vegas_state::nbashowt)
 	vegasban(config);
-	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)
-	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
-	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0b5d)
+	dcs2_audio_2104_device &dcs(DCS2_AUDIO_2104(config, "dcs", 0));
+	dcs.set_dram_in_mb(4);
+	dcs.set_polling_offset(0x0b5d);
 
-	MCFG_DEVICE_ADD(m_ioasic, MIDWAY_IOASIC, 0)
-	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_MACE)
+	MIDWAY_IOASIC(config, m_ioasic, 0);
+	m_ioasic->set_shuffle(MIDWAY_IOASIC_MACE);
 	// 528 494 478 development pic, 487 NBA
-	MCFG_MIDWAY_IOASIC_UPPER(487/* or 478 or 487 */)
-	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
-	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(*this, vegas_state, ioasic_irq))
-	//MCFG_MIDWAY_IOASIC_AUTO_ACK(1)
-	MCFG_MIDWAY_IOASIC_AUX_OUT_CB(WRITE32(*this, vegas_state, i40_w))
+	m_ioasic->set_upper(487/* or 478 or 487 */);
+	m_ioasic->set_yearoffs(80);
+	m_ioasic->irq_handler().set(FUNC(vegas_state::ioasic_irq));
+	//m_ioasic->set_auto_ack(1)
+	m_ioasic->aux_output_handler().set(FUNC(vegas_state::i40_w));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vegas_state::nbanfl)
 	vegasban(config);
-	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)
-	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
+	dcs2_audio_2104_device &dcs(DCS2_AUDIO_2104(config, "dcs", 0));
+	dcs.set_dram_in_mb(4);
+	dcs.set_polling_offset(0x0b5d);
 
-	MCFG_DEVICE_ADD(m_ioasic, MIDWAY_IOASIC, 0)
-	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_BLITZ99)
-	MCFG_MIDWAY_IOASIC_UPPER(498/* or 478 or 487 */)
-	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
-	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(*this, vegas_state, ioasic_irq))
-	//MCFG_MIDWAY_IOASIC_AUTO_ACK(1)
-	MCFG_MIDWAY_IOASIC_AUX_OUT_CB(WRITE32(*this, vegas_state, i40_w))
+	MIDWAY_IOASIC(config, m_ioasic, 0);
+	m_ioasic->set_shuffle(MIDWAY_IOASIC_BLITZ99);
+	m_ioasic->set_upper(498/* or 478 or 487 */);
+	m_ioasic->set_yearoffs(80);
+	m_ioasic->irq_handler().set(FUNC(vegas_state::ioasic_irq));
+	//m_ioasic->set_auto_ack(1)
+	m_ioasic->aux_output_handler().set(FUNC(vegas_state::i40_w));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vegas_state::nbagold)
 	vegasban(config);
-	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)
-	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
-	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0b5d)
+	QED5271LE(config.replace(), m_maincpu, vegas_state::SYSTEM_CLOCK * 2.5);
+	m_maincpu->set_icache_size(32768);
+	m_maincpu->set_dcache_size(32768);
+	m_maincpu->set_system_clock(vegas_state::SYSTEM_CLOCK);
+	m_nile->set_sdram_size(0, 0x00800000);
+	dcs2_audio_2104_device &dcs(DCS2_AUDIO_2104(config, "dcs", 0));
+	dcs.set_dram_in_mb(4);
+	dcs.set_polling_offset(0x0b5d);
 
-	MCFG_DEVICE_ADD(m_ioasic, MIDWAY_IOASIC, 0)
-	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_GAUNTDL)
-	MCFG_MIDWAY_IOASIC_UPPER( 494 /* 494 109 ??? */)
-	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
-	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(*this, vegas_state, ioasic_irq))
-	//MCFG_MIDWAY_IOASIC_AUTO_ACK(1)
-	MCFG_MIDWAY_IOASIC_AUX_OUT_CB(WRITE32(*this, vegas_state, i40_w))
+	MIDWAY_IOASIC(config, m_ioasic, 0);
+	m_ioasic->set_shuffle(MIDWAY_IOASIC_GAUNTDL);
+	m_ioasic->set_upper(494 /* 494 109 ??? */);
+	m_ioasic->set_yearoffs(80);
+	m_ioasic->irq_handler().set(FUNC(vegas_state::ioasic_irq));
+	//m_ioasic->set_auto_ack(1)
+	 m_ioasic->aux_output_handler().set(FUNC(vegas_state::i40_w));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vegas_state::sf2049)
 	denver(config);
-	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_DENVER_5CH, 0)
-	MCFG_DCS2_AUDIO_DRAM_IN_MB(8)
-	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x872)
+	dcs2_audio_denver_5ch_device &dcs(DCS2_AUDIO_DENVER_5CH(config, "dcs", 0));
+	dcs.set_dram_in_mb(8);
+	dcs.set_polling_offset(0x872);
 
-	MCFG_DEVICE_ADD(m_ioasic, MIDWAY_IOASIC, 0)
-	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_STANDARD)
-	MCFG_MIDWAY_IOASIC_UPPER(336/* others? */)
-	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
-	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(*this, vegas_state, ioasic_irq))
-	MCFG_MIDWAY_IOASIC_AUTO_ACK(1)
-	MCFG_MIDWAY_IOASIC_AUX_OUT_CB(WRITE32(*this, vegas_state, wheel_board_w))
+	MIDWAY_IOASIC(config, m_ioasic, 0);
+	m_ioasic->set_shuffle(MIDWAY_IOASIC_STANDARD);
+	m_ioasic->set_upper(336/* others? */);
+	m_ioasic->set_yearoffs(80);
+	m_ioasic->irq_handler().set(FUNC(vegas_state::ioasic_irq));
+	m_ioasic->set_auto_ack(1);
+	m_ioasic->aux_output_handler().set(FUNC(vegas_state::wheel_board_w));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vegas_state::sf2049se)
 	denver(config);
-	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_DENVER_5CH, 0)
-	MCFG_DCS2_AUDIO_DRAM_IN_MB(8)
-	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x872)
+	dcs2_audio_denver_5ch_device &dcs(DCS2_AUDIO_DENVER_5CH(config, "dcs", 0));
+	dcs.set_dram_in_mb(8);
+	dcs.set_polling_offset(0x872);
 
-	MCFG_DEVICE_ADD(m_ioasic, MIDWAY_IOASIC, 0)
-	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_SFRUSHRK)
-	MCFG_MIDWAY_IOASIC_UPPER(352/*352 336 others? */)
-	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
-	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(*this, vegas_state, ioasic_irq))
-	MCFG_MIDWAY_IOASIC_AUTO_ACK(1)
-	MCFG_MIDWAY_IOASIC_AUX_OUT_CB(WRITE32(*this, vegas_state, wheel_board_w))
+	MIDWAY_IOASIC(config, m_ioasic, 0);
+	m_ioasic->set_shuffle(MIDWAY_IOASIC_SFRUSHRK);
+	m_ioasic->set_upper(352/*352 336 others? */);
+	m_ioasic->set_yearoffs(80);
+	m_ioasic->irq_handler().set(FUNC(vegas_state::ioasic_irq));
+	m_ioasic->set_auto_ack(1);
+	m_ioasic->aux_output_handler().set(FUNC(vegas_state::wheel_board_w));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vegas_state::sf2049te)
 	denver(config);
-	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_DENVER_5CH, 0)
-	MCFG_DCS2_AUDIO_DRAM_IN_MB(8)
-	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x872)
+	dcs2_audio_denver_5ch_device &dcs(DCS2_AUDIO_DENVER_5CH(config, "dcs", 0));
+	dcs.set_dram_in_mb(8);
+	dcs.set_polling_offset(0x872);
 
-	MCFG_DEVICE_ADD(m_ioasic, MIDWAY_IOASIC, 0)
-	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_SFRUSHRK)
-	MCFG_MIDWAY_IOASIC_UPPER(348/* 348 others? */)
-	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
-	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(*this, vegas_state, ioasic_irq))
-	MCFG_MIDWAY_IOASIC_AUTO_ACK(1)
-	MCFG_MIDWAY_IOASIC_AUX_OUT_CB(WRITE32(*this, vegas_state, wheel_board_w))
+	MIDWAY_IOASIC(config, m_ioasic, 0);
+	m_ioasic->set_shuffle(MIDWAY_IOASIC_SFRUSHRK);
+	m_ioasic->set_upper(348/* 348 others? */);
+	m_ioasic->set_yearoffs(80);
+	m_ioasic->irq_handler().set(FUNC(vegas_state::ioasic_irq));
+	m_ioasic->set_auto_ack(1);
+	m_ioasic->aux_output_handler().set(FUNC(vegas_state::wheel_board_w));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vegas_state::cartfury)
 	vegasv3(config);
-	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)
-	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
-	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0b5d)
+	dcs2_audio_2104_device &dcs(DCS2_AUDIO_2104(config, "dcs", 0));
+	dcs.set_dram_in_mb(4);
+	dcs.set_polling_offset(0x0b5d);
 
-	MCFG_DEVICE_ADD(m_ioasic, MIDWAY_IOASIC, 0)
-	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_CARNEVIL)
-	// 433, 495 Development PIC
-	MCFG_MIDWAY_IOASIC_UPPER(495/*433,  495 others? */)
-	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
-	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(*this, vegas_state, ioasic_irq))
-	//MCFG_MIDWAY_IOASIC_AUTO_ACK(1)
+	MIDWAY_IOASIC(config, m_ioasic, 0);
+	m_ioasic->set_shuffle(MIDWAY_IOASIC_CARNEVIL);
+	// 433, 495, 490 Development PIC
+	m_ioasic->set_upper(495/*433,  495 others? */);
+	m_ioasic->set_yearoffs(80);
+	m_ioasic->irq_handler().set(FUNC(vegas_state::ioasic_irq));
+	//m_ioasic->set_auto_ack(1)
 MACHINE_CONFIG_END
 
 
@@ -2464,7 +2460,7 @@ void vegas_state::init_cartfury()
 
 /* Vegas + Vegas SIO + Voodoo 2 */
 GAME( 1998, gauntleg,   0,        gauntleg, gauntleg, vegas_state, init_gauntleg, ROT0, "Atari Games",   "Gauntlet Legends (version 1.6)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, gauntleg12, gauntleg, gauntleg, gauntleg, vegas_state, init_gauntleg, ROT0, "Atari Games",   "Gauntlet Legends (version 1.2)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, gauntleg12, gauntleg, gauntleg, gauntleg, vegas_state, init_gauntleg, ROT0, "Atari Games",   "Gauntlet Legends (version 1.2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, tenthdeg,   0,        tenthdeg, tenthdeg, vegas_state, init_tenthdeg, ROT0, "Atari Games",   "Tenth Degree (prototype)", MACHINE_SUPPORTS_SAVE )
 
 /* Durango + Vegas SIO + Voodoo 2 */
@@ -2481,16 +2477,16 @@ GAME( 1999, roadburn,   0,        roadburn, roadburn, vegas_state, init_roadburn
 GAME( 1999, roadburn1,  roadburn, roadburn, roadburn, vegas_state, init_roadburn, ROT0, "Atari Games",   "Road Burners (ver 1.0)", MACHINE_SUPPORTS_SAVE )
 
 /* Durango + DSIO? + Voodoo banshee */
-GAME( 1998, nbashowt,   0,        nbashowt, nbashowt, vegas_state, init_nbashowt, ROT0, "Midway Games",  "NBA Showtime: NBA on NBC (ver 2.0)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1999, nbanfl,     0,        nbanfl,   nbashowt, vegas_state, init_nbanfl,   ROT0, "Midway Games",  "NBA Showtime / NFL Blitz 2000 (ver 2.1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 2000, nbagold ,   0,        nbagold,  nbashowt, vegas_state, init_nbagold,  ROT0, "Midway Games",  "NBA Showtime Gold / NFL Blitz 2000 (ver 3.0) (Sports Station?)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, nbashowt,   0,        nbashowt, nbashowt, vegas_state, init_nbashowt, ROT0, "Midway Games",  "NBA Showtime: NBA on NBC (ver 2.0)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // random freezes on the 3d parts
+GAME( 1999, nbanfl,     0,        nbanfl,   nbashowt, vegas_state, init_nbanfl,   ROT0, "Midway Games",  "NBA Showtime / NFL Blitz 2000 (ver 2.1)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) //attempting to run blitz on either v2.1 or v3.0 wlil reset the machine
+GAME( 2000, nbagold ,   0,        nbagold,  nbashowt, vegas_state, init_nbagold,  ROT0, "Midway Games",  "NBA Showtime Gold / NFL Blitz 2000 (ver 3.0) (Sports Station?)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
 
 /* Durango + Denver SIO + Voodoo 3 */
-GAMEL( 1999, sf2049,     0,        sf2049,   sf2049,   vegas_state, init_sf2049,   ROT0, "Atari Games",   "San Francisco Rush 2049", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_sf2049 )
-GAMEL( 2003, sf2049se,   sf2049,   sf2049se, sf2049se, vegas_state, init_sf2049se, ROT0, "Atari Games",   "San Francisco Rush 2049: Special Edition", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_sf2049 )
-GAMEL( 2000, sf2049te,   sf2049,   sf2049te, sf2049se, vegas_state, init_sf2049te, ROT0, "Atari Games",   "San Francisco Rush 2049: Tournament Edition", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_sf2049 )
-GAMEL( 2001, sf2049tea,  sf2049,   sf2049te, sf2049se, vegas_state, init_sf2049te, ROT0, "Atari Games",   "San Francisco Rush 2049: Tournament Edition Unlocked", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_sf2049 )
+GAMEL( 1999, sf2049,     0,        sf2049,   sf2049,   vegas_state, init_sf2049,   ROT0, "Atari Games",   "San Francisco Rush 2049", MACHINE_SUPPORTS_SAVE, layout_sf2049 )
+GAMEL( 2003, sf2049se,   sf2049,   sf2049se, sf2049se, vegas_state, init_sf2049se, ROT0, "Atari Games",   "San Francisco Rush 2049: Special Edition", MACHINE_SUPPORTS_SAVE, layout_sf2049 )
+GAMEL( 2000, sf2049te,   sf2049,   sf2049te, sf2049se, vegas_state, init_sf2049te, ROT0, "Atari Games",   "San Francisco Rush 2049: Tournament Edition", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_sf2049 )
+GAMEL( 2001, sf2049tea,  sf2049,   sf2049te, sf2049se, vegas_state, init_sf2049te, ROT0, "Atari Games",   "San Francisco Rush 2049: Tournament Edition Unlocked", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_sf2049 )
 
 /* Durango + Vegas SIO + Voodoo 3 */
-GAME( 2000, cartfury,   0,        cartfury, cartfury, vegas_state, init_cartfury, ROT0, "Midway Games",  "Cart Fury", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2000, cartfury,   0,        cartfury, cartfury, vegas_state, init_cartfury, ROT0, "Midway Games",  "Cart Fury", MACHINE_SUPPORTS_SAVE )

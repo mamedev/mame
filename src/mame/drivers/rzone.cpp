@@ -245,11 +245,11 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(rzone_state::rzbatfor)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM512) // no external XTAL
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, rzone_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, rzone_state, t2_write_s))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, rzone_state, t2_write_r))
+	SM512(config, m_maincpu); // no external XTAL
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(rzone_state::input_r));
+	m_maincpu->write_s().set(FUNC(rzone_state::t2_write_s));
+	m_maincpu->write_r().set(FUNC(rzone_state::t2_write_r));
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -257,9 +257,9 @@ MACHINE_CONFIG_START(rzone_state::rzbatfor)
 	MCFG_SCREEN_SIZE(1368, 1080)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1368-1, 0, 1080-1)
 
-	MCFG_TIMER_DRIVER_ADD("led_off", rzone_state, led_off_callback)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_rzone)
+	TIMER(config, m_led_off).configure_generic(FUNC(rzone_state::led_off_callback));
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
+	config.set_default_layout(layout_rzone);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -270,12 +270,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(rzone_state::rztoshden)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510)
-	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, rzone_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, rzone_state, t1_write_s))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, rzone_state, t1_write_r))
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(rzone_state::input_r));
+	m_maincpu->write_s().set(FUNC(rzone_state::t1_write_s));
+	m_maincpu->write_r().set(FUNC(rzone_state::t1_write_r));
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -283,9 +283,9 @@ MACHINE_CONFIG_START(rzone_state::rztoshden)
 	MCFG_SCREEN_SIZE(1392, 1080)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1392-1, 0, 1080-1)
 
-	MCFG_TIMER_DRIVER_ADD("led_off", rzone_state, led_off_callback)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_rzone)
+	TIMER(config, m_led_off).configure_generic(FUNC(rzone_state::led_off_callback));
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
+	config.set_default_layout(layout_rzone);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -296,12 +296,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(rzone_state::rzindy500)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510) // no external XTAL
-	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT) // confirmed
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, rzone_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, rzone_state, t1_write_s))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, rzone_state, t1_write_r))
+	SM510(config, m_maincpu); // no external XTAL
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT); // confirmed
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(rzone_state::input_r));
+	m_maincpu->write_s().set(FUNC(rzone_state::t1_write_s));
+	m_maincpu->write_r().set(FUNC(rzone_state::t1_write_r));
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -309,9 +309,9 @@ MACHINE_CONFIG_START(rzone_state::rzindy500)
 	MCFG_SCREEN_SIZE(1425, 1080)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1425-1, 0, 1080-1)
 
-	MCFG_TIMER_DRIVER_ADD("led_off", rzone_state, led_off_callback)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_rzone)
+	TIMER(config, m_led_off).configure_generic(FUNC(rzone_state::led_off_callback));
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
+	config.set_default_layout(layout_rzone);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

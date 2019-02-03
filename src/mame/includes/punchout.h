@@ -5,6 +5,10 @@
     Punch Out / Super Punch Out / Arm Wrestling
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_PUNCHOUT_H
+#define MAME_INCLUDES_PUNCHOUT_H
+
+#pragma once
 
 #include "machine/rp5c01.h"
 #include "machine/rp5h01.h"
@@ -14,8 +18,8 @@
 class punchout_state : public driver_device
 {
 public:
-	punchout_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	punchout_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_rtc(*this, "rtc"),
@@ -103,3 +107,5 @@ private:
 	void punchout_vlm_map(address_map &map);
 	void spnchout_io_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_PUNCHOUT_H

@@ -613,15 +613,15 @@ MACHINE_CONFIG_START(igt_gameking_state::igt_gameking)
 	MCFG_DEVICE_ADD("maincpu", I960, XTAL(24'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(igt_gameking_map)
 
-	MCFG_DEVICE_ADD("quart1", SC28C94, XTAL(24'000'000) / 6)
-	MCFG_SC28C94_D_TX_CALLBACK(WRITELINE("diag", rs232_port_device, write_txd))
+	SC28C94(config, m_quart1, XTAL(24'000'000) / 6);
+	m_quart1->d_tx_cb().set("diag", FUNC(rs232_port_device::write_txd));
 
-	MCFG_DEVICE_ADD("quart2", SC28C94, XTAL(24'000'000) / 6)
-	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", I960_IRQ0))
+	sc28c94_device &quart2(SC28C94(config, "quart2", XTAL(24'000'000) / 6));
+	quart2.irq_cb().set_inputline(m_maincpu, I960_IRQ0);
 
-	MCFG_DEVICE_ADD("diag", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("quart1", sc28c94_device, rx_d_w))
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	rs232_port_device &diag(RS232_PORT(config, "diag", default_rs232_devices, nullptr));
+	diag.rxd_handler().set("quart1", FUNC(sc28c94_device::rx_d_w));
+	diag.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_igt_gameking)
 
@@ -637,7 +637,8 @@ MACHINE_CONFIG_START(igt_gameking_state::igt_gameking)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac.set_addrmap(0, &igt_gameking_state::ramdac_map);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -645,7 +646,7 @@ MACHINE_CONFIG_START(igt_gameking_state::igt_gameking)
 	MCFG_DEVICE_ADD("ymz", YMZ280B, XTAL(16'934'400)) // enhanced sound on optional Media-Lite sub board
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(igt_gameking_state::igt_ms72c)

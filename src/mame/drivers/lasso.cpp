@@ -501,7 +501,7 @@ MACHINE_CONFIG_START(lasso_state::base)
 	MCFG_DEVICE_ADD("audiocpu", M6502, 600000)
 	MCFG_DEVICE_PROGRAM_MAP(lasso_audio_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -510,20 +510,17 @@ MACHINE_CONFIG_START(lasso_state::base)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(lasso_state, screen_update_lasso)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lasso)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lasso);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("sn76489.1", SN76489, 2000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-
-	MCFG_DEVICE_ADD("sn76489.2", SN76489, 2000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	SN76489(config, m_sn_1, 2000000).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	SN76489(config, m_sn_2, 2000000).add_route(ALL_OUTPUTS, "speaker", 1.0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(lasso_state::lasso)
@@ -533,8 +530,7 @@ MACHINE_CONFIG_START(lasso_state::lasso)
 	MCFG_DEVICE_ADD("blitter", M6502, 11289000/16) /* guess */
 	MCFG_DEVICE_PROGRAM_MAP(lasso_coprocessor_map)
 
-	MCFG_PALETTE_ADD("palette", 0x40)
-	MCFG_PALETTE_INIT_OWNER(lasso_state, lasso)
+	PALETTE(config, m_palette, FUNC(lasso_state::lasso_palette), 0x40);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(lasso_state::chameleo)
@@ -548,8 +544,7 @@ MACHINE_CONFIG_START(lasso_state::chameleo)
 	MCFG_DEVICE_PROGRAM_MAP(chameleo_audio_map)
 
 	/* video hardware */
-	MCFG_PALETTE_ADD("palette", 0x40)
-	MCFG_PALETTE_INIT_OWNER(lasso_state, lasso)
+	PALETTE(config, m_palette, FUNC(lasso_state::lasso_palette), 0x40);
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(lasso_state, screen_update_chameleo)
@@ -572,11 +567,9 @@ MACHINE_CONFIG_START(lasso_state::wwjgtin)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(lasso_state, screen_update_wwjgtin)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_wwjgtin) // Has 1 additional layer
+	m_gfxdecode->set_info(gfx_wwjgtin); // Has 1 additional layer
 
-	MCFG_PALETTE_ADD("palette", 0x40 + 16*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(64)
-	MCFG_PALETTE_INIT_OWNER(lasso_state,wwjgtin)
+	PALETTE(config, m_palette, FUNC(lasso_state::wwjgtin_palette), 0x40 + 16*16, 64);
 	MCFG_VIDEO_START_OVERRIDE(lasso_state,wwjgtin)
 
 	/* sound hardware */
@@ -598,22 +591,19 @@ MACHINE_CONFIG_START(lasso_state::pinbo)
 	MCFG_DEVICE_IO_MAP(pinbo_audio_io_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_pinbo)
+	m_gfxdecode->set_info(gfx_pinbo);
 
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 	MCFG_VIDEO_START_OVERRIDE(lasso_state,pinbo)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(lasso_state, screen_update_chameleo)
 
 	/* sound hardware */
-	MCFG_DEVICE_REMOVE("sn76489.1")
-	MCFG_DEVICE_REMOVE("sn76489.2")
+	config.device_remove("sn76489.1");
+	config.device_remove("sn76489.2");
 
-	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(18'000'000)/12)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.55)
-
-	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(18'000'000)/12)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.55)
+	AY8910(config, "ay1", XTAL(18'000'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.55);
+	AY8910(config, "ay2", XTAL(18'000'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.55);
 MACHINE_CONFIG_END
 
 

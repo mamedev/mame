@@ -53,7 +53,7 @@ private:
 	DECLARE_READ8_MEMBER(input_r);
 	DECLARE_READ8_MEMBER(scanline_r);
 
-	DECLARE_PALETTE_INIT(destroyr);
+	void destroyr_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -438,15 +438,15 @@ static GFXDECODE_START( gfx_destroyr )
 GFXDECODE_END
 
 
-PALETTE_INIT_MEMBER(destroyr_state, destroyr)
+void destroyr_state::destroyr_palette(palette_device &palette) const
 {
-	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0x00));   /* major objects */
+	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0x00));   // major objects
 	palette.set_pen_color(1, rgb_t(0x50, 0x50, 0x50));
 	palette.set_pen_color(2, rgb_t(0xAF, 0xAF, 0xAF));
 	palette.set_pen_color(3, rgb_t(0xFF ,0xFF, 0xFF));
-	palette.set_pen_color(4, rgb_t(0x00, 0x00, 0x00));   /* alpha numerics, waves, minor objects */
+	palette.set_pen_color(4, rgb_t(0x00, 0x00, 0x00));   // alpha numerics, waves, minor objects
 	palette.set_pen_color(5, rgb_t(0xFF, 0xFF, 0xFF));
-	palette.set_pen_color(6, rgb_t(0x00, 0x00, 0x00));   /* cursor */
+	palette.set_pen_color(6, rgb_t(0x00, 0x00, 0x00));   // cursor
 	palette.set_pen_color(7, rgb_t(0x78, 0x78, 0x78));
 }
 
@@ -472,9 +472,9 @@ MACHINE_CONFIG_START(destroyr_state::destroyr)
 	MCFG_DEVICE_PROGRAM_MAP(destroyr_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(destroyr_state, irq0_line_assert,  4*60)
 
-	MCFG_DEVICE_ADD("outlatch", F9334, 0) // F8
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(OUTPUT("led0")) MCFG_DEVCB_INVERT // LED 1
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(OUTPUT("led1")) MCFG_DEVCB_INVERT // LED 2 (no second LED present on cab)
+	f9334_device &outlatch(F9334(config, "outlatch")); // F8
+	outlatch.q_out_cb<0>().set_output("led0").invert(); // LED 1
+	outlatch.q_out_cb<1>().set_output("led1").invert(); // LED 2 (no second LED present on cab)
 	// Q2 => songate
 	// Q3 => launch
 	// Q4 => explosion
@@ -482,7 +482,7 @@ MACHINE_CONFIG_START(destroyr_state::destroyr)
 	// Q6 => high explosion
 	// Q7 => low explosion
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -490,11 +490,10 @@ MACHINE_CONFIG_START(destroyr_state::destroyr)
 	MCFG_SCREEN_SIZE(256, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(destroyr_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_destroyr)
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(destroyr_state, destroyr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_destroyr)
+	PALETTE(config, m_palette, FUNC(destroyr_state::destroyr_palette), 8);
 
 	/* sound hardware */
 MACHINE_CONFIG_END

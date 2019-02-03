@@ -336,7 +336,7 @@ MACHINE_CONFIG_START(magmax_state::magmax)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_IO_MAP(sound_io_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	config.m_minimum_quantum = attotime::from_hz(600);
 
 
 	/* video hardware */
@@ -347,28 +347,24 @@ MACHINE_CONFIG_START(magmax_state::magmax)
 	MCFG_SCREEN_UPDATE_DRIVER(magmax_state, screen_update)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_magmax)
-	MCFG_PALETTE_ADD(m_palette, 1*16 + 16*16 + 256)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(magmax_state, magmax)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_magmax);
+	PALETTE(config, m_palette, FUNC(magmax_state::magmax_palette), 1*16 + 16*16 + 256, 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD(m_ay[0], AY8910, XTAL(20'000'000)/16) /* verified on pcb */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, magmax_state, ay8910_portA_0_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, magmax_state, ay8910_portB_0_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	AY8910(config, m_ay[0], XTAL(20'000'000)/16); /* verified on pcb */
+	m_ay[0]->port_a_write_callback().set(FUNC(magmax_state::ay8910_portA_0_w));
+	m_ay[0]->port_b_write_callback().set(FUNC(magmax_state::ay8910_portB_0_w));
+	m_ay[0]->add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	MCFG_DEVICE_ADD(m_ay[1], AY8910, XTAL(20'000'000)/16) /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	AY8910(config, m_ay[1], XTAL(20'000'000)/16).add_route(ALL_OUTPUTS, "mono", 0.40); /* verified on pcb */
 
-	MCFG_DEVICE_ADD(m_ay[2], AY8910, XTAL(20'000'000)/16) /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	AY8910(config, m_ay[2], XTAL(20'000'000)/16).add_route(ALL_OUTPUTS, "mono", 0.40); /* verified on pcb */
 
-	MCFG_GENERIC_LATCH_8_ADD(m_soundlatch)
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE(m_audiocpu, 0))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
+	m_soundlatch->set_separate_acknowledge(true);
 MACHINE_CONFIG_END
 
 

@@ -35,8 +35,8 @@
 class dragrace_state : public driver_device
 {
 public:
-	dragrace_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	dragrace_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_playfield_ram(*this, "playfield_ram"),
 		m_position_ram(*this, "position_ram"),
 		m_discrete(*this, "discrete"),
@@ -56,7 +56,7 @@ private:
 	DECLARE_READ8_MEMBER(dragrace_steering_r);
 	DECLARE_READ8_MEMBER(dragrace_scanline_r);
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	DECLARE_PALETTE_INIT(dragrace);
+	void dragrace_palette(palette_device &palette) const;
 	uint32_t screen_update_dragrace(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(dragrace_frame_callback);
 	void dragrace_update_misc_flags( address_space &space );

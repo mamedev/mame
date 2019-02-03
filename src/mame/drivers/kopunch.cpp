@@ -241,30 +241,30 @@ MACHINE_CONFIG_START(kopunch_state::kopunch)
 	MCFG_DEVICE_IO_MAP(kopunch_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", kopunch_state, vblank_interrupt)
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
 	// $30 - always $9b (PPI mode 0, ports A & B & C as input)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("P1"))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, kopunch_state, sensors1_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, kopunch_state, sensors2_r))
+	ppi0.in_pa_callback().set_ioport("P1");
+	ppi0.in_pb_callback().set(FUNC(kopunch_state::sensors1_r));
+	ppi0.in_pc_callback().set(FUNC(kopunch_state::sensors2_r));
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	i8255_device &ppi1(I8255A(config, "ppi8255_1"));
 	// $34 - always $80 (PPI mode 0, ports A & B & C as output)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, kopunch_state, coin_w))
-	MCFG_I8255_OUT_PORTB_CB(LOGGER("PPI8255 - unmapped write port B"))
-	MCFG_I8255_OUT_PORTC_CB(LOGGER("PPI8255 - unmapped write port C"))
+	ppi1.out_pa_callback().set(FUNC(kopunch_state::coin_w));
+	ppi1.out_pb_callback().set_log("PPI8255 - unmapped write port B");
+	ppi1.out_pc_callback().set_log("PPI8255 - unmapped write port C");
 
-	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
+	i8255_device &ppi2(I8255A(config, "ppi8255_2"));
 	// $38 - always $89 (PPI mode 0, ports A & B as output, port C as input)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, kopunch_state, lamp_w))
-	MCFG_I8255_OUT_PORTB_CB(LOGGER("PPI8255 - unmapped write port B"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW"))
+	ppi2.out_pa_callback().set(FUNC(kopunch_state::lamp_w));
+	ppi2.out_pb_callback().set_log("PPI8255 - unmapped write port B");
+	ppi2.in_pc_callback().set_ioport("DSW");
 
-	MCFG_DEVICE_ADD("ppi8255_3", I8255A, 0)
+	i8255_device &ppi3(I8255A(config, "ppi8255_3"));
 	// $3c - always $88 (PPI mode 0, ports A & B & lower C as output, upper C as input)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, kopunch_state, scroll_x_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, kopunch_state, scroll_y_w))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("P2"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, kopunch_state, gfxbank_w))
+	ppi3.out_pa_callback().set(FUNC(kopunch_state::scroll_x_w));
+	ppi3.out_pb_callback().set(FUNC(kopunch_state::scroll_y_w));
+	ppi3.in_pc_callback().set_ioport("P2");
+	ppi3.out_pc_callback().set(FUNC(kopunch_state::gfxbank_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -275,9 +275,8 @@ MACHINE_CONFIG_START(kopunch_state::kopunch)
 	MCFG_SCREEN_UPDATE_DRIVER(kopunch_state, screen_update_kopunch)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_kopunch)
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(kopunch_state, kopunch)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_kopunch);
+	PALETTE(config, "palette", FUNC(kopunch_state::kopunch_palette), 8);
 
 	/* sound hardware */
 	// ...

@@ -21,12 +21,24 @@
 void lynx_state::lynx_mem(address_map &map)
 {
 	map(0x0000, 0xfbff).ram().share("mem_0000");
-	map(0xfc00, 0xfcff).ram().share("mem_fc00");
-	map(0xfd00, 0xfdff).ram().share("mem_fd00");
-	map(0xfe00, 0xfff7).bankr("bank3").writeonly().share("mem_fe00");
+	map(0xfc00, 0xfcff).m(m_bank_fc00, FUNC(address_map_bank_device::amap8));
+	map(0xfd00, 0xfdff).m(m_bank_fd00, FUNC(address_map_bank_device::amap8));
+	map(0xfe00, 0xfff7).bankr("bank_fe00").writeonly().share("mem_fe00");
 	map(0xfff8, 0xfff8).ram();
 	map(0xfff9, 0xfff9).rw(FUNC(lynx_state::lynx_memory_config_r), FUNC(lynx_state::lynx_memory_config_w));
-	map(0xfffa, 0xffff).bankr("bank4").writeonly().share("mem_fffa");
+	map(0xfffa, 0xffff).bankr("bank_fffa").writeonly().share("mem_fffa");
+}
+
+void lynx_state::lynx_fc00_mem(address_map &map)
+{
+	map(0x000, 0x0ff).rw(FUNC(lynx_state::suzy_read), FUNC(lynx_state::suzy_write));
+	map(0x100, 0x1ff).ram().share("mem_fc00");
+}
+
+void lynx_state::lynx_fd00_mem(address_map &map)
+{
+	map(0x000, 0x0ff).rw(FUNC(lynx_state::mikey_read), FUNC(lynx_state::mikey_write));
+	map(0x100, 0x1ff).ram().share("mem_fd00");
 }
 
 static INPUT_PORTS_START( lynx )
@@ -45,25 +57,12 @@ static INPUT_PORTS_START( lynx )
 	// power on and power off buttons
 INPUT_PORTS_END
 
-PALETTE_INIT_MEMBER(lynx_state, lynx)
-{
-	int i;
-
-	for (i=0; i< 0x1000; i++)
-	{
-		palette.set_pen_color(i,
-			((i >> 0) & 0x0f) * 0x11,
-			((i >> 4) & 0x0f) * 0x11,
-			((i >> 8) & 0x0f) * 0x11);
-	}
-}
-
 void lynx_state::video_start()
 {
 	m_screen->register_screen_bitmap(m_bitmap);
 }
 
-uint32_t lynx_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t lynx_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
@@ -79,26 +78,27 @@ MACHINE_CONFIG_START(lynx_state::lynx)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M65SC02, 4000000)        /* vti core, integrated in vlsi, stz, but not bbr bbs */
 	MCFG_DEVICE_PROGRAM_MAP(lynx_mem)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
+
+	ADDRESS_MAP_BANK(config, "bank_fc00").set_map(&lynx_state::lynx_fc00_mem).set_options(ENDIANNESS_LITTLE, 8, 9, 0x100);
+	ADDRESS_MAP_BANK(config, "bank_fd00").set_map(&lynx_state::lynx_fd00_mem).set_options(ENDIANNESS_LITTLE, 8, 9, 0x100);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(LCD_FRAMES_PER_SECOND)
+	MCFG_SCREEN_REFRESH_RATE(30)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_UPDATE_DRIVER(lynx_state, screen_update)
 	MCFG_SCREEN_SIZE(160, 102)
 	MCFG_SCREEN_VISIBLE_AREA(0, 160-1, 0, 102-1)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_DEFAULT_LAYOUT(layout_lynx)
+	config.set_default_layout(layout_lynx);
 
-	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_PALETTE_INIT_OWNER(lynx_state, lynx)
+	MCFG_PALETTE_ADD("palette", 0x10)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("custom", LYNX_SND, 0)
-	MCFG_LYNX_SND_SET_TIMER(lynx_state, sound_cb)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	LYNX_SND(config, m_sound, 0);
+	m_sound->set_timer_delegate(FUNC(lynx_state::sound_cb), this);
+	m_sound->add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* devices */
 	MCFG_QUICKLOAD_ADD("quickload", lynx_state, lynx, "o", 0)
@@ -109,23 +109,24 @@ MACHINE_CONFIG_START(lynx_state::lynx)
 	MCFG_GENERIC_LOAD(lynx_state, lynx_cart)
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","lynx")
+	SOFTWARE_LIST(config, "cart_list").set_original("lynx");
 MACHINE_CONFIG_END
 
 #if 0
-static MACHINE_CONFIG_START( lynx2 )
+void lynx_state::lynx2(machine_config &config)
+{
 	lynx(config);
 
 	/* sound hardware */
-	MCFG_DEVICE_REMOVE("mono")
+	config.device_remove("mono");
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_REMOVE("lynx")
-	MCFG_DEVICE_ADD("custom", LYNX2_SND, 0)
-	MCFG_LYNX_SND_SET_TIMER(lynx_state, sound_cb)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
-MACHINE_CONFIG_END
+	config.device_remove("lynx");
+	LYNX2_SND(config.replace(), m_sound, 0);
+	m_sound->set_timer_delegate(FUNC(lynx_state::sound_cb), this);
+	m_sound->add_route(0, "lspeaker", 0.50);
+	m_sound->add_route(1, "rspeaker", 0.50);
+}
 #endif
 
 /* these 2 dumps are saved from an running machine,

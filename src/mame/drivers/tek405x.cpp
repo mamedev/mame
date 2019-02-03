@@ -48,14 +48,9 @@ enum {
 };
 
 
-
 //**************************************************************************
 //  INTERRUPTS
 //**************************************************************************
-
-//-------------------------------------------------
-//  update_irq -
-//-------------------------------------------------
 
 void tek4051_state::update_irq()
 {
@@ -63,11 +58,6 @@ void tek4051_state::update_irq()
 
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state);
 }
-
-
-//-------------------------------------------------
-//  update_nmi -
-//-------------------------------------------------
 
 void tek4051_state::update_nmi()
 {
@@ -77,23 +67,13 @@ void tek4051_state::update_nmi()
 }
 
 
-
 //**************************************************************************
 //  KEYBOARD
 //**************************************************************************
 
-//-------------------------------------------------
-//  scan_keyboard - scan keyboard
-//-------------------------------------------------
-
 void tek4051_state::scan_keyboard()
 {
 }
-
-
-//-------------------------------------------------
-//  TIMER_DEVICE_CALLBACK_MEMBER( keyboard_tick )
-//-------------------------------------------------
 
 TIMER_DEVICE_CALLBACK_MEMBER(tek4051_state::keyboard_tick)
 {
@@ -101,14 +81,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(tek4051_state::keyboard_tick)
 }
 
 
-
 //**************************************************************************
 //  MEMORY BANKING
 //**************************************************************************
-
-//-------------------------------------------------
-//  bankswitch -
-//-------------------------------------------------
 
 void tek4051_state::bankswitch(uint8_t data)
 {
@@ -136,7 +111,6 @@ void tek4051_state::bankswitch(uint8_t data)
 	}
 }
 
-
 WRITE8_MEMBER( tek4051_state::lbs_w )
 {
 	/*
@@ -160,14 +134,9 @@ WRITE8_MEMBER( tek4051_state::lbs_w )
 }
 
 
-
 //**************************************************************************
 //  ADDRESS MAPS
 //**************************************************************************
-
-//-------------------------------------------------
-//  ADDRESS_MAP( tek4051_mem )
-//-------------------------------------------------
 
 void tek4051_state::tek4051_mem(address_map &map)
 {
@@ -189,24 +158,14 @@ void tek4051_state::tek4051_mem(address_map &map)
 	map(0xa800, 0xffff).rom().region(MC6800_TAG, 0x2800);
 }
 
-
-//-------------------------------------------------
-//  ADDRESS_MAP( tek4052_mem )
-//-------------------------------------------------
-
 void tek4052_state::tek4052_mem(address_map &map)
 {
 }
 
 
-
 //**************************************************************************
 //  INPUT PORTS
 //**************************************************************************
-
-//-------------------------------------------------
-//  INPUT_PORTS( tek4051 )
-//-------------------------------------------------
 
 static INPUT_PORTS_START( tek4051 )
 	PORT_START("Y0")
@@ -377,7 +336,6 @@ static INPUT_PORTS_START( tek4051 )
 INPUT_PORTS_END
 
 
-
 //**************************************************************************
 //  VIDEO
 //**************************************************************************
@@ -390,7 +348,6 @@ void tek4051_state::video_start()
 void tek4052_state::video_start()
 {
 }
-
 
 
 //**************************************************************************
@@ -721,7 +678,6 @@ WRITE_LINE_MEMBER( tek4051_state::tape_pia_irqb_w )
 	update_nmi();
 }
 
-
 WRITE8_MEMBER( tek4051_state::dio_w )
 {
 	/*
@@ -842,7 +798,6 @@ WRITE_LINE_MEMBER( tek4051_state::gpib_pia_irqb_w )
 	update_irq();
 }
 
-
 WRITE8_MEMBER( tek4051_state::com_pia_pa_w )
 {
 	/*
@@ -934,7 +889,6 @@ WRITE_LINE_MEMBER( tek4051_state::com_pia_irqb_w )
 	update_irq();
 }
 
-
 WRITE_LINE_MEMBER( tek4051_state::acia_irq_w )
 {
 	m_acia_irq = state;
@@ -951,10 +905,6 @@ WRITE_LINE_MEMBER( tek4051_state::write_acia_clock )
 //**************************************************************************
 //  MACHINE INITIALIZATION
 //**************************************************************************
-
-//-------------------------------------------------
-//  MACHINE_START( tek4051 )
-//-------------------------------------------------
 
 void tek4051_state::machine_start()
 {
@@ -981,175 +931,154 @@ void tek4051_state::machine_start()
 	// register for state saving
 }
 
-
-//-------------------------------------------------
-//  MACHINE_START( tek4052 )
-//-------------------------------------------------
-
 void tek4052_state::machine_start()
 {
 }
-
 
 
 //**************************************************************************
 //  MACHINE CONFIGURATION
 //**************************************************************************
 
-//-------------------------------------------------
-//  MACHINE_CONFIG( tek4051 )
-//-------------------------------------------------
-
-MACHINE_CONFIG_START(tek4051_state::tek4051)
+void tek4051_state::tek4051(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD(MC6800_TAG, M6800, XTAL(12'500'000)/15)
-	MCFG_DEVICE_PROGRAM_MAP(tek4051_mem)
+	M6800(config, m_maincpu, XTAL(12'500'000)/15);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tek4051_state::tek4051_mem);
 
 	// video hardware
-	MCFG_VECTOR_ADD("vector")
-	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, VECTOR, rgb_t::green())
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
-	MCFG_SCREEN_SIZE(1024, 780)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 780-1)
-	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
+	VECTOR(config, "vector", 0);
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_VECTOR));
+	screen.set_color(rgb_t::green());
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
+	screen.set_size(1024, 780);
+	screen.set_visarea(0, 1024-1, 0, 780-1);
+	screen.set_screen_update("vector", FUNC(vector_device::screen_update));
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	// devices
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", tek4051_state, keyboard_tick, attotime::from_hz(XTAL(12'500'000)/15/4))
+	TIMER(config, "keyboard").configure_periodic(FUNC(tek4051_state::keyboard_tick), attotime::from_hz(XTAL(12'500'000)/15/4));
 
-	MCFG_DEVICE_ADD(MC6820_X_TAG, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, tek4051_state, x_pia_pa_r))
+	pia6821_device &piax(PIA6821(config, MC6820_X_TAG, 0));
+	piax.readpa_handler().set(FUNC(tek4051_state::x_pia_pa_r));
 	// CB1 viewcause
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, tek4051_state, x_pia_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, tek4051_state, x_pia_pb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, tek4051_state, adot_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, tek4051_state, bufclk_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, tek4051_state, x_pia_irqa_w))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, tek4051_state, x_pia_irqb_w))
+	piax.writepa_handler().set(FUNC(tek4051_state::x_pia_pa_w));
+	piax.writepb_handler().set(FUNC(tek4051_state::x_pia_pb_w));
+	piax.ca2_handler().set(FUNC(tek4051_state::adot_w));
+	piax.cb2_handler().set(FUNC(tek4051_state::bufclk_w));
+	piax.irqa_handler().set(FUNC(tek4051_state::x_pia_irqa_w));
+	piax.irqb_handler().set(FUNC(tek4051_state::x_pia_irqb_w));
 
-	MCFG_DEVICE_ADD(MC6820_Y_TAG, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, tek4051_state, sa_r))
+	pia6821_device &piay(PIA6821(config, MC6820_Y_TAG, 0));
+	piay.readpa_handler().set(FUNC(tek4051_state::sa_r));
 	// CA1 rdbyte
 	// CB1 mdata
 	// CB2 fmark
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, tek4051_state, y_pia_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, tek4051_state, sb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, tek4051_state, sot_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, tek4051_state, y_pia_irqa_w))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, tek4051_state, y_pia_irqb_w))
+	piay.writepa_handler().set(FUNC(tek4051_state::y_pia_pa_w));
+	piay.writepb_handler().set(FUNC(tek4051_state::sb_w));
+	piay.ca2_handler().set(FUNC(tek4051_state::sot_w));
+	piay.irqa_handler().set(FUNC(tek4051_state::y_pia_irqa_w));
+	piay.irqb_handler().set(FUNC(tek4051_state::y_pia_irqb_w));
 
-	MCFG_DEVICE_ADD(MC6820_KB_TAG, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, tek4051_state, kb_pia_pa_r))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, tek4051_state, kb_pia_pb_r))
+	pia6821_device &piakbd(PIA6821(config, MC6820_KB_TAG, 0));
+	piakbd.readpa_handler().set(FUNC(tek4051_state::kb_pia_pa_r));
+	piakbd.readpb_handler().set(FUNC(tek4051_state::kb_pia_pb_r));
 	// CA1 key
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, tek4051_state, kb_pia_pb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, tek4051_state, kb_halt_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, tek4051_state, kb_pia_irqa_w))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, tek4051_state, kb_pia_irqb_w))
+	piakbd.writepb_handler().set(FUNC(tek4051_state::kb_pia_pb_w));
+	piakbd.ca2_handler().set(FUNC(tek4051_state::kb_halt_w));
+	piakbd.irqa_handler().set(FUNC(tek4051_state::kb_pia_irqa_w));
+	piakbd.irqb_handler().set(FUNC(tek4051_state::kb_pia_irqb_w));
 
-	MCFG_DEVICE_ADD(MC6820_TAPE_TAG, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, tek4051_state, tape_pia_pa_r))
+	pia6821_device &piatape(PIA6821(config, MC6820_TAPE_TAG, 0));
+	piatape.readpa_handler().set(FUNC(tek4051_state::tape_pia_pa_r));
 	// CA1 rmark
 	// CB1 lohole
 	// CA2 filfnd
 	// CB2 uphole
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, tek4051_state, tape_pia_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, tek4051_state, tape_pia_pb_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, tek4051_state, tape_pia_irqa_w))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, tek4051_state, tape_pia_irqb_w))
+	piatape.writepa_handler().set(FUNC(tek4051_state::tape_pia_pa_w));
+	piatape.writepb_handler().set(FUNC(tek4051_state::tape_pia_pb_w));
+	piatape.irqa_handler().set(FUNC(tek4051_state::tape_pia_irqa_w));
+	piatape.irqb_handler().set(FUNC(tek4051_state::tape_pia_irqb_w));
 
-	MCFG_DEVICE_ADD(MC6820_GPIB_TAG, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(IEEE488_TAG, ieee488_device, dio_r))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, tek4051_state, gpib_pia_pb_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, tek4051_state, dio_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, tek4051_state, gpib_pia_pb_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, tek4051_state, talk_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, tek4051_state, gpib_pia_irqa_w))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, tek4051_state, gpib_pia_irqb_w))
+	PIA6821(config, m_gpib_pia, 0);
+	m_gpib_pia->readpa_handler().set(IEEE488_TAG, FUNC(ieee488_device::dio_r));
+	m_gpib_pia->readpb_handler().set(FUNC(tek4051_state::gpib_pia_pb_r));
+	m_gpib_pia->writepa_handler().set(FUNC(tek4051_state::dio_w));
+	m_gpib_pia->writepb_handler().set(FUNC(tek4051_state::gpib_pia_pb_w));
+	m_gpib_pia->cb2_handler().set(FUNC(tek4051_state::talk_w));
+	m_gpib_pia->irqa_handler().set(FUNC(tek4051_state::gpib_pia_irqa_w));
+	m_gpib_pia->irqb_handler().set(FUNC(tek4051_state::gpib_pia_irqb_w));
 
-	MCFG_DEVICE_ADD(MC6820_COM_TAG, PIA6821, 0)
-	MCFG_PIA_READPB_HANDLER(READ8(*this, tek4051_state, com_pia_pb_r))
+	PIA6821(config, m_com_pia, 0);
+	m_com_pia->readpb_handler().set(FUNC(tek4051_state::com_pia_pb_r));
 	//CA1 - SRX (RS-232 pin 12)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, tek4051_state, com_pia_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, tek4051_state, com_pia_pb_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, tek4051_state, com_pia_irqa_w))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, tek4051_state, com_pia_irqb_w))
+	m_com_pia->writepa_handler().set(FUNC(tek4051_state::com_pia_pa_w));
+	m_com_pia->writepb_handler().set(FUNC(tek4051_state::com_pia_pb_w));
+	m_com_pia->irqa_handler().set(FUNC(tek4051_state::com_pia_irqa_w));
+	m_com_pia->irqb_handler().set(FUNC(tek4051_state::com_pia_irqb_w));
 
-	MCFG_DEVICE_ADD(MC6850_TAG, ACIA6850, 0)
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, tek4051_state, acia_irq_w))
+	ACIA6850(config, m_acia, 0);
+	m_acia->irq_handler().set(FUNC(tek4051_state::acia_irq_w));
 
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, 38400)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, tek4051_state, write_acia_clock))
+	CLOCK(config, m_acia_clock, 38400);
+	m_acia_clock->signal_handler().set(FUNC(tek4051_state::write_acia_clock));
 
-	MCFG_IEEE488_BUS_ADD()
-	MCFG_IEEE488_EOI_CALLBACK(WRITELINE(MC6820_GPIB_TAG, pia6821_device, ca1_w))
-	MCFG_IEEE488_SRQ_CALLBACK(WRITELINE(MC6820_GPIB_TAG, pia6821_device, cb1_w))
+	IEEE488(config, m_gpib);
+	m_gpib->eoi_callback().set(MC6820_GPIB_TAG, FUNC(pia6821_device::ca1_w));
+	m_gpib->srq_callback().set(MC6820_GPIB_TAG, FUNC(pia6821_device::cb1_w));
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("8K")
-	MCFG_RAM_EXTRA_OPTIONS("16K,24K,32K")
+	RAM(config, RAM_TAG).set_default_size("8K").set_extra_options("16K,24K,32K");
 
 	// cartridge
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot1", generic_plain_slot, "tek4050_cart")
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot2", generic_plain_slot, "tek4050_cart")
-MACHINE_CONFIG_END
+	GENERIC_CARTSLOT(config, "cartslot1", generic_plain_slot, "tek4050_cart");
+	GENERIC_CARTSLOT(config, "cartslot2", generic_plain_slot, "tek4050_cart");
+}
 
-
-//-------------------------------------------------
-//  MACHINE_CONFIG( tek4052 )
-//-------------------------------------------------
-
-MACHINE_CONFIG_START(tek4052_state::tek4052)
+void tek4052_state::tek4052(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD(AM2901A_TAG, M6800, 1000000) // should be 4x AM2901A + AM2911
-	MCFG_DEVICE_PROGRAM_MAP(tek4052_mem)
+	m6800_cpu_device &cpu(M6800(config, AM2901A_TAG, 1000000)); // should be 4x AM2901A + AM2911
+	cpu.set_addrmap(AS_PROGRAM, &tek4052_state::tek4052_mem);
 
 	// video hardware
-	MCFG_VECTOR_ADD("vector")
-	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, VECTOR, rgb_t::green())
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
-	MCFG_SCREEN_SIZE(1024, 780)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 780-1)
-	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
+	VECTOR(config, "vector", 0);
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_VECTOR));
+	screen.set_color(rgb_t::green());
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
+	screen.set_size(1024, 780);
+	screen.set_visarea(0, 1024-1, 0, 780-1);
+	screen.set_screen_update("vector", FUNC(vector_device::screen_update));
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32K")
-	MCFG_RAM_EXTRA_OPTIONS("64K")
+	RAM(config, RAM_TAG).set_default_size("32K").set_extra_options("64K");
 
 	// cartridge
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot1", generic_plain_slot, "tek4050_cart")
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot2", generic_plain_slot, "tek4050_cart")
+	GENERIC_CARTSLOT(config, "cartslot1", generic_plain_slot, "tek4050_cart");
+	GENERIC_CARTSLOT(config, "cartslot2", generic_plain_slot, "tek4050_cart");
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "tek4052_cart")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_original("tek4052_cart");
+}
 
-
-//-------------------------------------------------
-//  MACHINE_CONFIG( tek4054 )
-//-------------------------------------------------
 /*
-MACHINE_CONFIG_START(tek4054_state::tek4054)
-    MCFG_SCREEN_SIZE(4096, 3125)
-    MCFG_SCREEN_VISIBLE_AREA(0, 4096-1, 0, 3125-1)
-MACHINE_CONFIG_END
+void tek4054_state::tek4054(machine_config &config)
+{
+    // screen size: 4096, 3125
+}
 */
 
 
@@ -1157,10 +1086,6 @@ MACHINE_CONFIG_END
 //**************************************************************************
 //  ROMS
 //**************************************************************************
-
-//-------------------------------------------------
-//  ROM( tek4051 )
-//-------------------------------------------------
 
 ROM_START( tek4051 )
 	ROM_REGION( 0x8000, MC6800_TAG, 0 )
@@ -1205,11 +1130,6 @@ ROM_START( tek4051 )
     ROM_LOAD( "4051r06", 0x0000, 0x1000, NO_DUMP )
 */
 ROM_END
-
-
-//-------------------------------------------------
-//  ROM( tek4052a )
-//-------------------------------------------------
 
 ROM_START( tek4052a )
 	ROM_REGION( 0x3800, AM2901A_TAG, 0 ) // ALU 670-7705-00 microcode

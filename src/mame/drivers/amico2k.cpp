@@ -43,7 +43,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_digits(*this, "digit%u", 0U)
-		{ }
+	{ }
 
 	void amico2k(machine_config &config);
 
@@ -221,13 +221,13 @@ MACHINE_CONFIG_START(amico2k_state::amico2k)
 	MCFG_DEVICE_PROGRAM_MAP(amico2k_mem)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT( layout_amico2k )
+	config.set_default_layout(layout_amico2k);
 
-	MCFG_DEVICE_ADD("i8255", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, amico2k_state, ppi_pa_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, amico2k_state, ppi_pa_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, amico2k_state, ppi_pb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, amico2k_state, ppi_pb_w))
+	i8255_device &ppi(I8255(config, "i8255"));
+	ppi.in_pa_callback().set(FUNC(amico2k_state::ppi_pa_r));
+	ppi.out_pa_callback().set(FUNC(amico2k_state::ppi_pa_w));
+	ppi.in_pb_callback().set(FUNC(amico2k_state::ppi_pb_r));
+	ppi.out_pb_callback().set(FUNC(amico2k_state::ppi_pb_w));
 MACHINE_CONFIG_END
 
 

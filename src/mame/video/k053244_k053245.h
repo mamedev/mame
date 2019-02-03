@@ -10,16 +10,6 @@ typedef device_delegate<void (int *code, int *color, int *priority)> k05324x_cb_
 #define K05324X_CB_MEMBER(_name)   void _name(int *code, int *color, int *priority)
 
 
-#define MCFG_K05324X_BPP(_bpp) \
-	downcast<k05324x_device &>(*device).set_bpp(_bpp);
-
-#define MCFG_K05324X_CB(_class, _method) \
-	downcast<k05324x_device &>(*device).set_k05324x_callback(k05324x_cb_delegate(&_class::_method, #_class "::" #_method, this));
-
-#define MCFG_K05324X_OFFSETS(_xoffs, _yoffs) \
-	downcast<k05324x_device &>(*device).set_offsets(_xoffs, _yoffs);
-
-
 class k05324x_device : public device_t, public device_gfx_interface
 {
 	static const gfx_layout spritelayout;
@@ -32,7 +22,7 @@ public:
 
 	// configuration
 	void set_bpp(int bpp);
-	void set_k05324x_callback(k05324x_cb_delegate callback) { m_k05324x_cb = callback; }
+	template <typename... T> void set_sprite_callback(T &&... args) { m_k05324x_cb = k05324x_cb_delegate(std::forward<T>(args)...); }
 	void set_offsets(int x_offset, int y_offset)
 	{
 		m_dx = x_offset;

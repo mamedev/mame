@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail, David Graves
+#ifndef MAME_INCLUDES_GROUNDFX_H
+#define MAME_INCLUDES_GROUNDFX_H
+
+#pragma once
 
 #include "video/tc0100scn.h"
 #include "video/tc0480scp.h"
@@ -18,15 +22,16 @@ struct gfx_tempsprite
 class groundfx_state : public driver_device
 {
 public:
-	groundfx_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_ram(*this,"ram"),
-		m_spriteram(*this,"spriteram") ,
+	groundfx_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_ram(*this, "ram"),
+		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
 		m_tc0100scn(*this, "tc0100scn"),
 		m_tc0480scp(*this, "tc0480scp"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	void groundfx(machine_config &config);
 	void init_groundfx();
@@ -61,3 +66,5 @@ private:
 
 	void groundfx_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_GROUNDFX_H

@@ -66,8 +66,7 @@ void galaxold_state::machine_reset_common(int line)
 	m_7474_9m_1->preset_w(0);
 
 	/* start a timer to generate interrupts */
-	timer_device *int_timer = machine().device<timer_device>("int_timer");
-	int_timer->adjust(m_screen->time_until_pos(0));
+	subdevice<timer_device>("int_timer")->adjust(m_screen->time_until_pos(0));
 }
 
 MACHINE_RESET_MEMBER(galaxold_state,galaxold)

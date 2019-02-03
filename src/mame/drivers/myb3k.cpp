@@ -23,7 +23,7 @@
     - Keyboard is not interfaced through 8255
     - Non standard graphics board
 
-    These and other incompatibilities required many PC software's to be
+    These and other incompatibilities required many PC softwares to be
     recompiled to work on this computer.
 
 ****************************************************************************/
@@ -932,84 +932,88 @@ static void stepone_isa_cards(device_slot_interface &device)
 
 MACHINE_CONFIG_START(myb3k_state::myb3k)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8088, XTAL(14'318'181) / 3) /* 14.3182 main crystal divided by three through a 8284A */
-	MCFG_DEVICE_PROGRAM_MAP(myb3k_map)
-	MCFG_DEVICE_IO_MAP(myb3k_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic", pic8259_device, inta_cb)
+	I8088(config, m_maincpu, XTAL(14'318'181) / 3); /* 14.3182 main crystal divided by three through a 8284A */
+	m_maincpu->set_addrmap(AS_PROGRAM, &myb3k_state::myb3k_map);
+	m_maincpu->set_addrmap(AS_IO, &myb3k_state::myb3k_io);
+	m_maincpu->set_irq_acknowledge_callback("pic", FUNC(pic8259_device::inta_cb));
 
 	/* RAM options */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("256K")
-	MCFG_RAM_EXTRA_OPTIONS("128K, 256K")
+	RAM(config, RAM_TAG).set_default_size("256K").set_extra_options("128K, 256K");
 
 	/* Interrupt controller */
-	MCFG_DEVICE_ADD("pic", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(WRITELINE(*this, myb3k_state, pic_int_w))
+	PIC8259(config, m_pic8259);
+	m_pic8259->out_int_callback().set(FUNC(myb3k_state::pic_int_w));
 
 	/* Parallel port */
-	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, myb3k_state, ppi_portb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, myb3k_state, ppi_portc_w))
+	I8255A(config, m_ppi8255);
+	m_ppi8255->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_ppi8255->in_pb_callback().set(FUNC(myb3k_state::ppi_portb_r));
+	m_ppi8255->out_pc_callback().set(FUNC(myb3k_state::ppi_portc_w));
 
 	/* DMA controller */
-	MCFG_DEVICE_ADD("dma", I8257, XTAL(14'318'181) / 6)
-	MCFG_I8257_OUT_HRQ_CB(WRITELINE(*this, myb3k_state, hrq_w))
-	MCFG_I8257_OUT_TC_CB(WRITELINE(*this, myb3k_state, tc_w))
-	MCFG_I8257_IN_MEMR_CB(READ8(*this, myb3k_state, dma_memory_read_byte))
-	MCFG_I8257_OUT_MEMW_CB(WRITE8(*this, myb3k_state, dma_memory_write_byte))
-	MCFG_I8257_IN_IOR_0_CB(READ8(*this, myb3k_state, io_dack0_r))
-	MCFG_I8257_IN_IOR_1_CB(READ8(*this, myb3k_state, io_dack1_r))
-	MCFG_I8257_IN_IOR_2_CB(READ8(*this, myb3k_state, io_dack2_r))
-	MCFG_I8257_IN_IOR_3_CB(READ8(*this, myb3k_state, io_dack3_r))
-	MCFG_I8257_OUT_IOW_0_CB(WRITE8(*this, myb3k_state, io_dack0_w))
-	MCFG_I8257_OUT_IOW_1_CB(WRITE8(*this, myb3k_state, io_dack1_w))
-	MCFG_I8257_OUT_IOW_2_CB(WRITE8(*this, myb3k_state, io_dack2_w))
-	MCFG_I8257_OUT_IOW_3_CB(WRITE8(*this, myb3k_state, io_dack3_w))
-	MCFG_I8257_OUT_DACK_0_CB(WRITELINE(*this, myb3k_state, dack0_w))
-	MCFG_I8257_OUT_DACK_1_CB(WRITELINE(*this, myb3k_state, dack1_w))
-	MCFG_I8257_OUT_DACK_2_CB(WRITELINE(*this, myb3k_state, dack2_w))
-	MCFG_I8257_OUT_DACK_3_CB(WRITELINE(*this, myb3k_state, dack3_w))
+	I8257(config, m_dma8257, XTAL(14'318'181) / 6);
+	m_dma8257->out_hrq_cb().set(FUNC(myb3k_state::hrq_w));
+	m_dma8257->out_tc_cb().set(FUNC(myb3k_state::tc_w));
+	m_dma8257->in_memr_cb().set(FUNC(myb3k_state::dma_memory_read_byte));
+	m_dma8257->out_memw_cb().set(FUNC(myb3k_state::dma_memory_write_byte));
+	m_dma8257->in_ior_cb<0>().set(FUNC(myb3k_state::io_dack0_r));
+	m_dma8257->in_ior_cb<1>().set(FUNC(myb3k_state::io_dack1_r));
+	m_dma8257->in_ior_cb<2>().set(FUNC(myb3k_state::io_dack2_r));
+	m_dma8257->in_ior_cb<3>().set(FUNC(myb3k_state::io_dack3_r));
+	m_dma8257->out_iow_cb<0>().set(FUNC(myb3k_state::io_dack0_w));
+	m_dma8257->out_iow_cb<1>().set(FUNC(myb3k_state::io_dack1_w));
+	m_dma8257->out_iow_cb<2>().set(FUNC(myb3k_state::io_dack2_w));
+	m_dma8257->out_iow_cb<3>().set(FUNC(myb3k_state::io_dack3_w));
+	m_dma8257->out_dack_cb<0>().set(FUNC(myb3k_state::dack0_w));
+	m_dma8257->out_dack_cb<1>().set(FUNC(myb3k_state::dack1_w));
+	m_dma8257->out_dack_cb<2>().set(FUNC(myb3k_state::dack2_w));
+	m_dma8257->out_dack_cb<3>().set(FUNC(myb3k_state::dack3_w));
 
 	/* Timer */
-	MCFG_DEVICE_ADD("pit", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(14'318'181) / 12.0) /* TIMINT straight into IRQ0 */
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("pic", pic8259_device, ir0_w))
-	MCFG_PIT8253_CLK1(XTAL(14'318'181) / 12.0) /* speaker if port c bit 5 is low */
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, myb3k_state, pit_out1_changed))
-	//  MCFG_PIT8253_CLK2(XTAL(14'318'181) / 12.0) /* ANDed with port c bit 6 but marked as "not use"*/
-	//  MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, myb3k_state, pit_out2_changed))
+	PIT8253(config, m_pit8253);
+	m_pit8253->set_clk<0>(XTAL(14'318'181) / 12.0); /* TIMINT straight into IRQ0 */
+	m_pit8253->out_handler<0>().set(m_pic8259, FUNC(pic8259_device::ir0_w));
+	m_pit8253->set_clk<1>(XTAL(14'318'181) / 12.0); /* speaker if port c bit 5 is low */
+	m_pit8253->out_handler<1>().set(FUNC(myb3k_state::pit_out1_changed));
+	// m_pit8253->set_clk<2>(XTAL(14'318'181) / 12.0); /* ANDed with port c bit 6 but marked as "not use"*/
+	// m_pit8253->out_handler<2>().set(FUNC(myb3k_state::pit_out2_changed));
 
 	/* Video controller */
-	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL(14'318'181) / 16) /* Main crystal divided by 16 through a 74163 4 bit counter */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(myb3k_state, crtc_update_row)
+	H46505(config, m_crtc, XTAL(14'318'181) / 16); /* Main crystal divided by 16 through a 74163 4 bit counter */
+	m_crtc->set_screen(m_screen);
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(myb3k_state::crtc_update_row), this);
 
 	/* ISA8+ Expansion bus */
-	MCFG_DEVICE_ADD("isa", ISA8, 0)
-	MCFG_ISA8_CPU("maincpu")
-	MCFG_ISA_OUT_IRQ2_CB(WRITELINE("pic", pic8259_device, ir2_w))
-	MCFG_ISA_OUT_IRQ3_CB(WRITELINE("pic", pic8259_device, ir3_w))
-	MCFG_ISA_OUT_IRQ4_CB(WRITELINE("pic", pic8259_device, ir4_w))
-	MCFG_ISA_OUT_IRQ5_CB(WRITELINE(*this, myb3k_state, isa_irq5_w)) // Jumper J4 selectable
-	MCFG_ISA_OUT_IRQ6_CB(WRITELINE("pic", pic8259_device, ir6_w))
-	MCFG_ISA_OUT_IRQ7_CB(WRITELINE(*this, myb3k_state, isa_irq7_w)) // Jumper J5 selectable
-	//MCFG_ISA_OUT_DRQ0_CB(WRITELINE("dma", i8257_device, dreq0_w)) // Part of ISA16 but not ISA8 standard but implemented on ISA8 B8 (SRDY) on this motherboard
-	MCFG_ISA_OUT_DRQ1_CB(WRITELINE("dma", i8257_device, dreq1_w))
-	MCFG_ISA_OUT_DRQ2_CB(WRITELINE("dma", i8257_device, dreq2_w))
-	MCFG_ISA_OUT_DRQ3_CB(WRITELINE("dma", i8257_device, dreq3_w))
+	ISA8(config, m_isabus, 0);
+	m_isabus->set_memspace("maincpu", AS_PROGRAM);
+	m_isabus->set_iospace("maincpu", AS_IO);
+	m_isabus->irq2_callback().set(m_pic8259, FUNC(pic8259_device::ir2_w));
+	m_isabus->irq3_callback().set(m_pic8259, FUNC(pic8259_device::ir3_w));
+	m_isabus->irq4_callback().set(m_pic8259, FUNC(pic8259_device::ir4_w));
+	m_isabus->irq5_callback().set(FUNC(myb3k_state::isa_irq5_w)); // Jumper J4 selectable
+	m_isabus->irq6_callback().set(m_pic8259, FUNC(pic8259_device::ir6_w));
+	m_isabus->irq7_callback().set(FUNC(myb3k_state::isa_irq7_w)); // Jumper J5 selectable
+	//m_isabus->drq0_callback().set("dma", FUNC(i8257_device::dreq0_w)); // Part of ISA16 but not ISA8 standard but implemented on ISA8 B8 (SRDY) on this motherboard
+	m_isabus->drq1_callback().set("dma", FUNC(i8257_device::dreq1_w));
+	m_isabus->drq2_callback().set("dma", FUNC(i8257_device::dreq2_w));
+	m_isabus->drq3_callback().set("dma", FUNC(i8257_device::dreq3_w));
+
 	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "isa", stepone_isa_cards, "myb3k_fdc4711", false) // FIXME: determine ISA bus clock
 	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "isa", stepone_isa_cards, "myb3k_com", false)
 	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "isa", stepone_isa_cards, nullptr, false)
 
 	/* Centronics */
-	MCFG_DEVICE_ADD (m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER (WRITELINE (*this, myb3k_state, centronics_ack_w))
-	MCFG_CENTRONICS_BUSY_HANDLER (WRITELINE (*this, myb3k_state, centronics_busy_w))
-	MCFG_CENTRONICS_PERROR_HANDLER (WRITELINE (*this, myb3k_state, centronics_perror_w))
-	MCFG_CENTRONICS_SELECT_HANDLER (WRITELINE (*this, myb3k_state, centronics_select_w))
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD ("cent_data_out", "centronics")
+
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->ack_handler().set(FUNC(myb3k_state::centronics_ack_w));
+	m_centronics->busy_handler().set(FUNC(myb3k_state::centronics_busy_w));
+	m_centronics->perror_handler().set(FUNC(myb3k_state::centronics_perror_w));
+	m_centronics->select_handler().set(FUNC(myb3k_state::centronics_select_w));
+
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
 
 	/* Sound */
 	SPEAKER(config, "mono").front_center();
@@ -1017,8 +1021,8 @@ MACHINE_CONFIG_START(myb3k_state::myb3k)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* Keyboard */
-	MCFG_DEVICE_ADD("myb3k_keyboard", MYB3K_KEYBOARD, 0)
-	MCFG_MYB3K_KEYBOARD_CB(PUT(myb3k_state, kbd_set_data_and_interrupt))
+	MYB3K_KEYBOARD(config, m_kb, 0);
+	m_kb->set_keyboard_callback(FUNC(myb3k_state::kbd_set_data_and_interrupt));
 
 	/* Monitor */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1026,23 +1030,24 @@ MACHINE_CONFIG_START(myb3k_state::myb3k)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", h46505_device, screen_update)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(myb3k_state::jb3000)
+void myb3k_state::jb3000(machine_config &config)
+{
 	myb3k(config);
 	/* Keyboard */
-	MCFG_DEVICE_REPLACE("myb3k_keyboard", JB3000_KEYBOARD, 0)
-	MCFG_MYB3K_KEYBOARD_CB(PUT(myb3k_state, kbd_set_data_and_interrupt))
+	JB3000_KEYBOARD(config.replace(), m_kb, 0);
+	m_kb->set_keyboard_callback(FUNC(myb3k_state::kbd_set_data_and_interrupt));
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(myb3k_state::stepone)
+void myb3k_state::stepone(machine_config &config)
+{
 	myb3k(config);
 	/* Keyboard */
-	MCFG_DEVICE_REPLACE("myb3k_keyboard", STEPONE_KEYBOARD, 0)
-	MCFG_MYB3K_KEYBOARD_CB(PUT(myb3k_state, kbd_set_data_and_interrupt))
+	STEPONE_KEYBOARD(config.replace(), m_kb, 0);
+	m_kb->set_keyboard_callback(FUNC(myb3k_state::kbd_set_data_and_interrupt));
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("stepone_flop_list", "stepone_flop")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "stepone_flop_list").set_original("stepone_flop");
+}
 
 /* ROM definitions, ROM area is 8 x 8Kb and can be populated with 2732 mask ROMs or 2764s */
 ROM_START( myb3k )

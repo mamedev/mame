@@ -326,14 +326,14 @@ MACHINE_CONFIG_START(munchmo_state::mnchmobl)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(munchmo_state, generic_irq_ack) // IORQ clears flip-flop at 1-7H
 
-	MCFG_DEVICE_ADD(m_mainlatch, LS259, 0) // 12E
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, munchmo_state, palette_bank_0_w)) // BCL0 2-11E
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, munchmo_state, palette_bank_1_w)) // BCL1 2-11E
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // CL2 2-11E
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP) // CL3 2-11E
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, munchmo_state, flipscreen_w)) // INV
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // DISP
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, munchmo_state, nmi_enable_w)) // ENI 1-10C
+	LS259(config, m_mainlatch, 0); // 12E
+	m_mainlatch->q_out_cb<0>().set(FUNC(munchmo_state::palette_bank_0_w)); // BCL0 2-11E
+	m_mainlatch->q_out_cb<1>().set(FUNC(munchmo_state::palette_bank_1_w)); // BCL1 2-11E
+	m_mainlatch->q_out_cb<2>().set_nop(); // CL2 2-11E
+	m_mainlatch->q_out_cb<3>().set_nop(); // CL3 2-11E
+	m_mainlatch->q_out_cb<4>().set(FUNC(munchmo_state::flipscreen_w)); // INV
+	m_mainlatch->q_out_cb<5>().set_nop(); // DISP
+	m_mainlatch->q_out_cb<6>().set(FUNC(munchmo_state::nmi_enable_w)); // ENI 1-10C
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -345,24 +345,22 @@ MACHINE_CONFIG_START(munchmo_state::mnchmobl)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, munchmo_state, vblank_irq))
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_mnchmobl)
-	MCFG_PALETTE_ADD(m_palette, 256)
-	MCFG_PALETTE_INIT_OWNER(munchmo_state, munchmo)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mnchmobl);
+	PALETTE(config, m_palette, FUNC(munchmo_state::munchmo_palette), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD(m_soundlatch)
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(ASSERTLINE(m_audiocpu, 0))
+	GENERIC_LATCH_8(config, m_soundlatch).data_pending_callback().set_inputline(m_audiocpu, 0, ASSERT_LINE);
 
 	/* AY clock speeds confirmed to match known recording */
-	MCFG_DEVICE_ADD(m_ay8910[0], AY8910, XTAL(15'000'000)/8)
-	//MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	AY8910(config, m_ay8910[0], XTAL(15'000'000)/8);
+	//m_ay8910[0]->set_flags(AY8910_SINGLE_OUTPUT);
+	m_ay8910[0]->add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_ADD(m_ay8910[1], AY8910, XTAL(15'000'000)/8)
-	//MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	AY8910(config, m_ay8910[1], XTAL(15'000'000)/8);
+	//m_ay8910[1]->set_flags(AY8910_SINGLE_OUTPUT);
+	m_ay8910[1]->add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
 

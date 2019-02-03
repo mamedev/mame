@@ -354,7 +354,7 @@ static void tetrisp2_draw_sprites(_BitmapClass &bitmap, bitmap_ind8 &bitmap_pri,
 
 		code    =   (color & 0x0fff);
 		// encoded to first word when YUV sprites are used
-		if(is_yuv == true)
+		if(is_yuv)
 			color   =   (attr & 0x7f00) >> 8;
 		else
 			color   =   (color >> 12) & 0xf;
@@ -877,12 +877,12 @@ void stepstag_state::convert_yuv422_to_rgb888(palette_device *paldev, uint16_t *
 	gf = std::max(gf,0.0);
 	bf = std::min(bf,255.0);
 	bf = std::max(bf,0.0);
-	
+
 	uint8_t r = (uint8_t)rf;
 	uint8_t g = (uint8_t)gf;
 	uint8_t b = (uint8_t)bf;
-	
-	paldev->set_pen_color(offset/4,	r, g, b);
+
+	paldev->set_pen_color(offset/4, r, g, b);
 }
 
 WRITE16_MEMBER(stepstag_state::stepstag_palette_left_w)

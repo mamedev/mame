@@ -28,7 +28,6 @@ Debugging information:
 #include "emu.h"
 #include "cpu/hcd62121/hcd62121.h"
 #include "emupal.h"
-#include "rendlay.h"
 #include "screen.h"
 
 class cfx9850_state : public driver_device
@@ -53,14 +52,14 @@ public:
 	DECLARE_READ8_MEMBER(in0_r);
 	required_shared_ptr<u8> m_video_ram;
 	required_shared_ptr<u8> m_display_ram;
-	DECLARE_PALETTE_INIT(cfx9850);
-	u32 screen_update_cfx9850(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void cfx9850_palette(palette_device &palette) const;
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void cfx9850(machine_config &config);
-	void cfx9850(address_map &map);
+	void cfx9850_mem(address_map &map);
 protected:
 	required_ioport_array<12> m_ko_port;
-	required_device<cpu_device> m_maincpu;
+	required_device<hcd62121_cpu_device> m_maincpu;
 
 private:
 	u16 m_ko;   // KO lines KO1 - KO14
@@ -69,7 +68,7 @@ private:
 };
 
 
-void cfx9850_state::cfx9850(address_map &map)
+void cfx9850_state::cfx9850_mem(address_map &map)
 {
 	map(0x000000, 0x007fff).rom();
 	map(0x080000, 0x0807ff).ram().share("video_ram");
@@ -246,7 +245,7 @@ static INPUT_PORTS_START(cfx9850)
 INPUT_PORTS_END
 
 
-PALETTE_INIT_MEMBER(cfx9850_state, cfx9850)
+void cfx9850_state::cfx9850_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, 0xff, 0xff, 0xff);
 	palette.set_pen_color(1, 0x00, 0x00, 0xff);
@@ -255,7 +254,7 @@ PALETTE_INIT_MEMBER(cfx9850_state, cfx9850)
 }
 
 
-u32 cfx9850_state::screen_update_cfx9850(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 cfx9850_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	u16 offset = 0;
 
@@ -283,29 +282,27 @@ u32 cfx9850_state::screen_update_cfx9850(screen_device &screen, bitmap_ind16 &bi
 }
 
 
-MACHINE_CONFIG_START(cfx9850_state::cfx9850)
-	MCFG_DEVICE_ADD("maincpu", HCD62121, 4300000)    /* X1 - 4.3 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(cfx9850)
-	MCFG_HCD62121_KOL_CB(WRITE8(*this, cfx9850_state, kol_w))
-	MCFG_HCD62121_KOH_CB(WRITE8(*this, cfx9850_state, koh_w))
-	MCFG_HCD62121_PORT_CB(WRITE8(*this, cfx9850_state, port_w))
-	MCFG_HCD62121_OPT_CB(WRITE8(*this, cfx9850_state, opt_w))
-	MCFG_HCD62121_KI_CB(READ8(*this, cfx9850_state, ki_r))
-	MCFG_HCD62121_IN0_CB(READ8(*this, cfx9850_state, in0_r))
+void cfx9850_state::cfx9850(machine_config &config)
+{
+	HCD62121(config, m_maincpu, 4300000); /* X1 - 4.3 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &cfx9850_state::cfx9850_mem);
+	m_maincpu->kol_cb().set(FUNC(cfx9850_state::kol_w));
+	m_maincpu->koh_cb().set(FUNC(cfx9850_state::koh_w));
+	m_maincpu->port_cb().set(FUNC(cfx9850_state::port_w));
+	m_maincpu->opt_cb().set(FUNC(cfx9850_state::opt_w));
+	m_maincpu->ki_cb().set(FUNC(cfx9850_state::ki_r));
+	m_maincpu->in0_cb().set(FUNC(cfx9850_state::in0_r));
 
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(128, 64)
-	MCFG_SCREEN_VISIBLE_AREA(0, 127, 0, 63)
-	MCFG_SCREEN_UPDATE_DRIVER(cfx9850_state, screen_update_cfx9850)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(60);
+	screen.set_size(128, 64);
+	screen.set_visarea(0, 127, 0, 63);
+	screen.set_screen_update(FUNC(cfx9850_state::screen_update));
+	screen.set_palette("palette");
 
 	// TODO: Verify amount of colors and palette. Colors can be changed by changing the contrast.
-	MCFG_PALETTE_ADD("palette", 4)
-	MCFG_PALETTE_INIT_OWNER(cfx9850_state, cfx9850)
-MACHINE_CONFIG_END
+	PALETTE(config, "palette", FUNC(cfx9850_state::cfx9850_palette), 4);
+}
 
 
 ROM_START(cfx9850)

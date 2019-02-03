@@ -12,6 +12,7 @@
 
     --- Hardware ---
     A 6809 CPU (U3) is clocked by a 556 (U2) circuit with 3 Pin addressing decoding via a 74LS138 (U14)
+    (this information seems incorrect: CPU clock is almost certainly sourced from the VDP's CPUCLK output)
     Program ROM is a 27256 (U15)
     Two 6821 PIAs (U4/U17) are used for I/O
     Video is processed via a TMS9118 (U11) with two TMS4416 (U12/U13) as RAM
@@ -62,7 +63,7 @@
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
 #include "machine/6840ptm.h"
-#include "machine/ram.h"
+#include "machine/nvram.h"
 #include "sound/spkrdev.h"
 #include "video/tms9928a.h"
 #include "speaker.h"
@@ -125,7 +126,7 @@ private:
 
 void arachnid_state::arachnid_map(address_map &map)
 {
-	map(0x0000, 0x1fff).ram();
+	map(0x0000, 0x07ff).ram().share("nvram");
 	map(0x2000, 0x2007).rw(PTM6840_TAG, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
 	map(0x4004, 0x4007).rw(m_pia_u4, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x4008, 0x400b).rw(m_pia_u17, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
@@ -424,41 +425,43 @@ void arachnid_state::machine_start()
 
 MACHINE_CONFIG_START(arachnid_state::arachnid)
 	// basic machine hardware
-	MCFG_DEVICE_ADD(M6809_TAG, M6809, XTAL(1'000'000))
+	MCFG_DEVICE_ADD(M6809_TAG, MC6809, 10.738635_MHz_XTAL / 3)
 	MCFG_DEVICE_PROGRAM_MAP(arachnid_map)
 
-	// devices
-	MCFG_DEVICE_ADD(PIA6821_U4_TAG, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, arachnid_state, pia_u4_pa_r))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, arachnid_state, pia_u4_pb_r))
-	MCFG_PIA_READCA1_HANDLER(READLINE(*this, arachnid_state, pia_u4_pca_r))
-	MCFG_PIA_READCB1_HANDLER(READLINE(*this, arachnid_state, pia_u4_pcb_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, arachnid_state, pia_u4_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, arachnid_state, pia_u4_pb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, arachnid_state, pia_u4_pca_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, arachnid_state, pia_u4_pcb_w))
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // MK48Z02 (or DS1220Y)
 
-	MCFG_DEVICE_ADD(PIA6821_U17_TAG, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, arachnid_state, pia_u17_pa_r))
-	MCFG_PIA_READCA1_HANDLER(READLINE(*this, arachnid_state, pia_u17_pca_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, arachnid_state, pia_u17_pb_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, arachnid_state, pia_u17_pcb_w))
+	// devices
+	PIA6821(config, m_pia_u4, 0);
+	m_pia_u4->readpa_handler().set(FUNC(arachnid_state::pia_u4_pa_r));
+	m_pia_u4->readpb_handler().set(FUNC(arachnid_state::pia_u4_pb_r));
+	m_pia_u4->readca1_handler().set(FUNC(arachnid_state::pia_u4_pca_r));
+	m_pia_u4->readcb1_handler().set(FUNC(arachnid_state::pia_u4_pcb_r));
+	m_pia_u4->writepa_handler().set(FUNC(arachnid_state::pia_u4_pa_w));
+	m_pia_u4->writepb_handler().set(FUNC(arachnid_state::pia_u4_pb_w));
+	m_pia_u4->ca2_handler().set(FUNC(arachnid_state::pia_u4_pca_w));
+	m_pia_u4->cb2_handler().set(FUNC(arachnid_state::pia_u4_pcb_w));
+
+	PIA6821(config, m_pia_u17, 0);
+	m_pia_u17->readpa_handler().set(FUNC(arachnid_state::pia_u17_pa_r));
+	m_pia_u17->readca1_handler().set(FUNC(arachnid_state::pia_u17_pca_r));
+	m_pia_u17->writepb_handler().set(FUNC(arachnid_state::pia_u17_pb_w));
+	m_pia_u17->cb2_handler().set(FUNC(arachnid_state::pia_u17_pcb_w));
 
 	// video hardware
-	MCFG_DEVICE_ADD( TMS9118_TAG, TMS9118, XTAL(10'738'635) / 2 )
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE(M6809_TAG, INPUT_LINE_IRQ0))
-	MCFG_TMS9928A_SCREEN_ADD_NTSC( SCREEN_TAG )
-	MCFG_SCREEN_UPDATE_DEVICE( TMS9118_TAG, tms9118_device, screen_update )
+	tms9118_device &vdp(TMS9118(config, TMS9118_TAG, 10.738635_MHz_XTAL));
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000);
+	vdp.int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_DEVICE_ADD(PTM6840_TAG, PTM6840, XTAL(8'000'000) / 4)
-	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_O1_CB(WRITELINE(*this, arachnid_state, ptm_o1_callback))
+	ptm6840_device &ptm(PTM6840(config, PTM6840_TAG, 10.738635_MHz_XTAL / 3 / 4));
+	ptm.set_external_clocks(0, 0, 0);
+	ptm.o1_callback().set(FUNC(arachnid_state::ptm_o1_callback));
 MACHINE_CONFIG_END
 
 /***************************************************************************

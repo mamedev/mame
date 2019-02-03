@@ -28,8 +28,8 @@ public:
 protected:
 		// device-level overrides
 		virtual void device_start() override;
-		virtual void device_reset() override;
 		virtual uint8_t* get_cart_base() override;
+		virtual memory_region* get_cart_memregion() override;
 
 		// internal state
 		device_image_interface *m_cart;

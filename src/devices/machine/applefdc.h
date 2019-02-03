@@ -72,6 +72,8 @@ public:
 	// accessor
 	uint8_t get_lines();
 
+	virtual void device_reset() override;
+
 protected:
 	enum applefdc_t
 	{
@@ -85,7 +87,6 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// other protecteds
@@ -123,6 +124,12 @@ private:
 class applefdc_device : public applefdc_base_device
 {
 public:
+	applefdc_device(const machine_config &mconfig, const char *tag, device_t *owner, const applefdc_interface *intrf)
+		: applefdc_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		set_config(intrf);
+	}
+
 	applefdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
@@ -135,33 +142,13 @@ public:
 class iwm_device : public applefdc_base_device
 {
 public:
+	iwm_device(const machine_config &mconfig, const char *tag, device_t *owner, const applefdc_interface *intrf)
+		: iwm_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		set_config(intrf);
+	}
+
 	iwm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
-
-
-
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_APPLEFDC_CONFIG(_intrf) \
-	downcast<applefdc_base_device &>(*device).set_config(&(_intrf));
-
-#define MCFG_APPLEFDC_ADD(_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, APPLEFDC, 0) \
-	MCFG_APPLEFDC_CONFIG(_intrf)
-
-#define MCFG_APPLEFDC_MODIFY(_tag, _intrf) \
-	MCFG_DEVICE_MODIFY(_tag)          \
-	MCFG_APPLEFDC_CONFIG(_intrf)
-
-#define MCFG_IWM_ADD(_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, IWM, 0) \
-	MCFG_APPLEFDC_CONFIG(_intrf)
-
-#define MCFG_IWM_MODIFY(_tag, _intrf) \
-	MCFG_DEVICE_MODIFY(_tag)          \
-	MCFG_APPLEFDC_CONFIG(_intrf)
-
 
 #endif // MAME_MACHINE_APPLEFDC_H

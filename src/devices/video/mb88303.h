@@ -26,21 +26,6 @@
 #pragma once
 
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_MB88303_VOW_CALLBACK(_write) \
-	devcb = &downcast<mb88303_device &>(*device).set_vow_callback(DEVCB_##_write);
-
-#define MCFG_MB88303_VOBN_CALLBACK(_write) \
-	devcb = &downcast<mb88303_device &>(*device).set_vob_n_callback(DEVCB_##_write);
-
-#define MCFG_MB88303_DO_CALLBACK(_write) \
-	devcb = &downcast<mb88303_device &>(*device).set_do_callback(DEVCB_##_write);
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -56,9 +41,9 @@ public:
 	// construction/destruction
 	mb88303_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_vow_callback(Object &&cb) { return m_write_vow.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_vobn_callback(Object &&cb) { return m_write_vobn.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_do_callback(Object &&cb) { return m_write_do.set_callback(std::forward<Object>(cb)); }
+	auto vow_callback() { return m_write_vow.bind(); }
+	auto vobn_callback() { return m_write_vobn.bind(); }
+	auto do_callback() { return m_write_do.bind(); }
 
 	DECLARE_WRITE8_MEMBER(da_w);
 	DECLARE_WRITE_LINE_MEMBER(adm_w);

@@ -61,21 +61,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_UV201_EXT_INT_CALLBACK(_write) \
-	devcb = &downcast<uv201_device &>(*device).set_ext_int_wr_callback(DEVCB_##_write);
-
-#define MCFG_UV201_HBLANK_CALLBACK(_write) \
-	devcb = &downcast<uv201_device &>(*device).set_hblank_wr_callback(DEVCB_##_write);
-
-#define MCFG_UV201_DB_CALLBACK(_read) \
-	devcb = &downcast<uv201_device &>(*device).set_db_rd_callback(DEVCB_##_read);
-
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -88,9 +73,9 @@ public:
 	// construction/destruction
 	uv201_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_ext_int_wr_callback(Object &&cb) { return m_write_ext_int.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_hblank_wr_callback(Object &&cb) { return m_write_hblank.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_db_rd_callback(Object &&cb) { return m_read_db.set_callback(std::forward<Object>(cb)); }
+	auto ext_int_wr_callback() { return m_write_ext_int.bind(); }
+	auto hblank_wr_callback() { return m_write_hblank.bind(); }
+	auto db_rd_callback() { return m_read_db.bind(); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );

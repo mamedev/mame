@@ -5,10 +5,17 @@
     Irem M72 hardware
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_M72_H
+#define MAME_INCLUDES_M72_H
+
+#pragma once
+
 #include "audio/m72.h"
-#include "sound/dac.h"
+#include "cpu/mcs51/mcs51.h"
+#include "machine/mb8421.h"
 #include "machine/pic8259.h"
 #include "machine/upd4701.h"
+#include "sound/dac.h"
 #include "emupal.h"
 #include "screen.h"
 
@@ -27,11 +34,12 @@
 class m72_state : public driver_device
 {
 public:
-	m72_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	m72_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_mcu(*this, "mcu"),
+		m_dpram(*this, "dpram"),
 		m_dac(*this, "dac"),
 		m_audio(*this, "m72"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -52,7 +60,7 @@ public:
 		m_m81_b_b_j3(*this, "JumperJ3"),
 		m_m82_rowscroll(0),
 		m_m82_tmcontrol(0)
-		{ }
+	{ }
 
 	void m72_base(machine_config &config);
 	void m72_audio_chips(machine_config &config);
@@ -84,7 +92,8 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
-	optional_device<cpu_device> m_mcu;
+	optional_device<i8751_device> m_mcu;
+	optional_device<mb8421_mb8431_16_device> m_dpram;
 	optional_device<dac_byte_interface> m_dac;
 	optional_device<m72_audio_device> m_audio;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -126,7 +135,6 @@ private:
 	uint16_t m_m82_tmcontrol;
 
 	// m72_i8751 specific
-	uint8_t m_mcu_snd_cmd_latch;
 	uint8_t m_mcu_sample_latch;
 	uint32_t m_mcu_sample_addr;
 
@@ -146,10 +154,7 @@ private:
 	DECLARE_WRITE8_MEMBER(mcu_data_w);
 	DECLARE_READ8_MEMBER(mcu_data_r);
 	DECLARE_READ8_MEMBER(mcu_sample_r);
-	DECLARE_WRITE8_MEMBER(mcu_ack_w);
-	DECLARE_READ8_MEMBER(mcu_snd_r);
 	DECLARE_WRITE8_MEMBER(mcu_port1_w);
-	DECLARE_WRITE8_MEMBER(mcu_port3_w);
 	DECLARE_WRITE8_MEMBER(mcu_low_w);
 	DECLARE_WRITE8_MEMBER(mcu_high_w);
 	DECLARE_READ8_MEMBER(snd_cpu_sample_r);
@@ -197,13 +202,12 @@ private:
 	DECLARE_MACHINE_START(kengo);
 	DECLARE_MACHINE_RESET(kengo);
 
-	INTERRUPT_GEN_MEMBER(mcu_int);
 	INTERRUPT_GEN_MEMBER(fake_nmi);
 	TIMER_CALLBACK_MEMBER(synch_callback);
 	TIMER_CALLBACK_MEMBER(scanline_interrupt);
 	TIMER_CALLBACK_MEMBER(kengo_scanline_interrupt);
 	TIMER_CALLBACK_MEMBER(delayed_ram16_w);
-
+	TIMER_CALLBACK_MEMBER(delayed_ram8_w);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_m81(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -224,7 +228,9 @@ private:
 	void kengo_map(address_map &map);
 	void m72_cpu1_common_map(address_map &map);
 	void m72_map(address_map &map);
+	void m72_protected_map(address_map &map);
 	void m72_portmap(address_map &map);
+	void m72_protected_portmap(address_map &map);
 	void m81_cpu1_common_map(address_map &map);
 	void m81_portmap(address_map &map);
 	void m82_map(address_map &map);
@@ -245,3 +251,5 @@ private:
 	void xmultipl_map(address_map &map);
 	void xmultiplm72_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_M72_H

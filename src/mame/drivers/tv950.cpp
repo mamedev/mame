@@ -6,13 +6,14 @@
     2016-07-30 Preliminary not-so-skeleton driver
 
     TODO:
-    - Keyboard
+    - VIA T2 counter mode emulation
     - CRTC reset and drawing
+    - Bidirectional communications mode
 
     Hardware:
-    6502 CPU
+    6502A CPU
     6545 CRTC
-    6522 VIA, wired to count HSYNCs and to enable the 6502 to pull RESET on the CRTC
+    6522A VIA, wired to count HSYNCs and to enable the 6502 to pull RESET on the CRTC
     3x 6551 ACIA  1 for the keyboard, 1 for the modem port, 1 for the printer port
 
     VIA hookup (see schematics):
@@ -21,6 +22,7 @@
     PA6 = IRQ in
     PA7 = force blank
     PB6 = Hblank in
+    PB7 = out speaker
     CA1 = reset CRTC in
     CA2 = reset CRTC out
     CB2 = blink timer
@@ -37,19 +39,12 @@
 #include "emu.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/m6502/m6502.h"
-#include "cpu/mcs48/mcs48.h"
+#include "machine/input_merger.h"
 #include "machine/6522via.h"
 #include "machine/mos6551.h"
+#include "machine/tv950kb.h"
 #include "video/mc6845.h"
 #include "screen.h"
-
-#define ACIA1_TAG   "acia1"
-#define ACIA2_TAG   "acia2"
-#define ACIA3_TAG   "acia3"
-#define CRTC_TAG    "crtc"
-#define VIA_TAG     "via"
-#define RS232A_TAG  "rs232a"
-#define RS232B_TAG  "rs232b"
 
 #define MASTER_CLOCK XTAL(23'814'000)
 
@@ -59,13 +54,20 @@ public:
 	tv950_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_via(*this, VIA_TAG)
-		, m_crtc(*this, CRTC_TAG)
+		, m_via(*this, "via")
+		, m_crtc(*this, "crtc")
+		, m_uart(*this, "a%uuart", 49U)
+		, m_keyboard(*this, "keyboard")
 		, m_vram(*this, "vram")
 		, m_gfx(*this, "graphics")
+		, m_dsw(*this, "DSW%u", 0U)
 	{ }
 
 	void tv950(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	DECLARE_WRITE8_MEMBER(via_a_w);
@@ -83,16 +85,26 @@ private:
 	uint8_t m_via_row;
 	uint8_t m_attr_row;
 	uint8_t m_attr_screen;
-	virtual void machine_reset() override;
+
 	required_device<m6502_device> m_maincpu;
 	required_device<via6522_device> m_via;
 	required_device<r6545_1_device> m_crtc;
+	required_device_array<mos6551_device, 3> m_uart;
+	required_device<tv950kb_device> m_keyboard;
 	required_shared_ptr<uint8_t> m_vram;
 	required_region_ptr<uint16_t> m_gfx;
+	required_ioport_array<4> m_dsw;
 
 	int m_row_addr;
 	int m_row;
 };
+
+void tv950_state::machine_start()
+{
+	m_uart[0]->write_dcd(0);
+	m_uart[0]->write_dsr(0);
+	m_uart[2]->write_cts(0);
+}
 
 void tv950_state::tv950_mem(address_map &map)
 {
@@ -102,9 +114,9 @@ void tv950_state::tv950_mem(address_map &map)
 	map(0x8100, 0x8100).rw(m_crtc, FUNC(r6545_1_device::status_r), FUNC(r6545_1_device::address_w));
 	map(0x8101, 0x8101).rw(m_crtc, FUNC(r6545_1_device::register_r), FUNC(r6545_1_device::register_w));
 	map(0x9000, 0x9000).w(FUNC(tv950_state::row_addr_w));
-	map(0x9300, 0x9303).rw(ACIA1_TAG, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
-	map(0x9500, 0x9503).rw(ACIA2_TAG, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
-	map(0x9900, 0x9903).rw(ACIA3_TAG, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
+	map(0x9300, 0x9303).rw(m_uart[0], FUNC(mos6551_device::read), FUNC(mos6551_device::write)); // CS0 = AB9
+	map(0x9500, 0x9503).rw(m_uart[2], FUNC(mos6551_device::read), FUNC(mos6551_device::write)); // CS0 = AB10
+	map(0x9900, 0x9903).rw(m_uart[1], FUNC(mos6551_device::read), FUNC(mos6551_device::write)); // CS0 = AB11
 	map(0xb100, 0xb10f).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write));
 	map(0xe000, 0xffff).rom().region("maincpu", 0);
 }
@@ -218,26 +230,21 @@ WRITE8_MEMBER(tv950_state::row_addr_w)
 WRITE8_MEMBER(tv950_state::via_a_w)
 {
 	m_via_row = ~data & 15;
-	m_maincpu->set_input_line(M6502_IRQ_LINE, BIT(data, 6) ? CLEAR_LINE : ASSERT_LINE);
 	// PA4, 5, 7 to do
 }
 
 WRITE8_MEMBER(tv950_state::via_b_w)
 {
-// bit 7 = speaker, and bit 3 of m_via_row must be active as well
+	// bit 3 of m_via_row must be active as well?
+	m_keyboard->rx_w(!BIT(data, 7));
 }
 
 READ8_MEMBER(tv950_state::via_b_r)
 {
 	uint8_t data = 0xff;
-	if (BIT(m_via_row, 0))
-		data &= ioport("DSW0")->read();
-	if (BIT(m_via_row, 1))
-		data &= ioport("DSW1")->read();
-	if (BIT(m_via_row, 2))
-		data &= ioport("DSW2")->read();
-	if (BIT(m_via_row, 3))
-		data &= ioport("DSW3")->read();
+	for (int n = 0; n < 4; n++)
+		if (BIT(m_via_row, n))
+			data &= m_dsw[n]->read();
 	return data;
 }
 
@@ -272,44 +279,67 @@ MC6845_UPDATE_ROW( tv950_state::crtc_update_row )
 	m_row = (m_row + 1) % 250;
 }
 
-MACHINE_CONFIG_START(tv950_state::tv950)
+void tv950_state::tv950(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK/14)
-	MCFG_DEVICE_PROGRAM_MAP(tv950_mem)
+	M6502(config, m_maincpu, MASTER_CLOCK/14);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tv950_state::tv950_mem);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK, 1200, 0, 1120, 370, 0, 250 )   // not real values
-	MCFG_SCREEN_UPDATE_DEVICE( CRTC_TAG, r6545_1_device, screen_update )
+	input_merger_device &mainirq(INPUT_MERGER_ANY_HIGH(config, "mainirq")); // open collector
+	mainirq.output_handler().set_inputline(m_maincpu, m6502_device::IRQ_LINE);
+	mainirq.output_handler().append(m_via, FUNC(via6522_device::write_pa6)).invert();
+
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(MASTER_CLOCK, 1200, 0, 1120, 370, 0, 250);   // not real values
+	screen.set_screen_update("crtc", FUNC(r6545_1_device::screen_update));
 
 	// there are many 6845 CRTC submodels, the Theory of Operation manual references the Rockwell R6545-1 specificially.
-	MCFG_MC6845_ADD(CRTC_TAG, R6545_1, "screen", MASTER_CLOCK/14)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(14)
-	MCFG_MC6845_UPDATE_ROW_CB(tv950_state, crtc_update_row)
-	MCFG_MC6845_ADDR_CHANGED_CB(tv950_state, crtc_update_addr)
-	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(VIA_TAG, via6522_device, write_pb6))
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, tv950_state, crtc_vs_w))
-	MCFG_VIDEO_SET_SCREEN(nullptr)
+	R6545_1(config, m_crtc, MASTER_CLOCK/14);
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(14);
+	m_crtc->set_update_row_callback(FUNC(tv950_state::crtc_update_row), this);
+	m_crtc->set_on_update_addr_change_callback(FUNC(tv950_state::crtc_update_addr), this);
+	m_crtc->out_hsync_callback().set(m_via, FUNC(via6522_device::write_pb6)).invert();
+	m_crtc->out_vsync_callback().set(FUNC(tv950_state::crtc_vs_w));
+	m_crtc->set_screen(nullptr);
 
-	MCFG_DEVICE_ADD(VIA_TAG, VIA6522, MASTER_CLOCK/14)
-	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6502_NMI_LINE))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, tv950_state, via_a_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, tv950_state, via_b_w))
-	MCFG_VIA6522_READPB_HANDLER(READ8(*this, tv950_state, via_b_r))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(*this, tv950_state, via_crtc_reset_w))
-	//MCFG_VIA6522_CB2_HANDLER(WRITELINE(*this, tv950_state, via_blink_rate_w))
+	VIA6522(config, m_via, MASTER_CLOCK/14);
+	//m_via->irq_handler().set_inputline(m_maincpu, M6502_NMI_LINE);
+	m_via->writepa_handler().set(FUNC(tv950_state::via_a_w));
+	m_via->writepb_handler().set(FUNC(tv950_state::via_b_w));
+	m_via->readpb_handler().set(FUNC(tv950_state::via_b_r));
+	m_via->ca2_handler().set(FUNC(tv950_state::via_crtc_reset_w));
+	//m_via->cb2_handler().set(FUNC(tv950_state::via_blink_rate_w));
 
-	MCFG_DEVICE_ADD(ACIA1_TAG, MOS6551, 0)
-	MCFG_MOS6551_XTAL(MASTER_CLOCK/13)
+	MOS6551(config, m_uart[0], MASTER_CLOCK/14).set_xtal(MASTER_CLOCK/13); // for keyboard
+	m_uart[0]->irq_handler().set("mainirq", FUNC(input_merger_device::in_w<0>));
 
-	MCFG_DEVICE_ADD(ACIA2_TAG, MOS6551, 0)
-	MCFG_MOS6551_XTAL(MASTER_CLOCK/13)
+	MOS6551(config, m_uart[1], MASTER_CLOCK/14).set_xtal(MASTER_CLOCK/13); // for main port
+	m_uart[1]->irq_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
+	m_uart[1]->dtr_handler().set("p3", FUNC(rs232_port_device::write_dtr));
+	m_uart[1]->rts_handler().set("p3", FUNC(rs232_port_device::write_rts));
+	m_uart[1]->txd_handler().set("p3", FUNC(rs232_port_device::write_txd));
 
-	MCFG_DEVICE_ADD(ACIA3_TAG, MOS6551, 0)
-	MCFG_MOS6551_XTAL(MASTER_CLOCK/13)
+	MOS6551(config, m_uart[2], MASTER_CLOCK/14).set_xtal(MASTER_CLOCK/13); // for printer port
+	m_uart[2]->irq_handler().set("mainirq", FUNC(input_merger_device::in_w<2>));
+	m_uart[2]->txd_handler().set("p4", FUNC(rs232_port_device::write_txd)); // to pin 3 (RXD)
+	m_uart[2]->rts_handler().set("p4", FUNC(rs232_port_device::write_rts)); // to pin 5 (CTS)
+	m_uart[2]->dtr_handler().set("p4", FUNC(rs232_port_device::write_dtr)); // to pin 6 (DSR)
 
-	MCFG_DEVICE_ADD("kbd", I8748, XTAL(5'714'300))
-MACHINE_CONFIG_END
+	TV950_KEYBOARD(config, m_keyboard);
+	m_keyboard->tx_cb().set(m_uart[0], FUNC(mos6551_device::write_rxd));
+
+	rs232_port_device &p3(RS232_PORT(config, "p3", default_rs232_devices, nullptr)); // main port
+	p3.dsr_handler().set(m_uart[1], FUNC(mos6551_device::write_dsr));
+	p3.dcd_handler().set(m_uart[1], FUNC(mos6551_device::write_dcd));
+	p3.rxd_handler().set(m_uart[1], FUNC(mos6551_device::write_rxd));
+	p3.cts_handler().set(m_uart[1], FUNC(mos6551_device::write_cts));
+
+	rs232_port_device &p4(RS232_PORT(config, "p4", default_rs232_devices, nullptr)); // printer port
+	p4.dsr_handler().set(m_uart[2], FUNC(mos6551_device::write_dsr)); // from pin 20 (DTR)
+	p4.rxd_handler().set(m_uart[2], FUNC(mos6551_device::write_rxd)); // from pin 2 (TXD)
+}
 
 /* ROM definition */
 ROM_START( tv950 )
@@ -320,9 +350,6 @@ ROM_START( tv950 )
 	ROM_REGION16_LE(0x2000, "graphics", 0)
 	ROM_LOAD16_BYTE( "180000-002a_a33_9294.bin", 0x000001, 0x001000, CRC(eaf4f346) SHA1(b4c531626846f3f055ddc086ac24fdb1b34f3f8e) )
 	ROM_LOAD16_BYTE( "180000-003a_a32_7ebf.bin", 0x000000, 0x001000, CRC(783ca0b6) SHA1(1cec9a9a56ef5795809f7ca7cd2e3f61b27e698d) )
-
-	ROM_REGION(0x400, "kbd", 0)
-	ROM_LOAD( "950kbd_8748_pn52080723-02.bin", 0x000000, 0x000400, CRC(11c8f22c) SHA1(99e73e9c74b10055733e89b92adbc5bf7f4ff338) )
 
 	ROM_REGION(0x10000, "user1", 0)
 	// came with "tv950.zip"
@@ -335,4 +362,4 @@ ROM_END
 
 /* Driver */
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY      FULLNAME                            FLAGS
-COMP( 1981, tv950, 0,      0,      tv950,   tv950, tv950_state, empty_init, "TeleVideo", "Model 950 Video Display Terminal", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1981, tv950, 0,      0,      tv950,   tv950, tv950_state, empty_init, "TeleVideo", "Model 950 Video Display Terminal", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

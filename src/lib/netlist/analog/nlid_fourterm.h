@@ -101,7 +101,7 @@ namespace netlist {
 		param_double_t m_cur_limit; /* current limit */
 
 	protected:
-		NETLIB_UPDATEI();
+		//NETLIB_UPDATEI();
 		NETLIB_RESETI();
 		NETLIB_UPDATE_PARAMI();
 		NETLIB_UPDATE_TERMINALSI();
@@ -141,7 +141,7 @@ namespace netlist {
 		}
 
 	protected:
-		NETLIB_UPDATEI();
+		//NETLIB_UPDATEI();
 		NETLIB_RESETI();
 		NETLIB_UPDATE_PARAMI();
 	};

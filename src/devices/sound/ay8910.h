@@ -52,27 +52,7 @@
 #define YM2149_PIN26_LOW            (0x10)
 
 
-#define MCFG_AY8910_OUTPUT_TYPE(_flag) \
-	downcast<ay8910_device &>(*device).set_flags(_flag);
-
-#define MCFG_AY8910_RES_LOADS(_res0, _res1, _res2) \
-	downcast<ay8910_device &>(*device).set_resistors_load(_res0, _res1, _res2);
-
-#define MCFG_AY8910_PORT_A_READ_CB(_devcb) \
-	devcb = &downcast<ay8910_device &>(*device).set_port_a_read_callback(DEVCB_##_devcb);
-
-#define MCFG_AY8910_PORT_B_READ_CB(_devcb) \
-	devcb = &downcast<ay8910_device &>(*device).set_port_b_read_callback(DEVCB_##_devcb);
-
-#define MCFG_AY8910_PORT_A_WRITE_CB(_devcb) \
-	devcb = &downcast<ay8910_device &>(*device).set_port_a_write_callback(DEVCB_##_devcb);
-
-#define MCFG_AY8910_PORT_B_WRITE_CB(_devcb) \
-	devcb = &downcast<ay8910_device &>(*device).set_port_b_write_callback(DEVCB_##_devcb);
-
-
-class ay8910_device : public device_t,
-									public device_sound_interface
+class ay8910_device : public device_t, public device_sound_interface
 {
 public:
 	enum psg_type_t
@@ -88,10 +68,10 @@ public:
 	void set_flags(int flags) { m_flags = flags; }
 	void set_psg_type(psg_type_t psg_type) { set_type(psg_type); }
 	void set_resistors_load(int res_load0, int res_load1, int res_load2) { m_res_load[0] = res_load0; m_res_load[1] = res_load1; m_res_load[2] = res_load2; }
-	template <class Object> devcb_base &set_port_a_read_callback(Object &&cb) { return m_port_a_read_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_port_b_read_callback(Object &&cb) { return m_port_b_read_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_port_a_write_callback(Object &&cb) { return m_port_a_write_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_port_b_write_callback(Object &&cb) { return m_port_b_write_cb.set_callback(std::forward<Object>(cb)); }
+	auto port_a_read_callback() { return m_port_a_read_cb.bind(); }
+	auto port_b_read_callback() { return m_port_b_read_cb.bind(); }
+	auto port_a_write_callback() { return m_port_a_write_cb.bind(); }
+	auto port_b_write_callback() { return m_port_b_write_cb.bind(); }
 
 	DECLARE_READ8_MEMBER( data_r );
 	DECLARE_WRITE8_MEMBER( address_w );
@@ -184,6 +164,7 @@ private:
 	uint32_t m_env_volume;
 	uint8_t m_hold,m_alternate,m_attack,m_holding;
 	int32_t m_rng;
+	uint8_t m_mode;
 	uint8_t m_env_step_mask;
 	/* init parameters ... */
 	int m_step;

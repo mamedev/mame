@@ -94,10 +94,11 @@ protected:
 	void common_start();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(wswan);
+	void wswan_palette(palette_device &palette) const;
 
 	void wswan_io(address_map &map);
 	void wswan_mem(address_map &map);
+	void wswan_snd(address_map &map);
 
 	void register_save();
 	void handle_irqs();
@@ -113,7 +114,7 @@ public:
 protected:
 	virtual void machine_start() override;
 	void wscolor_mem(address_map &map);
-	DECLARE_PALETTE_INIT(wscolor);
+	void wscolor_palette(palette_device &palette) const;
 };
 
 #endif // MAME_INCLUDES_WSWAN_H

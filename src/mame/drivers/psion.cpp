@@ -23,7 +23,6 @@
 #include "emu.h"
 #include "includes/psion.h"
 
-#include "rendlay.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -200,7 +199,7 @@ WRITE8_MEMBER( psion_state::io_w )
 	switch (offset & 0x0ffc0)
 	{
 	case 0x80:
-		m_lcdc->write(space, offset & 0x01, data);
+		m_lcdc->write(offset & 0x01, data);
 		break;
 	default:
 		io_rw(space, offset);
@@ -212,7 +211,7 @@ READ8_MEMBER( psion_state::io_r )
 	switch (offset & 0xffc0)
 	{
 	case 0x80:
-		return m_lcdc->read(space, offset & 0x01);
+		return m_lcdc->read(offset & 0x01);
 	default:
 		io_rw(space, offset);
 	}
@@ -548,7 +547,7 @@ HD44780_PIXEL_UPDATE(psion1_state::psion1_pixel_update)
 		bitmap.pix16(y, (line * 8 + pos) * 6 + x) = state;
 }
 
-PALETTE_INIT_MEMBER(psion_state, psion)
+void psion_state::psion_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
@@ -583,30 +582,27 @@ MACHINE_CONFIG_START(psion_state::psion_2lines)
 	MCFG_SCREEN_VISIBLE_AREA(0, 6*16-1, 0, 9*2-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(psion_state, psion)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_psion)
+	PALETTE(config, "palette", FUNC(psion_state::psion_palette), 2);
+	GFXDECODE(config, "gfxdecode", "palette", gfx_psion);
 
-	MCFG_HD44780_ADD("hd44780")
-	MCFG_HD44780_LCD_SIZE(2, 16)
+	HD44780(config, m_lcdc, 0);
+	m_lcdc->set_lcd_size(2, 16);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD( "beeper", BEEP, 3250 )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
+	BEEP(config, m_beep, 3250).add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram1", psion_state, nvram_init)     // sys_regs
-	MCFG_NVRAM_ADD_0FILL("nvram2")                                      // RAM
+	NVRAM(config, "nvram1").set_custom_handler(FUNC(psion_state::nvram_init)); // sys_regs
+	NVRAM(config, "nvram2", nvram_device::DEFAULT_ALL_0); // RAM
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer", psion_state, nmi_timer, attotime::from_seconds(1))
+	TIMER(config, "nmi_timer").configure_periodic(FUNC(psion_state::nmi_timer), attotime::from_seconds(1));
 
 	/* Datapack */
-	MCFG_PSION_DATAPACK_ADD("pack1")
-	MCFG_PSION_DATAPACK_ADD("pack2")
+	PSION_DATAPACK(config, m_pack1, 0);
+	PSION_DATAPACK(config, m_pack2, 0);
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("pack_list", "psion2")
+	SOFTWARE_LIST(config, "pack_list").set_original("psion2");
 MACHINE_CONFIG_END
 
 /* basic configuration for 4 lines display */
@@ -617,9 +613,8 @@ MACHINE_CONFIG_START(psion_state::psion_4lines)
 	MCFG_SCREEN_SIZE(6*20, 9*4)
 	MCFG_SCREEN_VISIBLE_AREA(0, 6*20-1, 0, 9*4-1)
 
-	MCFG_DEVICE_MODIFY("hd44780")
-	MCFG_HD44780_LCD_SIZE(4, 20)
-	MCFG_HD44780_PIXEL_UPDATE_CB(psion_state,lz_pixel_update)
+	m_lcdc->set_lcd_size(4, 20);
+	m_lcdc->set_pixel_update_cb(FUNC(psion_state::lz_pixel_update), this);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(psion1_state::psion1)
@@ -627,20 +622,17 @@ MACHINE_CONFIG_START(psion1_state::psion1)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(psion1_mem)
 
-	MCFG_DEVICE_MODIFY("nmi_timer")
-	MCFG_TIMER_START_DELAY(attotime::from_seconds(1))
+	subdevice<timer_device>("nmi_timer")->set_start_delay(attotime::from_seconds(1));
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(6*16, 1*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 6*16-1, 0, 8*1-1)
 
-	MCFG_DEVICE_MODIFY("hd44780")
-	MCFG_HD44780_LCD_SIZE(1, 16)
-	MCFG_HD44780_PIXEL_UPDATE_CB(psion1_state,psion1_pixel_update)
+	m_lcdc->set_lcd_size(1, 16);
+	m_lcdc->set_pixel_update_cb(FUNC(psion1_state::psion1_pixel_update), this);
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_REMOVE("pack_list")
-	MCFG_SOFTWARE_LIST_ADD("pack_list", "psion1")
+	SOFTWARE_LIST(config.replace(), "pack_list").set_original("psion1");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(psion_state::psioncm)
@@ -670,7 +662,7 @@ MACHINE_CONFIG_START(psion_state::psionp350)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(psionp350_mem)
 
-	MCFG_NVRAM_ADD_0FILL("nvram3") // paged RAM
+	NVRAM(config, "nvram3", nvram_device::DEFAULT_ALL_0); // paged RAM
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(psion_state::psionlz)
@@ -679,7 +671,7 @@ MACHINE_CONFIG_START(psion_state::psionlz)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(psionlz_mem)
 
-	MCFG_NVRAM_ADD_0FILL("nvram3") // paged RAM
+	NVRAM(config, "nvram3", nvram_device::DEFAULT_ALL_0); // paged RAM
 MACHINE_CONFIG_END
 
 /* ROM definition */

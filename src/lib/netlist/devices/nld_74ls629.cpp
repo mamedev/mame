@@ -100,11 +100,14 @@ namespace netlist
 		{
 			m_R_FC.set_R(90000.0);
 			m_R_RNG.set_R(90000.0);
-			m_clock.do_reset();
+			m_clock.reset();
 		}
 		NETLIB_UPDATEI();
 
-		NETLIB_UPDATE_PARAMI() { update_dev(); }
+		NETLIB_UPDATE_PARAMI()
+		{
+			/* update param may be called from anywhere, update_dev(time) is not a good idea */
+		}
 
 	public:
 		NETLIB_SUB(SN74LS629clk) m_clock;
@@ -145,8 +148,8 @@ namespace netlist
 
 		NETLIB_RESETI()
 		{
-			m_1.do_reset();
-			m_2.do_reset();
+			m_1.reset();
+			m_2.reset();
 		}
 
 	private:
@@ -231,8 +234,8 @@ namespace netlist
 		}
 	}
 
-	NETLIB_DEVICE_IMPL(SN74LS629)
-	NETLIB_DEVICE_IMPL(SN74LS629_dip)
+	NETLIB_DEVICE_IMPL(SN74LS629,     "SN74LS629",     "CAP")
+	NETLIB_DEVICE_IMPL(SN74LS629_dip, "SN74LS629_DIP", "1.CAP1,2.CAP2")
 
 	} //namespace devices
 } // namespace netlist

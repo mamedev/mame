@@ -511,12 +511,10 @@ READ8_MEMBER(towns_state::towns_video_5c8_r)
 
 WRITE8_MEMBER(towns_state::towns_video_5c8_w)
 {
-	pic8259_device* dev = m_pic_slave;
-
 	switch(offset)
 	{
 		case 0x02:  // 0x5ca - VSync clear?
-			dev->ir3_w(0);
+			m_pic_slave->ir3_w(0);
 			if(IRQ_LOG) logerror("PIC: IRQ11 (VSync) set low\n");
 			//towns_vblank_flag = 0;
 			break;
@@ -1488,19 +1486,17 @@ TIMER_CALLBACK_MEMBER(towns_state::towns_sprite_done)
 TIMER_CALLBACK_MEMBER(towns_state::towns_vblank_end)
 {
 	// here we'll clear the vsync signal, I presume it goes low on it's own eventually
-	device_t* dev = (device_t*)ptr;
-	downcast<pic8259_device *>(dev)->ir3_w(0);  // IRQ11 = VSync
+	m_pic_slave->ir3_w(0);  // IRQ11 = VSync
 	if(IRQ_LOG) logerror("PIC: IRQ11 (VSync) set low\n");
 	m_video.towns_vblank_flag = 0;
 }
 
 INTERRUPT_GEN_MEMBER(towns_state::towns_vsync_irq)
 {
-	pic8259_device* dev = m_pic_slave;
-	dev->ir3_w(1);  // IRQ11 = VSync
+	m_pic_slave->ir3_w(1);  // IRQ11 = VSync
 	if(IRQ_LOG) logerror("PIC: IRQ11 (VSync) set high\n");
 	m_video.towns_vblank_flag = 1;
-	machine().scheduler().timer_set(m_screen->time_until_vblank_end(), timer_expired_delegate(FUNC(towns_state::towns_vblank_end),this), 0, (void*)dev);
+	machine().scheduler().timer_set(m_screen->time_until_vblank_end(), timer_expired_delegate(FUNC(towns_state::towns_vblank_end),this), 0, (void*)m_pic_slave);
 	if(m_video.towns_tvram_enable)
 		draw_text_layer();
 	if(m_video.towns_sprite_reg[1] & 0x80)

@@ -45,10 +45,11 @@
 class vt220_state : public driver_device
 {
 public:
-	vt220_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+	vt220_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_ram(*this, RAM_TAG) { }
+		m_ram(*this, RAM_TAG)
+	{ }
 
 	void vt220(machine_config &config);
 	void vt220a(machine_config &config);
@@ -57,7 +58,7 @@ private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_vt220(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
+	required_device<i8051_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	void vt220_io(address_map &map);
 	void vt220_mem(address_map &map);
@@ -107,31 +108,31 @@ uint32_t vt220_state::screen_update_vt220(screen_device &screen, bitmap_ind16 &b
 }
 
 
-MACHINE_CONFIG_START(vt220_state::vt220)
+void vt220_state::vt220(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8051, XTAL(11'059'200)) // from schematic for earlier version
-	MCFG_DEVICE_PROGRAM_MAP(vt220_mem)
-	MCFG_DEVICE_IO_MAP(vt220_io)
-	MCFG_MCS51_PORT_P1_IN_CB(CONSTANT(0)) // ???
+	I8051(config, m_maincpu, XTAL(11'059'200)); // from schematic for earlier version
+	m_maincpu->set_addrmap(AS_PROGRAM, &vt220_state::vt220_mem);
+	m_maincpu->set_addrmap(AS_IO, &vt220_state::vt220_io);
+	m_maincpu->port_in_cb<1>().set_constant(0); // ???
 
-	MCFG_DEVICE_ADD("duart", SCN2681, XTAL(3'686'400))
-	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", MCS51_INT1_LINE))
+	scn2681_device &duart(SCN2681(config, "duart", XTAL(3'686'400)));
+	duart.irq_cb().set_inputline("maincpu", MCS51_INT1_LINE);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DRIVER(vt220_state, screen_update_vt220)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 640-1, 0, 480-1);
+	screen.set_screen_update(FUNC(vt220_state::screen_update_vt220));
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16K")
-MACHINE_CONFIG_END
+	RAM(config, RAM_TAG).set_default_size("16K");
+}
 
 MACHINE_CONFIG_START(vt220_state::vt220a)
 	vt220(config);

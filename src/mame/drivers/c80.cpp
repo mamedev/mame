@@ -254,37 +254,37 @@ void c80_state::machine_start()
 
 /* Machine Driver */
 
-MACHINE_CONFIG_START(c80_state::c80)
+void c80_state::c80(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, 2500000) /* U880D */
-	MCFG_DEVICE_PROGRAM_MAP(c80_mem)
-	MCFG_DEVICE_IO_MAP(c80_io)
-	MCFG_Z80_DAISY_CHAIN(c80_daisy_chain)
+	Z80(config, m_maincpu, 2500000); /* U880D */
+	m_maincpu->set_addrmap(AS_PROGRAM, &c80_state::c80_mem);
+	m_maincpu->set_addrmap(AS_IO, &c80_state::c80_io);
+	m_maincpu->set_daisy_config(c80_daisy_chain);
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT( layout_c80 )
+	config.set_default_layout(layout_c80);
 
 	/* devices */
-	MCFG_DEVICE_ADD(Z80PIO1_TAG, Z80PIO, 2500000)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, c80_state, pio1_pa_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, c80_state, pio1_pa_w))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, c80_state, pio1_pb_w))
-	MCFG_Z80PIO_OUT_BRDY_CB(WRITELINE(*this, c80_state, pio1_brdy_w))
+	Z80PIO(config, m_pio1, 2500000);
+	m_pio1->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pio1->in_pa_callback().set(FUNC(c80_state::pio1_pa_r));
+	m_pio1->out_pa_callback().set(FUNC(c80_state::pio1_pa_w));
+	m_pio1->out_pb_callback().set(FUNC(c80_state::pio1_pb_w));
+	m_pio1->out_brdy_callback().set(FUNC(c80_state::pio1_brdy_w));
 
-	MCFG_DEVICE_ADD(Z80PIO2_TAG, Z80PIO, 2500000)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	z80pio_device& pio2(Z80PIO(config, Z80PIO2_TAG, XTAL(2500000)));
+	pio2.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED )
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1K")
-MACHINE_CONFIG_END
+	RAM(config, RAM_TAG).set_default_size("1K");
+}
 
 /* ROMs */
 

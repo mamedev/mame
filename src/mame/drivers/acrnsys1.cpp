@@ -264,27 +264,31 @@ INPUT_PORTS_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-MACHINE_CONFIG_START(acrnsys1_state::acrnsys1)
+void acrnsys1_state::acrnsys1(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, 1.008_MHz_XTAL)  /* 1.008 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(acrnsys1_map)
+	M6502(config, m_maincpu, 1.008_MHz_XTAL);  /* 1.008 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &acrnsys1_state::acrnsys1_map);
 
-	MCFG_DEFAULT_LAYOUT(layout_acrnsys1)
+	config.set_default_layout(layout_acrnsys1);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
-	MCFG_DEVICE_ADD("b1", INS8154, 0)
-	MCFG_INS8154_IN_A_CB(READ8(*this, acrnsys1_state, ins8154_b1_port_a_r))
-	MCFG_INS8154_OUT_A_CB(WRITE8(*this, acrnsys1_state, ins8154_b1_port_a_w))
-	MCFG_INS8154_OUT_B_CB(WRITE8(*this, acrnsys1_state, acrnsys1_led_segment_w))
-	MCFG_DEVICE_ADD("ic8_7445", TTL74145, 0)
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("acrnsys1_c", acrnsys1_state, acrnsys1_c, attotime::from_hz(4800))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("acrnsys1_p", acrnsys1_state, acrnsys1_p, attotime::from_hz(40000))
-MACHINE_CONFIG_END
+	ins8154_device &b1(INS8154(config, "b1"));
+	b1.in_a().set(FUNC(acrnsys1_state::ins8154_b1_port_a_r));
+	b1.out_a().set(FUNC(acrnsys1_state::ins8154_b1_port_a_w));
+	b1.out_b().set(FUNC(acrnsys1_state::acrnsys1_led_segment_w));
+
+	TTL74145(config, m_ttl74145, 0);
+
+	CASSETTE(config, m_cass);
+
+	TIMER(config, "acrnsys1_c").configure_periodic(FUNC(acrnsys1_state::acrnsys1_c), attotime::from_hz(4800));
+	TIMER(config, "acrnsys1_p").configure_periodic(FUNC(acrnsys1_state::acrnsys1_p), attotime::from_hz(40000));
+}
 
 
 /***************************************************************************

@@ -937,11 +937,11 @@ void lucky74_state::lucky74_map(address_map &map)
 	map(0xf000, 0xf003).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));           // Input Ports 0 & 1
 	map(0xf080, 0xf083).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));           // DSW 1, 2 & 3
 	map(0xf0c0, 0xf0c3).rw("ppi8255_3", FUNC(i8255_device::read), FUNC(i8255_device::write));           // DSW 4
-	map(0xf100, 0xf100).w("sn1", FUNC(sn76489_device::command_w));                                      // SN76489 #1
+	map(0xf100, 0xf100).w("sn1", FUNC(sn76489_device::write));                                      // SN76489 #1
 	map(0xf200, 0xf203).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));           // Input Ports 2 & 4
-	map(0xf300, 0xf300).w("sn2", FUNC(sn76489_device::command_w));                                      // SN76489 #2
+	map(0xf300, 0xf300).w("sn2", FUNC(sn76489_device::write));                                      // SN76489 #2
 	map(0xf400, 0xf400).w("aysnd", FUNC(ay8910_device::address_w));                                     // YM2149 control
-	map(0xf500, 0xf500).w("sn3", FUNC(sn76489_device::command_w));                                      // SN76489 #3
+	map(0xf500, 0xf500).w("sn3", FUNC(sn76489_device::write));                                      // SN76489 #3
 	map(0xf600, 0xf600).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));          // YM2149 (Input Port 1)
 	map(0xf700, 0xf701).rw(FUNC(lucky74_state::usart_8251_r), FUNC(lucky74_state::usart_8251_w));       // USART 8251 port
 	map(0xf800, 0xf803).rw(FUNC(lucky74_state::copro_sm7831_r), FUNC(lucky74_state::copro_sm7831_w));   // SM7831 Co-Processor
@@ -1463,75 +1463,67 @@ WRITE_LINE_MEMBER(lucky74_state::lucky74_adpcm_int)
 *    Machine Drivers     *
 *************************/
 
-MACHINE_CONFIG_START(lucky74_state::lucky74)
-
+void lucky74_state::lucky74(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, C_06B49P_CLKOUT_03)    /* 3 MHz. */
-	MCFG_DEVICE_PROGRAM_MAP(lucky74_map)
-	MCFG_DEVICE_IO_MAP(lucky74_portmap)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lucky74_state,  nmi_interrupt) /* 60 Hz. measured */
+	Z80(config, m_maincpu, C_06B49P_CLKOUT_03);     /* 3 MHz. */
+	m_maincpu->set_addrmap(AS_PROGRAM, &lucky74_state::lucky74_map);
+	m_maincpu->set_addrmap(AS_IO, &lucky74_state::lucky74_portmap);
+	m_maincpu->set_vblank_int("screen", FUNC(lucky74_state::nmi_interrupt));    /* 60 Hz. measured */
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// Each 82C255 behaves like 2x 8255 (in mode 0). Since MAME doesn't support it yet, I replaced
 	// both 82C255 with 4x 8255...
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
+	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
+	ppi0.in_pa_callback().set_ioport("IN0");
+	ppi0.in_pb_callback().set_ioport("IN1");
 	// Port C write: 0x00 after reset, 0xff during game, and 0xfd when tap F2 for percentage and run count
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN2"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN4"))
+	i8255_device &ppi1(I8255A(config, "ppi8255_1"));
+	ppi1.in_pa_callback().set_ioport("IN2");
+	ppi1.in_pc_callback().set_ioport("IN4");
 
-	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW1"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW2"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW3"))
+	i8255_device &ppi2(I8255A(config, "ppi8255_2"));
+	ppi2.in_pa_callback().set_ioport("DSW1");
+	ppi2.in_pb_callback().set_ioport("DSW2");
+	ppi2.in_pc_callback().set_ioport("DSW3");
 
-	MCFG_DEVICE_ADD("ppi8255_3", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW4"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, lucky74_state, lamps_a_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, lucky74_state, lamps_b_w))
+	i8255_device &ppi3(I8255A(config, "ppi8255_3"));
+	ppi3.in_pa_callback().set_ioport("DSW4");
+	ppi3.out_pb_callback().set(FUNC(lucky74_state::lamps_a_w));
+	ppi3.out_pc_callback().set(FUNC(lucky74_state::lamps_b_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 1*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(lucky74_state, screen_update_lucky74)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 64*8-1, 1*8, 30*8-1);
+	screen.set_screen_update(FUNC(lucky74_state::screen_update_lucky74));
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lucky74)
-
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_INIT_OWNER(lucky74_state, lucky74)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_lucky74);
+	PALETTE(config, "palette", FUNC(lucky74_state::lucky74_palette), 512);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("sn1", SN76489, C_06B49P_CLKOUT_03)  /* 3 MHz. */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	SN76489(config, "sn1", C_06B49P_CLKOUT_03).add_route(ALL_OUTPUTS, "mono", 0.80);    /* 3 MHz. */
+	SN76489(config, "sn2", C_06B49P_CLKOUT_03).add_route(ALL_OUTPUTS, "mono", 0.80);    /* 3 MHz. */
+	SN76489(config, "sn3", C_06B49P_CLKOUT_03).add_route(ALL_OUTPUTS, "mono", 0.80);    /* 3 MHz. */
 
-	MCFG_DEVICE_ADD("sn2", SN76489, C_06B49P_CLKOUT_03)  /* 3 MHz. */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-
-	MCFG_DEVICE_ADD("sn3", SN76489, C_06B49P_CLKOUT_03)  /* 3 MHz. */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-
-	MCFG_DEVICE_ADD("aysnd", AY8910, C_06B49P_CLKOUT_04) /* 1.5 MHz. */
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN3"))
+	ay8910_device &aysnd(AY8910(config, "aysnd", C_06B49P_CLKOUT_04)); /* 1.5 MHz. */
+	aysnd.port_a_read_callback().set_ioport("IN3");
 	/* port b read is a sort of status byte */
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, lucky74_state, ym2149_portb_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.00)         /* not routed to audio hardware */
+	aysnd.port_b_write_callback().set(FUNC(lucky74_state::ym2149_portb_w));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.00);         /* not routed to audio hardware */
 
-	MCFG_DEVICE_ADD("msm", MSM5205, C_06B49P_CLKOUT_06)  /* 375 kHz. */
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, lucky74_state, lucky74_adpcm_int))  /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8KHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
-
-MACHINE_CONFIG_END
+	MSM5205(config, m_msm, C_06B49P_CLKOUT_06); /* 375 kHz. */
+	m_msm->vck_legacy_callback().set(FUNC(lucky74_state::lucky74_adpcm_int));   /* interrupt function */
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  /* 8KHz */
+	m_msm->add_route(ALL_OUTPUTS, "mono", 0.70);
+}
 
 
 /*************************

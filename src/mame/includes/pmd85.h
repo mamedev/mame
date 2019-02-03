@@ -5,9 +5,10 @@
  * includes/pmd85.h
  *
  ****************************************************************************/
-
 #ifndef MAME_INCLUDES_PMD85_H
 #define MAME_INCLUDES_PMD85_H
+
+#pragma once
 
 #include "machine/i8251.h"
 #include "machine/pit8253.h"
@@ -53,7 +54,7 @@ public:
 		m_leds(*this, "led%u", 0U)
 	{ }
 
-	void pmd85(machine_config &config);
+	void pmd85(machine_config &config, bool with_uart = true);
 	void pmd851(machine_config &config);
 	void pmd853(machine_config &config);
 	void pmd852a(machine_config &config);

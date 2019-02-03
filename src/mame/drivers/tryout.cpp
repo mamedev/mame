@@ -207,16 +207,15 @@ MACHINE_CONFIG_START(tryout_state::tryout)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tryout_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tryout)
-	MCFG_PALETTE_ADD("palette", 0x20)
-	MCFG_PALETTE_INIT_OWNER(tryout_state, tryout)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_tryout)
+	PALETTE(config, m_palette, FUNC(tryout_state::tryout_palette), 0x20);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

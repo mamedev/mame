@@ -221,20 +221,20 @@ MACHINE_CONFIG_START(myvision_state::myvision)
 	MCFG_DEVICE_IO_MAP(myvision_io)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD( "tms9918", TMS9918A, XTAL(10'738'635) / 2 )  /* Exact model not verified */
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)  /* Not verified */
-	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
-	MCFG_SCREEN_UPDATE_DEVICE( "tms9918", tms9918a_device, screen_update )
+	tms9918a_device &vdp(TMS9918A(config, "tms9918", XTAL(10'738'635)));  /* Exact model not verified */
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000);  /* Not verified */
+	vdp.int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ay8910", AY8910, XTAL(10'738'635)/3/2)  /* Exact model and clock not verified */
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, myvision_state, ay_port_a_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, myvision_state, ay_port_b_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, myvision_state, ay_port_a_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, myvision_state, ay_port_b_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	ay8910_device &ay8910(AY8910(config, "ay8910", XTAL(10'738'635)/3/2));  /* Exact model and clock not verified */
+	ay8910.port_a_read_callback().set(FUNC(myvision_state::ay_port_a_r));
+	ay8910.port_b_read_callback().set(FUNC(myvision_state::ay_port_b_r));
+	ay8910.port_a_write_callback().set(FUNC(myvision_state::ay_port_a_w));
+	ay8910.port_b_write_callback().set(FUNC(myvision_state::ay_port_b_w));
+	ay8910.add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "myvision_cart")
@@ -242,7 +242,7 @@ MACHINE_CONFIG_START(myvision_state::myvision)
 	//MCFG_GENERIC_MANDATORY
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","myvision")
+	SOFTWARE_LIST(config, "cart_list").set_original("myvision");
 MACHINE_CONFIG_END
 
 /* ROM definition */

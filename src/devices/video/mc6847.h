@@ -19,41 +19,6 @@
 //  MC6847 CONFIGURATION / INTERFACE
 //**************************************************************************
 
-#define MCFG_SCREEN_MC6847_NTSC_ADD(_tag, _mctag) \
-	MCFG_SCREEN_ADD(_tag, RASTER)                               \
-	MCFG_SCREEN_UPDATE_DEVICE(_mctag, mc6847_base_device, screen_update) \
-	MCFG_SCREEN_REFRESH_RATE(60)                                \
-	MCFG_SCREEN_SIZE(320, 243)                                  \
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 1, 241-1)                \
-	MCFG_SCREEN_VBLANK_TIME(0)
-
-#define MCFG_SCREEN_MC6847_PAL_ADD(_tag, _mctag) \
-	MCFG_SCREEN_ADD(_tag, RASTER)                               \
-	MCFG_SCREEN_UPDATE_DEVICE(_mctag, mc6847_base_device, screen_update) \
-	MCFG_SCREEN_REFRESH_RATE(50)                                \
-	MCFG_SCREEN_SIZE(320, 243)                                  \
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 1, 241-1)                \
-	MCFG_SCREEN_VBLANK_TIME(0)
-
-#define MCFG_MC6847_HSYNC_CALLBACK(_write) \
-	devcb = &downcast<mc6847_friend_device &>(*device).set_hsync_wr_callback(DEVCB_##_write);
-
-#define MCFG_MC6847_FSYNC_CALLBACK(_write) \
-	devcb = &downcast<mc6847_friend_device &>(*device).set_fsync_wr_callback(DEVCB_##_write);
-
-#define MCFG_MC6847_CHARROM_CALLBACK(_class, _method) \
-	downcast<mc6847_friend_device &>(*device).set_get_char_rom(mc6847_friend_device::get_char_rom_delegate(&_class::_method, #_class "::" #_method, this));
-
-#define MCFG_MC6847_INPUT_CALLBACK(_read) \
-	devcb = &downcast<mc6847_base_device &>(*device).set_input_callback(DEVCB_##_read);
-
-#define MCFG_MC6847_FIXED_MODE(_mode) \
-	downcast<mc6847_base_device &>(*device).set_get_fixed_mode(_mode);
-
-#define MCFG_MC6847_BW(_bw) \
-	downcast<mc6847_base_device &>(*device).set_black_and_white(_bw);
-
-
 #define MC6847_GET_CHARROM_MEMBER(_name)   uint8_t _name(uint8_t ch, int line)
 
 
@@ -67,7 +32,7 @@ INPUT_PORTS_EXTERN(mc6847_artifacting);
 //**************************************************************************
 
 // base class so that the GIME emulation can access mc6847 stuff
-class mc6847_friend_device : public device_t
+class mc6847_friend_device : public device_t, public device_video_interface
 {
 public:
 	// video mode constants
@@ -86,10 +51,19 @@ public:
 	bool hs_r() const { return m_horizontal_sync; }
 	bool fs_r() const { return m_field_sync; }
 
-	template <class Object> devcb_base &set_hsync_wr_callback(Object &&cb) { return m_write_hsync.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_fsync_wr_callback(Object &&cb) { return m_write_fsync.set_callback(std::forward<Object>(cb)); }
+	auto hsync_wr_callback() { return m_write_hsync.bind(); }
+	auto fsync_wr_callback() { return m_write_fsync.bind(); }
 
 	template <typename Object> void set_get_char_rom(Object &&cb) { m_charrom_cb = std::forward<Object>(cb); }
+	void set_get_char_rom(get_char_rom_delegate cb) { m_charrom_cb = cb; }
+	template <class FunctionClass> void set_get_char_rom(const char *devname, uint8_t (FunctionClass::*cb)(uint8_t, int), const char *name)
+	{
+		set_get_char_rom(get_char_rom_delegate(cb, name, devname, static_cast<FunctionClass *>(nullptr)));
+	}
+	template <class FunctionClass> void set_get_char_rom(uint8_t (FunctionClass::*cb)(uint8_t, int), const char *name)
+	{
+		set_get_char_rom(get_char_rom_delegate(cb, name, nullptr, static_cast<FunctionClass *>(nullptr)));
+	}
 
 protected:
 	mc6847_friend_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock,
@@ -477,16 +451,19 @@ private:
 	emu_timer *m_hsync_off_timer;
 	emu_timer *m_fsync_timer;
 
+protected:
+	const double m_tpfs;
+
+private:
 	// incidentals
-	double m_tpfs;
-	int m_divider;
+	const int m_divider;
 	int m_field_sync_falling_edge_scanline;
 	bool m_wide;
 	bool m_video_changed;
 	uint16_t m_top_border_scanlines;
 	uint16_t m_body_scanlines;
 	bool m_recording_scanline;
-	bool m_supports_partial_body_scanlines;
+	const bool m_supports_partial_body_scanlines;
 
 	// video state
 	uint16_t m_physical_scanline;
@@ -511,7 +488,7 @@ private:
 class mc6847_base_device : public mc6847_friend_device
 {
 public:
-	template <class Object> devcb_base &set_input_callback(Object &&cb) { return m_input_cb.set_callback(std::forward<Object>(cb)); }
+	auto input_callback() { return m_input_cb.bind(); }
 
 	void set_get_fixed_mode(uint8_t mode) { m_fixed_mode = mode; }
 	void set_black_and_white(bool bw) { m_black_and_white = bw; }
@@ -535,6 +512,7 @@ protected:
 	mc6847_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const uint8_t *fontdata, double tpfs);
 
 	// device-level overrides
+	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual ioport_constructor device_input_ports() const override;

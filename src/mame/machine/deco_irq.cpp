@@ -90,10 +90,10 @@ void deco_irq_device::device_reset()
 TIMER_CALLBACK_MEMBER( deco_irq_device::scanline_callback )
 {
 	const rectangle visible = m_screen->visible_area();
-	uint8_t y = m_screen->vpos();
+	uint16_t y = m_screen->vpos();
 
 	// raster irq?
-	if (m_raster_irq_scanline > 0 && m_raster_irq_scanline < 240 && y == (m_raster_irq_scanline - 1))
+	if (m_raster_irq_scanline >= visible.top() && m_raster_irq_scanline <= visible.bottom() && y == m_raster_irq_scanline)
 	{
 		if (!m_raster_irq_masked)
 		{
@@ -108,14 +108,14 @@ TIMER_CALLBACK_MEMBER( deco_irq_device::scanline_callback )
 	}
 
 	// lightgun?
-	if (m_lightgun_latch >= visible.min_y && m_lightgun_latch <= visible.max_y && y == m_lightgun_latch)
+	if (m_lightgun_latch >= visible.top() && m_lightgun_latch <= visible.bottom() && y == m_lightgun_latch)
 	{
 		m_lightgun_irq = true;
 		m_lightgun_irq_cb(ASSERT_LINE);
 	}
 
 	// vblank-in?
-	if (y == (visible.max_y + 1))
+	if (y == (visible.bottom() + 1))
 	{
 		m_vblank_irq = true;
 		m_vblank_irq_cb(ASSERT_LINE);

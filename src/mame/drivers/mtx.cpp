@@ -286,20 +286,20 @@ WRITE_LINE_MEMBER(mtx_state::mtx_tms9929a_interrupt)
 MACHINE_CONFIG_START(mtx_state::mtx512)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(mtx_mem)
-	MCFG_DEVICE_IO_MAP(mtx_io)
-	MCFG_Z80_DAISY_CHAIN(mtx_daisy_chain)
+	Z80(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &mtx_state::mtx_mem);
+	m_maincpu->set_addrmap(AS_IO, &mtx_state::mtx_io);
+	m_maincpu->set_daisy_config(mtx_daisy_chain);
 
 	MCFG_MACHINE_START_OVERRIDE(mtx_state,mtx512)
 	MCFG_MACHINE_RESET_OVERRIDE(mtx_state,mtx512)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD( "tms9929a", TMS9929A, XTAL(10'738'635) / 2 )
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, mtx_state, mtx_tms9929a_interrupt))
-	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
-	MCFG_SCREEN_UPDATE_DEVICE( "tms9929a", tms9929a_device, screen_update )
+	tms9929a_device &vdp(TMS9929A(config, "tms9929a", XTAL(10'738'635)));
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000);
+	vdp.int_callback().set(FUNC(mtx_state::mtx_tms9929a_interrupt));
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -307,32 +307,31 @@ MACHINE_CONFIG_START(mtx_state::mtx512)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL(4'000'000))
-	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, mtx_state, ctc_trg1_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, mtx_state, ctc_trg2_w))
+	Z80CTC(config, m_z80ctc, XTAL(4'000'000));
+	m_z80ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_z80ctc->zc_callback<1>().set(FUNC(mtx_state::ctc_trg1_w));
+	m_z80ctc->zc_callback<2>().set(FUNC(mtx_state::ctc_trg2_w));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("z80ctc_timer", mtx_state, ctc_tick, attotime::from_hz(XTAL(4'000'000)/13))
+	TIMER(config, "z80ctc_timer").configure_periodic(FUNC(mtx_state::ctc_tick), attotime::from_hz(XTAL(4'000'000)/13));
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, mtx_state, write_centronics_busy))
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, mtx_state, write_centronics_fault))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, mtx_state, write_centronics_perror))
-	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(*this, mtx_state, write_centronics_select))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(mtx_state::write_centronics_busy));
+	m_centronics->fault_handler().set(FUNC(mtx_state::write_centronics_fault));
+	m_centronics->perror_handler().set(FUNC(mtx_state::write_centronics_perror));
+	m_centronics->select_handler().set(FUNC(mtx_state::write_centronics_select));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
 
 	MCFG_SNAPSHOT_ADD("snapshot", mtx_state, mtx, "mtx", 1)
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
-	MCFG_CASSETTE_INTERFACE("mtx_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED);
+	m_cassette->set_interface("mtx_cass");
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("cassette_timer", mtx_state, cassette_tick, attotime::from_hz(44100))
+	TIMER(config, "cassette_timer").configure_periodic(FUNC(mtx_state::cassette_tick), attotime::from_hz(44100));
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
-	MCFG_RAM_EXTRA_OPTIONS("96K,128K,192K,320K,448K,512K")
+	RAM(config, m_ram).set_default_size("64K").set_extra_options("96K,128K,192K,320K,448K,512K");
 
 	/* rom extension board */
 	MCFG_GENERIC_SOCKET_ADD("extrom", generic_plain_slot, "mtx_rom")
@@ -345,45 +344,38 @@ MACHINE_CONFIG_START(mtx_state::mtx512)
 	MCFG_GENERIC_LOAD(mtx_state, rompak_load)
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "mtx_cass")
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "mtx_cart")
-	MCFG_SOFTWARE_LIST_ADD("rom_list", "mtx_rom")
+	SOFTWARE_LIST(config, "cass_list").set_original("mtx_cass");
+	SOFTWARE_LIST(config, "cart_list").set_original("mtx_cart");
+	SOFTWARE_LIST(config, "rom_list").set_original("mtx_rom");
 MACHINE_CONFIG_END
 
-/*-------------------------------------------------
-    MACHINE_CONFIG_START( mtx500 )
--------------------------------------------------*/
-
-MACHINE_CONFIG_START(mtx_state::mtx500)
+void mtx_state::mtx500(machine_config &config)
+{
 	mtx512(config);
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32K")
-	MCFG_RAM_EXTRA_OPTIONS("64K,96K,128K,160K,288K,416K")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("32K").set_extra_options("64K,96K,128K,160K,288K,416K");
+}
 
 /*-------------------------------------------------
     MACHINE_CONFIG_START( rs128 )
 -------------------------------------------------*/
 
-MACHINE_CONFIG_START(mtx_state::rs128)
+void mtx_state::rs128(machine_config &config)
+{
 	mtx512(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY(Z80_TAG)
-	MCFG_DEVICE_IO_MAP(rs128_io)
-	MCFG_Z80_DAISY_CHAIN(rs128_daisy_chain)
+	m_maincpu->set_addrmap(AS_IO, &mtx_state::rs128_io);
+	m_maincpu->set_daisy_config(rs128_daisy_chain);
 
 	/* devices */
-	MCFG_DEVICE_ADD(Z80DART_TAG, Z80DART, XTAL(4'000'000))
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	Z80DART(config, m_z80dart, XTAL(4'000'000));
+	m_z80dart->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
-	MCFG_RAM_EXTRA_OPTIONS("192K,320K,448K,512K")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("128K").set_extra_options("192K,320K,448K,512K");
+}
 
 /***************************************************************************
     ROMS

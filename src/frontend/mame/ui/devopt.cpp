@@ -32,6 +32,9 @@ void menu_device_config::populate(float &customtop, float &custombottom)
 	machine_config &mconfig(const_cast<machine_config &>(machine().config()));
 	machine_config::token const tok(mconfig.begin_configuration(mconfig.root_device()));
 	device_t *const dev = mconfig.device_add(m_option->name(), m_option->devtype(), 0);
+	for (device_t &d : device_iterator(*dev))
+		if (!d.configured())
+			d.config_complete();
 
 	std::ostringstream str;
 	util::stream_format(
@@ -96,13 +99,13 @@ void menu_device_config::populate(float &customtop, float &custombottom)
 
 				util::stream_format(
 						str,
-						(machine().system().flags & ORIENTATION_SWAP_XY)
+						(screen.orientation() & ORIENTATION_SWAP_XY)
 							? _("  Screen '%1$s': %2$d \xC3\x97 %3$d (V) %4$f\xC2\xA0Hz\n")
 							: _("  Screen '%1$s': %2$d \xC3\x97 %3$d (H) %4$f\xC2\xA0Hz\n"),
 						screen.tag(),
 						visarea.width(),
 						visarea.height(),
-						ATTOSECONDS_TO_HZ(screen.frame_period().attoseconds()));
+						screen.frame_period().as_hz());
 			}
 		}
 	}

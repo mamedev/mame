@@ -2991,8 +2991,8 @@ int32_t voodoo_device::lfb_direct_w(offs_t offset, uint32_t data, uint32_t mem_m
 	/* byte swizzling */
 	if (LFBMODE_BYTE_SWIZZLE_WRITES(reg[lfbMode].u))
 	{
-		data = flipendian_int32(data);
-		mem_mask = flipendian_int32(mem_mask);
+		data = swapendian_int32(data);
+		mem_mask = swapendian_int32(mem_mask);
 	}
 
 	/* word swapping */
@@ -3019,6 +3019,8 @@ int32_t voodoo_device::lfb_direct_w(offs_t offset, uint32_t data, uint32_t mem_m
 		dest[bufoffs + 0] = data&0xffff;
 	if (ACCESSING_BITS_16_31)
 		dest[bufoffs + 1] = data>>16;
+	// Need to notify that frame buffer has changed
+	fbi.video_changed = true;
 	if (LOG_LFB) logerror("VOODOO.%d.LFB:write direct (%d,%d) = %08X & %08X\n", index, x, y, data, mem_mask);
 	return 0;
 }
@@ -3039,8 +3041,8 @@ int32_t voodoo_device::lfb_w(voodoo_device* vd, offs_t offset, uint32_t data, ui
 	/* byte swizzling */
 	if (LFBMODE_BYTE_SWIZZLE_WRITES(vd->reg[lfbMode].u))
 	{
-		data = flipendian_int32(data);
-		mem_mask = flipendian_int32(mem_mask);
+		data = swapendian_int32(data);
+		mem_mask = swapendian_int32(mem_mask);
 	}
 
 	/* word swapping */
@@ -3524,7 +3526,7 @@ int32_t voodoo_device::texture_w(voodoo_device *vd, offs_t offset, uint32_t data
 
 	/* swizzle the data */
 	if (TEXLOD_TDATA_SWIZZLE(t->reg[tLOD].u))
-		data = flipendian_int32(data);
+		data = swapendian_int32(data);
 	if (TEXLOD_TDATA_SWAP(t->reg[tLOD].u))
 		data = (data >> 16) | (data << 16);
 
@@ -3783,7 +3785,7 @@ WRITE32_MEMBER( voodoo_device::voodoo_w )
 				{
 					/* check for byte swizzling (bit 18) */
 					if (offset & 0x40000/4)
-						data = flipendian_int32(data);
+						data = swapendian_int32(data);
 					cmdfifo_w(this, &fbi.cmdfifo[0], offset & 0xffff, data);
 					g_profiler.stop();
 					return;
@@ -3805,7 +3807,7 @@ WRITE32_MEMBER( voodoo_device::voodoo_w )
 
 			/* if not, we might be byte swizzled (bit 20) */
 			else if (offset & 0x100000/4)
-				data = flipendian_int32(data);
+				data = swapendian_int32(data);
 		}
 
 		/* check the access behavior; note that the table works even if the */
@@ -4213,7 +4215,7 @@ static uint32_t lfb_r(voodoo_device *vd, offs_t offset, bool lfb_3d)
 
 	/* byte swizzling */
 	if (LFBMODE_BYTE_SWIZZLE_READS(vd->reg[lfbMode].u))
-		data = flipendian_int32(data);
+		data = swapendian_int32(data);
 
 	if (LOG_LFB) vd->logerror("VOODOO.%d.LFB:read buf(%d) (%d,%d) = %08X @(%p)\n", vd->index, destbuf, x, y, data, buffer);
 	return data;

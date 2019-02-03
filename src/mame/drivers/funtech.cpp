@@ -37,8 +37,8 @@ and an unpopulated position for a YM2413 or UM3567
 class fun_tech_corp_state : public driver_device
 {
 public:
-	fun_tech_corp_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	fun_tech_corp_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_fgram(*this, "fgram"),
 		m_reel1_ram(*this, "reel1ram"),
 		m_reel2_ram(*this, "reel2ram"),
@@ -50,7 +50,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_hopper(*this, "hopper"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_lamps(*this, "lamp%u", 0U) { }
+		m_lamps(*this, "lamp%u", 0U)
+	{ }
 
 	void funtech(machine_config &config);
 
@@ -503,19 +504,17 @@ MACHINE_CONFIG_START(fun_tech_corp_state::funtech)
 	MCFG_SCREEN_UPDATE_DRIVER(fun_tech_corp_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_funtech)
-	MCFG_PALETTE_ADD("palette", 0x200)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_funtech)
+	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 0x200);
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 1500000) /* M5255, ? MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	AY8910(config, "aysnd", 1500000).add_route(ALL_OUTPUTS, "mono", 1.00); /* M5255, ? MHz */
 MACHINE_CONFIG_END
 
 

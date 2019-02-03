@@ -48,6 +48,7 @@ PAGE SEL bit in PORT0 set to 1:
 #include "machine/clock.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/z80daisy.h"
 #include "machine/keyboard.h"
 #include "machine/timer.h"
@@ -71,7 +72,7 @@ public:
 		, m_floppy1(*this, "fdc:1")
 		, m_p_chargen(*this, "chargen")
 		, m_io_dsw(*this, "DSW")
-		{ }
+	{ }
 
 	void ts803(machine_config &config);
 
@@ -98,7 +99,7 @@ private:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	required_device<palette_device> m_palette;
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<fd1793_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
@@ -422,10 +423,10 @@ static const z80_daisy_config daisy_chain[] =
 };
 
 MACHINE_CONFIG_START(ts803_state::ts803)
-	MCFG_DEVICE_ADD("maincpu", Z80, 16_MHz_XTAL / 4)
-	MCFG_DEVICE_PROGRAM_MAP(ts803_mem)
-	MCFG_DEVICE_IO_MAP(ts803_io)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
+	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ts803_state::ts803_mem);
+	m_maincpu->set_addrmap(AS_IO, &ts803_state::ts803_io);
+	m_maincpu->set_daisy_config(daisy_chain);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
@@ -433,41 +434,40 @@ MACHINE_CONFIG_START(ts803_state::ts803)
 	MCFG_SCREEN_SIZE(640,240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", sy6545_1_device, screen_update)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* crtc */
-	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", 13608000 / 8)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(ts803_state, crtc_update_row)
-	MCFG_MC6845_ADDR_CHANGED_CB(ts803_state, crtc_update_addr)
+	sy6545_1_device &crtc(SY6545_1(config, "crtc", 13608000 / 8));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.set_update_row_callback(FUNC(ts803_state::crtc_update_row), this);
+	crtc.set_on_update_addr_change_callback(FUNC(ts803_state::crtc_update_addr), this);
 
-	MCFG_DEVICE_ADD("sti_clock", CLOCK, 16_MHz_XTAL / 13)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("sti", z80sti_device, tc_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sti", z80sti_device, rc_w))
+	clock_device &sti_clock(CLOCK(config, "sti_clock", 16_MHz_XTAL / 13));
+	sti_clock.signal_handler().set("sti", FUNC(z80sti_device::tc_w));
+	sti_clock.signal_handler().append("sti", FUNC(z80sti_device::rc_w));
 
-	MCFG_DEVICE_ADD("dart_clock", CLOCK, (16_MHz_XTAL / 13) / 8)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("dart", z80dart_device, txca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("dart", z80dart_device, rxca_w))
+	clock_device &dart_clock(CLOCK(config, "dart_clock", 16_MHz_XTAL / 13 / 8));
+	dart_clock.signal_handler().set("dart", FUNC(z80dart_device::txca_w));
+	dart_clock.signal_handler().append("dart", FUNC(z80dart_device::rxca_w));
 
-	MCFG_DEVICE_ADD("sti", Z80STI, 16_MHz_XTAL / 4)
-	MCFG_Z80STI_OUT_TBO_CB(WRITELINE("dart", z80dart_device, rxtxcb_w))
-	MCFG_Z80STI_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	z80sti_device& sti(Z80STI(config, "sti", 16_MHz_XTAL / 4));
+	sti.out_tbo_cb().set("dart", FUNC(z80dart_device::rxtxcb_w));
+	sti.out_int_cb().set_inputline("maincpu", INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("dart", Z80DART, 16_MHz_XTAL / 4)
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE("rs232", rs232_port_device, write_txd))
+	z80dart_device& dart(Z80DART(config, "dart", 16_MHz_XTAL / 4));
+	dart.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	dart.out_txda_callback().set("rs232", FUNC(rs232_port_device::write_txd));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "keyboard")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("dart", z80dart_device, rxa_w))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "keyboard"));
+	rs232.rxd_handler().set("dart", FUNC(z80dart_device::rxa_w));
 
 	/* floppy disk */
-	MCFG_DEVICE_ADD("fdc", FD1793, 1_MHz_XTAL)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE("sti", z80sti_device, i7_w))
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ts803_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ts803_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FD1793(config, m_fdc, 1_MHz_XTAL);
+	m_fdc->intrq_wr_callback().set("sti", FUNC(z80sti_device::i7_w));
+	FLOPPY_CONNECTOR(config, "fdc:0", ts803_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", ts803_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
 MACHINE_CONFIG_END
 
 /* ROM definition */

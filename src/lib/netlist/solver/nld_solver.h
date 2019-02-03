@@ -41,7 +41,7 @@ NETLIB_OBJECT(solver)
 	, m_gs_sor(*this, "SOR_FACTOR", 1.059)
 	, m_method(*this, "METHOD", "MAT_CR")
 	, m_accuracy(*this, "ACCURACY", 1e-7)
-	, m_gs_loops(*this, "GS_LOOPS",9)              // Gauss-Seidel loops
+	, m_gs_loops(*this, "GS_LOOPS", 9)              // Gauss-Seidel loops
 
 	/* general parameters */
 	, m_gmin(*this, "GMIN", NETLIST_GMIN_DEFAULT)
@@ -55,7 +55,7 @@ NETLIB_OBJECT(solver)
 	, m_dynamic_lte(*this, "DYNAMIC_LTE", 1e-5)                     // diff/timestep
 	, m_dynamic_min_ts(*this, "DYNAMIC_MIN_TIMESTEP", 1e-6)   // nl_double timestep resolution
 
-	, m_log_stats(*this, "LOG_STATS", 0)   // log statistics on shutdown
+	, m_log_stats(*this, "LOG_STATS", 1)   // log statistics on shutdown
 	, m_params()
 	{
 		// internal staff
@@ -68,7 +68,7 @@ NETLIB_OBJECT(solver)
 	void post_start();
 	void stop();
 
-	inline nl_double gmin() { return m_gmin(); }
+	nl_double gmin() const { return m_gmin(); }
 
 	void create_solver_code(std::map<pstring, pstring> &mp);
 
@@ -96,13 +96,14 @@ protected:
 
 	param_logic_t  m_log_stats;
 
-	std::vector<std::unique_ptr<matrix_solver_t>> m_mat_solvers;
 private:
+	std::vector<matrix_solver_t *> m_mat_solvers;
+	std::vector<matrix_solver_t *> m_mat_solvers_timestepping;
 
 	solver_parameters_t m_params;
 
-	template <std::size_t m_N, std::size_t storage_N>
-	std::unique_ptr<matrix_solver_t> create_solver(std::size_t size, const pstring &solvername);
+	template <typename FT, int SIZE>
+	matrix_solver_t * create_solver(std::size_t size, const pstring &solvername);
 };
 
 	} //namespace devices

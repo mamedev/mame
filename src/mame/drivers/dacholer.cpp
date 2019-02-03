@@ -78,7 +78,7 @@ private:
 	DECLARE_WRITE8_MEMBER(music_irq_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	DECLARE_PALETTE_INIT(dacholer);
+	void dacholer_palette(palette_device &palette) const;
 	uint32_t screen_update_dacholer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(sound_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
@@ -627,111 +627,99 @@ void dacholer_state::machine_reset()
 	m_snd_ack = 0;
 }
 
-/* guess: use the same resistor values as Crazy Climber (needs checking on the real HW) */
-PALETTE_INIT_MEMBER(dacholer_state, dacholer)
+// guess: use the same resistor values as Crazy Climber (needs checking on the real hardware)
+void dacholer_state::dacholer_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	static const int resistances_rg[3] = { 1000, 470, 220 };
-	static const int resistances_b [2] = { 470, 220 };
-	double weights_rg[3], weights_b[2];
-	int i;
+	static constexpr int resistances_rg[3] = { 1000, 470, 220 };
+	static constexpr int resistances_b [2] = { 470, 220 };
 
-	/* compute the color output resistor weights */
+	// compute the color output resistor weights
+	double weights_rg[3], weights_b[2];
 	compute_resistor_weights(0, 255, -1.0,
 			3, resistances_rg, weights_rg, 0, 0,
 			2, resistances_b,  weights_b,  0, 0,
 			0, nullptr, nullptr, 0, 0);
 
-	for (i = 0;i < palette.entries(); i++)
+	for (int i = 0; i < palette.entries(); i++)
 	{
 		int bit0, bit1, bit2;
-		int r, g, b;
 
-		/* red component */
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		bit2 = (color_prom[i] >> 2) & 0x01;
-		r = combine_3_weights(weights_rg, bit0, bit1, bit2);
+		// red component
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
+		int const r = combine_3_weights(weights_rg, bit0, bit1, bit2);
 
-		/* green component */
-		bit0 = (color_prom[i] >> 3) & 0x01;
-		bit1 = (color_prom[i] >> 4) & 0x01;
-		bit2 = (color_prom[i] >> 5) & 0x01;
-		g = combine_3_weights(weights_rg, bit0, bit1, bit2);
+		// green component
+		bit0 = BIT(color_prom[i], 3);
+		bit1 = BIT(color_prom[i], 4);
+		bit2 = BIT(color_prom[i], 5);
+		int const g = combine_3_weights(weights_rg, bit0, bit1, bit2);
 
-		/* blue component */
-		bit0 = (color_prom[i] >> 6) & 0x01;
-		bit1 = (color_prom[i] >> 7) & 0x01;
-		b = combine_2_weights(weights_b, bit0, bit1);
+		// blue component
+		bit0 = BIT(color_prom[i], 6);
+		bit1 = BIT(color_prom[i], 7);
+		int const b = combine_2_weights(weights_b, bit0, bit1);
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
 /* note: clocks are taken from itaten sound reference recording */
-MACHINE_CONFIG_START(dacholer_state::dacholer)
-
+void dacholer_state::dacholer(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(16'000'000)/4)  /* ? */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_IO_MAP(main_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dacholer_state,  irq0_line_assert)
+	Z80(config, m_maincpu, XTAL(16'000'000)/4);  /* ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &dacholer_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &dacholer_state::main_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(dacholer_state::irq0_line_assert));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(19'968'000)/8) /* ? */
-	MCFG_DEVICE_PROGRAM_MAP(snd_map)
-	MCFG_DEVICE_IO_MAP(snd_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dacholer_state, sound_irq)
-
+	Z80(config, m_audiocpu, XTAL(19'968'000)/8); /* ? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &dacholer_state::snd_map);
+	m_audiocpu->set_addrmap(AS_IO, &dacholer_state::snd_io_map);
+	m_audiocpu->set_vblank_int("screen", FUNC(dacholer_state::sound_irq));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-1-16)
-	MCFG_SCREEN_UPDATE_DRIVER(dacholer_state, screen_update_dacholer)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 256-1, 16, 256-1-16);
+	screen.set_screen_update(FUNC(dacholer_state::screen_update_dacholer));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 32)
-	MCFG_PALETTE_INIT_OWNER(dacholer_state, dacholer)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dacholer)
-
+	PALETTE(config, m_palette, FUNC(dacholer_state::dacholer_palette), 32);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dacholer);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(19'968'000)/16)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	AY8910(config, "ay1", XTAL(19'968'000)/16).add_route(ALL_OUTPUTS, "mono", 0.15);
+	AY8910(config, "ay2", XTAL(19'968'000)/16).add_route(ALL_OUTPUTS, "mono", 0.15);
+	AY8910(config, "ay3", XTAL(19'968'000)/16).add_route(ALL_OUTPUTS, "mono", 0.15);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(19'968'000)/16)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	MSM5205(config, m_msm, XTAL(384'000));
+	m_msm->vck_legacy_callback().set(FUNC(dacholer_state::adpcm_int));  /* interrupt function */
+	m_msm->set_prescaler_selector(msm5205_device::S96_4B);  /* 1 / 96 = 3906.25Hz playback  - guess */
+	m_msm->add_route(ALL_OUTPUTS, "mono", 0.30);
+}
 
-	MCFG_DEVICE_ADD("ay3", AY8910, XTAL(19'968'000)/16)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
-
-	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(384'000))
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, dacholer_state, adpcm_int))          /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)  /* 1 / 96 = 3906.25Hz playback  - guess */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(dacholer_state::itaten)
+void dacholer_state::itaten(machine_config &config)
+{
 	dacholer(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(itaten_main_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &dacholer_state::itaten_main_map);
 
-	MCFG_DEVICE_MODIFY("audiocpu")
-	MCFG_DEVICE_PROGRAM_MAP(itaten_snd_map)
-	MCFG_DEVICE_IO_MAP(itaten_snd_io_map)
-	MCFG_DEVICE_VBLANK_INT_REMOVE()
+	m_audiocpu->set_addrmap(AS_PROGRAM, &dacholer_state::itaten_snd_map);
+	m_audiocpu->set_addrmap(AS_IO, &dacholer_state::itaten_snd_io_map);
+	m_audiocpu->set_vblank_int(device_interrupt_delegate(), nullptr);
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_itaten)
+	m_gfxdecode->set_info(gfx_itaten);
 
-	MCFG_DEVICE_REMOVE("msm")
-MACHINE_CONFIG_END
+	config.device_remove("msm");
+}
 
 ROM_START( dacholer )
 	ROM_REGION( 0x10000, "maincpu", 0 )

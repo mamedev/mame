@@ -263,45 +263,43 @@ void gotcha_state::machine_reset()
 MACHINE_CONFIG_START(gotcha_state::gotcha)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000,14318180)    /* 14.31818 MHz */
+	MCFG_DEVICE_ADD("maincpu", M68000, 14.318181_MHz_XTAL)    /* 14.31818 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(gotcha_map)
 
-	MCFG_DEVICE_ADD("audiocpu", Z80,6000000)   /* 6 MHz */
+	MCFG_DEVICE_ADD("audiocpu", Z80, 6_MHz_XTAL)   /* 6 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(55)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(gotcha_state, screen_update_gotcha)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_6))
-	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("audiocpu", INPUT_LINE_NMI)) // ?
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(55);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(40*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(gotcha_state::screen_update_gotcha));
+	screen.set_palette("palette");
+	screen.screen_vblank().set_inputline(m_maincpu, M68K_IRQ_6, HOLD_LINE);
+	screen.screen_vblank().append_inputline(m_audiocpu, INPUT_LINE_NMI); // ?
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gotcha)
-	MCFG_PALETTE_ADD("palette", 768)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_gotcha);
+	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 768);
 
-
-	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
-	MCFG_DECO_SPRITE_GFX_REGION(1)
-	MCFG_DECO_SPRITE_ISBOOTLEG(true)
-	MCFG_DECO_SPRITE_OFFSETS(5, -1) // aligned to 2nd instruction screen in attract
-	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+	DECO_SPRITE(config, m_sprgen, 0);
+	m_sprgen->set_gfx_region(1);
+	m_sprgen->set_is_bootleg(true);
+	m_sprgen->set_offsets(5, -1); // aligned to 2nd instruction screen in attract
+	m_sprgen->set_gfxdecode_tag(m_gfxdecode);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 14318180/4)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.80)
-	MCFG_SOUND_ROUTE(1, "mono", 0.80)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 14.318181_MHz_XTAL / 4));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.add_route(0, "mono", 0.80);
+	ymsnd.add_route(1, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1_MHz_XTAL, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
@@ -385,5 +383,42 @@ ROM_START( ppchamp )
 	ROM_LOAD( "uz11", 0x00000, 0x80000, CRC(3d96274c) SHA1(c7a670af86194c370bf8fb30afbe027ab78a0227) )
 ROM_END
 
-GAMEL( 1997, gotcha,  0,      gotcha, gotcha, gotcha_state, empty_init, ROT0, "Dongsung / Para", "Got-cha Mini Game Festival",                   MACHINE_SUPPORTS_SAVE, layout_gotcha )
-GAMEL( 1997, ppchamp, gotcha, gotcha, gotcha, gotcha_state, empty_init, ROT0, "Dongsung / Para", "Pasha Pasha Champ Mini Game Festival (Korea)", MACHINE_SUPPORTS_SAVE, layout_gotcha )
+ROM_START( ppchampa )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "d8-d15.u8", 0x00000, 0x40000, CRC(e7f8b97a) SHA1(85216fc64d3482a1108bd1bf7792db441be5e999) )
+	ROM_LOAD16_BYTE( "d0-d7.u2",  0x00001, 0x40000, CRC(35ee8ad7) SHA1(ce721899b627935703c5b2fc4fa4d107192d3814) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "uz02", 0x00000, 0x10000, CRC(f4f6e16b) SHA1(a360c571bee7391c66e98e5e111e78ac9732390e) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_LOAD( "u42a",         0x000000, 0x20000, CRC(f0b521d1) SHA1(fe44bfa13818eee08d112c2f75e14bfd67bbefbf) )
+	ROM_CONTINUE(             0x100000, 0x20000 )
+	ROM_CONTINUE(             0x020000, 0x20000 )
+	ROM_CONTINUE(             0x120000, 0x20000 )
+	ROM_LOAD( "u42b",         0x040000, 0x20000, CRC(1107918e) SHA1(bb508da36814f2954d6a9996b777d095f6e9c243) )
+	ROM_CONTINUE(             0x140000, 0x20000 )
+	ROM_CONTINUE(             0x060000, 0x20000 )
+	ROM_CONTINUE(             0x160000, 0x20000 )
+	ROM_LOAD( "u41a",         0x080000, 0x20000, CRC(3f567d33) SHA1(77122c1cdea663922fe570e005bfbb4c779f30da) )
+	ROM_CONTINUE(             0x180000, 0x20000 )
+	ROM_CONTINUE(             0x0a0000, 0x20000 )
+	ROM_CONTINUE(             0x1a0000, 0x20000 )
+	ROM_LOAD( "u41b",         0x0c0000, 0x20000, CRC(18a3497e) SHA1(7938f4e723bf4d29de6c9eda807c37d86b7ac78c) )
+	ROM_CONTINUE(             0x1c0000, 0x20000 )
+	ROM_CONTINUE(             0x0e0000, 0x20000 )
+	ROM_CONTINUE(             0x1e0000, 0x20000 )
+
+	ROM_REGION( 0x200000, "gfx2", 0 )
+	ROM_LOAD( "u56", 0x000000, 0x80000, CRC(160e46b3) SHA1(e2bec3388d41afb9f1025d66c15fcc6ca4d40703) )
+	ROM_LOAD( "u55", 0x080000, 0x80000, CRC(7351b61c) SHA1(2ef3011a7a1ff253f45186e46cfdce5f4ef17322) )
+	ROM_LOAD( "u54", 0x100000, 0x80000, CRC(a3d8c5ef) SHA1(f59874844934f3ce76a49e4a9618510537378387) )
+	ROM_LOAD( "u53", 0x180000, 0x80000, CRC(10ca65c4) SHA1(66ba3c6e1bda18c5668a609adc60bfe547205e53) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "uz11", 0x00000, 0x80000, CRC(3d96274c) SHA1(c7a670af86194c370bf8fb30afbe027ab78a0227) )
+ROM_END
+
+GAMEL( 1997, gotcha,   0,      gotcha, gotcha, gotcha_state, empty_init, ROT0, "Dongsung / Para", "Got-cha Mini Game Festival",                   MACHINE_SUPPORTS_SAVE, layout_gotcha )
+GAMEL( 1997, ppchamp,  gotcha, gotcha, gotcha, gotcha_state, empty_init, ROT0, "Dongsung / Para", "Pasha Pasha Champ Mini Game Festival (Korea, set 1)", MACHINE_SUPPORTS_SAVE, layout_gotcha )
+GAMEL( 1997, ppchampa, gotcha, gotcha, gotcha, gotcha_state, empty_init, ROT0, "Dongsung / Para", "Pasha Pasha Champ Mini Game Festival (Korea, set 2)", MACHINE_SUPPORTS_SAVE, layout_gotcha )

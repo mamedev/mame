@@ -41,7 +41,7 @@
 #include "speaker.h"
 
 
-WRITE8_MEMBER(f1gp_state::f1gp_sh_bankswitch_w)
+WRITE8_MEMBER(f1gp_state::sh_bankswitch_w)
 {
 	m_z80bank->set_entry(data & 0x01);
 }
@@ -58,24 +58,21 @@ void f1gp_state::f1gp_cpu1_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x100000, 0x2fffff).rom().region("user1", 0);
 	map(0xa00000, 0xbfffff).rom().region("user2", 0);
-	map(0xc00000, 0xc3ffff).rw(FUNC(f1gp_state::f1gp_zoomdata_r), FUNC(f1gp_state::f1gp_zoomdata_w));
-	map(0xd00000, 0xd01fff).rw(FUNC(f1gp_state::f1gp_rozvideoram_r), FUNC(f1gp_state::f1gp_rozvideoram_w)).share("rozvideoram");
-	map(0xd02000, 0xd03fff).rw(FUNC(f1gp_state::f1gp_rozvideoram_r), FUNC(f1gp_state::f1gp_rozvideoram_w));                            /* mirror */
-	map(0xd04000, 0xd05fff).rw(FUNC(f1gp_state::f1gp_rozvideoram_r), FUNC(f1gp_state::f1gp_rozvideoram_w));                            /* mirror */
-	map(0xd06000, 0xd07fff).rw(FUNC(f1gp_state::f1gp_rozvideoram_r), FUNC(f1gp_state::f1gp_rozvideoram_w));                            /* mirror */
+	map(0xc00000, 0xc3ffff).ram().w(FUNC(f1gp_state::rozgfxram_w)).share("rozgfxram");
+	map(0xd00000, 0xd01fff).mirror(0x006000).ram().w(FUNC(f1gp_state::rozvideoram_w)).share("rozvideoram");
 	map(0xe00000, 0xe03fff).ram().share("spr1cgram");               // SPR-1 CG RAM
 	map(0xe04000, 0xe07fff).ram().share("spr2cgram");               // SPR-2 CG RAM
 	map(0xf00000, 0xf003ff).ram().share("spr1vram");                                // SPR-1 VRAM
 	map(0xf10000, 0xf103ff).ram().share("spr2vram");                                // SPR-2 VRAM
 	map(0xff8000, 0xffbfff).ram();                                                         // WORK RAM-1
 	map(0xffc000, 0xffcfff).ram().share("sharedram");       // DUAL RAM
-	map(0xffd000, 0xffdfff).ram().w(FUNC(f1gp_state::f1gp_fgvideoram_w)).share("fgvideoram");         // CHARACTER
+	map(0xffd000, 0xffdfff).ram().w(FUNC(f1gp_state::fgvideoram_w)).share("fgvideoram");         // CHARACTER
 	map(0xffe000, 0xffefff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // PALETTE
 	map(0xfff000, 0xfff001).portr("INPUTS");
-	map(0xfff000, 0xfff001).w(FUNC(f1gp_state::f1gp_gfxctrl_w));
+	map(0xfff001, 0xfff001).w(FUNC(f1gp_state::gfxctrl_w));
 	map(0xfff002, 0xfff003).portr("WHEEL");
 	map(0xfff004, 0xfff005).portr("DSW1");
-	map(0xfff002, 0xfff005).w(FUNC(f1gp_state::f1gp_fgscroll_w));
+	map(0xfff002, 0xfff005).w(FUNC(f1gp_state::fgscroll_w));
 	map(0xfff006, 0xfff007).portr("DSW2");
 	map(0xfff009, 0xfff009).r(FUNC(f1gp_state::command_pending_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff);
 	map(0xfff020, 0xfff023).w("gga", FUNC(vsystem_gga_device::write)).umask16(0x00ff);
@@ -83,25 +80,27 @@ void f1gp_state::f1gp_cpu1_map(address_map &map)
 	map(0xfff050, 0xfff051).portr("DSW3");
 }
 
-void f1gp_state::f1gp2_cpu1_map(address_map &map)
+void f1gp2_state::f1gp2_cpu1_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x100000, 0x2fffff).rom().region("user1", 0);
-	map(0xa00000, 0xa07fff).ram().share("sprcgram");                                    // SPR-1 CG RAM + SPR-2 CG RAM
-	map(0xd00000, 0xd01fff).rw(FUNC(f1gp_state::f1gp_rozvideoram_r), FUNC(f1gp_state::f1gp_rozvideoram_w)).share("rozvideoram");   // BACK VRAM
-	map(0xe00000, 0xe00fff).ram().share("spritelist");                          // not checked + SPR-1 VRAM + SPR-2 VRAM
+	map(0xa00000, 0xa07fff).ram().share("spr1cgram");                                    // SPR-1 CG RAM + SPR-2 CG RAM
+	map(0xd00000, 0xd01fff).ram().w(FUNC(f1gp2_state::rozvideoram_w)).share("rozvideoram");   // BACK VRAM
+	map(0xe00000, 0xe00fff).ram().share("spr1vram");                          // not checked + SPR-1 VRAM + SPR-2 VRAM
 	map(0xff8000, 0xffbfff).ram();                                                             // WORK RAM-1
 	map(0xffc000, 0xffcfff).ram().share("sharedram");           // DUAL RAM
-	map(0xffd000, 0xffdfff).ram().w(FUNC(f1gp_state::f1gp_fgvideoram_w)).share("fgvideoram");             // CHARACTER
+	map(0xffd000, 0xffdfff).ram().w(FUNC(f1gp2_state::fgvideoram_w)).share("fgvideoram");             // CHARACTER
 	map(0xffe000, 0xffefff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");            // PALETTE
-	map(0xfff000, 0xfff001).portr("INPUTS").w(FUNC(f1gp_state::f1gp2_gfxctrl_w));
+	map(0xfff000, 0xfff001).portr("INPUTS");
+	map(0xfff000, 0xfff000).w(FUNC(f1gp2_state::rozbank_w));
+	map(0xfff001, 0xfff001).w(FUNC(f1gp2_state::gfxctrl_w));
 	map(0xfff002, 0xfff003).portr("WHEEL");
 	map(0xfff004, 0xfff005).portr("DSW1");
 	map(0xfff006, 0xfff007).portr("DSW2");
-	map(0xfff009, 0xfff009).r(FUNC(f1gp_state::command_pending_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff);
+	map(0xfff009, 0xfff009).r(FUNC(f1gp2_state::command_pending_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff);
 	map(0xfff00a, 0xfff00b).portr("DSW3");
 	map(0xfff020, 0xfff03f).w(m_k053936, FUNC(k053936_device::ctrl_w));
-	map(0xfff044, 0xfff047).w(FUNC(f1gp_state::f1gp_fgscroll_w));
+	map(0xfff044, 0xfff047).w(FUNC(f1gp2_state::fgscroll_w));
 }
 
 void f1gp_state::f1gp_cpu2_map(address_map &map)
@@ -116,14 +115,14 @@ void f1gp_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x77ff).rom();
 	map(0x7800, 0x7fff).ram();
-	map(0x8000, 0xffff).bankr("bank1");
+	map(0x8000, 0xffff).bankr("z80bank");
 }
 
 void f1gp_state::sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(FUNC(f1gp_state::f1gp_sh_bankswitch_w)); // f1gp
-	map(0x0c, 0x0c).w(FUNC(f1gp_state::f1gp_sh_bankswitch_w)); // f1gp2
+	map(0x00, 0x00).w(FUNC(f1gp_state::sh_bankswitch_w)); // f1gp
+	map(0x0c, 0x0c).w(FUNC(f1gp_state::sh_bankswitch_w)); // f1gp2
 	map(0x14, 0x14).rw(m_soundlatch, FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::acknowledge_w));
 	map(0x18, 0x1b).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
 }
@@ -159,18 +158,15 @@ void f1gp_state::f1gpb_cpu1_map(address_map &map)
 	map(0x100000, 0x2fffff).rom().region("user1", 0);
 	map(0xa00000, 0xbfffff).rom().region("user2", 0);
 	map(0x800000, 0x801fff).ram().share("spriteram");
-	map(0xc00000, 0xc3ffff).rw(FUNC(f1gp_state::f1gp_zoomdata_r), FUNC(f1gp_state::f1gp_zoomdata_w));
-	map(0xd00000, 0xd01fff).rw(FUNC(f1gp_state::f1gp_rozvideoram_r), FUNC(f1gp_state::f1gp_rozvideoram_w)).share("rozvideoram");
-	map(0xd02000, 0xd03fff).rw(FUNC(f1gp_state::f1gp_rozvideoram_r), FUNC(f1gp_state::f1gp_rozvideoram_w));   /* mirror */
-	map(0xd04000, 0xd05fff).rw(FUNC(f1gp_state::f1gp_rozvideoram_r), FUNC(f1gp_state::f1gp_rozvideoram_w));   /* mirror */
-	map(0xd06000, 0xd07fff).rw(FUNC(f1gp_state::f1gp_rozvideoram_r), FUNC(f1gp_state::f1gp_rozvideoram_w));   /* mirror */
+	map(0xc00000, 0xc3ffff).ram().w(FUNC(f1gp_state::rozgfxram_w)).share("rozgfxram");
+	map(0xd00000, 0xd01fff).mirror(0x006000).ram().w(FUNC(f1gp_state::rozvideoram_w)).share("rozvideoram");
 	map(0xe00000, 0xe03fff).ram(); //unused
 	map(0xe04000, 0xe07fff).ram(); //unused
 	map(0xf00000, 0xf003ff).ram(); //unused
 	map(0xf10000, 0xf103ff).ram(); //unused
 	map(0xff8000, 0xffbfff).ram();
 	map(0xffc000, 0xffcfff).ram().share("sharedram");
-	map(0xffd000, 0xffdfff).ram().w(FUNC(f1gp_state::f1gp_fgvideoram_w)).share("fgvideoram");
+	map(0xffd000, 0xffdfff).ram().w(FUNC(f1gp_state::fgvideoram_w)).share("fgvideoram");
 	map(0xffe000, 0xffefff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xfff000, 0xfff001).portr("INPUTS");
 	map(0xfff002, 0xfff003).portr("WHEEL");
@@ -325,10 +321,10 @@ static const gfx_layout charlayout =
 	8,8,
 	RGN_FRAC(1,1),
 	8,
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64 },
-	64*8
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
+	{ STEP8(0,8*8) },
+	8*8*8
 };
 
 static const gfx_layout tilelayout =
@@ -336,27 +332,10 @@ static const gfx_layout tilelayout =
 	16,16,
 	RGN_FRAC(1,1),
 	4,
-	{ 0, 1, 2, 3 },
-	{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4,
-			10*4, 11*4, 8*4, 9*4, 14*4, 15*4, 12*4, 13*4 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
-			8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
-	64*16
-};
-
-#define XOR(a) WORD_XOR_BE(a)
-
-static const gfx_layout tilelayout2 =
-{
-	16,16,
-	0x800,
-	4,
-	{ 0, 1, 2, 3 },
-	{ XOR(0)*4, XOR(1)*4, XOR(2)*4, XOR(3)*4, XOR(4)*4, XOR(5)*4, XOR(6)*4, XOR(7)*4,
-			XOR(8)*4, XOR(9)*4, XOR(10)*4, XOR(11)*4, XOR(12)*4, XOR(13)*4, XOR(14)*4, XOR(15)*4 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
-			8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
-	64*16
+	{ STEP4(0,1) },
+	{ STEP16(0,4) },
+	{ STEP16(0,4*16) },
+	16*16*4
 };
 
 static const gfx_layout spritelayout =
@@ -364,19 +343,18 @@ static const gfx_layout spritelayout =
 	16,16,
 	RGN_FRAC(1,1),
 	4,
-	{ 0, 1, 2, 3 },
+	{ STEP4(0,1) },
 	{ 1*4, 0*4, 3*4, 2*4, 5*4, 4*4, 7*4, 6*4,
 			9*4, 8*4, 11*4, 10*4, 13*4, 12*4, 15*4, 14*4 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
-			8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
-	128*8
+	{ STEP16(0,4*16) },
+	16*16*4
 };
 
 static GFXDECODE_START( gfx_f1gp )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0x000,  1 )
-	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0x100, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0x200, 16 )
-	GFXDECODE_ENTRY( "gfx4", 0, tilelayout2,  0x300, 16 )
+	GFXDECODE_ENTRY( "gfx1",    0, charlayout,   0x000,  1 )
+	GFXDECODE_ENTRY( "gfx2",    0, spritelayout, 0x100, 16 )
+	GFXDECODE_ENTRY( "gfx3",    0, spritelayout, 0x200, 16 )
+	GFXDECODE_RAM( "rozgfxram", 0, tilelayout,   0x300, 16 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_f1gp2 )
@@ -386,187 +364,170 @@ static GFXDECODE_START( gfx_f1gp2 )
 GFXDECODE_END
 
 
-MACHINE_START_MEMBER(f1gp_state,f1gpb)
+void f1gp_state::machine_start()
 {
+	if (m_z80bank)
+		m_z80bank->configure_entries(0, 2, memregion("audiocpu")->base() + 0x8000, 0x8000);
+
 	m_acia->write_cts(0);
 	m_acia->write_dcd(0);
-
-	save_item(NAME(m_roz_bank));
-	save_item(NAME(m_flipscreen));
-	save_item(NAME(m_gfxctrl));
-	save_item(NAME(m_scroll));
 }
 
-MACHINE_START_MEMBER(f1gp_state,f1gp)
+void f1gp_state::machine_reset()
 {
-	membank("bank1")->configure_entries(0, 2, memregion("audiocpu")->base() + 0x10000, 0x8000);
-
-	MACHINE_START_CALL_MEMBER(f1gpb);
-}
-
-MACHINE_RESET_MEMBER(f1gp_state,f1gp)
-{
-	m_roz_bank = 0;
 	m_flipscreen = 0;
 	m_gfxctrl = 0;
 	m_scroll[0] = 0;
 	m_scroll[1] = 0;
 }
 
-MACHINE_CONFIG_START(f1gp_state::f1gp)
+void f1gp2_state::machine_reset()
+{
+	f1gp_state::machine_reset();
+	m_roz_bank = 0;
+}
 
+template<int Chip>
+uint32_t f1gp_state::tile_callback( uint32_t code )
+{
+	return m_sprcgram[Chip][code & (m_sprcgram[Chip].mask()>>1)];
+}
+
+void f1gp_state::f1gp(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",M68000,XTAL(20'000'000)/2) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(f1gp_cpu1_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", f1gp_state,  irq1_line_hold)
+	M68000(config, m_maincpu, XTAL(20'000'000)/2); /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &f1gp_state::f1gp_cpu1_map);
+	m_maincpu->set_vblank_int("screen", FUNC(f1gp_state::irq1_line_hold));
 
-	MCFG_DEVICE_ADD("sub", M68000,XTAL(20'000'000)/2)    /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(f1gp_cpu2_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", f1gp_state,  irq1_line_hold)
+	m68000_device &sub(M68000(config, "sub", XTAL(20'000'000)/2));    /* verified on pcb */
+	sub.set_addrmap(AS_PROGRAM, &f1gp_state::f1gp_cpu2_map);
+	sub.set_vblank_int("screen", FUNC(f1gp_state::irq1_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80,XTAL(20'000'000)/4)  /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(sound_io_map)
+	Z80(config, m_audiocpu, XTAL(20'000'000)/4);  /* verified on pcb */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &f1gp_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &f1gp_state::sound_io_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* 100 CPU slices per frame */
+	config.m_minimum_quantum = attotime::from_hz(6000); /* 100 CPU slices per frame */
 
-	MCFG_MACHINE_START_OVERRIDE(f1gp_state,f1gp)
-	MCFG_MACHINE_RESET_OVERRIDE(f1gp_state,f1gp)
+	ACIA6850(config, m_acia, 0);
+	m_acia->irq_handler().set_inputline("sub", M68K_IRQ_3);
+	m_acia->txd_handler().set("acia", FUNC(acia6850_device::write_rxd)); // loopback for now
 
-	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
-	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE("sub", M68K_IRQ_3))
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("acia", acia6850_device, write_rxd)) // loopback for now
-
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, 1000000) // guessed
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("acia", acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia", acia6850_device, write_rxc))
+	clock_device &acia_clock(CLOCK(config, "acia_clock", 1000000)); // guessed
+	acia_clock.signal_handler().set(m_acia, FUNC(acia6850_device::write_txc));
+	acia_clock.signal_handler().append(m_acia, FUNC(acia6850_device::write_rxc));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(f1gp_state, screen_update_f1gp)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(f1gp_state::screen_update_f1gp));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_f1gp)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_f1gp);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
-	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL(14'318'181) / 2) // divider not verified
+	VSYSTEM_GGA(config, "gga", XTAL(14'318'181) / 2); // divider not verified
 
-	MCFG_DEVICE_ADD("vsystem_spr_old", VSYSTEM_SPR2, 0)
-	MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT( f1gp_state, f1gp_old_tile_callback )
-	MCFG_VSYSTEM_SPR2_SET_GFXREGION(1)
-	MCFG_VSYSTEM_SPR2_SET_PRITYPE(2)
-	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
+	VSYSTEM_SPR2(config, m_spr_old[0], 0);
+	m_spr_old[0]->set_tile_indirect_cb(FUNC(f1gp2_state::tile_callback<0>), this);
+	m_spr_old[0]->set_gfx_region(1);
+	m_spr_old[0]->set_pritype(2);
+	m_spr_old[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("vsystem_spr_ol2", VSYSTEM_SPR2, 0)
-	MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT( f1gp_state, f1gp_ol2_tile_callback )
-	MCFG_VSYSTEM_SPR2_SET_GFXREGION(2)
-	MCFG_VSYSTEM_SPR2_SET_PRITYPE(2)
-	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
+	VSYSTEM_SPR2(config, m_spr_old[1], 0);
+	m_spr_old[1]->set_tile_indirect_cb(FUNC(f1gp2_state::tile_callback<1>), this);
+	m_spr_old[1]->set_gfx_region(2);
+	m_spr_old[1]->set_pritype(2);
+	m_spr_old[1]->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_VIDEO_START_OVERRIDE(f1gp_state,f1gp)
-
-	MCFG_DEVICE_ADD("k053936", K053936, 0)
-	MCFG_K053936_WRAP(1)
-	MCFG_K053936_OFFSETS(-58, -2)
+	K053936(config, m_k053936, 0);
+	m_k053936->set_wrap(1);
+	m_k053936->set_offsets(-58, -2);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	m_soundlatch->set_separate_acknowledge(true);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2610, XTAL(8'000'000))
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
-	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
-	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(8'000'000)));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.add_route(0, "lspeaker", 0.25);
+	ymsnd.add_route(0, "rspeaker", 0.25);
+	ymsnd.add_route(1, "lspeaker", 1.0);
+	ymsnd.add_route(2, "rspeaker", 1.0);
+}
 
-
-MACHINE_CONFIG_START(f1gp_state::f1gpb)
-
+void f1gp_state::f1gpb(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",M68000,10000000) /* 10 MHz ??? */
-	MCFG_DEVICE_PROGRAM_MAP(f1gpb_cpu1_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", f1gp_state,  irq1_line_hold)
+	M68000(config, m_maincpu, 10000000); /* 10 MHz ??? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &f1gp_state::f1gpb_cpu1_map);
+	m_maincpu->set_vblank_int("screen", FUNC(f1gp_state::irq1_line_hold));
 
-	MCFG_DEVICE_ADD("sub", M68000,10000000)    /* 10 MHz ??? */
-	MCFG_DEVICE_PROGRAM_MAP(f1gpb_cpu2_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", f1gp_state,  irq1_line_hold)
+	m68000_device &sub(M68000(config, "sub", 10000000));    /* 10 MHz ??? */
+	sub.set_addrmap(AS_PROGRAM, &f1gp_state::f1gpb_cpu2_map);
+	sub.set_vblank_int("screen", FUNC(f1gp_state::irq1_line_hold));
 
 	/* NO sound CPU */
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* 100 CPU slices per frame */
+	config.m_minimum_quantum = attotime::from_hz(6000); /* 100 CPU slices per frame */
 
-	MCFG_MACHINE_START_OVERRIDE(f1gp_state,f1gpb)
-	MCFG_MACHINE_RESET_OVERRIDE(f1gp_state,f1gp)
+	ACIA6850(config, m_acia, 0);
+	m_acia->irq_handler().set_inputline("sub", M68K_IRQ_3);
+	m_acia->txd_handler().set("acia", FUNC(acia6850_device::write_rxd)); // loopback for now
 
-	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
-	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE("sub", M68K_IRQ_3))
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("acia", acia6850_device, write_rxd)) // loopback for now
-
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, 1000000) // guessed
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("acia", acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia", acia6850_device, write_rxc))
+	clock_device &acia_clock(CLOCK(config, "acia_clock", 1000000)); // guessed
+	acia_clock.signal_handler().set(m_acia, FUNC(acia6850_device::write_txc));
+	acia_clock.signal_handler().append(m_acia, FUNC(acia6850_device::write_rxc));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(f1gp_state, screen_update_f1gpb)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(f1gp_state::screen_update_f1gpb));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_f1gp)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_f1gp);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
-	//MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 0)
-
-	MCFG_VIDEO_START_OVERRIDE(f1gp_state,f1gpb)
+	//VSYSTEM_GGA(config, "gga", 0);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", 1000000, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
+	oki.add_route(ALL_OUTPUTS, "mono", 1.00);
+}
 
-
-MACHINE_CONFIG_START(f1gp_state::f1gp2)
-	f1gp(config);
+void f1gp2_state::f1gp2(machine_config &config)
+{
+	f1gp_state::f1gp(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(f1gp2_cpu1_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &f1gp2_state::f1gp2_cpu1_map);
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_f1gp2)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(f1gp_state, screen_update_f1gp2)
+	m_gfxdecode->set_info(gfx_f1gp2);
 
-	MCFG_DEVICE_REMOVE("gga")
-	MCFG_DEVICE_REMOVE("vsystem_spr_old")
-	MCFG_DEVICE_REMOVE("vsystem_spr_ol2")
-	MCFG_DEVICE_ADD("vsystem_spr", VSYSTEM_SPR, 0)
-	MCFG_VSYSTEM_SPR_SET_TILE_INDIRECT( f1gp_state, f1gp2_tile_callback )
-	MCFG_VSYSTEM_SPR_SET_GFXREGION(1)
-	MCFG_VSYSTEM_SPR_GFXDECODE("gfxdecode")
+	subdevice<screen_device>("screen")->set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(f1gp2_state::screen_update));
 
-	MCFG_DEVICE_MODIFY("k053936")
-	MCFG_K053936_OFFSETS(-48, -21)
+	config.device_remove("gga");
+	config.device_remove("vsystem_spr_old1");
+	config.device_remove("vsystem_spr_old2");
+	VSYSTEM_SPR(config, m_spr, 0);
+	m_spr->set_tile_indirect_cb(FUNC(f1gp2_state::tile_callback<0>), this);
+	m_spr->set_gfx_region(1);
+	m_spr->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_VIDEO_START_OVERRIDE(f1gp_state,f1gp2)
-MACHINE_CONFIG_END
+	m_k053936->set_offsets(-48, -21);
+}
 
 
 
@@ -592,9 +553,8 @@ ROM_START( f1gp )
 	ROM_REGION( 0x20000, "sub", 0 ) /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "rom4-a.4",     0x000000, 0x20000, CRC(8e811d36) SHA1(2b806b50a3a307a21894687f16485ace287a7c4c) )
 
-	ROM_REGION( 0x30000, "audiocpu", 0 )    /* 64k for the audio CPU + banks */
-	ROM_LOAD( "rom5-a.8",     0x00000, 0x08000, CRC(9ea36e35) SHA1(9254dea8362318d8cfbd5e36e476e0e235e6326a) )
-	ROM_CONTINUE(             0x10000, 0x18000 )
+	ROM_REGION( 0x20000, "audiocpu", 0 )    /* 64k for the audio CPU + banks */
+	ROM_LOAD( "rom5-a.8",     0x00000, 0x20000, CRC(9ea36e35) SHA1(9254dea8362318d8cfbd5e36e476e0e235e6326a) )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
 	ROM_LOAD( "rom3-b.07",    0x000000, 0x100000, CRC(ffb1d489) SHA1(9330b67e0eaaf67d6c38f40a02c72419bd38fb81) )
@@ -691,9 +651,8 @@ ROM_START( f1gp2 )
 	ROM_REGION( 0x20000, "sub", 0 ) /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "rom13.v3",     0x000000, 0x20000, CRC(c37aa303) SHA1(0fe09b398191888620fb676ed0f1593be575512d) )
 
-	ROM_REGION( 0x30000, "audiocpu", 0 )    /* 64k for the audio CPU + banks */
-	ROM_LOAD( "rom5.v4",      0x00000, 0x08000, CRC(6a9398a1) SHA1(e907fe5f9c135c5b10ec650ec0c6d08cb856230c) )
-	ROM_CONTINUE(             0x10000, 0x18000 )
+	ROM_REGION( 0x20000, "audiocpu", 0 )    /* 64k for the audio CPU + banks */
+	ROM_LOAD( "rom5.v4",      0x00000, 0x20000, CRC(6a9398a1) SHA1(e907fe5f9c135c5b10ec650ec0c6d08cb856230c) )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
 	ROM_LOAD( "rom1",         0x000000, 0x200000, CRC(f2d55ad7) SHA1(2f2d9dc4fab63b06ed7cba0ef1ced286dbfaa7b4) )
@@ -702,10 +661,10 @@ ROM_START( f1gp2 )
 	ROM_LOAD( "rom15",        0x000000, 0x200000, CRC(1ac03e2e) SHA1(9073d0ae24364229a993046bd71e403988692993) )
 
 	ROM_REGION( 0x400000, "gfx3", 0 )
-	ROM_LOAD( "rom11",        0x000000, 0x100000, CRC(b22a2c1f) SHA1(b5e67726be5a8561cd04c3c07895b8518b73b89c) )
-	ROM_LOAD( "rom10",        0x100000, 0x100000, CRC(43fcbe23) SHA1(54ab58d904890a0b907e674f855092e974c45edc) )
-	ROM_LOAD( "rom9",         0x200000, 0x100000, CRC(1bede8a1) SHA1(325ecc3afb30d281c2c8a56719e83e4dc20545bb) )
-	ROM_LOAD( "rom8",         0x300000, 0x100000, CRC(98baf2a1) SHA1(df7bd1a743ad0a6e067641e2b7a352c466875ef6) )
+	ROM_LOAD16_WORD_SWAP( "rom11",        0x000000, 0x100000, CRC(b22a2c1f) SHA1(b5e67726be5a8561cd04c3c07895b8518b73b89c) )
+	ROM_LOAD16_WORD_SWAP( "rom10",        0x100000, 0x100000, CRC(43fcbe23) SHA1(54ab58d904890a0b907e674f855092e974c45edc) )
+	ROM_LOAD16_WORD_SWAP( "rom9",         0x200000, 0x100000, CRC(1bede8a1) SHA1(325ecc3afb30d281c2c8a56719e83e4dc20545bb) )
+	ROM_LOAD16_WORD_SWAP( "rom8",         0x300000, 0x100000, CRC(98baf2a1) SHA1(df7bd1a743ad0a6e067641e2b7a352c466875ef6) )
 
 	ROM_REGION( 0x080000, "ymsnd.deltat", 0 ) /* sound samples */
 	ROM_LOAD( "rom4",         0x000000, 0x080000, CRC(c2d3d7ad) SHA1(3178096741583cfef1ca8f53e6efa0a59e1d5cb6) )
@@ -715,7 +674,7 @@ ROM_START( f1gp2 )
 ROM_END
 
 
-GAME( 1991, f1gp,  0,    f1gp,  f1gp,  f1gp_state, empty_init, ROT90, "Video System Co.",   "F-1 Grand Prix",                    MACHINE_NO_COCKTAIL | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, f1gpb, f1gp, f1gpb, f1gp,  f1gp_state, empty_init, ROT90, "bootleg (Playmark)", "F-1 Grand Prix (Playmark bootleg)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE ) // PCB marked 'Super Formula II', manufactured by Playmark.
+GAME( 1991, f1gp,  0,    f1gp,  f1gp,  f1gp_state,  empty_init, ROT90, "Video System Co.",   "F-1 Grand Prix",                    MACHINE_NO_COCKTAIL | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, f1gpb, f1gp, f1gpb, f1gp,  f1gp_state,  empty_init, ROT90, "bootleg (Playmark)", "F-1 Grand Prix (Playmark bootleg)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE ) // PCB marked 'Super Formula II', manufactured by Playmark.
 
-GAME( 1992, f1gp2, 0,    f1gp2, f1gp2, f1gp_state, empty_init, ROT90, "Video System Co.",   "F-1 Grand Prix Part II",            MACHINE_NO_COCKTAIL | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, f1gp2, 0,    f1gp2, f1gp2, f1gp2_state, empty_init, ROT90, "Video System Co.",   "F-1 Grand Prix Part II",            MACHINE_NO_COCKTAIL | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )

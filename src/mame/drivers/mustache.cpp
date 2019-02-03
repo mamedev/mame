@@ -185,10 +185,9 @@ MACHINE_CONFIG_START(mustache_state::mustache)
 	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(memmap)
 	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mustache_state, scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(mustache_state::scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("sei80bu", SEI80BU, 0)
-	MCFG_DEVICE_ROM("maincpu")
+	SEI80BU(config, "sei80bu", 0).set_device_rom_tag("maincpu");
 
 	MCFG_DEVICE_ADD("t5182", T5182, 0)
 
@@ -199,18 +198,18 @@ MACHINE_CONFIG_START(mustache_state::mustache)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 0, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mustache_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mustache)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, YM_CLOCK)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE("t5182", t5182_device, ym2151_irq_handler))
-	MCFG_SOUND_ROUTE(0, "mono", 1.0)
-	MCFG_SOUND_ROUTE(1, "mono", 1.0)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", YM_CLOCK));
+	ymsnd.irq_handler().set("t5182", FUNC(t5182_device::ym2151_irq_handler));
+	ymsnd.add_route(0, "mono", 1.0);
+	ymsnd.add_route(1, "mono", 1.0);
 MACHINE_CONFIG_END
 
 ROM_START( mustache )

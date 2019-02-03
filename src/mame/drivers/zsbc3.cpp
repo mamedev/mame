@@ -39,7 +39,6 @@
 #include "machine/z80ctc.h"
 #include "machine/z80sio.h"
 #include "machine/z80pio.h"
-#include "machine/clock.h"
 #include "bus/rs232/rs232.h"
 
 
@@ -83,35 +82,34 @@ static INPUT_PORTS_START( zsbc3 )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(zsbc3_state::zsbc3)
+void zsbc3_state::zsbc3(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(16'000'000) / 4)
-	MCFG_DEVICE_PROGRAM_MAP(zsbc3_mem)
-	MCFG_DEVICE_IO_MAP(zsbc3_io)
+	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &zsbc3_state::zsbc3_mem);
+	m_maincpu->set_addrmap(AS_IO, &zsbc3_state::zsbc3_io);
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(16'000'000) / 4)
-	MCFG_Z80CTC_ZC0_CB(WRITELINE("sio", z80sio_device, txca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio", z80sio_device, rxca_w))
+	z80ctc_device &ctc(Z80CTC(config, "ctc", 16_MHz_XTAL / 4));
+	ctc.set_clk<0>(16_MHz_XTAL / 8);
+	ctc.set_clk<1>(16_MHz_XTAL / 8);
+	ctc.set_clk<2>(16_MHz_XTAL / 8);
+	ctc.set_clk<3>(16_MHz_XTAL / 8);
+	ctc.zc_callback<0>().set("sio", FUNC(z80sio_device::txca_w));
+	ctc.zc_callback<0>().append("sio", FUNC(z80sio_device::rxca_w));
 
-	MCFG_DEVICE_ADD("clk2mhz", CLOCK, XTAL(16'000'000) / 8)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("ctc", z80ctc_device, trg0))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("ctc", z80ctc_device, trg1))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("ctc", z80ctc_device, trg2))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("ctc", z80ctc_device, trg3))
+	z80sio_device &sio(Z80SIO(config, "sio", 16_MHz_XTAL / 4));
+	//sio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);  // no evidence of a daisy chain because IM2 is not set
+	sio.out_txda_callback().set("rs232", FUNC(rs232_port_device::write_txd));
+	sio.out_dtra_callback().set("rs232", FUNC(rs232_port_device::write_dtr));
+	sio.out_rtsa_callback().set("rs232", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("sio", Z80SIO, XTAL(16'000'000) / 4)
-	//MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))  // no evidence of a daisy chain because IM2 is not set
-	MCFG_Z80SIO_OUT_TXDA_CB(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_DTRA_CB(WRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_Z80SIO_OUT_RTSA_CB(WRITELINE("rs232", rs232_port_device, write_rts))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set("sio", FUNC(z80sio_device::rxa_w));
+	rs232.cts_handler().set("sio", FUNC(z80sio_device::ctsa_w));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("sio", z80sio_device, rxa_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("sio", z80sio_device, ctsa_w))
-
-	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL(16'000'000) / 4)
-	//MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-MACHINE_CONFIG_END
+	/*z80pio_device &pio(*/Z80PIO(config, "pio", 16_MHz_XTAL / 4)/*)*/;
+	//pio.out_int_callback.set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+}
 
 /* ROM definition */
 ROM_START( zsbc3 )

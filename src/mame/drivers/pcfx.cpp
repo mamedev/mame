@@ -11,11 +11,13 @@
 
 #include "emu.h"
 #include "cpu/v810/v810.h"
+#include "sound/huc6230.h"
 #include "video/huc6261.h"
 #include "video/huc6270.h"
 #include "video/huc6271.h"
 #include "video/huc6272.h"
 #include "screen.h"
+#include "speaker.h"
 
 class pcfx_state : public driver_device
 {
@@ -189,7 +191,7 @@ WRITE16_MEMBER( pcfx_state::pad_w )
 void pcfx_state::pcfx_io(address_map &map)
 {
 	map(0x00000000, 0x000000FF).rw(FUNC(pcfx_state::pad_r), FUNC(pcfx_state::pad_w)); /* PAD */
-	map(0x00000100, 0x000001FF).noprw();   /* HuC6230 */
+	map(0x00000100, 0x000001FF).w("huc6230", FUNC(huc6230_device::write)).umask32(0x00ff00ff);   /* HuC6230 */
 	map(0x00000200, 0x000002FF).m("huc6271", FUNC(huc6271_device::regs)).umask32(0x0000ffff);   /* HuC6271 */
 	map(0x00000300, 0x000003FF).rw(m_huc6261, FUNC(huc6261_device::read), FUNC(huc6261_device::write)).umask32(0x0000ffff);  /* HuC6261 */
 	map(0x00000400, 0x000004FF).rw("huc6270_a", FUNC(huc6270_device::read), FUNC(huc6270_device::write)).umask32(0x0000ffff); /* HuC6270-A */
@@ -424,26 +426,37 @@ MACHINE_CONFIG_START(pcfx_state::pcfx)
 	MCFG_SCREEN_UPDATE_DRIVER(pcfx_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(21'477'272), huc6261_device::WPF, 64, 64 + 1024 + 64, huc6261_device::LPF, 18, 18 + 242)
 
-	MCFG_DEVICE_ADD( "huc6270_a", HUC6270, 0 )
-	MCFG_HUC6270_VRAM_SIZE(0x20000)
-	MCFG_HUC6270_IRQ_CHANGED_CB(WRITELINE(*this, pcfx_state, irq12_w))
+	huc6270_device &huc6270_a(HUC6270(config, "huc6270_a", 0));
+	huc6270_a.set_vram_size(0x20000);
+	huc6270_a.irq().set(FUNC(pcfx_state::irq12_w));
 
-	MCFG_DEVICE_ADD( "huc6270_b", HUC6270, 0 )
-	MCFG_HUC6270_VRAM_SIZE(0x20000)
-	MCFG_HUC6270_IRQ_CHANGED_CB(WRITELINE(*this, pcfx_state, irq14_w))
+	huc6270_device &huc6270_b(HUC6270(config, "huc6270_b", 0));
+	huc6270_b.set_vram_size(0x20000);
+	huc6270_b.irq().set(FUNC(pcfx_state::irq14_w));
 
-	MCFG_DEVICE_ADD("huc6261", HUC6261, XTAL(21'477'272))
-	MCFG_HUC6261_VDC1("huc6270_a")
-	MCFG_HUC6261_VDC2("huc6270_b")
-	MCFG_HUC6261_KING("huc6272")
+	HUC6261(config, m_huc6261, XTAL(21'477'272));
+	m_huc6261->set_vdc1_tag("huc6270_a");
+	m_huc6261->set_vdc2_tag("huc6270_b");
+	m_huc6261->set_king_tag("huc6272");
 
-	MCFG_DEVICE_ADD( "huc6272", HUC6272, XTAL(21'477'272) )
-	MCFG_HUC6272_IRQ_CHANGED_CB(WRITELINE(*this, pcfx_state, irq13_w))
-	MCFG_HUC6272_RAINBOW("huc6271")
+	huc6272_device &huc6272(HUC6272(config, "huc6272", XTAL(21'477'272)));
+	huc6272.irq_changed_callback().set(FUNC(pcfx_state::irq13_w));
+	huc6272.set_rainbow_tag("huc6271");
 
-	MCFG_DEVICE_ADD( "huc6271", HUC6271, XTAL(21'477'272) )
+	HUC6271(config, "huc6271", XTAL(21'477'272));
 
-	MCFG_SOFTWARE_LIST_ADD("cd_list", "pcfx")
+	SOFTWARE_LIST(config, "cd_list").set_original("pcfx");
+
+	/* sound hardware */
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
+	huc6230_device &huc6230(HuC6230(config, "huc6230", XTAL(21'477'272)));
+	huc6230.adpcm_update_cb<0>().set("huc6272", FUNC(huc6272_device::adpcm_update_0));
+	huc6230.adpcm_update_cb<1>().set("huc6272", FUNC(huc6272_device::adpcm_update_1));
+	huc6230.cdda_cb().set("huc6272", FUNC(huc6272_device::cdda_update));
+	huc6230.add_route(0, "lspeaker", 1.0);
+	huc6230.add_route(1, "rspeaker", 1.0);
 MACHINE_CONFIG_END
 
 

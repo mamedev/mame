@@ -5,6 +5,10 @@
     Last Duel
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_LASTDUEL_H
+#define MAME_INCLUDES_LASTDUEL_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
@@ -59,7 +63,7 @@ private:
 	template<int Layer> DECLARE_WRITE16_MEMBER(lastduel_vram_w);
 	DECLARE_WRITE16_MEMBER(txram_w);
 	template<int Layer> DECLARE_WRITE16_MEMBER(madgear_vram_w);
-	DECLARE_PALETTE_DECODER(lastduel_RRRRGGGGBBBBIIII);
+	static rgb_t lastduel_RRRRGGGGBBBBIIII(uint32_t raw);
 	TILE_GET_INFO_MEMBER(ld_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(ld_get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -74,9 +78,11 @@ private:
 	uint32_t screen_update_madgear(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(lastduel_timer_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(madgear_timer_cb);
-	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);
 	void lastduel_map(address_map &map);
 	void madgear_map(address_map &map);
 	void madgear_sound_map(address_map &map);
 	void sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_LASTDUEL_H

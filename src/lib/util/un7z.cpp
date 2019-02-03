@@ -96,7 +96,8 @@ public:
 	typedef std::unique_ptr<m7z_file_impl> ptr;
 
 	m7z_file_impl(const std::string &filename);
-	~m7z_file_impl()
+
+	virtual ~m7z_file_impl()
 	{
 		if (m_out_buffer)
 			IAlloc_Free(&m_alloc_imp, m_out_buffer);

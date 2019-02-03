@@ -19,33 +19,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_SEGA_315_5195_CPU(_cputag) \
-	downcast<sega_315_5195_mapper_device &>(*device).set_cputag(_cputag);
-#define MCFG_SEGA_315_5195_MAPPER_HANDLER(_class, _mapper) \
-	downcast<sega_315_5195_mapper_device &>(*device).set_mapper(sega_315_5195_mapper_device::mapper_delegate(&_class::_mapper, #_class "::" #_mapper, nullptr, (_class *)nullptr));
-#define MCFG_SEGA_315_5195_PBF_CALLBACK(_devcb) \
-	devcb = &downcast<sega_315_5195_mapper_device &>(*device).set_pbf_callback(DEVCB_##_devcb);
-#define MCFG_SEGA_315_5195_MCU_INT_CALLBACK(_devcb) \
-	devcb = &downcast<sega_315_5195_mapper_device &>(*device).set_mcu_int_callback(DEVCB_##_devcb);
-
-#define MCFG_SEGA_315_5248_MULTIPLIER_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, SEGA_315_5248_MULTIPLIER, 0)
-
-#define MCFG_SEGA_315_5249_DIVIDER_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, SEGA_315_5249_DIVIDER, 0)
-
-#define MCFG_SEGA_315_5250_COMPARE_TIMER_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, SEGA_315_5250_COMPARE_TIMER, 0)
-#define MCFG_SEGA_315_5250_68KINT_CALLBACK(_devcb) \
-	devcb = &downcast<sega_315_5250_compare_timer_device &>(*device).set_68kint_callback(DEVCB_##_devcb);
-#define MCFG_SEGA_315_5250_ZINT_CALLBACK(_devcb) \
-	devcb = &downcast<sega_315_5250_compare_timer_device &>(*device).set_zint_callback(DEVCB_##_devcb);
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -69,7 +42,7 @@ protected:
 	// internal helpers
 	void palette_init();
 
-public: // -- stupid system16.c
+public: // -- stupid system16.cpp
 	// memory pointers
 	required_shared_ptr<uint16_t> m_paletteram;
 protected:
@@ -93,17 +66,21 @@ public:
 	typedef device_delegate<void (sega_315_5195_mapper_device &, uint8_t)> mapper_delegate;
 
 	// construction/destruction
+	template <typename T>
+	sega_315_5195_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
+		: sega_315_5195_mapper_device(mconfig, tag, owner, clock)
+	{
+		m_cpu.set_tag(std::forward<T>(cpu_tag));
+		m_cpuregion.set_tag(std::forward<T>(cpu_tag));
+	}
+
 	sega_315_5195_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
-	void set_cputag(const char *cpu)
-	{
-		m_cpu.set_tag(cpu);
-		m_cpuregion.set_tag(cpu);
-	}
-	void set_mapper(mapper_delegate callback) { m_mapper = callback; }
-	template<class Object> devcb_base &set_pbf_callback(Object &&object) { return m_pbf_callback.set_callback(std::forward<Object>(object)); }
-	template<class Object> devcb_base &set_mcu_int_callback(Object &&object) { return m_mcu_int_callback.set_callback(std::forward<Object>(object)); }
+	template <typename... T> void set_mapper(T &&... args) { m_mapper = mapper_delegate(std::forward<T>(args)...); }
+
+	auto pbf() { return m_pbf_callback.bind(); }
+	auto mcu_int() { return m_mcu_int_callback.bind(); }
 
 	// public interface
 	DECLARE_READ8_MEMBER( read );
@@ -252,8 +229,8 @@ public:
 	sega_315_5250_compare_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
-	template<class Object> devcb_base &set_68kint_callback(Object &&object) { return m_68kint_callback.set_callback(std::forward<Object>(object)); }
-	template<class Object> devcb_base &set_zint_callback(Object &&object) { return m_zint_callback.set_callback(std::forward<Object>(object)); }
+	auto m68kint_callback() { return m_68kint_callback.bind(); }
+	auto zint_callback() { return m_zint_callback.bind(); }
 
 	// public interface
 	DECLARE_WRITE_LINE_MEMBER(exck_w);

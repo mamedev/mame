@@ -41,7 +41,6 @@ write
 #include "includes/marineb.h"
 
 #include "cpu/z80/z80.h"
-#include "machine/74259.h"
 #include "sound/ay8910.h"
 #include "screen.h"
 #include "speaker.h"
@@ -85,7 +84,7 @@ void marineb_state::marineb_map(address_map &map)
 	map(0x9800, 0x9800).w(FUNC(marineb_state::marineb_column_scroll_w));
 	map(0x9a00, 0x9a00).w(FUNC(marineb_state::marineb_palette_bank_0_w));
 	map(0x9c00, 0x9c00).w(FUNC(marineb_state::marineb_palette_bank_1_w));
-	map(0xa000, 0xa007).w("outlatch", FUNC(ls259_device::write_d0));
+	map(0xa000, 0xa007).w(m_outlatch, FUNC(ls259_device::write_d0));
 	map(0xa000, 0xa000).portr("P2");
 	map(0xa800, 0xa800).portr("P1");
 	map(0xb000, 0xb000).portr("DSW");
@@ -546,10 +545,10 @@ MACHINE_CONFIG_START(marineb_state::marineb)
 	MCFG_DEVICE_PROGRAM_MAP(marineb_map)
 	MCFG_DEVICE_IO_MAP(marineb_io_map)
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, marineb_state, nmi_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, marineb_state, flipscreen_y_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, marineb_state, flipscreen_x_w))
+	LS259(config, m_outlatch);
+	m_outlatch->q_out_cb<0>().set(FUNC(marineb_state::nmi_mask_w));
+	m_outlatch->q_out_cb<1>().set(FUNC(marineb_state::flipscreen_y_w));
+	m_outlatch->q_out_cb<2>().set(FUNC(marineb_state::flipscreen_x_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -558,56 +557,47 @@ MACHINE_CONFIG_START(marineb_state::marineb)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(marineb_state, screen_update_marineb)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, marineb_state, marineb_vblank_irq))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_marineb)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(marineb_state, marineb)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_marineb);
+	PALETTE(config, m_palette, FUNC(marineb_state::marineb_palette), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ay1", AY8910, SOUND_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	AY8910(config, "ay1", SOUND_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(marineb_state::changes)
+void marineb_state::changes(machine_config &config)
+{
 	marineb(config);
 
-	/* basic machine hardware */
-
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_changes)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(marineb_state, screen_update_changes)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_changes);
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(marineb_state::screen_update_changes));
+}
 
 
-MACHINE_CONFIG_START(marineb_state::springer)
+void marineb_state::springer(machine_config &config)
+{
 	marineb(config);
 
-	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("outlatch")
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, marineb_state, flipscreen_y_w)) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, marineb_state, flipscreen_x_w)) MCFG_DEVCB_INVERT
+	m_outlatch->q_out_cb<1>().set(FUNC(marineb_state::flipscreen_y_w)).invert();
+	m_outlatch->q_out_cb<2>().set(FUNC(marineb_state::flipscreen_x_w)).invert();
 
-	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(marineb_state, screen_update_springer)
-MACHINE_CONFIG_END
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(marineb_state::screen_update_springer));
+}
 
 
-MACHINE_CONFIG_START(marineb_state::hoccer)
+void marineb_state::hoccer(machine_config &config)
+{
 	marineb(config);
 
-	/* basic machine hardware */
-
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_hoccer)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(marineb_state, screen_update_hoccer)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_hoccer);
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(marineb_state::screen_update_hoccer));
+}
 
 
 MACHINE_CONFIG_START(marineb_state::wanted)
@@ -617,44 +607,38 @@ MACHINE_CONFIG_START(marineb_state::wanted)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(wanted_io_map)
 
-	MCFG_DEVICE_MODIFY("outlatch")
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, marineb_state, irq_mask_w))
+	m_outlatch->q_out_cb<0>().set(FUNC(marineb_state::irq_mask_w));
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_wanted)
+	m_gfxdecode->set_info(gfx_wanted);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(marineb_state, screen_update_springer)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, marineb_state, wanted_vblank_irq))
 
 	// sound hardware (PSG type verified only for bcruzm12)
-	MCFG_DEVICE_REPLACE("ay1", AY8912, SOUND_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8912(config.replace(), "ay1", SOUND_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ay2", AY8912, SOUND_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8912(config, "ay2", SOUND_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(marineb_state::hopprobo)
+void marineb_state::hopprobo(machine_config &config)
+{
 	marineb(config);
 
-	/* basic machine hardware */
-
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_hopprobo)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(marineb_state, screen_update_hopprobo)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_hopprobo);
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(marineb_state::screen_update_hopprobo));
+}
 
 
-MACHINE_CONFIG_START(marineb_state::bcruzm12)
+void marineb_state::bcruzm12(machine_config &config)
+{
 	wanted(config);
 
-	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("outlatch")
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, marineb_state, flipscreen_y_w)) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, marineb_state, flipscreen_x_w)) MCFG_DEVCB_INVERT
-MACHINE_CONFIG_END
+	m_outlatch->q_out_cb<1>().set(FUNC(marineb_state::flipscreen_y_w)).invert();
+	m_outlatch->q_out_cb<2>().set(FUNC(marineb_state::flipscreen_x_w)).invert();
+}
 
 /***************************************************************************
 

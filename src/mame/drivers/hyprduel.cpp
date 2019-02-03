@@ -72,8 +72,8 @@ public:
 	void init_hyprduel();
 
 private:
-	DECLARE_READ16_MEMBER(irq_cause_r);
-	DECLARE_WRITE16_MEMBER(irq_cause_w);
+	DECLARE_READ8_MEMBER(irq_cause_r);
+	DECLARE_WRITE8_MEMBER(irq_cause_w);
 	DECLARE_WRITE16_MEMBER(subcpu_control_w);
 	DECLARE_READ16_MEMBER(hyprduel_cpusync_trigger1_r);
 	DECLARE_WRITE16_MEMBER(hyprduel_cpusync_trigger1_w);
@@ -149,22 +149,19 @@ TIMER_DEVICE_CALLBACK_MEMBER(hyprduel_state::interrupt)
 	update_irq_state();
 }
 
-READ16_MEMBER(hyprduel_state::irq_cause_r)
+READ8_MEMBER(hyprduel_state::irq_cause_r)
 {
 	return m_requested_int;
 }
 
-WRITE16_MEMBER(hyprduel_state::irq_cause_w)
+WRITE8_MEMBER(hyprduel_state::irq_cause_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		if (data == m_int_num)
-			m_requested_int &= ~(m_int_num & ~*m_irq_enable);
-		else
-			m_requested_int &= ~(data & *m_irq_enable);
+	if (data == m_int_num)
+		m_requested_int &= ~(m_int_num & ~*m_irq_enable);
+	else
+		m_requested_int &= ~(data & *m_irq_enable);
 
-		update_irq_state();
-	}
+	update_irq_state();
 }
 
 
@@ -264,7 +261,7 @@ void hyprduel_state::hyprduel_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x400000, 0x47ffff).m(m_vdp, FUNC(imagetek_i4220_device::v2_map));
-	map(0x4788a2, 0x4788a3).rw(FUNC(hyprduel_state::irq_cause_r), FUNC(hyprduel_state::irq_cause_w));   /* IRQ Cause,Acknowledge */
+	map(0x4788a3, 0x4788a3).rw(FUNC(hyprduel_state::irq_cause_r), FUNC(hyprduel_state::irq_cause_w));   /* IRQ Cause,Acknowledge */
 	map(0x4788a4, 0x4788a5).ram().share("irq_enable");      /* IRQ Enable */
 	map(0x800000, 0x800001).w(FUNC(hyprduel_state::subcpu_control_w));
 	map(0xc00000, 0xc07fff).ram().share("sharedram1");
@@ -296,7 +293,7 @@ void hyprduel_state::magerror_map(address_map &map)
 	map(0x000000, 0x07ffff).rom();
 	map(0x400000, 0x400001).w(FUNC(hyprduel_state::subcpu_control_w));
 	map(0x800000, 0x87ffff).m(m_vdp, FUNC(imagetek_i4220_device::v2_map));
-	map(0x8788a2, 0x8788a3).rw(FUNC(hyprduel_state::irq_cause_r), FUNC(hyprduel_state::irq_cause_w));   /* IRQ Cause, Acknowledge */
+	map(0x8788a3, 0x8788a3).rw(FUNC(hyprduel_state::irq_cause_r), FUNC(hyprduel_state::irq_cause_w));   /* IRQ Cause, Acknowledge */
 	map(0x8788a4, 0x8788a5).ram().share("irq_enable");      /* IRQ Enable */
 	map(0xc00000, 0xc1ffff).ram().share("sharedram1");
 	map(0xe00000, 0xe00001).portr("SERVICE").nopw();
@@ -410,47 +407,6 @@ static INPUT_PORTS_START( magerror )
 INPUT_PORTS_END
 
 /***************************************************************************
-                            Graphics Layouts
-***************************************************************************/
-
-/* 8x8x4 tiles */
-static const gfx_layout layout_8x8x4 =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ 4*1,4*0, 4*3,4*2, 4*5,4*4, 4*7,4*6 },
-	{ STEP8(0,4*8) },
-	4*8*8
-};
-
-/* 8x8x8 tiles for later games */
-static GFXLAYOUT_RAW( layout_8x8x8, 8, 8, 8*8, 32*8 )
-
-/* 16x16x4 tiles for later games */
-static const gfx_layout layout_16x16x4 =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ 4*1,4*0, 4*3,4*2, 4*5,4*4, 4*7,4*6, 4*9,4*8, 4*11,4*10, 4*13,4*12, 4*15,4*14 },
-	{ STEP16(0,4*16) },
-	4*8*8
-};
-
-/* 16x16x8 tiles for later games */
-static GFXLAYOUT_RAW( layout_16x16x8, 16, 16, 16*8, 32*8 )
-
-static GFXDECODE_START( gfx_i4220 )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x4,    0x0, 0x100 ) // [0] 4 Bit Tiles
-	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x8,    0x0,  0x10 ) // [1] 8 Bit Tiles
-	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4,  0x0, 0x100 ) // [2] 4 Bit Tiles 16x16
-	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8,  0x0,  0x10 ) // [3] 8 Bit Tiles 16x16
-GFXDECODE_END
-
-/***************************************************************************
                                 Machine Drivers
 ***************************************************************************/
 
@@ -477,9 +433,8 @@ MACHINE_START_MEMBER(hyprduel_state,hyprduel)
 }
 
 MACHINE_CONFIG_START(hyprduel_state::i4220_config)
-	MCFG_DEVICE_ADD("vdp", I4220, XTAL(26'666'000))
-	MCFG_I4100_GFXDECODE("gfxdecode")
-	MCFG_I4100_BLITTER_END_CALLBACK(WRITELINE(*this, hyprduel_state,vdp_blit_end_w))
+	I4220(config, m_vdp, XTAL(26'666'000));
+	m_vdp->blit_irq_cb().set(FUNC(hyprduel_state::vdp_blit_end_w));
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
@@ -488,9 +443,8 @@ MACHINE_CONFIG_START(hyprduel_state::i4220_config)
 	MCFG_SCREEN_SIZE(320, 224)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, FIRST_VISIBLE_LINE, LAST_VISIBLE_LINE)
 	MCFG_SCREEN_UPDATE_DEVICE("vdp", imagetek_i4100_device, screen_update)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("vdp", imagetek_i4100_device, screen_eof))
 	MCFG_SCREEN_PALETTE(":vdp:palette")
-
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, ":vdp:palette", gfx_i4220)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hyprduel_state::hyprduel)
@@ -498,7 +452,7 @@ MACHINE_CONFIG_START(hyprduel_state::hyprduel)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000,20000000/2)      /* 10MHz */
 	MCFG_DEVICE_PROGRAM_MAP(hyprduel_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hyprduel_state, interrupt, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(hyprduel_state::interrupt), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD("sub", M68000,20000000/2)      /* 10MHz */
 	MCFG_DEVICE_PROGRAM_MAP(hyprduel_map2)
@@ -511,9 +465,9 @@ MACHINE_CONFIG_START(hyprduel_state::hyprduel)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 4000000)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("sub", 1))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 4000000));
+	ymsnd.irq_handler().set_inputline(m_subcpu, 1);
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 4000000/16/16*132, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.57)
@@ -525,7 +479,7 @@ MACHINE_CONFIG_START(hyprduel_state::magerror)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000,20000000/2)      /* 10MHz */
 	MCFG_DEVICE_PROGRAM_MAP(magerror_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hyprduel_state, interrupt, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(hyprduel_state::interrupt), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD("sub", M68000,20000000/2)      /* 10MHz */
 	MCFG_DEVICE_PROGRAM_MAP(magerror_map2)
@@ -555,7 +509,7 @@ ROM_START( hyprduel )
 	ROM_LOAD16_BYTE( "24.u24", 0x000000, 0x40000, CRC(c7402722) SHA1(e385676cdcee65a3ddf07791d82a1fe83ba1b3e2) ) /* Also silk screened as position 10 */
 	ROM_LOAD16_BYTE( "23.u23", 0x000001, 0x40000, CRC(d8297c2b) SHA1(2e23c5b1784d0a465c0c0dc3ca28505689a8b16c) ) /* Also silk screened as position  9 */
 
-	ROM_REGION( 0x400000, "gfx1", 0 )   /* Gfx + Prg + Data (Addressable by CPU & Blitter) */
+	ROM_REGION( 0x400000, "vdp", 0 )   /* Gfx + Prg + Data (Addressable by CPU & Blitter) */
 	ROMX_LOAD( "ts_hyper-1.u74", 0x000000, 0x100000, CRC(4b3b2d3c) SHA1(5e9e8ec853f71aeff3910b93dadbaeae2b61717b) , ROM_GROUPWORD | ROM_SKIP(6) )
 	ROMX_LOAD( "ts_hyper-2.u75", 0x000002, 0x100000, CRC(dc230116) SHA1(a3c447657d8499764f52c81382961f425c56037b) , ROM_GROUPWORD | ROM_SKIP(6) )
 	ROMX_LOAD( "ts_hyper-3.u76", 0x000004, 0x100000, CRC(2d770dd0) SHA1(27f9e7f67e96210d3710ab4f940c5d7ae13f8bbf) , ROM_GROUPWORD | ROM_SKIP(6) )
@@ -570,7 +524,7 @@ ROM_START( hyprduel2 )
 	ROM_LOAD16_BYTE( "24a.u24", 0x000000, 0x40000, CRC(2458f91d) SHA1(c75c7bccc84738e29b35667793491a1213aea1da) ) /* Also silk screened as position 10 */
 	ROM_LOAD16_BYTE( "23a.u23", 0x000001, 0x40000, CRC(98aedfca) SHA1(42028e57ac79473cde683be2100b953ff3b2b345) ) /* Also silk screened as position  9 */
 
-	ROM_REGION( 0x400000, "gfx1", 0 )   /* Gfx + Prg + Data (Addressable by CPU & Blitter) */
+	ROM_REGION( 0x400000, "vdp", 0 )   /* Gfx + Prg + Data (Addressable by CPU & Blitter) */
 	ROMX_LOAD( "ts_hyper-1.u74", 0x000000, 0x100000, CRC(4b3b2d3c) SHA1(5e9e8ec853f71aeff3910b93dadbaeae2b61717b) , ROM_GROUPWORD | ROM_SKIP(6) )
 	ROMX_LOAD( "ts_hyper-2.u75", 0x000002, 0x100000, CRC(dc230116) SHA1(a3c447657d8499764f52c81382961f425c56037b) , ROM_GROUPWORD | ROM_SKIP(6) )
 	ROMX_LOAD( "ts_hyper-3.u76", 0x000004, 0x100000, CRC(2d770dd0) SHA1(27f9e7f67e96210d3710ab4f940c5d7ae13f8bbf) , ROM_GROUPWORD | ROM_SKIP(6) )
@@ -585,7 +539,7 @@ ROM_START( magerror )
 	ROM_LOAD16_BYTE( "24.u24", 0x000000, 0x40000, CRC(5e78027f) SHA1(053374942bc545a92cc6f6ab6784c4626e4ec9e1) ) /* Also silk screened as position 10 */
 	ROM_LOAD16_BYTE( "23.u23", 0x000001, 0x40000, CRC(7271ec70) SHA1(bd7666390b70821f90ba976a3afe3194fb119478) ) /* Also silk screened as position  9 */
 
-	ROM_REGION( 0x400000, "gfx1", 0 )   /* Gfx + Prg + Data (Addressable by CPU & Blitter) */
+	ROM_REGION( 0x400000, "vdp", 0 )   /* Gfx + Prg + Data (Addressable by CPU & Blitter) */
 	ROMX_LOAD( "mr93046-02.u74", 0x000000, 0x100000, CRC(f7ba06fb) SHA1(e1407b0d03863f434b68183c01e8547612e5c5fd) , ROM_GROUPWORD | ROM_SKIP(6) )
 	ROMX_LOAD( "mr93046-04.u75", 0x000002, 0x100000, CRC(8c114d15) SHA1(4eb1f82e7992deb126633287cb4fd2a6d215346c) , ROM_GROUPWORD | ROM_SKIP(6) )
 	ROMX_LOAD( "mr93046-01.u76", 0x000004, 0x100000, CRC(6cc3b928) SHA1(f19d0add314867bfb7dcefe8e7a2d50a84530df7) , ROM_GROUPWORD | ROM_SKIP(6) )

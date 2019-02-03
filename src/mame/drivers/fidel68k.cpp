@@ -210,6 +210,7 @@ public:
 	void fdes2325(machine_config &config);
 	void init_fdes2265();
 
+	void eag_base(machine_config &config);
 	void eag(machine_config &config);
 	void eagv7(machine_config &config);
 	void eagv9(machine_config &config);
@@ -566,12 +567,13 @@ MACHINE_CONFIG_START(fidel68k_state::fex68k)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, 12_MHz_XTAL) // HD68HC000P12
 	MCFG_DEVICE_PROGRAM_MAP(fex68k_map)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel68k_state, irq_on, attotime::from_hz(618)) // theoretical frequency from 556 timer (22nF, 91K + 20K POT @ 14.8K, 0.1K), measurement was 580Hz
-	MCFG_TIMER_START_DELAY(attotime::from_hz(618) - attotime::from_nsec(1525)) // active for 1.525us
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel68k_state, irq_off, attotime::from_hz(618))
+	timer_device &irq_on(TIMER(config, "irq_on"));
+	irq_on.configure_periodic(FUNC(fidel68k_state::irq_on), attotime::from_hz(618)); // theoretical frequency from 556 timer (22nF, 91K + 20K POT @ 14.8K, 0.1K), measurement was 580Hz
+	irq_on.set_start_delay(attotime::from_hz(597) - attotime::from_nsec(1528)); // active for 1.525us
+	TIMER(config, "irq_off").configure_periodic(FUNC(fidel68k_state::irq_off), attotime::from_hz(618));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_fidel_ex_68k)
+	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
+	config.set_default_layout(layout_fidel_ex_68k);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -602,12 +604,13 @@ MACHINE_CONFIG_START(fidel68k_state::fdes2265)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL) // MC68HC000P12F
 	MCFG_DEVICE_PROGRAM_MAP(fdes2265_map)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel68k_state, irq_on, attotime::from_hz(597)) // from 555 timer, measured
-	MCFG_TIMER_START_DELAY(attotime::from_hz(597) - attotime::from_nsec(6000)) // active for 6us
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel68k_state, irq_off, attotime::from_hz(597))
+	timer_device &irq_on(TIMER(config, "irq_on"));
+	irq_on.configure_periodic(FUNC(fidel68k_state::irq_on), attotime::from_hz(597)); // from 555 timer, measured
+	irq_on.set_start_delay(attotime::from_hz(597) - attotime::from_nsec(6000)); // active for 6us
+	TIMER(config, "irq_off").configure_periodic(FUNC(fidel68k_state::irq_off), attotime::from_hz(597));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_fidel_desdis_68kr)
+	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
+	config.set_default_layout(layout_fidel_desdis_68kr);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -623,26 +626,23 @@ MACHINE_CONFIG_START(fidel68k_state::fdes2325)
 	MCFG_DEVICE_REPLACE("maincpu", M68EC020, 20_MHz_XTAL) // MC68EC020RP25
 	MCFG_DEVICE_PROGRAM_MAP(fdes2325_map)
 
-	MCFG_DEFAULT_LAYOUT(layout_fidel_desdis_68kg)
+	config.set_default_layout(layout_fidel_desdis_68kg);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(fidel68k_state::eag)
+MACHINE_CONFIG_START(fidel68k_state::eag_base)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(eag_map)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel68k_state, irq_on, attotime::from_hz(4.9152_MHz_XTAL/0x2000)) // 600Hz
-	MCFG_TIMER_START_DELAY(attotime::from_hz(4.9152_MHz_XTAL/0x2000) - attotime::from_nsec(8250)) // active for 8.25us
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel68k_state, irq_off, attotime::from_hz(4.9152_MHz_XTAL/0x2000))
+	timer_device &irq_on(TIMER(config, "irq_on"));
+	irq_on.configure_periodic(FUNC(fidel68k_state::irq_on), attotime::from_hz(4.9152_MHz_XTAL/0x2000)); // 600Hz
+	irq_on.set_start_delay(attotime::from_hz(4.9152_MHz_XTAL/0x2000) - attotime::from_nsec(8250)); // active for 8.25us
+	TIMER(config, "irq_off").configure_periodic(FUNC(fidel68k_state::irq_off), attotime::from_hz(4.9152_MHz_XTAL/0x2000));
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_fidel_eag_68k)
-
-	MCFG_RAM_ADD("ram")
-	MCFG_RAM_DEFAULT_SIZE("1M")
-	MCFG_RAM_EXTRA_OPTIONS("128K, 512K, 1M")
+	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
+	config.set_default_layout(layout_fidel_eag_68k);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -654,17 +654,21 @@ MACHINE_CONFIG_START(fidel68k_state::eag)
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "fidel_scc")
 	MCFG_GENERIC_EXTENSIONS("bin,dat")
 	MCFG_GENERIC_LOAD(fidelbase_state, scc_cartridge)
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "fidel_scc")
+	SOFTWARE_LIST(config, "cart_list").set_original("fidel_scc");
 MACHINE_CONFIG_END
 
+void fidel68k_state::eag(machine_config &config)
+{
+	eag_base(config);
+	RAM(config, "ram").set_default_size("1M").set_extra_options("128K, 512K, 1M");
+}
+
 MACHINE_CONFIG_START(fidel68k_state::eagv7)
-	eag(config);
+	eag_base(config);
 
 	/* basic machine hardware */
 	MCFG_DEVICE_REPLACE("maincpu", M68020, 20_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(eagv7_map)
-
-	MCFG_RAM_REMOVE("ram")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fidel68k_state::eagv9)
@@ -691,8 +695,8 @@ MACHINE_CONFIG_START(fidel68k_state::eagv11)
 	MCFG_DEVICE_PROGRAM_MAP(eagv11_map)
 
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(fidel68k_state, irq2_line_hold, 600)
-	MCFG_DEVICE_REMOVE("irq_on") // 8.25us is too long
-	MCFG_DEVICE_REMOVE("irq_off")
+	config.device_remove("irq_on"); // 8.25us is too long
+	config.device_remove("irq_off");
 MACHINE_CONFIG_END
 
 

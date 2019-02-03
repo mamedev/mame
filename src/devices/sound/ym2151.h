@@ -37,16 +37,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_YM2151_IRQ_HANDLER(_devcb) \
-	devcb = &downcast<ym2151_device &>(*device).set_irq_handler(DEVCB_##_devcb);
-#define MCFG_YM2151_PORT_WRITE_HANDLER(_devcb) \
-	devcb = &downcast<ym2151_device &>(*device).set_port_write_handler(DEVCB_##_devcb);
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -61,16 +51,16 @@ public:
 	ym2151_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
-	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return m_irqhandler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_port_write_handler(Object &&cb) { return m_portwritehandler.set_callback(std::forward<Object>(cb)); }
+	auto irq_handler() { return m_irqhandler.bind(); }
+	auto port_write_handler() { return m_portwritehandler.bind(); }
 
 	// read/write
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
 
-	DECLARE_READ8_MEMBER(status_r);
-	DECLARE_WRITE8_MEMBER(register_w);
-	DECLARE_WRITE8_MEMBER(data_w);
+	u8 status_r();
+	void register_w(u8 data);
+	void data_w(u8 data);
 
 	DECLARE_WRITE_LINE_MEMBER(reset_w);
 

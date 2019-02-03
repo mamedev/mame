@@ -5,6 +5,10 @@
     Haunted Castle
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_HCASTLE_H
+#define MAME_INCLUDES_HCASTLE_H
+
+#pragma once
 
 #include "video/bufsprite.h"
 #include "sound/k007232.h"
@@ -14,10 +18,10 @@
 class hcastle_state : public driver_device
 {
 public:
-	hcastle_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_spriteram(*this, "spriteram"),
-			m_spriteram2(*this, "spriteram2") ,
+	hcastle_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_spriteram(*this, "spriteram"),
+		m_spriteram2(*this, "spriteram2") ,
 		m_pf1_videoram(*this, "pf1_videoram"),
 		m_pf2_videoram(*this, "pf2_videoram"),
 		m_audiocpu(*this, "audiocpu"),
@@ -26,7 +30,8 @@ public:
 		m_k007232(*this, "k007232"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	void hcastle(machine_config &config);
 
@@ -68,7 +73,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(hcastle);
+	void hcastle_palette(palette_device &palette) const;
 	uint32_t screen_update_hcastle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, uint8_t *sbank, int bank );
 	DECLARE_WRITE8_MEMBER(volume_callback);
@@ -78,3 +83,5 @@ private:
 	void hcastle_map(address_map &map);
 	void sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_HCASTLE_H

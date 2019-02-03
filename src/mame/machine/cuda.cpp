@@ -297,10 +297,10 @@ WRITE8_MEMBER( cuda_device::timer_ctrl_w )
 {
 	static const attotime rates[4][5] =
 	{
-		{ attotime::from_seconds(1), attotime::from_msec(31.3f), attotime::from_msec(15.6f), attotime::from_msec(7.8f), attotime::from_msec(3.9f) },
-		{ attotime::from_seconds(2), attotime::from_msec(62.5f), attotime::from_msec(31.3f), attotime::from_msec(15.6f), attotime::from_msec(7.8f) },
-		{ attotime::from_seconds(4), attotime::from_msec(125.0f), attotime::from_msec(62.5f), attotime::from_msec(31.3f), attotime::from_msec(15.6f) },
-		{ attotime::from_seconds(8), attotime::from_msec(250.0f), attotime::from_msec(125.1f), attotime::from_msec(62.5f), attotime::from_msec(31.3f) },
+		{ attotime::from_seconds(1), attotime::from_usec(31300), attotime::from_usec(15600), attotime::from_usec(7800), attotime::from_usec(3900) },
+		{ attotime::from_seconds(2), attotime::from_usec(62500), attotime::from_usec(31300), attotime::from_usec(15600), attotime::from_usec(7800) },
+		{ attotime::from_seconds(4), attotime::from_usec(125000), attotime::from_usec(62500), attotime::from_usec(31300), attotime::from_usec(15600) },
+		{ attotime::from_seconds(8), attotime::from_usec(250000), attotime::from_usec(125100), attotime::from_usec(62500), attotime::from_usec(31300) },
 	};
 
 //    printf("%02x to timer control (PC=%x)\n", data, m_maincpu->pc());

@@ -57,10 +57,11 @@ static void mds_a_floppies(device_slot_interface &device)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(s100_mds_a_device::device_add_mconfig)
-	MCFG_FLOPPY_DRIVE_ADD("floppy0", mds_a_floppies, "525sd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("floppy1", mds_a_floppies, "525sd", floppy_image_device::default_floppy_formats)
-MACHINE_CONFIG_END
+void s100_mds_a_device::device_add_mconfig(machine_config &config)
+{
+	for (auto &floppy : m_floppy)
+		FLOPPY_CONNECTOR(config, floppy, mds_a_floppies, "525sd", floppy_image_device::default_floppy_formats);
+}
 
 
 
@@ -75,8 +76,7 @@ MACHINE_CONFIG_END
 s100_mds_a_device::s100_mds_a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, S100_MDS_A, tag, owner, clock),
 	device_s100_card_interface(mconfig, *this),
-	m_floppy0(*this, "floppy0"),
-	m_floppy1(*this, "floppy1"),
+	m_floppy(*this, "floppy%u", 0U),
 	m_psel_rom(*this, "psel"),
 	m_pgm_rom(*this, "pgm")
 {
@@ -107,5 +107,5 @@ void s100_mds_a_device::device_reset()
 
 uint8_t s100_mds_a_device::s100_smemr_r(address_space &space, offs_t offset)
 {
-	return 0;
+	return 0xff;
 }

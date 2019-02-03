@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder, Mike Naberezny
-#pragma once
-
 #ifndef MAME_INCLUDES_SOFTBOX_H
 #define MAME_INCLUDES_SOFTBOX_H
+
+#pragma once
 
 #include "bus/ieee488/ieee488.h"
 #include "bus/imi7000/imi7000.h"

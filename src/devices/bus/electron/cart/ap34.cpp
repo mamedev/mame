@@ -44,14 +44,13 @@ void ap34_floppies(device_slot_interface &device)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(electron_ap34_device::device_add_mconfig)
+void electron_ap34_device::device_add_mconfig(machine_config &config)
+{
 	/* fdc */
-	MCFG_DEVICE_ADD("fdc", WD1770, 16_MHz_XTAL / 2)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ap34_floppies, "525qd", electron_ap34_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ap34_floppies, nullptr, electron_ap34_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-MACHINE_CONFIG_END
+	WD1770(config, m_fdc, DERIVED_CLOCK(1, 2));
+	FLOPPY_CONNECTOR(config, m_floppy0, ap34_floppies, "525qd", electron_ap34_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy1, ap34_floppies, nullptr, electron_ap34_device::floppy_formats).enable_sound(true);
+}
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -82,9 +81,9 @@ void electron_ap34_device::device_start()
 //  read - cartridge data read
 //-------------------------------------------------
 
-uint8_t electron_ap34_device::read(address_space &space, offs_t offset, int infc, int infd, int romqa)
+uint8_t electron_ap34_device::read(address_space &space, offs_t offset, int infc, int infd, int romqa, int oe, int oe2)
 {
-	uint8_t data = 0xfe;
+	uint8_t data = 0xff;
 
 	if (infc)
 	{
@@ -94,21 +93,19 @@ uint8_t electron_ap34_device::read(address_space &space, offs_t offset, int infc
 		case 0xc5:
 		case 0xc6:
 		case 0xc7:
-			data = m_fdc->read(space, offset & 0x03);
+			data = m_fdc->read(offset & 0x03);
 			break;
 		}
 	}
-
-	if (!infc && !infd)
+	else if (oe)
 	{
-		if (offset >= 0x0000 && offset < 0x4000)
-		{
-			data = m_rom[(offset & 0x3fff) + (romqa * 0x4000)];
-		}
-
 		if (m_ram.size() != 0 && romqa == 0 && offset >= 0x3000)
 		{
 			data = m_ram[offset & 0x0fff];
+		}
+		else
+		{
+			data = m_rom[(offset & 0x3fff) | (romqa << 14)];
 		}
 	}
 
@@ -119,7 +116,7 @@ uint8_t electron_ap34_device::read(address_space &space, offs_t offset, int infc
 //  write - cartridge data write
 //-------------------------------------------------
 
-void electron_ap34_device::write(address_space &space, offs_t offset, uint8_t data, int infc, int infd, int romqa)
+void electron_ap34_device::write(address_space &space, offs_t offset, uint8_t data, int infc, int infd, int romqa, int oe, int oe2)
 {
 	if (infc)
 	{
@@ -132,12 +129,11 @@ void electron_ap34_device::write(address_space &space, offs_t offset, uint8_t da
 		case 0xc5:
 		case 0xc6:
 		case 0xc7:
-			m_fdc->write(space, offset & 0x03, data);
+			m_fdc->write(offset & 0x03, data);
 			break;
 		}
 	}
-
-	if (!infc && !infd)
+	else if (oe)
 	{
 		if (m_ram.size() != 0 && romqa == 0 && offset >= 0x3000)
 		{
@@ -168,6 +164,7 @@ WRITE8_MEMBER(electron_ap34_device::wd1770_control_w)
 	m_fdc->dden_w(BIT(data, 3));
 
 	// bit 4: NMI - not connected
+	//m_slot->nmi_w(!BIT(data, 4));
 
 	// bit 5: reset
 	if (!BIT(data, 5)) m_fdc->soft_reset();

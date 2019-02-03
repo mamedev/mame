@@ -188,10 +188,9 @@ MACHINE_CONFIG_START(vindictr_state::vindictr)
 	MCFG_DEVICE_ADD("maincpu", M68010, ATARI_CLOCK_14MHz/2)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_EEPROM_2804_ADD("eeprom")
-	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
+	EEPROM_2804(config, "eeprom").lock_after_write(true);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vindictr)
@@ -199,8 +198,9 @@ MACHINE_CONFIG_START(vindictr_state::vindictr)
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, vindictr_state, get_playfield_tile_info, 8,8, SCAN_COLS, 64,64)
 	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", "gfxdecode", 2, vindictr_state, get_alpha_tile_info, 8,8, SCAN_ROWS, 64,32, 0)
-	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", vindictr_state::s_mob_config)
-	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("gfxdecode")
+
+	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, vindictr_state::s_mob_config);
+	m_mob->set_gfxdecode(m_gfxdecode);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -214,11 +214,12 @@ MACHINE_CONFIG_START(vindictr_state::vindictr)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_ATARI_JSA_I_ADD("jsa", INPUTLINE("maincpu", M68K_IRQ_6))
-	MCFG_ATARI_JSA_TEST_PORT("260010", 1)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
-	MCFG_DEVICE_REMOVE("jsa:tms")
+	ATARI_JSA_I(config, m_jsa, 0);
+	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_6);
+	m_jsa->test_read_cb().set_ioport("260010").bit(12);
+	m_jsa->add_route(0, "lspeaker", 1.0);
+	m_jsa->add_route(1, "rspeaker", 1.0);
+	config.device_remove("jsa:tms");
 MACHINE_CONFIG_END
 
 

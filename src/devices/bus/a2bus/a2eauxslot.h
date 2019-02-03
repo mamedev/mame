@@ -23,17 +23,16 @@
 	downcast<a2eauxslot_device &>(*device).set_cputag(_cputag);
 
 #define MCFG_A2EAUXSLOT_OUT_IRQ_CB(_devcb) \
-	devcb = &downcast<a2eauxslot_device &>(*device).set_out_irq_callback(DEVCB_##_devcb);
+	downcast<a2eauxslot_device &>(*device).set_out_irq_callback(DEVCB_##_devcb);
 
 #define MCFG_A2EAUXSLOT_OUT_NMI_CB(_devcb) \
-	devcb = &downcast<a2eauxslot_device &>(*device).set_out_nmi_callback(DEVCB_##_devcb);
+	downcast<a2eauxslot_device &>(*device).set_out_nmi_callback(DEVCB_##_devcb);
 
 #define MCFG_A2EAUXSLOT_SLOT_ADD(_nbtag, _tag, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, A2EAUXSLOT_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
 	downcast<a2eauxslot_slot_device &>(*device).set_a2eauxslot_slot(_nbtag, _tag);
-#define MCFG_A2EAUXSLOT_SLOT_REMOVE(_tag)    \
-	MCFG_DEVICE_REMOVE(_tag)
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS

@@ -145,9 +145,12 @@ ZDIPSW      EQU 0FFH    ; Configuration dip switches
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
+//#include "bus/rs232/rs232.h"
 //#include "bus/s100/s100.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 #include "machine/6821pia.h"
+#include "machine/input_merger.h"
+#include "machine/mc2661.h"
 #include "machine/pic8259.h"
 #include "machine/wd_fdc.h"
 #include "video/mc6845.h"
@@ -160,15 +163,12 @@ public:
 	z100_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_pia0(*this, "pia0"),
-		m_pia1(*this, "pia1"),
+		m_pia(*this, "pia%u", 0U),
 		m_picm(*this, "pic8259_master"),
 		m_pics(*this, "pic8259_slave"),
 		m_fdc(*this, "z207_fdc"),
-		m_floppy0(*this, "z207_fdc:0"),
-		m_floppy1(*this, "z207_fdc:1"),
-		m_floppy2(*this, "z207_fdc:2"),
-		m_floppy3(*this, "z207_fdc:3"),
+		m_floppies(*this, "z207_fdc:%u", 0U),
+		m_epci(*this, "epci%u", 0U),
 		m_crtc(*this, "crtc"),
 		m_palette(*this, "palette"),
 		m_floppy(nullptr)
@@ -205,15 +205,12 @@ private:
 	void z100_mem(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
-	required_device<pia6821_device> m_pia0;
-	required_device<pia6821_device> m_pia1;
+	required_device_array<pia6821_device, 2> m_pia;
 	required_device<pic8259_device> m_picm;
 	required_device<pic8259_device> m_pics;
 	required_device<fd1797_device> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
-	required_device<floppy_connector> m_floppy2;
-	required_device<floppy_connector> m_floppy3;
+	required_device_array<floppy_connector, 4> m_floppies;
+	required_device_array<mc2661_device, 2> m_epci;
 	required_device<mc6845_device> m_crtc;
 	required_device<palette_device> m_palette;
 
@@ -376,14 +373,7 @@ WRITE8_MEMBER( z100_state::z100_6845_data_w )
 
 WRITE8_MEMBER( z100_state::floppy_select_w )
 {
-	switch (data & 0x03)
-	{
-	case 0: m_floppy = m_floppy0->get_device(); break;
-	case 1: m_floppy = m_floppy1->get_device(); break;
-	case 2: m_floppy = m_floppy2->get_device(); break;
-	case 3: m_floppy = m_floppy3->get_device(); break;
-	}
-
+	m_floppy = m_floppies[data & 0x03]->get_device();
 	m_fdc->set_floppy(m_floppy);
 }
 
@@ -412,14 +402,14 @@ void z100_state::z100_io(address_map &map)
 //  z-207 secondary disk controller (wd1797)
 //  AM_RANGE (0xcd, 0xce) ET-100 CRT Controller
 //  AM_RANGE (0xd4, 0xd7) ET-100 Trainer Parallel I/O
-	map(0xd8, 0xdb).rw(m_pia0, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); //video board
+	map(0xd8, 0xdb).rw(m_pia[0], FUNC(pia6821_device::read), FUNC(pia6821_device::write)); //video board
 	map(0xdc, 0xdc).w(FUNC(z100_state::z100_6845_address_w));
 	map(0xdd, 0xdd).w(FUNC(z100_state::z100_6845_data_w));
 //  AM_RANGE (0xde, 0xde) light pen
-	map(0xe0, 0xe3).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); //main board
+	map(0xe0, 0xe3).rw(m_pia[1], FUNC(pia6821_device::read), FUNC(pia6821_device::write)); //main board
 //  AM_RANGE (0xe4, 0xe7) 8253 PIT
-//  AM_RANGE (0xe8, 0xeb) First 2661-2 serial port (printer)
-//  AM_RANGE (0xec, 0xef) Second 2661-2 serial port (modem)
+	map(0xe8, 0xeb).rw(m_epci[0], FUNC(mc2661_device::read), FUNC(mc2661_device::write));
+	map(0xec, 0xef).rw(m_epci[1], FUNC(mc2661_device::read), FUNC(mc2661_device::write));
 	map(0xf0, 0xf1).rw(m_pics, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0xf2, 0xf3).rw(m_picm, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0xf4, 0xf4).r(FUNC(z100_state::keyb_data_r)); // -> 8041 MCU
@@ -438,7 +428,7 @@ INPUT_CHANGED_MEMBER(z100_state::key_stroke)
 	{
 		/* TODO: table */
 		m_keyb_press = (uint8_t)(uintptr_t)(param) & 0xff;
-		//pic8259_ir6_w(m_picm, 1);
+		//m_picm->ir6_w(1);
 		m_keyb_status = 1;
 	}
 
@@ -676,10 +666,10 @@ static void z100_floppies(device_slot_interface &device)
 
 MACHINE_CONFIG_START(z100_state::z100)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8088, 14.318181_MHz_XTAL / 3)
-	MCFG_DEVICE_PROGRAM_MAP(z100_mem)
-	MCFG_DEVICE_IO_MAP(z100_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
+	I8088(config, m_maincpu, 14.318181_MHz_XTAL / 3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &z100_state::z100_mem);
+	m_maincpu->set_addrmap(AS_IO, &z100_state::z100_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -693,33 +683,48 @@ MACHINE_CONFIG_START(z100_state::z100)
 	MCFG_PALETTE_ADD("palette", 8)
 
 	/* devices */
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 14.318181_MHz_XTAL / 8)    /* unknown clock, hand tuned to get ~50/~60 fps */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	MC6845(config, m_crtc, 14.318181_MHz_XTAL / 8);    /* unknown clock, hand tuned to get ~50/~60 fps */
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
 
-	MCFG_DEVICE_ADD("pic8259_master", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
-	MCFG_PIC8259_IN_SP_CB(VCC)
-	MCFG_PIC8259_CASCADE_ACK_CB(READ8(*this, z100_state, get_slave_ack))
+	PIC8259(config, m_picm, 0);
+	m_picm->out_int_callback().set_inputline(m_maincpu, 0);
+	m_picm->in_sp_callback().set_constant(1);
+	m_picm->read_slave_ack_callback().set(FUNC(z100_state::get_slave_ack));
 
-	MCFG_DEVICE_ADD("pic8259_slave", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(WRITELINE("pic8259_master", pic8259_device, ir3_w))
-	MCFG_PIC8259_IN_SP_CB(GND)
+	PIC8259(config, m_pics, 0);
+	m_pics->out_int_callback().set(m_picm, FUNC(pic8259_device::ir3_w));
+	m_pics->in_sp_callback().set_constant(0);
 
-	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, z100_state, video_pia_A_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, z100_state, video_pia_B_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, z100_state, video_pia_CA2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, z100_state, video_pia_CB2_w))
+	PIA6821(config, m_pia[0], 0);
+	m_pia[0]->writepa_handler().set(FUNC(z100_state::video_pia_A_w));
+	m_pia[0]->writepb_handler().set(FUNC(z100_state::video_pia_B_w));
+	m_pia[0]->ca2_handler().set(FUNC(z100_state::video_pia_CA2_w));
+	m_pia[0]->cb2_handler().set(FUNC(z100_state::video_pia_CB2_w));
 
-	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
+	PIA6821(config, m_pia[1], 0);
 
-	MCFG_DEVICE_ADD("z207_fdc", FD1797, 1_MHz_XTAL)
+	FD1797(config, m_fdc, 1_MHz_XTAL);
 
-	MCFG_FLOPPY_DRIVE_ADD("z207_fdc:0", z100_floppies, "dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("z207_fdc:1", z100_floppies, "dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("z207_fdc:2", z100_floppies, "", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("z207_fdc:3", z100_floppies, "", floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, m_floppies[0], z100_floppies, "dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppies[1], z100_floppies, "dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppies[2], z100_floppies, "", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppies[3], z100_floppies, "", floppy_image_device::default_floppy_formats);
+
+	MC2661(config, m_epci[0], 4.9152_MHz_XTAL); // First 2661-2 serial port (printer)
+	m_epci[0]->txrdy_handler().set("epci0int", FUNC(input_merger_device::in_w<0>));
+	m_epci[0]->rxrdy_handler().set("epci0int", FUNC(input_merger_device::in_w<1>));
+
+	MC2661(config, m_epci[1], 4.9152_MHz_XTAL); // Second 2661-2 serial port (modem)
+	m_epci[1]->txrdy_handler().set("epci1int", FUNC(input_merger_device::in_w<0>));
+	m_epci[1]->rxrdy_handler().set("epci1int", FUNC(input_merger_device::in_w<1>));
+
+	input_merger_device &epci0int(INPUT_MERGER_ANY_HIGH(config, "epci0int"));
+	epci0int.output_handler().set(m_picm, FUNC(pic8259_device::ir4_w));
+
+	input_merger_device &epci1int(INPUT_MERGER_ANY_HIGH(config, "epci1int"));
+	epci1int.output_handler().set(m_picm, FUNC(pic8259_device::ir5_w));
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -744,5 +749,5 @@ void z100_state::driver_init()
 
 /* Driver */
 
-//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  STATE       INIT         COMPANY   FULLNAME  FLAGS
-COMP( 1982, z100, 0,      0,      z100,    z100,  z100_state, driver_init, "Zenith", "Z-100",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  STATE       INIT         COMPANY                FULLNAME  FLAGS
+COMP( 1982, z100, 0,      0,      z100,    z100,  z100_state, driver_init, "Zenith Data Systems", "Z-100",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

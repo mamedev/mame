@@ -124,7 +124,9 @@
 #define SR_IMEX4                0x00004000
 #define SR_IMEX5                0x00008000
 #define SR_DE                   0x00010000
+#define SR_EIE                  0x00010000  /* R5900/EE only, Enable IE bit */
 #define SR_CE                   0x00020000
+#define SR_EDI                  0x00020000  /* R5900/EE only, EI/DI instruction enable */
 #define SR_CH                   0x00040000
 #define SR_SR                   0x00100000
 #define SR_TS                   0x00200000
@@ -185,5 +187,7 @@
 #define UIMMVAL         ((uint16_t)op)
 #define LIMMVAL         (op & 0x03ffffff)
 
+#define CACHE_TYPE      ((op >> 16) & 3)
+#define CACHE_OP        ((op >> 18) & 7)
 
 #endif // MAME_CPU_MIPS_MIPS3COM_H

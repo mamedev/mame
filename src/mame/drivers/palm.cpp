@@ -18,7 +18,6 @@
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "emupal.h"
-#include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -27,15 +26,16 @@
 class palm_state : public driver_device
 {
 public:
-	palm_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	palm_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_lsi(*this, MC68328_TAG),
 		m_ram(*this, RAM_TAG),
 		m_io_penx(*this, "PENX"),
 		m_io_peny(*this, "PENY"),
 		m_io_penb(*this, "PENB"),
-		m_io_portd(*this, "PORTD") { }
+		m_io_portd(*this, "PORTD")
+	{ }
 
 	void palmiii(machine_config &config);
 	void pilot1k(machine_config &config);
@@ -48,29 +48,31 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(pen_check);
 	DECLARE_INPUT_CHANGED_MEMBER(button_check);
 
-private:
-	required_device<cpu_device> m_maincpu;
-	required_device<mc68328_device> m_lsi;
-	required_device<ram_device> m_ram;
-	uint8_t m_port_f_latch;
-	uint16_t m_spim_data;
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+private:
 	DECLARE_WRITE8_MEMBER(palm_port_f_out);
 	DECLARE_READ8_MEMBER(palm_port_c_in);
 	DECLARE_READ8_MEMBER(palm_port_f_in);
 	DECLARE_WRITE16_MEMBER(palm_spim_out);
 	DECLARE_READ16_MEMBER(palm_spim_in);
 	DECLARE_WRITE_LINE_MEMBER(palm_spim_exchange);
-	DECLARE_PALETTE_INIT(palm);
+	void palm_palette(palette_device &palette) const;
 
+	offs_t palm_dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
+	void palm_map(address_map &map);
+
+	required_device<cpu_device> m_maincpu;
+	required_device<mc68328_device> m_lsi;
+	required_device<ram_device> m_ram;
+	uint8_t m_port_f_latch;
+	uint16_t m_spim_data;
 	required_ioport m_io_penx;
 	required_ioport m_io_peny;
 	required_ioport m_io_penb;
 	required_ioport m_io_portd;
-
-	offs_t palm_dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
-	void palm_map(address_map &map);
 };
 
 
@@ -158,7 +160,7 @@ void palm_state::machine_reset()
 }
 
 /* THIS IS PRETTY MUCH TOTALLY WRONG AND DOESN'T REFLECT THE MC68328'S INTERNAL FUNCTIONALITY AT ALL! */
-PALETTE_INIT_MEMBER(palm_state, palm)
+void palm_state::palm_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, 0x7b, 0x8c, 0x5a);
 	palette.set_pen_color(1, 0x00, 0x00, 0x00);
@@ -186,9 +188,9 @@ MACHINE_CONFIG_START(palm_state::palm)
 	MCFG_DEVICE_PROGRAM_MAP( palm_map)
 	MCFG_DEVICE_DISASSEMBLE_OVERRIDE(palm_state, palm_dasm_override)
 
-	MCFG_QUANTUM_TIME( attotime::from_hz(60) )
+	config.m_minimum_quantum =  attotime::from_hz(60);
 
-	MCFG_SCREEN_ADD( "screen", RASTER )
+	MCFG_SCREEN_ADD( "screen", LCD )
 	MCFG_SCREEN_REFRESH_RATE( 60 )
 	MCFG_SCREEN_VBLANK_TIME( ATTOSECONDS_IN_USEC(1260) )
 	/* video hardware */
@@ -198,9 +200,7 @@ MACHINE_CONFIG_START(palm_state::palm)
 	MCFG_SCREEN_UPDATE_DEVICE(MC68328_TAG, mc68328_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD( "palette", 2 )
-	MCFG_PALETTE_INIT_OWNER(palm_state, palm)
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	PALETTE(config, "palette", FUNC(palm_state::palm_palette), 2);
 
 	/* audio hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -208,15 +208,14 @@ MACHINE_CONFIG_START(palm_state::palm)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
-	MCFG_DEVICE_ADD( MC68328_TAG, MC68328, 0 ) // lsi device
-	MCFG_MC68328_CPU("maincpu")
-	MCFG_MC68328_OUT_PORT_F_CB(WRITE8(*this, palm_state, palm_port_f_out)) // Port F Output
-	MCFG_MC68328_IN_PORT_C_CB(READ8(*this, palm_state, palm_port_c_in)) // Port C Input
-	MCFG_MC68328_IN_PORT_F_CB(READ8(*this, palm_state, palm_port_f_in)) // Port F Input
-	MCFG_MC68328_OUT_PWM_CB(WRITELINE("dac", dac_bit_interface, write))
-	MCFG_MC68328_OUT_SPIM_CB(WRITE16(*this, palm_state, palm_spim_out))
-	MCFG_MC68328_IN_SPIM_CB(READ16(*this, palm_state, palm_spim_in))
-	MCFG_MC68328_SPIM_XCH_TRIGGER_CB(WRITELINE(*this, palm_state, palm_spim_exchange))
+	MC68328(config, m_lsi, 0, "maincpu"); // on-board peripherals
+	m_lsi->out_port_f().set(FUNC(palm_state::palm_port_f_out));
+	m_lsi->in_port_c().set(FUNC(palm_state::palm_port_c_in));
+	m_lsi->in_port_f().set(FUNC(palm_state::palm_port_f_in));
+	m_lsi->out_pwm().set("dac", FUNC(dac_bit_interface::write));
+	m_lsi->out_spim().set(FUNC(palm_state::palm_spim_out));
+	m_lsi->in_spim().set(FUNC(palm_state::palm_spim_in));
+	m_lsi->spim_xch_trigger().set(FUNC(palm_state::palm_spim_exchange));
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( palm )
@@ -431,58 +430,53 @@ ROM_START( spt1740 )
 	ROM_RELOAD(0x000000, 0x004000)
 ROM_END
 
-MACHINE_CONFIG_START(palm_state::pilot1k)
+void palm_state::pilot1k(machine_config &config)
+{
 	palm(config);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
-	MCFG_RAM_EXTRA_OPTIONS("512K,1M,2M,4M,8M")
-MACHINE_CONFIG_END
+	RAM(config, RAM_TAG).set_default_size("128K").set_extra_options("512K,1M,2M,4M,8M");
+}
 
-MACHINE_CONFIG_START(palm_state::pilot5k)
+void palm_state::pilot5k(machine_config &config)
+{
 	palm(config);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
-	MCFG_RAM_EXTRA_OPTIONS("1M,2M,4M,8M")
-MACHINE_CONFIG_END
+	RAM(config, RAM_TAG).set_default_size("512K").set_extra_options("1M,2M,4M,8M");
+}
 
-MACHINE_CONFIG_START(palm_state::palmpro)
+void palm_state::palmpro(machine_config &config)
+{
 	palm(config);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1M")
-	MCFG_RAM_EXTRA_OPTIONS("2M,4M,8M")
-MACHINE_CONFIG_END
+	RAM(config, RAM_TAG).set_default_size("1M").set_extra_options("2M,4M,8M");
+}
 
-MACHINE_CONFIG_START(palm_state::palmiii)
+void palm_state::palmiii(machine_config &config)
+{
 	palm(config);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2M")
-	MCFG_RAM_EXTRA_OPTIONS("4M,8M")
-MACHINE_CONFIG_END
+	RAM(config, RAM_TAG).set_default_size("2M").set_extra_options("4M,8M");
+}
 
-MACHINE_CONFIG_START(palm_state::palmv)
+void palm_state::palmv(machine_config &config)
+{
 	palm(config);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2M")
-	MCFG_RAM_EXTRA_OPTIONS("4M,8M")
-MACHINE_CONFIG_END
+	RAM(config, RAM_TAG).set_default_size("2M").set_extra_options("4M,8M");
+}
 
-MACHINE_CONFIG_START(palm_state::palmvx)
+void palm_state::palmvx(machine_config &config)
+{
 	palm(config);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("8M")
-MACHINE_CONFIG_END
+	RAM(config, RAM_TAG).set_default_size("8M");
+}
 
 //    YEAR  NAME      PARENT   COMPAT  MACHINE  INPUT CLASS       INIT        COMPANY          FULLNAME               FLAGS
 COMP( 1996, pilot1k,  0,       0,      pilot1k, palm, palm_state, empty_init, "U.S. Robotics", "Pilot 1000",          MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )

@@ -819,35 +819,35 @@ MACHINE_CONFIG_START(savquest_state::savquest)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
 	pcat_common(config);
-	MCFG_DEVICE_REMOVE("rtc")
-	MCFG_DS12885_ADD("rtc")
+	DS12885(config.replace(), "rtc");
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
 	MCFG_PCI_BUS_LEGACY_DEVICE(0, DEVICE_SELF, savquest_state, intel82439tx_pci_r, intel82439tx_pci_w)
 	MCFG_PCI_BUS_LEGACY_DEVICE(7, DEVICE_SELF, savquest_state, intel82371ab_pci_r, intel82371ab_pci_w)
 	MCFG_PCI_BUS_LEGACY_DEVICE(13, DEVICE_SELF, savquest_state, pci_3dfx_r, pci_3dfx_w)
 
-	MCFG_IDE_CONTROLLER_32_ADD("ide", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("pic8259_2", pic8259_device, ir6_w))
+	ide_controller_32_device &ide(IDE_CONTROLLER_32(config, "ide").options(ata_devices, "hdd", nullptr, true));
+	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
 
-	MCFG_IDE_CONTROLLER_32_ADD("ide2", ata_devices, nullptr, nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("pic8259_2", pic8259_device, ir7_w))
+	ide_controller_32_device &ide2(IDE_CONTROLLER_32(config, "ide2").options(ata_devices, nullptr, nullptr, true));
+	ide2.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir7_w));
 
 	/* sound hardware */
 
-	MCFG_DEVICE_ADD("isa", ISA16, 0) // FIXME: determine ISA bus clock
-	MCFG_ISA16_CPU("maincpu")
+	isa16_device &isa(ISA16(config, "isa", 0)); // FIXME: determine ISA bus clock
+	isa.set_memspace("maincpu", AS_PROGRAM);
+	isa.set_iospace("maincpu", AS_IO);
 	MCFG_DEVICE_ADD("isa1", ISA16_SLOT, 0, "isa", savquest_isa16_cards, "sb16", false)
 
 	/* video hardware */
 	pcvideo_s3_vga(config);
 
-	MCFG_DEVICE_ADD("voodoo", VOODOO_2, STD_VOODOO_2_CLOCK)
-	MCFG_VOODOO_FBMEM(4)
-	MCFG_VOODOO_TMUMEM(4,4) /* this is the 12Mb card */
-	MCFG_VOODOO_SCREEN_TAG("screen")
-	MCFG_VOODOO_CPU_TAG("maincpu")
-	MCFG_VOODOO_VBLANK_CB(WRITELINE(*this, savquest_state,vblank_assert))
+	VOODOO_2(config, m_voodoo, STD_VOODOO_2_CLOCK);
+	m_voodoo->set_fbmem(4);
+	m_voodoo->set_tmumem(4, 4); /* this is the 12Mb card */
+	m_voodoo->set_screen_tag("screen");
+	m_voodoo->set_cpu_tag(m_maincpu);
+	m_voodoo->vblank_callback().set(FUNC(savquest_state::vblank_assert));
 MACHINE_CONFIG_END
 
 ROM_START( savquest )

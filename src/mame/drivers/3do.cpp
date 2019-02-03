@@ -160,15 +160,15 @@ MACHINE_CONFIG_START(_3do_state::_3do)
 	MCFG_DEVICE_ADD( m_maincpu, ARM7_BE, XTAL(50'000'000)/4 )
 	MCFG_DEVICE_PROGRAM_MAP( main_mem)
 
-	MCFG_NVRAM_ADD_1FILL(m_nvram)
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_x16", _3do_state, timer_x16_cb, attotime::from_hz(12000)) // TODO: timing
+	TIMER(config, "timer_x16").configure_periodic(FUNC(_3do_state::timer_x16_cb), attotime::from_hz(12000)); // TODO: timing
 
 	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_RAW_PARAMS( X2_CLOCK_NTSC / 2, 1592, 254, 1534, 263, 22, 262 )
 	MCFG_SCREEN_UPDATE_DRIVER(_3do_state, screen_update)
 
-	MCFG_CDROM_ADD("cdrom")
+	CDROM(config, "cdrom");
 MACHINE_CONFIG_END
 
 
@@ -178,15 +178,15 @@ MACHINE_CONFIG_START(_3do_state::_3do_pal)
 	MCFG_DEVICE_ADD(m_maincpu, ARM7_BE, XTAL(50'000'000)/4 )
 	MCFG_DEVICE_PROGRAM_MAP( main_mem)
 
-	MCFG_NVRAM_ADD_1FILL(m_nvram)
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_x16", _3do_state, timer_x16_cb, attotime::from_hz(12000)) // TODO: timing
+	TIMER(config, "timer_x16").configure_periodic(FUNC(_3do_state::timer_x16_cb), attotime::from_hz(12000)); // TODO: timing
 
 	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_RAW_PARAMS( X2_CLOCK_PAL / 2, 1592, 254, 1534, 263, 22, 262 ) // TODO: proper params
 	MCFG_SCREEN_UPDATE_DRIVER(_3do_state, screen_update)
 
-	MCFG_CDROM_ADD("cdrom")
+	CDROM(config, "cdrom");
 MACHINE_CONFIG_END
 
 #if 0
@@ -288,7 +288,7 @@ CONS( 1993, 3do_pal, 3do,    0,      _3do_pal,   3do,    _3do_state, empty_init,
 // Misc 3do Arcade games
 GAME( 1993, 3dobios, 0,       _3do,    3do,   _3do_state, empty_init, ROT0,     "The 3DO Company",      "3DO Bios",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IS_BIOS_ROOT )
 
-GAME( 199?, orbatak, 3dobios, _3do,    3do,   _3do_state, empty_init, ROT0,     "<unknown>",            "Orbatak (prototype)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1995, orbatak, 3dobios, _3do,    3do,   _3do_state, empty_init, ROT0,     "American Laser Games", "Orbatak (prototype)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 // Beavis and Butthead (prototype)
 
 

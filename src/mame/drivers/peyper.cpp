@@ -18,7 +18,6 @@
   Ator (Video Dens)
 
   Others not emulated (need roms):
-  Night Fever (Sonic)
   Storm (Sonic)
 
   Sir Lancelot (Peyper, 1994)
@@ -608,30 +607,30 @@ MACHINE_CONFIG_START(peyper_state::peyper)
 	MCFG_DEVICE_PROGRAM_MAP(peyper_map)
 	MCFG_DEVICE_IO_MAP(peyper_io)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(peyper_state, irq0_line_hold,  1250)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_peyper)
+	config.set_default_layout(layout_peyper);
 
 	/* Sound */
 	genpin_audio(config);
 	SPEAKER(config, "ayvol").front_center();
-	MCFG_DEVICE_ADD("ay1", AY8910, 2500000)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, peyper_state, p1a_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, peyper_state, p1b_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ayvol", 1.0)
-	MCFG_DEVICE_ADD("ay2", AY8910, 2500000)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, peyper_state, p2a_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, peyper_state, p2b_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ayvol", 1.0)
+	ay8910_device &ay1(AY8910(config, "ay1", 2500000));
+	ay1.port_a_write_callback().set(FUNC(peyper_state::p1a_w));
+	ay1.port_b_write_callback().set(FUNC(peyper_state::p1b_w));
+	ay1.add_route(ALL_OUTPUTS, "ayvol", 1.0);
+	ay8910_device &ay2(AY8910(config, "ay2", 2500000));
+	ay2.port_a_write_callback().set(FUNC(peyper_state::p2a_w));
+	ay2.port_b_write_callback().set(FUNC(peyper_state::p2b_w));
+	ay2.add_route(ALL_OUTPUTS, "ayvol", 1.0);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("i8279", I8279, 2500000)
-	MCFG_I8279_OUT_SL_CB(WRITE8(*this, peyper_state, col_w))             // scan SL lines
-	MCFG_I8279_OUT_DISP_CB(WRITE8(*this, peyper_state, disp_w))          // display A&B
-	MCFG_I8279_IN_RL_CB(READ8(*this, peyper_state, sw_r))                // kbd RL lines
-	MCFG_I8279_IN_SHIFT_CB(VCC)                                   // Shift key
-	MCFG_I8279_IN_CTRL_CB(VCC)
+	i8279_device &kbdc(I8279(config, "i8279", 2500000));
+	kbdc.out_sl_callback().set(FUNC(peyper_state::col_w));      // scan SL lines
+	kbdc.out_disp_callback().set(FUNC(peyper_state::disp_w));   // display A&B
+	kbdc.in_rl_callback().set(FUNC(peyper_state::sw_r));        // kbd RL lines
+	kbdc.in_shift_callback().set_constant(1);                   // Shift key
+	kbdc.in_ctrl_callback().set_constant(1);
 MACHINE_CONFIG_END
 
 // Not allowed to set up an array all at once, so we have this mess
@@ -756,9 +755,6 @@ void peyper_state::init_wolfman()
 }
 
 
-/*-------------------------------------------------------------------
-/ Night Fever (1979)
-/-------------------------------------------------------------------*/
 
 /*-------------------------------------------------------------------
 / Odin (1985)

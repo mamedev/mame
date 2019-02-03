@@ -15,9 +15,6 @@
 #pragma once
 
 
-#define MCFG_METERS_NUMBER(_number) \
-	downcast<meters_device &>(*device).set_number_meters(_number);
-
 class meters_device : public device_t
 {
 public:
@@ -27,7 +24,7 @@ public:
 
 	meters_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void set_number_meters(int number) { m_number_mtr = number; }
+	void set_number(int number) { m_number_mtr = number; }
 
 	int update(int id, int state);
 	int GetActivity(int id);

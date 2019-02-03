@@ -283,11 +283,11 @@ MACHINE_CONFIG_START(clshroad_state::firebatl)
 	MCFG_DEVICE_PROGRAM_MAP(clshroad_sound_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(clshroad_state, sound_timer_irq, 120)    /* periodic interrupt, don't know about the frequency */
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(INPUTLINE("audiocpu", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, clshroad_state, main_irq_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, clshroad_state, sound_irq_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, clshroad_state, flipscreen_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch"));
+	mainlatch.q_out_cb<0>().set_inputline(m_audiocpu, INPUT_LINE_RESET).invert();
+	mainlatch.q_out_cb<1>().set(FUNC(clshroad_state::main_irq_mask_w));
+	mainlatch.q_out_cb<3>().set(FUNC(clshroad_state::sound_irq_mask_w));
+	mainlatch.q_out_cb<4>().set(FUNC(clshroad_state::flipscreen_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -296,12 +296,10 @@ MACHINE_CONFIG_START(clshroad_state::firebatl)
 	MCFG_SCREEN_SIZE(0x120, 0x100)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x120-1, 0x0+16, 0x100-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(clshroad_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_firebatl)
-	MCFG_PALETTE_ADD("palette", 512+64*4)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(clshroad_state,firebatl)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_firebatl);
+	PALETTE(config, m_palette, FUNC(clshroad_state::firebatl_palette), 512+64*4, 256);
 
 	MCFG_VIDEO_START_OVERRIDE(clshroad_state,firebatl)
 
@@ -324,11 +322,11 @@ MACHINE_CONFIG_START(clshroad_state::clshroad)
 	//MCFG_DEVICE_VBLANK_INT_DRIVER("screen", clshroad_state,  irq0_line_hold)   /* IRQ, no NMI */
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(clshroad_state, sound_timer_irq, 60)    /* periodic interrupt, don't know about the frequency */
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // never writes here?
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, clshroad_state, main_irq_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, clshroad_state, sound_irq_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, clshroad_state, flipscreen_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch"));
+	mainlatch.q_out_cb<0>().set_nop(); // never writes here?
+	mainlatch.q_out_cb<1>().set(FUNC(clshroad_state::main_irq_mask_w));
+	mainlatch.q_out_cb<3>().set(FUNC(clshroad_state::sound_irq_mask_w));
+	mainlatch.q_out_cb<4>().set(FUNC(clshroad_state::flipscreen_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -337,12 +335,11 @@ MACHINE_CONFIG_START(clshroad_state::clshroad)
 	MCFG_SCREEN_SIZE(0x120, 0x100)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x120-1, 0x0+16, 0x100-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(clshroad_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_clshroad)
-	MCFG_PALETTE_ADD("palette", 256)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_clshroad);
+	PALETTE(config, m_palette, FUNC(clshroad_state::clshroad_palette), 256);
 
-	MCFG_PALETTE_INIT_OWNER(clshroad_state,clshroad)
 	MCFG_VIDEO_START_OVERRIDE(clshroad_state,clshroad)
 
 	/* sound hardware */

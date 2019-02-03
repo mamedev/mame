@@ -13,6 +13,7 @@
 
 #include "slot.h"
 #include "machine/wd_fdc.h"
+#include "imagedev/floppy.h"
 #include "formats/acorn_dsk.h"
 
 //**************************************************************************
@@ -35,13 +36,11 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	// electron_cart_interface overrides
-	virtual uint8_t read(address_space &space, offs_t offset, int infc, int infd, int romqa) override;
-	virtual void write(address_space &space, offs_t offset, uint8_t data, int infc, int infd, int romqa) override;
+	virtual uint8_t read(address_space &space, offs_t offset, int infc, int infd, int romqa, int oe, int oe2) override;
+	virtual void write(address_space &space, offs_t offset, uint8_t data, int infc, int infd, int romqa, int oe, int oe2) override;
 
 private:
 	DECLARE_WRITE8_MEMBER(wd1770_control_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	required_device<wd1770_device> m_fdc;

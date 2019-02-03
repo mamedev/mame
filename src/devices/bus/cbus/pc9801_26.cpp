@@ -18,8 +18,6 @@
 #include "speaker.h"
 
 
-#define MAIN_CLOCK_X1 XTAL(1'996'800)
-
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
@@ -38,16 +36,17 @@ WRITE_LINE_MEMBER(pc9801_26_device::sound_irq)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(pc9801_26_device::device_add_mconfig)
+void pc9801_26_device::device_add_mconfig(machine_config &config)
+{
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("opn", YM2203, MAIN_CLOCK_X1*2) // unknown clock / divider
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(*this, pc9801_26_device, sound_irq))
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, pc9801_26_device, opn_porta_r))
-	//MCFG_AY8910_PORT_B_READ_CB(READ8(*this, pc9801_state, opn_portb_r))
-	//MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, pc9801_state, opn_porta_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, pc9801_26_device, opn_portb_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_CONFIG_END
+	YM2203(config, m_opn, 15.9744_MHz_XTAL / 4); // divider not verified
+	m_opn->irq_handler().set(FUNC(pc9801_26_device::sound_irq));
+	m_opn->port_a_read_callback().set(FUNC(pc9801_26_device::opn_porta_r));
+	//m_opn->port_b_read_callback().set(FUNC(pc8801_state::opn_portb_r));
+	//m_opn->port_a_write_callback().set(FUNC(pc8801_state::opn_porta_w));
+	m_opn->port_b_write_callback().set(FUNC(pc9801_26_device::opn_portb_w));
+	m_opn->add_route(ALL_OUTPUTS, "mono", 1.00);
+}
 
 // to load a different bios for slots:
 // -cbus0 pc9801_26,bios=N
@@ -147,7 +146,7 @@ READ8_MEMBER(pc9801_26_device::opn_r)
 {
 	if((offset & 1) == 0)
 	{
-		return offset & 4 ? 0xff : m_opn->read(space, offset >> 1);
+		return offset & 4 ? 0xff : m_opn->read(offset >> 1);
 	}
 	else // odd
 	{
@@ -160,7 +159,7 @@ READ8_MEMBER(pc9801_26_device::opn_r)
 WRITE8_MEMBER(pc9801_26_device::opn_w)
 {
 	if((offset & 5) == 0)
-		m_opn->write(space, offset >> 1, data);
+		m_opn->write(offset >> 1, data);
 	else // odd
 		printf("PC9801-26: Write to undefined port [%02x] %02x\n",offset+0x188,data);
 }

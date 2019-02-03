@@ -283,80 +283,82 @@ static GFXDECODE_START( gfx_osborne1 )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(osborne1_state::osborne1)
-	MCFG_DEVICE_ADD(m_maincpu, Z80, MAIN_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(osborne1_mem)
-	MCFG_DEVICE_OPCODES_MAP(osborne1_op)
-	MCFG_DEVICE_IO_MAP(osborne1_io)
-	MCFG_Z80_SET_IRQACK_CALLBACK(WRITELINE(*this, osborne1_state, irqack_w))
+void osborne1_state::osborne1(machine_config &config)
+{
+	Z80(config, m_maincpu, MAIN_CLOCK/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &osborne1_state::osborne1_mem);
+	m_maincpu->set_addrmap(AS_OPCODES, &osborne1_state::osborne1_op);
+	m_maincpu->set_addrmap(AS_IO, &osborne1_state::osborne1_io);
+	m_maincpu->irqack_cb().set(FUNC(osborne1_state::irqack_w));
 
-	MCFG_SCREEN_ADD_MONOCHROME(m_screen, RASTER, rgb_t::green())
-	MCFG_SCREEN_UPDATE_DRIVER(osborne1_state, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK, 1024, 0, 104*8, 260, 0, 24*10)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_osborne1)
-	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_color(rgb_t::green());
+	m_screen->set_screen_update(FUNC(osborne1_state::screen_update));
+	m_screen->set_raw(MAIN_CLOCK, 1024, 0, 104*8, 260, 0, 24*10);
+	m_screen->set_palette("palette");
+
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_osborne1);
+	PALETTE(config, "palette", palette_device::MONOCHROME_HIGHLIGHT);
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(m_speaker, SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	MCFG_DEVICE_ADD(m_pia0, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(m_ieee, ieee488_device, dio_r))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, osborne1_state, ieee_pia_pb_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(m_ieee, ieee488_device, host_dio_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, osborne1_state, ieee_pia_pb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(m_ieee, ieee488_device, host_ifc_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(m_ieee, ieee488_device, host_ren_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, osborne1_state, ieee_pia_irq_a_func))
+	PIA6821(config, m_pia0);
+	m_pia0->readpa_handler().set(m_ieee, FUNC(ieee488_device::dio_r));
+	m_pia0->readpb_handler().set(FUNC(osborne1_state::ieee_pia_pb_r));
+	m_pia0->writepa_handler().set(m_ieee, FUNC(ieee488_device::host_dio_w));
+	m_pia0->writepb_handler().set(FUNC(osborne1_state::ieee_pia_pb_w));
+	m_pia0->ca2_handler().set(m_ieee, FUNC(ieee488_device::host_ifc_w));
+	m_pia0->cb2_handler().set(m_ieee, FUNC(ieee488_device::host_ren_w));
+	m_pia0->irqa_handler().set(FUNC(osborne1_state::ieee_pia_irq_a_func));
 
-	MCFG_IEEE488_BUS_ADD()
-	MCFG_IEEE488_SRQ_CALLBACK(WRITELINE(m_pia0, pia6821_device, ca2_w))
+	IEEE488(config, m_ieee, 0);
+	m_ieee->srq_callback().set(m_pia0, FUNC(pia6821_device::ca2_w));
 
-	MCFG_DEVICE_ADD(m_pia1, PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, osborne1_state, video_pia_port_a_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, osborne1_state, video_pia_port_b_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, osborne1_state, video_pia_out_cb2_dummy))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, osborne1_state, video_pia_irq_a_func))
+	PIA6821(config, m_pia1);
+	m_pia1->writepa_handler().set(FUNC(osborne1_state::video_pia_port_a_w));
+	m_pia1->writepb_handler().set(FUNC(osborne1_state::video_pia_port_b_w));
+	m_pia1->cb2_handler().set(FUNC(osborne1_state::video_pia_out_cb2_dummy));
+	m_pia1->irqa_handler().set(FUNC(osborne1_state::video_pia_irq_a_func));
 
-	MCFG_DEVICE_ADD(m_acia, ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, osborne1_state, serial_acia_irq_func))
+	ACIA6850(config, m_acia);
+	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_acia->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
+	m_acia->irq_handler().set(FUNC(osborne1_state::serial_acia_irq_func));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_acia, acia6850_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_acia, acia6850_device, write_dcd))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_acia, acia6850_device, write_cts))
-	MCFG_RS232_RI_HANDLER(WRITELINE(m_pia1, pia6821_device, ca2_w))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(m_acia, FUNC(acia6850_device::write_rxd));
+	rs232.dcd_handler().set(m_acia, FUNC(acia6850_device::write_dcd));
+	rs232.cts_handler().set(m_acia, FUNC(acia6850_device::write_cts));
+	rs232.ri_handler().set(m_pia1, FUNC(pia6821_device::ca2_w));
 
-	MCFG_DEVICE_ADD(m_fdc, MB8877, MAIN_CLOCK/16)
-	MCFG_WD_FDC_FORCE_READY
-	MCFG_FLOPPY_DRIVE_ADD(m_floppy0, osborne1_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(m_floppy1, osborne1_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
+	MB8877(config, m_fdc, MAIN_CLOCK/16);
+	m_fdc->set_force_ready(true);
+	FLOPPY_CONNECTOR(config, m_floppy0, osborne1_floppies, "525ssdd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, osborne1_floppies, "525ssdd", floppy_image_device::default_floppy_formats);
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("68K")    // 64kB main RAM and 4kbit video attribute RAM
+	RAM(config, RAM_TAG).set_default_size("68K"); // 64kB main RAM and 4kbit video attribute RAM
 
-	MCFG_SOFTWARE_LIST_ADD("flop_list","osborne1")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "flop_list").set_original("osborne1");
+}
 
-MACHINE_CONFIG_START(osborne1nv_state::osborne1nv)
+void osborne1nv_state::osborne1nv(machine_config &config)
+{
 	osborne1(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(osborne1nv_io)
+	m_maincpu->set_addrmap(AS_IO, &osborne1nv_state::osborne1nv_io);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_NO_PALETTE
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
+	m_screen->set_palette(finder_base::DUMMY_TAG);
+	m_screen->set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
-	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", XTAL(12'288'000)/8)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(osborne1nv_state, crtc_update_row)
-	MCFG_MC6845_ADDR_CHANGED_CB(osborne1nv_state, crtc_update_addr_changed)
-MACHINE_CONFIG_END
+	sy6545_1_device &crtc(SY6545_1(config, "crtc", XTAL(12'288'000)/8));
+	crtc.set_screen(m_screen);
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.set_update_row_callback(FUNC(osborne1nv_state::crtc_update_row), this);
+	crtc.set_on_update_addr_change_callback(FUNC(osborne1nv_state::crtc_update_addr_changed), this);
+}
 
 
 ROM_START( osborne1 )
@@ -379,11 +381,11 @@ ROM_START( osborne1 )
 	ROMX_LOAD( "3a10082-00rev-e.ud11",   0x0000, 0x1000, CRC(c0596b14) SHA1(ee6a9cc9be3ddc5949d3379351c1d58a175ce9ac), ROM_BIOS(6) )
 
 	ROM_REGION( 0x800, "chargen", 0 )
-	ROMX_LOAD( "char.ua15",      0x0000, 0x800, CRC(5297C109) SHA1(e1a59d87edd66e6c226102cb0688e9cb74dbb594), ROM_BIOS(0) ) // this is CHRROM from v1.4 BIOS MB
-	ROMX_LOAD( "char.ua15",      0x0000, 0x800, CRC(5297C109) SHA1(e1a59d87edd66e6c226102cb0688e9cb74dbb594), ROM_BIOS(1) )
-	ROMX_LOAD( "char.ua15",      0x0000, 0x800, CRC(5297C109) SHA1(e1a59d87edd66e6c226102cb0688e9cb74dbb594), ROM_BIOS(2) )
-	ROMX_LOAD( "char.ua15",      0x0000, 0x800, CRC(5297C109) SHA1(e1a59d87edd66e6c226102cb0688e9cb74dbb594), ROM_BIOS(3) )
-	ROMX_LOAD( "char.ua15",      0x0000, 0x800, CRC(5297C109) SHA1(e1a59d87edd66e6c226102cb0688e9cb74dbb594), ROM_BIOS(4) )
+	ROMX_LOAD( "char.ua15",      0x0000, 0x800, CRC(5297c109) SHA1(e1a59d87edd66e6c226102cb0688e9cb74dbb594), ROM_BIOS(0) ) // this is CHRROM from v1.4 BIOS MB
+	ROMX_LOAD( "char.ua15",      0x0000, 0x800, CRC(5297c109) SHA1(e1a59d87edd66e6c226102cb0688e9cb74dbb594), ROM_BIOS(1) )
+	ROMX_LOAD( "char.ua15",      0x0000, 0x800, CRC(5297c109) SHA1(e1a59d87edd66e6c226102cb0688e9cb74dbb594), ROM_BIOS(2) )
+	ROMX_LOAD( "char.ua15",      0x0000, 0x800, CRC(5297c109) SHA1(e1a59d87edd66e6c226102cb0688e9cb74dbb594), ROM_BIOS(3) )
+	ROMX_LOAD( "char.ua15",      0x0000, 0x800, CRC(5297c109) SHA1(e1a59d87edd66e6c226102cb0688e9cb74dbb594), ROM_BIOS(4) )
 	ROMX_LOAD( "7a3007-00.ud15", 0x0000, 0x800, CRC(6c1eab0d) SHA1(b04459d377a70abc9155a5486003cb795342c801), ROM_BIOS(5) )
 	ROMX_LOAD( "7a3007-00.ud15", 0x0000, 0x800, CRC(6c1eab0d) SHA1(b04459d377a70abc9155a5486003cb795342c801), ROM_BIOS(6) )
 ROM_END

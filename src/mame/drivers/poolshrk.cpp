@@ -207,12 +207,12 @@ static GFXDECODE_START( gfx_poolshrk )
 GFXDECODE_END
 
 
-PALETTE_INIT_MEMBER(poolshrk_state, poolshrk)
+void poolshrk_state::poolshrk_palette(palette_device &palette) const
 {
-	palette.set_pen_color(0,rgb_t(0x7F, 0x7F, 0x7F));
-	palette.set_pen_color(1,rgb_t(0xFF, 0xFF, 0xFF));
-	palette.set_pen_color(2,rgb_t(0x7F, 0x7F, 0x7F));
-	palette.set_pen_color(3,rgb_t(0x00, 0x00, 0x00));
+	palette.set_pen_color(0, rgb_t(0x7f, 0x7f, 0x7f));
+	palette.set_pen_color(1, rgb_t(0xff, 0xff, 0xff));
+	palette.set_pen_color(2, rgb_t(0x7f, 0x7f, 0x7f));
+	palette.set_pen_color(3, rgb_t(0x00, 0x00, 0x00));
 }
 
 
@@ -223,7 +223,7 @@ MACHINE_CONFIG_START(poolshrk_state::poolshrk)
 	MCFG_DEVICE_PROGRAM_MAP(poolshrk_cpu_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", poolshrk_state,  irq0_line_assert)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -231,11 +231,10 @@ MACHINE_CONFIG_START(poolshrk_state::poolshrk)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(1, 255, 24, 255)
 	MCFG_SCREEN_UPDATE_DRIVER(poolshrk_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_poolshrk)
-	MCFG_PALETTE_ADD("palette", 4)
-	MCFG_PALETTE_INIT_OWNER(poolshrk_state, poolshrk)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_poolshrk)
+	PALETTE(config, m_palette, FUNC(poolshrk_state::poolshrk_palette), 4);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

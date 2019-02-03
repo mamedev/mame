@@ -471,10 +471,10 @@ MACHINE_CONFIG_START(mjsenpu_state::mjsenpu)
 	MCFG_DEVICE_IO_MAP(mjsenpu_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mjsenpu_state,  irq0_line_hold)
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	// more likely coins out?
-	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(50), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH)
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(50), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

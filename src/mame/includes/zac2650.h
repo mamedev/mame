@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Mike Coates
+#ifndef MAME_INCLUDES_ZAC2650_H
+#define MAME_INCLUDES_ZAC2650_H
+
+#pragma once
+
 #include "machine/s2636.h"
 #include "emupal.h"
 #include "screen.h"
@@ -7,17 +12,21 @@
 class zac2650_state : public driver_device
 {
 public:
-	zac2650_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	zac2650_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_s2636(*this, "s2636"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_videoram(*this, "videoram"),
-		m_s2636_0_ram(*this, "s2636_0_ram") { }
+		m_s2636_0_ram(*this, "s2636_0_ram")
+	{ }
 
 	void tinvader(machine_config &config);
+
+protected:
+	virtual void video_start() override;
 
 private:
 	/* devices */
@@ -43,11 +52,12 @@ private:
 	DECLARE_WRITE8_MEMBER(zac_s2636_w);
 	DECLARE_READ8_MEMBER(tinvader_port_0_r);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(zac2650);
+	void zac2650_palette(palette_device &palette) const;
 	uint32_t screen_update_tinvader(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int SpriteCollision(int first,int second);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void main_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_ZAC2650_H

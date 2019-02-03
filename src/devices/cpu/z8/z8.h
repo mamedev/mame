@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Curt Coder
+// copyright-holders:Curt Coder, AJR
 /**********************************************************************
 
     Zilog Z8 Single-Chip MCU emulation
@@ -12,60 +12,33 @@
 #pragma once
 
 
-#define MCFG_Z8_PORT_P0_READ_CB(_devcb) \
-	devcb = &downcast<z8_device &>(*device).set_input_cb(0, DEVCB_##_devcb);
-
-#define MCFG_Z8_PORT_P1_READ_CB(_devcb) \
-	devcb = &downcast<z8_device &>(*device).set_input_cb(1, DEVCB_##_devcb);
-
-#define MCFG_Z8_PORT_P2_READ_CB(_devcb) \
-	devcb = &downcast<z8_device &>(*device).set_input_cb(2, DEVCB_##_devcb);
-
-#define MCFG_Z8_PORT_P3_READ_CB(_devcb) \
-	devcb = &downcast<z8_device &>(*device).set_input_cb(3, DEVCB_##_devcb);
-
-
-#define MCFG_Z8_PORT_P0_WRITE_CB(_devcb) \
-	devcb = &downcast<z8_device &>(*device).set_output_cb(0, DEVCB_##_devcb);
-
-#define MCFG_Z8_PORT_P1_WRITE_CB(_devcb) \
-	devcb = &downcast<z8_device &>(*device).set_output_cb(1, DEVCB_##_devcb);
-
-#define MCFG_Z8_PORT_P2_WRITE_CB(_devcb) \
-	devcb = &downcast<z8_device &>(*device).set_output_cb(2, DEVCB_##_devcb);
-
-#define MCFG_Z8_PORT_P3_WRITE_CB(_devcb) \
-	devcb = &downcast<z8_device &>(*device).set_output_cb(3, DEVCB_##_devcb);
-
-
 class z8_device : public cpu_device
 {
 public:
 	// configuration
-	template<class Object> devcb_base &set_input_cb(int port, Object &&object)
-	{
-		assert(port >= 0 && port < 4);
-		return m_input_cb[port].set_callback(std::forward<Object>(object));
-	}
-	template<class Object> devcb_base &set_output_cb(int port, Object &&object)
-	{
-		assert(port >= 0 && port < 4);
-		return m_output_cb[port].set_callback(std::forward<Object>(object));
-	}
+	auto p0_in_cb() { return m_input_cb[0].bind(); }
+	auto p1_in_cb() { return m_input_cb[1].bind(); }
+	auto p2_in_cb() { return m_input_cb[2].bind(); }
+	auto p3_in_cb() { return m_input_cb[3].bind(); }
+	auto p0_out_cb() { return m_output_cb[0].bind(); }
+	auto p1_out_cb() { return m_output_cb[1].bind(); }
+	auto p2_out_cb() { return m_output_cb[2].bind(); }
+	auto p3_out_cb() { return m_output_cb[3].bind(); }
 
 protected:
 	enum
 	{
 		Z8_PC, Z8_SP, Z8_RP,
 		Z8_IMR, Z8_IRQ, Z8_IPR,
+		Z8_P0, Z8_P1, Z8_P2, Z8_P3,
 		Z8_P01M, Z8_P3M, Z8_P2M,
-		Z8_PRE0, Z8_T0, Z8_PRE1, Z8_T1, Z8_TMR,
+		Z8_PRE0, Z8_T0, Z8_PRE1, Z8_T1, Z8_TMR, Z8_TOUT,
 
 		Z8_R0, Z8_R1, Z8_R2, Z8_R3, Z8_R4, Z8_R5, Z8_R6, Z8_R7, Z8_R8, Z8_R9, Z8_R10, Z8_R11, Z8_R12, Z8_R13, Z8_R14, Z8_R15
 	};
 
 	// construction/destruction
-	z8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t rom_size, address_map_constructor map);
+	z8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t rom_size, bool preprogrammed);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -92,16 +65,19 @@ protected:
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	void program_2kb(address_map &map);
-	void program_4kb(address_map &map);
+	void program_map(address_map &map);
+	void preprogrammed_map(address_map &map);
+	void register_map(address_map &map);
 
 private:
 	address_space_config m_program_config;
 	address_space_config m_data_config;
+	address_space_config m_register_config;
 
 	address_space *m_program;
 	memory_access_cache<0, 0, ENDIANNESS_BIG> *m_cache;
 	address_space *m_data;
+	address_space *m_regs;
 
 	// callbacks
 	devcb_read8 m_input_cb[4];
@@ -109,46 +85,121 @@ private:
 
 	uint32_t m_rom_size;
 
-	/* registers */
-	uint16_t m_pc;              /* program counter */
-	uint16_t m_ppc;             /* program counter at last opcode fetch */
-	uint8_t m_r[256];           /* register file */
-	uint8_t m_input[4];         /* port input latches */
-	uint8_t m_output[4];        /* port output latches */
-	uint8_t m_t0;               /* timer 0 current count */
-	uint8_t m_t1;               /* timer 1 current count */
+	// basic registers
+	uint16_t m_pc;              // program counter
+	uint16_t m_ppc;             // program counter at last opcode fetch
+	PAIR16 m_sp;                // stack pointer (8-bit for internal stack, 16-bit for external stack)
+	uint8_t m_rp;               // register pointer
+	uint8_t m_flags;            // condition flags
+	uint8_t m_imr;              // interrupt mask
+	uint8_t m_irq;              // interrupt request
+	uint8_t m_ipr;              // interrupt priority
 
-	/* fake registers */
-	uint16_t m_fake_sp;         /* fake stack pointer */
-	uint8_t m_fake_r[16];       /* fake working registers */
+	// port registers
+	uint8_t m_input[4];         // port input latches
+	uint8_t m_output[4];        // port output latches
+	uint8_t m_p01m;             // port 0/1 mode
+	uint8_t m_p2m;              // port 2 mode
+	uint8_t m_p3m;              // port 3 mode
+	uint8_t m_p3_output;        // port 3 output (alternate functions included)
 
-	/* interrupts */
-	int m_irq_line[4];          /* IRQ line state */
+	// timer registers
+	uint8_t m_tmr;              // timer mode
+	uint8_t m_t[2];             // initial values
+	uint8_t m_count[2];         // current counts
+	uint8_t m_pre[2];           // prescalers
+	uint8_t m_pre_count[2];     // prescaler counts
+	bool m_tout;                // toggle output
+
+	// serial transmitter registers
+	uint16_t m_transmit_sr;     // transmitter shift register
+	uint8_t m_transmit_count;   // counter for transmitter timing
+	bool m_transmit_parity;     // transmitter parity calculation
+
+	// serial receiver registers
+	uint8_t m_receive_buffer;   // received character
+	uint16_t m_receive_sr;      // receiver shift register
+	uint8_t m_receive_count;    // counter for receiver timing
+	bool m_receive_parity;      // receiver parity calculation
+	bool m_receive_started;     // true if receiver has seen start bit
+
+	// fake registers
+	uint8_t m_fake_r[16];       // fake working registers
+
+	// interrupts
+	int m_irq_line[4];
 	bool m_irq_taken;
+	bool m_irq_initialized;     // IRQ must be unlocked by EI after reset
 
-	/* execution logic */
-	int m_icount;             /* instruction counter */
+	// execution logic
+	int32_t m_icount;           // instruction counter
 
-	/* timers */
-	emu_timer *m_t0_timer;
-	emu_timer *m_t1_timer;
+	// timers
+	emu_timer *m_internal_timer[2];
 
-	TIMER_CALLBACK_MEMBER( t0_tick );
-	TIMER_CALLBACK_MEMBER( t1_tick );
+	bool get_serial_in();
+	void sio_receive();
+	void sio_transmit();
 
+	template <int T> void timer_start();
+	template <int T> void timer_stop();
+	template <int T> void timer_end();
+	void t1_trigger();
+	void tout_init();
+	void tout_toggle();
+
+	template <int T> TIMER_CALLBACK_MEMBER(timeout);
+
+	void request_interrupt(int irq);
 	void take_interrupt(int irq);
 	void process_interrupts();
+
+	uint8_t p0_read();
+	void p0_write(uint8_t data);
+	uint8_t p1_read();
+	void p1_write(uint8_t data);
+	uint8_t p2_read();
+	void p2_write(uint8_t data);
+	uint8_t p3_read();
+	void p3_write(uint8_t data);
+	void p3_update_output();
+	uint8_t sio_read();
+	void sio_write(uint8_t data);
+	uint8_t tmr_read();
+	void tmr_write(uint8_t data);
+	uint8_t t0_read();
+	void t0_write(uint8_t data);
+	uint8_t t1_read();
+	void t1_write(uint8_t data);
+	void pre0_write(uint8_t data);
+	void pre1_write(uint8_t data);
+	void p01m_write(uint8_t data);
+	void p2m_write(uint8_t data);
+	void p3m_write(uint8_t data);
+	void ipr_write(uint8_t data);
+	uint8_t irq_read();
+	void irq_write(uint8_t data);
+	uint8_t imr_read();
+	void imr_write(uint8_t data);
+	uint8_t flags_read();
+	void flags_write(uint8_t data);
+	uint8_t rp_read();
+	void rp_write(uint8_t data);
+	uint8_t sph_read();
+	void sph_write(uint8_t data);
+	uint8_t spl_read();
+	void spl_write(uint8_t data);
 
 	inline uint16_t mask_external_address(uint16_t addr);
 	inline uint8_t fetch();
 	inline uint8_t fetch_opcode();
 	inline uint16_t fetch_word();
-	inline uint8_t register_read(uint8_t offset);
+	inline uint8_t register_read(uint8_t offset) { return m_regs->read_byte(offset); }
 	inline uint16_t register_pair_read(uint8_t offset);
-	inline void register_write(uint8_t offset, uint8_t data);
+	inline void register_write(uint8_t offset, uint8_t data) { m_regs->write_byte(offset, data); }
 	inline void register_pair_write(uint8_t offset, uint16_t data);
-	inline uint8_t get_working_register(int offset);
-	inline uint8_t get_register(uint8_t offset);
+	inline uint8_t get_working_register(int offset) const;
+	inline uint8_t get_register(uint8_t offset) const;
 	inline uint8_t get_intermediate_register(int offset);
 	inline void stack_push_byte(uint8_t src);
 	inline void stack_push_word(uint16_t src);
@@ -163,8 +214,8 @@ private:
 	inline void load_to_memory_autoinc(address_space &space);
 	inline void pop(uint8_t dst);
 	inline void push(uint8_t src);
-	inline void add_carry(uint8_t dst, int8_t src);
-	inline void add(uint8_t dst, int8_t src);
+	inline void add_carry(uint8_t dst, uint8_t src);
+	inline void add(uint8_t dst, uint8_t src);
 	inline void compare(uint8_t dst, uint8_t src);
 	inline void decimal_adjust(uint8_t dst);
 	inline void decrement(uint8_t dst);
@@ -179,7 +230,7 @@ private:
 	inline void _xor(uint8_t dst, uint8_t src);
 	inline void call(uint16_t dst);
 	inline void jump(uint16_t dst);
-	inline int check_condition_code(int cc);
+	inline bool check_condition_code(int cc);
 	inline void test_complement_under_mask(uint8_t dst, uint8_t src);
 	inline void test_under_mask(uint8_t dst, uint8_t src);
 	inline void rotate_left(uint8_t dst);
@@ -353,10 +404,30 @@ public:
 };
 
 
+class z8671_device : public z8_device
+{
+public:
+	z8671_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	const tiny_rom_entry *device_rom_region() const override;
+};
+
+
 class z8681_device : public z8_device
 {
 public:
 	z8681_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+
+class z8682_device : public z8_device
+{
+public:
+	z8682_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	const tiny_rom_entry *device_rom_region() const override;
 };
 
 
@@ -369,7 +440,13 @@ DECLARE_DEVICE_TYPE(UB8830D, ub8830d_device)
 // Zilog Z8611
 DECLARE_DEVICE_TYPE(Z8611, z8611_device)
 
+// Zilog Z8671 BASIC/DEBUG interpreter
+DECLARE_DEVICE_TYPE(Z8671, z8671_device)
+
 // Zilog Z8681 ROMless
 DECLARE_DEVICE_TYPE(Z8681, z8681_device)
+
+// Zilog Z8682 ROMless (boot to 0812H)
+DECLARE_DEVICE_TYPE(Z8682, z8682_device)
 
 #endif // MAME_CPU_Z8_Z8_H

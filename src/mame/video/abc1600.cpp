@@ -54,8 +54,8 @@ void abc1600_mover_device::vram_map(address_map &map)
 
 void abc1600_mover_device::crtc_map(address_map &map)
 {
-	map(0x00, 0x00).mirror(0xfe).rw(SY6845E_TAG, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
-	map(0x01, 0x01).mirror(0xfe).rw(SY6845E_TAG, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x00, 0x00).mirror(0xfe).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0x01, 0x01).mirror(0xfe).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 }
 
 void abc1600_mover_device::iowr0_map(address_map &map)
@@ -200,19 +200,20 @@ MC6845_ON_UPDATE_ADDR_CHANGED( abc1600_mover_device::crtc_update )
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(abc1600_mover_device::device_add_mconfig)
-	MCFG_DEFAULT_LAYOUT(layout_abc1600)
+	config.set_default_layout(layout_abc1600);
 
 	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
 	MCFG_SCREEN_UPDATE_DRIVER(abc1600_mover_device, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(64'000'000), 0x3e0, 0, 0x300, 0x433, 0, 0x400)
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
-	MCFG_MC6845_ADD(SY6845E_TAG, SY6845E, SCREEN_TAG, XTAL(64'000'000)/32)
-	MCFG_MC6845_SHOW_BORDER_AREA(true)
-	MCFG_MC6845_CHAR_WIDTH(32)
-	MCFG_MC6845_UPDATE_ROW_CB(abc1600_mover_device, crtc_update_row)
-	MCFG_MC6845_ADDR_CHANGED_CB(abc1600_mover_device, crtc_update)
+	SY6845E(config, m_crtc, XTAL(64'000'000)/32);
+	m_crtc->set_screen(SCREEN_TAG);
+	m_crtc->set_show_border_area(true);
+	m_crtc->set_char_width(32);
+	m_crtc->set_update_row_callback(FUNC(abc1600_mover_device::crtc_update_row), this);
+	m_crtc->set_on_update_addr_change_callback(FUNC(abc1600_mover_device::crtc_update), this);
 MACHINE_CONFIG_END
 
 

@@ -294,8 +294,8 @@ MACHINE_CONFIG_START(mz80_state::mz80k)
 	MCFG_SCREEN_UPDATE_DRIVER(mz80_state, screen_update_mz80k)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mz80k)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	GFXDECODE(config, "gfxdecode", "palette", gfx_mz80k);
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* Audio */
 	SPEAKER(config, "mono").front_center();
@@ -303,38 +303,40 @@ MACHINE_CONFIG_START(mz80_state::mz80k)
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, mz80_state, mz80k_8255_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, mz80_state, mz80k_8255_portb_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, mz80_state, mz80k_8255_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mz80_state, mz80k_8255_portc_w))
+	I8255(config, m_ppi);
+	m_ppi->out_pa_callback().set(FUNC(mz80_state::mz80k_8255_porta_w));
+	m_ppi->in_pb_callback().set(FUNC(mz80_state::mz80k_8255_portb_r));
+	m_ppi->in_pc_callback().set(FUNC(mz80_state::mz80k_8255_portc_r));
+	m_ppi->out_pc_callback().set(FUNC(mz80_state::mz80k_8255_portc_w));
 
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(8'000'000)/4)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, mz80_state, pit_out0_changed))
-	MCFG_PIT8253_CLK1(XTAL(8'000'000)/256)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("pit8253", pit8253_device, write_clk2))
-	MCFG_PIT8253_CLK2(0)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, mz80_state, pit_out2_changed))
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(XTAL(8'000'000)/4);
+	m_pit->out_handler<0>().set(FUNC(mz80_state::pit_out0_changed));
+	m_pit->set_clk<1>(XTAL(8'000'000)/256);
+	m_pit->out_handler<1>().set(m_pit, FUNC(pit8253_device::write_clk2));
+	m_pit->set_clk<2>(0);
+	m_pit->out_handler<2>().set(FUNC(mz80_state::pit_out2_changed));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("tempo", mz80_state, ne555_tempo_callback, attotime::from_hz(34))
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(mz700_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
+	TIMER(config, "tempo").configure_periodic(FUNC(mz80_state::ne555_tempo_callback), attotime::from_hz(34));
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(mz700_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(mz80_state::mz80kj)
+void mz80_state::mz80kj(machine_config &config)
+{
 	mz80k(config);
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(mz80_state, screen_update_mz80kj)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_mz80kj)
-MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(mz80_state::mz80a)
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(mz80_state::screen_update_mz80kj));
+	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_mz80kj);
+}
+
+void mz80_state::mz80a(machine_config &config)
+{
 	mz80k(config);
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(mz80_state, screen_update_mz80a)
-MACHINE_CONFIG_END
+
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(mz80_state::screen_update_mz80a));
+}
 
 
 ROM_START( mz80k )

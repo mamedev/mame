@@ -300,7 +300,7 @@ READ16_MEMBER( sun2_state::tl_mmu_r )
 		switch ((m_pagemap[entry] >> 22) & 7)
 		{
 			case 0: // type 0 space
-				return m_type0space->read16(space, tmp, mem_mask);
+				return m_type0space->read16(tmp, mem_mask);
 
 			case 1: // type 1 space
 				// EPROM space is special: the MMU has a trap door
@@ -326,13 +326,13 @@ READ16_MEMBER( sun2_state::tl_mmu_r )
 				}
 
 				//printf("read device space @ %x\n", tmp<<1);
-				return m_type1space->read16(space, tmp, mem_mask);
+				return m_type1space->read16(tmp, mem_mask);
 
 			case 2: // type 2 space
-				return m_type2space->read16(space, tmp, mem_mask);
+				return m_type2space->read16(tmp, mem_mask);
 
 			case 3: // type 3 space
-				return m_type3space->read16(space, tmp, mem_mask);
+				return m_type3space->read16(tmp, mem_mask);
 		}
 	}
 	else
@@ -445,20 +445,20 @@ WRITE16_MEMBER( sun2_state::tl_mmu_w )
 		switch ((m_pagemap[entry] >> 22) & 7)
 		{
 			case 0: // type 0
-				m_type0space->write16(space, tmp, data, mem_mask);
+				m_type0space->write16(tmp, data, mem_mask);
 				return;
 
 			case 1: // type 1
 				//printf("write device space @ %x\n", tmp<<1);
-				m_type1space->write16(space, tmp, data, mem_mask);
+				m_type1space->write16(tmp, data, mem_mask);
 				return;
 
 			case 2: // type 2
-				m_type2space->write16(space, tmp, data, mem_mask);
+				m_type2space->write16(tmp, data, mem_mask);
 				return;
 
 			case 3: // type 3
-				m_type3space->write16(space, tmp, data, mem_mask);
+				m_type3space->write16(tmp, data, mem_mask);
 				return;
 		}
 	}
@@ -616,38 +616,19 @@ MACHINE_CONFIG_START(sun2_state::sun2vme)
 	MCFG_DEVICE_ADD("maincpu", M68010, 19.6608_MHz_XTAL / 2) // or 24_MHz_XTAL / 2 by jumper setting
 	MCFG_DEVICE_PROGRAM_MAP(sun2_mem)
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2M")
-	MCFG_RAM_EXTRA_OPTIONS("4M,6M,8M")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
+	RAM(config, RAM_TAG).set_default_size("2M").set_extra_options("4M,6M,8M").set_default_value(0x00);
 
 	// MMU Type 0 device space
-	MCFG_DEVICE_ADD("type0", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(vmetype0space_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000000)
+	ADDRESS_MAP_BANK(config, "type0").set_map(&sun2_state::vmetype0space_map).set_options(ENDIANNESS_BIG, 16, 32, 0x1000000);
 
 	// MMU Type 1 device space
-	MCFG_DEVICE_ADD("type1", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(vmetype1space_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000000)
+	ADDRESS_MAP_BANK(config, "type1").set_map(&sun2_state::vmetype1space_map).set_options(ENDIANNESS_BIG, 16, 32, 0x1000000);
 
 	// MMU Type 2 device space
-	MCFG_DEVICE_ADD("type2", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(vmetype2space_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000000)
+	ADDRESS_MAP_BANK(config, "type2").set_map(&sun2_state::vmetype2space_map).set_options(ENDIANNESS_BIG, 16, 32, 0x1000000);
 
 	// MMU Type 3 device space
-	MCFG_DEVICE_ADD("type3", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(vmetype3space_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000000)
+	ADDRESS_MAP_BANK(config, "type3").set_map(&sun2_state::vmetype3space_map).set_options(ENDIANNESS_BIG, 16, 32, 0x1000000);
 
 	MCFG_SCREEN_ADD("bwtwo", RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(sun2_state, bw2_update)
@@ -655,32 +636,31 @@ MACHINE_CONFIG_START(sun2_state::sun2vme)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1152-1, 0, 900-1)
 	MCFG_SCREEN_REFRESH_RATE(72)
 
-	MCFG_DEVICE_ADD("timer", AM9513A, 19.6608_MHz_XTAL / 4)
-	MCFG_AM9513_FOUT_CALLBACK(WRITELINE("timer", am9513_device, gate1_w))
-	MCFG_AM9513_OUT1_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_7))
-	MCFG_AM9513_OUT2_CALLBACK(WRITELINE("irq5", input_merger_device, in_w<0>))
-	MCFG_AM9513_OUT3_CALLBACK(WRITELINE("irq5", input_merger_device, in_w<1>))
-	MCFG_AM9513_OUT4_CALLBACK(WRITELINE("irq5", input_merger_device, in_w<2>))
-	MCFG_AM9513_OUT5_CALLBACK(WRITELINE("irq5", input_merger_device, in_w<3>))
+	am9513a_device &timer(AM9513A(config, "timer", 19.6608_MHz_XTAL / 4));
+	timer.fout_cb().set("timer", FUNC(am9513_device::gate1_w));
+	timer.out1_cb().set_inputline(m_maincpu, M68K_IRQ_7);
+	timer.out2_cb().set("irq5", FUNC(input_merger_device::in_w<0>));
+	timer.out3_cb().set("irq5", FUNC(input_merger_device::in_w<1>));
+	timer.out4_cb().set("irq5", FUNC(input_merger_device::in_w<2>));
+	timer.out5_cb().set("irq5", FUNC(input_merger_device::in_w<3>));
 
-	MCFG_INPUT_MERGER_ANY_HIGH("irq5") // 74LS05 open collectors
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M68K_IRQ_5))
+	INPUT_MERGER_ANY_HIGH(config, "irq5").output_handler().set_inputline(m_maincpu, M68K_IRQ_5); // 74LS05 open collectors
 
-	MCFG_DEVICE_ADD(SCC1_TAG, SCC8530N, 19.6608_MHz_XTAL / 4)
-	MCFG_DEVICE_ADD(SCC2_TAG, SCC8530N, 19.6608_MHz_XTAL / 4)
-	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(RS232A_TAG, rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_TXDB_CB(WRITELINE(RS232B_TAG, rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_INT_CB(INPUTLINE("maincpu", M68K_IRQ_6))
+	SCC8530N(config, SCC1_TAG, 19.6608_MHz_XTAL / 4);
+	scc8530_device& scc2(SCC8530N(config, SCC2_TAG, 19.6608_MHz_XTAL / 4));
+	scc2.out_txda_callback().set(RS232A_TAG, FUNC(rs232_port_device::write_txd));
+	scc2.out_txdb_callback().set(RS232B_TAG, FUNC(rs232_port_device::write_txd));
+	scc2.out_int_callback().set_inputline(m_maincpu, M68K_IRQ_6);
 
-	MCFG_DEVICE_ADD(RS232A_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, ctsa_w))
+	rs232_port_device &rs232a(RS232_PORT(config, RS232A_TAG, default_rs232_devices, nullptr));
+	rs232a.rxd_handler().set(SCC2_TAG, FUNC(z80scc_device::rxa_w));
+	rs232a.dcd_handler().set(SCC2_TAG, FUNC(z80scc_device::dcda_w));
+	rs232a.cts_handler().set(SCC2_TAG, FUNC(z80scc_device::ctsa_w));
 
-	MCFG_DEVICE_ADD(RS232B_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, ctsb_w))
+	rs232_port_device &rs232b(RS232_PORT(config, RS232B_TAG, default_rs232_devices, nullptr));
+	rs232b.rxd_handler().set(SCC2_TAG, FUNC(z80scc_device::rxb_w));
+	rs232b.dcd_handler().set(SCC2_TAG, FUNC(z80scc_device::dcdb_w));
+	rs232b.cts_handler().set(SCC2_TAG, FUNC(z80scc_device::ctsb_w));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sun2_state::sun2mbus)
@@ -688,38 +668,19 @@ MACHINE_CONFIG_START(sun2_state::sun2mbus)
 	MCFG_DEVICE_ADD("maincpu", M68010, 39.3216_MHz_XTAL / 4)
 	MCFG_DEVICE_PROGRAM_MAP(sun2_mem)
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2M")
-	MCFG_RAM_EXTRA_OPTIONS("4M")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
+	RAM(config, RAM_TAG).set_default_size("2M").set_extra_options("4M").set_default_value(0x00);
 
 	// MMU Type 0 device space
-	MCFG_DEVICE_ADD("type0", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(mbustype0space_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000000)
+	ADDRESS_MAP_BANK(config, "type0").set_map(&sun2_state::mbustype0space_map).set_options(ENDIANNESS_BIG, 16, 32, 0x1000000);
 
 	// MMU Type 1 device space
-	MCFG_DEVICE_ADD("type1", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(mbustype1space_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000000)
+	ADDRESS_MAP_BANK(config, "type1").set_map(&sun2_state::mbustype1space_map).set_options(ENDIANNESS_BIG, 16, 32, 0x1000000);
 
 	// MMU Type 2 device space
-	MCFG_DEVICE_ADD("type2", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(mbustype2space_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000000)
+	ADDRESS_MAP_BANK(config, "type2").set_map(&sun2_state::mbustype2space_map).set_options(ENDIANNESS_BIG, 16, 32, 0x1000000);
 
 	// MMU Type 3 device space
-	MCFG_DEVICE_ADD("type3", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(mbustype3space_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000000)
+	ADDRESS_MAP_BANK(config, "type3").set_map(&sun2_state::mbustype3space_map).set_options(ENDIANNESS_BIG, 16, 32, 0x1000000);
 
 	MCFG_SCREEN_ADD("bwtwo", RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(sun2_state, bw2_update)
@@ -727,34 +688,33 @@ MACHINE_CONFIG_START(sun2_state::sun2mbus)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1152-1, 0, 900-1)
 	MCFG_SCREEN_REFRESH_RATE(72)
 
-	MCFG_DEVICE_ADD("timer", AM9513, 39.3216_MHz_XTAL / 8)
-	MCFG_AM9513_FOUT_CALLBACK(WRITELINE("timer", am9513_device, gate1_w))
-	MCFG_AM9513_OUT1_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_7))
-	MCFG_AM9513_OUT2_CALLBACK(WRITELINE("irq5", input_merger_device, in_w<0>))
-	MCFG_AM9513_OUT3_CALLBACK(WRITELINE("irq5", input_merger_device, in_w<1>))
-	MCFG_AM9513_OUT4_CALLBACK(WRITELINE("irq5", input_merger_device, in_w<2>))
-	MCFG_AM9513_OUT5_CALLBACK(WRITELINE("irq5", input_merger_device, in_w<3>))
+	am9513a_device &timer(AM9513A(config, "timer", 39.3216_MHz_XTAL / 8));
+	timer.fout_cb().set("timer", FUNC(am9513_device::gate1_w));
+	timer.out1_cb().set_inputline(m_maincpu, M68K_IRQ_7);
+	timer.out2_cb().set("irq5", FUNC(input_merger_device::in_w<0>));
+	timer.out3_cb().set("irq5", FUNC(input_merger_device::in_w<1>));
+	timer.out4_cb().set("irq5", FUNC(input_merger_device::in_w<2>));
+	timer.out5_cb().set("irq5", FUNC(input_merger_device::in_w<3>));
 
-	MCFG_INPUT_MERGER_ANY_HIGH("irq5") // 74LS05 open collectors
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M68K_IRQ_5))
+	INPUT_MERGER_ANY_HIGH(config, "irq5").output_handler().set_inputline(m_maincpu, M68K_IRQ_5); // 74LS05 open collectors
 
-	MCFG_DEVICE_ADD(SCC1_TAG, SCC8530N, 39.3216_MHz_XTAL / 8)
-	MCFG_DEVICE_ADD(SCC2_TAG, SCC8530N, 39.3216_MHz_XTAL / 8)
-	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(RS232A_TAG, rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_TXDB_CB(WRITELINE(RS232B_TAG, rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_INT_CB(INPUTLINE("maincpu", M68K_IRQ_6))
+	SCC8530N(config, SCC1_TAG, 39.3216_MHz_XTAL / 8);
+	scc8530_device& scc2(SCC8530N(config, SCC2_TAG, 39.3216_MHz_XTAL / 8));
+	scc2.out_txda_callback().set(RS232A_TAG, FUNC(rs232_port_device::write_txd));
+	scc2.out_txdb_callback().set(RS232B_TAG, FUNC(rs232_port_device::write_txd));
+	scc2.out_int_callback().set_inputline(m_maincpu, M68K_IRQ_6);
 
-	MCFG_DEVICE_ADD(RS232A_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, ctsa_w))
+	rs232_port_device &rs232a(RS232_PORT(config, RS232A_TAG, default_rs232_devices, nullptr));
+	rs232a.rxd_handler().set(SCC2_TAG, FUNC(z80scc_device::rxa_w));
+	rs232a.dcd_handler().set(SCC2_TAG, FUNC(z80scc_device::dcda_w));
+	rs232a.cts_handler().set(SCC2_TAG, FUNC(z80scc_device::ctsa_w));
 
-	MCFG_DEVICE_ADD(RS232B_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, ctsb_w))
+	rs232_port_device &rs232b(RS232_PORT(config, RS232B_TAG, default_rs232_devices, nullptr));
+	rs232b.rxd_handler().set(SCC2_TAG, FUNC(z80scc_device::rxb_w));
+	rs232b.dcd_handler().set(SCC2_TAG, FUNC(z80scc_device::dcdb_w));
+	rs232b.cts_handler().set(SCC2_TAG, FUNC(z80scc_device::ctsb_w));
 
-	MCFG_DEVICE_ADD("rtc", MM58167, 32.768_kHz_XTAL)
+	MM58167(config, "rtc", 32.768_kHz_XTAL);
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -771,10 +731,10 @@ ROM_START( sun2_120 ) // ROMs are located on the '501-1007' CPU PCB at locations
 	//ROM_SYSTEM_BIOS( 8, "revq", "Bootrom Rev Q")
 	// ROMX_LOAD( "520-1104-02.b11", 0x0000, 0x4000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(8))
 	// ROMX_LOAD( "520-1103-02.b10", 0x0001, 0x4000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(8))
-	ROM_SYSTEM_BIOS(2, "revn", "Bootrom Rev N") // SunOS 2.0 requires this bootrom version at a minimum
+	ROM_SYSTEM_BIOS( 2, "revn", "Bootrom Rev N") // SunOS 2.0 requires this bootrom version at a minimum; this version supports the sun-2 keyboard
 	ROMX_LOAD("revn.b11", 0x0000, 0x4000, CRC(b1e70965) SHA1(726b3ed9323750a1ae238cf6dccaed6ff5981ad1), ROM_SKIP(1) | ROM_BIOS(2)) // actual rom stickers had fallen off
 	ROMX_LOAD("revn.b10", 0x0001, 0x4000, CRC(95fd9242) SHA1(1eee2d291f4b18f6aafdde1a9521d88e454843b9), ROM_SKIP(1) | ROM_BIOS(2)) // "
-	ROM_SYSTEM_BIOS(3, "revm", "Bootrom Rev M") // SunOS 1.0 apparently requires this bootrom revision?
+	ROM_SYSTEM_BIOS( 3, "revm", "Bootrom Rev M") // SunOS 1.0 apparently requires this bootrom revision; this version might only support the sun-1 keyboard?
 	ROMX_LOAD("sun2-revm-8.b11", 0x0000, 0x4000, CRC(98b8ae55) SHA1(55485f4d8fd1ebc218aa8527c8bb62752c34abf7), ROM_SKIP(1) | ROM_BIOS(3)) // handwritten label: "SUN2-RevM-8"
 	ROMX_LOAD("sun2-revm-0.b10", 0x0001, 0x4000, CRC(5117f431) SHA1(fce85c11ada1614152dde35bb329350f6fb2ecd9), ROM_SKIP(1) | ROM_BIOS(3)) // handwritten label: "SUN2-RevM-0"
 

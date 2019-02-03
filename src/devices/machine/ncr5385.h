@@ -44,14 +44,6 @@
 #pragma once
 
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_NCR5385_INT_CB(_int) \
-	devcb = &downcast<ncr5385_device &>(*device).set_int_callback(DEVCB_##_int);
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -64,7 +56,7 @@ public:
 	// construction/destruction
 	ncr5385_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_int_callback(Object &&cb)   { return m_int.set_callback(std::forward<Object>(cb)); }
+	auto irq() { return m_int.bind(); }
 
 	DECLARE_WRITE8_MEMBER(write);
 	DECLARE_READ8_MEMBER(read);

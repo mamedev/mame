@@ -40,6 +40,7 @@
 
 #include "emu.h"
 #include "includes/canyon.h"
+
 #include "cpu/m6502/m6502.h"
 #include "sound/discrete.h"
 #include "screen.h"
@@ -52,12 +53,12 @@
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(canyon_state, canyon)
+void canyon_state::canyon_palette(palette_device &palette) const
 {
-	palette.set_pen_color(0, rgb_t(0x80, 0x80, 0x80)); /* GREY  */
-	palette.set_pen_color(1, rgb_t(0x00, 0x00, 0x00)); /* BLACK */
-	palette.set_pen_color(2, rgb_t(0x80, 0x80, 0x80)); /* GREY  */
-	palette.set_pen_color(3, rgb_t(0xff, 0xff, 0xff)); /* WHITE */
+	palette.set_pen_color(0, rgb_t(0x80, 0x80, 0x80)); // GREY
+	palette.set_pen_color(1, rgb_t(0x00, 0x00, 0x00)); // BLACK
+	palette.set_pen_color(2, rgb_t(0x80, 0x80, 0x80)); // GREY
+	palette.set_pen_color(3, rgb_t(0xff, 0xff, 0xff)); // WHITE
 }
 
 
@@ -241,33 +242,28 @@ GFXDECODE_END
 MACHINE_CONFIG_START(canyon_state::canyon)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(12'096'000) / 16)
+	MCFG_DEVICE_ADD("maincpu", M6502, 12.096_MHz_XTAL / 16)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", canyon_state,  nmi_line_pulse)
 
-	MCFG_DEVICE_ADD("outlatch", F9334, 0) // C7
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE("discrete", discrete_device, write_line<CANYON_WHISTLE1_EN>))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE("discrete", discrete_device, write_line<CANYON_WHISTLE2_EN>))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(OUTPUT("led0")) // 1 PLAYER LAMP
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(OUTPUT("led1")) // 2 PLAYER LAMP
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE("discrete", discrete_device, write_line<CANYON_ATTRACT1_EN>))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE("discrete", discrete_device, write_line<CANYON_ATTRACT2_EN>))
+	F9334(config, m_outlatch); // C7
+	m_outlatch->q_out_cb<0>().set("discrete", FUNC(discrete_device::write_line<CANYON_WHISTLE1_EN>));
+	m_outlatch->q_out_cb<1>().set("discrete", FUNC(discrete_device::write_line<CANYON_WHISTLE2_EN>));
+	m_outlatch->q_out_cb<2>().set_output("led0"); // 1 PLAYER LAMP
+	m_outlatch->q_out_cb<3>().set_output("led1"); // 2 PLAYER LAMP
+	m_outlatch->q_out_cb<4>().set("discrete", FUNC(discrete_device::write_line<CANYON_ATTRACT1_EN>));
+	m_outlatch->q_out_cb<5>().set("discrete", FUNC(discrete_device::write_line<CANYON_ATTRACT2_EN>));
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
+	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 8);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(22 * 1000000 / 15750))
-	MCFG_SCREEN_SIZE(256, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
+	MCFG_SCREEN_RAW_PARAMS(12.096_MHz_XTAL / 2, 384, 0, 256, 262, 0, 240) // HSYNC = 15,750 Hz
 	MCFG_SCREEN_UPDATE_DRIVER(canyon_state, screen_update_canyon)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", m6502_device::NMI_LINE))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_canyon)
-	MCFG_PALETTE_ADD("palette", 4)
-	MCFG_PALETTE_INIT_OWNER(canyon_state, canyon)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_canyon)
+	PALETTE(config, m_palette, FUNC(canyon_state::canyon_palette), 4);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

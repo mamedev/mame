@@ -32,6 +32,7 @@
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
 #include "sound/ym2413.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -54,7 +55,7 @@ void rampart_state::scanline_update(screen_device &screen, int scanline)
 {
 	/* generate 32V signals */
 	if ((scanline & 32) == 0)
-		scanline_int_gen(*m_maincpu);
+		scanline_int_write_line(1);
 }
 
 
@@ -134,7 +135,7 @@ void rampart_state::main_map(address_map &map)
 	map(0x140000, 0x147fff).mirror(0x438000).rom(); /* slapstic goes here */
 	map(0x200000, 0x21ffff).ram().share("bitmap");
 	map(0x220000, 0x3bffff).nopw();    /* the code blasts right through this when initializing */
-	map(0x3c0000, 0x3c07ff).mirror(0x019800).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0xff00).share("palette");
+	map(0x3c0000, 0x3c07ff).mirror(0x019800).rw("palette", FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0xff00).share("palette");
 	map(0x3e0000, 0x3e07ff).mirror(0x010000).ram().share("mob");
 	map(0x3e0800, 0x3e3f3f).mirror(0x010000).ram();
 	map(0x3e3f40, 0x3e3f7f).mirror(0x010000).ram().share("mob:slip");
@@ -343,24 +344,20 @@ MACHINE_CONFIG_START(rampart_state::rampart)
 	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK/2)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 118, true)
+	SLAPSTIC(config, m_slapstic_device, 118, true);
 
-	MCFG_EEPROM_2816_ADD("eeprom")
-	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
+	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 8);
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rampart)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
-	MCFG_PALETTE_MEMBITS(8)
+	PALETTE(config, "palette").set_format(palette_device::IRGB_1555, 512).set_membits(8);
 
-	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", rampart_state::s_mob_config)
-	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("gfxdecode")
+	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, rampart_state::s_mob_config);
+	m_mob->set_gfxdecode(m_gfxdecode);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS-2 chip to generate video signals */

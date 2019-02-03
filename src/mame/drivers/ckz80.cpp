@@ -88,11 +88,11 @@ public:
 	void display_matrix(int maxx, int maxy, u32 setx, u32 sety, bool update = true);
 
 	// Master
-	DECLARE_READ8_MEMBER(master_input_r);
-	DECLARE_WRITE8_MEMBER(master_control_w);
+	u8 master_input_r();
+	void master_control_w(u8 data);
 	void init_master();
-	DECLARE_READ8_MEMBER(master_trampoline_r);
-	DECLARE_WRITE8_MEMBER(master_trampoline_w);
+	u8 master_trampoline_r(offs_t offset);
+	void master_trampoline_w(offs_t offset, u8 data);
 	void master_map(address_map &map);
 	void master_trampoline(address_map &map);
 	void master(machine_config &config);
@@ -234,7 +234,7 @@ u16 ckz80_state::read_inputs(int columns)
 
 // TTL/generic
 
-WRITE8_MEMBER(ckz80_state::master_control_w)
+void ckz80_state::master_control_w(u8 data)
 {
 	// d0-d3: 74145 A-D
 	// 74145 0-9: input mux, led select
@@ -248,7 +248,7 @@ WRITE8_MEMBER(ckz80_state::master_control_w)
 	m_dac->write(data >> 6 & 3);
 }
 
-READ8_MEMBER(ckz80_state::master_input_r)
+u8 ckz80_state::master_input_r()
 {
 	// d0-d7: multiplexed inputs (active low)
 	return ~read_inputs(10);
@@ -286,23 +286,23 @@ void ckz80_state::master_map(address_map &map)
 }
 
 // PCB design is prone to bus conflicts, but should be fine if software obeys
-WRITE8_MEMBER(ckz80_state::master_trampoline_w)
+void ckz80_state::master_trampoline_w(offs_t offset, u8 data)
 {
 	if (offset & 0x2000)
-		m_master_map->write8(space, (offset & 0x3fff) | 0x8000, data);
+		m_master_map->write8((offset & 0x3fff) | 0x8000, data);
 	if (offset & 0x4000)
-		m_master_map->write8(space, (offset & 0x7fff) | 0x8000, data);
+		m_master_map->write8((offset & 0x7fff) | 0x8000, data);
 }
 
-READ8_MEMBER(ckz80_state::master_trampoline_r)
+u8 ckz80_state::master_trampoline_r(offs_t offset)
 {
 	u8 data = 0xff;
 	if (~offset & 0x8000)
-		data &= m_master_map->read8(space, offset);
+		data &= m_master_map->read8(offset);
 	if (offset & 0x2000)
-		data &= m_master_map->read8(space, (offset & 0x3fff) | 0x8000);
+		data &= m_master_map->read8((offset & 0x3fff) | 0x8000);
 	if (offset & 0x4000)
-		data &= m_master_map->read8(space, (offset & 0x7fff) | 0x8000);
+		data &= m_master_map->read8((offset & 0x7fff) | 0x8000);
 
 	return data;
 }
@@ -436,18 +436,15 @@ MACHINE_CONFIG_START(ckz80_state::master)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", Z80, 8_MHz_XTAL/2)
 	MCFG_DEVICE_PROGRAM_MAP(master_trampoline)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", ckz80_state, irq_on, attotime::from_hz(429)) // theoretical frequency from 555 timer (22nF, 150K, 1K5), measurement was 418Hz
-	MCFG_TIMER_START_DELAY(attotime::from_hz(429) - attotime::from_nsec(22870)) // active for 22.87us
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", ckz80_state, irq_off, attotime::from_hz(429))
+	timer_device &irq_on(TIMER(config, "irq_on"));
+	irq_on.configure_periodic(FUNC(ckz80_state::irq_on), attotime::from_hz(429)); // theoretical frequency from 555 timer (22nF, 150K, 1K5), measurement was 418Hz
+	irq_on.set_start_delay(attotime::from_hz(429) - attotime::from_nsec(22870)); // active for 22.87us
+	TIMER(config, "irq_off").configure_periodic(FUNC(ckz80_state::irq_off), attotime::from_hz(429));
 
-	MCFG_DEVICE_ADD("master_map", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(master_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(16)
+	ADDRESS_MAP_BANK(config, "master_map").set_map(&ckz80_state::master_map).set_options(ENDIANNESS_LITTLE, 8, 16);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", ckz80_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_ck_master)
+	TIMER(config, "display_decay").configure_periodic(FUNC(ckz80_state::display_decay_tick), attotime::from_msec(1));
+	config.set_default_layout(layout_ck_master);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

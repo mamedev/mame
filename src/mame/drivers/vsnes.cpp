@@ -276,9 +276,9 @@ void vsnes_state::vsnes_bootleg_z80_map(address_map &map)
 	map(0x6001, 0x6001).r(FUNC(vsnes_state::vsnes_bootleg_z80_address_r)); // ^
 
 
-	map(0x60FA, 0x60FA).w("sn1", FUNC(sn76489_device::command_w));
-	map(0x60F9, 0x60F9).w("sn2", FUNC(sn76489_device::command_w));
-	map(0x60FF, 0x60FF).w("sn3", FUNC(sn76489_device::command_w));
+	map(0x60FA, 0x60FA).w("sn1", FUNC(sn76489_device::write));
+	map(0x60F9, 0x60F9).w("sn2", FUNC(sn76489_device::write));
+	map(0x60FF, 0x60FF).w("sn3", FUNC(sn76489_device::write));
 
 }
 
@@ -1701,160 +1701,155 @@ static INPUT_PORTS_START( supxevs )
 	PORT_DIPSETTING(    0xc0, "RP2C04-0004" )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(vsnes_state::vsnes)
-
+void vsnes_state::vsnes(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", N2A03, NTSC_APU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(vsnes_cpu1_map)
-								/* some carts also trigger IRQs */
+	N2A03(config, m_maincpu, NTSC_APU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vsnes_state::vsnes_cpu1_map);
+	/* some carts also trigger IRQs */
 	MCFG_MACHINE_RESET_OVERRIDE(vsnes_state,vsnes)
 	MCFG_MACHINE_START_OVERRIDE(vsnes_state,vsnes)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen1", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(32*8, 262)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DEVICE("ppu1", ppu2c0x_device, screen_update)
+	screen_device &screen1(SCREEN(config, "screen1", SCREEN_TYPE_RASTER));
+	screen1.set_refresh_hz(60);
+	screen1.set_size(32*8, 262);
+	screen1.set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
+	screen1.set_screen_update("ppu1", FUNC(ppu2c0x_device::screen_update));
 
-	MCFG_PPU2C04_ADD("ppu1")
-	MCFG_PPU2C0X_SET_SCREEN("screen1")
-	MCFG_PPU2C0X_CPU("maincpu")
-	MCFG_PPU2C0X_INT_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	PPU_2C04(config, m_ppu1);
+	m_ppu1->set_screen("screen1");
+	m_ppu1->set_cpu_tag(m_maincpu);
+	m_ppu1->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(vsnes_state::jajamaru)
+void vsnes_state::jajamaru(machine_config &config)
+{
 	vsnes(config);
 
-	MCFG_DEVICE_REMOVE( "ppu1" )
-	MCFG_PPU2C05_01_ADD("ppu1")
-	MCFG_PPU2C0X_SET_SCREEN("screen1")
-	MCFG_PPU2C0X_CPU("maincpu")
-	MCFG_PPU2C0X_INT_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
-MACHINE_CONFIG_END
+	PPU_2C05_01(config.replace(), m_ppu1);
+	m_ppu1->set_screen("screen1");
+	m_ppu1->set_cpu_tag(m_maincpu);
+	m_ppu1->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+}
 
-MACHINE_CONFIG_START(vsnes_state::mightybj)
+void vsnes_state::mightybj(machine_config &config)
+{
 	vsnes(config);
 
-	MCFG_DEVICE_REMOVE( "ppu1" )
-	MCFG_PPU2C05_02_ADD("ppu1")
-	MCFG_PPU2C0X_SET_SCREEN("screen1")
-	MCFG_PPU2C0X_CPU("maincpu")
-	MCFG_PPU2C0X_INT_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
-MACHINE_CONFIG_END
+	PPU_2C05_02(config.replace(), m_ppu1);
+	m_ppu1->set_screen("screen1");
+	m_ppu1->set_cpu_tag(m_maincpu);
+	m_ppu1->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+}
 
-MACHINE_CONFIG_START(vsnes_state::vsgshoe)
+void vsnes_state::vsgshoe(machine_config &config)
+{
 	vsnes(config);
 
-	MCFG_DEVICE_REMOVE( "ppu1" )
-	MCFG_PPU2C05_03_ADD("ppu1")
-	MCFG_PPU2C0X_SET_SCREEN("screen1")
-	MCFG_PPU2C0X_CPU("maincpu")
-	MCFG_PPU2C0X_INT_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
-MACHINE_CONFIG_END
+	PPU_2C05_03(config.replace(), m_ppu1);
+	m_ppu1->set_screen("screen1");
+	m_ppu1->set_cpu_tag(m_maincpu);
+	m_ppu1->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+}
 
-MACHINE_CONFIG_START(vsnes_state::topgun)
+void vsnes_state::topgun(machine_config &config)
+{
 	vsnes(config);
 
-	MCFG_DEVICE_REMOVE( "ppu1" )
-	MCFG_PPU2C05_04_ADD("ppu1")
-	MCFG_PPU2C0X_SET_SCREEN("screen1")
-	MCFG_PPU2C0X_CPU("maincpu")
-	MCFG_PPU2C0X_INT_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
-MACHINE_CONFIG_END
+	PPU_2C05_04(config.replace(), m_ppu1);
+	m_ppu1->set_screen("screen1");
+	m_ppu1->set_cpu_tag(m_maincpu);
+	m_ppu1->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+}
 
-MACHINE_CONFIG_START(vsnes_state::vsdual)
-
+void vsnes_state::vsdual(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", N2A03, NTSC_APU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(vsnes_cpu1_map)
+	N2A03(config, m_maincpu, NTSC_APU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vsnes_state::vsnes_cpu1_map);
 
-	MCFG_DEVICE_ADD("sub", N2A03, NTSC_APU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(vsnes_cpu2_map)
+	N2A03(config, m_subcpu, NTSC_APU_CLOCK);
+	m_subcpu->set_addrmap(AS_PROGRAM, &vsnes_state::vsnes_cpu2_map);
 
 	MCFG_MACHINE_RESET_OVERRIDE(vsnes_state,vsdual)
 	MCFG_MACHINE_START_OVERRIDE(vsnes_state,vsdual)
 
-	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+	config.set_default_layout(layout_dualhsxs);
 
-	MCFG_SCREEN_ADD("screen1", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(32*8, 262)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DEVICE("ppu1", ppu2c0x_device, screen_update)
+	screen_device &screen1(SCREEN(config, "screen1", SCREEN_TYPE_RASTER));
+	screen1.set_refresh_hz(60);
+	screen1.set_size(32*8, 262);
+	screen1.set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
+	screen1.set_screen_update("ppu1", FUNC(ppu2c0x_device::screen_update));
 
-	MCFG_SCREEN_ADD("screen2", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(32*8, 262)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DEVICE("ppu2", ppu2c0x_device, screen_update)
+	screen_device &screen2(SCREEN(config, "screen2", SCREEN_TYPE_RASTER));
+	screen2.set_refresh_hz(60);
+	screen2.set_size(32*8, 262);
+	screen2.set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
+	screen2.set_screen_update("ppu2", FUNC(ppu2c0x_device::screen_update));
 
-	MCFG_PPU2C04_ADD("ppu1")
-	MCFG_PPU2C0X_SET_SCREEN("screen1")
-	MCFG_PPU2C0X_CPU("maincpu")
-	MCFG_PPU2C0X_INT_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	PPU_2C04(config, m_ppu1);
+	m_ppu1->set_screen("screen1");
+	m_ppu1->set_cpu_tag(m_maincpu);
+	m_ppu1->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
-	MCFG_PPU2C04_ADD("ppu2")
-	MCFG_PPU2C0X_SET_SCREEN("screen2")
-	MCFG_PPU2C0X_CPU("sub")
-	MCFG_PPU2C0X_INT_CALLBACK(INPUTLINE("sub", INPUT_LINE_NMI))
+	PPU_2C04(config, m_ppu2);
+	m_ppu2->set_screen("screen2");
+	m_ppu2->set_cpu_tag(m_subcpu);
+	m_ppu2->int_callback().set_inputline(m_subcpu, INPUT_LINE_NMI);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(vsnes_state::vsdual_pi)
+void vsnes_state::vsdual_pi(machine_config &config)
+{
 	vsdual(config);
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 	// need high level of interleave to keep screens in sync in Balloon Fight.
 	// however vsmahjng doesn't like perfect interleave? you end up needing to reset it to boot? maybe something in a bad default state? watchdog?
-	// as the board would always be running in 'perfect interleave' the fact the Mahjong game doens't work like this needs investigating.
-MACHINE_CONFIG_END
+	// as the board would always be running in 'perfect interleave' the fact the Mahjong game doesn't work like this needs investigating.
+}
 
-
-MACHINE_CONFIG_START(vsnes_state::vsnes_bootleg)
-
+void vsnes_state::vsnes_bootleg(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502,XTAL(16'000'000)/4) // 4mhz? seems too high but flickers badly otherwise, issue elsewhere?
-	MCFG_DEVICE_PROGRAM_MAP(vsnes_cpu1_bootleg_map)
-								/* some carts also trigger IRQs */
+	M6502(config, m_maincpu, XTAL(16'000'000)/4); // 4mhz? seems too high but flickers badly otherwise, issue elsewhere?
+	m_maincpu->set_addrmap(AS_PROGRAM, &vsnes_state::vsnes_cpu1_bootleg_map);
+	/* some carts also trigger IRQs */
 	MCFG_MACHINE_RESET_OVERRIDE(vsnes_state,vsnes)
 	MCFG_MACHINE_START_OVERRIDE(vsnes_state,vsnes)
 
-	MCFG_DEVICE_ADD("sub", Z80,XTAL(16'000'000)/4)         /* ? MHz */ // Z8400APS-Z80CPU
-	MCFG_DEVICE_PROGRAM_MAP(vsnes_bootleg_z80_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen1", vsnes_state,  irq0_line_hold)
-//  MCFG_DEVICE_PERIODIC_INT_DRIVER(vsnes_state, nmi_line_pulse)
+	Z80(config, m_subcpu, XTAL(16'000'000)/4); /* ? MHz */ // Z8400APS-Z80CPU
+	m_subcpu->set_addrmap(AS_PROGRAM, &vsnes_state::vsnes_bootleg_z80_map);
+	m_subcpu->set_vblank_int("screen1", FUNC(vsnes_state::irq0_line_hold));
+//  m_subcpu->set_periodic_int(FUNC(vsnes_state::nmi_line_pulse));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen1", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(32*8, 262)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DEVICE("ppu1", ppu2c0x_device, screen_update)
+	screen_device &screen1(SCREEN(config, "screen1", SCREEN_TYPE_RASTER));
+	screen1.set_refresh_hz(60);
+	screen1.set_size(32*8, 262);
+	screen1.set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
+	screen1.set_screen_update("ppu1", FUNC(ppu2c0x_device::screen_update));
 
-	MCFG_PPU2C04_ADD("ppu1")
-	MCFG_PPU2C0X_CPU("maincpu")
-	MCFG_PPU2C0X_SET_SCREEN("screen1")
-	MCFG_PPU2C0X_INT_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
-	MCFG_PPU2C0X_IGNORE_SPRITE_WRITE_LIMIT // bootleg seems to need this - code to set the sprite address is replaced with complete copy loops??
+	PPU_2C04(config, m_ppu1);
+	m_ppu1->set_cpu_tag(m_maincpu);
+	m_ppu1->set_screen("screen1");
+	m_ppu1->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_ppu1->use_sprite_write_limitation_disable(); // bootleg seems to need this - code to set the sprite address is replaced with complete copy loops??
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	// PCB has 2, code accesses 3? which 2 really exist?
-	MCFG_DEVICE_ADD("sn1", SN76489, XTAL(16'000'000)/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MCFG_DEVICE_ADD("sn2", SN76489, XTAL(16'000'000)/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MCFG_DEVICE_ADD("sn3", SN76489, XTAL(16'000'000)/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	SN76489(config, "sn1", XTAL(16'000'000)/4).add_route(ALL_OUTPUTS, "mono", 0.50);
+	SN76489(config, "sn2", XTAL(16'000'000)/4).add_route(ALL_OUTPUTS, "mono", 0.50);
+	SN76489(config, "sn3", XTAL(16'000'000)/4).add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 /******************************************************************************/
 
@@ -1972,7 +1967,7 @@ ROM_START( suprmriobl )
 
 	ROM_REGION( 0x4000,"pals", 0  )
 	ROM_LOAD( "pal16l8.1",  0x000, 0x104, CRC(bd76fb53) SHA1(2d0634e8edb3289a103719466465e9777606086e) )
-	ROM_LOAD( "pal16r6a.2.bad.dump",  0x000, 0x104, BAD_DUMP CRC(e9cd78fb) SHA1(557d3e7ef3b25c1338b24722cac91bca788c02b8) )
+	ROM_LOAD( "pal16r6a.2", 0x000, 0x104, NO_DUMP )
 	ROM_LOAD( "pal16r8.3",  0x000, 0x104, CRC(bd76fb53) SHA1(2d0634e8edb3289a103719466465e9777606086e) )
 	ROM_LOAD( "pal16l8.4",  0x000, 0x104, CRC(6f6de82d) SHA1(3d59b222d25457b2f89b559409721db37d6a81d8) )
 	ROM_LOAD( "pal16r6.5",  0x000, 0x104, CRC(ceff7c7c) SHA1(52fd344c591478469369cd0862d1facfe23e12fb) )

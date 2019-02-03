@@ -296,41 +296,41 @@ void kungfur_state::machine_reset()
 	m_control = 0;
 }
 
-MACHINE_CONFIG_START(kungfur_state::kungfur)
-
+void kungfur_state::kungfur(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6809, 8000000/2)   // 4MHz?
-	MCFG_DEVICE_PROGRAM_MAP(kungfur_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(kungfur_state, kungfur_irq,  975)      // close approximation
+	M6809(config, m_maincpu, 8000000/2);    // 4MHz?
+	m_maincpu->set_addrmap(AS_PROGRAM, &kungfur_state::kungfur_map);
+	m_maincpu->set_periodic_int(FUNC(kungfur_state::kungfur_irq), attotime::from_hz(975));  // close approximation
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
 	// $4008 - always $83 (PPI mode 0, ports B & lower C as input)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, kungfur_state, kungfur_output_w))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN1"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, kungfur_state, kungfur_control_w))
+	ppi0.out_pa_callback().set(FUNC(kungfur_state::kungfur_output_w));
+	ppi0.in_pb_callback().set_ioport("IN0");
+	ppi0.in_pc_callback().set_ioport("IN1");
+	ppi0.out_pc_callback().set(FUNC(kungfur_state::kungfur_control_w));
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	i8255_device &ppi1(I8255A(config, "ppi8255_1"));
 	// $400c - always $80 (PPI mode 0, all ports as output)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, kungfur_state, kungfur_latch1_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, kungfur_state, kungfur_latch2_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, kungfur_state, kungfur_latch3_w))
+	ppi1.out_pa_callback().set(FUNC(kungfur_state::kungfur_latch1_w));
+	ppi1.out_pb_callback().set(FUNC(kungfur_state::kungfur_latch2_w));
+	ppi1.out_pc_callback().set(FUNC(kungfur_state::kungfur_latch3_w));
 
 	/* no video! */
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("adpcm1", MSM5205, XTAL(384'000))  // clock verified with recording
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, kungfur_state, kfr_adpcm1_int))
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MSM5205(config, m_adpcm1, XTAL(384'000));   // clock verified with recording
+	m_adpcm1->vck_legacy_callback().set(FUNC(kungfur_state::kfr_adpcm1_int));
+	m_adpcm1->set_prescaler_selector(msm5205_device::S48_4B);
+	m_adpcm1->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("adpcm2", MSM5205, XTAL(384'000))  // "
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, kungfur_state, kfr_adpcm2_int))
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	MSM5205(config, m_adpcm2, XTAL(384'000));   // clock verified with recording
+	m_adpcm2->vck_legacy_callback().set(FUNC(kungfur_state::kfr_adpcm2_int));
+	m_adpcm2->set_prescaler_selector(msm5205_device::S48_4B);
+	m_adpcm2->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+}
 
 
 /***************************************************************************

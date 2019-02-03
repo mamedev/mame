@@ -72,10 +72,10 @@
  *---------------------------
  * 1981 Force Computers was founded in San Jose, California. Over time a European headquarter was opened
  *      in Munich, Germany, and a Japanese headquarter in Tokyo
- * 1996 Force was aquired by Solectron Corporation in 1996
+ * 1996 Force was acquired by Solectron Corporation in 1996
  * 2004 Force was sold off from Solectron to Motorola
- * 2008 Force was aquired by Emerson as part of the Motorola Embedded Division
- * 2016 Force was aquired by Platinum Equity as part of the Emerson Network Power Division
+ * 2008 Force was acquired by Emerson as part of the Motorola Embedded Division
+ * 2016 Force was acquired by Platinum Equity as part of the Emerson Network Power Division
  *
  * Force developed and produced VME board products based on SPARC, Pentium, PowerPC and 68K.
  *
@@ -660,13 +660,13 @@ static void fccpu30_vme_cards(device_slot_interface &device)
  */
 MACHINE_CONFIG_START(cpu30_state::cpu30)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD ("maincpu", M68030, XTAL(25'000'000))
-	MCFG_DEVICE_PROGRAM_MAP (cpu30_mem)
+	MCFG_DEVICE_ADD("maincpu", M68030, XTAL(25'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(cpu30_mem)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("fga002", fga002_device, iack)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_VME_DEVICE_ADD("vme")
-	MCFG_VME_SLOT_ADD ("vme", 1, fccpu30_vme_cards, nullptr)
+	MCFG_VME_SLOT_ADD("vme", 1, fccpu30_vme_cards, nullptr)
 	/* Terminal Port config */
 	/* Force CPU30 series of boards has up to four serial ports, p1-p4, the FGA boot uses p4 as console and subsequent
 	   firmware uses p1 as console and in an operating system environment there may be user login shells on the other.
@@ -689,77 +689,77 @@ MACHINE_CONFIG_START(cpu30_state::cpu30)
 #define RS232P3_TAG      "rs232p3"
 #define RS232P4_TAG      "rs232p4"
 
-	MCFG_DUSCC68562_ADD("duscc", DUSCC_CLOCK, 0, 0, 0, 0 )
+	DUSCC68562(config, m_dusccterm, DUSCC_CLOCK);
+	m_dusccterm->configure_channels(0, 0, 0, 0);
 	/* Port 1 on Port B */
-	MCFG_DUSCC_OUT_TXDB_CB(WRITELINE(RS232P1_TAG, rs232_port_device, write_txd))
-	MCFG_DUSCC_OUT_DTRB_CB(WRITELINE(RS232P1_TAG, rs232_port_device, write_dtr))
-	MCFG_DUSCC_OUT_RTSB_CB(WRITELINE(RS232P1_TAG, rs232_port_device, write_rts))
+	m_dusccterm->out_txdb_callback().set(RS232P1_TAG, FUNC(rs232_port_device::write_txd));
+	m_dusccterm->out_dtrb_callback().set(RS232P1_TAG, FUNC(rs232_port_device::write_dtr));
+	m_dusccterm->out_rtsb_callback().set(RS232P1_TAG, FUNC(rs232_port_device::write_rts));
 	/* Port 4 on Port A */
-	MCFG_DUSCC_OUT_TXDA_CB(WRITELINE(RS232P4_TAG, rs232_port_device, write_txd))
-	MCFG_DUSCC_OUT_DTRA_CB(WRITELINE(RS232P4_TAG, rs232_port_device, write_dtr))
-	MCFG_DUSCC_OUT_RTSA_CB(WRITELINE(RS232P4_TAG, rs232_port_device, write_rts))
+	m_dusccterm->out_txda_callback().set(RS232P4_TAG, FUNC(rs232_port_device::write_txd));
+	m_dusccterm->out_dtra_callback().set(RS232P4_TAG, FUNC(rs232_port_device::write_dtr));
+	m_dusccterm->out_rtsa_callback().set(RS232P4_TAG, FUNC(rs232_port_device::write_rts));
 	/* DUSCC1 interrupt signal REQN is connected to LOCAL IRQ4 of the FGA-002 and level is programmable */
-	MCFG_DUSCC_OUT_INT_CB(WRITELINE("fga002", fga002_device, lirq4_w))
+	m_dusccterm->out_int_callback().set(m_fga002, FUNC(fga002_device::lirq4_w));
 
-	MCFG_DUSCC68562_ADD("duscc2", DUSCC_CLOCK, 0, 0, 0, 0 )
+	duscc68562_device &duscc2(DUSCC68562(config, "duscc2", DUSCC_CLOCK));
+	duscc2.configure_channels(0, 0, 0, 0);
 	/* Port 2 on Port A */
-	MCFG_DUSCC_OUT_TXDA_CB(WRITELINE(RS232P2_TAG, rs232_port_device, write_txd))
-	MCFG_DUSCC_OUT_DTRA_CB(WRITELINE(RS232P2_TAG, rs232_port_device, write_dtr))
-	MCFG_DUSCC_OUT_RTSA_CB(WRITELINE(RS232P2_TAG, rs232_port_device, write_rts))
+	duscc2.out_txda_callback().set(RS232P2_TAG, FUNC(rs232_port_device::write_txd));
+	duscc2.out_dtra_callback().set(RS232P2_TAG, FUNC(rs232_port_device::write_dtr));
+	duscc2.out_rtsa_callback().set(RS232P2_TAG, FUNC(rs232_port_device::write_rts));
 	/* Port 3 on Port B */
-	MCFG_DUSCC_OUT_TXDB_CB(WRITELINE(RS232P3_TAG, rs232_port_device, write_txd))
-	MCFG_DUSCC_OUT_DTRB_CB(WRITELINE(RS232P3_TAG, rs232_port_device, write_dtr))
-	MCFG_DUSCC_OUT_RTSB_CB(WRITELINE(RS232P3_TAG, rs232_port_device, write_rts))
+	duscc2.out_txdb_callback().set(RS232P3_TAG, FUNC(rs232_port_device::write_txd));
+	duscc2.out_dtrb_callback().set(RS232P3_TAG, FUNC(rs232_port_device::write_dtr));
+	duscc2.out_rtsb_callback().set(RS232P3_TAG, FUNC(rs232_port_device::write_rts));
 	/* DUSCC2 interrupt signal REQN is connected to LOCAL IRQ5 of the FGA-002 and level is programmable */
-	MCFG_DUSCC_OUT_INT_CB(WRITELINE("fga002", fga002_device, lirq5_w))
+	duscc2.out_int_callback().set(m_fga002, FUNC(fga002_device::lirq5_w));
 
-	MCFG_DEVICE_ADD (RS232P1_TAG, RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER (WRITELINE ("duscc", duscc68562_device, rxb_w))
-	MCFG_RS232_CTS_HANDLER (WRITELINE ("duscc", duscc68562_device, ctsb_w))
+	rs232_port_device &rs232p1(RS232_PORT(config, RS232P1_TAG, default_rs232_devices, "terminal"));
+	rs232p1.rxd_handler().set(m_dusccterm, FUNC(duscc68562_device::rxb_w));
+	rs232p1.cts_handler().set(m_dusccterm, FUNC(duscc68562_device::ctsb_w));
 
-	MCFG_DEVICE_ADD (RS232P2_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER (WRITELINE ("duscc2", duscc68562_device, rxa_w))
-	MCFG_RS232_CTS_HANDLER (WRITELINE ("duscc2", duscc68562_device, ctsa_w))
+	rs232_port_device &rs232p2(RS232_PORT(config, RS232P2_TAG, default_rs232_devices, nullptr));
+	rs232p2.rxd_handler().set("duscc2", FUNC(duscc68562_device::rxa_w));
+	rs232p2.cts_handler().set("duscc2", FUNC(duscc68562_device::ctsa_w));
 
-	MCFG_DEVICE_ADD (RS232P3_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER (WRITELINE ("duscc2", duscc68562_device, rxb_w))
-	MCFG_RS232_CTS_HANDLER (WRITELINE ("duscc2", duscc68562_device, ctsb_w))
+	rs232_port_device &rs232p3(RS232_PORT(config, RS232P3_TAG, default_rs232_devices, nullptr));
+	rs232p3.rxd_handler().set("duscc2", FUNC(duscc68562_device::rxb_w));
+	rs232p3.cts_handler().set("duscc2", FUNC(duscc68562_device::ctsb_w));
 
-	MCFG_DEVICE_ADD (RS232P4_TAG, RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER (WRITELINE ("duscc", duscc68562_device, rxa_w))
-	MCFG_RS232_CTS_HANDLER (WRITELINE ("duscc", duscc68562_device, ctsa_w))
+	rs232_port_device &rs232p4(RS232_PORT(config, RS232P4_TAG, default_rs232_devices, "terminal"));
+	rs232p4.rxd_handler().set(m_dusccterm, FUNC(duscc68562_device::rxa_w));
+	rs232p4.cts_handler().set(m_dusccterm, FUNC(duscc68562_device::ctsa_w));
 
 	/* PIT Parallel Interface and Timer device, assumed strapped for on board clock */
-	MCFG_DEVICE_ADD ("pit1", PIT68230, XTAL(16'000'000) / 2) // The PIT clock is not verified on schema but reversed from behaviour
-	MCFG_PIT68230_PA_INPUT_CB(READ8(*this, cpu30_state, rotary_rd))
-	MCFG_PIT68230_PB_INPUT_CB(READ8(*this, cpu30_state, flop_dmac_r))
-	MCFG_PIT68230_PB_OUTPUT_CB(WRITE8(*this, cpu30_state, flop_dmac_w))
-	MCFG_PIT68230_PC_INPUT_CB(READ8(*this, cpu30_state, pit1c_r))
-	MCFG_PIT68230_PC_OUTPUT_CB(WRITE8(*this, cpu30_state, pit1c_w))
-//  MCFG_PIT68230_TIMER_IRQ_CB(WRITELINE("fga002", fga002_device, lirq2_w)) // The timer interrupt seems to silence the terminal interrupt, needs invectigation
+	PIT68230(config, m_pit1, XTAL(16'000'000) / 2); // The PIT clock is not verified on schema but reversed from behaviour
+	m_pit1->pa_in_callback().set(FUNC(cpu30_state::rotary_rd));
+	m_pit1->pb_in_callback().set(FUNC(cpu30_state::flop_dmac_r));
+	m_pit1->pb_out_callback().set(FUNC(cpu30_state::flop_dmac_w));
+	m_pit1->pc_in_callback().set(FUNC(cpu30_state::pit1c_r));
+	m_pit1->pc_out_callback().set(FUNC(cpu30_state::pit1c_w));
+//  m_pit1->timer_irq_callback().set(m_fga002, FUNC(fga002_device::lirq2_w)); // The timer interrupt seems to silence the terminal interrupt, needs invectigation
 
-	MCFG_DEVICE_ADD ("pit2", PIT68230, XTAL(16'000'000) / 2) // Th PIT clock is not verified on schema but reversed from behaviour
-	MCFG_PIT68230_PB_INPUT_CB(READ8(*this, cpu30_state, board_mem_id_rd))
-	MCFG_PIT68230_PA_INPUT_CB(READ8(*this, cpu30_state, pit2a_r))
-	MCFG_PIT68230_PA_OUTPUT_CB(WRITE8(*this, cpu30_state, pit2a_w))
-	MCFG_PIT68230_PC_INPUT_CB(READ8(*this, cpu30_state, pit2c_r))
-	MCFG_PIT68230_PC_OUTPUT_CB(WRITE8(*this, cpu30_state, pit2c_w))
-//  MCFG_PIT68230_TIMER_IRQ_CB(WRITELINE("fga002", fga002_device, lirq3_w)) // The timer interrupt seems to silence the terminal interrupt, needs invectigation
+	PIT68230(config, m_pit2, XTAL(16'000'000) / 2); // Th PIT clock is not verified on schema but reversed from behaviour
+	m_pit2->pb_in_callback().set(FUNC(cpu30_state::board_mem_id_rd));
+	m_pit2->pa_in_callback().set(FUNC(cpu30_state::pit2a_r));
+	m_pit2->pa_out_callback().set(FUNC(cpu30_state::pit2a_w));
+	m_pit2->pc_in_callback().set(FUNC(cpu30_state::pit2c_r));
+	m_pit2->pc_out_callback().set(FUNC(cpu30_state::pit2c_w));
+//  m_pit2->timer_irq_callback().set(m_fga002, FUNC(fga002_device::lirq3_w)); // The timer interrupt seems to silence the terminal interrupt, needs invectigation
 
 	/* FGA-002, Force Gate Array */
-	MCFG_FGA002_ADD("fga002", 0)
-	MCFG_FGA002_OUT_INT_CB(WRITELINE(*this, cpu30_state, fga_irq_callback))
-	MCFG_FGA002_OUT_LIACK4_CB(READ8("duscc",  duscc_device, iack))
-	MCFG_FGA002_OUT_LIACK5_CB(READ8("duscc2",  duscc_device, iack))
+	FGA002(config, m_fga002, 0);
+	m_fga002->out_int().set(FUNC(cpu30_state::fga_irq_callback));
+	m_fga002->liack4().set("duscc",  FUNC(duscc_device::iack));
+	m_fga002->liack5().set("duscc2", FUNC(duscc_device::iack));
 
 	// RTC
-	MCFG_DEVICE_ADD("rtc", RTC72423, XTAL(32'768)) // Fake crystal value, the 72423 uses it own internal crystal
-	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE("fga002", fga002_device, lirq0_w))
+	RTC72423(config, m_rtc, XTAL(32'768)); // Fake crystal value, the 72423 uses it own internal crystal
+	m_rtc->out_int_handler().set(m_fga002, FUNC(fga002_device::lirq0_w));
 
 	// dual ported ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_EXTRA_OPTIONS("8M, 16M, 32M")
+	RAM(config, m_ram).set_default_size("4M").set_extra_options("8M, 16M, 32M");
 MACHINE_CONFIG_END
 
 /* SYS68K/CPU-30X Part No.1 01300: 16.7 MHz 68030 based CPU board with 68882 FPCP, DMAC, 1 Mbyte Dual Ported RAM capacity and VMEPROM. */
@@ -768,12 +768,10 @@ MACHINE_CONFIG_START(cpu30_state::cpu30x)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(XTAL(16'777'216)) /* 16.7 MHz  from description, crystal needs verification */
 
-//  MCFG_DEVICE_REMOVE("")
+//  config.device_remove("");
 
 	// dual ported ram
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1M")
-	MCFG_RAM_EXTRA_OPTIONS("1M, 2M, 4M")
+	m_ram->set_default_size("1M").set_extra_options("1M, 2M, 4M");
 MACHINE_CONFIG_END
 
 /* SYS68K/CPU-30XA Part No.1 01301: 20.0 MHz 68030 based CPU board with 68882 FPCP, DMAC, 1 Mbyte Dual Ported RAM capacity and VMEPROM. Documentation included.*/
@@ -790,9 +788,7 @@ MACHINE_CONFIG_START(cpu30_state::cpu30za)
 	MCFG_DEVICE_CLOCK(XTAL(20'000'000)) /* 20.0 MHz  from description, crystal needs verification */
 
 	// dual ported ram
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_EXTRA_OPTIONS("1M, 2M, 4M")
+	m_ram->set_default_size("4M").set_extra_options("1M, 2M, 4M");
 MACHINE_CONFIG_END
 
 /* SYS68K/CPU-30ZBE 68030/68882 CPU, 25 MHz,  4 Mbyte shared DRAM, 4 Mbyte Flash, SCSI, Ethernet, Floppy disk, 4 serial I/O ports, 32-bit VMEbus interface */
@@ -802,9 +798,7 @@ MACHINE_CONFIG_START(cpu30_state::cpu30zbe)
 	MCFG_DEVICE_CLOCK(XTAL(25'000'000)) /* 25.0 MHz  from description, crystal needs verification */
 
 	// dual ported ram
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_EXTRA_OPTIONS("256K, 512K, 1M, 2M, 4M, 8M, 16M, 32M")
+	m_ram->set_default_size("4M").set_extra_options("256K, 512K, 1M, 2M, 4M, 8M, 16M, 32M");
 MACHINE_CONFIG_END
 
 /* SYS68K/CPU-33 */
@@ -814,51 +808,45 @@ MACHINE_CONFIG_START(cpu30_state::cpu33)
 	MCFG_DEVICE_CLOCK(XTAL(25'000'000)) /* 25.0 MHz  from description, crystal needs verification */
 
 	// dual ported ram
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_EXTRA_OPTIONS("256K, 512K, 1M, 2M, 4M, 8M, 16M, 32M")
+	m_ram->set_default_size("4M").set_extra_options("256K, 512K, 1M, 2M, 4M, 8M, 16M, 32M");
 MACHINE_CONFIG_END
 
 /* SYS68K/CPU-30BE/8 68030/68882 CPU, 25 MHz,  8 Mbyte shared DRAM, 4 Mbyte Flash, SCSI, Ethernet, Floppy disk, 4 serial I/O ports, 32-bit VMEbus interface, VMEPROM firmware*/
-MACHINE_CONFIG_START(cpu30_state::cpu30be8)
+void cpu30_state::cpu30be8(machine_config &config)
+{
 	cpu30zbe(config);
 	// dual ported ram
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("8M")
-	MCFG_RAM_EXTRA_OPTIONS("256K, 512K, 1M, 2M, 4M, 8M, 16M, 32M")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("8M").set_extra_options("256K, 512K, 1M, 2M, 4M, 8M, 16M, 32M");
+}
 
 /* SYS68K/CPU-30BE/16 68030/68882 CPU, 25 MHz, 16 Mbyte shared DRAM, 4 Mbyte Flash, SCSI, Ethernet, Floppy disk, 4 serial I/O ports, 32-bit VMEbus interface, VMEPROM firmware*/
-MACHINE_CONFIG_START(cpu30_state::cpu30be16)
+void cpu30_state::cpu30be16(machine_config &config)
+{
 	cpu30zbe(config);
 	// dual ported ram
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16M")
-	MCFG_RAM_EXTRA_OPTIONS("256K, 512K, 1M, 2M, 4M, 8M, 16M, 32M")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("16M").set_extra_options("256K, 512K, 1M, 2M, 4M, 8M, 16M, 32M");
+}
 
 /* SYS68K/CPU-30Lite/4 68030 CPU, 25 MHz, 4 Mbyte shared DRAM, 4 Mbyte Flash, 4 serial ports, 32-bit VMEbus interface, VMEPROM firmware. */
-MACHINE_CONFIG_START(cpu30_state::cpu30lite4)
+void cpu30_state::cpu30lite4(machine_config &config)
+{
 	cpu30zbe(config);
 // Enable these when added to main config
-//  MCFG_DEVICE_REMOVE("fpu")
-//  MCFG_DEVICE_REMOVE("scsi")
-//  MCFG_DEVICE_REMOVE("eth")
-//  MCFG_DEVICE_REMOVE("fdc")
+//  config.device_remove("fpu");
+//  config.device_remove("scsi");
+//  config.device_remove("eth");
+//  config.device_remove("fdc");
 	// dual ported ram
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_EXTRA_OPTIONS("256K, 512K, 1M, 2M, 4M, 8M, 16M, 32M")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("4M").set_extra_options("256K, 512K, 1M, 2M, 4M, 8M, 16M, 32M");
+}
 
 /* SYS68K/CPU-30Lite/8 68030 CPU, 25 MHz, 4 Mbyte shared DRAM, 8 Mbyte Flash, 4 serial ports, 32-bit VMEbus interface, VMEPROM firmware. */
-MACHINE_CONFIG_START(cpu30_state::cpu30lite8)
+void cpu30_state::cpu30lite8(machine_config &config)
+{
 	cpu30lite4(config);
 	// dual ported ram
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("8M")
-	MCFG_RAM_EXTRA_OPTIONS("256K, 512K, 1M, 2M, 4M, 8M, 16M, 32M")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("8M").set_extra_options("256K, 512K, 1M, 2M, 4M, 8M, 16M, 32M");
+}
 
 /* ROM definitions */
 ROM_START (fccpu30) /* This is an original rom dump */

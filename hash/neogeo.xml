@@ -1371,9 +1371,10 @@
 	</software>
 
 	<software name="quizdaisk" cloneof="quizdais">
-		<description>Quiz Daisousa Sen - The Last Count Down (Korean release)</description>
-		<year>1991</year>
-		<publisher>SNK</publisher>
+		<description>Quiz Salibtamjeong - The Last Count Down (Korean localized Quiz Daisousa Sen)</description>
+		<year>1995</year>
+		<publisher>SNK / Viccom</publisher> <!--Localized by Viccom-->
+		<info name="alt_title" value="퀴즈 사립탐정"/>
 		<sharedfeat name="release" value="MVS" />   <!-- Unknown if it was also released on AES -->
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
@@ -3290,12 +3291,13 @@
 	-->
 
 	<software name="fightfev">
-		<description>Fight Fever (set 1)</description>
+		<description>Fight Fever / Wang Jung Wang (set 1)</description>
 		<year>1994</year>
 		<publisher>Viccom</publisher>
 		<info name="serial" value="NGM-060"/>
 		<info name="release" value="19940628"/>
 		<info name="alt_title" value="ファイトフィーバー"/>
+		<!--<info name="alt_title" value="왕중왕"/> developed and released in korea; korean language is only available in europe / asia bios-->
 		<sharedfeat name="release" value="MVS" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
@@ -3322,12 +3324,13 @@
 	</software>
 
 	<software name="fightfeva" cloneof="fightfev">
-		<description>Fight Fever (set 2)</description>
+		<description>Fight Fever / Wang Jung Wang (set 2)</description>
 		<year>1994</year>
 		<publisher>Viccom</publisher>
 		<info name="serial" value="NGM-060"/>
 		<info name="release" value="19940628"/>
 		<info name="alt_title" value="ファイトフィーバー"/>
+		<!--<info name="alt_title" value="왕중왕"/> developed and released in korea; korean language is only available in europe / asia bios-->
 		<sharedfeat name="release" value="MVS" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
@@ -4147,7 +4150,7 @@
 	<software name="quizkof">
 		<description>Quiz King of Fighters (SAM-080 ~ SAH-080)</description>
 		<year>1995</year>
-		<publisher>Saurus</publisher>
+		<publisher>Saurus (SNK license)</publisher>
 		<info name="serial" value="NGM-080 / SAM-080 (MVS), NGH-080 / SAH-080 (AES)"/>
 		<info name="release" value="19950201 (MVS), 19950310 (AES)"/>
 		<info name="alt_title" value="クイズ キングオブファイターズ"/>
@@ -4178,9 +4181,10 @@
 	</software>
 
 	<software name="quizkofk" cloneof="quizkof">
-		<description>Quiz King of Fighters (Korean release)</description>
-		<year>1995</year>
-		<publisher>Saurus</publisher>
+		<description>Quiz King of Fighters (Korea)</description>
+		<year>1996</year>
+		<publisher>Saurus / Viccom (SNK license)</publisher>
+		<info name="alt_title" value="퀴즈 킹 오브 화이터즈"/>
 		<sharedfeat name="release" value="MVS" />   <!-- Unknown if it was also released on AES -->
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
@@ -5216,7 +5220,7 @@
 	The following ID's are used by Korean releases:
 
 	ID-0122 - Pae Wang Jeon Seol / Legend of a Warrior (Korean censored Samurai Shodown IV)
-	ID-0123 - Quiz Daisousa Sen - The Last Count Down (Korean release)
+	ID-0123 - Quiz Salibtamjeong - The Last Count Down (Korean localized Quiz Daisousa Sen)
 	ID-0124 - Real Bout Fatal Fury Special / Real Bout Garou Densetsu Special (Korean release)
 	ID-0134 - The Last Soldier (Korean release of The Last Blade)
 	ID-0140 - Real Bout Fatal Fury 2 - The Newcomers (Korean release)
@@ -5318,7 +5322,7 @@
 	<software name="puzzledp">
 		<description>Puzzle De Pon!</description>
 		<year>1995</year>
-		<publisher>Taito (Visco license)</publisher>
+		<publisher>Visco</publisher>
 		<info name="serial" value="NGM-202"/>
 		<info name="release" value="19951128"/>
 		<info name="alt_title" value="パズルdeポン！"/>
@@ -5939,11 +5943,11 @@
 
 	<!--
 	ID-0220
-	Choutetsu Brikin'ger - Iron clad (prototype) 1996 Saurus
+	Choutetsu Brikin'ger / Iron clad (prototype) 1996 Saurus
 	-->
 
 	<software name="ironclad">
-		<description>Choutetsu Brikin'ger - Iron Clad (Prototype)</description>
+		<description>Choutetsu Brikin'ger / Iron Clad (Prototype)</description>
 		<year>1996</year>
 		<publisher>Saurus</publisher>
 		<sharedfeat name="release" value="MVS,AES" />
@@ -5973,7 +5977,7 @@
 	</software>
 
 	<software name="ironclado" cloneof="ironclad">
-		<description>Choutetsu Brikin'ger - Iron Clad (Prototype, bootleg)</description>
+		<description>Choutetsu Brikin'ger / Iron Clad (Prototype, bootleg)</description>
 		<year>1996</year>
 		<publisher>bootleg</publisher>
 		<sharedfeat name="release" value="MVS,AES" />
@@ -6640,7 +6644,7 @@
 				<rom name="234-v1.v1" offset="0x000000" size="0x400000" crc="ed66b76f" sha1="8a05ff06d9b6f01c6c16b3026282eaabb0e25b44" />   <!-- TC5332204 -->
 				<rom name="234-v2.v2" offset="0x400000" size="0x400000" crc="a0e7f6e2" sha1="753ff74fa9294f695aae511ae01ead119b114a57" />   <!-- TC5332204 -->
 				<rom name="234-v3.v3" offset="0x800000" size="0x400000" crc="a506e1e2" sha1="b3e04ba1a5cb50b77c6fbe9fe353b9b64b6f3f74" />   <!-- TC5332204 -->
-				<rom name="234-v4.v4" offset="0xc00000" size="0x400000" crc="0e34157f" sha1="20A1F4833E5E29BA0073C1712D7A17AB7A2A035C" />   <!-- TC5332204 -->
+				<rom name="234-v4.v4" offset="0xc00000" size="0x400000" crc="0e34157f" sha1="20a1f4833e5e29ba0073c1712d7a17ab7a2a035c" />   <!-- TC5332204 -->
 			</dataarea>
 			<dataarea name="sprites" size="0x2800000">
 				<rom loadflag="load16_byte" name="234-c1.c1" offset="0x000000" size="0x800000" crc="9f7e2bd3" sha1="2828aca0c0f5802110f10453c1cf640f69736554" />    <!-- TC5364205 -->
@@ -6677,7 +6681,7 @@
 				<rom name="234-v1.v1" offset="0x000000" size="0x400000" crc="ed66b76f" sha1="8a05ff06d9b6f01c6c16b3026282eaabb0e25b44" />   <!-- TC5332204 -->
 				<rom name="234-v2.v2" offset="0x400000" size="0x400000" crc="a0e7f6e2" sha1="753ff74fa9294f695aae511ae01ead119b114a57" />   <!-- TC5332204 -->
 				<rom name="234-v3.v3" offset="0x800000" size="0x400000" crc="a506e1e2" sha1="b3e04ba1a5cb50b77c6fbe9fe353b9b64b6f3f74" />   <!-- TC5332204 -->
-				<rom name="234-v4.v4" offset="0xc00000" size="0x400000" crc="0e34157f" sha1="20A1F4833E5E29BA0073C1712D7A17AB7A2A035C" />   <!-- TC5332204 -->
+				<rom name="234-v4.v4" offset="0xc00000" size="0x400000" crc="0e34157f" sha1="20a1f4833e5e29ba0073c1712d7a17ab7a2a035c" />   <!-- TC5332204 -->
 			</dataarea>
 			<dataarea name="sprites" size="0x2800000">
 				<rom loadflag="load16_byte" name="234-c1.c1" offset="0x000000" size="0x800000" crc="9f7e2bd3" sha1="2828aca0c0f5802110f10453c1cf640f69736554" />    <!-- TC5364205 -->
@@ -6711,7 +6715,7 @@
 				<rom name="234-v1.v1" offset="0x000000" size="0x400000" crc="ed66b76f" sha1="8a05ff06d9b6f01c6c16b3026282eaabb0e25b44" />   <!-- TC5332204 -->
 				<rom name="234-v2.v2" offset="0x400000" size="0x400000" crc="a0e7f6e2" sha1="753ff74fa9294f695aae511ae01ead119b114a57" />   <!-- TC5332204 -->
 				<rom name="234-v3.v3" offset="0x800000" size="0x400000" crc="a506e1e2" sha1="b3e04ba1a5cb50b77c6fbe9fe353b9b64b6f3f74" />   <!-- TC5332204 -->
-				<rom name="234-v4.v4" offset="0xc00000" size="0x400000" crc="0e34157f" sha1="20A1F4833E5E29BA0073C1712D7A17AB7A2A035C" />   <!-- TC5332204 -->
+				<rom name="234-v4.v4" offset="0xc00000" size="0x400000" crc="0e34157f" sha1="20a1f4833e5e29ba0073c1712d7a17ab7a2a035c" />   <!-- TC5332204 -->
 			</dataarea>
 			<dataarea name="sprites" size="0x2800000">
 				<rom loadflag="load16_byte" name="234-c1.c1" offset="0x000000" size="0x800000" crc="9f7e2bd3" sha1="2828aca0c0f5802110f10453c1cf640f69736554" />    <!-- TC5364205 -->
@@ -6734,7 +6738,7 @@
 	<software name="puzzldpr" cloneof="puzzledp">
 		<description>Puzzle De Pon! R!</description>
 		<year>1997</year>
-		<publisher>Taito (Visco license)</publisher>
+		<publisher>Visco</publisher>
 		<info name="serial" value="NGM-2350?"/>
 		<info name="alt_title" value="パズル de ポン! R"/>
 		<sharedfeat name="release" value="MVS" />   <!-- MVS ONLY RELEASE -->
@@ -8206,7 +8210,7 @@
 	<software name="preisle2">
 		<description>Prehistoric Isle 2</description>
 		<year>1999</year>
-		<publisher>Yumekobo</publisher>
+		<publisher>Yumekobo / Saurus</publisher> <!--co-developed with saurus-->
 		<info name="serial" value="NGM-2550"/>
 		<info name="release" value="19990927"/>
 		<info name="alt_title" value="原始島2"/>
@@ -9210,7 +9214,7 @@
 	<software name="svc">
 		<description>SNK vs. Capcom - SVC Chaos (NGM-2690 ~ NGH-2690)</description>
 		<year>2003</year>
-		<publisher>SNK Playmore</publisher>
+		<publisher>Playmore / Capcom</publisher>
 		<info name="serial" value="NGM-2690 (MVS), NGH-2690 (AES)"/>
 		<info name="release" value="20030724 (MVS), 20031113 (AES)"/>
 		<info name="alt_title" value="エス・エヌ・ケイ バーサス カプコン エスブイシー カオス"/>
@@ -10077,7 +10081,7 @@
 			</dataarea>
 			<dataarea name="ymsnd" size="0x400000">
 				<rom name="nitd-v1.bin" offset="0x000000" size="0x200000" crc="79008868" sha1="90bd6aaefd37341297ab1f4ae7246e52facd87d0" />
-				<rom name="nitd-v2.bin" offset="0x200000" size="0x200000" crc="728558F9" sha1="309aa7c933c199b2e540a601b363e7af8744fe00" />
+				<rom name="nitd-v2.bin" offset="0x200000" size="0x200000" crc="728558f9" sha1="309aa7c933c199b2e540a601b363e7af8744fe00" />
 			</dataarea>
 			<dataarea name="sprites" size="0x800000">
 				<rom loadflag="load16_byte" name="nitd-c1.bin" offset="0x000000" size="0x200000" crc="b4353190" sha1="90d5352e243a05f5c2be4fa7475667bb56e78016" />

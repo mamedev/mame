@@ -44,9 +44,9 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(C1570,      c1570_device,      "c1570",    "C1570 Disk Drive")
-DEFINE_DEVICE_TYPE(C1571,      c1571_device,      "c1571",    "C1571 Disk Drive")
-DEFINE_DEVICE_TYPE(C1571CR,    c1571cr_device,    "c1571cr",  "C1571CR Disk Drive")
+DEFINE_DEVICE_TYPE(C1570,      c1570_device,      "c1570",    "Commodore 1570 Disk Drive")
+DEFINE_DEVICE_TYPE(C1571,      c1571_device,      "c1571",    "Commodore 1571 Disk Drive")
+DEFINE_DEVICE_TYPE(C1571CR,    c1571cr_device,    "c1571cr",  "Commodore 1571CR Disk Drive")
 DEFINE_DEVICE_TYPE(MINI_CHIEF, mini_chief_device, "minichif", "ICT Mini Chief Disk Drive")
 
 
@@ -384,7 +384,7 @@ WRITE8_MEMBER( c1571cr_device::via0_pb_w )
 
 READ8_MEMBER( c1571_device::via1_r )
 {
-	uint8_t data = m_via1->read(space, offset);
+	uint8_t data = m_via1->read(offset);
 
 	m_ga->ted_w(!m_1_2mhz);
 	m_ga->ted_w(1);
@@ -394,7 +394,7 @@ READ8_MEMBER( c1571_device::via1_r )
 
 WRITE8_MEMBER( c1571_device::via1_w )
 {
-	m_via1->write(space, offset, data);
+	m_via1->write(offset, data);
 
 	m_ga->ted_w(!m_1_2mhz);
 	m_ga->ted_w(1);
@@ -561,16 +561,6 @@ WRITE_LINE_MEMBER( c1571_device::byte_w )
 
 
 //-------------------------------------------------
-//  SLOT_INTERFACE( c1571_floppies )
-//-------------------------------------------------
-
-static void c1571_floppies(device_slot_interface &device)
-{
-	device.option_add("525qd", FLOPPY_525_QD);
-}
-
-
-//-------------------------------------------------
 //  floppy_interface c1571_floppy_interface
 //-------------------------------------------------
 
@@ -604,150 +594,88 @@ static void mini_chief_isa8_cards(device_slot_interface &device)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(c1570_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(M6502_TAG, M6502, 16_MHz_XTAL / 16)
-	MCFG_DEVICE_PROGRAM_MAP(c1571_mem)
-	MCFG_QUANTUM_PERFECT_CPU(M6502_TAG)
+void c1571_device::add_base_mconfig(machine_config &config)
+{
+	M6502(config, m_maincpu, 16_MHz_XTAL / 16);
+	m_maincpu->set_addrmap(AS_PROGRAM, &c1571_device::c1571_mem);
+	config.m_perfect_cpu_quantum = subtag(M6502_TAG);
 
-	MCFG_DEVICE_ADD(M6522_0_TAG, VIA6522, 16_MHz_XTAL / 16)
-	MCFG_VIA6522_READPA_HANDLER(READ8(*this, c1571_device, via0_pa_r))
-	MCFG_VIA6522_READPB_HANDLER(READ8(*this, c1571_device, via0_pb_r))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, c1571_device, via0_pa_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, c1571_device, via0_pb_w))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, c1571_device, via0_irq_w))
+	VIA6522(config, m_via0, 16_MHz_XTAL / 16);
+	m_via0->readpa_handler().set(FUNC(c1571_device::via0_pa_r));
+	m_via0->readpb_handler().set(FUNC(c1571_device::via0_pb_r));
+	m_via0->writepa_handler().set(FUNC(c1571_device::via0_pa_w));
+	m_via0->writepb_handler().set(FUNC(c1571_device::via0_pb_w));
+	m_via0->irq_handler().set(FUNC(c1571_device::via0_irq_w));
 
-	MCFG_DEVICE_ADD(M6522_1_TAG, VIA6522, 16_MHz_XTAL / 16)
-	MCFG_VIA6522_READPA_HANDLER(READ8(C64H156_TAG, c64h156_device, yb_r))
-	MCFG_VIA6522_READPB_HANDLER(READ8(*this, c1571_device, via1_pb_r))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(C64H156_TAG, c64h156_device, yb_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, c1571_device, via1_pb_w))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(C64H156_TAG, c64h156_device, soe_w))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(C64H156_TAG, c64h156_device, oe_w))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, c1571_device, via1_irq_w))
+	VIA6522(config, m_via1, 16_MHz_XTAL / 16);
+	m_via1->readpa_handler().set(C64H156_TAG, FUNC(c64h156_device::yb_r));
+	m_via1->readpb_handler().set(FUNC(c1571_device::via1_pb_r));
+	m_via1->writepa_handler().set(C64H156_TAG, FUNC(c64h156_device::yb_w));
+	m_via1->writepb_handler().set(FUNC(c1571_device::via1_pb_w));
+	m_via1->ca2_handler().set(C64H156_TAG, FUNC(c64h156_device::soe_w));
+	m_via1->cb2_handler().set(C64H156_TAG, FUNC(c64h156_device::oe_w));
+	m_via1->irq_handler().set(FUNC(c1571_device::via1_irq_w));
 
-	MCFG_DEVICE_ADD(M6526_TAG, MOS6526, 16_MHz_XTAL / 16)
-	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(*this, c1571_device, cia_irq_w))
-	MCFG_MOS6526_CNT_CALLBACK(WRITELINE(*this, c1571_device, cia_cnt_w))
-	MCFG_MOS6526_SP_CALLBACK(WRITELINE(*this, c1571_device, cia_sp_w))
-	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(*this, c1571_device, cia_pb_r))
-	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(*this, c1571_device, cia_pb_w))
-	MCFG_MOS6526_PC_CALLBACK(WRITELINE(*this, c1571_device, cia_pc_w))
+	WD1770(config, m_fdc, 16_MHz_XTAL / 2);
 
-	MCFG_DEVICE_ADD(WD1770_TAG, WD1770, 16_MHz_XTAL / 2)
+	C64H156(config, m_ga, 16_MHz_XTAL);
+	m_ga->byte_callback().set(FUNC(c1571_device::byte_w));
 
-	MCFG_DEVICE_ADD(C64H156_TAG, C64H156, 16_MHz_XTAL)
-	MCFG_64H156_BYTE_CALLBACK(WRITELINE(*this, c1571_device, byte_w))
-	MCFG_FLOPPY_DRIVE_ADD_FIXED(C64H156_TAG":0", c1571_floppies, "525qd", c1571_device::floppy_formats)
-MACHINE_CONFIG_END
+	floppy_connector &connector(FLOPPY_CONNECTOR(config, C64H156_TAG":0", 0));
+	connector.option_add("525qd", FLOPPY_525_QD);
+	connector.set_default_option("525qd");
+	connector.set_fixed(true);
+	connector.set_formats(c1571_device::floppy_formats);
+}
 
+void c1571_device::add_cia_mconfig(machine_config &config)
+{
+	MOS6526(config, m_cia, 16_MHz_XTAL / 16);
+	m_cia->irq_wr_callback().set(FUNC(c1571_device::cia_irq_w));
+	m_cia->cnt_wr_callback().set(FUNC(c1571_device::cia_cnt_w));
+	m_cia->sp_wr_callback().set(FUNC(c1571_device::cia_sp_w));
+	m_cia->pb_rd_callback().set(FUNC(c1571_device::cia_pb_r));
+	m_cia->pb_wr_callback().set(FUNC(c1571_device::cia_pb_w));
+	m_cia->pc_wr_callback().set(FUNC(c1571_device::cia_pc_w));
+}
 
-MACHINE_CONFIG_START(c1571_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(M6502_TAG, M6502, 16_MHz_XTAL / 16)
-	MCFG_DEVICE_PROGRAM_MAP(c1571_mem)
-	MCFG_QUANTUM_PERFECT_CPU(M6502_TAG)
-
-	MCFG_DEVICE_ADD(M6522_0_TAG, VIA6522, 16_MHz_XTAL / 16)
-	MCFG_VIA6522_READPA_HANDLER(READ8(*this, c1571_device, via0_pa_r))
-	MCFG_VIA6522_READPB_HANDLER(READ8(*this, c1571_device, via0_pb_r))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, c1571_device, via0_pa_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, c1571_device, via0_pb_w))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, c1571_device, via0_irq_w))
-
-	MCFG_DEVICE_ADD(M6522_1_TAG, VIA6522, 16_MHz_XTAL / 16)
-	MCFG_VIA6522_READPA_HANDLER(READ8(C64H156_TAG, c64h156_device, yb_r))
-	MCFG_VIA6522_READPB_HANDLER(READ8(*this, c1571_device, via1_pb_r))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(C64H156_TAG, c64h156_device, yb_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, c1571_device, via1_pb_w))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(C64H156_TAG, c64h156_device, soe_w))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(C64H156_TAG, c64h156_device, oe_w))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, c1571_device, via1_irq_w))
-
-	MCFG_DEVICE_ADD(M6526_TAG, MOS6526, 16_MHz_XTAL / 16)
-	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(*this, c1571_device, cia_irq_w))
-	MCFG_MOS6526_CNT_CALLBACK(WRITELINE(*this, c1571_device, cia_cnt_w))
-	MCFG_MOS6526_SP_CALLBACK(WRITELINE(*this, c1571_device, cia_sp_w))
-	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(*this, c1571_device, cia_pb_r))
-	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(*this, c1571_device, cia_pb_w))
-	MCFG_MOS6526_PC_CALLBACK(WRITELINE(*this, c1571_device, cia_pc_w))
-
-	MCFG_DEVICE_ADD(WD1770_TAG, WD1770, 16_MHz_XTAL / 2)
-
-	MCFG_DEVICE_ADD(C64H156_TAG, C64H156, 16_MHz_XTAL)
-	MCFG_64H156_BYTE_CALLBACK(WRITELINE(*this, c1571_device, byte_w))
-	MCFG_FLOPPY_DRIVE_ADD_FIXED(C64H156_TAG":0", c1571_floppies, "525qd", c1571_device::floppy_formats)
-MACHINE_CONFIG_END
+void c1570_device::device_add_mconfig(machine_config &config)
+{
+	add_base_mconfig(config);
+	add_cia_mconfig(config);
+}
 
 
-MACHINE_CONFIG_START(c1571cr_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(M6502_TAG, M6502, 16_MHz_XTAL / 16)
-	MCFG_DEVICE_PROGRAM_MAP(c1571_mem)
-	MCFG_QUANTUM_PERFECT_CPU(M6502_TAG)
-
-	MCFG_DEVICE_ADD(M6522_0_TAG, VIA6522, 16_MHz_XTAL / 16)
-	MCFG_VIA6522_READPA_HANDLER(READ8(*this, c1571_device, via0_pa_r))
-	MCFG_VIA6522_READPB_HANDLER(READ8(*this, c1571_device, via0_pb_r))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, c1571cr_device, via0_pa_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, c1571cr_device, via0_pb_w))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, c1571_device, via0_irq_w))
-
-	MCFG_DEVICE_ADD(M6522_1_TAG, VIA6522, 16_MHz_XTAL / 16)
-	MCFG_VIA6522_READPA_HANDLER(READ8(C64H156_TAG, c64h156_device, yb_r))
-	MCFG_VIA6522_READPB_HANDLER(READ8(*this, c1571_device, via1_pb_r))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(C64H156_TAG, c64h156_device, yb_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, c1571_device, via1_pb_w))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(C64H156_TAG, c64h156_device, soe_w))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(C64H156_TAG, c64h156_device, oe_w))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, c1571_device, via1_irq_w))
-
-	//MCFG_MOS5710_ADD(M5710_TAG, 16_MHz_XTAL / 16, 0)
-
-	MCFG_DEVICE_ADD(WD1770_TAG, WD1770, 16_MHz_XTAL / 2)
-
-	MCFG_DEVICE_ADD(C64H156_TAG, C64H156, 16_MHz_XTAL)
-	MCFG_64H156_BYTE_CALLBACK(WRITELINE(*this, c1571_device, byte_w))
-	MCFG_FLOPPY_DRIVE_ADD_FIXED(C64H156_TAG":0", c1571_floppies, "525qd", c1571_device::floppy_formats)
-MACHINE_CONFIG_END
+void c1571_device::device_add_mconfig(machine_config &config)
+{
+	add_base_mconfig(config);
+	add_cia_mconfig(config);
+}
 
 
-MACHINE_CONFIG_START(mini_chief_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(M6502_TAG, M6502, 16_MHz_XTAL / 16)
-	MCFG_DEVICE_PROGRAM_MAP(mini_chief_mem)
-	MCFG_QUANTUM_PERFECT_CPU(M6502_TAG)
+void c1571cr_device::device_add_mconfig(machine_config &config)
+{
+	add_base_mconfig(config);
 
-	MCFG_DEVICE_ADD(M6522_0_TAG, VIA6522, 16_MHz_XTAL / 16)
-	MCFG_VIA6522_READPA_HANDLER(READ8(*this, c1571_device, via0_pa_r))
-	MCFG_VIA6522_READPB_HANDLER(READ8(*this, c1571_device, via0_pb_r))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, c1571_device, via0_pa_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, c1571_device, via0_pb_w))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, c1571_device, via0_irq_w))
+	m_via0->writepa_handler().set(FUNC(c1571cr_device::via0_pa_w));
+	m_via0->writepb_handler().set(FUNC(c1571cr_device::via0_pb_w));
 
-	MCFG_DEVICE_ADD(M6522_1_TAG, VIA6522, 16_MHz_XTAL / 16)
-	MCFG_VIA6522_READPA_HANDLER(READ8(C64H156_TAG, c64h156_device, yb_r))
-	MCFG_VIA6522_READPB_HANDLER(READ8(*this, c1571_device, via1_pb_r))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(C64H156_TAG, c64h156_device, yb_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, c1571_device, via1_pb_w))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(C64H156_TAG, c64h156_device, soe_w))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(C64H156_TAG, c64h156_device, oe_w))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, c1571_device, via1_irq_w))
+	//MOS5710(config, M5710_TAG, 16_MHz_XTAL / 16);
+}
 
-	MCFG_DEVICE_ADD(M6526_TAG, MOS6526, 16_MHz_XTAL / 16)
-	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(*this, c1571_device, cia_irq_w))
-	MCFG_MOS6526_CNT_CALLBACK(WRITELINE(*this, c1571_device, cia_cnt_w))
-	MCFG_MOS6526_SP_CALLBACK(WRITELINE(*this, c1571_device, cia_sp_w))
-	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(*this, c1571_device, cia_pb_r))
-	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(*this, c1571_device, cia_pb_w))
-	MCFG_MOS6526_PC_CALLBACK(WRITELINE(*this, c1571_device, cia_pc_w))
 
-	MCFG_DEVICE_ADD(WD1770_TAG, WD1770, 16_MHz_XTAL / 2)
+void mini_chief_device::device_add_mconfig(machine_config &config)
+{
+	add_base_mconfig(config);
+	add_cia_mconfig(config);
 
-	MCFG_DEVICE_ADD(C64H156_TAG, C64H156, 16_MHz_XTAL)
-	MCFG_64H156_BYTE_CALLBACK(WRITELINE(*this, c1571_device, byte_w))
-	MCFG_FLOPPY_DRIVE_ADD_FIXED(C64H156_TAG":0", c1571_floppies, "525qd", c1571_device::floppy_formats)
+	m_maincpu->set_addrmap(AS_PROGRAM, &mini_chief_device::mini_chief_mem);
 
-	MCFG_DEVICE_ADD(ISA_BUS_TAG, ISA8, 0)
-	MCFG_ISA8_CPU(M6502_TAG)
-	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, ISA_BUS_TAG, mini_chief_isa8_cards, "wd1002a_wx1", false)
-MACHINE_CONFIG_END
+	isa8_device &isa8(ISA8(config, ISA_BUS_TAG, 0));
+	isa8.set_memspace(m_maincpu, AS_PROGRAM);
+	isa8.set_iospace(m_maincpu, AS_PROGRAM);
+	ISA8_SLOT(config, "isa1", 0, ISA_BUS_TAG, mini_chief_isa8_cards, "wd1002a_wx1", false);
+}
 
 
 //-------------------------------------------------

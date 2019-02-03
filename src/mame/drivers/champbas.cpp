@@ -82,7 +82,6 @@ TODO:
 #include "includes/champbas.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6805/m68705.h"
-#include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
@@ -193,7 +192,7 @@ void champbas_state::champbas_map(address_map &map)
 	map(0xa080, 0xa080).mirror(0x0020).portr("DSW");
 	map(0xa0c0, 0xa0c0).portr("SYSTEM");
 
-	map(0xa000, 0xa007).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0xa000, 0xa007).w(m_mainlatch, FUNC(ls259_device::write_d0));
 
 	map(0xa060, 0xa06f).writeonly().share("spriteram");
 	map(0xa080, 0xa080).w("soundlatch", FUNC(generic_latch_8_device::write));
@@ -534,21 +533,20 @@ MACHINE_CONFIG_START(champbas_state::talbot)
 	MCFG_DEVICE_PROGRAM_MAP(champbasj_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", champbas_state, vblank_irq)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, champbas_state, irq_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(NOOP) // !WORK board output (no use?)
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // no gfxbank
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, champbas_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // no palettebank
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // n.c.
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, champbas_state, mcu_start_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, champbas_state, mcu_switch_w))
+	LS259(config, m_mainlatch);
+	m_mainlatch->q_out_cb<0>().set(FUNC(champbas_state::irq_enable_w));
+	m_mainlatch->q_out_cb<1>().set_nop(); // !WORK board output (no use?)
+	m_mainlatch->q_out_cb<2>().set_nop(); // no gfxbank
+	m_mainlatch->q_out_cb<3>().set(FUNC(champbas_state::flipscreen_w));
+	m_mainlatch->q_out_cb<4>().set_nop(); // no palettebank
+	m_mainlatch->q_out_cb<5>().set_nop(); // n.c.
+	m_mainlatch->q_out_cb<6>().set(FUNC(champbas_state::mcu_start_w));
+	m_mainlatch->q_out_cb<7>().set(FUNC(champbas_state::mcu_switch_w));
 
 	MCFG_DEVICE_ADD("alpha_8201", ALPHA_8201, XTAL(18'432'000)/6/8)
-	MCFG_QUANTUM_PERFECT_CPU("alpha_8201:mcu")
+	config.m_perfect_cpu_quantum = subtag("alpha_8201:mcu");
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 0x10)
+	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 0x10);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -556,20 +554,17 @@ MACHINE_CONFIG_START(champbas_state::talbot)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(champbas_state, screen_update_champbas)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_talbot)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(champbas_state,champbas)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_talbot)
+	PALETTE(config, m_palette, FUNC(champbas_state::champbas_palette), 512, 32);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(18'432'000)/12)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	AY8910(config, "ay1", XTAL(18'432'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.5);
 MACHINE_CONFIG_END
 
 
@@ -580,21 +575,20 @@ MACHINE_CONFIG_START(champbas_state::champbas)
 	MCFG_DEVICE_PROGRAM_MAP(champbas_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", champbas_state, vblank_irq)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 9D; 8G on Champion Baseball II Double Board Configuration
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, champbas_state, irq_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(NOOP) // !WORK board output (no use?)
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, champbas_state, gfxbank_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, champbas_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, champbas_state, palette_bank_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // n.c.
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP) // no MCU
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP) // no MCU
+	LS259(config, m_mainlatch); // 9D; 8G on Champion Baseball II Double Board Configuration
+	m_mainlatch->q_out_cb<0>().set(FUNC(champbas_state::irq_enable_w));
+	m_mainlatch->q_out_cb<1>().set_nop(); // !WORK board output (no use?)
+	m_mainlatch->q_out_cb<2>().set(FUNC(champbas_state::gfxbank_w));
+	m_mainlatch->q_out_cb<3>().set(FUNC(champbas_state::flipscreen_w));
+	m_mainlatch->q_out_cb<4>().set(FUNC(champbas_state::palette_bank_w));
+	m_mainlatch->q_out_cb<5>().set_nop(); // n.c.
+	m_mainlatch->q_out_cb<6>().set_nop(); // no MCU
+	m_mainlatch->q_out_cb<7>().set_nop(); // no MCU
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(18'432'000)/6)
 	MCFG_DEVICE_PROGRAM_MAP(champbas_sound_map)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 0x10)
+	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 0x10);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -602,20 +596,17 @@ MACHINE_CONFIG_START(champbas_state::champbas)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(champbas_state, screen_update_champbas)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_champbas)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(champbas_state,champbas)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_champbas)
+	PALETTE(config, m_palette, FUNC(champbas_state::champbas_palette), 512, 32);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(18'432'000)/12)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
+	AY8910(config, "ay1", XTAL(18'432'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.3);
 
 	MCFG_DEVICE_ADD("dac", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.7) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
@@ -629,12 +620,11 @@ MACHINE_CONFIG_START(champbas_state::champbasj)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(champbasj_map)
 
-	MCFG_DEVICE_MODIFY("mainlatch")
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, champbas_state, mcu_start_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, champbas_state, mcu_switch_w))
+	m_mainlatch->q_out_cb<6>().set(FUNC(champbas_state::mcu_start_w));
+	m_mainlatch->q_out_cb<7>().set(FUNC(champbas_state::mcu_switch_w));
 
 	MCFG_DEVICE_ADD("alpha_8201", ALPHA_8201, XTAL(18'432'000)/6/8) // note: 8302 rom on champbb2 (same device!)
-	MCFG_QUANTUM_PERFECT_CPU("alpha_8201:mcu")
+	config.m_perfect_cpu_quantum = subtag("alpha_8201:mcu");
 MACHINE_CONFIG_END
 
 
@@ -686,29 +676,29 @@ MACHINE_CONFIG_START(exctsccr_state::exctsccr)
 	MCFG_DEVICE_PROGRAM_MAP(exctsccr_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", exctsccr_state, vblank_irq)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, exctsccr_state, irq_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(NOOP) // !WORK board output (no use?)
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, exctsccr_state, gfxbank_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, exctsccr_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // no palettebank
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // n.c.
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, exctsccr_state, mcu_start_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, exctsccr_state, mcu_switch_w))
+	LS259(config, m_mainlatch);
+	m_mainlatch->q_out_cb<0>().set(FUNC(exctsccr_state::irq_enable_w));
+	m_mainlatch->q_out_cb<1>().set_nop(); // !WORK board output (no use?)
+	m_mainlatch->q_out_cb<2>().set(FUNC(exctsccr_state::gfxbank_w));
+	m_mainlatch->q_out_cb<3>().set(FUNC(exctsccr_state::flipscreen_w));
+	m_mainlatch->q_out_cb<4>().set_nop(); // no palettebank
+	m_mainlatch->q_out_cb<5>().set_nop(); // n.c.
+	m_mainlatch->q_out_cb<6>().set(FUNC(exctsccr_state::mcu_start_w));
+	m_mainlatch->q_out_cb<7>().set(FUNC(exctsccr_state::mcu_switch_w));
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(14'318'181)/4 )
 	MCFG_DEVICE_PROGRAM_MAP(exctsccr_sound_map)
 	MCFG_DEVICE_IO_MAP(exctsccr_sound_io_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(exctsccr_state, nmi_line_pulse, 4000) // 4 kHz, updates the dac
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("exc_snd_irq", exctsccr_state, exctsccr_sound_irq, attotime::from_hz(75)) // irq source unknown, determines music tempo
-	MCFG_TIMER_START_DELAY(attotime::from_hz(75))
+	timer_device &exc_snd_irq(TIMER(config, "exc_snd_irq"));
+	exc_snd_irq.configure_periodic(FUNC(exctsccr_state::exctsccr_sound_irq), attotime::from_hz(75)); // irq source unknown, determines music tempo
+	exc_snd_irq.set_start_delay(attotime::from_hz(75));
 
 	MCFG_DEVICE_ADD("alpha_8201", ALPHA_8201, XTAL(18'432'000)/6/8) // note: 8302 rom, or 8303 on exctscc2 (same device!)
-	MCFG_QUANTUM_PERFECT_CPU("alpha_8201:mcu")
+	config.m_perfect_cpu_quantum = subtag("alpha_8201:mcu");
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 0x10)
+	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 0x10);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -716,30 +706,24 @@ MACHINE_CONFIG_START(exctsccr_state::exctsccr)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(exctsccr_state, screen_update_exctsccr)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_exctsccr)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(exctsccr_state,exctsccr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_exctsccr)
+	PALETTE(config, m_palette, FUNC(exctsccr_state::exctsccr_palette), 512, 32);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	/* AY (melody) clock is specified by a VR (0.9 - 3.9 MHz) */
-	MCFG_DEVICE_ADD("ay1", AY8910, 1940000) /* VR has a factory mark and this is the value read */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.08)
+	AY8910(config, "ay1", 1940000).add_route(ALL_OUTPUTS, "speaker", 0.08); /* VR has a factory mark and this is the value read */
 
-	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(14'318'181)/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.08)
+	AY8910(config, "ay2", XTAL(14'318'181)/8).add_route(ALL_OUTPUTS, "speaker", 0.08);
 
-	MCFG_DEVICE_ADD("ay3", AY8910, XTAL(14'318'181)/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.08)
+	AY8910(config, "ay3", XTAL(14'318'181)/8).add_route(ALL_OUTPUTS, "speaker", 0.08);
 
-	MCFG_DEVICE_ADD("ay4", AY8910, XTAL(14'318'181)/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.08)
+	AY8910(config, "ay4", XTAL(14'318'181)/8).add_route(ALL_OUTPUTS, "speaker", 0.08);
 
 	MCFG_DEVICE_ADD("dac1", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3) // unknown DAC
 	MCFG_DEVICE_ADD("dac2", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3) // unknown DAC
@@ -756,24 +740,23 @@ MACHINE_CONFIG_START(exctsccr_state::exctsccrb)
 	MCFG_DEVICE_PROGRAM_MAP(exctsccrb_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", exctsccr_state, vblank_irq)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, exctsccr_state, irq_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(NOOP) // !WORK board output (no use?)
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, exctsccr_state, gfxbank_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, exctsccr_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // no palettebank
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // n.c.
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, exctsccr_state, mcu_start_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, exctsccr_state, mcu_switch_w))
+	LS259(config, m_mainlatch);
+	m_mainlatch->q_out_cb<0>().set(FUNC(exctsccr_state::irq_enable_w));
+	m_mainlatch->q_out_cb<1>().set_nop(); // !WORK board output (no use?)
+	m_mainlatch->q_out_cb<2>().set(FUNC(exctsccr_state::gfxbank_w));
+	m_mainlatch->q_out_cb<3>().set(FUNC(exctsccr_state::flipscreen_w));
+	m_mainlatch->q_out_cb<4>().set_nop(); // no palettebank
+	m_mainlatch->q_out_cb<5>().set_nop(); // n.c.
+	m_mainlatch->q_out_cb<6>().set(FUNC(exctsccr_state::mcu_start_w));
+	m_mainlatch->q_out_cb<7>().set(FUNC(exctsccr_state::mcu_switch_w));
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(18'432'000)/6)
 	MCFG_DEVICE_PROGRAM_MAP(champbas_sound_map)
 
 	MCFG_DEVICE_ADD("alpha_8201", ALPHA_8201, XTAL(18'432'000)/6/8) // champbasj 8201 on pcb, though unused
-	MCFG_QUANTUM_PERFECT_CPU("alpha_8201:mcu")
+	config.m_perfect_cpu_quantum = subtag("alpha_8201:mcu");
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 0x10)
+	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 0x10);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -781,20 +764,17 @@ MACHINE_CONFIG_START(exctsccr_state::exctsccrb)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(exctsccr_state, screen_update_exctsccr)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_exctsccr)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(exctsccr_state,exctsccr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_exctsccr)
+	PALETTE(config, m_palette, FUNC(exctsccr_state::exctsccr_palette), 512, 32);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(18'432'000)/12)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
+	AY8910(config, "ay1", XTAL(18'432'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.3);
 
 	MCFG_DEVICE_ADD("dac", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.7) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)

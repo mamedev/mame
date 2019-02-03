@@ -18,6 +18,7 @@
 #include "sound/tms5220.h"
 #include "sound/ym2151.h"
 #include "video/atarimo.h"
+#include "emupal.h"
 
 class atarisy1_state : public atarigen_state
 {
@@ -28,6 +29,7 @@ public:
 		, m_soundcomm(*this, "soundcomm")
 		, m_bankselect(*this, "bankselect")
 		, m_mob(*this, "mob")
+		, m_palette(*this, "palette")
 		, m_adc(*this, "adc")
 		, m_ajsint(*this, "ajsint")
 		, m_playfield_tilemap(*this, "playfield")
@@ -44,6 +46,7 @@ public:
 
 	required_shared_ptr<uint16_t> m_bankselect;
 	required_device<atari_motion_objects_device> m_mob;
+	required_device<palette_device> m_palette;
 
 	uint8_t           m_joystick_type;
 	uint8_t           m_trackball_type;
@@ -113,6 +116,7 @@ public:
 	DECLARE_WRITE16_MEMBER( atarisy1_priority_w );
 
 	static const atari_motion_objects_config s_mob_config;
+	void add_adc(machine_config &config);
 	void atarisy1(machine_config &config);
 	void indytemp(machine_config &config);
 	void roadb110(machine_config &config);

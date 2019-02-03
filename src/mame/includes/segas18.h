@@ -5,6 +5,10 @@
     Sega System 16A/16B/18/Outrun/Hang On/X-Board/Y-Board hardware
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_SEGAS18_H
+#define MAME_INCLUDES_SEGAS18_H
+
+#pragma once
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
@@ -176,3 +180,5 @@ private:
 	uint8_t               m_lghost_value;
 	uint8_t               m_lghost_select;
 };
+
+#endif // MAME_INCLUDES_SEGAS18_H

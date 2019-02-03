@@ -34,7 +34,6 @@ SYSINTR_GPS      = INT_EINT3, INT_EINT8_23 (EINT18)
 #include "machine/docg3.h"
 #include "machine/s3c2440.h"
 #include "video/gf4500.h"
-#include "rendlay.h"
 #include "screen.h"
 
 
@@ -203,17 +202,15 @@ MACHINE_CONFIG_START(gizmondo_state::gizmondo)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320 - 1, 0, 240 - 1)
 	MCFG_SCREEN_UPDATE_DEVICE("gf4500", gf4500_device, screen_update)
 
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	GF4500(config, m_gf4500, 0);
 
-	MCFG_GF4500_ADD("gf4500")
+	S3C2440(config, m_s3c2440, 12000000);
+	m_s3c2440->set_palette_tag("palette");
+	m_s3c2440->set_screen_tag("screen");
+	m_s3c2440->gpio_port_r_callback().set(FUNC(gizmondo_state::s3c2440_gpio_port_r));
+	m_s3c2440->gpio_port_w_callback().set(FUNC(gizmondo_state::s3c2440_gpio_port_w));
 
-	MCFG_DEVICE_ADD("s3c2440", S3C2440, 12000000)
-	MCFG_S3C2440_PALETTE("palette")
-	MCFG_S3C2440_SCREEN("screen")
-	MCFG_S3C2440_GPIO_PORT_R_CB(READ32(*this, gizmondo_state, s3c2440_gpio_port_r))
-	MCFG_S3C2440_GPIO_PORT_W_CB(WRITE32(*this, gizmondo_state, s3c2440_gpio_port_w))
-
-	MCFG_DISKONCHIP_G3_ADD("diskonchip", 64)
+	DISKONCHIP_G3(config, "diskonchip", 64);
 
 #if 0
 	MCFG_QUICKLOAD_ADD("quickload", gizmondo_state, wince, "bin", 0)

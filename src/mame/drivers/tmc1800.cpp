@@ -716,15 +716,15 @@ QUICKLOAD_LOAD_MEMBER( tmc1800_base_state, tmc1800 )
 
 MACHINE_CONFIG_START(tmc1800_state::tmc1800)
 	// basic system hardware
-	MCFG_DEVICE_ADD(CDP1802_TAG, CDP1802, XTAL(1'750'000))
-	MCFG_DEVICE_PROGRAM_MAP(tmc1800_map)
-	MCFG_DEVICE_IO_MAP(tmc1800_io_map)
-	MCFG_COSMAC_WAIT_CALLBACK(VCC)
-	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(*this, tmc1800_state, clear_r))
-	MCFG_COSMAC_EF2_CALLBACK(READLINE(*this, tmc1800_state, ef2_r))
-	MCFG_COSMAC_EF3_CALLBACK(READLINE(*this, tmc1800_state, ef3_r))
-	MCFG_COSMAC_Q_CALLBACK(WRITELINE(*this, tmc1800_state, q_w))
-	MCFG_COSMAC_DMAW_CALLBACK(WRITE8(CDP1861_TAG, cdp1861_device, dma_w))
+	CDP1802(config, m_maincpu, 1.75_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tmc1800_state::tmc1800_map);
+	m_maincpu->set_addrmap(AS_IO, &tmc1800_state::tmc1800_io_map);
+	m_maincpu->wait_cb().set_constant(1);
+	m_maincpu->clear_cb().set(FUNC(tmc1800_state::clear_r));
+	m_maincpu->ef2_cb().set(FUNC(tmc1800_state::ef2_r));
+	m_maincpu->ef3_cb().set(FUNC(tmc1800_state::ef3_r));
+	m_maincpu->q_cb().set(FUNC(tmc1800_state::q_w));
+	m_maincpu->dma_wr_cb().set(m_vdc, FUNC(cdp1861_device::dma_w));
 
 	// video hardware
 	tmc1800_video(config);
@@ -732,30 +732,27 @@ MACHINE_CONFIG_START(tmc1800_state::tmc1800)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("beeper", BEEP, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	BEEP(config, m_beeper, 0).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	// devices
 	MCFG_QUICKLOAD_ADD("quickload", tmc1800_base_state, tmc1800, "bin", 0)
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2K")
-	MCFG_RAM_EXTRA_OPTIONS("4K")
+	RAM(config, RAM_TAG).set_default_size("2K").set_extra_options("4K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(osc1000b_state::osc1000b)
 	// basic system hardware
-	MCFG_DEVICE_ADD(CDP1802_TAG, CDP1802, XTAL(1'750'000))
-	MCFG_DEVICE_PROGRAM_MAP(osc1000b_map)
-	MCFG_DEVICE_IO_MAP(osc1000b_io_map)
-	MCFG_COSMAC_WAIT_CALLBACK(VCC)
-	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(*this, osc1000b_state, clear_r))
-	MCFG_COSMAC_EF2_CALLBACK(READLINE(*this, osc1000b_state, ef2_r))
-	MCFG_COSMAC_EF3_CALLBACK(READLINE(*this, osc1000b_state, ef3_r))
-	MCFG_COSMAC_Q_CALLBACK(WRITELINE(*this, osc1000b_state, q_w))
+	CDP1802(config, m_maincpu, 1.75_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &osc1000b_state::osc1000b_map);
+	m_maincpu->set_addrmap(AS_IO, &osc1000b_state::osc1000b_io_map);
+	m_maincpu->wait_cb().set_constant(1);
+	m_maincpu->clear_cb().set(FUNC(osc1000b_state::clear_r));
+	m_maincpu->ef2_cb().set(FUNC(osc1000b_state::ef2_r));
+	m_maincpu->ef3_cb().set(FUNC(osc1000b_state::ef3_r));
+	m_maincpu->q_cb().set(FUNC(osc1000b_state::q_w));
 
 	// video hardware
 	osc1000b_video(config);
@@ -763,69 +760,63 @@ MACHINE_CONFIG_START(osc1000b_state::osc1000b)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("beeper", BEEP, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	BEEP(config, m_beeper, 0).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	// devices
 	MCFG_QUICKLOAD_ADD("quickload", tmc1800_base_state, tmc1800, "bin", 0)
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2K")
-	MCFG_RAM_EXTRA_OPTIONS("4K")
+	RAM(config, RAM_TAG).set_default_size("2K").set_extra_options("4K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(tmc2000_state::tmc2000)
 	// basic system hardware
-	MCFG_DEVICE_ADD(CDP1802_TAG, CDP1802, XTAL(1'750'000))
-	MCFG_DEVICE_PROGRAM_MAP(tmc2000_map)
-	MCFG_DEVICE_IO_MAP(tmc2000_io_map)
-	MCFG_COSMAC_WAIT_CALLBACK(VCC)
-	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(*this, tmc2000_state, clear_r))
-	MCFG_COSMAC_EF2_CALLBACK(READLINE(*this, tmc2000_state, ef2_r))
-	MCFG_COSMAC_EF3_CALLBACK(READLINE(*this, tmc2000_state, ef3_r))
-	MCFG_COSMAC_Q_CALLBACK(WRITELINE(*this, tmc2000_state, q_w))
-	MCFG_COSMAC_DMAW_CALLBACK(WRITE8(*this, tmc2000_state, dma_w))
+	CDP1802(config, m_maincpu, 1.75_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tmc2000_state::tmc2000_map);
+	m_maincpu->set_addrmap(AS_IO, &tmc2000_state::tmc2000_io_map);
+	m_maincpu->wait_cb().set_constant(1);
+	m_maincpu->clear_cb().set(FUNC(tmc2000_state::clear_r));
+	m_maincpu->ef2_cb().set(FUNC(tmc2000_state::ef2_r));
+	m_maincpu->ef3_cb().set(FUNC(tmc2000_state::ef3_r));
+	m_maincpu->q_cb().set(FUNC(tmc2000_state::q_w));
+	m_maincpu->dma_wr_cb().set(FUNC(tmc2000_state::dma_w));
 
 	// video hardware
 	tmc2000_video(config);
 
 	// devices
 	MCFG_QUICKLOAD_ADD("quickload", tmc1800_base_state, tmc1800, "bin", 0)
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4K")
-	MCFG_RAM_EXTRA_OPTIONS("16K,32K")
+	RAM(config, RAM_TAG).set_default_size("4K").set_extra_options("16K,32K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nano_state::nano)
 	// basic system hardware
-	MCFG_DEVICE_ADD(CDP1802_TAG, CDP1802, XTAL(1'750'000))
-	MCFG_DEVICE_PROGRAM_MAP(nano_map)
-	MCFG_DEVICE_IO_MAP(nano_io_map)
-	MCFG_COSMAC_WAIT_CALLBACK(VCC)
-	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(*this, nano_state, clear_r))
-	MCFG_COSMAC_EF2_CALLBACK(READLINE(*this, nano_state, ef2_r))
-	MCFG_COSMAC_EF3_CALLBACK(READLINE(*this, nano_state, ef3_r))
-	MCFG_COSMAC_Q_CALLBACK(WRITELINE(*this, nano_state, q_w))
-	MCFG_COSMAC_DMAW_CALLBACK(WRITE8(CDP1864_TAG, cdp1864_device, dma_w))
+	CDP1802(config, m_maincpu, 1.75_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nano_state::nano_map);
+	m_maincpu->set_addrmap(AS_IO, &nano_state::nano_io_map);
+	m_maincpu->wait_cb().set_constant(1);
+	m_maincpu->clear_cb().set(FUNC(nano_state::clear_r));
+	m_maincpu->ef2_cb().set(FUNC(nano_state::ef2_r));
+	m_maincpu->ef3_cb().set(FUNC(nano_state::ef3_r));
+	m_maincpu->q_cb().set(FUNC(nano_state::q_w));
+	m_maincpu->dma_wr_cb().set(m_cti, FUNC(cdp1864_device::dma_w));
 
 	// video hardware
 	nano_video(config);
 
 	// devices
 	MCFG_QUICKLOAD_ADD("quickload", tmc1800_base_state, tmc1800, "bin", 0)
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4K")
+	RAM(config, RAM_TAG).set_default_size("4K");
 MACHINE_CONFIG_END
 
 /* ROMs */

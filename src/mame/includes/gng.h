@@ -33,8 +33,6 @@ public:
 
 private:
 	DECLARE_WRITE8_MEMBER(gng_bankswitch_w);
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
 	DECLARE_WRITE_LINE_MEMBER(ym_reset_w);
 	DECLARE_READ8_MEMBER(diamond_hack_r);
 	DECLARE_WRITE8_MEMBER(gng_fgvideoram_w);

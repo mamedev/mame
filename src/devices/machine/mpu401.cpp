@@ -66,12 +66,6 @@ void mpu401_device::mpu401_map(address_map &map)
 	map(0xf000, 0xffff).rom().region(ROM_TAG, 0);
 }
 
-void mpu401_device::mpu401_io_map(address_map &map)
-{
-	map(M6801_PORT1, M6801_PORT1).rw(FUNC(mpu401_device::port1_r), FUNC(mpu401_device::port1_w));
-	map(M6801_PORT2, M6801_PORT2).rw(FUNC(mpu401_device::port2_r), FUNC(mpu401_device::port2_w));
-}
-
 ROM_START( mpu401 )
 	ROM_REGION(0x1000, ROM_TAG, 0)
 	ROM_LOAD( "roland__6801v0b55p__15179222.bin", 0x000000, 0x001000, CRC(65d3a151) SHA1(00efbfb96aeb997b69bb16981c6751d3c784bb87) ) /* Mask MCU; Label: "Roland // 6801V0B55P // 5A1 JAPAN // 15179222"; This is the final version (1.5A) of the mpu401 firmware; version is located at offsets 0x649 (0x15) and 0x64f (0x01) */
@@ -87,17 +81,20 @@ DEFINE_DEVICE_TYPE(MPU401, mpu401_device, "mpu401", "Roland MPU-401 I/O box")
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(mpu401_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(M6801_TAG, M6801, 4000000) /* 4 MHz as per schematics */
-	MCFG_DEVICE_PROGRAM_MAP(mpu401_map)
-	MCFG_DEVICE_IO_MAP(mpu401_io_map)
-	MCFG_M6801_SER_TX(WRITELINE(MIDIOUT_TAG, midi_port_device, write_txd))
+void mpu401_device::device_add_mconfig(machine_config &config)
+{
+	M6801(config, m_ourcpu, 4000000); /* 4 MHz as per schematics */
+	m_ourcpu->set_addrmap(AS_PROGRAM, &mpu401_device::mpu401_map);
+	m_ourcpu->in_p1_cb().set(FUNC(mpu401_device::port1_r));
+	m_ourcpu->out_p1_cb().set(FUNC(mpu401_device::port1_w));
+	m_ourcpu->in_p2_cb().set(FUNC(mpu401_device::port2_r));
+	m_ourcpu->out_p2_cb().set(FUNC(mpu401_device::port2_w));
+	m_ourcpu->out_ser_tx_cb().set(MIDIOUT_TAG, FUNC(midi_port_device::write_txd));
 
-	MCFG_MIDI_PORT_ADD(MIDIIN_TAG, midiin_slot, "midiin")
-	MCFG_MIDI_RX_HANDLER(WRITELINE(DEVICE_SELF, mpu401_device, midi_rx_w))
+	MIDI_PORT(config, MIDIIN_TAG, midiin_slot, "midiin").rxd_handler().set(DEVICE_SELF, FUNC(mpu401_device::midi_rx_w));
 
-	MCFG_MIDI_PORT_ADD(MIDIOUT_TAG, midiout_slot, "midiout")
-MACHINE_CONFIG_END
+	MIDI_PORT(config, MIDIOUT_TAG, midiout_slot, "midiout");
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

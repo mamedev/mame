@@ -55,7 +55,7 @@
 #include "emu.h"
 
 #include "cpu/i86/i86.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/msm58321.h"
@@ -75,8 +75,8 @@
 class pc100_state : public driver_device
 {
 public:
-	pc100_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	pc100_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_beeper(*this, "beeper"),
 		m_rtc(*this, "rtc"),
@@ -339,7 +339,7 @@ WRITE8_MEMBER( pc100_state::pc100_crtc_data_w )
 void pc100_state::pc100_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x03).rw("pic8259", FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff); // i8259
+	map(0x00, 0x03).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff); // i8259
 //  AM_RANGE(0x04, 0x07) i8237?
 	map(0x08, 0x0b).m(m_fdc, FUNC(upd765a_device::map)).umask16(0x00ff); // upd765
 	map(0x10, 0x17).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff); // i8255 #1
@@ -347,8 +347,7 @@ void pc100_state::pc100_io(address_map &map)
 	map(0x20, 0x23).r(FUNC(pc100_state::pc100_key_r)).umask16(0x00ff); //i/o, keyboard, mouse
 	map(0x22, 0x22).w(FUNC(pc100_state::pc100_output_w)); //i/o, keyboard, mouse
 	map(0x24, 0x24).w(FUNC(pc100_state::pc100_tc_w)); //i/o, keyboard, mouse
-	map(0x28, 0x28).rw("uart8251", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x2a, 0x2a).rw("uart8251", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x28, 0x2b).rw("uart8251", FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 	map(0x30, 0x30).rw(FUNC(pc100_state::pc100_shift_r), FUNC(pc100_state::pc100_shift_w)); // crtc shift
 	map(0x38, 0x38).w(FUNC(pc100_state::pc100_crtc_addr_w)); //crtc address reg
 	map(0x3a, 0x3a).w(FUNC(pc100_state::pc100_crtc_data_w)); //crtc data reg
@@ -637,49 +636,49 @@ static void pc100_floppies(device_slot_interface &device)
 
 MACHINE_CONFIG_START(pc100_state::pc100)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8086, MASTER_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(pc100_map)
-	MCFG_DEVICE_IO_MAP(pc100_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pc100_state, pc100_vblank_irq)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
+	I8086(config, m_maincpu, MASTER_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc100_state::pc100_map);
+	m_maincpu->set_addrmap(AS_IO, &pc100_state::pc100_io);
+	m_maincpu->set_vblank_int("screen", FUNC(pc100_state::pc100_vblank_irq));
+	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("600hz", pc100_state, pc100_600hz_irq, attotime::from_hz(MASTER_CLOCK/600))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("100hz", pc100_state, pc100_100hz_irq, attotime::from_hz(MASTER_CLOCK/100))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("50hz", pc100_state, pc100_50hz_irq, attotime::from_hz(MASTER_CLOCK/50))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("10hz", pc100_state, pc100_10hz_irq, attotime::from_hz(MASTER_CLOCK/10))
+	TIMER(config, "600hz").configure_periodic(FUNC(pc100_state::pc100_600hz_irq), attotime::from_hz(MASTER_CLOCK/600));
+	TIMER(config, "100hz").configure_periodic(FUNC(pc100_state::pc100_100hz_irq), attotime::from_hz(MASTER_CLOCK/100));
+	TIMER(config, "50hz").configure_periodic(FUNC(pc100_state::pc100_50hz_irq), attotime::from_hz(MASTER_CLOCK/50));
+	TIMER(config, "10hz").configure_periodic(FUNC(pc100_state::pc100_10hz_irq), attotime::from_hz(MASTER_CLOCK/10));
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pc100_state, rtc_porta_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, pc100_state, rtc_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pc100_state, rtc_portc_w))
+	i8255_device &ppi1(I8255(config, "ppi8255_1"));
+	ppi1.out_pa_callback().set(FUNC(pc100_state::rtc_porta_w));
+	ppi1.in_pc_callback().set(FUNC(pc100_state::rtc_portc_r));
+	ppi1.out_pc_callback().set(FUNC(pc100_state::rtc_portc_w));
 
-	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pc100_state, lower_mask_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, pc100_state, upper_mask_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pc100_state, crtc_bank_w))
+	i8255_device &ppi2(I8255(config, "ppi8255_2"));
+	ppi2.out_pa_callback().set(FUNC(pc100_state::lower_mask_w));
+	ppi2.out_pb_callback().set(FUNC(pc100_state::upper_mask_w));
+	ppi2.out_pc_callback().set(FUNC(pc100_state::crtc_bank_w));
 
-	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
-	MCFG_PIC8259_IN_SP_CB(GND) // ???
+	PIC8259(config, m_pic, 0);
+	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
+	m_pic->in_sp_callback().set_constant(0); // ???
 
-	MCFG_DEVICE_ADD("uart8251", I8251, 0)
-	//MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
-	//MCFG_I8251_DTR_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
-	//MCFG_I8251_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE("pic8259", pic8259_device, ir1_w))
+	i8251_device &i8251(I8251(config, "uart8251", 0));
+	//i8251.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	//i8251.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
+	//i8251.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
+	i8251.rxrdy_handler().set(m_pic, FUNC(pic8259_device::ir1_w));
 
-	MCFG_UPD765A_ADD("upd765", true, true)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, pc100_state, irqnmi_w))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(*this, pc100_state, drqnmi_w))
+	UPD765A(config, m_fdc, 8'000'000, true, true);
+	m_fdc->intrq_wr_callback().set(FUNC(pc100_state::irqnmi_w));
+	m_fdc->drq_wr_callback().set(FUNC(pc100_state::drqnmi_w));
 
-	MCFG_DEVICE_ADD("rtc", MSM58321, XTAL(32'768))
-	MCFG_MSM58321_D0_HANDLER(WRITELINE(*this, pc100_state, rtc_portc_0_w))
-	MCFG_MSM58321_D1_HANDLER(WRITELINE(*this, pc100_state, rtc_portc_1_w))
-	MCFG_MSM58321_D2_HANDLER(WRITELINE(*this, pc100_state, rtc_portc_2_w))
-	MCFG_MSM58321_D3_HANDLER(WRITELINE(*this, pc100_state, rtc_portc_3_w))
+	MSM58321(config, m_rtc, XTAL(32'768));
+	m_rtc->d0_handler().set(FUNC(pc100_state::rtc_portc_0_w));
+	m_rtc->d1_handler().set(FUNC(pc100_state::rtc_portc_1_w));
+	m_rtc->d2_handler().set(FUNC(pc100_state::rtc_portc_2_w));
+	m_rtc->d3_handler().set(FUNC(pc100_state::rtc_portc_3_w));
 
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", pc100_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", pc100_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, "upd765:0", pc100_floppies, "525dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765:1", pc100_floppies, "525dd", floppy_image_device::default_floppy_formats);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -688,14 +687,12 @@ MACHINE_CONFIG_START(pc100_state::pc100)
 	MCFG_SCREEN_UPDATE_DRIVER(pc100_state, screen_update_pc100)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pc100)
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_FORMAT(xxxxxxxBBBGGGRRR)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_pc100);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_333, 16);
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("beeper", BEEP, 2400)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
+	BEEP(config, m_beeper, 2400).add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
 /* ROM definition */

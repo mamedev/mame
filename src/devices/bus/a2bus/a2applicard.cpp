@@ -52,11 +52,12 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(a2bus_applicard_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, 6000000) // Z80 runs at 6 MHz
-	MCFG_DEVICE_PROGRAM_MAP(z80_mem)
-	MCFG_DEVICE_IO_MAP(z80_io)
-MACHINE_CONFIG_END
+void a2bus_applicard_device::device_add_mconfig(machine_config &config)
+{
+	Z80(config, m_z80, 6000000); // Z80 runs at 6 MHz
+	m_z80->set_addrmap(AS_PROGRAM, &a2bus_applicard_device::z80_mem);
+	m_z80->set_addrmap(AS_IO, &a2bus_applicard_device::z80_io);
+}
 
 //-------------------------------------------------
 //  device_rom_region - device-specific ROMs

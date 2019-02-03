@@ -462,61 +462,60 @@ GFXDECODE_END
 
 
 /* Machine driver */
-MACHINE_CONFIG_START(radio86_state::radio86)
+void radio86_state::radio86(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",I8080, XTAL(16'000'000) / 9)
-	MCFG_DEVICE_PROGRAM_MAP(radio86_mem)
-	MCFG_DEVICE_IO_MAP(radio86_io)
-	MCFG_MACHINE_RESET_OVERRIDE(radio86_state, radio86 )
+	I8080(config, m_maincpu, XTAL(16'000'000) / 9);
+	m_maincpu->set_addrmap(AS_PROGRAM, &radio86_state::radio86_mem);
+	m_maincpu->set_addrmap(AS_IO, &radio86_state::radio86_io);
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, radio86_state, radio86_8255_porta_w2))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, radio86_state, radio86_8255_portb_r2))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, radio86_state, radio86_8255_portc_r2))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, radio86_state, radio86_8255_portc_w2))
+	I8255(config, m_ppi8255_1);
+	m_ppi8255_1->out_pa_callback().set(FUNC(radio86_state::radio86_8255_porta_w2));
+	m_ppi8255_1->in_pb_callback().set(FUNC(radio86_state::radio86_8255_portb_r2));
+	m_ppi8255_1->in_pc_callback().set(FUNC(radio86_state::radio86_8255_portc_r2));
+	m_ppi8255_1->out_pc_callback().set(FUNC(radio86_state::radio86_8255_portc_w2));
 
-	MCFG_DEVICE_ADD("i8275", I8275, XTAL(16'000'000) / 12)
-	MCFG_I8275_CHARACTER_WIDTH(6)
-	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(radio86_state, display_pixels)
-	MCFG_I8275_DRQ_CALLBACK(WRITELINE("dma8257",i8257_device, dreq2_w))
+	i8275_device &crtc(I8275(config, "i8275", XTAL(16'000'000) / 12));
+	crtc.set_character_width(6);
+	crtc.set_display_callback(FUNC(radio86_state::display_pixels), this);
+	crtc.drq_wr_callback().set(m_dma8257, FUNC(i8257_device::dreq2_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_UPDATE_DEVICE("i8275", i8275_device, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(16'000'000) / 2, 516, 0, 78*6, 310, 0, 30*10)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_radio86)
-	MCFG_PALETTE_ADD("palette", 3)
-	MCFG_PALETTE_INIT_OWNER(radio86_state,radio86)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_screen_update("i8275", FUNC(i8275_device::screen_update));
+	screen.set_raw(XTAL(16'000'000) / 2, 516, 0, 78*6, 310, 0, 30*10);
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_radio86);
+	PALETTE(config, m_palette, FUNC(radio86_state::radio86_palette), 3);
 
 	SPEAKER(config, "mono").front_center();
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("dma8257", I8257, XTAL(16'000'000) / 9)
-	MCFG_I8257_OUT_HRQ_CB(WRITELINE(*this, radio86_state, hrq_w))
-	MCFG_I8257_IN_MEMR_CB(READ8(*this, radio86_state, memory_read_byte))
-	MCFG_I8257_OUT_MEMW_CB(WRITE8(*this, radio86_state, memory_write_byte))
-	MCFG_I8257_OUT_IOW_2_CB(WRITE8("i8275", i8275_device, dack_w))
-	MCFG_I8257_REVERSE_RW_MODE(1)
+	I8257(config, m_dma8257, XTAL(16'000'000) / 9);
+	m_dma8257->out_hrq_cb().set(FUNC(radio86_state::hrq_w));
+	m_dma8257->in_memr_cb().set(FUNC(radio86_state::memory_read_byte));
+	m_dma8257->out_memw_cb().set(FUNC(radio86_state::memory_write_byte));
+	m_dma8257->out_iow_cb<2>().set("i8275", FUNC(i8275_device::dack_w));
+	m_dma8257->set_reverse_rw_mode(1);
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(rkr_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
-	MCFG_CASSETTE_INTERFACE("radio86_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(rkr_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cassette->set_interface("radio86_cass");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "radio86_cass")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cass_list").set_original("radio86_cass");
+}
 
 
-MACHINE_CONFIG_START(radio86_state::kr03)
+void radio86_state::kr03(machine_config &config)
+{
 	radio86(config);
 	/* basic machine hardware */
 
-	MCFG_DEVICE_MODIFY("ppi8255_1")
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, radio86_state, radio86_8255_porta_w2))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, radio86_state, kr03_8255_portb_r2))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, radio86_state, radio86_8255_portc_r2))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, radio86_state, radio86_8255_portc_w2))
-MACHINE_CONFIG_END
+	m_ppi8255_1->out_pa_callback().set(FUNC(radio86_state::radio86_8255_porta_w2));
+	m_ppi8255_1->in_pb_callback().set(FUNC(radio86_state::kr03_8255_portb_r2));
+	m_ppi8255_1->in_pc_callback().set(FUNC(radio86_state::radio86_8255_portc_r2));
+	m_ppi8255_1->out_pc_callback().set(FUNC(radio86_state::radio86_8255_portc_w2));
+}
 
 MACHINE_CONFIG_START(radio86_state::radio16)
 	radio86(config);
@@ -531,15 +530,15 @@ MACHINE_CONFIG_START(radio86_state::radiorom)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(radio86rom_mem)
 
-	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, radio86_state, radio86rom_romdisk_porta_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, radio86_state, radio86_romdisk_portb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, radio86_state, radio86_romdisk_portc_w))
+	I8255(config, m_ppi8255_2);
+	m_ppi8255_2->in_pa_callback().set(FUNC(radio86_state::radio86rom_romdisk_porta_r));
+	m_ppi8255_2->out_pb_callback().set(FUNC(radio86_state::radio86_romdisk_portb_w));
+	m_ppi8255_2->out_pc_callback().set(FUNC(radio86_state::radio86_romdisk_portc_w));
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "radio86_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "radio86_cart")
+	SOFTWARE_LIST(config, "cart_list").set_original("radio86_cart");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(radio86_state::radioram)
@@ -548,10 +547,10 @@ MACHINE_CONFIG_START(radio86_state::radioram)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(radio86ram_mem)
 
-	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, radio86_state, radio86ram_romdisk_porta_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, radio86_state, radio86_romdisk_portb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, radio86_state, radio86_romdisk_portc_w))
+	I8255(config, m_ppi8255_2);
+	m_ppi8255_2->in_pa_callback().set(FUNC(radio86_state::radio86ram_romdisk_porta_r));
+	m_ppi8255_2->out_pb_callback().set(FUNC(radio86_state::radio86_romdisk_portb_w));
+	m_ppi8255_2->out_pc_callback().set(FUNC(radio86_state::radio86_romdisk_portc_w));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(radio86_state::rk7007)
@@ -560,11 +559,11 @@ MACHINE_CONFIG_START(radio86_state::rk7007)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(rk7007_io)
 
-	MCFG_DEVICE_ADD("ms7007", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, radio86_state, radio86_8255_porta_w2))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, radio86_state, radio86_8255_portb_r2))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, radio86_state, rk7007_8255_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, radio86_state, radio86_8255_portc_w2))
+	i8255_device &ms7007(I8255(config, "ms7007"));
+	ms7007.out_pa_callback().set(FUNC(radio86_state::radio86_8255_porta_w2));
+	ms7007.in_pb_callback().set(FUNC(radio86_state::radio86_8255_portb_r2));
+	ms7007.in_pc_callback().set(FUNC(radio86_state::rk7007_8255_portc_r));
+	ms7007.out_pc_callback().set(FUNC(radio86_state::radio86_8255_portc_w2));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(radio86_state::rk700716)
@@ -573,11 +572,11 @@ MACHINE_CONFIG_START(radio86_state::rk700716)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(rk7007_io)
 
-	MCFG_DEVICE_ADD("ms7007", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, radio86_state, radio86_8255_porta_w2))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, radio86_state, radio86_8255_portb_r2))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, radio86_state, rk7007_8255_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, radio86_state, radio86_8255_portc_w2))
+	i8255_device &ms7007(I8255(config, "ms7007"));
+	ms7007.out_pa_callback().set(FUNC(radio86_state::radio86_8255_porta_w2));
+	ms7007.in_pb_callback().set(FUNC(radio86_state::radio86_8255_portb_r2));
+	ms7007.in_pc_callback().set(FUNC(radio86_state::rk7007_8255_portc_r));
+	ms7007.out_pc_callback().set(FUNC(radio86_state::radio86_8255_portc_w2));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(radio86_state::mikron2)

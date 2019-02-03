@@ -122,7 +122,6 @@ void mod8_state::mod8_mem(address_map &map)
 void mod8_state::mod8_io(address_map &map)
 {
 	map.unmap_value_high();
-	map.global_mask(0xff);
 	map(0x00, 0x00).r(FUNC(mod8_state::tty_r));
 	map(0x0a, 0x0a).w(FUNC(mod8_state::out_w));
 	map(0x0b, 0x0b).w(FUNC(mod8_state::tty_w));
@@ -155,8 +154,8 @@ MACHINE_CONFIG_START(mod8_state::mod8)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(mod8_state,mod8_irq_callback)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(TELEPRINTER_TAG, TELEPRINTER, 0)
-	MCFG_GENERIC_TELEPRINTER_KEYBOARD_CB(PUT(mod8_state, kbd_put))
+	TELEPRINTER(config, m_teleprinter, 0);
+	m_teleprinter->set_keyboard_callback(FUNC(mod8_state::kbd_put));
 MACHINE_CONFIG_END
 
 

@@ -196,10 +196,11 @@ void riscpc_state::vidc20_dynamic_screen_change()
 			hblank_period = (m_vidc20_horz_reg[HCR] & 0x3ffc);
 			vblank_period = (m_vidc20_vert_reg[VCR] & 0x3fff);
 			/* note that we use the border registers as the visible area */
-			visarea.min_x = (m_vidc20_horz_reg[HBSR] & 0x3ffe);
-			visarea.max_x = (m_vidc20_horz_reg[HBER] & 0x3ffe)-1;
-			visarea.min_y = (m_vidc20_vert_reg[VBSR] & 0x1fff);
-			visarea.max_y = (m_vidc20_vert_reg[VBER] & 0x1fff)-1;
+			visarea.set(
+					(m_vidc20_horz_reg[HBSR] & 0x3ffe),
+					(m_vidc20_horz_reg[HBER] & 0x3ffe) - 1,
+					(m_vidc20_vert_reg[VBSR] & 0x1fff),
+					(m_vidc20_vert_reg[VBER] & 0x1fff) - 1);
 
 			m_screen->configure(hblank_period, vblank_period, visarea, m_screen->frame_period().attoseconds() );
 			logerror("VIDC20: successfully changed the screen to:\n Display Size = %d x %d\n Border Size %d x %d\n Cycle Period %d x %d\n",

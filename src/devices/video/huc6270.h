@@ -12,12 +12,6 @@
 #pragma once
 
 
-#define MCFG_HUC6270_VRAM_SIZE(_size) \
-	downcast<huc6270_device &>(*device).set_vram_size(_size);
-
-#define MCFG_HUC6270_IRQ_CHANGED_CB(_devcb) \
-	devcb = &downcast<huc6270_device &>(*device).set_irq_changed_callback(DEVCB_##_devcb);
-
 class huc6270_device : public device_t
 {
 public:
@@ -25,7 +19,7 @@ public:
 	huc6270_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void set_vram_size(uint32_t vram_size) { m_vram_size = vram_size; }
-	template <class Object> devcb_base &set_irq_changed_callback(Object &&cb) { return m_irq_changed_cb.set_callback(std::forward<Object>(cb)); }
+	auto irq() { return m_irq_changed_cb.bind(); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );

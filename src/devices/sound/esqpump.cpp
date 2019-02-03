@@ -16,8 +16,12 @@ DEFINE_DEVICE_TYPE(ESQ_5505_5510_PUMP, esq_5505_5510_pump_device, "esq_5505_5510
 esq_5505_5510_pump_device::esq_5505_5510_pump_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ESQ_5505_5510_PUMP, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
-	, m_stream(nullptr), m_timer(nullptr), m_esp(nullptr)
-	, m_esp_halted(true), ticks_spent_processing(0), samples_processed(0)
+	, m_stream(nullptr)
+	, m_timer(nullptr)
+	, m_esp(*this, finder_base::DUMMY_TAG)
+	, m_esp_halted(true)
+	, ticks_spent_processing(0)
+	, samples_processed(0)
 {
 #if !PUMP_FAKE_ESP_PROCESSING && PUMP_REPLACE_ESP_PROGRAM
 	e = nullptr;
@@ -59,12 +63,14 @@ void esq_5505_5510_pump_device::device_stop()
 
 void esq_5505_5510_pump_device::device_reset()
 {
-	int64_t nsec_per_sample = 100 * 16 * 21;
-	attotime sample_time(0, 1000000000 * nsec_per_sample);
-	attotime initial_delay(0, 0);
-
-	m_timer->adjust(initial_delay, 0, sample_time);
+	m_timer->adjust(attotime::zero, 0, attotime::from_hz(clock()));
 	m_timer->enable(true);
+}
+
+void esq_5505_5510_pump_device::device_clock_changed()
+{
+	m_stream->set_sample_rate(clock());
+	m_timer->adjust(attotime::zero, 0, attotime::from_hz(clock()));
 }
 
 void esq_5505_5510_pump_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)

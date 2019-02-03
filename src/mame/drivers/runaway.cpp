@@ -345,71 +345,67 @@ static GFXDECODE_START( gfx_qwak )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(runaway_state::runaway)
-
+void runaway_state::runaway(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, 12096000 / 8) /* ? */
-	MCFG_DEVICE_PROGRAM_MAP(runaway_map)
+	M6502(config, m_maincpu, 12096000 / 8); /* ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &runaway_state::runaway_map);
 
-	MCFG_DEVICE_ADD("mainlatch", LS259)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // coin counter?
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(NOOP) // coin counter?
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(OUTPUT("led0")) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(OUTPUT("led1")) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, runaway_state, tile_bank_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch"));
+	mainlatch.q_out_cb<0>().set_nop(); // coin counter?
+	mainlatch.q_out_cb<1>().set_nop(); // coin counter?
+	mainlatch.q_out_cb<3>().set_output("led0").invert();
+	mainlatch.q_out_cb<4>().set_output("led1").invert();
+	mainlatch.q_out_cb<5>().set(FUNC(runaway_state::tile_bank_w));
 
-	MCFG_DEVICE_ADD("earom", ER2055)
+	ER2055(config, m_earom);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(256, 263)
-	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(runaway_state, screen_update_runaway)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(256, 263);
+	m_screen->set_visarea(0, 255, 0, 239);
+	m_screen->set_screen_update(FUNC(runaway_state::screen_update_runaway));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_runaway)
-	MCFG_PALETTE_ADD("palette", 16)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_runaway);
+	PALETTE(config, m_palette).set_entries(16);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("pokey1", POKEY, 12096000 / 8)
-	MCFG_POKEY_ALLPOT_R_CB(IOPORT("6008"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	pokey_device &pokey1(POKEY(config, "pokey1", 12096000 / 8));
+	pokey1.allpot_r().set_ioport("6008");
+	pokey1.add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("pokey2", POKEY, 12096000 / 8)
-	MCFG_POKEY_POT0_R_CB(READ8(*this, runaway_state, runaway_pot_r))
-	MCFG_POKEY_POT1_R_CB(READ8(*this, runaway_state, runaway_pot_r))
-	MCFG_POKEY_POT2_R_CB(READ8(*this, runaway_state, runaway_pot_r))
-	MCFG_POKEY_POT3_R_CB(READ8(*this, runaway_state, runaway_pot_r))
-	MCFG_POKEY_POT4_R_CB(READ8(*this, runaway_state, runaway_pot_r))
-	MCFG_POKEY_POT5_R_CB(READ8(*this, runaway_state, runaway_pot_r))
-	MCFG_POKEY_POT6_R_CB(READ8(*this, runaway_state, runaway_pot_r))
-	MCFG_POKEY_POT7_R_CB(READ8(*this, runaway_state, runaway_pot_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	pokey_device &pokey2(POKEY(config, "pokey2", 12096000 / 8));
+	pokey2.pot_r<0>().set(FUNC(runaway_state::runaway_pot_r));
+	pokey2.pot_r<1>().set(FUNC(runaway_state::runaway_pot_r));
+	pokey2.pot_r<2>().set(FUNC(runaway_state::runaway_pot_r));
+	pokey2.pot_r<3>().set(FUNC(runaway_state::runaway_pot_r));
+	pokey2.pot_r<4>().set(FUNC(runaway_state::runaway_pot_r));
+	pokey2.pot_r<5>().set(FUNC(runaway_state::runaway_pot_r));
+	pokey2.pot_r<6>().set(FUNC(runaway_state::runaway_pot_r));
+	pokey2.pot_r<7>().set(FUNC(runaway_state::runaway_pot_r));
+	pokey2.add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
-
-MACHINE_CONFIG_START(runaway_state::qwak)
+void runaway_state::qwak(machine_config &config)
+{
 	runaway(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(qwak_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &runaway_state::qwak_map);
 
-	MCFG_DEVICE_REMOVE("earom")
+	config.device_remove("earom");
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_qwak)
+	m_gfxdecode->set_info(gfx_qwak);
 
 	MCFG_VIDEO_START_OVERRIDE(runaway_state,qwak)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(runaway_state, screen_update_qwak)
 
-MACHINE_CONFIG_END
-
+	m_screen->set_screen_update(FUNC(runaway_state::screen_update_qwak));
+}
 
 ROM_START( runaway )
 	ROM_REGION( 0x10000, "maincpu", 0 )

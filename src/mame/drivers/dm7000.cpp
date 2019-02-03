@@ -301,26 +301,26 @@ void dm7000_state::kbd_put(u8 data)
 	m_scc0_lsr = 1;
 }
 
-MACHINE_CONFIG_START(dm7000_state::dm7000)
+void dm7000_state::dm7000(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",PPC405GP, 252000000 / 10) // Should be PPC405D4?
+	PPC405GP(config, m_maincpu, 252000000 / 10); // Should be PPC405D4?
 	// Slowed down 10 times in order to get normal response for now
-	MCFG_PPC_BUS_FREQUENCY(252000000)
-	MCFG_DEVICE_PROGRAM_MAP(dm7000_mem)
-
+	m_maincpu->set_bus_frequency(252000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &dm7000_state::dm7000_mem);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DRIVER(dm7000_state, screen_update_dm7000)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 640-1, 0, 480-1);
+	screen.set_screen_update(FUNC(dm7000_state::screen_update_dm7000));
 
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(dm7000_state, kbd_put))
+	GENERIC_TERMINAL(config, m_terminal, 0);
+	m_terminal->set_keyboard_callback(FUNC(dm7000_state::kbd_put));
+}
 
-MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( dm7000 )

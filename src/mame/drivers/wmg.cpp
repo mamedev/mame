@@ -524,22 +524,17 @@ MACHINE_CONFIG_START(wmg_state::wmg)
 	MCFG_DEVICE_ADD("soundcpu", M6808, SOUND_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(wmg_cpu2)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("bankc000", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(wmg_banked_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
+	ADDRESS_MAP_BANK(config, "bankc000").set_map(&wmg_state::wmg_banked_map).set_options(ENDIANNESS_BIG, 8, 16, 0x1000);
 
 	// set a timer to go off every 32 scanlines, to toggle the VA11 line and update the screen
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scan_timer", williams_state, williams_va11_callback, "screen", 0, 32)
+	TIMER(config, "scan_timer").configure_scanline(FUNC(williams_state::williams_va11_callback), "screen", 0, 32);
 
 	// also set a timer to go off on scanline 240
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("240_timer", williams_state, williams_count240_callback, "screen", 0, 240)
+	TIMER(config, "240_timer").configure_scanline(FUNC(williams_state::williams_count240_callback), "screen", 0, 240);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -549,8 +544,7 @@ MACHINE_CONFIG_START(wmg_state::wmg)
 
 	MCFG_VIDEO_START_OVERRIDE(williams_state,williams)
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(williams_state,williams)
+	PALETTE(config, m_palette, FUNC(williams_state::williams_palette), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -560,27 +554,25 @@ MACHINE_CONFIG_START(wmg_state::wmg)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* pia */
-	MCFG_INPUT_MERGER_ANY_HIGH("mainirq")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
+	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 
-	MCFG_INPUT_MERGER_ANY_HIGH("soundirq")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("soundcpu", M6808_IRQ_LINE))
+	INPUT_MERGER_ANY_HIGH(config, "soundirq").output_handler().set_inputline(m_soundcpu, M6808_IRQ_LINE);
 
-	MCFG_DEVICE_ADD("pia_0", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("IN0"))
-	MCFG_PIA_READPB_HANDLER(IOPORT("IN1"))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, wmg_state, wmg_port_select_w))
+	pia6821_device &pia0(PIA6821(config, "pia_0", 0));
+	pia0.readpa_handler().set_ioport("IN0");
+	pia0.readpb_handler().set_ioport("IN1");
+	pia0.cb2_handler().set(FUNC(wmg_state::wmg_port_select_w));
 
-	MCFG_DEVICE_ADD("pia_1", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("IN2"))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, williams_state, williams_snd_cmd_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE("mainirq", input_merger_any_high_device, in_w<0>))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE("mainirq", input_merger_any_high_device, in_w<1>))
+	pia6821_device &pia1(PIA6821(config, "pia_1", 0));
+	pia1.readpa_handler().set_ioport("IN2");
+	pia1.writepb_handler().set(FUNC(williams_state::williams_snd_cmd_w));
+	pia1.irqa_handler().set("mainirq", FUNC(input_merger_any_high_device::in_w<0>));
+	pia1.irqb_handler().set("mainirq", FUNC(input_merger_any_high_device::in_w<1>));
 
-	MCFG_DEVICE_ADD("pia_2", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8("dac", dac_byte_interface, data_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE("soundirq", input_merger_any_high_device, in_w<0>))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE("soundirq", input_merger_any_high_device, in_w<1>))
+	pia6821_device &pia2(PIA6821(config, "pia_2", 0));
+	pia2.writepa_handler().set("dac", FUNC(dac_byte_interface::data_w));
+	pia2.irqa_handler().set("soundirq", FUNC(input_merger_any_high_device::in_w<0>));
+	pia2.irqb_handler().set("soundirq", FUNC(input_merger_any_high_device::in_w<1>));
 MACHINE_CONFIG_END
 
 /*************************************

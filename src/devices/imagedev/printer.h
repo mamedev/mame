@@ -13,8 +13,6 @@
 
 #pragma once
 
-#define MCFG_PRINTER_ONLINE_CB(_devcb) \
-	devcb = &downcast<printer_image_device &>(*device).set_online_callback(DEVCB_##_devcb);
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -29,7 +27,7 @@ public:
 	// construction/destruction
 	printer_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_online_callback(Object &&cb) { return m_online_cb.set_callback(std::forward<Object>(cb)); }
+	auto online_callback() { return m_online_cb.bind(); }
 
 	// image-level overrides
 	virtual image_init_result call_load() override;

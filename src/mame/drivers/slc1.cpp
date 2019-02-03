@@ -274,7 +274,7 @@ MACHINE_CONFIG_START(slc1_state::slc1)
 	MCFG_DEVICE_IO_MAP(io_map)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_slc1)
+	config.set_default_layout(layout_slc1);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

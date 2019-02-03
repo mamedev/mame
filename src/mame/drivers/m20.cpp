@@ -43,6 +43,7 @@ E I1     Vectored interrupt error
 #include "bus/rs232/rs232.h"
 #include "cpu/i86/i86.h"
 #include "cpu/z8000/z8000.h"
+#include "imagedev/floppy.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/pic8259.h"
@@ -62,8 +63,8 @@ E I1     Vectored interrupt error
 class m20_state : public driver_device
 {
 public:
-	m20_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	m20_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, RAM_TAG),
 		m_kbdi8251(*this, "i8251_1"),
@@ -203,12 +204,12 @@ WRITE16_MEMBER(m20_state::port21_w)
 
 READ16_MEMBER(m20_state::m20_i8259_r)
 {
-	return m_i8259->read(space, offset)<<1;
+	return m_i8259->read(offset)<<1;
 }
 
 WRITE16_MEMBER(m20_state::m20_i8259_w)
 {
-	m_i8259->write(space, offset, (data>>1));
+	m_i8259->write(offset, (data>>1));
 }
 
 WRITE_LINE_MEMBER( m20_state::tty_clock_tick_w )
@@ -797,10 +798,7 @@ MACHINE_CONFIG_START(m20_state::m20)
 	MCFG_DEVICE_IO_MAP(m20_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(m20_state,m20_irq_callback)
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("160K")
-	MCFG_RAM_DEFAULT_VALUE(0)
-	MCFG_RAM_EXTRA_OPTIONS("128K,192K,224K,256K,384K,512K")
+	RAM(config, RAM_TAG).set_default_size("160K").set_default_value(0).set_extra_options("128K,192K,224K,256K,384K,512K");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -809,50 +807,51 @@ MACHINE_CONFIG_START(m20_state::m20)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("fd1797", FD1797, 1000000)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE("i8259", pic8259_device, ir0_w))
-	MCFG_FLOPPY_DRIVE_ADD("fd1797:0", m20_floppies, "5dd", m20_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd1797:1", m20_floppies, "5dd", m20_state::floppy_formats)
+	FD1797(config, m_fd1797, 1000000);
+	m_fd1797->intrq_wr_callback().set(m_i8259, FUNC(pic8259_device::ir0_w));
+	FLOPPY_CONNECTOR(config, "fd1797:0", m20_floppies, "5dd", m20_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fd1797:1", m20_floppies, "5dd", m20_state::floppy_formats);
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", PIXEL_CLOCK/8) /* hand tuned to get ~50 fps */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(16)
-	MCFG_MC6845_UPDATE_ROW_CB(m20_state, update_row)
+	mc6845_device &crtc(MC6845(config, "crtc", PIXEL_CLOCK/8)); /* hand tuned to get ~50 fps */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(16);
+	crtc.set_update_row_callback(FUNC(m20_state::update_row), this);
 
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
+	I8255A(config, m_i8255, 0);
 
-	MCFG_DEVICE_ADD("i8251_1", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE("kbd", rs232_port_device, write_txd))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE("i8259", pic8259_device, ir4_w))
+	I8251(config, m_kbdi8251, 0);
+	m_kbdi8251->txd_handler().set("kbd", FUNC(rs232_port_device::write_txd));
+	m_kbdi8251->rxrdy_handler().set(m_i8259, FUNC(pic8259_device::ir4_w));
 
-	MCFG_DEVICE_ADD("i8251_2", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE("i8259", pic8259_device, ir3_w))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE("i8259", pic8259_device, ir5_w))
+	I8251(config, m_ttyi8251, 0);
+	m_ttyi8251->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_ttyi8251->rxrdy_handler().set(m_i8259, FUNC(pic8259_device::ir3_w));
+	m_ttyi8251->txrdy_handler().set(m_i8259, FUNC(pic8259_device::ir5_w));
 
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(1230782)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, m20_state, tty_clock_tick_w))
-	MCFG_PIT8253_CLK1(1230782)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, m20_state, kbd_clock_tick_w))
-	MCFG_PIT8253_CLK2(1230782)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, m20_state, timer_tick_w))
+	pit8253_device &pit8253(PIT8253(config, "pit8253", 0));
+	pit8253.set_clk<0>(1230782);
+	pit8253.out_handler<0>().set(FUNC(m20_state::tty_clock_tick_w));
+	pit8253.set_clk<1>(1230782);
+	pit8253.out_handler<1>().set(FUNC(m20_state::kbd_clock_tick_w));
+	pit8253.set_clk<2>(1230782);
+	pit8253.out_handler<2>().set(FUNC(m20_state::timer_tick_w));
 
-	MCFG_DEVICE_ADD("i8259", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(WRITELINE(*this, m20_state, int_w))
+	PIC8259(config, m_i8259, 0);
+	m_i8259->out_int_callback().set(FUNC(m20_state::int_w));
 
-	MCFG_DEVICE_ADD("kbd", RS232_PORT, keyboard, "m20")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("i8251_1", i8251_device, write_rxd))
+	rs232_port_device &kbd(RS232_PORT(config, "kbd", keyboard, "m20"));
+	kbd.rxd_handler().set(m_kbdi8251, FUNC(i8251_device::write_rxd));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("i8251_2", i8251_device, write_rxd))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(m_ttyi8251, FUNC(i8251_device::write_rxd));
 
-	MCFG_DEVICE_ADD("apb", M20_8086, "maincpu", "i8259", RAM_TAG)
+	MCFG_DEVICE_ADD("apb", M20_8086, "maincpu", m_i8259, RAM_TAG)
 
-	MCFG_SOFTWARE_LIST_ADD("flop_list","m20")
+	SOFTWARE_LIST(config, "flop_list").set_original("m20");
 MACHINE_CONFIG_END
 
 ROM_START(m20)

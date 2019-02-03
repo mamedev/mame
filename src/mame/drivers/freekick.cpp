@@ -48,7 +48,6 @@ TODO:
 #include "includes/freekick.h"
 
 #include "cpu/z80/z80.h"
-#include "machine/74259.h"
 #include "machine/i8255.h"
 #include "machine/mc8123.h"
 #include "sound/sn76496.h"
@@ -203,14 +202,14 @@ void freekick_state::omega_map(address_map &map)
 	map(0xd800, 0xd8ff).ram().share("spriteram");
 	map(0xd900, 0xdfff).ram();
 	map(0xe000, 0xe000).portr("IN0");
-	map(0xe000, 0xe007).w("outlatch", FUNC(ls259_device::write_d0));
+	map(0xe000, 0xe007).w(m_outlatch, FUNC(ls259_device::write_d0));
 	map(0xe800, 0xe800).portr("IN1");
 	map(0xf000, 0xf000).portr("DSW1").nopw(); //bankswitch ?
 	map(0xf800, 0xf800).portr("DSW2");
-	map(0xfc00, 0xfc00).w("sn1", FUNC(sn76489a_device::command_w));
-	map(0xfc01, 0xfc01).w("sn2", FUNC(sn76489a_device::command_w));
-	map(0xfc02, 0xfc02).w("sn3", FUNC(sn76489a_device::command_w));
-	map(0xfc03, 0xfc03).w("sn4", FUNC(sn76489a_device::command_w));
+	map(0xfc00, 0xfc00).w("sn1", FUNC(sn76489a_device::write));
+	map(0xfc01, 0xfc01).w("sn2", FUNC(sn76489a_device::write));
+	map(0xfc02, 0xfc02).w("sn3", FUNC(sn76489a_device::write));
+	map(0xfc03, 0xfc03).w("sn4", FUNC(sn76489a_device::write));
 }
 
 void freekick_state::pbillrd_map(address_map &map)
@@ -222,14 +221,14 @@ void freekick_state::pbillrd_map(address_map &map)
 	map(0xd800, 0xd8ff).ram().share("spriteram");
 	map(0xd900, 0xdfff).ram();
 	map(0xe000, 0xe000).portr("IN0");
-	map(0xe000, 0xe007).w("outlatch", FUNC(ls259_device::write_d0));
+	map(0xe000, 0xe007).w(m_outlatch, FUNC(ls259_device::write_d0));
 	map(0xe800, 0xe800).portr("IN1");
 	map(0xf000, 0xf000).portr("DSW1").w(FUNC(freekick_state::pbillrd_bankswitch_w));
 	map(0xf800, 0xf800).portr("DSW2");
-	map(0xfc00, 0xfc00).w("sn1", FUNC(sn76489a_device::command_w));
-	map(0xfc01, 0xfc01).w("sn2", FUNC(sn76489a_device::command_w));
-	map(0xfc02, 0xfc02).w("sn3", FUNC(sn76489a_device::command_w));
-	map(0xfc03, 0xfc03).w("sn4", FUNC(sn76489a_device::command_w));
+	map(0xfc00, 0xfc00).w("sn1", FUNC(sn76489a_device::write));
+	map(0xfc01, 0xfc01).w("sn2", FUNC(sn76489a_device::write));
+	map(0xfc02, 0xfc02).w("sn3", FUNC(sn76489a_device::write));
+	map(0xfc03, 0xfc03).w("sn4", FUNC(sn76489a_device::write));
 }
 
 void freekick_state::decrypted_opcodes_map(address_map &map)
@@ -250,11 +249,11 @@ void freekick_state::freekick_map(address_map &map)
 	map(0xf801, 0xf801).portr("IN1");
 	map(0xf802, 0xf802).nopr(); //MUST return bit 0 = 0, otherwise game resets
 	map(0xf803, 0xf803).r(FUNC(freekick_state::spinner_r));
-	map(0xf800, 0xf807).w("outlatch", FUNC(ls259_device::write_d0));
-	map(0xfc00, 0xfc00).w("sn1", FUNC(sn76489a_device::command_w));
-	map(0xfc01, 0xfc01).w("sn2", FUNC(sn76489a_device::command_w));
-	map(0xfc02, 0xfc02).w("sn3", FUNC(sn76489a_device::command_w));
-	map(0xfc03, 0xfc03).w("sn4", FUNC(sn76489a_device::command_w));
+	map(0xf800, 0xf807).w(m_outlatch, FUNC(ls259_device::write_d0));
+	map(0xfc00, 0xfc00).w("sn1", FUNC(sn76489a_device::write));
+	map(0xfc01, 0xfc01).w("sn2", FUNC(sn76489a_device::write));
+	map(0xfc02, 0xfc02).w("sn3", FUNC(sn76489a_device::write));
+	map(0xfc03, 0xfc03).w("sn4", FUNC(sn76489a_device::write));
 }
 
 void freekick_state::gigas_map(address_map &map)
@@ -265,14 +264,14 @@ void freekick_state::gigas_map(address_map &map)
 	map(0xd800, 0xd8ff).ram().share("spriteram");
 	map(0xd900, 0xdfff).ram();
 	map(0xe000, 0xe000).portr("IN0");
-	map(0xe000, 0xe007).w("outlatch", FUNC(ls259_device::write_d0));
+	map(0xe000, 0xe007).w(m_outlatch, FUNC(ls259_device::write_d0));
 	map(0xe800, 0xe800).portr("IN1");
 	map(0xf000, 0xf000).portr("DSW1").nopw(); //bankswitch ?
 	map(0xf800, 0xf800).portr("DSW2");
-	map(0xfc00, 0xfc00).w("sn1", FUNC(sn76489a_device::command_w));
-	map(0xfc01, 0xfc01).w("sn2", FUNC(sn76489a_device::command_w));
-	map(0xfc02, 0xfc02).w("sn3", FUNC(sn76489a_device::command_w));
-	map(0xfc03, 0xfc03).w("sn4", FUNC(sn76489a_device::command_w));
+	map(0xfc00, 0xfc00).w("sn1", FUNC(sn76489a_device::write));
+	map(0xfc01, 0xfc01).w("sn2", FUNC(sn76489a_device::write));
+	map(0xfc02, 0xfc02).w("sn3", FUNC(sn76489a_device::write));
+	map(0xfc03, 0xfc03).w("sn4", FUNC(sn76489a_device::write));
 }
 
 void freekick_state::omega_io_map(address_map &map)
@@ -738,22 +737,22 @@ MACHINE_CONFIG_START(freekick_state::omega)
 	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(freekick_state, irq0_line_hold, 120) // measured on PCB
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0) // 3M
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, freekick_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, freekick_state, coin1_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, freekick_state, coin2_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, freekick_state, nmi_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // ???
+	LS259(config, m_outlatch); // 3M
+	m_outlatch->q_out_cb<0>().set(FUNC(freekick_state::flipscreen_w));
+	m_outlatch->q_out_cb<2>().set(FUNC(freekick_state::coin1_w));
+	m_outlatch->q_out_cb<3>().set(FUNC(freekick_state::coin2_w));
+	m_outlatch->q_out_cb<4>().set(FUNC(freekick_state::nmi_enable_w));
+	m_outlatch->q_out_cb<5>().set_nop(); // ???
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(18'432'000)/3, 768/2, 0, 512/2, 263, 0+16, 224+16) // unknown divisor
 	MCFG_SCREEN_UPDATE_DRIVER(freekick_state, screen_update_gigas)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, freekick_state, vblank_irq))
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_freekick)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 0x200)
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 0x200);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -778,20 +777,20 @@ MACHINE_CONFIG_START(freekick_state::base)
 	MCFG_DEVICE_PROGRAM_MAP(pbillrd_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(freekick_state, irq0_line_hold, 120) // measured on PCB
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, freekick_state, coin1_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, freekick_state, coin2_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, freekick_state, nmi_enable_w))
+	LS259(config, m_outlatch);
+	m_outlatch->q_out_cb<2>().set(FUNC(freekick_state::coin1_w));
+	m_outlatch->q_out_cb<3>().set(FUNC(freekick_state::coin2_w));
+	m_outlatch->q_out_cb<4>().set(FUNC(freekick_state::nmi_enable_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2, 768/2, 0, 512/2, 263, 0+16, 224+16)
 	MCFG_SCREEN_UPDATE_DRIVER(freekick_state, screen_update_pbillrd)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, freekick_state, vblank_irq))
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_freekick)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 0x200)
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 0x200);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -809,16 +808,18 @@ MACHINE_CONFIG_START(freekick_state::base)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(freekick_state::pbillrd)
+void freekick_state::pbillrd(machine_config &config)
+{
 	base(config);
-	MCFG_DEVICE_MODIFY("outlatch") // 10K
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, freekick_state, flipscreen_x_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, freekick_state, flipscreen_y_w))
+
+	// 10K
+	m_outlatch->q_out_cb<0>().set(FUNC(freekick_state::flipscreen_x_w));
+	m_outlatch->q_out_cb<1>().set(FUNC(freekick_state::flipscreen_y_w));
 	/* flip Y/X could be the other way round... */
 
 	MCFG_MACHINE_START_OVERRIDE(freekick_state,pbillrd)
 	MCFG_MACHINE_RESET_OVERRIDE(freekick_state,freekick)
-MACHINE_CONFIG_END
+}
 
 MACHINE_CONFIG_START(freekick_state::pbillrdm)
 	pbillrd(config);
@@ -836,22 +837,22 @@ MACHINE_CONFIG_START(freekick_state::freekick)
 	MCFG_DEVICE_PROGRAM_MAP(freekick_map)
 	MCFG_DEVICE_IO_MAP(freekick_io_map)
 
-	MCFG_DEVICE_MODIFY("outlatch") // 5C
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, freekick_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, freekick_state, spinner_select_w))
+	// 5C
+	m_outlatch->q_out_cb<0>().set(FUNC(freekick_state::flipscreen_w));
+	m_outlatch->q_out_cb<6>().set(FUNC(freekick_state::spinner_select_w));
 
 	MCFG_MACHINE_START_OVERRIDE(freekick_state,freekick)
 	MCFG_MACHINE_RESET_OVERRIDE(freekick_state,freekick)
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, freekick_state, snd_rom_addr_l_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, freekick_state, snd_rom_addr_h_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, freekick_state, snd_rom_r))
+	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
+	ppi0.out_pa_callback().set(FUNC(freekick_state::snd_rom_addr_l_w));
+	ppi0.out_pb_callback().set(FUNC(freekick_state::snd_rom_addr_h_w));
+	ppi0.in_pc_callback().set(FUNC(freekick_state::snd_rom_r));
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW1"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW2"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW3"))
+	i8255_device &ppi1(I8255A(config, "ppi8255_1"));
+	ppi1.in_pa_callback().set_ioport("DSW1");
+	ppi1.in_pb_callback().set_ioport("DSW2");
+	ppi1.in_pc_callback().set_ioport("DSW3");
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -867,9 +868,8 @@ MACHINE_CONFIG_START(freekick_state::gigas)
 	MCFG_DEVICE_IO_MAP(gigas_io_map)
 	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 
-	MCFG_DEVICE_MODIFY("outlatch")
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, freekick_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // ???
+	m_outlatch->q_out_cb<0>().set(FUNC(freekick_state::flipscreen_w));
+	m_outlatch->q_out_cb<5>().set_nop(); // ???
 
 	MCFG_MACHINE_START_OVERRIDE(freekick_state,freekick)
 	MCFG_MACHINE_RESET_OVERRIDE(freekick_state,freekick)
@@ -889,9 +889,8 @@ MACHINE_CONFIG_START(freekick_state::gigasm)
 	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(freekick_state, irq0_line_hold, 120) // measured on PCB
 
-	MCFG_DEVICE_MODIFY("outlatch")
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, freekick_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // ???
+	m_outlatch->q_out_cb<0>().set(FUNC(freekick_state::flipscreen_w));
+	m_outlatch->q_out_cb<5>().set_nop(); // ???
 
 	MCFG_MACHINE_START_OVERRIDE(freekick_state,freekick)
 	MCFG_MACHINE_RESET_OVERRIDE(freekick_state,freekick)
@@ -1289,20 +1288,20 @@ Note: MCU dump (in oigas?) has fixed bits, but read is good. If not correct, it'
 */
 ROM_START( gigasb )
 	ROM_REGION( 2*0xc000, "maincpu", 0 )
-	ROM_LOAD( "g-7",   0x0c000, 0x4000, CRC(daf4e88d) SHA1(391dff914ce8e9b7975fc8827c066d7db16c4171) )
-	ROM_CONTINUE(      0x00000, 0x4000 )
-	ROM_LOAD( "g-8",   0x10000, 0x8000, CRC(4ab4c1f1) SHA1(63d8f489c7a8271e99a66d97e6eb0eb252cb2b67) )
-	ROM_CONTINUE(      0x04000, 0x8000 )
+	ROM_LOAD( "g-7.r8",   0x0c000, 0x4000, CRC(daf4e88d) SHA1(391dff914ce8e9b7975fc8827c066d7db16c4171) )
+	ROM_CONTINUE(         0x00000, 0x4000 )
+	ROM_LOAD( "g-8.t8",   0x10000, 0x8000, CRC(4ab4c1f1) SHA1(63d8f489c7a8271e99a66d97e6eb0eb252cb2b67) )
+	ROM_CONTINUE(         0x04000, 0x8000 )
 
 	ROM_REGION( 0xc000, "gfx1", 0 ) /* GFX */
-	ROM_LOAD( "g-4", 0x00000, 0x04000, CRC(8ed78981) SHA1(1f2c0584fcc6d04b042638c7b9a7e21fc560ca3d) )
-	ROM_LOAD( "g-5", 0x04000, 0x04000, CRC(0645ec2d) SHA1(ecf8b1ce98f845b5b32e7fc959cea7679a149d74) )
-	ROM_LOAD( "g-6", 0x08000, 0x04000, CRC(99e9cb27) SHA1(d141d6caa077e3cd182eb64cf803613ac17e7d09) )
+	ROM_LOAD( "g-4.3l",  0x00000, 0x04000, CRC(8ed78981) SHA1(1f2c0584fcc6d04b042638c7b9a7e21fc560ca3d) )
+	ROM_LOAD( "g-5.3k",  0x04000, 0x04000, CRC(0645ec2d) SHA1(ecf8b1ce98f845b5b32e7fc959cea7679a149d74) )
+	ROM_LOAD( "g-6.3fh", 0x08000, 0x04000, CRC(99e9cb27) SHA1(d141d6caa077e3cd182eb64cf803613ac17e7d09) )
 
 	ROM_REGION( 0xc000, "gfx2", 0 ) /* GFX */
-	ROM_LOAD( "g-1", 0x00000, 0x04000, CRC(d78fae6e) SHA1(a7bf3b213f2a3a51b964959bd45003351670575a) )
-	ROM_LOAD( "g-3", 0x04000, 0x04000, CRC(37df4a4c) SHA1(ab996db636d89845474529ba2573307046fb96ee) )
-	ROM_LOAD( "g-2", 0x08000, 0x04000, CRC(3a46e354) SHA1(ebd6a5db4c9cdfc6fabe6b412a704aaf03c32d7c) )
+	ROM_LOAD( "g-1.3t", 0x00000, 0x04000, CRC(d78fae6e) SHA1(a7bf3b213f2a3a51b964959bd45003351670575a) )
+	ROM_LOAD( "g-3.3p", 0x04000, 0x04000, CRC(37df4a4c) SHA1(ab996db636d89845474529ba2573307046fb96ee) )
+	ROM_LOAD( "g-2.3r", 0x08000, 0x04000, CRC(3a46e354) SHA1(ebd6a5db4c9cdfc6fabe6b412a704aaf03c32d7c) )
 
 	ROM_REGION( 0x0600, "proms", 0 )
 	ROM_LOAD( "1.pr", 0x0000, 0x0100, CRC(a784e71f) SHA1(1741ce98d719bad6cc5ea42337ef897f2435bbab) ) /* 24S10N, 82S129 or compatible? */

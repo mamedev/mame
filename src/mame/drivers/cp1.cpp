@@ -22,8 +22,8 @@
 class cp1_state : public driver_device
 {
 public:
-	cp1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+	cp1_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_i8155(*this, "i8155"),
 		m_i8155_cp3(*this, "i8155_cp3"),
@@ -244,7 +244,7 @@ void cp1_state::machine_reset()
 
 QUICKLOAD_LOAD_MEMBER( cp1_state, quickload )
 {
-	uint8_t *dest = (uint8_t*)m_i8155->space().get_read_ptr(0);
+	address_space &space = machine().dummy_space();
 	char line[0x10];
 	int addr = 0;
 	while (image.fgets(line, 10) && addr < 0x100)
@@ -252,8 +252,8 @@ QUICKLOAD_LOAD_MEMBER( cp1_state, quickload )
 		int op = 0, arg = 0;
 		if (sscanf(line, "%d.%d", &op, &arg) == 2)
 		{
-			dest[addr++] = op;
-			dest[addr++] = arg;
+			m_i8155->memory_w(space, addr++, op);
+			m_i8155->memory_w(space, addr++, arg);
 		}
 		else
 		{
@@ -264,33 +264,34 @@ QUICKLOAD_LOAD_MEMBER( cp1_state, quickload )
 	return image_init_result::PASS;
 }
 
-MACHINE_CONFIG_START(cp1_state::cp1)
+void cp1_state::cp1(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8049, XTAL(6'000'000))
-	MCFG_DEVICE_IO_MAP(cp1_io)
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, cp1_state, port1_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, cp1_state, port1_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, cp1_state, port2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, cp1_state, port2_w))
-	MCFG_MCS48_PORT_BUS_IN_CB(LOGGER("getbus"))
-	MCFG_MCS48_PORT_BUS_OUT_CB(LOGGER("putbus"))
-	MCFG_MCS48_PORT_T0_IN_CB(LOGGER("t0_r"))
-	MCFG_MCS48_PORT_T1_IN_CB(LOGGER("t1_r"))
+	i8049_device &maincpu(I8049(config, m_maincpu, 6_MHz_XTAL));
+	maincpu.set_addrmap(AS_IO, &cp1_state::cp1_io);
+	maincpu.p1_in_cb().set(FUNC(cp1_state::port1_r));
+	maincpu.p1_out_cb().set(FUNC(cp1_state::port1_w));
+	maincpu.p2_in_cb().set(FUNC(cp1_state::port2_r));
+	maincpu.p2_out_cb().set(FUNC(cp1_state::port2_w));
+	maincpu.bus_in_cb().set_log("getbus");
+	maincpu.bus_out_cb().set_log("putbus");
+	maincpu.t0_in_cb().set_log("t0_r");
+	maincpu.t1_in_cb().set_log("t1_r");
 
-	MCFG_DEVICE_ADD("i8155", I8155, 0)
-	MCFG_I8155_OUT_PORTA_CB(WRITE8(*this, cp1_state, i8155_porta_w))
-	MCFG_I8155_IN_PORTB_CB(READ8(*this, cp1_state, i8155_portb_r))
-	MCFG_I8155_OUT_PORTB_CB(WRITE8(*this, cp1_state, i8155_portb_w))
-	MCFG_I8155_OUT_PORTC_CB(WRITE8(*this, cp1_state, i8155_portc_w))
+	i8155_device &i8155(I8155(config, "i8155", 0));
+	i8155.out_pa_callback().set(FUNC(cp1_state::i8155_porta_w));
+	i8155.in_pb_callback().set(FUNC(cp1_state::i8155_portb_r));
+	i8155.out_pb_callback().set(FUNC(cp1_state::i8155_portb_w));
+	i8155.out_pc_callback().set(FUNC(cp1_state::i8155_portc_w));
 
-	MCFG_DEVICE_ADD("i8155_cp3", I8155, 0)
+	I8155(config, "i8155_cp3", 0);
 
-	MCFG_DEFAULT_LAYOUT(layout_cp1)
+	config.set_default_layout(layout_cp1);
 
-	MCFG_CASSETTE_ADD("cassette")
+	CASSETTE(config, m_cassette);
 
-	MCFG_QUICKLOAD_ADD("quickload", cp1_state, quickload, "obj", 1)
-MACHINE_CONFIG_END
+	QUICKLOAD(config, "quickload", 0).set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(cp1_state, quickload), this), "obj", 1);
+}
 
 /* ROM definition */
 /*

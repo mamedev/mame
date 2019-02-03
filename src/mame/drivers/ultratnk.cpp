@@ -8,6 +8,7 @@ Atari Ultra Tank driver
 
 #include "emu.h"
 #include "includes/ultratnk.h"
+
 #include "audio/sprint4.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/74259.h"
@@ -143,11 +144,11 @@ WRITE_LINE_MEMBER(ultratnk_state::lockout_w)
 
 WRITE8_MEMBER(ultratnk_state::attract_w)
 {
-	m_discrete->write(space, ULTRATNK_ATTRACT_EN, data & 1);
+	m_discrete->write(ULTRATNK_ATTRACT_EN, data & 1);
 }
 WRITE8_MEMBER(ultratnk_state::explosion_w)
 {
-	m_discrete->write(space, ULTRATNK_EXPLOSION_DATA, data & 15);
+	m_discrete->write(ULTRATNK_EXPLOSION_DATA, data & 15);
 }
 
 
@@ -295,27 +296,24 @@ MACHINE_CONFIG_START(ultratnk_state::ultratnk)
 	MCFG_DEVICE_ADD("maincpu", M6502, PIXEL_CLOCK / 8)
 	MCFG_DEVICE_PROGRAM_MAP(ultratnk_cpu_map)
 
-	MCFG_DEVICE_ADD("latch", F9334, 0) // E11
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, ultratnk_state, lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(OUTPUT("led0")) // LED1 (left player start)
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(OUTPUT("led1")) // LED2 (right player start)
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE("discrete", discrete_device, write_line<ULTRATNK_FIRE_EN_2>))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE("discrete", discrete_device, write_line<ULTRATNK_FIRE_EN_1>))
+	f9334_device &latch(F9334(config, "latch")); // E11
+	latch.q_out_cb<3>().set(FUNC(ultratnk_state::lockout_w));
+	latch.q_out_cb<4>().set_output("led0"); // LED1 (left player start)
+	latch.q_out_cb<5>().set_output("led1"); // LED2 (right player start)
+	latch.q_out_cb<6>().set("discrete", FUNC(discrete_device::write_line<ULTRATNK_FIRE_EN_2>));
+	latch.q_out_cb<7>().set("discrete", FUNC(discrete_device::write_line<ULTRATNK_FIRE_EN_1>));
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
+	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count(m_screen, 8);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, 0, 256, VTOTAL, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(ultratnk_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ultratnk_state, screen_vblank))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ultratnk)
-	MCFG_PALETTE_ADD("palette", 10)
-	MCFG_PALETTE_INDIRECT_ENTRIES(4)
-	MCFG_PALETTE_INIT_OWNER(ultratnk_state, ultratnk)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_ultratnk)
+	PALETTE(config, m_palette, FUNC(ultratnk_state::ultratnk_palette), 10, 4);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

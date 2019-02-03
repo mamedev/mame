@@ -304,10 +304,10 @@ MACHINE_CONFIG_START(micropin_state::micropin)
 	MCFG_DEVICE_PROGRAM_MAP(micropin_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(micropin_state, irq0_line_hold, 500)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_micropin)
+	config.set_default_layout(layout_micropin);
 
 	/* Sound */
 	genpin_audio(config);
@@ -316,23 +316,23 @@ MACHINE_CONFIG_START(micropin_state::micropin)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
-	MCFG_DEVICE_ADD("pia50", PIA6821, 0)
-	//MCFG_PIA_READPA_HANDLER(READ8(*this, micropin_state, p50a_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, micropin_state, p50a_w))
-	//MCFG_PIA_READPB_HANDLER(READ8(*this, micropin_state, p50b_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, micropin_state, p50b_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, micropin_state, p50ca2_w))
-	//MCFG_PIA_CB2_HANDLER(WRITELINE(*this, micropin_state, p50cb2_w))
+	pia6821_device &pia50(PIA6821(config, "pia50", 0));
+	//pia50.readpa_handler().set(FUNC(micropin_state::p50a_r));
+	pia50.writepa_handler().set(FUNC(micropin_state::p50a_w));
+	//pia50.readpb_handler().set(FUNC(micropin_state::p50b_r));
+	pia50.writepb_handler().set(FUNC(micropin_state::p50b_w));
+	pia50.ca2_handler().set(FUNC(micropin_state::p50ca2_w));
+	//pia50.cb2_handler().set(FUNC(micropin_state::p50cb2_w));
 
-	MCFG_DEVICE_ADD("pia51", PIA6821, 0)
-	//MCFG_PIA_READPA_HANDLER(READ8(*this, micropin_state, p51a_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, micropin_state, p51a_w))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, micropin_state, p51b_r))
-	//MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, micropin_state, p51b_w))
-	//MCFG_PIA_CA2_HANDLER(WRITELINE(*this, micropin_state, p51ca2_w))
-	//MCFG_PIA_CB2_HANDLER(WRITELINE(*this, micropin_state, p51cb2_w))
+	PIA6821(config, m_pia51, 0);
+	//m_pia51->readpa_handler().set(FUNC(micropin_state::p51a_r));
+	m_pia51->writepa_handler().set(FUNC(micropin_state::p51a_w));
+	m_pia51->readpb_handler().set(FUNC(micropin_state::p51b_r));
+	//m_pia51->writepb_handler().set(FUNC(micropin_state::p51b_w));
+	//m_pia51->ca2_handler().set(FUNC(micropin_state::p51ca2_w));
+	//m_pia51->cb2_handler().set(FUNC(micropin_state::p51cb2_w));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_a", micropin_state, timer_a, attotime::from_hz(100))
+	TIMER(config, "timer_a").configure_periodic(FUNC(micropin_state::timer_a), attotime::from_hz(100));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(micropin_state::pentacup2)
@@ -342,7 +342,7 @@ MACHINE_CONFIG_START(micropin_state::pentacup2)
 	MCFG_DEVICE_IO_MAP(pentacup2_io)
 	//MCFG_DEVICE_PERIODIC_INT_DRIVER(micropin_state, irq2_line_hold, 50)
 
-	//MCFG_NVRAM_ADD_0FILL("nvram")
+//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Sound */
 	genpin_audio(config);

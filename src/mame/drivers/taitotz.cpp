@@ -566,7 +566,7 @@ public:
 
 private:
 	required_device<ppc_device> m_maincpu;
-	required_device<cpu_device> m_iocpu;
+	required_device<tmp95c063_device> m_iocpu;
 	required_shared_ptr<uint64_t> m_work_ram;
 	required_shared_ptr<uint16_t> m_mbox_ram;
 	required_device<ata_interface_device> m_ata;
@@ -2570,53 +2570,52 @@ WRITE_LINE_MEMBER(taitotz_state::ide_interrupt)
 	m_iocpu->set_input_line(TLCS900_INT2, state);
 }
 
-MACHINE_CONFIG_START(taitotz_state::taitotz)
+void taitotz_state::taitotz(machine_config &config)
+{
 	/* IBM EMPPC603eBG-100 */
-	MCFG_DEVICE_ADD("maincpu", PPC603E, 100000000)
-	MCFG_PPC_BUS_FREQUENCY(XTAL(66'666'700))    /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
-	MCFG_DEVICE_PROGRAM_MAP(ppc603e_mem)
+	PPC603E(config, m_maincpu, 100000000);
+	m_maincpu->set_bus_frequency(XTAL(66'666'700)); /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &taitotz_state::ppc603e_mem);
 
 	/* TMP95C063F I/O CPU */
-	MCFG_DEVICE_ADD("iocpu", TMP95C063, 25000000)
-	MCFG_TMP95C063_PORT9_READ(IOPORT("INPUTS1"))
-	MCFG_TMP95C063_PORTB_READ(IOPORT("INPUTS2"))
-	MCFG_TMP95C063_PORTD_READ(IOPORT("INPUTS3"))
-	MCFG_TMP95C063_PORTE_READ(IOPORT("INPUTS4"))
-	MCFG_TMP95C063_AN0_READ(IOPORT("ANALOG1"))
-	MCFG_TMP95C063_AN1_READ(IOPORT("ANALOG2"))
-	MCFG_TMP95C063_AN2_READ(IOPORT("ANALOG3"))
-	MCFG_TMP95C063_AN3_READ(IOPORT("ANALOG4"))
-	MCFG_TMP95C063_AN4_READ(IOPORT("ANALOG5"))
-	MCFG_TMP95C063_AN5_READ(IOPORT("ANALOG6"))
-	MCFG_TMP95C063_AN6_READ(IOPORT("ANALOG7"))
-	MCFG_TMP95C063_AN7_READ(IOPORT("ANALOG8"))
-
-	MCFG_DEVICE_PROGRAM_MAP(tlcs900h_mem)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitotz_state,  taitotz_vbi)
+	TMP95C063(config, m_iocpu, 25000000);
+	m_iocpu->port9_read().set_ioport("INPUTS1");
+	m_iocpu->portb_read().set_ioport("INPUTS2");
+	m_iocpu->portd_read().set_ioport("INPUTS3");
+	m_iocpu->porte_read().set_ioport("INPUTS4");
+	m_iocpu->an_read<0>().set_ioport("ANALOG1");
+	m_iocpu->an_read<1>().set_ioport("ANALOG2");
+	m_iocpu->an_read<2>().set_ioport("ANALOG3");
+	m_iocpu->an_read<3>().set_ioport("ANALOG4");
+	m_iocpu->an_read<4>().set_ioport("ANALOG5");
+	m_iocpu->an_read<5>().set_ioport("ANALOG6");
+	m_iocpu->an_read<6>().set_ioport("ANALOG7");
+	m_iocpu->an_read<7>().set_ioport("ANALOG8");
+	m_iocpu->set_addrmap(AS_PROGRAM, &taitotz_state::tlcs900h_mem);
+	m_iocpu->set_vblank_int("screen", FUNC(taitotz_state::taitotz_vbi));
 
 	/* MN1020819DA sound CPU */
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(120))
+	config.m_minimum_quantum = attotime::from_hz(120);
 
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, taitotz_state, ide_interrupt))
+	ata_interface_device &ata(ATA_INTERFACE(config, "ata").options(ata_devices, "hdd", nullptr, true));
+	ata.irq_handler().set(FUNC(taitotz_state::ide_interrupt));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 384)
-	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
-	MCFG_SCREEN_UPDATE_DRIVER(taitotz_state, screen_update_taitotz)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(512, 384);
+	m_screen->set_visarea(0, 511, 0, 383);
+	m_screen->set_screen_update(FUNC(taitotz_state::screen_update_taitotz));
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(taitotz_state::landhigh)
+void taitotz_state::landhigh(machine_config &config)
+{
 	taitotz(config);
-	MCFG_DEVICE_MODIFY("iocpu")
-	MCFG_DEVICE_PROGRAM_MAP(landhigh_tlcs900h_mem)
-MACHINE_CONFIG_END
+	m_iocpu->set_addrmap(AS_PROGRAM, &taitotz_state::landhigh_tlcs900h_mem);
+}
 
 
 // Init for BIOS v1.52

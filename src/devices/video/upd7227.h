@@ -14,27 +14,18 @@
 
 
 ///*************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-///*************************************************************************
-
-#define MCFG_UPD7227_ADD(_tag, _sx, _sy) \
-	MCFG_DEVICE_ADD(_tag, UPD7227, 0) \
-	downcast<upd7227_device &>(*device).set_offsets(_sx, _sy);
-
-
-
-///*************************************************************************
 //  TYPE DEFINITIONS
 ///*************************************************************************
 
 // ======================> upd7227_device
 
-class upd7227_device :  public device_t,
-						public device_memory_interface
+class upd7227_device : public device_t, public device_memory_interface
 {
 public:
 	// construction/destruction
-	upd7227_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	upd7227_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	upd7227_device(const machine_config &mconfig, const char *tag, device_t *owner, int sx, int sy) : upd7227_device(mconfig, tag, owner, 0)
+	{ set_offsets(sx, sy); }
 
 	// inline configuration helpers
 	void set_offsets(int sx, int sy) { m_sx = sx; m_sy = sy; }

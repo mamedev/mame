@@ -25,6 +25,7 @@ What there is of the schematic shows no sign of a daisy chain or associated inte
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80daisy.h"
 #include "machine/z80pio.h"
@@ -32,7 +33,6 @@ What there is of the schematic shows no sign of a daisy chain or associated inte
 #include "machine/z80ctc.h"
 #include "machine/mm58274c.h"
 #include "bus/rs232/rs232.h"
-#include "machine/clock.h"
 
 
 
@@ -159,48 +159,45 @@ MACHINE_CONFIG_START(dmax8000_state::dmax8000)
 	MCFG_DEVICE_IO_MAP(dmax8000_io)
 	MCFG_MACHINE_RESET_OVERRIDE(dmax8000_state, dmax8000)
 
-	MCFG_DEVICE_ADD("ctc_clock", CLOCK, 4'000'000 / 2) // 2MHz
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("ctc", z80ctc_device, trg0))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("ctc", z80ctc_device, trg1))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("ctc", z80ctc_device, trg2))
+	z80ctc_device &ctc(Z80CTC(config, "ctc", 4_MHz_XTAL));
+	ctc.set_clk<0>(4_MHz_XTAL / 2); // 2MHz
+	ctc.zc_callback<0>().set("dart1", FUNC(z80dart_device::rxca_w));
+	ctc.zc_callback<0>().append("dart1", FUNC(z80dart_device::txca_w));
+	ctc.zc_callback<0>().append("dart2", FUNC(z80dart_device::rxca_w));
+	ctc.zc_callback<0>().append("dart2", FUNC(z80dart_device::txca_w));
+	ctc.set_clk<1>(4_MHz_XTAL / 2); // 2MHz
+	ctc.zc_callback<1>().set("dart2", FUNC(z80dart_device::rxtxcb_w));
+	ctc.set_clk<2>(4_MHz_XTAL / 2); // 2MHz
+	ctc.zc_callback<2>().set("dart1", FUNC(z80dart_device::rxtxcb_w));
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, 4'000'000)
-	MCFG_Z80CTC_ZC0_CB(WRITELINE("dart1", z80dart_device, rxca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("dart1", z80dart_device, txca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("dart2", z80dart_device, rxca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("dart2", z80dart_device, txca_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE("dart2", z80dart_device, rxtxcb_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE("dart1", z80dart_device, rxtxcb_w))
+	z80dart_device& dart1(Z80DART(config, "dart1", 4'000'000)); // A = terminal; B = aux
+	dart1.out_txda_callback().set("rs232", FUNC(rs232_port_device::write_txd));
+	dart1.out_dtra_callback().set("rs232", FUNC(rs232_port_device::write_dtr));
+	dart1.out_rtsa_callback().set("rs232", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("dart1", Z80DART, 4'000'000) // A = terminal; B = aux
-	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRA_CB(WRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSA_CB(WRITELINE("rs232", rs232_port_device, write_rts))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set("dart1", FUNC(z80dart_device::rxa_w));
+	rs232.dcd_handler().set("dart1", FUNC(z80dart_device::dcda_w));
+	rs232.ri_handler().set("dart1", FUNC(z80dart_device::ria_w));
+	rs232.cts_handler().set("dart1", FUNC(z80dart_device::ctsa_w));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("dart1", z80dart_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("dart1", z80dart_device, dcda_w))
-	MCFG_RS232_RI_HANDLER(WRITELINE("dart1", z80dart_device, ria_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("dart1", z80dart_device, ctsa_w))
+	Z80DART(config, "dart2", 4'000'000); // RS232 ports
 
-	MCFG_DEVICE_ADD("dart2", Z80DART, 4'000'000) // RS232 ports
+	z80pio_device& pio1(Z80PIO(config, "pio1", 4'000'000));
+	pio1.out_pa_callback().set(FUNC(dmax8000_state::port0c_w));
+	pio1.out_pb_callback().set(FUNC(dmax8000_state::port0d_w));
 
-	MCFG_DEVICE_ADD("pio1", Z80PIO, 4'000'000)
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, dmax8000_state, port0c_w))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, dmax8000_state, port0d_w))
+	Z80PIO(config, "pio2", 4'000'000);
 
-	MCFG_DEVICE_ADD("pio2", Z80PIO, 4'000'000)
+	FD1793(config, m_fdc, 2'000'000); // no idea
+	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_fdc->drq_wr_callback().set(FUNC(dmax8000_state::fdc_drq_w));
+	FLOPPY_CONNECTOR(config, "fdc:0", floppies, "8dsdd", floppy_image_device::default_floppy_formats).enable_sound(true);
 
-	MCFG_DEVICE_ADD("fdc", FD1793, 2'000'000) // no idea
-	MCFG_WD_FDC_INTRQ_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, dmax8000_state, fdc_drq_w))
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", floppies, "8dsdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-
-	MCFG_DEVICE_ADD("rtc", MM58274C, 0) // MM58174
+	mm58274c_device &rtc(MM58274C(config, "rtc", 0)); // MM58174
 	// this is all guess
-	MCFG_MM58274C_MODE24(0) // 12 hour
-	MCFG_MM58274C_DAY1(1)   // monday
+	rtc.set_mode24(0); // 12 hour
+	rtc.set_day1(1);   // monday
 MACHINE_CONFIG_END
 
 

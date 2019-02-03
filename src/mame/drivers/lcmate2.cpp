@@ -36,7 +36,6 @@
 #include "sound/spkrdev.h"
 #include "video/hd44780.h"
 #include "emupal.h"
-#include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -44,28 +43,31 @@
 class lcmate2_state : public driver_device
 {
 public:
-	lcmate2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_lcdc(*this, "hd44780"),
-	m_rtc(*this, "rtc"),
-	m_speaker(*this, "speaker")
+	lcmate2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_lcdc(*this, "hd44780"),
+		m_rtc(*this, "rtc"),
+		m_speaker(*this, "speaker"),
+		m_kbdlines(*this, "LINE%u", 0U)
 	{ }
 
 	void lcmate2(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc;
 	required_device<rp5c15_device> m_rtc;
 	required_device<speaker_sound_device> m_speaker;
-
-	virtual void machine_start() override;
+	required_ioport_array<8> m_kbdlines;
 
 	DECLARE_READ8_MEMBER( key_r );
 	DECLARE_WRITE8_MEMBER( speaker_w );
 	DECLARE_WRITE8_MEMBER( bankswitch_w );
-	DECLARE_PALETTE_INIT(lcmate2);
+	void lcmate2_palette(palette_device &palette) const;
 	void lcmate2_io(address_map &map);
 	void lcmate2_mem(address_map &map);
 };
@@ -78,16 +80,12 @@ WRITE8_MEMBER( lcmate2_state::speaker_w )
 // offsets are FE,FD,FB,F7,EF,DF,BF,7F to scan a particular row, or 00 to check if any key pressed
 READ8_MEMBER( lcmate2_state::key_r )
 {
-	uint8_t i,data = 0xff;
-	char kbdrow[8];
+	uint8_t data = 0xff;
 
-	for (i=0; i<8; i++)
+	for (int i = 0; i < 8; i++)
 	{
-		if (BIT(offset, i)==0)
-		{
-			sprintf(kbdrow,"LINE%d", i);
-			data &= ioport(kbdrow)->read();
-		}
+		if (!BIT(offset, i))
+			data &= m_kbdlines[i]->read();
 	}
 
 	return data;
@@ -204,7 +202,7 @@ static INPUT_PORTS_START( lcmate2 )
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
-PALETTE_INIT_MEMBER(lcmate2_state, lcmate2)
+void lcmate2_state::lcmate2_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
@@ -246,23 +244,20 @@ MACHINE_CONFIG_START(lcmate2_state::lcmate2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 120-1, 0, 18-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(lcmate2_state, lcmate2)
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lcmate2)
+	PALETTE(config, "palette", FUNC(lcmate2_state::lcmate2_palette), 2);
+	GFXDECODE(config, "gfxdecode", "palette", gfx_lcmate2);
 
-	MCFG_HD44780_ADD("hd44780")
-	MCFG_HD44780_LCD_SIZE(2, 20)
+	HD44780(config, m_lcdc, 0);
+	m_lcdc->set_lcd_size(2, 20);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("rtc", RP5C15, XTAL(32'768))
+	RP5C15(config, m_rtc, XTAL(32'768));
 MACHINE_CONFIG_END
 
 /* ROM definition */

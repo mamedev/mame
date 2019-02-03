@@ -18,9 +18,9 @@ void electron_state::waitforramsync()
 {
 	int cycles = 0;
 
-	if (!(m_ula.screen_mode & 4) && (m_screen->vpos() > m_screen->visible_area().min_y) && (m_screen->vpos() < m_screen->visible_area().max_y) && !m_screen->hblank())
+	if (!(m_ula.screen_mode & 4) && (m_screen->vpos() > m_screen->visible_area().top()) && (m_screen->vpos() < m_screen->visible_area().bottom()) && !m_screen->hblank())
 	{
-		cycles += (m_screen->visible_area().max_x - m_screen->hpos()) / 16;
+		cycles += (m_screen->visible_area().right() - m_screen->hpos()) / 16;
 	}
 	if (cycles & 1) cycles++;
 
@@ -237,7 +237,7 @@ READ8_MEMBER(electron_state::electron_paged_r)
 
 	default:
 		/* ROM in extension devices */
-		data = m_exp->expbus_r(space, 0x8000 + offset, 0xff);
+		data = m_exp->expbus_r(space, 0x8000 + offset);
 		break;
 	}
 	return data;
@@ -275,7 +275,7 @@ READ8_MEMBER(electron_state::electron_fred_r)
 
 	/* The Issue 4 ULA returns data from OS ROM, whereas Issue 6 ULA will return 0xff */
 	//logerror("FRED: read fc%02x\n", offset);
-	return m_exp->expbus_r(space, 0xfc00 + offset, 0xff);
+	return m_exp->expbus_r(space, 0xfc00 + offset);
 }
 
 WRITE8_MEMBER(electron_state::electron_fred_w)
@@ -297,7 +297,7 @@ READ8_MEMBER(electron_state::electron_jim_r)
 
 	/* The Issue 4 ULA returns data from OS ROM, whereas Issue 6 ULA will return 0xff */
 	//logerror("JIM: read fd%02x\n", offset);
-	return m_exp->expbus_r(space, 0xfd00 + offset, 0xff);
+	return m_exp->expbus_r(space, 0xfd00 + offset);
 }
 
 WRITE8_MEMBER(electron_state::electron_jim_w)

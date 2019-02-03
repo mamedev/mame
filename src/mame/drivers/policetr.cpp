@@ -100,26 +100,10 @@ PC5380-9651            5380-JY3306A           5380-N1045503A
  *
  *************************************/
 
-void policetr_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+WRITE_LINE_MEMBER(policetr_state::vblank)
 {
-	switch (id)
-	{
-	case TIMER_IRQ5_GEN:
-		m_maincpu->set_input_line(R3000_IRQ5, ASSERT_LINE);
-		break;
-	default:
-		assert_always(false, "Unknown id in policetr_state::device_timer");
-	}
+	m_maincpu->set_input_line(state ? INPUT_LINE_IRQ4 : INPUT_LINE_IRQ5, ASSERT_LINE);
 }
-
-
-INTERRUPT_GEN_MEMBER(policetr_state::irq4_gen)
-{
-	device.execute().set_input_line(R3000_IRQ4, ASSERT_LINE);
-	m_irq5_gen_timer->adjust(m_screen->time_until_pos(0));
-}
-
-
 
 /*************************************
  *
@@ -129,34 +113,50 @@ INTERRUPT_GEN_MEMBER(policetr_state::irq4_gen)
 
 WRITE32_MEMBER(policetr_state::control_w)
 {
-	uint32_t old = m_control_data;
-
 	// bit $80000000 = BSMT access/ROM read
-	// bit $20000000 = toggled every 64 IRQ4's
-	// bit $10000000 = ????
+	// bit $40000000 = N.C. (per schematic)
+	// bit $20000000 = LED (PCB, red)
+	// bit $10000000 = LED (PCB, green)
 	// bit $00800000 = EEPROM data
 	// bit $00400000 = EEPROM clock
 	// bit $00200000 = EEPROM enable (on 1)
+	// bit $00200000 = Ticket Output (marked "omit for production" on I/O board schematic in Police Trainer manual)
+	// bit $00080000 = LED (coin 2)
+	// bit $00040000 = LED (coin 1)
+	// bit $00020000 = Coin lockout 2 (as noted on the schematic; not used by the actual game)
+	// bit $00010000 = Coin lockout 1 (as noted on the schematic; not used by the actual game)
 
+	const uint32_t old = m_control_data;
 	COMBINE_DATA(&m_control_data);
 
 	/* handle EEPROM I/O */
 	if (ACCESSING_BITS_16_23)
 	{
-		m_eeprom->di_write((data & 0x00800000) >> 23);
-		m_eeprom->cs_write((data & 0x00200000) ? ASSERT_LINE : CLEAR_LINE);
-		m_eeprom->clk_write((data & 0x00400000) ? ASSERT_LINE : CLEAR_LINE);
+		machine().bookkeeping().coin_lockout_w(0, BIT(m_control_data, 16));
+		machine().bookkeeping().coin_lockout_w(1, BIT(m_control_data, 17));
+		m_leds[LED_COIN1] = BIT(m_control_data, 18);
+		m_leds[LED_COIN2] = BIT(m_control_data, 19);
+
+		m_eeprom->di_write(BIT(data, 23));
+		m_eeprom->cs_write(BIT(data, 21));
+		m_eeprom->clk_write(BIT(data, 22));
 	}
 
-	/* toggling BSMT off then on causes a reset */
-	if (!(old & 0x80000000) && (m_control_data & 0x80000000))
+	if (ACCESSING_BITS_24_31)
 	{
-		m_bsmt->reset();
+		m_leds[LED_PCB_RED] = !BIT(m_control_data, 28);
+		m_leds[LED_PCB_GREEN] = !BIT(m_control_data, 29);
+
+		/* toggling BSMT off then on causes a reset */
+		if (!BIT(old, 31) && BIT(m_control_data, 31))
+		{
+			m_bsmt->reset();
+		}
 	}
 
 	/* log any unknown bits */
-	if (data & 0x4f1fffff)
-		logerror("%08X: control_w = %08X & %08X\n", m_maincpu->pcbase(), data, mem_mask);
+	if (data & 0x0f1fffff)
+		logerror("%s: control_w = %08X & %08X\n", machine().describe_context(), data, mem_mask);
 }
 
 
@@ -167,16 +167,16 @@ WRITE32_MEMBER(policetr_state::control_w)
  *
  *************************************/
 
-WRITE32_MEMBER(policetr_state::policetr_bsmt2000_reg_w)
+WRITE32_MEMBER(policetr_state::bsmt2000_reg_w)
 {
-	if (m_control_data & 0x80000000)
+	if (BIT(m_control_data, 31))
 		m_bsmt->write_data(data);
 	else
 		COMBINE_DATA(&m_bsmt_data_offset);
 }
 
 
-WRITE32_MEMBER(policetr_state::policetr_bsmt2000_data_w)
+WRITE32_MEMBER(policetr_state::bsmt2000_data_w)
 {
 	m_bsmt->write_reg(data);
 	COMBINE_DATA(&m_bsmt_data_bank);
@@ -189,9 +189,9 @@ CUSTOM_INPUT_MEMBER(policetr_state::bsmt_status_r)
 }
 
 
-READ32_MEMBER(policetr_state::bsmt2000_data_r)
+READ8_MEMBER(policetr_state::bsmt2000_data_r)
 {
-	return m_bsmt_region->base()[m_bsmt_data_bank * 0x10000 + m_bsmt_data_offset] << 8;
+	return m_bsmt_region[(m_bsmt_data_bank << 16) + m_bsmt_data_offset];
 }
 
 
@@ -235,43 +235,47 @@ WRITE32_MEMBER(policetr_state::speedup_w)
  *
  *************************************/
 
-void policetr_state::policetr_map(address_map &map)
+void policetr_state::mem(address_map &map)
 {
+	map.global_mask(0x3fffffff);
+
 	map(0x00000000, 0x0001ffff).ram().share(m_rambase);
-	map(0x00200000, 0x0020000f).w(FUNC(policetr_state::policetr_video_w));
-	map(0x00400000, 0x00400003).r(FUNC(policetr_state::policetr_video_r));
+	map(0x00200000, 0x0020000f).w(FUNC(policetr_state::video_w));
+	map(0x00400000, 0x00400003).r(FUNC(policetr_state::video_r));
 	map(0x00500000, 0x00500003).nopw();        // copies ROM here at startup, plus checksum
-	map(0x00600000, 0x00600003).r(FUNC(policetr_state::bsmt2000_data_r));
-	map(0x00700000, 0x00700003).w(FUNC(policetr_state::policetr_bsmt2000_reg_w));
-	map(0x00800000, 0x00800003).w(FUNC(policetr_state::policetr_bsmt2000_data_w));
-	map(0x00900000, 0x00900003).w(FUNC(policetr_state::policetr_palette_offset_w));
-	map(0x00920000, 0x00920003).w(FUNC(policetr_state::policetr_palette_data_w));
+	map(0x00600002, 0x00600002).r(FUNC(policetr_state::bsmt2000_data_r));
+	map(0x00700000, 0x00700003).w(FUNC(policetr_state::bsmt2000_reg_w));
+	map(0x00800000, 0x00800003).w(FUNC(policetr_state::bsmt2000_data_w));
+	map(0x00900001, 0x00900001).w(FUNC(policetr_state::palette_offset_w));
+	map(0x00920001, 0x00920001).w(FUNC(policetr_state::palette_data_w));
 	map(0x00a00000, 0x00a00003).w(FUNC(policetr_state::control_w));
 	map(0x00a00000, 0x00a00003).portr("IN0");
 	map(0x00a20000, 0x00a20003).portr("IN1");
 	map(0x00a40000, 0x00a40003).portr("DSW");
 	map(0x00e00000, 0x00e00003).nopw();        // watchdog???
-	map(0x1fc00000, 0x1fc7ffff).rom().region("user1", 0);
+	map(0x1fc00000, 0x1fc7ffff).rom().region("maincpu", 0);
 }
 
 
-void policetr_state::sshooter_map(address_map &map)
+void sshooter_state::mem(address_map &map)
 {
+	map.global_mask(0x3fffffff);
+
 	map(0x00000000, 0x0001ffff).ram().share(m_rambase);
-	map(0x00200000, 0x00200003).w(FUNC(policetr_state::policetr_bsmt2000_data_w));
-	map(0x00300000, 0x00300003).w(FUNC(policetr_state::policetr_palette_offset_w));
-	map(0x00320000, 0x00320003).w(FUNC(policetr_state::policetr_palette_data_w));
-	map(0x00400000, 0x00400003).r(FUNC(policetr_state::policetr_video_r));
+	map(0x00200000, 0x00200003).w(FUNC(sshooter_state::bsmt2000_data_w));
+	map(0x00300001, 0x00300001).w(FUNC(sshooter_state::palette_offset_w));
+	map(0x00320001, 0x00320001).w(FUNC(sshooter_state::palette_data_w));
+	map(0x00400000, 0x00400003).r(FUNC(sshooter_state::video_r));
 	map(0x00500000, 0x00500003).nopw();        // copies ROM here at startup, plus checksum
-	map(0x00600000, 0x00600003).r(FUNC(policetr_state::bsmt2000_data_r));
-	map(0x00700000, 0x00700003).w(FUNC(policetr_state::policetr_bsmt2000_reg_w));
-	map(0x00800000, 0x0080000f).w(FUNC(policetr_state::policetr_video_w));
-	map(0x00a00000, 0x00a00003).w(FUNC(policetr_state::control_w));
+	map(0x00600002, 0x00600002).r(FUNC(sshooter_state::bsmt2000_data_r));
+	map(0x00700000, 0x00700003).w(FUNC(sshooter_state::bsmt2000_reg_w));
+	map(0x00800000, 0x0080000f).w(FUNC(sshooter_state::video_w));
+	map(0x00a00000, 0x00a00003).w(FUNC(sshooter_state::control_w));
 	map(0x00a00000, 0x00a00003).portr("IN0");
 	map(0x00a20000, 0x00a20003).portr("IN1");
 	map(0x00a40000, 0x00a40003).portr("DSW");
 	map(0x00e00000, 0x00e00003).nopw();        // watchdog???
-	map(0x1fc00000, 0x1fcfffff).rom().region("user1", 0);
+	map(0x1fc00000, 0x1fcfffff).rom().region("maincpu", 0);
 }
 
 
@@ -284,40 +288,44 @@ void policetr_state::sshooter_map(address_map &map)
 
 static INPUT_PORTS_START( policetr )
 	PORT_START("IN0")
-	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /P2SPR1  (note 1) */
+	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /P2PUSH3 (note 1) */
+	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /P2PUSH2 (note 1) */
+	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /P2USH1  (note 1) */
+	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /P2RIGHT (note 1) */
+	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /P2LEFT  (note 1) */
+	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /P2DOWN  (note 1) */
+	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /P2UP    (note 1) */
+	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /P1SPR1  (note 1) */
+	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /P1PUSH3 (note 1) */
+	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /P1PUSH2 (note 1) */
+	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /P1PUSH1 (note 1) */
+	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /P1RIGHT (note 1) */
+	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /P1LEFT  (note 1) */
+	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /P1DOWN  (note 1) */
+	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /P1UP    (note 1) */
 
 	PORT_START("IN1")
 	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_SERVICE( 0x00200000, IP_ACTIVE_LOW )       /* Not actually a dipswitch */
-	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, policetr_state, bsmt_status_r, nullptr)
-	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20000000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read) /* EEPROM read */
-	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /TILT (note 1) */
+	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /SERVICE (note 1) */
+	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_CUSTOM )  PORT_CUSTOM_MEMBER(DEVICE_SELF, policetr_state, bsmt_status_r, nullptr)
+	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_BUTTON1 )  PORT_PLAYER(1)
+	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_UNKNOWN )  /* /XSW2 (note 2) */
+	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_BUTTON1 )  PORT_PLAYER(2)
+	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_UNKNOWN )  /* /XSW2 (note 2) */
+	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_UNUSED )   /* TKTSNS (note 3) */
+	PORT_BIT( 0x20000000, IP_ACTIVE_HIGH, IPT_CUSTOM )  PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read) /* EEPROM read */
+	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /VOLMDN (note 1) */
+	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /VOLMUP (note 1) */
+
+	/* Note 1: Input is unused but is shown in the service menu and noted as written on the I/O schematic in the Police Trainer manual. */
+	/* Note 2: It is unknown if this input is used, but it is noted as written on the I/O schematic in the Police Trainer manual. */
+	/* Note 3: Per the I/O schematic in the Police Trainer manual, the ticket dispenser connector is omitted for production. */
 
 	PORT_START("DSW")
 	PORT_DIPUNUSED_DIPLOC( 0x00010000, 0x00010000, "SW1:1" )
@@ -382,37 +390,42 @@ static INPUT_PORTS_START( sshoot11 )
 INPUT_PORTS_END
 
 
-void policetr_state::machine_start()
-{
-	m_irq5_gen_timer = timer_alloc(TIMER_IRQ5_GEN);
-}
-
 /*************************************
  *
  *  Machine driver
  *
  *************************************/
 
-MACHINE_CONFIG_START(policetr_state::policetr)
+void policetr_state::machine_start()
+{
+	m_leds.resolve();
 
+	save_item(NAME(m_control_data));
+	save_item(NAME(m_bsmt_data_bank));
+	save_item(NAME(m_bsmt_data_offset));
+	save_item(NAME(m_last_cycles));
+	save_item(NAME(m_loop_count));
+}
+
+void policetr_state::policetr(machine_config &config)
+{
 	/* basic machine hardware */
-	device = &R3041(config, m_maincpu, MASTER_CLOCK/2);
+	R3041(config, m_maincpu, MASTER_CLOCK/2);
 	m_maincpu->set_endianness(ENDIANNESS_BIG);
-	m_maincpu->set_addrmap(AS_PROGRAM, &policetr_state::policetr_map);
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", policetr_state, irq4_gen);
+	m_maincpu->set_addrmap(AS_PROGRAM, &policetr_state::mem);
 
-	EEPROM_SERIAL_93C66_16BIT(config, m_eeprom);
+	EEPROM_93C66_16BIT(config, m_eeprom);
 
 	/* video hardware */
-	device = &SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(400, 262);  /* needs to be verified */
 	m_screen->set_visarea(0, 393, 0, 239);
-	m_screen->set_palette(m_palette);
-	MCFG_SCREEN_UPDATE_DRIVER(policetr_state, screen_update_policetr);
+	m_screen->set_screen_update(FUNC(policetr_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(policetr_state::vblank));
 
-	PALETTE(config, m_palette, 256);
+	PALETTE(config, m_palette).set_entries(256);
 
 	/* sound hardware */
 	SPEAKER(config, m_lspeaker).front_left();
@@ -421,13 +434,13 @@ MACHINE_CONFIG_START(policetr_state::policetr)
 	BSMT2000(config, m_bsmt, MASTER_CLOCK/2);
 	m_bsmt->add_route(0, *m_lspeaker, 1.0);
 	m_bsmt->add_route(1, *m_rspeaker, 1.0);
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(policetr_state::sshooter)
+void sshooter_state::sshooter(machine_config &config)
+{
 	policetr(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &policetr_state::sshooter_map);
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &sshooter_state::mem);
+}
 
 
 
@@ -438,13 +451,13 @@ MACHINE_CONFIG_END
  *************************************/
 
 ROM_START( policetr ) /* Rev 0.3 PCB , with all chips dated 04/01/97 */
-	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x400000, "gfx", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "pt-u121.bin", 0x000000, 0x100000, CRC(56b0b00a) SHA1(4034fe373a61f756f4813f0c20b1cf05e4338059) )
 	ROM_LOAD16_BYTE( "pt-u120.bin", 0x000001, 0x100000, CRC(ca664142) SHA1(2727ecb9287b4ed30088e017bb6b8763dfb75b2f) )
 	ROM_LOAD16_BYTE( "pt-u125.bin", 0x200000, 0x100000, CRC(e9ccf3a0) SHA1(b3fd8c094f76ace4cf403c3d0f6bd6c5d8db7d6a) )
 	ROM_LOAD16_BYTE( "pt-u124.bin", 0x200001, 0x100000, CRC(f4acf921) SHA1(5b244e9a51304318fa0c03eb7365b3c12627d19b) )
 
-	ROM_REGION32_BE( 0x80000, "user1", 0 )
+	ROM_REGION32_BE( 0x80000, "maincpu", 0 )
 	ROM_LOAD32_BYTE( "pt-u113.bin", 0x00000, 0x20000, CRC(7b34d366) SHA1(b86cfe155e0685992aebbcc7db705fdbadc42bf9) )
 	ROM_LOAD32_BYTE( "pt-u112.bin", 0x00001, 0x20000, CRC(57d059c8) SHA1(ed0c624fc0afbeb6616bba8a67ce5b18d7c119fc) )
 	ROM_LOAD32_BYTE( "pt-u111.bin", 0x00002, 0x20000, CRC(fb5ce933) SHA1(4a07ac3e2d86262061092f112cab89f8660dce3d) )
@@ -459,13 +472,13 @@ ROM_END
 
 
 ROM_START( policetr11 ) /* Rev 0.3 PCB with all chips dated 01/06/97 */
-	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x400000, "gfx", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "pt-u121.bin", 0x000000, 0x100000, CRC(56b0b00a) SHA1(4034fe373a61f756f4813f0c20b1cf05e4338059) )
 	ROM_LOAD16_BYTE( "pt-u120.bin", 0x000001, 0x100000, CRC(ca664142) SHA1(2727ecb9287b4ed30088e017bb6b8763dfb75b2f) )
 	ROM_LOAD16_BYTE( "pt-u125.bin", 0x200000, 0x100000, CRC(e9ccf3a0) SHA1(b3fd8c094f76ace4cf403c3d0f6bd6c5d8db7d6a) )
 	ROM_LOAD16_BYTE( "pt-u124.bin", 0x200001, 0x100000, CRC(f4acf921) SHA1(5b244e9a51304318fa0c03eb7365b3c12627d19b) )
 
-	ROM_REGION32_BE( 0x80000, "user1", 0 )  /* 2MB for R3000 code */
+	ROM_REGION32_BE( 0x80000, "maincpu", 0 )  /* 2MB for R3000 code */
 	ROM_LOAD32_BYTE( "pt-u113.v11", 0x00000, 0x20000, CRC(3d62f6d6) SHA1(342ffa38a6972bbb03c89b4dd603c2cc60609d3d) )
 	ROM_LOAD32_BYTE( "pt-u112.v11", 0x00001, 0x20000, CRC(942b280b) SHA1(c342ba3255203ce28ff59479da00f26f0bd026e0) )
 	ROM_LOAD32_BYTE( "pt-u111.v11", 0x00002, 0x20000, CRC(da6c45a7) SHA1(471bd372d2ad5bcb29af19dae09f3cfab4b010fd) )
@@ -480,7 +493,7 @@ ROM_END
 
 
 ROM_START( policetr10 ) /* Rev 0.2 PCB with all chips dated 10/07/96 */
-	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x400000, "gfx", ROMREGION_ERASE00 )
 	/* Same data as the other sets, but split in 4 meg roms */
 	ROM_LOAD16_BYTE( "pt-u121.v10", 0x000000, 0x080000, CRC(9d31e805) SHA1(482f38e07ddb758e1fb444af7b56a0ef6ea945c8) )
 	ROM_LOAD16_BYTE( "pt-u120.v10", 0x000001, 0x080000, CRC(b03b9d46) SHA1(2bb8fcb1df09aa762b98adf2e1edd186203746c0) )
@@ -491,7 +504,7 @@ ROM_START( policetr10 ) /* Rev 0.2 PCB with all chips dated 10/07/96 */
 	ROM_LOAD16_BYTE( "pt-u127.v10", 0x300000, 0x080000, CRC(5031ea1e) SHA1(c1f9272f9874150d510f22c44c186fad0ed3a7e4) )
 	ROM_LOAD16_BYTE( "pt-u126.v10", 0x300001, 0x080000, CRC(33bf2653) SHA1(357da2da7df417109adbf600f3455c224f6c076f) )
 
-	ROM_REGION32_BE( 0x80000, "user1", 0 )  /* 2MB for R3000 code */
+	ROM_REGION32_BE( 0x80000, "maincpu", 0 )  /* 2MB for R3000 code */
 	ROM_LOAD32_BYTE( "pt-u113.v10", 0x00000, 0x20000, CRC(3e27a0ce) SHA1(0d010da68f950a10a74eddc57941e4c0e2144071) )
 	ROM_LOAD32_BYTE( "pt-u112.v10", 0x00001, 0x20000, CRC(fcbcf4ca) SHA1(374291600043cfbbd87260b12961ac6d68caeda0) )
 	ROM_LOAD32_BYTE( "pt-u111.v10", 0x00002, 0x20000, CRC(61f79667) SHA1(25298cd8706b5c59f7c9e0f8d44db0df73c23403) )
@@ -511,13 +524,13 @@ ROM_END
 
 
 ROM_START( policetr13a ) /* Rev 0.5B PCB , unknown program rom date. Actual version is V1.3B */
-	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x400000, "gfx", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "pt-u121.bin", 0x000000, 0x100000, CRC(56b0b00a) SHA1(4034fe373a61f756f4813f0c20b1cf05e4338059) )
 	ROM_LOAD16_BYTE( "pt-u120.bin", 0x000001, 0x100000, CRC(ca664142) SHA1(2727ecb9287b4ed30088e017bb6b8763dfb75b2f) )
 	ROM_LOAD16_BYTE( "pt-u125.bin", 0x200000, 0x100000, CRC(e9ccf3a0) SHA1(b3fd8c094f76ace4cf403c3d0f6bd6c5d8db7d6a) )
 	ROM_LOAD16_BYTE( "pt-u124.bin", 0x200001, 0x100000, CRC(f4acf921) SHA1(5b244e9a51304318fa0c03eb7365b3c12627d19b) )
 
-	ROM_REGION32_BE( 0x100000, "user1", 0 ) /* Program roms are type 27C020 */
+	ROM_REGION32_BE( 0x100000, "maincpu", 0 ) /* Program roms are type 27C020 */
 /*
 Note: With this version, the program roms are twice the size of those found on all other Police Trainer sets. Like the set listed below,
       if you set the dipswitch to service mode and reset the game within Mame. All 4 program ROMs fail the checksum code and the listed
@@ -542,13 +555,13 @@ ROM_END
 
 
 ROM_START( policetr13b ) /* Rev 0.5B PCB , unknown program rom date Actual version is V1.3B */
-	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x400000, "gfx", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "pt-u121.bin", 0x000000, 0x100000, CRC(56b0b00a) SHA1(4034fe373a61f756f4813f0c20b1cf05e4338059) )
 	ROM_LOAD16_BYTE( "pt-u120.bin", 0x000001, 0x100000, CRC(ca664142) SHA1(2727ecb9287b4ed30088e017bb6b8763dfb75b2f) )
 	ROM_LOAD16_BYTE( "pt-u125.bin", 0x200000, 0x100000, CRC(e9ccf3a0) SHA1(b3fd8c094f76ace4cf403c3d0f6bd6c5d8db7d6a) )
 	ROM_LOAD16_BYTE( "pt-u124.bin", 0x200001, 0x100000, CRC(f4acf921) SHA1(5b244e9a51304318fa0c03eb7365b3c12627d19b) )
 
-	ROM_REGION32_BE( 0x100000, "user1", 0 ) /* Program roms are type 27C010 */
+	ROM_REGION32_BE( 0x100000, "maincpu", 0 ) /* Program roms are type 27C010 */
 /*
 Note: If you set the dipswitch to service mode and reset the game within Mame. All 4 program ROMs fail the checksum code, IE: they
       show in red instead of green.  But, the listed checksums on the screen match the checksums printed on the ROM labels. However,
@@ -570,7 +583,7 @@ ROM_END
 
 
 ROM_START( sshooter ) /* Rev 0.5B PCB , Added a "Welcome" start-up screen which shows "This is Version C191012" */
-	ROM_REGION( 0x800000, "gfx1", ROMREGION_ERASE00 ) /* Graphics v1.0 */
+	ROM_REGION( 0x800000, "gfx", ROMREGION_ERASE00 ) /* Graphics v1.0 */
 	ROM_LOAD16_BYTE( "ss-u121.bin", 0x000000, 0x100000, CRC(22e27dd6) SHA1(cb9e8c450352bb116a9c0407cc8ce6d8ae9d9881) ) // 1:1
 	ROM_LOAD16_BYTE( "ss-u120.bin", 0x000001, 0x100000, CRC(30173b1b) SHA1(366464444ce208391ca350f1639403f0c2217330) ) // 1:2
 	ROM_LOAD16_BYTE( "ss-u125.bin", 0x200000, 0x100000, CRC(79e8520a) SHA1(682e5c7954f96db65a137f05cde67c310b85b526) ) // 2:1
@@ -580,7 +593,7 @@ ROM_START( sshooter ) /* Rev 0.5B PCB , Added a "Welcome" start-up screen which 
 	ROM_LOAD16_BYTE( "ss-u127.bin", 0x600000, 0x100000, CRC(76a7a591) SHA1(9fd7cce21b01f388966a3e8388ba95820ac10bfd) ) // 4:1
 	ROM_LOAD16_BYTE( "ss-u126.bin", 0x600001, 0x100000, CRC(ab1b9d60) SHA1(ff51a71443f7774d3abf96c2eb8ef6a54d73dd8e) ) // 4:2
 
-	ROM_REGION32_BE( 0x100000, "user1", 0 )
+	ROM_REGION32_BE( 0x100000, "maincpu", 0 )
 	ROM_LOAD32_BYTE( "ss-u113.v19", 0x00000, 0x40000, CRC(de536a90) SHA1(76f0e0e2457d91b3c1bd2b3501591646a18db348) ) // 1:1
 	ROM_LOAD32_BYTE( "ss-u112.v19", 0x00001, 0x40000, CRC(2e4e1837) SHA1(b4088269e1e7a3913d2841eb24f53b1c413cd0cc) ) // 1:2
 	ROM_LOAD32_BYTE( "ss-u111.v19", 0x00002, 0x40000, CRC(485d03e8) SHA1(ebdf166b2354b318e6bfb68e0fb5647381b9c405) ) // 1:3
@@ -595,7 +608,7 @@ ROM_END
 
 
 ROM_START( sshooter17 ) /* Rev 0.5B PCB , unknown program rom date */
-	ROM_REGION( 0x800000, "gfx1", ROMREGION_ERASE00 ) /* Graphics v1.0 */
+	ROM_REGION( 0x800000, "gfx", ROMREGION_ERASE00 ) /* Graphics v1.0 */
 	ROM_LOAD16_BYTE( "ss-u121.bin", 0x000000, 0x100000, CRC(22e27dd6) SHA1(cb9e8c450352bb116a9c0407cc8ce6d8ae9d9881) ) // 1:1
 	ROM_LOAD16_BYTE( "ss-u120.bin", 0x000001, 0x100000, CRC(30173b1b) SHA1(366464444ce208391ca350f1639403f0c2217330) ) // 1:2
 	ROM_LOAD16_BYTE( "ss-u125.bin", 0x200000, 0x100000, CRC(79e8520a) SHA1(682e5c7954f96db65a137f05cde67c310b85b526) ) // 2:1
@@ -605,7 +618,7 @@ ROM_START( sshooter17 ) /* Rev 0.5B PCB , unknown program rom date */
 	ROM_LOAD16_BYTE( "ss-u127.bin", 0x600000, 0x100000, CRC(76a7a591) SHA1(9fd7cce21b01f388966a3e8388ba95820ac10bfd) ) // 4:1
 	ROM_LOAD16_BYTE( "ss-u126.bin", 0x600001, 0x100000, CRC(ab1b9d60) SHA1(ff51a71443f7774d3abf96c2eb8ef6a54d73dd8e) ) // 4:2
 
-	ROM_REGION32_BE( 0x100000, "user1", 0 )
+	ROM_REGION32_BE( 0x100000, "maincpu", 0 )
 	ROM_LOAD32_BYTE( "ss-u113.v17", 0x00000, 0x40000, CRC(a8c96af5) SHA1(a62458156603b74e0d84ce6928f7bb868bf5a219) ) // 1:1
 	ROM_LOAD32_BYTE( "ss-u112.v17", 0x00001, 0x40000, CRC(c732d5fa) SHA1(2bcc26c8bbf55394173ca65b4b0df01bc6b719bb) ) // 1:2
 	ROM_LOAD32_BYTE( "ss-u111.v17", 0x00002, 0x40000, CRC(4240fa2f) SHA1(54223207c1e228d6b836918601c0f65c2692e5bc) ) // 1:3
@@ -620,7 +633,7 @@ ROM_END
 
 
 ROM_START( sshooter12 ) /* Rev 0.5B PCB , program roms dated 04/17/98 */
-	ROM_REGION( 0x800000, "gfx1", ROMREGION_ERASE00 ) /* Graphics v1.0 */
+	ROM_REGION( 0x800000, "gfx", ROMREGION_ERASE00 ) /* Graphics v1.0 */
 	ROM_LOAD16_BYTE( "ss-u121.bin", 0x000000, 0x100000, CRC(22e27dd6) SHA1(cb9e8c450352bb116a9c0407cc8ce6d8ae9d9881) ) // 1:1
 	ROM_LOAD16_BYTE( "ss-u120.bin", 0x000001, 0x100000, CRC(30173b1b) SHA1(366464444ce208391ca350f1639403f0c2217330) ) // 1:2
 	ROM_LOAD16_BYTE( "ss-u125.bin", 0x200000, 0x100000, CRC(79e8520a) SHA1(682e5c7954f96db65a137f05cde67c310b85b526) ) // 2:1
@@ -630,7 +643,7 @@ ROM_START( sshooter12 ) /* Rev 0.5B PCB , program roms dated 04/17/98 */
 	ROM_LOAD16_BYTE( "ss-u127.bin", 0x600000, 0x100000, CRC(76a7a591) SHA1(9fd7cce21b01f388966a3e8388ba95820ac10bfd) ) // 4:1
 	ROM_LOAD16_BYTE( "ss-u126.bin", 0x600001, 0x100000, CRC(ab1b9d60) SHA1(ff51a71443f7774d3abf96c2eb8ef6a54d73dd8e) ) // 4:2
 
-	ROM_REGION32_BE( 0x100000, "user1", 0 )
+	ROM_REGION32_BE( 0x100000, "maincpu", 0 )
 	ROM_LOAD32_BYTE( "ss-u113.v12", 0x00000, 0x40000, CRC(73dbaf4b) SHA1(a85fad95d63333f4fe5647f31258b3a22c5c2c0d) ) // 1:1
 	ROM_LOAD32_BYTE( "ss-u112.v12", 0x00001, 0x40000, CRC(06fbc2de) SHA1(8bdfcbc33b5fc010464dcd7691f9ecd6ba2168ba) ) // 1:2
 	ROM_LOAD32_BYTE( "ss-u111.v12", 0x00002, 0x40000, CRC(0b291731) SHA1(bd04f0b1b52198344df625fcddfc6c6ccb0bd923) ) // 1:3
@@ -645,7 +658,7 @@ ROM_END
 
 
 ROM_START( sshooter11 ) /* Rev 0.5B PCB , program roms dated 04/03/98 */
-	ROM_REGION( 0x800000, "gfx1", ROMREGION_ERASE00 ) /* Graphics v1.0 */
+	ROM_REGION( 0x800000, "gfx", ROMREGION_ERASE00 ) /* Graphics v1.0 */
 	ROM_LOAD16_BYTE( "ss-u121.bin", 0x000000, 0x100000, CRC(22e27dd6) SHA1(cb9e8c450352bb116a9c0407cc8ce6d8ae9d9881) ) // 1:1
 	ROM_LOAD16_BYTE( "ss-u120.bin", 0x000001, 0x100000, CRC(30173b1b) SHA1(366464444ce208391ca350f1639403f0c2217330) ) // 1:2
 	ROM_LOAD16_BYTE( "ss-u125.bin", 0x200000, 0x100000, CRC(79e8520a) SHA1(682e5c7954f96db65a137f05cde67c310b85b526) ) // 2:1
@@ -655,7 +668,7 @@ ROM_START( sshooter11 ) /* Rev 0.5B PCB , program roms dated 04/03/98 */
 	ROM_LOAD16_BYTE( "ss-u127.bin", 0x600000, 0x100000, CRC(76a7a591) SHA1(9fd7cce21b01f388966a3e8388ba95820ac10bfd) ) // 4:1
 	ROM_LOAD16_BYTE( "ss-u126.bin", 0x600001, 0x100000, CRC(ab1b9d60) SHA1(ff51a71443f7774d3abf96c2eb8ef6a54d73dd8e) ) // 4:2
 
-	ROM_REGION32_BE( 0x100000, "user1", 0 )
+	ROM_REGION32_BE( 0x100000, "maincpu", 0 )
 	ROM_LOAD32_BYTE( "ss-u113.v11", 0x00000, 0x40000, CRC(c19693f3) SHA1(2f1576261f741d5e69d30f645aea0ed359b8dc03) ) // 1:1
 	ROM_LOAD32_BYTE( "ss-u112.v11", 0x00001, 0x40000, CRC(a5ab6d82) SHA1(b2cc3fd875f0c6702cee973b77fd608f4cfe0555) ) // 1:2
 	ROM_LOAD32_BYTE( "ss-u111.v11", 0x00002, 0x40000, CRC(ec209b5f) SHA1(1408b509853b325e865d0b23d237bca321e73f60) ) // 1:3
@@ -676,33 +689,10 @@ ROM_END
  *
  *************************************/
 
-void policetr_state::init_policetr()
+void policetr_state::driver_init()
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x00000fc8, 0x00000fcb, write32_delegate(FUNC(policetr_state::speedup_w),this));
-	m_speedup_pc = 0x1fc028ac;
-	m_speedup_data = m_rambase + 0xfc8/4;
-}
-
-void policetr_state::init_plctr13b()
-{
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x00000fc8, 0x00000fcb, write32_delegate(FUNC(policetr_state::speedup_w),this));
-	m_speedup_pc = 0x1fc028bc;
-	m_speedup_data = m_rambase + 0xfc8/4;
-}
-
-
-void policetr_state::init_sshooter()
-{
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x00018fd8, 0x00018fdb, write32_delegate(FUNC(policetr_state::speedup_w),this));
-	m_speedup_pc = 0x1fc03470;
-	m_speedup_data = m_rambase + 0x18fd8/4;
-}
-
-void policetr_state::init_sshoot12()
-{
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x00018fd8, 0x00018fdb, write32_delegate(FUNC(policetr_state::speedup_w),this));
-	m_speedup_pc = 0x1fc033e0;
-	m_speedup_data = m_rambase + 0x18fd8/4;
+	m_maincpu->space(AS_PROGRAM).install_write_handler(m_speedup_addr, m_speedup_addr+3, write32_delegate(FUNC(policetr_state::speedup_w),this));
+	m_speedup_data = m_rambase + m_speedup_addr/4;
 }
 
 
@@ -713,14 +703,14 @@ void policetr_state::init_sshoot12()
  *
  *************************************/
 
-GAME( 1996, policetr,    0,        policetr, policetr, policetr_state, init_policetr, ROT0, "P&P Marketing", "Police Trainer (Rev 1.3)",        0 )
-GAME( 1996, policetr11,  policetr, policetr, polict10, policetr_state, init_policetr, ROT0, "P&P Marketing", "Police Trainer (Rev 1.1)",        0 )
-GAME( 1996, policetr10,  policetr, policetr, polict10, policetr_state, init_policetr, ROT0, "P&P Marketing", "Police Trainer (Rev 1.0)",        0 )
+GAME( 1996, policetr,    0,        policetr, policetr, policetr_state, empty_init, ROT0, "P&P Marketing", "Police Trainer (Rev 1.3)",        0 )
+GAME( 1996, policetr11,  policetr, policetr, polict10, policetr_state, empty_init, ROT0, "P&P Marketing", "Police Trainer (Rev 1.1)",        0 )
+GAME( 1996, policetr10,  policetr, policetr, polict10, policetr_state, empty_init, ROT0, "P&P Marketing", "Police Trainer (Rev 1.0)",        0 )
 
-GAME( 1996, policetr13a, policetr, sshooter, policetr, policetr_state, init_plctr13b, ROT0, "P&P Marketing", "Police Trainer (Rev 1.3B Newer)", 0 )
-GAME( 1996, policetr13b, policetr, sshooter, policetr, policetr_state, init_plctr13b, ROT0, "P&P Marketing", "Police Trainer (Rev 1.3B)",       0 )
+GAME( 1996, policetr13a, policetr, sshooter, policetr, plctr13b_state, empty_init, ROT0, "P&P Marketing", "Police Trainer (Rev 1.3B Newer)", 0 )
+GAME( 1996, policetr13b, policetr, sshooter, policetr, plctr13b_state, empty_init, ROT0, "P&P Marketing", "Police Trainer (Rev 1.3B)",       0 )
 
-GAME( 1998, sshooter,    0,        sshooter, policetr, policetr_state, init_sshooter, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.9)",          0 )
-GAME( 1998, sshooter17,  sshooter, sshooter, policetr, policetr_state, init_sshooter, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.7)",          0 )
-GAME( 1998, sshooter12,  sshooter, sshooter, sshoot11, policetr_state, init_sshoot12, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.2)",          0 )
-GAME( 1998, sshooter11,  sshooter, sshooter, sshoot11, policetr_state, init_sshoot12, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.1)",          0 )
+GAME( 1998, sshooter,    0,        sshooter, policetr, sshooter_state, empty_init, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.9)",          0 )
+GAME( 1998, sshooter17,  sshooter, sshooter, policetr, sshooter_state, empty_init, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.7)",          0 )
+GAME( 1998, sshooter12,  sshooter, sshooter, sshoot11, sshoot12_state, empty_init, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.2)",          0 )
+GAME( 1998, sshooter11,  sshooter, sshooter, sshoot11, sshoot12_state, empty_init, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.1)",          0 )

@@ -58,7 +58,7 @@ protected:
 	void risc2500_mem(address_map &map);
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<arm_cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<nvram_device> m_nvram;
 	required_device<dac_byte_interface> m_dac;
@@ -70,6 +70,7 @@ private:
 	uint32_t  m_p1000;
 	uint16_t  m_vram_addr;
 	uint8_t   m_vram[0x100];
+	emu_timer *m_boot_rom_disable_timer;
 };
 
 
@@ -271,7 +272,7 @@ WRITE32_MEMBER(risc2500_state::p1000_w)
 
 READ32_MEMBER(risc2500_state::disable_boot_rom_r)
 {
-	machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(10), timer_expired_delegate(FUNC(risc2500_state::disable_boot_rom), this));
+	m_boot_rom_disable_timer->adjust(m_maincpu->cycles_to_attotime(10));
 	return 0;
 }
 
@@ -287,6 +288,8 @@ void risc2500_state::machine_start()
 	m_leds.resolve();
 
 	m_nvram->set_base(m_ram->pointer(), m_ram->size());
+
+	m_boot_rom_disable_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(risc2500_state::disable_boot_rom), this));
 
 	save_item(NAME(m_p1000));
 	save_item(NAME(m_vram_addr));
@@ -311,37 +314,37 @@ void risc2500_state::risc2500_mem(address_map &map)
 	map(0x02000000, 0x0203ffff).rom().region("maincpu", 0);
 }
 
+void risc2500_state::risc2500(machine_config &config)
+{
+	ARM(config, m_maincpu, XTAL(28'322'000) / 2); // VY86C010
+	m_maincpu->set_addrmap(AS_PROGRAM, &risc2500_state::risc2500_mem);
+	m_maincpu->set_copro_type(arm_cpu_device::copro_type::VL86C020);
+	m_maincpu->set_periodic_int(FUNC(risc2500_state::irq1_line_hold), attotime::from_hz(250));
 
-MACHINE_CONFIG_START(risc2500_state::risc2500)
-	MCFG_DEVICE_ADD("maincpu", ARM, XTAL(28'322'000) / 2)      // VY86C010
-	MCFG_DEVICE_PROGRAM_MAP(risc2500_mem)
-	MCFG_ARM_COPRO(VL86C020)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(risc2500_state, irq1_line_hold, 250)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(12*6+1, 7);
+	screen.set_visarea(0, 12*6, 0, 7-1);
+	screen.set_screen_update(FUNC(risc2500_state::screen_update));
+	screen.set_palette("palette");
 
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(12*6+1, 7)
-	MCFG_SCREEN_VISIBLE_AREA(0, 12*6, 0, 7-1)
-	MCFG_SCREEN_UPDATE_DRIVER(risc2500_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	config.set_default_layout(layout_risc2500);
 
-	MCFG_DEFAULT_LAYOUT(layout_risc2500)
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	RAM(config, m_ram).set_default_size("2M").set_extra_options("128K, 256K, 512K, 1M, 2M");
 
-	MCFG_RAM_ADD("ram")
-	MCFG_RAM_DEFAULT_SIZE("2M")
-	MCFG_RAM_EXTRA_OPTIONS("128K, 256K, 512K, 1M, 2M")
-
-	MCFG_NVRAM_ADD_NO_FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", DAC_2BIT_BINARY_WEIGHTED_ONES_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC_2BIT_BINARY_WEIGHTED_ONES_COMPLEMENT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 
 /* ROM definitions */

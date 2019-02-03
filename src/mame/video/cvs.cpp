@@ -2,7 +2,7 @@
 // copyright-holders:Mike Coates, Couriersud
 /***************************************************************************
 
-  video\cvs.c
+  video\cvs.cpp
 
   Functions to emulate the video hardware of the machine.
 
@@ -26,27 +26,26 @@
  * colours are taken from SRAM and are programmable   *
  ******************************************************/
 
-PALETTE_INIT_MEMBER(cvs_state,cvs)
+void cvs_state::cvs_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i, attr;
+	uint8_t const *const color_prom = memregion("proms")->base();
 
-	/* color mapping PROM */
-	for (attr = 0; attr < 0x100; attr++)
+	// color mapping PROM
+	for (int attr = 0; attr < 0x100; attr++)
 	{
-		for (i = 0; i < 8; i++)
+		for (int i = 0; i < 8; i++)
 		{
 			uint8_t ctabentry = color_prom[(i << 8) | attr] & 0x07;
 
-			/* bits 0 and 2 are swapped */
-			ctabentry = bitswap<8>(ctabentry,7,6,5,4,3,0,1,2);
+			// bits 0 and 2 are swapped
+			ctabentry = bitswap<8>(ctabentry, 7, 6, 5, 4, 3, 0, 1, 2);
 
 			palette.set_pen_indirect((attr << 3) | i, ctabentry);
 		}
 	}
 
-	/* background collision map */
-	for (i = 0; i < 8; i++)
+	// background collision map
+	for (int i = 0; i < 8; i++)
 	{
 		palette.set_pen_indirect(0x800 + i, 0);
 		palette.set_pen_indirect(0x808 + i, i & 0x04);
@@ -54,11 +53,11 @@ PALETTE_INIT_MEMBER(cvs_state,cvs)
 		palette.set_pen_indirect(0x818 + i, i & 0x06);
 	}
 
-	/* sprites */
-	for (i = 0; i < 8; i++)
+	// sprites
+	for (int i = 0; i < 8; i++)
 		palette.set_pen_indirect(SPRITE_PEN_BASE + i, i | 0x08);
 
-	/* bullet */
+	// bullet
 	palette.set_pen_indirect(BULLET_STAR_PEN, 7);
 }
 
@@ -190,9 +189,9 @@ uint32_t cvs_state::screen_update_cvs(screen_device &screen, bitmap_ind16 &bitma
 	copyscrollbitmap(m_scrolled_collision_background, m_collision_background, 0, nullptr, 8, scroll, cliprect);
 
 	/* update the S2636 chips */
-	bitmap_ind16 const &s2636_0_bitmap = m_s2636_0->update(cliprect);
-	bitmap_ind16 const &s2636_1_bitmap = m_s2636_1->update(cliprect);
-	bitmap_ind16 const &s2636_2_bitmap = m_s2636_2->update(cliprect);
+	bitmap_ind16 const &s2636_0_bitmap = m_s2636[0]->update(cliprect);
+	bitmap_ind16 const &s2636_1_bitmap = m_s2636[1]->update(cliprect);
+	bitmap_ind16 const &s2636_2_bitmap = m_s2636[2]->update(cliprect);
 
 	/* Bullet Hardware */
 	for (offs = 8; offs < 256; offs++ )
@@ -224,11 +223,11 @@ uint32_t cvs_state::screen_update_cvs(screen_device &screen, bitmap_ind16 &bitma
 	{
 		int y;
 
-		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+		for (y = cliprect.top(); y <= cliprect.bottom(); y++)
 		{
 			int x;
 
-			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+			for (x = cliprect.left(); x <= cliprect.right(); x++)
 			{
 				int pixel0 = s2636_0_bitmap.pix16(y, x);
 				int pixel1 = s2636_1_bitmap.pix16(y, x);
@@ -328,7 +327,7 @@ void cvs_state::cvs_update_stars(bitmap_ind16 &bitmap, const rectangle &cliprect
 			if (flip_screen_y())
 				y = ~y;
 
-			if ((y >= cliprect.min_y) && (y <= cliprect.max_y) &&
+			if ((y >= cliprect.top()) && (y <= cliprect.bottom()) &&
 				(update_always || (m_palette->pen_indirect(bitmap.pix16(y, x)) == 0)))
 				bitmap.pix16(y, x) = star_pen;
 		}

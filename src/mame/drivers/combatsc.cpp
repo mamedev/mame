@@ -663,6 +663,10 @@ MACHINE_START_MEMBER(combatsc_state,combatsc)
 	save_item(NAME(m_prot));
 	save_item(NAME(m_pos));
 	save_item(NAME(m_sign));
+	save_pointer(NAME(m_page[0]),0x2000);
+	save_pointer(NAME(m_page[1]),0x2000);
+	save_pointer(NAME(m_scrollram0), 0x40);
+	save_pointer(NAME(m_scrollram1), 0x40);
 }
 
 MACHINE_START_MEMBER(combatsc_state,combatscb)
@@ -696,104 +700,100 @@ void combatsc_state::machine_reset()
 }
 
 /* combat school (original) */
-MACHINE_CONFIG_START(combatsc_state::combatsc)
-
+void combatsc_state::combatsc(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", HD6309, 3000000*4)  /* 3 MHz? */
-	MCFG_DEVICE_PROGRAM_MAP(combatsc_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", combatsc_state,  irq0_line_hold)
+	HD6309(config, m_maincpu, 3000000*4);  /* 3 MHz? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &combatsc_state::combatsc_map);
+	m_maincpu->set_vblank_int("screen", FUNC(combatsc_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80,3579545)   /* 3.579545 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(combatsc_sound_map)
+	Z80(config, m_audiocpu, 3579545);   /* 3.579545 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &combatsc_state::combatsc_sound_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(1200))
+	config.m_minimum_quantum = attotime::from_hz(1200);
 
 	MCFG_MACHINE_START_OVERRIDE(combatsc_state,combatsc)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-//  MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-//  MCFG_SCREEN_SIZE(32*8, 32*8)
-//  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000)/3, 528, 0, 256, 256, 16, 240) // not accurate, assuming same to other Konami games (59.17)
-	MCFG_SCREEN_UPDATE_DRIVER(combatsc_state, screen_update_combatsc)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+//  m_screen->set_refresh_hz(60);
+//  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+//  m_screen->set_size(32*8, 32*8);
+//  m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_raw(XTAL(24'000'000)/3, 528, 0, 256, 256, 16, 240); // not accurate, assuming same to other Konami games (59.17)
+	m_screen->set_screen_update(FUNC(combatsc_state::screen_update_combatsc));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_combatsc)
-	MCFG_PALETTE_ADD("palette", 8*16*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(128)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_PALETTE_INIT_OWNER(combatsc_state,combatsc)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_combatsc);
+	PALETTE(config, m_palette, FUNC(combatsc_state::combatsc_palette));
+	m_palette->set_format(palette_device::xBGR_555, 8 * 16 * 16, 128);
+	m_palette->set_endianness(ENDIANNESS_LITTLE);
+
 	MCFG_VIDEO_START_OVERRIDE(combatsc_state,combatsc)
 
-	MCFG_K007121_ADD("k007121_1")
-	MCFG_K007121_PALETTE("palette")
-	MCFG_K007121_ADD("k007121_2")
-	MCFG_K007121_PALETTE("palette")
+	K007121(config, m_k007121_1, 0);
+	m_k007121_1->set_palette_tag(m_palette);
+	K007121(config, m_k007121_2, 0);
+	m_k007121_2->set_palette_tag(m_palette);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, 3000000)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, combatsc_state, combatsc_portA_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", 3000000));
+	ymsnd.port_a_write_callback().set(FUNC(combatsc_state::combatsc_portA_w));
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.20);
 
-	MCFG_DEVICE_ADD("upd", UPD7759)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
-MACHINE_CONFIG_END
+	UPD7759(config, m_upd7759).add_route(ALL_OUTPUTS, "mono", 0.70);
+}
 
 
 /* combat school (bootleg on different hardware) */
-MACHINE_CONFIG_START(combatsc_state::combatscb)
-
+void combatsc_state::combatscb(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", HD6309, 3000000*4)  /* 3 MHz? */
-	MCFG_DEVICE_PROGRAM_MAP(combatscb_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", combatsc_state,  irq0_line_hold)
+	HD6309(config, m_maincpu, 3000000*4);  /* 3 MHz? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &combatsc_state::combatscb_map);
+	m_maincpu->set_vblank_int("screen", FUNC(combatsc_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80,3579545)   /* 3.579545 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(combatscb_sound_map)
+	Z80(config, m_audiocpu, 3579545);   /* 3.579545 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &combatsc_state::combatscb_sound_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(1200))
+	config.m_minimum_quantum = attotime::from_hz(1200);
 
 	MCFG_MACHINE_START_OVERRIDE(combatsc_state,combatscb)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(combatsc_state, screen_update_combatscb)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(combatsc_state::screen_update_combatscb));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_combatscb)
-	MCFG_PALETTE_ADD("palette", 8*16*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(128)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_PALETTE_INIT_OWNER(combatsc_state,combatscb)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_combatscb);
+	PALETTE(config, m_palette, FUNC(combatsc_state::combatscb_palette));
+	m_palette->set_format(palette_device::xBGR_555, 8 * 16 * 16, 128);
+	m_palette->set_endianness(ENDIANNESS_LITTLE);
+
 	MCFG_VIDEO_START_OVERRIDE(combatsc_state,combatscb)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, 3000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	YM2203(config, "ymsnd", 3000000).add_route(ALL_OUTPUTS, "mono", 0.20);
 
-	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-	MCFG_MSM5205_VCK_CALLBACK(ASSERTLINE("audiocpu", 0))
-MACHINE_CONFIG_END
+	MSM5205(config, m_msm, 384000);
+	m_msm->vck_callback().set_inputline("audiocpu", 0, ASSERT_LINE);
+	m_msm->set_prescaler_selector(msm5205_device::S96_4B);
+	m_msm->add_route(ALL_OUTPUTS, "mono", 0.30);
+}
 
 
 

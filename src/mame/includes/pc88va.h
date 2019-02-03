@@ -3,7 +3,7 @@
 /********************************************************************************************
 
     PC-88VA (c) 1987 NEC
-	
+
 ********************************************************************************************/
 
 #pragma once
@@ -13,6 +13,7 @@
 
 #include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/am9517a.h"
 #include "machine/i8255.h"
 #include "machine/pic8259.h"
@@ -35,23 +36,6 @@
 
 
 
-struct tsp_t
-{
-	uint16_t tvram_vreg_offset;
-	uint16_t attr_offset;
-	uint16_t spr_offset;
-	uint8_t disp_on;
-	uint8_t spr_on;
-	uint8_t pitch;
-	uint8_t line_height;
-	uint8_t h_line_pos;
-	uint8_t blink;
-	uint16_t cur_pos_x,cur_pos_y;
-	uint8_t curn;
-	uint8_t curn_blink;
-};
-
-
 class pc88va_state : public driver_device
 {
 public:
@@ -64,8 +48,8 @@ public:
 		TIMER_PC88VA_FDC_MOTOR_START_1
 	};
 
-	pc88va_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	pc88va_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_fdc(*this, "upd765"),
@@ -78,11 +62,28 @@ public:
 		m_tvram(*this, "tvram"),
 		m_gvram(*this, "gvram"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") 
-		{ }
+		m_palette(*this, "palette")
+	{ }
 
 	void pc88va(machine_config &config);
+
 protected:
+	struct tsp_t
+	{
+		uint16_t tvram_vreg_offset;
+		uint16_t attr_offset;
+		uint16_t spr_offset;
+		uint8_t disp_on;
+		uint8_t spr_on;
+		uint8_t pitch;
+		uint8_t line_height;
+		uint8_t h_line_pos;
+		uint8_t blink;
+		uint16_t cur_pos_x,cur_pos_y;
+		uint8_t curn;
+		uint8_t curn_blink;
+	};
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

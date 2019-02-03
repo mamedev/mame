@@ -121,8 +121,8 @@ OSC:    12.000MHz
 class jalmah_state : public driver_device
 {
 public:
-	jalmah_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	jalmah_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_palette(*this, "palette"),
 		m_tmap(*this, "scroll%u", 0),
 		m_sharedram(*this, "sharedram"),
@@ -133,7 +133,7 @@ public:
 		m_okibank(*this, "okibank"),
 		m_system_io(*this, "SYSTEM"),
 		m_dsw_io(*this, "DSW")
-		{ }
+	{ }
 
 	DECLARE_WRITE8_MEMBER(tilebank_w);
 	DECLARE_WRITE8_MEMBER(okirom_w);
@@ -1093,20 +1093,19 @@ MACHINE_CONFIG_START(jalmah_state::jalmah)
 
 	//M50747 MCU
 
-	MCFG_MEGASYS1_TILEMAP_ADD("scroll0", "palette", 0x0000)
-	MCFG_MEGASYS1_TILEMAP_ADD("scroll1", "palette", 0x0100)
-	MCFG_MEGASYS1_TILEMAP_ADD("scroll2", "palette", 0x0200)
-	MCFG_MEGASYS1_TILEMAP_ADD("scroll3", "palette", 0x0300)
+	MEGASYS1_TILEMAP(config, m_tmap[0], m_palette, 0x0000);
+	MEGASYS1_TILEMAP(config, m_tmap[1], m_palette, 0x0100);
+	MEGASYS1_TILEMAP(config, m_tmap[2], m_palette, 0x0200);
+	MEGASYS1_TILEMAP(config, m_tmap[3], m_palette, 0x0300);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(12000000/2,406,0,256,263,16,240) // assume same as nmk16 & mega system 1
 	MCFG_SCREEN_UPDATE_DRIVER(jalmah_state, screen_update_jalmah)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 0x400)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 0x400);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcusim", jalmah_state, mcu_sim, attotime::from_hz(10000))
+	TIMER(config, "mcusim").configure_periodic(FUNC(jalmah_state::mcu_sim), attotime::from_hz(10000));
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("oki", OKIM6295, 4000000, okim6295_device::PIN7_LOW)
@@ -1160,10 +1159,10 @@ MACHINE_CONFIG_START(urashima_state::urashima)
 
 	// Urashima seems to use an earlier version of the Jaleco tilemaps (without range etc.)
 	// and with per-scanline video registers
-	MCFG_DEVICE_REMOVE("scroll0")
-	MCFG_DEVICE_REMOVE("scroll1")
-	MCFG_DEVICE_REMOVE("scroll2")
-	MCFG_DEVICE_REMOVE("scroll3")
+	config.device_remove("scroll0");
+	config.device_remove("scroll1");
+	config.device_remove("scroll2");
+	config.device_remove("scroll3");
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_urashima)
 

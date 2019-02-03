@@ -26,13 +26,13 @@
 typedef delegate<void (uint8_t *)> cococart_base_update_delegate;
 
 #define MCFG_COCO_CARTRIDGE_CART_CB(_devcb) \
-	devcb = &downcast<cococart_slot_device &>(*device).set_cart_callback(DEVCB_##_devcb);
+	downcast<cococart_slot_device &>(*device).set_cart_callback(DEVCB_##_devcb);
 
 #define MCFG_COCO_CARTRIDGE_NMI_CB(_devcb) \
-	devcb = &downcast<cococart_slot_device &>(*device).set_nmi_callback(DEVCB_##_devcb);
+	downcast<cococart_slot_device &>(*device).set_nmi_callback(DEVCB_##_devcb);
 
 #define MCFG_COCO_CARTRIDGE_HALT_CB(_devcb) \
-	devcb = &downcast<cococart_slot_device &>(*device).set_halt_callback(DEVCB_##_devcb);
+	downcast<cococart_slot_device &>(*device).set_halt_callback(DEVCB_##_devcb);
 
 
 // ======================> cococart_slot_device
@@ -61,11 +61,23 @@ public:
 	};
 
 	// construction/destruction
+	template <typename T>
+	cococart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&opts, const char *dflt)
+		: cococart_slot_device(mconfig, tag, owner, clock)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
 	cococart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template <class Object> devcb_base &set_cart_callback(Object &&cb) { return m_cart_callback.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_nmi_callback(Object &&cb) { return m_nmi_callback.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_halt_callback(Object &&cb) { return m_halt_callback.set_callback(std::forward<Object>(cb)); }
+	auto cart_callback() { return m_cart_callback.bind(); }
+	auto nmi_callback() { return m_nmi_callback.bind(); }
+	auto halt_callback() { return m_halt_callback.bind(); }
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -102,7 +114,7 @@ public:
 
 	// cart base
 	uint8_t *get_cart_base();
-	uint32_t get_cart_size();
+	virtual uint32_t get_cart_size();
 	void set_cart_base_update(cococart_base_update_delegate update);
 
 private:
@@ -168,6 +180,8 @@ public:
 	virtual uint8_t* get_cart_base();
 	virtual uint32_t get_cart_size();
 	void set_cart_base_update(cococart_base_update_delegate update);
+	virtual memory_region* get_cart_memregion();
+
 
 	virtual void interface_config_complete() override;
 	virtual void interface_pre_start() override;
@@ -210,8 +224,5 @@ private:
 #define MCFG_COCO_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
 	MCFG_DEVICE_ADD(_tag, COCOCART_SLOT, DERIVED_CLOCK(1, 1)) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-
-#define MCFG_COCO_CARTRIDGE_REMOVE(_tag)        \
-	MCFG_DEVICE_REMOVE(_tag)
 
 #endif // MAME_BUS_COCO_COCOCART_H

@@ -188,11 +188,11 @@ namespace netlist
 	NETLIB_RESET(7448)
 	{
 		m_state = 0;
-		m_A.inactivate();
-		m_B.inactivate();
-		m_C.inactivate();
-		m_D.inactivate();
-		m_RBIQ.inactivate();
+		m_A.set_state(logic_t::STATE_INP_PASSIVE);
+		m_B.set_state(logic_t::STATE_INP_PASSIVE);
+		m_C.set_state(logic_t::STATE_INP_PASSIVE);
+		m_D.set_state(logic_t::STATE_INP_PASSIVE);
+		m_RBIQ.set_state(logic_t::STATE_INP_PASSIVE);
 	}
 
 	NETLIB_FUNC_VOID(7448, update_outputs, (unsigned v))
@@ -211,8 +211,8 @@ namespace netlist
 
 	#endif
 
-	NETLIB_DEVICE_IMPL(7448)
-	NETLIB_DEVICE_IMPL(7448_dip)
+	NETLIB_DEVICE_IMPL(7448, "TTL_7448", "+A,+B,+C,+D,+LTQ,+BIQ,+RBIQ")
+	NETLIB_DEVICE_IMPL(7448_dip, "TTL_7448_DIP", "")
 
 
 	} //namespace devices

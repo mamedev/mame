@@ -250,22 +250,22 @@ MACHINE_CONFIG_START(eacc_state::eacc)
 	MCFG_DEVICE_ADD("maincpu", M6802, XTAL(3'579'545))  /* Divided by 4 inside the m6802*/
 	MCFG_DEVICE_PROGRAM_MAP(eacc_mem)
 
-	MCFG_DEFAULT_LAYOUT(layout_eacc)
+	config.set_default_layout(layout_eacc);
 
-	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_READPB_HANDLER(READ8(*this, eacc_state, eacc_keyboard_r))
-	MCFG_PIA_READCA1_HANDLER(READLINE(*this, eacc_state, eacc_distance_r))
-	MCFG_PIA_READCB1_HANDLER(READLINE(*this, eacc_state, eacc_cb1_r))
-	MCFG_PIA_READCA2_HANDLER(READLINE(*this, eacc_state, eacc_fuel_sensor_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, eacc_state, eacc_segment_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, eacc_state, eacc_digit_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, eacc_state, eacc_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6802_IRQ_LINE))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6802_IRQ_LINE))
+	PIA6821(config, m_pia, 0);
+	m_pia->readpb_handler().set(FUNC(eacc_state::eacc_keyboard_r));
+	m_pia->readca1_handler().set(FUNC(eacc_state::eacc_distance_r));
+	m_pia->readcb1_handler().set(FUNC(eacc_state::eacc_cb1_r));
+	m_pia->readca2_handler().set(FUNC(eacc_state::eacc_fuel_sensor_r));
+	m_pia->writepa_handler().set(FUNC(eacc_state::eacc_segment_w));
+	m_pia->writepb_handler().set(FUNC(eacc_state::eacc_digit_w));
+	m_pia->cb2_handler().set(FUNC(eacc_state::eacc_cb2_w));
+	m_pia->irqa_handler().set_inputline("maincpu", M6802_IRQ_LINE);
+	m_pia->irqb_handler().set_inputline("maincpu", M6802_IRQ_LINE);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("eacc_nmi", eacc_state, eacc_nmi, attotime::from_hz(600))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("eacc_cb1", eacc_state, eacc_cb1, attotime::from_hz(30))
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	TIMER(config, "eacc_nmi").configure_periodic(FUNC(eacc_state::eacc_nmi), attotime::from_hz(600));
+	TIMER(config, "eacc_cb1").configure_periodic(FUNC(eacc_state::eacc_cb1), attotime::from_hz(30));
 MACHINE_CONFIG_END
 
 

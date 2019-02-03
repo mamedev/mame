@@ -68,7 +68,7 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	optional_device<cpu_device> m_voicecpu;
+	optional_device<i8085a_cpu_device> m_voicecpu;
 	optional_device<ay8910_device> m_ay8910;
 	optional_device_array<ay8910_device, 2> m_ay;
 	optional_device<hc55516_device> m_cvsd;

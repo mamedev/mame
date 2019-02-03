@@ -435,22 +435,22 @@ void harddriv_sound_board_device::driversnd_dsp_io_map(address_map &map)
 MACHINE_CONFIG_START(harddriv_sound_board_device::device_add_mconfig)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("soundcpu", M68000, XTAL(16'000'000)/2)
-	MCFG_DEVICE_PROGRAM_MAP(driversnd_68k_map)
+	M68000(config, m_soundcpu, 16_MHz_XTAL/2);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &harddriv_sound_board_device::driversnd_68k_map);
 
-	MCFG_DEVICE_ADD("latch", LS259, 0) // 80R
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, harddriv_sound_board_device, speech_write_w)) // SPWR - 5220 write strobe
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, harddriv_sound_board_device, speech_reset_w)) // SPRES - 5220 hard reset
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, harddriv_sound_board_device, speech_rate_w)) // SPRATE
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, harddriv_sound_board_device, cram_enable_w)) // CRAMEN
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(INPUTLINE("sounddsp", INPUT_LINE_HALT)) MCFG_DEVCB_INVERT // RES320
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, harddriv_sound_board_device, led_w))
+	LS259(config, m_latch, 0); // 80R
+	m_latch->q_out_cb<0>().set(FUNC(harddriv_sound_board_device::speech_write_w)); // SPWR - 5220 write strobe
+	m_latch->q_out_cb<1>().set(FUNC(harddriv_sound_board_device::speech_reset_w)); // SPRES - 5220 hard reset
+	m_latch->q_out_cb<2>().set(FUNC(harddriv_sound_board_device::speech_rate_w)); // SPRATE
+	m_latch->q_out_cb<3>().set(FUNC(harddriv_sound_board_device::cram_enable_w)); // CRAMEN
+	m_latch->q_out_cb<4>().set_inputline(m_sounddsp, INPUT_LINE_HALT).invert(); // RES320
+	m_latch->q_out_cb<7>().set(FUNC(harddriv_sound_board_device::led_w));
 
-	MCFG_DEVICE_ADD("sounddsp", TMS32010, XTAL(20'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(driversnd_dsp_program_map)
+	TMS32010(config, m_sounddsp, XTAL(20'000'000));
+	m_sounddsp->set_addrmap(AS_PROGRAM, &harddriv_sound_board_device::driversnd_dsp_program_map);
 	/* Data Map is internal to the CPU */
-	MCFG_DEVICE_IO_MAP(driversnd_dsp_io_map)
-	MCFG_TMS32010_BIO_IN_CB(READLINE(*this, harddriv_sound_board_device, hdsnddsp_get_bio))
+	m_sounddsp->set_addrmap(AS_IO, &harddriv_sound_board_device::driversnd_dsp_io_map);
+	m_sounddsp->bio().set(FUNC(harddriv_sound_board_device::hdsnddsp_get_bio));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

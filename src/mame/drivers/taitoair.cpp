@@ -200,7 +200,6 @@ perhaps? The two writes seem to take only two values.
 #include "audio/taitosnd.h"
 
 #include "cpu/m68000/m68000.h"
-#include "cpu/tms32025/tms32025.h"
 #include "cpu/z80/z80.h"
 #include "sound/2610intf.h"
 #include "speaker.h"
@@ -702,69 +701,69 @@ void taitoair_state::machine_reset()
 	}
 }
 
-MACHINE_CONFIG_START(taitoair_state::airsys)
-
+void taitoair_state::airsys(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(12'000'000)) // MC68000P12
-	MCFG_DEVICE_PROGRAM_MAP(airsys_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitoair_state,  irq5_line_hold)
+	M68000(config, m_maincpu, XTAL(12'000'000));    // MC68000P12
+	m_maincpu->set_addrmap(AS_PROGRAM, &taitoair_state::airsys_map);
+	m_maincpu->set_vblank_int("screen", FUNC(taitoair_state::irq5_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(16'000'000) / 4)   // Z8400AB1
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	Z80(config, m_audiocpu, XTAL(16'000'000) / 4);  // Z8400AB1
+	m_audiocpu->set_addrmap(AS_PROGRAM, &taitoair_state::sound_map);
 
-	MCFG_DEVICE_ADD("dsp", TMS32025, XTAL(36'000'000)) // Unverified
-	MCFG_DEVICE_PROGRAM_MAP(DSP_map_program)
-	MCFG_DEVICE_DATA_MAP(DSP_map_data)
-	MCFG_TMS32025_HOLD_IN_CB(READ16(*this, taitoair_state, dsp_HOLD_signal_r))
-	MCFG_TMS32025_HOLD_ACK_OUT_CB(WRITE16(*this, taitoair_state, dsp_HOLDA_signal_w))
+	TMS32025(config, m_dsp, XTAL(36'000'000)); // Unverified
+	m_dsp->set_addrmap(AS_PROGRAM, &taitoair_state::DSP_map_program);
+	m_dsp->set_addrmap(AS_DATA, &taitoair_state::DSP_map_data);
+	m_dsp->hold_in_cb().set(FUNC(taitoair_state::dsp_HOLD_signal_r));
+	m_dsp->hold_ack_out_cb().set(FUNC(taitoair_state::dsp_HOLDA_signal_w));
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
-	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
-	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
-	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
-	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
-	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(*this, taitoair_state, coin_control_w))
-	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
+	TC0220IOC(config, m_tc0220ioc, 0);
+	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
+	m_tc0220ioc->read_1_callback().set_ioport("DSWB");
+	m_tc0220ioc->read_2_callback().set_ioport("IN0");
+	m_tc0220ioc->read_3_callback().set_ioport("IN1");
+	m_tc0220ioc->write_4_callback().set(FUNC(taitoair_state::coin_control_w));
+	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
-	MCFG_TAITOIO_YOKE_ADD("yokectrl")
+	TAITOIO_YOKE(config, m_yoke, 0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-//  MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-//  MCFG_SCREEN_SIZE(64*16, 32*16)
-//  MCFG_SCREEN_VISIBLE_AREA(0*16, 32*16-1, 3*16, 28*16-1)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+//  m_screen->set_refresh_hz(60);
+//  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+//  m_screen->set_size(64*16, 32*16);
+//  m_screen->set_visarea(0*16, 32*16-1, 3*16, 28*16-1);
 	// Estimated, assume same as mlanding.cpp
-	MCFG_SCREEN_RAW_PARAMS(16000000, 640, 0, 512, 462, 3*16, 28*16)
-	MCFG_SCREEN_UPDATE_DRIVER(taitoair_state, screen_update_taitoair)
-	MCFG_SCREEN_PALETTE("palette")
+	m_screen->set_raw(16000000, 640, 0, 512, 462, 3*16, 28*16);
+	m_screen->set_screen_update(FUNC(taitoair_state::screen_update_taitoair));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_airsys)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_airsys);
 
-	MCFG_PALETTE_ADD_INIT_BLACK("palette", 512*16+512*16)
+	PALETTE(config, m_palette, palette_device::BLACK, 512*16+512*16);
 
-	MCFG_DEVICE_ADD("tc0080vco", TC0080VCO, 0)
-	MCFG_TC0080VCO_GFX_REGION(0)
-	MCFG_TC0080VCO_TX_REGION(1)
-	MCFG_TC0080VCO_OFFSETS(1, 1)
-	MCFG_TC0080VCO_BGFLIP_OFFS(-2)
-	MCFG_TC0080VCO_GFXDECODE("gfxdecode")
+	TC0080VCO(config, m_tc0080vco, 0);
+	m_tc0080vco->set_gfx_region(0);
+	m_tc0080vco->set_tx_region(1);
+	m_tc0080vco->set_offsets(1, 1);
+	m_tc0080vco->set_bgflip_yoffs(-2);
+	m_tc0080vco->set_gfxdecode_tag(m_gfxdecode);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2610, XTAL(16'000'000) / 2)
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.30)
-	MCFG_SOUND_ROUTE(1, "mono", 0.60)
-	MCFG_SOUND_ROUTE(2, "mono", 0.60)
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(16'000'000) / 2));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.add_route(0, "mono", 0.30);
+	ymsnd.add_route(1, "mono", 0.60);
+	ymsnd.add_route(2, "mono", 0.60);
 
-	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
-	MCFG_TC0140SYT_MASTER_CPU("maincpu")
-	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
-MACHINE_CONFIG_END
+	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
+	tc0140syt.set_master_tag(m_maincpu);
+	tc0140syt.set_slave_tag(m_audiocpu);
+}
 
 
 /*************************************************************

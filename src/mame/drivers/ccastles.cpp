@@ -247,12 +247,6 @@ WRITE8_MEMBER(ccastles_state::irq_ack_w)
 }
 
 
-template<int C> WRITE_LINE_MEMBER(ccastles_state::ccounter_w)
-{
-	machine().bookkeeping().coin_counter_w(C, state);
-}
-
-
 READ8_MEMBER(ccastles_state::leta_r)
 {
 	static const char *const letanames[] = { "LETA0", "LETA1", "LETA2", "LETA3" };
@@ -437,52 +431,51 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(ccastles_state::ccastles)
-
+void ccastles_state::ccastles(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK/8)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	M6502(config, m_maincpu, MASTER_CLOCK/8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ccastles_state::main_map);
 
-	MCFG_DEVICE_ADD("outlatch0", LS259, 0) // 8N
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(OUTPUT("led0")) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(OUTPUT("led1")) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, ccastles_state, nvram_store_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, ccastles_state, nvram_store_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, ccastles_state, ccounter_w<0>))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, ccastles_state, ccounter_w<1>))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(MEMBANK("bank1"))
+	LS259(config, m_outlatch[0]); // 8N
+	m_outlatch[0]->q_out_cb<0>().set_output("led0").invert();
+	m_outlatch[0]->q_out_cb<1>().set_output("led1").invert();
+	m_outlatch[0]->q_out_cb<2>().set(FUNC(ccastles_state::nvram_store_w));
+	m_outlatch[0]->q_out_cb<3>().set(FUNC(ccastles_state::nvram_store_w));
+	m_outlatch[0]->q_out_cb<5>().set([this] (int state) { machine().bookkeeping().coin_counter_w(0, state); });
+	m_outlatch[0]->q_out_cb<6>().set([this] (int state) { machine().bookkeeping().coin_counter_w(1, state); });
+	m_outlatch[0]->q_out_cb<7>().set_membank("bank1");
 
-	MCFG_DEVICE_ADD("outlatch1", LS259, 0) // 6P
+	LS259(config, m_outlatch[1]); // 6P
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 8);
 
-	MCFG_X2212_ADD_AUTOSAVE("nvram_4b")
-	MCFG_X2212_ADD_AUTOSAVE("nvram_4a")
+	X2212(config, "nvram_4b").set_auto_save(true);
+	X2212(config, "nvram_4a").set_auto_save(true);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ccastles)
-	MCFG_PALETTE_ADD("palette", 32)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ccastles);
+	PALETTE(config, m_palette).set_entries(32);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, 0, HTOTAL - 1, VTOTAL, 0, VTOTAL - 1)   /* will be adjusted later */
-	MCFG_SCREEN_UPDATE_DRIVER(ccastles_state, screen_update_ccastles)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, 0, HTOTAL - 1, VTOTAL, 0, VTOTAL - 1); /* will be adjusted later */
+	m_screen->set_screen_update(FUNC(ccastles_state::screen_update_ccastles));
+	m_screen->set_palette(m_palette);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("pokey1", POKEY, MASTER_CLOCK/8)
+	pokey_device &pokey1(POKEY(config, "pokey1", MASTER_CLOCK/8));
 	/* NOTE: 1k + 0.2k is not 100% exact, but should not make an audible difference */
-	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1) + RES_K(0.2), CAP_U(0.01), 5.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	pokey1.set_output_opamp(RES_K(1) + RES_K(0.2), CAP_U(0.01), 5.0);
+	pokey1.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("pokey2", POKEY, MASTER_CLOCK/8)
+	pokey_device &pokey2(POKEY(config, "pokey2", MASTER_CLOCK/8));
 	/* NOTE: 1k + 0.2k is not 100% exact, but should not make an audible difference */
-	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1) + RES_K(0.2), CAP_U(0.01), 5.0)
-	MCFG_POKEY_ALLPOT_R_CB(IOPORT("IN1"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	pokey2.set_output_opamp(RES_K(1) + RES_K(0.2), CAP_U(0.01), 5.0);
+	pokey2.allpot_r().set_ioport("IN1");
+	pokey2.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 

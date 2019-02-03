@@ -1458,541 +1458,524 @@ void nemesis_state::machine_reset()
 	m_irq_port_last = 0;
 }
 
-MACHINE_CONFIG_START(nemesis_state::nemesis)
-
+void nemesis_state::nemesis(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000,18432000/2)         /* 9.216 MHz? */
-//          14318180/2, /* From schematics, should be accurate */
-	MCFG_DEVICE_PROGRAM_MAP(nemesis_map)
+	M68000(config, m_maincpu, 18432000/2); /* 9.216 MHz? */
+//  14318180/2, /* From schematics, should be accurate */
+	m_maincpu->set_addrmap(AS_PROGRAM, &nemesis_state::nemesis_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80,14318180/4) /* From schematics, should be accurate */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map) /* fixed */
+	Z80(config, m_audiocpu, 14318180/4); /* From schematics, should be accurate */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &nemesis_state::sound_map); /* fixed */
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0) // 13J
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, nemesis_state, coin1_lockout_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, nemesis_state, coin2_lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, nemesis_state, sound_irq_w))
+	ls259_device &outlatch(LS259(config, "outlatch")); // 13J
+	outlatch.q_out_cb<0>().set(FUNC(nemesis_state::coin1_lockout_w));
+	outlatch.q_out_cb<0>().append(FUNC(nemesis_state::coin2_lockout_w));
+	outlatch.q_out_cb<2>().set(FUNC(nemesis_state::sound_irq_w));
 
-	MCFG_DEVICE_ADD("intlatch", LS259, 0) // 11K
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, nemesis_state, irq_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, nemesis_state, gfx_flipx_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, nemesis_state, gfx_flipy_w))
+	ls259_device &intlatch(LS259(config, "intlatch")); // 11K
+	intlatch.q_out_cb<0>().set(FUNC(nemesis_state::irq_enable_w));
+	intlatch.q_out_cb<2>().set(FUNC(nemesis_state::gfx_flipx_w));
+	intlatch.q_out_cb<3>().set(FUNC(nemesis_state::gfx_flipy_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog", 0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE((18432000.0/4)/(288*264))      /* ??? */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(nemesis_state, screen_update_nemesis)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, nemesis_state, nemesis_vblank_irq))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz((18432000.0/4)/(288*264));      /* ??? */
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(nemesis_state::screen_update_nemesis));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(nemesis_state::nemesis_vblank_irq));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nemesis)
-	MCFG_PALETTE_ADD("palette", 2048)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_nemesis);
+	PALETTE(config, m_palette).set_entries(2048);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 14318180/8)
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, nemesis_state, nemesis_portA_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter1", 0.20)
+	ay8910_device &ay1(AY8910(config, "ay1", 14318180/8));
+	ay1.set_flags(AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT);
+	ay1.port_a_read_callback().set(FUNC(nemesis_state::nemesis_portA_r));
+	ay1.add_route(ALL_OUTPUTS, "filter1", 0.20);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 14318180/8)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("k005289", k005289_device, k005289_control_A_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("k005289", k005289_device, k005289_control_B_w))
-	MCFG_SOUND_ROUTE(0, "filter2", 1.00)
-	MCFG_SOUND_ROUTE(1, "filter3", 1.00)
-	MCFG_SOUND_ROUTE(2, "filter4", 1.00)
+	ay8910_device &ay2(AY8910(config, "ay2", 14318180/8));
+	ay2.port_a_write_callback().set(m_k005289, FUNC(k005289_device::k005289_control_A_w));
+	ay2.port_b_write_callback().set(m_k005289, FUNC(k005289_device::k005289_control_B_w));
+	ay2.add_route(0, "filter2", 1.00);
+	ay2.add_route(1, "filter3", 1.00);
+	ay2.add_route(2, "filter4", 1.00);
 
-	MCFG_DEVICE_ADD("filter1", FILTER_RC)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADD("filter2", FILTER_RC)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADD("filter3", FILTER_RC)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADD("filter4", FILTER_RC)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	FILTER_RC(config, m_filter1);
+	m_filter1->add_route(ALL_OUTPUTS, "mono", 1.0);
+	FILTER_RC(config, m_filter2);
+	m_filter2->add_route(ALL_OUTPUTS, "mono", 1.0);
+	FILTER_RC(config, m_filter3);
+	m_filter3->add_route(ALL_OUTPUTS, "mono", 1.0);
+	FILTER_RC(config, m_filter4);
+	m_filter4->add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_K005289_ADD("k005289", 3579545)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
-MACHINE_CONFIG_END
+	K005289(config, m_k005289, 3579545);
+	m_k005289->add_route(ALL_OUTPUTS, "mono", 0.35);
+}
 
-
-MACHINE_CONFIG_START(nemesis_state::gx400)
-
+void nemesis_state::gx400(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000,18432000/2)     /* 9.216MHz */
-	MCFG_DEVICE_PROGRAM_MAP(gx400_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", nemesis_state, gx400_interrupt, "screen", 0, 1)
+	M68000(config, m_maincpu, 18432000/2); /* 9.216MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &nemesis_state::gx400_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(nemesis_state::gx400_interrupt), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80,14318180/4)        /* 3.579545 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(gx400_sound_map)
+	Z80(config, m_audiocpu, 14318180/4);        /* 3.579545 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &nemesis_state::gx400_sound_map);
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, nemesis_state, coin1_lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, nemesis_state, coin2_lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, nemesis_state, sound_irq_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, nemesis_state, irq4_enable_w)) // ??
+	ls259_device &outlatch(LS259(config, "outlatch"));
+	outlatch.q_out_cb<0>().set(FUNC(nemesis_state::coin1_lockout_w));;
+	outlatch.q_out_cb<1>().set(FUNC(nemesis_state::coin2_lockout_w));
+	outlatch.q_out_cb<2>().set(FUNC(nemesis_state::sound_irq_w));
+	outlatch.q_out_cb<7>().set(FUNC(nemesis_state::irq4_enable_w)); // ??
 
-	MCFG_DEVICE_ADD("intlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, nemesis_state, irq2_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, nemesis_state, irq1_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, nemesis_state, gfx_flipx_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, nemesis_state, gfx_flipy_w))
+	ls259_device &intlatch(LS259(config, "intlatch"));
+	intlatch.q_out_cb<0>().set(FUNC(nemesis_state::irq2_enable_w));
+	intlatch.q_out_cb<1>().set(FUNC(nemesis_state::irq1_enable_w));
+	intlatch.q_out_cb<2>().set(FUNC(nemesis_state::gfx_flipx_w));
+	intlatch.q_out_cb<3>().set(FUNC(nemesis_state::gfx_flipy_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE((18432000.0/4)/(288*264))      /* 60.606060 Hz */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(nemesis_state, screen_update_nemesis)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz((18432000.0/4)/(288*264)); /* 60.606060 Hz */
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(nemesis_state::screen_update_nemesis));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set_inputline("audiocpu", INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nemesis)
-	MCFG_PALETTE_ADD("palette", 2048)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_nemesis);
+	PALETTE(config, m_palette).set_entries(2048);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 14318180/8)
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, nemesis_state, nemesis_portA_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter1", 0.20)
+	ay8910_device &ay1(AY8910(config, "ay1", 14318180/8));
+	ay1.set_flags(AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT);
+	ay1.port_a_read_callback().set(FUNC(nemesis_state::nemesis_portA_r));
+	ay1.add_route(ALL_OUTPUTS, "filter1", 0.20);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 14318180/8)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("k005289", k005289_device, k005289_control_A_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("k005289", k005289_device, k005289_control_B_w))
-	MCFG_SOUND_ROUTE(0, "filter2", 1.00)
-	MCFG_SOUND_ROUTE(1, "filter3", 1.00)
-	MCFG_SOUND_ROUTE(2, "filter4", 1.00)
+	ay8910_device &ay2(AY8910(config, "ay2", 14318180/8));
+	ay2.port_a_write_callback().set(m_k005289, FUNC(k005289_device::k005289_control_A_w));
+	ay2.port_b_write_callback().set(m_k005289, FUNC(k005289_device::k005289_control_B_w));
+	ay2.add_route(0, "filter2", 1.00);
+	ay2.add_route(1, "filter3", 1.00);
+	ay2.add_route(2, "filter4", 1.00);
 
-	MCFG_DEVICE_ADD("filter1", FILTER_RC)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADD("filter2", FILTER_RC)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADD("filter3", FILTER_RC)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADD("filter4", FILTER_RC)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	FILTER_RC(config, m_filter1);
+	m_filter1->add_route(ALL_OUTPUTS, "mono", 1.0);
+	FILTER_RC(config, m_filter2);
+	m_filter2->add_route(ALL_OUTPUTS, "mono", 1.0);
+	FILTER_RC(config, m_filter3);
+	m_filter3->add_route(ALL_OUTPUTS, "mono", 1.0);
+	FILTER_RC(config, m_filter4);
+	m_filter4->add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_K005289_ADD("k005289", 3579545)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
+	K005289(config, m_k005289, 3579545);
+	m_k005289->add_route(ALL_OUTPUTS, "mono", 0.35);
 
-	MCFG_DEVICE_ADD("vlm", VLM5030, 3579545)
-	MCFG_DEVICE_ADDRESS_MAP(0, gx400_vlm_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
-MACHINE_CONFIG_END
+	VLM5030(config, m_vlm, 3579545);
+	m_vlm->set_addrmap(0, &nemesis_state::gx400_vlm_map);
+	m_vlm->add_route(ALL_OUTPUTS, "mono", 0.70);
+}
 
-
-MACHINE_CONFIG_START(nemesis_state::konamigt)
-
+void nemesis_state::konamigt(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000,18432000/2)         /* 9.216 MHz? */
-	MCFG_DEVICE_PROGRAM_MAP(konamigt_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", nemesis_state, konamigt_interrupt, "screen", 0, 1)
+	M68000(config, m_maincpu, 18432000/2); /* 9.216 MHz? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &nemesis_state::konamigt_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(nemesis_state::konamigt_interrupt), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80,14318180/4)        /* 3.579545 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	Z80(config, m_audiocpu, 14318180/4);        /* 3.579545 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &nemesis_state::sound_map);
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, nemesis_state, coin2_lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, nemesis_state, coin1_lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, nemesis_state, sound_irq_w))
+	ls259_device &outlatch(LS259(config, "outlatch"));
+	outlatch.q_out_cb<0>().set(FUNC(nemesis_state::coin2_lockout_w));
+	outlatch.q_out_cb<1>().set(FUNC(nemesis_state::coin1_lockout_w));
+	outlatch.q_out_cb<2>().set(FUNC(nemesis_state::sound_irq_w));
 
-	MCFG_DEVICE_ADD("intlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, nemesis_state, irq2_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, nemesis_state, irq_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, nemesis_state, gfx_flipx_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, nemesis_state, gfx_flipy_w))
+	ls259_device &intlatch(LS259(config, "intlatch"));
+	intlatch.q_out_cb<0>().set(FUNC(nemesis_state::irq2_enable_w));
+	intlatch.q_out_cb<1>().set(FUNC(nemesis_state::irq_enable_w));
+	intlatch.q_out_cb<2>().set(FUNC(nemesis_state::gfx_flipx_w));
+	intlatch.q_out_cb<3>().set(FUNC(nemesis_state::gfx_flipy_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE((18432000.0/4)/(288*264))      /* 60.606060 Hz */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(nemesis_state, screen_update_nemesis)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz((18432000.0/4)/(288*264)); /* 60.606060 Hz */
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(nemesis_state::screen_update_nemesis));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nemesis)
-	MCFG_PALETTE_ADD("palette", 2048)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_nemesis);
+	PALETTE(config, m_palette).set_entries(2048);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 14318180/8)
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, nemesis_state, nemesis_portA_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter1", 0.20)
+	ay8910_device &ay1(AY8910(config, "ay1", 14318180/8));
+	ay1.set_flags(AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT);
+	ay1.port_a_read_callback().set(FUNC(nemesis_state::nemesis_portA_r));
+	ay1.add_route(ALL_OUTPUTS, "filter1", 0.20);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 14318180/8)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("k005289", k005289_device, k005289_control_A_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("k005289", k005289_device, k005289_control_B_w))
-	MCFG_SOUND_ROUTE(0, "filter2", 1.00)
-	MCFG_SOUND_ROUTE(1, "filter3", 1.00)
-	MCFG_SOUND_ROUTE(2, "filter4", 1.00)
+	ay8910_device &ay2(AY8910(config, "ay2", 14318180/8));
+	ay2.port_a_write_callback().set(m_k005289, FUNC(k005289_device::k005289_control_A_w));
+	ay2.port_b_write_callback().set(m_k005289, FUNC(k005289_device::k005289_control_B_w));
+	ay2.add_route(0, "filter2", 1.00);
+	ay2.add_route(1, "filter3", 1.00);
+	ay2.add_route(2, "filter4", 1.00);
 
-	MCFG_DEVICE_ADD("filter1", FILTER_RC)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADD("filter2", FILTER_RC)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADD("filter3", FILTER_RC)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADD("filter4", FILTER_RC)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	FILTER_RC(config, m_filter1);
+	m_filter1->add_route(ALL_OUTPUTS, "mono", 1.0);
+	FILTER_RC(config, m_filter2);
+	m_filter2->add_route(ALL_OUTPUTS, "mono", 1.0);
+	FILTER_RC(config, m_filter3);
+	m_filter3->add_route(ALL_OUTPUTS, "mono", 1.0);
+	FILTER_RC(config, m_filter4);
+	m_filter4->add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_K005289_ADD("k005289", 3579545)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
-MACHINE_CONFIG_END
+	K005289(config, m_k005289, 3579545);
+	m_k005289->add_route(ALL_OUTPUTS, "mono", 0.60);
+}
 
-
-MACHINE_CONFIG_START(nemesis_state::rf2_gx400)
-
+void nemesis_state::rf2_gx400(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000,18432000/2)     /* 9.216MHz */
-	MCFG_DEVICE_PROGRAM_MAP(rf2_gx400_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", nemesis_state, gx400_interrupt, "screen", 0, 1)
+	M68000(config, m_maincpu, 18432000/2); /* 9.216MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &nemesis_state::rf2_gx400_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(nemesis_state::gx400_interrupt), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80,14318180/4)        /* 3.579545 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(gx400_sound_map)
+	Z80(config, m_audiocpu, 14318180/4); /* 3.579545 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &nemesis_state::gx400_sound_map);
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, nemesis_state, coin1_lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, nemesis_state, coin2_lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, nemesis_state, sound_irq_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, nemesis_state, irq4_enable_w)) // ??
+	ls259_device &outlatch(LS259(config, "outlatch"));
+	outlatch.q_out_cb<0>().set(FUNC(nemesis_state::coin1_lockout_w));;
+	outlatch.q_out_cb<1>().set(FUNC(nemesis_state::coin2_lockout_w));
+	outlatch.q_out_cb<2>().set(FUNC(nemesis_state::sound_irq_w));
+	outlatch.q_out_cb<7>().set(FUNC(nemesis_state::irq4_enable_w)); // ??
 
-	MCFG_DEVICE_ADD("intlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, nemesis_state, irq2_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, nemesis_state, irq1_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, nemesis_state, gfx_flipx_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, nemesis_state, gfx_flipy_w))
+	ls259_device &intlatch(LS259(config, "intlatch"));
+	intlatch.q_out_cb<0>().set(FUNC(nemesis_state::irq2_enable_w));
+	intlatch.q_out_cb<1>().set(FUNC(nemesis_state::irq1_enable_w));
+	intlatch.q_out_cb<2>().set(FUNC(nemesis_state::gfx_flipx_w));
+	intlatch.q_out_cb<3>().set(FUNC(nemesis_state::gfx_flipy_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE((18432000.0/4)/(288*264))      /* 60.606060 Hz */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(nemesis_state, screen_update_nemesis)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz((18432000.0/4)/(288*264)); /* 60.606060 Hz */
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(nemesis_state::screen_update_nemesis));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set_inputline("audiocpu", INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nemesis)
-	MCFG_PALETTE_ADD("palette", 2048)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_nemesis);
+	PALETTE(config, m_palette).set_entries(2048);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 14318180/8)
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, nemesis_state, nemesis_portA_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter1", 0.20)
+	ay8910_device &ay1(AY8910(config, "ay1", 14318180/8));
+	ay1.set_flags(AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT);
+	ay1.port_a_read_callback().set(FUNC(nemesis_state::nemesis_portA_r));
+	ay1.add_route(ALL_OUTPUTS, "filter1", 0.20);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 14318180/8)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("k005289", k005289_device, k005289_control_A_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("k005289", k005289_device, k005289_control_B_w))
-	MCFG_SOUND_ROUTE(0, "filter2", 1.00)
-	MCFG_SOUND_ROUTE(1, "filter3", 1.00)
-	MCFG_SOUND_ROUTE(2, "filter4", 1.00)
+	ay8910_device &ay2(AY8910(config, "ay2", 14318180/8));
+	ay2.port_a_write_callback().set(m_k005289, FUNC(k005289_device::k005289_control_A_w));
+	ay2.port_b_write_callback().set(m_k005289, FUNC(k005289_device::k005289_control_B_w));
+	ay2.add_route(0, "filter2", 1.00);
+	ay2.add_route(1, "filter3", 1.00);
+	ay2.add_route(2, "filter4", 1.00);
 
-	MCFG_DEVICE_ADD("filter1", FILTER_RC)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADD("filter2", FILTER_RC)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADD("filter3", FILTER_RC)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADD("filter4", FILTER_RC)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	FILTER_RC(config, m_filter1);
+	m_filter1->add_route(ALL_OUTPUTS, "mono", 1.0);
+	FILTER_RC(config, m_filter2);
+	m_filter2->add_route(ALL_OUTPUTS, "mono", 1.0);
+	FILTER_RC(config, m_filter3);
+	m_filter3->add_route(ALL_OUTPUTS, "mono", 1.0);
+	FILTER_RC(config, m_filter4);
+	m_filter4->add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_K005289_ADD("k005289", 3579545)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
+	K005289(config, m_k005289, 3579545);
+	m_k005289->add_route(ALL_OUTPUTS, "mono", 0.60);
 
-	MCFG_DEVICE_ADD("vlm", VLM5030, 3579545)
-	MCFG_DEVICE_ADDRESS_MAP(0, gx400_vlm_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
-MACHINE_CONFIG_END
+	VLM5030(config, m_vlm, 3579545);
+	m_vlm->set_addrmap(0, &nemesis_state::gx400_vlm_map);
+	m_vlm->add_route(ALL_OUTPUTS, "mono", 0.70);
+}
 
-
-MACHINE_CONFIG_START(nemesis_state::salamand)
-
+void nemesis_state::salamand(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000,18432000/2)       /* 9.216MHz */
-	MCFG_DEVICE_PROGRAM_MAP(salamand_map)
+	M68000(config, m_maincpu, 18432000/2); /* 9.216MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &nemesis_state::salamand_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 3579545)         /* 3.579545 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(sal_sound_map)
+	Z80(config, m_audiocpu, 3579545); /* 3.579545 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &nemesis_state::sal_sound_map);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE((18432000.0/4)/(288*264))      /* 60.606060 Hz */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC((264-256)*125/2))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(nemesis_state, screen_update_nemesis)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, nemesis_state, nemesis_vblank_irq))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+	m_screen->set_refresh_hz((18432000.0/4)/(288*264)); /* 60.606060 Hz */
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC((264-256)*125/2));
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(nemesis_state::screen_update_nemesis));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(nemesis_state::nemesis_vblank_irq));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nemesis)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_MEMBITS(8)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_nemesis);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
+	m_palette->set_membits(8);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("vlm", VLM5030, 3579545)
-	MCFG_DEVICE_ADDRESS_MAP(0, salamand_vlm_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 2.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 2.50)
+	VLM5030(config, m_vlm, 3579545);
+	m_vlm->set_addrmap(0, &nemesis_state::salamand_vlm_map);
+	m_vlm->add_route(ALL_OUTPUTS, "lspeaker", 2.50);
+	m_vlm->add_route(ALL_OUTPUTS, "rspeaker", 2.50);
 
-	MCFG_DEVICE_ADD("k007232", K007232, 3579545)
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, nemesis_state, volume_callback))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.08)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.08)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 0.08)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.08)
+	K007232(config, m_k007232, 3579545);
+	m_k007232->port_write().set(FUNC(nemesis_state::volume_callback));
+	m_k007232->add_route(0, "lspeaker", 0.08);
+	m_k007232->add_route(0, "rspeaker", 0.08);
+	m_k007232->add_route(1, "lspeaker", 0.08);
+	m_k007232->add_route(1, "rspeaker", 0.08);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579545)
-//  MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0)) ... Interrupts _are_ generated, I wonder where they go
-	MCFG_SOUND_ROUTE(0, "rspeaker", 1.2) // reversed according to MT #4565
-	MCFG_SOUND_ROUTE(1, "lspeaker", 1.2)
-MACHINE_CONFIG_END
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3579545));
+//  ymsnd.irq_handler().set_inputline(m_audiocpu, 0); ... Interrupts _are_ generated, I wonder where they go
+	ymsnd.add_route(0, "rspeaker", 1.2); // reversed according to MT #4565
+	ymsnd.add_route(1, "lspeaker", 1.2);
+}
 
-
-MACHINE_CONFIG_START(nemesis_state::blkpnthr)
-
+void nemesis_state::blkpnthr(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000,18432000/2)         /* 9.216 MHz? */
-	MCFG_DEVICE_PROGRAM_MAP(blkpnthr_map)
+	M68000(config, m_maincpu, 18432000/2); /* 9.216 MHz? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &nemesis_state::blkpnthr_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 3579545)        /* 3.579545 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(blkpnthr_sound_map)
+	Z80(config, m_audiocpu, 3579545); /* 3.579545 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &nemesis_state::blkpnthr_sound_map);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE((18432000.0/4)/(288*264))      /* 60.606060 Hz */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(nemesis_state, screen_update_nemesis)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, nemesis_state, blkpnthr_vblank_irq))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	m_screen->set_refresh_hz((18432000.0/4)/(288*264)); /* 60.606060 Hz */
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(nemesis_state::screen_update_nemesis));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(nemesis_state::blkpnthr_vblank_irq));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nemesis)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_MEMBITS(8)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_nemesis);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
+	m_palette->set_membits(8);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("k007232", K007232, 3579545)
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, nemesis_state, volume_callback))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.10)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.10)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 0.10)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.10)
+	K007232(config, m_k007232, 3579545);
+	m_k007232->port_write().set(FUNC(nemesis_state::volume_callback));
+	m_k007232->add_route(0, "lspeaker", 0.10);
+	m_k007232->add_route(0, "rspeaker", 0.10);
+	m_k007232->add_route(1, "lspeaker", 0.10);
+	m_k007232->add_route(1, "rspeaker", 0.10);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579545)
-//  MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0)) ... Interrupts _are_ generated, I wonder where they go
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3579545));
+//  ymsnd.irq_handler().set_inputline(m_audiocpu, 0); ... Interrupts _are_ generated, I wonder where they go
+	ymsnd.add_route(0, "lspeaker", 1.0);
+	ymsnd.add_route(1, "rspeaker", 1.0);
+}
 
-
-MACHINE_CONFIG_START(nemesis_state::citybomb)
-
+void nemesis_state::citybomb(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000,18432000/2)         /* 9.216 MHz? */
-	MCFG_DEVICE_PROGRAM_MAP(citybomb_map)
+	M68000(config, m_maincpu, 18432000/2); /* 9.216 MHz? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &nemesis_state::citybomb_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 3579545)        /* 3.579545 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(city_sound_map)
+	Z80(config, m_audiocpu, 3579545); /* 3.579545 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &nemesis_state::city_sound_map);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE((18432000.0/4)/(288*264))      /* 60.606060 Hz */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(nemesis_state, screen_update_nemesis)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, nemesis_state, nemesis_vblank_irq))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	m_screen->set_refresh_hz((18432000.0/4)/(288*264)); /* 60.606060 Hz */
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(nemesis_state::screen_update_nemesis));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(nemesis_state::nemesis_vblank_irq));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nemesis)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_MEMBITS(8)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_nemesis);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
+	m_palette->set_membits(8);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("k007232", K007232, 3579545)
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, nemesis_state, volume_callback))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.30)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.30)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 0.30)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.30)
+	K007232(config, m_k007232, 3579545);
+	m_k007232->port_write().set(FUNC(nemesis_state::volume_callback));
+	m_k007232->add_route(0, "lspeaker", 0.30);
+	m_k007232->add_route(0, "rspeaker", 0.30);
+	m_k007232->add_route(1, "lspeaker", 0.30);
+	m_k007232->add_route(1, "rspeaker", 0.30);
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, 3579545)
-//  MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0)) ... Interrupts _are_ generated, I wonder where they go
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	ym3812_device &ym3812(YM3812(config, "ymsnd", 3579545));
+//  ym3812.irq_handler().set_inputline("audiocpu", 0); ... Interrupts _are_ generated, I wonder where they go
+	ym3812.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	ym3812.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	MCFG_K051649_ADD("k051649", 3579545/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.38)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.38)
-MACHINE_CONFIG_END
+	k051649_device &k051649(K051649(config, "k051649", 3579545/2));
+	k051649.add_route(ALL_OUTPUTS, "lspeaker", 0.38);
+	k051649.add_route(ALL_OUTPUTS, "rspeaker", 0.38);
+}
 
-
-MACHINE_CONFIG_START(nemesis_state::nyanpani)
-
+void nemesis_state::nyanpani(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000,18432000/2)         /* 9.216 MHz? */
-	MCFG_DEVICE_PROGRAM_MAP(nyanpani_map)
+	M68000(config, m_maincpu, 18432000/2); /* 9.216 MHz? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &nemesis_state::nyanpani_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 3579545)        /* 3.579545 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(city_sound_map)
+	Z80(config, m_audiocpu, 3579545); /* 3.579545 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &nemesis_state::city_sound_map);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE((18432000.0/4)/(288*264))      /* 60.606060 Hz */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(nemesis_state, screen_update_nemesis)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, nemesis_state, nemesis_vblank_irq))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	m_screen->set_refresh_hz((18432000.0/4)/(288*264)); /* 60.606060 Hz */
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(nemesis_state::screen_update_nemesis));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(nemesis_state::nemesis_vblank_irq));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nemesis)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_MEMBITS(8)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_nemesis);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
+	m_palette->set_membits(8);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("k007232", K007232, 3579545)
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, nemesis_state, volume_callback))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.30)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.30)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 0.30)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.30)
+	K007232(config, m_k007232, 3579545);
+	m_k007232->port_write().set(FUNC(nemesis_state::volume_callback));
+	m_k007232->add_route(0, "lspeaker", 0.30);
+	m_k007232->add_route(0, "rspeaker", 0.30);
+	m_k007232->add_route(1, "lspeaker", 0.30);
+	m_k007232->add_route(1, "rspeaker", 0.30);
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, 3579545)
-//  MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0)) ... Interrupts _are_ generated, I wonder where they go
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	ym3812_device &ym3812(YM3812(config, "ymsnd", 3579545));
+//  ym3812.irq_handler().set_inputline("audiocpu", 0); ... Interrupts _are_ generated, I wonder where they go
+	ym3812.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	ym3812.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	MCFG_K051649_ADD("k051649", 3579545/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.38)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.38)
-MACHINE_CONFIG_END
+	k051649_device &k051649(K051649(config, "k051649", 3579545/2));
+	k051649.add_route(ALL_OUTPUTS, "lspeaker", 0.38);
+	k051649.add_route(ALL_OUTPUTS, "rspeaker", 0.38);
+}
 
-
-MACHINE_CONFIG_START(nemesis_state::hcrash)
-
+void nemesis_state::hcrash(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000,18432000/3)         /* 6.144MHz */
-	MCFG_DEVICE_PROGRAM_MAP(hcrash_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", nemesis_state, konamigt_interrupt, "screen", 0, 1)
+	M68000(config, m_maincpu, 18432000/3); /* 6.144MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &nemesis_state::hcrash_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(nemesis_state::konamigt_interrupt), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80,14318180/4)       /* 3.579545 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(sal_sound_map)
+	Z80(config, m_audiocpu, 14318180/4); /* 3.579545 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &nemesis_state::sal_sound_map);
 
-	MCFG_DEVICE_ADD("intlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // ?
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, nemesis_state, irq2_enable_w)) // or at 0x0c2804 ?
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // ?
+	ls259_device &intlatch(LS259(config, "intlatch"));
+	intlatch.q_out_cb<0>().set_nop(); // ?
+	intlatch.q_out_cb<1>().set(FUNC(nemesis_state::irq2_enable_w)); // or at 0x0c2804 ?
+	intlatch.q_out_cb<2>().set_nop(); // ?
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE((18432000.0/4)/(288*264))      /* 60.606060 Hz */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(nemesis_state, screen_update_nemesis)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz((18432000.0/4)/(288*264)); /* 60.606060 Hz */
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(nemesis_state::screen_update_nemesis));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nemesis)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_MEMBITS(8)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_nemesis);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
+	m_palette->set_membits(8);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("vlm", VLM5030, 3579545)
-	MCFG_DEVICE_ADDRESS_MAP(0, salamand_vlm_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
+	VLM5030(config, m_vlm, 3579545);
+	m_vlm->set_addrmap(0, &nemesis_state::salamand_vlm_map);
+	m_vlm->add_route(ALL_OUTPUTS, "lspeaker", 1.00);
+	m_vlm->add_route(ALL_OUTPUTS, "rspeaker", 1.00);
 
-	MCFG_DEVICE_ADD("k007232", K007232, 3579545)
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, nemesis_state, volume_callback))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.10)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.10)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 0.10)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.10)
+	K007232(config, m_k007232, 3579545);
+	m_k007232->port_write().set(FUNC(nemesis_state::volume_callback));
+	m_k007232->add_route(0, "lspeaker", 0.10);
+	m_k007232->add_route(0, "rspeaker", 0.10);
+	m_k007232->add_route(1, "lspeaker", 0.10);
+	m_k007232->add_route(1, "rspeaker", 0.10);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579545)
-//  MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0)) ... Interrupts _are_ generated, I wonder where they go
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3579545));
+//  ymsnd.irq_handler().set_inputline(m_audiocpu, 0); ... Interrupts _are_ generated, I wonder where they go
+	ymsnd.add_route(0, "lspeaker", 1.0);
+	ymsnd.add_route(1, "rspeaker", 1.0);
+}
 
 /***************************************************************************
 
@@ -2693,78 +2676,77 @@ Manual says SW4, 5, 6, 7 & 8 not used, leave off
 
 */
 
-MACHINE_CONFIG_START(nemesis_state::bubsys)
-
+void nemesis_state::bubsys(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000,18432000/2)     /* 9.216MHz */
-	MCFG_DEVICE_PROGRAM_MAP(gx400_map)
-	//MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", nemesis_state, gx400_interrupt, "screen", 0, 1)
-	MCFG_DEVICE_DISABLE()
+	M68000(config, m_maincpu, 18432000/2); /* 9.216MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &nemesis_state::gx400_map);
+	//TIMER(config, "scantimer").configure_scanline(FUNC(nemesis_state::gx400_interrupt), "screen", 0, 1);
+	m_maincpu->set_disable();
 
-	MCFG_DEVICE_ADD("audiocpu", Z80,14318180/4)        /* 3.579545 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(gx400_sound_map)
+	Z80(config, m_audiocpu, 14318180/4); /* 3.579545 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &nemesis_state::gx400_sound_map);
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, nemesis_state, coin1_lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, nemesis_state, coin2_lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, nemesis_state, sound_irq_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, nemesis_state, irq4_enable_w)) // ??
+	ls259_device &outlatch(LS259(config, "outlatch"));
+	outlatch.q_out_cb<0>().set(FUNC(nemesis_state::coin1_lockout_w));;
+	outlatch.q_out_cb<1>().set(FUNC(nemesis_state::coin2_lockout_w));
+	outlatch.q_out_cb<2>().set(FUNC(nemesis_state::sound_irq_w));
+	outlatch.q_out_cb<7>().set(FUNC(nemesis_state::irq4_enable_w)); // ??
 
-	MCFG_DEVICE_ADD("intlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, nemesis_state, irq2_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, nemesis_state, irq1_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, nemesis_state, gfx_flipx_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, nemesis_state, gfx_flipy_w))
+	ls259_device &intlatch(LS259(config, "intlatch"));
+	intlatch.q_out_cb<0>().set(FUNC(nemesis_state::irq2_enable_w));
+	intlatch.q_out_cb<1>().set(FUNC(nemesis_state::irq1_enable_w));
+	intlatch.q_out_cb<2>().set(FUNC(nemesis_state::gfx_flipx_w));
+	intlatch.q_out_cb<3>().set(FUNC(nemesis_state::gfx_flipy_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE((18432000.0/4)/(288*264))      /* 60.606060 Hz */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(nemesis_state, screen_update_nemesis)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz((18432000.0/4)/(288*264)); /* 60.606060 Hz */
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(nemesis_state::screen_update_nemesis));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set_inputline("audiocpu", INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nemesis)
-	MCFG_PALETTE_ADD("palette", 2048)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_nemesis);
+	PALETTE(config, m_palette).set_entries(2048);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 14318180/8)
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, nemesis_state, nemesis_portA_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter1", 0.20)
+	ay8910_device &ay1(AY8910(config, "ay1", 14318180/8));
+	ay1.set_flags(AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT);
+	ay1.port_a_read_callback().set(FUNC(nemesis_state::nemesis_portA_r));
+	ay1.add_route(ALL_OUTPUTS, "filter1", 0.20);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 14318180/8)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("k005289", k005289_device, k005289_control_A_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("k005289", k005289_device, k005289_control_B_w))
-	MCFG_SOUND_ROUTE(0, "filter2", 1.00)
-	MCFG_SOUND_ROUTE(1, "filter3", 1.00)
-	MCFG_SOUND_ROUTE(2, "filter4", 1.00)
+	ay8910_device &ay2(AY8910(config, "ay2", 14318180/8));
+	ay2.port_a_write_callback().set(m_k005289, FUNC(k005289_device::k005289_control_A_w));
+	ay2.port_b_write_callback().set(m_k005289, FUNC(k005289_device::k005289_control_B_w));
+	ay2.add_route(0, "filter2", 1.00);
+	ay2.add_route(1, "filter3", 1.00);
+	ay2.add_route(2, "filter4", 1.00);
 
-	MCFG_DEVICE_ADD("filter1", FILTER_RC)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADD("filter2", FILTER_RC)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADD("filter3", FILTER_RC)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADD("filter4", FILTER_RC)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	FILTER_RC(config, m_filter1);
+	m_filter1->add_route(ALL_OUTPUTS, "mono", 1.0);
+	FILTER_RC(config, m_filter2);
+	m_filter2->add_route(ALL_OUTPUTS, "mono", 1.0);
+	FILTER_RC(config, m_filter3);
+	m_filter3->add_route(ALL_OUTPUTS, "mono", 1.0);
+	FILTER_RC(config, m_filter4);
+	m_filter4->add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_K005289_ADD("k005289", 3579545)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
+	K005289(config, m_k005289, 3579545);
+	m_k005289->add_route(ALL_OUTPUTS, "mono", 0.35);
 
-	MCFG_DEVICE_ADD("vlm", VLM5030, 3579545)
-	MCFG_DEVICE_ADDRESS_MAP(0, gx400_vlm_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
-MACHINE_CONFIG_END
+	VLM5030(config, m_vlm, 3579545);
+	m_vlm->set_addrmap(0, &nemesis_state::gx400_vlm_map);
+	m_vlm->add_route(ALL_OUTPUTS, "mono", 0.70);
+}
 
 
 

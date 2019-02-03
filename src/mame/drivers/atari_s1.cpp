@@ -455,7 +455,7 @@ MACHINE_CONFIG_START(atari_s1_state::atari_s1)
 	MCFG_DEVICE_ADD("maincpu", M6800, MASTER_CLK)
 	MCFG_DEVICE_PROGRAM_MAP(atari_s1_map)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* Sound */
 	genpin_audio(config);
@@ -466,10 +466,10 @@ MACHINE_CONFIG_START(atari_s1_state::atari_s1)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_atari_s1)
+	config.set_default_layout(layout_atari_s1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi", atari_s1_state, nmi, attotime::from_hz(NMI_INT))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_s", atari_s1_state, timer_s, attotime::from_hz(AUDIO_CLK))
+	TIMER(config, "nmi").configure_periodic(FUNC(atari_s1_state::nmi), attotime::from_hz(NMI_INT));
+	TIMER(config, "timer_s").configure_periodic(FUNC(atari_s1_state::timer_s), attotime::from_hz(AUDIO_CLK));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(atari_s1_state::atarians)

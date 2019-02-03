@@ -330,40 +330,45 @@ void wpc_an_state::init_wpc_an()
 	memcpy(fixed,&ROM[codeoff],0x8000);  // copy static code from end of U6 ROM.
 }
 
-MACHINE_CONFIG_START(wpc_an_state::wpc_an_base)
+void wpc_an_state::wpc_an_base(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809E, XTAL(8'000'000) / 4) // 68B09E
-	MCFG_DEVICE_PROGRAM_MAP(wpc_an_map)
+	MC6809E(config, m_maincpu, XTAL(8'000'000) / 4); // 68B09E
+	m_maincpu->set_addrmap(AS_PROGRAM, &wpc_an_state::wpc_an_map);
 
-	MCFG_WMS_WPC_ADD("wpc")
-	MCFG_WPC_IRQ_ACKNOWLEDGE(WRITELINE(*this, wpc_an_state,wpc_irq_w))
-	MCFG_WPC_FIRQ_ACKNOWLEDGE(WRITELINE(*this, wpc_an_state,wpc_firq_w))
-	MCFG_WPC_ROMBANK(WRITE8(*this, wpc_an_state,wpc_rombank_w))
-	MCFG_WPC_SOUND_CTRL(READ8(*this, wpc_an_state,wpc_sound_ctrl_r),WRITE8(*this, wpc_an_state,wpc_sound_ctrl_w))
-	MCFG_WPC_SOUND_DATA(READ8(*this, wpc_an_state,wpc_sound_data_r),WRITE8(*this, wpc_an_state,wpc_sound_data_w))
-	MCFG_WPC_SOUND_S11C(WRITE8(*this, wpc_an_state,wpc_sound_s11_w))
+	WPCASIC(config, m_wpc, 0);
+	m_wpc->irq_callback().set(FUNC(wpc_an_state::wpc_irq_w));
+	m_wpc->firq_callback().set(FUNC(wpc_an_state::wpc_firq_w));
+	m_wpc->bank_write().set(FUNC(wpc_an_state::wpc_rombank_w));
+	m_wpc->sound_ctrl_read().set(FUNC(wpc_an_state::wpc_sound_ctrl_r));
+	m_wpc->sound_ctrl_write().set(FUNC(wpc_an_state::wpc_sound_ctrl_w));
+	m_wpc->sound_data_read().set(FUNC(wpc_an_state::wpc_sound_data_r));
+	m_wpc->sound_data_write().set(FUNC(wpc_an_state::wpc_sound_data_w));
+	m_wpc->sound_s11_write().set(FUNC(wpc_an_state::wpc_sound_s11_w));
 
-	MCFG_DEFAULT_LAYOUT(layout_wpc_an)
-MACHINE_CONFIG_END
+	config.set_default_layout(layout_wpc_an);
+}
 
-MACHINE_CONFIG_START(wpc_an_state::wpc_an)
+void wpc_an_state::wpc_an(machine_config &config)
+{
 	wpc_an_base(config);
 
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("wpcsnd", WPCSND)
-	MCFG_WPC_ROM_REGION("sound1")
-	MCFG_WPC_SOUND_REPLY_CALLBACK(WRITELINE(*this, wpc_an_state,wpcsnd_reply_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-MACHINE_CONFIG_END
+	WPCSND(config, m_wpcsnd);
+	m_wpcsnd->set_romregion("sound1");
+	m_wpcsnd->reply_callback().set(FUNC(wpc_an_state::wpcsnd_reply_w));
+	m_wpcsnd->add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
 
-MACHINE_CONFIG_START(wpc_an_state::wpc_an_dd)
+void wpc_an_state::wpc_an_dd(machine_config &config)
+{
 	wpc_an_base(config);
 
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("bg", S11C_BG)
-	MCFG_S11C_BG_ROM_REGION(":sound1")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-MACHINE_CONFIG_END
+	S11C_BG(config, m_bg);
+	m_bg->set_romregion("sound1");
+	m_bg->add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
 
 /*-----------------
 /  Dr. Dude #2016

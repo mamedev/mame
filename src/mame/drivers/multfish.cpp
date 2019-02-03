@@ -1032,7 +1032,7 @@ MACHINE_CONFIG_START(igrosoft_gamble_state::igrosoft_gamble)
 	MCFG_DEVICE_IO_MAP(igrosoft_gamble_portmap)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", igrosoft_gamble_state, irq0_line_hold)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1048,11 +1048,10 @@ MACHINE_CONFIG_START(igrosoft_gamble_state::igrosoft_gamble)
 
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("aysnd", AY8910, 6000000/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	AY8910(config, "aysnd", 6000000/4).add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	MCFG_DEVICE_ADD("m48t35", M48T35, 0)
-	MCFG_HOPPER_ADD("hopper", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
+	M48T35(config, m_m48t35, 0);
+	HOPPER(config, m_hopper, attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(igrosoft_gamble_state::rollfr)

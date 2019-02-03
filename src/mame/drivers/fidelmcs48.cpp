@@ -152,16 +152,16 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(fidelmcs48_state::sc6)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8040, 11_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(sc6_map)
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, fidelmcs48_state, sc6_mux_w))
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, fidelmcs48_state, sc6_input_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, fidelmcs48_state, sc6_select_w))
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, fidelmcs48_state, sc6_input6_r))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, fidelmcs48_state, sc6_input7_r))
+	i8040_device &maincpu(I8040(config, m_maincpu, 11_MHz_XTAL));
+	maincpu.set_addrmap(AS_PROGRAM, &fidelmcs48_state::sc6_map);
+	maincpu.p2_out_cb().set(FUNC(fidelmcs48_state::sc6_mux_w));
+	maincpu.p1_in_cb().set(FUNC(fidelmcs48_state::sc6_input_r));
+	maincpu.p1_out_cb().set(FUNC(fidelmcs48_state::sc6_select_w));
+	maincpu.t0_in_cb().set(FUNC(fidelmcs48_state::sc6_input6_r));
+	maincpu.t1_in_cb().set(FUNC(fidelmcs48_state::sc6_input7_r));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_fidel_sc6)
+	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
+	config.set_default_layout(layout_fidel_sc6);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

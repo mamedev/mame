@@ -164,10 +164,12 @@ Notes:
 **************************************************************************************/
 
 #include "emu.h"
-#include "includes/mw8080bw.h"
 
 #include "cpu/z80/z80.h"
+#include "sound/samples.h"
+#include "sound/sn76477.h"
 #include "emupal.h"
+#include "screen.h"
 #include "speaker.h"
 
 
@@ -221,7 +223,7 @@ private:
 	DECLARE_WRITE8_MEMBER(sound2_w);
 	DECLARE_WRITE8_MEMBER(sound3_w);
 
-	DECLARE_PALETTE_INIT(spaceg);
+	void spaceg_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void spaceg_map(address_map &map);
@@ -240,31 +242,29 @@ void spaceg_state::driver_start()
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(spaceg_state, spaceg)
+void spaceg_state::spaceg_palette(palette_device &palette) const
 {
-	int i;
-
-	for (i = 0; i < 128; i++)
-		palette.set_pen_color (i, rgb_t(0x00,0x00,0x00));
+	for (int i = 0; i < 128; i++)
+		palette.set_pen_color(i, rgb_t(0x00, 0x00, 0x00));
 
 	// proms are currently undumped...
-	palette.set_pen_color (0, rgb_t(0x00,0x00,0x00)); //ok czarny
-	palette.set_pen_color (1, rgb_t(0x7f,0x00,0x00));//???
-	palette.set_pen_color (2, rgb_t(0xff,0xff,0xff)); //ok+ bialy
-	palette.set_pen_color (3, rgb_t(0xff,0x00,0x00)); //ok j.czerw.
-	palette.set_pen_color (4, rgb_t(0x3f,0x3f,0xff)); //ok j.niebieski
-	palette.set_pen_color (5, rgb_t(0x3f,0xff,0x3f)); //ok j.zielony
-	palette.set_pen_color (6, rgb_t(0xff,0xbf,0xbf)); //ok+ 'majtki'
-	palette.set_pen_color (7, rgb_t(0xff,0xff,0x00)); //ok+ zolty
+	palette.set_pen_color( 0, rgb_t(0x00, 0x00, 0x00)); //ok czarny
+	palette.set_pen_color( 1, rgb_t(0x7f, 0x00, 0x00));//???
+	palette.set_pen_color( 2, rgb_t(0xff, 0xff, 0xff)); //ok+ bialy
+	palette.set_pen_color( 3, rgb_t(0xff, 0x00, 0x00)); //ok j.czerw.
+	palette.set_pen_color( 4, rgb_t(0x3f, 0x3f, 0xff)); //ok j.niebieski
+	palette.set_pen_color( 5, rgb_t(0x3f, 0xff, 0x3f)); //ok j.zielony
+	palette.set_pen_color( 6, rgb_t(0xff, 0xbf, 0xbf)); //ok+ 'majtki'
+	palette.set_pen_color( 7, rgb_t(0xff, 0xff, 0x00)); //ok+ zolty
 
-	palette.set_pen_color (8, rgb_t(0xff,0x7f,0x00)); //ok+ pomaranczowy
-	palette.set_pen_color (9, rgb_t(0x3f,0xbf,0xff)); //ok j.niebieski (ciemniejszy od 13)
-	palette.set_pen_color (10, rgb_t(0x3f,0xbf,0x3f));    //ok+ c.zielony
-	palette.set_pen_color (11, rgb_t(0x00,0xff,0x00));    //ok j.zielony
-	palette.set_pen_color (12, rgb_t(0x7f,0x00,0x00));    //ok brazowy (c.czerw)
-	palette.set_pen_color (13, rgb_t(0x7f,0xbf,0xff));    //ok j.niebieski (jasniejszy od 9)
-	palette.set_pen_color (14, rgb_t(0x00,0xff,0xff));//???
-	palette.set_pen_color (15, rgb_t(0x7f,0x7f,0x7f));//???
+	palette.set_pen_color( 8, rgb_t(0xff, 0x7f, 0x00)); //ok+ pomaranczowy
+	palette.set_pen_color( 9, rgb_t(0x3f, 0xbf, 0xff)); //ok j.niebieski (ciemniejszy od 13)
+	palette.set_pen_color(10, rgb_t(0x3f, 0xbf, 0x3f));    //ok+ c.zielony
+	palette.set_pen_color(11, rgb_t(0x00, 0xff, 0x00));    //ok j.zielony
+	palette.set_pen_color(12, rgb_t(0x7f, 0x00, 0x00));    //ok brazowy (c.czerw)
+	palette.set_pen_color(13, rgb_t(0x7f, 0xbf, 0xff));    //ok j.niebieski (jasniejszy od 9)
+	palette.set_pen_color(14, rgb_t(0x00, 0xff, 0xff));//???
+	palette.set_pen_color(15, rgb_t(0x7f, 0x7f, 0x7f));//???
 }
 
 WRITE8_MEMBER(spaceg_state::zvideoram_w)
@@ -507,51 +507,50 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(spaceg_state::spaceg)
-
+void spaceg_state::spaceg(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,2500000)         /* 2.5 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(spaceg_map)
+	Z80(config, m_maincpu, 2500000);         /* 2.5 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &spaceg_state::spaceg_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 255, 32, 255)
-	MCFG_SCREEN_UPDATE_DRIVER(spaceg_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI)) // 60 Hz NMIs (verified)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 255, 32, 255);
+	screen.set_screen_update(FUNC(spaceg_state::screen_update));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set_inputline("maincpu", INPUT_LINE_NMI); // 60 Hz NMIs (verified)
 
-	MCFG_PALETTE_ADD("palette", 16+128-16)
-	MCFG_PALETTE_INIT_OWNER(spaceg_state, spaceg)
+	PALETTE(config, m_palette, FUNC(spaceg_state::spaceg_palette), 16+128-16);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	// HACK: SN76477 parameters copied from space invaders
-	MCFG_DEVICE_ADD("snsnd", SN76477)
-	MCFG_SN76477_NOISE_PARAMS(0, 0, 0)                  // noise + filter: N/C
-	MCFG_SN76477_DECAY_RES(0)                           // decay_res: N/C
-	MCFG_SN76477_ATTACK_PARAMS(0, RES_K(100))           // attack_decay_cap + attack_res
-	MCFG_SN76477_AMP_RES(RES_K(56))                     // amplitude_res
-	MCFG_SN76477_FEEDBACK_RES(RES_K(10))                // feedback_res
-	MCFG_SN76477_VCO_PARAMS(0, CAP_U(0.1), RES_K(8.2))  // VCO volt + cap + res
-	MCFG_SN76477_PITCH_VOLTAGE(5.0)                     // pitch_voltage
-	MCFG_SN76477_SLF_PARAMS(CAP_U(1.0), RES_K(120))     // slf caps + res
-	MCFG_SN76477_ONESHOT_PARAMS(0, 0)                   // oneshot caps + res: N/C
-	MCFG_SN76477_VCO_MODE(1)                            // VCO mode
-	MCFG_SN76477_MIXER_PARAMS(0, 0, 0)                  // mixer A, B, C
-	MCFG_SN76477_ENVELOPE_PARAMS(1, 0)                  // envelope 1, 2
-	MCFG_SN76477_ENABLE(1)                              // enable
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	SN76477(config, m_sn);
+	m_sn->set_noise_params(0, 0, 0);
+	m_sn->set_decay_res(0);
+	m_sn->set_attack_params(0, RES_K(100));
+	m_sn->set_amp_res(RES_K(56));
+	m_sn->set_feedback_res(RES_K(10));
+	m_sn->set_vco_params(0, CAP_U(0.1), RES_K(8.2));
+	m_sn->set_pitch_voltage(5.0);
+	m_sn->set_slf_params(CAP_U(1.0), RES_K(120));
+	m_sn->set_oneshot_params(0, 0);
+	m_sn->set_vco_mode(1);
+	m_sn->set_mixer_params(0, 0, 0);
+	m_sn->set_envelope_params(1, 0);
+	m_sn->set_enable(1);
+	m_sn->add_route(ALL_OUTPUTS, "mono", 0.5);
 
 	// HACK: samples copied from space invaders
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(6)
-	MCFG_SAMPLES_NAMES(invaders_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(6);
+	m_samples->set_samples_names(invaders_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 /*************************************

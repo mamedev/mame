@@ -92,15 +92,16 @@ Notes:
 class calorie_state : public driver_device
 {
 public:
-	calorie_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	calorie_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_fg_ram(*this, "fg_ram"),
 		m_sprites(*this, "sprites"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
-		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
+		m_decrypted_opcodes(*this, "decrypted_opcodes")
+	{ }
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_fg_ram;
@@ -485,35 +486,32 @@ MACHINE_CONFIG_START(calorie_state::calorie)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(calorie_state, screen_update_calorie)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_calorie)
-	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_calorie);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 0x100);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ay1", YM2149, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
+	YM2149(config, "ay1", 1500000).add_route(ALL_OUTPUTS, "mono", 0.8);
 
-	MCFG_DEVICE_ADD("ay2", YM2149, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
+	YM2149(config, "ay2", 1500000).add_route(ALL_OUTPUTS, "mono", 0.8);
 
-	MCFG_DEVICE_ADD("ay3", YM2149, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
+	YM2149(config, "ay3", 1500000).add_route(ALL_OUTPUTS, "mono", 0.8);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(calorie_state::caloriee)
+void calorie_state::caloriee(machine_config &config)
+{
 	calorie(config);
-	MCFG_DEVICE_REPLACE("maincpu", SEGA_317_0004,4000000)         /* 4 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(calorie_map)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", calorie_state,  irq0_line_hold)
-	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	sega_317_0004_device &maincpu(SEGA_317_0004(config.replace(), m_maincpu, 4000000));         /* 4 MHz */
+	maincpu.set_addrmap(AS_PROGRAM, &calorie_state::calorie_map);
+	maincpu.set_addrmap(AS_OPCODES, &calorie_state::decrypted_opcodes_map);
+	maincpu.set_vblank_int("screen", FUNC(calorie_state::irq0_line_hold));
+	maincpu.set_decrypted_tag(m_decrypted_opcodes);
+}
 
 /*************************************
  *

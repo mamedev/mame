@@ -5,14 +5,20 @@
     Megazone
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_MEGAZONE_H
+#define MAME_INCLUDES_MEGAZONE_H
 
+#pragma once
+
+#include "cpu/mcs48/mcs48.h"
+#include "sound/flt_rc.h"
 #include "emupal.h"
 
 class megazone_state : public driver_device
 {
 public:
-	megazone_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	megazone_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_scrolly(*this, "scrolly"),
 		m_scrollx(*this, "scrollx"),
 		m_videoram(*this, "videoram"),
@@ -24,7 +30,9 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_daccpu(*this, "daccpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_filter(*this, "filter.0.%u", 0U)
+	{ }
 
 	void megazone(machine_config &config);
 
@@ -48,9 +56,10 @@ private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	required_device<cpu_device> m_daccpu;
+	required_device<i8039_device> m_daccpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device_array<filter_rc_device, 3> m_filter;
 
 	uint8_t         m_irq_mask;
 	DECLARE_WRITE8_MEMBER(megazone_i8039_irq_w);
@@ -64,7 +73,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(megazone);
+	void megazone_palette(palette_device &palette) const;
 	uint32_t screen_update_megazone(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void megazone_i8039_io_map(address_map &map);
@@ -73,3 +82,5 @@ private:
 	void megazone_sound_io_map(address_map &map);
 	void megazone_sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_MEGAZONE_H

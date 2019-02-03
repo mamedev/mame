@@ -116,20 +116,20 @@ static GFXDECODE_START( gfx_tmc600 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, tmc600_charlayout, 0, 36 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(tmc600_state::tmc600_video)
+void tmc600_state::tmc600_video(machine_config &config)
+{
 	// video hardware
-	MCFG_CDP1869_SCREEN_PAL_ADD(CDP1869_TAG, SCREEN_TAG, cdp1869_device::DOT_CLK_PAL)
-
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, CDP1869_TAG":palette", gfx_tmc600)
+	GFXDECODE(config, "gfxdecode", CDP1869_TAG":palette", gfx_tmc600);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	MCFG_CDP1869_ADD(CDP1869_TAG, cdp1869_device::DOT_CLK_PAL, cdp1869_page_ram)
-	MCFG_CDP1869_COLOR_CLOCK(cdp1869_device::COLOR_CLK_PAL)
-	MCFG_CDP1869_CHAR_PCB_READ_OWNER(tmc600_state, tmc600_pcb_r)
-	MCFG_CDP1869_CHAR_RAM_READ_OWNER(tmc600_state, tmc600_char_ram_r)
-	MCFG_CDP1869_PAL_NTSC_CALLBACK(VCC)
-	MCFG_CDP1869_PRD_CALLBACK(WRITELINE(*this, tmc600_state, prd_w))
-	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	CDP1869(config, m_vis, cdp1869_device::DOT_CLK_PAL, &tmc600_state::cdp1869_page_ram);
+	m_vis->add_pal_screen(config, SCREEN_TAG, cdp1869_device::DOT_CLK_PAL);
+	m_vis->set_color_clock(cdp1869_device::COLOR_CLK_PAL);
+	m_vis->set_pcb_read_callback(FUNC(tmc600_state::tmc600_pcb_r));
+	m_vis->set_char_ram_read_callback(FUNC(tmc600_state::tmc600_char_ram_r));
+	m_vis->pal_ntsc_callback().set_constant(1);
+	m_vis->prd_callback().set(FUNC(tmc600_state::prd_w));
+	m_vis->set_screen(SCREEN_TAG);
+	m_vis->add_route(ALL_OUTPUTS, "mono", 0.25);
+}

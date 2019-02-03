@@ -1,12 +1,10 @@
 // license:GPL-2.0+
 // copyright-holders:Raphael Nabet, Robbbert
-
 #ifndef MAME_INCLUDES_APEXC
 #define MAME_INCLUDES_APEXC
 
 #pragma once
 
-#include "emu.h"
 #include "cpu/apexc/apexc.h"
 #include "machine/apexc.h"
 #include "emupal.h"
@@ -42,8 +40,7 @@ protected:
 	void check_inputs();
 
 private:
-
-	DECLARE_PALETTE_INIT(apexc);
+	void apexc_palette(palette_device &palette) const;
 	uint32_t screen_update_apexc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(apexc_interrupt);
 	DECLARE_WRITE8_MEMBER(tape_write);

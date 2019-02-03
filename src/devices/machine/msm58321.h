@@ -39,32 +39,6 @@
 #include "dirtc.h"
 
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_MSM58321_D0_HANDLER(_devcb) \
-	devcb = &downcast<msm58321_device &>(*device).set_d0_handler(DEVCB_##_devcb);
-
-#define MCFG_MSM58321_D1_HANDLER(_devcb) \
-	devcb = &downcast<msm58321_device &>(*device).set_d1_handler(DEVCB_##_devcb);
-
-#define MCFG_MSM58321_D2_HANDLER(_devcb) \
-	devcb = &downcast<msm58321_device &>(*device).set_d2_handler(DEVCB_##_devcb);
-
-#define MCFG_MSM58321_D3_HANDLER(_devcb) \
-	devcb = &downcast<msm58321_device &>(*device).set_d3_handler(DEVCB_##_devcb);
-
-#define MCFG_MSM58321_BUSY_HANDLER(_devcb) \
-	devcb = &downcast<msm58321_device &>(*device).set_busy_handler(DEVCB_##_devcb);
-
-#define MCFG_MSM58321_YEAR0(_year0) \
-	downcast<msm58321_device &>(*device).set_year0(_year0);
-
-#define MCFG_MSM58321_DEFAULT_24H(_default_24h) \
-	downcast<msm58321_device &>(*device).set_default_24h(_default_24h);
-
 // ======================> msm58321_device
 
 class msm58321_device : public device_t,
@@ -76,11 +50,11 @@ public:
 	msm58321_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
-	template <class Object> devcb_base &set_d0_handler(Object &&cb) { return m_d0_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_d1_handler(Object &&cb) { return m_d1_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_d2_handler(Object &&cb) { return m_d2_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_d3_handler(Object &&cb) { return m_d3_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_busy_handler(Object &&cb) { return m_busy_handler.set_callback(std::forward<Object>(cb)); }
+	auto d0_handler() { return m_d0_handler.bind(); }
+	auto d1_handler() { return m_d1_handler.bind(); }
+	auto d2_handler() { return m_d2_handler.bind(); }
+	auto d3_handler() { return m_d3_handler.bind(); }
+	auto busy_handler() { return m_busy_handler.bind(); }
 	void set_year0(int year0) { m_year0 = year0; }
 	void set_default_24h(bool default_24h) { m_default_24h = default_24h; }
 
@@ -109,14 +83,16 @@ protected:
 	virtual void nvram_default() override;
 	virtual void nvram_read(emu_file &file) override;
 	virtual void nvram_write(emu_file &file) override;
+	virtual bool rtc_feature_leap_year() const override { return true; }
 
 private:
-	static const device_timer_id TIMER_CLOCK = 0;
-	static const device_timer_id TIMER_BUSY = 1;
+	static constexpr device_timer_id TIMER_CLOCK = 0;
+	static constexpr device_timer_id TIMER_BUSY = 1;
+	static constexpr device_timer_id TIMER_STANDARD = 2;
 
 	void update_input();
 	void update_output();
-
+	void update_standard();
 	inline int read_counter(int counter);
 	inline void write_counter(int counter, int value);
 
@@ -146,11 +122,14 @@ private:
 	int m_cs1;                  // chip select 1
 
 	uint8_t m_address;            // address latch
-	uint8_t m_reg[13];            // registers
+	std::array<uint8_t, 16> m_reg;            // registers
 
 	// timers
 	emu_timer *m_clock_timer;
 	emu_timer *m_busy_timer;
+	emu_timer *m_standard_timer;
+
+	int m_khz_ctr;
 };
 
 

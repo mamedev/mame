@@ -134,7 +134,6 @@ private:
 
 	emu_timer *m_ready_start_timer, *m_ready_end_timer, *m_kbd_strobe_timer;
 
-	DECLARE_PALETTE_INIT(apple2);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER(ram_r);
@@ -358,14 +357,14 @@ uint32_t apple1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 	// the cursor 555 timer counts 0.52 of a second; the cursor is ON for
 	// 2 of those counts and OFF for the last one.
-	if (((int)(machine().time().as_double() / (0.52 / 3.0)) % 3) < 2)
+	if ((int(machine().time().as_double() / (0.52 / 3.0)) % 3) < 2)
 	{
 		curs_save = m_vram[(m_cursy * 40) + m_cursx];
 		m_vram[(m_cursy * 40) + m_cursx] = 0x40;
 		cursor_blink = 1;
 	}
 
-	for (int row = 0; row < cliprect.max_y; row += 8)
+	for (int row = 0; row < cliprect.bottom(); row += 8)
 	{
 		for (int col = 0; col < 40; col++)
 		{
@@ -605,24 +604,21 @@ MACHINE_CONFIG_START(apple1_state::apple1)
 	MCFG_SCREEN_UPDATE_DRIVER(apple1_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	MCFG_DEVICE_ADD(m_pia, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, apple1_state, pia_keyboard_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, apple1_state, pia_display_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, apple1_state, pia_display_gate_w))
+	PIA6821(config, m_pia, 0);
+	m_pia->readpa_handler().set(FUNC(apple1_state::pia_keyboard_r));
+	m_pia->writepb_handler().set(FUNC(apple1_state::pia_display_w));
+	m_pia->cb2_handler().set(FUNC(apple1_state::pia_display_gate_w));
 
-	MCFG_DEVICE_ADD(A1_BUS_TAG, A1BUS, 0)
-	MCFG_A1BUS_CPU(m_maincpu)
-	MCFG_DEVICE_ADD("exp", A1BUS_SLOT, 0, A1_BUS_TAG, apple1_cards, "cassette")
+	A1BUS(config, A1_BUS_TAG, 0).set_cputag(m_maincpu);
+	A1BUS_SLOT(config, "exp", 0, A1_BUS_TAG, apple1_cards, "cassette");
 
 	MCFG_SNAPSHOT_ADD("snapshot", apple1_state, apple1, "snp", 0)
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "apple1")
+	SOFTWARE_LIST(config, "cass_list").set_original("apple1");
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("48K")
-	MCFG_RAM_EXTRA_OPTIONS("4K,8K,12K,16K,20K,24K,28K,32K,36K,40K,44K")
+	RAM(config, RAM_TAG).set_default_size("48K").set_extra_options("4K,8K,12K,16K,20K,24K,28K,32K,36K,40K,44K");
 MACHINE_CONFIG_END
 
 ROM_START(apple1)

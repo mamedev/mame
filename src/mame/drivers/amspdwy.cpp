@@ -68,7 +68,7 @@ READ8_MEMBER(amspdwy_state::amspdwy_wheel_1_r)
 
 READ8_MEMBER(amspdwy_state::amspdwy_sound_r)
 {
-	return (m_ym2151->status_r(space, 0) & ~0x30) | ioport("IN0")->read();
+	return (m_ym2151->status_r() & ~0x30) | ioport("IN0")->read();
 }
 
 void amspdwy_state::amspdwy_map(address_map &map)
@@ -258,7 +258,7 @@ MACHINE_CONFIG_START(amspdwy_state::amspdwy)
 	MCFG_DEVICE_ADD("audiocpu", Z80, 3000000)
 	MCFG_DEVICE_PROGRAM_MAP(amspdwy_sound_map)
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -267,23 +267,22 @@ MACHINE_CONFIG_START(amspdwy_state::amspdwy)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(amspdwy_state, screen_update_amspdwy)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_amspdwy)
-	MCFG_PALETTE_ADD("palette", 32)
-	MCFG_PALETTE_FORMAT(BBGGGRRR_inverted)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_amspdwy);
+	PALETTE(config, m_palette).set_format(palette_device::BGR_233_inverted, 32);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 3000000)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	YM2151(config, m_ym2151, 3000000);
+	m_ym2151->irq_handler().set_inputline(m_audiocpu, 0);
+	m_ym2151->add_route(0, "lspeaker", 1.0);
+	m_ym2151->add_route(1, "rspeaker", 1.0);
 MACHINE_CONFIG_END
 
 

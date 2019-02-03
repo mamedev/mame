@@ -62,12 +62,12 @@ ROM_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(a2bus_floppy_device::device_add_mconfig)
-	MCFG_APPLEFDC_ADD(FDC_TAG, fdc_interface)
+	APPLEFDC(config, m_fdc, &fdc_interface);
 	MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(floppy_interface,15,16)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(a2bus_iwmflop_device::device_add_mconfig)
-	MCFG_IWM_ADD(FDC_TAG, fdc_interface)
+	IWM(config, m_fdc, &fdc_interface);
 	MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(floppy_interface,15,16)
 MACHINE_CONFIG_END
 

@@ -151,14 +151,14 @@ void inder_sb_device::sound_io(address_map &map)
 
 
 MACHINE_CONFIG_START(inder_sb_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("audiocpu", Z80, 8000000) // unk freq
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(sound_io)
+	Z80(config, m_audiocpu, 8000000); // unk freq
+	m_audiocpu->set_daisy_config(daisy_chain);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &inder_sb_device::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &inder_sb_device::sound_io);
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, 4000000) // unk freq
+	Z80CTC(config, m_ctc, 4000000); // unk freq
 	// runs in IM2 , vector set to 0x20 , values there are 0xCC, 0x02, 0xE6, 0x02, 0x09, 0x03, 0x23, 0x03  (so 02cc, 02e6, 0309, 0323, all of which are valid irq handlers)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("audiocpu", 0))
+	m_ctc->intr_callback().set_inputline(m_audiocpu, 0);
 
 	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("dac0", DAC_8BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC

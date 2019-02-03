@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "includes/amiga.h"
+
 #include "bus/amiga/keyboard/keyboard.h"
 #include "bus/amiga/zorro/zorro.h"
 #include "cpu/m68000/m68000.h"
@@ -25,6 +26,191 @@
 #include "machine/rp5c01.h"
 #include "softlist.h"
 #include "speaker.h"
+
+
+//**************************************************************************
+//  PRIVATE DEVICES
+//**************************************************************************
+
+/*
+The keyboard reset/power-on reset circuit for the Amiga 2000 is built
+around the LM339 at U805 (top left on sheet 3 of the schematic).  To
+simplify things, we assume all components are ideal.
+
+In stead idle state:
+* /KBCLK is high
+* U805 pin 1 is driven low, holding C813 discharged
+* U805 pin 2 is not driven, allowing C814 to remain charged
+* U805 pin 13 is driven low setting thresholds to 2.0V and 1.0V
+* U805 pin 14 is not driven, leaving /KBRST deasserted
+
+When /KBCLK is asserted, C814 is allowed to charge.  A short pulse will
+not give it sufficient time to charge past the 2.0V threshold on pin 5
+and the circuit will remain in idle.
+
+If /KBCLK is asserted for over 112ms:
+* U805 pin 1 is not driven, allowing C813 to charge past 2.0V
+* U805 pin 2 is driven low, discharging C814
+* U805 pin 13 is not driven, raising thresholds to 2.86V and 3.57V
+* U805 pin 14 is driven low, asserting /KBRST
+
+The thresholds changing will cause U805 pin 2 to float, allowing C814 to
+begin charging.  If /KBCLK is asserted for a further 74 milliseconds,
+U805 pin 2 will be driven low keeping C814 discharged until /KBCLK is
+deasserted.
+
+C814 (22µF) will charge via R805 (47kΩ) until it reaches the 3.57V
+threshold, ensuring the minimum length of a reset pulse is 1.294s.
+
+The power-on reset signal is also allowed to discharge C814, but we
+ignore this for simplicity.  Earlier boards use a 1N4148 signal diode,
+while later boards replace it with a PST518B at XU1.
+
+The equivalent circuit in the Amiga 1000 works similarly, but has
+different components:
+* 10µF/22kΩ (C104/R62) for timing /KBCLK pulse
+* 10µF/100kΩ (C105/R63) for minimum /KBRESET pulse duration
+* Thresholds of 2.499/2.501V and 2.474V/2.526V
+* BAS32L diode for power-on reset
+* This gives delays of 152ms, 176µs, and 704ms
+
+The equivalent circuit in the Amiga CDTV has the same thresholds as the
+Amiga 2000, but uses 1kΩ resistors for timing.  This gives delays of
+11.2ms, 7.43ms, and 27.5ms.
+
+*/
+
+DECLARE_DEVICE_TYPE(A1000_KBRESET, a1000_kbreset_device)
+
+class a1000_kbreset_device : public device_t
+{
+public:
+	a1000_kbreset_device(machine_config const &config, char const *tag, device_t *owner, u32 clock = 0U) :
+		device_t(config, A1000_KBRESET, tag, owner, clock),
+		m_kbrst_cb(*this)
+	{
+	}
+
+	auto kbrst_cb() { return m_kbrst_cb.bind(); }
+
+	a1000_kbreset_device &set_delays(attotime detect, attotime stray, attotime output)
+	{
+		m_detect_time = detect;
+		m_stray_time = stray;
+		m_output_time = output;
+		return *this;
+	}
+
+	DECLARE_WRITE_LINE_MEMBER(kbclk_w)
+	{
+		if (bool(state) != bool(m_kbclk))
+		{
+			m_kbclk = state ? 1U : 0U;
+			if (state)
+			{
+				// U805 pin 1 driven low - discharges C813
+				m_c813_level = 0U;
+				m_c813_timer->reset();
+
+				// U805 pin 2 floating - allows C814 to charge
+				if (!m_c814_charging)
+				{
+					m_c814_charging = 1U;
+					m_c814_timer->adjust(m_output_time); // 0V to 3.57V
+				}
+			}
+			else
+			{
+				// U805 pin 1 floating - allows C813 to charge
+				assert(0U == m_c813_level);
+				m_c813_timer->adjust(m_detect_time); // 0V to 2V
+			}
+		}
+	}
+
+protected:
+	virtual void device_resolve_objects() override
+	{
+		m_kbrst_cb.resolve_safe();
+	}
+
+	virtual void device_start() override
+	{
+		// allocate resources
+		m_c813_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(a1000_kbreset_device::c813_charged), this));
+		m_c814_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(a1000_kbreset_device::c814_charged), this));
+
+		// start in idle state
+		m_kbclk = 1U;
+		m_kbrst = 1U;
+		m_c813_level = 0U;
+		m_c814_charging = 1U;
+
+		// always better to save state
+		save_item(NAME(m_kbclk));
+		save_item(NAME(m_kbrst));
+		save_item(NAME(m_c813_level));
+		save_item(NAME(m_c814_charging));
+	}
+
+private:
+	TIMER_CALLBACK_MEMBER(c813_charged)
+	{
+		assert(2U > m_c813_level);
+		if (2U > ++m_c813_level)
+			m_c813_timer->adjust(m_stray_time); // 2V to 2.86V
+
+		if ((m_kbrst ? 0U : 1U) < m_c813_level)
+		{
+			// U805 pin 2 driven low - discharges C814
+			if (2U > m_c813_level)
+			{
+				assert(m_c814_charging);
+				m_c814_timer->adjust(m_output_time); // 0V to 3.57V
+			}
+			else
+			{
+				m_c814_charging = 0U;
+				m_c814_timer->reset();
+			}
+			if (m_kbrst)
+				m_kbrst_cb(m_kbrst = 0U);
+		}
+	}
+
+	TIMER_CALLBACK_MEMBER(c814_charged)
+	{
+		// C814 above high threshold - /KBRST deasserted
+		assert(m_c814_charging);
+		assert(!m_kbrst);
+		m_kbrst_cb(m_kbrst = 1U);
+
+		// if C813 is between 2.0V and 2.86V, lowering the threshold will discharge C814
+		assert(2U > m_c813_level);
+		if (0U < m_c813_level)
+		{
+			// threshold is bumped back up
+			m_kbrst_cb(m_kbrst = 0U);
+			m_c814_timer->adjust(m_output_time); // 0V to 3.57V
+		}
+	}
+
+	attotime m_detect_time = attotime::from_msec(112);
+	attotime m_stray_time = attotime::from_msec(74);
+	attotime m_output_time = attotime::from_msec(1294);
+
+	devcb_write_line m_kbrst_cb;
+
+	emu_timer *m_c813_timer = nullptr; // C813 = 22µF, R802 = 10kΩ
+	emu_timer *m_c814_timer = nullptr; // C814 = 22µF, R805 = 47kΩ
+
+	u8 m_kbclk = 1U; // /KBCLK input
+	u8 m_kbrst = 1U; // /KBRST output
+	u8 m_c813_level = 0U; // 0 = 0V-2V, 1 = 2V - 2.86V, 2 = 2.86V - 5V
+	u8 m_c814_charging = 1U; // U805 pin 2
+};
+
+DEFINE_DEVICE_TYPE(A1000_KBRESET, a1000_kbreset_device, "a1000kbrst", "Amiga 1000/2000/CDTV keyboard reset circuit")
 
 
 //**************************************************************************
@@ -57,7 +243,7 @@ protected:
 private:
 	required_device<address_map_bank_device> m_bootrom;
 	required_memory_bank m_wom;
-	std::vector<uint16_t> m_wom_ram;
+	std::vector<u16> m_wom_ram;
 };
 
 class a2000_state : public amiga_state
@@ -260,7 +446,7 @@ public:
 	void init_pal();
 	void init_ntsc();
 
-	static const uint8_t GAYLE_ID = 0xd0;
+	static const u8 GAYLE_ID = 0xd0;
 
 	void a600n(machine_config &config);
 	void a600(machine_config &config);
@@ -285,7 +471,7 @@ public:
 	void init_pal();
 	void init_ntsc();
 
-	static const uint8_t GAYLE_ID = 0xd1;
+	static const u8 GAYLE_ID = 0xd1;
 
 	void a1200(machine_config &config);
 	void a1200n(machine_config &config);
@@ -354,8 +540,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( akiko_int_w );
 	DECLARE_WRITE8_MEMBER( akiko_cia_0_port_a_write );
 
-	void handle_joystick_cia(uint8_t pra, uint8_t dra);
-	uint16_t handle_joystick_potgor(uint16_t potgor);
+	void handle_joystick_cia(u8 pra, u8 dra);
+	u16 handle_joystick_potgor(u16 potgor);
 
 	DECLARE_CUSTOM_INPUT_MEMBER( cd32_input );
 	DECLARE_CUSTOM_INPUT_MEMBER( cd32_sel_mirror_input );
@@ -367,14 +553,14 @@ public:
 
 	int m_oldstate[2];
 	int m_cd32_shifter[2];
-	uint16_t m_potgo_value;
+	u16 m_potgo_value;
 
 	void cd32n(machine_config &config);
 	void cd32(machine_config &config);
 	void cd32_mem(address_map &map);
 protected:
 	// amiga_state overrides
-	virtual void potgo_w(uint16_t data) override;
+	virtual void potgo_w(u16 data) override;
 
 private:
 	required_device<cdda_device> m_cdda;
@@ -706,7 +892,7 @@ bool cdtv_state::int6_pending()
 
 READ32_MEMBER( a3000_state::scsi_r )
 {
-	uint32_t data = 0xffffffff;
+	u32 data = 0xffffffff;
 	logerror("scsi_r(%06x): %08x & %08x\n", offset, data, mem_mask);
 	return data;
 }
@@ -718,7 +904,7 @@ WRITE32_MEMBER( a3000_state::scsi_w )
 
 READ32_MEMBER( a3000_state::motherboard_r )
 {
-	uint32_t data = 0xffffffff;
+	u32 data = 0xffffffff;
 	logerror("motherboard_r(%06x): %08x & %08x\n", offset, data, mem_mask);
 	return data;
 }
@@ -771,7 +957,7 @@ WRITE_LINE_MEMBER( a1200_state::gayle_int2_w )
 
 READ32_MEMBER( a4000_state::scsi_r )
 {
-	uint16_t data = 0xffff;
+	u16 data = 0xffff;
 	logerror("scsi_r(%06x): %08x & %08x\n", offset, data, mem_mask);
 	return data;
 }
@@ -783,7 +969,7 @@ WRITE32_MEMBER( a4000_state::scsi_w )
 
 READ16_MEMBER( a4000_state::ide_r )
 {
-	uint16_t data = 0xffff;
+	u16 data = 0xffff;
 
 	// ide interrupt register
 	if (offset == 0x1010)
@@ -828,7 +1014,7 @@ WRITE_LINE_MEMBER( a4000_state::ide_interrupt_w )
 
 READ32_MEMBER( a4000_state::motherboard_r )
 {
-	uint32_t data = 0;
+	u32 data = 0;
 
 	if (offset == 0)
 	{
@@ -871,7 +1057,7 @@ WRITE_LINE_MEMBER(cd32_state::akiko_int_w)
 	set_interrupt(INTENA_SETCLR | INTENA_PORTS);
 }
 
-void cd32_state::potgo_w(uint16_t data)
+void cd32_state::potgo_w(u16 data)
 {
 	int i;
 
@@ -880,30 +1066,30 @@ void cd32_state::potgo_w(uint16_t data)
 
 	for (i = 0; i < 8; i += 2)
 	{
-		uint16_t dir = 0x0200 << i;
+		u16 dir = 0x0200 << i;
 		if (data & dir)
 		{
-			uint16_t d = 0x0100 << i;
+			u16 d = 0x0100 << i;
 			m_potgo_value &= ~d;
 			m_potgo_value |= data & d;
 		}
 	}
 	for (i = 0; i < 2; i++)
 	{
-		uint16_t p5dir = 0x0200 << (i * 4); /* output enable P5 */
-		uint16_t p5dat = 0x0100 << (i * 4); /* data P5 */
+		u16 p5dir = 0x0200 << (i * 4); /* output enable P5 */
+		u16 p5dat = 0x0100 << (i * 4); /* data P5 */
 		if ((m_potgo_value & p5dir) && (m_potgo_value & p5dat))
 			m_cd32_shifter[i] = 8;
 	}
 }
 
-void cd32_state::handle_joystick_cia(uint8_t pra, uint8_t dra)
+void cd32_state::handle_joystick_cia(u8 pra, u8 dra)
 {
 	for (int i = 0; i < 2; i++)
 	{
-		uint8_t but = 0x40 << i;
-		uint16_t p5dir = 0x0200 << (i * 4); /* output enable P5 */
-		uint16_t p5dat = 0x0100 << (i * 4); /* data P5 */
+		u8 but = 0x40 << i;
+		u16 p5dir = 0x0200 << (i * 4); /* output enable P5 */
+		u16 p5dat = 0x0100 << (i * 4); /* data P5 */
 
 		if (!(m_potgo_value & p5dir) || !(m_potgo_value & p5dat))
 		{
@@ -921,14 +1107,14 @@ void cd32_state::handle_joystick_cia(uint8_t pra, uint8_t dra)
 	}
 }
 
-uint16_t cd32_state::handle_joystick_potgor(uint16_t potgor)
+u16 cd32_state::handle_joystick_potgor(u16 potgor)
 {
 	for (int i = 0; i < 2; i++)
 	{
-		uint16_t p9dir = 0x0800 << (i * 4); /* output enable P9 */
-		uint16_t p9dat = 0x0400 << (i * 4); /* data P9 */
-		uint16_t p5dir = 0x0200 << (i * 4); /* output enable P5 */
-		uint16_t p5dat = 0x0100 << (i * 4); /* data P5 */
+		u16 p9dir = 0x0800 << (i * 4); /* output enable P9 */
+		u16 p9dat = 0x0400 << (i * 4); /* data P9 */
+		u16 p5dir = 0x0200 << (i * 4); /* output enable P5 */
+		u16 p5dat = 0x0100 << (i * 4); /* data P5 */
 
 		/* p5 is floating in input-mode */
 		potgor &= ~p5dat;
@@ -954,7 +1140,7 @@ CUSTOM_INPUT_MEMBER( cd32_state::cd32_input )
 
 CUSTOM_INPUT_MEMBER( cd32_state::cd32_sel_mirror_input )
 {
-	uint8_t bits = m_player_ports[(int)(uintptr_t)param]->read();
+	u8 bits = m_player_ports[(int)(uintptr_t)param]->read();
 	return (bits & 0x20)>>5;
 }
 
@@ -1375,136 +1561,130 @@ MACHINE_CONFIG_START(amiga_state::amiga_base)
 	// video
 	pal_video(config);
 
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_INIT_OWNER(amiga_state, amiga)
+	PALETTE(config, m_palette, FUNC(amiga_state::amiga_palette), 4096);
 
 	MCFG_VIDEO_START_OVERRIDE(amiga_state, amiga)
 
 	// cia
-	MCFG_DEVICE_ADD("cia_0", MOS8520, amiga_state::CLK_E_PAL)
-	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(*this, amiga_state, cia_0_irq))
-	MCFG_MOS6526_PA_INPUT_CALLBACK(IOPORT("cia_0_port_a"))
-	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(*this, amiga_state, cia_0_port_a_write))
-	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8("cent_data_out", output_latch_device, bus_w))
-	MCFG_MOS6526_PC_CALLBACK(WRITELINE("centronics", centronics_device, write_strobe))
-	MCFG_MOS6526_SP_CALLBACK(WRITELINE("kbd", amiga_keyboard_bus_device, kdat_in_w)) MCFG_DEVCB_INVERT
+	MOS8520(config, m_cia_0, amiga_state::CLK_E_PAL);
+	m_cia_0->irq_wr_callback().set(FUNC(amiga_state::cia_0_irq));
+	m_cia_0->pa_rd_callback().set_ioport("cia_0_port_a");
+	m_cia_0->pa_wr_callback().set(FUNC(amiga_state::cia_0_port_a_write));
+	m_cia_0->pb_wr_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_cia_0->pc_wr_callback().set(m_centronics, FUNC(centronics_device::write_strobe));
+	m_cia_0->sp_wr_callback().set("kbd", FUNC(amiga_keyboard_bus_device::kdat_in_w)).invert();
 
-	MCFG_DEVICE_ADD("cia_1", MOS8520, amiga_state::CLK_E_PAL)
-	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(*this, amiga_state, cia_1_irq))
-	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(*this, amiga_state, cia_1_port_a_read))
-	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(*this, amiga_state, cia_1_port_a_write))
-	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8("fdc", amiga_fdc_device, ciaaprb_w))
+	MOS8520(config, m_cia_1, amiga_state::CLK_E_PAL);
+	m_cia_1->irq_wr_callback().set(FUNC(amiga_state::cia_1_irq));
+	m_cia_1->pa_rd_callback().set(FUNC(amiga_state::cia_1_port_a_read));
+	m_cia_1->pa_wr_callback().set(FUNC(amiga_state::cia_1_port_a_write));
+	m_cia_1->pb_wr_callback().set(m_fdc, FUNC(amiga_fdc_device::ciaaprb_w));
 
 	// audio
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("amiga", PAULA_8364, amiga_state::CLK_C1_PAL)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
-	MCFG_SOUND_ROUTE(2, "rspeaker", 0.50)
-	MCFG_SOUND_ROUTE(3, "lspeaker", 0.50)
-	MCFG_PAULA_MEM_READ_CB(READ16(*this, amiga_state, chip_ram_r))
-	MCFG_PAULA_INT_CB(WRITELINE(*this, amiga_state, paula_int_w))
+	paula_8364_device &paula(PAULA_8364(config, "amiga", amiga_state::CLK_C1_PAL));
+	paula.add_route(0, "lspeaker", 0.50);
+	paula.add_route(1, "rspeaker", 0.50);
+	paula.add_route(2, "rspeaker", 0.50);
+	paula.add_route(3, "lspeaker", 0.50);
+	paula.mem_read_cb().set(FUNC(amiga_state::chip_ram_r));
+	paula.int_cb().set(FUNC(amiga_state::paula_int_w));
 
 	// floppy drives
-	MCFG_DEVICE_ADD("fdc", AMIGA_FDC, amiga_state::CLK_7M_PAL)
-	MCFG_AMIGA_FDC_READ_DMA_CALLBACK(READ16(*this, amiga_state, chip_ram_r))
-	MCFG_AMIGA_FDC_WRITE_DMA_CALLBACK(WRITE16(*this, amiga_state, chip_ram_w))
-	MCFG_AMIGA_FDC_DSKBLK_CALLBACK(WRITELINE(*this, amiga_state, fdc_dskblk_w))
-	MCFG_AMIGA_FDC_DSKSYN_CALLBACK(WRITELINE(*this, amiga_state, fdc_dsksyn_w))
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", amiga_floppies, "35dd", amiga_fdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", amiga_floppies, nullptr, amiga_fdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:2", amiga_floppies, nullptr, amiga_fdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:3", amiga_floppies, nullptr, amiga_fdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	AMIGA_FDC(config, m_fdc, amiga_state::CLK_7M_PAL);
+	m_fdc->read_dma_callback().set(FUNC(amiga_state::chip_ram_r));
+	m_fdc->write_dma_callback().set(FUNC(amiga_state::chip_ram_w));
+	m_fdc->dskblk_callback().set(FUNC(amiga_state::fdc_dskblk_w));
+	m_fdc->dsksyn_callback().set(FUNC(amiga_state::fdc_dsksyn_w));
+	FLOPPY_CONNECTOR(config, "fdc:0", amiga_floppies, "35dd", amiga_fdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", amiga_floppies, nullptr, amiga_fdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:2", amiga_floppies, nullptr, amiga_fdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:3", amiga_floppies, nullptr, amiga_fdc_device::floppy_formats).enable_sound(true);
 
 	// rs232
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(*this, amiga_state, rs232_rx_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(*this, amiga_state, rs232_dcd_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(*this, amiga_state, rs232_dsr_w))
-	MCFG_RS232_RI_HANDLER(WRITELINE(*this, amiga_state, rs232_ri_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(*this, amiga_state, rs232_cts_w))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(FUNC(amiga_state::rs232_rx_w));
+	rs232.dcd_handler().set(FUNC(amiga_state::rs232_dcd_w));
+	rs232.dsr_handler().set(FUNC(amiga_state::rs232_dsr_w));
+	rs232.ri_handler().set(FUNC(amiga_state::rs232_ri_w));
+	rs232.cts_handler().set(FUNC(amiga_state::rs232_cts_w));
 
 	// centronics
-	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, amiga_state, centronics_ack_w))
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, amiga_state, centronics_busy_w))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, amiga_state, centronics_perror_w))
-	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(*this, amiga_state, centronics_select_w))
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->ack_handler().set(FUNC(amiga_state::centronics_ack_w));
+	m_centronics->busy_handler().set(FUNC(amiga_state::centronics_busy_w));
+	m_centronics->perror_handler().set(FUNC(amiga_state::centronics_perror_w));
+	m_centronics->select_handler().set(FUNC(amiga_state::centronics_select_w));
 
-	// keyboard
-	MCFG_AMIGA_KEYBOARD_INTERFACE_ADD("kbd", "a500_us")
-	MCFG_AMIGA_KEYBOARD_KCLK_HANDLER(WRITELINE("cia_0", mos8520_device, cnt_w))
-	MCFG_AMIGA_KEYBOARD_KDAT_HANDLER(WRITELINE("cia_0", mos8520_device, sp_w))
-	MCFG_AMIGA_KEYBOARD_KRST_HANDLER(WRITELINE(*this, amiga_state, kbreset_w))
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
 
 	// software
-	MCFG_SOFTWARE_LIST_ADD("wb_list", "amiga_workbench")
-	MCFG_SOFTWARE_LIST_ADD("hardware_list", "amiga_hardware")
-	MCFG_SOFTWARE_LIST_ADD("apps_list", "amiga_apps")
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "amiga_flop")
-	MCFG_SOFTWARE_LIST_ADD("ocs_list", "amigaocs_flop")
+	SOFTWARE_LIST(config, "wb_list").set_original("amiga_workbench");
+	SOFTWARE_LIST(config, "hardware_list").set_original("amiga_hardware");
+	SOFTWARE_LIST(config, "apps_list").set_original("amiga_apps");
+	SOFTWARE_LIST(config, "flop_list").set_original("amiga_flop");
+	SOFTWARE_LIST(config, "ocs_list").set_original("amigaocs_flop");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(a1000_state::a1000)
 	amiga_base(config);
+
+	// keyboard
+	auto &kbd(AMIGA_KEYBOARD_INTERFACE(config, "kbd", amiga_keyboard_devices, "a1000_us"));
+	kbd.kclk_handler().set("cia_0", FUNC(mos8520_device::cnt_w));
+	kbd.kclk_handler().append("kbrst", FUNC(a1000_kbreset_device::kbclk_w));
+	kbd.kdat_handler().set("cia_0", FUNC(mos8520_device::sp_w));
+	A1000_KBRESET(config, "kbrst")
+			.set_delays(attotime::from_msec(152), attotime::from_usec(176), attotime::from_msec(704))
+			.kbrst_cb().set(FUNC(a1000_state::kbreset_w));
+
 	// main cpu
 	MCFG_DEVICE_ADD("maincpu", M68000, amiga_state::CLK_7M_PAL)
 	MCFG_DEVICE_PROGRAM_MAP(a1000_mem)
 
-	MCFG_DEVICE_ADD("overlay", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(a1000_overlay_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(22)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x200000)
+	ADDRESS_MAP_BANK(config, "overlay").set_map(&a1000_state::a1000_overlay_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
+	ADDRESS_MAP_BANK(config, "bootrom").set_map(&a1000_state::a1000_bootrom_map).set_options(ENDIANNESS_BIG, 16, 19, 0x40000);
 
-	MCFG_DEVICE_ADD("bootrom", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(a1000_bootrom_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(19)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x40000)
-
-	MCFG_SOFTWARE_LIST_ADD("a1000_list", "amiga_a1000")
+	SOFTWARE_LIST(config, "a1000_list").set_original("amiga_a1000");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(a1000_state::a1000n)
 	a1000(config);
+
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_NTSC)
-	MCFG_DEVICE_REMOVE("screen")
+	config.device_remove("screen");
 	ntsc_video(config);
 	MCFG_DEVICE_MODIFY("amiga")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_C1_NTSC)
-	MCFG_DEVICE_MODIFY("cia_0")
-	MCFG_DEVICE_CLOCK(amiga_state::CLK_E_NTSC)
-	MCFG_DEVICE_MODIFY("cia_1")
-	MCFG_DEVICE_CLOCK(amiga_state::CLK_E_NTSC)
+	m_cia_0->set_clock(amiga_state::CLK_E_NTSC);
+	m_cia_1->set_clock(amiga_state::CLK_E_NTSC);
 	MCFG_DEVICE_MODIFY("fdc")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_NTSC)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(a2000_state::a2000)
 	amiga_base(config);
+
+	// keyboard
+	auto &kbd(AMIGA_KEYBOARD_INTERFACE(config, "kbd", amiga_keyboard_devices, "a2000_us"));
+	kbd.kclk_handler().set("cia_0", FUNC(mos8520_device::cnt_w));
+	kbd.kclk_handler().append("kbrst", FUNC(a1000_kbreset_device::kbclk_w));
+	kbd.kdat_handler().set("cia_0", FUNC(mos8520_device::sp_w));
+	A1000_KBRESET(config, "kbrst")
+			.set_delays(attotime::from_msec(112), attotime::from_msec(74), attotime::from_msec(1294))
+			.kbrst_cb().set(FUNC(a2000_state::kbreset_w));
+
 	// main cpu
 	MCFG_DEVICE_ADD("maincpu", M68000, amiga_state::CLK_7M_PAL)
 	MCFG_DEVICE_PROGRAM_MAP(a2000_mem)
 
-	MCFG_DEVICE_ADD("overlay", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(overlay_512kb_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(22)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x200000)
+	ADDRESS_MAP_BANK(config, "overlay").set_map(&amiga_state::overlay_512kb_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
 
 	// real-time clock
-	MCFG_DEVICE_ADD("u65", MSM6242, XTAL(32'768))
+	MSM6242(config, m_rtc, XTAL(32'768));
 
 	// cpu slot
 	MCFG_EXPANSION_SLOT_ADD("maincpu", a2000_expansion_cards, nullptr)
@@ -1522,33 +1702,33 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(a2000_state::a2000n)
 	a2000(config);
+
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_NTSC)
-	MCFG_DEVICE_REMOVE("screen")
+	config.device_remove("screen");
 	ntsc_video(config);
 	MCFG_DEVICE_MODIFY("amiga")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_C1_NTSC)
-	MCFG_DEVICE_MODIFY("cia_0")
-	MCFG_DEVICE_CLOCK(amiga_state::CLK_E_NTSC)
-	MCFG_DEVICE_MODIFY("cia_1")
-	MCFG_DEVICE_CLOCK(amiga_state::CLK_E_NTSC)
+	m_cia_0->set_clock(amiga_state::CLK_E_NTSC);
+	m_cia_1->set_clock(amiga_state::CLK_E_NTSC);
 	MCFG_DEVICE_MODIFY("fdc")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_NTSC)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(a500_state::a500)
 	amiga_base(config);
+
+	// keyboard
+	auto &kbd(AMIGA_KEYBOARD_INTERFACE(config, "kbd", a500_keyboard_devices, "a500_us"));
+	kbd.kclk_handler().set("cia_0", FUNC(mos8520_device::cnt_w));
+	kbd.kdat_handler().set("cia_0", FUNC(mos8520_device::sp_w));
+	kbd.krst_handler().set(FUNC(amiga_state::kbreset_w));
+
 	// main cpu
 	MCFG_DEVICE_ADD("maincpu", M68000, amiga_state::CLK_7M_PAL)
 	MCFG_DEVICE_PROGRAM_MAP(a500_mem)
 
-	MCFG_DEVICE_ADD("overlay", ADDRESS_MAP_BANK, 0)
-	//MCFG_DEVICE_PROGRAM_MAP(overlay_512kb_map)
-	MCFG_DEVICE_PROGRAM_MAP(overlay_1mb_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(22)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x200000)
+	ADDRESS_MAP_BANK(config, "overlay").set_map(&amiga_state::overlay_1mb_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
 
 	// cpu slot
 	MCFG_EXPANSION_SLOT_ADD("maincpu", a500_expansion_cards, nullptr)
@@ -1560,20 +1740,28 @@ MACHINE_CONFIG_START(a500_state::a500n)
 	a500(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_NTSC)
-	MCFG_DEVICE_REMOVE("screen")
+	config.device_remove("screen");
 	ntsc_video(config);
 	MCFG_DEVICE_MODIFY("amiga")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_C1_NTSC)
-	MCFG_DEVICE_MODIFY("cia_0")
-	MCFG_DEVICE_CLOCK(amiga_state::CLK_E_NTSC)
-	MCFG_DEVICE_MODIFY("cia_1")
-	MCFG_DEVICE_CLOCK(amiga_state::CLK_E_NTSC)
+	m_cia_0->set_clock(amiga_state::CLK_E_NTSC);
+	m_cia_1->set_clock(amiga_state::CLK_E_NTSC);
 	MCFG_DEVICE_MODIFY("fdc")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_NTSC)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cdtv_state::cdtv)
 	amiga_base(config);
+
+	// keyboard
+	auto &kbd(AMIGA_KEYBOARD_INTERFACE(config, "kbd", amiga_keyboard_devices, "a2000_us"));
+	kbd.kclk_handler().set("cia_0", FUNC(mos8520_device::cnt_w));
+	kbd.kclk_handler().append("kbrst", FUNC(a1000_kbreset_device::kbclk_w));
+	kbd.kdat_handler().set("cia_0", FUNC(mos8520_device::sp_w));
+	A1000_KBRESET(config, "kbrst")
+			.set_delays(attotime::from_usec(11238), attotime::from_usec(7432), attotime::from_usec(27539))
+			.kbrst_cb().set(FUNC(a1000_state::kbreset_w));
+
 	// main cpu
 	MCFG_DEVICE_ADD("maincpu", M68000, amiga_state::CLK_7M_PAL)
 	MCFG_DEVICE_PROGRAM_MAP(cdtv_mem)
@@ -1589,59 +1777,52 @@ MACHINE_CONFIG_START(cdtv_state::cdtv)
 	MCFG_DEVICE_PROGRAM_MAP(lcd_mem)
 #endif
 
-	MCFG_DEVICE_ADD("overlay", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(overlay_1mb_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(22)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x200000)
+	ADDRESS_MAP_BANK(config, "overlay").set_map(&amiga_state::overlay_1mb_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
 
 	// standard sram
-	MCFG_NVRAM_ADD_0FILL("sram")
+	NVRAM(config, "sram", nvram_device::DEFAULT_ALL_0);
 
 	// 256kb memory card
-	MCFG_NVRAM_ADD_0FILL("memcard")
+	NVRAM(config, "memcard", nvram_device::DEFAULT_ALL_0);
 
 	// real-time clock
-	MCFG_DEVICE_ADD("u61", MSM6242, XTAL(32'768))
+	MSM6242(config, m_rtc, XTAL(32'768));
 
 	// cd-rom controller
-	MCFG_DMAC_ADD("u36", amiga_state::CLK_7M_PAL)
-	MCFG_DMAC_SCSI_READ_HANDLER(READ8(*this, cdtv_state, dmac_scsi_data_read))
-	MCFG_DMAC_SCSI_WRITE_HANDLER(WRITE8(*this, cdtv_state, dmac_scsi_data_write))
-	MCFG_DMAC_IO_READ_HANDLER(READ8(*this, cdtv_state, dmac_io_read))
-	MCFG_DMAC_IO_WRITE_HANDLER(WRITE8(*this, cdtv_state, dmac_io_write))
-	MCFG_DMAC_INT_HANDLER(WRITELINE(*this, cdtv_state, dmac_int_w))
+	AMIGA_DMAC(config, m_dmac, amiga_state::CLK_7M_PAL);
+	m_dmac->scsi_read_handler().set(FUNC(cdtv_state::dmac_scsi_data_read));
+	m_dmac->scsi_write_handler().set(FUNC(cdtv_state::dmac_scsi_data_write));
+	m_dmac->io_read_handler().set(FUNC(cdtv_state::dmac_io_read));
+	m_dmac->io_write_handler().set(FUNC(cdtv_state::dmac_io_write));
+	m_dmac->int_handler().set(FUNC(cdtv_state::dmac_int_w));
 
-	MCFG_DEVICE_ADD("u32", TPI6525, 0)
-	MCFG_TPI6525_OUT_IRQ_CB(WRITELINE(*this, cdtv_state, tpi_int_w))
-	MCFG_TPI6525_OUT_PB_CB(WRITE8(*this, cdtv_state, tpi_port_b_write))
+	tpi6525_device &tpi(TPI6525(config, "u32", 0));
+	tpi.out_irq_cb().set(FUNC(cdtv_state::tpi_int_w));
+	tpi.out_pb_cb().set(FUNC(cdtv_state::tpi_port_b_write));
 
 	// cd-rom
-	MCFG_CR511B_ADD("cdrom")
-	MCFG_CR511B_SCOR_HANDLER(WRITELINE("u32", tpi6525_device, i1_w)) MCFG_DEVCB_INVERT
-	MCFG_CR511B_STCH_HANDLER(WRITELINE("u32", tpi6525_device, i2_w)) MCFG_DEVCB_INVERT
-	MCFG_CR511B_STEN_HANDLER(WRITELINE("u32", tpi6525_device, i3_w))
-	MCFG_CR511B_XAEN_HANDLER(WRITELINE("u32", tpi6525_device, pb2_w))
-	MCFG_CR511B_DRQ_HANDLER(WRITELINE("u36", amiga_dmac_device, xdreq_w))
-	MCFG_CR511B_DTEN_HANDLER(WRITELINE("u36", amiga_dmac_device, xdreq_w))
+	CR511B(config, m_cdrom, 0);
+	m_cdrom->scor_handler().set("u32", FUNC(tpi6525_device::i1_w)).invert();
+	m_cdrom->stch_handler().set("u32", FUNC(tpi6525_device::i2_w)).invert();
+	m_cdrom->sten_handler().set("u32", FUNC(tpi6525_device::i3_w));
+	m_cdrom->xaen_handler().set("u32", FUNC(tpi6525_device::pb2_w));
+	m_cdrom->drq_handler().set("u36", FUNC(amiga_dmac_device::xdreq_w));
+	m_cdrom->dten_handler().set("u36", FUNC(amiga_dmac_device::xdreq_w));
 
 	// software
-	MCFG_SOFTWARE_LIST_ADD("cd_list", "cdtv")
+	SOFTWARE_LIST(config, "cd_list").set_original("cdtv");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cdtv_state::cdtvn)
 	cdtv(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_NTSC)
-	MCFG_DEVICE_REMOVE("screen")
+	config.device_remove("screen");
 	ntsc_video(config);
 	MCFG_DEVICE_MODIFY("amiga")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_C1_NTSC)
-	MCFG_DEVICE_MODIFY("cia_0")
-	MCFG_DEVICE_CLOCK(amiga_state::CLK_E_NTSC)
-	MCFG_DEVICE_MODIFY("cia_1")
-	MCFG_DEVICE_CLOCK(amiga_state::CLK_E_NTSC)
+	m_cia_0->set_clock(amiga_state::CLK_E_NTSC);
+	m_cia_1->set_clock(amiga_state::CLK_E_NTSC);
 	MCFG_DEVICE_MODIFY("u36")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_NTSC)
 	MCFG_DEVICE_MODIFY("fdc")
@@ -1650,105 +1831,107 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(a3000_state::a3000)
 	amiga_base(config);
+
+	// keyboard
+	auto &kbd(AMIGA_KEYBOARD_INTERFACE(config, "kbd", amiga_keyboard_devices, "a2000_us"));
+	kbd.kclk_handler().set("cia_0", FUNC(mos8520_device::cnt_w));
+	kbd.kdat_handler().set("cia_0", FUNC(mos8520_device::sp_w));
+
 	// main cpu
 	MCFG_DEVICE_ADD("maincpu", M68030, XTAL(32'000'000) / 2)
 	MCFG_DEVICE_PROGRAM_MAP(a3000_mem)
 
-	MCFG_DEVICE_ADD("overlay", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(overlay_1mb_map32)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(32)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(22)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x200000)
+	ADDRESS_MAP_BANK(config, "overlay").set_map(&amiga_state::overlay_1mb_map32).set_options(ENDIANNESS_BIG, 32, 22, 0x200000);
 
 	// real-time clock
-	MCFG_DEVICE_ADD("rtc", RP5C01, XTAL(32'768))
+	RP5C01(config, "rtc", XTAL(32'768));
 
 	// todo: zorro3 slots, super dmac, scsi
 
 	// software
-	MCFG_SOFTWARE_LIST_ADD("a3000_list", "amiga_a3000")
-	MCFG_SOFTWARE_LIST_ADD("ecs_list", "amigaecs_flop")
+	SOFTWARE_LIST(config, "a3000_list").set_original("amiga_a3000");
+	SOFTWARE_LIST(config, "ecs_list").set_original("amigaecs_flop");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(a3000_state::a3000n)
 	a3000(config);
-	MCFG_DEVICE_REMOVE("screen")
+	config.device_remove("screen");
 	ntsc_video(config);
-	MCFG_DEVICE_MODIFY("cia_0")
-	MCFG_DEVICE_CLOCK(amiga_state::CLK_E_NTSC)
-	MCFG_DEVICE_MODIFY("cia_1")
-	MCFG_DEVICE_CLOCK(amiga_state::CLK_E_NTSC)
+	m_cia_0->set_clock(amiga_state::CLK_E_NTSC);
+	m_cia_1->set_clock(amiga_state::CLK_E_NTSC);
 	MCFG_DEVICE_MODIFY("fdc")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_NTSC)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(a500p_state::a500p)
 	amiga_base(config);
+
+	// keyboard
+	auto &kbd(AMIGA_KEYBOARD_INTERFACE(config, "kbd", a500_keyboard_devices, "a500_us"));
+	kbd.kclk_handler().set("cia_0", FUNC(mos8520_device::cnt_w));
+	kbd.kdat_handler().set("cia_0", FUNC(mos8520_device::sp_w));
+	kbd.krst_handler().set(FUNC(amiga_state::kbreset_w));
+
 	// main cpu
 	MCFG_DEVICE_ADD("maincpu", M68000, amiga_state::CLK_7M_PAL)
 	MCFG_DEVICE_PROGRAM_MAP(a500p_mem)
 
-	MCFG_DEVICE_ADD("overlay", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(overlay_1mb_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(22)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x200000)
+	ADDRESS_MAP_BANK(config, "overlay").set_map(&amiga_state::overlay_1mb_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
 
 	// real-time clock
-	MCFG_DEVICE_ADD("u9", MSM6242, XTAL(32'768))
+	MSM6242(config, m_rtc, XTAL(32'768));
 
 	// cpu slot
 	MCFG_EXPANSION_SLOT_ADD("maincpu", a500_expansion_cards, nullptr)
 
 	// software
-	MCFG_SOFTWARE_LIST_ADD("ecs_list", "amigaecs_flop")
+	SOFTWARE_LIST(config, "ecs_list").set_original("amigaecs_flop");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(a500p_state::a500pn)
 	a500p(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_NTSC)
-	MCFG_DEVICE_REMOVE("screen")
+	config.device_remove("screen");
 	ntsc_video(config);
 	MCFG_DEVICE_MODIFY("amiga")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_C1_NTSC)
-	MCFG_DEVICE_MODIFY("cia_0")
-	MCFG_DEVICE_CLOCK(amiga_state::CLK_E_NTSC)
-	MCFG_DEVICE_MODIFY("cia_1")
-	MCFG_DEVICE_CLOCK(amiga_state::CLK_E_NTSC)
+	m_cia_0->set_clock(amiga_state::CLK_E_NTSC);
+	m_cia_1->set_clock(amiga_state::CLK_E_NTSC);
 	MCFG_DEVICE_MODIFY("fdc")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_NTSC)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(a600_state::a600)
 	amiga_base(config);
+
+	// keyboard
+	auto &kbd(AMIGA_KEYBOARD_INTERFACE(config, "kbd", a600_keyboard_devices, "a600_us"));
+	kbd.kclk_handler().set("cia_0", FUNC(mos8520_device::cnt_w));
+	kbd.kdat_handler().set("cia_0", FUNC(mos8520_device::sp_w));
+	kbd.krst_handler().set(FUNC(amiga_state::kbreset_w));
+
 	// main cpu
 	MCFG_DEVICE_ADD("maincpu", M68000, amiga_state::CLK_7M_PAL)
 	MCFG_DEVICE_PROGRAM_MAP(a600_mem)
 
-	MCFG_DEVICE_ADD("overlay", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(overlay_2mb_map16)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(22)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x200000)
+	ADDRESS_MAP_BANK(config, "overlay").set_map(&amiga_state::overlay_2mb_map16).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
 
-	MCFG_GAYLE_ADD("gayle", amiga_state::CLK_28M_PAL / 2, a600_state::GAYLE_ID)
-	MCFG_GAYLE_INT2_HANDLER(WRITELINE(*this, a600_state, gayle_int2_w))
-	MCFG_GAYLE_CS0_READ_HANDLER(READ16("ata", ata_interface_device, cs0_r))
-	MCFG_GAYLE_CS0_WRITE_HANDLER(WRITE16("ata", ata_interface_device, cs0_w))
-	MCFG_GAYLE_CS1_READ_HANDLER(READ16("ata", ata_interface_device, cs1_r))
-	MCFG_GAYLE_CS1_WRITE_HANDLER(WRITE16("ata", ata_interface_device, cs1_w))
+	gayle_device &gayle(GAYLE(config, "gayle", amiga_state::CLK_28M_PAL / 2));
+	gayle.set_id(a600_state::GAYLE_ID);
+	gayle.int2_handler().set(FUNC(a600_state::gayle_int2_w));
+	gayle.cs0_read_handler().set("ata", FUNC(ata_interface_device::cs0_r));
+	gayle.cs0_write_handler().set("ata", FUNC(ata_interface_device::cs0_w));
+	gayle.cs1_read_handler().set("ata", FUNC(ata_interface_device::cs1_r));
+	gayle.cs1_write_handler().set("ata", FUNC(ata_interface_device::cs1_w));
 
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, false)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("gayle", gayle_device, ide_interrupt_w))
+	ata_interface_device &ata(ATA_INTERFACE(config, "ata").options(ata_devices, "hdd", nullptr, false));
+	ata.irq_handler().set("gayle", FUNC(gayle_device::ide_interrupt_w));
 
 	// todo: pcmcia
 
 	// software
-	MCFG_SOFTWARE_LIST_ADD("ecs_list", "amigaecs_flop")
+	SOFTWARE_LIST(config, "ecs_list").set_original("amigaecs_flop");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(a600_state::a600n)
@@ -1757,48 +1940,49 @@ MACHINE_CONFIG_START(a600_state::a600n)
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_NTSC)
 	MCFG_DEVICE_MODIFY("gayle")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_28M_NTSC / 2)
-	MCFG_DEVICE_REMOVE("screen")
+	config.device_remove("screen");
 	ntsc_video(config);
 	MCFG_DEVICE_MODIFY("amiga")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_C1_NTSC)
-	MCFG_DEVICE_MODIFY("cia_0")
-	MCFG_DEVICE_CLOCK(amiga_state::CLK_E_NTSC)
-	MCFG_DEVICE_MODIFY("cia_1")
-	MCFG_DEVICE_CLOCK(amiga_state::CLK_E_NTSC)
+	m_cia_0->set_clock(amiga_state::CLK_E_NTSC);
+	m_cia_1->set_clock(amiga_state::CLK_E_NTSC);
 	MCFG_DEVICE_MODIFY("fdc")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_NTSC)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(a1200_state::a1200)
 	amiga_base(config);
+
+	// keyboard
+	auto &kbd(AMIGA_KEYBOARD_INTERFACE(config, "kbd", amiga_keyboard_devices, "a1200_us")); // FIXME: replace with Amiga 1200 devices when we have mask ROM dump
+	kbd.kclk_handler().set("cia_0", FUNC(mos8520_device::cnt_w));
+	kbd.kdat_handler().set("cia_0", FUNC(mos8520_device::sp_w));
+	kbd.krst_handler().set(FUNC(amiga_state::kbreset_w));
+
 	// main cpu
 	MCFG_DEVICE_ADD("maincpu", M68EC020, amiga_state::CLK_28M_PAL / 2)
 	MCFG_DEVICE_PROGRAM_MAP(a1200_mem)
 
-	MCFG_DEVICE_ADD("overlay", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(overlay_2mb_map32)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(32)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(22)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x200000)
+	ADDRESS_MAP_BANK(config, "overlay").set_map(&amiga_state::overlay_2mb_map32).set_options(ENDIANNESS_BIG, 32, 22, 0x200000);
 
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(amiga_state, screen_update_amiga_aga)
 	MCFG_SCREEN_NO_PALETTE
 
-	MCFG_DEVICE_REMOVE("palette")
+	config.device_remove("palette");
 
 	MCFG_VIDEO_START_OVERRIDE(amiga_state, amiga_aga)
 
-	MCFG_GAYLE_ADD("gayle", amiga_state::CLK_28M_PAL / 2, a1200_state::GAYLE_ID)
-	MCFG_GAYLE_INT2_HANDLER(WRITELINE(*this, a1200_state, gayle_int2_w))
-	MCFG_GAYLE_CS0_READ_HANDLER(READ16("ata", ata_interface_device, cs0_r))
-	MCFG_GAYLE_CS0_WRITE_HANDLER(WRITE16("ata", ata_interface_device, cs0_w))
-	MCFG_GAYLE_CS1_READ_HANDLER(READ16("ata", ata_interface_device, cs1_r))
-	MCFG_GAYLE_CS1_WRITE_HANDLER(WRITE16("ata", ata_interface_device, cs1_w))
+	gayle_device &gayle(GAYLE(config, "gayle", amiga_state::CLK_28M_PAL / 2));
+	gayle.set_id(a1200_state::GAYLE_ID);
+	gayle.int2_handler().set(FUNC(a1200_state::gayle_int2_w));
+	gayle.cs0_read_handler().set("ata", FUNC(ata_interface_device::cs0_r));
+	gayle.cs0_write_handler().set("ata", FUNC(ata_interface_device::cs0_w));
+	gayle.cs1_read_handler().set("ata", FUNC(ata_interface_device::cs1_r));
+	gayle.cs1_write_handler().set("ata", FUNC(ata_interface_device::cs1_w));
 
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, false)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("gayle", gayle_device, ide_interrupt_w))
+	ata_interface_device &ata(ATA_INTERFACE(config, "ata").options(ata_devices, "hdd", nullptr, false));
+	ata.irq_handler().set("gayle", FUNC(gayle_device::ide_interrupt_w));
 
 	// keyboard
 #if 0
@@ -1809,8 +1993,8 @@ MACHINE_CONFIG_START(a1200_state::a1200)
 	// todo: pcmcia
 
 	// software
-	MCFG_SOFTWARE_LIST_ADD("aga_list", "amigaaga_flop")
-	MCFG_SOFTWARE_LIST_ADD("ecs_list", "amigaecs_flop")
+	SOFTWARE_LIST(config, "aga_list").set_original("amigaaga_flop");
+	SOFTWARE_LIST(config, "ecs_list").set_original("amigaecs_flop");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(a1200_state::a1200n)
@@ -1819,69 +2003,67 @@ MACHINE_CONFIG_START(a1200_state::a1200n)
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_28M_NTSC / 2)
 	MCFG_DEVICE_MODIFY("gayle")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_28M_NTSC / 2)
-	MCFG_DEVICE_REMOVE("screen")
+	config.device_remove("screen");
 	ntsc_video(config);
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(amiga_state, screen_update_amiga_aga)
 	MCFG_SCREEN_NO_PALETTE
 	MCFG_DEVICE_MODIFY("amiga")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_C1_NTSC)
-	MCFG_DEVICE_MODIFY("cia_0")
-	MCFG_DEVICE_CLOCK(amiga_state::CLK_E_NTSC)
-	MCFG_DEVICE_MODIFY("cia_1")
-	MCFG_DEVICE_CLOCK(amiga_state::CLK_E_NTSC)
+	m_cia_0->set_clock(amiga_state::CLK_E_NTSC);
+	m_cia_1->set_clock(amiga_state::CLK_E_NTSC);
 	MCFG_DEVICE_MODIFY("fdc")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_NTSC)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(a4000_state::a4000)
 	amiga_base(config);
+
+	// keyboard
+	auto &kbd(AMIGA_KEYBOARD_INTERFACE(config, "kbd", amiga_keyboard_devices, "a2000_us"));
+	kbd.kclk_handler().set("cia_0", FUNC(mos8520_device::cnt_w));
+	kbd.kdat_handler().set("cia_0", FUNC(mos8520_device::sp_w));
+
 	// main cpu
 	MCFG_DEVICE_ADD("maincpu", M68040, XTAL(50'000'000) / 2)
 	MCFG_DEVICE_PROGRAM_MAP(a4000_mem)
 
-	MCFG_DEVICE_ADD("overlay", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(overlay_2mb_map32)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(32)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(22)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x200000)
+	ADDRESS_MAP_BANK(config, "overlay").set_map(&amiga_state::overlay_2mb_map32).set_options(ENDIANNESS_BIG, 32, 22, 0x200000);
 
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(amiga_state, screen_update_amiga_aga)
 	MCFG_SCREEN_NO_PALETTE
 
-	MCFG_DEVICE_REMOVE("palette")
+	config.device_remove("palette");
 
 	MCFG_VIDEO_START_OVERRIDE(amiga_state, amiga_aga)
 
 	// real-time clock
-	MCFG_DEVICE_ADD("rtc", RP5C01, XTAL(32'768))
+	RP5C01(config, "rtc", XTAL(32'768));
 
 	// ide
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, false)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, a4000_state, ide_interrupt_w))
+	ata_interface_device &ata(ATA_INTERFACE(config, "ata").options(ata_devices, "hdd", nullptr, false));
+	ata.irq_handler().set(FUNC(a4000_state::ide_interrupt_w));
 
 	// todo: zorro3
 
 	// software
-	MCFG_SOFTWARE_LIST_ADD("aga_list", "amigaaga_flop")
-	MCFG_SOFTWARE_LIST_ADD("ecs_list", "amigaecs_flop")
+	SOFTWARE_LIST(config, "aga_list").set_original("amigaaga_flop");
+	SOFTWARE_LIST(config, "ecs_list").set_original("amigaecs_flop");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(a4000_state::a4000n)
 	a4000(config);
-	MCFG_DEVICE_REMOVE("screen")
+
+	config.device_remove("screen");
 	ntsc_video(config);
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(amiga_state, screen_update_amiga_aga)
 	MCFG_SCREEN_NO_PALETTE
 	MCFG_DEVICE_MODIFY("amiga")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_C1_NTSC)
-	MCFG_DEVICE_MODIFY("cia_0")
-	MCFG_DEVICE_CLOCK(amiga_state::CLK_E_NTSC)
-	MCFG_DEVICE_MODIFY("cia_1")
-	MCFG_DEVICE_CLOCK(amiga_state::CLK_E_NTSC)
+	m_cia_0->set_clock(amiga_state::CLK_E_NTSC);
+	m_cia_1->set_clock(amiga_state::CLK_E_NTSC);
 	MCFG_DEVICE_MODIFY("fdc")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_NTSC)
 MACHINE_CONFIG_END
@@ -1889,7 +2071,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(a4000_state::a400030)
 	a4000(config);
 	// main cpu
-	MCFG_DEVICE_REMOVE("maincpu")
+	config.device_remove("maincpu");
 	MCFG_DEVICE_ADD("maincpu", M68EC030, XTAL(50'000'000) / 2)
 	MCFG_DEVICE_PROGRAM_MAP(a400030_mem)
 
@@ -1898,51 +2080,43 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(a4000_state::a400030n)
 	a400030(config);
-	MCFG_DEVICE_REMOVE("screen")
+	config.device_remove("screen");
 	ntsc_video(config);
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(amiga_state, screen_update_amiga_aga)
 	MCFG_SCREEN_NO_PALETTE
 	MCFG_DEVICE_MODIFY("amiga")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_C1_NTSC)
-	MCFG_DEVICE_MODIFY("cia_0")
-	MCFG_DEVICE_CLOCK(amiga_state::CLK_E_NTSC)
-	MCFG_DEVICE_MODIFY("cia_1")
-	MCFG_DEVICE_CLOCK(amiga_state::CLK_E_NTSC)
+	m_cia_0->set_clock(amiga_state::CLK_E_NTSC);
+	m_cia_1->set_clock(amiga_state::CLK_E_NTSC);
 	MCFG_DEVICE_MODIFY("fdc")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_NTSC)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cd32_state::cd32)
 	amiga_base(config);
+
 	// main cpu
 	MCFG_DEVICE_ADD("maincpu", M68EC020, amiga_state::CLK_28M_PAL / 2)
 	MCFG_DEVICE_PROGRAM_MAP(cd32_mem)
 
-	MCFG_DEVICE_ADD("overlay", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(overlay_2mb_map32)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(32)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(22)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x200000)
+	ADDRESS_MAP_BANK(config, "overlay").set_map(&amiga_state::overlay_2mb_map32).set_options(ENDIANNESS_BIG, 32, 22, 0x200000);
 
-	MCFG_I2CMEM_ADD("i2cmem")
-	MCFG_I2CMEM_PAGE_SIZE(16)
-	MCFG_I2CMEM_DATA_SIZE(1024)
+	I2CMEM(config, "i2cmem", 0).set_page_size(16).set_data_size(1024);
 
-	MCFG_AKIKO_ADD("akiko")
-	MCFG_AKIKO_MEM_READ_CB(READ16(*this, amiga_state, chip_ram_r))
-	MCFG_AKIKO_MEM_WRITE_CB(WRITE16(*this, amiga_state, chip_ram_w))
-	MCFG_AKIKO_INT_CB(WRITELINE(*this, cd32_state, akiko_int_w))
-	MCFG_AKIKO_SCL_HANDLER(WRITELINE("i2cmem", i2cmem_device, write_scl))
-	MCFG_AKIKO_SDA_READ_HANDLER(READLINE("i2cmem", i2cmem_device, read_sda))
-	MCFG_AKIKO_SDA_WRITE_HANDLER(WRITELINE("i2cmem", i2cmem_device, write_sda))
+	akiko_device &akiko(AKIKO(config, "akiko", 0));
+	akiko.mem_r_callback().set(FUNC(amiga_state::chip_ram_r));
+	akiko.mem_w_callback().set(FUNC(amiga_state::chip_ram_w));
+	akiko.int_callback().set(FUNC(cd32_state::akiko_int_w));
+	akiko.scl_callback().set("i2cmem", FUNC(i2cmem_device::write_scl));
+	akiko.sda_r_callback().set("i2cmem", FUNC(i2cmem_device::read_sda));
+	akiko.sda_w_callback().set("i2cmem", FUNC(i2cmem_device::write_sda));
 
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(amiga_state, screen_update_amiga_aga)
 	MCFG_SCREEN_NO_PALETTE
 
-	MCFG_DEVICE_REMOVE("palette")
+	config.device_remove("palette");
 
 	MCFG_VIDEO_START_OVERRIDE(amiga_state, amiga_aga)
 
@@ -1950,31 +2124,27 @@ MACHINE_CONFIG_START(cd32_state::cd32)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MCFG_DEVICE_MODIFY("cia_0")
-	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(*this, cd32_state, akiko_cia_0_port_a_write))
-	MCFG_MOS6526_SP_CALLBACK(NOOP)
+	m_cia_0->pa_wr_callback().set(FUNC(cd32_state::akiko_cia_0_port_a_write));
+	m_cia_0->sp_wr_callback().set_nop();
 
-	MCFG_CDROM_ADD("cdrom")
-	MCFG_CDROM_INTERFACE("cd32_cdrom")
-	MCFG_SOFTWARE_LIST_ADD("cd_list", "cd32")
-	MCFG_DEVICE_REMOVE("kbd")
+	CDROM(config, "cdrom").set_interface("cd32_cdrom");
+	SOFTWARE_LIST(config, "cd_list").set_original("cd32");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cd32_state::cd32n)
 	cd32(config);
+
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_28M_NTSC / 2)
-	MCFG_DEVICE_REMOVE("screen")
+	config.device_remove("screen");
 	ntsc_video(config);
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(amiga_state, screen_update_amiga_aga)
 	MCFG_SCREEN_NO_PALETTE
 	MCFG_DEVICE_MODIFY("amiga")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_C1_NTSC)
-	MCFG_DEVICE_MODIFY("cia_0")
-	MCFG_DEVICE_CLOCK(amiga_state::CLK_E_NTSC)
-	MCFG_DEVICE_MODIFY("cia_1")
-	MCFG_DEVICE_CLOCK(amiga_state::CLK_E_NTSC)
+	m_cia_0->set_clock(amiga_state::CLK_E_NTSC);
+	m_cia_1->set_clock(amiga_state::CLK_E_NTSC);
 	MCFG_DEVICE_MODIFY("fdc")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_NTSC)
 MACHINE_CONFIG_END
@@ -1982,7 +2152,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(a4000_state::a4000t)
 	a4000(config);
 	// main cpu
-	MCFG_DEVICE_REMOVE("maincpu")
+	config.device_remove("maincpu");
 	MCFG_DEVICE_ADD("maincpu", M68040, XTAL(50'000'000) / 2)
 	MCFG_DEVICE_PROGRAM_MAP(a4000t_mem)
 
@@ -1991,17 +2161,16 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(a4000_state::a4000tn)
 	a4000(config);
-	MCFG_DEVICE_REMOVE("screen")
+
+	config.device_remove("screen");
 	ntsc_video(config);
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(amiga_state, screen_update_amiga_aga)
 	MCFG_SCREEN_NO_PALETTE
 	MCFG_DEVICE_MODIFY("amiga")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_C1_NTSC)
-	MCFG_DEVICE_MODIFY("cia_0")
-	MCFG_DEVICE_CLOCK(amiga_state::CLK_E_NTSC)
-	MCFG_DEVICE_MODIFY("cia_1")
-	MCFG_DEVICE_CLOCK(amiga_state::CLK_E_NTSC)
+	m_cia_0->set_clock(amiga_state::CLK_E_NTSC);
+	m_cia_1->set_clock(amiga_state::CLK_E_NTSC);
 	MCFG_DEVICE_MODIFY("fdc")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_NTSC)
 MACHINE_CONFIG_END

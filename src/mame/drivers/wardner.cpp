@@ -18,7 +18,7 @@ Supported games:
 Notes:
         Basically the same video and machine hardware as Flying Shark,
           except for the Main CPU which is a Z80 here.
-        See twincobr.c machine and video drivers to complete the
+        See twincobr.cpp machine and video drivers to complete the
           hardware setup.
         To enter the "test mode", press START1 when the grid is displayed.
         Press 0 (actually P1 button 3) on startup to skip some video RAM tests
@@ -142,8 +142,8 @@ class wardner_state : public twincobr_state
 {
 public:
 	wardner_state(const machine_config &mconfig, device_type type, const char *tag)
-		: twincobr_state(mconfig, type, tag),
-		m_membank(*this, "membank")
+		: twincobr_state(mconfig, type, tag)
+		, m_membank(*this, "membank")
 	{
 	}
 
@@ -151,21 +151,22 @@ public:
 
 	void init_wardner();
 
+protected:
+	virtual void driver_start() override;
+	virtual void machine_reset() override;
+
 private:
 	required_device<address_map_bank_device> m_membank;
 
 	DECLARE_WRITE8_MEMBER(wardner_bank_w);
 
-	void DSP_io_map(address_map &map);
-	void DSP_program_map(address_map &map);
+	void dsp_io_map(address_map &map);
+	void dsp_program_map(address_map &map);
 	void main_bank_map(address_map &map);
 	void main_io_map(address_map &map);
 	void main_program_map(address_map &map);
 	void sound_io_map(address_map &map);
 	void sound_program_map(address_map &map);
-
-	virtual void driver_start() override;
-	virtual void machine_reset() override;
 };
 
 
@@ -241,14 +242,14 @@ void wardner_state::sound_io_map(address_map &map)
 
 /***************************** TMS32010 Memory Map **************************/
 
-void wardner_state::DSP_program_map(address_map &map)
+void wardner_state::dsp_program_map(address_map &map)
 {
 	map(0x000, 0x5ff).rom();
 }
 
 	/* $000 - 08F  TMS32010 Internal Data RAM in Data Address Space */
 
-void wardner_state::DSP_io_map(address_map &map)
+void wardner_state::dsp_io_map(address_map &map)
 {
 	map(0x00, 0x00).w(FUNC(wardner_state::wardner_dsp_addrsel_w));
 	map(0x01, 0x01).rw(FUNC(wardner_state::wardner_dsp_r), FUNC(wardner_state::wardner_dsp_w));
@@ -367,7 +368,7 @@ GFXDECODE_END
 
 void wardner_state::driver_start()
 {
-	/* Save-State stuff in src/machine/twincobr.c */
+	/* Save-State stuff in src/machine/twincobr.cpp */
 	twincobr_driver_savestate();
 }
 
@@ -378,76 +379,71 @@ void wardner_state::machine_reset()
 	m_membank->set_bank(0);
 }
 
-MACHINE_CONFIG_START(wardner_state::wardner)
-
+void wardner_state::wardner(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(24'000'000)/4)      /* 6MHz */
-	MCFG_DEVICE_PROGRAM_MAP(main_program_map)
-	MCFG_DEVICE_IO_MAP(main_io_map)
+	Z80(config, m_maincpu, XTAL(24'000'000) / 4);   /* 6MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &wardner_state::main_program_map);
+	m_maincpu->set_addrmap(AS_IO, &wardner_state::main_io_map);
 
-	MCFG_DEVICE_ADD("membank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(main_bank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(18)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000)
+	ADDRESS_MAP_BANK(config, "membank").set_map(&wardner_state::main_bank_map).set_options(ENDIANNESS_LITTLE, 8, 18, 0x8000);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(14'000'000)/4)     /* 3.5MHz */
-	MCFG_DEVICE_PROGRAM_MAP(sound_program_map)
-	MCFG_DEVICE_IO_MAP(sound_io_map)
+	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(14'000'000) / 4));    /* 3.5MHz */
+	audiocpu.set_addrmap(AS_PROGRAM, &wardner_state::sound_program_map);
+	audiocpu.set_addrmap(AS_IO, &wardner_state::sound_io_map);
 
-	MCFG_DEVICE_ADD("dsp", TMS32010, XTAL(14'000'000))       /* 14MHz Crystal CLKin */
-	MCFG_DEVICE_PROGRAM_MAP(DSP_program_map)
+	TMS32010(config, m_dsp, XTAL(14'000'000));       /* 14MHz Crystal CLKin */
+	m_dsp->set_addrmap(AS_PROGRAM, &wardner_state::dsp_program_map);
 	/* Data Map is internal to the CPU */
-	MCFG_DEVICE_IO_MAP(DSP_io_map)
-	MCFG_TMS32010_BIO_IN_CB(READLINE(*this, wardner_state, twincobr_BIO_r))
+	m_dsp->set_addrmap(AS_IO, &wardner_state::dsp_io_map);
+	m_dsp->bio().set(FUNC(wardner_state::twincobr_bio_r));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))      /* 100 CPU slices per frame */
+	config.m_minimum_quantum = attotime::from_hz(6000); /* 100 CPU slices per frame */
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, wardner_state, int_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, wardner_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, wardner_state, bg_ram_bank_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, wardner_state, fg_rom_bank_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, wardner_state, display_on_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch"));
+	mainlatch.q_out_cb<2>().set(FUNC(wardner_state::int_enable_w));
+	mainlatch.q_out_cb<3>().set(FUNC(wardner_state::flipscreen_w));
+	mainlatch.q_out_cb<4>().set(FUNC(wardner_state::bg_ram_bank_w));
+	mainlatch.q_out_cb<5>().set(FUNC(wardner_state::fg_rom_bank_w));
+	mainlatch.q_out_cb<6>().set(FUNC(wardner_state::display_on_w));
 
-	MCFG_DEVICE_ADD("coinlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, wardner_state, dsp_int_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, wardner_state, coin_counter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, wardner_state, coin_counter_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, wardner_state, coin_lockout_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, wardner_state, coin_lockout_2_w))
+	ls259_device &coinlatch(LS259(config, "coinlatch"));
+	coinlatch.q_out_cb<0>().set(FUNC(wardner_state::dsp_int_w));
+	coinlatch.q_out_cb<4>().set(FUNC(wardner_state::coin_counter_1_w));
+	coinlatch.q_out_cb<5>().set(FUNC(wardner_state::coin_counter_2_w));
+	coinlatch.q_out_cb<6>().set(FUNC(wardner_state::coin_lockout_1_w));
+	coinlatch.q_out_cb<7>().set(FUNC(wardner_state::coin_lockout_2_w));
 
 	/* video hardware */
-	MCFG_MC6845_ADD("crtc", HD6845, "screen", XTAL(14'000'000)/4) /* 3.5MHz measured on CLKin */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(2)
+	hd6845_device &crtc(HD6845(config, "crtc", XTAL(14'000'000)/4)); /* 3.5MHz measured on CLKin */
+	crtc.set_screen(m_screen);
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(2);
 
-	MCFG_TOAPLAN_SCU_ADD("scu", "palette", 32, 14)
+	TOAPLAN_SCU(config, m_spritegen, 0);
+	m_spritegen->set_palette(m_palette);
+	m_spritegen->set_xoffsets(32, 14);
 
-	MCFG_DEVICE_ADD("spriteram8", BUFFERED_SPRITERAM8)
+	BUFFERED_SPRITERAM8(config, m_spriteram8);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(14'000'000)/2, 446, 0, 320, 286, 0, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(wardner_state, screen_update_toaplan0)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram8", buffered_spriteram8_device, vblank_copy_rising))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, wardner_state, wardner_vblank_irq))
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	m_screen->set_raw(14_MHz_XTAL/2, 446, 0, 320, 286, 0, 240);
+	m_screen->set_screen_update(FUNC(wardner_state::screen_update_toaplan0));
+	m_screen->screen_vblank().set(m_spriteram8, FUNC(buffered_spriteram8_device::vblank_copy_rising));
+	m_screen->screen_vblank().append(FUNC(wardner_state::wardner_vblank_irq));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wardner)
-	MCFG_PALETTE_ADD("palette", 1792)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-
-	MCFG_VIDEO_START_OVERRIDE(wardner_state,toaplan0)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_wardner);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 4096);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(14'000'000)/4)
-	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL(14'000'000) / 4));
+	ymsnd.irq_handler().set_inputline("audiocpu", 0);
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 

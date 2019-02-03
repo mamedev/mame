@@ -14,7 +14,6 @@ Preliminary driver by:
 #include "includes/konamipt.h"
 
 #include "cpu/z80/z80.h"
-#include "cpu/m6809/konami.h" /* for the callback and the firq irq definition */
 #include "machine/watchdog.h"
 #include "sound/ym2151.h"
 #include "emupal.h"
@@ -195,62 +194,55 @@ WRITE8_MEMBER( aliens_state::banking_callback )
 	m_rombank->set_entry(data & 0x1f);
 }
 
-MACHINE_CONFIG_START(aliens_state::aliens)
-
+void aliens_state::aliens(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", KONAMI, XTAL(24'000'000)/2/4)       /* 052001 (verified on pcb) */
-	MCFG_DEVICE_PROGRAM_MAP(aliens_map)
-	MCFG_KONAMICPU_LINE_CB(WRITE8(*this, aliens_state, banking_callback))
+	KONAMI(config, m_maincpu, XTAL(24'000'000)/2/4); /* 052001 (verified on pcb) */
+	m_maincpu->set_addrmap(AS_PROGRAM, &aliens_state::aliens_map);
+	m_maincpu->line().set(FUNC(aliens_state::banking_callback));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))     /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(aliens_sound_map)
+	Z80(config, m_audiocpu, XTAL(3'579'545)); /* verified on pcb */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &aliens_state::aliens_sound_map);
 
-	MCFG_DEVICE_ADD("bank0000", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(bank0000_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(11)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x400)
+	ADDRESS_MAP_BANK(config, "bank0000").set_map(&aliens_state::bank0000_map).set_options(ENDIANNESS_BIG, 8, 11, 0x400);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000)/3, 528, 112, 400, 256, 16, 240) // measured 59.17
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(24'000'000)/3, 528, 112, 400, 256, 16, 240); // measured 59.17
 //  6MHz dotclock is more realistic, however needs drawing updates. replace when ready
-//  MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000)/4, 396, hbend, hbstart, 256, 16, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(aliens_state, screen_update_aliens)
-	MCFG_SCREEN_PALETTE("palette")
+//  screen.set_raw(XTAL(24'000'000)/4, 396, hbend, hbstart, 256, 16, 240);
+	screen.set_screen_update(FUNC(aliens_state::screen_update_aliens));
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 512).enable_shadows();
 
-	MCFG_DEVICE_ADD("k052109", K052109, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K052109_CB(aliens_state, tile_callback)
+	K052109(config, m_k052109, 0);
+	m_k052109->set_palette("palette");
+	m_k052109->set_tile_callback(FUNC(aliens_state::tile_callback), this);
 
-	MCFG_DEVICE_ADD("k051960", K051960, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051960_SCREEN_TAG("screen")
-	MCFG_K051960_CB(aliens_state, sprite_callback)
-	MCFG_K051960_IRQ_HANDLER(INPUTLINE("maincpu", KONAMI_IRQ_LINE))
+	K051960(config, m_k051960, 0);
+	m_k051960->set_palette("palette");
+	m_k051960->set_screen_tag("screen");
+	m_k051960->set_sprite_callback(FUNC(aliens_state::sprite_callback), this);
+	m_k051960->irq_handler().set_inputline(m_maincpu, KONAMI_IRQ_LINE);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))  /* verified on pcb */
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, aliens_state,aliens_snd_bankswitch_w))
-	MCFG_SOUND_ROUTE(0, "mono", 0.60)
-	MCFG_SOUND_ROUTE(1, "mono", 0.60)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(3'579'545)));  /* verified on pcb */
+	ymsnd.port_write_handler().set(FUNC(aliens_state::aliens_snd_bankswitch_w));
+	ymsnd.add_route(0, "mono", 0.60);
+	ymsnd.add_route(1, "mono", 0.60);
 
-	MCFG_DEVICE_ADD("k007232", K007232, XTAL(3'579'545))    /* verified on pcb */
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, aliens_state, volume_callback))
-	MCFG_SOUND_ROUTE(0, "mono", 0.20)
-	MCFG_SOUND_ROUTE(1, "mono", 0.20)
-MACHINE_CONFIG_END
+	K007232(config, m_k007232, XTAL(3'579'545));    /* verified on pcb */
+	m_k007232->port_write().set(FUNC(aliens_state::volume_callback));
+	m_k007232->add_route(0, "mono", 0.20);
+	m_k007232->add_route(1, "mono", 0.20);
+}
 
 
 /***************************************************************************

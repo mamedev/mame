@@ -25,22 +25,6 @@
 #define INH_READ            0x01
 #define INH_WRITE           0x02
 
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_A2BUS_CPU(_cputag) \
-	downcast<a2bus_device &>(*device).set_cputag(_cputag);
-
-#define MCFG_A2BUS_OUT_IRQ_CB(_devcb) \
-	devcb = &downcast<a2bus_device &>(*device).set_out_irq_callback(DEVCB_##_devcb);
-
-#define MCFG_A2BUS_OUT_NMI_CB(_devcb) \
-	devcb = &downcast<a2bus_device &>(*device).set_out_nmi_callback(DEVCB_##_devcb);
-
-#define MCFG_A2BUS_OUT_INH_CB(_devcb) \
-	devcb = &downcast<a2bus_device &>(*device).set_out_inh_callback(DEVCB_##_devcb);
-
 // 7M = XTAL(14'318'181) / 2 or XTAL(28'636'363) / 4 (for IIgs)
 static constexpr uint32_t A2BUS_7M_CLOCK = 7159090;
 
@@ -99,10 +83,11 @@ public:
 	a2bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration
-	template <typename T> void set_cputag(T &&tag) { m_maincpu.set_tag(std::forward<T>(tag)); }
-	template <class Object> devcb_base &set_out_irq_callback(Object &&cb) { return m_out_irq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_nmi_callback(Object &&cb) { return m_out_nmi_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_inh_callback(Object &&cb) { return m_out_inh_cb.set_callback(std::forward<Object>(cb)); }
+	template <typename T> void set_space(T &&tag, int spacenum) { m_maincpu_space.set_tag(std::forward<T>(tag), spacenum); }
+	auto irq_w() { return m_out_irq_cb.bind(); }
+	auto nmi_w() { return m_out_nmi_cb.bind(); }
+	auto inh_w() { return m_out_inh_cb.bind(); }
+	auto dma_w() { return m_out_dma_cb.bind(); }
 
 	void add_a2bus_card(int slot, device_a2bus_card_interface *card);
 	device_a2bus_card_interface *get_a2bus_card(int slot);
@@ -111,12 +96,10 @@ public:
 
 	void set_irq_line(int state, int slot);
 	void set_nmi_line(int state, int slot);
-	void set_maincpu_halt(int state);
+	void set_dma_line(int state);
 	void recalc_inh(int slot);
-	uint8_t dma_r(address_space &space, uint16_t offset);
-	void dma_w(address_space &space, uint16_t offset, uint8_t data);
-	uint8_t dma_nospace_r(uint16_t offset);
-	void dma_nospace_w(uint16_t offset, uint8_t data);
+	uint8_t dma_r(uint16_t offset);
+	void dma_w(uint16_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( irq_w );
 	DECLARE_WRITE_LINE_MEMBER( nmi_w );
@@ -130,12 +113,12 @@ protected:
 	virtual void device_reset() override;
 
 	// internal state
-	required_device<cpu_device> m_maincpu;
-	address_space *m_maincpu_space;
+	required_address_space m_maincpu_space;
 
 	devcb_write_line    m_out_irq_cb;
 	devcb_write_line    m_out_nmi_cb;
 	devcb_write8        m_out_inh_cb;
+	devcb_write_line    m_out_dma_cb;
 
 	device_a2bus_card_interface *m_device_list[8];
 
@@ -176,14 +159,8 @@ public:
 	void set_a2bus(a2bus_device *a2bus, const char *slottag) { m_a2bus = a2bus; m_a2bus_slottag = slottag; }
 	template <typename T> void set_onboard(T &&a2bus) { m_a2bus_finder.set_tag(std::forward<T>(a2bus)); m_a2bus_slottag = device().tag(); }
 
-	// pass through the original address space if any for debugger protection
-	// when debugging e.g. coprocessor cards (Z80 SoftCard etc).
-	uint8_t slot_dma_read(address_space &space, uint16_t offset) { return m_a2bus->dma_r(space, offset); }
-	void slot_dma_write(address_space &space, uint16_t offset, uint8_t data) { m_a2bus->dma_w(space, offset, data); }
-
-	// these versions forego that protection for when the DMA isn't coming from a debuggable CPU device
-	uint8_t slot_dma_read_no_space(uint16_t offset) { return m_a2bus->dma_nospace_r(offset); }
-	void slot_dma_write_no_space(uint16_t offset, uint8_t data) { m_a2bus->dma_nospace_w(offset, data); }
+	uint8_t slot_dma_read(uint16_t offset) { return m_a2bus->dma_r(offset); }
+	void slot_dma_write(uint16_t offset, uint8_t data) { m_a2bus->dma_w(offset, data); }
 
 protected:
 	uint32_t get_slotromspace() { return 0xc000 | (m_slot<<8); }      // return Cn00 address for this slot
@@ -194,7 +171,8 @@ protected:
 	void raise_slot_nmi() { m_a2bus->set_nmi_line(ASSERT_LINE, m_slot); }
 	void lower_slot_nmi() { m_a2bus->set_nmi_line(CLEAR_LINE, m_slot); }
 	void recalc_slot_inh() { m_a2bus->recalc_inh(m_slot); }
-	void set_maincpu_halt(int state) { m_a2bus->set_maincpu_halt(state); }
+	void raise_slot_dma() { m_a2bus->set_dma_line(ASSERT_LINE); }
+	void lower_slot_dma() { m_a2bus->set_dma_line(CLEAR_LINE); }
 
 	device_a2bus_card_interface(const machine_config &mconfig, device_t &device);
 

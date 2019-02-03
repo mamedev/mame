@@ -242,15 +242,17 @@ DEFINE_DEVICE_TYPE(UPD7201_NEW,    upd7201_new_device, "upd7201_new",    "NEC uP
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
-MACHINE_CONFIG_START(z80sio_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(CHANA_TAG, Z80SIO_CHANNEL, 0)
-	MCFG_DEVICE_ADD(CHANB_TAG, Z80SIO_CHANNEL, 0)
-MACHINE_CONFIG_END
+void z80sio_device::device_add_mconfig(machine_config &config)
+{
+	Z80SIO_CHANNEL(config, CHANA_TAG, 0);
+	Z80SIO_CHANNEL(config, CHANB_TAG, 0);
+}
 
-MACHINE_CONFIG_START(i8274_new_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(CHANA_TAG, I8274_CHANNEL, 0)
-	MCFG_DEVICE_ADD(CHANB_TAG, I8274_CHANNEL, 0)
-MACHINE_CONFIG_END
+void i8274_new_device::device_add_mconfig(machine_config &config)
+{
+	I8274_CHANNEL(config, CHANA_TAG, 0);
+	I8274_CHANNEL(config, CHANB_TAG, 0);
+}
 
 
 //**************************************************************************
@@ -355,6 +357,7 @@ z80sio_device::z80sio_device(const machine_config &mconfig, device_type type, co
 	device_z80daisy_interface(mconfig, *this),
 	m_chanA(*this, CHANA_TAG),
 	m_chanB(*this, CHANB_TAG),
+	m_hostcpu(*this, finder_base::DUMMY_TAG),
 	m_out_txd_cb{ { *this }, { *this } },
 	m_out_dtr_cb{ { *this }, { *this } },
 	m_out_rts_cb{ { *this }, { *this } },
@@ -362,8 +365,7 @@ z80sio_device::z80sio_device(const machine_config &mconfig, device_type type, co
 	m_out_sync_cb{ { *this }, { *this } },
 	m_out_int_cb(*this),
 	m_out_rxdrq_cb{ { *this }, { *this } },
-	m_out_txdrq_cb{ { *this }, { *this } },
-	m_cputag(nullptr)
+	m_out_txdrq_cb{ { *this }, { *this } }
 {
 	for (auto & elem : m_int_state)
 		elem = 0;
@@ -387,6 +389,15 @@ i8274_new_device::i8274_new_device(const machine_config &mconfig, const char *ta
 upd7201_new_device::upd7201_new_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	i8274_new_device(mconfig, UPD7201_NEW, tag, owner, clock)
 {
+}
+
+//-------------------------------------------------
+//  device_validity_check - device-specific validation
+//-------------------------------------------------
+void z80sio_device::device_validity_check(validity_checker &valid) const
+{
+	if ((m_hostcpu.finder_tag() != finder_base::DUMMY_TAG) && !m_hostcpu)
+		osd_printf_error("Host CPU configured but not found.\n");
 }
 
 //-------------------------------------------------
@@ -487,12 +498,11 @@ int z80sio_device::z80daisy_irq_ack()
 
 	// Did we not find a vector? Get the notion of a default vector from the CPU implementation
 	logerror(" - failed to find an interrupt to ack!\n");
-	if (m_cputag)
+	if (m_hostcpu)
 	{
 		// default irq vector is -1 for 68000 but 0 for z80 for example...
-		// FIXME: use an optional_device or something
-		int const ret = owner()->subdevice<cpu_device>(m_cputag)->default_irq_vector(INPUT_LINE_IRQ0);
-		LOGINT(" - failed to find an interrupt to ack [%s], returning default IRQ vector: %02x\n", m_cputag, ret);
+		int const ret = m_hostcpu->default_irq_vector(INPUT_LINE_IRQ0);
+		LOGINT(" - failed to find an interrupt to ack [%s], returning default IRQ vector: %02x\n", m_hostcpu->tag(), ret);
 		return ret;
 	}
 
@@ -556,12 +566,11 @@ int i8274_new_device::z80daisy_irq_ack()
 		logerror(" - failed to find an interrupt to ack!\n");
 	}
 
-	if (m_cputag)
+	if (m_hostcpu)
 	{
 		// default irq vector is -1 for 68000 but 0 for z80 for example...
-		// FIXME: use an optional_device or something
-		int const ret = owner()->subdevice<cpu_device>(m_cputag)->default_irq_vector(INPUT_LINE_IRQ0);
-		LOGINT(" - failed to find an interrupt to ack [%s], returning default IRQ vector: %02x\n", m_cputag, ret);
+		int const ret = m_hostcpu->default_irq_vector(INPUT_LINE_IRQ0);
+		LOGINT(" - failed to find an interrupt to ack [%s], returning default IRQ vector: %02x\n", m_hostcpu->tag(), ret);
 		return ret;
 	}
 
@@ -1440,15 +1449,22 @@ void z80sio_channel::do_sioreg_wr0(uint8_t data)
 		LOGCMD("%s Ch:%c : Null command\n", FUNCNAME, 'A' + m_index);
 		break;
 	case WR0_SEND_ABORT:
-		LOGCMD("%s Ch:%c : Send abort command\n", FUNCNAME, 'A' + m_index);
 		// TODO: what actually happens if you try this in a mode other than SDLC?
-		// FIXME: how does this interact with interrupts?
-		// For now assume it behaves like automatically sending CRC and generates a transmit interrupt when a new frame can be sent.
-		tx_setup(0xff, 8, 0, true, true);
-		m_rr0 |= RR0_TX_BUFFER_EMPTY;
-		m_rr1 &= ~RR1_ALL_SENT;
-		if ((m_wr1 & WR1_WRDY_ENABLE) && !(m_wr1 & WR1_WRDY_ON_RX_TX))
-			set_ready(false);
+		if ((m_wr4 & (WR4_STOP_BITS_MASK | WR4_SYNC_MODE_MASK)) != (WR4_STOP_BITS_SYNC | WR4_SYNC_MODE_SDLC))
+		{
+			LOGCMD("%s Ch:%c : Send abort command (not in SDLC mode, ignored)\n", FUNCNAME, 'A' + m_index);
+		}
+		else
+		{
+			LOGCMD("%s Ch:%c : Send abort command\n", FUNCNAME, 'A' + m_index);
+			// FIXME: how does this interact with interrupts?
+			// For now assume it behaves like automatically sending CRC and generates a transmit interrupt when a new frame can be sent.
+			tx_setup(0xff, 8, 0, true, true);
+			m_rr0 |= RR0_TX_BUFFER_EMPTY;
+			m_rr1 &= ~RR1_ALL_SENT;
+			if ((m_wr1 & WR1_WRDY_ENABLE) && !(m_wr1 & WR1_WRDY_ON_RX_TX))
+				set_ready(false);
+		}
 		break;
 	case WR0_RESET_EXT_STATUS:
 		reset_ext_status();

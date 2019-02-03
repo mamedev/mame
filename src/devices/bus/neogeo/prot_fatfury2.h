@@ -8,15 +8,12 @@
 
 DECLARE_DEVICE_TYPE(NG_FATFURY2_PROT, fatfury2_prot_device)
 
-#define MCFG_FATFURY2_PROT_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, NG_FATFURY2_PROT, 0)
-
 
 class fatfury2_prot_device :  public device_t
 {
 public:
 	// construction/destruction
-	fatfury2_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	fatfury2_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	DECLARE_READ16_MEMBER( protection_r );
 	DECLARE_WRITE16_MEMBER( protection_w );

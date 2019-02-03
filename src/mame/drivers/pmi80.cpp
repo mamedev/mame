@@ -176,7 +176,7 @@ MACHINE_CONFIG_START(pmi80_state::pmi80)
 
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_pmi80)
+	config.set_default_layout(layout_pmi80);
 MACHINE_CONFIG_END
 
 /* ROM definition */

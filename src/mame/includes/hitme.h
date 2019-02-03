@@ -22,13 +22,14 @@
 class hitme_state : public driver_device
 {
 public:
-	hitme_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	hitme_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_discrete(*this, "discrete"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_screen(*this, "screen") { }
+		m_screen(*this, "screen")
+	{ }
 
 	void hitme(machine_config &config);
 	void barricad(machine_config &config);

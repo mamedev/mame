@@ -3,6 +3,7 @@
 
 #include "emu.h"
 #include "i8271.h"
+#include "imagedev/floppy.h"
 
 DEFINE_DEVICE_TYPE(I8271, i8271_device, "i8271", "Intel 8271 FDC")
 
@@ -161,6 +162,24 @@ READ8_MEMBER(i8271_device::rr_r)
 void i8271_device::set_rate(int rate)
 {
 	cur_rate = rate;
+}
+
+READ8_MEMBER(i8271_device::read)
+{
+	switch(offset & 0x03) {
+	case 0x00: return sr_r(space, 0);
+	case 0x01: return rr_r(space, 0);
+	}
+	return 0xff;
+}
+
+WRITE8_MEMBER(i8271_device::write)
+{
+	switch(offset & 0x03) {
+	case 0x00: cmd_w(space, 0, data); break;
+	case 0x01: param_w(space, 0, data); break;
+	case 0x02: reset_w(space, 0, data); break;
+	}
 }
 
 READ8_MEMBER(i8271_device::data_r)
@@ -757,8 +776,8 @@ void i8271_device::start_command(int cmd)
 	case C_READ_DRIVE_STATUS:
 	{
 		floppy_info &fi = flopi[BIT(command[0], 7)];
-		rr = (get_ready(1) ? 0x40 : 0) | (fi.dev->idx_r() ? 0x10 : 0) | (fi.dev->wpt_r() ? 0 : 8) |
-				(get_ready(0) ? 4 : 0) | (fi.dev->trk00_r() ? 1 : 0);
+		rr = (get_ready(1) ? 0x40 : 0) | (fi.dev && fi.dev->idx_r() ? 0x10 : 0) | (fi.dev && fi.dev->wpt_r() ? 0 : 8) |
+				(get_ready(0) ? 4 : 0) | (fi.dev && fi.dev->trk00_r() ? 1 : 0);
 		flopi[0].ready = true;
 		flopi[1].ready = true;
 		main_phase = PHASE_IDLE;
@@ -823,8 +842,8 @@ void i8271_device::start_command(int cmd)
 			break;
 		case 0x22: {
 			floppy_info &fi = flopi[BIT(command[0], 7)];
-			rr = (get_ready(1) ? 0x40 : 0) | (fi.dev->idx_r() ? 0x10 : 0) | (fi.dev->wpt_r() ? 0 : 8) |
-					(get_ready(0) ? 4 : 0) | (fi.dev->trk00_r() ? 1 : 0);
+			rr = (get_ready(1) ? 0x40 : 0) | (fi.dev && fi.dev->idx_r() ? 0x10 : 0) | (fi.dev && fi.dev->wpt_r() ? 0 : 8) |
+					(get_ready(0) ? 4 : 0) | (fi.dev && fi.dev->trk00_r() ? 1 : 0);
 			break;
 		}
 		case 0x23:
@@ -870,8 +889,10 @@ void i8271_device::start_command(int cmd)
 		case 0x23: {
 			oport = command[2] & ~0xc0;
 			floppy_info &fi = flopi[BIT(command[0], 7)];
-			fi.dev->dir_w(BIT(command[2], 2));
-			fi.dev->stp_w(BIT(command[2], 1));
+			if (fi.dev) {
+				fi.dev->dir_w(BIT(command[2], 2));
+				fi.dev->stp_w(BIT(command[2], 1));
+			}
 			opt_cb(BIT(command[2], 5));
 			hdl_cb(BIT(command[2], 3));
 			break;

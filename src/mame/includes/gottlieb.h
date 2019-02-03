@@ -42,7 +42,7 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
-		, m_generic_paletteram_8(*this, "paletteram")
+		, m_paletteram(*this, "paletteram")
 		, m_track_x(*this, "TRACKX")
 		, m_track_y(*this, "TRACKY")
 		, m_leds(*this, "led%u", 0U)
@@ -67,7 +67,7 @@ public:
 	void init_stooges();
 	void init_qbert();
 	void init_qbertqub();
-	
+
 	DECLARE_CUSTOM_INPUT_MEMBER(analog_delta_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(stooges_joystick_r);
 
@@ -82,8 +82,8 @@ private:
 
 	void qbert_knocker(uint8_t knock);
 
-	DECLARE_WRITE8_MEMBER(gottlieb_analog_reset_w);
-	DECLARE_WRITE8_MEMBER(general_output_w);
+	DECLARE_WRITE8_MEMBER(analog_reset_w);
+	void general_output_w(u8 data);
 	DECLARE_WRITE8_MEMBER(reactor_output_w);
 	DECLARE_WRITE8_MEMBER(stooges_output_w);
 	DECLARE_WRITE8_MEMBER(qbertqub_output_w);
@@ -91,17 +91,17 @@ private:
 	DECLARE_READ8_MEMBER(laserdisc_status_r);
 	DECLARE_WRITE8_MEMBER(laserdisc_select_w);
 	DECLARE_WRITE8_MEMBER(laserdisc_command_w);
-	DECLARE_WRITE8_MEMBER(gottlieb_sh_w);
-	DECLARE_WRITE8_MEMBER(gottlieb_paletteram_w);
-	DECLARE_WRITE8_MEMBER(gottlieb_video_control_w);
-	DECLARE_WRITE8_MEMBER(gottlieb_laserdisc_video_control_w);
-	DECLARE_WRITE8_MEMBER(gottlieb_videoram_w);
-	DECLARE_WRITE8_MEMBER(gottlieb_charram_w);
+	void sound_w(u8 data);
+	void palette_w(offs_t offset, u8 data);
+	void video_control_w(u8 data);
+	void laserdisc_video_control_w(u8 data);
+	DECLARE_WRITE8_MEMBER(videoram_w);
+	DECLARE_WRITE8_MEMBER(charram_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_screwloo_bg_tile_info);
 	DECLARE_VIDEO_START(screwloo);
-	uint32_t screen_update_gottlieb(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(gottlieb_interrupt);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(interrupt);
 	TIMER_CALLBACK_MEMBER(laserdisc_philips_callback);
 	TIMER_CALLBACK_MEMBER(laserdisc_bit_off_callback);
 	TIMER_CALLBACK_MEMBER(laserdisc_bit_callback);
@@ -134,7 +134,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<uint8_t> m_generic_paletteram_8;
+	required_shared_ptr<uint8_t> m_paletteram;
 
 	optional_ioport m_track_x;
 	optional_ioport m_track_y;

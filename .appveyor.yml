@@ -1,0 +1,25 @@
+version: 1.0.{build}
+image:
+  - Visual Studio 2017
+  - Visual Studio 2017 Preview
+  - Visual Studio 2019 Preview
+  - Previous Visual Studio 2017
+
+shallow_clone: true
+clone_depth: 1
+
+install:
+  - set "PATH=C:\msys64\usr\bin;C:\msys64\mingw64\bin;C:\Windows\System32;C:\Windows;%PATH%"
+  - set MSYSTEM=MINGW64
+  - set PreferredToolArchitecture=x64
+  
+build_script:
+  - bash -lc "exec 0</dev/null && cd $APPVEYOR_BUILD_FOLDER && make SUBTARGET=tiny PTR64=1 TOOLS=1 OPTIMIZE=0 vs2017 -j4"
+  - msbuild "build\projects\windows\mametiny\vs2017\mametiny.sln" /m /p:ContinueOnError=false /p:StopOnFirstFailure=true /property:Configuration=Debug /property:Platform=x64 /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+
+test_script:
+  - \projects\mame\mametiny64d.exe -validate
+
+after_test:
+  - 7z a mametiny64d-appveyor-%APPVEYOR_REPO_BRANCH%-%APPVEYOR_REPO_COMMIT%-%APPVEYOR_BUILD_NUMBER%.7z %APPVEYOR_BUILD_FOLDER%\*.exe %APPVEYOR_BUILD_FOLDER%\artwork %APPVEYOR_BUILD_FOLDER%\bgfx %APPVEYOR_BUILD_FOLDER%\ctrlr %APPVEYOR_BUILD_FOLDER%\docs %APPVEYOR_BUILD_FOLDER%\hash %APPVEYOR_BUILD_FOLDER%\hlsl %APPVEYOR_BUILD_FOLDER%\ini %APPVEYOR_BUILD_FOLDER%\language %APPVEYOR_BUILD_FOLDER%\nl_examples %APPVEYOR_BUILD_FOLDER%\plugins %APPVEYOR_BUILD_FOLDER%\roms %APPVEYOR_BUILD_FOLDER%\samples
+  - appveyor PushArtifact mametiny64d-appveyor-%APPVEYOR_REPO_BRANCH%-%APPVEYOR_REPO_COMMIT%-%APPVEYOR_BUILD_NUMBER%.7z

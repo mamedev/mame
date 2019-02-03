@@ -23,42 +23,42 @@
 #include "includes/dynax.h"
 
 // Log Blitter
-#define VERBOSE 0
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
+//#define VERBOSE 1
+#include "logmacro.h"
 
 
-/* x B01234 G01234 R01234 */
-PALETTE_INIT_MEMBER(dynax_state,sprtmtch)
+// x B01234 G01234 R01234
+void dynax_state::sprtmtch_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
+	uint8_t const *const color_prom = memregion("proms")->base();
 	if (!color_prom)
 		return;
 
 	for (int i = 0; i < palette.entries(); i++)
 	{
-		int x = (color_prom[i] << 8) + color_prom[0x200 + i];
-		/* The bits are in reverse order! */
-		int r = bitswap<8>((x >>  0) & 0x1f, 7, 6, 5, 0, 1, 2, 3, 4);
-		int g = bitswap<8>((x >>  5) & 0x1f, 7, 6, 5, 0, 1, 2, 3, 4);
-		int b = bitswap<8>((x >> 10) & 0x1f, 7, 6, 5, 0, 1, 2, 3, 4);
+		int const x = (color_prom[i] << 8) | color_prom[0x200 + i];
+		// The bits are in reverse order!
+		int const r = bitswap<5>((x >>  0) & 0x1f, 0, 1, 2, 3, 4);
+		int const g = bitswap<5>((x >>  5) & 0x1f, 0, 1, 2, 3, 4);
+		int const b = bitswap<5>((x >> 10) & 0x1f, 0, 1, 2, 3, 4);
 		palette.set_pen_color(i, pal5bit(r), pal5bit(g), pal5bit(b));
 	}
 }
 
-/* x xB0123 xG0123 xR0123 */
-PALETTE_INIT_MEMBER(dynax_state,janyuki)
+// x xB0123 xG0123 xR0123
+void dynax_state::janyuki_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
+	uint8_t const *const color_prom = memregion("proms")->base();
 	if (!color_prom)
 		return;
 
 	for (int i = 0; i < palette.entries(); i++)
 	{
-		int x = (color_prom[i] << 8) + color_prom[0x200 + i];
-		/* The bits are in reverse order! */
-		int r = bitswap<8>((x >>  0) & 0x0f, 7, 6, 5, 4, 0, 1, 2, 3);
-		int g = bitswap<8>((x >>  5) & 0x0f, 7, 6, 5, 4, 0, 1, 2, 3);
-		int b = bitswap<8>((x >> 10) & 0x0f, 7, 6, 5, 4, 0, 1, 2, 3);
+		int const x = (color_prom[i] << 8) + color_prom[0x200 + i];
+		// The bits are in reverse order!
+		int const r = bitswap<4>((x >>  0) & 0x0f, 0, 1, 2, 3);
+		int const g = bitswap<4>((x >>  5) & 0x0f, 0, 1, 2, 3);
+		int const b = bitswap<4>((x >> 10) & 0x0f, 0, 1, 2, 3);
 		palette.set_pen_color(i, pal4bit(r), pal4bit(g), pal4bit(b));
 	}
 }
@@ -95,13 +95,13 @@ WRITE8_MEMBER(dynax_state::dynax_blit_dest_w)
 	if (m_layer_layout == LAYOUT_HNORIDUR)
 		m_blit_dest = bitswap<8>(m_blit_dest ^ 0x0f, 7, 6, 5, 4, 0, 1, 2, 3);
 
-	LOG(("D=%02X ", data));
+	LOG("D=%02X ", data);
 }
 
 WRITE8_MEMBER(dynax_state::dynax_blit2_dest_w)
 {
 	m_blit2_dest = data;
-	LOG(("D'=%02X ", data));
+	LOG("D'=%02X ", data);
 }
 
 WRITE8_MEMBER(dynax_state::tenkai_blit_dest_w)
@@ -123,7 +123,7 @@ WRITE8_MEMBER(dynax_state::mjembase_blit_dest_w)
 WRITE8_MEMBER(dynax_state::dynax_blit_backpen_w)
 {
 	m_blit_backpen = data;
-	LOG(("B=%02X ", data));
+	LOG("B=%02X ", data);
 }
 
 
@@ -134,13 +134,13 @@ WRITE8_MEMBER(dynax_state::dynax_blit_palette01_w)
 		m_blit_palettes = (m_blit_palettes & 0x00ff) | ((data & 0x0f) << 12) | ((data & 0xf0) << 4);
 	else
 		m_blit_palettes = (m_blit_palettes & 0xff00) | data;
-	LOG(("P01=%02X ", data));
+	LOG("P01=%02X ", data);
 }
 
 WRITE8_MEMBER(dynax_state::tenkai_blit_palette01_w)
 {
 	m_blit_palettes = (m_blit_palettes & 0xff00) | data;
-	LOG(("P01=%02X ", data));
+	LOG("P01=%02X ", data);
 }
 
 
@@ -151,7 +151,7 @@ WRITE8_MEMBER(dynax_state::dynax_blit_palette45_w)
 		m_blit2_palettes = (m_blit2_palettes & 0x00ff) | ((data & 0x0f) << 12) | ((data & 0xf0) << 4);
 	else
 		m_blit2_palettes = (m_blit2_palettes & 0xff00) | data;
-	LOG(("P45=%02X ", data));
+	LOG("P45=%02X ", data);
 }
 
 
@@ -162,13 +162,13 @@ WRITE8_MEMBER(dynax_state::dynax_blit_palette23_w)
 		m_blit_palettes = (m_blit_palettes & 0xff00) | ((data & 0x0f) << 4) | ((data & 0xf0) >> 4);
 	else
 		m_blit_palettes = (m_blit_palettes & 0x00ff) | (data << 8);
-	LOG(("P23=%02X ", data));
+	LOG("P23=%02X ", data);
 }
 
 WRITE8_MEMBER(dynax_state::tenkai_blit_palette23_w)
 {
 	m_blit_palettes = (m_blit_palettes & 0x00ff) | ((data & 0x0f) << 12) | ((data & 0xf0) << 4);
-	LOG(("P23=%02X ", data));
+	LOG("P23=%02X ", data);
 }
 
 WRITE8_MEMBER(dynax_state::mjembase_blit_palette23_w)
@@ -184,7 +184,7 @@ WRITE8_MEMBER(dynax_state::dynax_blit_palette67_w)
 		m_blit2_palettes = (m_blit2_palettes & 0xff00) | ((data & 0x0f) << 4) | ((data & 0xf0) >> 4);
 	else
 		m_blit2_palettes = (m_blit2_palettes & 0x00ff) | (data << 8);
-	LOG(("P67=%02X ", data));
+	LOG("P67=%02X ", data);
 }
 
 
@@ -192,13 +192,13 @@ WRITE8_MEMBER(dynax_state::dynax_blit_palette67_w)
 WRITE_LINE_MEMBER(dynax_state::blit_palbank_w)
 {
 	m_blit_palbank = state;
-	LOG(("PB=%d ", state));
+	LOG("PB=%d ", state);
 }
 
 WRITE_LINE_MEMBER(dynax_state::blit2_palbank_w)
 {
 	m_blit2_palbank = state;
-	LOG(("PB'=%d ", state));
+	LOG("PB'=%d ", state);
 }
 
 WRITE8_MEMBER(dynax_state::hnoridur_palbank_w)
@@ -212,7 +212,7 @@ WRITE8_MEMBER(dynax_state::hnoridur_palbank_w)
 WRITE_LINE_MEMBER(dynax_state::layer_half_w)
 {
 	m_hanamai_layer_half = !state;
-	LOG(("H=%d ", state));
+	LOG("H=%d ", state);
 }
 
 
@@ -220,7 +220,7 @@ WRITE_LINE_MEMBER(dynax_state::layer_half_w)
 WRITE_LINE_MEMBER(dynax_state::layer_half2_w)
 {
 	m_hnoridur_layer_half2 = !state;
-	LOG(("H2=%d ", state));
+	LOG("H2=%d ", state);
 }
 
 WRITE_LINE_MEMBER(dynax_state::mjdialq2_blit_dest0_w)
@@ -242,7 +242,7 @@ WRITE_LINE_MEMBER(dynax_state::mjdialq2_blit_dest1_w)
 WRITE8_MEMBER(dynax_state::dynax_layer_enable_w)
 {
 	m_layer_enable = data;
-	LOG(("E=%02X ", data));
+	LOG("E=%02X ", data);
 }
 
 WRITE8_MEMBER(dynax_state::jantouki_layer_enable_w)
@@ -270,7 +270,7 @@ WRITE_LINE_MEMBER(dynax_state::mjdialq2_layer1_enable_w)
 WRITE_LINE_MEMBER(dynax_state::flipscreen_w)
 {
 	m_flipscreen = state;
-	LOG(("F=%d ", state));
+	LOG("F=%d ", state);
 }
 
 
@@ -280,14 +280,14 @@ WRITE8_MEMBER(dynax_state::dynax_blit_romregion_w)
 {
 	if (data < 8)
 		m_blitter->set_rom_bank(data);
-	LOG(("GFX%X ", data + 1));
+	LOG("GFX%X ", data + 1);
 }
 
 WRITE8_MEMBER(dynax_state::dynax_blit2_romregion_w)
 {
 	if (data + 1 < 8)
 		m_blitter2->set_rom_bank(data);
-	LOG(("GFX%X' ", data + 2));
+	LOG("GFX%X' ", data + 2);
 }
 
 
@@ -748,7 +748,7 @@ void dynax_state::jantouki_copylayer( bitmap_ind16 &bitmap, const rectangle &cli
 			uint16_t *dst;
 			uint16_t *dstbase = &bitmap.pix16(sy);
 
-			if ((sy < cliprect.min_y) || (sy > cliprect.max_y))
+			if ((sy < cliprect.top()) || (sy > cliprect.bottom()))
 			{
 				src1 += 256;
 				src2 += 256;
@@ -912,7 +912,7 @@ int dynax_state::debug_viewer(bitmap_ind16 &bitmap, const rectangle &cliprect )
 		if (m_layer_layout != LAYOUT_MJDIALQ2)
 			memset(m_pixmap[0][1].get(), 0, sizeof(uint8_t) * 0x100 * 0x100);
 		for (m_hanamai_layer_half = 0; m_hanamai_layer_half < 2; m_hanamai_layer_half++)
-			blitter_drawgfx(0, 1, m_blitter_gfx, i, 0, cliprect.min_x, cliprect.min_y, 3, 0);
+			blitter_drawgfx(0, 1, m_blitter_gfx, i, 0, cliprect.left(), cliprect.top(), 3, 0);
 
 		if (m_layer_layout != LAYOUT_MJDIALQ2)
 			hanamai_copylayer(bitmap, cliprect, 0);

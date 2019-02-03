@@ -2,7 +2,7 @@
 // copyright-holders:Robbbert
 // PINBALL
 // Skeleton driver for early Inder pinballs on "Indertronic B-1" hardware.
-// Known pinballs to be dumped: Topaz (1979), Skateboard (1980)
+// Known pinballs to be dumped: Skateboard (1980)
 // Hardware listing and ROM definitions from PinMAME.
 
 /*
@@ -197,21 +197,22 @@ WRITE_LINE_MEMBER( inderp_state::clock_tick )
 		m_maincpu->set_input_line(M6504_IRQ_LINE, ASSERT_LINE);
 }
 
-MACHINE_CONFIG_START(inderp_state::inderp)
+void inderp_state::inderp(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6504, 434000) // possible calculation of frequency-derived time constant 100k res and 10pf cap
-	MCFG_DEVICE_PROGRAM_MAP(maincpu_map)
+	M6504(config, m_maincpu, 434000); // possible calculation of frequency-derived time constant 100k res and 10pf cap
+	m_maincpu->set_addrmap(AS_PROGRAM, &inderp_state::maincpu_map);
 
-	MCFG_DEVICE_ADD("cpoint_clock", CLOCK, 200) // crosspoint detector
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, inderp_state, clock_tick))
+	clock_device &cpoint_clock(CLOCK(config, "cpoint_clock", 200)); // crosspoint detector
+	cpoint_clock.signal_handler().set(FUNC(inderp_state::clock_tick));
 
 	/* video hardware */
-	//MCFG_DEFAULT_LAYOUT()
+	//config.set_default_layout()
 
 	/* sound hardware */
 	//discrete ?
 	genpin_audio(config);
-MACHINE_CONFIG_END
+}
 
 
 ROM_START(centauri)
@@ -232,6 +233,23 @@ ROM_START(centauri2)
 	ROM_RELOAD(0x1400, 0x0400)
 ROM_END
 
+ROM_START(topaz)
+	ROM_REGION(0x1800, "roms", 0)
+	ROM_LOAD("topaz0.bin", 0x0400, 0x0400, CRC(d047aee0) SHA1(b2bc2e9fb088006fd3b7eb080feaa1eac479af58))
+	ROM_LOAD("topaz1.bin", 0x0800, 0x0400, CRC(72a423c2) SHA1(e3ba5d581739fc0871901f861a7692fd86e0f6aa))
+	ROM_LOAD("topaz2.bin", 0x0c00, 0x0400, CRC(b8d2e7c6) SHA1(e19bec04fab15536fea51c4298c6a4cb3817630c))
+ROM_END
+
+ROM_START(skatebrd)
+	ROM_REGION(0x1800, "roms", 0)
+	ROM_LOAD("skate2.bin",  0x0000, 0x0800, CRC(ee9b4c4c) SHA1(1a8b2ef8dfead18bfc62e85474dab2838b73ce08))
+	ROM_LOAD("skate3.bin",  0x0800, 0x0400, CRC(58e181fe) SHA1(f54c8099100d0c96dc2ddbae8db9293f8581d459))
+	ROM_RELOAD(0x0c00, 0x0400)
+	ROM_LOAD("skate4.bin",  0x1000, 0x0400, CRC(fcdccffe) SHA1(a2db53f7bc555d705aa894e62307590fd74067dd))
+	ROM_RELOAD(0x1400, 0x0400)
+ROM_END
 
 GAME( 1979, centauri,  0,        inderp, inderp, inderp_state, empty_init, ROT0, "Inder", "Centaur (Inder)",         MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1979, centauri2, centauri, inderp, inderp, inderp_state, empty_init, ROT0, "Inder", "Centaur (alternate set)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1979, topaz,     0,        inderp, inderp, inderp_state, empty_init, ROT0, "Inder", "Topaz (Inder)",           MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1980, skatebrd,  0,        inderp, inderp, inderp_state, empty_init, ROT0, "Inder", "Skate Board (Inder)",     MACHINE_IS_SKELETON_MECHANICAL )

@@ -1,19 +1,24 @@
 // license:BSD-3-Clause
 // copyright-holders:Howie Cohen, Frank Palazzolo, Alex Pasadyn, David Haywood, Phil Stroffolino, Uki
+#ifndef MAME_INCLUDES_NOVA2001_H
+#define MAME_INCLUDES_NOVA2001_H
+
+#pragma once
 
 #include "emupal.h"
 
 class nova2001_state : public driver_device
 {
 public:
-	nova2001_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	nova2001_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_fg_videoram(*this, "fg_videoram"),
 		m_bg_videoram(*this, "bg_videoram"),
-		m_spriteram(*this, "spriteram")  { }
+		m_spriteram(*this, "spriteram")
+	{ }
 
 	void raiders5(machine_config &config);
 	void ninjakun(machine_config &config);
@@ -51,8 +56,8 @@ private:
 	DECLARE_WRITE8_MEMBER(pkunwar_flipscreen_w);
 
 	DECLARE_VIDEO_START(nova2001);
-	DECLARE_PALETTE_INIT(nova2001);
-	DECLARE_PALETTE_DECODER(BBGGRRII);
+	void nova2001_palette(palette_device &palette) const;
+	static rgb_t BBGGRRII(uint32_t raw);
 	DECLARE_MACHINE_START(ninjakun);
 	DECLARE_VIDEO_START(ninjakun);
 	DECLARE_VIDEO_START(pkunwar);
@@ -82,3 +87,5 @@ private:
 	void raiders5_cpu2_map(address_map &map);
 	void raiders5_io(address_map &map);
 };
+
+#endif // MAME_INCLUDES_NOVA2001_H

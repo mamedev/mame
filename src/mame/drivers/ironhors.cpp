@@ -47,9 +47,9 @@ WRITE8_MEMBER(ironhors_state::sh_irqtrigger_w)
 
 WRITE8_MEMBER(ironhors_state::filter_w)
 {
-	m_disc_ih->write(space, NODE_11, (data & 0x04) >> 2);
-	m_disc_ih->write(space, NODE_12, (data & 0x02) >> 1);
-	m_disc_ih->write(space, NODE_13, (data & 0x01) >> 0);
+	m_disc_ih->write(NODE_11, (data & 0x04) >> 2);
+	m_disc_ih->write(NODE_12, (data & 0x02) >> 1);
+	m_disc_ih->write(NODE_13, (data & 0x01) >> 0);
 }
 
 /*************************************
@@ -383,7 +383,7 @@ MACHINE_CONFIG_START(ironhors_state::ironhors)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", MC6809E, 18432000/6)        /* 3.072 MHz??? mod by Shingo Suzuki 1999/10/15 */
 	MCFG_DEVICE_PROGRAM_MAP(master_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ironhors_state, ironhors_scanline_tick, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(ironhors_state::ironhors_scanline_tick), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD("soundcpu", Z80, 18432000/6)      /* 3.072 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(slave_map)
@@ -392,32 +392,29 @@ MACHINE_CONFIG_START(ironhors_state::ironhors)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-//	MCFG_SCREEN_REFRESH_RATE(61)
-//	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-//	MCFG_SCREEN_SIZE(32*8, 32*8)
-//	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
+//  MCFG_SCREEN_REFRESH_RATE(61)
+//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+//  MCFG_SCREEN_SIZE(32*8, 32*8)
+//  MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_RAW_PARAMS(18432000/4,296,8,256-8,255,16,240) // pixel clock is a guesswork
 
 	MCFG_SCREEN_UPDATE_DRIVER(ironhors_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ironhors)
-	MCFG_PALETTE_ADD("palette", 16*8*16+16*8*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(ironhors_state, ironhors)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ironhors);
+	PALETTE(config, m_palette, FUNC(ironhors_state::ironhors_palette), 16*8*16+16*8*16, 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ym2203", YM2203, 18432000/6)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, ironhors_state, filter_w))
-
-	MCFG_SOUND_ROUTE(0, "disc_ih", 1.0, 0)
-	MCFG_SOUND_ROUTE(1, "disc_ih", 1.0, 1)
-	MCFG_SOUND_ROUTE(2, "disc_ih", 1.0, 2)
-	MCFG_SOUND_ROUTE(3, "disc_ih", 1.0, 3)
+	ym2203_device &ym2203(YM2203(config, "ym2203", 18432000/6));
+	ym2203.port_a_write_callback().set(FUNC(ironhors_state::filter_w));
+	ym2203.add_route(0, "disc_ih", 1.0, 0);
+	ym2203.add_route(1, "disc_ih", 1.0, 1);
+	ym2203.add_route(2, "disc_ih", 1.0, 2);
+	ym2203.add_route(3, "disc_ih", 1.0, 3);
 
 	MCFG_DEVICE_ADD("disc_ih", DISCRETE, ironhors_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -450,21 +447,18 @@ MACHINE_CONFIG_START(ironhors_state::farwest)
 
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(farwest_master_map)
-	MCFG_DEVICE_MODIFY("scantimer")
-	MCFG_TIMER_DRIVER_CALLBACK(ironhors_state, farwest_scanline_tick)
+	subdevice<timer_device>("scantimer")->set_callback(FUNC(ironhors_state::farwest_scanline_tick));
 
 	MCFG_DEVICE_MODIFY("soundcpu")
 	MCFG_DEVICE_PROGRAM_MAP(farwest_slave_map)
 	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_IO)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_farwest)
+	m_gfxdecode->set_info(gfx_farwest);
 	MCFG_VIDEO_START_OVERRIDE(ironhors_state,farwest)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(ironhors_state, screen_update_farwest)
 
-	MCFG_DEVICE_MODIFY("ym2203")
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, ironhors_state, farwest_soundlatch_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, ironhors_state, filter_w))
+	subdevice<ym2203_device>("ym2203")->port_b_read_callback().set(FUNC(ironhors_state::farwest_soundlatch_r));
 MACHINE_CONFIG_END
 
 

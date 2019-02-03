@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "mips3fe.h"
 #include "mips3com.h"
+#include "ps2vu.h"
 
 
 //**************************************************************************

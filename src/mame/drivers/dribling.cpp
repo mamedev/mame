@@ -148,9 +148,9 @@ WRITE8_MEMBER(dribling_state::shr_w)
 READ8_MEMBER(dribling_state::ioread)
 {
 	if (offset & 0x08)
-		return m_ppi8255_0->read(space, offset & 3);
+		return m_ppi8255_0->read(offset & 3);
 	else if (offset & 0x10)
-		return m_ppi8255_1->read(space, offset & 3);
+		return m_ppi8255_1->read(offset & 3);
 	return 0xff;
 }
 
@@ -158,9 +158,9 @@ READ8_MEMBER(dribling_state::ioread)
 WRITE8_MEMBER(dribling_state::iowrite)
 {
 	if (offset & 0x08)
-		m_ppi8255_0->write(space, offset & 3, data);
+		m_ppi8255_0->write(offset & 3, data);
 	else if (offset & 0x10)
-		m_ppi8255_1->write(space, offset & 3, data);
+		m_ppi8255_1->write(offset & 3, data);
 	else if (offset & 0x40)
 	{
 		m_dr = m_ds;
@@ -276,18 +276,18 @@ MACHINE_CONFIG_START(dribling_state::dribling)
 	MCFG_DEVICE_IO_MAP(io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dribling_state,  dribling_irq_gen)
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, dribling_state, dsr_r))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, dribling_state, input_mux0_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, dribling_state, misc_w))
+	I8255A(config, m_ppi8255_0);
+	m_ppi8255_0->in_pa_callback().set(FUNC(dribling_state::dsr_r));
+	m_ppi8255_0->in_pb_callback().set(FUNC(dribling_state::input_mux0_r));
+	m_ppi8255_0->out_pc_callback().set(FUNC(dribling_state::misc_w));
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, dribling_state, sound_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, dribling_state, pb_w))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN0"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, dribling_state, shr_w))
+	I8255A(config, m_ppi8255_1);
+	m_ppi8255_1->out_pa_callback().set(FUNC(dribling_state::sound_w));
+	m_ppi8255_1->out_pb_callback().set(FUNC(dribling_state::pb_w));
+	m_ppi8255_1->in_pc_callback().set_ioport("IN0");
+	m_ppi8255_1->out_pc_callback().set(FUNC(dribling_state::shr_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -299,8 +299,7 @@ MACHINE_CONFIG_START(dribling_state::dribling)
 	MCFG_SCREEN_UPDATE_DRIVER(dribling_state, screen_update_dribling)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(dribling_state, dribling)
+	PALETTE(config, "palette", FUNC(dribling_state::dribling_palette), 256);
 
 	/* sound hardware */
 MACHINE_CONFIG_END

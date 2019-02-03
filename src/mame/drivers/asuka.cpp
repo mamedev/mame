@@ -198,13 +198,13 @@ Earthjkr: Wrong screen size? Left edge of green blueprints in
 attract looks like it's incorrectly off screen.
 
 Cadash: Hooks for twin arcade machine setup: will involve emulating an extra
-microcontroller, the 07 rom might be the program for it. Cadash background
+microcontroller, the 07 ROM might be the program for it. Cadash background
 colors don't reinitialize properly with save states.
 
 Galmedes: Test mode has select1/2 stuck at on.
 
 Eto: $76d0 might be a protection check? It reads to and writes from
-the prog rom. Doesn't seem to cause problems though.
+the program ROM. Doesn't seem to cause problems though.
 
 DIP locations verified for:
     - bonzeadv (manual)
@@ -736,6 +736,15 @@ static INPUT_PORTS_START( earthjkr )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SWB:8" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( earthjkrp )
+	PORT_INCLUDE(asuka)
+
+	PORT_MODIFY("DSWB")
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SWB:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SWB:8" )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( eto )
 	PORT_INCLUDE(asuka)
 	/* DSWA: 0x300000 -> 0x200914 */
@@ -837,337 +846,333 @@ WRITE8_MEMBER(asuka_state::counters_w)
 	machine().bookkeeping().coin_counter_w(0, data & 0x10);
 }
 
-MACHINE_CONFIG_START(asuka_state::bonzeadv)
-
+void asuka_state::bonzeadv(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)/2)    /* checked on PCB */
-	MCFG_DEVICE_PROGRAM_MAP(bonzeadv_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", asuka_state,  bonze_interrupt)
+	M68000(config, m_maincpu, XTAL(16'000'000)/2);    /* checked on PCB */
+	m_maincpu->set_addrmap(AS_PROGRAM, &asuka_state::bonzeadv_map);
+	m_maincpu->set_vblank_int("screen", FUNC(asuka_state::bonze_interrupt));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(16'000'000)/4)    /* sound CPU, also required for test mode */
-	MCFG_DEVICE_PROGRAM_MAP(bonzeadv_z80_map)
+	Z80(config, m_audiocpu, XTAL(16'000'000)/4);    /* sound CPU, also required for test mode */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &asuka_state::bonzeadv_z80_map);
 
-	MCFG_TAITO_CCHIP_ADD("cchip", XTAL(12'000'000)) /* 12MHz OSC near C-Chip */
-	MCFG_CCHIP_IN_PORTA_CB(IOPORT("800007"))
-	MCFG_CCHIP_IN_PORTB_CB(IOPORT("800009"))
-	MCFG_CCHIP_IN_PORTC_CB(IOPORT("80000B"))
-	MCFG_CCHIP_IN_PORTAD_CB(IOPORT("80000D"))
-	MCFG_CCHIP_OUT_PORTB_CB(WRITE8(*this, asuka_state, counters_w))
+	TAITO_CCHIP(config, m_cchip, 12_MHz_XTAL); // 12MHz OSC near C-Chip
+	m_cchip->in_pa_callback().set_ioport("800007");
+	m_cchip->in_pb_callback().set_ioport("800009");
+	m_cchip->in_pc_callback().set_ioport("80000B");
+	m_cchip->in_ad_callback().set_ioport("80000D");
+	m_cchip->out_pb_callback().set(FUNC(asuka_state::counters_w));
 
-	MCFG_TIMER_DRIVER_ADD("cchip_irq_clear", asuka_state, cchip_irq_clear_cb)
+	TIMER(config, "cchip_irq_clear").configure_generic(FUNC(asuka_state::cchip_irq_clear_cb));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	config.m_minimum_quantum = attotime::from_hz(600);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 3*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(asuka_state, screen_update_bonzeadv)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, asuka_state, screen_vblank_asuka))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(40*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 3*8, 31*8-1);
+	screen.set_screen_update(FUNC(asuka_state::screen_update_bonzeadv));
+	screen.screen_vblank().set(FUNC(asuka_state::screen_vblank_asuka));
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_asuka)
-	MCFG_PALETTE_ADD("palette", 4096)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_asuka);
+	PALETTE(config, "palette").set_entries(4096);
 
-	MCFG_DEVICE_ADD("pc090oj", PC090OJ, 0)
-	MCFG_PC090OJ_OFFSETS(0, 8)
-	MCFG_PC090OJ_GFXDECODE("gfxdecode")
-	MCFG_PC090OJ_PALETTE("palette")
+	PC090OJ(config, m_pc090oj, 0);
+	m_pc090oj->set_offsets(0, 8);
+	m_pc090oj->set_gfxdecode_tag("gfxdecode");
+	m_pc090oj->set_palette_tag("palette");
 
-	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
-	MCFG_TC0100SCN_GFX_REGION(1)
-	MCFG_TC0100SCN_TX_REGION(2)
-	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
-	MCFG_TC0100SCN_PALETTE("palette")
+	TC0100SCN(config, m_tc0100scn, 0);
+	m_tc0100scn->set_gfx_region(1);
+	m_tc0100scn->set_tx_region(2);
+	m_tc0100scn->set_gfxdecode_tag("gfxdecode");
+	m_tc0100scn->set_palette_tag("palette");
 
-	MCFG_DEVICE_ADD("tc0110pcr", TC0110PCR, 0, "palette")
+	TC0110PCR(config, m_tc0110pcr, 0, "palette");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2610, XTAL(16'000'000)/2)
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.25)
-	MCFG_SOUND_ROUTE(1, "mono", 1.0)
-	MCFG_SOUND_ROUTE(2, "mono", 1.0)
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(16'000'000)/2));
+	ymsnd.irq_handler().set_inputline("audiocpu", 0);
+	ymsnd.add_route(0, "mono", 0.25);
+	ymsnd.add_route(1, "mono", 1.0);
+	ymsnd.add_route(2, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
-	MCFG_TC0140SYT_MASTER_CPU("maincpu")
-	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
-MACHINE_CONFIG_END
+	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
+	tc0140syt.set_master_tag(m_maincpu);
+	tc0140syt.set_slave_tag(m_audiocpu);
+}
 
-MACHINE_CONFIG_START(asuka_state::asuka)
-
+void asuka_state::asuka(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)/2)   /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(asuka_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", asuka_state,  irq5_line_hold)
+	M68000(config, m_maincpu, XTAL(16'000'000)/2);   /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &asuka_state::asuka_map);
+	m_maincpu->set_vblank_int("screen", FUNC(asuka_state::irq5_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(16'000'000)/4) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(z80_map)
+	Z80(config, m_audiocpu, XTAL(16'000'000)/4); /* verified on pcb */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &asuka_state::z80_map);
 
+	config.m_minimum_quantum = attotime::from_hz(600);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
-
-	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
-	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
-	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
-	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
-	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(*this, asuka_state, coin_control_w))
-	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
+	TC0220IOC(config, m_tc0220ioc, 0);
+	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
+	m_tc0220ioc->read_1_callback().set_ioport("DSWB");
+	m_tc0220ioc->read_2_callback().set_ioport("IN0");
+	m_tc0220ioc->read_3_callback().set_ioport("IN1");
+	m_tc0220ioc->write_4_callback().set(FUNC(asuka_state::coin_control_w));
+	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(asuka_state, screen_update_asuka)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, asuka_state, screen_vblank_asuka))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(40*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
+	screen.set_screen_update(FUNC(asuka_state::screen_update_asuka));
+	screen.screen_vblank().set(FUNC(asuka_state::screen_vblank_asuka));
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_asuka)
-	MCFG_PALETTE_ADD("palette", 4096)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_asuka);
+	PALETTE(config, "palette").set_entries(4096);
 
-	MCFG_DEVICE_ADD("pc090oj", PC090OJ, 0)
-	MCFG_PC090OJ_OFFSETS(0, 8)
-	MCFG_PC090OJ_USEBUFFER(1)
-	MCFG_PC090OJ_GFXDECODE("gfxdecode")
-	MCFG_PC090OJ_PALETTE("palette")
+	PC090OJ(config, m_pc090oj, 0);
+	m_pc090oj->set_offsets(0, 8);
+	m_pc090oj->set_usebuffer(1);
+	m_pc090oj->set_gfxdecode_tag("gfxdecode");
+	m_pc090oj->set_palette_tag("palette");
 
-	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
-	MCFG_TC0100SCN_GFX_REGION(1)
-	MCFG_TC0100SCN_TX_REGION(2)
-	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
-	MCFG_TC0100SCN_PALETTE("palette")
+	TC0100SCN(config, m_tc0100scn, 0);
+	m_tc0100scn->set_gfx_region(1);
+	m_tc0100scn->set_tx_region(2);
+	m_tc0100scn->set_gfxdecode_tag("gfxdecode");
+	m_tc0100scn->set_palette_tag("palette");
 
-	MCFG_DEVICE_ADD("tc0110pcr", TC0110PCR, 0, "palette")
+	TC0110PCR(config, m_tc0110pcr, 0, "palette");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(16'000'000)/4) /* verified on pcb */
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_YM2151_PORT_WRITE_HANDLER(MEMBANK("audiobank")) MCFG_DEVCB_MASK(0x03)
-	MCFG_SOUND_ROUTE(0, "mono", 0.50)
-	MCFG_SOUND_ROUTE(1, "mono", 0.50)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 16_MHz_XTAL/4)); // verified on PCB
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.port_write_handler().set_membank(m_audiobank).mask(0x03);
+	ymsnd.add_route(0, "mono", 0.25);
+	ymsnd.add_route(1, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(384'000)) /* verified on pcb */
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, asuka_state, asuka_msm5205_vck))  /* VCK function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MSM5205(config, m_msm, XTAL(384'000)); /* verified on pcb */
+	m_msm->vck_legacy_callback().set(FUNC(asuka_state::asuka_msm5205_vck));  /* VCK function */
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);      /* 8 kHz */
+	m_msm->add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	MCFG_DEVICE_ADD("adpcm_select", LS157, 0)
-	MCFG_74157_OUT_CB(WRITE8("msm", msm5205_device, data_w))
+	LS157(config, m_adpcm_select, 0);
+	m_adpcm_select->out_callback().set("msm", FUNC(msm5205_device::data_w));
 
-	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
-	MCFG_PC060HA_MASTER_CPU("maincpu")
-	MCFG_PC060HA_SLAVE_CPU("audiocpu")
-MACHINE_CONFIG_END
+	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
+	ciu.set_master_tag(m_maincpu);
+	ciu.set_slave_tag(m_audiocpu);
+}
 
-MACHINE_CONFIG_START(asuka_state::cadash)
-
+void asuka_state::cadash(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/2)   /* 68000p12 running at 16Mhz, verified on pcb  */
-	MCFG_DEVICE_PROGRAM_MAP(cadash_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", asuka_state,  cadash_interrupt)
+	M68000(config, m_maincpu, XTAL(32'000'000)/2);   /* 68000p12 running at 16Mhz, verified on pcb  */
+	m_maincpu->set_addrmap(AS_PROGRAM, &asuka_state::cadash_map);
+	m_maincpu->set_vblank_int("screen", FUNC(asuka_state::cadash_interrupt));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(8'000'000)/2)  /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(cadash_z80_map)
+	Z80(config, m_audiocpu, XTAL(8'000'000)/2);  /* verified on pcb */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &asuka_state::cadash_z80_map);
 
-	MCFG_DEVICE_ADD("subcpu", Z180, XTAL(8'000'000))   /* 8MHz HD64180RP8 Z180 */
-	MCFG_DEVICE_PROGRAM_MAP(cadash_sub_map)
-	MCFG_DEVICE_IO_MAP(cadash_sub_io)
+	z180_device &subcpu(Z180(config, "subcpu", XTAL(8'000'000)));   /* 8MHz HD64180RP8 Z180 */
+	subcpu.set_addrmap(AS_PROGRAM, &asuka_state::cadash_sub_map);
+	subcpu.set_addrmap(AS_IO, &asuka_state::cadash_sub_io);
 
+	config.m_minimum_quantum = attotime::from_hz(600);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
-
-	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
-	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
-	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
-	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
-	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(*this, asuka_state, coin_control_w))
-	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
+	TC0220IOC(config, m_tc0220ioc, 0);
+	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
+	m_tc0220ioc->read_1_callback().set_ioport("DSWB");
+	m_tc0220ioc->read_2_callback().set_ioport("IN0");
+	m_tc0220ioc->read_3_callback().set_ioport("IN1");
+	m_tc0220ioc->write_4_callback().set(FUNC(asuka_state::coin_control_w));
+	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(asuka_state, screen_update_bonzeadv)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, asuka_state, screen_vblank_asuka))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(40*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
+	screen.set_screen_update(FUNC(asuka_state::screen_update_bonzeadv));
+	screen.screen_vblank().set(FUNC(asuka_state::screen_vblank_asuka));
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_asuka)
-	MCFG_PALETTE_ADD("palette", 4096)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_asuka);
+	PALETTE(config, "palette").set_entries(4096);
 
-	MCFG_DEVICE_ADD("pc090oj", PC090OJ, 0)
-	MCFG_PC090OJ_OFFSETS(0, 8)
-	MCFG_PC090OJ_USEBUFFER(1)
-	MCFG_PC090OJ_GFXDECODE("gfxdecode")
-	MCFG_PC090OJ_PALETTE("palette")
+	PC090OJ(config, m_pc090oj, 0);
+	m_pc090oj->set_offsets(0, 8);
+	m_pc090oj->set_usebuffer(1);
+	m_pc090oj->set_gfxdecode_tag("gfxdecode");
+	m_pc090oj->set_palette_tag("palette");
 
-	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
-	MCFG_TC0100SCN_GFX_REGION(1)
-	MCFG_TC0100SCN_TX_REGION(2)
-	MCFG_TC0100SCN_OFFSETS(1, 0)
-	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
-	MCFG_TC0100SCN_PALETTE("palette")
+	TC0100SCN(config, m_tc0100scn, 0);
+	m_tc0100scn->set_gfx_region(1);
+	m_tc0100scn->set_tx_region(2);
+	m_tc0100scn->set_offsets(1, 0);
+	m_tc0100scn->set_gfxdecode_tag("gfxdecode");
+	m_tc0100scn->set_palette_tag("palette");
 
-	MCFG_DEVICE_ADD("tc0110pcr", TC0110PCR, 0, "palette")
+	TC0110PCR(config, m_tc0110pcr, 0, "palette");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(8'000'000)/2)   /* verified on pcb */
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_YM2151_PORT_WRITE_HANDLER(MEMBANK("audiobank")) MCFG_DEVCB_MASK(0x03)
-	MCFG_SOUND_ROUTE(0, "mono", 0.50)
-	MCFG_SOUND_ROUTE(1, "mono", 0.50)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 8_MHz_XTAL/2)); // verified on PCB
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.port_write_handler().set_membank(m_audiobank).mask(0x03);
+	ymsnd.add_route(0, "mono", 0.50);
+	ymsnd.add_route(1, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
-	MCFG_PC060HA_MASTER_CPU("maincpu")
-	MCFG_PC060HA_SLAVE_CPU("audiocpu")
-MACHINE_CONFIG_END
+	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
+	ciu.set_master_tag(m_maincpu);
+	ciu.set_slave_tag(m_audiocpu);
+}
 
-MACHINE_CONFIG_START(asuka_state::mofflott)
-
+void asuka_state::mofflott(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 8000000)    /* 8 MHz ??? */
-	MCFG_DEVICE_PROGRAM_MAP(asuka_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", asuka_state,  irq5_line_hold)
+	M68000(config, m_maincpu, 8000000);    /* 8 MHz ??? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &asuka_state::asuka_map);
+	m_maincpu->set_vblank_int("screen", FUNC(asuka_state::irq5_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)  /* 4 MHz ??? */
-	MCFG_DEVICE_PROGRAM_MAP(z80_map)
+	Z80(config, m_audiocpu, 4000000);  /* 4 MHz ??? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &asuka_state::z80_map);
 
+	config.m_minimum_quantum = attotime::from_hz(600);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
-
-	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
-	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
-	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
-	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
-	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(*this, asuka_state, coin_control_w))
-	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
+	TC0220IOC(config, m_tc0220ioc, 0);
+	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
+	m_tc0220ioc->read_1_callback().set_ioport("DSWB");
+	m_tc0220ioc->read_2_callback().set_ioport("IN0");
+	m_tc0220ioc->read_3_callback().set_ioport("IN1");
+	m_tc0220ioc->write_4_callback().set(FUNC(asuka_state::coin_control_w));
+	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(asuka_state, screen_update_asuka)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, asuka_state, screen_vblank_asuka))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(40*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
+	screen.set_screen_update(FUNC(asuka_state::screen_update_asuka));
+	screen.screen_vblank().set(FUNC(asuka_state::screen_vblank_asuka));
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_asuka)
-	MCFG_PALETTE_ADD("palette", 4096)   /* only Mofflott uses full palette space */
+	GFXDECODE(config, "gfxdecode", "palette", gfx_asuka);
+	PALETTE(config, "palette").set_entries(4096);   /* only Mofflott uses full palette space */
 
-	MCFG_DEVICE_ADD("pc090oj", PC090OJ, 0)
-	MCFG_PC090OJ_OFFSETS(0, 8)
-	MCFG_PC090OJ_GFXDECODE("gfxdecode")
-	MCFG_PC090OJ_PALETTE("palette")
+	PC090OJ(config, m_pc090oj, 0);
+	m_pc090oj->set_offsets(0, 8);
+	m_pc090oj->set_gfxdecode_tag("gfxdecode");
+	m_pc090oj->set_palette_tag("palette");
 
-	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
-	MCFG_TC0100SCN_GFX_REGION(1)
-	MCFG_TC0100SCN_TX_REGION(2)
-	MCFG_TC0100SCN_OFFSETS(1, 0)
-	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
-	MCFG_TC0100SCN_PALETTE("palette")
+	TC0100SCN(config, m_tc0100scn, 0);
+	m_tc0100scn->set_gfx_region(1);
+	m_tc0100scn->set_tx_region(2);
+	m_tc0100scn->set_offsets(1, 0);
+	m_tc0100scn->set_gfxdecode_tag("gfxdecode");
+	m_tc0100scn->set_palette_tag("palette");
 
-	MCFG_DEVICE_ADD("tc0110pcr", TC0110PCR, 0, "palette")
+	TC0110PCR(config, m_tc0110pcr, 0, "palette");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 4000000)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_YM2151_PORT_WRITE_HANDLER(MEMBANK("audiobank")) MCFG_DEVCB_MASK(0x03)
-	MCFG_SOUND_ROUTE(0, "mono", 0.50)
-	MCFG_SOUND_ROUTE(1, "mono", 0.50)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 4000000));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.port_write_handler().set_membank(m_audiobank).mask(0x03);
+	ymsnd.add_route(0, "mono", 0.25);
+	ymsnd.add_route(1, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, asuka_state, asuka_msm5205_vck))  /* VCK function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MSM5205(config, m_msm, 384000);
+	m_msm->vck_legacy_callback().set(FUNC(asuka_state::asuka_msm5205_vck));  /* VCK function */
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);      /* 8 kHz */
+	m_msm->add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	MCFG_DEVICE_ADD("adpcm_select", LS157, 0)
-	MCFG_74157_OUT_CB(WRITE8("msm", msm5205_device, data_w))
+	LS157(config, m_adpcm_select, 0);
+	m_adpcm_select->out_callback().set("msm", FUNC(msm5205_device::data_w));
 
-	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
-	MCFG_PC060HA_MASTER_CPU("maincpu")
-	MCFG_PC060HA_SLAVE_CPU("audiocpu")
-MACHINE_CONFIG_END
+	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
+	ciu.set_master_tag(m_maincpu);
+	ciu.set_slave_tag(m_audiocpu);
+}
 
-MACHINE_CONFIG_START(asuka_state::eto)
-
+void asuka_state::eto(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 8000000)    /* 8 MHz ??? */
-	MCFG_DEVICE_PROGRAM_MAP(eto_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", asuka_state,  irq5_line_hold)
+	M68000(config, m_maincpu, 8000000);    /* 8 MHz ??? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &asuka_state::eto_map);
+	m_maincpu->set_vblank_int("screen", FUNC(asuka_state::irq5_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)  /* 4 MHz ??? */
-	MCFG_DEVICE_PROGRAM_MAP(cadash_z80_map)
+	Z80(config, m_audiocpu, 4000000);  /* 4 MHz ??? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &asuka_state::cadash_z80_map);
 
+	config.m_minimum_quantum = attotime::from_hz(600);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
-
-	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
-	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
-	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
-	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
-	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(*this, asuka_state, coin_control_w))
-	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
+	TC0220IOC(config, m_tc0220ioc, 0);
+	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
+	m_tc0220ioc->read_1_callback().set_ioport("DSWB");
+	m_tc0220ioc->read_2_callback().set_ioport("IN0");
+	m_tc0220ioc->read_3_callback().set_ioport("IN1");
+	m_tc0220ioc->write_4_callback().set(FUNC(asuka_state::coin_control_w));
+	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(asuka_state, screen_update_asuka)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, asuka_state, screen_vblank_asuka))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(40*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
+	screen.set_screen_update(FUNC(asuka_state::screen_update_asuka));
+	screen.screen_vblank().set(FUNC(asuka_state::screen_vblank_asuka));
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_asuka)
-	MCFG_PALETTE_ADD("palette", 4096)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_asuka);
+	PALETTE(config, "palette").set_entries(4096);
 
-	MCFG_DEVICE_ADD("pc090oj", PC090OJ, 0)
-	MCFG_PC090OJ_OFFSETS(0, 8)
-	MCFG_PC090OJ_GFXDECODE("gfxdecode")
-	MCFG_PC090OJ_PALETTE("palette")
+	PC090OJ(config, m_pc090oj, 0);
+	m_pc090oj->set_offsets(0, 8);
+	m_pc090oj->set_gfxdecode_tag("gfxdecode");
+	m_pc090oj->set_palette_tag("palette");
 
-	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
-	MCFG_TC0100SCN_GFX_REGION(1)
-	MCFG_TC0100SCN_TX_REGION(2)
-	MCFG_TC0100SCN_OFFSETS(1, 0)
-	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
-	MCFG_TC0100SCN_PALETTE("palette")
+	TC0100SCN(config, m_tc0100scn, 0);
+	m_tc0100scn->set_gfx_region(1);
+	m_tc0100scn->set_tx_region(2);
+	m_tc0100scn->set_offsets(1, 0);
+	m_tc0100scn->set_gfxdecode_tag("gfxdecode");
+	m_tc0100scn->set_palette_tag("palette");
 
-	MCFG_DEVICE_ADD("tc0110pcr", TC0110PCR, 0, "palette")
+	TC0110PCR(config, m_tc0110pcr, 0, "palette");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 4000000)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_YM2151_PORT_WRITE_HANDLER(MEMBANK("audiobank")) MCFG_DEVCB_MASK(0x03)
-	MCFG_SOUND_ROUTE(0, "mono", 0.50)
-	MCFG_SOUND_ROUTE(1, "mono", 0.50)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 4000000));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.port_write_handler().set_membank(m_audiobank).mask(0x03);
+	ymsnd.add_route(0, "mono", 0.50);
+	ymsnd.add_route(1, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
-	MCFG_PC060HA_MASTER_CPU("maincpu")
-	MCFG_PC060HA_SLAVE_CPU("audiocpu")
-MACHINE_CONFIG_END
+	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
+	ciu.set_master_tag(m_maincpu);
+	ciu.set_slave_tag(m_audiocpu);
+}
 
 
 /***************************************************************************
@@ -1337,7 +1342,7 @@ ROM_START( asuka ) /* Taito PCB: ASKA&ASKA - K1100388A / J1100169A */
 	ROM_LOAD( "b68-05.ic43", 0x00000, 0x104, CRC(d6524ccc) SHA1(f3b56253692aebb63278d47832fc27b8b212b59c) )
 ROM_END
 
-ROM_START( asukaj ) /* Known to exist but not dumped: revision 1 with B68 08-1 & B68 09-1 program roms */
+ROM_START( asukaj ) /* Known to exist but not dumped: revision 1 with B68 08-1 & B68 09-1 program ROMs */
 	ROM_REGION( 0x100000, "maincpu", 0 )     /* 1024k for 68000 code */
 	ROM_LOAD16_BYTE( "b68-09.ic23", 0x00000, 0x20000, CRC(1eaa1bbb) SHA1(01ca6a5f3c47dab49654b84601119714eb329cc5) )
 	ROM_LOAD16_BYTE( "b68-08.ic8",  0x00001, 0x20000, CRC(8cc96e60) SHA1(dc94f3fd48c0407ec72e8330bc688e9e16d39213) )
@@ -1421,7 +1426,7 @@ ROM_START( cadashp )
 	ROM_REGION( 0x08000, "subcpu", 0 )  /* HD64180RP8 code (link) */
 	ROM_LOAD( "com.ic57",   0x00000, 0x08000, CRC(bae1a92f) SHA1(dbe10a02a294dfa7d6052a692c3a49aad85d6ffd) )
 
-	// all other roms are under some kind of epoxy, assuming to be the same..
+	// all other ROMs are under some kind of epoxy, assuming to be the same..
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "c21-02.9",  0x00000, 0x80000, CRC(205883b9) SHA1(5aafee8cab3f949a7db91bcc26912f331041b51e) ) /* SCR tiles (8 x 8) */
 
@@ -1672,16 +1677,16 @@ ROM_END
 
 ROM_START( earthjkr ) /* Taito PCB: K1100388A / J1100169A */
 	ROM_REGION( 0x100000, "maincpu", 0 )     /* 1024k for 68000 code */
-	ROM_LOAD16_BYTE( "ej_3b.ic23",  0x00000, 0x20000, CRC(bdd86fc2) SHA1(96578860ed03718f8a68847b367eac6c81b79ca2) )
+	ROM_LOAD16_BYTE( "ej_3b.ic23",  0x00000, 0x20000, BAD_DUMP CRC(bdd86fc2) SHA1(96578860ed03718f8a68847b367eac6c81b79ca2) )
 	ROM_LOAD16_BYTE( "ej_3a.ic8",   0x00001, 0x20000, CRC(9c8050c6) SHA1(076c882f75787e8120de66ff0dcd2cb820513c45) )
 	/* 0x40000 - 0x7ffff is intentionally empty */
 	ROM_LOAD16_WORD( "ej_30e.ic30", 0x80000, 0x80000, CRC(49d1f77f) SHA1(f6c9b2fc88b77cc9baa5be48da5c3eb72310e471) ) /* Fix ROM */
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "ej_chr-0.ic3", 0x00000, 0x80000, CRC(ac675297) SHA1(2a34e1eae3a4be84dbf709053f5e8a781b1073fc) )    /* SCR tiles (8 x 8) - MASK ROM */
+	ROM_LOAD( "ej_chr-0.ic3", 0x00000, 0x80000, CRC(ac675297) SHA1(2a34e1eae3a4be84dbf709053f5e8a781b1073fc) )    /* SCR tiles (8 x 8) - mask ROM */
 
 	ROM_REGION( 0xa0000, "gfx2", 0 )
-	ROM_LOAD       ( "ej_obj-0.ic6", 0x00000, 0x80000, CRC(5f21ac47) SHA1(45c94ffb53ee9b822b0676f6fb151fed4ce6d967) ) /* Sprites (16 x 16) - MASK ROM */
+	ROM_LOAD       ( "ej_obj-0.ic6", 0x00000, 0x80000, CRC(5f21ac47) SHA1(45c94ffb53ee9b822b0676f6fb151fed4ce6d967) ) /* Sprites (16 x 16) - mask ROM */
 	ROM_LOAD16_BYTE( "ej_1.ic5",     0x80000, 0x10000, CRC(cb4891db) SHA1(af1112608cdd897ef6028ef617f5ca69d7964861) )
 	ROM_LOAD16_BYTE( "ej_0.ic4",     0x80001, 0x10000, CRC(b612086f) SHA1(625748fcb698ec57b7b3ce46019cf85de99aaaa1) )
 
@@ -1696,11 +1701,39 @@ ROM_START( earthjkr ) /* Taito PCB: K1100388A / J1100169A */
 	ROM_LOAD( "b68-05.ic43", 0x00000, 0x104, CRC(d6524ccc) SHA1(f3b56253692aebb63278d47832fc27b8b212b59c) )
 ROM_END
 
+ROM_START( earthjkra )
+	ROM_REGION( 0x100000, "maincpu", 0 )     /* 1024k for 68000 code */
+	/* Blank ROM labels, might be for the Korean market, although region handling is unchanged. Very close to parent set, but some clearly additional intentional changes that can't be attributed to the bitrot in the parent */
+	ROM_LOAD16_BYTE( "ejok_ic23",  0x00000, 0x20000, CRC(cbd29731) SHA1(4cbbdc9352cb203b6b5ec37c1b11c09d827960fc) ) /* ejok_ic23 vs ej_3b.ic23 99.945831% similar (71 changed bytes) */
+	ROM_LOAD16_BYTE( "ejok_ic8",   0x00001, 0x20000, CRC(cfd4953c) SHA1(6aa91ebca4444070841c1f8307430bc787656df3) ) /* ejok_ic8  vs ej_3a.ic8  99.945831% similar (71 changed bytes) */
+	/* 0x40000 - 0x7ffff is intentionally empty */
+	ROM_LOAD16_WORD( "ejok_ic30", 0x80000, 0x80000, CRC(49d1f77f) SHA1(f6c9b2fc88b77cc9baa5be48da5c3eb72310e471) ) /* Fix ROM */
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD( "ej_chr-0.ic3", 0x00000, 0x80000, CRC(ac675297) SHA1(2a34e1eae3a4be84dbf709053f5e8a781b1073fc) )    /* SCR tiles (8 x 8) - mask ROM */
+
+	ROM_REGION( 0xa0000, "gfx2", 0 )
+	ROM_LOAD       ( "ej_obj-0.ic6", 0x00000, 0x80000, CRC(5f21ac47) SHA1(45c94ffb53ee9b822b0676f6fb151fed4ce6d967) ) /* Sprites (16 x 16) - mask ROM */
+	ROM_LOAD16_BYTE( "ejok_ic5",     0x80000, 0x10000, CRC(cb4891db) SHA1(af1112608cdd897ef6028ef617f5ca69d7964861) )
+	ROM_LOAD16_BYTE( "ejok_ic4",     0x80001, 0x10000, CRC(b612086f) SHA1(625748fcb698ec57b7b3ce46019cf85de99aaaa1) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound cpu */
+	ROM_LOAD( "ejok_ic28", 0x00000, 0x10000, CRC(42ba2566) SHA1(c437388684b565c7504d6bad6accd73aa000faca) ) /* banked */
+
+	ROM_REGION( 0x10000, "ymsnd", ROMREGION_ERASEFF )   /* ADPCM samples */
+	/* Empty socket on U.N. Defense Force: Earth Joker - but sound chips present */
+
+	ROM_REGION( 0x144, "pals", 0 )
+	ROM_LOAD( "b68-04.ic32", 0x00000, 0x144, CRC(9be618d1) SHA1(61ee33c3db448a05ff8f455e77fe17d51106baec) )
+	ROM_LOAD( "b68-05.ic43", 0x00000, 0x104, CRC(d6524ccc) SHA1(f3b56253692aebb63278d47832fc27b8b212b59c) )
+ROM_END
+
 // Known to exist (not dumped) a Japanese version with ROMs 3 & 4 also stamped "A" same as above or different version??
 // Also known to exist (not dumped) a US version of Earth Joker, title screen shows "DISTRIBUTED BY ROMSTAR, INC."  ROMs were numbered
-// from 0 through 4 and the fix rom at IC30 is labeled 1 even though IC5 is also labled as 1 similar to the below set:
+// from 0 through 4 and the fix ROM at IC30 is labeled 1 even though IC5 is also labled as 1 similar to the below set:
+// (ROMSTAR license is set by a dipswitch, is set mentioned above really undumped?)
 
-ROM_START( earthjkrp ) // was production PCB complete with MASK rom, could just be an early revision, not proto
+ROM_START( earthjkrp ) // was production PCB complete with mask ROM, could just be an early revision, not proto
 	ROM_REGION( 0x100000, "maincpu", 0 )     /* 1024k for 68000 code */
 	ROM_LOAD16_BYTE( "3.ic23", 0x00001, 0x20000, CRC(26c33225) SHA1(b039c47d0776c90813ab52c867e95989cab2c567) )
 	ROM_LOAD16_BYTE( "4.ic8",  0x00000, 0x20000, CRC(e9b1ef0c) SHA1(5e104146d37922a8c7e93696c2c156223653025b) )
@@ -1708,10 +1741,10 @@ ROM_START( earthjkrp ) // was production PCB complete with MASK rom, could just 
 	ROM_LOAD16_WORD( "5.ic30", 0x80000, 0x80000, CRC(bf760b2d) SHA1(4aff36623e5a31ab86c77461fa93e40e77f08edd) ) /* Fix ROM */
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "ej_chr-0.ic3", 0x00000, 0x80000, CRC(ac675297) SHA1(2a34e1eae3a4be84dbf709053f5e8a781b1073fc) )    /* SCR tiles (8 x 8) - MASK ROM */
+	ROM_LOAD( "ej_chr-0.ic3", 0x00000, 0x80000, CRC(ac675297) SHA1(2a34e1eae3a4be84dbf709053f5e8a781b1073fc) )    /* SCR tiles (8 x 8) - mask ROM */
 
 	ROM_REGION( 0xa0000, "gfx2", 0 )
-	ROM_LOAD       ( "ej_obj-0.ic6", 0x00000, 0x80000, CRC(5f21ac47) SHA1(45c94ffb53ee9b822b0676f6fb151fed4ce6d967) ) /* Sprites (16 x 16) - MASK ROM */
+	ROM_LOAD       ( "ej_obj-0.ic6", 0x00000, 0x80000, CRC(5f21ac47) SHA1(45c94ffb53ee9b822b0676f6fb151fed4ce6d967) ) /* Sprites (16 x 16) - mask ROM */
 	ROM_LOAD16_BYTE( "1.ic5",        0x80000, 0x10000, CRC(cb4891db) SHA1(af1112608cdd897ef6028ef617f5ca69d7964861) )
 	ROM_LOAD16_BYTE( "0.ic4",        0x80001, 0x10000, CRC(b612086f) SHA1(625748fcb698ec57b7b3ce46019cf85de99aaaa1) )
 
@@ -1748,6 +1781,14 @@ void asuka_state::init_cadash()
 	m_cadash_int5_timer = timer_alloc(TIMER_CADASH_INTERRUPT5);
 }
 
+void asuka_state::init_earthjkr()
+{
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
+	// 357c -> 317c, I think this is bitrot, see ROM loading for which ROM needs redumping, causes rowscroll to be broken on final stage (writes to ROM area instead)
+	// code is correct in the 'prototype?' set
+	rom[0x7aaa/2] = 0x317c;
+}
+
 GAME( 1988, bonzeadv,  0,        bonzeadv, bonzeadv, asuka_state, empty_init,  ROT0,   "Taito Corporation Japan",   "Bonze Adventure (World, Newer)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, bonzeadvo, bonzeadv, bonzeadv, bonzeadv, asuka_state, empty_init,  ROT0,   "Taito Corporation Japan",   "Bonze Adventure (World, Older)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, bonzeadvu, bonzeadv, bonzeadv, jigkmgri, asuka_state, empty_init,  ROT0,   "Taito America Corporation", "Bonze Adventure (US)", MACHINE_SUPPORTS_SAVE )
@@ -1772,7 +1813,8 @@ GAME( 1989, cadashs,   cadash,   cadash,   cadash,   asuka_state, init_cadash, R
 
 GAME( 1992, galmedes,  0,        asuka,    galmedes, asuka_state, empty_init,  ROT270, "Visco",                     "Galmedes (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1993, earthjkr,  0,        asuka,    earthjkr, asuka_state, empty_init,  ROT270, "Visco",                     "U.N. Defense Force: Earth Joker (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, earthjkrp, earthjkr, asuka,    earthjkr, asuka_state, empty_init,  ROT270, "Visco",                     "U.N. Defense Force: Earth Joker (Japan, prototype?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, earthjkr,  0,        asuka,    earthjkr, asuka_state, init_earthjkr,  ROT270, "Visco",                  "U.N. Defense Force: Earth Joker (US / Japan, set 1)", MACHINE_SUPPORTS_SAVE ) // sets 1 + 2 have ROMSTAR (US?) license and no region disclaimer if you change the dipswitch
+GAME( 1993, earthjkra, earthjkr, asuka,    earthjkr, asuka_state, empty_init,     ROT270, "Visco",                  "U.N. Defense Force: Earth Joker (US / Japan, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, earthjkrp, earthjkr, asuka,    earthjkrp,asuka_state, empty_init,     ROT270, "Visco",                  "U.N. Defense Force: Earth Joker (Japan, prototype?)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1994, eto,       0,        eto,      eto,      asuka_state, empty_init,  ROT0,   "Visco",                     "Kokontouzai Eto Monogatari (Japan)", MACHINE_SUPPORTS_SAVE )

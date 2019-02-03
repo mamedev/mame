@@ -1,17 +1,22 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
+#ifndef MAME_INCLUDES_DIGDUG_H
+#define MAME_INCLUDES_DIGDUG_H
+
+#pragma once
 
 #include "machine/er2055.h"
 
 class digdug_state : public galaga_state
 {
 public:
-	digdug_state(const machine_config &mconfig, device_type type, const char *tag)
-		: galaga_state(mconfig, type, tag),
+	digdug_state(const machine_config &mconfig, device_type type, const char *tag) :
+		galaga_state(mconfig, type, tag),
 		m_earom(*this, "earom"),
 		m_digdug_objram(*this, "digdug_objram"),
 		m_digdug_posram(*this, "digdug_posram"),
-		m_digdug_flpram(*this, "digdug_flpram")     { }
+		m_digdug_flpram(*this, "digdug_flpram")
+	{ }
 
 	void dzigzag(machine_config &config);
 	void digdug(machine_config &config);
@@ -31,7 +36,7 @@ private:
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	TILE_GET_INFO_MEMBER(tx_get_tile_info);
 	DECLARE_VIDEO_START(digdug);
-	DECLARE_PALETTE_INIT(digdug);
+	void digdug_palette(palette_device &palette) const;
 	uint32_t screen_update_digdug(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(digdug_videoram_w);
@@ -46,3 +51,5 @@ private:
 
 	void digdug_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_DIGDUG_H

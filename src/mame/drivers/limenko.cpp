@@ -41,6 +41,7 @@ public:
 	limenko_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_qs1000(*this, "qs1000")
 		, m_oki(*this, "oki")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
@@ -66,8 +67,12 @@ public:
 
 	DECLARE_CUSTOM_INPUT_MEMBER(spriteram_bit_r);
 
+protected:
+	virtual void video_start() override;
+
 private:
 	required_device<cpu_device> m_maincpu;
+	optional_device<qs1000_device> m_qs1000;
 	optional_device<okim6295_device> m_oki;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -111,7 +116,6 @@ private:
 	TILE_GET_INFO_MEMBER(get_md_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
-	virtual void video_start() override;
 	uint32_t screen_update_limenko(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_single_sprite(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,uint32_t code,uint32_t color,int flipx,int flipy,int sx,int sy,int priority);
 	void draw_sprites(const rectangle &cliprect);
@@ -271,7 +275,7 @@ READ8_MEMBER(limenko_state::spotty_sound_r)
 	if(m_spotty_sound_cmd == 0xf7)
 		return m_soundlatch->read(space,0);
 	else
-		return m_oki->read(space,0);
+		return m_oki->read();
 }
 
 /*****************************************************************************************************
@@ -704,82 +708,80 @@ GFXDECODE_END
   MACHINE DRIVERS
 *****************************************************************************************************/
 
+void limenko_state::limenko(machine_config &config)
+{
+	E132XN(config, m_maincpu, 20000000*4); /* 4x internal multiplier */
+	m_maincpu->set_addrmap(AS_PROGRAM, &limenko_state::limenko_map);
+	m_maincpu->set_addrmap(AS_IO, &limenko_state::limenko_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(limenko_state::irq0_line_hold));
 
-MACHINE_CONFIG_START(limenko_state::limenko)
-	MCFG_DEVICE_ADD("maincpu", E132XN, 20000000*4) /* 4x internal multiplier */
-	MCFG_DEVICE_PROGRAM_MAP(limenko_map)
-	MCFG_DEVICE_IO_MAP(limenko_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", limenko_state,  irq0_line_hold)
-
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(384, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 383, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(limenko_state, screen_update_limenko)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(384, 240);
+	screen.set_visarea(0, 383, 0, 239);
+	screen.set_screen_update(FUNC(limenko_state::screen_update_limenko));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_limenko)
-	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_limenko);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x1000);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("qs1000", qs1000_device, set_irq))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set(m_qs1000, FUNC(qs1000_device::set_irq));
+	m_soundlatch->set_separate_acknowledge(true);
 
-	MCFG_DEVICE_ADD("qs1000", QS1000, XTAL(24'000'000))
-	MCFG_QS1000_EXTERNAL_ROM(true)
-	MCFG_QS1000_IN_P1_CB(READ8("soundlatch", generic_latch_8_device, read))
-	MCFG_QS1000_OUT_P1_CB(WRITE8(*this, limenko_state, qs1000_p1_w))
-	MCFG_QS1000_OUT_P2_CB(WRITE8(*this, limenko_state, qs1000_p2_w))
-	MCFG_QS1000_OUT_P3_CB(WRITE8(*this, limenko_state, qs1000_p3_w))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	QS1000(config, m_qs1000, XTAL(24'000'000));
+	m_qs1000->set_external_rom(true);
+	m_qs1000->p1_in().set("soundlatch", FUNC(generic_latch_8_device::read));
+	m_qs1000->p1_out().set(FUNC(limenko_state::qs1000_p1_w));
+	m_qs1000->p2_out().set(FUNC(limenko_state::qs1000_p2_w));
+	m_qs1000->p3_out().set(FUNC(limenko_state::qs1000_p3_w));
+	m_qs1000->add_route(0, "lspeaker", 1.0);
+	m_qs1000->add_route(1, "rspeaker", 1.0);
+}
 
-MACHINE_CONFIG_START(limenko_state::spotty)
-	MCFG_DEVICE_ADD("maincpu", GMS30C2232, 20000000)   /* 20 MHz, no internal multiplier */
-	MCFG_DEVICE_PROGRAM_MAP(spotty_map)
-	MCFG_DEVICE_IO_MAP(spotty_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", limenko_state,  irq0_line_hold)
+void limenko_state::spotty(machine_config &config)
+{
+	GMS30C2232(config, m_maincpu, 20000000);   /* 20 MHz, no internal multiplier */
+	m_maincpu->set_addrmap(AS_PROGRAM, &limenko_state::spotty_map);
+	m_maincpu->set_addrmap(AS_IO, &limenko_state::spotty_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(limenko_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", AT89C4051, 4000000)    /* 4 MHz */
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, limenko_state, spotty_sound_r))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8("oki", okim6295_device, write)) //? sound latch and ?
-	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, limenko_state, spotty_sound_cmd_r))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, limenko_state, spotty_sound_cmd_w)) //not sure about anything...
+	at89c4051_device &audiocpu(AT89C4051(config, "audiocpu", 4000000));    /* 4 MHz */
+	audiocpu.port_in_cb<1>().set(FUNC(limenko_state::spotty_sound_r));
+	audiocpu.port_out_cb<1>().set("oki", FUNC(okim6295_device::write)); //? sound latch and ?
+	audiocpu.port_in_cb<3>().set(FUNC(limenko_state::spotty_sound_cmd_r));
+	audiocpu.port_out_cb<3>().set(FUNC(limenko_state::spotty_sound_cmd_w)); //not sure about anything...
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(384, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 383, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(limenko_state, screen_update_limenko)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(384, 240);
+	screen.set_visarea(0, 383, 0, 239);
+	screen.set_screen_update(FUNC(limenko_state::screen_update_limenko));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_limenko)
-	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_limenko);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x1000);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 4000000 / 4 , okim6295_device::PIN7_HIGH) //?
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, 4000000 / 4 , okim6295_device::PIN7_HIGH); //?
+	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 /*****************************************************************************************************
@@ -1092,7 +1094,7 @@ READ32_MEMBER(limenko_state::spotty_speedup_r)
 void limenko_state::init_common()
 {
 	// Set up the QS1000 program ROM banking, taking care not to overlap the internal RAM
-	machine().device("qs1000:cpu")->memory().space(AS_IO).install_read_bank(0x0100, 0xffff, "bank");
+	m_qs1000->cpu().space(AS_IO).install_read_bank(0x0100, 0xffff, "bank");
 	membank("qs1000:bank")->configure_entries(0, 8, memregion("qs1000:cpu")->base()+0x100, 0x10000);
 
 	m_spriteram_bit = 1;

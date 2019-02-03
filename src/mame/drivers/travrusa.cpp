@@ -321,35 +321,32 @@ MACHINE_CONFIG_START(travrusa_state::travrusa)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(travrusa_state, screen_update_travrusa)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_travrusa)
-
-	MCFG_PALETTE_ADD("palette", 16*8+16*8)
-	MCFG_PALETTE_INDIRECT_ENTRIES(128+16)
-	MCFG_PALETTE_INIT_OWNER(travrusa_state, travrusa)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_travrusa);
+	PALETTE(config, m_palette, FUNC(travrusa_state::travrusa_palette), 16*8+16*8, 128+16);
 
 	/* sound hardware */
 	//m52_sound_c_audio(config);
-	MCFG_DEVICE_ADD("irem_audio", IREM_M52_SOUNDC_AUDIO, 0)
-
+	IREM_M52_SOUNDC_AUDIO(config, "irem_audio", 0);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(travrusa_state::shtrider)
+void travrusa_state::shtrider(machine_config &config)
+{
 	travrusa(config);
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_shtrider)
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(travrusa_state,shtrider)
+	m_gfxdecode->set_info(gfx_shtrider);
+	m_palette->set_init(FUNC(travrusa_state::shtrider_palette));
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(travrusa_state::shtriderb)
+void travrusa_state::shtriderb(machine_config &config)
+{
 	travrusa(config);
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_shtrider)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_shtrider);
+}
 
 /***************************************************************************
 

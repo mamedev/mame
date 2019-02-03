@@ -5,11 +5,10 @@
         Psion Organiser II series
 
 ****************************************************************************/
-
-#pragma once
-
 #ifndef MAME_INCLUDES_PSION_H
 #define MAME_INCLUDES_PSION_H
+
+#pragma once
 
 #include "cpu/m6800/m6801.h"
 #include "machine/nvram.h"
@@ -26,18 +25,19 @@ class psion_state : public driver_device
 {
 public:
 	psion_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_lcdc(*this, "hd44780"),
-			m_beep(*this, "beeper"),
-			m_pack1(*this, "pack1"),
-			m_pack2(*this, "pack2"),
-			m_nvram1(*this, "nvram1"),
-			m_nvram2(*this, "nvram2"),
-			m_nvram3(*this, "nvram3"),
-			m_sys_register(*this, "sys_register"),
-			m_stby_pwr(1),
-			m_ram(*this, "ram"){ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_lcdc(*this, "hd44780")
+		, m_beep(*this, "beeper")
+		, m_pack1(*this, "pack1")
+		, m_pack2(*this, "pack2")
+		, m_nvram1(*this, "nvram1")
+		, m_nvram2(*this, "nvram2")
+		, m_nvram3(*this, "nvram3")
+		, m_sys_register(*this, "sys_register")
+		, m_stby_pwr(1)
+		, m_ram(*this, "ram")
+	{ }
 
 	void psion_2lines(machine_config &config);
 	void psion_4lines(machine_config &config);
@@ -90,7 +90,7 @@ protected:
 	void io_rw(address_space &space, uint16_t offset);
 	DECLARE_WRITE8_MEMBER( io_w );
 	DECLARE_READ8_MEMBER( io_r );
-	DECLARE_PALETTE_INIT(psion);
+	void psion_palette(palette_device &palette) const;
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_timer);
 
 	HD44780_PIXEL_UPDATE(lz_pixel_update);
@@ -107,7 +107,7 @@ class psion1_state : public psion_state
 public:
 	psion1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: psion_state(mconfig, type, tag)
-		{ }
+	{ }
 
 	void psion1(machine_config &config);
 

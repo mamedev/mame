@@ -7,7 +7,7 @@
 
  This is an ARM7 with Internal ROM. (Also used on later PGM games)
 
- In some cases the first part of the Internal ROM is excute only, and
+ In some cases the first part of the Internal ROM is execute only, and
  cannot be read out with a trojan.  It hasn't been confirmed if these
  games make use of that feature.
 
@@ -331,7 +331,7 @@ MACHINE_CONFIG_START(igs_m027_state::igs_majhong)
 	MCFG_DEVICE_ADD("maincpu", ARM7, 20000000)
 	MCFG_DEVICE_PROGRAM_MAP(igs_majhong_map)
 
-	//MCFG_NVRAM_ADD_0FILL("nvram")
+//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -346,11 +346,11 @@ MACHINE_CONFIG_START(igs_m027_state::igs_majhong)
 	MCFG_PALETTE_ADD("palette", 0x200)
 //  MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
-	MCFG_DEVICE_ADD("igs017_igs031", IGS017_IGS031, 0)
-	MCFG_IGS017_IGS031_REVERSE_TEXT_BITS
-	MCFG_GFX_PALETTE("palette")
+	IGS017_IGS031(config, m_igs017_igs031, 0);
+	m_igs017_igs031->set_text_reverse_bits();
+	m_igs017_igs031->set_palette("palette");
 
-	// 82C55? (accessed through igs017/igs031 area like igs017.c?)
+	// 82C55? (accessed through igs017/igs031 area like igs017.cpp?)
 
 	/* sound hardware */
 	// OK6295
@@ -364,7 +364,7 @@ MACHINE_CONFIG_START(igs_m027_state::amazonia)
 	MCFG_DEVICE_ADD("maincpu", ARM7, 20000000)
 	MCFG_DEVICE_PROGRAM_MAP(igs_majhong_map)
 
-	//MCFG_NVRAM_ADD_0FILL("nvram")
+//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 
 
@@ -380,11 +380,11 @@ MACHINE_CONFIG_START(igs_m027_state::amazonia)
 	MCFG_PALETTE_ADD("palette", 0x200)
 //  MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
-	MCFG_DEVICE_ADD("igs017_igs031", IGS017_IGS031, 0)
-	MCFG_IGS017_IGS031_REVERSE_TEXT_BITS
-	MCFG_GFX_PALETTE("palette")
+	IGS017_IGS031(config, m_igs017_igs031, 0);
+	m_igs017_igs031->set_text_reverse_bits();
+	m_igs017_igs031->set_palette("palette");
 
-	// 82C55? (accessed through igs017/igs031 area like igs017.c?)
+	// 82C55? (accessed through igs017/igs031 area like igs017.cpp?)
 
 	/* sound hardware */
 	// OK6295
@@ -1136,5 +1136,5 @@ GAME( 200?, lhzb4,     0,        igs_majhong, sdwx, igs_m027_state, init_lhzb4, 
 GAME( 200?, klxyj,     0,        igs_majhong, sdwx, igs_m027_state, init_klxyj,    ROT0, "IGS", "Kuai Le Xi You Ji",  MACHINE_IS_SKELETON )
 GAME( 2000, mgfx,      0,        igs_majhong, sdwx, igs_m027_state, init_mgfx,     ROT0, "IGS", "Man Guan Fu Xing",   MACHINE_IS_SKELETON )
 GAME( 200?, gonefsh2,  0,        igs_majhong, sdwx, igs_m027_state, init_gonefsh2, ROT0, "IGS", "Gone Fishing 2",   MACHINE_IS_SKELETON )
-GAME( 200?, chessc2,   0,        igs_majhong, sdwx, igs_m027_state, init_chessc2,  ROT0, "IGS", "Chess Challenge 2",   MACHINE_IS_SKELETON )
+GAME( 2002, chessc2,   0,        igs_majhong, sdwx, igs_m027_state, init_chessc2,  ROT0, "IGS", "Chess Challenge II",   MACHINE_IS_SKELETON )
 GAME( 200?, haunthig,  0,        igs_majhong, sdwx, igs_m027_state, init_hauntedh, ROT0, "IGS", "Haunted House (IGS)",   MACHINE_IS_SKELETON )

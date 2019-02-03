@@ -25,18 +25,6 @@
 #pragma once
 
 
-
-
-///*************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-///*************************************************************************
-
-#define MCFG_DS75160A_ADD(_tag, _read, _write) \
-	MCFG_DEVICE_ADD(_tag, DS75160A, 0)  \
-	downcast<ds75160a_device *>(device)->set_callbacks(DEVCB_##_read, DEVCB_##_write);
-
-
-
 ///*************************************************************************
 //  TYPE DEFINITIONS
 ///*************************************************************************
@@ -49,10 +37,8 @@ public:
 	// construction/destruction
 	ds75160a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Read, class Write> void set_callbacks(Read &&rd, Write &&wr) {
-		m_read.set_callback(std::forward<Read>(rd));
-		m_write.set_callback(std::forward<Write>(wr));
-	}
+	auto read_callback() { return m_read.bind(); }
+	auto write_callback() { return m_write.bind(); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );

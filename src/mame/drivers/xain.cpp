@@ -476,7 +476,7 @@ MACHINE_CONFIG_START(xain_state::xsleena)
 	// basic machine hardware
 	MCFG_DEVICE_ADD(m_maincpu, MC6809E, CPU_CLOCK) // 68B09E
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", xain_state, scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(xain_state::scanline), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD(m_subcpu, MC6809E, CPU_CLOCK) // 68B09E
 	MCFG_DEVICE_PROGRAM_MAP(cpu_map_B)
@@ -484,47 +484,46 @@ MACHINE_CONFIG_START(xain_state::xsleena)
 	MCFG_DEVICE_ADD(m_audiocpu, MC6809, PIXEL_CLOCK) // 68A09
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_DEVICE_ADD(m_mcu, TAITO68705_MCU, MCU_CLOCK)
+	TAITO68705_MCU(config, m_mcu, MCU_CLOCK);
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	// video hardware
 	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 8, 248)   // based on ddragon driver
 	MCFG_SCREEN_UPDATE_DRIVER(xain_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_xain)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_xain);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 512);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD(m_soundlatch)
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE(m_audiocpu, M6809_IRQ_LINE))
+	GENERIC_LATCH_8(config, m_soundlatch).data_pending_callback().set_inputline(m_audiocpu, M6809_IRQ_LINE);
 
-	MCFG_DEVICE_ADD("ym1", YM2203, MCU_CLOCK)
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE(m_audiocpu, M6809_FIRQ_LINE))
-	MCFG_SOUND_ROUTE(0, "mono", 0.50)
-	MCFG_SOUND_ROUTE(1, "mono", 0.50)
-	MCFG_SOUND_ROUTE(2, "mono", 0.50)
-	MCFG_SOUND_ROUTE(3, "mono", 0.40)
+	ym2203_device &ym1(YM2203(config, "ym1", MCU_CLOCK));
+	ym1.irq_handler().set_inputline(m_audiocpu, M6809_FIRQ_LINE);
+	ym1.add_route(0, "mono", 0.50);
+	ym1.add_route(1, "mono", 0.50);
+	ym1.add_route(2, "mono", 0.50);
+	ym1.add_route(3, "mono", 0.40);
 
-	MCFG_DEVICE_ADD("ym2", YM2203, MCU_CLOCK)
-	MCFG_SOUND_ROUTE(0, "mono", 0.50)
-	MCFG_SOUND_ROUTE(1, "mono", 0.50)
-	MCFG_SOUND_ROUTE(2, "mono", 0.50)
-	MCFG_SOUND_ROUTE(3, "mono", 0.40)
+	ym2203_device &ym2(YM2203(config, "ym2", MCU_CLOCK));
+	ym2.add_route(0, "mono", 0.50);
+	ym2.add_route(1, "mono", 0.50);
+	ym2.add_route(2, "mono", 0.50);
+	ym2.add_route(3, "mono", 0.40);
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(xain_state::xsleenab)
 	xsleena(config);
+
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(bootleg_map)
 
-	MCFG_DEVICE_REMOVE("mcu")
+	config.device_remove("mcu");
 MACHINE_CONFIG_END
 
 

@@ -377,31 +377,29 @@ MACHINE_CONFIG_START(pk8000_state::pk8000)
 	MCFG_SCREEN_UPDATE_DRIVER(pk8000_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(pk8000_base_state, pk8000)
+	PALETTE(config, "palette", FUNC(pk8000_state::pk8000_palette), 16);
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pk8000_state, _80_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, pk8000_state, _80_portb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pk8000_state, _80_portc_w))
+	i8255_device &ppi1(I8255(config, "ppi8255_1"));
+	ppi1.out_pa_callback().set(FUNC(pk8000_state::_80_porta_w));
+	ppi1.in_pb_callback().set(FUNC(pk8000_state::_80_portb_r));
+	ppi1.out_pc_callback().set(FUNC(pk8000_state::_80_portc_w));
 
-	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, pk8000_base_state, _84_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pk8000_base_state, _84_porta_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pk8000_base_state, _84_portc_w))
+	i8255_device &ppi2(I8255(config, "ppi8255_2"));
+	ppi2.in_pa_callback().set(FUNC(pk8000_base_state::_84_porta_r));
+	ppi2.out_pa_callback().set(FUNC(pk8000_base_state::_84_porta_w));
+	ppi2.out_pc_callback().set(FUNC(pk8000_base_state::_84_portc_w));
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(fmsx_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(fmsx_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_PLAY);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 MACHINE_CONFIG_END
 
 /* ROM definition */

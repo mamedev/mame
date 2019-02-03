@@ -113,7 +113,7 @@ READ8_MEMBER(irobot_state::quad_pokeyn_r)
 	int control = (offset & 0x20) >> 2;
 	int pokey_reg = (offset % 8) | control;
 
-	return m_pokey[pokey_num]->read(space, pokey_reg);
+	return m_pokey[pokey_num]->read(pokey_reg);
 }
 
 WRITE8_MEMBER(irobot_state::quad_pokeyn_w)
@@ -122,7 +122,7 @@ WRITE8_MEMBER(irobot_state::quad_pokeyn_w)
 	int control = (offset & 0x20) >> 2;
 	int pokey_reg = (offset % 8) | control;
 
-	m_pokey[pokey_num]->write(space, pokey_reg, data);
+	m_pokey[pokey_num]->write(pokey_reg, data);
 }
 
 
@@ -282,33 +282,32 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(irobot_state::irobot)
-
+void irobot_state::irobot(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809E, MAIN_CLOCK / 8)
-	MCFG_DEVICE_PROGRAM_MAP(irobot_map)
+	MC6809E(config, m_maincpu, MAIN_CLOCK / 8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &irobot_state::irobot_map);
 
-	MCFG_DEVICE_ADD("adc", ADC0809, MAIN_CLOCK / 16)
-	MCFG_ADC0808_IN0_CB(IOPORT("AN0"))
-	MCFG_ADC0808_IN1_CB(IOPORT("AN1"))
+	adc0809_device &adc(ADC0809(config, "adc", MAIN_CLOCK / 16));
+	adc.in_callback<0>().set_ioport("AN0");
+	adc.in_callback<1>().set_ioport("AN1");
 
-	MCFG_X2212_ADD_AUTOSAVE("nvram")
+	X2212(config, "nvram").set_auto_save(true);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 29*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(irobot_state, screen_update_irobot)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 0*8, 29*8-1);
+	m_screen->set_screen_update(FUNC(irobot_state::screen_update_irobot));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_irobot)
-	MCFG_PALETTE_ADD("palette", 64 + 32)    /* 64 for polygons, 32 for text */
-	MCFG_PALETTE_INIT_OWNER(irobot_state, irobot)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_irobot);
+	PALETTE(config, m_palette, FUNC(irobot_state::irobot_palette), 64 + 32); // 64 for polygons, 32 for text
 
-	MCFG_TIMER_DRIVER_ADD("irvg_timer", irobot_state, irobot_irvg_done_callback)
-	MCFG_TIMER_DRIVER_ADD("irmb_timer", irobot_state, irobot_irmb_done_callback)
+	TIMER(config, "irvg_timer").configure_generic(FUNC(irobot_state::irobot_irvg_done_callback));
+	TIMER(config, "irmb_timer").configure_generic(FUNC(irobot_state::irobot_irmb_done_callback));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -316,19 +315,19 @@ MACHINE_CONFIG_START(irobot_state::irobot)
 	/* FIXME: I-Robot has all channels of the quad-pokey tied together
 	 *        This needs to be taken into account in the design.
 	 */
-	MCFG_DEVICE_ADD("pokey1", POKEY, MAIN_CLOCK / 8)
-	MCFG_POKEY_ALLPOT_R_CB(IOPORT("DSW2"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	POKEY(config, m_pokey[0], MAIN_CLOCK / 8);
+	m_pokey[0]->allpot_r().set_ioport("DSW2");
+	m_pokey[0]->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("pokey2", POKEY, MAIN_CLOCK / 8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	POKEY(config, m_pokey[1], MAIN_CLOCK / 8);
+	m_pokey[1]->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("pokey3", POKEY, MAIN_CLOCK / 8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	POKEY(config, m_pokey[2], MAIN_CLOCK / 8);
+	m_pokey[2]->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("pokey4", POKEY, MAIN_CLOCK / 8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	POKEY(config, m_pokey[3], MAIN_CLOCK / 8);
+	m_pokey[3]->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 

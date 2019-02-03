@@ -24,14 +24,8 @@ public:
 	DECLARE_READ8_MEMBER(cru_r);
 	DECLARE_WRITE8_MEMBER(cru_w);
 
-	template <class Object> devcb_base &set_keyint_callback(Object &&cb)
-	{
-		return m_keyint_line.set_callback(std::forward<Object>(cb));
-	}
-	template <class Object> devcb_base &set_lineint_callback(Object &&cb)
-	{
-		return m_lineint_line.set_callback(std::forward<Object>(cb));
-	}
+	auto keyint_cb() { return m_keyint_line.bind(); }
+	auto lineint_cb() { return m_lineint_line.bind(); }
 
 protected:
 	// device-level overrides
@@ -56,8 +50,6 @@ private:
 	void draw_char(int character, int x, int y, int color);
 	void linefeed();
 	void transmit(uint8_t data);
-
-	DECLARE_PALETTE_INIT(asr733);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -85,11 +77,5 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(ASR733, asr733_device)
-
-#define MCFG_ASR733_KEYINT_HANDLER( _intcallb ) \
-	devcb = &downcast<asr733_device &>(*device).set_keyint_callback(DEVCB_##_intcallb);
-
-#define MCFG_ASR733_LINEINT_HANDLER( _intcallb ) \
-	devcb = &downcast<asr733_device &>(*device).set_lineint_callback(DEVCB_##_intcallb);
 
 #endif // MAME_VIDEO_733_ASR

@@ -51,7 +51,7 @@ public:
 		m_sprite_enable(*this, "sprite_enable"),
 		m_color_latch(*this, "color_latch"),
 		m_characterram(*this, "characterram") { }
-	
+
 	void base(machine_config &config);
 	void mtrap(machine_config &config);
 	void venture(machine_config &config);
@@ -108,6 +108,7 @@ private:
 
 	DECLARE_WRITE8_MEMBER(fax_bank_select_w);
 	DECLARE_READ8_MEMBER(exidy_interrupt_r);
+	DECLARE_WRITE8_MEMBER(mtrap_ocl_w);
 
 	virtual void video_start() override;
 	DECLARE_MACHINE_START(teetert);
@@ -142,12 +143,14 @@ private:
 
 	void exidy_map(address_map &map);
 	void fax_map(address_map &map);
+	void mtrap_map(address_map &map);
 	void pepper2_map(address_map &map);
 	void rallys_map(address_map &map);
 	void sidetrac_map(address_map &map);
 	void spectar_map(address_map &map);
 	void targ_map(address_map &map);
 	void venture_map(address_map &map);
+
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

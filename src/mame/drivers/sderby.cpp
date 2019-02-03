@@ -605,7 +605,7 @@ MACHINE_CONFIG_START(sderby_state::sderby)
 	MCFG_DEVICE_PROGRAM_MAP(sderby_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sderby_state,  irq2_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -613,11 +613,10 @@ MACHINE_CONFIG_START(sderby_state::sderby)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(4*8, 44*8-1, 3*8, 33*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sderby_state, screen_update_sderby)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sderby)
-	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sderby);
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_555, 0x1000);
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) /* clock frequency & pin 7 not verified */
@@ -630,7 +629,7 @@ MACHINE_CONFIG_START(sderby_state::sderbya)
 	MCFG_DEVICE_PROGRAM_MAP(sderbya_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sderby_state,  irq2_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -638,11 +637,10 @@ MACHINE_CONFIG_START(sderby_state::sderbya)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(4*8, 44*8-1, 3*8, 33*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sderby_state, screen_update_sderby)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sderby)
-	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sderby);
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_555, 0x1000);
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) /* clock frequency & pin 7 not verified */
@@ -655,7 +653,7 @@ MACHINE_CONFIG_START(sderby_state::luckboom)
 	MCFG_DEVICE_PROGRAM_MAP(luckboom_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sderby_state,  irq4_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -663,11 +661,10 @@ MACHINE_CONFIG_START(sderby_state::luckboom)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(4*8, 44*8-1, 3*8, 33*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sderby_state, screen_update_sderby)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sderby)
-	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sderby);
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_555, 0x1000);
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) /* clock frequency & pin 7 not verified */
@@ -680,7 +677,7 @@ MACHINE_CONFIG_START(sderby_state::spacewin)
 	MCFG_DEVICE_PROGRAM_MAP(spacewin_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sderby_state,  irq2_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -688,11 +685,10 @@ MACHINE_CONFIG_START(sderby_state::spacewin)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(4*8, 44*8-1, 3*8, 33*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sderby_state, screen_update_pmroulet)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sderby)
-	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sderby);
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_555, 0x1000);
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) /* clock frequency & pin 7 not verified */
@@ -705,7 +701,7 @@ MACHINE_CONFIG_START(sderby_state::shinygld)
 	MCFG_DEVICE_PROGRAM_MAP(shinygld_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sderby_state, irq4_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(57.47) // measured on PCB
@@ -713,11 +709,10 @@ MACHINE_CONFIG_START(sderby_state::shinygld)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(4*8, 44*8-1, 3*8, 33*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sderby_state, screen_update_sderby)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sderby)
-	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sderby);
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_555, 0x1000);
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH) /* clock frequency & pin 7 verified */
@@ -730,7 +725,7 @@ MACHINE_CONFIG_START(sderby_state::pmroulet)
 	MCFG_DEVICE_PROGRAM_MAP(roulette_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sderby_state,  irq2_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -738,11 +733,10 @@ MACHINE_CONFIG_START(sderby_state::pmroulet)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(4*8, 44*8-1, 3*8, 33*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sderby_state, screen_update_pmroulet)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sderby)
-	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sderby);
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_555, 0x1000);
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) /* clock frequency & pin 7 not verified */
@@ -1042,8 +1036,8 @@ ROM_END
 ******************************/
 
 //     YEAR  NAME       PARENT    MACHINE   INPUT     CLASS         INIT        ROT   COMPANY     FULLNAME                                FLAGS                                                LAYOUT
-GAMEL( 1996, sderby,    0,        sderby,   sderby,   sderby_state, empty_init, ROT0, "Playmark", "Super Derby (v.07.03)",                0,                                                   layout_sderby   )
-GAMEL( 1996, sderbya,   sderby,   sderbya,  sderbya,  sderby_state, empty_init, ROT0, "Playmark", "Super Derby (v.10.04)",                0,                                                   layout_sderby   )
+GAMEL( 1996, sderby,    0,        sderby,   sderby,   sderby_state, empty_init, ROT0, "Playmark", "Super Derby (Playmark, v.07.03)",      0,                                                   layout_sderby   )
+GAMEL( 1996, sderbya,   sderby,   sderbya,  sderbya,  sderby_state, empty_init, ROT0, "Playmark", "Super Derby (Playmark, v.10.04)",      0,                                                   layout_sderby   )
 GAMEL( 1996, spacewin,  0,        spacewin, spacewin, sderby_state, empty_init, ROT0, "Playmark", "Scacco Matto / Space Win",             0,                                                   layout_spacewin )
 GAME(  1996, shinygld,  0,        shinygld, shinygld, sderby_state, empty_init, ROT0, "Playmark", "Shiny Golds",                          0                                                                    )
 GAMEL( 1997, croupier,  0,        pmroulet, pmroulet, sderby_state, empty_init, ROT0, "Playmark", "Croupier (Playmark Roulette v.20.05)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_pmroulet )

@@ -25,9 +25,6 @@
 #include "osdepend.h"
 #include "xmlfile.h"
 
-#include <ctype.h>
-#include <fstream>
-
 
 const size_t debugger_cpu::NUM_TEMP_VARIABLES = 10;
 
@@ -152,42 +149,13 @@ symbol_table* debugger_cpu::get_visible_symtable()
 }
 
 
-/*-------------------------------------------------
-    source_script - specifies a debug command
-    script to execute
--------------------------------------------------*/
-
-void debugger_cpu::source_script(const char *file)
-{
-	// close any existing source file
-	m_source_file.reset();
-
-	// open a new one if requested
-	if (file != nullptr)
-	{
-		auto source_file = std::make_unique<std::ifstream>(file, std::ifstream::in);
-		if (source_file->fail())
-		{
-			if (m_machine.phase() == machine_phase::RUNNING)
-				m_machine.debugger().console().printf("Cannot open command file '%s'\n", file);
-			else
-				fatalerror("Cannot open command file '%s'\n", file);
-		}
-		else
-		{
-			m_source_file = std::move(source_file);
-		}
-	}
-}
-
-
 
 //**************************************************************************
 //  MEMORY AND DISASSEMBLY HELPERS
 //**************************************************************************
 
 //-------------------------------------------------
-//  omment_save - save all comments for the given
+//  comment_save - save all comments for the given
 //  machine
 //-------------------------------------------------
 
@@ -332,21 +300,18 @@ u8 debugger_cpu::read_byte(address_space &space, offs_t address, bool apply_tran
 {
 	device_memory_interface &memory = space.device().memory();
 
-	/* mask against the logical byte mask */
-	address &= space.logaddrmask();
-
-	/* translate if necessary; if not mapped, return 0xff */
-	u8 result;
-	if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_READ_DEBUG, address))
+	if (apply_translation)
 	{
-		result = 0xff;
-	}
-	else
-	{   /* otherwise, call the byte reading function for the translated address */
-		result = space.read_byte(address);
+		/* mask against the logical byte mask */
+		address &= space.logaddrmask();
+
+		/* translate if necessary; if not mapped, return 0xff */
+		if (!memory.translate(space.spacenum(), TRANSLATE_READ_DEBUG, address))
+			return 0xff;
 	}
 
-	return result;
+	/* otherwise, call the byte reading function for the translated address */
+	return space.read_byte(address);
 }
 
 
@@ -359,21 +324,18 @@ u16 debugger_cpu::read_word(address_space &space, offs_t address, bool apply_tra
 {
 	device_memory_interface &memory = space.device().memory();
 
-	/* mask against the logical byte mask */
-	address &= space.logaddrmask();
-
-	u16 result;
-	/* translate if necessary; if not mapped, return 0xffff */
-	if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_READ_DEBUG, address))
+	if (apply_translation)
 	{
-		result = 0xffff;
-	}
-	else
-	{   /* otherwise, call the byte reading function for the translated address */
-		result = space.read_word_unaligned(address);
+		/* mask against the logical byte mask */
+		address &= space.logaddrmask();
+
+		/* translate if necessary; if not mapped, return 0xffff */
+		if (!memory.translate(space.spacenum(), TRANSLATE_READ_DEBUG, address))
+			return 0xffff;
 	}
 
-	return result;
+	/* otherwise, call the byte reading function for the translated address */
+	return space.read_word_unaligned(address);
 }
 
 
@@ -386,21 +348,18 @@ u32 debugger_cpu::read_dword(address_space &space, offs_t address, bool apply_tr
 {
 	device_memory_interface &memory = space.device().memory();
 
-	/* mask against the logical byte mask */
-	address &= space.logaddrmask();
+	if (apply_translation)
+	{
+		/* mask against the logical byte mask */
+		address &= space.logaddrmask();
 
-	u32 result;
-
-	if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_READ_DEBUG, address))
-	{   /* translate if necessary; if not mapped, return 0xffffffff */
-		result = 0xffffffff;
-	}
-	else
-	{   /* otherwise, call the byte reading function for the translated address */
-		result = space.read_dword_unaligned(address);
+		/* translate if necessary; if not mapped, return 0xffffffff */
+		if (!memory.translate(space.spacenum(), TRANSLATE_READ_DEBUG, address))
+			return 0xffffffff;
 	}
 
-	return result;
+	/* otherwise, call the byte reading function for the translated address */
+	return space.read_dword_unaligned(address);
 }
 
 
@@ -413,22 +372,19 @@ u64 debugger_cpu::read_qword(address_space &space, offs_t address, bool apply_tr
 {
 	device_memory_interface &memory = space.device().memory();
 
-	/* mask against the logical byte mask */
-	address &= space.logaddrmask();
-
-	u64 result;
-
 	/* translate if necessary; if not mapped, return 0xffffffffffffffff */
-	if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_READ_DEBUG, address))
+	if (apply_translation)
 	{
-		result = ~u64(0);
-	}
-	else
-	{   /* otherwise, call the byte reading function for the translated address */
-		result = space.read_qword_unaligned(address);
+		/* mask against the logical byte mask */
+		address &= space.logaddrmask();
+
+		/* translate if necessary; if not mapped, return 0xffffffff */
+		if (!memory.translate(space.spacenum(), TRANSLATE_READ_DEBUG, address))
+			return ~u64(0);
 	}
 
-	return result;
+	/* otherwise, call the byte reading function for the translated address */
+	return space.read_qword_unaligned(address);
 }
 
 
@@ -460,16 +416,18 @@ void debugger_cpu::write_byte(address_space &space, offs_t address, u8 data, boo
 {
 	device_memory_interface &memory = space.device().memory();
 
-	/* mask against the logical byte mask */
-	address &= space.logaddrmask();
+	if (apply_translation)
+	{
+		/* mask against the logical byte mask */
+		address &= space.logaddrmask();
 
-	/* translate if necessary; if not mapped, we're done */
-	if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_WRITE_DEBUG, address))
-		;
+		/* translate if necessary; if not mapped, we're done */
+		if (!memory.translate(space.spacenum(), TRANSLATE_WRITE_DEBUG, address))
+			return;
+	}
 
 	/* otherwise, call the byte reading function for the translated address */
-	else
-		space.write_byte(address, data);
+	space.write_byte(address, data);
 
 	m_memory_modified = true;
 }
@@ -484,16 +442,18 @@ void debugger_cpu::write_word(address_space &space, offs_t address, u16 data, bo
 {
 	device_memory_interface &memory = space.device().memory();
 
-	/* mask against the logical byte mask */
-	address &= space.logaddrmask();
+	if (apply_translation)
+	{
+		/* mask against the logical byte mask */
+		address &= space.logaddrmask();
 
-	/* translate if necessary; if not mapped, we're done */
-	if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_WRITE_DEBUG, address))
-		;
+		/* translate if necessary; if not mapped, we're done */
+		if (!memory.translate(space.spacenum(), TRANSLATE_WRITE_DEBUG, address))
+			return;
+	}
 
 	/* otherwise, call the byte reading function for the translated address */
-	else
-		space.write_word_unaligned(address, data);
+	space.write_word_unaligned(address, data);
 
 	m_memory_modified = true;
 }
@@ -508,16 +468,18 @@ void debugger_cpu::write_dword(address_space &space, offs_t address, u32 data, b
 {
 	device_memory_interface &memory = space.device().memory();
 
-	/* mask against the logical byte mask */
-	address &= space.logaddrmask();
+	if (apply_translation)
+	{
+		/* mask against the logical byte mask */
+		address &= space.logaddrmask();
 
-	/* translate if necessary; if not mapped, we're done */
-	if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_WRITE_DEBUG, address))
-		;
+		/* translate if necessary; if not mapped, we're done */
+		if (!memory.translate(space.spacenum(), TRANSLATE_WRITE_DEBUG, address))
+			return;
+	}
 
 	/* otherwise, call the byte reading function for the translated address */
-	else
-		space.write_dword_unaligned(address, data);
+	space.write_dword_unaligned(address, data);
 
 	m_memory_modified = true;
 }
@@ -532,16 +494,18 @@ void debugger_cpu::write_qword(address_space &space, offs_t address, u64 data, b
 {
 	device_memory_interface &memory = space.device().memory();
 
-	/* mask against the logical byte mask */
-	address &= space.logaddrmask();
+	if (apply_translation)
+	{
+		/* mask against the logical byte mask */
+		address &= space.logaddrmask();
 
-	/* translate if necessary; if not mapped, we're done */
-	if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_WRITE_DEBUG, address))
-		;
+		/* translate if necessary; if not mapped, we're done */
+		if (!memory.translate(space.spacenum(), TRANSLATE_WRITE_DEBUG, address))
+			return;
+	}
 
 	/* otherwise, call the byte reading function for the translated address */
-	else
-		space.write_qword_unaligned(address, data);
+	space.write_qword_unaligned(address, data);
 
 	m_memory_modified = true;
 }
@@ -638,42 +602,6 @@ void debugger_cpu::reset_transient_flags()
 	for (device_t &device : device_iterator(m_machine.root_device()))
 		device.debug()->reset_transient_flag();
 	m_stop_when_not_device = nullptr;
-}
-
-
-/*-------------------------------------------------
-    process_source_file - executes commands from
-    a source file
--------------------------------------------------*/
-
-void debugger_cpu::process_source_file()
-{
-	std::string buf;
-
-	// loop until the file is exhausted or until we are executing again
-	while (m_execution_state == exec_state::STOPPED
-			&& m_source_file
-			&& std::getline(*m_source_file, buf))
-	{
-		// strip out comments (text after '//')
-		size_t pos = buf.find("//");
-		if (pos != std::string::npos)
-			buf.resize(pos);
-
-		// strip whitespace
-		strtrimrightspace(buf);
-
-		// execute the command
-		if (!buf.empty())
-			m_machine.debugger().console().execute_command(buf, true);
-	}
-
-	if (m_source_file && !m_source_file->good())
-	{
-		if (!m_source_file->eof())
-			m_machine.debugger().console().printf("I/O error, script processing terminated\n");
-		m_source_file.reset();
-	}
 }
 
 
@@ -1401,7 +1329,7 @@ device_debug::device_debug(device_t &device)
 			else
 				m_notifiers.push_back(-1);
 	}
-		
+
 	// set up state-related stuff
 	if (m_state != nullptr)
 	{
@@ -1585,7 +1513,7 @@ void device_debug::interrupt_hook(int irqline)
 
 void device_debug::exception_hook(int exception)
 {
-	// see if this matches a pending interrupt request
+	// see if this matches an exception breakpoint
 	if ((m_flags & DEBUG_FLAG_STOP_EXCEPTION) != 0 && (m_stopexception == -1 || m_stopexception == exception))
 	{
 		m_device.machine().debugger().cpu().set_execution_stopped();
@@ -1594,6 +1522,37 @@ void device_debug::exception_hook(int exception)
 	}
 }
 
+
+//-------------------------------------------------
+//  privilege_hook - called when privilege level is
+//  changed
+//-------------------------------------------------
+
+void device_debug::privilege_hook()
+{
+	bool matched = 1;
+
+	if ((m_flags & DEBUG_FLAG_STOP_PRIVILEGE) != 0)
+	{
+		if (m_privilege_condition && !m_privilege_condition->is_empty())
+		{
+			try
+			{
+				matched = m_privilege_condition->execute();
+			}
+			catch (...)
+			{
+			}
+		}
+
+		if (matched)
+		{
+			m_device.machine().debugger().cpu().set_execution_stopped();
+			m_device.machine().debugger().console().printf("Stopped due to privilege change\n", m_device.tag());
+			compute_debug_flags();
+		}
+	}
+}
 
 //-------------------------------------------------
 //  instruction_hook - called by the CPU cores
@@ -1718,7 +1677,7 @@ void device_debug::instruction_hook(offs_t curpc)
 			}
 
 			// check for commands in the source file
-			machine.debugger().cpu().process_source_file();
+			machine.debugger().console().process_source_file();
 
 			// if an event got scheduled, resume
 			if (machine.scheduled_event_pending())
@@ -1928,6 +1887,21 @@ void device_debug::go_milliseconds(u64 milliseconds)
 	m_device.machine().rewind_invalidate();
 	m_stoptime = m_device.machine().time() + attotime::from_msec(milliseconds);
 	m_flags |= DEBUG_FLAG_STOP_TIME;
+	m_device.machine().debugger().cpu().set_execution_running();
+}
+
+
+//-------------------------------------------------
+//  go_privilege - execute until execution
+//  level changes
+//-------------------------------------------------
+
+void device_debug::go_privilege(const char *condition)
+{
+	assert(m_exec != nullptr);
+	m_device.machine().rewind_invalidate();
+	m_privilege_condition = std::make_unique<parsed_expression>(&m_symtable, condition);
+	m_flags |= DEBUG_FLAG_STOP_PRIVILEGE;
 	m_device.machine().debugger().cpu().set_execution_running();
 }
 
@@ -2813,13 +2787,14 @@ device_debug::watchpoint::watchpoint(device_debug* debugInterface,
 	  m_address(address & space.addrmask()),
 	  m_length(length),
 	  m_condition(&symbols, (condition != nullptr) ? condition : "1"),
-	  m_action((action != nullptr) ? action : "")
+	  m_action((action != nullptr) ? action : ""),
+	  m_installing(false)
 {
 	std::fill(std::begin(m_start_address), std::end(m_start_address), 0);
 	std::fill(std::begin(m_end_address), std::end(m_end_address), 0);
 	std::fill(std::begin(m_masks), std::end(m_masks), 0);
 
-	offs_t ashift = m_space.addr_shift();
+	int ashift = m_space.addr_shift();
 	endianness_t endian = m_space.endianness();
 	offs_t subamask = m_space.alignment() - 1;
 	offs_t unit_size = ashift <= 0 ? 8 << -ashift : 8 >> ashift;
@@ -2841,9 +2816,9 @@ device_debug::watchpoint::watchpoint(device_debug* debugInterface,
 	if (end != rend)
 	{
 		if (endian == ENDIANNESS_LITTLE)
-			emask &= make_bitmask<u64>((rend + subamask + 1 - end) * unit_size);
+			emask &= make_bitmask<u64>((subamask + 1 + end - rend) * unit_size);
 		else
-			emask &= ~make_bitmask<u64>((end - rend) * unit_size);
+			emask &= ~make_bitmask<u64>((rend - end) * unit_size);
 	}
 
 	if (rend == (rstart | subamask) || smask == emask)
@@ -2885,10 +2860,6 @@ device_debug::watchpoint::watchpoint(device_debug* debugInterface,
 	m_notifier = m_space.add_change_notifier([this](read_or_write mode) {
 												 if (m_enabled)
 												 {
-													 if (u32(mode) & u32(read_or_write::READ))
-														 m_phr->remove();
-													 if (u32(mode) & u32(read_or_write::WRITE))
-														 m_phw->remove();
 													 install(mode);
 												 }
 											 });
@@ -2897,6 +2868,10 @@ device_debug::watchpoint::watchpoint(device_debug* debugInterface,
 device_debug::watchpoint::~watchpoint()
 {
 	m_space.remove_change_notifier(m_notifier);
+	if (m_phr)
+		m_phr->remove();
+	if (m_phw)
+		m_phw->remove();
 }
 
 void device_debug::watchpoint::setEnabled(bool value)
@@ -2908,16 +2883,25 @@ void device_debug::watchpoint::setEnabled(bool value)
 			install(read_or_write::READWRITE);
 		else
 		{
+			m_installing = true;
 			if(m_phr)
 				m_phr->remove();
 			if(m_phw)
 				m_phw->remove();
+			m_installing = false;
 		}
 	}
 }
 
 void device_debug::watchpoint::install(read_or_write mode)
 {
+	if (m_installing)
+		return;
+	m_installing = true;
+	if ((u32(mode) & u32(read_or_write::READ)) && m_phr)
+		m_phr->remove();
+	if ((u32(mode) & u32(read_or_write::WRITE)) && m_phw)
+		m_phw->remove();
 	std::string name = util::string_format("wp@%x", m_address);
 	switch (m_space.data_width())
 	{
@@ -2994,6 +2978,7 @@ void device_debug::watchpoint::install(read_or_write mode)
 			}
 		break;
 	}
+	m_installing = false;
 }
 
 void device_debug::watchpoint::triggered(read_or_write type, offs_t address, u64 data, u64 mem_mask)
@@ -3007,7 +2992,7 @@ void device_debug::watchpoint::triggered(read_or_write type, offs_t address, u64
 
 	// adjust address, size & value_to_write based on mem_mask.
 	offs_t size = 0;
-	offs_t ashift = m_space.addr_shift();
+	int ashift = m_space.addr_shift();
 	offs_t unit_size = ashift <= 0 ? 8 << -ashift : 8 >> ashift;
 	u64 unit_mask = make_bitmask<u64>(unit_size);
 

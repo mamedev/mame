@@ -377,14 +377,9 @@ MACHINE_CONFIG_START(bwing_state::bwing)
 	MCFG_DEVICE_IO_MAP(bwp3_io_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(bwing_state, bwp3_interrupt,  1000)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(18000))     // high enough?
+	config.m_minimum_quantum = attotime::from_hz(18000);     // high enough?
 
-	MCFG_DEVICE_ADD("vrambank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(bank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(15)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
+	ADDRESS_MAP_BANK(config, "vrambank").set_map(&bwing_state::bank_map).set_options(ENDIANNESS_BIG, 8, 15, 0x2000);
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -403,13 +398,11 @@ MACHINE_CONFIG_START(bwing_state::bwing)
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ay1", AY8912, XTAL(24'000'000) / 2 / 8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	AY8912(config, "ay1", XTAL(24'000'000) / 2 / 8).add_route(ALL_OUTPUTS, "speaker", 0.5);
 
-	MCFG_DEVICE_ADD("ay2", AY8912, XTAL(24'000'000) / 2 / 8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	AY8912(config, "ay2", XTAL(24'000'000) / 2 / 8).add_route(ALL_OUTPUTS, "speaker", 0.5);
 
 	MCFG_DEVICE_ADD("dac", DAC08, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)

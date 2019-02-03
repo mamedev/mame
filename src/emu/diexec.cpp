@@ -351,7 +351,7 @@ void device_execute_interface::interface_validity_check(validity_checker &valid)
 		if (iter.first() == nullptr)
 			osd_printf_error("VBLANK interrupt specified, but the driver is screenless\n");
 		else if (m_vblank_interrupt_screen != nullptr && device().siblingdevice(m_vblank_interrupt_screen) == nullptr)
-			osd_printf_error("VBLANK interrupt references a non-existant screen tag '%s'\n", m_vblank_interrupt_screen);
+			osd_printf_error("VBLANK interrupt references a nonexistent screen tag '%s'\n", m_vblank_interrupt_screen);
 	}
 
 	if (!m_timed_interrupt.isnull() && m_timed_interrupt_period == attotime::zero)
@@ -522,7 +522,9 @@ int device_execute_interface::standard_irq_callback(int irqline)
 		vector = m_driver_irq(device(), irqline);
 
 	// notify the debugger
-	debugger_interrupt_hook(irqline);
+	if (device().machine().debug_flags & DEBUG_FLAG_ENABLED)
+		device().debug()->interrupt_hook(irqline);
+
 	return vector;
 }
 

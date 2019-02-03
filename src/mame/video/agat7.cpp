@@ -43,10 +43,7 @@ MACHINE_CONFIG_START(agat7video_device::device_add_mconfig)
 	MCFG_SCREEN_ADD("a7screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(10'500'000), 672, 0, 512, 312, 0, 256)
 	MCFG_SCREEN_UPDATE_DRIVER(agat7video_device, screen_update)
-	MCFG_SCREEN_PALETTE("a7palette")
-
-	MCFG_PALETTE_ADD("a7palette", 16)
-	MCFG_PALETTE_INIT_OWNER(agat7video_device, agat7)
+	MCFG_SCREEN_PALETTE(DEVICE_SELF)
 MACHINE_CONFIG_END
 
 
@@ -56,8 +53,8 @@ MACHINE_CONFIG_END
 
 agat7video_device::agat7video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, AGAT7VIDEO, tag, owner, clock),
+	device_palette_interface(mconfig, *this),
 	m_ram_dev(*this, finder_base::DUMMY_TAG),
-	m_palette(*this, "a7palette"),
 	m_char_region(*this, finder_base::DUMMY_TAG),
 	m_char_ptr(nullptr),
 	m_char_size(0),
@@ -74,6 +71,13 @@ void agat7video_device::device_start()
 {
 	m_char_ptr = m_char_region->base();
 	m_char_size = m_char_region->bytes();
+
+	// per http://agatcomp.ru/Reading/IiO/87-2-077.djvu
+	for (int i = 0; 8 > i; ++i)
+	{
+		set_pen_color(i + 0, rgb_t(BIT(i, 0) ? 0xff : 0, BIT(i, 1) ? 0xff : 0, BIT(i, 2) ? 0xff : 0));
+		set_pen_color(i + 8, rgb_t(BIT(i, 0) ? 0x7f : 0, BIT(i, 1) ? 0x7f : 0, BIT(i, 2) ? 0x7f : 0));
+	}
 
 //  save_item(NAME(m_video_mode));
 	save_item(NAME(m_start_address));
@@ -168,8 +172,8 @@ void agat7video_device::text_update_lores(screen_device &screen, bitmap_ind16 &b
 	int fg = 0;
 	int bg = 0;
 
-	beginrow = std::max(beginrow, cliprect.min_y - (cliprect.min_y % 8));
-	endrow = std::min(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
+	beginrow = std::max(beginrow, cliprect.top() - (cliprect.top() % 8));
+	endrow = std::min(endrow, cliprect.bottom() - (cliprect.bottom() % 8) + 7);
 
 	for (row = beginrow; row <= endrow; row += 8)
 	{
@@ -198,8 +202,8 @@ void agat7video_device::text_update_hires(screen_device &screen, bitmap_ind16 &b
 	uint8_t ch;
 	int fg, bg;
 
-	beginrow = std::max(beginrow, cliprect.min_y - (cliprect.min_y % 8));
-	endrow = std::min(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
+	beginrow = std::max(beginrow, cliprect.top() - (cliprect.top() % 8));
+	endrow = std::min(endrow, cliprect.bottom() - (cliprect.bottom() % 8) + 7);
 
 	if (m_start_address & 0x800) {
 		fg = 7; bg = 0;
@@ -227,8 +231,8 @@ void agat7video_device::graph_update_mono(screen_device &screen, bitmap_ind16 &b
 	uint8_t gfx, v;
 	int fg = 7, bg = 0;
 
-	beginrow = std::max(beginrow, cliprect.min_y - (cliprect.min_y % 8));
-	endrow = std::min(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
+	beginrow = std::max(beginrow, cliprect.top() - (cliprect.top() % 8));
+	endrow = std::min(endrow, cliprect.bottom() - (cliprect.bottom() % 8) + 7);
 
 	for (row = beginrow; row <= endrow; row++)
 	{
@@ -256,8 +260,8 @@ void agat7video_device::graph_update_hires(screen_device &screen, bitmap_ind16 &
 	uint16_t *p;
 	uint8_t gfx, v;
 
-	beginrow = std::max(beginrow, cliprect.min_y - (cliprect.min_y % 8));
-	endrow = std::min(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
+	beginrow = std::max(beginrow, cliprect.top() - (cliprect.top() % 8));
+	endrow = std::min(endrow, cliprect.bottom() - (cliprect.bottom() % 8) + 7);
 
 	for (row = beginrow; row <= endrow; row++)
 	{
@@ -287,8 +291,8 @@ void agat7video_device::graph_update_lores(screen_device &screen, bitmap_ind16 &
 	uint16_t *p;
 	uint8_t gfx, v;
 
-	beginrow = std::max(beginrow, cliprect.min_y - (cliprect.min_y % 8));
-	endrow = std::min(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
+	beginrow = std::max(beginrow, cliprect.top() - (cliprect.top() % 8));
+	endrow = std::min(endrow, cliprect.bottom() - (cliprect.bottom() % 8) + 7);
 
 	for (row = beginrow; row <= endrow; row++)
 	{
@@ -348,7 +352,7 @@ uint32_t agat7video_device::screen_update(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
-// per http://agatcomp.ru/Reading/IiO/87-2-077.djvu
+#if 0
 static const rgb_t agat7_palette[] =
 {
 	rgb_t::black(),
@@ -368,8 +372,4 @@ static const rgb_t agat7_palette[] =
 	rgb_t(0x7F, 0x7F, 0x00),  /* White */
 	rgb_t(0x7F, 0x7F, 0x7F)   /* White */
 };
-
-PALETTE_INIT_MEMBER(agat7video_device, agat7)
-{
-	palette.set_pen_colors(0, agat7_palette, ARRAY_LENGTH(agat7_palette));
-}
+#endif

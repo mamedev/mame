@@ -15,17 +15,6 @@
 
 #include "emupal.h"
 
-#define MCFG_EF936X_PALETTE(palette_tag) \
-		downcast<ef9365_device &>(*device).set_palette_tag(palette_tag);
-
-#define MCFG_EF936X_BITPLANES_CNT(bitplanes_number) \
-		downcast<ef9365_device &>(*device).set_nb_bitplanes((bitplanes_number));
-
-#define MCFG_EF936X_DISPLAYMODE(display_mode) \
-		downcast<ef9365_device &>(*device).set_display_mode((ef9365_device::display_mode));
-
-#define MCFG_EF936X_IRQ_HANDLER(cb) \
-		devcb = &downcast<ef9365_device &>(*device).set_irq_handler((DEVCB_##cb));
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -54,7 +43,7 @@ public:
 	template <typename T> void set_palette_tag(T &&tag) { m_palette.set_tag(std::forward<T>(tag)); }
 	void set_nb_bitplanes(int nb_bitplanes );
 	void set_display_mode(int display_mode );
-	template<class Object> devcb_base &set_irq_handler(Object object) { return m_irq_handler.set_callback(std::forward<Object>(object)); }
+	auto irq_handler() { return m_irq_handler.bind(); }
 
 	// device interface
 	DECLARE_READ8_MEMBER( data_r );

@@ -23,11 +23,12 @@ DEFINE_DEVICE_TYPE(ELECTRON_CLICK, electron_click_device, "electron_click", "Slo
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(electron_click_device::device_add_mconfig)
+void electron_click_device::device_add_mconfig(machine_config &config)
+{
 	/* rtc */
-	MCFG_DEVICE_ADD("rtc", MC146818, 32.768_kHz_XTAL)
-	MCFG_MC146818_IRQ_HANDLER(WRITELINE(*this, electron_click_device, irq_w))
-MACHINE_CONFIG_END
+	MC146818(config, m_rtc, 32.768_kHz_XTAL);
+	m_rtc->irq().set(DEVICE_SELF_OWNER, FUNC(electron_cartslot_device::irq_w));
+}
 
 //-------------------------------------------------
 //  INPUT_PORTS( click )
@@ -87,7 +88,7 @@ void electron_click_device::device_reset()
 //  read - cartridge data read
 //-------------------------------------------------
 
-uint8_t electron_click_device::read(address_space &space, offs_t offset, int infc, int infd, int romqa)
+uint8_t electron_click_device::read(address_space &space, offs_t offset, int infc, int infd, int romqa, int oe, int oe2)
 {
 	uint8_t data = 0xff;
 
@@ -104,8 +105,7 @@ uint8_t electron_click_device::read(address_space &space, offs_t offset, int inf
 			break;
 		}
 	}
-
-	if (!infc && !infd)
+	else if (oe)
 	{
 		offs_t rom_page_offset = (m_page_register & 0x03) * 0x2000;
 		offs_t ram_page_offset = ((m_page_register & 0x0c) >> 2) * 0x2000;
@@ -127,7 +127,7 @@ uint8_t electron_click_device::read(address_space &space, offs_t offset, int inf
 //  write - cartridge data write
 //-------------------------------------------------
 
-void electron_click_device::write(address_space &space, offs_t offset, uint8_t data, int infc, int infd, int romqa)
+void electron_click_device::write(address_space &space, offs_t offset, uint8_t data, int infc, int infd, int romqa, int oe, int oe2)
 {
 	if (infc)
 	{
@@ -142,8 +142,7 @@ void electron_click_device::write(address_space &space, offs_t offset, uint8_t d
 			break;
 		}
 	}
-
-	if (!infc && !infd)
+	else if (oe)
 	{
 		offs_t ram_page_offset = ((m_page_register & 0x0c) >> 2) * 0x2000;
 
@@ -164,9 +163,4 @@ INPUT_CHANGED_MEMBER(electron_click_device::click_button)
 	{
 		m_slot->irq_w(CLEAR_LINE);
 	}
-}
-
-WRITE_LINE_MEMBER(electron_click_device::irq_w)
-{
-	m_slot->irq_w(state);
 }

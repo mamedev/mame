@@ -45,14 +45,191 @@
 		</part>
 	</software>
 
-	<software name="elite">
-		<description>Elite</description>
+	<software name="codedro" supported="no">
+		<description>Codename: DROID</description>
+		<year>1987</year>
+		<publisher>Superior Software/Acornsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="3463936">
+				<rom name="Codename DROID (Superior) (BMC) (Disc35).fdi" size="3463936" crc="8ee0a2a3" sha1="d6f5595b6738f75b271958d0763d14fc08fafee9" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="colos4ch" supported="no">
+		<description>Colossus Chess 4.0</description>
+		<year>1986</year>
+		<publisher>CDS</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="3468288">
+				<rom name="Colossus Chess 4 (CDS) (BMC) (Disc35).fdi" size="3468288" crc="5e009178" sha1="c09038f3803d3e4441042bd8c627ff010b63657e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="elited" cloneof="elite">
+		<description>Elite [deprotected]</description>
 		<year>1986</year>
 		<publisher>Superior Software/Acornsoft</publisher>
 		<info name="release" value="SUG60" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
 				<rom name="elite.adm" size="327680" crc="4668a225" sha1="0716a525820045f6b2092dda2eca2fa6a651b381" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="elite" supported="no">
+		<description>Elite</description>
+		<year>1986</year>
+		<publisher>Superior Software/Acornsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="3205376">
+				<rom name="Elite (Superior) (BMC) (Disc35).fdi" size="3205376" crc="a8580b91" sha1="8ec5c512d17432752c86e252f123d973098e3f5f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="exile" supported="no">
+		<description>Exile</description>
+		<year>1988</year>
+		<publisher>Superior Software/Acornsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="3461632">
+				<rom name="Exile (Superior) (BMC) (Disc35).fdi" size="3461632" crc="92c22af9" sha1="a0bc2024d42a1f488e9012ff88451bcf0abdb592" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="holedout" supported="no">
+		<description>Holed Out</description>
+		<year>1989</year>
+		<publisher>4th Dimension</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="3363584">
+				<rom name="Holed Out (Fourth Dimension, The) (BMC) (Disc35).fdi" size="3363584" crc="437cccc6" sha1="ab730a66e28c6ff0028b944e2d988ab79c5c492f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="holedoc2" supported="no">
+		<description>Holed Out Extra Courses Vol.2</description>
+		<year>1989</year>
+		<publisher>4th Dimension</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="3596800">
+				<rom name="Holed Out - Extra Courses Vol 2 (Fourth Dimension, The) (BMC) (Disc35).fdi" size="3596800" crc="bab311ef" sha1="df3747e8a3327fd63d3db91be39bcfa4572da095" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="krystalc">
+		<description>The Krystal Connection</description>
+		<year>2009</year>
+		<publisher>Retro Software</publisher>
+		<info name="author" value="Stephen Smith" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="39680">
+				<rom name="The Krystal Connection (2009)(Retro Software).adf" size="39680" crc="3f565fdf" sha1="e6ce604c23e32ad3e42b3fcd9b23ba57376bc621" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mpmagic" supported="no">
+		<description>Micro Power Magic</description>
+		<year>1986</year>
+		<publisher>Micro Power</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="3448832">
+				<rom name="Micro Power Magic (Micro Power) (BMC) (Disc35).fdi" size="3448832" crc="fbf0e03c" sha1="ac6bcc7df5f6dc8a925d074416089d242413a409" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pias" supported="no">
+		<description>Play It Again Sam</description>
+		<year>1987</year>
+		<publisher>Superior Software/Acornsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="3719168">
+				<rom name="Play It Again Sam (Superior) (BMC) (Disc35).fdi" size="3719168" crc="480eacc7" sha1="bb6f58124f1afd20471c73893582aa1ca4e12b38" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pias2" supported="no">
+		<description>Play It Again Sam 2</description>
+		<year>198?</year>
+		<publisher>Superior Software/Acornsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="3551232">
+				<rom name="Play It Again Sam 2 (Superior) (BMC) (Disc35).fdi" size="3551232" crc="127cca5b" sha1="b0c2c78487e1d1d514c221e50b3a6a39df1fb17b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qmaster" supported="no">
+		<description>Q-Master</description>
+		<year>1991</year>
+		<publisher>4th Dimension</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="3263488">
+				<rom name="Q-Master (Fourth Dimension, The) (BMC) (Disc35).fdi" size="3263488" crc="be8358e4" sha1="4941f2ace2ca1b09f3563e28e767ee4307d98c8f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="reptonti" supported="no">
+		<description>Repton Thru Time</description>
+		<year>1988</year>
+		<publisher>Superior Software/Acornsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="3601408">
+				<rom name="Repton Thru Time (Superior) (BMC) (Disc35).fdi" size="3601408" crc="b31c34a1" sha1="fe38370a119ee9f278569bb5a088d0e4055fc92f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="reptonwo" supported="no">
+		<description>Repton Around the World in 40 Screens</description>
+		<year>1987</year>
+		<publisher>Superior Software/Acornsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="3400192">
+				<rom name="Around the World in 40 Screens (Superior) (BMC) (Disc35).fdi" size="3400192" crc="68ff41a2" sha1="4d4e48bfc7fdb6660e64b676dbe2b630034f0814" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stdsnook" supported="no">
+		<description>Steve Davis Snooker</description>
+		<year>1986</year>
+		<publisher>CDS</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="3396096">
+				<rom name="Steve Davis Snooker (CDS) (BMC) (Disc35).fdi" size="3396096" crc="d2d2f15e" sha1="96e0adf8cb437c796b475d4785c337b7a1011612" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="strykrun" supported="no">
+		<description>Stryker's Run</description>
+		<year>1986</year>
+		<publisher>Superior Software/Acornsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="3726336">
+				<rom name="Stryker's Run (Superior) (BMC) (Disc35).fdi" size="3726336" crc="2709ce38" sha1="8343477be489e7eeecf844446f05001423dc01e2" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uim" supported="no">
+		<description>U.I.M.</description>
+		<year>1989</year>
+		<publisher>4th Dimension</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="3196928">
+				<rom name="UIM (Fourth Dimension, The) (BMC) (Disc35).fdi" size="3196928" crc="e86a2077" sha1="96102eeb1afb15fafddda4d92ad347bdbdbfcdc6" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -68,7 +245,36 @@
 		</part>
 	</software>
 
+	<software name="zap">
+		<description>Zap!</description>
+		<year>2009</year>
+		<publisher>Retro Software</publisher>
+		<info name="author" value="Jamie Woodhouse" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="45312">
+				<rom name="Zap! (2009)(Retro Software).adf" size="45312" crc="3554bc34" sha1="e8f206bf93c6b30295fd9926a37fb5743b8a3c93" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Business -->
+
+	<software name="acom">
+		<description>Acom</description>
+		<year>1987</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SNC11" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="655360">
+				<rom name="Acom.adl" size="655360" crc="8544394e" sha1="1ece4427f2bdbcfc8232f9b40478139d090fdde6" offset="0" />
+			</dataarea>
+		</part>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Acom-4.10.rom" size="16384" crc="a0fa1740" sha1="ef8f83707405b95c662c322b9e5a60456970cc9b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="viewplot">
 		<description>ViewPlot</description>

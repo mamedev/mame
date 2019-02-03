@@ -64,13 +64,13 @@ const tiny_rom_entry *plus4_sid_cartridge_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(plus4_sid_cartridge_device::device_add_mconfig)
+void plus4_sid_cartridge_device::device_add_mconfig(machine_config &config)
+{
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD(MOS8580_TAG, MOS8580, XTAL(17'734'470)/20)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	MOS8580(config, m_sid, XTAL(17'734'470)/20).add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, nullptr)
-MACHINE_CONFIG_END
+	VCS_CONTROL_PORT(config, m_joy, vcs_control_port_devices, nullptr);
+}
 
 
 

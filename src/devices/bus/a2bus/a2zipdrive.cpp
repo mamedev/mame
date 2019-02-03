@@ -46,9 +46,10 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(a2bus_zipdrivebase_device::device_add_mconfig)
-	MCFG_ATA_INTERFACE_ADD(ZIPDRIVE_ATA_TAG, ata_devices, "hdd", nullptr, false)
-MACHINE_CONFIG_END
+void a2bus_zipdrivebase_device::device_add_mconfig(machine_config &config)
+{
+	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, false);
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

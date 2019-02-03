@@ -253,48 +253,52 @@ WRITE8_MEMBER( tmc600_state::sc_w )
 
 /* Machine Drivers */
 
-MACHINE_CONFIG_START(tmc600_state::tmc600)
+void tmc600_state::tmc600(machine_config &config)
+{
 	// CPU
-	MCFG_DEVICE_ADD(CDP1802_TAG, CDP1802, XTAL(3'570'000))
-	MCFG_DEVICE_PROGRAM_MAP(tmc600_map)
-	MCFG_DEVICE_IO_MAP(tmc600_io_map)
-	MCFG_COSMAC_WAIT_CALLBACK(VCC)
-	MCFG_COSMAC_EF2_CALLBACK(READLINE(*this, tmc600_state, ef2_r))
-	MCFG_COSMAC_EF3_CALLBACK(READLINE(*this, tmc600_state, ef3_r))
-	MCFG_COSMAC_Q_CALLBACK(WRITELINE(*this, tmc600_state, q_w))
-	MCFG_COSMAC_SC_CALLBACK(WRITE8(*this, tmc600_state, sc_w))
+	cdp1802_device &cpu(CDP1802(config, CDP1802_TAG, 3.57_MHz_XTAL));
+	cpu.set_addrmap(AS_PROGRAM, &tmc600_state::tmc600_map);
+	cpu.set_addrmap(AS_IO, &tmc600_state::tmc600_io_map);
+	cpu.wait_cb().set_constant(1);
+	cpu.ef2_cb().set(FUNC(tmc600_state::ef2_r));
+	cpu.ef3_cb().set(FUNC(tmc600_state::ef3_r));
+	cpu.q_cb().set(FUNC(tmc600_state::q_w));
+	cpu.sc_cb().set(FUNC(tmc600_state::sc_w));
+	cpu.tpb_cb().set(CDP1852_KB_TAG, FUNC(cdp1852_device::clock_w));
+	cpu.tpb_cb().append(CDP1852_TMC700_TAG, FUNC(cdp1852_device::clock_w));
 
 	// sound and video hardware
 	tmc600_video(config);
 
 	// keyboard output latch
-	MCFG_DEVICE_ADD(CDP1852_KB_TAG, CDP1852, XTAL(3'570'000)/8) // clock is CDP1802 TPB
-	MCFG_CDP1852_MODE_CALLBACK(VCC)
+	CDP1852(config, m_bwio); // clock is CDP1802 TPB
+	m_bwio->mode_cb().set_constant(1);
 
+#if 0
 	// address bus demux for expansion bus
-	MCFG_DEVICE_ADD(CDP1852_BUS_TAG, CDP1852, 0) // clock is expansion bus TPA
-	MCFG_CDP1852_MODE_CALLBACK(GND)
+	cdp1852_device &demux(CDP1852(config, CDP1852_BUS_TAG)); // clock is expansion bus TPA
+	demux.mode_cb().set_constant(0);
+#endif
 
 	// printer output latch
-	MCFG_DEVICE_ADD(CDP1852_TMC700_TAG, CDP1852, XTAL(3'570'000)/8) // clock is CDP1802 TPB
-	MCFG_CDP1852_MODE_CALLBACK(VCC)
-	MCFG_CDP1852_DO_CALLBACK(WRITE8(*this, tmc600_state, printer_w))
+	cdp1852_device &prtout(CDP1852(config, CDP1852_TMC700_TAG)); // clock is CDP1802 TPB
+	prtout.mode_cb().set_constant(1);
+	prtout.do_cb().set(FUNC(tmc600_state::printer_w));
 
 	// printer connector
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(CDP1802_TAG, cosmac_device, ef4_w)) MCFG_DEVCB_XOR(1)
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(CDP1802_TAG, FUNC(cosmac_device::ef4_w)).exor(1);
 
 	// cassette
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
 
 	// expansion bus connector
-	MCFG_TMC600_EURO_BUS_SLOT_ADD(TMC600_EURO_BUS_TAG, tmc600_euro_bus_cards, nullptr)
+	TMC600_EURO_BUS_SLOT(config, m_bus, tmc600_euro_bus_cards, nullptr);
 
 	// internal RAM
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("8K")
-MACHINE_CONFIG_END
+	RAM(config, RAM_TAG).set_default_size("8K");
+}
 
 /* ROMs */
 

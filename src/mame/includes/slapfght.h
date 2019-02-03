@@ -5,6 +5,10 @@
   Toaplan Slap Fight hardware
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_SLAPFGHT_H
+#define MAME_INCLUDES_SLAPFGHT_H
+
+#pragma once
 
 #include "cpu/z80/z80.h"
 #include "video/bufsprite.h"
@@ -15,8 +19,8 @@
 class slapfght_state : public driver_device
 {
 public:
-	slapfght_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	slapfght_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_bmcu(*this, "bmcu"),
@@ -146,3 +150,5 @@ private:
 	void tigerhb1_map(address_map &map);
 	void tigerhb2_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_SLAPFGHT_H

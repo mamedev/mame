@@ -1,8 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
-
 #ifndef MAME_INCLUDES_CISCHEAT_H
 #define MAME_INCLUDES_CISCHEAT_H
+
+#pragma once
 
 // TODO: better inheritance, eventually split individual driver files
 

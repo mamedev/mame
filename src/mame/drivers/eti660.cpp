@@ -38,6 +38,7 @@
 
 #include "emu.h"
 #include "includes/eti660.h"
+#include "screen.h"
 #include "speaker.h"
 
 
@@ -308,39 +309,44 @@ QUICKLOAD_LOAD_MEMBER( eti660_state, eti660 )
 
 MACHINE_CONFIG_START(eti660_state::eti660)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(CDP1802_TAG, CDP1802, XTAL(8'867'238)/5)
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_COSMAC_WAIT_CALLBACK(VCC)
-	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(*this, eti660_state, clear_r))
-	MCFG_COSMAC_EF2_CALLBACK(READLINE(*this, eti660_state, ef2_r))
-	MCFG_COSMAC_EF4_CALLBACK(READLINE(*this, eti660_state, ef4_r))
-	MCFG_COSMAC_Q_CALLBACK(WRITELINE(*this, eti660_state, q_w))
-	MCFG_COSMAC_DMAW_CALLBACK(WRITE8(*this, eti660_state, dma_w))
+	CDP1802(config, m_maincpu, XTAL(8'867'238)/5);
+	m_maincpu->set_addrmap(AS_PROGRAM, &eti660_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &eti660_state::io_map);
+	m_maincpu->wait_cb().set_constant(1);
+	m_maincpu->clear_cb().set(FUNC(eti660_state::clear_r));
+	m_maincpu->ef2_cb().set(FUNC(eti660_state::ef2_r));
+	m_maincpu->ef4_cb().set(FUNC(eti660_state::ef4_r));
+	m_maincpu->q_cb().set(FUNC(eti660_state::q_w));
+	m_maincpu->dma_wr_cb().set(FUNC(eti660_state::dma_w));
 
 	/* video hardware */
-	MCFG_CDP1864_SCREEN_ADD(SCREEN_TAG, XTAL(8'867'238)/5)
-	MCFG_SCREEN_UPDATE_DEVICE(CDP1864_TAG, cdp1864_device, screen_update)
+	SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_CDP1864_ADD(CDP1864_TAG, SCREEN_TAG, XTAL(8'867'238)/5, GND, INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_INT), INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_DMAOUT), INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_EF1), NOOP, READLINE(*this, eti660_state, rdata_r), READLINE(*this, eti660_state, bdata_r), READLINE(*this, eti660_state, gdata_r))
-	MCFG_CDP1864_CHROMINANCE(RES_K(2.2), RES_K(1), RES_K(4.7), RES_K(4.7)) // R7, R5, R6, R4
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	CDP1864(config, m_cti, XTAL(8'867'238)/5).set_screen(SCREEN_TAG);
+	m_cti->inlace_cb().set_constant(0);
+	m_cti->int_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_INT);
+	m_cti->dma_out_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_DMAOUT);
+	m_cti->efx_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_EF1);
+	m_cti->rdata_cb().set(FUNC(eti660_state::rdata_r));
+	m_cti->bdata_cb().set(FUNC(eti660_state::bdata_r));
+	m_cti->gdata_cb().set(FUNC(eti660_state::gdata_r));
+	m_cti->set_chrominance(RES_K(2.2), RES_K(1), RES_K(4.7), RES_K(4.7)); // R7, R5, R6, R4
+	m_cti->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
-	MCFG_DEVICE_ADD(MC6821_TAG, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, eti660_state, pia_pa_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, eti660_state, pia_pa_w))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_INT)) MCFG_DEVCB_INVERT
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_INT)) MCFG_DEVCB_INVERT
+	PIA6821(config, m_pia, 0);
+	m_pia->readpa_handler().set(FUNC(eti660_state::pia_pa_r));
+	m_pia->writepa_handler().set(FUNC(eti660_state::pia_pa_w));
+	m_pia->irqa_handler().set_inputline(m_maincpu, COSMAC_INPUT_LINE_INT).invert(); // FIXME: use an input merger for these lines
+	m_pia->irqb_handler().set_inputline(m_maincpu, COSMAC_INPUT_LINE_INT).invert();
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("3K")
+	RAM(config, RAM_TAG).set_default_size("3K");
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", eti660_state, eti660, "bin,c8,ch8", 2)

@@ -1927,12 +1927,12 @@ MACHINE_CONFIG_START(igspoker_state::igspoker)
 	MCFG_DEVICE_ADD("maincpu",Z80, 3579545)
 	MCFG_DEVICE_PROGRAM_MAP(igspoker_prg_map)
 	MCFG_DEVICE_IO_MAP(igspoker_io_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igspoker_state, igs_interrupt, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(igspoker_state::igs_interrupt), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, igspoker_state, igs_nmi_and_coins_w))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("SERVICE"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("COINS"))
+	i8255_device &ppi(I8255A(config, "ppi"));
+	ppi.out_pa_callback().set(FUNC(igspoker_state::igs_nmi_and_coins_w));
+	ppi.in_pb_callback().set_ioport("SERVICE");
+	ppi.in_pc_callback().set_ioport("COINS");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1941,11 +1941,10 @@ MACHINE_CONFIG_START(igspoker_state::igspoker)
 	MCFG_SCREEN_SIZE(64*8, 32*8) // TODO: wrong screen size!
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(igspoker_state, screen_update_igs_video)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_igspoker)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_igspoker);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1971,10 +1970,11 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(igspoker_state::number10)
 	igspoker(config);
+
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(number10_io_map)
 
-	MCFG_DEVICE_REMOVE("ppi")
+	config.device_remove("ppi");
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(igspoker_state, screen_update_cpokerpk)
@@ -1986,9 +1986,10 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(igspoker_state::cpokerpk)
 	number10(config);
+
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(cpokerpk_io_map)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_cpokerpk)
+	m_gfxdecode->set_info(gfx_cpokerpk);
 MACHINE_CONFIG_END
 
 

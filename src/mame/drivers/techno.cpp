@@ -292,13 +292,13 @@ MACHINE_CONFIG_START(techno_state::techno)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(8'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(techno_map)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	//MCFG_DEVICE_ADD("cpu2", TMS7000, XTAL(4'000'000))
 	//MCFG_DEVICE_PROGRAM_MAP(techno_sub_map)
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_techno)
+	config.set_default_layout(layout_techno);
 MACHINE_CONFIG_END
 
 ROM_START(xforce)

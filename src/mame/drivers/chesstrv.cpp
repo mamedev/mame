@@ -278,7 +278,7 @@ MACHINE_CONFIG_START(chesstrv_state::chesstrv)
 	MCFG_DEVICE_IO_MAP( chesstrv_io )
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT( layout_chesstrv )
+	config.set_default_layout(layout_chesstrv);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(borisdpl_state::borisdpl)
@@ -288,9 +288,9 @@ MACHINE_CONFIG_START(borisdpl_state::borisdpl)
 	MCFG_DEVICE_IO_MAP( borisdpl_io )
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT( layout_borisdpl )
+	config.set_default_layout(layout_borisdpl);
 
-	//MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_interrupt", borisdpl_state, timer_interrupt, attotime::from_hz(40))
+	//TIMER(config, "timer_interrupt").configure_periodic(FUNC(borisdpl_state::timer_interrupt), attotime::from_hz(40));
 MACHINE_CONFIG_END
 
 

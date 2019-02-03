@@ -1522,10 +1522,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(zaurus_state::rtc_irq_callback)
 MACHINE_CONFIG_START(zaurus_state::zaurus)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",PXA255,MAIN_CLOCK)
+	MCFG_DEVICE_ADD(m_maincpu,PXA255,MAIN_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(zaurus_map)
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("rtc_timer", zaurus_state, rtc_irq_callback, attotime::from_hz(XTAL(32'768)))
+	TIMER(config, "rtc_timer").configure_periodic(FUNC(zaurus_state::rtc_irq_callback), attotime::from_hz(XTAL(32'768)));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1539,10 +1539,9 @@ MACHINE_CONFIG_START(zaurus_state::zaurus)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-//  MCFG_DEVICE_ADD("aysnd", AY8910, MAIN_CLOCK/4)
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+//  AY8910(config, "aysnd", MAIN_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	MCFG_DEVICE_ADD("pxa_periphs", PXA255_PERIPHERALS, MAIN_CLOCK, "maincpu")
+	PXA255_PERIPHERALS(config, m_pxa_periphs, MAIN_CLOCK, m_maincpu);
 MACHINE_CONFIG_END
 
 

@@ -6,6 +6,7 @@
 #define MAME_INCLUDES_NEXT_H
 
 #include "cpu/m68000/m68000.h"
+#include "imagedev/floppy.h"
 #include "machine/nscsi_bus.h"
 #include "machine/mccs1850.h"
 #include "machine/8530scc.h"
@@ -31,6 +32,7 @@ public:
 			net(*this, "net"),
 			mo(*this, "mo"),
 			fdc(*this, "fdc"),
+			floppy0(*this, "fdc:0"),
 			vram(*this, "vram") { }
 
 	void next_base(machine_config &config);
@@ -63,6 +65,7 @@ private:
 	required_device<mb8795_device> net;
 	required_device<nextmo_device> mo;
 	optional_device<n82077aa_device> fdc; // 040 only
+	optional_device<floppy_connector> floppy0; // 040 only
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -168,10 +171,10 @@ private:
 		DMA_BUSEXC       = 0x10
 	};
 
-	static const char *dma_targets[0x20];
-	static const int dma_irqs[0x20];
-	static const bool dma_has_saved[0x20];
-	static const int scsi_clocks[4];
+	static char const *const dma_targets[0x20];
+	static int const dma_irqs[0x20];
+	static bool const dma_has_saved[0x20];
+	static int const scsi_clocks[4];
 
 	dma_slot dma_slots[0x20];
 	uint32_t esp;

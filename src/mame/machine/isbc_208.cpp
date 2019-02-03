@@ -31,26 +31,27 @@ static void isbc_208_floppies(device_slot_interface &device)
 	device.option_add("525dd", FLOPPY_525_DD);
 }
 
-MACHINE_CONFIG_START(isbc_208_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("dmac", AM9517A, XTAL(8'000'000)/4)
-	MCFG_I8237_OUT_HREQ_CB(WRITELINE(*this, isbc_208_device, hreq_w))
-	MCFG_I8237_OUT_EOP_CB(WRITELINE(*this, isbc_208_device, out_eop_w))
-	MCFG_I8237_IN_MEMR_CB(READ8(*this, isbc_208_device, dma_read_byte))
-	MCFG_I8237_OUT_MEMW_CB(WRITE8(*this, isbc_208_device, dma_write_byte))
-	MCFG_I8237_IN_IOR_0_CB(READ8("fdc", i8272a_device, mdma_r))
-	MCFG_I8237_OUT_IOW_0_CB(WRITE8("fdc", i8272a_device, mdma_w))
+void isbc_208_device::device_add_mconfig(machine_config &config)
+{
+	AM9517A(config, m_dmac, 8_MHz_XTAL/4);
+	m_dmac->out_hreq_callback().set(FUNC(isbc_208_device::hreq_w));
+	m_dmac->out_eop_callback().set(FUNC(isbc_208_device::out_eop_w));
+	m_dmac->in_memr_callback().set(FUNC(isbc_208_device::dma_read_byte));
+	m_dmac->out_memw_callback().set(FUNC(isbc_208_device::dma_write_byte));
+	m_dmac->in_ior_callback<0>().set(m_fdc, FUNC(i8272a_device::mdma_r));
+	m_dmac->out_iow_callback<0>().set(m_fdc, FUNC(i8272a_device::mdma_w));
 
-	MCFG_I8272A_ADD("fdc", true)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, isbc_208_device, irq_w))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE("dmac", am9517a_device, dreq0_w))
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", isbc_208_floppies, "525dd", isbc_208_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", isbc_208_floppies, "525dd", isbc_208_device::floppy_formats)
-MACHINE_CONFIG_END
+	I8272A(config, m_fdc, 8_MHz_XTAL, true);
+	m_fdc->intrq_wr_callback().set(FUNC(isbc_208_device::irq_w));
+	m_fdc->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq0_w));
+	FLOPPY_CONNECTOR(config, "fdc:0", isbc_208_floppies, "525dd", isbc_208_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", isbc_208_floppies, "525dd", isbc_208_device::floppy_formats);
+}
 
 void isbc_208_device::map(address_map &map)
 {
-	map(0x00, 0x0f).rw("dmac", FUNC(am9517a_device::read), FUNC(am9517a_device::write));
-	map(0x10, 0x11).m("fdc", FUNC(i8272a_device::map));
+	map(0x00, 0x0f).rw(m_dmac, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
+	map(0x10, 0x11).m(m_fdc, FUNC(i8272a_device::map));
 	map(0x12, 0x15).rw(FUNC(isbc_208_device::stat_r), FUNC(isbc_208_device::aux_w));
 }
 

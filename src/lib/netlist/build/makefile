@@ -23,7 +23,7 @@ endif
 
 # LTO = -flto=4  -fuse-linker-plugin -flto-partition=balanced -Wodr
 
-CFLAGS =  $(LTO) -g -O3 -std=c++11 -march=native -I../.. -Wall -Wpedantic -Wsign-compare -Wextra -Wno-unused-parameter $(CEXTRAFLAGS)
+CFLAGS =  $(LTO) -g -O3 -std=c++11 -I../.. $(CEXTRAFLAGS)
 LDFLAGS = $(LTO) -g -O3 -std=c++11 $(LDEXTRAFLAGS)
 LIBS = -lpthread -ldl
 
@@ -79,6 +79,7 @@ NLOBJS := \
 	$(NLOBJ)/analog/nld_opamps.o \
 	$(NLOBJ)/devices/nld_2102A.o \
 	$(NLOBJ)/devices/nld_2716.o \
+	$(NLOBJ)/devices/nld_tms4800.o \
 	$(NLOBJ)/devices/nld_4020.o \
 	$(NLOBJ)/devices/nld_4066.o \
 	$(NLOBJ)/devices/nld_4316.o \
@@ -91,6 +92,7 @@ NLOBJS := \
 	$(NLOBJ)/devices/nld_7485.o \
 	$(NLOBJ)/devices/nld_7490.o \
 	$(NLOBJ)/devices/nld_7493.o \
+	$(NLOBJ)/devices/nld_7497.o \
 	$(NLOBJ)/devices/nld_74107.o \
 	$(NLOBJ)/devices/nld_74123.o \
 	$(NLOBJ)/devices/nld_74153.o \
@@ -113,6 +115,7 @@ NLOBJS := \
 	$(NLOBJ)/devices/nld_9316.o \
 	$(NLOBJ)/devices/nld_9322.o \
 	$(NLOBJ)/devices/nld_am2847.o \
+	$(NLOBJ)/devices/nld_dm9314.o \
 	$(NLOBJ)/devices/nld_dm9334.o \
 	$(NLOBJ)/devices/nld_mm5837.o \
 	$(NLOBJ)/devices/nld_ne555.o \
@@ -154,7 +157,7 @@ ALL_OBJS = $(OBJS) $(PMAIN) $(NLOBJ)/prg/nltool.o $(NLOBJ)/prg/nlwav.o
 SOURCES = $(patsubst $(OBJ)%, $(SRC)%, $(ALL_OBJS:.o=.cpp))
 ALLFILES = $(SOURCES) $(VSBUILDS) $(DOCS)
 
-MAKEFILE_TARGETS_WITHOUT_INCLUDE := clean doc clang mingw
+MAKEFILE_TARGETS_WITHOUT_INCLUDE := clean doc clang mingw nvcc
 
 
 # git archive HEAD --prefix=project-name-version/ \
@@ -171,7 +174,7 @@ all:    maketree depend $(TARGETS)
 #-------------------------------------------------
 
 clean:
-	$(RM) -rf $(OBJS) $(TARGETS) $(OBJ)/prg/nltool.o $(OBJ)/prg/nlwav.o .depend
+	$(RM) -rf $(OBJS) $(TARGETS) $(OBJ)/prg/nltool.o $(OBJ)/prg/nlwav.o .depend doxy/*
 
 #-------------------------------------------------
 # nltool
@@ -198,15 +201,23 @@ maketree: $(sort $(OBJDIRS))
 # Special targets
 #-------------------------------------------------
 
-.PHONY: clang clang-5 mingw doc
+.PHONY: clang clang-5 mingw doc native
+
+native: 
+	$(MAKE) CEXTRAFLAGS="-march=native -Wall -Wpedantic -Wsign-compare -Wextra -Wno-unused-parameter"
 
 clang:
-	$(MAKE) CC=clang++ LD=clang++ CEXTRAFLAGS="-march=native -Weverything -Werror -override -Wno-unreachable-code -Wno-padded -Wno-weak-vtables -Wno-missing-variable-declarations -Wconversion -Wno-c++98-compat -Wno-float-equal -Wno-global-constructors -Wno-c++98-compat-pedantic -Wno-format-nonliteral -Wno-weak-template-vtables -Wno-exit-time-destructors"
+	$(MAKE) CC=clang++ LD=clang++ CEXTRAFLAGS="-march=native -Wno-unused-parameter -Weverything -Werror -Wno-unreachable-code -Wno-padded -Wno-weak-vtables -Wno-missing-variable-declarations -Wconversion -Wno-c++98-compat -Wno-float-equal -Wno-global-constructors -Wno-c++98-compat-pedantic -Wno-format-nonliteral -Wweak-template-vtables -Wno-exit-time-destructors"
 
 clang-5:
 	$(MAKE) CC=clang++-5.0 LD=clang++-5.0 CEXTRAFLAGS="-march=native -Weverything -Werror -Wno-inconsistent-missing-destructor-override -Wno-unreachable-code -Wno-padded -Wno-weak-vtables -Wno-missing-variable-declarations -Wconversion -Wno-c++98-compat -Wno-float-equal -Wno-global-constructors -Wno-c++98-compat-pedantic -Wno-format-nonliteral -Wno-weak-template-vtables -Wno-exit-time-destructors"
 
+nvcc:
+	$(MAKE) CC=/usr/local/cuda-9.0/bin/nvcc LD=/usr/local/cuda-9.2/bin/nvcc \
+		CEXTRAFLAGS="-x cu  -DNVCCBUILD=1 --expt-extended-lambda --expt-relaxed-constexpr --default-stream per-thread --restrict"
+
 #
+# -Wno-c++11-narrowing : seems a bit broken
 # Mostly done: -Wno-weak-vtables -Wno-cast-align
 # FIXME:  -Wno-weak-vtables -Wno-missing-variable-declarations -Wno-conversion -Wno-exit-time-destructors
 # FIXME: -Winconsistent-missing-destructor-override : c++ community has diverging opinions on this https://github.com/isocpp/CppCoreGuidelines/issues/721
@@ -235,7 +246,7 @@ doc: nltool
 	@echo creating .depend
 	@rm -f ./.depend
 	@for i in $(SOURCES); do \
-		$(CC) $(CFLAGS) -MM $$i -MT `echo $$i | sed -e 's+$(SRC)+$(OBJ)+' -e 's+.cpp+.o+' ` >>./.depend; \
+		$(CC) $(CFLAGS) -MM $$i -MT `echo $$i | sed -e 's+$(SRC)+$(OBJ)+' -e 's+.cpp+.o+' ` >> ./.depend; \
 	done
 
 depend: .depend

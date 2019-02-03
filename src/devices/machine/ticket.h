@@ -19,23 +19,7 @@
 
 // device type definition
 DECLARE_DEVICE_TYPE(TICKET_DISPENSER, ticket_dispenser_device)
-
-
-
-//**************************************************************************
-//  DEVICE CONFIGURATION MACROS
-//**************************************************************************
-
-// add/remove dispensers
-#define MCFG_TICKET_DISPENSER_ADD(_tag, _period_in_msec, _motor_sense, _status_sense) \
-	MCFG_DEVICE_ADD(_tag, TICKET_DISPENSER, 0) \
-	downcast<ticket_dispenser_device &>(*device).set_period(_period_in_msec); \
-	downcast<ticket_dispenser_device &>(*device).set_senses(_motor_sense, _status_sense, false);
-
-#define MCFG_HOPPER_ADD(_tag, _period_in_msec, _motor_sense, _status_sense) \
-	MCFG_DEVICE_ADD(_tag, TICKET_DISPENSER, 0) \
-	downcast<ticket_dispenser_device &>(*device).set_period(_period_in_msec); \
-	downcast<ticket_dispenser_device &>(*device).set_senses(_motor_sense, _status_sense, true);
+DECLARE_DEVICE_TYPE(HOPPER, hopper_device)
 
 //**************************************************************************
 //  CONSTANTS
@@ -59,7 +43,13 @@ class ticket_dispenser_device : public device_t
 {
 public:
 	// construction/destruction
-	ticket_dispenser_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ticket_dispenser_device(const machine_config &mconfig, const char *tag, device_t *owner, const attotime &period, uint8_t motor_sense, uint8_t status_sense)
+		: ticket_dispenser_device(mconfig, tag, owner)
+	{
+		set_period(period);
+		set_senses(motor_sense, status_sense, false);
+	}
+	ticket_dispenser_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~ticket_dispenser_device();
 
 	// inline configuration helpers
@@ -76,6 +66,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( motor_w );
 
 protected:
+	ticket_dispenser_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
@@ -96,6 +88,19 @@ protected:
 	bool m_power;
 	emu_timer *m_timer;
 	output_finder<> m_output;
+};
+
+class hopper_device : public ticket_dispenser_device
+{
+public:
+	// construction/destruction
+	hopper_device(const machine_config &mconfig, const char *tag, device_t *owner, const attotime &period, uint8_t motor_sense, uint8_t status_sense)
+		: hopper_device(mconfig, tag, owner)
+	{
+		set_period(period);
+		set_senses(motor_sense, status_sense, true);
+	}
+	hopper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 #endif // MAME_MACHINE_TICKET_H

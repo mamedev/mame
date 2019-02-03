@@ -82,11 +82,11 @@ Secret menu hack [totmejan only] (I couldn't find official way to enter, so it's
 #include "speaker.h"
 
 
-class goodejan_state : public driver_device, protected seibu_sound_common
+class goodejan_state : public driver_device, public seibu_sound_common
 {
 public:
-	goodejan_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	goodejan_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
@@ -95,7 +95,8 @@ public:
 		m_sc1_vram(*this, "sc1_vram"),
 		m_sc2_vram(*this, "sc2_vram"),
 		m_sc3_vram(*this, "sc3_vram"),
-		m_spriteram16(*this, "sprite_ram") { }
+		m_spriteram16(*this, "sprite_ram")
+	{ }
 
 	void totmejan(machine_config &config);
 	void goodejan(machine_config &config);
@@ -650,59 +651,57 @@ WRITE16_MEMBER( goodejan_state::layer_scroll_w )
 	COMBINE_DATA(&m_scrollram[offset]);
 }
 
-
-
-MACHINE_CONFIG_START(goodejan_state::goodejan)
-
+void goodejan_state::goodejan(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", V30, GOODEJAN_MHZ2/2)
-	MCFG_DEVICE_PROGRAM_MAP(goodejan_map)
-	MCFG_DEVICE_IO_MAP(goodejan_io_map)
+	V30(config, m_maincpu, GOODEJAN_MHZ2/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &goodejan_state::goodejan_map);
+	m_maincpu->set_addrmap(AS_IO, &goodejan_state::goodejan_io_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, GOODEJAN_MHZ1/2)
-	MCFG_DEVICE_PROGRAM_MAP(seibu_sound_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
+	z80_device &audiocpu(Z80(config, "audiocpu", GOODEJAN_MHZ1/2));
+	audiocpu.set_addrmap(AS_PROGRAM, &goodejan_state::seibu_sound_map);
+	audiocpu.set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1) //TODO: dynamic resolution
-	MCFG_SCREEN_UPDATE_DRIVER(goodejan_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, goodejan_state, vblank_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1); //TODO: dynamic resolution
+	screen.set_screen_update(FUNC(goodejan_state::screen_update));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(goodejan_state::vblank_irq));
 
-	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
-	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, goodejan_state, layer_en_w))
-	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, goodejan_state, layer_scroll_w))
+	SEIBU_CRTC(config, m_crtc, 0);
+	m_crtc->layer_en_callback().set(FUNC(goodejan_state::layer_en_w));
+	m_crtc->layer_scroll_callback().set(FUNC(goodejan_state::layer_scroll_w));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_goodejan)
-	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_goodejan);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 0x1000);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, GOODEJAN_MHZ1/2)
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", GOODEJAN_MHZ1/2));
+	ymsnd.irq_handler().set("seibu_sound", FUNC(seibu_sound_device::fm_irqhandler));
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, GOODEJAN_MHZ2/16, okim6295_device::PIN7_LOW)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	okim6295_device &oki(OKIM6295(config, "oki", GOODEJAN_MHZ2/16, okim6295_device::PIN7_LOW));
+	oki.add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
-	MCFG_SEIBU_SOUND_CPU("audiocpu")
-	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
-	MCFG_SEIBU_SOUND_YM_READ_CB(READ8("ymsnd", ym3812_device, read))
-	MCFG_SEIBU_SOUND_YM_WRITE_CB(WRITE8("ymsnd", ym3812_device, write))
-MACHINE_CONFIG_END
+	seibu_sound_device &seibu_sound(SEIBU_SOUND(config, "seibu_sound", 0));
+	seibu_sound.int_callback().set_inputline("audiocpu", 0);
+	seibu_sound.set_rom_tag("audiocpu");
+	seibu_sound.set_rombank_tag("seibu_bank1");
+	seibu_sound.ym_read_callback().set("ymsnd", FUNC(ym3812_device::read));
+	seibu_sound.ym_write_callback().set("ymsnd", FUNC(ym3812_device::write));
+}
 
-MACHINE_CONFIG_START(goodejan_state::totmejan)
+void goodejan_state::totmejan(machine_config &config)
+{
 	goodejan(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(totmejan_io_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_IO, &goodejan_state::totmejan_io_map);
+}
 
 ROM_START( totmejan )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* V30 code */

@@ -184,6 +184,7 @@ protected:
 	/**/    uint8_t map13;
 	/**/    uint8_t irq_clear;
 	/**/    uint8_t irq_disable;
+			uint8_t no_wrap;
 		} crtc;
 
 		struct
@@ -414,14 +415,6 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(IBM8514A, ibm8514a_device)
 
-#define MCFG_8514A_ADD(_tag, _param) \
-		MCFG_DEVICE_ADD(_tag, IBM8514A, 0) \
-		downcast<ibm8514a_device*>(device)->set_vga(_param);
-
-#define MCFG_8514A_ADD_OWNER(_tag) \
-		MCFG_DEVICE_ADD(_tag, IBM8514A, 0) \
-		downcast<ibm8514a_device*>(device)->set_vga_owner();
-
 
 class mach8_device : public ibm8514a_device
 {
@@ -495,13 +488,6 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(MACH8, mach8_device)
 
-#define MCFG_MACH8_ADD(_tag, _param) \
-		MCFG_DEVICE_ADD(_tag, MACH8, 0) \
-		downcast<mach8_device*>(device)->set_vga(_param);
-
-#define MCFG_MACH8_ADD_OWNER(_tag) \
-		MCFG_DEVICE_ADD(_tag, MACH8, 0) \
-		downcast<mach8_device*>(device)->set_vga_owner();
 
 // ======================> tseng_vga_device
 

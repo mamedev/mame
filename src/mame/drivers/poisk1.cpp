@@ -84,6 +84,11 @@ public:
 
 	void init_poisk1();
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<pic8259_device> m_pic8259;
@@ -99,19 +104,6 @@ private:
 
 	required_ioport_array<8> m_kbdio;
 
-	DECLARE_MACHINE_START(poisk1);
-	DECLARE_MACHINE_RESET(poisk1);
-
-	DECLARE_PALETTE_INIT(p1);
-	virtual void video_start() override;
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void set_palette_luts();
-	POISK1_UPDATE_ROW(cga_gfx_2bpp_update_row);
-	POISK1_UPDATE_ROW(cga_gfx_1bpp_update_row);
-	POISK1_UPDATE_ROW(poisk1_gfx_1bpp_update_row);
-
-	DECLARE_WRITE_LINE_MEMBER(p1_pit8253_out2_changed);
-	DECLARE_WRITE_LINE_MEMBER(p1_speaker_set_spkrdata);
 	uint8_t m_p1_spkrdata;
 	uint8_t m_p1_input;
 
@@ -129,6 +121,15 @@ private:
 		void *update_row(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint8_t *videoram, uint16_t ma, uint8_t ra, uint8_t stride);
 	} m_video;
 
+	void p1_palette(palette_device &palette) const;
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void set_palette_luts();
+	POISK1_UPDATE_ROW(cga_gfx_2bpp_update_row);
+	POISK1_UPDATE_ROW(cga_gfx_1bpp_update_row);
+	POISK1_UPDATE_ROW(poisk1_gfx_1bpp_update_row);
+
+	DECLARE_WRITE_LINE_MEMBER(p1_pit8253_out2_changed);
+	DECLARE_WRITE_LINE_MEMBER(p1_speaker_set_spkrdata);
 	DECLARE_READ8_MEMBER(p1_trap_r);
 	DECLARE_WRITE8_MEMBER(p1_trap_w);
 	DECLARE_READ8_MEMBER(p1_cga_r);
@@ -145,7 +146,7 @@ private:
 	DECLARE_WRITE8_MEMBER(p1_ppi2_porta_w);
 	DECLARE_WRITE8_MEMBER(p1_ppi2_portb_w);
 	DECLARE_READ8_MEMBER(p1_ppi2_portc_r);
-	const char *m_cputag;
+
 	void poisk1_io(address_map &map);
 	void poisk1_map(address_map &map);
 };
@@ -402,17 +403,13 @@ POISK1_UPDATE_ROW(p1_state::poisk1_gfx_1bpp_update_row)
 	}
 }
 
-/* Initialise the cga palette */
-PALETTE_INIT_MEMBER(p1_state, p1)
+// Initialise the cga palette
+void p1_state::p1_palette(palette_device &palette) const
 {
-	int i;
-
 	DBG_LOG(0, "init", ("palette_init()\n"));
 
-	for (i = 0; i < CGA_PALETTE_SETS * 16; i++)
-	{
+	for (int i = 0; i < CGA_PALETTE_SETS * 16; i++)
 		palette.set_pen_color(i, cga_palette[i][0], cga_palette[i][1], cga_palette[i][2]);
-	}
 }
 
 void p1_state::video_start()
@@ -553,17 +550,17 @@ READ8_MEMBER(p1_state::p1_ppi_r)
 	switch (offset)
 	{
 	case 0:
-		return m_ppi8255n1->read(space, 0);
+		return m_ppi8255n1->read(0);
 	case 9:
 	case 10:
 	case 11:
-		return m_ppi8255n1->read(space, offset - 8);
+		return m_ppi8255n1->read(offset - 8);
 	case 8:
-		return m_ppi8255n2->read(space, 0);
+		return m_ppi8255n2->read(0);
 	case 1:
 	case 2:
 	case 3:
-		return m_ppi8255n2->read(space, offset);
+		return m_ppi8255n2->read(offset);
 	default:
 		DBG_LOG(1, "p1ppi", ("R %.2x (unimp)\n", 0x60 + offset));
 		return 0xff;
@@ -575,17 +572,17 @@ WRITE8_MEMBER(p1_state::p1_ppi_w)
 	switch (offset)
 	{
 	case 0:
-		return m_ppi8255n1->write(space, 0, data);
+		return m_ppi8255n1->write(0, data);
 	case 9:
 	case 10:
 	case 11:
-		return m_ppi8255n1->write(space, offset - 8, data);
+		return m_ppi8255n1->write(offset - 8, data);
 	case 8:
-		return m_ppi8255n2->write(space, 0, data);
+		return m_ppi8255n2->write(0, data);
 	case 1:
 	case 2:
 	case 3:
-		return m_ppi8255n2->write(space, offset, data);
+		return m_ppi8255n2->write(offset, data);
 	default:
 		DBG_LOG(1, "p1ppi", ("W %.2x $%02x (unimp)\n", 0x60 + offset, data));
 		return;
@@ -608,12 +605,12 @@ void p1_state::init_poisk1()
 	membank("bank10")->set_base(m_ram->pointer());
 }
 
-MACHINE_START_MEMBER(p1_state, poisk1)
+void p1_state::machine_start()
 {
 	DBG_LOG(0, "init", ("machine_start()\n"));
 }
 
-MACHINE_RESET_MEMBER(p1_state, poisk1)
+void p1_state::machine_reset()
 {
 	DBG_LOG(0, "init", ("machine_reset()\n"));
 
@@ -647,54 +644,53 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(p1_state::poisk1)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8088, 5000000)
-	MCFG_DEVICE_PROGRAM_MAP(poisk1_map)
-	MCFG_DEVICE_IO_MAP(poisk1_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
+	I8088(config, m_maincpu, 5000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &p1_state::poisk1_map);
+	m_maincpu->set_addrmap(AS_IO, &p1_state::poisk1_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
 
-	MCFG_MACHINE_START_OVERRIDE( p1_state, poisk1 )
-	MCFG_MACHINE_RESET_OVERRIDE( p1_state, poisk1 )
+	PIT8253(config, m_pit8253);
+	m_pit8253->set_clk<0>(XTAL(15'000'000)/12); /* heartbeat IRQ */
+	m_pit8253->out_handler<0>().set(m_pic8259, FUNC(pic8259_device::ir0_w));
+	m_pit8253->set_clk<1>(XTAL(15'000'000)/12); /* keyboard poll -- XXX edge or level triggered? */
+	m_pit8253->out_handler<1>().set(m_pic8259, FUNC(pic8259_device::ir6_w));
+	m_pit8253->set_clk<2>(XTAL(15'000'000)/12); /* pio port c pin 4, and speaker polling enough */
+	m_pit8253->out_handler<2>().set(FUNC(p1_state::p1_pit8253_out2_changed));
 
-	MCFG_DEVICE_ADD( "pit8253", PIT8253 ,0)
-	MCFG_PIT8253_CLK0(XTAL(15'000'000)/12) /* heartbeat IRQ */
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("pic8259", pic8259_device, ir0_w))
-	MCFG_PIT8253_CLK1(XTAL(15'000'000)/12) /* keyboard poll -- XXX edge or level triggered? */
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("pic8259", pic8259_device, ir6_w))
-	MCFG_PIT8253_CLK2(XTAL(15'000'000)/12) /* pio port c pin 4, and speaker polling enough */
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, p1_state, p1_pit8253_out2_changed))
+	PIC8259(config, m_pic8259);
+	m_pic8259->out_int_callback().set_inputline(m_maincpu, 0);
 
-	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	I8255A(config, m_ppi8255n1);
+	m_ppi8255n1->in_pa_callback().set(FUNC(p1_state::p1_ppi_porta_r)); /*60H*/
+	m_ppi8255n1->out_pa_callback().set(FUNC(p1_state::p1_ppi_porta_w));
+	m_ppi8255n1->in_pb_callback().set(FUNC(p1_state::p1_ppi_portb_r)); /*69H*/
+	m_ppi8255n1->in_pc_callback().set(FUNC(p1_state::p1_ppi_portc_r));
+	m_ppi8255n1->out_pc_callback().set(FUNC(p1_state::p1_ppi_portc_w));   /*6AH*/
 
-	MCFG_DEVICE_ADD("ppi8255n1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, p1_state, p1_ppi_porta_r)) /*60H*/
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, p1_state, p1_ppi_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, p1_state, p1_ppi_portb_r)) /*69H*/
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, p1_state, p1_ppi_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, p1_state, p1_ppi_portc_w))   /*6AH*/
+	I8255A(config, m_ppi8255n2);
+	m_ppi8255n2->out_pa_callback().set(FUNC(p1_state::p1_ppi2_porta_w));  /*68H*/
+	m_ppi8255n2->out_pb_callback().set(FUNC(p1_state::p1_ppi2_portb_w));  /*61H*/
+	m_ppi8255n2->in_pc_callback().set(FUNC(p1_state::p1_ppi2_portc_r));    /*62H*/
 
-	MCFG_DEVICE_ADD("ppi8255n2", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, p1_state, p1_ppi2_porta_w))  /*68H*/
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, p1_state, p1_ppi2_portb_w))  /*61H*/
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, p1_state, p1_ppi2_portc_r))    /*62H*/
+	ISA8(config, m_isabus, 0);
+	m_isabus->set_memspace("maincpu", AS_PROGRAM);
+	m_isabus->set_iospace("maincpu", AS_IO);
+	m_isabus->irq2_callback().set(m_pic8259, FUNC(pic8259_device::ir2_w));
+	m_isabus->irq3_callback().set(m_pic8259, FUNC(pic8259_device::ir3_w));
+	m_isabus->irq4_callback().set(m_pic8259, FUNC(pic8259_device::ir4_w));
+	m_isabus->irq5_callback().set(m_pic8259, FUNC(pic8259_device::ir5_w));
+	m_isabus->irq7_callback().set(m_pic8259, FUNC(pic8259_device::ir7_w));
 
-	MCFG_DEVICE_ADD("isa", ISA8, 0)
-	MCFG_ISA8_CPU("maincpu")
-	MCFG_ISA_OUT_IRQ2_CB(WRITELINE("pic8259", pic8259_device, ir2_w))
-	MCFG_ISA_OUT_IRQ3_CB(WRITELINE("pic8259", pic8259_device, ir3_w))
-	MCFG_ISA_OUT_IRQ4_CB(WRITELINE("pic8259", pic8259_device, ir4_w))
-	MCFG_ISA_OUT_IRQ5_CB(WRITELINE("pic8259", pic8259_device, ir5_w))
-	MCFG_ISA_OUT_IRQ7_CB(WRITELINE("pic8259", pic8259_device, ir7_w))
 	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "isa", p1_isa8_cards, "fdc", false) // FIXME: determine ISA bus clock
 	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "isa", p1_isa8_cards, nullptr, false)
 	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "isa", p1_isa8_cards, nullptr, false)
 	MCFG_DEVICE_ADD("isa4", ISA8_SLOT, 0, "isa", p1_isa8_cards, nullptr, false)
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 
-	MCFG_SOFTWARE_LIST_ADD("flop_list","poisk1_flop")
-//  MCFG_SOFTWARE_LIST_ADD("cass_list","poisk1_cass")
+	SOFTWARE_LIST(config, "flop_list").set_original("poisk1_flop");
+//  SOFTWARE_LIST(config, "cass_list").set_original("poisk1_cass");
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD( "speaker", SPEAKER_SOUND )
@@ -705,12 +701,10 @@ MACHINE_CONFIG_START(p1_state::poisk1)
 	MCFG_SCREEN_UPDATE_DRIVER( p1_state, screen_update )
 
 	/* XXX verify palette */
-	MCFG_PALETTE_ADD("palette",  CGA_PALETTE_SETS * 16 )
-	MCFG_PALETTE_INIT_OWNER(p1_state, p1)
+	PALETTE(config, m_palette, FUNC(p1_state::p1_palette), CGA_PALETTE_SETS * 16);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
+	RAM(config, RAM_TAG).set_default_size("512K");
 MACHINE_CONFIG_END
 
 ROM_START( poisk1 )

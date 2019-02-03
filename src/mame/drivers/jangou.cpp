@@ -112,7 +112,7 @@ private:
 	DECLARE_READ8_MEMBER(input_mux_r);
 	DECLARE_READ8_MEMBER(input_system_r);
 
-	DECLARE_PALETTE_INIT(jangou);
+	void jangou_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(jngolady);
 	DECLARE_MACHINE_RESET(jngolady);
 	DECLARE_MACHINE_START(common);
@@ -142,42 +142,40 @@ private:
  *
  *************************************/
 
-/* guess: use the same resistor values as Crazy Climber (needs checking on the real HW) */
-PALETTE_INIT_MEMBER(jangou_state, jangou)
+// guess: use the same resistor values as Crazy Climber (needs checking on the real hardware)
+void jangou_state::jangou_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	static const int resistances_rg[3] = { 1000, 470, 220 };
-	static const int resistances_b [2] = { 470, 220 };
-	double weights_rg[3], weights_b[2];
-	int i;
+	uint8_t const *const color_prom = memregion("proms")->base();
+	static constexpr int resistances_rg[3] = { 1000, 470, 220 };
+	static constexpr int resistances_b [2] = { 470, 220 };
 
-	/* compute the color output resistor weights */
+	// compute the color output resistor weights
+	double weights_rg[3], weights_b[2];
 	compute_resistor_weights(0, 255, -1.0,
 			3, resistances_rg, weights_rg, 0, 0,
 			2, resistances_b,  weights_b,  0, 0,
 			0, nullptr, nullptr, 0, 0);
 
-	for (i = 0;i < palette.entries(); i++)
+	for (int i = 0;i < palette.entries(); i++)
 	{
 		int bit0, bit1, bit2;
-		int r, g, b;
 
-		/* red component */
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		bit2 = (color_prom[i] >> 2) & 0x01;
-		r = combine_3_weights(weights_rg, bit0, bit1, bit2);
+		// red component
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
+		int const r = combine_3_weights(weights_rg, bit0, bit1, bit2);
 
-		/* green component */
-		bit0 = (color_prom[i] >> 3) & 0x01;
-		bit1 = (color_prom[i] >> 4) & 0x01;
-		bit2 = (color_prom[i] >> 5) & 0x01;
-		g = combine_3_weights(weights_rg, bit0, bit1, bit2);
+		// green component
+		bit0 = BIT(color_prom[i], 3);
+		bit1 = BIT(color_prom[i], 4);
+		bit2 = BIT(color_prom[i], 5);
+		int const g = combine_3_weights(weights_rg, bit0, bit1, bit2);
 
-		/* blue component */
-		bit0 = (color_prom[i] >> 6) & 0x01;
-		bit1 = (color_prom[i] >> 7) & 0x01;
-		b = combine_2_weights(weights_b, bit0, bit1);
+		// blue component
+		bit0 = BIT(color_prom[i], 6);
+		bit1 = BIT(color_prom[i], 7);
+		int const b = combine_2_weights(weights_b, bit0, bit1);
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -190,16 +188,14 @@ void jangou_state::video_start()
 
 uint32_t jangou_state::screen_update_jangou(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x, y;
-
-	for (y = cliprect.min_y; y <= cliprect.max_y; ++y)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
 		const uint8_t *src = &m_blitter->blit_buffer(y, cliprect.min_x);
 		uint16_t *dst = &m_tmp_bitmap->pix16(y, cliprect.min_x);
 
-		for (x = cliprect.min_x; x <= cliprect.max_x; x += 2)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x += 2)
 		{
-			uint32_t srcpix = *src++;
+			uint32_t const srcpix = *src++;
 			*dst++ = m_palette->pen(srcpix & 0xf);
 			*dst++ = m_palette->pen((srcpix >> 4) & 0xf);
 		}
@@ -877,106 +873,101 @@ MACHINE_RESET_MEMBER(jangou_state,jngolady)
 MACHINE_CONFIG_START(jangou_state::jangou)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("cpu0", Z80, MASTER_CLOCK / 8)
-	MCFG_DEVICE_PROGRAM_MAP(cpu0_map)
-	MCFG_DEVICE_IO_MAP(cpu0_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", jangou_state,  irq0_line_hold)
+	Z80(config, m_cpu_0, MASTER_CLOCK / 8);
+	m_cpu_0->set_addrmap(AS_PROGRAM, &jangou_state::cpu0_map);
+	m_cpu_0->set_addrmap(AS_IO, &jangou_state::cpu0_io);
+	m_cpu_0->set_vblank_int("screen", FUNC(jangou_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("cpu1", Z80, MASTER_CLOCK / 8)
-	MCFG_DEVICE_PROGRAM_MAP(cpu1_map)
-	MCFG_DEVICE_IO_MAP(cpu1_io)
+	Z80(config, m_cpu_1, MASTER_CLOCK / 8);
+	m_cpu_1->set_addrmap(AS_PROGRAM, &jangou_state::cpu1_map);
+	m_cpu_1->set_addrmap(AS_IO, &jangou_state::cpu1_io);
 
-	MCFG_JANGOU_BLITTER_ADD("blitter", MASTER_CLOCK/4)
+	JANGOU_BLITTER(config, "blitter", MASTER_CLOCK/4);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/4,320,0,256,264,16,240) // assume same as nightgal.cpp
-	MCFG_SCREEN_UPDATE_DRIVER(jangou_state, screen_update_jangou)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(MASTER_CLOCK/4,320,0,256,264,16,240); // assume same as nightgal.cpp
+	screen.set_screen_update(FUNC(jangou_state::screen_update_jangou));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 32)
-	MCFG_PALETTE_INIT_OWNER(jangou_state, jangou)
+	PALETTE(config, m_palette, FUNC(jangou_state::jangou_palette), 32);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, MASTER_CLOCK / 16)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, jangou_state, input_mux_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, jangou_state, input_system_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	ay8910_device &aysnd(AY8910(config, "aysnd", MASTER_CLOCK / 16));
+	aysnd.port_a_read_callback().set(FUNC(jangou_state::input_mux_r));
+	aysnd.port_b_read_callback().set(FUNC(jangou_state::input_system_r));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	MCFG_DEVICE_ADD("cvsd", HC55516, MASTER_CLOCK / 1024)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
-MACHINE_CONFIG_END
+	HC55516(config, m_cvsd, MASTER_CLOCK / 1024);
+	m_cvsd->add_route(ALL_OUTPUTS, "mono", 0.60);
+}
 
-MACHINE_CONFIG_START(jangou_state::jngolady)
+void jangou_state::jngolady(machine_config &config)
+{
 	jangou(config);
 
 	/* basic machine hardware */
+	m_cpu_0->set_addrmap(AS_PROGRAM, &jangou_state::jngolady_cpu0_map);
 
-	MCFG_DEVICE_MODIFY("cpu0")
-	MCFG_DEVICE_PROGRAM_MAP(jngolady_cpu0_map)
+	m_cpu_1->set_addrmap(AS_PROGRAM, &jangou_state::jngolady_cpu1_map);
+	m_cpu_1->set_addrmap(AS_IO, &jangou_state::jngolady_cpu1_io);
 
-	MCFG_DEVICE_MODIFY("cpu1")
-	MCFG_DEVICE_PROGRAM_MAP(jngolady_cpu1_map)
-	MCFG_DEVICE_IO_MAP(jngolady_cpu1_io)
-
-	MCFG_DEVICE_ADD("nsc", NSC8105, MASTER_CLOCK / 8)
-	MCFG_DEVICE_PROGRAM_MAP(nsc_map)
+	NSC8105(config, m_nsc, MASTER_CLOCK / 8);
+	m_nsc->set_addrmap(AS_PROGRAM, &jangou_state::nsc_map);
 
 	MCFG_MACHINE_START_OVERRIDE(jangou_state,jngolady)
 	MCFG_MACHINE_RESET_OVERRIDE(jangou_state,jngolady)
 
 	/* sound hardware */
-	MCFG_DEVICE_REMOVE("cvsd")
+	config.device_remove("cvsd");
 
-	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(400'000))
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, jangou_state, jngolady_vclk_cb))
-	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_CONFIG_END
+	MSM5205(config, m_msm, XTAL(400'000));
+	m_msm->vck_legacy_callback().set(FUNC(jangou_state::jngolady_vclk_cb));
+	m_msm->set_prescaler_selector(msm5205_device::S96_4B);
+	m_msm->add_route(ALL_OUTPUTS, "mono", 0.80);
+}
 
-MACHINE_CONFIG_START(jangou_state::cntrygrl)
+void jangou_state::cntrygrl(machine_config &config)
+{
 	jangou(config);
 
 	/* basic machine hardware */
+	m_cpu_0->set_addrmap(AS_PROGRAM, &jangou_state::cntrygrl_cpu0_map);
+	m_cpu_0->set_addrmap(AS_IO, &jangou_state::cntrygrl_cpu0_io);
 
-	MCFG_DEVICE_MODIFY("cpu0")
-	MCFG_DEVICE_PROGRAM_MAP(cntrygrl_cpu0_map )
-	MCFG_DEVICE_IO_MAP(cntrygrl_cpu0_io )
-
-	MCFG_DEVICE_REMOVE("cpu1")
+	config.device_remove("cpu1");
 
 	MCFG_MACHINE_START_OVERRIDE(jangou_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(jangou_state,common)
 
 	/* sound hardware */
-	MCFG_DEVICE_REMOVE("cvsd")
-	MCFG_DEVICE_REMOVE("soundlatch")
-MACHINE_CONFIG_END
+	config.device_remove("cvsd");
+	config.device_remove("soundlatch");
+}
 
-MACHINE_CONFIG_START(jangou_state::roylcrdn)
+void jangou_state::roylcrdn(machine_config &config)
+{
 	jangou(config);
 
 	/* basic machine hardware */
+	m_cpu_0->set_addrmap(AS_PROGRAM, &jangou_state::roylcrdn_cpu0_map);
+	m_cpu_0->set_addrmap(AS_IO, &jangou_state::roylcrdn_cpu0_io);
 
-	MCFG_DEVICE_MODIFY("cpu0")
-	MCFG_DEVICE_PROGRAM_MAP(roylcrdn_cpu0_map )
-	MCFG_DEVICE_IO_MAP(roylcrdn_cpu0_io )
+	config.device_remove("cpu1");
 
-	MCFG_DEVICE_REMOVE("cpu1")
-
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_MACHINE_START_OVERRIDE(jangou_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(jangou_state,common)
 
 	/* sound hardware */
-	MCFG_DEVICE_REMOVE("cvsd")
-	MCFG_DEVICE_REMOVE("soundlatch")
-MACHINE_CONFIG_END
+	config.device_remove("cvsd");
+	config.device_remove("soundlatch");
+}
 
 
 /*************************************
@@ -1270,12 +1261,12 @@ void jangou_state::init_luckygrl()
 		{
 			case 0x000: x = bitswap<8>(x ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
 			case 0x001: x = bitswap<8>(x ^ 0xa0, 3, 6, 5, 4, 7, 2, 1, 0); break;
-			case 0x010: x = bitswap<8>(x ^ 0x88, 7, 6, 5, 4, 3, 2, 1, 0); break;
-			case 0x011: x = bitswap<8>(x ^ 0x28, 7, 6, 3, 4, 5, 2, 1, 0); break;
-			case 0x100: x = bitswap<8>(x ^ 0x28, 7, 6, 3, 4, 5, 2, 1, 0); break;
-			case 0x101: x = bitswap<8>(x ^ 0x20, 7, 6, 5, 4, 3, 2, 1, 0); break;
-			case 0x110: x = bitswap<8>(x ^ 0x28, 3, 6, 5, 4, 7, 2, 1, 0); break;
-			case 0x111: x = bitswap<8>(x ^ 0x88, 7, 6, 5, 4, 3, 2, 1, 0); break;
+			case 0x010: x = bitswap<8>(x ^ 0x88, 5, 6, 7, 4, 3, 2, 1, 0); break;
+			case 0x011: x = bitswap<8>(x ^ 0x28, 3, 6, 7, 4, 5, 2, 1, 0); break;
+			case 0x100: x = bitswap<8>(x ^ 0x28, 3, 6, 7, 4, 5, 2, 1, 0); break;
+			case 0x101: x = bitswap<8>(x ^ 0x20, 5, 6, 7, 4, 3, 2, 1, 0); break;
+			case 0x110: x = bitswap<8>(x ^ 0x28, 5, 6, 3, 4, 7, 2, 1, 0); break;
+			case 0x111: x = bitswap<8>(x ^ 0x88, 5, 6, 7, 4, 3, 2, 1, 0); break;
 		}
 
 		ROM[A] = x;

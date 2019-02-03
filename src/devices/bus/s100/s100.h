@@ -68,68 +68,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_S100_SLOT_ADD(_tag, _slot_intf, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, S100_SLOT, DERIVED_CLOCK(1, 1)) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-
-
-#define MCFG_S100_IRQ_CALLBACK(_write) \
-	devcb = &downcast<s100_bus_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
-
-#define MCFG_S100_NMI_CALLBACK(_write) \
-	devcb = &downcast<s100_bus_device &>(*device).set_nmi_wr_callback(DEVCB_##_write);
-
-#define MCFG_S100_VI0_CALLBACK(_write) \
-	devcb = &downcast<s100_bus_device &>(*device).set_vi0_wr_callback(DEVCB_##_write);
-
-#define MCFG_S100_VI1_CALLBACK(_write) \
-	devcb = &downcast<s100_bus_device &>(*device).set_vi1_wr_callback(DEVCB_##_write);
-
-#define MCFG_S100_VI2_CALLBACK(_write) \
-	devcb = &downcast<s100_bus_device &>(*device).set_vi2_wr_callback(DEVCB_##_write);
-
-#define MCFG_S100_VI3_CALLBACK(_write) \
-	devcb = &downcast<s100_bus_device &>(*device).set_vi3_wr_callback(DEVCB_##_write);
-
-#define MCFG_S100_VI4_CALLBACK(_write) \
-	devcb = &downcast<s100_bus_device &>(*device).set_vi4_wr_callback(DEVCB_##_write);
-
-#define MCFG_S100_VI5_CALLBACK(_write) \
-	devcb = &downcast<s100_bus_device &>(*device).set_vi5_wr_callback(DEVCB_##_write);
-
-#define MCFG_S100_VI6_CALLBACK(_write) \
-	devcb = &downcast<s100_bus_device &>(*device).set_vi6_wr_callback(DEVCB_##_write);
-
-#define MCFG_S100_VI7_CALLBACK(_write) \
-	devcb = &downcast<s100_bus_device &>(*device).set_vi7_wr_callback(DEVCB_##_write);
-
-#define MCFG_S100_DMA0_CALLBACK(_write) \
-	devcb = &downcast<s100_bus_device &>(*device).set_dma0_wr_callback(DEVCB_##_write);
-
-#define MCFG_S100_DMA1_CALLBACK(_write) \
-	devcb = &downcast<s100_bus_device &>(*device).set_dma1_wr_callback(DEVCB_##_write);
-
-#define MCFG_S100_DMA2_CALLBACK(_write) \
-	devcb = &downcast<s100_bus_device &>(*device).set_dma2_wr_callback(DEVCB_##_write);
-
-#define MCFG_S100_DMA3_CALLBACK(_write) \
-	devcb = &downcast<s100_bus_device &>(*device).set_dma3_wr_callback(DEVCB_##_write);
-
-#define MCFG_S100_RDY_CALLBACK(_write) \
-	devcb = &downcast<s100_bus_device &>(*device).set_rdy_wr_callback(DEVCB_##_write);
-
-#define MCFG_S100_HOLD_CALLBACK(_write) \
-	devcb = &downcast<s100_bus_device &>(*device).set_hold_wr_callback(DEVCB_##_write);
-
-#define MCFG_S100_ERROR_CALLBACK(_write) \
-	devcb = &downcast<s100_bus_device &>(*device).set_error_wr_callback(DEVCB_##_write);
-
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -148,7 +86,7 @@ public:
 	// interrupts
 	virtual void s100_int_w(int state) { }
 	virtual void s100_nmi_w(int state) { }
-	virtual uint8_t s100_sinta_r(offs_t offset) { return 0; }
+	virtual uint8_t s100_sinta_r(offs_t offset) { return 0xff; }
 
 	// vectored interrupts
 	virtual void s100_vi0_w(int state) { }
@@ -161,11 +99,11 @@ public:
 	virtual void s100_vi7_w(int state) { }
 
 	// memory access
-	virtual uint8_t s100_smemr_r(address_space &space, offs_t offset) { return 0; }
+	virtual uint8_t s100_smemr_r(address_space &space, offs_t offset) { return 0xff; }
 	virtual void s100_mwrt_w(address_space &space, offs_t offset, uint8_t data) { }
 
 	// I/O access
-	virtual uint8_t s100_sinp_r(address_space &space, offs_t offset) { return 0; }
+	virtual uint8_t s100_sinp_r(address_space &space, offs_t offset) { return 0xff; }
 	virtual void s100_sout_w(address_space &space, offs_t offset, uint8_t data) { }
 
 	// configuration access
@@ -201,23 +139,23 @@ public:
 	s100_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~s100_bus_device() { m_device_list.detach_all(); }
 
-	template <class Object> devcb_base &set_irq_wr_callback(Object &&cb) { return m_write_irq.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_nmi_wr_callback(Object &&cb) { return m_write_nmi.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_vi0_wr_callback(Object &&cb) { return m_write_vi0.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_vi1_wr_callback(Object &&cb) { return m_write_vi1.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_vi2_wr_callback(Object &&cb) { return m_write_vi2.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_vi3_wr_callback(Object &&cb) { return m_write_vi3.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_vi4_wr_callback(Object &&cb) { return m_write_vi4.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_vi5_wr_callback(Object &&cb) { return m_write_vi5.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_vi6_wr_callback(Object &&cb) { return m_write_vi6.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_vi7_wr_callback(Object &&cb) { return m_write_vi7.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_dma0_wr_callback(Object &&cb) { return m_write_dma0.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_dma1_wr_callback(Object &&cb) { return m_write_dma1.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_dma2_wr_callback(Object &&cb) { return m_write_dma2.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_dma3_wr_callback(Object &&cb) { return m_write_dma3.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_rdy_wr_callback(Object &&cb) { return m_write_rdy.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_hold_wr_callback(Object &&cb) { return m_write_hold.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_error_wr_callback(Object &&cb) { return m_write_error.set_callback(std::forward<Object>(cb)); }
+	auto irq() { return m_write_irq.bind(); }
+	auto nmi() { return m_write_nmi.bind(); }
+	auto vi0() { return m_write_vi0.bind(); }
+	auto vi1() { return m_write_vi1.bind(); }
+	auto vi2() { return m_write_vi2.bind(); }
+	auto vi3() { return m_write_vi3.bind(); }
+	auto vi4() { return m_write_vi4.bind(); }
+	auto vi5() { return m_write_vi5.bind(); }
+	auto vi6() { return m_write_vi6.bind(); }
+	auto vi7() { return m_write_vi7.bind(); }
+	auto dma0() { return m_write_dma0.bind(); }
+	auto dma1() { return m_write_dma1.bind(); }
+	auto dma2() { return m_write_dma2.bind(); }
+	auto dma3() { return m_write_dma3.bind(); }
+	auto rdy() { return m_write_rdy.bind(); }
+	auto hold() { return m_write_hold.bind(); }
+	auto error() { return m_write_error.bind(); }
 
 	void add_card(device_s100_card_interface *card);
 
@@ -279,6 +217,15 @@ class s100_slot_device : public device_t, public device_slot_interface
 {
 public:
 	// construction/destruction
+	template <typename T>
+	s100_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
+		: s100_slot_device(mconfig, tag, owner, DERIVED_CLOCK(1, 1))
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
 	s100_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides

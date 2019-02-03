@@ -6,7 +6,7 @@
 #pragma once
 
 /****************************************************************************
-  gladiatr and Great Swordsman set.
+  not used by anything. TODO: remove?
 ****************************************************************************/
 
 /* NEC 8741 program mode */
@@ -14,38 +14,15 @@
 #define TAITO8741_SLAVE  1
 #define TAITO8741_PORT   2
 
-#define MCFG_TAITO8741_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, TAITO8741_4PACK, 0)
-
-#define MCFG_TAITO8741_PORT_HANDLERS(_devcb0, _devcb1, _devcb2, _devcb3) \
-	devcb = &downcast<taito8741_4pack_device &>(*device).set_port_handler_0_callback(DEVCB_##_devcb0); \
-	devcb = &downcast<taito8741_4pack_device &>(*device).set_port_handler_1_callback(DEVCB_##_devcb1); \
-	devcb = &downcast<taito8741_4pack_device &>(*device).set_port_handler_2_callback(DEVCB_##_devcb2); \
-	devcb = &downcast<taito8741_4pack_device &>(*device).set_port_handler_3_callback(DEVCB_##_devcb3);
-
-#define MCFG_TAITO8741_MODES(_mode0, _mode1, _mode2, _mode3) \
-	downcast<taito8741_4pack_device &>(*device).set_mode(0, _mode0);    \
-	downcast<taito8741_4pack_device &>(*device).set_mode(1, _mode1);    \
-	downcast<taito8741_4pack_device &>(*device).set_mode(2, _mode2);    \
-	downcast<taito8741_4pack_device &>(*device).set_mode(3, _mode3);
-
-
-#define MCFG_TAITO8741_CONNECT(_con0, _con1, _con2, _con3) \
-	downcast<taito8741_4pack_device &>(*device).set_connect(0, _con0);  \
-	downcast<taito8741_4pack_device &>(*device).set_connect(1, _con1);  \
-	downcast<taito8741_4pack_device &>(*device).set_connect(2, _con2);  \
-	downcast<taito8741_4pack_device &>(*device).set_connect(3, _con3);
-
-
 class taito8741_4pack_device : public device_t
 {
 public:
 	taito8741_4pack_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_port_handler_0_callback(Object &&cb) { return m_port_handler_0_r.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_port_handler_1_callback(Object &&cb) { return m_port_handler_1_r.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_port_handler_2_callback(Object &&cb) { return m_port_handler_2_r.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_port_handler_3_callback(Object &&cb) { return m_port_handler_3_r.set_callback(std::forward<Object>(cb)); }
+	auto port_handler_0_callback() { return m_port_handler_0_r.bind(); }
+	auto port_handler_1_callback() { return m_port_handler_1_r.bind(); }
+	auto port_handler_2_callback() { return m_port_handler_2_r.bind(); }
+	auto port_handler_3_callback() { return m_port_handler_3_r.bind(); }
 
 	void set_mode(int num, uint8_t mode) { m_taito8741[num].mode = mode; }
 	void set_connect(int num, int conn) { m_taito8741[num].connect = conn; }

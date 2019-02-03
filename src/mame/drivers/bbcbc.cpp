@@ -56,7 +56,7 @@ private:
 	uint8_t m_input_select;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<z80pio_device> m_z80pio;
 	required_ioport_array<3> m_buttons;
 };
@@ -118,28 +118,28 @@ static const z80_daisy_config bbcbc_daisy_chain[] =
 };
 
 
-MACHINE_CONFIG_START(bbcbc_state::bbcbc)
-	MCFG_DEVICE_ADD( "maincpu", Z80, MAIN_CLOCK / 8 )
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_Z80_DAISY_CHAIN(bbcbc_daisy_chain)
+void bbcbc_state::bbcbc(machine_config &config)
+{
+	Z80(config, m_maincpu, 10.6875_MHz_XTAL / 3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bbcbc_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &bbcbc_state::io_map);
+	m_maincpu->set_daisy_config(bbcbc_daisy_chain);
 
-	MCFG_DEVICE_ADD("z80pio", Z80PIO, MAIN_CLOCK/8)
-	//MCFG_Z80PIO_OUT_PA_CB(???)
-	//MCFG_Z80PIO_IN_STROBE_CB(???)
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, bbcbc_state, input_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, bbcbc_state, input_select_w))
+	Z80PIO(config, m_z80pio, 10.6875_MHz_XTAL / 3);
+	//m_z80pio->out_pa_callback().set(???);
+	m_z80pio->in_pb_callback().set(FUNC(bbcbc_state::input_r));
+	m_z80pio->out_pb_callback().set(FUNC(bbcbc_state::input_select_w));
 
-	MCFG_DEVICE_ADD( "tms9129", TMS9129, XTAL(10'738'635) / 2 )
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE("maincpu", 0))
-	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
-	MCFG_SCREEN_UPDATE_DEVICE( "tms9129", tms9928a_device, screen_update )
+	tms9129_device &vdp(TMS9129(config, "tms9129", 10.6875_MHz_XTAL));
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000);
+	vdp.int_callback().set_inputline("maincpu", 0);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	// Software on ROM cartridges
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "bbcbc_cart")
-	MCFG_SOFTWARE_LIST_ADD("cart_list","bbcbc")
-MACHINE_CONFIG_END
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "bbcbc_cart");
+	SOFTWARE_LIST(config, "cart_list").set_original("bbcbc");
+}
 
 
 void bbcbc_state::machine_start()

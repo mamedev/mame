@@ -359,35 +359,31 @@ MACHINE_CONFIG_START(bombjack_state::bombjack)
 	MCFG_DEVICE_PROGRAM_MAP(audio_map)
 	MCFG_DEVICE_IO_MAP(audio_io_map)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(bombjack_state, screen_update_bombjack)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, bombjack_state, vblank_irq))
-	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(bombjack_state::screen_update_bombjack));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(bombjack_state::vblank_irq));
+	screen.screen_vblank().append_inputline("audiocpu", INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bombjack)
-	MCFG_PALETTE_ADD("palette", 128)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bombjack);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 128);
 
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(12'000'000)/8) /* Confirmed from PCB */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.13)
+	AY8910(config, "ay1", XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.13); /* Confirmed from PCB */
 
-	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(12'000'000)/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.13)
+	AY8910(config, "ay2", XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.13);
 
-	MCFG_DEVICE_ADD("ay3", AY8910, XTAL(12'000'000)/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.13)
+	AY8910(config, "ay3", XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.13);
 MACHINE_CONFIG_END
 
 

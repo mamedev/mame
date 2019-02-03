@@ -1036,24 +1036,17 @@ MACHINE_CONFIG_START(cubo_state::cubo)
 	MCFG_DEVICE_ADD("maincpu", M68EC020, amiga_state::CLK_28M_PAL / 2)
 	MCFG_DEVICE_PROGRAM_MAP(cubo_mem)
 
-	MCFG_DEVICE_ADD("overlay", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(overlay_2mb_map32)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(32)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(22)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x200000)
+	ADDRESS_MAP_BANK(config, "overlay").set_map(&amiga_state::overlay_2mb_map32).set_options(ENDIANNESS_BIG, 32, 22, 0x200000);
 
-	MCFG_I2CMEM_ADD("i2cmem")
-	MCFG_I2CMEM_PAGE_SIZE(16)
-	MCFG_I2CMEM_DATA_SIZE(1024)
+	I2CMEM(config, "i2cmem", 0).set_page_size(16).set_data_size(1024);
 
-	MCFG_AKIKO_ADD("akiko")
-	MCFG_AKIKO_MEM_READ_CB(READ16(*this, amiga_state, chip_ram_r))
-	MCFG_AKIKO_MEM_WRITE_CB(WRITE16(*this, amiga_state, chip_ram_w))
-	MCFG_AKIKO_INT_CB(WRITELINE(*this, cubo_state, akiko_int_w))
-	MCFG_AKIKO_SCL_HANDLER(WRITELINE("i2cmem", i2cmem_device, write_scl))
-	MCFG_AKIKO_SDA_READ_HANDLER(READLINE("i2cmem", i2cmem_device, read_sda))
-	MCFG_AKIKO_SDA_WRITE_HANDLER(WRITELINE("i2cmem", i2cmem_device, write_sda))
+	akiko_device &akiko(AKIKO(config, "akiko", 0));
+	akiko.mem_r_callback().set(FUNC(amiga_state::chip_ram_r));
+	akiko.mem_w_callback().set(FUNC(amiga_state::chip_ram_w));
+	akiko.int_callback().set(FUNC(cubo_state::akiko_int_w));
+	akiko.scl_callback().set("i2cmem", FUNC(i2cmem_device::write_scl));
+	akiko.sda_r_callback().set("i2cmem", FUNC(i2cmem_device::read_sda));
+	akiko.sda_w_callback().set("i2cmem", FUNC(i2cmem_device::write_sda));
 
 	// video hardware
 	pal_video(config);
@@ -1067,13 +1060,13 @@ MACHINE_CONFIG_START(cubo_state::cubo)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("amiga", PAULA_8364, amiga_state::CLK_C1_PAL)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.25)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.25)
-	MCFG_SOUND_ROUTE(2, "rspeaker", 0.25)
-	MCFG_SOUND_ROUTE(3, "lspeaker", 0.25)
-	MCFG_PAULA_MEM_READ_CB(READ16(*this, amiga_state, chip_ram_r))
-	MCFG_PAULA_INT_CB(WRITELINE(*this, amiga_state, paula_int_w))
+	paula_8364_device &paula(PAULA_8364(config, "amiga", amiga_state::CLK_C1_PAL));
+	paula.add_route(0, "lspeaker", 0.25);
+	paula.add_route(1, "rspeaker", 0.25);
+	paula.add_route(2, "rspeaker", 0.25);
+	paula.add_route(3, "lspeaker", 0.25);
+	paula.mem_read_cb().set(FUNC(amiga_state::chip_ram_r));
+	paula.int_cb().set(FUNC(amiga_state::paula_int_w));
 
 	MCFG_DEVICE_ADD("cdda", CDDA)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
@@ -1081,25 +1074,25 @@ MACHINE_CONFIG_START(cubo_state::cubo)
 
 	/* cia */
 	// these are setup differently on other amiga drivers (needed for floppy to work) which is correct / why?
-	MCFG_DEVICE_ADD("cia_0", MOS8520, amiga_state::CLK_E_PAL)
-	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(*this, amiga_state, cia_0_irq))
-	MCFG_MOS6526_PA_INPUT_CALLBACK(IOPORT("CIA0PORTA"))
-	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(*this, cubo_state, akiko_cia_0_port_a_write))
-	MCFG_DEVICE_ADD("cia_1", MOS8520, amiga_state::CLK_E_PAL)
-	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(*this, amiga_state, cia_1_irq))
+	MOS8520(config, m_cia_0, amiga_state::CLK_E_PAL);
+	m_cia_0->irq_wr_callback().set(FUNC(amiga_state::cia_0_irq));
+	m_cia_0->pa_rd_callback().set_ioport("CIA0PORTA");
+	m_cia_0->pa_wr_callback().set(FUNC(cubo_state::akiko_cia_0_port_a_write));
 
-	MCFG_MICROTOUCH_ADD("microtouch", 9600, WRITELINE(*this, cubo_state, rs232_rx_w))
+	MOS8520(config, m_cia_1, amiga_state::CLK_E_PAL);
+	m_cia_1->irq_wr_callback().set(FUNC(amiga_state::cia_1_irq));
 
-	MCFG_CDROM_ADD("cd32_cdrom")
-	MCFG_CDROM_INTERFACE("cd32_cdrom")
+	MICROTOUCH(config, m_microtouch, 9600).stx().set(FUNC(cubo_state::rs232_rx_w));
+
+	CDROM(config, "cd32_cdrom").set_interface("cd32_cdrom");
 
 	/* fdc */
-	MCFG_DEVICE_ADD("fdc", AMIGA_FDC, amiga_state::CLK_7M_PAL)
-	MCFG_AMIGA_FDC_INDEX_CALLBACK(WRITELINE("cia_1", mos8520_device, flag_w))
-	MCFG_AMIGA_FDC_READ_DMA_CALLBACK(READ16(*this, amiga_state, chip_ram_r))
-	MCFG_AMIGA_FDC_WRITE_DMA_CALLBACK(WRITE16(*this, amiga_state, chip_ram_w))
-	MCFG_AMIGA_FDC_DSKBLK_CALLBACK(WRITELINE(*this, amiga_state, fdc_dskblk_w))
-	MCFG_AMIGA_FDC_DSKSYN_CALLBACK(WRITELINE(*this, amiga_state, fdc_dsksyn_w))
+	AMIGA_FDC(config, m_fdc, amiga_state::CLK_7M_PAL);
+	m_fdc->index_callback().set("cia_1", FUNC(mos8520_device::flag_w));
+	m_fdc->read_dma_callback().set(FUNC(amiga_state::chip_ram_r));
+	m_fdc->write_dma_callback().set(FUNC(amiga_state::chip_ram_w));
+	m_fdc->dskblk_callback().set(FUNC(amiga_state::fdc_dskblk_w));
+	m_fdc->dsksyn_callback().set(FUNC(amiga_state::fdc_dsksyn_w));
 MACHINE_CONFIG_END
 
 

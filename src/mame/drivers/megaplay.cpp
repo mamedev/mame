@@ -617,11 +617,11 @@ READ8_MEMBER(mplay_state::vdp1_count_r)
 void mplay_state::megaplay_bios_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x7f, 0x7f).w("sn2", FUNC(sn76496_device::command_w));
+	map(0x7f, 0x7f).w("sn2", FUNC(sn76496_device::write));
 
 	map(0x40, 0x41).mirror(0x3e).r(FUNC(mplay_state::vdp1_count_r));
-	map(0x80, 0x80).mirror(0x3e).rw(m_vdp1, FUNC(sega315_5124_device::vram_read), FUNC(sega315_5124_device::vram_write));
-	map(0x81, 0x81).mirror(0x3e).rw(m_vdp1, FUNC(sega315_5124_device::register_read), FUNC(sega315_5124_device::register_write));
+	map(0x80, 0x80).mirror(0x3e).rw(m_vdp1, FUNC(sega315_5124_device::data_read), FUNC(sega315_5124_device::data_write));
+	map(0x81, 0x81).mirror(0x3e).rw(m_vdp1, FUNC(sega315_5124_device::control_read), FUNC(sega315_5124_device::control_write));
 }
 
 
@@ -674,23 +674,23 @@ MACHINE_CONFIG_START(mplay_state::megaplay)
 	MCFG_DEVICE_PROGRAM_MAP(megaplay_bios_map)
 	MCFG_DEVICE_IO_MAP(megaplay_bios_io_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
-	MCFG_DEVICE_ADD("io1", CXD1095, 0)
-	MCFG_CXD1095_IN_PORTA_CB(IOPORT("DSW0"))
-	MCFG_CXD1095_IN_PORTB_CB(IOPORT("DSW1"))
-	MCFG_CXD1095_OUT_PORTD_CB(WRITE8(*this, mplay_state, bios_banksel_w))
-	MCFG_CXD1095_IN_PORTE_CB(READ8(*this, mplay_state, bios_6204_r))
-	MCFG_CXD1095_OUT_PORTE_CB(WRITE8(*this, mplay_state, bios_width_w))
+	cxd1095_device &io1(CXD1095(config, "io1", 0));
+	io1.in_porta_cb().set_ioport("DSW0");
+	io1.in_portb_cb().set_ioport("DSW1");
+	io1.out_portd_cb().set(FUNC(mplay_state::bios_banksel_w));
+	io1.in_porte_cb().set(FUNC(mplay_state::bios_6204_r));
+	io1.out_porte_cb().set(FUNC(mplay_state::bios_width_w));
 
-	MCFG_DEVICE_ADD("io2", CXD1095, 0)
-	MCFG_CXD1095_IN_PORTA_CB(IOPORT("TEST"))
-	MCFG_CXD1095_IN_PORTB_CB(IOPORT("COIN"))
-	MCFG_CXD1095_IN_PORTC_CB(READ8(*this, mplay_state, bios_6402_r))
-	MCFG_CXD1095_OUT_PORTC_CB(WRITE8(*this, mplay_state, bios_6402_w))
-	MCFG_CXD1095_OUT_PORTD_CB(WRITE8(*this, mplay_state, bios_gamesel_w))
-	MCFG_CXD1095_IN_PORTE_CB(READ8(*this, mplay_state, bios_6404_r))
-	MCFG_CXD1095_OUT_PORTE_CB(WRITE8(*this, mplay_state, bios_6404_w))
+	cxd1095_device &io2(CXD1095(config, "io2", 0));
+	io2.in_porta_cb().set_ioport("TEST");
+	io2.in_portb_cb().set_ioport("COIN");
+	io2.in_portc_cb().set(FUNC(mplay_state::bios_6402_r));
+	io2.out_portc_cb().set(FUNC(mplay_state::bios_6402_w));
+	io2.out_portd_cb().set(FUNC(mplay_state::bios_gamesel_w));
+	io2.in_porte_cb().set(FUNC(mplay_state::bios_6404_r));
+	io2.out_porte_cb().set(FUNC(mplay_state::bios_6404_w));
 
 	MCFG_DEVICE_ADD("sn2", SN76496, MASTER_CLOCK/15)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) /* 3.58 MHz */
@@ -704,10 +704,10 @@ MACHINE_CONFIG_START(mplay_state::megaplay)
 	MCFG_SCREEN_UPDATE_DRIVER(mplay_state, screen_update_megplay)
 
 	// Megaplay has an additional SMS VDP as an overlay
-	MCFG_DEVICE_ADD("vdp1", SEGA315_5246, 0)
-	MCFG_SEGA315_5246_SET_SCREEN("megadriv")
-	MCFG_SEGA315_5246_IS_PAL(false)
-	MCFG_SEGA315_5246_INT_CB(INPUTLINE("mtbios", 0))
+	SEGA315_5246(config, m_vdp1, 0);
+	m_vdp1->set_screen("megadriv");
+	m_vdp1->set_is_pal(false);
+	m_vdp1->irq().set_inputline(m_bioscpu, 0);
 MACHINE_CONFIG_END
 
 

@@ -67,7 +67,6 @@ end
 #include "cpu/arm7/arm7.h"
 #include "machine/s3c2410.h"
 #include "machine/smartmed.h"
-#include "rendlay.h"
 #include "screen.h"
 
 #define PALM_Z22_BATTERY_LEVEL  75
@@ -78,10 +77,10 @@ class palmz22_state : public driver_device
 {
 public:
 	palmz22_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_s3c2410(*this, "s3c2410"),
-			m_nand(*this, "nand")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_s3c2410(*this, "s3c2410")
+		, m_nand(*this, "nand")
 	{ }
 
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
@@ -300,25 +299,24 @@ MACHINE_CONFIG_START(palmz22_state::palmz22)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(160, 160)
 	MCFG_SCREEN_VISIBLE_AREA(0, 160 - 1, 0, 160 - 1)
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	MCFG_SCREEN_UPDATE_DEVICE("s3c2410", s3c2410_device, screen_update)
 
-	MCFG_DEVICE_ADD(m_s3c2410, S3C2410, 12000000)
-	MCFG_S3C2410_PALETTE("palette")
-	MCFG_S3C2410_SCREEN("screen")
-	MCFG_S3C2410_CORE_PIN_R_CB(READ32(*this, palmz22_state, s3c2410_core_pin_r))
-	MCFG_S3C2410_GPIO_PORT_R_CB(READ32(*this, palmz22_state, s3c2410_gpio_port_r))
-	MCFG_S3C2410_GPIO_PORT_W_CB(WRITE32(*this, palmz22_state, s3c2410_gpio_port_w))
-	MCFG_S3C2410_ADC_DATA_R_CB(READ32(*this, palmz22_state, s3c2410_adc_data_r))
-	MCFG_S3C2410_NAND_COMMAND_W_CB(WRITE8(*this, palmz22_state, s3c2410_nand_command_w))
-	MCFG_S3C2410_NAND_ADDRESS_W_CB(WRITE8(*this, palmz22_state, s3c2410_nand_address_w))
-	MCFG_S3C2410_NAND_DATA_R_CB(READ8(*this, palmz22_state, s3c2410_nand_data_r))
-	MCFG_S3C2410_NAND_DATA_W_CB(WRITE8(*this, palmz22_state, s3c2410_nand_data_w))
+	S3C2410(config, m_s3c2410, 12000000);
+	m_s3c2410->set_palette_tag("palette");
+	m_s3c2410->set_screen_tag("screen");
+	m_s3c2410->core_pin_r_callback().set(FUNC(palmz22_state::s3c2410_core_pin_r));
+	m_s3c2410->gpio_port_r_callback().set(FUNC(palmz22_state::s3c2410_gpio_port_r));
+	m_s3c2410->gpio_port_w_callback().set(FUNC(palmz22_state::s3c2410_gpio_port_w));
+	m_s3c2410->adc_data_r_callback().set(FUNC(palmz22_state::s3c2410_adc_data_r));
+	m_s3c2410->nand_command_w_callback().set(FUNC(palmz22_state::s3c2410_nand_command_w));
+	m_s3c2410->nand_address_w_callback().set(FUNC(palmz22_state::s3c2410_nand_address_w));
+	m_s3c2410->nand_data_r_callback().set(FUNC(palmz22_state::s3c2410_nand_data_r));
+	m_s3c2410->nand_data_w_callback().set(FUNC(palmz22_state::s3c2410_nand_data_w));
 
-	MCFG_DEVICE_ADD(m_nand, NAND, 0)
-	MCFG_NAND_TYPE(K9F5608U0D_J)
-	MCFG_NAND_RNB_CALLBACK(WRITELINE(m_s3c2410, s3c2410_device, frnb_w))
+	NAND(config, m_nand, 0);
+	m_nand->set_nand_type(nand_device::chip::K9F5608U0D_J);
+	m_nand->rnb_wr_callback().set(m_s3c2410, FUNC(s3c2410_device::frnb_w));
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( palmz22 )

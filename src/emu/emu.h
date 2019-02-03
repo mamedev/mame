@@ -49,7 +49,6 @@
 
 // memory and address spaces
 #include "emumem.h"
-class address_map; // Forward declaration
 #include "memarray.h"
 
 // machine-wide utilities

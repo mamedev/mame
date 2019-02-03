@@ -261,8 +261,8 @@ void mc1000_state::mc1000_io(address_map &map)
 	map.global_mask(0xff);
 	map(0x04, 0x04).rw(FUNC(mc1000_state::printer_r), FUNC(mc1000_state::printer_w));
 	map(0x05, 0x05).w("cent_data_out", FUNC(output_latch_device::bus_w));
-//  AM_RANGE(0x10, 0x10) AM_DEVWRITE(MC6845_TAG, mc6845_device, address_w)
-//  AM_RANGE(0x11, 0x11) AM_DEVREADWRITE(MC6845_TAG, mc6845_device, register_r, register_w)
+//  map(0x10, 0x10).w(m_crtc, FUNC(mc6845_device::address_w));
+//  map(0x11, 0x11).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x12, 0x12).w(FUNC(mc1000_state::mc6845_ctrl_w));
 	map(0x20, 0x20).w(AY8910_TAG, FUNC(ay8910_device::address_w));
 	map(0x40, 0x40).r(AY8910_TAG, FUNC(ay8910_device::data_r));
@@ -550,46 +550,48 @@ MACHINE_CONFIG_START(mc1000_state::mc1000)
 	MCFG_DEVICE_IO_MAP(mc1000_io)
 
 	/* timers */
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("ne555clear", mc1000_state, ne555_tick, attotime::from_hz(MC1000_NE555_FREQ))
-	MCFG_TIMER_PARAM(CLEAR_LINE)
+	timer_device &ne555clear(TIMER(config, "ne555clear"));
+	ne555clear.configure_periodic(FUNC(mc1000_state::ne555_tick), attotime::from_hz(MC1000_NE555_FREQ));
+	ne555clear.config_param(CLEAR_LINE);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("ne555assert", mc1000_state, ne555_tick, attotime::from_hz(MC1000_NE555_FREQ))
-	MCFG_TIMER_START_DELAY(attotime::from_hz(MC1000_NE555_FREQ * 100 / MC1000_NE555_DUTY_CYCLE))
-	MCFG_TIMER_PARAM(ASSERT_LINE)
+	timer_device &ne555assert(TIMER(config, "ne555assert"));
+	ne555assert.configure_periodic(FUNC(mc1000_state::ne555_tick), attotime::from_hz(MC1000_NE555_FREQ));
+	ne555assert.set_start_delay(attotime::from_hz(MC1000_NE555_FREQ * 100 / MC1000_NE555_DUTY_CYCLE));
+	ne555assert.config_param(ASSERT_LINE);
 
 	/* video hardware */
-	MCFG_SCREEN_MC6847_PAL_ADD(SCREEN_TAG, MC6847_TAG)
+	SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER);
 
-	MCFG_DEVICE_ADD(MC6847_TAG, MC6847_NTSC, XTAL(3'579'545))
-	MCFG_MC6847_HSYNC_CALLBACK(WRITELINE(*this, mc1000_state, hs_w))
-	MCFG_MC6847_FSYNC_CALLBACK(WRITELINE(*this, mc1000_state, fs_w))
-	MCFG_MC6847_INPUT_CALLBACK(READ8(*this, mc1000_state, videoram_r))
+	MC6847_NTSC(config, m_vdg, XTAL(3'579'545));
+	m_vdg->hsync_wr_callback().set(FUNC(mc1000_state::hs_w));
+	m_vdg->fsync_wr_callback().set(FUNC(mc1000_state::fs_w));
+	m_vdg->input_callback().set(FUNC(mc1000_state::videoram_r));
+	m_vdg->set_screen(SCREEN_TAG);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(AY8910_TAG, AY8910, 3579545/2)
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
-	MCFG_AY8910_RES_LOADS(RES_K(2.2), 0, 0)
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, mc1000_state, keydata_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, mc1000_state, keylatch_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ay8910_device &ay8910(AY8910(config, AY8910_TAG, 3579545/2));
+	ay8910.set_flags(AY8910_SINGLE_OUTPUT);
+	ay8910.set_resistors_load(RES_K(2.2), 0, 0);
+	ay8910.port_b_read_callback().set(FUNC(mc1000_state::keydata_r));
+	ay8910.port_a_write_callback().set(FUNC(mc1000_state::keylatch_w));
+	ay8910.add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("mc1000_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_interface("mc1000_cass");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "mc1000_cass")
+	SOFTWARE_LIST(config, "cass_list").set_original("mc1000_cass");
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, mc1000_state, write_centronics_busy))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(mc1000_state::write_centronics_busy));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+	output_latch_device &latch(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(latch);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16K")
-	MCFG_RAM_EXTRA_OPTIONS("48K")
+	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("48K");
 MACHINE_CONFIG_END
 
 /* ROMs */

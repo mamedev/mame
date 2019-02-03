@@ -40,12 +40,12 @@
 class meyc8088_state : public driver_device
 {
 public:
-	meyc8088_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	meyc8088_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_vram(*this, "vram"),
 		m_heartbeat(*this, "heartbeat"),
-		m_switches(*this, {"C0", "C1", "C2", "C3"}),
+		m_switches(*this, "C%u", 0U),
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
@@ -77,7 +77,7 @@ private:
 	DECLARE_WRITE8_MEMBER(lights2_w);
 	DECLARE_WRITE8_MEMBER(common_w);
 
-	DECLARE_PALETTE_INIT(meyc8088);
+	void meyc8088_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	TIMER_DEVICE_CALLBACK_MEMBER(heartbeat_callback);
@@ -131,9 +131,9 @@ static const res_net_info meyc8088_net_info =
 	}
 };
 
-PALETTE_INIT_MEMBER(meyc8088_state, meyc8088)
+void meyc8088_state:: meyc8088_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
+	uint8_t const *const color_prom = memregion("proms")->base();
 	std::vector<rgb_t> rgb;
 
 	compute_res_net_all(rgb, color_prom, meyc8088_decode_info, meyc8088_net_info);
@@ -370,23 +370,23 @@ MACHINE_CONFIG_START(meyc8088_state::meyc8088)
 	MCFG_DEVICE_ADD(m_maincpu, I8088, (XTAL(15'000'000) / 3) * 0.95) // NOTE: underclocked to prevent errors on diagnostics, MAME i8088 cycle timing is probably inaccurate
 	MCFG_DEVICE_PROGRAM_MAP(meyc8088_map)
 
-	MCFG_DEVICE_ADD("i8155_1", I8155, XTAL(15'000'000) / (3*1))
+	i8155_device &i8155_1(I8155(config, "i8155_1", XTAL(15'000'000) / (3*1)));
 	// all ports set to input
-	MCFG_I8155_IN_PORTA_CB(READ8(*this, meyc8088_state, input_r))
-	MCFG_I8155_IN_PORTB_CB(IOPORT("SW"))
-	MCFG_I8155_IN_PORTC_CB(READ8(*this, meyc8088_state, status_r))
+	i8155_1.in_pa_callback().set(FUNC(meyc8088_state::input_r));
+	i8155_1.in_pb_callback().set_ioport("SW");
+	i8155_1.in_pc_callback().set(FUNC(meyc8088_state::status_r));
 	// i8251A trigger txc/rxc (debug related, unpopulated on sold boards)
 
-	MCFG_DEVICE_ADD("i8155_2", I8155, XTAL(15'000'000) / (3*32))
+	i8155_device &i8155_2(I8155(config, "i8155_2", XTAL(15'000'000) / (3*32)));
 	// all ports set to output
-	MCFG_I8155_OUT_PORTA_CB(WRITE8(*this, meyc8088_state, lights2_w))
-	MCFG_I8155_OUT_PORTB_CB(WRITE8(*this, meyc8088_state, lights1_w))
-	MCFG_I8155_OUT_PORTC_CB(WRITE8(*this, meyc8088_state, common_w))
-	MCFG_I8155_OUT_TIMEROUT_CB(WRITELINE("dac", dac_bit_interface, write))
+	i8155_2.out_pa_callback().set(FUNC(meyc8088_state::lights2_w));
+	i8155_2.out_pb_callback().set(FUNC(meyc8088_state::lights1_w));
+	i8155_2.out_pc_callback().set(FUNC(meyc8088_state::common_w));
+	i8155_2.out_to_callback().set("dac", FUNC(dac_bit_interface::write));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_TIMER_DRIVER_ADD("heartbeat", meyc8088_state, heartbeat_callback)
+	TIMER(config, m_heartbeat).configure_generic(FUNC(meyc8088_state::heartbeat_callback));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -395,8 +395,7 @@ MACHINE_CONFIG_START(meyc8088_state::meyc8088)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, meyc8088_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 32)
-	MCFG_PALETTE_INIT_OWNER(meyc8088_state, meyc8088)
+	PALETTE(config, "palette", FUNC(meyc8088_state::meyc8088_palette), 32);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

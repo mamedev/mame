@@ -66,7 +66,7 @@ public:
 
 	CUSTOM_INPUT_MEMBER( bankmotor_pos_r );
 
-private:
+protected:
 	// PPI read/write handlers
 	DECLARE_READ8_MEMBER( unknown_porta_r );
 	DECLARE_READ8_MEMBER( unknown_portb_r );

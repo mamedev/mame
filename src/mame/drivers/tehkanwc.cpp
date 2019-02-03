@@ -665,75 +665,73 @@ static GFXDECODE_START( gfx_tehkanwc )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(tehkanwc_state::tehkanwc)
-
+void tehkanwc_state::tehkanwc(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 18432000/4)    /* 18.432000 / 4 */
-	MCFG_DEVICE_PROGRAM_MAP(main_mem)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tehkanwc_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 18432000/4);     /* 18.432000 / 4 */
+	m_maincpu->set_addrmap(AS_PROGRAM, &tehkanwc_state::main_mem);
+	m_maincpu->set_vblank_int("screen", FUNC(tehkanwc_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("sub", Z80, 18432000/4)
-	MCFG_DEVICE_PROGRAM_MAP(sub_mem)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tehkanwc_state,  irq0_line_hold)
+	Z80(config, m_subcpu, 18432000/4);
+	m_subcpu->set_addrmap(AS_PROGRAM, &tehkanwc_state::sub_mem);
+	m_subcpu->set_vblank_int("screen", FUNC(tehkanwc_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 18432000/4)
-	MCFG_DEVICE_PROGRAM_MAP(sound_mem)
-	MCFG_DEVICE_IO_MAP(sound_port)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tehkanwc_state,  irq0_line_hold)
+	Z80(config, m_audiocpu, 18432000/4);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &tehkanwc_state::sound_mem);
+	m_audiocpu->set_addrmap(AS_IO, &tehkanwc_state::sound_port);
+	m_audiocpu->set_vblank_int("screen", FUNC(tehkanwc_state::irq0_line_hold));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - seems enough to keep the CPUs in sync */
+	config.m_minimum_quantum = attotime::from_hz(600);  /* 10 CPU slices per frame - seems enough to keep the CPUs in sync */
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tehkanwc_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(tehkanwc_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tehkanwc)
-	MCFG_PALETTE_ADD("palette", 768)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
-	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tehkanwc);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 768).set_endianness(ENDIANNESS_BIG);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	MCFG_DEVICE_ADD("ay1", YM2149, 18432000/12)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, tehkanwc_state, portA_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, tehkanwc_state, portB_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ym2149_device &ay1(YM2149(config, "ay1", 18432000/12));
+	ay1.port_a_write_callback().set(FUNC(tehkanwc_state::portA_w));
+	ay1.port_b_write_callback().set(FUNC(tehkanwc_state::portB_w));
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ay2", YM2149, 18432000/12)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, tehkanwc_state, portA_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, tehkanwc_state, portB_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ym2149_device &ay2(YM2149(config, "ay2", 18432000/12));
+	ay2.port_a_read_callback().set(FUNC(tehkanwc_state::portA_r));
+	ay2.port_b_read_callback().set(FUNC(tehkanwc_state::portB_r));
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, tehkanwc_state, adpcm_int)) /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8KHz               */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
-MACHINE_CONFIG_END
+	MSM5205(config, m_msm, 384000);
+	m_msm->vck_legacy_callback().set(FUNC(tehkanwc_state::adpcm_int));  /* interrupt function */
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  /* 8KHz */
+	m_msm->add_route(ALL_OUTPUTS, "mono", 0.45);
+}
 
-MACHINE_CONFIG_START(tehkanwc_state::tehkanwcb)
+void tehkanwc_state::tehkanwcb(machine_config &config)
+{
 	tehkanwc(config);
-	MCFG_DEVICE_REPLACE("ay1", AY8910, 18432000/12)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, tehkanwc_state, portA_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, tehkanwc_state, portB_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ay8910_device &ay1(AY8910(config.replace(), "ay1", 18432000/12));
+	ay1.port_a_write_callback().set(FUNC(tehkanwc_state::portA_w));
+	ay1.port_b_write_callback().set(FUNC(tehkanwc_state::portB_w));
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_REPLACE("ay2", AY8910, 18432000/12)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, tehkanwc_state, portA_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, tehkanwc_state, portB_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
-
+	ay8910_device &ay2(AY8910(config.replace(), "ay2", 18432000/12));
+	ay2.port_a_read_callback().set(FUNC(tehkanwc_state::portA_r));
+	ay2.port_b_read_callback().set(FUNC(tehkanwc_state::portB_r));
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 void tehkanwc_state::init_teedoff()
 {
@@ -918,6 +916,34 @@ ROM_START( tehkanwcd ) // from a 2-PCB set labeled "A-32302 Tehkan" and "B-32302
 	ROM_LOAD( "twc-5.bin",    0x0000, 0x4000, CRC(444b5544) SHA1(0786d6d9ada7fe49c8ab9751b049095474d2e598) )
 ROM_END
 
+/* Just a year hack to put "1986" plus some other small changes, but this set has been found on different bootleg TWC PCBs. */
+ROM_START( tehkanwch )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "worldcup_3.bin",   0x0000, 0x4000, CRC(dd3f789b) SHA1(8e616a64d96f62797485c78e9c3f36fa90486e3f) ) // 27128
+	ROM_LOAD( "worldcup_2.bin",   0x4000, 0x4000, CRC(7017a221) SHA1(4b4700af0a6ff64f976db369ba4b9d97cee1fd5f) ) // 27128
+	ROM_LOAD( "worldcup_1.bin",   0x8000, 0x4000, CRC(8b662902) SHA1(13bcd4bf23e34dd7193545561e05bb2cb2c95f9b) ) // 27128
+
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_LOAD( "worldcup_6.bin",   0x0000, 0x8000, CRC(70a9f883) SHA1(ace04359265271eb37512a89eb0217eb013aecb7) ) // 24256
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "worldcup_5.bin",   0x0000, 0x4000, CRC(e3112be2) SHA1(7859e51b4312dc5df01c88e1d97cf608abc7ca72) ) // 27128
+
+	ROM_REGION( 0x04000, "gfx1", 0 ) /* fg tiles */
+	ROM_LOAD( "worldcup_9.bin",  0x00000, 0x4000, CRC(a9e274f8) SHA1(02b46e1b149a856f0be74a23faaeb792935b66c7) ) // 27128
+
+	ROM_REGION( 0x10000, "gfx2", 0 ) /* sprites */
+	ROM_LOAD( "worldcup_7.bin",  0x00000, 0x8000, CRC(055a5264) SHA1(fe294ba57c2c858952e2fab0be1b8859730846cb) ) // 24256
+	ROM_LOAD( "worldcup_8.bin",  0x08000, 0x8000, CRC(59faebe7) SHA1(85dad90928369601e039467d575750539410fcf6) ) // 24256
+
+	ROM_REGION( 0x10000, "gfx3", 0 ) /* bg tiles */
+	ROM_LOAD( "worldcup_10.bin", 0x00000, 0x8000, CRC(669389fc) SHA1(a93e8455060ce5242cb65f78e47b4840aa13ab13) ) // 24256
+	ROM_LOAD( "worldcup_11.bin", 0x08000, 0x8000, CRC(4ea7586f) SHA1(fd852c1d5ff09270e398137a7687f68d7256c8a6) ) // 24256
+
+	ROM_REGION( 0x8000, "adpcm", 0 ) /* ADPCM samples */
+	ROM_LOAD( "worldcup_4.bin",  0x0000,  0x4000, CRC(444b5544) SHA1(0786d6d9ada7fe49c8ab9751b049095474d2e598) ) // 27128
+ROM_END
+
 ROM_START( gridiron )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "gfight1.bin",  0x0000, 0x4000, CRC(51612741) SHA1(a0417a35f0ce51ba7fc81f27b356852a97f52a58) )
@@ -976,10 +1002,15 @@ ROM_START( teedoff )
 ROM_END
 
 
+/* There are some dumps out there that only have the year hacked to 1986 and a little bunch of bytes
+   from the graphics zone. I think that not worth to support these hacks...
+*/
+
 
 GAME( 1985, tehkanwc,  0,        tehkanwc, tehkanwc, tehkanwc_state, empty_init,   ROT0,  "Tehkan",  "Tehkan World Cup (set 1)",           MACHINE_SUPPORTS_SAVE )
 GAME( 1985, tehkanwcb, tehkanwc, tehkanwcb,tehkanwc, tehkanwc_state, empty_init,   ROT0,  "Tehkan",  "Tehkan World Cup (set 2, bootleg?)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, tehkanwcc, tehkanwc, tehkanwcb,tehkanwc, tehkanwc_state, empty_init,   ROT0,  "bootleg", "Tehkan World Cup (set 3, bootleg)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // aka 'World Cup 85', different inputs?
 GAME( 1985, tehkanwcd, tehkanwc, tehkanwc, tehkanwcd,tehkanwc_state, empty_init,   ROT0,  "Tehkan",  "Tehkan World Cup (set 4, earlier)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1986, tehkanwch, tehkanwc, tehkanwc, tehkanwcd,tehkanwc_state, empty_init,   ROT0,  "hack",    "Tehkan World Cup (1986 year hack)",  MACHINE_SUPPORTS_SAVE )
 GAMEL(1985, gridiron,  0,        tehkanwc, gridiron, tehkanwc_state, empty_init,   ROT0,  "Tehkan",  "Gridiron Fight",                     MACHINE_SUPPORTS_SAVE, layout_gridiron )
 GAME( 1986, teedoff,   0,        tehkanwc, teedoff,  tehkanwc_state, init_teedoff, ROT90, "Tecmo",   "Tee'd Off (Japan)",                  MACHINE_SUPPORTS_SAVE )

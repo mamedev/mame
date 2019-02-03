@@ -80,8 +80,8 @@ Then it puts settings at 0x9e08 and 0x9e0a (bp 91acb)
 class r2dx_v33_state : public raiden2_state
 {
 public:
-	r2dx_v33_state(const machine_config &mconfig, device_type type, const char *tag)
-		: raiden2_state(mconfig, type, tag),
+	r2dx_v33_state(const machine_config &mconfig, device_type type, const char *tag) :
+		raiden2_state(mconfig, type, tag),
 		m_r2dxbank(0),
 		m_r2dxgameselect(0),
 		m_eeprom(*this, "eeprom"),
@@ -493,12 +493,8 @@ void r2dx_v33_state::nzeroteam_base_map(address_map &map)
 //  map(0x00762, 0x00763).r(FUNC(r2dx_v33_state::nzerotea_unknown_r));
 
 	map(0x00780, 0x0079f).lrw8("seibu_sound_rw",
-							   [this](address_space &space, offs_t offset, u8 mem_mask) {
-								   return m_seibu_sound->main_r(space, offset >> 1, mem_mask);
-							   },
-							   [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
-								   m_seibu_sound->main_w(space, offset >> 1, data, mem_mask);
-							   }).umask16(0x00ff);
+							   [this](offs_t offset) { return m_seibu_sound->main_r(offset >> 1); },
+							   [this](offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); }).umask16(0x00ff);
 
 	map(0x00800, 0x00fff).ram();
 	map(0x01000, 0x0bfff).ram();
@@ -787,98 +783,97 @@ void r2dx_v33_state::r2dx_oki_map(address_map &map)
 	map(0x00000, 0x3ffff).bankr("okibank");
 }
 
-MACHINE_CONFIG_START(r2dx_v33_state::rdx_v33)
-
+void r2dx_v33_state::rdx_v33(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", V33, 32000000/2 ) // ?
-	MCFG_DEVICE_PROGRAM_MAP(rdx_v33_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", r2dx_v33_state,  rdx_v33_interrupt)
+	V33(config, m_maincpu, 32000000/2); // ?
+	m_maincpu->set_addrmap(AS_PROGRAM, &r2dx_v33_state::rdx_v33_map);
+	m_maincpu->set_vblank_int("screen", FUNC(r2dx_v33_state::rdx_v33_interrupt));
 
 	MCFG_MACHINE_RESET_OVERRIDE(r2dx_v33_state,r2dx_v33)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(55.47)    /* verified on pcb */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(500) /* not accurate */)
-	MCFG_SCREEN_SIZE(44*8, 34*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(raiden2_state, screen_update_raiden2)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+	screen.set_refresh_hz(55.47);    /* verified on pcb */
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(500)); /* not accurate */
+	screen.set_size(44*8, 34*8);
+	screen.set_visarea(0*8, 40*8-1, 0, 30*8-1);
+	screen.set_screen_update(FUNC(raiden2_state::screen_update_raiden2));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rdx_v33)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rdx_v33);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 
 	MCFG_VIDEO_START_OVERRIDE(raiden2_state,raiden2)
 
-	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
-	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, raiden2_state, tilemap_enable_w))
-	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, raiden2_state, tile_scroll_w))
+	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
+	crtc.layer_en_callback().set(FUNC(raiden2_state::tilemap_enable_w));
+	crtc.layer_scroll_callback().set(FUNC(raiden2_state::tile_scroll_w));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(28'636'363)/28, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-	MCFG_DEVICE_ADDRESS_MAP(0, r2dx_oki_map)
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL(28'636'363)/28, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
+	oki.set_addrmap(0, &r2dx_v33_state::r2dx_oki_map);
+	oki.add_route(ALL_OUTPUTS, "mono", 0.5);
+}
 
-MACHINE_CONFIG_START(r2dx_v33_state::nzerotea)
-
+void r2dx_v33_state::nzerotea(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", V33,XTAL(32'000'000)/2) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(nzerotea_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", r2dx_v33_state,  rdx_v33_interrupt)
+	V33(config, m_maincpu, XTAL(32'000'000)/2); /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &r2dx_v33_state::nzerotea_map);
+	m_maincpu->set_vblank_int("screen", FUNC(r2dx_v33_state::rdx_v33_interrupt));
 
 	MCFG_MACHINE_RESET_OVERRIDE(r2dx_v33_state,nzeroteam)
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 14318180/4)
-	MCFG_DEVICE_PROGRAM_MAP(zeroteam_sound_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
+	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(28'636'363)/8));
+	audiocpu.set_addrmap(AS_PROGRAM, &r2dx_v33_state::zeroteam_sound_map);
+	audiocpu.set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(55.47)    /* verified on pcb */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(500) /* not accurate */)
-	MCFG_SCREEN_SIZE(44*8, 34*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(raiden2_state, screen_update_raiden2)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+	screen.set_refresh_hz(55.47);    /* verified on pcb */
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(500)); /* not accurate */
+	screen.set_size(44*8, 34*8);
+	screen.set_visarea(0*8, 40*8-1, 0, 32*8-1);
+	screen.set_screen_update(FUNC(raiden2_state::screen_update_raiden2));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rdx_v33)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rdx_v33);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 
 	MCFG_VIDEO_START_OVERRIDE(raiden2_state,raiden2)
 
-	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
-	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, raiden2_state, tilemap_enable_w))
-	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, raiden2_state, tile_scroll_w))
+	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
+	crtc.layer_en_callback().set(FUNC(raiden2_state::tilemap_enable_w));
+	crtc.layer_scroll_callback().set(FUNC(raiden2_state::tile_scroll_w));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, 14318180/4)
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL(28'636'363)/8));
+	ymsnd.irq_handler().set("seibu_sound", FUNC(seibu_sound_device::fm_irqhandler));
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1320000, okim6295_device::PIN7_LOW)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL(28'636'363)/28, okim6295_device::PIN7_HIGH));
+	oki.add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
-	MCFG_SEIBU_SOUND_CPU("audiocpu")
-	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
-	MCFG_SEIBU_SOUND_YM_READ_CB(READ8("ymsnd", ym3812_device, read))
-	MCFG_SEIBU_SOUND_YM_WRITE_CB(WRITE8("ymsnd", ym3812_device, write))
-MACHINE_CONFIG_END
+	SEIBU_SOUND(config, m_seibu_sound, 0);
+	m_seibu_sound->int_callback().set_inputline("audiocpu", 0);
+	m_seibu_sound->set_rom_tag("audiocpu");
+	m_seibu_sound->set_rombank_tag("seibu_bank1");
+	m_seibu_sound->ym_read_callback().set("ymsnd", FUNC(ym3812_device::read));
+	m_seibu_sound->ym_write_callback().set("ymsnd", FUNC(ym3812_device::write));
+}
 
-MACHINE_CONFIG_START(r2dx_v33_state::zerotm2k)
+void r2dx_v33_state::zerotm2k(machine_config &config)
+{
 	nzerotea(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(zerotm2k_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &r2dx_v33_state::zerotm2k_map);
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
-MACHINE_CONFIG_END
+	EEPROM_93C46_16BIT(config, m_eeprom);
+}
 
 void r2dx_v33_state::init_rdx_v33()
 {

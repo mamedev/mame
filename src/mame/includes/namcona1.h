@@ -5,6 +5,10 @@
     Namco NA-1 System hardware
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_NAMCONA1_H
+#define MAME_INCLUDES_NAMCONA1_H
+
+#pragma once
 
 #include "machine/eeprompar.h"
 #include "machine/timer.h"
@@ -17,8 +21,8 @@
 class namcona1_state : public driver_device
 {
 public:
-	namcona1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	namcona1_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_mcu(*this, "mcu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -35,9 +39,12 @@ public:
 		m_scroll(*this, "scroll"),
 		m_spriteram(*this, "spriteram"),
 		m_prgrom(*this, "maincpu"),
-		m_maskrom(*this, "maskrom")
+		m_maskrom(*this, "maskrom"),
+		m_scan_timer(nullptr)
 	{ }
 
+	void namcona_base(machine_config &config);
+	void c69(machine_config &config);
 	void namcona1(machine_config &config);
 
 	void init_bkrtmaq();
@@ -48,6 +55,9 @@ public:
 	void init_exvania();
 	void init_emeraldj();
 	void init_swcourtb();
+
+	void namcona1_mcu_io_map(address_map &map);
+	void namcona1_mcu_map(address_map &map);
 
 protected:
 	DECLARE_READ16_MEMBER(custom_key_r);
@@ -76,13 +86,13 @@ protected:
 	DECLARE_READ16_MEMBER(snd_r);
 	DECLARE_WRITE16_MEMBER(snd_w);
 
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
+	void scanline_interrupt(int scanline);
 
 	void namcona1_main_map(address_map &map);
-	void namcona1_mcu_io_map(address_map &map);
-	void namcona1_mcu_map(address_map &map);
+	void namcona1_c140_map(address_map &map);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -102,6 +112,11 @@ protected:
 		NAMCO_FA,
 		NAMCO_XDAY2,
 		NAMCO_SWCOURTB
+	};
+
+	enum
+	{
+		TIMER_SCANLINE
 	};
 
 	int m_gametype;
@@ -127,6 +142,7 @@ protected:
 	required_region_ptr<uint16_t> m_prgrom;
 	required_region_ptr<uint16_t> m_maskrom;
 
+	emu_timer * m_scan_timer;
 	// this has to be uint8_t to be in the right byte order for the tilemap system
 	std::vector<uint8_t> m_shaperam;
 
@@ -167,10 +183,11 @@ protected:
 class namcona2_state : public namcona1_state
 {
 public:
-	namcona2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: namcona1_state(mconfig, type, tag)
+	namcona2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		namcona1_state(mconfig, type, tag)
 	{}
 
+	void c70(machine_config &config);
 	void namcona2(machine_config &config);
 
 	void init_knckhead();
@@ -182,8 +199,8 @@ public:
 class xday2_namcona2_state : public namcona2_state
 {
 public:
-	xday2_namcona2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: namcona2_state(mconfig, type, tag),
+	xday2_namcona2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		namcona2_state(mconfig, type, tag),
 		m_rtc(*this, "rtc")
 	{}
 
@@ -201,3 +218,5 @@ private:
 
 	void xday2_main_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_NAMCONA1_H

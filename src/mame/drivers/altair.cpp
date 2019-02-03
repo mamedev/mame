@@ -97,29 +97,30 @@ void altair_state::machine_reset()
 	m_maincpu->set_state_int(i8080_cpu_device::I8085_PC, 0xFD00);
 }
 
-MACHINE_CONFIG_START(altair_state::altair)
+void altair_state::altair(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8080, 2_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
+	I8080(config, m_maincpu, 2_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &altair_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &altair_state::io_map);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
+	acia6850_device &acia(ACIA6850(config, "acia", 0));
+	acia.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	acia.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("acia", acia6850_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("acia", acia6850_device, write_dcd))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("acia", acia6850_device, write_cts))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set("acia", FUNC(acia6850_device::write_rxd));
+	rs232.dcd_handler().set("acia", FUNC(acia6850_device::write_dcd));
+	rs232.cts_handler().set("acia", FUNC(acia6850_device::write_cts));
 
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, 153600) // TODO: this is set using jumpers S3/S2/S1/S0
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("acia", acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia", acia6850_device, write_rxc))
+	clock_device &uart_clock(CLOCK(config, "uart_clock", 153600)); // TODO: this is set using jumpers S3/S2/S1/S0
+	uart_clock.signal_handler().set("acia", FUNC(acia6850_device::write_txc));
+	uart_clock.signal_handler().append("acia", FUNC(acia6850_device::write_rxc));
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", altair_state, altair, "bin", 0)
-MACHINE_CONFIG_END
+	QUICKLOAD(config, "quickload", 0).set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(altair_state, altair), this), "bin", 0);
+}
 
 /* ROM definition */
 ROM_START( al8800bt )

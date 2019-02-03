@@ -45,7 +45,7 @@ Coin Counter Available
 Gun Shooting Effect Available (Option)
 Hopper, Ticket Counter, Prize System (Option)
 
-6. Develoment
+6. Development
 - On-chip ICEbreaker debug support with JTAG-based debugging solution
 - MultiICE, OPENICE etc.
 - Compiler : ADS, SDT
@@ -93,6 +93,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_i2cmem(*this, "i2cmem")
 		, m_s3c2410(*this, "s3c2410")
+		, m_qs1000(*this, "qs1000")
 		, m_soundlatch(*this, "soundlatch")
 		, m_system_memory(*this, "systememory")
 		, m_flash(*this, "flash")
@@ -110,6 +111,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<i2cmem_device> m_i2cmem;
 	required_device<s3c2410_device> m_s3c2410;
+	required_device<qs1000_device> m_qs1000;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_shared_ptr<uint32_t> m_system_memory;
 	required_region_ptr<uint8_t> m_flash;
@@ -592,7 +594,7 @@ READ32_MEMBER(ghosteo_state::bballoon_speedup_r)
 void ghosteo_state::machine_start()
 {
 	// Set up the QS1000 program ROM banking, taking care not to overlap the internal RAM
-	machine().device("qs1000:cpu")->memory().space(AS_IO).install_read_bank(0x0100, 0xffff, "bank");
+	m_qs1000->cpu().space(AS_IO).install_read_bank(0x0100, 0xffff, "bank");
 	membank("qs1000:bank")->configure_entries(0, 8, memregion("qs1000:cpu")->base()+0x100, 0x10000);
 }
 
@@ -601,74 +603,71 @@ void ghosteo_state::machine_reset()
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4d000010, 0x4d000013,read32_delegate(FUNC(ghosteo_state::bballoon_speedup_r), this));
 }
 
-MACHINE_CONFIG_START(ghosteo_state::ghosteo)
-
+void ghosteo_state::ghosteo(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", ARM9, 200000000)
+	ARM9(config, m_maincpu, 200000000);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(455, 262)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DEVICE("s3c2410", s3c2410_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(455, 262);
+	screen.set_visarea(0, 320-1, 0, 256-1);
+	screen.set_screen_update("s3c2410", FUNC(s3c2410_device::screen_update));
 
-	MCFG_PALETTE_ADD("palette", 256)
+	PALETTE(config, "palette").set_entries(256);
 
+	S3C2410(config, m_s3c2410, 12000000);
+	m_s3c2410->set_palette_tag("palette");
+	m_s3c2410->set_screen_tag("screen");
+	m_s3c2410->core_pin_r_callback().set(FUNC(ghosteo_state::s3c2410_core_pin_r));
+	m_s3c2410->gpio_port_r_callback().set(FUNC(ghosteo_state::s3c2410_gpio_port_r));
+	m_s3c2410->gpio_port_w_callback().set(FUNC(ghosteo_state::s3c2410_gpio_port_w));
+	m_s3c2410->i2c_scl_w_callback().set(FUNC(ghosteo_state::s3c2410_i2c_scl_w));
+	m_s3c2410->i2c_sda_r_callback().set(FUNC(ghosteo_state::s3c2410_i2c_sda_r));
+	m_s3c2410->i2c_sda_w_callback().set(FUNC(ghosteo_state::s3c2410_i2c_sda_w));
+	m_s3c2410->nand_command_w_callback().set(FUNC(ghosteo_state::s3c2410_nand_command_w));
+	m_s3c2410->nand_address_w_callback().set(FUNC(ghosteo_state::s3c2410_nand_address_w));
+	m_s3c2410->nand_data_r_callback().set(FUNC(ghosteo_state::s3c2410_nand_data_r));
+	m_s3c2410->nand_data_w_callback().set(FUNC(ghosteo_state::s3c2410_nand_data_w));
 
-	MCFG_DEVICE_ADD("s3c2410", S3C2410, 12000000)
-	MCFG_S3C2410_PALETTE("palette")
-	MCFG_S3C2410_SCREEN("screen")
-	MCFG_S3C2410_CORE_PIN_R_CB(READ32(*this, ghosteo_state, s3c2410_core_pin_r))
-	MCFG_S3C2410_GPIO_PORT_R_CB(READ32(*this, ghosteo_state, s3c2410_gpio_port_r))
-	MCFG_S3C2410_GPIO_PORT_W_CB(WRITE32(*this, ghosteo_state, s3c2410_gpio_port_w))
-	MCFG_S3C2410_I2C_SCL_W_CB(WRITELINE(*this, ghosteo_state, s3c2410_i2c_scl_w))
-	MCFG_S3C2410_I2C_SDA_R_CB(READLINE(*this, ghosteo_state, s3c2410_i2c_sda_r))
-	MCFG_S3C2410_I2C_SDA_W_CB(WRITELINE(*this, ghosteo_state, s3c2410_i2c_sda_w))
-	MCFG_S3C2410_NAND_COMMAND_W_CB(WRITE8(*this, ghosteo_state, s3c2410_nand_command_w))
-	MCFG_S3C2410_NAND_ADDRESS_W_CB(WRITE8(*this, ghosteo_state, s3c2410_nand_address_w))
-	MCFG_S3C2410_NAND_DATA_R_CB(READ8(*this, ghosteo_state, s3c2410_nand_data_r))
-	MCFG_S3C2410_NAND_DATA_W_CB(WRITE8(*this, ghosteo_state, s3c2410_nand_data_w))
+//  nand_device &nand(NAND(config, "nand", 0));
+//  nand.set_nand_type(nand_device::chip::K9F5608U0D);    // or another variant with ID 0xEC 0x75 ?
+//  nand.rnb_wr_callback().set(m_s3c2410, FUNC(s3c2410_device::s3c24xx_pin_frnb_w));
 
-//  MCFG_DEVICE_ADD("nand", NAND, 0)
-//  MCFG_NAND_TYPE(NAND_CHIP_K9F5608U0D)    // or another variant with ID 0xEC 0x75 ?
-//  MCFG_NAND_RNB_CALLBACK(WRITELINE("s3c2410", s3c2410_device, s3c24xx_pin_frnb_w))
-
-//  MCFG_I2CMEM_ADD("i2cmem", 0xA0, 0, 0x100, nullptr)
+//  I2CMEM(config, "i2cmem", 0, 0xA0, 0, 0x100, nullptr);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("qs1000", qs1000_device, set_irq))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set(m_qs1000, FUNC(qs1000_device::set_irq));
+	m_soundlatch->set_separate_acknowledge(true);
 
-	MCFG_DEVICE_ADD("qs1000", QS1000, XTAL(24'000'000))
-	MCFG_QS1000_EXTERNAL_ROM(true)
-	MCFG_QS1000_IN_P1_CB(READ8("soundlatch", generic_latch_8_device, read))
-	MCFG_QS1000_OUT_P1_CB(WRITE8(*this, ghosteo_state, qs1000_p1_w))
-	MCFG_QS1000_OUT_P2_CB(WRITE8(*this, ghosteo_state, qs1000_p2_w))
-	MCFG_QS1000_OUT_P3_CB(WRITE8(*this, ghosteo_state, qs1000_p3_w))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	QS1000(config, m_qs1000, XTAL(24'000'000));
+	m_qs1000->set_external_rom(true);
+	m_qs1000->p1_in().set("soundlatch", FUNC(generic_latch_8_device::read));
+	m_qs1000->p1_out().set(FUNC(ghosteo_state::qs1000_p1_w));
+	m_qs1000->p2_out().set(FUNC(ghosteo_state::qs1000_p2_w));
+	m_qs1000->p3_out().set(FUNC(ghosteo_state::qs1000_p3_w));
+	m_qs1000->add_route(0, "lspeaker", 1.0);
+	m_qs1000->add_route(1, "rspeaker", 1.0);
+}
 
-MACHINE_CONFIG_START(ghosteo_state::bballoon)
+void ghosteo_state::bballoon(machine_config &config)
+{
 	ghosteo(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(bballoon_map)
-	MCFG_I2CMEM_ADD("i2cmem")
-	MCFG_I2CMEM_DATA_SIZE(256)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &ghosteo_state::bballoon_map);
+	I2CMEM(config, "i2cmem", 0).set_data_size(256);
+}
 
-MACHINE_CONFIG_START(ghosteo_state::touryuu)
+void ghosteo_state::touryuu(machine_config &config)
+{
 	ghosteo(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(touryuu_map)
-	MCFG_I2CMEM_ADD("i2cmem")
-	MCFG_I2CMEM_DATA_SIZE(1024)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &ghosteo_state::touryuu_map);
+	I2CMEM(config, "i2cmem", 0).set_data_size(1024);
+}
 
 
 /*

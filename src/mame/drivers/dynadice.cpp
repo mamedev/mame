@@ -47,12 +47,13 @@ dy_6.bin (near Z80)
 class dynadice_state : public driver_device
 {
 public:
-	dynadice_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	dynadice_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_ay8910(*this, "ay8910") { }
+		m_ay8910(*this, "ay8910")
+	{ }
 
 	void dynadice(machine_config &config);
 
@@ -271,7 +272,7 @@ MACHINE_CONFIG_START(dynadice_state::dynadice)
 	MCFG_DEVICE_IO_MAP(dynadice_sound_io_map)
 
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -283,14 +284,13 @@ MACHINE_CONFIG_START(dynadice_state::dynadice)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_dynadice)
-	MCFG_PALETTE_ADD_3BIT_BRG("palette")
+	PALETTE(config, "palette", palette_device::BRG_3BIT);
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD(m_ay8910, AY8910, 2000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	AY8910(config, m_ay8910, 2000000).add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 ROM_START( dynadice )

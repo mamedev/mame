@@ -14,6 +14,7 @@ public:
 
 	void set_mode24(int mode) { m_mode24 = mode; }
 	void set_day1(int day) { m_day1 = day; }
+	void set_mode_and_day(int mode, int day) { m_mode24 = mode; m_day1 = day; }
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
@@ -29,7 +30,7 @@ protected:
 private:
 	// internal state
 
-	// Initializion the clock chip:
+	// Initialization of the clock chip:
 	// m_day1 must be set to a value from 0 (sunday), 1 (monday)...
 	// to 6 (saturday) and is needed to correctly retrieve the
 	// day-of-week from the host system clock.
@@ -64,16 +65,5 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(MM58274C, mm58274c_device)
-
-
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_MM58274C_MODE24(_mode) \
-	downcast<mm58274c_device &>(*device).set_mode24(_mode);
-
-#define MCFG_MM58274C_DAY1(_day) \
-	downcast<mm58274c_device &>(*device).set_day1(_day);
 
 #endif // MAME_MACHINE_MM58274C_H

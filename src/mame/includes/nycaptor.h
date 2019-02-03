@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
+#ifndef MAME_INCLUDES_NYCAPTOR_H
+#define MAME_INCLUDES_NYCAPTOR_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "machine/input_merger.h"
@@ -10,8 +14,8 @@
 class nycaptor_state : public driver_device
 {
 public:
-	nycaptor_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	nycaptor_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_scrlram(*this, "scrlram"),
 		m_sharedram(*this, "sharedram"),
@@ -25,7 +29,8 @@ public:
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
 		m_soundlatch2(*this, "soundlatch2"),
-		m_soundnmi(*this, "soundnmi") { }
+		m_soundnmi(*this, "soundnmi")
+	{ }
 
 	void nycaptor(machine_config &config);
 	void cyclshtg(machine_config &config);
@@ -35,6 +40,11 @@ public:
 	void init_colt();
 	void init_bronx();
 	void init_nycaptor();
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 private:
 	/* memory pointers */
@@ -95,12 +105,9 @@ private:
 	DECLARE_WRITE8_MEMBER(nycaptor_scrlram_w);
 	DECLARE_WRITE8_MEMBER(unk_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	uint32_t screen_update_nycaptor(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	int nycaptor_spot(  );
-	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
+	int nycaptor_spot();
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);
 	void bronx_master_map(address_map &map);
 	void bronx_slave_io_map(address_map &map);
 	void bronx_slave_map(address_map &map);
@@ -110,3 +117,5 @@ private:
 	void nycaptor_slave_map(address_map &map);
 	void sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_NYCAPTOR_H

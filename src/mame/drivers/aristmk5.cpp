@@ -5,6 +5,8 @@
     Aristocrat MK5 / MKV hardware
     possibly 'Acorn Archimedes on a chip' hardware
 
+    Note: ARM250 mapping is not identical to plain AA
+
     Current significant issues:
      - Games run twice as fast as they should, sound effects are double speed etc.
        There are threads that say when running in VGA mode an original AA
@@ -14,20 +16,27 @@
      - Games occasionally give a coin diverter fault when inserting coins, mainly with US region games.
      - Early US games will lock up completely if a hand pay is performed, requiring a complete memory reset.
        To avoid this until the issue has been fixed, change the hopper and jackpot limits to a very large number
-       such as 999999 so large wins will be paid via the hopper. Games where the music/sound works do not have this problem.
+       such as 999999 so large wins will be paid via the hopper.
+       US games where the music/sound works do not have this problem.
      - Venezuelan games give a note acceptor error on boot even if the note acceptor is disabled in the options
      - qnilebr (actually the 0301718V BIOS itself) won't accept coins on boot until the jackpot reset key is toggled (bug or not?)
-     - Later style games (e.g. with the newer music format) from NSW/ACT and Venezuela lock up (hang) after 50 spins
+     - Later games from NSW/ACT and Venezuela lock up (hang) after a while after a certain amount of spins (usually 50 spins)
 
-    Games which do *not* lock up after 50 spins:
-    All games from Brazil, Holland, New Zealand and USA.
-    All NSW/ACT games which have the early style (pre-1997) music e.g. chickna5, dolphntra, dstbloom, eforsta5, oscara5a, swhr2a, wcougar and others
-    Some 1997-era games with the later music: cashcham, kgalaha, locoloot, locoloota, lonewolf, qnileb, retrsama, retrsamb, rushrst, topbana
+    US games which can completely freeze after exceeding $1199.99 and forcing a hand pay, requiring the SRAM to be wiped:
+     - bumblbugu, bumblbugua, chickna5u, chickna5ua, eforsta5u, eforsta5ua, mgarden, minemineu, minemineua, pengpayu,
+       pengpayua, pengpayub, swhr2u, trpdlghtu, wcougaru, wcougarua, wcougarub, wnpost
 
-    Note: ARM250 mapping is not identical to plain AA
+    Games which do *not* lock up after a certain amount of spins:
+     - All games from Holland, New Zealand, USA, and Casino versions.
+     - baddog, buttdeli, cashcham, chickna5, dmdfever, dolphntra, dolphntrb, drgneye, dstbloom, dstblooma,
+       eforsta5, jumpjoey, kgalaha, kgbirda5, locoloot, locoloota, lonewolf, luckyclo, mammothm, minemine,
+       mountmon, mountmona, mystgard, oscara5a, pengpaya, pengpayc, phantpay, przfight, qnileb, qtbird,
+       reelpwr, retrsama, retrsamb, rushrst, snowcat, swhr2a, thndh, thndha, thor, topbana,
+       trpdlght, wamazona, wcougar, wildbill, wldangel
 
-    BIOS ROMs are actually nowhere to be found on a regular MK5 system. On some US machines, set chips are required
-    to change the system configurations on a game by swapping them with the game ROMs in U7/U11.
+    BIOS ROMs are actually nowhere to be found on a regular MK5 system, as the BIOS code is at the start of game ROMs U7 and U11.
+    Therefore, no BIOS system is required as it it built into each game, with the exception of casino software (see below).
+    On most US machines, set chips are required to change the system configurations on a game by swapping them with the game ROMs in U7/U11.
 
     Casino versions actually do have a BIOS, otherwise known as a Base System, which is installed at U7/U11 at all times.
     Casino game EPROMs are loaded in U8/U12 and beyond.
@@ -41,31 +50,33 @@
 
     chickna5ql, bumblbugql and the 0700474V casino BIOS all use QCOM, blackpnt uses VLC (Video Lottery Consultants) comms instead.
 
-    Most New Zealand games have an autoplay option, which is enabled by default in the options.
-    The Autoplay button replaces the fourth play line button normally used for 7 or 15 lines.
+    Diamond Touch, Dream Weaver, Magic Touch and the New Zealand games have an autoplay option.
+    The New Zealand games have this enabled by default in the options, whereas on the NSW games it is disabled by default.
+    The Autoplay button replaces the fourth play line button normally used for 7 or 15 lines (orchidmsnz has 8 lines/Autoplay due to its unique reel layout).
 
     Some Venezuelan games have a 'Play maximum lines' option, this will turn every play line button into maximum lines.
     For example, the default setup may have 1, 5, 10, 15 and 20 line buttons; this option will turn every play button into 20 lines.
 
     The gamble (double up) feature can be enabled in the options on non-US machines. It is disabled by default.
+    On US machines which don't use set chips, the gamble feature is enabled with dip switch 2-1.
+    On US machines which use set chips, the gamble feature can be enabled in the set chip options, but only if the game's region allows it.
+    The gamble option can not be enabled at all in the Brazilian casino BIOS, although the code is still in place.
+
+    The standard double up mode on Aristocrat games is the red/black card game, which is in fact the only option on US games.
     Some machines have different gamble features, such as being able to bet on the four card suits for 4:1 odds,
     or to spin a single slot reel which has 2:1, 3:1, 5:1, 10:1 or 100:1 odds of landing on the middle line.
     Other games replace the cards with animations, for example the double up game in Prize Fight bets on which
     boxer will knock out the other, likewise in Sumo Spins one sumo wrestler will ring-out the other.
     In both Prize Fight and Sumo Spins the two opponents are wearing either red or black just like the cards they replaced.
     The gamble feature is not available if a win coincides with a jackpot pay such as a Hyperlink feature.
-    The gamble option is also not available in the Brazilian casino BIOS.
-
-    On US machines which do not require set chips, dip switch DSW2-1 enables or disables the double up feature.
-    On US games which do require set chips, the gamble option is in the set chips, if the regional jurisdiction allows for it to be enabled.
-    US games only seem to have the standard red/black double up included.
 
     Regional button layout differences:
     US games have the payline buttons on the top row, the player selects the number of lines to be played first before choosing the bet multiplier to spin.
-    Some US games can have the bet and play line buttons reversed in the set chip options, which creates the same similar button layout as non-US games.
+    Some US games can have the bet and play line buttons reversed in the set chip options, which creates the same type of button layout as non-US games.
     Non-US games have the bet buttons on the top row, the player selects the bet multiplier first before selecting the amount of lines to play.
     An exception to the non-US layout applies if the game only has one payline, for example wamazona. In this case, the bottom row is used for the bet multipliers.
     Some non-US games default to 1 credit per line when there are zero credits in the machine so that a player does not accidentally bet higher than intended.
+    The Chariot Challenge (both sets) also reverts to 1 credit per line after rebooting, regardless of the previous bet.
 
     Some games can be set up to multiple bet and line configurations. Usually this applies to the US set chip games,
     however some non-US games also have this option, such as baddog, marmagic, trojhors and tritreat.
@@ -75,10 +86,11 @@
     This option is in the Sound System setup rather than in Machine Options.
     Selecting "Base" plays coin jingles while selecting "MK2.5" plays a small selection of prerecorded music taken from MK2.5 games.
 
-    Later games (non-US) removed the collect limit out of Machine Options into its own menu.
+    Later non-US games moved the collect limit from the Machine Options menu into its own menu.
 
-    US Hyperlink (e.g. Cash Express) games will not trigger the jackpot feature if the link system is not hooked up.
-    This affects dolphntrce, dolphntrcea, dolphntrceb, pengpuck, qnilece and qnilecea.
+    US Hyperlink (e.g. Cash Express) games will not trigger the jackpot feature if variation 5 is not selected in the set chip options.
+    This is not a bug, these games can either be set to normal standalone games or Hyperlink jackpot games.
+    This affects dolphntrce, dolphntrcea, dolphntrceb, eforsta5ce, glizrdce, kgalahce, pengpuck, qnilece, qnilecea and qnileceb.
 
     Non-US Hyperlink games will still trigger the jackpot feature as intended, however the link system is not emulated
     therefore no jackpot credits are paid if the Hyperlink feature is triggered, and the games will need the jackpot key to be toggled to continue play.
@@ -104,23 +116,59 @@
     Mountain Money displays "MOONSHINE MONEY" when a win with the wild Moonshine occurs. The game itself is not called Moonshine Money.
     Chicken displays "Chicken Run Feature Completed" at the end of the feature. The game itself is not called Chicken Run.
     Thunder Heart is named Thunderheart on the artwork, as well as on the later Hyperlink jackpot games.
+    Golden Pyramids is sometimes called Golden Pyramid (without the trailing 's') in the ROM.
 
-    Some games also have completely different artwork (using the same theme and paytable) but use the same ROMs for another game. Examples are:
-    Heart Throb = Sweethearts II (Heart Throb confirmed as using 0200004V EPROMs)
-    Moon Fire = Indian Dreaming (Moon Fire confirmed as using 0100845V EPROMs)
-    Golden Pyramids = Queen of the Nile (note that some ROMs actually do contain the Golden Pyramids string)
+    Some games also have completely different artwork (using the same theme and paytable) but use the ROMs from another game. Examples are:
+    Heart Throb = Sweethearts II (Heart Throb confirmed using 0200004V EPROMs)
+    Moon Fire = Indian Dreaming (Moon Fire confirmed using 0100845V EPROMs)
+    Golden Pyramids = Queen of the Nile (Golden Pyramids confirmed using 0300439V EPROMs; note that some ROMs actually do contain the Golden Pyramids string)
 
     Note that the artwork for Golden Pyramids (NSW/ACT) has a 1996 copyright, whereas Queen of the Nile has a 1997 copyright.
-    Earlier versions of Golden Pyramids (undumped) have prerecorded win music from MK2.5/MK4 games, as with other early MK5 games.
+    Earlier versions of Golden Pyramids (undumped) have prerecorded win music from MK2.5/MK4 games similar to dolphntra, as with other early MK5 games.
     Queen of the Nile does not use this early prerecorded music in any of its variants.
-    It is possible that Queen of the Nile ROMs were used as offical replacements/upgrades for earlier version Golden Pyramids ROMs.
+
+    List of clones (identical games with different names and/or graphics):
+    Queen of the Nile = Golden Pyramids = Dolphin Treasure = Adonis = Geisha (note that Adonis has a slightly different symbol layout for reel 1, but the symbol frequency is still identical)
+    Sweethearts II = Heart Throb = Desert Bloom = Tropical Delight = Coral Riches II
+    Phantom Pays = Enchanted Forest = Magic Garden = Lucky Clover = The Gambler = Thunder Heart (9 line) = Mountain Money (9 line)
+    Diamond Touch = Magic Mask = Party Gras = Diamond Destiny
+    Bumble Bugs = Oscar
+    Butterfly Delight = Golden Canaries (undumped)
+    Cash Cat = Kooka Bucks
+    Cash Crop = Money Mouse
+    Unicorn Dreaming = Inca Sun
+    Reelin-n-Rockin = Indian Dreaming = Moon Fire
+    Reel Power = Wizard Ways
+    Wicked Winnings = Way To Go (undumped)
+    Snow Cat = Loco Loot = Wild Coyote
+    Sweet Liberty Deluxe = Koala Mint
+    Cash Chameleon = Canyon Rose = Queens of Cash
+    Green Lizard = King Galah
+    Penguin Pays = Jumping Beans = Jumpin' Joey = Fortune Fever = Honky Tonk
+    Top Banana = Black Panther
+    Panther Magic = Black Rhino (undumped) = Wild Africa = K.G. Bird = Wild Cougar = Thor = Fantasy Fortune (undumped)
+    Wild Thing = Return of the Samurai
+    Toucan Tango = Boot Scootin'
+    Gnome Around the World = Penguin Pirate = Penguin Pirate II
+    Prize Fight = Super Bucks II
+    Silver Wolf = Lone Wolf
+    Mystic Garden = Mountain Money (20 line) = Mammoth Money
+    Winning Post = The Chariot Challenge
+    Rushin' Rooster = Chicken
+    Yukon Gold = Margarita Magic
+    Peacock Flutter = Treasure Trove = Trojan Horse
+    Mine Mine Mine = 3 Bags Full (undumped) = Fortune Hunter (only released on MK4)
+    Magic Touch = Dream Weaver
+    Keep Your Hat On = Bachelorette Party
+
+*****************************************************************************************************************
 
     How to set up the games from scratch:
 
-    Standard NSW/ACT games and variants:
+    Standard NSW/ACT games and similar non-US games, including Holland and Venezuela:
 
-    Step 1: Audit key in (F2), open the main door (M) and press Collect (A) and the fourth line button (G) together to clear the memory.
-    Note: On 3-payline games, press Collect (A) and Bet 1 Credit (E) to clear the memory.
+    Step 1: Audit key in (F2), open the main door (M) and press Reserve (A) and the fourth line button (G) together to clear the memory.
+    Note: On 3-payline games, press Reserve (A) and Bet 1 Credit (E) to clear the memory.
 
     Optionally, the main door can be closed from this point on (press M again).
 
@@ -146,27 +194,63 @@
     Note: To disable both the hopper and forced hand pay on cashout, change both the Collect Limit and Hopper Refill to $0.00.
     Disabling this setting will allow hand pays but still allow the player to continue if they inadvertently hit Collect.
     To perform a hand pay or jackpot reset (e.g. after a Hyperlink feature), press (V) to allow the game to enter play mode.
+    Note that in some games such as Treasure Trove (trstrove), the collect options are been moved to Operator Setup -> Set Collect Limit rather than in Machine Options.
 
 
     New Zealand non-casino games, and most NSW/ACT touchscreen games:
 
     These games have a slightly updated menu system reminiscent of MK6 games, complete with a black background instead of blue.
 
-    Step 1: Audit key in (F2), press Collect (A) and the first line button (S) together to clear the memory. The main door does not need to be open.
+    Step 1: Audit key in (F2), press Reserve (A) and the first line button (S) together to clear the memory. The main door does not need to be open.
 
     Step 2: Enter Operator Setup -> Machine Options
 
     Step 3: Set everything up as above, open the Security Cage/Logic Door (L), and save the machine options (which now has its own spot on the menu instead of a dedicated button).
     Close the Security Cage (L) and turn off the Audit key (F2) and the game should be ready to accept credits.
 
-    New Zealand machines are usually identical to Australian games except that they normally use NZ $2.00 coins in place of AU $1.00 coins, and have smaller but more frequent payouts due to local laws. CCCE comms is not used on New Zealand machines.
+    New Zealand machines are usually identical to Australian games except that they normally use NZ $2.00 coins in place of AU $1.00 coins,
+    and have smaller but more frequent payouts due to gambling laws which limit the maximum possible win per bought game to $500.00. CCCE comms is not used on New Zealand machines.
 
 
-    Brazil [e.g. qnilebr]:
+    Queensland games:
 
-    This game is similar to the NSW/ACT games however it requires a four-digit setup code before it can be initialized.
-    By default, this number is 4856. After the game has accepted this code, press Collect (A) and Play 7 Lines (G) at the same time to clear the memory.
+    Audit key in, press Reserve (A) and the fourth line button (G) together to clear the memory.
+    The game will automatically enter the Machine Options menu where you can change the QCOM poll address, serial number, denomination and bill acceptor settings.
+    The poll address must be a number from 1 to 255. The serial number cannot be zero.
+    Bill acceptor options should remain disabled until implemented in MAME, otherwise the machine will give a bill acceptor stacker error.
+    Press Reserve (A) to save changes, and key out (F2) to exit the menu.
+    Note 1: Once these settings have been saved, they cannot be changed unlike games from other regions as the Machine Options menu is hidden.
+    Note 2: As the QCOM protocol is not yet emulated, the games are not playable since they automatically disable themselves after timing out.
 
+
+    Casino games using the New Zealand 0700474V base EPROMs:
+    Currently, this is limited to goldpyrb, jungjuic and penpir2. The games are universal (including qnilebr below, if you swap the base EPROMs), however the base is region coded.
+
+    Step 1: Audit key in, press Service (A) and the fourth line button (G) together to clear the memory.
+
+    Step 2: Enter Options Setup -> Machine Options and follow the same instructions as per the NSW/ACT games. The game should already have some default settings, but they can still be changed.
+    Note that like Queensland games, this casino base requires QCOM thus the games are not yet playable with these base EPROMs.
+
+
+    Casino games using the Brazilian 0301718V base EPROMs:
+    Currently this is limited to qnilbr (and the above three casino games if you swap the base EPROMs).
+
+    This is similar to the NSW/ACT games, however upon keying in (F2), it requires a four-digit setup code before it can be initialized.
+    By default, this number is 4856. After the game has accepted this code, press Service (A) and Play 7 Lines (G) at the same time to clear the memory.
+    The game will then tell you to press Bet 1 (W) to continue.
+
+    You will now be asked to change the four digit code for the Audit menu. Do not forget this number otherwise you will not be able to enter the menu.
+    When the code has been inputted, you will have to repeat the code and then confirm with the Bet 1 button (W).
+    Two other similar menus will appear, requiring similar new codes, which are to be inputted and confirmed in the same way.
+    After confirming the third code, the machine will tell you to key out (F2). The game should now be ready to accept credits.
+
+    Note: To change settings, key in (F2) and enter the Operator Setup (Opcoes de Configuracao) -> Machine Options (Itens Gerais) as per the NSW/ACT games.
+    Once the required settings have been changed, open the logic door (L), press Bet 1 (W) to save the settings, close the logic door and key out.
+
+    Running non-Brazilian casino games with the Brazil base may cause minor text errors due to the games not having accented characters in the fonts,
+    however they are still fully playable.
+
+    *************************************************************************************************************
 
     USA platform, games without set chips:
 
@@ -218,6 +302,114 @@
     Performing a memory reset will not erase the machine options, but it will cause a memory error which will allow you to set up anything else.
     Using the Clear All Memory option from the set chip menu (assuming 4.04.xx) will erase everything however.
 
+    *************************************************************************************************************
+
+    USA platform, games requiring set chips:
+
+    Step 1: Take note of Bet/Line setup. If an invalid bet/line combination is used, the machine cannot perform a memory clear or be set up so it is important to check.
+
+    Key in (F2), Enter Operator Setup (T), Bet/Line Denom Settings to view allowable bet/line options
+    For example, qnilece only allows 20 lines with 5, 10, 25 or 50 credit multipliers, all other options are invalid.
+    The default (and usually invalid) setting is 1 line with a 3 credit multiplier, so it has to be changed in the set chip.
+
+    Step 2: Take note if the set chip version. As with having a wrong bet/line setting, the machine cannot be set up if the wrong set chip version is used.
+
+    Assuming you are still in the audit menu (press F2 anyway, it will be a shortcut to the main menu if a game hasn't been set up yet), enter Machine Identification
+    Note: This may cause the game to reboot so pause the emulation as soon as you enter the menu if you need more time to read the set chip version number. Remember to un-pause emulation afterward!
+
+    Using qnilece as an example, this particular game requires set chip version is 4.04.xx. This means that any set chip which is compatible with 4.04.xx can be used with this game (the "xx" digits don't matter).
+
+    Step 3: Now that we know the correct bet/line values and the set chip version it is time to swap the U7 and U11 game chips for the set chips.
+
+    To do this in MAME, press Tab to open the menu and enter Machine Configuration and select an appropriate set chip with the left/right keys.
+    I use 4.04.09 for all games as it is the latest version supported in MAME; set chips are backward compatible with previous versions so they can also be used to set up older games (for example, cashchamu requires 4.00.xx).
+    You should now be in the set chip menu (if not, hit F3).
+
+    Press Service and Cashout together (Q+A) to reset the SRAM and enter the Version Menu.
+    Service and Cashout are your up/down cursor keys in the set chip menu, for qnilece we need to set the machine to 4.04.xx so press Q or A until a suitable version appears and press F to confirm selection.
+    Press F again in the Game Type Setup Menu as this game is a video slot (as opposed to video poker).
+
+    You will now be in the main menu. Press G to enter a sub-menu and F to exit a sub-menu.
+    To change the options, press E or R to move the selection back or forward respectively.
+
+    Step 3a: Jurisdictional Options
+
+    Enter the Jurisdictional Options Menu to set up the region and various options.
+    Usually, only the jurisdiction and/or gamble feature need to be toggled (the latter is required in order to enable the double up option). Bill acceptors are not emulated as of 0.198.
+
+    Jurisdiction: This option sets the various US regions or Bolivia, Peru/Sask, Puerto Rico or Uruguay.
+    Each region has its own gambling laws and restrictions which is why there are so many options.
+    The set chip region with the least restrictions is actually Uruguay rather than a US state, as US slot machines are not allowed to store more than $1200.00 worth of credits and/or wins and wins in excess of the limit must be hand paid.
+
+    Cancel Residual Credit: Soft Lockup or Hard Lockup. Residual credits are credits below the minimum value which cannot be cashed out as coins or otherwise.
+    A soft lockup allows the player to either call an attendant for a hand pay or continue playing, while a hard lockup requires a hand pay of the remaining credits.
+
+    Gamble Feature: Toggle between Disabled or Enabled.
+    The gamble feature is not available in the following regions: Arizona, California, Colorado, North Dakota, South Dakota, Wisconsin and Puerto Rico.
+
+    Bill Acceptor Protocol: (To be written later once emulated)
+    EFT/Bonus Transfer: Cashless/ticket acceptance options, not required in MAME.
+
+    The following items are hard coded and cannot be changed:
+    Maximum Bet Limit, Max Bet Coin Reject, Tokenization, Cashout Device, Maximum Percentage.
+    The only setting of note is Tokenization. If this is enabled, one coin (token) can represent multiple credits, otherwise if disabled, one coin (token) is one credit.
+
+    Step 3b: Money Setup and Payout Setup
+
+    This is where the coin/credit (denomination) values can be changed. Note that some settings cannot be used with some games, or if the coin cannot be evenly divided into credits or is worth less than one credit.
+    By default, the machine is set to 5 cents buys 1 credit, which basically means a 1 cent (penny) slot which accepts nickels.
+    The higher the value of one coin, the more credits can be inserted at a time (unless one coin is equal to one credit).
+    The higher the value of one credit, the more money a win is worth e.g. 1000 credits on a penny slot is ten dollars whereas 1000 credits on a nickel slot is fifty dollars.
+    If tokenization is disabled, the coin and credit values must be identical.
+    Max Credit Limit is the maximum amount of credits allowed in the machine. While the menu allows you to select up to $999999.99 as an option, the maximum possible value is $99999.99
+    Tax Limit cannot be changed, it is hard coded to the region ($1200.00 for US setups, $999999.99 for non-US setups).
+
+    Payout Setup Menu: This menu is not required in MAME.
+
+    Step 3c: Playline Setup Menu
+    Remember how qnilece only allowed 20 lines, with bets of 5, 10, 25 and 50 credits? It's time to tell the set chip that this game is not a three credit single line game.
+    Of course, the higher the maximum bet, the larger the wins are at the cost of how much money you put through the machine.
+    Most games also allow the button panel to be reversed, with the bet buttons on the top row and the playline buttons on the bottom, similar to non-US machines. This is toggled with G.
+    Note that the intermediate bet values shown on the button display may not correspond perfectly with the actual bet values in the game itself; this information is not actually stored in the set chip and is up to the game's programming.
+
+    Step 3d: Miscellaneous Options Menu
+    Variation Number is how loose or tight you want the machine to be. By default, it is variation 99, which is usually around 87%, give or take 1% depending on the machine.
+    Variation 99: 87%
+    Variation 1: 90%
+    Variation 2: 92%
+    Variation 3: 94%
+    Variation 4: 97%
+    Variation 5: 82%
+    Usually, variation numbers beyond 4 are not supported, aside from variation 5 for Hyperlink games. Variation 6 identifies as a Hyperlink setting but no games support this value.
+    To enable the Hyperlink feature, variation 5 must be selected. This variation usually has a significantly lower payout percentage than the standard settings, with the progressive jackpots making up the remaining payouts.
+    Note: Not all percentage variations can be selected, and Hyperlink features (e.g. Cash Express) cannot be enabled on games which do not have them.
+    Also note: As the external link system is not emulated in MAME, it is recommended to only use variations 99 and/or 1-4 (if applicable) as you cannot win any Hyperlink jackpot credits without the link.
+
+    Hyperlink Turnover is the value to set when enabling the jackpot bonus. The higher the value, the harder the jackpot feature is to trigger, although the progressive jackpot will grow larger in the process.
+    Note that this setting is dependent on the machine's credit value (denomination) and bet settings, and usually only one or two settings will be valid.
+
+    Play Bet Button Functionality: Continuous allows the play/bet button to be held down to continue playing automatically, while Toggle forces the button to be pressed for every paid game and will not automatically spin if held.
+
+    Step 3e: If all of the above have been done, open the Logic Door (L) and press press G to save the changes. Optionally, you can close the Logic Door at this point.
+    It is time to save everything and swap the set chips back to the game EPROMs.
+    If all is OK, you should now see the line markers on the game screen and the coin/credit value in the top right corner.
+    If anything has gone wrong after going back to the game EPROMs and you have a jurisdictional error, the setup error(s) should be visible in the game's audit menu under Machine Lockups.
+
+    Step 4: Setting up the machine.
+    If there are no jurisdictional errors after going back to the game EPROMs, it is now time to set up the machine itself.
+    To reset the memory (EEPROM/static RAM), key in (F2), open the main door (M) and press Cashout and Service together (Q+A). This will reset the EEPROM so you can set up the machine for good.
+
+    Enter the Operator Setup / Game Machine Options menu.
+    Usually, most the default settings are fine, but the machine won't let you save until at least one item has been changed, even if it is reverted.
+    You might want to change the jackpot settings, as by default it is only 200 credits and will force a hand pay for wins over that amount. The higher the better of course, if you do not want constant hand pays.
+
+    To save settings, open the Logic Door (L) and go to Save Machine Options and hit (T) and close the Logic Door. The Logic Door must be open otherwise all changes will be lost if you exit the menu.
+
+    Once saved, go back to the main menu (or hit F2 for a shortcut) and reset the static RAM again and close any open doors such as the Main Door (M).
+    If all has gone well, there should be no more errors and you should be able to exit the audit menu (F2) and coin up!
+    If not, check the Current Lockup menu and it should show you any remaining errors or any doors that may still be open.
+
+*****************************************************************************************************************
 
     TODO (MK5 specific):
     - Fix remaining errors
@@ -252,7 +444,7 @@
             - R0 == x "Undefined error in DRAM emulator area"
             It r/w RAM location 0 and it expects to NOT read-back value written.
 
-    goldprmd: checks if a "keyboard IRQ" fires (IRQ status B bit 6), it seems a serial port with data on it,
+    goldpyr: checks if a "keyboard IRQ" fires (IRQ status B bit 6), it seems a serial port with data on it,
               returns an External Video Crystal Error (bp 3400278)
 
     dimtouch:
@@ -264,7 +456,7 @@
         bp 340064c: if R0 == 0 2MB DRAM is ok, otherwise there's an error
 
     set chip (BIOS):
-        same as goldprmd (serial + ext video crystal check)
+        same as goldpyr (serial + ext video crystal check)
         bp 3400110: External Video Crystal test
 
 *****************************************************************************************************************
@@ -391,7 +583,6 @@
 // Non-US button layouts    Bet buttons       Lines Gamble     Other
 #include "aristmk5.lh"   // 1, 2, 3, 5, 10    20    suits      Take Win/Start Feature
 #include "baddog.lh"     // Video Poker
-#include "bumblbug.lh"   // 1, 2, 3, 5, 10    9     red/black  TW/SF
 #include "cashcatnz.lh"  // 1, 2, 3, 4, 5     9     suits      TW/SF, 7L or Autoplay
 #include "cashcham.lh"   // 1, 5, 10, 20, 25  20    suits
 #include "cashchama.lh"  // 1, 2, 3, 4, 5     20    suits
@@ -422,6 +613,7 @@
 #include "mystgard.lh"   // 1, 2, 3, 4, 5     20    red/black
 #include "one4all.lh"    // 1, 2, 3, 5, 6     20    suits      TW/SF, 15L or Autoplay
 #include "orchidms.lh"   // 1, 5, 10, 25, 50  10    suits
+#include "orchidmsnz.lh" // 1, 2, 5, 15, 25   10    suits      TW/SF, 8L or Autoplay
 #include "pantmag.lh"    // 1, 2, 3, 5, 10    9/20  suits
 #include "pantmaga.lh"   // 1, 2              5     suits
 #include "penpir2.lh"    // 1, 2, 3, 5, 10    20    suits      Service
@@ -482,6 +674,8 @@ public:
 		, m_extra_ports(*this, "EXTRA")
 		, m_lamps(*this, "lamp%u", 0U)
 	 { }
+
+	static constexpr feature_type imperfect_features() { return feature::GRAPHICS | feature::SOUND | feature::TIMING; }
 
 	void aristmk5(machine_config &config);
 	void aristmk5_touch(machine_config &config);
@@ -939,8 +1133,8 @@ void aristmk5_state::aristmk5_map(address_map &map)
 
 	// bank5 slow
 	map(0x03250048, 0x0325004b).w(FUNC(aristmk5_state::Ns5w48)); //IOEB control register
-	map(0x03250050, 0x03250053).r(FUNC(aristmk5_state::Ns5r50));  //IOEB ID register
-	map(0x03250058, 0x0325005b).r(FUNC(aristmk5_state::Ns5x58));  //IOEB interrupt Latch
+	map(0x03250050, 0x03250053).r(FUNC(aristmk5_state::Ns5r50)); //IOEB ID register
+	map(0x03250058, 0x0325005b).r(FUNC(aristmk5_state::Ns5x58)); //IOEB interrupt Latch
 
 	map(0x03320000, 0x0333ffff).rw(FUNC(aristmk5_state::sram_r), FUNC(aristmk5_state::sram_w)).umask32(0x000000ff);
 
@@ -1078,54 +1272,100 @@ static INPUT_PORTS_START( aristmk5_usa )
 	PORT_CONFSETTING(    0x04, "Game Mode" )
 
 	PORT_START("DSW1")
-	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSW1:1")
-	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSW1:2")
-	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSW1:3")
-	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSW1:4")
-	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "DSW1:5")
-	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSW1:6")
-	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DSW1:7")
-	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DSW1:8")
+	PORT_DIPNAME(0x0f, 0x0f, "Bank 1 - Denomination Values: Coin Value")
+	PORT_DIPSETTING(0x0f, "$0.05") PORT_DIPLOCATION("DSW1:1,2,3,4")
+	PORT_DIPSETTING(0x0e, "$0.10")
+	PORT_DIPSETTING(0x0d, "$0.25")
+	PORT_DIPSETTING(0x0c, "$0.50")
+	PORT_DIPSETTING(0x0b, "$1.00")
+	PORT_DIPSETTING(0x0a, "$5.00")
+	PORT_DIPSETTING(0x09, "$10.00")
+	PORT_DIPSETTING(0x08, "$50.00")
+	PORT_DIPSETTING(0x07, "$100.00") // 0x00 through 0x07 are all $100.00
+	PORT_DIPSETTING(0x06, "$100.00") // 0x00 through 0x06 retained for dip switch test
+	PORT_DIPSETTING(0x05, "$100.00")
+	PORT_DIPSETTING(0x04, "$100.00")
+	PORT_DIPSETTING(0x03, "$100.00")
+	PORT_DIPSETTING(0x02, "$100.00")
+	PORT_DIPSETTING(0x01, "$100.00")
+	PORT_DIPSETTING(0x00, "$100.00")
+	PORT_DIPNAME(0xf0, 0xf0, "Bank 1 - Denomination Values: Credit Value")
+	PORT_DIPSETTING(0xf0, "$0.01") PORT_DIPLOCATION("DSW1:5,6,7,8")
+	PORT_DIPSETTING(0xe0, "$0.02")
+	PORT_DIPSETTING(0xd0, "$0.05")
+	PORT_DIPSETTING(0xc0, "$0.10")
+	PORT_DIPSETTING(0xb0, "$0.25")
+	PORT_DIPSETTING(0xa0, "$0.50")
+	PORT_DIPSETTING(0x90, "$1.00")
+	PORT_DIPSETTING(0x80, "$5.00")
+	PORT_DIPSETTING(0x70, "$10.00")
+	PORT_DIPSETTING(0x60, "$50.00")
+	PORT_DIPSETTING(0x50, "$100.00") // 0x00 through 0x50 are all $100.00
+	PORT_DIPSETTING(0x40, "$100.00") // All dip switches retained for dip switch test
+	PORT_DIPSETTING(0x30, "$100.00")
+	PORT_DIPSETTING(0x20, "$100.00")
+	PORT_DIPSETTING(0x10, "$100.00")
+	PORT_DIPSETTING(0x00, "$100.00")
 
 	PORT_START("DSW2")
-	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSW2:1")
-	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSW2:2")
-	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSW2:3")
-	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSW2:4")
-	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "DSW2:5")
-	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSW2:6")
-	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DSW2:7")
-	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DSW2:8")
+	PORT_DIPNAME(0x01, 0x00, "Bank 2: Gamble")
+	PORT_DIPSETTING(0x01, "Gamble Not Allowed") PORT_DIPLOCATION("DSW2:1")
+	PORT_DIPSETTING(0x00, "Gamble Allowed")
+	PORT_DIPNAME(0x02, 0x02, "Bank 2: Max Bet Coin Reject")
+	PORT_DIPSETTING(0x02, "Max Bet Coin Reject Not Enabled") PORT_DIPLOCATION("DSW2:2")
+	PORT_DIPSETTING(0x00, "Max Bet Coin Reject Enabled")
+	PORT_DIPNAME(0x04, 0x00, "Bank 2: Cancel Credit Type")
+	PORT_DIPSETTING(0x04, "Residual Credit Backout Not Allowed") PORT_DIPLOCATION("DSW2:3")
+	PORT_DIPSETTING(0x00, "Residual Credit Backout Allowed")
+	PORT_DIPNAME(0x08, 0x00, "Bank 2: Bill Acceptor")
+	PORT_DIPSETTING(0x08, "V2.2 - CRC Check") PORT_DIPLOCATION("DSW2:4")
+	PORT_DIPSETTING(0x00, "VFM4 - No CRC Check")
+	PORT_DIPNAME(0x30, 0x30, "Bank 2: BACC Denomination")
+	PORT_DIPSETTING(0x30, "Dollar ($)") PORT_DIPLOCATION("DSW2:5,6")
+	PORT_DIPSETTING(0x20, "Soles (S/.)")
+	PORT_DIPSETTING(0x10, "UrPeso ($)")
+	PORT_DIPSETTING(0x00, "Real (R/.)")
+	PORT_DIPNAME(0x40, 0x40, "Bank 2: NOT USED")
+	PORT_DIPSETTING(0x40, DEF_STR( Off )) PORT_DIPLOCATION("DSW2:7")
+	PORT_DIPSETTING(0x00, DEF_STR( On ))
+	PORT_DIPNAME(0x80, 0x80, "Bank 2: NOT USED")
+	PORT_DIPSETTING(0x80, DEF_STR( Off )) PORT_DIPLOCATION("DSW2:8")
+	PORT_DIPSETTING(0x00, DEF_STR( On ))
 
-	PORT_START("P1")
-	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_J) PORT_NAME("Gamble")
-	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_K) PORT_NAME("Take Win")
-	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_H) PORT_NAME("Bet 10 Credits / Black")
-	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_G) PORT_NAME("Bet 5 Credits")
-	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_F) PORT_NAME("Bet 3 Credits")
-	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_D) PORT_NAME("Bet 2 Credits")
-	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_S) PORT_NAME("Bet 1 Credit / Red")
-	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_A) PORT_NAME("Service")
+/*
+    Button order in the Key Test menu is right to left; Gamble and Take Win are also reversed.
+    On a typical 90 credit machine such as goldpyr, the button order is Service, Bet 1, Bet 2, Bet 3, Bet 5, Bet 10, Gamble, Take Win
+    The button order has been designed to match the button panel rather than the test menu.
+*/
+	PORT_START("P1") // Bottom row
+	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_BUTTON7)  PORT_CODE(KEYCODE_A) PORT_NAME("Service")                // PLAYER KEY 8
+	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_BUTTON8)  PORT_CODE(KEYCODE_S) PORT_NAME("Bet 1 Credit / Red")     // PLAYER KEY 7
+	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_BUTTON9)  PORT_CODE(KEYCODE_D) PORT_NAME("Bet 2 Credits")          // PLAYER KEY 6
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_BUTTON10) PORT_CODE(KEYCODE_F) PORT_NAME("Bet 3 Credits")          // PLAYER KEY 5
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_BUTTON11) PORT_CODE(KEYCODE_G) PORT_NAME("Bet 5 Credits")          // PLAYER KEY 4
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_BUTTON12) PORT_CODE(KEYCODE_H) PORT_NAME("Bet 10 Credits / Black") // PLAYER KEY 3
+	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_BUTTON13) PORT_CODE(KEYCODE_J) PORT_NAME("Gamble")                 // PLAYER KEY 1
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_BUTTON14) PORT_CODE(KEYCODE_K) PORT_NAME("Take Win")               // PLAYER KEY 2
 
-	PORT_START("P2")
-	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_Q) PORT_NAME("Cashout")
-	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_W) PORT_NAME("Play 1 Line")
-	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_E) PORT_NAME("Play 3 Lines")
-	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_R) PORT_NAME("Play 5 Lines")
-	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_T) PORT_NAME("Play 7 Lines")
-	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_Y) PORT_NAME("Play 9 Lines")
+	PORT_START("P2") // Top row
+	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_CODE(KEYCODE_Q) PORT_NAME("Cashout")                 // PLAYER KEY 9
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_CODE(KEYCODE_W) PORT_NAME("Play 1 Line")             // PLAYER KEY 10
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_CODE(KEYCODE_E) PORT_NAME("Play 3 Lines")            // PLAYER KEY 11
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_CODE(KEYCODE_R) PORT_NAME("Play 5 Lines")            // PLAYER KEY 12
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_CODE(KEYCODE_T) PORT_NAME("Play 7 Lines")            // PLAYER KEY 13
+	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_BUTTON6) PORT_CODE(KEYCODE_Y) PORT_NAME("Play 9 Lines")            // PLAYER KEY 14
 	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("P3")
-	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_Z)
-	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_X)
-	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_N)
-	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_SERVICE)
-	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_V) PORT_NAME("Reset Key")
-	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_B) PORT_TOGGLE PORT_NAME("Bill acceptor door")
-	PORT_BIT(0x00000040, IP_ACTIVE_LOW , IPT_KEYPAD)  PORT_CODE(KEYCODE_M) PORT_TOGGLE PORT_NAME("Main door")
-	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_C) PORT_TOGGLE PORT_NAME("Cashbox door")
+	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Audit Key")
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_GAMBLE_KEYIN) PORT_CODE(KEYCODE_V) PORT_NAME("Jackpot/Reset Key")
+	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_GAMBLE_DOOR)  PORT_CODE(KEYCODE_B) PORT_TOGGLE PORT_NAME("Bill acceptor door")
+	PORT_BIT(0x00000040, IP_ACTIVE_LOW,  IPT_GAMBLE_DOOR)  PORT_CODE(KEYCODE_M) PORT_TOGGLE PORT_NAME("Main door")
+	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_GAMBLE_DOOR)  PORT_CODE(KEYCODE_C) PORT_TOGGLE PORT_NAME("Cashbox door")
 
 	PORT_START("P4")
 	PORT_BIT(0x00000078, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, aristmk5_state, coin_usa_r, nullptr)
@@ -1142,51 +1382,43 @@ static INPUT_PORTS_START( aristmk5_usa )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( aristmk5 )
-	/* This simulates the ROM swap */
-	PORT_START("ROM_LOAD")
-	PORT_CONFNAME( 0x07, 0x04, "System Mode" )
-	PORT_CONFSETTING(    0x00, "USA Set Chip v4.04.09 Mode" )
-	PORT_CONFSETTING(    0x01, "USA Set Chip v4.04.08 Mode" )
-	PORT_CONFSETTING(    0x02, "USA Set Chip v4.04.00 Mode" )
-	PORT_CONFSETTING(    0x03, "USA Set Chip v4.02.04 Mode" )
-	PORT_CONFSETTING(    0x04, "Game Mode" )
 
 	PORT_START("P1")
-	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_J) PORT_NAME("Gamble")
-	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_K) PORT_NAME("Take Win / Start Feature")
-	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_H) PORT_NAME("Play 20 Lines / Black")
-	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_G) PORT_NAME("Play 15 Lines")
-	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_F) PORT_NAME("Play 10 Lines")
-	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_D) PORT_NAME("Play 5 Lines")
-	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_S) PORT_NAME("Play 1 Line / Red")
-	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_A) PORT_NAME("Reserve")
-	PORT_BIT(0x00000100, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_Q) PORT_NAME("Collect")
-	PORT_BIT(0x00000200, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_W) PORT_NAME("Bet 1 Credit / Heart")
-	PORT_BIT(0x00000400, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_E) PORT_NAME("Bet 2 Credits / Diamond")
-	PORT_BIT(0x00000800, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_R) PORT_NAME("Bet 3 Credits")
-	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_T) PORT_NAME("Bet 5 Credits / Club")
-	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_Y) PORT_NAME("Bet 10 Credits / Spade")
+	PORT_BIT(0x00000100, IP_ACTIVE_HIGH, IPT_BUTTON1)  PORT_CODE(KEYCODE_Q) PORT_NAME("Collect")
+	PORT_BIT(0x00000200, IP_ACTIVE_HIGH, IPT_BUTTON2)  PORT_CODE(KEYCODE_W) PORT_NAME("Bet 1 Credit / Heart")
+	PORT_BIT(0x00000400, IP_ACTIVE_HIGH, IPT_BUTTON3)  PORT_CODE(KEYCODE_E) PORT_NAME("Bet 2 Credits / Diamond")
+	PORT_BIT(0x00000800, IP_ACTIVE_HIGH, IPT_BUTTON4)  PORT_CODE(KEYCODE_R) PORT_NAME("Bet 3 Credits")
+	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_BUTTON5)  PORT_CODE(KEYCODE_T) PORT_NAME("Bet 5 Credits / Club")
+	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_BUTTON6)  PORT_CODE(KEYCODE_Y) PORT_NAME("Bet 10 Credits / Spade")
+	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_BUTTON7)  PORT_CODE(KEYCODE_A) PORT_NAME("Reserve")
+	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_BUTTON8)  PORT_CODE(KEYCODE_S) PORT_NAME("Play 1 Line / Red")
+	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_BUTTON9)  PORT_CODE(KEYCODE_D) PORT_NAME("Play 5 Lines")
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_BUTTON10) PORT_CODE(KEYCODE_F) PORT_NAME("Play 10 Lines")
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_BUTTON11) PORT_CODE(KEYCODE_G) PORT_NAME("Play 15 Lines")
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_BUTTON12) PORT_CODE(KEYCODE_H) PORT_NAME("Play 20 Lines / Black")
+	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_BUTTON13) PORT_CODE(KEYCODE_J) PORT_NAME("Gamble")
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_BUTTON14) PORT_CODE(KEYCODE_K) PORT_NAME("Take Win / Start Feature")
 	PORT_BIT(0x00004000, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x00008000, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x00ff0000, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("P2")
-	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_V) PORT_NAME("Reset Key")
-	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_SERVICE)
+	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_GAMBLE_KEYIN) PORT_CODE(KEYCODE_V) PORT_NAME("Jackpot/Reset Key")
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Audit Key")
 	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_OTHER)   // Hopper full
 	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_OTHER)   // Hopper empty
-	PORT_BIT(0x00000100, IP_ACTIVE_LOW,  IPT_KEYPAD)  PORT_CODE(KEYCODE_M) PORT_TOGGLE PORT_NAME("Main door optical sensor")
+	PORT_BIT(0x00000100, IP_ACTIVE_LOW,  IPT_GAMBLE_DOOR)  PORT_CODE(KEYCODE_M) PORT_TOGGLE PORT_NAME("Main door optical sensor")
 	PORT_BIT(0x0000fe00, IP_ACTIVE_HIGH, IPT_UNUSED)  // Unused optical security sensors
-	PORT_BIT(0x00010000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_L) PORT_TOGGLE PORT_NAME("Logic door")
-	PORT_BIT(0x00020000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_Z) PORT_TOGGLE PORT_NAME("Topbox door")
-	PORT_BIT(0x00040000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_X) PORT_TOGGLE PORT_NAME("Meter cage")
-	PORT_BIT(0x00080000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_C) PORT_TOGGLE PORT_NAME("Cashbox door")
-	PORT_BIT(0x00100000, IP_ACTIVE_LOW,  IPT_KEYPAD)  PORT_CODE(KEYCODE_M) PORT_TOGGLE PORT_NAME("Main door")
-	PORT_BIT(0x00200000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_B) PORT_TOGGLE PORT_NAME("Bill acceptor door")
+	PORT_BIT(0x00010000, IP_ACTIVE_HIGH, IPT_GAMBLE_DOOR)  PORT_CODE(KEYCODE_L) PORT_TOGGLE PORT_NAME("Logic door")
+	PORT_BIT(0x00020000, IP_ACTIVE_HIGH, IPT_GAMBLE_DOOR)  PORT_CODE(KEYCODE_Z) PORT_TOGGLE PORT_NAME("Topbox door")
+	PORT_BIT(0x00040000, IP_ACTIVE_HIGH, IPT_GAMBLE_DOOR)  PORT_CODE(KEYCODE_X) PORT_TOGGLE PORT_NAME("Meter cage")
+	PORT_BIT(0x00080000, IP_ACTIVE_HIGH, IPT_GAMBLE_DOOR)  PORT_CODE(KEYCODE_C) PORT_TOGGLE PORT_NAME("Cashbox door")
+	PORT_BIT(0x00100000, IP_ACTIVE_LOW,  IPT_GAMBLE_DOOR)  PORT_CODE(KEYCODE_M) PORT_TOGGLE PORT_NAME("Main door")
+	PORT_BIT(0x00200000, IP_ACTIVE_HIGH, IPT_GAMBLE_DOOR)  PORT_CODE(KEYCODE_B) PORT_TOGGLE PORT_NAME("Bill acceptor door")
 	PORT_BIT(0x00c00000, IP_ACTIVE_HIGH, IPT_UNUSED)  // Unused mechanical security switch
 
 PORT_START("P3")
@@ -1206,450 +1438,447 @@ static INPUT_PORTS_START(aristmk5_9)
 	PORT_INCLUDE(aristmk5)
 
 	PORT_MODIFY("P1")
-	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_H) PORT_NAME("Play 9 Lines / Black")
-	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_G) PORT_NAME("Play 7 Lines")
-	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_F) PORT_NAME("Play 5 Lines")
-	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_D) PORT_NAME("Play 3 Lines")
+	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_BUTTON9)  PORT_CODE(KEYCODE_D) PORT_NAME("Play 3 Lines")
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_BUTTON10) PORT_CODE(KEYCODE_F) PORT_NAME("Play 5 Lines")
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_BUTTON11) PORT_CODE(KEYCODE_G) PORT_NAME("Play 7 Lines")
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_BUTTON12) PORT_CODE(KEYCODE_H) PORT_NAME("Play 9 Lines / Black")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(trstrove)
 	PORT_INCLUDE(aristmk5)
 
 	PORT_MODIFY("P1")
-	PORT_BIT(0x00000800, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_R) PORT_NAME("Bet 5 Credits")
-	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_T) PORT_NAME("Bet 10 Credits / Club")
-	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_Y) PORT_NAME("Bet 25 Credits / Spade")
+	PORT_BIT(0x00000800, IP_ACTIVE_HIGH, IPT_BUTTON4)  PORT_CODE(KEYCODE_R) PORT_NAME("Bet 5 Credits")
+	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_BUTTON5)  PORT_CODE(KEYCODE_T) PORT_NAME("Bet 10 Credits / Club")
+	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_BUTTON6)  PORT_CODE(KEYCODE_Y) PORT_NAME("Bet 25 Credits / Spade")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(qnile)
 	PORT_INCLUDE(aristmk5)
 
 	PORT_MODIFY("P1")
-	PORT_BIT(0x00000400, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_E) PORT_NAME("Bet 5 Credits / Diamond")
-	PORT_BIT(0x00000800, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_R) PORT_NAME("Bet 10 Credits")
-	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_T) PORT_NAME("Bet 20 Credits / Club")
-	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_Y) PORT_NAME("Bet 25 Credits / Spade")
+	PORT_BIT(0x00000400, IP_ACTIVE_HIGH, IPT_BUTTON3)  PORT_CODE(KEYCODE_E) PORT_NAME("Bet 5 Credits / Diamond")
+	PORT_BIT(0x00000800, IP_ACTIVE_HIGH, IPT_BUTTON4)  PORT_CODE(KEYCODE_R) PORT_NAME("Bet 10 Credits")
+	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_BUTTON5)  PORT_CODE(KEYCODE_T) PORT_NAME("Bet 20 Credits / Club")
+	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_BUTTON6)  PORT_CODE(KEYCODE_Y) PORT_NAME("Bet 25 Credits / Spade")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(cashcham)
 	PORT_INCLUDE(qnile)
 
 	PORT_MODIFY("P1")
-	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_K) PORT_NAME("Take Win")
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_BUTTON14) PORT_CODE(KEYCODE_K) PORT_NAME("Take Win")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(cashchama)
 	PORT_INCLUDE(cashcham)
 
 	PORT_MODIFY("P1")
-	PORT_BIT(0x00000400, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_E) PORT_NAME("Bet 2 Credits / Diamond")
-	PORT_BIT(0x00000800, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_R) PORT_NAME("Bet 3 Credits")
-	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_T) PORT_NAME("Bet 4 Credits / Club")
-	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_Y) PORT_NAME("Bet 5 Credits / Spade")
+	PORT_BIT(0x00000400, IP_ACTIVE_HIGH, IPT_BUTTON3)  PORT_CODE(KEYCODE_E) PORT_NAME("Bet 2 Credits / Diamond")
+	PORT_BIT(0x00000800, IP_ACTIVE_HIGH, IPT_BUTTON4)  PORT_CODE(KEYCODE_R) PORT_NAME("Bet 3 Credits")
+	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_BUTTON5)  PORT_CODE(KEYCODE_T) PORT_NAME("Bet 4 Credits / Club")
+	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_BUTTON6)  PORT_CODE(KEYCODE_Y) PORT_NAME("Bet 5 Credits / Spade")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(cashchamnz)
 	PORT_INCLUDE(cashchama)
 
 	PORT_MODIFY("P1")
-	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_G) PORT_NAME("Play 15 Lines / Autoplay")
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_BUTTON11) PORT_CODE(KEYCODE_G) PORT_NAME("Play 15 Lines / Autoplay")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(cashcatnz)
 	PORT_INCLUDE(aristmk5_9)
 
 	PORT_MODIFY("P1")
-	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_G) PORT_NAME("Play 7 Lines / Autoplay")
-	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_T) PORT_NAME("Bet 4 Credits / Club")
-	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_Y) PORT_NAME("Bet 5 Credits / Spade")
+	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_BUTTON5)  PORT_CODE(KEYCODE_T) PORT_NAME("Bet 4 Credits / Club")
+	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_BUTTON6)  PORT_CODE(KEYCODE_Y) PORT_NAME("Bet 5 Credits / Spade")
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_BUTTON11) PORT_CODE(KEYCODE_G) PORT_NAME("Play 7 Lines / Autoplay")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(incasunnz)
 	PORT_INCLUDE(cashchamnz)
 
 	PORT_MODIFY("P1")
-	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_K) PORT_NAME("Take Win / Start Feature")
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_BUTTON14) PORT_CODE(KEYCODE_K) PORT_NAME("Take Win / Start Feature")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(chariotc)
 	PORT_INCLUDE(aristmk5)
 
 	PORT_MODIFY("P1")
-	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_K) PORT_NAME("Take Win")
-	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_H) PORT_NAME("Play 20 Lines / Chariot 5 / Black")
-	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_G) PORT_NAME("Play 15 Lines / Chariot 4")
-	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_F) PORT_NAME("Play 10 Lines / Chariot 3")
-	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_D) PORT_NAME("Play 5 Lines / Chariot 2")
-	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_S) PORT_NAME("Play 1 Line / Chariot 1 / Red")
+	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_BUTTON8)  PORT_CODE(KEYCODE_S) PORT_NAME("Play 1 Line / Chariot 1 / Red")
+	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_BUTTON9)  PORT_CODE(KEYCODE_D) PORT_NAME("Play 5 Lines / Chariot 2")
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_BUTTON10) PORT_CODE(KEYCODE_F) PORT_NAME("Play 10 Lines / Chariot 3")
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_BUTTON11) PORT_CODE(KEYCODE_G) PORT_NAME("Play 15 Lines / Chariot 4")
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_BUTTON12) PORT_CODE(KEYCODE_H) PORT_NAME("Play 20 Lines / Chariot 5 / Black")
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_BUTTON14) PORT_CODE(KEYCODE_K) PORT_NAME("Take Win")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(chariotcv)
 	PORT_INCLUDE(chariotc)
 
 	PORT_MODIFY("P1")
-	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_H) PORT_NAME("Play 9 Lines / Chariot 5 / Black")
-	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_G) PORT_NAME("Play 7 Lines / Chariot 4")
-	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_F) PORT_NAME("Play 5 Lines / Chariot 3")
-	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_D) PORT_NAME("Play 3 Lines / Chariot 2")
+	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_BUTTON9)  PORT_CODE(KEYCODE_D) PORT_NAME("Play 3 Lines / Chariot 2")
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_BUTTON10) PORT_CODE(KEYCODE_F) PORT_NAME("Play 5 Lines / Chariot 3")
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_BUTTON11) PORT_CODE(KEYCODE_G) PORT_NAME("Play 7 Lines / Chariot 4")
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_BUTTON12) PORT_CODE(KEYCODE_H) PORT_NAME("Play 9 Lines / Chariot 5 / Black")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(geisha)
 	PORT_INCLUDE(aristmk5)
 
 	PORT_MODIFY("P1")
-	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_G) PORT_NAME("Play 15 Lines / Autoplay")
-	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_Y) PORT_NAME("Bet 12 Credits / Spade")
+	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_BUTTON6)  PORT_CODE(KEYCODE_Y) PORT_NAME("Bet 12 Credits / Spade")
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_BUTTON11) PORT_CODE(KEYCODE_G) PORT_NAME("Play 15 Lines / Autoplay")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(one4all)
 	PORT_INCLUDE(geisha)
 
 	PORT_MODIFY("P1")
-	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_Y) PORT_NAME("Bet 6 Credits / Spade")
+	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_BUTTON6)  PORT_CODE(KEYCODE_Y) PORT_NAME("Bet 6 Credits / Spade")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(montree)
 	PORT_INCLUDE(geisha)
 
 	PORT_MODIFY("P1")
-	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_K) PORT_NAME("Take Win")
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_BUTTON14) PORT_CODE(KEYCODE_K) PORT_NAME("Take Win")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(goldenra) // marmagic uses the same button panel as goldenra for 1000 credit play, however it has a number of other bet and line options
 	PORT_INCLUDE(aristmk5)
 
 	PORT_MODIFY("P1")
-	PORT_BIT(0x00000800, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_R) PORT_NAME("Bet 5 Credits")
-	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_T) PORT_NAME("Bet 25 Credits / Club")
-	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_Y) PORT_NAME("Bet 50 Credits / Spade")
+	PORT_BIT(0x00000800, IP_ACTIVE_HIGH, IPT_BUTTON4)  PORT_CODE(KEYCODE_R) PORT_NAME("Bet 5 Credits")
+	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_BUTTON5)  PORT_CODE(KEYCODE_T) PORT_NAME("Bet 25 Credits / Club")
+	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_BUTTON6)  PORT_CODE(KEYCODE_Y) PORT_NAME("Bet 50 Credits / Spade")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(dynajack) // button panel reflects 1000 credit option only
 	PORT_INCLUDE(goldenra)
 
 	PORT_MODIFY("P1")
-	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_K) PORT_NAME("Take Win / Free Spin")
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_BUTTON14) PORT_CODE(KEYCODE_K) PORT_NAME("Take Win / Free Spin")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(goldpyrb)
 	PORT_INCLUDE(aristmk5_9)
 
 	PORT_MODIFY("P1")
-	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_A) PORT_NAME("Service")
+	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_BUTTON7)  PORT_CODE(KEYCODE_A) PORT_NAME("Service")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(penpir2)
 	PORT_INCLUDE(aristmk5)
 
 	PORT_MODIFY("P1")
-	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_A) PORT_NAME("Service")
+	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_BUTTON7)  PORT_CODE(KEYCODE_A) PORT_NAME("Service")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(incasun)
 	PORT_INCLUDE(aristmk5)
 
 	PORT_MODIFY("P1")
-	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_Y) PORT_NAME("Bet 25 Credits / Spade")
+	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_BUTTON6)  PORT_CODE(KEYCODE_Y) PORT_NAME("Bet 25 Credits / Spade")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(coralrc2)
 	PORT_INCLUDE(incasun)
 
 	PORT_MODIFY("P1")
-	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_K) PORT_NAME("Take Win")
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_BUTTON14) PORT_CODE(KEYCODE_K) PORT_NAME("Take Win")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(genmagi)
 	PORT_INCLUDE(incasun)
 
 	PORT_MODIFY("P1")
-	PORT_BIT(0x00000200, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_W) PORT_NAME("Bet 1 Credit")  // No red/black/suits on the buttons
-	PORT_BIT(0x00000400, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_E) PORT_NAME("Bet 2 Credits") // Gamble feature is touchscreen-based
-	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_T) PORT_NAME("Bet 5 Credits")
-	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_Y) PORT_NAME("Bet 25 Credits")
-	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_H) PORT_NAME("Play 20 Lines")
-	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_S) PORT_NAME("Play 1 Line")
-	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_K) PORT_NAME("Take Win / Start Free Games")
+	PORT_BIT(0x00000200, IP_ACTIVE_HIGH, IPT_BUTTON2)  PORT_CODE(KEYCODE_W) PORT_NAME("Bet 1 Credit")  // No red/black/suits on the buttons
+	PORT_BIT(0x00000400, IP_ACTIVE_HIGH, IPT_BUTTON3)  PORT_CODE(KEYCODE_E) PORT_NAME("Bet 2 Credits") // Gamble feature is touchscreen-based
+	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_BUTTON5)  PORT_CODE(KEYCODE_T) PORT_NAME("Bet 5 Credits")
+	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_BUTTON6)  PORT_CODE(KEYCODE_Y) PORT_NAME("Bet 25 Credits")
+	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_BUTTON8)  PORT_CODE(KEYCODE_S) PORT_NAME("Play 1 Line")
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_BUTTON12) PORT_CODE(KEYCODE_H) PORT_NAME("Play 20 Lines")
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_BUTTON14) PORT_CODE(KEYCODE_K) PORT_NAME("Take Win / Start Free Games")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(adonisce)
 	PORT_INCLUDE(aristmk5)
 
 	PORT_MODIFY("P1")
-	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_H) PORT_NAME("Play 20 Lines / Black / Train 5")
-	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_G) PORT_NAME("Play 15 Lines / Train 4")
-	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_F) PORT_NAME("Play 10 Lines / Train 3")
-	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_D) PORT_NAME("Play 5 Lines / Train 2")
-	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_S) PORT_NAME("Play 1 Line / Red / Train 1")
+	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_BUTTON8)  PORT_CODE(KEYCODE_S) PORT_NAME("Play 1 Line / Red / Train 1")
+	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_BUTTON9)  PORT_CODE(KEYCODE_D) PORT_NAME("Play 5 Lines / Train 2")
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_BUTTON10) PORT_CODE(KEYCODE_F) PORT_NAME("Play 10 Lines / Train 3")
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_BUTTON11) PORT_CODE(KEYCODE_G) PORT_NAME("Play 15 Lines / Train 4")
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_BUTTON12) PORT_CODE(KEYCODE_H) PORT_NAME("Play 20 Lines / Black / Train 5")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(kgalah)
 	PORT_INCLUDE(aristmk5)
 
 	PORT_MODIFY("P1")
-	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_K) PORT_NAME("Take Win")
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_BUTTON14) PORT_CODE(KEYCODE_K) PORT_NAME("Take Win")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(petshop) // different input order, weird
 	PORT_INCLUDE(kgalah)
 
 	PORT_MODIFY("P1")
-	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_F) PORT_NAME("Play 10 Lines")
-	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_D) PORT_NAME("Play 5 Lines")
-	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_S) PORT_NAME("Play 1 Line / Red")
-	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_G) PORT_NAME("Play 15 Lines")
-	PORT_BIT(0x00000200, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_T) PORT_NAME("Bet 5 Credits")
-	PORT_BIT(0x00000400, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_W) PORT_NAME("Bet 1 Credit / Heart")
-	PORT_BIT(0x00000800, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_E) PORT_NAME("Bet 2 Credits / Diamond")
-	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_R) PORT_NAME("Bet 3 Credits / Club")
+	PORT_BIT(0x00000400, IP_ACTIVE_HIGH, IPT_BUTTON2)  PORT_CODE(KEYCODE_W) PORT_NAME("Bet 1 Credit / Heart")
+	PORT_BIT(0x00000800, IP_ACTIVE_HIGH, IPT_BUTTON3)  PORT_CODE(KEYCODE_E) PORT_NAME("Bet 2 Credits / Diamond")
+	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_BUTTON4)  PORT_CODE(KEYCODE_R) PORT_NAME("Bet 3 Credits / Club")
+	PORT_BIT(0x00000200, IP_ACTIVE_HIGH, IPT_BUTTON5)  PORT_CODE(KEYCODE_T) PORT_NAME("Bet 5 Credits")
+	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_BUTTON8)  PORT_CODE(KEYCODE_S) PORT_NAME("Play 1 Line / Red")
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_BUTTON9)  PORT_CODE(KEYCODE_D) PORT_NAME("Play 5 Lines")
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_BUTTON10) PORT_CODE(KEYCODE_F) PORT_NAME("Play 10 Lines")
+	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_BUTTON11) PORT_CODE(KEYCODE_G) PORT_NAME("Play 15 Lines")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(rushrst)
 	PORT_INCLUDE(cashchama)
 
 	PORT_MODIFY("P1")
-	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_G) PORT_NAME("Play 15 Lines / Run")
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_BUTTON11) PORT_CODE(KEYCODE_G) PORT_NAME("Play 15 Lines / Run")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(mystgard)
 	PORT_INCLUDE(kgalah)
 
 	PORT_MODIFY("P1")
-	PORT_BIT(0x00000200, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_W) PORT_NAME("Bet 1 Credit")
-	PORT_BIT(0x00000400, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_E) PORT_NAME("Bet 2 Credits")
-	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_T) PORT_NAME("Bet 4 Credits")
-	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_Y) PORT_NAME("Bet 5 Credits")
+	PORT_BIT(0x00000200, IP_ACTIVE_HIGH, IPT_BUTTON2)  PORT_CODE(KEYCODE_W) PORT_NAME("Bet 1 Credit")
+	PORT_BIT(0x00000400, IP_ACTIVE_HIGH, IPT_BUTTON3)  PORT_CODE(KEYCODE_E) PORT_NAME("Bet 2 Credits")
+	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_BUTTON5)  PORT_CODE(KEYCODE_T) PORT_NAME("Bet 4 Credits")
+	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_BUTTON6)  PORT_CODE(KEYCODE_Y) PORT_NAME("Bet 5 Credits")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(mountmon)
 	PORT_INCLUDE(mystgard)
 
 	PORT_MODIFY("P1")
-	PORT_BIT(0x00000400, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_E) PORT_NAME("Bet 5 Credits")
-	PORT_BIT(0x00000800, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_R) PORT_NAME("Bet 10 Credits")
-	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_T) PORT_NAME("Bet 25 Credits")
-	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_Y) PORT_NAME("Bet 50 Credits")
-INPUT_PORTS_END
-
-static INPUT_PORTS_START(orchidms)
-	PORT_INCLUDE(aristmk5)
-
-	PORT_MODIFY("P1")
-	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_K) PORT_NAME("Take Win")
-	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_H) PORT_NAME("Play 10 Lines / Black")
-	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_G) PORT_NAME("Play 8 Lines")
-	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_F) PORT_NAME("Play 4 Lines")
-	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_D) PORT_NAME("Play 2 Lines")
-	PORT_BIT(0x00000400, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_E) PORT_NAME("Bet 5 Credits / Diamond")
-	PORT_BIT(0x00000800, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_R) PORT_NAME("Bet 10 Credits")
-	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_T) PORT_NAME("Bet 25 Credits / Club")
-	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_Y) PORT_NAME("Bet 50 Credits / Spade")
+	PORT_BIT(0x00000400, IP_ACTIVE_HIGH, IPT_BUTTON3)  PORT_CODE(KEYCODE_E) PORT_NAME("Bet 5 Credits")
+	PORT_BIT(0x00000800, IP_ACTIVE_HIGH, IPT_BUTTON4)  PORT_CODE(KEYCODE_R) PORT_NAME("Bet 10 Credits")
+	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_BUTTON5)  PORT_CODE(KEYCODE_T) PORT_NAME("Bet 25 Credits")
+	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_BUTTON6)  PORT_CODE(KEYCODE_Y) PORT_NAME("Bet 50 Credits")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(qnilec)
 	PORT_INCLUDE(aristmk5_9)
 
 	PORT_MODIFY("P1")
-	PORT_BIT(0x00000800, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_R) PORT_NAME("Bet 5 Credits")
-	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_T) PORT_NAME("Bet 10 Credits / Club")
-	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_Y) PORT_NAME("Bet 20 Credits / Spade")
+	PORT_BIT(0x00000800, IP_ACTIVE_HIGH, IPT_BUTTON4)  PORT_CODE(KEYCODE_R) PORT_NAME("Bet 5 Credits")
+	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_BUTTON5)  PORT_CODE(KEYCODE_T) PORT_NAME("Bet 10 Credits / Club")
+	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_BUTTON6)  PORT_CODE(KEYCODE_Y) PORT_NAME("Bet 20 Credits / Spade")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(locoloota)
 	PORT_INCLUDE(qnilec)
 
 	PORT_MODIFY("P1")
-	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_K) PORT_NAME("Take Win")
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_BUTTON14) PORT_CODE(KEYCODE_K) PORT_NAME("Take Win")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(snowcat)
 	PORT_INCLUDE(aristmk5_9)
 
 	PORT_MODIFY("P1")
-	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_K) PORT_NAME("Take Win")
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_BUTTON14) PORT_CODE(KEYCODE_K) PORT_NAME("Take Win")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(chickna5)
 	PORT_INCLUDE(snowcat)
 
 	PORT_MODIFY("P1")
-	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_G) PORT_NAME("Play 7 Lines / Run")
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_BUTTON11) PORT_CODE(KEYCODE_G) PORT_NAME("Play 7 Lines / Run")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(chickna5v)
 	PORT_INCLUDE(chickna5)
 
 	PORT_MODIFY("P1")
-	PORT_BIT(0x00000400, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_E) PORT_NAME("Bet 5 Credits / Diamond")
-	PORT_BIT(0x00000800, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_R) PORT_NAME("Bet 10 Credits")
-	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_T) PORT_NAME("Bet 25 Credits / Club")
-	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_Y) PORT_NAME("Bet 50 Credits / Spade")
+	PORT_BIT(0x00000400, IP_ACTIVE_HIGH, IPT_BUTTON3)  PORT_CODE(KEYCODE_E) PORT_NAME("Bet 5 Credits / Diamond")
+	PORT_BIT(0x00000800, IP_ACTIVE_HIGH, IPT_BUTTON4)  PORT_CODE(KEYCODE_R) PORT_NAME("Bet 10 Credits")
+	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_BUTTON5)  PORT_CODE(KEYCODE_T) PORT_NAME("Bet 25 Credits / Club")
+	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_BUTTON6)  PORT_CODE(KEYCODE_Y) PORT_NAME("Bet 50 Credits / Spade")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(orchidms)
+	PORT_INCLUDE(chickna5v)
+
+	PORT_MODIFY("P1")
+	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_BUTTON9)  PORT_CODE(KEYCODE_D) PORT_NAME("Play 2 Lines")
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_BUTTON10) PORT_CODE(KEYCODE_F) PORT_NAME("Play 4 Lines")
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_BUTTON11) PORT_CODE(KEYCODE_G) PORT_NAME("Play 8 Lines")
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_BUTTON12) PORT_CODE(KEYCODE_H) PORT_NAME("Play 10 Lines / Black")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(orchidmsnz)
+	PORT_INCLUDE(orchidms)
+
+	PORT_MODIFY("P1")
+	PORT_BIT(0x00000400, IP_ACTIVE_HIGH, IPT_BUTTON3)  PORT_CODE(KEYCODE_E) PORT_NAME("Bet 2 Credits / Diamond")
+	PORT_BIT(0x00000800, IP_ACTIVE_HIGH, IPT_BUTTON4)  PORT_CODE(KEYCODE_R) PORT_NAME("Bet 5 Credits")
+	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_BUTTON5)  PORT_CODE(KEYCODE_T) PORT_NAME("Bet 15 Credits / Club")
+	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_BUTTON6)  PORT_CODE(KEYCODE_Y) PORT_NAME("Bet 25 Credits / Spade")
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_BUTTON11) PORT_CODE(KEYCODE_G) PORT_NAME("Play 8 Lines / Autoplay")
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_BUTTON14) PORT_CODE(KEYCODE_K) PORT_NAME("Take Win / Start Feature")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(pantmaga)
 	PORT_INCLUDE(snowcat)
 
 	PORT_MODIFY("P1")
-	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_H) PORT_NAME("Play 5 Lines / Black")
-	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_G) PORT_NAME("Play 4 Lines")
-	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_F) PORT_NAME("Play 3 Lines")
-	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_D) PORT_NAME("Play 2 Lines")
+	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_BUTTON5)  PORT_CODE(KEYCODE_T) PORT_NAME("Club")
+	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_BUTTON6)  PORT_CODE(KEYCODE_Y) PORT_NAME("Spade")
+	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_BUTTON9)  PORT_CODE(KEYCODE_D) PORT_NAME("Play 2 Lines")
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_BUTTON10) PORT_CODE(KEYCODE_F) PORT_NAME("Play 3 Lines")
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_BUTTON11) PORT_CODE(KEYCODE_G) PORT_NAME("Play 4 Lines")
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_BUTTON12) PORT_CODE(KEYCODE_H) PORT_NAME("Play 5 Lines / Black")
 	PORT_BIT(0x00000800, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_T) PORT_NAME("Club")
-	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_Y) PORT_NAME("Spade")
-INPUT_PORTS_END
-
-static INPUT_PORTS_START(retrsamb)
-	PORT_INCLUDE(aristmk5)
-
-	PORT_MODIFY("P1")
-	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_K) PORT_NAME("Take Win")
-	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_H) PORT_NAME("Play 9 Lines / x100")
-	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_G) PORT_NAME("Play 7 Lines / x10")
-	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_F) PORT_NAME("Play 5 Lines / x5")
-	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_D) PORT_NAME("Play 3 Lines / x3")
-	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_S) PORT_NAME("Play 1 Line / x2")
-	PORT_BIT(0x00000200, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_W) PORT_NAME("Bet 1 Credit")
-	PORT_BIT(0x00000400, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_E) PORT_NAME("Bet 2 Credits")
-	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_T) PORT_NAME("Bet 5 Credits")
-	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_Y) PORT_NAME("Bet 10 Credits")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(sbuk3)
 	PORT_INCLUDE(aristmk5)
 
 	PORT_MODIFY("P1")
-	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_H) PORT_NAME("x100")
-	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_G) PORT_NAME("Play 3 Lines / x10")
-	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_F) PORT_NAME("Play 2 Lines / x5")
-	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_D) PORT_NAME("Play 1 Line / x3")
-	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_S) PORT_NAME("x2")
-	PORT_BIT(0x00000200, IP_ACTIVE_HIGH, IPT_UNUSED)  // unused bet button 1
-	PORT_BIT(0x00000400, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_E) PORT_NAME("Bet 1 Credit")
-	PORT_BIT(0x00000800, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_R) PORT_NAME("Bet 2 Credits")
-	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_T) PORT_NAME("Bet 3 Credits")
-	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_UNUSED)  // unused bet button 5
+	PORT_BIT(0x00000400, IP_ACTIVE_HIGH, IPT_BUTTON3)  PORT_CODE(KEYCODE_E) PORT_NAME("Bet 1 Credit")
+	PORT_BIT(0x00000800, IP_ACTIVE_HIGH, IPT_BUTTON4)  PORT_CODE(KEYCODE_R) PORT_NAME("Bet 2 Credits")
+	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_BUTTON5)  PORT_CODE(KEYCODE_T) PORT_NAME("Bet 3 Credits")
+	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_BUTTON8)  PORT_CODE(KEYCODE_S) PORT_NAME("x2")
+	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_BUTTON9)  PORT_CODE(KEYCODE_D) PORT_NAME("Play 1 Line / x3")
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_BUTTON10) PORT_CODE(KEYCODE_F) PORT_NAME("Play 2 Lines / x5")
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_BUTTON11) PORT_CODE(KEYCODE_G) PORT_NAME("Play 3 Lines / x10")
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_BUTTON12) PORT_CODE(KEYCODE_H) PORT_NAME("x100")
+	PORT_BIT(0x00000200, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(retrsam)
 	PORT_INCLUDE(sbuk3)
 
 	PORT_MODIFY("P1")
-	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_K) PORT_NAME("Take Win")
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_BUTTON14) PORT_CODE(KEYCODE_K) PORT_NAME("Take Win")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(swhr2)
 	PORT_INCLUDE(aristmk5_9)
 
 	PORT_MODIFY("P1")
-	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_K) PORT_NAME("Take Win")
-	PORT_BIT(0x00000200, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_W) PORT_NAME("Bet 1 Credit")
-	PORT_BIT(0x00000400, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_E) PORT_NAME("Bet 2 Credits")
-	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_T) PORT_NAME("Bet 5 Credits")
-	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_Y) PORT_NAME("Bet 10 Credits")
+	PORT_BIT(0x00000200, IP_ACTIVE_HIGH, IPT_BUTTON2)  PORT_CODE(KEYCODE_W) PORT_NAME("Bet 1 Credit")
+	PORT_BIT(0x00000400, IP_ACTIVE_HIGH, IPT_BUTTON3)  PORT_CODE(KEYCODE_E) PORT_NAME("Bet 2 Credits")
+	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_BUTTON5)  PORT_CODE(KEYCODE_T) PORT_NAME("Bet 5 Credits")
+	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_BUTTON6)  PORT_CODE(KEYCODE_Y) PORT_NAME("Bet 10 Credits")
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_BUTTON14) PORT_CODE(KEYCODE_K) PORT_NAME("Take Win")
 INPUT_PORTS_END
 
-static INPUT_PORTS_START(bumblbug) // bumblbug only, bumblbugql doesn't have Start Feature button
+static INPUT_PORTS_START(retrsamb)
 	PORT_INCLUDE(swhr2)
 
 	PORT_MODIFY("P1")
-	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_K) PORT_NAME("Take Win / Start Feature")
+	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_BUTTON8)  PORT_CODE(KEYCODE_S) PORT_NAME("Play 1 Line / x2")
+	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_BUTTON9)  PORT_CODE(KEYCODE_D) PORT_NAME("Play 3 Lines / x3")
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_BUTTON10) PORT_CODE(KEYCODE_F) PORT_NAME("Play 5 Lines / x5")
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_BUTTON11) PORT_CODE(KEYCODE_G) PORT_NAME("Play 7 Lines / x10")
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_BUTTON12) PORT_CODE(KEYCODE_H) PORT_NAME("Play 9 Lines / x100")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(toutangonl)
 	PORT_INCLUDE(swhr2)
 
 	PORT_MODIFY("P1")
-	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_A) PORT_NAME("Service")
+	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_BUTTON7)  PORT_CODE(KEYCODE_A) PORT_NAME("Service")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(qnilenl)
 	PORT_INCLUDE(toutangonl)
 
 	PORT_MODIFY("P1")
-	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_K) PORT_NAME("Take Win / Start Feature")
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_BUTTON14) PORT_CODE(KEYCODE_K) PORT_NAME("Take Win / Start Feature")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(dimtouch)
 	PORT_INCLUDE(swhr2)
 
 	PORT_MODIFY("P1")
-	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_H) PORT_NAME("Play 9 Lines") // No red/black/suits on the buttons
-	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_S) PORT_NAME("Play 1 Line")  // Gamble feature is touchscreen-based
+	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_BUTTON8)  PORT_CODE(KEYCODE_S) PORT_NAME("Play 1 Line")  // Gamble feature is touchscreen-based
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_BUTTON11) PORT_CODE(KEYCODE_G) PORT_NAME("Play 7 Lines / Autoplay")
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_BUTTON12) PORT_CODE(KEYCODE_H) PORT_NAME("Play 9 Lines") // No red/black/suits on the buttons
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(qtbird)
 	PORT_INCLUDE(swhr2)
 
 	PORT_MODIFY("P1")
-	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_T) PORT_NAME("Bet 4 Credits")
-	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_Y) PORT_NAME("Bet 5 Credits")
+	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_BUTTON5)  PORT_CODE(KEYCODE_T) PORT_NAME("Bet 4 Credits")
+	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_BUTTON6)  PORT_CODE(KEYCODE_Y) PORT_NAME("Bet 5 Credits")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(jungjuic)
 	PORT_INCLUDE(qtbird)
 
 	PORT_MODIFY("P1")
-	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_A) PORT_NAME("Service")
+	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_BUTTON7)  PORT_CODE(KEYCODE_A) PORT_NAME("Service")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(wcougar)
 	PORT_INCLUDE(swhr2)
 
 	PORT_MODIFY("P1")
-	PORT_BIT(0x00000800, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_R) PORT_NAME("Bet 5 Credits")
-	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_T) PORT_NAME("Bet 10 Credits")
-	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_Y) PORT_NAME("Bet 20 Credits")
+	PORT_BIT(0x00000800, IP_ACTIVE_HIGH, IPT_BUTTON4)  PORT_CODE(KEYCODE_R) PORT_NAME("Bet 5 Credits")
+	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_BUTTON5)  PORT_CODE(KEYCODE_T) PORT_NAME("Bet 10 Credits")
+	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_BUTTON6)  PORT_CODE(KEYCODE_Y) PORT_NAME("Bet 20 Credits")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(dreamwv)
 	PORT_INCLUDE(wcougar)
 
 	PORT_MODIFY("P1")
-	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_H) PORT_NAME("Play 9 Lines") // No red/black/suits on the buttons
-	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_S) PORT_NAME("Play 1 Line")  // Gamble feature is touchscreen-based
+	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_BUTTON8)  PORT_CODE(KEYCODE_S) PORT_NAME("Play 1 Line")  // Gamble feature is touchscreen-based
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_BUTTON11) PORT_CODE(KEYCODE_G) PORT_NAME("Play 7 Lines / Autoplay")
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_BUTTON12) PORT_CODE(KEYCODE_H) PORT_NAME("Play 9 Lines") // No red/black/suits on the buttons
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(kgbirda5)
 	PORT_INCLUDE(swhr2)
 
 	PORT_MODIFY("P1")
-	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_H) PORT_NAME("Play 5 Lines / Black")
-	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_G) PORT_NAME("Play 4 Lines")
-	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_F) PORT_NAME("Play 3 Lines")
-	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_D) PORT_NAME("Play 2 Lines")
+	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_BUTTON9)  PORT_CODE(KEYCODE_D) PORT_NAME("Play 2 Lines")
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_BUTTON10) PORT_CODE(KEYCODE_F) PORT_NAME("Play 3 Lines")
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_BUTTON11) PORT_CODE(KEYCODE_G) PORT_NAME("Play 4 Lines")
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_BUTTON12) PORT_CODE(KEYCODE_H) PORT_NAME("Play 5 Lines / Black")
 INPUT_PORTS_END
 
-static INPUT_PORTS_START(checkma5)
+static INPUT_PORTS_START(checkma5) // 3 line button panel only
 	PORT_INCLUDE(aristmk5)
 
 	PORT_MODIFY("P1")
-	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_H) PORT_NAME("Black")
-	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_G) PORT_NAME("Play 3 Lines")
-	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_F) PORT_NAME("Play 2 Lines")
-	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_D) PORT_NAME("Play 1 Line")
-	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_S) PORT_NAME("Red")
-	PORT_BIT(0x00000200, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_W) PORT_NAME("Heart")
-	PORT_BIT(0x00000400, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_E) PORT_NAME("Bet 1 Credit / Diamond")
-	PORT_BIT(0x00000800, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_R) PORT_NAME("Bet 2 Credits")
-	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_T) PORT_NAME("Bet 3 Credits / Club")
-	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_Y) PORT_NAME("Spade")
+	PORT_BIT(0x00000200, IP_ACTIVE_HIGH, IPT_BUTTON2)  PORT_CODE(KEYCODE_W) PORT_NAME("Heart")
+	PORT_BIT(0x00000400, IP_ACTIVE_HIGH, IPT_BUTTON3)  PORT_CODE(KEYCODE_E) PORT_NAME("Bet 1 Credit / Diamond")
+	PORT_BIT(0x00000800, IP_ACTIVE_HIGH, IPT_BUTTON4)  PORT_CODE(KEYCODE_R) PORT_NAME("Bet 2 Credits")
+	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_BUTTON5)  PORT_CODE(KEYCODE_T) PORT_NAME("Bet 3 Credits / Club")
+	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_BUTTON6)  PORT_CODE(KEYCODE_Y) PORT_NAME("Spade")
+	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_BUTTON8)  PORT_CODE(KEYCODE_S) PORT_NAME("Red")
+	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_BUTTON9)  PORT_CODE(KEYCODE_D) PORT_NAME("Play 1 Line")
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_BUTTON10) PORT_CODE(KEYCODE_F) PORT_NAME("Play 2 Lines")
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_BUTTON11) PORT_CODE(KEYCODE_G) PORT_NAME("Play 3 Lines")
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_BUTTON12) PORT_CODE(KEYCODE_H) PORT_NAME("Black")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(wildbill)
 	PORT_INCLUDE(checkma5)
 
 	PORT_MODIFY("P1")
-	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_K) PORT_NAME("Take Win")
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_BUTTON14) PORT_CODE(KEYCODE_K) PORT_NAME("Take Win")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(przfight)
 	PORT_INCLUDE(wildbill)
 
 	PORT_MODIFY("P1")
+	PORT_BIT(0x00000400, IP_ACTIVE_HIGH, IPT_BUTTON3)  PORT_CODE(KEYCODE_E) PORT_NAME("Bet 1 Credit")
+	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_BUTTON5)  PORT_CODE(KEYCODE_T) PORT_NAME("Bet 3 Credits")
 	PORT_BIT(0x00000200, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x00000400, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_E) PORT_NAME("Bet 1 Credit")
-	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_T) PORT_NAME("Bet 3 Credits")
 	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
@@ -1657,32 +1886,32 @@ static INPUT_PORTS_START(wamazon)
 	PORT_INCLUDE(wildbill)
 
 	PORT_MODIFY("P1")
-	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_H) PORT_NAME("Play Feature Game / Black")
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_BUTTON12) PORT_CODE(KEYCODE_H) PORT_NAME("Play Feature Game / Black")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(wamazona)
 	PORT_INCLUDE(wildbill)
 
 	PORT_MODIFY("P1")
-	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_H) PORT_NAME("Bet 10 Credits / Black")
-	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_G) PORT_NAME("Bet 5 Credits")
-	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_F) PORT_NAME("Bet 3 Credits")
-	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_D) PORT_NAME("Bet 2 Credits")
-	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_S) PORT_NAME("Bet 1 Credit / Red")
-	PORT_BIT(0x00000400, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_E) PORT_NAME("Diamond")
+	PORT_BIT(0x00000400, IP_ACTIVE_HIGH, IPT_BUTTON3)  PORT_CODE(KEYCODE_E) PORT_NAME("Diamond")
+	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_BUTTON5)  PORT_CODE(KEYCODE_T) PORT_NAME("Club")
+	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_BUTTON8)  PORT_CODE(KEYCODE_S) PORT_NAME("Bet 1 Credit / Red")
+	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_BUTTON9)  PORT_CODE(KEYCODE_D) PORT_NAME("Bet 2 Credits")
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_BUTTON10) PORT_CODE(KEYCODE_F) PORT_NAME("Bet 3 Credits")
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_BUTTON11) PORT_CODE(KEYCODE_G) PORT_NAME("Bet 5 Credits")
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_BUTTON12) PORT_CODE(KEYCODE_H) PORT_NAME("Bet 10 Credits / Black")
 	PORT_BIT(0x00000800, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_T) PORT_NAME("Club")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(sbuk2)
 	PORT_INCLUDE(kgalah)
 
 	PORT_MODIFY("P1")
-	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_H) PORT_NAME("Bet 5 Credits / Black")
-	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_G) PORT_NAME("Bet 4 Credits")
-	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_F) PORT_NAME("Bet 3 Credits")
-	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_D) PORT_NAME("Bet 2 Credits")
-	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_S) PORT_NAME("Bet 1 Credit / Red")
+	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_BUTTON8)  PORT_CODE(KEYCODE_S) PORT_NAME("Bet 1 Credit / Red")
+	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_BUTTON9)  PORT_CODE(KEYCODE_D) PORT_NAME("Bet 2 Credits")
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_BUTTON10) PORT_CODE(KEYCODE_F) PORT_NAME("Bet 3 Credits")
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_BUTTON11) PORT_CODE(KEYCODE_G) PORT_NAME("Bet 4 Credits")
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_BUTTON12) PORT_CODE(KEYCODE_H) PORT_NAME("Bet 5 Credits / Black")
 	PORT_BIT(0x00000200, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x00000400, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x00000800, IP_ACTIVE_HIGH, IPT_UNUSED)
@@ -1694,126 +1923,125 @@ static INPUT_PORTS_START(unicorndnz)
 	PORT_INCLUDE(aristmk5)
 
 	PORT_MODIFY("P1")
-	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_G) PORT_NAME("Play 15 Lines / Autoplay")
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_BUTTON11) PORT_CODE(KEYCODE_G) PORT_NAME("Play 15 Lines / Autoplay")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(wtiger)
 	PORT_INCLUDE(aristmk5)
 
 	PORT_MODIFY("P1")
-	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_J) PORT_NAME("Standard Game") // Classic Buy Feature toggle off
-	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_K) PORT_NAME("Classic Buy Feature / Start Feature")
-	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_A) PORT_NAME("Gamble / Reserve")
-	PORT_BIT(0x00000100, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_Q) PORT_NAME("Take Win / Collect")
+	PORT_BIT(0x00000100, IP_ACTIVE_HIGH, IPT_BUTTON1)  PORT_CODE(KEYCODE_Q) PORT_NAME("Take Win / Collect")
+	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_BUTTON7)  PORT_CODE(KEYCODE_A) PORT_NAME("Gamble / Reserve")
+	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_BUTTON13) PORT_CODE(KEYCODE_J) PORT_NAME("No Classic Buy Feature")
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_BUTTON14) PORT_CODE(KEYCODE_K) PORT_NAME("Classic Buy Feature / Start Feature")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(indrema5)
 	PORT_INCLUDE(aristmk5)
 
 	PORT_MODIFY("P1")
-	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_H) PORT_NAME("Play 243 Ways / Black")
-	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_G) PORT_NAME("Play 81 Ways")
-	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_F) PORT_NAME("Play 27 Ways")
-	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_D) PORT_NAME("Play 9 Ways")
-	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_S) PORT_NAME("Play 3 Ways / Red")
-	PORT_BIT(0x00000800, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_R) PORT_NAME("Bet 5 Credits")
-	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_T) PORT_NAME("Bet 10 Credits / Club")
-	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_Y) PORT_NAME("Bet 20 Credits / Spade")
+	PORT_BIT(0x00000800, IP_ACTIVE_HIGH, IPT_BUTTON4)  PORT_CODE(KEYCODE_R) PORT_NAME("Bet 5 Credits")
+	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_BUTTON5)  PORT_CODE(KEYCODE_T) PORT_NAME("Bet 10 Credits / Club")
+	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_BUTTON6)  PORT_CODE(KEYCODE_Y) PORT_NAME("Bet 20 Credits / Spade")
+	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_BUTTON8)  PORT_CODE(KEYCODE_S) PORT_NAME("Play 3 Ways / Red")
+	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_BUTTON9)  PORT_CODE(KEYCODE_D) PORT_NAME("Play 9 Ways")
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_BUTTON10) PORT_CODE(KEYCODE_F) PORT_NAME("Play 27 Ways")
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_BUTTON11) PORT_CODE(KEYCODE_G) PORT_NAME("Play 81 Ways")
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_BUTTON12) PORT_CODE(KEYCODE_H) PORT_NAME("Play 243 Ways / Black")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(wizways)
 	PORT_INCLUDE(indrema5)
 
 	PORT_MODIFY("P1")
-	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_K) PORT_NAME("Take Win")
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_BUTTON14) PORT_CODE(KEYCODE_K) PORT_NAME("Take Win")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(reelrock)
 	PORT_INCLUDE(wizways)
 
 	PORT_MODIFY("P1")
-	PORT_BIT(0x00000800, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_R) PORT_NAME("Bet 3 Credits")
-	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_T) PORT_NAME("Bet 5 Credits / Club")
-	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_Y) PORT_NAME("Bet 8 Credits / Spade")
+	PORT_BIT(0x00000800, IP_ACTIVE_HIGH, IPT_BUTTON4)  PORT_CODE(KEYCODE_R) PORT_NAME("Bet 3 Credits")
+	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_BUTTON5)  PORT_CODE(KEYCODE_T) PORT_NAME("Bet 5 Credits / Club")
+	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_BUTTON6)  PORT_CODE(KEYCODE_Y) PORT_NAME("Bet 8 Credits / Spade")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(wikwin)
 	PORT_INCLUDE(reelrock)
 
 	PORT_MODIFY("P1")
-	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_T) PORT_NAME("Bet 4 Credits / Club")
-	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_Y) PORT_NAME("Max Bet / Spade")
+	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_BUTTON5)  PORT_CODE(KEYCODE_T) PORT_NAME("Bet 4 Credits / Club")
+	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_BUTTON6)  PORT_CODE(KEYCODE_Y) PORT_NAME("Max Bet / Spade")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(baddog)
 	PORT_INCLUDE(aristmk5)
 
 	PORT_MODIFY("P1")
-	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x00000200, IP_ACTIVE_HIGH, IPT_BUTTON2)  PORT_CODE(KEYCODE_W) PORT_NAME("Bet 1 / Hold 1 / Heart")
+	PORT_BIT(0x00000400, IP_ACTIVE_HIGH, IPT_BUTTON3)  PORT_CODE(KEYCODE_E) PORT_NAME("Bet 2/5/50 / Hold 2 / Diamond")
+	PORT_BIT(0x00000800, IP_ACTIVE_HIGH, IPT_BUTTON4)  PORT_CODE(KEYCODE_R) PORT_NAME("Bet 5/25/100 / Hold 3")
+	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_BUTTON5)  PORT_CODE(KEYCODE_T) PORT_NAME("Bet 10/50/200 / Hold 4 / Club")
+	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_BUTTON6)  PORT_CODE(KEYCODE_Y) PORT_NAME("High 10/50/200 / Hold 5 / Spade")
+	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_BUTTON8)  PORT_CODE(KEYCODE_S) PORT_NAME("Red")
+	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_BUTTON9)  PORT_CODE(KEYCODE_D) PORT_NAME("Gamble / Half Gamble")
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_BUTTON10) PORT_CODE(KEYCODE_F) PORT_NAME("Take Win")
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_BUTTON11) PORT_CODE(KEYCODE_G) PORT_NAME("Black")
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_BUTTON12) PORT_CODE(KEYCODE_H) PORT_NAME("Draw")
 	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_H) PORT_NAME("Draw / Black")
-	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_F) PORT_NAME("Take Win")
-	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_D) PORT_NAME("Gamble")
-	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_S) PORT_NAME("Red")
-	PORT_BIT(0x00000200, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_W) PORT_NAME("Bet 1 / Hold 1 / Heart")
-	PORT_BIT(0x00000400, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_E) PORT_NAME("Bet 2/5/50 / Hold 2 / Diamond")
-	PORT_BIT(0x00000800, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_R) PORT_NAME("Bet 5/25/100 / Hold 3")
-	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_T) PORT_NAME("Bet 10/50/200 / Hold 4 / Club")
-	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_Y) PORT_NAME("High 10/50/200 / Hold 5 / Spade")
+	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(multidrw)
 	PORT_INCLUDE(baddog)
 
 	PORT_MODIFY("P1")
-	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_J) PORT_NAME("Draw")
-	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_H) PORT_NAME("Bet")
-	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_G) PORT_NAME("Black")
-	PORT_BIT(0x00000200, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_W) PORT_NAME("Hold 1 / Heart")
-	PORT_BIT(0x00000400, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_E) PORT_NAME("Hold 2 / Diamond")
-	PORT_BIT(0x00000800, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_R) PORT_NAME("1 Draw / Hold 3")
-	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_T) PORT_NAME("2 Draws / Hold 4 / Club")
-	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_Y) PORT_NAME("3 Draws / Hold 5 / Spade")
+	PORT_BIT(0x00000200, IP_ACTIVE_HIGH, IPT_BUTTON2)  PORT_CODE(KEYCODE_W) PORT_NAME("Hold 1 / Heart")
+	PORT_BIT(0x00000400, IP_ACTIVE_HIGH, IPT_BUTTON3)  PORT_CODE(KEYCODE_E) PORT_NAME("Hold 2 / Diamond")
+	PORT_BIT(0x00000800, IP_ACTIVE_HIGH, IPT_BUTTON4)  PORT_CODE(KEYCODE_R) PORT_NAME("1 Draw / Hold 3")
+	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_BUTTON5)  PORT_CODE(KEYCODE_T) PORT_NAME("2 Draws / Hold 4 / Club")
+	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_BUTTON6)  PORT_CODE(KEYCODE_Y) PORT_NAME("3 Draws / Hold 5 / Spade")
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_BUTTON12) PORT_CODE(KEYCODE_H) PORT_NAME("Bet / Next Card")
+	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_BUTTON13) PORT_CODE(KEYCODE_J) PORT_NAME("Draw")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(chickna5u)
 	PORT_INCLUDE(aristmk5_usa)
 
 	PORT_MODIFY("P2")
-	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_T) PORT_NAME("Play 7 Lines / Run")
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_BUTTON5)  PORT_CODE(KEYCODE_T) PORT_NAME("Play 7 Lines / Run")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(dolphntru)
 	PORT_INCLUDE(aristmk5_usa)
 
 	PORT_MODIFY("P2")
-	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_T) PORT_NAME("Play 7 Lines / Start Feature")
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_BUTTON5)  PORT_CODE(KEYCODE_T) PORT_NAME("Play 7 Lines / Start Feature")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(bootsctnua)
 	PORT_INCLUDE(aristmk5_usa)
 
 	PORT_MODIFY("P2")
-	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_E) PORT_NAME("Play 5 Lines")
-	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_R) PORT_NAME("Play 10 Lines")
-	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_T) PORT_NAME("Play 15 Lines")
-	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_Y) PORT_NAME("Play 20 Lines")
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_BUTTON3)  PORT_CODE(KEYCODE_E) PORT_NAME("Play 5 Lines")
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_BUTTON4)  PORT_CODE(KEYCODE_R) PORT_NAME("Play 10 Lines")
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_BUTTON5)  PORT_CODE(KEYCODE_T) PORT_NAME("Play 15 Lines")
+	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_BUTTON6)  PORT_CODE(KEYCODE_Y) PORT_NAME("Play 20 Lines")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(pengpuck)
 	PORT_INCLUDE(aristmk5_usa)
 
 	PORT_MODIFY("P2") // experimental use of PORT_CONDITION to select control panels
-	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_E) PORT_NAME("Play 5 Lines") PORT_CONDITION("CPANEL",0x01,NOTEQUALS,0x01)
-	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_R) PORT_NAME("Play 10 Lines") PORT_CONDITION("CPANEL",0x01,NOTEQUALS,0x01)
-	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_T) PORT_NAME("Play 15 Lines") PORT_CONDITION("CPANEL",0x01,NOTEQUALS,0x01)
-	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_Y) PORT_NAME("Play 20 Lines") PORT_CONDITION("CPANEL",0x01,NOTEQUALS,0x01)
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_BUTTON3)  PORT_CODE(KEYCODE_E) PORT_NAME("Play 5 Lines")  PORT_CONDITION("CPANEL",0x01,NOTEQUALS,0x01)
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_BUTTON4)  PORT_CODE(KEYCODE_R) PORT_NAME("Play 10 Lines") PORT_CONDITION("CPANEL",0x01,NOTEQUALS,0x01)
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_BUTTON5)  PORT_CODE(KEYCODE_T) PORT_NAME("Play 15 Lines") PORT_CONDITION("CPANEL",0x01,NOTEQUALS,0x01)
+	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_BUTTON6)  PORT_CODE(KEYCODE_Y) PORT_NAME("Play 20 Lines") PORT_CONDITION("CPANEL",0x01,NOTEQUALS,0x01)
 
-	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_E) PORT_NAME("Alt Button 1") PORT_CONDITION("CPANEL",0x01,EQUALS,0x01)
-	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_R) PORT_NAME("Alt Button 2") PORT_CONDITION("CPANEL",0x01,EQUALS,0x01)
-	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_T) PORT_NAME("Alt Button 3") PORT_CONDITION("CPANEL",0x01,EQUALS,0x01)
-	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_Y) PORT_NAME("Alt Button 4") PORT_CONDITION("CPANEL",0x01,EQUALS,0x01)
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_BUTTON3)  PORT_CODE(KEYCODE_E) PORT_NAME("Alt Button 1") PORT_CONDITION("CPANEL",0x01,EQUALS,0x01)
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_BUTTON4)  PORT_CODE(KEYCODE_R) PORT_NAME("Alt Button 2") PORT_CONDITION("CPANEL",0x01,EQUALS,0x01)
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_BUTTON5)  PORT_CODE(KEYCODE_T) PORT_NAME("Alt Button 3") PORT_CONDITION("CPANEL",0x01,EQUALS,0x01)
+	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_BUTTON6)  PORT_CODE(KEYCODE_Y) PORT_NAME("Alt Button 4") PORT_CONDITION("CPANEL",0x01,EQUALS,0x01)
 
 	PORT_START("CPANEL") // set this to match the game mode selected in Sevice Mode in addition to the layout
 	PORT_CONFNAME( 0x00000001, 0x00000000, "Control Panel Type" )
@@ -1825,32 +2053,32 @@ static INPUT_PORTS_START(dolphntrce)
 	PORT_INCLUDE(bootsctnua)
 
 	PORT_MODIFY("P2")
-	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_T) PORT_NAME("Play 15 Lines / Start Feature")
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_BUTTON5)  PORT_CODE(KEYCODE_T) PORT_NAME("Play 15 Lines / Start Feature")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(swhr2u)
 	PORT_INCLUDE(aristmk5_usa)
 
 	PORT_MODIFY("P1")
-	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_H) PORT_NAME("Bet 5 Credits / Black")
-	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_G) PORT_NAME("Bet 4 Credits")
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_BUTTON11) PORT_CODE(KEYCODE_G) PORT_NAME("Bet 4 Credits")
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_BUTTON12) PORT_CODE(KEYCODE_H) PORT_NAME("Bet 5 Credits / Black")
 
 	PORT_MODIFY("P2")
-	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_E) PORT_NAME("Play 2 Lines")
-	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_R) PORT_NAME("Play 3 Lines")
-	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_T) PORT_NAME("Play 4 Lines")
-	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_Y) PORT_NAME("Play 5 Lines")
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_BUTTON3)  PORT_CODE(KEYCODE_E) PORT_NAME("Play 2 Lines")
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_BUTTON4)  PORT_CODE(KEYCODE_R) PORT_NAME("Play 3 Lines")
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_BUTTON5)  PORT_CODE(KEYCODE_T) PORT_NAME("Play 4 Lines")
+	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_BUTTON6)  PORT_CODE(KEYCODE_Y) PORT_NAME("Play 5 Lines")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(wnpost)
 	PORT_INCLUDE(aristmk5_usa)
 
 	PORT_MODIFY("P2")
-	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_W) PORT_NAME("Play 1 Line / Horse 1")
-	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_E) PORT_NAME("Play 2 Lines / Horse 2")
-	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_R) PORT_NAME("Play 3 Lines / Horse 3")
-	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_T) PORT_NAME("Play 4 Lines / Horse 4")
-	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_Y) PORT_NAME("Play 5 Lines / Horse 5")
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_BUTTON2)  PORT_CODE(KEYCODE_W) PORT_NAME("Play 1 Line / Horse 1")
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_BUTTON3)  PORT_CODE(KEYCODE_E) PORT_NAME("Play 2 Lines / Horse 2")
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_BUTTON4)  PORT_CODE(KEYCODE_R) PORT_NAME("Play 3 Lines / Horse 3")
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_BUTTON5)  PORT_CODE(KEYCODE_T) PORT_NAME("Play 4 Lines / Horse 4")
+	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_BUTTON6)  PORT_CODE(KEYCODE_Y) PORT_NAME("Play 5 Lines / Horse 5")
 INPUT_PORTS_END
 
 void aristmk5_state::init_aristmk5()
@@ -2005,21 +2233,23 @@ void aristmk5_state::machine_reset()
 
 	m_ioc_regs[IRQ_STATUS_B] |= 0x40; //hack, set keyboard irq empty to be ON
 
-	/* load the roms according to what the operator wants */
 	{
+		/* for US sets, load the roms according to what the operator wants */
 		uint8_t *ROM = memregion("maincpu")->base();
-		uint8_t *PRG;// = memregion("prg_code")->base();
-		int i;
-		uint8_t op_mode;
-		static const char *const rom_region[] = { "set_4.04.09", "set_4.04.08", "set_4.04.00", "set_4.02.04", "game_prg" };
+		uint8_t *PRG;
 
-		op_mode = ioport("ROM_LOAD")->read();
+		if (ioport("ROM_LOAD") != nullptr)
+		{
+			static const char *const rom_region[] = { "set_4.04.09", "set_4.04.08", "set_4.04.00", "set_4.02.04", "game_prg" };
 
-		PRG = memregion(rom_region[op_mode & 7])->base();
+			uint8_t op_mode = ioport("ROM_LOAD")->read();
 
-		if(PRG != nullptr)
+			PRG = memregion(rom_region[op_mode & 7])->base();
+		}
+		else // non-US sets don't have set chips
+			PRG = memregion("game_prg")->base();
 
-		for(i = 0; i < 0x400000; i++)
+		for(int i = 0; i < 0x400000; i++)
 			ROM[i] = PRG[i];
 	}
 
@@ -2034,106 +2264,103 @@ void aristmk5_state::machine_reset()
 	memset(m_spi_data, 0, sizeof(m_spi_data));
 }
 
+void aristmk5_state::aristmk5(machine_config &config)
+{
+	ARM(config, m_maincpu, MASTER_CLOCK/6); // 12000000
+	m_maincpu->set_addrmap(AS_PROGRAM, &aristmk5_state::aristmk5_drame_map);
 
-MACHINE_CONFIG_START(aristmk5_state::aristmk5)
-	MCFG_DEVICE_ADD("maincpu", ARM, MASTER_CLOCK/6)    // 12000000
-	MCFG_DEVICE_PROGRAM_MAP(aristmk5_drame_map)
-
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(2))  /* 1.6 - 2 seconds */
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(2));  /* 1.6 - 2 seconds */
 
 	/* TODO: this isn't supposed to access a keyboard ... */
-	MCFG_DEVICE_ADD("kart", AAKART, 12000000/128) // TODO: frequency
+	AAKART(config, m_kart, 12000000/128); // TODO: frequency
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(640, 400)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
-	MCFG_SCREEN_UPDATE_DRIVER(archimedes_state, screen_update)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(640, 400);
+	m_screen->set_visarea(0, 640-1, 0, 400-1);
+	m_screen->set_screen_update(FUNC(archimedes_state::screen_update));
 
-	MCFG_PALETTE_ADD("palette", 0x200)
+	PALETTE(config, m_palette).set_entries(0x200);
 
-	MCFG_DEVICE_ADD("eeprom0", EEPROM_SERIAL_93C56_16BIT)
-	MCFG_DEVICE_ADD("eeprom1", EEPROM_SERIAL_93C56_16BIT)
+	EEPROM_93C56_16BIT(config, m_eeprom[0]);
+	EEPROM_93C56_16BIT(config, m_eeprom[1]);
 
-	MCFG_NVRAM_ADD_NO_FILL("nvram")
+	NVRAM(config, m_nvram, nvram_device::DEFAULT_NONE);
 
 	// TL16C452FN U71
-	MCFG_DEVICE_ADD("uart_0a", NS16450, MASTER_CLOCK / 9)
-	MCFG_INS8250_OUT_INT_CB(WRITELINE("uart_irq", input_merger_device, in_w<0>))
-	MCFG_DEVICE_ADD("uart_0b", NS16450, MASTER_CLOCK / 9)
-	MCFG_INS8250_OUT_INT_CB(WRITELINE("uart_irq", input_merger_device, in_w<1>))
+	ns16450_device &uart0a(NS16450(config, "uart_0a", MASTER_CLOCK / 9));
+	uart0a.out_int_callback().set("uart_irq", FUNC(input_merger_device::in_w<0>));
+	ns16450_device &uart0b(NS16450(config, "uart_0b", MASTER_CLOCK / 9));
+	uart0b.out_int_callback().set("uart_irq", FUNC(input_merger_device::in_w<1>));
 
 	// TL16C452FN U72
-	MCFG_DEVICE_ADD("uart_1a", NS16450, MASTER_CLOCK / 9)
-	MCFG_INS8250_OUT_INT_CB(WRITELINE("uart_irq", input_merger_device, in_w<2>))
-	MCFG_DEVICE_ADD("uart_1b", NS16450, MASTER_CLOCK / 9)
-	MCFG_INS8250_OUT_INT_CB(WRITELINE("uart_irq", input_merger_device, in_w<3>))
+	ns16450_device &uart1a(NS16450(config, "uart_1a", MASTER_CLOCK / 9));
+	uart1a.out_int_callback().set("uart_irq", FUNC(input_merger_device::in_w<2>));
+	ns16450_device &uart1b(NS16450(config, "uart_1b", MASTER_CLOCK / 9));
+	uart1b.out_int_callback().set("uart_irq", FUNC(input_merger_device::in_w<3>));
 
 	// COMM port 4 - 5
-	MCFG_DEVICE_ADD("uart_2a", NS16450, MASTER_CLOCK / 9)
-//  MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, aristmk5_state, uart_irq_callback))
-	MCFG_DEVICE_ADD("uart_2b", NS16450, MASTER_CLOCK / 9)
-//  MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, aristmk5_state, uart_irq_callback))
+	NS16450(config, "uart_2a", MASTER_CLOCK / 9);
+//  MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, FUNC(input_merger_device::in_w<4>));
+	NS16450(config, "uart_2b", MASTER_CLOCK / 9);
+//  MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, FUNC(input_merger_device::in_w<5>));
 
 	// COMM port 6 - 7
-	MCFG_DEVICE_ADD("uart_3a", NS16450, MASTER_CLOCK / 9)
-//  MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, aristmk5_state, uart_irq_callback))
-	MCFG_DEVICE_ADD("uart_3b", NS16450, MASTER_CLOCK / 9)
-//  MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, aristmk5_state, uart_irq_callback))
+	NS16450(config, "uart_3a", MASTER_CLOCK / 9);
+//  MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, FUNC(input_merger_device::in_w<6>));
+	NS16450(config, "uart_3b", MASTER_CLOCK / 9);
+//  MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, FUNC(input_merger_device::in_w<7>));
 
-	MCFG_INPUT_MERGER_ANY_HIGH("uart_irq")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(*this, aristmk5_state, uart_irq_callback))
+	INPUT_MERGER_ANY_HIGH(config, "uart_irq").output_handler().set(FUNC(aristmk5_state::uart_irq_callback));
 
-	MCFG_DEVICE_ADD("rtc", DS1302, 32.768_kHz_XTAL)
+	DS1302(config, m_rtc, 32.768_kHz_XTAL);
 
-	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
+	HOPPER(config, m_hopper, attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
 
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac0", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
-	MCFG_DEVICE_ADD("dac1", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
-	MCFG_DEVICE_ADD("dac2", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
-	MCFG_DEVICE_ADD("dac3", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
-	MCFG_DEVICE_ADD("dac4", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
-	MCFG_DEVICE_ADD("dac5", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
-	MCFG_DEVICE_ADD("dac6", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
-	MCFG_DEVICE_ADD("dac7", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac0", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac0", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "dac3", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac3", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "dac4", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac4", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "dac5", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac5", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "dac6", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac6", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "dac7", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac7", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	for (int i = 0; i < 8; i++)
+	{
+		DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac[i], 0).add_route(0, "speaker", 0.1); // unknown DAC
+	}
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "dac0", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac0", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "dac3", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac3", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "dac4", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac4", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "dac5", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac5", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "dac6", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac6", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "dac7", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac7", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 
-MACHINE_CONFIG_START(aristmk5_state::aristmk5_touch)
+void aristmk5_state::aristmk5_touch(machine_config &config)
+{
 	aristmk5(config);
-	MCFG_DEVICE_MODIFY("uart_0a")
-	MCFG_INS8250_OUT_TX_CB(WRITELINE("microtouch", microtouch_device, rx))
+	subdevice<ns16450_device>("uart_0a")->out_tx_callback().set("microtouch", FUNC(microtouch_device::rx));
 
-	MCFG_MICROTOUCH_ADD("microtouch", 2400, WRITELINE("uart_0a", ins8250_uart_device, rx_w))
-MACHINE_CONFIG_END
+	microtouch_device &microtouch(MICROTOUCH(config, "microtouch", 2400));
+	microtouch.stx().set("uart_0a", FUNC(ins8250_uart_device::rx_w));
+}
 
-MACHINE_CONFIG_START(aristmk5_state::aristmk5_usa)
+void aristmk5_state::aristmk5_usa(machine_config &config)
+{
 	aristmk5(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(aristmk5_usa_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &aristmk5_state::aristmk5_usa_map);
+}
 
-MACHINE_CONFIG_START(aristmk5_state::aristmk5_usa_touch)
+void aristmk5_state::aristmk5_usa_touch(machine_config &config)
+{
 	aristmk5_usa(config);
-	MCFG_DEVICE_MODIFY("uart_0a")
-	MCFG_INS8250_OUT_TX_CB(WRITELINE("microtouch", microtouch_device, rx))
+	subdevice<ns16450_device>("uart_0a")->out_tx_callback().set("microtouch", FUNC(microtouch_device::rx));
 
-	MCFG_MICROTOUCH_ADD("microtouch", 2400, WRITELINE("uart_0a", ins8250_uart_device, rx_w))
-MACHINE_CONFIG_END
+	microtouch_device &microtouch(MICROTOUCH(config, "microtouch", 2400));
+	microtouch.stx().set("uart_0a", FUNC(ins8250_uart_device::rx_w));
+}
 
-#define ARISTOCRAT_MK5_BIOS \
+#define ARISTOCRAT_MK5_USA_SETCHIPS \
 	ROM_REGION( 0x400000, "set_4.04.09", ROMREGION_ERASEFF ) /* setchip v4.04.09 4meg */ \
 	ROM_LOAD32_WORD( "setchip v4.04.09.u7",  0x000000, 0x80000, CRC(e8e8dc75) SHA1(201fe95256459ce34fdb6f7498135ab5016d07f3) ) \
 	ROM_LOAD32_WORD( "setchip v4.04.09.u11", 0x000002, 0x80000, CRC(ff7a9035) SHA1(4352c4336e61947c555fdc80c61f944076f64b64) ) \
@@ -2145,37 +2372,23 @@ MACHINE_CONFIG_END
 	ROM_LOAD32_WORD( "setchip v4.04.00.u11", 0x000002, 0x80000, CRC(82dfa12a) SHA1(86fd0f0ad8d5d1bc503392a40bbcdadb055b2765) ) \
 	ROM_REGION( 0x400000, "set_4.02.04", ROMREGION_ERASEFF ) /* setchip v4.02.04 */ \
 	ROM_LOAD32_WORD( "setchip v4.02.04.u7",  0x000000, 0x80000, CRC(5a254b22) SHA1(8444f237b392df2a3cb42ea349e7af32f47dd544) ) \
-	ROM_LOAD32_WORD( "setchip v4.02.04.u11", 0x000002, 0x80000, CRC(def36617) SHA1(c7ba5b08e884a8fb36c9fb51c08e243e32c81f89) ) \
-	/* GALs */ \
+	ROM_LOAD32_WORD( "setchip v4.02.04.u11", 0x000002, 0x80000, CRC(def36617) SHA1(c7ba5b08e884a8fb36c9fb51c08e243e32c81f89) )
+
+#define ARISTOCRAT_MK5_GALS \
 	ROM_REGION( 0x600, "gals", 0 ) \
 	ROM_LOAD( "a562837.u36",  0x000000, 0x000157, CRC(1f269234) SHA1(29940dd50fb55c632935f62ff44ca724379c7a43) ) \
 	ROM_LOAD( "a562838.u65",  0x000200, 0x000157, CRC(f2f3c40a) SHA1(b795dfa5cc4e8127c3f3a0906664910d1325ec92) ) \
-	ROM_LOAD( "a562840.u22",  0x000400, 0x000157, CRC(941d4cdb) SHA1(1ca091fba69e92f262dbb3d40f515703c8981793) ) \
+	ROM_LOAD( "a562840.u22",  0x000400, 0x000157, CRC(941d4cdb) SHA1(1ca091fba69e92f262dbb3d40f515703c8981793) )
+
+#define ARISTOCRAT_MK5_EEPROM \
 	ROM_REGION16_BE( 0x100, "eeprom0", ROMREGION_ERASEFF ) \
-	ROM_REGION16_BE( 0x100, "eeprom1", ROMREGION_ERASEFF ) \
-
-#define ARISTOCRAT_MK5_BIOS_HAVE_EEPROMS \
-	ROM_REGION( 0x400000, "set_4.04.09", ROMREGION_ERASEFF ) /* setchip v4.04.09 4meg */ \
-	ROM_LOAD32_WORD( "setchip v4.04.09.u7",  0x000000, 0x80000, CRC(e8e8dc75) SHA1(201fe95256459ce34fdb6f7498135ab5016d07f3) ) \
-	ROM_LOAD32_WORD( "setchip v4.04.09.u11", 0x000002, 0x80000, CRC(ff7a9035) SHA1(4352c4336e61947c555fdc80c61f944076f64b64) ) \
-	ROM_REGION( 0x400000, "set_4.04.08", ROMREGION_ERASEFF ) /* setchip v4.04.08 4meg */ \
-	ROM_LOAD32_WORD( "setchip v4.04.08.u7",  0x000000, 0x80000, CRC(7c4b7fe4) SHA1(39dd39c794c0cb6abc1b7503650643a8131468d1) ) \
-	ROM_LOAD32_WORD( "setchip v4.04.08.u11", 0x000002, 0x80000, CRC(d3234a28) SHA1(8ff112ee4aadf1d359ca8ffe0cfa9c7400aa0595) ) \
-	ROM_REGION( 0x400000, "set_4.04.00", ROMREGION_ERASEFF ) /* setchip v4.04.00 4meg 42pin */ \
-	ROM_LOAD32_WORD( "setchip v4.04.00.u7",  0x000000, 0x80000, CRC(2453137e) SHA1(b59998e75ae3924da16faf47b9cfe9afd60d810c) ) \
-	ROM_LOAD32_WORD( "setchip v4.04.00.u11", 0x000002, 0x80000, CRC(82dfa12a) SHA1(86fd0f0ad8d5d1bc503392a40bbcdadb055b2765) ) \
-	ROM_REGION( 0x400000, "set_4.02.04", ROMREGION_ERASEFF ) /* setchip v4.02.04 */ \
-	ROM_LOAD32_WORD( "setchip v4.02.04.u7",  0x000000, 0x80000, CRC(5a254b22) SHA1(8444f237b392df2a3cb42ea349e7af32f47dd544) ) \
-	ROM_LOAD32_WORD( "setchip v4.02.04.u11", 0x000002, 0x80000, CRC(def36617) SHA1(c7ba5b08e884a8fb36c9fb51c08e243e32c81f89) ) \
-	/* GALs */ \
-	ROM_REGION( 0x600, "gals", 0 ) \
-	ROM_LOAD( "a562837.u36",  0x000000, 0x000157, CRC(1f269234) SHA1(29940dd50fb55c632935f62ff44ca724379c7a43) ) \
-	ROM_LOAD( "a562838.u65",  0x000200, 0x000157, CRC(f2f3c40a) SHA1(b795dfa5cc4e8127c3f3a0906664910d1325ec92) ) \
-	ROM_LOAD( "a562840.u22",  0x000400, 0x000157, CRC(941d4cdb) SHA1(1ca091fba69e92f262dbb3d40f515703c8981793) ) \
+	ROM_REGION16_BE( 0x100, "eeprom1", ROMREGION_ERASEFF )
 
 
 ROM_START( aristmk5 )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 
@@ -2190,7 +2403,8 @@ ROM_END
 // 0200751V / 602/9 / 10 Credit Multiplier / 20 Line Multiline
 // ADONIS / NSW/ACT / A - 25/05/98
 ROM_START( adonis )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000bf8
 	    0x000000-0x05eb1b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -2214,7 +2428,8 @@ ROM_END
 // 0100751V / 602/9 / 10 Credit Multiplier / 20 Line Multiline
 // ADONIS / NSW/ACT / A - 25/05/98
 ROM_START( adonisa )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000bf8
 	    0x000000-0x05cdc3 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -2239,7 +2454,9 @@ ROM_END
 // ADONIS / Export / B - 31/07/01
 // Requires set chips 4.04.xx
 ROM_START( adonisu )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0e8a7b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -2264,7 +2481,9 @@ ROM_END
 // ADONIS / NSW/ACT / C - 06/07/99
 // Cash Express Hyperlink game
 ROM_START( adonisce )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	/*
 	    Checksum code found at 0x000c44
@@ -2292,7 +2511,8 @@ ROM_END
 // Venezuela is spelled as 'Venezuila' in the ROM
 // Game is in Spanish, however audit mode is in English
 ROM_START( alchemst )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000bb8
 	    0x000000-0x08e937 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -2318,7 +2538,8 @@ ROM_END
 // 0200428V / 386/56 / CARD POKER
 // BAD DOG POKER / NSW HOTEL / A 17/12/96
 ROM_START( baddog )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000ae4
 	    0x000000-0x056f3f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -2344,7 +2565,8 @@ ROM_END
 // 0200818V / 594/1 / 3 Credit Multiplier/3 Line Multiline
 // Black Panther / Victoria / A - 30/07/96
 ROM_START( blackpnt )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000bb0
 	    0x000000-0x056d8b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -2369,7 +2591,8 @@ ROM_END
 // 0100812V / 616/1 / 25 Credit Multiplier/20 Line Multiline
 // Boot Scootin' 500cm / NSW/ACT / B - 11/12/98
 ROM_START( bootsctn )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    0x000000-0x06c177 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
 	        Expected Checksum   0xb0980753
@@ -2397,8 +2620,11 @@ ROM_END
 // BOOT SCOOTIN' / Export / A - 25/08/99
 // All devices are 27c4002 instead of 27c4096
 // Marked as GHG101202 and 92.767%
+// No set chips required
 ROM_START( bootsctnu )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d08
 	    0x000000-0x0941ab is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -2426,7 +2652,9 @@ ROM_END
 // GHG1008-03 / MV4098/1 / 10 Credit Multiplier/20 Line Multiline
 // BOOT SCOOTIN' / Export / A - 27/07/99
 ROM_START( bootsctnua )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d08
 	    0x000000-0x0944bf is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -2454,7 +2682,9 @@ ROM_END
 // BOOT SCOOTIN' / Export / B - 22/03/01
 // Requires set chip version: 4.04.xx
 ROM_START( bootsctnub )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0f47a7 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -2484,7 +2714,9 @@ ROM_END
 // Touchscreen game
 // Game requires set chip version: 4.01.xx
 ROM_START( bparty )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0a693f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -2512,7 +2744,9 @@ ROM_END
 // Bachelorette Party / Export / B - 25/08/2000
 // Touchscreen game
 ROM_START( bpartya )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	// checksum code not found due to ROMs being corrupted, all files are missing bytes consisting of 0x0D
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "bhg1579.u7",  0x000000, 0x7f01b, BAD_DUMP CRC(da30ade2) SHA1(0a19181ae3968134a5731aa9eadde8c7a12798c1) )
@@ -2533,7 +2767,8 @@ ROM_END
 // 0200510V / 593 / 10 Credit Multiplier / 9 Line Multiline
 // Bumble Bugs / Local / D - 5/07/96
 ROM_START( bumblbug )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b68
 	    0x000000-0x05b94b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -2554,7 +2789,8 @@ ROM_END
 // 0200546V / 593 / 10 Credit Multiplier / 9 Line Multiline
 // Bumble Bugs / QLD CLUB & HOTEL / D - 05/07/96
 ROM_START( bumblbugql )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000ac8
 	    0x000000-0x05554b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -2579,8 +2815,11 @@ ROM_END
 // Bumble Bugs / Export / D - 05/07/97
 // All devices are 27c4002 instead of 27c4096
 // Marked as CHG047903 and 92.691%
+// No set chips required
 ROM_START( bumblbugu )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d08
 	    0x000000-0x0b1f47 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -2606,10 +2845,11 @@ ROM_END
 // All devices are 27c4002 instead of 27c4096
 // Marked as CHG047999 and 87.006%
 // Variation (% and NO): 87.006% 99
-// No required set chip version
-// No required touch screen
+// No set chips required
 ROM_START( bumblbugua )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d08
 	    0x000000-0x0b1f47 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -2633,7 +2873,8 @@ ROM_END
 // 0200143V / 571/4 / 10 Credit Multiplier/9 Line Multiline
 // Butterfly Delight / Local / A - 19/12/95
 ROM_START( buttdeli )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000adc
 	    0x000000-0x04477f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -2657,7 +2898,9 @@ ROM_END
 // AHG1463 / 603(a) / 3,5,10,25,50 Credit Multiplier / 20 Line Multiline
 // Canyon Rose 100cm / Export / B - 06/12/96
 ROM_START( canrose )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	// checksum code not found due to ROMs being corrupted, all files are missing bytes consisting of 0x0D
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "ahg1463.u7",  0x000000, 0x7f06d, CRC(d866097c) SHA1(2bd2c6200986b27a35329aa0c43e5afd22becbfc) )
@@ -2674,7 +2917,8 @@ ROM_END
 // 0100676V / 614/3 / 10 Credit Multiplier/20 Line Multiline
 // Cash Cat 200cm / NSW/ACT / A - 3/04/98
 ROM_START( cashcat )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	/*
 	    Checksum code found at 0x000b68
@@ -2698,7 +2942,8 @@ ROM_END
 // 0100557V / 614/1 / 10 Credit Multiplier/9 Line Multiline
 // Cash Cat 90cm / NSW/ACT / B - 1/12/97
 ROM_START( cashcata )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	/*
 	    Checksum code found at 0x000b68
@@ -2722,7 +2967,8 @@ ROM_END
 // 0300863V / MV4089 / 5 Credit Multiplier/9 Line Multiline
 // Cash Cat / New Zealand / A- 4/1/99
 ROM_START( cashcatnz )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	// checksum code not found (uses different startup sequence)
 	ROM_LOAD32_WORD( "0300863v.u7",  0x000000, 0x80000, CRC(de0f0202) SHA1(994f6c47b1e2e0e133853dc69b189752104486e4) )
@@ -2739,7 +2985,8 @@ ROM_END
 // 0100438V / 603/1 / 25 Credit Multiplier / 20 Line Multiline
 // Cash Chameleon / NSW/ACT / C - 15/4/97
 ROM_START( cashcham )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000ae0
 	    0x000000-0x055f83 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -2763,7 +3010,8 @@ ROM_END
 // 0200437V / 603(a) / 5 Credit Multiplier / 20 Line Multiline
 // Cash Chameleon 100cm / NSW/ACT / D - 18/02/98
 ROM_START( cashchama )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b00
 	    0x000000-0x05ca1b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -2787,7 +3035,8 @@ ROM_END
 // 0300781V / MV4067 / 5 Credit Multiplier/20 Line Multiline
 // Cash Chameleon / New Zealand / A - 31/08/98
 ROM_START( cashchamnz )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	// checksum code not found (uses different startup sequence)
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "0300781v.u7",  0x000000, 0x80000, CRC(009e109e) SHA1(b912b474a226af17bef554f4db6fade7cd2e558f) )
@@ -2806,7 +3055,9 @@ ROM_END
 // Marked as DHG4078.
 // Game requires set chip version: 4.00.xx
 ROM_START( cashchamu )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d08
 	    0x000000-0x09b413 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -2830,7 +3081,8 @@ ROM_END
 // 0300467V / 607 / 10 Credit Multiplier/20 Line Multiline
 // Cash Crop / Local / C - 14/07/97
 ROM_START( cashcra5 )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b80
 	    0x000000-0x06076b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -2854,7 +3106,8 @@ ROM_END
 // 0300447V / 607/2 / 10 Credit Multiplier/9 Line Multiline
 // Cash Crop / Local / C - 29/08/97
 ROM_START( cashcra5a )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	// checksum code not found due to ROMs being corrupted, all files are missing bytes consisting of 0x0D
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "0300447v.u7",  0x000000, 0x7f992, BAD_DUMP CRC(421ac2af) SHA1(552e98a0d3f969d702dd0aafcb4cb8f697a56b47) )
@@ -2871,7 +3124,8 @@ ROM_END
 // 0100787V / 630/1 / 10 Credit Multiplier / 20 Line Multiline
 // The Chariot Challenge / NSW/ACT / A - 10/08/98
 ROM_START( chariotc )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000ba8
 	    0x000000-0x0603fb is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -2897,7 +3151,8 @@ ROM_END
 // ROM contains unaltered NSW/ACT region string and date, but game is for the Venezuelan market
 // Game is in Spanish, however audit mode is in English
 ROM_START( chariotcv )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000ba8
 	    0x000000-0x07dbb7 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -2922,7 +3177,8 @@ ROM_END
 // Ckeckmate / NSW/ACT / B - 06/07/01
 // Checkmate is misspelled as 'Ckeckmate' in the ROM
 ROM_START( checkma5 )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000c38
 	    0x000000-0x071847 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -2948,7 +3204,8 @@ ROM_END
 // 0100351V / 596 / 10 Credit Multiplier/9 Line Multiline
 // Chicken / Local / A - 27/08/96
 ROM_START( chickna5 )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b80
 	    0x000000-0x053fb7 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -2973,7 +3230,8 @@ ROM_END
 // 0200530V / 596 / 10 Credit Multiplier/9 Line Multiline
 // Chicken / QLD Club & Hotels / C - 23/02/98
 ROM_START( chickna5ql )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000ac8
 	    0x000000-0x05f193 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3007,7 +3265,9 @@ ROM_END
 // No set chips required
 // Variation (% and NO): 92.588% 03
 ROM_START( chickna5u )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d08
 	    0x000000-0x0a6917 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3038,7 +3298,9 @@ ROM_END
 // No set chips required
 // All devices are 27c4002 instead of 27c4096.
 ROM_START( chickna5ua )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d08
 	    0x000000-0x0a6917 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3067,7 +3329,8 @@ ROM_END
 // ROM contains unaltered NSW/ACT "Local" region string, but game is for the Venezuelan market
 // Game is in Spanish, however audit mode is in English
 ROM_START( chickna5v )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b80
 	    0x000000-0x07c3e7 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3093,7 +3356,8 @@ ROM_END
 // 0100919V / 577/7 / 25 Credit Multiplier/20 Line Multiline
 // Coral Riches II / Local / A - 29/12/98
 ROM_START( coralrc2 )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000be8
 	    0x000000-0x05ba63 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3117,7 +3381,8 @@ ROM_END
 // 0200753V / 615/1 / 10 Credit Multiplier / 20 Line Multiline
 // Cuckoo / Local / D - 03/07/98
 ROM_START( cuckoo )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b10
 	    0x000000-0x05f63f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3144,7 +3409,8 @@ ROM_END
 // All devices are 27c4002 instead of 27c4096
 // Requires set chips 4.01.xx
 ROM_START( cuckoou )
-	ARISTOCRAT_MK5_BIOS_HAVE_EEPROMS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0a588b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3180,7 +3446,8 @@ ROM_END
 // 0300111V / 577/2 / 20 Credit Multiplier/9 Line Multiline
 // Desert Bloom / Local / A - 12/10/95
 ROM_START( dstbloom )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000adc
 	    0x000000-0x044573 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3205,7 +3472,8 @@ ROM_END
 // Desert Bloom / Local / A - 12/10/95
 // Same strings as dstbloom but earlier version
 ROM_START( dstblooma )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000adc
 	    0x000000-0x0431d3 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3229,7 +3497,9 @@ ROM_END
 // AHG1533 / MV4115_5 / 5, 10, 25, 50 Credit Multiplier / 20 Line Multiline
 // Diamond Destiny / Export / A - 09/05/2000
 ROM_START( diamdest )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	// checksum code not found due to ROMs being corrupted, all files are missing bytes consisting of 0x0D
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "ahg1533.u7",  0x000000, 0x7efb1, BAD_DUMP CRC(b228ed66) SHA1(a92e403b4df2054693787f48e988613843731f9e) )
@@ -3249,7 +3519,8 @@ ROM_END
 // Diamond Dove / NSW/ACT / B - 19/05/99
 // ROM says '9 Credit Multiplier' but game has a 3 credit multiplier
 ROM_START( diamdove )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b78
 	    0x000000-0x063a9f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3275,7 +3546,8 @@ ROM_END
 // 0200302V / 483/7 / 3 Credit Multiplier/3 Line Multiline
 // Diamond Fever / Local / E - 05/09/96
 ROM_START( dmdfever )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000ad8
 	    0x000000-0x054f3f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3297,7 +3569,8 @@ ROM_END
 // Diamond Touch / Local / E - 30/06/97
 // Touchscreen game
 ROM_START( dimtouch )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	// checksum code not found (uses different startup sequence)
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "0400433v.u7",  0x000000, 0x80000, CRC(71b19365) SHA1(5a8ba1806af544d33e9acbcbbc0555805b4074e6) )
@@ -3314,7 +3587,8 @@ ROM_END
 // 0200424V / 602/1 / 10 Credit Multiplier / 20 Line Multiline
 // Dolphin Treasure / NSW/ACT / B - 06/12/96
 ROM_START( dolphntr )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b08
 	    0x000000-0x05c367 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3336,7 +3610,8 @@ ROM_END
 // Dolphin Treasure / NSW/ACT / B - 06/12/96
 // Same strings as dolphntr but earlier version
 ROM_START( dolphntra )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b08
 	    0x000000-0x053897 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3360,7 +3635,8 @@ ROM_END
 // 0100388V / 602 / 10 Credit Multiplier / 9 Line Multiline
 // Dolphin Treasure / NSW/ACT / B - 10/12/96
 ROM_START( dolphntrb )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b20
 	    0x000000-0x0536c3 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3387,7 +3663,9 @@ ROM_END
 // ROM says '9 & 20 Line Multiline' but game only has 20 lines with a 5, 10, 25 or 50 credit multiplier
 // Requires set chips 4.04.xx
 ROM_START( dolphntrce )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0f24a3 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3417,7 +3695,9 @@ ROM_END
 // ROM says '9 & 20 Line Multiline' but game only has 9 lines with a 5, 10 or 20 credit multiplier
 // Requires set chips 4.04.xx
 ROM_START( dolphntrcea )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0f2307 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3447,7 +3727,9 @@ ROM_END
 // ROM says '9 & 20 Line Multiline' but game only has 20 lines
 // Requires set chips 4.04.xx
 ROM_START( dolphntrceb )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0eeb03 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3474,8 +3756,10 @@ ROM_END
 // FHG4077-02 / 602/1 / 10 Credit Multiplier / 9 Line Multiline
 // Dolphin Treasure / Export / B - 06/12/96
 // All devices are 27c4002 instead of 27c4096
+// No set chips required
 ROM_START( dolphntru )
-	ARISTOCRAT_MK5_BIOS_HAVE_EEPROMS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
 	/*
 	    Checksum code found at 0x000d08
 	    0x000000-0x08ec8b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3512,7 +3796,8 @@ ROM_END
 // Dragon's Eye / Local / A - 09/05/97
 // ROM says '10 Line Multiline' but game only has 9 lines
 ROM_START( drgneye )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000af8
 	    0x000000-0x05891b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3534,7 +3819,8 @@ ROM_END
 // Dream Weaver / Local / A- 20/06/97
 // Touchscreen game
 ROM_START( dreamwv )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	// checksum code not found (uses different startup sequence)
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "0200586v.u7",  0x000000, 0x80000, CRC(6d52fcd1) SHA1(136cb89037a96bf6824ed5754fc67167f0287684) )
@@ -3551,7 +3837,8 @@ ROM_END
 // 01J00081 / JB004 / Multi credit / Multi line
 // Dynamite Jack / NSW/ACT / A - 12/07/2000
 ROM_START( dynajack )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b78
 	    0x000000-0x07031b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3577,7 +3864,9 @@ ROM_END
 // CHG1562 / US002 / 5,10,20, Credit Multiplier / 9 Line Multiline
 // Dynamite Jack / Export / A - 11/07/01
 ROM_START( dynajacku )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	// checksum code not found due to ROMs being corrupted, first 4 files are missing bytes consisting of 0x0D
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "chg1562.u7",  0x000000, 0x7f023, BAD_DUMP CRC(c69c989c) SHA1(6eeadf185a38944c6c0c32777c006f27505eaa73) )
@@ -3596,7 +3885,8 @@ ROM_END
 // 0100652V / 623 / 8 Credit Multiplier / 25 Credit Multiway
 // El Dorado / Local / B - 24/03/98
 ROM_START( eldorda5 )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b88
 	    0x000000-0x06328b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3617,7 +3907,8 @@ ROM_END
 // 0400122V / 570/3 / 10 Credit Multiplier/9 Line Multiline
 // Enchanted Forest / Local / E - 23/06/95
 ROM_START( eforsta5 )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000ae4
 	    0x000000-0x045da3 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3639,7 +3930,9 @@ ROM_END
 // Enchanted Forest / Export / C - 17/01/00
 // Cash Express Hyperlink game, but can also run standalone without progressive jackpot
 ROM_START( eforsta5ce )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	// checksum code not found due to ROMs being corrupted, first 6 files are missing bytes consisting of 0x0D
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "chg1536.u7",  0x000000, 0x7efd4, BAD_DUMP CRC(d29185cc) SHA1(26154f3d99907461cff4a44fe02929fae66e6963) )
@@ -3664,7 +3957,9 @@ ROM_END
 // Cash Express Hyperlink game, but can also run standalone without progressive jackpot
 // Requires set chips 4.04.xx
 ROM_START( eforsta5cea )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0f29e7 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3692,8 +3987,11 @@ ROM_END
 // Enchanted Forest / Export / B - 10/02/97
 // Marked as 94.97%
 // All devices are 27c4002 instead of 27c4096.
+// No set chips required
 ROM_START( eforsta5u )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d08
 	    0x000000-0x0a5233 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3716,11 +4014,13 @@ ROM_END
 
 // JHG0415-99 / MV4033 / 10 Credit Multiplier / 9 Line Multiline
 // Enchanted Forest / Export / B - 10/02/97
-// Not requires set chip version
-// Variation (% and NO): 88,26% 99
+// Variation (% and NO): 88.26% 99
 // All devices are 27c4002 instead of 27c4096.
+// No set chips required
 ROM_START( eforsta5ua )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d08
 	    0x000000-0x0a5233 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3744,7 +4044,8 @@ ROM_END
 // 0100651V / 624 / 3 Credit Multiplier / 3 Line Multiline
 // Fast Fortune / Local / D - 07/05/98
 ROM_START( fastfort )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000ba8
 	    0x000000-0x05c0e7 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3768,7 +4069,8 @@ ROM_END
 // 01J00131 / JB006 / Multi credit / Multi line
 // Fortune Teller / NSW/ACT / D - 24/11/2000
 ROM_START( fortellr )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b78
 	    0x000000-0x07038b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3796,7 +4098,9 @@ ROM_END
 // BHG1566 / MV4122/2 / 9 Line Multiline / 5, 10, 20 Credit Multiplier
 // Fortune Fever / Export / A - 13/05/01
 ROM_START( fortfvr )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	// checksum code not found due to ROMs being corrupted, 7 out of 8 files are missing bytes consisting of 0x0D
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "bhg1566.u7",  0x000000, 0x7f050, BAD_DUMP CRC(07c896ae) SHA1(5d275f3759253d2aa3eeef4d6ce973e9a3b5e421) )
@@ -3818,8 +4122,11 @@ ROM_END
 // THE GAMBLER / Export / A - 30/10/98
 // Marked as EHG0916 and 92.268%
 // All devices are 27c4002 instead of 27c4096
+// No set chips required
 ROM_START( gambler )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d08
 	    0x000000-0x08f46b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3844,7 +4151,8 @@ ROM_END
 // Geisha / New Zealand / A- 05/03/01
 // This game is downported from the MK6 version for the New Zealand market only, no other MK5 version exists
 ROM_START( geisha )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	// checksum code not found (uses different startup sequence)
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "0101408v.u7",  0x000000, 0x80000, CRC(ebdde248) SHA1(83f4f4deb5c6f5b33ae066d50e043a24cb0cbfe0) )
@@ -3864,7 +4172,8 @@ ROM_END
 // Genie Magic / Local / C- 15/02/99
 // Touchscreen game
 ROM_START( genmagi )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	// checksum code not found (uses different startup sequence)
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "0200894v.u7",  0x000000, 0x80000, CRC(20ec3b50) SHA1(400ad7f86077184fee63690060fe2a51ba888e1b) )
@@ -3885,10 +4194,11 @@ ROM_END
 // AHG1623 / MV4112/2 / 5,10,25,50 Credit Multiplier / 20 Line Multiline
 // Green Lizard [Reel Game] / Export / A - 05/01/01
 // Requires set chip version: 4.04.xx
-// Variation (% and NO):
-// Doesn't requires touch screen
+// Cash Express Hyperlink game, but can also run standalone without progressive jackpot
 ROM_START( glizrdce )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0f19bf is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3915,7 +4225,8 @@ ROM_END
 // 0100767V / 625 / 10 Credit Multiplier/20 Line Multiline
 // Gnome Around The World 200cm / NSW/ACT / C - 18/12/98
 ROM_START( gnomeatw )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b68
 	    0x000000-0x05ebcb is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3938,10 +4249,13 @@ ROM_END
 
 // AHG1205-03 / MV4091 / 10 Credit Multiplier / 9 Line Multiline
 // QUEEN OF THE NILE / NSW/ACT / B - 13/05/97
+// ROM contains unaltered Queen of the Nile NSW/ACT region string and date, but game is for the US market
 // Marked as AHG1205-03, Golden Pyramids, and 94.941%
-// Queen of The Nile and Golden Pyramids are both the same game with different title
+// No set chips required
 ROM_START( goldpyr )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d08
 	    0x000000-0x08ec83 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3964,10 +4278,13 @@ ROM_END
 
 // AHG1206-99 / 602/2 - 10 Credit Multiplier / 20 Line Multiline
 // QUEEN OF THE NILE - NSW/ACT - B - 13/05/97
+// ROM contains unaltered Queen of the Nile NSW/ACT region string and date, but game is for the US market
 // Marked as AHG1206-99, Golden Pyramids, and 87.928%
-// Queen of The Nile and Golden Pyramids are both the same game with different title
+// No set chips required
 ROM_START( goldpyra )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d08
 	    0x000000-0x08ef13 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3993,7 +4310,8 @@ ROM_END
 // ROM says 'Golden Pyramid' with three trailing spaces, artwork says 'Golden Pyramids'
 // Original casino BIOS is not dumped, using New Zealand 0700474V BIOS until an Australian version is dumped
 ROM_START( goldpyrb )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    note, this actually contains a 2nd checksum for the game, this is the base/bios check only.
 
@@ -4022,7 +4340,8 @@ ROM_END
 // 0101164V / 661 / 50 Credit Multiplier / 20 Line Multiline
 // Golden Ra / NSW/ACT / A - 10/04/00
 ROM_START( goldenra )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b98
 	    0x000000-0x068297 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -4048,7 +4367,8 @@ ROM_END
 // 03J00241 / JB008 / Multi credit / Multi line
 // Honey Pot / NSW/ACT / A - 21/11/2000
 ROM_START( honeypot )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000bb8
 	    0x000000-0x06f02b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -4076,10 +4396,11 @@ ROM_END
 // ROM says 'Cash Express' but this game is not a Hyperlink game
 // Requires set chips 4.04.xx
 // Variation (% and NO)
-// No requires touch screen
-// The game shares reel graphics with Boot Scootin', but background is different and doesn't seems that is a clone.
+// The game shares reel graphics with Boot Scootin', but the game plays identically to Penguin Pays therefore it doesn't have the double wild feature.
 ROM_START( hnktonku )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0ed4ff is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -4104,7 +4425,8 @@ ROM_END
 // 0100872V / 631/3 B / 25 Credit Multiplier / 20 Line Multiline
 // INCA SUN / NSW/ACT / B- 03/05/99
 ROM_START( incasun )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000bf8
 	    0x000000-0x05f56b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -4130,7 +4452,8 @@ ROM_END
 // INCA SUN / NSW/ACT / B- 03/05/99
 // SHOW PROGRAM
 ROM_START( incasunsp )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	/*
 	    Checksum code found at 0x000bf8
@@ -4155,7 +4478,8 @@ ROM_END
 // 0101108V / MV4113 / 5 Credit Multiplier/20 Line Multiline
 // Inca Sun / New Zealand / A- 6/3/00
 ROM_START( incasunnz )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	// checksum code not found (uses different startup sequence)
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "0101108v.u7",  0x000000, 0x80000, CRC(1e7be5ca) SHA1(333b7665fab8f60fb60e9d3b44de96725763ca17) )
@@ -4175,7 +4499,8 @@ ROM_END
 // Inca Sun / Export / A - 05/09/00
 // Requires set chips 4.03.xx
 ROM_START( incasunu )
-	ARISTOCRAT_MK5_BIOS_HAVE_EEPROMS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0e847f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -4214,7 +4539,9 @@ ROM_END
 // Same strings as incasunu but different version
 // Requires set chips 4.04.xx
 ROM_START( incasunua )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0ec3a7 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -4240,7 +4567,8 @@ ROM_END
 // INCA SUN / VENEZUELA / B- 03/05/99
 // Game is in Spanish, however audit mode is in English
 ROM_START( incasunv )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000c10
 	    0x000000-0x082163 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -4265,7 +4593,8 @@ ROM_END
 // 0100845V / 628/1 / 25 Credit Multiway / 20 Credit Multiplier
 // Indian Dreaming / Local / B - 15/12/98
 ROM_START( indrema5 )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000ba8
 	    0x000000-0x06323f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -4289,7 +4618,8 @@ ROM_END
 // 0100161V / 586/2 / 10 Credit Multiplier/9 Line Multiline
 // Jumping Beans / Local / A - 25/1/96
 ROM_START( jumpbean )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	// checksum code not found due to ROMs being corrupted, all files are missing bytes consisting of 0x0D
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "0100161v.u7",  0x000000, 0x7fa4c, BAD_DUMP CRC(6994c968) SHA1(7896a93aeec9c2d815c49d203ca594644e5df8a6) )
@@ -4306,7 +4636,8 @@ ROM_END
 // 0100383V / 586/6 / 25 Credit Multiplier / 20 Line Multiline
 // JUMPIN' JOEY 500cm / NSW/ACT / C - 13/11/96
 ROM_START( jumpjoey )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000ae8
 	    0x000000-0x0562cb is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -4317,7 +4648,7 @@ ROM_START( jumpjoey )
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "0100383v.u7",  0x000000, 0x80000, CRC(9ce4ce4a) SHA1(cde42dc82432baba4c6471cb57be89c0f27ed520) )
-	ROM_LOAD32_WORD( "0100383v.u11", 0x000002, 0x80000, CRC(b67419d0) SHA1(3107d3fd852faB15e8a72850c984b74e522d91cc) )
+	ROM_LOAD32_WORD( "0100383v.u11", 0x000002, 0x80000, CRC(b67419d0) SHA1(3107d3fd852fab15e8a72850c984b74e522d91cc) )
 	ROM_LOAD32_WORD( "0100383v.u8",  0x100000, 0x80000, CRC(94b94149) SHA1(239b510c3ebe9114c27cd7b85fb8f0f5b7b55009) )
 	ROM_LOAD32_WORD( "0100383v.u12", 0x100002, 0x80000, CRC(defce2e9) SHA1(95f88f8647c52f99dceb4920780696d7f7c1c24b) )
 
@@ -4329,9 +4660,10 @@ ROM_END
 
 // 0200240V / 566/3 / 5 Credit Multiplier/9 Line Multiline
 // Jungle Juice / Crown / F - 06/03/96
-// ROM says 'Crown' as region (Crown Casino), but game was from Dunedin Casino with NZ BIOS installed
+// ROM says 'Crown' as region (Crown Casino), but game was from Dunedin Casino with New Zealand base chips
 ROM_START( jungjuic )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    note, this actually contains a 2nd checksum for the game, this is the base/bios check only.
 
@@ -4359,7 +4691,8 @@ ROM_END
 // King Galah / Local / A - 21/07/95
 // ROM says 1995 but artwork says 1997; game has a 1998+ style denomination sign
 ROM_START( kgalah )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b28
 	    0x000000-0x05af27 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -4384,7 +4717,8 @@ ROM_END
 // King Galah / Local / A - 21/07/95
 // ROM says 1995 but artwork says 1997; game has the newer style music introduced in 1997
 ROM_START( kgalaha )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b28
 	    0x000000-0x058863 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -4409,10 +4743,11 @@ ROM_END
 // KING GALAH / Export / B - 07/02/01
 // Requires set chips 4.04.xx
 // Variation (% and NO):
-// Not required touch screen
 // Cash Express Hyperlink game, but can also run standalone without progressive jackpot
 ROM_START( kgalahce )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0f19b3 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -4439,7 +4774,8 @@ ROM_END
 // 0200024V / 540/3 / 10 Credit Multiplier/5 Line Multiline
 // K. G. Bird / Local / D - 10/10/94
 ROM_START( kgbirda5 )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000ae0
 	    0x000000-0x0435af is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -4464,7 +4800,9 @@ ROM_END
 // Koala Mint / Export / A - 12/09/01
 // Requires set chips 4.04.xx
 ROM_START( koalamnt )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0ec32b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -4491,7 +4829,8 @@ ROM_END
 // 0100677V / 614/2 / 10 Credit Multiplier/20 Line Multiline
 // Kooka Bucks 200cm / NSW/ACT / A - 03/04/98
 ROM_START( kookabuk )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b68
 	    0x000000-0x061857 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -4516,9 +4855,11 @@ ROM_END
 // Keep Your Hat On / Export / B - 08/05/2000
 // Requires set chips 4.01.xx
 // Variation (% and NO)
-// Requires touch screen
+// Touchscreen game
 ROM_START( kyhatonu )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0a6927 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -4545,7 +4886,8 @@ ROM_END
 // 0100473V / 599/3 / 25 Credit Multiplier / 20 Line Multiline
 // Loco Loot / Local / C - 17/06/97
 ROM_START( locoloot )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b20
 	    0x000000-0x05633b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -4566,7 +4908,8 @@ ROM_END
 // 0100472V / 599/2 / 20 Credit Multiplier / 9 Line Multiline
 // Loco Loot / Local / C - 17/06/97
 ROM_START( locoloota )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b20
 	    0x000000-0x055e93 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -4587,7 +4930,8 @@ ROM_END
 // 0600725V / MV4064 / 5 Credit Multiplier / 20 Line Multiline
 // Loco Loot / New Zealand / A - 8/7/98
 ROM_START( locolootnz )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	// checksum code not found (uses different startup sequence)
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "0600725v.u7",  0x000000, 0x80000, CRC(164dd049) SHA1(c99c56af72cb1eb69591cb8f7bacbd06bdb6494d) )
@@ -4605,7 +4949,9 @@ ROM_END
 // Loco Loot / Export / A - 30/07/01
 // Requires set chips 4.04.xx
 ROM_START( locolootu )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0e94fb is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -4629,7 +4975,8 @@ ROM_END
 // 0100587V / 621 / 3 Credit Multiplier/3 Line Multiline
 // Lone Wolf / Local / A - 29/10/97
 ROM_START( lonewolf )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b48
 	    0x000000-0x0580f3 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -4650,7 +4997,8 @@ ROM_END
 // 0300109V / 570/6 / 20 Credit Multiplier/9 Line Multiline
 // Lucky Clover / Local / A - 12/10/95
 ROM_START( luckyclo )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000ae8
 	    0x000000-0x055e07 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -4668,12 +5016,14 @@ ROM_START( luckyclo )
 ROM_END
 
 
-// MV4033 / 10 Credit Multiplier / 9 Line Multiline
+// AHG1211-99 / MV4033 / 10 Credit Multiplier / 9 Line Multiline
 // Magic Garden / Export / B - 10/02/97
 // Marked as AHG1211 and 88.26%
-// (Same game as Enchanted Forest?)
+// No set chips required
 ROM_START( mgarden )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d08
 	    0x000000-0x0a522b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -4699,7 +5049,9 @@ ROM_END
 // Requires set chips 4.04.xx
 // Touchscreen game
 ROM_START( magimask )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0e95fb is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -4725,7 +5077,8 @@ ROM_END
 // Requires set chips 4.04.xx
 // Touchscreen game
 ROM_START( magimaska )
-	ARISTOCRAT_MK5_BIOS_HAVE_EEPROMS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0e9597 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -4765,7 +5118,8 @@ ROM_END
 // Requires set chips 4.03.xx
 // Touchscreen game
 ROM_START( magimaskb )
-	ARISTOCRAT_MK5_BIOS_HAVE_EEPROMS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0e8527 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -4802,7 +5156,8 @@ ROM_END
 // Magic Touch / Local / A- 06/03/97
 // Touchscreen game
 ROM_START( magtcha5 )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	// checksum code not found (uses different startup sequence)
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "0300455v.u7",  0x000000, 0x80000, CRC(a1568e3b) SHA1(842c1aa3f9765f7ba9f2587cb94b6ef03c74e8b9) )
@@ -4823,7 +5178,8 @@ ROM_END
 // Same strings as magtcha5 but earlier version
 // Touchscreen game
 ROM_START( magtcha5a )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	// checksum code not found (uses different startup sequence)
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "0200455v.u7",  0x000000, 0x80000, CRC(9fa3ee86) SHA1(ce7546b8d1dbf90eb8f4f8d3255dc1c215c966a7) )
@@ -4842,7 +5198,8 @@ ROM_END
 // 0100425V / 595/5 / 10 Credit Multiplier/20 Line Multiline
 // Mammoth Money / Local / D - 07/04/97
 ROM_START( mammothm )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000adc
 	    0x000000-0x053623 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -4866,7 +5223,8 @@ ROM_END
 // 01J00101 / JB005 / Multi credit / Multi line
 // Margarita Magic / NSW/ACT / A - 07/07/2000
 ROM_START( marmagic )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b78
 	    0x000000-0x06d93b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -4894,7 +5252,9 @@ ROM_END
 // ROM has NSW/ACT strings but it is for US platform
 // Requires set chips 4.04.xx
 ROM_START( marmagicu )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0ed9f3 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -4923,7 +5283,9 @@ ROM_END
 // ROM has NSW/ACT strings but it is for US platform
 // Requires set chips 4.04.xx
 ROM_START( marmagicua )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0eda53 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -4951,7 +5313,8 @@ ROM_END
 // 0400115V / 559/2 / 10 Credit Multiplier/9 Line Multiline
 // Mine, Mine, Mine / Local / D - 16/01/96
 ROM_START( minemine )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000adc
 	    0x000000-0x0446e3 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -4975,8 +5338,10 @@ ROM_END
 // VHG0416-99 / 559/2 / 10 Credit Multiplier / 9 Line Multiline
 // Mine, Mine, Mine / Export / E - 14/02/96
 // All devices are 27c4002 instead of 27c4096
+// No set chips required
 ROM_START( minemineu )
-	ARISTOCRAT_MK5_BIOS_HAVE_EEPROMS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
 	/*
 	    Checksum code found at 0x000d10
 	    0x000000-0x0a7203 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5011,12 +5376,13 @@ ROM_END
 
 // NHG0416-99 / 559/2 / 10 Credit Multiplier / 9 Line Multiline
 // Mine, Mine, Mine / Export / E - 14/02/96
-// Not Required set chip version:
-// Variation (% and NO): 87,408% 99
-// Not required touch screen
+// Variation (% and NO): 87.408% 99
 // All eproms are 27C4002.
+// No set chips required
 ROM_START( minemineua )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d10
 	    0x000000-0x0a7183 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5040,7 +5406,8 @@ ROM_END
 // 0400469V / 607/1 / 25 Credit Multiplier/20 Line Multiline
 // Money Mouse / Local / B - 08/04/97
 ROM_START( monmouse )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b80
 	    0x000000-0x066077 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5065,7 +5432,8 @@ ROM_END
 // Money Mouse / Local / B - 08/04/97
 // Same strings as monmouse but earlier version
 ROM_START( monmousea )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b80
 	    0x000000-0x05dc0b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5089,7 +5457,8 @@ ROM_END
 // 0201397V / MV4126 / 12 Credit Multiplier/20 Line Multiline
 // Money Tree / New Zealand / C- 12/04/01
 ROM_START( montree )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	// checksum code not found (uses different startup sequence)
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "0201397v.u7",  0x000000, 0x80000, CRC(982a0078) SHA1(163c15aebd2be623c0f2c7641360336399bc1f4f) )
@@ -5108,7 +5477,8 @@ ROM_END
 // 0100294V / 595/3 / 50 Credit Multiplier/20 Line Multiline
 // Mountain Money / Local / B - 11/06/96
 ROM_START( mountmon )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000ae4
 	    0x000000-0x04ee9b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5129,13 +5499,14 @@ ROM_END
 // 0100289V / 595/2 / 5 Credit Multiplier/20 Line Multiline
 // Mountain Money / Local / C - 11/06/96
 ROM_START( mountmona )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000ae4
-	    0x000000-0x04ee9b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-	        Expected Checksum   0x4bb1139e
-	        Calculated Checksum 0x4bb1139e  (OK)
-	    0x04ee9c-0x0e3a1f is the non-Checksummed range (unusual endpoint)
+	    0x000000-0x04eea3 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0xd2ec718d
+	        Calculated Checksum 0xd2ec718d  (OK)
+	    0x04eea4-0x0e3a27 is the non-Checksummed range (unusual endpoint)
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "0100289v.u7",  0x000000, 0x80000, CRC(35582166) SHA1(26bf4cd6939afe15a5c2ae940d6da921491fb401) )
@@ -5151,7 +5522,9 @@ ROM_END
 // Mountain Money / Export / A - 10/03/01
 // Cash Express Hyperlink game, but can also run standalone without progressive jackpot
 ROM_START( mountmonce )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	// checksum code not found due to ROMs being corrupted, all files except U10 are missing bytes consisting of 0x0D
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "ahg1629.u7",  0x000000, 0x7efa7, BAD_DUMP CRC(8e5b5354) SHA1(519c5af995d75c3035c0a3832956d94a989163de) )
@@ -5172,7 +5545,9 @@ ROM_END
 // BHG1465 / MV4108/5 / 5,10,25,50 Credit Multiplier / 20 Line Multiline
 // Mountain Money / Export / A - 10/03/01
 ROM_START( mountmonu )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	// checksum code not found due to ROMs being corrupted, first 6 files are missing bytes consisting of 0x0D
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "bhg1465.u7",  0x000000, 0x7f026, BAD_DUMP CRC(9a176a6b) SHA1(a86213020f6cf0c99271ae4e5768453578ade4c3) )
@@ -5194,9 +5569,10 @@ ROM_END
 // Mountain Money / Export / A - 10/03/01
 // Requires set chip version: 4.04.xx
 // Variation (% and NO):
-// Not required touch screen
 ROM_START( mountmonua )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0e8e57 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5223,7 +5599,8 @@ ROM_END
 // 0200956V / 386/64 / 200 Credits per Draw / 3 Draws(1 cent) / 2 Credits per Draw / 3 Draws ($1.00)
 // MULTIDRAW - FREE GAMES / NSW/ACT / E - 08/05/00
 ROM_START( multidrw )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b98
 	    0x000000-0x07477f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5249,7 +5626,8 @@ ROM_END
 // 0100275V / 595/1 / 5 Credit Multiplier/20 Line Multiline
 // Mystic Garden / Local / B - 11/06/96
 ROM_START( mystgard )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000ae4
 	    0x000000-0x04eea7 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5270,7 +5648,8 @@ ROM_END
 // 0101503V / MV4141 / 6 Credit Multiplier/20 Line Multiline
 // One For All / New Zealand / A- 28/05/01
 ROM_START( one4all )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	// checksum code not found (uses different startup sequence)
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "0101503v.u7",  0x000000, 0x80000, CRC(edf50554) SHA1(302737220c4b7d60db77074429d6f360c55494a6) )
@@ -5290,7 +5669,8 @@ ROM_END
 // Orchid Mist 500cm / Local / C - 03/02/99
 // ROM says '10 Credit Multiplier' but game has a 50 credit multiplier
 ROM_START( orchidms )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b20
 	    0x000000-0x0677c7 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5316,7 +5696,8 @@ ROM_END
 // Same strings as orchidms but earlier version
 // ROM says '10 Credit Multiplier' but game has a 50 credit multiplier
 ROM_START( orchidmsa )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b08
 	    0x000000-0x05f753 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5337,10 +5718,29 @@ ROM_START( orchidmsa )
 ROM_END
 
 
+// 0101241V / MV4118 / 25 Credit Multiplier/10 Line Multiline
+// Orchid Mist / New Zealand / A- 3/7/00
+ROM_START( orchidmsnz )
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
+	// checksum code not found (uses different startup sequence)
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD( "0101241v.u7",  0x000000, 0x80000, CRC(e4183d54) SHA1(c5829448450dff212e76b5571fc1bf0ba681afdf) )
+	ROM_LOAD32_WORD( "0101241v.u11", 0x000002, 0x80000, CRC(2623c7b7) SHA1(3601364afe75355641405c4695ef3194eeac1245) )
+	ROM_LOAD32_WORD( "0101241v.u8",  0x100000, 0x80000, CRC(3ec83f06) SHA1(1a89901a5c9126646aa5425801ec4b1570072d20) )
+	ROM_LOAD32_WORD( "0101241v.u12", 0x100002, 0x80000, CRC(141e2b47) SHA1(e311693d730bfff99ad75995e47606e9822ba722) )
+
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
+	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+ROM_END
+
+
 // 0200348V / 593/2 / 10 Credit Multiplier / 9 Line Multiline
 // Oscar / Local / C - 20/09/96
 ROM_START( oscara5 )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b80
 	    0x000000-0x05d187 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5362,7 +5762,8 @@ ROM_END
 // Oscar / Local / C - 20/09/96
 // Same strings as oscara5 but earlier version
 ROM_START( oscara5a )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b80
 	    0x000000-0x054093 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5386,7 +5787,8 @@ ROM_END
 // 0101046V / 594/7 / 10 Credit Multiplier/9 && 20 Line Multiline
 // Panther Magic / NSW/ACT / A - 06/10/99
 ROM_START( pantmag )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x06d1ff is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5410,7 +5812,8 @@ ROM_END
 // 0100716V / 594/4 / 2 Credit Multiplier/5 Line Multiline
 // Panther Magic / Local / A - 13/05/98
 ROM_START( pantmaga )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000c00
 	    0x000000-0x0583f7 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5438,7 +5841,8 @@ ROM_END
 // Requires set chips 4.04.xx
 // Touchscreen game
 ROM_START( partygrs )
-	ARISTOCRAT_MK5_BIOS_HAVE_EEPROMS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0e9b47 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5476,7 +5880,9 @@ ROM_END
 // Requires set chips 4.01.xx
 // Touchscreen game
 ROM_START( partygrsa )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0a69d3 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5501,7 +5907,9 @@ ROM_END
 // Party Gras / Export / A - 10/11/2001
 // Touchscreen game
 ROM_START( partygrsb )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	// checksum code not found due to ROMs being corrupted, all files are missing bytes consisting of 0x0D
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "ahg1568.u7",  0x000000, 0x7efb7, BAD_DUMP CRC(69ab6487) SHA1(d7147f78dc098d142e857687e6cbdb8a8762371a) )
@@ -5518,7 +5926,8 @@ ROM_END
 // 02J00011 / JB001 / 25 Credit Multiplier / 20 Line Multiline
 // Peacock Flutter / NSW/ACT / A - 10/03/00
 ROM_START( peaflut )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b98
 	    0x000000-0x0638d3 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5542,7 +5951,8 @@ ROM_END
 // 0200460V / 586/4(a) / 5 Credit Multiplier / 20 Line Multiline
 // Penguin Pays 100cm / NSW/ACT / D - 03/06/97
 ROM_START( pengpay )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b68
 	    0x000000-0x05c71f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5566,7 +5976,8 @@ ROM_END
 // 0200357V / 586/4 / 5 Credit Multiplier / 20 Line Multiline
 // Penguin Pays 100cm / NSW/ACT / C - 12/11/96
 ROM_START( pengpaya )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b60
 	    0x000000-0x05644f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5591,7 +6002,8 @@ ROM_END
 // Penguin Pays 90cm / NSW/ACT / D - 03/06/97
 // ROM says '100 Credit Multiplier' but game has a 10 credit multiplier
 ROM_START( pengpayb )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b68
 	    0x000000-0x05d7b7 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5615,7 +6027,8 @@ ROM_END
 // 0200113V / 586 / 20 Credit Multiplier/9 Line Multiline
 // Penguin Pays / Local / A - 12/10/95
 ROM_START( pengpayc )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000adc
 	    0x000000-0x0537d7 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5639,7 +6052,8 @@ ROM_END
 // 0300113V / 586 / 20 Credit Multiplier/9 Line Multiline
 // Penguin Pays 180cm / NSW/ACT / A - 12/10/95
 ROM_START( pengpayd )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	// checksum code not found due to ROMs being corrupted, all files are missing bytes consisting of 0x0D
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "0300113v.u7",  0x000000, 0x7f909, BAD_DUMP CRC(30c6c635) SHA1(9a31f99c8a7fb0a909b101b2c5767f39930934e9) )
@@ -5657,8 +6071,10 @@ ROM_END
 // Penguin Pays / Export / B - 14/07/97
 // All devices are 27c4002 instead of 27c4096
 // marked as 92.130%
+// No set chips required
 ROM_START( pengpayu )
-	ARISTOCRAT_MK5_BIOS_HAVE_EEPROMS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
 	/*
 	    Checksum code found at 0x000d08
 	    0x000000-0x0cd21b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5695,8 +6111,10 @@ ROM_END
 // Penguin Pays / Export / B - 14/07/97
 // All devices are 27c4002 instead of 27c4096
 // marked as 92.130%
+// No set chips required
 ROM_START( pengpayua )
-	ARISTOCRAT_MK5_BIOS_HAVE_EEPROMS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
 	/*
 	    Checksum code found at 0x000d08
 	    0x000000-0x0a898f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5721,8 +6139,10 @@ ROM_END
 // Penguin Pays / Export / B - 14/07/97
 // All devices are 27c4002 instead of 27c4096
 // marked as 90.45%
+// No set chips required
 ROM_START( pengpayub )
-	ARISTOCRAT_MK5_BIOS_HAVE_EEPROMS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
 	/*
 	    Checksum code found at 0x000d08
 	    0x000000-0x0a898f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5750,7 +6170,9 @@ ROM_END
 // Cash Express Hyperlink game, but can also run standalone without progressive jackpot
 // Requires set chips 4.04.xx
 ROM_START( pengpayce )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0f368f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5779,7 +6201,9 @@ ROM_END
 // Penguin Pucks Hyperlink game, but can also run standalone without progressive jackpot
 // Requires set chips 4.03.xx
 ROM_START( pengpuck )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0f29ef is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5806,7 +6230,8 @@ ROM_END
 // 0100674V / 619/1 / 10 Credit Multiplier/20 Line Multiline
 // Penguin Pirate 200cm / NSW/ACT / A - 31/03/98
 ROM_START( penpir )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b68
 	    0x000000-0x05d27b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5830,7 +6255,8 @@ ROM_END
 // 0200578V / 619 / 10 Credit Multiplier/9 Line Multiline
 // Penguin Pirate 90cm / NSW/ACT / C - 27/02/98
 ROM_START( penpira )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b68
 	    0x000000-0x05feeb is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5856,7 +6282,8 @@ ROM_END
 // ROM says 'Penguin Pirate 2', artwork says 'Penguin Pirate II'
 // Original casino BIOS is not dumped, using New Zealand 0700474V BIOS until an Australian version is dumped
 ROM_START( penpir2 )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    note, this actually contains a 2nd checksum for the game, this is the base/bios check only.
 
@@ -5886,7 +6313,8 @@ ROM_END
 // 0100731V / 618/1 / 10 Credit Multiplier / 20 Line Multiline
 // Pet Shop / Local / A - 17/04/98
 ROM_START( petshop )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b88
 	    0x000000-0x05f127 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5909,7 +6337,8 @@ ROM_END
 // 0100679V / 618 / 10 Credit Multiplier / 9 Line Multiline
 // Pet Shop / Local / A - 09/03/98
 ROM_START( petshopa )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	// checksum code not found due to bad ROMs, all 4 ROMs have stuck bits (0x20)
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "0100679v.u7",  0x000000, 0x80000, BAD_DUMP CRC(cf4a24fa) SHA1(b510de9199d16ba7319e1b692d7c6c09fcb735dc) )
@@ -5926,7 +6355,8 @@ ROM_END
 // 0500005V / 570/1 / 10 Credit Multiplier/9 Line Multiline
 // Phantom Pays / Local / E - 12/09/95
 ROM_START( phantpay )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000adc
 	    0x000000-0x044713 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5950,7 +6380,8 @@ ROM_END
 // 0100299V / 578/4 / 3 Credit Multiplier/3 Line Multiline
 // Prize Fight / Local / B - 08/08/96
 ROM_START( przfight )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b48
 	    0x000000-0x053def is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5976,7 +6407,8 @@ ROM_END
 // 0100706V / 603/6 / 10 Credit Multiplier / 20 Line Multiline
 // Queens of Cash / NSW/ACT / C  - 23/07/98
 ROM_START( qcash )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000af4
 	    0x000000-0x05d55b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5999,8 +6431,10 @@ ROM_END
 
 // 0300439V / 602/4 / 25 Credit Multiplier / 20 Line Multiline
 // QUEEN OF THE NILE / NSW/ACT / B - 13/05/97
+// EPROM labels have "Golden Pyramid 500" (no trailing 's') and 2001 for the year
 ROM_START( qnile )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b80
 	    0x000000-0x062913 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6025,7 +6459,8 @@ ROM_END
 // QUEEN OF THE NILE / NSW/ACT / B - 13/05/97
 // Same strings as qnile but earlier version
 ROM_START( qnilea )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b80
 	    0x000000-0x059dff is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6050,7 +6485,8 @@ ROM_END
 // QUEEN OF THE NILE / NSW/ACT / B - 13/05/97
 // Same strings as qnile and qnilea but earlier version
 ROM_START( qnileb )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b80
 	    0x000000-0x055c83 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6077,7 +6513,8 @@ ROM_END
 // 3 = Nine, 4 = Ten, 5 = Jack, 6 = Queen, 7 = King, 8 = Ace
 // Game and BIOS are in Portuguese
 ROM_START( qnilebr )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    note, this actually contains a 2nd checksum for the game, this is the base/bios check only.
 
@@ -6107,7 +6544,8 @@ ROM_END
 // 0300440V / 602/3 / 20 Credit Multiplier / 9 Line Multiline
 // QUEEN OF THE NILE / NSW/ACT / B - 13/05/97
 ROM_START( qnilec )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b80
 	    0x000000-0x064c4b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6133,7 +6571,9 @@ ROM_END
 // Cash Express Hyperlink game, but can also run standalone without progressive jackpot
 // Requires set chips 4.04.xx
 ROM_START( qnilece )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0f2453 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6163,7 +6603,9 @@ ROM_END
 // Cash Express Hyperlink game, but can also run standalone without progressive jackpot
 // Requires set chips 4.04.xx
 ROM_START( qnilecea )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0ee84f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6194,7 +6636,9 @@ ROM_END
 // Cash Express Hyperlink game, but can also run standalone without progressive jackpot
 // Requires set chips 4.04.xx
 ROM_START( qnileceb )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0f237f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6221,7 +6665,8 @@ ROM_END
 // 0101139V / 602/16 / 3 Credit Multiplier / 3 Line Multiline
 // QUEEN OF THE NILE / NSW/ACT / A - 11/10/99
 ROM_START( qniled )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b78
 	    0x000000-0x068183 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6244,11 +6689,39 @@ ROM_START( qniled )
 ROM_END
 
 
+// 0101670V / 602/4 / 25, 50 Credit / 20 Line Multiline
+// Queen Of The Nile - Fast Lane / Qld QCOM / E - 17/08/01
+// Fast Lane Hyperlink game
+ROM_START( qnilefl )
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
+	/*
+	    Checksum code found at 0x000ad0
+	    0x000000-0x086cbb is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x3297c26b
+	        Calculated Checksum 0x3297c26b  (OK)
+	    0x086cbc-0x2aecd3 is the non-Checksummed range (unusual endpoint)
+	*/
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD( "0101670v.u7",  0x000000, 0x80000, CRC(71817007) SHA1(90cd928894044b629e03aa2c1d533eb6aed4c7af) )
+	ROM_LOAD32_WORD( "0101670v.u11", 0x000002, 0x80000, CRC(53006d14) SHA1(00d99e74433023d007f6a401d0081decb36a32dc) )
+	ROM_LOAD32_WORD( "0101670v.u8",  0x100000, 0x80000, CRC(ffd13e39) SHA1(d0fd0efc968fc4c8c81b0824eb9773462b88acb4) )
+	ROM_LOAD32_WORD( "0101670v.u12", 0x100002, 0x80000, CRC(d918d776) SHA1(aa3729d712a43b777d648c840b3e3de21d76ab50) )
+	ROM_LOAD32_WORD( "0101670v.u9",  0x200000, 0x80000, CRC(d8c46bd8) SHA1(ae9427f668fe109573915ca0408450137f75ade0) )
+	ROM_LOAD32_WORD( "0101670v.u13", 0x200002, 0x80000, CRC(715e7789) SHA1(b734aa88e7e65fba988e7fffd711039c4f554b2c) )
+
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
+	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+ROM_END
+
+
 // 0401072V / 602/4 / 25 Credit Multiplier / 20 Line Multiline
 // QUEEN OF THE NILE / NSW/ACT / D - 18/06/99
 // Maximillions Hyperlink game
 ROM_START( qnilemax )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000bb8
 	    0x000000-0x06fd6f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6275,7 +6748,8 @@ ROM_END
 // 0301059V / 602/5 / 10 Credit Multiplier / 9 Line Multiline
 // QUEEN OF THE NILE / HOLLAND / G - 10/04/00
 ROM_START( qnilenl )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x00104c
 	    0x000000-0x05d1cb is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6296,12 +6770,60 @@ ROM_START( qnilenl )
 ROM_END
 
 
+// 0300785V / MV4068 / 5 Credit Multiplier/9 Line Multiline
+// Queen of the nile / New Zealand / A- 31/8/98
+// ROM has "nile" in lowercase
+ROM_START( qnilenz )
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
+	// checksum code not found (uses different startup sequence)
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD( "0300785v.u7",  0x000000, 0x80000, CRC(c327d801) SHA1(4721d87a7a759bd437d0d93dc6c415e7a8e60ea5) )
+	ROM_LOAD32_WORD( "0300785v.u11", 0x000002, 0x80000, CRC(6bf94b80) SHA1(82d5fa551818bd23eecceaa992ec0d9992c53786) )
+	ROM_LOAD32_WORD( "0300785v.u8",  0x100000, 0x80000, CRC(23e5aa25) SHA1(1b77f5ad1cd990e5b21ee9fa018e7ea584cc871e) )
+	ROM_LOAD32_WORD( "0300785v.u12", 0x100002, 0x80000, CRC(b938825c) SHA1(137abb5573fe120ca9cb1fa181bd8591889420d0) )
+	ROM_LOAD32_WORD( "0300785v.u9",  0x200000, 0x80000, CRC(35244a36) SHA1(2529ee5d2d8419d050dc1af501adba24f8e1fbcb) )
+	ROM_LOAD32_WORD( "0300785v.u13", 0x200002, 0x80000, CRC(b267d25a) SHA1(8065601190540e5f0b4a91fed1deffcdb2606f94) )
+
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
+	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+ROM_END
+
+
+// 0201200V / 602/4 / 25 Credit Multiplier / 20 Line Multiline
+// Queen Of The Nile / Qld QCOM / D - 18/06/99
+ROM_START( qnileql )
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
+	/*
+	    Checksum code found at 0x000ad0
+	    0x000000-0x0807ff is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x36105c3f
+	        Calculated Checksum 0x36105c3f  (OK)
+	    0x080800-0x1aa743 is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x080800-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
+	*/
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD( "0201200v.u7",  0x000000, 0x80000, CRC(093b575c) SHA1(3139e1f1e94f752e2162af8064ab7d62f0b15b07) )
+	ROM_LOAD32_WORD( "0201200v.u11", 0x000002, 0x80000, CRC(2a356826) SHA1(4c9ae643570fceff7138e1a7bb780de9eaa272b0) )
+	ROM_LOAD32_WORD( "0201200v.u8",  0x100000, 0x80000, CRC(8b3dd4cb) SHA1(b57494001bfd6a7b933214b62f5c93cb8c21fdca) )
+	ROM_LOAD32_WORD( "0201200v.u12", 0x100002, 0x80000, CRC(38332f4e) SHA1(53c90103df06e5a28bbaf32504a0984b7c65bec7) )
+
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
+	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+ROM_END
+
+
 // GHG4091-02 / MV4091 / 10 Credit Multiplier / 9 Line Multiline
 // QUEEN OF THE NILE / NSW/ACT / B - 13/05/97
 // All devices are 27c4002 instead of 27c4096
 // ROM contains unaltered NSW/ACT region string and date, but game is for the US platform
+// No set chips required
 ROM_START( qnileu )
-	ARISTOCRAT_MK5_BIOS_HAVE_EEPROMS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
 	/*
 	    Checksum code found at 0x000d08
 	    0x000000-0x08ec87 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6340,8 +6862,11 @@ ROM_END
 // All devices are 27C4002.
 // ROM contains unaltered NSW/ACT region string and date, but game is for the US platform
 // Note: The game has GHG4090-03 in the stickers, but the strings inside are GHG4091-03 instead. Also the base is GHG4091.
+// No set chips required
 ROM_START( qnileua )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d08
 	    0x000000-0x08ec87 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6367,7 +6892,8 @@ ROM_END
 // ROM contains unaltered NSW/ACT region string and date, but game is for the Venezuelan market
 // Game is in Spanish, however audit mode is in English
 ROM_START( qnilev )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b80
 	    0x000000-0x081a0b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6391,7 +6917,8 @@ ROM_END
 // 0500009V / 581 / 5 Credit Multiplier/9 Line Multiline
 // Q.T. Bird / Local / A - 27/10/94
 ROM_START( qtbird )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000ae0
 	    0x000000-0x0454af is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6416,7 +6943,8 @@ ROM_END
 // Rainbow Warriors / NSW/ACT / B - 02/03/00
 // Cash Express Hyperlink game
 ROM_START( rainwrce )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000bf8
 	    0x000000-0x06bb13 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6444,7 +6972,8 @@ ROM_END
 // 0100400V / 598/2 / 20 Credit Multiplier / 25 Credit Multiway
 // Reel Power / Local / A - 01/11/96
 ROM_START( reelpwr )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b80
 	    0x000000-0x059d1b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6469,7 +6998,8 @@ ROM_END
 // Reelin'n Rockin / Local / A - 13/07/98
 // ROM says 'Reelin'n Rockin', artwork says 'Reelin-n-Rockin'
 ROM_START( reelrock )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000ba8
 	    0x000000-0x062f6f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6490,10 +7020,38 @@ ROM_START( reelrock )
 ROM_END
 
 
+// 0101460V / 628/2 / 10, 25 & 50 Credit Multiplier / 20 Line Multiline
+// Reelin 'n Rockin / QLD / E - 20/12/00
+// ROM says 'Reelin 'n Rockin', artwork says 'Reelin-n-Rockin'
+ROM_START( reelrockql )
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
+	/*
+	    Checksum code found at 0x000ad0
+	    0x000000-0x08737b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x962948fb
+	        Calculated Checksum 0x962948fb  (OK)
+	    0x08737c-0x2b2beb is the non-Checksummed range (unusual endpoint)
+	*/
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD( "0101460v.u7",  0x000000, 0x80000, CRC(6781085a) SHA1(8fbd8cddada944ca3fd633bdc3b5dc3c0a14736d) )
+	ROM_LOAD32_WORD( "0101460v.u11", 0x000002, 0x80000, CRC(43525988) SHA1(705c0114300ea099c7eb96c5035233753534d28d) )
+	ROM_LOAD32_WORD( "0101460v.u8",  0x100000, 0x80000, CRC(21767926) SHA1(cbfc3304aab6ef4988652071b263a814804f5f6b) )
+	ROM_LOAD32_WORD( "0101460v.u12", 0x100002, 0x80000, NO_DUMP )
+	ROM_LOAD32_WORD( "0101460v.u9",  0x200000, 0x80000, CRC(324f6fd8) SHA1(c6d689447eb15a57046bcdecc5dbd67b716112f5) )
+	ROM_LOAD32_WORD( "0101460v.u13", 0x200002, 0x80000, NO_DUMP )
+
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
+	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+ROM_END
+
+
 // 0400549V / 608 / 3 Credit Multiplier/3 Line Multiline
 // Return of the Samurai / Local / A - 17/04/97
 ROM_START( retrsam )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b88
 	    0x000000-0x06445b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6518,7 +7076,8 @@ ROM_END
 // Return of the Samurai / Local / A - 17/04/97
 // Same strings as retrsam but earlier version
 ROM_START( retrsama )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b88
 	    0x000000-0x0590b7 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6539,7 +7098,8 @@ ROM_END
 // 0200506V / 608/1 / 10 Credit Multiplier/9 Line Multiline
 // Return of the Samurai / Local / A - 28/04/97
 ROM_START( retrsamb )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b88
 	    0x000000-0x05889b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6561,7 +7121,8 @@ ROM_END
 // Rushin Rooster / Local / C - 25/06/97
 // ROM says '10 Credit Multiplier' but game has a 5 credit multiplier
 ROM_START( rushrst )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b68
 	    0x000000-0x05a0c3 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6587,7 +7148,8 @@ ROM_END
 // SUPER BUCKS II / NSW/ACT / G 26/07/99
 // Sound data is damaged due to bad u8 ROM
 ROM_START( sbuk2 )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b98
 	    0x000000-0x06ab7f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6612,7 +7174,8 @@ ROM_END
 // No combination data due to missing u11 ROM
 // This version had Superman-style reel symbols, whereas sbuk2 has similar graphics to Super Bucks III
 ROM_START( sbuk2a )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	// checksum code not found due to missing ROMs
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "0300006v.u7",  0x000000, 0x80000, CRC(d1833c73) SHA1(1576a7877877569438571a16c51fdd56a172c60d) )
@@ -6629,7 +7192,8 @@ ROM_END
 // 0200711V / 626 / 3 Credit Multiplier / 3 Line Multiline
 // Super Bucks III / NSW/ACT / A-22/04/98
 ROM_START( sbuk3 )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000ba8
 	    0x000000-0x05ead3 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6654,7 +7218,8 @@ ROM_END
 // Super Bucks III / NSW/ACT / A-22/04/98
 // Same strings as sbuk3 but earlier version
 ROM_START( sbuk3a )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000ba8
 	    0x000000-0x05eaff is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6679,7 +7244,9 @@ ROM_END
 // Sweet Liberty Deluxe / Export / A - 11/02/01
 // Requires set chips 4.04.xx
 ROM_START( sldeluxe )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0ec207 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6706,7 +7273,8 @@ ROM_END
 // 0100673V / 621/2 / 10 Credit Multiplier
 // Silver Wolf / Local / A - 23/03/98
 ROM_START( slvrwolf )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000ba8
 	    0x000000-0x05bd47 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6730,7 +7298,8 @@ ROM_END
 // 0100405V / 599 / 10 Credit Multiplier / 9 Line Multiline
 // Snow Cat / Local / B - 23/12/96
 ROM_START( snowcat )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b80
 	    0x000000-0x0553db is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6751,7 +7320,8 @@ ROM_END
 // 0200606V / 622 / 10 Credit Multiplier / 9 Line Multiline
 // Sumo Spins / Local / A - 08/12/97
 ROM_START( sumospin )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b88
 	    0x000000-0x05d92b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6775,7 +7345,8 @@ ROM_END
 // 0200465V / 577/1 / 10 Credit Multiplier/9 Line Multiline
 // Sweethearts II / Local / C - 07/09/95
 ROM_START( swhr2 )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	        Checksum code found at 0x000b68
 	        0x000000-0x05b507 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6797,7 +7368,8 @@ ROM_END
 // Sweethearts II / Local / C - 07/09/95
 // Same strings as swhr2 but earlier version
 ROM_START( swhr2a )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000ae0
 	    0x000000-0x041803 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6819,8 +7391,11 @@ ROM_END
 // Sweethearts II / Export / A - 29/06/98
 // Marked as PHG0742 and 92.252%
 // All devices are 27c4002 instead of 27c4096
+// No set chips required
 ROM_START( swhr2u )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d08
 	    0x000000-0x0b31cb is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6845,7 +7420,8 @@ ROM_END
 // Sweethearts II / VENEZUELA / C - 07/09/95
 // Game is in Spanish, however audit mode is in English
 ROM_START( swhr2v )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b68
 	    0x000000-0x07a763 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6866,7 +7442,8 @@ ROM_END
 // 0200319V / 569/12 / 25 Credit Multiplier / 20 Line Multiline
 // Thor / Local / B - 14/08/96
 ROM_START( thor )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000adc
 	    0x000000-0x052b07 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6890,7 +7467,8 @@ ROM_END
 // 0200333V / 570/9 / 10 Credit Multiplier/9 Line Multiline
 // Thunder Heart / Local / A - 14/08/96
 ROM_START( thndh )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000ae0
 	    0x000000-0x054c6f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6914,7 +7492,8 @@ ROM_END
 // 0200334V / 597/1 / 3 Credit Multiplier/3 Line Multiline
 // Thunder Heart / Local / A - 14/08/96
 ROM_START( thndha )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b38
 	    0x000000-0x053c2b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6938,7 +7517,8 @@ ROM_END
 // 0100550V / 594/3 / 3 Credit Multiplier/3 Line Multiline
 // Top Banana / Local / A - 18/08/97
 ROM_START( topbana )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b68
 	    0x000000-0x05851f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6959,7 +7539,8 @@ ROM_END
 // 0100782V / 616/1 / 10 Credit Multiplier/20 Line Multiline
 // Toucan Tango 200cm / NSW/ACT / A - 17/06/98
 ROM_START( toutango )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b88
 	    0x000000-0x06766b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6987,7 +7568,8 @@ ROM_END
 // 0301388V / 616 / 10 Credit Multiplier / 9 Line Multiline
 // Toucan Tango 90cm / Holland / C - 11/05/99
 ROM_START( toutangonl )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x00104c
 	    0x000000-0x060dbf is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7014,7 +7596,8 @@ ROM_END
 // 01J00161 / JB001/3 / 25 Credit Multiplier / 20 Line Multiline
 // TREASURE TROVE / NSW/ACT / A - 5/10/00
 ROM_START( trstrove )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b98
 	    0x000000-0x0638d7 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7038,7 +7621,8 @@ ROM_END
 // 0201692V / 692 / 10 or 25 Credit Multiplier/9 or 20 Line Multiline
 // Triple Treat / NSW/ACT / A - 17/05/02
 ROM_START( tritreat )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x07089b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7064,7 +7648,8 @@ ROM_END
 // 01J00851 / JB001/5 / Multi credit / Multi line
 // TROJAN HORSE / NSW/ACT / A - 30/10/01
 ROM_START( trojhors )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000bb8
 	    0x000000-0x06e9f7 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7090,7 +7675,8 @@ ROM_END
 // 0100269V / 577/3 / 10 Credit Multiplier/9 Line Multiline
 // Tropical Delight / Local / B - 15/05/96
 ROM_START( trpdlght )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000adc
 	    0x000000-0x04ea87 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7115,8 +7701,11 @@ ROM_END
 // Tropical Delight / Export / D - 24/09/97
 // Marked as PHG062502 and 92.25%
 // All devices are 27c4002 instead of 27c4096
+// No set chips required
 ROM_START( trpdlghtu )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d08
 	    0x000000-0x0b2d1f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7140,7 +7729,8 @@ ROM_END
 // 0100791V / 631/1 A / 10 Credit Multiplier / 20 Line Multiline
 // UNICORN DREAMING / NSW/ACT / A - 31/08/98
 ROM_START( unicornd )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000bf8
 	    0x000000-0x05f36f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7164,7 +7754,8 @@ ROM_END
 // 0100813V / 631  A / 10 Credit Multiplier / 9 Line Multiline
 // UNICORN DREAMING / NSW/ACT / A - 02/09/98
 ROM_START( unicornda )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000bf8
 	    0x000000-0x05f087 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7188,7 +7779,8 @@ ROM_END
 // 0101228V / MV4113/1 / 10 Credit Multiplier/20 Line Multiline
 // Unicorn Dreaming / New Zealand / A- 5/4/00
 ROM_START( unicorndnz )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	// checksum code not found (uses different startup sequence)
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "0101228v.u7",  0x000000, 0x80000, CRC(54d55ecb) SHA1(0afb2d6489f01ae55563030e228e1d5443738af1) )
@@ -7206,7 +7798,9 @@ ROM_END
 // Unicorn Dreaming / Export / C - 10/17/01
 // Requires set chips 4.04.xx
 ROM_START( unicorndu )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0ec547 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7233,7 +7827,8 @@ ROM_END
 // Venezuela is spelled as 'Venezuila' in the ROM
 // Game is in Spanish, however audit mode is in English
 ROM_START( venicea5 )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code needs to be done
 	*/
@@ -7258,7 +7853,9 @@ ROM_END
 // All devices are 27c4096
 // Requires set chips 4.04.xx
 ROM_START( wafricau )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0e77e7 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7282,7 +7879,8 @@ ROM_END
 // 0200507V / 506/8 / 3 Credit Multiplier/3 Line Multiline
 // Wild Amazon / Local / A - 10/10/96
 ROM_START( wamazon )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b68
 	    0x000000-0x05c043 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7303,7 +7901,8 @@ ROM_END
 // 0200285V / 506/6 / 10 Credit Multiplier
 // Wild Amazon / Local / A - 7/5/96
 ROM_START( wamazona )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b68
 	    0x000000-0x052b8b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7328,7 +7927,8 @@ ROM_END
 // Wild Amazon / VENEZUELA / A - 10/10/96
 // Game is in Spanish, however audit mode is in English
 ROM_START( wamazonv )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b68
 	    0x000000-0x07b2f3 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7352,7 +7952,8 @@ ROM_END
 // 0100553V / 609 / 4 Credit Multiplier / 25 Credit Multiway
 // Wicked Winnings / Local / B - 01/07/97
 ROM_START( wikwin )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b88
 	    0x000000-0x07237f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7376,7 +7977,8 @@ ROM_END
 // 0100297V / 543/8 / 3 Credit Multiplier/3 Line Multiline
 // Wild Bill / Local / C - 15/08/96
 ROM_START( wildbill )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000ad8
 	    0x000000-0x054e6b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7397,7 +7999,8 @@ ROM_END
 // 0100167V / 569/9 / 20 Credit Multiplier / 9 Line Multiline
 // Wild Cougar / Local / B - 27/2/96
 ROM_START( wcougar )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000adc
 	    0x000000-0x043573 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7421,8 +8024,10 @@ ROM_END
 // NHG0296-04 / 569/8 / 10 Credit Multiplier / 9 Line Multiline
 // Wild Cougar / Export / D - 19/05/97
 // All devices are 27c4002 instead of 27c4096
+// No set chips required
 ROM_START( wcougaru )
-	ARISTOCRAT_MK5_BIOS_HAVE_EEPROMS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
 	/*
 	    Checksum code found at 0x000d08
 	    0x000000-0x0b0d5b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7459,8 +8064,11 @@ ROM_END
 // Wild Cougar / Export / D - 19/05/97
 // Marked 94.982%
 // All devices are 27C4002 instead of 27C4096
+// No set chips required
 ROM_START( wcougarua )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d08
 	    0x000000-0x0b0d5b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7483,11 +8091,12 @@ ROM_END
 
 // NHG0296-99 / 569/8 / 10 Credit Multiplier / 9 Line Multiline
 // Wild Cougar / Export / D - 19/05/97
-// Not Required set chip version
 // Variation (% and NO): 87,836% 99
-// Not required touch screen.
+// No set chips required
 ROM_START( wcougarub )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d08
 	    0x000000-0x0b0d5b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7514,7 +8123,9 @@ ROM_END
 // ROM says '5 Line / 10 Credit Multiplier' but this game has 9 lines with a 5, 10 or 20 credit multiplier
 // Requires set chips 4.04.xx
 ROM_START( wcougaruc )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0e783b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7538,7 +8149,9 @@ ROM_END
 // AHG1515 / MV4134 / 5,10,25,50 Credit Multiplier / 20 Line Multiline
 // Wild Coyote / Export / A - 30/07/01
 ROM_START( wcoyote )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	// checksum code not found due to ROMs being corrupted, all files are missing bytes consisting of 0x0D
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "ahg1515.u7",  0x000000, 0x7f070, BAD_DUMP CRC(045858cd) SHA1(232a9631bcdbbd2e60970eca62bdc540e537e1f2) )
@@ -7556,7 +8169,8 @@ ROM_END
 // Wizard Ways / Local / A - 04/11/96
 // ROM says 1996 but game has newer style music and a 1998+ style denomination sign
 ROM_START( wizways )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b88
 	    0x000000-0x05ee9b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7580,7 +8194,8 @@ ROM_END
 // 0100337V / 600 / 10 Credit Multiplier/9 Line Multiline
 // Wild Angels / Local / B - 24/09/96
 ROM_START( wldangel )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000ae0
 	    0x000000-0x05259f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7603,8 +8218,11 @@ ROM_END
 
 // RHG0418-04 / 541/2 / 10 Credit Multiplier / 5 Line Multiline
 // Winning Post / Export / G - 11/02/97
+// No set chips required
 ROM_START( wnpost )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d08
 	    0x000000-0x0c3697 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7628,7 +8246,8 @@ ROM_END
 // 0101158V / 608/4 / 3 Credit Multiplier/3 Line Multiline
 // Wild Thing / NSW/ACT / B - 14/12/99
 ROM_START( wthing )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b74
 	    0x000000-0x0673cb is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7652,7 +8271,8 @@ ROM_END
 // 0201176V / 608/5 / 25 Credit Multiplier/20 Line Multiline
 // Wild Thing / NSW/ACT / B - 25/02/00
 ROM_START( wthinga )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	// checksum code not found due to ROMs being corrupted, all files are missing bytes consisting of 0x0D
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "0201176v.u7",  0x000000, 0x7f44a, BAD_DUMP CRC(e2632da7) SHA1(ff53d87d8f45c3bcece358d0ecfa89e6912e1ccf) )
@@ -7671,7 +8291,8 @@ ROM_END
 // 0200954V / 638/1 / 10 Credit Multiplier / 20 Line Multiline
 // White Tiger Classic / NSW/ACT / B - 08/07/99
 ROM_START( wtiger )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d30
 	    0x000000-0x060227 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7692,7 +8313,8 @@ ROM_END
 // 03J00191 / JB005/1 / Multi credit / Multi line
 // Yukon Gold / NSW/ACT / A - 30/10/2000
 ROM_START( yukongl5 )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000bb8
 	    0x000000-0x06dbc3 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7719,233 +8341,236 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-#define MACHINE_FLAGS MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND|MACHINE_IMPERFECT_GRAPHICS
-
 //     YEAR  NAME         PARENT    MACHINE             INPUT         CLASS           INIT           ROT   COMPANY       FULLNAME                                                FLAGS
-GAMEL( 1995, aristmk5,    0,        aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "MKV Set/Clear Chips (USA)",                            MACHINE_FLAGS|MACHINE_IS_BIOS_ROOT, layout_aristmk5_us )
+GAMEL( 1995, aristmk5,    0,        aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "MKV Set/Clear Chips (USA)",                            MACHINE_NOT_WORKING | MACHINE_IS_BIOS_ROOT, layout_aristmk5_us )
 
 // Dates listed below are for the combination (reel layout), not release dates
-GAMEL( 1998, adonis,      aristmk5, aristmk5,           aristmk5,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Adonis (0200751V, NSW/ACT)",                           MACHINE_FLAGS, layout_aristmk5 )        // 602/9, A - 25/05/98, Rev 10
-GAMEL( 1998, adonisa,     adonis,   aristmk5,           aristmk5,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Adonis (0100751V, NSW/ACT)",                           MACHINE_FLAGS, layout_aristmk5 )        // 602/9, A - 25/05/98, Rev 9
-GAMEL( 1999, adonisce,    adonis,   aristmk5,           adonisce,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Adonis - Cash Express (0201005V, NSW/ACT)",            MACHINE_FLAGS, layout_aristmk5 )        // 602/9, C - 06/07/99, Rev 12
-GAMEL( 2001, adonisu,     adonis,   aristmk5_usa,       bootsctnua,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Adonis (BHG1508, US)",                                 MACHINE_FLAGS, layout_adonisu )         // MV4124/1, B - 31/07/01
-GAMEL( 2002, alchemst,    aristmk5, aristmk5,           goldenra,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Alchemist (01J02046, Venezuela)",                      MACHINE_FLAGS, layout_yukongl5 )        // JB013/1, A - 22/01/02, Rev 17
-GAMEL( 2000, bparty,      aristmk5, aristmk5_usa_touch, bootsctnua,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Bachelorette Party (BHG1248, US)",                     MACHINE_FLAGS, layout_bparty )          // MV4119/1, B - 25/08/2000
-GAMEL( 1996, baddog,      aristmk5, aristmk5,           baddog,       aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Bad Dog Poker (0200428V, NSW/ACT)",                    MACHINE_FLAGS, layout_baddog )          // 386/56, A - 17/12/96
-GAMEL( 1998, bootsctn,    aristmk5, aristmk5,           cashcham,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Boot Scootin' (0100812V, NSW/ACT)",                    MACHINE_FLAGS, layout_cashcham )        // 616/1, B - 11/12/98, Rev 20
-GAMEL( 1999, bootsctnu,   bootsctn, aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Boot Scootin' (GHG1012-02, US)",                       MACHINE_FLAGS, layout_aristmk5_us )     // MV4098, A - 25/08/99
-GAMEL( 1999, bootsctnua,  bootsctn, aristmk5_usa,       pengpuck,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Boot Scootin' (GHG1008-03, US)",                       MACHINE_FLAGS, layout_aristmk5_us_200 ) // MV4098/1, A - 27/07/99
-GAMEL( 2001, bootsctnub,  bootsctn, aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Boot Scootin' (AHG1547, US)",                          MACHINE_FLAGS, layout_adonisu )         // MV4098/1, B - 22/03/01
-GAMEL( 1996, bumblbug,    aristmk5, aristmk5,           bumblbug,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Bumble Bugs (0200510V, NSW/ACT)",                      MACHINE_FLAGS, layout_bumblbug )        // 593, D - 5/07/96, Rev 3
-GAMEL( 1996, bumblbugql,  bumblbug, aristmk5,           swhr2,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Bumble Bugs (0200456V, Queensland)",                   MACHINE_FLAGS, layout_swhr2 )           // 593, D - 5/07/96, Rev 1.0
-GAMEL( 1997, bumblbugu,   bumblbug, aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Bumble Bugs (CHG0479-03, US)",                         MACHINE_FLAGS, layout_aristmk5_us )     // 593, D - 05/07/97
-GAMEL( 1997, bumblbugua,  bumblbug, aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Bumble Bugs (CHG0479-99, US)",                         MACHINE_FLAGS, layout_aristmk5_us )     // 593, D - 05/07/97
-GAMEL( 1995, buttdeli,    aristmk5, aristmk5,           swhr2,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Butterfly Delight (0200143V, NSW/ACT)",                MACHINE_FLAGS, layout_swhr2 )           // 571/4, A - 19/12/95, Rev 1.8.1.0
-GAMEL( 1998, cashcat,     aristmk5, aristmk5,           aristmk5,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Cash Cat (0100676V, NSW/ACT)",                         MACHINE_FLAGS, layout_aristmk5 )        // 614/3, A - 03/04/98, Rev 7
-GAMEL( 1997, cashcata,    cashcat,  aristmk5,           aristmk5_9,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Cash Cat (0100557V, NSW/ACT)",                         MACHINE_FLAGS, layout_dolphntrb )       // 614/1, B - 01/12/97, Rev 7
-GAMEL( 1999, cashcatnz,   cashcat,  aristmk5,           cashcatnz,    aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Cash Cat (0300863V, New Zealand)",                     MACHINE_FLAGS, layout_cashcatnz )       // MV4089, A - 4/1/99, Rev 26
-GAMEL( 1997, cashcham,    aristmk5, aristmk5,           cashcham,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Cash Chameleon (0100438V, NSW/ACT)",                   MACHINE_FLAGS, layout_cashcham )        // 603/1, C  - 15/4/97, Rev 1.25.3.0
-GAMEL( 1998, cashchama,   cashcham, aristmk5,           cashchama,    aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Cash Chameleon (0200437V, NSW/ACT)",                   MACHINE_FLAGS, layout_cashchama )       // 603(a), D - 18/02/98, Rev 3
-GAMEL( 1998, cashchamnz,  cashcham, aristmk5,           cashchamnz,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Cash Chameleon (0300781V, New Zealand)",               MACHINE_FLAGS, layout_cashchamnz )      // MV4067, A - 31/08/98, Rev 21
-GAMEL( 1996, cashchamu,   cashcham, aristmk5_usa,       bootsctnua,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Cash Chameleon (DHG4078-99, US)",                      MACHINE_FLAGS, layout_cashchamu )       // 603(a), B - 06/12/96
-GAMEL( 1997, cashcra5,    aristmk5, aristmk5,           aristmk5,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Cash Crop (0300467V, NSW/ACT)",                        MACHINE_FLAGS, layout_aristmk5 )        // 607, C - 14/07/97, Rev 6
-GAMEL( 1998, chariotc,    aristmk5, aristmk5,           chariotc,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "The Chariot Challenge (0100787V, NSW/ACT)",            MACHINE_FLAGS, layout_aristmk5 )        // 630/1, A - 10/08/98, Rev 11
-GAMEL( 1998, chariotcv,   chariotc, aristmk5,           chariotcv,    aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "The Chariot Challenge (04J00714, Venezuela)",          MACHINE_FLAGS, layout_snowcat )         // 630, A - 10/08/98, Rev 12
-GAMEL( 2001, checkma5,    aristmk5, aristmk5,           checkma5,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Checkmate (01J00681, NSW/ACT)",                        MACHINE_FLAGS, layout_checkma5 )        // JB011, B - 06/07/01, Rev 17
-GAMEL( 1996, chickna5,    aristmk5, aristmk5,           chickna5,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Chicken (0100351V, NSW/ACT)",                          MACHINE_FLAGS, layout_snowcat )         // 596, A - 27/08/96, Rev 1.24
-GAMEL( 1998, chickna5ql,  chickna5, aristmk5,           chickna5,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Chicken (0200530V, Queensland)",                       MACHINE_FLAGS, layout_snowcat )         // 596, C - 23/02/98, Rev 1.0
-GAMEL( 1998, chickna5u,   chickna5, aristmk5_usa,       chickna5u,    aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Chicken (RHG0730-03, US)",                             MACHINE_FLAGS, layout_aristmk5_us )     // 596, C - 23/02/98
-GAMEL( 1998, chickna5ua,  chickna5, aristmk5_usa,       chickna5u,    aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Chicken (RHG0730-99, US)",                             MACHINE_FLAGS, layout_aristmk5_us )     // 596, C - 23/02/98
-GAMEL( 1998, coralrc2,    aristmk5, aristmk5,           coralrc2,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Coral Riches II (0100919V, NSW/ACT)",                  MACHINE_FLAGS, layout_coralrc2 )        // 577/7, A - 29/12/98, Rev 12
-GAMEL( 1998, cuckoo,      aristmk5, aristmk5,           aristmk5,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Cuckoo (0200753V, NSW/ACT)",                           MACHINE_FLAGS, layout_aristmk5 )        // 615/1, D - 03/07/98, Rev 6
-GAMEL( 2000, cuckoou,     cuckoo,   aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Cuckoo (CHG1195, US)",                                 MACHINE_FLAGS, layout_cuckoou )         // MV4104, C - 02/02/00
-GAMEL( 1995, dstbloom,    aristmk5, aristmk5,           wcougar,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Desert Bloom (0300111V, NSW/ACT)",                     MACHINE_FLAGS, layout_wcougar )         // 577/2, A - 12/10/95, Rev 1.16.4.0
-GAMEL( 1995, dstblooma,   dstbloom, aristmk5,           wcougar,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Desert Bloom (0200111V, NSW/ACT)",                     MACHINE_FLAGS, layout_wcougar )         // 577/2, A - 12/10/95, Rev 1.16.4.0
-GAMEL( 1999, diamdove,    aristmk5, aristmk5,           retrsam,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Diamond Dove (0101018V, NSW/ACT)",                     MACHINE_FLAGS, layout_sbuk3 )           // 640, B - 19/05/99, Rev 8
-GAMEL( 1996, dmdfever,    aristmk5, aristmk5,           wildbill,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Diamond Fever (0200302V, NSW/ACT)",                    MACHINE_FLAGS, layout_wildbill )        // 483/7, E - 05/09/96, Rev 1.23.5.0
-GAMEL( 1997, dimtouch,    aristmk5, aristmk5_touch,     dimtouch,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Diamond Touch (0400433V, NSW/ACT)",                    MACHINE_FLAGS, layout_dimtouch )        // 604, E - 30/06/97, Rev 17
-GAMEL( 1996, dolphntr,    aristmk5, aristmk5,           aristmk5,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Dolphin Treasure (0200424V, NSW/ACT)",                 MACHINE_FLAGS, layout_aristmk5 )        // 602/1, B - 06/12/96, Rev 3
-GAMEL( 1996, dolphntra,   dolphntr, aristmk5,           aristmk5,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Dolphin Treasure (0100424V, NSW/ACT)",                 MACHINE_FLAGS, layout_aristmk5 )        // 602/1, B - 06/12/96, Rev 1.24.4.0
-GAMEL( 1996, dolphntrb,   dolphntr, aristmk5,           aristmk5_9,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Dolphin Treasure (0100388V, NSW/ACT)",                 MACHINE_FLAGS, layout_dolphntrb )       // 602, B - 10/12/96, Rev 1.24.4.0
-GAMEL( 1996, dolphntru,   dolphntr, aristmk5_usa,       dolphntru,    aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Dolphin Treasure (FHG4077-02, US)",                    MACHINE_FLAGS, layout_aristmk5_us )     // 602/1, B - 06/12/96
-GAMEL( 1999, dolphntrce,  dolphntr, aristmk5_usa,       dolphntrce,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Dolphin Treasure - Cash Express (AHG1607, US)",        MACHINE_FLAGS, layout_adonisu )         // MV4090, D - 22/12/99
-GAMEL( 1999, dolphntrcea, dolphntr, aristmk5_usa,       dolphntru,    aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Dolphin Treasure - Cash Express (AHG1606, US)",        MACHINE_FLAGS, layout_magimaska )       // MV4090, D - 22/12/99
-GAMEL( 1999, dolphntrceb, dolphntr, aristmk5_usa,       dolphntrce,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Dolphin Treasure - Cash Express (AHG1519, US)",        MACHINE_FLAGS, layout_dolphntrceb )     // MV4090, D - 22/12/99
-GAMEL( 1997, drgneye,     aristmk5, aristmk5,           snowcat,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Dragon's Eye (0100521V, NSW/ACT)",                     MACHINE_FLAGS, layout_snowcat )         // 610, A - 09/05/97, Rev 1.27
-GAMEL( 1997, dreamwv,     aristmk5, aristmk5_touch,     dreamwv,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Dream Weaver (0200586V, NSW/ACT)",                     MACHINE_FLAGS, layout_dreamwv )         // 606/2, A - 20/06/97, Rev 16
-GAMEL( 2000, dynajack,    aristmk5, aristmk5,           dynajack,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Dynamite Jack (01J00081, NSW/ACT)",                    MACHINE_FLAGS, layout_dynajack )        // JB004, A - 12/07/2000, Rev 17
-GAMEL( 1998, eldorda5,    aristmk5, aristmk5,           reelrock,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "El Dorado (0100652V, NSW/ACT)",                        MACHINE_FLAGS, layout_reelrock )        // 623, B - 24/03/98, Rev 3
-GAMEL( 1995, eforsta5,    aristmk5, aristmk5,           swhr2,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Enchanted Forest (0400122V, NSW/ACT)",                 MACHINE_FLAGS, layout_swhr2 )           // 570/3, E - 23/06/95, Rev 1.18
-GAMEL( 1997, eforsta5u,   eforsta5, aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Enchanted Forest (JHG0415-03, US)",                    MACHINE_FLAGS, layout_aristmk5_us )     // MV4033, B - 10/02/97
-GAMEL( 1997, eforsta5ua,  eforsta5, aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Enchanted Forest (JHG0415-99, US)",                    MACHINE_FLAGS, layout_aristmk5_us )     // MV4033, B - 10/02/97
-GAMEL( 2000, eforsta5cea, eforsta5, aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Enchanted Forest - Cash Express (AHG1615, US)",        MACHINE_FLAGS, layout_magimaska )       // MV4108/6, C - 17/01/00
-GAMEL( 1998, fastfort,    aristmk5, aristmk5,           wildbill,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Fast Fortune (0100651V, NSW/ACT)",                     MACHINE_FLAGS, layout_wildbill )        // 624, D - 07/05/98, Rev 5
-GAMEL( 2000, fortellr,    aristmk5, aristmk5,           goldenra,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Fortune Teller (01J00131, NSW/ACT)",                   MACHINE_FLAGS, layout_fortellr )        // JB006, D - 24/11/2000, Rev 17
-GAMEL( 1998, gambler,     aristmk5, aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "The Gambler (EHG0916-02, US)",                         MACHINE_FLAGS, layout_aristmk5_us )     // MV4084/1, A - 30/10/98
-GAMEL( 2001, geisha,      aristmk5, aristmk5,           geisha,       aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Geisha (0101408V, New Zealand)",                       MACHINE_FLAGS, layout_geisha )          // MV4127, A - 05/03/01, Rev 25
-GAMEL( 1999, genmagi,     aristmk5, aristmk5_touch,     genmagi,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Genie Magic (0200894V, NSW/ACT)",                      MACHINE_FLAGS, layout_genmagi )         // 632/1, C - 15/02/99, Rev 20
-GAMEL( 2001, glizrdce,    aristmk5, aristmk5_usa,       bootsctnua,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Green Lizard - Cash Express (AHG1623, US)",            MACHINE_FLAGS, layout_adonisu )         // MV4112/2 - A - 05/01/01
-GAMEL( 1998, gnomeatw,    aristmk5, aristmk5,           kgalah,       aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Gnome Around The World (0100767V, NSW/ACT)",           MACHINE_FLAGS, layout_kgalah )          // 625, C - 18/12/98, Rev 16
-GAMEL( 1997, goldpyr,     aristmk5, aristmk5_usa,       dolphntru,    aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Golden Pyramids (AHG1205-03, US)",                     MACHINE_FLAGS, layout_aristmk5_us )     // MV4091, B - 13/05/97
-GAMEL( 1997, goldpyra,    goldpyr,  aristmk5_usa,       bootsctnua,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Golden Pyramids (AHG1206-99, US)",                     MACHINE_FLAGS, layout_aristmk5_us_200 ) // 602/2, B - 13/05/97
-GAMEL( 1998, goldpyrb,    goldpyr,  aristmk5,           goldpyrb,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Golden Pyramids (0100878V, Victoria)",                 MACHINE_FLAGS, layout_goldpyrb )        // 602/5, C - 19/06/98
-GAMEL( 2000, goldenra,    aristmk5, aristmk5,           goldenra,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Golden Ra (0101164V, NSW/ACT)",                        MACHINE_FLAGS, layout_goldenra )        // 661, A - 10/04/00, Rev 15
-GAMEL( 2001, hnktonku,    aristmk5, aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Honky Tonk (BHG1455, US)",                             MACHINE_FLAGS, layout_magimaska )       // MV4122/3, A - 07/08/01
-GAMEL( 2000, honeypot,    aristmk5, aristmk5,           goldenra,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Honey Pot (03J00241, NSW/ACT)",                        MACHINE_FLAGS, layout_yukongl5 )        // JB008, A - 21/11/2000, Rev 17
-GAMEL( 1999, incasun,     aristmk5, aristmk5,           incasun,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Inca Sun (0100872V, NSW/ACT)",                         MACHINE_FLAGS, layout_incasun )         // 631/3 B, B - 03/05/99, Rev 15
-GAMEL( 1999, incasunsp,   incasun,  aristmk5,           incasun,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Inca Sun (0100872V, NSW/ACT, Show Program)",           MACHINE_FLAGS, layout_incasun )         // 631/3 B, B - 03/05/99, Rev 15
-GAMEL( 2000, incasunnz,   incasun,  aristmk5,           incasunnz,    aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Inca Sun (0101108V, New Zealand)",                     MACHINE_FLAGS, layout_incasunnz )       // MV4113, A - 6/3/00, Rev 25
-GAMEL( 2000, incasunu,    incasun,  aristmk5_usa,       dolphntrce,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Inca Sun (CHG1458, US)",                               MACHINE_FLAGS, layout_adonisu )         // MV4130/3, A - 05/09/00
-GAMEL( 2000, incasunua,   incasun,  aristmk5_usa,       bootsctnua,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Inca Sun (DHG1577, US)",                               MACHINE_FLAGS, layout_adonisu )         // MV4130, A - 05/09/00
-GAMEL( 1999, incasunv,    incasun,  aristmk5,           incasun,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Inca Sun (01J01946, Venezuela)",                       MACHINE_FLAGS, layout_incasun )         // 631/3 B, B- 03/05/99, Rev 15
-GAMEL( 1998, indrema5,    aristmk5, aristmk5,           indrema5,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Indian Dreaming (0100845V, NSW/ACT)",                  MACHINE_FLAGS, layout_indrema5 )        // 628/1, B - 15/12/98, Rev 7
-GAMEL( 1996, jumpjoey,    aristmk5, aristmk5,           cashcham,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Jumpin' Joey (0100383V, NSW/ACT)",                     MACHINE_FLAGS, layout_cashcham )        // 586/6, C - 13/11/96
-GAMEL( 1996, jungjuic,    aristmk5, aristmk5,           jungjuic,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Jungle Juice (0200240V, New Zealand)",                 MACHINE_FLAGS, layout_jungjuic )        // 566/3, F - 06/03/96
-GAMEL( 1995, kgalah,      aristmk5, aristmk5,           kgalah,       aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "King Galah (0200536V, NSW/ACT)",                       MACHINE_FLAGS, layout_kgalah )          // 613/6, A - 21/07/95
-GAMEL( 1995, kgalaha,     kgalah,   aristmk5,           kgalah,       aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "King Galah (0100536V, NSW/ACT)",                       MACHINE_FLAGS, layout_kgalah )          // 613, A - 21/07/95
-GAMEL( 2001, kgalahce,    kgalah,   aristmk5_usa,       bootsctnua,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "King Galah - Cash Express (AHG1625, US)",              MACHINE_FLAGS, layout_adonisu )         // MV4112/2, B - 07/02/01
-GAMEL( 1994, kgbirda5,    aristmk5, aristmk5,           kgbirda5,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "K.G. Bird (0200024V, NSW/ACT)",                        MACHINE_FLAGS, layout_kgbirda5 )        // 540/3, D - 10/10/94
-GAMEL( 2001, koalamnt,    aristmk5, aristmk5_usa,       dolphntrce,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Koala Mint (CHG1573, US)",                             MACHINE_FLAGS, layout_adonisu )         // MV4137, A - 12/09/01
-GAMEL( 1998, kookabuk,    aristmk5, aristmk5,           aristmk5,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Kooka Bucks (0100677V, NSW/ACT)",                      MACHINE_FLAGS, layout_aristmk5 )        // 661, A - 03/04/98, Rev 5
-GAMEL( 2000, kyhatonu,    aristmk5, aristmk5_usa_touch, bootsctnua,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Keep Your Hat On (BHG1204, US)",                       MACHINE_FLAGS, layout_bparty )          // MV4114/1, B - 08/05/2000
-GAMEL( 1997, locoloot,    aristmk5, aristmk5,           cashcham,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Loco Loot (0100473V, NSW/ACT)",                        MACHINE_FLAGS, layout_cashcham )        // 599/3, C - 17/06/97, Rev 1.26.13.0
-GAMEL( 1997, locoloota,   locoloot, aristmk5,           locoloota,    aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Loco Loot (0100472V, NSW/ACT)",                        MACHINE_FLAGS, layout_locoloota )       // 599/2, C - 17/06/97, Rev 1.26.13.0
-GAMEL( 1998, locolootnz,  locoloot, aristmk5,           cashchamnz,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Loco Loot (0600725V, New Zealand)",                    MACHINE_FLAGS, layout_cashchamnz )      // MV4064, A - 8/7/98, Rev 24
-GAMEL( 2001, locolootu,   locoloot, aristmk5_usa,       bootsctnua,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Loco Loot (AHG1513, US)",                              MACHINE_FLAGS, layout_adonisu )         // MV4134, A - 30/07/01
-GAMEL( 1997, lonewolf,    aristmk5, aristmk5,           wildbill,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Lone Wolf (0100587V, NSW/ACT)",                        MACHINE_FLAGS, layout_wildbill )        // 621, A - 29/10/97, Rev 1.27.17.0
-GAMEL( 1995, luckyclo,    aristmk5, aristmk5,           wcougar,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Lucky Clover (0300109V, NSW/ACT)",                     MACHINE_FLAGS, layout_wcougar )         // 570/6, A - 12/10/95
-GAMEL( 2000, magimask,    aristmk5, aristmk5_usa_touch, bootsctnua,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Magic Mask (AHG1549, US)",                             MACHINE_FLAGS, layout_adonisu )         // MV4115_1, A - 09/05/00
-GAMEL( 2000, magimaska,   magimask, aristmk5_usa_touch, aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Magic Mask (AHG1548, US)",                             MACHINE_FLAGS, layout_magimaska )       // MV4115, A - 09/05/00
-GAMEL( 2000, magimaskb,   magimask, aristmk5_usa_touch, aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Magic Mask (DHG1309, US)",                             MACHINE_FLAGS, layout_magimaska )       // MV4115, A - 09/05/00
-GAMEL( 1997, magtcha5,    aristmk5, aristmk5_touch,     dimtouch,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Magic Touch (0300455V, NSW/ACT)",                      MACHINE_FLAGS, layout_dimtouch )        // 606, A - 06/03/97, Rev 14
-GAMEL( 1997, magtcha5a,   magtcha5, aristmk5_touch,     dimtouch,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Magic Touch (0200455V, NSW/ACT)",                      MACHINE_FLAGS, layout_dimtouch )        // 606, A - 06/03/97, Rev 14
-GAMEL( 1997, mammothm,    aristmk5, aristmk5,           kgalah,       aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Mammoth Money (0100425V, NSW/ACT)",                    MACHINE_FLAGS, layout_kgalah )          // 595/5, D - 07/04/97, Rev 1.22.14.1
-GAMEL( 2000, marmagic,    aristmk5, aristmk5,           goldenra,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Margarita Magic (01J00101, NSW/ACT)",                  MACHINE_FLAGS, layout_marmagic )        // JB005, A - 07/07/00, Rev 17
-GAMEL( 2000, marmagicu,   marmagic, aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Margarita Magic (EHG1558, US)",                        MACHINE_FLAGS, layout_magimaska )       // US003, 07/07/2000
-GAMEL( 2000, marmagicua,  marmagic, aristmk5_usa,       bootsctnua,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Margarita Magic (EHG1559, US)",                        MACHINE_FLAGS, layout_adonisu )         // US003, A - 07/07/00
-GAMEL( 1997, mgarden,     aristmk5, aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Magic Garden (AHG1211-99, US)",                        MACHINE_FLAGS, layout_aristmk5_us )     // MV4033, B - 10/02/97 (alt title for enchanted forest?)
-GAMEL( 1996, minemine,    aristmk5, aristmk5,           swhr2,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Mine, Mine, Mine (0400115V, NSW/ACT)",                 MACHINE_FLAGS, layout_swhr2 )           // 559/2, D - 16/01/96, Rev 1.18.3.0
-GAMEL( 1996, minemineu,   minemine, aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Mine, Mine, Mine (VHG0416-99, US)",                    MACHINE_FLAGS, layout_aristmk5_us )     // 559/2, E - 14/02/96
-GAMEL( 1996, minemineua,  minemine, aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Mine, Mine, Mine (NHG0416-99, US)",                    MACHINE_FLAGS, layout_aristmk5_us )     // 559/2, E - 14/02/96
-GAMEL( 1997, monmouse,    aristmk5, aristmk5,           cashcham,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Money Mouse (0400469V, NSW/ACT)",                      MACHINE_FLAGS, layout_cashcham )        // 607/1, B - 08/04/97, Rev 6
-GAMEL( 1997, monmousea,   monmouse, aristmk5,           cashcham,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Money Mouse (0300469V, NSW/ACT)",                      MACHINE_FLAGS, layout_cashcham )        // 607/1, B - 08/04/97, Rev 6
-GAMEL( 2001, montree,     aristmk5, aristmk5,           montree,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Money Tree (0201397V, New Zealand)",                   MACHINE_FLAGS, layout_montree )         // MV4126, C - 12/04/01, Rev 5
-GAMEL( 1996, mountmon,    aristmk5, aristmk5,           mountmon,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Mountain Money (0100294V, NSW/ACT)",                   MACHINE_FLAGS, layout_mountmon )        // 595/3, B - 11/06/96, Rev 1.22.5.0
-GAMEL( 1996, mountmona,   mountmon, aristmk5,           mystgard,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Mountain Money (0100289V, NSW/ACT)",                   MACHINE_FLAGS, layout_mystgard )        // 595/2, C - 11/06/96, Rev 1.22.5.0
-GAMEL( 2001, mountmonua,  mountmon, aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Mountain Money (BHG1464, US)",                         MACHINE_FLAGS, layout_magimaska )       // MV4108/5, A - 10/03/01
-GAMEL( 2000, multidrw,    aristmk5, aristmk5,           multidrw,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Multidraw - Free Games (0200956V, NSW/ACT)",           MACHINE_FLAGS, layout_multidrw )        // 386/64, E - 08/05/00, Rev 17
-GAMEL( 1996, mystgard,    aristmk5, aristmk5,           mystgard,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Mystic Garden (0100275V, NSW/ACT)",                    MACHINE_FLAGS, layout_mystgard )        // 595/1, B - 11/06/96, Rev 1.22
-GAMEL( 2001, one4all,     aristmk5, aristmk5,           one4all,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "One For All (0101503V, New Zealand)",                  MACHINE_FLAGS, layout_one4all )         // MV4141, A - 28/05/01, Rev 11
-GAMEL( 1999, orchidms,    aristmk5, aristmk5,           orchidms,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Orchid Mist (0200849V, NSW/ACT)",                      MACHINE_FLAGS, layout_orchidms )        // 601/3, C - 03/02/99, Rev 8
-GAMEL( 1999, orchidmsa,   orchidms, aristmk5,           orchidms,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Orchid Mist (0100849V, NSW/ACT)",                      MACHINE_FLAGS, layout_orchidms )        // 601/3, C - 03/02/99, Rev 6
-GAMEL( 1996, oscara5,     aristmk5, aristmk5,           aristmk5_9,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Oscar (0200348V, NSW/ACT)",                            MACHINE_FLAGS, layout_dolphntrb )       // 593/2, C - 20/09/96, Rev 3
-GAMEL( 1996, oscara5a,    oscara5,  aristmk5,           aristmk5_9,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Oscar (0100348V, NSW/ACT)",                            MACHINE_FLAGS, layout_dolphntrb )       // 593/2, C - 20/09/96, Rev 1.23.9.1
-GAMEL( 1999, pantmag,     aristmk5, aristmk5,           kgalah,       aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Panther Magic (0101046V, NSW/ACT)",                    MACHINE_FLAGS, layout_pantmag )         // 594/7, A - 06/10/99, Rev 16
-GAMEL( 1999, pantmaga,    pantmag,  aristmk5,           pantmaga,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Panther Magic (0100716V, NSW/ACT)",                    MACHINE_FLAGS, layout_pantmaga )        // 594/4, A - 13/05/98, Rev 9
-GAMEL( 2001, partygrs,    aristmk5, aristmk5_usa_touch, aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Party Gras (AHG1567, US)",                             MACHINE_FLAGS, layout_magimaska )       // MV4115/6, A - 10/11/01
-GAMEL( 2001, partygrsa,   partygrs, aristmk5_usa_touch, bootsctnua,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Party Gras (BHG1284, US)",                             MACHINE_FLAGS, layout_bparty )          // MV4115/3, B - 06/02/01
-GAMEL( 2000, peaflut,     aristmk5, aristmk5,           trstrove,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Peacock Flutter (02J00011, NSW/ACT)",                  MACHINE_FLAGS, layout_trstrove )        // JB001, A - 10/03/00, Rev 8
-GAMEL( 1997, pengpay,     aristmk5, aristmk5,           cashchama,    aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Penguin Pays (0200460V, NSW/ACT)",                     MACHINE_FLAGS, layout_cashchama )       // 586/4(a), D - 03/06/97, Rev 3
-GAMEL( 1996, pengpaya,    pengpay,  aristmk5,           cashchama,    aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Penguin Pays (0200357V, NSW/ACT)",                     MACHINE_FLAGS, layout_cashchama )       // 586/4, C - 12/11/96
-GAMEL( 1997, pengpayb,    pengpay,  aristmk5,           swhr2,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Penguin Pays (0200359V, NSW/ACT)",                     MACHINE_FLAGS, layout_swhr2 )           // 586/3(a), D - 03/06/97, Rev 4
-GAMEL( 1995, pengpayc,    pengpay,  aristmk5,           wcougar,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Penguin Pays (0200113V, NSW/ACT)",                     MACHINE_FLAGS, layout_wcougar )         // 586, A - 12/10/95
-GAMEL( 1997, pengpayu,    pengpay,  aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Penguin Pays (BHI0417-03, US)",                        MACHINE_FLAGS, layout_aristmk5_us )     // 586/7(b), B - 14/07/97
-GAMEL( 1997, pengpayua,   pengpay,  aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Penguin Pays (OHG0417-03, US)",                        MACHINE_FLAGS, layout_aristmk5_us )     // 586/7(b), B - 14/07/97
-GAMEL( 1997, pengpayub,   pengpay,  aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Penguin Pays (OHG0417-02, US)",                        MACHINE_FLAGS, layout_aristmk5_us )     // 586/7(b), B - 14/07/97
-GAMEL( 2001, pengpayce,   pengpay,  aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Penguin Pays - Cash Express (AHG1544, US)",            MACHINE_FLAGS, layout_qnilecea )        // MV4122,  C - 19/01/01
-GAMEL( 2001, pengpuck,    pengpay,  aristmk5_usa,       pengpuck,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Penguin Pays - Penguin Pucks (EHG1257, US)",           MACHINE_FLAGS, layout_pengpuck )        // MV4122/1, C - 19/01/01
-GAMEL( 1998, penpir,      aristmk5, aristmk5,           kgalah,       aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Penguin Pirate (0100674V, NSW/ACT)",                   MACHINE_FLAGS, layout_kgalah )          // 619/1, A - 31/03/98, Rev 10
-GAMEL( 1998, penpira,     penpir,   aristmk5,           snowcat,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Penguin Pirate (0200578V, NSW/ACT)",                   MACHINE_FLAGS, layout_snowcat )         // 619, A - 27/02/98, Rev 8
-GAMEL( 1998, penpir2,     aristmk5, aristmk5,           penpir2,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Penguin Pirate II (0100869V, Victoria)",               MACHINE_FLAGS, layout_penpir2 )         // 619/3, A - 17/12/98
-GAMEL( 1998, petshop,     aristmk5, aristmk5,           petshop,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Pet Shop (0100731V, NSW/ACT)",                         MACHINE_FLAGS, layout_petshop )         // 618/1, A - 17/04/98, Rev 13
-GAMEL( 1995, phantpay,    aristmk5, aristmk5,           swhr2,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Phantom Pays (0500005V, NSW/ACT)",                     MACHINE_FLAGS, layout_swhr2 )           // 570/1, E - 12/09/95
-GAMEL( 1996, przfight,    aristmk5, aristmk5,           przfight,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Prize Fight (0100299V, NSW/ACT)",                      MACHINE_FLAGS, layout_przfight )        // 578/4, B - 08/08/96
-GAMEL( 1998, qcash,       aristmk5, aristmk5,           kgalah,       aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queens of Cash (0100706V, NSW/ACT)",                   MACHINE_FLAGS, layout_kgalah )          // 603/6, C  - 23/07/98, Rev 6
-GAMEL( 1997, qnile,       aristmk5, aristmk5,           qnile,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile (0300439V, NSW/ACT)",                MACHINE_FLAGS, layout_qnile )           // 602/4, B - 13/05/97, Rev 7
-GAMEL( 1997, qnilea,      qnile,    aristmk5,           qnile,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile (0200439V, NSW/ACT)",                MACHINE_FLAGS, layout_qnile )           // 602/4, B - 13/05/97, Rev 7
-GAMEL( 1997, qnileb,      qnile,    aristmk5,           qnile,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile (0100439V, NSW/ACT)",                MACHINE_FLAGS, layout_qnile )           // 602/4, B - 13/05/97, Rev 1.26.18.1
-GAMEL( 2002, qnilebr,     qnile,    aristmk5,           goldpyrb,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile (0101707V, Brazil)",                 MACHINE_FLAGS, layout_goldpyrb )        // MV4162, A - 21/08/02
-GAMEL( 1997, qnilec,      qnile,    aristmk5,           qnilec,       aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile (0300440V, NSW/ACT)",                MACHINE_FLAGS, layout_qnilec )          // 602/3, B - 13/05/97, Rev 5
-GAMEL( 1999, qniled,      qnile,    aristmk5,           checkma5,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile (0101139V, NSW/ACT)",                MACHINE_FLAGS, layout_qniled )          // 602/16, A - 11/10/99, Rev 14
-GAMEL( 2000, qnilenl,     qnile,    aristmk5,           qnilenl,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile (0301059V, Holland)",                MACHINE_FLAGS, layout_qnilenl )         // 602/5, G - 10/04/00
-GAMEL( 1997, qnileu,      qnile,    aristmk5_usa,       dolphntru,    aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile (GHG4091-02, US)",                   MACHINE_FLAGS, layout_aristmk5_us )     // MV4091, B - 13/05/97
-GAMEL( 1997, qnileua,     qnile,    aristmk5_usa,       dolphntru,    aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile (GHG4091-03, US)",                   MACHINE_FLAGS, layout_aristmk5_us )     // MV4091, B - 13/05/97
-GAMEL( 1997, qnilev,      qnile,    aristmk5,           aristmk5_9,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile (04J00784, Venezuela)",              MACHINE_FLAGS, layout_dolphntrb )       // 602/3, B - 13/05/97, Rev 6
-GAMEL( 2001, qnilece,     qnile,    aristmk5_usa,       dolphntrce,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile - Cash Express (AHG1609, US)",       MACHINE_FLAGS, layout_adonisu )         // MV4091/1, A - 17/01/01
-GAMEL( 2001, qnilecea,    qnile,    aristmk5_usa,       dolphntru,    aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile - Cash Express (AHG1525, US)",       MACHINE_FLAGS, layout_qnilecea )        // MV4091, F - 17/01/01
-GAMEL( 2001, qnileceb,    qnile,    aristmk5_usa,       dolphntru,    aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile - Cash Express (AHG1608, US)",       MACHINE_FLAGS, layout_magimaska )       // MV4091, F - 17/01/01
-GAMEL( 1999, qnilemax,    qnile,    aristmk5_touch,     trstrove,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile - Maximillions (0401072V, NSW/ACT)", MACHINE_FLAGS, layout_trstrove )        // 602/4, D - 18/06/99, Rev 14
-GAMEL( 1994, qtbird,      aristmk5, aristmk5,           qtbird,       aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Q.T. Bird (0500009V, NSW/ACT)",                        MACHINE_FLAGS, layout_qtbird )          // 581, A - 27/10/94, Rev 1.1.1.0
-GAMEL( 2000, rainwrce,    aristmk5, aristmk5,           adonisce,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Rainbow Warriors - Cash Express (0101332V, NSW/ACT)",  MACHINE_FLAGS, layout_aristmk5 )        // 655, B - 02/03/00, Rev 25
-GAMEL( 1998, reelpwr,     aristmk5, aristmk5,           wizways,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Reel Power (0100400V, NSW/ACT)",                       MACHINE_FLAGS, layout_wizways )         // 598/2, A - 01/11/96, Rev 1.23.8.0
-GAMEL( 1998, reelrock,    aristmk5, aristmk5,           reelrock,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Reelin-n-Rockin (0100779V, NSW/ACT)",                  MACHINE_FLAGS, layout_reelrock )        // 628, A - 13/07/98, Rev 5
-GAMEL( 1997, retrsam,     aristmk5, aristmk5,           retrsam,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Return of the Samurai (0400549V, NSW/ACT)",            MACHINE_FLAGS, layout_sbuk3 )           // 608, A - 17/04/97, Rev 5
-GAMEL( 1997, retrsama,    retrsam,  aristmk5,           retrsam,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Return of the Samurai (0200549V, NSW/ACT)",            MACHINE_FLAGS, layout_sbuk3 )           // 608, A - 17/04/97, Rev 1.26.25.3
-GAMEL( 1997, retrsamb,    retrsam,  aristmk5,           retrsamb,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Return of the Samurai (0200506V, NSW/ACT)",            MACHINE_FLAGS, layout_retrsamb )        // 608, A - 17/04/97, Rev 1.26.25.3
-GAMEL( 1997, rushrst,     aristmk5, aristmk5,           rushrst,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Rushin Rooster (0100534V, NSW/ACT)",                   MACHINE_FLAGS, layout_cashchama )       // 596/3, C - 25/06/97, Rev 1.27.2.3
-GAMEL( 2001, sldeluxe,    aristmk5, aristmk5_usa,       bootsctnua,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Sweet Liberty Deluxe (AHG1575, US)",                   MACHINE_FLAGS, layout_adonisu )         // MV4137, A - 11/02/01
-GAMEL( 1998, slvrwolf,    aristmk5, aristmk5,           wamazona,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Silver Wolf (0100673V, NSW/ACT)",                      MACHINE_FLAGS, layout_wamazona )        // 621/2, A - 23/03/98, Rev 3
-GAMEL( 1996, snowcat,     aristmk5, aristmk5,           snowcat,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Snow Cat (0100405V, NSW/ACT)",                         MACHINE_FLAGS, layout_snowcat )         // 599, B - 23/12/96, Rev 1.25.1.0
-GAMEL( 1997, sumospin,    aristmk5, aristmk5,           swhr2,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Sumo Spins (0200606V, NSW/ACT)",                       MACHINE_FLAGS, layout_swhr2 )           // 622, A - 08/12/97, Rev 4
-GAMEL( 1998, sbuk3,       aristmk5, aristmk5,           sbuk3,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Super Bucks III (0200711V, NSW/ACT)",                  MACHINE_FLAGS, layout_sbuk3 )           // 626, A - 22/04/98, Rev 8
-GAMEL( 1998, sbuk3a,      sbuk3,    aristmk5,           sbuk3,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Super Bucks III (0100711V, NSW/ACT)",                  MACHINE_FLAGS, layout_sbuk3 )           // 626, A - 22/04/98, Rev 7
-GAMEL( 1995, swhr2,       aristmk5, aristmk5,           swhr2,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Sweethearts II (0200465V, NSW/ACT)",                   MACHINE_FLAGS, layout_swhr2 )           // 577/1, C - 07/09/95, Rev 3
-GAMEL( 1995, swhr2a,      swhr2,    aristmk5,           swhr2,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Sweethearts II (0200004V, NSW/ACT)",                   MACHINE_FLAGS, layout_swhr2 )           // 577/1, C - 07/09/95, Rev 1.1.3.0
-GAMEL( 1998, swhr2u,      swhr2,    aristmk5_usa,       swhr2u,       aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Sweethearts II (PHG0742-02, US)",                      MACHINE_FLAGS, layout_swhr2u )          // MV4061, A - 29/06/98
-GAMEL( 1995, swhr2v,      swhr2,    aristmk5,           swhr2,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Sweethearts II (01J01986, Venezuela)",                 MACHINE_FLAGS, layout_swhr2 )           // 577/1, C - 07/09/95, Rev 3
-GAMEL( 1996, thor,        aristmk5, aristmk5,           cashcham,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Thor (0200319V, NSW/ACT)",                             MACHINE_FLAGS, layout_cashcham )        // 569/12, B - 14/08/96, Rev 1.23.7.0
-GAMEL( 1996, thndh,       aristmk5, aristmk5,           snowcat,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Thunder Heart (0200333V, NSW/ACT)",                    MACHINE_FLAGS, layout_snowcat )         // 570/9, A - 14/08/96, Rev 1.23.6.0
-GAMEL( 1996, thndha,      thndh,    aristmk5,           wildbill,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Thunder Heart (0200334V, NSW/ACT)",                    MACHINE_FLAGS, layout_wildbill )        // 597/1, A - 14/08/96, Rev 1.23.6.0
-GAMEL( 1997, topbana,     aristmk5, aristmk5,           wildbill,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Top Banana (0100550V, NSW/ACT)",                       MACHINE_FLAGS, layout_wildbill )        // 594/3, A - 18/08/97, Rev 1.26.39.2
-GAMEL( 1998, toutango,    aristmk5, aristmk5,           kgalah,       aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Toucan Tango (0100782V, NSW/ACT)",                     MACHINE_FLAGS, layout_kgalah )          // 616/1, A - 17/06/98, Rev 16
-GAMEL( 1999, toutangonl,  toutango, aristmk5,           toutangonl,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Toucan Tango (0301388V, Holland)",                     MACHINE_FLAGS, layout_toutangonl )      // 616, C - 11/05/99
-GAMEL( 2000, trstrove,    aristmk5, aristmk5,           trstrove,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Treasure Trove (01J00161, NSW/ACT)",                   MACHINE_FLAGS, layout_trstrove )        // JB001/3, A - 5/10/00, Rev 8
-GAMEL( 2002, tritreat,    aristmk5, aristmk5,           trstrove,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Triple Treat (0201692V, NSW/ACT)",                     MACHINE_FLAGS, layout_tritreat )        // 692, A - 17/05/02, Rev 25
-GAMEL( 2001, trojhors,    aristmk5, aristmk5,           goldenra,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Trojan Horse (01J00851, NSW/ACT)",                     MACHINE_FLAGS, layout_marmagic )        // JB001/5, A - 30/10/01, Rev 17
-GAMEL( 1996, trpdlght,    aristmk5, aristmk5,           swhr2,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Tropical Delight (0100269V, NSW/ACT)",                 MACHINE_FLAGS, layout_swhr2 )           // 577/3, B - 15/05/96, Rev 1.22.2.0
-GAMEL( 1997, trpdlghtu,   trpdlght, aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Tropical Delight (PHG0625-02, US)",                    MACHINE_FLAGS, layout_aristmk5_us )     // 577/3, D - 24/09/97
-GAMEL( 1998, unicornd,    aristmk5, aristmk5,           aristmk5,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Unicorn Dreaming (0100791V, NSW/ACT)",                 MACHINE_FLAGS, layout_aristmk5 )        // 631/1 A, A - 31/08/98, Rev 12
-GAMEL( 1998, unicornda,   unicornd, aristmk5,           aristmk5_9,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Unicorn Dreaming (0100813V, NSW/ACT)",                 MACHINE_FLAGS, layout_dolphntrb )       // 631 A, A - 02/09/98, Rev 14
-GAMEL( 2000, unicorndnz,  unicornd, aristmk5,           unicorndnz,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Unicorn Dreaming (0101228V, New Zealand)",             MACHINE_FLAGS, layout_aristmk5 )        // MV4113/1, A - 05/04/2000, Rev 27
-GAMEL( 2001, unicorndu,   unicornd, aristmk5_usa,       bootsctnua,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Unicorn Dreaming (BHG1584, US)",                       MACHINE_FLAGS, layout_adonisu )         // MV4130/1, C - 10/17/01
-GAMEL( 2002, venicea5,    aristmk5, aristmk5,           goldenra,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Venice (02J02056, Venezuela)",                         MACHINE_FLAGS, layout_venicea5 )        // JB009/2, B - 11/07/02, Rev 17
-GAMEL( 2001, wafricau,    aristmk5, aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Wild Africa (AHG1535, US)",                            MACHINE_FLAGS, layout_magimaska )       // MV4076, B - 17/07/01
-GAMEL( 1996, wamazon,     aristmk5, aristmk5,           wamazon,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Wild Amazon (0200507V, NSW/ACT)",                      MACHINE_FLAGS, layout_wamazon )         // 506/8, A - 10/10/96, Rev 3
-GAMEL( 1996, wamazona,    wamazon,  aristmk5,           wamazona,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Wild Amazon (0200285V, NSW/ACT)",                      MACHINE_FLAGS, layout_wamazona )        // 506/6, A - 7/5/96, Rev 1.22.8.0
-GAMEL( 1996, wamazonv,    wamazon,  aristmk5,           wamazon,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Wild Amazon (01J01996, Venezuela)",                    MACHINE_FLAGS, layout_wamazon )         // 506/8, A - 10/10/96, Rev 3
-GAMEL( 1997, wikwin,      aristmk5, aristmk5,           wikwin,       aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Wicked Winnings (0100553V, NSW/ACT)",                  MACHINE_FLAGS, layout_wikwin )          // 609, B - 01/07/97, Rev 1
-GAMEL( 1996, wldangel,    aristmk5, aristmk5,           swhr2,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Wild Angels (0100337V, NSW/ACT)",                      MACHINE_FLAGS, layout_swhr2 )           // 600, B - 24/09/96
-GAMEL( 1996, wildbill,    aristmk5, aristmk5,           wildbill,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Wild Bill (0100297V, NSW/ACT)",                        MACHINE_FLAGS, layout_wildbill )        // 543/8, C - 15/08/96, Rev 1.22.12.0
-GAMEL( 1996, wcougar,     aristmk5, aristmk5,           wcougar,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Wild Cougar (0100167V, NSW/ACT)",                      MACHINE_FLAGS, layout_wcougar )         // 569/9, B - 27/2/96, Rev 1.18.1.0
-GAMEL( 1997, wcougaru,    wcougar,  aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Wild Cougar (NHG0296-04, US)",                         MACHINE_FLAGS, layout_aristmk5_us )     // 569/8, D - 19/05/97
-GAMEL( 1997, wcougarua,   wcougar,  aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Wild Cougar (NHG0296-07, US)",                         MACHINE_FLAGS, layout_aristmk5_us )     // 569/8, D - 19/05/97
-GAMEL( 1997, wcougarub,   wcougar,  aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Wild Cougar (NHG0296-99, US)",                         MACHINE_FLAGS, layout_aristmk5_us )     // 569/8, D - 19/05/97
-GAMEL( 1997, wcougaruc,   wcougar,  aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Wild Cougar (AHG1531, US)",                            MACHINE_FLAGS, layout_magimaska )       // MV4055, B - 13/05/97
-GAMEL( 1996, wizways,     aristmk5, aristmk5,           wizways,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Wizard Ways (0200396V, NSW/ACT)",                      MACHINE_FLAGS, layout_wizways )         // 598/3, A - 04/11/96, Rev 9
-GAMEL( 1997, wnpost,      aristmk5, aristmk5_usa,       wnpost,       aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Winning Post (RHG0418-04, US)",                        MACHINE_FLAGS, layout_wnpost )          // 541/2, G - 11/02/97
-GAMEL( 1999, wthing,      aristmk5, aristmk5,           retrsam,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Wild Thing (0101158V, NSW/ACT)",                       MACHINE_FLAGS, layout_sbuk3 )           // 608/4, B - 14/12/99, Rev 8
-GAMEL( 1999, wtiger,      aristmk5, aristmk5,           wtiger,       aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "White Tiger Classic (0200954V, NSW/ACT)",              MACHINE_FLAGS, layout_wtiger )          // 638/1, B - 08/07/99, Rev 13
-GAMEL( 2000, yukongl5,    aristmk5, aristmk5,           goldenra,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Yukon Gold (03J00191, NSW/ACT)",                       MACHINE_FLAGS, layout_yukongl5 )        // JB005/1, A - 30/10/2000, Rev 17
+GAMEL( 1998, adonis,      aristmk5, aristmk5,           aristmk5,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Adonis (0200751V, NSW/ACT)",                           MACHINE_NOT_WORKING, layout_aristmk5 )        // 602/9, A - 25/05/98, Rev 10
+GAMEL( 1998, adonisa,     adonis,   aristmk5,           aristmk5,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Adonis (0100751V, NSW/ACT)",                           MACHINE_NOT_WORKING, layout_aristmk5 )        // 602/9, A - 25/05/98, Rev 9
+GAMEL( 1999, adonisce,    adonis,   aristmk5,           adonisce,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Adonis - Cash Express (0201005V, NSW/ACT)",            MACHINE_NOT_WORKING, layout_aristmk5 )        // 602/9, C - 06/07/99, Rev 12
+GAMEL( 2001, adonisu,     adonis,   aristmk5_usa,       bootsctnua,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Adonis (BHG1508, US)",                                 MACHINE_NOT_WORKING, layout_adonisu )         // MV4124/1, B - 31/07/01
+GAMEL( 2002, alchemst,    aristmk5, aristmk5,           goldenra,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Alchemist (01J02046, Venezuela)",                      MACHINE_NOT_WORKING, layout_yukongl5 )        // JB013/1, A - 22/01/02, Rev 17
+GAMEL( 2000, bparty,      aristmk5, aristmk5_usa_touch, bootsctnua,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Bachelorette Party (BHG1248, US)",                     MACHINE_NOT_WORKING, layout_bparty )          // MV4119/1, B - 25/08/2000
+GAMEL( 1996, baddog,      aristmk5, aristmk5,           baddog,       aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Bad Dog Poker (0200428V, NSW/ACT)",                    0,                   layout_baddog )          // 386/56, A - 17/12/96
+GAMEL( 1998, bootsctn,    aristmk5, aristmk5,           cashcham,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Boot Scootin' (0100812V, NSW/ACT)",                    MACHINE_NOT_WORKING, layout_cashcham )        // 616/1, B - 11/12/98, Rev 20
+GAMEL( 1999, bootsctnu,   bootsctn, aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Boot Scootin' (GHG1012-02, US)",                       MACHINE_NOT_WORKING, layout_aristmk5_us )     // MV4098, A - 25/08/99
+GAMEL( 1999, bootsctnua,  bootsctn, aristmk5_usa,       pengpuck,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Boot Scootin' (GHG1008-03, US)",                       MACHINE_NOT_WORKING, layout_aristmk5_us_200 ) // MV4098/1, A - 27/07/99
+GAMEL( 2001, bootsctnub,  bootsctn, aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Boot Scootin' (AHG1547, US)",                          MACHINE_NOT_WORKING, layout_adonisu )         // MV4098/1, B - 22/03/01
+GAMEL( 1996, bumblbug,    aristmk5, aristmk5,           swhr2,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Bumble Bugs (0200510V, NSW/ACT)",                      MACHINE_NOT_WORKING, layout_swhr2 )           // 593, D - 5/07/96, Rev 3
+GAMEL( 1996, bumblbugql,  bumblbug, aristmk5,           swhr2,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Bumble Bugs (0200456V, Queensland)",                   MACHINE_NOT_WORKING, layout_swhr2 )           // 593, D - 5/07/96, Rev 1.0
+GAMEL( 1997, bumblbugu,   bumblbug, aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Bumble Bugs (CHG0479-03, US)",                         MACHINE_NOT_WORKING, layout_aristmk5_us )     // 593, D - 05/07/97
+GAMEL( 1997, bumblbugua,  bumblbug, aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Bumble Bugs (CHG0479-99, US)",                         MACHINE_NOT_WORKING, layout_aristmk5_us )     // 593, D - 05/07/97
+GAMEL( 1995, buttdeli,    aristmk5, aristmk5,           swhr2,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Butterfly Delight (0200143V, NSW/ACT)",                0,                   layout_swhr2 )           // 571/4, A - 19/12/95, Rev 1.8.1.0
+GAMEL( 1998, cashcat,     aristmk5, aristmk5,           aristmk5,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Cash Cat (0100676V, NSW/ACT)",                         MACHINE_NOT_WORKING, layout_aristmk5 )        // 614/3, A - 03/04/98, Rev 7
+GAMEL( 1997, cashcata,    cashcat,  aristmk5,           aristmk5_9,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Cash Cat (0100557V, NSW/ACT)",                         MACHINE_NOT_WORKING, layout_dolphntrb )       // 614/1, B - 01/12/97, Rev 7
+GAMEL( 1999, cashcatnz,   cashcat,  aristmk5,           cashcatnz,    aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Cash Cat (0300863V, New Zealand)",                     0,                   layout_cashcatnz )       // MV4089, A - 4/1/99, Rev 26
+GAMEL( 1997, cashcham,    aristmk5, aristmk5,           cashcham,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Cash Chameleon (0100438V, NSW/ACT)",                   0,                   layout_cashcham )        // 603/1, C  - 15/4/97, Rev 1.25.3.0
+GAMEL( 1998, cashchama,   cashcham, aristmk5,           cashchama,    aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Cash Chameleon (0200437V, NSW/ACT)",                   MACHINE_NOT_WORKING, layout_cashchama )       // 603(a), D - 18/02/98, Rev 3
+GAMEL( 1998, cashchamnz,  cashcham, aristmk5,           cashchamnz,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Cash Chameleon (0300781V, New Zealand)",               0,                   layout_cashchamnz )      // MV4067, A - 31/08/98, Rev 21
+GAMEL( 1996, cashchamu,   cashcham, aristmk5_usa,       bootsctnua,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Cash Chameleon (DHG4078-99, US)",                      MACHINE_NOT_WORKING, layout_cashchamu )       // 603(a), B - 06/12/96
+GAMEL( 1997, cashcra5,    aristmk5, aristmk5,           aristmk5,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Cash Crop (0300467V, NSW/ACT)",                        MACHINE_NOT_WORKING, layout_aristmk5 )        // 607, C - 14/07/97, Rev 6
+GAMEL( 1998, chariotc,    aristmk5, aristmk5,           chariotc,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "The Chariot Challenge (0100787V, NSW/ACT)",            MACHINE_NOT_WORKING, layout_aristmk5 )        // 630/1, A - 10/08/98, Rev 11
+GAMEL( 1998, chariotcv,   chariotc, aristmk5,           chariotcv,    aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "The Chariot Challenge (04J00714, Venezuela)",          MACHINE_NOT_WORKING, layout_snowcat )         // 630, A - 10/08/98, Rev 12
+GAMEL( 2001, checkma5,    aristmk5, aristmk5,           checkma5,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Checkmate (01J00681, NSW/ACT)",                        MACHINE_NOT_WORKING, layout_checkma5 )        // JB011, B - 06/07/01, Rev 17
+GAMEL( 1996, chickna5,    aristmk5, aristmk5,           chickna5,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Chicken (0100351V, NSW/ACT)",                          0,                   layout_snowcat )         // 596, A - 27/08/96, Rev 1.24
+GAMEL( 1998, chickna5ql,  chickna5, aristmk5,           chickna5,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Chicken (0200530V, Queensland)",                       MACHINE_NOT_WORKING, layout_snowcat )         // 596, C - 23/02/98, Rev 1.0
+GAMEL( 1998, chickna5u,   chickna5, aristmk5_usa,       chickna5u,    aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Chicken (RHG0730-03, US)",                             MACHINE_NOT_WORKING, layout_aristmk5_us )     // 596, C - 23/02/98
+GAMEL( 1998, chickna5ua,  chickna5, aristmk5_usa,       chickna5u,    aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Chicken (RHG0730-99, US)",                             MACHINE_NOT_WORKING, layout_aristmk5_us )     // 596, C - 23/02/98
+GAMEL( 1998, coralrc2,    aristmk5, aristmk5,           coralrc2,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Coral Riches II (0100919V, NSW/ACT)",                  MACHINE_NOT_WORKING, layout_coralrc2 )        // 577/7, A - 29/12/98, Rev 12
+GAMEL( 1998, cuckoo,      aristmk5, aristmk5,           aristmk5,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Cuckoo (0200753V, NSW/ACT)",                           MACHINE_NOT_WORKING, layout_aristmk5 )        // 615/1, D - 03/07/98, Rev 6
+GAMEL( 2000, cuckoou,     cuckoo,   aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Cuckoo (CHG1195, US)",                                 MACHINE_NOT_WORKING, layout_cuckoou )         // MV4104, C - 02/02/00
+GAMEL( 1995, dstbloom,    aristmk5, aristmk5,           wcougar,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Desert Bloom (0300111V, NSW/ACT)",                     0,                   layout_wcougar )         // 577/2, A - 12/10/95, Rev 1.16.4.0
+GAMEL( 1995, dstblooma,   dstbloom, aristmk5,           wcougar,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Desert Bloom (0200111V, NSW/ACT)",                     0,                   layout_wcougar )         // 577/2, A - 12/10/95, Rev 1.16.4.0
+GAMEL( 1999, diamdove,    aristmk5, aristmk5,           retrsam,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Diamond Dove (0101018V, NSW/ACT)",                     MACHINE_NOT_WORKING, layout_sbuk3 )           // 640, B - 19/05/99, Rev 8
+GAMEL( 1996, dmdfever,    aristmk5, aristmk5,           wildbill,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Diamond Fever (0200302V, NSW/ACT)",                    0,                   layout_wildbill )        // 483/7, E - 05/09/96, Rev 1.23.5.0
+GAMEL( 1997, dimtouch,    aristmk5, aristmk5_touch,     dimtouch,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Diamond Touch (0400433V, NSW/ACT)",                    MACHINE_NOT_WORKING, layout_dimtouch )        // 604, E - 30/06/97, Rev 17
+GAMEL( 1996, dolphntr,    aristmk5, aristmk5,           aristmk5,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Dolphin Treasure (0200424V, NSW/ACT)",                 MACHINE_NOT_WORKING, layout_aristmk5 )        // 602/1, B - 06/12/96, Rev 3
+GAMEL( 1996, dolphntra,   dolphntr, aristmk5,           aristmk5,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Dolphin Treasure (0100424V, NSW/ACT)",                 0,                   layout_aristmk5 )        // 602/1, B - 06/12/96, Rev 1.24.4.0
+GAMEL( 1996, dolphntrb,   dolphntr, aristmk5,           aristmk5_9,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Dolphin Treasure (0100388V, NSW/ACT)",                 0,                   layout_dolphntrb )       // 602, B - 10/12/96, Rev 1.24.4.0
+GAMEL( 1996, dolphntru,   dolphntr, aristmk5_usa,       dolphntru,    aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Dolphin Treasure (FHG4077-02, US)",                    MACHINE_NOT_WORKING, layout_aristmk5_us )     // 602/1, B - 06/12/96
+GAMEL( 1999, dolphntrce,  dolphntr, aristmk5_usa,       dolphntrce,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Dolphin Treasure - Cash Express (AHG1607, US)",        MACHINE_NOT_WORKING, layout_adonisu )         // MV4090, D - 22/12/99
+GAMEL( 1999, dolphntrcea, dolphntr, aristmk5_usa,       dolphntru,    aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Dolphin Treasure - Cash Express (AHG1606, US)",        MACHINE_NOT_WORKING, layout_magimaska )       // MV4090, D - 22/12/99
+GAMEL( 1999, dolphntrceb, dolphntr, aristmk5_usa,       dolphntrce,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Dolphin Treasure - Cash Express (AHG1519, US)",        MACHINE_NOT_WORKING, layout_dolphntrceb )     // MV4090, D - 22/12/99
+GAMEL( 1997, drgneye,     aristmk5, aristmk5,           snowcat,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Dragon's Eye (0100521V, NSW/ACT)",                     0,                   layout_snowcat )         // 610, A - 09/05/97, Rev 1.27
+GAMEL( 1997, dreamwv,     aristmk5, aristmk5_touch,     dreamwv,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Dream Weaver (0200586V, NSW/ACT)",                     MACHINE_NOT_WORKING, layout_dreamwv )         // 606/2, A - 20/06/97, Rev 16
+GAMEL( 2000, dynajack,    aristmk5, aristmk5,           dynajack,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Dynamite Jack (01J00081, NSW/ACT)",                    MACHINE_NOT_WORKING, layout_dynajack )        // JB004, A - 12/07/2000, Rev 17
+GAMEL( 1998, eldorda5,    aristmk5, aristmk5,           reelrock,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "El Dorado (0100652V, NSW/ACT)",                        MACHINE_NOT_WORKING, layout_reelrock )        // 623, B - 24/03/98, Rev 3
+GAMEL( 1995, eforsta5,    aristmk5, aristmk5,           swhr2,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Enchanted Forest (0400122V, NSW/ACT)",                 0,                   layout_swhr2 )           // 570/3, E - 23/06/95, Rev 1.18
+GAMEL( 1997, eforsta5u,   eforsta5, aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Enchanted Forest (JHG0415-03, US)",                    MACHINE_NOT_WORKING, layout_aristmk5_us )     // MV4033, B - 10/02/97
+GAMEL( 1997, eforsta5ua,  eforsta5, aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Enchanted Forest (JHG0415-99, US)",                    MACHINE_NOT_WORKING, layout_aristmk5_us )     // MV4033, B - 10/02/97
+GAMEL( 2000, eforsta5cea, eforsta5, aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Enchanted Forest - Cash Express (AHG1615, US)",        MACHINE_NOT_WORKING, layout_magimaska )       // MV4108/6, C - 17/01/00
+GAMEL( 1998, fastfort,    aristmk5, aristmk5,           wildbill,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Fast Fortune (0100651V, NSW/ACT)",                     MACHINE_NOT_WORKING, layout_wildbill )        // 624, D - 07/05/98, Rev 5
+GAMEL( 2000, fortellr,    aristmk5, aristmk5,           goldenra,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Fortune Teller (01J00131, NSW/ACT)",                   MACHINE_NOT_WORKING, layout_fortellr )        // JB006, D - 24/11/2000, Rev 17
+GAMEL( 1998, gambler,     aristmk5, aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "The Gambler (EHG0916-02, US)",                         MACHINE_NOT_WORKING, layout_aristmk5_us )     // MV4084/1, A - 30/10/98
+GAMEL( 2001, geisha,      aristmk5, aristmk5,           geisha,       aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Geisha (0101408V, New Zealand)",                       0,                   layout_geisha )          // MV4127, A - 05/03/01, Rev 25
+GAMEL( 1999, genmagi,     aristmk5, aristmk5_touch,     genmagi,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Genie Magic (0200894V, NSW/ACT)",                      MACHINE_NOT_WORKING, layout_genmagi )         // 632/1, C - 15/02/99, Rev 20
+GAMEL( 2001, glizrdce,    aristmk5, aristmk5_usa,       bootsctnua,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Green Lizard - Cash Express (AHG1623, US)",            MACHINE_NOT_WORKING, layout_adonisu )         // MV4112/2 - A - 05/01/01
+GAMEL( 1998, gnomeatw,    aristmk5, aristmk5,           kgalah,       aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Gnome Around The World (0100767V, NSW/ACT)",           MACHINE_NOT_WORKING, layout_kgalah )          // 625, C - 18/12/98, Rev 16
+GAMEL( 1997, goldpyr,     aristmk5, aristmk5_usa,       dolphntru,    aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Golden Pyramids (AHG1205-03, US)",                     MACHINE_NOT_WORKING, layout_aristmk5_us )     // MV4091, B - 13/05/97
+GAMEL( 1997, goldpyra,    goldpyr,  aristmk5_usa,       bootsctnua,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Golden Pyramids (AHG1206-99, US)",                     MACHINE_NOT_WORKING, layout_aristmk5_us_200 ) // 602/2, B - 13/05/97
+GAMEL( 1998, goldpyrb,    goldpyr,  aristmk5,           goldpyrb,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Golden Pyramids (0100878V, Victoria)",                 MACHINE_NOT_WORKING, layout_goldpyrb )        // 602/5, C - 19/06/98
+GAMEL( 2000, goldenra,    aristmk5, aristmk5,           goldenra,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Golden Ra (0101164V, NSW/ACT)",                        MACHINE_NOT_WORKING, layout_goldenra )        // 661, A - 10/04/00, Rev 15
+GAMEL( 2001, hnktonku,    aristmk5, aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Honky Tonk (BHG1455, US)",                             MACHINE_NOT_WORKING, layout_magimaska )       // MV4122/3, A - 07/08/01
+GAMEL( 2000, honeypot,    aristmk5, aristmk5,           goldenra,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Honey Pot (03J00241, NSW/ACT)",                        MACHINE_NOT_WORKING, layout_yukongl5 )        // JB008, A - 21/11/2000, Rev 17
+GAMEL( 1999, incasun,     aristmk5, aristmk5,           incasun,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Inca Sun (0100872V, NSW/ACT)",                         MACHINE_NOT_WORKING, layout_incasun )         // 631/3 B, B - 03/05/99, Rev 15
+GAMEL( 1999, incasunsp,   incasun,  aristmk5,           incasun,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Inca Sun (0100872V, NSW/ACT, Show Program)",           MACHINE_NOT_WORKING, layout_incasun )         // 631/3 B, B - 03/05/99, Rev 15
+GAMEL( 2000, incasunnz,   incasun,  aristmk5,           incasunnz,    aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Inca Sun (0101108V, New Zealand)",                     0,                   layout_incasunnz )       // MV4113, A - 6/3/00, Rev 25
+GAMEL( 2000, incasunu,    incasun,  aristmk5_usa,       dolphntrce,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Inca Sun (CHG1458, US)",                               MACHINE_NOT_WORKING, layout_adonisu )         // MV4130/3, A - 05/09/00
+GAMEL( 2000, incasunua,   incasun,  aristmk5_usa,       bootsctnua,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Inca Sun (DHG1577, US)",                               MACHINE_NOT_WORKING, layout_adonisu )         // MV4130, A - 05/09/00
+GAMEL( 1999, incasunv,    incasun,  aristmk5,           incasun,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Inca Sun (01J01946, Venezuela)",                       MACHINE_NOT_WORKING, layout_incasun )         // 631/3 B, B- 03/05/99, Rev 15
+GAMEL( 1998, indrema5,    aristmk5, aristmk5,           indrema5,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Indian Dreaming (0100845V, NSW/ACT)",                  MACHINE_NOT_WORKING, layout_indrema5 )        // 628/1, B - 15/12/98, Rev 7
+GAMEL( 1996, jumpjoey,    aristmk5, aristmk5,           cashcham,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Jumpin' Joey (0100383V, NSW/ACT)",                     0,                   layout_cashcham )        // 586/6, C - 13/11/96
+GAMEL( 1996, jungjuic,    aristmk5, aristmk5,           jungjuic,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Jungle Juice (0200240V, New Zealand)",                 MACHINE_NOT_WORKING, layout_jungjuic )        // 566/3, F - 06/03/96
+GAMEL( 1995, kgalah,      aristmk5, aristmk5,           kgalah,       aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "King Galah (0200536V, NSW/ACT)",                       MACHINE_NOT_WORKING, layout_kgalah )          // 613/6, A - 21/07/95
+GAMEL( 1995, kgalaha,     kgalah,   aristmk5,           kgalah,       aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "King Galah (0100536V, NSW/ACT)",                       0,                   layout_kgalah )          // 613, A - 21/07/95
+GAMEL( 2001, kgalahce,    kgalah,   aristmk5_usa,       bootsctnua,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "King Galah - Cash Express (AHG1625, US)",              MACHINE_NOT_WORKING, layout_adonisu )         // MV4112/2, B - 07/02/01
+GAMEL( 1994, kgbirda5,    aristmk5, aristmk5,           kgbirda5,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "K.G. Bird (0200024V, NSW/ACT)",                        0,                   layout_kgbirda5 )        // 540/3, D - 10/10/94
+GAMEL( 2001, koalamnt,    aristmk5, aristmk5_usa,       dolphntrce,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Koala Mint (CHG1573, US)",                             MACHINE_NOT_WORKING, layout_adonisu )         // MV4137, A - 12/09/01
+GAMEL( 1998, kookabuk,    aristmk5, aristmk5,           aristmk5,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Kooka Bucks (0100677V, NSW/ACT)",                      MACHINE_NOT_WORKING, layout_aristmk5 )        // 661, A - 03/04/98, Rev 5
+GAMEL( 2000, kyhatonu,    aristmk5, aristmk5_usa_touch, bootsctnua,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Keep Your Hat On (BHG1204, US)",                       MACHINE_NOT_WORKING, layout_bparty )          // MV4114/1, B - 08/05/2000
+GAMEL( 1997, locoloot,    aristmk5, aristmk5,           cashcham,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Loco Loot (0100473V, NSW/ACT)",                        0,                   layout_cashcham )        // 599/3, C - 17/06/97, Rev 1.26.13.0
+GAMEL( 1997, locoloota,   locoloot, aristmk5,           locoloota,    aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Loco Loot (0100472V, NSW/ACT)",                        0,                   layout_locoloota )       // 599/2, C - 17/06/97, Rev 1.26.13.0
+GAMEL( 1998, locolootnz,  locoloot, aristmk5,           cashchamnz,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Loco Loot (0600725V, New Zealand)",                    0,                   layout_cashchamnz )      // MV4064, A - 8/7/98, Rev 24
+GAMEL( 2001, locolootu,   locoloot, aristmk5_usa,       bootsctnua,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Loco Loot (AHG1513, US)",                              MACHINE_NOT_WORKING, layout_adonisu )         // MV4134, A - 30/07/01
+GAMEL( 1997, lonewolf,    aristmk5, aristmk5,           wildbill,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Lone Wolf (0100587V, NSW/ACT)",                        0,                   layout_wildbill )        // 621, A - 29/10/97, Rev 1.27.17.0
+GAMEL( 1995, luckyclo,    aristmk5, aristmk5,           wcougar,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Lucky Clover (0300109V, NSW/ACT)",                     0,                   layout_wcougar )         // 570/6, A - 12/10/95
+GAMEL( 2000, magimask,    aristmk5, aristmk5_usa_touch, bootsctnua,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Magic Mask (AHG1549, US)",                             MACHINE_NOT_WORKING, layout_adonisu )         // MV4115_1, A - 09/05/00
+GAMEL( 2000, magimaska,   magimask, aristmk5_usa_touch, aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Magic Mask (AHG1548, US)",                             MACHINE_NOT_WORKING, layout_magimaska )       // MV4115, A - 09/05/00
+GAMEL( 2000, magimaskb,   magimask, aristmk5_usa_touch, aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Magic Mask (DHG1309, US)",                             MACHINE_NOT_WORKING, layout_magimaska )       // MV4115, A - 09/05/00
+GAMEL( 1997, magtcha5,    aristmk5, aristmk5_touch,     dimtouch,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Magic Touch (0300455V, NSW/ACT)",                      MACHINE_NOT_WORKING, layout_dimtouch )        // 606, A - 06/03/97, Rev 14
+GAMEL( 1997, magtcha5a,   magtcha5, aristmk5_touch,     dimtouch,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Magic Touch (0200455V, NSW/ACT)",                      MACHINE_NOT_WORKING, layout_dimtouch )        // 606, A - 06/03/97, Rev 14
+GAMEL( 1997, mammothm,    aristmk5, aristmk5,           kgalah,       aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Mammoth Money (0100425V, NSW/ACT)",                    0,                   layout_kgalah )          // 595/5, D - 07/04/97, Rev 1.22.14.1
+GAMEL( 2000, marmagic,    aristmk5, aristmk5,           goldenra,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Margarita Magic (01J00101, NSW/ACT)",                  MACHINE_NOT_WORKING, layout_marmagic )        // JB005, A - 07/07/00, Rev 17
+GAMEL( 2000, marmagicu,   marmagic, aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Margarita Magic (EHG1558, US)",                        MACHINE_NOT_WORKING, layout_magimaska )       // US003, 07/07/2000
+GAMEL( 2000, marmagicua,  marmagic, aristmk5_usa,       bootsctnua,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Margarita Magic (EHG1559, US)",                        MACHINE_NOT_WORKING, layout_adonisu )         // US003, A - 07/07/00
+GAMEL( 1997, mgarden,     aristmk5, aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Magic Garden (AHG1211-99, US)",                        MACHINE_NOT_WORKING, layout_aristmk5_us )     // MV4033, B - 10/02/97
+GAMEL( 1996, minemine,    aristmk5, aristmk5,           swhr2,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Mine, Mine, Mine (0400115V, NSW/ACT)",                 0,                   layout_swhr2 )           // 559/2, D - 16/01/96, Rev 1.18.3.0
+GAMEL( 1996, minemineu,   minemine, aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Mine, Mine, Mine (VHG0416-99, US)",                    MACHINE_NOT_WORKING, layout_aristmk5_us )     // 559/2, E - 14/02/96
+GAMEL( 1996, minemineua,  minemine, aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Mine, Mine, Mine (NHG0416-99, US)",                    MACHINE_NOT_WORKING, layout_aristmk5_us )     // 559/2, E - 14/02/96
+GAMEL( 1997, monmouse,    aristmk5, aristmk5,           cashcham,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Money Mouse (0400469V, NSW/ACT)",                      MACHINE_NOT_WORKING, layout_cashcham )        // 607/1, B - 08/04/97, Rev 6
+GAMEL( 1997, monmousea,   monmouse, aristmk5,           cashcham,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Money Mouse (0300469V, NSW/ACT)",                      MACHINE_NOT_WORKING, layout_cashcham )        // 607/1, B - 08/04/97, Rev 6
+GAMEL( 2001, montree,     aristmk5, aristmk5,           montree,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Money Tree (0201397V, New Zealand)",                   0,                   layout_montree )         // MV4126, C - 12/04/01, Rev 5
+GAMEL( 1996, mountmon,    aristmk5, aristmk5,           mountmon,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Mountain Money (0100294V, NSW/ACT)",                   0,                   layout_mountmon )        // 595/3, B - 11/06/96, Rev 1.22.5.0
+GAMEL( 1996, mountmona,   mountmon, aristmk5,           mystgard,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Mountain Money (0100289V, NSW/ACT)",                   0,                   layout_mystgard )        // 595/2, C - 11/06/96, Rev 1.22.5.0
+GAMEL( 2001, mountmonua,  mountmon, aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Mountain Money (BHG1464, US)",                         MACHINE_NOT_WORKING, layout_magimaska )       // MV4108/5, A - 10/03/01
+GAMEL( 2000, multidrw,    aristmk5, aristmk5,           multidrw,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Multidraw - Free Games (0200956V, NSW/ACT)",           MACHINE_NOT_WORKING, layout_multidrw )        // 386/64, E - 08/05/00, Rev 17
+GAMEL( 1996, mystgard,    aristmk5, aristmk5,           mystgard,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Mystic Garden (0100275V, NSW/ACT)",                    0,                   layout_mystgard )        // 595/1, B - 11/06/96, Rev 1.22
+GAMEL( 2001, one4all,     aristmk5, aristmk5,           one4all,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "One For All (0101503V, New Zealand)",                  0,                   layout_one4all )         // MV4141, A - 28/05/01, Rev 11
+GAMEL( 1999, orchidms,    aristmk5, aristmk5,           orchidms,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Orchid Mist (0200849V, NSW/ACT)",                      MACHINE_NOT_WORKING, layout_orchidms )        // 601/3, C - 03/02/99, Rev 8
+GAMEL( 1999, orchidmsa,   orchidms, aristmk5,           orchidms,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Orchid Mist (0100849V, NSW/ACT)",                      MACHINE_NOT_WORKING, layout_orchidms )        // 601/3, C - 03/02/99, Rev 6
+GAMEL( 2000, orchidmsnz,  orchidms, aristmk5,           orchidmsnz,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Orchid Mist (0101241V, New Zealand)",                  0,                   layout_orchidmsnz )      // MV4118, A - 3/7/00, Rev 30
+GAMEL( 1996, oscara5,     aristmk5, aristmk5,           aristmk5_9,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Oscar (0200348V, NSW/ACT)",                            MACHINE_NOT_WORKING, layout_dolphntrb )       // 593/2, C - 20/09/96, Rev 3
+GAMEL( 1996, oscara5a,    oscara5,  aristmk5,           aristmk5_9,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Oscar (0100348V, NSW/ACT)",                            0,                   layout_dolphntrb )       // 593/2, C - 20/09/96, Rev 1.23.9.1
+GAMEL( 1999, pantmag,     aristmk5, aristmk5,           kgalah,       aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Panther Magic (0101046V, NSW/ACT)",                    MACHINE_NOT_WORKING, layout_pantmag )         // 594/7, A - 06/10/99, Rev 16
+GAMEL( 1999, pantmaga,    pantmag,  aristmk5,           pantmaga,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Panther Magic (0100716V, NSW/ACT)",                    MACHINE_NOT_WORKING, layout_pantmaga )        // 594/4, A - 13/05/98, Rev 9
+GAMEL( 2001, partygrs,    aristmk5, aristmk5_usa_touch, aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Party Gras (AHG1567, US)",                             MACHINE_NOT_WORKING, layout_magimaska )       // MV4115/6, A - 10/11/01
+GAMEL( 2001, partygrsa,   partygrs, aristmk5_usa_touch, bootsctnua,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Party Gras (BHG1284, US)",                             MACHINE_NOT_WORKING, layout_bparty )          // MV4115/3, B - 06/02/01
+GAMEL( 2000, peaflut,     aristmk5, aristmk5,           trstrove,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Peacock Flutter (02J00011, NSW/ACT)",                  MACHINE_NOT_WORKING, layout_trstrove )        // JB001, A - 10/03/00, Rev 8
+GAMEL( 1997, pengpay,     aristmk5, aristmk5,           cashchama,    aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Penguin Pays (0200460V, NSW/ACT)",                     MACHINE_NOT_WORKING, layout_cashchama )       // 586/4(a), D - 03/06/97, Rev 3
+GAMEL( 1996, pengpaya,    pengpay,  aristmk5,           cashchama,    aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Penguin Pays (0200357V, NSW/ACT)",                     0,                   layout_cashchama )       // 586/4, C - 12/11/96
+GAMEL( 1997, pengpayb,    pengpay,  aristmk5,           swhr2,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Penguin Pays (0200359V, NSW/ACT)",                     MACHINE_NOT_WORKING, layout_swhr2 )           // 586/3(a), D - 03/06/97, Rev 4
+GAMEL( 1995, pengpayc,    pengpay,  aristmk5,           wcougar,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Penguin Pays (0200113V, NSW/ACT)",                     0,                   layout_wcougar )         // 586, A - 12/10/95
+GAMEL( 1997, pengpayu,    pengpay,  aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Penguin Pays (BHI0417-03, US)",                        MACHINE_NOT_WORKING, layout_aristmk5_us )     // 586/7(b), B - 14/07/97
+GAMEL( 1997, pengpayua,   pengpay,  aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Penguin Pays (OHG0417-03, US)",                        MACHINE_NOT_WORKING, layout_aristmk5_us )     // 586/7(b), B - 14/07/97
+GAMEL( 1997, pengpayub,   pengpay,  aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Penguin Pays (OHG0417-02, US)",                        MACHINE_NOT_WORKING, layout_aristmk5_us )     // 586/7(b), B - 14/07/97
+GAMEL( 2001, pengpayce,   pengpay,  aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Penguin Pays - Cash Express (AHG1544, US)",            MACHINE_NOT_WORKING, layout_qnilecea )        // MV4122,  C - 19/01/01
+GAMEL( 2001, pengpuck,    pengpay,  aristmk5_usa,       pengpuck,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Penguin Pays - Penguin Pucks (EHG1257, US)",           MACHINE_NOT_WORKING, layout_pengpuck )        // MV4122/1, C - 19/01/01
+GAMEL( 1998, penpir,      aristmk5, aristmk5,           kgalah,       aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Penguin Pirate (0100674V, NSW/ACT)",                   MACHINE_NOT_WORKING, layout_kgalah )          // 619/1, A - 31/03/98, Rev 10
+GAMEL( 1998, penpira,     penpir,   aristmk5,           snowcat,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Penguin Pirate (0200578V, NSW/ACT)",                   MACHINE_NOT_WORKING, layout_snowcat )         // 619, A - 27/02/98, Rev 8
+GAMEL( 1998, penpir2,     aristmk5, aristmk5,           penpir2,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Penguin Pirate II (0100869V, Victoria)",               MACHINE_NOT_WORKING, layout_penpir2 )         // 619/3, A - 17/12/98
+GAMEL( 1998, petshop,     aristmk5, aristmk5,           petshop,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Pet Shop (0100731V, NSW/ACT)",                         MACHINE_NOT_WORKING, layout_petshop )         // 618/1, A - 17/04/98, Rev 13
+GAMEL( 1995, phantpay,    aristmk5, aristmk5,           swhr2,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Phantom Pays (0500005V, NSW/ACT)",                     0,                   layout_swhr2 )           // 570/1, E - 12/09/95
+GAMEL( 1996, przfight,    aristmk5, aristmk5,           przfight,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Prize Fight (0100299V, NSW/ACT)",                      0,                   layout_przfight )        // 578/4, B - 08/08/96
+GAMEL( 1998, qcash,       aristmk5, aristmk5,           kgalah,       aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queens of Cash (0100706V, NSW/ACT)",                   MACHINE_NOT_WORKING, layout_kgalah )          // 603/6, C  - 23/07/98, Rev 6
+GAMEL( 1997, qnile,       aristmk5, aristmk5,           qnile,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile (0300439V, NSW/ACT)",                MACHINE_NOT_WORKING, layout_qnile )           // 602/4, B - 13/05/97, Rev 7
+GAMEL( 1997, qnilea,      qnile,    aristmk5,           qnile,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile (0200439V, NSW/ACT)",                MACHINE_NOT_WORKING, layout_qnile )           // 602/4, B - 13/05/97, Rev 7
+GAMEL( 1997, qnileb,      qnile,    aristmk5,           qnile,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile (0100439V, NSW/ACT)",                0,                   layout_qnile )           // 602/4, B - 13/05/97, Rev 1.26.18.1
+GAMEL( 2002, qnilebr,     qnile,    aristmk5,           goldpyrb,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile (0101707V, Brazil)",                 0,                   layout_goldpyrb )        // MV4162, A - 21/08/02
+GAMEL( 1997, qnilec,      qnile,    aristmk5,           qnilec,       aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile (0300440V, NSW/ACT)",                MACHINE_NOT_WORKING, layout_qnilec )          // 602/3, B - 13/05/97, Rev 5
+GAMEL( 1999, qniled,      qnile,    aristmk5,           checkma5,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile (0101139V, NSW/ACT)",                MACHINE_NOT_WORKING, layout_qniled )          // 602/16, A - 11/10/99, Rev 14
+GAMEL( 2001, qnilefl,     qnile,    aristmk5,           trstrove,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile - Fast Lane (0101670V, Queensland)", MACHINE_NOT_WORKING, layout_trstrove )        // 602/4, E - 17/08/01
+GAMEL( 2000, qnilenl,     qnile,    aristmk5,           qnilenl,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile (0301059V, Holland)",                0,                   layout_qnilenl )         // 602/5, G - 10/04/00
+GAMEL( 1998, qnilenz,     qnile,    aristmk5,           cashcatnz,    aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile (0300785V, New Zealand)",            0,                   layout_cashcatnz )       // MV4068, A - 31/8/98, Rev 20
+GAMEL( 1999, qnileql,     qnile,    aristmk5,           trstrove,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile (0201200V, Queensland)",             MACHINE_NOT_WORKING, layout_trstrove )        // 602/4, D - 18/06/99
+GAMEL( 1997, qnileu,      qnile,    aristmk5_usa,       dolphntru,    aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile (GHG4091-02, US)",                   MACHINE_NOT_WORKING, layout_aristmk5_us )     // MV4091, B - 13/05/97
+GAMEL( 1997, qnileua,     qnile,    aristmk5_usa,       dolphntru,    aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile (GHG4091-03, US)",                   MACHINE_NOT_WORKING, layout_aristmk5_us )     // MV4091, B - 13/05/97
+GAMEL( 1997, qnilev,      qnile,    aristmk5,           aristmk5_9,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile (04J00784, Venezuela)",              MACHINE_NOT_WORKING, layout_dolphntrb )       // 602/3, B - 13/05/97, Rev 6
+GAMEL( 2001, qnilece,     qnile,    aristmk5_usa,       dolphntrce,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile - Cash Express (AHG1609, US)",       MACHINE_NOT_WORKING, layout_adonisu )         // MV4091/1, A - 17/01/01
+GAMEL( 2001, qnilecea,    qnile,    aristmk5_usa,       dolphntru,    aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile - Cash Express (AHG1525, US)",       MACHINE_NOT_WORKING, layout_qnilecea )        // MV4091, F - 17/01/01
+GAMEL( 2001, qnileceb,    qnile,    aristmk5_usa,       dolphntru,    aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile - Cash Express (AHG1608, US)",       MACHINE_NOT_WORKING, layout_magimaska )       // MV4091, F - 17/01/01
+GAMEL( 1999, qnilemax,    qnile,    aristmk5_touch,     trstrove,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile - Maximillions (0401072V, NSW/ACT)", MACHINE_NOT_WORKING, layout_trstrove )        // 602/4, D - 18/06/99, Rev 14
+GAMEL( 1994, qtbird,      aristmk5, aristmk5,           qtbird,       aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Q.T. Bird (0500009V, NSW/ACT)",                        0,                   layout_qtbird )          // 581, A - 27/10/94, Rev 1.1.1.0
+GAMEL( 2000, rainwrce,    aristmk5, aristmk5,           adonisce,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Rainbow Warriors - Cash Express (0101332V, NSW/ACT)",  MACHINE_NOT_WORKING, layout_aristmk5 )        // 655, B - 02/03/00, Rev 25
+GAMEL( 1998, reelpwr,     aristmk5, aristmk5,           wizways,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Reel Power (0100400V, NSW/ACT)",                       0,                   layout_wizways )         // 598/2, A - 01/11/96, Rev 1.23.8.0
+GAMEL( 1998, reelrock,    aristmk5, aristmk5,           reelrock,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Reelin-n-Rockin (0100779V, NSW/ACT)",                  MACHINE_NOT_WORKING, layout_reelrock )        // 628, A - 13/07/98, Rev 5
+GAMEL( 2000, reelrockql,  reelrock, aristmk5,           trstrove,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Reelin-n-Rockin (0101460V, Queensland)",               MACHINE_NOT_WORKING, layout_trstrove )        // 628/2, E - 20/12/00
+GAMEL( 1997, retrsam,     aristmk5, aristmk5,           retrsam,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Return of the Samurai (0400549V, NSW/ACT)",            MACHINE_NOT_WORKING, layout_sbuk3 )           // 608, A - 17/04/97, Rev 5
+GAMEL( 1997, retrsama,    retrsam,  aristmk5,           retrsam,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Return of the Samurai (0200549V, NSW/ACT)",            0,                   layout_sbuk3 )           // 608, A - 17/04/97, Rev 1.26.25.3
+GAMEL( 1997, retrsamb,    retrsam,  aristmk5,           retrsamb,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Return of the Samurai (0200506V, NSW/ACT)",            0,                   layout_retrsamb )        // 608, A - 17/04/97, Rev 1.26.25.3
+GAMEL( 1997, rushrst,     aristmk5, aristmk5,           rushrst,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Rushin Rooster (0100534V, NSW/ACT)",                   0,                   layout_cashchama )       // 596/3, C - 25/06/97, Rev 1.27.2.3
+GAMEL( 2001, sldeluxe,    aristmk5, aristmk5_usa,       bootsctnua,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Sweet Liberty Deluxe (AHG1575, US)",                   MACHINE_NOT_WORKING, layout_adonisu )         // MV4137, A - 11/02/01
+GAMEL( 1998, slvrwolf,    aristmk5, aristmk5,           wamazona,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Silver Wolf (0100673V, NSW/ACT)",                      MACHINE_NOT_WORKING, layout_wamazona )        // 621/2, A - 23/03/98, Rev 3
+GAMEL( 1996, snowcat,     aristmk5, aristmk5,           snowcat,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Snow Cat (0100405V, NSW/ACT)",                         0,                   layout_snowcat )         // 599, B - 23/12/96, Rev 1.25.1.0
+GAMEL( 1997, sumospin,    aristmk5, aristmk5,           swhr2,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Sumo Spins (0200606V, NSW/ACT)",                       MACHINE_NOT_WORKING, layout_swhr2 )           // 622, A - 08/12/97, Rev 4
+GAMEL( 1998, sbuk3,       aristmk5, aristmk5,           sbuk3,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Super Bucks III (0200711V, NSW/ACT)",                  MACHINE_NOT_WORKING, layout_sbuk3 )           // 626, A - 22/04/98, Rev 8
+GAMEL( 1998, sbuk3a,      sbuk3,    aristmk5,           sbuk3,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Super Bucks III (0100711V, NSW/ACT)",                  MACHINE_NOT_WORKING, layout_sbuk3 )           // 626, A - 22/04/98, Rev 7
+GAMEL( 1995, swhr2,       aristmk5, aristmk5,           swhr2,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Sweethearts II (0200465V, NSW/ACT)",                   MACHINE_NOT_WORKING, layout_swhr2 )           // 577/1, C - 07/09/95, Rev 3
+GAMEL( 1995, swhr2a,      swhr2,    aristmk5,           swhr2,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Sweethearts II (0200004V, NSW/ACT)",                   0,                   layout_swhr2 )           // 577/1, C - 07/09/95, Rev 1.1.3.0
+GAMEL( 1998, swhr2u,      swhr2,    aristmk5_usa,       swhr2u,       aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Sweethearts II (PHG0742-02, US)",                      MACHINE_NOT_WORKING, layout_swhr2u )          // MV4061, A - 29/06/98
+GAMEL( 1995, swhr2v,      swhr2,    aristmk5,           swhr2,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Sweethearts II (01J01986, Venezuela)",                 MACHINE_NOT_WORKING, layout_swhr2 )           // 577/1, C - 07/09/95, Rev 3
+GAMEL( 1996, thor,        aristmk5, aristmk5,           cashcham,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Thor (0200319V, NSW/ACT)",                             0,                   layout_cashcham )        // 569/12, B - 14/08/96, Rev 1.23.7.0
+GAMEL( 1996, thndh,       aristmk5, aristmk5,           snowcat,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Thunder Heart (0200333V, NSW/ACT)",                    0,                   layout_snowcat )         // 570/9, A - 14/08/96, Rev 1.23.6.0
+GAMEL( 1996, thndha,      thndh,    aristmk5,           wildbill,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Thunder Heart (0200334V, NSW/ACT)",                    0,                   layout_wildbill )        // 597/1, A - 14/08/96, Rev 1.23.6.0
+GAMEL( 1997, topbana,     aristmk5, aristmk5,           wildbill,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Top Banana (0100550V, NSW/ACT)",                       0,                   layout_wildbill )        // 594/3, A - 18/08/97, Rev 1.26.39.2
+GAMEL( 1998, toutango,    aristmk5, aristmk5,           kgalah,       aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Toucan Tango (0100782V, NSW/ACT)",                     MACHINE_NOT_WORKING, layout_kgalah )          // 616/1, A - 17/06/98, Rev 16
+GAMEL( 1999, toutangonl,  toutango, aristmk5,           toutangonl,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Toucan Tango (0301388V, Holland)",                     0,                   layout_toutangonl )      // 616, C - 11/05/99
+GAMEL( 2000, trstrove,    aristmk5, aristmk5,           trstrove,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Treasure Trove (01J00161, NSW/ACT)",                   MACHINE_NOT_WORKING, layout_trstrove )        // JB001/3, A - 5/10/00, Rev 8
+GAMEL( 2002, tritreat,    aristmk5, aristmk5,           trstrove,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Triple Treat (0201692V, NSW/ACT)",                     MACHINE_NOT_WORKING, layout_tritreat )        // 692, A - 17/05/02, Rev 25
+GAMEL( 2001, trojhors,    aristmk5, aristmk5,           goldenra,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Trojan Horse (01J00851, NSW/ACT)",                     MACHINE_NOT_WORKING, layout_marmagic )        // JB001/5, A - 30/10/01, Rev 17
+GAMEL( 1996, trpdlght,    aristmk5, aristmk5,           swhr2,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Tropical Delight (0100269V, NSW/ACT)",                 0,                   layout_swhr2 )           // 577/3, B - 15/05/96, Rev 1.22.2.0
+GAMEL( 1997, trpdlghtu,   trpdlght, aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Tropical Delight (PHG0625-02, US)",                    MACHINE_NOT_WORKING, layout_aristmk5_us )     // 577/3, D - 24/09/97
+GAMEL( 1998, unicornd,    aristmk5, aristmk5,           aristmk5,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Unicorn Dreaming (0100791V, NSW/ACT)",                 MACHINE_NOT_WORKING, layout_aristmk5 )        // 631/1 A, A - 31/08/98, Rev 12
+GAMEL( 1998, unicornda,   unicornd, aristmk5,           aristmk5_9,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Unicorn Dreaming (0100813V, NSW/ACT)",                 MACHINE_NOT_WORKING, layout_dolphntrb )       // 631 A, A - 02/09/98, Rev 14
+GAMEL( 2000, unicorndnz,  unicornd, aristmk5,           unicorndnz,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Unicorn Dreaming (0101228V, New Zealand)",             0,                   layout_aristmk5 )        // MV4113/1, A - 05/04/2000, Rev 27
+GAMEL( 2001, unicorndu,   unicornd, aristmk5_usa,       bootsctnua,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Unicorn Dreaming (BHG1584, US)",                       MACHINE_NOT_WORKING, layout_adonisu )         // MV4130/1, C - 10/17/01
+GAMEL( 2002, venicea5,    aristmk5, aristmk5,           goldenra,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Venice (02J02056, Venezuela)",                         MACHINE_NOT_WORKING, layout_venicea5 )        // JB009/2, B - 11/07/02, Rev 17
+GAMEL( 2001, wafricau,    aristmk5, aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Wild Africa (AHG1535, US)",                            MACHINE_NOT_WORKING, layout_magimaska )       // MV4076, B - 17/07/01
+GAMEL( 1996, wamazon,     aristmk5, aristmk5,           wamazon,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Wild Amazon (0200507V, NSW/ACT)",                      MACHINE_NOT_WORKING, layout_wamazon )         // 506/8, A - 10/10/96, Rev 3
+GAMEL( 1996, wamazona,    wamazon,  aristmk5,           wamazona,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Wild Amazon (0200285V, NSW/ACT)",                      0,                   layout_wamazona )        // 506/6, A - 7/5/96, Rev 1.22.8.0
+GAMEL( 1996, wamazonv,    wamazon,  aristmk5,           wamazon,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Wild Amazon (01J01996, Venezuela)",                    MACHINE_NOT_WORKING, layout_wamazon )         // 506/8, A - 10/10/96, Rev 3
+GAMEL( 1997, wikwin,      aristmk5, aristmk5,           wikwin,       aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Wicked Winnings (0100553V, NSW/ACT)",                  MACHINE_NOT_WORKING, layout_wikwin )          // 609, B - 01/07/97, Rev 1
+GAMEL( 1996, wldangel,    aristmk5, aristmk5,           swhr2,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Wild Angels (0100337V, NSW/ACT)",                      0,                   layout_swhr2 )           // 600, B - 24/09/96
+GAMEL( 1996, wildbill,    aristmk5, aristmk5,           wildbill,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Wild Bill (0100297V, NSW/ACT)",                        0,                   layout_wildbill )        // 543/8, C - 15/08/96, Rev 1.22.12.0
+GAMEL( 1996, wcougar,     aristmk5, aristmk5,           wcougar,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Wild Cougar (0100167V, NSW/ACT)",                      0,                   layout_wcougar )         // 569/9, B - 27/2/96, Rev 1.18.1.0
+GAMEL( 1997, wcougaru,    wcougar,  aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Wild Cougar (NHG0296-04, US)",                         MACHINE_NOT_WORKING, layout_aristmk5_us )     // 569/8, D - 19/05/97
+GAMEL( 1997, wcougarua,   wcougar,  aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Wild Cougar (NHG0296-07, US)",                         MACHINE_NOT_WORKING, layout_aristmk5_us )     // 569/8, D - 19/05/97
+GAMEL( 1997, wcougarub,   wcougar,  aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Wild Cougar (NHG0296-99, US)",                         MACHINE_NOT_WORKING, layout_aristmk5_us )     // 569/8, D - 19/05/97
+GAMEL( 1997, wcougaruc,   wcougar,  aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Wild Cougar (AHG1531, US)",                            MACHINE_NOT_WORKING, layout_magimaska )       // MV4055, B - 13/05/97
+GAMEL( 1996, wizways,     aristmk5, aristmk5,           wizways,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Wizard Ways (0200396V, NSW/ACT)",                      MACHINE_NOT_WORKING, layout_wizways )         // 598/3, A - 04/11/96, Rev 9
+GAMEL( 1997, wnpost,      aristmk5, aristmk5_usa,       wnpost,       aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Winning Post (RHG0418-04, US)",                        MACHINE_NOT_WORKING, layout_wnpost )          // 541/2, G - 11/02/97
+GAMEL( 1999, wthing,      aristmk5, aristmk5,           retrsam,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Wild Thing (0101158V, NSW/ACT)",                       MACHINE_NOT_WORKING, layout_sbuk3 )           // 608/4, B - 14/12/99, Rev 8
+GAMEL( 1999, wtiger,      aristmk5, aristmk5,           wtiger,       aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "White Tiger Classic (0200954V, NSW/ACT)",              MACHINE_NOT_WORKING, layout_wtiger )          // 638/1, B - 08/07/99, Rev 13
+GAMEL( 2000, yukongl5,    aristmk5, aristmk5,           goldenra,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Yukon Gold (03J00191, NSW/ACT)",                       MACHINE_NOT_WORKING, layout_yukongl5 )        // JB005/1, A - 30/10/2000, Rev 17
 
 // the following parent sets are known bad dumps, and do not boot (confirmed)
-GAMEL( 1996, blackpnt,    aristmk5, aristmk5,           wildbill,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Black Panther (0200818V, Victoria)",                   MACHINE_FLAGS, layout_wildbill )        // 594/1, A - 30/07/96
-GAMEL( 1996, canrose,     aristmk5, aristmk5_usa,       bootsctnua,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Canyon Rose (AHG1463, US)",                            MACHINE_FLAGS, layout_cashchamu )       // 603(a), B - 06/12/96 (same as Cash Chameleon)
-GAMEL( 2000, diamdest,    aristmk5, aristmk5_usa,       bootsctnua,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Diamond Destiny (AHG1533, US)",                        MACHINE_FLAGS, layout_aristmk5_us_200 ) // MV4115_5, A - 09/05/2000 (same as Magic Mask)
-GAMEL( 2001, fortfvr,     aristmk5, aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Fortune Fever (BHG1566, US)",                          MACHINE_FLAGS, layout_aristmk5_us )     // MV4122/2, A - 13/05/01
-GAMEL( 1996, jumpbean,    aristmk5, aristmk5,           swhr2,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Jumping Beans (0100161V, NSW/ACT)",                    MACHINE_FLAGS, layout_swhr2 )           // 586/2, A - 25/01/96
-GAMEL( 1999, sbuk2,       aristmk5, aristmk5,           sbuk2,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Super Bucks II (0400501V, NSW/ACT)",                   MACHINE_FLAGS, layout_sbuk2 )           // 578, G - 26/07/99, Rev 7
-GAMEL( 2001, wcoyote,     aristmk5, aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Wild Coyote (AHG1515, US)",                            MACHINE_FLAGS, layout_aristmk5_us )     // MV4134, A - 30/07/01 (same as Loco Loot)
+GAMEL( 1996, blackpnt,    aristmk5, aristmk5,           wildbill,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Black Panther (0200818V, Victoria)",                   MACHINE_NOT_WORKING, layout_wildbill )        // 594/1, A - 30/07/96
+GAMEL( 1996, canrose,     aristmk5, aristmk5_usa,       bootsctnua,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Canyon Rose (AHG1463, US)",                            MACHINE_NOT_WORKING, layout_cashchamu )       // 603(a), B - 06/12/96 (same as Cash Chameleon)
+GAMEL( 2000, diamdest,    aristmk5, aristmk5_usa,       bootsctnua,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Diamond Destiny (AHG1533, US)",                        MACHINE_NOT_WORKING, layout_aristmk5_us_200 ) // MV4115_5, A - 09/05/2000 (same as Magic Mask)
+GAMEL( 2001, fortfvr,     aristmk5, aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Fortune Fever (BHG1566, US)",                          MACHINE_NOT_WORKING, layout_aristmk5_us )     // MV4122/2, A - 13/05/01
+GAMEL( 1996, jumpbean,    aristmk5, aristmk5,           swhr2,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Jumping Beans (0100161V, NSW/ACT)",                    MACHINE_NOT_WORKING, layout_swhr2 )           // 586/2, A - 25/01/96
+GAMEL( 1999, sbuk2,       aristmk5, aristmk5,           sbuk2,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Super Bucks II (0400501V, NSW/ACT)",                   MACHINE_NOT_WORKING, layout_sbuk2 )           // 578, G - 26/07/99, Rev 7
+GAMEL( 2001, wcoyote,     aristmk5, aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Wild Coyote (AHG1515, US)",                            MACHINE_NOT_WORKING, layout_aristmk5_us )     // MV4134, A - 30/07/01 (same as Loco Loot)
 
 // the following clone sets are known bad dumps, and do not boot (confirmed)
-GAMEL( 2000, bpartya,     bparty,   aristmk5_usa_touch, bootsctnua,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Bachelorette Party (BHG1579, US)",                     MACHINE_FLAGS, layout_bparty )          // MV4119/1, B - 25/08/2000
-GAMEL( 1997, cashcra5a,   cashcra5, aristmk5,           aristmk5_9,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Cash Crop (0300447V, NSW/ACT)",                        MACHINE_FLAGS, layout_dolphntrb )       // 607/2, C - 29/08/97, Rev 7
-GAMEL( 1996, chickna5v,   chickna5, aristmk5,           chickna5v,    aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Chicken (01J01886, Venezuela)",                        MACHINE_FLAGS, layout_chickna5v )       // 596/1, B - 23/12/96, Rev 3
-GAMEL( 2001, dynajacku,   dynajack, aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Dynamite Jack (CHG1562, US)",                          MACHINE_FLAGS, layout_magimaska )       // US002, A - 11/07/01
-GAMEL( 2000, eforsta5ce,  eforsta5, aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Enchanted Forest - Cash Express (CHG1536, US)",        MACHINE_FLAGS, layout_aristmk5_us )     // MV4108/6, C - 17/01/00
-GAMEL( 2001, mountmonce,  mountmon, aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Mountain Money - Cash Express (AHG1629, US)",          MACHINE_FLAGS, layout_aristmk5_us )     // MV4108/5, A - 10/03/01
-GAMEL( 2001, mountmonu,   mountmon, aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Mountain Money (BHG1465, US)",                         MACHINE_FLAGS, layout_aristmk5_us )     // MV4108/5, A - 10/03/01
-GAMEL( 2001, partygrsb,   partygrs, aristmk5_usa_touch, bootsctnua,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Party Gras (AHG1568, US)",                             MACHINE_FLAGS, layout_bparty )          // MV4115/6, A - 10/11/2001, 20 lines
-GAMEL( 1995, pengpayd,    pengpay,  aristmk5,           wcougar,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Penguin Pays (0300113V, NSW/ACT)",                     MACHINE_FLAGS, layout_wcougar )         // 586, A - 12/10/95, Rev 4
-GAMEL( 1998, petshopa,    petshop,  aristmk5,           snowcat,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Pet Shop (0100679V, NSW/ACT)",                         MACHINE_FLAGS, layout_snowcat )         // 618, A - 09/03/98, Rev 10
-GAMEL( 1995, sbuk2a,      sbuk2,    aristmk5,           sbuk2,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Super Bucks II (0300006V, NSW/ACT)",                   MACHINE_FLAGS, layout_sbuk2 )           // no data due to missing ROMs
-GAMEL( 2000, wthinga,     wthing,   aristmk5,           aristmk5,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Wild Thing (0201176V, NSW/ACT)",                       MACHINE_FLAGS, layout_aristmk5 )        // 608/5, B - 25/02/00, Rev 11
+GAMEL( 2000, bpartya,     bparty,   aristmk5_usa_touch, bootsctnua,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Bachelorette Party (BHG1579, US)",                     MACHINE_NOT_WORKING, layout_bparty )          // MV4119/1, B - 25/08/2000
+GAMEL( 1997, cashcra5a,   cashcra5, aristmk5,           aristmk5_9,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Cash Crop (0300447V, NSW/ACT)",                        MACHINE_NOT_WORKING, layout_dolphntrb )       // 607/2, C - 29/08/97, Rev 7
+GAMEL( 1996, chickna5v,   chickna5, aristmk5,           chickna5v,    aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Chicken (01J01886, Venezuela)",                        MACHINE_NOT_WORKING, layout_chickna5v )       // 596/1, B - 23/12/96, Rev 3
+GAMEL( 2001, dynajacku,   dynajack, aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Dynamite Jack (CHG1562, US)",                          MACHINE_NOT_WORKING, layout_magimaska )       // US002, A - 11/07/01
+GAMEL( 2000, eforsta5ce,  eforsta5, aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Enchanted Forest - Cash Express (CHG1536, US)",        MACHINE_NOT_WORKING, layout_aristmk5_us )     // MV4108/6, C - 17/01/00
+GAMEL( 2001, mountmonce,  mountmon, aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Mountain Money - Cash Express (AHG1629, US)",          MACHINE_NOT_WORKING, layout_aristmk5_us )     // MV4108/5, A - 10/03/01
+GAMEL( 2001, mountmonu,   mountmon, aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Mountain Money (BHG1465, US)",                         MACHINE_NOT_WORKING, layout_aristmk5_us )     // MV4108/5, A - 10/03/01
+GAMEL( 2001, partygrsb,   partygrs, aristmk5_usa_touch, bootsctnua,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Party Gras (AHG1568, US)",                             MACHINE_NOT_WORKING, layout_bparty )          // MV4115/6, A - 10/11/2001, 20 lines
+GAMEL( 1995, pengpayd,    pengpay,  aristmk5,           wcougar,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Penguin Pays (0300113V, NSW/ACT)",                     MACHINE_NOT_WORKING, layout_wcougar )         // 586, A - 12/10/95, Rev 4
+GAMEL( 1998, petshopa,    petshop,  aristmk5,           snowcat,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Pet Shop (0100679V, NSW/ACT)",                         MACHINE_NOT_WORKING, layout_snowcat )         // 618, A - 09/03/98, Rev 10
+GAMEL( 1995, sbuk2a,      sbuk2,    aristmk5,           sbuk2,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Super Bucks II (0300006V, NSW/ACT)",                   MACHINE_NOT_WORKING, layout_sbuk2 )           // no data due to missing ROMs
+GAMEL( 2000, wthinga,     wthing,   aristmk5,           aristmk5,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Wild Thing (0201176V, NSW/ACT)",                       MACHINE_NOT_WORKING, layout_aristmk5 )        // 608/5, B - 25/02/00, Rev 11

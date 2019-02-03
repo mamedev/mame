@@ -119,16 +119,15 @@ class supracan_state : public driver_device
 {
 public:
 	supracan_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_soundcpu(*this, "soundcpu"),
-			m_cart(*this, "cartslot"),
-			m_vram(*this, "vram"),
-			m_soundram(*this, "soundram"),
-			m_gfxdecode(*this, "gfxdecode"),
-			m_screen(*this, "screen")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_soundcpu(*this, "soundcpu")
+		, m_cart(*this, "cartslot")
+		, m_vram(*this, "vram")
+		, m_soundram(*this, "soundram")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_screen(*this, "screen")
 	{
-		m_m6502_reset = 0;
 	}
 
 	void supracan(machine_config &config);
@@ -162,25 +161,25 @@ private:
 	acan_dma_regs_t m_acan_dma_regs;
 	acan_sprdma_regs_t m_acan_sprdma_regs;
 
-	uint16_t m_m6502_reset;
-	uint8_t m_sound_irq_enable_reg;
-	uint8_t m_sound_irq_source_reg;
-	uint8_t m_sound_cpu_68k_irq_reg;
+	uint16_t m_m6502_reset = 0;
+	uint8_t m_sound_irq_enable_reg = 0;
+	uint8_t m_sound_irq_source_reg = 0;
+	uint8_t m_sound_cpu_68k_irq_reg = 0;
 
-	emu_timer *m_video_timer;
-	emu_timer *m_hbl_timer;
-	emu_timer *m_line_on_timer;
-	emu_timer *m_line_off_timer;
+	emu_timer *m_video_timer = nullptr;
+	emu_timer *m_hbl_timer = nullptr;
+	emu_timer *m_line_on_timer = nullptr;
+	emu_timer *m_line_off_timer = nullptr;
 
 	std::vector<uint8_t> m_vram_addr_swapped;
 
 #if 0
-	uint16_t *m_pram;
+	uint16_t *m_pram = nullptr;
 #endif
 
-	uint16_t m_sprite_count;
-	uint32_t m_sprite_base_addr;
-	uint8_t m_sprite_flags;
+	uint16_t m_sprite_count = 0;
+	uint32_t m_sprite_base_addr = 0;
+	uint8_t m_sprite_flags = 0;
 
 	uint32_t m_tilemap_base_addr[3];
 	int m_tilemap_scrollx[3];
@@ -220,7 +219,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(supracan);
+	void supracan_palette(palette_device &palette) const;
 	uint32_t screen_update_supracan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(supracan_irq);
 	INTERRUPT_GEN_MEMBER(supracan_sound_irq);
@@ -1352,20 +1351,18 @@ static INPUT_PORTS_START( supracan )
 	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(4) PORT_NAME("P4 Button A")
 INPUT_PORTS_END
 
-PALETTE_INIT_MEMBER(supracan_state, supracan)
+void supracan_state::supracan_palette(palette_device &palette) const
 {
 	// Used for debugging purposes for now
-	//#if 0
-	int i, r, g, b;
-
-	for( i = 0; i < 32768; i++ )
+//#if 0
+	for (int i = 0; i < 32768; i++)
 	{
-		r = (i & 0x1f) << 3;
-		g = ((i >> 5) & 0x1f) << 3;
-		b = ((i >> 10) & 0x1f) << 3;
-		palette.set_pen_color( i, r, g, b );
+		int const r = (i & 0x1f) << 3;
+		int const g = ((i >> 5) & 0x1f) << 3;
+		int const b = ((i >> 10) & 0x1f) << 3;
+		palette.set_pen_color(i, r, g, b);
 	}
-	//#endif
+//#endif
 }
 
 WRITE16_MEMBER( supracan_state::_68k_soundram_w )
@@ -1895,8 +1892,8 @@ MACHINE_CONFIG_START(supracan_state::supracan)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", supracan_state,  supracan_sound_irq)
 
 #if !(SOUNDCPU_BOOT_HACK)
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
-	MCFG_QUANTUM_PERFECT_CPU("soundcpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.m_perfect_cpu_quantum = subtag("soundcpu");
 #endif
 
 	MCFG_SCREEN_ADD( "screen", RASTER )
@@ -1904,9 +1901,7 @@ MACHINE_CONFIG_START(supracan_state::supracan)
 	MCFG_SCREEN_UPDATE_DRIVER(supracan_state, screen_update_supracan)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD( "palette", 32768 )
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_INIT_OWNER(supracan_state, supracan)
+	PALETTE(config, "palette", FUNC(supracan_state::supracan_palette)).set_format(palette_device::xBGR_555, 32768);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_supracan)
 
@@ -1915,7 +1910,7 @@ MACHINE_CONFIG_START(supracan_state::supracan)
 	MCFG_GENERIC_ENDIAN(ENDIANNESS_BIG)
 	MCFG_GENERIC_LOAD(supracan_state, supracan_cart)
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list","supracan")
+	SOFTWARE_LIST(config, "cart_list").set_original("supracan");
 MACHINE_CONFIG_END
 
 

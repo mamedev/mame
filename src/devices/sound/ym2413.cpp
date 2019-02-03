@@ -1616,6 +1616,14 @@ void ym2413_device::device_start()
 }
 
 //-------------------------------------------------
+//  device_clock_changed
+//-------------------------------------------------
+void ym2413_device::device_clock_changed()
+{
+	m_stream->set_sample_rate(clock() / 72);
+}
+
+//-------------------------------------------------
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
@@ -1656,20 +1664,20 @@ void ym2413_device::device_reset()
 }
 
 
-WRITE8_MEMBER( ym2413_device::write )
+void ym2413_device::write(offs_t offset, u8 data)
 {
 	if (offset)
-		data_port_w(space, offset, data);
+		data_port_w(data);
 	else
-		register_port_w(space, offset, data);
+		register_port_w(data);
 }
 
-WRITE8_MEMBER( ym2413_device::register_port_w )
+void ym2413_device::register_port_w(u8 data)
 {
 	address = data;
 }
 
-WRITE8_MEMBER( ym2413_device::data_port_w )
+void ym2413_device::data_port_w(u8 data)
 {
 	m_stream->update();
 	write_reg(address, data);

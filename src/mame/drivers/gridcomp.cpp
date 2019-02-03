@@ -77,7 +77,6 @@
 #include "sound/spkrdev.h"
 
 #include "emupal.h"
-#include "rendlay.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -377,41 +376,41 @@ MACHINE_CONFIG_START(gridcomp_state::grid1101)
 	MCFG_MACHINE_START_OVERRIDE(gridcomp_state, gridcomp)
 	MCFG_MACHINE_RESET_OVERRIDE(gridcomp_state, gridcomp)
 
-	MCFG_DEVICE_ADD(I80130_TAG, I80130, XTAL(15'000'000)/3)
-	MCFG_I80130_IRQ_CALLBACK(INPUTLINE("maincpu", 0))
+	I80130(config, m_osp, XTAL(15'000'000)/3);
+	m_osp->irq().set_inputline("maincpu", 0);
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::amber())
+	MCFG_SCREEN_ADD_MONOCHROME("screen", LCD, rgb_t::amber()) // actually a kind of EL display
 	MCFG_SCREEN_UPDATE_DRIVER(gridcomp_state, screen_update_110x)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(15'000'000)/2, 424, 0, 320, 262, 0, 240) // XXX 66 Hz refresh
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(I80130_TAG, i80130_device, ir3_w))
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
-
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_DEVICE_ADD("keyboard", GRID_KEYBOARD, 0)
-	MCFG_GRID_KEYBOARD_CB(PUT(gridcomp_state, kbd_put))
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	MCFG_DEVICE_ADD("i7220", I7220, XTAL(4'000'000))
-	MCFG_I7220_DATA_SIZE(3) // 3 1-Mbit MBM's
-	MCFG_I7220_IRQ_CALLBACK(WRITELINE(I80130_TAG, i80130_device, ir1_w))
-	MCFG_I7220_DRQ_CALLBACK(WRITELINE(I80130_TAG, i80130_device, ir1_w))
+	grid_keyboard_device &keyboard(GRID_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(gridcomp_state::kbd_put));
 
-	MCFG_DEVICE_ADD("hpib", TMS9914, XTAL(4'000'000))
-	MCFG_TMS9914_INT_WRITE_CB(WRITELINE(I80130_TAG, i80130_device, ir5_w))
-	MCFG_TMS9914_DIO_READWRITE_CB(READ8(IEEE488_TAG, ieee488_device, dio_r), WRITE8(IEEE488_TAG, ieee488_device, host_dio_w))
-	MCFG_TMS9914_EOI_WRITE_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_eoi_w))
-	MCFG_TMS9914_DAV_WRITE_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_dav_w))
-	MCFG_TMS9914_NRFD_WRITE_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_nrfd_w))
-	MCFG_TMS9914_NDAC_WRITE_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_ndac_w))
-	MCFG_TMS9914_IFC_WRITE_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_ifc_w))
-	MCFG_TMS9914_SRQ_WRITE_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_srq_w))
-	MCFG_TMS9914_ATN_WRITE_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_atn_w))
-	MCFG_TMS9914_REN_WRITE_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_ren_w))
+	i7220_device &i7220(I7220(config, "i7220", XTAL(4'000'000)));
+	i7220.set_data_size(3); // 3 1-Mbit MBM's
+	i7220.irq_callback().set(I80130_TAG, FUNC(i80130_device::ir1_w));
+	i7220.drq_callback().set(I80130_TAG, FUNC(i80130_device::ir1_w));
+
+	tms9914_device &hpib(TMS9914(config, "hpib", XTAL(4'000'000)));
+	hpib.int_write_cb().set(I80130_TAG, FUNC(i80130_device::ir5_w));
+	hpib.dio_read_cb().set(IEEE488_TAG, FUNC(ieee488_device::dio_r));
+	hpib.dio_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_dio_w));
+	hpib.eoi_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_eoi_w));
+	hpib.dav_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_dav_w));
+	hpib.nrfd_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_nrfd_w));
+	hpib.ndac_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_ndac_w));
+	hpib.ifc_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_ifc_w));
+	hpib.srq_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_srq_w));
+	hpib.atn_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_atn_w));
+	hpib.ren_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_ren_w));
 	MCFG_IEEE488_BUS_ADD()
 	MCFG_IEEE488_EOI_CALLBACK(WRITELINE("hpib", tms9914_device, eoi_w))
 	MCFG_IEEE488_DAV_CALLBACK(WRITELINE("hpib", tms9914_device, dav_w))
@@ -423,20 +422,18 @@ MACHINE_CONFIG_START(gridcomp_state::grid1101)
 	MCFG_IEEE488_REN_CALLBACK(WRITELINE("hpib", tms9914_device, ren_w))
 	MCFG_IEEE488_SLOT_ADD("ieee_rem", 0, remote488_devices, nullptr)
 
-	MCFG_DEVICE_ADD("uart8274", I8274_NEW, XTAL(4'032'000))
+	I8274_NEW(config, m_uart8274, XTAL(4'032'000));
 
 	MCFG_DEVICE_ADD("modem", I8255, 0)
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("256K")
-	MCFG_RAM_DEFAULT_VALUE(0)
+	RAM(config, m_ram).set_default_size("256K").set_default_value(0);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(gridcomp_state::grid1109)
+void gridcomp_state::grid1109(machine_config &config)
+{
 	grid1101(config);
-	MCFG_DEVICE_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("512K");
+}
 
 MACHINE_CONFIG_START(gridcomp_state::grid1121)
 	grid1101(config);
@@ -445,11 +442,11 @@ MACHINE_CONFIG_START(gridcomp_state::grid1121)
 	MCFG_DEVICE_PROGRAM_MAP(grid1121_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(gridcomp_state::grid1129)
+void gridcomp_state::grid1129(machine_config &config)
+{
 	grid1121(config);
-	MCFG_DEVICE_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("512K");
+}
 
 MACHINE_CONFIG_START(gridcomp_state::grid1131)
 	grid1121(config);
@@ -458,11 +455,11 @@ MACHINE_CONFIG_START(gridcomp_state::grid1131)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(15'000'000)/2, 720, 0, 512, 262, 0, 240) // XXX
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(gridcomp_state::grid1139)
+void gridcomp_state::grid1139(machine_config &config)
+{
 	grid1131(config);
-	MCFG_DEVICE_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("512K");
+}
 
 
 ROM_START( grid1101 )
@@ -628,4 +625,3 @@ COMP( 1984, grid1121, 0,        0,      grid1121, gridcomp, gridcomp_state, empt
 COMP( 1984, grid1129, grid1121, 0,      grid1129, gridcomp, gridcomp_state, empty_init, "GRiD Computers", "Compass II 1129", MACHINE_IS_SKELETON )
 COMP( 1984, grid1131, grid1121, 0,      grid1131, gridcomp, gridcomp_state, empty_init, "GRiD Computers", "Compass II 1131", MACHINE_IS_SKELETON )
 COMP( 1984, grid1139, grid1121, 0,      grid1139, gridcomp, gridcomp_state, empty_init, "GRiD Computers", "Compass II 1139", MACHINE_IS_SKELETON )
-

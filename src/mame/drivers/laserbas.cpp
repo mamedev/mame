@@ -73,19 +73,18 @@ expected: 43 FB CC 9A D4 23 6C 01 3E  <- From ROM 4
 class laserbas_state : public driver_device
 {
 public:
-	laserbas_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	laserbas_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette"),
-		m_dac1(*this, "dac1"),
-		m_dac2(*this, "dac2"),
-		m_dac3(*this, "dac3"),
-		m_dac4(*this, "dac4"),
-		m_dac5(*this, "dac5"),
-		m_dac6(*this, "dac6")
+		m_dac(*this, "dac%u", 1U)
 	{ }
 
 	void laserbas(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	/* misc */
@@ -101,7 +100,11 @@ private:
 	int m_scl;
 	bool     m_flipscreen;
 	uint64_t m_z1data;
-	void write_pit_out(int num, int state);
+
+	required_device<cpu_device> m_maincpu;
+	required_device<palette_device> m_palette;
+	required_device_array<dac_byte_interface, 6> m_dac;
+
 	DECLARE_READ8_MEMBER(vram_r);
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_WRITE8_MEMBER(videoctrl_w);
@@ -109,26 +112,10 @@ private:
 	DECLARE_READ8_MEMBER(track_lo_r);
 	DECLARE_READ8_MEMBER(track_hi_r);
 	DECLARE_WRITE8_MEMBER(out_w);
-	DECLARE_WRITE_LINE_MEMBER(pit_out_0_w);
-	DECLARE_WRITE_LINE_MEMBER(pit_out_1_w);
-	DECLARE_WRITE_LINE_MEMBER(pit_out_2_w);
-	DECLARE_WRITE_LINE_MEMBER(pit_out_3_w);
-	DECLARE_WRITE_LINE_MEMBER(pit_out_4_w);
-	DECLARE_WRITE_LINE_MEMBER(pit_out_5_w);
+	template<uint8_t Which> DECLARE_WRITE_LINE_MEMBER(pit_out_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(laserbas_scanline);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
-	required_device<cpu_device> m_maincpu;
-	required_device<palette_device> m_palette;
-	required_device<dac_byte_interface> m_dac1;
-	required_device<dac_byte_interface> m_dac2;
-	required_device<dac_byte_interface> m_dac3;
-	required_device<dac_byte_interface> m_dac4;
-	required_device<dac_byte_interface> m_dac5;
-	required_device<dac_byte_interface> m_dac6;
 	void laserbas_io(address_map &map);
 	void laserbas_memory(address_map &map);
 };
@@ -200,7 +187,7 @@ WRITE8_MEMBER(laserbas_state::vram_w)
 
 WRITE8_MEMBER(laserbas_state::videoctrl_w)
 {
-	if(!(offset&1))
+	if (!(offset&1))
 	{
 		m_vrambank = data & 0x40; // layer select
 		m_flipscreen = !(data & 0x80);
@@ -286,51 +273,19 @@ void laserbas_state::machine_reset()
 	m_scl = 0;
 }
 
-void laserbas_state::write_pit_out(int num, int state)
+template<uint8_t Which>
+WRITE_LINE_MEMBER(laserbas_state::pit_out_w)
 {
 	state^=1; // 7404  (6G)
-	if((!state)& m_cnt_out[num]){ // 0->1 rising edge CLK
-		m_counter[num] = (m_counter[num]+1)&0x0f; // 4 bit counters 74393
+	if((!state)& m_cnt_out[Which]){ // 0->1 rising edge CLK
+		m_counter[Which] = (m_counter[Which]+1)&0x0f; // 4 bit counters 74393
 	}
-	int data =(state) | ((m_counter[num]&7)<<1); // combine output from 8253 with counter bits 0-3
+	int data =(state) | ((m_counter[Which]&7)<<1); // combine output from 8253 with counter bits 0-3
 	data<<=4;
-	if(m_counter[num]&8) data^=0x0f; // counter bit 4 xors the data ( 7486 x 6)
-	switch(num){
-		case 0: m_dac1->write(data);break; // 4 resistor packs :  47k, 100k, 220k, 470k
-		case 1: m_dac2->write(data);break;
-		case 2: m_dac3->write(data);break;
-		case 3: m_dac4->write(data);break;
-		case 4: m_dac5->write(data);break;
-		case 5: m_dac6->write(data);break;
-	}
+	if(m_counter[Which]&8) data^=0x0f; // counter bit 4 xors the data ( 7486 x 6)
+	m_dac[Which]->write(data); // 4 resistor packs :  47k, 100k, 220k, 470k
 
-	m_cnt_out[num]=state;
-}
-
-WRITE_LINE_MEMBER(laserbas_state::pit_out_0_w)
-{
-	write_pit_out(0,state);
-}
-
-WRITE_LINE_MEMBER(laserbas_state::pit_out_1_w)
-{
-	write_pit_out(1,state);
-}
-WRITE_LINE_MEMBER(laserbas_state::pit_out_2_w)
-{
-	write_pit_out(2,state);
-}
-WRITE_LINE_MEMBER(laserbas_state::pit_out_3_w)
-{
-	write_pit_out(3,state);
-}
-WRITE_LINE_MEMBER(laserbas_state::pit_out_4_w)
-{
-	write_pit_out(4,state);
-}
-WRITE_LINE_MEMBER(laserbas_state::pit_out_5_w)
-{
-	write_pit_out(5,state);
+	m_cnt_out[Which]=state;
 }
 
 void laserbas_state::laserbas_memory(address_map &map)
@@ -418,45 +373,45 @@ MACHINE_CONFIG_START(laserbas_state::laserbas)
 	MCFG_DEVICE_ADD("maincpu", Z80, CLOCK / 4)
 	MCFG_DEVICE_PROGRAM_MAP(laserbas_memory)
 	MCFG_DEVICE_IO_MAP(laserbas_io)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", laserbas_state, laserbas_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(laserbas_state::laserbas_scanline), "screen", 0, 1);
 
 	/* TODO: clocks aren't known */
-	MCFG_DEVICE_ADD("pit0", PIT8253, 0)
-	MCFG_PIT8253_CLK0(PIT_CLOCK)
-	MCFG_PIT8253_CLK1(PIT_CLOCK)
-	MCFG_PIT8253_CLK2(PIT_CLOCK)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, laserbas_state, pit_out_0_w))
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, laserbas_state, pit_out_1_w))
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, laserbas_state, pit_out_2_w))
+	pit8253_device &pit0(PIT8253(config, "pit0", 0));
+	pit0.set_clk<0>(PIT_CLOCK);
+	pit0.set_clk<1>(PIT_CLOCK);
+	pit0.set_clk<2>(PIT_CLOCK);
+	pit0.out_handler<0>().set(FUNC(laserbas_state::pit_out_w<0>));
+	pit0.out_handler<1>().set(FUNC(laserbas_state::pit_out_w<1>));
+	pit0.out_handler<2>().set(FUNC(laserbas_state::pit_out_w<2>));
 
-	MCFG_DEVICE_ADD("pit1", PIT8253, 0)
-	MCFG_PIT8253_CLK0(PIT_CLOCK)
-	MCFG_PIT8253_CLK1(PIT_CLOCK)
-	MCFG_PIT8253_CLK2(PIT_CLOCK)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, laserbas_state, pit_out_3_w))
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, laserbas_state, pit_out_4_w))
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, laserbas_state, pit_out_5_w))
+	pit8253_device &pit1(PIT8253(config, "pit1", 0));
+	pit1.set_clk<0>(PIT_CLOCK);
+	pit1.set_clk<1>(PIT_CLOCK);
+	pit1.set_clk<2>(PIT_CLOCK);
+	pit1.out_handler<0>().set(FUNC(laserbas_state::pit_out_w<3>));
+	pit1.out_handler<1>().set(FUNC(laserbas_state::pit_out_w<4>));
+	pit1.out_handler<2>().set(FUNC(laserbas_state::pit_out_w<5>));
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(4000000, 256, 0, 256, 256, 0, 256)   /* temporary, CRTC will configure screen */
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", 3000000/4) /* unknown clock, hand tuned to get ~60 fps */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(laserbas_state, crtc_update_row)
+	h46505_device &crtc(H46505(config, "crtc", 3000000/4)); /* unknown clock, hand tuned to get ~60 fps */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.set_update_row_callback(FUNC(laserbas_state::crtc_update_row), this);
 
-	MCFG_PALETTE_ADD("palette", 32)
-	MCFG_PALETTE_FORMAT(RRRGGGBB)
+	PALETTE(config, m_palette).set_format(palette_device::RGB_332, 32);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac1", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.16)
-	MCFG_DEVICE_ADD("dac2", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.16)
-	MCFG_DEVICE_ADD("dac3", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.16)
-	MCFG_DEVICE_ADD("dac4", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.16)
-	MCFG_DEVICE_ADD("dac5", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.16)
-	MCFG_DEVICE_ADD("dac6", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.16)
+	MCFG_DEVICE_ADD(m_dac[0], DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.16)
+	MCFG_DEVICE_ADD(m_dac[1], DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.16)
+	MCFG_DEVICE_ADD(m_dac[2], DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.16)
+	MCFG_DEVICE_ADD(m_dac[3], DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.16)
+	MCFG_DEVICE_ADD(m_dac[4], DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.16)
+	MCFG_DEVICE_ADD(m_dac[5], DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.16)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
 	MCFG_SOUND_ROUTE(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)

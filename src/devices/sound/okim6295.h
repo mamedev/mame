@@ -15,16 +15,6 @@
 
 #include "sound/okiadpcm.h"
 
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_OKIM6295_PIN7(pin7) \
-	downcast<okim6295_device &>(*device).config_pin7((okim6295_device::pin7));
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -57,11 +47,8 @@ public:
 	// runtime configuration
 	void set_pin7(int pin7);
 
-	uint8_t read_status();
-	void write_command(uint8_t command);
-
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read();
+	void write(uint8_t command);
 
 protected:
 	// device-level overrides

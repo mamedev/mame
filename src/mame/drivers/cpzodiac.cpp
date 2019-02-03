@@ -51,7 +51,7 @@ public:
 private:
 	virtual void machine_start() override;
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_memory_bank m_bank;
 
@@ -160,28 +160,28 @@ static const z80_daisy_config daisy_chain[] =
 	{ nullptr }
 };
 
-MACHINE_CONFIG_START(cpzodiac_state::cpzodiac)
-
+void cpzodiac_state::cpzodiac(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 12_MHz_XTAL/2)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_IO_MAP(main_io_map)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
+	Z80(config, m_maincpu, 12_MHz_XTAL/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cpzodiac_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &cpzodiac_state::main_io_map);
+	m_maincpu->set_daisy_config(daisy_chain);
 
-	MCFG_DEVICE_ADD("io", TE7750, 0)
-	MCFG_TE7750_IOS_CB(CONSTANT(4))
-	MCFG_TE7750_IN_PORT1_CB(IOPORT("IN1"))
-	MCFG_TE7750_IN_PORT2_CB(IOPORT("IN2"))
-	MCFG_TE7750_IN_PORT3_CB(IOPORT("IN3"))
-	MCFG_TE7750_IN_PORT4_CB(IOPORT("IN4"))
-	MCFG_TE7750_OUT_PORT8_CB(MEMBANK("databank")) MCFG_DEVCB_RSHIFT(-4)
+	te7750_device &io(TE7750(config, "io"));
+	io.ios_cb().set_constant(4);
+	io.in_port1_cb().set_ioport("IN1");
+	io.in_port2_cb().set_ioport("IN2");
+	io.in_port3_cb().set_ioport("IN3");
+	io.in_port4_cb().set_ioport("IN4");
+	io.out_port8_cb().set_membank(m_bank).rshift(4);
 	// Code initializes Port 3 and 4 latches to 0 by mistake?
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, 12_MHz_XTAL/2)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", 0))
+	z80ctc_device &ctc(Z80CTC(config, "ctc", 12_MHz_XTAL/2));
+	ctc.intr_callback().set_inputline(m_maincpu, 0);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 12_MHz_XTAL/2)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	Z80(config, m_audiocpu, 12_MHz_XTAL/2);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &cpzodiac_state::sound_map);
 
 	/* video hardware */
 	// TODO
@@ -190,17 +190,17 @@ MACHINE_CONFIG_START(cpzodiac_state::cpzodiac)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2610B, 16_MHz_XTAL/2)
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
-	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
-	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
+	ym2610_device &ymsnd(YM2610B(config, "ymsnd", 16_MHz_XTAL/2));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.add_route(0, "lspeaker", 0.25);
+	ymsnd.add_route(0, "rspeaker", 0.25);
+	ymsnd.add_route(1, "lspeaker", 1.0);
+	ymsnd.add_route(2, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("syt", TC0140SYT, 0)
-	MCFG_TC0140SYT_MASTER_CPU("maincpu")
-	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
-MACHINE_CONFIG_END
+	tc0140syt_device &syt(TC0140SYT(config, "syt", 0));
+	syt.set_master_tag(m_maincpu);
+	syt.set_slave_tag(m_audiocpu);
+}
 
 
 /***************************************************************************

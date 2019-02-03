@@ -1,8 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
-#ifndef __OSDNET_H__
-#define __OSDNET_H__
+#ifndef MAME_OSD_OSDNET_H
+#define MAME_OSD_OSDNET_H
 
+#pragma once
 
 class osd_netdev;
 
@@ -21,6 +22,7 @@ public:
 	};
 	osd_netdev(class device_network_interface *ifdev, int rate);
 	virtual ~osd_netdev();
+	void start();
 	void stop();
 
 	virtual int send(uint8_t *buf, int len);
@@ -38,7 +40,6 @@ private:
 
 	class device_network_interface *m_dev;
 	emu_timer *m_timer;
-	bool m_stop;
 };
 
 class osd_netdev *open_netdev(int id, class device_network_interface *ifdev, int rate);
@@ -46,4 +47,5 @@ void add_netdev(const char *name, const char *description, create_netdev func);
 void clear_netdev();
 const std::vector<std::unique_ptr<osd_netdev::entry_t>>& get_netdev_list();
 int netdev_count();
-#endif
+
+#endif // MAME_OSD_OSDNET_H

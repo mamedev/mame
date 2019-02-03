@@ -233,18 +233,16 @@ MACHINE_CONFIG_START(hanaawas_state::hanaawas)
 	MCFG_SCREEN_UPDATE_DRIVER(hanaawas_state, screen_update_hanaawas)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hanaawas)
-	MCFG_PALETTE_ADD("palette", 32*8)
-	MCFG_PALETTE_INDIRECT_ENTRIES(16)
-	MCFG_PALETTE_INIT_OWNER(hanaawas_state, hanaawas)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_hanaawas);
+	PALETTE(config, "palette", FUNC(hanaawas_state::hanaawas_palette), 32 * 8, 16);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 18432000/12)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW"))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, hanaawas_state, hanaawas_portB_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	ay8910_device &aysnd(AY8910(config, "aysnd", 18432000/12));
+	aysnd.port_a_read_callback().set_ioport("DSW");
+	aysnd.port_b_write_callback().set(FUNC(hanaawas_state::hanaawas_portB_w));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
 

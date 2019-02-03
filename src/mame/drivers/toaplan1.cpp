@@ -609,7 +609,6 @@ Stephh's and AWJ's notes (based on the games M68000 and Z80 code and some tests)
 #include "includes/toaplan1.h"
 #include "includes/toaplipt.h"
 
-#include "cpu/tms32010/tms32010.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z180/z180.h"
 #include "machine/74259.h"
@@ -927,14 +926,14 @@ void toaplan1_state::outzone_sound_io_map(address_map &map)
 
 /***************************** TMS32010 Memory Map **************************/
 
-void toaplan1_state::DSP_program_map(address_map &map)
+void toaplan1_state::dsp_program_map(address_map &map)
 {
 	map(0x000, 0x7ff).rom();
 }
 
 	/* $000 - 08F  TMS32010 Internal Data RAM in Data Address Space */
 
-void toaplan1_state::DSP_io_map(address_map &map)
+void toaplan1_state::dsp_io_map(address_map &map)
 {
 	map(0, 0).w(FUNC(toaplan1_state::demonwld_dsp_addrsel_w));
 	map(1, 1).rw(FUNC(toaplan1_state::demonwld_dsp_r), FUNC(toaplan1_state::demonwld_dsp_w));
@@ -1908,350 +1907,335 @@ GFXDECODE_END
 #define VBSTART             (240)
 
 
-MACHINE_CONFIG_START(toaplan1_rallybik_state::rallybik)
-
+void toaplan1_rallybik_state::rallybik(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(10'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(rallybik_main_map)
+	M68000(config, m_maincpu, XTAL(10'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan1_rallybik_state::rallybik_main_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(28'000'000)/8)
-	MCFG_DEVICE_PROGRAM_MAP(toaplan1_sound_map)
-	MCFG_DEVICE_IO_MAP(rallybik_sound_io_map)
+	Z80(config, m_audiocpu, XTAL(28'000'000)/8);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &toaplan1_rallybik_state::toaplan1_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &toaplan1_rallybik_state::rallybik_sound_io_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	config.m_minimum_quantum = attotime::from_hz(600);
 
-	MCFG_DEVICE_ADD("coinlatch", LS259, 0) // 19L
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, toaplan1_rallybik_state, coin_counter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, toaplan1_rallybik_state, coin_counter_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, toaplan1_rallybik_state, coin_lockout_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, toaplan1_rallybik_state, coin_lockout_2_w))
+	ls259_device &coinlatch(LS259(config, "coinlatch")); // 19L
+	coinlatch.q_out_cb<4>().set(FUNC(toaplan1_rallybik_state::coin_counter_1_w));
+	coinlatch.q_out_cb<5>().set(FUNC(toaplan1_rallybik_state::coin_counter_2_w));
+	coinlatch.q_out_cb<6>().set(FUNC(toaplan1_rallybik_state::coin_lockout_1_w));
+	coinlatch.q_out_cb<7>().set(FUNC(toaplan1_rallybik_state::coin_lockout_2_w));
 
 	MCFG_MACHINE_RESET_OVERRIDE(toaplan1_state,toaplan1)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL55, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(toaplan1_rallybik_state, screen_update_rallybik)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, toaplan1_rallybik_state, screen_vblank_rallybik))
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL55, VBEND, VBSTART);
+	m_screen->set_screen_update(FUNC(toaplan1_rallybik_state::screen_update_rallybik));
+	m_screen->screen_vblank().set(FUNC(toaplan1_rallybik_state::screen_vblank_rallybik));
+	m_screen->set_palette(m_palette);
 
-	MCFG_TOAPLAN_SCU_ADD("scu", "palette", 31, 15)
+	TOAPLAN_SCU(config, m_spritegen, 0);
+	m_spritegen->set_palette(m_palette);
+	m_spritegen->set_xoffsets(31, 15);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rallybik)
-	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rallybik);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, (64*16)+(64*16));
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan1_rallybik_state,rallybik)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
-	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	YM3812(config, m_ymsnd, XTAL(28'000'000) / 8);
+	m_ymsnd->irq_handler().set_inputline(m_audiocpu, 0);
+	m_ymsnd->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-
-MACHINE_CONFIG_START(toaplan1_state::truxton)
-
+void toaplan1_state::truxton(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(10'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(truxton_main_map)
+	M68000(config, m_maincpu, XTAL(10'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan1_state::truxton_main_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(28'000'000)/8)
-	MCFG_DEVICE_PROGRAM_MAP(toaplan1_sound_map)
-	MCFG_DEVICE_IO_MAP(truxton_sound_io_map)
+	Z80(config, m_audiocpu, XTAL(28'000'000)/8);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &toaplan1_state::toaplan1_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &toaplan1_state::truxton_sound_io_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	config.m_minimum_quantum = attotime::from_hz(600);
 
 	MCFG_MACHINE_RESET_OVERRIDE(toaplan1_state,toaplan1)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(toaplan1_state, screen_update_toaplan1)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, toaplan1_state, screen_vblank_toaplan1))
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
+	m_screen->set_screen_update(FUNC(toaplan1_state::screen_update_toaplan1));
+	m_screen->screen_vblank().set(FUNC(toaplan1_state::screen_vblank_toaplan1));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_toaplan1)
-	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_toaplan1);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, (64*16)+(64*16));
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan1_state,toaplan1)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
-	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	YM3812(config, m_ymsnd, XTAL(28'000'000)/8);
+	m_ymsnd->irq_handler().set_inputline(m_audiocpu, 0);
+	m_ymsnd->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-
-MACHINE_CONFIG_START(toaplan1_state::hellfire)
-
+void toaplan1_state::hellfire(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(10'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(hellfire_main_map)
+	M68000(config, m_maincpu, XTAL(10'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan1_state::hellfire_main_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(28'000'000)/8)
-	MCFG_DEVICE_PROGRAM_MAP(toaplan1_sound_map)
-	MCFG_DEVICE_IO_MAP(hellfire_sound_io_map)
+	Z80(config, m_audiocpu, XTAL(28'000'000)/8);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &toaplan1_state::toaplan1_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &toaplan1_state::hellfire_sound_io_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	config.m_minimum_quantum = attotime::from_hz(600);
 
 	MCFG_MACHINE_RESET_OVERRIDE(toaplan1_state,toaplan1)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND+16, VBSTART+16)
-	MCFG_SCREEN_UPDATE_DRIVER(toaplan1_state, screen_update_toaplan1)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, toaplan1_state, screen_vblank_toaplan1))
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND+16, VBSTART+16);
+	m_screen->set_screen_update(FUNC(toaplan1_state::screen_update_toaplan1));
+	m_screen->screen_vblank().set(FUNC(toaplan1_state::screen_vblank_toaplan1));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_toaplan1)
-	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_toaplan1);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, (64*16)+(64*16));
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan1_state,toaplan1)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
-	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	YM3812(config, m_ymsnd, XTAL(28'000'000)/8);
+	m_ymsnd->irq_handler().set_inputline(m_audiocpu, 0);
+	m_ymsnd->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-
-MACHINE_CONFIG_START(toaplan1_state::zerowing)
-
+void toaplan1_state::zerowing(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(10'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(zerowing_main_map)
+	M68000(config, m_maincpu, XTAL(10'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan1_state::zerowing_main_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(28'000'000)/8)
-	MCFG_DEVICE_PROGRAM_MAP(toaplan1_sound_map)
-	MCFG_DEVICE_IO_MAP(zerowing_sound_io_map)
+	Z80(config, m_audiocpu, XTAL(28'000'000)/8);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &toaplan1_state::toaplan1_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &toaplan1_state::zerowing_sound_io_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	config.m_minimum_quantum = attotime::from_hz(600);
 
 	MCFG_MACHINE_RESET_OVERRIDE(toaplan1_state,zerowing)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND+16, VBSTART+16)
-	MCFG_SCREEN_UPDATE_DRIVER(toaplan1_state, screen_update_toaplan1)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, toaplan1_state, screen_vblank_toaplan1))
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND+16, VBSTART+16);
+	m_screen->set_screen_update(FUNC(toaplan1_state::screen_update_toaplan1));
+	m_screen->screen_vblank().set(FUNC(toaplan1_state::screen_vblank_toaplan1));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_toaplan1)
-	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_toaplan1);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, (64*16)+(64*16));
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan1_state,toaplan1)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
-	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	YM3812(config, m_ymsnd, XTAL(28'000'000)/8);
+	m_ymsnd->irq_handler().set_inputline(m_audiocpu, 0);
+	m_ymsnd->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-
-MACHINE_CONFIG_START(toaplan1_state::demonwld)
-
+void toaplan1_state::demonwld(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(10'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(demonwld_main_map)
+	M68000(config, m_maincpu, XTAL(10'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan1_state::demonwld_main_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(28'000'000)/8)
-	MCFG_DEVICE_PROGRAM_MAP(toaplan1_sound_map)
-	MCFG_DEVICE_IO_MAP(demonwld_sound_io_map)
+	Z80(config, m_audiocpu, XTAL(28'000'000)/8);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &toaplan1_state::toaplan1_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &toaplan1_state::demonwld_sound_io_map);
 
-	MCFG_DEVICE_ADD("dsp", TMS32010, XTAL(28'000'000)/2)
-	MCFG_DEVICE_PROGRAM_MAP(DSP_program_map)
-	MCFG_DEVICE_IO_MAP(DSP_io_map)
-	MCFG_TMS32010_BIO_IN_CB(READLINE(*this, toaplan1_state, demonwld_BIO_r))
+	TMS32010(config, m_dsp, XTAL(28'000'000)/2);
+	m_dsp->set_addrmap(AS_PROGRAM, &toaplan1_state::dsp_program_map);
+	m_dsp->set_addrmap(AS_IO, &toaplan1_state::dsp_io_map);
+	m_dsp->bio().set(FUNC(toaplan1_state::demonwld_bio_r));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	config.m_minimum_quantum = attotime::from_hz(600);
 
 	MCFG_MACHINE_RESET_OVERRIDE(toaplan1_state,demonwld)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL55, VBEND+16, VBSTART+16)
-	MCFG_SCREEN_UPDATE_DRIVER(toaplan1_state, screen_update_toaplan1)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, toaplan1_state, screen_vblank_toaplan1))
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL55, VBEND+16, VBSTART+16);
+	m_screen->set_screen_update(FUNC(toaplan1_state::screen_update_toaplan1));
+	m_screen->screen_vblank().set(FUNC(toaplan1_state::screen_vblank_toaplan1));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_toaplan1)
-	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_toaplan1);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, (64*16)+(64*16));
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan1_state,toaplan1)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
-	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	YM3812(config, m_ymsnd, XTAL(28'000'000)/8);
+	m_ymsnd->irq_handler().set_inputline(m_audiocpu, 0);
+	m_ymsnd->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-
-MACHINE_CONFIG_START(toaplan1_state::samesame)
-
+void toaplan1_state::samesame(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(10'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(samesame_main_map)
+	M68000(config, m_maincpu, XTAL(10'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan1_state::samesame_main_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z180, XTAL(28'000'000)/8)    /* HD647180XOFS6 CPU */
-	MCFG_DEVICE_PROGRAM_MAP(samesame_hd647180_mem_map)
-	MCFG_DEVICE_IO_MAP(samesame_hd647180_io_map)
+	Z180(config, m_audiocpu, XTAL(28'000'000)/8);   /* HD647180XOFS6 CPU */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &toaplan1_state::samesame_hd647180_mem_map);
+	m_audiocpu->set_addrmap(AS_IO, &toaplan1_state::samesame_hd647180_io_map);
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	MCFG_MACHINE_RESET_OVERRIDE(toaplan1_state,zerowing)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(toaplan1_state, screen_update_toaplan1)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, toaplan1_state, screen_vblank_samesame))
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
+	m_screen->set_screen_update(FUNC(toaplan1_state::screen_update_toaplan1));
+	m_screen->screen_vblank().set(FUNC(toaplan1_state::screen_vblank_samesame));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_toaplan1)
-	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_toaplan1);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, (64*16)+(64*16));
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan1_state,toaplan1)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
-	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	YM3812(config, m_ymsnd, XTAL(28'000'000)/8);
+	m_ymsnd->irq_handler().set_inputline(m_audiocpu, 0);
+	m_ymsnd->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-
-MACHINE_CONFIG_START(toaplan1_state::outzone)
-
+void toaplan1_state::outzone(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(10'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(outzone_main_map)
+	M68000(config, m_maincpu, XTAL(10'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan1_state::outzone_main_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(28'000'000)/8)
-	MCFG_DEVICE_PROGRAM_MAP(toaplan1_sound_map)
-	MCFG_DEVICE_IO_MAP(outzone_sound_io_map)
+	Z80(config, m_audiocpu, XTAL(28'000'000)/8);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &toaplan1_state::toaplan1_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &toaplan1_state::outzone_sound_io_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	config.m_minimum_quantum = attotime::from_hz(600);
 
 	MCFG_MACHINE_RESET_OVERRIDE(toaplan1_state,zerowing)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL55, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(toaplan1_state, screen_update_toaplan1)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, toaplan1_state, screen_vblank_toaplan1))
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL55, VBEND, VBSTART);
+	m_screen->set_screen_update(FUNC(toaplan1_state::screen_update_toaplan1));
+	m_screen->screen_vblank().set(FUNC(toaplan1_state::screen_vblank_toaplan1));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_toaplan1)
-	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_toaplan1);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, (64*16)+(64*16));
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan1_state,toaplan1)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
-	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	YM3812(config, m_ymsnd, XTAL(28'000'000)/8);
+	m_ymsnd->irq_handler().set_inputline(m_audiocpu, 0);
+	m_ymsnd->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-
-MACHINE_CONFIG_START(toaplan1_state::outzonecv)
-
+void toaplan1_state::outzonecv(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(10'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(outzonecv_main_map)
+	M68000(config, m_maincpu, XTAL(10'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan1_state::outzonecv_main_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(28'000'000)/8)
-	MCFG_DEVICE_PROGRAM_MAP(toaplan1_sound_map)
-	MCFG_DEVICE_IO_MAP(zerowing_sound_io_map)
+	Z80(config, m_audiocpu, XTAL(28'000'000)/8);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &toaplan1_state::toaplan1_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &toaplan1_state::zerowing_sound_io_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	config.m_minimum_quantum = attotime::from_hz(600);
 
 	MCFG_MACHINE_RESET_OVERRIDE(toaplan1_state,zerowing)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(toaplan1_state, screen_update_toaplan1)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, toaplan1_state, screen_vblank_toaplan1))
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
+	m_screen->set_screen_update(FUNC(toaplan1_state::screen_update_toaplan1));
+	m_screen->screen_vblank().set(FUNC(toaplan1_state::screen_vblank_toaplan1));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_toaplan1)
-	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_toaplan1);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, (64*16)+(64*16));
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan1_state,toaplan1)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
-	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	YM3812(config, m_ymsnd, XTAL(28'000'000)/8);
+	m_ymsnd->irq_handler().set_inputline(m_audiocpu, 0);
+	m_ymsnd->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-
-MACHINE_CONFIG_START(toaplan1_state::vimana)
-
+void toaplan1_state::vimana(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(10'000'000)) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(vimana_main_map)
+	M68000(config, m_maincpu, XTAL(10'000'000));    /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan1_state::vimana_main_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z180, XTAL(28'000'000)/8)    /* HD647180XOFS6 CPU */
-	MCFG_DEVICE_PROGRAM_MAP(vimana_hd647180_mem_map)
-	MCFG_DEVICE_IO_MAP(vimana_hd647180_io_map)
+	Z180(config, m_audiocpu, XTAL(28'000'000)/8);   /* HD647180XOFS6 CPU */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &toaplan1_state::vimana_hd647180_mem_map);
+	m_audiocpu->set_addrmap(AS_IO, &toaplan1_state::vimana_hd647180_io_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600)) // GUESSED
+	config.m_minimum_quantum = attotime::from_hz(600);
 
 	MCFG_MACHINE_RESET_OVERRIDE(toaplan1_state,vimana)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(toaplan1_state, screen_update_toaplan1)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, toaplan1_state, screen_vblank_toaplan1))
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
+	m_screen->set_screen_update(FUNC(toaplan1_state::screen_update_toaplan1));
+	m_screen->screen_vblank().set(FUNC(toaplan1_state::screen_vblank_toaplan1));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_toaplan1)
-	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_toaplan1);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, (64*16)+(64*16));
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan1_state,toaplan1)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)   /* verified on pcb */
-	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	YM3812(config, m_ymsnd, XTAL(28'000'000)/8);    /* verified on pcb */
+	m_ymsnd->irq_handler().set_inputline(m_audiocpu, 0);
+	m_ymsnd->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 
@@ -2886,23 +2870,50 @@ ROM_START( fireshrkdh )
 	ROM_LOAD( "prom15.20c",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) ) /* ??? */
 ROM_END
 
-ROM_START( outzone )
-	ROM_REGION( 0x040000, "maincpu", 0 )    /* Main 68K code */
-	ROM_LOAD16_BYTE( "prg2.bin",  0x000001, 0x20000, CRC(9704db16) SHA1(12b43a6961a7f63f29563eb77aaacb70d3c368dd) )
-	ROM_LOAD16_BYTE( "prg1.bin",  0x000000, 0x20000, CRC(127a38d7) SHA1(d7f1ed91ff7d4de9e8215aa3b5cb65693145e433) )
+ROM_START( samesamecn )
+	ROM_REGION( 0x080000, "maincpu", 0 )    /* Main 68K code */
+	ROM_LOAD16_BYTE( "o17-09-h2.8j",0x000000, 0x08000, CRC(fc8c2420) SHA1(cf8333d3749213f2007467d3a80bd36ff7b4ce92) ) /* The actual label is stamped with the letter "H" and separate "2" */
+	ROM_LOAD16_BYTE( "o17_10-h2.8l",0x000001, 0x08000, CRC(cc0ffbeb) SHA1(1cf85f68b4e368294069053ba8f5710d6c557ede) ) /* The actual label is stamped with the letter "H" and separate "2" */
+	ROM_LOAD16_BYTE( "o17-11-2.7j", 0x040000, 0x20000, CRC(6beac378) SHA1(041ba98a89a4bac32575858db8a061bdf7804594) ) /* The actual label is stamped with the number "2" */
+	ROM_LOAD16_BYTE( "o17-12-2.7l", 0x040001, 0x20000, CRC(6adb6eb5) SHA1(9b6e63aa50d271c2bb0b4cf822fc6f3684f10230) ) /* The actual label is stamped with the number "2" */
 
-	ROM_REGION( 0x8000, "audiocpu", 0 )    /* Sound Z80 code */
-	ROM_LOAD( "rom9.bin",  0x0000, 0x8000, CRC(73d8e235) SHA1(f37ad497259a467cdf2ec8b3e6e7d3e873087e6c) )
+	ROM_REGION( 0x8000, "audiocpu", 0 )    /* Sound HD647180 code */
+	ROM_LOAD( "hd647180.017",  0x00000, 0x08000, CRC(43523032) SHA1(1b94003a00e7bf6bdf1b1b946f42ff5d04629949) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD16_WORD( "rom5.bin",  0x00000, 0x80000, CRC(c64ec7b6) SHA1(e73b51c3713c2ea7a572a02531c15d1261ddeaa0) )
-	ROM_LOAD16_WORD( "rom6.bin",  0x80000, 0x80000, CRC(64b6c5ac) SHA1(07fa20115f603445c0d51af3465c0471c09d76b1) )
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "o17_05.12j",  0x00000, 0x20000, CRC(565315f8) SHA1(6b1c5ef52359483228b329c89c2e1174e3fbf017) )
+	ROM_LOAD16_BYTE( "o17_06.13j",  0x00001, 0x20000, CRC(95262d4c) SHA1(16f3aabecb1c87ce7eadf4f0ff61b29a4c017614) )
+	ROM_LOAD16_BYTE( "o17_07.12l",  0x40000, 0x20000, CRC(4c4b735c) SHA1(812c3bf46bd7764b2bb812bd2b9eb0331ed257ae) )
+	ROM_LOAD16_BYTE( "o17_08.13l",  0x40001, 0x20000, CRC(95c6586c) SHA1(ff87901f79d80f73ad09664b0c0d892898570616) )
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
-	ROM_LOAD16_BYTE( "rom2.bin",  0x00000, 0x20000, CRC(6bb72d16) SHA1(a127b10d9c255542bd09fcb5df057c12fd28c0d1) )
-	ROM_LOAD16_BYTE( "rom1.bin",  0x00001, 0x20000, CRC(0934782d) SHA1(e4a775ead23227d7d6e76aea23aa3103b511d031) )
-	ROM_LOAD16_BYTE( "rom3.bin",  0x40000, 0x20000, CRC(ec903c07) SHA1(75906f31200877fc8f6e78c2606ad5be49778165) )
-	ROM_LOAD16_BYTE( "rom4.bin",  0x40001, 0x20000, CRC(50cbf1a8) SHA1(cfab1504746654b4a61912155e9aeca746c65321) )
+	ROM_LOAD16_BYTE( "o17_01.1d",  0x00000, 0x20000, CRC(ea12e491) SHA1(02190722b7c5383471e0af9596be7039a5367240) )
+	ROM_LOAD16_BYTE( "o17_02.3d",  0x00001, 0x20000, CRC(32a13a9f) SHA1(1446acdfd21cd41f3d97aaf30f498c0c5d890605) )
+	ROM_LOAD16_BYTE( "o17_03.5d",  0x40000, 0x20000, CRC(68723dc9) SHA1(4f1b7aa2469c955e03737b611a7d2524f1e4f61e) )
+	ROM_LOAD16_BYTE( "o17_04.7d",  0x40001, 0x20000, CRC(fe0ecb13) SHA1(634a49262b9c092c25f11b14c6757fe94ea9eddc) )
+
+	ROM_REGION( 0x40, "proms", 0 )      /* nibble bproms, lo/hi order to be determined */
+	ROM_LOAD( "prom14.25b",  0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) ) /* sprite attribute (flip/position) ?? */
+	ROM_LOAD( "prom15.20c",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) ) /* ??? */
+ROM_END
+
+ROM_START( outzone )
+	ROM_REGION( 0x040000, "maincpu", 0 )    /* Main 68K code */
+	ROM_LOAD16_BYTE( "tp_018_07.bin",  0x000001, 0x20000, CRC(9704db16) SHA1(12b43a6961a7f63f29563eb77aaacb70d3c368dd) )
+	ROM_LOAD16_BYTE( "tp_018_08.bin",  0x000000, 0x20000, CRC(127a38d7) SHA1(d7f1ed91ff7d4de9e8215aa3b5cb65693145e433) )
+
+	ROM_REGION( 0x8000, "audiocpu", 0 )    /* Sound Z80 code */
+	ROM_LOAD( "tp_018_09.bin",  0x0000, 0x8000, CRC(73d8e235) SHA1(f37ad497259a467cdf2ec8b3e6e7d3e873087e6c) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_WORD( "tp-018_rom5.bin",  0x00000, 0x80000, CRC(c64ec7b6) SHA1(e73b51c3713c2ea7a572a02531c15d1261ddeaa0) )
+	ROM_LOAD16_WORD( "tp-018_rom6.bin",  0x80000, 0x80000, CRC(64b6c5ac) SHA1(07fa20115f603445c0d51af3465c0471c09d76b1) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "tp-018_rom2.bin",  0x00000, 0x20000, CRC(6bb72d16) SHA1(a127b10d9c255542bd09fcb5df057c12fd28c0d1) )
+	ROM_LOAD16_BYTE( "tp-018_rom1.bin",  0x00001, 0x20000, CRC(0934782d) SHA1(e4a775ead23227d7d6e76aea23aa3103b511d031) )
+	ROM_LOAD16_BYTE( "tp-018_rom3.bin",  0x40000, 0x20000, CRC(ec903c07) SHA1(75906f31200877fc8f6e78c2606ad5be49778165) )
+	ROM_LOAD16_BYTE( "tp-018_rom4.bin",  0x40001, 0x20000, CRC(50cbf1a8) SHA1(cfab1504746654b4a61912155e9aeca746c65321) )
 
 	ROM_REGION( 0x40, "proms", 0 )      /* nibble bproms, lo/hi order to be determined */
 	ROM_LOAD( "tp018_10.bpr",  0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )   /* sprite attribute (flip/position) ?? */
@@ -2911,21 +2922,21 @@ ROM_END
 
 ROM_START( outzoneh )
 	ROM_REGION( 0x040000, "maincpu", 0 )    /* Main 68K code */
-	ROM_LOAD16_BYTE( "tp018_7.bin",  0x000000, 0x20000, CRC(0c2ac02d) SHA1(78fda906ef7e0bb8e4ad44f34a8ac934b75d4bd8) )
-	ROM_LOAD16_BYTE( "tp018_8.bin",  0x000001, 0x20000, CRC(ca7e48aa) SHA1(c5073e6c124d74f16d01e67949965fdca929a886) )
+	ROM_LOAD16_BYTE( "tp_018_07h.bin",  0x000000, 0x20000, CRC(0c2ac02d) SHA1(78fda906ef7e0bb8e4ad44f34a8ac934b75d4bd8) ) /* The actual label is stamped with the letter "H" */
+	ROM_LOAD16_BYTE( "tp_018_08h.bin",  0x000001, 0x20000, CRC(ca7e48aa) SHA1(c5073e6c124d74f16d01e67949965fdca929a886) ) /* The actual label is stamped with the letter "H" */
 
 	ROM_REGION( 0x8000, "audiocpu", 0 )    /* Sound Z80 code */
-	ROM_LOAD( "rom9.bin",  0x0000, 0x8000, CRC(73d8e235) SHA1(f37ad497259a467cdf2ec8b3e6e7d3e873087e6c) )
+	ROM_LOAD( "tp_018_09.bin",  0x0000, 0x8000, CRC(73d8e235) SHA1(f37ad497259a467cdf2ec8b3e6e7d3e873087e6c) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD16_WORD( "rom5.bin",  0x00000, 0x80000, CRC(c64ec7b6) SHA1(e73b51c3713c2ea7a572a02531c15d1261ddeaa0) )
-	ROM_LOAD16_WORD( "rom6.bin",  0x80000, 0x80000, CRC(64b6c5ac) SHA1(07fa20115f603445c0d51af3465c0471c09d76b1) )
+	ROM_LOAD16_WORD( "tp-018_rom5.bin",  0x00000, 0x80000, CRC(c64ec7b6) SHA1(e73b51c3713c2ea7a572a02531c15d1261ddeaa0) )
+	ROM_LOAD16_WORD( "tp-018_rom6.bin",  0x80000, 0x80000, CRC(64b6c5ac) SHA1(07fa20115f603445c0d51af3465c0471c09d76b1) )
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
-	ROM_LOAD16_BYTE( "rom2.bin",  0x00000, 0x20000, CRC(6bb72d16) SHA1(a127b10d9c255542bd09fcb5df057c12fd28c0d1) )
-	ROM_LOAD16_BYTE( "rom1.bin",  0x00001, 0x20000, CRC(0934782d) SHA1(e4a775ead23227d7d6e76aea23aa3103b511d031) )
-	ROM_LOAD16_BYTE( "rom3.bin",  0x40000, 0x20000, CRC(ec903c07) SHA1(75906f31200877fc8f6e78c2606ad5be49778165) )
-	ROM_LOAD16_BYTE( "rom4.bin",  0x40001, 0x20000, CRC(50cbf1a8) SHA1(cfab1504746654b4a61912155e9aeca746c65321) )
+	ROM_LOAD16_BYTE( "tp-018_rom2.bin",  0x00000, 0x20000, CRC(6bb72d16) SHA1(a127b10d9c255542bd09fcb5df057c12fd28c0d1) )
+	ROM_LOAD16_BYTE( "tp-018_rom1.bin",  0x00001, 0x20000, CRC(0934782d) SHA1(e4a775ead23227d7d6e76aea23aa3103b511d031) )
+	ROM_LOAD16_BYTE( "tp-018_rom3.bin",  0x40000, 0x20000, CRC(ec903c07) SHA1(75906f31200877fc8f6e78c2606ad5be49778165) )
+	ROM_LOAD16_BYTE( "tp-018_rom4.bin",  0x40001, 0x20000, CRC(50cbf1a8) SHA1(cfab1504746654b4a61912155e9aeca746c65321) )
 
 	ROM_REGION( 0x40, "proms", 0 )      /* nibble bproms, lo/hi order to be determined */
 	ROM_LOAD( "tp018_10.bpr",  0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )   /* sprite attribute (flip/position) ?? */
@@ -2938,11 +2949,11 @@ ROM_START( outzonea )
 	ROM_LOAD16_BYTE( "19.bin",  0x000001, 0x20000, CRC(804ecfd1) SHA1(7dead8064445c6d44ebd0889583deb5e17b1954a) )
 
 	ROM_REGION( 0x8000, "audiocpu", 0 )    /* Sound Z80 code */
-	ROM_LOAD( "rom9.bin",  0x0000, 0x8000, CRC(73d8e235) SHA1(f37ad497259a467cdf2ec8b3e6e7d3e873087e6c) )
+	ROM_LOAD( "tp_018_09.bin",  0x0000, 0x8000, CRC(73d8e235) SHA1(f37ad497259a467cdf2ec8b3e6e7d3e873087e6c) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD16_WORD( "rom5.bin",  0x00000, 0x80000, CRC(c64ec7b6) SHA1(e73b51c3713c2ea7a572a02531c15d1261ddeaa0) )
-	ROM_LOAD16_WORD( "rom6.bin",  0x80000, 0x80000, CRC(64b6c5ac) SHA1(07fa20115f603445c0d51af3465c0471c09d76b1) )
+	ROM_LOAD16_WORD( "tp-018_rom5.bin",  0x00000, 0x80000, CRC(c64ec7b6) SHA1(e73b51c3713c2ea7a572a02531c15d1261ddeaa0) )
+	ROM_LOAD16_WORD( "tp-018_rom6.bin",  0x80000, 0x80000, CRC(64b6c5ac) SHA1(07fa20115f603445c0d51af3465c0471c09d76b1) )
 /* a pirate board exists using the same data in a different layout
     ROM_LOAD16_BYTE( "04.bin",  0x000000, 0x10000, CRC(3d11eae0) )
     ROM_LOAD16_BYTE( "08.bin",  0x000001, 0x10000, CRC(c7628891) )
@@ -2963,10 +2974,10 @@ ROM_START( outzonea )
 */
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
-	ROM_LOAD16_BYTE( "rom2.bin",  0x00000, 0x20000, CRC(6bb72d16) SHA1(a127b10d9c255542bd09fcb5df057c12fd28c0d1) )
-	ROM_LOAD16_BYTE( "rom1.bin",  0x00001, 0x20000, CRC(0934782d) SHA1(e4a775ead23227d7d6e76aea23aa3103b511d031) )
-	ROM_LOAD16_BYTE( "rom3.bin",  0x40000, 0x20000, CRC(ec903c07) SHA1(75906f31200877fc8f6e78c2606ad5be49778165) )
-	ROM_LOAD16_BYTE( "rom4.bin",  0x40001, 0x20000, CRC(50cbf1a8) SHA1(cfab1504746654b4a61912155e9aeca746c65321) )
+	ROM_LOAD16_BYTE( "tp-018_rom2.bin",  0x00000, 0x20000, CRC(6bb72d16) SHA1(a127b10d9c255542bd09fcb5df057c12fd28c0d1) )
+	ROM_LOAD16_BYTE( "tp-018_rom1.bin",  0x00001, 0x20000, CRC(0934782d) SHA1(e4a775ead23227d7d6e76aea23aa3103b511d031) )
+	ROM_LOAD16_BYTE( "tp-018_rom3.bin",  0x40000, 0x20000, CRC(ec903c07) SHA1(75906f31200877fc8f6e78c2606ad5be49778165) )
+	ROM_LOAD16_BYTE( "tp-018_rom4.bin",  0x40001, 0x20000, CRC(50cbf1a8) SHA1(cfab1504746654b4a61912155e9aeca746c65321) )
 
 	ROM_REGION( 0x40, "proms", 0 )      /* nibble bproms, lo/hi order to be determined */
 	ROM_LOAD( "tp018_10.bpr",  0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )   /* sprite attribute (flip/position) ?? */
@@ -2982,14 +2993,14 @@ ROM_START( outzoneb )
 	ROM_LOAD( "tp09.bin",  0x0000, 0x8000, CRC(dd56041f) SHA1(a481b8959b349761624166906175f8efcbebb7e7) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD16_WORD( "rom5.bin",  0x00000, 0x80000, CRC(c64ec7b6) SHA1(e73b51c3713c2ea7a572a02531c15d1261ddeaa0) )
-	ROM_LOAD16_WORD( "rom6.bin",  0x80000, 0x80000, CRC(64b6c5ac) SHA1(07fa20115f603445c0d51af3465c0471c09d76b1) )
+	ROM_LOAD16_WORD( "tp-018_rom5.bin",  0x00000, 0x80000, CRC(c64ec7b6) SHA1(e73b51c3713c2ea7a572a02531c15d1261ddeaa0) )
+	ROM_LOAD16_WORD( "tp-018_rom6.bin",  0x80000, 0x80000, CRC(64b6c5ac) SHA1(07fa20115f603445c0d51af3465c0471c09d76b1) )
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
-	ROM_LOAD16_BYTE( "rom2.bin",  0x00000, 0x20000, CRC(6bb72d16) SHA1(a127b10d9c255542bd09fcb5df057c12fd28c0d1) )
-	ROM_LOAD16_BYTE( "rom1.bin",  0x00001, 0x20000, CRC(0934782d) SHA1(e4a775ead23227d7d6e76aea23aa3103b511d031) )
-	ROM_LOAD16_BYTE( "rom3.bin",  0x40000, 0x20000, CRC(ec903c07) SHA1(75906f31200877fc8f6e78c2606ad5be49778165) )
-	ROM_LOAD16_BYTE( "rom4.bin",  0x40001, 0x20000, CRC(50cbf1a8) SHA1(cfab1504746654b4a61912155e9aeca746c65321) )
+	ROM_LOAD16_BYTE( "tp-018_rom2.bin",  0x00000, 0x20000, CRC(6bb72d16) SHA1(a127b10d9c255542bd09fcb5df057c12fd28c0d1) )
+	ROM_LOAD16_BYTE( "tp-018_rom1.bin",  0x00001, 0x20000, CRC(0934782d) SHA1(e4a775ead23227d7d6e76aea23aa3103b511d031) )
+	ROM_LOAD16_BYTE( "tp-018_rom3.bin",  0x40000, 0x20000, CRC(ec903c07) SHA1(75906f31200877fc8f6e78c2606ad5be49778165) )
+	ROM_LOAD16_BYTE( "tp-018_rom4.bin",  0x40001, 0x20000, CRC(50cbf1a8) SHA1(cfab1504746654b4a61912155e9aeca746c65321) )
 
 	ROM_REGION( 0x40, "proms", 0 )      /* nibble bproms, lo/hi order to be determined */
 	ROM_LOAD( "tp018_10.bpr",  0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )   /* sprite attribute (flip/position) ?? */
@@ -3003,17 +3014,17 @@ ROM_START( outzonec )                   /* From board serial number 2122 */
 	ROM_LOAD16_BYTE( "rom8.bin",  0x000001, 0x20000, CRC(d19b3ecf) SHA1(b406999b9f1e2104d958b42cc745bf79dbfe50b3) )
 
 	ROM_REGION( 0x8000, "audiocpu", 0 )    /* Sound Z80 code */
-	ROM_LOAD( "rom9.bin",  0x0000, 0x8000, BAD_DUMP CRC(73d8e235) SHA1(f37ad497259a467cdf2ec8b3e6e7d3e873087e6c) ) // see notes
+	ROM_LOAD( "tp_018_09.bin",  0x0000, 0x8000, BAD_DUMP CRC(73d8e235) SHA1(f37ad497259a467cdf2ec8b3e6e7d3e873087e6c) ) // see notes
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD16_WORD( "rom5.bin",  0x00000, 0x80000, CRC(c64ec7b6) SHA1(e73b51c3713c2ea7a572a02531c15d1261ddeaa0) )
-	ROM_LOAD16_WORD( "rom6.bin",  0x80000, 0x80000, CRC(64b6c5ac) SHA1(07fa20115f603445c0d51af3465c0471c09d76b1) )
+	ROM_LOAD16_WORD( "tp-018_rom5.bin",  0x00000, 0x80000, CRC(c64ec7b6) SHA1(e73b51c3713c2ea7a572a02531c15d1261ddeaa0) )
+	ROM_LOAD16_WORD( "tp-018_rom6.bin",  0x80000, 0x80000, CRC(64b6c5ac) SHA1(07fa20115f603445c0d51af3465c0471c09d76b1) )
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
-	ROM_LOAD16_BYTE( "rom2.bin",  0x00000, 0x20000, CRC(6bb72d16) SHA1(a127b10d9c255542bd09fcb5df057c12fd28c0d1) )
-	ROM_LOAD16_BYTE( "rom1.bin",  0x00001, 0x20000, CRC(0934782d) SHA1(e4a775ead23227d7d6e76aea23aa3103b511d031) )
-	ROM_LOAD16_BYTE( "rom3.bin",  0x40000, 0x20000, CRC(ec903c07) SHA1(75906f31200877fc8f6e78c2606ad5be49778165) )
-	ROM_LOAD16_BYTE( "rom4.bin",  0x40001, 0x20000, CRC(50cbf1a8) SHA1(cfab1504746654b4a61912155e9aeca746c65321) )
+	ROM_LOAD16_BYTE( "tp-018_rom2.bin",  0x00000, 0x20000, CRC(6bb72d16) SHA1(a127b10d9c255542bd09fcb5df057c12fd28c0d1) )
+	ROM_LOAD16_BYTE( "tp-018_rom1.bin",  0x00001, 0x20000, CRC(0934782d) SHA1(e4a775ead23227d7d6e76aea23aa3103b511d031) )
+	ROM_LOAD16_BYTE( "tp-018_rom3.bin",  0x40000, 0x20000, CRC(ec903c07) SHA1(75906f31200877fc8f6e78c2606ad5be49778165) )
+	ROM_LOAD16_BYTE( "tp-018_rom4.bin",  0x40001, 0x20000, CRC(50cbf1a8) SHA1(cfab1504746654b4a61912155e9aeca746c65321) )
 
 	ROM_REGION( 0x40, "proms", 0 )      /* nibble bproms, lo/hi order to be determined */
 	ROM_LOAD( "tp018_10.bpr",  0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )   /* sprite attribute (flip/position) ?? */
@@ -3029,14 +3040,14 @@ ROM_START( outzonecv ) /* This is a factory conversion of a Zero Wing (TP-015 ha
 	ROM_LOAD( "tp_018_09+.bin",  0x0000, 0x8000, CRC(b7201606) SHA1(d413074b59f25eb2136c1bc98189550410658493) ) /* The actual label has a black dot instead of the "+" */
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD16_WORD( "rom5.bin",  0x00000, 0x80000, CRC(c64ec7b6) SHA1(e73b51c3713c2ea7a572a02531c15d1261ddeaa0) ) /* Located on a SUB 015 daughter card */
-	ROM_LOAD16_WORD( "rom6.bin",  0x80000, 0x80000, CRC(64b6c5ac) SHA1(07fa20115f603445c0d51af3465c0471c09d76b1) ) /* Located on a SUB 015 daughter card */
+	ROM_LOAD16_WORD( "tp-018_rom5.bin",  0x00000, 0x80000, CRC(c64ec7b6) SHA1(e73b51c3713c2ea7a572a02531c15d1261ddeaa0) ) /* Located on a SUB 015 daughter card */
+	ROM_LOAD16_WORD( "tp-018_rom6.bin",  0x80000, 0x80000, CRC(64b6c5ac) SHA1(07fa20115f603445c0d51af3465c0471c09d76b1) ) /* Located on a SUB 015 daughter card */
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
-	ROM_LOAD16_BYTE( "rom2.bin",  0x00000, 0x20000, CRC(6bb72d16) SHA1(a127b10d9c255542bd09fcb5df057c12fd28c0d1) )
-	ROM_LOAD16_BYTE( "rom1.bin",  0x00001, 0x20000, CRC(0934782d) SHA1(e4a775ead23227d7d6e76aea23aa3103b511d031) )
-	ROM_LOAD16_BYTE( "rom3.bin",  0x40000, 0x20000, CRC(ec903c07) SHA1(75906f31200877fc8f6e78c2606ad5be49778165) )
-	ROM_LOAD16_BYTE( "rom4.bin",  0x40001, 0x20000, CRC(50cbf1a8) SHA1(cfab1504746654b4a61912155e9aeca746c65321) )
+	ROM_LOAD16_BYTE( "tp-018_rom2.bin",  0x00000, 0x20000, CRC(6bb72d16) SHA1(a127b10d9c255542bd09fcb5df057c12fd28c0d1) )
+	ROM_LOAD16_BYTE( "tp-018_rom1.bin",  0x00001, 0x20000, CRC(0934782d) SHA1(e4a775ead23227d7d6e76aea23aa3103b511d031) )
+	ROM_LOAD16_BYTE( "tp-018_rom3.bin",  0x40000, 0x20000, CRC(ec903c07) SHA1(75906f31200877fc8f6e78c2606ad5be49778165) )
+	ROM_LOAD16_BYTE( "tp-018_rom4.bin",  0x40001, 0x20000, CRC(50cbf1a8) SHA1(cfab1504746654b4a61912155e9aeca746c65321) )
 
 	ROM_REGION( 0x40, "proms", 0 )      /* nibble bproms, lo/hi order to be determined */
 	ROM_LOAD( "tp018_10.bpr",  0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )   /* sprite attribute (flip/position) ?? */
@@ -3156,6 +3167,7 @@ GAME( 1990, fireshrkd,  fireshrk, samesame, samesame2, toaplan1_state,     init_
 GAME( 1990, fireshrkdh, fireshrk, samesame, samesame2, toaplan1_state,     init_toaplan1, ROT270, "Toaplan (Dooyong license)",   "Fire Shark (Korea, set 2, harder)",         0 )
 GAME( 1989, samesame,   fireshrk, samesame, samesame,  toaplan1_state,     init_toaplan1, ROT270, "Toaplan",                     "Same! Same! Same! (1P set)",                0 )
 GAME( 1989, samesame2,  fireshrk, samesame, samesame2, toaplan1_state,     init_toaplan1, ROT270, "Toaplan",                     "Same! Same! Same! (2P set)",                0 )
+GAME( 1990, samesamecn, fireshrk, samesame, samesame2, toaplan1_state,     init_toaplan1, ROT270, "Toaplan (Hong Kong Honest Trading license)",   "Jiao! Jiao! Jiao! (China, 2P set)", 0 )
 GAME( 2015, samesamenh, fireshrk, samesame, samesame,  toaplan1_state,     init_toaplan1, ROT270, "hack (trap15)",               "Same! Same! Same! (1P set, NEW VER! hack)", 0 )
 
 GAME( 1990, outzone,    0,        outzone,  outzone,   toaplan1_state,     init_toaplan1, ROT270, "Toaplan",                     "Out Zone",                                   0 )

@@ -1,8 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Quench, Yochizo, David Haywood
+#ifndef MAME_INCLUDES_TOAPLAN2_H
+#define MAME_INCLUDES_TOAPLAN2_H
 
-/**************** Machine stuff ******************/
-//#define TRUXTON2_STEREO       /* Uncomment to hear truxton2 music in stereo */
+#pragma once
 
 #include "cpu/m68000/m68000.h"
 #include "machine/bankdev.h"
@@ -16,8 +17,7 @@
 #include "emupal.h"
 #include "screen.h"
 
-// We encode priority with colour in the tilemaps, so need a larger palette
-#define T2PALETTE_LENGTH 0x10000
+/**************** Machine stuff ******************/
 
 class toaplan2_state : public driver_device
 {
@@ -25,12 +25,11 @@ public:
 	toaplan2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_shared_ram(*this, "shared_ram")
-		, m_paletteram(*this, "palette")
 		, m_tx_videoram(*this, "tx_videoram")
 		, m_tx_lineselect(*this, "tx_lineselect")
 		, m_tx_linescroll(*this, "tx_linescroll")
-		, m_tx_gfxram16(*this, "tx_gfxram16")
-		, m_mainram16(*this, "mainram16")
+		, m_tx_gfxram(*this, "tx_gfxram")
+		, m_mainram(*this, "mainram")
 		, m_maincpu(*this, "maincpu")
 		, m_audiocpu(*this, "audiocpu")
 		, m_vdp(*this, "gp9001_%u", 0U)
@@ -85,14 +84,19 @@ public:
 
 	DECLARE_CUSTOM_INPUT_MEMBER(c2map_r);
 
+protected:
+	virtual void device_post_load() override;
+
 private:
+	// We encode priority with colour in the tilemaps, so need a larger palette
+	static constexpr unsigned T2PALETTE_LENGTH = 0x10000;
+
 	optional_shared_ptr<uint8_t> m_shared_ram; // 8 bit RAM shared between 68K and sound CPU
-	optional_shared_ptr<uint16_t> m_paletteram;
 	optional_shared_ptr<uint16_t> m_tx_videoram;
 	optional_shared_ptr<uint16_t> m_tx_lineselect;
 	optional_shared_ptr<uint16_t> m_tx_linescroll;
-	optional_shared_ptr<uint16_t> m_tx_gfxram16;
-	optional_shared_ptr<uint16_t> m_mainram16;
+	optional_shared_ptr<uint16_t> m_tx_gfxram;
+	optional_shared_ptr<uint16_t> m_mainram;
 
 	required_device<m68000_base_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
@@ -149,9 +153,10 @@ private:
 	DECLARE_WRITE8_MEMBER(batrider_clear_nmi_w);
 	DECLARE_READ16_MEMBER(bbakraid_eeprom_r);
 	DECLARE_WRITE16_MEMBER(bbakraid_eeprom_w);
-	DECLARE_WRITE16_MEMBER(toaplan2_tx_videoram_w);
-	DECLARE_WRITE16_MEMBER(toaplan2_tx_linescroll_w);
-	DECLARE_WRITE16_MEMBER(toaplan2_tx_gfxram16_w);
+	DECLARE_WRITE16_MEMBER(tx_videoram_w);
+	DECLARE_WRITE16_MEMBER(tx_linescroll_w);
+	DECLARE_WRITE16_MEMBER(tx_gfxram_w);
+	DECLARE_WRITE16_MEMBER(batrider_tx_gfxram_w);
 	DECLARE_WRITE16_MEMBER(batrider_textdata_dma_w);
 	DECLARE_WRITE16_MEMBER(batrider_pal_text_dma_w);
 	DECLARE_WRITE8_MEMBER(batrider_objectbank_w);
@@ -178,18 +183,16 @@ private:
 	uint32_t screen_update_batsugun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_truxton2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_bootleg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_toaplan2);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	IRQ_CALLBACK_MEMBER(fixeightbl_irq_ack);
 	IRQ_CALLBACK_MEMBER(pipibibsbl_irq_ack);
 	INTERRUPT_GEN_MEMBER(bbakraid_snd_interrupt);
-	void truxton2_postload();
 	void create_tx_tilemap(int dx = 0, int dx_flipped = 0);
 
 	DECLARE_WRITE8_MEMBER(pwrkick_coin_w);
 	DECLARE_WRITE8_MEMBER(pwrkick_coin_lockout_w);
 
 	DECLARE_WRITE_LINE_MEMBER(toaplan2_reset);
-	
 
 	void batrider_68k_mem(address_map &map);
 	void batrider_dma_mem(address_map &map);
@@ -230,3 +233,5 @@ private:
 	void vfive_68k_mem(address_map &map);
 	void vfive_v25_mem(address_map &map);
 };
+
+#endif // MAME_INCLUDES_TOAPLAN2_H

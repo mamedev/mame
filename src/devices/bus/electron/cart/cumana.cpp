@@ -45,17 +45,17 @@ void cumana_floppies(device_slot_interface &device)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(electron_cumana_device::device_add_mconfig)
+void electron_cumana_device::device_add_mconfig(machine_config &config)
+{
 	/* fdc */
-	MCFG_DEVICE_ADD("fdc", FD1793, 16_MHz_XTAL / 16) // TODO: Not known whether DRQ and INTRQ are connected
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", cumana_floppies, "525qd", electron_cumana_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", cumana_floppies, nullptr, electron_cumana_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FD1793(config, m_fdc, DERIVED_CLOCK(1, 16)); // TODO: Not known whether DRQ and INTRQ are connected
+	FLOPPY_CONNECTOR(config, m_floppy0, cumana_floppies, "525qd", electron_cumana_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy1, cumana_floppies, nullptr, electron_cumana_device::floppy_formats).enable_sound(true);
 
 	/* rtc */
-	MCFG_DEVICE_ADD("rtc", MC146818, 32.768_kHz_XTAL)
-MACHINE_CONFIG_END
+	MC146818(config, m_rtc, 32.768_kHz_XTAL);
+	m_rtc->irq().set(DEVICE_SELF_OWNER, FUNC(electron_cartslot_device::irq_w));
+}
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -87,7 +87,7 @@ void electron_cumana_device::device_start()
 //  read - cartridge data read
 //-------------------------------------------------
 
-uint8_t electron_cumana_device::read(address_space &space, offs_t offset, int infc, int infd, int romqa)
+uint8_t electron_cumana_device::read(address_space &space, offs_t offset, int infc, int infd, int romqa, int oe, int oe2)
 {
 	uint8_t data = 0xff;
 
@@ -99,7 +99,7 @@ uint8_t electron_cumana_device::read(address_space &space, offs_t offset, int in
 		case 0x91:
 		case 0x92:
 		case 0x93:
-			data = m_fdc->read(space, offset & 0x03);
+			data = m_fdc->read(offset & 0x03);
 			break;
 		case 0x98:
 		case 0x9c:
@@ -107,8 +107,7 @@ uint8_t electron_cumana_device::read(address_space &space, offs_t offset, int in
 			break;
 		}
 	}
-
-	if (!infc && !infd)
+	else if (oe)
 	{
 		switch (romqa)
 		{
@@ -135,7 +134,7 @@ uint8_t electron_cumana_device::read(address_space &space, offs_t offset, int in
 //  write - cartridge data write
 //-------------------------------------------------
 
-void electron_cumana_device::write(address_space &space, offs_t offset, uint8_t data, int infc, int infd, int romqa)
+void electron_cumana_device::write(address_space &space, offs_t offset, uint8_t data, int infc, int infd, int romqa, int oe, int oe2)
 {
 	if (infc)
 	{
@@ -145,7 +144,7 @@ void electron_cumana_device::write(address_space &space, offs_t offset, uint8_t 
 		case 0x91:
 		case 0x92:
 		case 0x93:
-			m_fdc->write(space, offset & 0x03, data);
+			m_fdc->write(offset & 0x03, data);
 			break;
 		case 0x94:
 			wd1793_control_w(space, 0, data);
@@ -157,8 +156,7 @@ void electron_cumana_device::write(address_space &space, offs_t offset, uint8_t 
 			break;
 		}
 	}
-
-	if (!infc && !infd)
+	else if (oe)
 	{
 		if (romqa == 0 && offset >= 0x3800)
 		{

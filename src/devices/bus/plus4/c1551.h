@@ -13,6 +13,7 @@
 
 #include "exp.h"
 #include "cpu/m6502/m6510t.h"
+#include "imagedev/floppy.h"
 #include "machine/64h156.h"
 #include "machine/6525tpi.h"
 #include "machine/pla.h"
@@ -78,7 +79,7 @@ private:
 	required_device<tpi6525_device> m_tpi0;
 	required_device<tpi6525_device> m_tpi1;
 	required_device<c64h156_device> m_ga;
-	required_device<pla_device> m_pla;
+	required_device<pls100_device> m_pla;
 	required_device<floppy_image_device> m_floppy;
 	required_device<plus4_expansion_slot_device> m_exp;
 	required_ioport m_jp1;

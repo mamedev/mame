@@ -163,6 +163,40 @@ WRITE_LINE_MEMBER( mbc55x_state::vid_vsync_changed )
 {
 }
 
+static constexpr rgb_t mbc55x_pens[SCREEN_NO_COLOURS]
+{
+	// normal brightness
+	{ 0x00, 0x00, 0x00 }, // black
+	{ 0x00, 0x00, 0x80 }, // blue
+	{ 0x00, 0x80, 0x00 }, // green
+	{ 0x00, 0x80, 0x80 }, // cyan
+	{ 0x80, 0x00, 0x00 }, // red
+	{ 0x80, 0x00, 0x80 }, // magenta
+	{ 0x80, 0x80, 0x00 }, // yellow
+	{ 0x80, 0x80, 0x80 }  // light grey
+};
+
+void mbc55x_state::mbc55x_palette(palette_device &palette) const
+{
+	logerror("initializing palette\n");
+
+	palette.set_pen_colors(0, mbc55x_pens);
+}
+
+/* Video ram page register */
+
+uint8_t mbc55x_state::vram_page_r()
+{
+	return m_vram_page;
+}
+
+void mbc55x_state::vram_page_w(uint8_t data)
+{
+	logerror("%s : set vram page to %02X\n", machine().describe_context(),data);
+
+	m_vram_page=data;
+}
+
 void mbc55x_state::video_start()
 {
 	m_debug_video=0;
@@ -182,9 +216,4 @@ void mbc55x_state::video_reset()
 	memset(&m_video_mem,0,sizeof(m_video_mem));
 
 	logerror("Video reset\n");
-}
-
-WRITE_LINE_MEMBER(mbc55x_state::screen_vblank_mbc55x)
-{
-//  logerror("screen_vblank_mbc55x\n");
 }

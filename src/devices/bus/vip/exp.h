@@ -46,27 +46,6 @@
 #define VIP_EXPANSION_SLOT_TAG      "exp"
 
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_VIP_EXPANSION_SLOT_ADD(_tag, _clock, _slot_intf, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, VIP_EXPANSION_SLOT, _clock) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-
-
-#define MCFG_VIP_EXPANSION_SLOT_INT_CALLBACK(_write) \
-	devcb = &downcast<vip_expansion_slot_device &>(*device).set_int_wr_callback(DEVCB_##_write);
-
-#define MCFG_VIP_EXPANSION_SLOT_DMA_OUT_CALLBACK(_write) \
-	devcb = &downcast<vip_expansion_slot_device &>(*device).set_dma_out_wr_callback(DEVCB_##_write);
-
-#define MCFG_VIP_EXPANSION_SLOT_DMA_IN_CALLBACK(_write) \
-	devcb = &downcast<vip_expansion_slot_device &>(*device).set_dma_in_wr_callback(DEVCB_##_write);
-
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -80,31 +59,41 @@ class vip_expansion_slot_device : public device_t,
 {
 public:
 	// construction/destruction
+	template <typename T>
+	vip_expansion_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock, T &&opts, char const *dflt)
+		: vip_expansion_slot_device(mconfig, tag, owner, clock)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
 	vip_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_int_wr_callback(Object &&cb) { return m_write_int.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_dma_out_wr_callback(Object &&cb) { return m_write_dma_out.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_dma_in_wr_callback(Object &&cb) { return m_write_dma_in.set_callback(std::forward<Object>(cb)); }
+	auto int_wr_callback() { return m_write_int.bind(); }
+	auto dma_out_wr_callback() { return m_write_dma_out.bind(); }
+	auto dma_in_wr_callback() { return m_write_dma_in.bind(); }
 
 	// computer interface
 	uint8_t program_r(address_space &space, offs_t offset, int cs, int cdef, int *minh);
 	void program_w(address_space &space, offs_t offset, uint8_t data, int cdef, int *minh);
 	uint8_t io_r(address_space &space, offs_t offset);
 	void io_w(address_space &space, offs_t offset, uint8_t data);
-	uint8_t dma_r(address_space &space, offs_t offset);
-	void dma_w(address_space &space, offs_t offset, uint8_t data);
+	DECLARE_READ8_MEMBER(dma_r);
+	DECLARE_WRITE8_MEMBER(dma_w);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_READ_LINE_MEMBER( ef1_r );
-	DECLARE_READ_LINE_MEMBER( ef3_r );
-	DECLARE_READ_LINE_MEMBER( ef4_r );
-	void sc_w(int data);
-	DECLARE_WRITE_LINE_MEMBER( q_w );
-	DECLARE_WRITE_LINE_MEMBER( run_w );
+	DECLARE_READ_LINE_MEMBER(ef1_r);
+	DECLARE_READ_LINE_MEMBER(ef3_r);
+	DECLARE_READ_LINE_MEMBER(ef4_r);
+	DECLARE_WRITE8_MEMBER(sc_w);
+	DECLARE_WRITE_LINE_MEMBER(q_w);
+	DECLARE_WRITE_LINE_MEMBER(tpb_w);
+	DECLARE_WRITE_LINE_MEMBER(run_w);
 
 	// cartridge interface
-	DECLARE_WRITE_LINE_MEMBER( interrupt_w ) { m_write_int(state); }
-	DECLARE_WRITE_LINE_MEMBER( dma_out_w ) { m_write_dma_out(state); }
-	DECLARE_WRITE_LINE_MEMBER( dma_in_w ) { m_write_dma_in(state); }
+	DECLARE_WRITE_LINE_MEMBER(interrupt_w) { m_write_int(state); }
+	DECLARE_WRITE_LINE_MEMBER(dma_out_w) { m_write_dma_out(state); }
+	DECLARE_WRITE_LINE_MEMBER(dma_in_w) { m_write_dma_in(state); }
 
 protected:
 	// device-level overrides
@@ -144,9 +133,11 @@ protected:
 	virtual int vip_ef3_r() { return CLEAR_LINE; }
 	virtual int vip_ef4_r() { return CLEAR_LINE; }
 
-	virtual void vip_sc_w(int data) { }
+	virtual void vip_sc_w(int n, int sc) { }
 
 	virtual void vip_q_w(int state) { }
+
+	virtual void vip_tpb_w(int state) { }
 
 	virtual void vip_run_w(int state) { }
 

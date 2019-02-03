@@ -12,7 +12,6 @@
 #include "machine/smartmed.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
-#include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -22,8 +21,8 @@
 class mini2440_state : public driver_device
 {
 public:
-	mini2440_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	mini2440_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_s3c2440(*this, "s3c2440"),
 		m_nand(*this, "nand"),
@@ -237,7 +236,6 @@ MACHINE_CONFIG_START(mini2440_state::mini2440)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(1024, 768)
 	MCFG_SCREEN_VISIBLE_AREA(0, 239, 0, 319)
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	MCFG_SCREEN_UPDATE_DEVICE("s3c2440", s3c2440_device, screen_update)
 
@@ -249,22 +247,22 @@ MACHINE_CONFIG_START(mini2440_state::mini2440)
 	MCFG_SOUND_ROUTE(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
 	MCFG_SOUND_ROUTE(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 
-	MCFG_DEVICE_ADD("s3c2440", S3C2440, 12000000)
-	MCFG_S3C2440_PALETTE("palette")
-	MCFG_S3C2440_SCREEN("screen")
-	MCFG_S3C2440_CORE_PIN_R_CB(READ32(*this, mini2440_state, s3c2440_core_pin_r))
-	MCFG_S3C2440_GPIO_PORT_R_CB(READ32(*this, mini2440_state, s3c2440_gpio_port_r))
-	MCFG_S3C2440_GPIO_PORT_W_CB(WRITE32(*this, mini2440_state, s3c2440_gpio_port_w))
-	MCFG_S3C2440_ADC_DATA_R_CB(READ32(*this, mini2440_state, s3c2440_adc_data_r))
-	MCFG_S3C2440_I2S_DATA_W_CB(WRITE16(*this, mini2440_state, s3c2440_i2s_data_w))
-	MCFG_S3C2440_NAND_COMMAND_W_CB(WRITE8(*this, mini2440_state, s3c2440_nand_command_w))
-	MCFG_S3C2440_NAND_ADDRESS_W_CB(WRITE8(*this, mini2440_state, s3c2440_nand_address_w))
-	MCFG_S3C2440_NAND_DATA_R_CB(READ8(*this, mini2440_state, s3c2440_nand_data_r))
-	MCFG_S3C2440_NAND_DATA_W_CB(WRITE8(*this, mini2440_state, s3c2440_nand_data_w))
+	S3C2440(config, m_s3c2440, 12000000);
+	m_s3c2440->set_palette_tag("palette");
+	m_s3c2440->set_screen_tag("screen");
+	m_s3c2440->core_pin_r_callback().set(FUNC(mini2440_state::s3c2440_core_pin_r));
+	m_s3c2440->gpio_port_r_callback().set(FUNC(mini2440_state::s3c2440_gpio_port_r));
+	m_s3c2440->gpio_port_w_callback().set(FUNC(mini2440_state::s3c2440_gpio_port_w));
+	m_s3c2440->adc_data_r_callback().set(FUNC(mini2440_state::s3c2440_adc_data_r));
+	m_s3c2440->i2s_data_w_callback().set(FUNC(mini2440_state::s3c2440_i2s_data_w));
+	m_s3c2440->nand_command_w_callback().set(FUNC(mini2440_state::s3c2440_nand_command_w));
+	m_s3c2440->nand_address_w_callback().set(FUNC(mini2440_state::s3c2440_nand_address_w));
+	m_s3c2440->nand_data_r_callback().set(FUNC(mini2440_state::s3c2440_nand_data_r));
+	m_s3c2440->nand_data_w_callback().set(FUNC(mini2440_state::s3c2440_nand_data_w));
 
-	MCFG_DEVICE_ADD("nand", NAND, 0)
-	MCFG_NAND_TYPE(K9F1G08U0B)
-	MCFG_NAND_RNB_CALLBACK(WRITELINE("s3c2440", s3c2440_device, frnb_w))
+	NAND(config, m_nand, 0);
+	m_nand->set_nand_type(nand_device::chip::K9F1G08U0B);
+	m_nand->rnb_wr_callback().set(m_s3c2440, FUNC(s3c2440_device::frnb_w));
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( mini2440 )

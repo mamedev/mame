@@ -497,54 +497,55 @@ static INPUT_PORTS_START( ecoinf2 )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(ecoinf2_state::ecoinf2_oxo)
+void ecoinf2_state::ecoinf2_oxo(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z180,4000000) // some of these hit invalid opcodes with a plain z80, some don't?
-	MCFG_DEVICE_PROGRAM_MAP(oxo_memmap)
-	MCFG_DEVICE_IO_MAP(oxo_portmap)
+	Z180(config, m_maincpu, 4000000); // some of these hit invalid opcodes with a plain z80, some don't?
+	m_maincpu->set_addrmap(AS_PROGRAM, &ecoinf2_state::oxo_memmap);
+	m_maincpu->set_addrmap(AS_IO, &ecoinf2_state::oxo_portmap);
 
-	MCFG_DEFAULT_LAYOUT(layout_ecoinf2)
+	config.set_default_layout(layout_ecoinf2);
 
-	MCFG_DEVICE_ADD("ic10_lamp", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, ecoinf2_state, ppi8255_ic10_write_a_strobedat0))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, ecoinf2_state, ppi8255_ic10_write_b_strobedat1))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, ecoinf2_state, ppi8255_ic10_write_c_strobe))
+	i8255_device &ic10_lamp(I8255(config, "ic10_lamp"));
+	ic10_lamp.out_pa_callback().set(FUNC(ecoinf2_state::ppi8255_ic10_write_a_strobedat0));
+	ic10_lamp.out_pb_callback().set(FUNC(ecoinf2_state::ppi8255_ic10_write_b_strobedat1));
+	ic10_lamp.out_pc_callback().set(FUNC(ecoinf2_state::ppi8255_ic10_write_c_strobe));
 
 	// IC24 is the workhorse of the Phoenix, it seems to handle meters, payslides, coin lamps, inhibits and the watchdog! */
-	MCFG_DEVICE_ADD("ic24_coin", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, ecoinf2_state, ppi8255_ic24_write_a_meters))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, ecoinf2_state, ppi8255_ic24_write_b_payouts))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, ecoinf2_state, ppi8255_ic24_write_c_inhibits))
+	i8255_device &ic24_coin(I8255(config, "ic24_coin"));
+	ic24_coin.out_pa_callback().set(FUNC(ecoinf2_state::ppi8255_ic24_write_a_meters));
+	ic24_coin.out_pb_callback().set(FUNC(ecoinf2_state::ppi8255_ic24_write_b_payouts));
+	ic24_coin.out_pc_callback().set(FUNC(ecoinf2_state::ppi8255_ic24_write_c_inhibits));
 
-	MCFG_DEVICE_ADD("ic22_inpt", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, ecoinf2_state, ppi8255_ic22_read_a_levels))    // manual says level switches
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, ecoinf2_state, ppi8255_ic22_read_b_coins))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, ecoinf2_state, ppi8255_ic22_read_c_misc))  // 0x20 appears to be meter power
+	i8255_device &ic22_inpt(I8255(config, "ic22_inpt"));
+	ic22_inpt.in_pa_callback().set(FUNC(ecoinf2_state::ppi8255_ic22_read_a_levels));    // manual says level switches
+	ic22_inpt.in_pb_callback().set(FUNC(ecoinf2_state::ppi8255_ic22_read_b_coins));
+	ic22_inpt.in_pc_callback().set(FUNC(ecoinf2_state::ppi8255_ic22_read_c_misc));  // 0x20 appears to be meter power
 
-	MCFG_DEVICE_ADD("ic23_reel", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, ecoinf2_state, ppi8255_ic23_write_a_reel01))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, ecoinf2_state, ppi8255_ic23_write_b_reel23))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, ecoinf2_state, ppi8255_ic23_read_c_key))   // optos and keys
+	i8255_device &ic23_reel(I8255(config, "ic23_reel"));
+	ic23_reel.out_pa_callback().set(FUNC(ecoinf2_state::ppi8255_ic23_write_a_reel01));
+	ic23_reel.out_pb_callback().set(FUNC(ecoinf2_state::ppi8255_ic23_write_b_reel23));
+	ic23_reel.in_pc_callback().set(FUNC(ecoinf2_state::ppi8255_ic23_read_c_key));   // optos and keys
 
-	MCFG_DEVICE_ADD("ic13_leds", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, ecoinf2_state, ppi8255_ic13_write_a_strobedat0))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, ecoinf2_state, ppi8255_ic13_write_b_strobedat1))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, ecoinf2_state, ppi8255_ic13_read_c_panel))
+	i8255_device &ic13_leds(I8255(config, "ic13_leds"));
+	ic13_leds.out_pa_callback().set(FUNC(ecoinf2_state::ppi8255_ic13_write_a_strobedat0));
+	ic13_leds.out_pb_callback().set(FUNC(ecoinf2_state::ppi8255_ic13_write_b_strobedat1));
+	ic13_leds.in_pc_callback().set(FUNC(ecoinf2_state::ppi8255_ic13_read_c_panel));
 
-	MCFG_DEVICE_ADD("reel0", REEL, ECOIN_200STEP_REEL, 12, 24, 0x09, 7, 200*2)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, ecoinf2_state, reel_optic_cb<0>))
-	MCFG_DEVICE_ADD("reel1", REEL, ECOIN_200STEP_REEL, 12, 24, 0x09, 7, 200*2)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, ecoinf2_state, reel_optic_cb<1>))
-	MCFG_DEVICE_ADD("reel2", REEL, ECOIN_200STEP_REEL, 12, 24, 0x09, 7, 200*2)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, ecoinf2_state, reel_optic_cb<2>))
-	MCFG_DEVICE_ADD("reel3", REEL, ECOIN_200STEP_REEL, 12, 24, 0x09, 7, 200*2)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, ecoinf2_state, reel_optic_cb<3>))
+	REEL(config, m_reels[0], ECOIN_200STEP_REEL, 12, 24, 0x09, 7, 200*2);
+	m_reels[0]->optic_handler().set(FUNC(ecoinf2_state::reel_optic_cb<0>));
+	REEL(config, m_reels[1], ECOIN_200STEP_REEL, 12, 24, 0x09, 7, 200*2);
+	m_reels[1]->optic_handler().set(FUNC(ecoinf2_state::reel_optic_cb<1>));
+	REEL(config, m_reels[2], ECOIN_200STEP_REEL, 12, 24, 0x09, 7, 200*2);
+	m_reels[2]->optic_handler().set(FUNC(ecoinf2_state::reel_optic_cb<2>));
+	REEL(config, m_reels[3], ECOIN_200STEP_REEL, 12, 24, 0x09, 7, 200*2);
+	m_reels[3]->optic_handler().set(FUNC(ecoinf2_state::reel_optic_cb<3>));
 
-	MCFG_DEVICE_ADD("meters", METERS, 0)
-	MCFG_METERS_NUMBER(8)
+	METERS(config, m_meters, 0);
+	m_meters->set_number(8);
 
-//  MCFG_DEVICE_ADD("ic25_dips", I8255, 0)
-MACHINE_CONFIG_END
+//  I8255(config, "ic25_dips", 0);
+}
 
 
 

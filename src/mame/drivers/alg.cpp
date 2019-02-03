@@ -4,21 +4,23 @@
 
     American Laser Game Hardware
 
-    Amiga 500 + sony ldp1450 laserdisc player
+    Amiga 500 + sony laserdisc player LDP-1450
+    (LDP-3300P for Zorton Brothers, LDP-1500 for Marbella Vice)
 
     Games Supported:
 
         Mad Dog McCree [3 versions]
         Who Shot Johnny Rock? [2 versions]
-        Mad Dog II: The Lost Gold [2 versions]
-        Space Pirates
-        Gallagher's Gallery
-        Crime Patrol
+        Mad Dog II: The Lost Gold [4 versions]
+        Space Pirates [2 versions]
+        Gallagher's Gallery [2 versions]
+        Crime Patrol [3 versions]
         Crime Patrol 2: Drug Wars [2 versions]
-        The Last Bounty Hunter
-        Fast Draw Showdown
+        The Last Bounty Hunter [2 versions]
+        Fast Draw Showdown [2 versions]
         Platoon
-        Zorton Brothers (Los Justicieros)
+        Zorton Brothers (Los Justicieros) [2 versions]
+        Marbella Vice
 
 **************************************************************************************/
 
@@ -102,8 +104,8 @@ int alg_state::get_lightgun_pos(int player, int *x, int *y)
 	if (xpos == -1 || ypos == -1)
 		return false;
 
-	*x = visarea.min_x + xpos * visarea.width() / 255;
-	*y = visarea.min_y + ypos * visarea.height() / 255;
+	*x = visarea.left() + xpos * visarea.width() / 255;
+	*y = visarea.top() + ypos * visarea.height() / 255;
 	return true;
 }
 
@@ -309,26 +311,21 @@ MACHINE_CONFIG_START(alg_state::alg_r1)
 	MCFG_DEVICE_ADD("maincpu", M68000, amiga_state::CLK_7M_NTSC)
 	MCFG_DEVICE_PROGRAM_MAP(main_map_r1)
 
-	MCFG_DEVICE_ADD("overlay", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(overlay_512kb_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(22)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x200000)
+	ADDRESS_MAP_BANK(config, "overlay").set_map(&alg_state::overlay_512kb_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	ntsc_video(config);
 
-	MCFG_LASERDISC_LDP1450_ADD("laserdisc",9600)
-	MCFG_LASERDISC_SCREEN("screen")
-	MCFG_LASERDISC_OVERLAY_DRIVER(512*2, 262, amiga_state, screen_update_amiga)
-	MCFG_LASERDISC_OVERLAY_CLIP((129-8)*2, (449+8-1)*2, 44-8, 244+8-1)
-	MCFG_LASERDISC_OVERLAY_PALETTE("palette")
+	SONY_LDP1450(config, m_laserdisc, 9600);
+	m_laserdisc->set_screen("screen");
+	m_laserdisc->set_overlay(512*2, 262, FUNC(amiga_state::screen_update_amiga));
+	m_laserdisc->set_overlay_clip((129-8)*2, (449+8-1)*2, 44-8, 244+8-1);
+	m_laserdisc->set_overlay_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 4097)
-	MCFG_PALETTE_INIT_OWNER(alg_state,amiga)
+
+	PALETTE(config, m_palette, FUNC(alg_state::amiga_palette), 4097);
 
 	MCFG_VIDEO_START_OVERRIDE(alg_state,alg)
 
@@ -336,33 +333,32 @@ MACHINE_CONFIG_START(alg_state::alg_r1)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("amiga", PAULA_8364, amiga_state::CLK_C1_NTSC)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.25)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.25)
-	MCFG_SOUND_ROUTE(2, "rspeaker", 0.25)
-	MCFG_SOUND_ROUTE(3, "lspeaker", 0.25)
-	MCFG_PAULA_MEM_READ_CB(READ16(*this, amiga_state, chip_ram_r))
-	MCFG_PAULA_INT_CB(WRITELINE(*this, amiga_state, paula_int_w))
+	paula_8364_device &paula(PAULA_8364(config, "amiga", amiga_state::CLK_C1_NTSC));
+	paula.add_route(0, "lspeaker", 0.25);
+	paula.add_route(1, "rspeaker", 0.25);
+	paula.add_route(2, "rspeaker", 0.25);
+	paula.add_route(3, "lspeaker", 0.25);
+	paula.mem_read_cb().set(FUNC(amiga_state::chip_ram_r));
+	paula.int_cb().set(FUNC(amiga_state::paula_int_w));
 
-	MCFG_DEVICE_MODIFY("laserdisc")
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	m_laserdisc->add_route(0, "lspeaker", 1.0);
+	m_laserdisc->add_route(1, "rspeaker", 1.0);
 
 	/* cia */
-	MCFG_DEVICE_ADD("cia_0", MOS8520, amiga_state::CLK_E_NTSC)
-	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(*this, amiga_state, cia_0_irq))
-	MCFG_MOS6526_PA_INPUT_CALLBACK(IOPORT("FIRE"))
-	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(*this, amiga_state, cia_0_port_a_write))
-	MCFG_DEVICE_ADD("cia_1", MOS8520, amiga_state::CLK_E_NTSC)
-	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(*this, amiga_state, cia_1_irq))
+	MOS8520(config, m_cia_0, amiga_state::CLK_E_NTSC);
+	m_cia_0->irq_wr_callback().set(FUNC(amiga_state::cia_0_irq));
+	m_cia_0->pa_rd_callback().set_ioport("FIRE");
+	m_cia_0->pa_wr_callback().set(FUNC(amiga_state::cia_0_port_a_write));
 
-	/* fdc */
-	MCFG_DEVICE_ADD("fdc", AMIGA_FDC, amiga_state::CLK_7M_NTSC)
-	MCFG_AMIGA_FDC_INDEX_CALLBACK(WRITELINE("cia_1", mos8520_device, flag_w))
-	MCFG_AMIGA_FDC_READ_DMA_CALLBACK(READ16(*this, amiga_state, chip_ram_r))
-	MCFG_AMIGA_FDC_WRITE_DMA_CALLBACK(WRITE16(*this, amiga_state, chip_ram_w))
-	MCFG_AMIGA_FDC_DSKBLK_CALLBACK(WRITELINE(*this, amiga_state, fdc_dskblk_w))
-	MCFG_AMIGA_FDC_DSKSYN_CALLBACK(WRITELINE(*this, amiga_state, fdc_dsksyn_w))
+	MOS8520(config, m_cia_1, amiga_state::CLK_E_NTSC);
+	m_cia_1->irq_wr_callback().set(FUNC(amiga_state::cia_1_irq));
+
+	AMIGA_FDC(config, m_fdc, amiga_state::CLK_7M_NTSC);
+	m_fdc->index_callback().set("cia_1", FUNC(mos8520_device::flag_w));
+	m_fdc->read_dma_callback().set(FUNC(amiga_state::chip_ram_r));
+	m_fdc->write_dma_callback().set(FUNC(amiga_state::chip_ram_w));
+	m_fdc->dskblk_callback().set(FUNC(amiga_state::fdc_dskblk_w));
+	m_fdc->dsksyn_callback().set(FUNC(amiga_state::fdc_dsksyn_w));
 MACHINE_CONFIG_END
 
 
@@ -379,15 +375,13 @@ MACHINE_CONFIG_START(alg_state::picmatic)
 	MCFG_DEVICE_REPLACE("maincpu", M68000, amiga_state::CLK_7M_PAL)
 	MCFG_DEVICE_PROGRAM_MAP(main_map_picmatic)
 
-	MCFG_DEVICE_REMOVE("screen")
+	config.device_remove("screen");
 	pal_video(config);
 
 	MCFG_DEVICE_MODIFY("amiga")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_C1_PAL)
-	MCFG_DEVICE_MODIFY("cia_0")
-	MCFG_DEVICE_CLOCK(amiga_state::CLK_E_PAL)
-	MCFG_DEVICE_MODIFY("cia_1")
-	MCFG_DEVICE_CLOCK(amiga_state::CLK_E_PAL)
+	m_cia_0->set_clock(amiga_state::CLK_E_PAL);
+	m_cia_1->set_clock(amiga_state::CLK_E_PAL);
 	MCFG_DEVICE_MODIFY("fdc")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_PAL)
 MACHINE_CONFIG_END
@@ -685,7 +679,28 @@ ROM_START( aplatoon )
 	DISK_IMAGE_READONLY( "platoon", 0, NO_DUMP )
 ROM_END
 
+// zortonbr v1.01
+// ROM board labeled "PICMATIC LM6 04-01-92"
+// Uses Sony LaserMax LDP-3300P, a separate video encoder PCB with a Motorola MC1378B and a standard A500+ PCB.
+// ROM contains text: "Marbella Vice CopyRight 1994 Picmatic S.A. Program chief Brian Meitiner" (but it's Zorton Brothers)
+// References to linked libraries: Audio Master IV, AMAS II Version 1.1
+// Has a blacklist for high scores:
+//   "FUCK SHIT CUNT PRICK PENUS BALLS PUTA JODER POLLA PUTO MAMON PICHA COJON TETA TETAS TITS CHULO CULO PENE PIJO LEFA LISTO"
 ROM_START( zortonbr )
+	ALG_BIOS
+
+	ROM_REGION( 0x40000, "game_program", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "zort_1-01_23-3-94_odd.u2",  0x000000, 0x10000, CRC(21e63949) SHA1(0a62ad108f8cfa00dc8f03dea2ff6f1b277e8d5d) )
+	ROM_LOAD16_BYTE( "zort_1-01_23-3-94_even.u3", 0x000001, 0x10000, CRC(6a051c6a) SHA1(f8daafab068fef57e47287bd72be860b84e2e75c) )
+
+	ROM_REGION( 0x00800, "unused_nvram", ROMREGION_ERASEFF ) //NVRAM, unused
+	ROM_LOAD( "zort_mk48z02b.u13", 0x0000, 0x0800, CRC(45b064a9) SHA1(f446be2b0e3929e182b9f97989c30b3ee308c103) )
+
+	DISK_REGION( "laserdisc" )
+	DISK_IMAGE_READONLY( "zortonbr", 0, NO_DUMP )
+ROM_END
+
+ROM_START( zortonbr_100 )
 	ALG_BIOS
 
 	ROM_REGION( 0x40000, "game_program", ROMREGION_ERASEFF )
@@ -706,7 +721,7 @@ ROM_START( marvice )
 
 	ROM_REGION( 0x800, "unk", ROMREGION_ERASEFF ) // nvram contents, should be x4 in size
 	ROM_LOAD( "mk48z02b-20.u13", 0x0000, 0x0800, BAD_DUMP CRC(e6079615) SHA1(f528b2a600ab047ad7f87f4dbae65a7e4cd10f8c) )
-	
+
 	DISK_REGION( "laserdisc" )
 	DISK_IMAGE_READONLY( "marvice", 0, NO_DUMP )
 ROM_END
@@ -859,5 +874,6 @@ GAME( 1995, fastdraw_130, fastdraw, alg_r2,   alg_2p, alg_state, init_palr6,    
 GAME( 199?, aplatoon,     alg_bios, alg_r2,   alg,    alg_state, init_aplatoon, ROT0,  "Nova?", "Platoon V.3.1 US", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 /* Web Picmatic games PAL tv standard, own rom board */
-GAME( 1993, zortonbr,     alg_bios, picmatic, alg,    alg_state, init_pal,      ROT0,  "Web Picmatic", "Zorton Brothers (Los Justicieros)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, zortonbr,     alg_bios, picmatic, alg,    alg_state, init_pal,      ROT0,  "Web Picmatic", "Zorton Brothers v1.01 (Los Justicieros)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, zortonbr_100, zortonbr, picmatic, alg,    alg_state, init_pal,      ROT0,  "Web Picmatic", "Zorton Brothers v1.00 (Los Justicieros)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994, marvice,      alg_bios, picmatic, alg,    alg_state, init_pal,      ROT0,  "Web Picmatic", "Marbella Vice", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )

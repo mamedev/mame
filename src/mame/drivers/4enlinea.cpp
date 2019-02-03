@@ -515,8 +515,10 @@ MACHINE_CONFIG_START(_4enlinea_state::_4enlinea)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(_4enlinea_state, _4enlinea_audio_irq, 60) //TODO
 
 	// FIXME: determine ISA bus clock
-	MCFG_DEVICE_ADD("isa", ISA8, 0)
-	MCFG_ISA8_CPU("maincpu")
+	isa8_device &isa(ISA8(config, "isa", 0));
+	isa.set_memspace("maincpu", AS_PROGRAM);
+	isa.set_iospace("maincpu", AS_IO);
+
 	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "isa", _4enlinea_isa8_cards, "4enlinea", true)
 
 
@@ -531,10 +533,10 @@ MACHINE_CONFIG_START(_4enlinea_state::_4enlinea)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("aysnd", AY8910, SND_AY_CLOCK)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN-P2"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN-P1"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	AY8910(config, m_ay, SND_AY_CLOCK);
+	m_ay->port_a_read_callback().set_ioport("IN-P2");
+	m_ay->port_b_read_callback().set_ioport("IN-P1");
+	m_ay->add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
 

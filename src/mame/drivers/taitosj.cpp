@@ -1767,7 +1767,7 @@ DISCRETE_SOUND_END
 
 WRITE8_MEMBER(taitosj_state::taitosj_dacvol_w)
 {
-	m_dacvol->write(space, NODE_01, data ^ 0xff); // 7416 hex inverter
+	m_dacvol->write(NODE_01, data ^ 0xff); // 7416 hex inverter
 }
 
 MACHINE_CONFIG_START(taitosj_state::nomcu)
@@ -1802,41 +1802,38 @@ MACHINE_CONFIG_START(taitosj_state::nomcu)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE("soundnmi2", input_merger_device, in_w<0>))
+	INPUT_MERGER_ALL_HIGH(config, m_soundnmi).output_handler().set(m_soundnmi2, FUNC(input_merger_device::in_w<0>));
 
-	MCFG_INPUT_MERGER_ANY_HIGH("soundnmi2")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	INPUT_MERGER_ANY_HIGH(config, m_soundnmi2).output_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(6'000'000)/4) // 6mhz/4 on GAME board, AY-3-8910 @ IC53 (this is the only AY which uses proper mixing resistors, the 3 below have outputs tied together)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW3"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15)
+	AY8910(config, m_ay1, XTAL(6'000'000)/4); // 6mhz/4 on GAME board, AY-3-8910 @ IC53 (this is the only AY which uses proper mixing resistors, the 3 below have outputs tied together)
+	m_ay1->port_a_read_callback().set_ioport("DSW2");
+	m_ay1->port_b_read_callback().set_ioport("DSW3");
+	m_ay1->add_route(ALL_OUTPUTS, "speaker", 0.15);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(6'000'000)/4) // 6mhz/4 on GAME board, AY-3-8910 @ IC51
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("dac", dac_byte_interface, data_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, taitosj_state, taitosj_dacvol_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	AY8910(config, m_ay2, XTAL(6'000'000)/4); // 6mhz/4 on GAME board, AY-3-8910 @ IC51
+	m_ay2->set_flags(AY8910_SINGLE_OUTPUT);
+	m_ay2->port_a_write_callback().set(m_dac, FUNC(dac_byte_interface::data_w));
+	m_ay2->port_b_write_callback().set(FUNC(taitosj_state::taitosj_dacvol_w));
+	m_ay2->add_route(ALL_OUTPUTS, "speaker", 0.5);
 
-	MCFG_DEVICE_ADD("ay3", AY8910, XTAL(6'000'000)/4) // 6mhz/4 on GAME board, AY-3-8910 @ IC49
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, taitosj_state, input_port_4_f0_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	AY8910(config, m_ay3, XTAL(6'000'000)/4); // 6mhz/4 on GAME board, AY-3-8910 @ IC49
+	m_ay3->set_flags(AY8910_SINGLE_OUTPUT);
+	m_ay3->port_a_write_callback().set(FUNC(taitosj_state::input_port_4_f0_w));
+	m_ay3->add_route(ALL_OUTPUTS, "speaker", 0.5);
 
-	MCFG_DEVICE_ADD("ay4", AY8910, XTAL(6'000'000)/4) // 6mhz/4 on GAME board, AY-3-8910 @ IC50
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
+	AY8910(config, m_ay4, XTAL(6'000'000)/4); // 6mhz/4 on GAME board, AY-3-8910 @ IC50
+	m_ay4->set_flags(AY8910_SINGLE_OUTPUT);
 	/* TODO: Implement ay4 Port A bits 0 and 1 which connect to a 7416 open
 	   collector inverter, to selectively tie none, either or both of two
 	   capacitors between the ay4 audio output signal and ground, or between
 	   audio output signal and high-z (i.e. do nothing).
 	   Bio Attack uses this?
 	*/
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, taitosj_state, taitosj_sndnmi_msk_w)) /* port Bwrite */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	m_ay4->port_b_write_callback().set(FUNC(taitosj_state::taitosj_sndnmi_msk_w));
+	m_ay4->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 128); // 74LS393 on CPU board, counts 128 vblanks before firing watchdog
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128); // 74LS393 on CPU board, counts 128 vblanks before firing watchdog
 
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15) // 30k r-2r network
 	MCFG_DEVICE_ADD("dacvol", DISCRETE, taitosj_dacvol_discrete)
@@ -1852,14 +1849,14 @@ MACHINE_CONFIG_START(taitosj_state::mcu)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(taitosj_main_mcu_map)
 
-	MCFG_DEVICE_ADD("bmcu", TAITO_SJ_SECURITY_MCU, XTAL(3'000'000))   /* xtal is 3MHz, divided by 4 internally */
-	MCFG_TAITO_SJ_SECURITY_MCU_INT_MODE(LATCH)
-	MCFG_TAITO_SJ_SECURITY_MCU_68READ_CB(READ8(*this, taitosj_state, mcu_mem_r))
-	MCFG_TAITO_SJ_SECURITY_MCU_68WRITE_CB(WRITE8(*this, taitosj_state, mcu_mem_w))
-	MCFG_TAITO_SJ_SECURITY_MCU_68INTRQ_CB(WRITELINE(*this, taitosj_state, mcu_intrq_w))
-	MCFG_TAITO_SJ_SECURITY_MCU_BUSRQ_CB(WRITELINE(*this, taitosj_state, mcu_busrq_w))
+	TAITO_SJ_SECURITY_MCU(config, m_mcu, XTAL(3'000'000));   /* xtal is 3MHz, divided by 4 internally */
+	m_mcu->set_int_mode(taito_sj_security_mcu_device::int_mode::LATCH);
+	m_mcu->m68read_cb().set(FUNC(taitosj_state::mcu_mem_r));
+	m_mcu->m68write_cb().set(FUNC(taitosj_state::mcu_mem_w));
+	m_mcu->m68intrq_cb().set(FUNC(taitosj_state::mcu_intrq_w));
+	m_mcu->busrq_cb().set(FUNC(taitosj_state::mcu_busrq_w));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 MACHINE_CONFIG_END
 
 

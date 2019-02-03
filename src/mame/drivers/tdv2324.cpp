@@ -284,30 +284,28 @@ MACHINE_CONFIG_START(tdv2324_state::tdv2324)
 	MCFG_SCREEN_SIZE(800, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0, 800-1, 0, 400-1)
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	MCFG_DEVICE_ADD(TMS9937NL_TAG, TMS9927, 25.39836_MHz_XTAL / 8)
-	MCFG_TMS9927_CHAR_WIDTH(8)
+	TMS9927(config, m_tms, 25.39836_MHz_XTAL / 8).set_char_width(8);
 
 	// devices
-	MCFG_DEVICE_ADD(P8259A_TAG, PIC8259, 0)
+	PIC8259(config, m_pic, 0);
 
-	MCFG_DEVICE_ADD(P8253_5_0_TAG, PIT8253, 0)
+	PIT8253(config, m_pit0, 0);
 
-	MCFG_DEVICE_ADD(P8253_5_1_TAG, PIT8253, 0)
+	PIT8253(config, m_pit1, 0);
 
-	MCFG_DEVICE_ADD(MK3887N4_TAG, Z80SIO2, 8000000/2)
+	Z80SIO2(config, MK3887N4_TAG, 8000000/2);
 
-	MCFG_DEVICE_ADD(FD1797PL02_TAG, FD1797, 8000000/4)
-	MCFG_FLOPPY_DRIVE_ADD(FD1797PL02_TAG":0", tdv2324_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FD1797PL02_TAG":1", tdv2324_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
+	FD1797(config, FD1797PL02_TAG, 8000000/4);
+	FLOPPY_CONNECTOR(config, FD1797PL02_TAG":0", tdv2324_floppies, "8dsdd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, FD1797PL02_TAG":1", tdv2324_floppies, "8dsdd", floppy_image_device::default_floppy_formats);
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "tdv2324")
+	SOFTWARE_LIST(config, "flop_list").set_original("tdv2324");
 MACHINE_CONFIG_END
 
 

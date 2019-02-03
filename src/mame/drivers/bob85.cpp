@@ -53,7 +53,7 @@ private:
 	uint8_t m_count_key;
 	virtual void machine_reset() override;
 	virtual void machine_start() override { m_digits.resolve(); }
-	required_device<cpu_device> m_maincpu;
+	required_device<i8085a_cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 	required_ioport m_line0;
 	required_ioport m_line1;
@@ -207,21 +207,21 @@ READ_LINE_MEMBER( bob85_state::sid_r )
 	return m_cass->input() > 0.0;
 }
 
-MACHINE_CONFIG_START(bob85_state::bob85)
+void bob85_state::bob85(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8085A, XTAL(5'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(bob85_mem)
-	MCFG_DEVICE_IO_MAP(bob85_io)
-	MCFG_I8085A_SID(READLINE(*this, bob85_state, sid_r))
-	MCFG_I8085A_SOD(WRITELINE(*this, bob85_state, sod_w))
+	I8085A(config, m_maincpu, XTAL(5'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &bob85_state::bob85_mem);
+	m_maincpu->set_addrmap(AS_IO, &bob85_state::bob85_io);
+	m_maincpu->in_sid_func().set(FUNC(bob85_state::sid_r));
+	m_maincpu->out_sod_func().set(FUNC(bob85_state::sod_w));
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_bob85)
+	config.set_default_layout(layout_bob85);
 
 	// devices
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
-MACHINE_CONFIG_END
+	CASSETTE(config, m_cass).set_default_state((cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED));
+}
 
 /* ROM definition */
 ROM_START( bob85 )

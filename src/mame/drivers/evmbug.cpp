@@ -114,18 +114,21 @@ void evmbug_state::machine_reset()
 	m_maincpu->reset_line(ASSERT_LINE);
 }
 
-MACHINE_CONFIG_START(evmbug_state::evmbug)
+void evmbug_state::evmbug(machine_config &config)
+{
 	// basic machine hardware
 	// TMS9995 CPU @ 12.0 MHz
 	// We have no lines connected yet
-	MCFG_TMS99xx_ADD("maincpu", TMS9995, XTAL(12'000'000), mem_map, io_map )
+	TMS9995(config, m_maincpu, XTAL(12'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &evmbug_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &evmbug_state::io_map);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(evmbug_state, kbd_put))
+	GENERIC_TERMINAL(config, m_terminal, 0);
+	m_terminal->set_keyboard_callback(FUNC(evmbug_state::kbd_put));
 
-	//MCFG_DEVICE_ADD("uart1", TMS9902, XTAL(12'000'000) / 4)
-MACHINE_CONFIG_END
+	//TMS9902(config, "uart1", XTAL(12'000'000) / 4);
+}
 
 /* ROM definition */
 ROM_START( evmbug )

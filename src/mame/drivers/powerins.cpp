@@ -37,6 +37,7 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/gen_latch.h"
+#include "machine/nmk112.h"
 #include "sound/okim6295.h"
 #include "sound/2203intf.h"
 #include "speaker.h"
@@ -286,88 +287,85 @@ MACHINE_START_MEMBER(powerins_state, powerinsa)
 	m_okibank->configure_entries(0, 5, memregion("oki1")->base() + 0x30000, 0x10000);
 }
 
-MACHINE_CONFIG_START(powerins_state::powerins)
-
+void powerins_state::powerins(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)   /* 12MHz */
-	MCFG_DEVICE_PROGRAM_MAP(powerins_map)
+	M68000(config, m_maincpu, 12000000);   /* 12MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &powerins_state::powerins_map);
 
-	MCFG_DEVICE_ADD("soundcpu", Z80, 6000000) /* 6 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(powerins_sound_map)
-	MCFG_DEVICE_IO_MAP(powerins_sound_io_map)
+	Z80(config, m_soundcpu, 6000000); /* 6 MHz */
+	m_soundcpu->set_addrmap(AS_PROGRAM, &powerins_state::powerins_sound_map);
+	m_soundcpu->set_addrmap(AS_IO, &powerins_state::powerins_sound_io_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(56)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0+16, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(powerins_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, powerins_state, screen_vblank))
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(56);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(320, 256);
+	m_screen->set_visarea(0, 320-1, 0+16, 256-16-1);
+	m_screen->set_screen_update(FUNC(powerins_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(powerins_state::screen_vblank));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_powerins)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_powerins);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 2048);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, 4000000, okim6295_device::PIN7_LOW)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	okim6295_device &oki1(OKIM6295(config, "oki1", 4000000, okim6295_device::PIN7_LOW));
+	oki1.add_route(ALL_OUTPUTS, "mono", 0.15);
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, 4000000, okim6295_device::PIN7_LOW)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	okim6295_device &oki2(OKIM6295(config, "oki2", 4000000, okim6295_device::PIN7_LOW));
+	oki2.add_route(ALL_OUTPUTS, "mono", 0.15);
 
-	MCFG_DEVICE_ADD("ym2203", YM2203, 12000000 / 8)
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
+	ym2203_device &ym2203(YM2203(config, "ym2203", 12000000 / 8));
+	ym2203.irq_handler().set_inputline(m_soundcpu, 0);
+	ym2203.add_route(ALL_OUTPUTS, "mono", 2.0);
 
-	MCFG_DEVICE_ADD("nmk112", NMK112, 0)
-	MCFG_NMK112_ROM0("oki1")
-	MCFG_NMK112_ROM1("oki2")
-MACHINE_CONFIG_END
+	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
+	nmk112.set_rom0_tag("oki1");
+	nmk112.set_rom1_tag("oki2");
+}
 
-MACHINE_CONFIG_START(powerins_state::powerinsa)
+void powerins_state::powerinsa(machine_config &config)
+{
 	powerins(config);
 
 	/* basic machine hardware */
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(powerinsa_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &powerins_state::powerinsa_map);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(60)
+	m_screen->set_refresh_hz(60);
 
-	MCFG_DEVICE_REMOVE("soundcpu")
+	config.device_remove("soundcpu");
 
 	MCFG_MACHINE_START_OVERRIDE(powerins_state, powerinsa)
 
-	MCFG_DEVICE_REPLACE("oki1", OKIM6295, 990000, okim6295_device::PIN7_LOW) // pin7 not verified
-	MCFG_DEVICE_ADDRESS_MAP(0, powerinsa_oki_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	okim6295_device &oki1(OKIM6295(config.replace(), "oki1", 990000, okim6295_device::PIN7_LOW)); // pin7 not verified
+	oki1.set_addrmap(0, &powerins_state::powerinsa_oki_map);
+	oki1.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_REMOVE("oki2")
-	MCFG_DEVICE_REMOVE("ym2203")
-	MCFG_DEVICE_REMOVE("nmk112")
-MACHINE_CONFIG_END
+	config.device_remove("oki2");
+	config.device_remove("ym2203");
+	config.device_remove("nmk112");
+}
 
-MACHINE_CONFIG_START(powerins_state::powerinsb)
+void powerins_state::powerinsb(machine_config &config)
+{
 	powerins(config);
 
 	/* basic machine hardware */
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(60)
+	m_screen->set_refresh_hz(60);
 
-	MCFG_DEVICE_MODIFY("soundcpu") /* 6 MHz */
-	MCFG_DEVICE_IO_MAP(powerinsb_sound_io_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(powerins_state, irq0_line_hold,  120)  // YM2203 rate is at 150??
+	m_soundcpu->set_addrmap(AS_IO, &powerins_state::powerinsb_sound_io_map);
+	m_soundcpu->set_periodic_int(FUNC(powerins_state::irq0_line_hold), attotime::from_hz(120));  // YM2203 rate is at 150??
 
-	MCFG_DEVICE_REMOVE("ym2203")    // Sound code talks to one, but it's not fitted on the board
-MACHINE_CONFIG_END
+	config.device_remove("ym2203");    // Sound code talks to one, but it's not fitted on the board
+}
 
 
 /***************************************************************************
@@ -423,9 +421,9 @@ Notes:
       ROMs -
             -1, -2   : 27C1001 EPROM
             -3, -4   : 27C4096 EPROM
-            -5, -6   : 8M 42 pin MASKROM (578200)
-            -7       : 4M 40 pin MASKROM (574200)
-            -8 to -19: 8M 42 pin MASKROM (578200)
+            -5, -6   : 8M 42 pin mask ROM (578200)
+            -7       : 4M 40 pin mask ROM (574200)
+            -8 to -19: 8M 42 pin mask ROM (578200)
             20       : 82S129 PROM
             21       : 82S135 PROM
             22       : 82S123 PROM
@@ -624,9 +622,9 @@ Power Instinct
 Atlus, 1993
 
 This is a bootleg US version with different sound hardware to the existing bootleg set.
-The PCB is very large and has 2 plug-in daughterboards and many MASK ROMs.
-The addition of the contents of the MASK ROMs would probably equal the contents of presumably
-larger MASK ROMs found on the original PCB....
+The PCB is very large and has 2 plug-in daughterboards and many mask ROMs.
+The addition of the contents of the mask ROMs would probably equal the contents of presumably
+larger mask ROMs found on the original PCB....
 
 PCB Layout
 
@@ -662,7 +660,7 @@ Notes:
       M6295 clock:  4.000MHz (both); sample rate = 4000000/165 (both)
       VSync      :  60Hz
 
-      ROMs 1F and 6N are 1M MASK (MX27C1000), all other ROMs are 4M MASK (MX27C4000).
+      ROMs 1F and 6N are 1M mask (MX27C1000), all other ROMs are 4M mask (MX27C4000).
       ROMS at 5* are located on a plug-in daughterboard.
       ROMS at 11*, 12*, 13G, 13P and 14* are located on a plug-in daughterboard.
       82S123 and 82S147 are PROMs.

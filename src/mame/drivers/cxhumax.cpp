@@ -120,9 +120,9 @@ WRITE32_MEMBER ( cxhumax_state::flash_w )
 {
 	offset *= 2;
 	if(ACCESSING_BITS_0_15)
-		m_flash->write(space, offset, data);
+		m_flash->write(offset, data);
 	if(ACCESSING_BITS_16_31)
-		m_flash->write(space, offset+1, data >> 16);
+		m_flash->write(offset+1, data >> 16);
 	verboselog(*this, 9, "(FLASH) %08X <- %08X\n", 0xF0000000 + (offset << 2), data);
 }
 
@@ -131,9 +131,9 @@ READ32_MEMBER ( cxhumax_state::flash_r )
 	uint32_t res = 0;
 	offset *= 2;
 	if(ACCESSING_BITS_0_15)
-		res |= m_flash->read(space, offset);
+		res |= m_flash->read(offset);
 	if(ACCESSING_BITS_16_31)
-		res |= m_flash->read(space, offset+1) << 16;
+		res |= m_flash->read(offset+1) << 16;
 	//if(m_flash->m_flash_mode!=FM_NORMAL) verboselog(*this, 9, "(FLASH) %08X -> %08X\n", 0xF0000000 + (offset << 2), res);
 	return res;
 }
@@ -1060,9 +1060,8 @@ MACHINE_CONFIG_START(cxhumax_state::cxhumax)
 	MCFG_DEVICE_PROGRAM_MAP(cxhumax_map)
 
 
-	MCFG_INTEL_28F320J3D_ADD("flash")
-	MCFG_I2CMEM_ADD("eeprom")
-	MCFG_I2CMEM_DATA_SIZE(0x2000)
+	INTEL_28F320J3D(config, "flash");
+	I2CMEM(config, "eeprom", 0).set_data_size(0x2000);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1072,9 +1071,9 @@ MACHINE_CONFIG_START(cxhumax_state::cxhumax)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1920-1, 0, 1080-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cxhumax_state, screen_update_cxhumax)
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	GENERIC_TERMINAL(config, m_terminal, 0);
 MACHINE_CONFIG_END
 
 ROM_START( hxhdci2k )

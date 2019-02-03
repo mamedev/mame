@@ -359,9 +359,9 @@ MACHINE_CONFIG_START(blueprnt_state::blueprnt)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(blueprnt_state, irq0_line_hold,  4*60) // IRQs connected to 32V
 									// NMIs are caused by the main CPU
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -371,26 +371,25 @@ MACHINE_CONFIG_START(blueprnt_state::blueprnt)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_VIDEO_START_OVERRIDE(blueprnt_state, blueprnt)
 	MCFG_SCREEN_UPDATE_DRIVER(blueprnt_state, screen_update_blueprnt)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_blueprnt)
-	MCFG_PALETTE_ADD("palette", 128*4+8)
-	MCFG_PALETTE_INIT_OWNER(blueprnt_state, blueprnt)
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_blueprnt)
+	PALETTE(config, m_palette, FUNC(blueprnt_state::blueprnt_palette), 128*4+8);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 10000000/2/2/2)
-	MCFG_AY8910_PORT_B_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, blueprnt_state, dipsw_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ay8910_device &ay1(AY8910(config, "ay1", 10000000/2/2/2));
+	ay1.port_b_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
+	ay1.port_a_write_callback().set(FUNC(blueprnt_state::dipsw_w));
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 10000000/2/2/2/2)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DILSW1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DILSW2"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ay8910_device &ay2(AY8910(config, "ay2", 10000000/2/2/2/2));
+	ay2.port_a_read_callback().set_ioport("DILSW1");
+	ay2.port_b_read_callback().set_ioport("DILSW2");
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(blueprnt_state::grasspin)

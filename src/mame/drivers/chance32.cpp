@@ -41,6 +41,14 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
+	void chance32(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
 	DECLARE_WRITE8_MEMBER(chance32_fgram_w)
 	{
 		m_fgram[offset] = data;
@@ -60,14 +68,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	uint32_t screen_update_chance32(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void chance32(machine_config &config);
 	void chance32_map(address_map &map);
 	void chance32_portmap(address_map &map);
-
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
@@ -178,7 +180,6 @@ WRITE8_MEMBER(chance32_state::muxout_w)
 
 */
 	if (data & 1)   // bit 0 is the mux selector.
-
 	{
 		m_lamps[0] = BIT(data, 1);  /* Lamp 0 - Small / Big */
 		m_lamps[1] = BIT(data, 2);  /* Lamp 1 - Big / Small */
@@ -475,13 +476,13 @@ MACHINE_CONFIG_START(chance32_state::chance32)
 	MCFG_SCREEN_UPDATE_DRIVER(chance32_state, screen_update_chance32)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", 12000000/16)   /* 52.786 Hz (similar to Major Poker) */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(16)
+	h46505_device &crtc(H46505(config, "crtc", 12000000/16));   /* 52.786 Hz (similar to Major Poker) */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(16);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_chance32)
-	MCFG_PALETTE_ADD("palette", 0x800)
-	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_chance32);
+	PALETTE(config, "palette").set_format(palette_device::xGRB_555, 0x800);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

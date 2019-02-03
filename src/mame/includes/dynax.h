@@ -107,7 +107,7 @@ protected:
 	DECLARE_WRITE8_MEMBER(dynax_blit_romregion_w);
 	DECLARE_WRITE8_MEMBER(dynax_extra_scrollx_w);
 	DECLARE_WRITE8_MEMBER(dynax_extra_scrolly_w);
-	
+
 	void hanamai_copylayer(bitmap_ind16 &bitmap, const rectangle &cliprect, int i );
 
 	DECLARE_MACHINE_START(dynax);
@@ -237,7 +237,7 @@ private:
 	DECLARE_MACHINE_START(hanamai);
 	DECLARE_MACHINE_START(hjingi);
 	DECLARE_VIDEO_START(hanamai);
-	DECLARE_PALETTE_INIT(sprtmtch);
+	void sprtmtch_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(sprtmtch);
 	DECLARE_MACHINE_START(jantouki);
 	DECLARE_VIDEO_START(jantouki);
@@ -245,7 +245,7 @@ private:
 	DECLARE_VIDEO_START(mjembase);
 	DECLARE_VIDEO_START(mjdialq2);
 	DECLARE_VIDEO_START(mcnpshnt);
-	DECLARE_PALETTE_INIT(janyuki);
+	void janyuki_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(neruton);
 
 	//int blitter_drawgfx( int layer, int mask, memory_region *gfx, int src, int pen, int x, int y, int wrap, int flags );

@@ -528,82 +528,87 @@ WRITE8_MEMBER(de_2_state::lamps_w)
 }
 
 
-MACHINE_CONFIG_START(de_2_state::de_bg_audio)
+void de_2_state::de_bg_audio(machine_config &config)
+{
 	/* sound CPU */
-	MCFG_DEVICE_ADD("audiocpu", MC6809E, XTAL(8'000'000) / 4) // MC68B09E
-	MCFG_DEVICE_PROGRAM_MAP(de_2_audio_map)
+	MC6809E(config, m_audiocpu, XTAL(8'000'000) / 4); // MC68B09E
+	m_audiocpu->set_addrmap(AS_PROGRAM, &de_2_state::de_2_audio_map);
 
 	SPEAKER(config, "bg").front_center();
 
-	MCFG_DEVICE_ADD("ym2151", YM2151, XTAL(3'579'545))
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(*this, de_2_state, ym2151_irq_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bg", 0.50)
+	YM2151(config, m_ym2151, XTAL(3'579'545));
+	m_ym2151->irq_handler().set(FUNC(de_2_state::ym2151_irq_w));
+	m_ym2151->add_route(ALL_OUTPUTS, "bg", 0.50);
 
-	MCFG_DEVICE_ADD("msm5205", MSM5205, XTAL(384'000))
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, de_2_state, msm5205_irq_w))
-	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bg", 0.50)
-MACHINE_CONFIG_END
+	MSM5205(config, m_msm5205, XTAL(384'000));
+	m_msm5205->vck_legacy_callback().set(FUNC(de_2_state::msm5205_irq_w));
+	m_msm5205->set_prescaler_selector(msm5205_device::S96_4B);
+	m_msm5205->add_route(ALL_OUTPUTS, "bg", 0.50);
+}
 
-MACHINE_CONFIG_START(de_2_state::de_type1)
+void de_2_state::de_type1(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DECOCPU_TYPE1_ADD("decocpu", XTAL(8'000'000) / 2, ":maincpu")
-	MCFG_DECOCPU_DISPLAY(READ8(*this, de_2_state,display_r),WRITE8(*this, de_2_state,display_w))
-	MCFG_DECOCPU_SOUNDLATCH(WRITE8(*this, de_2_state,sound_w))
-	MCFG_DECOCPU_SWITCH(READ8(*this, de_2_state,switch_r),WRITE8(*this, de_2_state,switch_w))
-	MCFG_DECOCPU_LAMP(WRITE8(*this, de_2_state,lamps_w))
+	decocpu_type1_device &decocpu(DECOCPU1(config, "decocpu", XTAL(8'000'000) / 2, "maincpu"));
+	decocpu.display_read_callback().set(FUNC(de_2_state::display_r));
+	decocpu.display_write_callback().set(FUNC(de_2_state::display_w));
+	decocpu.soundlatch_write_callback().set(FUNC(de_2_state::sound_w));
+	decocpu.switch_read_callback().set(FUNC(de_2_state::switch_r));
+	decocpu.switch_write_callback().set(FUNC(de_2_state::switch_w));
+	decocpu.lamp_write_callback().set(FUNC(de_2_state::lamps_w));
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_de2)
+	config.set_default_layout(layout_de2);
 
 	genpin_audio(config);
 	de_bg_audio(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(de_2_state::de_type2)
+void de_2_state::de_type2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DECOCPU_TYPE2_ADD("decocpu", XTAL(8'000'000) / 2, ":maincpu")
-	MCFG_DECOCPU_DISPLAY(READ8(*this, de_2_state,display_r),WRITE8(*this, de_2_state,display_w))
-	MCFG_DECOCPU_SOUNDLATCH(WRITE8(*this, de_2_state,sound_w))
-	MCFG_DECOCPU_SWITCH(READ8(*this, de_2_state,switch_r),WRITE8(*this, de_2_state,switch_w))
-	MCFG_DECOCPU_LAMP(WRITE8(*this, de_2_state,lamps_w))
+	decocpu_type2_device &decocpu(DECOCPU2(config, "decocpu", XTAL(8'000'000) / 2, "maincpu"));
+	decocpu.display_read_callback().set(FUNC(de_2_state::display_r));
+	decocpu.display_write_callback().set(FUNC(de_2_state::display_w));
+	decocpu.soundlatch_write_callback().set(FUNC(de_2_state::sound_w));
+	decocpu.switch_read_callback().set(FUNC(de_2_state::switch_r));
+	decocpu.switch_write_callback().set(FUNC(de_2_state::switch_w));
+	decocpu.lamp_write_callback().set(FUNC(de_2_state::lamps_w));
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_de2)
+	config.set_default_layout(layout_de2);
 
 	genpin_audio(config);
 	de_bg_audio(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(de_2_state::de_type2_alpha3)
+void de_2_state::de_type2_alpha3(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DECOCPU_TYPE2_ADD("decocpu", XTAL(8'000'000) / 2, ":maincpu")
-	MCFG_DECOCPU_DISPLAY(READ8(*this, de_2_state,display_r),WRITE8(*this, de_2_state,type2alpha3_display_w))
-	MCFG_DECOCPU_SOUNDLATCH(WRITE8(*this, de_2_state,sound_w))
-	MCFG_DECOCPU_SWITCH(READ8(*this, de_2_state,switch_r),WRITE8(*this, de_2_state,switch_w))
-	MCFG_DECOCPU_LAMP(WRITE8(*this, de_2_state,lamps_w))
+	de_type2(config);
+	subdevice<decocpu_type2_device>("decocpu")->display_write_callback().set(FUNC(de_2_state::type2alpha3_display_w));
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_de2a3)
+	config.set_default_layout(layout_de2a3);
+}
+
+void de_2_state::de_type3(machine_config &config)
+{
+	/* basic machine hardware */
+	decocpu_type3_device &decocpu(DECOCPU3(config, "decocpu", XTAL(8'000'000) / 2, "maincpu"));
+	decocpu.display_read_callback().set(FUNC(de_2_state::display_r));
+	decocpu.display_write_callback().set(FUNC(de_2_state::type3_display_w));
+	decocpu.soundlatch_write_callback().set(FUNC(de_2_state::sound_w));
+	decocpu.switch_read_callback().set(FUNC(de_2_state::switch_r));
+	decocpu.switch_write_callback().set(FUNC(de_2_state::switch_w));
+	decocpu.lamp_write_callback().set(FUNC(de_2_state::lamps_w));
+
+	/* Video */
+	config.set_default_layout(layout_de2a3);
 
 	genpin_audio(config);
 	de_bg_audio(config);
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(de_2_state::de_type3)
-	/* basic machine hardware */
-	MCFG_DECOCPU_TYPE3_ADD("decocpu", XTAL(8'000'000) / 2, ":maincpu")
-	MCFG_DECOCPU_DISPLAY(READ8(*this, de_2_state,display_r),WRITE8(*this, de_2_state,type3_display_w))
-	MCFG_DECOCPU_SOUNDLATCH(WRITE8(*this, de_2_state,sound_w))
-	MCFG_DECOCPU_SWITCH(READ8(*this, de_2_state,switch_r),WRITE8(*this, de_2_state,switch_w))
-	MCFG_DECOCPU_LAMP(WRITE8(*this, de_2_state,lamps_w))
-
-	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_de2a3)
-
-	genpin_audio(config);
-	de_bg_audio(config);
-MACHINE_CONFIG_END
+}
 
 
 /*--------------------------------------------------------------------------------

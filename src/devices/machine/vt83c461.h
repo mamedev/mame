@@ -15,22 +15,31 @@
 
 #include "idectrl.h"
 
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_VT83C461_ADD(_tag, _slot_intf, _master, _slave, _fixed) \
-	MCFG_DEVICE_ADD(_tag, VT83C461, 0) \
-	MCFG_DEVICE_MODIFY(_tag ":0") \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _master, _fixed) \
-	MCFG_DEVICE_MODIFY(_tag ":1") \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _slave, _fixed) \
-	MCFG_DEVICE_MODIFY(_tag)
-
 class vt83c461_device : public ide_controller_32_device
 {
 public:
-	vt83c461_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vt83c461_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+	template <typename T> vt83c461_device &master(T &&opts, const char *dflt = nullptr, bool fixed = false)
+	{
+		abstract_ata_interface_device::master(std::forward<T>(opts), dflt, fixed);
+		return *this;
+	}
+	template <typename T> vt83c461_device &slave(T &&opts, const char *dflt = nullptr, bool fixed = false)
+	{
+		abstract_ata_interface_device::slave(std::forward<T>(opts), dflt, fixed);
+		return *this;
+	}
+	template <typename T> vt83c461_device &options(T &&opts, const char *master_default = nullptr, const char *slave_default = nullptr, bool fixed = false)
+	{
+		abstract_ata_interface_device::options(std::forward<T>(opts), master_default, slave_default, fixed);
+		return *this;
+	}
+	template <typename T> vt83c461_device &set_slot_options(int index, T &&opts, const char *dflt, bool fixed)
+	{
+		abstract_ata_interface_device::set_slot_options(std::forward<T>(opts), dflt, fixed);
+		return *this;
+	}
 
 	uint32_t read_config(offs_t offset);
 	void write_config(offs_t offset, uint32_t data);

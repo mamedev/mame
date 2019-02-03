@@ -233,7 +233,7 @@ INPUT_PORTS_END
 // This came from pinmame, even though there's no spb640 chip
 READ8_MEMBER( idsa_state::portb0_r )
 {
-	uint16_t data = m_speech->spb640_r(space, offset / 2);
+	uint16_t data = m_speech->spb640_r(offset / 2);
 	return offset % 2 ? (uint8_t)(data >> 8) : (uint8_t)(data & 0xff);
 }
 
@@ -251,9 +251,9 @@ WRITE8_MEMBER( idsa_state::ppi_control_w )
 {
 	//logerror("%s: AY1 port A = %02X\n", machine().describe_context(), data);
 	if (!BIT(data, 2))
-		m_ppi[0]->write(space, data & 0x03, m_ppi_data);
+		m_ppi[0]->write(data & 0x03, m_ppi_data);
 	if (!BIT(data, 3))
-		m_ppi[1]->write(space, data & 0x03, m_ppi_data);
+		m_ppi[1]->write(data & 0x03, m_ppi_data);
 }
 
 WRITE8_MEMBER( idsa_state::ppi_data_w )
@@ -332,51 +332,54 @@ void idsa_state::machine_reset()
 	m_irqcnt = 0;
 }
 
-MACHINE_CONFIG_START(idsa_state::idsa)
+void idsa_state::idsa(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(8'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(maincpu_map)
-	MCFG_DEVICE_IO_MAP(maincpu_io_map)
+	Z80(config, m_maincpu, XTAL(8'000'000) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &idsa_state::maincpu_map);
+	m_maincpu->set_addrmap(AS_IO, &idsa_state::maincpu_io_map);
 
-	MCFG_DEVICE_ADD("irqclk", CLOCK, XTAL(8'000'000) / 4 )
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, idsa_state, clock_w))
+	clock_device &irqclock(CLOCK(config, "irqclock", XTAL(8'000'000) / 4));
+	irqclock.signal_handler().set(FUNC(idsa_state::clock_w));
 
 	/* video hardware */
-	//MCFG_DEFAULT_LAYOUT()
+	//config.set_default_layout()
 
 	/* sound hardware */
 	genpin_audio(config);
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("speech", SP0256, 3120000) // unknown variant
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.5)
+	SP0256(config, m_speech, 3120000); // unknown variant
+	m_speech->add_route(ALL_OUTPUTS, "lspeaker", 1.5);
 
-	MCFG_DEVICE_ADD("aysnd1", AY8910, 2000000) // 2Mhz according to pinmame, schematic omits the clock line
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
+	ay8910_device &aysnd1(AY8910(config, "aysnd1", 2000000));  // 2Mhz according to pinmame, schematic omits the clock line
+	aysnd1.port_a_write_callback().set(FUNC(idsa_state::ay1_a_w));
+	aysnd1.port_b_write_callback().set(FUNC(idsa_state::ay1_b_w));
+	aysnd1.add_route(ALL_OUTPUTS, "lspeaker", 0.75);
 
-	MCFG_DEVICE_ADD("aysnd2", AY8910, 2000000)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, idsa_state, ay1_a_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, idsa_state, ay1_b_w))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, idsa_state, ay2_a_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, idsa_state, ay2_b_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
-MACHINE_CONFIG_END
+	ay8910_device &aysnd2(AY8910(config, "aysnd2", 2000000));
+	aysnd2.port_a_write_callback().set(FUNC(idsa_state::ay2_a_w));
+	aysnd2.port_b_write_callback().set(FUNC(idsa_state::ay2_b_w));
+	aysnd2.add_route(ALL_OUTPUTS, "rspeaker", 0.75);
+}
 
-MACHINE_CONFIG_START(idsa_state::bsktbllp)
+void idsa_state::bsktbllp(machine_config &config)
+{
 	idsa(config);
-	MCFG_DEVICE_MODIFY("aysnd1")
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, idsa_state, ppi_control_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, idsa_state, ppi_data_w))
+	auto &aysnd1(*subdevice<ay8910_device>("aysnd1"));
+	aysnd1.port_a_write_callback().set(FUNC(idsa_state::ppi_control_w));
+	aysnd1.port_b_write_callback().set(FUNC(idsa_state::ppi_data_w));
 
-	MCFG_DEVICE_ADD("ppi1", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, idsa_state, ppi1_a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, idsa_state, ppi1_b_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, idsa_state, ppi1_c_w))
-	MCFG_DEVICE_ADD("ppi2", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, idsa_state, ppi2_a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, idsa_state, ppi2_b_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, idsa_state, ppi2_c_w))
-MACHINE_CONFIG_END
+	I8255(config, m_ppi[0]);
+	m_ppi[0]->out_pa_callback().set(FUNC(idsa_state::ppi1_a_w));
+	m_ppi[0]->out_pb_callback().set(FUNC(idsa_state::ppi1_b_w));
+	m_ppi[0]->out_pc_callback().set(FUNC(idsa_state::ppi1_c_w));
+
+	I8255(config, m_ppi[1]);
+	m_ppi[1]->out_pa_callback().set(FUNC(idsa_state::ppi2_a_w));
+	m_ppi[1]->out_pb_callback().set(FUNC(idsa_state::ppi2_b_w));
+	m_ppi[1]->out_pc_callback().set(FUNC(idsa_state::ppi2_c_w));
+}
 
 
 ROM_START(v1)

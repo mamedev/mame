@@ -316,85 +316,78 @@ WRITE_LINE_MEMBER(chqflag_state::background_brt_w)
 	}
 }
 
-MACHINE_CONFIG_START(chqflag_state::chqflag)
-
+void chqflag_state::chqflag(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", KONAMI, XTAL(24'000'000)/2/4)    /* 052001 (verified on pcb) */
-	MCFG_DEVICE_PROGRAM_MAP(chqflag_map)
+	KONAMI(config, m_maincpu, XTAL(24'000'000)/2/4);    /* 052001 (verified on pcb) */
+	m_maincpu->set_addrmap(AS_PROGRAM, &chqflag_state::chqflag_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545)) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(chqflag_sound_map)
+	Z80(config, m_audiocpu, XTAL(3'579'545)); /* verified on pcb */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &chqflag_state::chqflag_sound_map);
 
-	MCFG_DEVICE_ADD("bank1000", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(bank1000_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(13)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
+	ADDRESS_MAP_BANK(config, m_bank1000).set_map(&chqflag_state::bank1000_map).set_options(ENDIANNESS_BIG, 8, 13, 0x1000);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	config.m_minimum_quantum = attotime::from_hz(600);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000)/3, 528, 96, 400, 256, 16, 240) // measured Vsync 59.17hz Hsync 15.13 / 15.19khz
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(24'000'000)/3, 528, 96, 400, 256, 16, 240); // measured Vsync 59.17hz Hsync 15.13 / 15.19khz
 //  6MHz dotclock is more realistic, however needs drawing updates. replace when ready
-//  MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000)/4, 396, hbend, hbstart, 256, 16, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(chqflag_state, screen_update_chqflag)
-	MCFG_SCREEN_PALETTE("palette")
+//  screen.set_raw(XTAL(24'000'000)/4, 396, hbend, hbstart, 256, 16, 240);
+	screen.set_screen_update(FUNC(chqflag_state::screen_update_chqflag));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
+	m_palette->enable_shadows();
 
-	MCFG_DEVICE_ADD("k051960", K051960, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051960_SCREEN_TAG("screen")
-	MCFG_K051960_CB(chqflag_state, sprite_callback)
-	MCFG_K051960_IRQ_HANDLER(INPUTLINE("maincpu", KONAMI_IRQ_LINE))
-	MCFG_K051960_NMI_HANDLER(INPUTLINE("maincpu", INPUT_LINE_NMI))
-	MCFG_K051960_VREG_CONTRAST_HANDLER(WRITELINE(*this, chqflag_state,background_brt_w))
+	K051960(config, m_k051960, 0);
+	m_k051960->set_palette(m_palette);
+	m_k051960->set_screen_tag("screen");
+	m_k051960->set_sprite_callback(FUNC(chqflag_state::sprite_callback), this);
+	m_k051960->irq_handler().set_inputline(m_maincpu, KONAMI_IRQ_LINE);
+	m_k051960->nmi_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_k051960->vreg_contrast_handler().set(FUNC(chqflag_state::background_brt_w));
 
-	MCFG_DEVICE_ADD("k051316_1", K051316, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051316_OFFSETS(7, 0)
-	MCFG_K051316_CB(chqflag_state, zoom_callback_1)
+	K051316(config, m_k051316[0], 0);
+	m_k051316[0]->set_palette(m_palette);
+	m_k051316[0]->set_offsets(7, 0);
+	m_k051316[0]->set_zoom_callback(FUNC(chqflag_state::zoom_callback_1), this);
 
-	MCFG_DEVICE_ADD("k051316_2", K051316, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051316_BPP(8)
-	MCFG_K051316_LAYER_MASK(0xc0)
-	MCFG_K051316_WRAP(1)
-	MCFG_K051316_CB(chqflag_state, zoom_callback_2)
+	K051316(config, m_k051316[1], 0);
+	m_k051316[1]->set_palette(m_palette);
+	m_k051316[1]->set_bpp(8);
+	m_k051316[1]->set_layermask(0xc0);
+	m_k051316[1]->set_wrap(1);
+	m_k051316[1]->set_zoom_callback(FUNC(chqflag_state::zoom_callback_2), this);
 
-	MCFG_K051733_ADD("k051733")
+	K051733(config, "k051733", 0);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
+	GENERIC_LATCH_8(config, "soundlatch");
+	GENERIC_LATCH_8(config, "soundlatch2").data_pending_callback().set_inputline(m_audiocpu, 0);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545)) /* verified on pcb */
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(3'579'545))); /* verified on pcb */
+	ymsnd.irq_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	ymsnd.add_route(0, "lspeaker", 1.00);
+	ymsnd.add_route(1, "rspeaker", 1.00);
 
-	MCFG_DEVICE_ADD("k007232_1", K007232, XTAL(3'579'545)) /* verified on pcb */
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, chqflag_state, volume_callback0))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.20)
+	K007232(config, m_k007232[0], XTAL(3'579'545)); /* verified on pcb */
+	m_k007232[0]->port_write().set(FUNC(chqflag_state::volume_callback0));
+	m_k007232[0]->add_route(0, "lspeaker", 0.20);
+	m_k007232[0]->add_route(1, "rspeaker", 0.20);
 
-	MCFG_DEVICE_ADD("k007232_2", K007232, XTAL(3'579'545)) /* verified on pcb */
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, chqflag_state, volume_callback1))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.20)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 0.20)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.20)
-MACHINE_CONFIG_END
+	K007232(config, m_k007232[1], XTAL(3'579'545)); /* verified on pcb */
+	m_k007232[1]->port_write().set(FUNC(chqflag_state::volume_callback1));
+	m_k007232[1]->add_route(0, "lspeaker", 0.20);
+	m_k007232[1]->add_route(0, "rspeaker", 0.20);
+	m_k007232[1]->add_route(1, "lspeaker", 0.20);
+	m_k007232[1]->add_route(1, "rspeaker", 0.20);
+}
 
 ROM_START( chqflag )
 	ROM_REGION( 0x50000, "maincpu", 0 ) /* 052001 code */

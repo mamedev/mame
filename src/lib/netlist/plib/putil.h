@@ -16,6 +16,7 @@
 
 namespace plib
 {
+
 	namespace util
 	{
 		const pstring buildpath(std::initializer_list<pstring> list );
@@ -24,8 +25,8 @@ namespace plib
 
 	namespace container
 	{
-		template <class C>
-		bool contains(C &con, const typename C::value_type &elem)
+		template <class C, class T>
+		bool contains(C &con, const T &elem)
 		{
 			return std::find(con.begin(), con.end(), elem) != con.end();
 		}
@@ -69,6 +70,9 @@ namespace plib
 
 	std::vector<pstring> psplit(const pstring &str, const pstring &onstr, bool ignore_empty = false);
 	std::vector<pstring> psplit(const pstring &str, const std::vector<pstring> &onstrl);
+	std::vector<std::string> psplit_r(const std::string &stri,
+			const std::string &token,
+			const std::size_t maxsplit);
 
 }
 

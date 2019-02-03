@@ -56,8 +56,6 @@ Notes:
 #include "emuopts.h"
 
 #define Z80_TAG     "commcpu"
-#define DMA_TAG     "commdma"
-#define DLC_TAG     "commdlc"
 
 /*************************************
  *  M1COMM Memory Map
@@ -104,26 +102,27 @@ DEFINE_DEVICE_TYPE(M1COMM, m1comm_device, "m1comm", "Model-1 Communication Board
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(m1comm_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, 8000000) /* 32 MHz / 4 */
-	MCFG_DEVICE_PROGRAM_MAP(m1comm_mem)
-	MCFG_DEVICE_IO_MAP(m1comm_io)
+void m1comm_device::device_add_mconfig(machine_config &config)
+{
+	Z80(config, m_cpu, 8000000); // 32 MHz / 4
+	m_cpu->set_memory_map(&m1comm_device::m1comm_mem);
+	m_cpu->set_io_map(&m1comm_device::m1comm_io);
 
-	MCFG_DEVICE_ADD(DMA_TAG, AM9517A, 8000000) /* 32 MHz / 4 */
-	MCFG_I8237_OUT_HREQ_CB(WRITELINE(*this, m1comm_device, dma_hreq_w))
-	MCFG_I8237_IN_MEMR_CB(READ8(*this, m1comm_device, dma_mem_r))
-	MCFG_I8237_OUT_MEMW_CB(WRITE8(*this, m1comm_device, dma_mem_w))
-	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(DLC_TAG, mb89374_device, pi3_w))
-	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(DLC_TAG, mb89374_device, pi2_w))
-	MCFG_I8237_OUT_EOP_CB(WRITELINE(DLC_TAG, mb89374_device, ci_w))
-	MCFG_I8237_IN_IOR_2_CB(READ8(DLC_TAG, mb89374_device, dma_r))
-	MCFG_I8237_OUT_IOW_3_CB(WRITE8(DLC_TAG, mb89374_device, dma_w))
+	AM9517A(config, m_dma, 8000000); // 32 MHz / 4
+	m_dma->out_hreq_callback().set(FUNC(m1comm_device::dma_hreq_w));
+	m_dma->in_memr_callback().set(FUNC(m1comm_device::dma_mem_r));
+	m_dma->out_memw_callback().set(FUNC(m1comm_device::dma_mem_w));
+	m_dma->out_dack_callback<2>().set(m_dlc, FUNC(mb89374_device::pi3_w));
+	m_dma->out_dack_callback<3>().set(m_dlc, FUNC(mb89374_device::pi2_w));
+	m_dma->out_eop_callback().set(m_dlc, FUNC(mb89374_device::ci_w));
+	m_dma->in_ior_callback<2>().set(m_dlc, FUNC(mb89374_device::dma_r));
+	m_dma->out_iow_callback<3>().set(m_dlc, FUNC(mb89374_device::dma_w));
 
-	MCFG_DEVICE_ADD(DLC_TAG, MB89374, 8000000) /* 32 MHz / 4 */
-	MCFG_MB89374_PO2_CB(WRITELINE(DMA_TAG, am9517a_device, dreq3_w))
-	MCFG_MB89374_PO3_CB(WRITELINE(DMA_TAG, am9517a_device, dreq2_w))
-	MCFG_MB89374_IRQ_CB(WRITELINE(*this, m1comm_device, dlc_int7_w))
-MACHINE_CONFIG_END
+	MB89374(config, m_dlc, 8000000); // 32 MHz / 4
+	m_dlc->out_po_callback<2>().set(m_dma, FUNC(am9517a_device::dreq3_w));
+	m_dlc->out_po_callback<3>().set(m_dma, FUNC(am9517a_device::dreq2_w));
+	m_dlc->out_irq_callback().set(FUNC(m1comm_device::dlc_int7_w));
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -144,8 +143,8 @@ const tiny_rom_entry *m1comm_device::device_rom_region() const
 m1comm_device::m1comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, M1COMM, tag, owner, clock),
 	m_cpu(*this, Z80_TAG),
-	m_dma(*this, DMA_TAG),
-	m_dlc(*this, DLC_TAG)
+	m_dma(*this, "commdma"),
+	m_dlc(*this, "commdlc")
 {
 #ifdef M1COMM_SIMULATION
 	// prepare localhost "filename"

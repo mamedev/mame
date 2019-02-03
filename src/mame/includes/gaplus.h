@@ -1,22 +1,26 @@
 // license:BSD-3-Clause
 // copyright-holders:Manuel Abadia, Ernesto Corvi, Nicola Salmoria
+#ifndef MAME_INCLUDES_GAPLUS_H
+#define MAME_INCLUDES_GAPLUS_H
+
+#pragma once
+
 #include "sound/namco.h"
 #include "sound/samples.h"
 #include "machine/namcoio.h"
 #include "emupal.h"
 #include "screen.h"
 
-#define MAX_STARS           250
-
-struct star {
-	float x,y;
-	int col,set;
-};
-
-
 class gaplus_base_state : public driver_device
 {
 public:
+	static constexpr unsigned MAX_STARS = 250;
+
+	struct star {
+		float x,y;
+		int col,set;
+	};
+
 	enum
 	{
 		TIMER_NAMCOIO0_RUN,
@@ -53,7 +57,7 @@ public:
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(starfield_control_w);
 
-	DECLARE_PALETTE_INIT(gaplus);
+	void gaplus_palette(palette_device &palette) const;
 
 	TILEMAP_MAPPER_MEMBER(tilemap_scan);
 	TILE_GET_INFO_MEMBER(get_tile_info);
@@ -153,3 +157,5 @@ protected:
 
 	output_finder<2> m_lamps;
 };
+
+#endif // MAME_INCLUDES_GAPLUS_H

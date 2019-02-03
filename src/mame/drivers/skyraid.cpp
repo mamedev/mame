@@ -19,28 +19,28 @@ void skyraid_state::machine_start()
 	m_led.resolve();
 }
 
-PALETTE_INIT_MEMBER(skyraid_state, skyraid)
+void skyraid_state::skyraid_palette(palette_device &palette) const
 {
-	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0x00));   /* terrain */
+	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0x00));   // terrain
 	palette.set_pen_color(1, rgb_t(0x18, 0x18, 0x18));
 	palette.set_pen_color(2, rgb_t(0x30, 0x30, 0x30));
 	palette.set_pen_color(3, rgb_t(0x48, 0x48, 0x48));
 	palette.set_pen_color(4, rgb_t(0x60, 0x60, 0x60));
 	palette.set_pen_color(5, rgb_t(0x78, 0x78, 0x78));
 	palette.set_pen_color(6, rgb_t(0x90, 0x90, 0x90));
-	palette.set_pen_color(7, rgb_t(0xA8, 0xA8, 0xA8));
-	palette.set_pen_color(8, rgb_t(0x10, 0x10, 0x10));   /* sprites */
-	palette.set_pen_color(9, rgb_t(0xE0, 0xE0, 0xE0));
-	palette.set_pen_color(10, rgb_t(0xA0, 0xA0, 0xA0));
+	palette.set_pen_color(7, rgb_t(0xa8, 0xa8, 0xa8));
+	palette.set_pen_color(8, rgb_t(0x10, 0x10, 0x10));   // sprites
+	palette.set_pen_color(9, rgb_t(0xe0, 0xe0, 0xe0));
+	palette.set_pen_color(10, rgb_t(0xa0, 0xa0, 0xa0));
 	palette.set_pen_color(11, rgb_t(0x48, 0x48, 0x48));
 	palette.set_pen_color(12, rgb_t(0x10, 0x10, 0x10));
 	palette.set_pen_color(13, rgb_t(0x48, 0x48, 0x48));
-	palette.set_pen_color(14, rgb_t(0xA0, 0xA0, 0xA0));
-	palette.set_pen_color(15, rgb_t(0xE0, 0xE0, 0xE0));
-	palette.set_pen_color(16, rgb_t(0x00, 0x00, 0x00));   /* missiles */
-	palette.set_pen_color(17, rgb_t(0xFF, 0xFF, 0xFF));
-	palette.set_pen_color(18, rgb_t(0x00, 0x00, 0x00));   /* text */
-	palette.set_pen_color(19, rgb_t(0xE0, 0xE0, 0xE0));
+	palette.set_pen_color(14, rgb_t(0xa0, 0xa0, 0xa0));
+	palette.set_pen_color(15, rgb_t(0xe0, 0xe0, 0xe0));
+	palette.set_pen_color(16, rgb_t(0x00, 0x00, 0x00));   // missiles
+	palette.set_pen_color(17, rgb_t(0xff, 0xff, 0xff));
+	palette.set_pen_color(18, rgb_t(0x00, 0x00, 0x00));   // text
+	palette.set_pen_color(19, rgb_t(0xe0, 0xe0, 0xe0));
 }
 
 READ8_MEMBER(skyraid_state::skyraid_port_0_r)
@@ -229,8 +229,7 @@ MACHINE_CONFIG_START(skyraid_state::skyraid)
 	MCFG_DEVICE_PROGRAM_MAP(skyraid_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", skyraid_state,  irq0_line_hold)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 4)
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 4);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -239,18 +238,16 @@ MACHINE_CONFIG_START(skyraid_state::skyraid)
 	MCFG_SCREEN_SIZE(512, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(skyraid_state, screen_update_skyraid)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_skyraid)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_skyraid)
 
-	MCFG_PALETTE_ADD("palette", 20)
-	MCFG_PALETTE_INIT_OWNER(skyraid_state, skyraid)
+	PALETTE(config, m_palette, FUNC(skyraid_state::skyraid_palette), 20);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE, skyraid_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	DISCRETE(config, m_discrete, skyraid_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 

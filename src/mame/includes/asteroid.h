@@ -14,8 +14,8 @@
 class asteroid_state : public driver_device
 {
 public:
-	asteroid_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	asteroid_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_dvg(*this, "dvg"),
 		m_earom(*this, "earom"),
@@ -24,7 +24,8 @@ public:
 		m_dsw_sel(*this, "dsw_sel"),
 		m_cocktail(*this, "COCKTAIL"),
 		m_ram1(*this, "ram1"),
-		m_ram2(*this, "ram2") { }
+		m_ram2(*this, "ram2")
+	{ }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

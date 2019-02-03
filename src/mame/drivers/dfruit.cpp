@@ -376,7 +376,7 @@ MACHINE_CONFIG_START(dfruit_state::dfruit)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu",Z80,MASTER_CLOCK/2) //!!! TC0091LVC !!!
 	MCFG_DEVICE_PROGRAM_MAP(dfruit_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", dfruit_state, dfruit_irq_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(dfruit_state::dfruit_irq_scanline), "screen", 0, 1);
 
 	//MCFG_MACHINE_START_OVERRIDE(dfruit_state,4enraya)
 	//MCFG_MACHINE_RESET_OVERRIDE(dfruit_state,4enraya)
@@ -394,20 +394,20 @@ MACHINE_CONFIG_START(dfruit_state::dfruit)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dfruit )
 	MCFG_PALETTE_ADD("palette", 0x100)
 
-	MCFG_DEVICE_ADD("tc0091lvc", TC0091LVC, 0)
-	MCFG_TC0091LVC_GFXDECODE("gfxdecode")
+	TC0091LVC(config, m_vdp, 0);
+	m_vdp->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+	i8255_device &ppi(I8255A(config, "ppi8255_0"));
+	ppi.in_pa_callback().set_ioport("IN0");
+	ppi.in_pb_callback().set_ioport("IN1");
+	ppi.in_pc_callback().set_ioport("IN2");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("opn", YM2203, MASTER_CLOCK/4)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN4"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN5"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	ym2203_device &opn(YM2203(config, "opn", MASTER_CLOCK/4));
+	opn.port_a_read_callback().set_ioport("IN4");
+	opn.port_b_read_callback().set_ioport("IN5");
+	opn.add_route(ALL_OUTPUTS, "mono", 0.30);
 MACHINE_CONFIG_END
 
 /***************************************************************************

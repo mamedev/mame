@@ -22,7 +22,9 @@ Year  Game                CPU         Sound            Custom                   
 1999  Bishou Jan          H8/3044**   SS9904           SS9601, SS9802, SS9803            HM86171 RAMDAC, Battery
 1999  X-Train/P-Train     AM188-EM    M6295            SS9601, SS9802, SS9803            HM86171 RAMDAC, Battery
 2000  New 2001            H8/3044**   SS9904           SS9601, SS9802, SS9803            HM86171 RAMDAC, Battery
+2001  Queen Bee           H8/3044**   SS9804           SS9601, SS9802, SS9803            HM86171 RAMDAC, Battery
 2001  Humlan's Lyckohjul  H8/3044**   SS9804           SS9601, SS9802, SS9803            HM86171 RAMDAC, Battery
+2002  Super Queen Bee     H8/3044**   ?                ?                                 ?
 2006  X-Plan              AM188-EM    M6295            SS9601, SS9802, SS9803            HM86171 RAMDAC, Battery
 ----------------------------------------------------------------------------------------------------------------
 *SS9600   **SS9689
@@ -34,7 +36,7 @@ To do:
 - ptrain: missing scroll in race screens.
 - humlan: empty reels when bonus image should scroll in via L0 scroll. The image (crown/fruits) is at y > 0x100 in the tilemap.
 - saklove, xplan: remove IRQ hacks (when an AM188-EM core will be available).
-- bishjan, new2001, humlan, saklove: game is sometimes too fast (can bishjan read the VBLANK state? saklove and xplan can).
+- bishjan, new2001, humlan, saklove, squeenb: game is sometimes too fast (can bishjan read the VBLANK state? saklove and xplan can).
 - xtrain: it runs faster than a video from the real thing. It doesn't use vblank irqs (but reads the vblank bit).
 - mtrain: implement hopper. Double up does not work?
 
@@ -113,7 +115,10 @@ public:
 
 	void init_bishjan();
 	void init_new2001();
+	void init_queenbee();
+	void init_queenbeeb();
 	void init_humlan();
+	void init_squeenb();
 	void init_xtrain();
 	void init_expcard();
 	void init_wtrnymph();
@@ -2385,8 +2390,8 @@ MACHINE_CONFIG_START(subsino2_state::bishjan)
 	MCFG_DEVICE_PROGRAM_MAP( bishjan_map )
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", subsino2_state, irq0_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2399,7 +2404,8 @@ MACHINE_CONFIG_START(subsino2_state::bishjan)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ss9601)
 	MCFG_PALETTE_ADD( "palette", 256 )
 
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette") // HMC HM86171 VGA 256 colour RAMDAC
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // HMC HM86171 VGA 256 colour RAMDAC
+	ramdac.set_addrmap(0, &subsino2_state::ramdac_map);
 
 	MCFG_VIDEO_START_OVERRIDE(subsino2_state, subsino2 )
 
@@ -2436,7 +2442,7 @@ MACHINE_CONFIG_START(subsino2_state::mtrain)
 	MCFG_DEVICE_PROGRAM_MAP( mtrain_map )
 	MCFG_DEVICE_IO_MAP( mtrain_io )
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2450,7 +2456,8 @@ MACHINE_CONFIG_START(subsino2_state::mtrain)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ss9601)
 	MCFG_PALETTE_ADD( "palette", 256 )
 
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette") // HMC HM86171 VGA 256 colour RAMDAC
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // HMC HM86171 VGA 256 colour RAMDAC
+	ramdac.set_addrmap(0, &subsino2_state::ramdac_map);
 
 	MCFG_VIDEO_START_OVERRIDE(subsino2_state, subsino2 )
 
@@ -2470,7 +2477,7 @@ MACHINE_CONFIG_START(subsino2_state::saklove)
 	MCFG_DEVICE_PROGRAM_MAP( saklove_map )
 	MCFG_DEVICE_IO_MAP( saklove_io )
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2484,7 +2491,8 @@ MACHINE_CONFIG_START(subsino2_state::saklove)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ss9601)
 	MCFG_PALETTE_ADD( "palette", 256 )
 
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette") // HMC HM86171 VGA 256 colour RAMDAC
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // HMC HM86171 VGA 256 colour RAMDAC
+	ramdac.set_addrmap(0, &subsino2_state::ramdac_map);
 
 	MCFG_VIDEO_START_OVERRIDE(subsino2_state, subsino2 )
 
@@ -2508,7 +2516,7 @@ MACHINE_CONFIG_START(subsino2_state::xplan)
 	MCFG_DEVICE_IO_MAP( xplan_io )
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", subsino2_state, am188em_int0_irq)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2522,7 +2530,8 @@ MACHINE_CONFIG_START(subsino2_state::xplan)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ss9601)
 	MCFG_PALETTE_ADD( "palette", 256 )
 
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette") // HMC HM86171 VGA 256 colour RAMDAC
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // HMC HM86171 VGA 256 colour RAMDAC
+	ramdac.set_addrmap(0, &subsino2_state::ramdac_map);
 
 	MCFG_VIDEO_START_OVERRIDE(subsino2_state, subsino2 )
 
@@ -2585,8 +2594,8 @@ PCB Layout
 |------------------------------------------------------|
 Notes:
       H8/3044 - Subsino re-badged Hitachi H8/3044 HD6433044A22F Microcontroller (QFP100)
-                The H8/3044 is a H8/3002 with 24bit address bus and has 32k MASKROM and 2k RAM, clock input is 14.7MHz [44.1/3]
-                MD0,MD1 & MD2 are configured to MODE 6 16MByte Expanded Mode with the on-chip 32k MASKROM enabled.
+                The H8/3044 is a H8/3002 with 24bit address bus and has 32k mask ROM and 2k RAM, clock input is 14.7MHz [44.1/3]
+                MD0,MD1 & MD2 are configured to MODE 6 16MByte Expanded Mode with the on-chip 32k mask ROM enabled.
      CXK58257 - Sony CXK58257 32k x8 SRAM (SOP28)
       HM86171 - Hualon Microelectronics HMC HM86171 VGA 256 colour RAMDAC (DIP28)
           S-1 - ?? Probably some kind of audio OP AMP or DAC? (DIP8)
@@ -2694,6 +2703,100 @@ void subsino2_state::init_new2001()
 
 /***************************************************************************
 
+Queen Bee
+(c) 2001 Subsino
+
+no ROM labels available
+
+***************************************************************************/
+
+ROM_START( queenbee )
+	ROM_REGION( 0x80000, "maincpu", 0 )    // H8/3044
+	ROM_LOAD( "27c020 u21.bin", 0x00000, 0x40000, CRC(baec0241) SHA1(345cfee7bdb4f4c61caa828372a121f3917bb4eb) )
+	ROM_FILL(                            0x40000, 0x40000, 0xff )
+
+	ROM_REGION( 0x200000, "tilemap", 0 )
+	ROM_LOAD32_BYTE( "27c4001 u25.bin", 0x000000, 0x80000, CRC(628ed650) SHA1(dadbc5f73f6a5773303d834a44d2eab836874cfe) )
+	ROM_LOAD32_BYTE( "27c4001 u26.bin", 0x000001, 0x80000, CRC(27a169df) SHA1(d36989c300051a0c41752638ab5134a9b04c50a4) )
+	ROM_LOAD32_BYTE( "27c4001 u27.bin", 0x000002, 0x80000, CRC(27e8c4b9) SHA1(b010b9dcadb357cf4e79d97ce84b86f792bd8ecf) )
+	ROM_LOAD32_BYTE( "27c4001 u28.bin", 0x000003, 0x80000, CRC(7f139a04) SHA1(595a114806756e6f77a6fe20a13515b211ffdf2a) )
+
+	ROM_REGION( 0x80000, "samples", 0 )
+	ROM_LOAD( "27c4001 u9.bin", 0x000000, 0x80000, CRC(c7cda990) SHA1(193144fe0c31fc8342bd44aa4899bf15f0bc399d) )
+ROM_END
+
+void subsino2_state::init_queenbee()
+{
+	uint16_t *rom = (uint16_t*)memregion("maincpu")->base();
+
+	// patch serial protection test (ERROR 093099 otherwise)
+	rom[0x1cc6/2] = 0x4066;
+
+	// rts -> rte
+	rom[0x3e6a/2] = 0x5670; // IRQ 8
+	rom[0x3fbe/2] = 0x5670; // IRQ 0
+}
+
+ROM_START( queenbeeb )
+	ROM_REGION( 0x80000, "maincpu", 0 )    // H8/3044
+	ROM_LOAD( "u21", 0x00000, 0x40000, CRC(23e0ad8f) SHA1(d913ebd249c471ab36aabe515a8b36bb3590c1ca) )
+	ROM_FILL(                            0x40000, 0x40000, 0xff )
+
+	ROM_REGION( 0x200000, "tilemap", 0 ) // this PCB has a single surface mounted ROM, which hasn't been dumped.
+	ROM_LOAD( "gfx", 0x000000, 0x200000, NO_DUMP )
+	// following ROMs are taken from humlan for testing, it doesn't seem to be a case of just differently split ROMs.
+	// ROM_LOAD32_BYTE( "hlj__truemax_3_v402.u25", 0x000000, 0x80000, CRC(dfc8d795) SHA1(93e0fe271c7390596f73092720befe11d8354838) )
+	// ROM_LOAD32_BYTE( "hlj__truemax_4_v402.u26", 0x000001, 0x80000, CRC(31c774d6) SHA1(13fcdb42f5fd7d0cadd3fd7030037c21b7585f0f) )
+	// ROM_LOAD32_BYTE( "hlj__truemax_5_v402.u27", 0x000002, 0x80000, CRC(28e14be8) SHA1(778906427175ca50ad5b0a7c5978c36ed29ef994) )
+	// ROM_LOAD32_BYTE( "hlj__truemax_6_v402.u28", 0x000003, 0x80000, CRC(d1c7ae17) SHA1(3ddb8ad38eeb5ab0a944d7d26cfb890a4327ef2e) )
+
+	ROM_REGION( 0x40000, "samples", 0 )
+	ROM_LOAD( "u9", 0x000000, 0x40000, NO_DUMP )
+ROM_END
+
+void subsino2_state::init_queenbeeb()
+{
+	uint16_t *rom = (uint16_t*)memregion("maincpu")->base();
+
+	// patch serial protection test (ERROR 093099 otherwise)
+	rom[0x1826/2] = 0x4066;
+
+	// rts -> rte
+	rom[0x3902/2] = 0x5670; // IRQ 8
+	rom[0x3a56/2] = 0x5670; // IRQ 0
+}
+
+// make sure these are really queenbee
+ROM_START( queenbeei )
+	ROM_REGION( 0x80000, "maincpu", 0 )    // H8/3044
+	ROM_LOAD( "u21 9ac9 v100", 0x00000, 0x40000, CRC(061b406f) SHA1(2a5433817e41610e9ba90302a6b9608f769176a0) )
+	ROM_FILL(                            0x40000, 0x40000, 0xff )
+
+	ROM_REGION( 0x200000, "tilemap", 0 )
+	ROM_LOAD( "gfx", 0x000000, 0x200000, NO_DUMP )
+
+	ROM_REGION( 0x80000, "samples", 0 )
+	ROM_LOAD( "u9", 0x000000, 0x80000, NO_DUMP )
+ROM_END
+
+ROM_START( queenbeesa )
+	ROM_REGION( 0x80000, "maincpu", 0 )    // H8/3044
+	ROM_LOAD( "00b0 u21 1v101", 0x00000, 0x40000, CRC(19e31fd7) SHA1(01cf507958b0411d21dd660280f45668d7c5b9d9) )
+	ROM_FILL(                            0x40000, 0x40000, 0xff )
+
+	ROM_REGION( 0x200000, "tilemap", 0 )
+	ROM_LOAD( "gfx", 0x000000, 0x200000, NO_DUMP )
+
+	ROM_REGION( 0x80000, "samples", 0 )
+	ROM_LOAD( "u9", 0x000000, 0x80000, NO_DUMP )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
 Humlan's Lyckohjul (Sweden, V402)
 (c) 2001 Subsino & Truemax
 
@@ -2730,6 +2833,42 @@ void subsino2_state::init_humlan()
 	// rts -> rte
 	rom[0x38B4/2] = 0x5670; // IRQ 8
 	rom[0x3A08/2] = 0x5670; // IRQ 0
+}
+
+/***************************************************************************
+
+Super Queen Bee
+(c) 2002 Subsino
+
+no ROM labels available
+
+***************************************************************************/
+
+ROM_START( squeenb )
+	ROM_REGION( 0x80000, "maincpu", 0 )    // H8/3044
+	ROM_LOAD( "u21", 0x00000, 0x40000, CRC(9edc4062) SHA1(515c8e648f839c99905fd5a861688fc62a45c4ed) )
+	ROM_FILL(                            0x40000, 0x40000, 0xff )
+
+	ROM_REGION( 0x200000, "tilemap", 0 )
+	ROM_LOAD32_BYTE( "u25", 0x000000, 0x80000, CRC(842c0a33) SHA1(defb79c158d5091ca8830e9f03dda382d03d51ef) )
+	ROM_LOAD32_BYTE( "u26", 0x000001, 0x80000, CRC(11b67abb) SHA1(e388e3aefbcceda1390c00e6590cbdd686982b2e) )
+	ROM_LOAD32_BYTE( "u27", 0x000002, 0x80000, CRC(d713131a) SHA1(74a95e1ef0d30da53a91a5232574687f816df2eb) )
+	ROM_LOAD32_BYTE( "u28", 0x000003, 0x80000, CRC(dfa39f39) SHA1(992f74c04cbf4af06a02812052ce701228d4e174) )
+
+	ROM_REGION( 0x80000, "samples", 0 )
+	ROM_LOAD( "u9", 0x000000, 0x80000, CRC(c7cda990) SHA1(193144fe0c31fc8342bd44aa4899bf15f0bc399d) )
+ROM_END
+
+void subsino2_state::init_squeenb()
+{
+	uint16_t *rom = (uint16_t*)memregion("maincpu")->base();
+
+	// patch serial protection test (ERROR 093099 otherwise)
+	rom[0x1814/2] = 0x4066;
+
+	// rts -> rte
+	rom[0x399a/2] = 0x5670; // IRQ 8
+	rom[0x3aa8/2] = 0x5670; // IRQ 0
 }
 
 /***************************************************************************
@@ -3173,13 +3312,29 @@ void subsino2_state::init_wtrnymph()
 	rom[0xc2d7] = 0x18;
 }
 
-GAME( 1996, mtrain,   0,        mtrain,   mtrain,   subsino2_state, init_mtrain,   ROT0, "Subsino",                   "Magic Train (Ver. 1.31)",               0 )
-GAME( 1996, wtrnymph, 0,        mtrain,   wtrnymph, subsino2_state, init_wtrnymph, ROT0, "Subsino",                   "Water-Nymph (Ver. 1.4)",                0 )
-GAME( 1998, expcard,  0,        expcard,  expcard,  subsino2_state, init_expcard,  ROT0, "American Alpha",            "Express Card / Top Card (Ver. 1.5)",    0 )
-GAME( 1998, saklove,  0,        saklove,  saklove,  subsino2_state, init_saklove,  ROT0, "Subsino",                   "Ying Hua Lian 2.0 (China, Ver. 1.02)",  0 )
-GAME( 1999, xtrain,   0,        xtrain,   xtrain,   subsino2_state, init_xtrain,   ROT0, "Subsino",                   "X-Train (Ver. 1.3)",                    0 )
-GAME( 1999, ptrain,   0,        xtrain,   xtrain,   subsino2_state, init_ptrain,   ROT0, "Subsino",                   "Panda Train (Novamatic 1.7)",           MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, bishjan,  0,        bishjan,  bishjan,  subsino2_state, init_bishjan,  ROT0, "Subsino",                   "Bishou Jan (Japan, Ver. 203)",          MACHINE_NO_SOUND )
-GAME( 2000, new2001,  0,        new2001,  new2001,  subsino2_state, init_new2001,  ROT0, "Subsino",                   "New 2001 (Italy, Ver. 200N)",           MACHINE_NO_SOUND )
-GAME( 2006, xplan,    0,        xplan,    xplan,    subsino2_state, init_xplan,    ROT0, "Subsino",                   "X-Plan (Ver. 101)",                     0 )
-GAME( 2001, humlan,   0,        humlan,   humlan,   subsino2_state, init_humlan,   ROT0, "Subsino (Truemax license)", "Humlan's Lyckohjul (Sweden, Ver. 402)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, mtrain,   0,        mtrain,   mtrain,   subsino2_state, init_mtrain,   ROT0, "Subsino",                          "Magic Train (Ver. 1.31)",               0 )
+
+GAME( 1996, wtrnymph, 0,        mtrain,   wtrnymph, subsino2_state, init_wtrnymph, ROT0, "Subsino",                          "Water-Nymph (Ver. 1.4)",                0 )
+
+GAME( 1998, expcard,  0,        expcard,  expcard,  subsino2_state, init_expcard,  ROT0, "Subsino (American Alpha license)", "Express Card / Top Card (Ver. 1.5)",    0 )
+
+GAME( 1998, saklove,  0,        saklove,  saklove,  subsino2_state, init_saklove,  ROT0, "Subsino",                          "Ying Hua Lian 2.0 (China, Ver. 1.02)",  0 )
+
+GAME( 1999, xtrain,   0,        xtrain,   xtrain,   subsino2_state, init_xtrain,   ROT0, "Subsino",                          "X-Train (Ver. 1.3)",                    0 )
+
+GAME( 1999, ptrain,   0,        xtrain,   xtrain,   subsino2_state, init_ptrain,   ROT0, "Subsino",                          "Panda Train (Novamatic 1.7)",           MACHINE_IMPERFECT_GRAPHICS )
+
+GAME( 1999, bishjan,  0,        bishjan,  bishjan,  subsino2_state, init_bishjan,  ROT0, "Subsino",                          "Bishou Jan (Japan, Ver. 203)",          MACHINE_NO_SOUND )
+
+GAME( 2000, new2001,  0,        new2001,  new2001,  subsino2_state, init_new2001,  ROT0, "Subsino",                          "New 2001 (Italy, Ver. 200N)",           MACHINE_NO_SOUND )
+
+GAME( 2006, xplan,    0,        xplan,    xplan,    subsino2_state, init_xplan,    ROT0, "Subsino",                          "X-Plan (Ver. 101)",                     0 )
+
+GAME( 2001, queenbee, 0,        humlan,   humlan,   subsino2_state, init_queenbee, ROT0, "Subsino (American Alpha license)", "Queen Bee (Ver. 114)",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // severe timing issues
+GAME( 2001, queenbeeb,queenbee, humlan,   humlan,   subsino2_state, init_queenbeeb,ROT0, "Subsino",                          "Queen Bee (Brazil, Ver. 202)",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // severe timing issues, only program ROM available
+GAME( 2001, queenbeei,queenbee, humlan,   humlan,   subsino2_state, empty_init,    ROT0, "Subsino",                          "Queen Bee (Israel, Ver. 100)",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // severe timing issues, only program ROM available
+GAME( 2001, queenbeesa,queenbee,humlan,   humlan,   subsino2_state, empty_init,    ROT0, "Subsino",                          "Queen Bee (SA-101-HARD)",               MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // severe timing issues, only program ROM available
+
+GAME( 2001, humlan,   queenbee, humlan,   humlan,   subsino2_state, init_humlan,   ROT0, "Subsino (Truemax license)",        "Humlan's Lyckohjul (Sweden, Ver. 402)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // severe timing issues
+
+GAME( 2002, squeenb,  0,        humlan,   humlan,   subsino2_state, init_squeenb,  ROT0, "Subsino",                          "Super Queen Bee (Ver. 101)",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // severe timing issues

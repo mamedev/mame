@@ -546,15 +546,16 @@ void mpu5_state::machine_start()
 }
 
 
-MACHINE_CONFIG_START(mpu5_state::mpu5)
-	MCFG_DEVICE_ADD("maincpu", M68340, 16000000)    // ?
-	MCFG_DEVICE_PROGRAM_MAP(mpu5_map)
+void mpu5_state::mpu5(machine_config &config)
+{
+	M68340(config, m_maincpu, 16000000);    // ?
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu5_state::mpu5_map);
 
-	MCFG_DEFAULT_LAYOUT(layout_mpu5)
+	config.set_default_layout(layout_mpu5);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 	/* unknown sound */
-MACHINE_CONFIG_END
+}
 
 #include "mpu5.hxx"

@@ -86,225 +86,212 @@ FLOPPY_FORMATS_MEMBER( orion_state::orion_floppy_formats )
 	FLOPPY_SMX_FORMAT
 FLOPPY_FORMATS_END
 
-static void orion_floppies(device_slot_interface &device)
+/* Machine driver */
+void orion_state::orion128(machine_config &config)
 {
-	device.option_add("525qd", FLOPPY_525_QD);
+	I8080(config, m_maincpu, 2000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &orion_state::orion128_mem);
+	m_maincpu->set_addrmap(AS_IO, &orion_state::orion128_io);
+
+	auto &ppi1(I8255A(config, "ppi8255_1"));
+	ppi1.in_pa_callback().set(FUNC(orion_state::orion_romdisk_porta_r));
+	ppi1.out_pb_callback().set(FUNC(orion_state::orion_romdisk_portb_w));
+	ppi1.out_pc_callback().set(FUNC(orion_state::orion_romdisk_portc_w));
+
+	auto &ppi2(I8255A(config, "ppi8255_2"));
+	ppi2.out_pa_callback().set(FUNC(radio86_state::radio86_8255_porta_w2));
+	ppi2.in_pb_callback().set(FUNC(radio86_state::radio86_8255_portb_r2));
+	ppi2.in_pc_callback().set(FUNC(radio86_state::radio86_8255_portc_r2));
+	ppi2.out_pc_callback().set(FUNC(radio86_state::radio86_8255_portc_w2));
+
+	/* video hardware */
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(50);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(384, 256);
+	m_screen->set_visarea(0, 384-1, 0, 256-1);
+	m_screen->set_screen_update(FUNC(orion_state::screen_update_orion128));
+	m_screen->set_palette(m_palette);
+
+	PALETTE(config, m_palette, FUNC(orion_state::orion128_palette), 18);
+
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+
+	auto &cassette(CASSETTE(config, "cassette"));
+	cassette.set_formats(rko_cassette_formats);
+	cassette.set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	cassette.set_interface("orion_cass");
+
+	SOFTWARE_LIST(config, "cass_list").set_type("orion_cass", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+
+	FD1793(config, m_fdc, 8_MHz_XTAL / 8);
+
+	FLOPPY_CONNECTOR(config, "fd0", "525qd", FLOPPY_525_QD, true, orion_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fd1", "525qd", FLOPPY_525_QD, true, orion_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fd2", "525qd", FLOPPY_525_QD, true, orion_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fd3", "525qd", FLOPPY_525_QD, true, orion_floppy_formats);
+	SOFTWARE_LIST(config, "flop_list").set_type("orion_flop", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+
+	auto &cart(GENERIC_CARTSLOT(config, "cartslot"));
+	generic_plain_slot(cart);
+	cart.set_interface("orion_cart");
+
+	SOFTWARE_LIST(config, "cart_list").set_type("orion_cart", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+
+	/* internal ram */
+	RAM(config, m_ram);
+	m_ram->set_default_size("256K");
+	m_ram->set_default_value(0x00);
 }
 
-/* Machine driver */
-MACHINE_CONFIG_START(orion_state::orion128)
-	MCFG_DEVICE_ADD("maincpu", I8080, 2000000)
-	MCFG_DEVICE_PROGRAM_MAP(orion128_mem)
-	MCFG_DEVICE_IO_MAP(orion128_io)
-
-	MCFG_MACHINE_START_OVERRIDE(orion_state, orion128 )
-	MCFG_MACHINE_RESET_OVERRIDE(orion_state, orion128 )
-
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, orion_state, orion_romdisk_porta_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, orion_state, orion_romdisk_portb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, orion_state, orion_romdisk_portc_w))
-
-	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, radio86_state, radio86_8255_porta_w2))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, radio86_state, radio86_8255_portb_r2))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, radio86_state, radio86_8255_portc_r2))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, radio86_state, radio86_8255_portc_w2))
-
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(384, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(orion_state, screen_update_orion128)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_PALETTE_ADD("palette", 18)
-	MCFG_PALETTE_INIT_OWNER(orion_state, orion128 )
-
-	MCFG_VIDEO_START_OVERRIDE(orion_state,orion128)
-
-	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
-
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(rko_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
-	MCFG_CASSETTE_INTERFACE("orion_cass")
-
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "orion_cass")
-
-	MCFG_DEVICE_ADD("fd1793", FD1793, 8_MHz_XTAL / 8)
-
-	MCFG_FLOPPY_DRIVE_ADD("fd0", orion_floppies, "525qd", orion_state::orion_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd1", orion_floppies, "525qd", orion_state::orion_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd2", orion_floppies, "525qd", orion_state::orion_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd3", orion_floppies, "525qd", orion_state::orion_floppy_formats)
-	MCFG_SOFTWARE_LIST_ADD("flop_list","orion_flop")
-
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "orion_cart")
-
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "orion_cart")
-
-	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("256K")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(orion_state::orion128ms)
+void orion_state::orion128ms(machine_config &config)
+{
 	orion128(config);
-	MCFG_DEVICE_REMOVE("ppi8255_2")
-	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, radio86_state, radio86_8255_porta_w2))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, radio86_state, radio86_8255_portb_r2))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, radio86_state, rk7007_8255_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, radio86_state, radio86_8255_portc_w2))
-MACHINE_CONFIG_END
+	auto &ppi2(I8255A(config.replace(), "ppi8255_2"));
+	ppi2.out_pa_callback().set(FUNC(radio86_state::radio86_8255_porta_w2));
+	ppi2.in_pb_callback().set(FUNC(radio86_state::radio86_8255_portb_r2));
+	ppi2.in_pc_callback().set(FUNC(radio86_state::rk7007_8255_portc_r));
+	ppi2.out_pc_callback().set(FUNC(radio86_state::radio86_8255_portc_w2));
+}
 
 
-MACHINE_CONFIG_START(orion_state::orionz80)
-	MCFG_DEVICE_ADD("maincpu", Z80, 2500000)
-	MCFG_DEVICE_PROGRAM_MAP(orionz80_mem)
-	MCFG_DEVICE_IO_MAP(orionz80_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", orion_state, orionz80_interrupt)
+void orion_z80_state::orionz80(machine_config &config)
+{
+	Z80(config, m_maincpu, 2500000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &orion_z80_state::orionz80_mem);
+	m_maincpu->set_addrmap(AS_IO, &orion_z80_state::orionz80_io);
+	m_maincpu->set_vblank_int("screen", FUNC(orion_z80_state::orionz80_interrupt));
 
-	MCFG_MACHINE_START_OVERRIDE(orion_state, orionz80 )
-	MCFG_MACHINE_RESET_OVERRIDE(orion_state, orionz80 )
+	auto &ppi1(I8255A(config, "ppi8255_1"));
+	ppi1.in_pa_callback().set(FUNC(orion_z80_state::orion_romdisk_porta_r));
+	ppi1.out_pb_callback().set(FUNC(orion_z80_state::orion_romdisk_portb_w));
+	ppi1.out_pc_callback().set(FUNC(orion_z80_state::orion_romdisk_portc_w));
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, orion_state, orion_romdisk_porta_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, orion_state, orion_romdisk_portb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, orion_state, orion_romdisk_portc_w))
-
-	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, radio86_state, radio86_8255_porta_w2))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, radio86_state, radio86_8255_portb_r2))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, radio86_state, radio86_8255_portc_r2))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, radio86_state, radio86_8255_portc_w2))
+	auto &ppi2(I8255A(config, "ppi8255_2"));
+	ppi2.out_pa_callback().set(FUNC(radio86_state::radio86_8255_porta_w2));
+	ppi2.in_pb_callback().set(FUNC(radio86_state::radio86_8255_portb_r2));
+	ppi2.in_pc_callback().set(FUNC(radio86_state::radio86_8255_portc_r2));
+	ppi2.out_pc_callback().set(FUNC(radio86_state::radio86_8255_portc_w2));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(384, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(orion_state, screen_update_orion128)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(50);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(384, 256);
+	m_screen->set_visarea(0, 384-1, 0, 256-1);
+	m_screen->set_screen_update(FUNC(orion_z80_state::screen_update_orion128));
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 18)
-	MCFG_PALETTE_INIT_OWNER(orion_state, orion128 )
+	PALETTE(config, m_palette, FUNC(orion_z80_state::orion128_palette), 18);
 
-	MCFG_VIDEO_START_OVERRIDE(orion_state,orion128)
-
-	MCFG_DEVICE_ADD("rtc", MC146818, 4.194304_MHz_XTAL)
+	MC146818(config, "rtc", 4.194304_MHz_XTAL);
 
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 1.0);
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
-	MCFG_DEVICE_ADD("ay8912", AY8912, 1773400)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(rko_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
-	MCFG_CASSETTE_INTERFACE("orion_cass")
+	auto &ay8912(AY8912(config, "ay8912", 1773400));
+	ay8912.add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "orion_cass")
+	auto &cassette(CASSETTE(config, "cassette"));
+	cassette.set_formats(rko_cassette_formats);
+	cassette.set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	cassette.set_interface("orion_cass");
 
-	MCFG_DEVICE_ADD("fd1793", FD1793, 8_MHz_XTAL / 8)
+	SOFTWARE_LIST(config, "cass_list").set_type("orion_cass", SOFTWARE_LIST_ORIGINAL_SYSTEM);
 
-	MCFG_FLOPPY_DRIVE_ADD("fd0", orion_floppies, "525qd", orion_state::orion_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd1", orion_floppies, "525qd", orion_state::orion_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd2", orion_floppies, "525qd", orion_state::orion_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd3", orion_floppies, "525qd", orion_state::orion_floppy_formats)
-	MCFG_SOFTWARE_LIST_ADD("flop_list","orion_flop")
+	FD1793(config, m_fdc, 8_MHz_XTAL / 8);
 
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "orion_cart")
+	FLOPPY_CONNECTOR(config, "fd0", "525qd", FLOPPY_525_QD, true, orion_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fd1", "525qd", FLOPPY_525_QD, true, orion_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fd2", "525qd", FLOPPY_525_QD, true, orion_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fd3", "525qd", FLOPPY_525_QD, true, orion_floppy_formats);
+	SOFTWARE_LIST(config, "flop_list").set_type("orion_flop", SOFTWARE_LIST_ORIGINAL_SYSTEM);
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "orion_cart")
+	auto &cart(GENERIC_CARTSLOT(config, "cartslot"));
+	generic_plain_slot(cart);
+	cart.set_interface("orion_cart");
+
+	SOFTWARE_LIST(config, "cart_list").set_type("orion_cart", SOFTWARE_LIST_ORIGINAL_SYSTEM);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
-MACHINE_CONFIG_END
+	RAM(config, m_ram);
+	m_ram->set_default_size("512K");
+	m_ram->set_default_value(0x00);
+}
 
-MACHINE_CONFIG_START(orion_state::orionz80ms)
+void orion_z80_state::orionz80ms(machine_config &config)
+{
 	orionz80(config);
 
-	MCFG_DEVICE_REMOVE("ppi8255_2")
-	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, radio86_state, radio86_8255_porta_w2))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, radio86_state, radio86_8255_portb_r2))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, radio86_state, rk7007_8255_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, radio86_state, radio86_8255_portc_w2))
-MACHINE_CONFIG_END
+	auto &ppi2(I8255A(config.replace(), "ppi8255_2"));
+	ppi2.out_pa_callback().set(FUNC(radio86_state::radio86_8255_porta_w2));
+	ppi2.in_pb_callback().set(FUNC(radio86_state::radio86_8255_portb_r2));
+	ppi2.in_pc_callback().set(FUNC(radio86_state::rk7007_8255_portc_r));
+	ppi2.out_pc_callback().set(FUNC(radio86_state::radio86_8255_portc_w2));
+}
 
-MACHINE_CONFIG_START(orion_state::orionpro)
-	MCFG_DEVICE_ADD("maincpu", Z80, 5000000)
-	MCFG_DEVICE_PROGRAM_MAP(orionpro_mem)
-	MCFG_DEVICE_IO_MAP(orionpro_io)
+void orion_pro_state::orionpro(machine_config &config)
+{
+	Z80(config, m_maincpu, 5000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &orion_pro_state::orionpro_mem);
+	m_maincpu->set_addrmap(AS_IO, &orion_pro_state::orionpro_io);
 
-	MCFG_MACHINE_RESET_OVERRIDE(orion_state, orionpro )
+	auto &ppi1(I8255A(config, "ppi8255_1"));
+	ppi1.in_pa_callback().set(FUNC(orion_pro_state::orion_romdisk_porta_r));
+	ppi1.out_pb_callback().set(FUNC(orion_pro_state::orion_romdisk_portb_w));
+	ppi1.out_pc_callback().set(FUNC(orion_pro_state::orion_romdisk_portc_w));
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, orion_state, orion_romdisk_porta_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, orion_state, orion_romdisk_portb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, orion_state, orion_romdisk_portc_w))
-
-	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, radio86_state, radio86_8255_porta_w2))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, radio86_state, radio86_8255_portb_r2))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, radio86_state, radio86_8255_portc_r2))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, radio86_state, radio86_8255_portc_w2))
+	auto &ppi2(I8255A(config, "ppi8255_2"));
+	ppi2.out_pa_callback().set(FUNC(radio86_state::radio86_8255_porta_w2));
+	ppi2.in_pb_callback().set(FUNC(radio86_state::radio86_8255_portb_r2));
+	ppi2.in_pc_callback().set(FUNC(radio86_state::radio86_8255_portc_r2));
+	ppi2.out_pc_callback().set(FUNC(radio86_state::radio86_8255_portc_w2));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(384, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(orion_state, screen_update_orion128)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(50);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(384, 256);
+	m_screen->set_visarea(0, 384-1, 0, 256-1);
+	m_screen->set_screen_update(FUNC(orion_pro_state::screen_update_orion128));
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 18)
-	MCFG_PALETTE_INIT_OWNER(orion_state, orion128 )
-
-	MCFG_VIDEO_START_OVERRIDE(orion_state,orion128)
+	PALETTE(config, m_palette, FUNC(orion_pro_state::orion128_palette), 18);
 
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 1.0);
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
-	MCFG_DEVICE_ADD("ay8912", AY8912, 1773400)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	auto &ay8912(AY8912(config, "ay8912", 1773400));
+	ay8912.add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(rko_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
-	MCFG_CASSETTE_INTERFACE("orion_cass")
+	auto &cassette(CASSETTE(config, "cassette"));
+	cassette.set_formats(rko_cassette_formats);
+	cassette.set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	cassette.set_interface("orion_cass");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "orion_cass")
+	SOFTWARE_LIST(config, "cass_list").set_type("orion_cass", SOFTWARE_LIST_ORIGINAL_SYSTEM);
 
-	MCFG_DEVICE_ADD("fd1793", FD1793, 8_MHz_XTAL / 8)
+	FD1793(config, m_fdc, 8_MHz_XTAL / 8);
 
-	MCFG_FLOPPY_DRIVE_ADD("fd0", orion_floppies, "525qd", orion_state::orion_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd1", orion_floppies, "525qd", orion_state::orion_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd2", orion_floppies, "525qd", orion_state::orion_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd3", orion_floppies, "525qd", orion_state::orion_floppy_formats)
-	MCFG_SOFTWARE_LIST_ADD("flop_list","orionpro_flop")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("flop128_list","orion_flop")
+	FLOPPY_CONNECTOR(config, "fd0", "525qd", FLOPPY_525_QD, true, orion_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fd1", "525qd", FLOPPY_525_QD, true, orion_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fd2", "525qd", FLOPPY_525_QD, true, orion_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fd3", "525qd", FLOPPY_525_QD, true, orion_floppy_formats);
+	SOFTWARE_LIST(config, "flop_list").set_type("orion_flop", SOFTWARE_LIST_ORIGINAL_SYSTEM);
 
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "orion_cart")
+	auto &cart(GENERIC_CARTSLOT(config, "cartslot"));
+	generic_plain_slot(cart);
+	cart.set_interface("orion_cart");
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "orion_cart")
+	SOFTWARE_LIST(config, "cart_list").set_type("orion_cart", SOFTWARE_LIST_ORIGINAL_SYSTEM);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
-MACHINE_CONFIG_END
+	RAM(config, m_ram);
+	m_ram->set_default_size("512K");
+	m_ram->set_default_value(0x00);
+}
 
 /* ROM definition */
 
@@ -372,11 +359,11 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT    CLASS        INIT        COMPANY      FULLNAME                                  FLAGS
-COMP( 1990, orion128, 0,        0,      orion128,   radio86, orion_state, empty_init, "<unknown>", "Orion 128",                              0 )
-COMP( 1990, orionms,  orion128, 0,      orion128ms, ms7007,  orion_state, empty_init, "<unknown>", "Orion 128 (MS7007)",                     0 )
-COMP( 1990, orionz80, orion128, 0,      orionz80,   radio86, orion_state, empty_init, "<unknown>", "Orion 128 + Z80 Card II",                0 )
-COMP( 1990, orionide, orion128, 0,      orionz80,   radio86, orion_state, empty_init, "<unknown>", "Orion 128 + Z80 Card II + IDE",          0 )
-COMP( 1990, orionzms, orion128, 0,      orionz80ms, ms7007,  orion_state, empty_init, "<unknown>", "Orion 128 + Z80 Card II (MS7007)",       0 )
-COMP( 1990, orionidm, orion128, 0,      orionz80ms, ms7007,  orion_state, empty_init, "<unknown>", "Orion 128 + Z80 Card II + IDE (MS7007)", 0 )
-COMP( 1994, orionpro, orion128, 0,      orionpro,   radio86, orion_state, empty_init, "<unknown>", "Orion Pro",                              0 )
+//    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT    CLASS            INIT        COMPANY      FULLNAME                                  FLAGS
+COMP( 1990, orion128, 0,        0,      orion128,   radio86, orion_state,     empty_init, "<unknown>", "Orion 128",                              0 )
+COMP( 1990, orionms,  orion128, 0,      orion128ms, ms7007,  orion_state,     empty_init, "<unknown>", "Orion 128 (MS7007)",                     0 )
+COMP( 1990, orionz80, orion128, 0,      orionz80,   radio86, orion_z80_state, empty_init, "<unknown>", "Orion 128 + Z80 Card II",                0 )
+COMP( 1990, orionide, orion128, 0,      orionz80,   radio86, orion_z80_state, empty_init, "<unknown>", "Orion 128 + Z80 Card II + IDE",          0 )
+COMP( 1990, orionzms, orion128, 0,      orionz80ms, ms7007,  orion_z80_state, empty_init, "<unknown>", "Orion 128 + Z80 Card II (MS7007)",       0 )
+COMP( 1990, orionidm, orion128, 0,      orionz80ms, ms7007,  orion_z80_state, empty_init, "<unknown>", "Orion 128 + Z80 Card II + IDE (MS7007)", 0 )
+COMP( 1994, orionpro, orion128, 0,      orionpro,   radio86, orion_pro_state, empty_init, "<unknown>", "Orion Pro",                              0 )

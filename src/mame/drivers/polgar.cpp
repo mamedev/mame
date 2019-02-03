@@ -14,15 +14,12 @@
 #include "machine/nvram.h"
 #include "machine/mmboard.h"
 #include "machine/ram.h"
-#include "machine/timer.h"
 #include "video/hd44780.h"
-#include "screen.h"
 #include "speaker.h"
 
 #include "mephisto_lcd.lh"
 #include "mephisto_academy.lh"
 #include "mephisto_milano.lh"
-#include "mephisto_modena.lh"
 
 
 class mephisto_polgar_state : public driver_device
@@ -31,7 +28,6 @@ public:
 	mephisto_polgar_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_keys(*this, "KEY")
-		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_READ8_MEMBER(polgar_keys_r);
@@ -39,10 +35,8 @@ public:
 	void polgar10(machine_config &config);
 	void polgar(machine_config &config);
 	void polgar_mem(address_map &map);
-	virtual void sound_start() override { m_digits.resolve(); }
 protected:
-	optional_ioport m_keys;
-	output_finder<4> m_digits;
+	required_ioport m_keys;
 };
 
 class mephisto_risc_state : public mephisto_polgar_state
@@ -105,43 +99,6 @@ private:
 	required_device<mephisto_display_modul_device> m_display;
 	output_finder<16> m_leds;
 	uint8_t m_led_latch;
-};
-
-class mephisto_modena_state : public mephisto_polgar_state
-{
-public:
-	mephisto_modena_state(const machine_config &mconfig, device_type type, const char *tag)
-		: mephisto_polgar_state(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_board(*this, "board")
-		, m_beeper(*this, "beeper")
-		, m_leds1(*this, "led%u", 100U)
-		, m_leds2(*this, "led%u", 0U)
-		, m_leds3(*this, "led%u", 8U)
-	{ }
-
-	DECLARE_READ8_MEMBER(modena_input_r);
-	DECLARE_WRITE8_MEMBER(modena_digits_w);
-	DECLARE_WRITE8_MEMBER(modena_io_w);
-	DECLARE_WRITE8_MEMBER(modena_led_w);
-	TIMER_DEVICE_CALLBACK_MEMBER(nmi_on)  { m_maincpu->set_input_line(M6502_NMI_LINE, ASSERT_LINE); }
-	TIMER_DEVICE_CALLBACK_MEMBER(nmi_off) { m_maincpu->set_input_line(M6502_NMI_LINE, CLEAR_LINE);  }
-
-	void modena(machine_config &config);
-	void modena_mem(address_map &map);
-protected:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
-
-private:
-	required_device<cpu_device> m_maincpu;
-	required_device<mephisto_board_device> m_board;
-	required_device<beep_device> m_beeper;
-	output_finder<8> m_leds1;
-	output_finder<8> m_leds2;
-	output_finder<8> m_leds3;
-	uint8_t m_digits_idx;
-	uint8_t m_io_ctrl;
 };
 
 class mephisto_academy_state : public mephisto_polgar_state
@@ -301,55 +258,6 @@ void mephisto_milano_state::milano_mem(address_map &map)
 }
 
 
-READ8_MEMBER(mephisto_modena_state::modena_input_r)
-{
-	if (m_board->mux_r(space, offset) == 0xff)
-		return m_keys->read();
-	else
-		return m_board->input_r(space, offset) ^ 0xff;
-}
-
-WRITE8_MEMBER(mephisto_modena_state::modena_led_w)
-{
-	m_board->mux_w(space, offset, data);
-
-	if (m_io_ctrl & 0x0e)
-	{
-		for(int i=0; i<8; i++)
-		{
-			if (BIT(m_io_ctrl, 1))
-				m_leds1[i] = BIT(data, i) ? 0 : 1;
-			if (BIT(m_io_ctrl, 2))
-				m_leds2[i] = BIT(data, i) ? 0 : 1;
-			if (BIT(m_io_ctrl, 3))
-				m_leds3[i] = BIT(data, i) ? 0 : 1;
-		}
-	}
-}
-
-WRITE8_MEMBER(mephisto_modena_state::modena_io_w)
-{
-	m_io_ctrl = data;
-	m_beeper->set_state(BIT(data, 6));
-}
-
-WRITE8_MEMBER(mephisto_modena_state::modena_digits_w)
-{
-	m_digits[m_digits_idx] = data ^ ((m_io_ctrl & 0x10) ? 0xff : 0x00);
-	m_digits_idx = (m_digits_idx + 1) & 3;
-}
-
-void mephisto_modena_state::modena_mem(address_map &map)
-{
-	map(0x0000, 0x1fff).ram().share("nvram");
-	map(0x4000, 0x4000).w(FUNC(mephisto_modena_state::modena_digits_w));
-	map(0x5000, 0x5000).w(FUNC(mephisto_modena_state::modena_led_w));
-	map(0x6000, 0x6000).w(FUNC(mephisto_modena_state::modena_io_w));
-	map(0x7000, 0x7fff).r(FUNC(mephisto_modena_state::modena_input_r));
-	map(0x8000, 0xffff).rom();
-}
-
-
 INTERRUPT_GEN_MEMBER(mephisto_academy_state::academy_irq)
 {
 	if (m_enable_nmi)
@@ -406,18 +314,6 @@ static INPUT_PORTS_START( polgar )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD)     PORT_NAME("CL")     PORT_CODE(KEYCODE_BACKSPACE)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( modena )
-	PORT_START("KEY")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD)     PORT_NAME("BOOK")      PORT_CODE(KEYCODE_B)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD)     PORT_NAME("INFO")      PORT_CODE(KEYCODE_I)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD)     PORT_NAME("MEMORY")    PORT_CODE(KEYCODE_M)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD)     PORT_NAME("POSITION")  PORT_CODE(KEYCODE_O)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD)     PORT_NAME("LEVEL")     PORT_CODE(KEYCODE_L)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD)     PORT_NAME("FUNCTION")  PORT_CODE(KEYCODE_F)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD)     PORT_NAME("ENTER")     PORT_CODE(KEYCODE_ENTER)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD)     PORT_NAME("CLEAR")     PORT_CODE(KEYCODE_BACKSPACE)
-INPUT_PORTS_END
-
 void mephisto_risc_state::machine_start()
 {
 	m_disable_boot_rom_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mephisto_risc_state::disable_boot_rom), this));
@@ -451,24 +347,9 @@ void mephisto_milano_state::machine_reset()
 	m_led_latch = 0;
 }
 
-void mephisto_modena_state::machine_start()
-{
-	m_leds1.resolve();
-	m_leds2.resolve();
-	m_leds3.resolve();
-	save_item(NAME(m_digits_idx));
-	save_item(NAME(m_io_ctrl));
-}
-
 void mephisto_academy_state::machine_start()
 {
 	m_leds.resolve();
-}
-
-void mephisto_modena_state::machine_reset()
-{
-	m_digits_idx = 0;
-	m_io_ctrl = 0;
 }
 
 void mephisto_academy_state::machine_reset()
@@ -476,108 +357,84 @@ void mephisto_academy_state::machine_reset()
 	m_enable_nmi = true;
 }
 
-MACHINE_CONFIG_START(mephisto_polgar_state::polgar)
-	MCFG_DEVICE_ADD("maincpu", M65C02, XTAL(4'915'200))
-	MCFG_DEVICE_PROGRAM_MAP(polgar_mem)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(mephisto_polgar_state, nmi_line_pulse, XTAL(4'915'200) / (1 << 13))
+void mephisto_polgar_state::polgar(machine_config &config)
+{
+	m65c02_device &maincpu(M65C02(config, "maincpu", XTAL(4'915'200)));
+	maincpu.set_addrmap(AS_PROGRAM, &mephisto_polgar_state::polgar_mem);
+	maincpu.set_periodic_int(FUNC(mephisto_polgar_state::nmi_line_pulse), attotime::from_hz(XTAL(4'915'200) / (1 << 13)));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("outlatch", HC259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(OUTPUT("led100"))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(OUTPUT("led101"))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(OUTPUT("led102"))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(OUTPUT("led103"))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(OUTPUT("led104"))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(OUTPUT("led105"))
+	hc259_device &outlatch(HC259(config, "outlatch"));
+	outlatch.q_out_cb<0>().set_output("led100");
+	outlatch.q_out_cb<1>().set_output("led101");
+	outlatch.q_out_cb<2>().set_output("led102");
+	outlatch.q_out_cb<3>().set_output("led103");
+	outlatch.q_out_cb<4>().set_output("led104");
+	outlatch.q_out_cb<5>().set_output("led105");
 
-	MCFG_MEPHISTO_SENSORS_BOARD_ADD("board")
-	MCFG_MEPHISTO_DISPLAY_MODUL_ADD("display")
-	MCFG_DEFAULT_LAYOUT(layout_mephisto_lcd)
-MACHINE_CONFIG_END
+	MEPHISTO_SENSORS_BOARD(config, "board", 0);
+	MEPHISTO_DISPLAY_MODUL(config, "display", 0);
+	config.set_default_layout(layout_mephisto_lcd);
+}
 
-MACHINE_CONFIG_START(mephisto_polgar_state::polgar10)
+void mephisto_polgar_state::polgar10(machine_config &config)
+{
 	polgar(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK( XTAL(10'000'000) )
-MACHINE_CONFIG_END
+	subdevice<m65c02_device>("maincpu")->set_clock(XTAL(10'000'000));
+}
 
-MACHINE_CONFIG_START(mephisto_risc_state::mrisc)
-	MCFG_DEVICE_ADD("maincpu", M65C02, XTAL(10'000'000) / 4)     // G65SC02
-	MCFG_DEVICE_PROGRAM_MAP(mrisc_mem)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(mephisto_risc_state, irq0_line_hold, XTAL(10'000'000) / (1 << 14))
+void mephisto_risc_state::mrisc(machine_config &config)
+{
+	m65c02_device &maincpu(M65C02(config, "maincpu", XTAL(10'000'000) / 4)); // G65SC02
+	maincpu.set_addrmap(AS_PROGRAM, &mephisto_risc_state::mrisc_mem);
+	maincpu.set_periodic_int(FUNC(mephisto_risc_state::irq0_line_hold), attotime::from_hz(XTAL(10'000'000) / (1 << 14)));
 
-	MCFG_DEVICE_ADD("subcpu", ARM, XTAL(14'000'000))             // VY86C010
-	MCFG_DEVICE_PROGRAM_MAP(mrisc_arm_mem)
-	MCFG_ARM_COPRO(VL86C020)
+	ARM(config, m_subcpu, XTAL(14'000'000)); // VY86C010
+	m_subcpu->set_addrmap(AS_PROGRAM, &mephisto_risc_state::mrisc_arm_mem);
+	m_subcpu->set_copro_type(arm_cpu_device::copro_type::VL86C020);
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("outlatch", HC259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(OUTPUT("led100"))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(OUTPUT("led101"))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(OUTPUT("led102"))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(OUTPUT("led103"))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(OUTPUT("led104"))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(OUTPUT("led105"))
-	MCFG_ADDRESSABLE_LATCH_PARALLEL_OUT_CB(MEMBANK("rombank")) MCFG_DEVCB_MASK(0xc0) MCFG_DEVCB_XOR(0x40) MCFG_DEVCB_RSHIFT(-6)
+	hc259_device &outlatch(HC259(config, "outlatch"));
+	outlatch.q_out_cb<0>().set_output("led100");
+	outlatch.q_out_cb<1>().set_output("led101");
+	outlatch.q_out_cb<2>().set_output("led102");
+	outlatch.q_out_cb<3>().set_output("led103");
+	outlatch.q_out_cb<4>().set_output("led104");
+	outlatch.q_out_cb<5>().set_output("led105");
+	outlatch.parallel_out_cb().set_membank("rombank").rshift(6).mask(0x03).exor(0x01);
 
-	MCFG_RAM_ADD("ram")
-	MCFG_RAM_DEFAULT_SIZE("1M")
+	RAM(config, "ram").set_default_size("1M");
 
-	MCFG_MEPHISTO_SENSORS_BOARD_ADD("board")
-	MCFG_MEPHISTO_DISPLAY_MODUL_ADD("display")
-	MCFG_DEFAULT_LAYOUT(layout_mephisto_lcd)
-MACHINE_CONFIG_END
+	MEPHISTO_SENSORS_BOARD(config, "board", 0);
+	MEPHISTO_DISPLAY_MODUL(config, "display", 0);
+	config.set_default_layout(layout_mephisto_lcd);
+}
 
-MACHINE_CONFIG_START(mephisto_milano_state::milano)
+void mephisto_milano_state::milano(machine_config &config)
+{
 	polgar(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(milano_mem)
+	subdevice<m65c02_device>("maincpu")->set_addrmap(AS_PROGRAM, &mephisto_milano_state::milano_mem);
 
-	MCFG_DEVICE_REMOVE("board")
-	MCFG_MEPHISTO_BUTTONS_BOARD_ADD("board")
-	MCFG_MEPHISTO_BOARD_DISABLE_LEDS(true)
-	MCFG_DEFAULT_LAYOUT(layout_mephisto_milano)
-MACHINE_CONFIG_END
+	MEPHISTO_BUTTONS_BOARD(config.replace(), m_board, 0);
+	m_board->set_disable_leds(true);
+	config.set_default_layout(layout_mephisto_milano);
+}
 
-MACHINE_CONFIG_START(mephisto_academy_state::academy)
+void mephisto_academy_state::academy(machine_config &config)
+{
 	polgar(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(academy_mem)
+	subdevice<m65c02_device>("maincpu")->set_addrmap(AS_PROGRAM, &mephisto_academy_state::academy_mem);
 
-	MCFG_DEVICE_REPLACE("outlatch", HC259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, mephisto_academy_state, academy_nmi_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE("display:beeper", beep_device, set_state)) MCFG_DEVCB_INVERT
+	hc259_device &outlatch(HC259(config.replace(), "outlatch"));
+	outlatch.q_out_cb<1>().set(FUNC(mephisto_academy_state::academy_nmi_w));
+	outlatch.q_out_cb<2>().set("display:beeper", FUNC(beep_device::set_state)).invert();
 
-	MCFG_DEFAULT_LAYOUT(layout_mephisto_academy)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(mephisto_modena_state::modena)
-	polgar(config);
-	MCFG_DEVICE_MODIFY("maincpu")          // W65C02SP
-	MCFG_DEVICE_CLOCK(XTAL(4'194'304))
-	MCFG_DEVICE_PROGRAM_MAP(modena_mem)
-	MCFG_DEVICE_PERIODIC_INT_REMOVE()
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_on", mephisto_modena_state, nmi_on, attotime::from_hz(XTAL(4'194'304) / (1 << 13)))
-	MCFG_TIMER_START_DELAY(attotime::from_hz(XTAL(4'194'304) / (1 << 13)) - attotime::from_usec(975))  // active for 975us
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_off", mephisto_modena_state, nmi_off, attotime::from_hz(XTAL(4'194'304) / (1 << 13)))
-
-	MCFG_DEVICE_REMOVE("board")
-	MCFG_DEVICE_REMOVE("display")
-	MCFG_MEPHISTO_BUTTONS_BOARD_ADD("board")
-	MCFG_MEPHISTO_BOARD_DISABLE_LEDS(true)
-	MCFG_DEFAULT_LAYOUT(layout_mephisto_modena)
-
-	MCFG_DEVICE_REMOVE("outlatch")
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("beeper", BEEP, 3250)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	config.set_default_layout(layout_mephisto_academy);
+}
 
 
 ROM_START(polgar)
@@ -641,14 +498,6 @@ ROM_START(nshort)
 	ROM_LOAD("nshort.bin", 0x00000, 0x10000, CRC(4bd51e23) SHA1(3f55cc1c55dae8818b7e9384b6b8d43dc4f0a1af))
 ROM_END
 
-ROM_START(modena)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_SYSTEM_BIOS( 0, "v1", "v1" )
-	ROMX_LOAD("modena 12aug1992.bin", 0x8000, 0x8000, CRC(dd7b4920) SHA1(4606b9d1f8a30180aabedfc0ed3cca0c96618524), ROM_BIOS(0))
-	ROM_SYSTEM_BIOS( 1, "v1alt", "v1alt" )
-	ROMX_LOAD("27c256,457f.bin", 0x8000, 0x8000, CRC(2889082c) SHA1(b63f0d856793b4f87471837e2219ce2a42fe18de), ROM_BIOS(1))
-ROM_END
-
 
 /***************************************************************************
     Game driver(s)
@@ -664,4 +513,3 @@ CONS( 1994, mrisc2,   mrisc,  0,      mrisc,    polgar, mephisto_risc_state,    
 CONS( 1989, academy,  0,      0,      academy,  polgar, mephisto_academy_state, empty_init, "Hegener & Glaser", "Mephisto Academy",          MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1991, milano,   0,      0,      milano,   polgar, mephisto_milano_state,  empty_init, "Hegener & Glaser", "Mephisto Milano",           MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1993, nshort,   milano, 0,      milano,   polgar, mephisto_milano_state,  empty_init, "Hegener & Glaser", "Mephisto Nigel Short",      MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1992, modena,   0,      0,      modena,   modena, mephisto_modena_state,  empty_init, "Hegener & Glaser", "Mephisto Modena",           MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

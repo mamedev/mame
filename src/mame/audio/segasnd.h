@@ -35,15 +35,12 @@ protected:
 
 #define SEGASND_SEGASPEECH_REGION "segaspeech:speech"
 
-#define MCFG_SEGASPEECH_INT_CALLBACK(_devcb) \
-	devcb = &downcast<speech_sound_device&>(*device).set_int_cb(DEVCB_##_devcb);
-
 class speech_sound_device : public device_t, public device_sound_interface
 {
 public:
 	speech_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	template <class Object> devcb_base &set_int_cb(Object &&cb) { return m_int_cb.set_callback(std::forward<Object>(cb)); }
+	auto int_cb() { return m_int_cb.bind(); }
 
 	DECLARE_WRITE8_MEMBER( data_w );
 	DECLARE_WRITE8_MEMBER( control_w );
@@ -213,14 +210,5 @@ protected:
 };
 
 DECLARE_DEVICE_TYPE(SEGAUSBROM, usb_rom_sound_device)
-
-
-#define MCFG_SEGAUSB_ADD(_tag, _cputag) \
-	MCFG_DEVICE_ADD(_tag, SEGAUSB, 0, _cputag) \
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-
-#define MCFG_SEGAUSBROM_ADD(_tag, _cputag) \
-	MCFG_DEVICE_ADD(_tag, SEGAUSBROM, 0, _cputag) \
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 #endif // MAME_AUDIO_SEGASND_H

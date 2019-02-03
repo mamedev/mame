@@ -166,9 +166,9 @@ void senjyo_state::senjyo_sound_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x4000, 0x43ff).ram();
-	map(0x8000, 0x8000).w("sn1", FUNC(sn76496_device::command_w));
-	map(0x9000, 0x9000).w("sn2", FUNC(sn76496_device::command_w));
-	map(0xa000, 0xa000).w("sn3", FUNC(sn76496_device::command_w));
+	map(0x8000, 0x8000).w("sn1", FUNC(sn76496_device::write));
+	map(0x9000, 0x9000).w("sn2", FUNC(sn76496_device::write));
+	map(0xa000, 0xa000).w("sn3", FUNC(sn76496_device::write));
 	map(0xd000, 0xd000).w(FUNC(senjyo_state::volume_w));
 }
 
@@ -231,9 +231,9 @@ void senjyo_state::starforb_sound_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x4000, 0x43ff).ram();
-	map(0x8000, 0x8000).w("sn1", FUNC(sn76496_device::command_w));
-	map(0x9000, 0x9000).w("sn2", FUNC(sn76496_device::command_w));
-	map(0xa000, 0xa000).w("sn3", FUNC(sn76496_device::command_w));
+	map(0x8000, 0x8000).w("sn1", FUNC(sn76496_device::write));
+	map(0x9000, 0x9000).w("sn2", FUNC(sn76496_device::write));
+	map(0xa000, 0xa000).w("sn3", FUNC(sn76496_device::write));
 	map(0xd000, 0xd000).w(FUNC(senjyo_state::volume_w));
 	map(0xf000, 0xffff).ram();
 }
@@ -555,19 +555,19 @@ MACHINE_CONFIG_START(senjyo_state::senjyo)
 	MCFG_DEVICE_PROGRAM_MAP(senjyo_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", senjyo_state, irq0_line_assert)
 
-	MCFG_DEVICE_ADD("sub", Z80, 2000000)   /* 2 MHz? */
-	MCFG_Z80_DAISY_CHAIN(senjyo_daisy_chain)
-	MCFG_DEVICE_PROGRAM_MAP(senjyo_sound_map)
-	MCFG_DEVICE_IO_MAP(senjyo_sound_io_map)
+	z80_device& sub(Z80(config, "sub", 2000000));   /* 2 MHz? */
+	sub.set_daisy_config(senjyo_daisy_chain);
+	sub.set_addrmap(AS_PROGRAM, &senjyo_state::senjyo_sound_map);
+	sub.set_addrmap(AS_IO, &senjyo_state::senjyo_sound_io_map);
 
-	MCFG_DEVICE_ADD("z80pio", Z80PIO, 2000000)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("sub", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, senjyo_state, pio_pa_r))
+	Z80PIO(config, m_pio, 2000000);
+	m_pio->out_int_callback().set_inputline("sub", INPUT_LINE_IRQ0);
+	m_pio->in_pa_callback().set(FUNC(senjyo_state::pio_pa_r));
 
-	MCFG_DEVICE_ADD("z80ctc", Z80CTC, 2000000 /* same as "sub" */)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("sub", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE("z80ctc", z80ctc_device, trg1))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, senjyo_state, sound_line_clock))
+	z80ctc_device& ctc(Z80CTC(config, "z80ctc", 2000000 /* same as "sub" */));
+	ctc.intr_callback().set_inputline("sub", INPUT_LINE_IRQ0);
+	ctc.zc_callback<0>().set("z80ctc", FUNC(z80ctc_device::trg1));
+	ctc.zc_callback<2>().set(FUNC(senjyo_state::sound_line_clock));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -577,13 +577,10 @@ MACHINE_CONFIG_START(senjyo_state::senjyo)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(senjyo_state, screen_update)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_senjyo)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_senjyo);
 
-	MCFG_PALETTE_ADD_INIT_BLACK("palette", 512)
-	MCFG_PALETTE_FORMAT_CLASS(1, senjyo_state, IIBBGGRR)
-
-	MCFG_PALETTE_ADD("radar_palette", 2)
-	MCFG_PALETTE_INIT_OWNER(senjyo_state, radar)
+	PALETTE(config, m_palette, palette_device::BLACK).set_format(1, &senjyo_state::IIBBGGRR, 512);
+	PALETTE(config, m_radar_palette, FUNC(senjyo_state::radar_palette), 2);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -604,23 +601,25 @@ MACHINE_CONFIG_END
 
 
 
-MACHINE_CONFIG_START(senjyo_state::senjyox_e)
+void senjyo_state::senjyox_e(machine_config &config)
+{
 	senjyo(config);
-	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5015, 4000000)   /* 4 MHz? */
-	MCFG_DEVICE_PROGRAM_MAP(senjyo_map)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", senjyo_state, irq0_line_assert)
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	sega_315_5015_device &maincpu(SEGA_315_5015(config.replace(), m_maincpu, 4000000));   /* 4 MHz? */
+	maincpu.set_addrmap(AS_PROGRAM, &senjyo_state::senjyo_map);
+	maincpu.set_addrmap(AS_OPCODES, &senjyo_state::decrypted_opcodes_map);
+	maincpu.set_vblank_int("screen", FUNC(senjyo_state::irq0_line_assert));
+	maincpu.set_decrypted_tag(":decrypted_opcodes");
+}
 
-MACHINE_CONFIG_START(senjyo_state::senjyox_a)
+void senjyo_state::senjyox_a(machine_config &config)
+{
 	senjyo(config);
-	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5018, 4000000)   /* 4 MHz? */
-	MCFG_DEVICE_PROGRAM_MAP(senjyo_map)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", senjyo_state, irq0_line_assert)
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	sega_315_5018_device &maincpu(SEGA_315_5018(config.replace(), m_maincpu, 4000000));   /* 4 MHz? */
+	maincpu.set_addrmap(AS_PROGRAM, &senjyo_state::senjyo_map);
+	maincpu.set_addrmap(AS_OPCODES, &senjyo_state::decrypted_opcodes_map);
+	maincpu.set_vblank_int("screen", FUNC(senjyo_state::irq0_line_assert));
+	maincpu.set_decrypted_tag(":decrypted_opcodes");
+}
 
 
 MACHINE_CONFIG_START(senjyo_state::starforb)

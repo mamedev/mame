@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood,Paul Priest
+#ifndef MAME_INCLUDES_MS32_H
+#define MAME_INCLUDES_MS32_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
@@ -9,14 +13,14 @@
 class ms32_state : public driver_device
 {
 public:
-	ms32_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	ms32_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_palette(*this, "palette"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_screen(*this, "screen"),
 		m_soundlatch(*this, "soundlatch"),
+		m_maincpu(*this, "maincpu"),
+		m_screen(*this, "screen"),
 		m_mainram(*this, "mainram"),
 		m_roz_ctrl(*this, "roz_ctrl"),
 		m_tx_scroll(*this, "tx_scroll"),
@@ -30,7 +34,8 @@ public:
 		m_txram(*this, "txram", 32),
 		m_bgram(*this, "bgram", 32),
 		m_f1superb_extraram(*this, "f1sb_extraram", 32),
-		m_z80bank(*this, "z80bank%u", 1) { }
+		m_z80bank(*this, "z80bank%u", 1)
+	{ }
 
 	void ms32(machine_config &config);
 	void f1superb(machine_config &config);
@@ -66,13 +71,13 @@ protected:
 	int m_reverse_sprite_order;
 	int m_flipscreen;
 
+	required_device<cpu_device> m_audiocpu;
+	optional_device<generic_latch_8_device> m_soundlatch;
+
 private:
 
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
 	optional_device<screen_device> m_screen;
-	optional_device<generic_latch_8_device> m_soundlatch;
-
 	optional_shared_ptr<uint32_t> m_mainram;
 	optional_shared_ptr<uint32_t> m_roz_ctrl;
 	optional_shared_ptr<uint32_t> m_tx_scroll;
@@ -148,3 +153,5 @@ private:
 	void ms32_map(address_map &map);
 	void ms32_sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_MS32_H

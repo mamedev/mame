@@ -262,15 +262,14 @@ MACHINE_CONFIG_START(pass_state::pass)
 	MCFG_SCREEN_UPDATE_DRIVER(pass_state, screen_update_pass)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 0x200)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pass)
+	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x200);
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_pass);
 
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, 14318180/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)

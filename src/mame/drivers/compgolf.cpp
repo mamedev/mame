@@ -235,21 +235,20 @@ MACHINE_CONFIG_START(compgolf_state::compgolf)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(compgolf_state, screen_update_compgolf)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_PALETTE_INIT_OWNER(compgolf_state, compgolf)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_compgolf)
+	PALETTE(config, m_palette, FUNC(compgolf_state::compgolf_palette), 0x100);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_compgolf)
 
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, 1500000)
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("maincpu", 0))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, compgolf_state, compgolf_scrollx_lo_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, compgolf_state, compgolf_scrolly_lo_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", 1500000));
+	ymsnd.irq_handler().set_inputline(m_maincpu, 0);
+	ymsnd.port_a_write_callback().set(FUNC(compgolf_state::compgolf_scrollx_lo_w));
+	ymsnd.port_b_write_callback().set(FUNC(compgolf_state::compgolf_scrolly_lo_w));
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 

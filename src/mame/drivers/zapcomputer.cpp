@@ -162,7 +162,7 @@ MACHINE_CONFIG_START(zapcomp_state::zapcomp)
 	MCFG_DEVICE_IO_MAP(zapcomp_io)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_zapcomputer)
+	config.set_default_layout(layout_zapcomputer);
 MACHINE_CONFIG_END
 
 ROM_START( zapcomp )

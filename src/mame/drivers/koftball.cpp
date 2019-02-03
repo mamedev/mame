@@ -241,7 +241,7 @@ GFXDECODE_END
 MACHINE_CONFIG_START(koftball_state::koftball)
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(21'477'272) / 2)
 	MCFG_DEVICE_PROGRAM_MAP(koftball_mem)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", koftball_state, bmc_interrupt, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(koftball_state::bmc_interrupt), "screen", 0, 1);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -252,7 +252,8 @@ MACHINE_CONFIG_START(koftball_state::koftball)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac.set_addrmap(0, &koftball_state::ramdac_map);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_koftball)
 

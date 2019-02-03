@@ -353,7 +353,7 @@ MACHINE_CONFIG_START(bmjr_state::bmjr)
 	MCFG_SCREEN_UPDATE_DRIVER(bmjr_state, screen_update_bmjr)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_3BIT_BRG("palette")
+	PALETTE(config, "palette", palette_device::BRG_3BIT);
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bmjr)
 
 	/* Audio */
@@ -362,7 +362,7 @@ MACHINE_CONFIG_START(bmjr_state::bmjr)
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* Devices */
-	MCFG_CASSETTE_ADD( "cassette" )
+	CASSETTE(config, m_cass);
 MACHINE_CONFIG_END
 
 /* ROM definition */

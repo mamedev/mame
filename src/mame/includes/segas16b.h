@@ -5,6 +5,10 @@
     Sega System 16B hardware
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_SEGAS16B_H
+#define MAME_INCLUDES_SEGAS16B_H
+
+#pragma once
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
@@ -369,3 +373,5 @@ private:
 	uint8_t           m_rle_byte;
 	void isgsm_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_SEGAS16B_H

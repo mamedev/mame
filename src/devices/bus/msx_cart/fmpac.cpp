@@ -141,7 +141,7 @@ WRITE8_MEMBER(msx_cart_fmpac_device::write_cart)
 		case 0x7ff5:
 			if (m_opll_active)
 			{
-				m_ym2413->write(space, offset & 1, data);
+				m_ym2413->write(offset & 1, data);
 			}
 			break;
 
@@ -163,6 +163,6 @@ WRITE8_MEMBER(msx_cart_fmpac_device::write_ym2413)
 {
 	if (m_opll_active)
 	{
-		m_ym2413->write(space, offset & 1, data);
+		m_ym2413->write(offset & 1, data);
 	}
 }

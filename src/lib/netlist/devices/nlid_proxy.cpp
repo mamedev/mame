@@ -20,7 +20,7 @@ namespace netlist
 	// nld_base_proxy
 	// -----------------------------------------------------------------------------
 
-	nld_base_proxy::nld_base_proxy(netlist_t &anetlist, const pstring &name,
+	nld_base_proxy::nld_base_proxy(netlist_base_t &anetlist, const pstring &name,
 			logic_t *inout_proxied, detail::core_terminal_t *proxy_inout)
 			: device_t(anetlist, name)
 	{
@@ -37,7 +37,7 @@ namespace netlist
 	// nld_a_to_d_proxy
 	// ----------------------------------------------------------------------------------------
 
-	nld_base_a_to_d_proxy::nld_base_a_to_d_proxy(netlist_t &anetlist, const pstring &name,
+	nld_base_a_to_d_proxy::nld_base_a_to_d_proxy(netlist_base_t &anetlist, const pstring &name,
 			logic_input_t *in_proxied, detail::core_terminal_t *in_proxy)
 			: nld_base_proxy(anetlist, name, in_proxied, in_proxy)
 	, m_Q(*this, "Q")
@@ -46,7 +46,7 @@ namespace netlist
 
 	nld_base_a_to_d_proxy::~nld_base_a_to_d_proxy() {}
 
-	nld_a_to_d_proxy::nld_a_to_d_proxy(netlist_t &anetlist, const pstring &name, logic_input_t *in_proxied)
+	nld_a_to_d_proxy::nld_a_to_d_proxy(netlist_base_t &anetlist, const pstring &name, logic_input_t *in_proxied)
 			: nld_base_a_to_d_proxy(anetlist, name, in_proxied, &m_I)
 	, m_I(*this, "I")
 	{
@@ -81,7 +81,7 @@ namespace netlist
 	// nld_d_to_a_proxy
 	// ----------------------------------------------------------------------------------------
 
-	nld_base_d_to_a_proxy::nld_base_d_to_a_proxy(netlist_t &anetlist, const pstring &name,
+	nld_base_d_to_a_proxy::nld_base_d_to_a_proxy(netlist_base_t &anetlist, const pstring &name,
 			logic_output_t *out_proxied, detail::core_terminal_t &proxy_out)
 	: nld_base_proxy(anetlist, name, out_proxied, &proxy_out)
 	, m_I(*this, "I")
@@ -92,7 +92,7 @@ namespace netlist
 	{
 	}
 
-	nld_d_to_a_proxy::nld_d_to_a_proxy(netlist_t &anetlist, const pstring &name, logic_output_t *out_proxied)
+	nld_d_to_a_proxy::nld_d_to_a_proxy(netlist_base_t &anetlist, const pstring &name, logic_output_t *out_proxied)
 	: nld_base_d_to_a_proxy(anetlist, name, out_proxied, m_RV.m_P)
 	, m_GNDHack(*this, "_Q")
 	, m_RV(*this, "RV")
@@ -111,9 +111,9 @@ namespace netlist
 		for (int i = 0; i < 3; i++)
 		{
 			pstring devname = out_proxied->device().name();
-			auto tp = netlist().setup().find_terminal(devname + "." + power_syms[i][0],
+			auto tp = setup().find_terminal(devname + "." + power_syms[i][0],
 					detail::terminal_type::INPUT, false);
-			auto tn = netlist().setup().find_terminal(devname + "." + power_syms[i][1],
+			auto tn = setup().find_terminal(devname + "." + power_syms[i][1],
 					detail::terminal_type::INPUT, false);
 			if (tp != nullptr && tn != nullptr)
 			{
@@ -126,11 +126,6 @@ namespace netlist
 			log().warning(MW_1_NO_POWER_TERMINALS_ON_DEVICE_1, out_proxied->device().name());
 		else
 			log().verbose("D/A Proxy: Found power terminals on device {1}", out_proxied->device().name());
-#if (0)
-		printf("%s %s\n", out_proxied->name().c_str(), out_proxied->device().name().c_str());
-		auto x = netlist().setup().find_terminal(out_proxied->name(), detail::device_object_t::terminal_type::OUTPUT, false);
-		if (x) printf("==> %s\n", x->name().c_str());
-#endif
 	}
 
 
@@ -142,7 +137,7 @@ namespace netlist
 
 		//m_Q.initial(0.0);
 		m_last_state = -1;
-		m_RV.do_reset();
+		m_RV.reset();
 		m_is_timestep = m_RV.m_P.net().solver()->has_timestep_devices();
 		m_RV.set(NL_FCONST(1.0) / logic_family()->R_low(),
 				logic_family()->low_V(0.0, supply_V), 0.0);
@@ -163,7 +158,7 @@ namespace netlist
 			// We only need to update the net first if this is a time stepping net
 			if (m_is_timestep)
 			{
-				m_RV.update_dev();
+				m_RV.update();
 			}
 			m_RV.set(NL_FCONST(1.0) / R, V, 0.0);
 			m_RV.m_P.schedule_solve_after(NLTIME_FROM_NS(1));

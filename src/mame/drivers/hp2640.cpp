@@ -971,8 +971,8 @@ MACHINE_CONFIG_START(hp2645_state::hp2645)
 	MCFG_DEVICE_IO_MAP(cpu_io_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(hp2645_state , irq_callback)
 
-	MCFG_TIMER_DRIVER_ADD("timer_10ms" , hp2645_state , timer_10ms_exp)
-	MCFG_TIMER_DRIVER_ADD("timer_cursor_blink_inh" , hp2645_state , timer_cursor_blink_inh)
+	TIMER(config, m_timer_10ms).configure_generic(FUNC(hp2645_state::timer_10ms_exp));
+	TIMER(config, m_timer_cursor_blink_inh).configure_generic(FUNC(hp2645_state::timer_cursor_blink_inh));
 
 	MCFG_SCREEN_ADD_MONOCHROME("screen" , RASTER , rgb_t::white())
 	// Actual pixel clock is half this value: 21.06 MHz
@@ -982,25 +982,24 @@ MACHINE_CONFIG_START(hp2645_state::hp2645)
 						   VIDEO_TOT_COLS * VIDEO_CHAR_WIDTH * 2 , 0 , VIDEO_VIS_COLS * VIDEO_CHAR_WIDTH * 2 ,
 						   VIDEO_TOT_ROWS * VIDEO_CHAR_HEIGHT , 0 , VIDEO_VIS_ROWS * VIDEO_CHAR_HEIGHT)
 	MCFG_SCREEN_UPDATE_DRIVER(hp2645_state , screen_update)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hp2645_state, scanline_timer, "screen", 0, 1)
-	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
-	MCFG_DEFAULT_LAYOUT(layout_hp2640)
+	TIMER(config, "scantimer").configure_scanline(FUNC(hp2645_state::scanline_timer), "screen", 0, 1);
+	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
+	config.set_default_layout(layout_hp2640);
 
 	// RS232
-	MCFG_DEVICE_ADD("rs232" , RS232_PORT, default_rs232_devices , nullptr)
+	RS232_PORT(config, m_rs232, default_rs232_devices , nullptr);
 
 	// UART (TR1602B)
-	MCFG_DEVICE_ADD("uart", AY51013, 0)
-	MCFG_AY51013_READ_SI_CB(READLINE("rs232" , rs232_port_device , rxd_r))
-	MCFG_AY51013_WRITE_SO_CB(WRITELINE(*this, hp2645_state , async_txd_w))
-	MCFG_AY51013_WRITE_DAV_CB(WRITELINE(*this, hp2645_state , async_dav_w))
-	MCFG_AY51013_AUTO_RDAV(true)
+	AY51013(config, m_uart);
+	m_uart->read_si_callback().set(m_rs232, FUNC(rs232_port_device::rxd_r));
+	m_uart->write_so_callback().set(FUNC(hp2645_state::async_txd_w));
+	m_uart->write_dav_callback().set(FUNC(hp2645_state::async_dav_w));
+	m_uart->set_auto_rdav(true);
 
 	// Beep
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("beep" , BEEP , BEEP_FREQUENCY)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS , "mono" , 1.00)
-	MCFG_TIMER_DRIVER_ADD("timer_beep" , hp2645_state , timer_beep_exp)
+	BEEP(config, m_beep, BEEP_FREQUENCY).add_route(ALL_OUTPUTS, "mono", 1.00);
+	TIMER(config, m_timer_beep).configure_generic(FUNC(hp2645_state::timer_beep_exp));
 
 MACHINE_CONFIG_END
 

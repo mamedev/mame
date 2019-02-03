@@ -490,52 +490,53 @@ void exprraid_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(exprraid_state::exprraid)
-
+void exprraid_state::exprraid(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", DECO16, XTAL(12'000'000) / 8)
-	MCFG_DEVICE_PROGRAM_MAP(master_map)
-	MCFG_DEVICE_IO_MAP(master_io_map)
+	DECO16(config, m_maincpu, XTAL(12'000'000) / 8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &exprraid_state::master_map);
+	m_maincpu->set_addrmap(AS_IO, &exprraid_state::master_io_map);
 
-	MCFG_DEVICE_ADD("slave", MC6809, XTAL(12'000'000) / 2) // MC68B09P
-	MCFG_DEVICE_PROGRAM_MAP(slave_map)
+	MC6809(config, m_slave, XTAL(12'000'000) / 2); // MC68B09P
+	m_slave->set_addrmap(AS_PROGRAM, &exprraid_state::slave_map);
 	/* IRQs are caused by the YM3526 */
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
+	config.m_minimum_quantum = attotime::from_hz(12000);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-//  MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-//  MCFG_SCREEN_SIZE(32*8, 32*8)
-//  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2, 384, 0, 256, 262, 8, 256-8) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(exprraid_state, screen_update_exprraid)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+//  screen.set_refresh_hz(60);
+//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+//  screen.set_size(32*8, 32*8);
+//  screen.set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
+	screen.set_raw(XTAL(12'000'000)/2, 384, 0, 256, 262, 8, 256-8); /* not accurate */
+	screen.set_screen_update(FUNC(exprraid_state::screen_update_exprraid));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_exprraid)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_exprraid);
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("slave", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_slave, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(12'000'000) / 8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	ym2203_device &ym1(YM2203(config, "ym1", XTAL(12'000'000) / 8));
+	ym1.add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	MCFG_DEVICE_ADD("ym2", YM3526, XTAL(12'000'000) / 4)
-	MCFG_YM3526_IRQ_HANDLER(WRITELINE(*this, exprraid_state, irqhandler))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
-MACHINE_CONFIG_END
+	ym3526_device &ym2(YM3526(config, "ym2", XTAL(12'000'000) / 4));
+	ym2.irq_handler().set(FUNC(exprraid_state::irqhandler));
+	ym2.add_route(ALL_OUTPUTS, "mono", 0.60);
+}
 
-MACHINE_CONFIG_START(exprraid_state::exprboot)
+void exprraid_state::exprboot(machine_config &config)
+{
 	exprraid(config);
 
-	MCFG_DEVICE_REPLACE("maincpu", M6502, 1500000)        /* 1.5 MHz ??? */
-	MCFG_DEVICE_PROGRAM_MAP(master_map)
-MACHINE_CONFIG_END
+	M6502(config.replace(), m_maincpu, 1500000);        /* 1.5 MHz ??? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &exprraid_state::master_map);
+}
 
 
 /***************************************************************************

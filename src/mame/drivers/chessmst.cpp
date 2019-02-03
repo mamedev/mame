@@ -64,13 +64,13 @@ protected:
 
 	void chessmst_io(address_map &map);
 	void chessmst_mem(address_map &map);
-	void chessmstdm(address_map &map);
+	void chessmstdm_mem(address_map &map);
 	void chessmstdm_io(address_map &map);
 
 private:
 	void update_display();
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<z80pio_device> m_pia2;
 	optional_device<speaker_sound_device> m_speaker;
 	optional_device<beep_device> m_beeper;
@@ -96,7 +96,7 @@ void chessmst_state::chessmst_mem(address_map &map)
 	map(0x3400, 0x3bff).ram();
 }
 
-void chessmst_state::chessmstdm(address_map &map)
+void chessmst_state::chessmstdm_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x3fff).rom();
@@ -381,21 +381,21 @@ static const z80_daisy_config chessmstdm_daisy_chain[] =
 MACHINE_CONFIG_START(chessmst_state::chessmst)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 9.8304_MHz_XTAL/4) // U880 Z80 clone
-	MCFG_DEVICE_PROGRAM_MAP(chessmst_mem)
-	MCFG_DEVICE_IO_MAP(chessmst_io)
-	MCFG_Z80_DAISY_CHAIN(chessmst_daisy_chain)
+	Z80(config, m_maincpu, 9.8304_MHz_XTAL/4); // U880 Z80 clone
+	m_maincpu->set_addrmap(AS_PROGRAM, &chessmst_state::chessmst_mem);
+	m_maincpu->set_addrmap(AS_IO, &chessmst_state::chessmst_io);
+	m_maincpu->set_daisy_config(chessmst_daisy_chain);
 
-	MCFG_DEVICE_ADD("z80pio1", Z80PIO, 9.8304_MHz_XTAL/4)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, chessmst_state, pio1_port_a_w))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, chessmst_state, pio1_port_b_w))
+	z80pio_device& pio1(Z80PIO(config, "z80pio1", 9.8304_MHz_XTAL/4));
+	pio1.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	pio1.out_pa_callback().set(FUNC(chessmst_state::pio1_port_a_w));
+	pio1.out_pb_callback().set(FUNC(chessmst_state::pio1_port_b_w));
 
-	MCFG_DEVICE_ADD("z80pio2", Z80PIO, 9.8304_MHz_XTAL/4)
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, chessmst_state, pio2_port_a_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, chessmst_state, pio2_port_b_w))
+	Z80PIO(config, m_pia2, 9.8304_MHz_XTAL/4);
+	m_pia2->in_pa_callback().set(FUNC(chessmst_state::pio2_port_a_r));
+	m_pia2->out_pb_callback().set(FUNC(chessmst_state::pio2_port_b_w));
 
-	MCFG_DEFAULT_LAYOUT(layout_chessmst)
+	config.set_default_layout(layout_chessmst);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -406,21 +406,21 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(chessmst_state::chessmsta)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 8_MHz_XTAL/4) // U880 Z80 clone
-	MCFG_DEVICE_PROGRAM_MAP(chessmst_mem)
-	MCFG_DEVICE_IO_MAP(chessmst_io)
-	MCFG_Z80_DAISY_CHAIN(chessmst_daisy_chain)
+	Z80(config, m_maincpu, 8_MHz_XTAL/4); // U880 Z80 clone
+	m_maincpu->set_addrmap(AS_PROGRAM, &chessmst_state::chessmst_mem);
+	m_maincpu->set_addrmap(AS_IO, &chessmst_state::chessmst_io);
+	m_maincpu->set_daisy_config(chessmst_daisy_chain);
 
-	MCFG_DEVICE_ADD("z80pio1", Z80PIO, 8_MHz_XTAL/4)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, chessmst_state, pio1_port_a_w))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, chessmst_state, pio1_port_b_w))
+	z80pio_device& pio1(Z80PIO(config, "z80pio1", 8_MHz_XTAL/4));
+	pio1.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	pio1.out_pa_callback().set(FUNC(chessmst_state::pio1_port_a_w));
+	pio1.out_pb_callback().set(FUNC(chessmst_state::pio1_port_b_w));
 
-	MCFG_DEVICE_ADD("z80pio2", Z80PIO, 8_MHz_XTAL/4)
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, chessmst_state, pio2_port_a_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, chessmst_state, pio2_port_b_w))
+	Z80PIO(config, m_pia2, 8_MHz_XTAL/4);
+	m_pia2->in_pa_callback().set(FUNC(chessmst_state::pio2_port_a_r));
+	m_pia2->out_pb_callback().set(FUNC(chessmst_state::pio2_port_b_w));
 
-	MCFG_DEFAULT_LAYOUT(layout_chessmst)
+	config.set_default_layout(layout_chessmst);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -431,25 +431,25 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(chessmst_state::chessmstdm)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 8_MHz_XTAL/2) // U880 Z80 clone
-	MCFG_DEVICE_PROGRAM_MAP(chessmstdm)
-	MCFG_DEVICE_IO_MAP(chessmstdm_io)
-	MCFG_Z80_DAISY_CHAIN(chessmstdm_daisy_chain)
+	Z80(config, m_maincpu, 8_MHz_XTAL/2); // U880 Z80 clone
+	m_maincpu->set_addrmap(AS_PROGRAM, &chessmst_state::chessmstdm_mem);
+	m_maincpu->set_addrmap(AS_IO, &chessmst_state::chessmstdm_io);
+	m_maincpu->set_daisy_config(chessmstdm_daisy_chain);
 
-	MCFG_DEVICE_ADD("z80pio1", Z80PIO, 8_MHz_XTAL/4)
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, chessmst_state, pio1_port_a_w))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, chessmst_state, pio1_port_b_dm_w))
-	MCFG_Z80PIO_IN_PB_CB(IOPORT("EXTRA"))
+	z80pio_device& pio1(Z80PIO(config, "z80pio1", 8_MHz_XTAL/4));
+	pio1.out_pa_callback().set(FUNC(chessmst_state::pio1_port_a_w));
+	pio1.out_pb_callback().set(FUNC(chessmst_state::pio1_port_b_dm_w));
+	pio1.in_pb_callback().set_ioport("EXTRA");
 
-	MCFG_DEVICE_ADD("z80pio2", Z80PIO, 8_MHz_XTAL/4)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, chessmst_state, pio2_port_a_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, chessmst_state, pio2_port_b_w))
+	Z80PIO(config, m_pia2, 8_MHz_XTAL/4);
+	m_pia2->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pia2->in_pa_callback().set(FUNC(chessmst_state::pio2_port_a_r));
+	m_pia2->out_pb_callback().set(FUNC(chessmst_state::pio2_port_b_w));
 
-	MCFG_DEFAULT_LAYOUT(layout_chessmstdm)
+	config.set_default_layout(layout_chessmstdm);
 
-	MCFG_DEVICE_ADD("555_timer", CLOCK, 500) // from 555 timer
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, chessmst_state, timer_555_w))
+	clock_device &_555_timer(CLOCK(config, "555_timer", 500)); // from 555 timer
+	_555_timer.signal_handler().set(FUNC(chessmst_state::timer_555_w));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -457,7 +457,7 @@ MACHINE_CONFIG_START(chessmst_state::chessmstdm)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "chessmstdm_cart")
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "chessmstdm")
+	SOFTWARE_LIST(config, "cart_list").set_original("chessmstdm");
 MACHINE_CONFIG_END
 
 

@@ -16,11 +16,6 @@
 #include "machine/timer.h"
 #include "sound/dmadac.h"
 
-#define MCFG_ATARI_CAGE_IRQ_CALLBACK(_write) \
-	devcb = &downcast<atari_cage_device &>(*device).set_irqhandler_callback(DEVCB_##_write);
-
-#define MCFG_ATARI_CAGE_SPEEDUP(_speedup) \
-	downcast<atari_cage_device &>(*device).set_speedup(_speedup);
 
 class atari_cage_device : public device_t
 {
@@ -35,7 +30,7 @@ public:
 	atari_cage_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void set_speedup(offs_t speedup) { m_speedup = speedup; }
-	template <class Object> devcb_base &set_irqhandler_callback(Object &&cb) { return m_irqhandler.set_callback(std::forward<Object>(cb)); }
+	auto irq_handler() { return m_irqhandler.bind(); }
 
 	void reset_w(int state);
 
@@ -69,9 +64,10 @@ protected:
 	TIMER_DEVICE_CALLBACK_MEMBER( dma_timer_callback );
 	TIMER_DEVICE_CALLBACK_MEMBER( cage_timer_callback );
 
+	required_device<tms32031_device> m_cpu;
+
 private:
 	required_shared_ptr<uint32_t> m_cageram;
-	required_device<tms32031_device> m_cpu;
 	required_device<generic_latch_16_device> m_soundlatch;
 	required_device<timer_device> m_dma_timer;
 	required_device_array<timer_device, 2> m_timer;
@@ -79,7 +75,7 @@ private:
 
 	required_memory_bank m_bootbank;
 	required_memory_bank m_mainbank;
- 
+
 	required_memory_region m_bootrom;
 	required_memory_region m_mainrom;
 

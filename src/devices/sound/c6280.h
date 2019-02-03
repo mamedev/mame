@@ -5,17 +5,12 @@
 
 #pragma once
 
-#include "cpu/h6280/h6280.h"
-
 class c6280_device : public device_t, public device_sound_interface
 {
 public:
 	c6280_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void set_devicecpu_tag(const char *tag) { m_cpudevice.set_tag(tag); }
-
-	// read/write
-	DECLARE_READ8_MEMBER( c6280_r );
+	// write only
 	DECLARE_WRITE8_MEMBER( c6280_w );
 
 protected:
@@ -43,7 +38,6 @@ private:
 
 	// internal state
 	sound_stream *m_stream;
-	required_device<h6280_device> m_cpudevice;
 	uint8_t m_select;
 	uint8_t m_balance;
 	uint8_t m_lfo_frequency;
@@ -55,8 +49,5 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(C6280, c6280_device)
-
-#define MCFG_C6280_CPU(tag) \
-	downcast<c6280_device &>(*device).set_devicecpu_tag(tag);
 
 #endif // MAME_SOUND_C6280_H

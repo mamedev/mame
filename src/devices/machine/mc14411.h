@@ -26,31 +26,6 @@
 
 #pragma once
 
-
-//**************************************************************************
-//  DEVICE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_MC14411_F1_CB(_devcb)  devcb = &downcast<mc14411_device &>(*device).set_out_fx_cb( 0, DEVCB_##_devcb);
-#define MCFG_MC14411_F2_CB(_devcb)  devcb = &downcast<mc14411_device &>(*device).set_out_fx_cb( 1, DEVCB_##_devcb);
-#define MCFG_MC14411_F3_CB(_devcb)  devcb = &downcast<mc14411_device &>(*device).set_out_fx_cb( 2, DEVCB_##_devcb);
-#define MCFG_MC14411_F4_CB(_devcb)  devcb = &downcast<mc14411_device &>(*device).set_out_fx_cb( 3, DEVCB_##_devcb);
-#define MCFG_MC14411_F5_CB(_devcb)  devcb = &downcast<mc14411_device &>(*device).set_out_fx_cb( 4, DEVCB_##_devcb);
-#define MCFG_MC14411_F6_CB(_devcb)  devcb = &downcast<mc14411_device &>(*device).set_out_fx_cb( 5, DEVCB_##_devcb);
-#define MCFG_MC14411_F7_CB(_devcb)  devcb = &downcast<mc14411_device &>(*device).set_out_fx_cb( 6, DEVCB_##_devcb);
-#define MCFG_MC14411_F8_CB(_devcb)  devcb = &downcast<mc14411_device &>(*device).set_out_fx_cb( 7, DEVCB_##_devcb);
-#define MCFG_MC14411_F9_CB(_devcb)  devcb = &downcast<mc14411_device &>(*device).set_out_fx_cb( 8, DEVCB_##_devcb);
-#define MCFG_MC14411_F10_CB(_devcb) devcb = &downcast<mc14411_device &>(*device).set_out_fx_cb( 9, DEVCB_##_devcb);
-#define MCFG_MC14411_F11_CB(_devcb) devcb = &downcast<mc14411_device &>(*device).set_out_fx_cb(10, DEVCB_##_devcb);
-#define MCFG_MC14411_F12_CB(_devcb) devcb = &downcast<mc14411_device &>(*device).set_out_fx_cb(11, DEVCB_##_devcb);
-#define MCFG_MC14411_F13_CB(_devcb) devcb = &downcast<mc14411_device &>(*device).set_out_fx_cb(12, DEVCB_##_devcb);
-#define MCFG_MC14411_F14_CB(_devcb) devcb = &downcast<mc14411_device &>(*device).set_out_fx_cb(13, DEVCB_##_devcb);
-#define MCFG_MC14411_F15_CB(_devcb) devcb = &downcast<mc14411_device &>(*device).set_out_fx_cb(14, DEVCB_##_devcb);
-#define MCFG_MC14411_F16_CB(_devcb) devcb = &downcast<mc14411_device &>(*device).set_out_fx_cb(15, DEVCB_##_devcb);
-
-//**************************************************************************
-//  TYPE DEFINITIONS
-//**************************************************************************
 class mc14411_device : public device_t
 {
 public:
@@ -86,7 +61,7 @@ public:
 	// construction/destruction
 	mc14411_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_out_fx_cb(int index, Object &&cb) { return m_out_fx_cbs[index].set_callback(std::forward<Object>(cb)); }
+	template <std::size_t Line> auto out_f() { return m_out_fx_cbs[Line-1].bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER(reset_w);
 	DECLARE_WRITE8_MEMBER(rate_select_w);
@@ -125,7 +100,6 @@ private:
 	bool m_timer_enabled[16];
 };
 
-// device type definition
 DECLARE_DEVICE_TYPE(MC14411, mc14411_device)
 
 #endif // MAME_MACHINE_MC14411_H

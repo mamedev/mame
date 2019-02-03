@@ -127,6 +127,8 @@ public:
 	DECLARE_MACHINE_START(mw8080bw);
 	DECLARE_MACHINE_RESET(mw8080bw);
 
+	IRQ_CALLBACK_MEMBER(interrupt_vector);
+
 protected:
 
 	/* device/memory pointers */
@@ -136,7 +138,7 @@ protected:
 	required_shared_ptr<uint8_t> m_main_ram;
 	optional_shared_ptr<uint8_t> m_colorram;
 	optional_shared_ptr<uint8_t> m_colorram2;
-	optional_device<discrete_device> m_discrete;
+	optional_device<discrete_sound_device> m_discrete;
 
 	/* other devices */
 	optional_device<samples_device> m_samples;
@@ -230,7 +232,7 @@ private:
 	uint32_t screen_update_phantom2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_phantom2);
 	TIMER_CALLBACK_MEMBER(maze_tone_timing_timer_callback);
-	TIMER_CALLBACK_MEMBER(mw8080bw_interrupt_callback);
+	TIMER_CALLBACK_MEMBER(interrupt_trigger);
 	TIMER_DEVICE_CALLBACK_MEMBER(spcenctr_strobe_timer_callback);
 	DECLARE_WRITE8_MEMBER(midway_tone_generator_lo_w);
 	DECLARE_WRITE8_MEMBER(midway_tone_generator_hi_w);

@@ -8,6 +8,7 @@
     see cpu/apexc.c for background and tech info
 */
 
+#include "emu.h"
 #include "machine/apexc.h"
 
 DEFINE_DEVICE_TYPE(APEXC_CYLINDER, apexc_cylinder_image_device, "apexc_cylinder_image", "APEXC Cylinder")

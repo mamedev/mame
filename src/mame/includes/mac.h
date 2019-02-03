@@ -7,9 +7,10 @@
  * Macintosh driver declarations
  *
  ****************************************************************************/
-
 #ifndef MAME_INCLUDES_MAC_H
 #define MAME_INCLUDES_MAC_H
+
+#pragma once
 
 #include "machine/8530scc.h"
 #include "machine/6522via.h"
@@ -19,6 +20,7 @@
 #include "machine/cuda.h"
 #include "bus/nubus/nubus.h"
 #include "bus/macpds/macpds.h"
+#include "machine/applefdc.h"
 #include "machine/ncr539x.h"
 #include "machine/ncr5380.h"
 #include "machine/mackbd.h"
@@ -64,8 +66,8 @@ void mac_fdc_set_enable_lines(device_t *device, int enable_mask);
 class mac_state : public driver_device
 {
 public:
-	mac_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	mac_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_via1(*this, "via6522_0"),
 		m_via2(*this, "via6522_1"),
@@ -74,11 +76,13 @@ public:
 		m_egret(*this, EGRET_TAG),
 		m_cuda(*this, CUDA_TAG),
 		m_ram(*this, RAM_TAG),
+		m_scc(*this, "scc"),
 		m_539x_1(*this, MAC_539X_1_TAG),
 		m_539x_2(*this, MAC_539X_2_TAG),
 		m_ncr5380(*this, "ncr5380"),
+		m_fdc(*this, "fdc"),
 		m_mackbd(*this, MACKBD_TAG),
-		m_rtc(*this,"rtc"),
+		m_rtc(*this, "rtc"),
 		m_mouse0(*this, "MOUSE0"),
 		m_mouse1(*this, "MOUSE1"),
 		m_mouse2(*this, "MOUSE2"),
@@ -96,19 +100,34 @@ public:
 	{
 	}
 
+	void add_mackbd(machine_config &config);
+	void add_scsi(machine_config &config, bool cdrom = false);
+	void add_base_devices(machine_config &config, bool rtc = true, bool super_woz = false);
+	void add_asc(machine_config &config, asc_device::asc_type type = asc_device::asc_type::ASC);
+	void add_macplus_additions(machine_config &config);
+	void add_nubus(machine_config &config, bool bank1 = true, bool bank2 = true);
+	template <typename T> void add_nubus_pds(machine_config &config, const char *slot_tag, T &&opts);
+	void add_via1_adb(machine_config &config, bool macii);
+	void add_via2(machine_config &config);
+	void add_pb1xx_vias(machine_config &config);
+	void add_pb1xx_screen(machine_config &config);
+	void add_egret(machine_config &config, int type);
+	void add_cuda(machine_config &config, int type);
+
+	void mac512ke_base(machine_config &config);
 	void mac512ke(machine_config &config);
 	void macplus(machine_config &config);
-	void maclc(machine_config &config);
+	void maclc(machine_config &config, bool cpu = true, bool egret = true, asc_device::asc_type asc_type = asc_device::asc_type::V8);
 	void macpb170(machine_config &config);
 	void macclasc(machine_config &config);
 	void maciisi(machine_config &config);
-	void maclc2(machine_config &config);
+	void maclc2(machine_config &config, bool egret = true);
 	void macse(machine_config &config);
-	void maclc3(machine_config &config);
+	void maclc3(machine_config &config, bool egret = true);
 	void macpd210(machine_config &config);
 	void maciici(machine_config &config);
 	void macprtb(machine_config &config);
-	void maciix(machine_config &config);
+	void maciix(machine_config &config, bool nubus_bank1 = true, bool nubus_bank2 = true);
 	void maclc520(machine_config &config);
 	void pwrmac(machine_config &config);
 	void maciivx(machine_config &config);
@@ -124,7 +143,8 @@ public:
 	void maciifx(machine_config &config);
 	void macpb140(machine_config &config);
 	void macclas2(machine_config &config);
-	void macii(machine_config &config);
+	void macii(machine_config &config, bool cpu = true, asc_device::asc_type asc_type = asc_device::asc_type::ASC,
+		bool nubus = true, bool nubus_bank1 = true, bool nubus_bank2 = true);
 	void maciihmu(machine_config &config);
 
 	void init_maclc2();
@@ -239,9 +259,11 @@ private:
 	optional_device<egret_device> m_egret;
 	optional_device<cuda_device> m_cuda;
 	required_device<ram_device> m_ram;
+	required_device<scc8530_t> m_scc;
 	optional_device<ncr539x_device> m_539x_1;
 	optional_device<ncr539x_device> m_539x_2;
 	optional_device<ncr5380_device> m_ncr5380;
+	required_device<applefdc_base_device> m_fdc;
 	optional_device<mackbd_device> m_mackbd;
 	optional_device<rtc3430042_device> m_rtc;
 
@@ -282,7 +304,6 @@ private:
 	TIMER_CALLBACK_MEMBER(overlay_timeout_func);
 	DECLARE_READ32_MEMBER(rom_switch_r);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(mac_scanline);
 	bool m_snd_enable;
 	bool m_main_buffer;
 	int m_snd_vol;
@@ -509,10 +530,10 @@ private:
 	emu_timer *m_scanline_timer;
 	emu_timer *m_adb_timer;
 
+	void macgsc_palette(palette_device &palette) const;
+
 	DECLARE_VIDEO_START(mac);
-	DECLARE_PALETTE_INIT(mac);
 	DECLARE_VIDEO_START(macprtb);
-	DECLARE_PALETTE_INIT(macgsc);
 	DECLARE_VIDEO_START(macsonora);
 	DECLARE_VIDEO_RESET(macrbv);
 	DECLARE_VIDEO_START(macdafb);
@@ -578,8 +599,7 @@ private:
 	void kbd_shift_out(int data);
 	void keyboard_receive(int val);
 	void mac_driver_init(model_t model);
-	void mac_install_memory(offs_t memory_begin, offs_t memory_end,
-		offs_t memory_size, void *memory_data, int is_rom, const char *bank);
+	void mac_install_memory(offs_t memory_begin, offs_t memory_end, offs_t memory_size, void *memory_data, int is_rom, const char *bank);
 	offs_t mac_dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
 };
 

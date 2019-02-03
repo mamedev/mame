@@ -39,7 +39,7 @@ private:
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
-	DECLARE_PALETTE_INIT(mgolf);
+	void mgolf_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -302,7 +302,7 @@ static INPUT_PORTS_START( mgolf )
 INPUT_PORTS_END
 
 
-PALETTE_INIT_MEMBER(mgolf_state, mgolf)
+void mgolf_state::mgolf_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(0x80, 0x80, 0x80));
 	palette.set_pen_color(1, rgb_t(0x00, 0x00, 0x00));
@@ -381,11 +381,10 @@ MACHINE_CONFIG_START(mgolf_state::mgolf)
 	MCFG_SCREEN_SIZE(256, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 223)
 	MCFG_SCREEN_UPDATE_DRIVER(mgolf_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mgolf)
-	MCFG_PALETTE_ADD("palette", 4)
-	MCFG_PALETTE_INIT_OWNER(mgolf_state, mgolf)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_mgolf)
+	PALETTE(config, m_palette, FUNC(mgolf_state::mgolf_palette), 4);
 
 	/* sound hardware */
 MACHINE_CONFIG_END

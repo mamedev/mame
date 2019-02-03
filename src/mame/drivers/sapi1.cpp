@@ -27,6 +27,8 @@ ToDo:
 
 Unable to proceed due to no info available (& in English).
 
+ZPS stands for "Základní Počítačová Sestava" (basic computer system).
+
 ****************************************************************************/
 
 
@@ -44,8 +46,8 @@ Unable to proceed due to no info available (& in English).
 class sapi1_state : public driver_device
 {
 public:
-	sapi1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	sapi1_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_p_videoram(*this, "videoram"),
 		m_bank1(*this, "bank1"),
 		m_line0(*this, "LINE0"),
@@ -623,7 +625,7 @@ void sapi1_state::init_sapizps3b()
 /* Machine driver */
 MACHINE_CONFIG_START(sapi1_state::sapi1)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8080A, XTAL(18'000'000) / 9) // Tesla MHB8080A + MHB8224 + MHB8228
+	MCFG_DEVICE_ADD(m_maincpu, I8080A, XTAL(18'000'000) / 9) // Tesla MHB8080A + MHB8224 + MHB8228
 	MCFG_DEVICE_PROGRAM_MAP(sapi1_mem)
 	MCFG_MACHINE_RESET_OVERRIDE(sapi1_state, sapi1)
 
@@ -634,23 +636,23 @@ MACHINE_CONFIG_START(sapi1_state::sapi1)
 	MCFG_SCREEN_SIZE(40*6, 24*9)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*6-1, 0, 24*9-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sapi1_state, screen_update_sapi1)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(sapi1_state::sapi2)
+void sapi1_state::sapi2(machine_config &config)
+{
 	sapi1(config);
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(sapi2_mem)
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(sapi1_state, kbd_put))
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &sapi1_state::sapi2_mem);
+
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(sapi1_state::kbd_put));
+}
 
 MACHINE_CONFIG_START(sapi1_state::sapi3)
 	sapi2(config);
@@ -672,10 +674,11 @@ MACHINE_CONFIG_START(sapi1_state::sapi3b)
 	MCFG_DEVICE_PROGRAM_MAP(sapi3b_mem)
 	MCFG_DEVICE_IO_MAP(sapi3b_io)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 1008000) // guess
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(6)
-	MCFG_MC6845_UPDATE_ROW_CB(sapi1_state, crtc_update_row)
+	mc6845_device &crtc(MC6845(config, "crtc", 1008000)); // guess
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(6);
+	crtc.set_update_row_callback(FUNC(sapi1_state::crtc_update_row), this);
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
@@ -699,19 +702,17 @@ MACHINE_CONFIG_START(sapi1_state::sapi3a)
 	MCFG_MACHINE_RESET_OVERRIDE(sapi1_state, sapizps3 )
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("uart", AY51013, 0) // Tesla MHB1012
-	MCFG_AY51013_TX_CLOCK(XTAL(12'288'000) / 80) // not actual rate?
-	MCFG_AY51013_RX_CLOCK(XTAL(12'288'000) / 80) // not actual rate?
-	MCFG_AY51013_READ_SI_CB(READLINE("v24", rs232_port_device, rxd_r))
-	MCFG_AY51013_WRITE_SO_CB(WRITELINE("v24", rs232_port_device, write_txd))
-	MCFG_AY51013_AUTO_RDAV(true) // RDAV not actually tied to RDE, but pulsed by K155AG3 (=74123N): R25=22k, C14=220
+	AY51013(config, m_uart); // Tesla MHB1012
+	m_uart->set_tx_clock(XTAL(12'288'000) / 80); // not actual rate?
+	m_uart->set_rx_clock(XTAL(12'288'000) / 80); // not actual rate?
+	m_uart->read_si_callback().set(m_v24, FUNC(rs232_port_device::rxd_r));
+	m_uart->write_so_callback().set(m_v24, FUNC(rs232_port_device::write_txd));
+	m_uart->set_auto_rdav(true); // RDAV not actually tied to RDE, but pulsed by K155AG3 (=74123N): R25=22k, C14=220
 
-	MCFG_DEVICE_ADD("v24", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	RS232_PORT(config, m_v24, default_rs232_devices, "terminal").set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 MACHINE_CONFIG_END
 
 

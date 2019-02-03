@@ -49,10 +49,14 @@ const char *const ee_disassembler::vireg[32] =
 
 const char *const mips3_disassembler::cacheop[32] =
 {
-	"I_Invd", "D_WBInvd", "Unknown 2", "Unknown 3", "I_IndexLoadTag", "D_IndexLoadTag", "Unknown 6", "Unknown 7",
-	"I_IndexStoreTag", "D_IndexStoreTag", "Unknown 10", "Unknown 11", "Unknown 12", "D_CreateDirtyExcl", "Unknown 14", "Unknown 15",
-	"I_HitInvalid", "D_HitInvalid", "Unknown 18", "Unknown 19", "I_Fill", "D_HitWBInvalid", "Unknown 22", "Unknown 23",
-	"I_HitWB", "D_HitWB", "Unknown 26", "Unknown 27", "Unknown 28", "Unknown 29", "Unknown 30", "Unknown 31"
+	"Index_Invalid_I", "Index_WB_Invalid_D", "Index_Invalid_SI", "Index_WB_Invalid_SD",
+	"Index_Load_Tag_I", "Index_Load_Tag_D", "Index_Load_Tag_SI", "Index_Load_Tag_SD",
+	"Index_Store_Tag_I", "Index_Store_Tag_D", "Index_Store_Tag_SI", "Index_Store_Tag_SD",
+	"Unknown 12", "Create_Dirty_Excl_D", "Unknown 14", "Create_Dirty_Excl_SD",
+	"Hit_Invalid_I", "Hit_Invalid_D", "Hit_Invalid_SI", "Hit_Invalid_SD",
+	"Fill_I", "Hit_WB_Invalid_D", "Unknown 22", "Hit_WB_Invalid_SD",
+	"Hit_WB_I", "Hit_WB_D", "Unknown 26", "Hit_WB_SD",
+	"Unknown 28", "Unknown 29", "Hit_Set_Virtual_SI", "Hit_Set_Virtual_SD"
 };
 
 
@@ -168,18 +172,24 @@ uint32_t mips3_disassembler::dasm_cop0(uint32_t pc, uint32_t op, std::ostream &s
 		case 0x1f:  /* COP */
 			switch (op & 0x01ffffff)
 			{
-				case 0x01:  util::stream_format(stream, "tlbr");                                            break;
-				case 0x02:  util::stream_format(stream, "tlbwi");                                           break;
-				case 0x06:  util::stream_format(stream, "tlbwr");                                           break;
-				case 0x08:  util::stream_format(stream, "tlbp");                                            break;
-				case 0x10:  util::stream_format(stream, "rfe"); flags = STEP_OUT;                  break;
-				case 0x18:  util::stream_format(stream, "eret      [invalid]");                                  break;
-				default:    util::stream_format(stream, "cop0      $%07x", op & 0x01ffffff);                    break;
+				case 0x01:  util::stream_format(stream, "tlbr");                                break;
+				case 0x02:  util::stream_format(stream, "tlbwi");                               break;
+				case 0x06:  util::stream_format(stream, "tlbwr");                               break;
+				case 0x08:  util::stream_format(stream, "tlbp");                                break;
+				case 0x10:  util::stream_format(stream, "rfe"); flags = STEP_OUT;               break;
+				case 0x18:  util::stream_format(stream, "eret");                                break;
+				default:    dasm_extra_cop0(pc, op, stream);                                    break;
 			}
 			break;
-		default:    util::stream_format(stream, "dc.l      $%08x [invalid]", op);                              break;
+		default:    util::stream_format(stream, "dc.l      $%08x [invalid]", op);               break;
 	}
 	return flags;
+}
+
+uint32_t mips3_disassembler::dasm_extra_cop0(uint32_t pc, uint32_t op, std::ostream &stream)
+{
+	util::stream_format(stream, "cop0       $%07x", op & 0x01ffffff);
+	return 0;
 }
 
 uint32_t mips3_disassembler::dasm_cop1(uint32_t pc, uint32_t op, std::ostream &stream)
@@ -258,11 +268,17 @@ uint32_t mips3_disassembler::dasm_cop1(uint32_t pc, uint32_t op, std::ostream &s
 				case 0x3d:  util::stream_format(stream, "c.nge.%s   %s,%s,%d", fmt, cpreg[1][fs], cpreg[1][ft], (op >> 8) & 7);   break;
 				case 0x3e:  util::stream_format(stream, "c.le.%s    %s,%s,%d", fmt, cpreg[1][fs], cpreg[1][ft], (op >> 8) & 7);    break;
 				case 0x3f:  util::stream_format(stream, "c.ngt.%s   %s,%s,%d", fmt, cpreg[1][fs], cpreg[1][ft], (op >> 8) & 7);   break;
-				default:    util::stream_format(stream, "cop1       $%07x", op & 0x01ffffff);                                   break;
+				default:    dasm_extra_cop1(pc, op, stream); break;
 			}
 			break;
 	}
 	return flags;
+}
+
+uint32_t mips3_disassembler::dasm_extra_cop1(uint32_t pc, uint32_t op, std::ostream &stream)
+{
+	util::stream_format(stream, "cop1       $%07x", op & 0x01ffffff);
+	return 0;
 }
 
 uint32_t mips3_disassembler::dasm_cop1x(uint32_t pc, uint32_t op, std::ostream &stream)
@@ -413,6 +429,32 @@ uint32_t mips3_disassembler::dasm_extra_regimm(uint32_t pc, uint32_t op, std::os
 uint32_t mips3_disassembler::dasm_extra_special(uint32_t pc, uint32_t op, std::ostream &stream)
 {
 	util::stream_format(stream, "dc.l      $%08x [invalid]", op);
+	return 0;
+}
+
+uint32_t ee_disassembler::dasm_extra_cop0(uint32_t pc, uint32_t op, std::ostream &stream)
+{
+	switch (op & 0x01ffffff)
+	{
+		case 0x38: util::stream_format(stream, "ei"); break;
+		case 0x39: util::stream_format(stream, "di"); break;
+		default:   util::stream_format(stream, "cop1       $%07x", op & 0x01ffffff); break;
+	}
+	return 0;
+}
+
+uint32_t ee_disassembler::dasm_extra_cop1(uint32_t pc, uint32_t op, std::ostream &stream)
+{
+	const int fd   = (op >>  6) & 31;
+	const int fs   = (op >> 11) & 31;
+	const int ft   = (op >> 16) & 31;
+
+	switch (op & 0x3f)
+	{
+		case 0x18: util::stream_format(stream, "adda.s   %s,%s", cpreg[1][fs], cpreg[1][ft]); break;
+		case 0x1c: util::stream_format(stream, "madd.s   %s,%s,%s", cpreg[1][fd], cpreg[1][fs], cpreg[1][ft]); break;
+		default:   util::stream_format(stream, "dc.l     $%08x [invalid]", op); break;
+	}
 	return 0;
 }
 
@@ -578,7 +620,7 @@ uint32_t ee_disassembler::dasm_idt(uint32_t pc, uint32_t op, std::ostream &strea
 			else
 				util::stream_format(stream, "maddu     %s,%s", reg[rs], reg[rt]);
 			break;
-		case 0x04: util::stream_format(stream, "plzcw     ?"); break;
+		case 0x04: util::stream_format(stream, "plzcw     %s,%s", reg[rd], reg[rs]); break;
 		case 0x08: flags = dasm_mmi0(pc, op, stream); break;
 		case 0x09: flags = dasm_mmi2(pc, op, stream); break;
 		case 0x10: util::stream_format(stream, "mfhi1     %s", reg[rd]); break;
@@ -803,9 +845,9 @@ uint32_t ee_disassembler::dasm_extra_special(uint32_t pc, uint32_t op, std::ostr
 
 	switch (op & 63)
 	{
-		case 0x28: util::stream_format(stream, "mfsa      %s", reg[rd]);			break;
-		case 0x29: util::stream_format(stream, "mtsa      %s", reg[rs]);			break;
-		default:   util::stream_format(stream, "dc.l      $%08x [invalid]", op);	break;
+		case 0x28: util::stream_format(stream, "mfsa      %s", reg[rd]);            break;
+		case 0x29: util::stream_format(stream, "mtsa      %s", reg[rs]);            break;
+		default:   util::stream_format(stream, "dc.l      $%08x [invalid]", op);    break;
 	}
 	return 0;
 }

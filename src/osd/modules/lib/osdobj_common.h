@@ -88,6 +88,7 @@
 #define OSDOPTION_BGFX_DEBUG            "bgfx_debug"
 #define OSDOPTION_BGFX_SCREEN_CHAINS    "bgfx_screen_chains"
 #define OSDOPTION_BGFX_SHADOW_MASK      "bgfx_shadow_mask"
+#define OSDOPTION_BGFX_LUT              "bgfx_lut"
 #define OSDOPTION_BGFX_AVI_NAME         "bgfx_avi_name"
 
 //============================================================
@@ -162,6 +163,7 @@ public:
 	bool bgfx_debug() const { return bool_value(OSDOPTION_BGFX_DEBUG); }
 	const char *bgfx_screen_chains() const { return value(OSDOPTION_BGFX_SCREEN_CHAINS); }
 	const char *bgfx_shadow_mask() const { return value(OSDOPTION_BGFX_SHADOW_MASK); }
+	const char *bgfx_lut() const { return value(OSDOPTION_BGFX_LUT); }
 	const char *bgfx_avi_name() const { return value(OSDOPTION_BGFX_AVI_NAME); }
 
 	// PortAudio options
@@ -243,11 +245,12 @@ public:
 	// osd_output interface ...
 	virtual void output_callback(osd_output_channel channel, const char *msg, va_list args)  override;
 	bool verbose() const { return m_print_verbose; }
-	void set_verbose(bool print_verbose) { m_print_verbose = print_verbose; }
+	virtual void set_verbose(bool print_verbose) override { m_print_verbose = print_verbose; }
 
 	void notify(const char *outname, int32_t value) const { m_output->notify(outname, value); }
 
 	static std::list<std::shared_ptr<osd_window>> s_window_list;
+
 protected:
 	virtual bool input_init();
 	virtual void input_pause();

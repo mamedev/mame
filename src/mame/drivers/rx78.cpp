@@ -298,7 +298,7 @@ void rx78_state::rx78_io(address_map &map)
 	map(0xf5, 0xfb).w(FUNC(rx78_state::vdp_reg_w)); //vdp
 	map(0xfc, 0xfc).w(FUNC(rx78_state::vdp_bg_reg_w)); //vdp
 	map(0xfe, 0xfe).w(FUNC(rx78_state::vdp_pri_mask_w));
-	map(0xff, 0xff).w("sn1", FUNC(sn76489a_device::command_w)); //psg
+	map(0xff, 0xff).w("sn1", FUNC(sn76489a_device::write)); //psg
 }
 
 /* Input ports */
@@ -496,11 +496,9 @@ MACHINE_CONFIG_START(rx78_state::rx78)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 	MCFG_GENERIC_LOAD(rx78_state, rx78_cart)
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32k")
-	MCFG_RAM_EXTRA_OPTIONS("16k")
+	RAM(config, RAM_TAG).set_default_size("32K").set_extra_options("16K");
 
-	MCFG_CASSETTE_ADD( "cassette" )
+	CASSETTE(config, m_cass);
 
 	SPEAKER(config, "mono").front_center();
 
@@ -510,7 +508,7 @@ MACHINE_CONFIG_START(rx78_state::rx78)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","rx78")
+	SOFTWARE_LIST(config, "cart_list").set_original("rx78");
 MACHINE_CONFIG_END
 
 /* ROM definition */

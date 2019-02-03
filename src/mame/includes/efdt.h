@@ -1,38 +1,43 @@
 // license:BSD-3-Clause
 // copyright-holders: ElSemi, Roberto Fresca.
-
 #ifndef MAME_INCLUDES_EFDT_H
 #define MAME_INCLUDES_EFDT_H
 
+#pragma once
+
+#include "machine/74259.h"
 #include "emupal.h"
 
 
 class efdt_state : public driver_device
 {
 public:
-	efdt_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	efdt_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_audiocpu(*this, "audiocpu"),
-		m_videoram(*this, "videoram", 8),
-		m_vregs1(*this, "vregs1"),
-		m_vregs2(*this, "vregs2")
+		m_vlatch(*this, "vlatch%u", 1U),
+		m_videoram(*this, "videoram", 8)
 	{ }
 
 	void efdt(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	optional_device<cpu_device> m_audiocpu;
+	required_device_array<ls259_device, 2> m_vlatch;
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
-	required_shared_ptr<uint8_t> m_vregs1;
-	required_shared_ptr<uint8_t> m_vregs2;
 	uint8_t m_soundlatch[4];
 	uint8_t m_soundCommand;
 	uint8_t m_soundControl;
@@ -49,11 +54,10 @@ private:
 	TILE_GET_INFO_MEMBER(get_tile_info_0);
 	TILE_GET_INFO_MEMBER(get_tile_info_1);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	void efdt_palette(palette_device &palette) const;
 
-	DECLARE_VIDEO_START(efdt);
-	DECLARE_PALETTE_INIT(efdt);
+	DECLARE_WRITE_LINE_MEMBER(vblank_nmi_w);
+	DECLARE_WRITE_LINE_MEMBER(nmi_clear_w);
 
 	DECLARE_READ8_MEMBER(main_soundlatch_r);
 	DECLARE_WRITE8_MEMBER(main_soundlatch_w);

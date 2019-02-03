@@ -10,8 +10,9 @@
 
 #include "emu.h"
 #include "a590.h"
-#include "bus/scsi/scsi.h"
-#include "bus/scsi/scsihd.h"
+#include "machine/nscsi_bus.h"
+#include "machine/nscsi_cd.h"
+#include "machine/nscsi_hd.h"
 
 
 //**************************************************************************
@@ -114,18 +115,37 @@ ioport_constructor a2091_device::device_input_ports() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(dmac_hdc_device::device_add_mconfig)
-	MCFG_DMAC_ADD("dmac", 0)
-	MCFG_DMAC_SCSI_READ_HANDLER(READ8(*this, dmac_hdc_device, dmac_scsi_r))
-	MCFG_DMAC_SCSI_WRITE_HANDLER(WRITE8(*this, dmac_hdc_device, dmac_scsi_w))
-	MCFG_DMAC_INT_HANDLER(WRITELINE(*this, dmac_hdc_device, dmac_int_w))
-	MCFG_DMAC_CFGOUT_HANDLER(WRITELINE(*this, dmac_hdc_device, dmac_cfgout_w))
-	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
-	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_1)
-	MCFG_DEVICE_ADD("wd33c93", WD33C93, 0)
-	MCFG_LEGACY_SCSI_PORT("scsi")
-	MCFG_WD33C93_IRQ_CB(WRITELINE(*this, dmac_hdc_device, scsi_irq_w))
-MACHINE_CONFIG_END
+void dmac_hdc_device::scsi_devices(device_slot_interface &device)
+{
+	device.option_add("cdrom", NSCSI_CDROM);
+	device.option_add("harddisk", NSCSI_HARDDISK);
+}
+
+void dmac_hdc_device::wd33c93(device_t *device)
+{
+	device->set_clock(10000000);
+	downcast<wd33c93a_device *>(device)->irq_cb().set(*this, FUNC(dmac_hdc_device::scsi_irq_w));
+	downcast<wd33c93a_device *>(device)->drq_cb().set(*this, FUNC(dmac_hdc_device::scsi_drq_w));
+}
+
+void dmac_hdc_device::device_add_mconfig(machine_config &config)
+{
+	amiga_dmac_device &dmac(AMIGA_DMAC(config, "dmac", 0));
+	dmac.scsi_read_handler().set(FUNC(dmac_hdc_device::dmac_scsi_r));
+	dmac.scsi_write_handler().set(FUNC(dmac_hdc_device::dmac_scsi_w));
+	dmac.int_handler().set(FUNC(dmac_hdc_device::dmac_int_w));
+	dmac.cfgout_handler().set(FUNC(dmac_hdc_device::dmac_cfgout_w));
+
+	NSCSI_BUS(config, "scsi", 0);
+	NSCSI_CONNECTOR(config, "scsi:0", scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsi:1", scsi_devices, "harddisk", false);
+	NSCSI_CONNECTOR(config, "scsi:3", scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsi:4", scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsi:5", scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsi:6", scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsi:7").option_set("wd33c93", WD33C93A)
+		.machine_config([this](device_t *device) { wd33c93(device); });
+}
 
 
 //-------------------------------------------------
@@ -202,7 +222,7 @@ dmac_hdc_device::dmac_hdc_device(const machine_config &mconfig, device_type type
 	device_t(mconfig, type, tag, owner, clock),
 	m_int6(false),
 	m_dmac(*this, "dmac"),
-	m_wdc(*this, "wd33c93")
+	m_wdc(*this, "scsi:7:wd33c93")
 {
 }
 
@@ -324,8 +344,8 @@ READ8_MEMBER( dmac_hdc_device::dmac_scsi_r )
 {
 	switch (offset)
 	{
-	case 0x48: return m_wdc->read(space, 0);
-	case 0x49: return m_wdc->read(space, 1);
+	case 0x48: return m_wdc->indir_addr_r();
+	case 0x49: return m_wdc->indir_reg_r();
 	}
 
 	return 0xff;
@@ -335,8 +355,8 @@ WRITE8_MEMBER( dmac_hdc_device::dmac_scsi_w )
 {
 	switch (offset)
 	{
-	case 0x48: m_wdc->write(space, 0, data); break;
-	case 0x49: m_wdc->write(space, 1, data); break;
+	case 0x48: m_wdc->indir_addr_w(data); break;
+	case 0x49: m_wdc->indir_reg_w(data); break;
 	}
 }
 
@@ -352,4 +372,9 @@ WRITE_LINE_MEMBER( dmac_hdc_device::scsi_irq_w )
 {
 	// should be or'ed with xt-ide IRQ
 	m_dmac->intx_w(state);
+}
+
+WRITE_LINE_MEMBER( dmac_hdc_device::scsi_drq_w )
+{
+	m_dmac->xdreq_w(state);
 }

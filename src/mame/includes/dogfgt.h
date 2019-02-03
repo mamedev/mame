@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
+#ifndef MAME_INCLUDES_DOGFGT_H
+#define MAME_INCLUDES_DOGFGT_H
+
+#pragma once
+
 #include "sound/ay8910.h"
 #include "emupal.h"
 #include "screen.h"
@@ -11,8 +16,8 @@
 class dogfgt_state : public driver_device
 {
 public:
-	dogfgt_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	dogfgt_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_bgvideoram(*this, "bgvideoram"),
 		m_spriteram(*this, "spriteram"),
 		m_sharedram(*this, "sharedram"),
@@ -21,7 +26,8 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_ay(*this, "ay%u", 0U) { }
+		m_ay(*this, "ay%u", 0U)
+	{ }
 
 	void dogfgt(machine_config &config);
 
@@ -72,10 +78,12 @@ private:
 
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	DECLARE_PALETTE_INIT(dogfgt);
+	void dogfgt_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect );
+	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 
 	void main_map(address_map &map);
 	void sub_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_DOGFGT_H

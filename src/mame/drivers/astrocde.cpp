@@ -116,7 +116,6 @@
 #include "emu.h"
 #include "includes/astrocde.h"
 
-#include "cpu/z80/z80.h"
 #include "machine/z80daisy.h"
 #include "machine/z80ctc.h"
 #include "machine/nvram.h"
@@ -1177,78 +1176,67 @@ static const z80_daisy_config tenpin_daisy_chain[] =
  *
  *************************************/
 
-MACHINE_CONFIG_START(astrocde_state::astrocade_base)
-
+void astrocde_state::astrocade_base(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, ASTROCADE_CLOCK/4)
+	Z80(config, m_maincpu, ASTROCADE_CLOCK/4);
 	/* each game has its own map */
 
 	/* video hardware */
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_INIT_OWNER(astrocde_state, astrocde)
+	PALETTE(config, m_palette, FUNC(astrocde_state::astrocade_palette), 512);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(ASTROCADE_CLOCK, 455, 0, 352, 262, 0, 240)
-	MCFG_SCREEN_DEFAULT_POSITION(1.1, 0.0, 1.18, -0.018)    /* clip out borders */
-	MCFG_SCREEN_UPDATE_DRIVER(astrocde_state, screen_update_astrocde)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(ASTROCADE_CLOCK, 455, 0, 352, 262, 0, 240);
+	m_screen->set_default_position(1.1, 0.0, 1.18, -0.018);    /* clip out borders */
+	m_screen->set_screen_update(FUNC(astrocde_state::screen_update_astrocde));
+	m_screen->set_palette(m_palette);
+}
 
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(astrocde_state::astrocade_16color_base)
+void astrocde_state::astrocade_16color_base(machine_config &config)
+{
 	astrocade_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("bank4000", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(bank4000_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
+	ADDRESS_MAP_BANK(config, m_bank4000).set_map(&astrocde_state::bank4000_map).set_options(ENDIANNESS_LITTLE, 8, 16, 0x4000);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(4096)
+	m_palette->set_entries(4096);
+	m_palette->set_init(FUNC(astrocde_state::profpac_palette));
 
-	MCFG_PALETTE_INIT_OWNER(astrocde_state,profpac)
 	MCFG_VIDEO_START_OVERRIDE(astrocde_state,profpac)
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(astrocde_state, screen_update_profpac)
-MACHINE_CONFIG_END
+	m_screen->set_screen_update(FUNC(astrocde_state::screen_update_profpac));
+}
 
 
-MACHINE_CONFIG_START(astrocde_state::astrocade_mono_sound)
-
+void astrocde_state::astrocade_mono_sound(machine_config &config)
+{
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("astrocade1", ASTROCADE_IO, ASTROCADE_CLOCK/4)
-	MCFG_ASTROCADE_IO_SI_READ_CB(READ8(*this, astrocde_state, input_mux_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	ASTROCADE_IO(config, m_astrocade_sound1, ASTROCADE_CLOCK/4);
+	m_astrocade_sound1->si_cb().set(FUNC(astrocde_state::input_mux_r));
+	m_astrocade_sound1->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
-MACHINE_CONFIG_START(astrocde_state::astrocade_stereo_sound)
-
+void astrocde_state::astrocade_stereo_sound(machine_config &config)
+{
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("astrocade1", ASTROCADE_IO, ASTROCADE_CLOCK/4)
-	MCFG_ASTROCADE_IO_SI_READ_CB(READ8(*this, astrocde_state, input_mux_r))
-	MCFG_ASTROCADE_IO_SO0_STROBE_CB(WRITE8("watchdog", watchdog_timer_device, reset_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	ASTROCADE_IO(config, m_astrocade_sound1, ASTROCADE_CLOCK/4);
+	m_astrocade_sound1->si_cb().set(FUNC(astrocde_state::input_mux_r));
+	m_astrocade_sound1->so_cb<0>().set("watchdog", FUNC(watchdog_timer_device::reset_w));
+	m_astrocade_sound1->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("astrocade2", ASTROCADE_IO, ASTROCADE_CLOCK/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	ASTROCADE_IO(config, "astrocade2", ASTROCADE_CLOCK/4).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	MCFG_WATCHDOG_ADD("watchdog") // MC14024B on CPU board at U18
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 128) // CLK = VERTDR, Q7 used for RESET
-MACHINE_CONFIG_END
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128); // MC14024B on CPU board at U18, CLK = VERTDR, Q7 used for RESET
+}
 
 
 
@@ -1258,285 +1246,265 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(seawolf2_state::seawolf2)
+void seawolf2_state::seawolf2(machine_config &config)
+{
 	astrocade_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(seawolf2_map)
-	MCFG_DEVICE_IO_MAP(port_map_discrete)
+	m_maincpu->set_addrmap(AS_PROGRAM, &seawolf2_state::seawolf2_map);
+	m_maincpu->set_addrmap(AS_IO, &seawolf2_state::port_map_discrete);
 
-	MCFG_DEVICE_ADD("lamplatch1", OUTPUT_LATCH, 0) // 74174 on game board at N2
-	MCFG_OUTPUT_LATCH_BIT0_HANDLER(OUTPUT("lamp6")) // right player torpedo 4 available
-	MCFG_OUTPUT_LATCH_BIT1_HANDLER(OUTPUT("lamp5")) // right player torpedo 3 available
-	MCFG_OUTPUT_LATCH_BIT2_HANDLER(OUTPUT("lamp4")) // right player torpedo 2 available
-	MCFG_OUTPUT_LATCH_BIT3_HANDLER(OUTPUT("lamp3")) // right player torpedo 1 available
-	MCFG_OUTPUT_LATCH_BIT4_HANDLER(OUTPUT("lamp2")) // right player ready
-	MCFG_DEVCB_CHAIN_OUTPUT(OUTPUT("lamp1")) MCFG_DEVCB_INVERT // right player reload (active low)
-	MCFG_OUTPUT_LATCH_BIT5_HANDLER(OUTPUT("lamp0")) // right player explosion (hit)
+	output_latch_device &lamplatch1(OUTPUT_LATCH(config, "lamplatch1")); // 74174 on game board at N2
+	lamplatch1.bit_handler<0>().set_output("lamp6"); // right player torpedo 4 available
+	lamplatch1.bit_handler<1>().set_output("lamp5"); // right player torpedo 3 available
+	lamplatch1.bit_handler<2>().set_output("lamp4"); // right player torpedo 2 available
+	lamplatch1.bit_handler<3>().set_output("lamp3"); // right player torpedo 1 available
+	lamplatch1.bit_handler<4>().set_output("lamp2"); // right player ready
+	lamplatch1.bit_handler<4>().append_output("lamp1").invert(); // right player reload (active low)
+	lamplatch1.bit_handler<5>().set_output("lamp0"); // right player explosion (hit)
 
-	MCFG_DEVICE_ADD("lamplatch2", OUTPUT_LATCH, 0) // 74174 on game board at P2
-	MCFG_OUTPUT_LATCH_BIT0_HANDLER(OUTPUT("lamp13")) // left player torpedo 4 available
-	MCFG_OUTPUT_LATCH_BIT1_HANDLER(OUTPUT("lamp12")) // left player torpedo 3 available
-	MCFG_OUTPUT_LATCH_BIT2_HANDLER(OUTPUT("lamp11")) // left player torpedo 2 available
-	MCFG_OUTPUT_LATCH_BIT3_HANDLER(OUTPUT("lamp10")) // left player torpedo 1 available
-	MCFG_OUTPUT_LATCH_BIT4_HANDLER(OUTPUT("lamp9")) // left player ready
-	MCFG_DEVCB_CHAIN_OUTPUT(OUTPUT("lamp8")) MCFG_DEVCB_INVERT // left player reload (active low)
-	MCFG_OUTPUT_LATCH_BIT5_HANDLER(OUTPUT("lamp7")) // left player explosion (hit)
+	output_latch_device &lamplatch2(OUTPUT_LATCH(config, "lamplatch2")); // 74174 on game board at P2
+	lamplatch2.bit_handler<0>().set_output("lamp13"); // left player torpedo 4 available
+	lamplatch2.bit_handler<1>().set_output("lamp12"); // left player torpedo 3 available
+	lamplatch2.bit_handler<2>().set_output("lamp11"); // left player torpedo 2 available
+	lamplatch2.bit_handler<3>().set_output("lamp10"); // left player torpedo 1 available
+	lamplatch2.bit_handler<4>().set_output("lamp9"); // left player ready
+	lamplatch2.bit_handler<4>().append_output("lamp8").invert(); // left player reload (active low)
+	lamplatch2.bit_handler<5>().set_output("lamp7"); // left player explosion (hit)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(10) /* 5*2 channels */
-	MCFG_SAMPLES_NAMES(seawolf_sample_names)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.25)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 0.25)
-	MCFG_SOUND_ROUTE(2, "lspeaker", 0.25)
-	MCFG_SOUND_ROUTE(3, "lspeaker", 0.25)
-	MCFG_SOUND_ROUTE(4, "lspeaker", 0.25)
-	MCFG_SOUND_ROUTE(5, "rspeaker", 0.25)
-	MCFG_SOUND_ROUTE(6, "rspeaker", 0.25)
-	MCFG_SOUND_ROUTE(7, "rspeaker", 0.25)
-	MCFG_SOUND_ROUTE(8, "rspeaker", 0.25)
-	MCFG_SOUND_ROUTE(9, "rspeaker", 0.25)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(10); /* 5*2 channels */
+	m_samples->set_samples_names(seawolf_sample_names);
+	m_samples->add_route(0, "lspeaker", 0.25);
+	m_samples->add_route(1, "lspeaker", 0.25);
+	m_samples->add_route(2, "lspeaker", 0.25);
+	m_samples->add_route(3, "lspeaker", 0.25);
+	m_samples->add_route(4, "lspeaker", 0.25);
+	m_samples->add_route(5, "rspeaker", 0.25);
+	m_samples->add_route(6, "rspeaker", 0.25);
+	m_samples->add_route(7, "rspeaker", 0.25);
+	m_samples->add_route(8, "rspeaker", 0.25);
+	m_samples->add_route(9, "rspeaker", 0.25);
+}
 
-
-MACHINE_CONFIG_START(ebases_state::ebases)
+void ebases_state::ebases(machine_config &config)
+{
 	astrocade_base(config);
 	astrocade_mono_sound(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(ebases_map)
-	MCFG_DEVICE_IO_MAP(port_map_ebases)
+	m_maincpu->set_addrmap(AS_PROGRAM, &ebases_state::ebases_map);
+	m_maincpu->set_addrmap(AS_IO, &ebases_state::port_map_ebases);
 
-	MCFG_DEVICE_MODIFY("astrocade1")
-	MCFG_ASTROCADE_IO_SO1_STROBE_CB(WRITE8("watchdog", watchdog_timer_device, reset_w))
+	m_astrocade_sound1->so_cb<1>().set("watchdog", FUNC(watchdog_timer_device::reset_w));
 
-	MCFG_WATCHDOG_ADD("watchdog") // MC14024 on CPU board at U18
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 128) // CLK = VERTDR, Q7 used for RESET
-MACHINE_CONFIG_END
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128); // MC14024 on CPU board at U18, CLK = VERTDR, Q7 used for RESET
+}
 
-
-MACHINE_CONFIG_START(astrocde_state::spacezap)
+void astrocde_state::spacezap(machine_config &config)
+{
 	astrocade_base(config);
 	astrocade_mono_sound(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(spacezap_map)
-	MCFG_DEVICE_IO_MAP(port_map_mono_pattern)
+	m_maincpu->set_addrmap(AS_PROGRAM, &astrocde_state::spacezap_map);
+	m_maincpu->set_addrmap(AS_IO, &astrocde_state::port_map_mono_pattern);
 
-	MCFG_DEVICE_MODIFY("astrocade1")
-	MCFG_ASTROCADE_IO_SO0_STROBE_CB(WRITE8("watchdog", watchdog_timer_device, reset_w))
-	MCFG_ASTROCADE_IO_SO3_STROBE_CB(WRITE8("outlatch", output_latch_device, bus_w))
+	m_astrocade_sound1->so_cb<0>().set("watchdog", FUNC(watchdog_timer_device::reset_w));
+	m_astrocade_sound1->so_cb<3>().set("outlatch", FUNC(output_latch_device::bus_w));
 
-	MCFG_DEVICE_ADD("outlatch", OUTPUT_LATCH, 0) // MC14174B on game board at U16
-	MCFG_OUTPUT_LATCH_BIT0_HANDLER(WRITELINE(*this, astrocde_state, coin_counter_w<0>))
-	MCFG_OUTPUT_LATCH_BIT1_HANDLER(WRITELINE(*this, astrocde_state, coin_counter_w<1>))
+	output_latch_device &outlatch(OUTPUT_LATCH(config, "outlatch", 0)); // MC14174B on game board at U16
+	outlatch.bit_handler<0>().set(FUNC(astrocde_state::coin_counter_w<0>));
+	outlatch.bit_handler<1>().set(FUNC(astrocde_state::coin_counter_w<1>));
 
-	MCFG_WATCHDOG_ADD("watchdog") // MC14024 on CPU board at U18
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 128) // CLK = VERTDR, Q7 used for RESET
-MACHINE_CONFIG_END
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128); // MC14024 on CPU board at U18, CLK = VERTDR, Q7 used for RESET
+}
 
-MACHINE_CONFIG_START(astrocde_state::wow)
+void astrocde_state::wow(machine_config &config)
+{
 	astrocade_base(config);
 	astrocade_stereo_sound(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(wow_map)
-	MCFG_DEVICE_IO_MAP(port_map_stereo_pattern)
+	m_maincpu->set_addrmap(AS_PROGRAM, &astrocde_state::wow_map);
+	m_maincpu->set_addrmap(AS_IO, &astrocde_state::port_map_stereo_pattern);
 
-	MCFG_DEVICE_ADD("outlatch", CD4099, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, astrocde_state, coin_counter_w<0>))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, astrocde_state, coin_counter_w<1>))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, astrocde_state, sparkle_w<0>))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, astrocde_state, sparkle_w<1>))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, astrocde_state, sparkle_w<2>))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, astrocde_state, sparkle_w<3>))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, astrocde_state, coin_counter_w<2>))
+	cd4099_device &outlatch(CD4099(config, "outlatch"));
+	outlatch.q_out_cb<0>().set(FUNC(astrocde_state::coin_counter_w<0>));
+	outlatch.q_out_cb<1>().set(FUNC(astrocde_state::coin_counter_w<1>));
+	outlatch.q_out_cb<2>().set(FUNC(astrocde_state::sparkle_w<0>));
+	outlatch.q_out_cb<3>().set(FUNC(astrocde_state::sparkle_w<1>));
+	outlatch.q_out_cb<4>().set(FUNC(astrocde_state::sparkle_w<2>));
+	outlatch.q_out_cb<5>().set(FUNC(astrocde_state::sparkle_w<3>));
+	outlatch.q_out_cb<7>().set(FUNC(astrocde_state::coin_counter_w<2>));
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_DEFAULT_POSITION(1.0, 0.0, 1.0, 0.0)    /* adjusted to match screenshots */
-//  MCFG_SCREEN_DEFAULT_POSITION(1.066, -0.004, 1.048, -0.026)  /* adjusted to match flyer */
+	m_screen->set_default_position(1.0, 0.0, 1.0, 0.0);    /* adjusted to match screenshots */
+//  m_screen->set_default_position(1.066, -0.004, 1.048, -0.026);  /* adjusted to match flyer */
 
 	/* sound hardware */
 	SPEAKER(config, "center").front_center();
 
-	MCFG_DEVICE_MODIFY("astrocade1")
-	MCFG_ASTROCADE_IO_SO5_STROBE_CB(WRITE8("outlatch", cd4099_device, write_nibble_d0))
-	MCFG_ASTROCADE_IO_SO7_STROBE_CB(WRITE8(*this, astrocde_state, votrax_speech_w))
+	m_astrocade_sound1->so_cb<5>().set("outlatch", FUNC(cd4099_device::write_nibble_d0));
+	m_astrocade_sound1->so_cb<7>().set(FUNC(astrocde_state::votrax_speech_w));
 
-	MCFG_DEVICE_ADD("votrax", VOTRAX_SC01, 720000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "center", 0.85)
-MACHINE_CONFIG_END
+	VOTRAX_SC01(config, m_votrax, 720000);
+	m_votrax->add_route(ALL_OUTPUTS, "center", 0.85);
+}
 
-
-MACHINE_CONFIG_START(astrocde_state::gorf)
+void astrocde_state::gorf(machine_config &config)
+{
 	astrocade_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(wow_map)
-	MCFG_DEVICE_IO_MAP(port_map_stereo_pattern)
+	m_maincpu->set_addrmap(AS_PROGRAM, &astrocde_state::wow_map);
+	m_maincpu->set_addrmap(AS_IO, &astrocde_state::port_map_stereo_pattern);
 
-	MCFG_DEVICE_ADD("outlatch", CD4099, 0) // MC14099B on game board at U6
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, astrocde_state, coin_counter_w<0>))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, astrocde_state, coin_counter_w<1>))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, astrocde_state, sparkle_w<0>))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, astrocde_state, sparkle_w<1>))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, astrocde_state, sparkle_w<2>))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, astrocde_state, sparkle_w<3>))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, astrocde_state, gorf_sound_switch_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(OUTPUT("lamp6"))
+	cd4099_device &outlatch(CD4099(config, "outlatch")); // MC14099B on game board at U6
+	outlatch.q_out_cb<0>().set(FUNC(astrocde_state::coin_counter_w<0>));
+	outlatch.q_out_cb<1>().set(FUNC(astrocde_state::coin_counter_w<1>));
+	outlatch.q_out_cb<2>().set(FUNC(astrocde_state::sparkle_w<0>));
+	outlatch.q_out_cb<3>().set(FUNC(astrocde_state::sparkle_w<1>));
+	outlatch.q_out_cb<4>().set(FUNC(astrocde_state::sparkle_w<2>));
+	outlatch.q_out_cb<5>().set(FUNC(astrocde_state::sparkle_w<3>));
+	outlatch.q_out_cb<6>().set(FUNC(astrocde_state::gorf_sound_switch_w));
+	outlatch.q_out_cb<7>().set_output("lamp6");
 
-	MCFG_DEVICE_ADD("lamplatch", CD4099, 0) // MC14099B on game board at U7
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(OUTPUT("lamp0"))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(OUTPUT("lamp1"))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(OUTPUT("lamp2"))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(OUTPUT("lamp3"))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(OUTPUT("lamp4"))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(OUTPUT("lamp5"))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP) // n/c
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(OUTPUT("lamp7"))
+	cd4099_device &lamplatch(CD4099(config, "lamplatch")); // MC14099B on game board at U7
+	lamplatch.q_out_cb<0>().set_output("lamp0");
+	lamplatch.q_out_cb<1>().set_output("lamp1");
+	lamplatch.q_out_cb<2>().set_output("lamp2");
+	lamplatch.q_out_cb<3>().set_output("lamp3");
+	lamplatch.q_out_cb<4>().set_output("lamp4");
+	lamplatch.q_out_cb<5>().set_output("lamp5");
+	lamplatch.q_out_cb<6>().set_nop(); // n/c
+	lamplatch.q_out_cb<7>().set_output("lamp7");
 
-	MCFG_WATCHDOG_ADD("watchdog") // MC14024 on CPU board at U18
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 128) // CLK = VERTDR, Q7 used for RESET
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128); // MC14024 on CPU board at U18, CLK = VERTDR, Q7 used for RESET
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_DEFAULT_POSITION(1.0, 0.0, 1.0, 0.0)    /* adjusted to match flyer */
+	m_screen->set_default_position(1.0, 0.0, 1.0, 0.0);    /* adjusted to match flyer */
 
 	/* sound hardware */
 	SPEAKER(config, "upper", 0.0, 0.0, 1.0);
 	SPEAKER(config, "lower", 0.0, -0.5, 1.0);
 
-	MCFG_DEVICE_ADD("astrocade1", ASTROCADE_IO, ASTROCADE_CLOCK/4)
-	MCFG_ASTROCADE_IO_SI_READ_CB(READ8(*this, astrocde_state, input_mux_r))
-	MCFG_ASTROCADE_IO_SO0_STROBE_CB(WRITE8("watchdog", watchdog_timer_device, reset_w))
-	MCFG_ASTROCADE_IO_SO5_STROBE_CB(WRITE8("outlatch", cd4099_device, write_nibble_d0))
-	MCFG_ASTROCADE_IO_SO6_STROBE_CB(WRITE8("lamplatch", cd4099_device, write_nibble_d0))
-	MCFG_ASTROCADE_IO_SO7_STROBE_CB(WRITE8(*this, astrocde_state, votrax_speech_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "upper", 1.0)
+	ASTROCADE_IO(config, m_astrocade_sound1, ASTROCADE_CLOCK/4);
+	m_astrocade_sound1->si_cb().set(FUNC(astrocde_state::input_mux_r));
+	m_astrocade_sound1->so_cb<0>().set("watchdog", FUNC(watchdog_timer_device::reset_w));
+	m_astrocade_sound1->so_cb<5>().set("outlatch", FUNC(cd4099_device::write_nibble_d0));
+	m_astrocade_sound1->so_cb<6>().set("lamplatch", FUNC(cd4099_device::write_nibble_d0));
+	m_astrocade_sound1->so_cb<7>().set(FUNC(astrocde_state::votrax_speech_w));
+	m_astrocade_sound1->add_route(ALL_OUTPUTS, "upper", 1.0);
 
-	MCFG_DEVICE_ADD("astrocade2", ASTROCADE_IO, ASTROCADE_CLOCK/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lower", 1.0)
+	ASTROCADE_IO(config, "astrocade2", ASTROCADE_CLOCK/4).add_route(ALL_OUTPUTS, "lower", 1.0);
 
-	MCFG_DEVICE_ADD("votrax", VOTRAX_SC01, 720000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "upper", 0.85)
-MACHINE_CONFIG_END
+	VOTRAX_SC01(config, m_votrax, 720000);
+	m_votrax->add_route(ALL_OUTPUTS, "upper", 0.85);
+}
 
-
-MACHINE_CONFIG_START(astrocde_state::robby)
+void astrocde_state::robby(machine_config &config)
+{
 	astrocade_base(config);
 	astrocade_stereo_sound(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(robby_map)
-	MCFG_DEVICE_IO_MAP(port_map_stereo_pattern)
+	m_maincpu->set_addrmap(AS_PROGRAM, &astrocde_state::robby_map);
+	m_maincpu->set_addrmap(AS_IO, &astrocde_state::port_map_stereo_pattern);
 
-	MCFG_NVRAM_ADD_0FILL("nvram") // HM6116LP-4 + battery
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // HM6116LP-4 + battery
 
-	MCFG_DEVICE_ADD("outlatch", CD4099, 0) // on game board at U1
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, astrocde_state, coin_counter_w<0>))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, astrocde_state, coin_counter_w<1>))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, astrocde_state, coin_counter_w<2>))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(OUTPUT("led0"))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(OUTPUT("led1"))
+	cd4099_device &outlatch(CD4099(config, "outlatch")); // on game board at U1
+	outlatch.q_out_cb<0>().set(FUNC(astrocde_state::coin_counter_w<0>));
+	outlatch.q_out_cb<1>().set(FUNC(astrocde_state::coin_counter_w<1>));
+	outlatch.q_out_cb<2>().set(FUNC(astrocde_state::coin_counter_w<2>));
+	outlatch.q_out_cb<6>().set_output("led0");
+	outlatch.q_out_cb<7>().set_output("led1");
 
-	MCFG_DEVICE_MODIFY("astrocade1")
-	MCFG_ASTROCADE_IO_SO5_STROBE_CB(WRITE8("outlatch", cd4099_device, write_nibble_d0))
-MACHINE_CONFIG_END
+	m_astrocade_sound1->so_cb<5>().set("outlatch", FUNC(cd4099_device::write_nibble_d0));
+}
 
-
-MACHINE_CONFIG_START(astrocde_state::profpac)
+void astrocde_state::profpac(machine_config &config)
+{
 	astrocade_16color_base(config);
 	astrocade_stereo_sound(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(profpac_map)
-	MCFG_DEVICE_IO_MAP(port_map_16col_pattern)
+	m_maincpu->set_addrmap(AS_PROGRAM, &astrocde_state::profpac_map);
+	m_maincpu->set_addrmap(AS_IO, &astrocde_state::port_map_16col_pattern);
 
-	MCFG_DEVICE_MODIFY("bank4000")
-	MCFG_DEVICE_PROGRAM_MAP(profpac_bank4000_map)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(20)
+	m_bank4000->set_map(&astrocde_state::profpac_bank4000_map);
+	m_bank4000->set_addr_width(20);
 
-	MCFG_DEVICE_ADD("outlatch", OUTPUT_LATCH, 0) // 74LS174 on game board at U6
-	MCFG_OUTPUT_LATCH_BIT0_HANDLER(WRITELINE(*this, astrocde_state, coin_counter_w<0>))
-	MCFG_OUTPUT_LATCH_BIT1_HANDLER(WRITELINE(*this, astrocde_state, coin_counter_w<1>))
-	MCFG_OUTPUT_LATCH_BIT2_HANDLER(OUTPUT("led0"))
-	MCFG_OUTPUT_LATCH_BIT3_HANDLER(OUTPUT("led1"))
+	output_latch_device &outlatch(OUTPUT_LATCH(config, "outlatch", 0)); // 74LS174 on game board at U6
+	outlatch.bit_handler<0>().set(FUNC(astrocde_state::coin_counter_w<0>));
+	outlatch.bit_handler<1>().set(FUNC(astrocde_state::coin_counter_w<1>));
+	outlatch.bit_handler<2>().set_output("led0");
+	outlatch.bit_handler<3>().set_output("led1");
 
-	MCFG_DEVICE_ADD("lamplatch", OUTPUT_LATCH, 0) // 74LS174 on game board at U7
-	MCFG_OUTPUT_LATCH_BIT0_HANDLER(OUTPUT("lamp0"))    // left lamp A
-	MCFG_OUTPUT_LATCH_BIT1_HANDLER(OUTPUT("lamp1"))    // left lamp B
-	MCFG_OUTPUT_LATCH_BIT2_HANDLER(OUTPUT("lamp2"))    // left lamp C
-	MCFG_OUTPUT_LATCH_BIT4_HANDLER(OUTPUT("lamp3"))   // right lamp A
-	MCFG_OUTPUT_LATCH_BIT5_HANDLER(OUTPUT("lamp4"))   // right lamp B
-	MCFG_OUTPUT_LATCH_BIT6_HANDLER(OUTPUT("lamp5"))   // right lamp C
+	output_latch_device &lamplatch(OUTPUT_LATCH(config, "lamplatch", 0)); // 74LS174 on game board at U7
+	lamplatch.bit_handler<0>().set_output("lamp0");    // left lamp A
+	lamplatch.bit_handler<1>().set_output("lamp1");    // left lamp B
+	lamplatch.bit_handler<2>().set_output("lamp2");    // left lamp C
+	lamplatch.bit_handler<4>().set_output("lamp3");   // right lamp A
+	lamplatch.bit_handler<5>().set_output("lamp4");   // right lamp B
+	lamplatch.bit_handler<6>().set_output("lamp5");   // right lamp C
 
-	MCFG_DEVICE_MODIFY("astrocade1")
-	MCFG_ASTROCADE_IO_SO4_STROBE_CB(WRITE8("outlatch", output_latch_device, bus_w))
-	MCFG_ASTROCADE_IO_SO5_STROBE_CB(WRITE8("lamplatch", output_latch_device, bus_w))
-MACHINE_CONFIG_END
+	m_astrocade_sound1->so_cb<4>().set("outlatch", FUNC(output_latch_device::bus_w));
+	m_astrocade_sound1->so_cb<5>().set("lamplatch", FUNC(output_latch_device::bus_w));
+}
 
-
-MACHINE_CONFIG_START(demndrgn_state::demndrgn)
+void demndrgn_state::demndrgn(machine_config &config)
+{
 	astrocade_16color_base(config);
 	astrocade_mono_sound(config); // used only for I/O
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(demndrgn_map)
-	MCFG_DEVICE_IO_MAP(port_map_16col_pattern_demndrgn)
+	m_maincpu->set_addrmap(AS_PROGRAM, &demndrgn_state::demndrgn_map);
+	m_maincpu->set_addrmap(AS_IO, &demndrgn_state::port_map_16col_pattern_demndrgn);
 
-	MCFG_DEVICE_ADD("outlatch", OUTPUT_LATCH, 0)
-	MCFG_OUTPUT_LATCH_BIT0_HANDLER(WRITELINE(*this, astrocde_state, coin_counter_w<0>))
-	MCFG_OUTPUT_LATCH_BIT1_HANDLER(WRITELINE(*this, astrocde_state, coin_counter_w<1>))
-	MCFG_OUTPUT_LATCH_BIT2_HANDLER(OUTPUT("led0"))
-	MCFG_OUTPUT_LATCH_BIT3_HANDLER(OUTPUT("led1"))
-	MCFG_OUTPUT_LATCH_BIT4_HANDLER(WRITELINE(*this, demndrgn_state, input_select_w))
+	output_latch_device &outlatch(OUTPUT_LATCH(config, "outlatch", 0));
+	outlatch.bit_handler<0>().set(FUNC(astrocde_state::coin_counter_w<0>));
+	outlatch.bit_handler<1>().set(FUNC(astrocde_state::coin_counter_w<1>));
+	outlatch.bit_handler<2>().set_output("led0");
+	outlatch.bit_handler<3>().set_output("led1");
+	outlatch.bit_handler<4>().set(FUNC(demndrgn_state::input_select_w));
 
-	MCFG_DEVICE_MODIFY("astrocade1")
-	MCFG_ASTROCADE_IO_SO4_STROBE_CB(WRITE8("outlatch", output_latch_device, bus_w))
-	MCFG_ASTROCADE_IO_POT0("FIREX")
-	MCFG_ASTROCADE_IO_POT1("FIREY")
-MACHINE_CONFIG_END
+	m_astrocade_sound1->so_cb<4>().set("outlatch", FUNC(output_latch_device::bus_w));
+	m_astrocade_sound1->set_pot_tag<0>("FIREX");
+	m_astrocade_sound1->set_pot_tag<1>("FIREY");
+}
 
-
-MACHINE_CONFIG_START(tenpindx_state::tenpindx)
+void tenpindx_state::tenpindx(machine_config &config)
+{
 	astrocade_16color_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(profpac_map)
-	MCFG_DEVICE_IO_MAP(port_map_16col_pattern_tenpindx)
+	m_maincpu->set_addrmap(AS_PROGRAM, &tenpindx_state::profpac_map);
+	m_maincpu->set_addrmap(AS_IO, &tenpindx_state::port_map_16col_pattern_tenpindx);
 
-	MCFG_DEVICE_ADD("sub", Z80, ASTROCADE_CLOCK/4) /* real clock unknown */
-	MCFG_Z80_DAISY_CHAIN(tenpin_daisy_chain)
-	MCFG_DEVICE_PROGRAM_MAP(sub_map)
-	MCFG_DEVICE_IO_MAP(sub_io_map)
+	Z80(config, m_subcpu, ASTROCADE_CLOCK/4); /* real clock unknown */
+	m_subcpu->set_daisy_config(tenpin_daisy_chain);
+	m_subcpu->set_addrmap(AS_PROGRAM, &tenpindx_state::sub_map);
+	m_subcpu->set_addrmap(AS_IO, &tenpindx_state::sub_io_map);
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, ASTROCADE_CLOCK/4 /* same as "sub" */)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("sub", INPUT_LINE_IRQ0))
+	z80ctc_device& ctc(Z80CTC(config, "ctc", ASTROCADE_CLOCK/4 /* same as "sub" */));
+	ctc.intr_callback().set_inputline(m_subcpu, INPUT_LINE_IRQ0);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("sub", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_subcpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("aysnd", AY8912, ASTROCADE_CLOCK/4)  /* real clock unknown */
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DIPSW"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
-MACHINE_CONFIG_END
+	ay8912_device &aysnd(AY8912(config, "aysnd", ASTROCADE_CLOCK/4));  /* real clock unknown */
+	aysnd.port_a_read_callback().set_ioport("DIPSW");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.33);
+}
 
 
 

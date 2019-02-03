@@ -5,6 +5,10 @@
     Taito Grand Champ hardware
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_GRCHAMP_H
+#define MAME_INCLUDES_GRCHAMP_H
+
+#pragma once
 
 #include "machine/input_merger.h"
 #include "machine/watchdog.h"
@@ -15,8 +19,8 @@
 class grchamp_state : public driver_device
 {
 public:
-	grchamp_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	grchamp_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_subcpu(*this, "sub"),
@@ -33,9 +37,14 @@ public:
 		m_rightram(*this, "rightram"),
 		m_centerram(*this, "centerram"),
 		m_digits(*this, "digit%u", 0U)
-		{ }
+	{ }
 
 	void grchamp(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 private:
 	DECLARE_WRITE8_MEMBER(cpu0_outputs_w);
@@ -68,7 +77,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_center_tile_info);
 	TILEMAP_MAPPER_MEMBER(get_memory_offset);
 
-	DECLARE_PALETTE_INIT(grchamp);
+	void grchamp_palette(palette_device &palette) const;
 	INTERRUPT_GEN_MEMBER(cpu0_interrupt);
 	INTERRUPT_GEN_MEMBER(cpu1_interrupt);
 	TIMER_CALLBACK_MEMBER(main_to_sub_comm_sync_w);
@@ -98,14 +107,10 @@ private:
 	uint8_t       m_collmode;
 
 	bitmap_ind16 m_work_bitmap;
-	tilemap_t * m_text_tilemap;
-	tilemap_t * m_left_tilemap;
-	tilemap_t * m_center_tilemap;
-	tilemap_t * m_right_tilemap;
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	tilemap_t *m_text_tilemap;
+	tilemap_t *m_left_tilemap;
+	tilemap_t *m_center_tilemap;
+	tilemap_t *m_right_tilemap;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -140,3 +145,5 @@ private:
 /*----------- defined in audio/grchamp.c -----------*/
 
 DISCRETE_SOUND_EXTERN( grchamp_discrete );
+
+#endif // MAME_INCLUDES_GRCHAMP_H

@@ -19,28 +19,25 @@ TODO:
 #include "pci.h"
 #include "idectrl.h"
 
-#define MCFG_IDE_PCI_IRQ_HANDLER(_devcb) \
-	devcb = &downcast<ide_pci_device &>(*device).set_irq_handler(DEVCB_##_devcb);
-
-// This will set the top 12 bits for address decoding in legacy mode. Needed for seattle driver.
-#define MCFG_IDE_PCI_SET_LEGACY_TOP(_val) \
-	downcast<ide_pci_device &>(*device).set_legacy_top(_val);
-
-// Sets the default Programming Interface (PIF) register
-#define MCFG_IDE_PCI_SET_PIF(_val) \
-	downcast<ide_pci_device &>(*device).set_pif(_val);
-
 class ide_pci_device : public pci_device {
 public:
-	ide_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t main_id, uint32_t revision, uint32_t subdevice_id)
+	ide_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t main_id, uint32_t revision, uint32_t subdevice_id
+		, const char *bmtag = ":pci:00.0", uint32_t bmspace = AS_DATA)
 		: ide_pci_device(mconfig, tag, owner, clock)
 	{
 		set_ids(main_id, revision, 0x01018a, subdevice_id);
+		m_bus_master_tag = bmtag;
+		m_bus_master_space = bmspace;
 	}
 	ide_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return m_irq_handler.set_callback(std::forward<Object>(cb)); }
+	auto irq_handler() { return m_irq_handler.bind(); }
+
+	// This will set the top 12 bits for address decoding in legacy mode. Needed for seattle driver.
 	void set_legacy_top(int val) { m_legacy_top = val & 0xfff; };
+
+	// Sets the default Programming Interface (PIF) register
 	void set_pif(int val) { m_pif = val & 0xff; };
 
 protected:
@@ -73,6 +70,8 @@ private:
 	// Bits 31-20 for legacy mode hack
 	uint32_t m_legacy_top;
 	uint32_t m_pif;
+	const char* m_bus_master_tag;
+	uint32_t m_bus_master_space;
 
 	uint32_t m_config_data[0x10];
 	void chan1_data_command_map(address_map &map);

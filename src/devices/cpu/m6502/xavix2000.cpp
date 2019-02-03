@@ -2,13 +2,13 @@
 // copyright-holders:David Haywood
 /***************************************************************************
 
-    xavix2000.cpp
+    xavix2000.cpp (Super XaviX)
 
     The dies for these are marked
 
     SSD 2000 NEC 85605-621
-    and possibly
-    SSD 2002 NEC 85054-611 (although this might use even more opcodes and need it's own file)
+
+    SSD 2002 NEC 85054-611
 
     6502 with custom opcodes
     integrated gfx / sound
@@ -17,62 +17,12 @@
 
     see xavix.cpp for basic notes
 
-    the machines using the '2000' series chips seem to have more extra
-    opcodes, so presumably these were only available in those models.
-    of note, push x / push y and pull x / pull y
+    the 2000 chip has more opcodes than the 97/98 chips in xavix.cpp, and
+    is a similar die structure to the 2002 chip, but doesn't seem to have any
+    additional capabilities.
 
-    Dirt Rebel MX, which is confirmed as 2000 type however seems to require
-    some of the documented but 'undocumented' opcodes on the 6502 to have additonal
-    meaning for one specific function on startup
-
-    01BC37: A0 3F       ldy #$3f
-    01BC39: B2          ??
-    01BC3A: 1B          ??
-            9B          ??
-    -- outer loop
-    01BC3C: 98          tya
-    01BC3D: 5B          (has to be 1 byte?)
-    -- inner loop
-    01BC3E: A3          (has to be 1 byte)
-            73          (could be 3 byte?)
-    01BC40: 83 FB       presumably fb is the address
-    01BC42: A7          (presumably 1 byte)
-            73          (could be 3 byte?)
-    01BC44: 87 FB       presumably fb is the address
-    01BC46: D0 F6       bne $1bc3e
-    01BC48: 88          dey
-    01BC49: 10 F1       bpl $1bc3c
-    01BC4B: 8D FB 00    sta $00fb
-    01BC4E: A3          ??
-    01BC4F: 8D FA 00    sta $00fa
-    01BC52: 07          ??
-    --
-    01BC53: D0 03       bne $1bc58
-    01BC55: CE fa 00    dec $00fa
-    01BC58: 80          retf
-
-    this is presumably meant to be similar to the function found in Namco
-    Nostalgia 2
-
-    09FFD8: A9 3F       lda #$3f
-    09FFDA: 85 01       sta $01
-    09FFDC: A0 00       ldy #$00
-    09FFDE: AD FA 00    lda $00fa
-    09FFE1: 71 00       adc ($00), y
-    09FFE3: 8D FA 00    sta $00fa
-    09FFE6: C8          iny
-    09FFE7: AD FB 00    lda $00fb
-    09FFEA: 71 00       adc ($00), y
-    09FFEC: 8D FB 00    sta $00fb
-    09FFEF: C8          iny
-    09FFF0: D0 EC       bne $c
-    09FFF2: C6 01       dec $01
-    09FFF4: 10 E8       bpl $9ffde
-    09FFF6: 0D FA 00    ora $00fa
-    --
-    09FFF9: D0 03       bne $9fffe
-    09FFFB: CE FA 00    dec $00fa
-    09FFFE: 80          retf
+    the 2002 chip seems to be the one that was officially dubbed 'SuperXaviX'
+    and has additional video capabilities on top of the extended opcodes.
 
 
 ***************************************************************************/
@@ -81,10 +31,13 @@
 #include "xavix2000.h"
 #include "xavix2000d.h"
 
-DEFINE_DEVICE_TYPE(XAVIX2000, xavix2000_device, "xavix2000", "XaviX (SSD 2000 / 2002)")
+DEFINE_DEVICE_TYPE(XAVIX2000, xavix2000_device, "xavix2000", "XaviX (SSD 2000)")
+DEFINE_DEVICE_TYPE(XAVIX2002, xavix2002_device, "xavix2002", "XaviX (SSD 2002) (SuperXaviX)")
 
-xavix2000_device::xavix2000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	xavix_device(mconfig, XAVIX2000, tag, owner, clock)
+
+
+xavix2000_device::xavix2000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	xavix_device(mconfig, type, tag, owner, clock)
 {
 	program_config.m_addr_width = 24;
 	program_config.m_logaddr_width = 24;
@@ -92,10 +45,81 @@ xavix2000_device::xavix2000_device(const machine_config &mconfig, const char *ta
 	sprogram_config.m_logaddr_width = 24;
 }
 
+xavix2000_device::xavix2000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	xavix2000_device(mconfig, XAVIX2000, tag, owner, clock)
+{
+}
+
+xavix2002_device::xavix2002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	xavix2000_device(mconfig, XAVIX2002, tag, owner, clock)
+{
+}
+
+
+void xavix2000_device::device_start()
+{
+	xavix_device::device_start();
+
+	state_add(SXAVIX_J, "J", m_j).callimport().formatstr("%8s");;
+	state_add(SXAVIX_K, "K", m_k).callimport().formatstr("%8s");;
+	state_add(SXAVIX_L, "L", m_l).callimport().formatstr("%8s");;
+	state_add(SXAVIX_M, "M", m_m).callimport().formatstr("%8s");;
+	state_add(SXAVIX_PA, "PA", m_pa).callimport().formatstr("%8s");
+	state_add(SXAVIX_PB, "PB", m_pb).callimport().formatstr("%8s");
+}
 
 std::unique_ptr<util::disasm_interface> xavix2000_device::create_disassembler()
 {
 	return std::make_unique<xavix2000_disassembler>();
+}
+
+
+void xavix2000_device::state_import(const device_state_entry &entry)
+{
+	xavix_device::state_import(entry);
+
+	switch(entry.index())
+	{
+	case SXAVIX_J:
+		break;
+	case SXAVIX_K:
+		break;
+	case SXAVIX_L:
+		break;
+	case SXAVIX_M:
+		break;
+	case SXAVIX_PA:
+		break;
+	case SXAVIX_PB:
+		break;
+	}
+}
+
+void xavix2000_device::state_string_export(const device_state_entry &entry, std::string &str) const
+{
+	xavix_device::state_string_export(entry, str);
+
+	switch(entry.index())
+	{
+	case SXAVIX_J:
+		str = string_format("%02x", m_j);
+		break;
+	case SXAVIX_K:
+		str = string_format("%02x", m_k);
+		break;
+	case SXAVIX_L:
+		str = string_format("%02x", m_l);
+		break;
+	case SXAVIX_M:
+		str = string_format("%02x", m_m);
+		break;
+	case SXAVIX_PA:
+		str = string_format("%08x", m_pa);
+		break;
+	case SXAVIX_PB:
+		str = string_format("%08x", m_pb);
+		break;
+	}
 }
 
 

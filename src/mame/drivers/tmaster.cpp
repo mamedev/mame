@@ -113,8 +113,8 @@ Chips:
 class tmaster_state : public driver_device
 {
 public:
-	tmaster_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	tmaster_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
@@ -369,15 +369,15 @@ int tmaster_compute_addr(uint16_t reg_low, uint16_t reg_mid, uint16_t reg_high)
 MACHINE_CONFIG_START(tmaster_state::tm)
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000) / 2) /* 12MHz */
 	MCFG_DEVICE_PROGRAM_MAP(tmaster_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", tmaster_state, scanline_interrupt, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(tmaster_state::scanline_interrupt), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD( "duart68681", MC68681, XTAL(8'664'000) / 2 /*??*/)
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, tmaster_state, duart_irq_handler))
-	MCFG_MC68681_A_TX_CALLBACK(WRITELINE("microtouch", microtouch_device, rx))
+	MC68681(config, m_duart, XTAL(8'664'000) / 2 /*??*/);
+	m_duart->irq_cb().set(FUNC(tmaster_state::duart_irq_handler));
+	m_duart->a_tx_cb().set(m_microtouch, FUNC(microtouch_device::rx));
 
-	MCFG_MICROTOUCH_ADD( "microtouch", 9600, WRITELINE("duart68681", mc68681_device, rx_a_w) )
+	MICROTOUCH(config, m_microtouch, 9600).stx().set(m_duart, FUNC(mc68681_device::rx_a_w));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -386,14 +386,13 @@ MACHINE_CONFIG_START(tmaster_state::tm)
 	MCFG_SCREEN_SIZE(400, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 400-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tmaster_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x1000);
 
-	MCFG_CESBLIT_ADD("blitter", "screen", XTAL(32'000'000))
-	MCFG_CESBLIT_COMPUTE_ADDR(tmaster_compute_addr)
-	MCFG_CESBLIT_IRQ_CB(WRITELINE(*this, tmaster_state, blitter_irq_callback))
+	CESBLIT(config, m_blitter, XTAL(32'000'000), m_screen);
+	m_blitter->set_compute_addr(tmaster_compute_addr);
+	m_blitter->irq_callback().set(FUNC(tmaster_state::blitter_irq_callback));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -402,10 +401,11 @@ MACHINE_CONFIG_START(tmaster_state::tm)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(tmaster_state::tmds1204)
+void tmaster_state::tmds1204(machine_config &config)
+{
 	tm(config);
-	MCFG_DS1204_ADD("ds1204")
-MACHINE_CONFIG_END
+	DS1204(config, "ds1204", 0);
+}
 
 /***************************************************************************
 
@@ -742,6 +742,26 @@ ROM_START( tm4ka )
 	ROM_REGION( 0x200000, "maincpu", 0 ) // 68000 Code
 	ROM_LOAD16_BYTE( "tm4k_v6.02.u51", 0x000000, 0x100000, CRC(3d8d7848) SHA1(31638f23cdd5e6cfbb2270e953f84fe1bd437950) ) /* TOUCHMASTER 4000 U51 DOMESTIC  6.02 (Standard 4-14-98) */
 	ROM_LOAD16_BYTE( "tm4k_v6.02.u52", 0x000001, 0x100000, CRC(6d412871) SHA1(ae27c7723b292daf6682c53bafac22e4a3cd1ece) ) /* TOUCHMASTER 4000 U52 DOMESTIC  6.02 (Standard 4-14-98) */
+
+	ROM_REGION( 0x000022, "ds1204", 0 )
+	ROM_LOAD( "a-21657-003", 0x0000, 0x000022, CRC(b9facb2a) SHA1(17157534f45ec6db78f952586bd98f1f7e7215c1) )
+
+	ROM_REGION( 0x600000, "blitter", 0 )    // Blitter gfx
+	ROM_LOAD16_BYTE( "tm4k_graphic.u38", 0x000000, 0x100000, CRC(a6683899) SHA1(d05024390917cdb1871d030996da8e1eb6460918) ) /* Mask rom labeled 5341-15746-03 U38 VIDEO IMAGE */
+	ROM_LOAD16_BYTE( "tm4k_graphic.u36", 0x000001, 0x100000, CRC(7bde520d) SHA1(77750b689e2f0d47804042456e54bbd9c28deeac) ) /* Mask rom labeled 5341-15746-01 U36 VIDEO IMAGE */
+	ROM_LOAD16_BYTE( "tm4k_graphic.u39", 0x200000, 0x100000, CRC(bac88cfb) SHA1(26ed169296b890c5f5b50c418c15299355a6592f) ) /* Mask rom labeled 5341-15746-04 U39 VIDEO IMAGE */
+	ROM_LOAD16_BYTE( "tm4k_graphic.u37", 0x200001, 0x100000, CRC(bf49fafa) SHA1(b400667bf654dc9cd01a85c8b99670459400fd60) ) /* Mask rom labeled 5341-15746-02 U37 VIDEO IMAGE */
+	ROM_LOAD16_BYTE( "tm4k_graphic.u41", 0x400000, 0x100000, CRC(e97edb1e) SHA1(75510676cf1692ad03efd4ccd57d25af1cc8ef2a) ) /* Mask rom labeled 5341-15746-06 U41 VIDEO IMAGE */
+	ROM_LOAD16_BYTE( "tm4k_graphic.u40", 0x400001, 0x100000, CRC(f6771a09) SHA1(74f71d5e910006c83a38170f24aa811c38a3e020) ) /* Mask rom labeled 5341-15746-05 U40 VIDEO IMAGE */
+
+	ROM_REGION( 0x100000, "oki", 0 ) // Samples
+	ROM_LOAD( "tm4k_sound.u8", 0x00000, 0x100000, CRC(48c3782b) SHA1(bfe105ddbde8bbbd84665dfdd565d6d41926834a) ) /* Mask rom labeled 5341-15746-07 U8 SOUND IMAGE */
+ROM_END
+
+ROM_START( tm4kuk )
+	ROM_REGION( 0x200000, "maincpu", 0 ) // 68000 Code
+	ROM_LOAD16_BYTE( "tm4k_v6.02uk.u51", 0x000000, 0x100000, CRC(83f506f9) SHA1(58cb2aa4ec8e9c9c4087bf9d6a50407e23c12e35) ) /* TOUCHMASTER 4000 U51 ENGLAND  6.02 (U.K. 4-14-98) */
+	ROM_LOAD16_BYTE( "tm4k_v6.02uk.u52", 0x000001, 0x100000, CRC(3303bd94) SHA1(d00a2e5094cf5e104a1da74d66cd89e7ccc26658) ) /* TOUCHMASTER 4000 U52 ENGLAND  6.02 (U.K. 4-14-98) */
 
 	ROM_REGION( 0x000022, "ds1204", 0 )
 	ROM_LOAD( "a-21657-003", 0x0000, 0x000022, CRC(b9facb2a) SHA1(17157534f45ec6db78f952586bd98f1f7e7215c1) )
@@ -1157,6 +1177,7 @@ GAME( 1997, tm3keval,   tm3k,     tm,       tm2k, tmaster_state, empty_init, ROT
 GAME( 1998, tm4k,       0,        tmds1204, tm4k, tmaster_state, empty_init, ROT0, "Midway Games Inc.",            "Touchmaster 4000 (v6.03 Standard)",                 0 )
 GAME( 1998, tm4knj,     tm4k,     tmds1204, tm4k, tmaster_state, empty_init, ROT0, "Midway Games Inc.",            "Touchmaster 4000 (v6.03 New Jersey)",               0 )
 GAME( 1998, tm4ka,      tm4k,     tmds1204, tm4k, tmaster_state, empty_init, ROT0, "Midway Games Inc.",            "Touchmaster 4000 (v6.02 Standard)",                 0 )
+GAME( 1998, tm4kuk,     tm4k,     tmds1204, tm4k, tmaster_state, empty_init, ROT0, "Midway Games Inc.",            "Touchmaster 4000 (v6.02 England)",                  0 )
 GAME( 1998, tm4kca,     tm4k,     tmds1204, tm4k, tmaster_state, empty_init, ROT0, "Midway Games Inc.",            "Touchmaster 4000 (v6.02 California)",               0 )
 GAME( 1998, tm4kb,      tm4k,     tmds1204, tm4k, tmaster_state, empty_init, ROT0, "Midway Games Inc.",            "Touchmaster 4000 (v6.01 Standard)",                 0 )
 GAME( 1998, tm4kmn,     tm4k,     tmds1204, tm4k, tmaster_state, empty_init, ROT0, "Midway Games Inc.",            "Touchmaster 4000 (v6.01 Minnesota)",                0 )

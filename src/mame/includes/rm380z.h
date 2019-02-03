@@ -15,7 +15,7 @@ Research Machines RM 380Z
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
 #include "machine/keyboard.h"
 
@@ -49,8 +49,8 @@ Research Machines RM 380Z
 class rm380z_state : public driver_device
 {
 public:
-	rm380z_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	rm380z_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, RM380Z_MAINCPU_TAG),
 		m_cassette(*this, "cassette"),
 		m_messram(*this, RAM_TAG),

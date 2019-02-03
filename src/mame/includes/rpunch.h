@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
+#ifndef MAME_INCLUDES_RPUNCH_H
+#define MAME_INCLUDES_RPUNCH_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "sound/upd7759.h"
@@ -10,8 +14,8 @@
 class rpunch_state : public driver_device
 {
 public:
-	rpunch_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	rpunch_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_soundlatch(*this, "soundlatch"),
@@ -22,7 +26,8 @@ public:
 		m_gga(*this, "gga"),
 		m_videoram(*this, "videoram"),
 		m_bitmapram(*this, "bitmapram"),
-		m_spriteram(*this, "spriteram") { }
+		m_spriteram(*this, "spriteram")
+	{ }
 
 	void svolley(machine_config &config);
 	void rpunch(machine_config &config);
@@ -32,6 +37,10 @@ public:
 	void init_svolley();
 
 	DECLARE_CUSTOM_INPUT_MEMBER(hi_bits_r);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -67,8 +76,6 @@ private:
 	DECLARE_WRITE8_MEMBER(upd_data_w);
 	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	DECLARE_VIDEO_START(rpunch);
 	DECLARE_VIDEO_START(svolley);
@@ -80,3 +87,5 @@ private:
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_RPUNCH_H

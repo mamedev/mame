@@ -92,8 +92,8 @@ private:
 	emu_timer *m_serial_timer;
 	emu_timer *m_mouse_timer;
 
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_mousecpu;
+	required_device<i8035_device> m_maincpu;
+	required_device<i8035_device> m_mousecpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_ioport m_z14;
 	required_ioport m_mouseb;

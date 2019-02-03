@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
+#ifndef MAME_INCLUDES_AEROFGT_H
+#define MAME_INCLUDES_AEROFGT_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "video/vsystem_spr.h"
@@ -172,3 +176,5 @@ public:
 	void wbbc97_map(address_map &map);
 	void wbbc97_sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_AEROFGT_H

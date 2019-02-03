@@ -58,35 +58,36 @@ void pm68k_state::machine_reset()
 	m_maincpu->reset();
 }
 
-MACHINE_CONFIG_START(pm68k_state::pm68k)
+void pm68k_state::pm68k(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 8000000)
-	MCFG_DEVICE_PROGRAM_MAP(pm68k_mem)
+	M68000(config, m_maincpu, 8000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pm68k_state::pm68k_mem);
 
-	MCFG_DEVICE_ADD("mpsc", I8274_NEW, 0)
-	MCFG_Z80SIO_OUT_TXDA_CB(WRITELINE("rs232a", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_DTRA_CB(WRITELINE("rs232a", rs232_port_device, write_dtr))
-	MCFG_Z80SIO_OUT_RTSA_CB(WRITELINE("rs232a", rs232_port_device, write_rts))
-	MCFG_Z80SIO_OUT_TXDB_CB(WRITELINE("rs232b", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_DTRB_CB(WRITELINE("rs232b", rs232_port_device, write_dtr))
-	MCFG_Z80SIO_OUT_RTSB_CB(WRITELINE("rs232b", rs232_port_device, write_rts))
+	i8274_new_device& mpsc(I8274_NEW(config, "mpsc", 0));
+	mpsc.out_txda_callback().set("rs232a", FUNC(rs232_port_device::write_txd));
+	mpsc.out_dtra_callback().set("rs232a", FUNC(rs232_port_device::write_dtr));
+	mpsc.out_rtsa_callback().set("rs232a", FUNC(rs232_port_device::write_rts));
+	mpsc.out_txdb_callback().set("rs232b", FUNC(rs232_port_device::write_txd));
+	mpsc.out_dtrb_callback().set("rs232b", FUNC(rs232_port_device::write_dtr));
+	mpsc.out_rtsb_callback().set("rs232b", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("stc", AM9513, 4000000)
-	MCFG_AM9513_OUT4_CALLBACK(WRITELINE("mpsc", i8274_new_device, rxca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("mpsc", i8274_new_device, txca_w))
-	MCFG_AM9513_OUT5_CALLBACK(WRITELINE("mpsc", i8274_new_device, rxcb_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("mpsc", i8274_new_device, txcb_w))
+	am9513_device &stc(AM9513(config, "stc", 4000000));
+	stc.out4_cb().set("mpsc", FUNC(i8274_new_device::rxca_w));
+	stc.out4_cb().append("mpsc", FUNC(i8274_new_device::txca_w));
+	stc.out5_cb().set("mpsc", FUNC(i8274_new_device::rxcb_w));
+	stc.out5_cb().append("mpsc", FUNC(i8274_new_device::txcb_w));
 
-	MCFG_DEVICE_ADD("rs232a", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("mpsc", i8274_new_device, rxa_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("mpsc", i8274_new_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("mpsc", i8274_new_device, ctsa_w))
+	rs232_port_device &rs232a(RS232_PORT(config, "rs232a", default_rs232_devices, "terminal"));
+	rs232a.rxd_handler().set("mpsc", FUNC(i8274_new_device::rxa_w));
+	rs232a.dsr_handler().set("mpsc", FUNC(i8274_new_device::dcda_w));
+	rs232a.cts_handler().set("mpsc", FUNC(i8274_new_device::ctsa_w));
 
-	MCFG_DEVICE_ADD("rs232b", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("mpsc", i8274_new_device, rxb_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("mpsc", i8274_new_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("mpsc", i8274_new_device, ctsb_w))
-MACHINE_CONFIG_END
+	rs232_port_device &rs232b(RS232_PORT(config, "rs232b", default_rs232_devices, nullptr));
+	rs232b.rxd_handler().set("mpsc", FUNC(i8274_new_device::rxb_w));
+	rs232b.dsr_handler().set("mpsc", FUNC(i8274_new_device::dcdb_w));
+	rs232b.cts_handler().set("mpsc", FUNC(i8274_new_device::ctsb_w));
+}
 
 /* ROM definition */
 ROM_START( pm68k )

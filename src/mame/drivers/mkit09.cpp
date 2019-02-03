@@ -198,53 +198,55 @@ WRITE8_MEMBER( mkit09_state::pb_w )
 }
 
 
-MACHINE_CONFIG_START(mkit09_state::mkit09)
+void mkit09_state::mkit09(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(mkit09_mem)
+	MC6809(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &mkit09_state::mkit09_mem);
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_mkit09)
+	config.set_default_layout(layout_mkit09);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, mkit09_state, pa_r))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, mkit09_state, pb_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, mkit09_state, pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, mkit09_state, pb_w))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
+	PIA6821(config, m_pia, 0);
+	m_pia->readpa_handler().set(FUNC(mkit09_state::pa_r));
+	m_pia->readpb_handler().set(FUNC(mkit09_state::pb_r));
+	m_pia->writepa_handler().set(FUNC(mkit09_state::pa_w));
+	m_pia->writepb_handler().set(FUNC(mkit09_state::pb_w));
+	m_pia->irqa_handler().set_inputline("maincpu", M6809_IRQ_LINE);
+	m_pia->irqb_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 
-	MCFG_CASSETTE_ADD( "cassette" )
-MACHINE_CONFIG_END
+	CASSETTE(config, m_cass);
+}
 
-MACHINE_CONFIG_START(mkit09_state::mkit09a)
+void mkit09_state::mkit09a(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(mkit09a_mem)
+	MC6809(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &mkit09_state::mkit09a_mem);
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_mkit09)
+	config.set_default_layout(layout_mkit09);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, mkit09_state, pa_r))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, mkit09_state, pb_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, mkit09_state, pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, mkit09_state, pb_w))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
+	PIA6821(config, m_pia, 0);
+	m_pia->readpa_handler().set(FUNC(mkit09_state::pa_r));
+	m_pia->readpb_handler().set(FUNC(mkit09_state::pb_r));
+	m_pia->writepa_handler().set(FUNC(mkit09_state::pa_w));
+	m_pia->writepb_handler().set(FUNC(mkit09_state::pb_w));
+	m_pia->irqa_handler().set_inputline("maincpu", M6809_IRQ_LINE);
+	m_pia->irqb_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 
-	MCFG_CASSETTE_ADD( "cassette" )
-MACHINE_CONFIG_END
+	CASSETTE(config, m_cass);
+}
 
 /* ROM definition */
 ROM_START( mkit09 )

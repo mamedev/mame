@@ -7,13 +7,6 @@
 
 #include "cpu/m6800/m6801.h"
 
-#define MCFG_MPU401_ADD(tag, irqf) \
-		MCFG_DEVICE_ADD((tag), MPU401, 0) \
-		MCFG_IRQ_FUNC(irqf)
-
-#define MCFG_IRQ_FUNC(irqf) \
-		devcb = &downcast<mpu401_device *>(device)->set_irqf(DEVCB_##irqf);
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -22,12 +15,9 @@ class mpu401_device : public device_t
 {
 public:
 	// construction/destruction
-	mpu401_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mpu401_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	template <class Write> devcb_base &set_irqf(Write &&wr)
-	{
-		return write_irq.set_callback(std::forward<Write>(wr));
-	}
+	auto irq_cb() { return write_irq.bind(); }
 
 	// public API - call for reads/writes at I/O 330/331 on PC, C0n0/C0n1 on Apple II, etc.
 	DECLARE_READ8_MEMBER(mpu_r);
@@ -53,7 +43,6 @@ private:
 	DECLARE_READ8_MEMBER(port2_r);
 	DECLARE_WRITE8_MEMBER(port2_w);
 
-	void mpu401_io_map(address_map &map);
 	void mpu401_map(address_map &map);
 
 	required_device<m6801_cpu_device> m_ourcpu;

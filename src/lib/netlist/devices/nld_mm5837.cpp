@@ -107,14 +107,14 @@ namespace netlist
 
 			// We only need to update the net first if this is a time stepping net
 			if (m_is_timestep)
-				m_RV.update_dev();
+				m_RV.update();
 			m_RV.set(NL_FCONST(1.0) / R, V, 0.0);
 			m_RV.m_P.schedule_solve_after(NLTIME_FROM_NS(1));
 		}
 
 	}
 
-	NETLIB_DEVICE_IMPL(MM5837_dip)
+	NETLIB_DEVICE_IMPL(MM5837_dip, "MM5837_DIP", "")
 
 	} //namespace devices
 } // namespace netlist

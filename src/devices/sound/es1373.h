@@ -8,9 +8,6 @@
 
 #include "machine/pci.h"
 
-#define MCFG_ES1373_IRQ_HANDLER(cb) \
-	devcb = &downcast<es1373_device &>(*device).set_irq_handler(DEVCB_##cb);
-
 class es1373_device : public pci_device, public device_sound_interface
 {
 public:
@@ -19,7 +16,7 @@ public:
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
-	template <typename T> devcb_base &set_irq_handler(T &&cb) { return m_irq_handler.set_callback(std::forward<T>(cb)); }
+	auto irq_handler() { return m_irq_handler.bind(); }
 
 	DECLARE_READ32_MEMBER (reg_r);
 	DECLARE_WRITE32_MEMBER(reg_w);

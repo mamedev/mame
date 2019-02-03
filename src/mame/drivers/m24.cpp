@@ -4,17 +4,32 @@
 
     Olivetti M24 emulation
 
+    http://olivettim24.hadesnet.org/index.html
+    https://sites.google.com/site/att6300shrine/Home
+    http://www.ti99.com/exelvision/website/index.php?page=logabax-persona-1600
+
+    The AT&T PC6300, the Xerox 6060 and the Logabax Persona 1600 were
+    badge-engineered Olivetti M24s.
+
 ****************************************************************************/
 
 #include "emu.h"
 
+#include "bus/isa/isa.h"
+#include "bus/isa/isa_cards.h"
 #include "cpu/i86/i86.h"
 #include "cpu/tms7000/tms7000.h"
 #include "imagedev/floppy.h"
+#include "machine/am9517a.h"
+#include "machine/i8087.h"
 #include "machine/m24_kbd.h"
 #include "machine/m24_z8000.h"
 #include "machine/mm58274c.h"
-#include "machine/genpc.h"
+#include "machine/pit8253.h"
+#include "machine/pic8259.h"
+#include "machine/ram.h"
+#include "sound/spkrdev.h"
+#include "speaker.h"
 
 #include "formats/pc_dsk.h"
 #include "formats/naslite_dsk.h"
@@ -28,46 +43,131 @@ public:
 	m24_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_mb(*this, "mb"),
+		m_ram(*this, RAM_TAG),
+		m_isabus(*this, "isabus"),
+		m_dmac(*this, "dmac"),
+		m_pic(*this, "pic"),
+		m_pit(*this, "pit"),
+		m_speaker(*this, "speaker"),
 		m_kbc(*this, "kbc"),
 		m_keyboard(*this, "keyboard"),
-		m_z8000_apb(*this, "z8000_apb")
+		m_z8000_apb(*this, "z8000_apb"),
+		m_dsw0(*this, "DSW0")
 	{ }
 
 	void olivetti(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
-	required_device<cpu_device> m_maincpu;
-	required_device<pc_noppi_mb_device> m_mb;
-	required_device<cpu_device> m_kbc;
+	void dma_segment_w(offs_t offset, u8 data);
+	DECLARE_WRITE_LINE_MEMBER(dma_hrq_w);
+	u8 dma_memory_read(offs_t offset);
+	void dma_memory_write(offs_t offset, u8 data);
+	template <int Channel> u8 dma_io_read(offs_t offset);
+	template <int Channel> void dma_io_write(offs_t offset, u8 data);
+	template <int Channel> DECLARE_WRITE_LINE_MEMBER(dma_dack_w);
+	DECLARE_WRITE_LINE_MEMBER(dma_tc_w);
+	DECLARE_WRITE_LINE_MEMBER(dreq0_ck_w);
+	DECLARE_WRITE_LINE_MEMBER(speaker_ck_w);
+	void update_speaker();
+
+	u8 keyboard_data_r();
+	u8 keyboard_status_r();
+	void keyboard_data_w(u8 data);
+
+	void ctrlport_a_w(u8 data);
+	u8 ctrlport_a_r();
+	u8 ctrlport_b_r();
+
+	void alt_w(u8 data);
+	DECLARE_WRITE_LINE_MEMBER(chck_w);
+	DECLARE_WRITE_LINE_MEMBER(int87_w);
+	void nmi_enable_w(u8 data);
+	void update_nmi();
+
+	required_device<i8086_cpu_device> m_maincpu;
+	required_device<ram_device> m_ram;
+	required_device<isa8_device> m_isabus;
+	required_device<am9517a_device> m_dmac;
+	required_device<pic8259_device> m_pic;
+	required_device<pit8253_device> m_pit;
+	required_device<speaker_sound_device> m_speaker;
+	required_device<tms7000_device> m_kbc;
 	required_device<m24_keyboard_device> m_keyboard;
 	optional_device<m24_z8000_device> m_z8000_apb;
+	required_ioport m_dsw0;
 
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_WRITE8_MEMBER(keyboard_w);
+	u8 m_dma_segment[4];
+	u8 m_dma_active;
+	bool m_tc;
+	bool m_dreq0_ck;
+
+	u8 m_ctrlport_a;
+	u8 m_ctrlport_b;
+
+	bool m_87int;
+	bool m_chck_active;
+	bool m_nmi_enable;
+
+	u8 m_pa, m_kbcin, m_kbcout;
+	bool m_kbcibf, m_kbdata, m_i86_halt, m_i86_halt_perm;
+
 	DECLARE_READ8_MEMBER(pa_r);
 	DECLARE_WRITE8_MEMBER(pb_w);
 	DECLARE_READ8_MEMBER(kbcdata_r);
 	DECLARE_WRITE8_MEMBER(kbcdata_w);
 	DECLARE_WRITE_LINE_MEMBER(kbcin_w);
-	DECLARE_WRITE_LINE_MEMBER(dma_hrq_w);
 	DECLARE_WRITE_LINE_MEMBER(int_w);
 	DECLARE_WRITE_LINE_MEMBER(halt_i86_w);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
-	void machine_reset() override;
-
-	uint8_t m_sysctl, m_pa, m_kbcin, m_kbcout;
-	bool m_kbcibf, m_kbdata, m_i86_halt, m_i86_halt_perm;
 	static void cfg_m20_format(device_t *device);
 	void kbc_map(address_map &map);
 	void m24_io(address_map &map);
 	void m24_map(address_map &map);
 };
 
+void m24_state::machine_start()
+{
+	m_maincpu->space(AS_PROGRAM).install_ram(0, m_ram->size() - 1, m_ram->pointer());
+
+	std::fill_n(&m_dma_segment[0], 4, 0);
+	m_dma_active = 0;
+	m_tc = false;
+	m_dreq0_ck = true;
+
+	m_ctrlport_a = 0;
+	m_ctrlport_b = 0;
+
+	m_87int = false;
+	m_chck_active = false;
+	m_nmi_enable = false;
+
+	save_item(NAME(m_dma_segment));
+	save_item(NAME(m_dma_active));
+	save_item(NAME(m_tc));
+	save_item(NAME(m_dreq0_ck));
+	save_item(NAME(m_ctrlport_a));
+	save_item(NAME(m_ctrlport_b));
+	save_item(NAME(m_87int));
+	save_item(NAME(m_chck_active));
+	save_item(NAME(m_nmi_enable));
+	save_item(NAME(m_pa));
+	save_item(NAME(m_kbcin));
+	save_item(NAME(m_kbcout));
+	save_item(NAME(m_kbcibf));
+	save_item(NAME(m_kbdata));
+	save_item(NAME(m_i86_halt));
+	save_item(NAME(m_i86_halt_perm));
+}
+
 void m24_state::machine_reset()
 {
-	m_sysctl = 0;
+	ctrlport_a_w(0);
+	nmi_enable_w(0);
 	m_pa = 0x40;
 	m_kbcibf = false;
 	m_kbdata = true;
@@ -77,47 +177,216 @@ void m24_state::machine_reset()
 		m_z8000_apb->halt_w(ASSERT_LINE);
 }
 
-READ8_MEMBER(m24_state::keyboard_r)
+void m24_state::dma_segment_w(offs_t offset, u8 data)
 {
-	switch(offset)
-	{
-		case 0:
-			m_pa |= 0x40;
-			m_mb->m_pic8259->ir1_w(0);
-			return m_kbcout;
-		case 1:
-			return m_sysctl;
-		case 2:
-			return 0;
-		case 4:
-			return (m_kbcibf ? 2 : 0) | ((m_pa & 0x40) ? 0 : 1);
-	}
-	return 0xff;
+	m_dma_segment[offset] = data & 0x0f;
 }
 
-WRITE8_MEMBER(m24_state::keyboard_w)
+WRITE_LINE_MEMBER(m24_state::dma_hrq_w)
 {
-	switch(offset)
+	if(!m_i86_halt)
+		m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+	if(m_z8000_apb && !m_z8000_apb->halted())
+		m_z8000_apb->halt_w(state ? ASSERT_LINE : CLEAR_LINE);
+
+	/* Assert HLDA */
+	m_dmac->hack_w(state);
+}
+
+u8 m24_state::dma_memory_read(offs_t offset)
+{
+	const int seg = (BIT(m_dma_active, 2) ? 0 : 2) | (BIT(m_dma_active, 3) ? 0 : 1);
+	return m_maincpu->space(AS_PROGRAM).read_byte(offset | u32(m_dma_segment[seg]) << 16);
+}
+
+void m24_state::dma_memory_write(offs_t offset, u8 data)
+{
+	const int seg = (BIT(m_dma_active, 2) ? 0 : 2) | (BIT(m_dma_active, 3) ? 0 : 1);
+	m_maincpu->space(AS_PROGRAM).write_byte(offset | u32(m_dma_segment[seg]) << 16, data);
+}
+
+template <int Channel>
+u8 m24_state::dma_io_read(offs_t offset)
+{
+	return m_isabus->dack_r(Channel);
+}
+
+template <int Channel>
+void m24_state::dma_io_write(offs_t offset, u8 data)
+{
+	m_isabus->dack_w(Channel, data);
+}
+
+template <int Channel>
+WRITE_LINE_MEMBER(m24_state::dma_dack_w)
+{
+	m_isabus->dack_line_w(Channel, state);
+
+	if (!state)
 	{
-		case 0:
-			m_kbc->set_input_line(TMS7000_INT1_LINE, ASSERT_LINE);
-			m_kbcibf = true;
-			m_kbcin = data;
-			break;
-		case 1:
-			m_sysctl = data;
-			m_mb->m_pit8253->write_gate2(BIT(data, 0));
-			m_mb->pc_speaker_set_spkrdata(BIT(data, 1));
-			if(BIT(data, 6))
-				m_pa |= 4;
-			else
-				m_pa &= ~4;
-			break;
-		case 5:
-			m_maincpu->set_input_line(INPUT_LINE_HALT, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
-			m_i86_halt = true;
-			m_i86_halt_perm = true;
+		m_dma_active |= 1 << Channel;
+		if (Channel == 0)
+			m_dmac->dreq0_w(0);
+		if (m_tc)
+			m_isabus->eop_w(Channel, ASSERT_LINE);
 	}
+	else
+	{
+		m_dma_active &= ~(1 << Channel);
+		if (m_tc)
+			m_isabus->eop_w(Channel, CLEAR_LINE);
+	}
+}
+
+WRITE_LINE_MEMBER(m24_state::dma_tc_w)
+{
+	m_tc = (state == ASSERT_LINE);
+	for (int channel = 0; channel < 4; channel++)
+		if (BIT(m_dma_active, channel))
+			m_isabus->eop_w(channel, state);
+}
+
+WRITE_LINE_MEMBER(m24_state::dreq0_ck_w)
+{
+	if (state && !m_dreq0_ck && !BIT(m_dma_active, 0))
+		m_dmac->dreq0_w(1);
+
+	m_dreq0_ck = state;
+}
+
+WRITE_LINE_MEMBER(m24_state::speaker_ck_w)
+{
+	if (state)
+		m_ctrlport_b |= 0x20;
+	else
+		m_ctrlport_b &= 0xdf;
+
+	update_speaker();
+}
+
+void m24_state::update_speaker()
+{
+	if (BIT(m_ctrlport_a, 1) && BIT(m_ctrlport_b, 5))
+	{
+		m_speaker->level_w(1);
+		m_ctrlport_b &= 0xef;
+	}
+	else
+	{
+		m_speaker->level_w(0);
+		m_ctrlport_b |= 0x10;
+	}
+}
+
+u8 m24_state::keyboard_data_r()
+{
+	if (!machine().side_effects_disabled())
+	{
+		m_pa |= 0x40;
+		m_pic->ir1_w(0);
+	}
+	return m_kbcout;
+}
+
+u8 m24_state::keyboard_status_r()
+{
+	return (m_kbcibf ? 2 : 0) | ((m_pa & 0x40) ? 0 : 1);
+}
+
+void m24_state::keyboard_data_w(u8 data)
+{
+	m_kbc->set_input_line(TMS7000_INT1_LINE, ASSERT_LINE);
+	m_kbcibf = true;
+	m_kbcin = data;
+}
+
+void m24_state::ctrlport_a_w(u8 data)
+{
+	const bool spkrdata_en_dis = BIT(data ^ m_ctrlport_a, 1);
+	const bool iochk_en_dis = BIT(data ^ m_ctrlport_a, 4);
+
+	m_pit->write_gate2(BIT(data, 0));
+
+	if (BIT(m_ctrlport_a, 4) && !m_chck_active)
+		m_ctrlport_b &= 0xbf;
+
+	if (BIT(data, 6))
+		m_pa |= 4;
+	else
+		m_pa &= ~4;
+
+	m_ctrlport_a = data;
+
+	if (spkrdata_en_dis)
+		update_speaker();
+	if (iochk_en_dis)
+		update_nmi();
+}
+
+u8 m24_state::ctrlport_a_r()
+{
+	return m_ctrlport_a;
+}
+
+u8 m24_state::ctrlport_b_r()
+{
+	// Bit 0 = NC
+	// Bit 1 = SW4 (8087 present)
+	// Bit 2 = ~RI1
+	// Bit 3 = ~DSR1
+	// Bit 4 = OUT2 (8253)
+	// Bit 5 = SPKR
+	// Bit 6 = IOCHK
+	// Bit 7 = MBMERR (MRD parity check)
+
+	if (BIT(m_dsw0->read(), 4))
+		m_ctrlport_b |= 0x02;
+	else
+		m_ctrlport_b &= 0xfd;
+
+	return m_ctrlport_b;
+}
+
+void m24_state::alt_w(u8 data)
+{
+	m_maincpu->set_input_line(INPUT_LINE_HALT, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+	m_i86_halt = true;
+	m_i86_halt_perm = true;
+}
+
+WRITE_LINE_MEMBER(m24_state::chck_w)
+{
+	m_chck_active = (state == 0);
+	if (m_chck_active)
+	{
+		if (!BIT(m_ctrlport_b, 6))
+		{
+			m_ctrlport_b |= 0x40;
+			update_nmi();
+		}
+	}
+	else if (BIT(m_ctrlport_a, 4))
+		m_ctrlport_b &= 0xbf;
+}
+
+WRITE_LINE_MEMBER(m24_state::int87_w)
+{
+	m_87int = state;
+	update_nmi();
+}
+
+void m24_state::nmi_enable_w(u8 data)
+{
+	m_nmi_enable = BIT(data, 7);
+	update_nmi();
+}
+
+void m24_state::update_nmi()
+{
+	if (m_nmi_enable && ((m_87int && BIT(m_dsw0->read(), 4)) || (BIT(m_ctrlport_b, 6) && !BIT(m_ctrlport_a, 4))))
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	else
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 READ8_MEMBER(m24_state::pa_r)
@@ -142,24 +411,13 @@ READ8_MEMBER(m24_state::kbcdata_r)
 WRITE8_MEMBER(m24_state::kbcdata_w)
 {
 	m_pa &= ~0x40;
-	m_mb->m_pic8259->ir1_w(1);
+	m_pic->ir1_w(1);
 	m_kbcout = data;
 }
 
 WRITE_LINE_MEMBER(m24_state::kbcin_w)
 {
 	m_kbdata = state;
-}
-
-WRITE_LINE_MEMBER(m24_state::dma_hrq_w)
-{
-	if(!m_i86_halt)
-		m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
-	if(m_z8000_apb && !m_z8000_apb->halted())
-		m_z8000_apb->halt_w(state ? ASSERT_LINE : CLEAR_LINE);
-
-	/* Assert HLDA */
-	m_mb->m_dma8237->hack_w(state);
 }
 
 WRITE_LINE_MEMBER(m24_state::int_w)
@@ -187,10 +445,18 @@ void m24_state::m24_map(address_map &map)
 void m24_state::m24_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x00ff).m(m_mb, FUNC(pc_noppi_mb_device::map));
-	map(0x0060, 0x0065).rw(FUNC(m24_state::keyboard_r), FUNC(m24_state::keyboard_w));
+	map(0x0000, 0x000f).rw(m_dmac, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
+	map(0x0020, 0x0021).mirror(0xe).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x0040, 0x0043).mirror(0xc).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0x0060, 0x0060).rw(FUNC(m24_state::keyboard_data_r), FUNC(m24_state::keyboard_data_w));
+	map(0x0061, 0x0061).rw(FUNC(m24_state::ctrlport_a_r), FUNC(m24_state::ctrlport_a_w));
+	map(0x0062, 0x0062).r(FUNC(m24_state::ctrlport_b_r));
+	map(0x0064, 0x0064).r(FUNC(m24_state::keyboard_status_r));
+	map(0x0065, 0x0065).w(FUNC(m24_state::alt_w));
 	map(0x0066, 0x0067).portr("DSW0");
 	map(0x0070, 0x007f).rw("mm58174an", FUNC(mm58274c_device::read), FUNC(mm58274c_device::write));
+	map(0x0080, 0x0083).mirror(0xc).w(FUNC(m24_state::dma_segment_w));
+	map(0x00a0, 0x00a1).mirror(0xe).w(FUNC(m24_state::nmi_enable_w));
 	map(0x80c1, 0x80c1).rw(m_z8000_apb, FUNC(m24_z8000_device::handshake_r), FUNC(m24_z8000_device::handshake_w));
 }
 
@@ -255,58 +521,115 @@ void m24_state::cfg_m20_format(device_t *device)
 	device->subdevice<floppy_connector>("fdc:1")->set_formats(m24_state::floppy_formats);
 }
 
-MACHINE_CONFIG_START(m24_state::olivetti)
+void m24_state::olivetti(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8086, XTAL(8'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(m24_map)
-	MCFG_DEVICE_IO_MAP(m24_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
+	I8086(config, m_maincpu, 24_MHz_XTAL / 3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &m24_state::m24_map);
+	m_maincpu->set_addrmap(AS_IO, &m24_state::m24_io);
+	m_maincpu->set_irq_acknowledge_callback("pic", FUNC(pic8259_device::inta_cb));
+	m_maincpu->esc_opcode_handler().set("ndp", FUNC(i8087_device::insn_w));
+	m_maincpu->esc_data_handler().set("ndp", FUNC(i8087_device::addr_w));
 
-	MCFG_PCNOPPI_MOTHERBOARD_ADD("mb", "maincpu")
+	i8087_device &i8087(I8087(config, "ndp", 24_MHz_XTAL / 3));
+	i8087.set_space_86(m_maincpu, AS_PROGRAM);
+	i8087.irq().set(FUNC(m24_state::int87_w));
+	i8087.busy().set_inputline(m_maincpu, INPUT_LINE_TEST);
 
-	// FIXME: determine ISA bus clock
-	MCFG_DEVICE_ADD("mb1", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "cga_m24", true)
-	MCFG_DEVICE_ADD("mb2", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "fdc_xt", true)
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc_xt", cfg_m20_format)
-	MCFG_DEVICE_ADD("mb3", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "lpt", true)
-	MCFG_DEVICE_ADD("mb4", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "com", true)
+	AM9517A(config, m_dmac, 24_MHz_XTAL / 6); // 8237A-4
+	m_dmac->out_hreq_callback().set(FUNC(m24_state::dma_hrq_w));
+	m_dmac->in_memr_callback().set(FUNC(m24_state::dma_memory_read));
+	m_dmac->out_memw_callback().set(FUNC(m24_state::dma_memory_write));
+	m_dmac->in_ior_callback<1>().set(FUNC(m24_state::dma_io_read<1>));
+	m_dmac->in_ior_callback<2>().set(FUNC(m24_state::dma_io_read<2>));
+	m_dmac->in_ior_callback<3>().set(FUNC(m24_state::dma_io_read<3>));
+	m_dmac->out_iow_callback<1>().set(FUNC(m24_state::dma_io_write<1>));
+	m_dmac->out_iow_callback<2>().set(FUNC(m24_state::dma_io_write<2>));
+	m_dmac->out_iow_callback<3>().set(FUNC(m24_state::dma_io_write<3>));
+	m_dmac->out_dack_callback<0>().set(FUNC(m24_state::dma_dack_w<0>));
+	m_dmac->out_dack_callback<1>().set(FUNC(m24_state::dma_dack_w<1>));
+	m_dmac->out_dack_callback<2>().set(FUNC(m24_state::dma_dack_w<2>));
+	m_dmac->out_dack_callback<3>().set(FUNC(m24_state::dma_dack_w<3>));
+	m_dmac->out_eop_callback().set(FUNC(m24_state::dma_tc_w));
 
-	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
+	PIC8259(config, m_pic);
+	m_pic->in_sp_callback().set_constant(1);
+	m_pic->out_int_callback().set(FUNC(m24_state::int_w));
 
-	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("640K")
-	MCFG_RAM_EXTRA_OPTIONS("64K, 128K, 256K, 512K")
+	PIT8253(config, m_pit); // 8253-5
+	m_pit->set_clk<0>(3.6864_MHz_XTAL / 3); // divided by LS175 at 8T
+	m_pit->set_clk<1>(3.6864_MHz_XTAL / 3);
+	m_pit->set_clk<2>(3.6864_MHz_XTAL / 3);
+	m_pit->out_handler<0>().set(m_pic, FUNC(pic8259_device::ir0_w));
+	m_pit->out_handler<1>().set(FUNC(m24_state::dreq0_ck_w));
+	m_pit->out_handler<2>().set(FUNC(m24_state::speaker_ck_w));
 
-	MCFG_DEVICE_ADD("kbc", TMS7000, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(kbc_map)
-	MCFG_TMS7000_IN_PORTA_CB(READ8(*this, m24_state, pa_r))
-	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(*this, m24_state, pb_w))
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	MCFG_DEVICE_ADD("keyboard", M24_KEYBOARD, 0)
-	MCFG_M24_KEYBOARD_OUT_DATA_HANDLER(WRITELINE(*this, m24_state, kbcin_w))
+	ISA8(config, m_isabus, 24_MHz_XTAL / 6);
+	m_isabus->set_memspace(m_maincpu, AS_PROGRAM);
+	m_isabus->set_iospace(m_maincpu, AS_IO);
+	m_isabus->irq2_callback().set(m_pic, FUNC(pic8259_device::ir2_w));
+	m_isabus->irq3_callback().set(m_pic, FUNC(pic8259_device::ir3_w));
+	m_isabus->irq4_callback().set(m_pic, FUNC(pic8259_device::ir4_w));
+	m_isabus->irq5_callback().set(m_pic, FUNC(pic8259_device::ir5_w));
+	m_isabus->irq6_callback().set(m_pic, FUNC(pic8259_device::ir6_w));
+	m_isabus->irq7_callback().set(m_pic, FUNC(pic8259_device::ir7_w));
+	m_isabus->drq1_callback().set(m_dmac, FUNC(am9517a_device::dreq1_w));
+	m_isabus->drq2_callback().set(m_dmac, FUNC(am9517a_device::dreq2_w));
+	m_isabus->drq3_callback().set(m_dmac, FUNC(am9517a_device::dreq3_w));
+	m_isabus->iochck_callback().set(FUNC(m24_state::chck_w));
 
-	MCFG_DEVICE_ADD("mm58174an", MM58274C, 0)
-	MCFG_MM58274C_MODE24(1) // ?
-	MCFG_MM58274C_DAY1(1)   // ?
+	ISA8_SLOT(config, "mb1", 0, m_isabus, pc_isa8_cards, "cga_m24", true);
+	ISA8_SLOT(config, "mb2", 0, m_isabus, pc_isa8_cards, "fdc_xt", true).set_option_machine_config("fdc_xt", cfg_m20_format);
+	ISA8_SLOT(config, "mb3", 0, m_isabus, pc_isa8_cards, "lpt", true);
+	ISA8_SLOT(config, "mb4", 0, m_isabus, pc_isa8_cards, "com", true);
 
-	MCFG_DEVICE_ADD("z8000_apb", M24_Z8000, 0)
-	MCFG_M24_Z8000_HALT(WRITELINE(*this, m24_state, halt_i86_w))
-	MCFG_DEVICE_MODIFY("mb:dma8237")
-	MCFG_I8237_OUT_HREQ_CB(WRITELINE(*this, m24_state, dma_hrq_w))
-	MCFG_DEVICE_MODIFY("mb:pic8259")
-	devcb = &downcast<pic8259_device &>(*device).set_out_int_callback(DEVCB_WRITELINE(*this, m24_state, int_w));
+	ISA8_SLOT(config, "isa1", 0, m_isabus, pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa2", 0, m_isabus, pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa3", 0, m_isabus, pc_isa8_cards, nullptr, false);
+
+	// 2 banks of 16 64Kx1 or 256Kx1 DRAMs on motherboard
+	RAM(config, m_ram).set_default_size("640K").set_extra_options("128K, 256K, 512K");
+
+	TMS7000(config, m_kbc, 24_MHz_XTAL / 6);
+	m_kbc->set_addrmap(AS_PROGRAM, &m24_state::kbc_map);
+	m_kbc->in_porta().set(FUNC(m24_state::pa_r));
+	m_kbc->out_portb().set(FUNC(m24_state::pb_w));
+
+	M24_KEYBOARD(config, m_keyboard, 0);
+	m_keyboard->out_data_handler().set(FUNC(m24_state::kbcin_w));
+
+	mm58274c_device &mm58174an(MM58274C(config, "mm58174an", 32.768_kHz_XTAL));
+	// this is all guess
+	mm58174an.set_mode24(1); // ?
+	mm58174an.set_day1(1);   // ?
+
+	M24_Z8000(config, m_z8000_apb, 0); // TODO: make this a slot device (uses custom bus connector)
+	m_z8000_apb->halt_callback().set(FUNC(m24_state::halt_i86_w));
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("disk_list","ibm5150")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "disk_list").set_original("ibm5150");
+}
 
 ROM_START( m24 )
 	ROM_REGION16_LE(0x8000,"bios", 0)
-	ROMX_LOAD("olivetti_m24_version_1.43_high.bin",0x4001, 0x2000, CRC(04e697ba) SHA1(1066dcc849e6289b5ac6372c84a590e456d497a6), ROM_SKIP(1))
-	ROMX_LOAD("olivetti_m24_version_1.43_low.bin", 0x4000, 0x2000, CRC(ff7e0f10) SHA1(13423011a9bae3f3193e8c199f98a496cab48c0f), ROM_SKIP(1))
+	ROM_SYSTEM_BIOS(0,"v1.1","v1.1")
+	ROMX_LOAD("m24_bios11h.rom",0x4001, 0x2000, CRC(f08e859a) SHA1(c2ede7ce4472c77462d1d841e2b47e8b306c563d), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("m24_bios11l.rom", 0x4000, 0x2000, CRC(ec494e66) SHA1(51259cf9fd9f6a6855d52730206ff66ad3367ea4), ROM_SKIP(1) | ROM_BIOS(0))
+
+	ROM_SYSTEM_BIOS(1,"v1.21","v1.21")
+	ROMX_LOAD("m24_bios121h.rom",0x4001, 0x2000, CRC(93292715) SHA1(863eccfb3beca6e64c5b0cc070c64394bad7da82), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("m24_bios121l.rom", 0x4000, 0x2000, CRC(1acbc9d7) SHA1(d3696e38853cea31e70ffa4e13e127ec7551bf57), ROM_SKIP(1) | ROM_BIOS(1))
+
+	ROM_SYSTEM_BIOS(2,"v1.36","v1.36")
+	ROMX_LOAD("m24_bios136h.rom",0x4001, 0x2000, CRC(25cbf8ba) SHA1(1ab90985852544d2c12b47bb7f20f9faccabdf88), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("m24_bios136l.rom", 0x4000, 0x2000, CRC(e2f738c0) SHA1(da9771325a5021cf9908997e0e0d14e47258125f), ROM_SKIP(1) | ROM_BIOS(2))
+
+	ROM_SYSTEM_BIOS(3,"v1.43","v1.43")
+	ROMX_LOAD("olivetti_m24_version_1.43_high.bin",0x4001, 0x2000, CRC(04e697ba) SHA1(1066dcc849e6289b5ac6372c84a590e456d497a6), ROM_SKIP(1) | ROM_BIOS(3))
+	ROMX_LOAD("olivetti_m24_version_1.43_low.bin", 0x4000, 0x2000, CRC(ff7e0f10) SHA1(13423011a9bae3f3193e8c199f98a496cab48c0f), ROM_SKIP(1) | ROM_BIOS(3))
 
 	ROM_REGION(0x800, "kbc", 0)
 	ROM_LOAD("pdbd.tms2516.kbdmcu_replacement_board.10u", 0x000, 0x800, CRC(b8c4c18a) SHA1(25b4c24e19ff91924c53557c66513ab242d926c6))

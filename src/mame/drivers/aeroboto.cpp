@@ -265,21 +265,20 @@ MACHINE_CONFIG_START(aeroboto_state::formatz)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_aeroboto)
 
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, "soundlatch");
+	GENERIC_LATCH_8(config, "soundlatch2");
 
-	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(10'000'000)/8) /* verified on pcb */
-	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
-	MCFG_AY8910_PORT_B_READ_CB(READ8("soundlatch2", generic_latch_8_device, read))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ay8910_device &ay1(AY8910(config, "ay1", XTAL(10'000'000)/8)); /* verified on pcb */
+	ay1.port_a_read_callback().set("soundlatch", FUNC(generic_latch_8_device::read));
+	ay1.port_b_read_callback().set("soundlatch2", FUNC(generic_latch_8_device::read));
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(10'000'000)/16) /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8910(config, "ay2", XTAL(10'000'000)/16).add_route(ALL_OUTPUTS, "mono", 0.25); /* verified on pcb */
 MACHINE_CONFIG_END
 
 

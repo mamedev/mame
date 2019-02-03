@@ -5,18 +5,24 @@
     Dr. Micro
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_DRMICRO_H
+#define MAME_INCLUDES_DRMICRO_H
+
+#pragma once
+
 #include "sound/msm5205.h"
 #include "emupal.h"
 
 class drmicro_state : public driver_device
 {
 public:
-	drmicro_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	drmicro_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_msm(*this, "msm"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	void drmicro(machine_config &config);
 
@@ -43,7 +49,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(drmicro);
+	void drmicro_palette(palette_device &palette) const;
 	uint32_t screen_update_drmicro(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(drmicro_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(pcm_w);
@@ -53,3 +59,5 @@ private:
 	void drmicro_map(address_map &map);
 	void io_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_DRMICRO_H

@@ -30,8 +30,12 @@ There's a chance that certain bootlegs might have the different 8/20 MHz XTALS.
 #include "speaker.h"
 
 
-#define MAIN_CLOCK      XTAL(8'200'000)
-#define VIDEO_CLOCK     XTAL(19'600'000)
+namespace {
+
+constexpr XTAL MAIN_CLOCK  =  8.2_MHz_XTAL;
+constexpr XTAL VIDEO_CLOCK = 19.6_MHz_XTAL;
+
+} // anonymous namespace
 
 
 
@@ -53,8 +57,8 @@ void mrdo_state::main_map(address_map &map)
 	map(0x8800, 0x8fff).ram().w(FUNC(mrdo_state::mrdo_fgvideoram_w)).share("fgvideoram");
 	map(0x9000, 0x90ff).writeonly().share("spriteram");
 	map(0x9800, 0x9800).w(FUNC(mrdo_state::mrdo_flipscreen_w));    /* screen flip + playfield priority */
-	map(0x9801, 0x9801).w("u8106_1", FUNC(u8106_device::command_w));
-	map(0x9802, 0x9802).w("u8106_2", FUNC(u8106_device::command_w));
+	map(0x9801, 0x9801).w("u8106_1", FUNC(u8106_device::write));
+	map(0x9802, 0x9802).w("u8106_2", FUNC(u8106_device::write));
 	map(0x9803, 0x9803).r(FUNC(mrdo_state::mrdo_SECRE_r));
 	map(0xa000, 0xa000).portr("P1");
 	map(0xa001, 0xa001).portr("P2");
@@ -182,12 +186,10 @@ MACHINE_CONFIG_START(mrdo_state::mrdo)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK/4, 312, 8, 248, 262, 32, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(mrdo_state, screen_update_mrdo)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mrdo)
-	MCFG_PALETTE_ADD("palette", 64*4+16*4)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(mrdo_state, mrdo)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mrdo);
+	PALETTE(config, m_palette, FUNC(mrdo_state::mrdo_palette), 64*4 + 16*4, 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -199,10 +201,11 @@ MACHINE_CONFIG_START(mrdo_state::mrdo)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(mrdo_state::mrlo)
+void mrdo_state::mrlo(machine_config &config)
+{
 	mrdo(config);
-	//MCFG_DEVICE_REMOVE("pal16r6")
-MACHINE_CONFIG_END
+	//config.device_remove("pal16r6");
+}
 
 
 

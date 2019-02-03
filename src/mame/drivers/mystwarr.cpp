@@ -925,8 +925,6 @@ MACHINE_RESET_MEMBER(mystwarr_state,martchmp)
 	int i;
 	k054539_device *k054539 = subdevice<k054539_device>("k054539");
 
-	k054539->init_flags(k054539_device::REVERSE_STEREO);
-
 	// boost voice(chip 0 channel 4-7)
 	for (i=4; i<=7; i++) k054539->set_gain(i, 1.4);
 }
@@ -940,55 +938,54 @@ MACHINE_RESET_MEMBER(mystwarr_state,gaiapols)
 }
 
 
-MACHINE_CONFIG_START(mystwarr_state::mystwarr)
-
+void mystwarr_state::mystwarr(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz (confirmed) */
-	MCFG_DEVICE_PROGRAM_MAP(mystwarr_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mystwarr_state, mystwarr_interrupt, "screen", 0, 1)
+	M68000(config, m_maincpu, 16000000);   /* 16 MHz (confirmed) */
+	m_maincpu->set_addrmap(AS_PROGRAM, &mystwarr_state::mystwarr_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(mystwarr_state::mystwarr_interrupt), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("soundcpu", Z80, 8000000)
-	MCFG_DEVICE_PROGRAM_MAP(mystwarr_sound_map)
+	Z80(config, m_soundcpu, 8000000);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &mystwarr_state::mystwarr_sound_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(1920))
+	config.m_minimum_quantum = attotime::from_hz(1920);
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_ER5911_8BIT)
+	EEPROM_ER5911_8BIT(config, "eeprom");
 
-	MCFG_DEVICE_ADD("k053252", K053252, 6000000) // 6 MHz?
-	MCFG_K053252_OFFSETS(24, 16)
+	K053252(config, m_k053252, 6000000); // 6 MHz?
+	m_k053252->set_offsets(24, 16);
 
 	MCFG_MACHINE_START_OVERRIDE(mystwarr_state,mystwarr)
 	MCFG_MACHINE_RESET_OVERRIDE(mystwarr_state,mystwarr)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-//  MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_RAW_PARAMS(6000000, 288+16+32+48, 0, 287, 224+16+8+16, 0, 223)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(600))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(24, 24+288-1, 16, 16+224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mystwarr_state, screen_update_mystwarr)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+//  m_screen->set_refresh_hz(60);
+	m_screen->set_raw(6000000, 288+16+32+48, 0, 287, 224+16+8+16, 0, 223);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(600));
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(24, 24+288-1, 16, 16+224-1);
+	m_screen->set_screen_update(FUNC(mystwarr_state::screen_update_mystwarr));
 
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(XRGB)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_ENABLE_HILIGHTS()
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 2048);
+	m_palette->enable_shadows();
+	m_palette->enable_hilights();
 
-	MCFG_DEVICE_ADD("k056832", K056832, 0)
-	MCFG_K056832_CB(mystwarr_state, mystwarr_tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_5, 0, 0)
-	MCFG_K056832_PALETTE("palette")
+	K056832(config, m_k056832, 0);
+	m_k056832->set_tile_callback(FUNC(mystwarr_state::mystwarr_tile_callback), this);
+	m_k056832->set_config("gfx1", K056832_BPP_5, 0, 0);
+	m_k056832->set_palette(m_palette);
 
-	MCFG_K055555_ADD("k055555")
+	K055555(config, m_k055555, 0);
 
-	MCFG_DEVICE_ADD("k055673", K055673, 0)
-	MCFG_K055673_CB(mystwarr_state, mystwarr_sprite_callback)
-	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX, -48, -24)
-	MCFG_K055673_PALETTE("palette")
+	K055673(config, m_k055673, 0);
+	m_k055673->set_sprite_callback(FUNC(mystwarr_state::mystwarr_sprite_callback), this);
+	m_k055673->set_config("gfx2", K055673_LAYOUT_GX, -48, -24);
+	m_k055673->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("k054338", K054338, 0, "k055555")
-	MCFG_K054338_ALPHAINV(1)
+	K054338(config, m_k054338, 0, m_k055555);
+	m_k054338->set_alpha_invert(1);
 
 	MCFG_VIDEO_START_OVERRIDE(mystwarr_state, mystwarr)
 
@@ -996,203 +993,171 @@ MACHINE_CONFIG_START(mystwarr_state::mystwarr)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_K054321_ADD("k054321", "lspeaker", "rspeaker")
+	K054321(config, m_k054321, "lspeaker", "rspeaker");
 
-	MCFG_DEVICE_ADD("k054539_1", K054539, XTAL(18'432'000))
-	MCFG_DEVICE_ADDRESS_MAP(0, mystwarr_k054539_map)
-	MCFG_K054539_TIMER_HANDLER(WRITELINE(*this, mystwarr_state, k054539_nmi_gen))
-	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)    /* stereo channels are inverted */
-	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
+	K054539(config, m_k054539_1, XTAL(18'432'000));
+	m_k054539_1->set_addrmap(0, &mystwarr_state::mystwarr_k054539_map);
+	m_k054539_1->timer_handler().set(FUNC(mystwarr_state::k054539_nmi_gen));
+	m_k054539_1->add_route(0, "rspeaker", 1.0);    /* stereo channels are inverted */
+	m_k054539_1->add_route(1, "lspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("k054539_2", K054539, XTAL(18'432'000))
-	MCFG_DEVICE_ADDRESS_MAP(0, mystwarr_k054539_map)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)    /* stereo channels are inverted */
-	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
-MACHINE_CONFIG_END
+	K054539(config, m_k054539_2, XTAL(18'432'000));
+	m_k054539_2->set_addrmap(0, &mystwarr_state::mystwarr_k054539_map);
+	m_k054539_2->add_route(0, "rspeaker", 1.0);    /* stereo channels are inverted */
+	m_k054539_2->add_route(1, "lspeaker", 1.0);
+}
 
-MACHINE_CONFIG_START(mystwarr_state::viostorm)
+void mystwarr_state::viostorm(machine_config &config)
+{
 	mystwarr(config);
 
 	MCFG_MACHINE_RESET_OVERRIDE(mystwarr_state,viostorm)
 
-	MCFG_DEVICE_REPLACE("k053252", K053252, 16000000/2)
-	MCFG_K053252_OFFSETS(40, 16)
+	m_k053252->set_clock(16000000/2);
+	m_k053252->set_offsets(40, 16);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(viostorm_map)
-	MCFG_TIMER_MODIFY("scantimer")
-	MCFG_TIMER_DRIVER_CALLBACK(mystwarr_state, metamrph_interrupt)
+	m_maincpu->set_addrmap(AS_PROGRAM, &mystwarr_state::viostorm_map);
+	subdevice<timer_device>("scantimer")->set_callback(FUNC(mystwarr_state::metamrph_interrupt));
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(mystwarr_state, viostorm)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(mystwarr_state, screen_update_metamrph)
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(900))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(40, 40+384-1, 16, 16+224-1)
+	m_screen->set_screen_update(FUNC(mystwarr_state::screen_update_metamrph));
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(900));
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(40, 40+384-1, 16, 16+224-1);
 
-	MCFG_DEVICE_MODIFY("k056832")
-	MCFG_K056832_CB(mystwarr_state, game4bpp_tile_callback)
+	m_k056832->set_tile_callback(FUNC(mystwarr_state::game4bpp_tile_callback), this);
 
-	MCFG_DEVICE_MODIFY("k055673")
-	MCFG_K055673_CB(mystwarr_state, metamrph_sprite_callback)
-	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_RNG, -62, -23)
-MACHINE_CONFIG_END
+	m_k055673->set_sprite_callback(FUNC(mystwarr_state::metamrph_sprite_callback), this);
+	m_k055673->set_config("gfx2", K055673_LAYOUT_RNG, -62, -23);
+}
 
-MACHINE_CONFIG_START(mystwarr_state::metamrph)
+void mystwarr_state::metamrph(machine_config &config)
+{
 	mystwarr(config);
 
 	MCFG_MACHINE_RESET_OVERRIDE(mystwarr_state,metamrph)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(metamrph_map)
-	MCFG_TIMER_MODIFY("scantimer")
-	MCFG_TIMER_DRIVER_CALLBACK(mystwarr_state, metamrph_interrupt)
+	m_maincpu->set_addrmap(AS_PROGRAM, &mystwarr_state::metamrph_map);
+	subdevice<timer_device>("scantimer")->set_callback(FUNC(mystwarr_state::metamrph_interrupt));
 
-	MCFG_DEVICE_MODIFY("k053252")
-	MCFG_K053252_OFFSETS(24, 15)
+	m_k053252->set_offsets(24, 15);
 
-	MCFG_K053250_ADD("k053250_1", "palette", "screen", -7, 0)
+	K053250(config, m_k053250_1, 0, m_palette, m_screen, -7, 0);
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(mystwarr_state, metamrph)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(mystwarr_state, screen_update_metamrph)
+	m_screen->set_screen_update(FUNC(mystwarr_state::screen_update_metamrph));
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(900));
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(24, 24+288-1, 15, 15+224-1);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(900))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(24, 24+288-1, 15, 15+224-1)
+	m_k056832->set_tile_callback(FUNC(mystwarr_state::game4bpp_tile_callback), this);
 
-	MCFG_DEVICE_MODIFY("k056832")
-	MCFG_K056832_CB(mystwarr_state, game4bpp_tile_callback)
+	m_k055673->set_sprite_callback(FUNC(mystwarr_state::metamrph_sprite_callback), this);
+	m_k055673->set_config("gfx2", K055673_LAYOUT_RNG, -51, -24);
+}
 
-	MCFG_DEVICE_MODIFY("k055673")
-	MCFG_K055673_CB(mystwarr_state, metamrph_sprite_callback)
-	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_RNG, -51, -24)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(mystwarr_state::dadandrn)
+void mystwarr_state::dadandrn(machine_config &config)
+{
 	mystwarr(config);
 
 	MCFG_MACHINE_RESET_OVERRIDE(mystwarr_state,dadandrn)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(dadandrn_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mystwarr_state,  ddd_interrupt)
-	MCFG_DEVICE_REMOVE("scantimer")
+	m_maincpu->set_addrmap(AS_PROGRAM, &mystwarr_state::dadandrn_map);
+	m_maincpu->set_vblank_int("screen", FUNC(mystwarr_state::ddd_interrupt));
+	config.device_remove("scantimer");
 
-	MCFG_DEVICE_MODIFY("k053252")
-	MCFG_K053252_OFFSETS(24, 16+1)
+	m_k053252->set_offsets(24, 16+1);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dadandrn)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dadandrn);
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(mystwarr_state, dadandrn)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(mystwarr_state, screen_update_dadandrn)
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(600))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(24, 24+288-1, 17, 17+224-1)
+	m_screen->set_screen_update(FUNC(mystwarr_state::screen_update_dadandrn));
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(600));
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(24, 24+288-1, 17, 17+224-1);
 
-	MCFG_DEVICE_MODIFY("k056832")
-	MCFG_K056832_CB(mystwarr_state, game5bpp_tile_callback)
+	m_k056832->set_tile_callback(FUNC(mystwarr_state::game5bpp_tile_callback), this);
 
-	MCFG_DEVICE_MODIFY("k055673")
-	MCFG_K055673_CB(mystwarr_state, gaiapols_sprite_callback)
-	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX, -42, -22)
-MACHINE_CONFIG_END
+	m_k055673->set_sprite_callback(FUNC(mystwarr_state::gaiapols_sprite_callback), this);
+	m_k055673->set_config("gfx2", K055673_LAYOUT_GX, -42, -22);
+}
 
-MACHINE_CONFIG_START(mystwarr_state::gaiapols)
+void mystwarr_state::gaiapols(machine_config &config)
+{
 	mystwarr(config);
 
 	MCFG_MACHINE_RESET_OVERRIDE(mystwarr_state,gaiapols)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(gaiapols_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mystwarr_state,  ddd_interrupt)
-	MCFG_DEVICE_REMOVE("scantimer")
+	m_maincpu->set_addrmap(AS_PROGRAM, &mystwarr_state::gaiapols_map);
+	m_maincpu->set_vblank_int("screen", FUNC(mystwarr_state::ddd_interrupt));
+	config.device_remove("scantimer");
 
-	MCFG_DEVICE_MODIFY("k053252")
-	MCFG_K053252_OFFSETS(40, 16)
+	m_k053252->set_offsets(40, 16);
 
-	MCFG_K054000_ADD("k054000")
+	K054000(config, "k054000", 0);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gaiapols)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gaiapols);
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(mystwarr_state, gaiapols)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(mystwarr_state, screen_update_dadandrn)
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_RAW_PARAMS(8000000, 384+24+64+40, 0, 383, 224+16+8+16, 0, 223)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(600))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(40, 40+376-1, 16, 16+224-1)
+	m_screen->set_screen_update(FUNC(mystwarr_state::screen_update_dadandrn));
+	m_screen->set_raw(8000000, 384+24+64+40, 0, 383, 224+16+8+16, 0, 223);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(600));
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(40, 40+376-1, 16, 16+224-1);
 
-	MCFG_DEVICE_MODIFY("k056832")
-	MCFG_K056832_CB(mystwarr_state, game4bpp_tile_callback)
+	m_k056832->set_tile_callback(FUNC(mystwarr_state::game4bpp_tile_callback), this);
 
-	MCFG_DEVICE_MODIFY("k055673")
-	MCFG_K055673_CB(mystwarr_state, gaiapols_sprite_callback)
-	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_RNG, -61, -22) // stage2 brick walls
-MACHINE_CONFIG_END
+	m_k055673->set_sprite_callback(FUNC(mystwarr_state::gaiapols_sprite_callback), this);
+	m_k055673->set_config("gfx2", K055673_LAYOUT_RNG, -61, -22); // stage2 brick walls
+}
 
-MACHINE_CONFIG_START(mystwarr_state::martchmp)
+void mystwarr_state::martchmp(machine_config &config)
+{
 	mystwarr(config);
 
 	MCFG_MACHINE_RESET_OVERRIDE(mystwarr_state,martchmp)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(martchmp_map)
-	MCFG_TIMER_MODIFY("scantimer")
-	MCFG_TIMER_DRIVER_CALLBACK(mystwarr_state, mchamp_interrupt)
+	m_maincpu->set_addrmap(AS_PROGRAM, &mystwarr_state::martchmp_map);
+	subdevice<timer_device>("scantimer")->set_callback(FUNC(mystwarr_state::mchamp_interrupt));
 
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_DEVICE_PROGRAM_MAP(martchmp_sound_map)
+	m_soundcpu->set_addrmap(AS_PROGRAM, &mystwarr_state::martchmp_sound_map);
 
-	MCFG_DEVICE_REPLACE("k053252", K053252, 16000000/2)
-	MCFG_K053252_OFFSETS(32, 24-1)
-
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_FORMAT(XRGB)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_ENABLE_HILIGHTS()
+	m_k053252->set_clock(16000000/2);
+	m_k053252->set_offsets(32, 24-1);
 
 	MCFG_VIDEO_START_OVERRIDE(mystwarr_state, martchmp)
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_UPDATE_DRIVER(mystwarr_state, screen_update_martchmp)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(32, 32+384-1, 16, 16+224-1)
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	m_screen->set_screen_update(FUNC(mystwarr_state::screen_update_martchmp));
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(32, 32+384-1, 16, 16+224-1);
 
-	MCFG_DEVICE_MODIFY("k056832")
-	MCFG_K056832_CB(mystwarr_state, game5bpp_tile_callback)
+	m_k056832->set_tile_callback(FUNC(mystwarr_state::game5bpp_tile_callback), this);
 
-	MCFG_DEVICE_MODIFY("k055673")
-	MCFG_K055673_CB(mystwarr_state, martchmp_sprite_callback)
-	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX, -58, -23)
+	m_k055673->set_sprite_callback(FUNC(mystwarr_state::martchmp_sprite_callback), this);
+	m_k055673->set_config("gfx2", K055673_LAYOUT_GX, -58, -23);
 
-	MCFG_DEVICE_REMOVE("k054539_1")
-	MCFG_DEVICE_REMOVE("k054539_2")
+	config.device_remove("k054539_1");
+	config.device_remove("k054539_2");
 
-	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
-	MCFG_K054539_TIMER_HANDLER(WRITELINE(*this, mystwarr_state, k054539_nmi_gen))
-	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)    /* stereo channels are inverted */
-	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
-MACHINE_CONFIG_END
+	k054539_device &k054539(K054539(config, "k054539", XTAL(18'432'000)));
+	k054539.timer_handler().set(FUNC(mystwarr_state::k054539_nmi_gen));
+	k054539.add_route(0, "rspeaker", 1.0);    /* stereo channels are inverted */
+	k054539.add_route(1, "lspeaker", 1.0);
+}
 
 /**********************************************************************************/
 

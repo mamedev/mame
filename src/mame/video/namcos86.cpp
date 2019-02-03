@@ -35,50 +35,49 @@ Namco System 86 Video Hardware
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(namcos86_state, namcos86)
+void namcos86_state::namcos86_palette(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
+
 	rgb_t palette_val[512];
-
-	for (i = 0;i < 512;i++)
+	for (int i = 0; i < 512; i++)
 	{
-		int bit0,bit1,bit2,bit3,r,g,b;
+		int bit0, bit1, bit2, bit3;
 
-		bit0 = (color_prom[0] >> 0) & 0x01;
-		bit1 = (color_prom[0] >> 1) & 0x01;
-		bit2 = (color_prom[0] >> 2) & 0x01;
-		bit3 = (color_prom[0] >> 3) & 0x01;
-		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		bit0 = (color_prom[0] >> 4) & 0x01;
-		bit1 = (color_prom[0] >> 5) & 0x01;
-		bit2 = (color_prom[0] >> 6) & 0x01;
-		bit3 = (color_prom[0] >> 7) & 0x01;
-		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		bit0 = (color_prom[512] >> 0) & 0x01;
-		bit1 = (color_prom[512] >> 1) & 0x01;
-		bit2 = (color_prom[512] >> 2) & 0x01;
-		bit3 = (color_prom[512] >> 3) & 0x01;
-		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		bit0 = BIT(color_prom[0], 0);
+		bit1 = BIT(color_prom[0], 1);
+		bit2 = BIT(color_prom[0], 2);
+		bit3 = BIT(color_prom[0], 3);
+		int const r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		bit0 = BIT(color_prom[0], 4);
+		bit1 = BIT(color_prom[0], 5);
+		bit2 = BIT(color_prom[0], 6);
+		bit3 = BIT(color_prom[0], 7);
+		int const g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		bit0 = BIT(color_prom[512], 0);
+		bit1 = BIT(color_prom[512], 1);
+		bit2 = BIT(color_prom[512], 2);
+		bit3 = BIT(color_prom[512], 3);
+		int const b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_val[i] = rgb_t(r,g,b);
+		palette_val[i] = rgb_t(r, g, b);
 		color_prom++;
 	}
 
 	color_prom += 512;
-	/* color_prom now points to the beginning of the lookup table */
+	// color_prom now points to the beginning of the lookup table
 
-	/* tiles lookup table */
-	for (i = 0;i < 2048;i++)
+	// tiles lookup table
+	for (int i = 0; i < 2048; i++)
 		palette.set_pen_color(i, palette_val[*color_prom++]);
 
-	/* sprites lookup table */
-	for (i = 0;i < 2048;i++)
+	// sprites lookup table
+	for (int i = 0; i < 2048; i++)
 		palette.set_pen_color(2048 + i, palette_val[256 + *color_prom++]);
 
-	/* color_prom now points to the beginning of the tile address decode PROM */
+	// color_prom now points to the beginning of the tile address decode PROM
 
-	m_tile_address_prom = color_prom;   /* we'll need this at run time */
+	m_tile_address_prom = color_prom; // we'll need this at run time
 }
 
 

@@ -673,7 +673,7 @@ void ymf278b_device::timer_busy_start(int is_pcm)
 	m_timer_busy->adjust(attotime::from_hz(m_clock / (is_pcm ? 88 : 56)));
 }
 
-WRITE8_MEMBER( ymf278b_device::write )
+void ymf278b_device::write(offs_t offset, u8 data)
 {
 	switch (offset)
 	{
@@ -717,7 +717,7 @@ WRITE8_MEMBER( ymf278b_device::write )
 }
 
 
-READ8_MEMBER( ymf278b_device::read )
+u8 ymf278b_device::read(offs_t offset)
 {
 	uint8_t ret = 0;
 
@@ -776,6 +776,14 @@ READ8_MEMBER( ymf278b_device::read )
 
 
 /**************************************************************************/
+
+//-------------------------------------------------
+//  device_post_load - device-specific post load
+//-------------------------------------------------
+void ymf278b_device::device_post_load()
+{
+	ymf262_post_load(m_ymf262);
+}
 
 //-------------------------------------------------
 //  device_reset - device-specific reset
@@ -839,6 +847,20 @@ void ymf278b_device::device_stop()
 {
 	ymf262_shutdown(m_ymf262);
 	m_ymf262 = nullptr;
+}
+
+void ymf278b_device::device_clock_changed()
+{
+	m_stream->set_sample_rate(clock()/768);
+
+	m_clock = clock();
+	m_timer_base = m_clock ? attotime::from_hz(m_clock) * (19 * 36) : attotime::zero;
+
+	// YMF262 related
+
+	int ymf262_clock = clock() / (19/8.0);
+	ymf262_clock_changed(m_ymf262, ymf262_clock, ymf262_clock / 288);
+	m_stream_ymf262->set_sample_rate(ymf262_clock / 288);
 }
 
 void ymf278b_device::rom_bank_updated()
@@ -949,7 +971,7 @@ void ymf278b_device::device_start()
 	m_clock = clock();
 	m_irq_handler.resolve();
 
-	m_timer_base = attotime::from_hz(m_clock) * (19*36);
+	m_timer_base = m_clock ? attotime::from_hz(m_clock) * (19*36) : attotime::zero;
 	m_timer_a = timer_alloc(TIMER_A);
 	m_timer_b = timer_alloc(TIMER_B);
 	m_timer_busy = timer_alloc(TIMER_BUSY_CLEAR);

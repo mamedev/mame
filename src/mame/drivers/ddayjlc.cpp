@@ -72,8 +72,8 @@ $842f = lives
 class ddayjlc_state : public driver_device
 {
 public:
-	ddayjlc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	ddayjlc_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_mainram(*this, "mainram"),
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"),
@@ -82,7 +82,8 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch") { }
+		m_soundlatch(*this, "soundlatch")
+	{ }
 
 	void ddayjlc(machine_config &config);
 
@@ -106,7 +107,7 @@ private:
 	DECLARE_WRITE8_MEMBER(i8257_LMSR_w);
 	TILE_GET_INFO_MEMBER(get_tile_info_bg);
 	TILE_GET_INFO_MEMBER(get_tile_info_fg);
-	DECLARE_PALETTE_INIT(ddayjlc);
+	void ddayjlc_palette(palette_device &palette) const;
 	uint32_t screen_update_ddayjlc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void main_map(address_map &map);
@@ -566,28 +567,27 @@ void ddayjlc_state::machine_reset()
 	}
 }
 
-PALETTE_INIT_MEMBER(ddayjlc_state, ddayjlc)
+void ddayjlc_state::ddayjlc_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i,r,g,b,val;
-	int bit0,bit1,bit2;
-
-	for (i = 0; i < 0x200; i++)
+	uint8_t const *const color_prom = memregion("proms")->base();
+	for (int i = 0; i < 0x200; i++)
 	{
-		val = (color_prom[i+0x000]) | (color_prom[i+0x200]<<4);
+		int bit0, bit1, bit2;
+
+		int const val = (color_prom[i + 0x000]) | (color_prom[i + 0x200] << 4);
 
 		bit0 = 0;
-		bit1 = (val >> 6) & 0x01;
-		bit2 = (val >> 7) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		bit0 = (val >> 3) & 0x01;
-		bit1 = (val >> 4) & 0x01;
-		bit2 = (val >> 5) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		bit0 = (val >> 0) & 0x01;
-		bit1 = (val >> 1) & 0x01;
-		bit2 = (val >> 2) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit1 = BIT(val, 6);
+		bit2 = BIT(val, 7);
+		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = BIT(val, 3);
+		bit1 = BIT(val, 4);
+		bit2 = BIT(val, 5);
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = BIT(val, 0);
+		bit1 = BIT(val, 1);
+		bit2 = BIT(val, 2);
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -608,7 +608,7 @@ MACHINE_CONFIG_START(ddayjlc_state::ddayjlc)
 	MCFG_DEVICE_ADD("audiocpu", Z80, 12000000/4)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -617,23 +617,21 @@ MACHINE_CONFIG_START(ddayjlc_state::ddayjlc)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ddayjlc_state, screen_update_ddayjlc)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ddayjlc_state, vblank_irq))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ddayjlc)
-	MCFG_PALETTE_ADD("palette", 0x200+4)
-	MCFG_PALETTE_INIT_OWNER(ddayjlc_state, ddayjlc)
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_ddayjlc)
+	PALETTE(config, m_palette, FUNC(ddayjlc_state::ddayjlc_palette), 0x200+4);
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 12000000/6)
-	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ay8910_device &ay1(AY8910(config, "ay1", 12000000/6));
+	ay1.port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
+	ay1.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 12000000/6)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	AY8910(config, "ay2", 12000000/6).add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 

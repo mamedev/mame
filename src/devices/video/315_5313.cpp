@@ -142,6 +142,16 @@
 #define MEGADRIVE_REG17_DMATYPE         ((m_regs[0x17]&0xc0)>>6)
 #define MEGADRIVE_REG17_UNUSED          ((m_regs[0x17]&0x3f)>>0)
 
+static constexpr uint8_t line_315_5313_mode4[8] = {
+			  26 /* VINT_HPOS */
+			, 26 /* VINT_FLAG_HPOS */
+			, 27 /* HINT_HPOS */
+			, 28 /* NMI_HPOS, not verified */
+			, 25 /* XSCROLL_HPOS */
+			, 28 /* VCOUNT_CHANGE_HPOS */
+			, 26 /* SPROVR_HPOS */
+			, 37 /* SPRCOL_BASEHPOS */
+		};
 
 #define MAX_HPOSITION 480
 
@@ -149,7 +159,8 @@
 DEFINE_DEVICE_TYPE(SEGA315_5313, sega315_5313_device, "sega315_5313", "Sega 315-5313 Megadrive VDP")
 
 sega315_5313_device::sega315_5313_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sega315_5124_device(mconfig, SEGA315_5313, tag, owner, clock, SEGA315_5124_CRAM_SIZE, 0, true)
+	// mode 4 support, for SMS compatibility, is implemented in 315_5124.cpp
+	: sega315_5313_mode4_device(mconfig, SEGA315_5313, tag, owner, clock, SEGA315_5124_CRAM_SIZE, 0x00, 0x1f, 0, 0, line_315_5313_mode4)
 	, device_mixer_interface(mconfig, *this, 2)
 	, m_render_bitmap(nullptr)
 	, m_render_line(nullptr)
@@ -210,13 +221,14 @@ sega315_5313_device::sega315_5313_device(const machine_config &mconfig, const ch
 //  add machine configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(sega315_5313_device::device_add_mconfig)
-	MCFG_PALETTE_ADD("palette", 0x200)
-	MCFG_PALETTE_INIT_OWNER(sega315_5124_device, sega315_5124)
+void sega315_5313_device::device_add_mconfig(machine_config &config)
+{
+	sega315_5313_mode4_device::device_add_mconfig(config);
 
-	MCFG_DEVICE_ADD("snsnd", SEGAPSG, DERIVED_CLOCK(1, 15))
-	MCFG_MIXER_ROUTE(ALL_OUTPUTS, *this, 0.5, 0)
-MACHINE_CONFIG_END
+	m_palette->set_entries(0x200); // more entries for 32X - not really the cleanest way to do this
+
+	SEGAPSG(config, m_snsnd, DERIVED_CLOCK(1, 15)).add_route(ALL_OUTPUTS, *this, 0.5, AUTO_ALLOC_INPUT, 0);
+}
 
 TIMER_CALLBACK_MEMBER(sega315_5313_device::irq6_on_timer_callback)
 {
@@ -322,7 +334,7 @@ void sega315_5313_device::device_start()
 
 	m_space68k = &m_cpu68k->space();
 
-	sega315_5124_device::device_start();
+	sega315_5313_mode4_device::device_start();
 }
 
 void sega315_5313_device::device_reset()
@@ -344,7 +356,7 @@ void sega315_5313_device::device_reset()
 	m_vblank_flag = 0;
 	m_total_scanlines = 262;
 
-	sega315_5124_device::device_reset();
+	sega315_5313_mode4_device::device_reset();
 }
 
 void sega315_5313_device::device_reset_old()

@@ -10,25 +10,25 @@
 #include "includes/sprint2.h"
 
 
-PALETTE_INIT_MEMBER(sprint2_state, sprint2)
+void sprint2_state::sprint2_palette(palette_device &palette) const
 {
 	palette.set_indirect_color(0, rgb_t(0x00, 0x00, 0x00));
 	palette.set_indirect_color(1, rgb_t(0x5b, 0x5b, 0x5b));
 	palette.set_indirect_color(2, rgb_t(0xa4, 0xa4, 0xa4));
 	palette.set_indirect_color(3, rgb_t(0xff, 0xff, 0xff));
 
-	palette.set_pen_indirect(0x0, 1);   /* black playfield */
+	palette.set_pen_indirect(0x0, 1);   // black playfield
 	palette.set_pen_indirect(0x1, 0);
-	palette.set_pen_indirect(0x2, 1);   /* white playfield */
+	palette.set_pen_indirect(0x2, 1);   // white playfield
 	palette.set_pen_indirect(0x3, 3);
 
-	palette.set_pen_indirect(0x4, 1);   /* car #1 */
+	palette.set_pen_indirect(0x4, 1);   // car #1
 	palette.set_pen_indirect(0x5, 3);
-	palette.set_pen_indirect(0x6, 1);   /* car #2 */
+	palette.set_pen_indirect(0x6, 1);   // car #2
 	palette.set_pen_indirect(0x7, 0);
-	palette.set_pen_indirect(0x8, 1);   /* car #3 */
+	palette.set_pen_indirect(0x8, 1);   // car #3
 	palette.set_pen_indirect(0x9, 2);
-	palette.set_pen_indirect(0xa, 1);   /* car #4 */
+	palette.set_pen_indirect(0xa, 1);   // car #4
 	palette.set_pen_indirect(0xb, 2);
 }
 
@@ -83,8 +83,8 @@ uint8_t sprint2_state::collision_check(rectangle& rect)
 	int x;
 	int y;
 
-	for (y = rect.min_y; y <= rect.max_y; y++)
-		for (x = rect.min_x; x <= rect.max_x; x++)
+	for (y = rect.top(); y <= rect.bottom(); y++)
+		for (x = rect.left(); x <= rect.right(); x++)
 		{
 			uint16_t a = m_palette->pen_indirect(m_helper.pix16(y, x));
 
@@ -155,13 +155,11 @@ WRITE_LINE_MEMBER(sprint2_state::screen_vblank_sprint2)
 
 		for (i = 0; i < 2; i++)
 		{
-			rectangle rect;
-
-			rect.min_x = get_sprite_x(video_ram, i);
-			rect.min_y = get_sprite_y(video_ram, i);
-			rect.max_x = get_sprite_x(video_ram, i) + m_gfxdecode->gfx(1)->width() - 1;
-			rect.max_y = get_sprite_y(video_ram, i) + m_gfxdecode->gfx(1)->height() - 1;
-
+			rectangle rect(
+					get_sprite_x(video_ram, i),
+					get_sprite_x(video_ram, i) + m_gfxdecode->gfx(1)->width() - 1,
+					get_sprite_y(video_ram, i),
+					get_sprite_y(video_ram, i) + m_gfxdecode->gfx(1)->height() - 1);
 			rect &= visarea;
 
 			/* check for sprite-tilemap collisions */

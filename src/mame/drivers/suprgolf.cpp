@@ -496,54 +496,54 @@ void suprgolf_state::machine_reset()
 
 #define MASTER_CLOCK XTAL(12'000'000)
 
-MACHINE_CONFIG_START(suprgolf_state::suprgolf)
-
+void suprgolf_state::suprgolf(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,MASTER_CLOCK/2) /* guess */
-	MCFG_DEVICE_PROGRAM_MAP(suprgolf_map)
-	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", suprgolf_state,  irq0_line_hold)
+	Z80(config, m_maincpu, MASTER_CLOCK/2); /* guess */
+	m_maincpu->set_addrmap(AS_PROGRAM, &suprgolf_state::suprgolf_map);
+	m_maincpu->set_addrmap(AS_IO, &suprgolf_state::io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(suprgolf_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, suprgolf_state, p1_r))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, suprgolf_state, p2_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, suprgolf_state, pedal_extra_bits_r))
+	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
+	ppi0.in_pa_callback().set(FUNC(suprgolf_state::p1_r));
+	ppi0.in_pb_callback().set(FUNC(suprgolf_state::p2_r));
+	ppi0.in_pc_callback().set(FUNC(suprgolf_state::pedal_extra_bits_r));
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("SYSTEM"))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, suprgolf_state, rom_bank_select_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, suprgolf_state, rom_bank_select_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, suprgolf_state, vregs_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, suprgolf_state, vregs_w))
+	i8255_device &ppi1(I8255A(config, "ppi8255_1"));
+	ppi1.in_pa_callback().set_ioport("SYSTEM");
+	ppi1.in_pb_callback().set(FUNC(suprgolf_state::rom_bank_select_r));
+	ppi1.out_pb_callback().set(FUNC(suprgolf_state::rom_bank_select_w));
+	ppi1.in_pc_callback().set(FUNC(suprgolf_state::vregs_r));
+	ppi1.out_pc_callback().set(FUNC(suprgolf_state::vregs_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 191)
-	MCFG_SCREEN_UPDATE_DRIVER(suprgolf_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 255, 0, 191);
+	screen.set_screen_update(FUNC(suprgolf_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_suprgolf)
-	MCFG_PALETTE_ADD("palette", 0x800)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_suprgolf);
+	PALETTE(config, m_palette).set_entries(0x800);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, MASTER_CLOCK/4) /* guess */
-	//MCFG_YM2203_IRQ_HANDLER(INPUTLINE("maincpu", INPUT_LINE_NMI))
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW0"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, suprgolf_state, writeA))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, suprgolf_state, writeB))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", MASTER_CLOCK/4)); /* guess */
+	//ymsnd.irq_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	ymsnd.port_a_read_callback().set_ioport("DSW0");
+	ymsnd.port_b_read_callback().set_ioport("DSW1");
+	ymsnd.port_a_write_callback().set(FUNC(suprgolf_state::writeA));
+	ymsnd.port_b_write_callback().set(FUNC(suprgolf_state::writeB));
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(384'000)) /* guess */
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, suprgolf_state, adpcm_int))      /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)  /* 4KHz 4-bit */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	MSM5205(config, m_msm, XTAL(384'000)); /* guess */
+	m_msm->vck_legacy_callback().set(FUNC(suprgolf_state::adpcm_int));  /* interrupt function */
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  /* 4KHz 4-bit */
+	m_msm->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 ROM_START( suprgolf )
 	ROM_REGION( 0x10000, "maincpu", 0 )  // on the YUVO-702A main board

@@ -347,10 +347,8 @@ void cgc7900_state::cgc7900_mem(address_map &map)
 //  AM_RANGE(0xefc446, 0xefc447) HVG Load dY
 //  AM_RANGE(0xefc448, 0xefc449) HVG Load Pixel Color
 //  AM_RANGE(0xefc44a, 0xefc44b) HVG Load Trip
-	map(0xff8001, 0xff8001).rw(m_i8251_0, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xff8003, 0xff8003).rw(m_i8251_0, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0xff8041, 0xff8041).rw(m_i8251_1, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xff8043, 0xff8043).rw(m_i8251_1, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xff8000, 0xff8003).rw(m_i8251_0, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
+	map(0xff8040, 0xff8043).rw(m_i8251_1, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 	map(0xff8080, 0xff8081).rw(FUNC(cgc7900_state::keyboard_r), FUNC(cgc7900_state::keyboard_w));
 //  AM_RANGE(0xff80c6, 0xff80c7) Joystick X axis
 //  AM_RANGE(0xff80ca, 0xff80cb) Joystick Y axis
@@ -460,68 +458,62 @@ void cgc7900_state::machine_reset()
     MACHINE_DRIVER( cgc7900 )
 -------------------------------------------------*/
 
-MACHINE_CONFIG_START(cgc7900_state::cgc7900)
+void cgc7900_state::cgc7900(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(M68000_TAG, M68000, XTAL(28'480'000)/4)
-	MCFG_DEVICE_PROGRAM_MAP(cgc7900_mem)
+	M68000(config, m_maincpu, XTAL(28'480'000)/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cgc7900_state::cgc7900_mem);
 
-	MCFG_DEVICE_ADD(I8035_TAG, I8035, 1000000)
-	MCFG_DEVICE_PROGRAM_MAP(keyboard_mem)
-	//MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, ))
-	//MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, ))
-	//MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, ))
-	//MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, ))
-	//MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, ))
-	//MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, ))
-	//MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(*this, ))
-	MCFG_DEVICE_DISABLE()
+	i8035_device &kbmcu(I8035(config, I8035_TAG, 1000000));
+	kbmcu.set_addrmap(AS_PROGRAM, &cgc7900_state::keyboard_mem);
+	kbmcu.set_disable();
 
-/*  MCFG_DEVICE_ADD(AM2910_TAG, AM2910, XTAL(17'360'000))
-    MCFG_DEVICE_PROGRAM_MAP(omti10_mem)*/
+//  am2910_device &am2910(AM2910(config, AM2910_TAG, XTAL(17'360'000)));
+//  am2910.set_addrmap(AS_PROGRAM, &cgc7900_state::omti10_mem);
+
 
 	/* video hardware */
 	cgc7900_video(config);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(AY8910_TAG, AY8910, XTAL(28'480'000)/16)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8910(config, AY8910_TAG, XTAL(28'480'000)/16).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(cgc7900_state, kbd_put))
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(cgc7900_state::kbd_put));
 
-	MCFG_DEVICE_ADD(MM58167_TAG, MM58167, XTAL(32'768))
-	MCFG_MM58167_IRQ_CALLBACK(WRITELINE(*this, cgc7900_state, irq<0x0>))
+	mm58167_device &rtc(MM58167(config, MM58167_TAG, XTAL(32'768)));
+	rtc.irq().set(FUNC(cgc7900_state::irq<0x0>));
 
-	MCFG_DEVICE_ADD(K1135A_TAG, COM8116, XTAL(5'068'800))
-	MCFG_COM8116_FR_HANDLER(WRITELINE(INS8251_0_TAG, i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(INS8251_0_TAG, i8251_device, write_rxc))
-	MCFG_COM8116_FT_HANDLER(WRITELINE(INS8251_1_TAG, i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(INS8251_1_TAG, i8251_device, write_rxc))
+	com8116_device &k1135a(COM8116(config, K1135A_TAG, XTAL(5'068'800)));
+	k1135a.fr_handler().set(m_i8251_0, FUNC(i8251_device::write_txc));
+	k1135a.fr_handler().append(m_i8251_0, FUNC(i8251_device::write_rxc));
+	k1135a.ft_handler().set(m_i8251_1, FUNC(i8251_device::write_txc));
+	k1135a.ft_handler().append(m_i8251_1, FUNC(i8251_device::write_rxc));
 
-	MCFG_DEVICE_ADD(INS8251_0_TAG, I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, cgc7900_state, irq<0xf>))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE(*this, cgc7900_state, irq<0x3>))
+	I8251(config, m_i8251_0, 0);
+	m_i8251_0->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_i8251_0->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
+	m_i8251_0->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
+	m_i8251_0->rxrdy_handler().set(FUNC(cgc7900_state::irq<0xf>));
+	m_i8251_0->txrdy_handler().set(FUNC(cgc7900_state::irq<0x3>));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "null_modem")
-	MCFG_RS232_RXD_HANDLER(WRITELINE(INS8251_0_TAG, i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(INS8251_0_TAG, i8251_device, write_dsr))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "null_modem"));
+	rs232.rxd_handler().set(m_i8251_0, FUNC(i8251_device::write_rxd));
+	rs232.dsr_handler().set(m_i8251_0, FUNC(i8251_device::write_dsr));
 
-	MCFG_DEVICE_ADD(INS8251_1_TAG, I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE("rs449", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(WRITELINE("rs449", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE("rs449", rs232_port_device, write_rts))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, cgc7900_state, irq<0x8>))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE(*this, cgc7900_state, irq<0x1>))
+	I8251(config, m_i8251_1, 0);
+	m_i8251_1->txd_handler().set("rs449", FUNC(rs232_port_device::write_txd));
+	m_i8251_1->dtr_handler().set("rs449", FUNC(rs232_port_device::write_dtr));
+	m_i8251_1->rts_handler().set("rs449", FUNC(rs232_port_device::write_rts));
+	m_i8251_1->rxrdy_handler().set(FUNC(cgc7900_state::irq<0x8>));
+	m_i8251_1->txrdy_handler().set(FUNC(cgc7900_state::irq<0x1>));
 
-	MCFG_DEVICE_ADD("rs449", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(INS8251_1_TAG, i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(INS8251_1_TAG, i8251_device, write_dsr))
-MACHINE_CONFIG_END
+	rs232_port_device &rs449(RS232_PORT(config, "rs449", default_rs232_devices, nullptr));
+	rs449.rxd_handler().set(m_i8251_1, FUNC(i8251_device::write_rxd));
+	rs449.dsr_handler().set(m_i8251_1, FUNC(i8251_device::write_dsr));
+}
 
 /***************************************************************************
     ROMS

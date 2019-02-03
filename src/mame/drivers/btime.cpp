@@ -1285,46 +1285,42 @@ MACHINE_CONFIG_START(btime_state::btime)
 
 	MCFG_DEVICE_ADD("audiocpu", M6502, HCLK1/3/2)
 	MCFG_DEVICE_PROGRAM_MAP(audio_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("8vck", btime_state, audio_nmi_gen, "screen", 0, 8)
+	TIMER(config, "8vck").configure_scanline(FUNC(btime_state::audio_nmi_gen), "screen", 0, 8);
 
-	MCFG_INPUT_MERGER_ALL_HIGH("audionmi")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	INPUT_MERGER_ALL_HIGH(config, "audionmi").output_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_RAW_PARAMS(HCLK, 384, 8, 248, 272, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(btime_state, screen_update_btime)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_MACHINE_START_OVERRIDE(btime_state,btime)
 	MCFG_MACHINE_RESET_OVERRIDE(btime_state,btime)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_btime)
-
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(btime_state,btime)
-	MCFG_PALETTE_FORMAT(BBGGGRRR_inverted)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_btime);
+	PALETTE(config, m_palette, FUNC(btime_state::btime_palette)).set_format(palette_device::BGR_233_inverted, 16);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
-	MCFG_DEVICE_ADD("ay1", AY8910, HCLK2)
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_DISCRETE_OUTPUT)
-	MCFG_AY8910_RES_LOADS(RES_K(5), RES_K(5), RES_K(5))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, btime_state, ay_audio_nmi_enable_w))
-	MCFG_SOUND_ROUTE(0, "discrete", 1.0, 0)
-	MCFG_SOUND_ROUTE(1, "discrete", 1.0, 1)
-	MCFG_SOUND_ROUTE(2, "discrete", 1.0, 2)
+	ay8910_device &ay1(AY8910(config, "ay1", HCLK2));
+	ay1.set_flags(AY8910_DISCRETE_OUTPUT);
+	ay1.set_resistors_load(RES_K(5), RES_K(5), RES_K(5));
+	ay1.port_a_write_callback().set(FUNC(btime_state::ay_audio_nmi_enable_w));
+	ay1.add_route(0, "discrete", 1.0, 0);
+	ay1.add_route(1, "discrete", 1.0, 1);
+	ay1.add_route(2, "discrete", 1.0, 2);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, HCLK2)
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_DISCRETE_OUTPUT)
-	MCFG_AY8910_RES_LOADS(RES_K(1), RES_K(5), RES_K(5))
-	MCFG_SOUND_ROUTE(0, "discrete", 1.0, 3)
-	MCFG_SOUND_ROUTE(1, "discrete", 1.0, 4)
-	MCFG_SOUND_ROUTE(2, "discrete", 1.0, 5)
+	ay8910_device &ay2(AY8910(config, "ay2", HCLK2));
+	ay2.set_flags(AY8910_DISCRETE_OUTPUT);
+	ay2.set_resistors_load(RES_K(1), RES_K(5), RES_K(5));
+	ay2.add_route(0, "discrete", 1.0, 3);
+	ay2.add_route(1, "discrete", 1.0, 4);
+	ay2.add_route(2, "discrete", 1.0, 5);
 
 	MCFG_DEVICE_ADD("discrete", DISCRETE, btime_sound_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -1342,10 +1338,8 @@ MACHINE_CONFIG_START(btime_state::cookrace)
 	MCFG_DEVICE_PROGRAM_MAP(audio_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_cookrace)
-
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(btime_state, screen_update_cookrace)
+	m_gfxdecode->set_info(gfx_cookrace);
+	m_screen->set_screen_update(FUNC(btime_state::screen_update_cookrace));
 MACHINE_CONFIG_END
 
 
@@ -1359,26 +1353,22 @@ MACHINE_CONFIG_START(btime_state::lnc)
 	MCFG_MACHINE_RESET_OVERRIDE(btime_state,lnc)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_lnc)
+	m_gfxdecode->set_info(gfx_lnc);
 
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(8)
-	MCFG_PALETTE_INIT_OWNER(btime_state,lnc)
+	m_palette->set_entries(8);
+	m_palette->set_init(FUNC(btime_state::lnc_palette));
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(btime_state, screen_update_lnc)
+	m_screen->set_screen_update(FUNC(btime_state::screen_update_lnc));
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(btime_state::wtennis)
+void btime_state::wtennis(machine_config &config)
+{
 	lnc(config);
 
-	/* basic machine hardware */
-
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(btime_state, screen_update_eggs)
-MACHINE_CONFIG_END
+	m_screen->set_screen_update(FUNC(btime_state::screen_update_eggs));
+}
 
 
 MACHINE_CONFIG_START(btime_state::mmonkey)
@@ -1401,13 +1391,12 @@ MACHINE_CONFIG_START(btime_state::bnj)
 	MCFG_DEVICE_PROGRAM_MAP(bnj_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_bnj)
+	m_gfxdecode->set_info(gfx_bnj);
 
 	MCFG_VIDEO_START_OVERRIDE(btime_state,bnj)
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(btime_state, screen_update_bnj)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1) // 256 * 240, confirmed
+	m_screen->set_screen_update(FUNC(btime_state::screen_update_bnj));
+	m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1); // 256 * 240, confirmed
 MACHINE_CONFIG_END
 
 
@@ -1428,24 +1417,22 @@ MACHINE_CONFIG_START(btime_state::zoar)
 	MCFG_DEVICE_PROGRAM_MAP(zoar_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_zoar)
+	m_gfxdecode->set_info(gfx_zoar);
 
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(64)
+	m_palette->set_entries(64);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(btime_state, screen_update_zoar)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1) // 256 * 240, confirmed
+	m_screen->set_screen_update(FUNC(btime_state::screen_update_zoar));
+	m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1); // 256 * 240, confirmed
 
 	/* sound hardware */
-	MCFG_DEVICE_REPLACE("ay1", AY8910, HCLK1)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_DISCRETE_OUTPUT)
-	MCFG_AY8910_RES_LOADS(RES_K(5), RES_K(5), RES_K(5))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, btime_state, ay_audio_nmi_enable_w))
+	ay8910_device &ay1(AY8910(config.replace(), "ay1", HCLK1));
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.23);
+	ay1.set_flags(AY8910_DISCRETE_OUTPUT);
+	ay1.set_resistors_load(RES_K(5), RES_K(5), RES_K(5));
+	ay1.port_a_write_callback().set(FUNC(btime_state::ay_audio_nmi_enable_w));
 
-	MCFG_DEVICE_REPLACE("ay2", AY8910, HCLK1)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
+	ay8910_device &ay2(AY8910(config.replace(), "ay2", HCLK1));
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.23);
 MACHINE_CONFIG_END
 
 
@@ -1460,19 +1447,15 @@ MACHINE_CONFIG_START(btime_state::disco)
 	MCFG_DEVICE_MODIFY("audiocpu")
 	MCFG_DEVICE_PROGRAM_MAP(disco_audio_map)
 
-	MCFG_DEVICE_MODIFY("soundlatch")
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	m_soundlatch->set_separate_acknowledge(true);
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_disco)
-
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(32)
+	m_gfxdecode->set_info(gfx_disco);
+	m_palette->set_entries(32);
 
 	MCFG_VIDEO_START_OVERRIDE(btime_state,disco)
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(btime_state, screen_update_disco)
+	m_screen->set_screen_update(FUNC(btime_state::screen_update_disco));
 MACHINE_CONFIG_END
 
 
@@ -1484,7 +1467,7 @@ MACHINE_CONFIG_START(btime_state::tisland)
 	MCFG_DEVICE_PROGRAM_MAP(tisland_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_zoar)
+	m_gfxdecode->set_info(gfx_zoar);
 MACHINE_CONFIG_END
 
 
@@ -2002,8 +1985,10 @@ void btime_state::init_zoar()
 
 	/* At location 0xD50A is what looks like an undocumented opcode. I tried
 	   implementing it given what opcode 0x23 should do, but it still didn't
-	   work in demo mode. So this could be another protection or a bad ROM read.
-	   I'm NOPing it out for now. */
+	   work in demo mode, this could be another protection.
+
+	   The ROM has been confirmed as good on multiple working PCBs, so this
+	   isn't a bitrot issue */
 	memset(&rom[0xd50a],0xea,8);
 
 	m_audio_nmi_enable_type = AUDIO_ENABLE_AY8910;
@@ -2016,7 +2001,11 @@ void btime_state::init_tisland()
 	/* At location 0xa2b6 there's a strange RLA followed by a BPL that reads from an
 	   unmapped area that causes the game to fail in several circumstances.On the Cassette
 	   version the RLA (33) is in reality a BIT (24),so I'm guessing that there's something
-	   wrong going on in the encryption scheme.*/
+	   wrong going on in the encryption scheme.
+
+	   There are other locations with similar problems. These ROMs have NOT yet been
+	   confirmed on multiple PCBs, so this could still be a bad dump.
+	   */
 	memset(&rom[0xa2b6],0x24,1);
 
 	m_audio_nmi_enable_type = AUDIO_ENABLE_DIRECT;

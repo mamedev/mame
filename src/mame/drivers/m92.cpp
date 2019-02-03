@@ -206,7 +206,6 @@ psoldier dip locations still need verification.
 #include "includes/iremipt.h"
 
 #include "cpu/nec/nec.h"
-#include "cpu/nec/v25.h"
 #include "machine/gen_latch.h"
 #include "machine/irem_cpu.h"
 #include "machine/nvram.h"
@@ -914,198 +913,188 @@ GFXDECODE_END
 
 /***************************************************************************/
 
-MACHINE_CONFIG_START(m92_state::m92)
-
+void m92_state::m92(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",V33,XTAL(18'000'000)/2)
-	MCFG_DEVICE_PROGRAM_MAP(m92_map)
-	MCFG_DEVICE_IO_MAP(m92_portmap)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("upd71059c", pic8259_device, inta_cb)
+	V33(config, m_maincpu, XTAL(18'000'000)/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &m92_state::m92_map);
+	m_maincpu->set_addrmap(AS_IO, &m92_state::m92_portmap);
+	m_maincpu->set_irq_acknowledge_callback("upd71059c", FUNC(pic8259_device::inta_cb));
 
-	MCFG_DEVICE_ADD("soundcpu" ,V35, XTAL(14'318'181))
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	V35(config, m_soundcpu, XTAL(14'318'181));
+	m_soundcpu->set_addrmap(AS_PROGRAM, &m92_state::sound_map);
 
-	MCFG_DEVICE_ADD("upd71059c", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	PIC8259(config, m_upd71059c, 0);
+	m_upd71059c->out_int_callback().set_inputline(m_maincpu, 0);
 
 	MCFG_MACHINE_RESET_OVERRIDE(m92_state,m92)
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", m92_state, scanline_interrupt, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(m92_state::scanline_interrupt), "screen", 0, 1);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
+	BUFFERED_SPRITERAM16(config, "spriteram");
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(80, 511-112, 8, 247) /* 320 x 240 */
-	MCFG_SCREEN_UPDATE_DRIVER(m92_state, screen_update_m92)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(512, 256);
+	m_screen->set_visarea(80, 511-112, 8, 247); /* 320 x 240 */
+	m_screen->set_screen_update(FUNC(m92_state::screen_update_m92));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_m92)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_m92);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 
 	MCFG_VIDEO_START_OVERRIDE(m92_state,m92)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", NEC_INPUT_LINE_INTP1))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	generic_latch_8_device &soundlatch(GENERIC_LATCH_8(config, "soundlatch"));
+	soundlatch.data_pending_callback().set_inputline(m_soundcpu, NEC_INPUT_LINE_INTP1);
+	soundlatch.set_separate_acknowledge(true);
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("upd71059c", pic8259_device, ir3_w))
+	GENERIC_LATCH_8(config, "soundlatch2").data_pending_callback().set(m_upd71059c, FUNC(pic8259_device::ir3_w));
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181)/4)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", NEC_INPUT_LINE_INTP0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.40)
-	MCFG_SOUND_ROUTE(1, "mono", 0.40)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(14'318'181)/4));
+	ymsnd.irq_handler().set_inputline(m_soundcpu, NEC_INPUT_LINE_INTP0);
+	ymsnd.add_route(0, "mono", 0.40);
+	ymsnd.add_route(1, "mono", 0.40);
 
-	MCFG_IREMGA20_ADD("irem", XTAL(14'318'181)/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	iremga20_device &ga20(IREMGA20(config, "irem", XTAL(14'318'181)/4));
+	ga20.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-
-MACHINE_CONFIG_START(m92_state::m92_banked)
+void m92_state::m92_banked(machine_config &config)
+{
 	m92(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(m92_banked_map)
-	MCFG_DEVICE_IO_MAP(m92_banked_portmap)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &m92_state::m92_banked_map);
+	m_maincpu->set_addrmap(AS_IO, &m92_state::m92_banked_portmap);
+}
 
-MACHINE_CONFIG_START(m92_state::gunforce)
+void m92_state::gunforce(machine_config &config)
+{
 	m92(config);
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_V25_CONFIG(gunforce_decryption_table)
-MACHINE_CONFIG_END
+	m_soundcpu->set_decryption_table(gunforce_decryption_table);
+}
 
-MACHINE_CONFIG_START(m92_state::bmaster)
+void m92_state::bmaster(machine_config &config)
+{
 	m92(config);
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_V25_CONFIG(bomberman_decryption_table)
-MACHINE_CONFIG_END
+	m_soundcpu->set_decryption_table(bomberman_decryption_table);
+}
 
-MACHINE_CONFIG_START(m92_state::lethalth)
+void m92_state::lethalth(machine_config &config)
+{
 	m92(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(lethalth_map)
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_V25_CONFIG(lethalth_decryption_table)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &m92_state::lethalth_map);
+	m_soundcpu->set_decryption_table(lethalth_decryption_table);
+}
 
-MACHINE_CONFIG_START(m92_state::uccops)
+void m92_state::uccops(machine_config &config)
+{
 	m92(config);
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_V25_CONFIG(dynablaster_decryption_table)
-MACHINE_CONFIG_END
+	m_soundcpu->set_decryption_table(dynablaster_decryption_table);
+}
 
-MACHINE_CONFIG_START(m92_state::mysticri)
+void m92_state::mysticri(machine_config &config)
+{
 	m92(config);
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_V25_CONFIG(mysticri_decryption_table)
-MACHINE_CONFIG_END
+	m_soundcpu->set_decryption_table(mysticri_decryption_table);
+}
 
-MACHINE_CONFIG_START(m92_state::majtitl2)
+void m92_state::majtitl2(machine_config &config)
+{
 	m92_banked(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(majtitl2_map)
-	MCFG_NVRAM_ADD_0FILL("eeprom")
+	m_maincpu->set_addrmap(AS_PROGRAM, &m92_state::majtitl2_map);
+	NVRAM(config, "eeprom", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_V25_CONFIG(majtitl2_decryption_table)
-MACHINE_CONFIG_END
+	m_soundcpu->set_decryption_table(majtitl2_decryption_table);
+}
 
-MACHINE_CONFIG_START(m92_state::majtitl2a)
+void m92_state::majtitl2a(machine_config &config)
+{
 	majtitl2(config);
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_V25_CONFIG(mysticri_decryption_table)
-MACHINE_CONFIG_END
+	m_soundcpu->set_decryption_table(mysticri_decryption_table);
+}
 
-MACHINE_CONFIG_START(m92_state::hook)
+void m92_state::hook(machine_config &config)
+{
 	m92(config);
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_V25_CONFIG(hook_decryption_table)
-MACHINE_CONFIG_END
+	m_soundcpu->set_decryption_table(hook_decryption_table);
+}
 
-MACHINE_CONFIG_START(m92_state::ppan)
+void m92_state::ppan(machine_config &config)
+{
 	m92(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(ppan_portmap)
+	m_maincpu->set_addrmap(AS_IO, &m92_state::ppan_portmap);
 
-	MCFG_DEVICE_REMOVE("soundcpu")
-	MCFG_DEVICE_REMOVE("soundlatch")
-	MCFG_DEVICE_REMOVE("soundlatch2")
-	MCFG_DEVICE_REMOVE("ymsnd")
-	MCFG_DEVICE_REMOVE("irem")
+	config.device_remove("soundcpu");
+	config.device_remove("soundlatch");
+	config.device_remove("soundlatch2");
+	config.device_remove("ymsnd");
+	config.device_remove("irem");
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(m92_state, screen_update_ppan)
+	m_screen->set_screen_update(FUNC(m92_state::screen_update_ppan));
 
 	MCFG_VIDEO_START_OVERRIDE(m92_state,ppan)
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, 1000000, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-MACHINE_CONFIG_START(m92_state::rtypeleo)
+void m92_state::rtypeleo(machine_config &config)
+{
 	m92(config);
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_V25_CONFIG(rtypeleo_decryption_table)
-MACHINE_CONFIG_END
+	m_soundcpu->set_decryption_table(rtypeleo_decryption_table);
+}
 
-
-MACHINE_CONFIG_START(m92_state::inthunt)
+void m92_state::inthunt(machine_config &config)
+{
 	m92(config);
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_V25_CONFIG(inthunt_decryption_table)
-MACHINE_CONFIG_END
+	m_soundcpu->set_decryption_table(inthunt_decryption_table);
+}
 
-
-MACHINE_CONFIG_START(m92_state::nbbatman)
+void m92_state::nbbatman(machine_config &config)
+{
 	m92_banked(config);
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_V25_CONFIG(leagueman_decryption_table)
-MACHINE_CONFIG_END
+	m_soundcpu->set_decryption_table(leagueman_decryption_table);
+}
 
-MACHINE_CONFIG_START(m92_state::nbbatman2bl)
+void m92_state::nbbatman2bl(machine_config &config)
+{
 	m92_banked(config);
-	MCFG_DEVICE_REMOVE("soundcpu")
-	MCFG_DEVICE_REMOVE("ymsnd")
-	MCFG_DEVICE_REMOVE("irem")
+	config.device_remove("soundcpu");
+	config.device_remove("ymsnd");
+	config.device_remove("irem");
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_bootleg)
+	m_gfxdecode->set_info(gfx_bootleg);
 
 	/* 8951 MCU as sound CPU */
 	/* OKI6295 (AD-65) as sound */
 
-	MCFG_DEVICE_MODIFY("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(NOOP)
-MACHINE_CONFIG_END
+	subdevice<generic_latch_8_device>("soundlatch")->data_pending_callback().set_nop();
+}
 
-MACHINE_CONFIG_START(m92_state::psoldier)
+void m92_state::psoldier(machine_config &config)
+{
 	m92(config);
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_V25_CONFIG(psoldier_decryption_table)
-	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_psoldier)
-MACHINE_CONFIG_END
+	m_soundcpu->set_decryption_table(psoldier_decryption_table);
+	m_gfxdecode->set_info(gfx_psoldier);
+}
 
-MACHINE_CONFIG_START(m92_state::dsoccr94j)
+void m92_state::dsoccr94j(machine_config &config)
+{
 	m92_banked(config);
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_V25_CONFIG(dsoccr94_decryption_table)
-	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_psoldier)
-MACHINE_CONFIG_END
+	m_soundcpu->set_decryption_table(dsoccr94_decryption_table);
+	m_gfxdecode->set_info(gfx_psoldier);
+}
 
-MACHINE_CONFIG_START(m92_state::gunforc2)
+void m92_state::gunforc2(machine_config &config)
+{
 	m92_banked(config);
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_V25_CONFIG(lethalth_decryption_table)
-MACHINE_CONFIG_END
+	m_soundcpu->set_decryption_table(lethalth_decryption_table);
+}
 
 /***************************************************************************/
 

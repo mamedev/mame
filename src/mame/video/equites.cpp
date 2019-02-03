@@ -18,45 +18,43 @@
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(equites_state,equites)
+void equites_state::equites_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
 
-	for (i = 0; i < 256; i++)
+	for (int i = 0; i < 256; i++)
 		palette.set_indirect_color(i, rgb_t(pal4bit(color_prom[i]), pal4bit(color_prom[i + 0x100]), pal4bit(color_prom[i + 0x200])));
 
 	// point to the CLUT
 	color_prom += 0x380;
 
-	for (i = 0; i < 256; i++)
+	for (int i = 0; i < 256; i++)
 		palette.set_pen_indirect(i, i);
 
-	for (i = 0; i < 0x80; i++)
+	for (int i = 0; i < 0x80; i++)
 		palette.set_pen_indirect(i + 0x100, color_prom[i]);
 }
 
-PALETTE_INIT_MEMBER(splndrbt_state,splndrbt)
+void splndrbt_state::splndrbt_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
 
-	for (i = 0; i < 0x100; i++)
+	for (int i = 0; i < 0x100; i++)
 		palette.set_indirect_color(i, rgb_t(pal4bit(color_prom[i]), pal4bit(color_prom[i + 0x100]), pal4bit(color_prom[i + 0x200])));
 
-	for (i = 0; i < 0x100; i++)
+	for (int i = 0; i < 0x100; i++)
 		palette.set_pen_indirect(i, i);
 
 	// point to the bg CLUT
 	color_prom += 0x300;
 
-	for (i = 0; i < 0x80; i++)
+	for (int i = 0; i < 0x80; i++)
 		palette.set_pen_indirect(i + 0x100, color_prom[i] + 0x10);
 
 	// point to the sprite CLUT
 	color_prom += 0x100;
 
-	for (i = 0; i < 0x100; i++)
+	for (int i = 0; i < 0x100; i++)
 		palette.set_pen_indirect(i + 0x180, color_prom[i]);
 }
 
@@ -338,13 +336,13 @@ void splndrbt_state::splndrbt_draw_sprites(bitmap_ind16 &bitmap, const rectangle
 			{
 				int const y = yhalf ? sy + 1 + yy : sy - yy;
 
-				if (y >= cliprect.min_y && y <= cliprect.max_y)
+				if (y >= cliprect.top() && y <= cliprect.bottom())
 				{
 					for (x = 0; x <= (scalex << 1); ++x)
 					{
 						int bx = (sx + x) & 0xff;
 
-						if (bx >= cliprect.min_x && bx <= cliprect.max_x)
+						if (bx >= cliprect.left() && bx <= cliprect.right())
 						{
 							int xx = scalex ? (x * 29 + scalex) / (scalex << 1) + 1 : 16;   // FIXME This is wrong. Should use the PROM.
 							int const offset = (fx ? (31 - xx) : xx) + ((fy ^ yhalf) ? (16 + line) : (15 - line)) * gfx->rowbytes();
@@ -382,7 +380,7 @@ void splndrbt_state::splndrbt_copy_bg(bitmap_ind16 &dst_bitmap, const rectangle 
 
 	for (dst_y = 32; dst_y < 256-32; ++dst_y)
 	{
-		if (dst_y >= cliprect.min_y && dst_y <= cliprect.max_y)
+		if (dst_y >= cliprect.top() && dst_y <= cliprect.bottom())
 		{
 			const uint8_t * const romline = &xrom[(dst_y ^ dinvert) << 5];
 			const uint16_t * const src_line = &src_bitmap.pix16((src_y + scroll_y) & 0x1ff);

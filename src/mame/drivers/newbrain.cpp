@@ -809,71 +809,74 @@ void newbrain_state::device_timer(emu_timer &timer, device_timer_id id, int para
 //  MACHINE_CONFIG( newbrain )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(newbrain_state::newbrain)
+void newbrain_state::newbrain(machine_config &config)
+{
 	// basic system hardware
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(16'000'000)/4)
-	MCFG_DEVICE_PROGRAM_MAP(newbrain_mreq)
-	MCFG_DEVICE_IO_MAP(newbrain_iorq)
+	Z80(config, m_maincpu, XTAL(16'000'000)/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &newbrain_state::newbrain_mreq);
+	m_maincpu->set_addrmap(AS_IO, &newbrain_state::newbrain_iorq);
 
-	MCFG_DEVICE_ADD(COP420_TAG, COP420, XTAL(16'000'000)/4)
-	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, true)
-	MCFG_COP400_READ_G_CB(READ8(*this, newbrain_state, cop_g_r))
-	MCFG_COP400_WRITE_G_CB(WRITE8(*this, newbrain_state, cop_g_w))
-	MCFG_COP400_WRITE_D_CB(WRITE8(*this, newbrain_state, cop_d_w))
-	MCFG_COP400_READ_IN_CB(READ8(*this, newbrain_state, cop_in_r))
-	MCFG_COP400_WRITE_SO_CB(WRITELINE(*this, newbrain_state, k1_w))
-	MCFG_COP400_WRITE_SK_CB(WRITELINE(*this, newbrain_state, k2_w))
-	MCFG_COP400_READ_SI_CB(READLINE(*this, newbrain_state, tdi_r))
+	COP420(config, m_cop, XTAL(16'000'000)/4);
+	m_cop->set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, true);
+	m_cop->read_g().set(FUNC(newbrain_state::cop_g_r));
+	m_cop->write_g().set(FUNC(newbrain_state::cop_g_w));
+	m_cop->write_d().set(FUNC(newbrain_state::cop_d_w));
+	m_cop->read_in().set(FUNC(newbrain_state::cop_in_r));
+	m_cop->write_so().set(FUNC(newbrain_state::k1_w));
+	m_cop->write_sk().set(FUNC(newbrain_state::k2_w));
+	m_cop->read_si().set(FUNC(newbrain_state::tdi_r));
 
 	// video hardware
 	newbrain_video(config);
 
 	// devices
-	MCFG_NEWBRAIN_EXPANSION_SLOT_ADD(NEWBRAIN_EXPANSION_SLOT_TAG, XTAL(16'000'000)/4, newbrain_expansion_cards, "eim")
+	NEWBRAIN_EXPANSION_SLOT(config, m_exp, XTAL(16'000'000)/4, newbrain_expansion_cards, "eim");
 
-	MCFG_CASSETTE_ADD(CASSETTE_TAG)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
+	CASSETTE(config, m_cassette1);
+	m_cassette1->set_default_state((cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED));
 
-	MCFG_CASSETTE_ADD(CASSETTE2_TAG)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
+	CASSETTE(config, m_cassette2);
+	m_cassette2->set_default_state((cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED));
 
-	MCFG_DEVICE_ADD(RS232_V24_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_DEVICE_ADD(RS232_PRN_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	RS232_PORT(config, RS232_V24_TAG, default_rs232_devices, nullptr);
+	RS232_PORT(config, RS232_PRN_TAG, default_rs232_devices, nullptr);
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32K")
-MACHINE_CONFIG_END
+	RAM(config, RAM_TAG).set_default_size("32K");
+}
 
 
 //-------------------------------------------------
 //  MACHINE_CONFIG( newbrain_ad )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(newbrain_state::newbrain_ad)
+void newbrain_state::newbrain_ad(machine_config &config)
+{
 	newbrain(config);
-	MCFG_DEFAULT_LAYOUT(layout_newbrain)
-MACHINE_CONFIG_END
+	config.set_default_layout(layout_newbrain);
+}
 
 
 //-------------------------------------------------
 //  MACHINE_CONFIG( newbrain_a )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(newbrain_state::newbrain_a)
+void newbrain_state::newbrain_a(machine_config &config)
+{
 	newbrain(config);
-	MCFG_DEFAULT_LAYOUT(layout_newbraina)
-MACHINE_CONFIG_END
+	config.set_default_layout(layout_newbraina);
+}
 
 
 //-------------------------------------------------
 //  MACHINE_CONFIG( newbrain_md )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(newbrain_state::newbrain_md)
+void newbrain_state::newbrain_md(machine_config &config)
+{
 	newbrain(config);
-	MCFG_DEFAULT_LAYOUT(layout_newbrain)
-MACHINE_CONFIG_END
+	config.set_default_layout(layout_newbrain);
+}
 
 
 

@@ -246,14 +246,14 @@ uint32_t cloud9_state::screen_update_cloud9(screen_device &screen, bitmap_ind16 
 		}
 
 	/* draw the bitmap to the screen, looping over Y */
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		uint16_t *dst = &bitmap.pix16(y);
 
 		/* if we're in the VBLANK region, just fill with black */
 		if (~m_syncprom[y] & 2)
 		{
-			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+			for (x = cliprect.left(); x <= cliprect.right(); x++)
 				dst[x] = black;
 		}
 
@@ -269,7 +269,7 @@ uint32_t cloud9_state::screen_update_cloud9(screen_device &screen, bitmap_ind16 
 			src[1] = &m_videoram[0x0000 | (effy * 64)];
 
 			/* loop over X */
-			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+			for (x = cliprect.left(); x <= cliprect.right(); x++)
 			{
 				/* if we're in the HBLANK region, just store black */
 				if (x >= 256)

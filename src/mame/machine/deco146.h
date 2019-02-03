@@ -7,35 +7,6 @@
 
 #include "machine/gen_latch.h"
 
-
-#define MCFG_DECO146_IN_PORTA_CB(_devcb) \
-	devcb = &downcast<deco_146_base_device &>(*device).set_port_a_cb(DEVCB_##_devcb);
-
-#define MCFG_DECO146_IN_PORTB_CB(_devcb) \
-	devcb = &downcast<deco_146_base_device &>(*device).set_port_b_cb(DEVCB_##_devcb);
-
-#define MCFG_DECO146_IN_PORTC_CB(_devcb) \
-	devcb = &downcast<deco_146_base_device &>(*device).set_port_c_cb(DEVCB_##_devcb);
-
-#define MCFG_DECO146_SOUNDLATCH_IRQ_CB(_devcb) \
-	devcb = &downcast<deco_146_base_device &>(*device).set_soundlatch_irq_callback(DEVCB_##_devcb);
-
-// there are some standard ways the chip gets hooked up, so have them here ready to use
-#define MCFG_DECO146_SET_INTERFACE_SCRAMBLE( a9,a8,a7,a6,a5,a4,a3,a2,a1,a0 ) \
-	downcast<deco_146_base_device &>(*device).set_interface_scramble(a9,a8,a7,a6,a5,a4,a3,a2,a1,a0);
-
-#define MCFG_DECO146_SET_INTERFACE_SCRAMBLE_REVERSE \
-	downcast<deco_146_base_device &>(*device).set_interface_scramble_reverse();
-
-#define MCFG_DECO146_SET_INTERFACE_SCRAMBLE_INTERLEAVE \
-	downcast<deco_146_base_device &>(*device).set_interface_scramble_interleave();
-
-#define MCFG_DECO146_SET_USE_MAGIC_ADDRESS_XOR \
-	downcast<deco_146_base_device &>(*device).set_use_magic_read_address_xor(true);
-
-
-
-
 #define BLK (0xff)
 #define INPUT_PORT_A (-1)
 #define INPUT_PORT_B (-2)
@@ -82,9 +53,11 @@ public:
 	void write_data(address_space &space, uint16_t address, uint16_t data, uint16_t mem_mask, uint8_t &csflags);
 	uint16_t read_data(uint16_t address, uint16_t mem_mask, uint8_t &csflags);
 
-	template<class Object> devcb_base &set_port_a_cb(Object &&object) { return m_port_a_r.set_callback(std::forward<Object>(object)); }
-	template<class Object> devcb_base &set_port_b_cb(Object &&object) { return m_port_b_r.set_callback(std::forward<Object>(object)); }
-	template<class Object> devcb_base &set_port_c_cb(Object &&object) { return m_port_c_r.set_callback(std::forward<Object>(object)); }
+	auto port_a_cb() { return m_port_a_r.bind(); }
+	auto port_b_cb() { return m_port_b_r.bind(); }
+	auto port_c_cb() { return m_port_c_r.bind(); }
+
+	// there are some standard ways the chip gets hooked up, so have them here ready to use
 	void set_interface_scramble(uint8_t a9, uint8_t a8, uint8_t a7, uint8_t a6, uint8_t a5, uint8_t a4, uint8_t a3,uint8_t a2,uint8_t a1,uint8_t a0)
 	{
 		m_external_addrswap[9] = a9;
@@ -102,7 +75,7 @@ public:
 	void set_interface_scramble_interleave() { set_interface_scramble(4, 5, 3, 6, 2, 7, 1, 8, 0, 9); }
 	void set_use_magic_read_address_xor(bool use_xor) { m_magic_read_address_xor_enabled = use_xor; }
 
-	template <class Object> devcb_base &set_soundlatch_irq_callback(Object &&cb) { return m_soundlatch_irq_cb.set_callback(std::forward<Object>(cb)); }
+	auto soundlatch_irq_cb() { return m_soundlatch_irq_cb.bind(); }
 
 	DECLARE_READ8_MEMBER( soundlatch_r );
 
@@ -161,8 +134,5 @@ public:
 };
 
 DECLARE_DEVICE_TYPE(DECO146PROT, deco146_device)
-
-#define MCFG_DECO146_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, DECO146PROT, 0)
 
 #endif // MAME_MACHINE_DECO146_H

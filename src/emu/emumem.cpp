@@ -38,7 +38,7 @@
 
 void handler_entry::dump_map(std::vector<memory_entry> &map) const
 {
-	fatalerror("dump_map called on non-dispatching class\n");	
+	fatalerror("dump_map called on non-dispatching class\n");
 }
 
 void handler_entry::reflist::add(const handler_entry *entry)
@@ -222,7 +222,7 @@ const int MEMORY_BLOCK_CHUNK = 65536;                   // minimum chunk size of
 template<int Width, int AddrShift, endianness_t Endian>
 class address_space_specific : public address_space
 {
-	using uX = typename handler_entry_size<Width>::uX;
+	using uX = typename emu::detail::handler_entry_size<Width>::uX;
 	using NativeType = uX;
 	using this_type = address_space_specific<Width, AddrShift, Endian>;
 
@@ -240,10 +240,11 @@ public:
 
 	void unmap_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, read_or_write readorwrite, bool quiet) override;
 	void install_ram_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, read_or_write readorwrite, void *baseptr) override;
-	void install_bank_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, const char *rtag, const char *wtag) override;
+	void install_bank_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string rtag, std::string wtag) override;
 	void install_bank_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, memory_bank *rbank, memory_bank *wbank) override;
-	void install_readwrite_port(offs_t addrstart, offs_t addrend, offs_t addrmirror, const char *rtag, const char *wtag) override;
+	void install_readwrite_port(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string rtag, std::string wtag) override;
 	void install_device_delegate(offs_t addrstart, offs_t addrend, device_t &device, address_map_constructor &map, u64 unitmask = 0, int cswidth = 0) override;
+
 	void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read8_delegate rhandler, u64 unitmask = 0, int cswidth = 0) override;
 	void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write8_delegate whandler, u64 unitmask = 0, int cswidth = 0) override;
 	void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read8_delegate rhandler, write8_delegate whandler, u64 unitmask = 0, int cswidth = 0) override;
@@ -256,6 +257,71 @@ public:
 	void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read64_delegate rhandler, u64 unitmask = 0, int cswidth = 0) override;
 	void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write64_delegate whandler, u64 unitmask = 0, int cswidth = 0) override;
 	void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read64_delegate rhandler, write64_delegate whandler, u64 unitmask = 0, int cswidth = 0) override;
+
+	void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read8m_delegate rhandler, u64 unitmask = 0, int cswidth = 0) override;
+	void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write8m_delegate whandler, u64 unitmask = 0, int cswidth = 0) override;
+	void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read8m_delegate rhandler, write8m_delegate whandler, u64 unitmask = 0, int cswidth = 0) override;
+	void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read16m_delegate rhandler, u64 unitmask = 0, int cswidth = 0) override;
+	void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write16m_delegate whandler, u64 unitmask = 0, int cswidth = 0) override;
+	void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read16m_delegate rhandler, write16m_delegate whandler, u64 unitmask = 0, int cswidth = 0) override;
+	void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read32m_delegate rhandler, u64 unitmask = 0, int cswidth = 0) override;
+	void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write32m_delegate whandler, u64 unitmask = 0, int cswidth = 0) override;
+	void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read32m_delegate rhandler, write32m_delegate whandler, u64 unitmask = 0, int cswidth = 0) override;
+	void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read64m_delegate rhandler, u64 unitmask = 0, int cswidth = 0) override;
+	void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write64m_delegate whandler, u64 unitmask = 0, int cswidth = 0) override;
+	void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read64m_delegate rhandler, write64m_delegate whandler, u64 unitmask = 0, int cswidth = 0) override;
+
+	void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read8s_delegate rhandler, u64 unitmask = 0, int cswidth = 0) override;
+	void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write8s_delegate whandler, u64 unitmask = 0, int cswidth = 0) override;
+	void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read8s_delegate rhandler, write8s_delegate whandler, u64 unitmask = 0, int cswidth = 0) override;
+	void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read16s_delegate rhandler, u64 unitmask = 0, int cswidth = 0) override;
+	void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write16s_delegate whandler, u64 unitmask = 0, int cswidth = 0) override;
+	void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read16s_delegate rhandler, write16s_delegate whandler, u64 unitmask = 0, int cswidth = 0) override;
+	void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read32s_delegate rhandler, u64 unitmask = 0, int cswidth = 0) override;
+	void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write32s_delegate whandler, u64 unitmask = 0, int cswidth = 0) override;
+	void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read32s_delegate rhandler, write32s_delegate whandler, u64 unitmask = 0, int cswidth = 0) override;
+	void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read64s_delegate rhandler, u64 unitmask = 0, int cswidth = 0) override;
+	void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write64s_delegate whandler, u64 unitmask = 0, int cswidth = 0) override;
+	void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read64s_delegate rhandler, write64s_delegate whandler, u64 unitmask = 0, int cswidth = 0) override;
+
+	void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read8sm_delegate rhandler, u64 unitmask = 0, int cswidth = 0) override;
+	void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write8sm_delegate whandler, u64 unitmask = 0, int cswidth = 0) override;
+	void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read8sm_delegate rhandler, write8sm_delegate whandler, u64 unitmask = 0, int cswidth = 0) override;
+	void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read16sm_delegate rhandler, u64 unitmask = 0, int cswidth = 0) override;
+	void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write16sm_delegate whandler, u64 unitmask = 0, int cswidth = 0) override;
+	void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read16sm_delegate rhandler, write16sm_delegate whandler, u64 unitmask = 0, int cswidth = 0) override;
+	void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read32sm_delegate rhandler, u64 unitmask = 0, int cswidth = 0) override;
+	void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write32sm_delegate whandler, u64 unitmask = 0, int cswidth = 0) override;
+	void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read32sm_delegate rhandler, write32sm_delegate whandler, u64 unitmask = 0, int cswidth = 0) override;
+	void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read64sm_delegate rhandler, u64 unitmask = 0, int cswidth = 0) override;
+	void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write64sm_delegate whandler, u64 unitmask = 0, int cswidth = 0) override;
+	void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read64sm_delegate rhandler, write64sm_delegate whandler, u64 unitmask = 0, int cswidth = 0) override;
+
+	void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read8mo_delegate rhandler, u64 unitmask = 0, int cswidth = 0) override;
+	void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write8mo_delegate whandler, u64 unitmask = 0, int cswidth = 0) override;
+	void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read8mo_delegate rhandler, write8mo_delegate whandler, u64 unitmask = 0, int cswidth = 0) override;
+	void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read16mo_delegate rhandler, u64 unitmask = 0, int cswidth = 0) override;
+	void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write16mo_delegate whandler, u64 unitmask = 0, int cswidth = 0) override;
+	void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read16mo_delegate rhandler, write16mo_delegate whandler, u64 unitmask = 0, int cswidth = 0) override;
+	void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read32mo_delegate rhandler, u64 unitmask = 0, int cswidth = 0) override;
+	void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write32mo_delegate whandler, u64 unitmask = 0, int cswidth = 0) override;
+	void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read32mo_delegate rhandler, write32mo_delegate whandler, u64 unitmask = 0, int cswidth = 0) override;
+	void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read64mo_delegate rhandler, u64 unitmask = 0, int cswidth = 0) override;
+	void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write64mo_delegate whandler, u64 unitmask = 0, int cswidth = 0) override;
+	void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read64mo_delegate rhandler, write64mo_delegate whandler, u64 unitmask = 0, int cswidth = 0) override;
+
+	void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read8smo_delegate rhandler, u64 unitmask = 0, int cswidth = 0) override;
+	void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write8smo_delegate whandler, u64 unitmask = 0, int cswidth = 0) override;
+	void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read8smo_delegate rhandler, write8smo_delegate whandler, u64 unitmask = 0, int cswidth = 0) override;
+	void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read16smo_delegate rhandler, u64 unitmask = 0, int cswidth = 0) override;
+	void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write16smo_delegate whandler, u64 unitmask = 0, int cswidth = 0) override;
+	void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read16smo_delegate rhandler, write16smo_delegate whandler, u64 unitmask = 0, int cswidth = 0) override;
+	void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read32smo_delegate rhandler, u64 unitmask = 0, int cswidth = 0) override;
+	void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write32smo_delegate whandler, u64 unitmask = 0, int cswidth = 0) override;
+	void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read32smo_delegate rhandler, write32smo_delegate whandler, u64 unitmask = 0, int cswidth = 0) override;
+	void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read64smo_delegate rhandler, u64 unitmask = 0, int cswidth = 0) override;
+	void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write64smo_delegate whandler, u64 unitmask = 0, int cswidth = 0) override;
+	void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read64smo_delegate rhandler, write64smo_delegate whandler, u64 unitmask = 0, int cswidth = 0) override;
 
 	using address_space::install_read_tap;
 	using address_space::install_write_tap;
@@ -342,6 +408,7 @@ public:
 	}
 
 	virtual void remove_passthrough(std::unordered_set<handler_entry *> &handlers) override {
+		invalidate_caches(read_or_write::READWRITE);
 		m_root_read->detach(handlers);
 		m_root_write->detach(handlers);
 	}
@@ -464,15 +531,15 @@ public:
 	static void write_qword_static(this_type &space, offs_t address, u64 data) { address &= space.m_addrmask; if (Width == 3) space.write_native(address & ~NATIVE_MASK, data); else memory_write_generic<Width, AddrShift, Endian, 3, false>([&space](offs_t offset, NativeType data, NativeType mask) { space.write_native(offset, data, mask); }, address, data, 0xffffffffffffffffU); }
 	static void write_qword_masked_static(this_type &space, offs_t address, u64 data, u64 mask) { address &= space.m_addrmask; memory_write_generic<Width, AddrShift, Endian, 3, false>([&space](offs_t offset, NativeType data, NativeType mask) { space.write_native(offset, data, mask); }, address, data, mask); }
 
-    handler_entry_read <Width, AddrShift, Endian> *m_root_read;
-    handler_entry_write<Width, AddrShift, Endian> *m_root_write;
+	handler_entry_read <Width, AddrShift, Endian> *m_root_read;
+	handler_entry_write<Width, AddrShift, Endian> *m_root_write;
 
 	std::unordered_set<handler_entry *> m_delayed_unrefs;
 
 private:
-	template<int AccessWidth> std::enable_if_t<(Width == AccessWidth)>
+	template<int AccessWidth, typename READ> std::enable_if_t<(Width == AccessWidth)>
 	install_read_handler_helper(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, u64 unitmask, int cswidth,
-								typename handler_entry_size<AccessWidth>::READ handler_r)
+								READ handler_r)
 	{
 		VPRINTF(("address_space::install_read_handler(%s-%s mask=%s mirror=%s, space width=%d, handler width=%d, %s, %s)\n",
 				 core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
@@ -482,18 +549,18 @@ private:
 
 		offs_t nstart, nend, nmask, nmirror;
 		u64 nunitmask;
-        int ncswidth;
-        check_optimize_all("install_read_handler", 8 << AccessWidth, addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, nstart, nend, nmask, nmirror, nunitmask, ncswidth);
+		int ncswidth;
+		check_optimize_all("install_read_handler", 8 << AccessWidth, addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, nstart, nend, nmask, nmirror, nunitmask, ncswidth);
 
-		auto hand_r = new handler_entry_read_delegate<Width, AddrShift, Endian>(this, handler_r);
+		auto hand_r = new handler_entry_read_delegate<Width, AddrShift, Endian, READ>(this, handler_r);
 		hand_r->set_address_info(nstart, nmask);
 		m_root_read->populate(nstart, nend, nmirror, hand_r);
 		invalidate_caches(read_or_write::READ);
 	}
 
-	template<int AccessWidth> std::enable_if_t<(Width > AccessWidth)>
+	template<int AccessWidth, typename READ> std::enable_if_t<(Width > AccessWidth)>
 	install_read_handler_helper(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, u64 unitmask, int cswidth,
-								typename handler_entry_size<AccessWidth>::READ handler_r)
+								READ handler_r)
 	{
 		VPRINTF(("address_space::install_read_handler(%s-%s mask=%s mirror=%s, space width=%d, handler width=%d, %s, %s)\n",
 				 core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
@@ -503,10 +570,10 @@ private:
 
 		offs_t nstart, nend, nmask, nmirror;
 		u64 nunitmask;
-        int ncswidth;
-        check_optimize_all("install_read_handler", 8 << AccessWidth, addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, nstart, nend, nmask, nmirror, nunitmask, ncswidth);
+		int ncswidth;
+		check_optimize_all("install_read_handler", 8 << AccessWidth, addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, nstart, nend, nmask, nmirror, nunitmask, ncswidth);
 
-		auto hand_r = new handler_entry_read_delegate<AccessWidth, -AccessWidth, Endian>(this, handler_r);
+		auto hand_r = new handler_entry_read_delegate<AccessWidth, -AccessWidth, Endian, READ>(this, handler_r);
 		memory_units_descriptor<Width, AddrShift, Endian> descriptor(AccessWidth, Endian, hand_r, nstart, nend, nmask, nunitmask, ncswidth);
 		hand_r->set_address_info(descriptor.get_handler_start(), descriptor.get_handler_mask());
 		m_root_read->populate_mismatched(nstart, nend, nmirror, descriptor);
@@ -515,16 +582,16 @@ private:
 	}
 
 
-	template<int AccessWidth> std::enable_if_t<(Width < AccessWidth)>
+	template<int AccessWidth, typename READ> std::enable_if_t<(Width < AccessWidth)>
 	install_read_handler_helper(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, u64 unitmask, int cswidth,
-								typename handler_entry_size<AccessWidth>::READ handler_r)
+								READ handler_r)
 	{
 		fatalerror("install_read_handler: cannot install a %d-wide handler in a %d-wide bus", 8 << AccessWidth, 8 << Width);
 	}
 
-	template<int AccessWidth> std::enable_if_t<(Width == AccessWidth)>
+	template<int AccessWidth, typename WRITE> std::enable_if_t<(Width == AccessWidth)>
 	install_write_handler_helper(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, u64 unitmask, int cswidth,
-								 typename handler_entry_size<AccessWidth>::WRITE handler_w)
+								 WRITE handler_w)
 	{
 		VPRINTF(("address_space::install_write_handler(%s-%s mask=%s mirror=%s, space width=%d, handler width=%d, %s, %s)\n",
 				 core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
@@ -534,18 +601,18 @@ private:
 
 		offs_t nstart, nend, nmask, nmirror;
 		u64 nunitmask;
-        int ncswidth;
-        check_optimize_all("install_write_handler", 8 << AccessWidth, addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, nstart, nend, nmask, nmirror, nunitmask, ncswidth);
+		int ncswidth;
+		check_optimize_all("install_write_handler", 8 << AccessWidth, addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, nstart, nend, nmask, nmirror, nunitmask, ncswidth);
 
-		auto hand_w = new handler_entry_write_delegate<Width, AddrShift, Endian>(this, handler_w);
+		auto hand_w = new handler_entry_write_delegate<Width, AddrShift, Endian, WRITE>(this, handler_w);
 		hand_w->set_address_info(nstart, nmask);
 		m_root_write->populate(nstart, nend, nmirror, hand_w);
 		invalidate_caches(read_or_write::WRITE);
 	}
 
-	template<int AccessWidth> std::enable_if_t<(Width > AccessWidth)>
+	template<int AccessWidth, typename WRITE> std::enable_if_t<(Width > AccessWidth)>
 	install_write_handler_helper(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, u64 unitmask, int cswidth,
-								 typename handler_entry_size<AccessWidth>::WRITE handler_w)
+								 WRITE handler_w)
 	{
 		VPRINTF(("address_space::install_write_handler(%s-%s mask=%s mirror=%s, space width=%d, handler width=%d, %s, %s)\n",
 				 core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
@@ -555,10 +622,10 @@ private:
 
 		offs_t nstart, nend, nmask, nmirror;
 		u64 nunitmask;
-        int ncswidth;
-        check_optimize_all("install_write_handler", 8 << AccessWidth, addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, nstart, nend, nmask, nmirror, nunitmask, ncswidth);
+		int ncswidth;
+		check_optimize_all("install_write_handler", 8 << AccessWidth, addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, nstart, nend, nmask, nmirror, nunitmask, ncswidth);
 
-		auto hand_w = new handler_entry_write_delegate<AccessWidth, -AccessWidth, Endian>(this, handler_w);
+		auto hand_w = new handler_entry_write_delegate<AccessWidth, -AccessWidth, Endian, WRITE>(this, handler_w);
 		memory_units_descriptor<Width, AddrShift, Endian> descriptor(AccessWidth, Endian, hand_w, nstart, nend, nmask, nunitmask, ncswidth);
 		hand_w->set_address_info(descriptor.get_handler_start(), descriptor.get_handler_mask());
 		m_root_write->populate_mismatched(nstart, nend, nmirror, descriptor);
@@ -567,19 +634,19 @@ private:
 	}
 
 
-	template<int AccessWidth> std::enable_if_t<(Width < AccessWidth)>
+	template<int AccessWidth, typename WRITE> std::enable_if_t<(Width < AccessWidth)>
 	install_write_handler_helper(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, u64 unitmask, int cswidth,
-								 typename handler_entry_size<AccessWidth>::WRITE handler_w)
+								 WRITE handler_w)
 	{
 		fatalerror("install_write_handler: cannot install a %d-wide handler in a %d-wide bus", 8 << AccessWidth, 8 << Width);
 	}
 
 
 
-	template<int AccessWidth> std::enable_if_t<(Width == AccessWidth)>
+	template<int AccessWidth, typename READ, typename WRITE> std::enable_if_t<(Width == AccessWidth)>
 	install_readwrite_handler_helper(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, u64 unitmask, int cswidth,
-									 typename handler_entry_size<AccessWidth>::READ  handler_r,
-									 typename handler_entry_size<AccessWidth>::WRITE handler_w)
+									 READ  handler_r,
+									 WRITE handler_w)
 	{
 		VPRINTF(("address_space::install_readwrite_handler(%s-%s mask=%s mirror=%s, space width=%d, handler width=%d, %s, %s, %s)\n",
 				 core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
@@ -589,24 +656,24 @@ private:
 
 		offs_t nstart, nend, nmask, nmirror;
 		u64 nunitmask;
-        int ncswidth;
-        check_optimize_all("install_readwrite_handler", 8 << AccessWidth, addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, nstart, nend, nmask, nmirror, nunitmask, ncswidth);
+		int ncswidth;
+		check_optimize_all("install_readwrite_handler", 8 << AccessWidth, addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, nstart, nend, nmask, nmirror, nunitmask, ncswidth);
 
-		auto hand_r = new handler_entry_read_delegate <Width, AddrShift, Endian>(this, handler_r);
+		auto hand_r = new handler_entry_read_delegate <Width, AddrShift, Endian, READ>(this, handler_r);
 		hand_r->set_address_info(nstart, nmask);
 		m_root_read ->populate(nstart, nend, nmirror, hand_r);
 
-		auto hand_w = new handler_entry_write_delegate<Width, AddrShift, Endian>(this, handler_w);
+		auto hand_w = new handler_entry_write_delegate<Width, AddrShift, Endian, WRITE>(this, handler_w);
 		hand_w->set_address_info(nstart, nmask);
 		m_root_write->populate(nstart, nend, nmirror, hand_w);
 
 		invalidate_caches(read_or_write::READWRITE);
 	}
- 
-	template<int AccessWidth> std::enable_if_t<(Width > AccessWidth)>
+
+	template<int AccessWidth, typename READ, typename WRITE> std::enable_if_t<(Width > AccessWidth)>
 	install_readwrite_handler_helper(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, u64 unitmask, int cswidth,
-									 typename handler_entry_size<AccessWidth>::READ  handler_r,
-									 typename handler_entry_size<AccessWidth>::WRITE handler_w)
+									 READ  handler_r,
+									 WRITE handler_w)
 	{
 		VPRINTF(("address_space::install_readwrite_handler(%s-%s mask=%s mirror=%s, space width=%d, handler width=%d, %s, %s, %s)\n",
 				 core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
@@ -616,16 +683,16 @@ private:
 
 		offs_t nstart, nend, nmask, nmirror;
 		u64 nunitmask;
-        int ncswidth;
-        check_optimize_all("install_readwrite_handler", 8 << AccessWidth, addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, nstart, nend, nmask, nmirror, nunitmask, ncswidth);
+		int ncswidth;
+		check_optimize_all("install_readwrite_handler", 8 << AccessWidth, addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, nstart, nend, nmask, nmirror, nunitmask, ncswidth);
 
-		auto hand_r = new handler_entry_read_delegate <AccessWidth, -AccessWidth, Endian>(this, handler_r);
+		auto hand_r = new handler_entry_read_delegate <AccessWidth, -AccessWidth, Endian, READ>(this, handler_r);
 		memory_units_descriptor<Width, AddrShift, Endian> descriptor(AccessWidth, Endian, hand_r, nstart, nend, nmask, nunitmask, ncswidth);
 		hand_r->set_address_info(descriptor.get_handler_start(), descriptor.get_handler_mask());
 		m_root_read ->populate_mismatched(nstart, nend, nmirror, descriptor);
 		hand_r->unref();
 
-		auto hand_w = new handler_entry_write_delegate<AccessWidth, -AccessWidth, Endian>(this, handler_w);
+		auto hand_w = new handler_entry_write_delegate<AccessWidth, -AccessWidth, Endian, WRITE>(this, handler_w);
 		descriptor.set_subunit_handler(hand_w);
 		hand_w->set_address_info(descriptor.get_handler_start(), descriptor.get_handler_mask());
 		m_root_write->populate_mismatched(nstart, nend, nmirror, descriptor);
@@ -635,10 +702,10 @@ private:
 	}
 
 
-	template<int AccessWidth> std::enable_if_t<(Width < AccessWidth)>
+	template<int AccessWidth, typename READ, typename WRITE> std::enable_if_t<(Width < AccessWidth)>
 	install_readwrite_handler_helper(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, u64 unitmask, int cswidth,
-									 typename handler_entry_size<AccessWidth>::READ  handler_r,
-									 typename handler_entry_size<AccessWidth>::WRITE handler_w)
+									 READ  handler_r,
+									 WRITE handler_w)
 	{
 		fatalerror("install_readwrite_handler: cannot install a %d-wide handler in a %d-wide bus", 8 << AccessWidth, 8 << Width);
 	}
@@ -751,7 +818,7 @@ void memory_manager::allocate(device_memory_interface &memory)
 					else
 						memory.allocate<address_space_specific<3, -3, ENDIANNESS_BIG   >>(*this, spacenum);
 					break;
-	
+
 				default:
 					throw emu_fatalerror("Invalid width %d/shift %d specified for address_space::allocate", spaceconfig->data_width(), spaceconfig->addr_shift());
 			}
@@ -879,6 +946,66 @@ memory_bank *memory_manager::allocate(address_space &space, offs_t addrstart, of
 }
 
 //**************************************************************************
+//  ADDRESS SPACE CONFIG
+//**************************************************************************
+
+//-------------------------------------------------
+//  address_space_config - constructors
+//-------------------------------------------------
+
+address_space_config::address_space_config()
+	: m_name("unknown"),
+		m_endianness(ENDIANNESS_NATIVE),
+		m_data_width(0),
+		m_addr_width(0),
+		m_addr_shift(0),
+		m_logaddr_width(0),
+		m_page_shift(0),
+		m_is_octal(false),
+		m_internal_map(address_map_constructor()),
+		m_default_map(address_map_constructor())
+{
+}
+
+/*!
+ @param name
+ @param endian CPU endianness
+ @param datawidth CPU parallelism bits
+ @param addrwidth address bits
+ @param addrshift
+ @param internal
+ @param defmap
+ */
+address_space_config::address_space_config(const char *name, endianness_t endian, u8 datawidth, u8 addrwidth, s8 addrshift, address_map_constructor internal, address_map_constructor defmap)
+	: m_name(name),
+		m_endianness(endian),
+		m_data_width(datawidth),
+		m_addr_width(addrwidth),
+		m_addr_shift(addrshift),
+		m_logaddr_width(addrwidth),
+		m_page_shift(0),
+		m_is_octal(false),
+		m_internal_map(internal),
+		m_default_map(defmap)
+{
+}
+
+address_space_config::address_space_config(const char *name, endianness_t endian, u8 datawidth, u8 addrwidth, s8 addrshift, u8 logwidth, u8 pageshift, address_map_constructor internal, address_map_constructor defmap)
+	: m_name(name),
+		m_endianness(endian),
+		m_data_width(datawidth),
+		m_addr_width(addrwidth),
+		m_addr_shift(addrshift),
+		m_logaddr_width(logwidth),
+		m_page_shift(pageshift),
+		m_is_octal(false),
+		m_internal_map(internal),
+		m_default_map(defmap)
+{
+}
+
+
+//**************************************************************************
 //  ADDRESS SPACE
 //**************************************************************************
 
@@ -889,14 +1016,14 @@ memory_bank *memory_manager::allocate(address_space &space, offs_t addrstart, of
 address_space::address_space(memory_manager &manager, device_memory_interface &memory, int spacenum)
 	: m_config(*memory.space_config(spacenum)),
 		m_device(memory.device()),
-		m_addrmask(make_bitmask<offs_t>(m_config.m_addr_width)),
-		m_logaddrmask(make_bitmask<offs_t>(m_config.m_logaddr_width)),
+		m_addrmask(make_bitmask<offs_t>(m_config.addr_width())),
+		m_logaddrmask(make_bitmask<offs_t>(m_config.logaddr_width())),
 		m_unmap(0),
 		m_spacenum(spacenum),
 		m_log_unmap(true),
 		m_name(memory.space_config(spacenum)->name()),
-		m_addrchars((m_config.m_addr_width + 3) / 4),
-		m_logaddrchars((m_config.m_logaddr_width + 3) / 4),
+		m_addrchars((m_config.addr_width() + 3) / 4),
+		m_logaddrchars((m_config.logaddr_width() + 3) / 4),
 		m_notifier_id(0),
 		m_in_notification(0),
 		m_manager(manager)
@@ -944,8 +1071,8 @@ void address_space::check_optimize_all(const char *function, int width, offs_t a
 
 	// Check the validity of the addresses given their intrinsic width
 	// We assume that busses with non-zero address shift have a data width matching the shift (reality says yes)
-	offs_t default_lowbits_mask = (m_config.data_width() >> (3 - m_config.m_addr_shift)) - 1;
-	offs_t lowbits_mask = width && !m_config.m_addr_shift ? (width >> 3) - 1 : default_lowbits_mask;
+	offs_t default_lowbits_mask = (m_config.data_width() >> (3 - m_config.addr_shift())) - 1;
+	offs_t lowbits_mask = width && !m_config.addr_shift() ? (width >> 3) - 1 : default_lowbits_mask;
 
 	if (addrstart & lowbits_mask)
 		fatalerror("%s: In range %x-%x mask %x mirror %x select %x, start address has low bits set, did you mean %x ?\n", function, addrstart, addrend, addrmask, addrmirror, addrselect, addrstart & ~lowbits_mask);
@@ -1051,7 +1178,7 @@ void address_space::check_optimize_mirror(const char *function, offs_t addrstart
 	if (addrend & ~m_addrmask)
 		fatalerror("%s: In range %x-%x mirror %x, end address is outside of the global address mask %x, did you mean %x ?\n", function, addrstart, addrend, addrmirror, m_addrmask, addrend & m_addrmask);
 
-	offs_t lowbits_mask = (m_config.data_width() >> (3 - m_config.m_addr_shift)) - 1;
+	offs_t lowbits_mask = (m_config.data_width() >> (3 - m_config.addr_shift())) - 1;
 	if (addrstart & lowbits_mask)
 		fatalerror("%s: In range %x-%x mirror %x, start address has low bits set, did you mean %x ?\n", function, addrstart, addrend, addrmirror, addrstart & ~lowbits_mask);
 	if ((~addrend) & lowbits_mask)
@@ -1101,7 +1228,7 @@ void address_space::check_address(const char *function, offs_t addrstart, offs_t
 	if (addrend & ~m_addrmask)
 		fatalerror("%s: In range %x-%x, end address is outside of the global address mask %x, did you mean %x ?\n", function, addrstart, addrend, m_addrmask, addrend & m_addrmask);
 
-	offs_t lowbits_mask = (m_config.data_width() >> (3 - m_config.m_addr_shift)) - 1;
+	offs_t lowbits_mask = (m_config.data_width() >> (3 - m_config.addr_shift())) - 1;
 	if (addrstart & lowbits_mask)
 		fatalerror("%s: In range %x-%x, start address has low bits set, did you mean %x ?\n", function, addrstart, addrend, addrstart & ~lowbits_mask);
 	if ((~addrend) & lowbits_mask)
@@ -1174,7 +1301,7 @@ void address_space::prepare_map()
 			// find the region
 			memory_region *region = m_manager.machine().root_device().memregion(fulltag.c_str());
 			if (region == nullptr)
-				fatalerror("device '%s' %s space memory map entry %X-%X references non-existant region \"%s\"\n", m_device.tag(), m_name, entry.m_addrstart, entry.m_addrend, entry.m_region);
+				fatalerror("device '%s' %s space memory map entry %X-%X references nonexistent region \"%s\"\n", m_device.tag(), m_name, entry.m_addrstart, entry.m_addrend, entry.m_region);
 
 			// validate the region
 			if (entry.m_rgnoffs + m_config.addr2byte(entry.m_addrend - entry.m_addrstart + 1) > region->bytes())
@@ -1274,16 +1401,111 @@ void address_space::populate_map_entry(const address_map_entry &entry, read_or_w
 				}
 			break;
 
+		case AMH_DEVICE_DELEGATE_M:
+			if (readorwrite == read_or_write::READ)
+				switch (data.m_bits)
+				{
+					case 8:     install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, read8m_delegate(entry.m_rproto8m, entry.m_devbase), entry.m_mask, entry.m_cswidth); break;
+					case 16:    install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, read16m_delegate(entry.m_rproto16m, entry.m_devbase), entry.m_mask, entry.m_cswidth); break;
+					case 32:    install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, read32m_delegate(entry.m_rproto32m, entry.m_devbase), entry.m_mask, entry.m_cswidth); break;
+					case 64:    install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, read64m_delegate(entry.m_rproto64m, entry.m_devbase), entry.m_mask, entry.m_cswidth); break;
+				}
+			else
+				switch (data.m_bits)
+				{
+					case 8:     install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, write8m_delegate(entry.m_wproto8m, entry.m_devbase), entry.m_mask, entry.m_cswidth); break;
+					case 16:    install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, write16m_delegate(entry.m_wproto16m, entry.m_devbase), entry.m_mask, entry.m_cswidth); break;
+					case 32:    install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, write32m_delegate(entry.m_wproto32m, entry.m_devbase), entry.m_mask, entry.m_cswidth); break;
+					case 64:    install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, write64m_delegate(entry.m_wproto64m, entry.m_devbase), entry.m_mask, entry.m_cswidth); break;
+				}
+			break;
+
+		case AMH_DEVICE_DELEGATE_S:
+			if (readorwrite == read_or_write::READ)
+				switch (data.m_bits)
+				{
+					case 8:     install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, read8s_delegate(entry.m_rproto8s, entry.m_devbase), entry.m_mask, entry.m_cswidth); break;
+					case 16:    install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, read16s_delegate(entry.m_rproto16s, entry.m_devbase), entry.m_mask, entry.m_cswidth); break;
+					case 32:    install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, read32s_delegate(entry.m_rproto32s, entry.m_devbase), entry.m_mask, entry.m_cswidth); break;
+					case 64:    install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, read64s_delegate(entry.m_rproto64s, entry.m_devbase), entry.m_mask, entry.m_cswidth); break;
+				}
+			else
+				switch (data.m_bits)
+				{
+					case 8:     install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, write8s_delegate(entry.m_wproto8s, entry.m_devbase), entry.m_mask, entry.m_cswidth); break;
+					case 16:    install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, write16s_delegate(entry.m_wproto16s, entry.m_devbase), entry.m_mask, entry.m_cswidth); break;
+					case 32:    install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, write32s_delegate(entry.m_wproto32s, entry.m_devbase), entry.m_mask, entry.m_cswidth); break;
+					case 64:    install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, write64s_delegate(entry.m_wproto64s, entry.m_devbase), entry.m_mask, entry.m_cswidth); break;
+				}
+			break;
+
+		case AMH_DEVICE_DELEGATE_SM:
+			if (readorwrite == read_or_write::READ)
+				switch (data.m_bits)
+				{
+					case 8:     install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, read8sm_delegate(entry.m_rproto8sm, entry.m_devbase), entry.m_mask, entry.m_cswidth); break;
+					case 16:    install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, read16sm_delegate(entry.m_rproto16sm, entry.m_devbase), entry.m_mask, entry.m_cswidth); break;
+					case 32:    install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, read32sm_delegate(entry.m_rproto32sm, entry.m_devbase), entry.m_mask, entry.m_cswidth); break;
+					case 64:    install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, read64sm_delegate(entry.m_rproto64sm, entry.m_devbase), entry.m_mask, entry.m_cswidth); break;
+				}
+			else
+				switch (data.m_bits)
+				{
+					case 8:     install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, write8sm_delegate(entry.m_wproto8sm, entry.m_devbase), entry.m_mask, entry.m_cswidth); break;
+					case 16:    install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, write16sm_delegate(entry.m_wproto16sm, entry.m_devbase), entry.m_mask, entry.m_cswidth); break;
+					case 32:    install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, write32sm_delegate(entry.m_wproto32sm, entry.m_devbase), entry.m_mask, entry.m_cswidth); break;
+					case 64:    install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, write64sm_delegate(entry.m_wproto64sm, entry.m_devbase), entry.m_mask, entry.m_cswidth); break;
+				}
+			break;
+
+		case AMH_DEVICE_DELEGATE_MO:
+			if (readorwrite == read_or_write::READ)
+				switch (data.m_bits)
+				{
+					case 8:     install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, read8mo_delegate(entry.m_rproto8mo, entry.m_devbase), entry.m_mask, entry.m_cswidth); break;
+					case 16:    install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, read16mo_delegate(entry.m_rproto16mo, entry.m_devbase), entry.m_mask, entry.m_cswidth); break;
+					case 32:    install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, read32mo_delegate(entry.m_rproto32mo, entry.m_devbase), entry.m_mask, entry.m_cswidth); break;
+					case 64:    install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, read64mo_delegate(entry.m_rproto64mo, entry.m_devbase), entry.m_mask, entry.m_cswidth); break;
+				}
+			else
+				switch (data.m_bits)
+				{
+					case 8:     install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, write8mo_delegate(entry.m_wproto8mo, entry.m_devbase), entry.m_mask, entry.m_cswidth); break;
+					case 16:    install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, write16mo_delegate(entry.m_wproto16mo, entry.m_devbase), entry.m_mask, entry.m_cswidth); break;
+					case 32:    install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, write32mo_delegate(entry.m_wproto32mo, entry.m_devbase), entry.m_mask, entry.m_cswidth); break;
+					case 64:    install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, write64mo_delegate(entry.m_wproto64mo, entry.m_devbase), entry.m_mask, entry.m_cswidth); break;
+				}
+			break;
+
+		case AMH_DEVICE_DELEGATE_SMO:
+			if (readorwrite == read_or_write::READ)
+				switch (data.m_bits)
+				{
+					case 8:     install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, read8smo_delegate(entry.m_rproto8smo, entry.m_devbase), entry.m_mask, entry.m_cswidth); break;
+					case 16:    install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, read16smo_delegate(entry.m_rproto16smo, entry.m_devbase), entry.m_mask, entry.m_cswidth); break;
+					case 32:    install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, read32smo_delegate(entry.m_rproto32smo, entry.m_devbase), entry.m_mask, entry.m_cswidth); break;
+					case 64:    install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, read64smo_delegate(entry.m_rproto64smo, entry.m_devbase), entry.m_mask, entry.m_cswidth); break;
+				}
+			else
+				switch (data.m_bits)
+				{
+					case 8:     install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, write8smo_delegate(entry.m_wproto8smo, entry.m_devbase), entry.m_mask, entry.m_cswidth); break;
+					case 16:    install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, write16smo_delegate(entry.m_wproto16smo, entry.m_devbase), entry.m_mask, entry.m_cswidth); break;
+					case 32:    install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, write32smo_delegate(entry.m_wproto32smo, entry.m_devbase), entry.m_mask, entry.m_cswidth); break;
+					case 64:    install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, write64smo_delegate(entry.m_wproto64smo, entry.m_devbase), entry.m_mask, entry.m_cswidth); break;
+				}
+			break;
+
 		case AMH_PORT:
 			install_readwrite_port(entry.m_addrstart, entry.m_addrend, entry.m_addrmirror,
-							(readorwrite == read_or_write::READ) ? data.m_tag : nullptr,
-							(readorwrite == read_or_write::WRITE) ? data.m_tag : nullptr);
+								   (readorwrite == read_or_write::READ) ? entry.m_devbase.subtag(data.m_tag) : "",
+								   (readorwrite == read_or_write::WRITE) ? entry.m_devbase.subtag(data.m_tag) : "");
 			break;
 
 		case AMH_BANK:
 			install_bank_generic(entry.m_addrstart, entry.m_addrend, entry.m_addrmirror,
-							(readorwrite == read_or_write::READ) ? data.m_tag : nullptr,
-							(readorwrite == read_or_write::WRITE) ? data.m_tag : nullptr);
+								 (readorwrite == read_or_write::READ) ? entry.m_devbase.subtag(data.m_tag) : "",
+								 (readorwrite == read_or_write::WRITE) ? entry.m_devbase.subtag(data.m_tag) : "");
 			break;
 
 		case AMH_DEVICE_SUBMAP:
@@ -1664,42 +1886,42 @@ template<int Width, int AddrShift, endianness_t Endian> void address_space_speci
 //  handler into this address space
 //-------------------------------------------------
 
-template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_readwrite_port(offs_t addrstart, offs_t addrend, offs_t addrmirror, const char *rtag, const char *wtag)
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_readwrite_port(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string rtag, std::string wtag)
 {
 	VPRINTF(("address_space::install_readwrite_port(%s-%s mirror=%s, read=\"%s\" / write=\"%s\")\n",
 				core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
 				core_i64_hex_format(addrmirror, m_addrchars),
-				(rtag != nullptr) ? rtag : "(none)", (wtag != nullptr) ? wtag : "(none)"));
+				rtag.empty() ? "(none)" : rtag.c_str(), wtag.empty() ? "(none)" : wtag.c_str()));
 
 	offs_t nstart, nend, nmask, nmirror;
 	check_optimize_mirror("install_readwrite_port", addrstart, addrend, addrmirror, nstart, nend, nmask, nmirror);
 
 	// read handler
-	if (rtag != nullptr)
+	if (rtag != "")
 	{
 		// find the port
 		ioport_port *port = device().owner()->ioport(rtag);
 		if (port == nullptr)
-			throw emu_fatalerror("Attempted to map non-existent port '%s' for read in space %s of device '%s'\n", rtag, m_name, m_device.tag());
+			throw emu_fatalerror("Attempted to map non-existent port '%s' for read in space %s of device '%s'\n", rtag.c_str(), m_name, m_device.tag());
 
 		// map the range and set the ioport
 		auto hand_r = new handler_entry_read_ioport<Width, AddrShift, Endian>(this, port);
 		m_root_read->populate(nstart, nend, nmirror, hand_r);
 	}
 
-	if (wtag != nullptr)
+	if (wtag != "")
 	{
 		// find the port
 		ioport_port *port = device().owner()->ioport(wtag);
 		if (port == nullptr)
-			fatalerror("Attempted to map non-existent port '%s' for write in space %s of device '%s'\n", wtag, m_name, m_device.tag());
+			fatalerror("Attempted to map non-existent port '%s' for write in space %s of device '%s'\n", wtag.c_str(), m_name, m_device.tag());
 
 		// map the range and set the ioport
 		auto hand_w = new handler_entry_write_ioport<Width, AddrShift, Endian>(this, port);
 		m_root_write->populate(nstart, nend, nmirror, hand_w);
 	}
 
-	invalidate_caches(rtag ? wtag ? read_or_write::READWRITE : read_or_write::READ : read_or_write::WRITE);
+	invalidate_caches(rtag != "" ? wtag != "" ? read_or_write::READWRITE : read_or_write::READ : read_or_write::WRITE);
 }
 
 
@@ -1708,18 +1930,18 @@ template<int Width, int AddrShift, endianness_t Endian> void address_space_speci
 //  mapping to a particular bank
 //-------------------------------------------------
 
-template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_bank_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, const char *rtag, const char *wtag)
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_bank_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string rtag, std::string wtag)
 {
 	VPRINTF(("address_space::install_readwrite_bank(%s-%s mirror=%s, read=\"%s\" / write=\"%s\")\n",
 				core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
 				core_i64_hex_format(addrmirror, m_addrchars),
-				(rtag != nullptr) ? rtag : "(none)", (wtag != nullptr) ? wtag : "(none)"));
+				rtag.empty() ? "(none)" : rtag.c_str(), wtag.empty() ? "(none)" : wtag.c_str()));
 
 	offs_t nstart, nend, nmask, nmirror;
 	check_optimize_mirror("install_bank_generic", addrstart, addrend, addrmirror, nstart, nend, nmask, nmirror);
 
 	// map the read bank
-	if (rtag != nullptr)
+	if (rtag != "")
 	{
 		std::string fulltag = device().siblingtag(rtag);
 		memory_bank &bank = bank_find_or_allocate(fulltag.c_str(), addrstart, addrend, addrmirror, read_or_write::READ);
@@ -1730,7 +1952,7 @@ template<int Width, int AddrShift, endianness_t Endian> void address_space_speci
 	}
 
 	// map the write bank
-	if (wtag != nullptr)
+	if (wtag != "")
 	{
 		std::string fulltag = device().siblingtag(wtag);
 		memory_bank &bank = bank_find_or_allocate(fulltag.c_str(), addrstart, addrend, addrmirror, read_or_write::WRITE);
@@ -1740,7 +1962,7 @@ template<int Width, int AddrShift, endianness_t Endian> void address_space_speci
 		m_root_write->populate(nstart, nend, nmirror, hand_w);
 	}
 
-	invalidate_caches(rtag ? wtag ? read_or_write::READWRITE : read_or_write::READ : read_or_write::WRITE);
+	invalidate_caches(rtag != "" ? wtag != "" ? read_or_write::READWRITE : read_or_write::READ : read_or_write::WRITE);
 }
 
 
@@ -1894,6 +2116,81 @@ template<int Width, int AddrShift, endianness_t Endian> void address_space_speci
 	install_readwrite_handler_helper<0>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, rhandler, whandler);
 }
 
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read8m_delegate handler, u64 unitmask, int cswidth)
+{
+	install_read_handler_helper<0>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, handler);
+}
+
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write8m_delegate handler, u64 unitmask, int cswidth)
+{
+	install_write_handler_helper<0>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, handler);
+}
+
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read8m_delegate rhandler, write8m_delegate whandler, u64 unitmask, int cswidth)
+{
+	install_readwrite_handler_helper<0>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, rhandler, whandler);
+}
+
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read8s_delegate handler, u64 unitmask, int cswidth)
+{
+	install_read_handler_helper<0>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, handler);
+}
+
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write8s_delegate handler, u64 unitmask, int cswidth)
+{
+	install_write_handler_helper<0>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, handler);
+}
+
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read8s_delegate rhandler, write8s_delegate whandler, u64 unitmask, int cswidth)
+{
+	install_readwrite_handler_helper<0>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, rhandler, whandler);
+}
+
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read8sm_delegate handler, u64 unitmask, int cswidth)
+{
+	install_read_handler_helper<0>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, handler);
+}
+
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write8sm_delegate handler, u64 unitmask, int cswidth)
+{
+	install_write_handler_helper<0>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, handler);
+}
+
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read8sm_delegate rhandler, write8sm_delegate whandler, u64 unitmask, int cswidth)
+{
+	install_readwrite_handler_helper<0>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, rhandler, whandler);
+}
+
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read8mo_delegate handler, u64 unitmask, int cswidth)
+{
+	install_read_handler_helper<0>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, handler);
+}
+
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write8mo_delegate handler, u64 unitmask, int cswidth)
+{
+	install_write_handler_helper<0>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, handler);
+}
+
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read8mo_delegate rhandler, write8mo_delegate whandler, u64 unitmask, int cswidth)
+{
+	install_readwrite_handler_helper<0>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, rhandler, whandler);
+}
+
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read8smo_delegate handler, u64 unitmask, int cswidth)
+{
+	install_read_handler_helper<0>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, handler);
+}
+
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write8smo_delegate handler, u64 unitmask, int cswidth)
+{
+	install_write_handler_helper<0>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, handler);
+}
+
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read8smo_delegate rhandler, write8smo_delegate whandler, u64 unitmask, int cswidth)
+{
+	install_readwrite_handler_helper<0>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, rhandler, whandler);
+}
+
 
 //-------------------------------------------------
 //  install_handler - install 16-bit read/write
@@ -1911,6 +2208,81 @@ template<int Width, int AddrShift, endianness_t Endian> void address_space_speci
 }
 
 template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read16_delegate rhandler, write16_delegate whandler, u64 unitmask, int cswidth)
+{
+	install_readwrite_handler_helper<1>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, rhandler, whandler);
+}
+
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read16m_delegate handler, u64 unitmask, int cswidth)
+{
+	install_read_handler_helper<1>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, handler);
+}
+
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write16m_delegate handler, u64 unitmask, int cswidth)
+{
+	install_write_handler_helper<1>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, handler);
+}
+
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read16m_delegate rhandler, write16m_delegate whandler, u64 unitmask, int cswidth)
+{
+	install_readwrite_handler_helper<1>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, rhandler, whandler);
+}
+
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read16s_delegate handler, u64 unitmask, int cswidth)
+{
+	install_read_handler_helper<1>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, handler);
+}
+
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write16s_delegate handler, u64 unitmask, int cswidth)
+{
+	install_write_handler_helper<1>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, handler);
+}
+
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read16s_delegate rhandler, write16s_delegate whandler, u64 unitmask, int cswidth)
+{
+	install_readwrite_handler_helper<1>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, rhandler, whandler);
+}
+
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read16sm_delegate handler, u64 unitmask, int cswidth)
+{
+	install_read_handler_helper<1>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, handler);
+}
+
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write16sm_delegate handler, u64 unitmask, int cswidth)
+{
+	install_write_handler_helper<1>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, handler);
+}
+
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read16sm_delegate rhandler, write16sm_delegate whandler, u64 unitmask, int cswidth)
+{
+	install_readwrite_handler_helper<1>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, rhandler, whandler);
+}
+
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read16smo_delegate handler, u64 unitmask, int cswidth)
+{
+	install_read_handler_helper<1>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, handler);
+}
+
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write16smo_delegate handler, u64 unitmask, int cswidth)
+{
+	install_write_handler_helper<1>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, handler);
+}
+
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read16smo_delegate rhandler, write16smo_delegate whandler, u64 unitmask, int cswidth)
+{
+	install_readwrite_handler_helper<1>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, rhandler, whandler);
+}
+
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read16mo_delegate handler, u64 unitmask, int cswidth)
+{
+	install_read_handler_helper<1>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, handler);
+}
+
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write16mo_delegate handler, u64 unitmask, int cswidth)
+{
+	install_write_handler_helper<1>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, handler);
+}
+
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read16mo_delegate rhandler, write16mo_delegate whandler, u64 unitmask, int cswidth)
 {
 	install_readwrite_handler_helper<1>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, rhandler, whandler);
 }
@@ -1936,6 +2308,81 @@ template<int Width, int AddrShift, endianness_t Endian> void address_space_speci
 	install_readwrite_handler_helper<2>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, rhandler, whandler);
 }
 
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read32m_delegate handler, u64 unitmask, int cswidth)
+{
+	install_read_handler_helper<2>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, handler);
+}
+
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write32m_delegate handler, u64 unitmask, int cswidth)
+{
+	install_write_handler_helper<2>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, handler);
+}
+
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read32m_delegate rhandler, write32m_delegate whandler, u64 unitmask, int cswidth)
+{
+	install_readwrite_handler_helper<2>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, rhandler, whandler);
+}
+
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read32s_delegate handler, u64 unitmask, int cswidth)
+{
+	install_read_handler_helper<2>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, handler);
+}
+
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write32s_delegate handler, u64 unitmask, int cswidth)
+{
+	install_write_handler_helper<2>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, handler);
+}
+
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read32s_delegate rhandler, write32s_delegate whandler, u64 unitmask, int cswidth)
+{
+	install_readwrite_handler_helper<2>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, rhandler, whandler);
+}
+
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read32sm_delegate handler, u64 unitmask, int cswidth)
+{
+	install_read_handler_helper<2>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, handler);
+}
+
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write32sm_delegate handler, u64 unitmask, int cswidth)
+{
+	install_write_handler_helper<2>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, handler);
+}
+
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read32sm_delegate rhandler, write32sm_delegate whandler, u64 unitmask, int cswidth)
+{
+	install_readwrite_handler_helper<2>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, rhandler, whandler);
+}
+
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read32mo_delegate handler, u64 unitmask, int cswidth)
+{
+	install_read_handler_helper<2>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, handler);
+}
+
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write32mo_delegate handler, u64 unitmask, int cswidth)
+{
+	install_write_handler_helper<2>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, handler);
+}
+
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read32mo_delegate rhandler, write32mo_delegate whandler, u64 unitmask, int cswidth)
+{
+	install_readwrite_handler_helper<2>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, rhandler, whandler);
+}
+
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read32smo_delegate handler, u64 unitmask, int cswidth)
+{
+	install_read_handler_helper<2>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, handler);
+}
+
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write32smo_delegate handler, u64 unitmask, int cswidth)
+{
+	install_write_handler_helper<2>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, handler);
+}
+
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read32smo_delegate rhandler, write32smo_delegate whandler, u64 unitmask, int cswidth)
+{
+	install_readwrite_handler_helper<2>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, rhandler, whandler);
+}
+
 
 //-------------------------------------------------
 //  install_handler64 - install 64-bit read/write
@@ -1953,6 +2400,81 @@ template<int Width, int AddrShift, endianness_t Endian> void address_space_speci
 }
 
 template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read64_delegate rhandler, write64_delegate whandler, u64 unitmask, int cswidth)
+{
+	install_readwrite_handler_helper<3>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, rhandler, whandler);
+}
+
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read64m_delegate handler, u64 unitmask, int cswidth)
+{
+	install_read_handler_helper<3>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, handler);
+}
+
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write64m_delegate handler, u64 unitmask, int cswidth)
+{
+	install_write_handler_helper<3>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, handler);
+}
+
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read64m_delegate rhandler, write64m_delegate whandler, u64 unitmask, int cswidth)
+{
+	install_readwrite_handler_helper<3>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, rhandler, whandler);
+}
+
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read64s_delegate handler, u64 unitmask, int cswidth)
+{
+	install_read_handler_helper<3>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, handler);
+}
+
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write64s_delegate handler, u64 unitmask, int cswidth)
+{
+	install_write_handler_helper<3>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, handler);
+}
+
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read64s_delegate rhandler, write64s_delegate whandler, u64 unitmask, int cswidth)
+{
+	install_readwrite_handler_helper<3>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, rhandler, whandler);
+}
+
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read64sm_delegate handler, u64 unitmask, int cswidth)
+{
+	install_read_handler_helper<3>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, handler);
+}
+
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write64sm_delegate handler, u64 unitmask, int cswidth)
+{
+	install_write_handler_helper<3>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, handler);
+}
+
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read64sm_delegate rhandler, write64sm_delegate whandler, u64 unitmask, int cswidth)
+{
+	install_readwrite_handler_helper<3>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, rhandler, whandler);
+}
+
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read64mo_delegate handler, u64 unitmask, int cswidth)
+{
+	install_read_handler_helper<3>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, handler);
+}
+
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write64mo_delegate handler, u64 unitmask, int cswidth)
+{
+	install_write_handler_helper<3>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, handler);
+}
+
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read64mo_delegate rhandler, write64mo_delegate whandler, u64 unitmask, int cswidth)
+{
+	install_readwrite_handler_helper<3>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, rhandler, whandler);
+}
+
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read64smo_delegate handler, u64 unitmask, int cswidth)
+{
+	install_read_handler_helper<3>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, handler);
+}
+
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write64smo_delegate handler, u64 unitmask, int cswidth)
+{
+	install_write_handler_helper<3>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, handler);
+}
+
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read64smo_delegate rhandler, write64smo_delegate whandler, u64 unitmask, int cswidth)
 {
 	install_readwrite_handler_helper<3>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, rhandler, whandler);
 }
@@ -2217,7 +2739,6 @@ memory_block::~memory_block()
 
 memory_bank::memory_bank(address_space &space, int index, offs_t addrstart, offs_t addrend, const char *tag)
 	: m_machine(space.m_manager.machine()),
-	  m_baseptr(nullptr),
 	  m_anonymous(tag == nullptr),
 	  m_addrstart(addrstart),
 	  m_addrend(addrend),
@@ -2293,7 +2814,7 @@ void memory_bank::set_base(void *base)
 		m_entries.resize(1);
 		m_curentry = 0;
 	}
-	m_baseptr = m_entries[m_curentry] = reinterpret_cast<u8 *>(base);
+	m_entries[m_curentry] = reinterpret_cast<u8 *>(base);
 	for(auto cb : m_alloc_notifier)
 		cb(base);
 	m_alloc_notifier.clear();
@@ -2324,7 +2845,6 @@ void memory_bank::set_entry(int entrynum)
 		throw emu_fatalerror("memory_bank::set_entry called for bank '%s' with invalid bank entry %d", m_tag.c_str(), entrynum);
 
 	m_curentry = entrynum;
-	m_baseptr = m_entries[entrynum];
 }
 
 
@@ -2344,10 +2864,6 @@ void memory_bank::configure_entry(int entrynum, void *base)
 
 	// set the entry
 	m_entries[entrynum] = reinterpret_cast<u8 *>(base);
-
-	// if the bank base is not configured, and we're the first entry, set us up
-	if (!m_baseptr && !entrynum)
-		m_baseptr = m_entries[0];
 }
 
 
@@ -2363,8 +2879,6 @@ void memory_bank::configure_entries(int startentry, int numentries, void *base, 
 	// fill in the requested bank entries
 	for (int entrynum = 0; entrynum < numentries; entrynum ++)
 		m_entries[entrynum + startentry] = reinterpret_cast<u8 *>(base) +  entrynum * stride ;
-	if(!m_baseptr && !startentry)
-		m_baseptr = reinterpret_cast<u8 *>(base);
 }
 
 

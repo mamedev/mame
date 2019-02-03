@@ -842,17 +842,17 @@ MACHINE_CONFIG_START(nss_state::nss)
 	MCFG_DEVICE_ADD("soundcpu", SPC700, XTAL(24'576'000) / 12)
 	MCFG_DEVICE_PROGRAM_MAP(spc_mem)
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	/* nss hardware */
 	MCFG_DEVICE_ADD("bios", Z80, 4000000)
 	MCFG_DEVICE_PROGRAM_MAP(bios_map)
 	MCFG_DEVICE_IO_MAP(bios_io_map)
 
-	MCFG_M50458_ADD("m50458", 4000000, "osd") /* TODO: correct clock */
-	MCFG_S3520CF_ADD("s3520cf") /* RTC */
-	MCFG_RP5H01_ADD("rp5h01")
-	MCFG_M6M80011AP_ADD("m6m80011ap")
+	M50458(config, m_m50458, 4000000, "osd"); /* TODO: correct clock */
+	S3520CF(config, m_s3520cf); /* RTC */
+	RP5H01(config, m_rp5h01, 0);
+	M6M80011AP(config, "m6m80011ap");
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -863,7 +863,7 @@ MACHINE_CONFIG_START(nss_state::nss)
 
 	/* video hardware */
 	/* TODO: the screen should actually superimpose, but for the time being let's just separate outputs */
-	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+	config.set_default_layout(layout_dualhsxs);
 
 	// SNES PPU
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -871,9 +871,9 @@ MACHINE_CONFIG_START(nss_state::nss)
 	MCFG_SCREEN_UPDATE_DRIVER( snes_state, screen_update )
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, nss_state, nss_vblank_irq))
 
-	MCFG_DEVICE_ADD("ppu", SNES_PPU, 0)
-	MCFG_SNES_PPU_OPENBUS_CB(READ8(*this, nss_state, snes_open_bus_r))
-	MCFG_VIDEO_SET_SCREEN("screen")
+	SNES_PPU(config, m_ppu, MCLK_NTSC);
+	m_ppu->open_bus_callback().set([this] { return snes_open_bus_r(); }); // lambda because overloaded function name
+	m_ppu->set_screen("screen");
 
 	// NSS
 	MCFG_SCREEN_ADD("osd", RASTER)

@@ -284,8 +284,7 @@ MACHINE_CONFIG_START(magnum_state::magnum)
 	MCFG_DEVICE_PROGRAM_MAP(magnum_map)
 	MCFG_DEVICE_IO_MAP(magnum_io)
 
-	MCFG_DEVICE_ADD("rtc", CDP1879, XTAL(32'768))
-	MCFG_CDP1879_IRQ_CALLBACK(WRITELINE(*this, magnum_state, rtcirq_w))
+	CDP1879(config, "rtc", XTAL(32'768)).irq_callback().set(FUNC(magnum_state::rtcirq_w));
 
 	MCFG_SCREEN_ADD("screen1", LCD)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -301,19 +300,19 @@ MACHINE_CONFIG_START(magnum_state::magnum)
 	MCFG_SCREEN_VISIBLE_AREA(0, 6*40-1, 0, 8*16-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("lcdc1", HD61830, 1000000) // unknown clock
-	MCFG_DEVICE_ADDRESS_MAP(0, magnum_lcdc)
-	MCFG_VIDEO_SET_SCREEN("screen1")
+	hd61830_device &lcdc1(HD61830(config, "lcdc1", 1000000)); // unknown clock
+	lcdc1.set_addrmap(0, &magnum_state::magnum_lcdc);
+	lcdc1.set_screen("screen1");
 
-	MCFG_DEVICE_ADD("lcdc2", HD61830, 1000000) // unknown clock
-	MCFG_DEVICE_ADDRESS_MAP(0, magnum_lcdc)
-	MCFG_VIDEO_SET_SCREEN("screen2")
+	hd61830_device &lcdc2(HD61830(config, "lcdc2", 1000000)); // unknown clock
+	lcdc2.set_addrmap(0, &magnum_state::magnum_lcdc);
+	lcdc2.set_screen("screen2");
 
-	//MCFG_DEVICE_ADD("crtc", I8275, 3000000) // unknown clock
+	//I8275(config, "crtc", 3000000); // unknown clock
 
-	//MCFG_DEVICE_ADD("fdc", WD1793, 1000000) // nothing known, type or if any disks even exist, port 0x44 is possibly motor control
+	//WD1793(config, "fdc", 1000000); // nothing known, type or if any disks even exist, port 0x44 is possibly motor control
 
-	MCFG_PALETTE_ADD_MONOCHROME_INVERTED("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
 
 	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("beep", BEEP, 500) /// frequency is guessed

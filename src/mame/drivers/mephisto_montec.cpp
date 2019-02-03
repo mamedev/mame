@@ -464,15 +464,15 @@ MACHINE_CONFIG_START(mephisto_montec_state::montec)
 	MCFG_DEVICE_PROGRAM_MAP( montec_mem )
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(mephisto_montec_state, nmi_line_assert, XTAL(4'000'000) / (1 << 13))
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beeper", BEEP, 3250)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_MEPHISTO_SENSORS_BOARD_ADD("board")
+	MEPHISTO_SENSORS_BOARD(config, m_board, 0);
 
-	MCFG_DEFAULT_LAYOUT(layout_mephisto_montec)
+	config.set_default_layout(layout_mephisto_montec);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mephisto_montec_state::monteciv)
@@ -488,10 +488,9 @@ MACHINE_CONFIG_START(mephisto_montec_state::megaiv)
 	MCFG_DEVICE_PROGRAM_MAP(megaiv_mem)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(mephisto_montec_state, nmi_line_pulse, XTAL(4'915'200) / (1 << 13))
 
-	MCFG_DEVICE_REMOVE("board")
-	MCFG_MEPHISTO_BUTTONS_BOARD_ADD("board")
-	MCFG_MEPHISTO_BOARD_DISABLE_LEDS(true)
-	MCFG_DEFAULT_LAYOUT(layout_mephisto_megaiv)
+	MEPHISTO_BUTTONS_BOARD(config.replace(), m_board, 0);
+	m_board->set_disable_leds(true);
+	config.set_default_layout(layout_mephisto_megaiv);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mephisto_montec_state::mondial2)
@@ -501,8 +500,8 @@ MACHINE_CONFIG_START(mephisto_montec_state::mondial2)
 	MCFG_DEVICE_PROGRAM_MAP(mondial2_mem)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(mephisto_montec_state, nmi_line_pulse, XTAL(2'000'000) / (1 << 12))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("refresh_leds", mephisto_montec_state, refresh_leds, attotime::from_hz(10))
-	MCFG_DEFAULT_LAYOUT(layout_mephisto_mondial2)
+	TIMER(config, "refresh_leds").configure_periodic(FUNC(mephisto_montec_state::refresh_leds), attotime::from_hz(10));
+	config.set_default_layout(layout_mephisto_mondial2);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mephisto_montec_state::smondial)
@@ -519,9 +518,9 @@ MACHINE_CONFIG_START(mephisto_montec_state::smondial2)
 	MCFG_DEVICE_PROGRAM_MAP(smondial2_mem)
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "smondial2_cart")
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "smondial2")
+	SOFTWARE_LIST(config, "cart_list").set_original("smondial2");
 
-	MCFG_DEFAULT_LAYOUT(layout_mephisto_smondial2)
+	config.set_default_layout(layout_mephisto_smondial2);
 MACHINE_CONFIG_END
 
 

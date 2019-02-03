@@ -37,12 +37,6 @@ X  Examine and modify CPU registers
 #include "machine/i8251.h"
 #include "bus/rs232/rs232.h"
 
-#define I8259A_TAG      "pic8259"
-#define I8253_TAG       "pit8253"
-#define I8255A_TAG      "ppi8255"
-#define I8251A_TAG      "usart"
-#define I8251A_BAUD_TAG "usart_baud"
-#define RS232_TAG       "rs232"
 
 class isbc8030_state : public driver_device
 {
@@ -50,11 +44,11 @@ public:
 	isbc8030_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_usart(*this, I8251A_TAG)
-		, m_ppi(*this, I8255A_TAG)
-		, m_pic(*this, I8259A_TAG)
-		, m_pit(*this, I8253_TAG)
-		, m_rs232(*this, RS232_TAG)
+		, m_usart(*this, "usart")
+		, m_ppi(*this, "ppi8255")
+		, m_pic(*this, "pic8259")
+		, m_pit(*this, "pit8253")
+		, m_rs232(*this, "rs232")
 	{ }
 
 	void isbc8030(machine_config &config);
@@ -85,42 +79,41 @@ void isbc8030_state::isbc8030_io(address_map &map)
 	map(0xd8, 0xd9).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0xdc, 0xdf).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0xe8, 0xeb).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xec, 0xec).mirror(0x02).rw(m_usart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xed, 0xed).mirror(0x02).rw(m_usart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xec, 0xed).mirror(0x02).rw(m_usart, FUNC(i8251_device::read), FUNC(i8251_device::write));
 }
 
 static INPUT_PORTS_START( isbc8030 )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(isbc8030_state::isbc8030)
-	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8085A, XTAL(22'118'400) / 4)
-	MCFG_DEVICE_PROGRAM_MAP(isbc8030_mem)
-	MCFG_DEVICE_IO_MAP(isbc8030_io)
+void isbc8030_state::isbc8030(machine_config &config)
+{
+	I8085A(config, m_maincpu, XTAL(22'118'400) / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &isbc8030_state::isbc8030_mem);
+	m_maincpu->set_addrmap(AS_IO, &isbc8030_state::isbc8030_io);
 
-	MCFG_DEVICE_ADD(I8259A_TAG, PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	PIC8259(config, m_pic, 0);
+	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
 
-	MCFG_DEVICE_ADD(I8253_TAG, PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(22'118'400) / 18)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(I8259A_TAG, pic8259_device, ir0_w))
-	MCFG_PIT8253_CLK1(XTAL(22'118'400) / 18)
-	MCFG_PIT8253_CLK2(XTAL(22'118'400) / 18)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(I8251A_TAG, i8251_device, write_rxc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(I8251A_TAG, i8251_device, write_txc))
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(XTAL(22'118'400) / 18);
+	m_pit->out_handler<0>().set(m_pic, FUNC(pic8259_device::ir0_w));
+	m_pit->set_clk<1>(XTAL(22'118'400) / 18);
+	m_pit->set_clk<2>(XTAL(22'118'400) / 18);
+	m_pit->out_handler<2>().set(m_usart, FUNC(i8251_device::write_rxc));
+	m_pit->out_handler<2>().append(m_usart, FUNC(i8251_device::write_txc));
 
-	MCFG_DEVICE_ADD(I8251A_TAG, I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_rts))
+	I8251(config, m_usart, 0);
+	m_usart->txd_handler().set(m_rs232, FUNC(rs232_port_device::write_txd));
+	m_usart->dtr_handler().set(m_rs232, FUNC(rs232_port_device::write_dtr));
+	m_usart->rts_handler().set(m_rs232, FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD(I8255A_TAG, I8255A, 0)
+	I8255A(config, m_ppi, 0);
 
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE(I8251A_TAG, i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(I8251A_TAG, i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(I8251A_TAG, i8251_device, write_cts))
-MACHINE_CONFIG_END
+	RS232_PORT(config, m_rs232, default_rs232_devices, "terminal");
+	m_rs232->rxd_handler().set(m_usart, FUNC(i8251_device::write_rxd));
+	m_rs232->dsr_handler().set(m_usart, FUNC(i8251_device::write_dsr));
+	m_rs232->cts_handler().set(m_usart, FUNC(i8251_device::write_cts));
+}
 
 /* ROM definition */
 ROM_START( isbc8030 )

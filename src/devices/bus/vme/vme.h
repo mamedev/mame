@@ -59,7 +59,7 @@
 
 // Callbacks to the board from the VME bus comes through here
 #define MCFG_VME_J1_CB(_devcb) \
-	devcb = &downcast<vme_slot_device &>(*device).set_vme_j1_callback(DEVCB_##_devcb);
+	downcast<vme_slot_device &>(*device).set_vme_j1_callback(DEVCB_##_devcb);
 
 //void vme_slot1(device_slot_interface &device); // Disabled until we know how to combine a board driver and a slot device.
 void vme_slots(device_slot_interface &device);
@@ -248,8 +248,5 @@ private:
 		downcast<vme_slot_device &>(*device).set_vme_slot(_tag, stag.c_str()); \
 		downcast<vme_slot_device &>(*device).update_vme_chains(_slotnbr);      \
 	}
-
-#define MCFG_VME_SLOT_REMOVE(_tag)        \
-	MCFG_DEVICE_REMOVE(_tag)
 
 #endif // MAME_BUS_VME_VME_H

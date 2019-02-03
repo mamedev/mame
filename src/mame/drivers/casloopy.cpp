@@ -297,7 +297,7 @@ uint32_t casloopy_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	count = test;
 
-	for (y=cliprect.min_y;y<cliprect.max_y;y++)
+	for (y=cliprect.top(); y<cliprect.bottom(); y++) // FIXME: off-by-one?
 	{
 		for(x=0;x<256;x++)
 		{
@@ -549,7 +549,7 @@ MACHINE_CONFIG_START(casloopy_state::casloopy)
 	MCFG_GENERIC_LOAD(casloopy_state, loopy_cart)
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","casloopy")
+	SOFTWARE_LIST(config, "cart_list").set_original("casloopy");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

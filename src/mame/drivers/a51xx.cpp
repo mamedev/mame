@@ -144,8 +144,7 @@ MACHINE_CONFIG_START(a51xx_state::a5120)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_a51xx)
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
-
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(a51xx_state::a5130)

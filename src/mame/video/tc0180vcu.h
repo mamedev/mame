@@ -5,11 +5,6 @@
 
 #pragma once
 
-#define MCFG_TC0180VCU_INTH_CALLBACK(_write) \
-	devcb = &downcast<tc0180vcu_device &>(*device).set_inth_callback(DEVCB_##_write);
-#define MCFG_TC0180VCU_INTL_CALLBACK(_write) \
-	devcb = &downcast<tc0180vcu_device &>(*device).set_intl_callback(DEVCB_##_write);
-
 class tc0180vcu_device : public device_t, public device_gfx_interface, public device_video_interface
 {
 public:
@@ -20,8 +15,8 @@ public:
 	void set_bg_colorbase(int color) { m_bg_color_base = color; }
 	void set_fg_colorbase(int color) { m_fg_color_base = color; }
 	void set_tx_colorbase(int color) { m_tx_color_base = color; }
-	template <class Object> devcb_base &set_inth_callback(Object &&cb) { return m_inth_callback.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_intl_callback(Object &&cb) { return m_intl_callback.set_callback(std::forward<Object>(cb)); }
+	auto inth_callback() { return m_inth_callback.bind(); }
+	auto intl_callback() { return m_intl_callback.bind(); }
 
 	uint8_t get_videoctrl() { return m_video_control; }
 	DECLARE_WRITE16_MEMBER( ctrl_w );
@@ -31,7 +26,6 @@ public:
 	void tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tmap_num, int plane);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_framebuffer( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 
 	void tc0180vcu_memrw(address_map &map);
 protected:
@@ -47,6 +41,7 @@ private:
 	};
 
 	void vblank_callback(screen_device &screen, bool state);
+	void vblank_update();
 
 	// internal state
 
@@ -83,17 +78,5 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(TC0180VCU, tc0180vcu_device)
-
-#define MCFG_TC0180VCU_FB_COLORBASE(_color) \
-	downcast<tc0180vcu_device &>(*device).set_fb_colorbase(_color);
-
-#define MCFG_TC0180VCU_BG_COLORBASE(_color) \
-	downcast<tc0180vcu_device &>(*device).set_bg_colorbase(_color);
-
-#define MCFG_TC0180VCU_FG_COLORBASE(_color) \
-	downcast<tc0180vcu_device &>(*device).set_fg_colorbase(_color);
-
-#define MCFG_TC0180VCU_TX_COLORBASE(_color) \
-	downcast<tc0180vcu_device &>(*device).set_tx_colorbase(_color);
 
 #endif // MAME_VIDEO_TC0180VCU_H

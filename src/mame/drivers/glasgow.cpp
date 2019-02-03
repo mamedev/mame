@@ -316,16 +316,16 @@ MACHINE_CONFIG_START(glasgow_state::glasgow)
 	MCFG_DEVICE_ADD("maincpu", M68000, 12_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(glasgow_mem)
 
-	MCFG_MEPHISTO_SENSORS_BOARD_ADD("board")
+	MEPHISTO_SENSORS_BOARD(config, m_board, 0);
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_glasgow)
+	config.set_default_layout(layout_glasgow);
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beeper", BEEP, 44)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer", glasgow_state, update_nmi, attotime::from_hz(50))
+	TIMER(config, "nmi_timer").configure_periodic(FUNC(glasgow_state::update_nmi), attotime::from_hz(50));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(amsterd_state::amsterd)
@@ -343,8 +343,8 @@ MACHINE_CONFIG_START(amsterd_state::dallas32)
 	MCFG_DEVICE_REPLACE("maincpu", M68020, 14_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(dallas32_mem)
 
-	MCFG_DEVICE_REMOVE("nmi_timer")
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer", amsterd_state, update_nmi32, attotime::from_hz(50))
+	config.device_remove("nmi_timer");
+	TIMER(config, "nmi_timer").configure_periodic(FUNC(amsterd_state::update_nmi32), attotime::from_hz(50));
 MACHINE_CONFIG_END
 
 

@@ -46,9 +46,10 @@ DAC               -26.6860Mhz
 class _2mindril_state : public taito_f3_state
 {
 public:
-	_2mindril_state(const machine_config &mconfig, device_type type, const char *tag)
-		: taito_f3_state(mconfig, type, tag),
-		m_in0(*this, "IN0") { }
+	_2mindril_state(const machine_config &mconfig, device_type type, const char *tag) :
+		taito_f3_state(mconfig, type, tag),
+		m_in0(*this, "IN0")
+	{ }
 
 	void drill(machine_config &config);
 
@@ -357,45 +358,44 @@ MACHINE_RESET_MEMBER(_2mindril_state,drill)
 	m_irq_reg = 0;
 }
 
-MACHINE_CONFIG_START(_2mindril_state::drill)
-
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000 )
-	MCFG_DEVICE_PROGRAM_MAP(drill_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", _2mindril_state,  drill_vblank_irq)
+void _2mindril_state::drill(machine_config &config)
+{
+	M68000(config, m_maincpu, 16000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &_2mindril_state::drill_map);
+	m_maincpu->set_vblank_int("screen", FUNC(_2mindril_state::drill_vblank_irq));
 	//MCFG_DEVICE_PERIODIC_INT_DRIVER(_2mindril_state, drill_device_irq, 60)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_2mindril)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_2mindril);
 
-	MCFG_DEVICE_ADD("tc0510nio", TC0510NIO, 0)
-	MCFG_TC0510NIO_READ_0_CB(IOPORT("DSW"))
-	MCFG_TC0510NIO_READ_1_CB(READ8(*this, _2mindril_state, arm_pwr_r))
-	MCFG_TC0510NIO_READ_2_CB(READ8(*this, _2mindril_state, sensors_r))
-	MCFG_TC0510NIO_WRITE_4_CB(WRITE8(*this, _2mindril_state, coins_w))
-	MCFG_TC0510NIO_READ_7_CB(IOPORT("COINS"))
+	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio", 0));
+	tc0510nio.read_0_callback().set_ioport("DSW");
+	tc0510nio.read_1_callback().set(FUNC(_2mindril_state::arm_pwr_r));
+	tc0510nio.read_2_callback().set(FUNC(_2mindril_state::sensors_r));
+	tc0510nio.write_4_callback().set(FUNC(_2mindril_state::coins_w));
+	tc0510nio.read_7_callback().set_ioport("COINS");
 
 	MCFG_MACHINE_START_OVERRIDE(_2mindril_state,drill)
 	MCFG_MACHINE_RESET_OVERRIDE(_2mindril_state,drill)
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* inaccurate, same as Taito F3? (needs screen raw params anyway) */
-	MCFG_SCREEN_SIZE(40*8+48*2, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(46, 40*8-1 + 46, 24, 24+224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(_2mindril_state, screen_update_f3)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, _2mindril_state, screen_vblank_f3))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* inaccurate, same as Taito F3? (needs screen raw params anyway) */
+	m_screen->set_size(40*8+48*2, 32*8);
+	m_screen->set_visarea(46, 40*8-1 + 46, 24, 24+224-1);
+	m_screen->set_screen_update(FUNC(_2mindril_state::screen_update_f3));
+	m_screen->screen_vblank().set(FUNC(_2mindril_state::screen_vblank_f3));
 
-	MCFG_PALETTE_ADD("palette", 0x2000)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 0x2000);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2610B, 16000000/2)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(*this, _2mindril_state, irqhandler))
-	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
-	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
-	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	ym2610b_device &ymsnd(YM2610B(config, "ymsnd", 16000000/2));
+	ymsnd.irq_handler().set(FUNC(_2mindril_state::irqhandler));
+	ymsnd.add_route(0, "lspeaker", 0.25);
+	ymsnd.add_route(0, "rspeaker", 0.25);
+	ymsnd.add_route(1, "lspeaker", 1.0);
+	ymsnd.add_route(2, "rspeaker", 1.0);
+}
 
 
 ROM_START( 2mindril )

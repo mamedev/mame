@@ -30,10 +30,11 @@ DEFINE_DEVICE_TYPE(C64_EASYFLASH, c64_easyflash_cartridge_device, "c64_easyflash
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(c64_easyflash_cartridge_device::device_add_mconfig)
-	MCFG_AMD_29F040_ADD(AM29F040_0_TAG)
-	MCFG_AMD_29F040_ADD(AM29F040_1_TAG)
-MACHINE_CONFIG_END
+void c64_easyflash_cartridge_device::device_add_mconfig(machine_config &config)
+{
+	AMD_29F040(config, AM29F040_0_TAG);
+	AMD_29F040(config, AM29F040_1_TAG);
+}
 
 
 //-------------------------------------------------
@@ -118,12 +119,12 @@ uint8_t c64_easyflash_cartridge_device::c64_cd_r(address_space &space, offs_t of
 	if (!roml)
 	{
 		offs_t addr = (m_bank << 13) | (offset & 0x1fff);
-		data = m_flash_roml->read(space, addr);
+		data = m_flash_roml->read(addr);
 	}
 	else if (!romh)
 	{
 		offs_t addr = (m_bank << 13) | (offset & 0x1fff);
-		data = m_flash_romh->read(space, addr);
+		data = m_flash_romh->read(addr);
 	}
 	else if (!io2)
 	{
@@ -143,12 +144,12 @@ void c64_easyflash_cartridge_device::c64_cd_w(address_space &space, offs_t offse
 	if (!roml)
 	{
 		offs_t addr = (m_bank << 13) | (offset & 0x1fff);
-		m_flash_roml->write(space, addr, data);
+		m_flash_roml->write(addr, data);
 	}
 	else if (!romh)
 	{
 		offs_t addr = (m_bank << 13) | (offset & 0x1fff);
-		m_flash_romh->write(space, addr, data);
+		m_flash_romh->write(addr, data);
 	}
 	else if (!io1)
 	{

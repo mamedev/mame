@@ -309,7 +309,7 @@ WRITE16_MEMBER(segac2_state::segac2_upd7759_w)
 	/* only works if we're accessing the low byte */
 	if (ACCESSING_BITS_0_7)
 	{
-		m_upd7759->port_w(space, 0, data & 0xff);
+		m_upd7759->port_w(data & 0xff);
 		m_upd7759->start_w(0);
 		m_upd7759->start_w(1);
 	}
@@ -485,7 +485,7 @@ WRITE8_MEMBER(segac2_state::io_porth_w)
 	if (m_sound_banks > 1)
 	{
 		newbank = (data >> 2) & (m_sound_banks - 1);
-		m_upd7759->set_bank_base(newbank * 0x20000);
+		m_upd7759->set_rom_bank(newbank);
 	}
 }
 
@@ -563,7 +563,7 @@ WRITE8_MEMBER(segac2_state::prot_w)
 		m_sp_palbase = new_sp_palbase;
 		m_bg_palbase = new_bg_palbase;
 		recompute_palette_tables();
-		if (LOG_PALETTE) logerror("Set palbank: %d/%d (scan=%d)\n", m_bg_palbase, m_sp_palbase, m_screen->vpos());
+		if (LOG_PALETTE && m_screen) logerror("Set palbank: %d/%d (scan=%d)\n", m_bg_palbase, m_sp_palbase, m_screen->vpos());
 	}
 }
 
@@ -1542,71 +1542,71 @@ WRITE_LINE_MEMBER(segac2_state::vdp_lv4irqline_callback_c2)
 }
 
 
-MACHINE_CONFIG_START(segac2_state::segac)
-
+void segac2_state::segac(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XL2_CLOCK/6)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(md_base_state,genesis_int_callback)
+	M68000(config, m_maincpu, XL2_CLOCK/6);
+	m_maincpu->set_addrmap(AS_PROGRAM, &segac2_state::main_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(md_base_state::genesis_int_callback));
 
 	MCFG_MACHINE_START_OVERRIDE(segac2_state,segac2)
 	MCFG_MACHINE_RESET_OVERRIDE(segac2_state,segac2)
-	MCFG_NVRAM_ADD_1FILL("nvram") // borencha requires 0xff fill or there is no sound (it lacks some of the init code of the borench set)
 
-	MCFG_DEVICE_ADD("io", SEGA_315_5296, XL2_CLOCK/6) // clock divider guessed
-	MCFG_315_5296_IN_PORTA_CB(IOPORT("P1"))
-	MCFG_315_5296_IN_PORTB_CB(IOPORT("P2"))
-	MCFG_315_5296_IN_PORTC_CB(READ8(*this, segac2_state, io_portc_r))
-	MCFG_315_5296_OUT_PORTD_CB(WRITE8(*this, segac2_state, io_portd_w))
-	MCFG_315_5296_IN_PORTE_CB(IOPORT("SERVICE"))
-	MCFG_315_5296_IN_PORTF_CB(IOPORT("COINAGE"))
-	MCFG_315_5296_IN_PORTG_CB(IOPORT("DSW"))
-	MCFG_315_5296_OUT_PORTH_CB(WRITE8(*this, segac2_state, io_porth_w))
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1); // borencha requires 0xff fill or there is no sound (it lacks some of the init code of the borench set)
+
+	sega_315_5296_device &io(SEGA_315_5296(config, "io", XL2_CLOCK/6)); // clock divider guessed
+	io.in_pa_callback().set_ioport("P1");
+	io.in_pb_callback().set_ioport("P2");
+	io.in_pc_callback().set(FUNC(segac2_state::io_portc_r));
+	io.out_pd_callback().set(FUNC(segac2_state::io_portd_w));
+	io.in_pe_callback().set_ioport("SERVICE");
+	io.in_pf_callback().set_ioport("COINAGE");
+	io.in_pg_callback().set_ioport("DSW");
+	io.out_ph_callback().set(FUNC(segac2_state::io_porth_w));
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gen_vdp", SEGA315_5313, XL2_CLOCK, "maincpu")
-	MCFG_SEGA315_5313_IS_PAL(false)
-	MCFG_SEGA315_5313_SND_IRQ_CALLBACK(WRITELINE(*this, segac2_state, vdp_sndirqline_callback_c2));
-	MCFG_SEGA315_5313_LV6_IRQ_CALLBACK(WRITELINE(*this, segac2_state, vdp_lv6irqline_callback_c2));
-	MCFG_SEGA315_5313_LV4_IRQ_CALLBACK(WRITELINE(*this, segac2_state, vdp_lv4irqline_callback_c2));
-	MCFG_SEGA315_5313_ALT_TIMING(1);
-	MCFG_VIDEO_SET_SCREEN("megadriv")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	SEGA315_5313(config, m_vdp, XL2_CLOCK, m_maincpu);
+	m_vdp->set_is_pal(false);
+	m_vdp->snd_irq().set(FUNC(segac2_state::vdp_sndirqline_callback_c2));
+	m_vdp->lv6_irq().set(FUNC(segac2_state::vdp_lv6irqline_callback_c2));
+	m_vdp->lv4_irq().set(FUNC(segac2_state::vdp_lv4irqline_callback_c2));
+	m_vdp->set_alt_timing(1);
+	m_vdp->set_screen("megadriv");
+	m_vdp->add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	MCFG_TIMER_DEVICE_ADD_SCANLINE("scantimer", "gen_vdp", sega315_5313_device, megadriv_scanline_timer_callback_alt_timing, "megadriv", 0, 1)
+	TIMER(config, "scantimer").configure_scanline("gen_vdp", FUNC(sega315_5313_device::megadriv_scanline_timer_callback_alt_timing), "megadriv", 0, 1);
 
-	MCFG_SCREEN_ADD("megadriv", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(512, 262)
-	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(segac2_state, screen_update_segac2_new)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, segac2_state, screen_vblank_megadriv))
+	screen_device &screen(SCREEN(config, "megadriv", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_size(512, 262);
+	screen.set_visarea(0, 32*8-1, 0, 28*8-1);
+	screen.set_screen_update(FUNC(segac2_state::screen_update_segac2_new));
+	screen.screen_vblank().set(FUNC(segac2_state::screen_vblank_megadriv));
 
-	MCFG_PALETTE_ADD("palette", 2048*3)
+	PALETTE(config, m_palette).set_entries(2048*3);
 
 	MCFG_VIDEO_START_OVERRIDE(segac2_state,segac2_new)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM3438, XL2_CLOCK/7)
-	MCFG_YM2612_IRQ_HANDLER(WRITELINE(*this, segac2_state, segac2_irq2_interrupt))
-	MCFG_SOUND_ROUTE(0, "mono", 0.50)
+	ym3438_device &ymsnd(YM3438(config, "ymsnd", XL2_CLOCK/7));
+	ymsnd.irq_handler().set(FUNC(segac2_state::segac2_irq2_interrupt));
+	ymsnd.add_route(0, "mono", 0.50);
 	/* right channel not connected */
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(segac2_state::segac2)
+void segac2_state::segac2(machine_config &config)
+{
 	segac(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5296_OUT_CNT1_CB(WRITELINE("upd", upd7759_device, reset_w))
+	subdevice<sega_315_5296_device>("io")->out_cnt1_callback().set(m_upd7759, FUNC(upd7759_device::reset_w));
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("upd", UPD7759, XL1_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	UPD7759(config, m_upd7759, XL1_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
 
@@ -1698,7 +1698,7 @@ ROM_START( tantrbl3 ) /* Tant-R (Puzzle & Action) (Alt Bootleg Running on C Boar
 ROM_END
 
 
-ROM_START( ichirjbl ) /* Ichident-R (Puzzle & Action 2) (Bootleg Running on C Board?, No Samples) */
+ROM_START( ichirjbl ) /* Ichidant-R (Puzzle & Action 2) (Bootleg Running on C Board?, No Samples) */
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "27c4000.2",0x000000, 0x080000, CRC(5a194f44) SHA1(67a4d21b91704f8c2210b5106e82e22ba3366f4c) )
 	ROM_LOAD16_BYTE( "27c4000.1",0x000001, 0x080000, CRC(de209f84) SHA1(0860d0ebfab2952e82fc1e292bf9410d673d9322) )
@@ -1729,7 +1729,7 @@ ROM_START( borencha ) /* Borench  (c)1990 Sega */
 ROM_END
 
 
-ROM_START( tfrceac ) /* Thunder Force AC  (c)1990 Technosoft / Sega - 834-7745-02 THUNDER FORCE (EMP5032 labeled 317-0172)  */
+ROM_START( tfrceac ) /* Thunder Force AC  (c)1990 Technosoft / Sega - 834-7745-02 THUNDER FORCE AC (EMP5032 labeled 317-0172) */
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "epr-13675.ic32", 0x000000, 0x040000, CRC(95ecf202) SHA1(92b0f351f2bee7d59873a4991615f14f1afe4da7) )
 	ROM_LOAD16_BYTE( "epr-13674.ic31", 0x000001, 0x040000, CRC(e63d7f1a) SHA1(a40d0a5a96f379a467048dc8fddd8aaaeb94da1d) )
@@ -1742,7 +1742,7 @@ ROM_START( tfrceac ) /* Thunder Force AC  (c)1990 Technosoft / Sega - 834-7745-0
 ROM_END
 
 
-ROM_START( tfrceacj ) /* Thunder Force AC (Jpn)  (c)1990 Technosoft / Sega */
+ROM_START( tfrceacj ) /* Thunder Force AC (Japan)  (c)1990 Technosoft / Sega - 834-7745 THUNDER FORCE AC (EMP5032 labeled 317-0172)  */
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "epr-13657.ic32", 0x000000, 0x040000, CRC(a0f38ffd) SHA1(da548e7f61aed0e82a460553a119941da8857bc4) )
 	ROM_LOAD16_BYTE( "epr-13656.ic31", 0x000001, 0x040000, CRC(b9438d1e) SHA1(598209c9fec3527fde720af09e5bebd7379f5b2b) )
@@ -1948,7 +1948,7 @@ ROM_START( puyobl ) /* Puyo Puyo  (c)1992 Sega / Compile  Bootleg */
 ROM_END
 
 
-ROM_START( ichir ) /* Ichident-R (Puzzle & Action 2)  (c)1994 Sega (World) */
+ROM_START( ichir ) /* Ichidant-R (Puzzle & Action 2)  (c)1994 Sega (World) */
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "pa2_32.bin",     0x000000, 0x080000, CRC(7ba0c025) SHA1(855e9bb2a20c6f51b26381233c57c26aa96ad1f6) )
 	ROM_LOAD16_BYTE( "pa2_31.bin",     0x000001, 0x080000, CRC(5f86e5cc) SHA1(44e201de00dfbf7c66d0e0d40d17b162c6f0625b) )
@@ -1960,7 +1960,7 @@ ROM_START( ichir ) /* Ichident-R (Puzzle & Action 2)  (c)1994 Sega (World) */
 ROM_END
 
 
-ROM_START( ichirk ) /* Ichident-R (Puzzle & Action 2)  (c)1994 Sega (Korea) */
+ROM_START( ichirk ) /* Ichidant-R (Puzzle & Action 2)  (c)1994 Sega (Korea) */
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	/* Again the part numbers are quite strange for the Korean verison */
 	ROM_LOAD16_BYTE( "epr_ichi.32", 0x000000, 0x080000, CRC(804dea11) SHA1(40bf8cbd40969a5880df10914252b7f64d5ce8e9) )
@@ -1973,7 +1973,7 @@ ROM_START( ichirk ) /* Ichident-R (Puzzle & Action 2)  (c)1994 Sega (Korea) */
 ROM_END
 
 
-ROM_START( ichirj ) /* Ichident-R (Puzzle & Action 2)  (c)1994 Sega (Japan) */
+ROM_START( ichirj ) /* Ichidant-R (Puzzle & Action 2)  (c)1994 Sega (Japan) - 834-10935 ICHIDANT-R */
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "epr-16886.ic32", 0x000000, 0x080000, CRC(38208e28) SHA1(07fc634bdf2d3e25274c9c374b3506dec765114c) )
 	ROM_LOAD16_BYTE( "epr-16885.ic31", 0x000001, 0x080000, CRC(1ce4e837) SHA1(16600600e12e3f35e3da89524f7f51f019b5ad17) )
@@ -2519,7 +2519,7 @@ void segac2_state::init_pclubjv5()
 
     Dates are all verified correct from Ingame display, some of the Titles
     such as Ichidant-R, Tant-R might be slightly incorrect as I've seen the
-    games referred to by other names such as Ichident-R, Tanto-R, Tanto Arle
+    games referred to by other names such as Ichidant-R, Tanto-R, Tanto Arle
     etc.
 
     bloxeedc is set as as clone of bloxeed as it is the same game but running

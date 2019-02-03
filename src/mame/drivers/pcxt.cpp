@@ -499,20 +499,15 @@ MACHINE_CONFIG_START(pcxt_state::filetto)
 	MCFG_DEVICE_PROGRAM_MAP(filetto_map)
 	MCFG_DEVICE_IO_MAP(filetto_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
-	MCFG_PCNOPPI_MOTHERBOARD_ADD("mb","maincpu")
+	PCNOPPI_MOTHERBOARD(config, "mb", 0).set_cputag(m_maincpu);
 	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", filetto_isa8_cards, "filetto", true) // FIXME: determine ISA bus clock
 
 	MCFG_DEVICE_ADD("voice", HC55516, 8000000/4)//8923S-UM5100 is a HC55536 with ROM hook-up
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mb:mono", 0.60)
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("640K")
 
-	MCFG_DEVICE_ADD("bank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(bank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(18)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
+	RAM(config, RAM_TAG).set_default_size("640K");
+
+	ADDRESS_MAP_BANK(config, "bank").set_map(&pcxt_state::bank_map).set_options(ENDIANNESS_LITTLE, 8, 18, 0x10000);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pcxt_state::tetriskr)
@@ -520,11 +515,11 @@ MACHINE_CONFIG_START(pcxt_state::tetriskr)
 	MCFG_DEVICE_PROGRAM_MAP(tetriskr_map)
 	MCFG_DEVICE_IO_MAP(tetriskr_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
-	MCFG_PCNOPPI_MOTHERBOARD_ADD("mb","maincpu")
+	PCNOPPI_MOTHERBOARD(config, "mb", 0).set_cputag(m_maincpu);
 
 	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", filetto_isa8_cards, "tetriskr", true) // FIXME: determine ISA bus clock
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("640K")
+
+	RAM(config, RAM_TAG).set_default_size("640K");
 MACHINE_CONFIG_END
 
 ROM_START( filetto )

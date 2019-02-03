@@ -305,19 +305,14 @@ public:
 
 // ======================> mc6809e_device
 
-// MC6809E has LIC line to indicate opcode/data fetch
-#define MCFG_MC6809E_LIC_CB(_devcb) \
-	devcb = &downcast<mc6809e_device &>(*device).set_lic_cb(DEVCB_##_devcb);
-
-
 class mc6809e_device : public m6809_base_device
 {
 public:
 	// construction/destruction
 	mc6809e_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// configuration helpers
-	template<class Object> devcb_base &set_lic_cb(Object &&cb) { return m_lic_func.set_callback(std::forward<Object>(cb)); }
+	// MC6809E has LIC line to indicate opcode/data fetch
+	auto lic() { return m_lic_func.bind(); }
 };
 
 // ======================> m6809_device (LEGACY)

@@ -16,21 +16,6 @@
 #define LOG_Move0205    0
 #define LOG_Move0905    0
 
-#define MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(_devcb) \
-	devcb = &downcast<raiden2cop_device &>(*device).set_videoramout_cb(DEVCB_##_devcb);
-
-#define MCFG_RAIDEN2COP_PALETTERAM_OUT_CB(_devcb) \
-	devcb = &downcast<raiden2cop_device &>(*device).set_paletteramout_cb(DEVCB_##_devcb);
-
-#define MCFG_RAIDEN2COP_HOST_CPU(_tag) \
-	downcast<raiden2cop_device &>(*device).set_host_cpu_tag(_tag);
-
-#define MCFG_RAIDEN2COP_ADD(_tag ) \
-	MCFG_DEVICE_ADD(_tag, RAIDEN2COP, 0)
-
-#define MCFG_LEGIONNACOP_ADD(_tag ) \
-	MCFG_DEVICE_ADD(_tag, RAIDEN2COP, 0)
-
 
 class raiden2cop_device : public device_t
 {
@@ -82,8 +67,8 @@ public:
 
 	uint8_t fade_table(int v);
 
-	template<class Object> devcb_base &set_videoramout_cb(Object &&cb) { return m_videoramout_cb.set_callback(std::forward<Object>(cb)); }
-	template<class Object> devcb_base &set_paletteramout_cb(Object &&cb) { return m_paletteramout_cb.set_callback(std::forward<Object>(cb)); }
+	auto videoramout_cb() { return m_videoramout_cb.bind(); }
+	auto paletteramout_cb() { return m_paletteramout_cb.bind(); }
 	template<class T> void set_host_cpu_tag(T &&tag) { m_host_cpu.set_tag(std::forward<T>(tag)); }
 
 	// Number Conversion

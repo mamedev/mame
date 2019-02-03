@@ -44,13 +44,15 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/gunbustr.h"
+
 #include "audio/taito_en.h"
 #include "machine/taitoio.h"
-#include "includes/gunbustr.h"
 
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
 #include "sound/es5506.h"
+
 #include "screen.h"
 
 
@@ -235,17 +237,17 @@ MACHINE_CONFIG_START(gunbustr_state::gunbustr)
 	MCFG_DEVICE_PROGRAM_MAP(gunbustr_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gunbustr_state,  gunbustr_interrupt) /* VBL */
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_DEVICE_ADD("tc0510nio", TC0510NIO, 0)
-	MCFG_TC0510NIO_READ_0_CB(IOPORT("EXTRA"))
-	MCFG_TC0510NIO_READ_2_CB(IOPORT("INPUTS"))
-	MCFG_TC0510NIO_READ_3_CB(IOPORT("SPECIAL"))
-	MCFG_TC0510NIO_WRITE_3_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write)) MCFG_DEVCB_BIT(5)
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("eeprom", eeprom_serial_93cxx_device, di_write)) MCFG_DEVCB_BIT(6)
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write)) MCFG_DEVCB_BIT(4)
-	MCFG_TC0510NIO_WRITE_4_CB(WRITE8(*this, gunbustr_state, coin_word_w))
-	MCFG_TC0510NIO_READ_7_CB(IOPORT("SYSTEM"))
+	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio", 0));
+	tc0510nio.read_0_callback().set_ioport("EXTRA");
+	tc0510nio.read_2_callback().set_ioport("INPUTS");
+	tc0510nio.read_3_callback().set_ioport("SPECIAL");
+	tc0510nio.write_3_callback().set("eeprom", FUNC(eeprom_serial_93cxx_device::clk_write)).bit(5);
+	tc0510nio.write_3_callback().append("eeprom", FUNC(eeprom_serial_93cxx_device::di_write)).bit(6);
+	tc0510nio.write_3_callback().append("eeprom", FUNC(eeprom_serial_93cxx_device::cs_write)).bit(4);
+	tc0510nio.write_4_callback().set(FUNC(gunbustr_state::coin_word_w));
+	tc0510nio.read_7_callback().set_ioport("SYSTEM");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -254,22 +256,21 @@ MACHINE_CONFIG_START(gunbustr_state::gunbustr)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gunbustr_state, screen_update_gunbustr)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gunbustr)
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gunbustr);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 4096);
 
-	MCFG_DEVICE_ADD("tc0480scp", TC0480SCP, 0)
-	MCFG_TC0480SCP_GFX_REGION(1)
-	MCFG_TC0480SCP_TX_REGION(2)
-	MCFG_TC0480SCP_OFFSETS(0x20, 0x07)
-	MCFG_TC0480SCP_OFFSETS_TX(-1, -1)
-	MCFG_TC0480SCP_OFFSETS_FLIP(-1, 0)
-	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
+	TC0480SCP(config, m_tc0480scp, 0);
+	m_tc0480scp->set_gfx_region(1);
+	m_tc0480scp->set_tx_region(2);
+	m_tc0480scp->set_offsets(0x20, 0x07);
+	m_tc0480scp->set_offsets_tx(-1, -1);
+	m_tc0480scp->set_offsets_flip(-1, 0);
+	m_tc0480scp->set_gfxdecode_tag(m_gfxdecode);
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("taito_en", TAITO_EN, 0)
+	TAITO_EN(config, "taito_en", 0);
 MACHINE_CONFIG_END
 
 /***************************************************************************/

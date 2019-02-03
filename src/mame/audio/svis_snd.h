@@ -12,13 +12,6 @@
 #pragma once
 
 
-//**************************************************************************
-//  TYPE DEFINITIONS
-//**************************************************************************
-
-#define MCFG_SVISION_SOUND_IRQ_CALLBACK(_devcb) \
-	devcb = &downcast<svision_sound_device&>(*device).set_irq_cb(DEVCB_##_devcb);
-
 // ======================> svision_sound_device
 
 class svision_sound_device : public device_t, public device_sound_interface
@@ -35,7 +28,7 @@ public:
 	svision_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	template <class Object> devcb_base &set_irq_cb(Object &&cb) { return m_irq_cb.set_callback(std::forward<Object>(cb)); }
+	auto irq_cb() { return m_irq_cb.bind(); }
 
 	DECLARE_WRITE8_MEMBER( sounddma_w );
 	DECLARE_WRITE8_MEMBER( noise_w );

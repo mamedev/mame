@@ -320,11 +320,11 @@ static INPUT_PORTS_START( madgear )
 	PORT_DIPSETTING(      0x0030, "Upright One Player" )
 	PORT_DIPSETTING(      0x0000, "Upright Two Players" )
 	PORT_DIPSETTING(      0x0010, DEF_STR( Cocktail ) )
-/*  PORT_DIPSETTING(      0x0020, "Upright One Player" ) */
+	PORT_DIPSETTING(      0x0020, "Upright One Player (duplicate)" )
 	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0040, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, "Background Music" ) PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x0080, 0x0080, "Demo Music" ) PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0080, DEF_STR( On ) )
 	PORT_BIT( 0x7f00, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -341,7 +341,7 @@ static INPUT_PORTS_START( madgear )
 	PORT_DIPSETTING(      0x0300, DEF_STR( 5C_3C ) )
 	PORT_DIPSETTING(      0x0600, DEF_STR( 3C_2C ) )
 	PORT_DIPSETTING(      0x0f00, DEF_STR( 1C_1C ) )
-//  PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0000, "1 Coin / 1 Credit (duplicate)" )
 	PORT_DIPSETTING(      0x0800, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(      0x0e00, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x0d00, DEF_STR( 1C_3C ) )
@@ -394,6 +394,45 @@ static INPUT_PORTS_START( madgear )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 INPUT_PORTS_END
+
+// TODO, verify that there is no 'very difficult' in game code, this is based on test mode
+static INPUT_PORTS_START( leds2011 )
+	PORT_INCLUDE( madgear )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPSETTING(      0x0008, DEF_STR( Easy ) )
+	PORT_DIPSETTING(      0x000c, DEF_STR( Normal ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Difficult ) )
+	PORT_DIPSETTING(      0x0000, "Normal (duplicate)" )
+INPUT_PORTS_END
+
+// A number of the dips are inverted
+// TODO: verify the difficulty dips, this is based on Test Mode
+static INPUT_PORTS_START( leds2011p )
+	PORT_INCLUDE( madgear )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x0001, 0x0000, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(      0x0001, DEF_STR( No ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Yes ) )
+	// This isn't a simple On / Off Flipscreen. The game code is buggy and it uses edge trigger logic rather than level based, so it always boots unflipped but changing it while running flips it
+	PORT_DIPNAME( 0x0002, 0x0002, "Flip Screen (Edge Trigger)" ) PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(      0x0002, "Position 0 ('Off')" )
+	PORT_DIPSETTING(      0x0000, "Position 1 ('On')" )
+	PORT_DIPNAME( 0x000c, 0x0008, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPSETTING(      0x000c, DEF_STR( Easy ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Normal ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Difficult ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Very_Difficult ) )
+	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0000, "Demo Music" ) PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+INPUT_PORTS_END
+
 
 /******************************************************************************/
 
@@ -475,99 +514,96 @@ void lastduel_state::machine_reset()
 		m_vctrl[i] = 0;
 }
 
-MACHINE_CONFIG_START(lastduel_state::lastduel)
-
+void lastduel_state::lastduel(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 10000000) // Unconfirmed - could be 8MHz
-	MCFG_DEVICE_PROGRAM_MAP(lastduel_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lastduel_state, irq2_line_hold)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_irq", lastduel_state, lastduel_timer_cb, attotime::from_hz(120))
+	M68000(config, m_maincpu, 10000000); // Unconfirmed - could be 8MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &lastduel_state::lastduel_map);
+	m_maincpu->set_vblank_int("screen", FUNC(lastduel_state::irq2_line_hold));
+	TIMER(config, "timer_irq").configure_periodic(FUNC(lastduel_state::lastduel_timer_cb), attotime::from_hz(120));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	Z80(config, m_audiocpu, XTAL(3'579'545));
+	m_audiocpu->set_addrmap(AS_PROGRAM, &lastduel_state::sound_map);
 
 	MCFG_MACHINE_START_OVERRIDE(lastduel_state,lastduel)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(lastduel_state, screen_update_lastduel)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(8*8, (64-8)*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(lastduel_state::screen_update_lastduel));
+	screen.screen_vblank().set("spriteram", FUNC(buffered_spriteram16_device::vblank_copy_rising));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
+	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lastduel)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT_CLASS(2, lastduel_state, lastduel_RRRRGGGGBBBBIIII)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lastduel);
+	PALETTE(config, m_palette).set_format(2, &lastduel_state::lastduel_RRRRGGGGBBBBIIII, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(lastduel_state,lastduel)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(3'579'545))
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	ym2203_device &ym1(YM2203(config, "ym1", XTAL(3'579'545)));
+	ym1.irq_handler().set_inputline(m_audiocpu, 0);
+	ym1.add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	MCFG_DEVICE_ADD("ym2", YM2203, XTAL(3'579'545))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-MACHINE_CONFIG_END
+	ym2203_device &ym2(YM2203(config, "ym2", XTAL(3'579'545)));
+	ym2.add_route(ALL_OUTPUTS, "mono", 0.40);
+}
 
-
-MACHINE_CONFIG_START(lastduel_state::madgear)
-
+void lastduel_state::madgear(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(10'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(madgear_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lastduel_state, irq5_line_hold)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_irq", lastduel_state, madgear_timer_cb, attotime::from_hz(120))
+	M68000(config, m_maincpu, XTAL(10'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &lastduel_state::madgear_map);
+	m_maincpu->set_vblank_int("screen", FUNC(lastduel_state::irq5_line_hold));
+	TIMER(config, "timer_irq").configure_periodic(FUNC(lastduel_state::madgear_timer_cb), attotime::from_hz(120));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
-	MCFG_DEVICE_PROGRAM_MAP(madgear_sound_map)
+	Z80(config, m_audiocpu, XTAL(3'579'545));
+	m_audiocpu->set_addrmap(AS_PROGRAM, &lastduel_state::madgear_sound_map);
 
 	MCFG_MACHINE_START_OVERRIDE(lastduel_state,madgear)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(57.4444)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(lastduel_state, screen_update_madgear)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	screen.set_refresh_hz(57.4444);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(8*8, (64-8)*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(lastduel_state::screen_update_madgear));
+	screen.screen_vblank().set("spriteram", FUNC(buffered_spriteram16_device::vblank_copy_rising));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
+	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lastduel)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT_CLASS(2, lastduel_state, lastduel_RRRRGGGGBBBBIIII)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lastduel);
+	PALETTE(config, m_palette).set_format(2, &lastduel_state::lastduel_RRRRGGGGBBBBIIII, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(lastduel_state,madgear)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(3'579'545))
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	ym2203_device &ym1(YM2203(config, "ym1", XTAL(3'579'545)));
+	ym1.irq_handler().set_inputline(m_audiocpu, 0);
+	ym1.add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	MCFG_DEVICE_ADD("ym2", YM2203, XTAL(3'579'545))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	ym2203_device &ym2(YM2203(config, "ym2", XTAL(3'579'545)));
+	ym2.add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(10'000'000)/10, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.98)
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL(10'000'000)/10, okim6295_device::PIN7_HIGH));
+	oki.add_route(ALL_OUTPUTS, "mono", 0.98);
+}
 
 /******************************************************************************/
 
@@ -879,6 +915,45 @@ ROM_START( leds2011u )
 	ROM_LOAD( "29.14k",   0x0000, 0x0100, CRC(7f862e1e) SHA1(7134c4f741463007a177d55922e1284d132f60e3) ) /* priority (not used) BPROM type 63S141 or compatible like 82S129A */
 ROM_END
 
+ROM_START( leds2011p ) /* CAPCOM 87616A-2 PCB connected to a CAPCOM 87616B-2 + 4 87616-C daughter cards - PCB had large label: from CAPCOM U.S.A. INC.  RETURN TO JAPAN AFTER THE SHOW */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 256K for 68000 code */
+	ROM_LOAD16_BYTE( "04.8d",    0x00000, 0x20000, CRC(7a20bc60) SHA1(36348d8ea150e20e0f9279a3fbac2b204d1e05f1) ) /* hand written 5/11 on genuine CAPCOM label */
+	ROM_LOAD16_BYTE( "03.7d",    0x00001, 0x20000, CRC(b6a20b12) SHA1(c15a551de283b165aed5ae65363b79a75697423c) ) /* hand written 5/11 on genuine CAPCOM label */
+	ROM_LOAD16_BYTE( "02.6d",    0x40000, 0x20000, CRC(c7e7f0bc) SHA1(18cbaa2a9a170523680495a3ffa8827990acebe7) ) /* hand written 5/11 on genuine CAPCOM label */
+	ROM_LOAD16_BYTE( "01.5d",    0x40001, 0x20000, CRC(01520af8) SHA1(45cc4b30ec0ff2432d2794d213261c65e4eda783) ) /* hand written 5/11 on genuine CAPCOM label */
+
+	ROM_REGION( 0x80000, "unused", 0 ) /* this is actually a 68k program rom from an entirely different revision shoved in a socket near the Z80 */
+	ROM_LOAD16_BYTE( "04.15k",    0x00000, 0x20000, CRC(4817558b) SHA1(82c08bafd7701cfa16b4a012825b8ae1b2386f24) ) /* hand written checksum of ABED on genuine CAPCOM label */
+
+	ROM_REGION( 0x18000 , "audiocpu", 0 ) /* audio CPU */
+	ROM_LOAD( "07.14j",   0x00000,  0x10000, CRC(742dc60e) SHA1(7e2edbbb830afb2ee7add2e69323f912c5f9b9db) ) /* hand written checksum of 503F on genuine CAPCOM label */
+
+	ROM_REGION( 0x80000, "sprites", 0 ) /* ROMs 09 & 10 located on one 87616-C daughter card, ROMs 11 & 12 located on another 87616-C daughter card */
+	ROM_LOAD32_BYTE( "09.rom0",   0x000000, 0x20000, CRC(945aeded) SHA1(ed75b44641b81833cd8925df4fd1966bc71eeb01) ) /* hand written checksum of 6831 on genuine CAPCOM label */
+	ROM_LOAD32_BYTE( "10.rom1",   0x000002, 0x20000, CRC(1ebd62b7) SHA1(2a132edf4057dc9db38e25374b81f306ca9a7625) ) /* hand written checksum of B8FB on genuine CAPCOM label */
+	ROM_LOAD32_BYTE( "11.rom0",   0x000001, 0x20000, CRC(e34b20aa) SHA1(f966d6a29b77e6e7182ebe98e4ce48b2e8798e43) ) /* hand written checksum of B863 on genuine CAPCOM label */
+	ROM_LOAD32_BYTE( "12.rom1",   0x000003, 0x20000, CRC(c106d67c) SHA1(ea104847c555852259cff57dced6297d5511a146) ) /* hand written checksum of A96B on genuine CAPCOM label */
+
+	ROM_REGION( 0x08000, "gfx2", 0 )
+	ROM_LOAD( "10k",    0x000000, 0x08000, CRC(e2ecb7c6) SHA1(fc8f7e06fbeac37e25ab81c440cd48ca8be02dda) ) /* had no label */
+
+	ROM_REGION( 0x40000, "gfx3", 0 ) /* ROMs 17 & 18 located on a 87616-C daughter card */
+	ROM_LOAD16_BYTE( "17.rom0",   0x000000, 0x20000, CRC(078a11e7) SHA1(993e4c7e27e94d373d872ca3b3fa1cad06c433b7) ) /* hand written checksum of 7384 on genuine CAPCOM label */
+	ROM_LOAD16_BYTE( "18.rom1",   0x000001, 0x20000, CRC(2222130e) SHA1(d257ce456d1e1b31aeccd4f796bceca6ef5d94a3) ) /* hand written checksum of A0D8 on genuine CAPCOM label */
+
+	ROM_REGION( 0x80000, "gfx4", 0 ) /* ROMs 13 through 16 located on a 87616-C daughter card */
+	ROM_LOAD16_BYTE( "13.rom0",   0x000000, 0x20000, CRC(813e9775) SHA1(1d636966a2a9bb02cfc43655b4dfdb66cf0cd81d) ) /* hand written checksum of C3F7 on genuine CAPCOM label */
+	ROM_LOAD16_BYTE( "14.rom1",   0x000001, 0x20000, CRC(8f1d3727) SHA1(ac0c9d501124de23550e14193780290596639b7c) ) /* hand written checksum of 35D3 on genuine CAPCOM label */
+	ROM_LOAD16_BYTE( "15.rom2",   0x040000, 0x20000, CRC(b68ebcec) SHA1(efbd05896bcf5d7d83dcb196f39941014a7dcfae) ) /* hand written checksum of 8784 on genuine CAPCOM label */
+	ROM_LOAD16_BYTE( "16.rom3",   0x040001, 0x20000, CRC(ccf22c41) SHA1(e69b638fa13ded00f7e60feaf73d3f247aa22fc2) ) /* hand written checksum of D58B on genuine CAPCOM label */
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM - IC positions swapped compared to other sets? */
+	ROM_LOAD( "06.12e",    0x00000, 0x20000, CRC(88d39a5b) SHA1(8fb2d1d26e2ffb93dfc9cf8f23bb81eb64496c2b) ) /* hand written checksum of 56DC on genuine CAPCOM label */
+	ROM_LOAD( "05.10e",    0x20000, 0x20000, CRC(b06e03b5) SHA1(7d17e5cfb57866c60146bea1a4535e961c73327c) ) /* hand written checksum of 926D on genuine CAPCOM label */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "63s141an.15k",   0x0000, 0x0100, CRC(7f862e1e) SHA1(7134c4f741463007a177d55922e1284d132f60e3) ) /* priority (not used) BPROM type MMI 63S141AN or compatible like 82S129A */
+ROM_END
 
 /******************************************************************************/
 
@@ -893,5 +968,6 @@ GAME( 1989, madgear,   0,        madgear,  madgear,  lastduel_state, empty_init,
 GAME( 1989, madgearj,  madgear,  madgear,  madgear,  lastduel_state, empty_init, ROT270, "Capcom",  "Mad Gear (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, ledstorm,  madgear,  madgear,  madgear,  lastduel_state, empty_init, ROT270, "Capcom",  "Led Storm (US)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, leds2011,  0,        madgear,  madgear,  lastduel_state, empty_init, ROT270, "Capcom",  "Led Storm Rally 2011 (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, leds2011u, leds2011, madgear,  madgear,  lastduel_state, empty_init, ROT270, "Capcom",  "Led Storm Rally 2011 (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, leds2011,  0,        madgear,  leds2011, lastduel_state, empty_init, ROT270, "Capcom",  "Led Storm Rally 2011 (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, leds2011u, leds2011, madgear,  leds2011, lastduel_state, empty_init, ROT270, "Capcom",  "Led Storm Rally 2011 (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, leds2011p, leds2011, madgear,  leds2011p,lastduel_state, empty_init, ROT270, "Capcom",  "Led Storm Rally 2011 (US, prototype 12)", MACHINE_SUPPORTS_SAVE )

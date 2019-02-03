@@ -33,14 +33,6 @@
 #include "softlist.h"
 
 
-/* Stubs for various functions called by the FBA code, replace with MAME specifics later */
-
-uint8_t *NeoSpriteRAM, *NeoTextRAM;
-//uint8_t* NeoSpriteROM;
-//uint8_t* NeoTextROM;
-uint8_t* YM2610ADPCMAROM;
-uint8_t* NeoZ80ROMActive;
-
 // was it actually released in eu / asia?
 #define NEOCD_REGION_ASIA 3 // IronClad runs with a darkened screen (MVS has the same issue)
 #define NEOCD_REGION_EUROPE 2 // ^
@@ -56,17 +48,19 @@ class ngcd_state : public aes_base_state
 public:
 	ngcd_state(const machine_config &mconfig, device_type type, const char *tag)
 		: aes_base_state(mconfig, type, tag)
-		, m_tempcdc(*this,"tempcdc")
+		, m_tempcdc(*this, "tempcdc")
+		, m_z80_ram(*this, "z80_ram")
+		, m_adpcm_ram(*this, "adpcm_ram")
 	{
-		NeoCDDMAAddress1 = 0;
-		NeoCDDMAAddress2 = 0;
-		NeoCDDMAValue1   = 0;
-		NeoCDDMAValue2   = 0;
-		NeoCDDMACount    = 0;
-		NeoCDDMAMode = 0;
-		nIRQAcknowledge = ~0;
-		nNeoCDIRQVectorAck = 0;
-		nNeoCDIRQVector = 0;
+		m_dma_address1 = 0;
+		m_dma_address2 = 0;
+		m_dma_value1   = 0;
+		m_dma_value2   = 0;
+		m_dma_count    = 0;
+		m_dma_mode = 0;
+		m_irq_ack = ~0;
+		m_irq_vector_ack = 0;
+		m_irq_vector = 0;
 		m_has_sprite_bus = true;
 		m_has_text_bus = true;
 		m_has_ymrom_bus = true;
@@ -74,66 +68,71 @@ public:
 	}
 
 	optional_device<lc89510_temp_device> m_tempcdc;
+	required_shared_ptr<uint8_t> m_z80_ram;
+	required_shared_ptr<uint8_t> m_adpcm_ram;
 
+	void do_dma(address_space& curr_space);
+	void set_dma_regs(int offset, uint16_t wordValue);
 
-	void NeoCDDoDMA(address_space& curr_space);
-	void set_DMA_regs(int offset, uint16_t wordValue);
-
-	DECLARE_READ16_MEMBER(neocd_memcard_r);
-	DECLARE_WRITE16_MEMBER(neocd_memcard_w);
-	DECLARE_READ16_MEMBER(neocd_control_r);
-	DECLARE_WRITE16_MEMBER(neocd_control_w);
-	DECLARE_READ8_MEMBER(neocd_transfer_r);
-	DECLARE_WRITE8_MEMBER(neocd_transfer_w);
+	DECLARE_READ16_MEMBER(memcard_r);
+	DECLARE_WRITE16_MEMBER(memcard_w);
+	DECLARE_READ16_MEMBER(control_r);
+	DECLARE_WRITE16_MEMBER(control_w);
+	DECLARE_READ8_MEMBER(transfer_r);
+	DECLARE_WRITE8_MEMBER(transfer_w);
 
 	DECLARE_INPUT_CHANGED_MEMBER(aes_jp1);
 
 	// neoCD
 
-	int32_t nActiveTransferArea;
-	int32_t nSpriteTransferBank;
-	int32_t nADPCMTransferBank;
-	int32_t NeoCDDMAAddress1;
-	int32_t NeoCDDMAAddress2;
-	int32_t NeoCDDMAValue1;
-	int32_t NeoCDDMAValue2;
-	int32_t NeoCDDMACount;
-	int32_t NeoCDDMAMode;
-	int32_t nIRQAcknowledge;
-	int nNeoCDIRQVectorAck;
-	int nNeoCDIRQVector;
+	int32_t m_active_transfer_area;
+	int32_t m_sprite_transfer_bank;
+	int32_t m_adpcm_transfer_bank;
+	int32_t m_dma_address1;
+	int32_t m_dma_address2;
+	int32_t m_dma_value1;
+	int32_t m_dma_value2;
+	int32_t m_dma_count;
+	int32_t m_dma_mode;
+	int32_t m_irq_ack;
+	int m_irq_vector_ack;
+	int m_irq_vector;
 
 	bool m_has_sprite_bus;
 	bool m_has_text_bus;
 	bool m_has_ymrom_bus;
 	bool m_has_z80_bus;
 
-	int get_nNeoCDIRQVectorAck(void) { return nNeoCDIRQVectorAck; }
-	void set_nNeoCDIRQVectorAck(int val) { nNeoCDIRQVectorAck = val; }
-	int get_nNeoCDIRQVector(void) { return nNeoCDIRQVector; }
-	void NeoCDIRQUpdate(uint8_t byteValue);
+	int get_irq_vector_ack(void) { return m_irq_vector_ack; }
+	void set_irq_vector_ack(int val) { m_irq_vector_ack = val; }
+	int get_irq_vector(void) { return m_irq_vector; }
+	void irq_update(uint8_t byteValue);
 
 	// from the CDC
 	void interrupt_callback_type1(void);
 	void interrupt_callback_type2(void);
 	void interrupt_callback_type3(void);
 
-	uint8_t nTransferWriteEnable;
+	uint8_t m_transfer_write_enable;
 
 	bool prohibit_cdc_irq; // hack?
 
-	uint32_t screen_update_neocd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void init_neocdz();
 	void init_neocdzj();
 
-	IRQ_CALLBACK_MEMBER(neocd_int_callback);
+	IRQ_CALLBACK_MEMBER(int_callback);
 
 	std::unique_ptr<uint8_t[]> m_meminternal_data;
+	std::unique_ptr<uint8_t[]> m_sprite_ram;
+	std::unique_ptr<uint8_t[]> m_fix_ram;
+
 	void neocd(machine_config &config);
 	void neocd_audio_io_map(address_map &map);
 	void neocd_audio_map(address_map &map);
 	void neocd_main_map(address_map &map);
+	void neocd_ym_map(address_map &map);
 
 protected:
 	virtual void machine_start() override;
@@ -154,13 +153,13 @@ protected:
 
 
 /* The NeoCD has an 8kB internal memory card, instead of memcard slots like the MVS and AES */
-READ16_MEMBER(ngcd_state::neocd_memcard_r)
+READ16_MEMBER(ngcd_state::memcard_r)
 {
 	return m_meminternal_data[offset] | 0xff00;
 }
 
 
-WRITE16_MEMBER(ngcd_state::neocd_memcard_w)
+WRITE16_MEMBER(ngcd_state::memcard_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -175,7 +174,7 @@ WRITE16_MEMBER(ngcd_state::neocd_memcard_w)
  *
  *************************************/
 
-READ16_MEMBER(ngcd_state::neocd_control_r)
+READ16_MEMBER(ngcd_state::control_r)
 {
 	uint32_t sekAddress = 0xff0000+ (offset*2);
 
@@ -204,7 +203,7 @@ READ16_MEMBER(ngcd_state::neocd_control_r)
 }
 
 
-WRITE16_MEMBER(ngcd_state::neocd_control_w)
+WRITE16_MEMBER(ngcd_state::control_w)
 {
 	uint32_t sekAddress = 0xff0000+ (offset*2);
 	uint16_t wordValue = data;
@@ -220,7 +219,7 @@ WRITE16_MEMBER(ngcd_state::neocd_control_w)
 			break;
 
 		case 0x000E:
-			NeoCDIRQUpdate(wordValue); // irqack
+			irq_update(wordValue); // irqack
 			break;
 
 		case 0x0016:
@@ -230,7 +229,7 @@ WRITE16_MEMBER(ngcd_state::neocd_control_w)
 			// DMA controller
 		case 0x0060:
 			if (byteValue & 0x40) {
-				NeoCDDoDMA(space);
+				do_dma(space);
 			}
 			break;
 
@@ -243,7 +242,7 @@ WRITE16_MEMBER(ngcd_state::neocd_control_w)
 		case 0x0070:
 		case 0x0072:
 		case 0x007E:
-			set_DMA_regs(sekAddress & 0xFFFE, wordValue);
+			set_dma_regs(sekAddress & 0xFFFE, wordValue);
 			break;
 
 		// upload DMA controller program
@@ -271,7 +270,7 @@ WRITE16_MEMBER(ngcd_state::neocd_control_w)
 //          bprintf(PRINT_NORMAL, _T("  - NGCD 0xE00000 area -> 0x%02X (PC: 0x%06X)\n"), byteValue, SekGetPC(-1));
 			if (ACCESSING_BITS_0_7)
 			{
-				nActiveTransferArea = byteValue;
+				m_active_transfer_area = byteValue;
 			}
 			break;
 
@@ -343,7 +342,7 @@ WRITE16_MEMBER(ngcd_state::neocd_control_w)
 		case 0x016e:
 //          bprintf(PRINT_IMPORTANT, _T("  - NGCD 0xE00000 area write access %s (0x%02X, PC: 0x%06X)\n"), byteValue ? _T("enabled") : _T("disabled"), byteValue, SekGetPC(-1));
 
-			nTransferWriteEnable = byteValue;
+			m_transfer_write_enable = byteValue;
 			break;
 
 		case 0x0180: {
@@ -380,10 +379,10 @@ WRITE16_MEMBER(ngcd_state::neocd_control_w)
 			break;
 		}
 		case 0x01A0:
-			nSpriteTransferBank = (byteValue & 3) << 20;
+			m_sprite_transfer_bank = (byteValue & 3) << 20;
 			break;
 		case 0x01A2:
-			nADPCMTransferBank  = (byteValue & 1) << 19;
+			m_adpcm_transfer_bank  = (byteValue & 1) << 19;
 			break;
 
 
@@ -403,61 +402,61 @@ WRITE16_MEMBER(ngcd_state::neocd_control_w)
  */
 
 
-READ8_MEMBER(ngcd_state::neocd_transfer_r)
+READ8_MEMBER(ngcd_state::transfer_r)
 {
 	uint32_t sekAddress = 0xe00000+ (offset);
 	int address;
 	sekAddress ^= 1;
 
-	switch (nActiveTransferArea) {
+	switch (m_active_transfer_area) {
 		case 0: // Sprites
-			address = (nSpriteTransferBank + (sekAddress & 0x0FFFFF));
+			address = (m_sprite_transfer_bank + (sekAddress & 0x0FFFFF));
 
 			// address is swizzled a bit due to out sprite decoding
-			if ((address&3)==0) return NeoSpriteRAM[address];
-			if ((address&3)==1) return NeoSpriteRAM[address^3];
-			if ((address&3)==2) return NeoSpriteRAM[address^3];
-			if ((address&3)==3) return NeoSpriteRAM[address];
+			if ((address&3)==0) return m_sprite_ram[address];
+			if ((address&3)==1) return m_sprite_ram[address^3];
+			if ((address&3)==2) return m_sprite_ram[address^3];
+			if ((address&3)==3) return m_sprite_ram[address];
 
-			return NeoSpriteRAM[nSpriteTransferBank + (sekAddress & 0x0FFFFF)];
+			return m_sprite_ram[m_sprite_transfer_bank + (sekAddress & 0x0FFFFF)];
 		case 1:                         // ADPCM
-			return YM2610ADPCMAROM[nADPCMTransferBank + ((sekAddress & 0x0FFFFF) >> 1)];
+			return m_adpcm_ram[m_adpcm_transfer_bank + ((sekAddress & 0x0FFFFF) >> 1)];
 		case 4:                         // Z80
 			if ((sekAddress & 0xfffff) >= 0x20000) return ~0;
-			return NeoZ80ROMActive[(sekAddress & 0x1FFFF) >> 1];
+			return m_z80_ram[(sekAddress & 0x1FFFF) >> 1];
 		case 5:                         // Text
-			return NeoTextRAM[(sekAddress & 0x3FFFF) >> 1];
+			return m_fix_ram[(sekAddress & 0x3FFFF) >> 1];
 	}
 
 	return ~0;
 
 }
 
-WRITE8_MEMBER(ngcd_state::neocd_transfer_w)
+WRITE8_MEMBER(ngcd_state::transfer_w)
 {
 	uint8_t byteValue = data;
 	uint32_t sekAddress = 0xe00000+ (offset);
 
-	if (!nTransferWriteEnable) {
+	if (!m_transfer_write_enable) {
 //      return;
 	}
 	int address;
 
 	sekAddress ^= 1;
 
-	switch (nActiveTransferArea) {
+	switch (m_active_transfer_area) {
 		case 0:                         // Sprites
-			address = (nSpriteTransferBank + (sekAddress & 0x0FFFFF));
+			address = (m_sprite_transfer_bank + (sekAddress & 0x0FFFFF));
 
 			// address is swizzled a bit due to out sprite decoding
-			if ((address&3)==0) NeoSpriteRAM[address] = byteValue;
-			if ((address&3)==1) NeoSpriteRAM[address^3] = byteValue;
-			if ((address&3)==2) NeoSpriteRAM[address^3] = byteValue;
-			if ((address&3)==3) NeoSpriteRAM[address] = byteValue;
+			if ((address&3)==0) m_sprite_ram[address] = byteValue;
+			if ((address&3)==1) m_sprite_ram[address^3] = byteValue;
+			if ((address&3)==2) m_sprite_ram[address^3] = byteValue;
+			if ((address&3)==3) m_sprite_ram[address] = byteValue;
 
 			break;
 		case 1:                         // ADPCM
-			YM2610ADPCMAROM[nADPCMTransferBank + ((sekAddress & 0x0FFFFF) >> 1)] = byteValue;
+			m_adpcm_ram[m_adpcm_transfer_bank + ((sekAddress & 0x0FFFFF) >> 1)] = byteValue;
 			break;
 		case 4:                         // Z80
 
@@ -467,60 +466,60 @@ WRITE8_MEMBER(ngcd_state::neocd_transfer_w)
 			// transfer area without the bus? - this should really be checked on hw
 			if (m_has_z80_bus)
 			{
-				YM2610ADPCMAROM[nADPCMTransferBank + ((sekAddress & 0x0FFFFF) >> 1)] = byteValue;
+				m_adpcm_ram[m_adpcm_transfer_bank + ((sekAddress & 0x0FFFFF) >> 1)] = byteValue;
 			}
 			else
 			{
 		//  printf("sekAddress %08x %02x\n", sekAddress, data);
 				if ((sekAddress & 0xfffff) >= 0x20000) break;
-				NeoZ80ROMActive[(sekAddress & 0x1FFFF) >> 1] = byteValue;
+				m_z80_ram[(sekAddress & 0x1FFFF) >> 1] = byteValue;
 			}
 			break;
 		case 5:                         // Text
-			NeoTextRAM[(sekAddress & 0x3FFFF) >> 1] = byteValue;
+			m_fix_ram[(sekAddress & 0x3FFFF) >> 1] = byteValue;
 			break;
 	}
 }
 
 
 
-void ngcd_state::set_DMA_regs(int offset, uint16_t wordValue)
+void ngcd_state::set_dma_regs(int offset, uint16_t wordValue)
 {
 	switch (offset)
 	{
 		case 0x0064:
-			NeoCDDMAAddress1 &= 0x0000FFFF;
-			NeoCDDMAAddress1 |= wordValue << 16;
+			m_dma_address1 &= 0x0000FFFF;
+			m_dma_address1 |= wordValue << 16;
 			break;
 		case 0x0066:
-			NeoCDDMAAddress1 &= 0xFFFF0000;
-			NeoCDDMAAddress1 |= wordValue;
+			m_dma_address1 &= 0xFFFF0000;
+			m_dma_address1 |= wordValue;
 			break;
 		case 0x0068:
-			NeoCDDMAAddress2 &= 0x0000FFFF;
-			NeoCDDMAAddress2 |= wordValue << 16;
+			m_dma_address2 &= 0x0000FFFF;
+			m_dma_address2 |= wordValue << 16;
 			break;
 		case 0x006A:
-			NeoCDDMAAddress2 &= 0xFFFF0000;
-			NeoCDDMAAddress2 |= wordValue;
+			m_dma_address2 &= 0xFFFF0000;
+			m_dma_address2 |= wordValue;
 			break;
 		case 0x006C:
-			NeoCDDMAValue1 = wordValue;
+			m_dma_value1 = wordValue;
 			break;
 		case 0x006E:
-			NeoCDDMAValue2 = wordValue;
+			m_dma_value2 = wordValue;
 			break;
 		case 0x0070:
-			NeoCDDMACount &= 0x0000FFFF;
-			NeoCDDMACount |= wordValue << 16;
+			m_dma_count &= 0x0000FFFF;
+			m_dma_count |= wordValue << 16;
 			break;
 		case 0x0072:
-			NeoCDDMACount &= 0xFFFF0000;
-			NeoCDDMACount |= wordValue;
+			m_dma_count &= 0xFFFF0000;
+			m_dma_count |= wordValue;
 			break;
 
 		case 0x007E:
-			NeoCDDMAMode = wordValue;
+			m_dma_mode = wordValue;
 //          bprintf(PRINT_NORMAL, _T("  - DMA controller 0x%2X -> 0x%04X (PC: 0x%06X)\n"), sekAddress & 0xFF, wordValue, SekGetPC(-1));
 			break;
 
@@ -582,7 +581,7 @@ int32_t ngcd_state::SekIdle(int32_t nCycles)
  */
 
 
-void ngcd_state::NeoCDDoDMA(address_space& curr_space)
+void ngcd_state::do_dma(address_space& curr_space)
 {
 	// The LC8953 chip has a programmable DMA controller, which is not properly emulated.
 	// Since the software only uses it in a limited way, we can apply a simple heuristic
@@ -594,9 +593,9 @@ void ngcd_state::NeoCDDoDMA(address_space& curr_space)
 
 //  bprintf(PRINT_IMPORTANT, _T("  - DMA controller transfer started (PC: 0x%06X)\n"), SekGetPC(-1));
 
-	switch (NeoCDDMAMode) {
+	switch (m_dma_mode) {
 		case 0xCFFD: {
-//          bprintf(PRINT_NORMAL, _T("    adr : 0x%08X - 0x%08X <- address, skip odd bytes\n"), NeoCDDMAAddress1, NeoCDDMAAddress1 + NeoCDDMACount * 8);
+//          bprintf(PRINT_NORMAL, _T("    adr : 0x%08X - 0x%08X <- address, skip odd bytes\n"), m_dma_address1, m_dma_address1 + m_dma_count * 8);
 
 			//  - DMA controller 0x7E -> 0xCFFD (PC: 0xC07CE2)
 			//  - DMA controller program[00] -> 0xFCF5 (PC: 0xC07CE8)
@@ -608,21 +607,21 @@ void ngcd_state::NeoCDDoDMA(address_space& curr_space)
 			//  - DMA controller program[12] -> 0x2E02 (PC: 0xC07D0C)
 			//  - DMA controller program[14] -> 0xFDFF (PC: 0xC07D12)
 
-			SekIdle(NeoCDDMACount * 4);
+			SekIdle(m_dma_count * 4);
 
-			while (NeoCDDMACount--) {
-				curr_space.write_word(NeoCDDMAAddress1 + 0, NeoCDDMAAddress1 >> 24);
-				curr_space.write_word(NeoCDDMAAddress1 + 2, NeoCDDMAAddress1 >> 16);
-				curr_space.write_word(NeoCDDMAAddress1 + 4, NeoCDDMAAddress1 >>  8);
-				curr_space.write_word(NeoCDDMAAddress1 + 6, NeoCDDMAAddress1 >>  0);
-				NeoCDDMAAddress1 += 8;
+			while (m_dma_count--) {
+				curr_space.write_word(m_dma_address1 + 0, m_dma_address1 >> 24);
+				curr_space.write_word(m_dma_address1 + 2, m_dma_address1 >> 16);
+				curr_space.write_word(m_dma_address1 + 4, m_dma_address1 >>  8);
+				curr_space.write_word(m_dma_address1 + 6, m_dma_address1 >>  0);
+				m_dma_address1 += 8;
 			}
 
 			break;
 		}
 
 		case 0xE2DD: {
-//          bprintf(PRINT_NORMAL, _T("    copy: 0x%08X - 0x%08X <- 0x%08X - 0x%08X, skip odd bytes\n"), NeoCDDMAAddress2, NeoCDDMAAddress2 + NeoCDDMACount * 2, NeoCDDMAAddress1, NeoCDDMAAddress1 + NeoCDDMACount * 4);
+//          bprintf(PRINT_NORMAL, _T("    copy: 0x%08X - 0x%08X <- 0x%08X - 0x%08X, skip odd bytes\n"), m_dma_address2, m_dma_address2 + m_dma_count * 2, m_dma_address1, m_dma_address1 + m_dma_count * 4);
 
 			//  - DMA controller 0x7E -> 0xE2DD (PC: 0xC0A190)
 			//  - DMA controller program[00] -> 0xFCF5 (PC: 0xC0A192)
@@ -634,20 +633,20 @@ void ngcd_state::NeoCDDoDMA(address_space& curr_space)
 			//  - DMA controller program[12] -> 0x02FD (PC: 0xC0A19E)
 			//  - DMA controller program[14] -> 0xFFFF (PC: 0xC0A1A0)
 
-			SekIdle(NeoCDDMACount * 1);
+			SekIdle(m_dma_count * 1);
 
-			while (NeoCDDMACount--) {
-				curr_space.write_word(NeoCDDMAAddress2 + 0, curr_space.read_byte(NeoCDDMAAddress1 + 0));
-				curr_space.write_word(NeoCDDMAAddress2 + 2, curr_space.read_byte(NeoCDDMAAddress1 + 1));
-				NeoCDDMAAddress1 += 2;
-				NeoCDDMAAddress2 += 4;
+			while (m_dma_count--) {
+				curr_space.write_word(m_dma_address2 + 0, curr_space.read_byte(m_dma_address1 + 0));
+				curr_space.write_word(m_dma_address2 + 2, curr_space.read_byte(m_dma_address1 + 1));
+				m_dma_address1 += 2;
+				m_dma_address2 += 4;
 			}
 
 			break;
 		}
 
 		case 0xFC2D: {
-//          bprintf(PRINT_NORMAL, _T("    copy: 0x%08X - 0x%08X <- LC8951 external buffer, skip odd bytes\n"), NeoCDDMAAddress1, NeoCDDMAAddress1 + NeoCDDMACount * 4);
+//          bprintf(PRINT_NORMAL, _T("    copy: 0x%08X - 0x%08X <- LC8951 external buffer, skip odd bytes\n"), m_dma_address1, m_dma_address1 + m_dma_count * 4);
 
 			//  - DMA controller 0x7E -> 0xFC2D (PC: 0xC0A190)
 			//  - DMA controller program[00] -> 0xFCF5 (PC: 0xC0A192)
@@ -659,17 +658,17 @@ void ngcd_state::NeoCDDoDMA(address_space& curr_space)
 			//  - DMA controller program[12] -> 0x48E7 (PC: 0xC0A19E)
 			//  - DMA controller program[14] -> 0xFFFE (PC: 0xC0A1A0)
 
-			char* data = m_tempcdc->LC8915InitTransfer(NeoCDDMACount);
+			char* data = m_tempcdc->LC8915InitTransfer(m_dma_count);
 			if (data == nullptr) {
 				break;
 			}
 
-			SekIdle(NeoCDDMACount * 4);
+			SekIdle(m_dma_count * 4);
 
-			while (NeoCDDMACount--) {
-				curr_space.write_byte(NeoCDDMAAddress1 + 0, data[0]);
-				curr_space.write_byte(NeoCDDMAAddress1 + 2, data[1]);
-				NeoCDDMAAddress1 += 4;
+			while (m_dma_count--) {
+				curr_space.write_byte(m_dma_address1 + 0, data[0]);
+				curr_space.write_byte(m_dma_address1 + 2, data[1]);
+				m_dma_address1 += 4;
 				data += 2;
 			}
 
@@ -691,7 +690,7 @@ void ngcd_state::NeoCDDoDMA(address_space& curr_space)
 			//  - DMA controller program[14] -> 0xFCF5 (PC: 0xC0A1A0)
 
 		case 0xFE6D: {
-//          bprintf(PRINT_NORMAL, _T("    copy: 0x%08X - 0x%08X <- 0x%08X - 0x%08X\n"), NeoCDDMAAddress2, NeoCDDMAAddress2 + NeoCDDMACount * 2, NeoCDDMAAddress1, NeoCDDMAAddress1 + NeoCDDMACount * 2);
+//          bprintf(PRINT_NORMAL, _T("    copy: 0x%08X - 0x%08X <- 0x%08X - 0x%08X\n"), m_dma_address2, m_dma_address2 + m_dma_count * 2, m_dma_address1, m_dma_address1 + m_dma_count * 2);
 
 			//  - DMA controller 0x7E -> 0xFE6D (PC: 0xC0FD7A)
 			//  - DMA controller program[00] -> 0xFCF5 (PC: 0xC0FD7C)
@@ -703,15 +702,15 @@ void ngcd_state::NeoCDDoDMA(address_space& curr_space)
 			//  - DMA controller program[12] -> 0xC515 (PC: 0xC0FD88)
 			//  - DMA controller program[14] -> 0xFCF5 (PC: 0xC0FD8A)
 
-			SekIdle(NeoCDDMACount * 1);
+			SekIdle(m_dma_count * 1);
 
-			while (NeoCDDMACount--) {
-				curr_space.write_word(NeoCDDMAAddress2, curr_space.read_word(NeoCDDMAAddress1));
-				NeoCDDMAAddress1 += 2;
-				NeoCDDMAAddress2 += 2;
+			while (m_dma_count--) {
+				curr_space.write_word(m_dma_address2, curr_space.read_word(m_dma_address1));
+				m_dma_address1 += 2;
+				m_dma_address2 += 2;
 			}
 
-if (NeoCDDMAAddress2 == 0x0800)  {
+if (m_dma_address2 == 0x0800)  {
 // MapVectorTable(false);
 //  bprintf(PRINT_ERROR, _T("    RAM vectors mapped (PC = 0x%08X\n"), SekGetPC(0));
 //  extern int32_t bRunPause;
@@ -721,7 +720,7 @@ if (NeoCDDMAAddress2 == 0x0800)  {
 		}
 
 		case 0xFEF5: {
-//          bprintf(PRINT_NORMAL, _T("    adr : 0x%08X - 0x%08X <- address\n"), NeoCDDMAAddress1, NeoCDDMAAddress1 + NeoCDDMACount * 4);
+//          bprintf(PRINT_NORMAL, _T("    adr : 0x%08X - 0x%08X <- address\n"), m_dma_address1, m_dma_address1 + m_dma_count * 4);
 
 			//  - DMA controller 0x7E -> 0xFEF5 (PC: 0xC07CE2)
 			//  - DMA controller program[00] -> 0xFCF5 (PC: 0xC07CE8)
@@ -733,19 +732,19 @@ if (NeoCDDMAAddress2 == 0x0800)  {
 			//  - DMA controller program[12] -> 0xFC3D (PC: 0xC07D0C)
 			//  - DMA controller program[14] -> 0xFCF5 (PC: 0xC07D12)
 
-			SekIdle(NeoCDDMACount * 2);
+			SekIdle(m_dma_count * 2);
 
-			while (NeoCDDMACount--) {
-				curr_space.write_word(NeoCDDMAAddress1 + 0, NeoCDDMAAddress1 >> 16);
-				curr_space.write_word(NeoCDDMAAddress1 + 2, NeoCDDMAAddress1 >>  0);
-				NeoCDDMAAddress1 += 4;
+			while (m_dma_count--) {
+				curr_space.write_word(m_dma_address1 + 0, m_dma_address1 >> 16);
+				curr_space.write_word(m_dma_address1 + 2, m_dma_address1 >>  0);
+				m_dma_address1 += 4;
 			}
 
 			break;
 		}
 
 		case 0xFFC5: {
-//          bprintf(PRINT_NORMAL, _T("    copy: 0x%08X - 0x%08X <- LC8951 external buffer\n"), NeoCDDMAAddress1, NeoCDDMAAddress1 + NeoCDDMACount * 2);
+//          bprintf(PRINT_NORMAL, _T("    copy: 0x%08X - 0x%08X <- LC8951 external buffer\n"), m_dma_address1, m_dma_address1 + m_dma_count * 2);
 
 			//  - DMA controller 0x7E -> 0xFFC5 (PC: 0xC0A190)
 			//  - DMA controller program[00] -> 0xFCF5 (PC: 0xC0A192)
@@ -757,17 +756,17 @@ if (NeoCDDMAAddress2 == 0x0800)  {
 			//  - DMA controller program[12] -> 0x8492 (PC: 0xC0A19E)
 			//  - DMA controller program[14] -> 0xDA92 (PC: 0xC0A1A0)
 
-			char* data = m_tempcdc->LC8915InitTransfer(NeoCDDMACount);
+			char* data = m_tempcdc->LC8915InitTransfer(m_dma_count);
 			if (data == nullptr) {
 				break;
 			}
 
-			SekIdle(NeoCDDMACount * 4);
+			SekIdle(m_dma_count * 4);
 
-			while (NeoCDDMACount--) {
-				curr_space.write_byte(NeoCDDMAAddress1 + 0, data[0]);
-				curr_space.write_byte(NeoCDDMAAddress1 + 1, data[1]);
-				NeoCDDMAAddress1 += 2;
+			while (m_dma_count--) {
+				curr_space.write_byte(m_dma_address1 + 0, data[0]);
+				curr_space.write_byte(m_dma_address1 + 1, data[1]);
+				m_dma_address1 += 2;
 				data += 2;
 			}
 
@@ -789,7 +788,7 @@ if (NeoCDDMAAddress2 == 0x0800)  {
 			//  - DMA controller program[14] -> 0x13FC (PC: 0xC0A1A0)
 
 		case 0xFFDD: {
-//          bprintf(PRINT_NORMAL, _T("    Fill: 0x%08X - 0x%08X <- 0x%04X\n"), NeoCDDMAAddress1, NeoCDDMAAddress1 + NeoCDDMACount * 2, NeoCDDMAValue1);
+//          bprintf(PRINT_NORMAL, _T("    Fill: 0x%08X - 0x%08X <- 0x%04X\n"), m_dma_address1, m_dma_address1 + m_dma_count * 2, m_dma_value1);
 
 			//  - DMA controller 0x7E -> 0xFFDD (PC: 0xC07CE2)
 			//  - DMA controller program[00] -> 0xFCF5 (PC: 0xC07CE8)
@@ -801,18 +800,18 @@ if (NeoCDDMAAddress2 == 0x0800)  {
 			//  - DMA controller program[12] -> 0x8AF0 (PC: 0xC07D0C)
 			//  - DMA controller program[14] -> 0x1609 (PC: 0xC07D12)
 
-			SekIdle(NeoCDDMACount * 1);
+			SekIdle(m_dma_count * 1);
 
-			while (NeoCDDMACount--) {
-				curr_space.write_word(NeoCDDMAAddress1, NeoCDDMAValue1);
-				NeoCDDMAAddress1 += 2;
+			while (m_dma_count--) {
+				curr_space.write_word(m_dma_address1, m_dma_value1);
+				m_dma_address1 += 2;
 			}
 
 			break;
 		}
 		default: {
-			//bprintf(PRINT_ERROR, _T("    Unknown transfer type 0x%04X (PC: 0x%06X)\n"), NeoCDDMAMode, SekGetPC(-1));
-			//bprintf(PRINT_NORMAL, _T("    ??? : 0x%08X  0x%08X 0x%04X 0x%04X 0x%08X\n"), NeoCDDMAAddress1, NeoCDDMAAddress2, NeoCDDMAValue1, NeoCDDMAValue2, NeoCDDMACount);
+			//bprintf(PRINT_ERROR, _T("    Unknown transfer type 0x%04X (PC: 0x%06X)\n"), m_dma_mode, SekGetPC(-1));
+			//bprintf(PRINT_NORMAL, _T("    ??? : 0x%08X  0x%08X 0x%04X 0x%04X 0x%08X\n"), m_dma_address1, m_dma_address2, m_dma_value1, m_dma_value2, m_dma_count);
 
 //extern int32_t bRunPause;
 //bRunPause = 1;
@@ -836,8 +835,13 @@ void ngcd_state::machine_start()
 	m_curr_slot = 0;
 
 	// initialize sprite to point to memory regions
-	m_sprgen->set_sprite_region(m_region_sprites->base(), m_region_sprites->bytes());
-	m_sprgen->set_fixed_regions(m_region_fixed->base(), m_region_fixed->bytes(), m_region_fixedbios);
+	m_sprite_ram = make_unique_clear<uint8_t[]>(0x400000);
+	m_fix_ram = make_unique_clear<uint8_t[]>(0x20000);
+	save_pointer(NAME(m_sprite_ram), 0x400000);
+	save_pointer(NAME(m_fix_ram), 0x20000);
+
+	m_sprgen->set_sprite_region(m_sprite_ram.get(), 0x400000);
+	m_sprgen->set_fixed_regions(m_fix_ram.get(), 0x20000, nullptr);
 	m_sprgen->neogeo_set_fixed_layer_source(1);
 
 	// irq levels for NEOCD (swapped compared to MVS / AES)
@@ -864,17 +868,12 @@ void ngcd_state::machine_reset()
 {
 	aes_base_state::machine_reset();
 
-	NeoSpriteRAM = memregion("sprites")->base();
-	YM2610ADPCMAROM = memregion("ymsnd")->base();
-	NeoZ80ROMActive = memregion("audiocpu")->base();
-	NeoTextRAM = memregion("fixed")->base();
-
 	m_tempcdc->NeoCDCommsReset();
 
 	m_audiocpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
-	nTransferWriteEnable = 0;
+	m_transfer_write_enable = 0;
 }
 
 
@@ -891,12 +890,12 @@ void ngcd_state::neocd_main_map(address_map &map)
 	map(0x000000, 0x1fffff).ram().region("maincpu", 0x00000);
 	map(0x000000, 0x00007f).r(FUNC(ngcd_state::banked_vectors_r)); // writes will fall through to area above
 
-	map(0x800000, 0x803fff).rw(FUNC(ngcd_state::neocd_memcard_r), FUNC(ngcd_state::neocd_memcard_w));
+	map(0x800000, 0x803fff).rw(FUNC(ngcd_state::memcard_r), FUNC(ngcd_state::memcard_w));
 	map(0xc00000, 0xc7ffff).mirror(0x080000).rom().region("mainbios", 0);
 	map(0xd00000, 0xdfffff).r(FUNC(ngcd_state::unmapped_r));
-	map(0xe00000, 0xefffff).rw(FUNC(ngcd_state::neocd_transfer_r), FUNC(ngcd_state::neocd_transfer_w));
+	map(0xe00000, 0xefffff).rw(FUNC(ngcd_state::transfer_r), FUNC(ngcd_state::transfer_w));
 	map(0xf00000, 0xfeffff).r(FUNC(ngcd_state::unmapped_r));
-	map(0xff0000, 0xff01ff).rw(FUNC(ngcd_state::neocd_control_r), FUNC(ngcd_state::neocd_control_w)); // CDROM / DMA
+	map(0xff0000, 0xff01ff).rw(FUNC(ngcd_state::control_r), FUNC(ngcd_state::control_w)); // CDROM / DMA
 	map(0xff0200, 0xffffff).r(FUNC(ngcd_state::unmapped_r));
 }
 
@@ -910,7 +909,7 @@ void ngcd_state::neocd_main_map(address_map &map)
 
 void ngcd_state::neocd_audio_map(address_map &map)
 {
-	map(0x0000, 0xffff).ram().region("audiocpu", 0x00000);
+	map(0x0000, 0xffff).ram().share("z80_ram");
 }
 
 
@@ -927,6 +926,11 @@ void ngcd_state::neocd_audio_io_map(address_map &map)
 	map(0x80, 0x80).mirror(0xff00).nopw();
 	map(0xc0, 0xc0).mirror(0xff00).nopw();
 	map(0xc1, 0xc1).mirror(0xff00).nopw();
+}
+
+void ngcd_state::neocd_ym_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).ram().share("adpcm_ram");
 }
 
 
@@ -954,13 +958,13 @@ INPUT_PORTS_END
 
 /* NeoCD uses custom vectors on IRQ4 to handle various events from the CDC */
 
-IRQ_CALLBACK_MEMBER(ngcd_state::neocd_int_callback)
+IRQ_CALLBACK_MEMBER(ngcd_state::int_callback)
 {
 	if (irqline==4)
 	{
-		if (get_nNeoCDIRQVectorAck()) {
-			set_nNeoCDIRQVectorAck(0);
-			return get_nNeoCDIRQVector();
+		if (get_irq_vector_ack()) {
+			set_irq_vector_ack(0);
+			return get_irq_vector();
 		}
 	}
 
@@ -969,46 +973,46 @@ IRQ_CALLBACK_MEMBER(ngcd_state::neocd_int_callback)
 
 void ngcd_state::interrupt_callback_type1(void)
 {
-	nIRQAcknowledge &= ~0x20;
-	NeoCDIRQUpdate(0);
+	m_irq_ack &= ~0x20;
+	irq_update(0);
 }
 
 void ngcd_state::interrupt_callback_type2(void)
 {
-	nIRQAcknowledge &= ~0x10;
-	NeoCDIRQUpdate(0);
+	m_irq_ack &= ~0x10;
+	irq_update(0);
 }
 
 void ngcd_state::interrupt_callback_type3(void)
 {
-	nIRQAcknowledge &= ~0x08;
-	NeoCDIRQUpdate(0);
+	m_irq_ack &= ~0x08;
+	irq_update(0);
 }
 
 
-void ngcd_state::NeoCDIRQUpdate(uint8_t byteValue)
+void ngcd_state::irq_update(uint8_t byteValue)
 {
 	// do we also need to check the regular interrupts like FBA?
 
-	nIRQAcknowledge |= (byteValue & 0x38);
+	m_irq_ack |= (byteValue & 0x38);
 
 	if (!prohibit_cdc_irq)
 	{
-		if ((nIRQAcknowledge & 0x08) == 0) {
-			nNeoCDIRQVector = 0x17;
-			nNeoCDIRQVectorAck = 1;
+		if ((m_irq_ack & 0x08) == 0) {
+			m_irq_vector = 0x17;
+			m_irq_vector_ack = 1;
 			m_maincpu->set_input_line(4, HOLD_LINE);
 			return;
 		}
-		if ((nIRQAcknowledge & 0x10) == 0) {
-			nNeoCDIRQVector = 0x16;
-			nNeoCDIRQVectorAck = 1;
+		if ((m_irq_ack & 0x10) == 0) {
+			m_irq_vector = 0x16;
+			m_irq_vector_ack = 1;
 			m_maincpu->set_input_line(4, HOLD_LINE);
 			return;
 		}
-		if ((nIRQAcknowledge & 0x20) == 0) {
-			nNeoCDIRQVector = 0x15;
-			nNeoCDIRQVectorAck = 1;
+		if ((m_irq_ack & 0x20) == 0) {
+			m_irq_vector = 0x15;
+			m_irq_vector_ack = 1;
 			m_maincpu->set_input_line(4, HOLD_LINE);
 			return;
 		}
@@ -1016,7 +1020,7 @@ void ngcd_state::NeoCDIRQUpdate(uint8_t byteValue)
 }
 
 
-uint32_t ngcd_state::screen_update_neocd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t ngcd_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// fill with background color first
 	bitmap.fill(*m_bg_pen, cliprect);
@@ -1029,40 +1033,38 @@ uint32_t ngcd_state::screen_update_neocd(screen_device &screen, bitmap_rgb32 &bi
 }
 
 
-MACHINE_CONFIG_START(ngcd_state::neocd)
+void ngcd_state::neocd(machine_config &config)
+{
 	neogeo_base(config);
 	neogeo_stereo(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(neocd_main_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(ngcd_state,neocd_int_callback)
+	m_maincpu->set_addrmap(AS_PROGRAM, &ngcd_state::neocd_main_map);
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(ngcd_state::int_callback), this));
 
-	MCFG_DEVICE_MODIFY("audiocpu")
-	MCFG_DEVICE_PROGRAM_MAP(neocd_audio_map)
-	MCFG_DEVICE_IO_MAP(neocd_audio_io_map)
+	m_audiocpu->set_addrmap(AS_PROGRAM, &ngcd_state::neocd_audio_map);
+	m_audiocpu->set_addrmap(AS_IO, &ngcd_state::neocd_audio_io_map);
 
-	MCFG_DEVICE_MODIFY("systemlatch")
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(LOGGER("NeoCD: write to regular vector change address?")) // what IS going on with "neocdz doubledr" and why do games write here if it's hooked up to nothing?
+	subdevice<hc259_device>("systemlatch")->q_out_cb<1>().set_log("NeoCD: write to regular vector change address?"); // what IS going on with "neocdz doubledr" and why do games write here if it's hooked up to nothing?
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(ngcd_state, screen_update_neocd)
+	m_screen->set_screen_update(FUNC(ngcd_state::screen_update));
 
 	// temporary until things are cleaned up
-	MCFG_DEVICE_ADD("tempcdc", LC89510_TEMP, 0) // cd controller
-	MCFG_SEGACD_HACK_SET_NEOCD
-	MCFG_SET_TYPE1_INTERRUPT_CALLBACK( ngcd_state, interrupt_callback_type1 )
-	MCFG_SET_TYPE2_INTERRUPT_CALLBACK( ngcd_state, interrupt_callback_type2 )
-	MCFG_SET_TYPE3_INTERRUPT_CALLBACK( ngcd_state, interrupt_callback_type3 )
+	LC89510_TEMP(config, m_tempcdc, 0); // cd controller
+	m_tempcdc->set_is_neoCD(true);
+	m_tempcdc->set_type1_interrupt_callback(FUNC(ngcd_state::interrupt_callback_type1), this);
+	m_tempcdc->set_type2_interrupt_callback(FUNC(ngcd_state::interrupt_callback_type2), this);
+	m_tempcdc->set_type3_interrupt_callback(FUNC(ngcd_state::interrupt_callback_type3), this);
 
-	MCFG_NVRAM_ADD_0FILL("saveram")
+	NVRAM(config, "saveram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl1", neogeo_controls, "joy", false)
-	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl2", neogeo_controls, "joy", false)
+	NEOGEO_CONTROL_PORT(config, m_ctrl1, neogeo_controls, "joy", false);
+	NEOGEO_CONTROL_PORT(config, m_ctrl2, neogeo_controls, "joy", false);
 
-	MCFG_CDROM_ADD( "cdrom" )
-	MCFG_CDROM_INTERFACE("neocd_cdrom")
-	MCFG_SOFTWARE_LIST_ADD("cd_list","neocd")
-MACHINE_CONFIG_END
+	CDROM(config, "cdrom").set_interface("neocd_cdrom");
+	SOFTWARE_LIST(config, "cd_list").set_type("neocd", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+
+	m_ym->set_addrmap(0, &ngcd_state::neocd_ym_map);
+}
 
 
 
@@ -1081,22 +1083,10 @@ ROM_START( neocd )
 	ROM_SYSTEM_BIOS( 2, "unibios32", "Universe Bios (Hack, Ver. 3.2)" )
 	ROMX_LOAD("uni-bioscd.rom",    0x00000, 0x80000, CRC(0ffb3127) SHA1(5158b728e62b391fb69493743dcf7abbc62abc82), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(2))
 
-	ROM_REGION( 0x100000, "ymsnd", ROMREGION_ERASEFF )
-	/* 1MB of Sound RAM */
-
-	ROM_REGION( 0x90000, "audiocpu", ROMREGION_ERASEFF )
-	/* 64KB of Z80 RAM */
-
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00 )
 	/* 2MB of 68K RAM */
 
-	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF )
-	/* 4MB of Sprite Tile RAM */
-
-	ROM_REGION( 0x20000, "fixed", ROMREGION_ERASEFF )
-	/* 128KB of Text Tile RAM */
-
-	ROM_REGION( 0x20000, "zoomy", 0 )
+	ROM_REGION( 0x20000, "spritegen:zoomy", 0 )
 	ROM_LOAD( "000-lo.lo", 0x00000, 0x20000, CRC(5a86cff2) SHA1(5992277debadeb64d1c1c64b0a92d9293eaf7e4a) )
 ROM_END
 
@@ -1107,22 +1097,10 @@ ROM_START( neocdz )
 	ROM_SYSTEM_BIOS( 1, "unibios32", "Universe Bios (Hack, Ver. 3.2)" )
 	ROMX_LOAD("uni-bioscd.rom",    0x00000, 0x80000, CRC(0ffb3127) SHA1(5158b728e62b391fb69493743dcf7abbc62abc82), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(1))
 
-	ROM_REGION( 0x100000, "ymsnd", ROMREGION_ERASEFF )
-	/* 1MB of Sound RAM */
-
-	ROM_REGION( 0x90000, "audiocpu", ROMREGION_ERASEFF )
-	/* 64KB of Z80 RAM */
-
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00 )
 	/* 2MB of 68K RAM */
 
-	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF )
-	/* 4MB of Sprite Tile RAM */
-
-	ROM_REGION( 0x20000, "fixed", ROMREGION_ERASEFF )
-	/* 128KB of Text Tile RAM */
-
-	ROM_REGION( 0x20000, "zoomy", 0 )
+	ROM_REGION( 0x20000, "spritegen:zoomy", 0 )
 	ROM_LOAD( "000-lo.lo", 0x00000, 0x20000, CRC(5a86cff2) SHA1(5992277debadeb64d1c1c64b0a92d9293eaf7e4a) )
 ROM_END
 

@@ -426,23 +426,23 @@ MACHINE_CONFIG_START(lviv_state::lviv)
 	MCFG_DEVICE_ADD(m_maincpu, I8080, 2500000)
 	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
-	MCFG_DEVICE_ADD(m_ppi[0], I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, lviv_state, ppi_0_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, lviv_state, ppi_0_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, lviv_state, ppi_0_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, lviv_state, ppi_0_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, lviv_state, ppi_0_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, lviv_state, ppi_0_portc_w))
+	I8255(config, m_ppi[0]);
+	m_ppi[0]->in_pa_callback().set(FUNC(lviv_state::ppi_0_porta_r));
+	m_ppi[0]->out_pa_callback().set(FUNC(lviv_state::ppi_0_porta_w));
+	m_ppi[0]->in_pb_callback().set(FUNC(lviv_state::ppi_0_portb_r));
+	m_ppi[0]->out_pb_callback().set(FUNC(lviv_state::ppi_0_portb_w));
+	m_ppi[0]->in_pc_callback().set(FUNC(lviv_state::ppi_0_portc_r));
+	m_ppi[0]->out_pc_callback().set(FUNC(lviv_state::ppi_0_portc_w));
 
-	MCFG_DEVICE_ADD(m_ppi[1], I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, lviv_state, ppi_1_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, lviv_state, ppi_1_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, lviv_state, ppi_1_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, lviv_state, ppi_1_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, lviv_state, ppi_1_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, lviv_state, ppi_1_portc_w))
+	I8255(config, m_ppi[1]);
+	m_ppi[1]->in_pa_callback().set(FUNC(lviv_state::ppi_1_porta_r));
+	m_ppi[1]->out_pa_callback().set(FUNC(lviv_state::ppi_1_porta_w));
+	m_ppi[1]->in_pb_callback().set(FUNC(lviv_state::ppi_1_portb_r));
+	m_ppi[1]->out_pb_callback().set(FUNC(lviv_state::ppi_1_portb_w));
+	m_ppi[1]->in_pc_callback().set(FUNC(lviv_state::ppi_1_portc_r));
+	m_ppi[1]->out_pc_callback().set(FUNC(lviv_state::ppi_1_portc_w));
 
 	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -454,27 +454,25 @@ MACHINE_CONFIG_START(lviv_state::lviv)
 	MCFG_SCREEN_UPDATE_DRIVER(lviv_state, screen_update)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD(m_palette, sizeof (s_palette) / 3)
-	MCFG_PALETTE_INIT_OWNER(lviv_state, lviv)
+	PALETTE(config, m_palette, FUNC(lviv_state::lviv_palette), ARRAY_LENGTH(s_palette));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* snapshot */
 	MCFG_SNAPSHOT_ADD("snapshot", lviv_state, lviv, "sav", 0)
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(lviv_lvt_format)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("lviv_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(lviv_lvt_format);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_interface("lviv_cass");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list","lviv")
+	SOFTWARE_LIST(config, "cass_list").set_original("lviv");
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 MACHINE_CONFIG_END
 
 

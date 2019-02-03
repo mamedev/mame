@@ -284,44 +284,44 @@ static INPUT_PORTS_START( amazon )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN3")
-	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Lives ) ) PORT_DIPLOCATION("DSW1:1,2")
 	PORT_DIPSETTING(      0x0003, "3" )
 	PORT_DIPSETTING(      0x0002, "4" )
 	PORT_DIPSETTING(      0x0001, "5" )
 	PORT_DIPSETTING(      0x0000, "6" )
-	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("DSW1:3,4")
 	PORT_DIPSETTING(      0x000c, "20k then every 40k" )    // "20000 40000" in the "test mode"
 	PORT_DIPSETTING(      0x0008, "50k then every 40k" )    // "50000 40000" in the "test mode"
 	PORT_DIPSETTING(      0x0004, "20k then every 70k" )    // "20000 70000" in the "test mode"
 	PORT_DIPSETTING(      0x0000, "50k then every 70k" )    // "50000 70000" in the "test mode"
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("DSW1:5")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("DSW1:6")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Upright ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( Cocktail ) )
-	PORT_DIPUNUSED( 0x0040, IP_ACTIVE_LOW )
-	PORT_DIPUNUSED( 0x0080, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Coin_A ) )
+	PORT_DIPUNUSED_DIPLOC( 0x0040, 0x0040, "DSW1:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x0080, 0x0080, "DSW1:8" )
+	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("DSW2:1,2")
 	PORT_DIPSETTING(      0x0100, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x0300, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(      0x0200, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("DSW2:3,4")
 	PORT_DIPSETTING(      0x0000, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0800, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(      0x0400, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(      0x0c00, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("DSW2:5")
 	PORT_DIPSETTING(      0x1000, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Flip_Screen ) )  // not in the "test mode"
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("DSW2:6")  // not in the "test mode"
 	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, "Level" )
+	PORT_DIPNAME( 0x4000, 0x4000, "Level" ) PORT_DIPLOCATION("DSW2:7")
 	PORT_DIPSETTING(      0x4000, DEF_STR( Low ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( High ) )
-	PORT_DIPNAME( 0x8000, 0x8000, "Sprite Test" )
+	PORT_DIPNAME( 0x8000, 0x8000, "Sprite Test" ) PORT_DIPLOCATION("DSW2:8")
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -473,16 +473,14 @@ MACHINE_CONFIG_START(terracre_state::ym3526)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(terracre_state, screen_update_amazon)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_terracre)
-	MCFG_PALETTE_ADD("palette", 1*16+16*16+16*256)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(terracre_state, terracre)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_terracre);
+	PALETTE(config, m_palette, FUNC(terracre_state::terracre_palette), 1*16+16*16+16*256, 256);
 
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ymsnd", YM3526, XTAL(16'000'000)/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
@@ -499,7 +497,7 @@ MACHINE_CONFIG_START(terracre_state::ym2203)
 	MCFG_DEVICE_MODIFY("audiocpu")
 	MCFG_DEVICE_IO_MAP(sound_2203_io_map)
 
-	MCFG_DEVICE_REMOVE("ymsnd")
+	config.device_remove("ymsnd");
 
 	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(16'000'000)/4)
 	MCFG_SOUND_ROUTE(0, "speaker", 0.2)
@@ -519,7 +517,7 @@ MACHINE_CONFIG_START(amazon_state::amazon_1412m2)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(amazon_1412m2_map)
 
-	MCFG_DEVICE_ADD("prot_chip", NB1412M2, XTAL(16'000'000)) // divided by 4 maybe
+	NB1412M2(config, m_prot, XTAL(16'000'000)); // divided by 4 maybe
 MACHINE_CONFIG_END
 
 
@@ -689,10 +687,49 @@ ROM_END
 
 ROM_START( amazon )
 	ROM_REGION( 0x20000, "maincpu", 0 ) /* 68000 code (main CPU) */
-	ROM_LOAD16_BYTE( "11.4d",   0x00000, 0x8000,CRC(6c7f85c5) SHA1(7f78cf16a93ea1f7b8616122127327a7d337e565) )
-	ROM_LOAD16_BYTE( "9.4b",    0x00001, 0x8000,CRC(e1b7a989) SHA1(ae49cbc6fc4bc151990caed1f57cc7e10aba7901) )
-	ROM_LOAD16_BYTE( "12.6d",   0x10000, 0x8000,CRC(4de8a3ee) SHA1(a650d5b6ebff257f08db01e76e5c11c1ecc8cd36) )
-	ROM_LOAD16_BYTE( "10.6b",   0x10001, 0x8000,CRC(d86bad81) SHA1(8f2e56422f9e604232c60f676dcd964392ec9d28) )
+	ROM_LOAD16_BYTE( "11.4d",   0x00000, 0x8000, CRC(6c7f85c5) SHA1(7f78cf16a93ea1f7b8616122127327a7d337e565) )
+	ROM_LOAD16_BYTE( "9.4b",    0x00001, 0x8000, CRC(e1b7a989) SHA1(ae49cbc6fc4bc151990caed1f57cc7e10aba7901) )
+	ROM_LOAD16_BYTE( "12.6d",   0x10000, 0x8000, CRC(4de8a3ee) SHA1(a650d5b6ebff257f08db01e76e5c11c1ecc8cd36) )
+	ROM_LOAD16_BYTE( "10.6b",   0x10001, 0x8000, CRC(d86bad81) SHA1(8f2e56422f9e604232c60f676dcd964392ec9d28) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 code (sound) */
+	ROM_LOAD( "1.15b",  0x00000, 0x4000, CRC(55a8b5e7) SHA1(d3f5609c1b97a54c505d12dd22f7454c88c90fb9) )
+	ROM_LOAD( "2.17b",  0x04000, 0x4000, CRC(427a7cca) SHA1(b30e3dd4f685c4095478972d38bb9616369a51bf) )
+	ROM_LOAD( "3.18b",  0x08000, 0x4000, CRC(b8cceaf7) SHA1(5682df3193ad1dfef366353921bfa7af08aec055) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 ) /* alphanumerics */
+	ROM_LOAD( "8.16g",  0x0000, 0x2000, CRC(0cec8644) SHA1(a8f2a67b2243771e20ba51a539a83f0017dff6bc) )
+
+	ROM_REGION( 0x20000, "gfx2", 0 ) /* tiles */
+	ROM_LOAD( "13.15f", 0x00000, 0x8000, CRC(415ff4d9) SHA1(b5d17bfbf78e620c29f8933f06bd88cc89825b4b) )
+	ROM_LOAD( "14.17f", 0x08000, 0x8000, CRC(492b5c48) SHA1(822d9098427650d55cdd6e4a7e540147198d72fc) )
+	ROM_LOAD( "15.18f", 0x10000, 0x8000, CRC(b1ac0b9d) SHA1(1b413823669db24a5cfb93f66f54bd08c410a0d4) )
+
+	ROM_REGION( 0x10000, "gfx3", 0 ) /* sprites */
+	ROM_LOAD( "4.6e",   0x0000, 0x4000, CRC(f77ced7a) SHA1(55bf0a0799d85877a71d1529073b0ed847c80e54) )
+	ROM_LOAD( "5.7e",   0x4000, 0x4000, CRC(16ef1465) SHA1(7547f24fec79f774e1be441c3734bdcc03b5d313) )
+	ROM_LOAD( "6.6g",   0x8000, 0x4000, CRC(936ec941) SHA1(b4891e207d66f8b77c237fc23ffa48f87ab6993a) )
+	ROM_LOAD( "7.7g",   0xc000, 0x4000, CRC(66dd718e) SHA1(80990c6199f63b215e1dead3b09cf6160dd75333) )
+
+	ROM_REGION( 0x400, "proms", 0 )
+	ROM_LOAD( "clr.10f", 0x000, 0x100, CRC(6440b341) SHA1(ccf89ac889f1653100f5b0a042dcd826c4ac628b) ) /* red */
+	ROM_LOAD( "clr.11f", 0x100, 0x100, CRC(271e947f) SHA1(3d1f44fe92cc5fdff001ef80e07aa46a1ca68fe5) ) /* green */
+	ROM_LOAD( "clr.12f", 0x200, 0x100, CRC(7d38621b) SHA1(7904c3c2c32006d4f4608b6ee84d44ecd601de73) ) /* blue */
+	ROM_LOAD( "2g",      0x300, 0x100, CRC(44ca16b9) SHA1(1893f24d1c7f4d8e24b5484b19f9284f2ec9be08) ) /* clut */
+
+	ROM_REGION( 0x0100, "user1", 0 )
+	ROM_LOAD( "4e",      0x000, 0x100, CRC(035f2c7b) SHA1(36e32a50146631e763711b586936b2815600f52d) ) /* ctable */
+
+	ROM_REGION( 0x2000, "prot_chip", 0 ) /* unknown, mostly text */
+	ROM_LOAD( "16.18g", 0x0000, 0x2000, CRC(1d8d592b) SHA1(be8d6df8b5926069ae2cbc1dc26e1fa92d63f297) )
+ROM_END
+
+ROM_START( amazont ) /* Found a on Tecfri TC-1A and TC-2A boardset */
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* 68000 code (main CPU) */
+	ROM_LOAD16_BYTE( "5.4d",   0x00000, 0x8000, CRC(ae39432f) SHA1(438f957e8e8e3ac12a24b4852bac5530cfbf858a) )
+	ROM_LOAD16_BYTE( "7.4b",   0x00001, 0x8000, CRC(a74cdcea) SHA1(6c9f891942a66d179405fd6067688522c3796235) )
+	ROM_LOAD16_BYTE( "4.6d",   0x10000, 0x8000, CRC(0c6b0772) SHA1(0b103622dcb74bba0320a8d6393d51a0cc653a0e) )
+	ROM_LOAD16_BYTE( "6.6b",   0x10001, 0x8000, CRC(edbaad3f) SHA1(b2ab817d4403ed6f58bae9b464116ccf9e005176) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 code (sound) */
 	ROM_LOAD( "1.15b",  0x00000, 0x4000, CRC(55a8b5e7) SHA1(d3f5609c1b97a54c505d12dd22f7454c88c90fb9) )
@@ -728,10 +765,10 @@ ROM_END
 
 ROM_START( amatelas )
 	ROM_REGION( 0x20000, "maincpu", 0 ) /* 68000 code (main CPU) */
-	ROM_LOAD16_BYTE( "a11.4d",  0x00000, 0x8000,CRC(3d226d0b) SHA1(b3f36973117dcca7ec6f891503ada1055694059d) )
-	ROM_LOAD16_BYTE( "a9.4b",   0x00001, 0x8000,CRC(e2a0d21d) SHA1(abb65ea5a10719d27f711216b7e387f2e01bdd5d) )
-	ROM_LOAD16_BYTE( "a12.6d",  0x10000, 0x8000,CRC(e6607c51) SHA1(7679f84ccdf75226bb46a5357a460aa2d5e5cd32) )
-	ROM_LOAD16_BYTE( "a10.6b",  0x10001, 0x8000,CRC(dbc1f1b4) SHA1(0fca999356e38d69ba5822c4ec489ea08f1d771f) )
+	ROM_LOAD16_BYTE( "a11.4d",  0x00000, 0x8000, CRC(3d226d0b) SHA1(b3f36973117dcca7ec6f891503ada1055694059d) )
+	ROM_LOAD16_BYTE( "a9.4b",   0x00001, 0x8000, CRC(e2a0d21d) SHA1(abb65ea5a10719d27f711216b7e387f2e01bdd5d) )
+	ROM_LOAD16_BYTE( "a12.6d",  0x10000, 0x8000, CRC(e6607c51) SHA1(7679f84ccdf75226bb46a5357a460aa2d5e5cd32) )
+	ROM_LOAD16_BYTE( "a10.6b",  0x10001, 0x8000, CRC(dbc1f1b4) SHA1(0fca999356e38d69ba5822c4ec489ea08f1d771f) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 code (sound) */
 	ROM_LOAD( "1.15b",  0x00000, 0x4000, CRC(55a8b5e7) SHA1(d3f5609c1b97a54c505d12dd22f7454c88c90fb9) )
@@ -897,9 +934,10 @@ GAME( 1985, terracrea,terracre, ym3526,  terracre, terracre_state,        empty_
 GAME( 1985, terracren,terracre, ym2203,  terracre, terracre_state,        empty_init, ROT270,  "Nichibutsu", "Terra Cresta (YM2203)", MACHINE_SUPPORTS_SAVE )
 
 // later HW: supports 1412M2 device, see also mightguy.cpp
-GAME( 1986, amazon,   0,        amazon_1412m2,  amazon,   amazon_state,   empty_init, ROT270,  "Nichibutsu", "Soldier Girl Amazon", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, amatelas, amazon,   amazon_1412m2,  amazon,   amazon_state,   empty_init, ROT270,  "Nichibutsu", "Sei Senshi Amatelass", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, horekid,  0,        amazon_1412m2,  horekid,  amazon_state,   empty_init, ROT270,  "Nichibutsu", "Kid no Hore Hore Daisakusen", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, amazon,   0,        amazon_1412m2,  amazon,   amazon_state,   empty_init, ROT270,  "Nichibutsu",                  "Soldier Girl Amazon", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, amazont,  amazon,   amazon_1412m2,  amazon,   amazon_state,   empty_init, ROT270,  "Nichibutsu (Tecfri license)", "Soldier Girl Amazon (Tecfri license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, amatelas, amazon,   amazon_1412m2,  amazon,   amazon_state,   empty_init, ROT270,  "Nichibutsu",                  "Sei Senshi Amatelass", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, horekid,  0,        amazon_1412m2,  horekid,  amazon_state,   empty_init, ROT270,  "Nichibutsu",                  "Kid no Hore Hore Daisakusen", MACHINE_SUPPORTS_SAVE )
 
 // bootlegs
 GAME( 1987, horekidb, horekid,  amazon_base,    horekid,  terracre_state, empty_init, ROT270,  "bootleg",    "Kid no Hore Hore Daisakusen (bootleg)", MACHINE_SUPPORTS_SAVE )

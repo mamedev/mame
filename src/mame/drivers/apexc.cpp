@@ -8,6 +8,7 @@
     see cpu/apexc.c for background and tech info
 */
 
+#include "emu.h"
 #include "includes/apexc.h"
 
 /*static*/ const device_timer_id apexc_state::TIMER_POLL_INPUTS = 1;
@@ -356,14 +357,14 @@ void apexc_state::mem(address_map &map)
 	map(0x1000, 0x7fff).noprw();
 }
 
-MACHINE_CONFIG_START(apexc_state::apexc)
-
+void apexc_state::apexc(machine_config &config)
+{
 	/* basic machine hardware */
 	/* APEXC CPU @ 2.0 kHz (memory word clock frequency) */
-	device = &APEXC(config, m_maincpu, 2000);
+	APEXC(config, m_maincpu, 2000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apexc_state::mem);
-	MCFG_APEXC_TAPE_READ_CB(READ8(m_tape_reader, apexc_tape_reader_image_device, read))
-	MCFG_APEXC_TAPE_PUNCH_CB(WRITE8(*this, apexc_state, tape_write))
+	m_maincpu->tape_read().set(m_tape_reader, FUNC(apexc_tape_reader_image_device::read));
+	m_maincpu->tape_punch().set(FUNC(apexc_state::tape_write));
 
 	/* video hardware does not exist, but we display a control panel and the typewriter output */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -376,13 +377,12 @@ MACHINE_CONFIG_START(apexc_state::apexc)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_apexc);
 
-	device = &PALETTE(config, m_palette, ARRAY_LENGTH(palette_table));
-	MCFG_PALETTE_INIT_OWNER(apexc_state, apexc)
+	PALETTE(config, m_palette, FUNC(apexc_state::apexc_palette), ARRAY_LENGTH(palette_table));
 
 	APEXC_CYLINDER(config, m_cylinder);
 	APEXC_TAPE_PUNCHER(config, m_tape_puncher);
 	APEXC_TAPE_READER(config, m_tape_reader);
-MACHINE_CONFIG_END
+}
 
 ROM_START(apexc)
 	/*CPU memory space*/

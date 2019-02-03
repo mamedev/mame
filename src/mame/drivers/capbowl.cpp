@@ -323,16 +323,16 @@ MACHINE_CONFIG_START(capbowl_state::capbowl)
 	MCFG_DEVICE_PROGRAM_MAP(capbowl_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", capbowl_state,  interrupt)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_ASTABLE(100000.0, 100000.0, 0.1e-6) * 15.5) // ~0.3s
+	// watchdog: 555 timer 16 cycles, edge triggered, ~0.3s
+	attotime period = PERIOD_OF_555_ASTABLE(100000.0, 100000.0, 0.1e-6);
+	WATCHDOG_TIMER(config, m_watchdog).set_time(period * 16 - period / 2);
 
 	MCFG_DEVICE_ADD("audiocpu", MC6809E, MASTER_CLOCK / 4) // MC68B09EP
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-//  MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_ASTABLE(100000.0, 100000.0, 0.1e-6) * 15.5) // TODO
 
-	MCFG_NVRAM_ADD_RANDOM_FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_RANDOM);
 
-	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
+	TICKET_DISPENSER(config, "ticket", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -341,26 +341,26 @@ MACHINE_CONFIG_START(capbowl_state::capbowl)
 	MCFG_SCREEN_REFRESH_RATE(57)
 	MCFG_SCREEN_UPDATE_DRIVER(capbowl_state, screen_update)
 
-	MCFG_DEVICE_ADD("tms34061", TMS34061, 0)
-	MCFG_TMS34061_ROWSHIFT(8)  /* VRAM address is (row << rowshift) | col */
-	MCFG_TMS34061_VRAM_SIZE(0x10000) /* size of video RAM */
-	MCFG_TMS34061_INTERRUPT_CB(INPUTLINE("maincpu", M6809_FIRQ_LINE))      /* interrupt gen callback */
+	TMS34061(config, m_tms34061, 0);
+	m_tms34061->set_rowshift(8);  /* VRAM address is (row << rowshift) | col */
+	m_tms34061->set_vram_size(0x10000);
+	m_tms34061->int_callback().set_inputline("maincpu", M6809_FIRQ_LINE);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, MASTER_CLOCK / 2)
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", M6809_FIRQ_LINE))
-	MCFG_AY8910_PORT_A_READ_CB(READLINE("ticket", ticket_dispenser_device, line_r)) MCFG_DEVCB_BIT(7)
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITELINE("ticket", ticket_dispenser_device, motor_w)) MCFG_DEVCB_BIT(7)  /* Also a status LED. See memory map above */
-	MCFG_SOUND_ROUTE(0, "speaker", 0.07)
-	MCFG_SOUND_ROUTE(1, "speaker", 0.07)
-	MCFG_SOUND_ROUTE(2, "speaker", 0.07)
-	MCFG_SOUND_ROUTE(3, "speaker", 0.75)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", MASTER_CLOCK / 2));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, M6809_FIRQ_LINE);
+	ymsnd.port_a_read_callback().set("ticket", FUNC(ticket_dispenser_device::line_r)).lshift(7);
+	ymsnd.port_b_write_callback().set("ticket", FUNC(ticket_dispenser_device::motor_w)).bit(7); // Also a status LED. See memory map above
+	ymsnd.add_route(0, "speaker", 0.07);
+	ymsnd.add_route(1, "speaker", 0.07);
+	ymsnd.add_route(2, "speaker", 0.07);
+	ymsnd.add_route(3, "speaker", 0.75);
 
-	MCFG_DEVICE_ADD("dac", DAC0832, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	DAC0832(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END

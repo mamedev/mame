@@ -22,10 +22,10 @@ void cinemat_state::cinemat_vector_callback(int16_t sx, int16_t sy, int16_t ex, 
 	int intensity = 0xff;
 
 	/* adjust for slop */
-	sx = sx - visarea.min_x;
-	ex = ex - visarea.min_x;
-	sy = sy - visarea.min_y;
-	ey = ey - visarea.min_y;
+	sx -= visarea.left();
+	ex -= visarea.left();
+	sy -= visarea.top();
+	ey -= visarea.top();
 
 	/* point intensity is determined by the shift value */
 	if (sx == ex && sy == ey)

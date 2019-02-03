@@ -5,6 +5,10 @@
     Karate Champ
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_KCHAMP_H
+#define MAME_INCLUDES_KCHAMP_H
+
+#pragma once
 
 #include "machine/74157.h"
 #include "machine/gen_latch.h"
@@ -16,8 +20,8 @@
 class kchamp_state : public driver_device
 {
 public:
-	kchamp_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	kchamp_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_spriteram(*this, "spriteram"),
@@ -30,7 +34,8 @@ public:
 		m_dac(*this, "dac"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch") { }
+		m_soundlatch(*this, "soundlatch")
+	{ }
 
 	void kchamp(machine_config &config);
 	void kchampvs(machine_config &config);
@@ -76,7 +81,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(kchamp);
+	void kchamp_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(kchampvs);
 	DECLARE_MACHINE_START(kchamp);
 	uint32_t screen_update_kchampvs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -97,3 +102,5 @@ private:
 	void kchampvs_sound_io_map(address_map &map);
 	void kchampvs_sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_KCHAMP_H

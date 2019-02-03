@@ -771,7 +771,7 @@ MACHINE_CONFIG_START(cdi_state::cdimono1_base)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 
-	MCFG_DEFAULT_LAYOUT(layout_cdi)
+	config.set_default_layout(layout_cdi);
 
 	MCFG_DEVICE_ADD("scc68070", CDI_68070, 0, "maincpu")
 
@@ -819,7 +819,7 @@ MACHINE_CONFIG_START(cdi_state::cdimono2)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 
-	MCFG_DEFAULT_LAYOUT(layout_cdi)
+	config.set_default_layout(layout_cdi);
 
 	MCFG_MACHINE_RESET_OVERRIDE( cdi_state, cdimono2 )
 
@@ -829,10 +829,8 @@ MACHINE_CONFIG_START(cdi_state::cdimono2)
 	MCFG_DEVICE_ADD("slave", M68HC05EG, 2000000) /* Unknown clock speed, docs say 2MHz internal clock */
 	MCFG_DEVICE_PROGRAM_MAP(cdimono2_slave_mem)
 
-	MCFG_CDROM_ADD("cdrom")
-	MCFG_CDROM_INTERFACE("cdi_cdrom")
-	MCFG_SOFTWARE_LIST_ADD("cd_list","cdi")
-	MCFG_SOFTWARE_LIST_FILTER("cd_list","!DVC")
+	CDROM(config, "cdrom").set_interface("cdi_cdrom");
+	SOFTWARE_LIST(config, "cd_list").set_original("cdi").set_filter("!DVC");
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -874,7 +872,7 @@ MACHINE_CONFIG_START(cdi_state::cdi910)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 
-	MCFG_DEFAULT_LAYOUT(layout_cdi)
+	config.set_default_layout(layout_cdi);
 
 	MCFG_MACHINE_RESET_OVERRIDE( cdi_state, cdimono2 )
 
@@ -884,10 +882,8 @@ MACHINE_CONFIG_START(cdi_state::cdi910)
 	MCFG_DEVICE_ADD("slave", M68HC05EG, 2000000) /* Unknown clock speed, docs say 2MHz internal clock */
 	MCFG_DEVICE_PROGRAM_MAP(cdimono2_slave_mem)
 
-	MCFG_CDROM_ADD( "cdrom" )
-	MCFG_CDROM_INTERFACE("cdi_cdrom")
-	MCFG_SOFTWARE_LIST_ADD("cd_list","cdi")
-	MCFG_SOFTWARE_LIST_FILTER("cd_list","!DVC")
+	CDROM(config, "cdrom").set_interface("cdi_cdrom");
+	SOFTWARE_LIST(config, "cd_list").set_original("cdi").set_filter("!DVC");
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -911,10 +907,8 @@ MACHINE_CONFIG_START(cdi_state::cdimono1)
 	cdimono1_base(config);
 	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, cdimono1)
 
-	MCFG_CDROM_ADD( "cdrom" )
-	MCFG_CDROM_INTERFACE("cdi_cdrom")
-	MCFG_SOFTWARE_LIST_ADD("cd_list","cdi")
-	MCFG_SOFTWARE_LIST_FILTER("cd_list","!DVC")
+	CDROM(config, "cdrom").set_interface("cdi_cdrom");
+	SOFTWARE_LIST(config, "cd_list").set_original("cdi").set_filter("!DVC");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cdi_state::quizard)
@@ -930,39 +924,37 @@ READ8_MEMBER( cdi_state::quizard_mcu_p1_r )
 	return machine().rand();
 }
 
-MACHINE_CONFIG_START(cdi_state::quizard1)
+void cdi_state::quizard1(machine_config &config)
+{
 	quizard(config);
-	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard1 )
+	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard1)
 
-	MCFG_DEVICE_ADD("mcu", I8751, 8000000)
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, cdi_state, quizard_mcu_p1_r))
-//  MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cdi_state, irq0_line_pulse)
+	i8751_device &mcu(I8751(config, "mcu", 8000000));
+	mcu.port_in_cb<1>().set(FUNC(cdi_state::quizard_mcu_p1_r));
+//  mcu.set_vblank_int("screen", FUNC(cdi_state::irq0_line_pulse));
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(cdi_state::quizard2)
+void cdi_state::quizard2(machine_config &config)
+{
 	quizard(config);
-	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard2 )
-MACHINE_CONFIG_END
+	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard2)
+}
 
-MACHINE_CONFIG_START(cdi_state::quizard3)
+void cdi_state::quizard3(machine_config &config)
+{
 	quizard(config);
-	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard3 )
-MACHINE_CONFIG_END
+	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard3)
+}
 
-MACHINE_CONFIG_START(cdi_state::quizard4)
+void cdi_state::quizard4(machine_config &config)
+{
 	quizard(config);
-	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard4 )
+	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard4)
 
-	MCFG_DEVICE_ADD("mcu", I8751, 8000000)
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, cdi_state, quizard_mcu_p1_r))
-//  MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cdi_state, irq0_line_pulse)
-
-MACHINE_CONFIG_END
-
-
-
-
+	i8751_device &mcu(I8751(config, "mcu", 8000000));
+	mcu.port_in_cb<1>().set(FUNC(cdi_state::quizard_mcu_p1_r));
+//  mcu.set_vblank_int("screen", FUNC(cdi_state::irq0_line_pulse));
+}
 
 /*************************
 *        Rom Load        *

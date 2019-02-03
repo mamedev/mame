@@ -237,7 +237,7 @@ MACHINE_CONFIG_START(dogfgt_state::dogfgt)
 	MCFG_DEVICE_ADD(m_subcpu, M6502, 1500000) /* 1.5 MHz ???? */
 	MCFG_DEVICE_PROGRAM_MAP(sub_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(m_screen, RASTER)
@@ -246,21 +246,16 @@ MACHINE_CONFIG_START(dogfgt_state::dogfgt)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dogfgt_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_dogfgt)
-	MCFG_PALETTE_ADD(m_palette, 16+64)
-	MCFG_PALETTE_FORMAT(BBGGGRRR)
-	MCFG_PALETTE_INIT_OWNER(dogfgt_state, dogfgt)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dogfgt);
+	PALETTE(config, m_palette, FUNC(dogfgt_state::dogfgt_palette)).set_format(palette_device::BGR_233, 16 + 64);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD(m_ay[0], AY8910, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-
-	MCFG_DEVICE_ADD(m_ay[1], AY8910, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	AY8910(config, m_ay[0], 1500000).add_route(ALL_OUTPUTS, "mono", 0.30);
+	AY8910(config, m_ay[1], 1500000).add_route(ALL_OUTPUTS, "mono", 0.30);
 MACHINE_CONFIG_END
 
 

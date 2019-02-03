@@ -242,8 +242,8 @@ void markham_state::markham_slave_map(address_map &map)
 	map(0x0000, 0x5fff).rom();
 	map(0x8000, 0x87ff).ram().share("share1");
 
-	map(0xc000, 0xc000).w("sn1", FUNC(sn76496_device::command_w));
-	map(0xc001, 0xc001).w("sn2", FUNC(sn76496_device::command_w));
+	map(0xc000, 0xc000).w("sn1", FUNC(sn76496_device::write));
+	map(0xc001, 0xc001).w("sn2", FUNC(sn76496_device::write));
 
 	map(0xc002, 0xc002).nopw(); /* unknown */
 	map(0xc003, 0xc003).nopw(); /* unknown */
@@ -255,8 +255,8 @@ void markham_state::strnskil_slave_map(address_map &map)
 	map(0xc000, 0xc7ff).ram().share("spriteram");
 	map(0xc800, 0xcfff).ram().share("share1");
 
-	map(0xd801, 0xd801).w("sn1", FUNC(sn76496_device::command_w));
-	map(0xd802, 0xd802).w("sn2", FUNC(sn76496_device::command_w));
+	map(0xd801, 0xd801).w("sn1", FUNC(sn76496_device::write));
+	map(0xd802, 0xd802).w("sn2", FUNC(sn76496_device::write));
 }
 
 /****************************************************************************/
@@ -554,18 +554,16 @@ MACHINE_CONFIG_START(markham_state::markham)
 	MCFG_DEVICE_PROGRAM_MAP(markham_slave_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", markham_state, irq0_line_hold)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(markham_state, screen_update_markham)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_markham)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(markham_state, markham)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_markham);
+	PALETTE(config, m_palette, FUNC(markham_state::markham_palette), 1024, 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -581,12 +579,12 @@ MACHINE_CONFIG_START(markham_state::strnskil)
 
 	markham(config);
 	/* basic machine hardware */
-	MCFG_DEVICE_REMOVE("maincpu")
+	config.device_remove("maincpu");
 	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK/2) /* 4.000MHz */
 	MCFG_DEVICE_PROGRAM_MAP(strnskil_master_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", markham_state, strnskil_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(markham_state::strnskil_scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_REMOVE("subcpu")
+	config.device_remove("subcpu");
 	MCFG_DEVICE_ADD("subcpu", Z80, CPU_CLOCK/2) /* 4.000MHz */
 	MCFG_DEVICE_PROGRAM_MAP(strnskil_slave_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(markham_state, irq0_line_hold, 2*(PIXEL_CLOCK/HTOTAL/VTOTAL))
@@ -608,19 +606,19 @@ MACHINE_CONFIG_START(markham_state::banbam)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(banbam_master_map)
 
-	MCFG_DEVICE_ADD("mcu", MB8841, CPU_CLOCK/2) /* 4.000MHz */
-	// MCFG_MB88XX_READ_K_CB(READ8(*this, markham_state, mcu_portk_r))
-	// MCFG_MB88XX_WRITE_O_CB(WRITE8(*this, markham_state, mcu_port_o_w))
-	// MCFG_MB88XX_WRITE_P_CB(WRITE8(*this, markham_state, mcu_port_p_w))
-	// MCFG_MB88XX_READ_R0_CB(READ8(*this, markham_state, mcu_port_r0_r))
-	// MCFG_MB88XX_WRITE_R0_CB(WRITE8(*this, markham_state, mcu_port_r0_w))
-	// MCFG_MB88XX_READ_R1_CB(READ8(*this, markham_state, mcu_port_r1_r))
-	// MCFG_MB88XX_WRITE_R1_CB(WRITE8(*this, markham_state, mcu_port_r1_w))
-	// MCFG_MB88XX_READ_R2_CB(READ8(*this, markham_state, mcu_port_r2_r))
-	// MCFG_MB88XX_WRITE_R2_CB(WRITE8(*this, markham_state, mcu_port_r2_w))
-	// MCFG_MB88XX_READ_R3_CB(READ8(*this, markham_state, mcu_port_r3_r))
-	// MCFG_MB88XX_WRITE_R3_CB(WRITE8(*this, markham_state, mcu_port_r3_w))
-	MCFG_DEVICE_DISABLE()
+	MB8841(config, m_mcu, CPU_CLOCK/2); /* 4.000MHz */
+	// m_mcu->read_k().set(FUNC(markham_state::mcu_portk_r));
+	// m_mcu->write_o().set(FUNC(markham_state::mcu_port_o_w));
+	// m_mcu->write_p().set(FUNC(markham_state::mcu_port_p_w));
+	// m_mcu->read_r<0>().set(FUNC(markham_state::mcu_port_r0_r));
+	// m_mcu->write_r<0>().set(FUNC(markham_state::mcu_port_r0_w));
+	// m_mcu->read_r<1>().set(FUNC(markham_state::mcu_port_r1_r));
+	// m_mcu->write_r<1>().set(FUNC(markham_state::mcu_port_r1_w));
+	// m_mcu->read_r<2>().set(FUNC(markham_state::mcu_port_r2_r));
+	// m_mcu->write_r<2>().set(FUNC(markham_state::mcu_port_r2_w));
+	// m_mcu->read_r<3>().set(FUNC(markham_state::mcu_port_r3_r));
+	// m_mcu->write_r<3>().set(FUNC(markham_state::mcu_port_r3_w));
+	m_mcu->set_disable();
 MACHINE_CONFIG_END
 
 /****************************************************************************/

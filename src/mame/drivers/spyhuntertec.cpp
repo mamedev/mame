@@ -679,7 +679,7 @@ MACHINE_CONFIG_START(spyhuntertec_state::spyhuntertec)
 	MCFG_DEVICE_PROGRAM_MAP(spyhuntertec_map)
 	MCFG_DEVICE_IO_MAP(spyhuntertec_portmap)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", spyhuntertec_state, irq0_line_hold)
-	MCFG_TIMER_DRIVER_ADD("analog_timer", spyhuntertec_state, analog_count_callback)
+	TIMER(config, m_analog_timer).configure_generic(FUNC(spyhuntertec_state::analog_count_callback));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -704,21 +704,20 @@ MACHINE_CONFIG_START(spyhuntertec_state::spyhuntertec)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ay1", AY8912, 3000000/2) // AY-3-8912
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, spyhuntertec_state, ay1_porta_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, spyhuntertec_state, ay1_porta_w))
+	ay8912_device &ay1(AY8912(config, "ay1", 3000000/2)); // AY-3-8912
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.25);
+	ay1.port_a_read_callback().set(FUNC(spyhuntertec_state::ay1_porta_r));
+	ay1.port_a_write_callback().set(FUNC(spyhuntertec_state::ay1_porta_w));
 
-	MCFG_DEVICE_ADD("ay2", AY8912, 3000000/2) // "
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, spyhuntertec_state, ay2_porta_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, spyhuntertec_state, ay2_porta_w))
+	ay8912_device &ay2(AY8912(config, "ay2", 3000000/2)); // "
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.25);
+	ay2.port_a_read_callback().set(FUNC(spyhuntertec_state::ay2_porta_r));
+	ay2.port_a_write_callback().set(FUNC(spyhuntertec_state::ay2_porta_w));
 
-	MCFG_DEVICE_ADD("ay3", AY8912, 3000000/2) // "
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8912(config, "ay3", 3000000/2).add_route(ALL_OUTPUTS, "mono", 0.25); // "
 
 MACHINE_CONFIG_END
 

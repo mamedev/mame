@@ -333,21 +333,20 @@ MACHINE_CONFIG_START(tiamc1_state::tiamc1)
 	MCFG_DEVICE_PROGRAM_MAP(tiamc1_map)
 	MCFG_DEVICE_IO_MAP(tiamc1_io_map)
 
-	MCFG_DEVICE_ADD("kr580vv55a", I8255A, 0)  /* soviet clone of i8255 */
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, tiamc1_state, tiamc1_control_w))
+	i8255_device &ppi(I8255A(config, "kr580vv55a"));  /* soviet clone of i8255 */
+	ppi.in_pa_callback().set_ioport("IN0");
+	ppi.in_pb_callback().set_ioport("IN1");
+	ppi.in_pc_callback().set_ioport("IN2");
+	ppi.out_pc_callback().set(FUNC(tiamc1_state::tiamc1_control_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 336, 0, 256, 312, 0, 256)       // pixel clock and htotal comes from docs/schematics, the rest is guess (determined by undumped PROM)
 	MCFG_SCREEN_UPDATE_DRIVER(tiamc1_state, screen_update_tiamc1)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tiamc1)
-	MCFG_PALETTE_ADD("palette", 32)
-	MCFG_PALETTE_INIT_OWNER(tiamc1_state, tiamc1)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tiamc1);
+	PALETTE(config, m_palette, FUNC(tiamc1_state::tiamc1_palette), 32);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -358,6 +357,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(tiamc1_state::kot)
 	tiamc1(config);
+
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(kotrybolov_map)
 	MCFG_DEVICE_IO_MAP(kotrybolov_io_map)
@@ -366,16 +366,15 @@ MACHINE_CONFIG_START(tiamc1_state::kot)
 	MCFG_VIDEO_START_OVERRIDE(tiamc1_state, kot)
 	MCFG_SCREEN_UPDATE_DRIVER(tiamc1_state, screen_update_kot)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_kot)
+	m_gfxdecode->set_info(gfx_kot);
 
-	MCFG_DEVICE_REMOVE("2x8253")
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	config.device_remove("2x8253");
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(PIXEL_CLOCK / 4)
-	MCFG_PIT8253_CLK2(SND_CLOCK)                // guess
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, tiamc1_state, pit8253_2_w))
+	pit8253_device &pit8253(PIT8253(config, "pit8253", 0));
+	pit8253.set_clk<0>(PIXEL_CLOCK / 4);
+	pit8253.set_clk<2>(SND_CLOCK);                // guess
+	pit8253.out_handler<2>().set(FUNC(tiamc1_state::pit8253_2_w));
 MACHINE_CONFIG_END
 
 

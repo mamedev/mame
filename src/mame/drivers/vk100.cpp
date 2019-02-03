@@ -749,15 +749,13 @@ void vk100_state::vk100_io(address_map &map)
 	map(0x64, 0x67).mirror(0x80).w(FUNC(vk100_state::vgEX));    //EX MOV, DOT, VEC, ER
 	map(0x68, 0x68).mirror(0x83).w(FUNC(vk100_state::KBDW));   //KBDW (probably AM_MIRROR(0x03))
 	map(0x6C, 0x6C).mirror(0x83).w(COM5016T_TAG, FUNC(com8116_device::stt_str_w));   //LD BAUD (baud rate clock divider setting for i8251 tx and rx clocks) (probably AM_MIRROR(0x03))
-	map(0x70, 0x70).mirror(0x82).w(m_uart, FUNC(i8251_device::data_w)); //LD COMD (i8251 data reg)
-	map(0x71, 0x71).mirror(0x82).w(m_uart, FUNC(i8251_device::control_w)); //LD COM (i8251 control reg)
+	map(0x70, 0x71).mirror(0x82).w(m_uart, FUNC(i8251_device::write)); //LD COMD
 	//AM_RANGE (0x74, 0x74) AM_MIRROR(0x83) AM_WRITE(unknown_74)
 	//AM_RANGE (0x78, 0x78) AM_MIRROR(0x83) AM_WRITE(kbdw)   //KBDW ?(mirror?)
 	//AM_RANGE (0x7C, 0x7C) AM_MIRROR(0x83) AM_WRITE(unknown_7C)
 	map(0x40, 0x47).mirror(0x80).r(FUNC(vk100_state::SYSTAT_A)); // SYSTAT A (state machine done and last 4 bits of vram, as well as dipswitches)
 	map(0x48, 0x48).mirror(0x87/*0x80*/).r(FUNC(vk100_state::SYSTAT_B)); // SYSTAT B (uart stuff)
-	map(0x50, 0x50).mirror(0x86).r(m_uart, FUNC(i8251_device::data_r)); // UART O
-	map(0x51, 0x51).mirror(0x86).r(m_uart, FUNC(i8251_device::status_r)); // UAR
+	map(0x50, 0x51).mirror(0x86).r(m_uart, FUNC(i8251_device::read)); // UART O
 	//AM_RANGE (0x58, 0x58) AM_MIRROR(0x87) AM_READ(unknown_58)
 	//AM_RANGE (0x60, 0x60) AM_MIRROR(0x87) AM_READ(unknown_60)
 	//AM_RANGE (0x68, 0x68) AM_MIRROR(0x87) AM_READ(unknown_68) // NOT USED
@@ -1044,33 +1042,33 @@ MACHINE_CONFIG_START(vk100_state::vk100)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(45'619'200)/3, 882, 0, 720, 370, 0, 350 ) // fake screen timings for startup until 6845 sets real ones
 	MCFG_SCREEN_UPDATE_DEVICE( "crtc", mc6845_device, screen_update )
 
-	MCFG_MC6845_ADD( "crtc", H46505, "screen", XTAL(45'619'200)/3/12)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(12)
-	MCFG_MC6845_UPDATE_ROW_CB(vk100_state, crtc_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, vk100_state, crtc_vsync))
+	H46505(config, m_crtc, 45.6192_MHz_XTAL/3/12);
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(12);
+	m_crtc->set_update_row_callback(FUNC(vk100_state::crtc_update_row), this);
+	m_crtc->out_vsync_callback().set(FUNC(vk100_state::crtc_vsync));
 
 	/* i8251 uart */
-	MCFG_DEVICE_ADD("i8251", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_rts))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, vk100_state, i8251_rxrdy_int))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE(*this, vk100_state, i8251_txrdy_int))
+	I8251(config, m_uart, 0);
+	m_uart->txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
+	m_uart->dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
+	m_uart->rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
+	m_uart->rxrdy_handler().set(FUNC(vk100_state::i8251_rxrdy_int));
+	m_uart->txrdy_handler().set(FUNC(vk100_state::i8251_txrdy_int));
 
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("i8251", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("i8251", i8251_device, write_dsr))
+	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(m_uart, FUNC(i8251_device::write_rxd));
+	rs232.dsr_handler().set(m_uart, FUNC(i8251_device::write_dsr));
 
-	MCFG_DEVICE_ADD(COM5016T_TAG, COM8116, XTAL(5'068'800))
-	MCFG_COM8116_FR_HANDLER(WRITELINE("i8251", i8251_device, write_rxc))
-	MCFG_COM8116_FT_HANDLER(WRITELINE("i8251", i8251_device, write_txc))
+	com8116_device &dbrg(COM8116(config, COM5016T_TAG, 5.0688_MHz_XTAL));
+	dbrg.fr_handler().set(m_uart, FUNC(i8251_device::write_rxc));
+	dbrg.ft_handler().set(m_uart, FUNC(i8251_device::write_txc));
 
-	MCFG_DEFAULT_LAYOUT( layout_vk100 )
+	config.set_default_layout(layout_vk100);
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD( "beeper", BEEP, 116 ) // 116 hz (page 172 of TM), but duty cycle is wrong here!
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 0.25 )
+	BEEP(config, m_speaker, 116).add_route(ALL_OUTPUTS, "mono", 0.25); // 116 hz (page 172 of TM), but duty cycle is wrong here!
 MACHINE_CONFIG_END
 
 /* ROM definition */

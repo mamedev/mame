@@ -837,7 +837,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( by17_state::u11_timer )
     -+                          +---+
 */
 
-	m_display_refresh_timer->adjust(attotime::from_msec(2.85));
+	m_display_refresh_timer->adjust(attotime::from_usec(2850));
 
 	m_u11_ca1 = true;
 	m_pia_u11->ca1_w(m_u11_ca1);
@@ -993,47 +993,48 @@ void by17_state::machine_reset()
 
 
 
-MACHINE_CONFIG_START(by17_state::by17)
+void by17_state::by17(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6800, 530000)  // No xtal, just 2 chips forming a multivibrator oscillator around 530KHz
-	MCFG_DEVICE_PROGRAM_MAP(by17_map)
+	M6800(config, m_maincpu, 530000);  // No xtal, just 2 chips forming a multivibrator oscillator around 530KHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &by17_state::by17_map);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")   // 'F' filled causes Credit Display to be blank on first startup
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);   // 'F' filled causes Credit Display to be blank on first startup
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_by17)
+	config.set_default_layout(layout_by17);
 
 	/* Sound */
 	genpin_audio(config);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("pia_u10", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, by17_state, u10_a_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, by17_state, u10_a_w))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, by17_state, u10_b_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, by17_state, u10_b_w))
-	MCFG_PIA_READCA1_HANDLER(READLINE(*this, by17_state, u10_ca1_r))
-	MCFG_PIA_READCB1_HANDLER(READLINE(*this, by17_state, u10_cb1_r))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, by17_state, u10_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, by17_state, u10_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_z_freq", by17_state, timer_z_freq, attotime::from_hz(100)) // Mains Line Frequency * 2
-	MCFG_TIMER_DRIVER_ADD(m_zero_crossing_active_timer, by17_state, timer_z_pulse)  // Active pulse length from Zero Crossing detector
+	PIA6821(config, m_pia_u10, 0);
+	m_pia_u10->readpa_handler().set(FUNC(by17_state::u10_a_r));
+	m_pia_u10->writepa_handler().set(FUNC(by17_state::u10_a_w));
+	m_pia_u10->readpb_handler().set(FUNC(by17_state::u10_b_r));
+	m_pia_u10->writepb_handler().set(FUNC(by17_state::u10_b_w));
+	m_pia_u10->readca1_handler().set(FUNC(by17_state::u10_ca1_r));
+	m_pia_u10->readcb1_handler().set(FUNC(by17_state::u10_cb1_r));
+	m_pia_u10->ca2_handler().set(FUNC(by17_state::u10_ca2_w));
+	m_pia_u10->cb2_handler().set(FUNC(by17_state::u10_cb2_w));
+	m_pia_u10->irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE);
+	m_pia_u10->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
+	TIMER(config, "timer_z_freq").configure_periodic(FUNC(by17_state::timer_z_freq), attotime::from_hz(100)); // Mains Line Frequency * 2
+	TIMER(config, m_zero_crossing_active_timer).configure_generic(FUNC(by17_state::timer_z_pulse));  // Active pulse length from Zero Crossing detector
 
-	MCFG_DEVICE_ADD("pia_u11", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, by17_state, u11_a_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, by17_state, u11_a_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, by17_state, u11_b_w))
-	MCFG_PIA_READCA1_HANDLER(READLINE(*this, by17_state, u11_ca1_r))
-	MCFG_PIA_READCB1_HANDLER(READLINE(*this, by17_state, u11_cb1_r))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, by17_state, u11_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, by17_state, u11_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_d_freq", by17_state, u11_timer, attotime::from_hz(317)) // 555 timer
-	MCFG_TIMER_DRIVER_ADD(m_display_refresh_timer, by17_state, timer_d_pulse)   // 555 Active pulse length
-MACHINE_CONFIG_END
+	PIA6821(config, m_pia_u11, 0);
+	m_pia_u11->readpa_handler().set(FUNC(by17_state::u11_a_r));
+	m_pia_u11->writepa_handler().set(FUNC(by17_state::u11_a_w));
+	m_pia_u11->writepb_handler().set(FUNC(by17_state::u11_b_w));
+	m_pia_u11->readca1_handler().set(FUNC(by17_state::u11_ca1_r));
+	m_pia_u11->readcb1_handler().set(FUNC(by17_state::u11_cb1_r));
+	m_pia_u11->ca2_handler().set(FUNC(by17_state::u11_ca2_w));
+	m_pia_u11->cb2_handler().set(FUNC(by17_state::u11_cb2_w));
+	m_pia_u11->irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE);
+	m_pia_u11->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
+	TIMER(config, "timer_d_freq").configure_periodic(FUNC(by17_state::u11_timer), attotime::from_hz(317)); // 555 timer
+	TIMER(config, m_display_refresh_timer).configure_generic(FUNC(by17_state::timer_d_pulse));   // 555 Active pulse length
+}
 
 
 

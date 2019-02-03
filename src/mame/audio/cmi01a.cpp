@@ -26,32 +26,32 @@ cmi01a_device::cmi01a_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-MACHINE_CONFIG_START(cmi01a_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("cmi01a_pia_0", PIA6821, 0) // pia_cmi01a_1_config
-	MCFG_PIA_READCB1_HANDLER(READLINE(*this, cmi01a_device, tri_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, cmi01a_device, ws_dir_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, cmi01a_device, rp_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, cmi01a_device, pia_0_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, cmi01a_device, pia_0_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE("cmi01a_irq", input_merger_device, in_w<0>))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE("cmi01a_irq", input_merger_device, in_w<1>))
+void cmi01a_device::device_add_mconfig(machine_config &config)
+{
+	PIA6821(config, m_pia[0], 0); // pia_cmi01a_1_config
+	m_pia[0]->readcb1_handler().set(FUNC(cmi01a_device::tri_r));
+	m_pia[0]->writepa_handler().set(FUNC(cmi01a_device::ws_dir_w));
+	m_pia[0]->writepb_handler().set(FUNC(cmi01a_device::rp_w));
+	m_pia[0]->ca2_handler().set(FUNC(cmi01a_device::pia_0_ca2_w));
+	m_pia[0]->cb2_handler().set(FUNC(cmi01a_device::pia_0_cb2_w));
+	m_pia[0]->irqa_handler().set("cmi01a_irq", FUNC(input_merger_device::in_w<0>));
+	m_pia[0]->irqb_handler().set("cmi01a_irq", FUNC(input_merger_device::in_w<1>));
 
-	MCFG_DEVICE_ADD("cmi01a_pia_1", PIA6821, 0) // pia_cmi01a_2_config
-	MCFG_PIA_READCA1_HANDLER(READLINE(*this, cmi01a_device, zx_r))
-	MCFG_PIA_READCA2_HANDLER(READLINE(*this, cmi01a_device, eosi_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, cmi01a_device, pia_1_a_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, cmi01a_device, pia_1_b_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE("cmi01a_irq", input_merger_device, in_w<2>))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE("cmi01a_irq", input_merger_device, in_w<3>))
+	PIA6821(config, m_pia[1], 0); // pia_cmi01a_2_config
+	m_pia[1]->readca1_handler().set(FUNC(cmi01a_device::zx_r));
+	m_pia[1]->readca2_handler().set(FUNC(cmi01a_device::eosi_r));
+	m_pia[1]->writepa_handler().set(FUNC(cmi01a_device::pia_1_a_w));
+	m_pia[1]->writepb_handler().set(FUNC(cmi01a_device::pia_1_b_w));
+	m_pia[1]->irqa_handler().set("cmi01a_irq", FUNC(input_merger_device::in_w<2>));
+	m_pia[1]->irqb_handler().set("cmi01a_irq", FUNC(input_merger_device::in_w<3>));
 
-	MCFG_DEVICE_ADD("cmi01a_ptm", PTM6840, 2000000) // ptm_cmi01a_config
-	MCFG_PTM6840_EXTERNAL_CLOCKS(250000, 500000, 500000)
-	MCFG_PTM6840_O1_CB(WRITELINE(*this, cmi01a_device, ptm_o1))
-	MCFG_PTM6840_IRQ_CB(WRITELINE("cmi01a_irq", input_merger_device, in_w<4>))
+	PTM6840(config, m_ptm, 2000000); // ptm_cmi01a_config
+	m_ptm->set_external_clocks(250000, 500000, 500000);
+	m_ptm->o1_callback().set(FUNC(cmi01a_device::ptm_o1));
+	m_ptm->irq_callback().set("cmi01a_irq", FUNC(input_merger_device::in_w<4>));
 
-	MCFG_INPUT_MERGER_ANY_HIGH("cmi01a_irq")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(*this, cmi01a_device, cmi01a_irq))
-MACHINE_CONFIG_END
+	INPUT_MERGER_ANY_HIGH(config, "cmi01a_irq").output_handler().set(FUNC(cmi01a_device::cmi01a_irq));
+}
 
 
 void cmi01a_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)

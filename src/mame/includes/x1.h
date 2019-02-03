@@ -16,7 +16,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/z80daisy.h"
 #include "imagedev/cassette.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 #include "machine/bankdev.h"
 #include "machine/i8255.h"
 #include "machine/timer.h"
@@ -57,7 +57,7 @@ class x1_state : public driver_device
 public:
 	x1_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_maincpu(*this,"x1_cpu"),
+		m_maincpu(*this, "x1_cpu"),
 		m_cassette(*this, "cassette"),
 		m_cart(*this, "cartslot"),
 		m_fdc(*this, "fdc"),
@@ -81,7 +81,7 @@ public:
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
 	required_device<generic_slot_device> m_cart;
 	required_device<mb8877_device> m_fdc;
@@ -138,7 +138,6 @@ public:
 	DECLARE_MACHINE_START(x1);
 	DECLARE_MACHINE_RESET(x1);
 	DECLARE_VIDEO_START(x1);
-	DECLARE_PALETTE_INIT(x1);
 	DECLARE_MACHINE_RESET(x1turbo);
 	uint32_t screen_update_x1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_INPUT_CHANGED_MEMBER(ipl_reset);

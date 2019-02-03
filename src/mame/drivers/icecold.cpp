@@ -362,56 +362,56 @@ TIMER_DEVICE_CALLBACK_MEMBER(icecold_state::icecold_motors_timer)
 	}
 }
 
-MACHINE_CONFIG_START(icecold_state::icecold)
-
+void icecold_state::icecold(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809E, XTAL(6'000'000)/4) // 68A09E
-	MCFG_DEVICE_PROGRAM_MAP(icecold_map)
+	MC6809E(config, m_maincpu, XTAL(6'000'000)/4); // 68A09E
+	m_maincpu->set_addrmap(AS_PROGRAM, &icecold_state::icecold_map);
 
-	MCFG_DEVICE_ADD( "pia0", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("JOY"))
-	MCFG_PIA_READPB_HANDLER(IOPORT("DSW3"))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
+	pia6821_device &pia0(PIA6821(config, "pia0", 0));
+	pia0.readpa_handler().set_ioport("JOY");
+	pia0.readpb_handler().set_ioport("DSW3");
+	pia0.irqa_handler().set_inputline("maincpu", M6809_IRQ_LINE);
+	pia0.irqb_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 
-	MCFG_DEVICE_ADD( "pia1", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, icecold_state, ay_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, icecold_state, ay_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, icecold_state, snd_ctrl_w))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6809_FIRQ_LINE))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6809_FIRQ_LINE))
+	PIA6821(config, m_pia1, 0);
+	m_pia1->readpa_handler().set(FUNC(icecold_state::ay_r));
+	m_pia1->writepa_handler().set(FUNC(icecold_state::ay_w));
+	m_pia1->writepb_handler().set(FUNC(icecold_state::snd_ctrl_w));
+	m_pia1->irqa_handler().set_inputline("maincpu", M6809_FIRQ_LINE);
+	m_pia1->irqb_handler().set_inputline("maincpu", M6809_FIRQ_LINE);
 
-	MCFG_DEVICE_ADD( "pia2", PIA6821, 0)
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
+	pia6821_device &pia2(PIA6821(config, "pia2", 0));
+	pia2.irqa_handler().set_inputline("maincpu", M6809_IRQ_LINE);
+	pia2.irqb_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 
-	MCFG_DEVICE_ADD("i8279", I8279, XTAL(6'000'000)/4)
-	MCFG_I8279_OUT_IRQ_CB(WRITELINE("pia0", pia6821_device, cb1_w)) // irq
-	MCFG_I8279_OUT_SL_CB(WRITE8(*this, icecold_state, scanlines_w))        // scan SL lines
-	MCFG_I8279_OUT_DISP_CB(WRITE8(*this, icecold_state, digit_w))         // display A&B
-	MCFG_I8279_IN_RL_CB(READ8(*this, icecold_state, kbd_r))                // kbd RL lines
+	i8279_device &kbdc(I8279(config, "i8279", XTAL(6'000'000)/4));
+	kbdc.out_irq_callback().set("pia0", FUNC(pia6821_device::cb1_w));   // irq
+	kbdc.out_sl_callback().set(FUNC(icecold_state::scanlines_w));       // scan SL lines
+	kbdc.out_disp_callback().set(FUNC(icecold_state::digit_w));         // display A&B
+	kbdc.in_rl_callback().set(FUNC(icecold_state::kbd_r));              // kbd RL lines
 
 	// 30Hz signal from CH-C of ay0
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("sint_timer", icecold_state, icecold_sint_timer, attotime::from_hz(30))
+	TIMER(config, "sint_timer", 0).configure_periodic(timer_device::expired_delegate(FUNC(icecold_state::icecold_sint_timer), this), attotime::from_hz(30));
 
 	// for update motors position
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("motors_timer", icecold_state, icecold_motors_timer, attotime::from_msec(50))
+	TIMER(config, "motors_timer", 0).configure_periodic(timer_device::expired_delegate(FUNC(icecold_state::icecold_motors_timer), this), attotime::from_msec(50));
 
 	// video hardware
-	MCFG_DEFAULT_LAYOUT(layout_icecold)
+	config.set_default_layout(layout_icecold);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ay0", AY8910, XTAL(6'000'000)/4)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW4"))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, icecold_state, ay8910_0_b_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8910(config, m_ay8910[0], XTAL(6'000'000)/4);
+	m_ay8910[0]->port_a_read_callback().set_ioport("DSW4");
+	m_ay8910[0]->port_b_write_callback().set(FUNC(icecold_state::ay8910_0_b_w));
+	m_ay8910[0]->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(6'000'000)/4)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, icecold_state, ay8910_1_a_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, icecold_state, ay8910_1_b_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	AY8910(config, m_ay8910[1], XTAL(6'000'000)/4);
+	m_ay8910[1]->port_a_write_callback().set(FUNC(icecold_state::ay8910_1_a_w));
+	m_ay8910[1]->port_b_write_callback().set(FUNC(icecold_state::ay8910_1_b_w));
+	m_ay8910[1]->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 /*-------------------------------------------------------------------
 / Ice Cold Beer

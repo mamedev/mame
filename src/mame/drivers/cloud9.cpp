@@ -216,18 +216,6 @@ WRITE8_MEMBER(cloud9_state::irq_ack_w)
 }
 
 
-WRITE_LINE_MEMBER(cloud9_state::coin1_counter_w)
-{
-	machine().bookkeeping().coin_counter_w(0, state);
-}
-
-
-WRITE_LINE_MEMBER(cloud9_state::coin2_counter_w)
-{
-	machine().bookkeeping().coin_counter_w(1, state);
-}
-
-
 READ8_MEMBER(cloud9_state::leta_r)
 {
 	return ioport(offset ? "TRACKX" : "TRACKY")->read();
@@ -404,47 +392,46 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(cloud9_state::cloud9)
-
+void cloud9_state::cloud9(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK/8)
-	MCFG_DEVICE_PROGRAM_MAP(cloud9_map)
+	M6502(config, m_maincpu, MASTER_CLOCK/8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cloud9_state::cloud9_map);
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, cloud9_state, coin1_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, cloud9_state, coin2_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(OUTPUT("led0")) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(OUTPUT("led1")) MCFG_DEVCB_INVERT
+	ls259_device &outlatch(LS259(config, "outlatch"));
+	outlatch.q_out_cb<0>().set([this] (int state) { machine().bookkeeping().coin_counter_w(0, state); });
+	outlatch.q_out_cb<1>().set([this] (int state) { machine().bookkeeping().coin_counter_w(1, state); });
+	outlatch.q_out_cb<2>().set_output("led0").invert();
+	outlatch.q_out_cb<3>().set_output("led1").invert();
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 8);
 
-	MCFG_X2212_ADD_AUTOSAVE("nvram")
+	X2212(config, "nvram").set_auto_save(true);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cloud9)
-	MCFG_PALETTE_ADD("palette", 64)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cloud9);
+	PALETTE(config, m_palette).set_entries(64);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE((float)PIXEL_CLOCK / (float)VTOTAL / (float)HTOTAL)
-	MCFG_SCREEN_SIZE(HTOTAL, VTOTAL)
-	MCFG_SCREEN_VBLANK_TIME(0)          /* VBLANK is handled manually */
-	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 231)
-	MCFG_SCREEN_UPDATE_DRIVER(cloud9_state, screen_update_cloud9)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz((float)PIXEL_CLOCK / (float)VTOTAL / (float)HTOTAL);
+	m_screen->set_size(HTOTAL, VTOTAL);
+	m_screen->set_vblank_time(0);          /* VBLANK is handled manually */
+	m_screen->set_visarea(0, 255, 0, 231);
+	m_screen->set_screen_update(FUNC(cloud9_state::screen_update_cloud9));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("videolatch", LS259, 0)
+	LS259(config, m_videolatch);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("pokey1", POKEY, MASTER_CLOCK/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	pokey_device &pokey1(POKEY(config, "pokey1", MASTER_CLOCK/8));
+	pokey1.add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("pokey2", POKEY, MASTER_CLOCK/8)
-	MCFG_POKEY_ALLPOT_R_CB(IOPORT("DSW"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	pokey_device &pokey2(POKEY(config, "pokey2", MASTER_CLOCK/8));
+	pokey2.allpot_r().set_ioport("DSW");
+	pokey2.add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
 

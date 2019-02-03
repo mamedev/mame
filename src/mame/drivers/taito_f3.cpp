@@ -13,7 +13,6 @@
     sprite sync fixes, sprite zoom fixes and others!
 
     Other Issues:
-    - ES5510 DSP isn't hooked up.
     - Various hacks in video core that needs squashing;
     - When playing space invaders dx in original mode, t.t. with overlay, the
       alpha blending effect is wrong (see Taito B version of game)
@@ -36,7 +35,6 @@
 #include "includes/taito_f3.h"
 
 #include "cpu/m68000/m68000.h"
-#include "machine/eepromser.h"
 #include "sound/es5506.h"
 #include "sound/okim6295.h"
 #include "speaker.h"
@@ -458,72 +456,68 @@ void taito_f3_state::machine_reset()
 		m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-MACHINE_CONFIG_START(taito_f3_state::f3)
-
+void taito_f3_state::f3(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68EC020, XTAL(16'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(f3_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taito_f3_state,  f3_interrupt2)
+	M68EC020(config, m_maincpu, XTAL(16'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &taito_f3_state::f3_map);
+	m_maincpu->set_vblank_int("screen", FUNC(taito_f3_state::f3_interrupt2));
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58.97)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(624) /* 58.97 Hz, 624us vblank time */)
-	MCFG_SCREEN_SIZE(40*8+48*2, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(46, 40*8-1 + 46, 24, 24+232-1)
-	MCFG_SCREEN_UPDATE_DRIVER(taito_f3_state, screen_update_f3)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taito_f3_state, screen_vblank_f3))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(58.97);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(624)); /* 58.97 Hz, 624us vblank time */
+	m_screen->set_size(40*8+48*2, 32*8);
+	m_screen->set_visarea(46, 40*8-1 + 46, 24, 24+232-1);
+	m_screen->set_screen_update(FUNC(taito_f3_state::screen_update_f3));
+	m_screen->screen_vblank().set(FUNC(taito_f3_state::screen_vblank_f3));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taito_f3)
-	MCFG_PALETTE_ADD("palette", 0x2000)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_taito_f3);
+	PALETTE(config, m_palette).set_entries(0x2000);
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("taito_en", TAITO_EN, 0)
-MACHINE_CONFIG_END
+	TAITO_EN(config, m_taito_en, 0);
+}
 
 /* These games reprogram the video output registers to display different scanlines,
  we can't change our screen display at runtime, so we do it here instead.  None
  of the games change the registers during the game (to do so would probably require
  monitor recalibration.)
 */
-MACHINE_CONFIG_START(taito_f3_state::f3_224a)
+void taito_f3_state::f3_224a(machine_config &config)
+{
 	f3(config);
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(46, 40*8-1 + 46, 31, 31+224-1)
-MACHINE_CONFIG_END
+	m_screen->set_visarea(46, 40*8-1 + 46, 31, 31+224-1);
+}
 
-MACHINE_CONFIG_START(taito_f3_state::f3_224b)
+void taito_f3_state::f3_224b(machine_config &config)
+{
 	f3(config);
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(46, 40*8-1 + 46, 32, 32+224-1)
-MACHINE_CONFIG_END
+	m_screen->set_visarea(46, 40*8-1 + 46, 32, 32+224-1);
+}
 
-MACHINE_CONFIG_START(taito_f3_state::f3_224c)
+void taito_f3_state::f3_224c(machine_config &config)
+{
 	f3(config);
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(46, 40*8-1 + 46, 24, 24+224-1)
-MACHINE_CONFIG_END
+	m_screen->set_visarea(46, 40*8-1 + 46, 24, 24+224-1);
+}
 
 /* recalh and gseeker need a default EEPROM to work */
-MACHINE_CONFIG_START(taito_f3_state::f3_eeprom)
+void taito_f3_state::f3_eeprom(machine_config &config)
+{
 	f3(config);
+	m_eeprom->default_data(recalh_eeprom, 128); //TODO: convert this into ROM
+}
 
-	MCFG_DEVICE_REMOVE("eeprom")
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
-	MCFG_EEPROM_DATA(recalh_eeprom, 128) //TODO: convert this into ROM
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(taito_f3_state::f3_224b_eeprom)
+void taito_f3_state::f3_224b_eeprom(machine_config &config)
+{
 	f3_224b(config);
-
-	MCFG_DEVICE_REMOVE("eeprom")
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
-	MCFG_EEPROM_DATA(recalh_eeprom, 128) //TODO: convert this into ROM
-MACHINE_CONFIG_END
+	m_eeprom->default_data(recalh_eeprom, 128); //TODO: convert this into ROM
+}
 
 static const gfx_layout bubsympb_sprite_layout =
 {
@@ -555,34 +549,35 @@ static GFXDECODE_START( gfx_bubsympb )
 	GFXDECODE_ENTRY( nullptr,           0x000000, pivotlayout,         0,  64 ) /* Dynamically modified */
 GFXDECODE_END
 
-MACHINE_CONFIG_START(taito_f3_state::bubsympb)
+void taito_f3_state::bubsympb(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68EC020, XTAL(16'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(bubsympb_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taito_f3_state, f3_interrupt2)
+	M68EC020(config, m_maincpu, XTAL(16'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &taito_f3_state::bubsympb_map);
+	m_maincpu->set_vblank_int("screen", FUNC(taito_f3_state::f3_interrupt2));
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58.97)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(624) /* 58.97 Hz, 624us vblank time */)
-	MCFG_SCREEN_SIZE(40*8+48*2, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(46, 40*8-1 + 46, 31, 31+224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(taito_f3_state, screen_update_f3)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taito_f3_state, screen_vblank_f3))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(58.97);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(624)); /* 58.97 Hz, 624us vblank time */
+	m_screen->set_size(40*8+48*2, 32*8);
+	m_screen->set_visarea(46, 40*8-1 + 46, 31, 31+224-1);
+	m_screen->set_screen_update(FUNC(taito_f3_state::screen_update_f3));
+	m_screen->screen_vblank().set(FUNC(taito_f3_state::screen_vblank_f3));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bubsympb)
-	MCFG_PALETTE_ADD("palette", 8192)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bubsympb);
+	PALETTE(config, m_palette).set_entries(0x2000);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000 , okim6295_device::PIN7_HIGH) // not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, 1000000, okim6295_device::PIN7_HIGH); // not verified
+	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 /******************************************************************************/
 
@@ -1597,8 +1592,8 @@ Notes:
                          PAL.7          PALCE16V8H
                          D49-12-1       PAL16L8B
 
-      D69-01 to D69-08          16M MASKROM (DIP42)
-      d69-09 to d69-11          8M MASKROM  (DIP42)
+      D69-01 to D69-08          16M mask ROM (DIP42)
+      d69-09 to d69-11          8M mask ROM  (DIP42)
       D69-13 to D69-15/D69-20   27C040 EPROM (DIP32)
       D69-18/D69-19             27C1001 EPROM (DIP32)
 */
@@ -3472,7 +3467,7 @@ ROM_START( kirameki )
 	ROM_LOAD( "d77-20.37",   0x0000, 0x0117, CRC(6bfbec07) SHA1(5dce4f2e9fc13273cd50b67f1d9a0d90128e7397) ) // PALCE16V8
 ROM_END
 
-ROM_START( puchicar )
+ROM_START( puchicar ) // an Asia cart was dumped and all ROMs match
 	ROM_REGION(0x200000, "maincpu", 0) /* 68020 code */
 	ROM_LOAD32_BYTE("e46-16", 0x000000, 0x80000, CRC(cf2accdf) SHA1(b1e9808299a3c68c939009275108ee76cd7f5749) )
 	ROM_LOAD32_BYTE("e46-15", 0x000001, 0x80000, CRC(c32c6ed8) SHA1(b0c4cca836e6957ecabdaddff23439f9d038a161) )
@@ -3809,6 +3804,43 @@ Notes:
 
 ROM_START( landmakr )
 	ROM_REGION(0x200000, "maincpu", 0) /* 68020 code */
+	ROM_LOAD32_BYTE("e61-19.20", 0x000000, 0x80000, CRC(f92eccd0) SHA1(88e836390be1ca08c578080662d17007a9e0bcc3) )
+	ROM_LOAD32_BYTE("e61-18.19", 0x000001, 0x80000, CRC(5a26c9e0) SHA1(e7f09722f6b7a459248c2c8ad0a2695365cc78dc) )
+	ROM_LOAD32_BYTE("e61-17.18", 0x000002, 0x80000, CRC(710776a8) SHA1(669aa086e7a5faedd90407e558c01bf5f0869790) )
+	ROM_LOAD32_BYTE("e61-16.17", 0x000003, 0x80000, CRC(b073cda9) SHA1(a8b713c3e17e431b5789a70d6f9b0e0a6b02624a) )
+
+	ROM_REGION(0x800000, "gfx1" , 0) /* Sprites */
+	ROM_LOAD16_BYTE("e61-03.12",0x000000, 0x200000, CRC(e8abfc46) SHA1(fbde006f9822af3ed8debec525270d329981ea21) )
+	ROM_LOAD16_BYTE("e61-02.08",0x000001, 0x200000, CRC(1dc4a164) SHA1(33b412d9653099aaff8ed5e62d1ba4fc30aa9058) )
+	ROM_LOAD       ("e61-01.04",0x600000, 0x200000, CRC(6cdd8311) SHA1(7810a5a81f3b5a730d2088c79b12fffd77659b5b) )
+	ROM_FILL       (            0x400000, 0x200000, 0x00 )
+
+	ROM_REGION(0x800000, "gfx2" , 0) /* Tiles */
+	ROM_LOAD16_BYTE("e61-09.47", 0x000000, 0x200000, CRC(6ba29987) SHA1(b63c12523e19da66b3ca07c3548ac81bf57b59a1) )
+	ROM_LOAD16_BYTE("e61-08.45", 0x000001, 0x200000, CRC(76c98e14) SHA1(c021c325ab4ae410fa54e2eab61d34318867432b) )
+	ROM_LOAD       ("e61-07.43", 0x600000, 0x200000, CRC(4a57965d) SHA1(8e80788e0f47fb242da9af3aa19077dc0ec829b8) )
+	ROM_FILL       (             0x400000, 0x200000, 0x00 )
+
+	ROM_REGION(0x180000, "taito_en:audiocpu", 0) /* 68000 sound CPU */
+	ROM_LOAD16_BYTE("e61-14.32", 0x100000, 0x40000, CRC(18961bbb) SHA1(df054def35a49c0754356c15ec15336cbf28b063) )
+	ROM_LOAD16_BYTE("e61-15.33", 0x100001, 0x40000, CRC(2c64557a) SHA1(768007162d5d2cbe650c735bc1af2c10ed13b046) )
+
+	ROM_REGION16_BE(0x1000000, "ensoniq.0" , ROMREGION_ERASE00 )    // V2: 4 banks
+	// empty
+	ROM_LOAD16_BYTE("e61-04.38", 0x400000, 0x200000, CRC(c27aec0c) SHA1(e95da2db07a20a53662ebd45c033966e8a22a15a) ) // C8 C9 CA CB
+	ROM_LOAD16_BYTE("e61-05.39", 0x800000, 0x200000, CRC(83920d9d) SHA1(019e39ae85d1129f6d3b8460c4b1bd925f868ee2) ) // CC CD CE CF
+	ROM_LOAD16_BYTE("e61-06.40", 0xc00000, 0x200000, CRC(2e717bfe) SHA1(1be54cd2ec65d8fd49a5c09b5d27791fd7a320d4) ) // D0 D1 D2 D3
+
+	ROM_REGION( 0x0a00, "plds", 0 )
+	ROM_LOAD( "pal16l8a-d77-09.ic14",   0x0000, 0x0104, CRC(b371532b) SHA1(7f875f380e69d14326a036a09d2fda7554b73664) )
+	ROM_LOAD( "pal16l8a-d77-10.ic28",   0x0200, 0x0104, CRC(42f59227) SHA1(1f0db7489b49c00603ea51d130c9dfc237545390) )
+	ROM_LOAD( "palce16v8q-d77-11.ic37", 0x0400, 0x0117, CRC(eacc294e) SHA1(90679d523d90c1f8d2ecbd7b6fac2861f94cf107) )
+	ROM_LOAD( "palce16v8q-d77-12.ic48", 0x0600, 0x0117, CRC(e9920cfe) SHA1(58b73fe65f118d57fdce56d781593fc70c797f1b) )
+	ROM_LOAD( "palce16v8q-d77-15.ic21", 0x0800, 0x0117, NO_DUMP ) /* PAL is read protected */
+ROM_END
+
+ROM_START( landmakrj )
+	ROM_REGION(0x200000, "maincpu", 0) /* 68020 code */
 	ROM_LOAD32_BYTE("e61-13.20", 0x000000, 0x80000, CRC(0af756a2) SHA1(2dadac6873f2491ee77703f07f00dde2aa909355) )
 	ROM_LOAD32_BYTE("e61-12.19", 0x000001, 0x80000, CRC(636b3df9) SHA1(78a5bf4977bb90d710942188ce5016f3df499feb) )
 	ROM_LOAD32_BYTE("e61-11.18", 0x000002, 0x80000, CRC(279a0ee4) SHA1(08380286737b33db76a79b27d0df5faba17dfb96) )
@@ -3826,25 +3858,30 @@ ROM_START( landmakr )
 	ROM_LOAD       ("e61-07.43", 0x600000, 0x200000, CRC(4a57965d) SHA1(8e80788e0f47fb242da9af3aa19077dc0ec829b8) )
 	ROM_FILL       (             0x400000, 0x200000, 0x00 )
 
-
-
-	ROM_REGION(0x140000, "taito_en:audiocpu", 0) /* 68000 sound CPU */
-	ROM_LOAD16_BYTE("e61-14.32", 0x100000, 0x20000, CRC(b905f4a7) SHA1(613b954e3e129fd44b4ce64958f16e5636012d6e) )
-	ROM_LOAD16_BYTE("e61-15.33", 0x100001, 0x20000, CRC(87909869) SHA1(7b90c23899a673966cac3352d375d17b83e66596) )
+	ROM_REGION(0x180000, "taito_en:audiocpu", 0) /* 68000 sound CPU */
+	ROM_LOAD16_BYTE("e61-14.32", 0x100000, 0x40000, CRC(18961bbb) SHA1(df054def35a49c0754356c15ec15336cbf28b063) )
+	ROM_LOAD16_BYTE("e61-15.33", 0x100001, 0x40000, CRC(2c64557a) SHA1(768007162d5d2cbe650c735bc1af2c10ed13b046) )
 
 	ROM_REGION16_BE(0x1000000, "ensoniq.0" , ROMREGION_ERASE00 )    // V2: 4 banks
 	// empty
 	ROM_LOAD16_BYTE("e61-04.38", 0x400000, 0x200000, CRC(c27aec0c) SHA1(e95da2db07a20a53662ebd45c033966e8a22a15a) ) // C8 C9 CA CB
 	ROM_LOAD16_BYTE("e61-05.39", 0x800000, 0x200000, CRC(83920d9d) SHA1(019e39ae85d1129f6d3b8460c4b1bd925f868ee2) ) // CC CD CE CF
 	ROM_LOAD16_BYTE("e61-06.40", 0xc00000, 0x200000, CRC(2e717bfe) SHA1(1be54cd2ec65d8fd49a5c09b5d27791fd7a320d4) ) // D0 D1 D2 D3
+
+	ROM_REGION( 0x0a00, "plds", 0 )
+	ROM_LOAD( "pal16l8a-d77-09.ic14",   0x0000, 0x0104, CRC(b371532b) SHA1(7f875f380e69d14326a036a09d2fda7554b73664) )
+	ROM_LOAD( "pal16l8a-d77-10.ic28",   0x0200, 0x0104, CRC(42f59227) SHA1(1f0db7489b49c00603ea51d130c9dfc237545390) )
+	ROM_LOAD( "palce16v8q-d77-11.ic37", 0x0400, 0x0117, CRC(eacc294e) SHA1(90679d523d90c1f8d2ecbd7b6fac2861f94cf107) )
+	ROM_LOAD( "palce16v8q-d77-12.ic48", 0x0600, 0x0117, CRC(e9920cfe) SHA1(58b73fe65f118d57fdce56d781593fc70c797f1b) )
+	ROM_LOAD( "palce16v8q-d77-15.ic21", 0x0800, 0x0117, NO_DUMP ) /* PAL is read protected */
 ROM_END
 
-ROM_START( landmakrp )
+ROM_START( landmakrp ) // First 3 roms match parent, mpro-0.63 has bytes 7FFFE & 7FFFF reversed compared to parent.
 	ROM_REGION(0x200000, "maincpu", 0) /* 68020 code */
 	ROM_LOAD32_BYTE("mpro-3.60", 0x000000, 0x80000, CRC(f92eccd0) SHA1(88e836390be1ca08c578080662d17007a9e0bcc3) )
 	ROM_LOAD32_BYTE("mpro-2.61", 0x000001, 0x80000, CRC(5a26c9e0) SHA1(e7f09722f6b7a459248c2c8ad0a2695365cc78dc) )
 	ROM_LOAD32_BYTE("mpro-1.62", 0x000002, 0x80000, CRC(710776a8) SHA1(669aa086e7a5faedd90407e558c01bf5f0869790) )
-	ROM_LOAD32_BYTE("mpro-0.63", 0x000003, 0x80000, CRC(bc71dd2f) SHA1(ec0d07f9729a53737975547066bd1221f78563c5) )
+	ROM_LOAD32_BYTE("mpro-0.63", 0x000003, 0x80000, CRC(bc71dd2f) SHA1(ec0d07f9729a53737975547066bd1221f78563c5) ) // 7FFFE: 03 FF vs 7FFFE: FF 03 in parent
 
 	ROM_REGION(0x800000, "gfx1" , 0) /* Sprites */
 	ROM_LOAD16_BYTE("obj0-0.8", 0x000000, 0x080000, CRC(4b862c1b) SHA1(ef46af27d0657b95f5f3bad13629f9119958fe78) )
@@ -3875,8 +3912,6 @@ ROM_START( landmakrp )
 	ROM_LOAD16_BYTE("scr1-4.15",0x700000, 0x080000, CRC(783b6d10) SHA1(eab2c7b19890c1f6c13f0062978db5b81988499b) )
 	ROM_LOAD16_BYTE("scr1-5.14",0x700001, 0x080000, CRC(24aba128) SHA1(b03804c738d86bfafc1f8fb91f8e77e878d2dc83) )
 	ROM_FILL       (            0x400000, 0x200000, 0x00 )
-
-
 
 	ROM_REGION(0x180000, "taito_en:audiocpu", 0) /* 68000 sound CPU */
 	ROM_LOAD16_BYTE("spro-1.66", 0x100000, 0x40000, CRC(18961bbb) SHA1(df054def35a49c0754356c15ec15336cbf28b063) )
@@ -4071,12 +4106,13 @@ void taito_f3_state::init_bubsymph()
 
 READ32_MEMBER(taito_f3_state::bubsympb_oki_r)
 {
-	return m_oki->read(space,0);
+	return m_oki->read();
 }
+
 WRITE32_MEMBER(taito_f3_state::bubsympb_oki_w)
 {
 	//printf("write %08x %08x\n",data,mem_mask);
-	if (ACCESSING_BITS_0_7) m_oki->write(space, 0,data&0xff);
+	if (ACCESSING_BITS_0_7) m_oki->write(data&0xff);
 	//if (mem_mask==0x000000ff) downcast<okim6295_device *>(device)->write(0,data&0xff);
 	if (ACCESSING_BITS_16_23)
 	{
@@ -4349,5 +4385,6 @@ GAME( 1997, pbobble4u,pbobble4, f3,      f3, taito_f3_state, init_pbobble4, ROT0
 GAME( 1997, popnpop,  0,        f3,      f3, taito_f3_state, init_popnpop,  ROT0,   "Taito Corporation",         "Pop'n Pop (Ver 2.07O 1998/02/09)", 0 )
 GAME( 1997, popnpopj, popnpop,  f3,      f3, taito_f3_state, init_popnpop,  ROT0,   "Taito Corporation",         "Pop'n Pop (Ver 2.07J 1998/02/09)", 0 )
 GAME( 1997, popnpopu, popnpop,  f3,      f3, taito_f3_state, init_popnpop,  ROT0,   "Taito Corporation",         "Pop'n Pop (Ver 2.07A 1998/02/09)", 0 )
-GAME( 1998, landmakr, 0,        f3,      f3, taito_f3_state, init_landmakr, ROT0,   "Taito Corporation",         "Land Maker (Ver 2.01J 1998/06/01)", 0 )
-GAME( 1998, landmakrp,landmakr, f3,      f3, taito_f3_state, init_landmkrp, ROT0,   "Taito Corporation",         "Land Maker (Ver 2.02O 1998/06/02, prototype)", 0 )
+GAME( 1998, landmakr, 0,        f3,      f3, taito_f3_state, init_landmakr, ROT0,   "Taito Corporation",         "Land Maker (Ver 2.02O 1998/06/02)", 0 )
+GAME( 1998, landmakrj,landmakr, f3,      f3, taito_f3_state, init_landmakr, ROT0,   "Taito Corporation",         "Land Maker (Ver 2.01J 1998/06/01)", 0 )
+GAME( 1998, landmakrp,landmakr, f3,      f3, taito_f3_state, init_landmkrp, ROT0,   "Taito Corporation",         "Land Maker (Ver 2.02O 1998/06/02, prototype)", 0 ) // proto or hack/bootleg?

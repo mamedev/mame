@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="leapfrog_mfleappad_cart" description="LeapFrog My First LeapPad cartridges">
+
+	<!--
+	<software name="nothing" supported="no">
+		<description>Nothing</description>
+		<year>20??</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_mfleappad_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="nothing.bin" size="0x200000" crc="11111111" sha1="1111111111111111111111111111111111111111" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	-->
+
+</softwarelist>
+
+

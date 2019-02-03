@@ -7,32 +7,6 @@
 
 #include "diserial.h"
 
-#define MCFG_MC68681_IRQ_CALLBACK(_cb) \
-	devcb = &downcast<duart_base_device &>(*device).set_irq_cb(DEVCB_##_cb);
-
-#define MCFG_MC68681_A_TX_CALLBACK(_cb) \
-	devcb = &downcast<duart_base_device &>(*device).set_a_tx_cb(DEVCB_##_cb);
-
-#define MCFG_MC68681_B_TX_CALLBACK(_cb) \
-	devcb = &downcast<duart_base_device &>(*device).set_b_tx_cb(DEVCB_##_cb);
-
-// deprecated: use ipX_w() instead
-#define MCFG_MC68681_INPORT_CALLBACK(_cb) \
-	devcb = &downcast<duart_base_device &>(*device).set_inport_cb(DEVCB_##_cb);
-
-#define MCFG_MC68681_OUTPORT_CALLBACK(_cb) \
-	devcb = &downcast<duart_base_device &>(*device).set_outport_cb(DEVCB_##_cb);
-
-#define MCFG_MC68681_SET_EXTERNAL_CLOCKS(_a, _b, _c, _d) \
-	downcast<duart_base_device &>(*device).set_clocks(_a, _b, _c, _d);
-
-// SC28C94 specific callbacks
-#define MCFG_SC28C94_C_TX_CALLBACK(_cb) \
-	devcb = &downcast<sc28c94_device &>(*device).set_c_tx_cb(DEVCB_##_cb);
-
-#define MCFG_SC28C94_D_TX_CALLBACK(_cb) \
-	devcb = &downcast<sc28c94_device &>(*device).set_d_tx_cb(DEVCB_##_cb);
-
 #define MC68681_RX_FIFO_SIZE                3
 
 // forward declaration
@@ -57,9 +31,10 @@ public:
 	void write_chan_reg(int reg, uint8_t data);
 	void update_interrupts();
 
+	void rx_fifo_push(uint8_t data, uint8_t errors);
 	uint8_t read_rx_fifo();
 
-	void ACR_updated();
+	void baud_updated();
 
 	uint8_t get_chan_CSR();
 
@@ -83,7 +58,7 @@ private:
 
 	/* Receiver */
 	uint8_t rx_enabled;
-	uint8_t rx_fifo[MC68681_RX_FIFO_SIZE];
+	uint16_t rx_fifo[MC68681_RX_FIFO_SIZE];
 	int   rx_fifo_read_ptr;
 	int   rx_fifo_write_ptr;
 	int   rx_fifo_num;
@@ -120,26 +95,26 @@ public:
 	}
 
 	// API
-	virtual DECLARE_READ8_MEMBER(read);
-	virtual DECLARE_WRITE8_MEMBER(write);
+	virtual uint8_t read(offs_t offset);
+	virtual void write(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( rx_a_w ) { m_chanA->device_serial_interface::rx_w((uint8_t)state); }
-	DECLARE_WRITE_LINE_MEMBER( rx_b_w ) { m_chanB->device_serial_interface::rx_w((uint8_t)state); }
+	DECLARE_WRITE_LINE_MEMBER(rx_a_w) { m_chanA->device_serial_interface::rx_w((uint8_t)state); }
+	DECLARE_WRITE_LINE_MEMBER(rx_b_w) { m_chanB->device_serial_interface::rx_w((uint8_t)state); }
 
-	template <class Object> devcb_base &set_irq_cb(Object &&cb) { return write_irq.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_a_tx_cb(Object &&cb) { return write_a_tx.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_b_tx_cb(Object &&cb) { return write_b_tx.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_inport_cb(Object &&cb) { return read_inport.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_outport_cb(Object &&cb) { return write_outport.set_callback(std::forward<Object>(cb)); }
+	auto irq_cb() { return write_irq.bind(); }
+	auto a_tx_cb() { return write_a_tx.bind(); }
+	auto b_tx_cb() { return write_b_tx.bind(); }
+	auto inport_cb() { return read_inport.bind(); } // deprecated: use ipX_w() instead
+	auto outport_cb() { return write_outport.bind(); }
 
 	// new-style push handlers for input port bits
-	DECLARE_WRITE_LINE_MEMBER( ip0_w );
-	DECLARE_WRITE_LINE_MEMBER( ip1_w );
-	DECLARE_WRITE_LINE_MEMBER( ip2_w );
-	DECLARE_WRITE_LINE_MEMBER( ip3_w );
-	DECLARE_WRITE_LINE_MEMBER( ip4_w );
-	DECLARE_WRITE_LINE_MEMBER( ip5_w );
-	DECLARE_WRITE_LINE_MEMBER( ip6_w );
+	DECLARE_WRITE_LINE_MEMBER(ip0_w);
+	DECLARE_WRITE_LINE_MEMBER(ip1_w);
+	DECLARE_WRITE_LINE_MEMBER(ip2_w);
+	DECLARE_WRITE_LINE_MEMBER(ip3_w);
+	DECLARE_WRITE_LINE_MEMBER(ip4_w);
+	DECLARE_WRITE_LINE_MEMBER(ip5_w);
+	DECLARE_WRITE_LINE_MEMBER(ip6_w);
 
 	bool irq_pending() const { return (ISR & IMR) != 0; }
 
@@ -160,12 +135,15 @@ protected:
 	virtual void update_interrupts();
 
 private:
-	TIMER_CALLBACK_MEMBER( duart_timer_callback );
+	TIMER_CALLBACK_MEMBER(duart_timer_callback);
 
+protected:
 	/* registers */
 	uint8_t ACR;  /* Auxiliary Control Register */
 	uint8_t IMR;  /* Interrupt Mask Register */
 	uint8_t ISR;  /* Interrupt Status Register */
+
+private:
 	uint8_t OPCR; /* Output Port Conf. Register */
 	uint8_t OPR;  /* Output Port Register */
 	PAIR  CTR;  /* Counter/Timer Preset Value */
@@ -181,7 +159,7 @@ private:
 	double get_ct_rate();
 	uint16_t get_ct_count();
 	void start_ct(int count);
-	int calc_baud(int ch, uint8_t data);
+	virtual int calc_baud(int ch, bool rx, uint8_t data);
 	void clear_ISR_bits(int mask);
 	void set_ISR_bits(int mask);
 
@@ -217,14 +195,15 @@ class mc68681_device : public duart_base_device
 public:
 	mc68681_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ8_MEMBER(read) override;
-	virtual DECLARE_WRITE8_MEMBER(write) override;
+	virtual uint8_t read(offs_t offset) override;
+	virtual void write(offs_t offset, uint8_t data) override;
 	uint8_t get_irq_vector() { m_read_vector = true; return IVR; }
 
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void update_interrupts() override;
+	mc68681_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 private:
 	bool m_read_vector; // if this is read and IRQ is active, it counts as pulling IACK
@@ -237,14 +216,14 @@ class sc28c94_device : public duart_base_device
 public:
 	sc28c94_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_c_tx_cb(Object &&cb) { return write_c_tx.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_d_tx_cb(Object &&cb) { return write_d_tx.set_callback(std::forward<Object>(cb)); }
+	auto c_tx_cb() { return write_c_tx.bind(); }
+	auto d_tx_cb() { return write_d_tx.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER( rx_c_w ) { m_chanC->device_serial_interface::rx_w((uint8_t)state); }
-	DECLARE_WRITE_LINE_MEMBER( rx_d_w ) { m_chanD->device_serial_interface::rx_w((uint8_t)state); }
+	DECLARE_WRITE_LINE_MEMBER(rx_c_w) { m_chanC->device_serial_interface::rx_w((uint8_t)state); }
+	DECLARE_WRITE_LINE_MEMBER(rx_d_w) { m_chanD->device_serial_interface::rx_w((uint8_t)state); }
 
-	virtual DECLARE_READ8_MEMBER(read) override;
-	virtual DECLARE_WRITE8_MEMBER(write) override;
+	virtual uint8_t read(offs_t offset) override;
+	virtual void write(offs_t offset, uint8_t data) override;
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -257,18 +236,37 @@ class mc68340_duart_device : public duart_base_device
 public:
 	mc68340_duart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ8_MEMBER(read) override;
-	virtual DECLARE_WRITE8_MEMBER(write) override;
+	virtual uint8_t read(offs_t offset) override;
+	virtual void write(offs_t offset, uint8_t data) override;
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	mc68340_duart_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 };
 
+class xr68c681_device : public mc68681_device
+{
+public:
+	xr68c681_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual uint8_t read(offs_t offset) override;
+	virtual void write(offs_t offset, uint8_t data) override;
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+private:
+	virtual int calc_baud(int ch, bool rx, uint8_t data) override;
+
+	bool m_XTXA,m_XRXA,m_XTXB,m_XRXB; /* X bits for the BRG (selects between 2 BRG tables) */
+};
+
 DECLARE_DEVICE_TYPE(SCN2681, scn2681_device)
 DECLARE_DEVICE_TYPE(MC68681, mc68681_device)
 DECLARE_DEVICE_TYPE(SC28C94, sc28c94_device)
 DECLARE_DEVICE_TYPE(MC68340_DUART, mc68340_duart_device)
+DECLARE_DEVICE_TYPE(XR68C681, xr68c681_device)
 DECLARE_DEVICE_TYPE(DUART_CHANNEL, duart_channel)
 
 #endif // MAME_MACHINE_MC68681_H

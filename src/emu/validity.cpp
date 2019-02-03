@@ -81,7 +81,7 @@ void validity_checker::validate_tag(const char *tag)
 		osd_printf_error("Invalid generic tag '%s' used\n", tag);
 
 	// scan for invalid characters
-	static const char *validchars = "abcdefghijklmnopqrstuvwxyz0123456789_.:^$";
+	static char const *const validchars = "abcdefghijklmnopqrstuvwxyz0123456789_.:^$";
 	for (const char *p = tag; *p != 0; p++)
 	{
 		// only lower-case permitted
@@ -1462,7 +1462,7 @@ void validity_checker::validate_driver()
 	if (compatible_with != nullptr && strcmp(compatible_with, "0") == 0)
 		compatible_with = nullptr;
 
-	// check for this driver being compatible with a non-existant driver
+	// check for this driver being compatible with a nonexistent driver
 	if (compatible_with != nullptr && m_drivlist.find(m_current_driver->compatible_with) == -1)
 		osd_printf_error("Driver is listed as compatible with nonexistent driver %s\n", m_current_driver->compatible_with);
 
@@ -1945,12 +1945,6 @@ void validity_checker::validate_devices()
 
 		// validate auto-finders
 		device.findit(true);
-
-		// validate callbacks
-		for (auto &cb : device.input_callbacks())
-			cb->validity_check(*this);
-		for (auto &cb : device.output_callbacks())
-			cb->validity_check(*this);
 
 		// validate the device tag
 		validate_tag(device.basetag());

@@ -8,7 +8,7 @@
 template<int Width, int AddrShift, int Endian> class handler_entry_read_address : public handler_entry_read<Width, AddrShift, Endian>
 {
 public:
-	using uX = typename handler_entry_size<Width>::uX;
+	using uX = typename emu::detail::handler_entry_size<Width>::uX;
 
 	handler_entry_read_address(address_space *space, u32 flags) : handler_entry_read<Width, AddrShift, Endian>(space, flags) {}
 	~handler_entry_read_address() = default;
@@ -25,7 +25,7 @@ protected:
 template<int Width, int AddrShift, int Endian> class handler_entry_write_address : public handler_entry_write<Width, AddrShift, Endian>
 {
 public:
-	using uX = typename handler_entry_size<Width>::uX;
+	using uX = typename emu::detail::handler_entry_size<Width>::uX;
 
 	handler_entry_write_address(address_space *space, u32 flags) : handler_entry_write<Width, AddrShift, Endian>(space, flags) {}
 	~handler_entry_write_address() = default;

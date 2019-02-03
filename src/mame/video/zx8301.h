@@ -35,17 +35,6 @@
 #pragma once
 
 
-
-
-///*************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-///*************************************************************************
-
-#define MCFG_ZX8301_VSYNC_CALLBACK(_write) \
-	devcb = &downcast<zx8301_device &>(*device).set_vsync_wr_callback(DEVCB_##_write);
-
-
-
 ///*************************************************************************
 //  TYPE DEFINITIONS
 ///*************************************************************************
@@ -66,7 +55,7 @@ public:
 
 	zx8301_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_vsync_wr_callback(Object &&cb) { return m_write_vsync.set_callback(std::forward<Object>(cb)); }
+	auto vsync_wr_callback() { return m_write_vsync.bind(); }
 
 	DECLARE_WRITE8_MEMBER( control_w );
 	DECLARE_READ8_MEMBER( data_r );

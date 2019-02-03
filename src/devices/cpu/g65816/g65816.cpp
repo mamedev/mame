@@ -17,6 +17,10 @@ All rights reserved.
 /*
 
 Changes:
+    1.02 (2019-02-02):
+        R. Belmont
+        - Corrected WDM to take 2 bytes and added callback
+
     1.01 (2010-04-04):
         Angelo Salese
         - Added boundary checks for MVP and MVN in M mode.
@@ -115,6 +119,7 @@ g65816_device::g65816_device(const machine_config &mconfig, device_type type, co
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, 24, 0, internal)
 	, m_opcode_config("opcodes", ENDIANNESS_LITTLE, 8, 24, 0, internal)
 	, m_vector_config("vectors", ENDIANNESS_LITTLE, 8, 5, 0)
+	, m_wdm_w(*this)
 	, m_cpu_type(cpu_type)
 {
 }
@@ -859,6 +864,8 @@ void g65816_device::device_start()
 	m_data_space = has_space(AS_DATA) ? &space(AS_DATA) : &program_space;
 	m_program_cache = program_space.cache<0, 0, ENDIANNESS_LITTLE>();
 	m_opcode_cache = (has_space(AS_OPCODES) ? space(AS_OPCODES) : program_space).cache<0, 0, ENDIANNESS_LITTLE>();
+
+	m_wdm_w.resolve_safe();
 
 	save_item(NAME(m_a));
 	save_item(NAME(m_b));

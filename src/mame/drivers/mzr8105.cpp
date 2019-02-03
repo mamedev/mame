@@ -6,7 +6,7 @@
  *
  *  19/08/2015
  *
- * I baught this board from http://www.retrotechnology.com without documentation.
+ * I bought this board from http://www.retrotechnology.com without documentation.
  * It has a Motorola 68000 CPU @ 10MHz and two 27128 EPROMS with OS9 DEBUG labels
  * and not much more except 16 or so TTLs, 2 PALs and a VME P1 connector. It is a
  * 2 layered pcb so it shold be possible to trace the schematics quite easily.
@@ -91,7 +91,7 @@
  * mailbox interrupt support. Standard MXbus side modules include additional DRAM.
  * SRAM, and I/O.
  *
- * Mizar's standard double- height (6U) processors provide additional features such
+ * Mizar's standard double-height (6U) processors provide additional features such
  * as a high-speed cache to enhance 68030 performance, floating, point coprocessor
  * support, up to four MB dual ported DRAM, VSB memory interface, Ethernet, and SCSI.
  *
@@ -179,7 +179,7 @@ mzr8105_state(const machine_config &mconfig, device_type type, const char *tag) 
 	}
 
 	void mzr8105(machine_config &config);
-	
+
 private:
 	void mzr8105_mem(address_map &map);
 	required_device<cpu_device> m_maincpu;

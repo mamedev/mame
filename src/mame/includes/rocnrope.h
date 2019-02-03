@@ -1,13 +1,17 @@
 // license:BSD-3-Clause
 // copyright-holders:Chris Hardy
+#ifndef MAME_INCLUDES_ROCNROPE_H
+#define MAME_INCLUDES_ROCNROPE_H
+
+#pragma once
 
 #include "emupal.h"
 
 class rocnrope_state : public driver_device
 {
 public:
-	rocnrope_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	rocnrope_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
@@ -46,9 +50,11 @@ private:
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(rocnrope);
+	void rocnrope_palette(palette_device &palette) const;
 	uint32_t screen_update_rocnrope(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void rocnrope_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_ROCNROPE_H

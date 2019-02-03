@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
-#include "machine/nmk112.h"
+#ifndef MAME_INCLUDES_POWERINS_H
+#define MAME_INCLUDES_POWERINS_H
+
 #include "emupal.h"
 #include "screen.h"
 
@@ -10,13 +12,15 @@ public:
 	powerins_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_soundcpu(*this, "soundcpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_vctrl_0(*this, "vctrl_0"),
 		m_vram(*this, "vram_%u", 0U),
 		m_spriteram(*this, "spriteram"),
-		m_okibank(*this, "okibank") { }
+		m_okibank(*this, "okibank")
+	{ }
 
 	void powerinsa(machine_config &config);
 	void powerinsb(machine_config &config);
@@ -24,6 +28,7 @@ public:
 
 private:
 	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_soundcpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -64,3 +69,5 @@ private:
 	void powerinsa_oki_map(address_map &map);
 	void powerinsb_sound_io_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_POWERINS_H

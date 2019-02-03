@@ -619,20 +619,18 @@ static void cd90_640_floppies(device_slot_interface &device)
 
 /* ------------ driver ------------ */
 
-MACHINE_CONFIG_START(thomson_state::to7)
+MACHINE_CONFIG_START(thomson_state::to7_base)
 
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, to7 )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, to7 )
 
 /* cpu */
-	MCFG_DEVICE_ADD("maincpu", MC6809E, 1000000)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, 16_MHz_XTAL / 16)
 	MCFG_DEVICE_PROGRAM_MAP(to7)
 
-	MCFG_INPUT_MERGER_ANY_HIGH("mainirq")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
+	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 
-	MCFG_INPUT_MERGER_ANY_HIGH("mainfirq")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M6809_FIRQ_LINE))
+	INPUT_MERGER_ANY_HIGH(config, "mainfirq").output_handler().set_inputline(m_maincpu, M6809_FIRQ_LINE);
 
 /* video */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -644,14 +642,13 @@ MACHINE_CONFIG_START(thomson_state::to7)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, thomson_state, thom_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD ( "palette", 4097 ) /* 12-bit color + transparency */
-	MCFG_PALETTE_INIT_OWNER(thomson_state, thom)
+	PALETTE(config, "palette", FUNC(thomson_state::thom_palette), 4097); // 12-bit color + transparency
 	MCFG_VIDEO_START_OVERRIDE( thomson_state, thom )
 
 /* sound */
 	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("buzzer", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
-	MCFG_DEVICE_ADD("dac", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC (6-bit game extension DAC)
+	MCFG_DEVICE_ADD("dac", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // 6-bit game extension R-2R DAC (R=10K)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "buzzer", 1.0, DAC_VREF_POS_INPUT)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
@@ -661,21 +658,13 @@ MACHINE_CONFIG_START(thomson_state::to7)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 /* cassette */
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(to7_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("to_cass")
-
-/* timer */
-	MCFG_DEVICE_ADD("mc6846", MC6846, 0)
-	MCFG_MC6846_OUT_PORT_CB(WRITE8(*this, thomson_state, to7_timer_port_out))
-	MCFG_MC6846_OUT_CP2_CB(WRITELINE("buzzer", dac_bit_interface, write))
-	MCFG_MC6846_IN_PORT_CB(READ8(*this, thomson_state, to7_timer_port_in))
-	MCFG_MC6846_OUT_CTO_CB(WRITELINE(*this, thomson_state, to7_set_cassette))
-	MCFG_MC6846_IRQ_CB(WRITELINE("mainirq", input_merger_device, in_w<0>))
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(to7_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_interface("to_cass");
 
 /* floppy */
-	MCFG_DEVICE_ADD("mc6843", MC6843, 0)
+	MCFG_DEVICE_ADD("mc6843", MC6843, 16_MHz_XTAL / 16 / 2)
 
 	MCFG_DEVICE_ADD(m_floppy_image[0], LEGACY_FLOPPY, 0)
 	MCFG_LEGACY_FLOPPY_CONFIG(thomson_floppy_interface)
@@ -690,61 +679,60 @@ MACHINE_CONFIG_START(thomson_state::to7)
 	MCFG_LEGACY_FLOPPY_CONFIG(thomson_floppy_interface)
 	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(*this, thomson_state, fdc_index_3_w))
 
-	MCFG_DEVICE_ADD("wd2793", WD2793, 1_MHz_XTAL)
-	MCFG_FLOPPY_DRIVE_ADD("wd2793:0", cd90_640_floppies, "dd", thomson_state::cd90_640_formats)
-	MCFG_FLOPPY_DRIVE_ADD("wd2793:1", cd90_640_floppies, "dd", thomson_state::cd90_640_formats)
+	WD2793(config, m_wd2793_fdc, 16_MHz_XTAL / 16);
+	FLOPPY_CONNECTOR(config, "wd2793:0", cd90_640_floppies, "dd", thomson_state::cd90_640_formats);
+	FLOPPY_CONNECTOR(config, "wd2793:1", cd90_640_floppies, "dd", thomson_state::cd90_640_formats);
 
 
 /* network */
-	MCFG_DEVICE_ADD("mc6854", MC6854, 0)
-	MCFG_MC6854_OUT_FRAME_CB(thomson_state, to7_network_got_frame)
+	MC6854(config, m_mc6854);
+	m_mc6854->set_out_frame_callback(FUNC(thomson_state::to7_network_got_frame));
 
 
 /* pia */
-	MCFG_DEVICE_ADD(THOM_PIA_SYS, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, thomson_state, to7_sys_porta_in))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, thomson_state, to7_sys_portb_in))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, thomson_state, to7_sys_portb_out))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, thomson_state, to7_set_cassette_motor))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, thomson_state, to7_sys_cb2_out))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE("mainfirq", input_merger_device, in_w<1>))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE("mainfirq", input_merger_device, in_w<1>))
+	PIA6821(config, m_pia_sys, 0);
+	m_pia_sys->readpa_handler().set(FUNC(thomson_state::to7_sys_porta_in));
+	m_pia_sys->readpb_handler().set(FUNC(thomson_state::to7_sys_portb_in));
+	m_pia_sys->writepb_handler().set(FUNC(thomson_state::to7_sys_portb_out));
+	m_pia_sys->ca2_handler().set(FUNC(thomson_state::to7_set_cassette_motor));
+	m_pia_sys->cb2_handler().set(FUNC(thomson_state::to7_sys_cb2_out));
+	m_pia_sys->irqa_handler().set("mainfirq", FUNC(input_merger_device::in_w<1>));
+	m_pia_sys->irqb_handler().set("mainfirq", FUNC(input_merger_device::in_w<1>));
 
-	MCFG_DEVICE_ADD(THOM_PIA_GAME, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, thomson_state, to7_game_porta_in))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, thomson_state, to7_game_portb_in))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, thomson_state, to7_game_portb_out))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, thomson_state, to7_game_cb2_out))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE("mainirq", input_merger_device, in_w<1>))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE("mainirq", input_merger_device, in_w<1>))
+	PIA6821(config, m_pia_game, 0);
+	m_pia_game->readpa_handler().set(FUNC(thomson_state::to7_game_porta_in));
+	m_pia_game->readpb_handler().set(FUNC(thomson_state::to7_game_portb_in));
+	m_pia_game->writepb_handler().set(FUNC(thomson_state::to7_game_portb_out));
+	m_pia_game->cb2_handler().set(FUNC(thomson_state::to7_game_cb2_out));
+	m_pia_game->irqa_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
+	m_pia_game->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
 
 /* TODO: CONVERT THIS TO A SLOT DEVICE (RF 57-932) */
-	MCFG_DEVICE_ADD("acia", MOS6551, 0)
-	MCFG_MOS6551_XTAL(1.8432_MHz_XTAL)
-	MCFG_MOS6551_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
+	mos6551_device &acia(MOS6551(config, "acia", 0));
+	acia.set_xtal(1.8432_MHz_XTAL);
+	acia.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 
 	/// 2400 7N2
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("acia", mos6551_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("acia", mos6551_device, write_dcd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("acia", mos6551_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("acia", mos6551_device, write_cts))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232.rxd_handler().set("acia", FUNC(mos6551_device::write_rxd));
+	rs232.dcd_handler().set("acia", FUNC(mos6551_device::write_dcd));
+	rs232.dsr_handler().set("acia", FUNC(mos6551_device::write_dsr));
+	rs232.cts_handler().set("acia", FUNC(mos6551_device::write_cts));
 
 
 /* TODO: CONVERT THIS TO A SLOT DEVICE (CC 90-232) */
-	MCFG_TO7_IO_LINE_ADD("to7_io")
+	TO7_IO_LINE(config, "to7_io", 0);
 
 
 /* TODO: CONVERT THIS TO A SLOT DEVICE (MD 90-120) */
-	MCFG_DEVICE_ADD(THOM_PIA_MODEM, PIA6821, 0)
+	PIA6821(config, THOM_PIA_MODEM, 0);
 
-	MCFG_DEVICE_ADD("acia6850", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, thomson_state, to7_modem_tx_w))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, thomson_state, to7_modem_cb))
+	ACIA6850(config, m_acia, 0);
+	m_acia->txd_handler().set(FUNC(thomson_state::to7_modem_tx_w));
+	m_acia->irq_handler().set(FUNC(thomson_state::to7_modem_cb));
 
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, 1200) /* 1200 bauds, might be divided by 16 */
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, thomson_state, write_acia_clock))
-
+	clock_device &acia_clock(CLOCK(config, "acia_clock", 1200)); /* 1200 bauds, might be divided by 16 */
+	acia_clock.signal_handler().set(FUNC(thomson_state::write_acia_clock));
 
 /* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "to_cart")
@@ -752,20 +740,32 @@ MACHINE_CONFIG_START(thomson_state::to7)
 	MCFG_GENERIC_LOAD(thomson_state, to7_cartridge)
 
 /* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("40K")
-	MCFG_RAM_EXTRA_OPTIONS("24K,48K")
+	RAM(config, m_ram).set_default_size("40K").set_extra_options("24K,48K");
 
 /* software lists */
-	MCFG_SOFTWARE_LIST_ADD("to7_cart_list","to7_cart")
-	MCFG_SOFTWARE_LIST_ADD("to7_cass_list","to7_cass")
-	MCFG_SOFTWARE_LIST_ADD("to_flop_list","to_flop")
-	MCFG_SOFTWARE_LIST_ADD("to7_qd_list","to7_qd")
+	SOFTWARE_LIST(config, "to7_cart_list").set_original("to7_cart");
+	SOFTWARE_LIST(config, "to7_cass_list").set_original("to7_cass");
+	SOFTWARE_LIST(config, "to_flop_list").set_original("to_flop");
+	SOFTWARE_LIST(config, "to7_qd_list").set_original("to7_qd");
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(thomson_state::t9000)
+void thomson_state::to7(machine_config &config)
+{
+	to7_base(config);
+
+	/* timer */
+	MC6846(config, m_mc6846, 16_MHz_XTAL / 16);
+	m_mc6846->out_port().set(FUNC(thomson_state::to7_timer_port_out));
+	m_mc6846->in_port().set(FUNC(thomson_state::to7_timer_port_in));
+	m_mc6846->cp2().set("buzzer", FUNC(dac_bit_interface::write));
+	m_mc6846->cto().set(FUNC(thomson_state::to7_set_cassette));
+	m_mc6846->irq().set("mainirq", FUNC(input_merger_device::in_w<0>));
+}
+
+void thomson_state::t9000(machine_config &config)
+{
 	to7(config);
-MACHINE_CONFIG_END
+}
 
 
 COMP( 1982, to7, 0, 0, to7, to7, thomson_state, empty_init, "Thomson", "TO7", 0 )
@@ -935,30 +935,26 @@ MACHINE_CONFIG_START(thomson_state::to770)
 	MCFG_DEVICE_MODIFY( "maincpu" )
 	MCFG_DEVICE_PROGRAM_MAP ( to770)
 
-	MCFG_DEVICE_MODIFY(THOM_PIA_SYS)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, thomson_state, to770_sys_porta_in))
-	MCFG_PIA_READPB_HANDLER(NOOP)
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, thomson_state, to770_sys_portb_out))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, thomson_state, to770_sys_cb2_out))
+	m_pia_sys->readpa_handler().set(FUNC(thomson_state::to770_sys_porta_in));
+	m_pia_sys->readpb_handler().set_constant(0);
+	m_pia_sys->writepb_handler().set(FUNC(thomson_state::to770_sys_portb_out));
+	m_pia_sys->cb2_handler().set(FUNC(thomson_state::to770_sys_cb2_out));
 
-	MCFG_DEVICE_MODIFY("mc6846")
-	MCFG_MC6846_OUT_PORT_CB(WRITE8(*this, thomson_state, to770_timer_port_out))
+	m_mc6846->out_port().set(FUNC(thomson_state::to770_timer_port_out));
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
-	MCFG_RAM_EXTRA_OPTIONS("64K")
+	m_ram->set_default_size("128K").set_extra_options("64K");
 
-	MCFG_DEVICE_REMOVE("to7_cart_list")
-	MCFG_SOFTWARE_LIST_ADD("t770_cart_list","to770_cart")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("to7_cart_list","to7_cart")
+	SOFTWARE_LIST(config, "t770_cart_list").set_original("to770_cart");
+	SOFTWARE_LIST(config.replace(), "to7_cart_list").set_compatible("to7_cart");
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(thomson_state::to770a)
+void thomson_state::to770a(machine_config &config)
+{
 	to770(config);
-	MCFG_DEVICE_REMOVE("t770_cart_list")
-	MCFG_SOFTWARE_LIST_ADD("t770a_cart_list","to770a_cart")
-MACHINE_CONFIG_END
+	config.device_remove("t770_cart_list");
+	SOFTWARE_LIST(config, "t770a_cart_list").set_original("to770a_cart");
+}
 
 COMP( 1984, to770, 0, 0, to770, to770, thomson_state, empty_init, "Thomson", "TO7/70", 0 )
 
@@ -1121,49 +1117,43 @@ INPUT_PORTS_END
 /* ------------ driver ------------ */
 
 MACHINE_CONFIG_START(thomson_state::mo5)
-	to7(config);
+	to7_base(config);
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, mo5 )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, mo5 )
 
 	MCFG_DEVICE_MODIFY( "maincpu" )
 	MCFG_DEVICE_PROGRAM_MAP ( mo5)
 
-	MCFG_CASSETTE_MODIFY( "cassette" )
-	MCFG_CASSETTE_FORMATS(mo5_cassette_formats)
-	MCFG_CASSETTE_INTERFACE("mo_cass")
+	m_cassette->set_formats(mo5_cassette_formats);
+	m_cassette->set_interface("mo_cass");
 
-	MCFG_DEVICE_REMOVE( "mc6846" )
+	subdevice<palette_device>("palette")->set_init(FUNC(thomson_state::mo5_palette));
 
-	MCFG_PALETTE_MODIFY( "palette" )
-	MCFG_PALETTE_INIT_OWNER(thomson_state, mo5)
+	m_pia_sys->readpa_handler().set(FUNC(thomson_state::mo5_sys_porta_in));
+	m_pia_sys->readpb_handler().set(FUNC(thomson_state::mo5_sys_portb_in));
+	m_pia_sys->writepa_handler().set(FUNC(thomson_state::mo5_sys_porta_out));
+	m_pia_sys->writepb_handler().set("buzzer", FUNC(dac_bit_interface::data_w));
+	m_pia_sys->ca2_handler().set(FUNC(thomson_state::mo5_set_cassette_motor));
+	m_pia_sys->cb2_handler().set_nop();
+	m_pia_sys->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<1>)); // WARNING: differs from TO7 !
 
-	MCFG_DEVICE_MODIFY(THOM_PIA_SYS)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, thomson_state, mo5_sys_porta_in))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, thomson_state, mo5_sys_portb_in))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, thomson_state, mo5_sys_porta_out))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8("buzzer", dac_bit_interface, data_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, thomson_state, mo5_set_cassette_motor))
-	MCFG_PIA_CB2_HANDLER(NOOP)
-	MCFG_PIA_IRQB_HANDLER(WRITELINE("mainirq", input_merger_device, in_w<1>)) // WARNING: differs from TO7 !
-
-	MCFG_DEVICE_REMOVE("cartslot")
+	config.device_remove("cartslot");
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "mo_cart")
 	MCFG_GENERIC_EXTENSIONS("m5,rom")
 	MCFG_GENERIC_LOAD(thomson_state, mo5_cartridge)
 
-	MCFG_DEVICE_REMOVE("to7_cart_list")
-	MCFG_DEVICE_REMOVE("to7_cass_list")
-	MCFG_DEVICE_REMOVE("to_flop_list")
-	MCFG_DEVICE_REMOVE("to7_qd_list")
+	config.device_remove("to7_cart_list");
+	config.device_remove("to7_cass_list");
+	config.device_remove("to_flop_list");
+	config.device_remove("to7_qd_list");
 
-	MCFG_SOFTWARE_LIST_ADD("mo5_cart_list","mo5_cart")
-	MCFG_SOFTWARE_LIST_ADD("mo5_cass_list","mo5_cass")
-	MCFG_SOFTWARE_LIST_ADD("mo5_flop_list","mo5_flop")
-	MCFG_SOFTWARE_LIST_ADD("mo5_qd_list","mo5_qd")
+	SOFTWARE_LIST(config, "mo5_cart_list").set_original("mo5_cart");
+	SOFTWARE_LIST(config, "mo5_cass_list").set_original("mo5_cass");
+	SOFTWARE_LIST(config, "mo5_flop_list").set_original("mo5_flop");
+	SOFTWARE_LIST(config, "mo5_qd_list").set_original("mo5_qd");
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("112K")
+	m_ram->set_default_size("112K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(thomson_state::mo5e)
@@ -1485,30 +1475,27 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(thomson_state::to9)
 	to7(config);
+
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, to9 )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, to9 )
 
 	MCFG_DEVICE_MODIFY( "maincpu" )
 	MCFG_DEVICE_PROGRAM_MAP ( to9)
 
-	MCFG_DEVICE_MODIFY(THOM_PIA_SYS)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, thomson_state, to9_sys_porta_in))
-	MCFG_PIA_READPB_HANDLER(NOOP)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, thomson_state, to9_sys_porta_out))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, thomson_state, to9_sys_portb_out))
-	MCFG_PIA_CB2_HANDLER(NOOP)
-	MCFG_PIA_IRQA_HANDLER(NOOP)
+	m_pia_sys->readpa_handler().set(FUNC(thomson_state::to9_sys_porta_in));
+	m_pia_sys->readpb_handler().set_constant(0);
+	m_pia_sys->writepa_handler().set(FUNC(thomson_state::to9_sys_porta_out));
+	m_pia_sys->writepb_handler().set(FUNC(thomson_state::to9_sys_portb_out));
+	m_pia_sys->cb2_handler().set_nop();
+	m_pia_sys->irqa_handler().set_nop();
 
-	MCFG_DEVICE_MODIFY("mc6846")
-	MCFG_MC6846_OUT_PORT_CB(WRITE8(*this, thomson_state, to9_timer_port_out))
+	m_mc6846->out_port().set(FUNC(thomson_state::to9_timer_port_out));
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, thomson_state, write_centronics_busy))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(thomson_state::write_centronics_busy));
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("192K")
-	MCFG_RAM_EXTRA_OPTIONS("128K")
+	m_ram->set_default_size("192K").set_extra_options("128K");
 MACHINE_CONFIG_END
 
 
@@ -1715,39 +1702,35 @@ MACHINE_CONFIG_START(thomson_state::to8)
 	MCFG_DEVICE_MODIFY( "maincpu" )
 	MCFG_DEVICE_PROGRAM_MAP ( to8)
 
-	MCFG_DEVICE_MODIFY(THOM_PIA_SYS)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, thomson_state, to8_sys_porta_in))
-	MCFG_PIA_READPB_HANDLER(NOOP)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, thomson_state, to9_sys_porta_out))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, thomson_state, to8_sys_portb_out))
-	MCFG_PIA_CB2_HANDLER(NOOP)
-	MCFG_PIA_IRQA_HANDLER(NOOP)
+	//MCFG_DEVICE_ADD("kbdmcu", MC6804, 11_MHz_XTAL)
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, thomson_state, write_centronics_busy))
+	m_pia_sys->readpa_handler().set(FUNC(thomson_state::to8_sys_porta_in));
+	m_pia_sys->readpb_handler().set_constant(0);
+	m_pia_sys->writepa_handler().set(FUNC(thomson_state::to9_sys_porta_out));
+	m_pia_sys->writepb_handler().set(FUNC(thomson_state::to8_sys_portb_out));
+	m_pia_sys->cb2_handler().set_nop();
+	m_pia_sys->irqa_handler().set_nop();
 
-	MCFG_DEVICE_MODIFY("mc6846")
-	MCFG_MC6846_OUT_PORT_CB(WRITE8(*this, thomson_state, to8_timer_port_out))
-	MCFG_MC6846_OUT_CP2_CB(WRITELINE(*this, thomson_state, to8_timer_cp2_out))
-	MCFG_MC6846_IN_PORT_CB(READ8(*this, thomson_state, to8_timer_port_in))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(thomson_state::write_centronics_busy));
+
+	m_mc6846->out_port().set(FUNC(thomson_state::to8_timer_port_out));
+	m_mc6846->in_port().set(FUNC(thomson_state::to8_timer_port_in));
+	m_mc6846->cp2().set(FUNC(thomson_state::to8_timer_cp2_out));
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
-	MCFG_RAM_EXTRA_OPTIONS("256K")
+	m_ram->set_default_size("512K").set_extra_options("256K");
 
-	MCFG_DEVICE_REMOVE("to7_cass_list")
-	MCFG_DEVICE_REMOVE("to7_qd_list")
-
-	MCFG_SOFTWARE_LIST_ADD("to8_cass_list", "to8_cass")
-	MCFG_SOFTWARE_LIST_ADD("to8_qd_list", "to8_qd")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("to7_cass_list", "to7_cass")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("to7_qd_list", "to7_qd")
+	SOFTWARE_LIST(config, "to8_cass_list").set_original("to8_cass");
+	SOFTWARE_LIST(config, "to8_qd_list").set_original("to8_qd");
+	SOFTWARE_LIST(config.replace(), "to7_cass_list").set_compatible("to7_cass");
+	SOFTWARE_LIST(config.replace(), "to7_qd_list").set_compatible("to7_qd");
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(thomson_state::to8d)
+void thomson_state::to8d(machine_config &config)
+{
 	to8(config);
-MACHINE_CONFIG_END
+}
 
 
 COMP( 1986, to8, 0, 0, to8, to8, thomson_state, empty_init, "Thomson", "TO8", 0 )
@@ -1881,34 +1864,28 @@ MACHINE_CONFIG_START(thomson_state::to9p)
 	MCFG_DEVICE_MODIFY( "maincpu" )
 	MCFG_DEVICE_PROGRAM_MAP ( to9p)
 
-	MCFG_DEVICE_MODIFY(THOM_PIA_SYS)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, thomson_state, to9_sys_porta_in))
-	MCFG_PIA_READPB_HANDLER(NOOP)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, thomson_state, to9_sys_porta_out))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, thomson_state, to8_sys_portb_out))
-	MCFG_PIA_CB2_HANDLER(NOOP)
-	MCFG_PIA_IRQA_HANDLER(NOOP)
-	MCFG_PIA_IRQB_HANDLER(WRITELINE("mainfirq", input_merger_device, in_w<1>))
+	m_pia_sys->readpa_handler().set(FUNC(thomson_state::to8_sys_porta_in));
+	m_pia_sys->readpb_handler().set_constant(0);
+	m_pia_sys->writepa_handler().set(FUNC(thomson_state::to9_sys_porta_out));
+	m_pia_sys->writepb_handler().set(FUNC(thomson_state::to8_sys_portb_out));
+	m_pia_sys->cb2_handler().set_nop();
+	m_pia_sys->irqa_handler().set_nop();
+	m_pia_sys->irqb_handler().set("mainfirq", FUNC(input_merger_device::in_w<1>));
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, thomson_state, write_centronics_busy))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(thomson_state::write_centronics_busy));
 
-	MCFG_DEVICE_MODIFY("mc6846")
-	MCFG_MC6846_OUT_PORT_CB(WRITE8(*this, thomson_state, to9p_timer_port_out))
-	MCFG_MC6846_OUT_CP2_CB(WRITELINE(*this, thomson_state, to8_timer_cp2_out))
-	MCFG_MC6846_IN_PORT_CB(READ8(*this, thomson_state, to9p_timer_port_in))
+	m_mc6846->out_port().set(FUNC(thomson_state::to9p_timer_port_out));
+	m_mc6846->in_port().set(FUNC(thomson_state::to9p_timer_port_in));
+	m_mc6846->cp2().set(FUNC(thomson_state::to8_timer_cp2_out));
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
+	m_ram->set_default_size("512K");
 
-	MCFG_DEVICE_REMOVE("to7_cass_list")
-	MCFG_DEVICE_REMOVE("to7_qd_list")
-
-	MCFG_SOFTWARE_LIST_ADD("to8_cass_list", "to8_cass")
-	MCFG_SOFTWARE_LIST_ADD("to8_qd_list", "to8_qd")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("to7_cass_list", "to7_cass")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("to7_qd_list", "to7_qd")
+	SOFTWARE_LIST(config, "to8_cass_list").set_original("to8_cass");
+	SOFTWARE_LIST(config, "to8_qd_list").set_original("to8_qd");
+	SOFTWARE_LIST(config.replace(), "to7_cass_list").set_compatible("to7_cass");
+	SOFTWARE_LIST(config.replace(), "to7_qd_list").set_compatible("to7_qd");
 MACHINE_CONFIG_END
 
 COMP( 1986, to9p, 0, 0, to9p, to9p, thomson_state, empty_init, "Thomson", "TO9+", 0 )
@@ -2223,74 +2200,70 @@ INPUT_PORTS_END
 /* ------------ driver ------------ */
 
 MACHINE_CONFIG_START(thomson_state::mo6)
-	to7(config);
+	to7_base(config);
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, mo6 )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, mo6 )
 
 	MCFG_DEVICE_MODIFY( "maincpu" )
 	MCFG_DEVICE_PROGRAM_MAP ( mo6)
 
-	MCFG_CASSETTE_MODIFY( "cassette" )
-	MCFG_CASSETTE_FORMATS(mo5_cassette_formats)
-	MCFG_CASSETTE_INTERFACE("mo_cass")
+	m_cassette->set_formats(mo5_cassette_formats);
+	m_cassette->set_interface("mo_cass");
 
-	MCFG_DEVICE_REMOVE( "mc6846" )
+	m_pia_sys->readpa_handler().set(FUNC(thomson_state::mo6_sys_porta_in));
+	m_pia_sys->readpb_handler().set(FUNC(thomson_state::mo6_sys_portb_in));
+	m_pia_sys->writepa_handler().set(FUNC(thomson_state::mo6_sys_porta_out));
+	m_pia_sys->writepb_handler().set("buzzer", FUNC(dac_bit_interface::data_w));
+	m_pia_sys->ca2_handler().set(FUNC(thomson_state::mo5_set_cassette_motor));
+	m_pia_sys->cb2_handler().set(FUNC(thomson_state::mo6_sys_cb2_out));
+	m_pia_sys->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<1>)); // differs from TO
 
-	MCFG_DEVICE_MODIFY(THOM_PIA_SYS)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, thomson_state, mo6_sys_porta_in))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, thomson_state, mo6_sys_portb_in))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, thomson_state, mo6_sys_porta_out))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8("buzzer", dac_bit_interface, data_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, thomson_state, mo5_set_cassette_motor))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, thomson_state, mo6_sys_cb2_out))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE("mainirq", input_merger_device, in_w<1>)) // differs from TO
+	m_pia_game->writepa_handler().set(FUNC(thomson_state::mo6_game_porta_out));
+	m_pia_game->cb2_handler().set(FUNC(thomson_state::mo6_game_cb2_out));
 
-	MCFG_DEVICE_MODIFY(THOM_PIA_GAME)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, thomson_state, mo6_game_porta_out))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, thomson_state, mo6_game_cb2_out))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(thomson_state::write_centronics_busy));
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, thomson_state, write_centronics_busy))
+	OUTPUT_LATCH(config, m_cent_data_out);
+	m_centronics->set_output_latch(*m_cent_data_out);
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
-
-	MCFG_DEVICE_REMOVE("cartslot")
+	config.device_remove("cartslot");
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "mo_cart")
 	MCFG_GENERIC_EXTENSIONS("m5,rom")
 	MCFG_GENERIC_LOAD(thomson_state, mo5_cartridge)
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
+	m_ram->set_default_size("128K");
 
-	MCFG_DEVICE_REMOVE("to7_cart_list")
-	MCFG_DEVICE_REMOVE("to7_cass_list")
-	MCFG_DEVICE_REMOVE("to_flop_list")
-	MCFG_DEVICE_REMOVE("to7_qd_list")
+	config.device_remove("to7_cart_list");
+	config.device_remove("to7_cass_list");
+	config.device_remove("to_flop_list");
+	config.device_remove("to7_qd_list");
 
-	MCFG_SOFTWARE_LIST_ADD("mo6_cass_list","mo6_cass")
-	MCFG_SOFTWARE_LIST_ADD("mo6_flop_list","mo6_flop")
+	SOFTWARE_LIST(config, "mo6_cass_list").set_original("mo6_cass");
+	SOFTWARE_LIST(config, "mo6_flop_list").set_original("mo6_flop");
 
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("mo5_cart_list","mo5_cart")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("mo5_cass_list","mo5_cass")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("mo5_flop_list","mo5_flop")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("mo5_qd_list","mo5_qd")
+	SOFTWARE_LIST(config, "mo5_cart_list").set_compatible("mo5_cart");
+	SOFTWARE_LIST(config, "mo5_cass_list").set_compatible("mo5_cass");
+	SOFTWARE_LIST(config, "mo5_flop_list").set_compatible("mo5_flop");
+	SOFTWARE_LIST(config, "mo5_qd_list").set_compatible("mo5_qd");
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(thomson_state::pro128)
+void thomson_state::pro128(machine_config &config)
+{
 	mo6(config);
-	MCFG_DEVICE_REMOVE("mo6_cass_list")
-	MCFG_DEVICE_REMOVE("mo6_flop_list")
+	config.device_remove("mo6_cass_list");
+	config.device_remove("mo6_flop_list");
 
-	MCFG_DEVICE_REMOVE("mo5_cart_list")
-	MCFG_DEVICE_REMOVE("mo5_cass_list")
-	MCFG_DEVICE_REMOVE("mo5_flop_list")
-	MCFG_DEVICE_REMOVE("mo5_qd_list")
+	config.device_remove("mo5_cart_list");
+	config.device_remove("mo5_cass_list");
+	config.device_remove("mo5_flop_list");
+	config.device_remove("mo5_qd_list");
 
-	MCFG_SOFTWARE_LIST_ADD("p128_cart_list","pro128_cart")
-	MCFG_SOFTWARE_LIST_ADD("p128_cass_list","pro128_cass")
-	MCFG_SOFTWARE_LIST_ADD("p128_flop_list","pro128_flop")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "p128_cart_list").set_original("pro128_cart");
+	SOFTWARE_LIST(config, "p128_cass_list").set_original("pro128_cass");
+	SOFTWARE_LIST(config, "p128_flop_list").set_original("pro128_flop");
+}
 
 COMP( 1986, mo6, 0, 0, mo6, mo6, thomson_state, empty_init, "Thomson", "MO6", 0 )
 
@@ -2493,59 +2466,55 @@ INPUT_PORTS_END
 /* ------------ driver ------------ */
 
 MACHINE_CONFIG_START(thomson_state::mo5nr)
-	to7(config);
+	to7_base(config);
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, mo5nr )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, mo5nr )
 
 	MCFG_DEVICE_MODIFY( "maincpu" )
 	MCFG_DEVICE_PROGRAM_MAP ( mo5nr)
 
-	MCFG_CASSETTE_MODIFY( "cassette" )
-	MCFG_CASSETTE_FORMATS(mo5_cassette_formats)
-	MCFG_CASSETTE_INTERFACE("mo_cass")
+	m_cassette->set_formats(mo5_cassette_formats);
+	m_cassette->set_interface("mo_cass");
 
-	MCFG_DEVICE_REMOVE( "mc6846" )
+	m_pia_sys->readpa_handler().set(FUNC(thomson_state::mo6_sys_porta_in));
+	m_pia_sys->readpb_handler().set(FUNC(thomson_state::mo5nr_sys_portb_in));
+	m_pia_sys->writepa_handler().set(FUNC(thomson_state::mo5nr_sys_porta_out));
+	m_pia_sys->writepb_handler().set("buzzer", FUNC(dac_bit_interface::data_w));
+	m_pia_sys->ca2_handler().set(FUNC(thomson_state::mo5_set_cassette_motor));
+	m_pia_sys->cb2_handler().set(FUNC(thomson_state::mo6_sys_cb2_out));
+	m_pia_sys->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<1>)); // differs from TO
 
-	MCFG_DEVICE_MODIFY(THOM_PIA_SYS)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, thomson_state, mo6_sys_porta_in))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, thomson_state, mo5nr_sys_portb_in))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, thomson_state, mo5nr_sys_porta_out))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8("buzzer", dac_bit_interface, data_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, thomson_state, mo5_set_cassette_motor))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, thomson_state, mo6_sys_cb2_out))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE("mainirq", input_merger_device, in_w<1>)) // differs from TO
+	m_pia_game->writepa_handler().set(FUNC(thomson_state::mo6_game_porta_out));
 
-	MCFG_DEVICE_MODIFY(THOM_PIA_GAME)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, thomson_state, mo6_game_porta_out))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->set_data_input_buffer("cent_data_in");
+	m_centronics->busy_handler().set(FUNC(thomson_state::write_centronics_busy));
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_DATA_INPUT_BUFFER("cent_data_in")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, thomson_state, write_centronics_busy))
+	INPUT_BUFFER(config, "cent_data_in");
 
-	MCFG_DEVICE_ADD("cent_data_in", INPUT_BUFFER, 0)
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	OUTPUT_LATCH(config, m_cent_data_out);
+	m_centronics->set_output_latch(*m_cent_data_out);
 
-	MCFG_DEVICE_REMOVE("cartslot")
+	config.device_remove("cartslot");
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "mo_cart")
 	MCFG_GENERIC_EXTENSIONS("m5,rom")
 	MCFG_GENERIC_LOAD(thomson_state, mo5_cartridge)
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
+	m_ram->set_default_size("128K");
 
-	MCFG_DEVICE_REMOVE("to7_cart_list")
-	MCFG_DEVICE_REMOVE("to7_cass_list")
-	MCFG_DEVICE_REMOVE("to_flop_list")
-	MCFG_DEVICE_REMOVE("to7_qd_list")
+	config.device_remove("to7_cart_list");
+	config.device_remove("to7_cass_list");
+	config.device_remove("to_flop_list");
+	config.device_remove("to7_qd_list");
 
-	MCFG_SOFTWARE_LIST_ADD("mo6_cass_list","mo6_cass")
-	MCFG_SOFTWARE_LIST_ADD("mo6_flop_list","mo6_flop")
+	SOFTWARE_LIST(config, "mo6_cass_list").set_original("mo6_cass");
+	SOFTWARE_LIST(config, "mo6_flop_list").set_original("mo6_flop");
 
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("mo5_cart_list","mo5_cart")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("mo5_cass_list","mo5_cass")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("mo5_flop_list","mo5_flop")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("mo5_qd_list","mo5_qd")
+	SOFTWARE_LIST(config, "mo5_cart_list").set_compatible("mo5_cart");
+	SOFTWARE_LIST(config, "mo5_cass_list").set_compatible("mo5_cass");
+	SOFTWARE_LIST(config, "mo5_flop_list").set_compatible("mo5_flop");
+	SOFTWARE_LIST(config, "mo5_qd_list").set_compatible("mo5_qd");
 MACHINE_CONFIG_END
 
 COMP( 1986, mo5nr, 0, 0, mo5nr, mo5nr, thomson_state, empty_init, "Thomson", "MO5 NR", 0 )

@@ -107,9 +107,6 @@ public:
 	DECLARE_WRITE8_MEMBER(bml3_firq_mask_w);
 	DECLARE_READ8_MEMBER(bml3_firq_status_r);
 	DECLARE_WRITE8_MEMBER(relay_w);
-	DECLARE_WRITE_LINE_MEMBER(bml3bus_nmi_w);
-	DECLARE_WRITE_LINE_MEMBER(bml3bus_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(bml3bus_firq_w);
 	DECLARE_WRITE_LINE_MEMBER(bml3_acia_tx_w);
 	DECLARE_WRITE_LINE_MEMBER(bml3_acia_rts_w);
 	DECLARE_WRITE_LINE_MEMBER(bml3_acia_irq_w);
@@ -305,14 +302,14 @@ READ8_MEMBER(bml3_state::bml3_ym2203_r)
 {
 	u8 dev_offs = ((m_psg_latch & 3) != 3);
 
-	return m_ym2203->read(space, dev_offs);
+	return m_ym2203->read(dev_offs);
 }
 
 WRITE8_MEMBER(bml3_state::bml3_ym2203_w)
 {
 	u8 dev_offs = ((m_psg_latch & 3) != 3);
 
-	m_ym2203->write(space, dev_offs, data);
+	m_ym2203->write(dev_offs, data);
 }
 
 READ8_MEMBER( bml3_state::bml3_vram_attr_r)
@@ -384,21 +381,6 @@ READ8_MEMBER( bml3_state::bml3_firq_status_r )
 	m_firq_status = 0;
 	m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 	return res;
-}
-
-WRITE_LINE_MEMBER(bml3_state::bml3bus_nmi_w)
-{
-	m_maincpu->set_input_line(INPUT_LINE_NMI, state);
-}
-
-WRITE_LINE_MEMBER(bml3_state::bml3bus_irq_w)
-{
-	m_maincpu->set_input_line(M6809_IRQ_LINE, state);
-}
-
-WRITE_LINE_MEMBER(bml3_state::bml3bus_firq_w)
-{
-	m_maincpu->set_input_line(M6809_FIRQ_LINE, state);
 }
 
 
@@ -949,18 +931,6 @@ TIMER_DEVICE_CALLBACK_MEMBER( bml3_state::bml3_c )
 		m_cass->output(BIT(m_cass_data[3], 1) ? -1.0 : +1.0); // 1200Hz
 }
 
-#if 0
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NOOP, // read A
-	DEVCB_NOOP, // read B
-	DEVCB_NOOP, // write A
-	DEVCB_NOOP  // write B
-};
-#endif
-
 static void bml3_cards(device_slot_interface &device)
 {
 	device.option_add("bml3mp1802", BML3BUS_MP1802); // MP-1802 Floppy Controller Card
@@ -971,7 +941,7 @@ static void bml3_cards(device_slot_interface &device)
 
 MACHINE_CONFIG_START(bml3_state::bml3_common)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",M6809, CPU_CLOCK)
+	MCFG_DEVICE_ADD(m_maincpu, MC6809, CPU_EXT_CLOCK)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bml3_state,  bml3_timer_firq)
 //  MCFG_DEVICE_PERIODIC_INT_DRIVER(bml3_state, bml3_firq, 45)
 
@@ -984,34 +954,35 @@ MACHINE_CONFIG_START(bml3_state::bml3_common)
 	MCFG_SCREEN_SIZE(640, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
-	MCFG_PALETTE_ADD_3BIT_BRG("palette")
+	PALETTE(config, m_palette, palette_device::BRG_3BIT);
 
 	/* Devices */
 	// CRTC clock should be synchronous with the CPU clock.
-	MCFG_MC6845_ADD("crtc", H46505, "screen", CPU_CLOCK)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(bml3_state, crtc_update_row)
+	H46505(config, m_crtc, CPU_CLOCK);
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(bml3_state::crtc_update_row), this);
 
 	// fire once per scan of an individual key
 	// According to the service manual (p.65), the keyboard timer is driven by the horizontal video sync clock.
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", bml3_state, keyboard_callback, attotime::from_hz(H_CLOCK/2))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("bml3_c", bml3_state, bml3_c, attotime::from_hz(4800))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("bml3_p", bml3_state, bml3_p, attotime::from_hz(40000))
+	TIMER(config, "keyboard_timer").configure_periodic(FUNC(bml3_state::keyboard_callback), attotime::from_hz(H_CLOCK/2));
+	TIMER(config, "bml3_c").configure_periodic(FUNC(bml3_state::bml3_c), attotime::from_hz(4800));
+	TIMER(config, "bml3_p").configure_periodic(FUNC(bml3_state::bml3_p), attotime::from_hz(40000));
 
-	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, bml3_state, bml3_piaA_w))
+	pia6821_device &pia(PIA6821(config, "pia", 0));
+	pia.writepa_handler().set(FUNC(bml3_state::bml3_piaA_w));
 
-	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, bml3_state, bml3_acia_tx_w))
-	MCFG_ACIA6850_RTS_HANDLER(WRITELINE(*this, bml3_state, bml3_acia_rts_w))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, bml3_state, bml3_acia_irq_w))
+	ACIA6850(config, m_acia, 0);
+	m_acia->txd_handler().set(FUNC(bml3_state::bml3_acia_tx_w));
+	m_acia->rts_handler().set(FUNC(bml3_state::bml3_acia_rts_w));
+	m_acia->irq_handler().set(FUNC(bml3_state::bml3_acia_irq_w));
 
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, 9600) // 600 baud x 16(divider) = 9600
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("acia", acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia", acia6850_device, write_rxc))
+	clock_device &acia_clock(CLOCK(config, "acia_clock", 9'600)); // 600 baud x 16(divider) = 9600
+	acia_clock.signal_handler().set(m_acia, FUNC(acia6850_device::write_txc));
+	acia_clock.signal_handler().append(m_acia, FUNC(acia6850_device::write_rxc));
 
-	MCFG_CASSETTE_ADD( "cassette" )
+	CASSETTE(config, m_cass);
 
 	/* Audio */
 	SPEAKER(config, "mono").front_center();
@@ -1019,11 +990,11 @@ MACHINE_CONFIG_START(bml3_state::bml3_common)
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* slot devices */
-	MCFG_DEVICE_ADD("bml3bus", BML3BUS, 0)
-	MCFG_BML3BUS_CPU("maincpu")
-	MCFG_BML3BUS_OUT_NMI_CB(WRITELINE(*this, bml3_state, bml3bus_nmi_w))
-	MCFG_BML3BUS_OUT_IRQ_CB(WRITELINE(*this, bml3_state, bml3bus_irq_w))
-	MCFG_BML3BUS_OUT_FIRQ_CB(WRITELINE(*this, bml3_state, bml3bus_firq_w))
+	bml3bus_device &bus(BML3BUS(config, "bml3bus", 0));
+	bus.set_space(m_maincpu, AS_PROGRAM);
+	bus.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	bus.irq_callback().set_inputline(m_maincpu, M6809_IRQ_LINE);
+	bus.firq_callback().set_inputline(m_maincpu, M6809_FIRQ_LINE);
 	/* Default to MP-1805 disk (3" or 5.25" SS/SD), as our MB-6892 ROM dump includes
 	   the MP-1805 ROM.
 	   User may want to switch this to MP-1802 (5.25" DS/DD).
@@ -1046,12 +1017,12 @@ MACHINE_CONFIG_START(bml3_state::bml3)
 #if 0
 	// TODO: slot device for sound card
 	// audio
-	MCFG_DEVICE_ADD("ym2203", YM2203, 2000000) //unknown clock / divider
-	MCFG_YM2203_AY8910_INTF(&ay8910_config)
-	MCFG_SOUND_ROUTE(0, "mono", 0.25)
-	MCFG_SOUND_ROUTE(1, "mono", 0.25)
-	MCFG_SOUND_ROUTE(2, "mono", 0.50)
-	MCFG_SOUND_ROUTE(3, "mono", 0.50)
+	YM2203(config, m_ym2203, 2000000); //unknown clock / divider
+	m_ym2203->set_flags(AY8910_LEGACY_OUTPUT);
+	m_ym2203->add_route(0, "mono", 0.25);
+	m_ym2203->add_route(1, "mono", 0.25);
+	m_ym2203->add_route(2, "mono", 0.50);
+	m_ym2203->add_route(3, "mono", 0.50);
 #endif
 MACHINE_CONFIG_END
 

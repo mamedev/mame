@@ -82,7 +82,7 @@ WRITE8_MEMBER(novag68k_state::diablo68k_control_w)
 	// d0: HD44780 E
 	// d1: HD44780 RS
 	if (m_lcd_control & ~data & 1)
-		m_lcd->write(space, m_lcd_control >> 1 & 1, m_lcd_data);
+		m_lcd->write(m_lcd_control >> 1 & 1, m_lcd_data);
 	m_lcd_control = data & 3;
 
 	// d7: enable beeper
@@ -130,7 +130,7 @@ WRITE8_MEMBER(novag68k_state::scorpio68k_control_w)
 	// d0: HD44780 E
 	// d1: HD44780 RS
 	if (m_lcd_control & ~data & 1)
-		m_lcd->write(space, m_lcd_control >> 1 & 1, m_lcd_data);
+		m_lcd->write(m_lcd_control >> 1 & 1, m_lcd_data);
 	m_lcd_control = data & 3;
 
 	// d7: enable beeper
@@ -240,14 +240,15 @@ MACHINE_CONFIG_START(novag68k_state::diablo68k)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(diablo68k_map)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", novag68k_state, irq_on, attotime::from_hz(32.768_kHz_XTAL/128)) // 256Hz
-	MCFG_TIMER_START_DELAY(attotime::from_hz(32.768_kHz_XTAL/128) - attotime::from_nsec(1100)) // active for 1.1us
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", novag68k_state, irq_off, attotime::from_hz(32.768_kHz_XTAL/128))
+	timer_device &irq_on(TIMER(config, "irq_on"));
+	irq_on.configure_periodic(FUNC(novag68k_state::irq_on), attotime::from_hz(32.768_kHz_XTAL/128)); // 256Hz
+	irq_on.set_start_delay(attotime::from_hz(32.768_kHz_XTAL/128) - attotime::from_nsec(1100)); // active for 1.1us
+	TIMER(config, "irq_off").configure_periodic(FUNC(novag68k_state::irq_off), attotime::from_hz(32.768_kHz_XTAL/128));
 
-	MCFG_DEVICE_ADD("acia", MOS6551, 0)
-	MCFG_MOS6551_XTAL(1.8432_MHz_XTAL)
+	mos6551_device &acia(MOS6551(config, "acia", 0));
+	acia.set_xtal(1.8432_MHz_XTAL);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -257,20 +258,19 @@ MACHINE_CONFIG_START(novag68k_state::diablo68k)
 	MCFG_SCREEN_VISIBLE_AREA(0, 6*16, 0, 10-1)
 	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_PALETTE_ADD("palette", 3)
-	MCFG_PALETTE_INIT_OWNER(novagbase_state, novag_lcd)
+	PALETTE(config, "palette", FUNC(novag68k_state::novag_lcd_palette), 3);
 
-	MCFG_HD44780_ADD("hd44780")
-	MCFG_HD44780_LCD_SIZE(2, 8)
-	MCFG_HD44780_PIXEL_UPDATE_CB(novagbase_state, novag_lcd_pixel_update)
+	HD44780(config, m_lcd, 0);
+	m_lcd->set_lcd_size(2, 8);
+	m_lcd->set_pixel_update_cb(FUNC(novag68k_state::novag_lcd_pixel_update), this);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", novagbase_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_novag_diablo68k)
+	TIMER(config, "display_decay").configure_periodic(FUNC(novag68k_state::display_decay_tick), attotime::from_msec(1));
+	config.set_default_layout(layout_novag_diablo68k);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("beeper", BEEP, 32.768_kHz_XTAL/32) // 1024Hz
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	BEEP(config, m_beeper, 32.768_kHz_XTAL/32); // 1024Hz
+	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(novag68k_state::scorpio68k)
@@ -280,7 +280,7 @@ MACHINE_CONFIG_START(novag68k_state::scorpio68k)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(scorpio68k_map)
 
-	MCFG_DEFAULT_LAYOUT(layout_novag_scorpio68k)
+	config.set_default_layout(layout_novag_scorpio68k);
 MACHINE_CONFIG_END
 
 

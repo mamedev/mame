@@ -1046,7 +1046,7 @@ MACHINE_CONFIG_START(snookr10_state::snookr10)
 	MCFG_DEVICE_ADD("maincpu", M65SC02, MASTER_CLOCK/8)    /* 2 MHz (1.999 MHz measured) */
 	MCFG_DEVICE_PROGRAM_MAP(snookr10_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 
@@ -1060,8 +1060,7 @@ MACHINE_CONFIG_START(snookr10_state::snookr10)
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_snookr10)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(snookr10_state, snookr10)
+	PALETTE(config, "palette", FUNC(snookr10_state::snookr10_palette), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1077,8 +1076,7 @@ MACHINE_CONFIG_START(snookr10_state::apple10)
 	MCFG_DEVICE_MODIFY("maincpu")
 
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(snookr10_state, apple10)
+	subdevice<palette_device>("palette")->set_init(FUNC(snookr10_state::apple10_palette));
 	MCFG_VIDEO_START_OVERRIDE(snookr10_state, apple10)
 
 MACHINE_CONFIG_END
@@ -1099,8 +1097,7 @@ MACHINE_CONFIG_START(snookr10_state::crystalc)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(crystalc_map)
 
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(snookr10_state, crystalc)
+	subdevice<palette_device>("palette")->set_init(FUNC(snookr10_state::crystalc_palette));
 	MCFG_VIDEO_START_OVERRIDE(snookr10_state, crystalc)
 
 MACHINE_CONFIG_END

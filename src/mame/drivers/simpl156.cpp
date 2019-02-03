@@ -229,10 +229,10 @@ void simpl156_state::joemacr_map(address_map &map)
 	map(0x110000, 0x111fff).rw(FUNC(simpl156_state::simpl156_spriteram_r), FUNC(simpl156_state::simpl156_spriteram_w));
 	map(0x120000, 0x120fff).rw(m_palette, FUNC(palette_device::read16), FUNC(palette_device::write16)).umask32(0x0000ffff).share("palette");
 	map(0x130000, 0x130003).portr("IN1").w(FUNC(simpl156_state::simpl156_eeprom_w));
-	map(0x140000, 0x14001f).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
-	map(0x150000, 0x151fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
-	map(0x152000, 0x153fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
-	map(0x154000, 0x155fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w));
+	map(0x140000, 0x14001f).rw(m_deco_tilegen, FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
+	map(0x150000, 0x151fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
+	map(0x152000, 0x153fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
+	map(0x154000, 0x155fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w));
 	map(0x160000, 0x161fff).rw(FUNC(simpl156_state::simpl156_pf1_rowscroll_r), FUNC(simpl156_state::simpl156_pf1_rowscroll_w));
 	map(0x164000, 0x165fff).rw(FUNC(simpl156_state::simpl156_pf2_rowscroll_r), FUNC(simpl156_state::simpl156_pf2_rowscroll_w));
 	map(0x170000, 0x170003).readonly().nopw(); // ?
@@ -255,10 +255,10 @@ void simpl156_state::chainrec_map(address_map &map)
 	map(0x410000, 0x411fff).rw(FUNC(simpl156_state::simpl156_spriteram_r), FUNC(simpl156_state::simpl156_spriteram_w));
 	map(0x420000, 0x420fff).rw(m_palette, FUNC(palette_device::read16), FUNC(palette_device::write16)).umask32(0x0000ffff).share("palette");
 	map(0x430000, 0x430003).portr("IN1").w(FUNC(simpl156_state::simpl156_eeprom_w));
-	map(0x440000, 0x44001f).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
-	map(0x450000, 0x451fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
-	map(0x452000, 0x453fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
-	map(0x454000, 0x455fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w));
+	map(0x440000, 0x44001f).rw(m_deco_tilegen, FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
+	map(0x450000, 0x451fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
+	map(0x452000, 0x453fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
+	map(0x454000, 0x455fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w));
 	map(0x460000, 0x461fff).rw(FUNC(simpl156_state::simpl156_pf1_rowscroll_r), FUNC(simpl156_state::simpl156_pf1_rowscroll_w));
 	map(0x464000, 0x465fff).rw(FUNC(simpl156_state::simpl156_pf2_rowscroll_r), FUNC(simpl156_state::simpl156_pf2_rowscroll_w));
 	map(0x470000, 0x470003).readonly().nopw(); // ??
@@ -278,10 +278,10 @@ void simpl156_state::magdrop_map(address_map &map)
 	map(0x390000, 0x391fff).rw(FUNC(simpl156_state::simpl156_spriteram_r), FUNC(simpl156_state::simpl156_spriteram_w));
 	map(0x3a0000, 0x3a0fff).rw(m_palette, FUNC(palette_device::read16), FUNC(palette_device::write16)).umask32(0x0000ffff).share("palette");
 	map(0x3b0000, 0x3b0003).portr("IN1").w(FUNC(simpl156_state::simpl156_eeprom_w));
-	map(0x3c0000, 0x3c001f).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
-	map(0x3d0000, 0x3d1fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
-	map(0x3d2000, 0x3d3fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
-	map(0x3d4000, 0x3d5fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w));
+	map(0x3c0000, 0x3c001f).rw(m_deco_tilegen, FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
+	map(0x3d0000, 0x3d1fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
+	map(0x3d2000, 0x3d3fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
+	map(0x3d4000, 0x3d5fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w));
 	map(0x3e0000, 0x3e1fff).rw(FUNC(simpl156_state::simpl156_pf1_rowscroll_r), FUNC(simpl156_state::simpl156_pf1_rowscroll_w));
 	map(0x3e4000, 0x3e5fff).rw(FUNC(simpl156_state::simpl156_pf2_rowscroll_r), FUNC(simpl156_state::simpl156_pf2_rowscroll_w));
 	map(0x3f0000, 0x3f0003).readonly().nopw(); //?
@@ -301,10 +301,10 @@ void simpl156_state::magdropp_map(address_map &map)
 	map(0x690000, 0x691fff).rw(FUNC(simpl156_state::simpl156_spriteram_r), FUNC(simpl156_state::simpl156_spriteram_w));
 	map(0x6a0000, 0x6a0fff).rw(m_palette, FUNC(palette_device::read16), FUNC(palette_device::write16)).umask32(0x0000ffff).share("palette");
 	map(0x6b0000, 0x6b0003).portr("IN1").w(FUNC(simpl156_state::simpl156_eeprom_w));
-	map(0x6c0000, 0x6c001f).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
-	map(0x6d0000, 0x6d1fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
-	map(0x6d2000, 0x6d3fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
-	map(0x6d4000, 0x6d5fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w));
+	map(0x6c0000, 0x6c001f).rw(m_deco_tilegen, FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
+	map(0x6d0000, 0x6d1fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
+	map(0x6d2000, 0x6d3fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
+	map(0x6d4000, 0x6d5fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w));
 	map(0x6e0000, 0x6e1fff).rw(FUNC(simpl156_state::simpl156_pf1_rowscroll_r), FUNC(simpl156_state::simpl156_pf1_rowscroll_w));
 	map(0x6e4000, 0x6e5fff).rw(FUNC(simpl156_state::simpl156_pf2_rowscroll_r), FUNC(simpl156_state::simpl156_pf2_rowscroll_w));
 	map(0x6f0000, 0x6f0003).readonly().nopw(); // ?
@@ -323,10 +323,10 @@ void simpl156_state::mitchell156_map(address_map &map)
 	map(0x190000, 0x191fff).rw(FUNC(simpl156_state::simpl156_spriteram_r), FUNC(simpl156_state::simpl156_spriteram_w));
 	map(0x1a0000, 0x1a0fff).rw(m_palette, FUNC(palette_device::read16), FUNC(palette_device::write16)).umask32(0x0000ffff).share("palette");
 	map(0x1b0000, 0x1b0003).portr("IN1").w(FUNC(simpl156_state::simpl156_eeprom_w));
-	map(0x1c0000, 0x1c001f).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
-	map(0x1d0000, 0x1d1fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
-	map(0x1d2000, 0x1d3fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
-	map(0x1d4000, 0x1d5fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w));
+	map(0x1c0000, 0x1c001f).rw(m_deco_tilegen, FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
+	map(0x1d0000, 0x1d1fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
+	map(0x1d2000, 0x1d3fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
+	map(0x1d4000, 0x1d5fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w));
 	map(0x1e0000, 0x1e1fff).rw(FUNC(simpl156_state::simpl156_pf1_rowscroll_r), FUNC(simpl156_state::simpl156_pf1_rowscroll_w));
 	map(0x1e4000, 0x1e5fff).rw(FUNC(simpl156_state::simpl156_pf2_rowscroll_r), FUNC(simpl156_state::simpl156_pf2_rowscroll_w));
 	map(0x1f0000, 0x1f0003).readonly().nopw(); // ?
@@ -408,7 +408,7 @@ MACHINE_CONFIG_START(simpl156_state::chainrec)
 	MCFG_DEVICE_PROGRAM_MAP(chainrec_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", simpl156_state,  simpl156_vbl_interrupt)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)  // 93C45
+	EEPROM_93C46_16BIT(config, "eeprom");  // 93C45
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -417,34 +417,34 @@ MACHINE_CONFIG_START(simpl156_state::chainrec)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(simpl156_state, screen_update_simpl156)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_MEMBITS(16)
+	PALETTE(config, m_palette);
+	m_palette->set_format(palette_device::xBGR_555, 4096);
+	m_palette->set_membits(16);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_simpl156)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_simpl156)
 
-	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
-	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF1_COL_BANK(0x00)
-	MCFG_DECO16IC_PF2_COL_BANK(0x10)
-	MCFG_DECO16IC_PF1_COL_MASK(0x0f)
-	MCFG_DECO16IC_PF2_COL_MASK(0x0f)
-	MCFG_DECO16IC_BANK1_CB(simpl156_state, bank_callback)
-	MCFG_DECO16IC_BANK2_CB(simpl156_state, bank_callback)
-	MCFG_DECO16IC_PF12_8X8_BANK(0)
-	MCFG_DECO16IC_PF12_16X16_BANK(1)
-	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	DECO16IC(config, m_deco_tilegen, 0);
+	m_deco_tilegen->set_split(0);
+	m_deco_tilegen->set_pf1_size(DECO_64x32);
+	m_deco_tilegen->set_pf2_size(DECO_64x32);
+	m_deco_tilegen->set_pf1_trans_mask(0x0f);
+	m_deco_tilegen->set_pf2_trans_mask(0x0f);
+	m_deco_tilegen->set_pf1_col_bank(0x00);
+	m_deco_tilegen->set_pf2_col_bank(0x10);
+	m_deco_tilegen->set_pf1_col_mask(0x0f);
+	m_deco_tilegen->set_pf2_col_mask(0x0f);
+	m_deco_tilegen->set_bank1_callback(FUNC(simpl156_state::bank_callback), this);
+	m_deco_tilegen->set_bank2_callback(FUNC(simpl156_state::bank_callback), this);
+	m_deco_tilegen->set_pf12_8x8_bank(0);
+	m_deco_tilegen->set_pf12_16x16_bank(1);
+	m_deco_tilegen->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
-	MCFG_DECO_SPRITE_GFX_REGION(2)
-	MCFG_DECO_SPRITE_PRIORITY_CB(simpl156_state, pri_callback)
-	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+	DECO_SPRITE(config, m_sprgen, 0);
+	m_sprgen->set_gfx_region(2);
+	m_sprgen->set_pri_callback(FUNC(simpl156_state::pri_callback), this);
+	m_sprgen->set_gfxdecode_tag("gfxdecode");
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

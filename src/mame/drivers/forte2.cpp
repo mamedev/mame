@@ -61,8 +61,8 @@ private:
 	void io_mem(address_map &map);
 	void program_mem(address_map &map);
 
-	DECLARE_READ8_MEMBER(forte2_ay8910_read_input);
-	DECLARE_WRITE8_MEMBER(forte2_ay8910_set_input_mask);
+	DECLARE_READ8_MEMBER(ay8910_read_input);
+	DECLARE_WRITE8_MEMBER(ay8910_set_input_mask);
 
 	required_device<cpu_device> m_maincpu;
 
@@ -102,12 +102,12 @@ static INPUT_PORTS_START( pesadelo )
 INPUT_PORTS_END
 
 
-READ8_MEMBER(forte2_state::forte2_ay8910_read_input)
+READ8_MEMBER(forte2_state::ay8910_read_input)
 {
 	return ioport("IN0")->read() | (m_input_mask & 0x3f);
 }
 
-WRITE8_MEMBER(forte2_state::forte2_ay8910_set_input_mask)
+WRITE8_MEMBER(forte2_state::ay8910_set_input_mask)
 {
 	/* PSG reg 15, writes 0 at coin insert, 0xff at boot and game over */
 	m_input_mask = data;
@@ -125,27 +125,27 @@ void forte2_state::machine_start()
 }
 
 
-MACHINE_CONFIG_START(forte2_state::pesadelo)
-
+void forte2_state::pesadelo(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(3'579'545))
-	MCFG_DEVICE_PROGRAM_MAP(program_mem)
-	MCFG_DEVICE_IO_MAP(io_mem)
+	Z80(config, m_maincpu, XTAL(3'579'545));
+	m_maincpu->set_addrmap(AS_PROGRAM, &forte2_state::program_mem);
+	m_maincpu->set_addrmap(AS_IO, &forte2_state::io_mem);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("tms9928a", TMS9928A, XTAL(10'738'635)/2)
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_TMS9928A_SCREEN_ADD_NTSC("screen")
-	MCFG_SCREEN_UPDATE_DEVICE("tms9928a", tms9928a_device, screen_update)
+	tms9928a_device &vdp(TMS9928A(config, "tms9928a", XTAL(10'738'635)));
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000);
+	vdp.int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(3'579'545)/2)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, forte2_state, forte2_ay8910_read_input))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, forte2_state, forte2_ay8910_set_input_mask))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL(3'579'545)/2));
+	aysnd.port_a_read_callback().set(FUNC(forte2_state::ay8910_read_input));
+	aysnd.port_b_write_callback().set(FUNC(forte2_state::ay8910_set_input_mask));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 void forte2_state::init_pesadelo()
 {
