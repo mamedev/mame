@@ -39,6 +39,7 @@ const char *const z8_disassembler::CONDITION_CODE[16] =
 ***************************************************************************/
 
 #define r       "R%u"
+#define rr      "RR%u"
 #define Ir      "@R%u"
 #define R       "%02Xh"
 #define RR      "%02Xh"
@@ -64,7 +65,7 @@ const char *const z8_disassembler::CONDITION_CODE[16] =
 #define arg_Ir(_value)              ARG(Ir, _value)
 #define arg_Irr(_value)             ARG(Irr, _value & 0x0f)
 #define arg_R(_value)               if ((_value & 0xf0) == 0xe0) ARG(r, _value & 0x0f) else if ((_value < 4) || (_value >= 0xf0)) arg_name(_value) else ARG(R, _value)
-#define arg_RR(_value)              if ((_value & 0xf0) == 0xe0) ARG(r, _value & 0x0f) else ARG(R, _value)
+#define arg_RR(_value)              if ((_value & 0xf0) == 0xe0) ARG(rr, _value & 0x0f) else ARG(R, _value)
 #define arg_IR(_value)              if ((_value & 0xf0) == 0xe0) ARG(Ir, _value & 0x0f) else ARG(IR, _value)
 #define arg_IRR(_value)             if ((_value & 0xf0) == 0xe0) ARG(Irr, _value & 0x0f) else ARG(IRR, _value)
 #define arg_IM(_value)              ARG(IM, _value)
