@@ -86,6 +86,21 @@ void k054321_device::device_start()
 	save_item(NAME(m_active));
 }
 
+TIMER_CALLBACK_MEMBER(k054321_device::write_main1)
+{
+	m_main1 = param;
+}
+
+TIMER_CALLBACK_MEMBER(k054321_device::write_main2)
+{
+	m_main2 = param;
+}
+
+TIMER_CALLBACK_MEMBER(k054321_device::write_sound1)
+{
+	m_sound1 = param;
+}
+
 READ8_MEMBER( k054321_device::main1_r)
 {
 	return m_main1;
@@ -93,7 +108,7 @@ READ8_MEMBER( k054321_device::main1_r)
 
 WRITE8_MEMBER(k054321_device::main1_w)
 {
-	m_main1 = data;
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(k054321_device::write_main1), this), data & 0xff);
 }
 
 READ8_MEMBER( k054321_device::main2_r)
@@ -103,7 +118,7 @@ READ8_MEMBER( k054321_device::main2_r)
 
 WRITE8_MEMBER(k054321_device::main2_w)
 {
-	m_main2 = data;
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(k054321_device::write_main2), this), data & 0xff);
 }
 
 READ8_MEMBER( k054321_device::sound1_r)
@@ -113,7 +128,7 @@ READ8_MEMBER( k054321_device::sound1_r)
 
 WRITE8_MEMBER(k054321_device::sound1_w)
 {
-	m_sound1 = data;
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(k054321_device::write_sound1), this), data & 0xff);
 }
 
 WRITE8_MEMBER(k054321_device::volume_reset_w)

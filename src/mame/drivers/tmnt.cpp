@@ -61,6 +61,7 @@ Updates:
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
+#include "machine/k054321.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
 #include "sound/k054539.h"
@@ -658,9 +659,7 @@ void tmnt_state::prmrsocr_main_map(address_map &map)
 	map(0x11c000, 0x11c01f).w(m_k053251, FUNC(k053251_device::msb_w));
 	map(0x120000, 0x120001).portr("P1/COINS");
 	map(0x120002, 0x120003).portr("P2/EEPROM");
-	map(0x12100d, 0x12100d).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x12100f, 0x12100f).w("soundlatch2", FUNC(generic_latch_8_device::write));
-	map(0x121015, 0x121015).r("soundlatch3", FUNC(generic_latch_8_device::read));
+	map(0x121000, 0x12101f).m("k054321", FUNC(k054321_device::main_map)).umask16(0x00ff);
 	map(0x122000, 0x122001).w(FUNC(tmnt_state::prmrsocr_eeprom_w));    /* EEPROM + video control */
 	map(0x123000, 0x123001).w(FUNC(tmnt_state::prmrsocr_sound_irq_w));
 	map(0x200000, 0x207fff).rw(FUNC(tmnt_state::k052109_word_noA12_r), FUNC(tmnt_state::k052109_word_noA12_w));
@@ -1089,9 +1088,7 @@ void tmnt_state::prmrsocr_audio_map(address_map &map)
 	map(0xc000, 0xdfff).ram();
 	map(0xe000, 0xe0ff).rw(m_k054539, FUNC(k054539_device::read), FUNC(k054539_device::write));
 	map(0xe100, 0xe12f).rw(FUNC(tmnt_state::k054539_ctrl_r), FUNC(tmnt_state::k054539_ctrl_w));
-	map(0xf000, 0xf000).w("soundlatch3", FUNC(generic_latch_8_device::write));
-	map(0xf002, 0xf002).r("soundlatch", FUNC(generic_latch_8_device::read));
-	map(0xf003, 0xf003).r("soundlatch2", FUNC(generic_latch_8_device::read));
+	map(0xf000, 0xf003).m("k054321", FUNC(k054321_device::sound_map));
 	map(0xf800, 0xf800).w(FUNC(tmnt_state::prmrsocr_audio_bankswitch_w));
 }
 
@@ -2382,9 +2379,7 @@ void tmnt_state::prmrsocr(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	GENERIC_LATCH_8(config, "soundlatch");
-	GENERIC_LATCH_8(config, "soundlatch2");
-	GENERIC_LATCH_8(config, "soundlatch3");
+	K054321(config, "k054321", "lspeaker", "rspeaker");
 
 	K054539(config, m_k054539, XTAL(18'432'000));
 	m_k054539->timer_handler().set_inputline("audiocpu", INPUT_LINE_NMI);
