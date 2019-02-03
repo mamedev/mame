@@ -164,7 +164,7 @@ WRITE8_MEMBER(mcr3_state::demoderm_op6_w)
 	if (data & 0x40) m_input_mux = 1;
 
 	/* low 5 bits control the turbo CS */
-	m_turbo_cheap_squeak->write(space, offset, data);
+	m_turbo_cheap_squeak->write(data);
 }
 
 
@@ -266,7 +266,7 @@ WRITE8_MEMBER(mcr3_state::maxrpm_op6_w)
 		m_maxrpm_adc->write(space, 0, bitswap<4>(m_maxrpm_adc_control, 2, 3, 1, 0));
 
 	/* low 5 bits control the turbo CS */
-	m_turbo_cheap_squeak->write(space, offset, data);
+	m_turbo_cheap_squeak->write(data);
 }
 
 
@@ -279,7 +279,7 @@ WRITE8_MEMBER(mcr3_state::maxrpm_op6_w)
 
 READ8_MEMBER(mcr3_state::rampage_ip4_r)
 {
-	return ioport("MONO.IP4")->read() | (m_sounds_good->read(space,0) << 7);
+	return ioport("MONO.IP4")->read() | (m_sounds_good->read() << 7);
 }
 
 
@@ -289,7 +289,7 @@ WRITE8_MEMBER(mcr3_state::rampage_op6_w)
 	m_sounds_good->reset_write((~data >> 5) & 1);
 
 	/* low 5 bits go directly to the Sounds Good board */
-	m_sounds_good->write(space, offset, data);
+	m_sounds_good->write(data);
 }
 
 
@@ -302,7 +302,7 @@ WRITE8_MEMBER(mcr3_state::rampage_op6_w)
 
 READ8_MEMBER(mcr3_state::powerdrv_ip2_r)
 {
-	return ioport("MONO.IP2")->read() | (m_sounds_good->read(space, 0) << 7);
+	return ioport("MONO.IP2")->read() | (m_sounds_good->read() << 7);
 }
 
 
@@ -333,7 +333,7 @@ WRITE8_MEMBER(mcr3_state::powerdrv_op6_w)
 	m_sounds_good->reset_write((~data >> 5) & 1);
 
 	/* low 5 bits go directly to the Sounds Good board */
-	m_sounds_good->write(space, offset, data);
+	m_sounds_good->write(data);
 }
 
 
@@ -349,7 +349,7 @@ READ8_MEMBER(mcr3_state::stargrds_ip0_r)
 	uint8_t result = ioport("MONO.IP0")->read();
 	if (m_input_mux)
 		result = (result & ~0x0a) | (ioport("MONO.IP0.ALT")->read() & 0x0a);
-	return (result & ~0x10) | ((m_sounds_good->read(space, 0) << 4) & 0x10);
+	return (result & ~0x10) | ((m_sounds_good->read() << 4) & 0x10);
 }
 
 
@@ -376,7 +376,7 @@ WRITE8_MEMBER(mcr3_state::stargrds_op6_w)
 	m_sounds_good->reset_write((~data >> 6) & 1);
 
 	/* unline the other games, the STROBE is in the high bit instead of the low bit */
-	m_sounds_good->write(space, offset, (data << 1) | (data >> 7));
+	m_sounds_good->write((data << 1) | (data >> 7));
 }
 
 
@@ -1580,7 +1580,7 @@ void mcr3_state::init_demoderm()
 void mcr3_state::init_sarge()
 {
 	mcr_common_init();
-	m_maincpu->space(AS_IO).install_write_handler(0x06, 0x06, write8_delegate(FUNC(midway_turbo_cheap_squeak_device::write),m_turbo_cheap_squeak.target()));
+	m_maincpu->space(AS_IO).install_write_handler(0x06, 0x06, write8smo_delegate(FUNC(midway_turbo_cheap_squeak_device::write),m_turbo_cheap_squeak.target()));
 }
 
 

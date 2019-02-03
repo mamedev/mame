@@ -9,9 +9,9 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "machine/input_merger.h"
 #include "includes/mcr.h"
 #include "audio/midway.h"
-#include "audio/williams.h"
 #include "sound/volt_reg.h"
 
 
@@ -36,15 +36,14 @@ DEFINE_DEVICE_TYPE(MIDWAY_SQUAWK_N_TALK,      midway_squawk_n_talk_device,      
 //-------------------------------------------------
 
 midway_ssio_device::midway_ssio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MIDWAY_SSIO, tag, owner, clock),
-		device_mixer_interface(mconfig, *this, 2),
-		m_cpu(*this, "cpu"),
-		m_ay0(*this, "ay0"),
-		m_ay1(*this, "ay1"),
-		m_ports(*this, {"IP0", "IP1", "IP2", "IP3", "IP4"}),
-		m_status(0),
-		m_14024_count(0),
-		m_mute(0)
+	: device_t(mconfig, MIDWAY_SSIO, tag, owner, clock)
+	, device_mixer_interface(mconfig, *this, 2)
+	, m_cpu(*this, "cpu")
+	, m_ay(*this, "ay%u", 0U)
+	, m_ports(*this, {"IP0", "IP1", "IP2", "IP3", "IP4"})
+	, m_status(0)
+	, m_14024_count(0)
+	, m_mute(0)
 {
 	memset(m_data, 0, sizeof(m_data));
 	memset(m_overall, 0, sizeof(m_overall));
@@ -68,7 +67,7 @@ void midway_ssio_device::suspend_cpu()
 //  read - return the status value
 //-------------------------------------------------
 
-READ8_MEMBER(midway_ssio_device::read)
+u8 midway_ssio_device::read()
 {
 	return m_status;
 }
@@ -79,7 +78,7 @@ READ8_MEMBER(midway_ssio_device::read)
 //  input latches
 //-------------------------------------------------
 
-WRITE8_MEMBER(midway_ssio_device::write)
+void midway_ssio_device::write(offs_t offset, u8 data)
 {
 	synchronize(0, (offset << 8) | (data & 0xff));
 }
@@ -255,7 +254,7 @@ INTERRUPT_GEN_MEMBER(midway_ssio_device::clock_14024)
 //  irq_clear - reset the IRQ state and 14024 count
 //-------------------------------------------------
 
-READ8_MEMBER(midway_ssio_device::irq_clear)
+u8 midway_ssio_device::irq_clear()
 {
 	// a read here asynchronously resets the 14024 count, clearing /SINT
 	m_14024_count = 0;
@@ -268,7 +267,7 @@ READ8_MEMBER(midway_ssio_device::irq_clear)
 //  status_w - set the outgoing status value
 //-------------------------------------------------
 
-WRITE8_MEMBER(midway_ssio_device::status_w)
+void midway_ssio_device::status_w(u8 data)
 {
 	m_status = data;
 }
@@ -278,7 +277,7 @@ WRITE8_MEMBER(midway_ssio_device::status_w)
 //  data_r - read incoming data latches
 //-------------------------------------------------
 
-READ8_MEMBER(midway_ssio_device::data_r)
+u8 midway_ssio_device::data_r(offs_t offset)
 {
 	return m_data[offset];
 }
@@ -288,7 +287,7 @@ READ8_MEMBER(midway_ssio_device::data_r)
 //  porta0_w - handle writes to AY-8910 #0 port A
 //-------------------------------------------------
 
-WRITE8_MEMBER(midway_ssio_device::porta0_w)
+void midway_ssio_device::porta0_w(u8 data)
 {
 	m_duty_cycle[0][0] = data & 15;
 	m_duty_cycle[0][1] = data >> 4;
@@ -300,7 +299,7 @@ WRITE8_MEMBER(midway_ssio_device::porta0_w)
 //  portb0_w - handle writes to AY-8910 #0 port B
 //-------------------------------------------------
 
-WRITE8_MEMBER(midway_ssio_device::portb0_w)
+void midway_ssio_device::portb0_w(u8 data)
 {
 	m_duty_cycle[0][2] = data & 15;
 	m_overall[0] = (data >> 4) & 7;
@@ -312,7 +311,7 @@ WRITE8_MEMBER(midway_ssio_device::portb0_w)
 //  porta1_w - handle writes to AY-8910 #1 port A
 //-------------------------------------------------
 
-WRITE8_MEMBER(midway_ssio_device::porta1_w)
+void midway_ssio_device::porta1_w(u8 data)
 {
 	m_duty_cycle[1][0] = data & 15;
 	m_duty_cycle[1][1] = data >> 4;
@@ -324,7 +323,7 @@ WRITE8_MEMBER(midway_ssio_device::porta1_w)
 //  portb1_w - handle writes to AY-8910 #1 port B
 //-------------------------------------------------
 
-WRITE8_MEMBER(midway_ssio_device::portb1_w)
+void midway_ssio_device::portb1_w(u8 data)
 {
 	m_duty_cycle[1][2] = data & 15;
 	m_overall[1] = (data >> 4) & 7;
@@ -340,12 +339,12 @@ WRITE8_MEMBER(midway_ssio_device::portb1_w)
 
 void midway_ssio_device::update_volumes()
 {
-	m_ay0->set_volume(0, m_mute ? 0 : m_ayvolume_lookup[m_duty_cycle[0][0]]);
-	m_ay0->set_volume(1, m_mute ? 0 : m_ayvolume_lookup[m_duty_cycle[0][1]]);
-	m_ay0->set_volume(2, m_mute ? 0 : m_ayvolume_lookup[m_duty_cycle[0][2]]);
-	m_ay1->set_volume(0, m_mute ? 0 : m_ayvolume_lookup[m_duty_cycle[1][0]]);
-	m_ay1->set_volume(1, m_mute ? 0 : m_ayvolume_lookup[m_duty_cycle[1][1]]);
-	m_ay1->set_volume(2, m_mute ? 0 : m_ayvolume_lookup[m_duty_cycle[1][2]]);
+	m_ay[0]->set_volume(0, m_mute ? 0 : m_ayvolume_lookup[m_duty_cycle[0][0]]);
+	m_ay[0]->set_volume(1, m_mute ? 0 : m_ayvolume_lookup[m_duty_cycle[0][1]]);
+	m_ay[0]->set_volume(2, m_mute ? 0 : m_ayvolume_lookup[m_duty_cycle[0][2]]);
+	m_ay[1]->set_volume(0, m_mute ? 0 : m_ayvolume_lookup[m_duty_cycle[1][0]]);
+	m_ay[1]->set_volume(1, m_mute ? 0 : m_ayvolume_lookup[m_duty_cycle[1][1]]);
+	m_ay[1]->set_volume(2, m_mute ? 0 : m_ayvolume_lookup[m_duty_cycle[1][2]]);
 }
 
 //-------------------------------------------------
@@ -417,15 +416,15 @@ void midway_ssio_device::device_add_mconfig(machine_config &config)
 	if (clock())
 		m_cpu->set_periodic_int(DEVICE_SELF, FUNC(midway_ssio_device::clock_14024), attotime::from_hz(clock() / (2*16*10)));
 
-	AY8910(config, m_ay0, DERIVED_CLOCK(1, 2*4));
-	m_ay0->port_a_write_callback().set(FUNC(midway_ssio_device::porta0_w));
-	m_ay0->port_b_write_callback().set(FUNC(midway_ssio_device::portb0_w));
-	m_ay0->add_route(ALL_OUTPUTS, *this, 0.33, AUTO_ALLOC_INPUT, 0);
+	AY8910(config, m_ay[0], DERIVED_CLOCK(1, 2*4));
+	m_ay[0]->port_a_write_callback().set(FUNC(midway_ssio_device::porta0_w));
+	m_ay[0]->port_b_write_callback().set(FUNC(midway_ssio_device::portb0_w));
+	m_ay[0]->add_route(ALL_OUTPUTS, *this, 0.33, AUTO_ALLOC_INPUT, 0);
 
-	AY8910(config, m_ay1, DERIVED_CLOCK(1, 2*4));
-	m_ay1->port_a_write_callback().set(FUNC(midway_ssio_device::porta1_w));
-	m_ay1->port_b_write_callback().set(FUNC(midway_ssio_device::portb1_w));
-	m_ay1->add_route(ALL_OUTPUTS, *this, 0.33, AUTO_ALLOC_INPUT, 1);
+	AY8910(config, m_ay[1], DERIVED_CLOCK(1, 2*4));
+	m_ay[1]->port_a_write_callback().set(FUNC(midway_ssio_device::porta1_w));
+	m_ay[1]->port_b_write_callback().set(FUNC(midway_ssio_device::portb1_w));
+	m_ay[1]->add_route(ALL_OUTPUTS, *this, 0.33, AUTO_ALLOC_INPUT, 1);
 }
 
 
@@ -490,13 +489,13 @@ void midway_ssio_device::device_timer(emu_timer &timer, device_timer_id id, int 
 //-------------------------------------------------
 
 midway_sounds_good_device::midway_sounds_good_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MIDWAY_SOUNDS_GOOD, tag, owner, clock),
-		device_mixer_interface(mconfig, *this),
-		m_cpu(*this, "cpu"),
-		m_pia(*this, "pia"),
-		m_dac(*this, "dac"),
-		m_status(0),
-		m_dacval(0)
+	: device_t(mconfig, MIDWAY_SOUNDS_GOOD, tag, owner, clock)
+	, device_mixer_interface(mconfig, *this)
+	, m_cpu(*this, "cpu")
+	, m_pia(*this, "pia")
+	, m_dac(*this, "dac")
+	, m_status(0)
+	, m_dacval(0)
 {
 }
 
@@ -505,7 +504,7 @@ midway_sounds_good_device::midway_sounds_good_device(const machine_config &mconf
 //  read - return the status value
 //-------------------------------------------------
 
-READ8_MEMBER(midway_sounds_good_device::read)
+u8 midway_sounds_good_device::read()
 {
 	return m_status;
 }
@@ -516,7 +515,7 @@ READ8_MEMBER(midway_sounds_good_device::read)
 //  latch
 //-------------------------------------------------
 
-WRITE8_MEMBER(midway_sounds_good_device::write)
+void midway_sounds_good_device::write(u8 data)
 {
 	synchronize(0, data);
 }
@@ -537,7 +536,7 @@ WRITE_LINE_MEMBER(midway_sounds_good_device::reset_write)
 //  porta_w - PIA port A writes
 //-------------------------------------------------
 
-WRITE8_MEMBER(midway_sounds_good_device::porta_w)
+void midway_sounds_good_device::porta_w(u8 data)
 {
 	m_dacval = (data << 2) | (m_dacval & 3);
 	m_dac->write(m_dacval);
@@ -548,7 +547,7 @@ WRITE8_MEMBER(midway_sounds_good_device::porta_w)
 //  portb_w - PIA port B writes
 //-------------------------------------------------
 
-WRITE8_MEMBER(midway_sounds_good_device::portb_w)
+void midway_sounds_good_device::portb_w(u8 data)
 {
 	uint8_t z_mask = m_pia->port_b_z_mask();
 
@@ -557,17 +556,6 @@ WRITE8_MEMBER(midway_sounds_good_device::portb_w)
 
 	if (~z_mask & 0x10)  m_status = (m_status & ~1) | ((data >> 4) & 1);
 	if (~z_mask & 0x20)  m_status = (m_status & ~2) | ((data >> 4) & 2);
-}
-
-
-//-------------------------------------------------
-//  irq_w - IRQ line state changes
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER(midway_sounds_good_device::irq_w)
-{
-	int combined_state = m_pia->irq_a_state() | m_pia->irq_b_state();
-	m_cpu->set_input_line(4, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -590,20 +578,25 @@ void midway_sounds_good_device::soundsgood_map(address_map &map)
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(midway_sounds_good_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("cpu", M68000, DERIVED_CLOCK(1, 2))
-	MCFG_DEVICE_PROGRAM_MAP(soundsgood_map)
+void midway_sounds_good_device::device_add_mconfig(machine_config &config)
+{
+	M68000(config, m_cpu, DERIVED_CLOCK(1, 2));
+	m_cpu->set_addrmap(AS_PROGRAM, &midway_sounds_good_device::soundsgood_map);
+
+	INPUT_MERGER_ANY_HIGH(config, "irq").output_handler().set_inputline(m_cpu, 4);
 
 	PIA6821(config, m_pia, 0);
 	m_pia->writepa_handler().set(FUNC(midway_sounds_good_device::porta_w));
 	m_pia->writepb_handler().set(FUNC(midway_sounds_good_device::portb_w));
-	m_pia->irqa_handler().set(FUNC(midway_sounds_good_device::irq_w));
-	m_pia->irqb_handler().set(FUNC(midway_sounds_good_device::irq_w));
+	m_pia->irqa_handler().set("irq", FUNC(input_merger_any_high_device::in_w<0>));
+	m_pia->irqb_handler().set("irq", FUNC(input_merger_any_high_device::in_w<1>));
 
-	MCFG_DEVICE_ADD("dac", AD7533, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, *this, 1.0) /// ad7533jn.u10
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	AD7533(config, m_dac, 0).add_route(ALL_OUTPUTS, *this, 1.0); /// ad7533jn.u10
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 
 //-------------------------------------------------
@@ -651,13 +644,13 @@ void midway_sounds_good_device::device_timer(emu_timer &timer, device_timer_id i
 //-------------------------------------------------
 
 midway_turbo_cheap_squeak_device::midway_turbo_cheap_squeak_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MIDWAY_TURBO_CHEAP_SQUEAK, tag, owner, clock),
-		device_mixer_interface(mconfig, *this),
-		m_cpu(*this, "cpu"),
-		m_pia(*this, "pia"),
-		m_dac(*this, "dac"),
-		m_status(0),
-		m_dacval(0)
+	: device_t(mconfig, MIDWAY_TURBO_CHEAP_SQUEAK, tag, owner, clock)
+	, device_mixer_interface(mconfig, *this)
+	, m_cpu(*this, "cpu")
+	, m_pia(*this, "pia")
+	, m_dac(*this, "dac")
+	, m_status(0)
+	, m_dacval(0)
 {
 }
 
@@ -666,7 +659,7 @@ midway_turbo_cheap_squeak_device::midway_turbo_cheap_squeak_device(const machine
 //  read - return the status value
 //-------------------------------------------------
 
-READ8_MEMBER(midway_turbo_cheap_squeak_device::read)
+u8 midway_turbo_cheap_squeak_device::read()
 {
 	return m_status;
 }
@@ -677,7 +670,7 @@ READ8_MEMBER(midway_turbo_cheap_squeak_device::read)
 //  latch
 //-------------------------------------------------
 
-WRITE8_MEMBER(midway_turbo_cheap_squeak_device::write)
+void midway_turbo_cheap_squeak_device::write(u8 data)
 {
 	synchronize(0, data);
 }
@@ -697,7 +690,7 @@ WRITE_LINE_MEMBER(midway_turbo_cheap_squeak_device::reset_write)
 //  porta_w - PIA port A writes
 //-------------------------------------------------
 
-WRITE8_MEMBER(midway_turbo_cheap_squeak_device::porta_w)
+void midway_turbo_cheap_squeak_device::porta_w(u8 data)
 {
 	m_dacval = (data << 2) | (m_dacval & 3);
 	m_dac->write(m_dacval);
@@ -708,22 +701,11 @@ WRITE8_MEMBER(midway_turbo_cheap_squeak_device::porta_w)
 //  portb_w - PIA port B writes
 //-------------------------------------------------
 
-WRITE8_MEMBER(midway_turbo_cheap_squeak_device::portb_w)
+void midway_turbo_cheap_squeak_device::portb_w(u8 data)
 {
 	m_dacval = (m_dacval & ~3) | (data >> 6);
 	m_dac->write(m_dacval);
 	m_status = (data >> 4) & 3;
-}
-
-
-//-------------------------------------------------
-//  irq_w - IRQ line state changes
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER(midway_turbo_cheap_squeak_device::irq_w)
-{
-	int combined_state = m_pia->irq_a_state() | m_pia->irq_b_state();
-	m_cpu->set_input_line(M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -745,20 +727,25 @@ void midway_turbo_cheap_squeak_device::turbocs_map(address_map &map)
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(midway_turbo_cheap_squeak_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("cpu", MC6809E, DERIVED_CLOCK(1, 4))
-	MCFG_DEVICE_PROGRAM_MAP(turbocs_map)
+void midway_turbo_cheap_squeak_device::device_add_mconfig(machine_config &config)
+{
+	MC6809E(config, m_cpu, DERIVED_CLOCK(1, 4));
+	m_cpu->set_addrmap(AS_PROGRAM, &midway_turbo_cheap_squeak_device::turbocs_map);
+
+	INPUT_MERGER_ANY_HIGH(config, "irq").output_handler().set_inputline(m_cpu, M6809_IRQ_LINE);
 
 	PIA6821(config, m_pia, 0);
 	m_pia->writepa_handler().set(FUNC(midway_turbo_cheap_squeak_device::porta_w));
 	m_pia->writepb_handler().set(FUNC(midway_turbo_cheap_squeak_device::portb_w));
-	m_pia->irqa_handler().set(FUNC(midway_turbo_cheap_squeak_device::irq_w));
-	m_pia->irqb_handler().set(FUNC(midway_turbo_cheap_squeak_device::irq_w));
+	m_pia->irqa_handler().set("irq", FUNC(input_merger_any_high_device::in_w<0>));
+	m_pia->irqb_handler().set("irq", FUNC(input_merger_any_high_device::in_w<1>));
 
-	MCFG_DEVICE_ADD("dac", AD7533, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, *this, 1.0)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	AD7533(config, m_dac, 0).add_route(ALL_OUTPUTS, *this, 1.0);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 
 //-------------------------------------------------
@@ -805,14 +792,13 @@ void midway_turbo_cheap_squeak_device::device_timer(emu_timer &timer, device_tim
 //-------------------------------------------------
 
 midway_squawk_n_talk_device::midway_squawk_n_talk_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MIDWAY_SQUAWK_N_TALK, tag, owner, clock),
-		device_mixer_interface(mconfig, *this),
-		m_cpu(*this, "cpu"),
-		m_pia0(*this, "pia0"),
-		m_pia1(*this, "pia1"),
-		m_tms5200(*this, "tms5200"),
-		m_tms_command(0),
-		m_tms_strobes(0)
+	: device_t(mconfig, MIDWAY_SQUAWK_N_TALK, tag, owner, clock)
+	, device_mixer_interface(mconfig, *this)
+	, m_cpu(*this, "cpu")
+	, m_pia(*this, "pia%u", 0U)
+	, m_tms5200(*this, "tms5200")
+	, m_tms_command(0)
+	, m_tms_strobes(0)
 {
 }
 
@@ -822,7 +808,7 @@ midway_squawk_n_talk_device::midway_squawk_n_talk_device(const machine_config &m
 //  latch
 //-------------------------------------------------
 
-WRITE8_MEMBER(midway_squawk_n_talk_device::write)
+void midway_squawk_n_talk_device::write(u8 data)
 {
 	synchronize(0, data);
 }
@@ -842,7 +828,7 @@ WRITE_LINE_MEMBER(midway_squawk_n_talk_device::reset_write)
 //  porta1_w - PIA #1 port A writes
 //-------------------------------------------------
 
-WRITE8_MEMBER(midway_squawk_n_talk_device::porta1_w )
+void midway_squawk_n_talk_device::porta1_w(u8 data)
 {
 	logerror("Write to AY-8912 = %02X\n", data);
 }
@@ -852,7 +838,7 @@ WRITE8_MEMBER(midway_squawk_n_talk_device::porta1_w )
 //  dac_w - DAC data writes
 //-------------------------------------------------
 
-WRITE8_MEMBER(midway_squawk_n_talk_device::dac_w)
+void midway_squawk_n_talk_device::dac_w(u8 data)
 {
 	logerror("Write to DAC = %02X\n", data);
 }
@@ -862,7 +848,7 @@ WRITE8_MEMBER(midway_squawk_n_talk_device::dac_w)
 //  porta2_w - PIA #2 port A writes
 //-------------------------------------------------
 
-WRITE8_MEMBER(midway_squawk_n_talk_device::porta2_w)
+void midway_squawk_n_talk_device::porta2_w(u8 data)
 {
 	m_tms_command = data;
 }
@@ -872,7 +858,7 @@ WRITE8_MEMBER(midway_squawk_n_talk_device::porta2_w)
 //  portb2_w - PIA #2 port B writes
 //-------------------------------------------------
 
-WRITE8_MEMBER(midway_squawk_n_talk_device::portb2_w)
+void midway_squawk_n_talk_device::portb2_w(u8 data)
 {
 	// bits 0-1 select read/write strobes on the TMS5200
 	data &= 0x03;
@@ -883,33 +869,22 @@ WRITE8_MEMBER(midway_squawk_n_talk_device::portb2_w)
 		m_tms5200->data_w(m_tms_command);
 
 		// DoT expects the ready line to transition on a command/write here, so we oblige
-		m_pia1->ca2_w(1);
-		m_pia1->ca2_w(0);
+		m_pia[1]->ca2_w(1);
+		m_pia[1]->ca2_w(0);
 	}
 
 	// read strobe -- read the current status from the TMS5200
 	else if (((data ^ m_tms_strobes) & 0x01) && !(data & 0x01))
 	{
-		m_pia1->write_porta(m_tms5200->status_r());
+		m_pia[1]->write_porta(m_tms5200->status_r());
 
 		// DoT expects the ready line to transition on a command/write here, so we oblige
-		m_pia1->ca2_w(1);
-		m_pia1->ca2_w(0);
+		m_pia[1]->ca2_w(1);
+		m_pia[1]->ca2_w(0);
 	}
 
 	// remember the state
 	m_tms_strobes = data;
-}
-
-
-//-------------------------------------------------
-//  irq_w - IRQ line state changes
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER(midway_squawk_n_talk_device::irq_w)
-{
-	int combined_state = m_pia0->irq_a_state() | m_pia0->irq_b_state() | m_pia1->irq_a_state() | m_pia1->irq_b_state();
-	m_cpu->set_input_line(M6802_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -949,28 +924,30 @@ void midway_squawk_n_talk_device::squawkntalk_alt_map(address_map &map)
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(midway_squawk_n_talk_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("cpu", M6802, DERIVED_CLOCK(1, 1))
-	MCFG_DEVICE_PROGRAM_MAP(squawkntalk_map)
+void midway_squawk_n_talk_device::device_add_mconfig(machine_config &config)
+{
+	M6802(config, m_cpu, DERIVED_CLOCK(1, 1));
+	m_cpu->set_addrmap(AS_PROGRAM, &midway_squawk_n_talk_device::squawkntalk_map);
 
-	PIA6821(config, m_pia0, 0);
-	m_pia0->writepa_handler().set(FUNC(midway_squawk_n_talk_device::porta1_w));
-	m_pia0->irqa_handler().set(FUNC(midway_squawk_n_talk_device::irq_w));
-	m_pia0->irqb_handler().set(FUNC(midway_squawk_n_talk_device::irq_w));
+	INPUT_MERGER_ANY_HIGH(config, "irq").output_handler().set_inputline(m_cpu, M6802_IRQ_LINE);
 
-	PIA6821(config, m_pia1, 0);
-	m_pia1->writepa_handler().set(FUNC(midway_squawk_n_talk_device::porta2_w));
-	m_pia1->writepb_handler().set(FUNC(midway_squawk_n_talk_device::portb2_w));
-	m_pia1->irqa_handler().set(FUNC(midway_squawk_n_talk_device::irq_w));
-	m_pia1->irqb_handler().set(FUNC(midway_squawk_n_talk_device::irq_w));
+	PIA6821(config, m_pia[0], 0);
+	m_pia[0]->writepa_handler().set(FUNC(midway_squawk_n_talk_device::porta1_w));
+	m_pia[0]->irqa_handler().set("irq", FUNC(input_merger_any_high_device::in_w<0>));
+	m_pia[0]->irqb_handler().set("irq", FUNC(input_merger_any_high_device::in_w<1>));
+
+	PIA6821(config, m_pia[1], 0);
+	m_pia[1]->writepa_handler().set(FUNC(midway_squawk_n_talk_device::porta2_w));
+	m_pia[1]->writepb_handler().set(FUNC(midway_squawk_n_talk_device::portb2_w));
+	m_pia[1]->irqa_handler().set("irq", FUNC(input_merger_any_high_device::in_w<2>));
+	m_pia[1]->irqb_handler().set("irq", FUNC(input_merger_any_high_device::in_w<3>));
 
 	// only used on Discs of Tron, which is stereo
-	MCFG_DEVICE_ADD("tms5200", TMS5200, 640000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, *this, 0.60)
+	TMS5200(config, m_tms5200, 640000).add_route(ALL_OUTPUTS, *this, 0.60);
 
 	// the board also supports an AY-8912 and/or an 8-bit DAC, neither of
 	// which are populated on the Discs of Tron board
-MACHINE_CONFIG_END
+}
 
 
 //-------------------------------------------------
@@ -999,6 +976,6 @@ void midway_squawk_n_talk_device::device_reset()
 
 void midway_squawk_n_talk_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_pia0->write_porta(~param & 0x0f);
-	m_pia0->cb1_w(BIT(~param, 4));
+	m_pia[0]->write_porta(~param & 0x0f);
+	m_pia[0]->cb1_w(BIT(~param, 4));
 }
