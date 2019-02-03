@@ -83,8 +83,6 @@ protected:
 	DECLARE_WRITE16_MEMBER(paletteram_w);
 	DECLARE_READ16_MEMBER(gfxram_r);
 	DECLARE_WRITE16_MEMBER(gfxram_w);
-	DECLARE_READ16_MEMBER(snd_r);
-	DECLARE_WRITE16_MEMBER(snd_w);
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
