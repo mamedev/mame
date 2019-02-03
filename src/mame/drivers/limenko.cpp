@@ -72,7 +72,7 @@ protected:
 
 private:
 	required_device<cpu_device> m_maincpu;
-	required_device<qs1000_device> m_qs1000;
+	optional_device<qs1000_device> m_qs1000;
 	optional_device<okim6295_device> m_oki;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
