@@ -118,7 +118,7 @@ public:
 
 protected:
 	// device-specific overrides
-	virtual const tiny_rom_entry *device_rom_region() const;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
 // device type declarations
