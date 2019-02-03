@@ -84,9 +84,9 @@ baud rate:
 -- in the unlikely case of T == 0, pretend T = 1.
 - If the required wr11 bits are set:
 -- let's say M = wr4 D7,D6 if 1,1 M = 64; if 1,0 M = 32; if 0,1 M = 16 else M = 1
--- so, the required clock on the MCFG_DEVICE_ADD line = 2*T*B*M.
+-- so, the required device clock = 2*T*B*M.
 - If the required wr11 bits are not set:
--- add a line: MCFG_Z80SCC_OFFSETS(X, 0, Y, 0), where X = channel-A-baud * T,
+-- call: configure_channels(X, 0, Y, 0), where X = channel-A-baud * T,
    and Y = channel-B-baud * T.
 
 ***************************************************************************/
