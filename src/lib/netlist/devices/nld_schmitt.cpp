@@ -99,7 +99,7 @@ namespace netlist
 						if (m_is_timestep)
 							m_RVO.update();
 						m_RVO.set(NL_FCONST(1.0) / m_model.m_ROH, m_model.m_VOH, 0.0);
-						m_RVO.m_P.schedule_solve_after(NLTIME_FROM_NS(1));
+						m_RVO.solve_later();
 					}
 				}
 				else
@@ -110,7 +110,7 @@ namespace netlist
 						if (m_is_timestep)
 							m_RVO.update();
 						m_RVO.set(NL_FCONST(1.0) / m_model.m_ROL, m_model.m_VOL, 0.0);
-						m_RVO.m_P.schedule_solve_after(NLTIME_FROM_NS(1));
+						m_RVO.solve_later();
 					}
 				}
 			}
