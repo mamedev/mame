@@ -183,13 +183,13 @@ WRITE_LINE_MEMBER(midway_serial_pic_device::reset_w)
 }
 
 
-READ8_MEMBER(midway_serial_pic_device::status_r)
+u8 midway_serial_pic_device::status_r()
 {
 	return m_status;
 }
 
 
-READ8_MEMBER(midway_serial_pic_device::read)
+u8 midway_serial_pic_device::read()
 {
 	logerror("%s:security R = %04X\n", machine().describe_context(), m_buff);
 	m_status = 1;
@@ -197,7 +197,7 @@ READ8_MEMBER(midway_serial_pic_device::read)
 }
 
 
-WRITE8_MEMBER(midway_serial_pic_device::write)
+void midway_serial_pic_device::write(u8 data)
 {
 	logerror("%s:security W = %04X\n", machine().describe_context(), data);
 
@@ -386,7 +386,7 @@ void midway_serial_pic2_device::set_default_nvram(const uint8_t *nvram)
 }
 
 
-READ8_MEMBER(midway_serial_pic2_device::status_r)
+u8 midway_serial_pic2_device::status_r()
 {
 	uint8_t result = 0;
 
@@ -405,7 +405,7 @@ READ8_MEMBER(midway_serial_pic2_device::status_r)
 }
 
 
-READ8_MEMBER(midway_serial_pic2_device::read)
+u8 midway_serial_pic2_device::read()
 {
 	uint8_t result = 0;
 
@@ -425,7 +425,7 @@ READ8_MEMBER(midway_serial_pic2_device::read)
 }
 
 
-WRITE8_MEMBER(midway_serial_pic2_device::write)
+void midway_serial_pic2_device::write(u8 data)
 {
 	static FILE *nvramlog;
 	if (LOG_NVRAM && !nvramlog)
@@ -1060,7 +1060,7 @@ READ32_MEMBER( midway_ioasic_device::read )
 			break;
 
 		case IOASIC_PICIN:
-			result = midway_serial_pic2_device::read(space,0) | (midway_serial_pic2_device::status_r(space,0) << 8);
+			result = midway_serial_pic2_device::read() | (midway_serial_pic2_device::status_r() << 8);
 			break;
 
 		default:
@@ -1193,11 +1193,11 @@ WRITE32_MEMBER( midway_ioasic_device::write )
 
 		case IOASIC_PICOUT:
 			if (m_shuffle_type == MIDWAY_IOASIC_VAPORTRX)
-				midway_serial_pic2_device::write(space, 0, newreg ^ 0x0a);
+				midway_serial_pic2_device::write(newreg ^ 0x0a);
 			else if (m_shuffle_type == MIDWAY_IOASIC_SFRUSHRK)
-				midway_serial_pic2_device::write(space, 0, newreg ^ 0x05);
+				midway_serial_pic2_device::write(newreg ^ 0x05);
 			else
-				midway_serial_pic2_device::write(space, 0, newreg);
+				midway_serial_pic2_device::write(newreg);
 			break;
 
 		case IOASIC_PICIN:
