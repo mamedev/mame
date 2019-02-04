@@ -205,7 +205,6 @@ public:
 	}
 
 	void get_display_params(display_params *params);
-	void tms34010_state_postload();
 
 	uint32_t tms340x0_ind16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t tms340x0_rgb32(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -292,11 +291,12 @@ protected:
 	};
 
 	// construction/destruction
-	tms340x0_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	tms340x0_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_regs_map = address_map_constructor());
 
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_post_load() override;
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const override { return 1; }
@@ -1057,6 +1057,7 @@ protected:
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override { return (clocks + 8 - 1) / 8; }
 	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return (cycles * 8); }
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+	void internal_regs_map(address_map &map);
 };
 
 DECLARE_DEVICE_TYPE(TMS34010, tms34010_device)
@@ -1066,7 +1067,7 @@ class tms34020_device : public tms340x0_device
 public:
 	tms34020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	/* Reads & writes to the 34010 I/O registers; place at 0xc0000000 */
+	/* Reads & writes to the 34020 I/O registers; place at 0xc0000000 */
 	virtual DECLARE_WRITE16_MEMBER( io_register_w ) override;
 	virtual DECLARE_READ16_MEMBER( io_register_r ) override;
 
@@ -1074,6 +1075,7 @@ protected:
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override { return (clocks + 4 - 1) / 4; }
 	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return (cycles * 4); }
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+	void internal_regs_map(address_map &map);
 };
 
 DECLARE_DEVICE_TYPE(TMS34020, tms34020_device)

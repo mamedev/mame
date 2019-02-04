@@ -31,7 +31,6 @@ void inder_vid_device::megaphx_tms_map(address_map &map)
 	map(0x04000030, 0x0400003f).w("ramdac", FUNC(ramdac_device::index_r_w)).umask16(0x00ff);
 	map(0x04000090, 0x0400009f).nopw();
 	map(0x7fc00000, 0x7fffffff).ram().mirror(0x80000000);
-	map(0xc0000000, 0xc00001ff).rw(m_tms, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 }
 
 
