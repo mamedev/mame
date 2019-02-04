@@ -62,6 +62,7 @@ namespace netlist
 		{
 			m_R.set_R(R_ON);
 		}
+		m_R.solve_later();
 
 	}
 

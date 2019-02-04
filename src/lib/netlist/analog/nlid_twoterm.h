@@ -85,6 +85,8 @@ public:
 
 	void solve_now();
 
+	void solve_later(netlist_time delay = netlist_time::from_nsec(1));
+
 	void set(const nl_double G, const nl_double V, const nl_double I)
 	{
 		/*      GO, GT, I                */
