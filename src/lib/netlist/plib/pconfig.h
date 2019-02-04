@@ -21,7 +21,7 @@
  * if PHAS_RDTSCP == 1
  */
 #ifndef PUSE_ACCURATE_STATS
-#define PUSE_ACCURATE_STATS (1)
+#define PUSE_ACCURATE_STATS (0)
 #endif
 
 /*

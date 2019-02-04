@@ -1,3 +1,4 @@
+
 // license:GPL-2.0+
 // copyright-holders:Couriersud
 /*
@@ -110,6 +111,7 @@ namespace netlist
 	NETLIB_RESET(7474)
 	{
 		m_CLK.set_state(logic_t::STATE_INP_LH);
+		m_D.set_state(logic_t::STATE_INP_ACTIVE);
 		m_nextD = 0;
 	}
 
