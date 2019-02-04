@@ -38,11 +38,11 @@ public:
 		set_end_callback(sample_end_cb_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
 	}
 
-	DECLARE_READ8_MEMBER( rf5c68_r );
-	DECLARE_WRITE8_MEMBER( rf5c68_w );
+	u8 rf5c68_r(offs_t offset);
+	void rf5c68_w(offs_t offset, u8 data);
 
-	DECLARE_READ8_MEMBER( rf5c68_mem_r );
-	DECLARE_WRITE8_MEMBER( rf5c68_mem_w );
+	u8 rf5c68_mem_r(offs_t offset);
+	void rf5c68_mem_w(offs_t offset, u8 data);
 
 protected:
 	rf5c68_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
