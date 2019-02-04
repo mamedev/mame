@@ -33,9 +33,9 @@ void tms34010_device::internal_regs_map(address_map &map)
 {
 	//map(0x00000000, 0xbfffffff); General use
 	map(0xc0000000, 0xc00001ff).rw(FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w)); // IO registers
-	//map(0xc0000200, 0xc0001fff).noprw(); Reserved
+	//map(0xc0000200, 0xc0001fff).noprw(); Reserved (for IO registers?)
 	//map(0xc0002000, 0xffffdfff); General use
-	//map(0xffffe000, 0xfffffbff).noprw(); Reserved
+	//map(0xffffe000, 0xfffffbff).noprw(); Reserved (for interrupt vectors, maybe)
 	//map(0xfffffc00, 0xffffffff); Interrupt Vectors
 }
 
