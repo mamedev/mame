@@ -7,8 +7,8 @@
     Copyright Alex Pasadyn/Zsolt Vasvari
     Parts based on code by Aaron Giles
 
-	TMS34020 TODO:
-	- Big endian mode isn't implemented
+    TMS34020 TODO:
+    - Big endian mode isn't implemented
 
 ***************************************************************************/
 
