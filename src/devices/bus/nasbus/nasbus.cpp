@@ -22,15 +22,14 @@ DEFINE_DEVICE_TYPE(NASBUS_SLOT, nasbus_slot_device, "nasbus_slot", "NASBUS Slot"
 //  nasbus_slot_device - constructor
 //-------------------------------------------------
 
-nasbus_slot_device::nasbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	nasbus_slot_device(mconfig, NASBUS_SLOT, tag, owner, clock)
+nasbus_slot_device::nasbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: nasbus_slot_device(mconfig, NASBUS_SLOT, tag, owner, clock)
 {
 }
 
-nasbus_slot_device::nasbus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, type, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
-	m_nasbus_tag(nullptr)
+nasbus_slot_device::nasbus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_slot_interface(mconfig, *this)
 {
 }
 
@@ -44,7 +43,7 @@ void nasbus_slot_device::device_start()
 
 	if (dev)
 	{
-		nasbus_device *m_nasbus = downcast<nasbus_device *>(m_owner->subdevice(m_nasbus_tag));
+		nasbus_device *m_nasbus = downcast<nasbus_device *>(owner()->subdevice(NASBUS_TAG));
 		m_nasbus->add_card(dev);
 	}
 }
