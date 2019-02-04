@@ -162,8 +162,17 @@ void menu::global_state::stack_reset()
 
 void menu::global_state::clear_free_list()
 {
+	// free stack is in reverse order - unwind it properly
+	std::unique_ptr<menu> reversed;
 	while (m_free)
-		m_free = std::move(m_free->m_parent);
+	{
+		std::unique_ptr<menu> menu(std::move(m_free));
+		m_free = std::move(menu->m_parent);
+		menu->m_parent = std::move(reversed);
+		reversed = std::move(menu);
+	}
+	while (reversed)
+		reversed = std::move(reversed->m_parent);
 }
 
 
