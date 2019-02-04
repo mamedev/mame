@@ -97,7 +97,7 @@ private:
 
 WRITE8_MEMBER(tomcat_state::adcon_w)
 {
-	m_adc->address_w(space, 0, data & 7);
+	m_adc->address_w(data & 7);
 	m_adc->start_w(BIT(data, 3));
 }
 
