@@ -121,7 +121,7 @@ READ32_MEMBER(midvunit_state::port0_r)
 READ32_MEMBER( midvunit_state::adc_r )
 {
 	if (!(m_control_data & 0x40))
-		return m_adc->read(space, 0) << m_adc_shift;
+		return m_adc->read() << m_adc_shift;
 	else
 		logerror("adc_r without enabling reads!\n");
 
@@ -131,7 +131,7 @@ READ32_MEMBER( midvunit_state::adc_r )
 WRITE32_MEMBER( midvunit_state::adc_w )
 {
 	if (!(m_control_data & 0x20))
-		m_adc->write(space, 0, data >> m_adc_shift);
+		m_adc->write(data >> m_adc_shift);
 	else
 		logerror("adc_w without enabling writes!\n");
 }

@@ -41,7 +41,7 @@ protected:
 	virtual void expbus_w(address_space &space, offs_t offset, uint8_t data) override;
 
 private:
-	DECLARE_READ8_MEMBER(status_r);
+	u8 status_r();
 	DECLARE_WRITE_LINE_MEMBER(busy_w);
 	DECLARE_WRITE_LINE_MEMBER(ready_w);
 

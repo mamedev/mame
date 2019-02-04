@@ -130,7 +130,7 @@ READ16_MEMBER(midyunit_state::term2_input_r)
 	if (offset != 2)
 		return m_ports[offset]->read();
 
-	return m_term2_adc->read(space, 0) | 0xff00;
+	return m_term2_adc->read() | 0xff00;
 }
 
 WRITE16_MEMBER(midyunit_state::term2_sound_w)
@@ -160,7 +160,7 @@ WRITE16_MEMBER(midyunit_state::term2_sound_w)
 	}
 
 	if (offset == 0)
-		m_term2_adc->write(space, 0, ((data >> 12) & 3) | 4);
+		m_term2_adc->write(((data >> 12) & 3) | 4);
 
 	m_adpcm_sound->reset_write((~data & 0x100) >> 1);
 	m_adpcm_sound->write(data);
