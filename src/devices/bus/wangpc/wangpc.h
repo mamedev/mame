@@ -24,51 +24,6 @@
 #define WANGPC_BUS_TAG      "wangpcbus"
 
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_WANGPC_BUS_ADD() \
-	MCFG_DEVICE_ADD(WANGPC_BUS_TAG, WANGPC_BUS, 0)
-
-#define MCFG_WANGPC_BUS_SLOT_ADD(_tag, _sid, _slot_intf, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, WANGPC_BUS_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-	downcast<wangpcbus_slot_device &>(*device).set_wangpcbus_slot(_sid);
-
-
-#define MCFG_WANGPC_BUS_IRQ2_CALLBACK(_write) \
-	downcast<wangpcbus_device &>(*device).set_irq2_wr_callback(DEVCB_##_write);
-
-#define MCFG_WANGPC_BUS_IRQ3_CALLBACK(_write) \
-	downcast<wangpcbus_device &>(*device).set_irq3_wr_callback(DEVCB_##_write);
-
-#define MCFG_WANGPC_BUS_IRQ4_CALLBACK(_write) \
-	downcast<wangpcbus_device &>(*device).set_irq4_wr_callback(DEVCB_##_write);
-
-#define MCFG_WANGPC_BUS_IRQ5_CALLBACK(_write) \
-	downcast<wangpcbus_device &>(*device).set_irq5_wr_callback(DEVCB_##_write);
-
-#define MCFG_WANGPC_BUS_IRQ6_CALLBACK(_write) \
-	downcast<wangpcbus_device &>(*device).set_irq6_wr_callback(DEVCB_##_write);
-
-#define MCFG_WANGPC_BUS_IRQ7_CALLBACK(_write) \
-	downcast<wangpcbus_device &>(*device).set_irq7_wr_callback(DEVCB_##_write);
-
-#define MCFG_WANGPC_BUS_DRQ1_CALLBACK(_write) \
-	downcast<wangpcbus_device &>(*device).set_drq1_wr_callback(DEVCB_##_write);
-
-#define MCFG_WANGPC_BUS_DRQ2_CALLBACK(_write) \
-	downcast<wangpcbus_device &>(*device).set_drq2_wr_callback(DEVCB_##_write);
-
-#define MCFG_WANGPC_BUS_DRQ3_CALLBACK(_write) \
-	downcast<wangpcbus_device &>(*device).set_drq3_wr_callback(DEVCB_##_write);
-
-#define MCFG_WANGPC_BUS_IOERROR_CALLBACK(_write) \
-	downcast<wangpcbus_device &>(*device).set_ioerror_wr_callback(DEVCB_##_write);
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -81,7 +36,17 @@ class wangpcbus_slot_device : public device_t, public device_slot_interface
 {
 public:
 	// construction/destruction
-	wangpcbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T>
+	wangpcbus_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt, int sid)
+		: wangpcbus_slot_device(mconfig, tag, owner, 0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+		set_wangpcbus_slot(sid);
+	}
+	wangpcbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// inline configuration
 	void set_wangpcbus_slot(int sid) { m_sid = sid; }
@@ -113,16 +78,16 @@ public:
 	wangpcbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~wangpcbus_device() { m_device_list.detach_all(); }
 
-	template <class Object> devcb_base &set_irq2_wr_callback(Object &&cb) { return m_write_irq2.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_irq3_wr_callback(Object &&cb) { return m_write_irq3.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_irq4_wr_callback(Object &&cb) { return m_write_irq4.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_irq5_wr_callback(Object &&cb) { return m_write_irq5.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_irq6_wr_callback(Object &&cb) { return m_write_irq6.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_irq7_wr_callback(Object &&cb) { return m_write_irq7.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_drq1_wr_callback(Object &&cb) { return m_write_drq1.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_drq2_wr_callback(Object &&cb) { return m_write_drq2.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_drq3_wr_callback(Object &&cb) { return m_write_drq3.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_ioerror_wr_callback(Object &&cb) { return m_write_ioerror.set_callback(std::forward<Object>(cb)); }
+	auto irq2_wr_callback() { return m_write_irq2.bind(); }
+	auto irq3_wr_callback() { return m_write_irq3.bind(); }
+	auto irq4_wr_callback() { return m_write_irq4.bind(); }
+	auto irq5_wr_callback() { return m_write_irq5.bind(); }
+	auto irq6_wr_callback() { return m_write_irq6.bind(); }
+	auto irq7_wr_callback() { return m_write_irq7.bind(); }
+	auto drq1_wr_callback() { return m_write_drq1.bind(); }
+	auto drq2_wr_callback() { return m_write_drq2.bind(); }
+	auto drq3_wr_callback() { return m_write_drq3.bind(); }
+	auto ioerror_wr_callback() { return m_write_ioerror.bind(); }
 
 	void add_card(device_wangpcbus_card_interface *card, int sid);
 

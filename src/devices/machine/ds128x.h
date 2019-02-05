@@ -5,11 +5,6 @@
 
 #include "mc146818.h"
 
-#define MCFG_DS12885_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, DS12885, XTAL(32'768))
-
-#define MCFG_DS12885EXT_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, DS12885EXT, XTAL(32'768))
 
 // ======================> ds12885_device
 
@@ -18,9 +13,10 @@ class ds12885_device : public mc146818_device
 public:
 	// construction/destruction
 	ds12885_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 32'768);
-	ds12885_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 32'768);
 
 protected:
+	ds12885_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual int data_size() override { return 128; }
 	virtual int get_timer_bypass() override;
 };

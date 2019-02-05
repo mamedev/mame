@@ -509,7 +509,7 @@ MACHINE_CONFIG_START(abc80_state::abc80)
 	m_csg->set_oneshot_params(CAP_U(0.1), RES_K(330));
 	m_csg->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	WAVE(config, "wave", CASSETTE_TAG).add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	// devices
 	Z80PIO(config, m_pio, XTAL(11'980'800)/2/2);
@@ -518,14 +518,14 @@ MACHINE_CONFIG_START(abc80_state::abc80)
 	m_pio->in_pb_callback().set(FUNC(abc80_state::pio_pb_r));
 	m_pio->out_pb_callback().set(FUNC(abc80_state::pio_pb_w));
 
-	MCFG_CASSETTE_ADD(CASSETTE_TAG)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("abc80_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_interface("abc80_cass");
 
 	ABC80_KEYBOARD(config, m_kb, 0);
 	m_kb->keydown_wr_callback().set(FUNC(abc80_state::keydown_w));
 
-	MCFG_ABCBUS_SLOT_ADD(ABCBUS_TAG, abc80_cards, "abcexp")
+	ABCBUS_SLOT(config, ABCBUS_TAG, XTAL(11'980'800)/2/2, abc80_cards, "abcexp");
 
 	RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr);
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, KEYBOARD_TAG, 0));
@@ -537,8 +537,8 @@ MACHINE_CONFIG_START(abc80_state::abc80)
 	RAM(config, RAM_TAG).set_default_size("16K");
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "abc80_cass")
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "abc80_flop")
+	SOFTWARE_LIST(config, "cass_list").set_original("abc80_cass");
+	SOFTWARE_LIST(config, "flop_list").set_original("abc80_flop");
 MACHINE_CONFIG_END
 
 

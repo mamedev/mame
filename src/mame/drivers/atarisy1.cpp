@@ -261,7 +261,7 @@ READ8_MEMBER(atarisy1_state::adc_r)
 	if (!m_adc.found())
 		return 0xff;
 
-	int value = m_adc->data_r(space, 0);
+	int value = m_adc->data_r();
 
 	if (!machine().side_effects_disabled())
 		adc_w(space, offset, 0);
@@ -275,7 +275,7 @@ WRITE8_MEMBER(atarisy1_state::adc_w)
 	if (!m_adc.found())
 		return;
 
-	m_adc->address_offset_start_w(space, offset & 7, 0);
+	m_adc->address_offset_start_w(offset & 7, 0);
 
 	/* the A4 bit enables/disables joystick IRQs */
 	m_ajsint->in_w<0>(!BIT(offset, 3));
@@ -747,9 +747,9 @@ MACHINE_CONFIG_START(atarisy1_state::atarisy1)
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_TIMER_DRIVER_ADD("scan_timer", atarisy1_state, atarisy1_int3_callback)
-	MCFG_TIMER_DRIVER_ADD("int3off_timer", atarisy1_state, atarisy1_int3off_callback)
-	MCFG_TIMER_DRIVER_ADD("yreset_timer", atarisy1_state, atarisy1_reset_yscroll_callback)
+	TIMER(config, m_scanline_timer).configure_generic(FUNC(atarisy1_state::atarisy1_int3_callback));
+	TIMER(config, m_int3off_timer).configure_generic(FUNC(atarisy1_state::atarisy1_int3off_callback));
+	TIMER(config, m_yscroll_reset_timer).configure_generic(FUNC(atarisy1_state::atarisy1_reset_yscroll_callback));
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_atarisy1)

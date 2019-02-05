@@ -2264,8 +2264,8 @@ cchasm1:
 ;@s:cclimber.cpp
 
 ;rpatrol:******River Patrol (Orca)
-rpatroln:
 rpatrol:
+rpatroln:
 @:maincpu,program,919b,4,18,0a
 @:maincpu,program,91ba,6,00,00
 @:maincpu,program,921b,4,18,0a
@@ -2595,8 +2595,8 @@ circusce:
 
 ;@s:cischeat.cpp
 
-f1gpstar:
-f1gpstaro:
+f1gpstar2:
+f1gpstar3:
 @:cpu1,program,f2803,5e3,04,4d
 
 
@@ -11423,9 +11423,9 @@ s1945:
 s1945a:
 s1945bl:
 s1945j:
-s1945jn:
 s1945k:
 s1945n:
+s1945nj:
 @:maincpu,program,fe2af8,78,2d,f8
 
 

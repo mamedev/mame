@@ -294,8 +294,8 @@ MACHINE_CONFIG_START(littlerb_state::littlerb)
 	INDER_VIDEO(config, m_indervid, 0); // XTAL(40'000'000)
 
 	// TODO: not accurate - driven by XTAL(6'000'000)?
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("step_timer", littlerb_state, littlerb_sound_step_cb,  attotime::from_hz(7500/150))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("sound_timer", littlerb_state, littlerb_sound_cb,  attotime::from_hz(7500))
+	TIMER(config, "step_timer").configure_periodic(FUNC(littlerb_state::littlerb_sound_step_cb), attotime::from_hz(7500/150));
+	TIMER(config, "sound_timer").configure_periodic(FUNC(littlerb_state::littlerb_sound_cb), attotime::from_hz(7500));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

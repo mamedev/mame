@@ -201,9 +201,10 @@ uint8_t *nes_datach_rom_device::get_cart_base()
 }
 
 
-MACHINE_CONFIG_START(nes_datach_24c01_device::device_add_mconfig)
-	MCFG_24C01_ADD("i2cmem")
-MACHINE_CONFIG_END
+void nes_datach_24c01_device::device_add_mconfig(machine_config &config)
+{
+	I2C_24C01(config, m_i2cmem);
+}
 
 
 //---------------------------------
@@ -368,11 +369,12 @@ static void datach_cart(device_slot_interface &device)
 }
 
 
-MACHINE_CONFIG_START(nes_datach_device::device_add_mconfig)
-	BARCODE_READER(config, "datach", 0);
-	MCFG_DATACH_MINICART_ADD("datach_slot", datach_cart)
-	MCFG_24C02_ADD("i2cmem")
-MACHINE_CONFIG_END
+void nes_datach_device::device_add_mconfig(machine_config &config)
+{
+	BARCODE_READER(config, m_reader, 0);
+	NES_DATACH_SLOT(config, m_subslot, 0, datach_cart);
+	I2C_24C02(config, m_i2cmem);
+}
 
 
 //-------------------------------------------------

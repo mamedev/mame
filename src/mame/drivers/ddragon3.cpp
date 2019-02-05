@@ -825,7 +825,7 @@ MACHINE_CONFIG_START(ddragon3_state::ddragon3)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, 20_MHz_XTAL / 2)
 	MCFG_DEVICE_PROGRAM_MAP(ddragon3_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ddragon3_state, ddragon3_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(ddragon3_state::ddragon3_scanline), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
@@ -901,7 +901,7 @@ MACHINE_CONFIG_START(wwfwfest_state::wwfwfest)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, 24_MHz_XTAL / 2)  /* 24 crystal, 12 rated chip */
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ddragon3_state, ddragon3_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(ddragon3_state::ddragon3_scanline), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)

@@ -319,8 +319,8 @@ void sun3_state::ncr5380(device_t *device)
 {
 	devcb_base *devcb;
 	(void)devcb;
-	MCFG_DEVICE_CLOCK(10000000)
-//  MCFG_NCR5380N_DRQ_HANDLER(WRITELINE(*this, sun3_state, drq_w))
+	downcast<ncr5380n_device &>(*device).set_clock(10000000);
+//  downcast<ncr5380n_device &>(*device).drq_handler().set(FUNC(sun3_state::drq_w));
 }
 
 static void scsi_devices(device_slot_interface &device)
@@ -543,7 +543,7 @@ READ32_MEMBER( sun3_state::tl_mmu_r )
 		switch ((m_pagemap[entry] >> 26) & 3)
 		{
 			case 0: // type 0 space
-				return m_type0space->read32(space, tmp, mem_mask);
+				return m_type0space->read32(tmp, mem_mask);
 
 			case 1: // type 1 space
 				// magic ROM bypass
@@ -551,13 +551,13 @@ READ32_MEMBER( sun3_state::tl_mmu_r )
 				{
 					return m_rom_ptr[offset & 0x3fff];
 				}
-				return m_type1space->read32(space, tmp, mem_mask);
+				return m_type1space->read32(tmp, mem_mask);
 
 			case 2: // type 2 space
-				return m_type2space->read32(space, tmp, mem_mask);
+				return m_type2space->read32(tmp, mem_mask);
 
 			case 3: // type 3 space
-				return m_type3space->read32(space, tmp, mem_mask);
+				return m_type3space->read32(tmp, mem_mask);
 		}
 	}
 	else
@@ -693,20 +693,20 @@ WRITE32_MEMBER( sun3_state::tl_mmu_w )
 		switch ((m_pagemap[entry] >> 26) & 3)
 		{
 			case 0: // type 0
-				m_type0space->write32(space, tmp, data, mem_mask);
+				m_type0space->write32(tmp, data, mem_mask);
 				return;
 
 			case 1: // type 1
 				//printf("write device space @ %x\n", tmp<<1);
-				m_type1space->write32(space, tmp, data, mem_mask);
+				m_type1space->write32(tmp, data, mem_mask);
 				return;
 
 			case 2: // type 2
-				m_type2space->write32(space, tmp, data, mem_mask);
+				m_type2space->write32(tmp, data, mem_mask);
 				return;
 
 			case 3: // type 3
-				m_type3space->write32(space, tmp, data, mem_mask);
+				m_type3space->write32(tmp, data, mem_mask);
 				return;
 		}
 	}
@@ -1035,7 +1035,7 @@ MACHINE_CONFIG_START(sun3_state::sun3)
 	// MMU Type 3 device space
 	ADDRESS_MAP_BANK(config, "type3").set_map(&sun3_state::vmetype3space_map).set_options(ENDIANNESS_BIG, 32, 32, 0x80000000);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer", sun3_state, sun3_timer, attotime::from_hz(100))
+	TIMER(config, "timer").configure_periodic(FUNC(sun3_state::sun3_timer), attotime::from_hz(100));
 
 	SCC8530N(config, m_scc1, 4.9152_MHz_XTAL);
 	m_scc1->out_txda_callback().set(KEYBOARD_TAG, FUNC(sun_keyboard_port_device::write_txd));
@@ -1061,16 +1061,15 @@ MACHINE_CONFIG_START(sun3_state::sun3)
 
 	AM79C90(config, m_lance, 10'000'000); // clock is a guess
 
-	MCFG_NSCSI_BUS_ADD("scsibus")
-	MCFG_NSCSI_ADD("scsibus:0", scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:1", scsi_devices, "harddisk", false)
-	MCFG_NSCSI_ADD("scsibus:2", scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:3", scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:4", scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:5", scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:6", scsi_devices, "cdrom", false)
-	MCFG_NSCSI_ADD("scsibus:7", scsi_devices, "ncr5380", true)
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("ncr5380", [this] (device_t *device) { ncr5380(device); })
+	NSCSI_BUS(config, "scsibus");
+	NSCSI_CONNECTOR(config, "scsibus:0", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:1", scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "scsibus:2", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:3", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:4", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:5", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:6", scsi_devices, "cdrom");
+	NSCSI_CONNECTOR(config, "scsibus:7", scsi_devices, "ncr5380", true).set_option_machine_config("ncr5380", [this] (device_t *device) { ncr5380(device); });
 MACHINE_CONFIG_END
 
 // Sun 3/60
@@ -1124,7 +1123,7 @@ MACHINE_CONFIG_START(sun3_state::sun3_50)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer", sun3_state, sun3_timer, attotime::from_hz(100))
+	TIMER(config, "timer").configure_periodic(FUNC(sun3_state::sun3_timer), attotime::from_hz(100));
 
 	RAM(config, m_ram).set_default_size("4M").set_default_value(0x00);
 
@@ -1162,16 +1161,15 @@ MACHINE_CONFIG_START(sun3_state::sun3_50)
 	rs232b.dcd_handler().set(m_scc2, FUNC(z80scc_device::dcdb_w));
 	rs232b.cts_handler().set(m_scc2, FUNC(z80scc_device::ctsb_w));
 
-	MCFG_NSCSI_BUS_ADD("scsibus")
-	MCFG_NSCSI_ADD("scsibus:0", scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:1", scsi_devices, "harddisk", false)
-	MCFG_NSCSI_ADD("scsibus:2", scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:3", scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:4", scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:5", scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:6", scsi_devices, "cdrom", false)
-	MCFG_NSCSI_ADD("scsibus:7", scsi_devices, "ncr5380", true)
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("ncr5380", [this] (device_t *device) { ncr5380(device); })
+	NSCSI_BUS(config, "scsibus");
+	NSCSI_CONNECTOR(config, "scsibus:0", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:1", scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "scsibus:2", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:3", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:4", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:5", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:6", scsi_devices, "cdrom");
+	NSCSI_CONNECTOR(config, "scsibus:7", scsi_devices, "ncr5380", true).set_option_machine_config("ncr5380", [this] (device_t *device) { ncr5380(device); });
 MACHINE_CONFIG_END
 
 /* ROM definition */

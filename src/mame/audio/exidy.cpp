@@ -768,8 +768,7 @@ MACHINE_CONFIG_START(venture_sound_device::device_add_mconfig)
 	m_pia->cb2_handler().set(FUNC(venture_sound_device::pia_cb2_w));
 	m_pia->irqb_handler().set("audioirq", FUNC(input_merger_device::in_w<1>));
 
-	MCFG_INPUT_MERGER_ANY_HIGH("audioirq") // open collector
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", m6502_device::IRQ_LINE))
+	INPUT_MERGER_ANY_HIGH(config, "audioirq").output_handler().set_inputline("audiocpu", m6502_device::IRQ_LINE); // open collector
 
 	SPEAKER(config, "mono").front_center();
 
@@ -997,8 +996,7 @@ MACHINE_CONFIG_START(victory_sound_device::device_add_mconfig)
 	m_pia->cb2_handler().set(FUNC(victory_sound_device::main_ack_w));
 	m_pia->irqb_handler().set("audioirq", FUNC(input_merger_device::in_w<1>));
 
-	MCFG_INPUT_MERGER_ANY_HIGH("audioirq") // open collector
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", m6502_device::IRQ_LINE))
+	INPUT_MERGER_ANY_HIGH(config, "audioirq").output_handler().set_inputline("audiocpu", m6502_device::IRQ_LINE); // open collector
 
 	SPEAKER(config, "mono").front_center();
 

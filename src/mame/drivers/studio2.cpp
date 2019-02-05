@@ -645,7 +645,7 @@ MACHINE_CONFIG_START(studio2_state::studio2_cartslot)
 	MCFG_GENERIC_LOAD(studio2_state, studio2_cart_load)
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "studio2")
+	SOFTWARE_LIST(config, "cart_list").set_original("studio2");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(studio2_state::studio2)
@@ -703,7 +703,7 @@ MACHINE_CONFIG_START(visicom_state::visicom)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "visicom")
+	SOFTWARE_LIST(config, "cart_list").set_original("visicom");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mpt02_state::mpt02)

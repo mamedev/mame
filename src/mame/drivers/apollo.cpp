@@ -1050,7 +1050,7 @@ MACHINE_CONFIG_START(apollo_state::dn3500)
 	MCFG_DEVICE_PROGRAM_MAP(dn3500_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(apollo_state,apollo_irq_acknowledge)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	apollo(config);
 
@@ -1072,7 +1072,7 @@ MACHINE_CONFIG_START(apollo_state::dsp3500)
 	MCFG_DEVICE_ADD(MAINCPU, M68030, 25000000) /* 25 MHz 68030 */
 	MCFG_DEVICE_PROGRAM_MAP(dsp3500_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(apollo_state,apollo_irq_acknowledge)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	apollo_terminal(config);
 
@@ -1124,7 +1124,7 @@ MACHINE_CONFIG_START(apollo_state::dsp3000)
 	MCFG_DEVICE_ADD(MAINCPU, M68020PMMU, 12000000) /* 12 MHz */
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(apollo_state,apollo_irq_acknowledge)
 	MCFG_DEVICE_PROGRAM_MAP(dsp3000_map)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	apollo_terminal(config);
 
@@ -1172,7 +1172,7 @@ MACHINE_CONFIG_START(apollo_state::dsp5500)
 	MCFG_DEVICE_ADD(MAINCPU, M68040, 25000000) /* 25 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(dsp5500_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(apollo_state,apollo_irq_acknowledge)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	apollo_terminal(config);
 

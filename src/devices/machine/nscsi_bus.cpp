@@ -3,13 +3,15 @@
 #include "emu.h"
 #include "nscsi_bus.h"
 
-#define LOG_GENERAL (1U << 0)
-#define LOG_STATE   (1U << 1)
-#define LOG_CONTROL (1U << 2)
-#define LOG_DATA    (1U << 3)
+#define LOG_GENERAL     (1U << 0)
+#define LOG_UNSUPPORTED (1U << 1)
+#define LOG_STATE       (1U << 2)
+#define LOG_CONTROL     (1U << 3)
+#define LOG_DATA        (1U << 4)
+#define LOG_DATA_SENT   (1U << 5)
 
 //#define VERBOSE (LOG_GENERAL | LOG_STATE | LOG_CONTROL | LOG_DATA)
-#define VERBOSE 0
+#define VERBOSE (LOG_UNSUPPORTED | LOG_DATA_SENT)
 
 #include "logmacro.h"
 
@@ -562,6 +564,17 @@ void nscsi_full_device::scsi_status_complete(uint8_t st)
 
 void nscsi_full_device::scsi_data_in(int buf, int size)
 {
+	if((VERBOSE & LOG_DATA_SENT) && buf == 0) {
+		std::string dt = "";
+		int sz = size;
+		if(sz > 50)
+			sz = 50;
+		for(int i=0; i<sz; i++)
+			dt += util::string_format(" %02x", scsi_cmdbuf[i]);
+		if(size > sz)
+			dt += " ...";
+		LOGMASKED(LOG_DATA_SENT, "Sending data (%d)%s\n", size, dt);
+	}
 	control *c;
 	c = buf_control_push();
 	c->action = BC_DATA_IN;
@@ -583,31 +596,28 @@ void nscsi_full_device::sense(bool deferred, uint8_t key, uint8_t asc, uint8_t a
 	memset(scsi_sense_buffer, 0, sizeof(scsi_sense_buffer));
 	scsi_sense_buffer[0] = deferred ? 0x71 : 0x70;
 	scsi_sense_buffer[2] = key;
+	scsi_sense_buffer[7] = sizeof(scsi_sense_buffer) - 8;
 	scsi_sense_buffer[12] = asc;
 	scsi_sense_buffer[13] = ascq;
 }
 
 void nscsi_full_device::scsi_unknown_command()
 {
-	LOG("Unhandled command %s", command_names[scsi_cmdbuf[0]]);
+	std::string txt = util::string_format("Unhandled command %s (%d):", command_names[scsi_cmdbuf[0]], scsi_cmdsize);
 	for(int i=0; i != scsi_cmdsize; i++)
-		logerror(" %02x", scsi_cmdbuf[i]);
-	logerror("\n");
+		txt += util::string_format(" %02x", scsi_cmdbuf[i]);
+	LOGMASKED(LOG_UNSUPPORTED, "%s\n", txt);
 
 	scsi_status_complete(SS_CHECK_CONDITION);
-	sense(false, 5);
+	sense(false, SK_ILLEGAL_REQUEST);
 }
 
 void nscsi_full_device::scsi_command()
 {
 	switch(scsi_cmdbuf[0]) {
 	case SC_REQUEST_SENSE:
-		LOG("command REQUEST SENSE\n");
-		/*
-		 * Targets shall be capable of returning eighteen bytes of data in
-		 * response to a REQUEST SENSE command.
-		 */
-		scsi_data_in(SBUF_SENSE, 18);
+		LOG("command REQUEST SENSE alloc=%d\n", scsi_cmdbuf[4]);
+		scsi_data_in(SBUF_SENSE, scsi_cmdbuf[4] ? std::min(scsi_cmdbuf[4], u8(sizeof(scsi_sense_buffer))) : 4);
 		scsi_status_complete(SS_GOOD);
 		break;
 	default:
@@ -623,10 +633,10 @@ void nscsi_full_device::scsi_message()
 		return;
 	}
 
-	LOG("Unknown message");
+	std::string txt = "Unknown message";
 	for(int i=0; i != scsi_cmdsize; i++)
-		logerror(" %02x", scsi_cmdbuf[i]);
-	logerror("\n");
+		txt += util::string_format(" %02x", scsi_cmdbuf[i]);
+	LOGMASKED(LOG_UNSUPPORTED, "%s\n", txt);
 }
 
 int nscsi_full_device::get_lun(int def)
@@ -640,9 +650,7 @@ int nscsi_full_device::get_lun(int def)
 void nscsi_full_device::bad_lun()
 {
 	scsi_status_complete(SS_CHECK_CONDITION);
-
-	// key:illegal request, asc:logical unit not supported
-	sense(false, 5, 0x25);
+	sense(false, SK_ILLEGAL_REQUEST, SK_ASC_LOGICAL_UNIT_NOT_SUPPORTED);
 }
 
 // Arbitration delay (2.4us)

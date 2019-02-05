@@ -105,7 +105,7 @@ class bus_master_ide_controller_device : public ide_controller_32_device
 {
 public:
 	bus_master_ide_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
-	void set_bus_master_space(const char *bmcpu, uint32_t bmspace) { m_bmcpu = bmcpu; m_bmspace = bmspace; }
+	template <typename T> void set_bus_master_space(T &&bmtag, int bmspace) { m_dma_space.set_tag(std::forward<T>(bmtag), bmspace); }
 
 	template <typename T> bus_master_ide_controller_device &master(T &&opts, const char *dflt = nullptr, bool fixed = false)
 	{
@@ -140,9 +140,7 @@ protected:
 private:
 	void execute_dma();
 
-	const char *m_bmcpu;
-	uint32_t m_bmspace;
-	address_space *m_dma_space;
+	required_address_space m_dma_space;
 	uint8_t m_dma_address_xor;
 
 	offs_t m_dma_address;

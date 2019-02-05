@@ -58,27 +58,6 @@ void ep64_expansion_bus_cards(device_slot_interface &device);
 
 #define EP64_EXPANSION_BUS_TAG  "exp"
 
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_EP64_EXPANSION_BUS_SLOT_ADD(_tag, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, EP64_EXPANSION_BUS_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(ep64_expansion_bus_cards, _def_slot, false)
-
-#define MCFG_EP64_EXPANSION_BUS_SLOT_DAVE(_tag) \
-	downcast<ep64_expansion_bus_slot_device &>(*device).set_dave_tag(_tag);
-
-#define MCFG_EP64_EXPANSION_BUS_SLOT_IRQ_CALLBACK(_write) \
-	downcast<ep64_expansion_bus_slot_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
-
-#define MCFG_EP64_EXPANSION_BUS_SLOT_NMI_CALLBACK(_write) \
-	downcast<ep64_expansion_bus_slot_device &>(*device).set_nmi_wr_callback(DEVCB_##_write);
-
-#define MCFG_EP64_EXPANSION_BUS_SLOT_WAIT_CALLBACK(_write) \
-	downcast<ep64_expansion_bus_slot_device &>(*device).set_wait_wr_callback(DEVCB_##_write);
-
-
 
 //**************************************************************************
 //  TYPE DEFINITIONS

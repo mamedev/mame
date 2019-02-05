@@ -1470,8 +1470,8 @@ MACHINE_CONFIG_START(socrates_state::socrates)
 	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(21'477'272)/6)  /* Toshiba TMPZ84C00AP @ 3.579545 MHz, verified, xtal is divided by 6 */
 	MCFG_DEVICE_PROGRAM_MAP(z80_mem)
 	MCFG_DEVICE_IO_MAP(z80_io)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", socrates_state,  assert_irq)
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	ADDRESS_MAP_BANK(config, "rombank1").set_map(&socrates_state::socrates_rombank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
 	ADDRESS_MAP_BANK(config, "rambank1").set_map(&socrates_state::socrates_rambank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
@@ -1496,7 +1496,7 @@ MACHINE_CONFIG_START(socrates_state::socrates)
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "socrates_cart")
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "socrates")
+	SOFTWARE_LIST(config, "cart_list").set_original("socrates");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(socrates_state::socrates_pal)
@@ -1505,8 +1505,8 @@ MACHINE_CONFIG_START(socrates_state::socrates_pal)
 	MCFG_DEVICE_REPLACE("maincpu", Z80, XTAL(26'601'712)/8)
 	MCFG_DEVICE_PROGRAM_MAP(z80_mem)
 	MCFG_DEVICE_IO_MAP(z80_io)
-	MCFG_QUANTUM_TIME(attotime::from_hz(50))
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", socrates_state,  assert_irq)
+	config.m_minimum_quantum = attotime::from_hz(50);
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(50)

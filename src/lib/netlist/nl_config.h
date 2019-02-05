@@ -26,7 +26,6 @@
  * linear memory pool. This is based of the assumption that
  * due to enhanced locality there will be less cache misses.
  * Your mileage may vary.
- * This will cause crashes on OSX and thus is ignored on OSX.
  *
  */
 #define USE_MEMPOOL                 (0)
@@ -50,9 +49,8 @@
 // savings are eaten up by effort
 // FIXME: Convert into solver parameter
 #define USE_LINEAR_PREDICTION       (0)
+
 #define NETLIST_GMIN_DEFAULT     (1e-9)
-
-
 
 //============================================================
 //  DEBUGGING
@@ -60,6 +58,8 @@
 
 #define NL_DEBUG                    (false)
 #define NL_KEEP_STATISTICS          (0)
+//#define NL_DEBUG                    (true)
+//#define NL_KEEP_STATISTICS          (1)
 
 //============================================================
 //  General Macros
@@ -95,14 +95,8 @@
 //#define nl_double float
 //#define NL_FCONST(x) (x ## f)
 
-//#define nl_double double
 #define NL_FCONST(x) x
 using nl_double = double;
-
-/* The following option determines how object::update is called.
- * If set to 1, a virtual call is used. If it is left undefined, the best
- * approach will be automatically selected.
- */
 
 //============================================================
 //  WARNINGS

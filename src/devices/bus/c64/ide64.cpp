@@ -225,7 +225,7 @@ uint8_t c64_ide64_cartridge_device::c64_cd_r(address_space &space, offs_t offset
 	{
 		offs_t addr = (m_bank << 14) | (offset & 0x3fff);
 
-		data = m_flash_rom->read(space, addr);
+		data = m_flash_rom->read(addr);
 	}
 	else if (!ram_oe)
 	{
@@ -259,7 +259,7 @@ void c64_ide64_cartridge_device::c64_cd_w(address_space &space, offs_t offset, u
 	if ((offset >= 0x8000 && offset < 0xc000) && !m_wp)
 	{
 		offs_t addr = (m_bank << 14) | (offset & 0x3fff);
-		m_flash_rom->write(space, addr, data);
+		m_flash_rom->write(addr, data);
 	}
 
 	if (!io1)

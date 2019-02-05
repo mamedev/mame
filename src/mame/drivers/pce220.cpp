@@ -966,7 +966,7 @@ MACHINE_CONFIG_START(pce220_state::pce220)
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beep, 3250).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("pce220_timer", pce220_state, pce220_timer_callback, attotime::from_msec(468))
+	TIMER(config, "pce220_timer").configure_periodic(FUNC(pce220_state::pce220_timer_callback), attotime::from_msec(468));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -998,7 +998,7 @@ MACHINE_CONFIG_START(pcg850v_state::pcg815)
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beep, 3250).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("pce220_timer", pcg850v_state, pce220_timer_callback, attotime::from_msec(468))
+	TIMER(config, "pce220_timer").configure_periodic(FUNC(pcg850v_state::pce220_timer_callback), attotime::from_msec(468));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -1030,7 +1030,7 @@ MACHINE_CONFIG_START(pcg850v_state::pcg850v)
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beep, 3250).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("pce220_timer", pcg850v_state, pce220_timer_callback, attotime::from_msec(468))
+	TIMER(config, "pce220_timer").configure_periodic(FUNC(pcg850v_state::pce220_timer_callback), attotime::from_msec(468));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

@@ -820,7 +820,7 @@ MACHINE_CONFIG_START(mz3500_state::mz3500)
 	MCFG_DEVICE_PROGRAM_MAP(mz3500_slave_map)
 	MCFG_DEVICE_IO_MAP(mz3500_slave_io)
 
-	MCFG_QUANTUM_PERFECT_CPU("master")
+	config.m_perfect_cpu_quantum = subtag("master");
 
 	i8255_device &ppi(I8255A(config, "i8255"));
 	ppi.out_pa_callback().set(FUNC(mz3500_state::mz3500_pa_w));
@@ -829,10 +829,10 @@ MACHINE_CONFIG_START(mz3500_state::mz3500)
 
 	UPD765A(config, m_fdc, 8'000'000, true, true);
 	m_fdc->intrq_wr_callback().set_inputline(m_master, INPUT_LINE_IRQ0);
-	MCFG_FLOPPY_DRIVE_ADD("upd765a:0", mz3500_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765a:1", mz3500_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765a:2", mz3500_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765a:3", mz3500_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, "upd765a:0", mz3500_floppies, "525ssdd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765a:1", mz3500_floppies, "525ssdd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765a:2", mz3500_floppies, "525ssdd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765a:3", mz3500_floppies, "525ssdd", floppy_image_device::default_floppy_formats);
 
 	UPD7220(config, m_hgdc1, MAIN_CLOCK/5);
 	m_hgdc1->set_addrmap(0, &mz3500_state::upd7220_1_map);

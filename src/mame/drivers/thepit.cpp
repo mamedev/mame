@@ -774,7 +774,7 @@ MACHINE_CONFIG_START(thepit_state::desertdn)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(thepit_state, screen_update_desertdan)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_intrepid)
+	m_gfxdecode->set_info(gfx_intrepid);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(thepit_state::intrepid)
@@ -787,19 +787,18 @@ MACHINE_CONFIG_START(thepit_state::intrepid)
 	m_mainlatch->q_out_cb<5>().set(FUNC(thepit_state::intrepid_graphics_bank_w));
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_intrepid)
+	m_gfxdecode->set_info(gfx_intrepid);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(thepit_state::suprmous)
+void thepit_state::suprmous(machine_config &config)
+{
 	intrepid(config);
-
-	/* basic machine hardware */
 
 	/* video hardware */
 	m_palette->set_init(FUNC(thepit_state::suprmous_palette));
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_suprmous)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_suprmous);
+}
 
 
 

@@ -459,7 +459,7 @@ WRITE_LINE_MEMBER(discoboy_state::yunsung8_adpcm_int)
 void discoboy_state::discoboy(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(12'000'000)/2);		/* 6 MHz? */
+	Z80(config, m_maincpu, XTAL(12'000'000)/2);     /* 6 MHz? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &discoboy_state::discoboy_map);
 	m_maincpu->set_addrmap(AS_IO, &discoboy_state::io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(discoboy_state::irq0_line_hold));

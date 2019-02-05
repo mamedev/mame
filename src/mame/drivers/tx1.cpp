@@ -208,7 +208,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(tx1_state::tx1j)
 	tx1(config);
 
-	MCFG_DEVICE_REMOVE("soundbrd")
+	config.device_remove("soundbrd");
 
 	MCFG_DEVICE_ADD("soundbrd", TX1J_SOUND, TX1_PIXEL_CLOCK)
 MACHINE_CONFIG_END

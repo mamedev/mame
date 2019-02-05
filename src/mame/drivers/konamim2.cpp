@@ -1203,7 +1203,7 @@ void konamim2_state::set_arcres(machine_config &config)
 
 void konamim2_state::add_ymz280b(machine_config &config)
 {
-    // TODO: The YMZ280B outputs are actually routed to a speaker in each gun
+	// TODO: The YMZ280B outputs are actually routed to a speaker in each gun
 	YMZ280B(config, m_ymz280b, XTAL(16'934'400));
 	m_ymz280b->add_route(0, "lspeaker", 0.5);
 	m_ymz280b->add_route(1, "rspeaker", 0.5);
@@ -1463,8 +1463,8 @@ void konamim2_state::install_m48t58()
 
 void konamim2_state::install_ymz280b()
 {
-	read8_delegate read_delegate(FUNC(ymz280b_device::read), &(*m_ymz280b));
-	write8_delegate write_delegate(FUNC(ymz280b_device::write), &(*m_ymz280b));
+	read8sm_delegate read_delegate(FUNC(ymz280b_device::read), &(*m_ymz280b));
+	write8sm_delegate write_delegate(FUNC(ymz280b_device::write), &(*m_ymz280b));
 
 	m_ppc1->space(AS_PROGRAM).install_readwrite_handler(0x3e800000, 0x3e80000f, read_delegate, write_delegate, 0xff00ff0000000000ULL);
 	m_ppc2->space(AS_PROGRAM).install_readwrite_handler(0x3e800000, 0x3e80000f, read_delegate, write_delegate, 0xff00ff0000000000ULL);

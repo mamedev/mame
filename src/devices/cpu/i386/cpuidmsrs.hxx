@@ -261,41 +261,70 @@ uint64_t athlonxp_device::opcode_rdmsr(bool &valid_msr)
 			break;
 		case 0x1b: // APIC_BASE
 			break;
+		case 0xfe: // MTRRcap
+			// 7-0   MTRRCapVCnt - Number of variable range MTRRs (8)
+			// 8     MtrrCapFix  - Fixed range MTRRs available (1)
+			// 10    MtrrCapWc   - Write combining memory type available (1)
+			break;
 		case 0x17b: // MCG_CTL
 			break;
 		case 0x200: // MTRRphysBase0-7
-		case 0x201: // MTRRphysMask0-7
 		case 0x202:
-		case 0x203:
 		case 0x204:
-		case 0x205:
 		case 0x206:
-		case 0x207:
 		case 0x208:
-		case 0x209:
 		case 0x20a:
-		case 0x20b:
 		case 0x20c:
-		case 0x20d:
 		case 0x20e:
+			// 7-0   Type        - Memory type for this memory range
+			// 39-12 PhyBase27-0 - Base address for this memory range
+			/* Format of type field:
+			    Bits 2-0 specify the memory type with the following encoding
+				 0 UC Uncacheable
+				 1 WC Write Combining
+				 4 WT Write Through
+				 5 WP Write Protect
+				 6 WB Write Back
+				 7 UC Uncacheable used only in PAT register
+				Bit 3 WrMem 1 write to memory 0 write to mmio, present only in fixed range MTRRs
+				Bit 4 RdMem 1 read from memory 0 read from mmio, present only in fixed range MTRRs
+				Other bits are unused
+			*/
+			break;
+		case 0x201: // MTRRphysMask0-7
+		case 0x203:
+		case 0x205:
+		case 0x207:
+		case 0x209:
+		case 0x20b:
+		case 0x20d:
 		case 0x20f:
+			// 11    Valid       - Memory range active
+			// 39-12 PhyMask27-0 - Address mask
 			break;
 		case 0x2ff: // MTRRdefType
+			// 7-0   MtrrDefMemType   - Default memory type
+			// 10    MtrrDefTypeFixEn - Enable fixed range MTRRs
+			// 11    MtrrDefTypeEn    - Enable MTRRs
 			break;
 		case 0x250: // MTRRfix64K_00000
+			// 8 bits for each 64k block starting at address 0
 			break;
 		case 0x258: // MTRRfix16K_80000
+			// 8 bits for each 16k block starting at address 0x80000
 			break;
 		case 0x259: // MTRRfix16K_A0000
+			// 8 bits for each 16k block starting at address 0xa0000
 			break;
-		case 0x268: // MTRRfix4K_C0000-F8000
-		case 0x269:
-		case 0x26a:
-		case 0x26b:
-		case 0x26c:
-		case 0x26d:
-		case 0x26e:
-		case 0x26f:
+		case 0x268: // MTRRfix4K_C0000
+		case 0x269: // MTRRfix4K_C8000
+		case 0x26a: // MTRRfix4K_D0000
+		case 0x26b: // MTRRfix4K_D8000
+		case 0x26c: // MTRRfix4K_E0000
+		case 0x26d: // MTRRfix4K_E8000
+		case 0x26e: // MTRRfix4K_F0000
+		case 0x26f: // MTRRfix4K_F8000
+			// 8 bits for each 4k block
 			break;
 		case 0x400: // MC0_CTL
 			break;
@@ -306,15 +335,25 @@ uint64_t athlonxp_device::opcode_rdmsr(bool &valid_msr)
 		case 0x40c: // MC3_CTL
 			break;
 		case 0xC0010010: // SYS_CFG
+			// 20    MtrrVarDramEn    - Enable top of memory address and I/O range registers
+			// 19    MtrrFixDramModEn - Enable modification of RdDram and WrDram bits in fixed MTRRs
+			// 18    MtrrFixDramEn    - Enable RdDram and WrDram attributes in fixed MTRRs
 			break;
 		case 0xC0010015: // HWCR
 			break;
-		case 0xC0010016: // IORRBase
-		case 0xC0010017: // IORRMask
+		case 0xC0010016: // IORRBase0-1
 		case 0xC0010018:
+			// 39-12 Base27-0 - Base address for this memory range
+			// 4     RdDram   - Read from DRAM
+			// 3     WrDram   - Write to DRAM
+			break;
+		case 0xC0010017: // IORRMask0-1
 		case 0xC0010019:
+			// 39-12 Mask27-0 - Address mask
+			// 11    V        - Register enabled
 			break;
 		case 0xC001001A: // TOP_MEM
+			// 39-23 TOM16-0 - Top of Memory, accesses from this address onward are directed to mmio
 			break;
 		case 0xC001001D: // TOP_MEM2
 			break;

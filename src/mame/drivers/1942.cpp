@@ -568,7 +568,7 @@ MACHINE_CONFIG_START(_1942_state::_1942)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_CPU_CLOCK)    /* 4 MHz ??? */
 	MCFG_DEVICE_PROGRAM_MAP(_1942_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", _1942_state, _1942_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(_1942_state::_1942_scanline), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, SOUND_CPU_CLOCK)  /* 3 MHz ??? */
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)

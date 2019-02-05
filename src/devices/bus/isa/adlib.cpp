@@ -20,7 +20,7 @@ READ8_MEMBER( isa8_adlib_device::ym3812_16_r )
 	uint8_t retVal = 0xff;
 	switch(offset)
 	{
-		case 0 : retVal = m_ym3812->status_port_r( space, offset ); break;
+		case 0 : retVal = m_ym3812->status_port_r(); break;
 	}
 	return retVal;
 }
@@ -29,8 +29,8 @@ WRITE8_MEMBER( isa8_adlib_device::ym3812_16_w )
 {
 	switch(offset)
 	{
-		case 0 : m_ym3812->control_port_w( space, offset, data ); break;
-		case 1 : m_ym3812->write_port_w( space, offset, data ); break;
+		case 0 : m_ym3812->control_port_w(data); break;
+		case 1 : m_ym3812->write_port_w(data); break;
 	}
 }
 

@@ -227,9 +227,9 @@ MACHINE_CONFIG_START(badlandsbl_state::badlandsb)
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(20'000'000)/12)    /* Divisor estimated */
 	MCFG_DEVICE_PROGRAM_MAP(bootleg_audio_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", badlandsbl_state, bootleg_sound_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(badlandsbl_state::bootleg_sound_scanline), "screen", 0, 1);
 
-//  MCFG_QUANTUM_PERFECT_CPU("maincpu")
+//  config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	MCFG_MACHINE_START_OVERRIDE(badlands_state,badlands)
 

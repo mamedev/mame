@@ -1322,7 +1322,7 @@ MACHINE_CONFIG_START(scramble_state::scramble)
 	ttl7474_device &konami_7474(TTL7474(config, "konami_7474", 0));
 	konami_7474.comp_output_cb().set(FUNC(scramble_state::scramble_sh_7474_q_callback));
 
-	MCFG_TIMER_DRIVER_ADD("int_timer", scramble_state, galaxold_interrupt_timer)
+	TIMER(config, "int_timer").configure_generic(FUNC(scramble_state::galaxold_interrupt_timer));
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -1388,7 +1388,7 @@ MACHINE_CONFIG_START(scramble_state::devilfsh)
 	MCFG_DEVICE_PROGRAM_MAP(mars_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_devilfsh)
+	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_devilfsh);
 	m_palette->set_entries(32+64+2+0); // 32 for characters, 64 for stars, 2 for bullets, 0/1 for background
 	m_palette->set_init(FUNC(scramble_state::galaxold_palette));
 MACHINE_CONFIG_END
@@ -1402,7 +1402,7 @@ MACHINE_CONFIG_START(scramble_state::newsin7)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", scramble_state,  irq0_line_hold) // newsin7a has a corrupt opcode at 0x67, the irq routine instead of NMI avoids it by jumping to 0x68 after doing some other things, probably intentional. newsin7 has this fixed, maybe a bootleg?
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_newsin7)
+	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_newsin7);
 	m_palette->set_entries(32+64+2+0); // 32 for characters, 64 for stars, 2 for bullets, 0/1 for background
 	m_palette->set_init(FUNC(scramble_state::galaxold_palette));
 	MCFG_VIDEO_START_OVERRIDE(scramble_state,newsin7)
@@ -1424,12 +1424,13 @@ MACHINE_CONFIG_START(scramble_state::mrkougb)
 	m_palette->set_init(FUNC(scramble_state::galaxold_palette));
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(scramble_state::mrkougar)
+void scramble_state::mrkougar(machine_config &config)
+{
 	mrkougb(config);
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_mrkougar)
-MACHINE_CONFIG_END
+	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_mrkougar);
+}
 
 MACHINE_CONFIG_START(scramble_state::ckongs)
 	scramble(config);
@@ -1451,8 +1452,8 @@ MACHINE_CONFIG_START(scramble_state::hotshock)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(hotshock_map)
 
-	MCFG_DEVICE_REMOVE( "ppi8255_0" )
-	MCFG_DEVICE_REMOVE( "ppi8255_1" )
+	config.device_remove( "ppi8255_0" );
+	config.device_remove( "ppi8255_1" );
 
 	MCFG_DEVICE_MODIFY("audiocpu")
 	MCFG_DEVICE_IO_MAP(hotshock_sound_io_map)
@@ -1503,9 +1504,9 @@ MACHINE_CONFIG_START(scramble_state::triplep)
 	MCFG_DEVICE_PROGRAM_MAP(triplep_map)
 	MCFG_DEVICE_IO_MAP(triplep_io_map)
 
-	MCFG_DEVICE_REMOVE("audiocpu")
-	MCFG_DEVICE_REMOVE("ppi8255_1")
-	MCFG_DEVICE_REMOVE("konami_7474")
+	config.device_remove("audiocpu");
+	config.device_remove("ppi8255_1");
+	config.device_remove("konami_7474");
 
 	/* video hardware */
 	m_palette->set_entries(32+64+2+0); // 32 for characters, 64 for stars, 2 for bullets
@@ -1519,7 +1520,7 @@ MACHINE_CONFIG_START(scramble_state::triplep)
 	MCFG_SOUND_ROUTES_RESET()
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_DEVICE_REMOVE("8910.2")
+	config.device_remove("8910.2");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(scramble_state::mariner)
@@ -1577,7 +1578,7 @@ MACHINE_CONFIG_START(scramble_state::ad2083)
 	ttl7474_device &konami_7474(TTL7474(config, "konami_7474", 0));
 	konami_7474.comp_output_cb().set(FUNC(scramble_state::scramble_sh_7474_q_callback));
 
-	MCFG_TIMER_DRIVER_ADD("int_timer", scramble_state, galaxold_interrupt_timer)
+	TIMER(config, "int_timer").configure_generic(FUNC(scramble_state::galaxold_interrupt_timer));
 
 	WATCHDOG_TIMER(config, "watchdog");
 

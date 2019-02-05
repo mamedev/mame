@@ -352,12 +352,12 @@ MACHINE_CONFIG_START(trs80m3_state::model3)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* devices */
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_FORMATS(trs80l2_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(trs80l2_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_PLAY);
 
 	MCFG_QUICKLOAD_ADD("quickload", trs80m3_state, trs80_cmd, "cmd", 1.0)
 
@@ -366,20 +366,19 @@ MACHINE_CONFIG_START(trs80m3_state::model3)
 	m_fdc->drq_wr_callback().set(FUNC(trs80m3_state::drq_w));
 
 	// Internal drives
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", trs80_floppies, "sssd", trs80m3_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", trs80_floppies, "sssd", trs80m3_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, "fdc:0", trs80_floppies, "sssd", trs80m3_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", trs80_floppies, "sssd", trs80m3_state::floppy_formats).enable_sound(true);
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit7))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit6))
-	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit5))
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit4))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(m_cent_status_in, FUNC(input_buffer_device::write_bit7));
+	m_centronics->perror_handler().set(m_cent_status_in, FUNC(input_buffer_device::write_bit6));
+	m_centronics->select_handler().set(m_cent_status_in, FUNC(input_buffer_device::write_bit5));
+	m_centronics->fault_handler().set(m_cent_status_in, FUNC(input_buffer_device::write_bit4));
 
-	MCFG_DEVICE_ADD("cent_status_in", INPUT_BUFFER, 0)
+	INPUT_BUFFER(config, m_cent_status_in);
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	OUTPUT_LATCH(config, m_cent_data_out);
+	m_centronics->set_output_latch(*m_cent_data_out);
 
 	COM8116(config, m_brg, 20.2752_MHz_XTAL / 4);   // BR1943 (or BR1941L)
 	m_brg->fr_handler().set(m_uart, FUNC(ay31015_device::write_rcp));
@@ -428,7 +427,7 @@ MACHINE_CONFIG_START(trs80m3_state::model4p)
 	m_m4p_bank->set_addr_width(19);
 	m_m4p_bank->set_stride(0x10000);
 
-	MCFG_DEVICE_REMOVE("quickload")
+	config.device_remove("quickload");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(trs80m3_state::cp500)

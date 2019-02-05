@@ -414,7 +414,7 @@ GFXDECODE_END
 
 WRITE8_MEMBER( zwackery_state::pia1_porta_w )
 {
-	m_cheap_squeak_deluxe->sr_w(space, 0, data >> 4);
+	m_cheap_squeak_deluxe->sr_w(data >> 4);
 }
 
 

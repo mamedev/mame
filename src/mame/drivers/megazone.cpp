@@ -309,7 +309,7 @@ MACHINE_CONFIG_START(megazone_state::megazone)
 	m_daccpu->p1_out_cb().set("dac", FUNC(dac_byte_interface::data_w));
 	m_daccpu->p2_out_cb().set(FUNC(megazone_state::i8039_irqen_and_status_w));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(900))
+	config.m_minimum_quantum = attotime::from_hz(900);
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // 13A
 	mainlatch.q_out_cb<0>().set(FUNC(megazone_state::coin_counter_2_w));

@@ -4039,10 +4039,11 @@ MACHINE_CONFIG_START(apple2e_state::apple2e)
 
 	/* slot devices */
 	A2BUS(config, m_a2bus, 0);
-	m_a2bus->set_cputag("maincpu");
+	m_a2bus->set_space(m_maincpu, AS_PROGRAM);
 	m_a2bus->irq_w().set(FUNC(apple2e_state::a2bus_irq_w));
 	m_a2bus->nmi_w().set(FUNC(apple2e_state::a2bus_nmi_w));
 	m_a2bus->inh_w().set(FUNC(apple2e_state::a2bus_inh_w));
+	m_a2bus->dma_w().set_inputline(m_maincpu, INPUT_LINE_HALT);
 	A2BUS_SLOT(config, "sl1", m_a2bus, apple2_cards, nullptr);
 	A2BUS_SLOT(config, "sl2", m_a2bus, apple2_cards, nullptr);
 	A2BUS_SLOT(config, "sl3", m_a2bus, apple2_cards, nullptr);
@@ -4057,10 +4058,13 @@ MACHINE_CONFIG_START(apple2e_state::apple2e)
 	MCFG_A2EAUXSLOT_OUT_NMI_CB(WRITELINE(*this, apple2e_state, a2bus_nmi_w))
 	MCFG_A2EAUXSLOT_SLOT_ADD(A2_AUXSLOT_TAG, "aux", apple2eaux_cards, "ext80")   // default to an extended 80-column card
 
-	MCFG_SOFTWARE_LIST_ADD("flop525_list","apple2")
+	SOFTWARE_LIST(config, "flop525_list").set_original("apple2");
 
-	MCFG_CASSETTE_ADD(A2_CASSETTE_TAG)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED);
+
+	/* softlist config for baseline A2E */
+	SOFTWARE_LIST(config, "flop525_orig").set_compatible("apple2_flop_orig").set_filter("A2E");  // By default, filter list to compatible disks for A2E
 MACHINE_CONFIG_END
 
 void apple2e_state::mprof3(machine_config &config)
@@ -4072,6 +4076,8 @@ void apple2e_state::mprof3(machine_config &config)
 
 MACHINE_CONFIG_START(apple2e_state::apple2ee)
 	apple2e(config);
+	subdevice<software_list_device>("flop525_orig")->set_filter("A2EE");  // Filter list to compatible disks for this machine.
+
 	M65C02(config.replace(), m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::apple2e_map);
 MACHINE_CONFIG_END
@@ -4102,6 +4108,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(apple2e_state::apple2c)
 	apple2ee(config);
+	subdevice<software_list_device>("flop525_orig")->set_filter("A2C");  // Filter list to compatible disks for this machine.
+
 	M65C02(config.replace(), m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::apple2c_map);
 
@@ -4255,7 +4263,7 @@ MACHINE_CONFIG_START(apple2e_state::apple2cp)
 
 	config.device_remove("sl4");
 	config.device_remove("sl6");
-	MCFG_IWM_ADD(IICP_IWM_TAG, a2cp_interface)
+	IWM(config, m_iicpiwm, &a2cp_interface);
 	MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(floppy_interface,15,16)
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADDITIONAL_ADD(apple2cp_floppy35_floppy_interface)
 
@@ -4295,7 +4303,7 @@ MACHINE_CONFIG_START(apple2e_state::laser128)
 	M65C02(config.replace(), m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::laser128_map);
 
-	MCFG_APPLEFDC_ADD(LASER128_UDC_TAG, fdc_interface)
+	APPLEFDC(config, m_laserudc, &fdc_interface);
 	MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(floppy_interface,15,16)
 
 	config.device_remove("sl4");
@@ -4317,7 +4325,7 @@ MACHINE_CONFIG_START(apple2e_state::laser128ex2)
 	M65C02(config.replace(), m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::laser128_map);
 
-	MCFG_APPLEFDC_ADD(LASER128_UDC_TAG, fdc_interface)
+	APPLEFDC(config, m_laserudc, &fdc_interface);
 	MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(floppy_interface,15,16)
 
 	config.device_remove("sl4");

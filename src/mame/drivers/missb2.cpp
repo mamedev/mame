@@ -175,12 +175,12 @@ WRITE8_MEMBER(missb2_state::missb2_bg_bank_w)
 
 WRITE8_MEMBER(missb2_state::missb2_oki_w)
 {
-	m_oki->write_command(bitswap<8>(data, 7,5,6,4,3,1,2,0));
+	m_oki->write(bitswap<8>(data, 7,5,6,4,3,1,2,0));
 }
 
 READ8_MEMBER(missb2_state::missb2_oki_r)
 {
-	return bitswap<8>(m_oki->read_status(), 7,5,6,4,3,1,2,0);
+	return bitswap<8>(m_oki->read(), 7,5,6,4,3,1,2,0);
 }
 
 /* Memory Maps */

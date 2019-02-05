@@ -317,6 +317,18 @@ void dc_cons_state::init_dcjp()
 	init_dc();
 }
 
+void dc_cons_state::init_tream()
+{
+	// Modchip connected to BIOS ROM chip changes 4 bytes (actually bits) as shown below, which allow to boot any region games.
+	u8 *rom = (u8 *)memregion("maincpu")->base();
+	rom[0x503] |= 0x40;
+	rom[0x50f] |= 0x40;
+	rom[0x523] |= 0x40;
+	rom[0x531] |= 0x40;
+
+	init_dcus();
+}
+
 READ64_MEMBER(dc_cons_state::dc_pdtra_r )
 {
 	uint64_t out = PCTRA<<32;
@@ -597,7 +609,7 @@ MACHINE_CONFIG_START(dc_cons_state::dc)
 	m_maincpu->set_addrmap(AS_PROGRAM, &dc_cons_state::dc_map);
 	m_maincpu->set_addrmap(AS_IO, &dc_cons_state::dc_port);
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", dc_state, dc_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(dc_state::dc_scanline), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD("soundcpu", ARM7, ((XTAL(33'868'800)*2)/3)/8)   // AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
 	MCFG_DEVICE_PROGRAM_MAP(dc_audio_map)
@@ -673,7 +685,7 @@ MACHINE_CONFIG_START(dc_cons_state::dc)
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("gdrom", gdrom_config)
 	MCFG_SLOT_DEFAULT_OPTION("gdrom")
 
-	MCFG_SOFTWARE_LIST_ADD("cd_list","dc")
+	SOFTWARE_LIST(config, "cd_list").set_original("dc");
 MACHINE_CONFIG_END
 
 
@@ -765,8 +777,8 @@ ROM_END
 // unauthorised portable modification
 ROM_START( dctream )
 	ROM_REGION(0x200000, "maincpu", 0)
-	// multi-region hack of mpr-21931/1.01d BIOS, hardware checksum protection passes OK due to algorithm weakness
-	ROM_LOAD( "dc_bios.bin", 0x000000, 0x200000, CRC(cff88d0d) SHA1(e3f84705b183ffded0a349ac7f2ab00be2ab74ee) ) // dumped in software way, ROM label unknown
+	// uses regular mpr-21931 BIOS chip, have region-free mod-chip installed, see driver init.
+	ROM_LOAD( "mpr-21931.ic501", 0x000000, 0x200000, CRC(89f2b1a1) SHA1(8951d1bb219ab2ff8583033d2119c899cc81f18c) )
 
 	ROM_REGION(0x020000, "dcflash", 0)
 	ROM_LOAD( "dc_flash.bin", 0x000000, 0x020000, CRC(9d5515c4) SHA1(78a86fd4e8b58fc9d3535eef6591178f1b97ecf9) ) // VA1 NTSC-US
@@ -796,5 +808,5 @@ ROM_END
 CONS( 1999, dc,      dcjp,   0,      dc,      dc,    dc_cons_state, init_dcus, "Sega", "Dreamcast (USA, NTSC)", MACHINE_NOT_WORKING )
 CONS( 1998, dcjp,    0,      0,      dc,      dc,    dc_cons_state, init_dcjp, "Sega", "Dreamcast (Japan, NTSC)", MACHINE_NOT_WORKING )
 CONS( 1999, dceu,    dcjp,   0,      dc,      dc,    dc_cons_state, init_dcus, "Sega", "Dreamcast (Europe, PAL)", MACHINE_NOT_WORKING )
-CONS( 200?, dctream, dcjp,   0,      dc,      dc,    dc_cons_state, init_dcus, "<unknown>", "Treamcast", MACHINE_NOT_WORKING )
+CONS( 200?, dctream, dcjp,   0,      dc,      dc,    dc_cons_state, init_tream,"<unknown>", "Treamcast", MACHINE_NOT_WORKING )
 CONS( 1998, dcdev,   0,      0,      dc,      dc,    dc_cons_state, init_dc,   "Sega", "HKT-0120 Sega Dreamcast Development Box", MACHINE_NOT_WORKING )

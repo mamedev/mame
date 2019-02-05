@@ -439,7 +439,7 @@ WRITE_LINE_MEMBER(maygay1b_state::srsel_w)
 
 WRITE8_MEMBER(maygay1b_state::latch_ch2_w)
 {
-	m_msm6376->write(space, 0, data&0x7f);
+	m_msm6376->write(data&0x7f);
 	m_msm6376->ch2_w(data&0x80);
 }
 
@@ -775,9 +775,9 @@ MACHINE_CONFIG_START(maygay1b_state::maygay_m1)
 	m_mcu->port_out_cb<2>().set(FUNC(maygay1b_state::mcu_port2_w));
 	m_mcu->port_out_cb<3>().set(FUNC(maygay1b_state::mcu_port3_w));
 
-	MCFG_DEVICE_ADD("duart68681", MC68681, M1_DUART_CLOCK)
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, maygay1b_state, duart_irq_handler))
-	MCFG_MC68681_INPORT_CALLBACK(READ8(*this, maygay1b_state, m1_duart_r))
+	MC68681(config, m_duart68681, M1_DUART_CLOCK);
+	m_duart68681->irq_cb().set(FUNC(maygay1b_state::duart_irq_handler));
+	m_duart68681->inport_cb().set(FUNC(maygay1b_state::m1_duart_r));;
 
 	pia6821_device &pia(PIA6821(config, "pia", 0));
 	pia.writepa_handler().set(FUNC(maygay1b_state::m1_pia_porta_w));
@@ -809,7 +809,7 @@ MACHINE_CONFIG_START(maygay1b_state::maygay_m1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmitimer", maygay1b_state, maygay1b_nmitimer_callback, attotime::from_hz(75)) // freq?
+	TIMER(config, "nmitimer").configure_periodic(FUNC(maygay1b_state::maygay1b_nmitimer_callback), attotime::from_hz(75)); // freq?
 
 	i8279_device &kbdc(I8279(config, "i8279", M1_MASTER_CLOCK/4));      // unknown clock
 	kbdc.out_sl_callback().set(FUNC(maygay1b_state::scanlines_w));      // scan SL lines
@@ -836,25 +836,25 @@ MACHINE_CONFIG_START(maygay1b_state::maygay_m1)
 	REEL(config, m_reels[5], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
 	m_reels[5]->optic_handler().set(FUNC(maygay1b_state::reel_optic_cb<5>));
 
-	MCFG_DEVICE_ADD("meters", METERS, 0)
-	MCFG_METERS_NUMBER(8)
+	METERS(config, m_meters, 0).set_number(8);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	config.set_default_layout(layout_maygay1b);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(maygay1b_state::maygay_m1_no_oki)
+void maygay1b_state::maygay_m1_no_oki(machine_config &config)
+{
 	maygay_m1(config);
-	MCFG_DEVICE_REMOVE("msm6376")
-MACHINE_CONFIG_END
+	config.device_remove("msm6376");
+}
 
 MACHINE_CONFIG_START(maygay1b_state::maygay_m1_nec)
 	maygay_m1(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(m1_nec_memmap)
 
-	MCFG_DEVICE_REMOVE("msm6376")
+	config.device_remove("msm6376");
 
 	MCFG_DEVICE_ADD("upd", UPD7759)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)

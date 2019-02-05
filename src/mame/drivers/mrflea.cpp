@@ -266,9 +266,9 @@ MACHINE_CONFIG_START(mrflea_state::mrflea)
 	MCFG_DEVICE_ADD("subcpu", Z80, 6000000) // runs in IM 1, so doesn't use 8259 INTA
 	MCFG_DEVICE_PROGRAM_MAP(mrflea_slave_map)
 	MCFG_DEVICE_IO_MAP(mrflea_slave_io_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mrflea_state, mrflea_slave_interrupt, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(mrflea_state::mrflea_slave_interrupt), "screen", 0, 1);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	i8255_device &mainppi(I8255(config, "mainppi", 0));
 	mainppi.in_pb_callback().set("subppi", FUNC(i8255_device::pb_r));

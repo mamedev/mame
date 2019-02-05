@@ -203,8 +203,9 @@ MACHINE_CONFIG_START(pc_state::pccga)
 	/* basic machine hardware */
 	MCFG_CPU_PC(pc8, pc8, I8088, 4772720)   /* 4,77 MHz */
 
-	MCFG_IBM5160_MOTHERBOARD_ADD("mb", "maincpu")
-	MCFG_DEVICE_INPUT_DEFAULTS(pccga)
+	ibm5160_mb_device &mb(IBM5160_MOTHERBOARD(config, "mb", 0));
+	mb.set_cputag(m_maincpu);
+	mb.set_input_default(DEVICE_INPUT_DEFAULTS_NAME(pccga));
 
 	// FIXME: determine ISA bus clock
 	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "cga", false)
@@ -220,7 +221,7 @@ MACHINE_CONFIG_START(pc_state::pccga)
 	RAM(config, RAM_TAG).set_default_size("640K").set_extra_options("64K, 128K, 256K, 512K");
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("disk_list","ibm5150")
+	SOFTWARE_LIST(config, "disk_list").set_original("ibm5150");
 MACHINE_CONFIG_END
 
 
@@ -329,7 +330,7 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(pc_state::bondwell)
 	pccga(config);
-	MCFG_DEVICE_REMOVE("maincpu")
+	config.device_remove("maincpu");
 	MCFG_CPU_PC(pc8, pc8, I8088, 4772720) // turbo?
 MACHINE_CONFIG_END
 
@@ -485,7 +486,7 @@ Options: 8087 FPU, EagleNet File server, EightPort serial card, High Resolution 
 
 MACHINE_CONFIG_START(pc_state::eagle1600)
 	pccga(config);
-	MCFG_DEVICE_REMOVE("maincpu")
+	config.device_remove("maincpu");
 	MCFG_CPU_PC(pc16, pc16, I8086, 8000000)
 MACHINE_CONFIG_END
 
@@ -555,7 +556,7 @@ void pc_state::epc_io(address_map &map)
 
 MACHINE_CONFIG_START(pc_state::epc)
 	pccga(config);
-	MCFG_DEVICE_REMOVE("maincpu")
+	config.device_remove("maincpu");
 	MCFG_CPU_PC(pc8, epc, I8088, 4772720)
 	MCFG_DEVICE_MODIFY("isa1")
 	MCFG_SLOT_DEFAULT_OPTION("ega")
@@ -617,8 +618,9 @@ MACHINE_CONFIG_START(pc_state::ibm5550)
 	/* basic machine hardware */
 	MCFG_CPU_PC(pc16, ibm5550, I8086, 8000000)
 
-	MCFG_IBM5160_MOTHERBOARD_ADD("mb", "maincpu")
-	MCFG_DEVICE_INPUT_DEFAULTS(pccga)
+	ibm5160_mb_device &mb(IBM5160_MOTHERBOARD(config, "mb", 0));
+	mb.set_cputag(m_maincpu);
+	mb.set_input_default(DEVICE_INPUT_DEFAULTS_NAME(pccga));
 
 	// FIXME: determine ISA bus clock
 	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "cga", false)
@@ -789,8 +791,7 @@ DEVICE_INPUT_DEFAULTS_END
 
 MACHINE_CONFIG_START(pc_state::m15)
 	pccga(config);
-	MCFG_DEVICE_MODIFY("mb")
-	MCFG_DEVICE_INPUT_DEFAULTS(m15)
+	subdevice<ibm5160_mb_device>("mb")->set_input_default(DEVICE_INPUT_DEFAULTS_NAME(m15));
 	MCFG_DEVICE_MODIFY("isa2")
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc_xt", cfg_dual_720K)
 
@@ -822,7 +823,7 @@ Options: 8087 FPU
 
 MACHINE_CONFIG_START(pc_state::olytext30)
 	pccga(config);
-	MCFG_DEVICE_REMOVE("maincpu")
+	config.device_remove("maincpu");
 	MCFG_CPU_PC(pc8, pc8, V20, XTAL(14'318'181)/3) /* 4,77 MHz */
 	MCFG_DEVICE_MODIFY("isa2")
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc_xt", cfg_single_720K)
@@ -847,8 +848,9 @@ MACHINE_CONFIG_START(pc_state::poisk2)
 	/* basic machine hardware */
 	MCFG_CPU_PC(pc16, pc16, I8086, 4772720)
 
-	MCFG_IBM5160_MOTHERBOARD_ADD("mb", "maincpu")
-	MCFG_DEVICE_INPUT_DEFAULTS(pccga)
+	ibm5160_mb_device &mb(IBM5160_MOTHERBOARD(config, "mb", 0));
+	mb.set_cputag(m_maincpu);
+	mb.set_input_default(DEVICE_INPUT_DEFAULTS_NAME(pccga));
 
 	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "cga_poisk2", false) // FIXME: determine ISA bus clock
 	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "fdc_xt", false)
@@ -938,8 +940,9 @@ MACHINE_CONFIG_START(pc_state::iskr3104)
 	/* basic machine hardware */
 	MCFG_CPU_PC(pc16, pc16, I8086, 4772720)
 
-	MCFG_IBM5160_MOTHERBOARD_ADD("mb", "maincpu")
-	MCFG_DEVICE_INPUT_DEFAULTS(iskr3104)
+	ibm5160_mb_device &mb(IBM5160_MOTHERBOARD(config, "mb", 0));
+	mb.set_cputag(m_maincpu);
+	mb.set_input_default(DEVICE_INPUT_DEFAULTS_NAME(iskr3104));
 
 	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "ega", false) // FIXME: determine ISA bus clock
 	MCFG_SLOT_OPTION_DEFAULT_BIOS("ega", "iskr3104")
@@ -1014,8 +1017,9 @@ MACHINE_CONFIG_START(pc_state::siemens)
 	/* basic machine hardware */
 	MCFG_CPU_PC(pc8, pc8, I8088, XTAL(14'318'181)/3) /* 4,77 MHz */
 
-	MCFG_IBM5150_MOTHERBOARD_ADD("mb", "maincpu")
-	MCFG_DEVICE_INPUT_DEFAULTS(siemens)
+	ibm5150_mb_device &mb(IBM5150_MOTHERBOARD(config, "mb", 0));
+	mb.set_cputag(m_maincpu);
+	mb.set_input_default(DEVICE_INPUT_DEFAULTS_NAME(siemens));
 
 	// FIXME: determine ISA bus clock
 	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "hercules", false)
@@ -1057,8 +1061,9 @@ Options: 8087 FPU
 MACHINE_CONFIG_START(pc_state::laser_turbo_xt)
 	MCFG_CPU_PC(pc8, pc8, I8088, XTAL(14'318'181)/3) /* 4,77 MHz */
 
-	MCFG_IBM5160_MOTHERBOARD_ADD("mb","maincpu")
-	MCFG_DEVICE_INPUT_DEFAULTS(pccga)
+	ibm5160_mb_device &mb(IBM5160_MOTHERBOARD(config, "mb", 0));
+	mb.set_cputag(m_maincpu);
+	mb.set_input_default(DEVICE_INPUT_DEFAULTS_NAME(pccga));
 
 	// FIXME: determine ISA bus clock
 	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "cga", false)
@@ -1077,7 +1082,7 @@ MACHINE_CONFIG_START(pc_state::laser_turbo_xt)
 	RAM(config, RAM_TAG).set_default_size("640K").set_extra_options("512K,768K,896K,1024K,1408K,1536K,1664K");
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("disk_list","ibm5150")
+	SOFTWARE_LIST(config, "disk_list").set_original("ibm5150");
 MACHINE_CONFIG_END
 
 ROM_START( laser_turbo_xt )
@@ -1136,8 +1141,9 @@ MACHINE_CONFIG_START(pc_state::zenith)
 	/* basic machine hardware */
 	MCFG_CPU_PC(zenith, pc8, I8088, XTAL(14'318'181)/3) /* 4,77 MHz */
 
-	MCFG_IBM5150_MOTHERBOARD_ADD("mb", "maincpu")
-	MCFG_DEVICE_INPUT_DEFAULTS(pccga)
+	ibm5150_mb_device &mb(IBM5150_MOTHERBOARD(config, "mb", 0));
+	mb.set_cputag(m_maincpu);
+	mb.set_input_default(DEVICE_INPUT_DEFAULTS_NAME(pccga));
 
 	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "cga", false) // FIXME: determine ISA bus clock
 	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "fdc_xt", false)
@@ -1152,7 +1158,7 @@ MACHINE_CONFIG_START(pc_state::zenith)
 	RAM(config, RAM_TAG).set_default_size("640K").set_extra_options("128K, 256K, 512K");
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("disk_list","ibm5150")
+	SOFTWARE_LIST(config, "disk_list").set_original("ibm5150");
 MACHINE_CONFIG_END
 
 ROM_START( zdsupers )

@@ -833,7 +833,7 @@ MACHINE_CONFIG_START(wiz_state::wiz)
 	MCFG_DEVICE_PROGRAM_MAP(wiz_main_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_wiz)
+	m_gfxdecode->set_info(gfx_wiz);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(wiz_state, screen_update_wiz)
 MACHINE_CONFIG_END
@@ -858,7 +858,7 @@ MACHINE_CONFIG_START(wiz_state::stinger)
 	MCFG_SCREEN_UPDATE_DRIVER(wiz_state, screen_update_stinger)
 
 	/* sound hardware */
-	MCFG_DEVICE_REMOVE("8910.3")
+	config.device_remove("8910.3");
 
 	MCFG_DEVICE_ADD("discrete", DISCRETE, stinger_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)

@@ -13,7 +13,7 @@
 	S-1   SC0001-     Hello Kitty Special
 	S-2   SC0002-     (unknown)
 	S-3   SC0003-     (unknown)
-	S-4  *SC0004-SAI  SAI (series 1) Volume 1 
+	S-4  *SC0004-SAI  SAI (series 1) Volume 1
 	S-5  *SC0005-SAI  SAI (series 2) Volume 1  (same series as 6,9,19,21,22)
 	S-6  *SC0006-SAI  SAI (series 2) Volume 2  (same series as 5,9,19,21,22)
 	S-7   SC0007-     (unknown)
@@ -21,7 +21,7 @@
 	S-9  *SC0009-SAI  SAI (series 2) Volume 3  (same series as 5,6,19,21,22)
 	S-10 *SC0010-HWK  HWK (untranslated)
 	S-11  SC0011-     (unknown)
-	S-12 *SC0012-SAI  SAI (series 3) Volume 3 
+	S-12 *SC0012-SAI  SAI (series 3) Volume 3
 	S-13  SC0013-     (unknown)
 	S-14  SC0014-     (unknown)
 	S-15  SC0015-     (unknown)
@@ -30,12 +30,12 @@
 	S-18  SC0018-     (unknown) Volume 1
 	S-19 *SC0019-SAI  SAI (series 2) Volume 6  (same series as 5,6,9,21,22)
 	S-20  SC0020-     (unknown) Volume 5
-	S-21 *SC0021-SAI  SAI (series 2) Volume 7  (same seires as 5,6,9,19,22)
-	S-22 *SC0022-SAI  SAI (series 2) Volume 8  (same seires as 5,6,9,19,21)
+	S-21 *SC0021-SAI  SAI (series 2) Volume 7  (same series as 5,6,9,19,22)
+	S-22 *SC0022-SAI  SAI (series 2) Volume 8  (same series as 5,6,9,19,21)
 	S-23  SC0023-     (unknown)
 
 	(more? what's the S highest number?)
-	
+
 	-->
 
 	<!-- Japanese e-kara cartridges SC (Special?) series -->

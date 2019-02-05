@@ -58,6 +58,7 @@ private:
 	DECLARE_WRITE8_MEMBER(duart_output);
 
 	DECLARE_WRITE8_MEMBER(mb87078_gain_changed);
+	void es5505_clock_changed(u32 data);
 };
 
 DECLARE_DEVICE_TYPE(TAITO_EN, taito_en_device)

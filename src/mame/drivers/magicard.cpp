@@ -1023,7 +1023,7 @@ MACHINE_CONFIG_START(magicard_state::hotslots)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(hotslots_mem)
 
-	MCFG_DEVICE_REMOVE("saa")
+	config.device_remove("saa");
 	YMZ284(config, "ssg", 4000000).add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 

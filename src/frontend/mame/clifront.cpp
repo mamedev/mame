@@ -183,9 +183,9 @@ void print_summary(
 //-------------------------------------------------
 
 cli_frontend::cli_frontend(emu_options &options, osd_interface &osd)
-	: m_options(options),
-		m_osd(osd),
-		m_result(EMU_ERR_NONE)
+	: m_options(options)
+	, m_osd(osd)
+	, m_result(EMU_ERR_NONE)
 {
 	m_options.add_entries(cli_option_entries);
 }
@@ -211,6 +211,7 @@ void cli_frontend::start_execution(mame_machine_manager *manager, const std::vec
 	try
 	{
 		m_options.parse_command_line(args, OPTION_PRIORITY_CMDLINE);
+		m_osd.set_verbose(m_options.verbose());
 	}
 	catch (options_exception &ex)
 	{
@@ -234,7 +235,10 @@ void cli_frontend::start_execution(mame_machine_manager *manager, const std::vec
 
 	// read INI's, if appropriate
 	if (m_options.read_config())
+	{
 		mame_options::parse_standard_inis(m_options, option_errors);
+		m_osd.set_verbose(m_options.verbose());
+	}
 
 	// otherwise, check for a valid system
 	load_translation(m_options);
@@ -291,14 +295,25 @@ int cli_frontend::execute(std::vector<std::string> &args)
 			// get the top 16 approximate matches
 			driver_enumerator drivlist(m_options);
 			int matches[16];
-			drivlist.find_approximate_matches(m_options.attempted_system_name().c_str(), ARRAY_LENGTH(matches), matches);
+			drivlist.find_approximate_matches(m_options.attempted_system_name(), ARRAY_LENGTH(matches), matches);
+
+			// work out how wide the titles need to be
+			int titlelen(0);
+			for (int match : matches)
+				if (0 <= match)
+					titlelen = (std::max)(titlelen, int(strlen(drivlist.driver(match).type.fullname())));
 
 			// print them out
 			osd_printf_error("\n\"%s\" approximately matches the following\n"
 					"supported machines (best match first):\n\n", m_options.attempted_system_name().c_str());
-			for (auto & matche : matches)
-				if (matche != -1)
-					osd_printf_error("%-18s%s\n", drivlist.driver(matche).name, drivlist.driver(matche).type.fullname());
+			for (int match : matches)
+			{
+				if (0 <= match)
+				{
+					game_driver const &drv(drivlist.driver(match));
+					osd_printf_error("%s", util::string_format("%-18s%-*s(%s, %s)\n", drv.name, titlelen + 2, drv.type.fullname(), drv.manufacturer, drv.year).c_str());
+				}
+			}
 		}
 	}
 	catch (emu_exception &)

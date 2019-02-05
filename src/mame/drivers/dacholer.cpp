@@ -702,7 +702,7 @@ void dacholer_state::dacholer(machine_config &config)
 	AY8910(config, "ay3", XTAL(19'968'000)/16).add_route(ALL_OUTPUTS, "mono", 0.15);
 
 	MSM5205(config, m_msm, XTAL(384'000));
-	m_msm->vck_legacy_callback().set(FUNC(dacholer_state::adpcm_int));	/* interrupt function */
+	m_msm->vck_legacy_callback().set(FUNC(dacholer_state::adpcm_int));  /* interrupt function */
 	m_msm->set_prescaler_selector(msm5205_device::S96_4B);  /* 1 / 96 = 3906.25Hz playback  - guess */
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.30);
 }

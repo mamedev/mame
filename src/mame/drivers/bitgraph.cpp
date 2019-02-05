@@ -336,10 +336,10 @@ WRITE_LINE_MEMBER(bitgraph_state::system_clock_write)
 WRITE16_MEMBER(bitgraph_state::baud_write)
 {
 	DBG_LOG(1,"Baud", ("%04X\n", data));
-	m_dbrgb->write_str(data & 15);      // 2 DBG
-	m_dbrga->write_stt((data >> 4) & 15);   // 1 KBD
-	m_dbrgb->write_stt((data >> 8) & 15);   // 3 PNT
-	m_dbrga->write_str((data >> 12) & 15);  // 0 HOST
+	m_dbrgb->str_w(data & 15);      // 2 DBG
+	m_dbrga->stt_w((data >> 4) & 15);   // 1 KBD
+	m_dbrgb->stt_w((data >> 8) & 15);   // 3 PNT
+	m_dbrga->str_w((data >> 12) & 15);  // 0 HOST
 }
 
 WRITE_LINE_MEMBER(bitgraph_state::com8116_a_fr_w)
@@ -559,7 +559,8 @@ MACHINE_CONFIG_START(bitgraph_state::bg_motherboard)
 MACHINE_CONFIG_END
 
 #ifdef UNUSED_FUNCTION
-MACHINE_CONFIG_START(bitgraph_state::bg_ppu)
+void bitgraph_state::bg_ppu(machine_config &config)
+{
 	i8035_device &ppu(I8035(config, PPU_TAG, XTAL(6'900'000)));
 	ppu.set_addrmap(AS_IO, &bitgraph_state::ppu_io);
 //  ppu.t0_in_cb().set(FUNC(bitgraph_state::ppu_t0_r));
@@ -569,16 +570,17 @@ MACHINE_CONFIG_START(bitgraph_state::bg_ppu)
 	i8243.read_handler().set_nop();
 	i8243.write_handler().set(FUNC(bitgraph_state::ppu_i8243_w));
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit6))
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit7))
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit4))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit5))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->ack_handler().set("cent_status_in", FUNC(input_buffer_device::write_bit6));
+	m_centronics->busy_handler().set("cent_status_in", FUNC(input_buffer_device::write_bit7));
+	m_centronics->fault_handler().set("cent_status_in", FUNC(input_buffer_device::write_bit4));
+	m_centronics->perror_handler().set("cent_status_in", FUNC(input_buffer_device::write_bit5));
 
-	MCFG_DEVICE_ADD("cent_status_in", INPUT_BUFFER, 0)
+	INPUT_BUFFER(config, "cent_status_in");
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
-MACHINE_CONFIG_END
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
+}
 #endif
 
 void bitgraph_state::bitgrpha(machine_config &config)

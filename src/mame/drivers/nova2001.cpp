@@ -693,7 +693,7 @@ MACHINE_CONFIG_START(nova2001_state::ninjakun)
 	MCFG_DEVICE_PROGRAM_MAP(ninjakun_cpu2_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(nova2001_state, irq0_line_hold, 4*60) /* ? */
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame */
+	config.m_minimum_quantum = attotime::from_hz(6000);  /* 100 CPU slices per frame */
 
 	MCFG_MACHINE_START_OVERRIDE(nova2001_state,ninjakun)
 
@@ -772,7 +772,7 @@ MACHINE_CONFIG_START(nova2001_state::raiders5)
 	MCFG_DEVICE_PROGRAM_MAP(raiders5_cpu2_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(nova2001_state, irq0_line_hold, 4*60)  /* ? */
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(24000))
+	config.m_minimum_quantum = attotime::from_hz(24000);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

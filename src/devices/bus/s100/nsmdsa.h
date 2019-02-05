@@ -42,8 +42,7 @@ protected:
 	virtual uint8_t s100_smemr_r(address_space &space, offs_t offset) override;
 
 private:
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
+	required_device_array<floppy_connector, 2> m_floppy;
 	required_memory_region m_psel_rom;
 	required_memory_region m_pgm_rom;
 };

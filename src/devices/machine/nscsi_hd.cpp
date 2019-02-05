@@ -166,8 +166,8 @@ void nscsi_harddisk_device::scsi_command()
 
 				// Apple HD SC setup utility needs to see this
 				strcpy((char *)&scsi_cmdbuf[8], " SEAGATE");
-				strcpy((char *)&scsi_cmdbuf[15], "          ST225N");
-				strcpy((char *)&scsi_cmdbuf[31], "1.00");
+				strcpy((char *)&scsi_cmdbuf[16], "          ST225N");
+				strcpy((char *)&scsi_cmdbuf[32], "1.00");
 				scsi_cmdbuf[36] = 0x00; // # of extents high
 				scsi_cmdbuf[37] = 0x08; // # of extents low
 				scsi_cmdbuf[38] = 0x00; // group 0 commands 0-1f
@@ -228,13 +228,49 @@ void nscsi_harddisk_device::scsi_command()
 
 		int pmax = page == 0x3f ? 0x3e : page;
 		int pmin = page == 0x3f ? 0x00 : page;
-		for(int page=pmax; page >= pmin; page--) {
-			switch(page) {
+
+		bool fail = false;
+		for(int p=pmax; p >= pmin; p--) {
+			switch(p) {
 			case 0x00: // Unit attention parameters page (weird)
 				scsi_cmdbuf[pos++] = 0x80; // PS, page id
 				scsi_cmdbuf[pos++] = 0x02; // Page length
 				scsi_cmdbuf[pos++] = 0x00; // Meh
 				scsi_cmdbuf[pos++] = 0x00; // Double meh
+				break;
+
+			case 0x01: // read-write error recovery page
+				scsi_cmdbuf[pos++] = 0x01; // !PS, page id
+				scsi_cmdbuf[pos++] = 0x0a; // page length
+				scsi_cmdbuf[pos++] = 0; // various bits
+				scsi_cmdbuf[pos++] = 0; // read retry count
+				scsi_cmdbuf[pos++] = 0; // correction span
+				scsi_cmdbuf[pos++] = 0; // head offset count
+				scsi_cmdbuf[pos++] = 0; // data strobe offset count
+				scsi_cmdbuf[pos++] = 0; // reserved
+				scsi_cmdbuf[pos++] = 0; // write retry count
+				scsi_cmdbuf[pos++] = 0; // reserved
+				scsi_cmdbuf[pos++] = 0; // recovery time limit (msb)
+				scsi_cmdbuf[pos++] = 0; // recovery time limit (lsb)
+				break;
+
+			case 0x02: // disconnect-reconnect page
+				scsi_cmdbuf[pos++] = 0x02; // !PS, page id
+				scsi_cmdbuf[pos++] = 0x0e; // page length
+				scsi_cmdbuf[pos++] = 0; // buffer full ratio
+				scsi_cmdbuf[pos++] = 0; // buffer empty ratio
+				scsi_cmdbuf[pos++] = 0; // bus inactivity limit (msb)
+				scsi_cmdbuf[pos++] = 0; // bus inactivity limit (lsb)
+				scsi_cmdbuf[pos++] = 0; // disconnect time limit (msb)
+				scsi_cmdbuf[pos++] = 0; // disconnect time limit (lsb)
+				scsi_cmdbuf[pos++] = 0; // connect time limit (msb)
+				scsi_cmdbuf[pos++] = 0; // connect time limit (lsb)
+				scsi_cmdbuf[pos++] = 0; // maximum burst size (msb)
+				scsi_cmdbuf[pos++] = 0; // maximum burst size (lsb)
+				scsi_cmdbuf[pos++] = 0; // reserved
+				scsi_cmdbuf[pos++] = 0; // reserved
+				scsi_cmdbuf[pos++] = 0; // reserved
+				scsi_cmdbuf[pos++] = 0; // reserved
 				break;
 
 			case 0x03:  { // Format parameters page
@@ -293,6 +329,21 @@ void nscsi_harddisk_device::scsi_command()
 				break;
 			}
 
+			case 0x08: // caching page
+				scsi_cmdbuf[pos++] = 0x08; // !PS, page id
+				scsi_cmdbuf[pos++] = 0x0a; // page length
+				scsi_cmdbuf[pos++] = 0;
+				scsi_cmdbuf[pos++] = 0;
+				scsi_cmdbuf[pos++] = 0;
+				scsi_cmdbuf[pos++] = 0;
+				scsi_cmdbuf[pos++] = 0;
+				scsi_cmdbuf[pos++] = 0;
+				scsi_cmdbuf[pos++] = 0;
+				scsi_cmdbuf[pos++] = 0;
+				scsi_cmdbuf[pos++] = 0;
+				scsi_cmdbuf[pos++] = 0;
+				break;
+
 			case 0x30: { // Apple firmware ID page
 				scsi_cmdbuf[pos++] = 0xb0; // cPS, page id
 				scsi_cmdbuf[pos++] = 0x16; // Page length
@@ -322,16 +373,25 @@ void nscsi_harddisk_device::scsi_command()
 			}
 
 			default:
-				LOG("mode sense page %02x unhandled\n", page);
+				if (page != 0x3f) {
+					LOG("mode sense page %02x unhandled\n", page);
+					fail = true;
+				}
 				break;
 			}
 		}
-		scsi_cmdbuf[0] = pos;
-		if(pos > size)
-			pos = size;
 
-		scsi_data_in(0, pos);
-		scsi_status_complete(SS_GOOD);
+		if (!fail) {
+			scsi_cmdbuf[0] = pos;
+			if (pos > size)
+				pos = size;
+
+			scsi_data_in(0, pos);
+			scsi_status_complete(SS_GOOD);
+		} else {
+			scsi_status_complete(SS_CHECK_CONDITION);
+			sense(false, SK_ILLEGAL_REQUEST, SK_ASC_INVALID_FIELD_IN_CDB);
+		}
 		break;
 	}
 
@@ -339,6 +399,48 @@ void nscsi_harddisk_device::scsi_command()
 		LOG("command %s UNIT\n", (scsi_cmdbuf[4] & 0x1) ? "START" : "STOP");
 		scsi_status_complete(SS_GOOD);
 		break;
+
+	case SC_RECIEVE_DIAG_RES: {
+		LOG("command RECIEVE DIAGNOSTICS RESULTS");
+		int size = (scsi_cmdbuf[3] << 8) | scsi_cmdbuf[4];
+		int pos = 0;
+		scsi_cmdbuf[pos++] = 0;
+		scsi_cmdbuf[pos++] = 6;
+		scsi_cmdbuf[pos++] = 0; // ROM is OK
+		scsi_cmdbuf[pos++] = 0; // RAM is OK
+		scsi_cmdbuf[pos++] = 0; // Data buffer is OK
+		scsi_cmdbuf[pos++] = 0; // Interface is OK
+		scsi_cmdbuf[pos++] = 0;
+		if(size > pos)
+			size = pos;
+		scsi_data_in(0, size);
+		scsi_status_complete(SS_GOOD);
+		break;
+	}
+
+	case SC_SEND_DIAGNOSTICS: {
+		LOG("command SEND DIAGNOSTICS");
+		int size = (scsi_cmdbuf[3] << 8) | scsi_cmdbuf[4];
+		if(scsi_cmdbuf[1] & 4) {
+			// Self-test
+			scsi_status_complete(SS_GOOD);
+			break;
+		}
+		int pos = 0;
+		scsi_cmdbuf[pos++] = 0;
+		scsi_cmdbuf[pos++] = 6;
+		scsi_cmdbuf[pos++] = 0; // ROM is OK
+		scsi_cmdbuf[pos++] = 0; // RAM is OK
+		scsi_cmdbuf[pos++] = 0; // Data buffer is OK
+		scsi_cmdbuf[pos++] = 0; // Interface is OK
+		scsi_cmdbuf[pos++] = 0;
+		scsi_cmdbuf[pos++] = 0;
+		if(size > pos)
+			size = pos;
+		scsi_data_in(0, size);
+		scsi_status_complete(SS_GOOD);
+		break;
+	}
 
 	case SC_READ_CAPACITY: {
 		LOG("command READ CAPACITY\n");
@@ -398,6 +500,11 @@ void nscsi_harddisk_device::scsi_command()
 				}
 			}
 		}
+		scsi_status_complete(SS_GOOD);
+		break;
+
+	case SC_MODE_SELECT_6:
+		LOG("command MODE SELECT\n");
 		scsi_status_complete(SS_GOOD);
 		break;
 

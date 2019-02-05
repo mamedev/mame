@@ -605,7 +605,7 @@ MACHINE_CONFIG_START(dblcrown_state::dblcrown)
 	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(dblcrown_map)
 	MCFG_DEVICE_IO_MAP(dblcrown_io)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", dblcrown_state, dblcrown_irq_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(dblcrown_state::dblcrown_irq_scanline), "screen", 0, 1);
 
 	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_msec(1000));   /* 1000 ms. (minimal of MAX693A watchdog long timeout period with internal oscillator) */
 

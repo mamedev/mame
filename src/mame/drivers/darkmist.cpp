@@ -244,7 +244,7 @@ MACHINE_CONFIG_START(darkmist_state::darkmist)
 	MCFG_DEVICE_ADD("maincpu", Z80,4000000)         /* ? MHz */
 	MCFG_DEVICE_PROGRAM_MAP(memmap)
 	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", darkmist_state, scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(darkmist_state::scanline), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD("t5182", T5182, 0)
 

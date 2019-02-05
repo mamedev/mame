@@ -282,8 +282,8 @@ MACHINE_CONFIG_START(att4425_state::att4425)
 	rs232b.rxd_handler().set(m_sio, FUNC(z80sio_device::rxb_w));
 
 	// XXX
-	MCFG_DEVICE_ADD("line_clock", CLOCK, 9600*64)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, att4425_state, write_line_clock))
+	clock_device &line_clock(CLOCK(config, "line_clock", 9600*64));
+	line_clock.signal_handler().set(FUNC(att4425_state::write_line_clock));
 
 	I8251(config, m_i8251, 0);
 	m_i8251->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
@@ -296,8 +296,8 @@ MACHINE_CONFIG_START(att4425_state::att4425)
 	rs232.dsr_handler().set(m_i8251, FUNC(i8251_device::write_dsr));
 
 	// XXX
-	MCFG_DEVICE_ADD("keyboard_clock", CLOCK, 4800*64)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, att4425_state, write_keyboard_clock))
+	clock_device &keyboard_clock(CLOCK(config, "keyboard_clock", 4800*64));
+	keyboard_clock.signal_handler().set(FUNC(att4425_state::write_keyboard_clock));
 
 	RAM(config, RAM_TAG).set_default_size("32K").set_default_value(0);
 MACHINE_CONFIG_END

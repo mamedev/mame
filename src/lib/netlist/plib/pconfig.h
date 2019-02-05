@@ -21,7 +21,7 @@
  * if PHAS_RDTSCP == 1
  */
 #ifndef PUSE_ACCURATE_STATS
-#define PUSE_ACCURATE_STATS (1)
+#define PUSE_ACCURATE_STATS (0)
 #endif
 
 /*
@@ -47,6 +47,13 @@
  *
  *============================================================*/
 
+#ifndef NVCCBUILD
+#define NVCCBUILD (0)
+#endif
+
+#if NVCCBUILD
+#define C14CONSTEXPR
+#else
 #if __cplusplus == 201103L
 #define C14CONSTEXPR
 #elif __cplusplus == 201402L
@@ -57,6 +64,7 @@
 #define C14CONSTEXPR
 #else
 #error "C++ version not supported"
+#endif
 #endif
 
 #ifndef PHAS_INT128
@@ -73,10 +81,8 @@ typedef __int128_t INT128;
 #undef RESTRICT
 #endif
 #define RESTRICT                __restrict__
-#define ATTR_UNUSED             __attribute__((__unused__))
 #else
 #define RESTRICT
-#define ATTR_UNUSED
 #endif
 
 //============================================================

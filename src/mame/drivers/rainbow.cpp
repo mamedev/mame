@@ -12,7 +12,7 @@ To unlock floppy drives A-D compile with WORKAROUND_RAINBOW_B (prevents a side e
 Native single sided 5.25" images with 80 tracks, 10 sectors are well tested (*.IMD / *.TD0=TeleDisk / *.IMG with 400 K).
 VT180 images (184.320 Bytes) are very unreliable in CP/M - though a real machine can read them.
 5.25 MFM PC style drives and 720 K (3.5 " DS-DD MFM PC formatted disks) (on slots 3 + 4) show regressions / bugs
-  as of Dec.2018 (file content bad while dir is OK, seek errors, write fault errors when copying _to_ hard disk). 
+  as of Dec.2018 (file content bad while dir is OK, seek errors, write fault errors when copying _to_ hard disk).
 
 ALWAYS USE THE RIGHT SLOT AND SAVE YOUR DATA BEFORE MOUNTING FOREIGN DISK FORMATS!
 
@@ -27,7 +27,7 @@ The public domain file RBCONVERT.ZIP documents how model 'A' differs from versio
 NVRAM files from -A and -B machines are not interchangeable. If problems arise, delete the NVRAM file.
 
 Venix 86-R (BSW) is working, just follow https://github.com/bsdimp/venix/blob/master/doc/MESS-RB-INSTALL.md
-    
+
 CPM 2.1 / DOS2.11 / DOS 3.x / diag disks boot. UCSD systems (fort_sys, pas_sys) boot, but expect 4 QD drives
   loaded with disks (reassign slots, reset and mount three empty 400 K images before startup at #2, #3, #4).
 
@@ -802,7 +802,7 @@ private:
 
 UPD7220_DISPLAY_PIXELS_MEMBER( rainbow_state::hgdc_display_pixels )
 {
-	if(m_inp7->read() == 0) 
+	if(m_inp7->read() == 0)
 		return;
 
 	const rgb_t *paletteX = m_palette2->palette()->entry_list_raw();
@@ -1417,10 +1417,10 @@ WRITE_LINE_MEMBER(rainbow_state::mpsc_irq)
 // PORT 0x06 : Communication bit rates (see page 21 of PC 100 SPEC)
 WRITE8_MEMBER(rainbow_state::comm_bitrate_w)
 {
-	m_dbrg->write_str(data & 0x0f);  // PDF is wrong, low nibble is RECEIVE clock (verified in SETUP).
+	m_dbrg->str_w(data & 0x0f);  // PDF is wrong, low nibble is RECEIVE clock (verified in SETUP).
 	logerror("\n(COMM.) receive bitrate = %d ($%02x)\n", comm_rates[data & 0x0f] , data & 0x0f);
 
-	m_dbrg->write_stt( ((data & 0xf0) >> 4) );
+	m_dbrg->stt_w( ((data & 0xf0) >> 4) );
 	logerror("(COMM.) transmit bitrate = %d ($%02x)\n", comm_rates[((data & 0xf0) >> 4)] ,(data & 0xf0) >> 4);
 }
 
@@ -3251,13 +3251,13 @@ MACHINE_CONFIG_START(rainbow_state::rainbow)
 	MCFG_SCREEN_UPDATE_DEVICE("upd7220", upd7220_device, screen_update)
 
 	FD1793(config, m_fdc, 24.0734_MHz_XTAL / 24); // no separate 1 Mhz quartz
-	MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":0", rainbow_floppies, "525qd", rainbow_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":1", rainbow_floppies, "525qd", rainbow_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":2", rainbow_floppies, "525qd", rainbow_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":3", rainbow_floppies, "525qd", rainbow_state::floppy_formats)
-	//MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":2", rainbow_floppies, "525dd", rainbow_state::floppy_formats)
-	//MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":3", rainbow_floppies, "35dd", rainbow_state::floppy_formats)
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "rainbow")
+	FLOPPY_CONNECTOR(config, FD1793_TAG ":0", rainbow_floppies, "525qd", rainbow_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, FD1793_TAG ":1", rainbow_floppies, "525qd", rainbow_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, FD1793_TAG ":2", rainbow_floppies, "525qd", rainbow_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, FD1793_TAG ":3", rainbow_floppies, "525qd", rainbow_state::floppy_formats);
+	//FLOPPY_CONNECTOR(config, FD1793_TAG ":2", rainbow_floppies, "525dd", rainbow_state::floppy_formats);
+	//FLOPPY_CONNECTOR(config, FD1793_TAG ":3", rainbow_floppies, "35dd", rainbow_state::floppy_formats);
+	SOFTWARE_LIST(config, "flop_list").set_original("rainbow");
 
 	/// ********************************* HARD DISK CONTROLLER *****************************************
 	WD2010(config, m_hdc, 5000000); // 10 Mhz quartz on controller (divided by 2 for WCLK)
@@ -3335,7 +3335,7 @@ MACHINE_CONFIG_START(rainbow_state::rainbow)
 	prtbrg.set_stages(8);
 	prtbrg.count_out_cb().set(FUNC(rainbow_state::bitrate_counter_w));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("motor", rainbow_state, hd_motor_tick, attotime::from_hz(60))
+	TIMER(config, "motor").configure_periodic(FUNC(rainbow_state::hd_motor_tick), attotime::from_hz(60));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END

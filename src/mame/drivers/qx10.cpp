@@ -824,7 +824,7 @@ MACHINE_CONFIG_START(qx10_state::qx10)
 	RAM(config, RAM_TAG).set_default_size("256K");
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "qx10_flop")
+	SOFTWARE_LIST(config, "flop_list").set_original("qx10_flop");
 
 	MCFG_QUICKLOAD_ADD("quickload", qx10_state, qx10, "com,cpm", 3)
 

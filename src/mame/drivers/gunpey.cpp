@@ -1223,7 +1223,7 @@ MACHINE_CONFIG_START(gunpey_state::gunpey)
 	MCFG_DEVICE_ADD("maincpu", V30, 57242400 / 4)
 	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", gunpey_state, scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(gunpey_state::scanline), "screen", 0, 1);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -63,8 +63,8 @@ void exedexes_state::sound_map(address_map &map)
 	map(0x4000, 0x47ff).ram();
 	map(0x6000, 0x6000).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0x8000, 0x8001).w("aysnd", FUNC(ay8910_device::address_data_w));
-	map(0x8002, 0x8002).w("sn1", FUNC(sn76489_device::command_w));
-	map(0x8003, 0x8003).w("sn2", FUNC(sn76489_device::command_w));
+	map(0x8002, 0x8002).w("sn1", FUNC(sn76489_device::write));
+	map(0x8003, 0x8003).w("sn2", FUNC(sn76489_device::write));
 }
 
 
@@ -224,7 +224,7 @@ MACHINE_CONFIG_START(exedexes_state::exedexes)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)   /* 4 MHz (?) */
 	MCFG_DEVICE_PROGRAM_MAP(exedexes_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", exedexes_state, exedexes_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(exedexes_state::exedexes_scanline), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, 3000000)  /* 3 MHz ??? */
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)

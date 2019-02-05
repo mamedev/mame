@@ -26,7 +26,8 @@ DEFINE_DEVICE_TYPE(ACORN_VIB, acorn_vib_device, "acorn_vib", "Acorn Versatile In
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(acorn_vib_device::device_add_mconfig)
+void acorn_vib_device::device_add_mconfig(machine_config &config)
+{
 	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set(FUNC(acorn_vib_device::irq_w));
 
 	VIA6522(config, m_via6522, XTAL(1'000'000));
@@ -37,7 +38,8 @@ MACHINE_CONFIG_START(acorn_vib_device::device_add_mconfig)
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->ack_handler().set(m_via6522, FUNC(via6522_device::write_ca1));
 	m_centronics->busy_handler().set(m_via6522, FUNC(via6522_device::write_pa7));
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
 
 	I8255(config, m_ppi8255, 0);
 
@@ -53,7 +55,7 @@ MACHINE_CONFIG_START(acorn_vib_device::device_add_mconfig)
 
 	CLOCK(config, m_acia_clock, 1.8432_MHz_XTAL);
 	m_acia_clock->signal_handler().set(FUNC(acorn_vib_device::write_acia_clock));
-MACHINE_CONFIG_END
+}
 
 //**************************************************************************
 //  LIVE DEVICE

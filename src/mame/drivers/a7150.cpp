@@ -475,8 +475,7 @@ void a7150_state::a7150(machine_config &config)
 	m_maincpu->esc_data_handler().set("i8087", FUNC(i8087_device::addr_w));
 
 	i8087_device &i8087(I8087(config, "i8087", XTAL(9'832'000)/2));
-	i8087.set_addrmap(AS_PROGRAM, &a7150_state::a7150_mem);
-	i8087.set_data_width(16);
+	i8087.set_space_86(m_maincpu, AS_PROGRAM);
 	i8087.irq().set(m_pic8259, FUNC(pic8259_device::ir0_w));
 	i8087.busy().set_inputline("maincpu", INPUT_LINE_TEST);
 

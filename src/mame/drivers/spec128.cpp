@@ -299,13 +299,13 @@ GFXDECODE_END
 MACHINE_CONFIG_START(spectrum_state::spectrum_128)
 	spectrum(config);
 
-	MCFG_DEVICE_REMOVE("maincpu")
+	config.device_remove("maincpu");
 
 	MCFG_DEVICE_ADD("maincpu", Z80, X1_128_SINCLAIR / 5)
 	MCFG_DEVICE_PROGRAM_MAP(spectrum_128_mem)
 	MCFG_DEVICE_IO_MAP(spectrum_128_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", spectrum_state, spec_interrupt)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	MCFG_MACHINE_RESET_OVERRIDE(spectrum_state, spectrum_128 )
 
@@ -314,7 +314,7 @@ MACHINE_CONFIG_START(spectrum_state::spectrum_128)
 	MCFG_SCREEN_RAW_PARAMS(X1_128_SINCLAIR / 2.5f, 456, 0, 352,  311, 0, 296)
 
 	MCFG_VIDEO_START_OVERRIDE(spectrum_state, spectrum_128 )
-	MCFG_GFXDECODE_MODIFY("gfxdecode", spec128)
+	subdevice<gfxdecode_device>("gfxdecode")->set_info(spec128);
 
 	/* sound hardware */
 	AY8912(config, "ay8912", X1_128_SINCLAIR / 10).add_route(ALL_OUTPUTS, "mono", 0.25);

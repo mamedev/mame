@@ -641,7 +641,7 @@ MACHINE_CONFIG_START(lethalj_state::gameroom)
 	m_maincpu->set_pixels_per_clock(1);
 	m_maincpu->set_scanline_ind16_callback(FUNC(lethalj_state::scanline_update));
 
-	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
+	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

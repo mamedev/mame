@@ -466,10 +466,8 @@ MACHINE_CONFIG_START(amust_state::amust)
 	UPD765A(config, m_fdc, 8'000'000, true, true);
 	m_fdc->drq_wr_callback().set(FUNC(amust_state::drq_w));
 	m_fdc->intrq_wr_callback().set(FUNC(amust_state::intrq_w));
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", amust_floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", amust_floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, "fdc:0", amust_floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", amust_floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
 
 	clock_device &uart_clock(CLOCK(config, "uart_clock", 153600));
 	uart_clock.signal_handler().set("uart1", FUNC(i8251_device::write_txc));

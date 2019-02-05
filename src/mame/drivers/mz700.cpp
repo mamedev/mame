@@ -189,7 +189,7 @@ void mz_state::mz800_io(address_map &map)
 	map(0xeb, 0xeb).w(FUNC(mz_state::mz800_ramaddr_w));
 	map(0xf0, 0xf0).portr("atari_joy1").w(FUNC(mz_state::mz800_palette_w));
 	map(0xf1, 0xf1).portr("atari_joy2");
-	map(0xf2, 0xf2).w("sn76489n", FUNC(sn76489_device::command_w));
+	map(0xf2, 0xf2).w("sn76489n", FUNC(sn76489_device::write));
 	map(0xfc, 0xff).rw("z80pio", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 }
 
@@ -387,9 +387,9 @@ MACHINE_CONFIG_START(mz_state::mz700)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(17'734'470)/2, 568, 0, 40*8, 312, 0, 25*8)
 	MCFG_SCREEN_UPDATE_DRIVER(mz_state, screen_update_mz700)
 	MCFG_SCREEN_PALETTE(m_palette)
-	PALETTE(config, m_palette, palette_device::RGB_3BIT);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mz700)
+	PALETTE(config, m_palette, palette_device::RGB_3BIT);
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_mz700);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -397,8 +397,8 @@ MACHINE_CONFIG_START(mz_state::mz700)
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* ne556 timers */
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("cursor", mz_state, ne556_cursor_callback, attotime::from_hz(1.5))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("other", mz_state, ne556_other_callback, attotime::from_hz(34.5))
+	TIMER(config, "cursor").configure_periodic(FUNC(mz_state::ne556_cursor_callback), attotime::from_hz(1.5));
+	TIMER(config, "other").configure_periodic(FUNC(mz_state::ne556_other_callback), attotime::from_hz(34.5));
 
 	/* devices */
 	PIT8253(config, m_pit, 0);
@@ -417,12 +417,12 @@ MACHINE_CONFIG_START(mz_state::mz700)
 
 	TTL74145(config, m_ls145);
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(mz700_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("mz_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(mz700_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_interface("mz_cass");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list","mz700_cass")
+	SOFTWARE_LIST(config, "cass_list").set_original("mz700_cass");
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K");
@@ -431,7 +431,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mz_state::mz800)
 	mz700(config);
-	MCFG_DEVICE_REMOVE("banke")
+	config.device_remove("banke");
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
@@ -441,7 +441,7 @@ MACHINE_CONFIG_START(mz_state::mz800)
 	ADDRESS_MAP_BANK(config, "bankf").set_map(&mz_state::mz800_bankf).set_options(ENDIANNESS_LITTLE, 8, 16, 0x2000);
 
 	MCFG_MACHINE_RESET_OVERRIDE(mz_state, mz800)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_mz800)
+	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_mz800);
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(mz_state, screen_update_mz800)
@@ -449,8 +449,8 @@ MACHINE_CONFIG_START(mz_state::mz800)
 	MCFG_DEVICE_ADD("sn76489n", SN76489, XTAL(17'734'470)/5)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_DEVICE_REMOVE("cass_list")
-	MCFG_SOFTWARE_LIST_ADD("cass_list","mz800_cass")
+	config.device_remove("cass_list");
+	SOFTWARE_LIST(config, "cass_list").set_original("mz800_cass");
 
 	/* devices */
 	m_pit->set_clk<0>(XTAL(17'734'470)/16);
@@ -461,9 +461,10 @@ MACHINE_CONFIG_START(mz_state::mz800)
 	pio.out_pa_callback().set(FUNC(mz_state::mz800_z80pio_port_a_w));
 	pio.out_pb_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
 MACHINE_CONFIG_END
 
 

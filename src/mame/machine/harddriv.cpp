@@ -312,7 +312,7 @@ WRITE16_MEMBER( harddriv_state::hd68k_adc_control_w )
 	COMBINE_DATA(&m_adc_control);
 
 	/* handle a write to the 8-bit ADC address select */
-	m_adc8->address_w(space, 0, m_adc_control & 0x07);
+	m_adc8->address_w(m_adc_control & 0x07);
 	m_adc8->start_w(BIT(m_adc_control, 3));
 
 	/* handle a write to the 12-bit ADC address select */

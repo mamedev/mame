@@ -882,7 +882,7 @@ MACHINE_CONFIG_START(apache3_state::apache3)
 	MCFG_DEVICE_PROGRAM_MAP(apache3_z80_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", apache3_state, irq0_line_hold)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	MCFG_MACHINE_RESET_OVERRIDE(apache3_state, apache3)
 
@@ -942,7 +942,7 @@ MACHINE_CONFIG_START(roundup5_state::roundup5)
 	MCFG_DEVICE_ADD("audiocpu", Z80, CLOCK_1 / 4)
 	MCFG_DEVICE_PROGRAM_MAP(roundup5_z80_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	i8255_device &ppi(I8255(config, "ppi"));
 	ppi.in_pa_callback().set_ioport("IN0");
@@ -1015,7 +1015,7 @@ MACHINE_CONFIG_START(cyclwarr_state::cyclwarr)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	// saner sync value (avoids crashing after crediting)
-	MCFG_QUANTUM_TIME(attotime::from_hz(CLOCK_2 / 1024))
+	config.m_minimum_quantum = attotime::from_hz(CLOCK_2 / 1024);
 
 	cxd1095_device &io1(CXD1095(config, "io1", 0));
 	io1.in_portb_cb().set_ioport("SERVICE");

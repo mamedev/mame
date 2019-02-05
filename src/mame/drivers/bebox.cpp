@@ -117,8 +117,9 @@ FLOPPY_FORMATS_END
 
 void bebox_state::mpc105_config(device_t *device)
 {
-	MCFG_MPC105_CPU( "ppc1" )
-	MCFG_MPC105_BANK_BASE_DEFAULT( 0 )
+	mpc105_device &mpc105 = *downcast<mpc105_device *>(device);
+	mpc105.set_cpu(":ppc1");
+	mpc105.set_bank_base_default(0);
 }
 
 /*************************************

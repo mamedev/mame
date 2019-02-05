@@ -197,7 +197,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(exterm_state::master_sound_nmi_callback)
 WRITE8_MEMBER(exterm_state::ym2151_data_latch_w)
 {
 	/* bit 7 of the sound control selects which port */
-	m_ym2151->write(space, m_sound_control >> 7, data);
+	m_ym2151->write(m_sound_control >> 7, data);
 }
 
 
@@ -401,7 +401,7 @@ MACHINE_CONFIG_START(exterm_state::exterm)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_TIMER_DRIVER_ADD(m_nmi_timer, exterm_state, master_sound_nmi_callback)
+	TIMER(config, m_nmi_timer).configure_generic(FUNC(exterm_state::master_sound_nmi_callback));
 
 	WATCHDOG_TIMER(config, "watchdog");
 

@@ -40,7 +40,7 @@ public:
 
 	template<typename T> struct datatype_f
 	{
-		static inline const datatype_t f()
+		static const datatype_t f()
 		{
 			return datatype_t(sizeof(T),
 					plib::is_integral<T>::value || std::is_enum<T>::value,
@@ -56,8 +56,8 @@ public:
 		virtual ~callback_t();
 
 		virtual void register_state(state_manager_t &manager, const pstring &module) = 0;
-		virtual void on_pre_save() = 0;
-		virtual void on_post_load() = 0;
+		virtual void on_pre_save(state_manager_t &manager) = 0;
+		virtual void on_post_load(state_manager_t &manager) = 0;
 	protected:
 	};
 
@@ -103,7 +103,7 @@ public:
 	template<typename C>
 	void save_item(const void *owner, std::vector<C> &v, const pstring &stname)
 	{
-		save_state(v.data(), owner, stname, v.size());
+		save_state_ptr(owner, stname, datatype_f<C>::f(), v.size(), v.data());
 	}
 
 	void pre_save();

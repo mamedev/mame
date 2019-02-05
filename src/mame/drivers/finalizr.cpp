@@ -117,7 +117,7 @@ void finalizr_state::main_map(address_map &map)
 	map(0x0813, 0x0813).portr("DSW1");
 	map(0x0818, 0x0818).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x0819, 0x0819).w(FUNC(finalizr_state::finalizr_coin_w));
-	map(0x081a, 0x081a).w("snsnd", FUNC(sn76489a_device::command_w));   /* This address triggers the SN chip to read the data port. */
+	map(0x081a, 0x081a).w("snsnd", FUNC(sn76489a_device::write));   /* This address triggers the SN chip to read the data port. */
 	map(0x081b, 0x081b).nopw();        /* Loads the snd command into the snd latch */
 	map(0x081c, 0x081c).w(FUNC(finalizr_state::finalizr_i8039_irq_w)); /* custom sound chip */
 	map(0x081d, 0x081d).w("soundlatch", FUNC(generic_latch_8_device::write)); /* custom sound chip */
@@ -267,7 +267,7 @@ MACHINE_CONFIG_START(finalizr_state::finalizr)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", KONAMI1, XTAL(18'432'000)/6) /* ??? */
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", finalizr_state, finalizr_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(finalizr_state::finalizr_scanline), "screen", 0, 1);
 
 	I8039(config, m_audiocpu, XTAL(18'432'000)/2); /* 9.216MHz clkin ?? */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &finalizr_state::sound_map);

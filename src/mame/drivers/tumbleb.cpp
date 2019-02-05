@@ -321,12 +321,12 @@ WRITE16_MEMBER(tumbleb_state::tumblepb_oki_w)
 {
 	if (mem_mask == 0xffff)
 	{
-		m_oki->write(space, 0, data & 0xff);
+		m_oki->write(data & 0xff);
 		//printf("tumbleb_oki_w %04x %04x\n", data, mem_mask);
 	}
 	else
 	{
-		m_oki->write(space, 0, (data >> 8) & 0xff);
+		m_oki->write((data >> 8) & 0xff);
 		//printf("tumbleb_oki_w %04x %04x\n", data, mem_mask);
 	}
 	/* STUFF IN OTHER BYTE TOO..*/
@@ -428,14 +428,14 @@ command 1 - stop?
 
 void tumbleb_state::tumbleb2_playmusic(okim6295_device *oki)
 {
-	int status = oki->read_status();
+	int status = oki->read();
 
 	if (m_music_is_playing)
 	{
 		if (!BIT(status, 3))
 		{
-			oki->write_command(0x80 | m_music_command);
-			oki->write_command(0x00 | 0x82);
+			oki->write(0x80 | m_music_command);
+			oki->write(0x00 | 0x82);
 		}
 	}
 }
@@ -476,22 +476,22 @@ void tumbleb_state::tumbleb2_set_music_bank( int bank )
 
 void tumbleb_state::tumbleb2_play_sound( okim6295_device *oki, int data )
 {
-	int status = oki->read_status();
+	int status = oki->read();
 
 	if (!BIT(status, 0))
 	{
-		oki->write_command(0x80 | data);
-		oki->write_command(0x00 | 0x12);
+		oki->write(0x80 | data);
+		oki->write(0x00 | 0x12);
 	}
 	else if (!BIT(status, 1))
 	{
-		oki->write_command(0x80 | data);
-		oki->write_command(0x00 | 0x22);
+		oki->write(0x80 | data);
+		oki->write(0x00 | 0x22);
 	}
 	else if (!BIT(status, 2))
 	{
-		oki->write_command(0x80 | data);
-		oki->write_command(0x00 | 0x42);
+		oki->write(0x80 | data);
+		oki->write(0x00 | 0x42);
 	}
 }
 
@@ -509,13 +509,13 @@ void tumbleb_state::tumbleb2_play_sound( okim6295_device *oki, int data )
 
 void tumbleb_state::process_tumbleb2_music_command( okim6295_device *oki, int data )
 {
-	int status = oki->read_status();
+	int status = oki->read();
 
 	if (data == 1) // stop?
 	{
 		if (BIT(status, 3))
 		{
-			oki->write_command(0x40);       /* Stop playing music */
+			oki->write(0x40);       /* Stop playing music */
 			m_music_is_playing = 0;
 		}
 	}
@@ -524,7 +524,7 @@ void tumbleb_state::process_tumbleb2_music_command( okim6295_device *oki, int da
 		if (m_music_is_playing != data)
 		{
 			m_music_is_playing = data;
-			oki->write_command(0x40); // stop the current music
+			oki->write(0x40); // stop the current music
 			switch (data)
 			{
 				case 0x04: // map screen

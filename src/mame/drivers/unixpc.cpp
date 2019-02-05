@@ -384,28 +384,29 @@ MACHINE_CONFIG_START(unixpc_state::unixpc)
 	WD2797(config, m_wd2797, 40_MHz_XTAL / 40); // 1PCK (CPU clock) divided by custom DMA chip
 	m_wd2797->intrq_wr_callback().set(FUNC(unixpc_state::wd2797_intrq_w));
 	m_wd2797->drq_wr_callback().set(FUNC(unixpc_state::wd2797_drq_w));
-	MCFG_FLOPPY_DRIVE_ADD("wd2797:0", unixpc_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, "wd2797:0", unixpc_floppies, "525dd", floppy_image_device::default_floppy_formats);
 
 	upd7201_new_device& mpsc(UPD7201_NEW(config, "mpsc", 19.6608_MHz_XTAL / 8));
 	mpsc.out_txda_callback().set("rs232", FUNC(rs232_port_device::write_txd));
 	mpsc.out_dtra_callback().set("rs232", FUNC(rs232_port_device::write_dtr));
 	mpsc.out_rtsa_callback().set("rs232", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("kbc", ACIA6850, 0)
+	ACIA6850(config, "kbc", 0);
 
 	// TODO: HDC
-	//MCFG_DEVICE_ADD("hdc", WD1010, 40_MHz_XTAL / 8)
+	//WD1010(config, "hdc", 40_MHz_XTAL / 8);
 
 	// TODO: RTC
-	//MCFG_DEVICE_ADD("rtc", TC8250, 32.768_kHz_XTAL)
+	//TC8250(config, "rtc", 32.768_kHz_XTAL);
 
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
 	rs232.rxd_handler().set("mpsc", FUNC(upd7201_new_device::rxa_w));
 	rs232.dsr_handler().set("mpsc", FUNC(upd7201_new_device::dcda_w));
 	rs232.cts_handler().set("mpsc", FUNC(upd7201_new_device::ctsa_w));
 
-	MCFG_DEVICE_ADD("printer", CENTRONICS, centronics_devices, nullptr)
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("printlatch", "printer")
+	centronics_device &printer(CENTRONICS(config, "printer", centronics_devices, nullptr));
+	output_latch_device &printlatch(OUTPUT_LATCH(config, "printlatch"));
+	printer.set_output_latch(printlatch);
 MACHINE_CONFIG_END
 
 

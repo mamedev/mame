@@ -20,6 +20,8 @@ acrnsys1.cpp
 acrnsys.cpp
 acvirus.cpp
 adam.cpp
+adm23.cpp
+adm31.cpp
 advision.cpp
 agat.cpp
 aim65.cpp
@@ -90,6 +92,7 @@ bbcbc.cpp
 bcs3.cpp
 bebox.cpp
 beehive.cpp
+bert.cpp
 besta.cpp
 beta.cpp
 bigbord2.cpp
@@ -108,6 +111,7 @@ bw12.cpp
 bw2.cpp
 c10.cpp
 c128.cpp
+c2color.cpp
 c64.cpp
 c64dtv.cpp
 c65.cpp
@@ -375,6 +379,7 @@ laser3k.cpp
 lb186.cpp
 lc80.cpp
 lcmate2.cpp
+leapfrog_leappad.cpp
 leapster.cpp
 learnwin.cpp
 lee1214.cpp
@@ -525,6 +530,7 @@ p2000t.cpp
 p8k.cpp
 palm.cpp
 palmz22.cpp
+palestra.cpp
 partner.cpp
 paso1600.cpp
 pasogo.cpp
@@ -692,10 +698,12 @@ spec128.cpp
 special.cpp
 specpls3.cpp
 spectrum.cpp
+spg110.cpp
 squale.cpp
 ssem.cpp
 ssystem3.cpp
 st17xx.cpp
+storio.cpp
 stratos.cpp
 studio2.cpp
 sun1.cpp
@@ -736,6 +744,7 @@ terco.cpp
 terminal.cpp
 test_t400.cpp
 testconsole.cpp
+testpat.cpp
 textelcomp.cpp
 tg100.cpp
 thomson.cpp
@@ -769,6 +778,7 @@ tr175.cpp
 tr606.cpp
 tranz330.cpp
 tricep.cpp
+trkfldch.cpp
 trs80.cpp
 trs80dt1.cpp
 trs80m2.cpp
@@ -827,6 +837,7 @@ votrtnt.cpp
 vp415.cpp
 vp60.cpp
 vsmile.cpp
+vsmileb.cpp
 vsmilepro.cpp
 vt100.cpp
 vt220.cpp

@@ -7,8 +7,8 @@
     driver by Angelo Salese
 
     TODO:
-    - no real documentation, the entire driver is just a bunch of educated
-      guesses ...
+    - Implement SMC-70 specific features;
+    - Implement GFX modes other than 160x100x4
     - ROM/RAM bankswitch, it apparently happens after one instruction prefetching.
       We currently use an hackish implementation until the MAME/MESS framework can
       support that ...
@@ -89,16 +89,17 @@ private:
 	DECLARE_READ8_MEMBER(key_r);
 	DECLARE_WRITE8_MEMBER(key_w);
 	DECLARE_WRITE8_MEMBER(border_col_w);
-	DECLARE_READ8_MEMBER(system_input_r);
-	DECLARE_WRITE8_MEMBER(system_output_w);
+	DECLARE_READ8_MEMBER(io_status_1c_r);
+	DECLARE_READ8_MEMBER(io_status_1d_r);
+	DECLARE_WRITE8_MEMBER(io_control_w);
 	DECLARE_WRITE8_MEMBER(color_mode_w);
 	DECLARE_WRITE8_MEMBER(ramdac_w);
-	DECLARE_READ8_MEMBER(display_reg_r);
-	DECLARE_WRITE8_MEMBER(display_reg_w);
+	DECLARE_READ8_MEMBER(gcw_r);
+	DECLARE_WRITE8_MEMBER(gcw_w);
 	DECLARE_READ8_MEMBER(smc777_mem_r);
 	DECLARE_WRITE8_MEMBER(smc777_mem_w);
-	DECLARE_READ8_MEMBER(irq_mask_r);
-	DECLARE_WRITE8_MEMBER(irq_mask_w);
+	DECLARE_READ8_MEMBER(vsync_irq_status_r);
+	DECLARE_WRITE8_MEMBER(vsync_irq_enable_w);
 	void smc777_palette(palette_device &palette) const;
 	uint32_t screen_update_smc777(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
@@ -106,8 +107,8 @@ private:
 
 	DECLARE_READ8_MEMBER(fdc_r);
 	DECLARE_WRITE8_MEMBER(fdc_w);
-	DECLARE_READ8_MEMBER(fdc_request_r);
-	DECLARE_WRITE8_MEMBER(floppy_select_w);
+	DECLARE_READ8_MEMBER(fdc1_fast_status_r);
+	DECLARE_WRITE8_MEMBER(fdc1_select_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 
@@ -144,11 +145,12 @@ private:
 	struct { uint8_t r,g,b; } m_pal;
 	uint8_t m_raminh,m_raminh_pending_change; //bankswitch
 	uint8_t m_raminh_prefetch;
-	uint8_t m_irq_mask;
 	uint8_t m_pal_mode;
 	uint8_t m_keyb_cmd;
 	uint8_t m_crtc_vreg[0x20];
 	uint8_t m_crtc_addr;
+	bool m_vsync_idf;
+	bool m_vsync_ief;
 };
 
 
@@ -456,26 +458,25 @@ WRITE8_MEMBER( smc777_state::fdc_w )
 	m_fdc->write(offset, data ^ 0xff);
 }
 
-READ8_MEMBER( smc777_state::fdc_request_r )
+READ8_MEMBER( smc777_state::fdc1_fast_status_r )
 {
 	uint8_t data = 0;
 
+	// TODO: inverted wrt documentation?
 	data |= !m_fdc_drq_flag << 6;
 	data |= m_fdc_irq_flag << 7;
 
 	return data;
 }
 
-WRITE8_MEMBER( smc777_state::floppy_select_w )
+WRITE8_MEMBER( smc777_state::fdc1_select_w )
 {
 	floppy_image_device *floppy = nullptr;
 
-	// ---- xxxx select floppy drive (yes, 15 of them, A to P)
-	switch (data & 0x01)
-	{
-	case 0: floppy = m_floppy0->get_device(); break;
-	case 1: floppy = m_floppy1->get_device(); break;
-	}
+	// x--- ---- SIDE1: [SMC-70] side select
+	// ---- --x- EXDS: [SMC-70] external drive select (0=internal, 1=external)
+	// ---- ---x DS01: select floppy drive
+	floppy = (data & 1 ? m_floppy1 : m_floppy0)->get_device();
 
 	m_fdc->set_floppy(floppy);
 
@@ -547,36 +548,59 @@ WRITE8_MEMBER(smc777_state::border_col_w)
 }
 
 
-READ8_MEMBER(smc777_state::system_input_r)
+READ8_MEMBER(smc777_state::io_status_1c_r)
 {
-	printf("System FF R %02x\n",m_system_data & 0x0f);
+	/*
+	 * RES     x--- ---- Power On bit (1=reset switch)
+	 * HiZ     -x-- ---- [SMC-70] no drive (always '1'?)
+	 * LPH     --x- ---- [SMC-70] light pen H position
+	 * CP      ---x ---- [SMC-777] color board (active low)
+	 * LPV     ---x x--- [SMC-70] light pen V position
+	 * ID      ---- -x-- 0=SMC-777 1=SMC-70
+	 * MD      ---- --xx [SMC-70] boot mode (00=DISK; 10=ROM; 11=EXT)
+	 */
+	printf("System R\n");
 
-	switch(m_system_data & 0x0f)
-	{
-		case 0x00:
-			return ((m_raminh & 1) << 4); //unknown bit, Dragon's Alphabet and Bird Crush relies on this for correct colors
-	}
+	return 0;
+}
 
-	return m_system_data;
+READ8_MEMBER(smc777_state::io_status_1d_r)
+{
+	/*
+	 * TCIN    x--- ---- CMT read data
+	 * HiZ     -x-- ---- [SMC-70] no drive (always '1'?)
+	 * LPIN    --x- ---- [SMC-70] light pen input
+	 * PR_BUSY ---x ---- printer busy
+	 * PR_ACK  ---- x--- printer ACK
+	 * ID      ---- -x-- 0=SMC-777 1=SMC-70
+	 * MD      ---- --xx [SMC-70] boot mode (00=DISK; 10=ROM; 11=EXT)
+	 */
+	return 0;
 }
 
 
-
-WRITE8_MEMBER(smc777_state::system_output_w)
+WRITE8_MEMBER(smc777_state::io_control_w)
 {
 	/*
-	---x 0000 ram inibit signal
-	---x 1001 beep
-	all the rest is unknown at current time
-	*/
+	 * flip-flop based
+	 * ---x -111 cassette write
+	 * ---x -110 printer strobe
+	 * ---x -101 beeper
+	 * ---x -100 cassette start (MONITOR_ON_OFF)
+	 * ---x -011 0=RGB 1=Component
+	 * ---x -010 0=525 lines 1=625 lines (NTSC/PAL switch?)
+	 * ---x -001 1=display disable
+	 * ---x -000 ram inibit signal
+	 */
 	m_system_data = data;
-	switch(m_system_data & 0x0f)
+	switch(m_system_data & 0x07)
 	{
 		case 0x00:
+			// "ROM / RAM register change is done at the beginning of the next M1 cycle"
 			m_raminh_pending_change = ((data & 0x10) >> 4) ^ 1;
 			m_raminh_prefetch = (uint8_t)(m_maincpu->state_int(Z80_R)) & 0x7f;
 			break;
-		case 0x02: printf("Interlace %s\n",data & 0x10 ? "on" : "off"); break;
+		case 0x02: printf("Screen line number %d\n",data & 0x10 ? 625 : 525); break;
 		case 0x05: m_beeper->set_state(data & 0x10); break;
 		default: printf("System FF W %02x\n",data); break;
 	}
@@ -584,7 +608,14 @@ WRITE8_MEMBER(smc777_state::system_output_w)
 
 WRITE8_MEMBER(smc777_state::color_mode_w)
 {
-	switch(data & 0x0f)
+	/*
+	 * ---x -111 gfx palette select
+	 * ---x -110 text palette select
+	 * ---x -101 joy 2 out
+	 * ...
+	 * ---x -000 joy 2 out
+	 */
+	switch(data & 0x07)
 	{
 		case 0x06: m_pal_mode = (data & 0x10) ^ 0x10; break;
 		default: printf("Color FF %02x\n",data); break;
@@ -608,18 +639,29 @@ WRITE8_MEMBER(smc777_state::ramdac_w)
 	}
 }
 
-READ8_MEMBER(smc777_state::display_reg_r)
+READ8_MEMBER(smc777_state::gcw_r)
 {
 	return m_display_reg;
 }
 
 /* x */
-WRITE8_MEMBER(smc777_state::display_reg_w)
+WRITE8_MEMBER(smc777_state::gcw_w)
 {
 	/*
-	x--- ---- width 80 / 40 switch (0 = 640 x 200 1 = 320 x 200)
-	---- -x-- mode select?
-	*/
+	 * x--- ---- text mode (0 = 80x25 1 = 40x25)
+	 * -x-- ---- text page (in 40x25 mode)
+	 * --x- ---- color mode (1=for 2bpp mode, blue is replaced with white)
+	 * ---x ---- [SMC-70] interlace
+	 * ---- xxyy gfx mode (model dependant)
+	 * [SMC-70]
+	 * ---- 11-- 640x400x1 bpp
+	 * ---- 10-- 640x200x2 bpp
+	 * ---- 01-- 320x200x4 bpp
+	 * ---- 00yy 160x100x4 bpp, bits 0-1 selects page
+	 * [SMC-777]
+	 * ---- 1--- 640x200x2 bpp
+	 * ---- 0--- 320x200x4 bpp
+	 */
 
 	m_display_reg = data;
 }
@@ -628,7 +670,8 @@ READ8_MEMBER(smc777_state::smc777_mem_r)
 {
 	uint8_t z80_r;
 
-	if(m_raminh_prefetch != 0xff) //do the bankswitch AFTER that the prefetch instruction is executed (FIXME: this is an hackish implementation)
+	// TODO: do the bankswitch AFTER that the prefetch instruction is executed (hackish implementation)
+	if(m_raminh_prefetch != 0xff)
 	{
 		z80_r = (uint8_t)m_maincpu->state_int(Z80_R);
 
@@ -650,17 +693,25 @@ WRITE8_MEMBER(smc777_state::smc777_mem_w)
 	m_work_ram[offset] = data;
 }
 
-READ8_MEMBER(smc777_state::irq_mask_r)
+READ8_MEMBER(smc777_state::vsync_irq_status_r)
 {
-	return m_irq_mask;
+	if (m_vsync_idf == true)
+	{
+		m_vsync_idf = false;
+		return 1;
+	}
+
+	return 0;
 }
 
-WRITE8_MEMBER(smc777_state::irq_mask_w)
+WRITE8_MEMBER(smc777_state::vsync_irq_enable_w)
 {
 	if(data & 0xfe)
-		printf("Irq mask = %02x\n",data & 0xfe);
+		logerror("Irq mask = %02x\n",data & 0xfe);
 
-	m_irq_mask = data & 1;
+	// IRQ mask
+	m_vsync_ief = BIT(data,0);
+	// TODO: clear idf on 1->0 irq mask transition?
 }
 
 void smc777_state::smc777_mem(address_map &map)
@@ -677,34 +728,40 @@ void smc777_state::smc777_io(address_map &map)
 	map(0x10, 0x17).select(0xff00).rw(FUNC(smc777_state::pcg_r), FUNC(smc777_state::pcg_w));
 	map(0x18, 0x19).mirror(0xff00).w(FUNC(smc777_state::mc6845_w));
 	map(0x1a, 0x1b).mirror(0xff00).rw(FUNC(smc777_state::key_r), FUNC(smc777_state::key_w));
-	map(0x1c, 0x1c).mirror(0xff00).rw(FUNC(smc777_state::system_input_r), FUNC(smc777_state::system_output_w));
-//  AM_RANGE(0x1d, 0x1d) system and control read, printer strobe write
-//  AM_RANGE(0x1e, 0x1f) rs232 irq control
-	map(0x20, 0x20).mirror(0xff00).rw(FUNC(smc777_state::display_reg_r), FUNC(smc777_state::display_reg_w));
-	map(0x21, 0x21).mirror(0xff00).rw(FUNC(smc777_state::irq_mask_r), FUNC(smc777_state::irq_mask_w));
-//  AM_RANGE(0x22, 0x22) printer output data
+	map(0x1c, 0x1c).mirror(0xff00).rw(FUNC(smc777_state::io_status_1c_r), FUNC(smc777_state::io_control_w));
+	map(0x1d, 0x1d).mirror(0xff00).rw(FUNC(smc777_state::io_status_1d_r), FUNC(smc777_state::io_control_w));
+//  map(0x1e, 0x1f) rs232 irq control
+	map(0x20, 0x20).mirror(0xff00).rw(FUNC(smc777_state::gcw_r), FUNC(smc777_state::gcw_w));
+	map(0x21, 0x21).mirror(0xff00).rw(FUNC(smc777_state::vsync_irq_status_r), FUNC(smc777_state::vsync_irq_enable_w));
+//  map(0x22, 0x22) printer output data
 	map(0x23, 0x23).mirror(0xff00).w(FUNC(smc777_state::border_col_w));
-//  AM_RANGE(0x24, 0x24) rtc write address
-//  AM_RANGE(0x25, 0x25) rtc read
-//  AM_RANGE(0x26, 0x26) rs232 #1
-//  AM_RANGE(0x28, 0x2c) fdc #2
-//  AM_RANGE(0x2d, 0x2f) rs232 #2
+//  map(0x24, 0x24) rtc write address (M5M58321RS)
+//  map(0x25, 0x25) rtc read
+//  map(0x26, 0x26) rs232 #1
+//  map(0x28, 0x2c) fdc #2 (8")
+//  map(0x2d, 0x2f) rs232 #2
 	map(0x30, 0x33).mirror(0xff00).rw(FUNC(smc777_state::fdc_r), FUNC(smc777_state::fdc_w));
-	map(0x34, 0x34).mirror(0xff00).rw(FUNC(smc777_state::fdc_request_r), FUNC(smc777_state::floppy_select_w));
-//  AM_RANGE(0x35, 0x37) rs232 #3
-//  AM_RANGE(0x38, 0x3b) cache disk unit
-//  AM_RANGE(0x3c, 0x3d) rgb superimposer
-//  AM_RANGE(0x40, 0x47) ieee-488
-//  AM_RANGE(0x48, 0x4f) hdd (winchester)
+	map(0x34, 0x34).mirror(0xff00).rw(FUNC(smc777_state::fdc1_fast_status_r), FUNC(smc777_state::fdc1_select_w));
+//  map(0x35, 0x37) rs232 #3
+//  map(0x38, 0x3b) cache disk unit
+	// 0x38 (R) CDSTS status port (W) CDCMD command port
+	// 0x39 (W) track register
+	// 0x3a (W) sector register
+	// 0x3b (RW) data port
+//  map(0x3c, 0x3d) rgb superimposer / genlock control
+//  map(0x40, 0x47) ieee-488 / TMS9914A I/F
+	map(0x44, 0x44).mirror(0xff00).portr("GPDSW"); // normally unmapped in GPIB interface
+//  map(0x48, 0x49) hdd (winchester)
+	// TODO: address bit 8 selects joy port 2
 	map(0x51, 0x51).mirror(0xff00).portr("JOY_1P").w(FUNC(smc777_state::color_mode_w));
 	map(0x52, 0x52).select(0xff00).w(FUNC(smc777_state::ramdac_w));
-	map(0x53, 0x53).mirror(0xff00).w("sn1", FUNC(sn76489a_device::command_w));
-//  AM_RANGE(0x54, 0x59) vrt controller
-//  AM_RANGE(0x5a, 0x5b) ram banking
-//  AM_RANGE(0x70, 0x70) auto-start rom
-//  AM_RANGE(0x74, 0x74) ieee-488 rom
-//  AM_RANGE(0x75, 0x75) vrt controller rom
-//  AM_RANGE(0x7e, 0x7f) kanji rom
+	map(0x53, 0x53).mirror(0xff00).w("sn1", FUNC(sn76489a_device::write));
+//  map(0x54, 0x59) vrt controller
+//  map(0x5a, 0x5b) ram banking
+//  map(0x70, 0x70) auto-start ROM (ext-ROM)
+//  map(0x74, 0x74) ieee-488 GPIB ROM port
+//  map(0x75, 0x75) vrt controller ROM
+//  map(0x7e, 0x7f) kanji ROM
 	map(0x80, 0xff).select(0xff00).rw(FUNC(smc777_state::fbuf_r), FUNC(smc777_state::fbuf_w));
 }
 
@@ -841,6 +898,32 @@ static INPUT_PORTS_START( smc777 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH,IPT_UNKNOWN ) //status?
+
+	PORT_START("GPDSW")
+	PORT_DIPNAME( 0x01, 0x00, "GPDSW" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
 /*
@@ -988,6 +1071,7 @@ void smc777_state::machine_reset()
 	m_raminh_pending_change = 1;
 	m_raminh_prefetch = 0xff;
 	m_pal_mode = 0x10;
+	m_vsync_idf = false;
 
 	m_beeper->set_state(0);
 }
@@ -1010,8 +1094,11 @@ void smc777_state::smc777_palette(palette_device &palette) const
 
 INTERRUPT_GEN_MEMBER(smc777_state::vblank_irq)
 {
-	if(m_irq_mask)
+	if(m_vsync_ief)
+	{
 		device.execute().set_input_line(0,HOLD_LINE);
+		m_vsync_idf = true;
+	}
 }
 
 
@@ -1052,10 +1139,10 @@ MACHINE_CONFIG_START(smc777_state::smc777)
 	m_fdc->drq_wr_callback().set(FUNC(smc777_state::fdc_drq_w));
 
 	// does it really support 16 of them?
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", smc777_floppies, "ssdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", smc777_floppies, "ssdd", floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, "fdc:0", smc777_floppies, "ssdd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", smc777_floppies, "ssdd", floppy_image_device::default_floppy_formats);
 
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "smc777")
+	SOFTWARE_LIST(config, "flop_list").set_original("smc777");
 	MCFG_QUICKLOAD_ADD("quickload", smc777_state, smc777, "com,cpm", 3)
 
 	/* sound hardware */
@@ -1067,7 +1154,7 @@ MACHINE_CONFIG_START(smc777_state::smc777)
 	BEEP(config, m_beeper, 300); // TODO: correct frequency
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", smc777_state, keyboard_callback, attotime::from_hz(240/32))
+	TIMER(config, "keyboard_timer").configure_periodic(FUNC(smc777_state::keyboard_callback), attotime::from_hz(240/32));
 MACHINE_CONFIG_END
 
 /* ROM definition */

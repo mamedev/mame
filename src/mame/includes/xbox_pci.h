@@ -60,15 +60,18 @@ DECLARE_DEVICE_TYPE(NV2A_RAM, nv2a_ram_device)
 
 class mcpx_isalpc_device : public pci_device {
 public:
+	mcpx_isalpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t subsystem_id);
 	mcpx_isalpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto interrupt_output() { return m_interrupt_output.bind(); }
+	auto boot_state_hook() { return m_boot_state_hook.bind(); }
 
 	uint32_t acknowledge();
 	void debug_generate_irq(int irq, int state);
 
-	DECLARE_READ32_MEMBER(lpc_r);
-	DECLARE_WRITE32_MEMBER(lpc_w);
+	DECLARE_READ32_MEMBER(acpi_r);
+	DECLARE_WRITE32_MEMBER(acpi_w);
+	DECLARE_WRITE8_MEMBER(boot_state_w);
 
 	DECLARE_WRITE_LINE_MEMBER(irq1);
 	DECLARE_WRITE_LINE_MEMBER(irq3);
@@ -93,6 +96,7 @@ private:
 	void lpc_io(address_map &map);
 
 	devcb_write_line m_interrupt_output;
+	devcb_write8 m_boot_state_hook;
 	required_device<pic8259_device> pic8259_1;
 	required_device<pic8259_device> pic8259_2;
 	required_device<pit8254_device> pit8254;

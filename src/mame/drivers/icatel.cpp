@@ -277,9 +277,9 @@ MACHINE_CONFIG_START(icatel_state::icatel)
 	PALETTE(config, "palette", FUNC(icatel_state::icatel_palette), 2);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_icatel);
 
-	MCFG_HD44780_ADD("hd44780")
-	MCFG_HD44780_LCD_SIZE(2, 16)
-	MCFG_HD44780_PIXEL_UPDATE_CB(icatel_state, icatel_pixel_update)
+	HD44780(config, m_lcdc, 0);
+	m_lcdc->set_lcd_size(2, 16);
+	m_lcdc->set_pixel_update_cb(FUNC(icatel_state::icatel_pixel_update), this);
 MACHINE_CONFIG_END
 
 ROM_START( icatel )

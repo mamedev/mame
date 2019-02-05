@@ -394,14 +394,14 @@ MACHINE_CONFIG_START(airraid_state::airraid)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD(m_maincpu, Z80,XTAL(12'000'000)/2)        /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(airraid_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", airraid_state, cshooter_scanline, "airraid_vid:screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(airraid_state::cshooter_scanline), "airraid_vid:screen", 0, 1);
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(14'318'181)/4)      /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(airraid_sound_map)
 	MCFG_DEVICE_OPCODES_MAP(airraid_sound_decrypted_opcodes_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 0x100);
 

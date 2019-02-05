@@ -904,7 +904,7 @@ MACHINE_CONFIG_START(expro02_state::expro02)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)
 	MCFG_DEVICE_PROGRAM_MAP(expro02_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", expro02_state, scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(expro02_state::scanline), "screen", 0, 1);
 
 	/* CALC01 MCU @ 16Mhz (unknown type, simulated) */
 
@@ -947,6 +947,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(expro02_state::comad)
 	expro02(config);
+
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(fantasia_map)
@@ -960,12 +961,14 @@ MACHINE_CONFIG_START(expro02_state::comad)
 	subdevice<watchdog_timer_device>("watchdog")->set_time(attotime::from_seconds(0));  /* a guess, and certainly wrong */
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(expro02_state::comad_noview2)
+void expro02_state::comad_noview2(machine_config &config)
+{
 	comad(config);
+
 	config.device_remove("view2_0");
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_expro02_noview2)
-MACHINE_CONFIG_END
+	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_expro02_noview2);
+}
 
 
 MACHINE_CONFIG_START(expro02_state::fantasia)
@@ -977,6 +980,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(expro02_state::supmodel)
 	comad_noview2(config);
+
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(supmodel_map)
 	MCFG_DEVICE_REPLACE("oki", OKIM6295, 1584000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
@@ -986,18 +990,21 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(expro02_state::smissw) // 951127 PCB, 12 & 16 clocks
 	comad_noview2(config);
+
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(smissw_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(expro02_state::fantsia2)
 	comad_noview2(config);
+
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(fantsia2_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(expro02_state::galhustl)
 	comad_noview2(config);
+
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(galhustl_map)
 	MCFG_DEVICE_REPLACE("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
@@ -1010,6 +1017,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(expro02_state::zipzap)
 	comad_noview2(config);
+
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(zipzap_map)

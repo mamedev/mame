@@ -45,32 +45,33 @@ void vp575_device::update_interrupts()
 //  MACHINE_CONFIG_START( vp575 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(vp575_device::device_add_mconfig)
-	MCFG_VIP_EXPANSION_SLOT_ADD("exp1", XTAL(3'521'280)/2, vip_expansion_cards, nullptr)
-	MCFG_VIP_EXPANSION_SLOT_INT_CALLBACK(WRITELINE(*this, vp575_device, exp1_int_w))
-	MCFG_VIP_EXPANSION_SLOT_DMA_OUT_CALLBACK(WRITELINE(*this, vp575_device, exp1_dma_out_w))
-	MCFG_VIP_EXPANSION_SLOT_DMA_IN_CALLBACK(WRITELINE(*this, vp575_device, exp1_dma_in_w))
+void vp575_device::device_add_mconfig(machine_config &config)
+{
+	VIP_EXPANSION_SLOT(config, m_expansion_slot[0], XTAL(3'521'280)/2, vip_expansion_cards, nullptr);
+	m_expansion_slot[0]->int_wr_callback().set(FUNC(vp575_device::exp1_int_w));
+	m_expansion_slot[0]->dma_out_wr_callback().set(FUNC(vp575_device::exp1_dma_out_w));
+	m_expansion_slot[0]->dma_in_wr_callback().set(FUNC(vp575_device::exp1_dma_in_w));
 
-	MCFG_VIP_EXPANSION_SLOT_ADD("exp2", XTAL(3'521'280)/2, vip_expansion_cards, nullptr)
-	MCFG_VIP_EXPANSION_SLOT_INT_CALLBACK(WRITELINE(*this, vp575_device, exp2_int_w))
-	MCFG_VIP_EXPANSION_SLOT_DMA_OUT_CALLBACK(WRITELINE(*this, vp575_device, exp2_dma_out_w))
-	MCFG_VIP_EXPANSION_SLOT_DMA_IN_CALLBACK(WRITELINE(*this, vp575_device, exp2_dma_in_w))
+	VIP_EXPANSION_SLOT(config, m_expansion_slot[1], XTAL(3'521'280)/2, vip_expansion_cards, nullptr);
+	m_expansion_slot[1]->int_wr_callback().set(FUNC(vp575_device::exp2_int_w));
+	m_expansion_slot[1]->dma_out_wr_callback().set(FUNC(vp575_device::exp2_dma_out_w));
+	m_expansion_slot[1]->dma_in_wr_callback().set(FUNC(vp575_device::exp2_dma_in_w));
 
-	MCFG_VIP_EXPANSION_SLOT_ADD("exp3", XTAL(3'521'280)/2, vip_expansion_cards, nullptr)
-	MCFG_VIP_EXPANSION_SLOT_INT_CALLBACK(WRITELINE(*this, vp575_device, exp3_int_w))
-	MCFG_VIP_EXPANSION_SLOT_DMA_OUT_CALLBACK(WRITELINE(*this, vp575_device, exp3_dma_out_w))
-	MCFG_VIP_EXPANSION_SLOT_DMA_IN_CALLBACK(WRITELINE(*this, vp575_device, exp3_dma_in_w))
+	VIP_EXPANSION_SLOT(config, m_expansion_slot[2], XTAL(3'521'280)/2, vip_expansion_cards, nullptr);
+	m_expansion_slot[2]->int_wr_callback().set(FUNC(vp575_device::exp3_int_w));
+	m_expansion_slot[2]->dma_out_wr_callback().set(FUNC(vp575_device::exp3_dma_out_w));
+	m_expansion_slot[2]->dma_in_wr_callback().set(FUNC(vp575_device::exp3_dma_in_w));
 
-	MCFG_VIP_EXPANSION_SLOT_ADD("exp4", XTAL(3'521'280)/2, vip_expansion_cards, nullptr)
-	MCFG_VIP_EXPANSION_SLOT_INT_CALLBACK(WRITELINE(*this, vp575_device, exp4_int_w))
-	MCFG_VIP_EXPANSION_SLOT_DMA_OUT_CALLBACK(WRITELINE(*this, vp575_device, exp4_dma_out_w))
-	MCFG_VIP_EXPANSION_SLOT_DMA_IN_CALLBACK(WRITELINE(*this, vp575_device, exp4_dma_in_w))
+	VIP_EXPANSION_SLOT(config, m_expansion_slot[3], XTAL(3'521'280)/2, vip_expansion_cards, nullptr);
+	m_expansion_slot[3]->int_wr_callback().set(FUNC(vp575_device::exp4_int_w));
+	m_expansion_slot[3]->dma_out_wr_callback().set(FUNC(vp575_device::exp4_dma_out_w));
+	m_expansion_slot[3]->dma_in_wr_callback().set(FUNC(vp575_device::exp4_dma_in_w));
 
-	MCFG_VIP_EXPANSION_SLOT_ADD("exp5", XTAL(3'521'280)/2, vip_expansion_cards, nullptr)
-	MCFG_VIP_EXPANSION_SLOT_INT_CALLBACK(WRITELINE(*this, vp575_device, exp5_int_w))
-	MCFG_VIP_EXPANSION_SLOT_DMA_OUT_CALLBACK(WRITELINE(*this, vp575_device, exp5_dma_out_w))
-	MCFG_VIP_EXPANSION_SLOT_DMA_IN_CALLBACK(WRITELINE(*this, vp575_device, exp5_dma_in_w))
-MACHINE_CONFIG_END
+	VIP_EXPANSION_SLOT(config, m_expansion_slot[4], XTAL(3'521'280)/2, vip_expansion_cards, nullptr);
+	m_expansion_slot[4]->int_wr_callback().set(FUNC(vp575_device::exp5_int_w));
+	m_expansion_slot[4]->dma_out_wr_callback().set(FUNC(vp575_device::exp5_dma_out_w));
+	m_expansion_slot[4]->dma_in_wr_callback().set(FUNC(vp575_device::exp5_dma_in_w));
+}
 
 
 

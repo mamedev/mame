@@ -630,13 +630,13 @@ MACHINE_CONFIG_START(xerox820_state::xerox820)
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_ctc->zc_callback<0>().set(m_ctc, FUNC(z80ctc_device::trg1));
 	m_ctc->zc_callback<2>().set(m_ctc, FUNC(z80ctc_device::trg3));
-	//MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", xerox820_state, ctc_tick, attotime::from_hz(20_MHz_XTAL / 8))
+	//TIMER(config, "ctc").configure_periodic(FUNC(xerox820_state::ctc_tick), attotime::from_hz(20_MHz_XTAL / 8));
 
 	FD1771(config, m_fdc, 20_MHz_XTAL / 20);
 	m_fdc->intrq_wr_callback().set(FUNC(xerox820_state::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(xerox820_state::fdc_drq_w));
-	MCFG_FLOPPY_DRIVE_ADD(FD1771_TAG":0", xerox820_floppies, "sa400l", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FD1771_TAG":1", xerox820_floppies, "sa400l", floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, FD1771_TAG":0", xerox820_floppies, "sa400l", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, FD1771_TAG":1", xerox820_floppies, "sa400l", floppy_image_device::default_floppy_formats);
 
 	Z80SIO0(config, m_sio, 20_MHz_XTAL / 8);
 	m_sio->out_txda_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_txd));
@@ -665,7 +665,7 @@ MACHINE_CONFIG_START(xerox820_state::xerox820)
 	RAM(config, m_ram).set_default_size("64K");
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "xerox820")
+	SOFTWARE_LIST(config, "flop_list").set_original("xerox820");
 	MCFG_QUICKLOAD_ADD("quickload", xerox820_state, xerox820, "com,cpm", 3)
 MACHINE_CONFIG_END
 
@@ -719,13 +719,13 @@ MACHINE_CONFIG_START(xerox820ii_state::xerox820ii)
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_ctc->zc_callback<0>().set(m_ctc, FUNC(z80ctc_device::trg1));
 	m_ctc->zc_callback<2>().set(m_ctc, FUNC(z80ctc_device::trg3));
-	//MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", xerox820_state, ctc_tick, attotime::from_hz(16_MHz_XTAL / 4))
+	//TIMER(config, "ctc").configure_periodic(FUNC(xerox820_state::ctc_tick), attotime::from_hz(16_MHz_XTAL / 4));
 
 	FD1797(config, m_fdc, 16_MHz_XTAL / 8);
 	m_fdc->intrq_wr_callback().set(FUNC(xerox820_state::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(xerox820_state::fdc_drq_w));
-	MCFG_FLOPPY_DRIVE_ADD(FD1797_TAG":0", xerox820_floppies, "sa450", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FD1797_TAG":1", xerox820_floppies, "sa450", floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, FD1797_TAG":0", xerox820_floppies, "sa450", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, FD1797_TAG":1", xerox820_floppies, "sa450", floppy_image_device::default_floppy_formats);
 
 	Z80SIO0(config, m_sio, 16_MHz_XTAL / 4);
 	m_sio->out_txda_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_txd));
@@ -761,15 +761,16 @@ MACHINE_CONFIG_START(xerox820ii_state::xerox820ii)
 
 	MCFG_SCSIDEV_ADD(SASIBUS_TAG ":" SCSI_PORT_DEVICE1, "harddisk", SA1403D, SCSI_ID_0)
 
-	MCFG_SCSI_OUTPUT_LATCH_ADD("sasi_data_out", SASIBUS_TAG)
-	MCFG_DEVICE_ADD("sasi_data_in", INPUT_BUFFER, 0)
-	MCFG_DEVICE_ADD("sasi_ctrl_in", INPUT_BUFFER, 0)
+	output_latch_device &sasi_data_out(OUTPUT_LATCH(config, "sasi_data_out"));
+	m_sasibus->set_output_latch(sasi_data_out);
+	INPUT_BUFFER(config, "sasi_data_in");
+	INPUT_BUFFER(config, "sasi_ctrl_in");
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("64K");
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "xerox820ii")
+	SOFTWARE_LIST(config, "flop_list").set_original("xerox820ii");
 	MCFG_QUICKLOAD_ADD("quickload", xerox820_state, xerox820, "com,cpm", 3)
 MACHINE_CONFIG_END
 

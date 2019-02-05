@@ -255,8 +255,7 @@ MACHINE_CONFIG_START(poly_state::poly)
 
 	ADDRESS_MAP_BANK(config, "bankdev").set_map(&poly_state::poly_bank).set_options(ENDIANNESS_LITTLE, 8, 17, 0x10000);
 
-	MCFG_INPUT_MERGER_ANY_HIGH("irqs")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
+	INPUT_MERGER_ANY_HIGH(config, "irqs").output_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -266,13 +265,13 @@ MACHINE_CONFIG_START(poly_state::poly)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40 * 12 - 1, 0, 24 * 20 - 1)
 	MCFG_SCREEN_UPDATE_DRIVER(poly_state, screen_update)
 
-	MCFG_DEVICE_ADD("saa5050_1", SAA5050, 12.0576_MHz_XTAL / 2)
-	MCFG_SAA5050_D_CALLBACK(READ8(*this, poly_state, videoram_1_r))
-	MCFG_SAA5050_SCREEN_SIZE(40, 24, 40)
+	SAA5050(config, m_trom[0], 12.0576_MHz_XTAL / 2);
+	m_trom[0]->d_cb().set(FUNC(poly_state::videoram_1_r));
+	m_trom[0]->set_screen_size(40, 24, 40);
 
-	MCFG_DEVICE_ADD("saa5050_2", SAA5050, 12.0576_MHz_XTAL / 2)
-	MCFG_SAA5050_D_CALLBACK(READ8(*this, poly_state, videoram_2_r))
-	MCFG_SAA5050_SCREEN_SIZE(40, 24, 40)
+	SAA5050(config, m_trom[1], 12.0576_MHz_XTAL / 2);
+	m_trom[1]->d_cb().set(FUNC(poly_state::videoram_2_r));
+	m_trom[1]->set_screen_size(40, 24, 40);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -346,18 +345,20 @@ MACHINE_CONFIG_START(poly_state::poly)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(poly_state::poly2)
+void poly_state::poly2(machine_config &config)
+{
 	poly(config);
 
 	/* internal ram */
 	m_ram->set_default_size("128K");
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_FILTER("flop_list", "POLY2")
-MACHINE_CONFIG_END
+	subdevice<software_list_device>("flop_list")->set_filter("POLY2");
+}
 
 
-MACHINE_CONFIG_START(polydev_state::polydev)
+void polydev_state::polydev(machine_config &config)
+{
 	poly(config);
 
 	/* fdc */
@@ -365,15 +366,13 @@ MACHINE_CONFIG_START(polydev_state::polydev)
 	m_fdc->hld_wr_callback().set(FUNC(polydev_state::motor_w));
 	m_fdc->set_force_ready(true);
 
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", poly_floppies, "525sd", polydev_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", poly_floppies, nullptr, polydev_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, "fdc:0", poly_floppies, "525sd", polydev_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", poly_floppies, nullptr, polydev_state::floppy_formats).enable_sound(true);
 
 	/* remove devices*/
-	//MCFG_DEVICE_REMOVE("netup")
-	//MCFG_DEVICE_REMOVE("netdown")
-MACHINE_CONFIG_END
+	//config.device_remove("netup");
+	//config.device_remove("netdown");
+}
 
 
 /* ROM definition */

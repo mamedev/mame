@@ -166,9 +166,9 @@ MACHINE_CONFIG_START(abc800c_state::abc800c_video)
 
 	PALETTE(config, m_palette, FUNC(abc800c_state::abc800c_palette), 8);
 
-	MCFG_DEVICE_ADD(SAA5052_TAG, SAA5052, XTAL(12'000'000)/2)
-	MCFG_SAA5050_D_CALLBACK(READ8(*this, abc800c_state, char_ram_r))
-	MCFG_SAA5050_SCREEN_SIZE(40, 24, 40)
+	SAA5052(config, m_trom, XTAL(12'000'000)/2);
+	m_trom->d_cb().set(FUNC(abc800c_state::char_ram_r));
+	m_trom->set_screen_size(40, 24, 40);
 MACHINE_CONFIG_END
 
 

@@ -880,7 +880,7 @@ MACHINE_CONFIG_START(novag6502_state::supercon)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", novag6502_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(novag6502_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_novag_supercon);
 
 	/* sound hardware */
@@ -894,9 +894,10 @@ MACHINE_CONFIG_START(novag6502_state::cforte)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", R65C02, 10_MHz_XTAL/2)
 	MCFG_DEVICE_PROGRAM_MAP(cforte_map)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", novag6502_state, irq_on, attotime::from_hz(32.768_kHz_XTAL/128)) // 256Hz
-	MCFG_TIMER_START_DELAY(attotime::from_hz(32.768_kHz_XTAL/128) - attotime::from_usec(11)) // active for 11us
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", novag6502_state, irq_off, attotime::from_hz(32.768_kHz_XTAL/128))
+	timer_device &irq_on(TIMER(config, "irq_on"));
+	irq_on.configure_periodic(FUNC(novag6502_state::irq_on), attotime::from_hz(32.768_kHz_XTAL/128)); // 256Hz
+	irq_on.set_start_delay(attotime::from_hz(32.768_kHz_XTAL/128) - attotime::from_usec(11)); // active for 11us
+	TIMER(config, "irq_off").configure_periodic(FUNC(novag6502_state::irq_off), attotime::from_hz(32.768_kHz_XTAL/128));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -904,7 +905,7 @@ MACHINE_CONFIG_START(novag6502_state::cforte)
 	HLCD0538(config, m_hlcd0538, 0);
 	m_hlcd0538->write_cols_callback().set(FUNC(novag6502_state::cforte_lcd_output_w));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", novag6502_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(novag6502_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_novag_cforte);
 
 	/* sound hardware */
@@ -918,9 +919,10 @@ MACHINE_CONFIG_START(novag6502_state::sexpert)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M65C02, 10_MHz_XTAL/2) // or 12_MHz_XTAL/2
 	MCFG_DEVICE_PROGRAM_MAP(sexpert_map)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", novag6502_state, irq_on, attotime::from_hz(32.768_kHz_XTAL/128)) // 256Hz
-	MCFG_TIMER_START_DELAY(attotime::from_hz(32.768_kHz_XTAL/128) - attotime::from_nsec(21500)) // active for 21.5us
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", novag6502_state, irq_off, attotime::from_hz(32.768_kHz_XTAL/128))
+	timer_device &irq_on(TIMER(config, "irq_on"));
+	irq_on.configure_periodic(FUNC(novag6502_state::irq_on), attotime::from_hz(32.768_kHz_XTAL/128)); // 256Hz
+	irq_on.set_start_delay(attotime::from_hz(32.768_kHz_XTAL/128) - attotime::from_nsec(21500)); // active for 21.5us
+	TIMER(config, "irq_off").configure_periodic(FUNC(novag6502_state::irq_off), attotime::from_hz(32.768_kHz_XTAL/128));
 
 	mos6551_device &acia(MOS6551(config, "acia", 0)); // R65C51P2 - RTS to CTS, DCD to GND
 	acia.set_xtal(1.8432_MHz_XTAL);
@@ -947,11 +949,11 @@ MACHINE_CONFIG_START(novag6502_state::sexpert)
 	MCFG_SCREEN_PALETTE("palette")
 	PALETTE(config, "palette", FUNC(novag6502_state::novag_lcd_palette), 3);
 
-	MCFG_HD44780_ADD("hd44780")
-	MCFG_HD44780_LCD_SIZE(2, 8)
-	MCFG_HD44780_PIXEL_UPDATE_CB(novag6502_state, novag_lcd_pixel_update)
+	HD44780(config, m_lcd, 0);
+	m_lcd->set_lcd_size(2, 8);
+	m_lcd->set_pixel_update_cb(FUNC(novag6502_state::novag_lcd_pixel_update), this);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", novag6502_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(novag6502_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_novag_sexpert);
 
 	/* sound hardware */
@@ -966,8 +968,7 @@ MACHINE_CONFIG_START(novag6502_state::sforte)
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(sforte_map)
-	MCFG_TIMER_MODIFY("irq_on")
-	MCFG_TIMER_START_DELAY(attotime::from_hz(32.768_kHz_XTAL/128) - attotime::from_usec(11)) // active for ?us (assume same as cforte)
+	subdevice<timer_device>("irq_on")->set_start_delay(attotime::from_hz(32.768_kHz_XTAL/128) - attotime::from_usec(11)); // active for ?us (assume same as cforte)
 
 	config.set_default_layout(layout_novag_sforte);
 MACHINE_CONFIG_END

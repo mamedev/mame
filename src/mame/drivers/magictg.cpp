@@ -936,17 +936,17 @@ MACHINE_CONFIG_START(magictg_state::magictg)
 #endif
 	MCFG_PCI_BUS_LEGACY_DEVICE(9, DEVICE_SELF, magictg_state, zr36120_pci_r, zr36120_pci_w) // TODO: ZR36120 device
 
-	MCFG_DEVICE_ADD("voodoo_0", VOODOO_1, STD_VOODOO_1_CLOCK)
-	MCFG_VOODOO_FBMEM(2)
-	MCFG_VOODOO_TMUMEM(4,0)
-	MCFG_VOODOO_SCREEN_TAG("screen")
-	MCFG_VOODOO_CPU_TAG("mips")
+	VOODOO_1(config, m_voodoo[0], STD_VOODOO_1_CLOCK);
+	m_voodoo[0]->set_fbmem(2);
+	m_voodoo[0]->set_tmumem(4,0);
+	m_voodoo[0]->set_screen_tag("screen");
+	m_voodoo[0]->set_cpu_tag(m_mips);
 
-	MCFG_DEVICE_ADD("voodoo_1", VOODOO_1, STD_VOODOO_1_CLOCK)
-	MCFG_VOODOO_FBMEM(2)
-	MCFG_VOODOO_TMUMEM(4,0)
-	MCFG_VOODOO_SCREEN_TAG("screen")
-	MCFG_VOODOO_CPU_TAG("mips")
+	VOODOO_1(config, m_voodoo[1], STD_VOODOO_1_CLOCK);
+	m_voodoo[1]->set_fbmem(2);
+	m_voodoo[1]->set_tmumem(4,0);
+	m_voodoo[1]->set_screen_tag("screen");
+	m_voodoo[1]->set_cpu_tag(m_mips);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

@@ -94,8 +94,8 @@ void mjkjidai_state::mjkjidai_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x03).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x10, 0x13).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x20, 0x20).w("sn1", FUNC(sn76489_device::command_w));
-	map(0x30, 0x30).w("sn2", FUNC(sn76489_device::command_w));
+	map(0x20, 0x20).w("sn1", FUNC(sn76489_device::write));
+	map(0x30, 0x30).w("sn2", FUNC(sn76489_device::write));
 	map(0x40, 0x40).w(FUNC(mjkjidai_state::adpcm_w));
 }
 
@@ -337,7 +337,7 @@ MACHINE_CONFIG_START(mjkjidai_state::mjkjidai)
 
 	MSM5205(config, m_msm, 384000);
 	m_msm->vck_legacy_callback().set(FUNC(mjkjidai_state::adpcm_int));
-	m_msm->set_prescaler_selector(msm5205_device::S64_4B);	/* 6kHz */
+	m_msm->set_prescaler_selector(msm5205_device::S64_4B);  /* 6kHz */
 	m_msm->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 

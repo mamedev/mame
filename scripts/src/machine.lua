@@ -2622,6 +2622,8 @@ if (MACHINES["SPG2XX"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/spg2xx.cpp",
 		MAME_DIR .. "src/devices/machine/spg2xx.h",
+		MAME_DIR .. "src/devices/machine/spg110.cpp",
+		MAME_DIR .. "src/devices/machine/spg110.h",
 	}
 end
 
@@ -2931,19 +2933,6 @@ if (MACHINES["WD2010"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/wd2010.cpp",
 		MAME_DIR .. "src/devices/machine/wd2010.h",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/machine/wd33c93.h,MACHINES["WD33C93"] = true
----------------------------------------------------
-
-if (MACHINES["WD33C93"]~=null) then
-	MACHINES["SCSI"] = true
-	files {
-		MAME_DIR .. "src/devices/machine/wd33c93.cpp",
-		MAME_DIR .. "src/devices/machine/wd33c93.h",
 	}
 end
 

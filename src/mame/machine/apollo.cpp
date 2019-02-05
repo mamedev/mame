@@ -1097,8 +1097,8 @@ MACHINE_CONFIG_START(apollo_state::common)
 	m_ptm->set_external_clocks(250000, 125000, 62500);
 	m_ptm->irq_callback().set(FUNC(apollo_state::apollo_ptm_irq_function));
 
-	MCFG_DEVICE_ADD("ptmclock", CLOCK, 250000)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, apollo_state, apollo_ptm_timer_tick))
+	clock_device &ptmclock(CLOCK(config, "ptmclock", 250000));
+	ptmclock.signal_handler().set(FUNC(apollo_state::apollo_ptm_timer_tick));
 
 	MC146818(config, m_rtc, 32.768_kHz_XTAL);
 	// FIXME: is this interrupt really only connected on DN3000?
@@ -1114,7 +1114,6 @@ MACHINE_CONFIG_START(apollo_state::common)
 	m_sio2->irq_cb().set(FUNC(apollo_state::sio2_irq_handler));
 
 	ISA16(config, m_isa, 0);
-	m_isa->set_cputag(MAINCPU);
 	m_isa->set_custom_spaces();
 	m_isa->irq2_callback().set(m_pic8259_slave, FUNC(pic8259_device::ir2_w)); // in place of irq 2 on at irq 9 is used
 	m_isa->irq3_callback().set(m_pic8259_master, FUNC(pic8259_device::ir3_w));
@@ -1143,7 +1142,7 @@ MACHINE_CONFIG_START(apollo_state::common)
 	MCFG_DEVICE_ADD("isa6", ISA16_SLOT, 0, APOLLO_ISA_TAG, apollo_isa_cards, nullptr, false)
 	MCFG_DEVICE_ADD("isa7", ISA16_SLOT, 0, APOLLO_ISA_TAG, apollo_isa_cards, nullptr, false)
 
-	MCFG_SOFTWARE_LIST_ADD("ctape_list", "apollo_ctape")
+	SOFTWARE_LIST(config, "ctape_list").set_original("apollo_ctape");
 MACHINE_CONFIG_END
 
 // for machines with the keyboard and a graphics head

@@ -532,7 +532,7 @@ MACHINE_CONFIG_START(kyugo_state::kyugo_base)
 	MCFG_DEVICE_IO_MAP(gyrodine_sub_portmap)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(kyugo_state, irq0_line_hold, 4*60)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	ls259_device &mainlatch(LS259(config, "mainlatch"));
 	mainlatch.q_out_cb<0>().set(FUNC(kyugo_state::nmi_mask_w));

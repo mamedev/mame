@@ -602,7 +602,7 @@ MACHINE_CONFIG_START(fresh_state::fresh)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, 24000000/2 )
 	MCFG_DEVICE_PROGRAM_MAP(fresh_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", fresh_state, fake_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(fresh_state::fake_scanline), "screen", 0, 1);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

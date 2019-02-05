@@ -11,7 +11,7 @@
 
 /*
   The 054321 is a sound communication latch/volume manager chip, that
-  is integrated into the 054544 and 05489A hybrid chips.  The hybrid
+  is integrated into the 054544 and 054986A hybrid chips.  The hybrid
   chips also include the DACs, capacitors, etc needed for the audio
   output.
 

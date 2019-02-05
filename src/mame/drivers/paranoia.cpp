@@ -175,7 +175,7 @@ MACHINE_CONFIG_START(paranoia_state::paranoia)
 	m_maincpu->add_route(0, "lspeaker", 1.00);
 	m_maincpu->add_route(1, "rspeaker", 1.00);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	MCFG_DEVICE_ADD("sub", I8085A, 18000000/3)
 	MCFG_DEVICE_PROGRAM_MAP(paranoia_8085_map)
@@ -197,14 +197,15 @@ MACHINE_CONFIG_START(paranoia_state::paranoia)
 	MCFG_SCREEN_UPDATE_DRIVER( pce_common_state, screen_update )
 	MCFG_SCREEN_PALETTE("huc6260")
 
-	MCFG_DEVICE_ADD( "huc6260", HUC6260, PCE_MAIN_CLOCK )
-	MCFG_HUC6260_NEXT_PIXEL_DATA_CB(READ16("huc6270", huc6270_device, next_pixel))
-	MCFG_HUC6260_TIME_TIL_NEXT_EVENT_CB(READ16("huc6270", huc6270_device, time_until_next_event))
-	MCFG_HUC6260_VSYNC_CHANGED_CB(WRITELINE("huc6270", huc6270_device, vsync_changed))
-	MCFG_HUC6260_HSYNC_CHANGED_CB(WRITELINE("huc6270", huc6270_device, hsync_changed))
-	MCFG_DEVICE_ADD( "huc6270", HUC6270, 0 )
-	MCFG_HUC6270_VRAM_SIZE(0x10000)
-	MCFG_HUC6270_IRQ_CHANGED_CB(INPUTLINE("maincpu", 0))
+	HUC6260(config, m_huc6260, PCE_MAIN_CLOCK);
+	m_huc6260->next_pixel_data().set("huc6270", FUNC(huc6270_device::next_pixel));
+	m_huc6260->time_til_next_event().set("huc6270", FUNC(huc6270_device::time_until_next_event));
+	m_huc6260->vsync_changed().set("huc6270", FUNC(huc6270_device::vsync_changed));
+	m_huc6260->hsync_changed().set("huc6270", FUNC(huc6270_device::hsync_changed));
+
+	huc6270_device &huc6270(HUC6270(config, "huc6270", 0));
+	huc6270.set_vram_size(0x10000);
+	huc6270.irq().set_inputline(m_maincpu, 0);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

@@ -310,7 +310,7 @@ TIMER_CALLBACK_MEMBER(m72_state::delayed_ram16_w)
 	uint16_t mem_mask = (BIT(param, 28) ? 0xff00 : 0x0000) | (BIT(param, 27) ? 0x00ff : 0x0000);
 
 	logerror("MB8421/MB8431 left_w(0x%03x, 0x%04x, 0x%04x)\n", offset, val, mem_mask);
-	m_dpram->left_w(machine().dummy_space(), offset, val, mem_mask);
+	m_dpram->left_w(offset, val, mem_mask);
 }
 
 TIMER_CALLBACK_MEMBER(m72_state::delayed_ram8_w)
@@ -319,9 +319,9 @@ TIMER_CALLBACK_MEMBER(m72_state::delayed_ram8_w)
 	uint16_t offset = (param >> 9) & 0x07ff;
 
 	if (BIT(param, 8))
-		m_dpram->right_w(machine().dummy_space(), offset, val << 8, 0xff00);
+		m_dpram->right_w(offset, val << 8, 0xff00);
 	else
-		m_dpram->right_w(machine().dummy_space(), offset, val, 0x00ff);
+		m_dpram->right_w(offset, val, 0x00ff);
 }
 
 
@@ -337,7 +337,7 @@ WRITE8_MEMBER(m72_state::mcu_data_w)
 
 READ8_MEMBER(m72_state::mcu_data_r)
 {
-	return (m_dpram->right_r(space, offset >> 1) >> (BIT(offset, 0) ? 8 : 0)) & 0xff;
+	return (m_dpram->right_r(offset >> 1) >> (BIT(offset, 0) ? 8 : 0)) & 0xff;
 }
 
 READ8_MEMBER(m72_state::mcu_sample_r)

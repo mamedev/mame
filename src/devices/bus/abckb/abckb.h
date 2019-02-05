@@ -12,27 +12,6 @@
 #pragma once
 
 
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_ABC_KEYBOARD_PORT_ADD(_tag, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, ABC_KEYBOARD_PORT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(abc_keyboard_devices, _def_slot, false)
-
-#define MCFG_ABC_KEYBOARD_OUT_RX_HANDLER(_devcb) \
-	downcast<abc_keyboard_port_device &>(*device).set_out_rx_handler(DEVCB_##_devcb);
-
-#define MCFG_ABC_KEYBOARD_OUT_TRXC_HANDLER(_devcb) \
-	downcast<abc_keyboard_port_device &>(*device).set_out_trxc_handler(DEVCB_##_devcb);
-
-#define MCFG_ABC_KEYBOARD_OUT_KEYDOWN_HANDLER(_devcb) \
-	downcast<abc_keyboard_port_device &>(*device).set_out_keydown_handler(DEVCB_##_devcb);
-
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -43,11 +22,21 @@ class abc_keyboard_port_device : public device_t, public device_slot_interface
 {
 public:
 	// construction/destruction
-	abc_keyboard_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T>
+	abc_keyboard_port_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
+		: abc_keyboard_port_device(mconfig, tag, owner, 0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
 
-	template <class Object> devcb_base &set_out_rx_handler(Object &&cb) { return m_out_rx_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_trxc_handler(Object &&cb) { return m_out_trxc_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_keydown_handler(Object &&cb) { return m_out_keydown_handler.set_callback(std::forward<Object>(cb)); }
+	abc_keyboard_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+	auto out_rx_handler() { return m_out_rx_handler.bind(); }
+	auto out_trxc_handler() { return m_out_trxc_handler.bind(); }
+	auto out_keydown_handler() { return m_out_keydown_handler.bind(); }
 
 	// computer interface
 	DECLARE_WRITE_LINE_MEMBER( txd_w );

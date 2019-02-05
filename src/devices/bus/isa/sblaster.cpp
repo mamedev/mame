@@ -66,7 +66,7 @@ static const int m_cmd_fifo_length[256] =
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, /* 6x */
 	-1, -1, -1, -1,  3,  3,  3,  3, -1, -1, -1, -1, -1,  1, -1,  1, /* 7x */
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, /* 8x */
-	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, /* 9x */
+	1,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, /* 9x */
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, /* Ax */
 		4, -1, -1, -1, -1, -1,  4, -1,  4, -1, -1,  -1, -1, -1,  4, -1, /* Bx */
 		4, -1, -1, -1, -1, -1,  4, -1,  4, -1, -1,  -1, -1, -1,  4, -1, /* Cx */
@@ -82,7 +82,7 @@ READ8_MEMBER( sb8_device::ym3812_16_r )
 	uint8_t retVal = 0xff;
 	switch(offset)
 	{
-		case 0 : retVal = m_ym3812->status_port_r( space, offset ); break;
+		case 0 : retVal = m_ym3812->status_port_r(); break;
 	}
 	return retVal;
 }
@@ -91,8 +91,8 @@ WRITE8_MEMBER( sb8_device::ym3812_16_w )
 {
 	switch(offset)
 	{
-		case 0 : m_ym3812->control_port_w( space, offset, data ); break;
-		case 1 : m_ym3812->write_port_w( space, offset, data ); break;
+		case 0 : m_ym3812->control_port_w(data); break;
+		case 1 : m_ym3812->write_port_w(data); break;
 	}
 }
 
@@ -356,6 +356,7 @@ void sb_device::process_fifo(uint8_t cmd)
 				break;
 
 			case 0x1c:  // 8-bit DMA with autoinit
+			case 0x90:  // 8-bit DMA with autoinit, high speed. XXX only on DSP 3.xx
 				//              printf("Start DMA (autoinit, size = %x)\n", m_dsp.dma_length);
 				m_dsp.dma_transferred = 0;
 				m_dsp.dma_autoinit = 1;
@@ -583,6 +584,12 @@ void sb_device::process_fifo(uint8_t cmd)
 							mode = m_dsp.fifo[1];
 							m_dsp.flags = 0;
 							m_dsp.dma_length = (m_dsp.fifo[2] + (m_dsp.fifo[3]<<8)) + 1;
+							if(cmd & 0x04)
+								m_dsp.dma_autoinit = 1;
+							if(mode & 0x10)
+								m_dsp.flags |= SIGNED;
+							if(mode & 0x20)
+								m_dsp.flags |= STEREO;
 							if((cmd & 0xf0) == 0xb0)
 							{
 								m_dsp.flags |= SIXTEENBIT;
@@ -591,15 +598,6 @@ void sb_device::process_fifo(uint8_t cmd)
 							}
 							else
 								drq_w(1);
-							if(cmd & 0x04)
-								m_dsp.dma_autoinit = 1;
-							if(mode & 0x10)
-								m_dsp.flags |= SIGNED;
-							if(mode & 0x20)
-							{
-								m_dsp.flags |= STEREO;
-								m_dsp.dma_length <<= 1;
-							}
 							m_dsp.dma_transferred = 0;
 							m_dsp.dma_timer_started = false;
 							m_dsp.dma_throttled = false;
@@ -1263,9 +1261,9 @@ void sb8_device::device_start()
 	{
 		ymf262_device *ymf262 = subdevice<ymf262_device>("ymf262");
 
-		m_isa->install_device(0x0388, 0x038b, read8_delegate(FUNC(ymf262_device::read), ymf262), write8_delegate(FUNC(ymf262_device::write), ymf262));
-		m_isa->install_device(0x0220, 0x0223, read8_delegate(FUNC(ymf262_device::read), ymf262), write8_delegate(FUNC(ymf262_device::write), ymf262));
-		m_isa->install_device(0x0228, 0x0229, read8_delegate(FUNC(ymf262_device::read), ymf262), write8_delegate(FUNC(ymf262_device::write), ymf262));
+		m_isa->install_device(0x0388, 0x038b, read8sm_delegate(FUNC(ymf262_device::read), ymf262), write8sm_delegate(FUNC(ymf262_device::write), ymf262));
+		m_isa->install_device(0x0220, 0x0223, read8sm_delegate(FUNC(ymf262_device::read), ymf262), write8sm_delegate(FUNC(ymf262_device::write), ymf262));
+		m_isa->install_device(0x0228, 0x0229, read8sm_delegate(FUNC(ymf262_device::read), ymf262), write8sm_delegate(FUNC(ymf262_device::write), ymf262));
 	}
 	else
 	{
@@ -1306,9 +1304,9 @@ void sb16_device::device_start()
 	m_isa->install_device(0x022e, 0x022f, read8_delegate(FUNC(sb_device::dsp_rbuf_status_r), this), write8_delegate(FUNC(sb_device::dsp_rbuf_status_w), this) );
 	m_isa->install_device(0x0224, 0x0225, read8_delegate(FUNC(sb16_device::mixer_r), this), write8_delegate(FUNC(sb16_device::mixer_w), this));
 	m_isa->install_device(0x0330, 0x0331, read8_delegate(FUNC(sb16_device::mpu401_r), this), write8_delegate(FUNC(sb16_device::mpu401_w), this));
-	m_isa->install_device(0x0388, 0x038b, read8_delegate(FUNC(ymf262_device::read), ymf262), write8_delegate(FUNC(ymf262_device::write), ymf262));
-	m_isa->install_device(0x0220, 0x0223, read8_delegate(FUNC(ymf262_device::read), ymf262), write8_delegate(FUNC(ymf262_device::write), ymf262));
-	m_isa->install_device(0x0228, 0x0229, read8_delegate(FUNC(ymf262_device::read), ymf262), write8_delegate(FUNC(ymf262_device::write), ymf262));
+	m_isa->install_device(0x0388, 0x038b, read8sm_delegate(FUNC(ymf262_device::read), ymf262), write8sm_delegate(FUNC(ymf262_device::write), ymf262));
+	m_isa->install_device(0x0220, 0x0223, read8sm_delegate(FUNC(ymf262_device::read), ymf262), write8sm_delegate(FUNC(ymf262_device::write), ymf262));
+	m_isa->install_device(0x0228, 0x0229, read8sm_delegate(FUNC(ymf262_device::read), ymf262), write8sm_delegate(FUNC(ymf262_device::write), ymf262));
 
 	save_item(NAME(m_mixer.data));
 	save_item(NAME(m_mixer.status));

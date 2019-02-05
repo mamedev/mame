@@ -366,7 +366,7 @@ MACHINE_CONFIG_START(aquarius_state::aquarius)
 	MCFG_SCREEN_PALETTE(m_palette)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_aquarius);
-	MCFG_TEA1002_ADD("encoder", XTAL(8'867'238))
+	TEA1002(config, m_tea1002, XTAL(8'867'238));
 	PALETTE(config, m_palette, FUNC(aquarius_state::aquarius_palette), 512, 16);
 
 	/* sound hardware */
@@ -379,8 +379,8 @@ MACHINE_CONFIG_START(aquarius_state::aquarius)
 	ay8910.add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "aquarius_cart")
@@ -389,7 +389,7 @@ MACHINE_CONFIG_START(aquarius_state::aquarius)
 	RAM(config, RAM_TAG).set_default_size("4K").set_extra_options("8K,20K,36K");
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","aquarius")
+	SOFTWARE_LIST(config, "cart_list").set_original("aquarius");
 MACHINE_CONFIG_END
 
 

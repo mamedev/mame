@@ -785,26 +785,49 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	// temp, needs priority, transparency etc. also it's far bigger than the screen, I guess it must get scaled?!
 	if (m_bmp_base)
 	{
-		if (m_bmp_base[0x14] & 0x01)
-		{
-			popmessage("bitmap %02x %02x %02x %02x %02x %02x %02x %02x  -- -- %02x %02x %02x %02x %02x %02x  -- -- %02x %02x %02x %02x %02x %02x",
-				m_bmp_base[0x00], m_bmp_base[0x01], m_bmp_base[0x02], m_bmp_base[0x03], m_bmp_base[0x04], m_bmp_base[0x05], m_bmp_base[0x06], m_bmp_base[0x07],
-				/*m_bmp_base[0x08], m_bmp_base[0x09],*/ m_bmp_base[0x0a], m_bmp_base[0x0b], m_bmp_base[0x0c], m_bmp_base[0x0d], m_bmp_base[0x0e], m_bmp_base[0x0f],
-				/*m_bmp_base[0x10], m_bmp_base[0x11],*/ m_bmp_base[0x12], m_bmp_base[0x13], m_bmp_base[0x14], m_bmp_base[0x15], m_bmp_base[0x16], m_bmp_base[0x17]);
+		// looks like it can zoom the bitmap using these?
+		uint16_t top = ((m_bmp_base[0x01] << 8) | m_bmp_base[0x00]);
+		uint16_t bot = ((m_bmp_base[0x03] << 8) | m_bmp_base[0x02]);
+		uint16_t lft = ((m_bmp_base[0x05] << 8) | m_bmp_base[0x04]);
+		uint16_t rgt = ((m_bmp_base[0x07] << 8) | m_bmp_base[0x06]);
 
-			int base = ((m_bmp_base[0x11] << 8) | m_bmp_base[0x10]) * 0x800;
-			int base2 = ((m_bmp_base[0x09] << 8) | m_bmp_base[0x08]) * 0x8;
+		// and can specify base address relative start / end positions with these for data reading to be cut off?
+		uint16_t topadr = ((m_bmp_base[0x09] << 8) | m_bmp_base[0x08]);
+		uint16_t botadr = ((m_bmp_base[0x0b] << 8) | m_bmp_base[0x0a]);
+		uint16_t lftadr = ((m_bmp_base[0x0d] << 8) | m_bmp_base[0x0c]);
+		uint16_t rgtadr = ((m_bmp_base[0x0f] << 8) | m_bmp_base[0x0e]);
+
+		uint16_t start = ((m_bmp_base[0x11] << 8) | m_bmp_base[0x10]);
+		uint8_t end = m_bmp_base[0x12]; // ?? related to width?
+		uint8_t size = m_bmp_base[0x13]; // some kind of additional scaling?
+		uint8_t mode = m_bmp_base[0x14]; // eanble,bpp, zval etc.
+
+		uint32_t unused = ((m_bmp_base[0x15] << 16) | (m_bmp_base[0x16] << 8) | (m_bmp_base[0x17] << 0));
+
+		if (mode & 0x01)
+		{
+			popmessage("bitmap t:%04x b:%04x l:%04x r:%04x  -- -- ba:%04x la:%04x ra:%04x   -- -- end:%02x - size:%02x unused:%08x",
+				top, bot, lft, rgt,
+				/*topadr*/ botadr, lftadr, rgtadr,
+				/*start*/ end, size, unused);
+
+			int base = start * 0x800;
+			int base2 = topadr * 0x8;
+
+			int bpp = ((mode & 0x0e) >> 1) + 1;
+			int zval = ((mode & 0xf0) >> 4);
+
+			int width = (rgtadr * 8) / bpp;
 
 			//int count = 0;
 			set_data_address(base + base2, 0);
 
-			for (int y = 0; y < 256; y++)
+			for (int y = top; y < 256; y++)
 			{
-				for (int x = 0; x < 512; x++)
+				for (int x = 0; x < width; x++)
 				{
 					uint16_t* yposptr = &bitmap.pix16(y);
-
-					int bpp = 6;
+					uint16_t* zyposptr = &m_zbuffer.pix16(y);
 
 					uint8_t dat = 0;
 					for (int i = 0; i < bpp; i++)
@@ -812,8 +835,17 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 						dat |= (get_next_bit() << i);
 					}
 
-					if (x < cliprect.max_x)
-						yposptr[x] = dat + 0x100;
+					if (((x <= cliprect.max_x) && (x >= cliprect.min_x)) && ((y <= cliprect.max_y) && (y >= cliprect.min_y)))
+					{
+						if ((m_bmp_palram_sh[dat] & 0x1f) < 24) // same transparency logic as everything else? (baseball title)
+						{
+							if (zval >= zyposptr[x])
+							{
+								yposptr[x] = dat + 0x100;
+								zyposptr[x] = zval;
+							}
+						}
+					}
 				}
 			}
 

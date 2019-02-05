@@ -60,17 +60,6 @@
 #define PORTFOLIO_MEMORY_CARD_SLOT_B_TAG     "ccmb"
 
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_PORTFOLIO_MEMORY_CARD_SLOT_ADD(_tag, _slot_intf, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, PORTFOLIO_MEMORY_CARD_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -108,7 +97,17 @@ class portfolio_memory_card_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	portfolio_memory_card_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T>
+	portfolio_memory_card_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
+		: portfolio_memory_card_slot_device(mconfig, tag, owner, 0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
+
+	portfolio_memory_card_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// computer interface
 	bool cdet_r() { return (m_card != nullptr) ? m_card->cdet() : 1; }

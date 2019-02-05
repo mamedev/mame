@@ -9,7 +9,7 @@ m24_z8000_device::m24_z8000_device(const machine_config &mconfig, const char *ta
 	device_t(mconfig, M24_Z8000, tag, owner, clock),
 	m_z8000(*this, "z8000"),
 	m_maincpu(*this, ":maincpu"),
-	m_pic(*this, ":mb:pic8259"),
+	m_pic(*this, ":pic"),
 	m_halt_out(*this),
 	m_z8000_halt(true)
 {

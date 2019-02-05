@@ -571,8 +571,8 @@ MACHINE_CONFIG_START(okean240_state::okean240)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(okean240_io)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_okean240)
-	MCFG_DEVICE_REMOVE("uart")
-	MCFG_DEVICE_REMOVE("rs232")
+	config.device_remove("uart");
+	config.device_remove("rs232");
 	subdevice<pit8253_device>("pit")->out_handler<1>().set_nop();
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
 	keyboard.set_keyboard_callback(FUNC(okean240_state::kbd_put));

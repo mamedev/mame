@@ -84,9 +84,9 @@ baud rate:
 -- in the unlikely case of T == 0, pretend T = 1.
 - If the required wr11 bits are set:
 -- let's say M = wr4 D7,D6 if 1,1 M = 64; if 1,0 M = 32; if 0,1 M = 16 else M = 1
--- so, the required clock on the MCFG_DEVICE_ADD line = 2*T*B*M.
+-- so, the required device clock = 2*T*B*M.
 - If the required wr11 bits are not set:
--- add a line: MCFG_Z80SCC_OFFSETS(X, 0, Y, 0), where X = channel-A-baud * T,
+-- call: configure_channels(X, 0, Y, 0), where X = channel-A-baud * T,
    and Y = channel-B-baud * T.
 
 ***************************************************************************/
@@ -436,6 +436,7 @@ z80scc_device::z80scc_device(const machine_config &mconfig, device_type type, co
 	m_out_rxdrq_cb{ { *this }, { *this } },
 	m_out_txdrq_cb{ { *this }, { *this } },
 	m_out_int_cb(*this),
+	m_out_int_state(CLEAR_LINE),
 	m_variant(variant),
 	m_wr0_ptrbits(0),
 	m_cputag(nullptr)
@@ -517,6 +518,7 @@ void z80scc_device::device_start()
 	LOG("%s", FUNCNAME);
 
 	// state saving
+	save_item(NAME(m_out_int_state));
 	save_item(NAME(m_int_state));
 	save_item(NAME(m_int_source));
 	save_item(NAME(m_wr9));
@@ -681,8 +683,12 @@ void z80scc_device::z80daisy_irq_reti()
 void z80scc_device::check_interrupts()
 {
 	int state = (z80daisy_irq_state() & Z80_DAISY_INT) ? ASSERT_LINE : CLEAR_LINE;
-	LOGINT("%s %s \n",tag(), FUNCNAME);
-	m_out_int_cb(state);
+	if (m_out_int_state != state)
+	{
+		m_out_int_state = state;
+		LOGINT("%s\n", FUNCNAME);
+		m_out_int_cb(state);
+	}
 }
 
 

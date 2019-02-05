@@ -236,9 +236,9 @@ MACHINE_CONFIG_START(p2000t_state::p2000t)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40 * 12 - 1, 0, 24 * 20 - 1)
 	MCFG_SCREEN_UPDATE_DEVICE("saa5050", saa5050_device, screen_update)
 
-	MCFG_DEVICE_ADD("saa5050", SAA5050, 6000000)
-	MCFG_SAA5050_D_CALLBACK(READ8(*this, p2000t_state, videoram_r))
-	MCFG_SAA5050_SCREEN_SIZE(40, 24, 80)
+	saa5050_device &saa5050(SAA5050(config, "saa5050", 6000000));
+	saa5050.d_cb().set(FUNC(p2000t_state::videoram_r));
+	saa5050.set_screen_size(40, 24, 80);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -254,7 +254,7 @@ MACHINE_CONFIG_START(p2000m_state::p2000m)
 	MCFG_DEVICE_PROGRAM_MAP(p2000m_mem)
 	MCFG_DEVICE_IO_MAP(p2000t_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", p2000m_state,  p2000_interrupt)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

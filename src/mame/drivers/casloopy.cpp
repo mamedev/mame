@@ -549,7 +549,7 @@ MACHINE_CONFIG_START(casloopy_state::casloopy)
 	MCFG_GENERIC_LOAD(casloopy_state, loopy_cart)
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","casloopy")
+	SOFTWARE_LIST(config, "cart_list").set_original("casloopy");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -6,13 +6,6 @@
 #pragma once
 
 
-#define MCFG_NSCSI_BUS_ADD(_tag)        \
-	MCFG_DEVICE_ADD(_tag, NSCSI_BUS, 0)
-
-#define MCFG_NSCSI_ADD(_tag, _slot_intf, _def_slot, _fixed) \
-	MCFG_DEVICE_ADD(_tag, NSCSI_CONNECTOR, 0)                   \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _fixed)
-
 class nscsi_device;
 
 class nscsi_bus_device : public device_t
@@ -176,7 +169,9 @@ protected:
 
 	// SCSI addtional sense code qualifiers
 	enum {
-		SK_ASC_MEDIUM_NOT_PRESENT       = 0x3a
+		SK_ASC_INVALID_FIELD_IN_CDB       = 0x24,
+		SK_ASC_LOGICAL_UNIT_NOT_SUPPORTED = 0x25,
+		SK_ASC_MEDIUM_NOT_PRESENT         = 0x3a
 	};
 
 	// SCSI commands

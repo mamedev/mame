@@ -106,6 +106,9 @@ function cheatfind.startplugin()
 		if not step or step <= 0 then
 			step = 1
 		end
+		if (olddata.shift < 0) and (step < (1 << -olddata.shift)) then
+			step = 1 << -olddata.shift;
+		end
 
 		local cfoper = {
 			lt = function(a, b, val) return (a < b and val == 0) or (val > 0 and (a + val) == b) end,
@@ -192,7 +195,7 @@ function cheatfind.startplugin()
 						oldval = old,
 						newval = new,
 						bitmask = bitmask }
-						ref[ret[#ret].addr] = #ret
+						ref[addr] = #ret
 					end
 				end
 			end
@@ -829,7 +832,7 @@ function cheatfind.startplugin()
 						local m = { _("Page"), matchpg, 0 }
 						local max
 						if matchsel == 0 then
-							max = math.ceil(matches[#matches].count / 100)
+							max = math.ceil(matches[#matches].count / 100) - 1
 						else
 							max = #matches[#matches][matchsel]
 						end

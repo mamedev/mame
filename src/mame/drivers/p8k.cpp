@@ -473,10 +473,10 @@ MACHINE_CONFIG_START(p8k_state::p8k)
 	m_pio2->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_pio2->in_pa_callback().set_ioport("DSW");
 
-	I8272A(config, m_i8272, 16_MHz_XTAL / 8, true);
+	I8272A(config, m_i8272, 16_MHz_XTAL / 2, true);
 	m_i8272->drq_wr_callback().set("dma", FUNC(z80dma_device::rdy_w));
-	MCFG_FLOPPY_DRIVE_ADD("i8272:0", p8k_floppies, "525hd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("i8272:1", p8k_floppies, "525hd", floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, "i8272:0", p8k_floppies, "525hd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "i8272:1", p8k_floppies, "525hd", floppy_image_device::default_floppy_formats);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

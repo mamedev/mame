@@ -7090,6 +7090,21 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="babyjo">
+		<!-- Dumped via Kryoflux -->
+		<description>Baby Jo in "Going Home"</description>
+		<year>1991</year>
+		<publisher>Loriciel</publisher>
+		<info name="developer" value="Loriciel" />
+		<info name="version" value="1.03 08/92" />
+		<part name="flop1" interface="floppy_3_5">
+			<!-- Copy-protected key disk -->
+			<dataarea name="flop" size = "2162637">
+				<rom name="Baby Jo [Loriciel] [1991] [3.5DD] [Disk 1 of 1].mfm" size="2162637" crc="7bff6ae7" sha1="d3e183367ed9b17487fa6d0938cc0ecc17700c6a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bttf2">
 		<description>Back to the Future Part II</description>
 		<year>1990</year>
@@ -7299,6 +7314,20 @@ has been replaced with an all-zero block. -->
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Blood Money [Psygnosis] [1989] [5.25] [Disk 2 of 2].img" size="368640" crc="bf2bc87b" sha1="803e50804de9caa64191854c89fd5976e8599846" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bluesbro">
+		<!-- Dumped via Kryoflux -->
+		<description>The Blues Brothers</description>
+		<year>1991</year>
+		<publisher>Titus</publisher>
+		<info name="developer" value="Titus" />
+		<part name="flop1" interface="floppy_3_5">
+			<!-- Copy-protected key disk -->
+			<dataarea name="flop" size = "2162514">
+				<rom name="Blues Brothers [Titus] [1991] [3.5DD] [Disk 1 of 1].mfm" size="2162514" crc="5657c2ec" sha1="d38d7c67888a5f7d2c9ba122b851104e005e0c63" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7717,6 +7746,23 @@ has been replaced with an all-zero block. -->
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Double Dragon II - The Revenge (World) (5.25'') (Disk 3).img" size="368640" crc="bdfe685a" sha1="076f827a949cd2480f7ab996ed3defa0c580edf3" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ddragon2_35" cloneof="ddragon2">
+		<description>Double Dragon II - The Revenge (3.5")</description>
+		<year>1989</year>
+		<publisher>Virgin Games</publisher>
+		<info name="developer" value="Binary Design" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Double Dragon II [Virgin Games] [1989] [3.5DD] [Disk 1 of 2].img" size="737280" crc="fea2f0d3" sha1="3c1d86afcfcf309d9aea72143883ee031873b2b5" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Double Dragon II [Virgin Games] [1989] [3.5DD] [Disk 2 of 2].img" size="737280" crc="c3df1da7" sha1="937967944ffb47f3d23a19fda7ec49522edb75a2" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8699,7 +8745,7 @@ has been replaced with an all-zero block. -->
 
 	<!-- black square glitches behind sprites -->
 	<software name="lombrall" supported="partial">
-		<description>Lombard RAC Rally</description>
+		<description>Lombard RAC Rally (5.25")</description>
 		<year>1989</year>
 		<publisher>Mandarin Software</publisher>
 		<info name="developer" value="Red Rat Software" />
@@ -8713,6 +8759,18 @@ has been replaced with an all-zero block. -->
 			<!-- Dumped via Kryoflux, two tracks show as modified -->
 			<dataarea name="flop" size = "368640">
 				<rom name="[PC] Lombard RAC Rally [5.25DD] [Disk 2 of 2].img" size="368640" crc="cc4c8cfe" sha1="3edaa3fc5f4d875148c2286dfc0d885e65816bdf" offset="0" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lombrall35" cloneof="lombrall">
+		<description>Lombard RAC Rally (3.5")</description>
+		<year>1989</year>
+		<publisher>Mandarin Software</publisher>
+		<info name="developer" value="Red Rat Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Lombard RAC Rally [Mandarin Software] [1989] [3.5DD] [Disk 1 of 1].img" size="737280" crc="13355638" sha1="309a36298c26fb782d119bb8d94515a8cb166af2" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9778,6 +9836,20 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="rick2">
+		<!-- Dumped via Kryoflux -->
+		<description>Rick Dangerous 2</description>
+		<year>1990</year>
+		<publisher>MicroStyle</publisher>
+		<info name="developer" value="Core Design" />
+		<part name="flop1" interface="floppy_3_5">
+			<!-- Copy-protected key disk -->
+			<dataarea name="flop" size = "2154613">
+				<rom name="Rick Dangerous 2 [Core Design] [1990] [3.5DD] [Disk 1 of 1].mfm" size="2154613" crc="454ae73b" sha1="e550e0c7584bf0f892da99722b6ce18939ad2e2a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="riskywd">
 		<description>Risky Woods</description>
 		<year>1992</year>
@@ -10491,6 +10563,19 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="supertet">
+		<description>Super Tetris</description>
+		<year>1991</year>
+		<publisher>Spectrum Holobyte</publisher>
+		<info name="developer" value="Sphere" />
+		<info name="version" value="1.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Super Tetris [Spectrum Holobyte] [1991] [3,5DD] [Disk 1 of 1].img" size="737280" crc="7e506514" sha1="a961229ec82ec8f5eafd57b239b61ece448e437b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="superman">
 		<description>Superman - The Man of Steel</description>
 		<year>1989</year>
@@ -10813,6 +10898,18 @@ has been replaced with an all-zero block. -->
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Xenon [Melbourne House] [1988] [5.25DD] [Disk 2 of 2].img" size="368640" crc="7b4c8346" sha1="050e699aa3babb52b84cfa9dfe7530859a9d7c14" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xenon2">
+		<description>Xenon 2: Megablast (Power Pack Compilation)</description>
+		<year>1990</year>
+		<publisher>Mirrorsoft</publisher>
+		<info name="developer" value="The Assembly Line - The Bitmap Brothers" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Xenon 2 (Power Pack Compilation) [Mirrorsoft] [1990] [3.5DD] [Disk 1 of 1].img" size="737280" crc="e11986f8" sha1="b70e62ff6af4270188f85dbd4d7bf24d4acc45b7" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

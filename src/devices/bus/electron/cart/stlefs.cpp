@@ -47,9 +47,9 @@ void stlefs_floppies(device_slot_interface &device)
 void electron_stlefs_device::device_add_mconfig(machine_config &config)
 {
 	/* fdc */
-	WD1770(config, m_fdc, 16_MHz_XTAL / 2);
-	m_fdc->intrq_wr_callback().set(FUNC(electron_stlefs_device::fdc_intrq_w));
-	m_fdc->drq_wr_callback().set(FUNC(electron_stlefs_device::fdc_drq_w));
+	WD1770(config, m_fdc, DERIVED_CLOCK(1, 2));
+	m_fdc->intrq_wr_callback().set(DEVICE_SELF_OWNER, FUNC(electron_cartslot_device::irq_w));
+	m_fdc->drq_wr_callback().set(DEVICE_SELF_OWNER, FUNC(electron_cartslot_device::nmi_w));
 	FLOPPY_CONNECTOR(config, m_floppy0, stlefs_floppies, "525qd", electron_stlefs_device::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppy1, stlefs_floppies, nullptr, electron_stlefs_device::floppy_formats).enable_sound(true);
 }
@@ -83,7 +83,7 @@ void electron_stlefs_device::device_start()
 //  read - cartridge data read
 //-------------------------------------------------
 
-uint8_t electron_stlefs_device::read(address_space &space, offs_t offset, int infc, int infd, int romqa)
+uint8_t electron_stlefs_device::read(address_space &space, offs_t offset, int infc, int infd, int romqa, int oe, int oe2)
 {
 	uint8_t data = 0xff;
 
@@ -99,13 +99,9 @@ uint8_t electron_stlefs_device::read(address_space &space, offs_t offset, int in
 			break;
 		}
 	}
-
-	if (!infc && !infd)
+	else if (oe)
 	{
-		if (offset >= 0x0000 && offset < 0x4000)
-		{
-			data = m_rom[(offset & 0x3fff) + (romqa * 0x4000)];
-		}
+		data = m_rom[(offset & 0x3fff) | (romqa << 14)];
 	}
 
 	return data;
@@ -115,7 +111,7 @@ uint8_t electron_stlefs_device::read(address_space &space, offs_t offset, int in
 //  write - cartridge data write
 //-------------------------------------------------
 
-void electron_stlefs_device::write(address_space &space, offs_t offset, uint8_t data, int infc, int infd, int romqa)
+void electron_stlefs_device::write(address_space &space, offs_t offset, uint8_t data, int infc, int infd, int romqa, int oe, int oe2)
 {
 	if (infc)
 	{
@@ -159,14 +155,4 @@ WRITE8_MEMBER(electron_stlefs_device::wd1770_control_w)
 
 	// bit 5: reset
 	if (!BIT(data, 5)) m_fdc->soft_reset();
-}
-
-void electron_stlefs_device::fdc_intrq_w(int state)
-{
-	m_slot->irq_w(state);
-}
-
-void electron_stlefs_device::fdc_drq_w(int state)
-{
-	m_slot->nmi_w(state);
 }

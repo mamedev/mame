@@ -178,7 +178,9 @@ static const sega8_slot slot_list[] =
 	{ SEGA8_MUSIC_EDITOR, "music_editor" },
 	{ SEGA8_DAHJEE_TYPEA, "dahjee_typea" },
 	{ SEGA8_DAHJEE_TYPEB, "dahjee_typeb" },
-	{ SEGA8_SEOJIN, "seojin" }
+	{ SEGA8_SEOJIN, "seojin" },
+	{ SEGA8_MULTICART, "multicart" },
+	{ SEGA8_MEGACART, "megacart" }
 };
 
 static int sega8_get_pcb_id(const char *slot)
@@ -277,7 +279,7 @@ void sega8_cart_slot_device::setup_ram()
 			m_cart->ram_alloc(0x800);
 			m_cart->set_has_battery(false);
 		}
-		else if (m_type == SEGA8_BASIC_L3)
+		else if (m_type == SEGA8_BASIC_L3 || m_type == SEGA8_MULTICART || m_type == SEGA8_MEGACART)
 		{
 			m_cart->ram_alloc(0x8000);
 			m_cart->set_has_battery(false);
@@ -584,6 +586,14 @@ int sega8_cart_slot_device::get_cart_type(const uint8_t *ROM, uint32_t len) cons
 			type = SEGA8_MUSIC_EDITOR;
 	}
 
+	// SC-3000 Survivors Multicart
+	if (len == 0x200000)
+		type = SEGA8_MULTICART;
+
+	// SC-3000 Survivors Megacart
+	if (len == 0x400000)
+		type = SEGA8_MEGACART;
+
 
 	return type;
 }
@@ -638,6 +648,14 @@ READ8_MEMBER(sega8_cart_slot_device::read_ram)
 		return 0xff;
 }
 
+READ8_MEMBER(sega8_cart_slot_device::read_io)
+{
+	if (m_cart)
+		return m_cart->read_io(space, offset);
+	else
+		return 0xff;
+}
+
 
 /*-------------------------------------------------
  write
@@ -659,6 +677,12 @@ WRITE8_MEMBER(sega8_cart_slot_device::write_ram)
 {
 	if (m_cart)
 		m_cart->write_ram(space, offset, data);
+}
+
+WRITE8_MEMBER(sega8_cart_slot_device::write_io)
+{
+	if (m_cart)
+		m_cart->write_io(space, offset, data);
 }
 
 
@@ -817,6 +841,8 @@ void sg1000_cart(device_slot_interface &device)
 	device.option_add_internal("dahjee_typea",  SEGA8_ROM_DAHJEE_TYPEA);
 	device.option_add_internal("dahjee_typeb",  SEGA8_ROM_DAHJEE_TYPEB);
 	device.option_add_internal("cardcatcher",  SEGA8_ROM_CARDCATCH);
+	device.option_add_internal("multicart",  SEGA8_ROM_MULTICART);
+	device.option_add_internal("megacart",  SEGA8_ROM_MEGACART);
 }
 
 void sg1000mk3_cart(device_slot_interface &device)

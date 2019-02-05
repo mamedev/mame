@@ -440,7 +440,7 @@ MACHINE_CONFIG_START(s3_state::s3)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M6800, 3580000)
 	MCFG_DEVICE_PROGRAM_MAP(s3_main_map)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq", s3_state, irq, attotime::from_hz(250))
+	TIMER(config, "irq").configure_periodic(FUNC(s3_state::irq), attotime::from_hz(250));
 	MCFG_MACHINE_RESET_OVERRIDE(s3_state, s3)
 
 	/* Video */

@@ -758,7 +758,7 @@ MACHINE_CONFIG_START(warpwarp_state::navarone)
 	geebee(config);
 
 	/* basic machine hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_2k)
+	m_gfxdecode->set_info(gfx_2k);
 	m_palette->set_entries(2*2);
 	m_palette->set_init(FUNC(warpwarp_state::navarone_palette));
 
@@ -769,7 +769,7 @@ MACHINE_CONFIG_START(warpwarp_state::kaitei)
 	geebee(config);
 
 	/* basic machine hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_1k)
+	m_gfxdecode->set_info(gfx_1k);
 	m_palette->set_entries(4*2+1);
 
 	MCFG_MACHINE_RESET_OVERRIDE(warpwarp_state,kaitei)

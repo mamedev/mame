@@ -466,10 +466,8 @@ MACHINE_CONFIG_START(ts803_state::ts803)
 	/* floppy disk */
 	FD1793(config, m_fdc, 1_MHz_XTAL);
 	m_fdc->intrq_wr_callback().set("sti", FUNC(z80sti_device::i7_w));
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ts803_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ts803_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, "fdc:0", ts803_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", ts803_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
 MACHINE_CONFIG_END
 
 /* ROM definition */

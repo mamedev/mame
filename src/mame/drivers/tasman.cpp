@@ -648,7 +648,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(kongambl_state::kongambl_vblank)
 MACHINE_CONFIG_START(kongambl_state::kongambl)
 	MCFG_DEVICE_ADD("maincpu", M68EC020, 25000000)
 	MCFG_DEVICE_PROGRAM_MAP(kongambl_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kongambl_state, kongambl_vblank, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(kongambl_state::kongambl_vblank), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD("sndcpu", M68000, 16000000)
 	MCFG_DEVICE_PROGRAM_MAP(kongamaud_map)

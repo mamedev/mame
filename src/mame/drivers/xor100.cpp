@@ -477,11 +477,12 @@ void xor100_state::post_load()
 
 /* Machine Driver */
 
-MACHINE_CONFIG_START(xor100_state::xor100)
+void xor100_state::xor100(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, 8_MHz_XTAL / 2)
-	MCFG_DEVICE_PROGRAM_MAP(xor100_mem)
-	MCFG_DEVICE_IO_MAP(xor100_io)
+	Z80(config, m_maincpu, 8_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &xor100_state::xor100_mem);
+	m_maincpu->set_addrmap(AS_IO, &xor100_state::xor100_io);
 
 	/* devices */
 	I8251(config, m_uart_a, 0/*8_MHz_XTAL / 2,*/);
@@ -521,35 +522,36 @@ MACHINE_CONFIG_START(xor100_state::xor100)
 	m_ctc->zc_callback<2>().set(FUNC(xor100_state::ctc_z2_w));
 
 	FD1795(config, m_fdc, 8_MHz_XTAL / 4);
-	MCFG_FLOPPY_DRIVE_ADD(WD1795_TAG":0", xor100_floppies, "8ssdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD1795_TAG":1", xor100_floppies, "8ssdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD1795_TAG":2", xor100_floppies, nullptr,    floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD1795_TAG":3", xor100_floppies, nullptr,    floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, WD1795_TAG":0", xor100_floppies, "8ssdd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, WD1795_TAG":1", xor100_floppies, "8ssdd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, WD1795_TAG":2", xor100_floppies, nullptr,    floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, WD1795_TAG":3", xor100_floppies, nullptr,    floppy_image_device::default_floppy_formats);
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(I8255A_TAG, i8255_device, pc4_w))
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, xor100_state, write_centronics_busy))
-	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(*this, xor100_state, write_centronics_select))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->ack_handler().set(I8255A_TAG, FUNC(i8255_device::pc4_w));
+	m_centronics->busy_handler().set(FUNC(xor100_state::write_centronics_busy));
+	m_centronics->select_handler().set(FUNC(xor100_state::write_centronics_select));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
 
 	// S-100
-	MCFG_DEVICE_ADD(S100_TAG, S100_BUS, 8_MHz_XTAL / 4)
-	MCFG_S100_RDY_CALLBACK(INPUTLINE(Z80_TAG, Z80_INPUT_LINE_BOGUSWAIT))
-	MCFG_S100_SLOT_ADD(S100_TAG ":1", xor100_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD(S100_TAG ":2", xor100_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD(S100_TAG ":3", xor100_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD(S100_TAG ":4", xor100_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD(S100_TAG ":5", xor100_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD(S100_TAG ":6", xor100_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD(S100_TAG ":7", xor100_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD(S100_TAG ":8", xor100_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD(S100_TAG ":9", xor100_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD(S100_TAG ":10", xor100_s100_cards, nullptr)
+	S100_BUS(config, m_s100, 8_MHz_XTAL / 4);
+	m_s100->rdy().set_inputline(m_maincpu, Z80_INPUT_LINE_BOGUSWAIT);
+	S100_SLOT(config, S100_TAG ":1", xor100_s100_cards, nullptr);
+	S100_SLOT(config, S100_TAG ":2", xor100_s100_cards, nullptr);
+	S100_SLOT(config, S100_TAG ":3", xor100_s100_cards, nullptr);
+	S100_SLOT(config, S100_TAG ":4", xor100_s100_cards, nullptr);
+	S100_SLOT(config, S100_TAG ":5", xor100_s100_cards, nullptr);
+	S100_SLOT(config, S100_TAG ":6", xor100_s100_cards, nullptr);
+	S100_SLOT(config, S100_TAG ":7", xor100_s100_cards, nullptr);
+	S100_SLOT(config, S100_TAG ":8", xor100_s100_cards, nullptr);
+	S100_SLOT(config, S100_TAG ":9", xor100_s100_cards, nullptr);
+	S100_SLOT(config, S100_TAG ":10", xor100_s100_cards, nullptr);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K").set_extra_options("128K,192K,256K,320K,384K,448K,512K");
-MACHINE_CONFIG_END
+}
 
 /* ROMs */
 

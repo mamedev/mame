@@ -83,7 +83,7 @@ void cpc_expansion_slot_device::device_start()
 void cpc_expansion_slot_device::device_config_complete()
 {
 	// for passthrough connectors, use the parent slot's CPU tag
-	if (strcmp(m_cpu.finder_tag(), finder_base::DUMMY_TAG) == 0 && dynamic_cast<device_cpc_expansion_card_interface *>(owner()) != nullptr)
+	if ((m_cpu.finder_tag() == finder_base::DUMMY_TAG) && (dynamic_cast<device_cpc_expansion_card_interface *>(owner()) != nullptr))
 	{
 		auto parent = dynamic_cast<cpc_expansion_slot_device *>(owner()->owner());
 		if (parent != nullptr)

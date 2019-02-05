@@ -842,14 +842,14 @@ MACHINE_CONFIG_START(nss_state::nss)
 	MCFG_DEVICE_ADD("soundcpu", SPC700, XTAL(24'576'000) / 12)
 	MCFG_DEVICE_PROGRAM_MAP(spc_mem)
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	/* nss hardware */
 	MCFG_DEVICE_ADD("bios", Z80, 4000000)
 	MCFG_DEVICE_PROGRAM_MAP(bios_map)
 	MCFG_DEVICE_IO_MAP(bios_io_map)
 
-	MCFG_M50458_ADD("m50458", 4000000, "osd") /* TODO: correct clock */
+	M50458(config, m_m50458, 4000000, "osd"); /* TODO: correct clock */
 	S3520CF(config, m_s3520cf); /* RTC */
 	RP5H01(config, m_rp5h01, 0);
 	M6M80011AP(config, "m6m80011ap");

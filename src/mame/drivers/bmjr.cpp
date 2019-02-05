@@ -362,7 +362,7 @@ MACHINE_CONFIG_START(bmjr_state::bmjr)
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* Devices */
-	MCFG_CASSETTE_ADD( "cassette" )
+	CASSETTE(config, m_cass);
 MACHINE_CONFIG_END
 
 /* ROM definition */

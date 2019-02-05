@@ -682,11 +682,11 @@ WRITE8_MEMBER(nes_konami_vrc7_device::write_h)
 
 		case 0x1010:
 		case 0x1018:
-			m_ym2413->register_port_w(space, 0, data);
+			m_ym2413->register_port_w(data);
 			break;
 		case 0x1030:
 		case 0x1038:
-			m_ym2413->data_port_w(space, 0, data);
+			m_ym2413->data_port_w(data);
 			break;
 
 		case 0x2000:

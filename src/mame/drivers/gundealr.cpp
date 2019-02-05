@@ -444,7 +444,7 @@ MACHINE_CONFIG_START(gundealr_state::gundealr)
 	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/2)   /* 6 MHz verified for Yam! Yam!? */
 	MCFG_DEVICE_PROGRAM_MAP(gundealr_main_map)
 	MCFG_DEVICE_IO_MAP(main_portmap)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", gundealr_state, scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(gundealr_state::scanline), "screen", 0, 1);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -534,13 +534,14 @@ MACHINE_CONFIG_START(gundealr_state::yamyam)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(yamyam_main_map)
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcusim", gundealr_state, yamyam_mcu_sim, attotime::from_hz(6000000/60)) /* 6mhz confirmed */
+	TIMER(config, "mcusim").configure_periodic(FUNC(gundealr_state::yamyam_mcu_sim), attotime::from_hz(6000000/60)); /* 6mhz confirmed */
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(gundealr_state::gundealrbl)
+void gundealr_state::gundealrbl(machine_config &config)
+{
 	yamyam(config);
-	MCFG_DEVICE_REMOVE("mcusim")
-MACHINE_CONFIG_END
+	config.device_remove("mcusim");
+}
 
 
 /***************************************************************************

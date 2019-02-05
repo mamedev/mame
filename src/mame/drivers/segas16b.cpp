@@ -1126,7 +1126,7 @@ WRITE16_MEMBER( segas16b_state::standard_io_w )
 
 WRITE16_MEMBER( segas16b_state::atomicp_sound_w )
 {
-	m_ym2413->write(space, offset, data >> 8);
+	m_ym2413->write(offset, data >> 8);
 }
 
 
@@ -7448,6 +7448,34 @@ ROM_START( ryukyu )
 	ROM_LOAD( "opr-13350.a11", 0x10000, 0x20000, CRC(3c59a658) SHA1(2cef13ee9e666bb850fe6c6e6954d7b75df665a9) )
 ROM_END
 
+//*************************************************************************************************************************
+//  Ryukyu, Sega System 16B
+//  CPU: FD1094 8M2 (317-5023A)
+//  ROM Board type: ?
+//
+ROM_START( ryukyua )
+	ROM_REGION( 0x20000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "epr-13348a.a7", 0x00000, 0x10000, CRC(64f6ada9) SHA1(31e2adc8697c21ca4aa2d9357f7303644168d0a2) )
+	ROM_LOAD16_BYTE( "epr-13347a.a5", 0x00001, 0x10000, CRC(fade1f50) SHA1(46e6224060d526aa362df1a1026ba445832ad7f3) )
+
+	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
+	ROM_LOAD( "317-5023a.key", 0x0000, 0x2000, NO_DUMP )
+
+	ROM_REGION( 0x60000, "gfx1", 0 ) // tiles
+	ROM_LOAD( "opr-13351.a14", 0x00000, 0x20000, CRC(a68a4e6d) SHA1(ee3e317c7184b41af5dd383d41f7be3eebff0d04) )
+	ROM_LOAD( "opr-13352.a15", 0x20000, 0x20000, CRC(5e5531e4) SHA1(e8e16b35f7985e6cdd77353ca5235db518914744) )
+	ROM_LOAD( "opr-13353.a16", 0x40000, 0x20000, CRC(6d23dfd8) SHA1(21266340290b9854cee0b62fc107cc2981519a80) )
+
+	ROM_REGION16_BE( 0x80000, "sprites", 0 ) // sprites
+	ROM_LOAD16_BYTE( "opr-13354.b1", 0x00001, 0x20000, CRC(f07aad99) SHA1(71759525a5b7fe76d112cec93984f0f89cadbc00) )
+	ROM_LOAD16_BYTE( "opr-13356.b5", 0x00000, 0x20000, CRC(5498290b) SHA1(b3115b636d8cb6ecac22d5264b7961e3b807cf04) )
+	ROM_LOAD16_BYTE( "opr-13355.b2", 0x40001, 0x20000, CRC(67890019) SHA1(165c6a32f305273396ec0e9499e00329caadc484) )
+	ROM_LOAD16_BYTE( "opr-13357.b6", 0x40000, 0x20000, CRC(f9e7cf03) SHA1(2258111499c79443faf84fb0495007016282bb3c) )
+
+	ROM_REGION( 0x50000, "soundcpu", 0 ) // sound CPU
+	ROM_LOAD( "epr-13349.a10", 0x00000, 0x08000, CRC(b83183f8) SHA1(9d6127f51c04a16bb2637dc9992b843b94613c2b) )
+	ROM_LOAD( "opr-13350.a11", 0x10000, 0x20000, CRC(3c59a658) SHA1(2cef13ee9e666bb850fe6c6e6954d7b75df665a9) )
+ROM_END
 
 ROM_START( ryukyud )
 	ROM_REGION( 0x20000, "maincpu", 0 ) // 68000 code
@@ -9261,6 +9289,7 @@ GAME( 1988, cencourt,   passsht,  system16b_mc8123,      cencourt, segas16b_stat
 GAME( 1991, riotcity,   0,        system16b,             riotcity, segas16b_state, init_generic_5704,       ROT0,   "Sega / Westone", "Riot City (Japan)", 0 )
 
 GAME( 1990, ryukyu,     0,        system16b_fd1094,      ryukyu,   segas16b_state, init_generic_5704,       ROT0,   "Success / Sega", "RyuKyu (Japan) (FD1094 317-5023)", 0 )
+GAME( 1990, ryukyua,    ryukyu,   system16b_fd1094,      ryukyu,   segas16b_state, init_generic_5704,       ROT0,   "Success / Sega", "RyuKyu (Japan) (FD1094 317-5023A)", MACHINE_NOT_WORKING ) // decryption key not available
 
 GAME( 1987, defense,    sdi,      system16b_fd1089a,     sdi,      segas16b_state, init_defense_5358_small, ROT0,   "Sega", "Defense (System 16B, FD1089A 317-0028)", 0 )
 GAME( 1987, sdib,       sdi,      system16b_fd1089a,     sdi,      segas16b_state, init_defense_5358_small, ROT0,   "Sega", "SDI - Strategic Defense Initiative (System 16B, FD1089A 317-0028)", 0 )
@@ -9822,8 +9851,8 @@ MACHINE_CONFIG_START(isgsm_state::isgsm)
 	system16b(config);
 	// basic machine hardware
 
-	MCFG_DEVICE_REMOVE("maincpu")
-	MCFG_DEVICE_REMOVE("mapper")
+	config.device_remove("maincpu");
+	config.device_remove("mapper");
 
 	MCFG_DEVICE_ADD("maincpu", M68000, 16000000) // no obvious CPU, but seems to be clocked faster than an original system16 based on the boot times
 	MCFG_DEVICE_PROGRAM_MAP(isgsm_map)

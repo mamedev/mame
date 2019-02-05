@@ -653,12 +653,12 @@ MACHINE_CONFIG_START(firefox_state::firefox)
 	MCFG_DEVICE_ADD("maincpu", MC6809E, MASTER_XTAL/8) // 68B09E
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	/* interrupts count starting at end of VBLANK, which is 44, so add 44 */
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("32v", firefox_state, video_timer_callback, "screen", 96+44, 128)
+	TIMER(config, "32v").configure_scanline(FUNC(firefox_state::video_timer_callback), "screen", 96+44, 128);
 
 	MCFG_DEVICE_ADD("audiocpu", M6502, MASTER_XTAL/8)
 	MCFG_DEVICE_PROGRAM_MAP(audio_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
+	config.m_minimum_quantum = attotime::from_hz(60000);
 
 	adc0809_device &adc(ADC0809(config, "adc", MASTER_XTAL/16)); // nominally 900 kHz
 	adc.in_callback<0>().set_ioport("PITCH");

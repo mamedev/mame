@@ -380,23 +380,25 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(spectrum_state::spectrum_plus3)
 	spectrum_128(config);
+
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(spectrum_plus3_mem)
 	MCFG_DEVICE_IO_MAP(spectrum_plus3_io)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(50.01)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", specpls3)
+
+	subdevice<gfxdecode_device>("gfxdecode")->set_info(specpls3);
 
 	MCFG_MACHINE_RESET_OVERRIDE(spectrum_state, spectrum_plus3 )
 
 	UPD765A(config, m_upd765, 4'000'000, true, true);
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", specpls3_floppies, "3ssdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", specpls3_floppies, "3ssdd", floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, "upd765:0", specpls3_floppies, "3ssdd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765:1", specpls3_floppies, "3ssdd", floppy_image_device::default_floppy_formats);
 
 	MCFG_DEVICE_MODIFY("exp")
 	MCFG_DEVICE_SLOT_INTERFACE(specpls3_expansion_devices, nullptr, false)
 
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "specpls3_flop")
+	SOFTWARE_LIST(config, "flop_list").set_original("specpls3_flop");
 MACHINE_CONFIG_END
 
 /***************************************************************************

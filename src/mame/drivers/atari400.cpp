@@ -2018,7 +2018,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( a400_state::a5200_interrupt )
 
 MACHINE_RESET_MEMBER( a400_state, a400 )
 {
-	m_pokey->write(machine().dummy_space(), 15, 0);
+	m_pokey->write(15, 0);
 }
 
 

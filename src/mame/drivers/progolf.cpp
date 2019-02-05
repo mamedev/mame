@@ -426,7 +426,7 @@ MACHINE_CONFIG_START(progolf_state::progolf)
 	MCFG_DEVICE_ADD("audiocpu", M6502, 500000)
 	MCFG_DEVICE_PROGRAM_MAP(sound_cpu)
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	generic_latch_8_device &soundlatch(GENERIC_LATCH_8(config, "soundlatch"));
 	soundlatch.data_pending_callback().set_inputline(m_audiocpu, 0);
@@ -459,7 +459,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(progolf_state::progolfa)
 	progolf(config);
-	MCFG_DEVICE_REMOVE("maincpu") /* different encrypted cpu to progolf */
+	config.device_remove("maincpu"); /* different encrypted cpu to progolf */
 	MCFG_DEVICE_ADD("maincpu", DECO_CPU6, 3000000/2) /* guess, 3 Mhz makes the game to behave worse? */
 	MCFG_DEVICE_PROGRAM_MAP(main_cpu)
 MACHINE_CONFIG_END

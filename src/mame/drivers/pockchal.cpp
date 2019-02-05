@@ -124,7 +124,7 @@ MACHINE_CONFIG_START(pockchalv1_state::pockchalv1)
 	MCFG_GENERIC_LOAD(pockchalv1_state, pockchalv1_cart)
 	MCFG_GENERIC_MANDATORY
 
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("pc1_list","pockchalw")
+	SOFTWARE_LIST(config, "pc1_list").set_compatible("pockchalw");
 
 MACHINE_CONFIG_END
 

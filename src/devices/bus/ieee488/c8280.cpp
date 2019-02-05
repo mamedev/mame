@@ -293,30 +293,31 @@ FLOPPY_FORMATS_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(c8280_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(M6502_DOS_TAG, M6502, XTAL(12'000'000)/8)
-	MCFG_DEVICE_PROGRAM_MAP(c8280_main_mem)
+void c8280_device::device_add_mconfig(machine_config &config)
+{
+	M6502(config, m_maincpu, XTAL(12'000'000)/8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &c8280_device::c8280_main_mem);
 
-	MCFG_DEVICE_ADD(M6532_0_TAG, MOS6532_NEW, XTAL(12'000'000)/8)
-	MCFG_MOS6530n_IN_PA_CB(READ8(*this, c8280_device, dio_r))
-	MCFG_MOS6530n_OUT_PB_CB(WRITE8(*this, c8280_device, dio_w))
+	MOS6532_NEW(config, m_riot0, XTAL(12'000'000)/8);
+	m_riot0->pa_rd_callback().set(FUNC(c8280_device::dio_r));
+	m_riot0->pb_wr_callback().set(FUNC(c8280_device::dio_w));
 
-	MCFG_DEVICE_ADD(M6532_1_TAG, MOS6532_NEW, XTAL(12'000'000)/8)
-	MCFG_MOS6530n_IN_PA_CB(READ8(*this, c8280_device, riot1_pa_r))
-	MCFG_MOS6530n_OUT_PA_CB(WRITE8(*this, c8280_device, riot1_pa_w))
-	MCFG_MOS6530n_IN_PB_CB(READ8(*this, c8280_device, riot1_pb_r))
-	MCFG_MOS6530n_OUT_PB_CB(WRITE8(*this, c8280_device, riot1_pb_w))
-	MCFG_MOS6530n_IRQ_CB(INPUTLINE(M6502_DOS_TAG, INPUT_LINE_IRQ0))
+	MOS6532_NEW(config, m_riot1, XTAL(12'000'000)/8);
+	m_riot1->pa_rd_callback().set(FUNC(c8280_device::riot1_pa_r));
+	m_riot1->pa_wr_callback().set(FUNC(c8280_device::riot1_pa_w));
+	m_riot1->pb_rd_callback().set(FUNC(c8280_device::riot1_pb_r));
+	m_riot1->pb_wr_callback().set(FUNC(c8280_device::riot1_pb_w));
+	m_riot1->irq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD(M6502_FDC_TAG, M6502, XTAL(12'000'000)/8)
-	MCFG_DEVICE_PROGRAM_MAP(c8280_fdc_mem)
+	M6502(config, m_fdccpu, XTAL(12'000'000)/8);
+	m_fdccpu->set_addrmap(AS_PROGRAM, &c8280_device::c8280_fdc_mem);
 
 	FD1797(config, m_fdc, XTAL(12'000'000)/6);
 	m_fdc->intrq_wr_callback().set_inputline(m_fdccpu, M6502_IRQ_LINE);
 	m_fdc->drq_wr_callback().set_inputline(m_fdccpu, M6502_SET_OVERFLOW);
 	FLOPPY_CONNECTOR(config, m_floppy0, c8280_floppies, "8dsdd", c8280_device::floppy_formats);
 	FLOPPY_CONNECTOR(config, m_floppy1, c8280_floppies, "8dsdd", c8280_device::floppy_formats);
-MACHINE_CONFIG_END
+}
 
 
 //-------------------------------------------------

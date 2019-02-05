@@ -1376,8 +1376,8 @@ void pacman_state::writeport(address_map &map)
 void pacman_state::vanvan_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x01, 0x01).w("sn1", FUNC(sn76496_device::command_w));
-	map(0x02, 0x02).w("sn2", FUNC(sn76496_device::command_w));
+	map(0x01, 0x01).w("sn1", FUNC(sn76496_device::write));
+	map(0x02, 0x02).w("sn2", FUNC(sn76496_device::write));
 }
 
 void pacman_state::dremshpr_portmap(address_map &map)
@@ -1417,7 +1417,7 @@ void pacman_state::bigbucks_portmap(address_map &map)
 
 void pacman_state::s2650games_dataport(address_map &map)
 {
-	map(S2650_DATA_PORT, S2650_DATA_PORT).w("sn1", FUNC(sn76496_device::command_w));
+	map(S2650_DATA_PORT, S2650_DATA_PORT).w("sn1", FUNC(sn76496_device::write));
 }
 
 void pacman_state::drivfrcp_portmap(address_map &map)
@@ -3741,7 +3741,7 @@ MACHINE_CONFIG_START(pacman_state::vanvan)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pacman_state, vblank_nmi))
 
 	/* sound hardware */
-	MCFG_DEVICE_REMOVE("namco")
+	config.device_remove("namco");
 	MCFG_DEVICE_ADD("sn1", SN76496, 1789750)
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
@@ -3787,7 +3787,7 @@ MACHINE_CONFIG_START(pacman_state::s2650games)
 	m_mainlatch->q_out_cb<6>().set_nop();
 	m_mainlatch->q_out_cb<7>().set(FUNC(pacman_state::coin_counter_w));
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_s2650games)
+	m_gfxdecode->set_info(gfx_s2650games);
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(32*8, 32*8)
@@ -3799,7 +3799,7 @@ MACHINE_CONFIG_START(pacman_state::s2650games)
 	MCFG_VIDEO_START_OVERRIDE(pacman_state,s2650games)
 
 	/* sound hardware */
-	MCFG_DEVICE_REMOVE("namco")
+	config.device_remove("namco");
 	MCFG_DEVICE_ADD("sn1", SN76496, MASTER_CLOCK/6)    /* 1H */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
@@ -3869,16 +3869,17 @@ MACHINE_CONFIG_START(pacman_state::superabc)
 	MCFG_MACHINE_RESET_OVERRIDE(pacman_state,superabc)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_superabc)
+	m_gfxdecode->set_info(gfx_superabc);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(pacman_state::crush4)
+void pacman_state::crush4(machine_config &config)
+{
 	mschamp(config);
 
 	/* basic machine hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_crush4)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_crush4);
+}
 
 MACHINE_CONFIG_START(pacman_state::crushs)
 	pacman(config);

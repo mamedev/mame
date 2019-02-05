@@ -977,9 +977,9 @@ MACHINE_CONFIG_START(apc_state::apc)
 	UPD765A(config, m_fdc, 8'000'000, true, true);
 	m_fdc->intrq_wr_callback().set(m_i8259_s, FUNC(pic8259_device::ir4_w));
 	m_fdc->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq1_w));
-	MCFG_FLOPPY_DRIVE_ADD(m_fdc_connector[0], apc_floppies, "8", apc_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(m_fdc_connector[1], apc_floppies, "8", apc_floppy_formats)
-	MCFG_SOFTWARE_LIST_ADD("disk_list","apc")
+	FLOPPY_CONNECTOR(config, m_fdc_connector[0], apc_floppies, "8", apc_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_fdc_connector[1], apc_floppies, "8", apc_floppy_formats);
+	SOFTWARE_LIST(config, "disk_list").set_original("apc");
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

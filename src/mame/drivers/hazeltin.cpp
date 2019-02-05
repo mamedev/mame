@@ -698,10 +698,9 @@ MACHINE_CONFIG_START(hazl1500_state::hazl1500)
 	MCFG_DEVICE_ADD(CPU_TAG, I8080, XTAL(18'000'000)/9) // 18MHz crystal on schematics, using an i8224 clock gen/driver IC
 	MCFG_DEVICE_PROGRAM_MAP(hazl1500_mem)
 	MCFG_DEVICE_IO_MAP(hazl1500_io)
-	MCFG_QUANTUM_PERFECT_CPU(CPU_TAG)
+	config.m_perfect_cpu_quantum = subtag(CPU_TAG);
 
-	MCFG_INPUT_MERGER_ANY_HIGH("mainint")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE(CPU_TAG, INPUT_LINE_IRQ0))
+	INPUT_MERGER_ANY_HIGH(config, "mainint").output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)

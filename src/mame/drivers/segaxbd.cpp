@@ -732,7 +732,7 @@ WRITE8_MEMBER(segaxbd_state::smgp_motor_w)
 
 READ8_MEMBER(segaxbd_rascot_state::commram_r)
 {
-	return m_commram->right_r(space, m_commram_bank << 3 | offset);
+	return m_commram->right_r(m_commram_bank << 3 | offset);
 }
 
 
@@ -743,7 +743,7 @@ READ8_MEMBER(segaxbd_rascot_state::commram_r)
 
 WRITE8_MEMBER(segaxbd_rascot_state::commram_w)
 {
-	m_commram->right_w(space, m_commram_bank << 3 | offset, data);
+	m_commram->right_w(m_commram_bank << 3 | offset, data);
 }
 
 
@@ -1789,7 +1789,7 @@ void segaxbd_new_state_double::sega_xboard_fd1094_double(machine_config &config)
 	SEGA_XBD_FD1094(config, "mainpcb", 0);
 	SEGA_XBD_FD1094(config, "subpcb", 0);
 
-	//MCFG_QUANTUM_PERFECT_CPU("mainpcb:maincpu") // doesn't help..
+	//config.m_perfect_cpu_quantum = subtag("mainpcb:maincpu"); // doesn't help..
 }
 
 

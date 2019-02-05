@@ -8,7 +8,7 @@
   Preliminary driver by Roberto Fresca.
 
 
-  German board game similar to Ludo, derivated from the indian game Parchisi.
+  German board game similar to Ludo, derived from the Indian game Parchisi.
   Coin-operated machine for 1-4 players. No screen, just artwork and lamps.
   The machine was designed for pubs, etc...
 
@@ -242,25 +242,25 @@ INPUT_PORTS_END
 *               Machine Config               *
 *********************************************/
 
-MACHINE_CONFIG_START(manohman_state::manohman)
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(8'000'000)) // MC68000P8
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(manohman_state, iack_handler)
+void manohman_state::manohman(machine_config &config)
+{
+	M68000(config, m_maincpu, XTAL(8'000'000)); // MC68000P8
+	m_maincpu->set_addrmap(AS_PROGRAM, &manohman_state::mem_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(manohman_state::iack_handler));
 
 	PIT68230(config, m_pit, XTAL(8'000'000)); // MC68230P8
 	m_pit->timer_irq_callback().set_inputline("maincpu", M68K_IRQ_2);
 
-	MCFG_DEVICE_ADD("duart", MC68681, XTAL(3'686'400))
-	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_4))
+	MC68681(config, m_duart, XTAL(3'686'400));
+	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_4);
 
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768)) // M62X42B
+	MSM6242(config, "rtc", XTAL(32'768)); // M62X42B
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE); // KM6264BL-10 x2 + MAX696CFL + battery
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("saa", SAA1099, XTAL(8'000'000) / 2) // clock not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
-MACHINE_CONFIG_END
+	SAA1099(config, "saa", XTAL(8'000'000) / 2).add_route(ALL_OUTPUTS, "mono", 0.10); // clock not verified
+}
 
 
 /*********************************************

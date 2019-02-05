@@ -642,7 +642,6 @@ end
 ---------------------------------------------------
 -- Nintendo custom sound chips
 --@src/devices/sound/nes_apu.h,SOUNDS["NES_APU"] = true
---@src/devices/sound/nes_vt_apu.h,SOUNDS["NES_APU"] = true
 ---------------------------------------------------
 
 if (SOUNDS["NES_APU"]~=null) then
@@ -650,8 +649,6 @@ if (SOUNDS["NES_APU"]~=null) then
 		MAME_DIR .. "src/devices/sound/nes_apu.cpp",
 		MAME_DIR .. "src/devices/sound/nes_apu.h",
 		MAME_DIR .. "src/devices/sound/nes_defs.h",
-		MAME_DIR .. "src/devices/sound/nes_vt_apu.cpp",
-		MAME_DIR .. "src/devices/sound/nes_vt_apu.h"
 	}
 end
 

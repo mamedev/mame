@@ -259,13 +259,13 @@ MC6845_UPDATE_ROW( miniboy7_state::crtc_update_row )
 void miniboy7_state::miniboy7_palette(palette_device &palette) const
 {
 	/*
-		prom bits
-		7654 3210
-		---- ---x   red component?.
-		---- --x-   green component?.
-		---- -x--   blue component?.
-		---- x---   intensity?.
-		xxxx ----   unused.
+	    prom bits
+	    7654 3210
+	    ---- ---x   red component?.
+	    ---- --x-   green component?.
+	    ---- -x--   blue component?.
+	    ---- x---   intensity?.
+	    xxxx ----   unused.
 	*/
 
 	/* 0000IBGR */

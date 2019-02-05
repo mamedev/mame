@@ -921,8 +921,7 @@ MACHINE_CONFIG_START(ql_state::ql)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	// devices
 	ZX8301(config, m_zx8301, X1, m_maincpu);
@@ -954,21 +953,21 @@ MACHINE_CONFIG_START(ql_state::ql)
 	RS232_PORT(config, m_ser2, default_rs232_devices, nullptr); // wired as DTE
 	m_ser2->cts_handler().set(m_zx8302, FUNC(zx8302_device::write_cts2));
 
-	MCFG_DEVICE_ADD("exp", QL_EXPANSION_SLOT, 0, ql_expansion_cards, nullptr) // FIXME: what's the clock on the slot?
-	//MCFG_QL_EXPANSION_SLOT_IPL0L_CALLBACK()
-	//MCFG_QL_EXPANSION_SLOT_IPL1L_CALLBACK()
-	//MCFG_QL_EXPANSION_SLOT_BERRL_CALLBACK()
-	MCFG_QL_EXPANSION_SLOT_EXTINTL_CALLBACK(WRITELINE(*this, ql_state, exp_extintl_w))
+	QL_EXPANSION_SLOT(config, m_exp, 0, ql_expansion_cards, nullptr); // FIXME: what's the clock on the slot?
+	//m_exp->ipl0l_wr_callback().set();
+	//m_exp->ipl1l_wr_callback().set();(
+	//m_exp->berrl_wr_callback().set();
+	m_exp->extintl_wr_callback().set(FUNC(ql_state::exp_extintl_w));
 
-	MCFG_DEVICE_ADD("rom", QL_ROM_CARTRIDGE_SLOT, ql_rom_cartridge_cards, nullptr)
+	QL_ROM_CARTRIDGE_SLOT(config, m_cart, ql_rom_cartridge_cards, nullptr);
 
 	QIMI(config, m_qimi, 0);
 	m_qimi->extint_wr_callback().set(FUNC(ql_state::qimi_extintl_w));
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "ql_cart")
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "ql_cass")
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "ql_flop")
+	SOFTWARE_LIST(config, "cart_list").set_original("ql_cart");
+	SOFTWARE_LIST(config, "cass_list").set_original("ql_cass");
+	SOFTWARE_LIST(config, "flop_list").set_original("ql_flop");
 
 	// internal ram
 	RAM(config, m_ram).set_default_size("128K");

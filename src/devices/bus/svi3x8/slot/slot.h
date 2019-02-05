@@ -40,27 +40,11 @@
 #pragma once
 
 
-
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
+//  CONSTANTS / MACROS
 //**************************************************************************
 
-#define MCFG_SVI_SLOT_BUS_ADD \
-	MCFG_DEVICE_ADD("slotbus", SVI_SLOT_BUS, 0)
-
-#define MCFG_SVI_SLOT_ADD(_tag, _slot_intf, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, SVI_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-	downcast<svi_slot_device &>(*device).set_bus(this, "slotbus");
-
-#define MCFG_SVI_SLOT_INT_HANDLER(_devcb) \
-	downcast<svi_slot_bus_device &>(*device).set_int_handler(DEVCB_##_devcb);
-
-#define MCFG_SVI_SLOT_ROMDIS_HANDLER(_devcb) \
-	downcast<svi_slot_bus_device &>(*device).set_romdis_handler(DEVCB_##_devcb);
-
-#define MCFG_SVI_SLOT_RAMDIS_HANDLER(_devcb) \
-	downcast<svi_slot_bus_device &>(*device).set_ramdis_handler(DEVCB_##_devcb);
+#define SVIBUS_TAG "slot_bux"
 
 
 //**************************************************************************
@@ -79,9 +63,9 @@ public:
 	virtual ~svi_slot_bus_device();
 
 	// callbacks
-	template <class Object> devcb_base &set_int_handler(Object &&cb) { return m_int_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_romdis_handler(Object &&cb) { return m_romdis_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_ramdis_handler(Object &&cb) { return m_ramdis_handler.set_callback(std::forward<Object>(cb)); }
+	auto int_handler() { return m_int_handler.bind(); }
+	auto romdis_handler() { return m_romdis_handler.bind(); }
+	auto ramdis_handler() { return m_ramdis_handler.bind(); }
 
 	void add_card(device_svi_slot_interface *card);
 
@@ -122,10 +106,17 @@ class svi_slot_device : public device_t, public device_slot_interface
 {
 public:
 	// construction/destruction
-	svi_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T>
+	svi_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
+		: svi_slot_device(mconfig, tag, owner, 0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
 
-	// inline configuration
-	void set_bus(device_t *owner, const char *bus_tag) { m_owner = owner; m_bus_tag = bus_tag; }
+	svi_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides

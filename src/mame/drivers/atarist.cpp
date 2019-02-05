@@ -2171,7 +2171,7 @@ void ste_state::ste(machine_config &config)
 	LMC1992(config, LMC1992_TAG);
 
 	// cartridge
-//  MCFG_SOFTWARE_LIST_ADD("cart_list", "ste_cart")
+//  SOFTWARE_LIST(config, "cart_list").set_original("ste_cart");
 
 	// internal ram
 	RAM(config, m_ram);

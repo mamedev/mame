@@ -56,6 +56,7 @@ King of Beetle: Battle Terminal             ???-?????                 no        
 Love & Berry Ver 1.003                      834-14661-02              ROM  EXP    253-5508-0446   AAFE-01D84934906
 Love & Berry Ver 2.000                      834-14661-02              ROM  EXP    253-5508-0446   AAFE-01D8493xxxx
 Love & Berry 3 EXP Ver 1.002                834-14661-01    MDA-C0042 CF   US/EXP 253-5508-0446   AAFE-01D64704904
+Love & Berry 3 CHN                          ???-?????       MDA-C0071 CF   EXP    253-5508-0446   AAFE-01G15765216
 Marine & Marine                             ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
 Medalink                                    837-14699                 no
 Medalink                                    837-14700                 no

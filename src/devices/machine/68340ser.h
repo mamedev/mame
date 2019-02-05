@@ -7,11 +7,6 @@
 
 #include "machine/mc68681.h"
 
-// MCFG macros to hide the implementation
-#define MCFG_MC68340SER_IRQ_CALLBACK(_cb) MCFG_MC68681_IRQ_CALLBACK(_cb)
-#define MCFG_MC68340SER_A_TX_CALLBACK(_cb) MCFG_MC68681_A_TX_CALLBACK(_cb)
-#define MCFG_MC68340SER_B_TX_CALLBACK(_cb) MCFG_MC68681_B_TX_CALLBACK(_cb)
-
 class m68340_cpu_device;
 
 class mc68340_serial_module_device : public mc68340_duart_device

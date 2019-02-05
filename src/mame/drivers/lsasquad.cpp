@@ -568,7 +568,7 @@ MACHINE_CONFIG_START(lsasquad_state::lsasquad)
 	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, MASTER_CLOCK / 8)
 
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(30000)) /* 500 CPU slices per frame - an high value to ensure proper */
+	config.m_minimum_quantum = attotime::from_hz(30000); /* 500 CPU slices per frame - a high value to ensure proper */
 							/* synchronization of the CPUs */
 							/* main<->sound synchronization depends on this */
 
@@ -578,8 +578,7 @@ MACHINE_CONFIG_START(lsasquad_state::lsasquad)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set("soundnmi", FUNC(input_merger_device::in_w<0>));
 
-	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	INPUT_MERGER_ALL_HIGH(config, "soundnmi").output_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	GENERIC_LATCH_8(config, m_soundlatch2);
 
@@ -616,7 +615,7 @@ MACHINE_CONFIG_START(lsasquad_state::storming)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(storming_map)
 
-	MCFG_DEVICE_REMOVE("bmcu")
+	config.device_remove("bmcu");
 
 	AY8910(config.replace(), "aysnd", MASTER_CLOCK / 8).add_route(ALL_OUTPUTS, "mono", 0.12); // AY-3-8910A
 MACHINE_CONFIG_END
@@ -634,7 +633,7 @@ MACHINE_CONFIG_START(lsasquad_state::daikaiju)
 
 	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, MASTER_CLOCK / 8)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(30000)) /* 500 CPU slices per frame - an high value to ensure proper */
+	config.m_minimum_quantum = attotime::from_hz(30000); /* 500 CPU slices per frame - a high value to ensure proper */
 							/* synchronization of the CPUs */
 							/* main<->sound synchronization depends on this */
 
@@ -644,8 +643,7 @@ MACHINE_CONFIG_START(lsasquad_state::daikaiju)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set("soundnmi", FUNC(input_merger_device::in_w<0>));
 
-	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	INPUT_MERGER_ALL_HIGH(config, "soundnmi").output_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

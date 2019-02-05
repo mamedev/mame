@@ -243,7 +243,7 @@ READ16_MEMBER(kaneko16_berlwall_state::berlwall_oki_r)
 		mem_mask >>= 8;
 	}
 
-	ret = m_oki[0]->read(space, offset, mem_mask);
+	ret = m_oki[0]->read();
 	ret = ret | ret << 8;
 
 	return ret;
@@ -257,7 +257,7 @@ WRITE16_MEMBER(kaneko16_berlwall_state::berlwall_oki_w)
 		mem_mask >>= 8;
 	}
 
-	m_oki[0]->write(space, offset, data, mem_mask);
+	m_oki[0]->write(data);
 }
 
 READ16_MEMBER(kaneko16_berlwall_state::berlwall_spriteram_r)
@@ -1773,7 +1773,7 @@ MACHINE_CONFIG_START(kaneko16_berlwall_state::berlwall)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 12000000); /* MC68000P12 */
 	m_maincpu->set_addrmap(AS_PROGRAM, &kaneko16_berlwall_state::berlwall_map);
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kaneko16_state, kaneko16_interrupt, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(kaneko16_state::kaneko16_interrupt), "screen", 0, 1);
 
 	WATCHDOG_TIMER(config, m_watchdog);
 
@@ -1835,7 +1835,7 @@ MACHINE_CONFIG_START(kaneko16_state::bakubrkr)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(12'000'000)); /* verified on pcb */
 	m_maincpu->set_addrmap(AS_PROGRAM, &kaneko16_state::bakubrkr_map);
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kaneko16_state, kaneko16_interrupt, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(kaneko16_state::kaneko16_interrupt), "screen", 0, 1);
 
 	MCFG_MACHINE_RESET_OVERRIDE(kaneko16_state,gtmr)
 	EEPROM_93C46_16BIT(config, m_eeprom);
@@ -1907,7 +1907,7 @@ MACHINE_CONFIG_START(kaneko16_state::blazeon)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 12000000);    /* TMP68HC000-12 */
 	m_maincpu->set_addrmap(AS_PROGRAM, &kaneko16_state::blazeon_map);
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kaneko16_state, kaneko16_interrupt, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(kaneko16_state::kaneko16_interrupt), "screen", 0, 1);
 
 	Z80(config, m_audiocpu, 4000000);   /* D780C-2 (6 MHz) */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &kaneko16_state::blazeon_soundmem);
@@ -1962,7 +1962,7 @@ MACHINE_CONFIG_START(kaneko16_state::wingforc)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(16'000'000));    /* TMP68HC000N-16 */
 	m_maincpu->set_addrmap(AS_PROGRAM, &kaneko16_state::blazeon_map);
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kaneko16_state, kaneko16_interrupt, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(kaneko16_state::kaneko16_interrupt), "screen", 0, 1);
 
 	Z80(config, m_audiocpu, XTAL(16'000'000)/4);   /* D780C-2 (6 MHz) */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &kaneko16_state::blazeon_soundmem);
@@ -2040,7 +2040,7 @@ MACHINE_CONFIG_START(kaneko16_gtmr_state::gtmr)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(16'000'000)); /* verified on pcb */
 	m_maincpu->set_addrmap(AS_PROGRAM, &kaneko16_gtmr_state::gtmr_map);
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kaneko16_state, kaneko16_interrupt, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(kaneko16_state::kaneko16_interrupt), "screen", 0, 1);
 
 	MCFG_MACHINE_RESET_OVERRIDE(kaneko16_gtmr_state,gtmr)
 
@@ -2148,7 +2148,7 @@ MACHINE_CONFIG_START(kaneko16_state::mgcrystl)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(12'000'000)); /* verified on pcb, TMP68HC000N-12 @U31 and X2 is 12MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &kaneko16_state::mgcrystl_map);
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kaneko16_state, kaneko16_interrupt, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(kaneko16_state::kaneko16_interrupt), "screen", 0, 1);
 
 	MCFG_MACHINE_RESET_OVERRIDE(kaneko16_state,mgcrystl)
 
@@ -2266,7 +2266,7 @@ MACHINE_CONFIG_START(kaneko16_shogwarr_state::shogwarr)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(12'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &kaneko16_shogwarr_state::shogwarr_map);
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kaneko16_shogwarr_state, shogwarr_interrupt, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(kaneko16_shogwarr_state::shogwarr_interrupt), "screen", 0, 1);
 
 	MCFG_MACHINE_RESET_OVERRIDE(kaneko16_shogwarr_state,mgcrystl)
 

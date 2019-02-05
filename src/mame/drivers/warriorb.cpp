@@ -423,11 +423,11 @@ void warriorb_state::machine_reset()
 void warriorb_state::darius2d(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 12000000);	/* 12 MHz ??? (Might well be 16!) */
+	M68000(config, m_maincpu, 12000000);    /* 12 MHz ??? (Might well be 16!) */
 	m_maincpu->set_addrmap(AS_PROGRAM, &warriorb_state::darius2d_map);
 	m_maincpu->set_vblank_int("lscreen", FUNC(warriorb_state::irq4_line_hold));
 
-	z80_device &audiocpu(Z80(config, "audiocpu", 16000000/4));	/* 4 MHz ? */
+	z80_device &audiocpu(Z80(config, "audiocpu", 16000000/4));  /* 4 MHz ? */
 	audiocpu.set_addrmap(AS_PROGRAM, &warriorb_state::z80_sound_map);
 
 	TC0220IOC(config, m_tc0220ioc, 0);
@@ -504,11 +504,11 @@ void warriorb_state::darius2d(machine_config &config)
 void warriorb_state::warriorb(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 16000000);	/* 16 MHz ? */
+	M68000(config, m_maincpu, 16000000);    /* 16 MHz ? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &warriorb_state::warriorb_map);
 	m_maincpu->set_vblank_int("lscreen", FUNC(warriorb_state::irq4_line_hold));
 
-	z80_device &audiocpu(Z80(config, "audiocpu", 16000000/4));	/* 4 MHz ? */
+	z80_device &audiocpu(Z80(config, "audiocpu", 16000000/4));  /* 4 MHz ? */
 	audiocpu.set_addrmap(AS_PROGRAM, &warriorb_state::z80_sound_map);
 
 	TC0510NIO(config, m_tc0510nio, 0);

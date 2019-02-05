@@ -264,8 +264,8 @@ MACHINE_CONFIG_START(eacc_state::eacc)
 	m_pia->irqb_handler().set_inputline("maincpu", M6802_IRQ_LINE);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("eacc_nmi", eacc_state, eacc_nmi, attotime::from_hz(600))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("eacc_cb1", eacc_state, eacc_cb1, attotime::from_hz(30))
+	TIMER(config, "eacc_nmi").configure_periodic(FUNC(eacc_state::eacc_nmi), attotime::from_hz(600));
+	TIMER(config, "eacc_cb1").configure_periodic(FUNC(eacc_state::eacc_cb1), attotime::from_hz(30));
 MACHINE_CONFIG_END
 
 

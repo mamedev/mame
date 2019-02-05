@@ -2467,7 +2467,7 @@ void segas1x_bootleg_state::astormbl(machine_config &config)
 void segas1x_bootleg_state::astormb2(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(24'000'000)/2);	/* 12MHz */
+	M68000(config, m_maincpu, XTAL(24'000'000)/2);  /* 12MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::astormbl_map);
 	m_maincpu->set_vblank_int("screen", FUNC(segas1x_bootleg_state::irq4_line_hold));
 

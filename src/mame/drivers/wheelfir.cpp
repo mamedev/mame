@@ -740,7 +740,7 @@ MACHINE_CONFIG_START(wheelfir_state::wheelfir)
 	MCFG_DEVICE_ADD("subcpu", M68000, 32000000/2)
 	MCFG_DEVICE_PROGRAM_MAP(wheelfir_sub)
 
-	//MCFG_QUANTUM_TIME(attotime::from_hz(12000))
+	//config.m_minimum_quantum = attotime::from_hz(12000);
 
 	adc0808_device &adc(ADC0808(config, "adc", 500000)); // unknown clock
 	adc.eoc_ff_callback().set(FUNC(wheelfir_state::adc_eoc_w));
@@ -748,7 +748,7 @@ MACHINE_CONFIG_START(wheelfir_state::wheelfir)
 	adc.in_callback<1>().set_ioport("ACCELERATOR");
 	adc.in_callback<2>().set_ioport("BRAKE");
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scan_timer", wheelfir_state, scanline_timer_callback, "screen", 0, 1)
+	TIMER(config, "scan_timer").configure_scanline(FUNC(wheelfir_state::scanline_timer_callback), "screen", 0, 1);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

@@ -956,7 +956,7 @@ READ32_MEMBER( sun4_state::sun4_insn_data_r )
 		switch (entry.type)
 		{
 		case 0: // type 0 space
-			return m_type0space->read32(space, tmp, mem_mask);
+			return m_type0space->read32(tmp, mem_mask);
 
 		case 1: // type 1 space
 			// magic EPROM bypass
@@ -965,7 +965,7 @@ READ32_MEMBER( sun4_state::sun4_insn_data_r )
 				return m_rom_ptr[offset & 0x1ffff];
 			}
 			//printf("Read type 1 @ VA %08x, phys %08x\n", offset<<2, tmp<<2);
-			return m_type1space->read32(space, tmp, mem_mask);
+			return m_type1space->read32(tmp, mem_mask);
 
 		default:
 			//logerror("sun4: access to unhandled memory type\n");
@@ -1019,12 +1019,12 @@ WRITE32_MEMBER( sun4_state::sun4_insn_data_w )
 		switch (entry.type)
 		{
 		case 0: // type 0
-			m_type0space->write32(space, tmp, data, mem_mask);
+			m_type0space->write32(tmp, data, mem_mask);
 			return;
 
 		case 1: // type 1
 			//printf("write device space @ %x\n", tmp<<1);
-			m_type1space->write32(space, tmp, data, mem_mask);
+			m_type1space->write32(tmp, data, mem_mask);
 			return;
 
 		default:
@@ -1839,14 +1839,15 @@ static void sun_scsi_devices(device_slot_interface &device)
 
 void sun4_state::ncr53c90a(device_t *device)
 {
-	devcb_base *devcb;
-	(void)devcb;
-	MCFG_DEVICE_CLOCK(10000000)
-	MCFG_NCR5390_IRQ_HANDLER(WRITELINE(*this, sun4_state, scsi_irq))
-	MCFG_NCR5390_DRQ_HANDLER(WRITELINE(*this, sun4_state, scsi_drq))
+	ncr53c90a_device &adapter = downcast<ncr53c90a_device &>(*device);
+
+	adapter.set_clock(10000000);
+	adapter.irq_handler_cb().set(*this, FUNC(sun4_state::scsi_irq));
+	adapter.drq_handler_cb().set(*this, FUNC(sun4_state::scsi_drq));
 }
 
-MACHINE_CONFIG_START(sun4_state::sun4)
+void sun4_state::sun4(machine_config &config)
+{
 	/* basic machine hardware */
 	MB86901(config, m_maincpu, 16'670'000);
 		m_maincpu->add_asi_desc([](sparc_disassembler *dasm) { dasm->add_asi_desc(sun4_asi_desc); });
@@ -1920,19 +1921,19 @@ MACHINE_CONFIG_START(sun4_state::sun4)
 	rs232b.dcd_handler().set(m_scc2, FUNC(z80scc_device::dcdb_w));
 	rs232b.cts_handler().set(m_scc2, FUNC(z80scc_device::ctsb_w));
 
-	MCFG_NSCSI_BUS_ADD("scsibus")
-	MCFG_NSCSI_ADD("scsibus:0", sun_scsi_devices, "harddisk", false)
-	MCFG_NSCSI_ADD("scsibus:1", sun_scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:2", sun_scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:3", sun_scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:4", sun_scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:5", sun_scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:6", sun_scsi_devices, "cdrom", false)
-	MCFG_NSCSI_ADD("scsibus:7", sun_scsi_devices, "ncr53c90a", true)
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("ncr53c90a", [this] (device_t *device) { ncr53c90a(device); })
-MACHINE_CONFIG_END
+	NSCSI_BUS(config, "scsibus");
+	NSCSI_CONNECTOR(config, "scsibus:0", sun_scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "scsibus:1", sun_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:2", sun_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:3", sun_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:4", sun_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:5", sun_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:6", sun_scsi_devices, "cdrom");
+	NSCSI_CONNECTOR(config, "scsibus:7", sun_scsi_devices, "ncr53c90a", true).set_option_machine_config("ncr53c90a", [this] (device_t *device) { ncr53c90a(device); });
+}
 
-MACHINE_CONFIG_START(sun4_state::sun4c)
+void sun4_state::sun4c(machine_config &config)
+{
 	/* basic machine hardware */
 	MB86901(config, m_maincpu, 20'000'000);
 	m_maincpu->add_asi_desc([](sparc_disassembler *dasm) { dasm->add_asi_desc(sun4c_asi_desc); });
@@ -2004,23 +2005,22 @@ MACHINE_CONFIG_START(sun4_state::sun4c)
 	rs232b.dcd_handler().set(m_scc2, FUNC(z80scc_device::dcdb_w));
 	rs232b.cts_handler().set(m_scc2, FUNC(z80scc_device::ctsb_w));
 
-	MCFG_NSCSI_BUS_ADD("scsibus")
-	MCFG_NSCSI_ADD("scsibus:0", sun_scsi_devices, "harddisk", false)
-	MCFG_NSCSI_ADD("scsibus:1", sun_scsi_devices, "cdrom", false)
-	MCFG_NSCSI_ADD("scsibus:2", sun_scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:3", sun_scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:4", sun_scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:5", sun_scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:6", sun_scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:7", sun_scsi_devices, "ncr53c90a", true)
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("ncr53c90a", [this] (device_t *device) { ncr53c90a(device); })
+	NSCSI_BUS(config, "scsibus");
+	NSCSI_CONNECTOR(config, "scsibus:0", sun_scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "scsibus:1", sun_scsi_devices, "cdrom");
+	NSCSI_CONNECTOR(config, "scsibus:2", sun_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:3", sun_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:4", sun_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:5", sun_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:6", sun_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:7", sun_scsi_devices, "ncr53c90a", true).set_option_machine_config("ncr53c90a", [this] (device_t *device) { ncr53c90a(device); });
 
 	// SBus
 	SBUS(config, m_sbus, 20'000'000, "maincpu", "type1");
 	SBUS_SLOT(config, m_sbus_slot[0], 20'000'000, m_sbus, sbus_cards, nullptr);
 	SBUS_SLOT(config, m_sbus_slot[1], 20'000'000, m_sbus, sbus_cards, nullptr);
 	SBUS_SLOT(config, m_sbus_slot[2], 20'000'000, m_sbus, sbus_cards, nullptr);
-MACHINE_CONFIG_END
+}
 
 void sun4_state::sun4_20(machine_config &config)
 {

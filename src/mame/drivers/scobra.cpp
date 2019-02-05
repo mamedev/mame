@@ -897,7 +897,7 @@ MACHINE_CONFIG_START(scobra_state::type1)
 	ttl7474_device &ttl7474_9m_2(TTL7474(config, "7474_9m_2", 0));
 	ttl7474_9m_2.comp_output_cb().set(FUNC(scobra_state::galaxold_7474_9m_2_q_callback));
 
-	MCFG_TIMER_DRIVER_ADD("int_timer", scobra_state, galaxold_interrupt_timer)
+	TIMER(config, "int_timer").configure_generic(FUNC(scobra_state::galaxold_interrupt_timer));
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -1058,7 +1058,7 @@ MACHINE_CONFIG_START(scobra_state::hustler)
 	ttl7474_device &ttl7474_9m_2(TTL7474(config, "7474_9m_2", 0));
 	ttl7474_9m_2.comp_output_cb().set(FUNC(scobra_state::galaxold_7474_9m_2_q_callback));
 
-	MCFG_TIMER_DRIVER_ADD("int_timer", scobra_state, galaxold_interrupt_timer)
+	TIMER(config, "int_timer").configure_generic(FUNC(scobra_state::galaxold_interrupt_timer));
 
 	WATCHDOG_TIMER(config, "watchdog");
 

@@ -48,16 +48,13 @@ void electron_aqr_device::device_start()
 //  read - cartridge data read
 //-------------------------------------------------
 
-uint8_t electron_aqr_device::read(address_space &space, offs_t offset, int infc, int infd, int romqa)
+uint8_t electron_aqr_device::read(address_space &space, offs_t offset, int infc, int infd, int romqa, int oe, int oe2)
 {
 	uint8_t data = 0xff;
 
-	if (!infc && !infd)
+	if (oe)
 	{
-		if (offset >= 0x0000 && offset < 0x4000)
-		{
-			data = m_ram[(offset & 0x3fff) | (m_page_register << 14)];
-		}
+		data = m_ram[(offset & 0x3fff) | (m_page_register << 14)];
 	}
 
 	return data;
@@ -67,7 +64,7 @@ uint8_t electron_aqr_device::read(address_space &space, offs_t offset, int infc,
 //  write - cartridge data write
 //-------------------------------------------------
 
-void electron_aqr_device::write(address_space &space, offs_t offset, uint8_t data, int infc, int infd, int romqa)
+void electron_aqr_device::write(address_space &space, offs_t offset, uint8_t data, int infc, int infd, int romqa, int oe, int oe2)
 {
 	if (infc)
 	{
@@ -84,12 +81,8 @@ void electron_aqr_device::write(address_space &space, offs_t offset, uint8_t dat
 			break;
 		}
 	}
-
-	if (!infc && !infd)
+	else if (oe)
 	{
-		if (offset >= 0x0000 && offset < 0x4000 && !m_lock_register)
-		{
-			m_ram[(offset & 0x3fff) | (m_page_register << 14)] = data;
-		}
+		m_ram[(offset & 0x3fff) | (m_page_register << 14)] = data;
 	}
 }

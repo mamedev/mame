@@ -510,7 +510,7 @@ MACHINE_CONFIG_START(amstrad_pc_state::pc200)
 	m_maincpu->set_addrmap(AS_IO, &amstrad_pc_state::pc200_io);
 	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
-	MCFG_PCNOPPI_MOTHERBOARD_ADD("mb", "maincpu")
+	PCNOPPI_MOTHERBOARD(config, "mb", 0).set_cputag(m_maincpu);
 
 	// FIXME: determine ISA bus clock
 	MCFG_DEVICE_ADD("aga", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "aga_pc200", true)

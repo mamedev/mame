@@ -60,7 +60,7 @@ private:
 	/* NR signal */
 	uint8_t m_NR;
 
-	DECLARE_READ8_MEMBER(nmi_r);
+	uint8_t nmi_r();
 	DECLARE_WRITE8_MEMBER(elwro800jr_fdc_control_w);
 	DECLARE_READ8_MEMBER(elwro800jr_io_r);
 	DECLARE_WRITE8_MEMBER(elwro800jr_io_w);
@@ -99,12 +99,12 @@ private:
  *
  *************************************/
 
-READ8_MEMBER(elwro800_state::nmi_r)
+uint8_t elwro800_state::nmi_r()
 {
 	if (m_ram_at_0000)
 		return 0xdf;
 	else
-		return m_bank1->read8(space, 0x66);
+		return m_bank1->read8(0x66);
 }
 
 /*************************************
@@ -593,21 +593,22 @@ MACHINE_CONFIG_START(elwro800_state::elwro800)
 	m_centronics->ack_handler().set(FUNC(elwro800_state::write_centronics_ack));
 
 	INPUT_BUFFER(config, "cent_data_in");
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
 
 	I8251(config, m_i8251, 14_MHz_XTAL / 4);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(tzx_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(tzx_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
 
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", elwro800jr_floppies, "525hd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", elwro800jr_floppies, "525hd", floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, "upd765:0", elwro800jr_floppies, "525hd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765:1", elwro800jr_floppies, "525hd", floppy_image_device::default_floppy_formats);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K");

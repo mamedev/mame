@@ -323,7 +323,7 @@ MACHINE_CONFIG_START(pandoras_state::pandoras)
 	m_mcu->p1_out_cb().set("dac", FUNC(dac_byte_interface::data_w));
 	m_mcu->p2_out_cb().set(FUNC(pandoras_state::i8039_irqen_and_status_w));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - needed for correct synchronization of the sound CPUs */
+	config.m_minimum_quantum = attotime::from_hz(6000);  /* 100 CPU slices per frame - needed for correct synchronization of the sound CPUs */
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // C3
 	mainlatch.q_out_cb<0>().set(FUNC(pandoras_state::cpua_irq_enable_w)); // ENA

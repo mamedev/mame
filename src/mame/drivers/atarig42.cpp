@@ -67,7 +67,7 @@ void atarig42_state::machine_reset()
 WRITE8_MEMBER(atarig42_state::a2d_select_w)
 {
 	if (m_adc.found())
-		m_adc->address_offset_start_w(space, offset, 0);
+		m_adc->address_offset_start_w(offset, 0);
 }
 
 
@@ -76,9 +76,9 @@ READ8_MEMBER(atarig42_state::a2d_data_r)
 	if (!m_adc.found())
 		return 0xff;
 
-	uint8_t result = m_adc->data_r(space, 0);
+	uint8_t result = m_adc->data_r();
 	if (!machine().side_effects_disabled())
-		m_adc->address_offset_start_w(space, offset, 0);
+		m_adc->address_offset_start_w(offset, 0);
 	return result;
 }
 

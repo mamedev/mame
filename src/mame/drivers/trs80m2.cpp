@@ -736,10 +736,10 @@ MACHINE_CONFIG_START(trs80m2_state::trs80m2)
 	FD1791(config, m_fdc, 8_MHz_XTAL / 4);
 	m_fdc->intrq_wr_callback().set(m_pio, FUNC(z80pio_device::pa_w));
 	m_fdc->drq_wr_callback().set(m_dmac, FUNC(z80dma_device::rdy_w));
-	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":0", trs80m2_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":1", trs80m2_floppies, nullptr,    floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":2", trs80m2_floppies, nullptr,    floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":3", trs80m2_floppies, nullptr,    floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, FD1791_TAG":0", trs80m2_floppies, "8dsdd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, FD1791_TAG":1", trs80m2_floppies, nullptr, floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, FD1791_TAG":2", trs80m2_floppies, nullptr, floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, FD1791_TAG":3", trs80m2_floppies, nullptr, floppy_image_device::default_floppy_formats);
 
 	Z80CTC(config, m_ctc, 8_MHz_XTAL / 2);
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -747,7 +747,7 @@ MACHINE_CONFIG_START(trs80m2_state::trs80m2)
 	m_ctc->zc_callback<1>().set(Z80SIO_TAG, FUNC(z80dart_device::txca_w));
 	m_ctc->zc_callback<2>().set(Z80SIO_TAG, FUNC(z80dart_device::rxtxcb_w));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", trs80m2_state, ctc_tick, attotime::from_hz(8_MHz_XTAL / 2 / 2))
+	TIMER(config, "ctc").configure_periodic(FUNC(trs80m2_state::ctc_tick), attotime::from_hz(8_MHz_XTAL / 2 / 2));
 
 	Z80DMA(config, m_dmac, 8_MHz_XTAL / 2);
 	m_dmac->out_busreq_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
@@ -767,12 +767,14 @@ MACHINE_CONFIG_START(trs80m2_state::trs80m2)
 	z80sio0_device& sio(Z80SIO0(config, Z80SIO_TAG, 8_MHz_XTAL / 2));
 	sio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(m_pio, z80pio_device, strobe_b))
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, trs80m2_state, write_centronics_busy))
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, trs80m2_state, write_centronics_fault))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, trs80m2_state, write_centronics_perror))
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->ack_handler().set(m_pio, FUNC(z80pio_device::strobe_b));
+	m_centronics->busy_handler().set(FUNC(trs80m2_state::write_centronics_busy));
+	m_centronics->fault_handler().set(FUNC(trs80m2_state::write_centronics_fault));
+	m_centronics->perror_handler().set(FUNC(trs80m2_state::write_centronics_perror));
+
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
 
 	TRS80M2_KEYBOARD(config, m_kb, 0);
 	m_kb->clock_wr_callback().set(FUNC(trs80m2_state::kb_clock_w));
@@ -783,7 +785,7 @@ MACHINE_CONFIG_START(trs80m2_state::trs80m2)
 	RAM(config, RAM_TAG).set_default_size("64K").set_extra_options("32K,96K,128K,160K,192K,224K,256K,288K,320K,352K,384K,416K,448K,480K,512K");
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "trs80m2")
+	SOFTWARE_LIST(config, "flop_list").set_original("trs80m2");
 MACHINE_CONFIG_END
 
 
@@ -825,10 +827,10 @@ MACHINE_CONFIG_START(trs80m16_state::trs80m16)
 	FD1791(config, m_fdc, 8_MHz_XTAL / 4);
 	m_fdc->intrq_wr_callback().set(m_pio, FUNC(z80pio_device::pa_w));
 	m_fdc->drq_wr_callback().set(m_dmac, FUNC(z80dma_device::rdy_w));
-	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":0", trs80m2_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":1", trs80m2_floppies, nullptr,    floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":2", trs80m2_floppies, nullptr,    floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":3", trs80m2_floppies, nullptr,    floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, FD1791_TAG":0", trs80m2_floppies, "8dsdd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, FD1791_TAG":1", trs80m2_floppies, nullptr, floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, FD1791_TAG":2", trs80m2_floppies, nullptr, floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, FD1791_TAG":3", trs80m2_floppies, nullptr, floppy_image_device::default_floppy_formats);
 
 	Z80CTC(config, m_ctc, 8_MHz_XTAL / 2);
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -836,7 +838,7 @@ MACHINE_CONFIG_START(trs80m16_state::trs80m16)
 	m_ctc->zc_callback<1>().set(Z80SIO_TAG, FUNC(z80dart_device::txca_w));
 	m_ctc->zc_callback<2>().set(Z80SIO_TAG, FUNC(z80dart_device::rxtxcb_w));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", trs80m2_state, ctc_tick, attotime::from_hz(8_MHz_XTAL / 2 / 2))
+	TIMER(config, "ctc").configure_periodic(FUNC(trs80m2_state::ctc_tick), attotime::from_hz(8_MHz_XTAL / 2 / 2));
 
 	Z80DMA(config, m_dmac, 8_MHz_XTAL / 2);
 	m_dmac->out_busreq_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
@@ -859,12 +861,14 @@ MACHINE_CONFIG_START(trs80m16_state::trs80m16)
 	AM9519(config, m_uic, 0);
 	m_uic->out_int_callback().set_inputline(M68000_TAG, M68K_IRQ_5);
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(m_pio, z80pio_device, strobe_b))
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, trs80m2_state, write_centronics_busy))
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, trs80m2_state, write_centronics_fault))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, trs80m2_state, write_centronics_perror))
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->ack_handler().set(m_pio, FUNC(z80pio_device::strobe_b));
+	m_centronics->busy_handler().set(FUNC(trs80m2_state::write_centronics_busy));
+	m_centronics->fault_handler().set(FUNC(trs80m2_state::write_centronics_fault));
+	m_centronics->perror_handler().set(FUNC(trs80m2_state::write_centronics_perror));
+
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
 
 	TRS80M2_KEYBOARD(config, m_kb, 0);
 	m_kb->clock_wr_callback().set(FUNC(trs80m2_state::kb_clock_w));
@@ -875,7 +879,7 @@ MACHINE_CONFIG_START(trs80m16_state::trs80m16)
 	RAM(config, RAM_TAG).set_default_size("256K").set_extra_options("512K,768K,1M");
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "trs80m2")
+	SOFTWARE_LIST(config, "flop_list").set_original("trs80m2");
 MACHINE_CONFIG_END
 
 

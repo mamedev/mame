@@ -537,10 +537,10 @@ void sf_state::sfan(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &sf_state::sfan_map);
 	m_maincpu->set_vblank_int("screen", FUNC(sf_state::irq1_line_hold));
 
-	Z80(config, m_audiocpu, XTAL(3'579'545));	/* ? xtal is 3.579545MHz */
+	Z80(config, m_audiocpu, XTAL(3'579'545));   /* ? xtal is 3.579545MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &sf_state::sound_map);
 
-	z80_device &audio2(Z80(config, "audio2", XTAL(3'579'545)));	/* ? xtal is 3.579545MHz */
+	z80_device &audio2(Z80(config, "audio2", XTAL(3'579'545))); /* ? xtal is 3.579545MHz */
 	audio2.set_addrmap(AS_PROGRAM, &sf_state::sound2_map);
 	audio2.set_addrmap(AS_IO, &sf_state::sound2_io_map);
 	audio2.set_periodic_int(FUNC(sf_state::irq0_line_hold), attotime::from_hz(8000)); // ?
@@ -569,12 +569,12 @@ void sf_state::sfan(machine_config &config)
 	ymsnd.add_route(1, "rspeaker", 0.60);
 
 	MSM5205(config, m_msm[0], 384000);
-	m_msm[0]->set_prescaler_selector(msm5205_device::SEX_4B);	/* 8KHz playback ? */
+	m_msm[0]->set_prescaler_selector(msm5205_device::SEX_4B);   /* 8KHz playback ? */
 	m_msm[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_msm[0]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
 	MSM5205(config, m_msm[1], 384000);
-	m_msm[1]->set_prescaler_selector(msm5205_device::SEX_4B);	/* 8KHz playback ? */
+	m_msm[1]->set_prescaler_selector(msm5205_device::SEX_4B);   /* 8KHz playback ? */
 	m_msm[1]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_msm[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 }

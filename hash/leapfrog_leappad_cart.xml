@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="leapfrog_leappad_cart" description="LeapFrog LeapPad cartridges">
+
+	<software name="abc" supported="no">
+		<description>LeapPad ABC</description>
+		<year>20??</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="leappad_abc.bin" size="0x200000" crc="1f265010" sha1="a5fa878f5bcf92e80cb606d5f869d166d3805e05" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dino" supported="no">
+		<description>LeapPad Dinosaur</description>
+		<year>20??</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="leappad_dino.bin" size="0x400000" crc="5e306c92" sha1="7496f5b994a40ea07228b5ab27ec907fbcf603b4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>
+
+

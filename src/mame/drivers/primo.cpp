@@ -266,20 +266,20 @@ MACHINE_CONFIG_START(primo_state::primoa32)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* snapshot/quickload */
 	MCFG_SNAPSHOT_ADD("snapshot", primo_state, primo, "pss", 0)
 	MCFG_QUICKLOAD_ADD("quickload", primo_state, primo, "pp", 0)
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(primo_ptp_format)
-	MCFG_CASSETTE_CREATE_OPTS(&primo_cassette_options)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(primo_ptp_format);
+	m_cassette->set_create_opts(&primo_cassette_options);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED);
 
 	/* floppy from serial bus */
-	MCFG_CBM_IEC_ADD(nullptr)
+	cbm_iec_slot_device::add(config, m_iec, nullptr);
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot1", generic_plain_slot, nullptr)

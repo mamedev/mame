@@ -241,23 +241,28 @@ namespace plib {
 	{
 	public:
 		class generic_class;
+
+		template <class C>
+		using MemberFunctionType =  R (C::*)(Targs...);
+
 		pmfp() : pmfp_base<R, Targs...>(), m_obj(nullptr) {}
 
-		template<typename MemberFunctionType, typename O>
-		pmfp(MemberFunctionType mftp, O *object)
+		template<typename O>
+		pmfp(MemberFunctionType<O> mftp, O *object)
 		: pmfp_base<R, Targs...>()
 		{
 			this->set(mftp, object);
 		}
 
-		template<typename MemberFunctionType, typename O>
-		void set(MemberFunctionType mftp, O *object)
+
+		template<typename O>
+		void set(MemberFunctionType<O> mftp, O *object)
 		{
 			this->set_base(mftp, object);
 			m_obj = reinterpret_cast<generic_class *>(object);
 		}
 
-		inline R operator()(Targs... args)
+		inline R operator()(Targs ... args)
 		{
 			return this->call(m_obj, std::forward<Targs>(args)...);
 		}

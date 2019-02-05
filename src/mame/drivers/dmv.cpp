@@ -786,7 +786,7 @@ MACHINE_CONFIG_START(dmv_state::dmv)
 	kbmcu.p1_out_cb().set(FUNC(dmv_state::kb_mcu_port1_w)); // bit 1 data to kb
 	kbmcu.p2_out_cb().set(FUNC(dmv_state::kb_mcu_port2_w));
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	DMV_KEYBOARD(config, m_keyboard, 0);
 
@@ -825,8 +825,8 @@ MACHINE_CONFIG_START(dmv_state::dmv)
 	I8272A(config, m_fdc, 8'000'000, true);
 	m_fdc->intrq_wr_callback().set(FUNC(dmv_state::fdc_irq));
 	m_fdc->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq3_w));
-	MCFG_FLOPPY_DRIVE_ADD("i8272:0", dmv_floppies, "525dd", dmv_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("i8272:1", dmv_floppies, "525dd", dmv_state::floppy_formats)
+	FLOPPY_CONNECTOR(config, "i8272:0", dmv_floppies, "525dd", dmv_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "i8272:1", dmv_floppies, "525dd", dmv_state::floppy_formats);
 
 	PIT8253(config, m_pit, 0);
 	m_pit->set_clk<0>(50);
@@ -879,7 +879,7 @@ MACHINE_CONFIG_START(dmv_state::dmv)
 	MCFG_DMVCART_SLOT_OUT_INT_CB(WRITELINE(*this, dmv_state, busint7a_w))
 	MCFG_DMVCART_SLOT_OUT_IRQ_CB(WRITELINE(*this, dmv_state, irq7a_w))
 
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "dmv")
+	SOFTWARE_LIST(config, "flop_list").set_original("dmv");
 
 	MCFG_QUICKLOAD_ADD("quickload", dmv_state, dmv, "com,cpm", 3)
 

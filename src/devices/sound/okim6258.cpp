@@ -262,7 +262,7 @@ int okim6258_device::get_vclk()
 
 ***********************************************************************************************/
 
-READ8_MEMBER( okim6258_device::status_r )
+uint8_t okim6258_device::status_r()
 {
 	m_stream->update();
 
@@ -275,7 +275,7 @@ READ8_MEMBER( okim6258_device::status_r )
      okim6258_data_w -- write to the control port of an OKIM6258-compatible chip
 
 ***********************************************************************************************/
-WRITE8_MEMBER( okim6258_device::data_w )
+void okim6258_device::data_w(uint8_t data)
 {
 	/* update the stream */
 	m_stream->update();
@@ -291,7 +291,7 @@ WRITE8_MEMBER( okim6258_device::data_w )
 
 ***********************************************************************************************/
 
-WRITE8_MEMBER( okim6258_device::ctrl_w )
+void okim6258_device::ctrl_w(uint8_t data)
 {
 	m_stream->update();
 

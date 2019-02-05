@@ -281,7 +281,7 @@ MACHINE_CONFIG_START(dragrace_state::dragrace)
 
 	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 8);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("frame_timer", dragrace_state, dragrace_frame_callback, attotime::from_hz(60))
+	TIMER(config, "frame_timer").configure_periodic(FUNC(dragrace_state::dragrace_frame_callback), attotime::from_hz(60));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
