@@ -12,13 +12,13 @@ Notes:
 4. Only difference between all TI-86 drivers is ROM version.
 5. Video engine (with grayscale support) based on the idea found in VTI source
    emulator written by Rusty Wagner.
-6. NVRAM is saved properly only when calculator is turned off before exiting MESS.
+6. NVRAM is saved properly only when calculator is turned off before exiting MAME.
 7. To receive data from TI press "R" immediately after TI starts to send data.
 8. To request screen dump from calculator press "S".
 9. TI-81 does not have a serial link.
 
 Needed:
-1. Info about ports 3 (bit 2 seems to be allways 0) and 4.
+1. Info about ports 3 (bit 2 seems to be always 0) and 4.
 2. Any info on TI-81 hardware.
 3. ROM dumps of unemulated models.
 4. Artworks.
@@ -1089,7 +1089,13 @@ ROM_START (ti84pcse)
 	ROMX_LOAD( "ti84pcsev40.bin", 0x00000, 0x400000, CRC(e0b8ec78) SHA1(a4ffdfa0d2a8fc1b1356429675efc96b4f25fbc5), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "v42", "V 4.2" )
 	ROMX_LOAD( "ti84pcsev42.bin", 0x00000, 0x400000, CRC(57d5373d) SHA1(06acbd22c9cb31320e022791ac03ba695f058654), ROM_BIOS(1) )
+ROM_END
 
+ROM_START (ti84pcsev2)
+	ROM_REGION (0x400000, "flash",0)
+	ROM_DEFAULT_BIOS("v42")
+	ROM_SYSTEM_BIOS( 0, "v42", "V 4.2" )
+	ROMX_LOAD( "ti84pcsev42.bin", 0x00000, 0x400000, CRC(4b6c2342) SHA1(e2a9d0124f852af79643438c994f13abc47e07af), ROM_BIOS(0) )
 ROM_END
 
 ROM_START (ti84pce)
@@ -1109,47 +1115,67 @@ ROM_START (ti84pce)
 	ROMX_LOAD( "ti84pcev522.bin", 0x00000, 0x400000, CRC(49ce1768) SHA1(f949c8f2832edd33a1b0dd4da0ab4c1f23e47b21), ROM_BIOS(5) )
 	ROM_SYSTEM_BIOS( 6, "v530", "V 5.30" )
 	ROMX_LOAD( "ti84pcev530.bin", 0x00000, 0x400000, CRC(c72f36b8) SHA1(6856fb2a9d0a2e338a89b91bb7680180a69482d3), ROM_BIOS(6) )
+	ROM_SYSTEM_BIOS( 7, "v531", "V 5.31" )
+	ROMX_LOAD( "ti84pcev531.bin", 0x00000, 0x400000, CRC(6d269f68) SHA1(9f9321a0cff17c331c92be127ec67ef67317968b), ROM_BIOS(7) )
+ROM_END
+
+ROM_START (ti83pcev15)
+	ROM_REGION (0x400000, "flash",0)
+	ROM_DEFAULT_BIOS("v530") // 5.30 is the default because 5.31 disables some features
+	ROM_SYSTEM_BIOS( 0, "v515", "V 5.15" )
+	ROMX_LOAD( "ti83pcev15v515.bin", 0x00000, 0x400000, CRC(f924d8e6) SHA1(ffb100c0d0478c414e7ba4dd9d73791d026b40ca), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 1, "v520", "V 5.20" )
+	ROMX_LOAD( "ti83pcev15v520.bin", 0x00000, 0x400000, CRC(a403db1a) SHA1(a565d96e75bed354483c6904b9ee2b8054adc31e), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 2, "v521", "V 5.21" )
+	ROMX_LOAD( "ti83pcev15v521.bin", 0x00000, 0x400000, CRC(1dc2e3e3) SHA1(d8e44e1a8a6591b289766a881a81d33eca9a0ecc), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS( 3, "v530", "V 5.30" )
+	ROMX_LOAD( "ti83pcev15v530.bin", 0x00000, 0x400000, CRC(08ae7388) SHA1(6d9d98d090ac1b250d1f8ba8ef7c26eb448e7f8c), ROM_BIOS(3) )
+	ROM_SYSTEM_BIOS( 4, "v531", "V 5.31" )
+	ROMX_LOAD( "ti83pcev15v531.bin", 0x00000, 0x400000, CRC(6643adb3) SHA1(b380e15946c1749a56600d18fee7d9d3c658dee3), ROM_BIOS(4) )
 ROM_END
 
 ROM_START (ti84pcev15)
 	ROM_REGION (0x400000, "flash",0)
-	ROM_DEFAULT_BIOS("v530")
+	ROM_DEFAULT_BIOS("v530") // 5.30 is the default because 5.31 disables some features
 	ROM_SYSTEM_BIOS( 0, "v530", "V 5.30" )
 	ROMX_LOAD( "ti84pcev15v530.bin", 0x00000, 0x400000, CRC(0148cc26) SHA1(72a10379bbd9d427c6e73afa9fe316cbd502f53c), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 1, "v531", "V 5.31" )
+	ROMX_LOAD( "ti84pcev15v531.bin", 0x00000, 0x400000, CRC(86511ea0) SHA1(ff14ec454fd1e0a2c436b4eed1eefca0d16aabfb), ROM_BIOS(1) )
 ROM_END
 
 ROM_START (ti84pcev30)
 	ROM_REGION (0x400000, "flash",0)
-	ROM_DEFAULT_BIOS("v530")
+	ROM_DEFAULT_BIOS("v530") // 5.30 is the default because 5.31 disables some features
 	ROM_SYSTEM_BIOS( 0, "v530", "V 5.30" )
 	ROMX_LOAD( "ti84pcev30v530.bin", 0x00000, 0x400000, CRC(cc7a7047) SHA1(0d348e60dc57276b1f8d5ff87935e47cdd27455c), ROM_BIOS(0) )
 ROM_END
 
 //    YEAR  NAME        PARENT   COMPAT  MACHINE  INPUT  STATE       INIT        COMPANY              FULLNAME                                           FLAGS
+COMP( 201?, ti84pob,    ti84p,   0,      ti84p,   ti82,  ti85_state, empty_init, "Texas Instruments", "Orion TI-84 Plus (bootleg)",                      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 201?, ti84pov2,   ti84p,   0,      ti84p,   ti82,  ti85_state, empty_init, "Texas Instruments", "Orion TI-84 Plus (Boot Code 1.02)",               MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 201?, ti84pov3,   ti84p,   0,      ti84p,   ti82,  ti85_state, empty_init, "Texas Instruments", "Orion TI-84 Plus (Boot Code 1.03)",               MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 COMP( 1998, ti73,       0,       0,      ti73,    ti82,  ti85_state, empty_init, "Texas Instruments", "TI-73 Explorer",                                  MACHINE_NO_SOUND_HW )
+COMP( 20??, ti73b,      ti73,    0,      ti73,    ti82,  ti85_state, empty_init, "Texas Instruments", "TI-73 Explorer (bootleg)",                        MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
 COMP( 1990, ti81,       0,       0,      ti81,    ti81,  ti85_state, empty_init, "Texas Instruments", "TI-81",                                           MACHINE_NO_SOUND_HW )
 COMP( 1994, ti81v2,     ti81,    0,      ti81v2,  ti81,  ti85_state, empty_init, "Texas Instruments", "TI-81 v2.0",                                      MACHINE_NO_SOUND_HW )
 COMP( 1993, ti82,       0,       0,      ti82,    ti82,  ti85_state, empty_init, "Texas Instruments", "TI-82",                                           MACHINE_NO_SOUND_HW )
 COMP( 1996, ti83,       0,       0,      ti83,    ti83,  ti85_state, empty_init, "Texas Instruments", "TI-83",                                           MACHINE_NO_SOUND_HW )
-COMP( 1992, ti85,       0,       0,      ti85d,   ti85,  ti85_state, empty_init, "Texas Instruments", "TI-85",                                           MACHINE_NO_SOUND_HW )
-COMP( 1997, ti86,       0,       0,      ti86,    ti85,  ti85_state, empty_init, "Texas Instruments", "TI-86",                                           MACHINE_NO_SOUND_HW )
-COMP( 20??, ti73b,      ti73,    0,      ti73,    ti82,  ti85_state, empty_init, "Texas Instruments", "TI-73 Explorer (bootleg)",                        MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
 COMP( 1999, ti83p,      0,       0,      ti83p,   ti82,  ti85_state, empty_init, "Texas Instruments", "TI-83 Plus (Boot Code 1.00)",                     MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
 COMP( 20??, ti83pb,     ti83p,   0,      ti83p,   ti82,  ti85_state, empty_init, "Texas Instruments", "TI-83 Plus (bootleg)",                            MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
 COMP( 2001, ti83pse,    0,       0,      ti83pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-83 Plus Silver Edition (Boot Code 1.00)",      MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
 COMP( 20??, ti83pseb,   ti83pse, 0,      ti83pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-83 Plus Silver Edition (bootleg)",             MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+COMP( 201?, ti83pcev15, ti84pse, 0,      ti84pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-83 Premium CE (Boot Code 5.1.5.0014)",         MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
 COMP( 2004, ti84p,      0,       0,      ti84p,   ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus (Boot Code 1.00)",                     MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-COMP( 20??, ti84pb,     ti84p,   0,      ti84p,   ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus (bootleg)",                            MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-COMP( 2015, ti84pce,    ti84pse, 0,      ti84pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus Color Edition (Boot Code 5.0.0.0089)", MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-COMP( 2016, ti84pcev15, ti84pse, 0,      ti84pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus Color Edition (Boot Code 5.1.5.0014)", MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-COMP( 2017, ti84pcev30, ti84pse, 0,      ti84pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus Color Edition (Boot Code 5.3.0.0037)", MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-COMP( 20??, ti84pcse,   ti84pse, 0,      ti84pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus Color Silver Edition (Boot Code 4.0)", MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-COMP( 201?, ti84pob,    ti84p,   0,      ti84p,   ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus Orion (bootleg)",                      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-COMP( 201?, ti84pov2,   ti84p,   0,      ti84p,   ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus Orion (Boot Code 1.02)",               MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-COMP( 201?, ti84pov3,   ti84p,   0,      ti84p,   ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus Orion (Boot Code 1.03)",               MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 COMP( 200?, ti84pv2,    ti84p,   0,      ti84p,   ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus (Boot Code 1.02)",                     MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
 COMP( 2011, ti84pv3,    ti84p,   0,      ti84p,   ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus (Boot Code 1.03)",                     MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+COMP( 20??, ti84pb,     ti84p,   0,      ti84p,   ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus (bootleg)",                            MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+COMP( 20??, ti84pcse,   ti84pse, 0,      ti84pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus C Silver Edition (Boot Code 4.0)",     MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+COMP( 20??, ti84pcsev2, ti84pse, 0,      ti84pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus C Silver Edition (Boot Code 4.2)",     MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+COMP( 2015, ti84pce,    ti84pse, 0,      ti84pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus CE (Boot Code 5.0.0.0089)",            MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+COMP( 2016, ti84pcev15, ti84pse, 0,      ti84pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus CE (Boot Code 5.1.5.0014)",            MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+COMP( 2017, ti84pcev30, ti84pse, 0,      ti84pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus CE (Boot Code 5.3.0.0037)",            MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
 COMP( 2004, ti84pse,    0,       0,      ti84pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus Silver Edition (Boot Code 1.00)",      MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-COMP( 20??, ti84pseb,   ti84pse, 0,      ti84pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus Silver Edition (bootleg)",             MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
 COMP( 2011, ti84psev3,  ti84pse, 0,      ti84pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus Silver Edition (Boot Code 1.03)",      MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-
+COMP( 20??, ti84pseb,   ti84pse, 0,      ti84pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus Silver Edition (bootleg)",             MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+COMP( 1992, ti85,       0,       0,      ti85d,   ti85,  ti85_state, empty_init, "Texas Instruments", "TI-85",                                           MACHINE_NO_SOUND_HW )
+COMP( 1997, ti86,       0,       0,      ti86,    ti85,  ti85_state, empty_init, "Texas Instruments", "TI-86",                                           MACHINE_NO_SOUND_HW )
