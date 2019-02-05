@@ -1737,7 +1737,12 @@ ROM_START( xavjmat )
 	ROM_LOAD( "xpjmat.bin", 0x000000, 0x1000000, CRC(71a51eef) SHA1(41fd2c3013d1c86756046ec9174e94400f8fa06d) )
 ROM_END
 
-ROM_START( xavmusic ) // currently copies the wrong code into RAM to execute (due to extended ROM size, and possible banking)
+// currently copies the wrong code into RAM to execute (due to extended ROM size, and possible banking)
+// [:] ':maincpu' (00E074): rom_dmatrg_w (do DMA?) 01
+// [:]   (possible DMA op SRC 00ebe2d3 DST 358a LEN 0398)
+//         needs to come from 006be2d3 (so still from lower 8MB, not upper 8MB)
+
+ROM_START( xavmusic ) 
 	ROM_REGION( 0x1000000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "xpmusicandcircuit.bin", 0x000000, 0x1000000, CRC(e06129d2) SHA1(d074d0dd85ce870f435da3c066a7f52b50999665) )
 ROM_END
