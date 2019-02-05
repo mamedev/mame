@@ -124,6 +124,7 @@ namespace netlist
 		static constexpr ptime quantum() noexcept { return ptime(1, RES); }
 		static constexpr ptime never() noexcept { return ptime(plib::numeric_limits<internal_type>::max(), RES); }
 		static constexpr internal_type resolution() noexcept { return RES; }
+
 	private:
 		static constexpr const double inv_res = 1.0 / static_cast<double>(RES);
 		internal_type m_time;
@@ -133,6 +134,7 @@ namespace netlist
 	using netlist_time = ptime<UINT128, NETLIST_INTERNAL_RES>;
 #else
 	using netlist_time = ptime<std::uint64_t, NETLIST_INTERNAL_RES>;
+	static_assert(noexcept(netlist_time::from_nsec(1)) == true, "Not evaluated as constexpr");
 #endif
 }
 

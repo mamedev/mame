@@ -403,9 +403,17 @@ void netlist_state_t::reset()
 		case 1:     // brute force backward
 		{
 			log().verbose("Using brute force backward startup strategy");
+
+			for (auto &n : m_nets)  // only used if USE_COPY_INSTEAD_OF_REFERENCE == 1
+				n->update_inputs();
+
 			std::size_t i = m_devices.size();
 			while (i>0)
 				m_devices[--i]->update();
+
+			for (auto &n : m_nets)  // only used if USE_COPY_INSTEAD_OF_REFERENCE == 1
+				n->update_inputs();
+
 		}
 		break;
 		case 2:     // brute force forward
@@ -694,7 +702,7 @@ detail::net_t::net_t(netlist_base_t &nl, const pstring &aname, core_terminal_t *
 	, netlist_ref(nl)
 	, m_new_Q(*this, "m_new_Q", 0)
 	, m_cur_Q (*this, "m_cur_Q", 0)
-	, m_in_queue(*this, "m_in_queue", QS_DELIVERED)
+	, m_in_queue(*this, "m_in_queue", queue_status::DELIVERED)
 	, m_next_scheduled_time(*this, "m_time", netlist_time::zero())
 	, m_railterminal(mr)
 {
@@ -715,14 +723,18 @@ void detail::net_t::rebuild_list()
 		if (term->terminal_state() != logic_t::STATE_INP_PASSIVE)
 		{
 			m_list_active.push_back(term);
+			term->set_copied_input(m_cur_Q);
 		}
 }
-
 template <typename T>
-void detail::net_t::process(const T mask)
+void detail::net_t::process(const T mask, netlist_sig_t sig)
 {
+	m_cur_Q = sig;
+
 	for (auto & p : m_list_active)
 	{
+		p.set_copied_input(sig);
+
 		p.device().m_stat_call_count.inc();
 		if ((p.terminal_state() & mask))
 		{
@@ -743,13 +755,12 @@ void detail::net_t::update_devs() NL_NOEXCEPT
 	const auto mask((new_Q << core_terminal_t::INP_LH_SHIFT)
 			| (m_cur_Q << core_terminal_t::INP_HL_SHIFT));
 
-	m_in_queue = QS_DELIVERED; /* mark as taken ... */
+	m_in_queue = queue_status::DELIVERED; /* mark as taken ... */
 	switch (mask)
 	{
 		case core_terminal_t::STATE_INP_HL:
 		case core_terminal_t::STATE_INP_LH:
-			m_cur_Q = new_Q;
-			process(mask | core_terminal_t::STATE_INP_ACTIVE);
+			process(mask | core_terminal_t::STATE_INP_ACTIVE, new_Q);
 			break;
 		default:
 			/* do nothing */
@@ -760,7 +771,7 @@ void detail::net_t::update_devs() NL_NOEXCEPT
 void detail::net_t::reset()
 {
 	m_next_scheduled_time = netlist_time::zero();
-	m_in_queue = QS_DELIVERED;
+	m_in_queue = queue_status::DELIVERED;
 
 	m_new_Q = 0;
 	m_cur_Q = 0;
@@ -778,6 +789,7 @@ void detail::net_t::reset()
 		ct->reset();
 		if (ct->terminal_state() != logic_t::STATE_INP_PASSIVE)
 			m_list_active.push_back(ct);
+		ct->set_copied_input(m_cur_Q);
 	}
 }
 
@@ -849,6 +861,9 @@ detail::core_terminal_t::core_terminal_t(core_device_t &dev, const pstring &anam
 : device_object_t(dev, dev.name() + "." + aname)
 , plib::linkedlist_t<core_terminal_t>::element_t()
 , m_delegate(delegate)
+#if USE_COPY_INSTEAD_OF_REFERENCE
+, m_Q(*this, "m_Q", 0)
+#endif
 , m_net(nullptr)
 , m_state(*this, "m_state", state)
 {

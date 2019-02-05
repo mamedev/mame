@@ -30,6 +30,18 @@
  */
 #define USE_MEMPOOL                 (0)
 
+/*! Store input values in logic_terminal_t.
+ *
+ * Set to 1 to store values in logic_terminal_t instead of
+ * accessing them indirectly by pointer from logic_net_t.
+ * This approach is stricter and should identify bugs in
+ * the netlist core faster.
+ * By default it is disabled since it is not as fast as
+ * the default approach.
+ *
+ */
+#define USE_COPY_INSTEAD_OF_REFERENCE (0)
+
 /*
  * FIXME: Using truthtable is a lot slower than the explicit device
  *        in breakout. Performance drops by 20%. This can be fixed by

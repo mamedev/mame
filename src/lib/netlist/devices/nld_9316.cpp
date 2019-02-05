@@ -21,7 +21,6 @@ namespace netlist
 		, m_CLK(*this, "CLK", NETLIB_DELEGATE(9316, clk))
 		, m_ENT(*this, "ENT")
 		, m_LOADQ(*this, "LOADQ")
-		, m_cnt(*this, "m_cnt", 0)
 		, m_ENP(*this, "ENP")
 		, m_CLRQ(*this, "CLRQ")
 		, m_A(*this, "A", NETLIB_DELEGATE(9316, abcd))
@@ -30,7 +29,10 @@ namespace netlist
 		, m_D(*this, "D", NETLIB_DELEGATE(9316, abcd))
 		, m_Q(*this, {{ "QA", "QB", "QC", "QD" }})
 		, m_RC(*this, "RC")
+		, m_cnt(*this, "m_cnt", 0)
 		, m_abcd(*this, "m_abcd", 0)
+		, m_loadq(*this, "m_loadq", 0)
+		, m_ent(*this, "m_ent", 0)
 		{
 		}
 
@@ -48,8 +50,6 @@ namespace netlist
 		logic_input_t m_ENT;
 		logic_input_t m_LOADQ;
 
-		state_var_u8 m_cnt;
-
 		logic_input_t m_ENP;
 		logic_input_t m_CLRQ;
 
@@ -60,7 +60,14 @@ namespace netlist
 
 		object_array_t<logic_output_t, 4> m_Q;
 		logic_output_t m_RC;
+
+		/* counter state */
+		state_var_u8 m_cnt;
+
+		/* cached pins */
 		state_var_u8 m_abcd;
+		state_var_sig m_loadq;
+		state_var_sig m_ent;
 
 	private:
 		void update_outputs_all(const unsigned &cnt, const netlist_time &out_delay) noexcept
@@ -106,11 +113,10 @@ namespace netlist
 	NETLIB_HANDLER(9316, clk)
 	{
 		auto cnt(m_cnt);
-		if (m_LOADQ())
+		if (m_loadq)
 		{
 			++cnt &= MAXCNT;
 			//m_RC.push(m_ENT() && (cnt == MAXCNT), NLTIME_FROM_NS(27));
-
 			if (cnt > 0 && cnt < MAXCNT)
 				update_outputs_all(cnt, NLTIME_FROM_NS(20));
 			else if (cnt == 0)
@@ -120,14 +126,14 @@ namespace netlist
 			}
 			else
 			{
-				m_RC.push(m_ENT(), NLTIME_FROM_NS(27));
+				m_RC.push(m_ent, NLTIME_FROM_NS(27));
 				update_outputs_all(MAXCNT, NLTIME_FROM_NS(20));
 			}
 		}
 		else
 		{
 			cnt = m_abcd;
-			m_RC.push(m_ENT() && (cnt == MAXCNT), NLTIME_FROM_NS(27));
+			m_RC.push(m_ent && (cnt == MAXCNT), NLTIME_FROM_NS(27));
 			update_outputs_all(cnt, NLTIME_FROM_NS(22));
 		}
 		m_cnt = cnt;
@@ -136,9 +142,10 @@ namespace netlist
 	NETLIB_UPDATE(9316)
 	{
 		const netlist_sig_t CLRQ(m_CLRQ());
-		const netlist_sig_t ENT(m_ENT());
+		m_ent = m_ENT();
+		m_loadq = m_LOADQ();
 
-		if (((m_LOADQ() ^ 1) || (ENT && m_ENP())) && CLRQ)
+		if (((m_loadq ^ 1) || (m_ent && m_ENP())) && CLRQ)
 		{
 			m_CLK.activate_lh();
 		}
@@ -151,7 +158,7 @@ namespace netlist
 				update_outputs_all(m_cnt, NLTIME_FROM_NS(36));
 			}
 		}
-		m_RC.push(ENT && (m_cnt == MAXCNT), NLTIME_FROM_NS(27));
+		m_RC.push(m_ent && (m_cnt == MAXCNT), NLTIME_FROM_NS(27));
 	}
 
 
