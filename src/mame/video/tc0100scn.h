@@ -44,8 +44,8 @@ public:
 	void set_colbanks(u8 bg0, u8 bg1, u8 tx);
 
 	// read16s_handler
-	u16 ram_r(offs_t offset, u16 mem_mask = 0xffff);
-	u16 ctrl_r(offs_t offset, u16 mem_mask = 0xffff);
+	u16 ram_r(offs_t offset);
+	u16 ctrl_r(offs_t offset);
 
 	// write16s_handler
 	void ram_w(offs_t offset, u16 data, u16 mem_mask = 0xffff);

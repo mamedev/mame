@@ -217,7 +217,7 @@ void tc0100scn_device::device_start()
 	/* Double width versions */
 	m_tilemap[0][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(&tc0100scn_device::get_bg_tile_info<0x0000, 0>, "bg0_128x64", this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
 	m_tilemap[1][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(&tc0100scn_device::get_bg_tile_info<0x4000, 1>, "bg1_128x64", this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
-	m_tilemap[2][1] = &machine().tilemap().create(*this,        tilemap_get_info_delegate(&tc0100scn_device::get_tx_tile_info<0x9000, 1>, "fg0_128x32",  this), TILEMAP_SCAN_ROWS, 8, 8, 128, 32);
+	m_tilemap[2][1] = &machine().tilemap().create(*this,        tilemap_get_info_delegate(&tc0100scn_device::get_tx_tile_info<0x9000, 1>, "fg0_128x32", this), TILEMAP_SCAN_ROWS, 8, 8, 128, 32);
 
 	m_tilemap[0][0]->set_transparent_pen(0);
 	m_tilemap[1][0]->set_transparent_pen(0);
@@ -305,11 +305,11 @@ void tc0100scn_device::device_reset()
 template<int Offset, int Layer>
 TILE_GET_INFO_MEMBER(tc0100scn_device::get_bg_tile_info)
 {
-	/* Mahjong Quest (F2 system) inexplicably has a banking feature */
 	u32 code = m_ram[Offset + 2 * tile_index + 1];
 	u16 const attr = m_ram[Offset + 2 * tile_index];
 	u16 color = attr & 0xff;
 
+	/* Mahjong Quest (F2 system) inexplicably has a banking feature */
 	if (!m_tc0100scn_cb.isnull())
 		m_tc0100scn_cb(&code, &color);
 
@@ -390,7 +390,7 @@ void tc0100scn_device::device_post_load()
 	restore_scroll();
 }
 
-u16 tc0100scn_device::ram_r(offs_t offset, u16 mem_mask)
+u16 tc0100scn_device::ram_r(offs_t offset)
 {
 	return m_ram[offset];
 }
@@ -429,7 +429,7 @@ void tc0100scn_device::ram_w(offs_t offset, u16 data, u16 mem_mask)
 		m_tilemap[2][1]->mark_tile_dirty((offset & 0x0fff));
 }
 
-u16 tc0100scn_device::ctrl_r(offs_t offset, u16 mem_mask)
+u16 tc0100scn_device::ctrl_r(offs_t offset)
 {
 	return m_ctrl[offset];
 }
