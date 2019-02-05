@@ -172,6 +172,9 @@ namespace netlist
 	class source_t
 	{
 	public:
+
+		friend class setup_t;
+
 		enum type_t
 		{
 			SOURCE,
@@ -187,10 +190,12 @@ namespace netlist
 		virtual ~source_t() { }
 
 		virtual bool parse(const pstring &name);
-		virtual std::unique_ptr<plib::pistream> stream(const pstring &name) = 0;
-
 		setup_t &setup() { return m_setup; }
 		type_t type() const { return m_type; }
+
+	protected:
+		virtual std::unique_ptr<plib::pistream> stream(const pstring &name) = 0;
+
 	private:
 		setup_t &m_setup;
 		const type_t m_type;
@@ -370,6 +375,7 @@ namespace netlist
 		{
 		}
 
+	protected:
 		virtual std::unique_ptr<plib::pistream> stream(const pstring &name) override;
 
 	private:
@@ -385,6 +391,7 @@ namespace netlist
 		{
 		}
 
+	protected:
 		virtual std::unique_ptr<plib::pistream> stream(const pstring &name) override;
 
 	private:
@@ -399,6 +406,7 @@ namespace netlist
 		{
 		}
 
+	protected:
 		virtual std::unique_ptr<plib::pistream> stream(const pstring &name) override;
 
 	private:
@@ -416,6 +424,8 @@ namespace netlist
 		}
 
 		virtual bool parse(const pstring &name) override;
+
+	protected:
 		virtual std::unique_ptr<plib::pistream> stream(const pstring &name) override;
 
 	private:

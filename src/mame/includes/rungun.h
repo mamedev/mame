@@ -120,7 +120,6 @@ private:
 
 	INTERRUPT_GEN_MEMBER(rng_interrupt);
 
-	void k054539_map(address_map &map);
 	void rungun_map(address_map &map);
 	void rungun_sound_map(address_map &map);
 };

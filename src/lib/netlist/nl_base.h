@@ -493,9 +493,9 @@ namespace netlist
 
 		using list_t = std::vector<core_terminal_t *>;
 
-		static constexpr const unsigned INP_HL_SHIFT = 0;
-		static constexpr const unsigned INP_LH_SHIFT = 1;
-		static constexpr const unsigned INP_ACTIVE_SHIFT = 2;
+		static constexpr const auto INP_HL_SHIFT = 0;
+		static constexpr const auto INP_LH_SHIFT = 1;
+		static constexpr const auto INP_ACTIVE_SHIFT = 2;
 
 		enum state_e {
 			STATE_INP_PASSIVE = 0,
@@ -1084,19 +1084,27 @@ namespace netlist
 		{
 			if (m_hint_deactivate)
 			{
-				m_stat_inc_active.inc();
-				inc_active();
+				if (++m_active_outputs == 1)
+				{
+					m_stat_inc_active.inc();
+					inc_active();
+				}
 			}
 		}
 
 		void do_dec_active() NL_NOEXCEPT
 		{
 			if (m_hint_deactivate)
-				dec_active();
+				if (--m_active_outputs == 0)
+				{
+					dec_active();
+				}
 		}
 
 		void set_hint_deactivate(bool v) { m_hint_deactivate = v; }
 		bool get_hint_deactivate() { return m_hint_deactivate; }
+		/* Has to be set in device reset */
+		void set_active_outputs(int n) { m_active_outputs = n; }
 
 		void set_default_delegate(detail::core_terminal_t &term);
 
@@ -1124,7 +1132,8 @@ namespace netlist
 		virtual bool is_timestep() const { return false; }
 
 	private:
-		bool m_hint_deactivate;
+		bool 			m_hint_deactivate;
+		state_var_s32   m_active_outputs;
 	};
 
 	// -----------------------------------------------------------------------------

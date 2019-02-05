@@ -430,7 +430,7 @@ void netlist_t::process_queue(const netlist_time delta) NL_NOEXCEPT
 
 	m_queue.push(detail::queue_t::entry_t(stop, nullptr));
 
-	m_stat_mainloop.start();
+	auto sm_guard(m_stat_mainloop.guard());
 
 	if (m_mainclock == nullptr)
 	{
@@ -472,7 +472,6 @@ void netlist_t::process_queue(const netlist_time delta) NL_NOEXCEPT
 		} while (true); //while (e.m_object != nullptr);
 		mc_net.set_next_scheduled_time(mc_time);
 	}
-	m_stat_mainloop.stop();
 }
 
 void netlist_t::print_stats() const
@@ -504,13 +503,13 @@ void netlist_t::print_stats() const
 
 		nperftime_t<NL_KEEP_STATISTICS> overhead;
 		nperftime_t<NL_KEEP_STATISTICS> test;
-		overhead.start();
-		for (int j=0; j<100000;j++)
 		{
-			test.start();
-			test.stop();
+			auto overhead_guard(overhead.guard());
+			for (int j=0; j<100000;j++)
+			{
+				auto test_guard(test.guard());
+			}
 		}
-		overhead.stop();
 
 		nperftime_t<NL_KEEP_STATISTICS>::type total_overhead = overhead()
 				* static_cast<nperftime_t<NL_KEEP_STATISTICS>::type>(total_count)
@@ -518,6 +517,8 @@ void netlist_t::print_stats() const
 
 		log().verbose("Queue Pushes   {1:15}", m_queue.m_prof_call());
 		log().verbose("Queue Moves    {1:15}", m_queue.m_prof_sortmove());
+		log().verbose("Queue Removes  {1:15}", m_queue.m_prof_remove());
+		log().verbose("Queue Retimes  {1:15}", m_queue.m_prof_retime());
 
 		log().verbose("Total loop     {1:15}", m_stat_mainloop());
 		/* Only one serialization should be counted in total time */
@@ -570,6 +571,7 @@ core_device_t::core_device_t(netlist_base_t &owner, const pstring &name)
 	, logic_family_t()
 	, netlist_ref(owner)
 	, m_hint_deactivate(false)
+	, m_active_outputs(*this, "m_active_outputs", 1)
 {
 	if (logic_family() == nullptr)
 		set_logic_family(family_TTL());
@@ -580,6 +582,7 @@ core_device_t::core_device_t(core_device_t &owner, const pstring &name)
 	, logic_family_t()
 	, netlist_ref(owner.state())
 	, m_hint_deactivate(false)
+	, m_active_outputs(*this, "m_active_outputs", 1)
 {
 	set_logic_family(owner.logic_family());
 	if (logic_family() == nullptr)
@@ -723,9 +726,10 @@ void detail::net_t::process(const T mask)
 		p.device().m_stat_call_count.inc();
 		if ((p.terminal_state() & mask))
 		{
-			p.device().m_stat_total_time.start();
+			auto g(p.device().m_stat_total_time.guard());
+			//p.device().m_stat_total_time.start();
 			p.m_delegate();
-			p.device().m_stat_total_time.stop();
+			//p.device().m_stat_total_time.stop();
 		}
 	}
 }
@@ -740,16 +744,16 @@ void detail::net_t::update_devs() NL_NOEXCEPT
 			| (m_cur_Q << core_terminal_t::INP_HL_SHIFT));
 
 	m_in_queue = QS_DELIVERED; /* mark as taken ... */
-
-	if (mask == core_terminal_t::STATE_INP_HL)
+	switch (mask)
 	{
-		m_cur_Q = new_Q;
-		process(core_terminal_t::STATE_INP_HL | core_terminal_t::STATE_INP_ACTIVE);
-	}
-	else if (mask == core_terminal_t::STATE_INP_LH)
-	{
-		m_cur_Q = new_Q;
-		process(core_terminal_t::STATE_INP_LH | core_terminal_t::STATE_INP_ACTIVE);
+		case core_terminal_t::STATE_INP_HL:
+		case core_terminal_t::STATE_INP_LH:
+			m_cur_Q = new_Q;
+			process(mask | core_terminal_t::STATE_INP_ACTIVE);
+			break;
+		default:
+			/* do nothing */
+			break;
 	}
 }
 

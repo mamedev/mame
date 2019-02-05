@@ -110,7 +110,7 @@ class nascom2_state : public nascom_state
 public:
 	nascom2_state(const machine_config &mconfig, device_type type, const char *tag) :
 		nascom_state(mconfig, type, tag),
-		m_nasbus(*this, "nasbus"),
+		m_nasbus(*this, NASBUS_TAG),
 		m_socket1(*this, "socket1"),
 		m_socket2(*this, "socket2"),
 		m_lsw1(*this, "lsw1")

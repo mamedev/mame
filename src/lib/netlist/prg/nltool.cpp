@@ -337,78 +337,82 @@ static std::vector<input_t> read_input(const netlist::setup_t &setup, pstring fn
 void tool_app_t::run()
 {
 	plib::chrono::timer<plib::chrono::system_ticks> t;
-	t.start();
-
+	std::vector<input_t> inps;
+	netlist::netlist_time ttr;
 	netlist_tool_t nt(*this, "netlist");
-	//plib::perftime_t<plib::exact_ticks> t;
 
-	nt.init();
+	{
+		auto t_guard(t.guard());
+		//plib::perftime_t<plib::exact_ticks> t;
 
-	if (!opt_verb())
-		nt.log().verbose.set_enabled(false);
-	if (opt_quiet())
-		nt.log().warning.set_enabled(false);
+		nt.init();
 
-	nt.read_netlist(opt_file(), opt_name(),
-			opt_logs(),
-			m_options, opt_rfolders());
+		if (!opt_verb())
+			nt.log().verbose.set_enabled(false);
+		if (opt_quiet())
+			nt.log().warning.set_enabled(false);
 
-	std::vector<input_t> inps = read_input(nt.setup(), opt_inp());
+		nt.read_netlist(opt_file(), opt_name(),
+				opt_logs(),
+				m_options, opt_rfolders());
 
-	netlist::netlist_time ttr = netlist::netlist_time::from_double(opt_ttr());
-	t.stop();
+		inps = read_input(nt.setup(), opt_inp());
+		ttr = netlist::netlist_time::from_double(opt_ttr());
+	}
+
 
 	pout("startup time ==> {1:5.3f}\n", t.as_seconds() );
 
 	t.reset();
-	t.start();
 
-	// FIXME: error handling
-	if (opt_loadstate.was_specified())
-	{
-		plib::pifilestream strm(opt_loadstate());
-		plib::pbinary_reader reader(strm);
-		std::vector<char> loadstate;
-		reader.read(loadstate);
-		nt.load_state(loadstate);
-		pout("Loaded state, run will continue at {1:.6f}\n", nt.time().as_double());
-	}
-
-	unsigned pos = 0;
 	netlist::netlist_time nlt = nt.time();
-
-
-	while (pos < inps.size()
-			&& inps[pos].m_time < ttr
-			&& inps[pos].m_time >= nlt)
 	{
-		nt.process_queue(inps[pos].m_time - nlt);
-		inps[pos].setparam();
-		nlt = inps[pos].m_time;
-		pos++;
+		auto t_guard(t.guard());
+
+		// FIXME: error handling
+		if (opt_loadstate.was_specified())
+		{
+			plib::pifilestream strm(opt_loadstate());
+			plib::pbinary_reader reader(strm);
+			std::vector<char> loadstate;
+			reader.read(loadstate);
+			nt.load_state(loadstate);
+			pout("Loaded state, run will continue at {1:.6f}\n", nt.time().as_double());
+		}
+
+		unsigned pos = 0;
+
+
+		while (pos < inps.size()
+				&& inps[pos].m_time < ttr
+				&& inps[pos].m_time >= nlt)
+		{
+			nt.process_queue(inps[pos].m_time - nlt);
+			inps[pos].setparam();
+			nlt = inps[pos].m_time;
+			pos++;
+		}
+
+		pout("runnning ...\n");
+
+		if (ttr > nlt)
+			nt.process_queue(ttr - nlt);
+		else
+		{
+			pout("end time {1:.6f} less than saved time {2:.6f}\n",
+					ttr.as_double(), nlt.as_double());
+			ttr = nlt;
+		}
+
+		if (opt_savestate.was_specified())
+		{
+			auto savestate = nt.save_state();
+			plib::pofilestream strm(opt_savestate());
+			plib::pbinary_writer writer(strm);
+			writer.write(savestate);
+		}
+		nt.stop();
 	}
-
-	pout("runnning ...\n");
-
-	if (ttr > nlt)
-		nt.process_queue(ttr - nlt);
-	else
-	{
-		pout("end time {1:.6f} less than saved time {2:.6f}\n",
-				ttr.as_double(), nlt.as_double());
-		ttr = nlt;
-	}
-
-	if (opt_savestate.was_specified())
-	{
-		auto savestate = nt.save_state();
-		plib::pofilestream strm(opt_savestate());
-		plib::pbinary_writer writer(strm);
-		writer.write(savestate);
-	}
-	nt.stop();
-
-	t.stop();
 
 	double emutime = t.as_seconds();
 	pout("{1:f} seconds emulation took {2:f} real time ==> {3:5.2f}%\n",
