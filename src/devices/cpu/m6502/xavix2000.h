@@ -139,7 +139,6 @@ protected:
 	O(cmc_imp);
 	O(sev_imp);
 
-	O(callf_aba);
 	O(jmpf_ind);
 
 #undef O
