@@ -285,6 +285,7 @@ VIDEOS["BUFSPRITE"] = true
 VIDEOS["CESBLIT"] = true
 --VIDEOS["CRT9007"] = true
 --VIDEOS["CRT9021"] = true
+--VIDEOS["CRT9028"] = true
 --VIDEOS["CRT9212"] = true
 VIDEOS["CRTC_EGA"] = true
 --VIDEOS["DL1416"] = true

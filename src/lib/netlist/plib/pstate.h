@@ -56,8 +56,8 @@ public:
 		virtual ~callback_t();
 
 		virtual void register_state(state_manager_t &manager, const pstring &module) = 0;
-		virtual void on_pre_save() = 0;
-		virtual void on_post_load() = 0;
+		virtual void on_pre_save(state_manager_t &manager) = 0;
+		virtual void on_post_load(state_manager_t &manager) = 0;
 	protected:
 	};
 

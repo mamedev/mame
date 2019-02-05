@@ -301,7 +301,7 @@ public:
 	{
 		int pos = (upto - m_last_buffer_time) / m_sample_time;
 		if (pos > m_bufsize)
-			state().log().fatal("sound {1}: pos {2} exceeded bufsize {3}\n", name().c_str(), pos, m_bufsize);
+			throw emu_fatalerror("sound %s: pos %d exceeded bufsize %d\n", name().c_str(), pos, m_bufsize);
 		while (m_last_pos < pos )
 		{
 			m_buffer[m_last_pos++] = (stream_sample_t) m_cur;
@@ -1050,10 +1050,8 @@ ATTR_COLD uint64_t netlist_mame_cpu_device::execute_cycles_to_clocks(uint64_t cy
 
 ATTR_HOT void netlist_mame_cpu_device::execute_run()
 {
-	bool check_debugger = ((device_t::machine().debug_flags & DEBUG_FLAG_ENABLED) != 0);
-	// debugging
 	//m_ppc = m_pc; // copy PC to previous PC
-	if (check_debugger)
+	if (debugger_enabled())
 	{
 		while (m_icount > 0)
 		{

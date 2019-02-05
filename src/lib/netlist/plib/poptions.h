@@ -27,7 +27,7 @@ public:
 	option_base(options &parent, pstring help);
 	virtual ~option_base();
 
-	pstring help() { return m_help; }
+	pstring help() const { return m_help; }
 private:
 	pstring m_help;
 };
@@ -39,7 +39,7 @@ public:
 	: option_base(parent, help), m_group(group) { }
 	~option_group();
 
-	pstring group() { return m_group; }
+	pstring group() const { return m_group; }
 private:
 	pstring m_group;
 };
@@ -51,7 +51,7 @@ public:
 	: option_base(parent, help), m_example(group) { }
 	~option_example();
 
-	pstring example() { return m_example; }
+	pstring example() const { return m_example; }
 private:
 	pstring m_example;
 };
@@ -93,7 +93,7 @@ public:
 	: option(parent, ashort, along, help, true), m_val(defval)
 	{}
 
-	pstring operator ()() { return m_val; }
+	pstring operator ()() const { return m_val; }
 
 protected:
 	virtual int parse(const pstring &argument) override;
@@ -128,7 +128,7 @@ public:
 	{
 	}
 
-	T operator ()() { return m_val; }
+	T operator ()() const { return m_val; }
 
 	pstring as_string() const { return limit()[m_val]; }
 
@@ -157,7 +157,7 @@ public:
 	: option(parent, ashort, along, help, false), m_val(false)
 	{}
 
-	bool operator ()() { return m_val; }
+	bool operator ()() const { return m_val; }
 
 protected:
 	virtual int parse(const pstring &argument) override;
@@ -180,7 +180,7 @@ public:
 	, m_max(maxval)
 	{}
 
-	T operator ()() { return m_val; }
+	T operator ()() const { return m_val; }
 
 protected:
 	virtual int parse(const pstring &argument) override
@@ -203,7 +203,7 @@ public:
 	: option(parent, ashort, along, help, true)
 	{}
 
-	std::vector<pstring> operator ()() { return m_val; }
+	const std::vector<pstring> &operator ()() const { return m_val; }
 
 protected:
 	virtual int parse(const pstring &argument) override;
@@ -233,9 +233,9 @@ public:
 	int parse(int argc, char *argv[]);
 
 	pstring help(pstring description, pstring usage,
-			unsigned width = 72, unsigned indent = 20);
+			unsigned width = 72, unsigned indent = 20) const;
 
-	pstring app() { return m_app; }
+	pstring app() const { return m_app; }
 
 private:
 	static pstring split_paragraphs(pstring text, unsigned width, unsigned indent,
@@ -244,7 +244,7 @@ private:
 	void check_consistency();
 
 	template <typename T>
-	T *getopt_type()
+	T *getopt_type() const
 	{
 		for (auto & optbase : m_opts )
 		{
@@ -254,8 +254,8 @@ private:
 		return nullptr;
 	}
 
-	option *getopt_short(pstring arg);
-	option *getopt_long(pstring arg);
+	option *getopt_short(pstring arg) const;
+	option *getopt_long(pstring arg) const;
 
 	std::vector<option_base *> m_opts;
 	pstring m_app;

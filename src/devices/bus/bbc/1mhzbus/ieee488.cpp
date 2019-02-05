@@ -54,7 +54,8 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(bbc_ieee488_device::device_add_mconfig)
+void bbc_ieee488_device::device_add_mconfig(machine_config &config)
+{
 	TMS9914(config, m_tms9914, 5_MHz_XTAL);
 	m_tms9914->int_write_cb().set(DEVICE_SELF_OWNER, FUNC(bbc_1mhzbus_slot_device::irq_w));
 	m_tms9914->dio_read_cb().set(IEEE488_TAG, FUNC(ieee488_device::dio_r));
@@ -67,23 +68,25 @@ MACHINE_CONFIG_START(bbc_ieee488_device::device_add_mconfig)
 	m_tms9914->srq_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_srq_w));
 	m_tms9914->atn_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_atn_w));
 	m_tms9914->ren_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_ren_w));
-	MCFG_IEEE488_BUS_ADD()
-	MCFG_IEEE488_EOI_CALLBACK(WRITELINE(m_tms9914, tms9914_device, eoi_w))
-	MCFG_IEEE488_DAV_CALLBACK(WRITELINE(m_tms9914, tms9914_device, dav_w))
-	MCFG_IEEE488_NRFD_CALLBACK(WRITELINE(m_tms9914, tms9914_device, nrfd_w))
-	MCFG_IEEE488_NDAC_CALLBACK(WRITELINE(m_tms9914, tms9914_device, ndac_w))
-	MCFG_IEEE488_IFC_CALLBACK(WRITELINE(m_tms9914, tms9914_device, ifc_w))
-	MCFG_IEEE488_SRQ_CALLBACK(WRITELINE(m_tms9914, tms9914_device, srq_w))
-	MCFG_IEEE488_ATN_CALLBACK(WRITELINE(m_tms9914, tms9914_device, atn_w))
-	MCFG_IEEE488_REN_CALLBACK(WRITELINE(m_tms9914, tms9914_device, ren_w))
-	MCFG_IEEE488_SLOT_ADD("ieee_dev", 0, cbm_ieee488_devices, nullptr)
+
+	IEEE488(config, m_ieee);
+	m_ieee->eoi_callback().set(m_tms9914, FUNC(tms9914_device::eoi_w));
+	m_ieee->dav_callback().set(m_tms9914, FUNC(tms9914_device::dav_w));
+	m_ieee->nrfd_callback().set(m_tms9914, FUNC(tms9914_device::nrfd_w));
+	m_ieee->ndac_callback().set(m_tms9914, FUNC(tms9914_device::ndac_w));
+	m_ieee->ifc_callback().set(m_tms9914, FUNC(tms9914_device::ifc_w));
+	m_ieee->srq_callback().set(m_tms9914, FUNC(tms9914_device::srq_w));
+	m_ieee->atn_callback().set(m_tms9914, FUNC(tms9914_device::atn_w));
+	m_ieee->ren_callback().set(m_tms9914, FUNC(tms9914_device::ren_w));
+	IEEE488_SLOT(config, "ieee_dev", 0, cbm_ieee488_devices, nullptr);
 
 	BBC_1MHZBUS_SLOT(config, m_1mhzbus, DERIVED_CLOCK(1, 1), bbc_1mhzbus_devices, nullptr);
 	m_1mhzbus->irq_handler().set(DEVICE_SELF_OWNER, FUNC(bbc_1mhzbus_slot_device::irq_w));
 	m_1mhzbus->nmi_handler().set(DEVICE_SELF_OWNER, FUNC(bbc_1mhzbus_slot_device::nmi_w));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(bbc_b488_device::device_add_mconfig)
+void bbc_b488_device::device_add_mconfig(machine_config &config)
+{
 	TMS9914(config, m_tms9914, 5_MHz_XTAL); // TODO: verify clock
 	m_tms9914->int_write_cb().set(DEVICE_SELF_OWNER, FUNC(bbc_1mhzbus_slot_device::irq_w));
 	m_tms9914->dio_read_cb().set(IEEE488_TAG, FUNC(ieee488_device::dio_r));
@@ -96,35 +99,37 @@ MACHINE_CONFIG_START(bbc_b488_device::device_add_mconfig)
 	m_tms9914->srq_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_srq_w));
 	m_tms9914->atn_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_atn_w));
 	m_tms9914->ren_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_ren_w));
-	MCFG_IEEE488_BUS_ADD()
-	MCFG_IEEE488_EOI_CALLBACK(WRITELINE(m_tms9914, tms9914_device, eoi_w))
-	MCFG_IEEE488_DAV_CALLBACK(WRITELINE(m_tms9914, tms9914_device, dav_w))
-	MCFG_IEEE488_NRFD_CALLBACK(WRITELINE(m_tms9914, tms9914_device, nrfd_w))
-	MCFG_IEEE488_NDAC_CALLBACK(WRITELINE(m_tms9914, tms9914_device, ndac_w))
-	MCFG_IEEE488_IFC_CALLBACK(WRITELINE(m_tms9914, tms9914_device, ifc_w))
-	MCFG_IEEE488_SRQ_CALLBACK(WRITELINE(m_tms9914, tms9914_device, srq_w))
-	MCFG_IEEE488_ATN_CALLBACK(WRITELINE(m_tms9914, tms9914_device, atn_w))
-	MCFG_IEEE488_REN_CALLBACK(WRITELINE(m_tms9914, tms9914_device, ren_w))
-	MCFG_IEEE488_SLOT_ADD("ieee_dev", 0, cbm_ieee488_devices, nullptr)
+
+	IEEE488(config, m_ieee);
+	m_ieee->eoi_callback().set(m_tms9914, FUNC(tms9914_device::eoi_w));
+	m_ieee->dav_callback().set(m_tms9914, FUNC(tms9914_device::dav_w));
+	m_ieee->nrfd_callback().set(m_tms9914, FUNC(tms9914_device::nrfd_w));
+	m_ieee->ndac_callback().set(m_tms9914, FUNC(tms9914_device::ndac_w));
+	m_ieee->ifc_callback().set(m_tms9914, FUNC(tms9914_device::ifc_w));
+	m_ieee->srq_callback().set(m_tms9914, FUNC(tms9914_device::srq_w));
+	m_ieee->atn_callback().set(m_tms9914, FUNC(tms9914_device::atn_w));
+	m_ieee->ren_callback().set(m_tms9914, FUNC(tms9914_device::ren_w));
+	IEEE488_SLOT(config, "ieee_dev", 0, cbm_ieee488_devices, nullptr);
 
 	// TODO: LED's for ATN, TALK, and DATA
-MACHINE_CONFIG_END
+}
 
-//MACHINE_CONFIG_START(bbc_procyon_device::device_add_mconfig)
+//void bbc_procyon_device::device_add_mconfig(machine_config &config)
+//{
 	// TODO: Implement MC68488
-	//MCFG_IEEE488_BUS_ADD()
-	//MCFG_IEEE488_EOI_CALLBACK(WRITELINE(m_mc68488, mc68488_device, eoi_w))
-	//MCFG_IEEE488_DAV_CALLBACK(WRITELINE(m_mc68488, mc68488_device, dav_w))
-	//MCFG_IEEE488_NRFD_CALLBACK(WRITELINE(m_mc68488, mc68488_device, nrfd_w))
-	//MCFG_IEEE488_NDAC_CALLBACK(WRITELINE(m_mc68488, mc68488_device, ndac_w))
-	//MCFG_IEEE488_IFC_CALLBACK(WRITELINE(m_mc68488, mc68488_device, ifc_w))
-	//MCFG_IEEE488_SRQ_CALLBACK(WRITELINE(m_mc68488, mc68488_device, srq_w))
-	//MCFG_IEEE488_ATN_CALLBACK(WRITELINE(m_mc68488, mc68488_device, atn_w))
-	//MCFG_IEEE488_REN_CALLBACK(WRITELINE(m_mc68488, mc68488_device, ren_w))
-	//MCFG_IEEE488_SLOT_ADD("ieee_dev", 0, cbm_ieee488_devices, nullptr)
+	//IEEE488(config, m_ieee);
+	//m_ieee->eoi_callback(m_mc68488, FUNC(mc68488_device::eoi_w));
+	//m_ieee->dav_callback(m_mc68488, FUNC(mc68488_device::dav_w));
+	//m_ieee->nrfd_callback(m_mc68488, FUNC(mc68488_device::nrfd_w));
+	//m_ieee->ndac_callback(m_mc68488, FUNC(mc68488_device::ndac_w));
+	//m_ieee->ifc_callback(m_mc68488, FUNC(mc68488_device::ifc_w));
+	//m_ieee->srq_callback(m_mc68488, FUNC(mc68488_device::srq_w));
+	//m_ieee->atn_callback(m_mc68488, FUNC(mc68488_device::atn_w));
+	//m_ieee->ren_callback(m_mc68488, FUNC(mc68488_device::ren_w));
+	//IEEE488_SLOT(config, "ieee_dev", 0, cbm_ieee488_devices, nullptr);
 
 	// TODO: LED's for Bus Active, Byte Out, and Byte In
-//MACHINE_CONFIG_END
+//}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

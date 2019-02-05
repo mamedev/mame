@@ -160,7 +160,7 @@ Language:
 |        |          (IT)     | Toy Story 3 (EAN 8033836704196) GP470419?                                  |
 |        | 80-084422(NL)     | Toy Story 3                                                                |
 |        | 80-084423(UK)     | Toy Story 3                                                                |
-|        | 80-084424(GE)     | Toy Story 3                                                                |
+|   XX   | 80-084424(GE)     | Toy Story 3                                                                |
 |        | 80-084425(FR)     | Toy Story 3                                                                |
 |        | 80-084427(SP)     | Toy Story 3                                                                |
 +========+===================+============================================================================+
@@ -184,10 +184,10 @@ Language:
 |        | 80-084485(FR)     | La Princesse Et La Grenouille                                              |
 |        | 80-084487(SP)     | Tiana y el Sapo - El gran sueño de Tiana                                   |
 +========+===================+============================================================================+
-|        | 80-084500(US)     | Shrek Forever After                                                        |
+|   XX   | 80-084500(US)     | Shrek Forever After                                                        |
 |        | 80-084502(NL)     | Sjrek voor eeuwig en altijd                                                |
 |        | 80-084503(UK)     | Shrek Forever After                                                        |
-|        | 80-084504(GE)     | Fuer immer Shrek                                                           |
+|   XX   | 80-084504(GE)     | Fuer immer Shrek                                                           |
 |        | 80-084505(FR)     | Shrek 4 - Il Etait une Fin                                                 |
 |        | 80-084507(SP)     | Shrek Felices para siempre                                                 |
 +========+===================+============================================================================+
@@ -405,6 +405,38 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 		</part>
 	</software>
 
+	<software name="shrekfa" supported="no">
+		<description>Shrek Forever After (US)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084500(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="84500 E" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM --> <!-- 2 globs, uses /CS2 for 2nd glob -->
+			<feature name="u2" value="" /> <!-- EPOXY BLOB ROM --> 
+			<dataarea name="rom" size="0x1000000">
+				<rom name="vsmile84500.blob1.bin" size="0x0800000" crc="175117f1" sha1="48231caf853e27856eb033d14937b7eb7e74198c" offset="0x0000000" />
+				<rom name="vsmile84500.blob2.bin" size="0x0800000" crc="5dc681ea" sha1="1a3a2ff08bd52ad74183b09059082b492000e571" offset="0x0800000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fimshrek" supported="no">
+		<description>Für immer Shrek (Ger)</description>
+		<year>2010</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084504(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="710654-1" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM --> <!-- 2 globs, uses /CS2 for 2nd glob -->
+			<feature name="u2" value="" /> <!-- EPOXY BLOB ROM --> 
+			<dataarea name="rom" size="0x1000000">
+				<rom name="vsmile84504.blob1.bin" size="0x0800000" crc="3f1c79e2" sha1="1b12b9b379dd942356e6ee6594c8b80dbb9db781" offset="0x0000000" />
+				<rom name="vsmile84504.blob2.bin" size="0x0800000" crc="78cf731b" sha1="9b1d1eed7bd216f4feca3160c31912b7c81e4efd" offset="0x0800000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="spidermn" supported="no">
 		<description>Spider-Man &amp; Freunde - Geheime Missionen (Ger)</description>
 		<year>2010</year>
@@ -458,6 +490,22 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="C84324.u1" size="8388608" crc="9e207566" sha1="bb3e180a2c69306b56f08909a05dc83309be0f09" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="toystor3g" supported="no">
+		<description>Toy Story 3 (Ger)</description>
+		<year>2010</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084424(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="710654-2" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM --> <!-- 2 globs, uses /CS2 for 2nd glob -->
+			<feature name="u2" value="" /> <!-- EPOXY BLOB ROM --> 
+			<dataarea name="rom" size="0x1000000">
+				<rom name="vsmile84424.blob1.bin" size="0x0800000" crc="845bbb46" sha1="1b11bb1a119715073560b40d65b77894043dd67a" offset="0x0000000" />
+				<rom name="vsmile84424.blob2.bin" size="0x0800000" crc="c006e9b6" sha1="2f4b32ba578117caa53bb0bf9db717d8d9dd8a13" offset="0x0800000" />
 			</dataarea>
 		</part>
 	</software>

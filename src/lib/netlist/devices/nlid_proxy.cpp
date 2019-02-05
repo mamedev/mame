@@ -161,7 +161,7 @@ namespace netlist
 				m_RV.update();
 			}
 			m_RV.set(NL_FCONST(1.0) / R, V, 0.0);
-			m_RV.m_P.schedule_solve_after(NLTIME_FROM_NS(1));
+			m_RV.solve_later();
 		}
 	}
 

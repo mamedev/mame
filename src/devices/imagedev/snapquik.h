@@ -40,7 +40,8 @@ public:
 	virtual const char *file_extensions() const override { return m_file_extensions; }
 
 	TIMER_CALLBACK_MEMBER(process_snapshot_or_quickload);
-	void set_handler(snapquick_load_delegate load, const char *ext, seconds_t sec) { m_load = load; m_file_extensions = ext; m_delay_seconds = sec; };
+	void set_handler(snapquick_load_delegate load, const char *ext, s32 delay) { m_load = load; m_file_extensions = ext; m_delay = attotime::from_seconds(delay); };
+	void set_handler(snapquick_load_delegate load, const char *ext, double delay) { m_load = load; m_file_extensions = ext; m_delay = attotime::from_double(delay); };
 
 protected:
 	snapshot_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -51,8 +52,7 @@ protected:
 	snapquick_load_delegate m_load;                 /* loading function */
 	const char *        m_file_extensions;      /* file extensions */
 	const char *        m_interface;
-	seconds_t           m_delay_seconds;        /* loading delay (seconds) */
-	attoseconds_t       m_delay_attoseconds;    /* loading delay (attoseconds) */
+	attotime            m_delay;                   /* loading delay */
 	emu_timer           *m_timer;
 };
 

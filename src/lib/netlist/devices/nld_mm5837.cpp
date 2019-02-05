@@ -75,7 +75,7 @@ namespace netlist
 			log().warning(MW_1_FREQUENCY_OUTSIDE_OF_SPECS_1, m_FREQ());
 
 		m_shift = 0x1ffff;
-		m_is_timestep = m_RV.m_P.net().solver()->is_timestep();
+		m_is_timestep = m_RV.m_P.net().solver()->has_timestep_devices();
 	}
 
 	NETLIB_UPDATE_PARAM(MM5837_dip)
@@ -109,7 +109,7 @@ namespace netlist
 			if (m_is_timestep)
 				m_RV.update();
 			m_RV.set(NL_FCONST(1.0) / R, V, 0.0);
-			m_RV.m_P.schedule_solve_after(NLTIME_FROM_NS(1));
+			m_RV.solve_later(NLTIME_FROM_NS(1));
 		}
 
 	}

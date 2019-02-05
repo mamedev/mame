@@ -194,7 +194,7 @@ template<int Layer> WRITE32_MEMBER(backfire_state::pf_rowscroll_w){ data &= 0x00
 READ32_MEMBER(backfire_state::pot_select_r)
 {
 	if (!machine().side_effects_disabled())
-		m_adc->address_offset_start_w(space, offset, 0);
+		m_adc->address_offset_start_w(offset, 0);
 	return 0;
 }
 

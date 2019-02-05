@@ -27,6 +27,7 @@ namespace netlist
 {
 setup_t::setup_t(netlist_t &netlist)
 	: m_netlist(netlist)
+	, m_netlist_params(nullptr)
 	, m_factory(*this)
 	, m_proxy_cnt(0)
 	, m_frontier_cnt(0)
@@ -970,13 +971,13 @@ std::unique_ptr<plib::pistream> setup_t::get_data_stream(const pstring &name)
 	return std::unique_ptr<plib::pistream>(nullptr);
 }
 
-void setup_t::register_define(const pstring &defstr)
+void setup_t::add_define(const pstring &defstr)
 {
 	auto p = defstr.find("=");
 	if (p != pstring::npos)
-		register_define(plib::left(defstr, p), defstr.substr(p+1));
+		add_define(plib::left(defstr, p), defstr.substr(p+1));
 	else
-		register_define(defstr, "1");
+		add_define(defstr, "1");
 }
 
 // ----------------------------------------------------------------------------------------
@@ -1024,7 +1025,7 @@ void setup_t::prepare_to_run()
 	log().debug("Searching for solver and parameters ...\n");
 
 	auto solver = netlist().get_single_device<devices::NETLIB_NAME(solver)>("solver");
-	netlist().m_params = netlist().get_single_device<devices::NETLIB_NAME(netlistparams)>("parameter");
+	m_netlist_params = netlist().get_single_device<devices::NETLIB_NAME(netlistparams)>("parameter");
 
 	/* create devices */
 
@@ -1039,7 +1040,7 @@ void setup_t::prepare_to_run()
 		}
 	}
 
-	bool use_deactivate = (netlist().m_params->m_use_deactivate() ? true : false);
+	bool use_deactivate = m_netlist_params->m_use_deactivate() ? true : false;
 
 	for (auto &d : netlist().devices())
 	{

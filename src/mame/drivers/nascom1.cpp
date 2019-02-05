@@ -110,7 +110,7 @@ class nascom2_state : public nascom_state
 public:
 	nascom2_state(const machine_config &mconfig, device_type type, const char *tag) :
 		nascom_state(mconfig, type, tag),
-		m_nasbus(*this, "nasbus"),
+		m_nasbus(*this, NASBUS_TAG),
 		m_socket1(*this, "socket1"),
 		m_socket2(*this, "socket2"),
 		m_lsw1(*this, "lsw1")
@@ -737,7 +737,8 @@ void nascom1_state::nascom1(machine_config &config)
 	SOFTWARE_LIST(config, "snap_list").set_original("nascom_snap").set_filter("NASCOM1");
 }
 
-MACHINE_CONFIG_START(nascom2_state::nascom2)
+void nascom2_state::nascom2(machine_config &config)
+{
 	nascom(config);
 
 	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
@@ -758,31 +759,30 @@ MACHINE_CONFIG_START(nascom2_state::nascom2)
 	m_socket2->set_device_load(device_image_load_delegate(&nascom2_state::device_image_load_socket2, this));
 
 	// nasbus expansion bus
-	MCFG_NASBUS_ADD(NASBUS_TAG)
-	MCFG_NASBUS_RAM_DISABLE_HANDLER(WRITELINE(*this, nascom2_state, ram_disable_w))
-	MCFG_NASBUS_SLOT_ADD("nasbus1", nasbus_slot_cards, nullptr)
-	MCFG_NASBUS_SLOT_ADD("nasbus2", nasbus_slot_cards, nullptr)
-	MCFG_NASBUS_SLOT_ADD("nasbus3", nasbus_slot_cards, nullptr)
-	MCFG_NASBUS_SLOT_ADD("nasbus4", nasbus_slot_cards, nullptr)
+	nasbus_device &nasbus(NASBUS(config, NASBUS_TAG));
+	nasbus.ram_disable().set(FUNC(nascom2_state::ram_disable_w));
+	NASBUS_SLOT(config, "nasbus1", nasbus_slot_cards, nullptr);
+	NASBUS_SLOT(config, "nasbus2", nasbus_slot_cards, nullptr);
+	NASBUS_SLOT(config, "nasbus3", nasbus_slot_cards, nullptr);
+	NASBUS_SLOT(config, "nasbus4", nasbus_slot_cards, nullptr);
 
 	// software
 	SOFTWARE_LIST(config, "snap_list").set_original("nascom_snap").set_filter("NASCOM2");
 	SOFTWARE_LIST(config, "socket_list").set_original("nascom_socket");
 	SOFTWARE_LIST(config, "floppy_list").set_original("nascom_flop");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(nascom2_state::nascom2c)
+void nascom2_state::nascom2c(machine_config &config)
+{
 	nascom2(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &nascom2_state::nascom2c_mem);
 
 	m_ram->set_default_size("60K");
 
-	MCFG_DEVICE_MODIFY(NASBUS_TAG)
-	MCFG_NASBUS_RAM_DISABLE_HANDLER(WRITELINE(*this, nascom2_state, ram_disable_cpm_w))
-	MCFG_DEVICE_MODIFY("nasbus1")
-	MCFG_SLOT_DEFAULT_OPTION("floppy")
-MACHINE_CONFIG_END
+	subdevice<nasbus_device>(NASBUS_TAG)->ram_disable().set(FUNC(nascom2_state::ram_disable_cpm_w));
+	subdevice<nasbus_slot_device>("nasbus1")->set_default_option("floppy");
+}
 
 
 //**************************************************************************

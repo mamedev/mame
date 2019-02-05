@@ -750,6 +750,7 @@ MACHINE_CONFIG_START(md_cons_state::genesis_scd)
 
 	SEGA_SEGACD_US(config, m_segacd, 0);
 	m_segacd->set_palette("gen_vdp:palette");
+	m_segacd->set_hostcpu(m_maincpu);
 
 	CDROM(config, "cdrom").set_interface("scd_cdrom");
 
@@ -767,6 +768,7 @@ MACHINE_CONFIG_START(md_cons_state::md_scd)
 
 	SEGA_SEGACD_EUROPE(config, m_segacd, 0);
 	m_segacd->set_palette("gen_vdp:palette");
+	m_segacd->set_hostcpu(m_maincpu);
 
 	CDROM(config, "cdrom").set_interface("scd_cdrom");
 
@@ -784,6 +786,7 @@ MACHINE_CONFIG_START(md_cons_state::mdj_scd)
 
 	SEGA_SEGACD_JAPAN(config, m_segacd, 0);
 	m_segacd->set_palette("gen_vdp:palette");
+	m_segacd->set_hostcpu(m_maincpu);
 
 	CDROM(config, "cdrom").set_interface("scd_cdrom");
 
@@ -797,6 +800,7 @@ MACHINE_CONFIG_START(md_cons_state::genesis_32x_scd)
 
 	SEGA_SEGACD_US(config, m_segacd, 0);
 	m_segacd->set_palette("gen_vdp:palette");
+	m_segacd->set_hostcpu(m_maincpu);
 
 	CDROM(config, "cdrom").set_interface("scd_cdrom");
 
@@ -816,6 +820,7 @@ MACHINE_CONFIG_START(md_cons_state::md_32x_scd)
 
 	SEGA_SEGACD_EUROPE(config, m_segacd, 0);
 	m_segacd->set_palette("gen_vdp:palette");
+	m_segacd->set_hostcpu(m_maincpu);
 
 	CDROM(config, "cdrom").set_interface("scd_cdrom");
 
@@ -835,6 +840,7 @@ MACHINE_CONFIG_START(md_cons_state::mdj_32x_scd)
 
 	SEGA_SEGACD_JAPAN(config, m_segacd, 0);
 	m_segacd->set_palette("gen_vdp:palette");
+	m_segacd->set_hostcpu(m_maincpu);
 
 	CDROM(config, "cdrom").set_interface("scd_cdrom");
 

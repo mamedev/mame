@@ -1610,15 +1610,15 @@ void r4000_base_device::cp0_update_timer(bool start)
 	if (start || m_cp0_timer->enabled())
 	{
 		u32 const count = (total_cycles() - m_cp0_timer_zero) / 2;
-		u64 const delta = m_cp0[CP0_Compare] - count;
+		u32 const delta = m_cp0[CP0_Compare] - count;
 
-		m_cp0_timer->adjust(cycles_to_attotime(delta * 2));
+		m_cp0_timer->adjust(cycles_to_attotime(u64(delta) * 2));
 	}
 }
 
 TIMER_CALLBACK_MEMBER(r4000_base_device::cp0_timer_callback)
 {
-	set_input_line(5, ASSERT_LINE);
+	m_cp0[CP0_Cause] |= CAUSE_IPEX5;
 }
 
 void r4000_base_device::cp0_mode_check()
@@ -2737,7 +2737,7 @@ r4000_base_device::translate_t r4000_base_device::translate(int intention, u64 &
 		// remember the last-used tlb entry
 		m_last[intention & TRANSLATE_TYPE_MASK] = index;
 
-		return (pfn & EL_C) == C_2 ? UNCACHED : CACHED;
+		return ((pfn & EL_C) == C_2) ? UNCACHED : CACHED;
 	}
 
 	// tlb miss, invalid entry, or a store to a non-dirty entry

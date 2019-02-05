@@ -297,6 +297,7 @@ VIDEOS["CDP1862"] = true
 --VIDEOS["CESBLIT"] = true
 VIDEOS["CRT9007"] = true
 VIDEOS["CRT9021"] = true
+VIDEOS["CRT9028"] = true
 VIDEOS["CRT9212"] = true
 VIDEOS["CRTC_EGA"] = true
 VIDEOS["DL1416"] = true
@@ -1093,6 +1094,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"kontron",
 		"kurzweil",
 		"kyocera",
+		"leapfrog",
 		"luxor",
 		"magnavox",
 		"makerbot",
@@ -2412,6 +2414,12 @@ files {
 	MAME_DIR .. "src/mame/drivers/kyocera.cpp",
 	MAME_DIR .. "src/mame/includes/kyocera.h",
 	MAME_DIR .. "src/mame/video/kyocera.cpp",
+}
+
+createMESSProjects(_target, _subtarget, "leapfrog")
+files {
+	MAME_DIR .. "src/mame/drivers/leapster.cpp",
+	MAME_DIR .. "src/mame/drivers/leapfrog_leappad.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "luxor")
@@ -3740,6 +3748,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/busicom.cpp",
 	MAME_DIR .. "src/mame/includes/busicom.h",
 	MAME_DIR .. "src/mame/video/busicom.cpp",
+	MAME_DIR .. "src/mame/drivers/c2color.cpp",
 	MAME_DIR .. "src/mame/drivers/candela.cpp",
 	MAME_DIR .. "src/mame/drivers/cardinal.cpp",
 	MAME_DIR .. "src/mame/drivers/chaos.cpp",
@@ -3824,7 +3833,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/jade.cpp",
 	MAME_DIR .. "src/mame/drivers/jonos.cpp",
 	MAME_DIR .. "src/mame/drivers/kron.cpp",
-	MAME_DIR .. "src/mame/drivers/leapster.cpp",
 	MAME_DIR .. "src/mame/drivers/lee1214.cpp",
 	MAME_DIR .. "src/mame/drivers/learnwin.cpp",
 	MAME_DIR .. "src/mame/drivers/lft.cpp",

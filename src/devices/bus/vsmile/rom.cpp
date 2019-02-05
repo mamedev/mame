@@ -49,10 +49,12 @@ vsmile_rom_nvram_device::vsmile_rom_nvram_device(const machine_config &mconfig, 
 
 void vsmile_rom_device::device_start()
 {
+	save_item(NAME(m_bank_offset));
 }
 
 void vsmile_rom_device::device_reset()
 {
+	m_bank_offset = 0;
 }
 
 
@@ -72,4 +74,13 @@ WRITE16_MEMBER(vsmile_rom_nvram_device::bank2_w)
 {
 	if (!m_nvram.empty() && offset < m_nvram.size())
 		COMBINE_DATA(&m_nvram[offset]);
+}
+
+/*-------------------------------------------------
+ CS2 bankswitching
+ -------------------------------------------------*/
+
+void vsmile_rom_device::set_cs2(bool cs2)
+{
+	m_bank_offset = cs2 ? 0x400000 : 0x000000;
 }

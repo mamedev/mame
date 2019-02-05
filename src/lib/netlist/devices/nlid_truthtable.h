@@ -86,7 +86,6 @@ namespace devices
 		static constexpr const std::size_t m_num_bits = m_NI;
 		static constexpr const std::size_t m_size = (1 << (m_num_bits));
 		static constexpr const type_t m_outmask = ((1 << m_NO) - 1);
-		static constexpr const std::size_t m_min_inputs_for_deactivate = 2;
 
 		struct truthtable_t
 		{
@@ -106,7 +105,6 @@ namespace devices
 		: device_t(owner, name)
 		, m_fam(*this, fam)
 		, m_ign(*this, "m_ign", 0)
-		, m_active_outputs(*this, "m_active_outputs", 1)
 		, m_ttp(ttp)
 		{
 			init(desc);
@@ -116,13 +114,14 @@ namespace devices
 
 		NETLIB_RESETI()
 		{
-			m_active_outputs = 0;
+			int active_outputs = 0;
 			m_ign = 0;
 			for (auto &i : m_I)
 				i.activate();
 			for (auto &q : m_Q)
 				if (q.has_net() && q.net().num_cons() > 0)
-					m_active_outputs++;
+					active_outputs++;
+			set_active_outputs(active_outputs);
 		}
 
 		NETLIB_UPDATEI()
@@ -132,28 +131,14 @@ namespace devices
 
 		void inc_active() NL_NOEXCEPT override
 		{
-			if (m_NI >= m_min_inputs_for_deactivate)
-				if (++m_active_outputs == 1)
-				{
-					process<false>();
-				}
+			process<false>();
 		}
 
 		void dec_active() NL_NOEXCEPT override
 		{
-			/* FIXME:
-			 * Based on current measurements there is no point to disable
-			 * 1 input devices. This should actually be a parameter so that we
-			 * can decide for each individual gate whether it is beneficial to
-			 * ignore deactivation.
-			 */
-			if (m_NI >= m_min_inputs_for_deactivate)
-				if (--m_active_outputs == 0)
-				{
-					for (std::size_t i = 0; i< m_NI; i++)
-						m_I[i].inactivate();
-					m_ign = (1<<m_NI)-1;
-				}
+			for (std::size_t i = 0; i< m_NI; i++)
+				m_I[i].inactivate();
+			m_ign = (1<<m_NI)-1;
 		}
 
 		plib::uninitialised_array_t<logic_input_t, m_NI> m_I;
@@ -169,52 +154,35 @@ namespace devices
 			netlist_time mt(netlist_time::zero());
 
 			type_t nstate(0);
-			if (m_NI >= m_min_inputs_for_deactivate)
-			{
-				type_t ign(m_ign);
+			type_t ign(m_ign);
 #if 1
-				if (!doOUT)
-					for (std::size_t i = 0; i < m_NI; i++)
-					{
-						m_I[i].activate();
-						//nstate |= (m_I[i]() ? (1 << i) : 0);
-						nstate |= (m_I[i]() << i);
-						mt = std::max(this->m_I[i].net().time(), mt);
-					}
-				else
-					for (std::size_t i = 0; i < m_NI; i++)
-					{
-						if ((ign & 1))
-							m_I[i].activate();
-						//nstate |= (m_I[i]() ? (1 << i) : 0);
-						nstate |= (m_I[i]() << i);
-						ign >>= 1;
-					}
-#else
-				if (!doOUT)
+			if (!doOUT)
+				for (std::size_t i = 0; i < m_NI; i++)
 				{
-					nstate = aa<m_NI, type_t>().f(m_I, ~0);
-					for (std::size_t i = 0; i < m_NI; i++)
-						mt = std::max(this->m_I[i].net().time(), mt);
+					m_I[i].activate();
+					//nstate |= (m_I[i]() ? (1 << i) : 0);
+					nstate |= (m_I[i]() << i);
+					mt = std::max(this->m_I[i].net().next_scheduled_time(), mt);
 				}
-				else
-					nstate = aa<m_NI, type_t>().f(m_I, ign);
-#endif
+			else
+				for (std::size_t i = 0; i < m_NI; i++)
+				{
+					if ((ign & 1))
+						m_I[i].activate();
+					//nstate |= (m_I[i]() ? (1 << i) : 0);
+					nstate |= (m_I[i]() << i);
+					ign >>= 1;
+				}
+#else
+			if (!doOUT)
+			{
+				nstate = aa<m_NI, type_t>().f(m_I, ~0);
+				for (std::size_t i = 0; i < m_NI; i++)
+					mt = std::max(this->m_I[i].net().time(), mt);
 			}
 			else
-			{
-				if (!doOUT)
-					for (std::size_t i = 0; i < m_NI; i++)
-					{
-						//nstate |= (m_I[i]() ? (1 << i) : 0);
-						nstate |= (m_I[i]() << i);
-						mt = std::max(this->m_I[i].net().time(), mt);
-					}
-				else
-					for (std::size_t i = 0; i < m_NI; i++)
-						//nstate |= (m_I[i]() ? (1 << i) : 0);
-						nstate |= (m_I[i]() << i);
-			}
+				nstate = aa<m_NI, type_t>().f(m_I, ign);
+#endif
 
 			const type_t outstate(m_ttp.m_out_state[nstate]);
 			type_t out(outstate & m_outmask);
@@ -232,18 +200,14 @@ namespace devices
 				for (std::size_t i = 0; i < m_NO; out >>= 1, ++i)
 					m_Q[i].set_Q_time(out & 1, mt + tim[t[i]]);
 
-			if (m_NI >= m_min_inputs_for_deactivate)
-			{
-				type_t ign(m_ign);
-				for (auto I = m_I.begin(); ign != 0; ign >>= 1, ++I)
-					if (ign & 1)
-						I->inactivate();
-			}
+			ign = m_ign;
+			for (auto I = m_I.begin(); ign != 0; ign >>= 1, ++I)
+				if (ign & 1)
+					I->inactivate();
 		}
 
 		/* FIXME: check width */
 		state_var<type_t>   m_ign;
-		state_var_s32       m_active_outputs;
 		const truthtable_t &m_ttp;
 	};
 

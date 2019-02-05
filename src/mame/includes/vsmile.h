@@ -85,6 +85,7 @@ private:
 	template <int Which> DECLARE_WRITE_LINE_MEMBER(ctrl_rts_w);
 
 	DECLARE_READ16_MEMBER(portb_r);
+	DECLARE_WRITE16_MEMBER(portb_w);
 	DECLARE_READ16_MEMBER(portc_r);
 	DECLARE_WRITE16_MEMBER(portc_w);
 
@@ -113,6 +114,20 @@ private:
 
 	bool m_ctrl_rts[2];
 	bool m_ctrl_select[2];
+};
+
+class vsmilem_state : public vsmile_state
+{
+public:
+	vsmilem_state(const machine_config &mconfig, device_type type, const char *tag)
+		: vsmile_state(mconfig, type, tag)
+	{ }
+
+	void vsmilem(machine_config &config);
+
+protected:
+	DECLARE_WRITE16_MEMBER(porta_w);
+	DECLARE_READ16_MEMBER(porta_r);
 };
 
 class vsmileb_state : public vsmile_base_state

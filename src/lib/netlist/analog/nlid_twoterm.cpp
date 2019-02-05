@@ -92,6 +92,15 @@ void NETLIB_NAME(twoterm)::solve_now()
 		m_N.solve_now();
 }
 
+void NETLIB_NAME(twoterm)::solve_later(netlist_time delay)
+{
+	/* we only need to call the non-rail terminal */
+	if (m_P.has_net() && !m_P.net().isRailNet())
+		m_P.schedule_solve_after(delay);
+	else if (m_N.has_net() && !m_N.net().isRailNet())
+		m_N.schedule_solve_after(delay);
+}
+
 
 NETLIB_UPDATE(twoterm)
 {

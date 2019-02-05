@@ -408,10 +408,11 @@ READ16_MEMBER(sage2_state::rom_r)
 //  MACHINE_CONFIG( sage2 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(sage2_state::sage2)
+void sage2_state::sage2(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD(M68000_TAG, M68000, XTAL(16'000'000)/2)
-	MCFG_DEVICE_PROGRAM_MAP(sage2_mem)
+	M68000(config, m_maincpu, XTAL(16'000'000)/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sage2_state::sage2_mem);
 
 	// devices
 	PIC8259(config, m_pic, 0);
@@ -482,14 +483,15 @@ MACHINE_CONFIG_START(sage2_state::sage2)
 
 	FLOPPY_CONNECTOR(config, UPD765_TAG ":0", sage2_floppies, "525qd", floppy_image_device::default_floppy_formats);
 	FLOPPY_CONNECTOR(config, UPD765_TAG ":1", sage2_floppies, "525qd", floppy_image_device::default_floppy_formats);
-	MCFG_IEEE488_BUS_ADD()
+
+	IEEE488(config, m_ieee488);
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("512K");
 
 	// software list
 	SOFTWARE_LIST(config, "flop_list").set_original("sage2");
-MACHINE_CONFIG_END
+}
 
 
 

@@ -2,8 +2,17 @@
 // copyright-holders:Andrew Gardner, Couriersud
 #include "netlist/devices/net_lib.h"
 
+#ifdef NLBASE_H_
+#error Somehow nl_base.h made it into the include chain.
+#endif
+
+#ifndef NLTOOL_VERSION
 #define USE_FRONTIERS 1
 #define USE_FIXED_STV 1
+#else
+#define USE_FRONTIERS 0
+#define USE_FIXED_STV 1
+#endif
 
 /* ----------------------------------------------------------------------------
  *  Library section header START

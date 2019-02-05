@@ -123,6 +123,7 @@ namespace netlist
 
 	namespace devices {
 		class nld_base_proxy;
+		class nld_netlistparams;
 	}
 
 	class core_device_t;
@@ -171,6 +172,9 @@ namespace netlist
 	class source_t
 	{
 	public:
+
+		friend class setup_t;
+
 		enum type_t
 		{
 			SOURCE,
@@ -186,10 +190,12 @@ namespace netlist
 		virtual ~source_t() { }
 
 		virtual bool parse(const pstring &name);
-		virtual std::unique_ptr<plib::pistream> stream(const pstring &name) = 0;
-
 		setup_t &setup() { return m_setup; }
 		type_t type() const { return m_type; }
+
+	protected:
+		virtual std::unique_ptr<plib::pistream> stream(const pstring &name) = 0;
+
 	private:
 		setup_t &m_setup;
 		const type_t m_type;
@@ -274,8 +280,12 @@ namespace netlist
 			m_sources.push_back(std::move(src));
 		}
 
-		void register_define(pstring def, pstring val) { m_defines.push_back(plib::ppreprocessor::define_t(def, val)); }
-		void register_define(const pstring &defstr);
+		void add_define(pstring def, pstring val)
+		{
+			m_defines.insert({ def, plib::ppreprocessor::define_t(def, val)});
+		}
+
+		void add_define(const pstring &defstr);
 
 		factory::list_t &factory() { return m_factory; }
 		const factory::list_t &factory() const { return m_factory; }
@@ -337,14 +347,16 @@ namespace netlist
 		std::unordered_map<pstring, detail::core_terminal_t *> m_terminals;
 
 		netlist_t                                   &m_netlist;
+		devices::nld_netlistparams			 		*m_netlist_params;
 		std::unordered_map<pstring, param_ref_t>    m_params;
+
 		std::vector<link_t>                         m_links;
 		factory::list_t                             m_factory;
 		std::unordered_map<pstring, pstring>        m_models;
 
 		std::stack<pstring>                         m_namespace_stack;
 		source_t::list_t                            m_sources;
-		std::vector<plib::ppreprocessor::define_t>  m_defines;
+		plib::ppreprocessor::defines_map_type	    m_defines;
 
 		unsigned m_proxy_cnt;
 		unsigned m_frontier_cnt;
@@ -363,6 +375,7 @@ namespace netlist
 		{
 		}
 
+	protected:
 		virtual std::unique_ptr<plib::pistream> stream(const pstring &name) override;
 
 	private:
@@ -378,6 +391,7 @@ namespace netlist
 		{
 		}
 
+	protected:
 		virtual std::unique_ptr<plib::pistream> stream(const pstring &name) override;
 
 	private:
@@ -392,6 +406,7 @@ namespace netlist
 		{
 		}
 
+	protected:
 		virtual std::unique_ptr<plib::pistream> stream(const pstring &name) override;
 
 	private:
@@ -409,6 +424,8 @@ namespace netlist
 		}
 
 		virtual bool parse(const pstring &name) override;
+
+	protected:
 		virtual std::unique_ptr<plib::pistream> stream(const pstring &name) override;
 
 	private:
