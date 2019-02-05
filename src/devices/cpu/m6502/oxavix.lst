@@ -18,6 +18,14 @@ callf_xa3
 	set_codebank(TMP2);
 	prefetch();
 
+jmp_xa3
+	TMP2 = read_pc();
+	TMP = read_pc();
+	TMP = set_h(TMP, read_pc());
+	PC = TMP;
+	set_codebank(TMP2);
+	prefetch();
+
 retf_imp
 	read_pc_noinc();
 	read(SP);
