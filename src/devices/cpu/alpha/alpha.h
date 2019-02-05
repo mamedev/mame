@@ -6,13 +6,12 @@
 
 #pragma once
 
-#include <limits.h>
-#include "softfloat/milieu.h"
-#include "softfloat/softfloat.h"
+#include "alphad.h"
 
 class alpha_device : public cpu_device
 {
 public:
+	void set_dasm_type(alpha_disassembler::dasm_type type) { m_dasm_type = type; }
 
 protected:
 	alpha_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
@@ -36,8 +35,11 @@ protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 private:
-	// emulation state
+	// configuration
 	address_space_config m_main_config;
+	alpha_disassembler::dasm_type m_dasm_type;
+
+	// emulation state
 	int m_icount;
 
 	u64 m_pc;

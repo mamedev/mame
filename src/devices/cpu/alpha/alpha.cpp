@@ -15,10 +15,10 @@
 
 #include "emu.h"
 #include "alpha.h"
-#include "alphad.h"
 
 #include "debugger.h"
 
+#include "softfloat3/source/include/softfloat.h"
 
 #define LOG_GENERAL   (1U << 0)
 #define LOG_EXCEPTION (1U << 1)
@@ -38,6 +38,7 @@ dec_21064_device::dec_21064_device(const machine_config &mconfig, const char *ta
 alpha_device::alpha_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_main_config("main", ENDIANNESS_LITTLE, 64, 32, 0)
+	, m_dasm_type(alpha_disassembler::dasm_type::TYPE_UNKNOWN)
 	, m_icount(0)
 {
 }
@@ -66,11 +67,17 @@ void alpha_device::device_start()
 
 void alpha_device::device_reset()
 {
+	m_pc = 0;
 }
 
 void alpha_device::execute_run()
 {
-	m_icount = 0;
+	while (m_icount > 0)
+	{
+		debugger_instruction_hook(m_pc);
+
+		m_icount--;
+	}
 }
 
 void alpha_device::execute_set_input(int inputnum, int state)
@@ -89,5 +96,5 @@ bool alpha_device::memory_translate(int spacenum, int intention, offs_t &address
 
 std::unique_ptr<util::disasm_interface> alpha_device::create_disassembler()
 {
-	return std::make_unique<alpha_disassembler>();
+	return std::make_unique<alpha_disassembler>(m_dasm_type);
 }
