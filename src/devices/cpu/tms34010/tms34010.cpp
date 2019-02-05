@@ -89,6 +89,7 @@ tms340x0_device::tms340x0_device(const machine_config &mconfig, device_type type
 	, m_scantimer(nullptr)
 	, m_icount(0)
 	, m_output_int_cb(*this)
+	, m_ioreg_pre_write_cb(*this)
 {
 }
 
@@ -628,6 +629,7 @@ void tms340x0_device::device_start()
 	m_scanline_ind16_cb.bind_relative_to(*owner());
 	m_scanline_rgb32_cb.bind_relative_to(*owner());
 	m_output_int_cb.resolve();
+	m_ioreg_pre_write_cb.resolve();
 	m_to_shiftreg_cb.bind_relative_to(*owner());
 	m_from_shiftreg_cb.bind_relative_to(*owner());
 
@@ -706,7 +708,7 @@ void tms340x0_device::device_reset()
 
 	if (m_reset_deferred)
 	{
-		io_register_w(*m_program, REG_HSTCTLH, 0x8000, 0xffff);
+		io_register_w(REG_HSTCTLH, 0x8000, 0xffff);
 	}
 }
 
@@ -1134,8 +1136,11 @@ static const char *const ioreg_name[] =
 	"HCOUNT", "VCOUNT", "DPYADR", "REFCNT"
 };
 
-WRITE16_MEMBER( tms34010_device::io_register_w )
+void tms34010_device::io_register_w(offs_t offset, u16 data, u16 mem_mask)
 {
+	if (!m_ioreg_pre_write_cb.isnull())
+		m_ioreg_pre_write_cb(offset, data, mem_mask);
+
 	int oldreg, newreg;
 
 	/* Set register */
@@ -1282,8 +1287,11 @@ static const char *const ioreg020_name[] =
 	"IHOST3L", "IHOST3H", "IHOST4L", "IHOST4H"
 };
 
-WRITE16_MEMBER( tms34020_device::io_register_w )
+void tms34020_device::io_register_w(offs_t offset, u16 data, u16 mem_mask)
 {
+	if (!m_ioreg_pre_write_cb.isnull())
+		m_ioreg_pre_write_cb(offset, data, mem_mask);
+
 	int oldreg, newreg;
 
 	/* Set register */
@@ -1443,7 +1451,7 @@ WRITE16_MEMBER( tms34020_device::io_register_w )
     I/O REGISTER READS
 ***************************************************************************/
 
-READ16_MEMBER( tms34010_device::io_register_r )
+u16 tms34010_device::io_register_r(offs_t offset)
 {
 	int result, total;
 
@@ -1484,7 +1492,7 @@ READ16_MEMBER( tms34010_device::io_register_r )
 }
 
 
-READ16_MEMBER( tms34020_device::io_register_r )
+u16 tms34020_device::io_register_r(offs_t offset)
 {
 	int result, total;
 
@@ -1535,7 +1543,7 @@ void tms340x0_device::device_post_load()
     HOST INTERFACE WRITES
 ***************************************************************************/
 
-WRITE16_MEMBER( tms340x0_device::host_w )
+void tms340x0_device::host_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	int reg = offset;
 	unsigned int addr;
@@ -1572,8 +1580,8 @@ WRITE16_MEMBER( tms340x0_device::host_w )
 		case TMS34010_HOST_CONTROL:
 		{
 			m_external_host_access = true;
-			if (mem_mask&0xff00) io_register_w(*m_program, REG_HSTCTLH, data & 0xff00, 0xff00);
-			if (mem_mask&0x00ff) io_register_w(*m_program, REG_HSTCTLL, data & 0x00ff, 0x00ff);
+			if (mem_mask&0xff00) io_register_w(REG_HSTCTLH, data & 0xff00, 0xff00);
+			if (mem_mask&0x00ff) io_register_w(REG_HSTCTLL, data & 0x00ff, 0x00ff);
 			m_external_host_access = false;
 			break;
 		}
@@ -1591,7 +1599,7 @@ WRITE16_MEMBER( tms340x0_device::host_w )
     HOST INTERFACE READS
 ***************************************************************************/
 
-READ16_MEMBER( tms340x0_device::host_r )
+u16 tms340x0_device::host_r(offs_t offset)
 {
 	int reg = offset;
 	unsigned int addr;

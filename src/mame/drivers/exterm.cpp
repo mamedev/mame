@@ -92,13 +92,13 @@ void exterm_state::machine_start()
 
 WRITE16_MEMBER(exterm_state::host_data_w)
 {
-	m_slave->host_w(space,offset / 0x0010000, data, 0xffff);
+	m_slave->host_w(offset / 0x0010000, data);
 }
 
 
 READ16_MEMBER(exterm_state::host_data_r)
 {
-	return m_slave->host_r(space,offset / 0x0010000, 0xffff);
+	return m_slave->host_r(offset / 0x0010000);
 }
 
 
