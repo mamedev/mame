@@ -224,7 +224,7 @@ MACHINE_CONFIG_START(kaypro_state::kayproii)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */
-	MCFG_QUICKLOAD_ADD("quickload", kaypro_state, kaypro, "com,cpm", 3)
+	MCFG_QUICKLOAD_ADD("quickload", kaypro_state, kaypro, "com,cpm", attotime::from_seconds(3))
 
 	kaypro_10_keyboard_device &kbd(KAYPRO_10_KEYBOARD(config, "kbd"));
 	kbd.rxd_cb().set("sio", FUNC(z80sio_device::rxb_w));
@@ -315,7 +315,7 @@ MACHINE_CONFIG_START(kaypro_state::kaypro484)
 	m_crtc->set_char_width(7);
 	m_crtc->set_update_row_callback(FUNC(kaypro_state::kaypro484_update_row), this);
 
-	MCFG_QUICKLOAD_ADD("quickload", kaypro_state, kaypro, "com,cpm", 3)
+	MCFG_QUICKLOAD_ADD("quickload", kaypro_state, kaypro, "com,cpm", attotime::from_seconds(3))
 
 	kaypro_10_keyboard_device &kbd(KAYPRO_10_KEYBOARD(config, "kbd"));
 	kbd.rxd_cb().set("sio_1", FUNC(z80sio_device::rxb_w));

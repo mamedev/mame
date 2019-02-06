@@ -881,7 +881,7 @@ MACHINE_CONFIG_START(dmv_state::dmv)
 
 	SOFTWARE_LIST(config, "flop_list").set_original("dmv");
 
-	MCFG_QUICKLOAD_ADD("quickload", dmv_state, dmv, "com,cpm", 3)
+	MCFG_QUICKLOAD_ADD("quickload", dmv_state, dmv, "com,cpm", attotime::from_seconds(3))
 
 MACHINE_CONFIG_END
 

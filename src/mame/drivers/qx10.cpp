@@ -826,7 +826,7 @@ MACHINE_CONFIG_START(qx10_state::qx10)
 	// software lists
 	SOFTWARE_LIST(config, "flop_list").set_original("qx10_flop");
 
-	MCFG_QUICKLOAD_ADD("quickload", qx10_state, qx10, "com,cpm", 3)
+	MCFG_QUICKLOAD_ADD("quickload", qx10_state, qx10, "com,cpm", attotime::from_seconds(3))
 
 MACHINE_CONFIG_END
 

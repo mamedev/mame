@@ -409,8 +409,8 @@ void jr100_state::jr100(machine_config &config)
 	m_cassette->set_default_state((cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED));
 
 	/* quickload */
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(jr100_state, jr100), this), "prg", 2);
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
+	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(jr100_state, jr100), this), "prg", attotime::from_seconds(2));
 }
 
 

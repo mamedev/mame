@@ -790,7 +790,7 @@ MACHINE_CONFIG_START(ace_state::ace)
 	m_cassette->set_default_state(CASSETTE_STOPPED);
 	m_cassette->set_interface("jupace_cass");
 
-	MCFG_SNAPSHOT_ADD("snapshot", ace_state, ace, "ace", 1)
+	MCFG_SNAPSHOT_ADD("snapshot", ace_state, ace, "ace", attotime::from_seconds(1))
 
 	I8255A(config, m_ppi);
 	m_ppi->in_pb_callback().set(FUNC(ace_state::sby_r));

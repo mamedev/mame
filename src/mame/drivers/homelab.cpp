@@ -778,7 +778,7 @@ MACHINE_CONFIG_START(homelab_state::homelab)
 	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "speaker", 0.25);
 
 	CASSETTE(config, m_cass);
-	MCFG_QUICKLOAD_ADD("quickload", homelab_state, homelab, "htp", 2)
+	MCFG_QUICKLOAD_ADD("quickload", homelab_state, homelab, "htp", attotime::from_seconds(2))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(homelab_state::homelab3)
@@ -810,7 +810,7 @@ MACHINE_CONFIG_START(homelab_state::homelab3)
 	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "speaker", 0.25);
 
 	CASSETTE(config, m_cass);
-	MCFG_QUICKLOAD_ADD("quickload", homelab_state, homelab, "htp", 2)
+	MCFG_QUICKLOAD_ADD("quickload", homelab_state, homelab, "htp", attotime::from_seconds(2))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(homelab_state::brailab4)
@@ -845,7 +845,7 @@ MACHINE_CONFIG_START(homelab_state::brailab4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	CASSETTE(config, m_cass);
-	MCFG_QUICKLOAD_ADD("quickload", homelab_state, homelab, "htp", 18)
+	MCFG_QUICKLOAD_ADD("quickload", homelab_state, homelab, "htp", attotime::from_seconds(18))
 MACHINE_CONFIG_END
 
 void homelab_state::init_brailab4()

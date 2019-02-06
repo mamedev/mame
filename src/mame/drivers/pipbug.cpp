@@ -174,8 +174,8 @@ void pipbug_state::pipbug(machine_config &config)
 	m_rs232->set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 
 	/* quickload */
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(pipbug_state, pipbug), this), "pgm", 1);
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
+	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(pipbug_state, pipbug), this), "pgm", attotime::from_seconds(1));
 }
 
 

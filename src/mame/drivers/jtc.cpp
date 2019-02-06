@@ -831,7 +831,7 @@ MACHINE_CONFIG_START(jtc_state::basic)
 	m_centronics->busy_handler().set(FUNC(jtc_state::write_centronics_busy));
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", jtc_state, jtc, "jtc,bin", 2)
+	MCFG_QUICKLOAD_ADD("quickload", jtc_state, jtc, "jtc,bin", attotime::from_seconds(2))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(jtc_state::jtc)

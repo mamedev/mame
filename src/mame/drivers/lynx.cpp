@@ -101,7 +101,7 @@ MACHINE_CONFIG_START(lynx_state::lynx)
 	m_sound->add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* devices */
-	MCFG_QUICKLOAD_ADD("quickload", lynx_state, lynx, "o", 0)
+	MCFG_QUICKLOAD_ADD("quickload", lynx_state, lynx, "o");
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "lynx_cart")
 	MCFG_GENERIC_EXTENSIONS("lnx,lyx")

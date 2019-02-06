@@ -462,7 +462,7 @@ MACHINE_CONFIG_START(lviv_state::lviv)
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* snapshot */
-	MCFG_SNAPSHOT_ADD("snapshot", lviv_state, lviv, "sav", 0)
+	MCFG_SNAPSHOT_ADD("snapshot", lviv_state, lviv, "sav")
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(lviv_lvt_format);

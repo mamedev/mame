@@ -717,11 +717,11 @@ void nascom_state::nascom(machine_config &config)
 	RAM(config, m_ram).set_default_size("48K").set_extra_options("8K,16K,32K");
 
 	// devices
-	snapshot_image_device &snapshot(SNAPSHOT(config, "snapshot", 0));
-	snapshot.set_handler(snapquick_load_delegate(&SNAPSHOT_LOAD_NAME(nascom_state, nascom1), this), "nas", 0.5);
+	snapshot_image_device &snapshot(SNAPSHOT(config, "snapshot"));
+	snapshot.set_handler(snapquick_load_delegate(&SNAPSHOT_LOAD_NAME(nascom_state, nascom1), this), "nas", attotime::from_msec(500));
 	snapshot.set_interface("nascom_snap");
-	snapshot_image_device &snapchar(SNAPSHOT(config, "snapchar", 0));
-	snapchar.set_handler(snapquick_load_delegate(&SNAPSHOT_LOAD_NAME(nascom_state, charrom), this), "chr", 0.5);
+	snapshot_image_device &snapchar(SNAPSHOT(config, "snapchar"));
+	snapchar.set_handler(snapquick_load_delegate(&SNAPSHOT_LOAD_NAME(nascom_state, charrom), this), "chr", attotime::from_msec(500));
 	snapchar.set_interface("nascom_char");
 }
 

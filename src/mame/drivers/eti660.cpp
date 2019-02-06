@@ -349,7 +349,7 @@ MACHINE_CONFIG_START(eti660_state::eti660)
 	RAM(config, RAM_TAG).set_default_size("3K");
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", eti660_state, eti660, "bin,c8,ch8", 2)
+	MCFG_QUICKLOAD_ADD("quickload", eti660_state, eti660, "bin,c8,ch8", attotime::from_seconds(2))
 MACHINE_CONFIG_END
 
 /* ROMs */

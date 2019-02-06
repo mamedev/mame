@@ -1361,8 +1361,8 @@ void c64_state::ntsc(machine_config &config)
 	m_user->pl_handler().set(FUNC(c64_state::write_user_pb7));
 	m_user->pm_handler().set(FUNC(c64_state::write_user_pa2));
 
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(c64_state, cbm_c64), this), "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS);
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
+	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(c64_state, cbm_c64), this), "p00,prg,t64", CBM_QUICKLOAD_DELAY);
 
 	// software list
 	SOFTWARE_LIST(config, "cart_list_vic10").set_original("vic10");
@@ -1537,8 +1537,8 @@ void c64_state::pal(machine_config &config)
 	m_user->pl_handler().set(FUNC(c64_state::write_user_pb7));
 	m_user->pm_handler().set(FUNC(c64_state::write_user_pa2));
 
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(c64_state, cbm_c64), this), "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS);
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
+	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(c64_state, cbm_c64), this), "p00,prg,t64", CBM_QUICKLOAD_DELAY);
 
 	// software list
 	SOFTWARE_LIST(config, "cart_list_vic10").set_original("vic10");
@@ -1687,8 +1687,8 @@ void c64gs_state::pal_gs(machine_config &config)
 	m_user->pl_handler().set(FUNC(c64_state::write_user_pb7));
 	m_user->pm_handler().set(FUNC(c64_state::write_user_pa2));
 
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(c64_state, cbm_c64), this), "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS);
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
+	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(c64_state, cbm_c64), this), "p00,prg,t64", CBM_QUICKLOAD_DELAY);
 
 	// software list
 	SOFTWARE_LIST(config, "cart_list_vic10").set_original("vic10");

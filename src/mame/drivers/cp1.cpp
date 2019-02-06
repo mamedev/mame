@@ -290,7 +290,7 @@ void cp1_state::cp1(machine_config &config)
 
 	CASSETTE(config, m_cassette);
 
-	QUICKLOAD(config, "quickload", 0).set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(cp1_state, quickload), this), "obj", 1);
+	QUICKLOAD(config, "quickload").set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(cp1_state, quickload), this), "obj", attotime::from_seconds(1));
 }
 
 /* ROM definition */

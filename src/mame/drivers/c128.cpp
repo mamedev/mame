@@ -1755,8 +1755,8 @@ void c128_state::ntsc(machine_config &config)
 	m_user->pl_handler().set(FUNC(c128_state::write_user_pb7));
 	m_user->pm_handler().set(FUNC(c128_state::write_user_pa2));
 
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(c128_state, cbm_c64), this), "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS);
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
+	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(c128_state, cbm_c64), this), "p00,prg", CBM_QUICKLOAD_DELAY);
 
 	// software list
 	SOFTWARE_LIST(config, "cart_list_vic10").set_original("vic10");
@@ -1950,8 +1950,8 @@ void c128_state::pal(machine_config &config)
 	m_user->pl_handler().set(FUNC(c128_state::write_user_pb7));
 	m_user->pm_handler().set(FUNC(c128_state::write_user_pa2));
 
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(c128_state, cbm_c64), this), "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS);
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
+	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(c128_state, cbm_c64), this), "p00,prg", CBM_QUICKLOAD_DELAY);
 
 	// software list
 	SOFTWARE_LIST(config, "cart_list_vic10").set_original("vic10");

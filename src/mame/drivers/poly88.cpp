@@ -231,7 +231,7 @@ MACHINE_CONFIG_START(poly88_state::poly88)
 	m_uart->rxrdy_handler().set(FUNC(poly88_state::poly88_usart_rxready));
 
 	/* snapshot */
-	MCFG_SNAPSHOT_ADD("snapshot", poly88_state, poly88, "img", 2)
+	MCFG_SNAPSHOT_ADD("snapshot", poly88_state, poly88, "img", attotime::from_seconds(2))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(poly88_state::poly8813)

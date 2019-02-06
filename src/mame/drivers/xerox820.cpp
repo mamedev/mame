@@ -666,7 +666,7 @@ MACHINE_CONFIG_START(xerox820_state::xerox820)
 
 	// software lists
 	SOFTWARE_LIST(config, "flop_list").set_original("xerox820");
-	MCFG_QUICKLOAD_ADD("quickload", xerox820_state, xerox820, "com,cpm", 3)
+	MCFG_QUICKLOAD_ADD("quickload", xerox820_state, xerox820, "com,cpm", attotime::from_seconds(3))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(bigboard_state::bigboard)
@@ -771,7 +771,7 @@ MACHINE_CONFIG_START(xerox820ii_state::xerox820ii)
 
 	// software lists
 	SOFTWARE_LIST(config, "flop_list").set_original("xerox820ii");
-	MCFG_QUICKLOAD_ADD("quickload", xerox820_state, xerox820, "com,cpm", 3)
+	MCFG_QUICKLOAD_ADD("quickload", xerox820_state, xerox820, "com,cpm", attotime::from_seconds(3))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(xerox820ii_state::xerox168)

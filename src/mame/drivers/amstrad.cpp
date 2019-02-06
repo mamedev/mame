@@ -954,7 +954,7 @@ MACHINE_CONFIG_START(amstrad_state::amstrad_base)
 	m_centronics->busy_handler().set(FUNC(amstrad_state::write_centronics_busy));
 
 	/* snapshot */
-	MCFG_SNAPSHOT_ADD("snapshot", amstrad_state, amstrad, "sna", 0)
+	MCFG_SNAPSHOT_ADD("snapshot", amstrad_state, amstrad, "sna")
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(cdt_cassette_formats);
@@ -1077,7 +1077,7 @@ MACHINE_CONFIG_START(amstrad_state::cpcplus)
 	m_centronics->busy_handler().set(FUNC(amstrad_state::write_centronics_busy));
 
 	/* snapshot */
-	MCFG_SNAPSHOT_ADD("snapshot", amstrad_state, amstrad, "sna", 0)
+	MCFG_SNAPSHOT_ADD("snapshot", amstrad_state, amstrad, "sna")
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(cdt_cassette_formats);

@@ -930,8 +930,8 @@ void plus4_state::plus4(machine_config &config)
 	m_exp->cd_wr_callback().set(FUNC(plus4_state::write));
 	m_exp->aec_wr_callback().set_inputline(MOS7501_TAG, INPUT_LINE_HALT);
 
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(plus4_state, cbm_c16), this), "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS);
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
+	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(plus4_state, cbm_c16), this), "p00,prg", CBM_QUICKLOAD_DELAY);
 
 	// internal ram
 	RAM(config, m_ram).set_default_size("64K");

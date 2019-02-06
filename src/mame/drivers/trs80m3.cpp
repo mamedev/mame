@@ -359,7 +359,7 @@ MACHINE_CONFIG_START(trs80m3_state::model3)
 	m_cassette->set_formats(trs80l2_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_PLAY);
 
-	MCFG_QUICKLOAD_ADD("quickload", trs80m3_state, trs80_cmd, "cmd", 1.0)
+	MCFG_QUICKLOAD_ADD("quickload", trs80m3_state, trs80_cmd, "cmd", attotime::from_seconds(1))
 
 	FD1793(config, m_fdc, 4_MHz_XTAL / 4);
 	m_fdc->intrq_wr_callback().set(FUNC(trs80m3_state::intrq_w));

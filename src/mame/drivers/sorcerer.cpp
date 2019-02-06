@@ -445,8 +445,8 @@ MACHINE_CONFIG_START(sorcerer_state::sorcerer)
 	INPUT_BUFFER(config, "cent_status_in");
 
 	/* quickload */
-	MCFG_SNAPSHOT_ADD("snapshot", sorcerer_state, sorcerer, "snp", 2)
-	MCFG_QUICKLOAD_ADD("quickload", sorcerer_state, sorcerer, "bin", 3)
+	MCFG_SNAPSHOT_ADD("snapshot", sorcerer_state, sorcerer, "snp", attotime::from_seconds(2))
+	MCFG_QUICKLOAD_ADD("quickload", sorcerer_state, sorcerer, "bin", attotime::from_seconds(3))
 
 	CASSETTE(config, m_cassette1);
 	m_cassette1->set_formats(sorcerer_cassette_formats);

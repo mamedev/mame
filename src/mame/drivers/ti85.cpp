@@ -617,7 +617,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ti85_state::ti85d)
 	ti85(config);
-	MCFG_SNAPSHOT_ADD("snapshot", ti85_state, ti8x, "sav", 0)
+	MCFG_SNAPSHOT_ADD("snapshot", ti85_state, ti8x, "sav")
 	//MCFG_TI85SERIAL_ADD( "tiserial" )
 MACHINE_CONFIG_END
 
@@ -673,7 +673,7 @@ MACHINE_CONFIG_START(ti85_state::ti86)
 	MCFG_MACHINE_START_OVERRIDE(ti85_state, ti86 )
 	MCFG_MACHINE_RESET_OVERRIDE(ti85_state, ti85 )
 
-	MCFG_SNAPSHOT_ADD("snapshot", ti85_state, ti8x, "sav", 0)
+	MCFG_SNAPSHOT_ADD("snapshot", ti85_state, ti8x, "sav")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ti85_state::ti83p)

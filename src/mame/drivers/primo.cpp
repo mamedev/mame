@@ -270,8 +270,8 @@ MACHINE_CONFIG_START(primo_state::primoa32)
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* snapshot/quickload */
-	MCFG_SNAPSHOT_ADD("snapshot", primo_state, primo, "pss", 0)
-	MCFG_QUICKLOAD_ADD("quickload", primo_state, primo, "pp", 0)
+	MCFG_SNAPSHOT_ADD("snapshot", primo_state, primo, "pss")
+	MCFG_QUICKLOAD_ADD("quickload", primo_state, primo, "pp")
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(primo_ptp_format);

@@ -198,7 +198,7 @@ MACHINE_CONFIG_START(galaxy_state::galaxy)
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* snapshot */
-	MCFG_SNAPSHOT_ADD("snapshot", galaxy_state, galaxy, "gal", 0)
+	MCFG_SNAPSHOT_ADD("snapshot", galaxy_state, galaxy, "gal")
 
 	SPEAKER(config, "mono").front_center();
 	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -237,7 +237,7 @@ MACHINE_CONFIG_START(galaxy_state::galaxyp)
 
 
 	/* snapshot */
-	MCFG_SNAPSHOT_ADD("snapshot", galaxy_state, galaxy, "gal", 0)
+	MCFG_SNAPSHOT_ADD("snapshot", galaxy_state, galaxy, "gal")
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
