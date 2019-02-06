@@ -1144,7 +1144,7 @@ void xavix_state::machine_reset()
 
 	m_sound_irqstatus = 0x00;
 
-	m_sound_regbase = 0x00;
+	m_sound_regbase = 0x02; // rad_bb doesn't initialize this and expects it here.  It is possible the default is 0x00, but since 0x00 and 0x01 are special (zero page and stack) those values would also use bank 0x02
 
 	m_adc_control = 0x00;
 

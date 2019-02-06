@@ -39811,6 +39811,7 @@ rad_ping                        //
 rad_pingp                       //
 rad_mtrk                        //
 rad_mtrkp                       //
+rad_bb                          //
 rad_bb2                         //
 rad_box                         //
 rad_boxp                        //
