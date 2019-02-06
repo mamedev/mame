@@ -214,7 +214,6 @@ void skeetsht_state::tms_program_map(address_map &map)
 {
 	map(0x00000000, 0x003fffff).ram().share("tms_vram");
 	map(0x00440000, 0x004fffff).rw(FUNC(skeetsht_state::ramdac_r), FUNC(skeetsht_state::ramdac_w));
-	map(0xc0000000, 0xc00001ff).rw(m_tms, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xff800000, 0xffbfffff).rom().mirror(0x00400000).region("tms", 0);
 }
 
