@@ -7,7 +7,7 @@
 		<year>1999</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-10756 UBL"/>
-		<part name="cart" interface="leapfrog_mfleappad_cart">
+		<part name="cart" interface="leapfrog_leappad_cart">
 			<feature name="pcb" value="57000-003-7210"/>
 			<feature name="pcb_rev" value="REV.00"/>
 			<feature name="u1" value="OKi 16M"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
@@ -22,7 +22,7 @@
 		<year>1999</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-11538-B"/>
-		<part name="cart" interface="leapfrog_mfleappad_cart">
+		<part name="cart" interface="leapfrog_leappad_cart">
 			<feature name="pcb" value="57000-003-7211"/>
 			<feature name="pcb_rev" value="REV.01"/>
 			<feature name="u1" value="OKi 16M(F)"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
@@ -37,7 +37,7 @@
 		<year>2008</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-11539"/>
-		<part name="cart" interface="leapfrog_mfleappad_cart">
+		<part name="cart" interface="leapfrog_leappad_cart">
 			<feature name="pcb" value="57000-003-7234"/>
 			<feature name="pcb_rev" value="Rev.00"/>
 			<feature name="u1" value="OKI 32M(L)-XXWE"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
@@ -52,7 +52,7 @@
 		<year>2004</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-11973"/>
-		<part name="cart" interface="leapfrog_mfleappad_cart">
+		<part name="cart" interface="leapfrog_leappad_cart">
 			<feature name="pcb" value="57000-003-7223"/>
 			<feature name="pcb_rev" value="Rev.00"/>
 			<feature name="u1" value="OKI 32M(J)"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
@@ -67,7 +67,7 @@
 		<year>2006</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12559-B"/>
-		<part name="cart" interface="leapfrog_mfleappad_cart">
+		<part name="cart" interface="leapfrog_leappad_cart">
 			<feature name="pcb" value="57000-003-7212"/>
 			<feature name="pcb_rev" value="Rev:00"/>
 			<feature name="u1" value="OKi 16M(Ver:L)"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
