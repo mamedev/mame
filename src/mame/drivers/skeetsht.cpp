@@ -144,13 +144,13 @@ WRITE8_MEMBER(skeetsht_state::tms_w)
 	if ((offset & 1) == 0)
 		m_lastdataw = data;
 	else
-		m_tms->host_w(space, offset >> 1, (m_lastdataw << 8) | data, 0xffff);
+		m_tms->host_w(offset >> 1, (m_lastdataw << 8) | data);
 }
 
 READ8_MEMBER(skeetsht_state::tms_r)
 {
 	if ((offset & 1) == 0)
-		m_lastdatar = m_tms->host_r(space, offset >> 1, 0xffff);
+		m_lastdatar = m_tms->host_r(offset >> 1);
 
 	return m_lastdatar >> ((offset & 1) ? 0 : 8);
 }
