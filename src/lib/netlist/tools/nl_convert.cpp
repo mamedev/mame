@@ -5,12 +5,12 @@
  *
  */
 
+#include "../plib/palloc.h"
+#include "../plib/putil.h"
+#include "nl_convert.h"
 #include <algorithm>
 #include <cmath>
 #include <unordered_map>
-#include "nl_convert.h"
-#include "../plib/palloc.h"
-#include "../plib/putil.h"
 
 /* FIXME: temporarily defined here - should be in a file */
 /* FIXME: family logic in netlist is convoluted, create
@@ -305,7 +305,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				pstring model;
 				pstring pins ="CBE";
 				bool err;
-				long nval = plib::pstonum_ne<long>(tt[4], err);
+				auto nval = plib::pstonum_ne<long>(tt[4], err);
 				plib::unused_var(nval);
 
 				if ((err || plib::startsWith(tt[4], "N")) && tt.size() > 5)

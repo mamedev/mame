@@ -10,9 +10,9 @@
 
 #include "nl_factory.h"
 #include "nl_base.h"
+#include "nl_errstr.h"
 #include "nl_setup.h"
 #include "plib/putil.h"
-#include "nl_errstr.h"
 
 namespace netlist { namespace factory
 {
@@ -26,7 +26,7 @@ namespace netlist { namespace factory
 		}
 	protected:
 		NETLIB_RESETI() { }
-		NETLIB_UPDATEI() { };
+		NETLIB_UPDATEI() { }
 	};
 
 	element_t::element_t(const pstring &name, const pstring &classname,
@@ -40,10 +40,6 @@ namespace netlist { namespace factory
 			const pstring &def_param)
 		: m_name(name), m_classname(classname), m_def_param(def_param),
 		  m_sourcefile("<unknown>")
-	{
-	}
-
-	element_t::~element_t()
 	{
 	}
 
@@ -98,4 +94,5 @@ namespace netlist { namespace factory
 	}
 
 
-} }
+} // namespace factory
+ } // namespace netlist

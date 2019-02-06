@@ -14,8 +14,8 @@
 
 #include <algorithm>
 
-#include "nld_ms_direct.h"
 #include "nld_matrix_solver.h"
+#include "nld_ms_direct.h"
 #include "nld_solver.h"
 
 namespace netlist
@@ -40,11 +40,11 @@ public:
 		{
 		}
 
-	virtual ~matrix_solver_SOR_mat_t() override {}
+	~matrix_solver_SOR_mat_t() override = default;
 
-	virtual void vsetup(analog_net_t::list_t &nets) override;
+	void vsetup(analog_net_t::list_t &nets) override;
 
-	virtual unsigned vsolve_non_dynamic(const bool newton_raphson) override;
+	unsigned vsolve_non_dynamic(const bool newton_raphson) override;
 
 private:
 	//state_var<float_type[storage_N]> m_Vdelta;
@@ -192,10 +192,10 @@ unsigned matrix_solver_SOR_mat_t<FT, SIZE>::vsolve_non_dynamic(const bool newton
 					if (p[i] != k)
 						gabs_t = gabs_t + std::abs(this->A(k,p[i]));
 
-				gabs_t *= NL_FCONST(1.0); // derived by try and error
+				gabs_t *= plib::constants<FT>::one; // derived by try and error
 				if (gabs_t > this->A(k,k))
 				{
-					w = NL_FCONST(1.0) / (this->A(k,k) + gabs_t);
+					w = plib::constants<FT>::one / (this->A(k,k) + gabs_t);
 				}
 			}
 

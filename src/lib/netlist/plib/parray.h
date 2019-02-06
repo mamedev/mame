@@ -11,11 +11,11 @@
 #include "pconfig.h"
 #include "pexception.h"
 
+#include <array>
 #include <memory>
+#include <type_traits>
 #include <utility>
 #include <vector>
-#include <array>
-#include <type_traits>
 
 namespace plib {
 
@@ -112,6 +112,6 @@ namespace plib {
 		base_type m_a;
 		size_type m_size;
 	};
-}
+} // namespace plib
 
 #endif /* PARRAY_H_ */

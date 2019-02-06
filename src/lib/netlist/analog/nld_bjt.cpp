@@ -6,8 +6,8 @@
  */
 
 #include "../solver/nld_solver.h"
-#include "nlid_twoterm.h"
 #include "../nl_setup.h"
+#include "nlid_twoterm.h"
 
 #include <cmath>
 
@@ -248,10 +248,6 @@ public:
 		register_subalias("B", m_D_EB.m_N);   // Anode
 
 		register_subalias("C", m_D_CB.m_P);   // Cathode
-		//register_term("_B1", m_D_CB.m_N); // Anode
-
-		//register_term("_E1", m_D_EC.m_P);
-		//register_term("_C1", m_D_EC.m_N);
 
 		connect(m_D_EB.m_P, m_D_EC.m_P);
 		connect(m_D_EB.m_N, m_D_CB.m_N);
@@ -432,6 +428,6 @@ NETLIB_UPDATE_PARAM(QBJT_EB)
 	namespace devices {
 		NETLIB_DEVICE_IMPL_NS(analog, QBJT_EB, "QBJT_EB", "MODEL")
 		NETLIB_DEVICE_IMPL_NS(analog, QBJT_switch, "QBJT_SW", "MODEL")
-	}
+	} // namespace devices
 
 } // namespace netlist

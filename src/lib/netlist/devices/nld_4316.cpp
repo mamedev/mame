@@ -6,9 +6,9 @@
  */
 
 #include "nld_4316.h"
-#include "nlid_cmos.h"
 #include "netlist/analog/nlid_twoterm.h"
 #include "netlist/solver/nld_solver.h"
+#include "nlid_cmos.h"
 
 namespace netlist { namespace devices {
 
@@ -38,7 +38,7 @@ namespace netlist { namespace devices {
 
 	NETLIB_RESET(CD4316_GATE)
 	{
-		m_R.set_R(NL_FCONST(1.0) / exec().gmin());
+		m_R.set_R(plib::constants<nl_double>::one / exec().gmin());
 	}
 
 	NETLIB_UPDATE(CD4316_GATE)
@@ -47,10 +47,11 @@ namespace netlist { namespace devices {
 		if (m_S() && !m_E())
 			m_R.set_R(m_base_r());
 		else
-			m_R.set_R(NL_FCONST(1.0) / exec().gmin());
+			m_R.set_R(plib::constants<nl_double>::one / exec().gmin());
 		m_R.solve_later(NLTIME_FROM_NS(1));
 	}
 
 	NETLIB_DEVICE_IMPL(CD4316_GATE, "CD4316_GATE", "")
 
-} } // namesapce netlist::devices
+} // namespace devices
+ } // namespace netlist

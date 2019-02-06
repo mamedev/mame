@@ -30,7 +30,7 @@ namespace devices
 		// ----------------------------------------------------------------------------------------
 		// matrix_solver - Direct1
 		// ----------------------------------------------------------------------------------------
-		virtual unsigned vsolve_non_dynamic(const bool newton_raphson) override
+		unsigned vsolve_non_dynamic(const bool newton_raphson) override
 		{
 			this->build_LE_A(*this);
 			this->build_LE_RHS(*this);

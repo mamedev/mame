@@ -13,18 +13,20 @@
 #error "nl_base.h included. Please correct."
 #endif
 
+#include <unordered_map>
+#include <vector>
+
+#include "plib/palloc.h" // owned_ptr
+#include "plib/pdynlib.h"
+#include "plib/pfmtlog.h"
+#include "plib/ppmf.h"
+#include "plib/pstate.h"
+#include "plib/pstream.h"
+
 #include "netlist_types.h"
 #include "nl_errstr.h"
 #include "nl_lists.h"
 #include "nl_time.h"
-#include "plib/palloc.h" // owned_ptr
-#include "plib/pdynlib.h"
-#include "plib/pstate.h"
-#include "plib/pfmtlog.h"
-#include "plib/pstream.h"
-#include "plib/ppmf.h"
-
-#include <unordered_map>
 
 //============================================================
 //  MACROS / New Syntax
@@ -186,7 +188,7 @@ namespace netlist
 		class NETLIB_NAME(base_proxy);
 		class NETLIB_NAME(base_d_to_a_proxy);
 		class NETLIB_NAME(base_a_to_d_proxy);
-	}
+	} // namespace devices
 
 	namespace detail {
 		class object_t;
@@ -196,13 +198,12 @@ namespace netlist
 		struct family_setter_t;
 		class queue_t;
 		class net_t;
-	}
+	} // namespace detail
 
 	class logic_output_t;
 	class logic_input_t;
 	class analog_net_t;
 	class logic_net_t;
-	class net_t;
 	class setup_t;
 	class netlist_t;
 	class netlist_state_t;
@@ -228,8 +229,7 @@ namespace netlist
 				)
 		: plib::pexception(text) { }
 		/*! Copy constructor. */
-		nl_exception(const nl_exception &e) : plib::pexception(e) { }
-		virtual ~nl_exception();
+		nl_exception(const nl_exception &e) = default;
 	};
 
 	/*! Logic families descriptors are used to create proxy devices.
@@ -240,7 +240,7 @@ namespace netlist
 	{
 	public:
 		logic_family_desc_t();
-		virtual ~logic_family_desc_t();
+		virtual ~logic_family_desc_t() = default;
 
 		virtual plib::owned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_base_t &anetlist, const pstring &name,
 				logic_output_t *proxied) const = 0;
@@ -250,8 +250,8 @@ namespace netlist
 		double fixed_V() const { return m_fixed_V; }
 		double low_thresh_V(const double VN, const double VP) const { return VN + (VP - VN) * m_low_thresh_PCNT; }
 		double high_thresh_V(const double VN, const double VP) const { return VN + (VP - VN) * m_high_thresh_PCNT; }
-		double low_V(const double VN, const double VP) const { return VN + m_low_VO; }
-		double high_V(const double VN, const double VP) const { return VP - m_high_VO; }
+		double low_V(const double VN, const double VP) const { plib::unused_var(VP); return VN + m_low_VO; }
+		double high_V(const double VN, const double VP) const { plib::unused_var(VN);  return VP - m_high_VO; }
 		double R_low() const { return m_R_low; }
 		double R_high() const { return m_R_high; }
 
@@ -285,7 +285,7 @@ namespace netlist
 		void set_logic_family(const logic_family_desc_t *fam) { m_logic_family = fam; }
 
 	protected:
-		~logic_family_t() { } // prohibit polymorphic destruction
+		~logic_family_t() = default; // prohibit polymorphic destruction
 		const logic_family_desc_t *m_logic_family;
 	};
 
@@ -391,7 +391,7 @@ namespace netlist
 	 *  memory allocation to enhance locality. Please refer to \ref USE_MEMPOOL as
 	 *  well.
 	 */
-	class detail::object_t
+	class detail::object_t : public plib::nocopyassignmove
 	{
 	public:
 
@@ -405,17 +405,22 @@ namespace netlist
 		 *
 		 *  \returns name of the object.
 		 */
-		const pstring &name() const;
+		pstring name() const;
 
-		void * operator new (size_t size, void *ptr) { return ptr; }
-		void operator delete (void *ptr, void *) {  }
+		void * operator new (size_t size, void *ptr) { plib::unused_var(size); return ptr; }
+		void operator delete (void *ptr, void *) { plib::unused_var(ptr); }
 		void * operator new (size_t size);
 		void operator delete (void * mem);
 	protected:
-		~object_t(); // only childs should be destructible
+		~object_t() = default; // only childs should be destructible
 
 	private:
-		std::unique_ptr<pstring> m_name;
+		//pstring m_name;
+		static std::unordered_map<const object_t *, pstring> &name_hash()
+		{
+			static std::unordered_map<const object_t *, pstring> lhash;
+			return lhash;
+		}
 	};
 
 	struct detail::netlist_ref
@@ -508,7 +513,7 @@ namespace netlist
 
 		core_terminal_t(core_device_t &dev, const pstring &aname,
 				const state_e state, nldelegate delegate = nldelegate());
-		virtual ~core_terminal_t();
+		virtual ~core_terminal_t() = default;
 
 		/*! The object type.
 		 * \returns type of the object
@@ -562,7 +567,6 @@ namespace netlist
 	public:
 
 		analog_t(core_device_t &dev, const pstring &aname, const state_e state);
-		virtual ~analog_t();
 
 		const analog_net_t & net() const NL_NOEXCEPT;
 		analog_net_t & net() NL_NOEXCEPT;
@@ -576,8 +580,7 @@ namespace netlist
 	{
 	public:
 
-		terminal_t(core_device_t &dev, const pstring &aname);
-		virtual ~terminal_t();
+		terminal_t(core_device_t &dev, const pstring &aname, terminal_t *otherterm);
 
 		nl_double operator ()() const  NL_NOEXCEPT;
 
@@ -593,35 +596,27 @@ namespace netlist
 
 		void set(const nl_double GO, const nl_double GT, const nl_double I)  noexcept
 		{
-			set_ptr(m_Idr1, I);
-			set_ptr(m_go1, GO);
-			set_ptr(m_gt1, GT);
+			if (m_go1 != nullptr)
+			{
+				if (*m_Idr1 != I) *m_Idr1 = I;
+				if (*m_go1 != GO) *m_go1 = GO;
+				if (*m_gt1 != GT) *m_gt1 = GT;
+			}
 		}
 
 		void solve_now();
 		void schedule_solve_after(const netlist_time after);
 
-		void set_ptrs(nl_double *gt, nl_double *go, nl_double *Idr) noexcept
-		{
-			m_gt1 = gt;
-			m_go1 = go;
-			m_Idr1 = Idr;
-		}
+		void set_ptrs(nl_double *gt, nl_double *go, nl_double *Idr) noexcept;
 
-		terminal_t *m_otherterm;
-
+		terminal_t *otherterm() const noexcept { return m_otherterm; }
 	private:
-		void set_ptr(nl_double *ptr, const nl_double val) noexcept
-		{
-			if (ptr != nullptr && *ptr != val)
-			{
-				*ptr = val;
-			}
-		}
 
 		nl_double *m_Idr1; // drive current
 		nl_double *m_go1;  // conductance for Voltage from other term
 		nl_double *m_gt1;  // conductance for total conductance
+
+		terminal_t *m_otherterm;
 
 	};
 
@@ -635,7 +630,6 @@ namespace netlist
 	public:
 		logic_t(core_device_t &dev, const pstring &aname,
 				const state_e state, nldelegate delegate = nldelegate());
-		virtual ~logic_t();
 
 		bool has_proxy() const { return (m_proxy != nullptr); }
 		devices::nld_base_proxy *get_proxy() const  { return m_proxy; }
@@ -659,7 +653,6 @@ namespace netlist
 	public:
 		logic_input_t(core_device_t &dev, const pstring &aname,
 				nldelegate delegate = nldelegate());
-		virtual ~logic_input_t();
 
 		netlist_sig_t operator()() const NL_NOEXCEPT
 		{
@@ -690,9 +683,6 @@ namespace netlist
 		analog_input_t(core_device_t &dev, /*!< owning device */
 				const pstring &aname       /*!< name of terminal */
 		);
-
-		/*! Destructor */
-		virtual ~analog_input_t();
 
 		/*! returns voltage at terminal.
 		 *  \returns voltage at terminal.
@@ -796,7 +786,6 @@ namespace netlist
 	public:
 
 		logic_net_t(netlist_base_t &nl, const pstring &aname, detail::core_terminal_t *mr = nullptr);
-		virtual ~logic_net_t();
 
 		netlist_sig_t Q() const noexcept { return m_cur_Q; }
 		void initial(const netlist_sig_t val) noexcept
@@ -853,8 +842,6 @@ namespace netlist
 
 		analog_net_t(netlist_base_t &nl, const pstring &aname, detail::core_terminal_t *mr = nullptr);
 
-		virtual ~analog_net_t();
-
 		nl_double Q_Analog() const NL_NOEXCEPT { return m_cur_Analog; }
 		void set_Q_Analog(const nl_double v) NL_NOEXCEPT { m_cur_Analog = v; }
 		nl_double *Q_Analog_state_ptr() NL_NOEXCEPT { return m_cur_Analog.ptr(); }
@@ -877,7 +864,6 @@ namespace netlist
 	public:
 
 		logic_output_t(core_device_t &dev, const pstring &aname);
-		virtual ~logic_output_t();
 
 		void initial(const netlist_sig_t val);
 
@@ -904,7 +890,6 @@ namespace netlist
 	{
 	public:
 		analog_output_t(core_device_t &dev, const pstring &aname);
-		virtual ~analog_output_t();
 
 		void push(const nl_double val) NL_NOEXCEPT { set_Q(val); }
 		void initial(const nl_double val);
@@ -935,7 +920,7 @@ namespace netlist
 		param_type_t param_type() const;
 
 	protected:
-		virtual ~param_t(); /* not intended to be destroyed */
+		virtual ~param_t() = default; /* not intended to be destroyed */
 
 		void update_param();
 
@@ -995,10 +980,9 @@ namespace netlist
 	{
 	public:
 		param_str_t(device_t &device, const pstring &name, const pstring &val);
-		virtual ~param_str_t();
 
 		const pstring &operator()() const NL_NOEXCEPT { return Value(); }
-		void setTo(netlist_time time, const pstring &param) NL_NOEXCEPT
+		void setTo(const pstring &param) NL_NOEXCEPT
 		{
 			if (m_param != param)
 			{
@@ -1042,12 +1026,12 @@ namespace netlist
 
 		const pstring model_value_str(const pstring &entity) /*const*/;
 		const pstring model_type() /*const*/;
-	protected:
-		virtual void changed() override;
-		nl_double model_value(const pstring &entity) /*const*/;
-	private:
 		/* hide this */
 		void setTo(const pstring &param) = delete;
+	protected:
+		void changed() override;
+		nl_double model_value(const pstring &entity) /*const*/;
+	private:
 		detail::model_map_t m_map;
 };
 
@@ -1065,7 +1049,7 @@ namespace netlist
 
 		std::unique_ptr<plib::pistream> stream();
 	protected:
-		virtual void changed() override { }
+		void changed() override { }
 	};
 
 	// -----------------------------------------------------------------------------
@@ -1081,7 +1065,7 @@ namespace netlist
 
 		const ST & operator[] (std::size_t n) NL_NOEXCEPT { return m_data[n]; }
 	protected:
-		virtual void changed() override
+		void changed() override
 		{
 			stream()->read(reinterpret_cast<plib::pistream::value_type *>(&m_data[0]),1<<AW);
 		}
@@ -1103,7 +1087,7 @@ namespace netlist
 		core_device_t(netlist_base_t &owner, const pstring &name);
 		core_device_t(core_device_t &owner, const pstring &name);
 
-		virtual ~core_device_t();
+		virtual ~core_device_t() = default;
 
 		void do_inc_active() NL_NOEXCEPT
 		{
@@ -1172,7 +1156,7 @@ namespace netlist
 		device_t(netlist_base_t &owner, const pstring &name);
 		device_t(core_device_t &owner, const pstring &name);
 
-		virtual ~device_t() override;
+		~device_t() override = default;
 
 		setup_t &setup();
 		const setup_t &setup() const;
@@ -1203,7 +1187,11 @@ namespace netlist
 
 	struct detail::family_setter_t
 	{
-		family_setter_t() { }
+		/* clang will complain about an unused private field if
+		 * a defaulted constructor is used
+		 */
+		// NOLINTNEXTLINE(modernize-use-equals-default)
+		family_setter_t();
 		family_setter_t(core_device_t &dev, const pstring &desc);
 		family_setter_t(core_device_t &dev, const logic_family_desc_t *desc);
 	};
@@ -1255,7 +1243,9 @@ namespace netlist
 	{
 	public:
 		using nets_collection_type = std::vector<plib::owned_ptr<detail::net_t>>;
-		using devices_collection_type = std::vector<plib::owned_ptr<core_device_t>>;
+
+		/* need to preserve order of device creation ... */
+		using devices_collection_type = std::vector<std::pair<pstring, plib::owned_ptr<core_device_t>>>;
 		netlist_state_t(const pstring &aname,
 			std::unique_ptr<callbacks_t> &&callbacks,
 			std::unique_ptr<setup_t> &&setup);
@@ -1289,13 +1279,15 @@ namespace netlist
 
 		plib::state_manager_t &run_state_manager() { return m_state; }
 
-		template<typename O, typename C> void save(O &owner, C &state, const pstring &stname)
+		template<typename O, typename C>
+		void save(O &owner, C &state, const pstring &module, const pstring &stname)
 		{
-			this->run_state_manager().save_item(static_cast<void *>(&owner), state, owner.name() + pstring(".") + stname);
+			this->run_state_manager().save_item(static_cast<void *>(&owner), state, module + pstring(".") + stname);
 		}
-		template<typename O, typename C> void save(O &owner, C *state, const pstring &stname, const std::size_t count)
+		template<typename O, typename C>
+		void save(O &owner, C *state, const pstring &module, const pstring &stname, const std::size_t count)
 		{
-			this->run_state_manager().save_state_ptr(static_cast<void *>(&owner), owner.name() + pstring(".") + stname, plib::state_manager_t::datatype_f<C>::f(), count, state);
+			this->run_state_manager().save_state_ptr(static_cast<void *>(&owner), module + pstring(".") + stname, plib::state_manager_t::dtype<C>(), count, state);
 		}
 
 		core_device_t *get_single_device(const pstring &classname, bool (*cc)(core_device_t *)) const;
@@ -1312,33 +1304,31 @@ namespace netlist
 			std::vector<device_class *> tmp;
 			for (auto &d : m_devices)
 			{
-				device_class *dev = dynamic_cast<device_class *>(d.get());
+				auto dev = dynamic_cast<device_class *>(d.second.get());
 				if (dev != nullptr)
 					tmp.push_back(dev);
 			}
 			return tmp;
 		}
 
-		void add_dev(plib::owned_ptr<core_device_t> dev)
+		template <typename T>
+		void add_dev(const pstring &name, plib::owned_ptr<T> &&dev)
 		{
 			for (auto & d : m_devices)
-				if (d->name() == dev->name())
-					log().fatal(MF_1_DUPLICATE_NAME_DEVICE_LIST, d->name());
-			m_devices.push_back(std::move(dev));
+				if (d.first == name)
+					log().fatal(MF_1_DUPLICATE_NAME_DEVICE_LIST, d.first);
+			//m_devices.push_back(std::move(dev));
+			m_devices.insert(m_devices.end(), { name, std::move(dev) });
 		}
 
 		void remove_dev(core_device_t *dev)
 		{
-			m_devices.erase(
-				std::remove_if(
-					m_devices.begin(),
-					m_devices.end(),
-					[&] (plib::owned_ptr<core_device_t> const& p)
-					{
-						return p.get() == dev;
-					}),
-					m_devices.end()
-				);
+			for (auto it = m_devices.begin(); it != m_devices.end(); it++)
+				if (it->second.get() == dev)
+				{
+					m_devices.erase(it);
+					return;
+				}
 		}
 
 		/* sole use is to manage lifetime of family objects */
@@ -1379,7 +1369,7 @@ namespace netlist
 	public:
 
 		explicit netlist_t(const pstring &aname, std::unique_ptr<callbacks_t> callbacks);
-		~netlist_t();
+		~netlist_t() = default;
 
 		/* run functions */
 
@@ -1407,6 +1397,7 @@ namespace netlist
 		template <typename X = devices::NETLIB_NAME(solver)>
 		nl_double gmin(X *solv = nullptr) const NL_NOEXCEPT
 		{
+			plib::unused_var(solv);
 			return static_cast<X *>(m_solver)->gmin();
 		}
 
@@ -1486,7 +1477,7 @@ namespace netlist
 		if (found)
 		{
 			bool err = false;
-			T vald = plib::pstonum_ne<T>(p, err);
+			auto vald = plib::pstonum_ne<T>(p, err);
 			if (err)
 				device.state().log().fatal(MF_2_INVALID_NUMBER_CONVERSION_1_2, name, p);
 			m_param = vald;
@@ -1494,7 +1485,7 @@ namespace netlist
 		else
 			m_param = val;
 
-		device.state().save(*this, m_param, "m_param");
+		device.state().save(*this, m_param, this->name(), "m_param");
 	}
 
 	template <typename ST, std::size_t AW, std::size_t DW>
@@ -1613,6 +1604,18 @@ namespace netlist
 
 	inline nl_double terminal_t::operator ()() const NL_NOEXCEPT { return net().Q_Analog(); }
 
+	inline void terminal_t::set_ptrs(nl_double *gt, nl_double *go, nl_double *Idr) noexcept
+	{
+		if (!(gt && go && Idr) && (gt || go || Idr))
+			state().log().fatal("Inconsistent nullptrs for terminal {}", name());
+		else
+		{
+			m_gt1 = gt;
+			m_go1 = go;
+			m_Idr1 = Idr;
+		}
+	}
+
 	inline logic_net_t & logic_t::net() NL_NOEXCEPT
 	{
 		return static_cast<logic_net_t &>(core_terminal_t::net());
@@ -1674,18 +1677,18 @@ namespace netlist
 	state_var<T>::state_var(O &owner, const pstring &name, const T &value)
 	: m_value(value)
 	{
-		owner.state().save(owner, m_value, name);
+		owner.state().save(owner, m_value, owner.name(), name);
 	}
 
 	template <typename T, std::size_t N>
 	template <typename O>
 	state_var<T[N]>::state_var(O &owner, const pstring &name, const T & value)
 	{
-		owner.state().save(owner, m_value, name);
+		owner.state().save(owner, m_value, owner.name(), name);
 		for (std::size_t i=0; i<N; i++)
 			m_value[i] = value;
 	}
-}
+} // namespace netlist
 
 namespace plib
 {
@@ -1693,7 +1696,7 @@ namespace plib
 	struct ptype_traits<netlist::state_var<X>> : ptype_traits<X>
 	{
 	};
-}
+} // namespace plib
 
 
 

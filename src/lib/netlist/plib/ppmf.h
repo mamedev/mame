@@ -8,11 +8,10 @@
 #ifndef PPMF_H_
 #define PPMF_H_
 
-#include "pconfig.h"
-
-#include <utility>
 #include <cstdint>
+#include <utility>
 
+#include "pconfig.h"
 
 /*
  *
@@ -70,7 +69,8 @@ namespace plib {
 		using generic_function = void (*)();
 
 		template<typename MemberFunctionType>
-		mfp(MemberFunctionType mftp)
+		mfp(MemberFunctionType mftp) // NOLINT(cppcoreguidelines-pro-type-member-init)
+
 		: m_function(0), m_this_delta(0), m_size(sizeof(mfp))
 		{
 			*reinterpret_cast<MemberFunctionType *>(this) = mftp;
@@ -82,7 +82,7 @@ namespace plib {
 			mfp mfpo(mftp);
 			//return mfpo.update_after_bind<FunctionType>(object);
 			generic_function rfunc(nullptr);
-			generic_class *robject = reinterpret_cast<generic_class *>(object);
+			auto robject = reinterpret_cast<generic_class *>(object);
 			mfpo.convert_to_generic(rfunc, robject);
 			func = reinterpret_cast<FunctionType>(rfunc);
 			object = reinterpret_cast<ObjectType *>(robject);
@@ -95,7 +95,7 @@ namespace plib {
 			if (PHAS_PMF_INTERNAL == 1)
 			{
 				// apply the "this" delta to the object first
-				generic_class * o_p_delta = reinterpret_cast<generic_class *>(reinterpret_cast<std::uint8_t *>(object) + m_this_delta);
+				auto o_p_delta = reinterpret_cast<generic_class *>(reinterpret_cast<std::uint8_t *>(object) + m_this_delta);
 
 				// if the low bit of the vtable index is clear, then it is just a raw function pointer
 				if (!(m_function & 1))
@@ -274,6 +274,6 @@ namespace plib {
 	};
 
 
-}
+} // namespace plib
 
 #endif /* PPMF_H_ */

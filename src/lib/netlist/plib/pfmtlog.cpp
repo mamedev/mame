@@ -8,18 +8,19 @@
 #include "pfmtlog.h"
 #include "palloc.h"
 
-#include <cstring>
-#include <cstdlib>
-#include <cstdarg>
 #include <algorithm>
-#include <locale>
+#include <cstdarg>
+#include <cstdlib>
+#include <cstring>
 #include <iostream>
+#include <locale>
 
 namespace plib {
 
 pfmt &pfmt::format_element(const char *l, const unsigned cfmt_spec,  ...)
 {
 	va_list ap;
+	// NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
 	va_start(ap, cfmt_spec);
 	pstring fmt("%");
 	char buf[2048]; // FIXME
@@ -87,4 +88,4 @@ pfmt &pfmt::format_element(const char *l, const unsigned cfmt_spec,  ...)
 	return *this;
 }
 
-}
+} // namespace plib

@@ -7,8 +7,8 @@
 
 #include "../solver/nld_solver.h"
 
-#include "nlid_twoterm.h"
 #include "../nl_factory.h"
+#include "nlid_twoterm.h"
 
 #include <cmath>
 
@@ -70,7 +70,7 @@ void generic_diode::update_diode(const nl_double nVd)
 	}
 	else
 	{
-		const double a = std::max((nVd - m_Vd) * m_VtInv, NL_FCONST(-0.99));
+		const double a = std::max((nVd - m_Vd) * m_VtInv, plib::constants<nl_double>()(-0.99));
 		m_Vd = m_Vd + std::log1p(a) * m_Vt;
 		//const double IseVDVt = m_Is * std::exp(m_Vd * m_VtInv);
 		const double IseVDVt = std::exp(m_logIs + m_Vd * m_VtInv);
@@ -145,7 +145,7 @@ NETLIB_RESET(POT)
 		v = (std::exp(v) - 1.0) / (std::exp(1.0) - 1.0);
 
 	m_R1.set_R(std::max(m_R() * v, exec().gmin()));
-	m_R2.set_R(std::max(m_R() * (NL_FCONST(1.0) - v), exec().gmin()));
+	m_R2.set_R(std::max(m_R() * (plib::constants<nl_double>::one - v), exec().gmin()));
 }
 
 NETLIB_UPDATE_PARAM(POT)
@@ -158,7 +158,7 @@ NETLIB_UPDATE_PARAM(POT)
 		v = (std::exp(v) - 1.0) / (std::exp(1.0) - 1.0);
 
 	m_R1.set_R(std::max(m_R() * v, exec().gmin()));
-	m_R2.set_R(std::max(m_R() * (NL_FCONST(1.0) - v), exec().gmin()));
+	m_R2.set_R(std::max(m_R() * (plib::constants<nl_double>::one - v), exec().gmin()));
 
 }
 
@@ -288,6 +288,6 @@ NETLIB_UPDATE_TERMINALS(D)
 		NETLIB_DEVICE_IMPL_NS(analog, D,    "DIODE", "MODEL")
 		NETLIB_DEVICE_IMPL_NS(analog, VS,   "VS",    "V")
 		NETLIB_DEVICE_IMPL_NS(analog, CS,   "CS",    "I")
-	}
+	} // namespace devices
 
 } // namespace netlist

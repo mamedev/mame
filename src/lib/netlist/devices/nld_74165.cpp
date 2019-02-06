@@ -86,6 +86,7 @@ namespace netlist
 		}
 		else if (!m_CLK() || m_CLKINH())
 		{
+			// FIXME: qh is overwritten below?
 			qh = old_qh;
 		}
 		else if (!m_last_CLK)

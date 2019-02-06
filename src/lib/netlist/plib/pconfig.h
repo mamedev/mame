@@ -76,15 +76,6 @@ typedef __uint128_t UINT128;
 typedef __int128_t INT128;
 #endif
 
-#if defined(__GNUC__)
-#ifdef RESTRICT
-#undef RESTRICT
-#endif
-#define RESTRICT                __restrict__
-#else
-#define RESTRICT
-#endif
-
 //============================================================
 //  Standard defines
 //============================================================

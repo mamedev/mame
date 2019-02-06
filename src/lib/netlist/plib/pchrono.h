@@ -10,8 +10,8 @@
 
 #include "pconfig.h"
 
-#include <cstdint>
 #include <chrono>
+#include <cstdint>
 
 namespace plib {
 namespace chrono {
@@ -174,7 +174,10 @@ namespace chrono {
 
 		struct guard_t
 		{
-			guard_t(timer &m) : m_m(m) { m_m.m_time -= T::start();; }
+			guard_t() = delete;
+			guard_t(const guard_t &g) noexcept = default;
+			guard_t(guard_t &&g) noexcept = default;
+			guard_t(timer &m) noexcept : m_m(m) { m_m.m_time -= T::start(); }
 			~guard_t() { m_m.m_time += T::stop(); ++m_m.m_count; }
 		private:
 			timer &m_m;
@@ -208,8 +211,14 @@ namespace chrono {
 
 		struct guard_t
 		{
-			guard_t() {}
-			~guard_t() {}
+			guard_t() = default;
+			guard_t(const guard_t &g) noexcept = default;
+			guard_t(guard_t &&g) noexcept = default;
+			/* using default constructor will trigger warning on
+			 * unused local variable.
+			 */
+			// NOLINTNEXTLINE(modernize-use-equals-default)
+			~guard_t() { }
 		};
 
 		constexpr type operator()() const { return 0; }

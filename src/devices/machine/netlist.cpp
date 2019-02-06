@@ -581,11 +581,12 @@ void netlist_mame_analog_output_device::custom_netlist_additions(netlist::setup_
 {
 	const pstring pin(m_in);
 	pstring dname = pstring("OUT_") + pin;
+	pstring dfqn = setup.build_fqn(dname);
 	m_delegate.bind_relative_to(owner()->machine().root_device());
 
-	plib::owned_ptr<netlist::device_t> dev = plib::owned_ptr<netlist::device_t>::Create<NETLIB_NAME(analog_callback)>(setup.netlist(), setup.build_fqn(dname));
+	plib::owned_ptr<netlist::device_t> dev = plib::owned_ptr<netlist::device_t>::Create<NETLIB_NAME(analog_callback)>(setup.netlist(), dfqn);
 	static_cast<NETLIB_NAME(analog_callback) *>(dev.get())->register_callback(std::move(m_delegate));
-	setup.netlist().add_dev(std::move(dev));
+	setup.netlist().add_dev(dfqn, std::move(dev));
 	setup.register_link(dname + ".IN", pin);
 }
 
@@ -616,11 +617,13 @@ void netlist_mame_logic_output_device::custom_netlist_additions(netlist::setup_t
 {
 	pstring pin(m_in);
 	pstring dname = "OUT_" + pin;
+	pstring dfqn = setup.build_fqn(dname);
+
 	m_delegate.bind_relative_to(owner()->machine().root_device());
 
-	plib::owned_ptr<netlist::device_t> dev = plib::owned_ptr<netlist::device_t>::Create<NETLIB_NAME(logic_callback)>(setup.netlist(), setup.build_fqn(dname));
+	plib::owned_ptr<netlist::device_t> dev = plib::owned_ptr<netlist::device_t>::Create<NETLIB_NAME(logic_callback)>(setup.netlist(), dfqn);
 	static_cast<NETLIB_NAME(logic_callback) *>(dev.get())->register_callback(std::move(m_delegate));
-	setup.netlist().add_dev(std::move(dev));
+	setup.netlist().add_dev(dfqn, std::move(dev));
 	setup.register_link(dname + ".IN", pin);
 }
 
@@ -882,9 +885,9 @@ void netlist_mame_device::device_start()
 
 	setup().prepare_to_run();
 
-	netlist().nlstate().save(*this, m_rem, "m_rem");
-	netlist().nlstate().save(*this, m_div, "m_div");
-	netlist().nlstate().save(*this, m_old, "m_old");
+	netlist().nlstate().save(*this, m_rem, this->name(), "m_rem");
+	netlist().nlstate().save(*this, m_div, this->name(), "m_div");
+	netlist().nlstate().save(*this, m_old, this->name(), "m_old");
 
 	save_state();
 

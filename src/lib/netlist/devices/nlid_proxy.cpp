@@ -29,10 +29,6 @@ namespace netlist
 		m_proxy_term = proxy_inout;
 	}
 
-	nld_base_proxy::~nld_base_proxy()
-	{
-	}
-
 	// ----------------------------------------------------------------------------------------
 	// nld_a_to_d_proxy
 	// ----------------------------------------------------------------------------------------
@@ -44,15 +40,9 @@ namespace netlist
 	{
 	}
 
-	nld_base_a_to_d_proxy::~nld_base_a_to_d_proxy() {}
-
 	nld_a_to_d_proxy::nld_a_to_d_proxy(netlist_base_t &anetlist, const pstring &name, logic_input_t *in_proxied)
 			: nld_base_a_to_d_proxy(anetlist, name, in_proxied, &m_I)
 	, m_I(*this, "I")
-	{
-	}
-
-	nld_a_to_d_proxy::~nld_a_to_d_proxy()
 	{
 	}
 
@@ -85,10 +75,6 @@ namespace netlist
 			logic_output_t *out_proxied, detail::core_terminal_t &proxy_out)
 	: nld_base_proxy(anetlist, name, out_proxied, &proxy_out)
 	, m_I(*this, "I")
-	{
-	}
-
-	nld_base_d_to_a_proxy::~nld_base_d_to_a_proxy()
 	{
 	}
 
@@ -139,13 +125,13 @@ namespace netlist
 		m_last_state = -1;
 		m_RV.reset();
 		m_is_timestep = m_RV.m_P.net().solver()->has_timestep_devices();
-		m_RV.set(NL_FCONST(1.0) / logic_family()->R_low(),
+		m_RV.set(plib::constants<nl_double>::one / logic_family()->R_low(),
 				logic_family()->low_V(0.0, supply_V), 0.0);
 	}
 
 	NETLIB_UPDATE(d_to_a_proxy)
 	{
-		const int state = static_cast<int>(m_I());
+		const auto state = static_cast<int>(m_I());
 		if (state != m_last_state)
 		{
 			// FIXME: Variable voltage
@@ -160,7 +146,7 @@ namespace netlist
 			{
 				m_RV.update();
 			}
-			m_RV.set(NL_FCONST(1.0) / R, V, 0.0);
+			m_RV.set(plib::constants<nl_double>::one / R, V, 0.0);
 			m_RV.solve_later();
 		}
 	}

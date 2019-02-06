@@ -10,10 +10,10 @@
 #ifndef NL_CONVERT_H_
 #define NL_CONVERT_H_
 
-#include <memory>
-#include "../plib/pstring.h"
 #include "../plib/plists.h"
 #include "../plib/pparser.h"
+#include "../plib/pstring.h"
+#include <memory>
 
 /*-------------------------------------------------
     convert - convert a spice netlist
@@ -140,9 +140,7 @@ class nl_convert_spice_t : public nl_convert_base_t
 public:
 
 	nl_convert_spice_t() : nl_convert_base_t() {}
-	virtual ~nl_convert_spice_t() override
-	{
-	}
+	~nl_convert_spice_t() override = default;
 
 	void convert(const pstring &contents) override;
 
@@ -159,9 +157,7 @@ class nl_convert_eagle_t : public nl_convert_base_t
 public:
 
 	nl_convert_eagle_t() : nl_convert_base_t() {}
-	virtual ~nl_convert_eagle_t() override
-	{
-	}
+	~nl_convert_eagle_t() override = default;
 
 	class tokenizer : public plib::ptokenizer
 	{
@@ -175,7 +171,7 @@ public:
 
 	protected:
 
-		virtual void verror(const pstring &msg, int line_num, const pstring &line) override;
+		void verror(const pstring &msg, int line_num, const pstring &line) override;
 
 	private:
 		nl_convert_eagle_t &m_convert;
@@ -195,9 +191,7 @@ class nl_convert_rinf_t : public nl_convert_base_t
 public:
 
 	nl_convert_rinf_t() : nl_convert_base_t() {}
-	virtual ~nl_convert_rinf_t() override
-	{
-	}
+	~nl_convert_rinf_t() override = default;
 
 	class tokenizer : public plib::ptokenizer
 	{
@@ -216,7 +210,7 @@ public:
 
 	protected:
 
-		virtual void verror(const pstring &msg, int line_num, const pstring &line) override;
+		void verror(const pstring &msg, int line_num, const pstring &line) override;
 
 	private:
 		nl_convert_rinf_t &m_convert;

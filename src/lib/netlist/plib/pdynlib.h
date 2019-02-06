@@ -64,6 +64,6 @@ private:
 	calltype m_sym;
 };
 
-}
+} // namespace plib
 
 #endif /* PSTRING_H_ */

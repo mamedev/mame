@@ -11,12 +11,12 @@
 #define PMAIN_H_
 
 #include "poptions.h"
+#include "pstream.h"
 #include "pstring.h"
 #include "putil.h"
-#include "pstream.h"
 
-#include <memory>
 #include <cwchar>
+#include <memory>
 
 #ifdef _WIN32
 #define PMAIN(appclass) \
@@ -36,7 +36,7 @@ namespace plib {
 	{
 	public:
 		app();
-		virtual ~app();
+		virtual ~app() = default;
 
 		virtual pstring usage() = 0;
 		virtual int execute() = 0;
@@ -62,7 +62,7 @@ namespace plib {
 
 	};
 
-}
+} // namespace plib
 
 
 

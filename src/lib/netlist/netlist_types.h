@@ -9,13 +9,14 @@
 #ifndef NETLIST_TYPES_H_
 #define NETLIST_TYPES_H_
 
-#include "nl_config.h"
-#include "plib/pchrono.h"
-#include "plib/pstring.h"
-#include "plib/pfmtlog.h"
-
 #include <cstdint>
 #include <unordered_map>
+
+#include "nl_config.h"
+#include "plib/pchrono.h"
+#include "plib/pfmtlog.h"
+#include "plib/pstring.h"
+
 
 namespace netlist
 {
@@ -37,7 +38,7 @@ namespace netlist
 	class callbacks_t
 	{
 	public:
-		virtual ~callbacks_t() {}
+		virtual ~callbacks_t() = default;
 
 		/* logging callback */
 		virtual void vlog(const plib::plog_level &l, const pstring &ls) const = 0;
@@ -74,7 +75,7 @@ namespace netlist
 	 */
 	using model_map_t = std::unordered_map<pstring, pstring>;
 
-	}
-}
+	} // namespace detail
+} // namespace netlist
 
 #endif /* NETLIST_TYPES_H_ */

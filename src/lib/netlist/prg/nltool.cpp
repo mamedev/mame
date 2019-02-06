@@ -9,11 +9,11 @@
 ****************************************************************************/
 
 #include "netlist/plib/pmain.h"
-#include "netlist/nl_setup.h"
-#include "netlist/nl_parser.h"
 #include "netlist/devices/net_lib.h"
-#include "netlist/tools/nl_convert.h"
+#include "netlist/nl_parser.h"
+#include "netlist/nl_setup.h"
 #include "netlist/solver/nld_solver.h"
+#include "netlist/tools/nl_convert.h"
 
 #include <cstring>
 
@@ -85,8 +85,8 @@ public:
 	plib::option_example opt_ex2;
 	plib::option_example opt_ex3;
 
-	int execute();
-	pstring usage();
+	int execute() override;
+	pstring usage() override;
 
 private:
 	void run();
@@ -127,7 +127,7 @@ public:
 	{
 	}
 
-	virtual std::unique_ptr<plib::pistream> stream(const pstring &file) override;
+	std::unique_ptr<plib::pistream> stream(const pstring &file) override;
 
 private:
 	pstring m_folder;
@@ -172,9 +172,7 @@ public:
 	{
 	}
 
-	~netlist_tool_t()
-	{
-	}
+	~netlist_tool_t() = default;
 
 	void init()
 	{
@@ -281,9 +279,11 @@ void netlist_tool_callbacks_t::vlog(const plib::plog_level &l, const pstring &ls
 struct input_t
 {
 	input_t(const netlist::setup_t &setup, const pstring &line)
+	: m_value(0.0)
 	{
 		char buf[400];
 		double t;
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
 		int e = sscanf(line.c_str(), "%lf,%[^,],%lf", &t, buf, &m_value);
 		if (e != 3)
 			throw netlist::nl_exception(plib::pfmt("error {1} scanning line {2}\n")(e)(line));
@@ -478,12 +478,12 @@ void tool_app_t::cmac(const netlist::factory::element_t *e)
 {
 	auto v = plib::psplit(e->param_desc(), ",");
 	pstring vs;
-	for (auto s : v)
+	for (const auto &s : v)
 		vs += ", p" + plib::replace_all(plib::replace_all(s, "+", ""), ".", "_");
 	mac_out("#define " + e->name() + "(name" + vs + ")");
 	mac_out("\tNET_REGISTER_DEV(" + e->name() +", name)");
 
-	for (auto s : v)
+	for (const auto &s : v)
 	{
 		pstring r(plib::replace_all(plib::replace_all(s, "+", ""), ".", "_"));
 		if (plib::startsWith(s, "+"))
@@ -498,7 +498,7 @@ void tool_app_t::mac(const netlist::factory::element_t *e)
 {
 	auto v = plib::psplit(e->param_desc(), ",");
 	pstring vs;
-	for (auto s : v)
+	for (const auto &s : v)
 	{
 		vs += ", " + plib::replace_all(plib::replace_all(s, "+", ""), ".", "_");
 	}
@@ -506,7 +506,7 @@ void tool_app_t::mac(const netlist::factory::element_t *e)
 	if (v.size() > 0)
 	{
 		pout("/*\n");
-		for (auto s : v)
+		for (const auto &s : v)
 		{
 			pstring r(plib::replace_all(plib::replace_all(s, "+", ""), ".", "_"));
 			if (plib::startsWith(s, "+"))
@@ -645,7 +645,7 @@ void tool_app_t::listdevices()
 		std::vector<pstring> terms(nt.setup().get_terminals_for_device_name(d->name()));
 
 		out += "," + f->param_desc();
-		for (auto p : plib::psplit(f->param_desc(),",") )
+		for (const auto &p : plib::psplit(f->param_desc(),",") )
 		{
 			if (plib::startsWith(p, "+"))
 			{
@@ -661,7 +661,7 @@ void tool_app_t::listdevices()
 				t += "," + j;
 			printf("\tTerminals: %s\n", t.substr(1).c_str());
 		}
-		devs.push_back(std::move(d));
+		devs.emplace_back(std::move(d));
 	}
 }
 
@@ -715,7 +715,7 @@ int tool_app_t::execute()
 	}
 
 	m_options = opt_defines();
-	m_options.push_back("NLTOOL_VERSION=" PSTRINGIFY(NLTOOL_VERSION));
+	m_options.emplace_back("NLTOOL_VERSION=" PSTRINGIFY(NLTOOL_VERSION));
 
 	try
 	{

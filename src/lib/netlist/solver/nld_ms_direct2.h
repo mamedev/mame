@@ -26,7 +26,7 @@ namespace devices
 		matrix_solver_direct2_t(netlist_base_t &anetlist, const pstring &name, const solver_parameters_t *params)
 			: matrix_solver_direct_t<double, 2>(anetlist, name, params, 2)
 			{}
-		virtual unsigned vsolve_non_dynamic(const bool newton_raphson) override;
+		unsigned vsolve_non_dynamic(const bool newton_raphson) override;
 
 	};
 

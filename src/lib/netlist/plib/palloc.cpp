@@ -7,8 +7,8 @@
 
 #include "pconfig.h"
 #include "palloc.h"
-#include "pfmtlog.h"
 #include "pexception.h"
+#include "pfmtlog.h"
 
 #include <algorithm>
 
@@ -37,7 +37,7 @@ mempool::~mempool()
 
 mempool::block * mempool::new_block()
 {
-	block *b = new block();
+	auto *b = new block();
 	b->data = static_cast<char *>(::operator new(m_min_alloc));
 	b->cur_ptr = b->data;
 	b->m_free = m_min_alloc;
@@ -92,7 +92,7 @@ void mempool::free(void *ptr)
 	auto i = reinterpret_cast<info *>(p - mininfosize());
 	block *b = i->m_block;
 	if (b->m_num_alloc == 0)
-		plib::pexception("mempool::free - double free was called\n");
+		throw plib::pexception("mempool::free - double free was called\n");
 	else
 	{
 		//b->m_free = m_min_alloc;
@@ -101,4 +101,4 @@ void mempool::free(void *ptr)
 	b->m_num_alloc--;
 }
 
-}
+} // namespace plib

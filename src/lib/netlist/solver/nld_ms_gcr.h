@@ -10,14 +10,14 @@
 #ifndef NLD_MS_GCR_H_
 #define NLD_MS_GCR_H_
 
-#include <netlist/plib/mat_cr.h>
 #include <algorithm>
+#include <netlist/plib/mat_cr.h>
 
 #include "../plib/pdynlib.h"
+#include "../plib/pstream.h"
+#include "../plib/vector_ops.h"
 #include "nld_ms_direct.h"
 #include "nld_solver.h"
-#include "../plib/vector_ops.h"
-#include "../plib/pstream.h"
 
 namespace netlist
 {
@@ -44,16 +44,14 @@ public:
 		{
 		}
 
-	virtual ~matrix_solver_GCR_t() override
-	{
-	}
+	~matrix_solver_GCR_t() override = default;
 
 	constexpr std::size_t N() const { return m_dim; }
 
-	virtual void vsetup(analog_net_t::list_t &nets) override;
-	virtual unsigned vsolve_non_dynamic(const bool newton_raphson) override;
+	void vsetup(analog_net_t::list_t &nets) override;
+	unsigned vsolve_non_dynamic(const bool newton_raphson) override;
 
-	virtual std::pair<pstring, pstring> create_solver_code() override;
+	std::pair<pstring, pstring> create_solver_code() override;
 
 private:
 
@@ -62,7 +60,7 @@ private:
 
 	void csc_private(plib::putf8_fmt_writer &strm);
 
-	using extsolver = void (*)(double * RESTRICT m_A, double * RESTRICT RHS, double * RESTRICT V);
+	using extsolver = void (*)(double * m_A, double * RHS, double * V);
 
 	pstring static_compile_name();
 
@@ -75,7 +73,7 @@ private:
 	mat_type mat;
 
 	//extsolver m_proc;
-	plib::dynproc<void, double * RESTRICT, double * RESTRICT, double * RESTRICT> m_proc;
+	plib::dynproc<void, double * , double * , double * > m_proc;
 
 };
 

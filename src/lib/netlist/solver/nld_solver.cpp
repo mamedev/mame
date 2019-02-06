@@ -40,8 +40,8 @@
 
 #include "../nl_factory.h"
 
-#include "nld_solver.h"
 #include "nld_matrix_solver.h"
+#include "nld_solver.h"
 
 #if 1
 #include "nld_ms_direct.h"
@@ -49,13 +49,13 @@
 #else
 #include "nld_ms_direct_lu.h"
 #endif
-#include "nld_ms_w.h"
-#include "nld_ms_sm.h"
 #include "nld_ms_direct1.h"
 #include "nld_ms_direct2.h"
+#include "nld_ms_gmres.h"
+#include "nld_ms_sm.h"
 #include "nld_ms_sor.h"
 #include "nld_ms_sor_mat.h"
-#include "nld_ms_gmres.h"
+#include "nld_ms_w.h"
 
 namespace netlist
 {
@@ -70,14 +70,14 @@ namespace netlist
 
 NETLIB_RESET(solver)
 {
-	for (std::size_t i = 0; i < m_mat_solvers.size(); i++)
-		m_mat_solvers[i]->reset();
+	for (auto &s : m_mat_solvers)
+		s->reset();
 }
 
 void NETLIB_NAME(solver)::stop()
 {
-	for (std::size_t i = 0; i < m_mat_solvers.size(); i++)
-		m_mat_solvers[i]->log_stats();
+	for (auto &s : m_mat_solvers)
+		s->log_stats();
 }
 
 NETLIB_NAME(solver)::~NETLIB_NAME(solver)()
@@ -206,8 +206,8 @@ struct net_splitter
 		{
 			if (p->is_type(detail::terminal_type::TERMINAL))
 			{
-				terminal_t *pt = static_cast<terminal_t *>(p);
-				analog_net_t *other_net = &pt->m_otherterm->net();
+				auto *pt = static_cast<terminal_t *>(p);
+				analog_net_t *other_net = &pt->otherterm()->net();
 				if (!already_processed(other_net))
 					process_net(other_net);
 			}
@@ -223,10 +223,10 @@ struct net_splitter
 			{
 				netlist.log().debug("   ==> not a rail net\n");
 				/* Must be an analog net */
-				analog_net_t *n = static_cast<analog_net_t *>(net.get());
+				auto *n = static_cast<analog_net_t *>(net.get());
 				if (!already_processed(n))
 				{
-					groups.push_back(analog_net_t::list_t());
+					groups.emplace_back(analog_net_t::list_t());
 					process_net(n);
 				}
 			}
@@ -382,7 +382,7 @@ void NETLIB_NAME(solver)::post_start()
 				else
 				{
 					log().fatal(MF_1_NETGROUP_SIZE_EXCEEDED_1, 128);
-					ms = nullptr; /* tease compilers */
+					return; /* tease compilers */
 				}
 				break;
 		}

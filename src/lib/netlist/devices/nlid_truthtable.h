@@ -10,8 +10,8 @@
 #ifndef NLID_TRUTHTABLE_H_
 #define NLID_TRUTHTABLE_H_
 
-#include "../nl_setup.h"
 #include "../nl_base.h"
+#include "../nl_setup.h"
 #include "../plib/putil.h"
 
 #define NETLIB_TRUTHTABLE(cname, nIN, nOUT)                                    \
@@ -90,8 +90,10 @@ namespace devices
 		struct truthtable_t
 		{
 			truthtable_t()
-			: m_initialized(false)
+			: m_timing_index{0}
+			, m_initialized(false)
 			{}
+
 			type_t m_out_state[m_size];
 			uint_least8_t m_timing_index[m_size * m_NO];
 			netlist_time m_timing_nt[16];
@@ -217,7 +219,7 @@ namespace devices
 		netlist_base_factory_truthtable_t(const pstring &name, const pstring &classname,
 				const pstring &def_param, const pstring &sourcefile);
 
-		virtual ~netlist_base_factory_truthtable_t();
+		~netlist_base_factory_truthtable_t() override = default;
 
 		std::vector<pstring> m_desc;
 		const logic_family_desc_t *m_family;

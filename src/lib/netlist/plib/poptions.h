@@ -10,8 +10,8 @@
 #ifndef POPTIONS_H_
 #define POPTIONS_H_
 
-#include "pstring.h"
 #include "plists.h"
+#include "pstring.h"
 #include "putil.h"
 
 namespace plib {
@@ -25,7 +25,7 @@ class option_base
 {
 public:
 	option_base(options &parent, pstring help);
-	virtual ~option_base();
+	virtual ~option_base() = default;
 
 	pstring help() const { return m_help; }
 private:
@@ -37,7 +37,6 @@ class option_group : public option_base
 public:
 	option_group(options &parent, pstring group, pstring help)
 	: option_base(parent, help), m_group(group) { }
-	~option_group();
 
 	pstring group() const { return m_group; }
 private:
@@ -49,7 +48,6 @@ class option_example : public option_base
 public:
 	option_example(options &parent, pstring group, pstring help)
 	: option_base(parent, help), m_example(group) { }
-	~option_example();
 
 	pstring example() const { return m_example; }
 private:
@@ -61,7 +59,6 @@ class option : public option_base
 {
 public:
 	option(options &parent, pstring ashort, pstring along, pstring help, bool has_argument);
-	~option();
 
 	/* no_argument options will be called with "" argument */
 
@@ -96,7 +93,7 @@ public:
 	pstring operator ()() const { return m_val; }
 
 protected:
-	virtual int parse(const pstring &argument) override;
+	int parse(const pstring &argument) override;
 
 private:
 	pstring m_val;
@@ -133,7 +130,7 @@ public:
 	pstring as_string() const { return limit()[m_val]; }
 
 protected:
-	virtual int parse(const pstring &argument) override
+	int parse(const pstring &argument) override
 	{
 		auto raw = plib::container::indexof(limit(), argument);
 
@@ -160,7 +157,7 @@ public:
 	bool operator ()() const { return m_val; }
 
 protected:
-	virtual int parse(const pstring &argument) override;
+	int parse(const pstring &argument) override;
 
 private:
 	bool m_val;
@@ -183,7 +180,7 @@ public:
 	T operator ()() const { return m_val; }
 
 protected:
-	virtual int parse(const pstring &argument) override
+	int parse(const pstring &argument) override
 	{
 		bool err;
 		m_val = pstonum_ne<T>(argument, err);
@@ -206,7 +203,7 @@ public:
 	const std::vector<pstring> &operator ()() const { return m_val; }
 
 protected:
-	virtual int parse(const pstring &argument) override;
+	int parse(const pstring &argument) override;
 
 private:
 	std::vector<pstring> m_val;
@@ -262,6 +259,6 @@ private:
 	option_args * m_other_args;
 };
 
-}
+} // namespace plib
 
 #endif /* POPTIONS_H_ */

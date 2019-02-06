@@ -10,16 +10,16 @@
 #ifndef NLLISTS_H_
 #define NLLISTS_H_
 
-#include "nl_config.h"
 #include "netlist_types.h"
-#include "plib/plists.h"
+#include "nl_config.h"
 #include "plib/pchrono.h"
+#include "plib/plists.h"
 #include "plib/ptypes.h"
 
-#include <atomic>
-#include <thread>
-#include <mutex>
 #include <algorithm>
+#include <atomic>
+#include <mutex>
+#include <thread>
 #include <utility>
 
 // ----------------------------------------------------------------------------------------
@@ -33,7 +33,7 @@ namespace netlist
 	class pspin_mutex
 	{
 	public:
-		pspin_mutex() noexcept { }
+		pspin_mutex() noexcept = default;
 		void lock() noexcept{ while (m_lock.test_and_set(std::memory_order_acquire)) { } }
 		void unlock() noexcept { m_lock.clear(std::memory_order_release); }
 	private:
@@ -309,6 +309,6 @@ namespace netlist
 	template <class T, bool TS, bool KEEPSTAT, class QueueOp = typename T::QueueOp>
 	using timed_queue = timed_queue_linear<T, TS, KEEPSTAT, QueueOp>;
 
-}
+} // namespace netlist
 
 #endif /* NLLISTS_H_ */

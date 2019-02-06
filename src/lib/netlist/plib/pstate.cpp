@@ -9,17 +9,6 @@
 #include "palloc.h"
 
 namespace plib {
-state_manager_t::state_manager_t()
-{
-}
-
-state_manager_t::~state_manager_t()
-{
-	m_save.clear();
-	m_custom.clear();
-}
-
-
 
 void state_manager_t::save_state_ptr(const void *owner, const pstring &stname, const datatype_t &dt, const std::size_t count, void *ptr)
 {
@@ -65,9 +54,4 @@ template<> void state_manager_t::save_item(const void *owner, callback_t &state,
 	state.register_state(*this, stname);
 }
 
-state_manager_t::callback_t::~callback_t()
-{
-}
-
-
-}
+} // namespace plib

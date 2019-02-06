@@ -111,7 +111,7 @@ public:
 	static owned_ptr Create(Args&&... args)
 	{
 		owned_ptr a;
-		DC *x = new DC(std::forward<Args>(args)...);
+		auto *x = new DC(std::forward<Args>(args)...);
 		a.m_ptr = static_cast<SC *>(x);
 		return std::move(a);
 	}
@@ -176,6 +176,6 @@ public:
 
 };
 
-}
+} // namespace plib
 
 #endif /* PALLOC_H_ */

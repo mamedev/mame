@@ -1,12 +1,12 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-#include <cstring>
 #include "../plib/pstring.h"
+#include "../nl_setup.h"
 #include "../plib/plists.h"
-#include "../plib/pstream.h"
 #include "../plib/pmain.h"
 #include "../plib/ppmf.h"
-#include "../nl_setup.h"
+#include "../plib/pstream.h"
+#include <cstring>
 
 
 
@@ -24,6 +24,8 @@
 class wav_t
 {
 public:
+	// FIXME: Initialized in intialize, need better c++ compliance
+	// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init)
 	wav_t(plib::postream &strm, std::size_t sr, std::size_t channels)
 	: m_f(strm)
 	{
@@ -60,7 +62,7 @@ public:
 		m_data.len += m_fmt.block_align;
 		for (std::size_t i = 0; i < channels(); i++)
 		{
-			int16_t ps = static_cast<int16_t>(sample[i]); /* 16 bit sample, FIXME: Endianess? */
+			auto ps = static_cast<int16_t>(sample[i]); /* 16 bit sample, FIXME: Endianess? */
 			write(ps);
 		}
 	}
@@ -150,6 +152,8 @@ public:
 				m_e[i].eof = !r[i].readline(line);
 				if (!m_e[i].eof)
 				{
+					// sscanf is very fast ...
+					// NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
 					sscanf(line.c_str(), "%lf %lf", &m_e[i].t, &m_e[i].v);
 					m_e[i].need_more = false;
 				}
@@ -162,9 +166,9 @@ public:
 	void process(std::vector<std::unique_ptr<plib::pistream>> &is)
 	{
 		std::vector<plib::putf8_reader> readers;
-		for (std::size_t i = 0; i < is.size(); i++)
+		for (auto &i : is)
 		{
-			plib::putf8_reader r(std::move(is[i]));
+			plib::putf8_reader r(std::move(i));
 			readers.push_back(std::move(r));
 		}
 
@@ -308,7 +312,7 @@ public:
 	, m_format(format)
 	{
 		for (pstring::value_type c = 64; c < 64+26; c++)
-			m_ids.push_back(pstring(c));
+			m_ids.emplace_back(pstring(c));
 		write("$date Sat Jan 19 14:14:17 2019\n");
 		write("$end\n");
 		write("$version Netlist nlwav 0.1\n");
@@ -316,7 +320,7 @@ public:
 		write("$timescale 1 ns\n");
 		write("$end\n");
 		std::size_t i = 0;
-		for (auto ch : channels)
+		for (const auto &ch : channels)
 		{
 			//      $var real 64 N1X1 N1X1 $end
 			if (format == ANALOG)
@@ -417,8 +421,8 @@ public:
 	plib::option_example   opt_ex1;
 	plib::option_example   opt_ex2;
 
-	int execute();
-	pstring usage();
+	int execute() override;
+	pstring usage() override;
 
 	plib::pstdin pin_strm;
 private:

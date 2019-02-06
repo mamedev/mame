@@ -7,9 +7,9 @@
 
 #include "nld_4066.h"
 
-#include "nlid_cmos.h"
 #include "netlist/analog/nlid_twoterm.h"
 #include "netlist/solver/nld_solver.h"
+#include "nlid_cmos.h"
 
 namespace netlist
 {
@@ -41,28 +41,28 @@ namespace netlist
 	{
 		// Start in off condition
 		// FIXME: is ROFF correct?
-		m_R.set_R(NL_FCONST(1.0) / exec().gmin());
+		m_R.set_R(plib::constants<nl_double>::one / exec().gmin());
 
 	}
 
 	NETLIB_UPDATE(CD4066_GATE)
 	{
 		nl_double sup = (m_supply.vdd() - m_supply.vss());
-		nl_double low = NL_FCONST(0.45) * sup;
-		nl_double high = NL_FCONST(0.55) * sup;
+		nl_double low = plib::constants<nl_double>()(0.45) * sup;
+		nl_double high = plib::constants<nl_double>()(0.55) * sup;
 		nl_double in = m_control() - m_supply.vss();
-		nl_double rON = m_base_r() * NL_FCONST(5.0) / sup;
+		nl_double rON = m_base_r() * plib::constants<nl_double>()(5.0) / sup;
 		nl_double R = -1.0;
 
 		if (in < low)
 		{
-			R = NL_FCONST(1.0) / exec().gmin();
+			R = plib::constants<nl_double>::one / exec().gmin();
 		}
 		else if (in > high)
 		{
 			R = rON;
 		}
-		if (R > NL_FCONST(0.0))
+		if (R > plib::constants<nl_double>::zero)
 		{
 			m_R.update();
 			m_R.set_R(R);

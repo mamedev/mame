@@ -11,8 +11,8 @@
 #ifndef NLID_PROXY_H_
 #define NLID_PROXY_H_
 
-#include "../nl_setup.h"
 #include "../analog/nlid_twoterm.h"
+#include "../nl_setup.h"
 
 namespace netlist
 {
@@ -29,7 +29,7 @@ namespace netlist
 		nld_base_proxy(netlist_base_t &anetlist, const pstring &name,
 				logic_t *inout_proxied, detail::core_terminal_t *proxy_inout);
 
-		virtual ~nld_base_proxy();
+		~nld_base_proxy() override = default;
 
 		logic_t &term_proxied() const { return *m_term_proxied; }
 		detail::core_terminal_t &proxy_term() const { return *m_proxy_term; }
@@ -49,7 +49,7 @@ namespace netlist
 	{
 	public:
 
-		virtual ~nld_base_a_to_d_proxy();
+		~nld_base_a_to_d_proxy() override = default;
 
 		virtual logic_output_t &out() { return m_Q; }
 
@@ -69,7 +69,7 @@ namespace netlist
 	public:
 		nld_a_to_d_proxy(netlist_base_t &anetlist, const pstring &name, logic_input_t *in_proxied);
 
-		virtual ~nld_a_to_d_proxy() override;
+		~nld_a_to_d_proxy() override = default;
 
 		analog_input_t m_I;
 
@@ -88,7 +88,7 @@ namespace netlist
 	NETLIB_OBJECT_DERIVED(base_d_to_a_proxy, base_proxy)
 	{
 	public:
-		virtual ~nld_base_d_to_a_proxy();
+		~nld_base_d_to_a_proxy() override = default;
 
 		virtual logic_input_t &in() { return m_I; }
 
@@ -105,7 +105,7 @@ namespace netlist
 	{
 	public:
 		nld_d_to_a_proxy(netlist_base_t &anetlist, const pstring &name, logic_output_t *out_proxied);
-		virtual ~nld_d_to_a_proxy() override {}
+		~nld_d_to_a_proxy() override = default;
 
 	protected:
 

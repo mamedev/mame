@@ -6,8 +6,8 @@
  */
 
 #include "poptions.h"
-#include "ptypes.h"
 #include "pexception.h"
+#include "ptypes.h"
 
 namespace plib {
 /***************************************************************************
@@ -20,25 +20,9 @@ namespace plib {
 		parent.register_option(this);
 	}
 
-	option_base::~option_base()
-	{
-	}
-
-	option_group::~option_group()
-	{
-	}
-
-	option_example::~option_example()
-	{
-	}
-
 	option::option(options &parent, pstring ashort, pstring along, pstring help, bool has_argument)
 	: option_base(parent, help), m_short(ashort), m_long(along),
 	  m_has_argument(has_argument), m_specified(false)
-	{
-	}
-
-	option::~option()
 	{
 	}
 
@@ -92,12 +76,12 @@ namespace plib {
 	{
 		for (auto &opt : m_opts)
 		{
-			option *o = dynamic_cast<option *>(opt);
+			auto *o = dynamic_cast<option *>(opt);
 			if (o != nullptr)
 			{
 				if (o->short_opt() == "" && o->long_opt() == "")
 				{
-					option_args *ov = dynamic_cast<option_args *>(o);
+					auto *ov = dynamic_cast<option_args *>(o);
 					if (ov != nullptr)
 					{
 						if (m_other_args != nullptr)
@@ -247,7 +231,7 @@ namespace plib {
 					if (opt->has_argument())
 					{
 						line += "=";
-						option_str_limit_base *ol = dynamic_cast<option_str_limit_base *>(opt);
+						auto *ol = dynamic_cast<option_str_limit_base *>(opt);
 						if (ol)
 						{
 							for (auto &v : ol->limit())

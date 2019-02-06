@@ -62,8 +62,6 @@
 // FIXME: Convert into solver parameter
 #define USE_LINEAR_PREDICTION       (0)
 
-#define NETLIST_GMIN_DEFAULT     (1e-9)
-
 //============================================================
 //  DEBUGGING
 //============================================================
@@ -98,16 +96,17 @@
 #endif // !defined(USE_OPENMP)
 
 // Use nano-second resolution - Sufficient for now
-#define NETLIST_INTERNAL_RES        (UINT64_C(1000000000))
-#define NETLIST_CLOCK               (NETLIST_INTERNAL_RES)
+
+static constexpr const auto NETLIST_INTERNAL_RES = 1000000000;
+static constexpr const auto NETLIST_CLOCK = NETLIST_INTERNAL_RES;
+
+//#define NETLIST_INTERNAL_RES        (UINT64_C(1000000000))
+//#define NETLIST_CLOCK               (NETLIST_INTERNAL_RES)
 //#define NETLIST_INTERNAL_RES      (UINT64_C(1000000000000))
 //#define NETLIST_CLOCK               (UINT64_C(1000000000))
 
 
 //#define nl_double float
-//#define NL_FCONST(x) (x ## f)
-
-#define NL_FCONST(x) x
 using nl_double = double;
 
 //============================================================

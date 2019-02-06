@@ -8,12 +8,12 @@
 #ifndef NLD_MS_GMRES_H_
 #define NLD_MS_GMRES_H_
 
+#include "../plib/gmres.h"
 #include "../plib/mat_cr.h"
 #include "../plib/parray.h"
+#include "../plib/vector_ops.h"
 #include "nld_ms_direct.h"
 #include "nld_solver.h"
-#include "../plib/vector_ops.h"
-#include "../plib/gmres.h"
 
 #include <algorithm>
 #include <cmath>
@@ -44,12 +44,10 @@ namespace devices
 			{
 			}
 
-		virtual ~matrix_solver_GMRES_t() override
-		{
-		}
+		~matrix_solver_GMRES_t() override = default;
 
-		virtual void vsetup(analog_net_t::list_t &nets) override;
-		virtual unsigned vsolve_non_dynamic(const bool newton_raphson) override;
+		void vsetup(analog_net_t::list_t &nets) override;
+		unsigned vsolve_non_dynamic(const bool newton_raphson) override;
 
 	private:
 
@@ -77,7 +75,7 @@ namespace devices
 		for (std::size_t k=0; k<iN; k++)
 		{
 			fill[k].resize(iN, decltype(m_ops.m_mat)::FILL_INFINITY);
-			terms_for_net_t * RESTRICT row = this->m_terms[k].get();
+			terms_for_net_t * row = this->m_terms[k].get();
 			for (std::size_t j=0; j < row->m_nz.size(); j++)
 			{
 				fill[k][static_cast<mattype>(row->m_nz[j])] = 0;

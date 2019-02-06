@@ -27,7 +27,7 @@ namespace netlist
 	{
 		NETLIB_CONSTRUCTOR(switch1)
 		, m_R(*this, "R")
-		, m_POS(*this, "POS", 0)
+		, m_POS(*this, "POS", false)
 		{
 			register_subalias("1", m_R.m_P);
 			register_subalias("2", m_R.m_N);
@@ -75,7 +75,7 @@ namespace netlist
 		NETLIB_CONSTRUCTOR(switch2)
 		, m_R1(*this, "R1")
 		, m_R2(*this, "R2")
-		, m_POS(*this, "POS", 0)
+		, m_POS(*this, "POS", false)
 		{
 			connect(m_R1.m_N, m_R2.m_N);
 
@@ -139,5 +139,5 @@ namespace netlist
 	namespace devices {
 		NETLIB_DEVICE_IMPL_NS(analog, switch1, "SWITCH",  "")
 		NETLIB_DEVICE_IMPL_NS(analog, switch2, "SWITCH2", "")
-	}
+	} // namespace devices
 } // namespace netlist

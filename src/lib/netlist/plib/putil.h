@@ -5,13 +5,13 @@
  *
  */
 
-#ifndef P_UTIL_H_
-#define P_UTIL_H_
+#ifndef PUTIL_H_
+#define PUTIL_H_
 
 #include "pstring.h"
 
-#include <initializer_list>
 #include <algorithm>
+#include <initializer_list>
 #include <vector> // <<= needed by windows build
 
 #define PSTRINGIFY_HELP(y) # y
@@ -25,7 +25,7 @@ namespace plib
 	{
 		const pstring buildpath(std::initializer_list<pstring> list );
 		const pstring environment(const pstring &var, const pstring &default_val);
-	}
+	} // namespace util
 
 	namespace container
 	{
@@ -56,7 +56,21 @@ namespace plib
 		{
 			con.erase(std::remove(con.begin(), con.end(), elem), con.end());
 		}
-	}
+	} // namespace container
+
+	/* May be further specialized .... This is the generic version */
+	template <typename T>
+	struct constants
+	{
+		static constexpr T zero = static_cast<T>(0);
+		static constexpr T one = static_cast<T>(1);
+		static constexpr T two = static_cast<T>(2);
+
+		template <typename V>
+		constexpr T operator()(V &&v) const noexcept { return static_cast<T>(v); }
+	};
+
+
 
 	template <class C>
 	struct indexed_compare
@@ -78,6 +92,6 @@ namespace plib
 			const std::string &token,
 			const std::size_t maxsplit);
 
-}
+} // namespace plib
 
-#endif /* P_UTIL_H_ */
+#endif /* PUTIL_H_ */

@@ -6,9 +6,9 @@
  */
 
 #include "nl_parser.h"
-#include "nl_factory.h"
-#include "nl_errstr.h"
 #include "nl_base.h"
+#include "nl_errstr.h"
+#include "nl_factory.h"
 
 namespace netlist
 {
@@ -395,7 +395,7 @@ void parser_t::device(const pstring &dev_type)
 // ----------------------------------------------------------------------------------------
 
 
-nl_double parser_t::eval_param(const token_t tok)
+nl_double parser_t::eval_param(const token_t &tok)
 {
 	static pstring macs[6] = {"", "RES_K", "RES_M", "CAP_U", "CAP_N", "CAP_P"};
 	static nl_double facs[6] = {1, 1e3, 1e6, 1e-6, 1e-9, 1e-12};
@@ -423,4 +423,4 @@ nl_double parser_t::eval_param(const token_t tok)
 
 }
 
-}
+} // namespace netlist
