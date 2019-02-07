@@ -95,4 +95,49 @@
 		</part>
 	</software>
 
+	<!-- Actually for the Apricot XEN, but (at least to some extent) compatible with the PC/Xi -->
+	<software name="win103">
+		<description>Microsoft Windows 1.03</description>
+		<year>1987</year>
+		<publisher>ACT</publisher>
+		<!-- The following disk images were created from zip files with mkfs.fat 4.1 and libdsk 1.5.10 -->
+		<!-- They should be replaced by proper images read from original disks -->
+		<part name="windows" interface="floppy_3_5">
+			<feature name="part_id" value="Windows" />
+			<dataarea name="flop" size="508524">
+				<rom name="windows.dsk" size="508524" crc="17867369" sha1="10dab3e9a923023544efc90bbb8a5817b92098bb" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="system" interface="floppy_3_5">
+			<feature name="part_id" value="System" />
+			<dataarea name="flop" size="103869">
+				<rom name="system.dsk" size="103869" crc="1c2210e6" sha1="594fc0188e7f9f66befe94089bc681acd85ed1c0" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="fonts" interface="floppy_3_5">
+			<feature name="part_id" value="Fonts" />
+			<dataarea name="flop" size="420976">
+				<rom name="fonts.dsk" size="420976" crc="c5410ef4" sha1="9f78938ad1a4f6456ee0edd284a7f211b6959869" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="applics" interface="floppy_3_5">
+			<feature name="part_id" value="Applications" />
+			<dataarea name="flop" size="652571">
+				<rom name="applics.dsk" size="652571" crc="5c6c08e2" sha1="b6a38eff3069ae771d24749346d6b1c040df50d3" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="drivers" interface="floppy_3_5">
+			<feature name="part_id" value="Drivers" />
+			<dataarea name="flop" size="511578">
+				<rom name="drivers.dsk" size="511578" crc="0ccec09a" sha1="2e5c73aa334c4a84b28c91663e19b6136c209b80" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="wutils" interface="floppy_3_5">
+			<feature name="part_id" value="Utils" />
+			<dataarea name="flop" size="532447">
+				<rom name="wutils.dsk" size="532447" crc="a546a374" sha1="acc15f5ab457d2c31beec19ccfd9debd2db04b9f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
