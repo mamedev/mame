@@ -1439,9 +1439,12 @@ void apple2_state::apple2_common(machine_config &config)
 	A2BUS_SLOT(config, "sl6", m_a2bus, apple2_cards, "diskiing");
 	A2BUS_SLOT(config, "sl7", m_a2bus, apple2_cards, nullptr);
 
-	SOFTWARE_LIST(config, "flop525_list").set_original("apple2");
+	/* Set up the softlists: clean cracks priority, originals second, others last */
+	SOFTWARE_LIST(config, "flop525_clean").set_original("apple2_flop_clcracked");
 	SOFTWARE_LIST(config, "flop525_orig").set_compatible("apple2_flop_orig").set_filter("A2");
+	SOFTWARE_LIST(config, "flop525_misc").set_compatible("apple2_flop_misc");
 	SOFTWARE_LIST(config, "cass_list").set_original("apple2_cass");
+	//MCFG_SOFTWARE_LIST_ADD("cass_list", "apple2_cass")
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED);

@@ -4058,13 +4058,15 @@ MACHINE_CONFIG_START(apple2e_state::apple2e)
 	MCFG_A2EAUXSLOT_OUT_NMI_CB(WRITELINE(*this, apple2e_state, a2bus_nmi_w))
 	MCFG_A2EAUXSLOT_SLOT_ADD(A2_AUXSLOT_TAG, "aux", apple2eaux_cards, "ext80")   // default to an extended 80-column card
 
-	SOFTWARE_LIST(config, "flop525_list").set_original("apple2");
+	/* softlist config for baseline A2E
+	By default, filter lists where possible to compatible disks for A2E */
+	SOFTWARE_LIST(config, "flop525_clean").set_original("apple2_flop_clcracked");
+	SOFTWARE_LIST(config, "flop525_orig").set_compatible("apple2_flop_orig").set_filter("A2E");
+	SOFTWARE_LIST(config, "flop525_misc").set_compatible("apple2_flop_misc");
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED);
 
-	/* softlist config for baseline A2E */
-	SOFTWARE_LIST(config, "flop525_orig").set_compatible("apple2_flop_orig").set_filter("A2E");  // By default, filter list to compatible disks for A2E
 MACHINE_CONFIG_END
 
 void apple2e_state::mprof3(machine_config &config)
