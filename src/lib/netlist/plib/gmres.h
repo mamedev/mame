@@ -246,7 +246,7 @@ namespace plib
 				if (rho < rho_delta)
 					return itr_used + 1;
 
-				vec_set_scalar(RESTART+1, m_g, constants<FT>::zero);
+				vec_set_scalar(RESTART+1, m_g, +constants<FT>::zero);
 				m_g[0] = rho;
 
 				//for (std::size_t i = 0; i < mr + 1; i++)
