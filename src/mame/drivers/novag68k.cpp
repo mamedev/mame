@@ -127,19 +127,9 @@ READ8_MEMBER(novag68k_state::diablo68k_input2_r)
 
 WRITE8_MEMBER(novag68k_state::scorpio68k_control_w)
 {
-	// d0: HD44780 E
-	// d1: HD44780 RS
-	if (m_lcd_control & ~data & 1)
-		m_lcd->write(m_lcd_control >> 1 & 1, m_lcd_data);
-	m_lcd_control = data & 3;
-
-	// d7: enable beeper
-	m_beeper->set_state(data >> 7 & 1);
-
-	// d4-d6: input mux, led select
-	// d2,d3: led data
-	m_inp_mux = 1 << (data >> 4 & 0x7) & 0xff;
-	display_matrix(2, 8, ~data >> 2 & 3, m_inp_mux);
+	// d2,d3: led data, rest same as diablo
+	m_led_data = ~data >> 2 & 3;
+	diablo68k_control_w(space, offset, data);
 }
 
 

@@ -288,7 +288,7 @@ P27 - row 3 through inverter
 PROG - I/O expander
 
 T0 - optical card sensor (high = bright/reflective, low = dark/non reflective)
-T1 - connects to inverter, then nothing?
+T1 - connects to inverter, then 5MHz/4
 
 D8243C I/O expander:
 --------------------
@@ -525,8 +525,7 @@ public:
 		m_i8243(*this, "i8243"),
 		m_beeper_off(*this, "beeper_off"),
 		m_beeper(*this, "beeper"),
-		m_irq_on(*this, "irq_on"),
-		m_barcode(*this, "BARCODE")
+		m_irq_on(*this, "irq_on")
 	{ }
 
 	void cc10(machine_config &config);
@@ -552,7 +551,6 @@ private:
 	optional_device<timer_device> m_beeper_off;
 	optional_device<beep_device> m_beeper;
 	optional_device<timer_device> m_irq_on;
-	optional_ioport m_barcode;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE); }
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE); }
@@ -601,14 +599,10 @@ private:
 	void vbrc_prepare_display();
 	DECLARE_WRITE8_MEMBER(vbrc_speech_w);
 	DECLARE_WRITE8_MEMBER(vbrc_mcu_p1_w);
-	DECLARE_READ_LINE_MEMBER(vbrc_mcu_t0_r);
-	DECLARE_READ_LINE_MEMBER(vbrc_mcu_t1_r);
-	DECLARE_WRITE_LINE_MEMBER(vbrc_clock_w);
 	DECLARE_READ8_MEMBER(vbrc_mcu_p2_r);
 	template<int P> void vbrc_ioexp_port_w(uint8_t data);
 	void vbrc_main_io(address_map &map);
 	void vbrc_main_map(address_map &map);
-	int m_vbrc_t1;
 
 	// DSC
 	void dsc_prepare_display();
@@ -616,9 +610,6 @@ private:
 	DECLARE_WRITE8_MEMBER(dsc_select_w);
 	DECLARE_READ8_MEMBER(dsc_input_r);
 	void dsc_map(address_map &map);
-
-protected:
-	virtual void machine_start() override;
 };
 
 
@@ -662,17 +653,6 @@ void fidelbase_state::machine_start()
 
 void fidelbase_state::machine_reset()
 {
-}
-
-void fidelz80_state::machine_start()
-{
-	fidelbase_state::machine_start();
-
-	// zerofill
-	m_vbrc_t1 = 0;
-
-	// register for savestates
-	save_item(NAME(m_vbrc_t1));
 }
 
 
@@ -1064,10 +1044,6 @@ void fidelz80_state::vbrc_prepare_display()
 	u16 outdata = bitswap<16>(m_7seg_data,12,13,1,6,5,2,0,7,15,11,10,14,4,3,9,8);
 	set_display_segmask(0xff, 0x3fff);
 	display_matrix(16, 8, outdata, m_led_select);
-
-	// d14(13) is tone (not on speech model)
-	if (m_dac != nullptr)
-		m_dac->write(BIT(outdata, 14));
 }
 
 WRITE8_MEMBER(fidelz80_state::vbrc_speech_w)
@@ -1086,9 +1062,13 @@ WRITE8_MEMBER(fidelz80_state::vbrc_speech_w)
 template<int P>
 void fidelz80_state::vbrc_ioexp_port_w(uint8_t data)
 {
-	// P4-P7: digit segment data
+	// P4x-P7x: digit segment data
 	m_7seg_data = (m_7seg_data & ~(0xf << (4*P))) | ((data & 0xf) << (4*P));
 	vbrc_prepare_display();
+
+	// P71 is tone (not on speech model)
+	if (P == 3 && m_dac != nullptr)
+		m_dac->write(BIT(data, 1));
 }
 
 
@@ -1106,23 +1086,6 @@ READ8_MEMBER(fidelz80_state::vbrc_mcu_p2_r)
 	// P20-P23: I8243 P2
 	// P24-P27: multiplexed inputs (active low)
 	return (m_i8243->p2_r() & 0x0f) | (read_inputs(8) << 4 ^ 0xf0);
-}
-
-READ_LINE_MEMBER(fidelz80_state::vbrc_mcu_t0_r)
-{
-	// T0: card scanner
-	return m_barcode->read();
-}
-
-READ_LINE_MEMBER(fidelz80_state::vbrc_mcu_t1_r)
-{
-	// T1: master clock / 4
-	return m_vbrc_t1;
-}
-
-WRITE_LINE_MEMBER(fidelz80_state::vbrc_clock_w)
-{
-	m_vbrc_t1 = state;
 }
 
 
@@ -1922,10 +1885,11 @@ void fidelz80_state::brc_base(machine_config &config)
 	m_mcu->p2_in_cb().set(FUNC(fidelz80_state::vbrc_mcu_p2_r));
 	m_mcu->p2_out_cb().set(m_i8243, FUNC(i8243_device::p2_w));
 	m_mcu->prog_out_cb().set(m_i8243, FUNC(i8243_device::prog_w));
-	m_mcu->t0_in_cb().set(FUNC(fidelz80_state::vbrc_mcu_t0_r));
-	m_mcu->t1_in_cb().set(FUNC(fidelz80_state::vbrc_mcu_t1_r));
+	m_mcu->t0_in_cb().set_ioport("BARCODE"); // card scanner
 
-	CLOCK(config, "t1_clock", 5_MHz_XTAL/4).signal_handler().set(FUNC(fidelz80_state::vbrc_clock_w));
+	// MCU T1 tied to master clock / 4
+	CLOCK(config, "t1_clock", 5_MHz_XTAL/4).signal_handler().set_nop();
+	m_mcu->t1_in_cb().set("t1_clock", FUNC(clock_device::signal_r)).invert();
 
 	I8243(config, m_i8243);
 	m_i8243->p4_out_cb().set(FUNC(fidelz80_state::vbrc_ioexp_port_w<0>));
@@ -2209,8 +2173,8 @@ CONS( 1980, vscsp,    vsc,     0, vsc,    vscsp, fidelz80_state, empty_init, "Fi
 CONS( 1980, vscg,     vsc,     0, vsc,    vscg,  fidelz80_state, empty_init, "Fidelity Electronics", "Voice Sensory Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 CONS( 1980, vscfr,    vsc,     0, vsc,    vscfr, fidelz80_state, empty_init, "Fidelity Electronics", "Voice Sensory Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 
-CONS( 1980, vbrc,     0,       0, vbrc,   vbrc,  fidelz80_state, empty_init, "Fidelity Electronics", "Voice Bridge Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NOT_WORKING )
-CONS( 1980, bridgeca, vbrc,    0, ubc,    vbrc,  fidelz80_state, empty_init, "Fidelity Electronics", "Advanced Bridge Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NOT_WORKING )
-CONS( 1982, bridgec3, 0,       0, bv3,    bv3,   fidelz80_state, empty_init, "Fidelity Electronics", "Bridge Challenger III", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NOT_WORKING )
+CONS( 1980, vbrc,     0,       0, vbrc,   vbrc,  fidelz80_state, empty_init, "Fidelity Electronics", "Voice Bridge Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )
+CONS( 1980, bridgeca, vbrc,    0, ubc,    vbrc,  fidelz80_state, empty_init, "Fidelity Electronics", "Advanced Bridge Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )
+CONS( 1982, bridgec3, 0,       0, bv3,    bv3,   fidelz80_state, empty_init, "Fidelity Electronics", "Bridge Challenger III", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )
 
 CONS( 1981, damesc,   0,       0, dsc,    dsc,   fidelz80_state, empty_init, "Fidelity Electronics", "Dame Sensory Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
