@@ -2,6 +2,21 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="leapfrog_leappad_cart" description="LeapFrog LeapPad cartridges">
 
+	<software name="dinosaurg" supported="no">
+		<description>Leap und die Welt der Dinosaurier (Germany)</description>
+		<year>2004</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-10635"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-7021"/>
+			<feature name="pcb_rev" value="REV.01"/>
+			<feature name="u1" value="Matronix 32m"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-10635 - Leap und die Welt der Dinosaurier (GER).bin" size="0x400000" crc="5e306c92" sha1="7496f5b994a40ea07228b5ab27ec907fbcf603b4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="tadsgngt" supported="no">
 		<description>Tad's Good Night (UK)</description>
 		<year>1999</year>
@@ -13,6 +28,34 @@
 			<feature name="u1" value="OKi 16M"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x200000">
 				<rom name="500-10756 UBL - Tad's Good Night.bin" size="0x200000" crc="dc872e63" sha1="ebd259e53849151434091a99455ca74db46528b1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mosslakeg" supported="no">
+		<description>A Day at Moss Lake (Germany)</description>
+		<year>1999</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-10757 UBL"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-2612"/>
+			<feature name="pcb_rev" value="REV.01"/>
+			<feature name="u1" value="Sunplus16m-b"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-10757 UBL - A Day at Moss Lake.bin" size="0x200000" crc="22c3c65d" sha1="b3c6f7de54552dd9b164b2f3a97f8565f8cc7879" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="angelg" supported="no">
+		<description>Das Angel-Abenteuer (Germany)</description>
+		<year>2002</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-11537-B"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="335-13845-40"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-11537-B - Das Angel-Abenteuer (GER).bin" size="0x200000" crc="c90b3a2d" sha1="48e08bbef6b1f4d4671b808ef5a35b954449d0d2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -47,6 +90,36 @@
 		</part>
 	</software>
 
+	<software name="letsgo1g" supported="no">
+		<description>Englisch Kurs - Let's go 1 (Germany)</description>
+		<year>2004</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-11546"/>
+		<part name="cart" interface="leapfrog_mfleappad_cart">
+			<feature name="pcb" value="30338-003-0033"/>
+			<feature name="pcb_rev" value="REV : 01"/>
+			<feature name="u1" value="OKI 32M VER : J"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-11546 - Englisch Kurs - Let's go 1 (GER).bin" size="0x400000" crc="70eed726" sha1="fd425df0e9108dbc8e384ec566ed2b284aa7a7fe" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="letsgo2g" supported="no">
+		<description>Englisch Kurs - Let's go 2 (Germany)</description>
+		<year>2004</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-11547"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="30338-003-0033"/>
+			<feature name="pcb_rev" value="REV : 01"/>
+			<feature name="u1" value="OKI 32M VER : J"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-11547 - Englisch Kurs - Let's go 2 (GER).bin" size="0x400000" crc="5a31e9e6" sha1="4c4020c2cf31f09dc910c7686250ea96a7bb12bf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="lamadeusg" supported="no">
 		<description>Little Amadeus (Germany)</description>
 		<year>2004</year>
@@ -77,14 +150,19 @@
 		</part>
 	</software>
 
-	<software name="dino" supported="no">
-		<description>Dinosaurs</description>
-		<year>20??</year>
+	<software name="bobbldrg" supported="no">
+		<description>Bob der Baumeister - Bob und Heppo: Alles im Griff! (Germany)</description>
+		<year>2006</year>
 		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-12560"/>
 		<part name="cart" interface="leapfrog_leappad_cart">
-			<dataarea name="rom" size="0x400000">
-				<rom name="leappad_dino.bin" size="0x400000" crc="5e306c92" sha1="7496f5b994a40ea07228b5ab27ec907fbcf603b4" offset="0" />
+			<feature name="pcb" value="57000+003+7112"/>
+			<feature name="pcb_rev" value="Rev:00"/>
+			<feature name="u1" value="OKI 16M(Ver:L)"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-12560 - Bob der Baumeister - Bob und Heppo - Alles im Griff! (GER).bin" size="0x200000" crc="4821cae5" sha1="80e9743ae8870e8ef03eb8c7c882fe42fdd545b2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
+
 </softwarelist>
