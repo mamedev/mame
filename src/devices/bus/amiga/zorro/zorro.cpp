@@ -84,10 +84,6 @@ void zorro_device::device_resolve_objects()
 
 void zorro_device::device_start()
 {
-	// resolve callbacks
-	m_ovr_handler.resolve_safe();
-	m_int2_handler.resolve_safe();
-	m_int6_handler.resolve_safe();
 }
 
 // from slot device
@@ -121,16 +117,18 @@ exp_slot_device::exp_slot_device(const machine_config &mconfig, device_type type
 }
 
 //-------------------------------------------------
-//  device_start - device-specific startup
+//  device_resolve_objects - resolve objects that
+//  may be needed for other devices to set
+//  initial conditions at start time
 //-------------------------------------------------
 
-void exp_slot_device::device_start()
+void exp_slot_device::device_resolve_objects()
 {
 	// resolve callbacks
 	m_ipl_handler.resolve_safe();
 
-	// call base device start
-	zorro_device::device_start();
+	// call base device
+	zorro_device::device_resolve_objects();
 }
 
 //-------------------------------------------------
@@ -196,10 +194,12 @@ zorro2_device::~zorro2_device()
 }
 
 //-------------------------------------------------
-//  device_start - device-specific startup
+//  device_resolve_objects - resolve objects that
+//  may be needed for other devices to set
+//  initial conditions at start time
 //-------------------------------------------------
 
-void zorro2_device::device_start()
+void zorro2_device::device_resolve_objects()
 {
 	// resolve callbacks
 	m_eint1_handler.resolve_safe();
@@ -207,8 +207,8 @@ void zorro2_device::device_start()
 	m_eint5_handler.resolve_safe();
 	m_eint7_handler.resolve_safe();
 
-	// call base device start
-	zorro_device::device_start();
+	// call base device
+	zorro_device::device_resolve_objects();
 }
 
 //-------------------------------------------------
