@@ -775,11 +775,12 @@ static void dmv_slot7a(device_slot_interface &device)
 	device.option_add("k235", DMV_K235);        // K235 Internal 8088 module with interrupt controller
 }
 
-MACHINE_CONFIG_START(dmv_state::dmv)
+void dmv_state::dmv(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(24'000'000) / 6)
-	MCFG_DEVICE_PROGRAM_MAP(dmv_mem)
-	MCFG_DEVICE_IO_MAP(dmv_io)
+	Z80(config, m_maincpu, XTAL(24'000'000) / 6);
+	m_maincpu->set_addrmap(AS_PROGRAM, &dmv_state::dmv_mem);
+	m_maincpu->set_addrmap(AS_IO, &dmv_state::dmv_io);
 
 	i8741_device &kbmcu(I8741(config, "kb_ctrl_mcu", XTAL(6'000'000)));
 	kbmcu.p1_in_cb().set(FUNC(dmv_state::kb_mcu_port1_r)); // bit 0 data from kb
@@ -791,13 +792,13 @@ MACHINE_CONFIG_START(dmv_state::dmv)
 	DMV_KEYBOARD(config, m_keyboard, 0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_UPDATE_DEVICE("upd7220", upd7220_device, screen_update)
-	MCFG_SCREEN_SIZE(640, 400)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(50);
+	m_screen->set_screen_update("upd7220", FUNC(upd7220_device::screen_update));
+	m_screen->set_size(640, 400);
+	m_screen->set_visarea(0, 640-1, 0, 400-1);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dmv)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_dmv);
 	PALETTE(config, m_palette, palette_device::RGB_3BIT);
 	config.set_default_layout(layout_dmv);
 
@@ -836,54 +837,46 @@ MACHINE_CONFIG_START(dmv_state::dmv)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("slot1", DMVCART_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(dmv_slot1, nullptr, false)
-	MCFG_DEVICE_ADD("slot2", DMVCART_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(dmv_slot2_6, nullptr, false)
-	MCFG_DMVCART_SLOT_OUT_INT_CB(WRITELINE(*this, dmv_state, busint2_w))
-	MCFG_DMVCART_SLOT_OUT_IRQ_CB(WRITELINE(*this, dmv_state, irq2_w))
-	MCFG_DEVICE_ADD("slot2a", DMVCART_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(dmv_slot2a, nullptr, false)
-	MCFG_DMVCART_SLOT_OUT_INT_CB(WRITELINE(*this, dmv_state, busint2a_w))
-	MCFG_DMVCART_SLOT_OUT_IRQ_CB(WRITELINE(*this, dmv_state, irq2a_w))
-	MCFG_DEVICE_ADD("slot3", DMVCART_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(dmv_slot2_6, nullptr, false)
-	MCFG_DMVCART_SLOT_OUT_INT_CB(WRITELINE(*this, dmv_state, busint3_w))
-	MCFG_DMVCART_SLOT_OUT_IRQ_CB(WRITELINE(*this, dmv_state, irq3_w))
-	MCFG_DEVICE_ADD("slot4", DMVCART_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(dmv_slot2_6, nullptr, false)
-	MCFG_DMVCART_SLOT_OUT_INT_CB(WRITELINE(*this, dmv_state, busint4_w))
-	MCFG_DMVCART_SLOT_OUT_IRQ_CB(WRITELINE(*this, dmv_state, irq4_w))
-	MCFG_DEVICE_ADD("slot5", DMVCART_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(dmv_slot2_6, nullptr, false)
-	MCFG_DMVCART_SLOT_OUT_INT_CB(WRITELINE(*this, dmv_state, busint5_w))
-	MCFG_DMVCART_SLOT_OUT_IRQ_CB(WRITELINE(*this, dmv_state, irq5_w))
-	MCFG_DEVICE_ADD("slot6", DMVCART_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(dmv_slot2_6, nullptr, false)
-	MCFG_DMVCART_SLOT_OUT_INT_CB(WRITELINE(*this, dmv_state, busint6_w))
-	MCFG_DMVCART_SLOT_OUT_IRQ_CB(WRITELINE(*this, dmv_state, irq6_w))
+	DMVCART_SLOT(config, m_slot1, dmv_slot1, nullptr);
+	DMVCART_SLOT(config, m_slot2, dmv_slot2_6, nullptr);
+	m_slot2->out_int().set(FUNC(dmv_state::busint2_w));
+	m_slot2->out_irq().set(FUNC(dmv_state::irq2_w));
+	DMVCART_SLOT(config, m_slot2a, dmv_slot2a, nullptr);
+	m_slot2a->out_int().set(FUNC(dmv_state::busint2a_w));
+	m_slot2a->out_irq().set(FUNC(dmv_state::irq2a_w));
+	DMVCART_SLOT(config, m_slot3, dmv_slot2_6, nullptr);
+	m_slot3->out_int().set(FUNC(dmv_state::busint3_w));
+	m_slot3->out_irq().set(FUNC(dmv_state::irq3_w));
+	DMVCART_SLOT(config, m_slot4, dmv_slot2_6, nullptr);
+	m_slot4->out_int().set(FUNC(dmv_state::busint4_w));
+	m_slot4->out_irq().set(FUNC(dmv_state::irq4_w));
+	DMVCART_SLOT(config, m_slot5, dmv_slot2_6, nullptr);
+	m_slot5->out_int().set(FUNC(dmv_state::busint5_w));
+	m_slot5->out_irq().set(FUNC(dmv_state::irq5_w));
+	DMVCART_SLOT(config, m_slot6, dmv_slot2_6, nullptr);
+	m_slot6->out_int().set(FUNC(dmv_state::busint6_w));
+	m_slot6->out_irq().set(FUNC(dmv_state::irq6_w));
 
-	MCFG_DEVICE_ADD("slot7", DMVCART_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(dmv_slot7, nullptr, false)
-	MCFG_DMVCART_SLOT_PROGRAM_READWRITE_CB(READ8(*this, dmv_state, exp_program_r), WRITE8(*this, dmv_state, exp_program_w))
-	MCFG_DMVCART_SLOT_OUT_THOLD_CB(WRITELINE(*this, dmv_state, thold7_w))
-	MCFG_DMVCART_SLOT_OUT_INT_CB(WRITELINE(*this, dmv_state, busint7_w))
-	MCFG_DMVCART_SLOT_OUT_IRQ_CB(WRITELINE(*this, dmv_state, irq7_w))
-	MCFG_DEVICE_ADD("slot7a", DMVCART_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(dmv_slot7a, "k230", false)
-	MCFG_DMVCART_SLOT_PROGRAM_READWRITE_CB(READ8(*this, dmv_state, exp_program_r), WRITE8(*this, dmv_state, exp_program_w))
-	MCFG_DMVCART_SLOT_OUT_THOLD_CB(WRITELINE(*this, dmv_state, thold7_w))
-	MCFG_DMVCART_SLOT_OUT_INT_CB(WRITELINE(*this, dmv_state, busint7a_w))
-	MCFG_DMVCART_SLOT_OUT_IRQ_CB(WRITELINE(*this, dmv_state, irq7a_w))
+	DMVCART_SLOT(config, m_slot7, dmv_slot7, nullptr);
+	m_slot7->prog_read().set(FUNC(dmv_state::exp_program_r));
+	m_slot7->prog_write().set(FUNC(dmv_state::exp_program_w));
+	m_slot7->out_thold().set(FUNC(dmv_state::thold7_w));
+	m_slot7->out_int().set(FUNC(dmv_state::busint7_w));
+	m_slot7->out_irq().set(FUNC(dmv_state::irq7_w));
+	DMVCART_SLOT(config, m_slot7a, dmv_slot7a, "k230");
+	m_slot7a->prog_read().set(FUNC(dmv_state::exp_program_r));
+	m_slot7a->prog_write().set(FUNC(dmv_state::exp_program_w));
+	m_slot7a->out_thold().set(FUNC(dmv_state::thold7_w));
+	m_slot7a->out_int().set(FUNC(dmv_state::busint7a_w));
+	m_slot7a->out_irq().set(FUNC(dmv_state::irq7a_w));
 
 	SOFTWARE_LIST(config, "flop_list").set_original("dmv");
 
-	MCFG_QUICKLOAD_ADD("quickload", dmv_state, dmv, "com,cpm", attotime::from_seconds(3))
-
-MACHINE_CONFIG_END
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
+	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(dmv_state, dmv), this), "com,cpm", attotime::from_seconds(3));
+}
 
 /* ROM definition */
 ROM_START( dmv )
