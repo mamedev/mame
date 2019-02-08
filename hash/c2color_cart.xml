@@ -25,7 +25,7 @@
 		</part>
 	</software>
 
- 	<software name="kingdlnd" supported="no">
+	<software name="kingdlnd" supported="no">
 		<description>The Mysterious King of the Dragon Land</description> <!-- TODO, romanized title instead? -->
 		<year>2015</year>
 		<publisher>Baiyi Animation</publisher>
