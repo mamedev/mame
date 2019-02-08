@@ -137,7 +137,7 @@ void matrix_solver_direct_t<FT, SIZE>::LE_solve()
 			for (std::size_t j = i + 1; j < kN; j++)
 			{
 				const FT f1 = - A(j,i) * f;
-				if (f1 != plib::constants<FT>::zero)
+				if (f1 != plib::constants<FT>::zero())
 				{
 					const FT * pi = &A(i,i+1);
 					FT * pj = &A(j,i+1);

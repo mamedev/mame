@@ -51,7 +51,7 @@ namespace netlist {
 		{
 			connect(m_OP, m_OP1);
 			connect(m_ON, m_ON1);
-			m_gfac = plib::constants<nl_double>::one;
+			m_gfac = plib::constants<nl_double>::one();
 		}
 
 		param_double_t m_G;
@@ -129,7 +129,7 @@ namespace netlist {
 	public:
 		NETLIB_CONSTRUCTOR_DERIVED(CCCS, VCCS)
 		{
-			m_gfac = plib::constants<nl_double>::one / m_RI();
+			m_gfac = plib::constants<nl_double>::one() / m_RI();
 		}
 
 	protected:

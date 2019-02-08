@@ -865,7 +865,7 @@ nl_double setup_t::model_value(detail::model_map_t &map, const pstring &entity)
 {
 	pstring tmp = model_value_str(map, entity);
 
-	nl_double factor = plib::constants<nl_double>::one;
+	nl_double factor = plib::constants<nl_double>::one();
 	auto p = std::next(tmp.begin(), static_cast<pstring::difference_type>(tmp.size() - 1));
 	switch (*p)
 	{
@@ -881,7 +881,7 @@ nl_double setup_t::model_value(detail::model_map_t &map, const pstring &entity)
 			if (*p < '0' || *p > '9')
 			log().fatal(MF_1_UNKNOWN_NUMBER_FACTOR_IN_1, entity);
 	}
-	if (factor != plib::constants<nl_double>::one)
+	if (factor != plib::constants<nl_double>::one())
 		tmp = plib::left(tmp, tmp.size() - 1);
 	// FIXME: check for errors
 	return plib::pstonum<nl_double>(tmp) * factor;

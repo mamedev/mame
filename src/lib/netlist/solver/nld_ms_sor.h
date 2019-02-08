@@ -114,18 +114,18 @@ unsigned matrix_solver_SOR_t<FT, SIZE>::vsolve_non_dynamic(const bool newton_rap
 			if (gabs_t <= gtot_t)
 			{
 				w[k] = ws / gtot_t;
-				one_m_w[k] = plib::constants<FT>::one - ws;
+				one_m_w[k] = plib::constants<FT>::one() - ws;
 			}
 			else
 			{
-				w[k] = plib::constants<FT>::one / (gtot_t + gabs_t);
-				one_m_w[k] = plib::constants<FT>::one - plib::constants<FT>::one * gtot_t / (gtot_t + gabs_t);
+				w[k] = plib::constants<FT>::one() / (gtot_t + gabs_t);
+				one_m_w[k] = plib::constants<FT>::one() - plib::constants<FT>::one() * gtot_t / (gtot_t + gabs_t);
 			}
 		}
 		else
 		{
 			w[k] = ws / gtot_t;
-			one_m_w[k] = plib::constants<FT>::one - ws;
+			one_m_w[k] = plib::constants<FT>::one() - ws;
 		}
 	}
 

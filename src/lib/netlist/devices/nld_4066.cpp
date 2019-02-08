@@ -41,7 +41,7 @@ namespace netlist
 	{
 		// Start in off condition
 		// FIXME: is ROFF correct?
-		m_R.set_R(plib::constants<nl_double>::one / exec().gmin());
+		m_R.set_R(plib::constants<nl_double>::one() / exec().gmin());
 
 	}
 
@@ -56,13 +56,13 @@ namespace netlist
 
 		if (in < low)
 		{
-			R = plib::constants<nl_double>::one / exec().gmin();
+			R = plib::constants<nl_double>::one() / exec().gmin();
 		}
 		else if (in > high)
 		{
 			R = rON;
 		}
-		if (R > plib::constants<nl_double>::zero)
+		if (R > plib::constants<nl_double>::zero())
 		{
 			m_R.update();
 			m_R.set_R(R);

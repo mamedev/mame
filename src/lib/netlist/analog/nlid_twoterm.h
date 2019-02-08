@@ -123,7 +123,7 @@ NETLIB_OBJECT_DERIVED(R_base, twoterm)
 public:
 	void set_R(const nl_double R)
 	{
-		const nl_double G = plib::constants<nl_double>::one / R;
+		const nl_double G = plib::constants<nl_double>::one() / R;
 		set_mat( G, -G, 0.0,
 				-G,  G, 0.0);
 	}

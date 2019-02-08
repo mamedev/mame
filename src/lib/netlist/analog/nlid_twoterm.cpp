@@ -145,7 +145,7 @@ NETLIB_RESET(POT)
 		v = (std::exp(v) - 1.0) / (std::exp(1.0) - 1.0);
 
 	m_R1.set_R(std::max(m_R() * v, exec().gmin()));
-	m_R2.set_R(std::max(m_R() * (plib::constants<nl_double>::one - v), exec().gmin()));
+	m_R2.set_R(std::max(m_R() * (plib::constants<nl_double>::one() - v), exec().gmin()));
 }
 
 NETLIB_UPDATE_PARAM(POT)
@@ -158,7 +158,7 @@ NETLIB_UPDATE_PARAM(POT)
 		v = (std::exp(v) - 1.0) / (std::exp(1.0) - 1.0);
 
 	m_R1.set_R(std::max(m_R() * v, exec().gmin()));
-	m_R2.set_R(std::max(m_R() * (plib::constants<nl_double>::one - v), exec().gmin()));
+	m_R2.set_R(std::max(m_R() * (plib::constants<nl_double>::one() - v), exec().gmin()));
 
 }
 

@@ -62,14 +62,15 @@ namespace plib
 	template <typename T>
 	struct constants
 	{
-		static constexpr const T zero = static_cast<T>(0);
-		static constexpr const T one = static_cast<T>(1);
-		static constexpr const T two = static_cast<T>(2);
+		static constexpr T zero() { return static_cast<T>(0); }
+		static constexpr T one()  { return static_cast<T>(1); }
+		static constexpr T two()  { return static_cast<T>(2); }
 
 		template <typename V>
 		static constexpr const T cast(V &&v) noexcept { return static_cast<T>(v); }
 	};
 
+	static_assert(noexcept(constants<double>::one()) == true, "Not evaluated as constexpr");
 
 
 	template <class C>

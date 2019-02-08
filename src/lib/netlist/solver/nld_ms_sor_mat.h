@@ -192,10 +192,10 @@ unsigned matrix_solver_SOR_mat_t<FT, SIZE>::vsolve_non_dynamic(const bool newton
 					if (p[i] != k)
 						gabs_t = gabs_t + std::abs(this->A(k,p[i]));
 
-				gabs_t *= plib::constants<FT>::one; // derived by try and error
+				gabs_t *= plib::constants<FT>::one(); // derived by try and error
 				if (gabs_t > this->A(k,k))
 				{
-					w = plib::constants<FT>::one / (this->A(k,k) + gabs_t);
+					w = plib::constants<FT>::one() / (this->A(k,k) + gabs_t);
 				}
 			}
 

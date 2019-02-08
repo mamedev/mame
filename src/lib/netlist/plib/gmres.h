@@ -250,13 +250,13 @@ namespace plib
 				 * on some systems / compiler versions. Issue reported by
 				 * AJR, no details known yet.
 				 */
-				vec_set_scalar(RESTART+1, m_g, +constants<FT>::zero);
+				vec_set_scalar(RESTART+1, m_g, +constants<FT>::zero());
 				m_g[0] = rho;
 
 				//for (std::size_t i = 0; i < mr + 1; i++)
 				//	vec_set_scalar(mr, m_ht[i], NL_FCONST(0.0));
 
-				vec_mult_scalar(n, residual, constants<FT>::one / rho, m_v[0]);
+				vec_mult_scalar(n, residual, constants<FT>::one() / rho, m_v[0]);
 
 				for (std::size_t k = 0; k < RESTART; k++)
 				{
@@ -273,7 +273,7 @@ namespace plib
 					m_ht[kp1][k] = std::sqrt(vec_mult2<FT>(n, m_v[kp1]));
 
 					if (m_ht[kp1][k] != 0.0)
-						vec_scale(n, m_v[kp1], constants<FT>::one / m_ht[kp1][k]);
+						vec_scale(n, m_v[kp1], constants<FT>::one() / m_ht[kp1][k]);
 
 					for (std::size_t j = 0; j < k; j++)
 						givens_mult(m_c[j], m_s[j], m_ht[j][k], m_ht[j+1][k]);
