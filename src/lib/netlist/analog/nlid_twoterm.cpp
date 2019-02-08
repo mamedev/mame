@@ -70,7 +70,7 @@ void generic_diode::update_diode(const nl_double nVd)
 	}
 	else
 	{
-		const double a = std::max((nVd - m_Vd) * m_VtInv, plib::constants<nl_double>()(-0.99));
+		const double a = std::max((nVd - m_Vd) * m_VtInv, plib::constants<nl_double>::cast(-0.99));
 		m_Vd = m_Vd + std::log1p(a) * m_Vt;
 		//const double IseVDVt = m_Is * std::exp(m_Vd * m_VtInv);
 		const double IseVDVt = std::exp(m_logIs + m_Vd * m_VtInv);

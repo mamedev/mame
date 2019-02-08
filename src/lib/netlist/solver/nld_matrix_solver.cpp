@@ -617,8 +617,8 @@ netlist_time matrix_solver_t::compute_next_timestep(const double cur_ts)
 
 			t->m_h_n_m_1 = hn;
 			t->m_DD_n_m_1 = DD_n;
-			if (std::fabs(DD2) > plib::constants<nl_double>()(1e-60)) // avoid div-by-zero
-				new_net_timestep = std::sqrt(m_params.m_dynamic_lte / std::fabs(plib::constants<nl_double>()(0.5)*DD2));
+			if (std::fabs(DD2) > plib::constants<nl_double>::cast(1e-60)) // avoid div-by-zero
+				new_net_timestep = std::sqrt(m_params.m_dynamic_lte / std::fabs(plib::constants<nl_double>::cast(0.5)*DD2));
 			else
 				new_net_timestep = m_params.m_max_timestep;
 

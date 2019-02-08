@@ -48,10 +48,10 @@ namespace netlist
 	NETLIB_UPDATE(CD4066_GATE)
 	{
 		nl_double sup = (m_supply.vdd() - m_supply.vss());
-		nl_double low = plib::constants<nl_double>()(0.45) * sup;
-		nl_double high = plib::constants<nl_double>()(0.55) * sup;
+		nl_double low = plib::constants<nl_double>::cast(0.45) * sup;
+		nl_double high = plib::constants<nl_double>::cast(0.55) * sup;
 		nl_double in = m_control() - m_supply.vss();
-		nl_double rON = m_base_r() * plib::constants<nl_double>()(5.0) / sup;
+		nl_double rON = m_base_r() * plib::constants<nl_double>::cast(5.0) / sup;
 		nl_double R = -1.0;
 
 		if (in < low)

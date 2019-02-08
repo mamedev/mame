@@ -267,7 +267,7 @@ namespace plib
 
 					for (std::size_t j = 0; j <= k; j++)
 					{
-						m_ht[j][k] = vec_mult<float_type>(n, m_v[kp1], m_v[j]);
+						m_ht[j][k] = vec_mult<FT>(n, m_v[kp1], m_v[j]);
 						vec_add_mult_scalar(n, m_v[j], -m_ht[j][k], m_v[kp1]);
 					}
 					m_ht[kp1][k] = std::sqrt(vec_mult2<FT>(n, m_v[kp1]));
