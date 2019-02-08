@@ -16,6 +16,7 @@ enum
 {
 	EKARA_PLAIN = 0,
 	EKARA_I2C_BASE,
+	EKARA_I2C_24C08,
 	EKARA_I2C_24LC04,
 	EKARA_I2C_24LC02,
 };
@@ -34,6 +35,11 @@ public:
 
 	virtual DECLARE_READ8_MEMBER(read_extra) { return 0xff; }
 	virtual DECLARE_WRITE8_MEMBER(write_extra) { }
+
+	virtual DECLARE_WRITE8_MEMBER(write_bus_control) { }
+
+	virtual bool is_read_access_not_rom(void) { return false; }
+	virtual bool is_write_access_not_rom(void) { return false; }
 
 	void rom_alloc(uint32_t size, const char *tag);
 	uint8_t* get_rom_base() { return m_rom; }
@@ -95,6 +101,11 @@ public:
 
 	virtual DECLARE_READ8_MEMBER(read_extra);
 	virtual DECLARE_WRITE8_MEMBER(write_extra);
+
+	virtual DECLARE_WRITE8_MEMBER(write_bus_control);
+
+	virtual bool is_read_access_not_rom(void);
+	virtual bool is_write_access_not_rom(void);
 
 	bool has_cart() { return m_cart ? true : false; }
 
