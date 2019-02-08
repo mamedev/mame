@@ -236,7 +236,7 @@ MACHINE_CONFIG_START(vulgus_state::vulgus)
 	MCFG_SCREEN_UPDATE_DRIVER(vulgus_state, screen_update)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_vulgus)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_vulgus);
 
 	PALETTE(config, m_palette, FUNC(vulgus_state::vulgus_palette), 64*4+16*16+4*32*8, 256);
 

@@ -505,7 +505,7 @@ MACHINE_CONFIG_START(sprint2_state::sprint2)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sprint2_state, screen_vblank_sprint2))
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_sprint2)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sprint2);
 	PALETTE(config, m_palette, FUNC(sprint2_state::sprint2_palette), 12, 4);
 
 	/* sound hardware */

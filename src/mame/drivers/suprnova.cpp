@@ -815,9 +815,9 @@ MACHINE_CONFIG_START(skns_state::skns)
 	MCFG_SCREEN_UPDATE_DRIVER(skns_state, screen_update)
 
 	MCFG_PALETTE_ADD("palette", 32768)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", skns_bg)
+	GFXDECODE(config, m_gfxdecode, m_palette, skns_bg);
 
-	MCFG_DEVICE_ADD("spritegen", SKNS_SPRITE, 0)
+	SKNS_SPRITE(config, m_spritegen, 0);
 
 
 	/* sound hardware */

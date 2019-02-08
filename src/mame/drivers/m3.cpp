@@ -127,7 +127,7 @@ MACHINE_CONFIG_START(m3_state::m3)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_f4disp)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_f4disp);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* Devices */

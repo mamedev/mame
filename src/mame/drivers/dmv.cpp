@@ -798,7 +798,7 @@ void dmv_state::dmv(machine_config &config)
 	m_screen->set_size(640, 400);
 	m_screen->set_visarea(0, 640-1, 0, 400-1);
 
-	GFXDECODE(config, "gfxdecode", "palette", gfx_dmv);
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_dmv);
 	PALETTE(config, m_palette, palette_device::RGB_3BIT);
 	config.set_default_layout(layout_dmv);
 

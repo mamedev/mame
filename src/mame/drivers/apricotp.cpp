@@ -596,7 +596,7 @@ MACHINE_CONFIG_START(fp_state::fp)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 256-1)
 
 	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_act_f1)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_act_f1);
 
 	MC6845(config, m_crtc, 4000000);
 	m_crtc->set_screen(SCREEN_CRT_TAG);

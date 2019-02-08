@@ -393,7 +393,7 @@ MACHINE_CONFIG_START(segald_state::astron)
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_segald)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_segald);
 	MCFG_PALETTE_ADD("palette", 256)
 
 	/* sound hardare */

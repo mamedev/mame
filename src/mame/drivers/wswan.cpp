@@ -143,7 +143,7 @@ MACHINE_CONFIG_START(wswan_state::wswan)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wswan)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_wswan);
 	PALETTE(config, "palette", FUNC(wswan_state::wswan_palette), 16);
 
 	/* sound hardware */

@@ -243,7 +243,7 @@ MACHINE_CONFIG_START(exedexes_state::exedexes)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_exedexes)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_exedexes);
 
 	PALETTE(config, m_palette, FUNC(exedexes_state::exedexes_palette), 64*4+64*4+16*16+16*16, 256);
 

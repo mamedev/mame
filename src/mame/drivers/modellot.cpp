@@ -193,7 +193,7 @@ MACHINE_CONFIG_START(modellot_state::modellot)
 	MCFG_SCREEN_UPDATE_DRIVER(modellot_state, screen_update_modellot)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_modellot)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_modellot);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* Devices */

@@ -292,7 +292,7 @@ MACHINE_CONFIG_START(thoop2_state::thoop2)
 	MCFG_SCREEN_UPDATE_DRIVER(thoop2_state, screen_update)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_thoop2)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_thoop2);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
 
 	/* sound hardware */

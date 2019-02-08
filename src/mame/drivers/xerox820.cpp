@@ -613,7 +613,7 @@ MACHINE_CONFIG_START(xerox820_state::xerox820)
 	MCFG_SCREEN_UPDATE_DRIVER(xerox820_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(10.69425_MHz_XTAL, 700, 0, 560, 260, 0, 240)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_xerox820)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_xerox820);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* devices */
@@ -689,7 +689,7 @@ MACHINE_CONFIG_START(xerox820ii_state::xerox820ii)
 	MCFG_SCREEN_UPDATE_DRIVER(xerox820ii_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(10.69425_MHz_XTAL, 700, 0, 560, 260, 0, 240)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_xerox820ii)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_xerox820ii);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* sound hardware */

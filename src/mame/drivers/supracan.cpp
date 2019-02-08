@@ -1903,7 +1903,7 @@ MACHINE_CONFIG_START(supracan_state::supracan)
 
 	PALETTE(config, "palette", FUNC(supracan_state::supracan_palette)).set_format(palette_device::xBGR_555, 32768);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_supracan)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_supracan);
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "supracan_cart")
 	MCFG_GENERIC_WIDTH(GENERIC_ROM16_WIDTH)

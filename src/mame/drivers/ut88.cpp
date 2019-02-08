@@ -205,7 +205,7 @@ MACHINE_CONFIG_START(ut88_state::ut88)
 	MCFG_SCREEN_PALETTE(m_palette)
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ut88)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ut88);
 
 	/* audio hardware */
 	SPEAKER(config, "speaker").front_center();

@@ -421,7 +421,7 @@ MACHINE_CONFIG_START(sorcerer_state::sorcerer)
 	MCFG_SCREEN_UPDATE_DRIVER(sorcerer_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sorcerer)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_sorcerer);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */

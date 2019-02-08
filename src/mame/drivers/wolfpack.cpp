@@ -323,7 +323,7 @@ MACHINE_CONFIG_START(wolfpack_state::wolfpack)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, wolfpack_state, screen_vblank))
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_wolfpack)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_wolfpack);
 	PALETTE(config, m_palette, FUNC(wolfpack_state::wolfpack_palette), 12, 8);
 
 	/* sound hardware */

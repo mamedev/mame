@@ -383,7 +383,7 @@ MACHINE_CONFIG_START(chsuper_state::chsuper)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_chsuper)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_chsuper);
 	MCFG_PALETTE_ADD("palette", 0x100)
 
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));

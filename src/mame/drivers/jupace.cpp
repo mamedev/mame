@@ -772,7 +772,7 @@ MACHINE_CONFIG_START(ace_state::ace)
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ace)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_ace);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

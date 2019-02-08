@@ -273,7 +273,7 @@ MACHINE_CONFIG_START(peoplepc_state::olypeopl)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(22'000'000),640,0,640,475,0,475)
 	MCFG_SCREEN_UPDATE_DEVICE( "h46505", mc6845_device, screen_update )
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfxdecode_device::empty);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	h46505_device &crtc(H46505(config, "h46505", XTAL(22'000'000)/8));

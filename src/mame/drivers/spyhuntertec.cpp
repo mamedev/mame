@@ -691,7 +691,7 @@ MACHINE_CONFIG_START(spyhuntertec_state::spyhuntertec)
 	MCFG_SCREEN_UPDATE_DRIVER(spyhuntertec_state, screen_update_spyhuntertec)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_spyhuntertec)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_spyhuntertec);
 	MCFG_PALETTE_ADD("palette", 64+4)
 
 //  MCFG_PALETTE_INIT_OWNER(spyhuntertec_state,spyhunt)

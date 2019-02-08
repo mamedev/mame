@@ -172,7 +172,7 @@ MACHINE_CONFIG_START(isa8_pgc_device::device_add_mconfig)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, isa8_pgc_device, vblank_irq))
 #endif
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pgc)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_pgc);
 	MCFG_PALETTE_ADD( "palette", 256 )
 MACHINE_CONFIG_END
 

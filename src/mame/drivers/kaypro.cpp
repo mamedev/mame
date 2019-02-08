@@ -215,7 +215,7 @@ MACHINE_CONFIG_START(kaypro_state::kayproii)
 	MCFG_SCREEN_UPDATE_DRIVER(kaypro_state, screen_update_kayproii)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_kayproii)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_kayproii);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* sound hardware */

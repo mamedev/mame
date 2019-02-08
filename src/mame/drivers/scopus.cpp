@@ -212,7 +212,7 @@ MACHINE_CONFIG_START(sagitta180_state::sagitta180)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(80*5, 25*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*5-1, 0, 25*8-1)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sagitta180 )
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_sagitta180);
 
 	I8275(config, m_crtc, 12480000 / 8); /* guessed xtal */
 	m_crtc->set_character_width(8);

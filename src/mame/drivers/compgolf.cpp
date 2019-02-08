@@ -239,7 +239,7 @@ MACHINE_CONFIG_START(compgolf_state::compgolf)
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	PALETTE(config, m_palette, FUNC(compgolf_state::compgolf_palette), 0x100);
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_compgolf)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_compgolf);
 
 
 	SPEAKER(config, "mono").front_center();

@@ -687,7 +687,7 @@ MACHINE_CONFIG_START(firefox_state::firefox)
 	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_hz(MASTER_XTAL/8/16/16/16/16));
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_firefox)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_firefox);
 	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_LASERDISC_22VP931_ADD("laserdisc")

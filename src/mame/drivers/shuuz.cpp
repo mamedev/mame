@@ -244,7 +244,7 @@ MACHINE_CONFIG_START(shuuz_state::shuuz)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_shuuz)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_shuuz);
 	PALETTE(config, "palette").set_format(palette_device::IRGB_1555, 1024);
 
 	ATARI_VAD(config, m_vad, 0, m_screen);

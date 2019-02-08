@@ -1795,7 +1795,7 @@ MACHINE_CONFIG_START(taitosj_state::nomcu)
 	MCFG_SCREEN_UPDATE_DRIVER(taitosj_state, screen_update_taitosj)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taitosj)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_taitosj);
 	MCFG_PALETTE_ADD("palette", 64)
 
 

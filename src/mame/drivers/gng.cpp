@@ -408,7 +408,7 @@ MACHINE_CONFIG_START(gng_state::gng)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gng)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gng);
 
 	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 256);
 

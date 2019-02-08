@@ -665,7 +665,7 @@ MACHINE_CONFIG_START(tandy1000_state::tandy1000_common)
 	/* video hardware */
 	MCFG_DEVICE_ADD("pcvideo_t1000", PCVIDEO_T1000, 0)
 	MCFG_VIDEO_SET_SCREEN("pcvideo_t1000:screen")
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "pcvideo_t1000:palette", gfx_t1000)
+	GFXDECODE(config, "gfxdecode", "pcvideo_t1000:palette", gfx_t1000);
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("sn76496", NCR8496, XTAL(14'318'181)/4)

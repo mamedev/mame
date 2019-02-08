@@ -296,7 +296,7 @@ MACHINE_CONFIG_START(orbit_state::orbit)
 	MCFG_SCREEN_UPDATE_DRIVER(orbit_state, screen_update)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_orbit)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_orbit);
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 

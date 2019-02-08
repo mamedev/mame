@@ -3928,7 +3928,7 @@ MACHINE_CONFIG_START(segas16b_state::lockonph)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lockonph)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_lockonph);
 	MCFG_PALETTE_ADD("palette", 0x2000*4)
 
 	MCFG_SCREEN_ADD("screen", RASTER)

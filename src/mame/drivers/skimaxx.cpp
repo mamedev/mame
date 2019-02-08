@@ -531,7 +531,7 @@ MACHINE_CONFIG_START(skimaxx_state::skimaxx)
 	MCFG_SCREEN_UPDATE_DEVICE("tms", tms34010_device, tms340x0_ind16)
 	MCFG_SCREEN_PALETTE("palette")
 
-//  MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_skimaxx)
+//  GFXDECODE(config, "gfxdecode", "palette", gfx_skimaxx);
 
 	PALETTE(config, "palette", palette_device::RGB_555);
 

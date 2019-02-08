@@ -321,7 +321,7 @@ MACHINE_CONFIG_START(starshp1_state::starshp1)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, starshp1_state, screen_vblank_starshp1))
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_starshp1)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_starshp1);
 	PALETTE(config, m_palette, FUNC(starshp1_state::starshp1_palette), 19, 8);
 
 	/* sound hardware */

@@ -4232,7 +4232,7 @@ void igs011_state::lhb2(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(igs011_state::irq6_line_hold));
 	TIMER(config, "timer_irq").configure_periodic(FUNC(igs011_state::lev5_timer_irq_cb), attotime::from_hz(240)); // lev5 frequency drives the music tempo
 
-//  MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_igs011_hi)
+//  GFXDECODE(config, "gfxdecode", m_palette, gfx_igs011_hi);
 
 	YM2413(config, "ymsnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 2.0);
 }
@@ -4247,7 +4247,7 @@ void igs011_state::nkishusp(machine_config &config)
 
 	// VSync 60.0052Hz, HSync 15.620kHz
 
-//  MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_igs011_hi)
+//  GFXDECODE(config, "gfxdecode", m_palette, gfx_igs011_hi);
 
 	YM2413(config, "ymsnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 2.0);
 }

@@ -490,7 +490,7 @@ MACHINE_CONFIG_START(rx78_state::rx78)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 16+1) //+1 for the background color
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rx78)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_rx78);
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "rx78_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")

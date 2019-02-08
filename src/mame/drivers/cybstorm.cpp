@@ -242,7 +242,7 @@ MACHINE_CONFIG_START(cybstorm_state::round2)
 
 	ADDRESS_MAP_BANK(config, "vadbank").set_map(&cybstorm_state::vadbank_map).set_options(ENDIANNESS_BIG, 16, 32, 0x90000);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cybstorm)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_cybstorm);
 	PALETTE(config, "palette").set_format(palette_device::IRGB_1555, 32768);
 
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -185,7 +185,7 @@ MACHINE_CONFIG_START(korgm1_state::korgm1)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_korgm1)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_korgm1);
 
 	MCFG_PALETTE_ADD("palette", 8)
 

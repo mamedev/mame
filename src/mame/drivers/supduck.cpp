@@ -464,7 +464,7 @@ MACHINE_CONFIG_START(supduck_state::supduck)
 
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_supduck)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_supduck);
 
 	MCFG_DEVICE_ADD("spritegen", TIGEROAD_SPRITE, 0)
 

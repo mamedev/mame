@@ -147,7 +147,7 @@ MACHINE_CONFIG_START(ipds_state::ipds)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ipds)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_ipds);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	I8275(config, m_crtc, XTAL(19'660'800) / 4);

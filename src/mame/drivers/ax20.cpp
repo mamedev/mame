@@ -147,7 +147,7 @@ MACHINE_CONFIG_START(ax20_state::ax20)
 	MCFG_SCREEN_SIZE(80*8, 24*12)
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 24*12-1)
 	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ax20)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ax20);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	I8272A(config, m_fdc, 8'000'000, true);

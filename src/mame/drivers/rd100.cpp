@@ -120,7 +120,7 @@ MACHINE_CONFIG_START(rd100_state::rd100)
 	MCFG_SCREEN_SIZE(64*6, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*6-1, 0, 32*8-1)
 	PALETTE(config, "palette", palette_device::MONOCHROME);
-	//MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rd100)
+	//GFXDECODE(config, "gfxdecode", "palette", gfx_rd100);
 MACHINE_CONFIG_END
 
 ROM_START( rd100 )

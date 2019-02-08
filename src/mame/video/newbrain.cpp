@@ -195,5 +195,5 @@ MACHINE_CONFIG_START(newbrain_state::newbrain_video)
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_newbrain)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_newbrain);
 MACHINE_CONFIG_END

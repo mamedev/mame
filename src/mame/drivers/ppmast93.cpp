@@ -394,7 +394,7 @@ MACHINE_CONFIG_START(ppmast93_state::ppmast93)
 	MCFG_SCREEN_UPDATE_DRIVER(ppmast93_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ppmast93)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_ppmast93);
 
 	PALETTE(config, "palette", palette_device::RGB_444_PROMS, "proms", 0x100);
 

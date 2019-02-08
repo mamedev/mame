@@ -1971,7 +1971,7 @@ MACHINE_CONFIG_START(m72_state::rtype2)
 	m_upd71059c->out_int_callback().set_inputline(m_maincpu, 0);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rtype2)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rtype2);
 	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2016,7 +2016,7 @@ MACHINE_CONFIG_START(m72_state::cosmccop)
 	// upd71059c isn't needed because the V35 has its own IRQ controller
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rtype2)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rtype2);
 	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2061,7 +2061,7 @@ MACHINE_CONFIG_START(m72_state::m82)
 	m_upd71059c->out_int_callback().set_inputline(m_maincpu, 0);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_majtitle)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_majtitle);
 	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2104,7 +2104,7 @@ MACHINE_CONFIG_START(m72_state::poundfor)
 	m_upd4701[1]->set_porty_tag("TRACK1_Y");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rtype2)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rtype2);
 	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -252,7 +252,7 @@ MACHINE_CONFIG_START(att4425_state::att4425)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_SIZE(720, 351)
 	MCFG_SCREEN_VISIBLE_AREA(0, 720-1, 0, 351-1)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_att4425)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_att4425);
 	PALETTE(config, "palette", palette_device::MONOCHROME_HIGHLIGHT);
 
 	// ch.3 -- timer?

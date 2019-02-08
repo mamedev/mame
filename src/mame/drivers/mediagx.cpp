@@ -908,7 +908,7 @@ MACHINE_CONFIG_START(mediagx_state::mediagx)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(mediagx_state, screen_update)
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_cga)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cga);
 
 	MCFG_PALETTE_ADD(m_palette, 256)
 

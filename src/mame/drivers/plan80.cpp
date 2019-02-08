@@ -248,7 +248,7 @@ MACHINE_CONFIG_START(plan80_state::plan80)
 	MCFG_SCREEN_VISIBLE_AREA(0, 48*6-1, 0, 32*8-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_plan80)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_plan80);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 MACHINE_CONFIG_END
 

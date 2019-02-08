@@ -504,7 +504,7 @@ MACHINE_CONFIG_START(fun_tech_corp_state::funtech)
 	MCFG_SCREEN_UPDATE_DRIVER(fun_tech_corp_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_funtech)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_funtech);
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 0x200);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);

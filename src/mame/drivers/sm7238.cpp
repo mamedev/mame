@@ -377,7 +377,7 @@ MACHINE_CONFIG_START(sm7238_state::sm7238)
 	MCFG_SCREEN_PALETTE("palette")
 
 	PALETTE(config, "palette", FUNC(sm7238_state::sm7238_palette), 3);
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sm7238)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_sm7238);
 
 	PIC8259(config, m_pic8259, 0);
 	m_pic8259->out_int_callback().set_inputline(m_maincpu, 0);

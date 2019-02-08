@@ -492,7 +492,7 @@ MACHINE_CONFIG_START(destroyr_state::destroyr)
 	MCFG_SCREEN_UPDATE_DRIVER(destroyr_state, screen_update)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_destroyr)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_destroyr);
 	PALETTE(config, m_palette, FUNC(destroyr_state::destroyr_palette), 8);
 
 	/* sound hardware */

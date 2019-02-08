@@ -751,7 +751,7 @@ MACHINE_CONFIG_START(freekick_state::omega)
 	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, freekick_state, vblank_irq))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_freekick)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_freekick);
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 0x200);
 
 	// sound hardware
@@ -789,7 +789,7 @@ MACHINE_CONFIG_START(freekick_state::base)
 	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, freekick_state, vblank_irq))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_freekick)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_freekick);
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 0x200);
 
 	/* sound hardware */

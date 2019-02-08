@@ -139,7 +139,7 @@ MACHINE_CONFIG_START(ichibanjyan_state::ichibanjyan)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ichibanjyan)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_ichibanjyan);
 
 	PALETTE(config, "palette", palette_device::RGB_444_PROMS, "proms", 512);
 

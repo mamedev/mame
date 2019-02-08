@@ -197,7 +197,7 @@ MACHINE_CONFIG_START(wms_state::wms)
 	MCFG_SCREEN_UPDATE_DRIVER(wms_state, screen_update_wms)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wms)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_wms);
 	MCFG_PALETTE_ADD("palette", 0x100)
 MACHINE_CONFIG_END
 

@@ -507,7 +507,7 @@ MACHINE_CONFIG_START(boxer_state::boxer)
 	MCFG_SCREEN_UPDATE_DRIVER(boxer_state, screen_update)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_boxer)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_boxer);
 	PALETTE(config, m_palette, FUNC(boxer_state::boxer_palette), 4);
 
 	/* sound hardware */

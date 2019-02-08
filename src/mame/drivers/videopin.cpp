@@ -375,7 +375,7 @@ MACHINE_CONFIG_START(videopin_state::videopin)
 	m_screen->set_screen_update(FUNC(videopin_state::screen_update));
 	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_videopin)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_videopin);
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 

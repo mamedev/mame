@@ -239,7 +239,7 @@ MACHINE_CONFIG_START(skullxbo_state::skullxbo)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_skullxbo)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_skullxbo);
 	PALETTE(config, "palette").set_format(palette_device::IRGB_1555, 2048);
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, skullxbo_state, get_playfield_tile_info, 16,8, SCAN_COLS, 64,64)

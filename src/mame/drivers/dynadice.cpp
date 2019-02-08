@@ -283,7 +283,7 @@ MACHINE_CONFIG_START(dynadice_state::dynadice)
 	MCFG_SCREEN_UPDATE_DRIVER(dynadice_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_dynadice)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_dynadice);
 	PALETTE(config, "palette", palette_device::BRG_3BIT);
 
 	SPEAKER(config, "mono").front_center();

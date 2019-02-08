@@ -535,7 +535,7 @@ MACHINE_CONFIG_START(h19_state::h19)
 
 	MCFG_SCREEN_SIZE(640, 250)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 250 - 1)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_h19)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_h19);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	MC6845(config, m_crtc, MC6845_CLOCK);

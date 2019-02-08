@@ -42,23 +42,6 @@
 // include here so drivers don't need to
 #include "carts.h"
 
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_CG_EXP_SLOT_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, CG_EXP_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(cg_exp_slot_carts, nullptr, false)
-
-#define MCFG_CG_EXP_SLOT_INT_HANDLER(_devcb) \
-	downcast<cg_exp_slot_device &>(*device).set_int_handler(DEVCB_##_devcb);
-
-#define MCFG_CG_EXP_SLOT_NMI_HANDLER(_devcb) \
-	downcast<cg_exp_slot_device &>(*device).set_nmi_handler(DEVCB_##_devcb);
-
-#define MCFG_CG_EXP_SLOT_RESET_HANDLER(_devcb) \
-	downcast<cg_exp_slot_device &>(*device).set_reset_handler(DEVCB_##_devcb);
-
 
 //**************************************************************************
 //  TYPE DEFINITIONS

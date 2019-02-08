@@ -185,7 +185,7 @@ MACHINE_CONFIG_START(mikro80_state::mikro80)
 	MCFG_SCREEN_UPDATE_DRIVER(mikro80_state, screen_update_mikro80)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mikro80)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_mikro80);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	SPEAKER(config, "speaker").front_center();

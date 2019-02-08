@@ -447,7 +447,7 @@ MACHINE_CONFIG_START(amust_state::amust)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_amust)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_amust);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

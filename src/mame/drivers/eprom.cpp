@@ -402,7 +402,7 @@ MACHINE_CONFIG_START(eprom_state::eprom)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_eprom)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_eprom);
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, eprom_state, get_playfield_tile_info, 8,8, SCAN_COLS, 64,64)
@@ -446,7 +446,7 @@ MACHINE_CONFIG_START(eprom_state::klaxp)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_eprom)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_eprom);
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, eprom_state, get_playfield_tile_info, 8,8, SCAN_COLS, 64,64)
@@ -495,7 +495,7 @@ MACHINE_CONFIG_START(eprom_state::guts)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_guts)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_guts);
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, eprom_state, guts_get_playfield_tile_info, 8,8, SCAN_COLS, 64,64)

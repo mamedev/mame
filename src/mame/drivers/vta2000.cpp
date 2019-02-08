@@ -222,7 +222,7 @@ MACHINE_CONFIG_START(vta2000_state::vta2000)
 	MCFG_SCREEN_PALETTE("palette")
 
 	PALETTE(config, "palette", FUNC(vta2000_state::vta2000_palette), 3);
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vta2000)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_vta2000);
 
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.5);

@@ -1071,7 +1071,7 @@ MACHINE_CONFIG_START(igrosoft_gamble_state::igrosoft_gamble)
 	MCFG_SCREEN_UPDATE_DRIVER(igrosoft_gamble_state, screen_update_igrosoft_gamble)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_igrosoft_gamble)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_igrosoft_gamble);
 	MCFG_PALETTE_ADD("palette", 0x1000)
 
 

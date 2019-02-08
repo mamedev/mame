@@ -312,7 +312,7 @@ MACHINE_CONFIG_START(ultratnk_state::ultratnk)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ultratnk_state, screen_vblank))
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_ultratnk)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ultratnk);
 	PALETTE(config, m_palette, FUNC(ultratnk_state::ultratnk_palette), 10, 4);
 
 	/* sound hardware */

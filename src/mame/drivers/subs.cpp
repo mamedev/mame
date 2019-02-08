@@ -182,7 +182,7 @@ MACHINE_CONFIG_START(subs_state::subs)
 
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_subs)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_subs);
 
 	PALETTE(config, m_palette, FUNC(subs_state::subs_palette), 4);
 

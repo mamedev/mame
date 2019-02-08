@@ -872,7 +872,7 @@ MACHINE_CONFIG_START(jtces23_state::jtces23)
 	MCFG_SCREEN_VISIBLE_AREA(0, 128-1, 0, 128-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jtces23)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_jtces23);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* internal ram */
@@ -893,7 +893,7 @@ MACHINE_CONFIG_START(jtces40_state::jtces40)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 192-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jtces40)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_jtces40);
 	PALETTE(config, "palette", FUNC(jtc_state::es40_palette), 16);
 
 	/* internal ram */

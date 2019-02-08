@@ -339,7 +339,7 @@ MACHINE_CONFIG_START(ohmygod_state::ohmygod)
 	MCFG_SCREEN_UPDATE_DRIVER(ohmygod_state, screen_update_ohmygod)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ohmygod)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ohmygod);
 
 	PALETTE(config, m_palette).set_format(palette_device::xGRB_555, 1024);
 

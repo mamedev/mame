@@ -432,7 +432,7 @@ MACHINE_CONFIG_START(ksm_state::ksm)
 
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ksm)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_ksm);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	PIC8259(config, m_pic8259, 0);

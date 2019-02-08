@@ -175,7 +175,7 @@ MACHINE_CONFIG_START(tim100_state::tim100)
 	MCFG_SCREEN_SIZE(600, 352)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*12-1, 0, 16*16-1)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tim100 )
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_tim100);
 
 	I8276(config, m_crtc, XTAL(4'915'200));
 	m_crtc->set_character_width(12);

@@ -386,7 +386,7 @@ MACHINE_CONFIG_START(z1013_state::z1013)
 	MCFG_SCREEN_UPDATE_DRIVER(z1013_state, screen_update_z1013)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_z1013)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_z1013);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */

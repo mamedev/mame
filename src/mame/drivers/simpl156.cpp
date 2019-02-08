@@ -423,7 +423,7 @@ MACHINE_CONFIG_START(simpl156_state::chainrec)
 	m_palette->set_format(palette_device::xBGR_555, 4096);
 	m_palette->set_membits(16);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_simpl156)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_simpl156);
 
 	DECO16IC(config, m_deco_tilegen, 0);
 	m_deco_tilegen->set_split(0);

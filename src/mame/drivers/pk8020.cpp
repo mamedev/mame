@@ -206,7 +206,7 @@ MACHINE_CONFIG_START(pk8020_state::pk8020)
 	MCFG_SCREEN_UPDATE_DRIVER(pk8020_state, screen_update_pk8020)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_pk8020)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_pk8020);
 	PALETTE(config, m_palette, FUNC(pk8020_state::pk8020_palette), 16);
 
 	I8255(config, m_ppi8255_1);

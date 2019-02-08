@@ -325,7 +325,7 @@ MACHINE_CONFIG_START(vt100_state::vt100)
 	MCFG_SCREEN_UPDATE_DRIVER(vt100_state, screen_update_vt100)
 	MCFG_SCREEN_PALETTE("vt100_video:palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "vt100_video:palette", gfx_vt100)
+	GFXDECODE(config, "gfxdecode", "vt100_video:palette", gfx_vt100);
 //  MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	config.set_default_layout(layout_vt100);

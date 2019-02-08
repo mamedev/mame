@@ -226,7 +226,7 @@ MACHINE_CONFIG_START(sbugger_state::sbugger)
 	i8156.in_pc_callback().set_ioport("DSW2");
 	i8156.out_to_callback().set_inputline(m_maincpu, I8085_RST75_LINE);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sbugger)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_sbugger);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

@@ -576,7 +576,8 @@ static void einstein_floppies(device_slot_interface &device)
 	device.option_add("35dd", FLOPPY_35_DD);
 }
 
-MACHINE_CONFIG_START(einstein_state::einstein)
+void einstein_state::einstein(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL_X002 / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &einstein_state::einstein_mem);
@@ -676,9 +677,8 @@ MACHINE_CONFIG_START(einstein_state::einstein)
 	m_pipe->nmi_handler().set_inputline(IC_I001, INPUT_LINE_NMI);
 
 	// user port
-	MCFG_EINSTEIN_USERPORT_ADD("user")
-	MCFG_EINSTEIN_USERPORT_BSTB_HANDLER(WRITELINE(IC_I063, z80pio_device, strobe_b))
-MACHINE_CONFIG_END
+	EINSTEIN_USERPORT(config, "user").bstb_handler().set(IC_I063, FUNC(z80pio_device::strobe_b));
+}
 
 
 /***************************************************************************

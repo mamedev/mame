@@ -225,7 +225,7 @@ MACHINE_CONFIG_START(microtan_state::microtan)
 	MCFG_SCREEN_UPDATE_DRIVER(microtan_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_microtan)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_microtan);
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 

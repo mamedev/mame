@@ -1120,7 +1120,7 @@ MACHINE_CONFIG_START(pinkiri8_state::pinkiri8)
 	MCFG_SCREEN_UPDATE_DRIVER(pinkiri8_state, screen_update_pinkiri8)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pinkiri8)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pinkiri8);
 	MCFG_PALETTE_ADD("palette", 0x2000)
 
 

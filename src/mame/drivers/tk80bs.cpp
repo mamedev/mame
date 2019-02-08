@@ -187,7 +187,7 @@ MACHINE_CONFIG_START(tk80bs_state::tk80bs)
 	MCFG_SCREEN_PALETTE(m_palette)
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tk80bs)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tk80bs);
 
 	/* Devices */
 	I8255(config, m_ppi);

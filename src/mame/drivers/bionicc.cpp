@@ -418,7 +418,7 @@ MACHINE_CONFIG_START(bionicc_state::bionicc)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bionicc)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bionicc);
 
 	MCFG_DEVICE_ADD("spritegen", TIGEROAD_SPRITE, 0)
 

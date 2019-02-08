@@ -1232,7 +1232,7 @@ MACHINE_CONFIG_START(alphatp_12_state::alphatp2)
 	m_crtc->vsyn_callback().set_inputline("maincpu", I8085_RST65_LINE).exor(1);
 	m_crtc->set_screen("screen");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_alphatp3)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_alphatp3);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -1309,7 +1309,7 @@ MACHINE_CONFIG_START(alphatp_34_state::alphatp3)
 	m_crtc->vsyn_callback().set_inputline("maincpu", I8085_RST65_LINE).exor(1);
 	m_crtc->set_screen("screen");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_alphatp3)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_alphatp3);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

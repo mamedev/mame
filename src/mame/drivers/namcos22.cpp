@@ -3924,7 +3924,7 @@ MACHINE_CONFIG_START(namcos22_state::namcos22)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, namcos22_state, screen_vblank))
 
 	MCFG_PALETTE_ADD("palette", 0x8000)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namcos22)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_namcos22);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -3970,7 +3970,7 @@ MACHINE_CONFIG_START(namcos22_state::namcos22s)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(namcos22_state, screen_update_namcos22s)
 
-	MCFG_DEVICE_REPLACE("gfxdecode", GFXDECODE, "palette", gfx_super)
+	GFXDECODE(config.replace(), m_gfxdecode, m_palette, gfx_super);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos22_state::airco22b)

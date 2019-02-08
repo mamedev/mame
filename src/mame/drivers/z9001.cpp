@@ -222,7 +222,7 @@ MACHINE_CONFIG_START(z9001_state::z9001)
 	MCFG_SCREEN_UPDATE_DRIVER(z9001_state, screen_update_z9001)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_z9001)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_z9001);
 	MCFG_PALETTE_ADD("palette", 16)
 
 	/* Sound */

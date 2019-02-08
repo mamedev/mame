@@ -735,7 +735,7 @@ MACHINE_CONFIG_START(qx10_state::qx10)
 	m_screen->set_screen_update(FUNC(qx10_state::screen_update));
 	m_screen->set_size(640, 480);
 	m_screen->set_visarea(0, 640-1, 0, 480-1);
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_qx10)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_qx10);
 	PALETTE(config, m_palette, FUNC(qx10_state::qx10_palette), 8);
 
 	/* Devices */

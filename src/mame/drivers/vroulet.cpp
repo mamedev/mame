@@ -307,7 +307,7 @@ MACHINE_CONFIG_START(vroulet_state::vroulet)
 	MCFG_SCREEN_UPDATE_DRIVER(vroulet_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vroulet)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_vroulet);
 	MCFG_PALETTE_ADD("palette", 128*4)
 
 	// sound hardware

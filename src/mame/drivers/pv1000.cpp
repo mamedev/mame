@@ -455,7 +455,7 @@ MACHINE_CONFIG_START(pv1000_state::pv1000)
 
 	PALETTE(config, m_palette, palette_device::BGR_3BIT);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pv1000)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pv1000);
 
 	SPEAKER(config, "mono").front_center();
 	PV1000(config, m_sound, 17897725).add_route(ALL_OUTPUTS, "mono", 1.00);

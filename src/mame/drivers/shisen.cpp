@@ -237,7 +237,7 @@ MACHINE_CONFIG_START(shisen_state::shisen)
 	MCFG_SCREEN_UPDATE_DRIVER(shisen_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_shisen)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_shisen);
 	MCFG_PALETTE_ADD("palette", 256)
 
 	/* sound hardware */

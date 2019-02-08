@@ -391,7 +391,7 @@ MACHINE_CONFIG_START(bwing_state::bwing)
 	MCFG_SCREEN_UPDATE_DRIVER(bwing_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bwing)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bwing);
 	MCFG_PALETTE_ADD("palette", 64)
 
 

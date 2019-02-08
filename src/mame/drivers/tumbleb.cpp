@@ -2089,7 +2089,7 @@ MACHINE_CONFIG_START(tumbleb_state::tumblepb)
 	m_sprgen->set_is_bootleg(true);
 	m_sprgen->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_tumbleb)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tumbleb);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(tumbleb_state,tumblepb)
@@ -2131,7 +2131,7 @@ MACHINE_CONFIG_START(tumbleb_state::tumbleb2)
 	m_sprgen->set_is_bootleg(true);
 	m_sprgen->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_tumbleb)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tumbleb);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(tumbleb_state,tumblepb)
@@ -2179,7 +2179,7 @@ MACHINE_CONFIG_START(tumbleb_state::jumpkids)
 	m_sprgen->set_is_bootleg(true);
 	m_sprgen->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_tumbleb)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tumbleb);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(tumbleb_state,tumblepb)
@@ -2218,7 +2218,7 @@ MACHINE_CONFIG_START(tumbleb_state::fncywld)
 	m_sprgen->set_transpen(15);
 	m_sprgen->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_fncywld)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fncywld);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 0x800);
 
 	MCFG_VIDEO_START_OVERRIDE(tumbleb_state,fncywld)
