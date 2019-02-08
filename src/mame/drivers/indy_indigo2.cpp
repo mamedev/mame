@@ -200,7 +200,7 @@ void ip22_state::wd33c93(device_t *device)
 
 void ip22_state::scsi_devices(device_slot_interface &device)
 {
-	device.option_add("cdrom", NSCSI_CDROM);
+	device.option_add("cdrom", NSCSI_CDROM_SGI);
 	device.option_add("harddisk", NSCSI_HARDDISK);
 	//device.set_option_machine_config("cdrom", cdrom_config);
 }
