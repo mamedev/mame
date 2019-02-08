@@ -359,9 +359,9 @@ void netlist_state_t::reset()
 	 * variations are explicitly stated in the breakout manual.
 	 */
 
-	const unsigned startup_strategy = 1; //! \note make this a parameter
+	auto *netlist_params = get_single_device<devices::NETLIB_NAME(netlistparams)>("parameter");
 
-	switch (startup_strategy)
+	switch (netlist_params->m_startup_strategy())
 	{
 		case 0:
 		{
@@ -384,8 +384,10 @@ void netlist_state_t::reset()
 			log().verbose("Devices not yet updated:");
 			for (auto &dev : m_devices)
 				if (!plib::container::contains(d, dev.second.get()))
+				{
 					log().verbose("\t ...{1}", dev.second->name());
-					//x->update_dev();
+					dev.second->update();
+				}
 		}
 		break;
 		case 1:     // brute force backward

@@ -28,6 +28,7 @@ namespace netlist
 	{
 		NETLIB_CONSTRUCTOR(netlistparams)
 		, m_use_deactivate(*this, "USE_DEACTIVATE", false)
+		, m_startup_strategy(*this, "STARTUP_STRATEGY", 1)
 		{
 		}
 		NETLIB_UPDATEI() { }
@@ -35,6 +36,7 @@ namespace netlist
 		//NETLIB_UPDATE_PARAMI() { }
 	public:
 		param_logic_t m_use_deactivate;
+		param_int_t   m_startup_strategy;
 	};
 
 	// -----------------------------------------------------------------------------
