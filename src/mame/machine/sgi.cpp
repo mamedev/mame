@@ -10,7 +10,6 @@
 
 #include "emu.h"
 #include "sgi.h"
-#include "cpu/mips/mips3.h"
 
 #define LOG_UNKNOWN     (1 << 0)
 #define LOG_READS       (1 << 1)
@@ -458,12 +457,12 @@ WRITE32_MEMBER( sgi_mc_device::write )
 		break;
 	case 0x00e8/4:
 		LOGMASKED(LOG_WRITES, "%s: CPU Error Status Clear\n", machine().describe_context());
-		m_maincpu->set_input_line(MIPS3_IRQ4, CLEAR_LINE);
+		m_maincpu->set_input_line(4, CLEAR_LINE);
 		m_cpu_error_status = 0;
 		break;
 	case 0x00f8/4:
 		LOGMASKED(LOG_WRITES, "%s: GIO Error Status Clear\n", machine().describe_context());
-		m_maincpu->set_input_line(MIPS3_IRQ4, CLEAR_LINE);
+		m_maincpu->set_input_line(4, CLEAR_LINE);
 		m_gio_error_status = 0;
 		break;
 	case 0x0100/4:

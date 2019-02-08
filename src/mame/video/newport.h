@@ -9,7 +9,6 @@
 
 #pragma once
 
-#include "cpu/mips/mips3.h"
 #include "machine/hpc3.h"
 
 class newport_video_device : public device_t
@@ -183,7 +182,7 @@ private:
 	DECLARE_WRITE32_MEMBER(vc2_w);
 	void do_rex3_command();
 
-	required_device<mips3_device> m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	required_device<hpc3_device> m_hpc3;
 	vc2_t  m_vc2;
 	xmap_t m_xmap0;
