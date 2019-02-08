@@ -1304,7 +1304,7 @@ CONS( 2005, jak_dora, 0, 0, jakks_gkr_nk, jak_gkr,  jakks_gkr_state, empty_init,
 CONS( 2005, jak_sdoo, 0, 0, jakks_gkr_2m, jak_gkr,  jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Jolliford Management","Scooby-Doo! and the Mystery of the Castle (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) //  SD (no game-keys released)
 CONS( 2005, jak_disf, 0, 0, jakks_gkr_dy, jak_gkr,  jakks_gkr_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",          "Disney Friends (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // uses DY keys (3 released)
 CONS( 2005, jak_sith, 0, 0, jakks_gkr_sw, jak_sith, jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Griptonite Games",    "Star Wars - Revenge of the Sith (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // uses SW keys (1 released)
-CONS( 2005, jak_dbz,  0, 0, jakks_gkr_1m, jak_gkr,  jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Handheld Games",      "Dragon Ball Z (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // DB (no game-keys released, 1 in development but cancelled)
+CONS( 2005, jak_dbz,  0, 0, jakks_gkr_1m, jak_gkr,  jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Handheld Games",      "Dragon Ball Z (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // DB (no game-keys released, 1 in development but cancelled)
 
 // Nicktoons                                   NK (3? keys available) (same keys as Dora the Explorer)
 // SpongeBob SquarePants: The Fry Cook Games   NK (3? keys available)  ^^
