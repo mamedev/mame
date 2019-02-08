@@ -1933,6 +1933,9 @@ void spg2xx_device::device_timer(emu_timer &timer, device_timer_id id, int param
 				check_video_irq();
 			}
 			m_screen->update_partial(m_screen->vpos());
+
+			// fire again, jak_dbz pinball needs this
+			m_screenpos_timer->adjust(m_screen->time_until_pos(m_video_regs[0x36], m_video_regs[0x37] << 1));
 			break;
 		}
 
