@@ -54111,7 +54111,7 @@ ExtractDisk  [11]"Super-88_Disk#11" -> "pc88 oldgame collection (super-88 disks 
 ExtractDisk  [12]"Super-88_Disk#12" -> "pc88 oldgame collection (super-88 disks 1-12)_12.d88"   5fbceedf (same as sp88-12)
 -->
 <!-- Alt disk exists with disks 1-6 (sixth disk underdumped)
-				<rom name="88 oldgame collection(super 88 1-6).d88" size="1832540" crc="51e02647" sha1="1a872df51ccba34f193ce88c154e3ada79f888a9" offset="0" /-->
+                <rom name="88 oldgame collection(super 88 1-6).d88" size="1832540" crc="51e02647" sha1="1a872df51ccba34f193ce88c154e3ada79f888a9" offset="0" /-->
 	<software name="pc88oldg">
 		<description>PC88 Oldgame Collection (Super-88 Disks 1-12)</description>
 		<year>19??</year>

@@ -2142,7 +2142,7 @@ Game cartridges
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="poohg" cloneof="pooh" supported="yes">
 		<description>Disneys Winnie Puuh - Die Honigjagd (Ger)</description>
 		<year>2004?</year>
