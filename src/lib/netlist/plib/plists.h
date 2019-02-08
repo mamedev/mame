@@ -73,6 +73,7 @@ protected:
 private:
 
 	/* ensure proper alignment */
+	// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays)
 	typename std::aligned_storage<sizeof(C), alignof(C)>::type m_buf[N];
 };
 

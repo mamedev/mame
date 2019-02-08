@@ -246,6 +246,10 @@ namespace plib
 				if (rho < rho_delta)
 					return itr_used + 1;
 
+				/* FIXME: The "+" is necessary to avoid link issues
+				 * on some systems / compiler versions. Issue reported by
+				 * AJR, no details known yet.
+				 */
 				vec_set_scalar(RESTART+1, m_g, +constants<FT>::zero);
 				m_g[0] = rho;
 
@@ -327,14 +331,14 @@ namespace plib
 		plib::parray<float_type, SIZE> residual;
 		plib::parray<float_type, SIZE> Ax;
 
-		float_type m_c[RESTART + 1];  			/* mr + 1 */
-		float_type m_g[RESTART + 1];  			/* mr + 1 */
-		float_type m_ht[RESTART + 1][RESTART];  /* (mr + 1), mr */
-		float_type m_s[RESTART + 1];     			/* mr + 1 */
-		float_type m_y[RESTART + 1];       		/* mr + 1 */
+		std::array<float_type, RESTART + 1> m_c;  			/* mr + 1 */
+		std::array<float_type, RESTART + 1> m_g;  			/* mr + 1 */
+		std::array<std::array<float_type, RESTART>, RESTART + 1> m_ht;  /* (mr + 1), mr */
+		std::array<float_type, RESTART + 1> m_s;   			/* mr + 1 */
+		std::array<float_type, RESTART + 1> m_y;       		/* mr + 1 */
 
 		//plib::parray<float_type, SIZE> m_v[RESTART + 1];  /* mr + 1, n */
-		float_type m_v[RESTART + 1][storage_N];  /* mr + 1, n */
+		std::array<std::array<float_type, storage_N>, RESTART + 1> m_v;  /* mr + 1, n */
 
 		std::size_t m_size;
 

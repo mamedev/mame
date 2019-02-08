@@ -23,7 +23,7 @@
 extern "C" int wmain(int argc, wchar_t *argv[]) { return plib::app::mainrun<appclass, wchar_t>(argc, argv); }
 #else
 #define PMAIN(appclass) \
-int main(int argc, char *argv[]) { return plib::app::mainrun<appclass, char>(argc, argv); }
+int main(int argc, char **argv) { return plib::app::mainrun<appclass, char>(argc, argv); }
 #endif
 
 
@@ -48,14 +48,14 @@ namespace plib {
 		plib::putf8_fmt_writer perr;
 
 		template <class C, typename T>
-		static int mainrun(int argc, T *argv[])
+		static int mainrun(int argc, T **argv)
 		{
 			auto a = std::unique_ptr<C>(new C);
 			return a->main_utfX(argc, argv);
 		}
 
 	private:
-		int main_utfX(int argc, char *argv[]);
+		int main_utfX(int argc, char **argv);
 #ifdef _WIN32
 		int main_utfX(int argc, wchar_t *argv[]);
 #endif

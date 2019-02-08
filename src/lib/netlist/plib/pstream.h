@@ -416,8 +416,8 @@ public:
 	friend struct constructor_helper;
 
 	template <typename T>
-	putf8_reader(T &&strm) // NOLINT(misc-forwarding-reference-overload,bugprone-move-forwarding-reference,bugprone-forwarding-reference-overload)
-	: m_strm(std::move(constructor_helper<T>()(std::move(strm))))
+	putf8_reader(T &&strm) // NOLINT(misc-forwarding-reference-overload, bugprone-forwarding-reference-overload)
+	: m_strm(std::move(constructor_helper<T>()(std::move(strm)))) // NOLINT(bugprone-move-forwarding-reference)
 	{}
 
 	bool eof() const { return m_strm->eof(); }
@@ -430,7 +430,7 @@ public:
 
 	bool readcode(putf8string::traits_type::code_t &c)
 	{
-		pistream::value_type b[4];
+		std::array<pistream::value_type, 4> b{0};
 		if (m_strm->read(&b[0], 1) != 1)
 			return false;
 		const std::size_t l = putf8string::traits_type::codelen(reinterpret_cast<putf8string::traits_type::mem_t *>(&b));
@@ -587,10 +587,10 @@ private:
 
 inline void copystream(postream &dest, pistream &src)
 {
-	postream::value_type buf[1024];
+	std::array<postream::value_type, 1024> buf; // NOLINT(cppcoreguidelines-pro-type-member-init)
 	pstream::pos_type r;
-	while ((r=src.read(buf, 1024)) > 0)
-		dest.write(buf, r);
+	while ((r=src.read(buf.data(), 1024)) > 0)
+		dest.write(buf.data(), r);
 }
 
 

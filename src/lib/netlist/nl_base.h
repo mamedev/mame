@@ -343,25 +343,25 @@ namespace netlist
 	 *  Please refer to \ref state_var.
 	 */
 	template <typename T, std::size_t N>
-	struct state_var<T[N]>
+	struct state_array
 	{
 	public:
 		//! Constructor.
 		template <typename O>
-		state_var(O &owner,             //!< owner must have a netlist() method.
+		state_array(O &owner,             //!< owner must have a netlist() method.
 				const pstring &name,     //!< identifier/name for this state variable
 				const T &value          //!< Initial value after construction
 				);
 		//! Copy Constructor.
-		state_var(const state_var &rhs) NL_NOEXCEPT = default;
+		state_array(const state_array &rhs) NL_NOEXCEPT = default;
 		//! Move Constructor.
-		state_var(state_var &&rhs) NL_NOEXCEPT = default;
-		state_var &operator=(const state_var &rhs) NL_NOEXCEPT = default;
-		state_var &operator=(const T &rhs) NL_NOEXCEPT { m_value = rhs; return *this; }
+		state_array(state_array &&rhs) NL_NOEXCEPT = default;
+		state_array &operator=(const state_array &rhs) NL_NOEXCEPT = default;
+		state_array &operator=(const T &rhs) NL_NOEXCEPT { m_value = rhs; return *this; }
 		T & operator[](const std::size_t i) NL_NOEXCEPT { return m_value[i]; }
-		constexpr T & operator[](const std::size_t i) const NL_NOEXCEPT { return m_value[i]; }
+		constexpr const T & operator[](const std::size_t i) const NL_NOEXCEPT { return m_value[i]; }
 	private:
-		T m_value[N];
+		std::array<T, N> m_value;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -1071,7 +1071,7 @@ namespace netlist
 		}
 
 	private:
-		ST m_data[1 << AW];
+		std::array<ST, 1 << AW> m_data;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -1433,7 +1433,7 @@ namespace netlist
 	public:
 		struct init
 		{
-			const char *p[N];
+			std::array<const char *, N> p;
 		};
 		template<typename... Args>
 		object_array_t(core_device_t &dev, init names, Args&&... args)
@@ -1682,7 +1682,7 @@ namespace netlist
 
 	template <typename T, std::size_t N>
 	template <typename O>
-	state_var<T[N]>::state_var(O &owner, const pstring &name, const T & value)
+	state_array<T,N>::state_array(O &owner, const pstring &name, const T & value)
 	{
 		owner.state().save(owner, m_value, owner.name(), name);
 		for (std::size_t i=0; i<N; i++)

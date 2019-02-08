@@ -51,7 +51,7 @@ namespace plib {
 	{
 	}
 
-	options::options(option *o[])
+	options::options(option **o)
 	: m_other_args(nullptr)
 	{
 		int i=0;
@@ -100,7 +100,7 @@ namespace plib {
 		}
 	}
 
-	int options::parse(int argc, char *argv[])
+	int options::parse(int argc, char **argv)
 	{
 		check_consistency();
 		m_app = pstring(argv[0]);
@@ -122,7 +122,7 @@ namespace plib {
 					has_equal_arg = (v.size() > 1);
 					if (has_equal_arg)
 					{
-						for (unsigned j = 1; j < v.size() - 1; j++)
+						for (std::size_t j = 1; j < v.size() - 1; j++)
 							opt_arg = opt_arg + v[j] + "=";
 						opt_arg += v[v.size()-1];
 					}

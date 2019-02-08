@@ -94,9 +94,9 @@ namespace devices
 			, m_initialized(false)
 			{}
 
-			type_t m_out_state[m_size];
-			uint_least8_t m_timing_index[m_size * m_NO];
-			netlist_time m_timing_nt[16];
+			std::array<type_t, m_size> m_out_state;
+			std::array<uint_least8_t, m_size * m_NO> m_timing_index;
+			std::array<netlist_time, 16> m_timing_nt;
 			bool m_initialized;
 		};
 
@@ -193,7 +193,7 @@ namespace devices
 
 			const std::size_t timebase(nstate * m_NO);
 			const auto *t(&m_ttp.m_timing_index[timebase]);
-			const auto *tim = m_ttp.m_timing_nt;
+			const auto *tim = m_ttp.m_timing_nt.data();
 
 			if (doOUT)
 				for (std::size_t i = 0; i < m_NO; out >>= 1, ++i)

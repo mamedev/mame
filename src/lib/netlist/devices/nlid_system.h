@@ -125,7 +125,7 @@ namespace netlist
 				std::vector<pstring> pat(plib::psplit(m_pattern(),","));
 				m_off = netlist_time::from_double(m_offset());
 
-				netlist_time::mult_type pati[32] = { 0 };
+				std::array<netlist_time::mult_type, 32> pati = { 0 };
 
 				m_size = static_cast<std::uint8_t>(pat.size());
 				netlist_time::mult_type total = 0;
@@ -163,7 +163,7 @@ namespace netlist
 		state_var_u8 m_cnt;
 		std::uint8_t m_size;
 		state_var<netlist_time> m_off;
-		netlist_time m_inc[32];
+		std::array<netlist_time, 32> m_inc;
 	};
 
 	// -----------------------------------------------------------------------------

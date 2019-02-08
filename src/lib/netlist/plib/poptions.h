@@ -222,12 +222,12 @@ class options
 public:
 
 	options();
-	explicit options(option *o[]);
+	explicit options(option **o);
 
 	~options();
 
 	void register_option(option_base *opt);
-	int parse(int argc, char *argv[]);
+	int parse(int argc, char **argv);
 
 	pstring help(pstring description, pstring usage,
 			unsigned width = 72, unsigned indent = 20) const;

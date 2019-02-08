@@ -107,7 +107,7 @@ public:
 
 	template<typename C, std::size_t N,
 		class = typename std::enable_if<std::is_same<C, const mem_t>::value>::type>
-	pstring_t(C (&string)[N])
+	pstring_t(C (&string)[N]) // NOLINT(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays)
 	{
 		static_assert(N > 0,"pstring from array of length 0");
 		if (string[N-1] != 0)

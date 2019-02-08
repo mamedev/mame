@@ -228,8 +228,8 @@ namespace netlist
 		{
 			typedef nld_truthtable_t<m_NI, m_NO> tt_type;
 			truthtable_parser desc_s(m_NO, m_NI, &m_ttbl.m_initialized,
-					packed_int(m_ttbl.m_out_state, sizeof(m_ttbl.m_out_state[0]) * 8),
-					m_ttbl.m_timing_index, m_ttbl.m_timing_nt);
+					packed_int(m_ttbl.m_out_state.data(), sizeof(m_ttbl.m_out_state[0]) * 8),
+					m_ttbl.m_timing_index.data(), m_ttbl.m_timing_nt.data());
 
 			desc_s.parse(m_desc);
 			return plib::owned_ptr<device_t>::Create<tt_type>(anetlist, name, m_family, m_ttbl, m_desc);

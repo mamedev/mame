@@ -30,7 +30,7 @@ namespace netlist
 		logic_input_t m_RC;
 		logic_input_t m_IN;
 
-		state_var<uint16_t[5]> m_buffer;
+		state_array<uint16_t, 5> m_buffer;
 
 		logic_output_t m_OUT;
 	};

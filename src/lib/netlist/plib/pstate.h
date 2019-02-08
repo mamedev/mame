@@ -11,6 +11,7 @@
 #include "pstring.h"
 #include "ptypes.h"
 
+#include <array>
 #include <memory>
 #include <vector>
 
@@ -90,7 +91,7 @@ public:
 	}
 
 	template<typename C, std::size_t N>
-	void save_item(const void *owner, C (&state)[N], const pstring &stname)
+	void save_item(const void *owner, C (&state)[N], const pstring &stname) // NOLINT(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays)
 	{
 		save_state_ptr(owner, stname, dtype<C>(), N, &(state[0]));
 	}
@@ -105,6 +106,12 @@ public:
 	void save_item(const void *owner, std::vector<C> &v, const pstring &stname)
 	{
 		save_state_ptr(owner, stname, dtype<C>(), v.size(), v.data());
+	}
+
+	template<typename C, std::size_t N>
+	void save_item(const void *owner, std::array<C, N> &a, const pstring &stname)
+	{
+		save_state_ptr(owner, stname, dtype<C>(), N, a.data());
 	}
 
 	void pre_save();

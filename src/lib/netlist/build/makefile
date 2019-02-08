@@ -23,7 +23,7 @@ TIDY_FLAGSX += -cppcoreguidelines-special-member-functions,-cppcoreguidelines-pr
 TIDY_FLAGSX += -performance-unnecessary-value-param,-android-*,-cppcoreguidelines-avoid-magic-numbers,
 TIDY_FLAGSX += -cppcoreguidelines-macro-usage,-misc-non-private-member-variables-in-classes,
 TIDY_FLAGSX += -cppcoreguidelines-non-private-member-variables-in-classes,
-TIDY_FLAGSX += -cppcoreguidelines-avoid-c-arrays,-modernize-avoid-c-arrays,
+#TIDY_FLAGSX += -cppcoreguidelines-avoid-c-arrays,-modernize-avoid-c-arrays,
 TIDY_FLAGSX += -performance-unnecessary-copy-initialization,
 TIDY_FLAGSX += -bugprone-macro-parentheses
 

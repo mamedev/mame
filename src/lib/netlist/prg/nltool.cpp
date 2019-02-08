@@ -281,14 +281,14 @@ struct input_t
 	input_t(const netlist::setup_t &setup, const pstring &line)
 	: m_value(0.0)
 	{
-		char buf[400];
+		std::array<char, 400> buf; // NOLINT(cppcoreguidelines-pro-type-member-init)
 		double t;
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
-		int e = sscanf(line.c_str(), "%lf,%[^,],%lf", &t, buf, &m_value);
+		int e = sscanf(line.c_str(), "%lf,%[^,],%lf", &t, buf.data(), &m_value);
 		if (e != 3)
 			throw netlist::nl_exception(plib::pfmt("error {1} scanning line {2}\n")(e)(line));
 		m_time = netlist::netlist_time::from_double(t);
-		m_param = setup.find_param(pstring(buf), true);
+		m_param = setup.find_param(pstring(buf.data()), true);
 	}
 
 	void setparam()
@@ -653,13 +653,13 @@ void tool_app_t::listdevices()
 			}
 		}
 		out += ")";
-		printf("%s\n", out.c_str());
+		pout("{}\n", out);
 		if (terms.size() > 0)
 		{
 			pstring t = "";
 			for (auto & j : terms)
 				t += "," + j;
-			printf("\tTerminals: %s\n", t.substr(1).c_str());
+			pout("\tTerminals: {}\n", t.substr(1));
 		}
 		devs.emplace_back(std::move(d));
 	}
