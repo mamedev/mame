@@ -123,7 +123,7 @@ void hpc1_device::indigo_mice(device_slot_interface &device)
 
 void hpc1_device::scsi_devices(device_slot_interface &device)
 {
-	device.option_add("cdrom", NSCSI_CDROM);
+	device.option_add("cdrom", NSCSI_CDROM_SGI);
 	device.option_add("harddisk", NSCSI_HARDDISK);
 }
 
