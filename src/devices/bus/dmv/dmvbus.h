@@ -76,6 +76,8 @@ public:
 	auto out_int() { return m_out_int_cb.bind(); }
 	auto out_irq() { return m_out_irq_cb.bind(); }
 	auto out_thold() { return m_out_thold_cb.bind(); }
+	template <typename T> void set_memspace(T &&tag, int spacenum) { m_memspace.set_tag(std::forward<T>(tag), spacenum); }
+	template <typename T> void set_iospace(T &&tag, int spacenum) { m_iospace.set_tag(std::forward<T>(tag), spacenum); }
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -107,6 +109,10 @@ public:
 	devcb_write_line                m_out_int_cb;
 	devcb_write_line                m_out_irq_cb;
 	devcb_write_line                m_out_thold_cb;
+
+	required_address_space          m_memspace;
+	required_address_space          m_iospace;
+
 	device_dmvslot_interface*       m_cart;
 };
 

@@ -872,6 +872,12 @@ void dmv_state::dmv(machine_config &config)
 	m_slot7a->out_int().set(FUNC(dmv_state::busint7a_w));
 	m_slot7a->out_irq().set(FUNC(dmv_state::irq7a_w));
 
+	for (auto &slot : { m_slot1, m_slot2, m_slot2a, m_slot3, m_slot4, m_slot5, m_slot6, m_slot7, m_slot7a })
+	{
+		slot->set_memspace(m_maincpu, AS_PROGRAM);
+		slot->set_iospace(m_maincpu, AS_IO);
+	}
+
 	SOFTWARE_LIST(config, "flop_list").set_original("dmv");
 
 	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
