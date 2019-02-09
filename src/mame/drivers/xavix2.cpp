@@ -131,6 +131,12 @@ void xavix2_state::xavix2(machine_config &config)
 	// unknown sound hardware
 }
 
+
+ROM_START( ltv_naru )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "naruto.bin", 0x000000, 0x800000, CRC(e3465ad2) SHA1(13e3d2de5d5a084635cab158f3639a1ea73265dc) )
+ROM_END
+
 ROM_START( domfitad )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "xpfitnessadventure.bin", 0x000000, 0x1000000, CRC(a7917081) SHA1(95ae5dc6e64a78ae060cb0e61d8b0af34a93c4ce) )
@@ -140,6 +146,9 @@ ROM_START( dombikec )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "xpbikeconcept.bin", 0x000000, 0x1000000, CRC(3447fce5) SHA1(c7e9e9cd789a17ac886ecf253f67753213cf8d21) )
 ROM_END
+
+
+CONS( 2006, ltv_naru, 0, 0, xavix2, xavix2, xavix2_state, empty_init, "Bandai / SSD Company LTD", "Let's TV Play Naruto", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // These are for the 'Domyos Interactive System' other Domyos Interactive System games can be found in xavix.cpp (the SoC is inside the cartridge, base acts as a 'TV adapter' only)
 
