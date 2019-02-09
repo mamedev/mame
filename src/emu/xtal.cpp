@@ -91,6 +91,7 @@ const double XTAL::known_xtals[] = {
 	  3'686'400, /* 3.6864_MHz_XTAL        Baud rate clock for MC68681 and similar UARTs */
 	  3'840'000, /* 3.84_MHz_XTAL          Fairlight CMI Alphanumeric Keyboard */
 	  3'900'000, /* 3.9_MHz_XTAL           Resonator - Used on some Fidelity boards */
+	  3'932'160, /* 3.93216_MHz_XTAL       Apple Lisa COP421 (197-0016A) */
 	  4'000'000, /* 4_MHz_XTAL             - */
 	  4'028'000, /* 4.028_MHz_XTAL         Sony SMC-777 */
 	  4'032'000, /* 4.032_MHz_XTAL         GRiD Compass modem board */
@@ -259,6 +260,7 @@ const double XTAL::known_xtals[] = {
 	 20'000'000, /* 20_MHz_XTAL            - */
 	 20'160'000, /* 20.16_MHz_XTAL         Nintendo 8080 */
 	 20'275'200, /* 20.2752_MHz_XTAL       TRS-80 Model III */
+	 20'375'040, /* 20.37504_MHz_XTAL      Apple Lisa dot clock (197-0019A) */
 	 20'625'000, /* 20.625_MHz_XTAL        SM 7238 */
 	 20'790'000, /* 20.79_MHz_XTAL         Blockade-hardware Gremlin games */
 	 21'000'000, /* 21_MHz_XTAL            Lock-On pixel clock */
