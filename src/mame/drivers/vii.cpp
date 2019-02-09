@@ -1091,6 +1091,11 @@ ROM_START( jak_sdoo )
 	ROM_LOAD16_WORD_SWAP( "jakksscoobydoogkr.bin", 0x000000, 0x400000, CRC(61062ce5) SHA1(9d21767fd855385ef83e4209c429ecd4bf7e5384) )
 ROM_END
 
+ROM_START( jak_dbz )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jakksdragonballzgkr.bin", 0x000000, 0x200000, CRC(d52c3b20) SHA1(fd5ce41c143cad9bca3372054f4ff98b52c33874) )
+ROM_END
+
 ROM_START( jak_sith )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "jakksstarwarsgkr.bin", 0x000000, 0x200000, CRC(932cde19) SHA1(b88b748c235e9eeeda574e4d5b4077ae9da6fbd0) )
@@ -1288,15 +1293,18 @@ CONS( 2010, wirels60, 0, 0, wireless60, wirels60, spg2xx_game_state, empty_init,
 CONS( 2004, jak_batm, 0, 0, jakks, batman, spg2xx_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "The Batman (JAKKS Pacific TV Game)",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 CONS( 2008, jak_wall, 0, 0, walle, walle,  spg2xx_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "Wall-E (JAKKS Pacific TV Game)",              MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-// 'Game-Key Ready' JAKKS games (these can also take per-game specific expansion cartridges, although not all games had them released)  Some of these were available in versions without Game-Key ports, it is unconfirmed if code was the same unless otherwise stated
+// 'Game-Key Ready' JAKKS games (these can also take per-game specific expansion cartridges, although not all games had them released)
+// Some of these were available in versions without Game-Key ports, it is unconfirmed if code was the same unless otherwise stated
+// For units released AFTER the GameKey promotion was cancelled it appears the code is the same as the PCB inside is the same, just the external port closed off, earlier units might be different hardware in some cases.
 CONS( 2005, jak_wwe,  0, 0, jakks_gkr_1m, jak_gkr,  jakks_gkr_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",          "WWE (JAKKS Pacific TV Game, Game-Key Ready)",            MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // WW (no game-keys released)
 CONS( 2005, jak_fan4, 0, 0, jakks_gkr_1m, jak_gkr,  jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Digital Eclipse",     "Fantastic Four (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // F4 (no game-keys released)
 CONS( 2005, jak_just, 0, 0, jakks_gkr_1m, jak_gkr,  jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Taniko",              "Justice League (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // DC (no game-keys released)
-CONS( 2005, jak_dora, 0, 0, jakks_gkr_nk, jak_gkr,  jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Handheld Games",      "Dora the Explorer - Nursery Rhyme Adventure (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // uses NK keys (same as Nicktoons & Spongebob) (3+ released) - The upper part of this one is pink/purple.
+CONS( 2005, jak_dora, 0, 0, jakks_gkr_nk, jak_gkr,  jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Handheld Games",      "Dora the Explorer - Nursery Rhyme Adventure (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // uses NK keys (same as Nicktoons & Spongebob) (3 released) - The upper part of this one is pink/purple.
 // there is also a Dora the Explorer 'Race to Play Park' which is also a GameKeyReady unit with NK code, and different games - the upper part of this one is blue.
 CONS( 2005, jak_sdoo, 0, 0, jakks_gkr_2m, jak_gkr,  jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Jolliford Management","Scooby-Doo! and the Mystery of the Castle (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) //  SD (no game-keys released)
 CONS( 2005, jak_disf, 0, 0, jakks_gkr_dy, jak_gkr,  jakks_gkr_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",          "Disney Friends (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // uses DY keys (3 released)
 CONS( 2005, jak_sith, 0, 0, jakks_gkr_sw, jak_sith, jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Griptonite Games",    "Star Wars - Revenge of the Sith (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // uses SW keys (1 released)
+CONS( 2005, jak_dbz,  0, 0, jakks_gkr_1m, jak_gkr,  jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Handheld Games",      "Dragon Ball Z (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // DB (no game-keys released, 1 in development but cancelled)
 
 // Nicktoons                                   NK (3? keys available) (same keys as Dora the Explorer)
 // SpongeBob SquarePants: The Fry Cook Games   NK (3? keys available)  ^^
@@ -1305,7 +1313,6 @@ CONS( 2005, jak_sith, 0, 0, jakks_gkr_sw, jak_sith, jakks_gkr_state, empty_init,
 // Spider-Man                                  MV (1? key available)
 
 // no keys released for the following, some were in development but cancelled
-// Dragon Ball Z                               DB (no game-keys released)
 // Capcom 3-in-1                               CC (no game-keys released)
 // Care Bears                                  CB (no game-keys released)
 // Wheel of Fortune                            WF (no game-keys released)

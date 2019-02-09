@@ -801,7 +801,7 @@
 
 	<!-- EC0077-ATS  Artist Selection Volume 15 - unknown artist -->
 
-	<!-- EC0078-     (unknown) -->
+	<!-- EC0078-JPM  J-Pop Mix Volume 40 -->
 
 	<software name="ec0079"> <!-- custom presentation -->
 		<description>ETZ (Japan) (EC0079-ETZ)</description> <!-- Japanese text in 'Volume' box -->
@@ -814,7 +814,7 @@
 		</part>
 	</software>
 
-	<!-- EC0080-     (unknown) -->
+	<!-- EC0080-JPM  J-Pop Mix Volume 41-->
 
 	<!-- EC0081-JPM  J-Pop Mix Volume 42 -->
 
@@ -831,8 +831,8 @@
 
 	<!-- EC0083-JPM  J-Pop Mix Volume 43 -->
 
-	<!-- EC0084-     (unknown, seen) -->
+	<!-- EC0084-     Something 40 (unknown, seen) -->
 
-	<!-- EC0085-     (unknown, seen in the wild) -->
+	<!-- EC0085-     (unknown, seen in the wild, sequel to 69, 79 so probably ETZ) -->
 
 </softwarelist>

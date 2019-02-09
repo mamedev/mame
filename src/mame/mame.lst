@@ -13280,6 +13280,7 @@ bang                            // (c) 1998 - Ref ???
 bangj                           // (c) 1999 - Ref ???
 play2000                        // (c) 1999 - Ref ???
 play2000a                       // (c) 1999 - Ref ???
+play2000b                       // (c) 1999 - Ref ???
 maniacsq                        // (c) 1996 - Ref 940411
 maniacsqa                       // (c) 1996 - Ref 940411
 maniacsqu                       // (c) 1996 - Ref 940411 - (unprotected)
@@ -38668,6 +38669,7 @@ jak_dora                        //
 jak_disf                        //
 jak_sith                        //
 jak_sdoo                        //
+jak_dbz                         //
 vii                             // KenSingTon / Jungle Soft / Siatronics Vii
 wrlshunt                        // Wireless: Hunting Video Game System
 wirels60                        // Wireless 60
@@ -39846,6 +39848,7 @@ ekaraa                          //
 ekaraj                          //
 ekarag                          //
 ekaraphs                        //
+epitch                          //
 ddrfammt                        //
 popira                          //
 taikodp                         //
@@ -39864,6 +39867,9 @@ xavmusic                        //
 domfitex                        //
 domfitch                        //
 domdance                        //
+
+@source:xavix2.cpp
+ltv_naru                        //
 domfitad                        //
 dombikec                        //
 

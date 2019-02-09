@@ -3515,6 +3515,7 @@ files {
 	MAME_DIR .. "src/mame/machine/xavix_io.h",
 	MAME_DIR .. "src/mame/machine/xavix2002_io.cpp",
 	MAME_DIR .. "src/mame/machine/xavix2002_io.h",
+	MAME_DIR .. "src/mame/drivers/xavix2.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "ultimachine")
