@@ -106,6 +106,13 @@ void lisa_state::lisa(machine_config &config)
 
 	cop421_cpu_device &iocop(COP421(config, "iocop", 3.93216_MHz_XTAL)); // U9F (I/O board)
 	iocop.set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, true);
+	iocop.read_si().set_constant(1); // FIXME: actually tied to VIA CA2 but both pulled up to +5
+	iocop.read_g().set_constant(15);
+
+	cop421_cpu_device &kbcop(COP421(config, "kbcop", 3932160)); // same clock as other COP?
+	kbcop.set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, true);
+	kbcop.read_si().set_constant(0);
+	kbcop.read_g().set_constant(15);
 
 	M6504(config, m_fdc_cpu, 2000000);        /* 16.000 MHz / 8 in when DIS asserted, 16.000 MHz / 9 otherwise (?) */
 	m_fdc_cpu->set_addrmap(AS_PROGRAM, &lisa_state::lisa_fdc_map);
@@ -123,7 +130,7 @@ void lisa_state::lisa(machine_config &config)
 	m_latch->q_out_cb<7>().set(FUNC(lisa_state::hdmsk_w));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(20.37504_MHz_XTAL, 896, 0, 720, 380, 0, 364);
+	m_screen->set_raw(20.37504_MHz_XTAL, 896, 0, 720, 379, 0, 364);
 	//m_screen->set_raw(20_MHz_XTAL, 896, 0, 720, 374, 0, 360); // according to Lisa Hardware Reference Manual
 	m_screen->set_screen_update(FUNC(lisa_state::screen_update_lisa));
 	m_screen->set_palette("palette");
@@ -359,6 +366,9 @@ ROM_START( lisa ) /* with twiggy drives, io40 i/o rom; technically any of the bo
 	ROM_REGION( 0x400, "iocop", 0 )
 	ROM_LOAD("341-0064a.u9f", 0x000, 0x400, CRC(e6849910) SHA1(d46e67df75c9e3e773d20542fb9d5b1d2ac0fb9b))
 
+	ROM_REGION( 0x400, "kbcop", 0 )
+	ROM_LOAD("341-0064a.u9f", 0x000, 0x400, CRC(e6849910) SHA1(d46e67df75c9e3e773d20542fb9d5b1d2ac0fb9b))
+
 	ROM_REGION(0x2000,"fdccpu",0)       // 6504 RAM and ROM
 	// note: other ?prototype? revisions of this rom for the lisa probably exist as well
 	ROM_LOAD( "341-0138f.bin", 0x001000, 0x001000, CRC(edd8d560) SHA1(872211d21386cd9625b3735d7682e2b2ecff05b4) )
@@ -399,6 +409,9 @@ ROM_START( lisa2 ) /* internal apple codename was 'pepsi'; has one SSDD 400K dri
 	ROM_REGION( 0x400, "iocop", 0 )
 	ROM_LOAD("341-0064a.u9f", 0x000, 0x400, CRC(e6849910) SHA1(d46e67df75c9e3e773d20542fb9d5b1d2ac0fb9b))
 
+	ROM_REGION( 0x400, "kbcop", 0 )
+	ROM_LOAD("341-0064a.u9f", 0x000, 0x400, CRC(e6849910) SHA1(d46e67df75c9e3e773d20542fb9d5b1d2ac0fb9b))
+
 	ROM_REGION(0x2000,"fdccpu",0)       // 6504 RAM and ROM
 	ROM_LOAD("341-0290-b", 0x1000, 0x1000, CRC(bc6364f1) SHA1(f3164923330a51366a06d9d8a4a01ec7b0d3a8aa)) // 341-0290-B LISA 2/5 Disk Rom (ioa8), supports profile on external port
 
@@ -429,6 +442,9 @@ ROM_START( lisa210 ) /* newer motherboard and i/o board; has io88 i/o rom, built
 	ROM_REGION( 0x400, "iocop", 0 )
 	ROM_LOAD("341-0064a.u9f", 0x000, 0x400, CRC(e6849910) SHA1(d46e67df75c9e3e773d20542fb9d5b1d2ac0fb9b))
 
+	ROM_REGION( 0x400, "kbcop", 0 )
+	ROM_LOAD("341-0064a.u9f", 0x000, 0x400, CRC(e6849910) SHA1(d46e67df75c9e3e773d20542fb9d5b1d2ac0fb9b))
+
 #if 1
 	ROM_REGION(0x2000,"fdccpu", 0)      // 6504 RAM and ROM
 	ROM_LOAD("341-0281-d", 0x1000, 0x1000, CRC(e343fe74) SHA1(a0e484ead2d2315fca261f39fff2f211ff61b0ef)) // 341-0281-D LISA 2/10 Disk Rom (io88), supports widget on internal port
@@ -452,6 +468,9 @@ ROM_START( macxl )
 	ROM_LOAD16_BYTE("341-0346-a", 0x000001, 0x2000, CRC(edf5222f) SHA1(b0388ee8dbbc51a2d628473dc29b65ce913fcd76)) // 341-0346-A Mac XL '3A' Bootrom Lo (boot3a.lo)
 
 	ROM_REGION( 0x400, "iocop", 0 )
+	ROM_LOAD("341-0064a.u9f", 0x000, 0x400, CRC(e6849910) SHA1(d46e67df75c9e3e773d20542fb9d5b1d2ac0fb9b))
+
+	ROM_REGION( 0x400, "kbcop", 0 )
 	ROM_LOAD("341-0064a.u9f", 0x000, 0x400, CRC(e6849910) SHA1(d46e67df75c9e3e773d20542fb9d5b1d2ac0fb9b))
 
 #if 1
