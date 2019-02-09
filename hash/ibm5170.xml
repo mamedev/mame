@@ -9983,7 +9983,7 @@
 	<software name="hook">
 		<description>Hook</description>
 		<year>1992</year>
-		<publisher>Ocean Software Ltd.</publisher>
+		<publisher>Ocean Software</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="disk1.img" size="737280" crc="95e41749" sha1="4a319888e029ea2ba9bd748b74163865dd560843" offset="0" />
@@ -10263,7 +10263,7 @@
 	<software name="indycar">
 		<description>IndyCar Racing</description>
 		<year>1993</year>
-		<publisher>Papyrus Publishing Inc.</publisher>
+		<publisher>Papyrus Publishing</publisher>
 		<info name="version" value="1.02" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
@@ -10735,6 +10735,19 @@
 		</part>
 	</software>
 
+	<software name="micromac">
+		<description>Micro Machines</description>
+		<year>1994</year>
+		<publisher>Codemasters</publisher>
+		<info name="developer" value="Codemasters" />
+		<info name="ported by" value="The Big Red Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Micro Machines [Codemasters] [1994] [3.5DD] [Disk 1 of 1].img" size="737280" crc="3bc676f8" sha1="da941c58f12b7e07b19356716bf5f028106488f5" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="micromc2">
 		<description>Micro Machines 2: Turbo Tournament</description>
 		<year>1995</year>
