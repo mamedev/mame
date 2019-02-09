@@ -47,17 +47,16 @@ public:
 				std::is_floating_point<T>::value);
 	}
 
-	class callback_t
+	class callback_t : nocopyassignmove
 	{
 	public:
 		using list_t = std::vector<callback_t *>;
-
-		virtual ~callback_t() = default;
 
 		virtual void register_state(state_manager_t &manager, const pstring &module) = 0;
 		virtual void on_pre_save(state_manager_t &manager) = 0;
 		virtual void on_post_load(state_manager_t &manager) = 0;
 	protected:
+		virtual ~callback_t() = default;
 	};
 
 	struct entry_t

@@ -103,7 +103,7 @@ class pistream_base : public pstream
 {
 public:
 
-	typedef T value_type;
+	using value_type = T;
 
 	bool eof() const { return ((flags() & FLAG_EOF) != 0); }
 
@@ -120,7 +120,7 @@ protected:
 	virtual size_type vread(T *buf, const size_type n) = 0;
 };
 
-typedef pistream_base<char> pistream;
+using pistream = pistream_base<char>;
 
 // -----------------------------------------------------------------------------
 // postream: output stream
@@ -132,7 +132,7 @@ class postream_base : public pstream
 {
 public:
 
-	typedef T value_type;
+	using value_type = T;
 
 	void write(const T *buf, const size_type n)
 	{
@@ -148,7 +148,7 @@ protected:
 private:
 };
 
-typedef postream_base<char> postream;
+using postream = postream_base<char>;
 
 // -----------------------------------------------------------------------------
 // pomemstream: output string stream

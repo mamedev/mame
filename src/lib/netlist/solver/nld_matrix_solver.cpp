@@ -70,7 +70,7 @@ void terms_for_net_t::set_pointers()
 // matrix_solver
 // ----------------------------------------------------------------------------------------
 
-matrix_solver_t::matrix_solver_t(netlist_base_t &anetlist, const pstring &name,
+matrix_solver_t::matrix_solver_t(netlist_state_t &anetlist, const pstring &name,
 		const eSortType sort, const solver_parameters_t *params)
 	: device_t(anetlist, name)
 	, m_params(*params)
@@ -374,8 +374,8 @@ void matrix_solver_t::setup_matrix()
 		for (std::size_t k = 0; k < iN; k++)
 		{
 			pstring line = plib::pfmt("{1:3}")(k);
-			for (std::size_t j = 0; j < m_terms[k]->m_nzrd.size(); j++)
-				line += plib::pfmt(" {1:3}")(m_terms[k]->m_nzrd[j]);
+			for (const auto & nzrd : m_terms[k]->m_nzrd)
+				line += plib::pfmt(" {1:3}")(nzrd);
 			log().verbose("{1}", line);
 		}
 

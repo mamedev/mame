@@ -29,8 +29,8 @@ class uninitialised_array_t
 {
 public:
 
-	typedef C* iterator;
-	typedef const C* const_iterator;
+	using iterator = C *;
+	using const_iterator = const C *;
 
 	uninitialised_array_t() = default;
 

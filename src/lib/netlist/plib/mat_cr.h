@@ -30,8 +30,8 @@ namespace plib
 	template<typename T, int N, typename C = uint16_t>
 	struct matrix_compressed_rows_t
 	{
-		typedef C index_type;
-		typedef T value_type;
+		using index_type = C;
+		using value_type = T;
 
 		enum constants_e
 		{

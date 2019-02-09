@@ -23,14 +23,14 @@ namespace plib {
 	struct sizeabs
 	{
 		static constexpr std::size_t ABS() { return (SIZE < 0) ? static_cast<std::size_t>(0 - SIZE) : static_cast<std::size_t>(SIZE); }
-		typedef typename std::array<FT, ABS()> container;
+		using container = typename std::array<FT, ABS()> ;
 	};
 
 	template <typename FT>
 	struct sizeabs<FT, 0>
 	{
 		static constexpr const std::size_t ABS = 0;
-		typedef typename std::vector<FT> container;
+		using container = typename std::vector<FT> ;
 	};
 
 	/**
@@ -55,10 +55,10 @@ namespace plib {
 	public:
 		static constexpr std::size_t SIZEABS() { return sizeabs<FT, SIZE>::ABS(); }
 
-		typedef typename sizeabs<FT, SIZE>::container base_type;
-		typedef typename base_type::size_type size_type;
-		typedef typename base_type::reference reference;
-		typedef typename base_type::const_reference const_reference;
+		using base_type = typename sizeabs<FT, SIZE>::container;
+		using size_type = typename base_type::size_type;
+		using reference = typename base_type::reference;
+		using const_reference = typename base_type::const_reference;
 
 		template <int X = SIZE >
 		parray(size_type size, typename std::enable_if<X==0, int>::type = 0)

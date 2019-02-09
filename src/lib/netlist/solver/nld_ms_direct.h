@@ -27,10 +27,10 @@ class matrix_solver_direct_t: public matrix_solver_t
 	friend class matrix_solver_t;
 public:
 
-	typedef FT float_type;
+	using float_type = FT;
 
-	matrix_solver_direct_t(netlist_base_t &anetlist, const pstring &name, const solver_parameters_t *params, const std::size_t size);
-	matrix_solver_direct_t(netlist_base_t &anetlist, const pstring &name, const eSortType sort, const solver_parameters_t *params, const std::size_t size);
+	matrix_solver_direct_t(netlist_state_t &anetlist, const pstring &name, const solver_parameters_t *params, const std::size_t size);
+	matrix_solver_direct_t(netlist_state_t &anetlist, const pstring &name, const eSortType sort, const solver_parameters_t *params, const std::size_t size);
 
 	~matrix_solver_direct_t() override = default;
 
@@ -212,7 +212,7 @@ unsigned matrix_solver_direct_t<FT, SIZE>::vsolve_non_dynamic(const bool newton_
 }
 
 template <typename FT, int SIZE>
-matrix_solver_direct_t<FT, SIZE>::matrix_solver_direct_t(netlist_base_t &anetlist, const pstring &name,
+matrix_solver_direct_t<FT, SIZE>::matrix_solver_direct_t(netlist_state_t &anetlist, const pstring &name,
 		const solver_parameters_t *params, const std::size_t size)
 : matrix_solver_t(anetlist, name, ASCENDING, params)
 , m_new_V(size)
@@ -223,7 +223,7 @@ matrix_solver_direct_t<FT, SIZE>::matrix_solver_direct_t(netlist_base_t &anetlis
 }
 
 template <typename FT, int SIZE>
-matrix_solver_direct_t<FT, SIZE>::matrix_solver_direct_t(netlist_base_t &anetlist, const pstring &name,
+matrix_solver_direct_t<FT, SIZE>::matrix_solver_direct_t(netlist_state_t &anetlist, const pstring &name,
 		const eSortType sort, const solver_parameters_t *params, const std::size_t size)
 : matrix_solver_t(anetlist, name, sort, params)
 , m_new_V(size)

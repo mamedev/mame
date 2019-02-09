@@ -172,7 +172,7 @@ namespace netlist
 	/*! Delegate type for device notification.
 	 *
 	 */
-	typedef plib::pmfp<void> nldelegate;
+	using nldelegate = plib::pmfp<void>;
 
 	// -----------------------------------------------------------------------------
 	// forward definitions
@@ -207,7 +207,6 @@ namespace netlist
 	class setup_t;
 	class netlist_t;
 	class netlist_state_t;
-	typedef netlist_state_t netlist_base_t;
 	class core_device_t;
 	class device_t;
 	class callbacks_t;
@@ -242,9 +241,9 @@ namespace netlist
 		logic_family_desc_t();
 		virtual ~logic_family_desc_t() = default;
 
-		virtual plib::owned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_base_t &anetlist, const pstring &name,
+		virtual plib::owned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_state_t &anetlist, const pstring &name,
 				logic_output_t *proxied) const = 0;
-		virtual plib::owned_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_base_t &anetlist, const pstring &name,
+		virtual plib::owned_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_state_t &anetlist, const pstring &name,
 				logic_input_t *proxied) const = 0;
 
 		double fixed_V() const { return m_fixed_V; }
@@ -472,8 +471,8 @@ namespace netlist
 		/*! The netlist owning the owner of this object.
 		 * \returns reference to netlist object.
 		 */
-		netlist_base_t &state() NL_NOEXCEPT;
-		const netlist_base_t &state() const NL_NOEXCEPT;
+		netlist_state_t &state() NL_NOEXCEPT;
+		const netlist_state_t &state() const NL_NOEXCEPT;
 
 		netlist_t &exec() NL_NOEXCEPT;
 		const netlist_t &exec() const NL_NOEXCEPT;
@@ -713,7 +712,7 @@ namespace netlist
 			DELIVERED
 		};
 
-		net_t(netlist_base_t &nl, const pstring &aname, core_terminal_t *mr = nullptr);
+		net_t(netlist_state_t &nl, const pstring &aname, core_terminal_t *mr = nullptr);
 		virtual ~net_t();
 
 		void reset();
@@ -785,7 +784,7 @@ namespace netlist
 	{
 	public:
 
-		logic_net_t(netlist_base_t &nl, const pstring &aname, detail::core_terminal_t *mr = nullptr);
+		logic_net_t(netlist_state_t &nl, const pstring &aname, detail::core_terminal_t *mr = nullptr);
 
 		netlist_sig_t Q() const noexcept { return m_cur_Q; }
 		void initial(const netlist_sig_t val) noexcept
@@ -840,7 +839,7 @@ namespace netlist
 
 		friend class detail::net_t;
 
-		analog_net_t(netlist_base_t &nl, const pstring &aname, detail::core_terminal_t *mr = nullptr);
+		analog_net_t(netlist_state_t &nl, const pstring &aname, detail::core_terminal_t *mr = nullptr);
 
 		nl_double Q_Analog() const NL_NOEXCEPT { return m_cur_Analog; }
 		void set_Q_Analog(const nl_double v) NL_NOEXCEPT { m_cur_Analog = v; }
@@ -954,9 +953,9 @@ namespace netlist
 	};
 
 	/* FIXME: these should go as well */
-	typedef param_num_t<bool> param_logic_t;
-	typedef param_num_t<int> param_int_t;
-	typedef param_num_t<double> param_double_t;
+	using param_logic_t = param_num_t<bool>;
+	using param_int_t = param_num_t<int>;
+	using param_double_t = param_num_t<double>;
 
 	// -----------------------------------------------------------------------------
 	// pointer parameter
@@ -1084,7 +1083,7 @@ namespace netlist
 			public detail::netlist_ref
 	{
 	public:
-		core_device_t(netlist_base_t &owner, const pstring &name);
+		core_device_t(netlist_state_t &owner, const pstring &name);
 		core_device_t(core_device_t &owner, const pstring &name);
 
 		virtual ~core_device_t() = default;
@@ -1153,7 +1152,7 @@ namespace netlist
 	{
 	public:
 
-		device_t(netlist_base_t &owner, const pstring &name);
+		device_t(netlist_state_t &owner, const pstring &name);
 		device_t(core_device_t &owner, const pstring &name);
 
 		~device_t() override = default;
@@ -1220,7 +1219,7 @@ namespace netlist
 			public plib::state_manager_t::callback_t
 	{
 	public:
-		typedef pqentry_t<net_t *, netlist_time> entry_t;
+		using entry_t = pqentry_t<net_t *, netlist_time>;
 		explicit queue_t(netlist_state_t &nl);
 
 	protected:
@@ -1652,12 +1651,12 @@ namespace netlist
 		}
 	}
 
-	inline netlist_base_t &detail::device_object_t::state() NL_NOEXCEPT
+	inline netlist_state_t &detail::device_object_t::state() NL_NOEXCEPT
 	{
 		return m_device.state();
 	}
 
-	inline const netlist_base_t &detail::device_object_t::state() const NL_NOEXCEPT
+	inline const netlist_state_t &detail::device_object_t::state() const NL_NOEXCEPT
 	{
 		return m_device.state();
 	}

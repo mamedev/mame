@@ -23,7 +23,7 @@ namespace plib
 	template <typename FT, int SIZE>
 	struct mat_precondition_ILU
 	{
-		typedef plib::matrix_compressed_rows_t<FT, SIZE> mat_type;
+		using mat_type = plib::matrix_compressed_rows_t<FT, SIZE>;
 
 		mat_precondition_ILU(std::size_t size, int ilu_scale = 4
 			, std::size_t bw = plib::matrix_compressed_rows_t<FT, SIZE>::FILL_INFINITY)
@@ -138,7 +138,7 @@ namespace plib
 	{
 	public:
 
-		typedef FT float_type;
+		using float_type = FT;
 		// FIXME: dirty hack to make this compile
 		static constexpr const std::size_t storage_N = plib::sizeabs<FT, SIZE>::ABS();
 

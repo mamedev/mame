@@ -29,11 +29,11 @@ class matrix_solver_GCR_t: public matrix_solver_t
 {
 public:
 
-	typedef plib::matrix_compressed_rows_t<FT, SIZE> mat_type;
+	using mat_type = plib::matrix_compressed_rows_t<FT, SIZE>;
 	// FIXME: dirty hack to make this compile
 	static constexpr const std::size_t storage_N = 100;
 
-	matrix_solver_GCR_t(netlist_base_t &anetlist, const pstring &name,
+	matrix_solver_GCR_t(netlist_state_t &anetlist, const pstring &name,
 			const solver_parameters_t *params, const std::size_t size)
 		: matrix_solver_t(anetlist, name, matrix_solver_t::PREFER_IDENTITY_TOP_LEFT, params)
 		, m_dim(size)
@@ -68,7 +68,7 @@ private:
 	plib::parray<FT, SIZE> RHS;
 	plib::parray<FT, SIZE> new_V;
 
-	std::vector<FT *> m_term_cr[storage_N];
+	std::array<std::vector<FT *>, storage_N> m_term_cr;
 
 	mat_type mat;
 

@@ -56,7 +56,7 @@ namespace netlist
 			return b ? *h : d2;
 		}
 		template<>
-		inline core_device_t &bselect(bool b, netlist_base_t &d1, core_device_t &d2)
+		inline core_device_t &bselect(bool b, netlist_state_t &d1, core_device_t &d2)
 		{
 			plib::unused_var(d1);
 			if (b)

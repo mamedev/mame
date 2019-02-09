@@ -27,9 +27,9 @@ class matrix_solver_SOR_t: public matrix_solver_direct_t<FT, SIZE>
 {
 public:
 
-	typedef FT float_type;
+	using float_type = FT;
 
-	matrix_solver_SOR_t(netlist_base_t &anetlist, const pstring &name, const solver_parameters_t *params, const std::size_t size)
+	matrix_solver_SOR_t(netlist_state_t &anetlist, const pstring &name, const solver_parameters_t *params, const std::size_t size)
 		: matrix_solver_direct_t<FT, SIZE>(anetlist, name, matrix_solver_t::ASCENDING, params, size)
 		, m_lp_fact(*this, "m_lp_fact", 0)
 		, w(size, 0.0)

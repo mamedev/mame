@@ -129,7 +129,7 @@ NETLIB_UPDATE(solver)
 }
 
 template <class C>
-matrix_solver_t * create_it(netlist_base_t &nl, pstring name, solver_parameters_t &params, std::size_t size)
+matrix_solver_t * create_it(netlist_state_t &nl, pstring name, solver_parameters_t &params, std::size_t size)
 {
 	return plib::palloc<C>(nl, name, &params, size);
 }
@@ -214,7 +214,7 @@ struct net_splitter
 		}
 	}
 
-	void run(netlist_base_t &netlist)
+	void run(netlist_state_t &netlist)
 	{
 		for (auto & net : netlist.nets())
 		{

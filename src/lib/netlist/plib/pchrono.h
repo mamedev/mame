@@ -18,7 +18,7 @@ namespace chrono {
 	template <typename T>
 	struct sys_ticks
 	{
-		typedef typename T::rep type;
+		using type = typename T::rep;
 		static inline type start() { return T::now().time_since_epoch().count(); }
 		static inline type stop() { return T::now().time_since_epoch().count(); }
 		static inline constexpr type per_second() { return T::period::den / T::period::num; }
@@ -145,7 +145,7 @@ namespace chrono {
 	struct counter
 	{
 		counter() : m_count(0) { }
-		typedef uint_least64_t type;
+		using type = uint_least64_t;
 		type operator()() const { return m_count; }
 		void inc() { ++m_count; }
 		void reset() { m_count = 0; }
@@ -157,7 +157,7 @@ namespace chrono {
 	template<>
 	struct counter<false>
 	{
-		typedef uint_least64_t type;
+		using type = uint_least64_t;
 		constexpr type operator()() const { return 0; }
 		void inc() const { }
 		void reset() const { }
@@ -168,8 +168,8 @@ namespace chrono {
 	template< typename T, bool enabled_ = true>
 	struct timer
 	{
-		typedef typename T::type type;
-		typedef uint_least64_t   ctype;
+		using type = typename T::type;
+		using ctype = uint_least64_t;
 		constexpr static bool enabled = enabled_;
 
 		struct guard_t
@@ -206,8 +206,8 @@ namespace chrono {
 	template<typename T>
 	struct timer<T, false>
 	{
-		typedef typename T::type type;
-		typedef uint_least64_t   ctype;
+		using type = typename T::type;
+		using ctype = uint_least64_t;
 
 		struct guard_t
 		{

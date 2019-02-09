@@ -57,13 +57,13 @@ class matrix_solver_w_t: public matrix_solver_t
 	friend class matrix_solver_t;
 
 public:
-	typedef FT float_ext_type;
-	typedef FT float_type;
+	using float_ext_type = FT;
+	using float_type = FT;
 
 	// FIXME: dirty hack to make this compile
 	static constexpr const std::size_t storage_N = 100;
 
-	matrix_solver_w_t(netlist_base_t &anetlist, const pstring &name, const solver_parameters_t *params, const std::size_t size);
+	matrix_solver_w_t(netlist_state_t &anetlist, const pstring &name, const solver_parameters_t *params, const std::size_t size);
 
 	~matrix_solver_w_t() override = default;
 
@@ -367,7 +367,7 @@ unsigned matrix_solver_w_t<FT, SIZE>::vsolve_non_dynamic(const bool newton_raphs
 }
 
 template <typename FT, int SIZE>
-matrix_solver_w_t<FT, SIZE>::matrix_solver_w_t(netlist_base_t &anetlist, const pstring &name,
+matrix_solver_w_t<FT, SIZE>::matrix_solver_w_t(netlist_state_t &anetlist, const pstring &name,
 		const solver_parameters_t *params, const std::size_t size)
 	: matrix_solver_t(anetlist, name, NOSORT, params)
 	, m_cnt(0)

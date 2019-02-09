@@ -181,7 +181,7 @@ public:
 
 protected:
 
-	matrix_solver_t(netlist_base_t &anetlist, const pstring &name,
+	matrix_solver_t(netlist_state_t &anetlist, const pstring &name,
 			eSortType sort, const solver_parameters_t *params);
 
 	void sort_terms(eSortType sort);
@@ -264,7 +264,7 @@ void matrix_solver_t::store(const T & V)
 template <typename T>
 void matrix_solver_t::build_LE_A(T &child)
 {
-	typedef typename T::float_type float_type;
+	using float_type = typename T::float_type;
 	static_assert(std::is_base_of<matrix_solver_t, T>::value, "T must derive from matrix_solver_t");
 
 	const std::size_t iN = child.size();
@@ -300,7 +300,7 @@ template <typename T>
 void matrix_solver_t::build_LE_RHS(T &child)
 {
 	static_assert(std::is_base_of<matrix_solver_t, T>::value, "T must derive from matrix_solver_t");
-	typedef typename T::float_type float_type;
+	using float_type = typename T::float_type;
 
 	const std::size_t iN = child.size();
 	for (std::size_t k = 0; k < iN; k++)

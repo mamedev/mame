@@ -129,11 +129,11 @@ void nl_convert_base_t::add_term(pstring netname, pstring termname)
 
 void nl_convert_base_t::dump_nl()
 {
-	for (std::size_t i=0; i<m_ext_alias.size(); i++)
+	for (auto & alias : m_ext_alias)
 	{
-		net_t *net = m_nets[m_ext_alias[i]].get();
+		net_t *net = m_nets[alias].get();
 		// use the first terminal ...
-		out("ALIAS({}, {})\n", m_ext_alias[i].c_str(), net->terminals()[0].c_str());
+		out("ALIAS({}, {})\n", alias.c_str(), net->terminals()[0].c_str());
 		// if the aliased net only has this one terminal connected ==> don't dump
 		if (net->terminals().size() == 1)
 			net->set_no_export();

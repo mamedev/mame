@@ -187,7 +187,7 @@ case OP: \
 
 double pfunction::evaluate(const std::vector<double> &values)
 {
-	double stack[20];
+	std::array<double, 20> stack = { 0 };
 	unsigned ptr = 0;
 	stack[0] = 0.0;
 	for (auto &rc : m_precompiled)

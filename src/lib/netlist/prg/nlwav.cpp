@@ -125,7 +125,7 @@ private:
 class log_processor
 {
 public:
-	typedef plib::pmfp<void, std::size_t, double, double> callback_type;
+	using callback_type = plib::pmfp<void, std::size_t, double, double>;
 
 	struct elem
 	{
@@ -202,7 +202,7 @@ private:
 
 struct aggregator
 {
-	typedef plib::pmfp<void, std::size_t, double, double> callback_type;
+	using callback_type = plib::pmfp<void, std::size_t, double, double>;
 
 	aggregator(std::size_t channels, double quantum, callback_type cb)
 	: m_channels(channels)

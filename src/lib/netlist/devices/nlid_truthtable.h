@@ -44,10 +44,10 @@ namespace devices
 	};
 
 	template<unsigned bits> struct uint_for_size;
-	template<> struct uint_for_size<1> { typedef uint_least8_t  type; };
-	template<> struct uint_for_size<2> { typedef uint_least16_t type; };
-	template<> struct uint_for_size<4> { typedef uint_least32_t type; };
-	template<> struct uint_for_size<8> { typedef uint_least64_t type; };
+	template<> struct uint_for_size<1> { using type = uint_least8_t; };
+	template<> struct uint_for_size<2> { using type = uint_least16_t; };
+	template<> struct uint_for_size<4> { using type = uint_least32_t; };
+	template<> struct uint_for_size<8> { using type = uint_least64_t; };
 
 	template<std::size_t NUM, typename R>
 	struct aa
@@ -81,7 +81,7 @@ namespace devices
 		detail::family_setter_t m_fam;
 	public:
 
-		typedef typename uint_for_size<need_bytes_for_bits<m_NO + m_NI>::value>::type type_t;
+		using type_t = typename uint_for_size<need_bytes_for_bits<m_NO + m_NI>::value>::type;
 
 		static constexpr const std::size_t m_num_bits = m_NI;
 		static constexpr const std::size_t m_size = (1 << (m_num_bits));
