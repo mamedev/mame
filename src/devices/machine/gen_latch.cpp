@@ -182,14 +182,14 @@ generic_latch_16_device::generic_latch_16_device(const machine_config &mconfig, 
 {
 }
 
-READ16_MEMBER( generic_latch_16_device::read )
+u16 generic_latch_16_device::read()
 {
 	if (!has_separate_acknowledge() && !machine().side_effects_disabled())
 		set_latch_written(false);
 	return m_latched_value;
 }
 
-WRITE16_MEMBER( generic_latch_16_device::write )
+void generic_latch_16_device::write(u16 data)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(generic_latch_16_device::sync_callback), this), data);
 }

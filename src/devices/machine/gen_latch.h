@@ -93,8 +93,8 @@ public:
 	// construction/destruction
 	generic_latch_16_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
-	DECLARE_READ16_MEMBER( read );
-	DECLARE_WRITE16_MEMBER( write );
+	u16 read();
+	void write(u16 data);
 
 	void preset_w(u16 data = 0xffff);
 	void clear_w(u16 data = 0);

@@ -552,7 +552,7 @@ WRITE8_MEMBER( leland_80186_sound_device::leland_80186_command_lo_w )
 {
 	if (LOG_COMM) logerror("%s:Write sound command latch lo = %02X\n", machine().describe_context(), data);
 	m_sound_command = (m_sound_command & 0xff00) | data;
-	m_soundlatch->write(space, offset, m_sound_command);
+	m_soundlatch->write(m_sound_command);
 }
 
 
@@ -560,7 +560,7 @@ WRITE8_MEMBER( leland_80186_sound_device::leland_80186_command_hi_w )
 {
 	if (LOG_COMM) logerror("%s:Write sound command latch hi = %02X\n", machine().describe_context(), data);
 	m_sound_command = (m_sound_command & 0x00ff) | (data << 8);
-	m_soundlatch->write(space, offset, m_sound_command);
+	m_soundlatch->write(m_sound_command);
 }
 
 
@@ -728,8 +728,8 @@ READ16_MEMBER( leland_80186_sound_device::peripheral_r )
 				return ((m_clock_active << 1) & 0x7e);
 
 		case 1:
-			if (LOG_COMM) logerror("%s:Read sound command latch = %02X\n", machine().describe_context(), m_soundlatch->read(space, offset));
-			return m_soundlatch->read(space, offset);
+			if (LOG_COMM) logerror("%s:Read sound command latch = %02X\n", machine().describe_context(), m_soundlatch->read());
+			return m_soundlatch->read();
 
 		case 2:
 			if (ACCESSING_BITS_0_7)

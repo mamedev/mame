@@ -271,20 +271,20 @@ WRITE16_MEMBER(megasys1_state::screen_flag_w)
 
 WRITE16_MEMBER(megasys1_state::soundlatch_w)
 {
-	m_soundlatch[0]->write(space, 0, data, mem_mask);
+	m_soundlatch[0]->write(data);
 	m_audiocpu->set_input_line(4, HOLD_LINE);
 }
 
 WRITE16_MEMBER(megasys1_state::soundlatch_z_w)
 {
-	m_soundlatch[0]->write(space, 0, data & 0xff);
+	m_soundlatch[0]->write(data & 0xff);
 	m_audiocpu->set_input_line(5, HOLD_LINE);
 }
 
 WRITE16_MEMBER(megasys1_state::soundlatch_c_w)
 {
 	// Cybattler reads sound latch on irq 2
-	m_soundlatch[0]->write(space, 0, data, mem_mask);
+	m_soundlatch[0]->write(data);
 	m_audiocpu->set_input_line(2, HOLD_LINE);
 }
 

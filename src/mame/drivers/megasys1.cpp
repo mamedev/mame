@@ -571,7 +571,7 @@ void megasys1_state::z80_sound_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0xc000, 0xc7ff).ram();
-	map(0xe000, 0xe000).lr8("soundlatch_r_z", [this](address_space &space, offs_t offset){ return m_soundlatch[0]->read(space, 0) & 0xff; });
+	map(0xe000, 0xe000).lr8("soundlatch_r_z", [this](){ return m_soundlatch[0]->read() & 0xff; });
 	map(0xf000, 0xf000).nopw(); /* ?? */
 }
 
