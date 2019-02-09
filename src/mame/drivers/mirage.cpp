@@ -311,7 +311,7 @@ MACHINE_CONFIG_START(miragemj_state::mirage)
 	MCFG_SCREEN_UPDATE_DRIVER(miragemj_state, screen_update_mirage)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mirage)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_mirage);
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 1024);
 
 	DECO16IC(config, m_deco_tilegen, 0);

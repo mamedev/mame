@@ -1333,7 +1333,7 @@ WRITE_LINE_MEMBER(mpu4_state::pia_ic8_cb2_w)
 WRITE8_MEMBER(mpu4_state::pia_gb_porta_w)
 {
 	LOG_SS(("%s: GAMEBOARD: PIA Port A Set to %2x\n", machine().describe_context(),data));
-	m_msm6376->write(space, 0, data);
+	m_msm6376->write(data);
 }
 
 WRITE8_MEMBER(mpu4_state::pia_gb_portb_w)
@@ -2115,12 +2115,12 @@ READ8_MEMBER(mpu4_state::bwb_characteriser_r)
 
 WRITE8_MEMBER(mpu4_state::mpu4_ym2413_w)
 {
-	if (m_ym2413) m_ym2413->write(space,offset,data);
+	if (m_ym2413) m_ym2413->write(offset,data);
 }
 
 READ8_MEMBER(mpu4_state::mpu4_ym2413_r)
 {
-//  if (m_ym2413) return m_ym2413->read(space,offset);
+//  if (m_ym2413) return m_ym2413->read(offset);
 	return 0xff;
 }
 
@@ -2981,8 +2981,9 @@ void mpu4_state::mpu4_bwb_7reel(machine_config &config)
 	m_reel[7]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<7>));
 }
 
-MACHINE_CONFIG_START(mpu4_state::mpu4_common)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("50hz", mpu4_state, gen_50hz, attotime::from_hz(100))
+void mpu4_state::mpu4_common(machine_config &config)
+{
+	TIMER(config, "50hz").configure_periodic(FUNC(mpu4_state::gen_50hz), attotime::from_hz(100));
 
 	MSC1937(config, m_vfd);
 	/* 6840 PTM */
@@ -3045,12 +3046,11 @@ MACHINE_CONFIG_START(mpu4_state::mpu4_common)
 	m_pia8->irqa_handler().set(FUNC(mpu4_state::cpu0_irq));
 	m_pia8->irqb_handler().set(FUNC(mpu4_state::cpu0_irq));
 
-	MCFG_DEVICE_ADD("meters", METERS, 0)
-	MCFG_METERS_NUMBER(8)
+	METERS(config, m_meters, 0).set_number(8);
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(mpu4_state::mpu4_common2)
+void mpu4_state::mpu4_common2(machine_config &config)
+{
 	PTM6840(config, m_ptm_ic3ss, MPU4_MASTER_CLOCK / 4);
 	m_ptm_ic3ss->set_external_clocks(0, 0, 0);
 	m_ptm_ic3ss->o1_callback().set("ptm_ic3ss", FUNC(ptm6840_device::set_c2));
@@ -3064,7 +3064,7 @@ MACHINE_CONFIG_START(mpu4_state::mpu4_common2)
 	pia_ic4ss.writepb_handler().set(FUNC(mpu4_state::pia_gb_portb_w));
 	pia_ic4ss.ca2_handler().set(FUNC(mpu4_state::pia_gb_ca2_w));
 	pia_ic4ss.cb2_handler().set(FUNC(mpu4_state::pia_gb_cb2_w));
-MACHINE_CONFIG_END
+}
 
 /* machine driver for MOD 2 board */
 MACHINE_CONFIG_START(mpu4_state::mpu4base)

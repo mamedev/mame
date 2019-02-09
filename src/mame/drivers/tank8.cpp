@@ -346,7 +346,7 @@ MACHINE_CONFIG_START(tank8_state::tank8)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tank8_state, screen_vblank))
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_tank8)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tank8);
 	PALETTE(config, m_palette, FUNC(tank8_state::tank8_palette), 20, 10);
 
 	/* sound hardware */

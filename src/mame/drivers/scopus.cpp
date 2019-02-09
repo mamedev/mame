@@ -212,16 +212,16 @@ MACHINE_CONFIG_START(sagitta180_state::sagitta180)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(80*5, 25*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*5-1, 0, 25*8-1)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sagitta180 )
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_sagitta180);
 
-	MCFG_DEVICE_ADD("crtc", I8275, 12480000 / 8) /* guessed xtal */
-	MCFG_I8275_CHARACTER_WIDTH(8)
-	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(sagitta180_state, crtc_display_pixels)
-	MCFG_I8275_DRQ_CALLBACK(WRITELINE("dma" , i8257_device , dreq2_w))
-	MCFG_I8275_IRQ_CALLBACK(INPUTLINE("maincpu" , I8085_INTR_LINE))
-	MCFG_VIDEO_SET_SCREEN("screen")
+	I8275(config, m_crtc, 12480000 / 8); /* guessed xtal */
+	m_crtc->set_character_width(8);
+	m_crtc->set_display_callback(FUNC(sagitta180_state::crtc_display_pixels), this);
+	m_crtc->drq_wr_callback().set(m_dma8257, FUNC(i8257_device::dreq2_w));
+	m_crtc->irq_wr_callback().set_inputline(m_maincpu, I8085_INTR_LINE);
+	m_crtc->set_screen("screen");
+
 	MCFG_PALETTE_ADD("palette", 3)
-
 MACHINE_CONFIG_END
 
 

@@ -416,9 +416,9 @@ MACHINE_CONFIG_START(mugsmash_state::mugsmash)
 	MCFG_SCREEN_UPDATE_DRIVER(mugsmash_state, screen_update_mugsmash)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mugsmash)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mugsmash);
 
-	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 0x300);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x300);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

@@ -286,7 +286,7 @@ MACHINE_CONFIG_START(md_boot_state::puckpkmn)
 
 	MCFG_MACHINE_START_OVERRIDE(md_boot_state, md_bootleg)
 
-	MCFG_DEVICE_REMOVE("genesis_snd_z80")
+	config.device_remove("genesis_snd_z80");
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(4'000'000) / 4, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)

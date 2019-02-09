@@ -58,8 +58,8 @@ void suprloco_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0xa000, 0xa003).w("sn1", FUNC(sn76496_device::command_w));
-	map(0xc000, 0xc003).w("sn2", FUNC(sn76496_device::command_w));
+	map(0xa000, 0xa003).w("sn1", FUNC(sn76496_device::write));
+	map(0xc000, 0xc003).w("sn2", FUNC(sn76496_device::write));
 	map(0xe000, 0xe000).r("ppi", FUNC(i8255_device::acka_r));
 }
 

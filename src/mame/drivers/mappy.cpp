@@ -1334,7 +1334,7 @@ void mappy_state::superpac_common(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 8);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);    // 100 CPU slices per frame - an high value to ensure proper synchronization of the CPUs
+	config.m_minimum_quantum = attotime::from_hz(6000);    // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
 
 	ls157_device &dipmux(LS157(config, "dipmux"));
 	dipmux.a_in_callback().set_ioport("DSW2");
@@ -1446,7 +1446,7 @@ void mappy_state::phozon(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 8);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);    // 100 CPU slices per frame - an high value to ensure proper synchronization of the CPUs
+	config.m_minimum_quantum = attotime::from_hz(6000);    // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
 
 	NAMCO_58XX(config, m_namcoio[0], 0);
 	m_namcoio[0]->in_callback<0>().set_ioport("COINS");
@@ -1505,7 +1505,7 @@ void mappy_state::mappy_common(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 8);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);    // 100 CPU slices per frame - an high value to ensure proper synchronization of the CPUs
+	config.m_minimum_quantum = attotime::from_hz(6000);    // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
 
 	ls157_device &dipmux(LS157(config, "dipmux"));
 	dipmux.a_in_callback().set_ioport("DSW2");
@@ -1513,7 +1513,7 @@ void mappy_state::mappy_common(machine_config &config)
 
 	/* video hardware */
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mappy);
-	PALETTE(config, m_palette, FUNC(mappy_state::mappy_palette), 64*4+16*4, 32);
+	PALETTE(config, m_palette, FUNC(mappy_state::mappy_palette), 64*4+16*16, 32);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);

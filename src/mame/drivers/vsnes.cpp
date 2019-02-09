@@ -276,9 +276,9 @@ void vsnes_state::vsnes_bootleg_z80_map(address_map &map)
 	map(0x6001, 0x6001).r(FUNC(vsnes_state::vsnes_bootleg_z80_address_r)); // ^
 
 
-	map(0x60FA, 0x60FA).w("sn1", FUNC(sn76489_device::command_w));
-	map(0x60F9, 0x60F9).w("sn2", FUNC(sn76489_device::command_w));
-	map(0x60FF, 0x60FF).w("sn3", FUNC(sn76489_device::command_w));
+	map(0x60FA, 0x60FA).w("sn1", FUNC(sn76489_device::write));
+	map(0x60F9, 0x60F9).w("sn2", FUNC(sn76489_device::write));
+	map(0x60FF, 0x60FF).w("sn3", FUNC(sn76489_device::write));
 
 }
 
@@ -1967,7 +1967,7 @@ ROM_START( suprmriobl )
 
 	ROM_REGION( 0x4000,"pals", 0  )
 	ROM_LOAD( "pal16l8.1",  0x000, 0x104, CRC(bd76fb53) SHA1(2d0634e8edb3289a103719466465e9777606086e) )
-	ROM_LOAD( "pal16r6a.2.bad.dump",  0x000, 0x104, BAD_DUMP CRC(e9cd78fb) SHA1(557d3e7ef3b25c1338b24722cac91bca788c02b8) )
+	ROM_LOAD( "pal16r6a.2", 0x000, 0x104, NO_DUMP )
 	ROM_LOAD( "pal16r8.3",  0x000, 0x104, CRC(bd76fb53) SHA1(2d0634e8edb3289a103719466465e9777606086e) )
 	ROM_LOAD( "pal16l8.4",  0x000, 0x104, CRC(6f6de82d) SHA1(3d59b222d25457b2f89b559409721db37d6a81d8) )
 	ROM_LOAD( "pal16r6.5",  0x000, 0x104, CRC(ceff7c7c) SHA1(52fd344c591478469369cd0862d1facfe23e12fb) )

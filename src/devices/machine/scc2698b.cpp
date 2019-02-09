@@ -768,7 +768,8 @@ attotime scc2698b_device::generate_baudrate(int block, int tx, int table_index)
 
 
 
-MACHINE_CONFIG_START(scc2698b_device::device_add_mconfig)
+void scc2698b_device::device_add_mconfig(machine_config &config)
+{
 	for (required_device<scc2698b_channel> &channel : m_channel)
 		SCC2698B_CHANNEL(config, channel, 0);
-MACHINE_CONFIG_END
+}

@@ -482,7 +482,7 @@ MACHINE_CONFIG_START(nanos_state::nanos)
 	MCFG_SCREEN_VISIBLE_AREA(0,80*8-1,0,25*10-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nanos)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_nanos);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* devices */
@@ -517,12 +517,12 @@ MACHINE_CONFIG_START(nanos_state::nanos)
 
 	/* UPD765 */
 	UPD765A(config, m_fdc, 8'000'000, false, true);
-	MCFG_FLOPPY_DRIVE_ADD(m_floppy, nanos_floppies, "525hd", nanos_state::floppy_formats)
+	FLOPPY_CONNECTOR(config, m_floppy, nanos_floppies, "525hd", nanos_state::floppy_formats);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K");
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", nanos_state, keyboard_callback, attotime::from_hz(24000))
+	TIMER(config, "keyboard_timer").configure_periodic(FUNC(nanos_state::keyboard_callback), attotime::from_hz(24000));
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -497,7 +497,7 @@ MACHINE_CONFIG_START(terracre_state::ym2203)
 	MCFG_DEVICE_MODIFY("audiocpu")
 	MCFG_DEVICE_IO_MAP(sound_2203_io_map)
 
-	MCFG_DEVICE_REMOVE("ymsnd")
+	config.device_remove("ymsnd");
 
 	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(16'000'000)/4)
 	MCFG_SOUND_ROUTE(0, "speaker", 0.2)

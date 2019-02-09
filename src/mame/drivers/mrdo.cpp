@@ -57,8 +57,8 @@ void mrdo_state::main_map(address_map &map)
 	map(0x8800, 0x8fff).ram().w(FUNC(mrdo_state::mrdo_fgvideoram_w)).share("fgvideoram");
 	map(0x9000, 0x90ff).writeonly().share("spriteram");
 	map(0x9800, 0x9800).w(FUNC(mrdo_state::mrdo_flipscreen_w));    /* screen flip + playfield priority */
-	map(0x9801, 0x9801).w("u8106_1", FUNC(u8106_device::command_w));
-	map(0x9802, 0x9802).w("u8106_2", FUNC(u8106_device::command_w));
+	map(0x9801, 0x9801).w("u8106_1", FUNC(u8106_device::write));
+	map(0x9802, 0x9802).w("u8106_2", FUNC(u8106_device::write));
 	map(0x9803, 0x9803).r(FUNC(mrdo_state::mrdo_SECRE_r));
 	map(0xa000, 0xa000).portr("P1");
 	map(0xa001, 0xa001).portr("P2");
@@ -201,10 +201,11 @@ MACHINE_CONFIG_START(mrdo_state::mrdo)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(mrdo_state::mrlo)
+void mrdo_state::mrlo(machine_config &config)
+{
 	mrdo(config);
-	//MCFG_DEVICE_REMOVE("pal16r6")
-MACHINE_CONFIG_END
+	//config.device_remove("pal16r6");
+}
 
 
 

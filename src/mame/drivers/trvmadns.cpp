@@ -403,7 +403,7 @@ MACHINE_CONFIG_START(trvmadns_state::trvmadns)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_trvmadns)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_trvmadns);
 	MCFG_PALETTE_ADD("palette", 16)
 
 

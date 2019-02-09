@@ -577,10 +577,11 @@ MACHINE_CONFIG_START(bw2_state::bw2)
 	MCFG_DEVICE_ADDRESS_MAP(0, lcdc_map)
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, bw2_state, write_centronics_busy))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(bw2_state::write_centronics_busy));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+	output_latch_device &latch(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(latch);
 
 	I8251(config, m_uart, 0);
 	m_uart->txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
@@ -595,12 +596,12 @@ MACHINE_CONFIG_START(bw2_state::bw2)
 	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_fdc->drq_wr_callback().set(FUNC(bw2_state::fdc_drq_w));
 
-	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG":0", bw2_floppies, "35dd", bw2_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG":1", bw2_floppies, nullptr,   bw2_state::floppy_formats)
-	MCFG_BW2_EXPANSION_SLOT_ADD(BW2_EXPANSION_SLOT_TAG, 16_MHz_XTAL, bw2_expansion_cards, nullptr)
+	FLOPPY_CONNECTOR(config, WD2797_TAG":0", bw2_floppies, "35dd", bw2_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, WD2797_TAG":1", bw2_floppies, nullptr, bw2_state::floppy_formats);
+	BW2_EXPANSION_SLOT(config, m_exp, 16_MHz_XTAL, bw2_expansion_cards, nullptr);
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("flop_list","bw2")
+	SOFTWARE_LIST(config, "flop_list").set_original("bw2");
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("64K").set_extra_options("96K,128K,160K,192K,224K");

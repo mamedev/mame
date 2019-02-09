@@ -898,7 +898,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( by35_state::u11_timer )
     -+                          +---+
 */
 
-	m_display_refresh_timer->adjust(attotime::from_msec(2.85));
+	m_display_refresh_timer->adjust(attotime::from_usec(2850));
 
 	m_u11_ca1 = true;
 	m_pia_u11->ca1_w(m_u11_ca1);
@@ -1117,8 +1117,8 @@ MACHINE_CONFIG_START(by35_state::by35)
 	m_pia_u10->cb2_handler().set(FUNC(by35_state::u10_cb2_w));
 	m_pia_u10->irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 	m_pia_u10->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_z_freq", by35_state, timer_z_freq, attotime::from_hz(100)) // Mains Line Frequency * 2
-	MCFG_TIMER_DRIVER_ADD(m_zero_crossing_active_timer, by35_state, timer_z_pulse)  // Active pulse length from Zero Crossing detector
+	TIMER(config, "timer_z_freq").configure_periodic(FUNC(by35_state::timer_z_freq), attotime::from_hz(100)); // Mains Line Frequency * 2
+	TIMER(config, m_zero_crossing_active_timer).configure_generic(FUNC(by35_state::timer_z_pulse));  // Active pulse length from Zero Crossing detector
 
 	PIA6821(config, m_pia_u11, 0);
 	m_pia_u11->readpa_handler().set(FUNC(by35_state::u11_a_r));
@@ -1130,8 +1130,8 @@ MACHINE_CONFIG_START(by35_state::by35)
 	m_pia_u11->cb2_handler().set(FUNC(by35_state::u11_cb2_w));
 	m_pia_u11->irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 	m_pia_u11->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_d_freq", by35_state, u11_timer, attotime::from_hz(317)) // 555 timer
-	MCFG_TIMER_DRIVER_ADD(m_display_refresh_timer, by35_state, timer_d_pulse)   // 555 Active pulse length
+	TIMER(config, "timer_d_freq").configure_periodic(FUNC(by35_state::u11_timer), attotime::from_hz(317)); // 555 timer
+	TIMER(config, m_display_refresh_timer).configure_generic(FUNC(by35_state::timer_d_pulse));   // 555 Active pulse length
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(as2888_state::as2888_audio)
@@ -1142,8 +1142,8 @@ MACHINE_CONFIG_START(as2888_state::as2888_audio)
 	m_pia_u11->writepb_handler().set(FUNC(as2888_state::u11_b_as2888_w));
 	m_pia_u11->cb2_handler().set(FUNC(as2888_state::u11_cb2_as2888_w));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_s_freq", as2888_state, timer_s, attotime::from_hz(353000))     // Inverter clock on AS-2888 sound board
-	MCFG_TIMER_DRIVER_ADD(m_snd_sustain_timer, as2888_state, timer_as2888)
+	TIMER(config, "timer_s_freq").configure_periodic(FUNC(as2888_state::timer_s), attotime::from_hz(353000));     // Inverter clock on AS-2888 sound board
+	TIMER(config, m_snd_sustain_timer).configure_generic(FUNC(as2888_state::timer_as2888));
 MACHINE_CONFIG_END
 
 

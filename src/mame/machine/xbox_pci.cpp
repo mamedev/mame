@@ -5,6 +5,7 @@
 #include "machine/pci.h"
 #include "includes/xbox_pci.h"
 #include "includes/xbox.h"
+#include "machine/ds128x.h"
 
 #include <functional>
 
@@ -20,7 +21,7 @@ nv2a_host_device::nv2a_host_device(const machine_config &mconfig, const char *ta
 	pci_host_device(mconfig, NV2A_HOST, tag, owner, clock),
 	cpu(*this, finder_base::DUMMY_TAG)
 {
-	set_ids(0x10de01b0, 0, 0, 0);
+	set_ids_host(0x10de02a5, 0, 0);
 }
 
 void nv2a_host_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
@@ -81,38 +82,205 @@ WRITE32_MEMBER(nv2a_ram_device::config_register_w)
  * LPC Bus
  */
 
-DEFINE_DEVICE_TYPE(MCPX_LPC, mcpx_lpc_device, "mcpx_lpc", "MCPX HUB Interface - ISA Bridge")
+DEFINE_DEVICE_TYPE(MCPX_ISALPC, mcpx_isalpc_device, "mcpx_isalpc", "MCPX HUB Interface - ISA Bridge")
 
-void mcpx_lpc_device::lpc_io(address_map &map)
+void mcpx_isalpc_device::lpc_io(address_map &map)
 {
-	map(0x00000000, 0x000000ff).rw(FUNC(mcpx_lpc_device::lpc_r), FUNC(mcpx_lpc_device::lpc_w));
+	map(0x00000000, 0x000000ff).rw(FUNC(mcpx_isalpc_device::acpi_r), FUNC(mcpx_isalpc_device::acpi_w));
 }
 
-mcpx_lpc_device::mcpx_lpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, MCPX_LPC, tag, owner, clock)
+void mcpx_isalpc_device::internal_io_map(address_map &map)
 {
-	set_ids(0x10de01b2, 0xb4, 0, 0); // revision id must be at least 0xb4, otherwise usb will require a hub
+	map(0x0020, 0x0023).rw("pic8259_1", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x0040, 0x0043).rw("pit8254", FUNC(pit8254_device::read), FUNC(pit8254_device::write));
+	map(0x0070, 0x0073).rw("rtc", FUNC(ds12885ext_device::read_extended), FUNC(ds12885ext_device::write_extended));
+	map(0x0080, 0x0080).w(FUNC(mcpx_isalpc_device::boot_state_w));
+	map(0x00a0, 0x00a3).rw("pic8259_2", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 }
 
-void mcpx_lpc_device::device_start()
+void mcpx_isalpc_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+	uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
+{
+	io_space->install_device(0, 0xffff, *this, &mcpx_isalpc_device::internal_io_map);
+}
+
+mcpx_isalpc_device::mcpx_isalpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t subsystem_id)
+	: mcpx_isalpc_device(mconfig, tag, owner, clock)
+{
+	set_ids(0x10de01b2, 0xb4, 0, subsystem_id); // revision id must be at least 0xb4, otherwise usb will require a hub
+}
+
+mcpx_isalpc_device::mcpx_isalpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pci_device(mconfig, MCPX_ISALPC, tag, owner, clock),
+	m_interrupt_output(*this),
+	m_boot_state_hook(*this),
+	pic8259_1(*this, "pic8259_1"),
+	pic8259_2(*this, "pic8259_2"),
+	pit8254(*this, "pit8254")
+{
+}
+
+void mcpx_isalpc_device::device_start()
 {
 	pci_device::device_start();
-	add_map(0x00000100, M_IO, FUNC(mcpx_lpc_device::lpc_io));
+	m_interrupt_output.resolve_safe();
+	m_boot_state_hook.resolve_safe();
+	add_map(0x00000100, M_IO, FUNC(mcpx_isalpc_device::lpc_io));
 	bank_infos[0].adr = 0x8000;
 }
 
-void mcpx_lpc_device::device_reset()
+void mcpx_isalpc_device::device_reset()
 {
 	pci_device::device_reset();
 }
 
-READ32_MEMBER(mcpx_lpc_device::lpc_r)
+void mcpx_isalpc_device::device_add_mconfig(machine_config &config)
 {
+	pic8259_device &pic8259_1(PIC8259(config, "pic8259_1", 0));
+	pic8259_1.out_int_callback().set(FUNC(mcpx_isalpc_device::interrupt_ouptut_changed));
+	pic8259_1.in_sp_callback().set_constant(1);
+	pic8259_1.read_slave_ack_callback().set(FUNC(mcpx_isalpc_device::get_slave_ack));
+
+	pic8259_device &pic8259_2(PIC8259(config, "pic8259_2", 0));
+	pic8259_2.out_int_callback().set(pic8259_1, FUNC(pic8259_device::ir2_w));
+	pic8259_2.in_sp_callback().set_constant(0);
+
+	pit8254_device &pit8254(PIT8254(config, "pit8254", 0));
+	pit8254.set_clk<0>(1125000); /* heartbeat IRQ */
+	pit8254.out_handler<0>().set(FUNC(mcpx_isalpc_device::pit8254_out0_changed));
+	pit8254.set_clk<1>(1125000); /* (unused) dram refresh */
+	pit8254.set_clk<2>(1125000); /* (unused) pio port c pin 4, and speaker polling enough */
+	pit8254.out_handler<2>().set(FUNC(mcpx_isalpc_device::pit8254_out2_changed));
+
+	ds12885ext_device &ds12885(DS12885EXT(config, "rtc", 0));
+	ds12885.irq().set(pic8259_2, FUNC(pic8259_device::ir0_w));
+
+	/*
+	More devices are needed:
+	    82093 compatible I/O APIC
+	    dual 8237 DMA controllers
+	*/
+}
+
+READ32_MEMBER(mcpx_isalpc_device::acpi_r)
+{
+	logerror("Acpi read from %04X mask %08X\n", bank_infos[0].adr + offset, mem_mask);
 	return 0;
 }
 
-WRITE32_MEMBER(mcpx_lpc_device::lpc_w)
+WRITE32_MEMBER(mcpx_isalpc_device::acpi_w)
 {
+	logerror("Acpi write %08X to %04X mask %08X\n", data, bank_infos[0].adr + offset, mem_mask);
+}
+
+WRITE8_MEMBER(mcpx_isalpc_device::boot_state_w)
+{
+	if (m_boot_state_hook)
+		m_boot_state_hook((offs_t)0, data);
+}
+
+WRITE_LINE_MEMBER(mcpx_isalpc_device::interrupt_ouptut_changed)
+{
+	m_interrupt_output(state);
+}
+
+READ8_MEMBER(mcpx_isalpc_device::get_slave_ack)
+{
+	if (offset == 2) // IRQ = 2
+		return pic8259_2->acknowledge();
+	return 0x00;
+}
+
+WRITE_LINE_MEMBER(mcpx_isalpc_device::pit8254_out0_changed)
+{
+	pic8259_1->ir0_w(state);
+}
+
+WRITE_LINE_MEMBER(mcpx_isalpc_device::pit8254_out2_changed)
+{
+	//xbox_speaker_set_input( state ? 1 : 0 );
+}
+
+WRITE_LINE_MEMBER(mcpx_isalpc_device::irq1)
+{
+	pic8259_1->ir1_w(state);
+}
+
+WRITE_LINE_MEMBER(mcpx_isalpc_device::irq3)
+{
+	pic8259_1->ir3_w(state);
+}
+
+WRITE_LINE_MEMBER(mcpx_isalpc_device::irq10)
+{
+	pic8259_2->ir2_w(state);
+}
+
+WRITE_LINE_MEMBER(mcpx_isalpc_device::irq11)
+{
+	pic8259_2->ir3_w(state);
+}
+
+WRITE_LINE_MEMBER(mcpx_isalpc_device::irq14)
+{
+	pic8259_2->ir6_w(state);
+}
+
+uint32_t mcpx_isalpc_device::acknowledge()
+{
+	return pic8259_1->acknowledge();
+}
+
+void mcpx_isalpc_device::debug_generate_irq(int irq, int state)
+{
+	switch (irq)
+	{
+	case 0:
+		pic8259_1->ir0_w(state);
+		break;
+	case 1:
+		pic8259_1->ir1_w(state);
+		break;
+	case 3:
+		pic8259_1->ir3_w(state);
+		break;
+	case 4:
+		pic8259_1->ir4_w(state);
+		break;
+	case 5:
+		pic8259_1->ir5_w(state);
+		break;
+	case 6:
+		pic8259_1->ir6_w(state);
+		break;
+	case 7:
+		pic8259_1->ir7_w(state);
+		break;
+	case 8:
+		pic8259_2->ir0_w(state);
+		break;
+	case 9:
+		pic8259_2->ir1_w(state);
+		break;
+	case 10:
+		pic8259_2->ir2_w(state);
+		break;
+	case 11:
+		pic8259_2->ir3_w(state);
+		break;
+	case 12:
+		pic8259_2->ir4_w(state);
+		break;
+	case 13:
+		pic8259_2->ir5_w(state);
+		break;
+	case 14:
+		pic8259_2->ir6_w(state);
+		break;
+	case 15:
+		pic8259_2->ir7_w(state);
+		break;
+	}
 }
 
 /*
@@ -747,7 +915,7 @@ void mcpx_ide_device::device_add_mconfig(machine_config &config)
 {
 	bus_master_ide_controller_device &ide(BUS_MASTER_IDE_CONTROLLER(config, "ide", 0));
 	ide.irq_handler().set(FUNC(mcpx_ide_device::ide_interrupt));
-	ide.set_bus_master_space("maincpu", AS_PROGRAM);
+	ide.set_bus_master_space(":maincpu", AS_PROGRAM);
 }
 
 WRITE_LINE_MEMBER(mcpx_ide_device::ide_interrupt)

@@ -177,7 +177,7 @@ MACHINE_CONFIG_START(sm1800_state::sm1800)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	PALETTE(config, m_palette, FUNC(sm1800_state::sm1800_palette), 3);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_sm1800)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_sm1800);
 
 	/* Devices */
 	I8255(config, m_ppi);
@@ -186,9 +186,9 @@ MACHINE_CONFIG_START(sm1800_state::sm1800)
 	m_ppi->in_pc_callback().set(FUNC(sm1800_state::sm1800_8255_portc_r));
 	m_ppi->out_pc_callback().set(FUNC(sm1800_state::sm1800_8255_portc_w));
 
-	MCFG_DEVICE_ADD("i8275", I8275, 2000000)
-	MCFG_I8275_CHARACTER_WIDTH(8)
-	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(sm1800_state, crtc_display_pixels)
+	I8275(config, m_crtc, 2000000);
+	m_crtc->set_character_width(8);
+	m_crtc->set_display_callback(FUNC(sm1800_state::crtc_display_pixels), this);
 
 	MCFG_DEVICE_ADD("i8251", I8251, 0)
 MACHINE_CONFIG_END

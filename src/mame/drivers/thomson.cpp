@@ -628,11 +628,9 @@ MACHINE_CONFIG_START(thomson_state::to7_base)
 	MCFG_DEVICE_ADD("maincpu", MC6809E, 16_MHz_XTAL / 16)
 	MCFG_DEVICE_PROGRAM_MAP(to7)
 
-	MCFG_INPUT_MERGER_ANY_HIGH("mainirq")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
+	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 
-	MCFG_INPUT_MERGER_ANY_HIGH("mainfirq")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M6809_FIRQ_LINE))
+	INPUT_MERGER_ANY_HIGH(config, "mainfirq").output_handler().set_inputline(m_maincpu, M6809_FIRQ_LINE);
 
 /* video */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -660,10 +658,10 @@ MACHINE_CONFIG_START(thomson_state::to7_base)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 /* cassette */
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(to7_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("to_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(to7_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_interface("to_cass");
 
 /* floppy */
 	MCFG_DEVICE_ADD("mc6843", MC6843, 16_MHz_XTAL / 16 / 2)
@@ -682,8 +680,8 @@ MACHINE_CONFIG_START(thomson_state::to7_base)
 	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(*this, thomson_state, fdc_index_3_w))
 
 	WD2793(config, m_wd2793_fdc, 16_MHz_XTAL / 16);
-	MCFG_FLOPPY_DRIVE_ADD("wd2793:0", cd90_640_floppies, "dd", thomson_state::cd90_640_formats)
-	MCFG_FLOPPY_DRIVE_ADD("wd2793:1", cd90_640_floppies, "dd", thomson_state::cd90_640_formats)
+	FLOPPY_CONNECTOR(config, "wd2793:0", cd90_640_floppies, "dd", thomson_state::cd90_640_formats);
+	FLOPPY_CONNECTOR(config, "wd2793:1", cd90_640_floppies, "dd", thomson_state::cd90_640_formats);
 
 
 /* network */
@@ -733,9 +731,8 @@ MACHINE_CONFIG_START(thomson_state::to7_base)
 	m_acia->txd_handler().set(FUNC(thomson_state::to7_modem_tx_w));
 	m_acia->irq_handler().set(FUNC(thomson_state::to7_modem_cb));
 
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, 1200) /* 1200 bauds, might be divided by 16 */
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, thomson_state, write_acia_clock))
-
+	clock_device &acia_clock(CLOCK(config, "acia_clock", 1200)); /* 1200 bauds, might be divided by 16 */
+	acia_clock.signal_handler().set(FUNC(thomson_state::write_acia_clock));
 
 /* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "to_cart")
@@ -746,10 +743,10 @@ MACHINE_CONFIG_START(thomson_state::to7_base)
 	RAM(config, m_ram).set_default_size("40K").set_extra_options("24K,48K");
 
 /* software lists */
-	MCFG_SOFTWARE_LIST_ADD("to7_cart_list","to7_cart")
-	MCFG_SOFTWARE_LIST_ADD("to7_cass_list","to7_cass")
-	MCFG_SOFTWARE_LIST_ADD("to_flop_list","to_flop")
-	MCFG_SOFTWARE_LIST_ADD("to7_qd_list","to7_qd")
+	SOFTWARE_LIST(config, "to7_cart_list").set_original("to7_cart");
+	SOFTWARE_LIST(config, "to7_cass_list").set_original("to7_cass");
+	SOFTWARE_LIST(config, "to_flop_list").set_original("to_flop");
+	SOFTWARE_LIST(config, "to7_qd_list").set_original("to7_qd");
 MACHINE_CONFIG_END
 
 void thomson_state::to7(machine_config &config)
@@ -948,16 +945,16 @@ MACHINE_CONFIG_START(thomson_state::to770)
 	/* internal ram */
 	m_ram->set_default_size("128K").set_extra_options("64K");
 
-	MCFG_DEVICE_REMOVE("to7_cart_list")
-	MCFG_SOFTWARE_LIST_ADD("t770_cart_list","to770_cart")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("to7_cart_list","to7_cart")
+	SOFTWARE_LIST(config, "t770_cart_list").set_original("to770_cart");
+	SOFTWARE_LIST(config.replace(), "to7_cart_list").set_compatible("to7_cart");
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(thomson_state::to770a)
+void thomson_state::to770a(machine_config &config)
+{
 	to770(config);
-	MCFG_DEVICE_REMOVE("t770_cart_list")
-	MCFG_SOFTWARE_LIST_ADD("t770a_cart_list","to770a_cart")
-MACHINE_CONFIG_END
+	config.device_remove("t770_cart_list");
+	SOFTWARE_LIST(config, "t770a_cart_list").set_original("to770a_cart");
+}
 
 COMP( 1984, to770, 0, 0, to770, to770, thomson_state, empty_init, "Thomson", "TO7/70", 0 )
 
@@ -1127,9 +1124,8 @@ MACHINE_CONFIG_START(thomson_state::mo5)
 	MCFG_DEVICE_MODIFY( "maincpu" )
 	MCFG_DEVICE_PROGRAM_MAP ( mo5)
 
-	MCFG_CASSETTE_MODIFY( "cassette" )
-	MCFG_CASSETTE_FORMATS(mo5_cassette_formats)
-	MCFG_CASSETTE_INTERFACE("mo_cass")
+	m_cassette->set_formats(mo5_cassette_formats);
+	m_cassette->set_interface("mo_cass");
 
 	subdevice<palette_device>("palette")->set_init(FUNC(thomson_state::mo5_palette));
 
@@ -1141,20 +1137,20 @@ MACHINE_CONFIG_START(thomson_state::mo5)
 	m_pia_sys->cb2_handler().set_nop();
 	m_pia_sys->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<1>)); // WARNING: differs from TO7 !
 
-	MCFG_DEVICE_REMOVE("cartslot")
+	config.device_remove("cartslot");
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "mo_cart")
 	MCFG_GENERIC_EXTENSIONS("m5,rom")
 	MCFG_GENERIC_LOAD(thomson_state, mo5_cartridge)
 
-	MCFG_DEVICE_REMOVE("to7_cart_list")
-	MCFG_DEVICE_REMOVE("to7_cass_list")
-	MCFG_DEVICE_REMOVE("to_flop_list")
-	MCFG_DEVICE_REMOVE("to7_qd_list")
+	config.device_remove("to7_cart_list");
+	config.device_remove("to7_cass_list");
+	config.device_remove("to_flop_list");
+	config.device_remove("to7_qd_list");
 
-	MCFG_SOFTWARE_LIST_ADD("mo5_cart_list","mo5_cart")
-	MCFG_SOFTWARE_LIST_ADD("mo5_cass_list","mo5_cass")
-	MCFG_SOFTWARE_LIST_ADD("mo5_flop_list","mo5_flop")
-	MCFG_SOFTWARE_LIST_ADD("mo5_qd_list","mo5_qd")
+	SOFTWARE_LIST(config, "mo5_cart_list").set_original("mo5_cart");
+	SOFTWARE_LIST(config, "mo5_cass_list").set_original("mo5_cass");
+	SOFTWARE_LIST(config, "mo5_flop_list").set_original("mo5_flop");
+	SOFTWARE_LIST(config, "mo5_qd_list").set_original("mo5_qd");
 
 	/* internal ram */
 	m_ram->set_default_size("112K");
@@ -1725,18 +1721,16 @@ MACHINE_CONFIG_START(thomson_state::to8)
 	/* internal ram */
 	m_ram->set_default_size("512K").set_extra_options("256K");
 
-	MCFG_DEVICE_REMOVE("to7_cass_list")
-	MCFG_DEVICE_REMOVE("to7_qd_list")
-
-	MCFG_SOFTWARE_LIST_ADD("to8_cass_list", "to8_cass")
-	MCFG_SOFTWARE_LIST_ADD("to8_qd_list", "to8_qd")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("to7_cass_list", "to7_cass")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("to7_qd_list", "to7_qd")
+	SOFTWARE_LIST(config, "to8_cass_list").set_original("to8_cass");
+	SOFTWARE_LIST(config, "to8_qd_list").set_original("to8_qd");
+	SOFTWARE_LIST(config.replace(), "to7_cass_list").set_compatible("to7_cass");
+	SOFTWARE_LIST(config.replace(), "to7_qd_list").set_compatible("to7_qd");
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(thomson_state::to8d)
+void thomson_state::to8d(machine_config &config)
+{
 	to8(config);
-MACHINE_CONFIG_END
+}
 
 
 COMP( 1986, to8, 0, 0, to8, to8, thomson_state, empty_init, "Thomson", "TO8", 0 )
@@ -1888,13 +1882,10 @@ MACHINE_CONFIG_START(thomson_state::to9p)
 	/* internal ram */
 	m_ram->set_default_size("512K");
 
-	MCFG_DEVICE_REMOVE("to7_cass_list")
-	MCFG_DEVICE_REMOVE("to7_qd_list")
-
-	MCFG_SOFTWARE_LIST_ADD("to8_cass_list", "to8_cass")
-	MCFG_SOFTWARE_LIST_ADD("to8_qd_list", "to8_qd")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("to7_cass_list", "to7_cass")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("to7_qd_list", "to7_qd")
+	SOFTWARE_LIST(config, "to8_cass_list").set_original("to8_cass");
+	SOFTWARE_LIST(config, "to8_qd_list").set_original("to8_qd");
+	SOFTWARE_LIST(config.replace(), "to7_cass_list").set_compatible("to7_cass");
+	SOFTWARE_LIST(config.replace(), "to7_qd_list").set_compatible("to7_qd");
 MACHINE_CONFIG_END
 
 COMP( 1986, to9p, 0, 0, to9p, to9p, thomson_state, empty_init, "Thomson", "TO9+", 0 )
@@ -2216,9 +2207,8 @@ MACHINE_CONFIG_START(thomson_state::mo6)
 	MCFG_DEVICE_MODIFY( "maincpu" )
 	MCFG_DEVICE_PROGRAM_MAP ( mo6)
 
-	MCFG_CASSETTE_MODIFY( "cassette" )
-	MCFG_CASSETTE_FORMATS(mo5_cassette_formats)
-	MCFG_CASSETTE_INTERFACE("mo_cass")
+	m_cassette->set_formats(mo5_cassette_formats);
+	m_cassette->set_interface("mo_cass");
 
 	m_pia_sys->readpa_handler().set(FUNC(thomson_state::mo6_sys_porta_in));
 	m_pia_sys->readpb_handler().set(FUNC(thomson_state::mo6_sys_portb_in));
@@ -2234,9 +2224,10 @@ MACHINE_CONFIG_START(thomson_state::mo6)
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->busy_handler().set(FUNC(thomson_state::write_centronics_busy));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	OUTPUT_LATCH(config, m_cent_data_out);
+	m_centronics->set_output_latch(*m_cent_data_out);
 
-	MCFG_DEVICE_REMOVE("cartslot")
+	config.device_remove("cartslot");
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "mo_cart")
 	MCFG_GENERIC_EXTENSIONS("m5,rom")
 	MCFG_GENERIC_LOAD(thomson_state, mo5_cartridge)
@@ -2244,34 +2235,35 @@ MACHINE_CONFIG_START(thomson_state::mo6)
 	/* internal ram */
 	m_ram->set_default_size("128K");
 
-	MCFG_DEVICE_REMOVE("to7_cart_list")
-	MCFG_DEVICE_REMOVE("to7_cass_list")
-	MCFG_DEVICE_REMOVE("to_flop_list")
-	MCFG_DEVICE_REMOVE("to7_qd_list")
+	config.device_remove("to7_cart_list");
+	config.device_remove("to7_cass_list");
+	config.device_remove("to_flop_list");
+	config.device_remove("to7_qd_list");
 
-	MCFG_SOFTWARE_LIST_ADD("mo6_cass_list","mo6_cass")
-	MCFG_SOFTWARE_LIST_ADD("mo6_flop_list","mo6_flop")
+	SOFTWARE_LIST(config, "mo6_cass_list").set_original("mo6_cass");
+	SOFTWARE_LIST(config, "mo6_flop_list").set_original("mo6_flop");
 
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("mo5_cart_list","mo5_cart")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("mo5_cass_list","mo5_cass")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("mo5_flop_list","mo5_flop")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("mo5_qd_list","mo5_qd")
+	SOFTWARE_LIST(config, "mo5_cart_list").set_compatible("mo5_cart");
+	SOFTWARE_LIST(config, "mo5_cass_list").set_compatible("mo5_cass");
+	SOFTWARE_LIST(config, "mo5_flop_list").set_compatible("mo5_flop");
+	SOFTWARE_LIST(config, "mo5_qd_list").set_compatible("mo5_qd");
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(thomson_state::pro128)
+void thomson_state::pro128(machine_config &config)
+{
 	mo6(config);
-	MCFG_DEVICE_REMOVE("mo6_cass_list")
-	MCFG_DEVICE_REMOVE("mo6_flop_list")
+	config.device_remove("mo6_cass_list");
+	config.device_remove("mo6_flop_list");
 
-	MCFG_DEVICE_REMOVE("mo5_cart_list")
-	MCFG_DEVICE_REMOVE("mo5_cass_list")
-	MCFG_DEVICE_REMOVE("mo5_flop_list")
-	MCFG_DEVICE_REMOVE("mo5_qd_list")
+	config.device_remove("mo5_cart_list");
+	config.device_remove("mo5_cass_list");
+	config.device_remove("mo5_flop_list");
+	config.device_remove("mo5_qd_list");
 
-	MCFG_SOFTWARE_LIST_ADD("p128_cart_list","pro128_cart")
-	MCFG_SOFTWARE_LIST_ADD("p128_cass_list","pro128_cass")
-	MCFG_SOFTWARE_LIST_ADD("p128_flop_list","pro128_flop")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "p128_cart_list").set_original("pro128_cart");
+	SOFTWARE_LIST(config, "p128_cass_list").set_original("pro128_cass");
+	SOFTWARE_LIST(config, "p128_flop_list").set_original("pro128_flop");
+}
 
 COMP( 1986, mo6, 0, 0, mo6, mo6, thomson_state, empty_init, "Thomson", "MO6", 0 )
 
@@ -2481,9 +2473,8 @@ MACHINE_CONFIG_START(thomson_state::mo5nr)
 	MCFG_DEVICE_MODIFY( "maincpu" )
 	MCFG_DEVICE_PROGRAM_MAP ( mo5nr)
 
-	MCFG_CASSETTE_MODIFY( "cassette" )
-	MCFG_CASSETTE_FORMATS(mo5_cassette_formats)
-	MCFG_CASSETTE_INTERFACE("mo_cass")
+	m_cassette->set_formats(mo5_cassette_formats);
+	m_cassette->set_interface("mo_cass");
 
 	m_pia_sys->readpa_handler().set(FUNC(thomson_state::mo6_sys_porta_in));
 	m_pia_sys->readpb_handler().set(FUNC(thomson_state::mo5nr_sys_portb_in));
@@ -2500,9 +2491,11 @@ MACHINE_CONFIG_START(thomson_state::mo5nr)
 	m_centronics->busy_handler().set(FUNC(thomson_state::write_centronics_busy));
 
 	INPUT_BUFFER(config, "cent_data_in");
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
-	MCFG_DEVICE_REMOVE("cartslot")
+	OUTPUT_LATCH(config, m_cent_data_out);
+	m_centronics->set_output_latch(*m_cent_data_out);
+
+	config.device_remove("cartslot");
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "mo_cart")
 	MCFG_GENERIC_EXTENSIONS("m5,rom")
 	MCFG_GENERIC_LOAD(thomson_state, mo5_cartridge)
@@ -2510,18 +2503,18 @@ MACHINE_CONFIG_START(thomson_state::mo5nr)
 	/* internal ram */
 	m_ram->set_default_size("128K");
 
-	MCFG_DEVICE_REMOVE("to7_cart_list")
-	MCFG_DEVICE_REMOVE("to7_cass_list")
-	MCFG_DEVICE_REMOVE("to_flop_list")
-	MCFG_DEVICE_REMOVE("to7_qd_list")
+	config.device_remove("to7_cart_list");
+	config.device_remove("to7_cass_list");
+	config.device_remove("to_flop_list");
+	config.device_remove("to7_qd_list");
 
-	MCFG_SOFTWARE_LIST_ADD("mo6_cass_list","mo6_cass")
-	MCFG_SOFTWARE_LIST_ADD("mo6_flop_list","mo6_flop")
+	SOFTWARE_LIST(config, "mo6_cass_list").set_original("mo6_cass");
+	SOFTWARE_LIST(config, "mo6_flop_list").set_original("mo6_flop");
 
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("mo5_cart_list","mo5_cart")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("mo5_cass_list","mo5_cass")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("mo5_flop_list","mo5_flop")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("mo5_qd_list","mo5_qd")
+	SOFTWARE_LIST(config, "mo5_cart_list").set_compatible("mo5_cart");
+	SOFTWARE_LIST(config, "mo5_cass_list").set_compatible("mo5_cass");
+	SOFTWARE_LIST(config, "mo5_flop_list").set_compatible("mo5_flop");
+	SOFTWARE_LIST(config, "mo5_qd_list").set_compatible("mo5_qd");
 MACHINE_CONFIG_END
 
 COMP( 1986, mo5nr, 0, 0, mo5nr, mo5nr, thomson_state, empty_init, "Thomson", "MO5 NR", 0 )

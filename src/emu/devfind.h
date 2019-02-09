@@ -346,7 +346,7 @@ protected:
 	///
 	/// Walks ROM regions of all devices starting from the root looking
 	/// for one with matching tag and length in bytes.  Prints a warning
-	/// message if the region is required, a region iwth the requested
+	/// message if the region is required, a region with the requested
 	/// tag is found, but its length does not match.  Calls
 	/// report_missing to print an error message if the region is
 	/// not found.  Returns true if the region is required but no
@@ -376,6 +376,36 @@ protected:
 	/// \return Pointer to base of memory share if a matching memory
 	///   share is found, or nullptr otherwise.
 	void *find_memshare(u8 width, size_t &bytes, bool required) const;
+
+	/// \brief Find an address space
+	///
+	/// Look up address space and check that its width matches desired
+	/// value.  Returns pointer to address space if a matching space
+	/// is found, or nullptr otherwise.  Prints a message at warning
+	/// level if the address space is required, a device with the
+	/// requested tag is found, but it doesn't have a memory interface
+	/// or a space with the designated number.
+	/// \param [in] spacenum Address space number.
+	/// \param [in] width Specific data width, or 0.
+	/// \param [in] required. Whether warning message should be printed
+	///   if a device with no memory interface or space of that number
+	///   is found.
+	/// \return Pointer to address space if a matching address space
+	///   is found, or nullptr otherwise.
+	address_space *find_addrspace(int spacenum, u8 width, bool required) const;
+
+	/// \brief Check that address space exists
+	///
+	/// Returns true if the space is required but no matching space is
+	/// found, or false otherwise.
+	/// \param [in] spacenum Address space number.
+	/// \param [in] width Specific data width, or 0.
+	/// \param [in] required. Whether warning message should be printed
+	///   if a device with no memory interface or space of that number
+	///   is found.
+	/// \return True if the space is optional, or if the space is
+	///   space and a matching space is found, or false otherwise.
+	bool validate_addrspace(int spacenum, u8 width, bool required) const;
 
 	/// \brief Log if object was not found
 	///
@@ -818,6 +848,108 @@ using required_ioport = ioport_finder<true>;
 template <unsigned Count, bool Required> using ioport_array_finder = object_array_finder<ioport_finder<Required>, Count>;
 template <unsigned Count> using optional_ioport_array = ioport_array_finder<Count, false>;
 template <unsigned Count> using required_ioport_array = ioport_array_finder<Count, true>;
+
+
+/// \brief Address space finder template
+///
+/// Template argument is whether the address space is required.  It is a
+/// validation error if a required address space is not found.  This class is
+/// generally not used directly, instead the optional_address_space and
+/// required_address_space helpers are used.
+/// \sa optional_address_space required_address_space
+template <bool Required>
+class address_space_finder : public object_finder_base<address_space, Required>
+{
+public:
+	/// \brief Address space finder constructor
+	/// \param [in] base Base device to search from.
+	/// \param [in] tag Address space tag to search for.  This is not copied,
+	///   it is the caller's responsibility to ensure this pointer
+	///   remains valid until resolution time.
+	/// \param [in] spacenum Address space number.
+	/// \param [in] width Specific data width (optional).
+	address_space_finder(device_t &base, char const *tag, int spacenum, u8 width = 0) : object_finder_base<address_space, Required>(base, tag), m_spacenum(spacenum), m_data_width(width) { }
+
+	/// \brief Set search tag and space number
+	///
+	/// Allows search tag to be changed after construction.  Note that
+	/// this must be done before resolution time to take effect.  Also
+	/// note that the tag is not copied.
+	/// \param [in] base Updated search base.  The tag must be specified
+	///   relative to this device.
+	/// \param [in] tag Updated search tag.  This is not copied, it is
+	///   the caller's responsibility to ensure this pointer remains
+	///   valid until resolution time.
+	/// \param [in] spacenum Address space number.
+	void set_tag(device_t &base, char const *tag, int spacenum) { finder_base::set_tag(base, tag); m_spacenum = spacenum; }
+
+	/// \brief Set search tag and space number
+	///
+	/// Allows search tag to be changed after construction.  Note that
+	/// this must be done before resolution time to take effect.  Also
+	/// note that the tag is not copied.
+	/// \param [in] tag Updated search tag relative to the current
+	///   device being configured.  This is not copied, it is the
+	///   caller's responsibility to ensure this pointer remains valid
+	///   until resolution time.
+	/// \param [in] spacenum Address space number.
+	void set_tag(char const *tag, int spacenum) { finder_base::set_tag(tag); m_spacenum = spacenum; }
+
+	/// \brief Set search tag and space number
+	///
+	/// Allows search tag to be changed after construction.  Note that
+	/// this must be done before resolution time to take effect.
+	/// \param [in] finder Object finder to take the search base and tag
+	///   from.
+	/// \param [in] spacenum Address space number.
+	void set_tag(finder_base const &finder, int spacenum) { finder_base::set_tag(finder); this->m_spacenum = spacenum; }
+
+	/// \brief Set data width of space
+	///
+	/// Allows data width to be specified after construction.  Note that
+	/// this must be done before resolution time to take effect.
+	/// \param [in] width Data width in bits (0 = don't care).
+	void set_data_width(u8 width) { this->m_data_width = width; }
+
+private:
+	/// \brief Find address space
+	///
+	/// Find address space with requested tag.  For a dry run, the
+	/// target object pointer will not be set.  This method is called by
+	/// the base device at resolution time.
+	/// \param [in] isvalidation True if this is a dry run (not
+	///   intending to run the machine, just checking for errors).
+	/// \return True if the address space is optional, a matching address space is
+	///   is found or this is a dry run, false otherwise.
+	virtual bool findit(bool isvalidation) override
+	{
+		if (isvalidation)
+			return this->validate_addrspace(this->m_spacenum, this->m_data_width, Required);
+
+		assert(!this->m_resolved);
+		this->m_resolved = true;
+		this->m_target = this->find_addrspace(this->m_spacenum, this->m_data_width, Required);
+		return this->report_missing("address space");
+	}
+
+	int m_spacenum;
+	u8 m_data_width;
+};
+
+/// \brief Optional address space finder
+///
+/// Finds address space with maching tag and number.  No error is generated if a
+/// matching address space is not found (the target object pointer will be
+/// null).
+/// \sa required_address_space address_space_finder
+using optional_address_space = address_space_finder<false>;
+
+/// \brief Required address space finder
+///
+/// Finds address space with maching tag and number.  A validation error is generated if
+/// a matching address space is not found.
+/// \sa optional_address_space address_space_finder
+using required_address_space = address_space_finder<true>;
 
 
 /// \brief Memory region base pointer finder

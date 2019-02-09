@@ -366,7 +366,7 @@ MACHINE_CONFIG_START(jackal_state::jackal)
 	MCFG_DEVICE_ADD("slave", MC6809E, MASTER_CLOCK/12) // verified on pcb
 	MCFG_DEVICE_PROGRAM_MAP(slave_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	WATCHDOG_TIMER(config, "watchdog");
 

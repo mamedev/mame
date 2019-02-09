@@ -482,7 +482,7 @@ MACHINE_CONFIG_START(flyball_state::flyball)
 	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_flyball)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_flyball);
 	PALETTE(config, m_palette, FUNC(flyball_state::flyball_palette), 4);
 
 	/* sound hardware */

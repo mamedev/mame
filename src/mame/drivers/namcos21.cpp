@@ -861,7 +861,7 @@ void namcos21_state::configure_c148_standard(machine_config &config)
 MACHINE_CONFIG_START(namcos21_state::winrun)
 	MCFG_DEVICE_ADD("maincpu", M68000,12288000) /* Master */
 	MCFG_DEVICE_PROGRAM_MAP(winrun_master_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namcos21_state, screen_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(namcos21_state::screen_scanline), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD("slave", M68000,12288000) /* Slave */
 	MCFG_DEVICE_PROGRAM_MAP(winrun_slave_map)
@@ -883,7 +883,7 @@ MACHINE_CONFIG_START(namcos21_state::winrun)
 	NAMCO_C148(config, m_gpu_intc, 0, "gpu", false);
 	NAMCO_C139(config, m_sci, 0);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* 100 CPU slices per frame */
+	config.m_minimum_quantum = attotime::from_hz(6000); /* 100 CPU slices per frame */
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 

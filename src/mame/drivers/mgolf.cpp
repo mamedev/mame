@@ -383,7 +383,7 @@ MACHINE_CONFIG_START(mgolf_state::mgolf)
 	MCFG_SCREEN_UPDATE_DRIVER(mgolf_state, screen_update)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_mgolf)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mgolf);
 	PALETTE(config, m_palette, FUNC(mgolf_state::mgolf_palette), 4);
 
 	/* sound hardware */

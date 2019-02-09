@@ -181,6 +181,7 @@ public:
 	void overlay_scandraw_16( uint8_t* vram, uint16_t* dst, uint16_t* pal, int org, int len );
 	void overlayhalf_scandraw_16( uint8_t* vram, uint16_t* dst, uint16_t* pal, int org, int len );
 	void overlay3_scandraw_16( uint8_t* vram, uint16_t* dst, uint16_t* pal, int org, int len );
+	void bitmap16alt_scandraw_16( uint8_t* vram, uint16_t* dst, uint16_t* pal, int org, int len );
 	void to770_scandraw_8( uint8_t* vram, uint16_t* dst, uint16_t* pal, int org, int len );
 	void mo5_scandraw_8( uint8_t* vram, uint16_t* dst, uint16_t* pal, int org, int len );
 	void mo5alt_scandraw_8( uint8_t* vram, uint16_t* dst, uint16_t* pal, int org, int len );
@@ -196,6 +197,7 @@ public:
 	void overlay_scandraw_8( uint8_t* vram, uint16_t* dst, uint16_t* pal, int org, int len );
 	void overlayhalf_scandraw_8( uint8_t* vram, uint16_t* dst, uint16_t* pal, int org, int len );
 	void overlay3_scandraw_8( uint8_t* vram, uint16_t* dst, uint16_t* pal, int org, int len );
+	void bitmap16alt_scandraw_8( uint8_t* vram, uint16_t* dst, uint16_t* pal, int org, int len );
 
 private:
 	DECLARE_FLOPPY_FORMATS(cd90_640_formats);
@@ -690,7 +692,8 @@ private:
 #define THOM_VMODE_BITMAP4_ALT_HALF 12
 #define THOM_VMODE_MO5_ALT    13
 #define THOM_VMODE_OVERLAY_HALF     14
-#define THOM_VMODE_NB         15
+#define THOM_VMODE_BITMAP16_ALT 15
+#define THOM_VMODE_NB         16
 
 
 class to7_io_line_device : public device_t

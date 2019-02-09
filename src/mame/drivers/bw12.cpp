@@ -563,7 +563,7 @@ MACHINE_CONFIG_START(bw12_state::common)
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bw12)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_bw12);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	MC6845(config, m_crtc, XTAL(16'000'000)/8);
@@ -579,7 +579,7 @@ MACHINE_CONFIG_START(bw12_state::common)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* devices */
-	MCFG_TIMER_DRIVER_ADD(FLOPPY_TIMER_TAG, bw12_state, floppy_motor_off_tick)
+	TIMER(config, FLOPPY_TIMER_TAG).configure_generic(FUNC(bw12_state::floppy_motor_off_tick));
 	UPD765A(config, m_fdc, 8'000'000, false, true);
 
 	PIA6821(config, m_pia, 0);
@@ -632,40 +632,43 @@ MACHINE_CONFIG_START(bw12_state::common)
 	rs232b.cts_handler().set(m_sio, FUNC(z80dart_device::ctsb_w));
 
 	/* printer */
-	MCFG_DEVICE_ADD(CENTRONICS_TAG, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(PIA6821_TAG, pia6821_device, ca1_w))
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, bw12_state, write_centronics_busy))
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, bw12_state, write_centronics_fault))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, bw12_state, write_centronics_perror))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->ack_handler().set(m_pia, FUNC(pia6821_device::ca1_w));
+	m_centronics->busy_handler().set(FUNC(bw12_state::write_centronics_busy));
+	m_centronics->fault_handler().set(FUNC(bw12_state::write_centronics_fault));
+	m_centronics->perror_handler().set(FUNC(bw12_state::write_centronics_perror));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(bw12_state::bw12)
+void bw12_state::bw12(machine_config &config)
+{
 	common(config);
 	/* floppy drives */
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", bw12_floppies, "525dd", bw12_state::bw12_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":2", bw12_floppies, "525dd", bw12_state::bw12_floppy_formats)
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":1", bw12_floppies, "525dd", bw12_state::bw12_floppy_formats);
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":2", bw12_floppies, "525dd", bw12_state::bw12_floppy_formats);
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "bw12")
+	SOFTWARE_LIST(config, "flop_list").set_original("bw12");
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(bw12_state::bw14)
+void bw12_state::bw14(machine_config &config)
+{
 	common(config);
 	/* floppy drives */
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", bw14_floppies, "525dd", bw12_state::bw14_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":2", bw14_floppies, "525dd", bw12_state::bw14_floppy_formats)
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":1", bw14_floppies, "525dd", bw12_state::bw14_floppy_formats);
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":2", bw14_floppies, "525dd", bw12_state::bw14_floppy_formats);
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "bw14")
+	SOFTWARE_LIST(config, "flop_list").set_original("bw14");
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("128K");
-MACHINE_CONFIG_END
+	}
 
 /* ROMs */
 

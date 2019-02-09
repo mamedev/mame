@@ -91,6 +91,8 @@ dynlib::dynlib(const pstring libname)
 dynlib::dynlib(const pstring path, const pstring libname)
 : m_isLoaded(false), m_lib(nullptr)
 {
+	// FIXME: implement path search
+	plib::unused_var(path);
 	//  printf("win: loading <%s>\n", libname.c_str());
 #ifdef _WIN32
 	TCHAR *buffer = tstring_from_utf8(libname.c_str());
@@ -148,4 +150,4 @@ void *dynlib::getsym_p(const pstring name)
 #endif
 }
 
-}
+} // namespace plib

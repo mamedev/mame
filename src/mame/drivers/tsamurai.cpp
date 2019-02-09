@@ -749,7 +749,7 @@ MACHINE_CONFIG_START(tsamurai_state::tsamurai)
 	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tsamurai_state, vblank_irq))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tsamurai)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tsamurai);
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 	MCFG_VIDEO_START_OVERRIDE(tsamurai_state,tsamurai)
 
@@ -796,7 +796,7 @@ MACHINE_CONFIG_START(tsamurai_state::vsgongf)
 	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tsamurai_state, vblank_irq))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tsamurai)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tsamurai);
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 	MCFG_VIDEO_START_OVERRIDE(tsamurai_state,vsgongf)
 
@@ -851,7 +851,7 @@ MACHINE_CONFIG_START(tsamurai_state::m660)
 	screen.screen_vblank().set(FUNC(tsamurai_state::vblank_irq));
 	screen.screen_vblank().append_inputline(m_audio3, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tsamurai)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tsamurai);
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 	MCFG_VIDEO_START_OVERRIDE(tsamurai_state,m660)
 

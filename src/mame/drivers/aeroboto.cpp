@@ -263,7 +263,7 @@ MACHINE_CONFIG_START(aeroboto_state::formatz)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, aeroboto_state, vblank_irq))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_aeroboto)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_aeroboto);
 
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 

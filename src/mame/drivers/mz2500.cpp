@@ -1828,12 +1828,12 @@ MACHINE_CONFIG_START(mz2500_state::mz2500)
 
 	MB8877(config, m_fdc, 1_MHz_XTAL);
 
-	MCFG_FLOPPY_DRIVE_ADD("mb8877a:0", mz2500_floppies, "dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("mb8877a:1", mz2500_floppies, "dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("mb8877a:2", mz2500_floppies, "dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("mb8877a:3", mz2500_floppies, "dd", floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, "mb8877a:0", mz2500_floppies, "dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "mb8877a:1", mz2500_floppies, "dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "mb8877a:2", mz2500_floppies, "dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "mb8877a:3", mz2500_floppies, "dd", floppy_image_device::default_floppy_formats);
 
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "mz2500")
+	SOFTWARE_LIST(config, "flop_list").set_original("mz2500");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -147,12 +147,12 @@ MACHINE_CONFIG_START(ipds_state::ipds)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ipds)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_ipds);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
-	MCFG_DEVICE_ADD("i8275", I8275, XTAL(19'660'800) / 4)
-	MCFG_I8275_CHARACTER_WIDTH(6)
-	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(ipds_state, crtc_display_pixels)
+	I8275(config, m_crtc, XTAL(19'660'800) / 4);
+	m_crtc->set_character_width(6);
+	m_crtc->set_display_callback(FUNC(ipds_state::crtc_display_pixels), this);
 
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
 	keyboard.set_keyboard_callback(FUNC(ipds_state::kbd_put));

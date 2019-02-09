@@ -39,7 +39,8 @@ void msx_cart_bm_012_device::bm_012_memory_map(address_map &map)
 }
 
 
-MACHINE_CONFIG_START(msx_cart_bm_012_device::device_add_mconfig)
+void msx_cart_bm_012_device::device_add_mconfig(machine_config &config)
+{
 	// 12MHz XTAL @ X1
 	// Toshiba TMPZ84C015AF-6 (@U5) components:
 	// - Z80
@@ -69,13 +70,12 @@ MACHINE_CONFIG_START(msx_cart_bm_012_device::device_add_mconfig)
 	m_bm012_pio->out_brdy_callback().set("tmpz84c015af", FUNC(tmpz84c015_device::strobe_b));
 
 	// MIDI ports
-	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_MIDI_RX_HANDLER(WRITELINE(*this, msx_cart_bm_012_device, midi_in))
+	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set(FUNC(msx_cart_bm_012_device::midi_in));
 
-	MCFG_MIDI_PORT_ADD("mdthru", midiout_slot, "midiout")
+	MIDI_PORT(config, "mdthru", midiout_slot, "midiout");
 
-	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
-MACHINE_CONFIG_END
+	MIDI_PORT(config, "mdout", midiout_slot, "midiout");
+}
 
 
 ROM_START( msx_cart_bm_012 )

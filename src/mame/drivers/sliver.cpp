@@ -520,7 +520,7 @@ MACHINE_CONFIG_START(sliver_state::sliver)
 	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)
 	MCFG_DEVICE_PROGRAM_MAP(sliver_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sliver_state, irq4_line_hold)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("obj_actel", sliver_state, obj_irq_cb, attotime::from_hz(60)) /* unknown clock, causes "obj actel ready error" without this */
+	TIMER(config, "obj_actel").configure_periodic(FUNC(sliver_state::obj_irq_cb), attotime::from_hz(60)); /* unknown clock, causes "obj actel ready error" without this */
 	// irq 2 valid but not used?
 
 	I8051(config, m_audiocpu, 8000000);

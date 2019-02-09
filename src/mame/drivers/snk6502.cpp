@@ -830,7 +830,7 @@ MACHINE_CONFIG_START(snk6502_state::sasuke)
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("sasuke_timer", snk6502_state, sasuke_update_counter, attotime::from_hz(MASTER_CLOCK / 8))
+	TIMER(config, "sasuke_timer").configure_periodic(FUNC(snk6502_state::sasuke_update_counter), attotime::from_hz(MASTER_CLOCK / 8));
 
 	// sound hardware
 	MCFG_DEVICE_ADD("snk6502", SASUKE_SOUND, 0)
@@ -844,7 +844,7 @@ MACHINE_CONFIG_START(snk6502_state::satansat)
 	MCFG_DEVICE_PROGRAM_MAP(satansat_map)
 
 	// video hardware
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_satansat)
+	m_gfxdecode->set_info(gfx_satansat);
 
 	// sound hardware
 	MCFG_DEVICE_REPLACE("snk6502", SATANSAT_SOUND, 0)

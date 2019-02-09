@@ -485,7 +485,7 @@ MACHINE_CONFIG_START(kingofb_state::kingofb)
 
 	CLOCK(config, "soundnmi", 6000).signal_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) // We really need heavy synching among the processors
+	config.m_minimum_quantum = attotime::from_hz(6000); // We really need heavy synching among the processors
 
 
 	/* video hardware */
@@ -498,7 +498,7 @@ MACHINE_CONFIG_START(kingofb_state::kingofb)
 	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("nmigate", input_merger_device, in_w<0>))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_kingobox)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_kingobox);
 	PALETTE(config, m_palette, FUNC(kingofb_state::kingofb_palette), 256+8*2, 256+8);
 	MCFG_VIDEO_START_OVERRIDE(kingofb_state,kingofb)
 
@@ -541,7 +541,7 @@ MACHINE_CONFIG_START(kingofb_state::ringking)
 
 	CLOCK(config, "soundnmi", 6000).signal_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) // We really need heavy synching among the processors
+	config.m_minimum_quantum = attotime::from_hz(6000); // We really need heavy synching among the processors
 
 
 	/* video hardware */
@@ -554,7 +554,7 @@ MACHINE_CONFIG_START(kingofb_state::ringking)
 	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("nmigate", input_merger_device, in_w<0>))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_rk)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rk);
 	PALETTE(config, m_palette, FUNC(kingofb_state::ringking_palette), 256+8*2, 256+8);
 	MCFG_VIDEO_START_OVERRIDE(kingofb_state,ringking)
 

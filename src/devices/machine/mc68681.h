@@ -7,32 +7,6 @@
 
 #include "diserial.h"
 
-#define MCFG_MC68681_IRQ_CALLBACK(_cb) \
-	downcast<duart_base_device &>(*device).set_irq_cb(DEVCB_##_cb);
-
-#define MCFG_MC68681_A_TX_CALLBACK(_cb) \
-	downcast<duart_base_device &>(*device).set_a_tx_cb(DEVCB_##_cb);
-
-#define MCFG_MC68681_B_TX_CALLBACK(_cb) \
-	downcast<duart_base_device &>(*device).set_b_tx_cb(DEVCB_##_cb);
-
-// deprecated: use ipX_w() instead
-#define MCFG_MC68681_INPORT_CALLBACK(_cb) \
-	downcast<duart_base_device &>(*device).set_inport_cb(DEVCB_##_cb);
-
-#define MCFG_MC68681_OUTPORT_CALLBACK(_cb) \
-	downcast<duart_base_device &>(*device).set_outport_cb(DEVCB_##_cb);
-
-#define MCFG_MC68681_SET_EXTERNAL_CLOCKS(_a, _b, _c, _d) \
-	downcast<duart_base_device &>(*device).set_clocks(_a, _b, _c, _d);
-
-// SC28C94 specific callbacks
-#define MCFG_SC28C94_C_TX_CALLBACK(_cb) \
-	downcast<sc28c94_device &>(*device).set_c_tx_cb(DEVCB_##_cb);
-
-#define MCFG_SC28C94_D_TX_CALLBACK(_cb) \
-	downcast<sc28c94_device &>(*device).set_d_tx_cb(DEVCB_##_cb);
-
 #define MC68681_RX_FIFO_SIZE                3
 
 // forward declaration
@@ -127,15 +101,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(rx_a_w) { m_chanA->device_serial_interface::rx_w((uint8_t)state); }
 	DECLARE_WRITE_LINE_MEMBER(rx_b_w) { m_chanB->device_serial_interface::rx_w((uint8_t)state); }
 
-	template <class Object> devcb_base &set_irq_cb(Object &&cb) { return write_irq.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_a_tx_cb(Object &&cb) { return write_a_tx.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_b_tx_cb(Object &&cb) { return write_b_tx.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_inport_cb(Object &&cb) { return read_inport.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_outport_cb(Object &&cb) { return write_outport.set_callback(std::forward<Object>(cb)); }
 	auto irq_cb() { return write_irq.bind(); }
 	auto a_tx_cb() { return write_a_tx.bind(); }
 	auto b_tx_cb() { return write_b_tx.bind(); }
-	auto inport_cb() { return read_inport.bind(); }
+	auto inport_cb() { return read_inport.bind(); } // deprecated: use ipX_w() instead
 	auto outport_cb() { return write_outport.bind(); }
 
 	// new-style push handlers for input port bits
@@ -247,8 +216,8 @@ class sc28c94_device : public duart_base_device
 public:
 	sc28c94_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_c_tx_cb(Object &&cb) { return write_c_tx.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_d_tx_cb(Object &&cb) { return write_d_tx.set_callback(std::forward<Object>(cb)); }
+	auto c_tx_cb() { return write_c_tx.bind(); }
+	auto d_tx_cb() { return write_d_tx.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER(rx_c_w) { m_chanC->device_serial_interface::rx_w((uint8_t)state); }
 	DECLARE_WRITE_LINE_MEMBER(rx_d_w) { m_chanD->device_serial_interface::rx_w((uint8_t)state); }

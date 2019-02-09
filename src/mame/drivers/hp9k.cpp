@@ -409,7 +409,7 @@ MACHINE_CONFIG_START(hp9k_state::hp9k)
 	MCFG_SCREEN_UPDATE_DRIVER(hp9k_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hp9k)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_hp9k);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	MC6845(config, m_6845, XTAL(16'000'000) / 16);

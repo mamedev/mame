@@ -541,16 +541,16 @@ MACHINE_CONFIG_START(ti74_state::ti74)
 
 	PALETTE(config, "palette", FUNC(ti74_state::ti74_palette), 3);
 
-	MCFG_HD44780_ADD("hd44780") // 270kHz
-	MCFG_HD44780_LCD_SIZE(2, 16) // 2*16 internal
-	MCFG_HD44780_PIXEL_UPDATE_CB(ti74_state,ti74_pixel_update)
+	hd44780_device &hd44780(HD44780(config, "hd44780", 0)); // 270kHz
+	hd44780.set_lcd_size(2, 16); // 2*16 internal
+	hd44780.set_pixel_update_cb(FUNC(ti74_state::ti74_pixel_update), this);
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "ti74_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,rom,256")
 	MCFG_GENERIC_LOAD(ti74_state, ti74_cartridge)
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "ti74_cart")
+	SOFTWARE_LIST(config, "cart_list").set_original("ti74_cart");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ti74_state::ti95)
@@ -576,16 +576,16 @@ MACHINE_CONFIG_START(ti74_state::ti95)
 
 	PALETTE(config, "palette", FUNC(ti74_state::ti74_palette), 3);
 
-	MCFG_HD44780_ADD("hd44780")
-	MCFG_HD44780_LCD_SIZE(2, 16)
-	MCFG_HD44780_PIXEL_UPDATE_CB(ti74_state,ti95_pixel_update)
+	hd44780_device &hd44780(HD44780(config, "hd44780", 0));
+	hd44780.set_lcd_size(2, 16);
+	hd44780.set_pixel_update_cb(FUNC(ti74_state::ti95_pixel_update), this);
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "ti95_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,rom,256")
 	MCFG_GENERIC_LOAD(ti74_state, ti74_cartridge)
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "ti95_cart")
+	SOFTWARE_LIST(config, "cart_list").set_original("ti95_cart");
 MACHINE_CONFIG_END
 
 

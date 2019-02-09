@@ -257,11 +257,11 @@ MACHINE_CONFIG_START(d110_state::d110)
 
 	PALETTE(config, "palette", FUNC(d110_state::d110_palette), 2);
 
-	MCFG_MSM6222B_01_ADD( m_lcd )
+	MSM6222B_01(config, m_lcd, 0);
 
-	MCFG_TIMER_DRIVER_ADD( m_midi_timer, d110_state, midi_timer_cb )
+	TIMER(config, m_midi_timer).configure_generic(FUNC(d110_state::midi_timer_cb));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC( "samples_timer", d110_state, samples_timer_cb, attotime::from_hz(32000*2) )
+	TIMER(config,  "samples_timer").configure_periodic(FUNC(d110_state::samples_timer_cb), attotime::from_hz(32000*2) );
 MACHINE_CONFIG_END
 
 ROM_START( d110 )

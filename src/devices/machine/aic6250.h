@@ -52,11 +52,11 @@ protected:
 	u8 status_reg_1_r();
 	u8 scsi_signal_reg_r();
 	u8 scsi_id_data_r();
-	u8 source_dest_id_r() { logerror("source_dest_id_r\n"); return m_source_dest_id; }
+	u8 source_dest_id_r() { return m_source_dest_id; }
 	u8 memory_data_r();
 	u8 port_a_r();
 	u8 port_b_r();
-	u8 scsi_latch_data_r() { logerror("scsi_latch_data_r 0x%02x\n", m_scsi_latch_data); return m_scsi_latch_data; }
+	u8 scsi_latch_data_r() { return m_scsi_latch_data; }
 
 	void dma_count_l_w(u8 data) { m_dma_count &= ~0x0000ff; m_dma_count |= (data << 0); }
 	void dma_count_m_w(u8 data) { m_dma_count &= ~0x00ff00; m_dma_count |= (data << 8); }

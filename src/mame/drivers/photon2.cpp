@@ -363,7 +363,7 @@ MACHINE_CONFIG_START(photon2_state::photon2)
 	MCFG_DEVICE_ADD("maincpu", Z80, 3500000)        /* 3.5 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(spectrum_mem)
 	MCFG_DEVICE_IO_MAP(spectrum_io)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", photon2_state, spec_interrupt_hack, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(photon2_state::spec_interrupt_hack), "screen", 0, 1);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

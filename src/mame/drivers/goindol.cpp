@@ -256,7 +256,7 @@ MACHINE_CONFIG_START(goindol_state::goindol)
 	MCFG_SCREEN_UPDATE_DRIVER(goindol_state, screen_update_goindol)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_goindol)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_goindol);
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 
 	/* sound hardware */

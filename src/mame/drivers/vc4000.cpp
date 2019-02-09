@@ -550,8 +550,8 @@ void vc4000_state::vc4000(machine_config &config)
 	VC4000_SND(config, m_custom, 0).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* quickload */
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(vc4000_state, vc4000), this), "pgm,tvc", 0);
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
+	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(vc4000_state, vc4000), this), "pgm,tvc");
 
 	/* cartridge */
 	VC4000_CART_SLOT(config, "cartslot", vc4000_cart, nullptr);

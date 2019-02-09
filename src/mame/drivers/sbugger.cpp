@@ -123,8 +123,8 @@ void sbugger_state::sbugger_map(address_map &map)
 void sbugger_state::sbugger_io_map(address_map &map)
 {
 	map(0xe0, 0xe7).rw("i8156", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
-	map(0xe8, 0xe8).w("sn76489.1", FUNC(sn76489_device::command_w));
-	map(0xe9, 0xe9).w("sn76489.2", FUNC(sn76489_device::command_w));
+	map(0xe8, 0xe8).w("sn76489.1", FUNC(sn76489_device::write));
+	map(0xe9, 0xe9).w("sn76489.2", FUNC(sn76489_device::write));
 }
 
 
@@ -226,7 +226,7 @@ MACHINE_CONFIG_START(sbugger_state::sbugger)
 	i8156.in_pc_callback().set_ioport("DSW2");
 	i8156.out_to_callback().set_inputline(m_maincpu, I8085_RST75_LINE);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sbugger)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_sbugger);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

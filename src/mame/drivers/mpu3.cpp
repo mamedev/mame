@@ -822,17 +822,18 @@ void mpu3_state::mpu3_basemap(address_map &map)
 	map(0xa800, 0xa803).rw(m_pia6, FUNC(pia6821_device::read), FUNC(pia6821_device::write));        /* PIA6821 IC6 */
 }
 
-MACHINE_CONFIG_START(mpu3_state::mpu3base)
-	MCFG_DEVICE_ADD("maincpu", M6808, 4_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(mpu3_basemap)
+void mpu3_state::mpu3base(machine_config &config)
+{
+	M6808(config, m_maincpu, 4_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu3_state::mpu3_basemap);
 
 	input_merger_device &mainirq(INPUT_MERGER_ANY_HIGH(config, "mainirq")); // open collector
 	mainirq.output_handler().set_inputline("maincpu", M6808_IRQ_LINE);
 
 	MSC1937(config, m_vfd);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("50hz", mpu3_state, gen_50hz, attotime::from_hz(100))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("555_ic10", mpu3_state, ic10_callback, PERIOD_OF_555_ASTABLE(10000,1000,0.0000001))
+	TIMER(config, "50hz").configure_periodic(FUNC(mpu3_state::gen_50hz), attotime::from_hz(100));
+	TIMER(config, "555_ic10").configure_periodic(FUNC(mpu3_state::ic10_callback), PERIOD_OF_555_ASTABLE(10000,1000,0.0000001));
 
 	/* 6840 PTM */
 	PTM6840(config, m_ptm2, 4_MHz_XTAL / 4);
@@ -880,13 +881,12 @@ MACHINE_CONFIG_START(mpu3_state::mpu3base)
 	REEL(config, m_reels[3], MPU3_48STEP_REEL, 1, 3, 0x00, 2);
 	m_reels[3]->optic_handler().set(FUNC(mpu3_state::reel_optic_cb<3>));
 
-	MCFG_DEVICE_ADD("meters", METERS, 0)
-	MCFG_METERS_NUMBER(8)
+	METERS(config, m_meters, 0).set_number(8);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 2x HM4334 or HMI6514 or MB8414 + 2.4V battery
 
 	config.set_default_layout(layout_mpu3);
-MACHINE_CONFIG_END
+}
 
 
 static const mpu3_chr_table hprvpr_data[64] = {

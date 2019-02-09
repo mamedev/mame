@@ -393,15 +393,16 @@ MACHINE_CONFIG_START(pong_state::pong)
 	MCFG_NETLIST_LOGIC_INPUT("maincpu", "antenna", "antenna.IN", 0)
 
 	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "snd0", "sound", pong_state, sound_cb, "")
-	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "vid0", "videomix", fixedfreq_device, update_vid, "fixfreq")
+	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "vid0", "videomix", fixedfreq_device, update_composite_monochrome, "fixfreq")
 
 	/* video hardware */
-	MCFG_FIXFREQ_ADD("fixfreq", "screen")
-	MCFG_FIXFREQ_MONITOR_CLOCK(MASTER_CLOCK)
-	MCFG_FIXFREQ_HORZ_PARAMS(H_TOTAL_PONG-67,H_TOTAL_PONG-40,H_TOTAL_PONG-8,H_TOTAL_PONG)
-	MCFG_FIXFREQ_VERT_PARAMS(V_TOTAL_PONG-22,V_TOTAL_PONG-19,V_TOTAL_PONG-12,V_TOTAL_PONG)
-	MCFG_FIXFREQ_FIELDCOUNT(1)
-	MCFG_FIXFREQ_SYNC_THRESHOLD(0.11)
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	FIXFREQ(config, m_video).set_screen("screen");
+	m_video->set_monitor_clock(MASTER_CLOCK);
+	m_video->set_horz_params(H_TOTAL_PONG-67,H_TOTAL_PONG-40,H_TOTAL_PONG-8,H_TOTAL_PONG);
+	m_video->set_vert_params(V_TOTAL_PONG-22,V_TOTAL_PONG-19,V_TOTAL_PONG-12,V_TOTAL_PONG);
+	m_video->set_fieldcount(1);
+	m_video->set_threshold(0.11);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -435,7 +436,7 @@ MACHINE_CONFIG_START(breakout_state::breakout)
 	MCFG_NETLIST_LOGIC_INPUT("maincpu", "antenna", "antenna.IN", 0)
 
 	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "snd0", "sound", breakout_state, sound_cb, "")
-	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "vid0", "videomix", fixedfreq_device, update_vid, "fixfreq")
+	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "vid0", "videomix", fixedfreq_device, update_composite_monochrome, "fixfreq")
 
 	// Leds and lamps
 
@@ -445,16 +446,17 @@ MACHINE_CONFIG_START(breakout_state::breakout)
 	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "coin_counter", "CON_T", breakout_state, coin_counter_cb, "")
 
 	/* video hardware */
-	MCFG_FIXFREQ_ADD("fixfreq", "screen")
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	FIXFREQ(config, m_video).set_screen("screen");
 	/* The Pixel width is a 2,1,2,1,2,1,1,1 repeating pattern
 	 * Thus we must use double resolution horizontally
 	 */
-	MCFG_FIXFREQ_MONITOR_CLOCK(MASTER_CLOCK_BREAKOUT*2)
-	MCFG_FIXFREQ_HORZ_PARAMS((H_TOTAL_BREAKOUT-104)*2,(H_TOTAL_BREAKOUT-72)*2,(H_TOTAL_BREAKOUT-8)*2,  (H_TOTAL_BREAKOUT)*2)
-	MCFG_FIXFREQ_VERT_PARAMS(V_TOTAL_BREAKOUT-22,V_TOTAL_BREAKOUT-23,V_TOTAL_BREAKOUT-4, V_TOTAL_BREAKOUT)
-	MCFG_FIXFREQ_FIELDCOUNT(1)
-	MCFG_FIXFREQ_SYNC_THRESHOLD(1.0)
-	MCFG_FIXFREQ_GAIN(1.5)
+	m_video->set_monitor_clock(MASTER_CLOCK_BREAKOUT*2);
+	m_video->set_horz_params((H_TOTAL_BREAKOUT-104)*2,(H_TOTAL_BREAKOUT-72)*2,(H_TOTAL_BREAKOUT-8)*2,  (H_TOTAL_BREAKOUT)*2);
+	m_video->set_vert_params(V_TOTAL_BREAKOUT-22,V_TOTAL_BREAKOUT-23,V_TOTAL_BREAKOUT-4, V_TOTAL_BREAKOUT);
+	m_video->set_fieldcount(1);
+	m_video->set_threshold(1.0);
+	m_video->set_gain(1.5);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -491,15 +493,16 @@ MACHINE_CONFIG_START(pong_state::pongd)
 #endif
 
 	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "snd0", "AUDIO", pong_state, sound_cb, "")
-	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "vid0", "videomix", fixedfreq_device, update_vid, "fixfreq")
+	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "vid0", "videomix", fixedfreq_device, update_composite_monochrome, "fixfreq")
 
 	/* video hardware */
-	MCFG_FIXFREQ_ADD("fixfreq", "screen")
-	MCFG_FIXFREQ_MONITOR_CLOCK(MASTER_CLOCK)
-	MCFG_FIXFREQ_HORZ_PARAMS(H_TOTAL_PONG-67,H_TOTAL_PONG-52,H_TOTAL_PONG-8,H_TOTAL_PONG)
-	MCFG_FIXFREQ_VERT_PARAMS(V_TOTAL_PONG-22,V_TOTAL_PONG-19,V_TOTAL_PONG-12,V_TOTAL_PONG)
-	MCFG_FIXFREQ_FIELDCOUNT(1)
-	MCFG_FIXFREQ_SYNC_THRESHOLD(0.11)
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	FIXFREQ(config, m_video).set_screen("screen");
+	m_video->set_monitor_clock(MASTER_CLOCK);
+	m_video->set_horz_params(H_TOTAL_PONG-67,H_TOTAL_PONG-52,H_TOTAL_PONG-8,H_TOTAL_PONG);
+	m_video->set_vert_params(V_TOTAL_PONG-22,V_TOTAL_PONG-19,V_TOTAL_PONG-12,V_TOTAL_PONG);
+	m_video->set_fieldcount(1);
+	m_video->set_threshold(0.11);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

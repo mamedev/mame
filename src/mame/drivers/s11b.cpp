@@ -336,7 +336,7 @@ MACHINE_CONFIG_START(s11b_state::s11b)
 	/* Add the background music card */
 	MCFG_DEVICE_ADD("bgcpu", MC6809E, XTAL(8'000'000) / 4) // MC68B09E
 	MCFG_DEVICE_PROGRAM_MAP(s11b_bg_map)
-	MCFG_QUANTUM_TIME(attotime::from_hz(50))
+	config.m_minimum_quantum = attotime::from_hz(50);
 
 	SPEAKER(config, "bg").front_center();
 	YM2151(config, m_ym, 3580000);

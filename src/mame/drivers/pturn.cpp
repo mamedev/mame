@@ -545,7 +545,7 @@ MACHINE_CONFIG_START(pturn_state::pturn)
 
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 0x100);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pturn)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pturn);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -352,7 +352,7 @@ MACHINE_CONFIG_START(supbtime_state::supbtime)
 	MCFG_SCREEN_UPDATE_DRIVER(supbtime_state, screen_update_supbtime)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_supbtime)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_supbtime);
 	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 1024);
 
 	DECO16IC(config, m_deco_tilegen, 0);

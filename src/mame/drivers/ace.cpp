@@ -337,7 +337,7 @@ MACHINE_CONFIG_START(aceal_state::ace)
 	MCFG_SCREEN_UPDATE_DRIVER(aceal_state, screen_update_ace)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ace)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ace);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* sound hardware */

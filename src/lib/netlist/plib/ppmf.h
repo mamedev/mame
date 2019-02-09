@@ -8,11 +8,10 @@
 #ifndef PPMF_H_
 #define PPMF_H_
 
-#include "pconfig.h"
-
-#include <utility>
 #include <cstdint>
+#include <utility>
 
+#include "pconfig.h"
 
 /*
  *
@@ -70,7 +69,8 @@ namespace plib {
 		using generic_function = void (*)();
 
 		template<typename MemberFunctionType>
-		mfp(MemberFunctionType mftp)
+		mfp(MemberFunctionType mftp) // NOLINT(cppcoreguidelines-pro-type-member-init)
+
 		: m_function(0), m_this_delta(0), m_size(sizeof(mfp))
 		{
 			*reinterpret_cast<MemberFunctionType *>(this) = mftp;
@@ -82,7 +82,7 @@ namespace plib {
 			mfp mfpo(mftp);
 			//return mfpo.update_after_bind<FunctionType>(object);
 			generic_function rfunc(nullptr);
-			generic_class *robject = reinterpret_cast<generic_class *>(object);
+			auto robject = reinterpret_cast<generic_class *>(object);
 			mfpo.convert_to_generic(rfunc, robject);
 			func = reinterpret_cast<FunctionType>(rfunc);
 			object = reinterpret_cast<ObjectType *>(robject);
@@ -95,7 +95,7 @@ namespace plib {
 			if (PHAS_PMF_INTERNAL == 1)
 			{
 				// apply the "this" delta to the object first
-				generic_class * o_p_delta = reinterpret_cast<generic_class *>(reinterpret_cast<std::uint8_t *>(object) + m_this_delta);
+				auto o_p_delta = reinterpret_cast<generic_class *>(reinterpret_cast<std::uint8_t *>(object) + m_this_delta);
 
 				// if the low bit of the vtable index is clear, then it is just a raw function pointer
 				if (!(m_function & 1))
@@ -241,23 +241,28 @@ namespace plib {
 	{
 	public:
 		class generic_class;
+
+		template <class C>
+		using MemberFunctionType =  R (C::*)(Targs...);
+
 		pmfp() : pmfp_base<R, Targs...>(), m_obj(nullptr) {}
 
-		template<typename MemberFunctionType, typename O>
-		pmfp(MemberFunctionType mftp, O *object)
+		template<typename O>
+		pmfp(MemberFunctionType<O> mftp, O *object)
 		: pmfp_base<R, Targs...>()
 		{
 			this->set(mftp, object);
 		}
 
-		template<typename MemberFunctionType, typename O>
-		void set(MemberFunctionType mftp, O *object)
+
+		template<typename O>
+		void set(MemberFunctionType<O> mftp, O *object)
 		{
 			this->set_base(mftp, object);
 			m_obj = reinterpret_cast<generic_class *>(object);
 		}
 
-		inline R operator()(Targs... args)
+		inline R operator()(Targs ... args)
 		{
 			return this->call(m_obj, std::forward<Targs>(args)...);
 		}
@@ -269,6 +274,6 @@ namespace plib {
 	};
 
 
-}
+} // namespace plib
 
 #endif /* PPMF_H_ */

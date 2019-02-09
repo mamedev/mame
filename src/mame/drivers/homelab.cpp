@@ -766,7 +766,7 @@ MACHINE_CONFIG_START(homelab_state::homelab)
 	MCFG_SCREEN_UPDATE_DRIVER(homelab_state, screen_update_homelab2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_homelab)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_homelab);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
@@ -775,10 +775,10 @@ MACHINE_CONFIG_START(homelab_state::homelab)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "speaker", 0.25);
+	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "speaker", 0.25);
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_QUICKLOAD_ADD("quickload", homelab_state, homelab, "htp", 2)
+	CASSETTE(config, m_cass);
+	MCFG_QUICKLOAD_ADD("quickload", homelab_state, homelab, "htp", attotime::from_seconds(2))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(homelab_state::homelab3)
@@ -798,7 +798,7 @@ MACHINE_CONFIG_START(homelab_state::homelab3)
 	MCFG_SCREEN_UPDATE_DRIVER(homelab_state, screen_update_homelab3)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_homelab)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_homelab);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
@@ -807,10 +807,10 @@ MACHINE_CONFIG_START(homelab_state::homelab3)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "speaker", 0.25);
+	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "speaker", 0.25);
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_QUICKLOAD_ADD("quickload", homelab_state, homelab, "htp", 2)
+	CASSETTE(config, m_cass);
+	MCFG_QUICKLOAD_ADD("quickload", homelab_state, homelab, "htp", attotime::from_seconds(2))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(homelab_state::brailab4)
@@ -830,7 +830,7 @@ MACHINE_CONFIG_START(homelab_state::brailab4)
 	MCFG_SCREEN_UPDATE_DRIVER(homelab_state, screen_update_homelab3)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_homelab)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_homelab);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
@@ -839,13 +839,13 @@ MACHINE_CONFIG_START(homelab_state::brailab4)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "speaker", 0.25);
+	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "speaker", 0.25);
 
 	MCFG_DEVICE_ADD("mea8000", MEA8000, 3840000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_QUICKLOAD_ADD("quickload", homelab_state, homelab, "htp", 18)
+	CASSETTE(config, m_cass);
+	MCFG_QUICKLOAD_ADD("quickload", homelab_state, homelab, "htp", attotime::from_seconds(18))
 MACHINE_CONFIG_END
 
 void homelab_state::init_brailab4()

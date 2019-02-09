@@ -555,7 +555,7 @@ MACHINE_CONFIG_START(jr200_state::jr200)
 	MCFG_SCREEN_UPDATE_DRIVER(jr200_state, screen_update_jr200)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jr200)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jr200);
 	PALETTE(config, m_palette, palette_device::BRG_3BIT);
 
 	SPEAKER(config, "mono").front_center();

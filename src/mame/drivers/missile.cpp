@@ -742,7 +742,7 @@ WRITE8_MEMBER(missile_state::missile_w)
 	else if (offset < 0x4800)
 	{
 		if (m_pokey.found())
-			m_pokey->write(space, offset, data, 0xff);
+			m_pokey->write(offset, data);
 	}
 
 	/* OUT0 */
@@ -804,7 +804,7 @@ READ8_MEMBER(missile_state::missile_r)
 	else if (offset < 0x4800)
 	{
 		if (m_pokey.found())
-			result = m_pokey->read(space, offset & 0x0f, 0xff);
+			result = m_pokey->read(offset & 0x0f);
 	}
 
 	/* IN0 */

@@ -229,7 +229,7 @@ READ8_MEMBER(a78_rom_device::read_40xx)
 READ8_MEMBER(a78_rom_pokey_device::read_40xx)
 {
 	if (offset < 0x4000)
-		return m_pokey->read(space, offset & 0x0f);
+		return m_pokey->read(offset & 0x0f);
 
 	if (offset + 0x4000 < m_base_rom)
 		return 0xff;
@@ -240,7 +240,7 @@ READ8_MEMBER(a78_rom_pokey_device::read_40xx)
 WRITE8_MEMBER(a78_rom_pokey_device::write_40xx)
 {
 	if (offset < 0x4000)
-		m_pokey->write(space, offset & 0x0f, data);
+		m_pokey->write(offset & 0x0f, data);
 }
 
 // TO DO: do we need a PAL variant?!?
@@ -327,7 +327,7 @@ WRITE8_MEMBER(a78_rom_sg_device::write_40xx)
 READ8_MEMBER(a78_rom_sg_pokey_device::read_40xx)
 {
 	if (offset < 0x4000)
-		return m_pokey->read(space, offset & 0x0f);
+		return m_pokey->read(offset & 0x0f);
 	else if (offset < 0x8000)
 		return m_rom[(offset & 0x3fff) + (m_bank * 0x4000)];
 	else
@@ -337,7 +337,7 @@ READ8_MEMBER(a78_rom_sg_pokey_device::read_40xx)
 WRITE8_MEMBER(a78_rom_sg_pokey_device::write_40xx)
 {
 	if (offset < 0x4000)
-		m_pokey->write(space, offset & 0x0f, data);
+		m_pokey->write(offset & 0x0f, data);
 	else if (offset < 0x8000)
 		m_bank = data & m_bank_mask;
 }

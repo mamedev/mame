@@ -724,7 +724,7 @@ MACHINE_CONFIG_START(geniusiq_state::iq128)
 	MCFG_GENERIC_UNLOAD(geniusiq_state, iq128_cart)
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "iq128")
+	SOFTWARE_LIST(config, "cart_list").set_original("iq128");
 MACHINE_CONFIG_END
 
 void geniusiq_state::iqtv512(machine_config &config)

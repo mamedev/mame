@@ -250,7 +250,7 @@ MACHINE_CONFIG_START(srumbler_state::srumbler)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", MC6809, 6000000)        /* HD68B09P at 6 MHz (?) */
 	MCFG_DEVICE_PROGRAM_MAP(srumbler_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", srumbler_state, interrupt, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(srumbler_state::interrupt), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, 3000000)        /* 3 MHz ??? */
 	MCFG_DEVICE_PROGRAM_MAP(srumbler_sound_map)
@@ -269,7 +269,7 @@ MACHINE_CONFIG_START(srumbler_state::srumbler)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_srumbler)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_srumbler);
 
 	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 512);
 

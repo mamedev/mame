@@ -208,7 +208,7 @@ READ8_MEMBER(spool99_state::spool99_io_r)
 //          case 0xafe5: return 1;
 //          case 0xafe6: return 1;
 			case 0xafe7: return m_eeprom->do_read();
-			case 0xaff8: return m_oki->read(space,0);
+			case 0xaff8: return m_oki->read();
 		}
 	}
 //  printf("%04x %d\n",offset+0xaf00,io_switch);
@@ -267,7 +267,7 @@ READ8_MEMBER(spool99_state::vcarn_io_r)
 			case 0xa725: return ioport("HOLD3")->read();
 			case 0xa726: return ioport("HOLD4")->read();
 			case 0xa727: return ioport("HOLD2")->read();
-			case 0xa780: return m_oki->read(space,0);
+			case 0xa780: return m_oki->read();
 			case 0xa7a0: return ioport("HOLD1")->read();
 			case 0xa7a1: return ioport("HOLD5")->read();
 			case 0xa7a2: return ioport("START")->read();

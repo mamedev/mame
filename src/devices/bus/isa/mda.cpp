@@ -22,7 +22,7 @@
 
 #define VERBOSE_MDA 0       /* MDA (Monochrome Display Adapter) */
 
-#define MDA_CLOCK   16257000
+#define MDA_CLOCK   16.257_MHz_XTAL
 
 #define MDA_LOG(N,M,A) \
 	do { \
@@ -122,7 +122,7 @@ MACHINE_CONFIG_START(isa8_mda_device::device_add_mconfig)
 	m_crtc->out_hsync_callback().set(FUNC(isa8_mda_device::hsync_changed));
 	m_crtc->out_vsync_callback().set(FUNC(isa8_mda_device::vsync_changed));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pcmda)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_pcmda);
 
 	PC_LPT(config, m_lpt);
 	m_lpt->irq_handler().set(FUNC(isa8_mda_device::pc_cpu_line));
@@ -547,7 +547,7 @@ MACHINE_CONFIG_START(isa8_hercules_device::device_add_mconfig)
 	m_crtc->out_hsync_callback().set(FUNC(isa8_mda_device::hsync_changed));
 	m_crtc->out_vsync_callback().set(FUNC(isa8_mda_device::vsync_changed));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pcherc)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_pcherc);
 
 	PC_LPT(config, m_lpt);
 	m_lpt->irq_handler().set(FUNC(isa8_mda_device::pc_cpu_line));

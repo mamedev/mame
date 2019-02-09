@@ -191,8 +191,8 @@ MACHINE_CONFIG_START(isbc8010_state::isbc8010)
 	m_rs232->cts_handler().set(m_usart, FUNC(i8251_device::write_cts));
 	m_rs232->set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 
-	MCFG_DEVICE_ADD("usart_clock", CLOCK, XTAL(18'432'000)/60)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, isbc8010_state, usart_clock_tick))
+	clock_device &usart_clock(CLOCK(config, "usart_clock", XTAL(18'432'000)/60));
+	usart_clock.signal_handler().set(FUNC(isbc8010_state::usart_clock_tick));
 
 	/* video hardware */
 	// 96364 crt controller
@@ -212,7 +212,7 @@ MACHINE_CONFIG_START(isbc8010_state::isbc8010)
 //  MCFG_SCREEN_UPDATE_DRIVER(sdk80_state, screen_update)
 //  MCFG_SCREEN_PALETTE("palette")
 
-//  MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sdk80)
+//  GFXDECODE(config, "gfxdecode", "palette", gfx_sdk80);
 
 //  MCFG_PALETTE_ADD_MONOCHROME("palette")
 

@@ -375,7 +375,8 @@ TIMER_DEVICE_CALLBACK_MEMBER( by6803_state::pia0_timer )
 	m_pia0->cb1_w(m_pia0_timer);
 }
 
-MACHINE_CONFIG_START(by6803_state::by6803)
+void by6803_state::by6803(machine_config &config)
+{
 	/* basic machine hardware */
 	M6803(config, m_maincpu, XTAL(3'579'545));
 	m_maincpu->set_addrmap(AS_PROGRAM, &by6803_state::by6803_map);
@@ -402,7 +403,7 @@ MACHINE_CONFIG_START(by6803_state::by6803)
 	m_pia0->cb2_handler().set(FUNC(by6803_state::pia0_cb2_w));
 	m_pia0->irqa_handler().set_inputline("maincpu", M6803_IRQ_LINE);
 	m_pia0->irqb_handler().set_inputline("maincpu", M6803_IRQ_LINE);
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_z", by6803_state, pia0_timer, attotime::from_hz(120)) // mains freq*2
+	TIMER(config, "timer_z").configure_periodic(FUNC(by6803_state::pia0_timer), attotime::from_hz(120)); // mains freq*2
 
 	PIA6821(config, m_pia1, 0);
 	m_pia1->readpa_handler().set(FUNC(by6803_state::pia1_a_r));
@@ -410,10 +411,9 @@ MACHINE_CONFIG_START(by6803_state::by6803)
 	m_pia1->writepb_handler().set(FUNC(by6803_state::pia1_b_w));
 	m_pia1->cb2_handler().set(FUNC(by6803_state::pia1_cb2_w));
 
-	//MCFG_SPEAKER_STANDARD_MONO("speaker")
-	//MCFG_DEVICE_ADD("tcs", MIDWAY_TURBO_CHEAP_SQUEAK) // Cheap Squeak Turbo
-	//MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-MACHINE_CONFIG_END
+	//SPEAKER(config, "mono").front_center();
+	//MIDWAY_TURBO_CHEAP_SQUEAK(config, "tcs").add_route(ALL_OUTPUTS, "speaker", 1.0); // Cheap Squeak Turbo
+}
 
 
 /*-----------------------------------------------------------

@@ -449,7 +449,7 @@ MACHINE_CONFIG_START(badlands_state::badlands)
 
 	MCFG_DEVICE_ADD("audiocpu", M6502, ATARI_CLOCK_14MHz/8)
 	MCFG_DEVICE_PROGRAM_MAP(audio_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", badlands_state, sound_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(badlands_state::sound_scanline), "screen", 0, 1);
 
 	MCFG_MACHINE_START_OVERRIDE(badlands_state,badlands)
 	MCFG_MACHINE_RESET_OVERRIDE(badlands_state,badlands)
@@ -459,7 +459,7 @@ MACHINE_CONFIG_START(badlands_state::badlands)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_badlands)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_badlands);
 	palette_device &palette(PALETTE(config, "palette"));
 	palette.set_format(palette_device::IRGB_1555, 256);
 	palette.set_membits(8);

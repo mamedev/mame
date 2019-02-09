@@ -294,7 +294,7 @@ MACHINE_CONFIG_START(shootout_state::shootout)
 	MCFG_SCREEN_UPDATE_DRIVER(shootout_state, screen_update_shootout)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_shootout)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_shootout);
 	PALETTE(config, m_palette, FUNC(shootout_state::shootout_palette), 256);
 
 	/* sound hardware */
@@ -323,7 +323,7 @@ MACHINE_CONFIG_START(shootout_state::shootouj)
 	MCFG_SCREEN_UPDATE_DRIVER(shootout_state, screen_update_shootouj)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_shootout)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_shootout);
 	PALETTE(config, m_palette, FUNC(shootout_state::shootout_palette), 256);
 
 	/* sound hardware */
@@ -341,7 +341,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(shootout_state::shootouk)
 	shootouj(config);
 	/* the Korean 'bootleg' has the usual DECO222 style encryption */
-	MCFG_DEVICE_REMOVE("maincpu")
+	config.device_remove("maincpu");
 	MCFG_DEVICE_ADD("maincpu", DECO_222, XTAL(12'000'000) / 6) // 2 MHz? (Assuming the same XTAL as DE-0219 pcb)
 	MCFG_DEVICE_PROGRAM_MAP(shootouj_map)
 MACHINE_CONFIG_END

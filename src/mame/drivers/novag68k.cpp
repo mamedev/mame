@@ -127,19 +127,9 @@ READ8_MEMBER(novag68k_state::diablo68k_input2_r)
 
 WRITE8_MEMBER(novag68k_state::scorpio68k_control_w)
 {
-	// d0: HD44780 E
-	// d1: HD44780 RS
-	if (m_lcd_control & ~data & 1)
-		m_lcd->write(m_lcd_control >> 1 & 1, m_lcd_data);
-	m_lcd_control = data & 3;
-
-	// d7: enable beeper
-	m_beeper->set_state(data >> 7 & 1);
-
-	// d4-d6: input mux, led select
-	// d2,d3: led data
-	m_inp_mux = 1 << (data >> 4 & 0x7) & 0xff;
-	display_matrix(2, 8, ~data >> 2 & 3, m_inp_mux);
+	// d2,d3: led data, rest same as diablo
+	m_led_data = ~data >> 2 & 3;
+	diablo68k_control_w(space, offset, data);
 }
 
 
@@ -240,9 +230,10 @@ MACHINE_CONFIG_START(novag68k_state::diablo68k)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(diablo68k_map)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", novag68k_state, irq_on, attotime::from_hz(32.768_kHz_XTAL/128)) // 256Hz
-	MCFG_TIMER_START_DELAY(attotime::from_hz(32.768_kHz_XTAL/128) - attotime::from_nsec(1100)) // active for 1.1us
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", novag68k_state, irq_off, attotime::from_hz(32.768_kHz_XTAL/128))
+	timer_device &irq_on(TIMER(config, "irq_on"));
+	irq_on.configure_periodic(FUNC(novag68k_state::irq_on), attotime::from_hz(32.768_kHz_XTAL/128)); // 256Hz
+	irq_on.set_start_delay(attotime::from_hz(32.768_kHz_XTAL/128) - attotime::from_nsec(1100)); // active for 1.1us
+	TIMER(config, "irq_off").configure_periodic(FUNC(novag68k_state::irq_off), attotime::from_hz(32.768_kHz_XTAL/128));
 
 	mos6551_device &acia(MOS6551(config, "acia", 0));
 	acia.set_xtal(1.8432_MHz_XTAL);
@@ -259,11 +250,11 @@ MACHINE_CONFIG_START(novag68k_state::diablo68k)
 	MCFG_SCREEN_PALETTE("palette")
 	PALETTE(config, "palette", FUNC(novag68k_state::novag_lcd_palette), 3);
 
-	MCFG_HD44780_ADD("hd44780")
-	MCFG_HD44780_LCD_SIZE(2, 8)
-	MCFG_HD44780_PIXEL_UPDATE_CB(novag68k_state, novag_lcd_pixel_update)
+	HD44780(config, m_lcd, 0);
+	m_lcd->set_lcd_size(2, 8);
+	m_lcd->set_pixel_update_cb(FUNC(novag68k_state::novag_lcd_pixel_update), this);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", novag68k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(novag68k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_novag_diablo68k);
 
 	/* sound hardware */

@@ -48,6 +48,7 @@ involves replacing the XTAL and reconnecting one jumper.
 #define I8251_R_TAG     "4a"
 #define RS232_A_TAG     "rs232a"
 #define RS232_B_TAG     "rs232b"
+#define S100_TAG        "s100"
 
 class horizon_state : public driver_device
 {
@@ -57,6 +58,7 @@ public:
 		, m_maincpu(*this, Z80_TAG)
 		, m_usart_l(*this, I8251_L_TAG)
 		, m_usart_r(*this, I8251_R_TAG)
+		, m_s100(*this, S100_TAG)
 		{ }
 
 	void horizon(machine_config &config);
@@ -72,6 +74,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<i8251_device> m_usart_l;
 	required_device<i8251_device> m_usart_r;
+	required_device<s100_bus_device> m_s100;
 };
 
 
@@ -179,11 +182,12 @@ static void horizon_s100_cards(device_slot_interface &device)
 //  MACHINE_CONFIG( horizon )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(horizon_state::horizon)
+void horizon_state::horizon(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(8'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(horizon_mem)
-	MCFG_DEVICE_IO_MAP(horizon_io)
+	Z80(config, m_maincpu, XTAL(8'000'000) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &horizon_state::horizon_mem);
+	m_maincpu->set_addrmap(AS_IO, &horizon_state::horizon_io);
 
 	// devices
 	I8251(config, m_usart_l, 0);
@@ -206,33 +210,31 @@ MACHINE_CONFIG_START(horizon_state::horizon)
 	rs232b.dsr_handler().set(m_usart_r, FUNC(i8251_device::write_dsr));
 
 	// S-100
-	MCFG_DEVICE_ADD("s100", S100_BUS, XTAL(8'000'000) / 4)
-	MCFG_S100_RDY_CALLBACK(INPUTLINE(Z80_TAG, Z80_INPUT_LINE_BOGUSWAIT))
-	//MCFG_S100_SLOT_ADD("s100:1", horizon_s100_cards, nullptr, nullptr) // CPU
-	MCFG_S100_SLOT_ADD("s100:2", horizon_s100_cards, nullptr) // RAM
-	MCFG_S100_SLOT_ADD("s100:3", horizon_s100_cards, "mdsad") // MDS
-	MCFG_S100_SLOT_ADD("s100:4", horizon_s100_cards, nullptr) // FPB
-	MCFG_S100_SLOT_ADD("s100:5", horizon_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD("s100:6", horizon_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD("s100:7", horizon_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD("s100:8", horizon_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD("s100:9", horizon_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD("s100:10", horizon_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD("s100:11", horizon_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD("s100:12", horizon_s100_cards, nullptr)
+	S100_BUS(config, m_s100, XTAL(8'000'000) / 4);
+	m_s100->rdy().set_inputline(m_maincpu, Z80_INPUT_LINE_BOGUSWAIT);
+	//S100_SLOT(config, S100_TAG":1", horizon_s100_cards, nullptr, nullptr); // CPU
+	S100_SLOT(config, "s100:2", horizon_s100_cards, nullptr); // RAM
+	S100_SLOT(config, "s100:3", horizon_s100_cards, "mdsad"); // MDS
+	S100_SLOT(config, "s100:4", horizon_s100_cards, nullptr); // FPB
+	S100_SLOT(config, "s100:5", horizon_s100_cards, nullptr);
+	S100_SLOT(config, "s100:6", horizon_s100_cards, nullptr);
+	S100_SLOT(config, "s100:7", horizon_s100_cards, nullptr);
+	S100_SLOT(config, "s100:8", horizon_s100_cards, nullptr);
+	S100_SLOT(config, "s100:9", horizon_s100_cards, nullptr);
+	S100_SLOT(config, "s100:10", horizon_s100_cards, nullptr);
+	S100_SLOT(config, "s100:11", horizon_s100_cards, nullptr);
+	S100_SLOT(config, "s100:12", horizon_s100_cards, nullptr);
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "horizon")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "flop_list").set_original("horizon");
+}
 
-MACHINE_CONFIG_START(horizon_state::horizon2mhz)
+void horizon_state::horizon2mhz(machine_config &config)
+{
 	horizon(config);
-	MCFG_DEVICE_MODIFY("z80")
-	MCFG_DEVICE_CLOCK(XTAL(4'000'000) / 2)
-
-	MCFG_DEVICE_MODIFY("s100")
-	MCFG_DEVICE_CLOCK(XTAL(4'000'000) / 2)
-MACHINE_CONFIG_END
+	m_maincpu->set_clock(XTAL(4'000'000) / 2);
+	m_s100->set_clock(XTAL(4'000'000) / 2);
+}
 
 
 

@@ -528,7 +528,6 @@ void coolpool_state::amerdart_map(address_map &map)
 	map(0x04000000, 0x0400000f).w(FUNC(coolpool_state::amerdart_misc_w));
 	map(0x05000000, 0x0500000f).r(m_dsp2main, FUNC(generic_latch_16_device::read)).w(m_main2dsp, FUNC(generic_latch_16_device::write));
 	map(0x06000000, 0x06007fff).ram().w(FUNC(coolpool_state::nvram_thrash_data_w)).share("nvram");
-	map(0xc0000000, 0xc00001ff).rw(m_maincpu, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xffb00000, 0xffffffff).rom().region("maincpu", 0);
 }
 
@@ -541,7 +540,6 @@ void coolpool_state::coolpool_map(address_map &map)
 	map(0x03000000, 0x0300000f).w(FUNC(coolpool_state::coolpool_misc_w));
 	map(0x03000000, 0x03ffffff).rom().region("gfx1", 0);
 	map(0x06000000, 0x06007fff).ram().w(FUNC(coolpool_state::nvram_thrash_data_w)).share("nvram");
-	map(0xc0000000, 0xc00001ff).rw(m_maincpu, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xffe00000, 0xffffffff).rom().region("maincpu", 0);
 }
 
@@ -553,7 +551,6 @@ void coolpool_state::nballsht_map(address_map &map)
 	map(0x03000000, 0x0300000f).w(FUNC(coolpool_state::coolpool_misc_w));
 	map(0x04000000, 0x040000ff).rw(m_tlc34076, FUNC(tlc34076_device::read), FUNC(tlc34076_device::write)).umask16(0x00ff);    // IMSG176P-40
 	map(0x06000000, 0x0601ffff).mirror(0x00020000).ram().w(FUNC(coolpool_state::nvram_thrash_data_w)).share("nvram");
-	map(0xc0000000, 0xc00001ff).rw(m_maincpu, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xff000000, 0xff7fffff).rom().region("gfx1", 0);
 	map(0xffc00000, 0xffffffff).rom().region("maincpu", 0);
 }
@@ -731,7 +728,7 @@ MACHINE_CONFIG_START(coolpool_state::amerdart)
 	dsp.set_addrmap(AS_IO, &coolpool_state::amerdart_dsp_io_map);
 	dsp.bio().set(FUNC(coolpool_state::amerdart_dsp_bio_line_r));
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("audioint", coolpool_state, amerdart_audio_int_gen, "screen", 0, 1)
+	TIMER(config, "audioint").configure_scanline(FUNC(coolpool_state::amerdart_audio_int_gen), "screen", 0, 1);
 
 	GENERIC_LATCH_16(config, m_main2dsp);
 	GENERIC_LATCH_16(config, m_dsp2main);
@@ -740,7 +737,7 @@ MACHINE_CONFIG_START(coolpool_state::amerdart)
 	MCFG_MACHINE_RESET_OVERRIDE(coolpool_state,amerdart)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_TIMER_DRIVER_ADD(m_nvram_timer, coolpool_state, nvram_write_timeout)
+	TIMER(config, m_nvram_timer).configure_generic(FUNC(coolpool_state::nvram_write_timeout));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -785,10 +782,10 @@ MACHINE_CONFIG_START(coolpool_state::coolpool)
 	MCFG_MACHINE_RESET_OVERRIDE(coolpool_state,coolpool)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_TIMER_DRIVER_ADD(m_nvram_timer, coolpool_state, nvram_write_timeout)
+	TIMER(config, m_nvram_timer).configure_generic(FUNC(coolpool_state::nvram_write_timeout));
 
 	/* video hardware */
-	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
+	TLC34076(config, m_tlc34076, tlc34076_device::TLC34076_6_BIT);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(40'000'000)/6, 424, 0, 320, 262, 0, 240)

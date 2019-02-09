@@ -9,6 +9,7 @@ Witch / Pinball Champ '95 / Keirin Ou
 #ifndef MAME_INCLUDES_WITCH_H
 #define MAME_INCLUDES_WITCH_H
 
+#pragma once
 
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"

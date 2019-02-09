@@ -366,6 +366,18 @@ void galaxian_state::moonwar_palette(palette_device &palette)
 	m_bullet_color[7] = rgb_t(0xef, 0xef, 0x97);
 }
 
+void galaxian_state::eagle_palette(palette_device &palette)
+{
+	galaxian_palette(palette);
+
+	// uses a wiring harness that swaps RGB -> GBR
+	for (unsigned i = 0; palette.entries() > i; ++i)
+	{
+		rgb_t const c = palette.pen(i);
+		palette.set_pen_color(i, c.g(), c.b(), c.r());
+	}
+}
+
 /*************************************
  *
  *  Common video init

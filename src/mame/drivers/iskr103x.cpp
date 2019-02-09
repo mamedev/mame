@@ -75,8 +75,9 @@ MACHINE_CONFIG_START(iskr103x_state::iskr1030m)
 	MCFG_DEVICE_IO_MAP(iskr1031_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 
-	MCFG_IBM5160_MOTHERBOARD_ADD("mb","maincpu")
-	MCFG_DEVICE_INPUT_DEFAULTS(iskr1030m)
+	ibm5160_mb_device &mb(IBM5160_MOTHERBOARD(config, "mb", 0));
+	mb.set_cputag(m_maincpu);
+	mb.set_input_default(DEVICE_INPUT_DEFAULTS_NAME(iskr1030m));
 
 	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", iskr103x_isa8_cards, "cga_iskr1030m", false) // FIXME: determine IS bus clock
 	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "mb:isa", iskr103x_isa8_cards, "fdc_xt", false)
@@ -93,8 +94,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(iskr103x_state::iskr1031)
 	iskr1030m(config);
-	MCFG_DEVICE_MODIFY("mb")
-	MCFG_DEVICE_INPUT_DEFAULTS(iskr1031)
+	subdevice<ibm5160_mb_device>("mb")->set_input_default(DEVICE_INPUT_DEFAULTS_NAME(iskr1031));
 	MCFG_DEVICE_MODIFY("isa1")
 	MCFG_DEVICE_SLOT_INTERFACE(iskr103x_isa8_cards, "cga_iskr1031", false)
 MACHINE_CONFIG_END

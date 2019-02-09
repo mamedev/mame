@@ -229,7 +229,7 @@ MACHINE_CONFIG_START(vaportra_state::vaportra)
 	MCFG_SCREEN_UPDATE_DRIVER(vaportra_state, screen_update)
 	MCFG_SCREEN_PALETTE("colors")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_vaportra)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_vaportra);
 	MCFG_PALETTE_ADD(m_palette, 1280)
 
 	DECO16IC(config, m_deco_tilegen[0], 0);

@@ -221,9 +221,9 @@ MACHINE_CONFIG_START(mpu4dealem_state::dealem)
 	MCFG_SCREEN_UPDATE_DRIVER(mpu4dealem_state, screen_update_dealem)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dealem)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dealem);
 
-	PALETTE(config, "palette", FUNC(mpu4dealem_state::dealem_palette), 32);
+	PALETTE(config, m_palette, FUNC(mpu4dealem_state::dealem_palette), 32);
 
 	hd6845_device &crtc(HD6845(config, "crtc", MPU4_MASTER_CLOCK / 4 / 8)); /* HD68B45 */
 	crtc.set_screen("screen");

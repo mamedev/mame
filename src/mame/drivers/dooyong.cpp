@@ -1428,9 +1428,9 @@ READ8_MEMBER(dooyong_z80_ym2203_state::unk_r)
 ***************************************************************************/
 
 
-MACHINE_CONFIG_START(dooyong_z80_ym2203_state::sound_2203)
-	MCFG_INPUT_MERGER_ANY_HIGH("soundirq")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", 0))
+void dooyong_z80_ym2203_state::sound_2203(machine_config &config)
+{
+	INPUT_MERGER_ANY_HIGH(config, "soundirq").output_handler().set_inputline(m_audiocpu, 0);
 
 	SPEAKER(config, "mono").front_center();
 
@@ -1445,7 +1445,7 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::sound_2203)
 	ym2.irq_handler().set("soundirq", FUNC(input_merger_any_high_device::in_w<1>));
 	ym2.port_a_read_callback().set(FUNC(dooyong_z80_ym2203_state::unk_r));
 	ym2.add_route(ALL_OUTPUTS, "mono", 0.40);
-MACHINE_CONFIG_END
+}
 
 MACHINE_CONFIG_START(dooyong_z80_state::sound_2151)
 	SPEAKER(config, "mono").front_center();
@@ -1509,8 +1509,7 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::lastday)
 	MCFG_VIDEO_START_OVERRIDE(dooyong_z80_ym2203_state, lastday)
 
 	/* sound hardware */
-	MCFG_INPUT_MERGER_ANY_HIGH("soundirq")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", 0))
+	INPUT_MERGER_ANY_HIGH(config, "soundirq").output_handler().set_inputline(m_audiocpu, 0);
 
 	SPEAKER(config, "mono").front_center();
 
@@ -1731,7 +1730,7 @@ MACHINE_CONFIG_START(rshark_state::dooyong_68k)
 
 	// basic machine hardware
 	MCFG_DEVICE_ADD("maincpu", M68000, 8_MHz_XTAL)  // 8MHz measured on Super-X
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", rshark_state, scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(rshark_state::scanline), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, 8_MHz_XTAL/2)  // 4MHz measured on Super-X
 	MCFG_DEVICE_PROGRAM_MAP(bluehawk_sound_map)
@@ -1748,7 +1747,7 @@ MACHINE_CONFIG_START(rshark_state::dooyong_68k)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(m_spriteram, buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rshark)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rshark);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
 	RSHARK_ROM_TILEMAP(config, m_bg[0], m_gfxdecode, 4, "gfx5", 0x00000, "gfx6", 0x60000);
@@ -1782,7 +1781,7 @@ MACHINE_CONFIG_START(popbingo_state::popbingo)
 	// basic machine hardware
 	MCFG_DEVICE_ADD("maincpu", M68000, 20_MHz_XTAL/2)   // 10MHz measured
 	MCFG_DEVICE_PROGRAM_MAP(popbingo_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", popbingo_state, scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(popbingo_state::scanline), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, 16_MHz_XTAL/4)     // 4MHz measured
 	MCFG_DEVICE_PROGRAM_MAP(bluehawk_sound_map)
@@ -1799,7 +1798,7 @@ MACHINE_CONFIG_START(popbingo_state::popbingo)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(m_spriteram, buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_popbingo)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_popbingo);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
 	DOOYONG_ROM_TILEMAP(config, m_bg[0], m_gfxdecode, 1, "gfx2", 0x00000);

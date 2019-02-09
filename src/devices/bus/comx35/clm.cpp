@@ -145,7 +145,7 @@ MACHINE_CONFIG_START(comx_clm_device::device_add_mconfig)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_REFRESH_RATE(50)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_comx_clm)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_comx_clm);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	MC6845(config, m_crtc, XTAL(14'318'181)/7);

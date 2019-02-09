@@ -34,7 +34,7 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_video_ram(*this, "video_ram"),
-		m_leds(*this, "LED%02u", 0U)
+		m_leds(*this, "LED%02u", 1U)
 	{ }
 
 	void videopin(machine_config &config);
@@ -75,7 +75,7 @@ private:
 	required_device<palette_device> m_palette;
 
 	required_shared_ptr<uint8_t> m_video_ram;
-	output_finder<33> m_leds;
+	output_finder<32> m_leds;
 
 	attotime m_time_pushed;
 	attotime m_time_released;

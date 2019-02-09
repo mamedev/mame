@@ -524,9 +524,9 @@ MACHINE_CONFIG_START(cosmicos_state::cosmicos)
 
 	/* video hardware */
 	config.set_default_layout(layout_cosmicos);
-	MCFG_DEVICE_ADD(DM9368_TAG, DM9368, 0)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("digit", cosmicos_state, digit_tick, attotime::from_hz(100))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("interrupt", cosmicos_state, int_tick, attotime::from_hz(1000))
+	DM9368(config, m_led, 0);
+	TIMER(config, "digit").configure_periodic(FUNC(cosmicos_state::digit_tick), attotime::from_hz(100));
+	TIMER(config, "interrupt").configure_periodic(FUNC(cosmicos_state::int_tick), attotime::from_hz(1000));
 
 	SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER);
 
@@ -548,9 +548,9 @@ MACHINE_CONFIG_START(cosmicos_state::cosmicos)
 	m_cti->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
-	MCFG_QUICKLOAD_ADD("quickload", cosmicos_state, cosmicos, "bin", 0)
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
+	MCFG_QUICKLOAD_ADD("quickload", cosmicos_state, cosmicos, "bin")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("256").set_extra_options("4K,48K");

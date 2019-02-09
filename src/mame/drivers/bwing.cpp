@@ -377,7 +377,7 @@ MACHINE_CONFIG_START(bwing_state::bwing)
 	MCFG_DEVICE_IO_MAP(bwp3_io_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(bwing_state, bwp3_interrupt,  1000)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(18000))     // high enough?
+	config.m_minimum_quantum = attotime::from_hz(18000);     // high enough?
 
 	ADDRESS_MAP_BANK(config, "vrambank").set_map(&bwing_state::bank_map).set_options(ENDIANNESS_BIG, 8, 15, 0x2000);
 
@@ -391,7 +391,7 @@ MACHINE_CONFIG_START(bwing_state::bwing)
 	MCFG_SCREEN_UPDATE_DRIVER(bwing_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bwing)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bwing);
 	MCFG_PALETTE_ADD("palette", 64)
 
 

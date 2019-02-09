@@ -1369,7 +1369,8 @@ static void apple2_cards(device_slot_interface &device)
 //  device.option_add("magicmusician", A2BUS_MAGICMUSICIAN);    /* Magic Musician Card */
 }
 
-MACHINE_CONFIG_START(apple2_state::apple2_common)
+void apple2_state::apple2_common(machine_config &config)
+{
 	/* basic machine hardware */
 	M6502(config, m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2_state::apple2_map);
@@ -1424,10 +1425,11 @@ MACHINE_CONFIG_START(apple2_state::apple2_common)
 
 	/* slot devices */
 	A2BUS(config, m_a2bus, 0);
-	m_a2bus->set_cputag("maincpu");
+	m_a2bus->set_space(m_maincpu, AS_PROGRAM);
 	m_a2bus->irq_w().set(FUNC(apple2_state::a2bus_irq_w));
 	m_a2bus->nmi_w().set(FUNC(apple2_state::a2bus_nmi_w));
 	m_a2bus->inh_w().set(FUNC(apple2_state::a2bus_inh_w));
+	m_a2bus->dma_w().set_inputline(m_maincpu, INPUT_LINE_HALT);
 	A2BUS_SLOT(config, "sl0", m_a2bus, apple2_slot0_cards, "lang");
 	A2BUS_SLOT(config, "sl1", m_a2bus, apple2_cards, nullptr);
 	A2BUS_SLOT(config, "sl2", m_a2bus, apple2_cards, nullptr);
@@ -1437,13 +1439,17 @@ MACHINE_CONFIG_START(apple2_state::apple2_common)
 	A2BUS_SLOT(config, "sl6", m_a2bus, apple2_cards, "diskiing");
 	A2BUS_SLOT(config, "sl7", m_a2bus, apple2_cards, nullptr);
 
-	MCFG_SOFTWARE_LIST_ADD("flop525_list","apple2")
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "apple2_cass")
+	/* Set up the softlists: clean cracks priority, originals second, others last */
+	SOFTWARE_LIST(config, "flop525_clean").set_original("apple2_flop_clcracked");
+	SOFTWARE_LIST(config, "flop525_orig").set_compatible("apple2_flop_orig").set_filter("A2");
+	SOFTWARE_LIST(config, "flop525_misc").set_compatible("apple2_flop_misc");
+	SOFTWARE_LIST(config, "cass_list").set_original("apple2_cass");
+	//MCFG_SOFTWARE_LIST_ADD("cass_list", "apple2_cass")
 
-	MCFG_CASSETTE_ADD(A2_CASSETTE_TAG)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
-	MCFG_CASSETTE_INTERFACE("apple2_cass")
-MACHINE_CONFIG_END
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED);
+	m_cassette->set_interface("apple2_cass");
+}
 
 void apple2_state::apple2(machine_config &config)
 {
@@ -1455,6 +1461,7 @@ void apple2_state::apple2(machine_config &config)
 void apple2_state::apple2p(machine_config &config)
 {
 	apple2_common(config);
+	subdevice<software_list_device>("flop525_orig")->set_filter("A2P"); // Filter list to compatible disks for this machine.
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("48K").set_extra_options("16K,32K,48K").set_default_value(0x00);
 }
@@ -1475,9 +1482,9 @@ static MACHINE_CONFIG_START( laba2p )
 	apple2p(config);
 	MCFG_MACHINE_START_OVERRIDE(apple2_state,laba2p)
 
-	MCFG_DEVICE_REMOVE("sl0")
-	MCFG_DEVICE_REMOVE("sl3")
-	MCFG_DEVICE_REMOVE("sl6")
+	config.device_remove("sl0");
+	config.device_remove("sl3");
+	config.device_remove("sl6");
 
 //  A2BUS_LAB_80COL("sl3", A2BUS_LAB_80COL).set_onboard(m_a2bus);
 	A2BUS_IWM_FDC("sl6", A2BUS_IWM_FDC).set_onboard(m_a2bus);

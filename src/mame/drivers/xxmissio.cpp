@@ -275,7 +275,7 @@ MACHINE_CONFIG_START(xxmissio_state::xxmissio)
 	MCFG_DEVICE_PROGRAM_MAP(map2)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(xxmissio_state, interrupt_s, 2*60)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

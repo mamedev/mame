@@ -54,26 +54,6 @@
 #define PORTFOLIO_EXPANSION_SLOT_TAG      "exp"
 
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_PORTFOLIO_EXPANSION_SLOT_ADD(_tag, _clock, _slot_intf, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, PORTFOLIO_EXPANSION_SLOT, _clock) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-
-#define MCFG_PORTFOLIO_EXPANSION_SLOT_EINT_CALLBACK(_write) \
-	downcast<portfolio_expansion_slot_device &>(*device).set_eint_wr_callback(DEVCB_##_write);
-
-#define MCFG_PORTFOLIO_EXPANSION_SLOT_NMIO_CALLBACK(_write) \
-	downcast<portfolio_expansion_slot_device &>(*device).set_nmio_wr_callback(DEVCB_##_write);
-
-#define MCFG_PORTFOLIO_EXPANSION_SLOT_WAKE_CALLBACK(_write) \
-	downcast<portfolio_expansion_slot_device &>(*device).set_wake_wr_callback(DEVCB_##_write);
-
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -115,11 +95,21 @@ class portfolio_expansion_slot_device : public device_t, public device_slot_inte
 {
 public:
 	// construction/destruction
+	template <typename T>
+	portfolio_expansion_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock, T &&opts, char const *dflt)
+		: portfolio_expansion_slot_device(mconfig, tag, owner, clock)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
+
 	portfolio_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_eint_wr_callback(Object &&cb) { return m_write_eint.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_nmio_wr_callback(Object &&cb) { return m_write_nmio.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_wake_wr_callback(Object &&cb) { return m_write_wake.set_callback(std::forward<Object>(cb)); }
+	auto eint_wr_callback() { return m_write_eint.bind(); }
+	auto nmio_wr_callback() { return m_write_nmio.bind(); }
+	auto wake_wr_callback() { return m_write_wake.bind(); }
 
 	// computer interface
 	bool nmd1_r() { return (m_card != nullptr) ? m_card->nmd1() : 1; }

@@ -6,7 +6,7 @@
 #include "cpu/m6809/m6809.h"
 
 
-#define ANALOG_DELAY 7800
+#define ANALOG_DELAY 8500
 
 #define INT_PER_CLOCK 550
 

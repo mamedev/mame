@@ -476,7 +476,7 @@ MACHINE_CONFIG_START(drw80pkr_state::drw80pkr)
 	MCFG_SCREEN_UPDATE_DRIVER(drw80pkr_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_drw80pkr)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_drw80pkr);
 	PALETTE(config, "palette", FUNC(drw80pkr_state::drw80pkr_palette), 16 * 16);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);

@@ -283,24 +283,24 @@ void wackygtr_state::program_map(address_map &map)
 
 MACHINE_CONFIG_START(wackygtr_state::wackygtr)
 
-	MCFG_DEVICE_ADD("maincpu", MC6809, XTAL(3'579'545))   // HD68B09P
-	MCFG_DEVICE_PROGRAM_MAP(program_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(wackygtr_state, irq0_line_assert, 50)  // FIXME
+	MC6809(config, m_maincpu, XTAL(3'579'545)); // HD68B09P
+	m_maincpu->set_addrmap(AS_PROGRAM, &wackygtr_state::program_map);
+	m_maincpu->set_periodic_int(FUNC(wackygtr_state::irq0_line_assert), attotime::from_hz(50)); // FIXME
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer", wackygtr_state, nmi_timer, attotime::from_hz(100))  // FIXME
+	TIMER(config, "nmi_timer").configure_periodic(FUNC(wackygtr_state::nmi_timer), attotime::from_hz(100)); // FIXME
 
 	/* Video */
 	config.set_default_layout(layout_wackygtr);
 
 	/* Sound */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(384'000) )
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, wackygtr_state, adpcm_int))   /* IRQ handler */
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 KHz, 4 Bits  */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MSM5205(config, m_msm, XTAL(384'000));
+	m_msm->vck_legacy_callback().set(FUNC(wackygtr_state::adpcm_int));  /* IRQ handler */
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  /* 8 KHz, 4 Bits  */
+	m_msm->add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(3'579'545) )
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ym2413_device &ymsnd(YM2413(config, "ymsnd", XTAL(3'579'545)));
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	i8255_device &ppi0(I8255(config, "i8255_0"));
 	ppi0.out_pa_callback().set(FUNC(wackygtr_state::status_lamps_w));
@@ -333,8 +333,8 @@ MACHINE_CONFIG_START(wackygtr_state::wackygtr)
 	m_pit8253[1]->set_clk<2>(XTAL(3'579'545)/16);  // this is a guess
 	m_pit8253[1]->out_handler<2>().set(FUNC(wackygtr_state::alligator_ck<4>));
 
-	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
-MACHINE_CONFIG_END
+	TICKET_DISPENSER(config, "ticket", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+}
 
 
 ROM_START( wackygtr )

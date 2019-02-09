@@ -401,7 +401,7 @@ void shadfrce_state::shadfrce_sound_map(address_map &map)
 
 /* Input Ports */
 
-/* Similar to MUGSMASH_PLAYER_INPUT in drivers/mugsmash.c */
+// Similar to MUGSMASH_PLAYER_INPUT in drivers/mugsmash.cpp
 #define SHADFRCE_PLAYER_INPUT( player, start ) \
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(player) PORT_8WAY \
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(player) PORT_8WAY \
@@ -539,7 +539,7 @@ MACHINE_CONFIG_START(shadfrce_state::shadfrce)
 
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(28'000'000) / 2)          /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(shadfrce_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", shadfrce_state, scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(shadfrce_state::scanline), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))         /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(shadfrce_sound_map)

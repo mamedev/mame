@@ -208,7 +208,6 @@ void xtheball_state::main_map(address_map &map)
 	map(0x03040180, 0x0304018f).r(FUNC(xtheball_state::analogy_watchdog_r)).nopw();
 	map(0x03060000, 0x0306000f).w("dac", FUNC(dac_byte_interface::data_w)).umask16(0xff00);
 	map(0x04000000, 0x057fffff).rom().region("user2", 0);
-	map(0xc0000000, 0xc00001ff).rw(m_maincpu, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xfff80000, 0xffffffff).rom().region("user1", 0);
 }
 
@@ -318,12 +317,12 @@ MACHINE_CONFIG_START(xtheball_state::xtheball)
 	latch3.q_out_cb<3>().set(FUNC(xtheball_state::foreground_mode_w));
 	// Q3 = video foreground control?
 
-	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
+	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 
 	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
-	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
+	TLC34076(config, m_tlc34076, tlc34076_device::TLC34076_6_BIT);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(10000000, 640, 114, 626, 257, 24, 248)

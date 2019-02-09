@@ -703,10 +703,10 @@ MACHINE_CONFIG_START(spectrum_state::spectrum_common)
 	m_exp->nmi_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	/* devices */
-	snapshot_image_device &snapshot(SNAPSHOT(config, "snapshot", 0));
-	snapshot.set_handler(snapquick_load_delegate(&SNAPSHOT_LOAD_NAME(spectrum_state, spectrum), this), "ach,frz,plusd,prg,sem,sit,sna,snp,snx,sp,z80,zx", 0);
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(spectrum_state, spectrum), this), "raw,scr", 2); // The delay prevents the screen from being cleared by the RAM test at boot
+	snapshot_image_device &snapshot(SNAPSHOT(config, "snapshot"));
+	snapshot.set_handler(snapquick_load_delegate(&SNAPSHOT_LOAD_NAME(spectrum_state, spectrum), this), "ach,frz,plusd,prg,sem,sit,sna,snp,snx,sp,z80,zx");
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
+	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(spectrum_state, spectrum), this), "raw,scr", attotime::from_seconds(2)); // The delay prevents the screen from being cleared by the RAM test at boot
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(tzx_cassette_formats);

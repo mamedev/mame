@@ -373,12 +373,12 @@ MACHINE_CONFIG_START(vg5k_state::vg5k)
 	MCFG_DEVICE_PROGRAM_MAP(vg5k_mem)
 	MCFG_DEVICE_IO_MAP(vg5k_io)
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("vg5k_scanline", vg5k_state, vg5k_scanline, "screen", 0, 10)
+	TIMER(config, "vg5k_scanline").configure_scanline(FUNC(vg5k_state::vg5k_scanline), "screen", 0, 10);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", vg5k_state, z80_irq, attotime::from_msec(20))
+	TIMER(config, "irq_timer").configure_periodic(FUNC(vg5k_state::z80_irq), attotime::from_msec(20));
 
-	MCFG_DEVICE_ADD("ef9345", EF9345, 0)
-	MCFG_EF9345_PALETTE("palette")
+	EF9345(config, m_ef9345, 0);
+	m_ef9345->set_palette_tag("palette");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -388,7 +388,7 @@ MACHINE_CONFIG_START(vg5k_state::vg5k)
 	MCFG_SCREEN_SIZE(336, 300)
 	MCFG_SCREEN_VISIBLE_AREA(00, 336-1, 00, 270-1)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vg5k)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_vg5k);
 	MCFG_PALETTE_ADD("palette", 8)
 
 	/* sound hardware */
@@ -398,21 +398,21 @@ MACHINE_CONFIG_START(vg5k_state::vg5k)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
 	/* cassette */
-	WAVE(config, "wave", "cassette").add_route(0, "speaker", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(0, "speaker", 0.25);
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(vg5k_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MASK_SPEAKER)
-	MCFG_CASSETTE_INTERFACE("vg5k_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(vg5k_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MASK_SPEAKER);
+	m_cassette->set_interface("vg5k_cass");
 
 	/* printer */
-	MCFG_DEVICE_ADD("printer", PRINTER, 0)
+	PRINTER(config, m_printer, 0);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("32K,48K");
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "vg5k")
+	SOFTWARE_LIST(config, "cass_list").set_original("vg5k");
 MACHINE_CONFIG_END
 
 /* ROM definition */

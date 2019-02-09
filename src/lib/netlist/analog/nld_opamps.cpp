@@ -8,8 +8,8 @@
 #include "nld_opamps.h"
 #include "../nl_base.h"
 #include "../nl_errstr.h"
-#include "nlid_twoterm.h"
 #include "nlid_fourterm.h"
+#include "nlid_twoterm.h"
 
 #include <cmath>
 
@@ -201,7 +201,7 @@ namespace netlist
 
 	NETLIB_RESET(opamp)
 	{
-		m_G1.do_reset();
+		m_G1.reset();
 		m_G1.m_RI.setTo(m_model.m_RI);
 
 		if (m_type == 1)
@@ -213,11 +213,11 @@ namespace netlist
 		}
 		else if (m_type == 3)
 		{
-			m_EBUF->do_reset();
-			m_DP->do_reset();
-			m_DN->do_reset();
-			m_CP->do_reset();
-			m_RP.do_reset();
+			m_EBUF->reset();
+			m_DP->reset();
+			m_DN->reset();
+			m_CP->reset();
+			m_RP.reset();
 
 			m_EBUF->m_G.setTo(1.0);
 			m_EBUF->m_RO.setTo(m_model.m_RO);
@@ -239,6 +239,6 @@ namespace netlist
 	} //namespace analog
 
 	namespace devices {
-		NETLIB_DEVICE_IMPL_NS(analog, opamp)
-	}
+		NETLIB_DEVICE_IMPL_NS(analog, opamp, "OPAMP", "MODEL")
+	} // namespace devices
 } // namespace netlist

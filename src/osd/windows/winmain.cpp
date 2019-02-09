@@ -6,20 +6,6 @@
 //
 //============================================================
 
-// only for oslog callback
-#include <functional>
-
-// standard windows headers
-#include <windows.h>
-#include <commctrl.h>
-#include <mmsystem.h>
-#include <tchar.h>
-#include <io.h>
-
-// standard C headers
-#include <ctype.h>
-#include <stdarg.h>
-
 // MAME headers
 #include "emu.h"
 #include "emuopts.h"
@@ -33,6 +19,18 @@
 #include "winfile.h"
 #include "modules/diagnostics/diagnostics_module.h"
 #include "modules/monitor/monitor_common.h"
+
+// standard C headers
+#include <ctype.h>
+#include <stdarg.h>
+#include <stdio.h>
+
+// standard windows headers
+#include <windows.h>
+#include <commctrl.h>
+#include <mmsystem.h>
+#include <tchar.h>
+#include <io.h>
 
 #if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 #include <wrl/client.h>
@@ -475,6 +473,8 @@ void windows_osd_interface::output_oslog(const char *buffer)
 {
 	if (IsDebuggerPresent())
 		win_output_debug_string_utf8(buffer);
+	else
+		fputs(buffer, stderr);
 }
 
 
@@ -573,10 +573,7 @@ void windows_osd_interface::init(running_machine &machine)
 
 	// hook up the debugger log
 	if (options.oslog())
-	{
-		using namespace std::placeholders;
-		machine.add_logerror_callback(std::bind(&windows_osd_interface::output_oslog, this, _1));
-	}
+		machine.add_logerror_callback(&windows_osd_interface::output_oslog);
 
 #if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 	// crank up the multimedia timer resolution to its max

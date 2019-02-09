@@ -596,7 +596,8 @@ static void z88_cart(device_slot_interface &device)
 	device.option_add("1024kflash", Z88_1024K_FLASH);   // 1024KB Flash cart
 }
 
-MACHINE_CONFIG_START(z88_state::z88)
+void z88_state::z88(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(9'830'400)/3);  // divided by 3 through the uPD65031
 	m_maincpu->set_addrmap(AS_PROGRAM, &z88_state::z88_mem);
@@ -629,21 +630,18 @@ MACHINE_CONFIG_START(z88_state::z88)
 	RAM(config, RAM_TAG).set_default_size("128K").set_extra_options("32K,64K,256K,512K");
 
 	/* cartridges */
-	device = &Z88CART_SLOT(config, m_carts[1]);
-	MCFG_DEVICE_SLOT_INTERFACE(z88_cart, nullptr, false)
-	MCFG_Z88CART_SLOT_OUT_FLP_CB(WRITELINE("blink", upd65031_device, flp_w))
+	Z88CART_SLOT(config, m_carts[1], z88_cart, nullptr);
+	m_carts[1]->out_flp_callback().set(m_blink, FUNC(upd65031_device::flp_w));
 
-	device = &Z88CART_SLOT(config, m_carts[2]);
-	MCFG_DEVICE_SLOT_INTERFACE(z88_cart, nullptr, false)
-	MCFG_Z88CART_SLOT_OUT_FLP_CB(WRITELINE("blink", upd65031_device, flp_w))
+	Z88CART_SLOT(config, m_carts[2], z88_cart, nullptr);
+	m_carts[2]->out_flp_callback().set(m_blink, FUNC(upd65031_device::flp_w));
 
-	device = &Z88CART_SLOT(config, m_carts[3]);
-	MCFG_DEVICE_SLOT_INTERFACE(z88_cart, nullptr, false)
-	MCFG_Z88CART_SLOT_OUT_FLP_CB(WRITELINE("blink", upd65031_device, flp_w))
+	Z88CART_SLOT(config, m_carts[3], z88_cart, nullptr);
+	m_carts[3]->out_flp_callback().set(m_blink, FUNC(upd65031_device::flp_w));
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "z88_cart")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_original("z88_cart");
+}
 
 
 /***************************************************************************

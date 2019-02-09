@@ -487,7 +487,7 @@ MACHINE_CONFIG_START(sauro_state::trckydoc)
 	m_mainlatch->q_out_cb<2>().set(FUNC(sauro_state::coin1_w));
 	m_mainlatch->q_out_cb<3>().set(FUNC(sauro_state::coin2_w));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_trckydoc)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_trckydoc);
 
 	MCFG_VIDEO_START_OVERRIDE(sauro_state,trckydoc)
 	MCFG_SCREEN_MODIFY("screen")
@@ -514,7 +514,7 @@ MACHINE_CONFIG_START(sauro_state::sauro)
 	MCFG_DEVICE_PROGRAM_MAP(sauro_sound_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(sauro_state, irq0_line_hold, 8 * 60) // ?
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sauro)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sauro);
 
 	MCFG_VIDEO_START_OVERRIDE(sauro_state, sauro)
 	MCFG_SCREEN_MODIFY("screen")
@@ -537,7 +537,7 @@ MACHINE_CONFIG_START(sauro_state::saurob)
 	MCFG_DEVICE_PROGRAM_MAP(saurob_sound_map)
 
 	/* sound hardware */
-	MCFG_DEVICE_REMOVE("speech")
+	config.device_remove("speech");
 
 MACHINE_CONFIG_END
 

@@ -583,11 +583,11 @@ MACHINE_CONFIG_START(vcombat_state::vcombat)
 
 /* Temporary hack for experimenting with timing. */
 #if 0
-	//MCFG_QUANTUM_TIME(attotime::from_hz(1200))
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	//config.m_minimum_quantum = attotime::from_hz(1200);
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 #endif
 
-	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
+	TLC34076(config, m_tlc34076, tlc34076_device::TLC34076_6_BIT);
 
 	/* Disabled for now as it can't handle multiple screens */
 //  MC6845(config, m_crtc, 6000000 / 16);
@@ -625,7 +625,7 @@ MACHINE_CONFIG_START(vcombat_state::shadfgtr)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	MCFG_MACHINE_RESET_OVERRIDE(vcombat_state,shadfgtr)
 
-	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
+	TLC34076(config, m_tlc34076, tlc34076_device::TLC34076_6_BIT);
 
 	MC6845(config, m_crtc, XTAL(20'000'000) / 4 / 16);
 	m_crtc->set_screen("screen");

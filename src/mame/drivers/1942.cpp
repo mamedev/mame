@@ -568,7 +568,7 @@ MACHINE_CONFIG_START(_1942_state::_1942)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_CPU_CLOCK)    /* 4 MHz ??? */
 	MCFG_DEVICE_PROGRAM_MAP(_1942_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", _1942_state, _1942_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(_1942_state::_1942_scanline), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, SOUND_CPU_CLOCK)  /* 3 MHz ??? */
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
@@ -576,7 +576,7 @@ MACHINE_CONFIG_START(_1942_state::_1942)
 
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_1942)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_1942);
 
 	PALETTE(config, m_palette, FUNC(_1942_state::_1942_palette), 64*4+4*32*8+16*16, 256);
 
@@ -641,7 +641,7 @@ MACHINE_CONFIG_START(_1942p_state::_1942p)
 
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_1942p)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_1942p);
 
 	PALETTE(config, m_palette, FUNC(_1942p_state::_1942p_palette), 0x500, 0x400);
 

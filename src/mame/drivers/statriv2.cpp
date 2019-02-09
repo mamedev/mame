@@ -650,7 +650,7 @@ MACHINE_CONFIG_START(statriv2_state::statriv2v)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 392, 0, 256, 262, 0, 256)
 
 	MCFG_VIDEO_START_OVERRIDE(statriv2_state, vertical)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_vertical)
+	m_gfxdecode->set_info(gfx_vertical);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(statriv2_state::funcsino)

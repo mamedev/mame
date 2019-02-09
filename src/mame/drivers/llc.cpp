@@ -219,7 +219,7 @@ MACHINE_CONFIG_START(llc_state::llc1)
 	MCFG_SCREEN_UPDATE_DRIVER(llc_state, screen_update_llc1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_llc1)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_llc1);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 	config.set_default_layout(layout_llc1);
 
@@ -262,7 +262,7 @@ MACHINE_CONFIG_START(llc_state::llc2)
 	MCFG_SCREEN_UPDATE_DRIVER(llc_state, screen_update_llc2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_llc2)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_llc2);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */

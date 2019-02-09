@@ -83,9 +83,9 @@ READ8_MEMBER(eprom_state::adc_r)
 	if (!m_adc.found())
 		return 0xff;
 
-	uint8_t result = m_adc->data_r(space, 0);
+	uint8_t result = m_adc->data_r();
 	if (!machine().side_effects_disabled())
-		m_adc->address_offset_start_w(space, offset, 0);
+		m_adc->address_offset_start_w(offset, 0);
 	return result;
 }
 
@@ -389,7 +389,7 @@ MACHINE_CONFIG_START(eprom_state::eprom)
 	MCFG_DEVICE_ADD("extra", M68000, ATARI_CLOCK_14MHz/2)
 	MCFG_DEVICE_PROGRAM_MAP(extra_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	ADC0809(config, m_adc, ATARI_CLOCK_14MHz/16);
 	m_adc->in_callback<0>().set_ioport("ADC0");
@@ -402,7 +402,7 @@ MACHINE_CONFIG_START(eprom_state::eprom)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_eprom)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_eprom);
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, eprom_state, get_playfield_tile_info, 8,8, SCAN_COLS, 64,64)
@@ -439,14 +439,14 @@ MACHINE_CONFIG_START(eprom_state::klaxp)
 	MCFG_DEVICE_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	config.m_minimum_quantum = attotime::from_hz(600);
 
 	EEPROM_2804(config, "eeprom").lock_after_write(true);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_eprom)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_eprom);
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, eprom_state, get_playfield_tile_info, 8,8, SCAN_COLS, 64,64)
@@ -482,7 +482,7 @@ MACHINE_CONFIG_START(eprom_state::guts)
 	MCFG_DEVICE_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
 	MCFG_DEVICE_PROGRAM_MAP(guts_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	config.m_minimum_quantum = attotime::from_hz(600);
 
 	ADC0809(config, m_adc, ATARI_CLOCK_14MHz/16);
 	m_adc->in_callback<0>().set_ioport("ADC0");
@@ -495,7 +495,7 @@ MACHINE_CONFIG_START(eprom_state::guts)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_guts)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_guts);
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, eprom_state, guts_get_playfield_tile_info, 8,8, SCAN_COLS, 64,64)

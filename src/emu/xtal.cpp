@@ -91,6 +91,7 @@ const double XTAL::known_xtals[] = {
 	  3'686'400, /* 3.6864_MHz_XTAL        Baud rate clock for MC68681 and similar UARTs */
 	  3'840'000, /* 3.84_MHz_XTAL          Fairlight CMI Alphanumeric Keyboard */
 	  3'900'000, /* 3.9_MHz_XTAL           Resonator - Used on some Fidelity boards */
+	  3'932'160, /* 3.93216_MHz_XTAL       Apple Lisa COP421 (197-0016A) */
 	  4'000'000, /* 4_MHz_XTAL             - */
 	  4'028'000, /* 4.028_MHz_XTAL         Sony SMC-777 */
 	  4'032'000, /* 4.032_MHz_XTAL         GRiD Compass modem board */
@@ -137,6 +138,7 @@ const double XTAL::known_xtals[] = {
 	  8'867'238, /* 8.867238_MHz_XTAL      ETI-660 (~2x PAL subcarrier) */
 	  8'945'000, /* 8.945_MHz_XTAL         Hit Me */
 	  9'216'000, /* 9.216_MHz_XTAL         Conitec PROF-180X */
+	  9'600'000, /* 9.6_MHz_XTAL           WD37C65 second clock (for 300 KB/sec rate) */
 	  9'828'000, /* 9.828_MHz_XTAL         Universal PCBs */
 	  9'830'400, /* 9.8304_MHz_XTAL        Epson PX-8 */
 	  9'832'000, /* 9.832_MHz_XTAL         Robotron A7150 */
@@ -199,6 +201,7 @@ const double XTAL::known_xtals[] = {
 	 14'318'181, /* 14.318181_MHz_XTAL     Extremely common, used on 100's of PCBs (4x NTSC subcarrier) */
 	 14'580'000, /* 14.58_MHz_XTAL         Fortune 32:16 Video Controller */
 	 14'705'882, /* 14.705882_MHz_XTAL     Aleck64 */
+	 14'742'800, /* 14.7428_MHz_XTAL       ADM 23 */
 	 14'745'600, /* 14.7456_MHz_XTAL       Namco System 12 & System Super 22/23 for JVS */
 	 14'784'000, /* 14.784_MHz_XTAL        Zenith Z-29 */
 	 14'916'000, /* 14.916_MHz_XTAL        ADDS Viewpoint 122 */
@@ -212,6 +215,7 @@ const double XTAL::known_xtals[] = {
 	 15'400'000, /* 15.4_MHz_XTAL          DVK KSM */
 	 15'468'480, /* 15.46848_MHz_XTAL      Bank Panic h/w, Sega G80 */
 	 15'582'000, /* 15.582_MHz_XTAL        Zentec Zephyr */
+	 15'667'200, /* 15.6672_MHz_XTAL       Apple Macintosh */
 	 15'700'000, /* 15.700_MHz_XTAL        Motogonki */
 	 15'897'600, /* 15.8976_MHz_XTAL       IAI Swyft */
 	 15'920'000, /* 15.92_MHz_XTAL         HP Integral PC */
@@ -219,6 +223,8 @@ const double XTAL::known_xtals[] = {
 	 16'000'000, /* 16_MHz_XTAL            Extremely common, used on 100's of PCBs */
 	 16'097'280, /* 16.09728_MHz_XTAL      DEC VT240 (1024 * 262 * 60) */
 	 16'128'000, /* 16.128_MHz_XTAL        Fujitsu FM-7 */
+	 16'257'000, /* 16.257_MHz_XTAL        IBM PC MDA & EGA */
+	 16'364'000, /* 16.364_MHz_XTAL        Corvus Concept */
 	 16'384'000, /* 16.384_MHz_XTAL        - */
 	 16'400'000, /* 16.4_MHz_XTAL          MS 6102 */
 	 16'572'000, /* 16.572_MHz_XTAL        Micro-Term ACT-5A */
@@ -237,12 +243,14 @@ const double XTAL::known_xtals[] = {
 	 17'734'472, /* 17.734472_MHz_XTAL     actually ~4x PAL subcarrier */
 	 17'971'200, /* 17.9712_MHz_XTAL       Compucolor II, Hazeltine Esprit III */
 	 18'000'000, /* 18_MHz_XTAL            S.A.R, Ikari Warriors 3 */
+	 18'414'000, /* 18.414_MHz_XTAL        Ann Arbor Ambassador */
 	 18'432'000, /* 18.432_MHz_XTAL        Extremely common, used on 100's of PCBs (48000 * 384) */
 	 18'480'000, /* 18.48_MHz_XTAL         Wyse WY-100 video */
 	 18'575'000, /* 18.575_MHz_XTAL        Visual 102, Visual 220 */
 	 18'720'000, /* 18.72_MHz_XTAL         Nokia MikroMikko 1 */
 	 18'869'600, /* 18.8696_MHz_XTAL       Memorex 2178 */
 	 19'339'600, /* 19.3396_MHz_XTAL       TeleVideo TVI-955 80-column display clock */
+	 19'584'000, /* 19.584_MHz_XTAL        ADM-42 */
 	 19'600'000, /* 19.6_MHz_XTAL          Universal Mr. Do - Model 8021 PCB */
 	 19'602'000, /* 19.602_MHz_XTAL        Ampex 210+ 80-column display clock */
 	 19'660'800, /* 19.6608_MHz_XTAL       Euro League (bootleg), labeled as "UKI 19.6608 20PF" */
@@ -252,6 +260,7 @@ const double XTAL::known_xtals[] = {
 	 20'000'000, /* 20_MHz_XTAL            - */
 	 20'160'000, /* 20.16_MHz_XTAL         Nintendo 8080 */
 	 20'275'200, /* 20.2752_MHz_XTAL       TRS-80 Model III */
+	 20'375'040, /* 20.37504_MHz_XTAL      Apple Lisa dot clock (197-0019A) */
 	 20'625'000, /* 20.625_MHz_XTAL        SM 7238 */
 	 20'790'000, /* 20.79_MHz_XTAL         Blockade-hardware Gremlin games */
 	 21'000'000, /* 21_MHz_XTAL            Lock-On pixel clock */
@@ -277,6 +286,7 @@ const double XTAL::known_xtals[] = {
 	 24'883'200, /* 24.8832_MHz_XTAL       DEC VT100 */
 	 25'000'000, /* 25_MHz_XTAL            Namco System 22, Taito GNET, Dogyuun h/w */
 	 25'174'800, /* 25.1748_MHz_XTAL       Sega System 16A/16B (1600x NTSC line rate) */
+	 25'175'000, /* 25.175_MHz_XTAL        IBM MCGA/VGA 320/640-pixel graphics */
 	 25'200'000, /* 25.2_MHz_XTAL          Tektronix 4404 video clock */
 	 25'398'360, /* 25.39836_MHz_XTAL      Tandberg TDV 2324 */
 	 25'400'000, /* 25.4_MHz_XTAL          PC9801-86 PCM base clock */
@@ -335,6 +345,7 @@ const double XTAL::known_xtals[] = {
 	 39'710'000, /* 39.71_MHz_XTAL         Wyse WY-60 132-column display clock */
 	 40'000'000, /* 40_MHz_XTAL            - */
 	 40'210'000, /* 40.21_MHz_XTAL         Fairlight CMI IIx */
+	 41'539'000, /* 41.539_MHz_XTAL        IBM PS/2 132-column text mode */
 	 42'000'000, /* 42_MHz_XTAL            BMC A-00211 - Popo Bear */
 	 42'105'200, /* 42.1052_MHz_XTAL       NEC PC-88xx */
 	 42'954'545, /* 42.954545_MHz_XTAL     CPS3 (12x NTSC subcarrier)*/
@@ -342,6 +353,7 @@ const double XTAL::known_xtals[] = {
 	 44'100'000, /* 44.1_MHz_XTAL          Subsino's Bishou Jan */
 	 44'236'800, /* 44.2368_MHz_XTAL       ReCo6502, Fortune 32:16 */
 	 44'452'800, /* 44.4528_MHz_XTAL       TeleVideo 965 */
+	 44'900'000, /* 44.9_MHz_XTAL          IBM 8514 1024x768 43.5Hz graphics */
 	 45'000'000, /* 45_MHz_XTAL            Eolith with Hyperstone CPUs */
 	 45'158'000, /* 45.158_MHz_XTAL        Sega Model 2A video board, Model 3 CPU board */
 	 45'619'200, /* 45.6192_MHz_XTAL       DEC VK100 */
@@ -382,6 +394,7 @@ const double XTAL::known_xtals[] = {
 	 77'414'400, /* 77.4144_MHz_XTAL       NCD17c */
 	 80'000'000, /* 80_MHz_XTAL            ARM710 */
 	 87'183'360, /* 87.18336_MHz_XTAL      AT&T 630 MTG */
+	 92'940'500, /* 92.9405_MHz_XTAL       Sun cgthree */
 	100'000'000, /* 100_MHz_XTAL           PSX-based Namco System 12, Vegas, Sony ZN1-2-based */
 	101'491'200, /* 101.4912_MHz_XTAL      PSX-based Namco System 10 */
 	108'108'000, /* 108.108_MHz_XTAL       HP 98550 high-res color card */

@@ -1598,7 +1598,7 @@ MACHINE_CONFIG_START(pc88va_state::pc88va)
 	MCFG_DEVICE_PROGRAM_MAP(pc88va_z80_map)
 	MCFG_DEVICE_IO_MAP(pc88va_z80_io_map)
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 #endif
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1609,7 +1609,7 @@ MACHINE_CONFIG_START(pc88va_state::pc88va)
 
 	MCFG_PALETTE_ADD("palette", 32)
 //  MCFG_PALETTE_INIT_OWNER(pc88va_state, pc8801 )
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pc88va)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pc88va);
 
 	i8255_device &d8255_2(I8255(config, "d8255_2"));
 	d8255_2.in_pa_callback().set("d8255_2s", FUNC(i8255_device::pb_r));
@@ -1653,7 +1653,7 @@ MACHINE_CONFIG_START(pc88va_state::pc88va)
 	m_fdc->drq_wr_callback().set(FUNC(pc88va_state::fdc_drq));
 	FLOPPY_CONNECTOR(config, m_fdd[0], pc88va_floppies, "525hd", pc88va_state::floppy_formats);
 	FLOPPY_CONNECTOR(config, m_fdd[1], pc88va_floppies, "525hd", pc88va_state::floppy_formats);
-	MCFG_SOFTWARE_LIST_ADD("disk_list","pc88va")
+	SOFTWARE_LIST(config, "disk_list").set_original("pc88va");
 
 	pit8253_device &pit8253(PIT8253(config, "pit8253", 0));
 	pit8253.set_clk<0>(8000000); /* general purpose timer 1 */

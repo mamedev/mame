@@ -566,29 +566,13 @@ WRITE8_MEMBER(mystwarr_state::sound_ctrl_w)
    quite similar to xexex/gijoe/asterix's sound.
  */
 
-void mystwarr_state::mystwarr_sound_map(address_map &map)
-{
-	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("z80bank");
-	map(0x0000, 0xbfff).nopw();
-	map(0xc000, 0xdfff).ram();
-	map(0xe000, 0xe22f).rw(m_k054539_1, FUNC(k054539_device::read), FUNC(k054539_device::write));
-	map(0xe230, 0xe3ff).ram();
-	map(0xe400, 0xe62f).rw(m_k054539_2, FUNC(k054539_device::read), FUNC(k054539_device::write));
-	map(0xe630, 0xe7ff).ram();
-	map(0xf000, 0xf003).m(m_k054321, FUNC(k054321_device::sound_map));
-	map(0xf800, 0xf800).w(FUNC(mystwarr_state::sound_ctrl_w));
-	map(0xfff0, 0xfff3).nopw();    // unknown write
-}
-
-
 void mystwarr_state::martchmp_sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("z80bank");
 	map(0x0000, 0xbfff).nopw();
 	map(0xc000, 0xdfff).ram();
-	map(0xe000, 0xe22f).rw("k054539", FUNC(k054539_device::read), FUNC(k054539_device::write));
+	map(0xe000, 0xe22f).rw(m_k054539_1, FUNC(k054539_device::read), FUNC(k054539_device::write));
 	map(0xe230, 0xe3ff).ram();
 	map(0xe400, 0xe62f).noprw();
 	map(0xe630, 0xe7ff).ram();
@@ -598,9 +582,10 @@ void mystwarr_state::martchmp_sound_map(address_map &map)
 }
 
 
-void mystwarr_state::mystwarr_k054539_map(address_map &map)
+void mystwarr_state::mystwarr_sound_map(address_map &map)
 {
-	map(0x000000, 0x3fffff).rom().region("k054539", 0);
+	martchmp_sound_map(map);
+	map(0xe400, 0xe62f).rw(m_k054539_2, FUNC(k054539_device::read), FUNC(k054539_device::write));
 }
 
 
@@ -923,10 +908,9 @@ MACHINE_RESET_MEMBER(mystwarr_state,metamrph)
 MACHINE_RESET_MEMBER(mystwarr_state,martchmp)
 {
 	int i;
-	k054539_device *k054539 = subdevice<k054539_device>("k054539");
 
 	// boost voice(chip 0 channel 4-7)
-	for (i=4; i<=7; i++) k054539->set_gain(i, 1.4);
+	for (i=4; i<=7; i++) m_k054539_1->set_gain(i, 1.4);
 }
 
 MACHINE_RESET_MEMBER(mystwarr_state,gaiapols)
@@ -996,13 +980,13 @@ void mystwarr_state::mystwarr(machine_config &config)
 	K054321(config, m_k054321, "lspeaker", "rspeaker");
 
 	K054539(config, m_k054539_1, XTAL(18'432'000));
-	m_k054539_1->set_addrmap(0, &mystwarr_state::mystwarr_k054539_map);
+	m_k054539_1->set_device_rom_tag("k054539");
 	m_k054539_1->timer_handler().set(FUNC(mystwarr_state::k054539_nmi_gen));
 	m_k054539_1->add_route(0, "rspeaker", 1.0);    /* stereo channels are inverted */
 	m_k054539_1->add_route(1, "lspeaker", 1.0);
 
 	K054539(config, m_k054539_2, XTAL(18'432'000));
-	m_k054539_2->set_addrmap(0, &mystwarr_state::mystwarr_k054539_map);
+	m_k054539_2->set_device_rom_tag("k054539");
 	m_k054539_2->add_route(0, "rspeaker", 1.0);    /* stereo channels are inverted */
 	m_k054539_2->add_route(1, "lspeaker", 1.0);
 }
@@ -1150,13 +1134,7 @@ void mystwarr_state::martchmp(machine_config &config)
 	m_k055673->set_sprite_callback(FUNC(mystwarr_state::martchmp_sprite_callback), this);
 	m_k055673->set_config("gfx2", K055673_LAYOUT_GX, -58, -23);
 
-	config.device_remove("k054539_1");
 	config.device_remove("k054539_2");
-
-	k054539_device &k054539(K054539(config, "k054539", XTAL(18'432'000)));
-	k054539.timer_handler().set(FUNC(mystwarr_state::k054539_nmi_gen));
-	k054539.add_route(0, "rspeaker", 1.0);    /* stereo channels are inverted */
-	k054539.add_route(1, "lspeaker", 1.0);
 }
 
 /**********************************************************************************/

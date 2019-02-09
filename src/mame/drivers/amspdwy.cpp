@@ -68,7 +68,7 @@ READ8_MEMBER(amspdwy_state::amspdwy_wheel_1_r)
 
 READ8_MEMBER(amspdwy_state::amspdwy_sound_r)
 {
-	return (m_ym2151->status_r(space, 0) & ~0x30) | ioport("IN0")->read();
+	return (m_ym2151->status_r() & ~0x30) | ioport("IN0")->read();
 }
 
 void amspdwy_state::amspdwy_map(address_map &map)
@@ -258,7 +258,7 @@ MACHINE_CONFIG_START(amspdwy_state::amspdwy)
 	MCFG_DEVICE_ADD("audiocpu", Z80, 3000000)
 	MCFG_DEVICE_PROGRAM_MAP(amspdwy_sound_map)
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

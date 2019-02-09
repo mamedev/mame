@@ -400,7 +400,7 @@ MACHINE_CONFIG_START(shangkid_state::chinhero)
 	mainlatch.q_out_cb<6>().set(FUNC(shangkid_state::coin_counter_1_w));
 	mainlatch.q_out_cb<7>().set(FUNC(shangkid_state::coin_counter_2_w));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	config.m_minimum_quantum = attotime::from_hz(600);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -450,7 +450,7 @@ MACHINE_CONFIG_START(shangkid_state::shangkid)
 	MCFG_MACHINE_RESET_OVERRIDE(shangkid_state,shangkid)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_shangkid)
+	m_gfxdecode->set_info(gfx_shangkid);
 
 	m_aysnd->port_a_write_callback().set(FUNC(shangkid_state::shangkid_ay8910_porta_w));
 MACHINE_CONFIG_END

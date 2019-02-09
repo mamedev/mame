@@ -165,10 +165,8 @@ MACHINE_CONFIG_START( olytext_state::olytext )
 
 	/* devices */
 	WD1772(config, "fdc", 16_MHz_XTAL / 8); // divisor guess
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", olytext_floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", olytext_floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, "fdc:0", olytext_floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", olytext_floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
 
 	/* keyboard */
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));

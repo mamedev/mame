@@ -19,18 +19,16 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_spriteram(*this, "spriteram")
 		, m_pf_rowscroll(*this, "pf%u_rowscroll", 1)
-		, m_deco146(*this, "ioprot")
-		, m_sprgen(*this, "spritegen")
 		, m_maincpu(*this, "maincpu")
 		, m_audiocpu(*this, "audiocpu")
+		, m_deco146(*this, "ioprot")
+		, m_sprgen(*this, "spritegen")
 		, m_deco_tilegen(*this, "tilegen")
 	{ }
 
 	void funkyjet(machine_config &config);
-	void funkyjetb(machine_config &config);
 
 	void init_funkyjet();
-	void init_funkyjetb();
 
 private:
 	/* memory pointers */
@@ -38,16 +36,16 @@ private:
 	required_shared_ptr_array<uint16_t, 2> m_pf_rowscroll;
 
 	/* devices */
-	optional_device<deco146_device> m_deco146;
-	required_device<decospr_device> m_sprgen;
 	required_device<cpu_device> m_maincpu;
-	optional_device<h6280_device> m_audiocpu;
+	required_device<h6280_device> m_audiocpu;
+	required_device<deco146_device> m_deco146;
+	required_device<decospr_device> m_sprgen;
 	required_device<deco16ic_device> m_deco_tilegen;
+
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ16_MEMBER( funkyjet_protection_region_0_146_r );
 	DECLARE_WRITE16_MEMBER( funkyjet_protection_region_0_146_w );
 	void funkyjet_map(address_map &map);
-	void funkyjetb_map(address_map &map);
 	void sound_map(address_map &map);
 };

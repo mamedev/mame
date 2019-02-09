@@ -282,7 +282,7 @@ MACHINE_CONFIG_START(wrally_state::wrally)
 	MCFG_SCREEN_UPDATE_DRIVER(wrally_state, screen_update)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_wrally)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_wrally);
 	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 1024*8);
 
 	GAELCO_WRALLY_SPRITES(config, m_sprites, 0);

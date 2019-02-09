@@ -314,7 +314,7 @@ MACHINE_CONFIG_START(mystston_state::mystston_video)
 	MCFG_VIDEO_START_OVERRIDE(mystston_state,mystston)
 	MCFG_VIDEO_RESET_OVERRIDE(mystston_state,mystston)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mystston)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mystston);
 	MCFG_PALETTE_ADD("palette", 0x40)
 
 	MCFG_SCREEN_ADD("screen", RASTER)

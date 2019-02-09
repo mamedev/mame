@@ -649,7 +649,7 @@ MACHINE_CONFIG_START(ddealer_state::ddealer)
 
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 0x200);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("coinsim", ddealer_state, mcu_sim, attotime::from_hz(10000))
+	TIMER(config, "coinsim").configure_periodic(FUNC(ddealer_state::mcu_sim), attotime::from_hz(10000));
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(6'000'000) / 8) /* 7.5KHz */

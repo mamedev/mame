@@ -273,7 +273,7 @@ MACHINE_CONFIG_START(peoplepc_state::olypeopl)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(22'000'000),640,0,640,475,0,475)
 	MCFG_SCREEN_UPDATE_DEVICE( "h46505", mc6845_device, screen_update )
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfxdecode_device::empty);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	h46505_device &crtc(H46505(config, "h46505", XTAL(22'000'000)/8));
@@ -293,8 +293,8 @@ MACHINE_CONFIG_START(peoplepc_state::olypeopl)
 	UPD765A(config, m_fdc, 8'000'000, true, true);
 	m_fdc->intrq_wr_callback().set("pic8259_0", FUNC(pic8259_device::ir2_w));
 	m_fdc->drq_wr_callback().set(m_dmac, FUNC(i8257_device::dreq0_w));
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", peoplepc_floppies, "525qd", peoplepc_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", peoplepc_floppies, "525qd", peoplepc_state::floppy_formats)
+	FLOPPY_CONNECTOR(config, "upd765:0", peoplepc_floppies, "525qd", peoplepc_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765:1", peoplepc_floppies, "525qd", peoplepc_state::floppy_formats);
 
 	I8251(config, m_8251key, 0);
 	m_8251key->rxrdy_handler().set("pic8259_1", FUNC(pic8259_device::ir1_w));

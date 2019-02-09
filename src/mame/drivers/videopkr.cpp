@@ -1243,7 +1243,7 @@ MACHINE_CONFIG_START(videopkr_state::videopkr)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("t1_timer", videopkr_state, sound_t1_callback, attotime::from_hz(50))
+	TIMER(config, "t1_timer").configure_periodic(FUNC(videopkr_state::sound_t1_callback), attotime::from_hz(50));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1254,7 +1254,7 @@ MACHINE_CONFIG_START(videopkr_state::videopkr)
 	MCFG_SCREEN_UPDATE_DRIVER(videopkr_state, screen_update_videopkr)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_videopkr)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_videopkr);
 	PALETTE(config, "palette", FUNC(videopkr_state::videopkr_palette), 256);
 
 	/* sound hardware */
@@ -1288,7 +1288,7 @@ MACHINE_CONFIG_START(videopkr_state::videodad)
 	MCFG_SCREEN_SIZE(32*16, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(4*16, 31*16-1, 2*8, 30*8-1)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_videodad)
+	m_gfxdecode->set_info(gfx_videodad);
 	MCFG_VIDEO_START_OVERRIDE(videopkr_state,vidadcba)
 MACHINE_CONFIG_END
 
@@ -1315,7 +1315,7 @@ MACHINE_CONFIG_START(videopkr_state::babypkr)
 	MCFG_SCREEN_VISIBLE_AREA(5*16, 31*16-1, 3*8, 29*8-1)
 
 	subdevice<palette_device>("palette")->set_init(FUNC(videopkr_state::babypkr_palette));
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_videodad)
+	m_gfxdecode->set_info(gfx_videodad);
 	MCFG_VIDEO_START_OVERRIDE(videopkr_state,vidadcba)
 
 	AY8910(config, m_aysnd, CPU_CLOCK / 6).add_route(ALL_OUTPUTS, "speaker", 0.3); /* no ports used */

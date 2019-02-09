@@ -31,14 +31,15 @@ DEFINE_DEVICE_TYPE(POFO_HPC104_2, pofo_hpc104_2_device, "pofo_hpc104_2", "Atari 
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(pofo_hpc104_device::device_add_mconfig)
-	MCFG_PORTFOLIO_MEMORY_CARD_SLOT_ADD(PORTFOLIO_MEMORY_CARD_SLOT_B_TAG, portfolio_memory_cards, nullptr)
+void pofo_hpc104_device::device_add_mconfig(machine_config &config)
+{
+	PORTFOLIO_MEMORY_CARD_SLOT(config, m_ccm, portfolio_memory_cards, nullptr);
 
-	MCFG_PORTFOLIO_EXPANSION_SLOT_ADD(PORTFOLIO_EXPANSION_SLOT_TAG, XTAL(4'915'200), portfolio_expansion_cards, nullptr)
-	MCFG_PORTFOLIO_EXPANSION_SLOT_EINT_CALLBACK(WRITELINE(DEVICE_SELF_OWNER, portfolio_expansion_slot_device, eint_w))
-	MCFG_PORTFOLIO_EXPANSION_SLOT_NMIO_CALLBACK(WRITELINE(DEVICE_SELF_OWNER, portfolio_expansion_slot_device, nmio_w))
-	MCFG_PORTFOLIO_EXPANSION_SLOT_WAKE_CALLBACK(WRITELINE(DEVICE_SELF_OWNER, portfolio_expansion_slot_device, wake_w))
-MACHINE_CONFIG_END
+	PORTFOLIO_EXPANSION_SLOT(config, m_exp, XTAL(4'915'200), portfolio_expansion_cards, nullptr);
+	m_exp->eint_wr_callback().set(DEVICE_SELF_OWNER, FUNC(portfolio_expansion_slot_device::eint_w));
+	m_exp->nmio_wr_callback().set(DEVICE_SELF_OWNER, FUNC(portfolio_expansion_slot_device::nmio_w));
+	m_exp->wake_wr_callback().set(DEVICE_SELF_OWNER, FUNC(portfolio_expansion_slot_device::wake_w));
+}
 
 
 //-------------------------------------------------

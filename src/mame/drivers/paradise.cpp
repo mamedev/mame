@@ -741,7 +741,7 @@ MACHINE_CONFIG_START(paradise_state::paradise)
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(54) /* 54 verified */
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */    /* we're using PORT_VBLANK */)
 	MCFG_SCREEN_SIZE(256, 256)
@@ -779,21 +779,20 @@ MACHINE_CONFIG_START(paradise_state::torus)
 	MCFG_DEVICE_PROGRAM_MAP(torus_map)
 	MCFG_DEVICE_IO_MAP(torus_io_map)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_torus)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(paradise_state, screen_update_torus)
+	m_gfxdecode->set_info(gfx_torus);
+	m_screen->set_screen_update(FUNC(paradise_state::screen_update_torus));
 
-	MCFG_DEVICE_REMOVE("oki2")
+	config.device_remove("oki2");
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(paradise_state::madball)
+void paradise_state::madball(machine_config &config)
+{
 	torus(config);
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_madball)
+	m_gfxdecode->set_info(gfx_madball);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(paradise_state, screen_update_madball)
-MACHINE_CONFIG_END
+	m_screen->set_screen_update(FUNC(paradise_state::screen_update_madball));
+}
 
 MACHINE_CONFIG_START(paradise_state::penky)
 	paradise(config);
@@ -805,13 +804,14 @@ MACHINE_CONFIG_START(paradise_state::penky)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(paradise_state::penkyi)
+void paradise_state::penkyi(machine_config &config)
+{
 	penky(config);
 
 	// TODO add ticket dispenser
 
-	MCFG_DEVICE_REMOVE("oki2")
-MACHINE_CONFIG_END
+	config.device_remove("oki2");
+}
 
 /***************************************************************************
 

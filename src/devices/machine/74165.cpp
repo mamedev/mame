@@ -22,9 +22,10 @@ DEFINE_DEVICE_TYPE(TTL165, ttl165_device, "ttl165", "SN54/74165")
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(ttl165_device::device_add_mconfig)
-	MCFG_TIMER_DRIVER_ADD("timer", ttl165_device, qh_output)
-MACHINE_CONFIG_END
+void ttl165_device::device_add_mconfig(machine_config &config)
+{
+	TIMER(config, m_timer).configure_generic(FUNC(ttl165_device::qh_output));
+}
 
 
 //**************************************************************************

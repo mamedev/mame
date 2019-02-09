@@ -228,7 +228,7 @@ void superdq_state::superdq_io(address_map &map)
 	map(0x01, 0x01).portr("IN1");
 	map(0x02, 0x02).portr("DSW1");
 	map(0x03, 0x03).portr("DSW2");
-	map(0x04, 0x04).r(FUNC(superdq_state::superdq_ld_r)).w("snsnd", FUNC(sn76496_device::command_w));
+	map(0x04, 0x04).r(FUNC(superdq_state::superdq_ld_r)).w("snsnd", FUNC(sn76496_device::write));
 	map(0x08, 0x08).w(FUNC(superdq_state::superdq_io_w));
 	map(0x0c, 0x0d).noprw(); /* HD46505S */
 }

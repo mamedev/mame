@@ -2274,7 +2274,7 @@ ROM_START( scud )   /* step 1.5, Sega game ID# is 833-13041, ROM board ID# 834-1
 	ROM_LOAD( "epr-19338a.bin", 0x000000, 0x010000, CRC(c9fac464) SHA1(47b9ab7921a685c01629afb592d597faa11d2bd6) )
 ROM_END
 
-ROM_START( scudj )  /* step 1.5, Sega game ID# is 833-13041, ROM board ID# 12934 SPG DX */
+ROM_START( scudj )  /* step 1.5, Sega game ID# is 833-13041, ROM board ID# 12934 SPG DX, Digital Audio board ID# 837-12941 */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-19610a.17",  0x0600006,  0x80000,  CRC(53f5cd94) SHA1(e27609165087ef7000b61ce628883561ffe64b22) )
@@ -3124,7 +3124,7 @@ ROM_START( lostwsga )   /* Step 1.5, PCB cage labeled 834-13172 THE LOST WORLD U
 	ROM_FILL( 0x000000, 0x800000, 0x0000 )
 ROM_END
 
-ROM_START( lostwsgo )   /* Step 1.5, build 1997/06/24, possible original "no revision" release */
+ROM_START( lostwsgp )   /* Step 1.5, build 1997/06/24, location test or preview version, about half of game is available, Stage 3-2 ends with "Coming Soon?" */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "ic17.17",  0x600006, 0x080000, CRC(9e94afdb) SHA1(c66ebc6f1ec34475f67cfc8dc66fa8634a59432b) )
@@ -4311,6 +4311,7 @@ ROM_START( swtrilgy )   /* Step 2.1, Sega game ID# is 833-13586, ROM board ID# 8
 	ROM_LOAD( "mpr-21378.24", 0xc00000, 0x400000, CRC(1fcf715e) SHA1(9706f36e7a61d885d34a6974311a2410fe3d6760) )
 
 	ROM_REGION( 0x10000, "ffcpu", 0 )   /* force feedback controller prg */
+	ROM_LOAD( "dvctbd.bin",     0x00000, 0x10000, CRC(f5208c59) SHA1(f8216b2dc0dac94dcbcf4f8f09dc606777251209) ) // ROM label unknown, not clear if older or newer than epr-21119
 	ROM_LOAD( "epr-21119.ic8",  0x00000, 0x10000, CRC(65082b14) SHA1(6c3c192dd6ef3780c6202dd63fc6086328928818) )
 
 	//             ????     317-0241-COM   Model 3
@@ -6545,7 +6546,7 @@ GAME( 1996, scuda,       scud,      scud, scud,     model3_state,     init_scud,
 GAME( 1997, scudplus,    scud,      scud, scud,     model3_state, init_scudplus, ROT0, "Sega", "Scud Race Plus (Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, scudplusa,   scud,      scud, scud,     model3_state,init_scudplusa, ROT0, "Sega", "Scud Race Plus", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, lostwsga,       0, model3_15, lostwsga, model3_state, init_lostwsga, ROT0, "Sega", "The Lost World (Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1997, lostwsgo,lostwsga, model3_15, lostwsga, model3_state, init_lostwsga, ROT0, "Sega", "The Lost World (older)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, lostwsgp,lostwsga, model3_15, lostwsga, model3_state, init_lostwsga, ROT0, "Sega", "The Lost World (location test)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, vs215,        vs2, model3_15, model3,   model3_state,    init_vs215, ROT0, "Sega", "Virtua Striker 2 (Step 1.5, Export, USA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, vs215o,       vs2, model3_15, model3,   model3_state,    init_vs215, ROT0, "Sega", "Virtua Striker 2 (Step 1.5, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, lemans24,       0, model3_15, scud,     model3_state, init_lemans24, ROT0, "Sega", "Le Mans 24 (Revision B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

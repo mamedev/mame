@@ -65,7 +65,7 @@ PS4  J8635      PS4  J8541       PS4  J8648
 
 READ8_MEMBER(mexico86_state::kiki_ym2203_r)
 {
-	u8 result = m_ymsnd->read(space, offset);
+	u8 result = m_ymsnd->read(offset);
 
 	if (offset == 0)
 		result &= 0x7f;

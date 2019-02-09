@@ -358,7 +358,7 @@ MACHINE_CONFIG_START(gcpinbal_state::gcpinbal)
 	MCFG_DEVICE_ADD("maincpu", M68000, 32_MHz_XTAL/2) /* 16 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(gcpinbal_map)
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", gcpinbal_state, scanline_cb, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(gcpinbal_state::scanline_cb), "screen", 0, 1);
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 

@@ -647,7 +647,7 @@ MACHINE_CONFIG_START(ssem_state::ssem)
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", ssem_state, ssem_store, "snp,asm", 1)
+	MCFG_QUICKLOAD_ADD("quickload", ssem_state, ssem_store, "snp,asm", attotime::from_seconds(1))
 MACHINE_CONFIG_END
 
 

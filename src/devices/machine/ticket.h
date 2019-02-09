@@ -21,22 +21,6 @@
 DECLARE_DEVICE_TYPE(TICKET_DISPENSER, ticket_dispenser_device)
 DECLARE_DEVICE_TYPE(HOPPER, hopper_device)
 
-
-//**************************************************************************
-//  DEVICE CONFIGURATION MACROS
-//**************************************************************************
-
-// add/remove dispensers
-#define MCFG_TICKET_DISPENSER_ADD(_tag, _period_in_msec, _motor_sense, _status_sense) \
-	MCFG_DEVICE_ADD(_tag, TICKET_DISPENSER, 0) \
-	downcast<ticket_dispenser_device &>(*device).set_period(_period_in_msec); \
-	downcast<ticket_dispenser_device &>(*device).set_senses(_motor_sense, _status_sense, false);
-
-#define MCFG_HOPPER_ADD(_tag, _period_in_msec, _motor_sense, _status_sense) \
-	MCFG_DEVICE_ADD(_tag, TICKET_DISPENSER, 0) \
-	downcast<ticket_dispenser_device &>(*device).set_period(_period_in_msec); \
-	downcast<ticket_dispenser_device &>(*device).set_senses(_motor_sense, _status_sense, true);
-
 //**************************************************************************
 //  CONSTANTS
 //**************************************************************************

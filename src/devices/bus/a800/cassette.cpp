@@ -28,12 +28,13 @@ TODO:
 DEFINE_DEVICE_TYPE(A8SIO_CASSETTE, a8sio_cassette_device, "a8sio_cass", "Atari 8 bit cassette")
 const device_timer_id TIMER_CASSETTE_READ = 1;
 
-MACHINE_CONFIG_START(a8sio_cassette_device::device_add_mconfig)
-	MCFG_CASSETTE_ADD("cassette")
-	//MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
-	MCFG_CASSETTE_INTERFACE("atari8bit_cass")
-MACHINE_CONFIG_END
+void a8sio_cassette_device::device_add_mconfig(machine_config &config)
+{
+	CASSETTE(config, m_cassette);
+	//m_cassette->set_default_state(CASSETTE_STOPPED);
+	m_cassette->set_default_state(CASSETTE_PLAY);
+	m_cassette->set_interface("atari8bit_cass");
+}
 
 //**************************************************************************
 //  LIVE DEVICE

@@ -56,6 +56,8 @@ public:
 	// construction/destruction
 	g65816_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	auto wdm_handler() { return m_wdm_w.bind(); }
+
 protected:
 	/* Registers - used by g65816_set_reg() and g65816_get_reg() */
 	enum
@@ -96,6 +98,7 @@ protected:
 	address_space_config m_data_config;
 	address_space_config m_opcode_config;
 	address_space_config m_vector_config;
+	devcb_write8 m_wdm_w;     /* WDM callback */
 
 	typedef void (g65816_device::*opcode_func) ();
 	typedef unsigned (g65816_device::*get_reg_func)(int regnum);

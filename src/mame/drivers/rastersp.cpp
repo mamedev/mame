@@ -954,6 +954,24 @@ ROM_START( rotr )
 ROM_END
 
 
+ROM_START( rotra )
+	ROM_REGION(0x100000, "bios", 0)
+	ROM_LOAD( "rasterspeed2.1_bootrom4.u10", 0x00000, 0x10000, CRC(6da142d1) SHA1(e2dbd479034677726fc26fd1ba85c4458d89286c) )
+
+	ROM_REGION(0x1000000, "dspboot", 0)
+	ROM_LOAD32_BYTE( "rasterspeed2.1_bootrom4.u10", 0x00000, 0x10000, CRC(6da142d1) SHA1(e2dbd479034677726fc26fd1ba85c4458d89286c) )
+
+	ROM_REGION(0x8000, "proms", 0) /* Xilinx FPGA PROMs */
+	ROM_LOAD( "17128dpc.u72", 0x0000, 0x4000, CRC(5ddf6ee3) SHA1(f3d15b649b5641374a9e14877cea84ba9c57ef3c) )
+	ROM_LOAD( "17128dpc.u73", 0x2000, 0x4000, CRC(9e274cea) SHA1(e974cad4e4b965bf2c9df7d3d0b4eec64629eeb0) )
+
+	ROM_REGION(0x8000, "nvram", 0) /* Default NVRAM */
+	ROM_LOAD( "rotr.nv", 0x0000, 0x8000, CRC(62543517) SHA1(a4bf3431cdab956839bb155c4a8c140d30e5c7ec) )
+
+	DISK_REGION( "scsibus:0:harddisk:image" )
+	DISK_IMAGE( "rotra", 0, SHA1(570d402e5e9bba123edf7dfa9db7a0e6bdb23823) )
+ROM_END
+
 /*
   Football Crazy runs on the (c)1997 "RASTERSPEED 2.1 31-599-001 ISS 4" PCB, which seems to be a more modern production version.
   a PCB photo with the rom sticker showing the text below has also been seen
@@ -991,5 +1009,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1994, rotr,    0, rastersp, rotr, rastersp_state, empty_init, ROT0, "BFM/Mirage", "Rise of the Robots (prototype)", 0 )
-GAME( 1997, fbcrazy, 0, rastersp, rotr, rastersp_state, empty_init, ROT0, "BFM",        "Football Crazy (Video Quiz)",    MACHINE_NOT_WORKING )
+GAME( 1994, rotr,    0,    rastersp, rotr, rastersp_state, empty_init, ROT0, "BFM/Mirage", "Rise of the Robots (prototype)",        0 )
+GAME( 1994, rotra,   rotr, rastersp, rotr, rastersp_state, empty_init, ROT0, "BFM/Mirage", "Rise of the Robots (prototype, older)", 0 )
+GAME( 1997, fbcrazy, 0,    rastersp, rotr, rastersp_state, empty_init, ROT0, "BFM",        "Football Crazy (Video Quiz)",           MACHINE_NOT_WORKING )

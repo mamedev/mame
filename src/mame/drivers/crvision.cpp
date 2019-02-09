@@ -748,7 +748,7 @@ void crvision_state::creativision(machine_config &config)
 	m_pia->readpa_handler().set(FUNC(crvision_state::pia_pa_r));
 	m_pia->readpb_handler().set(FUNC(crvision_state::pia_pb_r));
 	m_pia->writepa_handler().set(FUNC(crvision_state::pia_pa_w));
-	m_pia->writepb_handler().set(SN76489_TAG, FUNC(sn76496_base_device::command_w));
+	m_pia->writepb_handler().set(SN76489_TAG, FUNC(sn76496_base_device::write));
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state((cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED));

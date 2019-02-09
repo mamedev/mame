@@ -166,7 +166,9 @@ upd765_family_device::upd765_family_device(const machine_config &mconfig, device
 	pc_fdc_interface(mconfig, type, tag, owner, clock),
 	intrq_cb(*this),
 	drq_cb(*this),
-	hdl_cb(*this)
+	hdl_cb(*this),
+	idx_cb(*this),
+	us_cb(*this)
 {
 	ready_polled = true;
 	ready_connected = true;
@@ -191,14 +193,19 @@ void upd765_family_device::set_mode(int _mode)
 	mode = _mode;
 }
 
+void upd765_family_device::device_resolve_objects()
+{
+	intrq_cb.resolve_safe();
+	drq_cb.resolve_safe();
+	hdl_cb.resolve_safe();
+	idx_cb.resolve_safe();
+	us_cb.resolve_safe();
+}
+
 void upd765_family_device::device_start()
 {
 	save_item(NAME(motorcfg));
 	save_item(NAME(selected_drive));
-
-	intrq_cb.resolve_safe();
-	drq_cb.resolve_safe();
-	hdl_cb.resolve_safe();
 
 	for(int i=0; i != 4; i++) {
 		char name[2];
@@ -327,6 +334,7 @@ void upd765_family_device::set_ds(int fid)
 	for(floppy_info &fi : flopi)
 		if(fi.dev)
 			fi.dev->ds_w(fid);
+	us_cb(fid);
 
 	// record selected drive
 	selected_drive = fid;
@@ -341,6 +349,8 @@ void upd765_family_device::set_floppy(floppy_image_device *flop)
 	}
 	if(flop)
 		flop->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(&upd765_family_device::index_callback, this));
+	else
+		idx_cb(0);
 }
 
 READ8_MEMBER(upd765_family_device::sra_r)
@@ -2443,6 +2453,7 @@ void upd765_family_device::index_callback(floppy_image_device *floppy, int state
 		if(fi.live)
 			live_sync();
 		fi.index = state;
+		idx_cb(state);
 
 		if(!state) {
 			general_continue(fi);

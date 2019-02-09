@@ -368,7 +368,7 @@ MACHINE_RESET_MEMBER(speglsht_state,speglsht)
 
 VIDEO_START_MEMBER(speglsht_state,speglsht)
 {
-	m_bitmap = std::make_unique<bitmap_ind16>(512, 5122 );
+	m_bitmap = std::make_unique<bitmap_ind16>(512, 512);
 //  VIDEO_START_CALL_MEMBER(st0016);
 }
 
@@ -426,7 +426,7 @@ MACHINE_CONFIG_START(speglsht_state::speglsht)
 	m_subcpu->set_addrmap(AS_PROGRAM, &speglsht_state::speglsht_mem);
 	m_subcpu->set_vblank_int("screen", FUNC(speglsht_state::irq4_line_assert));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 	MCFG_MACHINE_RESET_OVERRIDE(speglsht_state,speglsht)
 
 	/* video hardware */
@@ -437,7 +437,7 @@ MACHINE_CONFIG_START(speglsht_state::speglsht)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 8, 239-8)
 	MCFG_SCREEN_UPDATE_DRIVER(speglsht_state, screen_update_speglsht)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_speglsht)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_speglsht);
 	MCFG_PALETTE_ADD("palette", 16*16*4+1)
 
 	MCFG_VIDEO_START_OVERRIDE(speglsht_state,speglsht)

@@ -1166,7 +1166,7 @@ MACHINE_CONFIG_START(radica_eu3a05_state::radicasi)
 
 	MCFG_PALETTE_ADD("palette", 256)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_radicasi_fake)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_radicasi_fake);
 
 	radica6502_gpio_device &gpio(RADICA6502_GPIO(config, "gpio", 0));
 	gpio.read_0_callback().set_ioport("IN0");

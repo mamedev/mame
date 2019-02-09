@@ -391,7 +391,7 @@ MACHINE_CONFIG_START(shougi_state::shougi)
 	mainlatch.q_out_cb<4>().set("alpha_8201", FUNC(alpha_8201_device::bus_dir_w)).invert(); // ALPHA-8201 shared RAM bus direction: 0: mcu, 1: maincpu
 	mainlatch.q_out_cb<7>().set_nop(); // nothing? connected to +5v via resistor
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 0x10); // assuming it's the same as champbas
 

@@ -20,28 +20,10 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_BML3BUS_CPU(_cputag) \
-	downcast<bml3bus_device &>(*device).set_cputag(_cputag);
-
-#define MCFG_BML3BUS_OUT_NMI_CB(_devcb) \
-	downcast<bml3bus_device &>(*device).set_out_nmi_callback(DEVCB_##_devcb);
-
-#define MCFG_BML3BUS_OUT_IRQ_CB(_devcb) \
-	downcast<bml3bus_device &>(*device).set_out_irq_callback(DEVCB_##_devcb);
-
-#define MCFG_BML3BUS_OUT_FIRQ_CB(_devcb) \
-	downcast<bml3bus_device &>(*device).set_out_firq_callback(DEVCB_##_devcb);
-
 #define MCFG_BML3BUS_SLOT_ADD(_nbtag, _tag, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, BML3BUS_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
 	downcast<bml3bus_slot_device &>(*device).set_bml3bus_slot(_nbtag, _tag);
-#define MCFG_BML3BUS_SLOT_REMOVE(_tag)    \
-	MCFG_DEVICE_REMOVE(_tag)
-
-#define MCFG_BML3BUS_ONBOARD_ADD(_nbtag, _tag, _dev_type) \
-	MCFG_DEVICE_ADD(_tag, _dev_type, 0) \
-	downcast<device_bml3bus_card_interface &>(*device).set_bml3bus_tag(_nbtag, _tag);
 
 
 //**************************************************************************
@@ -83,10 +65,10 @@ public:
 	bml3bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration
-	void set_cputag(const char *tag) { m_maincpu.set_tag(tag); }
-	template <class Object> devcb_base &set_out_nmi_callback(Object &&cb) { return m_out_nmi_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_irq_callback(Object &&cb) { return m_out_irq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_firq_callback(Object &&cb) { return m_out_firq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> void set_space(Object &&tag, int spacenum) { m_space.set_tag(std::forward<Object>(tag), spacenum); }
+	auto nmi_callback() { return m_out_nmi_cb.bind(); }
+	auto irq_callback() { return m_out_irq_cb.bind(); }
+	auto firq_callback() { return m_out_firq_cb.bind(); }
 
 	void add_bml3bus_card(int slot, device_bml3bus_card_interface *card);
 	device_bml3bus_card_interface *get_bml3bus_card(int slot);
@@ -99,7 +81,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( irq_w );
 	DECLARE_WRITE_LINE_MEMBER( firq_w );
 
-	address_space &space() const { return m_maincpu->space(AS_PROGRAM); }
+	address_space &space() const { return *m_space; }
 
 protected:
 	bml3bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -109,14 +91,13 @@ protected:
 	virtual void device_reset() override;
 
 	// internal state
-	required_device<cpu_device> m_maincpu;
+	required_address_space m_space;
 
 	devcb_write_line    m_out_nmi_cb;
 	devcb_write_line    m_out_irq_cb;
 	devcb_write_line    m_out_firq_cb;
 
 	device_bml3bus_card_interface *m_device_list[BML3BUS_MAX_SLOTS];
-	const char *m_cputag;
 };
 
 

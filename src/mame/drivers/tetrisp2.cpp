@@ -1712,7 +1712,7 @@ MACHINE_CONFIG_START(tetrisp2_state::tetrisp2)
 	MCFG_SCREEN_UPDATE_DRIVER(tetrisp2_state, screen_update_tetrisp2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tetrisp2)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tetrisp2);
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
 	MCFG_VIDEO_START_OVERRIDE(tetrisp2_state,tetrisp2)
@@ -1747,7 +1747,7 @@ MACHINE_CONFIG_START(tetrisp2_state::nndmseal)
 	MCFG_SCREEN_UPDATE_DRIVER(tetrisp2_state, screen_update_tetrisp2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tetrisp2)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tetrisp2);
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
 	MCFG_VIDEO_START_OVERRIDE(tetrisp2_state,nndmseal)  // bg layer offset
@@ -1780,7 +1780,7 @@ MACHINE_CONFIG_START(tetrisp2_state::rockn)
 	MCFG_SCREEN_UPDATE_DRIVER(tetrisp2_state, screen_update_rockntread)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tetrisp2)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tetrisp2);
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
 	MCFG_VIDEO_START_OVERRIDE(tetrisp2_state,rockntread)
@@ -1815,7 +1815,7 @@ MACHINE_CONFIG_START(tetrisp2_state::rockn2)
 	MCFG_SCREEN_UPDATE_DRIVER(tetrisp2_state, screen_update_rockntread)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tetrisp2)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tetrisp2);
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
 	MCFG_VIDEO_START_OVERRIDE(tetrisp2_state,rockntread)
@@ -1847,10 +1847,10 @@ MACHINE_CONFIG_START(tetrisp2_state::rocknms)
 
 	/* video hardware */
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tetrisp2)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tetrisp2);
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
-	MCFG_DEVICE_ADD("sub_gfxdecode", GFXDECODE, "sub_palette", gfx_rocknms_sub)
+	GFXDECODE(config, m_sub_gfxdecode, m_sub_palette, gfx_rocknms_sub);
 	MCFG_PALETTE_ADD("sub_palette", 0x8000)
 
 	config.set_default_layout(layout_rocknms);
@@ -1926,16 +1926,16 @@ MACHINE_CONFIG_START(stepstag_state::stepstag)
 	rscreen.set_palette("rpalette");
 
 	MCFG_VIDEO_START_OVERRIDE(stepstag_state, stepstag )
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tetrisp2)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tetrisp2);
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
-	MCFG_DEVICE_ADD("gfxdecode_l", GFXDECODE, "lpalette", gfx_vj_lscreen)
+	GFXDECODE(config, m_vj_gfxdecode_l, m_vj_palette_l, gfx_vj_lscreen);
 	MCFG_PALETTE_ADD("lpalette", 0x8000)
 
-	MCFG_DEVICE_ADD("gfxdecode_m", GFXDECODE, "mpalette", gfx_vj_mscreen)
+	GFXDECODE(config, m_vj_gfxdecode_m, m_vj_palette_m, gfx_vj_mscreen);
 	MCFG_PALETTE_ADD("mpalette", 0x8000)
 
-	MCFG_DEVICE_ADD("gfxdecode_r", GFXDECODE, "rpalette", gfx_vj_rscreen)
+	GFXDECODE(config, m_vj_gfxdecode_r, m_vj_palette_r, gfx_vj_rscreen);
 	MCFG_PALETTE_ADD("rpalette", 0x8000)
 
 	config.set_default_layout(layout_stepstag);
@@ -1999,16 +1999,16 @@ MACHINE_CONFIG_START(stepstag_state::vjdash)    // 4 Screens
 	MCFG_SCREEN_PALETTE("rpalette")
 
 	MCFG_VIDEO_START_OVERRIDE(stepstag_state, stepstag )
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tetrisp2)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tetrisp2);
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
-	MCFG_DEVICE_ADD("gfxdecode_l", GFXDECODE, "lpalette", gfx_vj_lscreen)
+	GFXDECODE(config, m_vj_gfxdecode_l, m_vj_palette_l, gfx_vj_lscreen);
 	MCFG_PALETTE_ADD("lpalette", 0x8000)
 
-	MCFG_DEVICE_ADD("gfxdecode_m", GFXDECODE, "mpalette", gfx_vj_mscreen)
+	GFXDECODE(config, m_vj_gfxdecode_m, m_vj_palette_m, gfx_vj_mscreen);
 	MCFG_PALETTE_ADD("mpalette", 0x8000)
 
-	MCFG_DEVICE_ADD("gfxdecode_r", GFXDECODE, "rpalette", gfx_vj_rscreen)
+	GFXDECODE(config, m_vj_gfxdecode_r, m_vj_palette_r, gfx_vj_rscreen);
 	MCFG_PALETTE_ADD("rpalette", 0x8000)
 
 	config.set_default_layout(layout_vjdash);
@@ -2080,6 +2080,33 @@ ROM_START( tetrisp2 ) /* Version 2.8 */
 	ROM_REGION( 0x100000, "maincpu", 0 )        /* 68000 Code */
 	ROM_LOAD16_BYTE( "tet2_4_ver2.8.ic59", 0x000000, 0x080000, CRC(e67f9c51) SHA1(d8b2937699d648267b163c7c3f591426877f3701) )
 	ROM_LOAD16_BYTE( "tet2_1_ver2.8.ic65", 0x000001, 0x080000, CRC(5020a4ed) SHA1(9c0f02fe3700761771ac026a2e375144e86e5eb7) )
+
+	ROM_REGION( 0x800000, "gfx1", 0 )   /* 8x8x8 (Sprites) */
+	ROM_LOAD32_WORD( "96019-01.9", 0x000000, 0x400000, CRC(06f7dc64) SHA1(722c51b707b9854c0293afdff18b27ec7cae6719) )
+	ROM_LOAD32_WORD( "96019-02.8", 0x000002, 0x400000, CRC(3e613bed) SHA1(038b5e43fa3d69654107c8093126eeb2e8fa4ddc) )
+
+	/* If t2p_m01&2 from this board were correctly read, since they hold the same data of the above but with swapped halves, it
+	       means they had to invert the top bit of the "page select" register in the sprite's hardware on this board! */
+
+	ROM_REGION( 0x800000, "gfx2", 0 )   /* 16x16x8 (Background) */
+	ROM_LOAD( "96019-06.13", 0x000000, 0x400000, CRC(16f7093c) SHA1(2be77c6a692c5d762f5553ae24e8c415ab194cc6) )
+	//ROM_LOAD( "96019-04.6",  0x400000, 0x100000, CRC(b849dec9) SHA1(fa7ac00fbe587a74c3fb8c74a0f91f7afeb8682f) )
+
+	ROM_REGION( 0x100000, "gfx3", 0 )   /* 16x16x8 (Rotation) */
+	ROM_COPY( "gfx2",        0x400000, 0x000000, 0x100000 )
+	ROM_LOAD( "96019-04.6",  0x000000, 0x100000, CRC(b849dec9) SHA1(fa7ac00fbe587a74c3fb8c74a0f91f7afeb8682f) )
+
+	ROM_REGION( 0x080000, "gfx4", 0 )   /* 8x8x8 (Foreground) */
+	ROM_LOAD( "tetp2-10.ic27", 0x000000, 0x080000, CRC(34dd1bad) SHA1(9bdf1dde11f82839676400de5dd7acb06ea8cdb2) )   // 11111xxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x400000, "ymz", 0 )    /* Samples */
+	ROM_LOAD( "96019-07.7", 0x000000, 0x400000, CRC(a8a61954) SHA1(86c3db10b348ba1f44ff696877b8b20845fa53de) )
+ROM_END
+
+ROM_START( tetrisp2a ) /* Version 2.7 */
+	ROM_REGION( 0x100000, "maincpu", 0 )        /* 68000 Code */
+	ROM_LOAD16_BYTE( "tet2_4_ver2.7.ic59", 0x000000, 0x080000, CRC(3070bfde) SHA1(ba4f69961411fb7d64bcdf83763322e8ff097a59) )
+	ROM_LOAD16_BYTE( "tet2_1_ver2.7.ic65", 0x000001, 0x080000, CRC(fe3eb1d2) SHA1(7ab27de254a0701a5ba8879456db794e871e6d69) )
 
 	ROM_REGION( 0x800000, "gfx1", 0 )   /* 8x8x8 (Sprites) */
 	ROM_LOAD32_WORD( "96019-01.9", 0x000000, 0x400000, CRC(06f7dc64) SHA1(722c51b707b9854c0293afdff18b27ec7cae6719) )
@@ -2823,7 +2850,8 @@ ROM_END
 ***************************************************************************/
 
 //    YEAR, NAME,      PARENT,   MACHINE,  INPUT,     STATE,          INIT,     MONITOR, COMPANY,                       FULLNAME,                               FLAGS
-GAME( 1997, tetrisp2,  0,        tetrisp2, tetrisp2,  tetrisp2_state, empty_init,   ROT0,    "Jaleco / The Tetris Company", "Tetris Plus 2 (World)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1997, tetrisp2,  0,        tetrisp2, tetrisp2,  tetrisp2_state, empty_init,   ROT0,    "Jaleco / The Tetris Company", "Tetris Plus 2 (World, V2.8)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1997, tetrisp2a, tetrisp2, tetrisp2, tetrisp2,  tetrisp2_state, empty_init,   ROT0,    "Jaleco / The Tetris Company", "Tetris Plus 2 (World, V2.7)",          MACHINE_SUPPORTS_SAVE )
 GAME( 1997, tetrisp2j, tetrisp2, tetrisp2, tetrisp2j, tetrisp2_state, empty_init,   ROT0,    "Jaleco / The Tetris Company", "Tetris Plus 2 (Japan, V2.2)",          MACHINE_SUPPORTS_SAVE )
 GAME( 1997, tetrisp2ja,tetrisp2, tetrisp2, tetrisp2j, tetrisp2_state, empty_init,   ROT0,    "Jaleco / The Tetris Company", "Tetris Plus 2 (Japan, V2.1)",          MACHINE_SUPPORTS_SAVE )
 

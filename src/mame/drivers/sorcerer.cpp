@@ -421,13 +421,13 @@ MACHINE_CONFIG_START(sorcerer_state::sorcerer)
 	MCFG_SCREEN_UPDATE_DRIVER(sorcerer_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sorcerer)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_sorcerer);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05); // cass1 speaker
-	WAVE(config, "wave2", "cassette2").add_route(ALL_OUTPUTS, "mono", 0.05); // cass2 speaker
+	WAVE(config, "wave", m_cassette1).add_route(ALL_OUTPUTS, "mono", 0.05); // cass1 speaker
+	WAVE(config, "wave2", m_cassette2).add_route(ALL_OUTPUTS, "mono", 0.05); // cass2 speaker
 
 	AY31015(config, m_uart);
 	m_uart->set_tx_clock(ES_UART_CLOCK);
@@ -437,35 +437,34 @@ MACHINE_CONFIG_START(sorcerer_state::sorcerer)
 	RS232_PORT(config, "rs232", default_rs232_devices, "null_modem").set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 
 	/* printer */
-	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "covox")
-
 	/* The use of the parallel port as a general purpose port is not emulated.
 	Currently the only use is to read the printer status in the Centronics CENDRV bios routine. */
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit7))
+	CENTRONICS(config, m_centronics, centronics_devices, "covox");
+	m_centronics->busy_handler().set("cent_status_in", FUNC(input_buffer_device::write_bit7));
 
-	MCFG_DEVICE_ADD("cent_status_in", INPUT_BUFFER, 0)
+	INPUT_BUFFER(config, "cent_status_in");
 
 	/* quickload */
-	MCFG_SNAPSHOT_ADD("snapshot", sorcerer_state, sorcerer, "snp", 2)
-	MCFG_QUICKLOAD_ADD("quickload", sorcerer_state, sorcerer, "bin", 3)
+	MCFG_SNAPSHOT_ADD("snapshot", sorcerer_state, sorcerer, "snp", attotime::from_seconds(2))
+	MCFG_QUICKLOAD_ADD("quickload", sorcerer_state, sorcerer, "bin", attotime::from_seconds(3))
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(sorcerer_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("sorcerer_cass")
+	CASSETTE(config, m_cassette1);
+	m_cassette1->set_formats(sorcerer_cassette_formats);
+	m_cassette1->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette1->set_interface("sorcerer_cass");
 
-	MCFG_CASSETTE_ADD( "cassette2" )
-	MCFG_CASSETTE_FORMATS(sorcerer_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("sorcerer_cass")
+	CASSETTE(config, m_cassette2);
+	m_cassette2->set_formats(sorcerer_cassette_formats);
+	m_cassette2->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette2->set_interface("sorcerer_cass");
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "sorcerer_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","sorcerer_cart")
-	MCFG_SOFTWARE_LIST_ADD("cass_list","sorcerer_cass")
+	SOFTWARE_LIST(config, "cart_list").set_original("sorcerer_cart");
+	SOFTWARE_LIST(config, "cass_list").set_original("sorcerer_cass");
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("48K").set_extra_options("8K,16K,32K");
@@ -492,12 +491,10 @@ MACHINE_CONFIG_START(sorcerer_state::sorcererd)
 	m_fdc2->set_force_ready(true); // should be able to get rid of this when fdc issue is fixed
 	m_fdc2->intrq_wr_callback().set(FUNC(sorcerer_state::intrq_w));
 	m_fdc2->drq_wr_callback().set(FUNC(sorcerer_state::drq_w));
-	MCFG_FLOPPY_DRIVE_ADD("fdc2:0", floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc2:1", floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, "fdc2:0", floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc2:1", floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
 
-	MCFG_SOFTWARE_LIST_ADD("flop_list","sorcerer_flop")
+	SOFTWARE_LIST(config, "flop_list").set_original("sorcerer_flop");
 MACHINE_CONFIG_END
 
 

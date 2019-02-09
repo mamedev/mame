@@ -476,7 +476,7 @@ MACHINE_CONFIG_START(xain_state::xsleena)
 	// basic machine hardware
 	MCFG_DEVICE_ADD(m_maincpu, MC6809E, CPU_CLOCK) // 68B09E
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", xain_state, scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(xain_state::scanline), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD(m_subcpu, MC6809E, CPU_CLOCK) // 68B09E
 	MCFG_DEVICE_PROGRAM_MAP(cpu_map_B)
@@ -486,7 +486,7 @@ MACHINE_CONFIG_START(xain_state::xsleena)
 
 	TAITO68705_MCU(config, m_mcu, MCU_CLOCK);
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	// video hardware
 	MCFG_SCREEN_ADD(m_screen, RASTER)
@@ -523,7 +523,7 @@ MACHINE_CONFIG_START(xain_state::xsleenab)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(bootleg_map)
 
-	MCFG_DEVICE_REMOVE("mcu")
+	config.device_remove("mcu");
 MACHINE_CONFIG_END
 
 

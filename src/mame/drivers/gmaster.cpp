@@ -356,7 +356,7 @@ MACHINE_CONFIG_START(gmaster_state::gmaster)
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "gmaster_cart")
 	MCFG_GENERIC_MANDATORY
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list","gmaster")
+	SOFTWARE_LIST(config, "cart_list").set_original("gmaster");
 MACHINE_CONFIG_END
 
 

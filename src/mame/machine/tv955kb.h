@@ -7,9 +7,7 @@
 #pragma once
 
 #include "cpu/mcs48/mcs48.h"
-//#include "machine/ripple_counter.h"
-//#include "sound/spkrdev.h"
-//#include "speaker.h"
+#include "sound/spkrdev.h"
 
 
 //**************************************************************************
@@ -29,12 +27,11 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(write_rxd);
 
-	static constexpr feature_type unemulated_features() { return feature::SOUND; }
-
 protected:
 	// device-specific overrides
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
+	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -45,12 +42,19 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(txd_w);
 	DECLARE_WRITE_LINE_MEMBER(reset_w);
 
+	TIMER_CALLBACK_MEMBER(bell_q8);
+	void bell_reset();
+
 	// line output callbacks
 	devcb_write_line m_txd_cb;
 	devcb_write_line m_reset_cb;
 
 	required_device<mcs48_cpu_device> m_mcu;
+	required_device<speaker_sound_device> m_bell;
 	required_ioport_array<16> m_keys;
+
+	emu_timer *m_bell_timer;
+	bool m_bell_on;
 };
 
 // device type definition

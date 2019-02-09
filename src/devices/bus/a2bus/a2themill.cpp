@@ -238,34 +238,34 @@ READ8_MEMBER( a2bus_themill_device::dma_r )
 	{
 		if (offset <= 0x7fff)
 		{
-			return slot_dma_read(space, offset+0x1000);
+			return slot_dma_read(offset+0x1000);
 		}
 		else if (offset <= 0xafff)
 		{
-			return slot_dma_read(space, (offset&0x3fff) + 0xd000);
+			return slot_dma_read((offset&0x3fff) + 0xd000);
 		}
 		else if (offset <= 0xbfff)
 		{
-			return slot_dma_read(space, (offset&0xfff) + 0xc000);
+			return slot_dma_read((offset&0xfff) + 0xc000);
 		}
 		else if (offset <= 0xcfff)  // 6809 Cxxx -> 6502 ZP
 		{
-			return slot_dma_read(space, (offset&0xfff));
+			return slot_dma_read((offset&0xfff));
 		}
 		else    // 6809 Dxxx -> 6502 9000
 		{
-			return slot_dma_read(space, (offset-0xd000)+0x9000);
+			return slot_dma_read((offset-0xd000)+0x9000);
 		}
 	}
 	else
 	{
 		if (m_flipAddrSpace)
 		{
-			return slot_dma_read(space, offset^0x8000);
+			return slot_dma_read(offset^0x8000);
 		}
 		else
 		{
-			return slot_dma_read(space, offset);
+			return slot_dma_read(offset);
 		}
 	}
 
@@ -283,34 +283,34 @@ WRITE8_MEMBER( a2bus_themill_device::dma_w )
 	{
 		if (offset <= 0x7fff)
 		{
-			slot_dma_write(space, offset+0x1000, data);
+			slot_dma_write(offset+0x1000, data);
 		}
 		else if (offset <= 0xafff)
 		{
-			slot_dma_write(space, (offset&0x3fff) + 0xd000, data);
+			slot_dma_write((offset&0x3fff) + 0xd000, data);
 		}
 		else if (offset <= 0xbfff)
 		{
-			slot_dma_write(space, (offset&0xfff) + 0xc000, data);
+			slot_dma_write((offset&0xfff) + 0xc000, data);
 		}
 		else if (offset <= 0xcfff)
 		{
-			slot_dma_write(space, (offset&0xfff), data);
+			slot_dma_write((offset&0xfff), data);
 		}
 		else    // 6809 Dxxx -> 6502 9000
 		{
-			slot_dma_write(space, (offset-0xd000)+0x9000, data);
+			slot_dma_write((offset-0xd000)+0x9000, data);
 		}
 	}
 	else
 	{
 		if (m_flipAddrSpace)
 		{
-			slot_dma_write(space, offset^0x8000, data);
+			slot_dma_write(offset^0x8000, data);
 		}
 		else
 		{
-			slot_dma_write(space, offset, data);
+			slot_dma_write(offset, data);
 		}
 	}
 }

@@ -144,7 +144,7 @@ READ16_MEMBER( harddriv_state::hd68k_gsp_io_r )
 	uint16_t result;
 	offset = (offset / 2) ^ 1;
 	m_hd34010_host_access = true;
-	result = m_gsp->host_r(space, offset, 0xffff);
+	result = m_gsp->host_r(offset);
 	m_hd34010_host_access = false;
 	return result;
 }
@@ -154,7 +154,7 @@ WRITE16_MEMBER( harddriv_state::hd68k_gsp_io_w )
 {
 	offset = (offset / 2) ^ 1;
 	m_hd34010_host_access = true;
-	m_gsp->host_w(space, offset, data, 0xffff);
+	m_gsp->host_w(offset, data);
 	m_hd34010_host_access = false;
 }
 
@@ -171,7 +171,7 @@ READ16_MEMBER( harddriv_state::hd68k_msp_io_r )
 	uint16_t result;
 	offset = (offset / 2) ^ 1;
 	m_hd34010_host_access = true;
-	result = m_msp.found() ? m_msp->host_r(space, offset, 0xffff) : 0xffff;
+	result = m_msp.found() ? m_msp->host_r(offset) : 0xffff;
 	m_hd34010_host_access = false;
 	return result;
 }
@@ -183,7 +183,7 @@ WRITE16_MEMBER( harddriv_state::hd68k_msp_io_w )
 	if (m_msp.found())
 	{
 		m_hd34010_host_access = true;
-		m_msp->host_w(space, offset, data, 0xffff);
+		m_msp->host_w(offset, data);
 		m_hd34010_host_access = false;
 	}
 }
@@ -312,7 +312,7 @@ WRITE16_MEMBER( harddriv_state::hd68k_adc_control_w )
 	COMBINE_DATA(&m_adc_control);
 
 	/* handle a write to the 8-bit ADC address select */
-	m_adc8->address_w(space, 0, m_adc_control & 0x07);
+	m_adc8->address_w(m_adc_control & 0x07);
 	m_adc8->start_w(BIT(m_adc_control, 3));
 
 	/* handle a write to the 12-bit ADC address select */
@@ -503,7 +503,7 @@ WRITE_LINE_MEMBER(harddriv_state::harddriv_duart_irq_handler)
  *
  *************************************/
 
-WRITE16_MEMBER( harddriv_state::hdgsp_io_w )
+void harddriv_state::hdgsp_io_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	/* detect an enabling of the shift register and force yielding */
 	if (offset == REG_DPYCTL)
@@ -520,10 +520,8 @@ WRITE16_MEMBER( harddriv_state::hdgsp_io_w )
 	screen_device &scr = m_gsp->screen();
 
 	/* detect changes to HEBLNK and HSBLNK and force an update before they change */
-	if ((offset == REG_HEBLNK || offset == REG_HSBLNK) && data != m_gsp->io_register_r(space, offset, 0xffff))
+	if ((offset == REG_HEBLNK || offset == REG_HSBLNK) && data != m_gsp->io_register_r(offset))
 		scr.update_partial(scr.vpos() - 1);
-
-	m_gsp->io_register_w(space, offset, data, mem_mask);
 }
 
 

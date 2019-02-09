@@ -417,7 +417,7 @@ MACHINE_CONFIG_START(shanghai_state::shanghai)
 
 	PALETTE(config, "palette", FUNC(shanghai_state::shanghai_palette)).set_format(palette_device::xBGR_444, 256);
 
-	MCFG_HD63484_ADD("hd63484", 0, hd63484_map)
+	HD63484(config, "hd63484", 0).set_addrmap(0, &shanghai_state::hd63484_map);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -451,7 +451,7 @@ MACHINE_CONFIG_START(shanghai_state::shangha2)
 
 	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 256);
 
-	MCFG_HD63484_ADD("hd63484", 0, hd63484_map)
+	HD63484(config, "hd63484", 0).set_addrmap(0, &shanghai_state::hd63484_map);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -477,7 +477,7 @@ MACHINE_CONFIG_START(shanghai_state::kothello)
 	MCFG_DEVICE_PROGRAM_MAP(kothello_sound_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
+	config.m_minimum_quantum = attotime::from_hz(12000);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -490,8 +490,9 @@ MACHINE_CONFIG_START(shanghai_state::kothello)
 
 	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 256);
 
-	MCFG_HD63484_ADD("hd63484", 0, hd63484_map)
-	MCFG_HD63484_EXTERNAL_SKEW(2)
+	hd63484_device &hd63484(HD63484(config, "hd63484", 0));
+	hd63484.set_addrmap(0, &shanghai_state::hd63484_map);
+	hd63484.set_external_skew(2);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

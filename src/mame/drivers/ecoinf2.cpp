@@ -542,7 +542,7 @@ void ecoinf2_state::ecoinf2_oxo(machine_config &config)
 	m_reels[3]->optic_handler().set(FUNC(ecoinf2_state::reel_optic_cb<3>));
 
 	METERS(config, m_meters, 0);
-	m_meters->set_number_meters(8);
+	m_meters->set_number(8);
 
 //  I8255(config, "ic25_dips", 0);
 }

@@ -141,9 +141,10 @@ void mephisto_modena_state::machine_reset()
 MACHINE_CONFIG_START(mephisto_modena_state::modena)
 	MCFG_DEVICE_ADD("maincpu", M65C02, XTAL(4'194'304))          // W65C02SP
 	MCFG_DEVICE_PROGRAM_MAP(modena_mem)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_on", mephisto_modena_state, nmi_on, attotime::from_hz(XTAL(4'194'304) / (1 << 13)))
-	MCFG_TIMER_START_DELAY(attotime::from_hz(XTAL(4'194'304) / (1 << 13)) - attotime::from_usec(975))  // active for 975us
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_off", mephisto_modena_state, nmi_off, attotime::from_hz(XTAL(4'194'304) / (1 << 13)))
+	timer_device &nmi_on(TIMER(config, "nmi_on"));
+	nmi_on.configure_periodic(FUNC(mephisto_modena_state::nmi_on), attotime::from_hz(XTAL(4'194'304) / (1 << 13)));
+	nmi_on.set_start_delay(attotime::from_hz(XTAL(4'194'304) / (1 << 13)) - attotime::from_usec(975));  // active for 975us
+	TIMER(config, "nmi_off").configure_periodic(FUNC(mephisto_modena_state::nmi_off), attotime::from_hz(XTAL(4'194'304) / (1 << 13)));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

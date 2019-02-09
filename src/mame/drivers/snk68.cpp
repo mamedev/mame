@@ -593,29 +593,28 @@ void snk68_state::tile_callback_notpow(int &tile, int& fx, int& fy, int& region)
 	region = 1;
 }
 
-MACHINE_CONFIG_START(snk68_state::pow)
-
+void snk68_state::pow(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(18'000'000)/2) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(pow_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", snk68_state,  irq1_line_hold)
+	M68000(config, m_maincpu, XTAL(18'000'000)/2); /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &snk68_state::pow_map);
+	m_maincpu->set_vblank_int("screen", FUNC(snk68_state::irq1_line_hold));
 
-	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(8'000'000)/2) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(sound_io_map)
+	Z80(config, m_soundcpu, XTAL(8'000'000)/2); /* verified on pcb */
+	m_soundcpu->set_addrmap(AS_PROGRAM, &snk68_state::sound_map);
+	m_soundcpu->set_addrmap(AS_IO, &snk68_state::sound_io_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	// the screen parameters are guessed but should be accurate. They
 	// give a theoretical refresh rate of 59.1856Hz while the measured
 	// rate on a SAR board is 59.16Hz.
-	MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000)/4, 384, 0, 256, 264, 16, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(snk68_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	m_screen->set_raw(XTAL(24'000'000)/4, 384, 0, 256, 264, 16, 240);
+	m_screen->set_screen_update(FUNC(snk68_state::screen_update));
+	m_screen->set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pow)
-	MCFG_PALETTE_ADD("palette", 0x800)
-	MCFG_PALETTE_FORMAT(xRGBRRRRGGGGBBBB_bit0)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_pow);
+	PALETTE(config, "palette").set_format(2, &raw_to_rgb_converter::xRGBRRRRGGGGBBBB_bit0_decoder, 0x800);
 
 	SNK68_SPR(config, m_sprites, 0);
 	m_sprites->set_gfxdecode_tag(m_gfxdecode);
@@ -627,13 +626,13 @@ MACHINE_CONFIG_START(snk68_state::pow)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	GENERIC_LATCH_8(config, "soundlatch2");
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(8'000'000)/2) /* verified on pcb  */
-	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL(8'000'000)/2)); /* verified on pcb  */
+	ymsnd.irq_handler().set_inputline(m_soundcpu, 0);
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("upd", UPD7759)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	UPD7759(config, m_upd7759);
+	m_upd7759->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 void snk68_state::streetsm(machine_config &config)
 {
@@ -641,14 +640,12 @@ void snk68_state::streetsm(machine_config &config)
 	m_sprites->set_tile_indirect_cb(FUNC(snk68_state::tile_callback_notpow), this);
 }
 
-MACHINE_CONFIG_START(snk68_state::searchar)
+void snk68_state::searchar(machine_config &config)
+{
 	streetsm(config);
-
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(searchar_map)
-
+	m_maincpu->set_addrmap(AS_PROGRAM, &snk68_state::searchar_map);
 	MCFG_VIDEO_START_OVERRIDE(snk68_state,searchar)
-MACHINE_CONFIG_END
+}
 
 
 /******************************************************************************/

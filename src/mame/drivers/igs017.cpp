@@ -3520,7 +3520,7 @@ MACHINE_CONFIG_START(igs017_state::iqblocka)
 	MCFG_DEVICE_ADD("maincpu", Z180, XTAL(16'000'000) / 2)
 	MCFG_DEVICE_PROGRAM_MAP(iqblocka_map)
 	MCFG_DEVICE_IO_MAP(iqblocka_io)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, iqblocka_interrupt, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(igs017_state::iqblocka_interrupt), "screen", 0, 1);
 
 	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,iqblocka)
 
@@ -3618,7 +3618,7 @@ MACHINE_RESET_MEMBER(igs017_state,mgcs)
 MACHINE_CONFIG_START(igs017_state::mgcs)
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(22'000'000) / 2)
 	MCFG_DEVICE_PROGRAM_MAP(mgcs)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, mgcs_interrupt, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(igs017_state::mgcs_interrupt), "screen", 0, 1);
 
 	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,mgcs)
 
@@ -3627,7 +3627,7 @@ MACHINE_CONFIG_START(igs017_state::mgcs)
 	ppi.in_pa_callback().set_ioport("COINS");
 	ppi.in_pb_callback().set(FUNC(igs017_state::mgcs_keys_r));
 
-	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
+	TICKET_DISPENSER(config, m_hopperdev, attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW );
 
 	// video
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3656,7 +3656,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(igs017_state::lhzb2)
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(22'000'000) / 2)
 	MCFG_DEVICE_PROGRAM_MAP(lhzb2)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, mgcs_interrupt, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(igs017_state::mgcs_interrupt), "screen", 0, 1);
 
 	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,mgcs)
 
@@ -3705,7 +3705,7 @@ MACHINE_RESET_MEMBER(igs017_state,lhzb2a)
 MACHINE_CONFIG_START(igs017_state::lhzb2a)
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(22'000'000)/2)
 	MCFG_DEVICE_PROGRAM_MAP(lhzb2a)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, mgcs_interrupt, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(igs017_state::mgcs_interrupt), "screen", 0, 1);
 
 	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,lhzb2a)
 
@@ -3750,7 +3750,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(igs017_state::slqz2)
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(22'000'000) / 2)
 	MCFG_DEVICE_PROGRAM_MAP(slqz2)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, mgcs_interrupt, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(igs017_state::mgcs_interrupt), "screen", 0, 1);
 
 	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,mgcs)
 
@@ -3793,7 +3793,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(igs017_state::sdmg2)
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(22'000'000)/2)
 	MCFG_DEVICE_PROGRAM_MAP(sdmg2)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, mgcs_interrupt, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(igs017_state::mgcs_interrupt), "screen", 0, 1);
 
 	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,mgcs)
 
@@ -3839,7 +3839,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(igs017_state::mgdh_interrupt)
 MACHINE_CONFIG_START(igs017_state::mgdha)
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(22'000'000) / 2)
 	MCFG_DEVICE_PROGRAM_MAP(mgdha_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, mgdh_interrupt, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(igs017_state::mgdh_interrupt), "screen", 0, 1);
 
 	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,mgcs)
 
@@ -3874,7 +3874,7 @@ MACHINE_CONFIG_START(igs017_state::tjsb)
 	MCFG_DEVICE_ADD("maincpu", Z180, XTAL(16'000'000) / 2)
 	MCFG_DEVICE_PROGRAM_MAP(tjsb_map)
 	MCFG_DEVICE_IO_MAP(tjsb_io)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, iqblocka_interrupt, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(igs017_state::iqblocka_interrupt), "screen", 0, 1);
 
 	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,iqblocka)
 
@@ -3915,7 +3915,7 @@ MACHINE_CONFIG_START(igs017_state::spkrform)
 	MCFG_DEVICE_ADD("maincpu", Z180, XTAL(16'000'000) / 2)
 	MCFG_DEVICE_PROGRAM_MAP(spkrform_map)
 	MCFG_DEVICE_IO_MAP(spkrform_io)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, iqblocka_interrupt, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(igs017_state::iqblocka_interrupt), "screen", 0, 1);
 
 	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,iqblocka)
 

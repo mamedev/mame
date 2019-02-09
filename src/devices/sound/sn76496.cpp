@@ -290,14 +290,14 @@ void sn76496_base_device::device_clock_changed()
 	m_sound->set_sample_rate(clock()/2);
 }
 
-WRITE8_MEMBER( sn76496_base_device::stereo_w )
+void sn76496_base_device::stereo_w(u8 data)
 {
 	m_sound->update();
 	if (m_stereo) m_stereo_mask = data;
 	else fatalerror("sn76496_base_device: Call to stereo write with mono chip!\n");
 }
 
-void sn76496_base_device::write(uint8_t data)
+void sn76496_base_device::write(u8 data)
 {
 	int n, r, c;
 

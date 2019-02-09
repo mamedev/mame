@@ -3956,7 +3956,8 @@ static void apple2eaux_cards(device_slot_interface &device)
 	device.option_add("rw3", A2EAUX_RAMWORKS3);  /* Applied Engineering RamWorks III */
 }
 
-MACHINE_CONFIG_START(apple2e_state::apple2e)
+void apple2e_state::apple2e(machine_config &config)
+{
 	/* basic machine hardware */
 	M6502(config, m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::apple2e_map);
@@ -4039,10 +4040,11 @@ MACHINE_CONFIG_START(apple2e_state::apple2e)
 
 	/* slot devices */
 	A2BUS(config, m_a2bus, 0);
-	m_a2bus->set_cputag("maincpu");
+	m_a2bus->set_space(m_maincpu, AS_PROGRAM);
 	m_a2bus->irq_w().set(FUNC(apple2e_state::a2bus_irq_w));
 	m_a2bus->nmi_w().set(FUNC(apple2e_state::a2bus_nmi_w));
 	m_a2bus->inh_w().set(FUNC(apple2e_state::a2bus_inh_w));
+	m_a2bus->dma_w().set_inputline(m_maincpu, INPUT_LINE_HALT);
 	A2BUS_SLOT(config, "sl1", m_a2bus, apple2_cards, nullptr);
 	A2BUS_SLOT(config, "sl2", m_a2bus, apple2_cards, nullptr);
 	A2BUS_SLOT(config, "sl3", m_a2bus, apple2_cards, nullptr);
@@ -4051,17 +4053,21 @@ MACHINE_CONFIG_START(apple2e_state::apple2e)
 	A2BUS_SLOT(config, "sl6", m_a2bus, apple2_cards, "diskiing");
 	A2BUS_SLOT(config, "sl7", m_a2bus, apple2_cards, nullptr);
 
-	MCFG_DEVICE_ADD(A2_AUXSLOT_TAG, A2EAUXSLOT, 0)
-	MCFG_A2EAUXSLOT_CPU("maincpu")
-	MCFG_A2EAUXSLOT_OUT_IRQ_CB(WRITELINE(*this, apple2e_state, a2bus_irq_w))
-	MCFG_A2EAUXSLOT_OUT_NMI_CB(WRITELINE(*this, apple2e_state, a2bus_nmi_w))
-	MCFG_A2EAUXSLOT_SLOT_ADD(A2_AUXSLOT_TAG, "aux", apple2eaux_cards, "ext80")   // default to an extended 80-column card
+	A2EAUXSLOT(config, m_a2eauxslot, 0);
+	m_a2eauxslot->set_cputag(m_maincpu);
+	m_a2eauxslot->out_irq_callback().set(FUNC(apple2e_state::a2bus_irq_w));
+	m_a2eauxslot->out_nmi_callback().set(FUNC(apple2e_state::a2bus_nmi_w));
+	A2EAUXSLOT_SLOT(config, "aux", apple2eaux_cards, "ext80", A2_AUXSLOT_TAG);
 
-	MCFG_SOFTWARE_LIST_ADD("flop525_list","apple2")
+	/* softlist config for baseline A2E
+	By default, filter lists where possible to compatible disks for A2E */
+	SOFTWARE_LIST(config, "flop525_clean").set_original("apple2_flop_clcracked");
+	SOFTWARE_LIST(config, "flop525_orig").set_compatible("apple2_flop_orig").set_filter("A2E");
+	SOFTWARE_LIST(config, "flop525_misc").set_compatible("apple2_flop_misc");
 
-	MCFG_CASSETTE_ADD(A2_CASSETTE_TAG)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
-MACHINE_CONFIG_END
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED);
+}
 
 void apple2e_state::mprof3(machine_config &config)
 {
@@ -4070,38 +4076,47 @@ void apple2e_state::mprof3(machine_config &config)
 	m_ram->set_default_size("128K");
 }
 
-MACHINE_CONFIG_START(apple2e_state::apple2ee)
+void apple2e_state::apple2ee(machine_config &config)
+{
 	apple2e(config);
+	subdevice<software_list_device>("flop525_orig")->set_filter("A2EE");  // Filter list to compatible disks for this machine.
+
 	M65C02(config.replace(), m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::apple2e_map);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(apple2e_state::spectred)
+void apple2e_state::spectred(machine_config &config)
+{
 	apple2e(config);
-	MCFG_DEVICE_ADD("keyb_mcu", I8035, XTAL(4'000'000)) /* guessed frequency */
-	MCFG_DEVICE_PROGRAM_MAP(spectred_keyb_map)
+	i8035_device &keyb_mcu(I8035(config, "keyb_mcu", XTAL(4'000'000))); /* guessed frequency */
+	keyb_mcu.set_addrmap(AS_PROGRAM, &apple2e_state::spectred_keyb_map);
 
 		//TODO: implement the actual interfacing to this 8035 MCU and
 		//      and then remove the keyb CPU inherited from apple2e
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(apple2e_state::tk3000)
+void apple2e_state::tk3000(machine_config &config)
+{
 	apple2e(config);
 	M65C02(config.replace(), m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::apple2e_map);
 
-//  MCFG_DEVICE_ADD("subcpu", Z80, 1021800)    // schematics are illegible on where the clock comes from, but it *seems* to be the same as the 65C02 clock
-//  MCFG_DEVICE_PROGRAM_MAP(tk3000_kbd_map)
-MACHINE_CONFIG_END
+//  z80_device &subcpu(Z80(config, "subcpu", 1021800));    // schematics are illegible on where the clock comes from, but it *seems* to be the same as the 65C02 clock
+//  subcpu.set_addrmap(AS_PROGRAM, &apple2e_state::tk3000_kbd_map);
+}
 
-MACHINE_CONFIG_START(apple2e_state::apple2ep)
+void apple2e_state::apple2ep(machine_config &config)
+{
 	apple2e(config);
 	M65C02(config.replace(), m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::apple2e_map);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(apple2e_state::apple2c)
+void apple2e_state::apple2c(machine_config &config)
+{
 	apple2ee(config);
+	subdevice<software_list_device>("flop525_orig")->set_filter("A2C");  // Filter list to compatible disks for this machine.
+
 	M65C02(config.replace(), m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::apple2c_map);
 
@@ -4144,7 +4159,7 @@ MACHINE_CONFIG_START(apple2e_state::apple2c)
 	config.device_remove(A2_AUXSLOT_TAG);
 
 	m_ram->set_default_size("128K").set_extra_options("128K");
-MACHINE_CONFIG_END
+}
 
 static void apple2cp_set_lines(device_t *device, uint8_t lines)
 {
@@ -4255,21 +4270,23 @@ MACHINE_CONFIG_START(apple2e_state::apple2cp)
 
 	config.device_remove("sl4");
 	config.device_remove("sl6");
-	MCFG_IWM_ADD(IICP_IWM_TAG, a2cp_interface)
+	IWM(config, m_iicpiwm, &a2cp_interface);
 	MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(floppy_interface,15,16)
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADDITIONAL_ADD(apple2cp_floppy35_floppy_interface)
 
 	m_ram->set_default_size("128K").set_extra_options("128K, 384K, 640K, 896K, 1152K");
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(apple2e_state::apple2c_iwm)
+void apple2e_state::apple2c_iwm(machine_config &config)
+{
 	apple2c(config);
 
 	config.device_remove("sl6");
 	A2BUS_IWM_FDC(config, "sl6", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(apple2e_state::apple2c_mem)
+void apple2e_state::apple2c_mem(machine_config &config)
+{
 	apple2c(config);
 	M65C02(config.replace(), m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::apple2c_memexp_map);
@@ -4278,7 +4295,7 @@ MACHINE_CONFIG_START(apple2e_state::apple2c_mem)
 	A2BUS_IWM_FDC(config, "sl6", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
 
 	m_ram->set_default_size("128K").set_extra_options("128K, 384K, 640K, 896K, 1152K");
-MACHINE_CONFIG_END
+}
 
 const applefdc_interface fdc_interface =
 {
@@ -4295,7 +4312,7 @@ MACHINE_CONFIG_START(apple2e_state::laser128)
 	M65C02(config.replace(), m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::laser128_map);
 
-	MCFG_APPLEFDC_ADD(LASER128_UDC_TAG, fdc_interface)
+	APPLEFDC(config, m_laserudc, &fdc_interface);
 	MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(floppy_interface,15,16)
 
 	config.device_remove("sl4");
@@ -4317,7 +4334,7 @@ MACHINE_CONFIG_START(apple2e_state::laser128ex2)
 	M65C02(config.replace(), m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::laser128_map);
 
-	MCFG_APPLEFDC_ADD(LASER128_UDC_TAG, fdc_interface)
+	APPLEFDC(config, m_laserudc, &fdc_interface);
 	MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(floppy_interface,15,16)
 
 	config.device_remove("sl4");
@@ -4334,7 +4351,8 @@ MACHINE_CONFIG_START(apple2e_state::laser128ex2)
 	m_ram->set_default_size("128K").set_extra_options("128K, 384K, 640K, 896K, 1152K");
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(apple2e_state::ceci)
+void apple2e_state::ceci(machine_config &config)
+{
 	apple2e(config);
 	config.device_remove("sl1");
 	config.device_remove("sl2");
@@ -4351,7 +4369,7 @@ MACHINE_CONFIG_START(apple2e_state::ceci)
 	config.device_remove(A2_AUXSLOT_TAG);
 
 	m_ram->set_default_size("64K");
-MACHINE_CONFIG_END
+}
 
 /***************************************************************************
 

@@ -51,7 +51,8 @@ iteagle_fpga_device::iteagle_fpga_device(const machine_config &mconfig, const ch
 	set_ids(0x55cc33aa, 0xaa, 0xaaaaaa, 0x00);
 }
 
-MACHINE_CONFIG_START(iteagle_fpga_device::device_add_mconfig)
+void iteagle_fpga_device::device_add_mconfig(machine_config &config)
+{
 	NVRAM(config, "eagle2_rtc", nvram_device::DEFAULT_ALL_0);
 	NVRAM(config, "eagle1_bram", nvram_device::DEFAULT_ALL_1);
 
@@ -72,7 +73,7 @@ MACHINE_CONFIG_START(iteagle_fpga_device::device_add_mconfig)
 	com2.rxd_handler().set(m_scc1, FUNC(scc85c30_device::rxa_w));
 	com2.dcd_handler().set(m_scc1, FUNC(scc85c30_device::dcda_w));
 	com2.cts_handler().set(m_scc1, FUNC(scc85c30_device::ctsa_w));
-MACHINE_CONFIG_END
+}
 
 void iteagle_fpga_device::device_start()
 {
@@ -277,7 +278,7 @@ READ32_MEMBER( iteagle_fpga_device::fpga_r )
 				logerror("%s:fpga_r offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
 			break;
 		case 0x14/4: // GUN1-- Interrupt & 0x4==0x00080000
-			result = (m_guny_cb(0) << 16) | (m_gunx_cb(0) << 0);
+			result = (m_gun_y << 16) | (m_gun_x << 0);
 			if (LOG_FPGA)
 				logerror("%s:fpga_r offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
 			break;

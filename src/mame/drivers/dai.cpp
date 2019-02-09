@@ -193,7 +193,7 @@ MACHINE_CONFIG_START(dai_state::dai)
 	MCFG_DEVICE_PROGRAM_MAP(dai_mem)
 	MCFG_DEVICE_IO_MAP(dai_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(dai_state,int_ack)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	PIT8253(config, m_pit, 0);
 	m_pit->set_clk<0>(2000000);
@@ -214,21 +214,21 @@ MACHINE_CONFIG_START(dai_state::dai)
 	MCFG_SCREEN_UPDATE_DRIVER(dai_state, screen_update_dai)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_dai)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_dai);
 	PALETTE(config, m_palette, FUNC(dai_state::dai_palette), ARRAY_LENGTH(s_palette));
 
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 	DAI_SOUND(config, m_sound).add_route(0, "lspeaker", 0.50).add_route(1, "rspeaker", 0.50);
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("dai_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_interface("dai_cass");
 
 	/* tms5501 */
 	TMS5501(config, m_tms5501, 2000000);
@@ -240,7 +240,7 @@ MACHINE_CONFIG_START(dai_state::dai)
 	RAM(config, RAM_TAG).set_default_size("48K");
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "dai_cass")
+	SOFTWARE_LIST(config, "cass_list").set_original("dai_cass");
 MACHINE_CONFIG_END
 
 

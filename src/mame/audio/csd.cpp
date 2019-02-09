@@ -116,7 +116,7 @@ void midway_cheap_squeak_deluxe_device::suspend_cpu()
 //  stat_r - return the status value
 //-------------------------------------------------
 
-READ8_MEMBER( midway_cheap_squeak_deluxe_device::stat_r )
+u8 midway_cheap_squeak_deluxe_device::stat_r()
 {
 	return m_status;
 }
@@ -125,7 +125,7 @@ READ8_MEMBER( midway_cheap_squeak_deluxe_device::stat_r )
 //  sr_w - external 4-bit write to the input latch
 //-------------------------------------------------
 
-WRITE8_MEMBER( midway_cheap_squeak_deluxe_device::sr_w )
+void midway_cheap_squeak_deluxe_device::sr_w(u8 data)
 {
 	m_pia->write_portb(data & 0x0f);
 }

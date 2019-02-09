@@ -38,6 +38,9 @@ public:
 
 	void init_dps1();
 
+protected:
+	virtual void machine_reset() override;
+
 private:
 	DECLARE_WRITE8_MEMBER(portb2_w);
 	DECLARE_WRITE8_MEMBER(portb4_w);
@@ -49,7 +52,6 @@ private:
 	DECLARE_READ8_MEMBER(portff_r);
 	DECLARE_WRITE8_MEMBER(portff_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
-	DECLARE_MACHINE_RESET(dps1);
 
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
@@ -167,7 +169,7 @@ WRITE_LINE_MEMBER( dps1_state::fdc_drq_w )
 	// else take /dack high (unsupported)
 }
 
-MACHINE_RESET_MEMBER( dps1_state, dps1 )
+void dps1_state::machine_reset()
 {
 	membank("bankr0")->set_entry(1); // point at rom
 	membank("bankw0")->set_entry(0); // always write to ram
@@ -196,13 +198,12 @@ static void floppies(device_slot_interface &device)
 	device.option_add("floppy0", FLOPPY_8_DSDD);
 }
 
-MACHINE_CONFIG_START(dps1_state::dps1)
+void dps1_state::dps1(machine_config &config)
+{
 	// basic machine hardware
 	Z80(config, m_maincpu, 4_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &dps1_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &dps1_state::io_map);
-
-	MCFG_MACHINE_RESET_OVERRIDE(dps1_state, dps1)
 
 	/* video hardware */
 	mc2661_device &uart(MC2661(config, "uart", 5.0688_MHz_XTAL)); // Signetics 2651N
@@ -222,14 +223,12 @@ MACHINE_CONFIG_START(dps1_state::dps1)
 	UPD765A(config, m_fdc, 16_MHz_XTAL / 2, false, true);
 	//m_fdc->intrq_wr_callback().set(FUNC(dps1_state::fdc_int_w)); // doesn't appear to be used
 	m_fdc->drq_wr_callback().set(FUNC(dps1_state::fdc_drq_w));
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", floppies, "floppy0", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	//MCFG_FLOPPY_DRIVE_ADD("fdc:1", floppies, "floppy1", floppy_image_device::default_floppy_formats)
-	//MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, "fdc:0", floppies, "floppy0", floppy_image_device::default_floppy_formats).enable_sound(true);
+	//FLOPPY_CONNECTOR(config, "fdc:1", floppies, "floppy1", floppy_image_device::default_floppy_formats).enable_sound(true);
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "dps1")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "flop_list").set_original("dps1");
+}
 
 ROM_START( dps1 )
 	ROM_REGION( 0x800, "maincpu", 0 )

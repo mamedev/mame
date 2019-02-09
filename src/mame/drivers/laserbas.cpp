@@ -373,7 +373,7 @@ MACHINE_CONFIG_START(laserbas_state::laserbas)
 	MCFG_DEVICE_ADD("maincpu", Z80, CLOCK / 4)
 	MCFG_DEVICE_PROGRAM_MAP(laserbas_memory)
 	MCFG_DEVICE_IO_MAP(laserbas_io)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", laserbas_state, laserbas_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(laserbas_state::laserbas_scanline), "screen", 0, 1);
 
 	/* TODO: clocks aren't known */
 	pit8253_device &pit0(PIT8253(config, "pit0", 0));

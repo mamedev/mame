@@ -1344,8 +1344,8 @@ MACHINE_CONFIG_START(snes_console_state::snes)
 	MCFG_DEVICE_ADD("soundcpu", SPC700, XTAL(24'576'000) / 12)
 	MCFG_DEVICE_PROGRAM_MAP(spc_map)
 
-	//MCFG_QUANTUM_TIME(attotime::from_hz(48000))
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	//config.m_minimum_quantum = attotime::from_hz(48000);
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1356,11 +1356,11 @@ MACHINE_CONFIG_START(snes_console_state::snes)
 	m_ppu->open_bus_callback().set([this] { return snes_open_bus_r(); }); // lambda because overloaded function name
 	m_ppu->set_screen("screen");
 
-	MCFG_SNES_CONTROL_PORT_ADD("ctrl1", snes_control_port_devices, "joypad")
-	MCFG_SNESCTRL_ONSCREEN_CB(snes_console_state, onscreen_cb)
-	MCFG_SNES_CONTROL_PORT_ADD("ctrl2", snes_control_port_devices, "joypad")
-	MCFG_SNESCTRL_ONSCREEN_CB(snes_console_state, onscreen_cb)
-	MCFG_SNESCTRL_GUNLATCH_CB(snes_console_state, gun_latch_cb)
+	SNES_CONTROL_PORT(config, m_ctrl1, snes_control_port_devices, "joypad");
+	m_ctrl1->set_onscreen_callback(FUNC(snes_console_state::onscreen_cb), this);
+	SNES_CONTROL_PORT(config, m_ctrl2, snes_control_port_devices, "joypad");
+	m_ctrl2->set_onscreen_callback(FUNC(snes_console_state::onscreen_cb), this);
+	m_ctrl2->set_gunlatch_callback(FUNC(snes_console_state::gun_latch_cb), this);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1372,9 +1372,9 @@ MACHINE_CONFIG_START(snes_console_state::snes)
 	SNS_CART_SLOT(config, m_cartslot, MCLK_NTSC, snes_cart, nullptr);
 	m_cartslot->irq_callback().set_inputline(m_maincpu, G65816_LINE_IRQ);
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list","snes")
-	MCFG_SOFTWARE_LIST_ADD("bsx_list","snes_bspack")
-	MCFG_SOFTWARE_LIST_ADD("st_list","snes_strom")
+	SOFTWARE_LIST(config, "cart_list").set_original("snes");
+	SOFTWARE_LIST(config, "bsx_list").set_original("snes_bspack");
+	SOFTWARE_LIST(config, "st_list").set_original("snes_strom");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(snes_console_state::snespal)

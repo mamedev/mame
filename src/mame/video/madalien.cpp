@@ -370,7 +370,7 @@ MACHINE_CONFIG_START(madalien_state::madalien_video)
 	MCFG_SCREEN_UPDATE_DRIVER(madalien_state, screen_update_madalien)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_madalien)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_madalien);
 	PALETTE(config, m_palette, FUNC(madalien_state::madalien_palette), 0x30, 0x20);
 	MCFG_VIDEO_START_OVERRIDE(madalien_state,madalien)
 

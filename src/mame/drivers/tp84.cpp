@@ -242,9 +242,9 @@ void tp84_state::audio_map(address_map &map)
 	map(0x8000, 0x8000).r(FUNC(tp84_state::tp84_sh_timer_r));
 	map(0xa000, 0xa1ff).w(FUNC(tp84_state::tp84_filter_w));
 	map(0xc000, 0xc000).nopw();
-	map(0xc001, 0xc001).w("y2404_1", FUNC(y2404_device::command_w));
-	map(0xc003, 0xc003).w("y2404_2", FUNC(y2404_device::command_w));
-	map(0xc004, 0xc004).w("y2404_3", FUNC(y2404_device::command_w));
+	map(0xc001, 0xc001).w("y2404_1", FUNC(y2404_device::write));
+	map(0xc003, 0xc003).w("y2404_2", FUNC(y2404_device::write));
+	map(0xc004, 0xc004).w("y2404_3", FUNC(y2404_device::write));
 }
 
 
@@ -341,7 +341,7 @@ MACHINE_CONFIG_START(tp84_state::tp84)
 	MCFG_DEVICE_ADD("audiocpu", Z80,XTAL(14'318'181)/4) /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(audio_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - an high value to ensure proper */
+	config.m_minimum_quantum = attotime::from_hz(6000);  /* 100 CPU slices per frame - a high value to ensure proper */
 							/* synchronization of the CPUs */
 
 	ls259_device &mainlatch(LS259(config, "mainlatch", 0)); // 3B

@@ -313,25 +313,25 @@ void pkscram_state::machine_reset()
 	m_scan_timer->adjust(m_screen->time_until_pos(interrupt_scanline), interrupt_scanline);
 }
 
-MACHINE_CONFIG_START(pkscram_state::pkscramble)
+void pkscram_state::pkscramble(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 8000000 )
-	MCFG_DEVICE_PROGRAM_MAP(pkscramble_map)
-	//MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pkscram_state,  irq1_line_hold) /* only valid irq */
+	M68000(config, m_maincpu, 8000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pkscram_state::pkscramble_map);
+	//m_maincpu->set_vblank_int("screen", FUNC(pkscram_state::irq1_line_hold)); /* only valid irq */
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-
-	MCFG_TIMER_DRIVER_ADD("scan_timer", pkscram_state, scanline_callback)
+	TIMER(config, m_scan_timer).configure_generic(FUNC(pkscram_state::scanline_callback));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 24*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(pkscram_state, screen_update_pkscramble)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 0*8, 24*8-1);
+	m_screen->set_screen_update(FUNC(pkscram_state::screen_update_pkscramble));
+	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x800);
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_pkscram);
@@ -339,10 +339,10 @@ MACHINE_CONFIG_START(pkscram_state::pkscramble)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, 12000000/4)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(*this, pkscram_state, irqhandler))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
-MACHINE_CONFIG_END
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", 12000000/4));
+	ymsnd.irq_handler().set(FUNC(pkscram_state::irqhandler));
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.60);
+}
 
 
 ROM_START( pkscram )

@@ -236,8 +236,8 @@ MACHINE_CONFIG_START(cgc7900_state::cgc7900_video)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 768-1)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, cgc7900_state, irq<0xc>))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_cgc7900)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_cgc7900);
 	PALETTE(config, m_palette, FUNC(cgc7900_state::cgc7900_palette), 8);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("blink", cgc7900_state, blink_tick, attotime::from_hz(XTAL(28'480'000)/7500000))
+	TIMER(config, "blink").configure_periodic(FUNC(cgc7900_state::blink_tick), attotime::from_hz(XTAL(28'480'000)/7500000));
 MACHINE_CONFIG_END

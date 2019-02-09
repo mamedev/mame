@@ -264,7 +264,7 @@ MACHINE_CONFIG_START(tosh1000_state::tosh1000)
 
 	MCFG_MACHINE_RESET_OVERRIDE(tosh1000_state, tosh1000)
 
-	MCFG_IBM5160_MOTHERBOARD_ADD("mb", "maincpu")
+	IBM5160_MOTHERBOARD(config, "mb", 0).set_cputag(m_maincpu);
 
 	TC8521(config, "rtc", XTAL(32'768));
 
@@ -277,7 +277,7 @@ MACHINE_CONFIG_START(tosh1000_state::tosh1000)
 	MCFG_DEVICE_ADD("isa5", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
 	MCFG_DEVICE_ADD("isa6", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
 
-//  MCFG_SOFTWARE_LIST_ADD("flop_list","tosh1000")
+//  SOFTWARE_LIST(config, "flop_list").set_original("tosh1000");
 
 	// uses a 80C50 instead of 8042 for KBDC
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270)

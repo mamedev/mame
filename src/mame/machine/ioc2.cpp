@@ -95,12 +95,12 @@ void ioc2_device::device_add_mconfig(machine_config &config)
 	m_kbdc->input_buffer_full_callback().set(FUNC(ioc2_device::kbdc_int_w));
 
 	PIT8254(config, m_pit, 0);
-	m_pit->set_clk<0>(1000000);
-	m_pit->set_clk<1>(1000000);
+	m_pit->set_clk<0>(0);
+	m_pit->set_clk<1>(0);
 	m_pit->set_clk<2>(1000000);
 	m_pit->out_handler<0>().set(FUNC(ioc2_device::timer0_int));
 	m_pit->out_handler<1>().set(FUNC(ioc2_device::timer1_int));
-	m_pit->out_handler<2>().set(m_kbdc, FUNC(kbdc8042_device::write_out2));
+	m_pit->out_handler<2>().set(FUNC(ioc2_device::pit_clock2_out));
 }
 
 
@@ -173,25 +173,32 @@ void ioc2_device::device_reset()
 void ioc2_device::raise_local_irq(int channel, uint8_t mask)
 {
 	m_int3_local_status_reg[channel] |= mask;
-	m_maincpu->set_input_line(MIPS3_IRQ0 + channel, (m_int3_local_mask_reg[channel] & m_int3_local_status_reg[channel]) ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(channel, (m_int3_local_mask_reg[channel] & m_int3_local_status_reg[channel]) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void ioc2_device::lower_local_irq(int channel, uint8_t mask)
 {
 	m_int3_local_status_reg[channel] &= ~mask;
-	m_maincpu->set_input_line(MIPS3_IRQ0 + channel, (m_int3_local_mask_reg[channel] & m_int3_local_status_reg[channel]) ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(channel, (m_int3_local_mask_reg[channel] & m_int3_local_status_reg[channel]) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER(ioc2_device::timer0_int)
 {
 	if (state)
-		m_maincpu->set_input_line(MIPS3_IRQ2, ASSERT_LINE);
+		m_maincpu->set_input_line(2, ASSERT_LINE);
 }
 
 WRITE_LINE_MEMBER(ioc2_device::timer1_int)
 {
 	if (state)
-		m_maincpu->set_input_line(MIPS3_IRQ3, ASSERT_LINE);
+		m_maincpu->set_input_line(3, ASSERT_LINE);
+}
+
+WRITE_LINE_MEMBER(ioc2_device::pit_clock2_out)
+{
+	m_pit->write_clk0(state);
+	m_pit->write_clk1(state);
+	m_kbdc->write_out2(state);
 }
 
 WRITE_LINE_MEMBER(ioc2_device::kbdc_int_w)
@@ -617,7 +624,7 @@ void ioc2_device::set_local_int_mask(int channel, uint32_t mask)
 	if (old_line != new_line)
 	{
 		const uint32_t int_bits = (m_int3_local_mask_reg[channel] & m_int3_local_status_reg[channel]);
-		m_maincpu->set_input_line(MIPS3_IRQ0 + channel, int_bits != 0 ? ASSERT_LINE : CLEAR_LINE);
+		m_maincpu->set_input_line(channel, int_bits != 0 ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -629,9 +636,9 @@ void ioc2_device::set_map_int_mask(int channel, uint32_t mask)
 void ioc2_device::set_timer_int_clear(uint32_t data)
 {
 	if (BIT(data, 0))
-		m_maincpu->set_input_line(MIPS3_IRQ2, CLEAR_LINE);
+		m_maincpu->set_input_line(2, CLEAR_LINE);
 	if (BIT(data, 1))
-		m_maincpu->set_input_line(MIPS3_IRQ3, CLEAR_LINE);
+		m_maincpu->set_input_line(3, CLEAR_LINE);
 }
 
 void ioc2_device::handle_reset_reg_write(uint8_t data)

@@ -445,13 +445,15 @@ void vtech1_state::laser110(machine_config &config)
 
 	// video hardware
 	MC6847_PAL(config, m_mc6847, XTAL(4'433'619));
+	m_mc6847->set_screen("screen");
 	m_mc6847->fsync_wr_callback().set_inputline(m_maincpu, 0).invert();
 	m_mc6847->input_callback().set(FUNC(vtech1_state::mc6847_videoram_r));
 	m_mc6847->set_black_and_white(true);
 	m_mc6847->set_get_fixed_mode(mc6847_pal_device::MODE_GM1);
-	mc6847_base_device::add_pal_screen(config, "screen", "mc6847");
 	// GM2 = GND, GM0 = GND, INTEXT = GND
 	// other lines not connected
+
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -465,7 +467,7 @@ void vtech1_state::laser110(machine_config &config)
 
 	// snapshot
 	snapshot_image_device &snapshot(SNAPSHOT(config, "snapshot", 0));
-	snapshot.set_handler(snapquick_load_delegate(&SNAPSHOT_LOAD_NAME(vtech1_state, vtech1), this), "vz", 1.5);
+	snapshot.set_handler(snapquick_load_delegate(&SNAPSHOT_LOAD_NAME(vtech1_state, vtech1), this), "vz", attotime::from_double(1.5));
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(vtech1_cassette_formats);
@@ -479,6 +481,7 @@ void vtech1_state::laser200(machine_config &config)
 {
 	laser110(config);
 	MC6847_PAL(config.replace(), m_mc6847, XTAL(4'433'619));
+	m_mc6847->set_screen("screen");
 	m_mc6847->fsync_wr_callback().set_inputline(m_maincpu, 0).invert();
 	m_mc6847->input_callback().set(FUNC(vtech1_state::mc6847_videoram_r));
 	m_mc6847->set_get_fixed_mode(mc6847_pal_device::MODE_GM1);
@@ -506,6 +509,7 @@ void vtech1_state::laser310h(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &vtech1_state::vtech1_shrg_io);
 
 	MC6847_PAL(config.replace(), m_mc6847, XTAL(4'433'619));
+	m_mc6847->set_screen("screen");
 	m_mc6847->fsync_wr_callback().set_inputline(m_maincpu, 0).invert();
 	m_mc6847->input_callback().set(FUNC(vtech1_state::mc6847_videoram_r));
 	m_mc6847->set_get_fixed_mode(mc6847_pal_device::MODE_GM1);

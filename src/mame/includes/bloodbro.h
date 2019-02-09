@@ -8,14 +8,16 @@
 #include "audio/seibu.h"
 #include "sound/3812intf.h"
 #include "emupal.h"
+#include "screen.h"
 
-class bloodbro_state : public driver_device, protected seibu_sound_common
+class bloodbro_state : public driver_device, public seibu_sound_common
 {
 public:
 	bloodbro_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_audiocpu(*this, "audiocpu"),
 		m_seibu_sound(*this, "seibu_sound"),
@@ -28,6 +30,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<cpu_device> m_audiocpu;
 	required_device<seibu_sound_device> m_seibu_sound;

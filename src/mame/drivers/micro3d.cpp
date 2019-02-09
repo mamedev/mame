@@ -240,7 +240,6 @@ void micro3d_state::vgbmem(address_map &map)
 	map(0x02e00000, 0x02e0003f).w(FUNC(micro3d_state::vgb_uart_w)).umask16(0x00ff);
 	map(0x03800000, 0x03dfffff).rom().region("tms_gfx", 0);
 	map(0x03e00000, 0x03ffffff).rom().region("tms34010", 0);
-	map(0xc0000000, 0xc00001ff).rw(m_vgb, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xffe00000, 0xffffffff).rom().region("tms34010", 0);
 }
 
@@ -331,12 +330,12 @@ MACHINE_CONFIG_START(micro3d_state::micro3d)
 	m_audiocpu->serial_tx_cb().set(FUNC(micro3d_state::data_from_i8031));
 	m_audiocpu->serial_rx_cb().set(FUNC(micro3d_state::data_to_i8031));
 
-	MCFG_DEVICE_ADD("duart", MC68681, 3.6864_MHz_XTAL)
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, micro3d_state, duart_irq_handler))
-	MCFG_MC68681_A_TX_CALLBACK(WRITELINE("monitor_host", rs232_port_device, write_txd))
-	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(*this, micro3d_state, duart_txb))
-	MCFG_MC68681_INPORT_CALLBACK(READ8(*this, micro3d_state, duart_input_r))
-	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, micro3d_state, duart_output_w))
+	MC68681(config, m_duart, 3.6864_MHz_XTAL);
+	m_duart->irq_cb().set(FUNC(micro3d_state::duart_irq_handler));
+	m_duart->a_tx_cb().set("monitor_host", FUNC(rs232_port_device::write_txd));
+	m_duart->b_tx_cb().set(FUNC(micro3d_state::duart_txb));
+	m_duart->inport_cb().set(FUNC(micro3d_state::duart_input_r));
+	m_duart->outport_cb().set(FUNC(micro3d_state::duart_output_w));
 
 	mc68901_device &mfp(MC68901(config, "mfp", 4000000));
 	mfp.set_timer_clock(4000000);
@@ -348,7 +347,7 @@ MACHINE_CONFIG_START(micro3d_state::micro3d)
 	mfp.out_tco_cb().set("mfp", FUNC(mc68901_device::tbi_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-	MCFG_QUANTUM_TIME(attotime::from_hz(3000))
+	config.m_minimum_quantum = attotime::from_hz(3000);
 
 	PALETTE(config, m_palette).set_format(palette_device::BRGx_555, 4096);
 

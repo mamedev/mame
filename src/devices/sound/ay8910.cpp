@@ -511,6 +511,56 @@ Yamaha YMZ294: limited info: 0 I/O port
     between 4MHz (H) and 6MHz (L), while pin 10 is /TEST.
 OKI M5255, Winbond WF19054, JFC 95101, File KC89C72, Toshiba T7766A : differences to be listed
 
+AY8930 Expanded mode registers :
+	Bank Register Bits
+	A    0        xxxx xxxx Channel A Tone period fine tune
+	A    1        xxxx xxxx Channel A Tone period coarse tune
+	A    2        xxxx xxxx Channel B Tone period fine tune
+	A    3        xxxx xxxx Channel B Tone period coarse tune
+	A    4        xxxx xxxx Channel C Tone period fine tune
+	A    5        xxxx xxxx Channel C Tone period coarse tune
+	A    6        xxxx xxxx Noise period
+	A    7        x--- ---- I/O Port B input(0) / output(1)
+	              -x-- ---- I/O Port A input(0) / output(1)
+	              --x- ---- Channel C Noise enable(0) / disable(1)
+	              ---x ---- Channel B Noise enable(0) / disable(1)
+	              ---- x--- Channel A Noise enable(0) / disable(1)
+	              ---- -x-- Channel C Tone enable(0) / disable(1)
+	              ---- --x- Channel B Tone enable(0) / disable(1)
+	              ---- ---x Channel A Tone enable(0) / disable(1)
+	A    8        --x- ---- Channel A Envelope mode
+	              ---x xxxx Channel A Tone volume
+	A    9        --x- ---- Channel B Envelope mode
+	              ---x xxxx Channel B Tone volume
+	A    A        --x- ---- Channel C Envelope mode
+	              ---x xxxx Channel C Tone volume
+	A    B        xxxx xxxx Channel A Envelope period fine tune
+	A    C        xxxx xxxx Channel A Envelope period coarse tune
+	A    D        101- ---- 101 = Expanded mode enable, other AY-3-8910A Compatiblity mode
+	              ---0 ---- 0 for Register Bank A
+	              ---- xxxx Channel A Envelope Shape/Cycle
+	A    E        xxxx xxxx 8 bit Parallel I/O on Port A
+	A    F        xxxx xxxx 8 bit Parallel I/O on Port B
+
+	B    0        xxxx xxxx Channel B Envelope period fine tune
+	B    1        xxxx xxxx Channel B Envelope period coarse tune
+	B    2        xxxx xxxx Channel C Envelope period fine tune
+	B    3        xxxx xxxx Channel C Envelope period coarse tune
+	B    4        ---- xxxx Channel B Envelope Shape/Cycle
+	B    5        ---- xxxx Channel C Envelope Shape/Cycle
+	B    6        ---- xxxx Channel A Duty Cycle
+	B    7        ---- xxxx Channel B Duty Cycle
+	B    8        ---- xxxx Channel C Duty Cycle
+	B    9        xxxx xxxx Noise "And" Mask
+	B    A        xxxx xxxx Noise "Or" Mask
+	B    B        Reserved (Read as 0)
+	B    C        Reserved (Read as 0)
+	B    D        101- ---- 101 = Expanded mode enable, other AY-3-8910A Compatiblity mode
+	              ---1 ---- 1 for Register Bank B
+	              ---- xxxx Channel A Envelope Shape
+	B    E        Reserved (Read as 0)
+	B    F        Test (Function unknown)
+
 Decaps:
 AY-3-8914 - http://siliconpr0n.org/map/gi/ay-3-8914/mz_mit20x/
 AY-3-8910 - http://privatfrickler.de/blick-auf-den-chip-soundchip-general-instruments-ay-3-8910/
@@ -889,6 +939,7 @@ uint16_t ay8910_device::mix_3D()
 void ay8910_device::ay8910_write_reg(int r, int v)
 {
 	//if (r >= 11 && r <= 13 ) printf("%d %x %02x\n", PSG->index, r, v);
+	device_type chip_type = type();
 	m_regs[r] = v;
 
 	switch( r )
@@ -930,6 +981,14 @@ void ay8910_device::ay8910_write_reg(int r, int v)
 			m_last_enable = m_regs[AY_ENABLE];
 			break;
 		case AY_ESHAPE:
+			if (chip_type == AY8930)
+			{
+				m_mode = (v >> 4) & 0xf;
+				if ((m_mode & 0xe) == 0xa) // AY8930 expanded mode
+					logerror("warning: activated unemulated extended mode at %s, bank %02x\n", name(), m_mode & 1);
+				else if (m_mode & 0xf)
+					logerror("warning: activated unknown mode %02x at %s\n", m_mode & 0xf, name());
+			}
 			if ( (v & 0x0f) > 0)
 				osd_printf_verbose("EShape\n");
 			m_attack = (m_regs[AY_ESHAPE] & 0x04) ? m_env_step_mask : 0x00;
@@ -1175,6 +1234,7 @@ void ay8910_device::ay8910_statesave()
 	save_item(NAME(m_attack));
 	save_item(NAME(m_holding));
 	save_item(NAME(m_rng));
+	save_item(NAME(m_mode));
 }
 
 //-------------------------------------------------
@@ -1483,6 +1543,7 @@ ay8910_device::ay8910_device(const machine_config &mconfig, device_type type, co
 		m_attack(0),
 		m_holding(0),
 		m_rng(0),
+		m_mode(0),
 		m_env_step_mask(psg_type == PSG_TYPE_AY ? 0x0f : 0x1f),
 		m_step(         psg_type == PSG_TYPE_AY ? 2 : 1),
 		m_zero_is_off(  psg_type == PSG_TYPE_AY ? 1 : 0),

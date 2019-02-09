@@ -773,7 +773,7 @@ MACHINE_CONFIG_START(bwidow_state::bwidow)
 	MCFG_DEVICE_ADD("earom", ER2055)
 
 	/* video hardware */
-	MCFG_VECTOR_ADD("vector")
+	VECTOR(config, "vector", 0);
 	MCFG_SCREEN_ADD("screen", VECTOR)
 	MCFG_SCREEN_REFRESH_RATE(CLOCK_3KHZ / 12 / 4)
 	MCFG_SCREEN_SIZE(400, 300)

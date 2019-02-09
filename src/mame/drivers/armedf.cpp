@@ -1349,10 +1349,11 @@ MACHINE_CONFIG_START(armedf_state::terrafjb)
 	MCFG_SOUND_ROUTE(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(armedf_state::terrafb)
+void armedf_state::terrafb(machine_config &config)
+{
 	terraf(config);
-	MCFG_DEVICE_REMOVE("nb1414m4")
-MACHINE_CONFIG_END
+	config.device_remove("nb1414m4");
+}
 
 MACHINE_CONFIG_START(armedf_state::kozure)
 

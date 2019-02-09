@@ -296,7 +296,7 @@ MACHINE_CONFIG_START(v6809_state::v6809)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", sy6545_1_device, screen_update)
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_v6809)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_v6809);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -343,14 +343,13 @@ MACHINE_CONFIG_START(v6809_state::v6809)
 	acia_clock.signal_handler().append("acia1", FUNC(acia6850_device::write_txc));
 	acia_clock.signal_handler().append("acia1", FUNC(acia6850_device::write_rxc));
 
-	MCFG_DEVICE_ADD("rtc", MM58274C, 0)
+	mm58274c_device &rtc(MM58274C(config, "rtc", 0));
 // this is all guess
-	MCFG_MM58274C_MODE24(0) // 12 hour
-	MCFG_MM58274C_DAY1(1)   // monday
+	rtc.set_mode24(0); // 12 hour
+	rtc.set_day1(1);   // monday
 
 	MB8876(config, m_fdc, 16_MHz_XTAL / 16);
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", v6809_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, "fdc:0", v6809_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
 MACHINE_CONFIG_END
 
 /* ROM definition */

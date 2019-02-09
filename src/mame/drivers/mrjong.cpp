@@ -85,8 +85,8 @@ void mrjong_state::mrjong_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).portr("P2").w(FUNC(mrjong_state::mrjong_flipscreen_w));
-	map(0x01, 0x01).portr("P1").w("sn1", FUNC(sn76489_device::command_w));
-	map(0x02, 0x02).portr("DSW").w("sn2", FUNC(sn76489_device::command_w));
+	map(0x01, 0x01).portr("P1").w("sn1", FUNC(sn76489_device::write));
+	map(0x02, 0x02).portr("DSW").w("sn2", FUNC(sn76489_device::write));
 	map(0x03, 0x03).r(FUNC(mrjong_state::io_0x03_r));     // Unknown
 }
 

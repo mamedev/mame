@@ -569,16 +569,14 @@ MACHINE_CONFIG_START(marineb_state::marineb)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(marineb_state::changes)
+void marineb_state::changes(machine_config &config)
+{
 	marineb(config);
 
-	/* basic machine hardware */
-
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_changes)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(marineb_state, screen_update_changes)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_changes);
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(marineb_state::screen_update_changes));
+}
 
 
 void marineb_state::springer(machine_config &config)
@@ -592,16 +590,14 @@ void marineb_state::springer(machine_config &config)
 }
 
 
-MACHINE_CONFIG_START(marineb_state::hoccer)
+void marineb_state::hoccer(machine_config &config)
+{
 	marineb(config);
 
-	/* basic machine hardware */
-
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_hoccer)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(marineb_state, screen_update_hoccer)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_hoccer);
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(marineb_state::screen_update_hoccer));
+}
 
 
 MACHINE_CONFIG_START(marineb_state::wanted)
@@ -614,7 +610,7 @@ MACHINE_CONFIG_START(marineb_state::wanted)
 	m_outlatch->q_out_cb<0>().set(FUNC(marineb_state::irq_mask_w));
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_wanted)
+	m_gfxdecode->set_info(gfx_wanted);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(marineb_state, screen_update_springer)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, marineb_state, wanted_vblank_irq))
@@ -626,16 +622,14 @@ MACHINE_CONFIG_START(marineb_state::wanted)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(marineb_state::hopprobo)
+void marineb_state::hopprobo(machine_config &config)
+{
 	marineb(config);
 
-	/* basic machine hardware */
-
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_hopprobo)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(marineb_state, screen_update_hopprobo)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_hopprobo);
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(marineb_state::screen_update_hopprobo));
+}
 
 
 void marineb_state::bcruzm12(machine_config &config)

@@ -143,7 +143,7 @@ MACHINE_CONFIG_START(monon_color_state::monon_color)
 	MCFG_GENERIC_MANDATORY
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","monon_color")
+	SOFTWARE_LIST(config, "cart_list").set_original("monon_color");
 MACHINE_CONFIG_END
 
 DEVICE_IMAGE_LOAD_MEMBER( monon_color_state, monon_color_cart )

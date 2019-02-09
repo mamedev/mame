@@ -749,14 +749,14 @@ MACHINE_CONFIG_START(cpu30_state::cpu30)
 //  m_pit2->timer_irq_callback().set(m_fga002, FUNC(fga002_device::lirq3_w)); // The timer interrupt seems to silence the terminal interrupt, needs invectigation
 
 	/* FGA-002, Force Gate Array */
-	fga002_device &fga002(FGA002(config, m_fga002, 0));
-	fga002.out_int().set(FUNC(cpu30_state::fga_irq_callback));
-	fga002.liack4().set("duscc",  FUNC(duscc_device::iack));
-	fga002.liack5().set("duscc2", FUNC(duscc_device::iack));
+	FGA002(config, m_fga002, 0);
+	m_fga002->out_int().set(FUNC(cpu30_state::fga_irq_callback));
+	m_fga002->liack4().set("duscc",  FUNC(duscc_device::iack));
+	m_fga002->liack5().set("duscc2", FUNC(duscc_device::iack));
 
 	// RTC
-	MCFG_DEVICE_ADD("rtc", RTC72423, XTAL(32'768)) // Fake crystal value, the 72423 uses it own internal crystal
-	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE("fga002", fga002_device, lirq0_w))
+	RTC72423(config, m_rtc, XTAL(32'768)); // Fake crystal value, the 72423 uses it own internal crystal
+	m_rtc->out_int_handler().set(m_fga002, FUNC(fga002_device::lirq0_w));
 
 	// dual ported ram
 	RAM(config, m_ram).set_default_size("4M").set_extra_options("8M, 16M, 32M");
@@ -768,7 +768,7 @@ MACHINE_CONFIG_START(cpu30_state::cpu30x)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(XTAL(16'777'216)) /* 16.7 MHz  from description, crystal needs verification */
 
-//  MCFG_DEVICE_REMOVE("")
+//  config.device_remove("");
 
 	// dual ported ram
 	m_ram->set_default_size("1M").set_extra_options("1M, 2M, 4M");
@@ -832,10 +832,10 @@ void cpu30_state::cpu30lite4(machine_config &config)
 {
 	cpu30zbe(config);
 // Enable these when added to main config
-//  MCFG_DEVICE_REMOVE("fpu")
-//  MCFG_DEVICE_REMOVE("scsi")
-//  MCFG_DEVICE_REMOVE("eth")
-//  MCFG_DEVICE_REMOVE("fdc")
+//  config.device_remove("fpu");
+//  config.device_remove("scsi");
+//  config.device_remove("eth");
+//  config.device_remove("fdc");
 	// dual ported ram
 	m_ram->set_default_size("4M").set_extra_options("256K, 512K, 1M, 2M, 4M, 8M, 16M, 32M");
 }

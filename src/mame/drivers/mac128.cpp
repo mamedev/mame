@@ -109,8 +109,8 @@ c0   8 data bits, Rx disabled
 #define DAC_TAG "macdac"
 #define SCC_TAG "scc"
 
-#define C7M (7833600)
-#define C3_7M (3916800)
+#define C7M (15.6672_MHz_XTAL / 2)
+#define C3_7M (15.6672_MHz_XTAL / 4).value()
 
 // uncomment to run i8021 keyboard in original Mac/512(e)/Plus
 //#define MAC_USE_EMULATED_KBD (1)
@@ -220,6 +220,7 @@ private:
 	int m_last_was_x;
 	int m_screen_buffer;
 	emu_timer *m_scan_timer;
+	emu_timer *m_hblank_timer;
 
 	// interrupts
 	int m_scc_interrupt, m_via_interrupt, m_scsi_interrupt, m_last_taken_interrupt;
@@ -246,6 +247,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(set_scc_interrupt);
 
 	TIMER_CALLBACK_MEMBER(mac_scanline);
+	TIMER_CALLBACK_MEMBER(mac_hblank);
 	DECLARE_VIDEO_START(mac);
 	uint32_t screen_update_mac(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 #ifndef MAC_USE_EMULATED_KBD
@@ -291,8 +293,8 @@ void mac128_state::machine_start()
 	m_ram_mask = m_ram_size - 1;
 	m_rom_ptr = (u16*)memregion("bootrom")->base();
 
-	if (!m_scan_timer)
-		m_scan_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mac128_state::mac_scanline), this));
+	m_scan_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mac128_state::mac_scanline), this));
+	m_hblank_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mac128_state::mac_hblank), this));
 }
 
 void mac128_state::machine_reset()
@@ -320,6 +322,8 @@ void mac128_state::machine_reset()
 
 	const int next_vpos = m_screen->vpos() + 1;
 	m_scan_timer->adjust(m_screen->time_until_pos(next_vpos), next_vpos);
+	if (m_screen->vblank())
+		m_via->write_pb6(0);
 }
 
 READ16_MEMBER(mac128_state::ram_r)
@@ -451,6 +455,13 @@ TIMER_CALLBACK_MEMBER(mac128_state::mac_scanline)
 		vblank_irq();
 	}
 
+	/* video beam in display (! VBLANK && ! HBLANK basically) */
+	if (scanline < MAC_V_VIS)
+	{
+		m_via->write_pb6(1);
+		m_hblank_timer->adjust(m_screen->time_until_pos(scanline, MAC_H_VIS));
+	}
+
 	if (!(scanline % 10))
 	{
 		mouse_callback();
@@ -467,6 +478,11 @@ TIMER_CALLBACK_MEMBER(mac128_state::mac_scanline)
 
 	m_dac->write(mac_snd_buf_ptr[scanline] >> 8);
 	m_scan_timer->adjust(m_screen->time_until_pos(scanline+1), (scanline+1) % m_screen->height());
+}
+
+TIMER_CALLBACK_MEMBER(mac128_state::mac_hblank)
+{
+	m_via->write_pb6(0);
 }
 
 WRITE_LINE_MEMBER(mac128_state::mac_scsi_irq)
@@ -506,6 +522,7 @@ void mac128_state::scc_mouse_irq(int x, int y)
 	static int lasty = 0;
 	static int lastx = 0;
 
+	// DCD lines are active low in hardware but active high to software
 	if (x && y)
 	{
 		if (m_last_was_x)
@@ -514,12 +531,12 @@ void mac128_state::scc_mouse_irq(int x, int y)
 			{
 				if(lastx)
 				{
-					m_scc->dcda_w(CLEAR_LINE);
+					m_scc->dcda_w(1);
 					m_mouse_bit_x = 0;
 				}
 				else
 				{
-					m_scc->dcda_w(ASSERT_LINE);
+					m_scc->dcda_w(0);
 					m_mouse_bit_x = 1;
 				}
 			}
@@ -527,12 +544,12 @@ void mac128_state::scc_mouse_irq(int x, int y)
 			{
 				if(lastx)
 				{
-					m_scc->dcda_w(CLEAR_LINE);
+					m_scc->dcda_w(1);
 					m_mouse_bit_x = 1;
 				}
 				else
 				{
-					m_scc->dcda_w(ASSERT_LINE);
+					m_scc->dcda_w(0);
 					m_mouse_bit_x = 0;
 				}
 			}
@@ -544,12 +561,12 @@ void mac128_state::scc_mouse_irq(int x, int y)
 			{
 				if(lasty)
 				{
-					m_scc->dcdb_w(CLEAR_LINE);
+					m_scc->dcdb_w(1);
 					m_mouse_bit_y = 0;
 				}
 				else
 				{
-					m_scc->dcdb_w(ASSERT_LINE);
+					m_scc->dcdb_w(0);
 					m_mouse_bit_y = 1;
 				}
 			}
@@ -557,12 +574,12 @@ void mac128_state::scc_mouse_irq(int x, int y)
 			{
 				if(lasty)
 				{
-					m_scc->dcdb_w(CLEAR_LINE);
+					m_scc->dcdb_w(1);
 					m_mouse_bit_y = 1;
 				}
 				else
 				{
-					m_scc->dcdb_w(ASSERT_LINE);
+					m_scc->dcdb_w(0);
 					m_mouse_bit_y = 0;
 				}
 			}
@@ -579,12 +596,12 @@ void mac128_state::scc_mouse_irq(int x, int y)
 			{
 				if(lastx)
 				{
-					m_scc->dcda_w(CLEAR_LINE);
+					m_scc->dcda_w(1);
 					m_mouse_bit_x = 0;
 				}
 				else
 				{
-					m_scc->dcda_w(ASSERT_LINE);
+					m_scc->dcda_w(0);
 					m_mouse_bit_x = 1;
 				}
 			}
@@ -592,12 +609,12 @@ void mac128_state::scc_mouse_irq(int x, int y)
 			{
 				if(lastx)
 				{
-					m_scc->dcda_w(CLEAR_LINE);
+					m_scc->dcda_w(1);
 					m_mouse_bit_x = 1;
 				}
 				else
 				{
-					m_scc->dcda_w(ASSERT_LINE);
+					m_scc->dcda_w(0);
 					m_mouse_bit_x = 0;
 				}
 			}
@@ -609,12 +626,12 @@ void mac128_state::scc_mouse_irq(int x, int y)
 			{
 				if(lasty)
 				{
-					m_scc->dcdb_w(CLEAR_LINE);
+					m_scc->dcdb_w(1);
 					m_mouse_bit_y = 0;
 				}
 				else
 				{
-					m_scc->dcdb_w(ASSERT_LINE);
+					m_scc->dcdb_w(0);
 					m_mouse_bit_y = 1;
 				}
 			}
@@ -622,12 +639,12 @@ void mac128_state::scc_mouse_irq(int x, int y)
 			{
 				if(lasty)
 				{
-					m_scc->dcdb_w(CLEAR_LINE);
+					m_scc->dcdb_w(1);
 					m_mouse_bit_y = 1;
 				}
 				else
 				{
-					m_scc->dcdb_w(ASSERT_LINE);
+					m_scc->dcdb_w(0);
 					m_mouse_bit_y = 0;
 				}
 			}
@@ -733,10 +750,7 @@ READ8_MEMBER(mac128_state::mac_via_in_a)
 
 READ8_MEMBER(mac128_state::mac_via_in_b)
 {
-	int val = 0;
-	/* video beam in display (! VBLANK && ! HBLANK basically) */
-	if (m_screen->vpos() >= MAC_V_VIS)
-		val |= 0x40;
+	int val = 0x40;
 
 	if (m_mouse_bit_y)  /* Mouse Y2 */
 		val |= 0x20;
@@ -1336,7 +1350,7 @@ void mac128_state::mac512ke(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(C7M*2, MAC_H_TOTAL, 0, MAC_H_VIS, MAC_V_TOTAL, 0, MAC_V_VIS);
+	m_screen->set_raw(15.6672_MHz_XTAL, MAC_H_TOTAL, 0, MAC_H_VIS, MAC_V_TOTAL, 0, MAC_V_VIS);
 	m_screen->set_screen_update(FUNC(mac128_state::screen_update_mac));
 	m_screen->set_palette("palette");
 

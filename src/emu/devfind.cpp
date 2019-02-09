@@ -22,6 +22,8 @@ template class object_finder_base<memory_bank, false>;
 template class object_finder_base<memory_bank, true>;
 template class object_finder_base<ioport_port, false>;
 template class object_finder_base<ioport_port, true>;
+template class object_finder_base<address_space, false>;
+template class object_finder_base<address_space, true>;
 
 template class object_finder_base<u8, false>;
 template class object_finder_base<u8, true>;
@@ -49,6 +51,9 @@ template class memory_bank_finder<true>;
 
 template class ioport_finder<false>;
 template class ioport_finder<true>;
+
+template class address_space_finder<false>;
+template class address_space_finder<true>;
 
 template class region_ptr_finder<u8, false>;
 template class region_ptr_finder<u8, true>;
@@ -226,6 +231,79 @@ void *finder_base::find_memshare(u8 width, size_t &bytes, bool required) const
 	// return results
 	bytes = share->bytes();
 	return share->ptr();
+}
+
+
+//-------------------------------------------------
+//  find_addrspace - find address space
+//-------------------------------------------------
+
+address_space *finder_base::find_addrspace(int spacenum, u8 width, bool required) const
+{
+	// look up the device and return nullptr if not found
+	device_t *const device(m_base.get().subdevice(m_tag));
+	if (device == nullptr)
+		return nullptr;
+
+	// check for memory interface and the specified space number
+	const device_memory_interface *memory;
+	if (!device->interface(memory))
+	{
+		if (required)
+			osd_printf_warning("Device '%s' found but lacks memory interface\n", m_tag);
+		return nullptr;
+	}
+	if (!memory->has_space(spacenum))
+	{
+		if (required)
+			osd_printf_warning("Device '%s' found but lacks address space #%d\n", m_tag, spacenum);
+		return nullptr;
+	}
+
+	// check data width
+	address_space &space(memory->space(spacenum));
+	if (width != 0 && width != space.data_width())
+	{
+		if (required)
+			osd_printf_warning("Device '%s' found but address space #%d has the wrong data width (expected %d, found %d)\n", m_tag, spacenum, width, space.data_width());
+		return nullptr;
+	}
+
+	// return result
+	return &space;
+}
+
+
+//-------------------------------------------------
+//  validate_addrspace - find address space
+//-------------------------------------------------
+
+bool finder_base::validate_addrspace(int spacenum, u8 width, bool required) const
+{
+	// look up the device and return false if not found
+	device_t *const device(m_base.get().subdevice(m_tag));
+	if (device == nullptr)
+		return report_missing(false, "address space", required);
+
+	// check for memory interface and a configuration for the designated space
+	const device_memory_interface *memory = nullptr;
+	const address_space_config *config = nullptr;
+	if (device->interface(memory))
+	{
+		config = memory->space_config(spacenum);
+		if (required)
+		{
+			if (config == nullptr)
+				osd_printf_warning("Device '%s' found but lacks address space #%d\n", m_tag, spacenum);
+			else if (width != 0 && width != config->data_width())
+				osd_printf_warning("Device '%s' found but space #%d has the wrong data width (expected %d, found %d)\n", m_tag, spacenum, width, config->data_width());
+		}
+	}
+	else if (required)
+		osd_printf_warning("Device '%s' found but lacks memory interface\n", m_tag);
+
+	// report result
+	return report_missing(config != nullptr && (width == 0 || width == config->data_width()), "address space", required);
 }
 
 

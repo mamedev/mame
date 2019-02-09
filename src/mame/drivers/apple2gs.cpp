@@ -4683,10 +4683,11 @@ void apple2gs_state::apple2gs(machine_config &config)
 
 	/* slot devices */
 	A2BUS(config, m_a2bus, 0);
-	m_a2bus->set_cputag("maincpu");
+	m_a2bus->set_space(m_maincpu, AS_PROGRAM);
 	m_a2bus->irq_w().set(FUNC(apple2gs_state::a2bus_irq_w));
 	m_a2bus->nmi_w().set(FUNC(apple2gs_state::a2bus_nmi_w));
 	m_a2bus->inh_w().set(FUNC(apple2gs_state::a2bus_inh_w));
+	m_a2bus->dma_w().set_inputline(m_maincpu, INPUT_LINE_HALT);
 	A2BUS_SLOT(config, "sl1", m_a2bus, apple2_cards, nullptr);
 	A2BUS_SLOT(config, "sl2", m_a2bus, apple2_cards, nullptr);
 	A2BUS_SLOT(config, "sl3", m_a2bus, apple2_cards, nullptr);
@@ -4704,7 +4705,10 @@ void apple2gs_state::apple2gs(machine_config &config)
 	FLOPPY_SONY(config, FLOPPY_3, &apple2gs_floppy35_floppy_interface);
 
 	SOFTWARE_LIST(config, "flop35_list").set_original("apple2gs");
-	SOFTWARE_LIST(config, "flop525_list").set_compatible("apple2");
+	SOFTWARE_LIST(config, "flop525_clean").set_compatible("apple2_flop_clcracked"); // No filter on clean cracks yet.
+	// As WOZ images won't load in the 2GS driver yet, comment out the softlist entry.
+	//SOFTWARE_LIST(config, "flop525_orig").set_compatible("apple2_flop_orig").set_filter("A2GS");  // Filter list to compatible disks for this machine.
+	SOFTWARE_LIST(config, "flop525_misc").set_compatible("apple2_misc");
 }
 
 void apple2gs_state::apple2gsr1(machine_config &config)

@@ -516,10 +516,10 @@ MACHINE_CONFIG_START(trs80_state::trs80)       // the original model I, level I,
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* devices */
-	MCFG_CASSETTE_ADD("cassette")
+	CASSETTE(config, m_cassette);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(trs80_state::model1)      // model I, level II
@@ -531,33 +531,29 @@ MACHINE_CONFIG_START(trs80_state::model1)      // model I, level II
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(trs80_state, rtc_interrupt, 40)
 
 	/* devices */
-	MCFG_CASSETTE_MODIFY("cassette")
-	MCFG_CASSETTE_FORMATS(trs80l2_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
+	m_cassette->set_formats(trs80l2_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_PLAY);
 
-	MCFG_QUICKLOAD_ADD("quickload", trs80_state, trs80_cmd, "cmd", 1.0)
+	MCFG_QUICKLOAD_ADD("quickload", trs80_state, trs80_cmd, "cmd", attotime::from_seconds(1))
 
 	FD1793(config, m_fdc, 4_MHz_XTAL / 4); // todo: should be fd1771
 	m_fdc->intrq_wr_callback().set(FUNC(trs80_state::intrq_w));
 
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", trs80_floppies, "sssd", trs80_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", trs80_floppies, "sssd", trs80_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:2", trs80_floppies, "", trs80_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:3", trs80_floppies, "", trs80_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, "fdc:0", trs80_floppies, "sssd", trs80_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", trs80_floppies, "sssd", trs80_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:2", trs80_floppies, "", trs80_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:3", trs80_floppies, "", trs80_state::floppy_formats).enable_sound(true);
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit7))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit6))
-	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit5))
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit4))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(m_cent_status_in, FUNC(input_buffer_device::write_bit7));
+	m_centronics->perror_handler().set(m_cent_status_in, FUNC(input_buffer_device::write_bit6));
+	m_centronics->select_handler().set(m_cent_status_in, FUNC(input_buffer_device::write_bit5));
+	m_centronics->fault_handler().set(m_cent_status_in, FUNC(input_buffer_device::write_bit4));
 
-	MCFG_DEVICE_ADD("cent_status_in", INPUT_BUFFER, 0)
+	INPUT_BUFFER(config, m_cent_status_in);
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	OUTPUT_LATCH(config, m_cent_data_out);
+	m_centronics->set_output_latch(*m_cent_data_out);
 
 	COM8116(config, m_brg, 5.0688_MHz_XTAL);   // BR1941L
 	m_brg->fr_handler().set(m_uart, FUNC(ay31015_device::write_rcp));
@@ -575,7 +571,7 @@ MACHINE_CONFIG_START(trs80_state::sys80)
 	model1(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(sys80_io)
-	MCFG_DEVICE_REMOVE("brg")
+	config.device_remove("brg");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(trs80_state::ht1080z)
@@ -585,7 +581,7 @@ MACHINE_CONFIG_START(trs80_state::ht1080z)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(trs80_state, screen_update_ht1080z)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_ht1080z)
+	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_ht1080z);
 
 	AY8910(config, "ay1", 1'500'000).add_route(ALL_OUTPUTS, "mono", 0.25); // guess of clock
 	//ay1.port_a_read_callback(FUNC(trs80_state::...);  // ports are some kind of expansion slot
@@ -608,7 +604,7 @@ MACHINE_CONFIG_START(trs80_state::lnw80)
 
 	MCFG_MACHINE_RESET_OVERRIDE(trs80_state, lnw80)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_lnw80)
+	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_lnw80);
 
 	subdevice<palette_device>("palette")->set_entries(8).set_init(FUNC(trs80_state::lnw80_palette));
 	MCFG_SCREEN_MODIFY("screen")
@@ -630,7 +626,7 @@ MACHINE_CONFIG_START(trs80_state::radionic)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_RAW_PARAMS(12_MHz_XTAL, 768, 0, 512, 312, 0, 256)
 	MCFG_SCREEN_UPDATE_DRIVER(trs80_state, screen_update_radionic)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_radionic)
+	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_radionic);
 
 	// Interface to external circuits
 	I8255(config, m_ppi);

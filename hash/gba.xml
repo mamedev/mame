@@ -39918,7 +39918,7 @@
 	<!-- "Daigasso Band Brothers" (大合奏!バンドブラザーズ) for Nintendo DS uses a GBA cart (NTR-A-ZBBJ-JPN) called "Daigasso Request Selection" for adding new songs to the game.
 	    Inside there is an standard "AGB-E01-41" GBA cart PCB with "U1=GPIO MASK ROM [R27V810F-064]". -->
 
-	<!-- AM3 did a Nintendo officially lilcensed video player for GBA in form of a GBA cart with a SmartMedia slot.
+	<!-- AM3 did a Nintendo officially licensed video player for GBA in form of a GBA cart with a SmartMedia slot.
 	    There were lot of pre-recorded SmartMedia cards with videos (Pokémon, Detective Conan, etc.), but also kiosk machines to download new videos to an empty card.
 	    Inside this GBA cart the PCB is labeled "YGP2-AM1-01". The ROM and the video processor are behind the SmartMedia slot, but the label "U3 AM3-ASIC" is visible. -->
 

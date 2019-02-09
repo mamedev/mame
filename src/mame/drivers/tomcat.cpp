@@ -97,7 +97,7 @@ private:
 
 WRITE8_MEMBER(tomcat_state::adcon_w)
 {
-	m_adc->address_w(space, 0, data & 7);
+	m_adc->address_w(data & 7);
 	m_adc->start_w(BIT(data, 3));
 }
 
@@ -342,7 +342,7 @@ MACHINE_CONFIG_START(tomcat_state::tomcat)
 	// OUTB PB0 - PB7   OUTPUT  Speech Data
 	// IRQ CB connected to IRQ line of 6502
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(4000))
+	config.m_minimum_quantum = attotime::from_hz(4000);
 
 	LS259(config, m_mainlatch);
 	m_mainlatch->q_out_cb<0>().set_output("led1").invert();
@@ -360,7 +360,7 @@ MACHINE_CONFIG_START(tomcat_state::tomcat)
 
 	MCFG_DEVICE_ADD("m48t02", M48T02, 0)
 
-	MCFG_VECTOR_ADD("vector")
+	VECTOR(config, "vector", 0);
 	MCFG_SCREEN_ADD("screen", VECTOR)
 	MCFG_SCREEN_REFRESH_RATE(40)
 	//MCFG_SCREEN_REFRESH_RATE((double)XTAL(12'000'000) / 16 / 16 / 16 / 12  / 5 )

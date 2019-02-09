@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Maurizio Petrarota
+// copyright-holders:Maurizio Petrarota, Vas Crabb
 /***************************************************************************
 
     ui/inifile.h
@@ -7,7 +7,6 @@
     UI INIs file manager.
 
 ***************************************************************************/
-
 #ifndef MAME_FRONTEND_UI_INIFILE_H
 #define MAME_FRONTEND_UI_INIFILE_H
 
@@ -15,6 +14,10 @@
 
 #include "ui/utils.h"
 
+#include <functional>
+#include <set>
+#include <tuple>
+#include <type_traits>
 #include <unordered_set>
 
 
@@ -28,7 +31,7 @@ class inifile_manager
 {
 public:
 	// construction/destruction
-	inifile_manager(running_machine &machine, ui_options &moptions);
+	inifile_manager(ui_options &options);
 
 	// load systems from category
 	void load_ini_category(size_t file, size_t category, std::unordered_set<game_driver const *> &result) const;
@@ -59,52 +62,67 @@ class favorite_manager
 {
 public:
 	// construction/destruction
-	favorite_manager(running_machine &machine, ui_options &moptions);
-
-	// favorites comparator
-	struct ci_less
-	{
-		bool operator() (const std::string &s1, const std::string &s2) const
-		{
-			return (core_stricmp(s1.c_str(), s2.c_str()) < 0);
-		}
-	};
-
-	// favorite indices
-	std::multimap<std::string, ui_software_info, ci_less> m_list;
-
-	// getters
-	running_machine &machine() const { return m_machine; }
+	favorite_manager(ui_options &options);
 
 	// add
-	void add_favorite_game();
-	void add_favorite_game(const game_driver *driver);
-	void add_favorite_game(ui_software_info &swinfo);
+	void add_favorite_system(game_driver const &driver);
+	void add_favorite_software(ui_software_info const &swinfo);
+	void add_favorite(running_machine &machine);
 
 	// check
-	bool isgame_favorite();
-	bool isgame_favorite(const game_driver *driver);
-	bool isgame_favorite(ui_software_info const &swinfo);
-
-	// save
-	void save_favorite_games();
+	bool is_favorite_system(game_driver const &driver) const;
+	bool is_favorite_software(ui_software_info const &swinfo) const;
+	bool is_favorite_system_software(ui_software_info const &swinfo) const;
+	bool is_favorite(running_machine &machine) const;
 
 	// remove
-	void remove_favorite_game();
-	void remove_favorite_game(ui_software_info const &swinfo);
+	void remove_favorite_system(game_driver const &driver);
+	void remove_favorite_software(ui_software_info const &swinfo);
+	void remove_favorite(running_machine &machine);
+
+	// walk
+	template <typename T> void apply(T &&action)
+	{
+		for (auto const &item : m_favorites)
+			action(item);
+	}
+	template <typename T> void apply_sorted(T &&action)
+	{
+		update_sorted();
+		for (auto const &item : m_sorted)
+			action(item.get());
+	}
 
 private:
-	const char *favorite_filename = "favorites.ini";
+	using running_software_key = std::tuple<game_driver const &, char const *, std::string const &>;
 
-	// current
-	std::multimap<std::string, ui_software_info>::iterator m_current;
+	struct favorite_compare
+	{
+		using is_transparent = std::true_type;
 
-	// parse file ui_favorite
-	void parse_favorite();
+		bool operator()(ui_software_info const &lhs, ui_software_info const &rhs) const;
+		bool operator()(ui_software_info const &lhs, game_driver const &rhs) const;
+		bool operator()(game_driver const &lhs, ui_software_info const &rhs) const;
+		bool operator()(ui_software_info const &lhs, running_software_key const &rhs) const;
+		bool operator()(running_software_key const &lhs, ui_software_info const &rhs) const;
+	};
+
+	using favorites_set = std::set<ui_software_info, favorite_compare>;
+	using sorted_favorites = std::vector<std::reference_wrapper<ui_software_info const> >;
+
+	// implementation
+	template <typename T> static void apply_running_machine(running_machine &machine, T &&action);
+	template <typename T> void add_impl(T &&key);
+	template <typename T> bool check_impl(T const &key) const;
+	template <typename T> bool remove_impl(T const &key);
+	void update_sorted();
+	void save_favorites();
 
 	// internal state
-	running_machine &m_machine;  // reference to our machine
 	ui_options &m_options;
+	favorites_set m_favorites;
+	sorted_favorites m_sorted;
+	bool m_need_sort;
 };
 
 #endif  // MAME_FRONTEND_UI_INIFILE_H

@@ -1918,8 +1918,8 @@ void jaguar_state::jaguar(machine_config &config)
 	vref.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
 
 	/* quickload */
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(jaguar_state, jaguar), this), "abs,bin,cof,jag,prg", 0);
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
+	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(jaguar_state, jaguar), this), "abs,bin,cof,jag,prg");
 
 	/* cartridge */
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "jaguar_cart", "j64,rom,bin"));

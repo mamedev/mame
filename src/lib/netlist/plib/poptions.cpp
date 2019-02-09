@@ -6,6 +6,8 @@
  */
 
 #include "poptions.h"
+#include "pexception.h"
+#include "ptypes.h"
 
 namespace plib {
 /***************************************************************************
@@ -18,25 +20,9 @@ namespace plib {
 		parent.register_option(this);
 	}
 
-	option_base::~option_base()
-	{
-	}
-
-	option_group::~option_group()
-	{
-	}
-
-	option_example::~option_example()
-	{
-	}
-
 	option::option(options &parent, pstring ashort, pstring along, pstring help, bool has_argument)
 	: option_base(parent, help), m_short(ashort), m_long(along),
 	  m_has_argument(has_argument), m_specified(false)
-	{
-	}
-
-	option::~option()
 	{
 	}
 
@@ -46,35 +32,11 @@ namespace plib {
 		return 0;
 	}
 
-	int option_str_limit::parse(const pstring &argument)
-	{
-		if (plib::container::contains(m_limit, argument))
-		{
-			m_val = argument;
-			return 0;
-		}
-		else
-			return 1;
-	}
-
 	int option_bool::parse(const pstring &argument)
 	{
+		unused_var(argument);
 		m_val = true;
 		return 0;
-	}
-
-	int option_double::parse(const pstring &argument)
-	{
-		bool err = false;
-		m_val = argument.as_double(&err);
-		return (err ? 1 : 0);
-	}
-
-	int option_long::parse(const pstring &argument)
-	{
-		bool err = false;
-		m_val = argument.as_long(&err);
-		return (err ? 1 : 0);
 	}
 
 	int option_vec::parse(const pstring &argument)
@@ -85,15 +47,17 @@ namespace plib {
 	}
 
 	options::options()
+	: m_other_args(nullptr)
 	{
 	}
 
-	options::options(option *o[])
+	options::options(option **o)
+	: m_other_args(nullptr)
 	{
 		int i=0;
 		while (o[i] != nullptr)
 		{
-			m_opts.push_back(o[i]);
+			register_option(o[i]);
 			i++;
 		}
 	}
@@ -108,30 +72,68 @@ namespace plib {
 		m_opts.push_back(opt);
 	}
 
-	int options::parse(int argc, char *argv[])
+	void options::check_consistency()
 	{
-		m_app = pstring(argv[0], pstring::UTF8);
+		for (auto &opt : m_opts)
+		{
+			auto *o = dynamic_cast<option *>(opt);
+			if (o != nullptr)
+			{
+				if (o->short_opt() == "" && o->long_opt() == "")
+				{
+					auto *ov = dynamic_cast<option_args *>(o);
+					if (ov != nullptr)
+					{
+						if (m_other_args != nullptr)
+						{
+							throw pexception("other args can only be specified once!");
+						}
+						else
+						{
+							m_other_args = ov;
+						}
+					}
+					else
+						throw pexception("found option with neither short or long tag!" );
+				}
+			}
+		}
+	}
+
+	int options::parse(int argc, char **argv)
+	{
+		check_consistency();
+		m_app = pstring(argv[0]);
+		bool seen_other_args = false;
 
 		for (int i=1; i<argc; )
 		{
-			pstring arg(argv[i], pstring::UTF8);
+			pstring arg(argv[i]);
 			option *opt = nullptr;
 			pstring opt_arg;
 			bool has_equal_arg = false;
 
-			if (arg.startsWith("--"))
+			if (!seen_other_args && plib::startsWith(arg, "--"))
 			{
 				auto v = psplit(arg.substr(2),"=");
-				opt = getopt_long(v[0]);
-				has_equal_arg = (v.size() > 1);
-				if (has_equal_arg)
+				if (v.size() && v[0] != pstring(""))
 				{
-					for (unsigned j = 1; j < v.size() - 1; j++)
-						opt_arg = opt_arg + v[j] + "=";
-					opt_arg += v[v.size()-1];
+					opt = getopt_long(v[0]);
+					has_equal_arg = (v.size() > 1);
+					if (has_equal_arg)
+					{
+						for (std::size_t j = 1; j < v.size() - 1; j++)
+							opt_arg = opt_arg + v[j] + "=";
+						opt_arg += v[v.size()-1];
+					}
+				}
+				else
+				{
+					opt = m_other_args;
+					seen_other_args = true;
 				}
 			}
-			else if (arg.startsWith("-"))
+			else if (!seen_other_args && plib::startsWith(arg, "-"))
 			{
 				std::size_t p = 1;
 				opt = getopt_short(arg.substr(p, 1));
@@ -144,7 +146,11 @@ namespace plib {
 			}
 			else
 			{
-				return i;
+				seen_other_args = true;
+				if (m_other_args == nullptr)
+					return i;
+				opt = m_other_args;
+				i--; // we haven't had an option specifier;
 			}
 			if (opt == nullptr)
 				return i;
@@ -158,7 +164,7 @@ namespace plib {
 				else
 				{
 					i++; // FIXME: are there more arguments?
-					if (opt->do_parse(pstring(argv[i], pstring::UTF8)) != 0)
+					if (opt->do_parse(pstring(argv[i])) != 0)
 						return i - 1;
 				}
 			}
@@ -181,13 +187,13 @@ namespace plib {
 
 		for (auto &p : paragraphs)
 		{
-			pstring line = pstring("").rpad(" ", firstline_indent);
+			pstring line = plib::rpad(pstring(""), pstring(" "), firstline_indent);
 			for (auto &s : psplit(p, " "))
 			{
 				if (line.length() + s.length() > width)
 				{
 					ret += line + "\n";
-					line = pstring("").rpad(" ", indent);
+					line = plib::rpad(pstring(""), pstring(" "), indent);
 				}
 				line += s + " ";
 			}
@@ -197,7 +203,7 @@ namespace plib {
 	}
 
 	pstring options::help(pstring description, pstring usage,
-			unsigned width, unsigned indent)
+			unsigned width, unsigned indent) const
 	{
 		pstring ret;
 
@@ -206,6 +212,10 @@ namespace plib {
 
 		for (auto & optbase : m_opts )
 		{
+			// Skip anonymous inputs which are collected in option_args
+			if (dynamic_cast<option_args *>(optbase) != nullptr)
+				continue;
+
 			if (auto opt = dynamic_cast<option *>(optbase))
 			{
 				pstring line = "";
@@ -221,20 +231,20 @@ namespace plib {
 					if (opt->has_argument())
 					{
 						line += "=";
-						option_str_limit *ol = dynamic_cast<option_str_limit *>(opt);
+						auto *ol = dynamic_cast<option_str_limit_base *>(opt);
 						if (ol)
 						{
 							for (auto &v : ol->limit())
 							{
 								line += v + "|";
 							}
-							line = line.left(line.length() - 1);
+							line = plib::left(line, line.length() - 1);
 						}
 						else
 							line += "Value";
 					}
 				}
-				line = line.rpad(" ", indent - 2) + "  ";
+				line = plib::rpad(line, pstring(" "), indent - 2) + "  ";
 				if (line.length() > indent)
 				{
 					//ret += "TestGroup abc\n  def gef\nxyz\n\n" ;
@@ -250,6 +260,7 @@ namespace plib {
 				if (grp->help() != "") ret += split_paragraphs(grp->help(), width, 4, 4) + "\n";
 			}
 		}
+		// FIXME: other help ...
 		pstring ex("");
 		for (auto & optbase : m_opts )
 		{
@@ -266,22 +277,22 @@ namespace plib {
 		return ret;
 	}
 
-	option *options::getopt_short(pstring arg)
+	option *options::getopt_short(pstring arg) const
 	{
 		for (auto & optbase : m_opts)
 		{
 			auto opt = dynamic_cast<option *>(optbase);
-			if (opt && opt->short_opt() == arg)
+			if (opt && arg != "" && opt->short_opt() == arg)
 				return opt;
 		}
 		return nullptr;
 	}
-	option *options::getopt_long(pstring arg)
+	option *options::getopt_long(pstring arg) const
 	{
 		for (auto & optbase : m_opts)
 		{
 			auto opt = dynamic_cast<option *>(optbase);
-			if (opt && opt->long_opt() == arg)
+			if (opt && arg !="" && opt->long_opt() == arg)
 				return opt;
 		}
 		return nullptr;

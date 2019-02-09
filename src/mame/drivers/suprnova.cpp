@@ -790,18 +790,21 @@ GFXDECODE_END
 MACHINE_CONFIG_START(skns_state::skns)
 	MCFG_DEVICE_ADD("maincpu", SH2,28638000)
 	MCFG_DEVICE_PROGRAM_MAP(skns_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", skns_state, irq, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(skns_state::irq), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
+	MSM6242(config, "rtc", XTAL(32'768));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("int15_timer", skns_state, interrupt_callback, attotime::from_msec(2))
-	MCFG_TIMER_PARAM(15)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("int11_timer", skns_state, interrupt_callback, attotime::from_msec(8))
-	MCFG_TIMER_PARAM(11)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("int9_timer", skns_state, interrupt_callback, attotime::from_hz(28638000/1824))
-	MCFG_TIMER_PARAM(9)
+	timer_device &int15_timer(TIMER(config, "int15_timer"));
+	int15_timer.configure_periodic(FUNC(skns_state::interrupt_callback), attotime::from_msec(2));
+	int15_timer.config_param(15);
+	timer_device &int11_timer(TIMER(config, "int11_timer"));
+	int11_timer.configure_periodic(FUNC(skns_state::interrupt_callback), attotime::from_msec(8));
+	int11_timer.config_param(11);
+	timer_device &int9_timer(TIMER(config, "int9_timer"));
+	int9_timer.configure_periodic(FUNC(skns_state::interrupt_callback), attotime::from_hz(28638000/1824));
+	int9_timer.config_param(9);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
@@ -812,9 +815,9 @@ MACHINE_CONFIG_START(skns_state::skns)
 	MCFG_SCREEN_UPDATE_DRIVER(skns_state, screen_update)
 
 	MCFG_PALETTE_ADD("palette", 32768)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", skns_bg)
+	GFXDECODE(config, m_gfxdecode, m_palette, skns_bg);
 
-	MCFG_DEVICE_ADD("spritegen", SKNS_SPRITE, 0)
+	SKNS_SPRITE(config, m_spritegen, 0);
 
 
 	/* sound hardware */

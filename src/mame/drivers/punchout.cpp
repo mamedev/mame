@@ -645,8 +645,8 @@ MACHINE_CONFIG_START(punchout_state::punchout)
 	mainlatch.q_out_cb<7>().set_nop(); // enable NVRAM?
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_punchout)
-	MCFG_PALETTE_ADD("palette", 0x200)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_punchout);
+	PALETTE(config, m_palette).set_entries(0x200);
 	config.set_default_layout(layout_dualhovu);
 
 	screen_device &top(SCREEN(config, "top", SCREEN_TYPE_RASTER));
@@ -704,7 +704,7 @@ MACHINE_CONFIG_START(punchout_state::armwrest)
 	MCFG_DEVICE_PROGRAM_MAP(armwrest_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_armwrest)
+	m_gfxdecode->set_info(gfx_armwrest);
 
 	MCFG_VIDEO_START_OVERRIDE(punchout_state, armwrest)
 	MCFG_SCREEN_MODIFY("top")

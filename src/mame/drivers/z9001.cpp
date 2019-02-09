@@ -222,7 +222,7 @@ MACHINE_CONFIG_START(z9001_state::z9001)
 	MCFG_SCREEN_UPDATE_DRIVER(z9001_state, screen_update_z9001)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_z9001)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_z9001);
 	MCFG_PALETTE_ADD("palette", 16)
 
 	/* Sound */
@@ -233,7 +233,7 @@ MACHINE_CONFIG_START(z9001_state::z9001)
 	/* Devices */
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
 	keyboard.set_keyboard_callback(FUNC(z9001_state::kbd_put));
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("z9001_timer", z9001_state, timer_callback, attotime::from_msec(10))
+	TIMER(config, "z9001_timer").configure_periodic(FUNC(z9001_state::timer_callback), attotime::from_msec(10));
 
 	z80pio_device& pio1(Z80PIO(config, "z80pio1", XTAL(9'830'400) / 4));
 	pio1.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -247,7 +247,7 @@ MACHINE_CONFIG_START(z9001_state::z9001)
 	ctc.zc_callback<0>().set(FUNC(z9001_state::cass_w));
 	ctc.zc_callback<2>().set("z80ctc", FUNC(z80ctc_device::trg3));
 
-	MCFG_CASSETTE_ADD( "cassette" )
+	CASSETTE(config, m_cass);
 MACHINE_CONFIG_END
 
 /* ROM definition */

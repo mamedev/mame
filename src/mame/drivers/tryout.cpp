@@ -209,7 +209,7 @@ MACHINE_CONFIG_START(tryout_state::tryout)
 	MCFG_SCREEN_UPDATE_DRIVER(tryout_state, screen_update)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_tryout)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tryout);
 	PALETTE(config, m_palette, FUNC(tryout_state::tryout_palette), 0x20);
 
 	/* sound hardware */

@@ -541,7 +541,7 @@ MACHINE_CONFIG_START(popper_state::popper)
 	MCFG_DEVICE_ADD("subcpu", Z80, XTAL(18'432'000)/3/2)
 	MCFG_DEVICE_PROGRAM_MAP(sub_map)
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)

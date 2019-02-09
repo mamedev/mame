@@ -315,7 +315,7 @@ MACHINE_CONFIG_START(pce_state::pce_common)
 	m_maincpu->add_route(0, "lspeaker", 1.00);
 	m_maincpu->add_route(1, "rspeaker", 1.00);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	MCFG_MACHINE_START_OVERRIDE(pce_state, pce )
 	MCFG_MACHINE_RESET_OVERRIDE(pce_state, mess_pce )
@@ -326,36 +326,36 @@ MACHINE_CONFIG_START(pce_state::pce_common)
 	MCFG_SCREEN_UPDATE_DRIVER( pce_state, screen_update )
 	MCFG_SCREEN_PALETTE("huc6260")
 
-	MCFG_DEVICE_ADD( "huc6260", HUC6260, MAIN_CLOCK )
-	MCFG_HUC6260_NEXT_PIXEL_DATA_CB(READ16("huc6270", huc6270_device, next_pixel))
-	MCFG_HUC6260_TIME_TIL_NEXT_EVENT_CB(READ16("huc6270", huc6270_device, time_until_next_event))
-	MCFG_HUC6260_VSYNC_CHANGED_CB(WRITELINE("huc6270", huc6270_device, vsync_changed))
-	MCFG_HUC6260_HSYNC_CHANGED_CB(WRITELINE("huc6270", huc6270_device, hsync_changed))
+	HUC6260(config, m_huc6260, MAIN_CLOCK);
+	m_huc6260->next_pixel_data().set("huc6270", FUNC(huc6270_device::next_pixel));
+	m_huc6260->time_til_next_event().set("huc6270", FUNC(huc6270_device::time_until_next_event));
+	m_huc6260->vsync_changed().set("huc6270", FUNC(huc6270_device::vsync_changed));
+	m_huc6260->hsync_changed().set("huc6270", FUNC(huc6270_device::hsync_changed));
 
-	MCFG_DEVICE_ADD( "huc6270", HUC6270, 0 )
-	MCFG_HUC6270_VRAM_SIZE(0x10000)
-	MCFG_HUC6270_IRQ_CHANGED_CB(INPUTLINE("maincpu", 0))
+	huc6270_device &huc6270(HUC6270(config, "huc6270", 0));
+	huc6270.set_vram_size(0x10000);
+	huc6270.irq().set_inputline(m_maincpu, 0);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
 	PCE_CD(config, m_cd, 0);
 
-	MCFG_SOFTWARE_LIST_ADD("cd_list","pcecd")
+	SOFTWARE_LIST(config, "cd_list").set_original("pcecd");
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(pce_state::pce)
 	pce_common(config);
 	MCFG_PCE_CARTRIDGE_ADD("cartslot", pce_cart, nullptr)
-	MCFG_SOFTWARE_LIST_ADD("cart_list","pce")
+	SOFTWARE_LIST(config, "cart_list").set_original("pce");
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(pce_state::tg16)
 	pce_common(config);
 	MCFG_TG16_CARTRIDGE_ADD("cartslot", pce_cart, nullptr)
-	MCFG_SOFTWARE_LIST_ADD("cart_list","tg16")
+	SOFTWARE_LIST(config, "cart_list").set_original("tg16");
 MACHINE_CONFIG_END
 
 
@@ -369,7 +369,7 @@ MACHINE_CONFIG_START(pce_state::sgx)
 	m_maincpu->add_route(0, "lspeaker", 1.00);
 	m_maincpu->add_route(1, "rspeaker", 1.00);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	MCFG_MACHINE_START_OVERRIDE(pce_state, pce )
 	MCFG_MACHINE_RESET_OVERRIDE(pce_state, mess_pce )
@@ -380,41 +380,44 @@ MACHINE_CONFIG_START(pce_state::sgx)
 	MCFG_SCREEN_UPDATE_DRIVER( pce_state, screen_update )
 	MCFG_SCREEN_PALETTE("huc6260")
 
-	MCFG_DEVICE_ADD( "huc6260", HUC6260, MAIN_CLOCK )
-	MCFG_HUC6260_NEXT_PIXEL_DATA_CB(READ16("huc6202", huc6202_device, next_pixel))
-	MCFG_HUC6260_TIME_TIL_NEXT_EVENT_CB(READ16("huc6202", huc6202_device, time_until_next_event))
-	MCFG_HUC6260_VSYNC_CHANGED_CB(WRITELINE("huc6202", huc6202_device, vsync_changed))
-	MCFG_HUC6260_HSYNC_CHANGED_CB(WRITELINE("huc6202", huc6202_device, hsync_changed))
-	MCFG_DEVICE_ADD( "huc6270_0", HUC6270, 0 )
-	MCFG_HUC6270_VRAM_SIZE(0x10000)
-	MCFG_HUC6270_IRQ_CHANGED_CB(INPUTLINE("maincpu", 0))
-	MCFG_DEVICE_ADD( "huc6270_1", HUC6270, 0 )
-	MCFG_HUC6270_VRAM_SIZE(0x10000)
-	MCFG_HUC6270_IRQ_CHANGED_CB(INPUTLINE("maincpu", 0))
-	MCFG_DEVICE_ADD( "huc6202", HUC6202, 0 )
-	MCFG_HUC6202_NEXT_PIXEL_0_CB(READ16("huc6270_0", huc6270_device, next_pixel))
-	MCFG_HUC6202_TIME_TIL_NEXT_EVENT_0_CB(READ16("huc6270_0", huc6270_device, time_until_next_event))
-	MCFG_HUC6202_VSYNC_CHANGED_0_CB(WRITELINE("huc6270_0", huc6270_device, vsync_changed))
-	MCFG_HUC6202_HSYNC_CHANGED_0_CB(WRITELINE("huc6270_0", huc6270_device, hsync_changed))
-	MCFG_HUC6202_READ_0_CB(READ8("huc6270_0", huc6270_device, read))
-	MCFG_HUC6202_WRITE_0_CB(WRITE8("huc6270_0", huc6270_device, write))
-	MCFG_HUC6202_NEXT_PIXEL_1_CB(READ16("huc6270_1", huc6270_device, next_pixel))
-	MCFG_HUC6202_TIME_TIL_NEXT_EVENT_1_CB(READ16("huc6270_1", huc6270_device, time_until_next_event))
-	MCFG_HUC6202_VSYNC_CHANGED_1_CB(WRITELINE("huc6270_1", huc6270_device, vsync_changed))
-	MCFG_HUC6202_HSYNC_CHANGED_1_CB(WRITELINE("huc6270_1", huc6270_device, hsync_changed))
-	MCFG_HUC6202_READ_1_CB(READ8("huc6270_1", huc6270_device, read))
-	MCFG_HUC6202_WRITE_1_CB(WRITE8("huc6270_1", huc6270_device, write))
+	HUC6260(config, m_huc6260, MAIN_CLOCK);
+	m_huc6260->next_pixel_data().set("huc6202", FUNC(huc6202_device::next_pixel));
+	m_huc6260->time_til_next_event().set("huc6202", FUNC(huc6202_device::time_until_next_event));
+	m_huc6260->vsync_changed().set("huc6202", FUNC(huc6202_device::vsync_changed));
+	m_huc6260->hsync_changed().set("huc6202", FUNC(huc6202_device::hsync_changed));
+
+	huc6270_device &huc6270_0(HUC6270(config, "huc6270_0", 0));
+	huc6270_0.set_vram_size(0x10000);
+	huc6270_0.irq().set_inputline(m_maincpu, 0);
+
+	huc6270_device &huc6270_1(HUC6270(config, "huc6270_1", 0));
+	huc6270_1.set_vram_size(0x10000);
+	huc6270_1.irq().set_inputline(m_maincpu, 0);
+
+	huc6202_device &huc6202(HUC6202(config, "huc6202", 0 ));
+	huc6202.next_pixel_0_callback().set("huc6270_0", FUNC(huc6270_device::next_pixel));
+	huc6202.time_til_next_event_0_callback().set("huc6270_0", FUNC(huc6270_device::time_until_next_event));
+	huc6202.vsync_changed_0_callback().set("huc6270_0", FUNC(huc6270_device::vsync_changed));
+	huc6202.hsync_changed_0_callback().set("huc6270_0", FUNC(huc6270_device::hsync_changed));
+	huc6202.read_0_callback().set("huc6270_0", FUNC(huc6270_device::read));
+	huc6202.write_0_callback().set("huc6270_0", FUNC(huc6270_device::write));
+	huc6202.next_pixel_1_callback().set("huc6270_1", FUNC(huc6270_device::next_pixel));
+	huc6202.time_til_next_event_1_callback().set("huc6270_1", FUNC(huc6270_device::time_until_next_event));
+	huc6202.vsync_changed_1_callback().set("huc6270_1", FUNC(huc6270_device::vsync_changed));
+	huc6202.hsync_changed_1_callback().set("huc6270_1", FUNC(huc6270_device::hsync_changed));
+	huc6202.read_1_callback().set("huc6270_1", FUNC(huc6270_device::read));
+	huc6202.write_1_callback().set("huc6270_1", FUNC(huc6270_device::write));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_PCE_CARTRIDGE_ADD("cartslot", pce_cart, nullptr)
-	MCFG_SOFTWARE_LIST_ADD("cart_list","sgx")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("pce_list","pce")
+	SOFTWARE_LIST(config, "cart_list").set_original("sgx");
+	SOFTWARE_LIST(config, "pce_list").set_compatible("pce");
 
 	PCE_CD(config, m_cd, 0);
 
-	MCFG_SOFTWARE_LIST_ADD("cd_list","pcecd")
+	SOFTWARE_LIST(config, "cd_list").set_original("pcecd");
 MACHINE_CONFIG_END
 
 /***************************************************************************

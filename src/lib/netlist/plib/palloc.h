@@ -10,8 +10,10 @@
 
 #include "pstring.h"
 
-#include <vector>
+#include <cstddef>
 #include <memory>
+#include <utility>
+#include <vector>
 
 namespace plib {
 
@@ -50,7 +52,7 @@ std::unique_ptr<T> make_unique(Args&&... args)
 }
 
 template<typename BC, typename DC, typename... Args>
-static std::unique_ptr<BC> make_unique_base(Args&&... args)
+std::unique_ptr<BC> make_unique_base(Args&&... args)
 {
 	std::unique_ptr<BC> ret(new DC(std::forward<Args>(args)...));
 	return ret;
@@ -109,7 +111,7 @@ public:
 	static owned_ptr Create(Args&&... args)
 	{
 		owned_ptr a;
-		DC *x = new DC(std::forward<Args>(args)...);
+		auto *x = new DC(std::forward<Args>(args)...);
 		a.m_ptr = static_cast<SC *>(x);
 		return std::move(a);
 	}
@@ -151,19 +153,19 @@ private:
 		char *data;
 	};
 
-	size_t new_block();
+	block * new_block();
 	size_t mininfosize();
 
 	struct info
 	{
-		info() : m_block(0) { }
-		size_t m_block;
+		info() : m_block(nullptr) { }
+		block * m_block;
 	};
 
 	size_t m_min_alloc;
 	size_t m_min_align;
 
-	std::vector<block> m_blocks;
+	std::vector<block *> m_blocks;
 
 public:
 	mempool(size_t min_alloc, size_t min_align);
@@ -174,6 +176,6 @@ public:
 
 };
 
-}
+} // namespace plib
 
 #endif /* PALLOC_H_ */

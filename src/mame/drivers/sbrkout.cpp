@@ -576,7 +576,7 @@ MACHINE_CONFIG_START(sbrkout_state::sbrkout)
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 8);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sbrkout)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sbrkout);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(MAIN_CLOCK/2, 384, 0, 256, 262, 0, 224);

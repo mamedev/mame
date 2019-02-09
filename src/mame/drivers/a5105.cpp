@@ -596,13 +596,13 @@ MACHINE_CONFIG_START(a5105_state::a5105)
 	z80pio_device& pio(Z80PIO(config, "z80pio", XTAL(15'000'000) / 4));
 	pio.out_int_callback().set_inputline(m_maincpu, 0);
 
-	MCFG_CASSETTE_ADD( "cassette" )
+	CASSETTE(config, m_cass);
 
 	UPD765A(config, m_fdc, 8'000'000, true, true);
-	MCFG_FLOPPY_DRIVE_ADD("upd765a:0", a5105_floppies, "525qd", a5105_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765a:1", a5105_floppies, "525qd", a5105_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765a:2", a5105_floppies, "525qd", a5105_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765a:3", a5105_floppies, "525qd", a5105_state::floppy_formats)
+	FLOPPY_CONNECTOR(config, "upd765a:0", a5105_floppies, "525qd", a5105_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765a:1", a5105_floppies, "525qd", a5105_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765a:2", a5105_floppies, "525qd", a5105_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765a:3", a5105_floppies, "525qd", a5105_state::floppy_formats);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K");

@@ -205,7 +205,7 @@ MACHINE_CONFIG_START(ut88_state::ut88)
 	MCFG_SCREEN_PALETTE(m_palette)
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ut88)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ut88);
 
 	/* audio hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -213,7 +213,7 @@ MACHINE_CONFIG_START(ut88_state::ut88)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "speaker", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "speaker", 0.25);
 
 	/* Devices */
 	I8255A(config, m_ppi);
@@ -221,12 +221,12 @@ MACHINE_CONFIG_START(ut88_state::ut88)
 	m_ppi->in_pb_callback().set(FUNC(ut88_state::ut88_8255_portb_r));
 	m_ppi->in_pc_callback().set(FUNC(ut88_state::ut88_8255_portc_r));
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(rku_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
-	MCFG_CASSETTE_INTERFACE("ut88_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(rku_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cassette->set_interface("ut88_cass");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list","ut88")
+	SOFTWARE_LIST(config, "cass_list").set_original("ut88");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ut88_state::ut88mini)
@@ -242,14 +242,14 @@ MACHINE_CONFIG_START(ut88_state::ut88mini)
 
 	/* Cassette */
 	SPEAKER(config, "speaker").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "speaker", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "speaker", 0.25);
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(rku_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
-	MCFG_CASSETTE_INTERFACE("ut88_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(rku_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cassette->set_interface("ut88_cass");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list","ut88")
+	SOFTWARE_LIST(config, "cass_list").set_original("ut88");
 MACHINE_CONFIG_END
 
 /* ROM definition */

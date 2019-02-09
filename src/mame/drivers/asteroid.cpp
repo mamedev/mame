@@ -808,7 +808,7 @@ void asteroid_state::astdelux(machine_config &config)
 	audiolatch.q_out_cb<5>().set(FUNC(asteroid_state::coin_counter_left_w)); // LEFT COIN
 	audiolatch.q_out_cb<6>().set(FUNC(asteroid_state::coin_counter_center_w)); // CENTER COIN
 	audiolatch.q_out_cb<7>().set(FUNC(asteroid_state::coin_counter_right_w)); // RIGHT COIN
-MACHINE_CONFIG_END
+}
 
 
 MACHINE_CONFIG_START(asteroid_state::llander)
@@ -824,13 +824,13 @@ MACHINE_CONFIG_START(asteroid_state::llander)
 	MCFG_SCREEN_VISIBLE_AREA(522, 1566, 270, 1070)
 	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
 
-	MCFG_DEVICE_MODIFY("outlatch") // LS174 at N11
-	MCFG_OUTPUT_LATCH_BIT0_HANDLER(OUTPUT("lamp4")) // LAMP5 (COMMAND MISSION)
-	MCFG_OUTPUT_LATCH_BIT1_HANDLER(OUTPUT("lamp3")) // LAMP4 (PRIME MISSION)
-	MCFG_OUTPUT_LATCH_BIT2_HANDLER(OUTPUT("lamp2")) // LAMP3 (CADET MISSION)
-	MCFG_OUTPUT_LATCH_BIT3_HANDLER(OUTPUT("lamp1")) // LAMP2 (TRAINING MISSION)
-	MCFG_OUTPUT_LATCH_BIT4_HANDLER(OUTPUT("lamp0")) // START/SELECT LEDs
-	MCFG_OUTPUT_LATCH_BIT5_HANDLER(NOOP)
+	output_latch_device &outlatch(*subdevice<output_latch_device>("outlatch")); // LS174 at N11
+	outlatch.bit_handler<0>().set_output("lamp4"); // LAMP5 (COMMAND MISSION)
+	outlatch.bit_handler<1>().set_output("lamp3"); // LAMP4 (PRIME MISSION)
+	outlatch.bit_handler<2>().set_output("lamp2"); // LAMP3 (CADET MISSION)
+	outlatch.bit_handler<3>().set_output("lamp1"); // LAMP2 (TRAINING MISSION)
+	outlatch.bit_handler<4>().set_output("lamp0"); // START/SELECT LEDs
+	outlatch.bit_handler<5>().set_nop();
 
 	/* sound hardware */
 	llander_sound(config);

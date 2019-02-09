@@ -518,13 +518,13 @@ MACHINE_CONFIG_START(imolagp_state::imolagp)
 	MCFG_DEVICE_ADD("maincpu", Z80, 3000000) // ? (assume slower than slave)
 	MCFG_DEVICE_PROGRAM_MAP(imolagp_master_map)
 	MCFG_DEVICE_IO_MAP(imolagp_master_io)
-	MCFG_TIMER_DRIVER_ADD("pot", imolagp_state, imolagp_pot_callback) // maincpu nmi
+	TIMER(config, m_steer_pot_timer).configure_generic(FUNC(imolagp_state::imolagp_pot_callback)); // maincpu nmi
 
 	MCFG_DEVICE_ADD("slave", Z80, 4000000) // ?
 	MCFG_DEVICE_PROGRAM_MAP(imolagp_slave_map)
 	MCFG_DEVICE_IO_MAP(imolagp_slave_io)
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	i8255_device &ppi(I8255A(config, "ppi8255", 0));
 	// mode $91 - ports A & C-lower as input, ports B & C-upper as output

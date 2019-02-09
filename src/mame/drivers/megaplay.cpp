@@ -617,7 +617,7 @@ READ8_MEMBER(mplay_state::vdp1_count_r)
 void mplay_state::megaplay_bios_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x7f, 0x7f).w("sn2", FUNC(sn76496_device::command_w));
+	map(0x7f, 0x7f).w("sn2", FUNC(sn76496_device::write));
 
 	map(0x40, 0x41).mirror(0x3e).r(FUNC(mplay_state::vdp1_count_r));
 	map(0x80, 0x80).mirror(0x3e).rw(m_vdp1, FUNC(sega315_5124_device::data_read), FUNC(sega315_5124_device::data_write));
@@ -674,7 +674,7 @@ MACHINE_CONFIG_START(mplay_state::megaplay)
 	MCFG_DEVICE_PROGRAM_MAP(megaplay_bios_map)
 	MCFG_DEVICE_IO_MAP(megaplay_bios_io_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	cxd1095_device &io1(CXD1095(config, "io1", 0));
 	io1.in_porta_cb().set_ioport("DSW0");
@@ -704,10 +704,10 @@ MACHINE_CONFIG_START(mplay_state::megaplay)
 	MCFG_SCREEN_UPDATE_DRIVER(mplay_state, screen_update_megplay)
 
 	// Megaplay has an additional SMS VDP as an overlay
-	MCFG_DEVICE_ADD("vdp1", SEGA315_5246, 0)
-	MCFG_SEGA315_5246_SET_SCREEN("megadriv")
-	MCFG_SEGA315_5246_IS_PAL(false)
-	MCFG_SEGA315_5246_INT_CB(INPUTLINE("mtbios", 0))
+	SEGA315_5246(config, m_vdp1, 0);
+	m_vdp1->set_screen("megadriv");
+	m_vdp1->set_is_pal(false);
+	m_vdp1->irq().set_inputline(m_bioscpu, 0);
 MACHINE_CONFIG_END
 
 

@@ -448,8 +448,12 @@ asr_zpg
 	prefetch();
 
 asr_aba
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
-	read_pc_noinc();
+	TMP = read_pc();
+	TMP = set_h(TMP, read_pc());
+	TMP2 = read(TMP);
+	write(TMP, TMP2);
+	TMP2 = do_asr(TMP2); // used by xavbox, see 14e8
+	write(TMP, TMP2);
 	prefetch();
 
 asr_zpx
@@ -474,11 +478,6 @@ cmc_imp
 sev_imp
 	read_pc_noinc();
 	P |= F_V;
-	prefetch();
-
-callf_aba
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
-	read_pc_noinc();
 	prefetch();
 
 jmpf_ind

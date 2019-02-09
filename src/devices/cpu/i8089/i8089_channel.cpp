@@ -20,7 +20,7 @@
 //  MACROS/CONSTANTS
 //**************************************************************************
 
-#define VERBOSE      1
+#define VERBOSE      0
 #define VERBOSE_DMA  0
 
 // channel control register fields

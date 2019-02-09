@@ -906,7 +906,7 @@ MACHINE_CONFIG_START(slapfght_state::perfrman)
 	MCFG_DEVICE_PROGRAM_MAP(perfrman_sound_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(slapfght_state, sound_nmi, 240) // music speed, verified
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	/* video hardware */
 	BUFFERED_SPRITERAM8(config, m_spriteram);
@@ -921,7 +921,7 @@ MACHINE_CONFIG_START(slapfght_state::perfrman)
 	m_screen->screen_vblank().append(FUNC(slapfght_state::vblank_irq));
 	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_perfrman)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_perfrman);
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 	MCFG_VIDEO_START_OVERRIDE(slapfght_state, perfrman)
 
@@ -958,7 +958,7 @@ MACHINE_CONFIG_START(slapfght_state::tigerh)
 
 	TAITO68705_MCU_TIGER(config, m_bmcu, 36_MHz_XTAL/12); // 3MHz
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	/* video hardware */
 	BUFFERED_SPRITERAM8(config, m_spriteram);
@@ -973,7 +973,7 @@ MACHINE_CONFIG_START(slapfght_state::tigerh)
 	m_screen->screen_vblank().append(FUNC(slapfght_state::vblank_irq));
 	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_slapfght)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_slapfght);
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 	MCFG_VIDEO_START_OVERRIDE(slapfght_state, slapfight)
 
@@ -999,7 +999,7 @@ MACHINE_CONFIG_START(slapfght_state::tigerhb1)
 	MCFG_DEVICE_PROGRAM_MAP(tigerhb1_map)
 	MCFG_DEVICE_IO_MAP(io_map_nomcu)
 
-	MCFG_DEVICE_REMOVE("bmcu")
+	config.device_remove("bmcu");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(slapfght_state::tigerhb2)
@@ -1031,7 +1031,7 @@ MACHINE_CONFIG_START(slapfght_state::slapfigh)
 	TAITO68705_MCU(config, m_bmcu, 36_MHz_XTAL/12); // 3MHz
 	m_bmcu->aux_strobe_cb().set(FUNC(slapfght_state::scroll_from_mcu_w));
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	/* video hardware */
 	BUFFERED_SPRITERAM8(config, m_spriteram);
@@ -1046,7 +1046,7 @@ MACHINE_CONFIG_START(slapfght_state::slapfigh)
 	m_screen->screen_vblank().append(FUNC(slapfght_state::vblank_irq));
 	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_slapfght)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_slapfght);
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 	MCFG_VIDEO_START_OVERRIDE(slapfght_state, slapfight)
 
@@ -1072,7 +1072,7 @@ MACHINE_CONFIG_START(slapfght_state::slapfighb1)
 	MCFG_DEVICE_PROGRAM_MAP(slapfighb1_map)
 	MCFG_DEVICE_IO_MAP(io_map_nomcu)
 
-	MCFG_DEVICE_REMOVE("bmcu")
+	config.device_remove("bmcu");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(slapfght_state::slapfighb2)

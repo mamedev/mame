@@ -56,7 +56,7 @@ public:
 
 	/* sound-related */
 	uint8_t       m_adpcm_byte;
-	int         m_msm5205_vclk_toggle;
+	int           m_msm5205_vclk_toggle;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

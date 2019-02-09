@@ -240,7 +240,7 @@ MACHINE_CONFIG_START(skyraid_state::skyraid)
 	MCFG_SCREEN_UPDATE_DRIVER(skyraid_state, screen_update_skyraid)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_skyraid)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_skyraid);
 
 	PALETTE(config, m_palette, FUNC(skyraid_state::skyraid_palette), 20);
 

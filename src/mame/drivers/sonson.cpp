@@ -250,7 +250,7 @@ MACHINE_CONFIG_START(sonson_state::sonson)
 	MCFG_SCREEN_UPDATE_DRIVER(sonson_state, screen_update_sonson)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_sonson)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sonson);
 
 	PALETTE(config, m_palette, FUNC(sonson_state::sonson_palette), 64*4 + 32*8, 32);
 

@@ -809,7 +809,8 @@ void newbrain_state::device_timer(emu_timer &timer, device_timer_id id, int para
 //  MACHINE_CONFIG( newbrain )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(newbrain_state::newbrain)
+void newbrain_state::newbrain(machine_config &config)
+{
 	// basic system hardware
 	Z80(config, m_maincpu, XTAL(16'000'000)/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &newbrain_state::newbrain_mreq);
@@ -829,7 +830,7 @@ MACHINE_CONFIG_START(newbrain_state::newbrain)
 	newbrain_video(config);
 
 	// devices
-	MCFG_NEWBRAIN_EXPANSION_SLOT_ADD(NEWBRAIN_EXPANSION_SLOT_TAG, XTAL(16'000'000)/4, newbrain_expansion_cards, "eim")
+	NEWBRAIN_EXPANSION_SLOT(config, m_exp, XTAL(16'000'000)/4, newbrain_expansion_cards, "eim");
 
 	CASSETTE(config, m_cassette1);
 	m_cassette1->set_default_state((cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED));
@@ -842,7 +843,7 @@ MACHINE_CONFIG_START(newbrain_state::newbrain)
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("32K");
-MACHINE_CONFIG_END
+}
 
 
 //-------------------------------------------------

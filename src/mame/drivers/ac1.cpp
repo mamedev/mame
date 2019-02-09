@@ -150,14 +150,14 @@ MACHINE_CONFIG_START(ac1_state::ac1)
 	MCFG_SCREEN_UPDATE_DRIVER(ac1_state, screen_update_ac1)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ac1 )
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ac1);
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	SPEAKER(config, "mono").front_center();
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_CASSETTE_ADD( "cassette" )
+	CASSETTE(config, m_cassette);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ac1_state::ac1_32)

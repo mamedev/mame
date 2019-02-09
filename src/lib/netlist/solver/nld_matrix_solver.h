@@ -43,22 +43,53 @@ public:
 
 	void add(terminal_t *term, int net_other, bool sorted);
 
-	inline std::size_t count() const { return m_terms.size(); }
+	std::size_t count() const { return m_terms.size(); }
 
-	inline terminal_t **terms() { return m_terms.data(); }
-	inline int *connected_net_idx() { return m_connected_net_idx.data(); }
-	inline nl_double *gt() { return m_gt.data(); }
-	inline nl_double *go() { return m_go.data(); }
-	inline nl_double *Idr() { return m_Idr.data(); }
-	inline nl_double * const *connected_net_V() const { return m_connected_net_V.data(); }
+	terminal_t **terms() { return m_terms.data(); }
+	int *connected_net_idx() { return m_connected_net_idx.data(); }
+	nl_double *gt() { return m_gt.data(); }
+	nl_double *go() { return m_go.data(); }
+	nl_double *Idr() { return m_Idr.data(); }
+	nl_double * const *connected_net_V() const { return m_connected_net_V.data(); }
 
 	void set_pointers();
+
+	template <typename AP, typename FT>
+	void fill_matrix(AP &tcr, FT &RHS)
+	{
+		FT gtot_t = 0.0;
+		FT RHS_t = 0.0;
+
+		const std::size_t term_count = this->count();
+		const std::size_t railstart = this->m_railstart;
+		const FT * const * other_cur_analog = this->connected_net_V();
+
+		for (std::size_t i = 0; i < railstart; i++)
+		{
+			*tcr[i]       -= m_go[i];
+			gtot_t        += m_gt[i];
+			RHS_t         += m_Idr[i];
+		}
+
+		for (std::size_t i = railstart; i < term_count; i++)
+		{
+			RHS_t += (m_Idr[i] + m_go[i] * *other_cur_analog[i]);
+			gtot_t += m_gt[i];
+		}
+
+		RHS = RHS_t;
+		// update diagonal element ...
+		*tcr[railstart] += gtot_t; //mat.A[mat.diag[k]] += gtot_t;
+	}
 
 	std::size_t m_railstart;
 
 	std::vector<unsigned> m_nz;   /* all non zero for multiplication */
 	std::vector<unsigned> m_nzrd; /* non zero right of the diagonal for elimination, may include RHS element */
 	std::vector<unsigned> m_nzbd; /* non zero below of the diagonal for elimination */
+
+
+
 
 	/* state */
 	nl_double m_last_V;
@@ -79,12 +110,14 @@ class proxied_analog_output_t : public analog_output_t
 {
 public:
 
-	proxied_analog_output_t(core_device_t &dev, const pstring &aname)
+	proxied_analog_output_t(core_device_t &dev, const pstring &aname, analog_net_t *pnet)
 	: analog_output_t(dev, aname)
-	, m_proxied_net(nullptr)
+	, m_proxied_net(pnet)
 	{ }
-	virtual ~proxied_analog_output_t();
+	~proxied_analog_output_t() override = default;
 
+	analog_net_t *proxied_net() const { return m_proxied_net;}
+private:
 	analog_net_t *m_proxied_net; // only for proxy nets in analog input logic
 };
 
@@ -98,10 +131,12 @@ public:
 	{
 		NOSORT,
 		ASCENDING,
-		DESCENDING
+		DESCENDING,
+		PREFER_IDENTITY_TOP_LEFT,
+		PREFER_BAND_MATRIX
 	};
 
-	virtual ~matrix_solver_t() override;
+	~matrix_solver_t() override = default;
 
 	void setup(analog_net_t::list_t &nets)
 	{
@@ -113,14 +148,14 @@ public:
 	/* after every call to solve, update inputs must be called.
 	 * this can be done as well as a batch to ease parallel processing.
 	 */
-	const netlist_time solve();
+	const netlist_time solve(netlist_time now);
 	void update_inputs();
 
-	inline bool has_dynamic_devices() const { return m_dynamic_devices.size() > 0; }
-	inline bool has_timestep_devices() const { return m_step_devices.size() > 0; }
+	bool has_dynamic_devices() const { return m_dynamic_devices.size() > 0; }
+	bool has_timestep_devices() const { return m_step_devices.size() > 0; }
 
 	void update_forced();
-	void update_after(const netlist_time &after)
+	void update_after(const netlist_time after)
 	{
 		m_Q_sync.net().toggle_and_push_to_queue(after);
 	}
@@ -131,6 +166,8 @@ public:
 
 public:
 	int get_net_idx(detail::net_t *net);
+	std::pair<int, int> get_left_right_of_diag(std::size_t row, std::size_t diag);
+	double get_weight_around_diag(std::size_t row, std::size_t diag);
 
 	virtual void log_stats();
 
@@ -144,8 +181,10 @@ public:
 
 protected:
 
-	matrix_solver_t(netlist_t &anetlist, const pstring &name,
-			const eSortType sort, const solver_parameters_t *params);
+	matrix_solver_t(netlist_base_t &anetlist, const pstring &name,
+			eSortType sort, const solver_parameters_t *params);
+
+	void sort_terms(eSortType sort);
 
 	void setup_base(analog_net_t::list_t &nets);
 	void update_dynamic();
@@ -157,14 +196,15 @@ protected:
 	/* virtual */ void  add_term(std::size_t net_idx, terminal_t *term);
 
 	template <typename T>
-	void store(const T * RESTRICT V);
-	template <typename T>
-	T delta(const T * RESTRICT V);
+	void store(const T & V);
 
 	template <typename T>
-	void build_LE_A();
+	auto delta(const T & V) -> typename std::decay<decltype(V[0])>::type;
+
 	template <typename T>
-	void build_LE_RHS();
+	void build_LE_A(T &child);
+	template <typename T>
+	void build_LE_RHS(T &child);
 
 	std::vector<std::unique_ptr<terms_for_net_t>> m_terms;
 	std::vector<analog_net_t *> m_nets;
@@ -199,7 +239,7 @@ private:
 };
 
 template <typename T>
-T matrix_solver_t::delta(const T * RESTRICT V)
+auto matrix_solver_t::delta(const T & V) -> typename std::decay<decltype(V[0])>::type
 {
 	/* NOTE: Ideally we should also include currents (RHS) here. This would
 	 * need a reevaluation of the right hand side after voltages have been updated
@@ -207,14 +247,14 @@ T matrix_solver_t::delta(const T * RESTRICT V)
 	 */
 
 	const std::size_t iN = this->m_terms.size();
-	T cerr = 0;
+	typename std::decay<decltype(V[0])>::type cerr = 0;
 	for (std::size_t i = 0; i < iN; i++)
-		cerr = std::max(cerr, std::abs(V[i] - static_cast<T>(this->m_nets[i]->Q_Analog())));
+		cerr = std::max(cerr, std::abs(V[i] - this->m_nets[i]->Q_Analog()));
 	return cerr;
 }
 
 template <typename T>
-void matrix_solver_t::store(const T * RESTRICT V)
+void matrix_solver_t::store(const T & V)
 {
 	const std::size_t iN = this->m_terms.size();
 	for (std::size_t i = 0; i < iN; i++)
@@ -222,35 +262,34 @@ void matrix_solver_t::store(const T * RESTRICT V)
 }
 
 template <typename T>
-void matrix_solver_t::build_LE_A()
+void matrix_solver_t::build_LE_A(T &child)
 {
+	typedef typename T::float_type float_type;
 	static_assert(std::is_base_of<matrix_solver_t, T>::value, "T must derive from matrix_solver_t");
 
-	T &child = static_cast<T &>(*this);
-
-	const std::size_t iN = child.N();
+	const std::size_t iN = child.size();
 	for (std::size_t k = 0; k < iN; k++)
 	{
 		terms_for_net_t *terms = m_terms[k].get();
-		nl_double * Ak = &child.A(k, 0);
+		float_type * Ak = &child.A(k, 0ul);
 
 		for (std::size_t i=0; i < iN; i++)
 			Ak[i] = 0.0;
 
 		const std::size_t terms_count = terms->count();
 		const std::size_t railstart =  terms->m_railstart;
-		const nl_double * const RESTRICT gt = terms->gt();
+		const float_type * const gt = terms->gt();
 
 		{
-			nl_double akk  = 0.0;
+			float_type akk  = 0.0;
 			for (std::size_t i = 0; i < terms_count; i++)
 				akk += gt[i];
 
 			Ak[k] = akk;
 		}
 
-		const nl_double * const RESTRICT go = terms->go();
-		int * RESTRICT net_other = terms->connected_net_idx();
+		const float_type * const go = terms->go();
+		int * net_other = terms->connected_net_idx();
 
 		for (std::size_t i = 0; i < railstart; i++)
 			Ak[net_other[i]] -= go[i];
@@ -258,21 +297,21 @@ void matrix_solver_t::build_LE_A()
 }
 
 template <typename T>
-void matrix_solver_t::build_LE_RHS()
+void matrix_solver_t::build_LE_RHS(T &child)
 {
 	static_assert(std::is_base_of<matrix_solver_t, T>::value, "T must derive from matrix_solver_t");
-	T &child = static_cast<T &>(*this);
+	typedef typename T::float_type float_type;
 
-	const std::size_t iN = child.N();
+	const std::size_t iN = child.size();
 	for (std::size_t k = 0; k < iN; k++)
 	{
-		nl_double rhsk_a = 0.0;
-		nl_double rhsk_b = 0.0;
+		float_type rhsk_a = 0.0;
+		float_type rhsk_b = 0.0;
 
 		const std::size_t terms_count = m_terms[k]->count();
-		const nl_double * const RESTRICT go = m_terms[k]->go();
-		const nl_double * const RESTRICT Idr = m_terms[k]->Idr();
-		const nl_double * const * RESTRICT other_cur_analog = m_terms[k]->connected_net_V();
+		const float_type * const go = m_terms[k]->go();
+		const float_type * const Idr = m_terms[k]->Idr();
+		const float_type * const * other_cur_analog = m_terms[k]->connected_net_V();
 
 		for (std::size_t i = 0; i < terms_count; i++)
 			rhsk_a = rhsk_a + Idr[i];

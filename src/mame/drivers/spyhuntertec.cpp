@@ -679,7 +679,7 @@ MACHINE_CONFIG_START(spyhuntertec_state::spyhuntertec)
 	MCFG_DEVICE_PROGRAM_MAP(spyhuntertec_map)
 	MCFG_DEVICE_IO_MAP(spyhuntertec_portmap)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", spyhuntertec_state, irq0_line_hold)
-	MCFG_TIMER_DRIVER_ADD("analog_timer", spyhuntertec_state, analog_count_callback)
+	TIMER(config, m_analog_timer).configure_generic(FUNC(spyhuntertec_state::analog_count_callback));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -691,7 +691,7 @@ MACHINE_CONFIG_START(spyhuntertec_state::spyhuntertec)
 	MCFG_SCREEN_UPDATE_DRIVER(spyhuntertec_state, screen_update_spyhuntertec)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_spyhuntertec)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_spyhuntertec);
 	MCFG_PALETTE_ADD("palette", 64+4)
 
 //  MCFG_PALETTE_INIT_OWNER(spyhuntertec_state,spyhunt)

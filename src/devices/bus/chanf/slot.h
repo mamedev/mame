@@ -64,7 +64,17 @@ class channelf_cart_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	channelf_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T>
+	channelf_cart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
+		: channelf_cart_slot_device(mconfig, tag, owner, 0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
+
+	channelf_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~channelf_cart_slot_device();
 
 	// device-level overrides
@@ -114,9 +124,5 @@ DECLARE_DEVICE_TYPE(CHANF_CART_SLOT, channelf_cart_slot_device)
  ***************************************************************************/
 
 #define CHANFSLOT_ROM_REGION_TAG ":cart:rom"
-
-#define MCFG_CHANNELF_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
-	MCFG_DEVICE_ADD(_tag, CHANF_CART_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 #endif // MAME_BUS_CHANF_SLOT_H

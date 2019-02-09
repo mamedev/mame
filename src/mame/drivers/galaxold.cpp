@@ -780,7 +780,7 @@ void galaxold_state::racknrol_map(address_map &map)
 
 void galaxold_state::racknrol_io(address_map &map)
 {
-	map(0x1d, 0x1d).w("snsnd", FUNC(sn76489a_device::command_w));
+	map(0x1d, 0x1d).w("snsnd", FUNC(sn76489a_device::write));
 //  AM_RANGE(0x1e, 0x1e) AM_WRITENOP
 //  AM_RANGE(0x1f, 0x1f) AM_WRITENOP
 	map(0x20, 0x3f).w(FUNC(galaxold_state::racknrol_tiles_bank_w)).share("racknrol_tbank");
@@ -808,7 +808,7 @@ void galaxold_state::hexpoola_io(address_map &map)
 
 void galaxold_state::hexpoola_data(address_map &map)
 {
-	map(S2650_DATA_PORT, S2650_DATA_PORT).r(FUNC(galaxold_state::hexpoola_data_port_r)).w("snsnd", FUNC(sn76496_device::command_w));
+	map(S2650_DATA_PORT, S2650_DATA_PORT).r(FUNC(galaxold_state::hexpoola_data_port_r)).w("snsnd", FUNC(sn76496_device::write));
 }
 
 READ8_MEMBER(galaxold_state::bullsdrtg_data_port_r)
@@ -834,7 +834,7 @@ READ8_MEMBER(galaxold_state::bullsdrtg_data_port_r)
 
 void galaxold_state::bullsdrtg_data_map(address_map &map)
 {
-	map(S2650_DATA_PORT, S2650_DATA_PORT).r(FUNC(galaxold_state::bullsdrtg_data_port_r)).w("snsnd", FUNC(sn76496_device::command_w));
+	map(S2650_DATA_PORT, S2650_DATA_PORT).r(FUNC(galaxold_state::bullsdrtg_data_port_r)).w("snsnd", FUNC(sn76496_device::write));
 }
 
 /* Lives Dips are spread across two input ports */
@@ -2267,7 +2267,7 @@ MACHINE_CONFIG_START(galaxold_state::galaxold_base)
 	TTL7474(config, m_7474_9m_2, 0);
 	m_7474_9m_2->comp_output_cb().set(FUNC(galaxold_state::galaxold_7474_9m_2_q_callback));
 
-	MCFG_TIMER_DRIVER_ADD("int_timer", galaxold_state, galaxold_interrupt_timer)
+	TIMER(config, "int_timer").configure_generic(FUNC(galaxold_state::galaxold_interrupt_timer));
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -2430,7 +2430,7 @@ MACHINE_CONFIG_START(galaxold_state::_4in1)
 	MCFG_DEVICE_PROGRAM_MAP(_4in1_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_4in1)
+	m_gfxdecode->set_info(gfx_4in1);
 
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,pisces)
 MACHINE_CONFIG_END
@@ -2477,7 +2477,7 @@ MACHINE_CONFIG_START(galaxold_state::rockclim)
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(rockclim_map)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_rockclim)
+	m_gfxdecode->set_info(gfx_rockclim);
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,rockclim)
@@ -2660,7 +2660,7 @@ MACHINE_CONFIG_START(galaxold_state::ckongg)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(ckongg_map)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_gmgalax)
+	m_gfxdecode->set_info(gfx_gmgalax);
 
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,ckongs)
 MACHINE_CONFIG_END
@@ -2673,7 +2673,7 @@ MACHINE_CONFIG_START(galaxold_state::ckongmc)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(ckongmc_map)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_gmgalax)
+	m_gfxdecode->set_info(gfx_gmgalax);
 
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,ckongs)
 MACHINE_CONFIG_END

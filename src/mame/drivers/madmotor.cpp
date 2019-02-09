@@ -279,7 +279,7 @@ MACHINE_CONFIG_START(madmotor_state::madmotor)
 	MCFG_SCREEN_UPDATE_DRIVER(madmotor_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_madmotor)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_madmotor);
 	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 1024);
 
 	DECO_BAC06(config, m_tilegen[0], 0);

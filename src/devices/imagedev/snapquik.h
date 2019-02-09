@@ -11,6 +11,8 @@
 #ifndef MAME_DEVICES_IMAGEDEV_SNAPQUIK_H
 #define MAME_DEVICES_IMAGEDEV_SNAPQUIK_H
 
+#pragma once
+
 #include "softlist_dev.h"
 
 typedef delegate<image_init_result (device_image_interface &,const char *, int)> snapquick_load_delegate;
@@ -21,7 +23,7 @@ class snapshot_image_device :   public device_t,
 {
 public:
 	// construction/destruction
-	snapshot_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	snapshot_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0U);
 	virtual ~snapshot_image_device();
 
 	void set_interface(const char *interface) { m_interface = interface; }
@@ -39,8 +41,7 @@ public:
 	virtual const char *image_interface() const override { return m_interface; }
 	virtual const char *file_extensions() const override { return m_file_extensions; }
 
-	TIMER_CALLBACK_MEMBER(process_snapshot_or_quickload);
-	void set_handler(snapquick_load_delegate load, const char *ext, seconds_t sec) { m_load = load; m_file_extensions = ext; m_delay_seconds = sec; };
+	void set_handler(snapquick_load_delegate load, const char *ext, attotime delay = attotime::from_seconds(0)) { m_load = load; m_file_extensions = ext; m_delay = delay; };
 
 protected:
 	snapshot_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -48,11 +49,12 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 
+	TIMER_CALLBACK_MEMBER(process_snapshot_or_quickload);
+
 	snapquick_load_delegate m_load;                 /* loading function */
 	const char *        m_file_extensions;      /* file extensions */
 	const char *        m_interface;
-	seconds_t           m_delay_seconds;        /* loading delay (seconds) */
-	attoseconds_t       m_delay_attoseconds;    /* loading delay (attoseconds) */
+	attotime            m_delay;                   /* loading delay */
 	emu_timer           *m_timer;
 };
 
@@ -65,7 +67,7 @@ class quickload_image_device : public snapshot_image_device
 {
 public:
 	// construction/destruction
-	quickload_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	quickload_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0U);
 
 	virtual iodevice_t image_type() const override { return IO_QUICKLOAD; }
 };
@@ -88,16 +90,16 @@ DECLARE_DEVICE_TYPE(QUICKLOAD, quickload_image_device)
 #define QUICKLOAD_LOAD_MEMBER(_class,_name)         image_init_result QUICKLOAD_LOAD_NAME(_class,_name)(device_image_interface &image, const char *file_type, int quickload_size)
 #define QUICKLOAD_LOAD_DELEGATE(_class,_name)       snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(_class,_name), downcast<_class *>(device->owner()))
 
-#define MCFG_SNAPSHOT_ADD(_tag, _class, _load, _file_extensions, _delay) \
+#define MCFG_SNAPSHOT_ADD(_tag, _class, _load, ...) \
 	MCFG_DEVICE_ADD(_tag, SNAPSHOT, 0) \
-	static_cast<snapshot_image_device *>(device)->set_handler(SNAPSHOT_LOAD_DELEGATE(_class,_load), _file_extensions, _delay);
+	static_cast<snapshot_image_device *>(device)->set_handler(SNAPSHOT_LOAD_DELEGATE(_class,_load), __VA_ARGS__);
 
 #define MCFG_SNAPSHOT_INTERFACE(_interface)                         \
 	downcast<snapshot_image_device &>(*device).set_interface(_interface);
 
-#define MCFG_QUICKLOAD_ADD(_tag, _class, _load, _file_extensions, _delay)   \
+#define MCFG_QUICKLOAD_ADD(_tag, _class, _load, ...)   \
 	MCFG_DEVICE_ADD(_tag, QUICKLOAD, 0) \
-	static_cast<quickload_image_device *>(device)->set_handler(QUICKLOAD_LOAD_DELEGATE(_class,_load), _file_extensions, _delay);
+	static_cast<quickload_image_device *>(device)->set_handler(QUICKLOAD_LOAD_DELEGATE(_class,_load), __VA_ARGS__);
 
 #define MCFG_QUICKLOAD_INTERFACE(_interface)                         \
 	downcast<quickload_image_device &>(*device).set_interface(_interface);

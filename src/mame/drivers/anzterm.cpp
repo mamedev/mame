@@ -431,7 +431,7 @@ MACHINE_CONFIG_START(anzterm_state::anzterm)
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_anzterm)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_anzterm);
 MACHINE_CONFIG_END
 
 

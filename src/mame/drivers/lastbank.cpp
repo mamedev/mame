@@ -517,7 +517,7 @@ MACHINE_CONFIG_START(lastbank_state::lastbank)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu",Z80,MASTER_CLOCK/4) //!!! TC0091LVC !!!
 	MCFG_DEVICE_PROGRAM_MAP(lastbank_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", lastbank_state, irq_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(lastbank_state::irq_scanline), "screen", 0, 1);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -526,7 +526,7 @@ MACHINE_CONFIG_START(lastbank_state::lastbank)
 	MCFG_DEVICE_IO_MAP(lastbank_audio_io)
 	// yes, we have no interrupts
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	//MCFG_MACHINE_START_OVERRIDE(lastbank_state,lastbank)
 	//MCFG_MACHINE_RESET_OVERRIDE(lastbank_state,lastbank)
@@ -541,7 +541,7 @@ MACHINE_CONFIG_START(lastbank_state::lastbank)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, lastbank_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lastbank )
+	GFXDECODE(config, "gfxdecode", "palette", gfx_lastbank );
 	MCFG_PALETTE_ADD("palette", 0x100)
 
 	TC0091LVC(config, m_vdp, 0);

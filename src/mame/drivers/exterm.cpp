@@ -92,13 +92,13 @@ void exterm_state::machine_start()
 
 WRITE16_MEMBER(exterm_state::host_data_w)
 {
-	m_slave->host_w(space,offset / 0x0010000, data, 0xffff);
+	m_slave->host_w(offset / 0x0010000, data);
 }
 
 
 READ16_MEMBER(exterm_state::host_data_r)
 {
-	return m_slave->host_r(space,offset / 0x0010000, 0xffff);
+	return m_slave->host_r(offset / 0x0010000);
 }
 
 
@@ -197,7 +197,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(exterm_state::master_sound_nmi_callback)
 WRITE8_MEMBER(exterm_state::ym2151_data_latch_w)
 {
 	/* bit 7 of the sound control selects which port */
-	m_ym2151->write(space, m_sound_control >> 7, data);
+	m_ym2151->write(m_sound_control >> 7, data);
 }
 
 
@@ -253,7 +253,6 @@ void exterm_state::master_map(address_map &map)
 	map(0x01800000, 0x01807fff).mirror(0xfc7f8000).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x02800000, 0x02807fff).mirror(0xfc7f8000).ram().share("nvram");
 	map(0x03000000, 0x03ffffff).mirror(0xfc000000).rom().region("maincpu", 0);
-	map(0xc0000000, 0xc00001ff).rw(m_maincpu, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 }
 
 
@@ -261,7 +260,6 @@ void exterm_state::slave_map(address_map &map)
 {
 	map(0x00000000, 0x000fffff).mirror(0xfbf00000).ram().share("slave_videoram");
 	map(0x04000000, 0x047fffff).mirror(0xfb800000).ram();
-	map(0xc0000000, 0xc00001ff).rw(m_slave, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 }
 
 
@@ -401,7 +399,7 @@ MACHINE_CONFIG_START(exterm_state::exterm)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_TIMER_DRIVER_ADD(m_nmi_timer, exterm_state, master_sound_nmi_callback)
+	TIMER(config, m_nmi_timer).configure_generic(FUNC(exterm_state::master_sound_nmi_callback));
 
 	WATCHDOG_TIMER(config, "watchdog");
 

@@ -49,21 +49,6 @@
 #define VIDEOBRAIN_EXPANSION_SLOT_TAG       "exp"
 
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_VIDEOBRAIN_EXPANSION_SLOT_ADD(_tag, _slot_intf, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, VIDEOBRAIN_EXPANSION_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-
-
-#define MCFG_VIDEOBRAIN_EXPANSION_SLOT_EXTRES_CALLBACK(_write) \
-	downcast<videobrain_expansion_slot_device &>(*device).set_extres_wr_callback(DEVCB_##_write);
-
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -110,9 +95,18 @@ class videobrain_expansion_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	videobrain_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T>
+	videobrain_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, char const* dflt)
+		: videobrain_expansion_slot_device(mconfig, tag, owner, 0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
+	videobrain_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	template <class Object> devcb_base &set_extres_wr_callback(Object &&cb) { return m_write_extres.set_callback(std::forward<Object>(cb)); }
+	auto extres_wr_callback() { return m_write_extres.bind(); }
 
 	// computer interface
 	uint8_t bo_r(address_space &space, offs_t offset, int cs1, int cs2);

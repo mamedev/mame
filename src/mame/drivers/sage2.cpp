@@ -408,10 +408,11 @@ READ16_MEMBER(sage2_state::rom_r)
 //  MACHINE_CONFIG( sage2 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(sage2_state::sage2)
+void sage2_state::sage2(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD(M68000_TAG, M68000, XTAL(16'000'000)/2)
-	MCFG_DEVICE_PROGRAM_MAP(sage2_mem)
+	M68000(config, m_maincpu, XTAL(16'000'000)/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sage2_state::sage2_mem);
 
 	// devices
 	PIC8259(config, m_pic, 0);
@@ -470,25 +471,27 @@ MACHINE_CONFIG_START(sage2_state::sage2)
 	UPD765A(config, m_fdc, 8'000'000, false, false);
 	m_fdc->intrq_wr_callback().set(FUNC(sage2_state::fdc_irq));
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, sage2_state, write_centronics_ack))
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, sage2_state, write_centronics_busy))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, sage2_state, write_centronics_perror))
-	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(*this, sage2_state, write_centronics_select))
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, sage2_state, write_centronics_fault))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->ack_handler().set(FUNC(sage2_state::write_centronics_ack));
+	m_centronics->busy_handler().set(FUNC(sage2_state::write_centronics_busy));
+	m_centronics->perror_handler().set(FUNC(sage2_state::write_centronics_perror));
+	m_centronics->select_handler().set(FUNC(sage2_state::write_centronics_select));
+	m_centronics->fault_handler().set(FUNC(sage2_state::write_centronics_fault));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
 
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", sage2_floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", sage2_floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_IEEE488_BUS_ADD()
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":0", sage2_floppies, "525qd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":1", sage2_floppies, "525qd", floppy_image_device::default_floppy_formats);
+
+	IEEE488(config, m_ieee488);
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("512K");
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "sage2")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "flop_list").set_original("sage2");
+}
 
 
 
