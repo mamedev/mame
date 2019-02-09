@@ -212,7 +212,8 @@ GFXDECODE_END
 
 
 
-MACHINE_CONFIG_START(spg110_device::device_add_mconfig)
+void spg110_device::device_add_mconfig(machine_config &config)
+{
 //	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x100);
 //	PALETTE(config, m_palette).set_format(palette_device::RGB_565, 0x100);
 //	PALETTE(config, m_palette).set_format(palette_device::IRGB_4444, 0x100);
@@ -221,7 +222,7 @@ MACHINE_CONFIG_START(spg110_device::device_add_mconfig)
 	PALETTE(config, m_palette, palette_device::BLACK, 256);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx);
-MACHINE_CONFIG_END
+}
 
 
 device_memory_interface::space_config_vector spg110_device::memory_space_config() const
