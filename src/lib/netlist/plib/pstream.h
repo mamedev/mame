@@ -7,6 +7,7 @@
 #ifndef PSTREAM_H_
 #define PSTREAM_H_
 
+#include <array>
 #include <type_traits>
 #include <vector>
 
