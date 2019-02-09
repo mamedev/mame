@@ -33,12 +33,12 @@ DEFINE_DEVICE_TYPE(VIC20_SPEAKEASY, vic20_speakeasy_device, "vic20_speakeasy", "
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(vic20_speakeasy_device::device_add_mconfig)
+void vic20_speakeasy_device::device_add_mconfig(machine_config &config)
+{
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD(SC01A_TAG, VOTRAX_SC01, 720000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.85)
-MACHINE_CONFIG_END
+	VOTRAX_SC01(config, m_votrax, 720000).add_route(ALL_OUTPUTS, "mono", 0.85);
+}
 
 
 

@@ -64,14 +64,15 @@ void tiki100_8088_device::i8088_io(address_map &map)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( tiki100_8088 )
+//  device_add_mconfig()
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(tiki100_8088_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(I8088_TAG, I8088, 6000000)
-	MCFG_DEVICE_PROGRAM_MAP(i8088_mem)
-	MCFG_DEVICE_IO_MAP(i8088_io)
-MACHINE_CONFIG_END
+void tiki100_8088_device::device_add_mconfig(machine_config &config)
+{
+	I8088(config, m_maincpu, 6000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tiki100_8088_device::i8088_mem);
+	m_maincpu->set_addrmap(AS_IO, &tiki100_8088_device::i8088_io);
+}
 
 
 

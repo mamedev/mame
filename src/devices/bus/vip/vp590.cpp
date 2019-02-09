@@ -53,7 +53,8 @@ READ_LINE_MEMBER( vp590_device::gd_r )
 //  MACHINE_CONFIG_START( vp590 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(vp590_device::device_add_mconfig)
+void vp590_device::device_add_mconfig(machine_config &config)
+{
 	CDP1862(config, m_cgc, 7.15909_MHz_XTAL);
 	m_cgc->rdata_cb().set(FUNC(vp590_device::rd_r));
 	m_cgc->bdata_cb().set(FUNC(vp590_device::bd_r));
@@ -61,7 +62,7 @@ MACHINE_CONFIG_START(vp590_device::device_add_mconfig)
 	m_cgc->set_luminance(RES_R(510), RES_R(360), RES_K(1), RES_K(1.5)); // R3, R4, R5, R6
 	m_cgc->set_chrominance(RES_K(3.9), RES_K(10), RES_K(2), RES_K(3.3)); // R7, R8, R9, R10
 	m_cgc->set_screen(SCREEN_TAG);
-MACHINE_CONFIG_END
+}
 
 
 //-------------------------------------------------

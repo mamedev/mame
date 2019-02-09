@@ -121,10 +121,11 @@ ioport_constructor a2bus_transwarp_device::device_input_ports() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(a2bus_transwarp_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(CPU_TAG, M65C02, A2BUS_7M_CLOCK / 2)
-	MCFG_DEVICE_PROGRAM_MAP(m65c02_mem)
-MACHINE_CONFIG_END
+void a2bus_transwarp_device::device_add_mconfig(machine_config &config)
+{
+	M65C02(config, m_ourcpu, A2BUS_7M_CLOCK / 2);
+	m_ourcpu->set_addrmap(AS_PROGRAM, &a2bus_transwarp_device::m65c02_mem);
+}
 
 //**************************************************************************
 //  LIVE DEVICE
