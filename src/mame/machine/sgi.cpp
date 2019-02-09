@@ -19,9 +19,10 @@
 #define LOG_MEMCFG      (1 << 5)
 #define LOG_MEMCFG_EXT  (1 << 6)
 #define LOG_EEPROM      (1 << 7)
+#define LOG_DMA         (1 << 8)
 #define LOG_DEFAULT     (LOG_READS | LOG_WRITES | LOG_RPSS | LOG_WATCHDOG | LOG_UNKNOWN)
 
-#define VERBOSE         (0)
+#define VERBOSE         (LOG_DMA)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(SGI_MC, sgi_mc_device, "sgi_mc", "SGI Memory Controller")
@@ -52,14 +53,6 @@ sgi_mc_device::sgi_mc_device(const machine_config &mconfig, const char *tag, dev
 	, m_gio64_substitute_bits(0)
 	, m_dma_int_cause(0)
 	, m_dma_control(0)
-	, m_dma_tlb_entry0_hi(0)
-	, m_dma_tlb_entry0_lo(0)
-	, m_dma_tlb_entry1_hi(0)
-	, m_dma_tlb_entry1_lo(0)
-	, m_dma_tlb_entry2_hi(0)
-	, m_dma_tlb_entry2_lo(0)
-	, m_dma_tlb_entry3_hi(0)
-	, m_dma_tlb_entry3_lo(0)
 	, m_rpss_counter(0)
 	, m_dma_mem_addr(0)
 	, m_dma_size(0)
@@ -117,14 +110,8 @@ void sgi_mc_device::device_start()
 	save_item(NAME(m_gio64_substitute_bits));
 	save_item(NAME(m_dma_int_cause));
 	save_item(NAME(m_dma_control));
-	save_item(NAME(m_dma_tlb_entry0_hi));
-	save_item(NAME(m_dma_tlb_entry0_lo));
-	save_item(NAME(m_dma_tlb_entry1_hi));
-	save_item(NAME(m_dma_tlb_entry1_lo));
-	save_item(NAME(m_dma_tlb_entry2_hi));
-	save_item(NAME(m_dma_tlb_entry2_lo));
-	save_item(NAME(m_dma_tlb_entry3_hi));
-	save_item(NAME(m_dma_tlb_entry3_lo));
+	save_item(NAME(m_dma_tlb_entry_hi));
+	save_item(NAME(m_dma_tlb_entry_lo));
 	save_item(NAME(m_rpss_counter));
 	save_item(NAME(m_dma_mem_addr));
 	save_item(NAME(m_dma_size));
@@ -166,14 +153,11 @@ void sgi_mc_device::device_reset()
 	m_gio64_substitute_bits = 0;
 	m_dma_int_cause = 0;
 	m_dma_control = 0;
-	m_dma_tlb_entry0_hi = 0;
-	m_dma_tlb_entry0_lo = 0;
-	m_dma_tlb_entry1_hi = 0;
-	m_dma_tlb_entry1_lo = 0;
-	m_dma_tlb_entry2_hi = 0;
-	m_dma_tlb_entry2_lo = 0;
-	m_dma_tlb_entry3_hi = 0;
-	m_dma_tlb_entry3_lo = 0;
+	for (int i = 0; i < 4; i++)
+	{
+		m_dma_tlb_entry_hi[i] = 0;
+		m_dma_tlb_entry_lo[i] = 0;
+	}
 	m_rpss_counter = 0;
 	m_dma_mem_addr = 0;
 	m_dma_size = 0;
@@ -198,6 +182,19 @@ void sgi_mc_device::set_cpu_buserr(uint32_t address)
 		m_cpu_error_status |= 0x000000f0;
 	else
 		m_cpu_error_status |= 0x0000000f;
+}
+
+uint32_t sgi_mc_device::dma_translate(uint32_t address)
+{
+	for (int entry = 0; entry < 4; entry++)
+	{
+		if ((address & 0xfff00000) == (m_dma_tlb_entry_hi[entry] & 0xfff00000))
+		{
+			const uint32_t offset = address - m_dma_tlb_entry_hi[entry];
+			return ((m_dma_tlb_entry_lo[entry] &~ 0x3f) << 6) + offset;
+		}
+	}
+	return 0;
 }
 
 READ32_MEMBER(sgi_mc_device::read)
@@ -283,63 +280,63 @@ READ32_MEMBER(sgi_mc_device::read)
 		LOGMASKED(LOG_READS, "%s: GIO64 Translation Address Substitution Bits Read: %08x & %08x\n", machine().describe_context(), m_gio64_substitute_bits, mem_mask);
 		return m_gio64_substitute_bits;
 	case 0x0160/4:
-		LOGMASKED(LOG_READS, "%s: DMA Interrupt Cause: %08x & %08x\n", machine().describe_context(), m_dma_int_cause, mem_mask);
+		LOGMASKED(LOG_READS | LOG_DMA, "%s: DMA Interrupt Cause: %08x & %08x\n", machine().describe_context(), m_dma_int_cause, mem_mask);
 		return m_dma_int_cause;
 	case 0x0168/4:
-		LOGMASKED(LOG_READS, "%s: DMA Control Read: %08x & %08x\n", machine().describe_context(), m_dma_control, mem_mask);
+		LOGMASKED(LOG_READS | LOG_DMA, "%s: DMA Control Read: %08x & %08x\n", machine().describe_context(), m_dma_control, mem_mask);
 		return m_dma_control;
 	case 0x0180/4:
-		LOGMASKED(LOG_READS, "%s: DMA TLB Entry 0 High Read: %08x & %08x\n", machine().describe_context(), m_dma_tlb_entry0_hi, mem_mask);
-		return m_dma_tlb_entry0_hi;
+		LOGMASKED(LOG_READS | LOG_DMA, "%s: DMA TLB Entry 0 High Read: %08x & %08x\n", machine().describe_context(), m_dma_tlb_entry_hi[0], mem_mask);
+		return m_dma_tlb_entry_hi[0];
 	case 0x0188/4:
-		LOGMASKED(LOG_READS, "%s: DMA TLB Entry 0 Low Read: %08x & %08x\n", machine().describe_context(), m_dma_tlb_entry0_lo, mem_mask);
-		return m_dma_tlb_entry0_lo;
+		LOGMASKED(LOG_READS | LOG_DMA, "%s: DMA TLB Entry 0 Low Read: %08x & %08x\n", machine().describe_context(), m_dma_tlb_entry_lo[0], mem_mask);
+		return m_dma_tlb_entry_lo[0];
 	case 0x0190/4:
-		LOGMASKED(LOG_READS, "%s: DMA TLB Entry 1 High Read: %08x & %08x\n", machine().describe_context(), m_dma_tlb_entry1_hi, mem_mask);
-		return m_dma_tlb_entry1_hi;
+		LOGMASKED(LOG_READS | LOG_DMA, "%s: DMA TLB Entry 1 High Read: %08x & %08x\n", machine().describe_context(), m_dma_tlb_entry_hi[1], mem_mask);
+		return m_dma_tlb_entry_hi[1];
 	case 0x0198/4:
-		LOGMASKED(LOG_READS, "%s: DMA TLB Entry 1 Low Read: %08x & %08x\n", machine().describe_context(), m_dma_tlb_entry1_lo, mem_mask);
-		return m_dma_tlb_entry1_lo;
+		LOGMASKED(LOG_READS | LOG_DMA, "%s: DMA TLB Entry 1 Low Read: %08x & %08x\n", machine().describe_context(), m_dma_tlb_entry_lo[1], mem_mask);
+		return m_dma_tlb_entry_lo[1];
 	case 0x01a0/4:
-		LOGMASKED(LOG_READS, "%s: DMA TLB Entry 2 High Read: %08x & %08x\n", machine().describe_context(), m_dma_tlb_entry2_hi, mem_mask);
-		return m_dma_tlb_entry2_hi;
+		LOGMASKED(LOG_READS | LOG_DMA, "%s: DMA TLB Entry 2 High Read: %08x & %08x\n", machine().describe_context(), m_dma_tlb_entry_hi[2], mem_mask);
+		return m_dma_tlb_entry_hi[2];
 	case 0x01a8/4:
-		LOGMASKED(LOG_READS, "%s: DMA TLB Entry 2 Low Read: %08x & %08x\n", machine().describe_context(), m_dma_tlb_entry2_lo, mem_mask);
-		return m_dma_tlb_entry2_lo;
+		LOGMASKED(LOG_READS | LOG_DMA, "%s: DMA TLB Entry 2 Low Read: %08x & %08x\n", machine().describe_context(), m_dma_tlb_entry_lo[2], mem_mask);
+		return m_dma_tlb_entry_lo[2];
 	case 0x01b0/4:
-		LOGMASKED(LOG_READS, "%s: DMA TLB Entry 3 High Read: %08x & %08x\n", machine().describe_context(), m_dma_tlb_entry3_hi, mem_mask);
-		return m_dma_tlb_entry3_hi;
+		LOGMASKED(LOG_READS | LOG_DMA, "%s: DMA TLB Entry 3 High Read: %08x & %08x\n", machine().describe_context(), m_dma_tlb_entry_hi[3], mem_mask);
+		return m_dma_tlb_entry_hi[3];
 	case 0x01b8/4:
-		LOGMASKED(LOG_READS, "%s: DMA TLB Entry 3 Low Read: %08x & %08x\n", machine().describe_context(), m_dma_tlb_entry3_lo, mem_mask);
-		return m_dma_tlb_entry3_lo;
+		LOGMASKED(LOG_READS | LOG_DMA, "%s: DMA TLB Entry 3 Low Read: %08x & %08x\n", machine().describe_context(), m_dma_tlb_entry_lo[3], mem_mask);
+		return m_dma_tlb_entry_lo[3];
 	case 0x1000/4:
 		LOGMASKED(LOG_RPSS, "%s: RPSS 100ns Counter Read: %08x & %08x\n", machine().describe_context(), m_rpss_counter, mem_mask);
 		return m_rpss_counter;
 	case 0x2000/4:
 	case 0x2008/4:
-		LOGMASKED(LOG_READS, "%s: DMA Memory Address Read: %08x & %08x\n", machine().describe_context(), m_dma_mem_addr, mem_mask);
+		LOGMASKED(LOG_READS | LOG_DMA, "%s: DMA Memory Address Read: %08x & %08x\n", machine().describe_context(), m_dma_mem_addr, mem_mask);
 		return m_dma_mem_addr;
 	case 0x2010/4:
-		LOGMASKED(LOG_READS, "%s: DMA Line Count and Width Read: %08x & %08x\n", machine().describe_context(), m_dma_size, mem_mask);
+		LOGMASKED(LOG_READS | LOG_DMA, "%s: DMA Line Count and Width Read: %08x & %08x\n", machine().describe_context(), m_dma_size, mem_mask);
 		return m_dma_size;
 	case 0x2018/4:
-		LOGMASKED(LOG_READS, "%s: DMA Line Zoom and Stride Read: %08x & %08x\n", machine().describe_context(), m_dma_stride, mem_mask);
+		LOGMASKED(LOG_READS | LOG_DMA, "%s: DMA Line Zoom and Stride Read: %08x & %08x\n", machine().describe_context(), m_dma_stride, mem_mask);
 		return m_dma_stride;
 	case 0x2020/4:
 	case 0x2028/4:
-		LOGMASKED(LOG_READS, "%s: DMA GIO64 Address Read: %08x & %08x\n", machine().describe_context(), m_dma_gio64_addr, mem_mask);
+		LOGMASKED(LOG_READS | LOG_DMA, "%s: DMA GIO64 Address Read: %08x & %08x\n", machine().describe_context(), m_dma_gio64_addr, mem_mask);
 		return m_dma_gio64_addr;
 	case 0x2030/4:
-		LOGMASKED(LOG_READS, "%s: DMA Mode Write: %08x & %08x\n", machine().describe_context(), m_dma_mode, mem_mask);
+		LOGMASKED(LOG_READS | LOG_DMA, "%s: DMA Mode Write: %08x & %08x\n", machine().describe_context(), m_dma_mode, mem_mask);
 		return m_dma_mode;
 	case 0x2038/4:
-		LOGMASKED(LOG_READS, "%s: DMA Zoom Count Read: %08x & %08x\n", machine().describe_context(), m_dma_count, mem_mask);
+		LOGMASKED(LOG_READS | LOG_DMA, "%s: DMA Zoom Count Read: %08x & %08x\n", machine().describe_context(), m_dma_count, mem_mask);
 		return m_dma_count;
 	case 0x2040/4:
-		LOGMASKED(LOG_READS, "%s: DMA Start Read\n", machine().describe_context());
+		LOGMASKED(LOG_READS | LOG_DMA, "%s: DMA Start Read\n", machine().describe_context());
 		return 0;
 	case 0x2048/4:
-		LOGMASKED(LOG_READS, "%s: VDMA Running Read: %08x & %08x\n", machine().describe_context(), m_dma_running, mem_mask);
+		LOGMASKED(LOG_READS | LOG_DMA, "%s: VDMA Running Read: %08x & %08x\n", machine().describe_context(), m_dma_running, mem_mask);
 		if (m_dma_running == 1)
 		{
 			m_dma_running = 0;
@@ -486,86 +483,105 @@ WRITE32_MEMBER( sgi_mc_device::write )
 		m_gio64_substitute_bits = data;
 		break;
 	case 0x0160/4:
-		LOGMASKED(LOG_WRITES, "%s: DMA Interrupt Cause Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		LOGMASKED(LOG_WRITES | LOG_DMA, "%s: DMA Interrupt Cause Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		m_dma_int_cause = data;
 		break;
 	case 0x0168/4:
-		LOGMASKED(LOG_WRITES, "%s: DMA Control Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		LOGMASKED(LOG_WRITES | LOG_DMA, "%s: DMA Control Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		m_dma_control = data;
 		break;
 	case 0x0180/4:
-		LOGMASKED(LOG_WRITES, "%s: DMA TLB Entry 0 High Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
-		m_dma_tlb_entry0_hi = data;
+		LOGMASKED(LOG_WRITES | LOG_DMA, "%s: DMA TLB Entry 0 High Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		m_dma_tlb_entry_hi[0] = data;
 		break;
 	case 0x0188/4:
-		LOGMASKED(LOG_WRITES, "%s: DMA TLB Entry 0 Low Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
-		m_dma_tlb_entry0_lo = data;
+		LOGMASKED(LOG_WRITES | LOG_DMA, "%s: DMA TLB Entry 0 Low Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		m_dma_tlb_entry_lo[0] = data;
 		break;
 	case 0x0190/4:
-		LOGMASKED(LOG_WRITES, "%s: DMA TLB Entry 1 High Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
-		m_dma_tlb_entry1_hi = data;
+		LOGMASKED(LOG_WRITES | LOG_DMA, "%s: DMA TLB Entry 1 High Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		m_dma_tlb_entry_hi[1] = data;
 		break;
 	case 0x0198/4:
-		LOGMASKED(LOG_WRITES, "%s: DMA TLB Entry 1 Low Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
-		m_dma_tlb_entry1_lo = data;
+		LOGMASKED(LOG_WRITES | LOG_DMA, "%s: DMA TLB Entry 1 Low Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		m_dma_tlb_entry_lo[1] = data;
 		break;
 	case 0x01a0/4:
-		LOGMASKED(LOG_WRITES, "%s: DMA TLB Entry 2 High Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
-		m_dma_tlb_entry2_hi = data;
+		LOGMASKED(LOG_WRITES | LOG_DMA, "%s: DMA TLB Entry 2 High Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		m_dma_tlb_entry_hi[2] = data;
 		break;
 	case 0x01a8/4:
-		LOGMASKED(LOG_WRITES, "%s: DMA TLB Entry 2 Low Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
-		m_dma_tlb_entry2_lo = data;
+		LOGMASKED(LOG_WRITES | LOG_DMA, "%s: DMA TLB Entry 2 Low Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		m_dma_tlb_entry_lo[2] = data;
 		break;
 	case 0x01b0/4:
-		LOGMASKED(LOG_WRITES, "%s: DMA TLB Entry 3 High Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
-		m_dma_tlb_entry3_hi = data;
+		LOGMASKED(LOG_WRITES | LOG_DMA, "%s: DMA TLB Entry 3 High Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		m_dma_tlb_entry_hi[3] = data;
 		break;
 	case 0x01b8/4:
-		LOGMASKED(LOG_WRITES, "%s: DMA TLB Entry 3 Low Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
-		m_dma_tlb_entry3_lo = data;
+		LOGMASKED(LOG_WRITES | LOG_DMA, "%s: DMA TLB Entry 3 Low Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		m_dma_tlb_entry_lo[3] = data;
 		break;
 	case 0x2000/4:
-		LOGMASKED(LOG_WRITES, "%s: DMA Memory Address Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		LOGMASKED(LOG_WRITES | LOG_DMA, "%s: DMA Memory Address Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		m_dma_mem_addr = data;
 		break;
 	case 0x2008/4:
-		LOGMASKED(LOG_WRITES, "%s: DMA Memory Address + Default Params Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		LOGMASKED(LOG_WRITES | LOG_DMA, "%s: DMA Memory Address + Default Params Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		m_dma_mem_addr = data;
 		break;
 	case 0x2010/4:
-		LOGMASKED(LOG_WRITES, "%s: DMA Line Count and Width Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		LOGMASKED(LOG_WRITES | LOG_DMA, "%s: DMA Line Count and Width Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		m_dma_size = data;
 		break;
 	case 0x2018/4:
-		LOGMASKED(LOG_WRITES, "%s: DMA Line Zoom and Stride Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		LOGMASKED(LOG_WRITES | LOG_DMA, "%s: DMA Line Zoom and Stride Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		m_dma_stride = data;
 		break;
 	case 0x2020/4:
-		LOGMASKED(LOG_WRITES, "%s: DMA GIO64 Address Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		LOGMASKED(LOG_WRITES | LOG_DMA, "%s: DMA GIO64 Address Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		m_dma_gio64_addr = data;
 		break;
 	case 0x2028/4:
-		LOGMASKED(LOG_WRITES, "%s: DMA GIO64 Address Write + Start DMA: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+	{
+		LOGMASKED(LOG_WRITES | LOG_DMA, "%s: DMA GIO64 Address Write + Start DMA: %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		m_dma_gio64_addr = data;
-		// Start DMA
 		m_dma_running = 1;
+		if (m_dma_gio64_addr == 0x1f0f0a30)
+		{
+			address_space &space = m_maincpu->space(AS_PROGRAM);
+			const uint32_t line_count = m_dma_size >> 16;
+			const uint32_t line_size = (uint16_t)m_dma_size;
+			const uint32_t line_stride = (uint16_t)m_dma_stride;
+			uint32_t src_addr = m_dma_mem_addr;
+			machine().debug_break();
+			for (uint32_t line = 0; line < line_count; line++)
+			{
+				for (uint32_t i = 0; i < line_size; i++)
+				{
+					space.write_dword(m_dma_gio64_addr, space.read_dword(dma_translate(src_addr)));
+					src_addr += 4;
+				}
+				src_addr += line_stride;
+			}
+		}
 		break;
+	}
 	case 0x2030/4:
-		LOGMASKED(LOG_WRITES, "%s: DMA Mode Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		LOGMASKED(LOG_WRITES | LOG_DMA, "%s: DMA Mode Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		m_dma_mode = data;
 		break;
 	case 0x2038/4:
-		LOGMASKED(LOG_WRITES, "%s: DMA Zoom Count + Byte Count Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		LOGMASKED(LOG_WRITES | LOG_DMA, "%s: DMA Zoom Count + Byte Count Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		m_dma_count = data;
 		break;
 	case 0x2040/4:
-		LOGMASKED(LOG_WRITES, "%s: DMA Start Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		LOGMASKED(LOG_WRITES | LOG_DMA, "%s: DMA Start Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		// Start DMA
 		m_dma_running = 1;
 		break;
 	case 0x2070/4:
-		LOGMASKED(LOG_WRITES, "%s: DMA GIO64 Address Write + Default Params Write + Start DMA: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		LOGMASKED(LOG_WRITES | LOG_DMA, "%s: DMA GIO64 Address Write + Default Params Write + Start DMA: %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		m_dma_gio64_addr = data;
 		// Start DMA
 		m_dma_running = 1;

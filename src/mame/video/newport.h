@@ -157,9 +157,8 @@ private:
 		uint32_t m_config;
 		uint32_t m_status;
 		uint8_t m_xfer_width;
-		uint32_t m_skipline_kludge;
+		bool m_read_active;
 	};
-
 
 	struct cmap_t
 	{
@@ -180,6 +179,11 @@ private:
 	DECLARE_WRITE32_MEMBER(xmap1_w);
 	DECLARE_READ32_MEMBER(vc2_r);
 	DECLARE_WRITE32_MEMBER(vc2_w);
+
+	void do_v_iline(int x1, int y1, int y2, uint8_t color, bool skip_last);
+	void do_h_iline(int x1, int y1, int x2, uint8_t color, bool skip_last);
+	void do_iline(int x1, int y1, int x2, int y2, uint8_t color, bool skip_last);
+	uint8_t do_pixel_read();
 	void do_rex3_command();
 
 	required_device<cpu_device> m_maincpu;
@@ -188,7 +192,7 @@ private:
 	xmap_t m_xmap0;
 	xmap_t m_xmap1;
 	rex3_t m_rex3;
-	std::unique_ptr<uint32_t[]> m_base;
+	std::unique_ptr<uint8_t[]> m_base;
 	cmap_t m_cmap0;
 };
 

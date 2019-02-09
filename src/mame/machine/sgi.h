@@ -43,6 +43,8 @@ protected:
 	static const device_timer_id TIMER_RPSS = 0;
 
 private:
+	uint32_t dma_translate(uint32_t address);
+
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 
@@ -71,14 +73,8 @@ private:
 	uint32_t m_gio64_substitute_bits;
 	uint32_t m_dma_int_cause;
 	uint32_t m_dma_control;
-	uint32_t m_dma_tlb_entry0_hi;
-	uint32_t m_dma_tlb_entry0_lo;
-	uint32_t m_dma_tlb_entry1_hi;
-	uint32_t m_dma_tlb_entry1_lo;
-	uint32_t m_dma_tlb_entry2_hi;
-	uint32_t m_dma_tlb_entry2_lo;
-	uint32_t m_dma_tlb_entry3_hi;
-	uint32_t m_dma_tlb_entry3_lo;
+	uint32_t m_dma_tlb_entry_hi[4];
+	uint32_t m_dma_tlb_entry_lo[4];
 	uint32_t m_rpss_counter;
 	uint32_t m_dma_mem_addr;
 	uint32_t m_dma_size;

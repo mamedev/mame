@@ -61,7 +61,7 @@
 
 #include "emu.h"
 
-#include "cpu/mips/mips3.h"
+#include "cpu/mips/r4000.h"
 
 #include "machine/hpc3.h"
 #include "machine/nscsi_bus.h"
@@ -107,7 +107,7 @@ protected:
 
 	static void scsi_devices(device_slot_interface &device);
 
-	required_device<mips3_device> m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint64_t> m_mainram;
 	required_device<sgi_mc_device> m_mem_ctrl;
 	required_device<wd33c93b_device> m_scsi_ctrl;
@@ -173,7 +173,7 @@ void ip22_state::machine_reset()
 	// set up low RAM mirror
 	membank("bank1")->set_base(m_mainram);
 
-	m_maincpu->mips3drc_set_options(MIPS3DRC_COMPATIBLE_OPTIONS | MIPS3DRC_CHECK_OVERFLOWS);
+	//m_maincpu->mips3drc_set_options(MIPS3DRC_COMPATIBLE_OPTIONS | MIPS3DRC_CHECK_OVERFLOWS);
 }
 
 static INPUT_PORTS_START( ip225015 )
@@ -238,9 +238,9 @@ void ip22_state::ip225015(machine_config &config)
 {
 	ip22_base(config);
 
-	R5000BE(config, m_maincpu, 50000000*3);
-	m_maincpu->set_icache_size(32768);
-	m_maincpu->set_dcache_size(32768);
+	R4000(config, m_maincpu, 50000000*3);
+	//m_maincpu->set_icache_size(32768);
+	//m_maincpu->set_dcache_size(32768);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ip22_state::ip22_map);
 
 	SGI_HPC3(config, m_hpc3, m_maincpu, m_scsi_ctrl);
@@ -250,9 +250,9 @@ void ip22_state::ip224613(machine_config &config)
 {
 	ip22_base(config);
 
-	R4600BE(config, m_maincpu, 33333333*4);
-	m_maincpu->set_icache_size(32768);
-	m_maincpu->set_dcache_size(32768);
+	R4600(config, m_maincpu, 33333333*4);
+	//m_maincpu->set_icache_size(32768);
+	//m_maincpu->set_dcache_size(32768);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ip22_state::ip22_map);
 
 	SGI_HPC3(config, m_hpc3, m_maincpu, m_scsi_ctrl);
@@ -269,9 +269,9 @@ void ip24_state::ip244415(machine_config &config)
 {
 	ip22_base(config);
 
-	R4400BE(config, m_maincpu, 50000000*3);
-	m_maincpu->set_icache_size(32768);
-	m_maincpu->set_dcache_size(32768);
+	R4400(config, m_maincpu, 50000000*3);
+	//m_maincpu->set_icache_size(32768);
+	//m_maincpu->set_dcache_size(32768);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ip24_state::ip22_map);
 
 	NSCSI_BUS(config, "scsibus2", 0);
