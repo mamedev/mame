@@ -112,7 +112,7 @@ READ8_MEMBER(bombjack_state::soundlatch_read_and_clear)
 	// (this flip-flop is then cleared in sync with the sound CPU clock)
 	uint8_t res = m_soundlatch->read(space, 0);
 	if (!machine().side_effects_disabled())
-		m_soundlatch->clear_w(space, 0, 0);
+		m_soundlatch->clear_w();
 	return res;
 }
 

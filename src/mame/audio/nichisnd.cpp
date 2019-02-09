@@ -61,7 +61,7 @@ WRITE8_MEMBER(nichisnd_device::soundbank_w)
 
 WRITE8_MEMBER(nichisnd_device::soundlatch_clear_w)
 {
-	if (!(data & 0x01)) m_soundlatch->clear_w(space, 0, 0);
+	if (!(data & 0x01)) m_soundlatch->clear_w();
 }
 
 

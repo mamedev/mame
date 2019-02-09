@@ -427,7 +427,7 @@ void tbowl_state::machine_reset()
 	m_adpcm_pos[0] = m_adpcm_pos[1] = 0;
 	m_adpcm_end[0] = m_adpcm_end[1] = 0;
 	m_adpcm_data[0] = m_adpcm_data[1] = -1;
-	m_soundlatch->acknowledge_w(machine().dummy_space(), 0, 0);
+	m_soundlatch->acknowledge_w();
 }
 
 void tbowl_state::tbowl(machine_config &config)

@@ -453,10 +453,10 @@ void mario_state::sound_reset()
 #endif
 
 	/* FIXME: convert to latch8 */
-	m_soundlatch->clear_w(space, 0, 0);
-	if (m_soundlatch2) m_soundlatch2->clear_w(space, 0, 0);
-	if (m_soundlatch3) m_soundlatch3->clear_w(space, 0, 0);
-	if (m_soundlatch4) m_soundlatch4->clear_w(space, 0, 0);
+	m_soundlatch->clear_w();
+	if (m_soundlatch2) m_soundlatch2->clear_w();
+	if (m_soundlatch3) m_soundlatch3->clear_w();
+	if (m_soundlatch4) m_soundlatch4->clear_w();
 	if (m_soundlatch3) I8035_P1_W(space, 0x00); /* Input port */
 	if (m_soundlatch4) I8035_P2_W(space, 0xff); /* Port is in high impedance state after reset */
 

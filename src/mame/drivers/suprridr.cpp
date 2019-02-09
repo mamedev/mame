@@ -100,7 +100,7 @@ void suprridr_state::machine_start()
 
 void suprridr_state::machine_reset()
 {
-	m_soundlatch->acknowledge_w(machine().dummy_space(), 0, 0);
+	m_soundlatch->acknowledge_w();
 }
 
 /*************************************

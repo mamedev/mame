@@ -49,7 +49,7 @@ WRITE8_MEMBER(galivan_state::galivan_sound_command_w)
 
 READ8_MEMBER(galivan_state::soundlatch_clear_r)
 {
-	m_soundlatch->clear_w(space, 0, 0);
+	m_soundlatch->clear_w();
 	return 0;
 }
 

@@ -1648,7 +1648,7 @@ void neogeo_base_state::machine_reset()
 {
 	// disable audiocpu NMI
 	m_audionmi->in_w<1>(0);
-	m_soundlatch->acknowledge_r(machine().dummy_space(), 0);
+	m_soundlatch->acknowledge_w();
 
 	m_maincpu->reset();
 

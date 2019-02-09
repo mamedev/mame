@@ -2,7 +2,7 @@
 // copyright-holders:Miodrag Milanovic
 /***************************************************************************
 
-    Generic 8bit and 16 bit latch devices
+    Generic 8 bit and 16 bit latch devices
 
 ***************************************************************************/
 
@@ -36,8 +36,8 @@ public:
 
 	DECLARE_READ_LINE_MEMBER(pending_r);
 
-	DECLARE_READ8_MEMBER( acknowledge_r );
-	DECLARE_WRITE8_MEMBER( acknowledge_w );
+	u8 acknowledge_r(address_space &space);
+	void acknowledge_w(u8 data = 0);
 
 protected:
 	// construction/destruction
@@ -70,12 +70,10 @@ public:
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
-	DECLARE_WRITE8_MEMBER( preset_w );
-	DECLARE_WRITE8_MEMBER( clear_w );
+	void preset_w(u8 data = 0xff);
+	void clear_w(u8 data = 0);
 	DECLARE_WRITE_LINE_MEMBER( preset );
 	DECLARE_WRITE_LINE_MEMBER( clear );
-
-	void preset_w(u8 value) { m_latched_value = value; }
 
 protected:
 	virtual void device_start() override;
@@ -98,12 +96,10 @@ public:
 	DECLARE_READ16_MEMBER( read );
 	DECLARE_WRITE16_MEMBER( write );
 
-	DECLARE_WRITE16_MEMBER( preset_w );
-	DECLARE_WRITE16_MEMBER( clear_w );
+	void preset_w(u16 data = 0xffff);
+	void clear_w(u16 data = 0);
 	DECLARE_WRITE_LINE_MEMBER( preset );
 	DECLARE_WRITE_LINE_MEMBER( clear );
-
-	void preset_w(u16 value) { m_latched_value = value; }
 
 protected:
 	virtual void device_start() override;

@@ -639,7 +639,7 @@ WRITE8_MEMBER(cyclemb_state::skydest_i8741_1_w)
 			m_mcu[1].rst = 1;
 	}
 	//else
-	//  m_soundlatch->clear_w(space, 0, 0);
+	//  m_soundlatch->clear_w();
 }
 
 

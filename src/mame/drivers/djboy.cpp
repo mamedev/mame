@@ -277,7 +277,7 @@ WRITE8_MEMBER(djboy_state::beast_p0_w)
 	}
 
 	if (BIT(data, 0) == 0)
-		m_beastlatch->acknowledge_w(space, 0, data);
+		m_beastlatch->acknowledge_w();
 
 	m_beast_p0 = data;
 }

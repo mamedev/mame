@@ -147,7 +147,7 @@ WRITE8_MEMBER(sauro_state::sauro_sound_command_w)
 READ8_MEMBER(sauro_state::sauro_sound_command_r)
 {
 	int ret = m_soundlatch->read(space, offset);
-	m_soundlatch->clear_w(space, offset, 0);
+	m_soundlatch->clear_w();
 	return ret;
 }
 

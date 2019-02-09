@@ -100,7 +100,7 @@ WRITE16_MEMBER(terracre_state::amazon_sound_w)
 
 READ8_MEMBER(terracre_state::soundlatch_clear_r)
 {
-	m_soundlatch->clear_w(space,0,0);
+	m_soundlatch->clear_w();
 	return 0;
 }
 

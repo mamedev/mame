@@ -495,7 +495,7 @@ WRITE16_MEMBER(vamphalf_state::boonggab_lamps_w)
 WRITE8_MEMBER( vamphalf_state::qs1000_p3_w )
 {
 	if (!BIT(data, 5))
-		m_soundlatch->acknowledge_w(space, 0, !BIT(data, 5));
+		m_soundlatch->acknowledge_w();
 
 	membank("qs1000:data")->set_entry(data & 7);
 }

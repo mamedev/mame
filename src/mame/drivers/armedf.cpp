@@ -396,7 +396,7 @@ WRITE16_MEMBER(armedf_state::sound_command_w)
 
 READ8_MEMBER(armedf_state::soundlatch_clear_r)
 {
-	m_soundlatch->clear_w(space, 0, 0);
+	m_soundlatch->clear_w();
 	return 0;
 }
 

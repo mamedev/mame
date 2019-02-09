@@ -213,7 +213,7 @@ void gaelco3d_state::machine_reset()
 {
 	MACHINE_RESET_CALL_MEMBER( common );
 	m_tms_offset_xor = 0;
-	m_soundlatch->acknowledge_w(machine().dummy_space(), 0, 0);
+	m_soundlatch->acknowledge_w();
 }
 
 

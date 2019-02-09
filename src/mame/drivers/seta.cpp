@@ -3063,7 +3063,7 @@ void seta_state::umanclub_map(address_map &map)
 WRITE8_MEMBER(seta_state::utoukond_sound_control_w)
 {
 	if (!BIT(data, 6))
-		m_soundlatch[0]->acknowledge_w(space, 0, 0);
+		m_soundlatch[0]->acknowledge_w();
 
 	// other bits used for banking? (low nibble seems to always be 2)
 }
@@ -3559,7 +3559,7 @@ WRITE8_MEMBER(seta_state::calibr50_sub_bankswitch_w)
 
 	// Bit 3: NMICLR
 	if (!BIT(data, 3))
-		m_soundlatch[0]->acknowledge_w(space, 0, 0);
+		m_soundlatch[0]->acknowledge_w();
 
 	// Bit 2: IRQCLR
 	if (!BIT(data, 2))

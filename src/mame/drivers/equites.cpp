@@ -444,7 +444,7 @@ WRITE8_MEMBER(equites_state::equites_c0f8_w)
 
 		case 7: // c0ff: sound command latch clear
 			// Note: solder pad CP1 on the pcb would allow to disable this
-			m_soundlatch->clear_w(space, 0, 0);
+			m_soundlatch->clear_w();
 			break;
 	}
 }
