@@ -622,6 +622,11 @@ WRITE16_MEMBER( leland_80186_sound_device::dac_w )
 	/* handle value changes */
 	if (ACCESSING_BITS_0_7)
 	{
+		if((offset & 0x60) == 0x40)
+			m_audiocpu->drq0_w(CLEAR_LINE);
+		else if((offset & 0x60) == 0x60)
+			m_audiocpu->drq1_w(CLEAR_LINE);
+
 		m_dac[dac]->write(data & 0xff);
 
 		set_clock_line(dac, 0);
@@ -637,7 +642,9 @@ WRITE16_MEMBER( leland_80186_sound_device::dac_w )
 
 WRITE16_MEMBER( redline_80186_sound_device::redline_dac_w )
 {
-	dac_w(space, (offset >> 8) & 7, (data & 0xff) | (offset << 8), 0xffff);
+	data = (data & 0xff) | (offset << 8);
+	offset = ((offset >> 8) & 7) | ((offset & 0x2000) ? 0x40 : 0) | ((offset & 0x800) ? 0x20 : 0);
+	dac_w(space, offset, data, 0xffff);
 }
 
 WRITE16_MEMBER( leland_80186_sound_device::ataxx_dac_control )
@@ -645,7 +652,7 @@ WRITE16_MEMBER( leland_80186_sound_device::ataxx_dac_control )
 	if (ACCESSING_BITS_0_7)
 	{
 		/* handle common offsets */
-		switch (offset)
+		switch (offset & 0x1f)
 		{
 		case 0x00:
 		case 0x01:
@@ -657,9 +664,6 @@ WRITE16_MEMBER( leland_80186_sound_device::ataxx_dac_control )
 			m_dacvol[1]->write(((data >> 3) & 7) << 5);
 			m_dacvol[2]->write(((data >> 6) & 3) << 6);
 			return;
-		case 0x21:
-			dac_w(space, 3, data, mem_mask);
-			return;
 		}
 	}
 
@@ -667,7 +671,7 @@ WRITE16_MEMBER( leland_80186_sound_device::ataxx_dac_control )
 	switch (m_type)
 	{
 	case TYPE_WSF:
-		switch (offset)
+		switch (offset & 0x3f)
 		{
 		case 0x04:
 			m_ext_active = 1;
@@ -763,7 +767,6 @@ READ16_MEMBER( leland_80186_sound_device::peripheral_r )
 WRITE16_MEMBER( leland_80186_sound_device::peripheral_w )
 {
 	int select = offset / 0x40;
-	offset &= 0x3f;
 
 	switch (select)
 	{
@@ -784,7 +787,7 @@ WRITE16_MEMBER( leland_80186_sound_device::peripheral_w )
 					m_pit[1]->write(offset & 3, data);
 			}
 			else if(m_type == TYPE_WSF)
-				m_ymsnd->write(offset, data);
+				m_ymsnd->write(offset & 0x3f, data);
 			break;
 
 		case 4:
@@ -802,7 +805,7 @@ WRITE16_MEMBER( leland_80186_sound_device::peripheral_w )
 
 		case 5: /* Ataxx/WSF/Indy Heat only */
 			if (m_type > TYPE_REDLINE)
-				ataxx_dac_control(space, offset, data, mem_mask);
+				ataxx_dac_control(space, offset & 0x7f, data, mem_mask);
 			break;
 
 		default:
