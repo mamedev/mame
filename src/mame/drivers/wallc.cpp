@@ -157,18 +157,18 @@ void wallc_state::wallc_palette(palette_device &palette) const
 		// red component
 		bit0 = BIT(color_prom[i], 5);
 		bit1 = BIT(color_prom[i], 6);
-		int const r = combine_2_weights(weights_r, bit1, bit0);
+		int const r = combine_weights(weights_r, bit1, bit0);
 
 		// green component
 		bit0 = BIT(color_prom[i], 2);
 		bit1 = BIT(color_prom[i], 3);
-		int const g = combine_2_weights(weights_g, bit1, bit0);
+		int const g = combine_weights(weights_g, bit1, bit0);
 
 		// blue component
 		bit0 = BIT(color_prom[i], 0);
 		bit1 = BIT(color_prom[i], 1);
 		bit7 = BIT(color_prom[i], 7);
-		int const b = combine_3_weights(weights_b, bit7, bit1, bit0);
+		int const b = combine_weights(weights_b, bit7, bit1, bit0);
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -195,18 +195,18 @@ void wallc_state::unkitpkr_palette(palette_device &palette) const
 		// red component
 		bit0 = BIT(color_prom[i], 5);
 		bit1 = BIT(color_prom[i], 6);
-		int const r = combine_2_weights(weights_r, bit1, bit0);
+		int const r = combine_weights(weights_r, bit1, bit0);
 
 		// green component
 		bit0 = BIT(color_prom[i], 2);
 		bit1 = BIT(color_prom[i], 3);
-		int const g = combine_2_weights(weights_g, bit1, bit0);
+		int const g = combine_weights(weights_g, bit1, bit0);
 
 		// blue component
 		bit0 = BIT(color_prom[i], 0);
 		bit1 = BIT(color_prom[i], 1);
 		bit7 = BIT(color_prom[i], 7);
-		int const b = combine_3_weights(weights_b, bit7, bit1, bit0);
+		int const b = combine_weights(weights_b, bit7, bit1, bit0);
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}

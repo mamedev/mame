@@ -476,9 +476,9 @@ void berzerk_state::get_pens(rgb_t *pens)
 		uint8_t b_bit = (color >> 2) & 0x01;
 		uint8_t i_bit = (color >> 3) & 0x01;
 
-		uint8_t r = combine_2_weights(color_weights, r_bit & i_bit, r_bit);
-		uint8_t g = combine_2_weights(color_weights, g_bit & i_bit, g_bit);
-		uint8_t b = combine_2_weights(color_weights, b_bit & i_bit, b_bit);
+		uint8_t r = combine_weights(color_weights, r_bit & i_bit, r_bit);
+		uint8_t g = combine_weights(color_weights, g_bit & i_bit, g_bit);
+		uint8_t b = combine_weights(color_weights, b_bit & i_bit, b_bit);
 
 		pens[color] = rgb_t(r, g, b);
 	}

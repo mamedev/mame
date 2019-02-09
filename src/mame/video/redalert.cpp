@@ -80,9 +80,9 @@ void redalert_state::get_pens(pen_t *pens)
 		uint8_t b0_bit = (data >> 0) & 0x01;
 		uint8_t b1_bit = (data >> 7) & 0x01;
 
-		uint8_t r = combine_3_weights(charmap_rg_weights, r0_bit, r1_bit, r2_bit);
-		uint8_t g = combine_3_weights(charmap_rg_weights, g0_bit, g1_bit, g2_bit);
-		uint8_t b = combine_2_weights(charmap_b_weights,  b0_bit, b1_bit);
+		uint8_t r = combine_weights(charmap_rg_weights, r0_bit, r1_bit, r2_bit);
+		uint8_t g = combine_weights(charmap_rg_weights, g0_bit, g1_bit, g2_bit);
+		uint8_t b = combine_weights(charmap_b_weights,  b0_bit, b1_bit);
 
 		pens[offs] = rgb_t(r, g, b);
 	}
