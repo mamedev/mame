@@ -1000,6 +1000,7 @@ void setup_t::delete_empty_nets()
 				if (x->num_cons() == 0)
 				{
 					x->state().log().verbose("Deleting net {1} ...", x->name());
+					x->state().run_state_manager().remove_save_items(x.get());
 					return true;
 				}
 				else

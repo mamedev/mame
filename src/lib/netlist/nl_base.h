@@ -713,7 +713,7 @@ namespace netlist
 		};
 
 		net_t(netlist_state_t &nl, const pstring &aname, core_terminal_t *mr = nullptr);
-		virtual ~net_t();
+		virtual ~net_t() = default;
 
 		void reset();
 
@@ -1221,6 +1221,7 @@ namespace netlist
 	public:
 		using entry_t = pqentry_t<net_t *, netlist_time>;
 		explicit queue_t(netlist_state_t &nl);
+		~queue_t();
 
 	protected:
 
@@ -1249,7 +1250,7 @@ namespace netlist
 			std::unique_ptr<callbacks_t> &&callbacks,
 			std::unique_ptr<setup_t> &&setup);
 
-		~netlist_state_t();
+		~netlist_state_t() = default;
 
 		friend class netlist_t; // allow access to private members
 
@@ -1320,11 +1321,20 @@ namespace netlist
 			m_devices.insert(m_devices.end(), { name, std::move(dev) });
 		}
 
+		/**
+		 * @brief Remove device
+		 *
+		 * Care needs to be applied if this is called to remove devices with
+		 * sub-devices which may have registered state.
+		 *
+		 * @param dev Device to be removed
+		 */
 		void remove_dev(core_device_t *dev)
 		{
 			for (auto it = m_devices.begin(); it != m_devices.end(); it++)
 				if (it->second.get() == dev)
 				{
+					m_state.remove_save_items(dev);
 					m_devices.erase(it);
 					return;
 				}

@@ -148,6 +148,10 @@ detail::queue_t::queue_t(netlist_state_t &nl)
 {
 }
 
+detail::queue_t::~queue_t()
+{
+}
+
 void detail::queue_t::register_state(plib::state_manager_t &manager, const pstring &module)
 {
 	//state().log().debug("register_state\n");
@@ -266,15 +270,6 @@ netlist_state_t::netlist_state_t(const pstring &aname,
 	pstring libpath = plib::util::environment("NL_BOOSTLIB", plib::util::buildpath({".", "nlboost.so"}));
 	m_lib = plib::make_unique<plib::dynlib>(libpath);
 }
-
-
-netlist_state_t::~netlist_state_t()
-{
-	nets().clear();
-	m_devices.clear();
-}
-
-
 
 
 void netlist_t::stop()
@@ -694,12 +689,6 @@ detail::net_t::net_t(netlist_state_t &nl, const pstring &aname, core_terminal_t 
 	, m_railterminal(mr)
 {
 }
-
-detail::net_t::~net_t()
-{
-	state().run_state_manager().remove_save_items(this);
-}
-
 
 void detail::net_t::rebuild_list()
 {

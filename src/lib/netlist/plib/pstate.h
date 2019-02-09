@@ -117,7 +117,13 @@ public:
 	void post_load();
 	void remove_save_items(const void *owner);
 
-	const entry_t::list_t &save_list() const { return m_save; }
+	const std::vector<const entry_t *> save_list() const
+	{
+		std::vector<const entry_t *> ret;
+		for (auto &i : m_save)
+			ret.push_back(i.get());
+		return ret;
+	}
 
 	void save_state_ptr(const void *owner, const pstring &stname, const datatype_t &dt, const std::size_t count, void *ptr);
 
