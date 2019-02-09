@@ -73,6 +73,7 @@
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "bus/jakks_gamekey/slot.h"
 
 #include "screen.h"
 #include "softlist.h"
@@ -174,16 +175,19 @@ public:
 	void jakks_gkr_dy(machine_config &config);
 	void jakks_gkr_sw(machine_config &config);
 
+	DECLARE_CUSTOM_INPUT_MEMBER(i2c_gkr_r);
+
 private:
 	virtual void machine_start() override;
 
+	DECLARE_WRITE16_MEMBER(gkr_portc_w);
 	DECLARE_WRITE16_MEMBER(jakks_porta_key_io_w);
 	DECLARE_READ16_MEMBER(jakks_porta_key_io_r);
 	bool m_porta_key_mode;
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(gamekey_cart);
 
-	required_device<generic_slot_device> m_cart;
+	required_device<jakks_gamekey_slot_device> m_cart;
 	memory_region *m_cart_region;
 };
 
@@ -306,6 +310,17 @@ CUSTOM_INPUT_MEMBER(spg2xx_game_state::i2c_r)
 	return m_i2cmem->read_sda();
 }
 
+CUSTOM_INPUT_MEMBER(jakks_gkr_state::i2c_gkr_r)
+{
+	if (m_cart && m_cart->exists())
+	{
+		return m_cart->read_cart_seeprom();
+	}
+	else
+	{
+		return m_i2cmem->read_sda();
+	}
+}
 
 WRITE16_MEMBER(spg2xx_game_state::walle_portc_w)
 {
@@ -314,6 +329,23 @@ WRITE16_MEMBER(spg2xx_game_state::walle_portc_w)
 		m_i2cmem->write_scl(BIT(data, 1));
 	if (BIT(mem_mask, 0))
 		m_i2cmem->write_sda(BIT(data, 0));
+}
+
+WRITE16_MEMBER(jakks_gkr_state::gkr_portc_w)
+{
+	m_walle_portc_data = data & mem_mask;
+
+	if (m_cart && m_cart->exists())
+	{
+		m_cart->write_cart_seeprom(space,offset,data,mem_mask);
+	}
+	else
+	{
+		if (BIT(mem_mask, 1))
+			m_i2cmem->write_scl(BIT(data, 1));
+		if (BIT(mem_mask, 0))
+			m_i2cmem->write_sda(BIT(data, 0));
+	}
 }
 
 READ16_MEMBER(spg2xx_game_state::jakks_porta_r)
@@ -456,7 +488,7 @@ static INPUT_PORTS_START( jak_sith )
 	PORT_BIT( 0xf3df, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P3")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, spg2xx_game_state,i2c_r, nullptr)
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, jakks_gkr_state,i2c_gkr_r, nullptr)
 	PORT_BIT( 0xfffe, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("JOYX")
@@ -478,7 +510,7 @@ static INPUT_PORTS_START( jak_gkr )
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON4 )
 
 	PORT_START("P3")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, spg2xx_game_state,i2c_r, nullptr)
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, jakks_gkr_state,i2c_gkr_r, nullptr)
 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -923,7 +955,7 @@ void jakks_gkr_state::machine_start()
 	if (m_cart && m_cart->exists())
 	{
 		std::string region_tag;
-		m_cart_region = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+		m_cart_region = memregion(region_tag.assign(m_cart->tag()).append(JAKKSSLOT_ROM_REGION_TAG).c_str());
 		m_bank->configure_entries(0, (m_cart_region->bytes() + 0x7fffff) / 0x800000, m_cart_region->base(), 0x800000);
 		m_bank->set_entry(0);
 	}
@@ -931,12 +963,7 @@ void jakks_gkr_state::machine_start()
 
 DEVICE_IMAGE_LOAD_MEMBER(jakks_gkr_state, gamekey_cart)
 {
-	uint32_t size = m_cart->common_get_size("rom");
-
-	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
-	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
-
-	return image_init_result::PASS;
+	return m_cart->call_load();
 }
 
 void jakks_gkr_state::jakks_gkr(machine_config &config)
@@ -946,10 +973,9 @@ void jakks_gkr_state::jakks_gkr(machine_config &config)
 	m_spg->porta_in().set(FUNC(jakks_gkr_state::jakks_porta_key_io_r));
 	m_spg->porta_out().set(FUNC(jakks_gkr_state::jakks_porta_key_io_w));
 	//m_spg->portb_in().set_ioport("P2");
+	m_spg->portc_out().set(FUNC(jakks_gkr_state::gkr_portc_w));
 
-	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "jakks_gamekey");
-	m_cart->set_width(GENERIC_ROM16_WIDTH);
-	m_cart->set_device_load(device_image_load_delegate(&jakks_gkr_state::device_image_load_gamekey_cart, this));
+	JAKKS_GAMEKEY_SLOT(config, m_cart, 0, jakks_gamekey, nullptr);
 }
 
 void jakks_gkr_state::jakks_gkr_1m(machine_config &config)

@@ -12,6 +12,7 @@
 		<year>2005</year>
 		<publisher>JAKKS Pacific / Griptonite Games</publisher>
 		<part name="cart" interface="jakks_gamekey">
+      <feature name="slot" value="rom_24lc04"/>
 			<dataarea name="rom" size="0x800000">
 				<rom name="jakksswgkyodaturret.bin" size="0x200000" crc="78f663f6" sha1="375763e6b6ccf290d9a37f0d849f72bea7b25722" offset="0" />
 				<rom size="0x200000" offset="0x200000" loadflag="reload" />
