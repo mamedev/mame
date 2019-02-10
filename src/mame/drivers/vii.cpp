@@ -1043,6 +1043,8 @@ void jakks_gkr_state::jakks_gkr(machine_config &config)
 	//m_spg->portb_in().set_ioport("P2");
 	m_spg->portc_out().set(FUNC(jakks_gkr_state::gkr_portc_w));
 
+	m_spg-> set_rowscroll_offset(0);
+
 	JAKKS_GAMEKEY_SLOT(config, m_cart, 0, jakks_gamekey, nullptr);
 }
 
@@ -1441,7 +1443,7 @@ CONS( 2005, jak_disp, 0, 0, jakks_gkr_dp, jak_disp, jakks_gkr_state, empty_init,
 CONS( 2005, jak_sith, 0, 0, jakks_gkr_sw, jak_sith, jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Griptonite Games",    "Star Wars - Revenge of the Sith (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // uses SW keys (1 released)
 CONS( 2005, jak_dbz,  0, 0, jakks_gkr_1m, jak_gkr,  jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Handheld Games",      "Dragon Ball Z (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // DB (no game-keys released, 1 in development but cancelled)
 CONS( 2004, jak_mpac, 0, 0, jakks_gkr_nm, jak_nm,   jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Namco / HotGen Ltd",  "Ms. Pac-Man 5-in-1 (Ms. Pac-Man, Pole Position, Galaga, Xevious, Mappy) (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // uses NM (3 keys available [Dig Dug, New Rally-X], [Rally-X, Pac-Man, Bosconian], [Pac-Man, Bosconian])
-CONS( 2005, jak_wof,  0, 0, jakks_gkr_wf, jak_wf,   jakks_gkr_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",          "Wheel of Fortune (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // uses WF lkeys (no game-keys released)
+CONS( 2005, jak_wof,  0, 0, jakks_gkr_wf, jak_wf,   jakks_gkr_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",          "Wheel of Fortune (JAKKS Pacific TV Game, Game-Key Ready)",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // uses WF keys (no game-keys released)  analog wheel not emulated
 
 // Nicktoons                                   NK (3 keys available) (same keys as Dora the Explorer)
 // SpongeBob SquarePants: The Fry Cook Games   NK (3 keys available)  ^^                
