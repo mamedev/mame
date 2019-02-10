@@ -1,8 +1,74 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<!-- As of 02/07/2019, this still needs to be re-sorted. -->
 
 <softwarelist name="apple2_flop_clcracked" description="Apple II cleanly cracked 5.25 disks">
+
+	<software name="101mword">
+		<description>101 Misused Words (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Learning Seed Company</publisher>
+		<info name="release" value="2016-04-12"/>
+		<sharedfeat name="compatibility" value="NEEDDATA" />
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="101 misused words (4am crack).dsk" size="143360" crc="49662c0d" sha1="b71a873630ef10333695890ab66a7bd80a9ef06e" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="123dmult">
+		<description>1-2-3 Digit Multiplication (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Microcomputer Workshops</publisher>
+		<info name="release" value="2017-04-30"/>
+		<sharedfeat name="compatibility" value="NEEDDATA" />
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="1-2-3 digit multiplication (4am crack).dsk" size="143360" crc="78461261" sha1="c8b8e76295be278b0faa2a10c255b3c3f7b7468c" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="2400ad">
+		<description>2400 A.D. (4am crack) side A</description>
+		<year>1987</year>
+		<publisher>Origin Systems</publisher>
+		<info name="release" value="2018-09-23"/>
+		<sharedfeat name="compatibility" value="NEEDDATA" />
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="2400 a.d. (4am crack) side a.dsk" size="143360" crc="b213865f" sha1="6f32418850fa522019233743e19ceac5bd961c95" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="2400 a.d. (4am crack) side b.dsk" size="143360" crc="30248b30" sha1="6154a819e207104af57b262c950fa225a8b0d1a1" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="abnewv">
+		<description>A Brand New View (4am crack)</description>
+		<year>1987</year>
+		<publisher>D.C. Heath and Company</publisher>
+		<info name="release" value="2016-08-24"/>
+		<sharedfeat name="compatibility" value="NEEDDATA" />
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+			<rom name="a brand new view (4am crack).dsk" size="143360" crc="dcbee16d" sha1="1f5fba7748da446fb3c31845788e18905691baea" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="alcazar">
 		<description>Alcazar the Forgotten Fortress (cleanly cracked)</description>
@@ -22,11 +88,13 @@
 		<publisher>Activision</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="143360">
 				<rom name="aliens (1986)(activision)(disk 1 of 2)(clean crack).dsk" size="143360" crc="bf0f7f72" sha1="d77b4d92ce266c75c4d7f08b85e507529e0afc68" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="143360">
 				<rom name="aliens (1986)(activision)(disk 2 of 2)(clean crack).dsk" size="143360" crc="001325b2" sha1="077d7e3d9fb920b6f7cfc69381eb447f44ce0713" offset="0x0000" />
 			</dataarea>
@@ -63,11 +131,13 @@
 		<publisher>Interplay</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop1" size="143360">
 				<rom name="battle chess side a (1990)(interplay)(trex crack).dsk" size="143360" crc="a81e4ae5" sha1="5b0e79fa0d4257a4855864c9324840cc1a41284e" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop1" size="143360">
 				<rom name="battle chess side b (1990)(interplay)(trex crack)[unk filesys].dsk" size="143360" crc="54359fd3" sha1="19b3ed795c9827f580df77f559ad02eca55455b9" offset="0x0000" />
 			</dataarea>
@@ -80,11 +150,13 @@
 		<publisher>Data East</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop1" size="143360">
 				<rom name="batman (1988)(data east)(side a)(4am crack).dsk" size="143360" crc="d8ddda60" sha1="456ced865c6a7f74af89e2bc1fbad0bde44fb55d" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop1" size="143360">
 				<rom name="batman (1988)(data east)(side b)(4am crack).dsk" size="143360" crc="0aebbb48" sha1="97888412b36e2f65725a8177c46cb1d5f2a9e083" offset="0x0000" />
 			</dataarea>
@@ -97,11 +169,13 @@
 		<publisher>Micro Education</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop1" size="143360">
 				<rom name="basic building blocks (1983)(micro education)(disk 1)(4am crack).dsk" size="143360" crc="a1752e9a" sha1="cfdd011756427b782935732446c27cb1caa6b8a1" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop1" size="143360">
 				<rom name="basic building blocks (1983)(micro education)(disk 2)(4am crack).dsk" size="143360" crc="a51a3503" sha1="98b6d27d0da675c2f5d351340cd56f2d8d807eba" offset="0x0000" />
 			</dataarea>
@@ -114,11 +188,13 @@
 		<publisher>Taito America / NovaLogic</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop1" size="143360">
 				<rom name="bubble bobble disk 1 of 2 (1988)(taito america - novalogic)(trex crack).dsk" size="143360" crc="2af0a5d4" sha1="4810c07e9514d6d3a49ee9babee7497103428d43" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop1" size="143360">
 				<rom name="bubble bobble disk 2 of 2 (1988)(taito america - novalogic)(trex crack).dsk" size="143360" crc="ac056c8d" sha1="0f30fb98d37e91f166d0c8c6b328e898cdf37ec1" offset="0x0000" />
 			</dataarea>
@@ -167,21 +243,25 @@
 		<publisher>Broderbund</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="143360">
 				<rom name="where in time is carmen sandiego v1.1 side a (1989)(broderbund)(trex crack).dsk" size="143360" crc="9d391061" sha1="32f18c02974e0a915e3ac74abe10ec9cf5f67533" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="where in time is carmen sandiego v1.1 side b (1989)(broderbund)(trex crack).dsk" size="143360" crc="33e65f76" sha1="8995ca7786b6a70d68b8305625e65a534c15d435" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Side C"/>
 			<dataarea name="flop" size="143360">
 				<rom name="where in time is carmen sandiego v1.1 side c (1989)(broderbund)(trex crack).dsk" size="143360" crc="15942fc0" sha1="03189fdefa100e64c0ad9ba38804bab7508f9881" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Side D"/>
 			<dataarea name="flop" size="143360">
 				<rom name="where in time is carmen sandiego v1.1 side d (1989)(broderbund)(trex crack).dsk" size="143360" crc="704551a0" sha1="469ef6f3be3919cd904c63d37d6e8d46e895ab31" offset="0x0000" />
 			</dataarea>
@@ -206,21 +286,25 @@
 		<publisher>Broderbund</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="143360">
 				<rom name="where in time is carmen sandiego v1.0 (4am crack) side a.dsk" size="143360" crc="cd3da2a7" sha1="21a9fc7220c84ffec91b4e76b28dc8b514ab56a3" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="where in time is carmen sandiego v1.0 (4am crack) side b.dsk" size="143360" crc="3bad4b59" sha1="7e84dc0db9e964db44692fa340b6c6828f83bfe6" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Side C"/>
 			<dataarea name="flop" size="143360">
 				<rom name="where in time is carmen sandiego v1.0 (4am crack) side c.dsk" size="143360" crc="650735af" sha1="aecf8b17bb26e73036100ac648e5eddede12fe91" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Side D"/>
 			<dataarea name="flop" size="143360">
 				<rom name="where in time is carmen sandiego v1.0 (4am crack) side d.dsk" size="143360" crc="3c7643ca" sha1="8a6a168f25b4698465b89db9546d9b35489fe042" offset="0x0000" />
 			</dataarea>
@@ -233,11 +317,13 @@
 		<publisher>SSI</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop1" size="143360">
 				<rom name="dungeon master's assistant side a (1988)(ssi)(trex crack)[rdos].dsk" size="143360" crc="14904b40" sha1="9a8953ed45bb36f340b13db1eb6d75a26e498815" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop1" size="143360">
 				<rom name="dungeon master's assistant side b (1988)(ssi)(trex crack)[rdos].dsk" size="143360" crc="fafa454c" sha1="169ec625b5d72f6c624534e4c031915a0e36c82d" offset="0x0000" />
 			</dataarea>
@@ -472,21 +558,25 @@
 		<publisher>Activision</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="143360">
 				<rom name="portal disk 1 of 4 (1986)(activision)(trex crack).dsk" size="143360" crc="5f90a84a" sha1="1fcc3990b5680d47ee5a87fd0dac8266433e7a7d" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="143360">
 				<rom name="portal disk 2 of 4 (1986)(activision)(trex crack).dsk" size="143360" crc="56038539" sha1="e2f98196e977a60d088948d5689a254c831b78d5" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
 			<dataarea name="flop" size="143360">
 				<rom name="portal disk 3 of 4 (1986)(activision)(trex crack).dsk" size="143360" crc="43fa124b" sha1="96e8eb50e1f7c5608f0e5c21c8510f950f475340" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4"/>
 			<dataarea name="flop" size="143360">
 				<rom name="portal disk 4 of 4 (1986)(activision)(trex crack).dsk" size="143360" crc="0cc78e02" sha1="ea7f178de04fe64aa62ed25df5e64aa405ee13b5" offset="0x0000" />
 			</dataarea>
@@ -548,11 +638,13 @@
 		<publisher>Taito America / NovaLogic</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop1" size="143360">
 				<rom name="renegade disk 1 of 2 (1988)(taito america - novalogic)(trex crack).dsk" size="143360" crc="9d480dec" sha1="bca268ad1859c8cfd214496c3195b88362a31502" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop1" size="143360">
 				<rom name="renegade disk 2 of 2 (1988)(taito america - novalogic)(trex crack).dsk" size="143360" crc="c01e6c75" sha1="b4b789285ee0c06315ffb216c413414c09a7756a" offset="0x0000" />
 			</dataarea>
@@ -653,11 +745,13 @@
 		<publisher>Mindplay</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="143360">
 				<rom name="ace detective (4am crack) side a.dsk" size="143360" crc="1ed89d6f" sha1="065673511e9c48d24c0e92dfdb5ed617c3f5cf62" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="ace detective (4am crack) side b.dsk" size="143360" crc="e3a16f45" sha1="c5ffe33fac6919982ab1b24dbeed393ece532908" offset="0x0000" />
 			</dataarea>
@@ -730,11 +824,13 @@
 		<publisher>Windham Classics</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="143360">
 				<rom name="alice in wonderland (4am crack) side a.dsk" size="143360" crc="46d03565" sha1="bf3ea2cdf0c5fb63aff9686605c2cae84774c62f" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="alice in wonderland (4am crack) side b.dsk" size="143360" crc="f03e007e" sha1="fd960bf392beaa9f081ff36a9f621cd1ce5e3c92" offset="0x0000" />
 			</dataarea>
@@ -760,21 +856,25 @@
 		<info name="usage" value="Works with Apple II Mouse Card in slot 4: -sl4 mouse" />
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Program Disk Side 1"/>
 			<dataarea name="flop" size="143360">
 				<rom name="alge-blaster plus (4am crack) program disk side 1.dsk" size="143360" crc="e8d890c7" sha1="e2dbdde612c1da4543d79a6a8bd793a9a3501320" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Program Disk Side 2"/>
 			<dataarea name="flop" size="143360">
 				<rom name="alge-blaster plus (4am crack) program disk side 2.dsk" size="143360" crc="90c22d74" sha1="75d3c345e93dfe177ae4e2c5cd85bd770bead924" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Data Disk Side 1"/>
 			<dataarea name="flop" size="143360">
 				<rom name="alge-blaster plus (4am crack) data disk side 1.dsk" size="143360" crc="cbd1a613" sha1="fde73dbad3ede97e2e1758b2f20fcf42e5756c5d" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Data Disk Side 2"/>
 			<dataarea name="flop" size="143360">
 				<rom name="alge-blaster plus (4am crack) data disk side 2.dsk" size="143360" crc="8d94d796" sha1="8716509d1e68ad38f269d411b6c67838d4e9c4e8" offset="0x0000" />
 			</dataarea>
@@ -823,11 +923,13 @@
 		<publisher>Queue Inc.</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="143360">
 				<rom name="american history adventure (4am crack) disk 1.dsk" size="143360" crc="ebed5630" sha1="e022f2c9d398128df5b01b67bdb03e1935307bc0" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="143360">
 				<rom name="american history adventure (4am crack) disk 2.dsk" size="143360" crc="fdac8698" sha1="efb8b395b6c508d5a5eb2caa0d34a89a2eb2c54f" offset="0x0000" />
 			</dataarea>
@@ -840,11 +942,13 @@
 		<publisher>Unicorn Software</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="143360">
 				<rom name="animal kingdom (4am crack) side a.dsk" size="143360" crc="ccd3005b" sha1="9255e54d15b405b360f340c811cd71f70ae33945" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="animal kingdom (4am crack) side b.dsk" size="143360" crc="98b5bc0f" sha1="c50c55c2fffc2e37c3d3319b4e8eb0c04c282beb" offset="0x0000" />
 			</dataarea>
@@ -930,21 +1034,25 @@
 		<publisher>Pelican Software</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side A"/>
 			<dataarea name="flop" size="143360">
 				<rom name="big book maker (4am crack) disk 1 side a.dsk" size="143360" crc="3f18085e" sha1="b69bdab8c4840a0922ac65b765bc3d20a38cfbd1" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="big book maker (4am crack) disk 1 side b.dsk" size="143360" crc="1142180f" sha1="cc8cd090bb644c31ec7229a0d79f135cc9e7f732" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side A"/>
 			<dataarea name="flop" size="143360">
 				<rom name="big book maker (4am crack) disk 2 side a.dsk" size="143360" crc="b13c5630" sha1="8b6771472e2f977b5dc30d48ba8cbf8680b635a4" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="big book maker (4am crack) disk 2 side b.dsk" size="143360" crc="b75798e9" sha1="1c25c3a721a731cb9bedc01da8d3440eac2db099" offset="0x0000" />
 			</dataarea>
@@ -1077,11 +1185,13 @@
 		<publisher>Epyx</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="143360">
 				<rom name="california games (4am crack) side a.dsk" size="143360" crc="284f014d" sha1="97a5a792a936e13131ae37c3bdd32369d1eea8c0" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="california games (4am crack) side b.dsk" size="143360" crc="45e24a4e" sha1="4a649cf48658f1150477bc712070acf40994d21e" offset="0x0000" />
 			</dataarea>
@@ -1154,11 +1264,13 @@
 		<publisher>Developmental Learning Materials</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="143360">
 				<rom name="curious george in outer space (4am crack) side a.dsk" size="143360" crc="4b80d3bf" sha1="1f81407c343b9683fc9d0c6e4c5400b0ef17bc52" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="curious george in outer space (4am crack) side b.dsk" size="143360" crc="4da9d944" sha1="5f222458fc9b9fbc73946dea4d0ae80a14ffafc9" offset="0x0000" />
 			</dataarea>
@@ -1171,11 +1283,13 @@
 		<publisher>Developmental Learning Materials</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="143360">
 				<rom name="curious george goes shopping (4am crack) side a.dsk" size="143360" crc="5ad866e9" sha1="b4e384105be03c792d30ed32e72459781ce99676" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="curious george goes shopping (4am crack) side b.dsk" size="143360" crc="972d8958" sha1="70a81aa46b819ac438988ed696c78f70f7c1c010" offset="0x0000" />
 			</dataarea>
@@ -1200,11 +1314,13 @@
 		<publisher>Random House</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="143360">
 				<rom name="charlie brown's 1-2-3s (4am crack) side a.dsk" size="143360" crc="22ff5067" sha1="5b09390b3c438284f9ea534ee755fe57899dabc4" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="charlie brown's 1-2-3s (4am crack) side b.dsk" size="143360" crc="7ea28429" sha1="5d5f985d2fc3d899f1a6b6cf16448c387a677c41" offset="0x0000" />
 			</dataarea>
@@ -1217,11 +1333,13 @@
 		<publisher>Random House</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="143360">
 				<rom name="charlie brown's abc's (4am crack) side a.dsk" size="143360" crc="d727b6f6" sha1="1af44fa21e611564ab3929aec753cc4e160d8b80" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="charlie brown's abc's (4am crack) side b.dsk" size="143360" crc="5bb8d11e" sha1="d394b12ad488c50e69c07367c7bd55b07d3aed6d" offset="0x0000" />
 			</dataarea>
@@ -1246,11 +1364,13 @@
 		<publisher>Epyx</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="143360">
 				<rom name="championship wrestling (4am crack) side a.dsk" size="143360" crc="9b562e29" sha1="8b7ff536b52238ea0ee048d0ef98c72c159b1a54" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="championship wrestling (4am crack) side b.dsk" size="143360" crc="5e513adf" sha1="76946879b72976b6477a0ffa68c8a9a677c3550b" offset="0x0000" />
 			</dataarea>
@@ -1316,21 +1436,25 @@
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Picture Disk - Hugga Bunch - Side A"/>
 			<dataarea name="flop" size="143360">
 				<rom name="colorme (4am crack) picture disk - hugga bunch - side a.dsk" size="143360" crc="6afeb028" sha1="206788a5ad07b1d7e7d5dabe936d4bb1c1608a2b" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Picture Disk - Hugga Bunch - Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="colorme (4am crack) picture disk - hugga bunch - side b.dsk" size="143360" crc="227c37ce" sha1="18e1f544389770a6a74d97c585e2a7e6a8a5674c" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Picture Disk - Tink Tonk - Side A"/>
 			<dataarea name="flop" size="143360">
 				<rom name="colorme (4am crack) picture disk - tink tonk - side a.dsk" size="143360" crc="8444dd7f" sha1="14cb015848ec215f928484db6bc5d9abb4693c56" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Picture Disk - Tink Tonk - Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="colorme (4am crack) picture disk - tink tonk - side b.dsk" size="143360" crc="6afeb028" sha1="206788a5ad07b1d7e7d5dabe936d4bb1c1608a2b" offset="0x0000" />
 			</dataarea>
@@ -1367,11 +1491,13 @@
 		<publisher>DataSoft</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="143360">
 				<rom name="conan (4am crack) side a.dsk" size="143360" crc="59ab412d" sha1="7b867eb234ebf0026a810609ab676a80eb6b1792" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="conan (4am crack) side b.dsk" size="143360" crc="8b11dd5a" sha1="62cb3e0c28deab25e35484f9aefa47e07b5f9dec" offset="0x0000" />
 			</dataarea>
@@ -1408,11 +1534,13 @@
 		<publisher>Pelican Software</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="143360">
 				<rom name="creation (4am crack) side a.dsk" size="143360" crc="24686294" sha1="f103a1bb993cfe484baccc0b2fd51d569c5429b8" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="creation (4am crack) side b.dsk" size="143360" crc="52b81661" sha1="435881b4f3f75fc7317fbccf10690c653c9cade1" offset="0x0000" />
 			</dataarea>
@@ -1629,16 +1757,19 @@
 		<publisher>Avant-Garde Publishing Corp.</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Program disk (no mouse)"/>
 			<dataarea name="flop" size="143360">
 				<rom name="design your own home - architectural design (4am crack) disk 1 - program disk without mouse support.dsk" size="143360" crc="7a636e73" sha1="cc5db5f4babe23b6949e4649dcb4b064db26f8a2" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Program disk (mouse support)"/>
 			<dataarea name="flop" size="143360">
 				<rom name="design your own home - architectural design (4am crack) disk 2 - program disk with mouse support.dsk" size="143360" crc="a560a7fe" sha1="2cc71bcc086775800cd523e759956604be7f8be2" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Data Disk"/>
 			<dataarea name="flop" size="143360">
 				<rom name="design your own home - architectural design (4am crack) disk 3 - data disk.dsk" size="143360" crc="6181b68e" sha1="fad415f43ce90278ad8ed5e1e8118316e0542fc2" offset="0x0000" />
 			</dataarea>
@@ -1663,16 +1794,19 @@
 		<publisher>Avant-Garde Publishing Corp.</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Program disk (no mouse)"/>
 			<dataarea name="flop" size="143360">
 				<rom name="design your own home (4am crack) disk 1 - program disk without mouse support.dsk" size="143360" crc="74ca0ac3" sha1="80e4d88fb2e8042faeefc053b9af25e6a3aec87d" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Program disk (mouse support)"/>
 			<dataarea name="flop" size="143360">
 				<rom name="design your own home (4am crack) disk 2 - program disk with mouse support.dsk" size="143360" crc="f68d0486" sha1="7ee505ad27631520237691ce07a996ef0eae5976" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Data Disk"/>
 			<dataarea name="flop" size="143360">
 				<rom name="design your own home (4am crack) disk 3 - data disk.dsk" size="143360" crc="3b6b6514" sha1="c6ceba63f3707fe91d7aacd521961dd815171eb4" offset="0x0000" />
 			</dataarea>
@@ -1697,21 +1831,25 @@
 		<publisher>American Educational Computer, Inc.</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="143360">
 				<rom name="easy reader demo (4am crack) disk 1.dsk" size="143360" crc="bfecd940" sha1="f08cc5a4e7e6f59ed9c07ae6fa9597ee1db97c2b" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="143360">
 				<rom name="easy reader demo (4am crack) disk 2.dsk" size="143360" crc="a235a2db" sha1="ca8e12d10437d09bd8f3ffe90e3ffd56d3865233" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
 			<dataarea name="flop" size="143360">
 				<rom name="easy reader demo (4am crack) disk 3.dsk" size="143360" crc="81b665db" sha1="ccd6f29a9a12def13602bde6ddd40cc0d9015cc9" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4"/>
 			<dataarea name="flop" size="143360">
 				<rom name="easy reader demo (4am crack) disk 4.dsk" size="143360" crc="ee0f7dfe" sha1="b346068156741b5585aa1b5b1565f0745238bf52" offset="0x0000" />
 			</dataarea>
@@ -1749,11 +1887,13 @@
 		<publisher>Grolier</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="143360">
 				<rom name="educalc (4am crack) side a.dsk" size="143360" crc="60a6cbb6" sha1="dbc1c97e26cf0387eb454adb340b990637f20d48" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="educalc (4am crack) side b.dsk" size="143360" crc="b01b103a" sha1="62884243c3dc97a53d6e0608cac7323ba7287b1a" offset="0x0000" />
 			</dataarea>
@@ -1898,11 +2038,13 @@
 		<publisher>Queue, Inc.</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="143360">
 				<rom name="force and motion (4am crack) disk 1.dsk" size="143360" crc="a338ba73" sha1="4ddb1788cd67f4f85ebbac4995f9817a1334f6cf" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="143360">
 				<rom name="force and motion (4am crack) disk 2.dsk" size="143360" crc="4a1e54f2" sha1="8a1863172a8e782425b14c3f09995e9dfb444024" offset="0x0000" />
 			</dataarea>
@@ -1951,11 +2093,13 @@
 		<publisher>Opportunities For Learning</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="143360">
 				<rom name="fraction tutorial (4am crack) side a.dsk" size="143360" crc="e9e24530" sha1="2524d748c108220ac1c4907193d3444fbf457707" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="fraction tutorial (4am crack) side b.dsk" size="143360" crc="fc980274" sha1="58f3349216f3463c49bfa8738d0e7ebbde249fcf" offset="0x0000" />
 			</dataarea>
@@ -1992,16 +2136,19 @@
 		<publisher>Hartley Courseware</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="143360">
 				<rom name="frogs, dogs, kittens, and kids 1 (4am crack) disk 1.dsk" size="143360" crc="ab28d4d3" sha1="4d2644e78bb8ef4d6df9ae808861c9c5e5e91a5e" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="143360">
 				<rom name="frogs, dogs, kittens, and kids 1 (4am crack) disk 2.dsk" size="143360" crc="6e24da32" sha1="4076f55cb2563df30b2c4f75a9bece77e54cffd6" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
 			<dataarea name="flop" size="143360">
 				<rom name="frogs, dogs, kittens, and kids 1 (4am crack) disk 3.dsk" size="143360" crc="c156dc96" sha1="9965dc051410c7c8b907550dd4b65bbdca07b331" offset="0x0000" />
 			</dataarea>
@@ -2074,11 +2221,13 @@
 		<publisher>Random House</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="143360">
 				<rom name="garfield eat your words (4am crack) side a.dsk" size="143360" crc="7509dff7" sha1="56dd7fdee9a9d9092d25cd933c9f029687c85d13" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="garfield eat your words (4am crack) side b.dsk" size="143360" crc="655c5f4c" sha1="9e28deb94582d1789a3a46d793b53af591d977ee" offset="0x0000" />
 			</dataarea>
@@ -2115,11 +2264,13 @@
 		<publisher>Davidson &amp; Associates, Inc.</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="143360">
 				<rom name="grammar gremlins (4am crack) side a.dsk" size="143360" crc="6c8489fa" sha1="38428a2f090900660fa4ff581e770004b71ad801" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="grammar gremlins (4am crack) side b.dsk" size="143360" crc="b07ee7b3" sha1="0c4171e8a85bd5627a8c3a25da4c29cc68c2038b" offset="0x0000" />
 			</dataarea>
@@ -2132,86 +2283,103 @@
 		<publisher>American Language Academy</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A-1"/>
 			<dataarea name="flop" size="143360">
 				<rom name="grammar mastery ii (4am crack) disk a-1.dsk" size="143360" crc="3d53eb4f" sha1="e85c7999c214c488c9bdc2d74f024ccbbda8b1a4" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A-2"/>
 			<dataarea name="flop" size="143360">
 				<rom name="grammar mastery ii (4am crack) disk a-2.dsk" size="143360" crc="62861308" sha1="efdf35fb331e1ea76bf3febb74b98f1aa9072a3d" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A-4"/>
 			<dataarea name="flop" size="143360">
 				<rom name="grammar mastery ii (4am crack) disk a-4.dsk" size="143360" crc="0b7db6d7" sha1="64017e68302426b20e2d60c723370fb125bb597f" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A-5"/>
 			<dataarea name="flop" size="143360">
 				<rom name="grammar mastery ii (4am crack) disk a-5.dsk" size="143360" crc="e3e18574" sha1="4c7f7138f3640955ae2f44f0b3c384b1baf5ef87" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A-6"/>
 			<dataarea name="flop" size="143360">
 				<rom name="grammar mastery ii (4am crack) disk a-6.dsk" size="143360" crc="35b2b8c5" sha1="34004d39f76ba327b290db7774848087811686a2" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B-1"/>
 			<dataarea name="flop" size="143360">
 				<rom name="grammar mastery ii (4am crack) disk b-1.dsk" size="143360" crc="8631e8c0" sha1="a0df701d842885ab5efa1f0263ed3adfd8ffab71" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B-2"/>
 			<dataarea name="flop" size="143360">
 				<rom name="grammar mastery ii (4am crack) disk b-2.dsk" size="143360" crc="8393c99d" sha1="c4e685db3617bbc813eed22ca2154a10af8c2c31" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B-3"/>
 			<dataarea name="flop" size="143360">
 				<rom name="grammar mastery ii (4am crack) disk b-3.dsk" size="143360" crc="60906690" sha1="bf46683255c2cabd11faf78d0fc7f1758053fb72" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop9" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B-4"/>
 			<dataarea name="flop" size="143360">
 				<rom name="grammar mastery ii (4am crack) disk b-4.dsk" size="143360" crc="119a3936" sha1="dfea07eaf3b869b7c9f3eb04aafcbfe6b688e7fd" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop10" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B-5"/>
 			<dataarea name="flop" size="143360">
 				<rom name="grammar mastery ii (4am crack) disk b-5.dsk" size="143360" crc="930a0f64" sha1="438af9967691d15a2ffc7e8698d2cc2bb8d74b52" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop11" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B-6"/>
 			<dataarea name="flop" size="143360">
 				<rom name="grammar mastery ii (4am crack) disk b-6.dsk" size="143360" crc="285997e9" sha1="bac4010cbf9a79730358941248eed02198f968e5" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop12" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C-1"/>
 			<dataarea name="flop" size="143360">
 				<rom name="grammar mastery ii (4am crack) disk c-1.dsk" size="143360" crc="1f1be2d0" sha1="42950035862d42b3f26ce35bc8c260e4c4785406" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop13" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C-2"/>
 			<dataarea name="flop" size="143360">
 				<rom name="grammar mastery ii (4am crack) disk c-2.dsk" size="143360" crc="907f27a0" sha1="b3835d8cc4224d8e32c18b79737b3f4a5a647d4d" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop14" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C-3"/>
 			<dataarea name="flop" size="143360">
 				<rom name="grammar mastery ii (4am crack) disk c-3.dsk" size="143360" crc="e86de7e2" sha1="1df2d1d7335415fde97fc2c2078c8fee05ce79cc" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop15" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C-4"/>
 			<dataarea name="flop" size="143360">
 				<rom name="grammar mastery ii (4am crack) disk c-4.dsk" size="143360" crc="e13a724f" sha1="57c2814e87fbcfcfc4b83f348b18b8bc52c5d60d" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop16" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C-5"/>
 			<dataarea name="flop" size="143360">
 				<rom name="grammar mastery ii (4am crack) disk c-5.dsk" size="143360" crc="84f65fd3" sha1="91831d0762420e4c7e5033bcbc763b2b43370840" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop17" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C-6"/>
 			<dataarea name="flop" size="143360">
 				<rom name="grammar mastery ii (4am crack) disk c-6.dsk" size="143360" crc="1cbb4327" sha1="ed9a040d0ee4d20056daf43a1d039b6998c1e5f7" offset="0x0000" />
 			</dataarea>
@@ -2309,31 +2477,37 @@
 		<publisher>Spinnaker</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="143360">
 				<rom name="homework helper writing (4am crack) side a.dsk" size="143360" crc="ba414e13" sha1="969b9b1e9274ff408ed1943386fb404558347d20" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="homework helper writing (4am crack) side b.dsk" size="143360" crc="cadc35d1" sha1="14333181c3377b99119afd8b0b78bc76dec9ef58" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Side C"/>
 			<dataarea name="flop" size="143360">
 				<rom name="homework helper writing (4am crack) side c.dsk" size="143360" crc="ed3408a7" sha1="bcd388c678ec6ed88ee17c44aee8e964e29c8320" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Side D"/>
 			<dataarea name="flop" size="143360">
 				<rom name="homework helper writing (4am crack) side d.dsk" size="143360" crc="480fe9b8" sha1="da63ce365fe39fec470494e0d8a7c2dfa5603e2e" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Side E"/>
 			<dataarea name="flop" size="143360">
 				<rom name="homework helper writing (4am crack) side e.dsk" size="143360" crc="283dcd8b" sha1="42452afe600f86154347eeba2c9fc556519ee9ff" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Side F"/>
 			<dataarea name="flop" size="143360">
 				<rom name="homework helper writing (4am crack) side f.dsk" size="143360" crc="769ebeee" sha1="82f0379fec113421d2bba8ac95e929a20918ffab" offset="0x0000" />
 			</dataarea>
@@ -2346,11 +2520,13 @@
 		<publisher>Scholastic, Inc.</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="143360">
 				<rom name="homework writer (4am crack) side a.dsk" size="143360" crc="9f679792" sha1="b4a8db1ec71e52049f5f06f51cc4587b2022c4e3" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="homework writer (4am crack) side b.dsk" size="143360" crc="aeb2abe1" sha1="786f32a81eada81297f0c93c5525bdede2a7ffbe" offset="0x0000" />
 			</dataarea>
@@ -2363,11 +2539,13 @@
 		<publisher>Decision Development Co</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="143360">
 				<rom name="house-a-fire (4am crack) side a.dsk" size="143360" crc="86f910e6" sha1="33c07bc9096be166c055e7ab792c2bd66f9f4114" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="house-a-fire (4am crack) side b.dsk" size="143360" crc="41bbc599" sha1="7f1b2789cda668de2f583bead3a8fc03aedcd157" offset="0x0000" />
 			</dataarea>
@@ -2392,11 +2570,13 @@
 		<publisher>Epyx</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="143360">
 				<rom name="impossible mission ii (4am crack) side a.dsk" size="143360" crc="a219d468" sha1="98a1aa883ad0a46ee30f043d431138ec4382d205" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="impossible mission ii (4am crack) side b.dsk" size="143360" crc="7968cf85" sha1="b4853d27a3b3aee986f4c4ea5b8f908a9423c782" offset="0x0000" />
 			</dataarea>
@@ -2409,11 +2589,13 @@
 		<publisher>University of Massachusetts</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="143360">
 				<rom name="investigating secondary mathematics with computers (4am crack) side a.dsk" size="143360" crc="8cf2e9bc" sha1="d32d449515fa0ac526135d677ee75b3c19f281dc" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="investigating secondary mathematics with computers (4am crack) side b.dsk" size="143360" crc="217fd3bb" sha1="8bc60eb6bbe8b46921c4942bdcb6df44159b2471" offset="0x0000" />
 			</dataarea>
@@ -2450,11 +2632,13 @@
 		<publisher>Epyx</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="143360">
 				<rom name="jumpman (4am crack) side a.dsk" size="143360" crc="4f291aa3" sha1="1c43eac018c0a04e70177cf413d7b20b4eaa3a89" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="jumpman (4am crack) side b.dsk" size="143360" crc="90312d4c" sha1="0ba7c41afbb31c93e4dc602da12cf577876dbc2c" offset="0x0000" />
 			</dataarea>
@@ -2515,11 +2699,13 @@
 		<publisher>Hartley Courseware, Inc.</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="143360">
 				<rom name="kittens, kids, and a frog (4am crack) disk 1.dsk" size="143360" crc="8c27a9ce" sha1="487e3ffae06831e594c8f1d6212ef9e3c1421476" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="143360">
 				<rom name="kittens, kids, and a frog (4am crack) disk 2.dsk" size="143360" crc="6982459d" sha1="1c0fa745487f156229c494955508a1591d6d376b" offset="0x0000" />
 			</dataarea>
