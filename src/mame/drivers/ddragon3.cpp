@@ -206,7 +206,7 @@ WRITE8_MEMBER(ddragon3_state::oki_bankswitch_w)
 WRITE16_MEMBER(wwfwfest_state::wwfwfest_soundwrite)
 {
 	// upper byte is always set to 0x31 for some reason
-	m_soundlatch->write(space, 0, data & 0xff);
+	m_soundlatch->write(data & 0xff);
 }
 
 

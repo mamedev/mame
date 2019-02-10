@@ -124,7 +124,7 @@ private:
 	{
 		if (ACCESSING_BITS_0_7)
 		{
-			m_soundlatch->write(space, 0, data & 0xff);
+			m_soundlatch->write(data & 0xff);
 			machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(20));
 
 		}

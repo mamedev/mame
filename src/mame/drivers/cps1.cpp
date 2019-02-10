@@ -299,15 +299,15 @@ WRITE8_MEMBER(cps_state::cps1_oki_pin7_w)
 WRITE16_MEMBER(cps_state::cps1_soundlatch_w)
 {
 	if (ACCESSING_BITS_0_7)
-		m_soundlatch->write(space, 0, data & 0xff);
+		m_soundlatch->write(data & 0xff);
 	else
-		m_soundlatch->write(space, 0, data >> 8);
+		m_soundlatch->write(data >> 8);
 }
 
 WRITE16_MEMBER(cps_state::cps1_soundlatch2_w)
 {
 	if (ACCESSING_BITS_0_7)
-		m_soundlatch2->write(space, 0, data & 0xff);
+		m_soundlatch2->write(data & 0xff);
 }
 
 WRITE16_MEMBER(cps_state::cps1_coinctrl_w)

@@ -220,7 +220,7 @@ WRITE8_MEMBER(neoprint_state::audio_cpu_clear_nmi_w)
 
 WRITE8_MEMBER(neoprint_state::audio_command_w)
 {
-	m_soundlatch->write(space, 0, data);
+	m_soundlatch->write(data);
 
 	audio_cpu_assert_nmi();
 
@@ -233,7 +233,7 @@ WRITE8_MEMBER(neoprint_state::audio_command_w)
 
 READ8_MEMBER(neoprint_state::audio_command_r)
 {
-	uint8_t ret = m_soundlatch->read(space, 0);
+	uint8_t ret = m_soundlatch->read();
 
 	//if (LOG_CPU_COMM) logerror(" AUD CPU PC   %04x: audio_command_r %02x\n", m_audiocpu->pc(), ret);
 

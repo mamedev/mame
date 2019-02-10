@@ -142,7 +142,7 @@ WRITE_LINE_MEMBER(r2dtank_state::main_cpu_irq)
 
 READ8_MEMBER(r2dtank_state::audio_command_r)
 {
-	uint8_t ret = m_soundlatch->read(space, 0);
+	uint8_t ret = m_soundlatch->read();
 
 if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  Audio Command Read: %x\n", m_audiocpu->pc(), ret);
 
@@ -152,7 +152,7 @@ if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  Audio Command Read: %x\n", m_audiocpu
 
 WRITE8_MEMBER(r2dtank_state::audio_command_w)
 {
-	m_soundlatch->write(space, 0, ~data);
+	m_soundlatch->write(~data);
 	m_audiocpu->set_input_line(M6802_IRQ_LINE, HOLD_LINE);
 
 if (LOG_AUDIO_COMM) logerror("%08X   CPU#0  Audio Command Write: %x\n", m_maincpu->pc(), data^0xff);
@@ -161,7 +161,7 @@ if (LOG_AUDIO_COMM) logerror("%08X   CPU#0  Audio Command Write: %x\n", m_maincp
 
 READ8_MEMBER(r2dtank_state::audio_answer_r)
 {
-	uint8_t ret = m_soundlatch2->read(space, 0);
+	uint8_t ret = m_soundlatch2->read();
 if (LOG_AUDIO_COMM) logerror("%08X  CPU#0  Audio Answer Read: %x\n", m_maincpu->pc(), ret);
 
 	return ret;
@@ -174,7 +174,7 @@ WRITE8_MEMBER(r2dtank_state::audio_answer_w)
 	if (m_audiocpu->pc() == 0xfb12)
 		data = 0x00;
 
-	m_soundlatch2->write(space, 0, data);
+	m_soundlatch2->write(data);
 	m_maincpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 
 if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  Audio Answer Write: %x\n", m_audiocpu->pc(), data);

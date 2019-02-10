@@ -60,7 +60,7 @@ WRITE16_MEMBER(mugsmash_state::mugsmash_reg2_w)
 	switch (offset)
 	{
 	case 1:
-		m_soundlatch->write(space, 1, data & 0xff);
+		m_soundlatch->write(data & 0xff);
 		break;
 
 	default:

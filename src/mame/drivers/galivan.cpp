@@ -44,7 +44,7 @@ TODO
 
 WRITE8_MEMBER(galivan_state::galivan_sound_command_w)
 {
-	m_soundlatch->write(space,0,((data & 0x7f) << 1) | 1);
+	m_soundlatch->write(((data & 0x7f) << 1) | 1);
 }
 
 READ8_MEMBER(galivan_state::soundlatch_clear_r)

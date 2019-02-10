@@ -167,8 +167,7 @@ WRITE_LINE_MEMBER(gameplan_state::r6532_irq)
 
 WRITE8_MEMBER(gameplan_state::r6532_soundlatch_w)
 {
-	address_space &progspace = m_maincpu->space(AS_PROGRAM);
-	m_soundlatch->write(progspace, 0, data);
+	m_soundlatch->write(data);
 }
 
 

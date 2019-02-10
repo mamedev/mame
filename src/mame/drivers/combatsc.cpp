@@ -202,7 +202,7 @@ WRITE8_MEMBER(combatsc_state::combatscb_io_w)
 	switch (offset)
 	{
 		case 0x400: combatscb_priority_w(space, 0, data); break;
-		case 0x800: m_soundlatch->write(space, offset, data); break;
+		case 0x800: m_soundlatch->write(data); break;
 		case 0xc00: combatsc_vreg_w(space, 0, data); break;
 		default: m_io_ram[offset] = data; break;
 	}

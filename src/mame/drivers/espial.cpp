@@ -96,7 +96,7 @@ INTERRUPT_GEN_MEMBER(espial_state::espial_sound_nmi_gen)
 
 WRITE8_MEMBER(espial_state::espial_master_soundlatch_w)
 {
-	m_soundlatch->write(space, offset, data);
+	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 

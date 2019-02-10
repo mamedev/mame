@@ -273,7 +273,7 @@ WRITE8_MEMBER(djboy_state::beast_p0_w)
 {
 	if (!BIT(m_beast_p0, 1) && BIT(data, 1))
 	{
-		m_slavelatch->write(space, 0, m_beast_p1);
+		m_slavelatch->write(m_beast_p1);
 	}
 
 	if (BIT(data, 0) == 0)
@@ -285,7 +285,7 @@ WRITE8_MEMBER(djboy_state::beast_p0_w)
 READ8_MEMBER(djboy_state::beast_p1_r)
 {
 	if (BIT(m_beast_p0, 0) == 0)
-		return m_beastlatch->read(space, 0);
+		return m_beastlatch->read();
 	else
 		return 0; // ?
 }

@@ -93,7 +93,7 @@ WRITE8_MEMBER(ksayakyu_state::bank_select_w)
 WRITE8_MEMBER(ksayakyu_state::latch_w)
 {
 	m_sound_status &= ~0x80;
-	m_soundlatch->write(space, 0, data | 0x80);
+	m_soundlatch->write(data | 0x80);
 }
 
 READ8_MEMBER(ksayakyu_state::sound_status_r)
@@ -104,7 +104,7 @@ READ8_MEMBER(ksayakyu_state::sound_status_r)
 WRITE8_MEMBER(ksayakyu_state::tomaincpu_w)
 {
 	m_sound_status |= 0x80;
-	m_soundlatch->write(space, 0, data);
+	m_soundlatch->write(data);
 }
 
 READ8_MEMBER(ksayakyu_state::int_ack_r)

@@ -439,7 +439,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(ironhors_state::farwest_scanline_tick)
 
 READ8_MEMBER(ironhors_state::farwest_soundlatch_r)
 {
-	return m_soundlatch->read(m_soundcpu->space(AS_PROGRAM), 0);
+	return m_soundlatch->read();
 }
 
 MACHINE_CONFIG_START(ironhors_state::farwest)

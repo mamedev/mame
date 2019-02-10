@@ -268,14 +268,14 @@ template<int Latch>
 READ8_MEMBER(sandscrp_state::soundlatch_r)
 {
 	m_latch_full[Latch] = 0;
-	return m_soundlatch[Latch]->read(space,0);
+	return m_soundlatch[Latch]->read();
 }
 
 template<int Latch>
 WRITE8_MEMBER(sandscrp_state::soundlatch_w)
 {
 	m_latch_full[Latch] = 1;
-	m_soundlatch[Latch]->write(space,0,data);
+	m_soundlatch[Latch]->write(data);
 }
 
 void sandscrp_state::sandscrp(address_map &map)

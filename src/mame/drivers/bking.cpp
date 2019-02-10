@@ -42,7 +42,7 @@ WRITE8_MEMBER(bking_state::bking_sndnmi_enable_w)
 
 WRITE8_MEMBER(bking_state::bking_soundlatch_w)
 {
-	m_soundlatch->write(space, offset, bitswap<8>(data, 0, 1, 2, 3, 4, 5, 6, 7));
+	m_soundlatch->write(bitswap<8>(data, 0, 1, 2, 3, 4, 5, 6, 7));
 }
 
 WRITE8_MEMBER(bking_state::bking3_addr_l_w)

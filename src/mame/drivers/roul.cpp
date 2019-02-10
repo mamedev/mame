@@ -200,7 +200,7 @@ WRITE8_MEMBER(roul_state::blitter_cmd_w)
 
 WRITE8_MEMBER(roul_state::sound_latch_w)
 {
-	m_soundlatch->write(space, 0, data & 0xff);
+	m_soundlatch->write(data & 0xff);
 	m_soundcpu->set_input_line(0, HOLD_LINE);
 }
 

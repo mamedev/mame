@@ -150,7 +150,7 @@ WRITE8_MEMBER(ajax_state::ls138_f10_w)
 			m_audiocpu->set_input_line(0, HOLD_LINE);
 			break;
 		case 0x02:  /* Sound command number */
-			m_soundlatch->write(space, offset, data);
+			m_soundlatch->write(data);
 			break;
 		case 0x03:  /* Bankswitch + coin counters + priority*/
 			bankswitch_w(space, 0, data);

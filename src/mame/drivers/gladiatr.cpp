@@ -254,14 +254,14 @@ WRITE8_MEMBER(ppking_state::cpu2_irq_ack_w)
 
 WRITE8_MEMBER(gladiatr_state_base::adpcm_command_w)
 {
-	m_soundlatch->write(space,0,data);
+	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 READ8_MEMBER(gladiatr_state_base::adpcm_command_r)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	return m_soundlatch->read(space,0);
+	return m_soundlatch->read();
 }
 
 WRITE_LINE_MEMBER(gladiatr_state_base::flipscreen_w)
@@ -550,7 +550,7 @@ WRITE8_MEMBER(ppking_state::ppking_qx0_w)
 		m_mcu[0].txd = data;
 
 		m_mcu[1].rst = 0;
-		m_soundlatch2->write(space, 0, data & 0xff);
+		m_soundlatch2->write(data & 0xff);
 
 		mcu_input_check();
 
@@ -580,7 +580,7 @@ READ8_MEMBER(ppking_state::ppking_qx1_r)
 	if(m_mcu[1].rst == 1)
 		return 0x40;
 
-	return m_soundlatch2->read(space,0);
+	return m_soundlatch2->read();
 }
 
 READ8_MEMBER(ppking_state::ppking_qx3_r)

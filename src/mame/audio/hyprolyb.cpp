@@ -43,7 +43,7 @@ void hyprolyb_adpcm_device::device_reset()
 
 WRITE8_MEMBER( hyprolyb_adpcm_device::write )
 {
-	m_soundlatch2->write(m_audiocpu->space(AS_PROGRAM), offset, data);
+	m_soundlatch2->write(data);
 	m_adpcm_ready = 0x80;
 }
 
@@ -73,7 +73,7 @@ READ8_MEMBER( hyprolyb_adpcm_device::ready_r )
 READ8_MEMBER( hyprolyb_adpcm_device::data_r )
 {
 	m_adpcm_ready = 0x00;
-	return m_soundlatch2->read(m_audiocpu->space(AS_PROGRAM), offset);
+	return m_soundlatch2->read();
 }
 
 void hyprolyb_adpcm_device::vck_callback( int st )

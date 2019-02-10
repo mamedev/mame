@@ -111,7 +111,7 @@ WRITE16_MEMBER(segas1x_bootleg_state::sound_command_nmi_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_soundlatch->write(space, 0, data & 0xff);
+		m_soundlatch->write(data & 0xff);
 		m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }
@@ -120,7 +120,7 @@ WRITE16_MEMBER(segas1x_bootleg_state::sound_command_irq_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_soundlatch->write(space, 0, data & 0xff);
+		m_soundlatch->write(data & 0xff);
 		m_soundcpu->set_input_line(0, HOLD_LINE);
 	}
 }
@@ -128,7 +128,7 @@ WRITE16_MEMBER(segas1x_bootleg_state::sound_command_irq_w)
 READ8_MEMBER(segas1x_bootleg_state::sound_command_irq_r)
 {
 	m_soundcpu->set_input_line(0, CLEAR_LINE);
-	return m_soundlatch->read(space, 0, 0xff);
+	return m_soundlatch->read();
 }
 
 WRITE8_MEMBER(segas1x_bootleg_state::soundbank_msm_w)
@@ -4043,7 +4043,7 @@ void segas1x_bootleg_state::init_astormb2()
 	init_sys18bl_oki();
 
 	m_maincpu->space(AS_PROGRAM).unmap_write(0xa00006, 0xa00007);
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa00006, 0xa00007, write8_delegate(FUNC(generic_latch_8_device::write), (generic_latch_8_device*)m_soundlatch), 0x00ff);
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa00006, 0xa00007, write8smo_delegate(FUNC(generic_latch_8_device::write), (generic_latch_8_device*)m_soundlatch), 0x00ff);
 }
 
 /*************************************

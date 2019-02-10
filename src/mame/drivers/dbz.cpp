@@ -97,7 +97,7 @@ WRITE16_MEMBER(dbz_state::dbzcontrol_w)
 
 WRITE16_MEMBER(dbz_state::dbz_sound_command_w)
 {
-	m_soundlatch->write(space, 0, data >> 8);
+	m_soundlatch->write(data >> 8);
 }
 
 WRITE16_MEMBER(dbz_state::dbz_sound_cause_nmi)

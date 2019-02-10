@@ -327,10 +327,10 @@ READ8_MEMBER(hvyunit_state::mermaid_p0_r)
 WRITE8_MEMBER(hvyunit_state::mermaid_p0_w)
 {
 	if (!BIT(m_mermaid_p[0], 1) && BIT(data, 1))
-		m_slavelatch->write(space, 0, m_mermaid_p[1]);
+		m_slavelatch->write(m_mermaid_p[1]);
 
 	if (BIT(data, 0) == 0)
-		m_mermaid_p[1] = m_mermaidlatch->read(space, 0);
+		m_mermaid_p[1] = m_mermaidlatch->read();
 
 	m_mermaid_p[0] = data;
 }

@@ -109,7 +109,7 @@ READ8_MEMBER(bingoc_state::sound_test_r)
 #else
 WRITE16_MEMBER(bingoc_state::main_sound_latch_w)
 {
-	m_soundlatch->write(space,0,data&0xff);
+	m_soundlatch->write(data&0xff);
 	m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 #endif

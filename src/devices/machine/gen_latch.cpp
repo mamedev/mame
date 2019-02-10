@@ -111,14 +111,14 @@ generic_latch_8_device::generic_latch_8_device(const machine_config &mconfig, co
 {
 }
 
-READ8_MEMBER( generic_latch_8_device::read )
+u8 generic_latch_8_device::read()
 {
 	if (!has_separate_acknowledge() && !machine().side_effects_disabled())
 		set_latch_written(false);
 	return m_latched_value;
 }
 
-WRITE8_MEMBER( generic_latch_8_device::write )
+void generic_latch_8_device::write(u8 data)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(generic_latch_8_device::sync_callback), this), data);
 }

@@ -157,7 +157,7 @@ WRITE8_MEMBER(tehkanwc_state::track_1_reset_w)
 
 WRITE8_MEMBER(tehkanwc_state::sound_command_w)
 {
-	m_soundlatch->write(space, offset, data);
+	m_soundlatch->write(data);
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
@@ -175,7 +175,7 @@ void tehkanwc_state::device_timer(emu_timer &timer, device_timer_id id, int para
 
 WRITE8_MEMBER(tehkanwc_state::sound_answer_w)
 {
-	m_soundlatch2->write(space, 0, data);
+	m_soundlatch2->write(data);
 
 	/* in Gridiron, the sound CPU goes in a tight loop after the self test, */
 	/* probably waiting to be reset by a watchdog */

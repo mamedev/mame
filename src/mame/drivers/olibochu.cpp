@@ -263,7 +263,7 @@ WRITE8_MEMBER(olibochu_state::sound_command_w)
 	for (c = 15; c >= 0; c--)
 		if (m_cmd & (1 << c)) break;
 
-	if (c >= 0) m_soundlatch->write(space, 0, 15 - c);
+	if (c >= 0) m_soundlatch->write(15 - c);
 }
 
 

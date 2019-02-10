@@ -316,7 +316,7 @@ WRITE8_MEMBER(flower_state::coin_counter_w)
 
 WRITE8_MEMBER(flower_state::sound_command_w)
 {
-	m_soundlatch->write(space, 0, data & 0xff);
+	m_soundlatch->write(data & 0xff);
 	if(m_audio_nmi_enable == true)
 		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }

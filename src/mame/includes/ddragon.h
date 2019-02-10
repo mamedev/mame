@@ -123,7 +123,7 @@ private:
 
 	optional_region_ptr_array<uint8_t, 2> m_adpcm_rom;
 
-	void ddragon_interrupt_ack(address_space &space, offs_t offset, uint8_t data);
+	void ddragon_interrupt_ack(offs_t offset, uint8_t data);
 	void dd_adpcm_int(int chip);
 
 	/* video/ddragon.c */

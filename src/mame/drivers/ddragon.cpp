@@ -260,7 +260,7 @@ WRITE8_MEMBER(darktowr_state::darktowr_bankswitch_w)
  *
  *************************************/
 
-void ddragon_state::ddragon_interrupt_ack(address_space &space, offs_t offset, uint8_t data)
+void ddragon_state::ddragon_interrupt_ack(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -277,7 +277,7 @@ void ddragon_state::ddragon_interrupt_ack(address_space &space, offs_t offset, u
 			break;
 
 		case 3: /* 380e - SND IRQ and latch */
-			m_soundlatch->write(space, 0, data);
+			m_soundlatch->write(data);
 			break;
 
 		case 4: /* 380f - MCU IRQ */
@@ -290,14 +290,14 @@ void ddragon_state::ddragon_interrupt_ack(address_space &space, offs_t offset, u
 
 READ8_MEMBER(ddragon_state::ddragon_interrupt_r)
 {
-	ddragon_interrupt_ack(space, offset, 0xff);
+	ddragon_interrupt_ack(offset, 0xff);
 	return 0xff;
 }
 
 
 WRITE8_MEMBER(ddragon_state::ddragon_interrupt_w)
 {
-	ddragon_interrupt_ack(space, offset, data);
+	ddragon_interrupt_ack(offset, data);
 }
 
 

@@ -110,7 +110,7 @@ READ8_MEMBER(bombjack_state::soundlatch_read_and_clear)
 {
 	// An extra flip-flop is used to clear the LS273 after reading it through a LS245
 	// (this flip-flop is then cleared in sync with the sound CPU clock)
-	uint8_t res = m_soundlatch->read(space, 0);
+	uint8_t res = m_soundlatch->read();
 	if (!machine().side_effects_disabled())
 		m_soundlatch->clear_w();
 	return res;

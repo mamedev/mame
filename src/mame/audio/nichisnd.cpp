@@ -139,5 +139,5 @@ void nichisnd_device::device_reset()
 // use this to connect to the sound board
 WRITE8_MEMBER(nichisnd_device::sound_host_command_w)
 {
-	m_soundlatch->write(space,0,data);
+	m_soundlatch->write(data);
 }

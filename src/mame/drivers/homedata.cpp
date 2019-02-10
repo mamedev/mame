@@ -311,7 +311,7 @@ WRITE8_MEMBER(homedata_state::mrokumei_sound_bank_w)
 
 WRITE8_MEMBER(homedata_state::mrokumei_sound_cmd_w)
 {
-	m_soundlatch->write(space, offset, data);
+	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
@@ -430,7 +430,7 @@ READ8_MEMBER(homedata_state::pteacher_keyboard_r)
 READ8_MEMBER(homedata_state::pteacher_upd7807_porta_r)
 {
 	if (!BIT(m_upd7807_portc, 6))
-		m_upd7807_porta = m_soundlatch->read(space, 0);
+		m_upd7807_porta = m_soundlatch->read();
 	else
 		logerror("%s: read PA with PC *not* clear\n", machine().describe_context());
 

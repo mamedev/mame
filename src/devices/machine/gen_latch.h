@@ -67,8 +67,8 @@ public:
 	// construction/destruction
 	generic_latch_8_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	u8 read();
+	void write(u8 data);
 
 	void preset_w(u8 data = 0xff);
 	void clear_w(u8 data = 0);

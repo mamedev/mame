@@ -296,7 +296,7 @@ WRITE_LINE_MEMBER(mirax_state::nmi_mask_w)
 
 WRITE8_MEMBER(mirax_state::sound_cmd_w)
 {
-	m_soundlatch->write(space, 0, data & 0xff);
+	m_soundlatch->write(data & 0xff);
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 

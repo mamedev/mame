@@ -43,7 +43,7 @@ WRITE8_MEMBER(pcktgal_state::sound_bank_w)
 
 WRITE8_MEMBER(pcktgal_state::sound_w)
 {
-	m_soundlatch->write(space, 0, data);
+	m_soundlatch->write(data);
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 

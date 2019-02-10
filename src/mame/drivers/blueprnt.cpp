@@ -85,7 +85,7 @@ READ8_MEMBER(blueprnt_state::grasspin_sh_dipsw_r)
 
 WRITE8_MEMBER(blueprnt_state::blueprnt_sound_command_w)
 {
-	m_soundlatch->write(space, offset, data);
+	m_soundlatch->write(data);
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 

@@ -107,7 +107,7 @@ Stephh's notes (based on the game Z80 code and some tests) :
 
 WRITE8_MEMBER(pbaction_state::pbaction_sh_command_w)
 {
-	m_soundlatch->write(space, offset, data);
+	m_soundlatch->write(data);
 	m_soundcommand_timer->adjust(attotime::zero, 0);
 }
 
@@ -154,7 +154,7 @@ READ8_MEMBER(pbaction_state::sound_data_r)
 {
 	if (!machine().side_effects_disabled())
 		m_audiocpu->set_input_line(0, CLEAR_LINE);
-	return m_soundlatch->read(space, 0);
+	return m_soundlatch->read();
 }
 
 WRITE8_MEMBER(pbaction_state::sound_irq_ack_w)
@@ -235,23 +235,23 @@ WRITE8_MEMBER(pbaction_tecfri_state::sub8008_w)
 
 WRITE8_MEMBER(pbaction_tecfri_state::subtomain_w)
 {
-	//m_subtomainlatch->write(space, offset, data); // where does this go if it can't go to maincpu?
+	//m_subtomainlatch->write(data); // where does this go if it can't go to maincpu?
 }
 
 READ8_MEMBER(pbaction_tecfri_state::maintosub_r)
 {
-	return m_maintosublatch->read(space, offset);
+	return m_maintosublatch->read();
 }
 
 READ8_MEMBER(pbaction_tecfri_state::subcpu_r)
 {
 	return 0x00; // other values stop the flippers from working? are there different inputs from the custom cabinet in here somehow?
-//  return m_subtomainlatch->read(space, offset);
+//  return m_subtomainlatch->read();
 }
 
 WRITE8_MEMBER(pbaction_tecfri_state::subcpu_w)
 {
-	m_maintosublatch->write(space, offset, data);
+	m_maintosublatch->write(data);
 	m_subcommand_timer->adjust(attotime::zero, 0);
 }
 

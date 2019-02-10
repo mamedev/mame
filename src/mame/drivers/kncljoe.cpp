@@ -39,7 +39,7 @@ Updates:
 WRITE8_MEMBER(kncljoe_state::sound_cmd_w)
 {
 	if ((data & 0x80) == 0)
-		m_soundlatch->write(space, 0, data & 0x7f);
+		m_soundlatch->write(data & 0x7f);
 	else
 		m_soundcpu->set_input_line(0, ASSERT_LINE);
 }

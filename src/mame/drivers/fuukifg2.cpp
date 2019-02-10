@@ -77,7 +77,7 @@ WRITE16_MEMBER(fuuki16_state::vregs_w)
 
 WRITE8_MEMBER( fuuki16_state::sound_command_w )
 {
-	m_soundlatch->write(space,0,data & 0xff);
+	m_soundlatch->write(data & 0xff);
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 //      m_maincpu->spin_until_time(attotime::from_usec(50));   // Allow the other CPU to reply
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50)); // Fixes glitching in rasters

@@ -60,7 +60,7 @@ WRITE_LINE_MEMBER(scotrsht_state::vblank_irq)
 
 WRITE8_MEMBER(scotrsht_state::soundlatch_w)
 {
-	m_soundlatch->write(space, 0, data);
+	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 

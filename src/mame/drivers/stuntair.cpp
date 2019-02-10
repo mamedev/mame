@@ -320,7 +320,7 @@ WRITE8_MEMBER(stuntair_state::stuntair_sound_w)
 {
 	// each command is written three times: with bit 7 set, then with bit 7 clear, then with bit 7 set again
 	// the 3 highest bits are ignored by the sound program
-	m_soundlatch->write(space, 0, data);
+	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
 }
 

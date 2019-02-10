@@ -1790,7 +1790,7 @@ READ8_MEMBER(pairmtch_state::input_r)
 WRITE8_MEMBER(pairmtch_state::sound_w)
 {
 	// R5x: soundlatch (to audiocpu R2x)
-	m_soundlatch[0]->write(space, 0, bitswap<8>(data,7,6,5,4,0,1,2,3));
+	m_soundlatch[0]->write(bitswap<8>(data,7,6,5,4,0,1,2,3));
 }
 
 
@@ -1799,7 +1799,7 @@ WRITE8_MEMBER(pairmtch_state::sound_w)
 WRITE8_MEMBER(pairmtch_state::sound2_w)
 {
 	// R2x: soundlatch (to maincpu R5x)
-	m_soundlatch[1]->write(space, 0, bitswap<8>(data,7,6,5,4,0,1,2,3));
+	m_soundlatch[1]->write(bitswap<8>(data,7,6,5,4,0,1,2,3));
 }
 
 WRITE16_MEMBER(pairmtch_state::speaker_w)

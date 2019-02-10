@@ -44,7 +44,7 @@ WRITE8_MEMBER(aliens_state::aliens_coin_counter_w)
 
 WRITE8_MEMBER(aliens_state::aliens_sh_irqtrigger_w)
 {
-	m_soundlatch->write(space, offset, data);
+	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 

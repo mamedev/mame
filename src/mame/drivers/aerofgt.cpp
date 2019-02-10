@@ -76,7 +76,7 @@ Verification still needed for the other PCBs.
 
 WRITE8_MEMBER(aerofgt_state::karatblzbl_soundlatch_w)
 {
-	m_soundlatch->write(space, 0, data);
+	m_soundlatch->write(data);
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 

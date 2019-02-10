@@ -608,7 +608,7 @@ WRITE8_MEMBER(suna8_state::rranger_bankswitch_w)
 */
 READ8_MEMBER(suna8_state::rranger_soundstatus_r)
 {
-	m_soundlatch2->read(space, offset);
+	m_soundlatch2->read();
 	return 0x02;
 }
 
@@ -784,7 +784,7 @@ WRITE8_MEMBER(suna8_state::brickzn_multi_w)
 		*/
 		uint8_t remap = (m_remap_sound ? bitswap<8>(data, 7,6,3,4,5,2,1,0) : data);
 
-		m_soundlatch->write(space, 0, remap);
+		m_soundlatch->write(remap);
 
 		logerror("CPU #0 - PC %04X: soundlatch = %02X (->%02X)\n",m_maincpu->pc(),data,remap);
 	}
@@ -1038,7 +1038,7 @@ WRITE8_MEMBER(suna8_state::starfigh_rombank_latch_w)
 WRITE8_MEMBER(suna8_state::starfigh_sound_latch_w)
 {
 	if ( !(m_rombank_latch & 0x20) )
-		m_soundlatch->write(space, 0, data);
+		m_soundlatch->write(data);
 }
 
 /*

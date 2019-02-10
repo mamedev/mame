@@ -255,7 +255,7 @@ uint32_t deco_ld_state::screen_update_rblaster(screen_device &screen, bitmap_ind
 
 WRITE8_MEMBER(deco_ld_state::decold_sound_cmd_w)
 {
-	m_soundlatch->write(space, 0, data);
+	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 

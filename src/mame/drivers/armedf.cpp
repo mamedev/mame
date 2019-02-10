@@ -391,7 +391,7 @@ WRITE16_MEMBER(armedf_state::bootleg_io_w)
 WRITE16_MEMBER(armedf_state::sound_command_w)
 {
 	if (ACCESSING_BITS_0_7)
-		m_soundlatch->write(space, 0, ((data & 0x7f) << 1) | 1);
+		m_soundlatch->write(((data & 0x7f) << 1) | 1);
 }
 
 READ8_MEMBER(armedf_state::soundlatch_clear_r)

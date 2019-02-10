@@ -61,7 +61,7 @@ single plane board.
 WRITE16_MEMBER(tigeroad_state::tigeroad_soundcmd_w)
 {
 	if (ACCESSING_BITS_8_15)
-		m_soundlatch->write(space,offset,data >> 8);
+		m_soundlatch->write(data >> 8);
 }
 
 
@@ -76,7 +76,7 @@ WRITE8_MEMBER(tigeroad_state::msm5205_w)
 
 WRITE8_MEMBER(f1dream_state::out1_w)
 {
-	m_soundlatch->write(space,2,data);
+	m_soundlatch->write(data);
 }
 
 WRITE8_MEMBER(f1dream_state::out3_w)

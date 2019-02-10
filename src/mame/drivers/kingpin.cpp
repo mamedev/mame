@@ -69,7 +69,7 @@ private:
 
 WRITE8_MEMBER(kingpin_state::sound_nmi_w)
 {
-	m_soundlatch->write(space, 0, data);
+	m_soundlatch->write(data);
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 

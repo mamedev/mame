@@ -122,7 +122,7 @@ WRITE8_MEMBER(scramble_state::hotshock_sh_irqtrigger_w)
 READ8_MEMBER( scramble_state::hotshock_soundlatch_r )
 {
 	m_audiocpu->set_input_line(0, CLEAR_LINE);
-	return m_soundlatch->read(m_audiocpu->space(AS_PROGRAM),0);
+	return m_soundlatch->read();
 }
 
 void scramble_state::sh_init()

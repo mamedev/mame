@@ -234,7 +234,7 @@ void othello_state::main_portmap(address_map &map)
 
 READ8_MEMBER(othello_state::latch_r)
 {
-	int retval = m_soundlatch->read(space, 0);
+	int retval = m_soundlatch->read();
 	m_soundlatch->clear_w();
 	return retval;
 }

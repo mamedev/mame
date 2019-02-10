@@ -457,7 +457,7 @@ READ8_MEMBER(m63_state::snddata_r)
 {
 	switch (m_p2 & 0xf0)
 	{
-		case 0x60:  return m_soundlatch->read(space, 0); ;
+		case 0x60:  return m_soundlatch->read();
 		case 0x70:  return memregion("user1")->base()[((m_p1 & 0x1f) << 8) | offset];
 	}
 	return 0xff;

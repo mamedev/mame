@@ -186,7 +186,7 @@ WRITE8_MEMBER(chinagat_state::interrupt_w)
 	switch (offset)
 	{
 		case 0: /* 3e00 - SND irq */
-			m_soundlatch->write(space, 0, data);
+			m_soundlatch->write(data);
 			break;
 
 		case 1: /* 3e01 - NMI ack */

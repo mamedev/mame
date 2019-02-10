@@ -47,7 +47,7 @@ WRITE8_MEMBER(kingofb_state::scroll_interrupt_w)
 
 WRITE8_MEMBER(kingofb_state::sound_command_w)
 {
-	m_soundlatch->write(space, 0, data);
+	m_soundlatch->write(data);
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 

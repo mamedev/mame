@@ -89,7 +89,7 @@ WRITE16_MEMBER(esd16_state::esd16_sound_command_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_soundlatch->write(space, 0, data & 0xff);
+		m_soundlatch->write(data & 0xff);
 		m_audiocpu->set_input_line(0, ASSERT_LINE);      // Generate an IRQ
 		m_maincpu->spin_until_time(attotime::from_usec(50));  // Allow the other CPU to reply
 	}
@@ -276,7 +276,7 @@ READ8_MEMBER(esd16_state::esd16_sound_command_r)
 {
 	/* Clear IRQ only after reading the command, or some get lost */
 	m_audiocpu->set_input_line(0, CLEAR_LINE);
-	return m_soundlatch->read(space, 0);
+	return m_soundlatch->read();
 }
 
 void esd16_state::multchmp_sound_io_map(address_map &map)

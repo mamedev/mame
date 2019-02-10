@@ -356,7 +356,7 @@ WRITE8_MEMBER(omegrace_state::omegrace_leds_w)
 
 WRITE8_MEMBER(omegrace_state::omegrace_soundlatch_w)
 {
-	m_soundlatch->write(space, offset, data);
+	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 

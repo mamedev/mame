@@ -385,7 +385,7 @@ WRITE8_MEMBER(kickgoal_state::soundio_port_c_w)
 	{
 		if (!(data & 0x10))
 		{
-			m_pic_portb = m_soundlatch->read(space, 0);
+			m_pic_portb = m_soundlatch->read();
 			m_sound_command_sent = 0x00;
 		}
 	}
@@ -412,7 +412,7 @@ WRITE8_MEMBER(kickgoal_state::soundio_port_c_w)
 
 WRITE16_MEMBER(kickgoal_state::to_pic_w)
 {
-	m_soundlatch->write(space, 0, data);
+	m_soundlatch->write(data);
 	m_sound_command_sent = 0x20;
 }
 

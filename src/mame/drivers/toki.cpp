@@ -105,7 +105,7 @@ Notes:
 
 WRITE16_MEMBER(toki_state::tokib_soundcommand_w)
 {
-	m_soundlatch->write(space, 0, data & 0xff);
+	m_soundlatch->write(data & 0xff);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 

@@ -113,7 +113,7 @@ WRITE8_MEMBER(wc90b_state::bankswitch1_w)
 
 WRITE8_MEMBER(wc90b_state::sound_command_w)
 {
-	m_soundlatch->write(space, offset, data);
+	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 

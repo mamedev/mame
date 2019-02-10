@@ -49,7 +49,7 @@ WRITE16_MEMBER(suna16_state::soundlatch_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_soundlatch->write(space, 0, data & 0xff );
+		m_soundlatch->write(data & 0xff);
 	}
 	if (data & ~0xff)   logerror("CPU#0 PC %06X - Sound latch unknown bits: %04X\n", m_maincpu->pc(), data);
 }

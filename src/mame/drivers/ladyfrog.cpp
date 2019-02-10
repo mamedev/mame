@@ -89,7 +89,7 @@ TIMER_CALLBACK_MEMBER(ladyfrog_state::nmi_callback)
 
 WRITE8_MEMBER(ladyfrog_state::sound_command_w)
 {
-	m_soundlatch->write(space, 0, data);
+	m_soundlatch->write(data);
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(ladyfrog_state::nmi_callback),this), data);
 }
 
