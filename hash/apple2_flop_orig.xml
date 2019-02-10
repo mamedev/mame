@@ -1854,6 +1854,21 @@
 		</part>
 	</software>
 
+	<software name="photar">
+		<description>Photar</description>
+		<year>1981</year>
+		<publisher>Softape</publisher>
+		<info name="release" value="2019-02-07"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="233476">
+				<rom name="photar.woz" size="233476" crc="4a7964e2" sha1="280dbce5d9ce0fd18d9697028131b1e52a105838" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pparanoi">
 		<description>Picnic Paranoia</description>
 		<year>1982</year>
