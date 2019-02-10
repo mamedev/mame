@@ -1174,10 +1174,15 @@ public:
 
 static INPUT_PORTS_START( gnw_fire )
 	PORT_START("IN.0") // R2
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_CONFNAME( 0x01, 0x00, "Infinite Lives (Cheat)")
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // same as 0x01?
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) // reset?
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED ) // piezo test?
 
 	PORT_START("IN.1") // R3
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED ) // lcd test?
 
 	PORT_START("IN.2") // R4
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Time")
@@ -7556,6 +7561,7 @@ ROM_START( exospace )
 	ROM_LOAD( "exospace.svg", 0, 66790, BAD_DUMP CRC(df31043a) SHA1(2d8caf42894df699e469652e5f448beaebbcc1ae) )
 ROM_END
 
+
 ROM_START( gnw_fire )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "fr-27", 0x0000, 0x0740, CRC(f4c53ef0) SHA1(6b57120a0f9d2fd4dcd65ad57a5f32def71d905f) )
@@ -7563,6 +7569,7 @@ ROM_START( gnw_fire )
 	ROM_REGION( 163753, "svg", 0)
 	ROM_LOAD( "gnw_fire.svg", 0, 163753, CRC(d546fa42) SHA1(492c785aa0ed33ff1ac8c84066e5b6d7cb7d1566) )
 ROM_END
+
 
 ROM_START( gnw_opanic )
 	ROM_REGION( 0x1000, "maincpu", 0 )
@@ -7575,6 +7582,7 @@ ROM_START( gnw_opanic )
 	ROM_LOAD( "gnw_opanic_bottom.svg", 0, 112809, CRC(919b9649) SHA1(f3d3c8ca3fed81782a1fcb5a7aff07faea86db07) )
 ROM_END
 
+
 ROM_START( gnw_dkong )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "dk-52", 0x0000, 0x1000, CRC(5180cbf8) SHA1(5174570a8d6a601226f51e972bac6735535fe11d) )
@@ -7585,6 +7593,7 @@ ROM_START( gnw_dkong )
 	ROM_REGION( 145397, "svg_bottom", 0)
 	ROM_LOAD( "gnw_dkong_bottom.svg", 0, 145397, CRC(2c8c9d08) SHA1(658fd0bbccaabb0645b02e5cb81709c4b2a4250e) )
 ROM_END
+
 
 ROM_START( gnw_mickdon )
 	ROM_REGION( 0x1000, "maincpu", 0 )
@@ -7597,6 +7606,7 @@ ROM_START( gnw_mickdon )
 	ROM_LOAD( "gnw_mickdon_bottom.svg", 0, 122870, CRC(8f06ddf1) SHA1(69d4b785781600abcdfc01b3902df1d0ae3608cf) )
 ROM_END
 
+
 ROM_START( gnw_ghouse )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "gh-54", 0x0000, 0x1000, CRC(4df12b4d) SHA1(708be5fef8dbd9337f5ab35baaca5bdf21e1f36c) )
@@ -7607,6 +7617,7 @@ ROM_START( gnw_ghouse )
 	ROM_REGION( 149757, "svg_bottom", 0)
 	ROM_LOAD( "gnw_ghouse_bottom.svg", 0, 149757, CRC(d66ee72c) SHA1(dcbe1c81ee0c7ddb9692858749ce6934f4dd7f30) )
 ROM_END
+
 
 ROM_START( gnw_dkong2 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
