@@ -84,8 +84,8 @@
 #define CAUSE      m_cp0[CP0_Cause]
 
 DEFINE_DEVICE_TYPE(R4000, r4000_device, "r4000", "MIPS R4000")
-DEFINE_DEVICE_TYPE(R4400, r4400_device, "r4400", "MIPS R4000")
-DEFINE_DEVICE_TYPE(R4600, r4600_device, "r4600", "QED R4000")
+DEFINE_DEVICE_TYPE(R4400, r4400_device, "r4400", "MIPS R4400")
+DEFINE_DEVICE_TYPE(R4600, r4600_device, "r4600", "QED R4600")
 
 r4000_base_device::r4000_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 prid, cache_size_t icache_size, cache_size_t dcache_size)
 	: cpu_device(mconfig, type, tag, owner, clock)
