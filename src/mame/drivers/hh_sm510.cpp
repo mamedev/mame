@@ -1193,7 +1193,6 @@ static INPUT_PORTS_START( gnw_fire )
 
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
-
 INPUT_PORTS_END
 
 void gnw_fire_state::gnw_fire(machine_config &config)
@@ -8246,9 +8245,9 @@ CONS( 1991, kgarfld,     0,          0, kgarfld,     kgarfld,     kgarfld_state,
 // Nintendo G&W: wide screen
 CONS( 1981, gnw_mmouse,  0,          0, gnw_mmouse,  gnw_mmouse,  gnw_mmouse_state,  empty_init, "Nintendo", "Game & Watch: Mickey Mouse", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, gnw_egg,     gnw_mmouse, 0, gnw_egg,     gnw_mmouse,  gnw_mmouse_state,  empty_init, "Nintendo", "Game & Watch: Egg", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, gnw_fire,    0,          0, gnw_fire,    gnw_fire,    gnw_fire_state,    empty_init, "Nintendo", "Game & Watch: Fire (wide screen)", MACHINE_SUPPORTS_SAVE )
 CONS( 1984, nupogodi,    gnw_mmouse, 0, nupogodi,    gnw_mmouse,  gnw_mmouse_state,  empty_init, "Elektronika", "Nu, pogodi!", MACHINE_SUPPORTS_SAVE )
 CONS( 1989, exospace,    gnw_mmouse, 0, exospace,    exospace,    gnw_mmouse_state,  empty_init, "Elektronika", "Explorers of Space", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, gnw_fire,    0,          0, gnw_fire,    gnw_fire,    gnw_fire_state,    empty_init, "Nintendo", "Game & Watch: Fire (wide screen)", MACHINE_SUPPORTS_SAVE )
 
 // Nintendo G&W: multi screen
 CONS( 1982, gnw_opanic,  0,          0, gnw_opanic,  gnw_opanic,  gnw_opanic_state,  empty_init, "Nintendo", "Game & Watch: Oil Panic", MACHINE_SUPPORTS_SAVE)
