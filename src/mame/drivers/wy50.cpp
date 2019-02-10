@@ -54,6 +54,7 @@ protected:
 private:
 	u8 pvtc_videoram_r(offs_t offset);
 	SCN2672_DRAW_CHARACTER_MEMBER(draw_character);
+	DECLARE_WRITE_LINE_MEMBER(mbc_attr_clock_w);
 
 	u8 pvtc_r(offs_t offset);
 	void pvtc_w(offs_t offset, u8 data);
@@ -77,15 +78,21 @@ private:
 	required_region_ptr<u8> m_chargen;
 	required_shared_ptr_array<u8, 2> m_videoram;
 
+	u8 m_cur_attr;
+	u8 m_last_row_attr;
 	u8 m_row_buffer_char;
 	bool m_is_132;
 };
 
 void wy50_state::machine_start()
 {
+	m_cur_attr = 0;
+	m_last_row_attr = 0;
 	m_row_buffer_char = 0;
 	m_is_132 = false;
 
+	save_item(NAME(m_cur_attr));
+	save_item(NAME(m_last_row_attr));
 	save_item(NAME(m_row_buffer_char));
 	save_item(NAME(m_is_132));
 }
@@ -104,19 +111,38 @@ u8 wy50_state::pvtc_videoram_r(offs_t offset)
 
 SCN2672_DRAW_CHARACTER_MEMBER(wy50_state::draw_character)
 {
-	bool is_attr = (charcode & 0xe0) == 0x80;
-	u16 dots = is_attr ? 0 : m_chargen[charcode << 4 | linecount] << 1;
+	const bool attr = (charcode & 0xe0) == 0x80;
+	if (attr)
+		m_cur_attr = charcode & 0x1f;
+	else if (x == 0)
+		m_cur_attr = m_last_row_attr;
 
+	u16 dots;
+	if (attr || (BIT(m_cur_attr, 1) && blink) || BIT(m_cur_attr, 2))
+		dots = 0;
+	else if (BIT(m_cur_attr, 3) && ul)
+		dots = 0x3ff;
+	else
+		dots = m_chargen[charcode << 4 | linecount] << 2;
+
+	if (!attr && BIT(m_cur_attr, 4))
+		dots = ~dots;
 	if (cursor)
 		dots = ~dots;
 
 	for (int i = 0; i < 9; i++)
 	{
-		bitmap.pix32(y, x++) = BIT(dots, 8) ? rgb_t::white() : rgb_t::black();
+		bitmap.pix32(y, x++) = BIT(dots, 9) ? rgb_t::white() : rgb_t::black();
 		dots <<= 1;
 	}
 	if (!m_is_132)
-		bitmap.pix32(y, x++) = BIT(dots, 8) ? rgb_t::white() : rgb_t::black();
+		bitmap.pix32(y, x++) = BIT(dots, 9) ? rgb_t::white() : rgb_t::black();
+}
+
+WRITE_LINE_MEMBER(wy50_state::mbc_attr_clock_w)
+{
+	if (state)
+		m_last_row_attr = m_cur_attr;
 }
 
 u8 wy50_state::pvtc_r(offs_t offset)
@@ -231,6 +257,7 @@ void wy50_state::wy50(machine_config &config)
 	m_pvtc->set_display_callback(FUNC(wy50_state::draw_character));
 	m_pvtc->intr_callback().set_inputline(m_maincpu, MCS51_T0_LINE);
 	m_pvtc->breq_callback().set_inputline(m_maincpu, MCS51_INT0_LINE);
+	m_pvtc->mbc_callback().set(FUNC(wy50_state::mbc_attr_clock_w));
 	m_pvtc->mbc_char_callback().set(FUNC(wy50_state::pvtc_videoram_r));
 
 	MC2661(config, m_sio, 4.9152_MHz_XTAL); // SCN2661B
