@@ -6,7 +6,7 @@
 
 	<software name="nrxdig"> <!-- has SEEPROM -->
 		<description>New Rally X &amp; Dig Dug</description>
-		<publisher>JAKKS Pacific / HotGen Ltd</publisher>
+		<publisher>JAKKS Pacific Inc / Namco / HotGen Ltd</publisher>
 		<year>2005</year>
 		<part name="cart" interface="jakks_gamekey">
 			<feature name="slot" value="rom_24lc04"/>
