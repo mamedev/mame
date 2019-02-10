@@ -73,6 +73,7 @@
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "bus/jakks_gamekey/slot.h"
 
 #include "screen.h"
 #include "softlist.h"
@@ -172,18 +173,24 @@ public:
 	void jakks_gkr_2m(machine_config &config);
 	void jakks_gkr_nk(machine_config &config);
 	void jakks_gkr_dy(machine_config &config);
+	void jakks_gkr_dp(machine_config &config);
 	void jakks_gkr_sw(machine_config &config);
+	void jakks_gkr_nm(machine_config &config);
+	void jakks_gkr_wf(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(i2c_gkr_r);
 
 private:
 	virtual void machine_start() override;
 
+	DECLARE_WRITE16_MEMBER(gkr_portc_w);
 	DECLARE_WRITE16_MEMBER(jakks_porta_key_io_w);
 	DECLARE_READ16_MEMBER(jakks_porta_key_io_r);
 	bool m_porta_key_mode;
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(gamekey_cart);
 
-	required_device<generic_slot_device> m_cart;
+	required_device<jakks_gamekey_slot_device> m_cart;
 	memory_region *m_cart_region;
 };
 
@@ -306,6 +313,17 @@ CUSTOM_INPUT_MEMBER(spg2xx_game_state::i2c_r)
 	return m_i2cmem->read_sda();
 }
 
+CUSTOM_INPUT_MEMBER(jakks_gkr_state::i2c_gkr_r)
+{
+	if (m_cart && m_cart->exists())
+	{
+		return m_cart->read_cart_seeprom();
+	}
+	else
+	{
+		return m_i2cmem->read_sda();
+	}
+}
 
 WRITE16_MEMBER(spg2xx_game_state::walle_portc_w)
 {
@@ -314,6 +332,23 @@ WRITE16_MEMBER(spg2xx_game_state::walle_portc_w)
 		m_i2cmem->write_scl(BIT(data, 1));
 	if (BIT(mem_mask, 0))
 		m_i2cmem->write_sda(BIT(data, 0));
+}
+
+WRITE16_MEMBER(jakks_gkr_state::gkr_portc_w)
+{
+	m_walle_portc_data = data & mem_mask;
+
+	if (m_cart && m_cart->exists())
+	{
+		m_cart->write_cart_seeprom(space,offset,data,mem_mask);
+	}
+	else
+	{
+		if (BIT(mem_mask, 1))
+			m_i2cmem->write_scl(BIT(data, 1));
+		if (BIT(mem_mask, 0))
+			m_i2cmem->write_sda(BIT(data, 0));
+	}
 }
 
 READ16_MEMBER(spg2xx_game_state::jakks_porta_r)
@@ -456,7 +491,7 @@ static INPUT_PORTS_START( jak_sith )
 	PORT_BIT( 0xf3df, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P3")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, spg2xx_game_state,i2c_r, nullptr)
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, jakks_gkr_state,i2c_gkr_r, nullptr)
 	PORT_BIT( 0xfffe, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("JOYX")
@@ -464,6 +499,54 @@ static INPUT_PORTS_START( jak_sith )
 
 	PORT_START("JOYY")
 	PORT_BIT(0x0fff, 0x0000, IPT_AD_STICK_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_MINMAX(0x00,0x0fff)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( jak_nm )
+	PORT_START("P1")
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_PLAYER(1)
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1)
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1)
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Menu")
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+
+	PORT_START("P3")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, jakks_gkr_state,i2c_gkr_r, nullptr)
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN ) // PAL/NTSC flag? music speed changes in Mappy
+	PORT_BIT( 0xfff0, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+
+	PORT_START("DIALX") // for Pole Position, joystick can be twisted like a dial/wheel (limited?) (check range)
+	PORT_BIT(0x0fff, 0x0000, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_MINMAX(0x00,0x0fff)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( jak_wf )
+	PORT_START("P1")
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_PLAYER(1)
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1)
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1)
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("A")
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("B")
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x01c0, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Menu")
+	PORT_BIT( 0x001f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P3")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, jakks_gkr_state,i2c_gkr_r, nullptr)
+	PORT_BIT( 0xfffe, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	/* on real unit you can spin the wheel (and must make sure it completes a full circle, or you lose your turn) instead of pressing 'B' for a random spin but where does it map?
+	PORT_START("DIALX")
+	PORT_BIT(0x0fff, 0x0000, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_MINMAX(0x00,0x0fff)
+
+	PORT_START("DIALY")
+	PORT_BIT(0x0fff, 0x0000, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_MINMAX(0x00,0x0fff)
+	*/
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( jak_gkr )
@@ -478,7 +561,7 @@ static INPUT_PORTS_START( jak_gkr )
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON4 )
 
 	PORT_START("P3")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, spg2xx_game_state,i2c_r, nullptr)
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, jakks_gkr_state,i2c_gkr_r, nullptr)
 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -525,6 +608,26 @@ static INPUT_PORTS_START( jak_gkr )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
+
+static INPUT_PORTS_START( jak_disp )
+	PORT_START("P1")
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_PLAYER(1)
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1)
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1)
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x00c0, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Start / Menu / Pause")
+	PORT_BIT( 0x001f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P3")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, jakks_gkr_state,i2c_gkr_r, nullptr)
+	PORT_BIT( 0xfffe, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
 
 
 static INPUT_PORTS_START( wirels60 )
@@ -923,7 +1026,7 @@ void jakks_gkr_state::machine_start()
 	if (m_cart && m_cart->exists())
 	{
 		std::string region_tag;
-		m_cart_region = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+		m_cart_region = memregion(region_tag.assign(m_cart->tag()).append(JAKKSSLOT_ROM_REGION_TAG).c_str());
 		m_bank->configure_entries(0, (m_cart_region->bytes() + 0x7fffff) / 0x800000, m_cart_region->base(), 0x800000);
 		m_bank->set_entry(0);
 	}
@@ -931,12 +1034,7 @@ void jakks_gkr_state::machine_start()
 
 DEVICE_IMAGE_LOAD_MEMBER(jakks_gkr_state, gamekey_cart)
 {
-	uint32_t size = m_cart->common_get_size("rom");
-
-	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
-	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
-
-	return image_init_result::PASS;
+	return m_cart->call_load();
 }
 
 void jakks_gkr_state::jakks_gkr(machine_config &config)
@@ -946,10 +1044,11 @@ void jakks_gkr_state::jakks_gkr(machine_config &config)
 	m_spg->porta_in().set(FUNC(jakks_gkr_state::jakks_porta_key_io_r));
 	m_spg->porta_out().set(FUNC(jakks_gkr_state::jakks_porta_key_io_w));
 	//m_spg->portb_in().set_ioport("P2");
+	m_spg->portc_out().set(FUNC(jakks_gkr_state::gkr_portc_w));
 
-	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "jakks_gamekey");
-	m_cart->set_width(GENERIC_ROM16_WIDTH);
-	m_cart->set_device_load(device_image_load_delegate(&jakks_gkr_state::device_image_load_gamekey_cart, this));
+	m_spg-> set_rowscroll_offset(0);
+
+	JAKKS_GAMEKEY_SLOT(config, m_cart, 0, jakks_gamekey, nullptr);
 }
 
 void jakks_gkr_state::jakks_gkr_1m(machine_config &config)
@@ -978,6 +1077,13 @@ void jakks_gkr_state::jakks_gkr_dy(machine_config &config)
 	SOFTWARE_LIST(config, "jakks_gamekey_dy").set_original("jakks_gamekey_dy");
 }
 
+void jakks_gkr_state::jakks_gkr_dp(machine_config &config)
+{
+	jakks_gkr(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &jakks_gkr_state::mem_map_1m);
+	//SOFTWARE_LIST(config, "jakks_gamekey_dp").set_original("jakks_gamekey_dp");
+}
+
 void jakks_gkr_state::jakks_gkr_sw(machine_config &config)
 {
 	jakks_gkr(config);
@@ -985,6 +1091,23 @@ void jakks_gkr_state::jakks_gkr_sw(machine_config &config)
 	m_spg->adc_in<0>().set_ioport("JOYX");
 	m_spg->adc_in<1>().set_ioport("JOYY");
 	SOFTWARE_LIST(config, "jakks_gamekey_sw").set_original("jakks_gamekey_sw");
+}
+
+void jakks_gkr_state::jakks_gkr_nm(machine_config &config)
+{
+	jakks_gkr(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &jakks_gkr_state::mem_map_1m);
+	m_spg->adc_in<0>().set_ioport("DIALX");
+	SOFTWARE_LIST(config, "jakks_gamekey_nm").set_original("jakks_gamekey_nm");
+}
+
+void jakks_gkr_state::jakks_gkr_wf(machine_config &config)
+{
+	jakks_gkr(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &jakks_gkr_state::mem_map_1m);
+	//m_spg->adc_in<0>().set_ioport("DIALX"); // wheel does not seem to map here
+	//m_spg->adc_in<1>().set_ioport("DIALY");
+	//SOFTWARE_LIST(config, "jakks_gamekey_wf").set_original("jakks_gamekey_wf"); // no game keys were released
 }
 
 
@@ -1081,9 +1204,24 @@ ROM_START( jak_dora )
 	ROM_LOAD16_WORD_SWAP( "jakksdoragkr.bin", 0x000000, 0x200000, CRC(bcaa132d) SHA1(3894b980fbc4144731b2a7a94acebb29e30de67c) )
 ROM_END
 
+ROM_START( jak_wof )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jakkswheeloffortunegkr.bin", 0x000000, 0x200000, CRC(6a879620) SHA1(95478764a61741569041c2299528f6464651d593) )
+ROM_END
+
 ROM_START( jak_disf )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "disneyfriendsgkr.bin", 0x000000, 0x200000, CRC(77bca50b) SHA1(6e0f4fd229ee11eac721b5dbe79cf9002d3dbd64) )
+ROM_END
+
+ROM_START( jak_disp )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jakksdisneyprincessgkr.bin", 0x000000, 0x200000, CRC(e26003ce) SHA1(ee15243281df6f09b96185c34582d7091604c954) )
+ROM_END
+
+ROM_START( jak_mpac )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jakksmspacmangkr.bin", 0x000000, 0x100000, CRC(cab40f77) SHA1(30731acc461150d96aafa7a0451cfb1a25264678) )
 ROM_END
 
 ROM_START( jak_sdoo )
@@ -1303,19 +1441,21 @@ CONS( 2005, jak_dora, 0, 0, jakks_gkr_nk, jak_gkr,  jakks_gkr_state, empty_init,
 // there is also a Dora the Explorer 'Race to Play Park' which is also a GameKeyReady unit with NK code, and different games - the upper part of this one is blue.
 CONS( 2005, jak_sdoo, 0, 0, jakks_gkr_2m, jak_gkr,  jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Jolliford Management","Scooby-Doo! and the Mystery of the Castle (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) //  SD (no game-keys released)
 CONS( 2005, jak_disf, 0, 0, jakks_gkr_dy, jak_gkr,  jakks_gkr_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",          "Disney Friends (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // uses DY keys (3 released)
+CONS( 2005, jak_disp, 0, 0, jakks_gkr_dp, jak_disp, jakks_gkr_state, empty_init, "JAKKS Pacific Inc / 5000ft, Inc",         "Disney Princess (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // uses DP keys (1 key released)
+// There seems to be a second game called 'Disney Princesses' with a 'board game' style front end as well as the minigames, also GKR, see https://www.youtube.com/watch?v=w9p5TI029bQ  The one we have is https://www.youtube.com/watch?v=9ppPKVbpoMs  the physical package seems identical.
 CONS( 2005, jak_sith, 0, 0, jakks_gkr_sw, jak_sith, jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Griptonite Games",    "Star Wars - Revenge of the Sith (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // uses SW keys (1 released)
 CONS( 2005, jak_dbz,  0, 0, jakks_gkr_1m, jak_gkr,  jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Handheld Games",      "Dragon Ball Z (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // DB (no game-keys released, 1 in development but cancelled)
+CONS( 2004, jak_mpac, 0, 0, jakks_gkr_nm, jak_nm,   jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Namco / HotGen Ltd",  "Ms. Pac-Man 5-in-1 (Ms. Pac-Man, Pole Position, Galaga, Xevious, Mappy) (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // uses NM (3 keys available [Dig Dug, New Rally-X], [Rally-X, Pac-Man, Bosconian], [Pac-Man, Bosconian])
+CONS( 2005, jak_wof,  0, 0, jakks_gkr_wf, jak_wf,   jakks_gkr_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",          "Wheel of Fortune (JAKKS Pacific TV Game, Game-Key Ready)",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // uses WF keys (no game-keys released)  analog wheel not emulated
+// There is a 'Second Edition' version of Wheel of Fortune with a Gold case, GameKey port removed, and a '2' over the usual Game Key Ready logo, it is not yet verified to be the same code.
 
-// Nicktoons                                   NK (3? keys available) (same keys as Dora the Explorer)
-// SpongeBob SquarePants: The Fry Cook Games   NK (3? keys available)  ^^
-// Namco Ms. Pac-Man                           NM (3 keys available [Dig Dug, New Rally-X], [Rally-X, Pac-Man, Bosconian], [Pac-Man, Bosconian])
-// Disney Princess                             DP (? keys available)
-// Spider-Man                                  MV (1? key available)
+// Nicktoons                                   NK (3 keys available) (same keys as Dora the Explorer)
+// SpongeBob SquarePants: The Fry Cook Games   NK (3 keys available)  ^^                
+// Spider-Man                                  MV (1 key available)
 
 // no keys released for the following, some were in development but cancelled
 // Capcom 3-in-1                               CC (no game-keys released)
-// Care Bears                                  CB (no game-keys released)
-// Wheel of Fortune                            WF (no game-keys released)
+// Care Bears                                  CB (no game-keys released)                           
 // Winnie the Pooh                             WP (no game-keys released)
 
 // Radica TV games

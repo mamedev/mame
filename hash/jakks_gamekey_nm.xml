@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="jakks_gamekey_nm" description="JAKKS Pacific 'NM' Game Keys">
+
+	<!-- This list is for the 'NM' coded Game Keys, for Namco base systems (MS Pacman) -->
+
+	<software name="nrxdig"> <!-- has SEEPROM -->
+		<description>New Rally X &amp; Dig Dug</description>
+		<publisher>JAKKS Pacific Inc / Namco / HotGen Ltd</publisher>
+		<year>2005</year>
+		<part name="cart" interface="jakks_gamekey">
+			<feature name="slot" value="rom_24lc04"/>
+			<dataarea name="rom" size="0x800000">
+				<rom name="jakksdigdugnewrallyxgk.bin" size="0x100000" crc="2a0e958a" sha1="2e09d87a8fdf115f13aaa8fd2c48f9eaf3c82bac" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
