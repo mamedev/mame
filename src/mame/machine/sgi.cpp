@@ -193,12 +193,15 @@ void sgi_mc_device::set_cpu_buserr(uint32_t address)
 
 uint32_t sgi_mc_device::dma_translate(uint32_t address)
 {
+	machine().debug_break();
 	for (int entry = 0; entry < 4; entry++)
 	{
-		if ((address & 0xffc00000) == (m_dma_tlb_entry_hi[entry] & 0xffc00000))
+		if ((address & 0xffe00000) == (m_dma_tlb_entry_hi[entry] & 0xffe00000))
 		{
-			const uint32_t offset = address - m_dma_tlb_entry_hi[entry];
-			return ((m_dma_tlb_entry_lo[entry] &~ 0x3f) << 6) + (offset & 0xfff);
+			const uint32_t vpn_lo = (address & 0x001ff000) >> 12;
+			const uint32_t pte = m_space->read_dword(((m_dma_tlb_entry_lo[entry] & 0x003fffc0) << 6) + (vpn_lo << 2));
+			const uint32_t offset = address & 0xfff;
+			return ((pte & 0x03ffffc0) << 6) + offset;
 		}
 	}
 	return 0;
@@ -229,20 +232,20 @@ void sgi_mc_device::dma_tick()
 	else
 	{	// Host to graphics
 		const uint32_t remaining = m_dma_count & 0x0000ffff;
-		uint32_t length = 4;
-		uint32_t shift = 24;
-		if (remaining < 4)
+		uint32_t length = 8;
+		uint64_t shift = 56;
+		if (remaining < 8)
 			length = remaining;
 
-		uint32_t data = 0;
+		uint64_t data = 0;
 		for (uint32_t i = 0; i < length; i++)
 		{
-			data |= m_space->read_byte(addr) << shift;
+			data |= (uint64_t)m_space->read_byte(addr) << shift;
 			addr++;
 			shift -= 8;
 		}
 
-		m_space->write_dword(m_dma_gio64_addr, data);
+		m_space->write_qword(m_dma_gio64_addr, data);
 		m_dma_mem_addr += length;
 		m_dma_count -= length;
 	}
@@ -655,8 +658,11 @@ WRITE32_MEMBER( sgi_mc_device::write )
 		break;
 	case 0x2040/4:
 		LOGMASKED(LOG_WRITES | LOG_DMA, "%s: DMA Start Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
-		m_dma_run |= 0x40;
-		m_dma_timer->adjust(attotime::from_hz(33333333), 0, attotime::from_hz(33333333));
+		if (data & 1)
+		{
+			m_dma_run |= 0x40;
+			m_dma_timer->adjust(attotime::from_hz(33333333), 0, attotime::from_hz(33333333));
+		}
 		break;
 	case 0x2070/4:
 		LOGMASKED(LOG_WRITES | LOG_DMA, "%s: DMA GIO64 Address Write + Default Params Write + Start DMA: %08x & %08x\n", machine().describe_context(), data, mem_mask);

@@ -158,6 +158,8 @@ void newport_video_device::device_start()
 	save_item(NAME(m_rex3.m_clip_mode));
 	save_item(NAME(m_rex3.m_config));
 	save_item(NAME(m_rex3.m_status));
+	save_item(NAME(m_rex3.m_iter_x));
+	save_item(NAME(m_rex3.m_iter_y));
 	save_item(NAME(m_rex3.m_xfer_width));
 	save_item(NAME(m_rex3.m_read_active));
 
@@ -302,7 +304,7 @@ READ32_MEMBER(newport_video_device::xmap0_r)
 		return m_xmap0.m_config;
 	case 1:
 		LOGMASKED(LOG_XMAP0, "XMAP0 Revision Read: %08x\n", 0);
-		return m_xmap0.m_revision;
+		return 1;
 	case 2:
 		LOGMASKED(LOG_XMAP0, "XMAP0 FIFO Availability Read: %08x\n", 0x2);
 		return 0x2;
@@ -399,7 +401,7 @@ READ32_MEMBER(newport_video_device::xmap1_r)
 		return m_xmap1.m_config;
 	case 1:
 		LOGMASKED(LOG_XMAP1, "XMAP1 Revision Read: %08x\n", 0);
-		return m_xmap1.m_revision;
+		return 1;
 	case 2:
 		LOGMASKED(LOG_XMAP1, "XMAP1 FIFO Availability Read: %08x\n", 0x02);
 		return 0x2;
@@ -938,7 +940,7 @@ READ32_MEMBER(newport_video_device::rex3_r)
 		uint32_t old_status = m_rex3.m_status;
 		m_rex3.m_status = 0;
 		m_hpc3->lower_local_irq(1, ioc2_device::INT3_LOCAL1_RETRACE);
-		return old_status;
+		return old_status | 3;
 	}
 	case 0x133c/4:
 		LOGMASKED(LOG_REX3, "REX3 User Status Read: %08x\n", m_rex3.m_status);
@@ -975,13 +977,17 @@ void newport_video_device::write_pixel(uint32_t x, uint32_t y, uint8_t color)
 	m_base[y * (1280 + 64) + x] = color;
 }
 
-void newport_video_device::do_v_iline(int x1, int y1, int y2, uint8_t color, bool skip_last)
+void newport_video_device::do_v_iline(uint16_t x1, uint16_t y1, uint16_t y2, uint8_t color, bool skip_last)
 {
-	x1 += (m_rex3.m_xy_window >> 16) & 0x0fff;
-	y1 += m_rex3.m_xy_window & 0x0fff;
-	y2 += m_rex3.m_xy_window & 0x0fff;
-	int x = x1;
-	int y = y1;
+	uint16_t window_x = (m_rex3.m_xy_window >> 16) & 0x0fff;
+	uint16_t window_y = m_rex3.m_xy_window & 0x0fff;
+
+	x1 += window_x;
+	y1 += window_y;
+	y2 += window_y;
+
+	m_rex3.m_iter_x = x1;
+	m_rex3.m_iter_y = y1;
 	int incy = (y2 < y1) ? -1 : 1;
 
 	if (skip_last)
@@ -989,38 +995,60 @@ void newport_video_device::do_v_iline(int x1, int y1, int y2, uint8_t color, boo
 
 	do
 	{
-		write_pixel(x, y, color);
-		y += incy;
-	} while (y != y2);
+		write_pixel(m_rex3.m_iter_x, m_rex3.m_iter_y, color);
+		m_rex3.m_iter_y += incy;
+	} while (m_rex3.m_iter_y != y2);
+
+	m_rex3.m_iter_x -= window_x;
+	m_rex3.m_iter_y -= window_y;
+
+	m_rex3.m_xy_start_i = (m_rex3.m_iter_x << 16) | m_rex3.m_iter_y;
+	m_rex3.m_x_start_i = m_rex3.m_iter_x;
+	m_rex3.m_x_start = ((m_rex3.m_xy_start_i & 0xffff0000) >>  5);
+	m_rex3.m_y_start = ((m_rex3.m_xy_start_i & 0x0000ffff) << 11);
 }
 
-void newport_video_device::do_h_iline(int x1, int y1, int x2, uint8_t color, bool skip_last)
+void newport_video_device::do_h_iline(uint16_t x1, uint16_t y1, uint16_t x2, uint8_t color, bool skip_last)
 {
-	x1 += (m_rex3.m_xy_window >> 16) & 0x0fff;
-	x2 += (m_rex3.m_xy_window >> 16) & 0x0fff;
-	y1 += m_rex3.m_xy_window & 0x0fff;
+	uint16_t window_x = (m_rex3.m_xy_window >> 16) & 0x0fff;
+	uint16_t window_y = m_rex3.m_xy_window & 0x0fff;
 
-	int x = x1;
-	int y = y1;
+	x1 += window_x;
+	x2 += window_x;
+	y1 += window_y;
+
+	m_rex3.m_iter_x = x1;
+	m_rex3.m_iter_y = y1;
 
 	if (skip_last)
 		x2--;
 
-	int addr = y * (1280 + 64) + x;
+	int addr = m_rex3.m_iter_y * (1280 + 64) + m_rex3.m_iter_x;
 	do
 	{
-		write_pixel(x, y, color);
+		write_pixel(m_rex3.m_iter_x, m_rex3.m_iter_y, color);
 		addr++;
-		x++;
-	} while (x != x2);
+		m_rex3.m_iter_x++;
+	} while (m_rex3.m_iter_x != x2);
+
+	m_rex3.m_iter_x -= (m_rex3.m_xy_window >> 16) & 0x0fff;
+	m_rex3.m_iter_y -= m_rex3.m_xy_window & 0x0fff;
+
+	m_rex3.m_xy_start_i = (m_rex3.m_iter_x << 16) | m_rex3.m_iter_y;
+	m_rex3.m_x_start_i = m_rex3.m_iter_x;
+	m_rex3.m_x_start = ((m_rex3.m_xy_start_i & 0xffff0000) >>  5);
+	m_rex3.m_y_start = ((m_rex3.m_xy_start_i & 0x0000ffff) << 11);
 }
 
-void newport_video_device::do_iline(int x1, int y1, int x2, int y2, uint8_t color, bool skip_last)
+void newport_video_device::do_iline(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint8_t color, bool skip_last)
 {
-	x1 += (m_rex3.m_xy_window >> 16) & 0x0fff;
-	x2 += (m_rex3.m_xy_window >> 16) & 0x0fff;
-	y1 += m_rex3.m_xy_window & 0x0fff;
-	y2 += m_rex3.m_xy_window & 0x0fff;
+	uint16_t window_x = (m_rex3.m_xy_window >> 16) & 0x0fff;
+	uint16_t window_y = m_rex3.m_xy_window & 0x0fff;
+
+	x1 += window_x;
+	y1 += window_y;
+	x2 += window_x;
+	y2 += window_y;
 
 	unsigned char c1 = 0;
 	int incy = 1;
@@ -1075,18 +1103,18 @@ void newport_video_device::do_iline(int x1, int y1, int x2, int y2, uint8_t colo
 	else
 		incy = -1;
 
-	int x = x1;
-	int y = y1;
+	m_rex3.m_iter_x = x1;
+	m_rex3.m_iter_y = y1;
 
 	if (c1)
 	{
 		do
 		{
-			write_pixel(x, y, color);
+			write_pixel(m_rex3.m_iter_x, m_rex3.m_iter_y, color);
 
 			if (e > 0)
 			{
-				y = y + incy;
+				m_rex3.m_iter_y = m_rex3.m_iter_y + incy;
 				e = e + diago;
 			}
 			else
@@ -1094,18 +1122,18 @@ void newport_video_device::do_iline(int x1, int y1, int x2, int y2, uint8_t colo
 				e = e + horiz;
 			}
 
-			x++;
-		} while (skip_last ? x < x2 : x <= x2);
+			m_rex3.m_iter_x++;
+		} while (skip_last ? m_rex3.m_iter_x < x2 : m_rex3.m_iter_x <= x2);
 	}
 	else
 	{
 		do
 		{
-			write_pixel(x, y, color);
+			write_pixel(m_rex3.m_iter_x, m_rex3.m_iter_y, color);
 
 			if (e > 0)
 			{
-				y = y + incy;
+				m_rex3.m_iter_y = m_rex3.m_iter_y + incy;
 				e = e + diago;
 			}
 			else
@@ -1113,28 +1141,34 @@ void newport_video_device::do_iline(int x1, int y1, int x2, int y2, uint8_t colo
 				e = e + horiz;
 			}
 
-			x++;
-		} while (skip_last ? x < x2 : x <= x2);
+			m_rex3.m_iter_x++;
+		} while (skip_last ? m_rex3.m_iter_x < x2 : m_rex3.m_iter_x <= x2);
 	}
+
+	m_rex3.m_iter_x -= window_x;
+	m_rex3.m_iter_y -= window_y;
+
+	m_rex3.m_xy_start_i = (m_rex3.m_iter_x << 16) | m_rex3.m_iter_y;
+	m_rex3.m_x_start_i = m_rex3.m_iter_x;
+	m_rex3.m_x_start = ((m_rex3.m_xy_start_i & 0xffff0000) >>  5);
+	m_rex3.m_y_start = ((m_rex3.m_xy_start_i & 0x0000ffff) << 11);
 }
 
 uint8_t newport_video_device::do_pixel_read()
 {
-	uint16_t x = (uint16_t)(m_rex3.m_xy_start_i >> 16);
-	uint16_t y = (uint16_t)m_rex3.m_xy_start_i;
 	if (m_rex3.m_xy_start_i == m_rex3.m_xy_end_i)
 		m_rex3.m_read_active = false;
-	LOGMASKED(LOG_COMMANDS, "Reading from %04x, %04x\n", x, y);
+	LOGMASKED(LOG_COMMANDS, "Reading from %04x, %04x\n", m_rex3.m_iter_x, m_rex3.m_iter_y);
 	m_rex3.m_bres_octant_inc1 = 0;
-	const uint8_t ret = m_base[y * (1280 + 64) + x];
-	x++;
-	if (x > (m_rex3.m_xy_end_i >> 16))
+	const uint8_t ret = m_base[m_rex3.m_iter_y * (1280 + 64) + m_rex3.m_iter_x];
+	m_rex3.m_iter_x++;
+	if (m_rex3.m_iter_x > (m_rex3.m_xy_end_i >> 16))
 	{
-		y++;
-		x = m_rex3.m_x_save;
+		m_rex3.m_iter_y++;
+		m_rex3.m_iter_x = m_rex3.m_x_save;
 	}
-	m_rex3.m_xy_start_i = (x << 16) | y;
-	m_rex3.m_x_start_i = x;
+	m_rex3.m_xy_start_i = (m_rex3.m_iter_x << 16) | m_rex3.m_iter_y;
+	m_rex3.m_x_start_i = m_rex3.m_iter_x;
 	m_rex3.m_x_start = ((m_rex3.m_xy_start_i & 0xffff0000) >>  5);
 	m_rex3.m_y_start = ((m_rex3.m_xy_start_i & 0x0000ffff) << 11);
 	return ret;
@@ -1185,12 +1219,16 @@ void newport_video_device::do_rex3_command()
 		"0", "src & dst", "src & !dst", "src", "!src & dst", "dst", "src ^ dst", "src | dst",
 		"!(src | dst)", "!(src ^ dst)", "!dst", "src | !dst", "!src", "!src | dst", "!(src & dst)", "1"
 	};
-	uint16_t start_x = (uint16_t)(m_rex3.m_xy_start_i >> 16);
-	uint16_t start_y = (uint16_t)m_rex3.m_xy_start_i;
-	uint16_t end_x = (uint16_t)(m_rex3.m_xy_end_i >> 16);
-	uint16_t end_y = (uint16_t)m_rex3.m_xy_end_i;
+
 	const uint32_t mode0 = m_rex3.m_draw_mode0;
 	const uint32_t mode1 = m_rex3.m_draw_mode1;
+
+	m_rex3.m_iter_x = BIT(mode0, 5) ? (int16_t)(m_rex3.m_xy_start_i >> 16) : m_rex3.m_iter_x;
+	m_rex3.m_iter_y = BIT(mode0, 5) ? (int16_t)m_rex3.m_xy_start_i : m_rex3.m_iter_y;
+	int16_t end_x = (int16_t)(m_rex3.m_xy_end_i >> 16);
+	int16_t end_y = (int16_t)m_rex3.m_xy_end_i;
+	int16_t dx = m_rex3.m_iter_x > end_x ? -1 : 1;
+	int16_t dy = m_rex3.m_iter_y > end_y ? -1 : 1;
 
 	LOGMASKED(LOG_COMMANDS, "REX3 Command: %08x|%08x - %s %s:\n", mode0, mode1, s_opcode_str[mode0 & 3], s_adrmode_str[(mode0 >> 2) & 7]);
 	LOGMASKED(LOG_COMMANDS, "              DoSetup:%d, ColorHost:%d, AlphaHost:%d, StopOnX:%d, StopOnY:%d\n", BIT(mode0, 5), BIT(mode0, 6), BIT(mode0, 7),
@@ -1210,154 +1248,182 @@ void newport_video_device::do_rex3_command()
 
 	switch (mode0)
 	{
-	case 0x00000006:
+	case 0x00000006: // Block, Draw
 	{
-		uint16_t x = start_x;
-		uint16_t y = start_y;
-		LOGMASKED(LOG_COMMANDS, "%04x, %04x = %02x\n", x, y, m_rex3.m_zero_fract & 0xff);
+		LOGMASKED(LOG_COMMANDS, "%04x, %04x = %02x\n", m_rex3.m_iter_x, m_rex3.m_iter_y, m_rex3.m_zero_fract & 0xff);
 		m_rex3.m_bres_octant_inc1 = 0;
-		write_pixel(x, y, m_rex3.m_zero_fract & 0xff);
-		x++;
-		if (x > (m_rex3.m_xy_end_i >> 16))
+		write_pixel(m_rex3.m_iter_x, m_rex3.m_iter_y, m_rex3.m_zero_fract & 0xff);
+		m_rex3.m_iter_x++;
+		if (m_rex3.m_iter_x > (m_rex3.m_xy_end_i >> 16))
 		{
-			y++;
-			x = m_rex3.m_x_save;
+			m_rex3.m_iter_y++;
+			m_rex3.m_iter_x = m_rex3.m_x_save;
 		}
-		m_rex3.m_xy_start_i = (x << 16) | y;
-		m_rex3.m_x_start_i = x;
+		m_rex3.m_xy_start_i = (m_rex3.m_iter_x << 16) | m_rex3.m_iter_y;
+		m_rex3.m_x_start_i = m_rex3.m_iter_x;
 		m_rex3.m_x_start = ((m_rex3.m_xy_start_i & 0xffff0000) >>  5);
 		m_rex3.m_y_start = ((m_rex3.m_xy_start_i & 0x0000ffff) << 11);
 		break;
 	}
-	case 0x00000046: // Block Draw, Host
+	case 0x00000046: // ColorHost, Block, Draw
 	{
-		uint16_t x = start_x;
-		uint16_t y = start_y;
 		m_rex3.m_bres_octant_inc1 = 0;
-		uint16_t length;
 		if (BIT(mode1, 7)) // Packed
 		{
-			uint16_t remaining_length = ((m_rex3.m_xy_end_i >> 16) - start_x) + 1;
-			length = 4;
+			const bool doubleword = BIT(mode1, 10);
+			uint16_t remaining_length = ((m_rex3.m_xy_end_i >> 16) - m_rex3.m_iter_x) + 1;
+			uint16_t length = doubleword ? 8 : 4;
 			if (remaining_length < length)
 				length = remaining_length;
-			LOGMASKED(LOG_COMMANDS, "%04x, %04x = %08x\n", x, y, m_rex3.m_host_dataport_msw);
+			uint64_t dataport = ((uint64_t)m_rex3.m_host_dataport_msw << 32) | m_rex3.m_host_dataport_lsw;
+			LOGMASKED(LOG_COMMANDS, "%04x, %04x = %08x%08x\n", m_rex3.m_iter_x, m_rex3.m_iter_y, (uint32_t)(dataport >> 32), (uint32_t)dataport);
+			uint64_t shift = 56;
 			for (uint16_t i = 0; i < length; i++)
 			{
-				write_pixel(x + i, y, m_rex3.m_host_dataport_msw >> 24);
-				m_rex3.m_host_dataport_msw <<= 8;
+				write_pixel(m_rex3.m_iter_x, m_rex3.m_iter_y, (uint8_t)(dataport >> shift));
+				m_rex3.m_iter_x++;
+				shift -= 8;
 			}
 		}
 		else
 		{
-			length = 1;
-			LOGMASKED(LOG_COMMANDS, "%04x, %04x = %02x\n", x, y, m_rex3.m_host_dataport_msw >> 24);
-			write_pixel(x, y, m_rex3.m_host_dataport_msw >> 24);
+			LOGMASKED(LOG_COMMANDS, "%04x, %04x = %02x\n", m_rex3.m_iter_x, m_rex3.m_iter_y, m_rex3.m_host_dataport_msw >> 24);
+			write_pixel(m_rex3.m_iter_x, m_rex3.m_iter_y, m_rex3.m_host_dataport_msw >> 24);
+			m_rex3.m_iter_x++;
 		}
-		x += length;
-		if (x > (m_rex3.m_xy_end_i >> 16))
+		if (m_rex3.m_iter_x > (m_rex3.m_xy_end_i >> 16))
 		{
-			y++;
-			x = m_rex3.m_x_save;
+			m_rex3.m_iter_y++;
+			m_rex3.m_iter_x = m_rex3.m_x_save;
 		}
-		m_rex3.m_xy_start_i = (x << 16) | y;
-		m_rex3.m_x_start_i = x;
+		m_rex3.m_xy_start_i = (m_rex3.m_iter_x << 16) | m_rex3.m_iter_y;
+		m_rex3.m_x_start_i = m_rex3.m_iter_x;
 		m_rex3.m_x_start = ((m_rex3.m_xy_start_i & 0xffff0000) >>  5);
 		m_rex3.m_y_start = ((m_rex3.m_xy_start_i & 0x0000ffff) << 11);
 		break;
 	}
-	case 0x00000045:
+	case 0x00000045: // ColorHost, Block, Read
 	{
 		m_rex3.m_read_active = true;
 		break;
 	}
-	case 0x00000102:
-	case 0x00000122:
+	case 0x00000102: // StopOnX, Span, Draw
+	case 0x00000122: // StopOnX, DoSetup, Span, Draw
 	{
+		end_x += dx;
+		end_y += dy;
+
 		uint32_t color = m_rex3.m_zero_fract & 0xff;
-		LOGMASKED(LOG_COMMANDS, "%04x, %04x to %04x, %04x = %08x\n", start_x, start_y, end_x, end_y, color);
-		for (uint16_t y = start_y; y <= end_y; y++)
+		LOGMASKED(LOG_COMMANDS, "%04x, %04x to %04x, %04x = %08x\n", m_rex3.m_iter_x, m_rex3.m_iter_y, end_x, end_y, color);
+		for (; m_rex3.m_iter_x != end_x; m_rex3.m_iter_x += dx)
 		{
-			for (uint16_t x = start_x; x <= end_x; x++)
-			{
-				write_pixel(x, y, color);
-			}
+			write_pixel(m_rex3.m_iter_x, m_rex3.m_iter_y, color);
 		}
+		m_rex3.m_iter_y++;
+
+		m_rex3.m_xy_start_i = (m_rex3.m_iter_x << 16) | m_rex3.m_iter_y;
+		m_rex3.m_x_start_i = m_rex3.m_iter_x;
+		m_rex3.m_x_start = ((m_rex3.m_xy_start_i & 0xffff0000) >>  5);
+		m_rex3.m_y_start = ((m_rex3.m_xy_start_i & 0x0000ffff) << 11);
 		break;
 	}
-	case 0x00000326:
+	case 0x00000326: // StopOnX, StopOnY, DoSetup, Block, Draw
 	{
+		end_x += dx;
+		end_y += dy;
+
 		uint32_t color = m_rex3.m_zero_fract & 0xff;
 		if (BIT(mode1, 17))
 		{
 			color = m_rex3.m_color_vram & 0xff;
 		}
-		LOGMASKED(LOG_COMMANDS, "%04x, %04x to %04x, %04x = %08x\n", start_x, start_y, end_x, end_y, m_cmap0.m_palette[m_rex3.m_zero_fract]);
-		for (uint16_t y = start_y; y <= end_y; y++)
+		LOGMASKED(LOG_COMMANDS, "%04x, %04x to %04x, %04x = %08x\n", m_rex3.m_iter_x, m_rex3.m_iter_y, end_x, end_y, m_cmap0.m_palette[color]);
+		for (; m_rex3.m_iter_y != end_y; m_rex3.m_iter_y += dy)
 		{
-			for (uint16_t x = start_x; x <= end_x; x++)
+			for (m_rex3.m_iter_x = m_rex3.m_x_start_i; m_rex3.m_iter_x != end_x; m_rex3.m_iter_x += dx)
 			{
-				write_pixel(x, y, color);
+				write_pixel(m_rex3.m_iter_x, m_rex3.m_iter_y, color);
 			}
 		}
+
+		m_rex3.m_xy_start_i = (m_rex3.m_iter_x << 16) | m_rex3.m_iter_y;
+		m_rex3.m_x_start_i = m_rex3.m_iter_x;
+		m_rex3.m_x_start = ((m_rex3.m_xy_start_i & 0xffff0000) >>  5);
+		m_rex3.m_y_start = ((m_rex3.m_xy_start_i & 0x0000ffff) << 11);
 		break;
 	}
-	case 0x00000327:
+	case 0x00000327: // StopOnX, StopOnY, DoSetup, Block, Scr2Scr
 	{
 		int16_t move_x = (int16_t)((m_rex3.m_xy_move >> 16) & 0x0000ffff);
 		int16_t move_y = (int16_t)m_rex3.m_xy_move;
-		LOGMASKED(LOG_COMMANDS, "%04x, %04x - %04x, %04x to %04x, %04x\n", start_x, start_y, end_x, end_y, start_x + move_x, start_y + move_y);
-		for (uint16_t y = start_y; y <= end_y; y++)
+		end_x += dx;
+		end_y += dy;
+		LOGMASKED(LOG_COMMANDS, "%04x, %04x - %04x, %04x to %04x, %04x\n", m_rex3.m_iter_x, m_rex3.m_iter_y, end_x, end_y,
+			m_rex3.m_iter_x + move_x, m_rex3.m_iter_y + move_y);
+		for (; m_rex3.m_iter_y != end_y; m_rex3.m_iter_y += dy)
 		{
-			for (uint16_t x = start_x; x <= end_x; x++)
+			for (m_rex3.m_iter_x = m_rex3.m_x_start_i; m_rex3.m_iter_x != end_x; m_rex3.m_iter_x += dx)
 			{
-				write_pixel(x + move_x, y + move_y, m_base[y * (1280 + 64) + x]);
+				write_pixel(m_rex3.m_iter_x + move_x, m_rex3.m_iter_y + move_y, m_base[m_rex3.m_iter_y * (1280 + 64) + m_rex3.m_iter_x]);
 			}
 		}
 		break;
 	}
-	case 0x0000032a:
-	case 0x00000b2a:
-		LOGMASKED(LOG_COMMANDS, "ILine: %04x, %04x to %04x, %04x = %08x\n", start_x, start_y, end_x, end_y, m_cmap0.m_palette[m_rex3.m_zero_fract]);
-		if (start_x == end_x)
+	case 0x0000032a: // StopOnX, StopOnY, DoSetup, I_Line, Draw
+	case 0x00000b2a: // SkipLast, StopOnX, StopOnY, DoSetup, I_Line, Draw
+	{
+		LOGMASKED(LOG_COMMANDS, "ILine: %04x, %04x to %04x, %04x = %08x\n", m_rex3.m_iter_x, m_rex3.m_iter_y, end_x, end_y, m_cmap0.m_palette[m_rex3.m_zero_fract]);
+		if (m_rex3.m_iter_x == end_x)
 		{
-			do_v_iline(start_x, start_y, end_y, m_cmap0.m_palette[m_rex3.m_zero_fract], BIT(mode0, 11));
+			do_v_iline(m_rex3.m_iter_x, m_rex3.m_iter_y, end_y, m_cmap0.m_palette[m_rex3.m_zero_fract], BIT(mode0, 11));
 		}
-		else if (start_y == end_y)
+		else if (m_rex3.m_iter_y == end_y)
 		{
-			do_h_iline(start_x, start_y, end_x, m_cmap0.m_palette[m_rex3.m_zero_fract], BIT(mode0, 11));
+			do_h_iline(m_rex3.m_iter_x, m_rex3.m_iter_y, end_x, m_cmap0.m_palette[m_rex3.m_zero_fract], BIT(mode0, 11));
 		}
 		else
 		{
-			do_iline(start_x, start_y, end_x, end_y, m_cmap0.m_palette[m_rex3.m_zero_fract], BIT(mode0, 11));
+			do_iline(m_rex3.m_iter_x, m_rex3.m_iter_y, end_x, end_y, m_cmap0.m_palette[m_rex3.m_zero_fract], BIT(mode0, 11));
 		}
 		break;
-	case 0x00002106:
-	case 0x00009106:
-	case 0x00022106:
-	case 0x00029106:
+	}
+	case 0x00002106: // EnLSPattern, StopOnX, Block, Draw
+	case 0x00009106: // Length32, EnZPattern, StopOnX, Block, Draw
+	case 0x00022106: // LSOpaque, EnLSPattern, StopOnX, Block, Draw
+	case 0x00019106: // ZPOpaque, EnLSPattern, StopOnX, Block, Draw
 	{
-		const bool opaque = (mode0 == 0x00029106) || (mode0 == 0x00022106);
-		const uint32_t pattern = (mode0 == 0x00009106 || mode0 == 0x00029106) ? m_rex3.m_z_pattern : m_rex3.m_ls_pattern;
+		const bool opaque = (mode0 == 0x00019106) || (mode0 == 0x00022106);
+		const uint32_t pattern = BIT(mode0, 12) ? m_rex3.m_z_pattern : m_rex3.m_ls_pattern;
 		const uint8_t foreground = m_rex3.m_zero_fract & 0xff;
 		const uint8_t background = m_rex3.m_color_back & 0xff;
-		LOGMASKED(LOG_COMMANDS, "%08x at %04x, %04x color %08x\n", pattern, m_rex3.m_xy_start_i >> 16, (uint16_t)m_rex3.m_xy_start_i, foreground);
-		for (uint16_t x = start_x; x <= end_x && x < (start_x + 32); x++)
+		LOGMASKED(LOG_COMMANDS, "%08x at %04x (%04x), %04x (%04x) color %08x\n", pattern, m_rex3.m_xy_start_i >> 16, m_rex3.m_iter_x,
+			(uint16_t)m_rex3.m_xy_start_i, m_rex3.m_iter_y, foreground);
+		end_x += dx;
+		int16_t end = end_x;
+		if (BIT(mode0, 15))
 		{
-			if (pattern & (1 << (31 - (x - start_x))))
+			if ((end_x - m_rex3.m_iter_x) >= 32)
 			{
-				write_pixel(x, start_y, foreground);
+				end = m_rex3.m_x_start_i + 31;
+			}
+		}
+		for (; m_rex3.m_iter_x != end; m_rex3.m_iter_x += dx)
+		{
+			if (pattern & (1 << (31 - (m_rex3.m_iter_x - m_rex3.m_x_start_i))))
+			{
+				write_pixel(m_rex3.m_iter_x, m_rex3.m_iter_y, foreground);
 			}
 			else if (opaque)
 			{
-				write_pixel(x, start_y, background);
+				write_pixel(m_rex3.m_iter_x, m_rex3.m_iter_y, background);
 			}
 		}
 		if (BIT(m_rex3.m_bres_octant_inc1, 24))
-			start_y--;
+			m_rex3.m_iter_y--;
 		else
-			start_y++;
-		m_rex3.m_xy_start_i = (start_x << 16) | start_y;
+			m_rex3.m_iter_y++;
+		m_rex3.m_iter_x = m_rex3.m_x_start_i;
+		m_rex3.m_xy_start_i = (m_rex3.m_iter_x << 16) | m_rex3.m_iter_y;
 		m_rex3.m_y_start = ((m_rex3.m_xy_start_i & 0x0000ffff) << 11);
 		break;
 	}
@@ -1747,6 +1813,8 @@ WRITE32_MEMBER(newport_video_device::rex3_w)
 		m_rex3.m_x_save = m_rex3.m_x_start_i;
 		m_rex3.m_x_start = ((m_rex3.m_xy_start_i & 0xffff0000) >>  5);
 		m_rex3.m_y_start = ((m_rex3.m_xy_start_i & 0x0000ffff) << 11);
+		m_rex3.m_iter_x = data >> 16;
+		m_rex3.m_iter_y = (uint16_t)data;
 		break;
 	case 0x0154/4:
 		LOGMASKED(LOG_REX3, "REX3 XYEnd (integer) Write: %08x\n", data);
@@ -1762,6 +1830,7 @@ WRITE32_MEMBER(newport_video_device::rex3_w)
 		m_rex3.m_x_save = m_rex3.m_x_start_i;
 		m_rex3.m_x_start = ((m_rex3.m_x_start_end_i & 0xffff0000) >>  5);
 		m_rex3.m_x_end   = ((m_rex3.m_x_start_end_i & 0x0000ffff) << 11);
+		m_rex3.m_iter_x = data >> 16;
 		break;
 	case 0x0200/4:
 		LOGMASKED(LOG_REX3, "REX3 Red/CI Full State Write: %08x\n", data);

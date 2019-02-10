@@ -148,6 +148,8 @@ private:
 		uint32_t m_clip_mode;
 		uint32_t m_config;
 		uint32_t m_status;
+		int16_t m_iter_x;
+		int16_t m_iter_y;
 		uint8_t m_xfer_width;
 		bool m_read_active;
 	};
@@ -173,9 +175,9 @@ private:
 	DECLARE_WRITE32_MEMBER(vc2_w);
 
 	void write_pixel(uint32_t x, uint32_t y, uint8_t color);
-	void do_v_iline(int x1, int y1, int y2, uint8_t color, bool skip_last);
-	void do_h_iline(int x1, int y1, int x2, uint8_t color, bool skip_last);
-	void do_iline(int x1, int y1, int x2, int y2, uint8_t color, bool skip_last);
+	void do_v_iline(uint16_t x1, uint16_t y1, uint16_t y2, uint8_t color, bool skip_last);
+	void do_h_iline(uint16_t x1, uint16_t y1, uint16_t x2, uint8_t color, bool skip_last);
+	void do_iline(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint8_t color, bool skip_last);
 	uint8_t do_pixel_read();
 	uint32_t do_pixel_word_read();
 	void do_rex3_command();

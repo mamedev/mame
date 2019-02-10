@@ -7,14 +7,7 @@
 *  Known Issues:
 *  - The proper hookup for the MAC address is unknown, requiring
 *    a fake MAC to be set up before any IRIX installers will proceed.
-*  - The IRIX 6.5.x installer kernel-panics on startup.
-*  - The IRIX 5.3 installer hangs after loading.
 *  - The Gentoo Linux live CD hangs on starting the kernel.
-*  - The disk formatting/partitioning utility for IRIX, fx, has
-*    various issues, from the disk formatting too quickly to hanging
-*    when exercising the disk.
-*  - Disk accesses frequently result in a "SYNC negotiation error"
-*    message.
 *
 *  Memory map:
 *
