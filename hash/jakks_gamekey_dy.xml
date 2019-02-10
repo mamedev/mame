@@ -12,7 +12,7 @@
 		<year>2005</year>
 		<publisher>JAKKS Pacific / HotGen Ltd</publisher>
 		<part name="cart" interface="jakks_gamekey">
-      <feature name="slot" value="rom_24lc04"/>
+			<feature name="slot" value="rom_24lc04"/>
 			<dataarea name="rom" size="0x800000">
 				<rom name="dy_disneygkbowlinggoofy.bin" size="0x200000" crc="d2147aa4" sha1="0db986aac68868a2ff4936e93178da8c592ac81d" offset="0" />
 				<rom size="0x200000" offset="0x200000" loadflag="reload" />
@@ -27,7 +27,7 @@
 		<year>2005</year>
 		<publisher>JAKKS Pacific / HotGen Ltd</publisher>
 		<part name="cart" interface="jakks_gamekey">
-      <feature name="slot" value="rom_24lc04"/>
+			<feature name="slot" value="rom_24lc04"/>
 			<dataarea name="rom" size="0x800000">
 				<rom name="dy_disneygktennisfacechase.bin" size="0x200000" crc="ba37ccf2" sha1="c7204a0499b6949f3f70f0f5c042d353435406fb" offset="0" />
 				<rom size="0x200000" offset="0x200000" loadflag="reload" />
@@ -42,8 +42,8 @@
 		<year>2005</year>
 		<publisher>JAKKS Pacific / HotGen Ltd</publisher>
 		<part name="cart" interface="jakks_gamekey">
+			<feature name="slot" value="rom_24lc04"/>
 			<dataarea name="rom" size="0x800000">
-      <feature name="slot" value="rom_24lc04"/>
 				<rom name="disneygktennisfaceagrabah.bin" size="0x200000" crc="f3fd0759" sha1="1272e7e34acfce5dbe55b39bff888f5dd16c63f9" offset="0" />
 				<rom size="0x200000" offset="0x200000" loadflag="reload" />
 				<rom size="0x200000" offset="0x400000" loadflag="reload" />
