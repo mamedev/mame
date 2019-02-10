@@ -176,6 +176,7 @@ public:
 	void jakks_gkr_dp(machine_config &config);
 	void jakks_gkr_sw(machine_config &config);
 	void jakks_gkr_nm(machine_config &config);
+	void jakks_gkr_wf(machine_config &config);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(i2c_gkr_r);
 
@@ -520,6 +521,29 @@ static INPUT_PORTS_START( jak_nm )
 
 	PORT_START("DIALX") // for Pole Position, joystick can be twisted like a dial/wheel (limited?) (check range)
 	PORT_BIT(0x0fff, 0x0000, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_MINMAX(0x00,0x0fff)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( jak_wf )
+	PORT_START("P1")
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_PLAYER(1)
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1)
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1)
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON3 )
+
+	PORT_START("P3")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, jakks_gkr_state,i2c_gkr_r, nullptr)
+	PORT_BIT( 0xfffe, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	/* on real unit you can spin the wheel (and must make sure it completes a full circle, or you lose your turn) instead of pressing 'B' for a random spin but where does it map?
+	PORT_START("DIALX")
+	PORT_BIT(0x0fff, 0x0000, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_MINMAX(0x00,0x0fff)
+
+	PORT_START("DIALY")
+	PORT_BIT(0x0fff, 0x0000, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_MINMAX(0x00,0x0fff)
+	*/
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( jak_gkr )
@@ -1072,6 +1096,15 @@ void jakks_gkr_state::jakks_gkr_nm(machine_config &config)
 	SOFTWARE_LIST(config, "jakks_gamekey_nm").set_original("jakks_gamekey_nm");
 }
 
+void jakks_gkr_state::jakks_gkr_wf(machine_config &config)
+{
+	jakks_gkr(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &jakks_gkr_state::mem_map_1m);
+	//m_spg->adc_in<0>().set_ioport("DIALX"); // wheel does not seem to map here
+	//m_spg->adc_in<1>().set_ioport("DIALY");
+	//SOFTWARE_LIST(config, "jakks_gamekey_wf").set_original("jakks_gamekey_wf"); // no game keys were released
+}
+
 
 void spg2xx_game_state::walle(machine_config &config)
 {
@@ -1164,6 +1197,11 @@ ROM_END
 ROM_START( jak_dora )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "jakksdoragkr.bin", 0x000000, 0x200000, CRC(bcaa132d) SHA1(3894b980fbc4144731b2a7a94acebb29e30de67c) )
+ROM_END
+
+ROM_START( jak_wof )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jakkswheeloffortunegkr.bin", 0x000000, 0x200000, CRC(6a879620) SHA1(95478764a61741569041c2299528f6464651d593) )
 ROM_END
 
 ROM_START( jak_disf )
@@ -1403,6 +1441,7 @@ CONS( 2005, jak_disp, 0, 0, jakks_gkr_dp, jak_disp, jakks_gkr_state, empty_init,
 CONS( 2005, jak_sith, 0, 0, jakks_gkr_sw, jak_sith, jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Griptonite Games",    "Star Wars - Revenge of the Sith (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // uses SW keys (1 released)
 CONS( 2005, jak_dbz,  0, 0, jakks_gkr_1m, jak_gkr,  jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Handheld Games",      "Dragon Ball Z (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // DB (no game-keys released, 1 in development but cancelled)
 CONS( 2004, jak_mpac, 0, 0, jakks_gkr_nm, jak_nm,   jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Namco / HotGen Ltd",  "Ms. Pac-Man 5-in-1 (Ms. Pac-Man, Pole Position, Galaga, Xevious, Mappy) (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // uses NM (3 keys available [Dig Dug, New Rally-X], [Rally-X, Pac-Man, Bosconian], [Pac-Man, Bosconian])
+CONS( 2005, jak_wof,  0, 0, jakks_gkr_wf, jak_wf,   jakks_gkr_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",          "Wheel of Fortune (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // uses WF lkeys (no game-keys released)
 
 // Nicktoons                                   NK (3 keys available) (same keys as Dora the Explorer)
 // SpongeBob SquarePants: The Fry Cook Games   NK (3 keys available)  ^^                
@@ -1410,8 +1449,7 @@ CONS( 2004, jak_mpac, 0, 0, jakks_gkr_nm, jak_nm,   jakks_gkr_state, empty_init,
 
 // no keys released for the following, some were in development but cancelled
 // Capcom 3-in-1                               CC (no game-keys released)
-// Care Bears                                  CB (no game-keys released)
-// Wheel of Fortune                            WF (no game-keys released)
+// Care Bears                                  CB (no game-keys released)                           
 // Winnie the Pooh                             WP (no game-keys released)
 
 // Radica TV games
