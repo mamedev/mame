@@ -14,16 +14,18 @@
 #pragma once
 
 #include "machine/eepromser.h"
+#include "machine/hpc3.h"
 
 class sgi_mc_device : public device_t
 {
 public:
-	template <typename T, typename U>
-	sgi_mc_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag, U &&eeprom_tag)
+	template <typename T, typename U, typename V>
+	sgi_mc_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag, U &&eeprom_tag, V &&hpc3_tag)
 		: sgi_mc_device(mconfig, tag, owner, (uint32_t)0)
 	{
 		m_maincpu.set_tag(std::forward<T>(cpu_tag));
 		m_eeprom.set_tag(std::forward<U>(eeprom_tag));
+		m_hpc3.set_tag(std::forward<V>(hpc3_tag));
 	}
 
 	sgi_mc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -49,6 +51,7 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<hpc3_device> m_hpc3;
 
 	address_space *m_space;
 

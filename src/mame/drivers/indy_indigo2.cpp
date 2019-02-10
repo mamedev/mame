@@ -220,7 +220,7 @@ void ip22_state::ip22_base(machine_config &config)
 
 	NEWPORT_VIDEO(config, m_newport, m_maincpu, m_hpc3);
 
-	SGI_MC(config, m_mem_ctrl, m_maincpu, ":hpc3:eeprom");
+	SGI_MC(config, m_mem_ctrl, m_maincpu, ":hpc3:eeprom", m_hpc3);
 
 	NSCSI_BUS(config, "scsibus", 0);
 	NSCSI_CONNECTOR(config, "scsibus:0").option_set("wd33c93", WD33C93B)

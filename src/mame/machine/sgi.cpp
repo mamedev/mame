@@ -31,6 +31,7 @@ sgi_mc_device::sgi_mc_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, SGI_MC, tag, owner, clock)
 	, m_maincpu(*this, finder_base::DUMMY_TAG)
 	, m_eeprom(*this, finder_base::DUMMY_TAG)
+	, m_hpc3(*this, finder_base::DUMMY_TAG)
 	, m_rpss_timer(nullptr)
 	, m_dma_timer(nullptr)
 	, m_watchdog(0)
@@ -194,7 +195,7 @@ uint32_t sgi_mc_device::dma_translate(uint32_t address)
 {
 	for (int entry = 0; entry < 4; entry++)
 	{
-		if ((address & 0xfff00000) == (m_dma_tlb_entry_hi[entry] & 0xfff00000))
+		if ((address & 0xffc00000) == (m_dma_tlb_entry_hi[entry] & 0xffc00000))
 		{
 			const uint32_t offset = address - m_dma_tlb_entry_hi[entry];
 			return ((m_dma_tlb_entry_lo[entry] &~ 0x3f) << 6) + (offset & 0xfff);
@@ -241,7 +242,7 @@ void sgi_mc_device::dma_tick()
 			shift -= 8;
 		}
 
-		m_space->write_byte(m_dma_gio64_addr, data);
+		m_space->write_dword(m_dma_gio64_addr, data);
 		m_dma_mem_addr += length;
 		m_dma_count -= length;
 	}
@@ -264,6 +265,10 @@ void sgi_mc_device::dma_tick()
 				m_dma_timer->adjust(attotime::never);
 				m_dma_run |= (1 << 3);
 				m_dma_run &= ~(1 << 6);
+				if (BIT(m_dma_control, 4))
+				{
+					m_hpc3->raise_local_irq(3, 1 << 4);
+				}
 			}
 			else
 			{
@@ -571,6 +576,10 @@ WRITE32_MEMBER( sgi_mc_device::write )
 	case 0x0168/4:
 		LOGMASKED(LOG_WRITES | LOG_DMA, "%s: DMA Control Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		m_dma_control = data;
+		if (!BIT(m_dma_control, 4))
+		{
+			m_hpc3->lower_local_irq(3, 1 << 4);
+		}
 		break;
 	case 0x0180/4:
 		LOGMASKED(LOG_WRITES | LOG_DMA, "%s: DMA TLB Entry 0 High Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
