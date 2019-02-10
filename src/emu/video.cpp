@@ -1037,7 +1037,7 @@ osd_ticks_t video_manager::throttle_until_ticks(osd_ticks_t target_ticks)
 {
 	// we're allowed to sleep via the OSD code only if we're configured to do so
 	// and we're not frameskipping due to autoframeskip, or if we're paused
-	bool const allowed_to_sleep = (machine().options().sleep() && (!effective_autoframeskip() || effective_frameskip() == 0)) || machine().paused();
+	bool const allowed_to_sleep = machine().options().sleep() || machine().paused();
 
 	// loop until we reach our target
 	g_profiler.start(PROFILER_IDLE);
