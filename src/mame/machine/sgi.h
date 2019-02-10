@@ -41,14 +41,19 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	static const device_timer_id TIMER_RPSS = 0;
+	static const device_timer_id TIMER_DMA = 1;
 
 private:
 	uint32_t dma_translate(uint32_t address);
+	void dma_tick();
 
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 
+	address_space *m_space;
+
 	emu_timer *m_rpss_timer;
+	emu_timer *m_dma_timer;
 
 	uint32_t m_cpu_control[2];
 	uint32_t m_watchdog;
@@ -82,7 +87,7 @@ private:
 	uint32_t m_dma_gio64_addr;
 	uint32_t m_dma_mode;
 	uint32_t m_dma_count;
-	uint32_t m_dma_running;
+	uint32_t m_dma_run;
 	uint32_t m_eeprom_ctrl;
 	uint32_t m_semaphore[16];
 	int m_rpss_divide_counter;

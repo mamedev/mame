@@ -32,6 +32,7 @@ sgi_mc_device::sgi_mc_device(const machine_config &mconfig, const char *tag, dev
 	, m_maincpu(*this, finder_base::DUMMY_TAG)
 	, m_eeprom(*this, finder_base::DUMMY_TAG)
 	, m_rpss_timer(nullptr)
+	, m_dma_timer(nullptr)
 	, m_watchdog(0)
 	, m_sys_id(0)
 	, m_rpss_divider(0)
@@ -60,7 +61,7 @@ sgi_mc_device::sgi_mc_device(const machine_config &mconfig, const char *tag, dev
 	, m_dma_gio64_addr(0)
 	, m_dma_mode(0)
 	, m_dma_count(0)
-	, m_dma_running(0)
+	, m_dma_run(0)
 	, m_eeprom_ctrl(0)
 	, m_rpss_divide_counter(0)
 	, m_rpss_divide_count(0)
@@ -86,6 +87,9 @@ void sgi_mc_device::device_start()
 
 	m_rpss_timer = timer_alloc(TIMER_RPSS);
 	m_rpss_timer->adjust(attotime::never);
+
+	m_dma_timer = timer_alloc(TIMER_DMA);
+	m_dma_timer->adjust(attotime::never);
 
 	save_item(NAME(m_cpu_control));
 	save_item(NAME(m_watchdog));
@@ -119,7 +123,7 @@ void sgi_mc_device::device_start()
 	save_item(NAME(m_dma_gio64_addr));
 	save_item(NAME(m_dma_mode));
 	save_item(NAME(m_dma_count));
-	save_item(NAME(m_dma_running));
+	save_item(NAME(m_dma_run));
 	save_item(NAME(m_eeprom_ctrl));
 	save_item(NAME(m_semaphore));
 	save_item(NAME(m_rpss_divide_counter));
@@ -165,13 +169,15 @@ void sgi_mc_device::device_reset()
 	m_dma_gio64_addr = 0;
 	m_dma_mode = 0;
 	m_dma_count = 0;
-	m_dma_running = 0;
+	m_dma_run = 0;
 	m_eeprom_ctrl = 0;
 	memset(m_semaphore, 0, sizeof(uint32_t) * 16);
 	m_rpss_timer->adjust(attotime::from_hz(10000000), 0, attotime::from_hz(10000000));
 	m_rpss_divide_counter = 4;
 	m_rpss_divide_count = 4;
 	m_rpss_increment = 1;
+
+	m_space = &m_maincpu->space(AS_PROGRAM);
 }
 
 void sgi_mc_device::set_cpu_buserr(uint32_t address)
@@ -191,10 +197,89 @@ uint32_t sgi_mc_device::dma_translate(uint32_t address)
 		if ((address & 0xfff00000) == (m_dma_tlb_entry_hi[entry] & 0xfff00000))
 		{
 			const uint32_t offset = address - m_dma_tlb_entry_hi[entry];
-			return ((m_dma_tlb_entry_lo[entry] &~ 0x3f) << 6) + offset;
+			return ((m_dma_tlb_entry_lo[entry] &~ 0x3f) << 6) + (offset & 0xfff);
 		}
 	}
 	return 0;
+}
+
+void sgi_mc_device::dma_tick()
+{
+	uint32_t addr = m_dma_mem_addr;
+	if (m_dma_control & (1 << 8))
+	{	// Enable virtual address translation
+		addr = dma_translate(addr);
+	}
+
+	if (m_dma_mode & (1 << 1))
+	{	// Graphics to host
+		if (m_dma_mode & (1 << 3))
+		{	// Fill mode
+			m_space->write_dword(addr, m_dma_gio64_addr);
+			m_dma_count -= 4;
+		}
+		else
+		{
+			m_space->write_byte(addr, m_space->read_byte(m_dma_gio64_addr));
+			m_dma_mem_addr++;
+			m_dma_count--;
+		}
+	}
+	else
+	{	// Host to graphics
+		const uint32_t remaining = m_dma_count & 0x0000ffff;
+		uint32_t length = 4;
+		uint32_t shift = 24;
+		if (remaining < 4)
+			length = remaining;
+
+		uint32_t data = 0;
+		for (uint32_t i = 0; i < length; i++)
+		{
+			data |= m_space->read_byte(addr) << shift;
+			addr++;
+			shift -= 8;
+		}
+
+		m_space->write_byte(m_dma_gio64_addr, data);
+		m_dma_mem_addr += length;
+		m_dma_count -= length;
+	}
+
+	if ((m_dma_count & 0x0000ffff) == 0)
+	{	// If remaining byte count is 0, deduct zoom count
+		if (!BIT(m_dma_mode, 3))
+			logerror("Remaining DMA byte count is 0, count register contains %08x, deducting a zoom line\n", m_dma_count);
+		m_dma_count -= 0x00010000;
+		if (m_dma_count == 0)
+		{	// If remaining zoom count is also 0, move to next line
+			m_dma_mem_addr += m_dma_stride & 0x0000ffff;
+			m_dma_size -= 0x00010000;
+			if (!BIT(m_dma_mode, 3))
+				logerror("Remaining DMA zoom count is also 0, deducting a line, DMA size now %08x\n", m_dma_size);
+			if ((m_dma_size & 0xffff0000) == 0)
+			{	// If no remaining lines, DMA is done.
+				if (!BIT(m_dma_mode, 3))
+					logerror("No remaining lines, DMA is done\n");
+				m_dma_timer->adjust(attotime::never);
+				m_dma_run |= (1 << 3);
+				m_dma_run &= ~(1 << 6);
+			}
+			else
+			{
+				m_dma_count = (m_dma_stride & 0x03ff0000) | (m_dma_size & 0x0000ffff);
+				if (!BIT(m_dma_mode, 3))
+					logerror("Reloading DMA count with %08x\n", m_dma_count);
+			}
+		}
+		else
+		{	// If remaining zoom count is non-zero, reload byte count and return source address to the beginning of the line.
+			m_dma_count |= m_dma_size & 0x0000ffff;
+			m_dma_mem_addr -= m_dma_size & 0x0000ffff;
+			if (!BIT(m_dma_mode, 3))
+				logerror("Remaining DMA zoom count is non-zero, returning source address to beginning, DMA count now %08x\n", m_dma_count);
+		}
+	}
 }
 
 READ32_MEMBER(sgi_mc_device::read)
@@ -336,16 +421,13 @@ READ32_MEMBER(sgi_mc_device::read)
 		LOGMASKED(LOG_READS | LOG_DMA, "%s: DMA Start Read\n", machine().describe_context());
 		return 0;
 	case 0x2048/4:
-		LOGMASKED(LOG_READS | LOG_DMA, "%s: VDMA Running Read: %08x & %08x\n", machine().describe_context(), m_dma_running, mem_mask);
-		if (m_dma_running == 1)
+	{
+		if (!(m_dma_run & 0x40))
 		{
-			m_dma_running = 0;
-			return 0x00000040;
+			LOGMASKED(LOG_READS | LOG_DMA, "%s: DMA Run Read: %08x & %08x\n", machine().describe_context(), m_dma_run, mem_mask);
 		}
-		else
-		{
-			return 0;
-		}
+		return m_dma_run;
+	}
 	case 0x10000/4:
 	case 0x11000/4:
 	case 0x12000/4:
@@ -532,10 +614,14 @@ WRITE32_MEMBER( sgi_mc_device::write )
 		break;
 	case 0x2010/4:
 		LOGMASKED(LOG_WRITES | LOG_DMA, "%s: DMA Line Count and Width Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		m_dma_count &= 0xffff0000;
+		m_dma_count |= data & 0x0000ffff;
 		m_dma_size = data;
 		break;
 	case 0x2018/4:
 		LOGMASKED(LOG_WRITES | LOG_DMA, "%s: DMA Line Zoom and Stride Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		m_dma_count &= 0x0000ffff;
+		m_dma_count |= data & 0x03ff0000;
 		m_dma_stride = data;
 		break;
 	case 0x2020/4:
@@ -546,25 +632,8 @@ WRITE32_MEMBER( sgi_mc_device::write )
 	{
 		LOGMASKED(LOG_WRITES | LOG_DMA, "%s: DMA GIO64 Address Write + Start DMA: %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		m_dma_gio64_addr = data;
-		m_dma_running = 1;
-		if (m_dma_gio64_addr == 0x1f0f0a30)
-		{
-			address_space &space = m_maincpu->space(AS_PROGRAM);
-			const uint32_t line_count = m_dma_size >> 16;
-			const uint32_t line_size = (uint16_t)m_dma_size;
-			const uint32_t line_stride = (uint16_t)m_dma_stride;
-			uint32_t src_addr = m_dma_mem_addr;
-			machine().debug_break();
-			for (uint32_t line = 0; line < line_count; line++)
-			{
-				for (uint32_t i = 0; i < line_size; i++)
-				{
-					space.write_dword(m_dma_gio64_addr, space.read_dword(dma_translate(src_addr)));
-					src_addr += 4;
-				}
-				src_addr += line_stride;
-			}
-		}
+		m_dma_run |= 0x40;
+		m_dma_timer->adjust(attotime::from_hz(33333333), 0, attotime::from_hz(33333333));
 		break;
 	}
 	case 0x2030/4:
@@ -577,14 +646,18 @@ WRITE32_MEMBER( sgi_mc_device::write )
 		break;
 	case 0x2040/4:
 		LOGMASKED(LOG_WRITES | LOG_DMA, "%s: DMA Start Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
-		// Start DMA
-		m_dma_running = 1;
+		m_dma_run |= 0x40;
+		m_dma_timer->adjust(attotime::from_hz(33333333), 0, attotime::from_hz(33333333));
 		break;
 	case 0x2070/4:
 		LOGMASKED(LOG_WRITES | LOG_DMA, "%s: DMA GIO64 Address Write + Default Params Write + Start DMA: %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		m_dma_gio64_addr = data;
-		// Start DMA
-		m_dma_running = 1;
+		m_dma_size = 0x0001000c;
+		m_dma_stride = 0x00010000;
+		m_dma_count = 0x0001000c;
+		m_dma_mode = 0x00000028;
+		m_dma_run |= 0x40;
+		m_dma_timer->adjust(attotime::from_hz(33333333), 0, attotime::from_hz(33333333));
 		break;
 	case 0x10000/4:
 	case 0x11000/4:
@@ -624,5 +697,9 @@ void sgi_mc_device::device_timer(emu_timer &timer, device_timer_id id, int param
 			m_rpss_divide_counter = m_rpss_divide_count;
 			m_rpss_counter += m_rpss_increment;
 		}
+	}
+	else if (id == TIMER_DMA)
+	{
+		dma_tick();
 	}
 }

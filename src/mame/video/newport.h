@@ -99,8 +99,6 @@ private:
 		uint32_t m_color_back;
 		uint32_t m_color_vram;
 		uint32_t m_alpha_ref;
-		uint32_t m_smask0_x;
-		uint32_t m_smask0_y;
 		uint32_t m_setup;
 		uint32_t m_step_z;
 		uint32_t m_x_start;
@@ -143,14 +141,8 @@ private:
 		uint32_t m_dcb_slave_select;
 		uint32_t m_dcb_data_msw;
 		uint32_t m_dcb_data_lsw;
-		uint32_t m_s_mask1_x;
-		uint32_t m_s_mask1_y;
-		uint32_t m_s_mask2_x;
-		uint32_t m_s_mask2_y;
-		uint32_t m_s_mask3_x;
-		uint32_t m_s_mask3_y;
-		uint32_t m_s_mask4_x;
-		uint32_t m_s_mask4_y;
+		uint32_t m_smask_x[5];
+		uint32_t m_smask_y[5];
 		uint32_t m_top_scanline;
 		uint32_t m_xy_window;
 		uint32_t m_clip_mode;
@@ -180,10 +172,12 @@ private:
 	DECLARE_READ32_MEMBER(vc2_r);
 	DECLARE_WRITE32_MEMBER(vc2_w);
 
+	void write_pixel(uint32_t x, uint32_t y, uint8_t color);
 	void do_v_iline(int x1, int y1, int y2, uint8_t color, bool skip_last);
 	void do_h_iline(int x1, int y1, int x2, uint8_t color, bool skip_last);
 	void do_iline(int x1, int y1, int x2, int y2, uint8_t color, bool skip_last);
 	uint8_t do_pixel_read();
+	uint32_t do_pixel_word_read();
 	void do_rex3_command();
 
 	required_device<cpu_device> m_maincpu;
