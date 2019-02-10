@@ -272,8 +272,7 @@ WRITE8_MEMBER(sorcerer_state::port_fe_w)
 	// bit 6 baud rate */
 	if (BIT(changed_bits, 6))
 	{
-		m_uart->set_receiver_clock(BIT(data, 6) ? ES_UART_CLOCK*4 : ES_UART_CLOCK);
-		m_uart->set_transmitter_clock(BIT(data, 6) ? ES_UART_CLOCK*4 : ES_UART_CLOCK);
+		m_uart_clock->set_unscaled_clock(BIT(data, 6) ? ES_UART_CLOCK*4 : ES_UART_CLOCK);
 	}
 }
 

@@ -14,6 +14,7 @@
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
 #include "machine/ay31015.h"
+#include "machine/clock.h"
 #include "machine/ram.h"
 #include "machine/z80pio.h"
 
@@ -701,10 +702,12 @@ void nascom_state::nascom(machine_config &config)
 
 	// uart
 	AY31015(config, m_hd6402);
-	m_hd6402->set_tx_clock((16_MHz_XTAL / 16) / 256);
-	m_hd6402->set_rx_clock((16_MHz_XTAL / 16) / 256);
 	m_hd6402->read_si_callback().set(FUNC(nascom_state::nascom1_hd6402_si));
 	m_hd6402->write_so_callback().set(FUNC(nascom_state::nascom1_hd6402_so));
+
+	clock_device &uart_clock(CLOCK(config, "uart_clock", (16_MHz_XTAL / 16) / 256));
+	uart_clock.signal_handler().set(m_hd6402, FUNC(ay31015_device::write_tcp));
+	uart_clock.signal_handler().append(m_hd6402, FUNC(ay31015_device::write_rcp));
 
 	// cassette is connected to the uart
 	CASSETTE(config, m_cassette);

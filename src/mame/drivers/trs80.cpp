@@ -571,7 +571,11 @@ MACHINE_CONFIG_START(trs80_state::sys80)
 	model1(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(sys80_io)
+
 	config.device_remove("brg");
+	CLOCK(config, m_uart_clock, 19200 * 16);
+	m_uart_clock->signal_handler().set(m_uart, FUNC(ay31015_device::write_rcp));
+	m_uart_clock->signal_handler().append(m_uart, FUNC(ay31015_device::write_tcp));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(trs80_state::ht1080z)

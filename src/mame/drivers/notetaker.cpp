@@ -104,6 +104,7 @@ DONE:
 #include "cpu/i86/i86.h"
 #include "imagedev/floppy.h"
 #include "machine/ay31015.h"
+#include "machine/clock.h"
 #include "machine/pic8259.h"
 #include "machine/wd_fdc.h"
 #include "sound/dac.h"
@@ -847,14 +848,18 @@ MACHINE_CONFIG_START(notetaker_state::notetakr)
 	m_crtc->set_screen("screen");
 
 	AY31015(config, m_kbduart); // HD6402, == AY-3-1015D
-	m_kbduart->set_rx_clock(960_kHz_XTAL); // hard-wired to 960KHz xtal #f11 (60000 baud, 16 clocks per baud)
-	m_kbduart->set_tx_clock(960_kHz_XTAL); // hard-wired to 960KHz xtal #f11 (60000 baud, 16 clocks per baud)
 	m_kbduart->write_dav_callback().set(m_iop_pic, FUNC(pic8259_device::ir6_w)); // DataRecvd = KbdInt
 
+	clock_device &kbdclock(CLOCK(config, "kbdclock", 960_kHz_XTAL)); // hard-wired to 960KHz xtal #f11 (60000 baud, 16 clocks per baud)
+	kbdclock.signal_handler().set(m_kbduart, FUNC(ay31015_device::write_rcp));
+	kbdclock.signal_handler().append(m_kbduart, FUNC(ay31015_device::write_tcp));
+
 	AY31015(config, m_eiauart); // HD6402, == AY-3-1015D
-	m_eiauart->set_rx_clock(((960_kHz_XTAL/10)/4)/5); // hard-wired through an mc14568b divider set to divide by 4, the result set to divide by 5; this resulting 4800hz signal being 300 baud (16 clocks per baud)
-	m_eiauart->set_tx_clock(((960_kHz_XTAL/10)/4)/5); // hard-wired through an mc14568b divider set to divide by 4, the result set to divide by 5; this resulting 4800hz signal being 300 baud (16 clocks per baud)
 	m_eiauart->write_dav_callback().set(m_iop_pic, FUNC(pic8259_device::ir3_w)); // EIADataReady = EIAInt
+
+	clock_device &eiaclock(CLOCK(config, "eiaclock", ((960_kHz_XTAL/10)/4)/5)); // hard-wired through an mc14568b divider set to divide by 4, the result set to divide by 5; this resulting 4800hz signal being 300 baud (16 clocks per baud)
+	eiaclock.signal_handler().set(m_eiauart, FUNC(ay31015_device::write_rcp));
+	eiaclock.signal_handler().append(m_eiauart, FUNC(ay31015_device::write_tcp));
 
 	/* Floppy */
 	FD1791(config, m_fdc, (((24_MHz_XTAL/3)/2)/2)); // 2mhz, from 24mhz ip clock divided by 6 via 8284, an additional 2 by LS161 at #e1 on display/floppy board

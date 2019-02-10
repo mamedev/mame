@@ -57,6 +57,7 @@ Other things...
 #include "screen.h"
 #include "speaker.h"
 #include "machine/ay31015.h"
+#include "machine/clock.h"
 #include "bus/rs232/rs232.h"
 
 
@@ -410,10 +411,13 @@ MACHINE_CONFIG_START(micral_state::micral)
 	//MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	AY31015(config, m_uart); // CDP6402
-	m_uart->set_tx_clock(153600);
-	m_uart->set_rx_clock(153600);
 	m_uart->read_si_callback().set("rs232", FUNC(rs232_port_device::rxd_r));
 	m_uart->write_so_callback().set("rs232", FUNC(rs232_port_device::write_txd));
+
+	clock_device &uart_clock(CLOCK(config, "uart_clock", 153600));
+	uart_clock.signal_handler().set(m_uart, FUNC(ay31015_device::write_tcp));
+	uart_clock.signal_handler().append(m_uart, FUNC(ay31015_device::write_rcp));
+
 	RS232_PORT(config, "rs232", default_rs232_devices, "keyboard");
 MACHINE_CONFIG_END
 
