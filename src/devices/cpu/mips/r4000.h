@@ -275,6 +275,7 @@ protected:
 		MIPS3_PC  = 96,
 		MIPS3_HI,
 		MIPS3_LO,
+		MIPS3_FCR30,
 		MIPS3_FCR31,
 	};
 
@@ -409,6 +410,7 @@ protected:
 	// cp1 state
 	u64 m_f[32]; // floating point registers
 	u32 m_fcr0;  // implementation and revision register
+	u32 m_fcr30; // unknown
 	u32 m_fcr31; // control/status register
 
 	// experimental icache state

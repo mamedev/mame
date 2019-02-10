@@ -171,6 +171,7 @@ void r4000_base_device::device_start()
 	state_add(MIPS3_LO,        "LO",       m_lo).formatstr("%016X");
 
 	// floating point registers
+	state_add(MIPS3_FCR30,     "FCR30",    m_fcr30).formatstr("%08X");
 	state_add(MIPS3_FCR31,     "FCR31",    m_fcr31).formatstr("%08X");
 	for (unsigned i = 0; i < 32; i++)
 		state_add(MIPS3_F0 + i, util::string_format("F%d", i).c_str(), m_f[i]);
@@ -1668,6 +1669,7 @@ void r4000_base_device::cp1_execute(u32 const op)
 			switch (RDREG)
 			{
 			case 0:  m_r[RTREG] = m_fcr0; break;
+			case 30: m_r[RTREG] = m_fcr30; break;
 			case 31: m_r[RTREG] = m_fcr31; break;
 
 			default:
@@ -1695,6 +1697,10 @@ void r4000_base_device::cp1_execute(u32 const op)
 			switch (RDREG)
 			{
 			case 0: // register is read-only
+				break;
+
+			case 30: // unknown
+				m_fcr30 = u32(m_r[RTREG]);
 				break;
 
 			case 31:
