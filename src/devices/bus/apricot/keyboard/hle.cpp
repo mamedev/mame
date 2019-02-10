@@ -205,11 +205,12 @@ ioport_constructor apricot_keyboard_hle_device::device_input_ports() const
 	return INPUT_PORTS_NAME( keyboard );
 }
 
-MACHINE_CONFIG_START(apricot_keyboard_hle_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("rtc", MSM5832, 32.768_kHz_XTAL)
+void apricot_keyboard_hle_device::device_add_mconfig(machine_config &config)
+{
+	MSM5832(config, m_rtc, 32.768_kHz_XTAL);
 
 	TIMER(config, "timer").configure_periodic(FUNC(apricot_keyboard_hle_device::mouse_callback), attotime::from_hz(60));
-MACHINE_CONFIG_END
+}
 
 
 //**************************************************************************

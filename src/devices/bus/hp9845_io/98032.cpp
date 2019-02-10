@@ -56,12 +56,13 @@ hp98032_io_card_device::~hp98032_io_card_device()
 {
 }
 
-MACHINE_CONFIG_START(hp98032_io_card_device::device_add_mconfig)
+void hp98032_io_card_device::device_add_mconfig(machine_config &config)
+{
 	HP98032_GPIO_SLOT(config , m_gpio , 0);
 	m_gpio->pflg_cb().set(FUNC(hp98032_io_card_device::pflg_w));
 	m_gpio->psts_cb().set(FUNC(hp98032_io_card_device::psts_w));
 	m_gpio->eir_cb().set(FUNC(hp98032_io_card_device::eir_w));
-MACHINE_CONFIG_END
+}
 
 static INPUT_PORTS_START(hp98032_port)
 	MCFG_HP9845_IO_SC(2)
