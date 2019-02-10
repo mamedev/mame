@@ -576,7 +576,7 @@ WRITE32_MEMBER( sgi_mc_device::write )
 	case 0x0168/4:
 		LOGMASKED(LOG_WRITES | LOG_DMA, "%s: DMA Control Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		m_dma_control = data;
-		if (!BIT(m_dma_control, 4))
+		if (!BIT(m_dma_control, 4) && m_hpc3)
 		{
 			m_hpc3->lower_local_irq(3, 1 << 4);
 		}
