@@ -395,6 +395,7 @@ const double XTAL::known_xtals[] = {
 	 80'000'000, /* 80_MHz_XTAL            ARM710 */
 	 87'183'360, /* 87.18336_MHz_XTAL      AT&T 630 MTG */
 	 92'940'500, /* 92.9405_MHz_XTAL       Sun cgthree */
+	 99'522'000, /* 99.522_MHz_XTAL        Radius Two Page Display */
 	100'000'000, /* 100_MHz_XTAL           PSX-based Namco System 12, Vegas, Sony ZN1-2-based */
 	101'491'200, /* 101.4912_MHz_XTAL      PSX-based Namco System 10 */
 	108'108'000, /* 108.108_MHz_XTAL       HP 98550 high-res color card */
