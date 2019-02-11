@@ -37,8 +37,8 @@ Sensory Chess Challenger 6 (model SC6):
 class fidelmcs48_state : public fidelbase_state
 {
 public:
-	fidelmcs48_state(const machine_config &mconfig, device_type type, const char *tag)
-		: fidelbase_state(mconfig, type, tag)
+	fidelmcs48_state(const machine_config &mconfig, device_type type, const char *tag) :
+		fidelbase_state(mconfig, type, tag)
 	{ }
 
 	void sc6(machine_config &config);

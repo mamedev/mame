@@ -469,13 +469,12 @@ I/O is via TTL, very similar to Designer Display
 class fidel6502_state : public fidelbase_state
 {
 public:
-	fidel6502_state(const machine_config &mconfig, device_type type, const char *tag)
-		: fidelbase_state(mconfig, type, tag),
+	fidel6502_state(const machine_config &mconfig, device_type type, const char *tag) :
+		fidelbase_state(mconfig, type, tag),
 		m_ppi8255(*this, "ppi8255"),
 		m_rombank(*this, "rombank"),
 		m_mainmap(*this, "mainmap"),
-		m_div_config(*this, "div_config"),
-		m_irq_on(*this, "irq_on")
+		m_div_config(*this, "div_config")
 	{ }
 
 	void csc(machine_config &config);
@@ -529,13 +528,8 @@ private:
 	optional_memory_bank m_rombank;
 	optional_device<address_map_bank_device> m_mainmap;
 	optional_ioport m_div_config;
-	optional_device<timer_device> m_irq_on;
 
 	// common
-	TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE); }
-	TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE); }
-	TIMER_DEVICE_CALLBACK_MEMBER(dummy) { ; } // config.m_perfect_cpu_quantum = subtag("maincpu"); didn't work
-
 	void div_trampoline_w(offs_t offset, u8 data);
 	u8 div_trampoline_r(offs_t offset);
 	void div_set_cpu_freq(offs_t offset);
@@ -1839,10 +1833,10 @@ void fidel6502_state::rsc(machine_config &config)
 	M6502(config, m_maincpu, 1800000); // measured approx 1.81MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &fidel6502_state::rsc_map);
 
-	TIMER(config, m_irq_on).configure_periodic(FUNC(fidel6502_state::irq_on), attotime::from_hz(546)); // from 555 timer, measured
-	m_irq_on->set_start_delay(attotime::from_hz(546) - attotime::from_usec(38)); // active for 38us
-
-	TIMER(config, "irq_off").configure_periodic(FUNC(fidel6502_state::irq_off), attotime::from_hz(546));
+	const attotime irq_period = attotime::from_hz(546); // from 555 timer, measured
+	TIMER(config, m_irq_on).configure_periodic(FUNC(fidel6502_state::irq_on<M6502_IRQ_LINE>), irq_period);
+	m_irq_on->set_start_delay(irq_period - attotime::from_usec(38)); // active for 38us
+	TIMER(config, "irq_off").configure_periodic(FUNC(fidel6502_state::irq_off<M6502_IRQ_LINE>), irq_period);
 
 	pia6821_device &pia(PIA6821(config, "pia", 0)); // MOS 6520
 	pia.readpa_handler().set(FUNC(fidel6502_state::csc_pia1_pa_r));
@@ -1870,9 +1864,10 @@ void fidel6502_state::csc(machine_config &config)
 	M6502(config, m_maincpu, 3.9_MHz_XTAL/2); // from 3.9MHz resonator
 	m_maincpu->set_addrmap(AS_PROGRAM, &fidel6502_state::csc_map);
 
-	TIMER(config, m_irq_on).configure_periodic(FUNC(fidel6502_state::irq_on), attotime::from_hz(38.4_kHz_XTAL/64)); // through 4060 IC, 600Hz
-	m_irq_on->set_start_delay(attotime::from_hz(38.4_kHz_XTAL/64) - attotime::from_hz(38.4_kHz_XTAL*2)); // edge!
-	TIMER(config, "irq_off").configure_periodic(FUNC(fidel6502_state::irq_off), attotime::from_hz(38.4_kHz_XTAL/64));
+	const attotime irq_period = attotime::from_hz(38.4_kHz_XTAL/64); // through 4060 IC, 600Hz
+	TIMER(config, m_irq_on).configure_periodic(FUNC(fidel6502_state::irq_on<M6502_IRQ_LINE>), irq_period);
+	m_irq_on->set_start_delay(irq_period - attotime::from_hz(38.4_kHz_XTAL*2)); // edge!
+	TIMER(config, "irq_off").configure_periodic(FUNC(fidel6502_state::irq_off<M6502_IRQ_LINE>), irq_period);
 
 	pia6821_device &pia0(PIA6821(config, "pia0", 0));
 	pia0.readpb_handler().set(FUNC(fidel6502_state::csc_pia0_pb_r));
@@ -1920,14 +1915,14 @@ void fidel6502_state::eas_base(machine_config &config)
 	/* basic machine hardware */
 	R65C02(config, m_maincpu, 3_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &fidel6502_state::div_trampoline);
-
-	TIMER(config, m_irq_on).configure_periodic(FUNC(fidel6502_state::irq_on), attotime::from_hz(38.4_kHz_XTAL/64)); // through 4060 IC, 600Hz
-	m_irq_on->set_start_delay(attotime::from_hz(38.4_kHz_XTAL/64) - attotime::from_hz(38.4_kHz_XTAL*2)); // edge!
-
-	TIMER(config, "irq_off").configure_periodic(FUNC(fidel6502_state::irq_off), attotime::from_hz(38.4_kHz_XTAL/64));
-	TIMER(config, "dummy_timer").configure_periodic(FUNC(fidel6502_state::dummy), attotime::from_hz(3_MHz_XTAL));
-
 	ADDRESS_MAP_BANK(config, m_mainmap).set_map(&fidel6502_state::eas_map).set_options(ENDIANNESS_LITTLE, 8, 16);
+
+	TIMER(config, "dummy_timer").configure_periodic(timer_device::expired_delegate(), attotime::from_hz(3_MHz_XTAL));
+
+	const attotime irq_period = attotime::from_hz(38.4_kHz_XTAL/64); // through 4060 IC, 600Hz
+	TIMER(config, m_irq_on).configure_periodic(FUNC(fidel6502_state::irq_on<M6502_IRQ_LINE>), irq_period);
+	m_irq_on->set_start_delay(irq_period - attotime::from_hz(38.4_kHz_XTAL*2)); // edge!
+	TIMER(config, "irq_off").configure_periodic(FUNC(fidel6502_state::irq_off<M6502_IRQ_LINE>), irq_period);
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_fidel_eas);
@@ -1970,9 +1965,8 @@ void fidel6502_state::pc(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_clock(4_MHz_XTAL); // R65C02P4
 
-	TIMER(config.replace(), "dummy_timer").configure_periodic(FUNC(fidel6502_state::dummy), attotime::from_hz(4_MHz_XTAL));
-
 	m_mainmap->set_addrmap(AS_PROGRAM, &fidel6502_state::pc_map);
+	TIMER(config.replace(), "dummy_timer").configure_periodic(timer_device::expired_delegate(), attotime::from_hz(4_MHz_XTAL));
 
 	config.set_default_layout(layout_fidel_pc);
 }
@@ -1984,9 +1978,8 @@ void fidel6502_state::eag(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_clock(5_MHz_XTAL); // R65C02P4
 
-	TIMER(config.replace(), "dummy_timer").configure_periodic(FUNC(fidel6502_state::dummy), attotime::from_hz(5_MHz_XTAL));
-
 	m_mainmap->set_addrmap(AS_PROGRAM, &fidel6502_state::eag_map);
+	TIMER(config.replace(), "dummy_timer").configure_periodic(timer_device::expired_delegate(), attotime::from_hz(5_MHz_XTAL));
 
 	config.set_default_layout(layout_fidel_eag);
 }
@@ -1996,9 +1989,11 @@ void fidel6502_state::sc9d(machine_config &config)
 	/* basic machine hardware */
 	M6502(config, m_maincpu, 3.9_MHz_XTAL/2); // R6502AP, 3.9MHz resonator
 	m_maincpu->set_addrmap(AS_PROGRAM, &fidel6502_state::sc9d_map);
-	TIMER(config, m_irq_on).configure_periodic(FUNC(fidel6502_state::irq_on), attotime::from_hz(610)); // from 555 timer (22nF, 102K, 2.7K)
-	m_irq_on->set_start_delay(attotime::from_hz(610) - attotime::from_usec(41)); // active for 41us
-	TIMER(config, "irq_off").configure_periodic(FUNC(fidel6502_state::irq_off), attotime::from_hz(610));
+
+	const attotime irq_period = attotime::from_hz(610); // from 555 timer (22nF, 102K, 2.7K)
+	TIMER(config, m_irq_on).configure_periodic(FUNC(fidel6502_state::irq_on<M6502_IRQ_LINE>), irq_period);
+	m_irq_on->set_start_delay(irq_period - attotime::from_usec(41)); // active for 41us
+	TIMER(config, "irq_off").configure_periodic(FUNC(fidel6502_state::irq_off<M6502_IRQ_LINE>), irq_period);
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_fidel_sc9);
@@ -2050,13 +2045,14 @@ void fidel6502_state::sc12(machine_config &config)
 	/* basic machine hardware */
 	R65C02(config, m_maincpu, 3_MHz_XTAL); // R65C02P3
 	m_maincpu->set_addrmap(AS_PROGRAM, &fidel6502_state::div_trampoline);
-	TIMER(config, m_irq_on).configure_periodic(FUNC(fidel6502_state::irq_on), attotime::from_hz(630)); // from 556 timer (22nF, 102K, 1K)
-	m_irq_on->set_start_delay(attotime::from_hz(630) - attotime::from_nsec(15250)); // active for 15.25us
-	TIMER(config, "irq_off").configure_periodic(FUNC(fidel6502_state::irq_off), attotime::from_hz(630));
-
-	TIMER(config, "dummy_timer").configure_periodic(FUNC(fidel6502_state::dummy), attotime::from_hz(3_MHz_XTAL));
-
 	ADDRESS_MAP_BANK(config, m_mainmap).set_map(&fidel6502_state::sc12_map).set_options(ENDIANNESS_LITTLE, 8, 16);
+
+	TIMER(config, "dummy_timer").configure_periodic(timer_device::expired_delegate(), attotime::from_hz(3_MHz_XTAL));
+
+	const attotime irq_period = attotime::from_hz(630); // from 556 timer (22nF, 102K, 1K)
+	TIMER(config, m_irq_on).configure_periodic(FUNC(fidel6502_state::irq_on<M6502_IRQ_LINE>), irq_period);
+	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(15250)); // active for 15.25us
+	TIMER(config, "irq_off").configure_periodic(FUNC(fidel6502_state::irq_off<M6502_IRQ_LINE>), irq_period);
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_fidel_sc12);
@@ -2084,11 +2080,12 @@ void fidel6502_state::sc12b(machine_config &config)
 	m_maincpu->set_clock(4_MHz_XTAL); // R65C02P4
 
 	// change irq timer frequency
-	TIMER(config.replace(), m_irq_on).configure_periodic(FUNC(fidel6502_state::irq_on), attotime::from_hz(596)); // from 556 timer (22nF, 82K+26K, 1K)
-	m_irq_on->set_start_delay(attotime::from_hz(596) - attotime::from_nsec(15250)); // active for 15.25us
-	TIMER(config.replace(), "irq_off").configure_periodic(FUNC(fidel6502_state::irq_off), attotime::from_hz(596));
+	const attotime irq_period = attotime::from_hz(596); // from 556 timer (22nF, 82K+26K, 1K)
+	TIMER(config.replace(), m_irq_on).configure_periodic(FUNC(fidel6502_state::irq_on<M6502_IRQ_LINE>), irq_period);
+	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(15250)); // active for 15.25us
+	TIMER(config.replace(), "irq_off").configure_periodic(FUNC(fidel6502_state::irq_off<M6502_IRQ_LINE>), irq_period);
 
-	TIMER(config.replace(), "dummy_timer").configure_periodic(FUNC(fidel6502_state::dummy), attotime::from_hz(4_MHz_XTAL));
+	TIMER(config.replace(), "dummy_timer").configure_periodic(timer_device::expired_delegate(), attotime::from_hz(4_MHz_XTAL));
 }
 
 void fidel6502_state::as12(machine_config &config)
@@ -2099,9 +2096,10 @@ void fidel6502_state::as12(machine_config &config)
 	m_mainmap->set_addrmap(AS_PROGRAM, &fidel6502_state::as12_map);
 
 	// change irq timer frequency
-	TIMER(config.replace(), m_irq_on).configure_periodic(FUNC(fidel6502_state::irq_on), attotime::from_hz(585)); // from 556 timer (22nF, 110K, 1K)
-	m_irq_on->set_start_delay(attotime::from_hz(585) - attotime::from_nsec(15250)); // active for 15.25us
-	TIMER(config.replace(), "irq_off").configure_periodic(FUNC(fidel6502_state::irq_off), attotime::from_hz(585));
+	const attotime irq_period = attotime::from_hz(585); // from 556 timer (22nF, 110K, 1K)
+	TIMER(config.replace(), m_irq_on).configure_periodic(FUNC(fidel6502_state::irq_on<M6502_IRQ_LINE>), irq_period);
+	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(15250)); // active for 15.25us
+	TIMER(config.replace(), "irq_off").configure_periodic(FUNC(fidel6502_state::irq_off<M6502_IRQ_LINE>), irq_period);
 
 	config.set_default_layout(layout_fidel_as12);
 }
@@ -2111,9 +2109,11 @@ void fidel6502_state::fexcel(machine_config &config)
 	/* basic machine hardware */
 	M65SC02(config, m_maincpu, 12_MHz_XTAL/4); // G65SC102P-3, 12.0M ceramic resonator
 	m_maincpu->set_addrmap(AS_PROGRAM, &fidel6502_state::fexcel_map);
-	TIMER(config, m_irq_on).configure_periodic(FUNC(fidel6502_state::irq_on), attotime::from_hz(630)); // from 556 timer (22nF, 102K, 1K)
-	m_irq_on->set_start_delay(attotime::from_hz(630) - attotime::from_nsec(15250)); // active for 15.25us
-	TIMER(config, "irq_off").configure_periodic(FUNC(fidel6502_state::irq_off), attotime::from_hz(630));
+
+	const attotime irq_period = attotime::from_hz(630); // from 556 timer (22nF, 102K, 1K)
+	TIMER(config, m_irq_on).configure_periodic(FUNC(fidel6502_state::irq_on<M6502_IRQ_LINE>), irq_period);
+	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(15250)); // active for 15.25us
+	TIMER(config, "irq_off").configure_periodic(FUNC(fidel6502_state::irq_off<M6502_IRQ_LINE>), irq_period);
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_fidel_ex);
@@ -2169,9 +2169,10 @@ void fidel6502_state::fdes2100(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &fidel6502_state::fexcelp_map);
 
 	// change irq timer frequency
-	TIMER(config.replace(), m_irq_on).configure_periodic(FUNC(fidel6502_state::irq_on), attotime::from_hz(585)); // from 556 timer (22nF, 110K, 1K)
-	m_irq_on->set_start_delay(attotime::from_hz(585) - attotime::from_nsec(15250)); // active for 15.25us
-	TIMER(config.replace(), "irq_off").configure_periodic(FUNC(fidel6502_state::irq_off), attotime::from_hz(585));
+	const attotime irq_period = attotime::from_hz(630); // from 556 timer (22nF, 102K, 1K)
+	TIMER(config.replace(), m_irq_on).configure_periodic(FUNC(fidel6502_state::irq_on<M6502_IRQ_LINE>), irq_period);
+	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(15250)); // active for 15.25us
+	TIMER(config.replace(), "irq_off").configure_periodic(FUNC(fidel6502_state::irq_off<M6502_IRQ_LINE>), irq_period);
 
 	config.set_default_layout(layout_fidel_des);
 }
@@ -2208,9 +2209,11 @@ void fidel6502_state::fdes2100d(machine_config &config)
 	/* basic machine hardware */
 	M65C02(config, m_maincpu, 6_MHz_XTAL); // W65C02P-6
 	m_maincpu->set_addrmap(AS_PROGRAM, &fidel6502_state::fdesdis_map);
-	TIMER(config, m_irq_on).configure_periodic(FUNC(fidel6502_state::irq_on), attotime::from_hz(630)); // from 556 timer (22nF, 102K, 1K)
-	m_irq_on->set_start_delay(attotime::from_hz(630) - attotime::from_nsec(15250)); // active for 15.25us
-	TIMER(config, "irq_off").configure_periodic(FUNC(fidel6502_state::irq_off), attotime::from_hz(630));
+
+	const attotime irq_period = attotime::from_hz(630); // from 556 timer (22nF, 102K, 1K)
+	TIMER(config, m_irq_on).configure_periodic(FUNC(fidel6502_state::irq_on<M6502_IRQ_LINE>), irq_period);
+	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(15250)); // active for 15.25us
+	TIMER(config, "irq_off").configure_periodic(FUNC(fidel6502_state::irq_off<M6502_IRQ_LINE>), irq_period);
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_fidel_desdis);
@@ -2257,9 +2260,11 @@ void fidel6502_state::chesster(machine_config &config)
 	/* basic machine hardware */
 	R65C02(config, m_maincpu, 5_MHz_XTAL); // RP65C02G
 	m_maincpu->set_addrmap(AS_PROGRAM, &fidel6502_state::chesster_map);
-	TIMER(config, m_irq_on).configure_periodic(FUNC(fidel6502_state::irq_on), attotime::from_hz(9615)); // R/C circuit, measured
-	m_irq_on->set_start_delay(attotime::from_hz(9615) - attotime::from_nsec(2600)); // active for 2.6us
-	TIMER(config, "irq_off").configure_periodic(FUNC(fidel6502_state::irq_off), attotime::from_hz(9615));
+
+	const attotime irq_period = attotime::from_hz(9615); // R/C circuit, measured
+	TIMER(config, m_irq_on).configure_periodic(FUNC(fidel6502_state::irq_on<M6502_IRQ_LINE>), irq_period);
+	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(2600)); // active for 2.6us
+	TIMER(config, "irq_off").configure_periodic(FUNC(fidel6502_state::irq_off<M6502_IRQ_LINE>), irq_period);
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_fidel_chesster);

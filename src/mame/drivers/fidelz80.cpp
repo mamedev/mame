@@ -524,8 +524,7 @@ public:
 		m_ppi8255(*this, "ppi8255"),
 		m_i8243(*this, "i8243"),
 		m_beeper_off(*this, "beeper_off"),
-		m_beeper(*this, "beeper"),
-		m_irq_on(*this, "irq_on")
+		m_beeper(*this, "beeper")
 	{ }
 
 	void cc10(machine_config &config);
@@ -550,10 +549,6 @@ private:
 	optional_device<i8243_device> m_i8243;
 	optional_device<timer_device> m_beeper_off;
 	optional_device<beep_device> m_beeper;
-	optional_device<timer_device> m_irq_on;
-
-	TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE); }
-	TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE); }
 
 	// CC10, VCC/UVC
 	void vcc_prepare_display();
@@ -1850,7 +1845,11 @@ void fidelz80_state::vsc(machine_config &config)
 	Z80(config, m_maincpu, 3.9_MHz_XTAL); // 3.9MHz resonator
 	m_maincpu->set_addrmap(AS_PROGRAM, &fidelz80_state::vsc_map);
 	m_maincpu->set_addrmap(AS_IO, &fidelz80_state::vsc_io);
-	m_maincpu->set_periodic_int(FUNC(fidelz80_state::nmi_line_pulse), attotime::from_hz(587)); // 555 timer, measured
+
+	const attotime irq_period = attotime::from_hz(587); // 555 timer, measured
+	TIMER(config, m_irq_on).configure_periodic(FUNC(fidelz80_state::irq_on<INPUT_LINE_NMI>), irq_period);
+	m_irq_on->set_start_delay(irq_period - attotime::from_usec(845)); // active for 0.845ms (approx half)
+	TIMER(config, "irq_off").configure_periodic(FUNC(fidelz80_state::irq_off<INPUT_LINE_NMI>), irq_period);
 
 	I8255(config, m_ppi8255);
 	m_ppi8255->out_pa_callback().set(FUNC(fidelz80_state::vsc_ppi_porta_w));
@@ -1935,9 +1934,11 @@ void fidelz80_state::dsc(machine_config &config)
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 3.9_MHz_XTAL); // 3.9MHz resonator
 	m_maincpu->set_addrmap(AS_PROGRAM, &fidelz80_state::dsc_map);
-	TIMER(config, m_irq_on).configure_periodic(FUNC(fidelz80_state::irq_on), attotime::from_hz(523)); // from 555 timer (22nF, 120K, 2.7K)
-	m_irq_on->set_start_delay(attotime::from_hz(523) - attotime::from_usec(41)); // active for 41us
-	TIMER(config, "irq_off").configure_periodic(FUNC(fidelz80_state::irq_off), attotime::from_hz(523));
+
+	const attotime irq_period = attotime::from_hz(523); // from 555 timer (22nF, 120K, 2.7K)
+	TIMER(config, m_irq_on).configure_periodic(FUNC(fidelz80_state::irq_on<INPUT_LINE_IRQ0>), irq_period);
+	m_irq_on->set_start_delay(irq_period - attotime::from_usec(41)); // active for 41us
+	TIMER(config, "irq_off").configure_periodic(FUNC(fidelz80_state::irq_off<INPUT_LINE_IRQ0>), irq_period);
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_fidel_dsc);

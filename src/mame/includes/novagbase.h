@@ -22,8 +22,9 @@ class novagbase_state : public driver_device
 public:
 	novagbase_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_beeper(*this, "beeper"),
 		m_maincpu(*this, "maincpu"),
+		m_irq_on(*this, "irq_on"),
+		m_beeper(*this, "beeper"),
 		m_dac(*this, "dac"),
 		m_lcd(*this, "hd44780"),
 		m_inp_matrix(*this, "IN.%u", 0),
@@ -40,8 +41,9 @@ protected:
 	virtual void machine_reset() override;
 
 	// devices/pointers
-	optional_device<beep_device> m_beeper;
 	required_device<cpu_device> m_maincpu;
+	optional_device<timer_device> m_irq_on;
+	optional_device<beep_device> m_beeper;
 	optional_device<dac_bit_interface> m_dac;
 	optional_device<hd44780_device> m_lcd;
 	optional_ioport_array<9> m_inp_matrix; // max 9
@@ -57,6 +59,9 @@ protected:
 	u8 m_lcd_data;
 
 	u16 read_inputs(int columns);
+
+	template<int L> TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(L, ASSERT_LINE); }
+	template<int L> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(L, CLEAR_LINE); }
 
 	// display common
 	int m_display_wait;             // led/lamp off-delay in milliseconds (default 33ms)

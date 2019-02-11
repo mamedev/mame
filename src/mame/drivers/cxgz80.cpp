@@ -37,9 +37,10 @@ Chess 2001:
 class cxgz80_state : public driver_device
 {
 public:
-	cxgz80_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	cxgz80_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_irq_on(*this, "irq_on"),
 		m_dac(*this, "dac"),
 		m_speaker_off_timer(*this, "speaker_off"),
 		m_inp_matrix(*this, "IN.%u", 0),
@@ -53,6 +54,7 @@ public:
 
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
+	required_device<timer_device> m_irq_on;
 	required_device<dac_bit_interface> m_dac;
 	required_device<timer_device> m_speaker_off_timer;
 	optional_ioport_array<10> m_inp_matrix; // max 10
@@ -60,8 +62,8 @@ public:
 	output_finder<0x20> m_out_a;
 	output_finder<0x20> m_out_digit;
 
-	TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE); }
-	TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE); }
+	template<int L> TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(L, ASSERT_LINE); }
+	template<int L> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(L, CLEAR_LINE); }
 
 	// misc common
 	u16 m_inp_mux;                  // multiplexed keypad mask
@@ -399,10 +401,11 @@ MACHINE_CONFIG_START(cxgz80_state::ch2001)
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 8_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cxgz80_state::ch2001_map);
-	timer_device &irq_on(TIMER(config, "irq_on"));
-	irq_on.configure_periodic(FUNC(cxgz80_state::irq_on), attotime::from_hz(484)); // theoretical frequency from 555 timer (22nF, 100K+33K, 1K2), measurement was 568Hz
-	irq_on.set_start_delay(attotime::from_hz(484) - attotime::from_nsec(18300)); // active for 18.3us
-	TIMER(config, "irq_off").configure_periodic(FUNC(cxgz80_state::irq_off), attotime::from_hz(484));
+
+	const attotime irq_period = attotime::from_hz(484); // theoretical frequency from 555 timer (22nF, 100K+33K, 1K2), measurement was 568Hz
+	TIMER(config, m_irq_on).configure_periodic(FUNC(cxgz80_state::irq_on<INPUT_LINE_IRQ0>), irq_period);
+	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(18300)); // active for 18.3us
+	TIMER(config, "irq_off").configure_periodic(FUNC(cxgz80_state::irq_off<INPUT_LINE_IRQ0>), irq_period);
 
 	TIMER(config, m_speaker_off_timer).configure_generic(FUNC(cxgz80_state::speaker_off_callback));
 

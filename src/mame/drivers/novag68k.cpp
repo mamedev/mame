@@ -51,9 +51,6 @@ public:
 	void scorpio68k(machine_config &config);
 
 private:
-	TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(M68K_IRQ_2, ASSERT_LINE); }
-	TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE); }
-
 	// Diablo 68000
 	DECLARE_WRITE8_MEMBER(diablo68k_control_w);
 	DECLARE_WRITE8_MEMBER(diablo68k_lcd_data_w);
@@ -230,10 +227,11 @@ MACHINE_CONFIG_START(novag68k_state::diablo68k)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(diablo68k_map)
-	timer_device &irq_on(TIMER(config, "irq_on"));
-	irq_on.configure_periodic(FUNC(novag68k_state::irq_on), attotime::from_hz(32.768_kHz_XTAL/128)); // 256Hz
-	irq_on.set_start_delay(attotime::from_hz(32.768_kHz_XTAL/128) - attotime::from_nsec(1100)); // active for 1.1us
-	TIMER(config, "irq_off").configure_periodic(FUNC(novag68k_state::irq_off), attotime::from_hz(32.768_kHz_XTAL/128));
+
+	const attotime irq_period = attotime::from_hz(32.768_kHz_XTAL/128); // 256Hz
+	TIMER(config, m_irq_on).configure_periodic(FUNC(novag68k_state::irq_on<M68K_IRQ_2>), irq_period);
+	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(1100)); // active for 1.1us
+	TIMER(config, "irq_off").configure_periodic(FUNC(novag68k_state::irq_off<M68K_IRQ_2>), irq_period);
 
 	mos6551_device &acia(MOS6551(config, "acia", 0));
 	acia.set_xtal(1.8432_MHz_XTAL);
