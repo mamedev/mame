@@ -728,6 +728,9 @@ void scn2674_device::write_delayed_command(uint8_t data)
 	case 0xbb:
 		// write from cursor address to pointer address
 		// TODO: transfer only during blank
+		m_display_enabled = false;
+		m_display_enabled_field = true;
+		m_display_enabled_scanline = false;
 		for (i = m_cursor_address; i != m_screen2_address; i = ((i + 1) & 0xffff))
 		{
 			m_char_space->write_byte(i, m_char_buffer);
@@ -780,7 +783,6 @@ void scn2674_device::write_command(uint8_t data)
 			m_IR_pointer = 0;
 			m_irq_register = 0x00;
 			m_status_register = 0x20; // RDFLG activated
-			m_linecounter = 0;
 			m_irq_mask = 0x00;
 			m_gfx_enabled = false;
 			m_display_enabled = false;
@@ -788,6 +790,10 @@ void scn2674_device::write_command(uint8_t data)
 			m_cursor_enabled = false;
 			m_use_row_table = false;
 			m_intr_cb(CLEAR_LINE);
+			m_breq_cb(CLEAR_LINE);
+			m_mbc_cb(0);
+			m_breq_timer->adjust(attotime::never);
+			m_vblank_timer->adjust(attotime::never);
 		}
 		else
 		{
