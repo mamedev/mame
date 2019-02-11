@@ -81,6 +81,8 @@ private:
 	u8 m_cur_attr;
 	u8 m_last_row_attr;
 	u8 m_row_buffer_char;
+	bool m_font2;
+	bool m_rev_prot;
 	bool m_is_132;
 };
 
@@ -89,11 +91,15 @@ void wy50_state::machine_start()
 	m_cur_attr = 0;
 	m_last_row_attr = 0;
 	m_row_buffer_char = 0;
+	m_font2 = false;
+	m_rev_prot = false;
 	m_is_132 = false;
 
 	save_item(NAME(m_cur_attr));
 	save_item(NAME(m_last_row_attr));
 	save_item(NAME(m_row_buffer_char));
+	save_item(NAME(m_font2));
+	save_item(NAME(m_rev_prot));
 	save_item(NAME(m_is_132));
 }
 
@@ -112,6 +118,7 @@ u8 wy50_state::pvtc_videoram_r(offs_t offset)
 SCN2672_DRAW_CHARACTER_MEMBER(wy50_state::draw_character)
 {
 	const bool attr = (charcode & 0xe0) == 0x80;
+	const bool prot = (charcode & 0xe0) > 0x80 && !m_font2;
 	if (attr)
 		m_cur_attr = charcode & 0x1f;
 	else if (x == 0)
@@ -123,20 +130,26 @@ SCN2672_DRAW_CHARACTER_MEMBER(wy50_state::draw_character)
 	else if (BIT(m_cur_attr, 3) && ul)
 		dots = 0x3ff;
 	else
-		dots = m_chargen[charcode << 4 | linecount] << 2;
+		dots = m_chargen[(charcode & (m_font2 ? 0xff : 0x7f)) << 4 | linecount] << 2;
 
-	if (!attr && BIT(m_cur_attr, 4))
-		dots = ~dots;
+	if (!attr)
+	{
+		if (BIT(m_cur_attr, 4))
+			dots = ~dots;
+		if (prot && m_rev_prot)
+			dots = ~dots;
+	}
 	if (cursor)
 		dots = ~dots;
 
+	const rgb_t fg = BIT(m_cur_attr, 0) || (prot && !m_rev_prot) ? rgb_t(0xc0, 0xc0, 0xc0) : rgb_t::white();
 	for (int i = 0; i < 9; i++)
 	{
-		bitmap.pix32(y, x++) = BIT(dots, 9) ? rgb_t::white() : rgb_t::black();
+		bitmap.pix32(y, x++) = BIT(dots, 9) ? fg : rgb_t::black();
 		dots <<= 1;
 	}
 	if (!m_is_132)
-		bitmap.pix32(y, x++) = BIT(dots, 9) ? rgb_t::white() : rgb_t::black();
+		bitmap.pix32(y, x++) = BIT(dots, 9) ? fg : rgb_t::black();
 }
 
 WRITE_LINE_MEMBER(wy50_state::mbc_attr_clock_w)
@@ -177,12 +190,14 @@ void wy50_state::keyboard_w(u8 data)
 
 void wy50_state::earom_w(u8 data)
 {
+	// Bit 5 = UPCHAR/NORM
+
 	m_earom->clock_w(BIT(data, 1));
 	m_earom->c3_w(BIT(data, 2));
 	m_earom->c2_w(BIT(data, 3));
 	m_earom->c1_w(BIT(data, 4));
 	m_earom->data_w(BIT(data, 3) ? BIT(data, 0) : 0);
-	// Bit 5 = UPCHAR/NORM
+	m_font2 = BIT(data, 5);
 }
 
 u8 wy50_state::p1_r()
@@ -201,11 +216,13 @@ void wy50_state::p1_w(u8 data)
 	// P1.6 = REV/DIM PROT
 	// P1.7 (inverted) = 80/132
 
+	m_rev_prot = BIT(data, 6);
+
 	if (m_is_132 != BIT(data, 7))
 	{
 		m_is_132 = BIT(data, 7);
 		m_pvtc->set_character_width(m_is_132 ? 9 : 10);
-		m_pvtc->set_unscaled_clock(68.85_MHz_XTAL / (m_is_132 ? 20 : 30));
+		m_pvtc->set_unscaled_clock(68.85_MHz_XTAL / (m_is_132 ? 18 : 30));
 	}
 }
 
