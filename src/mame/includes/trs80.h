@@ -15,7 +15,6 @@
 #include "imagedev/snapquik.h"
 #include "machine/ay31015.h"
 #include "machine/clock.h"
-#include "machine/com8116.h"
 #include "machine/i8255.h"
 #include "bus/rs232/rs232.h"
 #include "machine/buffer.h"
@@ -44,7 +43,6 @@ public:
 		, m_uart(*this, "uart")
 		, m_uart_clock(*this, "uart_clock")
 		, m_ppi(*this, "ppi")  // Radionic only
-		, m_brg(*this, "brg")
 		, m_fdc(*this, "fdc")
 		, m_floppy0(*this, "fdc:0")
 		, m_floppy1(*this, "fdc:1")
@@ -139,7 +137,6 @@ private:
 	optional_device<ay31015_device> m_uart;
 	optional_device<clock_device> m_uart_clock;
 	optional_device<i8255_device> m_ppi;
-	optional_device<com8116_device> m_brg;
 	optional_device<fd1793_device> m_fdc;
 	optional_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;
