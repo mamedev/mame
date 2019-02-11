@@ -1447,10 +1447,22 @@ void spg2xx_game_state::init_zeus()
 		ROM[i] = bitswap<16>(ROM[i] ,15,14,4,12,   11,10,9,8,    7,6,5,13,   3,2,1,0);
 		ROM[i] = bitswap<16>(ROM[i] ,15,14,13,12,   11,10,9,6,    7,8,5,4,   3,2,1,0);
 
+		ROM[i] = bitswap<16>(ROM[i] ,15,14,13,12,   11,8,9,10,    7,6,5,4,   3,2,1,0);
+		ROM[i] = bitswap<16>(ROM[i] ,15,14,13,12,   9,10,11,8,    7,6,5,4,   3,2,1,0);
+
+		if (ROM[i] & 0x0400)
+			ROM[i] ^= 0x1000;
+
+		ROM[i] = bitswap<16>(ROM[i] ,15,14,11,12,   13,10,9,8,    7,6,5,4,   3,2,1,0);
+
+		if (ROM[i] & 0x4000)
+			ROM[i] ^= 0x0200;
+
+		ROM[i] = bitswap<16>(ROM[i] ,15,12,13,14,   11,10,9,8,    7,6,5,4,   3,2,1,0);
 
 	}
 
-	if (0)
+	if (1)
 	{
 		uint8_t *DUMP = memregion("maincpu")->base();
 		FILE *fp;
