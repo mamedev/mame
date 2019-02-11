@@ -164,15 +164,15 @@ private:
 
 	// internal state
 
-	DECLARE_READ32_MEMBER(cmap0_r);
-	DECLARE_WRITE32_MEMBER(cmap0_w);
-	DECLARE_READ32_MEMBER(cmap1_r);
-	DECLARE_READ32_MEMBER(xmap0_r);
-	DECLARE_WRITE32_MEMBER(xmap0_w);
-	DECLARE_READ32_MEMBER(xmap1_r);
-	DECLARE_WRITE32_MEMBER(xmap1_w);
-	DECLARE_READ32_MEMBER(vc2_r);
-	DECLARE_WRITE32_MEMBER(vc2_w);
+	uint32_t cmap0_read();
+	void cmap0_write(uint32_t data);
+	uint32_t cmap1_read();
+	uint32_t xmap0_read();
+	void xmap0_write(uint32_t data);
+	uint32_t xmap1_read();
+	void xmap1_write(uint32_t data);
+	uint32_t vc2_read();
+	void vc2_write(uint32_t data);
 
 	void write_pixel(uint32_t x, uint32_t y, uint8_t color);
 	void do_v_iline(uint16_t x1, uint16_t y1, uint16_t y2, uint8_t color, bool skip_last);

@@ -245,7 +245,7 @@ uint32_t newport_video_device::screen_update(screen_device &device, bitmap_rgb32
 }
 
 
-WRITE32_MEMBER(newport_video_device::cmap0_w)
+void newport_video_device::cmap0_write(uint32_t data)
 {
 	switch (m_rex3.m_dcb_reg_select)
 	{
@@ -263,7 +263,7 @@ WRITE32_MEMBER(newport_video_device::cmap0_w)
 	}
 }
 
-READ32_MEMBER(newport_video_device::cmap0_r)
+uint32_t newport_video_device::cmap0_read()
 {
 	switch (m_rex3.m_dcb_reg_select)
 	{
@@ -279,7 +279,7 @@ READ32_MEMBER(newport_video_device::cmap0_r)
 	}
 }
 
-READ32_MEMBER(newport_video_device::cmap1_r)
+uint32_t newport_video_device::cmap1_read()
 {
 	switch (m_rex3.m_dcb_reg_select)
 	{
@@ -295,7 +295,7 @@ READ32_MEMBER(newport_video_device::cmap1_r)
 	}
 }
 
-READ32_MEMBER(newport_video_device::xmap0_r)
+uint32_t newport_video_device::xmap0_read()
 {
 	switch (m_rex3.m_dcb_reg_select)
 	{
@@ -353,7 +353,7 @@ READ32_MEMBER(newport_video_device::xmap0_r)
 	return 0;
 }
 
-WRITE32_MEMBER(newport_video_device::xmap0_w)
+void newport_video_device::xmap0_write(uint32_t data)
 {
 	switch (m_rex3.m_dcb_reg_select)
 	{
@@ -392,7 +392,7 @@ WRITE32_MEMBER(newport_video_device::xmap0_w)
 	}
 }
 
-READ32_MEMBER(newport_video_device::xmap1_r)
+uint32_t newport_video_device::xmap1_read()
 {
 	switch (m_rex3.m_dcb_reg_select)
 	{
@@ -450,7 +450,7 @@ READ32_MEMBER(newport_video_device::xmap1_r)
 	return 0;
 }
 
-WRITE32_MEMBER(newport_video_device::xmap1_w)
+void newport_video_device::xmap1_write(uint32_t data)
 {
 	switch (m_rex3.m_dcb_reg_select)
 	{
@@ -489,7 +489,7 @@ WRITE32_MEMBER(newport_video_device::xmap1_w)
 	}
 }
 
-READ32_MEMBER(newport_video_device::vc2_r)
+uint32_t newport_video_device::vc2_read()
 {
 	switch (m_rex3.m_dcb_reg_select)
 	{
@@ -571,7 +571,7 @@ READ32_MEMBER(newport_video_device::vc2_r)
 	}
 }
 
-WRITE32_MEMBER(newport_video_device::vc2_w)
+void newport_video_device::vc2_write(uint32_t data)
 {
 	switch (m_rex3.m_xfer_width)
 	{
@@ -881,15 +881,15 @@ READ32_MEMBER(newport_video_device::rex3_r)
 		switch (m_rex3.m_dcb_slave_select)
 		{
 		case 0x00:
-			return vc2_r(space, 0, mem_mask);
+			return vc2_read();
 		case 0x02:
-			return cmap0_r(space, 0, mem_mask);
+			return cmap0_read();
 		case 0x03:
-			return cmap1_r(space, 0, mem_mask);
+			return cmap1_read();
 		case 0x05:
-			return xmap0_r(space, 0, mem_mask);
+			return xmap0_read();
 		case 0x06:
-			return xmap1_r(space, 0, mem_mask);
+			return xmap1_read();
 		default:
 			LOGMASKED(LOG_REX3, "REX3 Display Control Bus Data MSW Read: %08x\n", m_rex3.m_dcb_data_msw);
 			break;
@@ -1978,20 +1978,20 @@ WRITE32_MEMBER(newport_video_device::rex3_w)
 		switch (m_rex3.m_dcb_slave_select)
 		{
 		case 0x00:
-			vc2_w(space, 0, data, mem_mask);
+			vc2_write(data);
 			break;
 		case 0x01:
-			cmap0_w(space, 0, data, mem_mask);
+			cmap0_write(data);
 			break;
 		case 0x04:
-			xmap0_w(space, 0, data, mem_mask);
-			xmap1_w(space, 0, data, mem_mask);
+			xmap0_write(data);
+			xmap1_write(data);
 			break;
 		case 0x05:
-			xmap0_w(space, 0, data, mem_mask);
+			xmap0_write(data);
 			break;
 		case 0x06:
-			xmap1_w(space, 0, data, mem_mask);
+			xmap1_write(data);
 			break;
 		default:
 			LOGMASKED(LOG_REX3 | LOG_UNKNOWN, "REX3 Display Control Bus Data MSW Write: %08x\n", data);
