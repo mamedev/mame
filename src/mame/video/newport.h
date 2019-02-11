@@ -24,8 +24,8 @@ public:
 
 	newport_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ32_MEMBER(rex3_r);
-	DECLARE_WRITE32_MEMBER(rex3_w);
+	DECLARE_READ64_MEMBER(rex3_r);
+	DECLARE_WRITE64_MEMBER(rex3_w);
 
 	uint32_t screen_update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -134,8 +134,7 @@ private:
 		uint32_t m_write_mask;
 		uint32_t m_zero_fract;
 		uint32_t m_zero_overflow;
-		uint32_t m_host_dataport_msw;
-		uint32_t m_host_dataport_lsw;
+		uint64_t m_host_dataport;
 		uint32_t m_dcb_mode;
 		uint32_t m_dcb_reg_select;
 		uint32_t m_dcb_slave_select;

@@ -146,8 +146,7 @@ void newport_video_device::device_start()
 	save_item(NAME(m_rex3.m_write_mask));
 	save_item(NAME(m_rex3.m_zero_fract));
 	save_item(NAME(m_rex3.m_zero_overflow));
-	save_item(NAME(m_rex3.m_host_dataport_msw));
-	save_item(NAME(m_rex3.m_host_dataport_lsw));
+	save_item(NAME(m_rex3.m_host_dataport));
 	save_item(NAME(m_rex3.m_dcb_mode));
 	save_item(NAME(m_rex3.m_dcb_reg_select));
 	save_item(NAME(m_rex3.m_dcb_slave_select));
@@ -716,239 +715,437 @@ WRITE_LINE_MEMBER(newport_video_device::vblank_w)
 	}
 }
 
-READ32_MEMBER(newport_video_device::rex3_r)
+READ64_MEMBER(newport_video_device::rex3_r)
 {
-	switch (offset & ~(0x800/4))
+	uint64_t ret = 0;
+	switch (offset & ~(0x800/8))
 	{
-	case 0x0000/4:
-		LOGMASKED(LOG_REX3, "REX3 Draw Mode 1 Read: %08x\n", m_rex3.m_draw_mode1);
-		return m_rex3.m_draw_mode1;
-	case 0x0004/4:
-		LOGMASKED(LOG_REX3, "REX3 Draw Mode 0 Read: %08x\n", m_rex3.m_draw_mode0);
-		return m_rex3.m_draw_mode0;
-	case 0x0008/4:
-		LOGMASKED(LOG_REX3, "REX3 Line Stipple Mode Read: %08x\n", m_rex3.m_ls_mode);
-		return m_rex3.m_ls_mode;
-	case 0x000c/4:
-		LOGMASKED(LOG_REX3, "REX3 Line Stipple Pattern Read: %08x\n", m_rex3.m_ls_pattern);
-		return m_rex3.m_ls_pattern;
-	case 0x0010/4:
-		LOGMASKED(LOG_REX3, "REX3 Line Stipple Pattern (Save) Read: %08x\n", m_rex3.m_ls_pattern_saved);
-		return m_rex3.m_ls_pattern_saved;
-	case 0x0014/4:
-		LOGMASKED(LOG_REX3, "REX3 Pattern Register Read: %08x\n", m_rex3.m_z_pattern);
-		return m_rex3.m_z_pattern;
-	case 0x0018/4:
-		LOGMASKED(LOG_REX3, "REX3 Opaque Pattern / Blendfunc Dest Color Read: %08x\n", m_rex3.m_color_back);
-		return m_rex3.m_color_back;
-	case 0x001c/4:
-		LOGMASKED(LOG_REX3, "REX3 VRAM Fastclear Color Read: %08x\n", m_rex3.m_color_vram);
-		return m_rex3.m_color_vram;
-	case 0x0020/4:
+	case 0x0000/8:
+		if (ACCESSING_BITS_32_63)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Draw Mode 1 Read: %08x\n", m_rex3.m_draw_mode1);
+			ret |= (uint64_t)m_rex3.m_draw_mode1 << 32;
+		}
+		if (ACCESSING_BITS_0_31)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Draw Mode 0 Read: %08x\n", m_rex3.m_draw_mode0);
+			ret |= m_rex3.m_draw_mode0;
+		}
+		break;
+	case 0x0008/8:
+		if (ACCESSING_BITS_32_63)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Line Stipple Mode Read: %08x\n", m_rex3.m_ls_mode);
+			ret |= (uint64_t)m_rex3.m_ls_mode << 32;
+		}
+		if (ACCESSING_BITS_0_31)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Line Stipple Pattern Read: %08x\n", m_rex3.m_ls_pattern);
+			ret |= m_rex3.m_ls_pattern;
+		}
+		break;
+	case 0x0010/8:
+		if (ACCESSING_BITS_32_63)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Line Stipple Pattern (Save) Read: %08x\n", m_rex3.m_ls_pattern_saved);
+			ret |= (uint64_t)m_rex3.m_ls_pattern_saved << 32;
+		}
+		if (ACCESSING_BITS_0_31)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Pattern Register Read: %08x\n", m_rex3.m_z_pattern);
+			ret |= m_rex3.m_z_pattern;
+		}
+		break;
+	case 0x0018/8:
+		if (ACCESSING_BITS_32_63)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Opaque Pattern / Blendfunc Dest Color Read: %08x\n", m_rex3.m_color_back);
+			ret |= (uint64_t)m_rex3.m_color_back << 32;
+		}
+		if (ACCESSING_BITS_0_31)
+		{
+			LOGMASKED(LOG_REX3, "REX3 VRAM Fastclear Color Read: %08x\n", m_rex3.m_color_vram);
+			ret |= m_rex3.m_color_vram;
+		}
+		break;
+	case 0x0020/8:
 		LOGMASKED(LOG_REX3, "REX3 AFUNCTION Reference Alpha Read: %08x\n", m_rex3.m_alpha_ref);
-		return m_rex3.m_alpha_ref;
-	case 0x0028/4:
-		LOGMASKED(LOG_REX3, "REX3 Screenmask 0 X Min/Max Read: %08x\n", m_rex3.m_smask_x[0]);
-		return m_rex3.m_smask_x[0];
-	case 0x002c/4:
-		LOGMASKED(LOG_REX3, "REX3 Screenmask 0 Y Min/Max Read: %08x\n", m_rex3.m_smask_y[0]);
-		return m_rex3.m_smask_y[0];
-	case 0x0030/4:
-		LOGMASKED(LOG_REX3, "REX3 Line/Span Setup Read: %08x\n", m_rex3.m_setup);
-		return m_rex3.m_setup;
-	case 0x0034/4:
-		LOGMASKED(LOG_REX3, "REX3 ZPattern Enable Read: %08x\n", m_rex3.m_step_z);
-		return m_rex3.m_step_z;
-	case 0x0100/4:
-		LOGMASKED(LOG_REX3, "REX3 X Start Read: %08x\n", m_rex3.m_x_start);
-		return m_rex3.m_x_start;
-	case 0x0104/4:
-		LOGMASKED(LOG_REX3, "REX3 YStart Read: %08x\n", m_rex3.m_y_start);
-		return m_rex3.m_y_start;
-	case 0x0108/4:
-		LOGMASKED(LOG_REX3, "REX3 XEnd Read: %08x\n", m_rex3.m_x_end);
-		return m_rex3.m_x_end;
-	case 0x010c/4:
-		LOGMASKED(LOG_REX3, "REX3 YEnd Read: %08x\n", m_rex3.m_y_end);
-		return m_rex3.m_y_end;
-	case 0x0110/4:
-		LOGMASKED(LOG_REX3, "REX3 XSave Read: %08x\n", m_rex3.m_x_save);
-		return m_rex3.m_x_save;
-	case 0x0114/4:
-		LOGMASKED(LOG_REX3, "REX3 XYMove Read: %08x\n", m_rex3.m_xy_move);
-		return m_rex3.m_xy_move;
-	case 0x0118/4:
-		LOGMASKED(LOG_REX3, "REX3 Bresenham D Read: %08x\n", m_rex3.m_bres_d);
-		return m_rex3.m_bres_d;
-	case 0x011c/4:
-		LOGMASKED(LOG_REX3, "REX3 Bresenham S1 Read: %08x\n", m_rex3.m_bres_s1);
-		return m_rex3.m_bres_s1;
-	case 0x0120/4:
-		LOGMASKED(LOG_REX3, "REX3 Bresenham Octant & Incr1 Read: %08x\n", m_rex3.m_bres_octant_inc1);
-		return m_rex3.m_bres_octant_inc1;
-	case 0x0124/4:
-		LOGMASKED(LOG_REX3, "REX3 Bresenham Octant Rounding Mode & Incr2 Read: %08x\n", m_rex3.m_bres_round_inc2);
-		return m_rex3.m_bres_round_inc2;
-	case 0x0128/4:
-		LOGMASKED(LOG_REX3, "REX3 Bresenham E1 Read: %08x\n", m_rex3.m_bres_e1);
-		return m_rex3.m_bres_e1;
-	case 0x012c/4:
-		LOGMASKED(LOG_REX3, "REX3 Bresenham S2 Read: %08x\n", m_rex3.m_bres_s2);
-		return m_rex3.m_bres_s2;
-	case 0x0130/4:
-		LOGMASKED(LOG_REX3, "REX3 AA Line Weight Table 1/2 Read: %08x\n", m_rex3.m_a_weight0);
-		return m_rex3.m_a_weight0;
-	case 0x0134/4:
-		LOGMASKED(LOG_REX3, "REX3 AA Line Weight Table 2/2 Read: %08x\n", m_rex3.m_a_weight1);
-		return m_rex3.m_a_weight1;
-	case 0x0138/4:
-		LOGMASKED(LOG_REX3, "REX3 GL XStart Read: %08x\n", m_rex3.m_x_start_f);
-		return m_rex3.m_x_start_f;
-	case 0x013c/4:
-		LOGMASKED(LOG_REX3, "REX3 GL YStart Read: %08x\n", m_rex3.m_y_start_f);
-		return m_rex3.m_y_start_f;
-	case 0x0140/4:
-		LOGMASKED(LOG_REX3, "REX3 GL XEnd Read: %08x\n", m_rex3.m_x_end_f);
-		return m_rex3.m_x_end_f;
-	case 0x0144/4:
-		LOGMASKED(LOG_REX3, "REX3 GL YEnd Read: %08x\n", m_rex3.m_y_end_f);
-		return m_rex3.m_y_end_f;
-	case 0x0148/4:
-		LOGMASKED(LOG_REX3, "REX3 XStart (integer) Read: %08x\n", m_rex3.m_x_start_i);
-		return m_rex3.m_x_start_i;
-	case 0x014c/4:
-		LOGMASKED(LOG_REX3, "REX3 GL XEnd (copy) Read: %08x\n", m_rex3.m_x_end_f);
-		return m_rex3.m_x_end_f;
-	case 0x0150/4:
-		LOGMASKED(LOG_REX3, "REX3 XYStart (integer) Read: %08x\n", m_rex3.m_xy_start_i);
-		return m_rex3.m_xy_start_i;
-	case 0x0154/4:
-		LOGMASKED(LOG_REX3, "REX3 XYEnd (integer) Read: %08x\n", m_rex3.m_xy_end_i);
-		return m_rex3.m_xy_end_i;
-	case 0x0158/4:
-		LOGMASKED(LOG_REX3, "REX3 XStartEnd (integer) Read: %08x\n", m_rex3.m_x_start_end_i);
-		return m_rex3.m_x_start_end_i;
-	case 0x0200/4:
-		LOGMASKED(LOG_REX3, "REX3 Red/CI Full State Read: %08x\n", m_rex3.m_color_red);
-		return m_rex3.m_color_red;
-	case 0x0204/4:
-		LOGMASKED(LOG_REX3, "REX3 Alpha Full State Read: %08x\n", m_rex3.m_color_alpha);
-		return m_rex3.m_color_alpha;
-	case 0x0208/4:
-		LOGMASKED(LOG_REX3, "REX3 Green Full State Read: %08x\n", m_rex3.m_color_green);
-		return m_rex3.m_color_green;
-	case 0x020c/4:
-		LOGMASKED(LOG_REX3, "REX3 Blue Full State Read: %08x\n", m_rex3.m_color_blue);
-		return m_rex3.m_color_blue;
-	case 0x0210/4:
-		LOGMASKED(LOG_REX3, "REX3 Red/CI Slope Read: %08x\n", m_rex3.m_slope_red);
-		return m_rex3.m_slope_red;
-	case 0x0214/4:
-		LOGMASKED(LOG_REX3, "REX3 Alpha Slope Read: %08x\n", m_rex3.m_slope_alpha);
-		return m_rex3.m_slope_alpha;
-	case 0x0218/4:
-		LOGMASKED(LOG_REX3, "REX3 Green Slope Read: %08x\n", m_rex3.m_slope_green);
-		return m_rex3.m_slope_green;
-	case 0x021c/4:
-		LOGMASKED(LOG_REX3, "REX3 Blue Slope Read: %08x\n", m_rex3.m_slope_blue);
-		return m_rex3.m_slope_blue;
-	case 0x0220/4:
-		LOGMASKED(LOG_REX3, "REX3 Write Mask Read: %08x\n", m_rex3.m_write_mask);
-		return m_rex3.m_write_mask;
-	case 0x0224/4:
-		LOGMASKED(LOG_REX3, "REX3 Packed Color Fractions Read: %08x\n", m_rex3.m_zero_fract);
-		return m_rex3.m_zero_fract;
-	case 0x0228/4:
-		LOGMASKED(LOG_REX3, "REX3 Color Index Zeros Overflow Read: %08x\n", m_rex3.m_zero_overflow);
-		return m_rex3.m_zero_overflow;
-	case 0x022c/4:
-		LOGMASKED(LOG_REX3, "REX3 Red/CI Slope (copy) Read: %08x\n", m_rex3.m_slope_red);
-		return m_rex3.m_slope_red;
-	case 0x0230/4:
+		ret |= (uint64_t)m_rex3.m_alpha_ref << 32;
+		break;
+	case 0x0028/8:
+		if (ACCESSING_BITS_32_63)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Screenmask 0 X Min/Max Read: %08x\n", m_rex3.m_smask_x[0]);
+			ret |= (uint64_t)m_rex3.m_smask_x[0] << 32;
+		}
+		if (ACCESSING_BITS_0_31)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Screenmask 0 Y Min/Max Read: %08x\n", m_rex3.m_smask_y[0]);
+			ret |= m_rex3.m_smask_y[0];
+		}
+		break;
+	case 0x0030/8:
+		if (ACCESSING_BITS_32_63)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Line/Span Setup Read: %08x\n", m_rex3.m_setup);
+			ret |= (uint64_t)m_rex3.m_setup << 32;
+		}
+		if (ACCESSING_BITS_0_31)
+		{
+			LOGMASKED(LOG_REX3, "REX3 ZPattern Enable Read: %08x\n", m_rex3.m_step_z);
+			ret |= m_rex3.m_step_z;
+		}
+		break;
+	case 0x0100/8:
+		if (ACCESSING_BITS_32_63)
+		{
+			LOGMASKED(LOG_REX3, "REX3 X Start Read: %08x\n", m_rex3.m_x_start);
+			ret |= (uint64_t)m_rex3.m_x_start << 32;
+		}
+		if (ACCESSING_BITS_0_31)
+		{
+			LOGMASKED(LOG_REX3, "REX3 YStart Read: %08x\n", m_rex3.m_y_start);
+			ret |= m_rex3.m_y_start;
+		}
+		break;
+	case 0x0108/8:
+		if (ACCESSING_BITS_32_63)
+		{
+			LOGMASKED(LOG_REX3, "REX3 XEnd Read: %08x\n", m_rex3.m_x_end);
+			ret |= (uint64_t)m_rex3.m_x_end << 32;
+		}
+		if (ACCESSING_BITS_0_31)
+		{
+			LOGMASKED(LOG_REX3, "REX3 YEnd Read: %08x\n", m_rex3.m_y_end);
+			ret |= m_rex3.m_y_end;
+		}
+		break;
+	case 0x0110/8:
+		if (ACCESSING_BITS_32_63)
+		{
+			LOGMASKED(LOG_REX3, "REX3 XSave Read: %08x\n", m_rex3.m_x_save);
+			ret |= (uint64_t)m_rex3.m_x_save << 32;
+		}
+		if (ACCESSING_BITS_0_31)
+		{
+			LOGMASKED(LOG_REX3, "REX3 XYMove Read: %08x\n", m_rex3.m_xy_move);
+			ret |= m_rex3.m_xy_move;
+		}
+		break;
+	case 0x0118/8:
+		if (ACCESSING_BITS_32_63)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Bresenham D Read: %08x\n", m_rex3.m_bres_d);
+			ret |= (uint64_t)m_rex3.m_bres_d << 32;
+		}
+		if (ACCESSING_BITS_0_31)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Bresenham S1 Read: %08x\n", m_rex3.m_bres_s1);
+			ret |= m_rex3.m_bres_s1;
+		}
+		break;
+	case 0x0120/8:
+		if (ACCESSING_BITS_32_63)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Bresenham Octant & Incr1 Read: %08x\n", m_rex3.m_bres_octant_inc1);
+			ret |= (uint64_t)m_rex3.m_bres_octant_inc1 << 32;
+		}
+		if (ACCESSING_BITS_0_31)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Bresenham Octant Rounding Mode & Incr2 Read: %08x\n", m_rex3.m_bres_round_inc2);
+			ret |= m_rex3.m_bres_round_inc2;
+		}
+		break;
+	case 0x0128/8:
+		if (ACCESSING_BITS_32_63)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Bresenham E1 Read: %08x\n", m_rex3.m_bres_e1);
+			ret |= (uint64_t)m_rex3.m_bres_e1 << 32;
+		}
+		if (ACCESSING_BITS_0_31)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Bresenham S2 Read: %08x\n", m_rex3.m_bres_s2);
+			ret |= m_rex3.m_bres_s2;
+		}
+		break;
+	case 0x0130/8:
+		if (ACCESSING_BITS_32_63)
+		{
+			LOGMASKED(LOG_REX3, "REX3 AA Line Weight Table 1/2 Read: %08x\n", m_rex3.m_a_weight0);
+			ret |= (uint64_t)m_rex3.m_a_weight0 << 32;
+		}
+		if (ACCESSING_BITS_0_31)
+		{
+			LOGMASKED(LOG_REX3, "REX3 AA Line Weight Table 2/2 Read: %08x\n", m_rex3.m_a_weight1);
+			ret |= m_rex3.m_a_weight1;
+		}
+		break;
+	case 0x0138/8:
+		if (ACCESSING_BITS_32_63)
+		{
+			LOGMASKED(LOG_REX3, "REX3 GL XStart Read: %08x\n", m_rex3.m_x_start_f);
+			ret |= (uint64_t)m_rex3.m_x_start_f << 32;
+		}
+		if (ACCESSING_BITS_0_31)
+		{
+			LOGMASKED(LOG_REX3, "REX3 GL YStart Read: %08x\n", m_rex3.m_y_start_f);
+			ret |= m_rex3.m_y_start_f;
+		}
+		break;
+	case 0x0140/8:
+		if (ACCESSING_BITS_32_63)
+		{
+			LOGMASKED(LOG_REX3, "REX3 GL XEnd Read: %08x\n", m_rex3.m_x_end_f);
+			ret |= (uint64_t)m_rex3.m_x_end_f << 32;
+		}
+		if (ACCESSING_BITS_0_31)
+		{
+			LOGMASKED(LOG_REX3, "REX3 GL YEnd Read: %08x\n", m_rex3.m_y_end_f);
+			ret |= m_rex3.m_y_end_f;
+		}
+		break;
+	case 0x0148/8:
+		if (ACCESSING_BITS_32_63)
+		{
+			LOGMASKED(LOG_REX3, "REX3 XStart (integer) Read: %08x\n", m_rex3.m_x_start_i);
+			ret |= (uint64_t)m_rex3.m_x_start_i << 32;
+		}
+		if (ACCESSING_BITS_0_31)
+		{
+			LOGMASKED(LOG_REX3, "REX3 GL XEnd (copy) Read: %08x\n", m_rex3.m_x_end_f);
+			ret |= m_rex3.m_x_end_f;
+		}
+		break;
+	case 0x0150/8:
+		if (ACCESSING_BITS_32_63)
+		{
+			LOGMASKED(LOG_REX3, "REX3 XYStart (integer) Read: %08x\n", m_rex3.m_xy_start_i);
+			ret |= (uint64_t)m_rex3.m_xy_start_i << 32;
+		}
+		if (ACCESSING_BITS_0_31)
+		{
+			LOGMASKED(LOG_REX3, "REX3 XYEnd (integer) Read: %08x\n", m_rex3.m_xy_end_i);
+			ret |= m_rex3.m_xy_end_i;
+		}
+		break;
+	case 0x0158/8:
+		if (ACCESSING_BITS_32_63)
+		{
+			LOGMASKED(LOG_REX3, "REX3 XStartEnd (integer) Read: %08x\n", m_rex3.m_x_start_end_i);
+			ret |= (uint64_t)m_rex3.m_x_start_end_i << 32;
+		}
+		break;
+	case 0x0200/8:
+		if (ACCESSING_BITS_32_63)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Red/CI Full State Read: %08x\n", m_rex3.m_color_red);
+			ret |= (uint64_t)m_rex3.m_color_red << 32;
+		}
+		if (ACCESSING_BITS_0_31)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Alpha Full State Read: %08x\n", m_rex3.m_color_alpha);
+			ret |= m_rex3.m_color_alpha;
+		}
+		break;
+	case 0x0208/8:
+		if (ACCESSING_BITS_32_63)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Green Full State Read: %08x\n", m_rex3.m_color_green);
+			ret |= (uint64_t)m_rex3.m_color_green << 32;
+		}
+		if (ACCESSING_BITS_0_31)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Blue Full State Read: %08x\n", m_rex3.m_color_blue);
+			ret |= m_rex3.m_color_blue;
+		}
+		break;
+	case 0x0210/8:
+		if (ACCESSING_BITS_32_63)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Red/CI Slope Read: %08x\n", m_rex3.m_slope_red);
+			ret |= (uint64_t)m_rex3.m_slope_red << 32;
+		}
+		if (ACCESSING_BITS_0_31)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Alpha Slope Read: %08x\n", m_rex3.m_slope_alpha);
+			ret |= m_rex3.m_slope_alpha;
+		}
+		break;
+	case 0x0218/8:
+		if (ACCESSING_BITS_32_63)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Green Slope Read: %08x\n", m_rex3.m_slope_green);
+			ret |= (uint64_t)m_rex3.m_slope_green << 32;
+		}
+		if (ACCESSING_BITS_0_31)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Blue Slope Read: %08x\n", m_rex3.m_slope_blue);
+			ret |= m_rex3.m_slope_blue;
+		}
+		break;
+	case 0x0220/8:
+		if (ACCESSING_BITS_32_63)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Write Mask Read: %08x\n", m_rex3.m_write_mask);
+			ret |= (uint64_t)m_rex3.m_write_mask << 32;
+		}
+		if (ACCESSING_BITS_0_31)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Packed Color Fractions Read: %08x\n", m_rex3.m_zero_fract);
+			ret |= m_rex3.m_zero_fract;
+		}
+		break;
+	case 0x0228/8:
+		if (ACCESSING_BITS_32_63)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Color Index Zeros Overflow Read: %08x\n", m_rex3.m_zero_overflow);
+			ret |= (uint64_t)m_rex3.m_zero_overflow << 32;
+		}
+		if (ACCESSING_BITS_0_31)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Red/CI Slope (copy) Read: %08x\n", m_rex3.m_slope_red);
+			ret |= m_rex3.m_slope_red;
+		}
+		break;
+	case 0x0230/8:
 		if (m_rex3.m_read_active)
+			m_rex3.m_host_dataport = do_pixel_word_read();
+		LOGMASKED(LOG_REX3, "REX3 Host Data Port Read: %08x%08x\n", (uint32_t)(m_rex3.m_host_dataport >> 32), (uint32_t)m_rex3.m_host_dataport);
+		ret = m_rex3.m_host_dataport;
+		break;
+	case 0x0238/8:
+		if (ACCESSING_BITS_32_63)
 		{
-			m_rex3.m_host_dataport_msw = do_pixel_word_read();
+			LOGMASKED(LOG_REX3, "REX3 Display Control Bus Mode Read: %08x\n", m_rex3.m_dcb_mode);
+			ret |= (uint64_t)m_rex3.m_dcb_mode << 32;
 		}
-		LOGMASKED(LOG_REX3, "REX3 Host Data Port MSW Read: %08x\n", m_rex3.m_host_dataport_msw);
-		return m_rex3.m_host_dataport_msw;
-	case 0x0234/4:
-		LOGMASKED(LOG_REX3, "REX3 Host Data Port LSW Read: %08x\n", m_rex3.m_host_dataport_lsw);
-		return m_rex3.m_host_dataport_lsw;
-	case 0x0238/4:
-		LOGMASKED(LOG_REX3, "REX3 Display Control Bus Mode Read: %08x\n", m_rex3.m_dcb_mode);
-		return m_rex3.m_dcb_mode;
-	case 0x0240/4:
-		switch (m_rex3.m_dcb_slave_select)
+		break;
+	case 0x0240/8:
+		if (ACCESSING_BITS_32_63)
 		{
-		case 0x00:
-			return vc2_read();
-		case 0x02:
-			return cmap0_read();
-		case 0x03:
-			return cmap1_read();
-		case 0x05:
-			return xmap0_read();
-		case 0x06:
-			return xmap1_read();
-		default:
-			LOGMASKED(LOG_REX3, "REX3 Display Control Bus Data MSW Read: %08x\n", m_rex3.m_dcb_data_msw);
-			break;
+			switch (m_rex3.m_dcb_slave_select)
+			{
+			case 0x00:
+				ret |= (uint64_t)vc2_read() << 32;
+				break;
+			case 0x02:
+				ret |= (uint64_t)cmap0_read() << 32;
+				break;
+			case 0x03:
+				ret |= (uint64_t)cmap1_read() << 32;
+				break;
+			case 0x05:
+				ret |= (uint64_t)xmap0_read() << 32;
+				break;
+			case 0x06:
+				ret |= (uint64_t)xmap1_read() << 32;
+				break;
+			default:
+				LOGMASKED(LOG_REX3, "REX3 Display Control Bus Data MSW Read: %08x\n", m_rex3.m_dcb_data_msw);
+				ret |= (uint64_t)m_rex3.m_dcb_data_msw << 32;
+				break;
+			}
 		}
-		return m_rex3.m_dcb_data_msw;
-	case 0x0244/4:
-		LOGMASKED(LOG_REX3, "REX3 Display Control Bus Data LSW Read: %08x\n", m_rex3.m_dcb_data_lsw);
-		return m_rex3.m_dcb_data_lsw;
-	case 0x1300/4:
-		LOGMASKED(LOG_REX3, "REX3 Screenmask 1 X Min/Max Read: %08x\n", m_rex3.m_smask_x[1]);
-		return m_rex3.m_smask_x[1];
-	case 0x1304/4:
-		LOGMASKED(LOG_REX3, "REX3 Screenmask 1 Y Min/Max Read: %08x\n", m_rex3.m_smask_y[1]);
-		return m_rex3.m_smask_y[1];
-	case 0x1308/4:
-		LOGMASKED(LOG_REX3, "REX3 Screenmask 2 X Min/Max Read: %08x\n", m_rex3.m_smask_x[2]);
-		return m_rex3.m_smask_x[2];
-	case 0x130c/4:
-		LOGMASKED(LOG_REX3, "REX3 Screenmask 2 Y Min/Max Read: %08x\n", m_rex3.m_smask_y[2]);
-		return m_rex3.m_smask_y[2];
-	case 0x1310/4:
-		LOGMASKED(LOG_REX3, "REX3 Screenmask 3 X Min/Max Read: %08x\n", m_rex3.m_smask_x[3]);
-		return m_rex3.m_smask_x[3];
-	case 0x1314/4:
-		LOGMASKED(LOG_REX3, "REX3 Screenmask 3 Y Min/Max Read: %08x\n", m_rex3.m_smask_y[3]);
-		return m_rex3.m_smask_y[3];
-	case 0x1318/4:
-		LOGMASKED(LOG_REX3, "REX3 Screenmask 4 X Min/Max Read: %08x\n", m_rex3.m_smask_x[4]);
-		return m_rex3.m_smask_x[4];
-	case 0x131c/4:
-		LOGMASKED(LOG_REX3, "REX3 Screenmask 4 Y Min/Max Read: %08x\n", m_rex3.m_smask_y[4]);
-		return m_rex3.m_smask_y[4];
-	case 0x1320/4:
-		LOGMASKED(LOG_REX3, "REX3 Top of Screen Scanline Read: %08x\n", m_rex3.m_top_scanline);
-		return m_rex3.m_top_scanline;
-	case 0x1324/4:
-		LOGMASKED(LOG_REX3, "REX3 XY Window Read: %08x\n", m_rex3.m_xy_window);
-		return m_rex3.m_xy_window;
-	case 0x1328/4:
-		LOGMASKED(LOG_REX3, "REX3 Clipping Mode Read: %08x\n", m_rex3.m_clip_mode);
-		return m_rex3.m_clip_mode;
-	case 0x1330/4:
-		LOGMASKED(LOG_REX3, "REX3 Config Read: %08x\n", m_rex3.m_config);
-		return m_rex3.m_config;
-	case 0x1338/4:
-	{
-		LOGMASKED(LOG_REX3, "REX3 Status Read: %08x\n", m_rex3.m_status);
-		uint32_t old_status = m_rex3.m_status;
-		m_rex3.m_status = 0;
-		m_hpc3->lower_local_irq(1, ioc2_device::INT3_LOCAL1_RETRACE);
-		return old_status | 3;
-	}
-	case 0x133c/4:
-		LOGMASKED(LOG_REX3, "REX3 User Status Read: %08x\n", m_rex3.m_status);
-		return m_rex3.m_status;
+		if (ACCESSING_BITS_0_31)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Display Control Bus Data LSW Read: %08x\n", m_rex3.m_dcb_data_lsw);
+			ret |= m_rex3.m_dcb_data_lsw;
+		}
+		break;
+	case 0x1300/8:
+		if (ACCESSING_BITS_32_63)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Screenmask 1 X Min/Max Read: %08x\n", m_rex3.m_smask_x[1]);
+			ret |= (uint64_t)m_rex3.m_smask_x[1] << 32;
+		}
+		if (ACCESSING_BITS_0_31)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Screenmask 1 Y Min/Max Read: %08x\n", m_rex3.m_smask_y[1]);
+			ret |= m_rex3.m_smask_y[1];
+		}
+		break;
+	case 0x1308/8:
+		if (ACCESSING_BITS_32_63)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Screenmask 2 X Min/Max Read: %08x\n", m_rex3.m_smask_x[2]);
+			ret |= (uint64_t)m_rex3.m_smask_x[2] << 32;
+		}
+		if (ACCESSING_BITS_0_31)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Screenmask 2 Y Min/Max Read: %08x\n", m_rex3.m_smask_y[2]);
+			ret |= m_rex3.m_smask_y[2];
+		}
+		break;
+	case 0x1310/8:
+		if (ACCESSING_BITS_32_63)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Screenmask 3 X Min/Max Read: %08x\n", m_rex3.m_smask_x[3]);
+			ret |= (uint64_t)m_rex3.m_smask_x[3] << 32;
+		}
+		if (ACCESSING_BITS_0_31)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Screenmask 3 Y Min/Max Read: %08x\n", m_rex3.m_smask_y[3]);
+			ret |= m_rex3.m_smask_y[3];
+		}
+		break;
+	case 0x1318/8:
+		if (ACCESSING_BITS_32_63)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Screenmask 4 X Min/Max Read: %08x\n", m_rex3.m_smask_x[4]);
+			ret |= (uint64_t)m_rex3.m_smask_x[4] << 32;
+		}
+		if (ACCESSING_BITS_0_31)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Screenmask 4 Y Min/Max Read: %08x\n", m_rex3.m_smask_y[4]);
+			ret |= m_rex3.m_smask_y[4];
+		}
+		break;
+	case 0x1320/8:
+		if (ACCESSING_BITS_32_63)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Top of Screen Scanline Read: %08x\n", m_rex3.m_top_scanline);
+			ret |= (uint64_t)m_rex3.m_top_scanline << 32;
+		}
+		if (ACCESSING_BITS_0_31)
+		{
+			LOGMASKED(LOG_REX3, "REX3 XY Window Read: %08x\n", m_rex3.m_xy_window);
+			ret |= m_rex3.m_xy_window;
+		}
+		break;
+	case 0x1328/8:
+		if (ACCESSING_BITS_32_63)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Clipping Mode Read: %08x\n", m_rex3.m_clip_mode);
+			ret |= (uint64_t)m_rex3.m_clip_mode << 32;
+		}
+		break;
+	case 0x1330/8:
+		if (ACCESSING_BITS_32_63)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Config Read: %08x\n", m_rex3.m_config);
+			ret |= (uint64_t)m_rex3.m_config << 32;
+		}
+		break;
+	case 0x1338/8:
+		if (ACCESSING_BITS_32_63)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Status Read: %08x\n", m_rex3.m_status);
+			uint32_t old_status = m_rex3.m_status;
+			m_rex3.m_status = 0;
+			m_hpc3->lower_local_irq(1, ioc2_device::INT3_LOCAL1_RETRACE);
+			ret |= (uint64_t)(old_status | 3) << 32;
+		}
+		if (ACCESSING_BITS_0_31)
+		{
+			LOGMASKED(LOG_REX3, "REX3 User Status Read: %08x\n", m_rex3.m_status);
+			ret |= m_rex3.m_status;
+		}
+		break;
 	default:
-		LOGMASKED(LOG_REX3 | LOG_UNKNOWN, "Unknown REX3 Read: %08x (%08x)\n", 0x1f0f0000 + (offset << 2), mem_mask);
+		LOGMASKED(LOG_REX3 | LOG_UNKNOWN, "Unknown REX3 Read: %08x (%08x%08x)\n", 0x1f0f0000 + (offset << 2), (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
 		return 0;
 	}
+	return ret;
 }
 
 void newport_video_device::write_pixel(uint32_t x, uint32_t y, uint8_t color)
@@ -1275,20 +1472,19 @@ void newport_video_device::do_rex3_command()
 			uint16_t length = doubleword ? 8 : 4;
 			if (remaining_length < length)
 				length = remaining_length;
-			uint64_t dataport = ((uint64_t)m_rex3.m_host_dataport_msw << 32) | m_rex3.m_host_dataport_lsw;
-			LOGMASKED(LOG_COMMANDS, "%04x, %04x = %08x%08x\n", m_rex3.m_iter_x, m_rex3.m_iter_y, (uint32_t)(dataport >> 32), (uint32_t)dataport);
+			LOGMASKED(LOG_COMMANDS, "%04x, %04x = %08x%08x\n", m_rex3.m_iter_x, m_rex3.m_iter_y, (uint32_t)(m_rex3.m_host_dataport >> 32), (uint32_t)m_rex3.m_host_dataport);
 			uint64_t shift = 56;
 			for (uint16_t i = 0; i < length; i++)
 			{
-				write_pixel(m_rex3.m_iter_x, m_rex3.m_iter_y, (uint8_t)(dataport >> shift));
+				write_pixel(m_rex3.m_iter_x, m_rex3.m_iter_y, (uint8_t)(m_rex3.m_host_dataport >> shift));
 				m_rex3.m_iter_x++;
 				shift -= 8;
 			}
 		}
 		else
 		{
-			LOGMASKED(LOG_COMMANDS, "%04x, %04x = %02x\n", m_rex3.m_iter_x, m_rex3.m_iter_y, m_rex3.m_host_dataport_msw >> 24);
-			write_pixel(m_rex3.m_iter_x, m_rex3.m_iter_y, m_rex3.m_host_dataport_msw >> 24);
+			LOGMASKED(LOG_COMMANDS, "%04x, %04x = %02x\n", m_rex3.m_iter_x, m_rex3.m_iter_y, (uint8_t)(m_rex3.m_host_dataport >> 56));
+			write_pixel(m_rex3.m_iter_x, m_rex3.m_iter_y, m_rex3.m_host_dataport >> 56);
 			m_rex3.m_iter_x++;
 		}
 		if (m_rex3.m_iter_x > (m_rex3.m_xy_end_i >> 16))
@@ -1433,635 +1629,780 @@ void newport_video_device::do_rex3_command()
 	}
 }
 
-WRITE32_MEMBER(newport_video_device::rex3_w)
+WRITE64_MEMBER(newport_video_device::rex3_w)
 {
-	switch (offset & ~(0x800/4))
+	switch (offset & ~(0x800/8))
 	{
-	case 0x0000/4:
-		LOGMASKED(LOG_REX3, "REX3 Draw Mode 1 Write: %08x\n", data);
-		switch (data & 7)
+	case 0x0000/8:
+		if (ACCESSING_BITS_32_63)
 		{
-		case 0x00:
-			LOGMASKED(LOG_REX3, "    Planes Enabled:     None\n");
-			break;
-		case 0x01:
-			LOGMASKED(LOG_REX3, "    Planes Enabled:     R/W RGB/CI\n");
-			break;
-		case 0x02:
-			LOGMASKED(LOG_REX3, "    Planes Enabled:     R/W RGBA\n");
-			break;
-		case 0x03:
-			LOGMASKED(LOG_REX3, "    Planes Enabled:     R/W OLAY\n");
-			break;
-		case 0x04:
-			LOGMASKED(LOG_REX3, "    Planes Enabled:     R/W PUP\n");
-			break;
-		case 0x05:
-			LOGMASKED(LOG_REX3, "    Planes Enabled:     R/W CID\n");
-			break;
-		default:
-			LOGMASKED(LOG_REX3 | LOG_UNKNOWN, "    Unknown Plane Enable Value\n");
+			const uint32_t data32 = (uint32_t)(data >> 32);
+			LOGMASKED(LOG_REX3, "REX3 Draw Mode 1 Write: %08x\n", data32);
+			switch (data32 & 7)
+			{
+			case 0x00:
+				LOGMASKED(LOG_REX3, "    Planes Enabled:     None\n");
+				break;
+			case 0x01:
+				LOGMASKED(LOG_REX3, "    Planes Enabled:     R/W RGB/CI\n");
+				break;
+			case 0x02:
+				LOGMASKED(LOG_REX3, "    Planes Enabled:     R/W RGBA\n");
+				break;
+			case 0x03:
+				LOGMASKED(LOG_REX3, "    Planes Enabled:     R/W OLAY\n");
+				break;
+			case 0x04:
+				LOGMASKED(LOG_REX3, "    Planes Enabled:     R/W PUP\n");
+				break;
+			case 0x05:
+				LOGMASKED(LOG_REX3, "    Planes Enabled:     R/W CID\n");
+				break;
+			default:
+				LOGMASKED(LOG_REX3 | LOG_UNKNOWN, "    Unknown Plane Enable Value\n");
+				break;
+			}
+			switch ((data32 & 0x00000018) >> 3)
+			{
+			case 0x00:
+				LOGMASKED(LOG_REX3, "    Plane Draw Depth:    4 bits\n");
+				break;
+			case 0x01:
+				LOGMASKED(LOG_REX3, "    Plane Draw Depth:    8 bits\n");
+				break;
+			case 0x02:
+				LOGMASKED(LOG_REX3, "    Plane Draw Depth:   12 bits\n");
+				break;
+			case 0x03:
+				LOGMASKED(LOG_REX3, "    Plane Draw Depth:   32 bits\n");
+				break;
+			}
+			LOGMASKED(LOG_REX3, "    DBuf Source Buffer: %d\n", BIT(data, 5));
+			LOGMASKED(LOG_REX3, "    GL Y Coordinates:   %d\n", BIT(data, 6));
+			LOGMASKED(LOG_REX3, "    Enable Pxl Packing: %d\n", BIT(data, 7));
+			switch ((data32 & 0x00000300) >> 8)
+			{
+			case 0x00:
+				LOGMASKED(LOG_REX3, "    HOSTRW Depth:        4 bits\n");
+				break;
+			case 0x01:
+				LOGMASKED(LOG_REX3, "    HOSTRW Depth:        8 bits\n");
+				break;
+			case 0x02:
+				LOGMASKED(LOG_REX3, "    HOSTRW Depth:       12 bits\n");
+				break;
+			case 0x03:
+				LOGMASKED(LOG_REX3, "    HOSTRW Depth:       32 bits\n");
+				break;
+			}
+			LOGMASKED(LOG_REX3, "    DWord Transfers:    %d\n", BIT(data, 10));
+			LOGMASKED(LOG_REX3, "    Swap Endianness:    %d\n", BIT(data, 11));
+			LOGMASKED(LOG_REX3, "    Compare Src > Dest: %d\n", BIT(data, 12));
+			LOGMASKED(LOG_REX3, "    Compare Src = Dest: %d\n", BIT(data, 13));
+			LOGMASKED(LOG_REX3, "    Compare Src < Dest: %d\n", BIT(data, 14));
+			LOGMASKED(LOG_REX3, "    RGB Mode Select:    %d\n", BIT(data, 15));
+			LOGMASKED(LOG_REX3, "    Enable Dithering:   %d\n", BIT(data, 16));
+			LOGMASKED(LOG_REX3, "    Enable Fast Clear:  %d\n", BIT(data, 17));
+			LOGMASKED(LOG_REX3, "    Enable Blending:    %d\n", BIT(data, 18));
+			switch ((data32 & 0x00380000) >> 19)
+			{
+			case 0x00:
+				LOGMASKED(LOG_REX3, "    Src Blend Factor:   0\n");
+				break;
+			case 0x01:
+				LOGMASKED(LOG_REX3, "    Src Blend Factor:   1\n");
+				break;
+			case 0x02:
+				LOGMASKED(LOG_REX3, "    Src Blend Factor:   Normalized Dest (or COLORBACK)\n");
+				break;
+			case 0x03:
+				LOGMASKED(LOG_REX3, "    Src Blend Factor:   1 - Normalized Dest (or COLORBACK)\n");
+				break;
+			case 0x04:
+				LOGMASKED(LOG_REX3, "    Src Blend Factor:   Normalized Src\n");
+				break;
+			case 0x05:
+				LOGMASKED(LOG_REX3, "    Src Blend Factor:   1 - Normalized Src\n");
+				break;
+			default:
+				LOGMASKED(LOG_REX3 | LOG_UNKNOWN, "    Unknown Src Blend Factor: %02x\n", (data32 & 0x00380000) >> 19);
+				break;
+			}
+			switch ((data32 & 0x01c00000) >> 22)
+			{
+			case 0x00:
+				LOGMASKED(LOG_REX3, "    Dest Blend Factor:  0\n");
+				break;
+			case 0x01:
+				LOGMASKED(LOG_REX3, "    Dest Blend Factor:  1\n");
+				break;
+			case 0x02:
+				LOGMASKED(LOG_REX3, "    Dest Blend Factor:  Normalized Dest (or COLORBACK)\n");
+				break;
+			case 0x03:
+				LOGMASKED(LOG_REX3, "    Dest Blend Factor:  1 - Normalized Dest (or COLORBACK)\n");
+				break;
+			case 0x04:
+				LOGMASKED(LOG_REX3, "    Dest Blend Factor:  Normalized Src\n");
+				break;
+			case 0x05:
+				LOGMASKED(LOG_REX3, "    Dest Blend Factor:  1 - Normalized Src\n");
+				break;
+			default:
+				LOGMASKED(LOG_REX3 | LOG_UNKNOWN, "    Unknown Src Blend Factor: %02x\n", (data32 & 0x00380000) >> 19);
+				break;
+			}
+			LOGMASKED(LOG_REX3, "  COLORBACK Dest Blend: %d\n", BIT(data, 25));
+			LOGMASKED(LOG_REX3, "   Enable Pxl Prefetch: %d\n", BIT(data, 26));
+			LOGMASKED(LOG_REX3, "    SFACTOR Src Alpha:  %d\n", BIT(data, 27));
+			switch ((data32 & 0xf0000000) >> 28)
+			{
+			case 0x00:
+				LOGMASKED(LOG_REX3, "    Logical Op. Type:   0\n");
+				break;
+			case 0x01:
+				LOGMASKED(LOG_REX3, "    Logical Op. Type:   Src & Dst\n");
+				break;
+			case 0x02:
+				LOGMASKED(LOG_REX3, "    Logical Op. Type:   Src & ~Dst\n");
+				break;
+			case 0x03:
+				LOGMASKED(LOG_REX3, "    Logical Op. Type:   Src\n");
+				break;
+			case 0x04:
+				LOGMASKED(LOG_REX3, "    Logical Op. Type:   ~Src & Dst\n");
+				break;
+			case 0x05:
+				LOGMASKED(LOG_REX3, "    Logical Op. Type:   Dst\n");
+				break;
+			case 0x06:
+				LOGMASKED(LOG_REX3, "    Logical Op. Type:   Src ^ Dst\n");
+				break;
+			case 0x07:
+				LOGMASKED(LOG_REX3, "    Logical Op. Type:   Src | Dst\n");
+				break;
+			case 0x08:
+				LOGMASKED(LOG_REX3, "    Logical Op. Type:   ~(Src | Dst)\n");
+				break;
+			case 0x09:
+				LOGMASKED(LOG_REX3, "    Logical Op. Type:   ~(Src ^ Dst)\n");
+				break;
+			case 0x0a:
+				LOGMASKED(LOG_REX3, "    Logical Op. Type:   ~Dst\n");
+				break;
+			case 0x0b:
+				LOGMASKED(LOG_REX3, "    Logical Op. Type:   Src | ~Dst\n");
+				break;
+			case 0x0c:
+				LOGMASKED(LOG_REX3, "    Logical Op. Type:   ~Src\n");
+				break;
+			case 0x0d:
+				LOGMASKED(LOG_REX3, "    Logical Op. Type:   ~Src | Dst\n");
+				break;
+			case 0x0e:
+				LOGMASKED(LOG_REX3, "    Logical Op. Type:   ~(Src & Dst)\n");
+				break;
+			case 0x0f:
+				LOGMASKED(LOG_REX3, "    Logical Op. Type:   1\n");
+				break;
+			}
+			m_rex3.m_draw_mode1 = data32;
+		}
+		if (ACCESSING_BITS_0_31)
+		{
+			const uint32_t data32 = (uint32_t)data;
+			LOGMASKED(LOG_REX3, "REX3 Draw Mode 0 Write: %08x\n", data32);
+			switch (data32 & 3)
+			{
+			case 0x00:
+				LOGMASKED(LOG_REX3, "    Primitive Function: No Op\n");
+				break;
+			case 0x01:
+				LOGMASKED(LOG_REX3, "    Primitive Function: Read From FB\n");
+				break;
+			case 0x02:
+				LOGMASKED(LOG_REX3, "    Primitive Function: Draw To FB\n");
+				break;
+			case 0x03:
+				LOGMASKED(LOG_REX3, "    Primitive Function: Copy FB To FB\n");
+				break;
+			}
+			switch ((data32 & 0x0000001c) >> 2)
+			{
+			case 0x00:
+				LOGMASKED(LOG_REX3, "    Addressing Mode: Span/Point\n");
+				break;
+			case 0x01:
+				LOGMASKED(LOG_REX3, "    Addressing Mode: Block\n");
+				break;
+			case 0x02:
+				LOGMASKED(LOG_REX3, "    Addressing Mode: Bresenham Line, Integer Endpoints\n");
+				break;
+			case 0x03:
+				LOGMASKED(LOG_REX3, "    Addressing Mode: Bresenham Line, Fractional Endpoints\n");
+				break;
+			case 0x04:
+				LOGMASKED(LOG_REX3, "    Addressing Mode: AA Bresenham Line\n");
+				break;
+			default:
+				LOGMASKED(LOG_REX3 | LOG_UNKNOWN, "    Unknown Addressing Mode: %02x\n", (data32 & 0x0000001c) >> 2);
+				break;
+			}
+			LOGMASKED(LOG_REX3, "    Iterator Setup:     %d\n", BIT(data32, 5));
+			LOGMASKED(LOG_REX3, "    RGB/CI Draw Source: %d\n", BIT(data32, 6));
+			LOGMASKED(LOG_REX3, "     Alpha Draw Source: %d\n", BIT(data32, 7));
+			LOGMASKED(LOG_REX3, "    Stop On X:          %d\n", BIT(data32, 8));
+			LOGMASKED(LOG_REX3, "    Stop On Y:          %d\n", BIT(data32, 9));
+			LOGMASKED(LOG_REX3, "    Skip Start Point:   %d\n", BIT(data32, 10));
+			LOGMASKED(LOG_REX3, "    Skip End Point:     %d\n", BIT(data32, 11));
+			LOGMASKED(LOG_REX3, "    Enable Patterning:  %d\n", BIT(data32, 12));
+			LOGMASKED(LOG_REX3, "    Enable Stippling:   %d\n", BIT(data32, 13));
+			LOGMASKED(LOG_REX3, "    Stipple Advance:    %d\n", BIT(data32, 14));
+			LOGMASKED(LOG_REX3, "    Limit Draw To 32px: %d\n", BIT(data32, 15));
+			LOGMASKED(LOG_REX3, "     Z Opaque Stipple   %d\n", BIT(data32, 16));
+			LOGMASKED(LOG_REX3, "    LS Opaque Stipple:  %d\n", BIT(data32, 17));
+			LOGMASKED(LOG_REX3, "    Enable Lin. Shade:  %d\n", BIT(data32, 18));
+			LOGMASKED(LOG_REX3, "    Left-Right Only:    %d\n", BIT(data32, 19));
+			LOGMASKED(LOG_REX3, "    Offset by XYMove:   %d\n", BIT(data32, 20));
+			LOGMASKED(LOG_REX3, "    Enable CI Clamping: %d\n", BIT(data32, 21));
+			LOGMASKED(LOG_REX3, "    Enable End Filter:  %d\n", BIT(data32, 22));
+			LOGMASKED(LOG_REX3, "    Enable Y+2 Stride:  %d\n", BIT(data32, 23));
+			m_rex3.m_draw_mode0 = data32;
+		}
+		break;
+	case 0x0008/8:
+		if (ACCESSING_BITS_32_63)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Line Stipple Mode Write: %08x\n", (uint32_t)(data >> 32));
+			m_rex3.m_ls_mode = (uint32_t)(data >> 32) & 0xfffffff;
+		}
+		if (ACCESSING_BITS_0_31)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Line Stipple Pattern Write: %08x\n", (uint32_t)data);
+			m_rex3.m_ls_pattern = (uint32_t)data;
+		}
+		break;
+	case 0x0010/8:
+		if (ACCESSING_BITS_32_63)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Line Stipple Pattern (Save) Write: %08x\n", (uint32_t)(data >> 32));
+			m_rex3.m_ls_pattern_saved = (uint32_t)(data >> 32);
+		}
+		if (ACCESSING_BITS_0_31)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Pattern Register Write: %08x\n", (uint32_t)data);
+			m_rex3.m_z_pattern = (uint32_t)data;
+		}
+		break;
+	case 0x0018/8:
+		if (ACCESSING_BITS_32_63)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Opaque Pattern / Blendfunc Dest Color Write: %08x\n", (uint32_t)(data >> 32));
+			m_rex3.m_color_back = (uint32_t)(data >> 32);
+		}
+		if (ACCESSING_BITS_0_31)
+		{
+			LOGMASKED(LOG_REX3, "REX3 VRAM Fastclear Color Write: %08x\n", (uint32_t)data);
+			m_rex3.m_color_vram = (uint32_t)data;
+		}
+		break;
+	case 0x0020/8:
+		if (ACCESSING_BITS_32_63)
+		{
+			LOGMASKED(LOG_REX3, "REX3 AFUNCTION Reference Alpha Write: %08x\n", (uint32_t)(data >> 32));
+			m_rex3.m_alpha_ref = (uint8_t)(data >> 32);
+		}
+		if (ACCESSING_BITS_0_31)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Stall GFIFO Write: %08x\n", data);
 			break;
 		}
-		switch ((data & 0x00000018) >> 3)
+		break;
+	case 0x0028/8:
+		if (ACCESSING_BITS_32_63)
 		{
-		case 0x00:
-			LOGMASKED(LOG_REX3, "    Plane Draw Depth:    4 bits\n");
-			break;
-		case 0x01:
-			LOGMASKED(LOG_REX3, "    Plane Draw Depth:    8 bits\n");
-			break;
-		case 0x02:
-			LOGMASKED(LOG_REX3, "    Plane Draw Depth:   12 bits\n");
-			break;
-		case 0x03:
-			LOGMASKED(LOG_REX3, "    Plane Draw Depth:   32 bits\n");
-			break;
+			LOGMASKED(LOG_REX3, "REX3 Screenmask 0 X Min/Max Write: %08x\n", (uint32_t)(data >> 32));
+			m_rex3.m_smask_x[0] = (uint32_t)(data >> 32);
 		}
-		LOGMASKED(LOG_REX3, "    DBuf Source Buffer: %d\n", BIT(data, 5));
-		LOGMASKED(LOG_REX3, "    GL Y Coordinates:   %d\n", BIT(data, 6));
-		LOGMASKED(LOG_REX3, "    Enable Pxl Packing: %d\n", BIT(data, 7));
-		switch ((data & 0x00000300) >> 8)
+		if (ACCESSING_BITS_0_31)
 		{
-		case 0x00:
-			LOGMASKED(LOG_REX3, "    HOSTRW Depth:        4 bits\n");
-			break;
-		case 0x01:
-			LOGMASKED(LOG_REX3, "    HOSTRW Depth:        8 bits\n");
-			break;
-		case 0x02:
-			LOGMASKED(LOG_REX3, "    HOSTRW Depth:       12 bits\n");
-			break;
-		case 0x03:
-			LOGMASKED(LOG_REX3, "    HOSTRW Depth:       32 bits\n");
-			break;
+			LOGMASKED(LOG_REX3, "REX3 Screenmask 0 Y Min/Max Write: %08x\n", (uint32_t)data);
+			m_rex3.m_smask_y[0] = (uint32_t)data;
 		}
-		LOGMASKED(LOG_REX3, "    DWord Transfers:    %d\n", BIT(data, 10));
-		LOGMASKED(LOG_REX3, "    Swap Endianness:    %d\n", BIT(data, 11));
-		LOGMASKED(LOG_REX3, "    Compare Src > Dest: %d\n", BIT(data, 12));
-		LOGMASKED(LOG_REX3, "    Compare Src = Dest: %d\n", BIT(data, 13));
-		LOGMASKED(LOG_REX3, "    Compare Src < Dest: %d\n", BIT(data, 14));
-		LOGMASKED(LOG_REX3, "    RGB Mode Select:    %d\n", BIT(data, 15));
-		LOGMASKED(LOG_REX3, "    Enable Dithering:   %d\n", BIT(data, 16));
-		LOGMASKED(LOG_REX3, "    Enable Fast Clear:  %d\n", BIT(data, 17));
-		LOGMASKED(LOG_REX3, "    Enable Blending:    %d\n", BIT(data, 18));
-		switch ((data & 0x00380000) >> 19)
+		break;
+	case 0x0030/8:
+		if (ACCESSING_BITS_32_63)
 		{
-		case 0x00:
-			LOGMASKED(LOG_REX3, "    Src Blend Factor:   0\n");
-			break;
-		case 0x01:
-			LOGMASKED(LOG_REX3, "    Src Blend Factor:   1\n");
-			break;
-		case 0x02:
-			LOGMASKED(LOG_REX3, "    Src Blend Factor:   Normalized Dest (or COLORBACK)\n");
-			break;
-		case 0x03:
-			LOGMASKED(LOG_REX3, "    Src Blend Factor:   1 - Normalized Dest (or COLORBACK)\n");
-			break;
-		case 0x04:
-			LOGMASKED(LOG_REX3, "    Src Blend Factor:   Normalized Src\n");
-			break;
-		case 0x05:
-			LOGMASKED(LOG_REX3, "    Src Blend Factor:   1 - Normalized Src\n");
-			break;
-		default:
-			LOGMASKED(LOG_REX3 | LOG_UNKNOWN, "    Unknown Src Blend Factor: %02x\n", (data & 0x00380000) >> 19);
-			break;
+			LOGMASKED(LOG_REX3, "REX3 Line/Span Setup Write: %08x\n", (uint32_t)(data >> 32));
+			m_rex3.m_setup = (uint32_t)(data >> 32);
 		}
-		switch ((data & 0x01c00000) >> 22)
+		if (ACCESSING_BITS_0_31)
 		{
-		case 0x00:
-			LOGMASKED(LOG_REX3, "    Dest Blend Factor:  0\n");
-			break;
-		case 0x01:
-			LOGMASKED(LOG_REX3, "    Dest Blend Factor:  1\n");
-			break;
-		case 0x02:
-			LOGMASKED(LOG_REX3, "    Dest Blend Factor:  Normalized Dest (or COLORBACK)\n");
-			break;
-		case 0x03:
-			LOGMASKED(LOG_REX3, "    Dest Blend Factor:  1 - Normalized Dest (or COLORBACK)\n");
-			break;
-		case 0x04:
-			LOGMASKED(LOG_REX3, "    Dest Blend Factor:  Normalized Src\n");
-			break;
-		case 0x05:
-			LOGMASKED(LOG_REX3, "    Dest Blend Factor:  1 - Normalized Src\n");
-			break;
-		default:
-			LOGMASKED(LOG_REX3 | LOG_UNKNOWN, "    Unknown Src Blend Factor: %02x\n", (data & 0x00380000) >> 19);
-			break;
+			LOGMASKED(LOG_REX3, "REX3 ZPattern Enable Write: %08x\n", (uint32_t)data);
+			m_rex3.m_step_z = (uint32_t)data;
 		}
-		LOGMASKED(LOG_REX3, "  COLORBACK Dest Blend: %d\n", BIT(data, 25));
-		LOGMASKED(LOG_REX3, "   Enable Pxl Prefetch: %d\n", BIT(data, 26));
-		LOGMASKED(LOG_REX3, "    SFACTOR Src Alpha:  %d\n", BIT(data, 27));
-		switch ((data & 0xf0000000) >> 28)
+		break;
+	case 0x0038/8:
+		if (ACCESSING_BITS_32_63)
 		{
-		case 0x00:
-			LOGMASKED(LOG_REX3, "    Logical Op. Type:   0\n");
-			break;
-		case 0x01:
-			LOGMASKED(LOG_REX3, "    Logical Op. Type:   Src & Dst\n");
-			break;
-		case 0x02:
-			LOGMASKED(LOG_REX3, "    Logical Op. Type:   Src & ~Dst\n");
-			break;
-		case 0x03:
-			LOGMASKED(LOG_REX3, "    Logical Op. Type:   Src\n");
-			break;
-		case 0x04:
-			LOGMASKED(LOG_REX3, "    Logical Op. Type:   ~Src & Dst\n");
-			break;
-		case 0x05:
-			LOGMASKED(LOG_REX3, "    Logical Op. Type:   Dst\n");
-			break;
-		case 0x06:
-			LOGMASKED(LOG_REX3, "    Logical Op. Type:   Src ^ Dst\n");
-			break;
-		case 0x07:
-			LOGMASKED(LOG_REX3, "    Logical Op. Type:   Src | Dst\n");
-			break;
-		case 0x08:
-			LOGMASKED(LOG_REX3, "    Logical Op. Type:   ~(Src | Dst)\n");
-			break;
-		case 0x09:
-			LOGMASKED(LOG_REX3, "    Logical Op. Type:   ~(Src ^ Dst)\n");
-			break;
-		case 0x0a:
-			LOGMASKED(LOG_REX3, "    Logical Op. Type:   ~Dst\n");
-			break;
-		case 0x0b:
-			LOGMASKED(LOG_REX3, "    Logical Op. Type:   Src | ~Dst\n");
-			break;
-		case 0x0c:
-			LOGMASKED(LOG_REX3, "    Logical Op. Type:   ~Src\n");
-			break;
-		case 0x0d:
-			LOGMASKED(LOG_REX3, "    Logical Op. Type:   ~Src | Dst\n");
-			break;
-		case 0x0e:
-			LOGMASKED(LOG_REX3, "    Logical Op. Type:   ~(Src & Dst)\n");
-			break;
-		case 0x0f:
-			LOGMASKED(LOG_REX3, "    Logical Op. Type:   1\n");
-			break;
+			LOGMASKED(LOG_REX3, "REX3 Update LSPATTERN/LSRCOUNT\n");
+			m_rex3.m_ls_pattern = m_rex3.m_ls_pattern_saved;
 		}
-		m_rex3.m_draw_mode1 = data;
-		break;
-	case 0x0004/4:
-		LOGMASKED(LOG_REX3, "REX3 Draw Mode 0 Write: %08x\n", data);
-		switch (data & 3)
+		if (ACCESSING_BITS_0_31)
 		{
-		case 0x00:
-			LOGMASKED(LOG_REX3, "    Primitive Function: No Op\n");
-			break;
-		case 0x01:
-			LOGMASKED(LOG_REX3, "    Primitive Function: Read From FB\n");
-			break;
-		case 0x02:
-			LOGMASKED(LOG_REX3, "    Primitive Function: Draw To FB\n");
-			break;
-		case 0x03:
-			LOGMASKED(LOG_REX3, "    Primitive Function: Copy FB To FB\n");
-			break;
+			LOGMASKED(LOG_REX3, "REX3 Update LSPATSAVE/LSRCNTSAVE\n");
+			m_rex3.m_ls_pattern_saved = m_rex3.m_ls_pattern;
 		}
-		switch ((data & 0x0000001c) >> 2)
+		break;
+	case 0x0100/8:
+		if (ACCESSING_BITS_32_63)
 		{
-		case 0x00:
-			LOGMASKED(LOG_REX3, "    Addressing Mode: Span/Point\n");
-			break;
-		case 0x01:
-			LOGMASKED(LOG_REX3, "    Addressing Mode: Block\n");
-			break;
-		case 0x02:
-			LOGMASKED(LOG_REX3, "    Addressing Mode: Bresenham Line, Integer Endpoints\n");
-			break;
-		case 0x03:
-			LOGMASKED(LOG_REX3, "    Addressing Mode: Bresenham Line, Fractional Endpoints\n");
-			break;
-		case 0x04:
-			LOGMASKED(LOG_REX3, "    Addressing Mode: AA Bresenham Line\n");
-			break;
-		default:
-			LOGMASKED(LOG_REX3 | LOG_UNKNOWN, "    Unknown Addressing Mode: %02x\n", (data & 0x0000001c) >> 2);
-			break;
+			LOGMASKED(LOG_REX3, "REX3 XStart Write: %08x\n", (uint32_t)(data >> 32));
+			m_rex3.m_x_start = (uint32_t)(data >> 32) & 0x007ffff80;
 		}
-		LOGMASKED(LOG_REX3, "    Iterator Setup:     %d\n", BIT(data, 5));
-		LOGMASKED(LOG_REX3, "    RGB/CI Draw Source: %d\n", BIT(data, 6));
-		LOGMASKED(LOG_REX3, "     Alpha Draw Source: %d\n", BIT(data, 7));
-		LOGMASKED(LOG_REX3, "    Stop On X:          %d\n", BIT(data, 8));
-		LOGMASKED(LOG_REX3, "    Stop On Y:          %d\n", BIT(data, 9));
-		LOGMASKED(LOG_REX3, "    Skip Start Point:   %d\n", BIT(data, 10));
-		LOGMASKED(LOG_REX3, "    Skip End Point:     %d\n", BIT(data, 11));
-		LOGMASKED(LOG_REX3, "    Enable Patterning:  %d\n", BIT(data, 12));
-		LOGMASKED(LOG_REX3, "    Enable Stippling:   %d\n", BIT(data, 13));
-		LOGMASKED(LOG_REX3, "    Stipple Advance:    %d\n", BIT(data, 14));
-		LOGMASKED(LOG_REX3, "    Limit Draw To 32px: %d\n", BIT(data, 15));
-		LOGMASKED(LOG_REX3, "     Z Opaque Stipple   %d\n", BIT(data, 16));
-		LOGMASKED(LOG_REX3, "    LS Opaque Stipple:  %d\n", BIT(data, 17));
-		LOGMASKED(LOG_REX3, "    Enable Lin. Shade:  %d\n", BIT(data, 18));
-		LOGMASKED(LOG_REX3, "    Left-Right Only:    %d\n", BIT(data, 19));
-		LOGMASKED(LOG_REX3, "    Offset by XYMove:   %d\n", BIT(data, 20));
-		LOGMASKED(LOG_REX3, "    Enable CI Clamping: %d\n", BIT(data, 21));
-		LOGMASKED(LOG_REX3, "    Enable End Filter:  %d\n", BIT(data, 22));
-		LOGMASKED(LOG_REX3, "    Enable Y+2 Stride:  %d\n", BIT(data, 23));
-		m_rex3.m_draw_mode0 = data;
+		if (ACCESSING_BITS_0_31)
+		{
+			LOGMASKED(LOG_REX3, "REX3 YStart Write: %08x\n", (uint32_t)data);
+			m_rex3.m_y_start = (uint32_t)data & 0x007ffff80;
+		}
 		break;
-	case 0x0008/4:
-		LOGMASKED(LOG_REX3, "REX3 Line Stipple Mode Write: %08x\n", data);
-		m_rex3.m_ls_mode = data & 0xfffffff;
+	case 0x0108/8:
+		if (ACCESSING_BITS_32_63)
+		{
+			LOGMASKED(LOG_REX3, "REX3 XEnd Write: %08x\n", (uint32_t)(data >> 32));
+			m_rex3.m_x_end = (uint32_t)(data >> 32) & 0x007ffff80;
+		}
+		if (ACCESSING_BITS_0_31)
+		{
+			LOGMASKED(LOG_REX3, "REX3 YEnd Write: %08x\n", (uint32_t)data);
+			m_rex3.m_y_end = (uint32_t)data & 0x007ffff80;
+		}
 		break;
-	case 0x000C/4:
-		LOGMASKED(LOG_REX3, "REX3 Line Stipple Pattern Write: %08x\n", data);
-		m_rex3.m_ls_pattern = data;
+	case 0x0110/8:
+		if (ACCESSING_BITS_32_63)
+		{
+			LOGMASKED(LOG_REX3, "REX3 XSave Write: %08x\n", (uint32_t)(data >> 32));
+			m_rex3.m_x_save = (uint16_t)(data >> 32);
+			m_rex3.m_x_start_i = m_rex3.m_x_save;
+		}
+		if (ACCESSING_BITS_0_31)
+		{
+			LOGMASKED(LOG_REX3, "REX3 XYMove Write: %08x\n", (uint32_t)data);
+			m_rex3.m_xy_move = (uint32_t)data;
+		}
 		break;
-	case 0x0010/4:
-		LOGMASKED(LOG_REX3, "REX3 Line Stipple Pattern (Save) Write: %08x\n", data);
-		m_rex3.m_ls_pattern_saved = data;
+	case 0x0118/8:
+		if (ACCESSING_BITS_32_63)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Bresenham D Write: %08x\n", (uint32_t)(data >> 32));
+			m_rex3.m_bres_d = (uint32_t)(data >> 32) & 0x7ffffff;
+		}
+		if (ACCESSING_BITS_0_31)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Bresenham S1 Write: %08x\n", (uint32_t)data);
+			m_rex3.m_bres_s1 = (uint32_t)data & 0x1ffff;
+		}
 		break;
-	case 0x0014/4:
-		LOGMASKED(LOG_REX3, "REX3 Pattern Register Write: %08x\n", data);
-		m_rex3.m_z_pattern = data;
+	case 0x0120/8:
+		if (ACCESSING_BITS_32_63)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Bresenham Octant & Incr1 Write: %08x\n", (uint32_t)(data >> 32));
+			m_rex3.m_bres_octant_inc1 = (uint32_t)(data >> 32) & 0x70fffff;
+		}
+		if (ACCESSING_BITS_0_31)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Bresenham Octant Rounding Mode & Incr2 Write: %08x\n", (uint32_t)data);
+			m_rex3.m_bres_round_inc2 = data & 0xff1fffff;
+		}
 		break;
-	case 0x0018/4:
-		LOGMASKED(LOG_REX3, "REX3 Opaque Pattern / Blendfunc Dest Color Write: %08x\n", data);
-		m_rex3.m_color_back = data;
+	case 0x0128/8:
+		if (ACCESSING_BITS_32_63)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Bresenham E1 Write: %08x\n", (uint32_t)(data >> 32));
+			m_rex3.m_bres_e1 = (uint16_t)(data >> 32);
+		}
+		if (ACCESSING_BITS_0_31)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Bresenham S2 Write: %08x\n", (uint32_t)data);
+			m_rex3.m_bres_s2 = (uint32_t)data & 0x3ffffff;
+		}
 		break;
-	case 0x001c/4:
-		LOGMASKED(LOG_REX3, "REX3 VRAM Fastclear Color Write: %08x\n", data);
-		m_rex3.m_color_vram = data;
+	case 0x0130/8:
+		if (ACCESSING_BITS_32_63)
+		{
+			LOGMASKED(LOG_REX3, "REX3 AA Line Weight Table 1/2 Write: %08x\n", (uint32_t)(data >> 32));
+			m_rex3.m_a_weight0 = (uint32_t)(data >> 32);
+		}
+		if (ACCESSING_BITS_0_31)
+		{
+			LOGMASKED(LOG_REX3, "REX3 AA Line Weight Table 2/2 Write: %08x\n", (uint32_t)data);
+			m_rex3.m_a_weight1 = (uint32_t)data;
+		}
 		break;
-	case 0x0020/4:
-		LOGMASKED(LOG_REX3, "REX3 AFUNCTION Reference Alpha Write: %08x\n", data);
-		m_rex3.m_alpha_ref = (uint8_t)data;
+	case 0x0138/8:
+		if (ACCESSING_BITS_32_63)
+		{
+			LOGMASKED(LOG_REX3, "REX3 GL XStart Write: %08x\n", (uint32_t)(data >> 32));
+			m_rex3.m_x_start_f = (uint32_t)(data >> 32) & 0x7fff80;
+		}
+		if (ACCESSING_BITS_0_31)
+		{
+			LOGMASKED(LOG_REX3, "REX3 GL YStart Write: %08x\n", (uint32_t)data);
+			m_rex3.m_y_start_f = (uint32_t)data & 0x7fff80;
+		}
 		break;
-	case 0x0024/4:
-		LOGMASKED(LOG_REX3, "REX3 Stall GFIFO Write: %08x\n", data);
+	case 0x0140/8:
+		if (ACCESSING_BITS_32_63)
+		{
+			LOGMASKED(LOG_REX3, "REX3 GL XEnd Write: %08x\n", (uint32_t)(data >> 32));
+			m_rex3.m_x_end_f = (uint32_t)(data >> 32) & 0x7fff80;
+		}
+		if (ACCESSING_BITS_0_31)
+		{
+			LOGMASKED(LOG_REX3, "REX3 GL YEnd Write: %08x\n", (uint32_t)data);
+			m_rex3.m_y_end_f = (uint32_t)data & 0x7fff80;
+		}
 		break;
-	case 0x0028/4:
-		LOGMASKED(LOG_REX3, "REX3 Screenmask 0 X Min/Max Write: %08x\n", data);
-		m_rex3.m_smask_x[0] = data;
+	case 0x0148/8:
+		if (ACCESSING_BITS_32_63)
+		{
+			LOGMASKED(LOG_REX3, "REX3 XStart (integer) Write: %08x\n", (uint32_t)(data >> 32));
+			m_rex3.m_x_start_i = (uint16_t)(data >> 32);
+			m_rex3.m_x_save = m_rex3.m_x_start_i;
+			m_rex3.m_x_start = ((m_rex3.m_x_start_i & 0x0000ffff) << 11);
+		}
+		if (ACCESSING_BITS_0_31)
+		{
+			LOGMASKED(LOG_REX3, "REX3 GL XEnd (copy) Write: %08x\n", (uint32_t)data);
+			m_rex3.m_x_end_f = (uint32_t)data & 0x007fff80;
+		}
 		break;
-	case 0x002c/4:
-		LOGMASKED(LOG_REX3, "REX3 Screenmask 0 Y Min/Max Write: %08x\n", data);
-		m_rex3.m_smask_y[0] = data;
+	case 0x0150/8:
+		if (ACCESSING_BITS_32_63)
+		{
+			const uint32_t data32 = (uint32_t)(data >> 32);
+			LOGMASKED(LOG_REX3, "REX3 XYStart (integer) Write: %08x\n", data32);
+			m_rex3.m_xy_start_i = data32;
+			m_rex3.m_x_start_i = data32 >> 16;
+			m_rex3.m_x_save = m_rex3.m_x_start_i;
+			m_rex3.m_x_start = ((m_rex3.m_xy_start_i & 0xffff0000) >>  5);
+			m_rex3.m_y_start = ((m_rex3.m_xy_start_i & 0x0000ffff) << 11);
+			m_rex3.m_iter_x = data32 >> 16;
+			m_rex3.m_iter_y = (uint16_t)data32;
+		}
+		if (ACCESSING_BITS_0_31)
+		{
+			LOGMASKED(LOG_REX3, "REX3 XYEnd (integer) Write: %08x\n", (uint32_t)data);
+			m_rex3.m_xy_end_i = (uint32_t)data;
+			m_rex3.m_x_end = ((m_rex3.m_xy_end_i & 0xffff0000) >>  5);
+			m_rex3.m_y_end = ((m_rex3.m_xy_end_i & 0x0000ffff) << 11);
+		}
 		break;
-	case 0x0030/4:
-		LOGMASKED(LOG_REX3, "REX3 Line/Span Setup Write: %08x\n", data);
-		m_rex3.m_setup = data;
+	case 0x0158/8:
+		if (ACCESSING_BITS_32_63)
+		{
+			const uint32_t data32 = (uint32_t)(data >> 32);
+			LOGMASKED(LOG_REX3, "REX3 XStartEnd (integer) Write: %08x\n", data32);
+			m_rex3.m_x_start_end_i = data32;
+			m_rex3.m_xy_end_i   = (uint16_t)m_rex3.m_xy_end_i   | ((m_rex3.m_x_start_end_i & 0x0000ffff) << 16);
+			m_rex3.m_xy_start_i = (uint16_t)m_rex3.m_xy_start_i | ( m_rex3.m_x_start_end_i & 0xffff0000);
+			m_rex3.m_x_save = m_rex3.m_x_start_i;
+			m_rex3.m_x_start = ((m_rex3.m_x_start_end_i & 0xffff0000) >>  5);
+			m_rex3.m_x_end   = ((m_rex3.m_x_start_end_i & 0x0000ffff) << 11);
+			m_rex3.m_iter_x = data32 >> 16;
+		}
 		break;
-	case 0x0034/4:
-		LOGMASKED(LOG_REX3, "REX3 ZPattern Enable Write: %08x\n", data);
-		m_rex3.m_step_z = data;
+	case 0x0200/8:
+		if (ACCESSING_BITS_32_63)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Red/CI Full State Write: %08x\n", (uint32_t)(data >> 32));
+			m_rex3.m_color_red = (uint32_t)((data >> 32) & 0xffffff);
+		}
+		if (ACCESSING_BITS_0_31)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Alpha Full State Write: %08x\n", (uint32_t)data);
+			m_rex3.m_color_alpha = data & 0xfffff;
+		}
 		break;
-	case 0x0038/4:
-		LOGMASKED(LOG_REX3, "REX3 Update LSPATTERN/LSRCOUNT\n");
-		m_rex3.m_ls_pattern = m_rex3.m_ls_pattern_saved;
+	case 0x0208/8:
+		if (ACCESSING_BITS_32_63)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Green Full State Write: %08x\n", (uint32_t)(data >> 32));
+			m_rex3.m_color_green = (uint32_t)((data >> 32) & 0xfffff);
+		}
+		if (ACCESSING_BITS_0_31)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Blue Full State Write: %08x\n", (uint32_t)data);
+			m_rex3.m_color_blue = data & 0xfffff;
+		}
 		break;
-	case 0x003c/4:
-		LOGMASKED(LOG_REX3, "REX3 Update LSPATSAVE/LSRCNTSAVE\n");
-		m_rex3.m_ls_pattern_saved = m_rex3.m_ls_pattern;
-		break;
-	case 0x0100/4:
-		LOGMASKED(LOG_REX3, "REX3 XStart Write: %08x\n", data);
-		m_rex3.m_x_start = data & (0x0000fffff << 7);
-		break;
-	case 0x0104/4:
-		LOGMASKED(LOG_REX3, "REX3 YStart Write: %08x\n", data);
-		m_rex3.m_y_start = data & (0x0000fffff << 7);
-		break;
-	case 0x0108/4:
-		LOGMASKED(LOG_REX3, "REX3 XEnd Write: %08x\n", data);
-		m_rex3.m_x_end = data & (0x0000fffff << 7);
-		break;
-	case 0x010c/4:
-		LOGMASKED(LOG_REX3, "REX3 YEnd Write: %08x\n", data);
-		m_rex3.m_y_end = data & (0x0000fffff << 7);
-		break;
-	case 0x0110/4:
-		LOGMASKED(LOG_REX3, "REX3 XSave Write: %08x\n", data);
-		m_rex3.m_x_save = (uint16_t)data;
-		m_rex3.m_x_start_i = (uint16_t)m_rex3.m_x_save;
-		break;
-	case 0x0114/4:
-		LOGMASKED(LOG_REX3, "REX3 XYMove Write: %08x\n", data);
-		m_rex3.m_xy_move = data;
-		break;
-	case 0x0118/4:
-		LOGMASKED(LOG_REX3, "REX3 Bresenham D Write: %08x\n", data);
-		m_rex3.m_bres_d = data & 0x7ffffff;
-		break;
-	case 0x011c/4:
-		LOGMASKED(LOG_REX3, "REX3 Bresenham S1 Write: %08x\n", data);
-		m_rex3.m_bres_s1 = data & 0x1ffff;
-		break;
-	case 0x0120/4:
-		LOGMASKED(LOG_REX3, "REX3 Bresenham Octant & Incr1 Write: %08x\n", data);
-		m_rex3.m_bres_octant_inc1 = data & 0x70fffff;
-		break;
-	case 0x0124/4:
-		LOGMASKED(LOG_REX3, "REX3 Bresenham Octant Rounding Mode & Incr2 Write: %08x\n", data);
-		m_rex3.m_bres_round_inc2 = data & 0xff1fffff;
-		break;
-	case 0x0128/4:
-		LOGMASKED(LOG_REX3, "REX3 Bresenham E1 Write: %08x\n", data);
-		m_rex3.m_bres_e1 = (uint16_t)data;
-		break;
-	case 0x012c/4:
-		LOGMASKED(LOG_REX3, "REX3 Bresenham S2 Write: %08x\n", data);
-		m_rex3.m_bres_s2 = data & 0x3ffffff;
-		break;
-	case 0x0130/4:
-		LOGMASKED(LOG_REX3, "REX3 AA Line Weight Table 1/2 Write: %08x\n", data);
-		m_rex3.m_a_weight0 = data;
-		break;
-	case 0x0134/4:
-		LOGMASKED(LOG_REX3, "REX3 AA Line Weight Table 2/2 Write: %08x\n", data);
-		m_rex3.m_a_weight1 = data;
-		break;
-	case 0x0138/4:
-		LOGMASKED(LOG_REX3, "REX3 GL XStart Write: %08x\n", data);
-		m_rex3.m_x_start_f = data & 0x7fff80;
-		break;
-	case 0x013c/4:
-		LOGMASKED(LOG_REX3, "REX3 GL YStart Write: %08x\n", data);
-		m_rex3.m_y_start_f = data & 0x7fff80;
-		break;
-	case 0x0140/4:
-		LOGMASKED(LOG_REX3, "REX3 GL XEnd Write: %08x\n", data);
-		m_rex3.m_x_end_f = data & 0x7fff80;
-		break;
-	case 0x0144/4:
-		LOGMASKED(LOG_REX3, "REX3 GL YEnd Write: %08x\n", data);
-		m_rex3.m_y_end_f = data & 0x7fff80;
-		break;
-	case 0x0148/4:
-		LOGMASKED(LOG_REX3, "REX3 XStart (integer) Write: %08x\n", data);
-		m_rex3.m_x_start_i = (uint16_t)data;
-		m_rex3.m_x_save = m_rex3.m_x_start_i;
-		m_rex3.m_x_start = ((m_rex3.m_x_start_i & 0x0000ffff) << 11);
-		break;
-	case 0x014c/4:
-		LOGMASKED(LOG_REX3, "REX3 GL XEnd (copy) Write: %08x\n", data);
-		m_rex3.m_x_end_f = data & ( 0x0000ffff << 7 );
-		break;
-	case 0x0150/4:
-		LOGMASKED(LOG_REX3, "REX3 XYStart (integer) Write: %08x\n", data);
-		m_rex3.m_xy_start_i = data;
-		m_rex3.m_x_start_i = data >> 16;
-		m_rex3.m_x_save = m_rex3.m_x_start_i;
-		m_rex3.m_x_start = ((m_rex3.m_xy_start_i & 0xffff0000) >>  5);
-		m_rex3.m_y_start = ((m_rex3.m_xy_start_i & 0x0000ffff) << 11);
-		m_rex3.m_iter_x = data >> 16;
-		m_rex3.m_iter_y = (uint16_t)data;
-		break;
-	case 0x0154/4:
-		LOGMASKED(LOG_REX3, "REX3 XYEnd (integer) Write: %08x\n", data);
-		m_rex3.m_xy_end_i = data;
-		m_rex3.m_x_end = ((m_rex3.m_xy_end_i & 0xffff0000) >>  5);
-		m_rex3.m_y_end = ((m_rex3.m_xy_end_i & 0x0000ffff) << 11);
-		break;
-	case 0x0158/4:
-		LOGMASKED(LOG_REX3, "REX3 XStartEnd (integer) Write: %08x\n", data);
-		m_rex3.m_x_start_end_i = data;
-		m_rex3.m_xy_end_i   = (uint16_t)m_rex3.m_xy_end_i   | ((m_rex3.m_x_start_end_i & 0x0000ffff) << 16);
-		m_rex3.m_xy_start_i = (uint16_t)m_rex3.m_xy_start_i | ( m_rex3.m_x_start_end_i & 0xffff0000);
-		m_rex3.m_x_save = m_rex3.m_x_start_i;
-		m_rex3.m_x_start = ((m_rex3.m_x_start_end_i & 0xffff0000) >>  5);
-		m_rex3.m_x_end   = ((m_rex3.m_x_start_end_i & 0x0000ffff) << 11);
-		m_rex3.m_iter_x = data >> 16;
-		break;
-	case 0x0200/4:
-		LOGMASKED(LOG_REX3, "REX3 Red/CI Full State Write: %08x\n", data);
-		m_rex3.m_color_red = data & 0xffffff;
-		break;
-	case 0x0204/4:
-		LOGMASKED(LOG_REX3, "REX3 Alpha Full State Write: %08x\n", data);
-		m_rex3.m_color_alpha = data & 0xfffff;
-		break;
-	case 0x0208/4:
-		LOGMASKED(LOG_REX3, "REX3 Green Full State Write: %08x\n", data);
-		m_rex3.m_color_green = data & 0xfffff;
-		break;
-	case 0x020c/4:
-		LOGMASKED(LOG_REX3, "REX3 Blue Full State Write: %08x\n", data);
-		m_rex3.m_color_blue = data & 0xfffff;
-		break;
-	case 0x0210/4:
+	case 0x0210/8:
 	{
-		LOGMASKED(LOG_REX3, "REX3 Red/CI Slope Write: %08x\n", data);
-		data &= 0x807fffff;
-		uint32_t temp = 0;
-		if (BIT(data, 31))
+		if (ACCESSING_BITS_32_63)
 		{
-			temp  = 0x00800000 - (data & 0x7fffff);
-			temp |= 0x00800000;
+			uint32_t data32 = (uint32_t)(data >> 32);
+			LOGMASKED(LOG_REX3, "REX3 Red/CI Slope Write: %08x\n", data32);
+			data32 &= 0x807fffff;
+			uint32_t temp = 0;
+			if (BIT(data32, 31))
+			{
+				temp  = 0x00800000 - (data32 & 0x7fffff);
+				temp |= 0x00800000;
+			}
+			else
+			{
+				temp = data32 & 0x7fffff;
+			}
+			m_rex3.m_slope_red = temp;
 		}
-		else
+		if (ACCESSING_BITS_0_31)
 		{
-			temp = data & 0x7fffff;
+			LOGMASKED(LOG_REX3, "REX3 Alpha Slope Write: %08x\n", (uint32_t)data);
+			data &= 0x8007ffff;
+			uint32_t temp = 0;
+			if (BIT(data, 31))
+			{
+				temp  = 0x00080000 - (data & 0x7ffff);
+				temp |= 0x00080000;
+			}
+			else
+			{
+				temp = data & 0x7ffff;
+			}
+			m_rex3.m_slope_alpha = temp;
 		}
-		m_rex3.m_slope_red = temp;
 		break;
 	}
-	case 0x0214/4:
+	case 0x0218/8:
 	{
-		LOGMASKED(LOG_REX3, "REX3 Alpha Slope Write: %08x\n", data);
-		data &= 0x8007ffff;
-		uint32_t temp = 0;
-		if (BIT(data, 31))
+		if (ACCESSING_BITS_32_63)
 		{
-			temp  = 0x00080000 - (data & 0x7ffff);
-			temp |= 0x00080000;
+			uint32_t data32 = (uint32_t)(data >> 32);
+			LOGMASKED(LOG_REX3, "REX3 Green Slope Write: %08x\n", data32);
+			data32 &= 0x8007ffff;
+			uint32_t temp = 0;
+			if (BIT(data32, 31))
+			{
+				temp  = 0x00080000 - (data32 & 0x7ffff);
+				temp |= 0x00080000;
+			}
+			else
+			{
+				temp = data32 & 0x7ffff;
+			}
+			m_rex3.m_slope_green = temp;
 		}
-		else
+		if (ACCESSING_BITS_0_31)
 		{
-			temp = data & 0x7ffff;
+			LOGMASKED(LOG_REX3, "REX3 Blue Slope Write: %08x\n", (uint32_t)data);
+			data &= 0x8007ffff;
+			uint32_t temp = 0;
+			if (BIT(data, 31))
+			{
+				temp  = 0x00080000 - (data & 0x7ffff);
+				temp |= 0x00080000;
+			}
+			else
+			{
+				temp = data & 0x7ffff;
+			}
+			m_rex3.m_slope_blue = temp;
 		}
-		m_rex3.m_slope_alpha = temp;
 		break;
 	}
-	case 0x0218/4:
-	{
-		LOGMASKED(LOG_REX3, "REX3 Green Slope Write: %08x\n", data);
-		data &= 0x8007ffff;
-		uint32_t temp = 0;
-		if (BIT(data, 31))
+	case 0x0220/8:
+		if (ACCESSING_BITS_32_63)
 		{
-			temp  = 0x00080000 - (data & 0x7ffff);
-			temp |= 0x00080000;
+			const uint32_t data32 = (uint32_t)(data >> 32);
+			LOGMASKED(LOG_REX3, "REX3 Write Mask Write: %08x\n", data32);
+			m_rex3.m_write_mask = data32 & 0xffffff;
 		}
-		else
+		if (ACCESSING_BITS_0_31)
 		{
-			temp = data & 0x7ffff;
-		}
-		m_rex3.m_slope_green = temp;
-		break;
-	}
-	case 0x021c/4:
-	{
-		LOGMASKED(LOG_REX3, "REX3 Blue Slope Write: %08x\n", data);
-		data &= 0x8007ffff;
-		uint32_t temp = 0;
-		if (BIT(data, 31))
-		{
-			temp  = 0x00080000 - (data & 0x7ffff);
-			temp |= 0x00080000;
-		}
-		else
-		{
-			temp = data & 0x7ffff;
-		}
-		m_rex3.m_slope_blue = temp;
-		break;
-	}
-	case 0x0220/4:
-		LOGMASKED(LOG_REX3, "REX3 Write Mask Write: %08x\n", data);
-		m_rex3.m_write_mask = data & 0xffffff;
-		break;
-	case 0x0224/4:
-		LOGMASKED(LOG_REX3, "REX3 Packed Color Fractions Write: %08x\n", data);
-		m_rex3.m_zero_fract = data;
-		break;
-	case 0x0228/4:
-		LOGMASKED(LOG_REX3, "REX3 Color Index Zeros Overflow Write: %08x\n", data);
-		m_rex3.m_zero_overflow = data;
-		break;
-	case 0x022c/4:
-		LOGMASKED(LOG_REX3, "REX3 Red/CI Slope (copy) Write: %08x\n", data);
-		m_rex3.m_slope_red = data;
-		break;
-	case 0x0230/4:
-		LOGMASKED(LOG_REX3, "REX3 Host Data Port MSW Write: %08x\n", data);
-		m_rex3.m_host_dataport_msw = data;
-		break;
-	case 0x0234/4:
-		LOGMASKED(LOG_REX3, "REX3 Host Data Port LSW Write: %08x\n", data);
-		m_rex3.m_host_dataport_lsw = data;
-		break;
-	case 0x0238/4:
-		LOGMASKED(LOG_REX3, "REX3 Display Control Bus Mode Write: %08x\n", data);
-		switch (data & 3)
-		{
-		case 0x00:
-			LOGMASKED(LOG_REX3, "    Transfer Width:     4 bytes\n");
-			m_rex3.m_xfer_width = 4;
-			break;
-		case 0x01:
-			LOGMASKED(LOG_REX3, "    Transfer Width:     1 bytes\n");
-			m_rex3.m_xfer_width = 1;
-			break;
-		case 0x02:
-			LOGMASKED(LOG_REX3, "    Transfer Width:     2 bytes\n");
-			m_rex3.m_xfer_width = 2;
-			break;
-		case 0x03:
-			LOGMASKED(LOG_REX3, "    Transfer Width:     3 bytes\n");
-			m_rex3.m_xfer_width = 3;
-			break;
-		}
-		LOGMASKED(LOG_REX3, "    DCB Reg Select Adr: %d\n", (data & 0x00000070 ) >> 4);
-		LOGMASKED(LOG_REX3, "     DCB Slave Address: %d\n", (data & 0x00000780 ) >> 7);
-		LOGMASKED(LOG_REX3, "    Use Sync XFer ACK:  %d\n", (data & 0x00000800 ) >> 11);
-		LOGMASKED(LOG_REX3, "    Use Async XFer ACK: %d\n", (data & 0x00001000 ) >> 12);
-		LOGMASKED(LOG_REX3, "   GIO CLK Cycle Width: %d\n", (data & 0x0003e000 ) >> 13);
-		LOGMASKED(LOG_REX3, "    GIO CLK Cycle Hold: %d\n", (data & 0x007c0000 ) >> 18);
-		LOGMASKED(LOG_REX3, "   GIO CLK Cycle Setup: %d\n", (data & 0x0f800000 ) >> 23);
-		LOGMASKED(LOG_REX3, "    Swap Byte Ordering: %d\n", (data & 0x10000000 ) >> 28);
-		m_rex3.m_dcb_reg_select = (data & 0x00000070) >> 4;
-		m_rex3.m_dcb_slave_select = (data & 0x00000780) >> 7;
-		m_rex3.m_dcb_mode = data & 0x1fffffff;
-		break;
-	case 0x0240/4:
-		m_rex3.m_dcb_data_msw = data;
-		switch (m_rex3.m_dcb_slave_select)
-		{
-		case 0x00:
-			vc2_write(data);
-			break;
-		case 0x01:
-			cmap0_write(data);
-			break;
-		case 0x04:
-			xmap0_write(data);
-			xmap1_write(data);
-			break;
-		case 0x05:
-			xmap0_write(data);
-			break;
-		case 0x06:
-			xmap1_write(data);
-			break;
-		default:
-			LOGMASKED(LOG_REX3 | LOG_UNKNOWN, "REX3 Display Control Bus Data MSW Write: %08x\n", data);
-			break;
+			LOGMASKED(LOG_REX3, "REX3 Packed Color Fractions Write: %08x\n", (uint32_t)data);
+			m_rex3.m_zero_fract = (uint32_t)data;
 		}
 		break;
-	case 0x0244/4:
-		LOGMASKED(LOG_REX3, "REX3 Display Control Bus Data LSW Write: %08x\n", data);
-		m_rex3.m_dcb_data_lsw = data;
+	case 0x0228/8:
+		if (ACCESSING_BITS_32_63)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Color Index Zeros Overflow Write: %08x\n", (uint32_t)(data >> 32));
+			m_rex3.m_zero_overflow = (uint32_t)(data >> 32);
+		}
+		if (ACCESSING_BITS_0_31)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Red/CI Slope (copy) Write: %08x\n", (uint32_t)data);
+			m_rex3.m_slope_red = (uint32_t)data;
+		}
 		break;
-	case 0x1300/4:
-		LOGMASKED(LOG_REX3, "REX3 Screenmask 1 X Min/Max Write: %08x\n", data);
-		m_rex3.m_smask_x[1] = data;
+	case 0x0230/8:
+		LOGMASKED(LOG_REX3, "REX3 Host Data Port Write: %08x%08x & %08x%08x\n", (uint32_t)(data >> 32), (uint32_t)data, (uint64_t)(mem_mask >> 32), (uint32_t)mem_mask);
+		COMBINE_DATA(&m_rex3.m_host_dataport);
 		break;
-	case 0x1304/4:
-		LOGMASKED(LOG_REX3, "REX3 Screenmask 1 Y Min/Max Write: %08x\n", data);
-		m_rex3.m_smask_y[1] = data;
+	case 0x0238/8:
+		if (ACCESSING_BITS_32_63)
+		{
+			data >>= 32;
+			LOGMASKED(LOG_REX3, "REX3 Display Control Bus Mode Write: %08x\n", (uint32_t)data);
+			switch (data & 3)
+			{
+			case 0x00:
+				LOGMASKED(LOG_REX3, "    Transfer Width:     4 bytes\n");
+				m_rex3.m_xfer_width = 4;
+				break;
+			case 0x01:
+				LOGMASKED(LOG_REX3, "    Transfer Width:     1 bytes\n");
+				m_rex3.m_xfer_width = 1;
+				break;
+			case 0x02:
+				LOGMASKED(LOG_REX3, "    Transfer Width:     2 bytes\n");
+				m_rex3.m_xfer_width = 2;
+				break;
+			case 0x03:
+				LOGMASKED(LOG_REX3, "    Transfer Width:     3 bytes\n");
+				m_rex3.m_xfer_width = 3;
+				break;
+			}
+			LOGMASKED(LOG_REX3, "    DCB Reg Select Adr: %d\n", (data & 0x00000070 ) >> 4);
+			LOGMASKED(LOG_REX3, "     DCB Slave Address: %d\n", (data & 0x00000780 ) >> 7);
+			LOGMASKED(LOG_REX3, "    Use Sync XFer ACK:  %d\n", (data & 0x00000800 ) >> 11);
+			LOGMASKED(LOG_REX3, "    Use Async XFer ACK: %d\n", (data & 0x00001000 ) >> 12);
+			LOGMASKED(LOG_REX3, "   GIO CLK Cycle Width: %d\n", (data & 0x0003e000 ) >> 13);
+			LOGMASKED(LOG_REX3, "    GIO CLK Cycle Hold: %d\n", (data & 0x007c0000 ) >> 18);
+			LOGMASKED(LOG_REX3, "   GIO CLK Cycle Setup: %d\n", (data & 0x0f800000 ) >> 23);
+			LOGMASKED(LOG_REX3, "    Swap Byte Ordering: %d\n", (data & 0x10000000 ) >> 28);
+			m_rex3.m_dcb_reg_select = (data & 0x00000070) >> 4;
+			m_rex3.m_dcb_slave_select = (data & 0x00000780) >> 7;
+			m_rex3.m_dcb_mode = data & 0x1fffffff;
+		}
 		break;
-	case 0x1308/4:
-		LOGMASKED(LOG_REX3, "REX3 Screenmask 2 X Min/Max Write: %08x\n", data);
-		m_rex3.m_smask_x[2] = data;
+	case 0x0240/8:
+		if (ACCESSING_BITS_32_63)
+		{
+			const uint32_t data32 = (uint32_t)(data >> 32);
+			m_rex3.m_dcb_data_msw = data32;
+			switch (m_rex3.m_dcb_slave_select)
+			{
+			case 0x00:
+				vc2_write(data32);
+				break;
+			case 0x01:
+				cmap0_write(data32);
+				break;
+			case 0x04:
+				xmap0_write(data32);
+				xmap1_write(data32);
+				break;
+			case 0x05:
+				xmap0_write(data32);
+				break;
+			case 0x06:
+				xmap1_write(data32);
+				break;
+			default:
+				LOGMASKED(LOG_REX3 | LOG_UNKNOWN, "REX3 Display Control Bus Data MSW Write: %08x\n", data32);
+				break;
+			}
+		}
+		if (ACCESSING_BITS_0_31)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Display Control Bus Data LSW Write: %08x\n", (uint32_t)data);
+			m_rex3.m_dcb_data_lsw = (uint32_t)data;
+		}
 		break;
-	case 0x130c/4:
-		LOGMASKED(LOG_REX3, "REX3 Screenmask 2 Y Min/Max Write: %08x\n", data);
-		m_rex3.m_smask_y[2] = data;
+	case 0x1300/8:
+		if (ACCESSING_BITS_32_63)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Screenmask 1 X Min/Max Write: %08x\n", (uint32_t)(data >> 32));
+			m_rex3.m_smask_x[1] = (uint32_t)(data >> 32);
+		}
+		if (ACCESSING_BITS_0_31)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Screenmask 1 Y Min/Max Write: %08x\n", (uint32_t)data);
+			m_rex3.m_smask_y[1] = (uint32_t)data;
+		}
 		break;
-	case 0x1310/4:
-		LOGMASKED(LOG_REX3, "REX3 Screenmask 3 X Min/Max Write: %08x\n", data);
-		m_rex3.m_smask_x[3] = data;
+	case 0x1308/8:
+		if (ACCESSING_BITS_32_63)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Screenmask 2 X Min/Max Write: %08x\n", (uint32_t)(data >> 32));
+			m_rex3.m_smask_x[2] = (uint32_t)(data >> 32);
+		}
+		if (ACCESSING_BITS_0_31)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Screenmask 2 Y Min/Max Write: %08x\n", (uint32_t)data);
+			m_rex3.m_smask_y[2] = (uint32_t)data;
+		}
 		break;
-	case 0x1314/4:
-		LOGMASKED(LOG_REX3, "REX3 Screenmask 3 Y Min/Max Write: %08x\n", data);
-		m_rex3.m_smask_y[3] = data;
+	case 0x1310/8:
+		if (ACCESSING_BITS_32_63)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Screenmask 3 X Min/Max Write: %08x\n", (uint32_t)(data >> 32));
+			m_rex3.m_smask_x[3] = (uint32_t)(data >> 32);
+		}
+		if (ACCESSING_BITS_0_31)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Screenmask 3 Y Min/Max Write: %08x\n", (uint32_t)data);
+			m_rex3.m_smask_y[3] = (uint32_t)data;
+		}
 		break;
-	case 0x1318/4:
-		LOGMASKED(LOG_REX3, "REX3 Screenmask 4 X Min/Max Write: %08x\n", data);
-		m_rex3.m_smask_x[4] = data;
+	case 0x1318/8:
+		if (ACCESSING_BITS_32_63)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Screenmask 4 X Min/Max Write: %08x\n", (uint32_t)(data >> 32));
+			m_rex3.m_smask_x[4] = (uint32_t)(data >> 32);
+		}
+		if (ACCESSING_BITS_0_31)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Screenmask 4 Y Min/Max Write: %08x\n", (uint32_t)data);
+			m_rex3.m_smask_y[4] = (uint32_t)data;
+		}
 		break;
-	case 0x131c/4:
-		LOGMASKED(LOG_REX3, "REX3 Screenmask 4 Y Min/Max Write: %08x\n", data);
-		m_rex3.m_smask_y[4] = data;
+	case 0x1320/8:
+		if (ACCESSING_BITS_32_63)
+		{
+			const uint32_t data32 = (uint32_t)(data >> 32);
+			LOGMASKED(LOG_REX3, "REX3 Top of Screen Scanline Write: %08x\n", data32);
+			m_rex3.m_top_scanline = data32 & 0x3ff;
+		}
+		if (ACCESSING_BITS_0_31)
+		{
+			const uint32_t data32 = (uint32_t)data;
+			LOGMASKED(LOG_REX3, "REX3 XY Window Write: %08x\n", data32);
+			m_rex3.m_xy_window = data32;
+		}
 		break;
-	case 0x1320/4:
-		LOGMASKED(LOG_REX3, "REX3 Top of Screen Scanline Write: %08x\n", data);
-		m_rex3.m_top_scanline = data & 0x3ff;
+	case 0x1328/8:
+		if (ACCESSING_BITS_32_63)
+		{
+			const uint32_t data32 = (uint32_t)(data >> 32);
+			LOGMASKED(LOG_REX3, "REX3 Clipping Mode Write: %08x\n", data32);
+			m_rex3.m_clip_mode = data32 & 0x1fff;
+		}
+		if (ACCESSING_BITS_0_31)
+		{
+			LOGMASKED(LOG_REX3, "Request GFIFO Stall\n");
+		}
 		break;
-	case 0x1324/4:
-		LOGMASKED(LOG_REX3, "REX3 XY Window Write: %08x\n", data);
-		m_rex3.m_xy_window = data;
+	case 0x1330/8:
+		if (ACCESSING_BITS_32_63)
+		{
+			LOGMASKED(LOG_REX3, "REX3 Config Write: %08x\n", data);
+			m_rex3.m_config = data & 0x1fffff;
+		}
 		break;
-	case 0x1328/4:
-		LOGMASKED(LOG_REX3, "REX3 Clipping Mode Write: %08x\n", data);
-		m_rex3.m_clip_mode = data & 0x1fff;
-		break;
-	case 0x132c/4:
-		LOGMASKED(LOG_REX3, "Request GFIFO Stall\n");
-		break;
-	case 0x1330/4:
-		LOGMASKED(LOG_REX3, "REX3 Config Write: %08x\n", data);
-		m_rex3.m_config = data & 0x1fffff;
-		break;
-	case 0x1340/4:
-		LOGMASKED(LOG_REX3, "Reset DCB Bus and Flush BFIFO\n");
+	case 0x1340/8:
+		if (ACCESSING_BITS_32_63)
+		{
+			LOGMASKED(LOG_REX3, "Reset DCB Bus and Flush BFIFO\n");
+		}
 		break;
 	default:
 		LOGMASKED(LOG_REX3 | LOG_UNKNOWN, "Unknown REX3 Write: %08x (%08x): %08x\n", 0xbf0f0000 + (offset << 2), mem_mask, data);
 		break;
 	}
 
-	if (offset & 0x00000200)
+	if (offset & 0x00000100)
 	{
 		do_rex3_command();
 	}

@@ -22,7 +22,7 @@
 #define LOG_DMA         (1 << 8)
 #define LOG_DEFAULT     (LOG_READS | LOG_WRITES | LOG_RPSS | LOG_WATCHDOG | LOG_UNKNOWN)
 
-#define VERBOSE         (LOG_DMA)
+#define VERBOSE         (0)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(SGI_MC, sgi_mc_device, "sgi_mc", "SGI Memory Controller")
@@ -252,19 +252,13 @@ void sgi_mc_device::dma_tick()
 
 	if ((m_dma_count & 0x0000ffff) == 0)
 	{	// If remaining byte count is 0, deduct zoom count
-		if (!BIT(m_dma_mode, 3))
-			logerror("Remaining DMA byte count is 0, count register contains %08x, deducting a zoom line\n", m_dma_count);
 		m_dma_count -= 0x00010000;
 		if (m_dma_count == 0)
 		{	// If remaining zoom count is also 0, move to next line
 			m_dma_mem_addr += m_dma_stride & 0x0000ffff;
 			m_dma_size -= 0x00010000;
-			if (!BIT(m_dma_mode, 3))
-				logerror("Remaining DMA zoom count is also 0, deducting a line, DMA size now %08x\n", m_dma_size);
 			if ((m_dma_size & 0xffff0000) == 0)
 			{	// If no remaining lines, DMA is done.
-				if (!BIT(m_dma_mode, 3))
-					logerror("No remaining lines, DMA is done\n");
 				m_dma_timer->adjust(attotime::never);
 				m_dma_run |= (1 << 3);
 				m_dma_run &= ~(1 << 6);
@@ -276,16 +270,12 @@ void sgi_mc_device::dma_tick()
 			else
 			{
 				m_dma_count = (m_dma_stride & 0x03ff0000) | (m_dma_size & 0x0000ffff);
-				if (!BIT(m_dma_mode, 3))
-					logerror("Reloading DMA count with %08x\n", m_dma_count);
 			}
 		}
 		else
 		{	// If remaining zoom count is non-zero, reload byte count and return source address to the beginning of the line.
 			m_dma_count |= m_dma_size & 0x0000ffff;
 			m_dma_mem_addr -= m_dma_size & 0x0000ffff;
-			if (!BIT(m_dma_mode, 3))
-				logerror("Remaining DMA zoom count is non-zero, returning source address to beginning, DMA count now %08x\n", m_dma_count);
 		}
 	}
 }
