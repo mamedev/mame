@@ -1433,8 +1433,36 @@ void spg2xx_game_state::init_zeus()
 	for (int i = 0; i < size/2; i++)
 	{
 		ROM[i] = ROM[i] ^ 0x8a1d;
+
+	// there is also bitswapping, and conditional xoring
+		if (ROM[i] & 0x0020)
+			ROM[i] ^= 0x0100;
+
+	//	ROM[i] = bitswap<16>(ROM[i] ,15,14,13,12,   11,10,9,8,    7,6,5,4,   3,2,1,0);
+		ROM[i] = bitswap<16>(ROM[i] ,15,14,13,12,   0,10,9,8,    7,6,5,4,   3,2,1,11);
+		ROM[i] = bitswap<16>(ROM[i] ,15,14,13,12,   11,10,9,1,    7,6,5,4,   3,2,8,0);
+		ROM[i] = bitswap<16>(ROM[i] ,15,14,2,12,   11,10,9,8,    7,6,5,4,   3,13,1,0);
+		ROM[i] = bitswap<16>(ROM[i] ,15,14,13,12,   11,10,9,8,    7,6,3,4,   5,2,1,0);
+		ROM[i] = bitswap<16>(ROM[i] ,7,14,13,12,   11,10,9,8,    15,6,5,4,   3,2,1,0);
+		ROM[i] = bitswap<16>(ROM[i] ,15,14,4,12,   11,10,9,8,    7,6,5,13,   3,2,1,0);
+		ROM[i] = bitswap<16>(ROM[i] ,15,14,13,12,   11,10,9,6,    7,8,5,4,   3,2,1,0);
+
+
 	}
-	// there is also bitswapping, maybe conditional on certain bits being set.
+
+	if (0)
+	{
+		uint8_t *DUMP = memregion("maincpu")->base();
+		FILE *fp;
+		char filename[256];
+		sprintf(filename,"decrypted_%s", machine().system().name);
+		fp=fopen(filename, "w+b");
+		if (fp)
+		{
+			fwrite(DUMP, size, 1, fp);
+			fclose(fp);
+		}
+	}
 }
 
 void spg2xx_game_state::init_zone40()
