@@ -15423,6 +15423,7 @@ hp95lx                          //
 
 @source:hp9825.cpp
 hp9825b                         // HP 9825B
+hp9825t                         // HP 9825T
 
 @source:hp9845.cpp
 hp9835a                         //
