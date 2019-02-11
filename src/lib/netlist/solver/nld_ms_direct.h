@@ -32,8 +32,6 @@ public:
 	matrix_solver_direct_t(netlist_state_t &anetlist, const pstring &name, const solver_parameters_t *params, const std::size_t size);
 	matrix_solver_direct_t(netlist_state_t &anetlist, const pstring &name, const eSortType sort, const solver_parameters_t *params, const std::size_t size);
 
-	~matrix_solver_direct_t() override = default;
-
 	void vsetup(analog_net_t::list_t &nets) override;
 	void reset() override { matrix_solver_t::reset(); }
 

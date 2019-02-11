@@ -34,6 +34,9 @@ public:
 		write(m_fmt);
 		write(m_data);
 	}
+
+	COPYASSIGNMOVE(wav_t, delete)
+
 	~wav_t()
 	{
 		if (m_f.seekable())

@@ -87,10 +87,13 @@ static constexpr unsigned FP_ALL = 0x0001f;
  * Catch SIGFPE on linux for debugging purposes.
  */
 
-class fpsignalenabler : public nocopyassignmove
+class fpsignalenabler
 {
 public:
 	explicit fpsignalenabler(unsigned fpexceptions);
+
+	COPYASSIGNMOVE(fpsignalenabler, delete)
+
 	~fpsignalenabler();
 
 	/* is the functionality supported ? */

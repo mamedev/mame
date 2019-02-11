@@ -65,8 +65,6 @@ public:
 
 	matrix_solver_w_t(netlist_state_t &anetlist, const pstring &name, const solver_parameters_t *params, const std::size_t size);
 
-	~matrix_solver_w_t() override = default;
-
 	void vsetup(analog_net_t::list_t &nets) override;
 	void reset() override { matrix_solver_t::reset(); }
 
@@ -293,7 +291,7 @@ unsigned matrix_solver_w_t<FT, SIZE>::solve_non_dynamic(const bool newton_raphso
 			for (unsigned i = 0; i < rowcount; i++)
 			{
 				if (H[i][i] == 0.0)
-					printf("%s H singular\n", this->name().c_str());
+					plib::perrlogger("{} H singular\n", this->name());
 				const float_type f = 1.0 / H[i][i];
 				for (unsigned j = i+1; j < rowcount; j++)
 				{
@@ -348,7 +346,7 @@ unsigned matrix_solver_w_t<FT, SIZE>::solve_non_dynamic(const bool newton_raphso
 				tmp += A(i,j) * new_V[j];
 			}
 			if (std::abs(tmp-RHS(i)) > 1e-6)
-				printf("%s failed on row %d: %f RHS: %f\n", this->name().c_str(), i, std::abs(tmp-RHS(i)), RHS(i));
+				plib::perrlogger("{} failed on row {}: {} RHS: {}\n", this->name(), i, std::abs(tmp-RHS(i)), RHS(i));
 		}
 
 	const float_type err = (newton_raphson ? delta(new_V) : 0.0);

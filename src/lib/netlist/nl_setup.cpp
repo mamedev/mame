@@ -34,14 +34,14 @@ setup_t::setup_t(netlist_t &netlist)
 {
 }
 
-setup_t::~setup_t()
+setup_t::~setup_t() noexcept
 {
+	// FIXME: can't see a need any longer
 	m_links.clear();
 	m_alias.clear();
 	m_params.clear();
 	m_terminals.clear();
 	m_param_values.clear();
-
 	m_sources.clear();
 }
 

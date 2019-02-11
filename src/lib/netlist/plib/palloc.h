@@ -9,6 +9,7 @@
 #define PALLOC_H_
 
 #include "pstring.h"
+#include "ptypes.h"
 
 #include <cstddef>
 #include <memory>
@@ -92,6 +93,15 @@ public:
 		r.m_ptr = nullptr;
 	}
 
+	owned_ptr &operator=(owned_ptr &&r) noexcept
+	{
+		m_is_owned = r.m_is_owned;
+		m_ptr = r.m_ptr;
+		r.m_is_owned = false;
+		r.m_ptr = nullptr;
+		return *this;
+	}
+
 	template<typename DC>
 	owned_ptr(owned_ptr<DC> &&r) noexcept
 	{
@@ -169,6 +179,9 @@ private:
 
 public:
 	mempool(size_t min_alloc, size_t min_align);
+
+	COPYASSIGNMOVE(mempool, delete)
+
 	~mempool();
 
 	void *alloc(size_t size);

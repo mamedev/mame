@@ -92,7 +92,7 @@ public:
 
 	// simple construction/destruction
 	pstring_t() = default;
-	~pstring_t() = default;
+	~pstring_t() noexcept = default;
 
 	// FIXME: Do something with encoding
 	pstring_t(const mem_t *string)
@@ -115,13 +115,15 @@ public:
 		m_str.assign(string, N - 1);
 	}
 
-	pstring_t(const pstring_t &string) = default;
 
 	explicit pstring_t(const string_type &string)
 		: m_str(string)
 	{ }
 
+	pstring_t(const pstring_t &string) = default;
 	pstring_t(pstring_t &&string) noexcept = default;
+	pstring_t &operator=(const pstring_t &string) = default;
+	pstring_t &operator=(pstring_t &&string) noexcept = default;
 
 	explicit pstring_t(code_t code)
 	{
@@ -139,8 +141,6 @@ public:
 
 	operator string_type () const { return m_str; }
 
-	pstring_t &operator=(const pstring_t &string) = default;
-	pstring_t &operator=(pstring_t &&string) noexcept = default;
 
 	template <typename T,
 		class = typename std::enable_if<!std::is_same<T, pstring_t::traits_type>::value>::type>

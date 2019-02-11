@@ -9,6 +9,7 @@
 #include "palloc.h"
 #include "pexception.h"
 #include "pfmtlog.h"
+#include "pstream.h"
 
 #include <algorithm>
 
@@ -28,7 +29,7 @@ mempool::~mempool()
 	{
 		if (b->m_num_alloc != 0)
 		{
-			fprintf(stderr, "Found block with %d dangling allocations\n", static_cast<int>(b->m_num_alloc));
+			perrlogger("Found block with {} dangling allocations\n", b->m_num_alloc);
 		}
 		::operator delete(b->data);
 	}

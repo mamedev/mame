@@ -157,8 +157,9 @@ public:
 	: m_str(fmt), m_arg(0)
 	{
 	}
-	pfmt(const pfmt &rhs) = default;
-	~pfmt() = default;
+	COPYASSIGNMOVE(pfmt, default)
+
+	~pfmt() noexcept = default;
 
 	operator pstring() const { return m_str; }
 	// NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
@@ -215,10 +216,12 @@ private:
 };
 
 template <class T, bool build_enabled = true>
-class pfmt_writer_t : plib::nocopyassignmove
+class pfmt_writer_t
 {
 public:
 	explicit pfmt_writer_t() : m_enabled(true)  { }
+
+	COPYASSIGNMOVE(pfmt_writer_t, delete)
 
 	/* runtime enable */
 	template<bool enabled, typename... Args>
@@ -249,7 +252,7 @@ public:
 	bool is_enabled() const { return m_enabled; }
 
 protected:
-	~pfmt_writer_t() = default;
+	~pfmt_writer_t() noexcept = default;
 
 private:
 	pfmt &xlog(pfmt &fmt) const { return fmt; }
@@ -270,7 +273,10 @@ class plog_channel : public pfmt_writer_t<plog_channel<T, L, build_enabled>, bui
 	friend class pfmt_writer_t<plog_channel<T, L, build_enabled>, build_enabled>;
 public:
 	explicit plog_channel(T &b) : pfmt_writer_t<plog_channel, build_enabled>(), m_base(b) { }
-	~plog_channel() = default;
+
+	COPYASSIGNMOVE(plog_channel, delete)
+
+	~plog_channel() noexcept = default;
 
 protected:
 	void vdowrite(const pstring &ls) const
@@ -295,7 +301,9 @@ public:
 		error(proxy),
 		fatal(proxy)
 	{}
-	virtual ~plog_base() = default;
+
+	COPYASSIGNMOVE(plog_base, default)
+	virtual ~plog_base() noexcept = default;
 
 	plog_channel<T, plog_level::DEBUG, debug_enabled> debug;
 	plog_channel<T, plog_level::INFO> info;

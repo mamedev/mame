@@ -219,8 +219,6 @@ namespace devices
 		netlist_base_factory_truthtable_t(const pstring &name, const pstring &classname,
 				const pstring &def_param, const pstring &sourcefile);
 
-		~netlist_base_factory_truthtable_t() override = default;
-
 		std::vector<pstring> m_desc;
 		const logic_family_desc_t *m_family;
 	};

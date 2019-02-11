@@ -120,7 +120,7 @@ namespace netlist
 		m_last_B = new_B;
 	}
 
-	NETLIB_FUNC_VOID(7490, update_outputs, (void))
+	NETLIB_FUNC_VOID(7490, update_outputs, ())
 	{
 		for (std::size_t i=0; i<4; i++)
 			m_Q[i].push((m_cnt >> i) & 1, delay[i]);

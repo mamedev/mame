@@ -172,8 +172,6 @@ public:
 	{
 	}
 
-	~netlist_tool_t() = default;
-
 	void init()
 	{
 	}

@@ -44,8 +44,6 @@ public:
 		{
 		}
 
-	~matrix_solver_GCR_t() override = default;
-
 	constexpr std::size_t N() const { return m_dim; }
 
 	void vsetup(analog_net_t::list_t &nets) override;
@@ -55,8 +53,7 @@ public:
 
 private:
 
-	//typedef typename mat_cr_t<storage_N>::type mattype;
-	typedef typename plib::matrix_compressed_rows_t<FT, SIZE>::index_type mat_index_type;
+	using mat_index_type = typename plib::matrix_compressed_rows_t<FT, SIZE>::index_type;
 
 	void csc_private(plib::putf8_fmt_writer &strm);
 

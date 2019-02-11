@@ -22,6 +22,7 @@
 #include "pconfig.h"
 #include "pomp.h"
 #include "pstate.h"
+#include "ptypes.h"
 #include "putil.h"
 
 namespace plib
@@ -32,6 +33,8 @@ namespace plib
 	{
 		using index_type = C;
 		using value_type = T;
+
+		COPYASSIGNMOVE(matrix_compressed_rows_t, default)
 
 		enum constants_e
 		{

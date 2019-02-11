@@ -30,6 +30,8 @@ namespace netlist
 
 		constexpr ptime() noexcept : m_time(0) {}
 
+		~ptime() noexcept = default;
+
 		constexpr ptime(const ptime &rhs) noexcept = default;
 		constexpr ptime(ptime &&rhs) noexcept = default;
 		constexpr explicit ptime(const internal_type &time) noexcept : m_time(time) {}

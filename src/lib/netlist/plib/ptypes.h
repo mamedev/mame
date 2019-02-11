@@ -14,6 +14,16 @@
 
 #include "pconfig.h"
 
+#define COPYASSIGNMOVE(name, def)  \
+		name(const name &) = def; \
+		name(name &&) noexcept = def; \
+		name &operator=(const name &) = def; \
+		name &operator=(name &&) noexcept = def;
+
+#define COPYASSIGN(name, def)  \
+		name(const name &) = def; \
+		name &operator=(const name &) = def; \
+
 namespace plib
 {
 	template<typename T> struct is_integral : public std::is_integral<T> { };

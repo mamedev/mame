@@ -227,8 +227,6 @@ namespace netlist
 		explicit nl_exception(const pstring &text //!< text to be passed
 				)
 		: plib::pexception(text) { }
-		/*! Copy constructor. */
-		nl_exception(const nl_exception &e) = default;
 	};
 
 	/*! Logic families descriptors are used to create proxy devices.
@@ -239,7 +237,10 @@ namespace netlist
 	{
 	public:
 		logic_family_desc_t();
-		virtual ~logic_family_desc_t() = default;
+
+		COPYASSIGNMOVE(logic_family_desc_t, delete)
+
+		virtual ~logic_family_desc_t() noexcept = default;
 
 		virtual plib::owned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_state_t &anetlist, const pstring &name,
 				logic_output_t *proxied) const = 0;
@@ -279,12 +280,14 @@ namespace netlist
 	public:
 
 		logic_family_t() : m_logic_family(nullptr) {}
+		COPYASSIGNMOVE(logic_family_t, delete)
+
 
 		const logic_family_desc_t *logic_family() const { return m_logic_family; }
 		void set_logic_family(const logic_family_desc_t *fam) { m_logic_family = fam; }
 
 	protected:
-		~logic_family_t() = default; // prohibit polymorphic destruction
+		~logic_family_t() noexcept = default; // prohibit polymorphic destruction
 		const logic_family_desc_t *m_logic_family;
 	};
 
@@ -314,6 +317,9 @@ namespace netlist
 				const pstring &name,     //!< identifier/name for this state variable
 				const T &value          //!< Initial value after construction
 				);
+
+		//! Destructor.
+		~state_var() noexcept = default;
 		//! Copy Constructor.
 		constexpr state_var(const state_var &rhs) = default;
 		//! Move Constructor.
@@ -353,9 +359,13 @@ namespace netlist
 				);
 		//! Copy Constructor.
 		state_array(const state_array &rhs) NL_NOEXCEPT = default;
+		//! Destructor.
+		~state_array() noexcept = default;
 		//! Move Constructor.
 		state_array(state_array &&rhs) NL_NOEXCEPT = default;
 		state_array &operator=(const state_array &rhs) NL_NOEXCEPT = default;
+		state_array &operator=(state_array &&rhs) NL_NOEXCEPT = default;
+
 		state_array &operator=(const T &rhs) NL_NOEXCEPT { m_value = rhs; return *this; }
 		T & operator[](const std::size_t i) NL_NOEXCEPT { return m_value[i]; }
 		constexpr const T & operator[](const std::size_t i) const NL_NOEXCEPT { return m_value[i]; }
@@ -390,7 +400,7 @@ namespace netlist
 	 *  memory allocation to enhance locality. Please refer to \ref USE_MEMPOOL as
 	 *  well.
 	 */
-	class detail::object_t : public plib::nocopyassignmove
+	class detail::object_t
 	{
 	public:
 
@@ -400,6 +410,7 @@ namespace netlist
 		 */
 		explicit object_t(const pstring &aname /*!< string containing name of the object */);
 
+		COPYASSIGNMOVE(object_t, delete)
 		/*! return name of the object
 		 *
 		 *  \returns name of the object.
@@ -411,7 +422,7 @@ namespace netlist
 		void * operator new (size_t size);
 		void operator delete (void * mem);
 	protected:
-		~object_t() = default; // only childs should be destructible
+		~object_t() noexcept = default; // only childs should be destructible
 
 	private:
 		//pstring m_name;
@@ -425,6 +436,8 @@ namespace netlist
 	struct detail::netlist_ref
 	{
 		explicit netlist_ref(netlist_state_t &nl);
+
+		COPYASSIGNMOVE(netlist_ref, delete)
 
 		netlist_state_t & state() noexcept;
 		const netlist_state_t & state() const noexcept;
@@ -512,7 +525,9 @@ namespace netlist
 
 		core_terminal_t(core_device_t &dev, const pstring &aname,
 				const state_e state, nldelegate delegate = nldelegate());
-		virtual ~core_terminal_t() = default;
+		virtual ~core_terminal_t() noexcept = default;
+
+		COPYASSIGNMOVE(core_terminal_t, delete)
 
 		/*! The object type.
 		 * \returns type of the object
@@ -713,7 +728,10 @@ namespace netlist
 		};
 
 		net_t(netlist_state_t &nl, const pstring &aname, core_terminal_t *mr = nullptr);
-		virtual ~net_t() = default;
+
+		COPYASSIGNMOVE(net_t, delete)
+
+		virtual ~net_t() noexcept = default;
 
 		void reset();
 
@@ -916,6 +934,8 @@ namespace netlist
 
 		param_t(device_t &device, const pstring &name);
 
+		COPYASSIGNMOVE(param_t, delete)
+
 		param_type_t param_type() const;
 
 	protected:
@@ -946,6 +966,7 @@ namespace netlist
 	{
 	public:
 		param_num_t(device_t &device, const pstring &name, const T val);
+
 		const T operator()() const NL_NOEXCEPT { return m_param; }
 		void setTo(const T &param) { set(m_param, param); }
 	private:
@@ -1086,7 +1107,9 @@ namespace netlist
 		core_device_t(netlist_state_t &owner, const pstring &name);
 		core_device_t(core_device_t &owner, const pstring &name);
 
-		virtual ~core_device_t() = default;
+		COPYASSIGNMOVE(core_device_t, delete)
+
+		virtual ~core_device_t() noexcept = default;
 
 		void do_inc_active() NL_NOEXCEPT
 		{
@@ -1155,6 +1178,8 @@ namespace netlist
 		device_t(netlist_state_t &owner, const pstring &name);
 		device_t(core_device_t &owner, const pstring &name);
 
+		COPYASSIGNMOVE(device_t, delete)
+
 		~device_t() override = default;
 
 		setup_t &setup();
@@ -1221,7 +1246,6 @@ namespace netlist
 	public:
 		using entry_t = pqentry_t<net_t *, netlist_time>;
 		explicit queue_t(netlist_state_t &nl);
-		~queue_t();
 
 	protected:
 
@@ -1250,7 +1274,9 @@ namespace netlist
 			std::unique_ptr<callbacks_t> &&callbacks,
 			std::unique_ptr<setup_t> &&setup);
 
-		~netlist_state_t() = default;
+		COPYASSIGNMOVE(netlist_state_t, delete)
+
+		~netlist_state_t() noexcept = default;
 
 		friend class netlist_t; // allow access to private members
 
@@ -1378,7 +1404,10 @@ namespace netlist
 	public:
 
 		explicit netlist_t(const pstring &aname, std::unique_ptr<callbacks_t> callbacks);
-		~netlist_t() = default;
+
+		COPYASSIGNMOVE(netlist_t, delete)
+
+		~netlist_t() noexcept = default;
 
 		/* run functions */
 

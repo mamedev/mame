@@ -201,7 +201,7 @@ double nl_convert_base_t::get_sp_unit(const pstring &unit)
 			return m_units[i].m_mult;
 		i++;
 	}
-	fprintf(stderr, "Unit %s unknown\n", unit.c_str());
+	plib::perrlogger("Unit {} unknown\n", unit);
 	return 0.0;
 }
 
@@ -250,10 +250,10 @@ void nl_convert_spice_t::convert(const pstring &contents)
 
 	pstring line = "";
 
-	for (std::size_t i=0; i < spnl.size(); i++)
+	for (const auto &i : spnl)
 	{
 		// Basic preprocessing
-		pstring inl = plib::ucase(plib::trim(spnl[i]));
+		pstring inl = plib::ucase(plib::trim(i));
 		if (plib::startsWith(inl, "+"))
 			line = line + inl.substr(1);
 		else
@@ -316,7 +316,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				if (m.size() == 2)
 				{
 					if (m[1].length() != 4)
-						fprintf(stderr, "error with model desc %s\n", model.c_str());
+						plib::perrlogger("error with model desc {}\n", model);
 					pins = plib::left(m[1], 3);
 				}
 				add_device("QBJT_EB", tt[0], m[0]);
@@ -358,7 +358,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 					//add_term(tt[2], tt[0] + ".2");
 				}
 				else
-					fprintf(stderr, "Voltage Source %s not connected to GND\n", tt[0].c_str());
+					plib::perrlogger("Voltage Source {} not connected to GND\n", tt[0]);
 				break;
 			case 'I': // Input pin special notation
 				{

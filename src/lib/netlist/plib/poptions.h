@@ -27,6 +27,8 @@ public:
 	option_base(options &parent, pstring help);
 	virtual ~option_base() = default;
 
+	COPYASSIGNMOVE(option_base, delete)
+
 	pstring help() const { return m_help; }
 private:
 	pstring m_help;
@@ -217,14 +219,12 @@ public:
 	{}
 };
 
-class options
+class options : public nocopyassignmove
 {
 public:
 
 	options();
 	explicit options(option **o);
-
-	~options();
 
 	void register_option(option_base *opt);
 	int parse(int argc, char **argv);

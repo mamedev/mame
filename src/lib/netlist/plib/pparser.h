@@ -17,7 +17,7 @@
 
 
 namespace plib {
-class ptokenizer : public nocopyassignmove
+class ptokenizer
 {
 public:
 	template <typename T>
@@ -25,6 +25,8 @@ public:
 	: m_strm(std::forward<T>(strm)), m_lineno(0), m_cur_line(""), m_px(m_cur_line.begin()), m_unget(0), m_string('"')
 	{
 	}
+
+	COPYASSIGNMOVE(ptokenizer, delete)
 
 	virtual ~ptokenizer() = default;
 
@@ -182,6 +184,10 @@ public:
 		}
 		return *this;
 	}
+
+	COPYASSIGN(ppreprocessor, delete)
+	ppreprocessor &operator=(ppreprocessor &&src) = delete;
+
 
 	ppreprocessor(ppreprocessor &&s) noexcept
 	: m_defines(std::move(s.m_defines))

@@ -27,6 +27,7 @@ namespace netlist
 	 */
 	using netlist_sig_t = std::uint32_t;
 
+	/* FIXME: belongs into nl_base.h to nlstate */
 	/**
 	 * @brief Interface definition for netlist callbacks into calling code
 	 *
@@ -38,10 +39,17 @@ namespace netlist
 	class callbacks_t
 	{
 	public:
+
+		callbacks_t() = default;
+		/* what is done before this is passed as a unique_ptr to netlist
+		 * we should not limit.
+		 */
 		virtual ~callbacks_t() = default;
+		COPYASSIGNMOVE(callbacks_t, default)
 
 		/* logging callback */
 		virtual void vlog(const plib::plog_level &l, const pstring &ls) const = 0;
+
 	};
 
 	using log_type =  plib::plog_base<callbacks_t, NL_DEBUG>;

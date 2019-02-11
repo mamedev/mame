@@ -47,7 +47,7 @@ public:
 				std::is_floating_point<T>::value);
 	}
 
-	class callback_t : nocopyassignmove
+	class callback_t
 	{
 	public:
 		using list_t = std::vector<callback_t *>;
@@ -56,7 +56,9 @@ public:
 		virtual void on_pre_save(state_manager_t &manager) = 0;
 		virtual void on_post_load(state_manager_t &manager) = 0;
 	protected:
-		virtual ~callback_t() = default;
+		callback_t() = default;
+		~callback_t() = default;
+		COPYASSIGNMOVE(callback_t, default)
 	};
 
 	struct entry_t
@@ -70,8 +72,6 @@ public:
 		entry_t(const pstring &stname, const void *owner, callback_t *callback)
 		: m_name(stname), m_dt(datatype_t(true)), m_owner(owner), m_callback(callback), m_count(0), m_ptr(nullptr) { }
 
-		~entry_t() = default;
-
 		pstring             m_name;
 		const datatype_t    m_dt;
 		const void *        m_owner;
@@ -81,7 +81,6 @@ public:
 	};
 
 	state_manager_t() = default;
-	~state_manager_t() = default;
 
 	template<typename C>
 	void save_item(const void *owner, C &state, const pstring &stname)

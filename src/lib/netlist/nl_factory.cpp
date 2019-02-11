@@ -52,11 +52,6 @@ namespace netlist { namespace factory
 	{
 	}
 
-	list_t::~list_t()
-	{
-		clear();
-	}
-
 	void list_t::register_device(std::unique_ptr<element_t> &&factory)
 	{
 		for (auto & e : *this)

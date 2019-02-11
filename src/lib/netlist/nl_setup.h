@@ -140,6 +140,7 @@ namespace netlist
 
 	struct tt_desc
 	{
+		tt_desc() : ni(0), no(0) { }
 		pstring name;
 		pstring classname;
 		unsigned long ni;
@@ -187,7 +188,9 @@ namespace netlist
 		: m_setup(setup), m_type(type)
 		{}
 
-		virtual ~source_t() = default;
+		COPYASSIGNMOVE(source_t, delete)
+
+		virtual ~source_t() noexcept = default;
 
 		virtual bool parse(const pstring &name);
 		setup_t &setup() { return m_setup; }
@@ -206,15 +209,16 @@ namespace netlist
 	// ----------------------------------------------------------------------------------------
 
 
-	class setup_t : plib::nocopyassignmove
+	class setup_t
 	{
 	public:
 
 		using link_t = std::pair<pstring, pstring>;
 
 		explicit setup_t(netlist_t &netlist);
-		~setup_t();
+		~setup_t() noexcept;
 
+		COPYASSIGNMOVE(setup_t, delete)
 
 		netlist_state_t &netlist();
 		const netlist_state_t &netlist() const;

@@ -68,10 +68,10 @@ namespace netlist
 		m_B.activate();
 		m_C.activate();
 		m_D.activate();
-		unsigned t1 = m_A() & m_B();
-		unsigned t2 = m_C() & m_D();
+		auto t1 = m_A() & m_B();
+		auto t2 = m_C() & m_D();
 
-		const netlist_time times[2] = { NLTIME_FROM_NS(22), NLTIME_FROM_NS(15) };
+		const netlist_time times[2] = { NLTIME_FROM_NS(15), NLTIME_FROM_NS(22) };
 
 		uint_fast8_t res = 0;
 		if (t1 ^ 1)
@@ -85,14 +85,16 @@ namespace netlist
 				m_A.inactivate();
 				m_B.inactivate();
 			}
-		} else {
+		}
+		else
+		{
 			if (t2 ^ 1)
 			{
 				m_C.inactivate();
 				m_D.inactivate();
 			}
 		}
-		m_Q.push(res, times[1 - res]);// ? 22000 : 15000);
+		m_Q.push(res, times[res]);// ? 22000 : 15000);
 	}
 
 	NETLIB_DEVICE_IMPL(7450,        "TTL_7450_ANDORINVERT", "+A,+B,+C,+D")

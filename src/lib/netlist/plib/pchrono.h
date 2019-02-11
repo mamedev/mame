@@ -9,6 +9,7 @@
 #define PCHRONO_H_
 
 #include "pconfig.h"
+#include "ptypes.h"
 
 #include <chrono>
 #include <cstdint>
@@ -175,10 +176,11 @@ namespace chrono {
 		struct guard_t
 		{
 			guard_t() = delete;
-			guard_t(const guard_t &g) noexcept = default;
-			guard_t(guard_t &&g) noexcept = default;
 			guard_t(timer &m) noexcept : m_m(m) { m_m.m_time -= T::start(); }
 			~guard_t() { m_m.m_time += T::stop(); ++m_m.m_count; }
+
+			COPYASSIGNMOVE(guard_t, default)
+
 		private:
 			timer &m_m;
 		};
@@ -212,8 +214,7 @@ namespace chrono {
 		struct guard_t
 		{
 			guard_t() = default;
-			guard_t(const guard_t &g) noexcept = default;
-			guard_t(guard_t &&g) noexcept = default;
+			COPYASSIGNMOVE(guard_t, default)
 			/* using default constructor will trigger warning on
 			 * unused local variable.
 			 */

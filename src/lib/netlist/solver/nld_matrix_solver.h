@@ -114,7 +114,6 @@ public:
 	: analog_output_t(dev, aname)
 	, m_proxied_net(pnet)
 	{ }
-	~proxied_analog_output_t() override = default;
 
 	analog_net_t *proxied_net() const { return m_proxied_net;}
 private:
@@ -135,8 +134,6 @@ public:
 		PREFER_IDENTITY_TOP_LEFT,
 		PREFER_BAND_MATRIX
 	};
-
-	~matrix_solver_t() override = default;
 
 	void setup(analog_net_t::list_t &nets)
 	{
