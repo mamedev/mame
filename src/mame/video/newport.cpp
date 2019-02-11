@@ -39,7 +39,7 @@
 #define LOG_COMMANDS    (1 << 7)
 #define LOG_ALL         (LOG_UNKNOWN | LOG_VC2 | LOG_CMAP0 | LOG_CMAP1 | LOG_XMAP0 | LOG_XMAP1 | LOG_REX3)
 
-#define VERBOSE (LOG_COMMANDS | LOG_UNKNOWN | LOG_REX3 | LOG_CMAP0 | LOG_CMAP1)
+#define VERBOSE 0
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(NEWPORT_VIDEO, newport_video_device, "newport_video", "SGI Newport graphics board")

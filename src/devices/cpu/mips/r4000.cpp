@@ -41,6 +41,7 @@
 #define LOG_CACHE     (1U << 2)
 #define LOG_EXCEPTION (1U << 3)
 #define LOG_SYSCALL   (1U << 4)
+#define LOG_STATS     (1U << 5)
 
 #define VERBOSE       (LOG_GENERAL)
 
@@ -210,15 +211,29 @@ void r4000_base_device::device_reset()
 	m_cp0[CP0_WatchLo] = 0;
 	m_cp0[CP0_WatchHi] = 0;
 
-	m_icache_hit = 0;
-	m_icache_miss = 0;
+	// initialize tlb mru index with identity mapping
+	for (unsigned i = 0; i < ARRAY_LENGTH(m_tlb); i++)
+	{
+		m_tlb_mru[TRANSLATE_READ][i] = i;
+		m_tlb_mru[TRANSLATE_WRITE][i] = i;
+		m_tlb_mru[TRANSLATE_FETCH][i] = i;
+	}
+
+	// initialize statistics
+	m_tlb_scans = 0;
+	m_tlb_loops = 0;
+	m_icache_hits = 0;
+	m_icache_misses = 0;
 }
 
 void r4000_base_device::device_stop()
 {
-	if (ICACHE)
-		LOGMASKED(LOG_CACHE, "icache hit ratio %.3f%% (%d hits %d misses)\n",
-			double(m_icache_hit) / double(m_icache_hit + m_icache_miss) * 100.0, m_icache_hit, m_icache_miss);
+	if ((m_icache_hits + m_icache_misses) > 0)
+		LOGMASKED(LOG_STATS, "icache hit ratio %.3f%% (%d hits %d misses)\n",
+			double(m_icache_hits) / double(m_icache_hits + m_icache_misses) * 100.0, m_icache_hits, m_icache_misses);
+
+	if (m_tlb_scans > 0)
+		LOGMASKED(LOG_STATS, "tlb scans %d loops %d average %.3f loops per scan\n", m_tlb_scans, m_tlb_loops, double(m_tlb_loops) / double(m_tlb_scans));
 }
 
 device_memory_interface::space_config_vector r4000_base_device::memory_space_config() const
@@ -1224,8 +1239,7 @@ void r4000_base_device::cpu_exception(u32 exception, u16 const vector)
 
 void r4000_base_device::cpu_lwl(u32 const op)
 {
-	unsigned const reverse = (SR & SR_RE) && ((SR & SR_KSU) == SR_KSU_U) ? 7 : 0;
-	u64 const offset = u64(ADDR(m_r[RSREG], s16(op))) ^ reverse;
+	u64 const offset = ADDR(m_r[RSREG], s16(op));
 	unsigned const shift = ((offset & 3) ^ R4000_ENDIAN_LE_BE(3, 0)) << 3;
 
 	load<u32>(offset & ~3,
@@ -1237,8 +1251,7 @@ void r4000_base_device::cpu_lwl(u32 const op)
 
 void r4000_base_device::cpu_lwr(u32 const op)
 {
-	unsigned const reverse = (SR & SR_RE) && ((SR & SR_KSU) == SR_KSU_U) ? 7 : 0;
-	u64 const offset = u64(ADDR(m_r[RSREG], s16(op))) ^ reverse;
+	u64 const offset = ADDR(m_r[RSREG], s16(op));
 	unsigned const shift = ((offset & 0x3) ^ R4000_ENDIAN_LE_BE(0, 3)) << 3;
 
 	load<u32>(offset & ~3,
@@ -1250,8 +1263,7 @@ void r4000_base_device::cpu_lwr(u32 const op)
 
 void r4000_base_device::cpu_swl(u32 const op)
 {
-	unsigned const reverse = (SR & SR_RE) && ((SR & SR_KSU) == SR_KSU_U) ? 7 : 0;
-	u64 const offset = u64(ADDR(m_r[RSREG], s16(op))) ^ reverse;
+	u64 const offset = ADDR(m_r[RSREG], s16(op));
 	unsigned const shift = ((offset & 3) ^ R4000_ENDIAN_LE_BE(3, 0)) << 3;
 
 	store<u32>(offset & ~3, u32(m_r[RTREG]) >> shift, ~u32(0) >> shift);
@@ -1259,8 +1271,7 @@ void r4000_base_device::cpu_swl(u32 const op)
 
 void r4000_base_device::cpu_swr(u32 const op)
 {
-	unsigned const reverse = (SR & SR_RE) && ((SR & SR_KSU) == SR_KSU_U) ? 7 : 0;
-	u64 const offset = u64(ADDR(m_r[RSREG], s16(op))) ^ reverse;
+	u64 const offset = ADDR(m_r[RSREG], s16(op));
 	unsigned const shift = ((offset & 3) ^ R4000_ENDIAN_LE_BE(0, 3)) << 3;
 
 	store<u32>(offset & ~3, u32(m_r[RTREG]) << shift, ~u32(0) << shift);
@@ -1268,8 +1279,7 @@ void r4000_base_device::cpu_swr(u32 const op)
 
 void r4000_base_device::cpu_ldl(u32 const op)
 {
-	unsigned const reverse = (SR & SR_RE) && ((SR & SR_KSU) == SR_KSU_U) ? 7 : 0;
-	u64 const offset = u64(ADDR(m_r[RSREG], s16(op))) ^ reverse;
+	u64 const offset = ADDR(m_r[RSREG], s16(op));
 	unsigned const shift = ((offset & 7) ^ R4000_ENDIAN_LE_BE(7, 0)) << 3;
 
 	load<u64>(offset & ~7,
@@ -1281,8 +1291,7 @@ void r4000_base_device::cpu_ldl(u32 const op)
 
 void r4000_base_device::cpu_ldr(u32 const op)
 {
-	unsigned const reverse = (SR & SR_RE) && ((SR & SR_KSU) == SR_KSU_U) ? 7 : 0;
-	u64 const offset = u64(ADDR(m_r[RSREG], s16(op))) ^ reverse;
+	u64 const offset = ADDR(m_r[RSREG], s16(op));
 	unsigned const shift = ((offset & 7) ^ R4000_ENDIAN_LE_BE(0, 7)) << 3;
 
 	load<u64>(offset & ~7,
@@ -1294,8 +1303,7 @@ void r4000_base_device::cpu_ldr(u32 const op)
 
 void r4000_base_device::cpu_sdl(u32 const op)
 {
-	unsigned const reverse = (SR & SR_RE) && ((SR & SR_KSU) == SR_KSU_U) ? 7 : 0;
-	u64 const offset = u64(ADDR(m_r[RSREG], s16(op))) ^ reverse;
+	u64 const offset = ADDR(m_r[RSREG], s16(op));
 	unsigned const shift = ((offset & 7) ^ R4000_ENDIAN_LE_BE(7, 0)) << 3;
 
 	store<u64>(offset & ~7, m_r[RTREG] >> shift, ~u64(0) >> shift);
@@ -1303,8 +1311,7 @@ void r4000_base_device::cpu_sdl(u32 const op)
 
 void r4000_base_device::cpu_sdr(u32 const op)
 {
-	unsigned const reverse = (SR & SR_RE) && ((SR & SR_KSU) == SR_KSU_U) ? 7 : 0;
-	u64 const offset = u64(ADDR(m_r[RSREG], s16(op))) ^ reverse;
+	u64 const offset = ADDR(m_r[RSREG], s16(op));
 	unsigned const shift = ((offset & 7) ^ R4000_ENDIAN_LE_BE(0, 7)) << 3;
 
 	store<u64>(offset & ~7, m_r[RTREG] << shift, ~u64(0) << shift);
@@ -2712,11 +2719,15 @@ r4000_base_device::translate_t r4000_base_device::translate(int intention, u64 &
 	// address needs translation, using a combination of VPN2 and ASID
 	u64 const key = (address & (extended ? (EH_R | EH_VPN2_64) : EH_VPN2_32)) | (m_cp0[CP0_EntryHi] & EH_ASID);
 
+	unsigned *mru = m_tlb_mru[intention & TRANSLATE_TYPE_MASK];
+	if (LOG_STATS)
+		m_tlb_scans++;
+
 	bool invalid = false;
 	bool modify = false;
 	for (unsigned i = 0; i < ARRAY_LENGTH(m_tlb); i++)
 	{
-		unsigned const index = (m_last[intention & TRANSLATE_TYPE_MASK] + i) % ARRAY_LENGTH(m_tlb);
+		unsigned const index = mru[i];
 		tlb_entry_t const &entry = m_tlb[index];
 
 		// test vpn and asid
@@ -2725,6 +2736,9 @@ r4000_base_device::translate_t r4000_base_device::translate(int intention, u64 &
 
 		if ((entry.vpn & mask) != (key & mask))
 			continue;
+
+		if (LOG_STATS)
+			m_tlb_loops += i + 1;
 
 		u64 const pfn = entry.pfn[BIT(address, entry.low_bit)];
 
@@ -2746,8 +2760,9 @@ r4000_base_device::translate_t r4000_base_device::translate(int intention, u64 &
 		address &= (entry.mask >> 1) | 0xfff;
 		address |= ((pfn & EL_PFN) << 6) & ~(entry.mask >> 1);
 
-		// remember the last-used tlb entry
-		m_last[intention & TRANSLATE_TYPE_MASK] = index;
+		// promote the entry in the mru index
+		if (i > 0)
+			std::swap(mru[i - 1], mru[i]);
 
 		return ((pfn & EL_C) == C_2) ? UNCACHED : CACHED;
 	}
@@ -2979,7 +2994,7 @@ bool r4000_base_device::fetch(u64 address, std::function<void(u32)> &&apply)
 		if (!(tag & ICACHE_V) || (tag & ICACHE_PTAG) != (address >> 12))
 		{
 			// cache miss
-			m_icache_miss++;
+			m_icache_misses++;
 
 			// reload the cache line
 			tag = ICACHE_V | (address >> 12);
@@ -2992,7 +3007,7 @@ bool r4000_base_device::fetch(u64 address, std::function<void(u32)> &&apply)
 			}
 		}
 		else
-			m_icache_hit++;
+			m_icache_hits++;
 
 		// apply the result
 		apply(m_icache_data[cache_address >> 2]);

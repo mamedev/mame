@@ -401,10 +401,10 @@ protected:
 		u64 vpn;
 		u64 pfn[2];
 
-		u8 low_bit;
+		unsigned low_bit;
 	}
 	m_tlb[48];
-	unsigned m_last[3];
+	unsigned m_tlb_mru[3][48];
 	bool m_64;
 
 	// cp1 state
@@ -421,9 +421,11 @@ protected:
 	std::unique_ptr<u32[]> m_icache_tag;
 	std::unique_ptr<u32[]> m_icache_data;
 
-	// experimental icache statistics
-	u64 m_icache_hit;
-	u64 m_icache_miss;
+	// statistics
+	u64 m_tlb_scans;
+	u64 m_tlb_loops;
+	u64 m_icache_hits;
+	u64 m_icache_misses;
 };
 
 class r4000_device : public r4000_base_device
