@@ -94,9 +94,10 @@ WRITE16_MEMBER(jakks_gamekey_rom_i2c_base_device::write_cart_seeprom)
 
 // i2c 24lc04
 
-MACHINE_CONFIG_START(jakks_gamekey_rom_i2c_24lc04_device::device_add_mconfig)
+void jakks_gamekey_rom_i2c_24lc04_device::device_add_mconfig(machine_config &config)
+{
 	I2CMEM(config, "i2cmem", 0)/*.set_page_size(16)*/.set_data_size(0x200); // 24LC04
-MACHINE_CONFIG_END
+}
 
 
 /*-------------------------------------------------

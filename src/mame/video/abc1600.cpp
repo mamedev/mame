@@ -199,12 +199,13 @@ MC6845_ON_UPDATE_ADDR_CHANGED( abc1600_mover_device::crtc_update )
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(abc1600_mover_device::device_add_mconfig)
+void abc1600_mover_device::device_add_mconfig(machine_config &config)
+{
 	config.set_default_layout(layout_abc1600);
 
-	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
-	MCFG_SCREEN_UPDATE_DRIVER(abc1600_mover_device, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(64'000'000), 0x3e0, 0, 0x300, 0x433, 0, 0x400)
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen.set_screen_update(FUNC(abc1600_mover_device::screen_update));
+	screen.set_raw(XTAL(64'000'000), 0x3e0, 0, 0x300, 0x433, 0, 0x400);
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
@@ -214,7 +215,7 @@ MACHINE_CONFIG_START(abc1600_mover_device::device_add_mconfig)
 	m_crtc->set_char_width(32);
 	m_crtc->set_update_row_callback(FUNC(abc1600_mover_device::crtc_update_row), this);
 	m_crtc->set_on_update_addr_change_callback(FUNC(abc1600_mover_device::crtc_update), this);
-MACHINE_CONFIG_END
+}
 
 
 //**************************************************************************

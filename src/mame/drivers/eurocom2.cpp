@@ -438,14 +438,15 @@ static void eurocom_floppies(device_slot_interface &device)
 	device.option_add("8dsdd", FLOPPY_8_DSDD);
 }
 
-MACHINE_CONFIG_START(eurocom2_state::eurocom2)
-	MCFG_DEVICE_ADD("maincpu", MC6809, 10.7172_MHz_XTAL / 2) // EXTAL = CLK/2 = 5.3586 MHz; Q = E = 1.33965 MHz
-	MCFG_DEVICE_PROGRAM_MAP(eurocom2_map)
+void eurocom2_state::eurocom2(machine_config &config)
+{
+	MC6809(config, m_maincpu, 10.7172_MHz_XTAL / 2); // EXTAL = CLK/2 = 5.3586 MHz; Q = E = 1.33965 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &eurocom2_state::eurocom2_map);
 
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_RAW_PARAMS(10.7172_MHz_XTAL, VC_TOTAL_HORZ, 0, VC_DISP_HORZ, VC_TOTAL_VERT, 0, VC_DISP_VERT)
-	MCFG_SCREEN_UPDATE_DRIVER(eurocom2_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER, rgb_t::green());
+	m_screen->set_raw(10.7172_MHz_XTAL, VC_TOTAL_HORZ, 0, VC_DISP_HORZ, VC_TOTAL_VERT, 0, VC_DISP_VERT);
+	m_screen->set_screen_update(FUNC(eurocom2_state::screen_update));
+	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
@@ -477,12 +478,12 @@ MACHINE_CONFIG_START(eurocom2_state::eurocom2)
 //  m_fdc->intrq_wr_callback().set_inputline(m_maincpu, M6809_IRQ_LINE);
 	FLOPPY_CONNECTOR(config, "fdc:0", eurocom_floppies, "525qd", eurocom2_state::floppy_formats);// enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:1", eurocom_floppies, "525qd", eurocom2_state::floppy_formats);// enable_sound(true);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(waveterm_state::waveterm)
+void waveterm_state::waveterm(machine_config &config)
+{
 	eurocom2(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(waveterm_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &waveterm_state::waveterm_map);
 
 	m_pia2->cb2_handler().set(FUNC(waveterm_state::waveterm_kbh_w));
 	m_pia2->writepb_handler().set(FUNC(waveterm_state::waveterm_kb_w));
@@ -499,10 +500,10 @@ MACHINE_CONFIG_START(waveterm_state::waveterm)
 	m_pia3->readcb1_handler().set_ioport("FP");
 //  m_pia3->cb2_handler().set(FUNC(waveterm_state::pia3_cb2_w));
 
-	MCFG_DEVICE_ADD("ptm", PTM6840, 0)
+	PTM6840(config, m_ptm, 0);
 
 	SOFTWARE_LIST(config, "disk_list").set_original("waveterm");
-MACHINE_CONFIG_END
+}
 
 void eurocom2_state::microtrol(machine_config &config)
 {

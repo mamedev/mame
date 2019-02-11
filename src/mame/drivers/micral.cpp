@@ -390,13 +390,13 @@ MACHINE_CONFIG_START(micral_state::micral)
 	MCFG_MACHINE_RESET_OVERRIDE(micral_state, micral)
 
 	// video hardware
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(250))
-	MCFG_SCREEN_UPDATE_DRIVER(micral_state, screen_update)
-	MCFG_SCREEN_SIZE(640, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 239)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(250));
+	screen.set_screen_update(FUNC(micral_state::screen_update));
+	screen.set_size(640, 240);
+	screen.set_visarea(0, 639, 0, 239);
+	screen.set_palette("palette");
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 	//GFXDECODE(config, "gfxdecode", "palette", gfx_micral);
 

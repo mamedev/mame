@@ -2191,10 +2191,10 @@ MACHINE_CONFIG_START(cmi_state::cmi2x)
 	m_dp3->update().set(FUNC(cmi_state::cmi_iix_update_dp<2>));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBLANK_END, HBLANK_START, VTOTAL, VBLANK_END, VBLANK_START)
-	MCFG_SCREEN_UPDATE_DRIVER(cmi_state, screen_update_cmi2x)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, cmi_state, cmi_iix_vblank))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER, rgb_t::green());
+	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBLANK_END, HBLANK_START, VTOTAL, VBLANK_END, VBLANK_START);
+	m_screen->set_screen_update(FUNC(cmi_state::screen_update_cmi2x));
+	m_screen->screen_vblank().set(FUNC(cmi_state::cmi_iix_vblank));
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 

@@ -61,25 +61,14 @@ DEFINE_DEVICE_TYPE(C64_PS64, c64_ps64_cartridge_device, "c64_ps64", "C64 PS-64")
 
 
 //-------------------------------------------------
-//  votrax_sc02_interface votrax_intf
-//-------------------------------------------------
-/*
-static struct votrax_sc02_interface votrax_intf =
-{
-    DEVCB_NOOP
-};
-*/
-
-
-//-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(c64_ps64_cartridge_device::device_add_mconfig)
-	//MCFG_SPEAKER_STANDARD_MONO("mono")
-	//MCFG_VOTRAX_SC02_ADD(SSI263_TAG, 2000000, votrax_intf)
-	//MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_CONFIG_END
+void c64_ps64_cartridge_device::device_add_mconfig(machine_config &config)
+{
+	//SPEAKER(config, "speaker").front_center();
+	//VOTRAX_SC02(config, SSI263_TAG, 2000000).add_route(ALL_OUTPUTS, "mono", 1.00);
+}
 
 
 

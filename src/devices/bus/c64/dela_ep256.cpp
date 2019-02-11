@@ -22,24 +22,17 @@ DEFINE_DEVICE_TYPE(C64_DELA_EP256, c64_dela_ep256_cartridge_device, "delep256", 
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(c64_dela_ep256_cartridge_device::device_add_mconfig)
-	MCFG_GENERIC_SOCKET_ADD("rom1", generic_linear_slot, nullptr)
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_SOCKET_ADD("rom2", generic_linear_slot, nullptr)
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_SOCKET_ADD("rom3", generic_linear_slot, nullptr)
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_SOCKET_ADD("rom4", generic_linear_slot, nullptr)
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_SOCKET_ADD("rom5", generic_linear_slot, nullptr)
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_SOCKET_ADD("rom6", generic_linear_slot, nullptr)
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_SOCKET_ADD("rom7", generic_linear_slot, nullptr)
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_SOCKET_ADD("rom8", generic_linear_slot, nullptr)
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-MACHINE_CONFIG_END
+void c64_dela_ep256_cartridge_device::device_add_mconfig(machine_config &config)
+{
+	GENERIC_SOCKET(config, "rom1", generic_linear_slot, nullptr, "bin,rom");
+	GENERIC_SOCKET(config, "rom2", generic_linear_slot, nullptr, "bin,rom");
+	GENERIC_SOCKET(config, "rom3", generic_linear_slot, nullptr, "bin,rom");
+	GENERIC_SOCKET(config, "rom4", generic_linear_slot, nullptr, "bin,rom");
+	GENERIC_SOCKET(config, "rom5", generic_linear_slot, nullptr, "bin,rom");
+	GENERIC_SOCKET(config, "rom6", generic_linear_slot, nullptr, "bin,rom");
+	GENERIC_SOCKET(config, "rom7", generic_linear_slot, nullptr, "bin,rom");
+	GENERIC_SOCKET(config, "rom8", generic_linear_slot, nullptr, "bin,rom");
+}
 
 
 

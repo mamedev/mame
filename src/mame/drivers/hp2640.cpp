@@ -975,14 +975,14 @@ MACHINE_CONFIG_START(hp2645_state::hp2645)
 	TIMER(config, m_timer_10ms).configure_generic(FUNC(hp2645_state::timer_10ms_exp));
 	TIMER(config, m_timer_cursor_blink_inh).configure_generic(FUNC(hp2645_state::timer_cursor_blink_inh));
 
-	MCFG_SCREEN_ADD_MONOCHROME("screen" , RASTER , rgb_t::white())
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER, rgb_t::white());
 	// Actual pixel clock is half this value: 21.06 MHz
 	// We use the doubled value to be able to emulate the half-pixel shifting of the real hw
 	// Each real-world half pixel is a whole MAME pixel
-	MCFG_SCREEN_RAW_PARAMS(VIDEO_DOT_CLOCK * 2 ,
+	m_screen->set_raw(VIDEO_DOT_CLOCK * 2 ,
 						   VIDEO_TOT_COLS * VIDEO_CHAR_WIDTH * 2 , 0 , VIDEO_VIS_COLS * VIDEO_CHAR_WIDTH * 2 ,
-						   VIDEO_TOT_ROWS * VIDEO_CHAR_HEIGHT , 0 , VIDEO_VIS_ROWS * VIDEO_CHAR_HEIGHT)
-	MCFG_SCREEN_UPDATE_DRIVER(hp2645_state , screen_update)
+						   VIDEO_TOT_ROWS * VIDEO_CHAR_HEIGHT , 0 , VIDEO_VIS_ROWS * VIDEO_CHAR_HEIGHT);
+	m_screen->set_screen_update(FUNC(hp2645_state::screen_update));
 	TIMER(config, "scantimer").configure_scanline(FUNC(hp2645_state::scanline_timer), "screen", 0, 1);
 	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
 	config.set_default_layout(layout_hp2640);

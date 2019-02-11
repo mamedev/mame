@@ -757,14 +757,15 @@ MACHINE_CONFIG_START(homelab_state::homelab)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", homelab_state,  homelab_frame)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(40*8, 25*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 25*8-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_size(40*8, 25*8);
+	screen.set_visarea(0, 40*8-1, 0, 25*8-1);
+	screen.set_screen_update(FUNC(homelab_state::screen_update_homelab2));
+	screen.set_palette("palette");
+
 	MCFG_VIDEO_START_OVERRIDE(homelab_state,homelab2)
-	MCFG_SCREEN_UPDATE_DRIVER(homelab_state, screen_update_homelab2)
-	MCFG_SCREEN_PALETTE("palette")
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_homelab);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
@@ -789,14 +790,15 @@ MACHINE_CONFIG_START(homelab_state::homelab3)
 	MCFG_MACHINE_RESET_OVERRIDE(homelab_state,homelab3)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 32*8-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0, 64*8-1, 0, 32*8-1);
+	screen.set_screen_update(FUNC(homelab_state::screen_update_homelab3));
+	screen.set_palette("palette");
+
 	MCFG_VIDEO_START_OVERRIDE(homelab_state,homelab3)
-	MCFG_SCREEN_UPDATE_DRIVER(homelab_state, screen_update_homelab3)
-	MCFG_SCREEN_PALETTE("palette")
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_homelab);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
@@ -821,14 +823,15 @@ MACHINE_CONFIG_START(homelab_state::brailab4)
 	MCFG_MACHINE_RESET_OVERRIDE(homelab_state,brailab4)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 32*8-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0, 64*8-1, 0, 32*8-1);
+	screen.set_screen_update(FUNC(homelab_state::screen_update_homelab3));
+	screen.set_palette("palette");
+
 	MCFG_VIDEO_START_OVERRIDE(homelab_state,brailab4)
-	MCFG_SCREEN_UPDATE_DRIVER(homelab_state, screen_update_homelab3)
-	MCFG_SCREEN_PALETTE("palette")
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_homelab);
 	PALETTE(config, "palette", palette_device::MONOCHROME);

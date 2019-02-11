@@ -870,8 +870,10 @@ MACHINE_CONFIG_START(notetaker_state::notetakr)
 	SPEAKER(config, "rspeaker").front_right();
 	// TODO: hook DAC up to two HA2425 (sample and hold) chips and hook those up to the speakers
 	MCFG_DEVICE_ADD("dac", DAC1200, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.set_output(5.0);
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 MACHINE_CONFIG_END
 
 void notetaker_state::init_notetakr()

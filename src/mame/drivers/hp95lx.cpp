@@ -747,10 +747,10 @@ MACHINE_CONFIG_START(hp95lx_state::hp95lx)
 
 	// XXX When the AC adapter is plugged in, the LCD refresh rate is 73.14 Hz.
 	// XXX When the AC adapter is not plugged in (ie, running off of batteries) the refresh rate is 56.8 Hz.
-	MCFG_SCREEN_ADD_MONOCHROME("screen", LCD, rgb_t::white())
-	MCFG_SCREEN_UPDATE_DRIVER(hp95lx_state, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(5'370'000) / 2, 300, 0, 240, 180, 0, 128)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_LCD, rgb_t::white());
+	m_screen->set_screen_update(FUNC(hp95lx_state::screen_update));
+	m_screen->set_raw(XTAL(5'370'000) / 2, 300, 0, 240, 180, 0, 128);
+	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(hp95lx_state::hp95lx_palette), 2);
 

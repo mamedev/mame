@@ -278,11 +278,11 @@ MACHINE_CONFIG_START(tdv2324_state::tdv2324)
 	MCFG_DEVICE_PROGRAM_MAP(tdv2324_fdc_mem)
 
 	// video hardware
-	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_UPDATE_DRIVER(tdv2324_state, screen_update)
-	MCFG_SCREEN_SIZE(800, 400)
-	MCFG_SCREEN_VISIBLE_AREA(0, 800-1, 0, 400-1)
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen.set_refresh_hz(50);
+	screen.set_screen_update(FUNC(tdv2324_state::screen_update));
+	screen.set_size(800, 400);
+	screen.set_visarea(0, 800-1, 0, 400-1);
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 

@@ -177,6 +177,12 @@ public:
 	{
 		set_type(type);
 	}
+	screen_device(const machine_config &mconfig, const char *tag, device_t *owner, screen_type_enum type, rgb_t color)
+		: screen_device(mconfig, tag, owner, u32(0))
+	{
+		set_type(type);
+		set_color(color);
+	}
 	~screen_device();
 
 	// configuration readers
@@ -520,11 +526,6 @@ typedef device_type_iterator<screen_device> screen_device_iterator;
 #define MCFG_SCREEN_ADD(_tag, _type) \
 	MCFG_DEVICE_ADD(_tag, SCREEN, SCREEN_TYPE_##_type)
 
-#define MCFG_SCREEN_ADD_MONOCHROME(_tag, _type, _color) \
-	MCFG_DEVICE_ADD(_tag, SCREEN, 0) \
-	MCFG_SCREEN_TYPE(_type) \
-	MCFG_SCREEN_COLOR(_color)
-
 #define MCFG_SCREEN_MODIFY(_tag) \
 	MCFG_DEVICE_MODIFY(_tag)
 
@@ -564,7 +565,5 @@ typedef device_type_iterator<screen_device> screen_device_iterator;
 	downcast<screen_device &>(*device).set_palette(finder_base::DUMMY_TAG);
 #define MCFG_SCREEN_VIDEO_ATTRIBUTES(_flags) \
 	downcast<screen_device &>(*device).set_video_attributes(_flags);
-#define MCFG_SCREEN_COLOR(_color) \
-	downcast<screen_device &>(*device).set_color(_color);
 
 #endif // MAME_EMU_SCREEN_H

@@ -307,13 +307,12 @@ MACHINE_CONFIG_START(kron180_state::kron180)
 	MCFG_DEVICE_IO_MAP(kron180_iomap)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_COLOR(rgb_t::green())
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_UPDATE_DRIVER(kron180_state, screen_update)
-	MCFG_SCREEN_SIZE(80 * 10, 24 * 10)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 199) // TODO: This need to be fixed once the real char table is used...
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen.set_refresh_hz(50);
+	screen.set_screen_update(FUNC(kron180_state::screen_update));
+	screen.set_size(80 * 10, 24 * 10);
+	screen.set_visarea(0, 639, 0, 199); // TODO: This need to be fixed once the real char table is used...
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 

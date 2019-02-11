@@ -424,13 +424,12 @@ MACHINE_CONFIG_START(ksm_state::ksm)
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(ksm_state::scanline_callback), "screen", 0, 1);
 
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_UPDATE_DRIVER(ksm_state, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(15'400'000), KSM_TOTAL_HORZ, KSM_HORZ_START,
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER, rgb_t::green());
+	m_screen->set_screen_update(FUNC(ksm_state::screen_update));
+	m_screen->set_raw(XTAL(15'400'000), KSM_TOTAL_HORZ, KSM_HORZ_START,
 		KSM_HORZ_START+KSM_DISP_HORZ, KSM_TOTAL_VERT, KSM_VERT_START,
 		KSM_VERT_START+KSM_DISP_VERT);
-
-	MCFG_SCREEN_PALETTE("palette")
+	m_screen->set_palette("palette");
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_ksm);
 	PALETTE(config, "palette", palette_device::MONOCHROME);

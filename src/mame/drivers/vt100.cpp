@@ -319,11 +319,11 @@ MACHINE_CONFIG_START(vt100_state::vt100)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("rstbuf", rst_pos_buffer_device, inta_cb)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_RAW_PARAMS(XTAL(24'073'400)*2/3, 102*10, 0, 80*10, 262, 0, 25*10)
-	//MCFG_SCREEN_RAW_PARAMS(XTAL(24'073'400), 170*9, 0, 132*9, 262, 0, 25*10)
-	MCFG_SCREEN_UPDATE_DRIVER(vt100_state, screen_update_vt100)
-	MCFG_SCREEN_PALETTE("vt100_video:palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen.set_raw(XTAL(24'073'400)*2/3, 102*10, 0, 80*10, 262, 0, 25*10);
+	//screen.set_raw(XTAL(24'073'400), 170*9, 0, 132*9, 262, 0, 25*10);
+	screen.set_screen_update(FUNC(vt100_state::screen_update_vt100));
+	screen.set_palette("vt100_video:palette");
 
 	GFXDECODE(config, "gfxdecode", "vt100_video:palette", gfx_vt100);
 //  MCFG_PALETTE_ADD_MONOCHROME("palette")

@@ -97,12 +97,13 @@ GFXDECODE_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(vic20_video_pak_device::device_add_mconfig)
-	MCFG_SCREEN_ADD_MONOCHROME(MC6845_SCREEN_TAG, RASTER, rgb_t::white())
-	MCFG_SCREEN_UPDATE_DEVICE(MC6845_TAG, h46505_device, screen_update)
-	MCFG_SCREEN_SIZE(80*8, 24*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 24*8-1)
-	MCFG_SCREEN_REFRESH_RATE(50)
+void vic20_video_pak_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, MC6845_SCREEN_TAG, SCREEN_TYPE_RASTER, rgb_t::white()));
+	screen.set_screen_update(MC6845_TAG, FUNC(h46505_device::screen_update));
+	screen.set_size(80*8, 24*8);
+	screen.set_visarea(0, 80*8-1, 0, 24*8-1);
+	screen.set_refresh_hz(50);
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_vic20_video_pak);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
@@ -112,7 +113,7 @@ MACHINE_CONFIG_START(vic20_video_pak_device::device_add_mconfig)
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(8);
 	m_crtc->set_update_row_callback(FUNC(vic20_video_pak_device::crtc_update_row), this);
-MACHINE_CONFIG_END
+}
 
 
 
