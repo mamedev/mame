@@ -849,7 +849,7 @@ static INPUT_PORTS_START( rad_fb2 ) // controls must be multiplexed somehow, as 
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( lexizeus )
+static INPUT_PORTS_START( lexizeus ) // how many buttons does this have?  I accidentally entered a secret test mode before that seemed to indicate 6, but can't get there again
 	PORT_START("P1")
 	PORT_DIPNAME( 0x0001, 0x0001, "P1" )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
@@ -889,10 +889,8 @@ static INPUT_PORTS_START( lexizeus )
 	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON1 ) // shoot in Tiger Rescue & Deep
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Button 1") // shoot in Tiger Rescue & Deep
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Pause")
 
 	PORT_START("P2")
 	PORT_DIPNAME( 0x0001, 0x0001, "P2" )
@@ -945,14 +943,12 @@ static INPUT_PORTS_START( lexizeus )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 	PORT_START("P3")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON2 ) // shoot in Tiger Rescue
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON3 ) // bomb in Tiger Rescue
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Button 1 Rapid") // same function as button 1 but with rapid toggle on/off
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Button 2 Rapid") // same function as button 2 but with rapid toggle on/off
+	PORT_DIPNAME( 0x0004, 0x0004, "P3" )
 	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Button 2") // toggles ball / number view in pool
 	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
