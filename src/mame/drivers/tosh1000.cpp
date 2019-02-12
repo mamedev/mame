@@ -280,7 +280,7 @@ MACHINE_CONFIG_START(tosh1000_state::tosh1000)
 //  SOFTWARE_LIST(config, "flop_list").set_original("tosh1000");
 
 	// uses a 80C50 instead of 8042 for KBDC
-	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270)
+	PC_KBDC_SLOT(config, "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
 
 	RAM(config, RAM_TAG).set_default_size("512K");
 

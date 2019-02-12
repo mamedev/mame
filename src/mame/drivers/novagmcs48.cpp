@@ -147,8 +147,8 @@ INPUT_CHANGED_MEMBER(novagmcs48_state::octo_cpu_freq)
     Machine Drivers
 ******************************************************************************/
 
-MACHINE_CONFIG_START(novagmcs48_state::presto)
-
+void novagmcs48_state::presto(machine_config &config)
+{
 	/* basic machine hardware */
 	i8049_device &maincpu(I8049(config, m_maincpu, 6000000)); // LC circuit, measured 6MHz
 	maincpu.p1_in_cb().set(FUNC(novagmcs48_state::presto_input_r));
@@ -160,20 +160,21 @@ MACHINE_CONFIG_START(novagmcs48_state::presto)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
-MACHINE_CONFIG_END
+	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.set_output(5.0);
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+}
 
-MACHINE_CONFIG_START(novagmcs48_state::octo)
+void novagmcs48_state::octo(machine_config &config)
+{
 	presto(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(12000000) // LC circuit, measured, see octo_set_cpu_freq
+	m_maincpu->set_clock(12000000); // LC circuit, measured, see octo_set_cpu_freq
 
 	MCFG_MACHINE_RESET_OVERRIDE(novagmcs48_state, octo)
-MACHINE_CONFIG_END
+}
 
 
 

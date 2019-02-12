@@ -86,8 +86,8 @@ MACHINE_CONFIG_START(iskr103x_state::iskr1030m)
 	MCFG_DEVICE_ADD("isa5", ISA8_SLOT, 0, "mb:isa", iskr103x_isa8_cards, nullptr, false)
 	MCFG_DEVICE_ADD("isa6", ISA8_SLOT, 0, "mb:isa", iskr103x_isa8_cards, nullptr, false)
 
-	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_EC_1841)
-//  MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_ISKR_1030)
+	PC_KBDC_SLOT(config, "kbd", pc_xt_keyboards, STR_KBD_EC_1841).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
+//  PC_KBDC_SLOT(config, "kbd", pc_xt_keyboards, STR_KBD_ISKR_1030).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
 
 	RAM(config, RAM_TAG).set_default_size("640K").set_extra_options("64K, 128K, 256K, 512K");
 MACHINE_CONFIG_END

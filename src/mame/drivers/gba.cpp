@@ -1452,11 +1452,12 @@ MACHINE_CONFIG_START(gba_state::gbadv)
 	MCFG_DEVICE_ADD("rdaca", DAC_8BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
 	MCFG_DEVICE_ADD("ldacb", DAC_8BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) // unknown DAC
 	MCFG_DEVICE_ADD("rdacb", DAC_8BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "ldaca", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldaca", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "rdaca", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdaca", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "ldacb", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldacb", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "rdacb", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdacb", -1.0, DAC_VREF_NEG_INPUT)
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "ldaca", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "ldaca", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "rdaca", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "rdaca", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "ldacb", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "ldacb", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "rdacb", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "rdacb", -1.0, DAC_VREF_NEG_INPUT);
 
 	GBA_CART_SLOT(config, m_cart, gba_cart, nullptr);
 	SOFTWARE_LIST(config, "cart_list").set_original("gba");

@@ -14,9 +14,6 @@
 #pragma once
 
 
-#define MCFG_VOLTAGE_REGULATOR_OUTPUT(_output) \
-	downcast<voltage_regulator_device &>(*device).set_output(_output);
-
 class voltage_regulator_device : public device_t, public device_sound_interface
 {
 public:

@@ -300,11 +300,12 @@ WRITE_LINE_MEMBER(kron180_state::keyb_interrupt)
 /*
  * Machine configuration
  */
-MACHINE_CONFIG_START(kron180_state::kron180)
+void kron180_state::kron180(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD ("maincpu", Z180, XTAL(12'288'000))
-	MCFG_DEVICE_PROGRAM_MAP (kron180_mem)
-	MCFG_DEVICE_IO_MAP(kron180_iomap)
+	Z180(config, m_maincpu, XTAL(12'288'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &kron180_state::kron180_mem);
+	m_maincpu->set_addrmap(AS_IO, &kron180_state::kron180_iomap);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
@@ -317,8 +318,9 @@ MACHINE_CONFIG_START(kron180_state::kron180)
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* keyboard TODO: fix it, doesn't work yet */
-	MCFG_PC_KEYB_ADD("pc_keyboard", WRITELINE(*this, kron180_state, keyb_interrupt))
-MACHINE_CONFIG_END
+	PC_KEYB(config, m_keyboard);
+	m_keyboard->keypress().set(FUNC(kron180_state::keyb_interrupt));
+}
 
 /* ROM definitions */
 ROM_START (kron180)

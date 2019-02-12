@@ -381,22 +381,22 @@ void t4426_cart(device_slot_interface &device)
 //  MACHINE_CONFIG_START( coco_sound )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(coco_state::coco_sound)
+void coco_state::coco_sound(machine_config &config)
+{
 	SPEAKER(config, "speaker").front_center();
 
 	// 6-bit D/A: R10-15 = 10K, 20K, 40.2K, 80.6K, 162K, 324K (according to parts list); output also controls joysticks
-	MCFG_DEVICE_ADD("dac", DAC_6BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.125)
+	DAC_6BIT_BINARY_WEIGHTED(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.125);
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.set_output(5.0);
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
-	MCFG_SOUND_ROUTE(0, "sbs", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "sbs", -1.0, DAC_VREF_NEG_INPUT)
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "sbs", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "sbs", -1.0, DAC_VREF_NEG_INPUT);
 
 	// Single-bit sound: R22 = 10K
 	DAC_1BIT(config, "sbs", 0).add_route(ALL_OUTPUTS, "speaker", 0.125);
 
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "speaker", 0.25);
-MACHINE_CONFIG_END
+}
 
 
 //-------------------------------------------------

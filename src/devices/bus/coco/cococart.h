@@ -25,15 +25,6 @@
 // direct region update handler
 typedef delegate<void (uint8_t *)> cococart_base_update_delegate;
 
-#define MCFG_COCO_CARTRIDGE_CART_CB(_devcb) \
-	downcast<cococart_slot_device &>(*device).set_cart_callback(DEVCB_##_devcb);
-
-#define MCFG_COCO_CARTRIDGE_NMI_CB(_devcb) \
-	downcast<cococart_slot_device &>(*device).set_nmi_callback(DEVCB_##_devcb);
-
-#define MCFG_COCO_CARTRIDGE_HALT_CB(_devcb) \
-	downcast<cococart_slot_device &>(*device).set_halt_callback(DEVCB_##_devcb);
-
 
 // ======================> cococart_slot_device
 class device_cococart_interface;
@@ -72,9 +63,6 @@ public:
 	}
 	cococart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_cart_callback(Object &&cb) { return m_cart_callback.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_nmi_callback(Object &&cb) { return m_nmi_callback.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_halt_callback(Object &&cb) { return m_halt_callback.set_callback(std::forward<Object>(cb)); }
 	auto cart_callback() { return m_cart_callback.bind(); }
 	auto nmi_callback() { return m_nmi_callback.bind(); }
 	auto halt_callback() { return m_halt_callback.bind(); }
@@ -215,14 +203,5 @@ private:
 	cococart_slot_device *           m_owning_slot;
 	device_cococart_host_interface * m_host;
 };
-
-
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_COCO_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
-	MCFG_DEVICE_ADD(_tag, COCOCART_SLOT, DERIVED_CLOCK(1, 1)) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 #endif // MAME_BUS_COCO_COCOCART_H

@@ -242,7 +242,7 @@ MACHINE_CONFIG_START(ec184x_state::ec1840)
 
 	SOFTWARE_LIST(config, "flop_list").set_original("ec1841");
 
-	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_EC_1841)
+	PC_KBDC_SLOT(config, "kbd", pc_xt_keyboards, STR_KBD_EC_1841).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
 
 	RAM(config, m_ram).set_default_size("512K");
 MACHINE_CONFIG_END
@@ -267,7 +267,7 @@ MACHINE_CONFIG_START(ec184x_state::ec1841)
 
 	SOFTWARE_LIST(config, "flop_list").set_original("ec1841");
 
-	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_EC_1841)
+	PC_KBDC_SLOT(config, "kbd", pc_xt_keyboards, STR_KBD_EC_1841).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
 
 	RAM(config, m_ram).set_default_size("640K").set_extra_options("512K,1024K,1576K,2048K");
 MACHINE_CONFIG_END
@@ -289,7 +289,7 @@ MACHINE_CONFIG_START(ec184x_state::ec1847)
 	MCFG_DEVICE_ADD("isa5", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
 	MCFG_DEVICE_ADD("isa6", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
 
-	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270)
+	PC_KBDC_SLOT(config, "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
 
 	RAM(config, m_ram).set_default_size("640K");
 MACHINE_CONFIG_END

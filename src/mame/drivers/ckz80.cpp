@@ -433,11 +433,11 @@ INPUT_PORTS_END
     Machine Drivers
 ******************************************************************************/
 
-MACHINE_CONFIG_START(ckz80_state::master)
-
+void ckz80_state::master(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 8_MHz_XTAL/2)
-	MCFG_DEVICE_PROGRAM_MAP(master_trampoline)
+	Z80(config, m_maincpu, 8_MHz_XTAL/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ckz80_state::master_trampoline);
 	ADDRESS_MAP_BANK(config, "master_map").set_map(&ckz80_state::master_map).set_options(ENDIANNESS_LITTLE, 8, 16);
 
 	const attotime irq_period = attotime::from_hz(429); // theoretical frequency from 555 timer (22nF, 150K, 1K5), measurement was 418Hz
@@ -450,12 +450,12 @@ MACHINE_CONFIG_START(ckz80_state::master)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", DAC_2BIT_BINARY_WEIGHTED_ONES_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	DAC_2BIT_BINARY_WEIGHTED_ONES_COMPLEMENT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
-MACHINE_CONFIG_END
+}
 
 
 

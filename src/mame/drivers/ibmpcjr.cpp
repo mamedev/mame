@@ -664,7 +664,8 @@ MACHINE_CONFIG_START(pcjr_state::ibmpcjr)
 
 	FLOPPY_CONNECTOR(config, "fdc:0", pcjr_floppies, "525dd", isa8_fdc_device::floppy_formats, true);
 
-	MCFG_PC_KEYB_ADD("pc_keyboard", WRITELINE(*this, pcjr_state, keyb_interrupt))
+	PC_KEYB(config, m_keyboard);
+	m_keyboard->keypress().set(FUNC(pcjr_state::keyb_interrupt));
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot1", generic_plain_slot, "ibmpcjr_cart")

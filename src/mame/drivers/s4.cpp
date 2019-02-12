@@ -430,10 +430,11 @@ TIMER_DEVICE_CALLBACK_MEMBER( s4_state::irq )
 		m_t_c++;
 }
 
-MACHINE_CONFIG_START(s4_state::s4)
+void s4_state::s4(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6800, 3580000)
-	MCFG_DEVICE_PROGRAM_MAP(s4_main_map)
+	M6800(config, m_maincpu, 3580000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &s4_state::s4_main_map);
 	TIMER(config, "irq").configure_periodic(FUNC(s4_state::irq), attotime::from_hz(250));
 	MCFG_MACHINE_RESET_OVERRIDE(s4_state, s4)
 
@@ -480,17 +481,18 @@ MACHINE_CONFIG_START(s4_state::s4)
 	m_pia30->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(s4_state::s4a)
+void s4_state::s4a(machine_config &config)
+{
 	s4(config);
 	/* Add the soundcard */
-	MCFG_DEVICE_ADD("audiocpu", M6808, 3580000)
-	MCFG_DEVICE_PROGRAM_MAP(s4_audio_map)
+	M6808(config, m_audiocpu, 3580000);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &s4_state::s4_audio_map);
 	MCFG_MACHINE_RESET_OVERRIDE(s4_state, s4a)
 
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
@@ -501,7 +503,7 @@ MACHINE_CONFIG_START(s4_state::s4a)
 	m_pias->writepa_handler().set("dac", FUNC(dac_byte_interface::data_w));
 	m_pias->irqa_handler().set_inputline("audiocpu", M6808_IRQ_LINE);
 	m_pias->irqb_handler().set_inputline("audiocpu", M6808_IRQ_LINE);
-MACHINE_CONFIG_END
+}
 
 
 /*--------------------------------

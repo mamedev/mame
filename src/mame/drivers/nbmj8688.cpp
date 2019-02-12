@@ -2490,7 +2490,8 @@ MACHINE_CONFIG_START(nbmj8688_state::NBMJDRV_4096)
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(nbmj8688_state::NBMJDRV_256)
+void nbmj8688_state::NBMJDRV_256(machine_config &config)
+{
 	NBMJDRV_4096(config);
 
 	/* basic machine hardware */
@@ -2499,9 +2500,10 @@ MACHINE_CONFIG_START(nbmj8688_state::NBMJDRV_256)
 	subdevice<palette_device>("palette")->set_entries(256).set_init(FUNC(nbmj8688_state::mbmj8688_8bit));
 
 	MCFG_VIDEO_START_OVERRIDE(nbmj8688_state,mbmj8688_8bit)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(nbmj8688_state::NBMJDRV_65536)
+void nbmj8688_state::NBMJDRV_65536(machine_config &config)
+{
 	NBMJDRV_4096(config);
 
 	/* basic machine hardware */
@@ -2510,7 +2512,7 @@ MACHINE_CONFIG_START(nbmj8688_state::NBMJDRV_65536)
 	subdevice<palette_device>("palette")->set_entries(65536).set_init(FUNC(nbmj8688_state::mbmj8688_16bit));
 
 	MCFG_VIDEO_START_OVERRIDE(nbmj8688_state,mbmj8688_hybrid_16bit)
-MACHINE_CONFIG_END
+}
 
 // --------------------------------------------------------------------------------
 

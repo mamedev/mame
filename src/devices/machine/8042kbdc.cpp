@@ -45,9 +45,11 @@ kbdc8042_device::kbdc8042_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-MACHINE_CONFIG_START(kbdc8042_device::device_add_mconfig)
-	MCFG_AT_KEYB_ADD("at_keyboard", 1, WRITELINE(*this, kbdc8042_device, keyboard_w))
-MACHINE_CONFIG_END
+void kbdc8042_device::device_add_mconfig(machine_config &config)
+{
+	AT_KEYB(config, m_keyboard_dev, pc_keyboard_device::KEYBOARD_TYPE::AT, 1);
+	m_keyboard_dev->keypress().set(FUNC(kbdc8042_device::keyboard_w));
+}
 
 
 /*-------------------------------------------------

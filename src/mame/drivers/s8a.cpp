@@ -289,10 +289,11 @@ void s8a_state::init_s8a()
 	m_irq_timer->adjust(attotime::from_ticks(980,1e6),1);
 }
 
-MACHINE_CONFIG_START(s8a_state::s8a)
+void s8a_state::s8a(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6802, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(s8a_main_map)
+	M6802(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &s8a_state::s8a_main_map);
 	MCFG_MACHINE_RESET_OVERRIDE(s8a_state, s8a)
 
 	/* Video */
@@ -336,11 +337,11 @@ MACHINE_CONFIG_START(s8a_state::s8a)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Add the soundcard */
-	MCFG_DEVICE_ADD("audiocpu", M6808, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(s8a_audio_map)
+	M6808(config, m_audiocpu, XTAL(4'000'000));
+	m_audiocpu->set_addrmap(AS_PROGRAM, &s8a_state::s8a_audio_map);
 
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
@@ -351,7 +352,7 @@ MACHINE_CONFIG_START(s8a_state::s8a)
 	m_pias->writepb_handler().set("dac", FUNC(dac_byte_interface::data_w));
 	m_pias->irqa_handler().set_inputline("audiocpu", M6808_IRQ_LINE);
 	m_pias->irqa_handler().set_inputline("audiocpu", M6808_IRQ_LINE);
-MACHINE_CONFIG_END
+}
 
 
 /*----------------------------

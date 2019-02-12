@@ -1357,9 +1357,9 @@ MACHINE_CONFIG_START(hp85_state::hp85)
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("dac" , DAC_1BIT , 0)
 	MCFG_MIXER_ROUTE(ALL_OUTPUTS , "mono" , 0.5 , 0)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0)
-	MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.set_output(5.0);
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	MCFG_DEVICE_ADD("beeper" , BEEP , MASTER_CLOCK / 8192)
 	MCFG_MIXER_ROUTE(ALL_OUTPUTS , "mono" , 0.5 , 0)
 

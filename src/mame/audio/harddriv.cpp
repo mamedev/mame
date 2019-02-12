@@ -432,8 +432,8 @@ void harddriv_sound_board_device::driversnd_dsp_io_map(address_map &map)
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(harddriv_sound_board_device::device_add_mconfig)
-
+void harddriv_sound_board_device::device_add_mconfig(machine_config &config)
+{
 	/* basic machine hardware */
 	M68000(config, m_soundcpu, 16_MHz_XTAL/2);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &harddriv_sound_board_device::driversnd_68k_map);
@@ -455,9 +455,9 @@ MACHINE_CONFIG_START(harddriv_sound_board_device::device_add_mconfig)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_DEVICE_ADD("dac", AM6012, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // ls374d.75e + ls374d.90e + am6012
+	AM6012(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // ls374d.75e + ls374d.90e + am6012
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
-MACHINE_CONFIG_END
+}
