@@ -1252,11 +1252,11 @@ void jakks_gkr_state::jakks_gkr_wf(machine_config &config)
 
 void spg2xx_game_state::lexizeus(machine_config &config)
 {
-	jakks(config);
+	non_spg_base(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_state::mem_map_4m);
-	m_spg->porta_in().set_ioport("P1");
-	m_spg->portb_in().set_ioport("P2");
-	m_spg->portc_in().set_ioport("P3");
+//	m_spg->porta_in().set_ioport("P1");
+//	m_spg->portb_in().set_ioport("P2");
+//	m_spg->portc_in().set_ioport("P3");
 }
 
 void spg2xx_game_state::walle(machine_config &config)
