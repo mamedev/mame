@@ -1578,13 +1578,12 @@ void spg2xx_game_state::init_zeus()
 	uint16_t *ROM = (uint16_t*)memregion("maincpu")->base();
 	int size = memregion("maincpu")->bytes();
 
-	// TODO squash this to a single bitswap + conditional xors
-
-	for (int i = 0; i < size/2; i++)
+	for (int i = 0x8000 / 2; i < size / 2; i++)
 	{
+		// global 16-bit xor
 		ROM[i] = ROM[i] ^ 0x8a1d;
 
-	// there is also bitswapping, and conditional xoring
+		// 4 single bit conditional xors
 		if (ROM[i] & 0x0020)
 			ROM[i] ^= 0x0100;
 
@@ -1594,38 +1593,11 @@ void spg2xx_game_state::init_zeus()
 		if (ROM[i] & 0x4000)
 			ROM[i] ^= 0x0001;
 
+		if (ROM[i] & 0x0080)
+			ROM[i] ^= 0x0004;
 
-	//	ROM[i] = bitswap<16>(ROM[i] ,15,14,13,12,   11,10, 9, 8,    7, 6, 5, 4,   3, 2, 1, 0);
-		ROM[i] = bitswap<16>(ROM[i] ,15,14,13,12,   0, 10, 9, 8,    7, 6, 5, 4,   3, 2, 1,11);
-		ROM[i] = bitswap<16>(ROM[i] ,15,14,13,12,   11,10, 9, 1,    7, 6, 5, 4,   3, 2, 8, 0);
-		ROM[i] = bitswap<16>(ROM[i] ,15,14, 2,12,   11,10, 9, 8,    7, 6, 5, 4,   3,13, 1, 0);
-		ROM[i] = bitswap<16>(ROM[i] ,15,14,13,12,   11,10, 9, 8,    7, 6, 3, 4,   5, 2, 1, 0);
-		ROM[i] = bitswap<16>(ROM[i] , 7,14,13,12,   11,10, 9, 8,   15, 6, 5, 4,   3, 2, 1, 0);
-		ROM[i] = bitswap<16>(ROM[i] ,15,14, 4,12,   11,10, 9, 8,    7, 6, 5,13,   3, 2, 1, 0);
-		ROM[i] = bitswap<16>(ROM[i] ,15,14,13,12,   11,10, 9, 6,    7, 8, 5, 4,   3, 2, 1, 0);
-		ROM[i] = bitswap<16>(ROM[i] ,15,14,13,12,   11, 8, 9,10,    7, 6, 5, 4,   3, 2, 1, 0);
-		ROM[i] = bitswap<16>(ROM[i] ,15,14,13,12,    9,10,11, 8,    7, 6, 5, 4,   3, 2, 1, 0);
- 		ROM[i] = bitswap<16>(ROM[i] ,15,14,11,12,   13,10, 9, 8,    7, 6, 5, 4,   3, 2, 1, 0);
-		ROM[i] = bitswap<16>(ROM[i] ,15,12,13,14,   11,10, 9, 8,    7, 6, 5, 4,   3, 2, 1, 0);
-
-		if (ROM[i] & 0x8000)
-			ROM[i] ^= 0x0010;
-
-
-	}
-
-	if (0)
-	{
-		uint8_t *DUMP = memregion("maincpu")->base();
-		FILE *fp;
-		char filename[256];
-		sprintf(filename,"decrypted_%s", machine().system().name);
-		fp=fopen(filename, "w+b");
-		if (fp)
-		{
-			fwrite(DUMP, size, 1, fp);
-			fclose(fp);
-		}
+		// global 16-bit bitswap
+		ROM[i] = bitswap<16>(ROM[i], 7, 12, 9, 14, 4, 6, 0, 10, 15, 1, 3, 2, 5, 13, 8, 11);
 	}
 }
 
