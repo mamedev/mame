@@ -44,6 +44,7 @@ jazz_mct_adr_device::jazz_mct_adr_device(const machine_config &mconfig, const ch
 	, m_dma_r{ *this, *this, *this, *this }
 	, m_dma_w{ *this, *this, *this, *this }
 {
+	(void)m_dma_address;
 }
 
 void jazz_mct_adr_device::map(address_map &map)
