@@ -164,7 +164,7 @@ void mephisto_pinball_state::mephisto(machine_config &config)
 {
 	/* basic machine hardware */
 	I8088(config, m_maincpu, XTAL(18'000'000)/3);
-	m_maincpu->set_addrmap(AS_PROGRAM, mephisto_pinball_state::mephisto_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mephisto_pinball_state::mephisto_map);
 	//m_maincpu->set_irq_acknowledge_callback("muart", FUNC(i8256_device::inta_cb));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
