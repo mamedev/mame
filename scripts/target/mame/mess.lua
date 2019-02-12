@@ -682,6 +682,7 @@ MACHINES["IOPTIMER"] = true
 MACHINES["Z8038"] = true
 MACHINES["AIC6250"] = true
 MACHINES["DC7085"] = true
+MACHINES["I82357"] = true
 
 --------------------------------------------------
 -- specify available bus cores
