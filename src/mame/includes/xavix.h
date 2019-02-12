@@ -626,6 +626,18 @@ private:
 	int hackaddress2;
 };
 
+class xavix_i2c_ltv_tam_state : public xavix_i2c_state
+{
+public:
+	xavix_i2c_ltv_tam_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_i2c_state(mconfig, type, tag)
+	{ }
+
+private:
+	virtual void write_io1(uint8_t data, uint8_t direction) override;
+};
+
+
 class xavix_i2c_jmat_state : public xavix_i2c_state
 {
 public:

@@ -8,7 +8,7 @@
 	   Silkscreened onto both PCBs is the text A1 A2 A3 A4 with 2 boxes next to each with H and L.  Both PCBs are marked A1 H A3 L. -->
 
 	<software name="sbwlgoof" supported="no"> <!-- AT24C04 SEEPROM -->
-		<description>Sports Bowling &amp; Goofy's Underwater Adventure</description>
+		<description>Sports Bowling &amp; Goofy's Underwater Adventure (V1.31 - JUN 15 2005)</description>
 		<year>2005</year>
 		<publisher>JAKKS Pacific / HotGen Ltd</publisher>
 		<part name="cart" interface="jakks_gamekey">
@@ -23,7 +23,7 @@
 	</software>
 
 	<software name="stenfchs" supported="no"> <!-- AT24C04 SEEPROM -->
-		<description>Sports Tennis &amp; Face Chase</description>
+		<description>Sports Tennis &amp; Face Chase (15 JUN 2005 C)</description>
 		<year>2005</year>
 		<publisher>JAKKS Pacific / HotGen Ltd</publisher>
 		<part name="cart" interface="jakks_gamekey">
@@ -38,7 +38,7 @@
 	</software>
 
 	<software name="stenfcha" supported="no"> <!-- AT24C04 SEEPROM -->
-		<description>Sports Tennis &amp; Face Chase &amp; Riches of Agrabah</description>
+		<description>Sports Tennis &amp; Face Chase &amp; Riches of Agrabah (15 JUN 2005 A)</description>
 		<year>2005</year>
 		<publisher>JAKKS Pacific / HotGen Ltd</publisher>
 		<part name="cart" interface="jakks_gamekey">

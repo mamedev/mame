@@ -4,7 +4,7 @@
 
 	<!-- This list is for the 'NK' coded Game Keys, for Nicktoons and related systems -->
 
-	<software name="dora" supported="no">
+	<software name="dora">
 		<description>Soccer Shootout &amp; Juego De Futbol De Dora &amp; Dora's Star Mountain Adventure</description>
 		<year>2005</year>
 		<publisher>JAKKS Pacific / Handheld Games</publisher>

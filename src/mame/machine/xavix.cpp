@@ -587,6 +587,21 @@ void xavix_i2c_state::write_io1(uint8_t data, uint8_t direction)
 	}
 }
 
+// ltv_tam
+void xavix_i2c_ltv_tam_state::write_io1(uint8_t data, uint8_t direction)
+{
+	if (direction & 0x08)
+	{
+		m_i2cmem->write_sda((data & 0x08) >> 3);
+	}
+
+	if (direction & 0x04)
+	{
+		m_i2cmem->write_scl((data & 0x04) >> 2);
+	}
+}
+
+
 // for taikodp
 void xavix_i2c_cart_state::write_io1(uint8_t data, uint8_t direction)
 {
