@@ -9,7 +9,6 @@
 
 #pragma once
 
-#include "cpu/mips/mips3.h"
 #include "machine/hpc3.h"
 
 class newport_video_device : public device_t
@@ -25,8 +24,8 @@ public:
 
 	newport_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ32_MEMBER(rex3_r);
-	DECLARE_WRITE32_MEMBER(rex3_w);
+	DECLARE_READ64_MEMBER(rex3_r);
+	DECLARE_WRITE64_MEMBER(rex3_w);
 
 	uint32_t screen_update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -100,8 +99,6 @@ private:
 		uint32_t m_color_back;
 		uint32_t m_color_vram;
 		uint32_t m_alpha_ref;
-		uint32_t m_smask0_x;
-		uint32_t m_smask0_y;
 		uint32_t m_setup;
 		uint32_t m_step_z;
 		uint32_t m_x_start;
@@ -137,30 +134,24 @@ private:
 		uint32_t m_write_mask;
 		uint32_t m_zero_fract;
 		uint32_t m_zero_overflow;
-		uint32_t m_host_dataport_msw;
-		uint32_t m_host_dataport_lsw;
+		uint64_t m_host_dataport;
 		uint32_t m_dcb_mode;
 		uint32_t m_dcb_reg_select;
 		uint32_t m_dcb_slave_select;
 		uint32_t m_dcb_data_msw;
 		uint32_t m_dcb_data_lsw;
-		uint32_t m_s_mask1_x;
-		uint32_t m_s_mask1_y;
-		uint32_t m_s_mask2_x;
-		uint32_t m_s_mask2_y;
-		uint32_t m_s_mask3_x;
-		uint32_t m_s_mask3_y;
-		uint32_t m_s_mask4_x;
-		uint32_t m_s_mask4_y;
+		uint32_t m_smask_x[5];
+		uint32_t m_smask_y[5];
 		uint32_t m_top_scanline;
 		uint32_t m_xy_window;
 		uint32_t m_clip_mode;
 		uint32_t m_config;
 		uint32_t m_status;
+		int16_t m_iter_x;
+		int16_t m_iter_y;
 		uint8_t m_xfer_width;
-		uint32_t m_skipline_kludge;
+		bool m_read_active;
 	};
-
 
 	struct cmap_t
 	{
@@ -172,24 +163,31 @@ private:
 
 	// internal state
 
-	DECLARE_READ32_MEMBER(cmap0_r);
-	DECLARE_WRITE32_MEMBER(cmap0_w);
-	DECLARE_READ32_MEMBER(cmap1_r);
-	DECLARE_READ32_MEMBER(xmap0_r);
-	DECLARE_WRITE32_MEMBER(xmap0_w);
-	DECLARE_READ32_MEMBER(xmap1_r);
-	DECLARE_WRITE32_MEMBER(xmap1_w);
-	DECLARE_READ32_MEMBER(vc2_r);
-	DECLARE_WRITE32_MEMBER(vc2_w);
+	uint32_t cmap0_read();
+	void cmap0_write(uint32_t data);
+	uint32_t cmap1_read();
+	uint32_t xmap0_read();
+	void xmap0_write(uint32_t data);
+	uint32_t xmap1_read();
+	void xmap1_write(uint32_t data);
+	uint32_t vc2_read();
+	void vc2_write(uint32_t data);
+
+	void write_pixel(uint32_t x, uint32_t y, uint8_t color);
+	void do_v_iline(uint16_t x1, uint16_t y1, uint16_t y2, uint8_t color, bool skip_last);
+	void do_h_iline(uint16_t x1, uint16_t y1, uint16_t x2, uint8_t color, bool skip_last);
+	void do_iline(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint8_t color, bool skip_last);
+	uint8_t do_pixel_read();
+	uint32_t do_pixel_word_read();
 	void do_rex3_command();
 
-	required_device<mips3_device> m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	required_device<hpc3_device> m_hpc3;
 	vc2_t  m_vc2;
 	xmap_t m_xmap0;
 	xmap_t m_xmap1;
 	rex3_t m_rex3;
-	std::unique_ptr<uint32_t[]> m_base;
+	std::unique_ptr<uint8_t[]> m_base;
 	cmap_t m_cmap0;
 };
 

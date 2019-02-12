@@ -21,7 +21,7 @@
  * if PHAS_RDTSCP == 1
  */
 #ifndef PUSE_ACCURATE_STATS
-#define PUSE_ACCURATE_STATS (1)
+#define PUSE_ACCURATE_STATS (0)
 #endif
 
 /*
@@ -74,15 +74,6 @@
 #if (PHAS_INT128)
 typedef __uint128_t UINT128;
 typedef __int128_t INT128;
-#endif
-
-#if defined(__GNUC__)
-#ifdef RESTRICT
-#undef RESTRICT
-#endif
-#define RESTRICT                __restrict__
-#else
-#define RESTRICT
 #endif
 
 //============================================================

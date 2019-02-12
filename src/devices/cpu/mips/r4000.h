@@ -275,6 +275,7 @@ protected:
 		MIPS3_PC  = 96,
 		MIPS3_HI,
 		MIPS3_LO,
+		MIPS3_FCR30,
 		MIPS3_FCR31,
 	};
 
@@ -400,15 +401,16 @@ protected:
 		u64 vpn;
 		u64 pfn[2];
 
-		u8 low_bit;
+		unsigned low_bit;
 	}
 	m_tlb[48];
-	unsigned m_last[3];
+	unsigned m_tlb_mru[3][48];
 	bool m_64;
 
 	// cp1 state
 	u64 m_f[32]; // floating point registers
 	u32 m_fcr0;  // implementation and revision register
+	u32 m_fcr30; // unknown
 	u32 m_fcr31; // control/status register
 
 	// experimental icache state
@@ -419,9 +421,11 @@ protected:
 	std::unique_ptr<u32[]> m_icache_tag;
 	std::unique_ptr<u32[]> m_icache_data;
 
-	// experimental icache statistics
-	u64 m_icache_hit;
-	u64 m_icache_miss;
+	// statistics
+	u64 m_tlb_scans;
+	u64 m_tlb_loops;
+	u64 m_icache_hits;
+	u64 m_icache_misses;
 };
 
 class r4000_device : public r4000_base_device

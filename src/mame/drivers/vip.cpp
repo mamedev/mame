@@ -739,7 +739,7 @@ MACHINE_CONFIG_START(vip_state::vip)
 	m_exp->dma_in_wr_callback().set(FUNC(vip_state::exp_dma_in_w));
 
 	// devices
-	MCFG_QUICKLOAD_ADD("quickload", vip_state, vip, "bin,c8,c8x", 0)
+	MCFG_QUICKLOAD_ADD("quickload", vip_state, vip, "bin,c8,c8x")
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
 	m_cassette->set_interface("vip_cass");

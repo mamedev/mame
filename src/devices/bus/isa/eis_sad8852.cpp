@@ -199,13 +199,14 @@ ioport_constructor isa16_sad8852_device::device_input_ports() const
 //-------------------------------------------------
 //  Board configuration
 //-------------------------------------------------
-MACHINE_CONFIG_START(isa16_sad8852_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(I80188_TAG, I80188, XTAL(12'000'000) / 2) // Chip revision is 6 MHz
-	MCFG_DEVICE_PROGRAM_MAP( sad8852_mem )
-	MCFG_DEVICE_IO_MAP(sad8852_io)
+void isa16_sad8852_device::device_add_mconfig(machine_config &config)
+{
+	i80188_cpu_device &cpu(I80188(config, I80188_TAG, XTAL(12'000'000) / 2)); // Chip revision is 6 MHz
+	cpu.set_addrmap(AS_PROGRAM, &isa16_sad8852_device::sad8852_mem);
+	cpu.set_addrmap(AS_IO, &isa16_sad8852_device::sad8852_io);
 
 	I8274_NEW(config, "terminal", XTAL(12'000'000) / 3); // Needs verification
-MACHINE_CONFIG_END
+}
 
 isa16_sad8852_device::isa16_sad8852_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ISA16_SAD8852, tag, owner, clock)

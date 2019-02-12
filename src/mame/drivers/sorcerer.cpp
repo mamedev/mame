@@ -421,7 +421,7 @@ MACHINE_CONFIG_START(sorcerer_state::sorcerer)
 	MCFG_SCREEN_UPDATE_DRIVER(sorcerer_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sorcerer)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_sorcerer);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
@@ -430,9 +430,11 @@ MACHINE_CONFIG_START(sorcerer_state::sorcerer)
 	WAVE(config, "wave2", m_cassette2).add_route(ALL_OUTPUTS, "mono", 0.05); // cass2 speaker
 
 	AY31015(config, m_uart);
-	m_uart->set_tx_clock(ES_UART_CLOCK);
-	m_uart->set_rx_clock(ES_UART_CLOCK);
 	m_uart->set_auto_rdav(true);
+
+	CLOCK(config, m_uart_clock, ES_UART_CLOCK);
+	m_uart_clock->signal_handler().set(m_uart, FUNC(ay31015_device::write_tcp));
+	m_uart_clock->signal_handler().append(m_uart, FUNC(ay31015_device::write_rcp));
 
 	RS232_PORT(config, "rs232", default_rs232_devices, "null_modem").set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 
@@ -445,8 +447,8 @@ MACHINE_CONFIG_START(sorcerer_state::sorcerer)
 	INPUT_BUFFER(config, "cent_status_in");
 
 	/* quickload */
-	MCFG_SNAPSHOT_ADD("snapshot", sorcerer_state, sorcerer, "snp", 2)
-	MCFG_QUICKLOAD_ADD("quickload", sorcerer_state, sorcerer, "bin", 3)
+	MCFG_SNAPSHOT_ADD("snapshot", sorcerer_state, sorcerer, "snp", attotime::from_seconds(2))
+	MCFG_QUICKLOAD_ADD("quickload", sorcerer_state, sorcerer, "bin", attotime::from_seconds(3))
 
 	CASSETTE(config, m_cassette1);
 	m_cassette1->set_formats(sorcerer_cassette_formats);

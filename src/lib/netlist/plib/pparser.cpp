@@ -16,11 +16,6 @@ namespace plib {
 // A simple tokenizer
 // ----------------------------------------------------------------------------------------
 
-ptokenizer::~ptokenizer()
-{
-}
-
-
 pstring ptokenizer::currentline_str()
 {
 	return m_cur_line;
@@ -126,7 +121,7 @@ double ptokenizer::get_number_double()
 		error(pfmt("Expected a number, got <{1}>")(tok.str()) );
 	}
 	bool err;
-	double ret = plib::pstonum_ne<double>(tok.str(), err);
+	auto ret = plib::pstonum_ne<double>(tok.str(), err);
 	if (err)
 		error(pfmt("Expected a number, got <{1}>")(tok.str()) );
 	return ret;
@@ -140,7 +135,7 @@ long ptokenizer::get_number_long()
 		error(pfmt("Expected a long int, got <{1}>")(tok.str()) );
 	}
 	bool err;
-	long ret = plib::pstonum_ne<long>(tok.str(), err);
+	auto ret = plib::pstonum_ne<long>(tok.str(), err);
 	if (err)
 		error(pfmt("Expected a long int, got <{1}>")(tok.str()) );
 	return ret;
@@ -268,7 +263,7 @@ void ptokenizer::error(const pstring &errs)
 // A simple preprocessor
 // ----------------------------------------------------------------------------------------
 
-ppreprocessor::ppreprocessor(std::vector<define_t> *defines)
+ppreprocessor::ppreprocessor(defines_map_type *defines)
 : pistream()
 , m_ifflag(0)
 , m_level(0)
@@ -277,27 +272,22 @@ ppreprocessor::ppreprocessor(std::vector<define_t> *defines)
 , m_state(PROCESS)
 , m_comment(false)
 {
-	m_expr_sep.push_back("!");
-	m_expr_sep.push_back("(");
-	m_expr_sep.push_back(")");
-	m_expr_sep.push_back("+");
-	m_expr_sep.push_back("-");
-	m_expr_sep.push_back("*");
-	m_expr_sep.push_back("/");
-	m_expr_sep.push_back("&&");
-	m_expr_sep.push_back("||");
-	m_expr_sep.push_back("==");
-	m_expr_sep.push_back(" ");
-	m_expr_sep.push_back("\t");
+	m_expr_sep.emplace_back("!");
+	m_expr_sep.emplace_back("(");
+	m_expr_sep.emplace_back(")");
+	m_expr_sep.emplace_back("+");
+	m_expr_sep.emplace_back("-");
+	m_expr_sep.emplace_back("*");
+	m_expr_sep.emplace_back("/");
+	m_expr_sep.emplace_back("&&");
+	m_expr_sep.emplace_back("||");
+	m_expr_sep.emplace_back("==");
+	m_expr_sep.emplace_back(" ");
+	m_expr_sep.emplace_back("\t");
 
 	m_defines.insert({"__PLIB_PREPROCESSOR__", define_t("__PLIB_PREPROCESSOR__", "1")});
 	if (defines != nullptr)
-	{
-		for (auto & p : *defines)
-		{
-			m_defines.insert({p.m_name, p});
-		}
-	}
+		m_defines = *defines;
 }
 
 void ppreprocessor::error(const pstring &err)
@@ -320,10 +310,10 @@ pstream::size_type ppreprocessor::vread(value_type *buf, const pstream::size_typ
 #define CHECKTOK2(p_op, p_prio) \
 	else if (tok == # p_op)                         \
 	{                                               \
-		if (prio < p_prio)                          \
+		if (prio < (p_prio))                        \
 			return val;                             \
 		start++;                                    \
-		const auto v2 = expr(sexpr, start, p_prio); \
+		const auto v2 = expr(sexpr, start, (p_prio)); \
 		val = (val p_op v2);                        \
 	}                                               \
 
@@ -394,9 +384,9 @@ pstring ppreprocessor::replace_macros(const pstring &line)
 static pstring catremainder(const std::vector<pstring> &elems, std::size_t start, pstring sep)
 {
 	pstring ret("");
-	for (auto & elem : elems)
+	for (std::size_t i = start; i < elems.size(); i++)
 	{
-		ret += elem;
+		ret += elems[i];
 		ret += sep;
 	}
 	return ret;
@@ -477,7 +467,7 @@ pstring  ppreprocessor::process_line(pstring line)
 			std::size_t start = 0;
 			lt = replace_macros(lt);
 			std::vector<pstring> t(psplit(replace_all(lt.substr(3), pstring(" "), pstring("")), m_expr_sep));
-			int val = static_cast<int>(expr(t, start, 255));
+			auto val = static_cast<int>(expr(t, start, 255));
 			if (val == 0)
 				m_ifflag |= (1 << m_level);
 		}
@@ -524,7 +514,10 @@ pstring  ppreprocessor::process_line(pstring line)
 			}
 		}
 		else
-			error(pfmt("unknown directive on line {1}: {2}")(m_lineno)(line));
+		{
+			if (m_ifflag == 0)
+				error(pfmt("unknown directive on line {1}: {2}")(m_lineno)(replace_macros(line)));
+		}
 	}
 	else
 	{
@@ -537,4 +530,4 @@ pstring  ppreprocessor::process_line(pstring line)
 
 
 
-}
+} // namespace plib

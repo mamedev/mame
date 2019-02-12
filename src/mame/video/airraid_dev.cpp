@@ -69,7 +69,7 @@ MACHINE_CONFIG_START(airraid_video_device::device_add_mconfig)
 	MCFG_SCREEN_UPDATE_DRIVER(airraid_video_device, screen_update_airraid)
 	MCFG_SCREEN_PALETTE("^palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "^palette", gfx_cshooter)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cshooter);
 
 MACHINE_CONFIG_END
 

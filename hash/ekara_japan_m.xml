@@ -5,21 +5,26 @@
 
 	Japanese cart listing (by M code) (M-x on cartridge / box, MC in cart identifier code)
 
-	M-1  *MC0001-ATM  ATM Mini Volume 1
-	M-2   MC0002-
-	M-3   MC0003-
-	M-4   MC0004-     ? Mini Volume 4 (w-inds)
-	M-5   MC0005-
-	M-6   MC0006-
-	M-7   MC0007-ATM  ATM Mini Volume 5
-	M-8
-	M-9
-	M-10
-	M-11
-	M-12
-	M-13  MC0013-KSM  KSM Mini Volume 5
-  M-14
-  M-15  MC0015-TPM  TV Pop Mini Volume 1
+	M-1  *MC0001-ATM  Artist Mini Volume 1 (untranslated artist)
+	M-2   MC0002-ATM  Artist Mini Volume 2 (untranslated artist)
+	M-3   MC0003-ATM  Artist Mini Volume 3 (untranslated artist)
+	M-4   MC0004-ATM  Artist Mini Volume 4 (w-inds)
+	M-5   MC0005-     KSM? unknown Vol 1
+	M-6   MC0006-     KSM? TPM? unknown Vol 2 (TV)
+	M-7   MC0007-ATM  Artist Mini Volume 5 (SMAP, KinKi Kids)
+	M-8   MC0008-     KSM? TPM? unknown Vol 3 (TV)
+	M-9   MC0009-KSM  JPop Mix Mini Vol 1
+	M-10  MC0010-ATM  Artist Mini Volume 6 (untranslated artist)
+	M-11  MC0011-     KSM? unknown Vol 4
+	M-12  MC0012-ATM  Artist Mini Volume 7 (untranslated artist)
+	M-13 *MC0013-KSM  KSM Mini Volume 5
+	M-14  MC0014-ATM  Artist Mini Volume 8 (BoA)
+	M-15  MC0015-     KSM? TPM? unknown Vol 6 (TV Pop)
+	M-16  MC0016-ATM  Artist Mini Volume 9  (untranslated artist)
+	M-17  MC0017-     KSM? TPM? TV Pop Mini Vol 7 (TV Pop)
+
+	unsure of KSM / TMP naming,  MC0005/0005/0008/0011/0013/0015/0017 all seem to be the same series
+	but might have different 3 letter codes
 
 	(more? what's the M highest number?)
 

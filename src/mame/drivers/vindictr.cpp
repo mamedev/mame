@@ -193,7 +193,7 @@ MACHINE_CONFIG_START(vindictr_state::vindictr)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vindictr)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_vindictr);
 	MCFG_PALETTE_ADD("palette", 2048*8)
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, vindictr_state, get_playfield_tile_info, 8,8, SCAN_COLS, 64,64)

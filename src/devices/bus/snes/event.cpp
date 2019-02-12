@@ -221,11 +221,12 @@ void sns_pfest94_device::dsp_data_map_lorom(address_map &map)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(sns_pfest94_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("dsp", UPD7725, 8000000)
-	MCFG_DEVICE_PROGRAM_MAP(dsp_prg_map_lorom)
-	MCFG_DEVICE_DATA_MAP(dsp_data_map_lorom)
-MACHINE_CONFIG_END
+void sns_pfest94_device::device_add_mconfig(machine_config &config)
+{
+	UPD7725(config, m_upd7725, 8000000);
+	m_upd7725->set_addrmap(AS_PROGRAM, &sns_pfest94_device::dsp_prg_map_lorom);
+	m_upd7725->set_addrmap(AS_DATA, &sns_pfest94_device::dsp_data_map_lorom);
+}
 
 //-------------------------------------------------
 //  Dipswitch

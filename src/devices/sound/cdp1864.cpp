@@ -470,18 +470,18 @@ void cdp1864_device::initialize_palette()
 		// foreground colors
 		uint8_t r = 0, g = 0, b = 0;
 
-		if (m_chr_r != RES_INF) r = combine_1_weights(color_weights_r, BIT(i, 0));
-		if (m_chr_b != RES_INF) b = combine_1_weights(color_weights_b, BIT(i, 1));
-		if (m_chr_g != RES_INF) g = combine_1_weights(color_weights_g, BIT(i, 2));
+		if (m_chr_r != RES_INF) r = combine_weights(color_weights_r, BIT(i, 0));
+		if (m_chr_b != RES_INF) b = combine_weights(color_weights_b, BIT(i, 1));
+		if (m_chr_g != RES_INF) g = combine_weights(color_weights_g, BIT(i, 2));
 
 		m_palette[i] = rgb_t(r, g, b);
 
 		// background colors
 		r = 0, g = 0, b = 0;
 
-		if (m_chr_r != RES_INF) r = combine_1_weights(color_weights_bkg_r, BIT(i, 0));
-		if (m_chr_b != RES_INF) b = combine_1_weights(color_weights_bkg_b, BIT(i, 1));
-		if (m_chr_g != RES_INF) g = combine_1_weights(color_weights_bkg_g, BIT(i, 2));
+		if (m_chr_r != RES_INF) r = combine_weights(color_weights_bkg_r, BIT(i, 0));
+		if (m_chr_b != RES_INF) b = combine_weights(color_weights_bkg_b, BIT(i, 1));
+		if (m_chr_g != RES_INF) g = combine_weights(color_weights_bkg_g, BIT(i, 2));
 
 		m_palette[i + 8] = rgb_t(r, g, b);
 	}

@@ -131,7 +131,7 @@ MACHINE_CONFIG_START(kramermc_state::kramermc)
 	MCFG_SCREEN_UPDATE_DRIVER(kramermc_state, screen_update_kramermc)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_kramermc)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_kramermc);
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 

@@ -613,7 +613,7 @@ MACHINE_CONFIG_START(xerox820_state::xerox820)
 	MCFG_SCREEN_UPDATE_DRIVER(xerox820_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(10.69425_MHz_XTAL, 700, 0, 560, 260, 0, 240)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_xerox820)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_xerox820);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* devices */
@@ -666,7 +666,7 @@ MACHINE_CONFIG_START(xerox820_state::xerox820)
 
 	// software lists
 	SOFTWARE_LIST(config, "flop_list").set_original("xerox820");
-	MCFG_QUICKLOAD_ADD("quickload", xerox820_state, xerox820, "com,cpm", 3)
+	MCFG_QUICKLOAD_ADD("quickload", xerox820_state, xerox820, "com,cpm", attotime::from_seconds(3))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(bigboard_state::bigboard)
@@ -689,7 +689,7 @@ MACHINE_CONFIG_START(xerox820ii_state::xerox820ii)
 	MCFG_SCREEN_UPDATE_DRIVER(xerox820ii_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(10.69425_MHz_XTAL, 700, 0, 560, 260, 0, 240)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_xerox820ii)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_xerox820ii);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* sound hardware */
@@ -771,7 +771,7 @@ MACHINE_CONFIG_START(xerox820ii_state::xerox820ii)
 
 	// software lists
 	SOFTWARE_LIST(config, "flop_list").set_original("xerox820ii");
-	MCFG_QUICKLOAD_ADD("quickload", xerox820_state, xerox820, "com,cpm", 3)
+	MCFG_QUICKLOAD_ADD("quickload", xerox820_state, xerox820, "com,cpm", attotime::from_seconds(3))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(xerox820ii_state::xerox168)

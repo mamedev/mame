@@ -202,11 +202,11 @@ uint8_t electron_plus1_device::expbus_r(address_space &space, offs_t offset)
 
 			if (offset == 0xfc70)
 			{
-				data &= m_adc->read(space, 0);
+				data &= m_adc->read();
 			}
 			else if (offset == 0xfc72)
 			{
-				data &= status_r(space, 0);
+				data &= status_r();
 			}
 			break;
 
@@ -255,7 +255,7 @@ void electron_plus1_device::expbus_w(address_space &space, offs_t offset, uint8_
 
 			if (offset == 0xfc70)
 			{
-				m_adc->write(space, 0, data);
+				m_adc->write(data);
 			}
 			else if (offset == 0xfc71)
 			{
@@ -283,9 +283,9 @@ void electron_plus1_device::expbus_w(address_space &space, offs_t offset, uint8_
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ8_MEMBER(electron_plus1_device::status_r)
+u8 electron_plus1_device::status_r()
 {
-	uint8_t data = 0x0f;
+	u8 data = 0x0f;
 	// Status: b7: printer Busy
 	//         b6: ADC conversion end
 	//         b5: Fire Button 1

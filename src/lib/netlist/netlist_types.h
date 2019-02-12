@@ -9,13 +9,14 @@
 #ifndef NETLIST_TYPES_H_
 #define NETLIST_TYPES_H_
 
-#include "nl_config.h"
-#include "plib/pchrono.h"
-#include "plib/pstring.h"
-#include "plib/pfmtlog.h"
-
 #include <cstdint>
 #include <unordered_map>
+
+#include "nl_config.h"
+#include "plib/pchrono.h"
+#include "plib/pfmtlog.h"
+#include "plib/pstring.h"
+
 
 namespace netlist
 {
@@ -26,6 +27,7 @@ namespace netlist
 	 */
 	using netlist_sig_t = std::uint32_t;
 
+	/* FIXME: belongs into nl_base.h to nlstate */
 	/**
 	 * @brief Interface definition for netlist callbacks into calling code
 	 *
@@ -37,10 +39,17 @@ namespace netlist
 	class callbacks_t
 	{
 	public:
-		virtual ~callbacks_t() {}
+
+		callbacks_t() = default;
+		/* what is done before this is passed as a unique_ptr to netlist
+		 * we should not limit.
+		 */
+		virtual ~callbacks_t() = default;
+		COPYASSIGNMOVE(callbacks_t, default)
 
 		/* logging callback */
 		virtual void vlog(const plib::plog_level &l, const pstring &ls) const = 0;
+
 	};
 
 	using log_type =  plib::plog_base<callbacks_t, NL_DEBUG>;
@@ -74,7 +83,7 @@ namespace netlist
 	 */
 	using model_map_t = std::unordered_map<pstring, pstring>;
 
-	}
-}
+	} // namespace detail
+} // namespace netlist
 
 #endif /* NETLIST_TYPES_H_ */

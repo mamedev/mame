@@ -276,7 +276,8 @@ uint32_t abc800m_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 //  MACHINE_CONFIG_START( abc800m_video )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(abc800m_state::abc800m_video)
+void abc800m_state::abc800m_video(machine_config &config)
+{
 	mc6845_device &mc6845(MC6845(config, MC6845_TAG, ABC800_CCLK));
 	mc6845.set_screen(SCREEN_TAG);
 	mc6845.set_show_border_area(true);
@@ -284,9 +285,9 @@ MACHINE_CONFIG_START(abc800m_state::abc800m_video)
 	mc6845.set_update_row_callback(FUNC(abc800m_state::abc800m_update_row), this);
 	mc6845.out_vsync_callback().set(m_dart, FUNC(z80dart_device::rib_w)).invert();
 
-	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t(0xff, 0xff, 0x00))
-	MCFG_SCREEN_UPDATE_DRIVER(abc800m_state, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000), 0x300, 0, 0x1e0, 0x13a, 0, 0xf0)
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER, rgb_t(0xff, 0xff, 0x00)));
+	screen.set_screen_update(FUNC(abc800m_state::screen_update));
+	screen.set_raw(XTAL(12'000'000), 0x300, 0, 0x1e0, 0x13a, 0, 0xf0);
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
-MACHINE_CONFIG_END
+}

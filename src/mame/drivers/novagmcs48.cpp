@@ -41,8 +41,8 @@ Otherwise, it's identical to Presto. The MCU internal ROM is same too.
 class novagmcs48_state : public novagbase_state
 {
 public:
-	novagmcs48_state(const machine_config &mconfig, device_type type, const char *tag)
-		: novagbase_state(mconfig, type, tag)
+	novagmcs48_state(const machine_config &mconfig, device_type type, const char *tag) :
+		novagbase_state(mconfig, type, tag)
 	{ }
 
 	void presto(machine_config &config);

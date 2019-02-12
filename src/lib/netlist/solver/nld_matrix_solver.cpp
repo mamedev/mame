@@ -15,10 +15,6 @@ namespace netlist
 	namespace devices
 	{
 
-proxied_analog_output_t::~proxied_analog_output_t()
-{
-}
-
 terms_for_net_t::terms_for_net_t()
 	: m_railstart(0)
 	, m_last_V(0.0)
@@ -66,7 +62,7 @@ void terms_for_net_t::set_pointers()
 	for (std::size_t i = 0; i < count(); i++)
 	{
 		m_terms[i]->set_ptrs(&m_gt[i], &m_go[i], &m_Idr[i]);
-		m_connected_net_V[i] = m_terms[i]->m_otherterm->net().Q_Analog_state_ptr();
+		m_connected_net_V[i] = m_terms[i]->otherterm()->net().Q_Analog_state_ptr();
 	}
 }
 
@@ -74,7 +70,7 @@ void terms_for_net_t::set_pointers()
 // matrix_solver
 // ----------------------------------------------------------------------------------------
 
-matrix_solver_t::matrix_solver_t(netlist_base_t &anetlist, const pstring &name,
+matrix_solver_t::matrix_solver_t(netlist_state_t &anetlist, const pstring &name,
 		const eSortType sort, const solver_parameters_t *params)
 	: device_t(anetlist, name)
 	, m_params(*params)
@@ -90,10 +86,6 @@ matrix_solver_t::matrix_solver_t(netlist_base_t &anetlist, const pstring &name,
 	, m_sort(sort)
 {
 	connect_post_start(m_fb_sync, m_Q_sync);
-}
-
-matrix_solver_t::~matrix_solver_t()
-{
 }
 
 void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
@@ -132,7 +124,7 @@ void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 						if (!plib::container::contains(m_dynamic_devices, &p->device()))
 							m_dynamic_devices.push_back(&p->device());
 					{
-						terminal_t *pterm = dynamic_cast<terminal_t *>(p);
+						auto *pterm = dynamic_cast<terminal_t *>(p);
 						add_term(k, pterm);
 					}
 					log().debug("Added terminal {1}\n", p->name());
@@ -262,7 +254,7 @@ void matrix_solver_t::sort_terms(eSortType sort)
 		for (std::size_t i = 0; i < term->count(); i++)
 			//FIXME: this is weird
 			if (other[i] != -1)
-				other[i] = get_net_idx(&term->terms()[i]->m_otherterm->net());
+				other[i] = get_net_idx(&term->terms()[i]->otherterm()->net());
 	}
 }
 
@@ -344,7 +336,7 @@ void matrix_solver_t::setup_matrix()
 	 * This should reduce cache misses ...
 	 */
 
-	bool **touched = plib::palloc_array<bool *>(iN);
+	auto **touched = plib::palloc_array<bool *>(iN);
 	for (std::size_t k=0; k<iN; k++)
 		touched[k] = plib::palloc_array<bool>(iN);
 
@@ -378,12 +370,12 @@ void matrix_solver_t::setup_matrix()
 	}
 	log().verbose("Number of mults/adds for {1}: {2}", name(), m_ops);
 
-	if ((0))
+	if ((false))
 		for (std::size_t k = 0; k < iN; k++)
 		{
 			pstring line = plib::pfmt("{1:3}")(k);
-			for (std::size_t j = 0; j < m_terms[k]->m_nzrd.size(); j++)
-				line += plib::pfmt(" {1:3}")(m_terms[k]->m_nzrd[j]);
+			for (const auto & nzrd : m_terms[k]->m_nzrd)
+				line += plib::pfmt(" {1:3}")(nzrd);
 			log().verbose("{1}", line);
 		}
 
@@ -394,13 +386,14 @@ void matrix_solver_t::setup_matrix()
 	{
 		pstring num = plib::pfmt("{1}")(k);
 
-		state().save(*this, m_terms[k]->m_last_V, "lastV." + num);
-		state().save(*this, m_terms[k]->m_DD_n_m_1, "m_DD_n_m_1." + num);
-		state().save(*this, m_terms[k]->m_h_n_m_1, "m_h_n_m_1." + num);
+		state().save(*this, m_terms[k]->m_last_V, this->name(), "lastV." + num);
+		state().save(*this, m_terms[k]->m_DD_n_m_1, this->name(), "m_DD_n_m_1." + num);
+		state().save(*this, m_terms[k]->m_h_n_m_1, this->name(), "m_h_n_m_1." + num);
 
-		state().save(*this, m_terms[k]->go(),"GO" + num, m_terms[k]->count());
-		state().save(*this, m_terms[k]->gt(),"GT" + num, m_terms[k]->count());
-		state().save(*this, m_terms[k]->Idr(),"IDR" + num , m_terms[k]->count());
+		// FIXME: This shouldn't be necessary, recalculate on each entry ...
+		state().save(*this, m_terms[k]->go(),"GO" + num, this->name(), m_terms[k]->count());
+		state().save(*this, m_terms[k]->gt(),"GT" + num, this->name(), m_terms[k]->count());
+		state().save(*this, m_terms[k]->Idr(),"IDR" + num, this->name(), m_terms[k]->count());
 	}
 
 	for (std::size_t k=0; k<iN; k++)
@@ -460,11 +453,11 @@ void matrix_solver_t::update_forced()
 void matrix_solver_t::step(const netlist_time &delta)
 {
 	const nl_double dd = delta.as_double();
-	for (std::size_t k=0; k < m_step_devices.size(); k++)
-		m_step_devices[k]->timestep(dd);
+	for (auto &d : m_step_devices)
+		d->timestep(dd);
 }
 
-void matrix_solver_t::solve_base(netlist_time time)
+void matrix_solver_t::solve_base()
 {
 	++m_stat_vsolver_calls;
 	if (has_dynamic_devices())
@@ -505,7 +498,7 @@ const netlist_time matrix_solver_t::solve(netlist_time now)
 	/* update all terminals for new time step */
 	m_last_step = now;
 	step(delta);
-	solve_base(now);
+	solve_base();
 	const netlist_time next_time_step = compute_next_timestep(delta.as_double());
 
 	return next_time_step;
@@ -526,8 +519,8 @@ std::pair<int, int> matrix_solver_t::get_left_right_of_diag(std::size_t irow, st
 	 * return the minimum column right of the diagonal (999999 if no cols found)
 	 */
 
-	const int row = static_cast<int>(irow);
-	const int diag = static_cast<int>(idiag);
+	const auto row = static_cast<int>(irow);
+	const auto diag = static_cast<int>(idiag);
 
 	int colmax = -1;
 	int colmin = 999999;
@@ -536,7 +529,7 @@ std::pair<int, int> matrix_solver_t::get_left_right_of_diag(std::size_t irow, st
 
 	for (std::size_t i = 0; i < term->count(); i++)
 	{
-		auto col = get_net_idx(&term->terms()[i]->m_otherterm->net());
+		auto col = get_net_idx(&term->terms()[i]->otherterm()->net());
 		if (col != -1)
 		{
 			if (col==row) col = diag;
@@ -548,7 +541,7 @@ std::pair<int, int> matrix_solver_t::get_left_right_of_diag(std::size_t irow, st
 				colmax = col;
 		}
 	}
-	return std::pair<int, int>(colmax, colmin);
+	return {colmax, colmin};
 }
 
 double matrix_solver_t::get_weight_around_diag(std::size_t row, std::size_t diag)
@@ -564,10 +557,10 @@ double matrix_solver_t::get_weight_around_diag(std::size_t row, std::size_t diag
 		auto &term = m_terms[row];
 		for (std::size_t i = 0; i < term->count(); i++)
 		{
-			auto col = get_net_idx(&term->terms()[i]->m_otherterm->net());
+			auto col = get_net_idx(&term->terms()[i]->otherterm()->net());
 			if (col >= 0)
 			{
-				std::size_t colu = static_cast<std::size_t>(col);
+				auto colu = static_cast<std::size_t>(col);
 				if (!touched[colu])
 				{
 					if (colu==row) colu = static_cast<unsigned>(diag);
@@ -585,13 +578,13 @@ double matrix_solver_t::get_weight_around_diag(std::size_t row, std::size_t diag
 
 void matrix_solver_t::add_term(std::size_t k, terminal_t *term)
 {
-	if (term->m_otherterm->net().isRailNet())
+	if (term->otherterm()->net().isRailNet())
 	{
 		m_rails_temp[k]->add(term, -1, false);
 	}
 	else
 	{
-		int ot = get_net_idx(&term->m_otherterm->net());
+		int ot = get_net_idx(&term->otherterm()->net());
 		if (ot>=0)
 		{
 			m_terms[k]->add(term, ot, true);
@@ -624,8 +617,8 @@ netlist_time matrix_solver_t::compute_next_timestep(const double cur_ts)
 
 			t->m_h_n_m_1 = hn;
 			t->m_DD_n_m_1 = DD_n;
-			if (std::fabs(DD2) > NL_FCONST(1e-60)) // avoid div-by-zero
-				new_net_timestep = std::sqrt(m_params.m_dynamic_lte / std::fabs(NL_FCONST(0.5)*DD2));
+			if (std::fabs(DD2) > plib::constants<nl_double>::cast(1e-60)) // avoid div-by-zero
+				new_net_timestep = std::sqrt(m_params.m_dynamic_lte / std::fabs(plib::constants<nl_double>::cast(0.5)*DD2));
 			else
 				new_net_timestep = m_params.m_max_timestep;
 

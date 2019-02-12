@@ -393,7 +393,7 @@ MACHINE_CONFIG_START(proteus3_state::proteus3)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 16*12-1)
 	MCFG_SCREEN_UPDATE_DRIVER(proteus3_state, screen_update_proteus3)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_proteus3)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_proteus3);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* Devices */

@@ -354,7 +354,7 @@ MACHINE_CONFIG_START(bmjr_state::bmjr)
 	MCFG_SCREEN_PALETTE("palette")
 
 	PALETTE(config, "palette", palette_device::BRG_3BIT);
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bmjr)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_bmjr);
 
 	/* Audio */
 	SPEAKER(config, "mono").front_center();

@@ -300,7 +300,7 @@
 
 	<!-- lcd panel -->
 
-		<screen index="0">
+		<screen tag="screen">
 			<bounds x="86.5" y="9.5" width="24.25" height="2.5" />
 		</screen>
 

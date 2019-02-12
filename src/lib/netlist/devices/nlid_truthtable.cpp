@@ -6,9 +6,9 @@
  */
 
 #include  "nlid_truthtable.h"
-#include "../plib/plists.h"
 #include "../nl_setup.h"
 #include "../plib/palloc.h"
+#include "../plib/plists.h"
 
 #include <bitset>
 
@@ -24,7 +24,7 @@ namespace netlist
 	template <typename T>
 	struct sbitset
 	{
-		typedef T type;
+		using type = T;
 
 		sbitset() : m_bs(0) { }
 		/* explicit */ sbitset(T v) : m_bs(v) { }
@@ -224,12 +224,12 @@ namespace netlist
 		: netlist_base_factory_truthtable_t(name, classname, def_param, sourcefile)
 		{ }
 
-		plib::owned_ptr<device_t> Create(netlist_base_t &anetlist, const pstring &name) override
+		plib::owned_ptr<device_t> Create(netlist_state_t &anetlist, const pstring &name) override
 		{
-			typedef nld_truthtable_t<m_NI, m_NO> tt_type;
+			using tt_type = nld_truthtable_t<m_NI, m_NO>;
 			truthtable_parser desc_s(m_NO, m_NI, &m_ttbl.m_initialized,
-					packed_int(m_ttbl.m_out_state, sizeof(m_ttbl.m_out_state[0]) * 8),
-					m_ttbl.m_timing_index, m_ttbl.m_timing_nt);
+					packed_int(m_ttbl.m_out_state.data(), sizeof(m_ttbl.m_out_state[0]) * 8),
+					m_ttbl.m_timing_index.data(), m_ttbl.m_timing_nt.data());
 
 			desc_s.parse(m_desc);
 			return plib::owned_ptr<device_t>::Create<tt_type>(anetlist, name, m_family, m_ttbl, m_desc);
@@ -394,7 +394,7 @@ void truthtable_parser::parse(const std::vector<pstring> &truthtable)
 			else
 				nl_assert_always(outs == "0", "Unknown value (not 0 or 1");
 			// FIXME: error handling
-			netlist_time t = netlist_time::from_nsec(plib::pstonum<unsigned long>(plib::trim(times[j])));
+			netlist_time t = netlist_time::from_nsec(plib::pstonum<netlist_time::internal_type>(plib::trim(times[j])));
 			uint_least8_t k=0;
 			while (m_timing_nt[k] != netlist_time::zero() && m_timing_nt[k] != t)
 				k++;
@@ -450,11 +450,6 @@ netlist_base_factory_truthtable_t::netlist_base_factory_truthtable_t(const pstri
 : factory::element_t(name, classname, def_param, sourcefile), m_family(family_TTL())
 {
 }
-
-netlist_base_factory_truthtable_t::~netlist_base_factory_truthtable_t()
-{
-}
-
 
 #define ENTRYY(n, m, s)    case (n * 100 + m): \
 	{ using xtype = netlist_factory_truthtable_t<n, m>; \

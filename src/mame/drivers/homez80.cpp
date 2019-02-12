@@ -304,7 +304,7 @@ MACHINE_CONFIG_START(homez80_state::homez80)
 	MCFG_SCREEN_PALETTE("palette")
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_homez80)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_homez80);
 MACHINE_CONFIG_END
 
 /* ROM definition */

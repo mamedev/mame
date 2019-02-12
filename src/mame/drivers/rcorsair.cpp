@@ -177,7 +177,7 @@ MACHINE_CONFIG_START(rcorsair_state::rcorsair)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rcorsair)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_rcorsair);
 	MCFG_PALETTE_ADD("palette", 0x100)
 MACHINE_CONFIG_END
 

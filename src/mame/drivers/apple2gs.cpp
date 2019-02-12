@@ -4705,9 +4705,10 @@ void apple2gs_state::apple2gs(machine_config &config)
 	FLOPPY_SONY(config, FLOPPY_3, &apple2gs_floppy35_floppy_interface);
 
 	SOFTWARE_LIST(config, "flop35_list").set_original("apple2gs");
-	SOFTWARE_LIST(config, "flop525_list").set_compatible("apple2");
+	SOFTWARE_LIST(config, "flop525_clean").set_compatible("apple2_flop_clcracked"); // No filter on clean cracks yet.
 	// As WOZ images won't load in the 2GS driver yet, comment out the softlist entry.
 	//SOFTWARE_LIST(config, "flop525_orig").set_compatible("apple2_flop_orig").set_filter("A2GS");  // Filter list to compatible disks for this machine.
+	SOFTWARE_LIST(config, "flop525_misc").set_compatible("apple2_misc");
 }
 
 void apple2gs_state::apple2gsr1(machine_config &config)

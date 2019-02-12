@@ -424,8 +424,10 @@ MACHINE_CONFIG_START(z80ne_state::z80ne)
 	MCFG_MACHINE_RESET_OVERRIDE(z80ne_state,z80ne)
 
 	AY31015(config, m_uart);
-	m_uart->set_tx_clock(4800.0);
-	m_uart->set_rx_clock(4800.0);
+
+	CLOCK(config, m_uart_clock, 4800);
+	m_uart_clock->signal_handler().set(FUNC(z80ne_state::lx385_uart_tx_clock_w));
+	m_uart_clock->signal_handler().append(m_uart, FUNC(ay31015_device::write_rcp));
 
 	CASSETTE(config, m_cassette1);
 	m_cassette1->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
@@ -493,8 +495,10 @@ MACHINE_CONFIG_START(z80ne_state::z80netb)
 	MCFG_MACHINE_RESET_OVERRIDE(z80ne_state,z80netb)
 
 	AY31015(config, m_uart);
-	m_uart->set_tx_clock(4800.0);
-	m_uart->set_rx_clock(4800.0);
+
+	CLOCK(config, m_uart_clock, 4800);
+	m_uart_clock->signal_handler().set(FUNC(z80ne_state::lx385_uart_tx_clock_w));
+	m_uart_clock->signal_handler().append(m_uart, FUNC(ay31015_device::write_rcp));
 
 	CASSETTE(config, m_cassette1);
 	m_cassette1->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
@@ -543,8 +547,10 @@ MACHINE_CONFIG_START(z80netf_state::z80netf)
 	MCFG_MACHINE_RESET_OVERRIDE(z80netf_state,z80netf)
 
 	AY31015(config, m_uart);
-	m_uart->set_tx_clock(4800.0);
-	m_uart->set_rx_clock(4800.0);
+
+	CLOCK(config, m_uart_clock, 4800);
+	m_uart_clock->signal_handler().set(FUNC(z80netf_state::lx385_uart_tx_clock_w));
+	m_uart_clock->signal_handler().append(m_uart, FUNC(ay31015_device::write_rcp));
 
 	CASSETTE(config, m_cassette1);
 	m_cassette1->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);

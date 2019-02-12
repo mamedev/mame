@@ -42,17 +42,23 @@ namespace factory {
 	// net_dev class factory
 	// -----------------------------------------------------------------------------
 
-	class element_t : plib::nocopyassignmove
+	class element_t
 	{
 	public:
 		element_t(const pstring &name, const pstring &classname,
 				const pstring &def_param);
 		element_t(const pstring &name, const pstring &classname,
 				const pstring &def_param, const pstring &sourcefile);
-		virtual ~element_t();
+		virtual ~element_t() = default;
+
+		COPYASSIGNMOVE(element_t, default)
 
 		virtual plib::owned_ptr<device_t> Create(netlist_state_t &anetlist, const pstring &name) = 0;
-		virtual void macro_actions(netlist_state_t &anetlist, const pstring &name) {}
+		virtual void macro_actions(netlist_state_t &anetlist, const pstring &name)
+		{
+			plib::unused_var(anetlist);
+			plib::unused_var(name);
+		}
 
 		const pstring &name() const { return m_name; }
 		const pstring &classname() const { return m_classname; }
@@ -87,7 +93,9 @@ namespace factory {
 	{
 	public:
 		explicit list_t(setup_t &m_setup);
-		~list_t();
+		~list_t() = default;
+
+		COPYASSIGNMOVE(list_t, delete)
 
 		template<class device_class>
 		void register_device(const pstring &name, const pstring &classname,
@@ -133,7 +141,11 @@ namespace factory {
 
 		library_element_t(setup_t &setup, const pstring &name, const pstring &classname,
 				const pstring &def_param, const pstring &source)
-		: element_t(name, classname, def_param, source) {  }
+		: element_t(name, classname, def_param, source)
+		{
+			// FIXME: if it is not used, remove it
+			plib::unused_var(setup);
+		}
 
 		plib::owned_ptr<device_t> Create(netlist_state_t &anetlist, const pstring &name) override;
 
@@ -142,11 +154,11 @@ namespace factory {
 	private:
 	};
 
-	}
+	} // namespace factory
 
 	namespace devices {
 		void initialize_factory(factory::list_t &factory);
-	}
-}
+	} // namespace devices
+} // namespace netlist
 
 #endif /* NLFACTORY_H_ */

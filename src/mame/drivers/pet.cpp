@@ -1783,8 +1783,8 @@ void pet_state::base_pet_devices(machine_config &config, const char *default_dri
 	m_user->pl_handler().set(m_via, FUNC(via6522_device::write_pa7));
 	m_user->pm_handler().set(m_via, FUNC(via6522_device::write_cb2));
 
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(pet_state, cbm_pet), this), "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS);
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
+	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(pet_state, cbm_pet), this), "p00,prg", CBM_QUICKLOAD_DELAY);
 	quickload.set_interface("cbm_quik");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("pet_cass");

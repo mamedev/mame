@@ -389,7 +389,7 @@ MACHINE_CONFIG_START(unior_state::unior)
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", i8275_device, screen_update)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_unior)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_unior);
 	PALETTE(config, m_palette, FUNC(unior_state::unior_palette), 3);
 
 	/* sound hardware */

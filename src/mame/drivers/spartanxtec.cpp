@@ -384,7 +384,7 @@ MACHINE_CONFIG_START(spartanxtec_state::spartanxtec)
 
 	PALETTE(config, m_palette, FUNC(spartanxtec_state::spartanxtec_palette), 0x200);
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_news)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_news);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

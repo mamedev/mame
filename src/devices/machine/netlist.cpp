@@ -117,7 +117,7 @@ namespace {
 class NETLIB_NAME(analog_callback) : public netlist::device_t
 {
 public:
-	NETLIB_NAME(analog_callback)(netlist::netlist_base_t &anetlist, const pstring &name)
+	NETLIB_NAME(analog_callback)(netlist::netlist_state_t &anetlist, const pstring &name)
 		: device_t(anetlist, name)
 		, m_in(*this, "IN")
 		, m_cpu_device(nullptr)
@@ -165,7 +165,7 @@ private:
 class NETLIB_NAME(logic_callback) : public netlist::device_t
 {
 public:
-	NETLIB_NAME(logic_callback)(netlist::netlist_base_t &anetlist, const pstring &name)
+	NETLIB_NAME(logic_callback)(netlist::netlist_state_t &anetlist, const pstring &name)
 		: device_t(anetlist, name)
 		, m_in(*this, "IN")
 		, m_cpu_device(nullptr)
@@ -273,7 +273,7 @@ std::unique_ptr<plib::pistream> netlist_data_memregions_t::stream(const pstring 
 class NETLIB_NAME(sound_out) : public netlist::device_t
 {
 public:
-	NETLIB_NAME(sound_out)(netlist::netlist_base_t &anetlist, const pstring &name)
+	NETLIB_NAME(sound_out)(netlist::netlist_state_t &anetlist, const pstring &name)
 		: netlist::device_t(anetlist, name)
 		, m_channel(*this, "CHAN", 0)
 		, m_mult(*this, "MULT", 1000.0)
@@ -301,7 +301,7 @@ public:
 	{
 		int pos = (upto - m_last_buffer_time) / m_sample_time;
 		if (pos > m_bufsize)
-			state().log().fatal("sound {1}: pos {2} exceeded bufsize {3}\n", name().c_str(), pos, m_bufsize);
+			throw emu_fatalerror("sound %s: pos %d exceeded bufsize %d\n", name().c_str(), pos, m_bufsize);
 		while (m_last_pos < pos )
 		{
 			m_buffer[m_last_pos++] = (stream_sample_t) m_cur;
@@ -355,7 +355,7 @@ public:
 
 	static const int MAX_INPUT_CHANNELS = 16;
 
-	NETLIB_NAME(sound_in)(netlist::netlist_base_t &anetlist, const pstring &name)
+	NETLIB_NAME(sound_in)(netlist::netlist_state_t &anetlist, const pstring &name)
 	: netlist::device_t(anetlist, name)
 	, m_inc(netlist::netlist_time::from_nsec(1))
 	, m_feedback(*this, "FB") // clock part
@@ -581,11 +581,12 @@ void netlist_mame_analog_output_device::custom_netlist_additions(netlist::setup_
 {
 	const pstring pin(m_in);
 	pstring dname = pstring("OUT_") + pin;
+	pstring dfqn = setup.build_fqn(dname);
 	m_delegate.bind_relative_to(owner()->machine().root_device());
 
-	plib::owned_ptr<netlist::device_t> dev = plib::owned_ptr<netlist::device_t>::Create<NETLIB_NAME(analog_callback)>(setup.netlist(), setup.build_fqn(dname));
+	plib::owned_ptr<netlist::device_t> dev = plib::owned_ptr<netlist::device_t>::Create<NETLIB_NAME(analog_callback)>(setup.netlist(), dfqn);
 	static_cast<NETLIB_NAME(analog_callback) *>(dev.get())->register_callback(std::move(m_delegate));
-	setup.netlist().add_dev(std::move(dev));
+	setup.netlist().add_dev(dfqn, std::move(dev));
 	setup.register_link(dname + ".IN", pin);
 }
 
@@ -616,11 +617,13 @@ void netlist_mame_logic_output_device::custom_netlist_additions(netlist::setup_t
 {
 	pstring pin(m_in);
 	pstring dname = "OUT_" + pin;
+	pstring dfqn = setup.build_fqn(dname);
+
 	m_delegate.bind_relative_to(owner()->machine().root_device());
 
-	plib::owned_ptr<netlist::device_t> dev = plib::owned_ptr<netlist::device_t>::Create<NETLIB_NAME(logic_callback)>(setup.netlist(), setup.build_fqn(dname));
+	plib::owned_ptr<netlist::device_t> dev = plib::owned_ptr<netlist::device_t>::Create<NETLIB_NAME(logic_callback)>(setup.netlist(), dfqn);
 	static_cast<NETLIB_NAME(logic_callback) *>(dev.get())->register_callback(std::move(m_delegate));
-	setup.netlist().add_dev(std::move(dev));
+	setup.netlist().add_dev(dfqn, std::move(dev));
 	setup.register_link(dname + ".IN", pin);
 }
 
@@ -882,9 +885,9 @@ void netlist_mame_device::device_start()
 
 	setup().prepare_to_run();
 
-	netlist().nlstate().save(*this, m_rem, "m_rem");
-	netlist().nlstate().save(*this, m_div, "m_div");
-	netlist().nlstate().save(*this, m_old, "m_old");
+	netlist().nlstate().save(*this, m_rem, this->name(), "m_rem");
+	netlist().nlstate().save(*this, m_div, this->name(), "m_div");
+	netlist().nlstate().save(*this, m_old, this->name(), "m_old");
 
 	save_state();
 
@@ -1050,10 +1053,8 @@ ATTR_COLD uint64_t netlist_mame_cpu_device::execute_cycles_to_clocks(uint64_t cy
 
 ATTR_HOT void netlist_mame_cpu_device::execute_run()
 {
-	bool check_debugger = ((device_t::machine().debug_flags & DEBUG_FLAG_ENABLED) != 0);
-	// debugging
 	//m_ppc = m_pc; // copy PC to previous PC
-	if (check_debugger)
+	if (debugger_enabled())
 	{
 		while (m_icount > 0)
 		{

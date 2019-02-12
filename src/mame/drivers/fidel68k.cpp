@@ -12,6 +12,7 @@
 
     TODO:
     - USART is not emulated
+	- V5 CPU comms is unemulated, it's still playable but not at all as intended
     - V9(68030 @ 32MHz) is faster than V10(68040 @ 25MHz) but it should be the other
       way around, culprit is unemulated cache?
     - V11 CPU should be M68EC060, not yet emulated. Now using M68EC040 in its place
@@ -68,7 +69,7 @@ V1: 128KB DRAM, no EEPROM
 V2: 128KB DRAM
 V3: 512KB DRAM
 V4: 1MB DRAM
-V5: 128KB+64KB DRAM, dual-CPU! (2*68K @ 16MHz)
+V5: 128KB+16KB DRAM, dual-CPU! (2*68K @ 16MHz)
 
 V6-V11 are on model 6117. Older 1986 model 6081/6088/6089 uses a 6502 CPU.
 
@@ -112,7 +113,7 @@ Memory map: (of what is known)
 Elite Avant Garde (EAG, model 6117)
 -----------------------------------
 
-There are 6 versions of model 6114(V6 to V11). From a programmer's point of view,
+There are 6 versions of model 6117(V6 to V11). From a programmer's point of view,
 the hardware is very similar to model 6114.
 
 V6: 68020, 512KB hashtable RAM
@@ -197,8 +198,8 @@ B0000x-xxxxxx: see V7, -800000
 class fidel68k_state : public fidelbase_state
 {
 public:
-	fidel68k_state(const machine_config &mconfig, device_type type, const char *tag)
-		: fidelbase_state(mconfig, type, tag),
+	fidel68k_state(const machine_config &mconfig, device_type type, const char *tag) :
+		fidelbase_state(mconfig, type, tag),
 		m_ram(*this, "ram")
 	{ }
 
@@ -212,6 +213,7 @@ public:
 
 	void eag_base(machine_config &config);
 	void eag(machine_config &config);
+	void eagv5(machine_config &config);
 	void eagv7(machine_config &config);
 	void eagv9(machine_config &config);
 	void eagv10(machine_config &config);
@@ -220,9 +222,6 @@ public:
 
 private:
 	optional_device<ram_device> m_ram;
-
-	TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(M68K_IRQ_2, ASSERT_LINE); }
-	TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE); }
 
 	// Excel 68000
 	DECLARE_WRITE8_MEMBER(fex68k_mux_w);
@@ -247,6 +246,7 @@ private:
 	void eag_map(address_map &map);
 	void eagv7_map(address_map &map);
 	void eagv11_map(address_map &map);
+	void eagv5_slave_map(address_map &map);
 };
 
 
@@ -451,7 +451,7 @@ void fidel68k_state::fdes2325_map(address_map &map)
 
 void fidel68k_state::init_eag()
 {
-	// eag_map: DRAM slots at $200000-$2fffff - V1/V2: 128K, V3: 512K, V4: 1M
+	// eag_map: DRAM slots at $200000-$2fffff - V1/V2/V5: 128K, V3: 512K, V4: 1M
 	m_maincpu->space(AS_PROGRAM).install_ram(0x200000, 0x200000 + m_ram->size() - 1, m_ram->pointer());
 }
 
@@ -495,6 +495,12 @@ void fidel68k_state::eagv11_map(address_map &map)
 	map(0x00e04000, 0x00e07fff).ram().share("nvram");
 	map(0x00f00003, 0x00f00003).r(FUNC(fidel68k_state::eag_input2_r));
 	map(0x01000000, 0x0101ffff).ram();
+}
+
+void fidel68k_state::eagv5_slave_map(address_map &map)
+{
+	map(0x000000, 0x00ffff).rom();
+	map(0x044000, 0x047fff).ram();
 }
 
 
@@ -567,10 +573,11 @@ MACHINE_CONFIG_START(fidel68k_state::fex68k)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, 12_MHz_XTAL) // HD68HC000P12
 	MCFG_DEVICE_PROGRAM_MAP(fex68k_map)
-	timer_device &irq_on(TIMER(config, "irq_on"));
-	irq_on.configure_periodic(FUNC(fidel68k_state::irq_on), attotime::from_hz(618)); // theoretical frequency from 556 timer (22nF, 91K + 20K POT @ 14.8K, 0.1K), measurement was 580Hz
-	irq_on.set_start_delay(attotime::from_hz(597) - attotime::from_nsec(1528)); // active for 1.525us
-	TIMER(config, "irq_off").configure_periodic(FUNC(fidel68k_state::irq_off), attotime::from_hz(618));
+
+	const attotime irq_period = attotime::from_hz(618); // theoretical frequency from 556 timer (22nF, 91K + 20K POT @ 14.8K, 0.1K), measurement was 580Hz
+	TIMER(config, m_irq_on).configure_periodic(FUNC(fidel68k_state::irq_on<M68K_IRQ_2>), irq_period);
+	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(1528)); // active for 1.525us
+	TIMER(config, "irq_off").configure_periodic(FUNC(fidel68k_state::irq_off<M68K_IRQ_2>), irq_period);
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_fidel_ex_68k);
@@ -604,10 +611,11 @@ MACHINE_CONFIG_START(fidel68k_state::fdes2265)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL) // MC68HC000P12F
 	MCFG_DEVICE_PROGRAM_MAP(fdes2265_map)
-	timer_device &irq_on(TIMER(config, "irq_on"));
-	irq_on.configure_periodic(FUNC(fidel68k_state::irq_on), attotime::from_hz(597)); // from 555 timer, measured
-	irq_on.set_start_delay(attotime::from_hz(597) - attotime::from_nsec(6000)); // active for 6us
-	TIMER(config, "irq_off").configure_periodic(FUNC(fidel68k_state::irq_off), attotime::from_hz(597));
+
+	const attotime irq_period = attotime::from_hz(597); // from 555 timer, measured
+	TIMER(config, m_irq_on).configure_periodic(FUNC(fidel68k_state::irq_on<M68K_IRQ_4>), irq_period);
+	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(6000)); // active for 6us
+	TIMER(config, "irq_off").configure_periodic(FUNC(fidel68k_state::irq_off<M68K_IRQ_4>), irq_period);
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_fidel_desdis_68kr);
@@ -634,10 +642,11 @@ MACHINE_CONFIG_START(fidel68k_state::eag_base)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(eag_map)
-	timer_device &irq_on(TIMER(config, "irq_on"));
-	irq_on.configure_periodic(FUNC(fidel68k_state::irq_on), attotime::from_hz(4.9152_MHz_XTAL/0x2000)); // 600Hz
-	irq_on.set_start_delay(attotime::from_hz(4.9152_MHz_XTAL/0x2000) - attotime::from_nsec(8250)); // active for 8.25us
-	TIMER(config, "irq_off").configure_periodic(FUNC(fidel68k_state::irq_off), attotime::from_hz(4.9152_MHz_XTAL/0x2000));
+
+	const attotime irq_period = attotime::from_hz(4.9152_MHz_XTAL/0x2000); // 600Hz
+	TIMER(config, m_irq_on).configure_periodic(FUNC(fidel68k_state::irq_on<M68K_IRQ_2>), irq_period);
+	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(8250)); // active for 8.25us
+	TIMER(config, "irq_off").configure_periodic(FUNC(fidel68k_state::irq_off<M68K_IRQ_2>), irq_period);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -660,8 +669,18 @@ MACHINE_CONFIG_END
 void fidel68k_state::eag(machine_config &config)
 {
 	eag_base(config);
-	RAM(config, "ram").set_default_size("1M").set_extra_options("128K, 512K, 1M");
+	RAM(config, m_ram).set_default_size("1M").set_extra_options("128K, 512K, 1M");
 }
+
+MACHINE_CONFIG_START(fidel68k_state::eagv5)
+	eag(config);
+
+	/* basic machine hardware */
+	m_ram->set_default_size("128K");
+
+	MCFG_DEVICE_ADD("subcpu", M68000, 16_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(eagv5_slave_map)
+MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fidel68k_state::eagv7)
 	eag_base(config);
@@ -763,6 +782,16 @@ ROM_START( feagv2a ) // from a V3 board
 	ROM_LOAD16_BYTE("elite_1.6_o.u19", 0x00001, 0x10000, CRC(904c7061) SHA1(742110576cf673321440bc81a4dae4c949b49e38) )
 ROM_END
 
+ROM_START( feagv5 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD16_BYTE("master_e", 0x00000, 0x10000, CRC(e424bddc) SHA1(ff03656addfe5c47f06df2efb4602f43a9e19d96) )
+	ROM_LOAD16_BYTE("master_o", 0x00001, 0x10000, CRC(33a00894) SHA1(849460332b1ac10d452ca3631eb99f5597511b73) )
+
+	ROM_REGION( 0x10000, "subcpu", 0 )
+	ROM_LOAD16_BYTE("slave_e", 0x00000, 0x08000, CRC(eea4de52) SHA1(a64ca8a44b431e2fa7f00e44cab7e6aa2d4a9403) )
+	ROM_LOAD16_BYTE("slave_o", 0x00001, 0x08000, CRC(35fe2fdf) SHA1(731da12ee290bad9bc03cffe281c8cc48e555dfb) )
+ROM_END
+
 ROM_START( feagv7 )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("eag-v7b", 0x00000, 0x10000, CRC(f2f68b63) SHA1(621e5073e9c5083ac9a9b467f3ef8aa29beac5ac) )
@@ -815,6 +844,7 @@ CONS( 1991, fdes2325, fdes2265, 0, fdes2325, fdes68k, fidel68k_state, empty_init
 
 CONS( 1989, feagv2,   0,        0, eag,      eag,     fidel68k_state, init_eag,      "Fidelity Electronics",  "Elite Avant Garde (model 6114-2/3/4, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 CONS( 1989, feagv2a,  feagv2,   0, eag,      eag,     fidel68k_state, init_eag,      "Fidelity Electronics",  "Elite Avant Garde (model 6114-2/3/4, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1989, feagv5,   feagv2,   0, eagv5,    eag,     fidel68k_state, empty_init,    "Fidelity Electronics",  "Elite Avant Garde (model 6114-5)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )
 CONS( 1990, feagv7,   feagv2,   0, eagv7,    eag,     fidel68k_state, empty_init,    "Fidelity Electronics",  "Elite Avant Garde (model 6117-7, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 CONS( 1990, feagv7a,  feagv2,   0, eagv7,    eag,     fidel68k_state, empty_init,    "Fidelity Electronics",  "Elite Avant Garde (model 6117-7, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 CONS( 1990, feagv9,   feagv2,   0, eagv9,    eag,     fidel68k_state, empty_init,    "Fidelity Electronics",  "Elite Avant Garde (model 6117-9)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )

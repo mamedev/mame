@@ -210,7 +210,7 @@ namespace netlist
 			freq += k9 * v_rng * v_freq_3;
 			freq += k10 * v_rng * v_freq_4;
 
-			freq *= NL_FCONST(0.1e-6) / m_CAP();
+			freq *= plib::constants<nl_double>::cast(0.1e-6) / m_CAP();
 
 			// FIXME: we need a possibility to remove entries from queue ...
 			//        or an exact model ...

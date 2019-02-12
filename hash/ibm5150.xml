@@ -7382,6 +7382,18 @@ has been replaced with an all-zero block. -->
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="budokana" cloneof="budokan">
+		<description>Budokan - The Martial Spirit (Big Games release)</description>
+		<year>1989</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Electronic Arts" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Budokan - The Martial Spirit (Big Games release) [Electronic Arts] [1989] [3.5DD] [Disk 1 of 1].img" size="737280" crc="7c3acc15" sha1="ed1e6883d394b2e1fce1006105cc6a5a05f926f8" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="cadaver">
 		<description>Cadaver (5.25")</description>
@@ -9182,6 +9194,20 @@ has been replaced with an all-zero block. -->
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="moktar">
+		<!-- Dumped via Kryoflux -->
+		<description>Lagaf': Les Adventures De Moktar - Vol 1: La Zoubida</description>
+		<year>1991</year>
+		<publisher>Titus</publisher>
+		<info name="developer" value="Titus" />
+		<part name="flop1" interface="floppy_3_5">
+			<!-- Copy-protected key disk -->
+			<dataarea name="flop" size = "2162593">
+				<rom name="Les Adventures De Moktar [Titus] [1991] [3.5DD] [Disk 1 of 1].mfm" size="2162593" crc="49c51dbf" sha1="c20705be599f3daac5f98c235bc7a5ddaaead4a6" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="monopoly">
 		<description>Monopoly v2.00 (Shareware)</description>
@@ -9195,7 +9221,7 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="montypyt">
-		<description>Monty Python's Flying Circus</description>
+		<description>Monty Python's Flying Circus (5.25")</description>
 		<year>1990</year>
 		<publisher>Virgin Games</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -9206,6 +9232,18 @@ has been replaced with an all-zero block. -->
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Monty Python's Flying Circus (1990)(Virgin Games)(Disk 2 of 2).dsk" size="368640" crc="c1c40d8c" sha1="b724017f7a314cac625463d1aa106eaeac669288" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="montypyt35" cloneof="montypyt">
+		<description>Monty Python's Flying Circus (3.5")</description>
+		<year>1990</year>
+		<publisher>Virgin Games</publisher>
+		<info name="developer" value="Core Design" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Monty Python's Flying Circus [Virgin Games] [1991] [3.5DD] [Disk 1 of 1].img" size="737280" crc="2eda6769" sha1="3a9f6b0e02571366ec30c65cdb4add3257d2c0c0" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9506,7 +9544,7 @@ has been replaced with an all-zero block. -->
 		<description>Platoon</description>
 		<year>1987</year>
 		<publisher>Data East Corporation</publisher>
-		<info name="developer" value="Ocean Software Ltd." />
+		<info name="developer" value="Ocean Software" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Platoon [Data East] [1987] [5.25DD] [Disk 1 of 2].img" size="368640" crc="78008871" sha1="51bf517cdc22460565a37100a97b9dbccf630e2e" offset="0"/>
@@ -10148,8 +10186,8 @@ has been replaced with an all-zero block. -->
 	<software name="simearth">
 		<description>SimEarth: The Living Planet</description>
 		<year>1990</year>
-		<publisher>Maxis Software Inc.</publisher>
-		<info name="developer" value="Maxis Software Inc." />
+		<publisher>Maxis Software</publisher>
+		<info name="developer" value="Maxis Software" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="SimEarth [Maxis] [1990] [3.5DD] [Disk 1 of 2].img" size="737280" crc="cdd4e652" sha1="4024b10089787a7c76ca01b773fbb48325cd807e" offset="0"/>
@@ -10662,7 +10700,7 @@ has been replaced with an all-zero block. -->
 	<software name="term2">
 		<description>Terminator 2: Judgment Day</description>
 		<year>1991</year>
-		<publisher>Ocean Software Ltd.</publisher>
+		<publisher>Ocean Software</publisher>
 		<info name="developer" value="Dementia" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
@@ -10886,10 +10924,11 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="xenon">
-		<description>Xenon</description>
+		<description>Xenon (5.25")</description>
 		<year>1988</year>
 		<publisher>Melbourne House</publisher>
 		<info name="developer" value="The Bitmap Brothers" />
+		<info name="ported by" value="M.C. Lothlorien" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Xenon [Melbourne House] [1988] [5.25DD] [Disk 1 of 2].img" size="368640" crc="4fdbb490" sha1="e2b174953e254c5bd77a7ee816748ca19d417c41" offset="0"/>
@@ -10898,6 +10937,19 @@ has been replaced with an all-zero block. -->
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Xenon [Melbourne House] [1988] [5.25DD] [Disk 2 of 2].img" size="368640" crc="7b4c8346" sha1="050e699aa3babb52b84cfa9dfe7530859a9d7c14" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="xenon35" cloneof="xenon">
+		<description>Xenon (16 Blitz Plus release) (3.5")</description>
+		<year>1990</year>
+		<publisher>Virgin Mastertronic</publisher>
+		<info name="developer" value="The Bitmap Brothers" />
+		<info name="ported by" value="M.C. Lothlorien" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Xenon (16 Blitz Plus release) [Virgin Mastertronic] [1988] [3.5DD] [Disk 1 of 1].img" size="737280" crc="725ed8e2" sha1="f2f9a97f83f9d00493b374b1cac0940c4a5c87e2" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

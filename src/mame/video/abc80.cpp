@@ -198,6 +198,6 @@ MACHINE_CONFIG_START(abc80_state::abc80_video)
 
 	MCFG_SCREEN_RAW_PARAMS(XTAL(11'980'800)/2, ABC80_HTOTAL, ABC80_HBEND, ABC80_HBSTART, ABC80_VTOTAL, ABC80_VBEND, ABC80_VBSTART)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_abc80)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_abc80);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 MACHINE_CONFIG_END

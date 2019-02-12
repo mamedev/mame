@@ -6,9 +6,9 @@
  */
 
 #include "pfunction.h"
+#include "pexception.h"
 #include "pfmtlog.h"
 #include "putil.h"
-#include "pexception.h"
 
 #include <cmath>
 #include <stack>
@@ -56,7 +56,7 @@ void pfunction::compile_postfix(const std::vector<pstring> &inputs,
 			{ rc.m_cmd = RAND; stk += 1; }
 		else
 		{
-			for (unsigned i = 0; i < inputs.size(); i++)
+			for (std::size_t i = 0; i < inputs.size(); i++)
 			{
 				if (inputs[i] == cmd)
 				{
@@ -117,7 +117,7 @@ void pfunction::compile_infix(const std::vector<pstring> &inputs, const pstring 
 	std::stack<pstring> opstk;
 	std::vector<pstring> postfix;
 
-	for (unsigned i = 0; i < sexpr.size(); i++)
+	for (std::size_t i = 0; i < sexpr.size(); i++)
 	{
 		pstring &s = sexpr[i];
 		if (s=="(")
@@ -181,14 +181,15 @@ void pfunction::compile_infix(const std::vector<pstring> &inputs, const pstring 
 
 #define OP(OP, ADJ, EXPR) \
 case OP: \
-	ptr-=ADJ; \
-	stack[ptr-1] = EXPR; \
+	ptr-= (ADJ); \
+	stack[ptr-1] = (EXPR); \
 	break;
 
 double pfunction::evaluate(const std::vector<double> &values)
 {
-	double stack[20];
+	std::array<double, 20> stack = { 0 };
 	unsigned ptr = 0;
+	stack[0] = 0.0;
 	for (auto &rc : m_precompiled)
 	{
 		switch (rc.m_cmd)
@@ -214,4 +215,4 @@ double pfunction::evaluate(const std::vector<double> &values)
 	return stack[ptr-1];
 }
 
-}
+} // namespace plib

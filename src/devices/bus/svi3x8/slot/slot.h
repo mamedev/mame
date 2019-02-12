@@ -41,6 +41,13 @@
 
 
 //**************************************************************************
+//  CONSTANTS / MACROS
+//**************************************************************************
+
+#define SVIBUS_TAG "slot_bux"
+
+
+//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -107,13 +114,9 @@ public:
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(false);
-		set_bus(this, "slot_bus");
 	}
 
 	svi_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	// inline configuration
-	void set_bus(device_t *owner, const char *bus_tag) { m_owner = owner; m_bus_tag = bus_tag; }
 
 protected:
 	// device-level overrides

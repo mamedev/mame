@@ -40,9 +40,10 @@ Master:
 class ckz80_state : public driver_device
 {
 public:
-	ckz80_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	ckz80_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_irq_on(*this, "irq_on"),
 		m_dac(*this, "dac"),
 		m_master_map(*this, "master_map"),
 		m_inp_matrix(*this, "IN.%u", 0),
@@ -56,6 +57,7 @@ public:
 
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
+	required_device<timer_device> m_irq_on;
 	required_device<dac_2bit_binary_weighted_ones_complement_device> m_dac;
 	optional_device<address_map_bank_device> m_master_map;
 	optional_ioport_array<10> m_inp_matrix; // max 10
@@ -63,8 +65,8 @@ public:
 	output_finder<0x20> m_out_a;
 	output_finder<0x20> m_out_digit;
 
-	TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE); }
-	TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE); }
+	template<int L> TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(L, ASSERT_LINE); }
+	template<int L> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(L, CLEAR_LINE); }
 
 	// misc common
 	u16 m_inp_mux;                  // multiplexed keypad mask
@@ -436,12 +438,12 @@ MACHINE_CONFIG_START(ckz80_state::master)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", Z80, 8_MHz_XTAL/2)
 	MCFG_DEVICE_PROGRAM_MAP(master_trampoline)
-	timer_device &irq_on(TIMER(config, "irq_on"));
-	irq_on.configure_periodic(FUNC(ckz80_state::irq_on), attotime::from_hz(429)); // theoretical frequency from 555 timer (22nF, 150K, 1K5), measurement was 418Hz
-	irq_on.set_start_delay(attotime::from_hz(429) - attotime::from_nsec(22870)); // active for 22.87us
-	TIMER(config, "irq_off").configure_periodic(FUNC(ckz80_state::irq_off), attotime::from_hz(429));
-
 	ADDRESS_MAP_BANK(config, "master_map").set_map(&ckz80_state::master_map).set_options(ENDIANNESS_LITTLE, 8, 16);
+
+	const attotime irq_period = attotime::from_hz(429); // theoretical frequency from 555 timer (22nF, 150K, 1K5), measurement was 418Hz
+	TIMER(config, m_irq_on).configure_periodic(FUNC(ckz80_state::irq_on<INPUT_LINE_IRQ0>), irq_period);
+	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(22870)); // active for 22.87us
+	TIMER(config, "irq_off").configure_periodic(FUNC(ckz80_state::irq_off<INPUT_LINE_IRQ0>), irq_period);
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(ckz80_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_ck_master);
@@ -449,8 +451,10 @@ MACHINE_CONFIG_START(ckz80_state::master)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("dac", DAC_2BIT_BINARY_WEIGHTED_ONES_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.set_output(5.0);
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 MACHINE_CONFIG_END
 
 

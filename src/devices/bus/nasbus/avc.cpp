@@ -22,10 +22,11 @@ DEFINE_DEVICE_TYPE(NASCOM_AVC, nascom_avc_device, "nascom_avc", "Nascom Advanced
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(nascom_avc_device::device_add_mconfig)
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(16250000, 1024, 0, 768, 320, 0, 256)
-	MCFG_SCREEN_UPDATE_DEVICE("mc6845", mc6845_device, screen_update)
+void nascom_avc_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(16250000, 1024, 0, 768, 320, 0, 256);
+	screen.set_screen_update("mc6845", FUNC(mc6845_device::screen_update));
 
 	PALETTE(config, m_palette, palette_device::RGB_3BIT);
 
@@ -34,7 +35,7 @@ MACHINE_CONFIG_START(nascom_avc_device::device_add_mconfig)
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(6);
 	m_crtc->set_update_row_callback(FUNC(nascom_avc_device::crtc_update_row), this);
-MACHINE_CONFIG_END
+}
 
 
 //**************************************************************************

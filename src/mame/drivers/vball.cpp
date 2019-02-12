@@ -413,7 +413,7 @@ MACHINE_CONFIG_START(vball_state::vball)
 	MCFG_SCREEN_UPDATE_DRIVER(vball_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vb)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_vb);
 	MCFG_PALETTE_ADD("palette", 256)
 
 

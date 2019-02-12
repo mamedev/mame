@@ -97,9 +97,6 @@ private:
 	optional_device<hlcd0538_device> m_hlcd0538;
 	optional_memory_bank m_rombank;
 
-	TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE); }
-	TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE); }
-
 	// Super Constellation
 	DECLARE_WRITE8_MEMBER(supercon_mux_w);
 	DECLARE_WRITE8_MEMBER(supercon_control_w);
@@ -894,10 +891,11 @@ MACHINE_CONFIG_START(novag6502_state::cforte)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", R65C02, 10_MHz_XTAL/2)
 	MCFG_DEVICE_PROGRAM_MAP(cforte_map)
-	timer_device &irq_on(TIMER(config, "irq_on"));
-	irq_on.configure_periodic(FUNC(novag6502_state::irq_on), attotime::from_hz(32.768_kHz_XTAL/128)); // 256Hz
-	irq_on.set_start_delay(attotime::from_hz(32.768_kHz_XTAL/128) - attotime::from_usec(11)); // active for 11us
-	TIMER(config, "irq_off").configure_periodic(FUNC(novag6502_state::irq_off), attotime::from_hz(32.768_kHz_XTAL/128));
+
+	const attotime irq_period = attotime::from_hz(32.768_kHz_XTAL/128); // 256Hz
+	TIMER(config, m_irq_on).configure_periodic(FUNC(novag6502_state::irq_on<M6502_IRQ_LINE>), irq_period);
+	m_irq_on->set_start_delay(irq_period - attotime::from_usec(11)); // active for 11us
+	TIMER(config, "irq_off").configure_periodic(FUNC(novag6502_state::irq_off<M6502_IRQ_LINE>), irq_period);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -919,10 +917,11 @@ MACHINE_CONFIG_START(novag6502_state::sexpert)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M65C02, 10_MHz_XTAL/2) // or 12_MHz_XTAL/2
 	MCFG_DEVICE_PROGRAM_MAP(sexpert_map)
-	timer_device &irq_on(TIMER(config, "irq_on"));
-	irq_on.configure_periodic(FUNC(novag6502_state::irq_on), attotime::from_hz(32.768_kHz_XTAL/128)); // 256Hz
-	irq_on.set_start_delay(attotime::from_hz(32.768_kHz_XTAL/128) - attotime::from_nsec(21500)); // active for 21.5us
-	TIMER(config, "irq_off").configure_periodic(FUNC(novag6502_state::irq_off), attotime::from_hz(32.768_kHz_XTAL/128));
+
+	const attotime irq_period = attotime::from_hz(32.768_kHz_XTAL/128); // 256Hz
+	TIMER(config, m_irq_on).configure_periodic(FUNC(novag6502_state::irq_on<M6502_IRQ_LINE>), irq_period);
+	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(21500)); // active for 21.5us
+	TIMER(config, "irq_off").configure_periodic(FUNC(novag6502_state::irq_off<M6502_IRQ_LINE>), irq_period);
 
 	mos6551_device &acia(MOS6551(config, "acia", 0)); // R65C51P2 - RTS to CTS, DCD to GND
 	acia.set_xtal(1.8432_MHz_XTAL);
@@ -968,7 +967,8 @@ MACHINE_CONFIG_START(novag6502_state::sforte)
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(sforte_map)
-	subdevice<timer_device>("irq_on")->set_start_delay(attotime::from_hz(32.768_kHz_XTAL/128) - attotime::from_usec(11)); // active for ?us (assume same as cforte)
+
+	m_irq_on->set_start_delay(m_irq_on->period() - attotime::from_usec(11)); // active for ?us (assume same as cforte)
 
 	config.set_default_layout(layout_novag_sforte);
 MACHINE_CONFIG_END

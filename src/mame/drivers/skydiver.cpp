@@ -377,7 +377,7 @@ MACHINE_CONFIG_START(skydiver_state::skydiver)
 	MCFG_SCREEN_UPDATE_DRIVER(skydiver_state, screen_update)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_skydiver)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_skydiver);
 	PALETTE(config, m_palette, FUNC(skydiver_state::skydiver_palette), ARRAY_LENGTH(colortable_source));
 
 	/* sound hardware */

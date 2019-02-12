@@ -651,7 +651,7 @@ MACHINE_CONFIG_START(vpoker_state::vpoker)
 	MCFG_SCREEN_UPDATE_DRIVER(vpoker_state, screen_update_vpoker)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vpoker)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_vpoker);
 
 	PALETTE(config, m_palette, palette_device::GBR_3BIT);
 

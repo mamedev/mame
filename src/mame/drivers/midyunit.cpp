@@ -190,7 +190,6 @@ void midyunit_state::main_map(address_map &map)
 	map(0x01e00000, 0x01e0001f).w(FUNC(midyunit_state::midyunit_sound_w));
 	map(0x01f00000, 0x01f0001f).w(FUNC(midyunit_state::midyunit_control_w));
 	map(0x02000000, 0x05ffffff).r(FUNC(midyunit_state::midyunit_gfxrom_r)).share("gfx_rom");
-	map(0xc0000000, 0xc00001ff).rw("maincpu", FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xff800000, 0xffffffff).rom().region("user1", 0);
 }
 

@@ -1609,7 +1609,7 @@ MACHINE_CONFIG_START(pc88va_state::pc88va)
 
 	MCFG_PALETTE_ADD("palette", 32)
 //  MCFG_PALETTE_INIT_OWNER(pc88va_state, pc8801 )
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pc88va)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pc88va);
 
 	i8255_device &d8255_2(I8255(config, "d8255_2"));
 	d8255_2.in_pa_callback().set("d8255_2s", FUNC(i8255_device::pb_r));

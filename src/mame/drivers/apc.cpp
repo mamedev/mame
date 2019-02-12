@@ -991,7 +991,7 @@ MACHINE_CONFIG_START(apc_state::apc)
 
 	PALETTE(config, m_palette, palette_device::BRG_3BIT);
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_apc)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_apc);
 
 	UPD7220(config, m_hgdc1, 3579545); // unk clock
 	m_hgdc1->set_addrmap(0, &apc_state::upd7220_1_map);

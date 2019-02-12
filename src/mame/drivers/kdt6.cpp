@@ -617,16 +617,18 @@ static const z80_daisy_config daisy_chain_intf[] =
 	{ nullptr }
 };
 
-MACHINE_CONFIG_START(kdt6_state::psi98)
+void kdt6_state::psi98(machine_config &config)
+{
 	Z80(config, m_cpu, XTAL(16'000'000) / 4);
 	m_cpu->set_addrmap(AS_PROGRAM, &kdt6_state::psi98_mem);
 	m_cpu->set_addrmap(AS_IO, &kdt6_state::psi98_io);
 	m_cpu->set_daisy_config(daisy_chain_intf);
 
 	// video hardware
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_RAW_PARAMS(XTAL(13'516'800), 824, 48, 688, 274, 0, 250)
-	MCFG_SCREEN_UPDATE_DRIVER(kdt6_state, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_color(rgb_t::green());
+	screen.set_raw(XTAL(13'516'800), 824, 48, 688, 274, 0, 250);
+	screen.set_screen_update(FUNC(kdt6_state::screen_update));
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 	config.set_default_layout(layout_kdt6);
@@ -718,12 +720,12 @@ MACHINE_CONFIG_START(kdt6_state::psi98)
 
 	SOFTWARE_LIST(config, "floppy_list").set_original("psi98");
 
-	MCFG_PSI_KEYBOARD_INTERFACE_ADD("kbd", "hle")
-	MCFG_PSI_KEYBOARD_RX_HANDLER(WRITELINE(*this, kdt6_state, keyboard_rx_w))
-	MCFG_PSI_KEYBOARD_KEY_STROBE_HANDLER(WRITELINE("ctc2", z80ctc_device, trg1))
+	PSI_KEYBOARD_INTERFACE(config, m_keyboard, "hle");
+	m_keyboard->rx().set(FUNC(kdt6_state::keyboard_rx_w));
+	m_keyboard->key_strobe().set("ctc2", FUNC(z80ctc_device::trg1));
 
 	// 6 ECB slots
-MACHINE_CONFIG_END
+}
 
 
 //**************************************************************************

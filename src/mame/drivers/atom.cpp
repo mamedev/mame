@@ -757,7 +757,7 @@ MACHINE_CONFIG_START(atom_state::atom)
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
 	m_cassette->set_interface("atom_cass");
 
-	MCFG_QUICKLOAD_ADD("quickload", atom_state, atom_atm, "atm", 0)
+	MCFG_QUICKLOAD_ADD("quickload", atom_state, atom_atm, "atm")
 
 	/* utility rom slot */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "atom_cart")

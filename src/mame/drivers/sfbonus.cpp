@@ -1386,7 +1386,7 @@ MACHINE_CONFIG_START(sfbonus_state::sfbonus)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sfbonus)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_sfbonus);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

@@ -14,6 +14,7 @@
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
 #include "machine/ay31015.h"
+#include "machine/clock.h"
 #include "machine/ram.h"
 #include "machine/z80pio.h"
 
@@ -110,7 +111,7 @@ class nascom2_state : public nascom_state
 public:
 	nascom2_state(const machine_config &mconfig, device_type type, const char *tag) :
 		nascom_state(mconfig, type, tag),
-		m_nasbus(*this, "nasbus"),
+		m_nasbus(*this, NASBUS_TAG),
 		m_socket1(*this, "socket1"),
 		m_socket2(*this, "socket2"),
 		m_lsw1(*this, "lsw1")
@@ -701,10 +702,12 @@ void nascom_state::nascom(machine_config &config)
 
 	// uart
 	AY31015(config, m_hd6402);
-	m_hd6402->set_tx_clock((16_MHz_XTAL / 16) / 256);
-	m_hd6402->set_rx_clock((16_MHz_XTAL / 16) / 256);
 	m_hd6402->read_si_callback().set(FUNC(nascom_state::nascom1_hd6402_si));
 	m_hd6402->write_so_callback().set(FUNC(nascom_state::nascom1_hd6402_so));
+
+	clock_device &uart_clock(CLOCK(config, "uart_clock", (16_MHz_XTAL / 16) / 256));
+	uart_clock.signal_handler().set(m_hd6402, FUNC(ay31015_device::write_tcp));
+	uart_clock.signal_handler().append(m_hd6402, FUNC(ay31015_device::write_rcp));
 
 	// cassette is connected to the uart
 	CASSETTE(config, m_cassette);
@@ -717,11 +720,11 @@ void nascom_state::nascom(machine_config &config)
 	RAM(config, m_ram).set_default_size("48K").set_extra_options("8K,16K,32K");
 
 	// devices
-	snapshot_image_device &snapshot(SNAPSHOT(config, "snapshot", 0));
-	snapshot.set_handler(snapquick_load_delegate(&SNAPSHOT_LOAD_NAME(nascom_state, nascom1), this), "nas", 0.5);
+	snapshot_image_device &snapshot(SNAPSHOT(config, "snapshot"));
+	snapshot.set_handler(snapquick_load_delegate(&SNAPSHOT_LOAD_NAME(nascom_state, nascom1), this), "nas", attotime::from_msec(500));
 	snapshot.set_interface("nascom_snap");
-	snapshot_image_device &snapchar(SNAPSHOT(config, "snapchar", 0));
-	snapchar.set_handler(snapquick_load_delegate(&SNAPSHOT_LOAD_NAME(nascom_state, charrom), this), "chr", 0.5);
+	snapshot_image_device &snapchar(SNAPSHOT(config, "snapchar"));
+	snapchar.set_handler(snapquick_load_delegate(&SNAPSHOT_LOAD_NAME(nascom_state, charrom), this), "chr", attotime::from_msec(500));
 	snapchar.set_interface("nascom_char");
 }
 

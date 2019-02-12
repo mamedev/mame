@@ -707,7 +707,8 @@ void trs80m2_state::machine_reset()
 //  MACHINE_CONFIG( trs80m2 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(trs80m2_state::trs80m2)
+void trs80m2_state::trs80m2(machine_config &config)
+{
 	// basic machine hardware
 	Z80(config, m_maincpu, 8_MHz_XTAL / 2);
 	m_maincpu->set_daisy_config(trs80m2_daisy_chain);
@@ -715,12 +716,12 @@ MACHINE_CONFIG_START(trs80m2_state::trs80m2)
 	m_maincpu->set_addrmap(AS_IO, &trs80m2_state::z80_io);
 
 	// video hardware
-	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_UPDATE_DRIVER(trs80m2_state, screen_update)
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_screen_update(FUNC(trs80m2_state::screen_update));
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 639, 0, 479);
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
@@ -786,14 +787,15 @@ MACHINE_CONFIG_START(trs80m2_state::trs80m2)
 
 	// software list
 	SOFTWARE_LIST(config, "flop_list").set_original("trs80m2");
-MACHINE_CONFIG_END
+}
 
 
 //-------------------------------------------------
 //  MACHINE_CONFIG( trs80m16 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(trs80m16_state::trs80m16)
+void trs80m16_state::trs80m16(machine_config &config)
+{
 	// basic machine hardware
 	Z80(config, m_maincpu, 8_MHz_XTAL / 2);
 	m_maincpu->set_daisy_config(trs80m2_daisy_chain);
@@ -801,17 +803,17 @@ MACHINE_CONFIG_START(trs80m16_state::trs80m16)
 	m_maincpu->set_addrmap(AS_IO, &trs80m16_state::m16_z80_io);
 	m_maincpu->set_irq_acknowledge_callback(AM9519A_TAG, FUNC(am9519_device::iack_cb));
 
-	MCFG_DEVICE_ADD(M68000_TAG, M68000, 24_MHz_XTAL / 4)
-	MCFG_DEVICE_PROGRAM_MAP(m68000_mem)
-	MCFG_DEVICE_DISABLE()
+	M68000(config, m_subcpu, 24_MHz_XTAL / 4);
+	m_subcpu->set_addrmap(AS_PROGRAM, &trs80m16_state::m68000_mem);
+	m_subcpu->set_disable();
 
 	// video hardware
-	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_UPDATE_DRIVER(trs80m2_state, screen_update)
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_screen_update(FUNC(trs80m2_state::screen_update));
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 639, 0, 479);
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
@@ -859,7 +861,7 @@ MACHINE_CONFIG_START(trs80m16_state::trs80m16)
 	sio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	AM9519(config, m_uic, 0);
-	m_uic->out_int_callback().set_inputline(M68000_TAG, M68K_IRQ_5);
+	m_uic->out_int_callback().set_inputline(m_subcpu, M68K_IRQ_5);
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->ack_handler().set(m_pio, FUNC(z80pio_device::strobe_b));
@@ -880,7 +882,7 @@ MACHINE_CONFIG_START(trs80m16_state::trs80m16)
 
 	// software list
 	SOFTWARE_LIST(config, "flop_list").set_original("trs80m2");
-MACHINE_CONFIG_END
+}
 
 
 

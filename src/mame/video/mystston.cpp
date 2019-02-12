@@ -100,18 +100,18 @@ void mystston_state::set_palette()
 		bit0 = (data >> 0) & 0x01;
 		bit1 = (data >> 1) & 0x01;
 		bit2 = (data >> 2) & 0x01;
-		r = combine_3_weights(weights_rg, bit0, bit1, bit2);
+		r = combine_weights(weights_rg, bit0, bit1, bit2);
 
 		/* green component */
 		bit0 = (data >> 3) & 0x01;
 		bit1 = (data >> 4) & 0x01;
 		bit2 = (data >> 5) & 0x01;
-		g = combine_3_weights(weights_rg, bit0, bit1, bit2);
+		g = combine_weights(weights_rg, bit0, bit1, bit2);
 
 		/* blue component */
 		bit0 = (data >> 6) & 0x01;
 		bit1 = (data >> 7) & 0x01;
-		b = combine_2_weights(weights_b, bit0, bit1);
+		b = combine_weights(weights_b, bit0, bit1);
 
 		m_palette->set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -314,7 +314,7 @@ MACHINE_CONFIG_START(mystston_state::mystston_video)
 	MCFG_VIDEO_START_OVERRIDE(mystston_state,mystston)
 	MCFG_VIDEO_RESET_OVERRIDE(mystston_state,mystston)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mystston)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mystston);
 	MCFG_PALETTE_ADD("palette", 0x40)
 
 	MCFG_SCREEN_ADD("screen", RASTER)

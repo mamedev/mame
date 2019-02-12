@@ -11,9 +11,9 @@
 #ifndef NLID_SYSTEM_H_
 #define NLID_SYSTEM_H_
 
+#include "../analog/nlid_twoterm.h"
 #include "../nl_base.h"
 #include "../nl_setup.h"
-#include "../analog/nlid_twoterm.h"
 #include "../plib/putil.h"
 
 namespace netlist
@@ -27,7 +27,8 @@ namespace netlist
 	NETLIB_OBJECT(netlistparams)
 	{
 		NETLIB_CONSTRUCTOR(netlistparams)
-		, m_use_deactivate(*this, "USE_DEACTIVATE", 0)
+		, m_use_deactivate(*this, "USE_DEACTIVATE", false)
+		, m_startup_strategy(*this, "STARTUP_STRATEGY", 0)
 		{
 		}
 		NETLIB_UPDATEI() { }
@@ -35,6 +36,7 @@ namespace netlist
 		//NETLIB_UPDATE_PARAMI() { }
 	public:
 		param_logic_t m_use_deactivate;
+		param_int_t   m_startup_strategy;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -52,7 +54,7 @@ namespace netlist
 
 		NETLIB_RESETI()
 		{
-			m_Q.net().set_time(netlist_time::zero());
+			m_Q.net().set_next_scheduled_time(netlist_time::zero());
 		}
 
 		NETLIB_UPDATE_PARAMI()
@@ -65,7 +67,7 @@ namespace netlist
 			logic_net_t &net = m_Q.net();
 			// this is only called during setup ...
 			net.toggle_new_Q();
-			net.set_time(exec().time() + m_inc);
+			net.set_next_scheduled_time(exec().time() + m_inc);
 		}
 
 	public:
@@ -73,13 +75,6 @@ namespace netlist
 
 		param_double_t m_freq;
 		netlist_time m_inc;
-
-		static void mc_update(logic_net_t &net)
-		{
-			net.toggle_new_Q();
-			net.update_devs();
-		}
-
 	};
 
 	// -----------------------------------------------------------------------------
@@ -132,18 +127,15 @@ namespace netlist
 				std::vector<pstring> pat(plib::psplit(m_pattern(),","));
 				m_off = netlist_time::from_double(m_offset());
 
-				unsigned long pati[32];
-				for (int pI = 0; pI < 32; pI++)
-				{
-					pati[pI] = 0;
-				}
+				std::array<netlist_time::mult_type, 32> pati = { 0 };
+
 				m_size = static_cast<std::uint8_t>(pat.size());
-				unsigned long total = 0;
+				netlist_time::mult_type total = 0;
 				for (unsigned i=0; i<m_size; i++)
 				{
 					// FIXME: use pstonum_ne
 					//pati[i] = plib::pstonum<decltype(pati[i])>(pat[i]);
-					pati[i] = plib::pstonum<unsigned long>(pat[i]);
+					pati[i] = plib::pstonum<netlist_time::mult_type>(pat[i]);
 					total += pati[i];
 				}
 				netlist_time ttotal = netlist_time::zero();
@@ -158,6 +150,10 @@ namespace netlist
 		NETLIB_UPDATEI();
 		NETLIB_RESETI();
 		//NETLIB_UPDATE_PARAMI();
+
+		NETLIB_HANDLERI(clk2);
+		NETLIB_HANDLERI(clk2_pow2);
+
 	protected:
 
 		param_double_t m_freq;
@@ -169,7 +165,7 @@ namespace netlist
 		state_var_u8 m_cnt;
 		std::uint8_t m_size;
 		state_var<netlist_time> m_off;
-		netlist_time m_inc[32];
+		std::array<netlist_time, 32> m_inc;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -180,7 +176,7 @@ namespace netlist
 	{
 		NETLIB_CONSTRUCTOR(logic_input)
 		, m_Q(*this, "Q")
-		, m_IN(*this, "IN", 0)
+		, m_IN(*this, "IN", false)
 		/* make sure we get the family first */
 		, m_FAMILY(*this, "FAMILY", "FAMILY(TYPE=TTL)")
 		{

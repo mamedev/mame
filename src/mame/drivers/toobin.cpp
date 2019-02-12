@@ -225,7 +225,7 @@ MACHINE_CONFIG_START(toobin_state::toobin)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 640, 0, 512, 416, 0, 384)
 	MCFG_SCREEN_UPDATE_DRIVER(toobin_state, screen_update)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_toobin)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_toobin);
 	MCFG_PALETTE_ADD("palette", 1024)
 
 	/* sound hardware */

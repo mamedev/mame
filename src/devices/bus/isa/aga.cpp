@@ -273,12 +273,13 @@ MC6845_UPDATE_ROW( isa8_aga_device::aga_update_row )
 }
 
 
-MACHINE_CONFIG_START(isa8_aga_device::device_add_mconfig)
-	MCFG_SCREEN_ADD( AGA_SCREEN_NAME, RASTER )
-	MCFG_SCREEN_RAW_PARAMS( XTAL(14'318'181),912,0,640,262,0,200 )
-	MCFG_SCREEN_UPDATE_DEVICE( AGA_MC6845_NAME, mc6845_device, screen_update )
+void isa8_aga_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, AGA_SCREEN_NAME, SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(14'318'181), 912, 0, 640, 262, 0, 200);
+	screen.set_screen_update(AGA_MC6845_NAME, FUNC(mc6845_device::screen_update));
 
-	MCFG_PALETTE_ADD( "palette", /* CGA_PALETTE_SETS * 16*/ 65536 )
+	PALETTE(config, m_palette).set_entries(/* CGA_PALETTE_SETS * 16*/ 65536);
 
 	MC6845(config, m_mc6845, XTAL(14'318'181)/8);
 	m_mc6845->set_screen(AGA_SCREEN_NAME);
@@ -287,7 +288,7 @@ MACHINE_CONFIG_START(isa8_aga_device::device_add_mconfig)
 	m_mc6845->set_update_row_callback(FUNC(isa8_aga_device::aga_update_row), this);
 	m_mc6845->out_hsync_callback().set(FUNC(isa8_aga_device::hsync_changed));
 	m_mc6845->out_vsync_callback().set(FUNC(isa8_aga_device::vsync_changed));
-MACHINE_CONFIG_END
+}
 
 
 /*************************************

@@ -134,7 +134,7 @@ MACHINE_CONFIG_START(magreel_state::magreel)
 //  MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK/2, 442, 0, 320, 264, 0, 240)          /* generic NTSC video timing at 320x240 */
 //  MCFG_SCREEN_PALETTE("palette")
 
-//  MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_magreel)
+//  GFXDECODE(config, "gfxdecode", "palette", gfx_magreel);
 
 //  MCFG_PALETTE_ADD("palette", 8)
 //  MCFG_PALETTE_INIT_OWNER(magreel_state, magreel)

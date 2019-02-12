@@ -503,7 +503,7 @@ MACHINE_CONFIG_START(pegasus_state::pegasus)
 	MCFG_SCREEN_SIZE(32*8, 16*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 16*16-1)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pegasus)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_pegasus);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */

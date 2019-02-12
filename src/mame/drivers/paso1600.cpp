@@ -320,7 +320,7 @@ MACHINE_CONFIG_START(paso1600_state::paso1600)
 	MCFG_SCREEN_UPDATE_DRIVER(paso1600_state, screen_update_paso1600)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_paso1600)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_paso1600);
 	MCFG_PALETTE_ADD("palette", 8)
 //  MCFG_PALETTE_INIT(black_and_white)
 

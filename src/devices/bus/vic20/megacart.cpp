@@ -22,10 +22,9 @@ DEFINE_DEVICE_TYPE(VIC20_MEGACART, vic20_megacart_device, "vic20_megacart", "VIC
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(vic20_megacart_device::device_add_mconfig)
-
-MACHINE_CONFIG_END
-
+void vic20_megacart_device::device_add_mconfig(machine_config &config)
+{
+}
 
 
 //**************************************************************************

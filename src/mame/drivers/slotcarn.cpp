@@ -576,7 +576,7 @@ MACHINE_CONFIG_START(slotcarn_state::slotcarn)
 	crtc.out_hsync_callback().set(FUNC(slotcarn_state::hsync_changed));
 	crtc.out_vsync_callback().set_inputline(m_maincpu, 0);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_slotcarn)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_slotcarn);
 	MCFG_PALETTE_ADD("palette", 0x400)
 
 	/* sound hardware */

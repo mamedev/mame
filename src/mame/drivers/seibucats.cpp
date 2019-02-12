@@ -314,7 +314,7 @@ MACHINE_CONFIG_START(seibucats_state::seibucats)
 	MCFG_SCREEN_UPDATE_DRIVER(seibuspi_state, screen_update_sys386f)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, SPI_HTOTAL, SPI_HBEND, SPI_HBSTART, SPI_VTOTAL, SPI_VBEND, SPI_VBSTART)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_seibucats)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_seibucats);
 
 	MCFG_DEVICE_ADD(m_palette, PALETTE, palette_device::BLACK, 8192);
 //  MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)

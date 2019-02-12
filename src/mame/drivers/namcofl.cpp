@@ -576,7 +576,7 @@ MACHINE_CONFIG_START(namcofl_state::namcofl)
 	MCFG_SCREEN_UPDATE_DRIVER(namcofl_state, screen_update_namcofl)
 	MCFG_SCREEN_PALETTE(m_c116)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_c116, gfx_namcofl)
+	GFXDECODE(config, "gfxdecode", m_c116, gfx_namcofl);
 
 	NAMCO_C169ROZ(config, m_c169roz, 0);
 	m_c169roz->set_palette(m_c116);

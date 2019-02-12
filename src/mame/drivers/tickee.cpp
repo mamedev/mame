@@ -454,7 +454,6 @@ void tickee_state::tickee_map(address_map &map)
 	map(0x04200100, 0x0420011f).w("ym2", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
 	map(0x04400000, 0x0440007f).w(FUNC(tickee_state::tickee_control_w)).share("control");
 	map(0x04400040, 0x0440004f).portr("IN2");
-	map(0xc0000000, 0xc00001ff).rw(m_maincpu, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xc0000240, 0xc000025f).nopw();        /* seems to be a bug in their code */
 	map(0xff000000, 0xffffffff).rom().region("user1", 0);
 }
@@ -472,7 +471,6 @@ void tickee_state::ghoshunt_map(address_map &map)
 	map(0x04300100, 0x0430010f).r("ym2", FUNC(ay8910_device::data_r)).umask16(0x00ff);
 	map(0x04300100, 0x0430011f).w("ym2", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
 	map(0x04500000, 0x0450007f).w(FUNC(tickee_state::tickee_control_w)).share("control");
-	map(0xc0000000, 0xc00001ff).rw(m_maincpu, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xc0000240, 0xc000025f).nopw();        /* seems to be a bug in their code */
 	map(0xff000000, 0xffffffff).rom().region("user1", 0);
 }
@@ -489,7 +487,6 @@ void tickee_state::mouseatk_map(address_map &map)
 	map(0x04200100, 0x0420010f).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
 	map(0x04400000, 0x0440007f).w(FUNC(tickee_state::tickee_control_w)).share("control");
 	map(0x04400040, 0x0440004f).portr("IN2"); // ?
-	map(0xc0000000, 0xc00001ff).rw(m_maincpu, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xc0000240, 0xc000025f).nopw();        /* seems to be a bug in their code */
 	map(0xff000000, 0xffffffff).rom().region("user1", 0);
 }
@@ -500,7 +497,6 @@ void tickee_state::rapidfir_map(address_map &map)
 {
 	map(0x00000000, 0x007fffff).ram().share("vram");
 	map(0x02000000, 0x027fffff).rw(FUNC(tickee_state::rapidfir_transparent_r), FUNC(tickee_state::rapidfir_transparent_w));
-	map(0xc0000000, 0xc00001ff).rw(m_maincpu, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xfc000000, 0xfc00000f).r(FUNC(tickee_state::rapidfir_gun1_r));
 	map(0xfc000100, 0xfc00010f).r(FUNC(tickee_state::rapidfir_gun2_r));
 	map(0xfc000400, 0xfc00040f).r(FUNC(tickee_state::ffff_r));

@@ -851,7 +851,7 @@ MACHINE_CONFIG_START(mz3500_state::mz3500)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mz3500)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_mz3500);
 
 	PALETTE(config, m_palette, palette_device::BRG_3BIT);
 

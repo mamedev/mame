@@ -5,12 +5,12 @@
  *
  */
 
+#include "../plib/palloc.h"
+#include "../plib/putil.h"
+#include "nl_convert.h"
 #include <algorithm>
 #include <cmath>
 #include <unordered_map>
-#include "nl_convert.h"
-#include "../plib/palloc.h"
-#include "../plib/putil.h"
 
 /* FIXME: temporarily defined here - should be in a file */
 /* FIXME: family logic in netlist is convoluted, create
@@ -129,11 +129,11 @@ void nl_convert_base_t::add_term(pstring netname, pstring termname)
 
 void nl_convert_base_t::dump_nl()
 {
-	for (std::size_t i=0; i<m_ext_alias.size(); i++)
+	for (auto & alias : m_ext_alias)
 	{
-		net_t *net = m_nets[m_ext_alias[i]].get();
+		net_t *net = m_nets[alias].get();
 		// use the first terminal ...
-		out("ALIAS({}, {})\n", m_ext_alias[i].c_str(), net->terminals()[0].c_str());
+		out("ALIAS({}, {})\n", alias.c_str(), net->terminals()[0].c_str());
 		// if the aliased net only has this one terminal connected ==> don't dump
 		if (net->terminals().size() == 1)
 			net->set_no_export();
@@ -201,7 +201,7 @@ double nl_convert_base_t::get_sp_unit(const pstring &unit)
 			return m_units[i].m_mult;
 		i++;
 	}
-	fprintf(stderr, "Unit %s unknown\n", unit.c_str());
+	plib::perrlogger("Unit {} unknown\n", unit);
 	return 0.0;
 }
 
@@ -250,10 +250,10 @@ void nl_convert_spice_t::convert(const pstring &contents)
 
 	pstring line = "";
 
-	for (std::size_t i=0; i < spnl.size(); i++)
+	for (const auto &i : spnl)
 	{
 		// Basic preprocessing
-		pstring inl = plib::ucase(plib::trim(spnl[i]));
+		pstring inl = plib::ucase(plib::trim(i));
 		if (plib::startsWith(inl, "+"))
 			line = line + inl.substr(1);
 		else
@@ -305,7 +305,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				pstring model;
 				pstring pins ="CBE";
 				bool err;
-				long nval = plib::pstonum_ne<long>(tt[4], err);
+				auto nval = plib::pstonum_ne<long>(tt[4], err);
 				plib::unused_var(nval);
 
 				if ((err || plib::startsWith(tt[4], "N")) && tt.size() > 5)
@@ -316,7 +316,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				if (m.size() == 2)
 				{
 					if (m[1].length() != 4)
-						fprintf(stderr, "error with model desc %s\n", model.c_str());
+						plib::perrlogger("error with model desc {}\n", model);
 					pins = plib::left(m[1], 3);
 				}
 				add_device("QBJT_EB", tt[0], m[0]);
@@ -358,7 +358,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 					//add_term(tt[2], tt[0] + ".2");
 				}
 				else
-					fprintf(stderr, "Voltage Source %s not connected to GND\n", tt[0].c_str());
+					plib::perrlogger("Voltage Source {} not connected to GND\n", tt[0]);
 				break;
 			case 'I': // Input pin special notation
 				{

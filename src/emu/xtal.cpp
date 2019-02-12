@@ -91,6 +91,7 @@ const double XTAL::known_xtals[] = {
 	  3'686'400, /* 3.6864_MHz_XTAL        Baud rate clock for MC68681 and similar UARTs */
 	  3'840'000, /* 3.84_MHz_XTAL          Fairlight CMI Alphanumeric Keyboard */
 	  3'900'000, /* 3.9_MHz_XTAL           Resonator - Used on some Fidelity boards */
+	  3'932'160, /* 3.93216_MHz_XTAL       Apple Lisa COP421 (197-0016A) */
 	  4'000'000, /* 4_MHz_XTAL             - */
 	  4'028'000, /* 4.028_MHz_XTAL         Sony SMC-777 */
 	  4'032'000, /* 4.032_MHz_XTAL         GRiD Compass modem board */
@@ -147,6 +148,7 @@ const double XTAL::known_xtals[] = {
 	 10'137'600, /* 10.1376_MHz_XTAL       Wyse WY-100 */
 	 10'245'000, /* 10.245_MHz_XTAL        PES Speech box */
 	 10'380'000, /* 10.38_MHz_XTAL         Fairlight Q219 Lightpen/Graphics Card */
+	 10'480'000, /* 10.48_MHz_XTAL         System-80 (50 Hz) */
 	 10'500'000, /* 10.5_MHz_XTAL          Agat-7 */
 	 10'595'000, /* 10.595_MHz_XTAL        Mad Alien */
 	 10'644'500, /* 10.6445_MHz_XTAL       TRS-80 Model I */
@@ -259,6 +261,7 @@ const double XTAL::known_xtals[] = {
 	 20'000'000, /* 20_MHz_XTAL            - */
 	 20'160'000, /* 20.16_MHz_XTAL         Nintendo 8080 */
 	 20'275'200, /* 20.2752_MHz_XTAL       TRS-80 Model III */
+	 20'375'040, /* 20.37504_MHz_XTAL      Apple Lisa dot clock (197-0019A) */
 	 20'625'000, /* 20.625_MHz_XTAL        SM 7238 */
 	 20'790'000, /* 20.79_MHz_XTAL         Blockade-hardware Gremlin games */
 	 21'000'000, /* 21_MHz_XTAL            Lock-On pixel clock */
@@ -393,6 +396,7 @@ const double XTAL::known_xtals[] = {
 	 80'000'000, /* 80_MHz_XTAL            ARM710 */
 	 87'183'360, /* 87.18336_MHz_XTAL      AT&T 630 MTG */
 	 92'940'500, /* 92.9405_MHz_XTAL       Sun cgthree */
+	 99'522'000, /* 99.522_MHz_XTAL        Radius Two Page Display */
 	100'000'000, /* 100_MHz_XTAL           PSX-based Namco System 12, Vegas, Sony ZN1-2-based */
 	101'491'200, /* 101.4912_MHz_XTAL      PSX-based Namco System 10 */
 	108'108'000, /* 108.108_MHz_XTAL       HP 98550 high-res color card */

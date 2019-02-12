@@ -489,7 +489,7 @@ MACHINE_CONFIG_START(blackt96_state::blackt96)
 	audiocpu.read_c().set(FUNC(blackt96_state::blackt96_soundio_port_c_r));
 	audiocpu.write_c().set(FUNC(blackt96_state::blackt96_soundio_port_c_w));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_blackt96)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_blackt96);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

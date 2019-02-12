@@ -829,7 +829,7 @@ MACHINE_CONFIG_START(tvc_state::tvc)
 	m_cassette->set_interface("tvc_cass");
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", tvc_state, tvc64, "cas", 6)
+	MCFG_QUICKLOAD_ADD("quickload", tvc_state, tvc64, "cas", attotime::from_seconds(6))
 
 	/* Software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("tvc_cart");

@@ -292,7 +292,7 @@ MACHINE_CONFIG_START(patapata_state::patapata)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", patapata_state,  irq4_line_hold) // 1 + 4 valid? (4 main VBL)
 	TIMER(config, "scantimer").configure_scanline(FUNC(patapata_state::scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_patapata)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_patapata);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

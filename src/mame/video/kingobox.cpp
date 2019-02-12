@@ -57,21 +57,21 @@ void kingofb_state::palette_init_common( palette_device &palette, const uint8_t 
 		bit1 = (r_data >> 1) & 0x01;
 		bit2 = (r_data >> 2) & 0x01;
 		bit3 = (r_data >> 3) & 0x01;
-		r = combine_4_weights(rweights, bit0, bit1, bit2, bit3);
+		r = combine_weights(rweights, bit0, bit1, bit2, bit3);
 
 		/* green component */
 		bit0 = (g_data >> 0) & 0x01;
 		bit1 = (g_data >> 1) & 0x01;
 		bit2 = (g_data >> 2) & 0x01;
 		bit3 = (g_data >> 3) & 0x01;
-		g = combine_4_weights(gweights, bit0, bit1, bit2, bit3);
+		g = combine_weights(gweights, bit0, bit1, bit2, bit3);
 
 		/* blue component */
 		bit0 = (b_data >> 0) & 0x01;
 		bit1 = (b_data >> 1) & 0x01;
 		bit2 = (b_data >> 2) & 0x01;
 		bit3 = (b_data >> 3) & 0x01;
-		b = combine_4_weights(bweights, bit0, bit1, bit2, bit3);
+		b = combine_weights(bweights, bit0, bit1, bit2, bit3);
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}

@@ -386,7 +386,7 @@ MACHINE_CONFIG_START(z1013_state::z1013)
 	MCFG_SCREEN_UPDATE_DRIVER(z1013_state, screen_update_z1013)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_z1013)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_z1013);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
@@ -401,7 +401,7 @@ MACHINE_CONFIG_START(z1013_state::z1013)
 	CASSETTE(config, m_cass);
 	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 
-	MCFG_SNAPSHOT_ADD("snapshot", z1013_state, z1013, "z80", 0)
+	MCFG_SNAPSHOT_ADD("snapshot", z1013_state, z1013, "z80")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(z1013_state::z1013k76)

@@ -12,6 +12,32 @@
 SRC = ..
 VSBUILD = $(SRC)/buildVS
 DOC = $(SRC)/documentation
+TIDY_DB = ../compile_commands.json
+
+TIDY_FLAGSX = -checks=*,-google*,-hicpp*,-readability*,-fuchsia*,-cert-*,-android-*,
+TIDY_FLAGSX += -llvm-header-guard,-cppcoreguidelines-pro-type-reinterpret-cast,
+TIDY_FLAGSX += -cppcoreguidelines-pro-bounds-pointer-arithmetic,-cppcoreguidelines-owning-memory, 
+TIDY_FLAGSX += -modernize-use-default-member-init,-cppcoreguidelines-pro-bounds-constant-array-index,
+TIDY_FLAGSX += -modernize-pass-by-value,-cppcoreguidelines-pro-type-static-cast-downcast,
+#TIDY_FLAGSX += -cppcoreguidelines-special-member-functions,
+#TIDY_FLAGSX += -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
+TIDY_FLAGSX += -performance-unnecessary-value-param,-cppcoreguidelines-avoid-magic-numbers,
+TIDY_FLAGSX += -cppcoreguidelines-macro-usage,
+TIDY_FLAGSX += -cppcoreguidelines-non-private-member-variables-in-classes,-misc-non-private-member-variables-in-classes,
+#TIDY_FLAGSX += -cppcoreguidelines-avoid-c-arrays,-modernize-avoid-c-arrays,
+#TIDY_FLAGSX += -modernize-use-using,
+TIDY_FLAGSX += -performance-unnecessary-copy-initialization,
+TIDY_FLAGSX += -bugprone-macro-parentheses,-misc-macro-parentheses
+
+space := 
+space += 
+TIDY_FLAGS = $(subst $(space),,$(TIDY_FLAGSX))
+
+#TIDY_FLAGS = -checks=llvm-include-order,llvm-namespace-comment,modernize-use-override,modernize-use-using -fix
+#TIDY_FLAGS = -checks=llvm-include-order -fix
+#TIDY_FLAGS = -checks=llvm-namespace-comment -fix
+#TIDY_FLAGS = -checks=modernize-use-override -fix
+#TIDY_FLAGS = -checks=modernize-use-using -fix
 
 ifeq ($(subst Windows_NT,windows,$(OS)),windows)
 OBJ = obj/mingw
@@ -32,6 +58,7 @@ LD = @g++
 MD = @mkdir
 RM = @rm
 DOXYGEN = @doxygen
+CLANG_TIDY = clang-tidy-9
 
 TARGETS = nltool nlwav
 
@@ -154,6 +181,8 @@ DOCS = \
 	$(DOC)/test1-50r.svg \
 
 ALL_OBJS = $(OBJS) $(PMAIN) $(NLOBJ)/prg/nltool.o $(NLOBJ)/prg/nlwav.o
+
+ALL_TIDY_FILES = $(ALL_OBJS:.o=.json)
 SOURCES = $(patsubst $(OBJ)%, $(SRC)%, $(ALL_OBJS:.o=.cpp))
 ALLFILES = $(SOURCES) $(VSBUILDS) $(DOCS)
 
@@ -207,7 +236,7 @@ native:
 	$(MAKE) CEXTRAFLAGS="-march=native -Wall -Wpedantic -Wsign-compare -Wextra -Wno-unused-parameter"
 
 clang:
-	$(MAKE) CC=clang++ LD=clang++ CEXTRAFLAGS="-march=native -Wno-unused-parameter -Weverything -Werror -Wno-unreachable-code -Wno-padded -Wno-weak-vtables -Wno-missing-variable-declarations -Wconversion -Wno-c++98-compat -Wno-float-equal -Wno-global-constructors -Wno-c++98-compat-pedantic -Wno-format-nonliteral -Wweak-template-vtables -Wno-exit-time-destructors"
+	$(MAKE) CC=clang++-9 LD=clang++-9 CEXTRAFLAGS="-march=native -Wno-unused-parameter -Weverything -Werror -Wno-non-virtual-dtor -Wno-unreachable-code -Wno-padded -Wno-weak-vtables -Wno-missing-variable-declarations -Wconversion -Wno-c++98-compat -Wno-float-equal -Wno-global-constructors -Wno-c++98-compat-pedantic -Wno-format-nonliteral -Wweak-template-vtables -Wno-exit-time-destructors"
 
 clang-5:
 	$(MAKE) CC=clang++-5.0 LD=clang++-5.0 CEXTRAFLAGS="-march=native -Weverything -Werror -Wno-inconsistent-missing-destructor-override -Wno-unreachable-code -Wno-padded -Wno-weak-vtables -Wno-missing-variable-declarations -Wconversion -Wno-c++98-compat -Wno-float-equal -Wno-global-constructors -Wno-c++98-compat-pedantic -Wno-format-nonliteral -Wno-weak-template-vtables -Wno-exit-time-destructors"
@@ -215,6 +244,8 @@ clang-5:
 nvcc:
 	$(MAKE) CC=/usr/local/cuda-9.0/bin/nvcc LD=/usr/local/cuda-9.2/bin/nvcc \
 		CEXTRAFLAGS="-x cu  -DNVCCBUILD=1 --expt-extended-lambda --expt-relaxed-constexpr --default-stream per-thread --restrict"
+
+tidy_db: compile_commands_prefix $(ALL_TIDY_FILES) compile_commands_postfix
 
 #
 # -Wno-c++11-narrowing : seems a bit broken
@@ -257,6 +288,18 @@ ifeq ($(filter $(MAKECMDGOALS),$(MAKEFILE_TARGETS_WITHOUT_INCLUDE)),)
 endif
 
 #-------------------------------------------------
+# clang tidy
+#-------------------------------------------------
+tidy: tidy_db
+	@echo running tidy
+	@for i in $(SOURCES); do \
+		$(CLANG_TIDY) $$i $(TIDY_FLAGS) -header-filter=.*; \
+	done
+
+tidy_db: compile_commands_prefix $(ALL_TIDY_FILES) compile_commands_postfix
+
+
+#-------------------------------------------------
 # generic rules
 #-------------------------------------------------
 
@@ -277,3 +320,15 @@ $(OBJ)/%.a:
 	$(RM) $@
 	$(AR) $(ARFLAGS) $@ $^
 
+$(OBJ)/%.json: $(SRC)/%.cpp
+	@echo Building compile database entry for $< ...
+	@echo { \"directory\": \".\", >> $(TIDY_DB)
+	@echo   \"command\": \"$(CC) $(CDEFS) $(CFLAGS) -c $< -o dummy.o\", >> $(TIDY_DB)
+	@echo   \"file\": \"$(CURDIR)/$<\" } >> $(TIDY_DB)
+	@echo "," >> $(TIDY_DB)
+
+compile_commands_prefix:
+	@echo "[" > $(TIDY_DB)
+
+compile_commands_postfix:
+	@echo "]" >> $(TIDY_DB)

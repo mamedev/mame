@@ -8,9 +8,9 @@
 #ifndef PLIB_GMRES_H_
 #define PLIB_GMRES_H_
 
-#include "pconfig.h"
 #include "mat_cr.h"
 #include "parray.h"
+#include "pconfig.h"
 #include "vector_ops.h"
 
 #include <algorithm>
@@ -23,7 +23,7 @@ namespace plib
 	template <typename FT, int SIZE>
 	struct mat_precondition_ILU
 	{
-		typedef plib::matrix_compressed_rows_t<FT, SIZE> mat_type;
+		using mat_type = plib::matrix_compressed_rows_t<FT, SIZE>;
 
 		mat_precondition_ILU(std::size_t size, int ilu_scale = 4
 			, std::size_t bw = plib::matrix_compressed_rows_t<FT, SIZE>::FILL_INFINITY)
@@ -138,7 +138,7 @@ namespace plib
 	{
 	public:
 
-		typedef FT float_type;
+		using float_type = FT;
 		// FIXME: dirty hack to make this compile
 		static constexpr const std::size_t storage_N = plib::sizeabs<FT, SIZE>::ABS();
 
@@ -246,13 +246,17 @@ namespace plib
 				if (rho < rho_delta)
 					return itr_used + 1;
 
-				vec_set_scalar(RESTART+1, m_g, NL_FCONST(0.0));
+				/* FIXME: The "+" is necessary to avoid link issues
+				 * on some systems / compiler versions. Issue reported by
+				 * AJR, no details known yet.
+				 */
+				vec_set_scalar(RESTART+1, m_g, +constants<FT>::zero());
 				m_g[0] = rho;
 
 				//for (std::size_t i = 0; i < mr + 1; i++)
 				//	vec_set_scalar(mr, m_ht[i], NL_FCONST(0.0));
 
-				vec_mult_scalar(n, residual, NL_FCONST(1.0) / rho, m_v[0]);
+				vec_mult_scalar(n, residual, constants<FT>::one() / rho, m_v[0]);
 
 				for (std::size_t k = 0; k < RESTART; k++)
 				{
@@ -263,13 +267,13 @@ namespace plib
 
 					for (std::size_t j = 0; j <= k; j++)
 					{
-						m_ht[j][k] = vec_mult<float_type>(n, m_v[kp1], m_v[j]);
+						m_ht[j][k] = vec_mult<FT>(n, m_v[kp1], m_v[j]);
 						vec_add_mult_scalar(n, m_v[j], -m_ht[j][k], m_v[kp1]);
 					}
 					m_ht[kp1][k] = std::sqrt(vec_mult2<FT>(n, m_v[kp1]));
 
 					if (m_ht[kp1][k] != 0.0)
-						vec_scale(n, m_v[kp1], NL_FCONST(1.0) / m_ht[kp1][k]);
+						vec_scale(n, m_v[kp1], constants<FT>::one() / m_ht[kp1][k]);
 
 					for (std::size_t j = 0; j < k; j++)
 						givens_mult(m_c[j], m_s[j], m_ht[j][k], m_ht[j+1][k]);
@@ -327,14 +331,14 @@ namespace plib
 		plib::parray<float_type, SIZE> residual;
 		plib::parray<float_type, SIZE> Ax;
 
-		float_type m_c[RESTART + 1];  			/* mr + 1 */
-		float_type m_g[RESTART + 1];  			/* mr + 1 */
-		float_type m_ht[RESTART + 1][RESTART];  /* (mr + 1), mr */
-		float_type m_s[RESTART + 1];     			/* mr + 1 */
-		float_type m_y[RESTART + 1];       		/* mr + 1 */
+		std::array<float_type, RESTART + 1> m_c;  			/* mr + 1 */
+		std::array<float_type, RESTART + 1> m_g;  			/* mr + 1 */
+		std::array<std::array<float_type, RESTART>, RESTART + 1> m_ht;  /* (mr + 1), mr */
+		std::array<float_type, RESTART + 1> m_s;   			/* mr + 1 */
+		std::array<float_type, RESTART + 1> m_y;       		/* mr + 1 */
 
 		//plib::parray<float_type, SIZE> m_v[RESTART + 1];  /* mr + 1, n */
-		float_type m_v[RESTART + 1][storage_N];  /* mr + 1, n */
+		std::array<std::array<float_type, storage_N>, RESTART + 1> m_v;  /* mr + 1, n */
 
 		std::size_t m_size;
 

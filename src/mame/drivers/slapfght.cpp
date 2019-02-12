@@ -921,7 +921,7 @@ MACHINE_CONFIG_START(slapfght_state::perfrman)
 	m_screen->screen_vblank().append(FUNC(slapfght_state::vblank_irq));
 	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_perfrman)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_perfrman);
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 	MCFG_VIDEO_START_OVERRIDE(slapfght_state, perfrman)
 
@@ -973,7 +973,7 @@ MACHINE_CONFIG_START(slapfght_state::tigerh)
 	m_screen->screen_vblank().append(FUNC(slapfght_state::vblank_irq));
 	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_slapfght)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_slapfght);
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 	MCFG_VIDEO_START_OVERRIDE(slapfght_state, slapfight)
 
@@ -1046,7 +1046,7 @@ MACHINE_CONFIG_START(slapfght_state::slapfigh)
 	m_screen->screen_vblank().append(FUNC(slapfght_state::vblank_irq));
 	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_slapfght)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_slapfght);
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 	MCFG_VIDEO_START_OVERRIDE(slapfght_state, slapfight)
 

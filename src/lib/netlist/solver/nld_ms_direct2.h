@@ -21,12 +21,12 @@ namespace devices
 	{
 	public:
 
-		typedef FT float_type;
+		using float_type = FT;
 
-		matrix_solver_direct2_t(netlist_base_t &anetlist, const pstring &name, const solver_parameters_t *params)
+		matrix_solver_direct2_t(netlist_state_t &anetlist, const pstring &name, const solver_parameters_t *params)
 			: matrix_solver_direct_t<double, 2>(anetlist, name, params, 2)
 			{}
-		virtual unsigned vsolve_non_dynamic(const bool newton_raphson) override;
+		unsigned vsolve_non_dynamic(const bool newton_raphson) override;
 
 	};
 
@@ -45,9 +45,9 @@ namespace devices
 		const float_type c = this->A(1,0);
 		const float_type d = this->A(1,1);
 
-		float_type new_V[2];
-		new_V[1] = (a * this->RHS(1) - c * this->RHS(0)) / (a * d - b * c);
-		new_V[0] = (this->RHS(0) - b * new_V[1]) / a;
+		const float_type v1 = (a * this->RHS(1) - c * this->RHS(0)) / (a * d - b * c);
+		const float_type v0 = (this->RHS(0) - b * v1) / a;
+		std::array<float_type, 2> new_V = {v0, v1};
 
 		const float_type err = (newton_raphson ? this->delta(new_V) : 0.0);
 		this->store(new_V);

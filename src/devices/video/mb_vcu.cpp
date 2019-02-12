@@ -64,19 +64,19 @@ WRITE8_MEMBER( mb_vcu_device::mb_vcu_paletteram_w )
 	/* red component */
 	bit1 = (m_palram[offset] >> 7) & 0x01;
 	bit0 = (m_palram[offset] >> 6) & 0x01;
-	r = combine_2_weights(m_weights_r, bit0, bit1);
+	r = combine_weights(m_weights_r, bit0, bit1);
 
 	/* green component */
 	bit2 = (m_palram[offset] >> 5) & 0x01;
 	bit1 = (m_palram[offset] >> 4) & 0x01;
 	bit0 = (m_palram[offset] >> 3) & 0x01;
-	g = combine_3_weights(m_weights_g, bit0, bit1, bit2);
+	g = combine_weights(m_weights_g, bit0, bit1, bit2);
 
 	/* blue component */
 	bit2 = (m_palram[offset] >> 2) & 0x01;
 	bit1 = (m_palram[offset] >> 1) & 0x01;
 	bit0 = (m_palram[offset] >> 0) & 0x01;
-	b = combine_3_weights(m_weights_b, bit0, bit1, bit2);
+	b = combine_weights(m_weights_b, bit0, bit1, bit2);
 
 	m_palette->set_pen_color(offset, rgb_t(r, g, b));
 }
@@ -474,19 +474,19 @@ WRITE8_MEMBER( mb_vcu_device::background_color_w )
 	/* red component */
 	bit1 = (m_bk_color >> 7) & 0x01;
 	bit0 = (m_bk_color >> 6) & 0x01;
-	r = combine_2_weights(m_weights_r, bit0, bit1);
+	r = combine_weights(m_weights_r, bit0, bit1);
 
 	/* green component */
 	bit2 = (m_bk_color >> 5) & 0x01;
 	bit1 = (m_bk_color >> 4) & 0x01;
 	bit0 = (m_bk_color >> 3) & 0x01;
-	g = combine_3_weights(m_weights_g, bit0, bit1, bit2);
+	g = combine_weights(m_weights_g, bit0, bit1, bit2);
 
 	/* blue component */
 	bit2 = (m_bk_color >> 2) & 0x01;
 	bit1 = (m_bk_color >> 1) & 0x01;
 	bit0 = (m_bk_color >> 0) & 0x01;
-	b = combine_3_weights(m_weights_b, bit0, bit1, bit2);
+	b = combine_weights(m_weights_b, bit0, bit1, bit2);
 
 	m_palette->set_pen_color(0x100, rgb_t(r, g, b));
 }

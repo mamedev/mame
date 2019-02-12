@@ -386,21 +386,21 @@ void tx1_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t
 		if (m_step0 & ((1 << TX1_FRAC)))
 		{
 			update_engine(m_eng0);
-			m_pit0 = combine_4_weights(m_weights0, m_eng0[0], m_eng0[1], m_eng0[2], m_eng0[3]);
+			m_pit0 = combine_weights(m_weights0, m_eng0[0], m_eng0[1], m_eng0[2], m_eng0[3]);
 			m_step0 &= ((1 << TX1_FRAC) - 1);
 		}
 
 		if (m_step1 & ((1 << TX1_FRAC)))
 		{
 			update_engine(m_eng1);
-			m_pit1 = combine_3_weights(m_weights1, m_eng1[0], m_eng1[1], m_eng1[3]);
+			m_pit1 = combine_weights(m_weights1, m_eng1[0], m_eng1[1], m_eng1[3]);
 			m_step1 &= ((1 << TX1_FRAC) - 1);
 		}
 
 		if (m_step2 & ((1 << TX1_FRAC)))
 		{
 			update_engine(m_eng2);
-			m_pit2 = combine_3_weights(m_weights2, m_eng2[0], m_eng2[1], m_eng2[3]);
+			m_pit2 = combine_weights(m_weights2, m_eng2[0], m_eng2[1], m_eng2[3]);
 			m_step2 &= ((1 << TX1_FRAC) - 1);
 		}
 
@@ -659,7 +659,7 @@ void buggyboy_sound_device::device_start()
 							0, nullptr, nullptr, 0, 0 );
 
 	for (i = 0; i < 16; i++)
-		m_eng_voltages[i] = combine_4_weights(aweights, BIT(tmp[i], 0), BIT(tmp[i], 1), BIT(tmp[i], 2), BIT(tmp[i], 3));
+		m_eng_voltages[i] = combine_weights(aweights, BIT(tmp[i], 0), BIT(tmp[i], 1), BIT(tmp[i], 2), BIT(tmp[i], 3));
 
 	/* Allocate the stream */
 	m_stream = machine().sound().stream_alloc(*this, 0, 2, machine().sample_rate());

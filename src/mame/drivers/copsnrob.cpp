@@ -263,7 +263,7 @@ MACHINE_CONFIG_START(copsnrob_state::copsnrob)
 	m_screen->set_screen_update(FUNC(copsnrob_state::screen_update_copsnrob));
 	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_copsnrob)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_copsnrob);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	copsnrob_audio(config);

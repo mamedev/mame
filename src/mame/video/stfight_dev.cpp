@@ -119,7 +119,7 @@ MACHINE_CONFIG_START(stfight_video_device::device_add_mconfig)
 	MCFG_SCREEN_UPDATE_DRIVER(stfight_video_device, screen_update_stfight)
 	MCFG_SCREEN_PALETTE("^palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "^palette", gfx_stfight)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_stfight);
 MACHINE_CONFIG_END
 
 /*

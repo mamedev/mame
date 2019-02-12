@@ -428,7 +428,7 @@ MACHINE_CONFIG_START(silvmil_state::silvmil)
 	MCFG_SCREEN_PALETTE("palette")
 
 	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x300);
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_silvmil)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_silvmil);
 
 	DECO_SPRITE(config, m_sprgen, 0);
 	m_sprgen->set_gfx_region(0);

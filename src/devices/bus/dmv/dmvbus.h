@@ -59,14 +59,25 @@ class dmvcart_slot_device : public device_t,
 {
 public:
 	// construction/destruction
+	template <typename T>
+	dmvcart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
+		: dmvcart_slot_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
 	dmvcart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~dmvcart_slot_device();
 
-	template <class Object> devcb_base &set_prog_read_callback(Object &&cb) { return m_prog_read_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_prog_write_callback(Object &&cb) { return m_prog_write_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_int_callback(Object &&cb) { return m_out_int_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_irq_callback(Object &&cb) { return m_out_irq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_thold_callback(Object &&cb) { return m_out_thold_cb.set_callback(std::forward<Object>(cb)); }
+	auto prog_read() { return m_prog_read_cb.bind(); }
+	auto prog_write() { return m_prog_write_cb.bind(); }
+	auto out_int() { return m_out_int_cb.bind(); }
+	auto out_irq() { return m_out_irq_cb.bind(); }
+	auto out_thold() { return m_out_thold_cb.bind(); }
+	template <typename T> void set_memspace(T &&tag, int spacenum) { m_memspace.set_tag(std::forward<T>(tag), spacenum); }
+	template <typename T> void set_iospace(T &&tag, int spacenum) { m_iospace.set_tag(std::forward<T>(tag), spacenum); }
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -98,29 +109,15 @@ public:
 	devcb_write_line                m_out_int_cb;
 	devcb_write_line                m_out_irq_cb;
 	devcb_write_line                m_out_thold_cb;
+
+	required_address_space          m_memspace;
+	required_address_space          m_iospace;
+
 	device_dmvslot_interface*       m_cart;
 };
 
 
 // device type definition
 DECLARE_DEVICE_TYPE(DMVCART_SLOT, dmvcart_slot_device)
-
-
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_DMVCART_SLOT_PROGRAM_READWRITE_CB(_read_devcb, _write_devcb) \
-	downcast<dmvcart_slot_device &>(*device).set_prog_read_callback(DEVCB_##_read_devcb); \
-	downcast<dmvcart_slot_device &>(*device).set_prog_write_callback(DEVCB_##_write_devcb);
-
-#define MCFG_DMVCART_SLOT_OUT_INT_CB(_devcb) \
-	downcast<dmvcart_slot_device &>(*device).set_out_int_callback(DEVCB_##_devcb);
-
-#define MCFG_DMVCART_SLOT_OUT_IRQ_CB(_devcb) \
-	downcast<dmvcart_slot_device &>(*device).set_out_irq_callback(DEVCB_##_devcb);
-
-#define MCFG_DMVCART_SLOT_OUT_THOLD_CB(_devcb) \
-	downcast<dmvcart_slot_device &>(*device).set_out_thold_callback(DEVCB_##_devcb);
 
 #endif // MAME_BUS_DMV_DMVBUS_H

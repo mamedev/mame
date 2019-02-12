@@ -40,7 +40,23 @@ namespace netlist
 	{
 		m_cnt = 0;
 		m_off = netlist_time::from_double(m_offset());
+		m_feedback.m_delegate = NETLIB_DELEGATE(extclock, update);
+
+		//m_feedback.m_delegate .set(&NETLIB_NAME(extclock)::update, this);
 		//m_Q.initial(0);
+	}
+
+	NETLIB_HANDLER(extclock, clk2)
+	{
+		m_Q.push((m_cnt & 1) ^ 1, m_inc[m_cnt]);
+		if (++m_cnt >= m_size)
+			m_cnt = 0;
+	}
+
+	NETLIB_HANDLER(extclock, clk2_pow2)
+	{
+		m_Q.push((m_cnt & 1) ^ 1, m_inc[m_cnt]);
+		m_cnt = (++m_cnt) & (m_size-1);
 	}
 
 	NETLIB_UPDATE(extclock)
@@ -49,6 +65,13 @@ namespace netlist
 		m_off = netlist_time::zero();
 		if (++m_cnt >= m_size)
 			m_cnt = 0;
+
+		// continue with optimized clock handlers ....
+
+		if ((m_size & (m_size-1)) == 0) // power of 2?
+			m_feedback.m_delegate.set(&NETLIB_NAME(extclock)::clk2_pow2, this);
+		else
+			m_feedback.m_delegate.set(&NETLIB_NAME(extclock)::clk2, this);
 	}
 
 	// -----------------------------------------------------------------------------
@@ -69,19 +92,10 @@ namespace netlist
 			m_last_state = state;
 			const nl_double R = state ? m_RON() : m_ROFF();
 
-			// We only need to update the net first if this is a time stepping net
-			if ((0)) // m_R->m_P.net().as_analog().solver()->is_timestep())
-			{
-				m_R.update();
-				m_R.set_R(R);
-				m_R.m_P.schedule_solve_after(NLTIME_FROM_NS(1));
-			}
-			else
-			{
-				m_R.set_R(R);
-				m_R.m_P.schedule_solve_after(NLTIME_FROM_NS(1));
-				//m_R->update();
-			}
+			// FIXME: We only need to update the net first if this is a time stepping net
+			m_R.update();
+			m_R.set_R(R);
+			m_R.solve_later();
 		}
 	}
 

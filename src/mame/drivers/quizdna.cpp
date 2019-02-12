@@ -457,7 +457,7 @@ MACHINE_CONFIG_START(quizdna_state::quizdna)
 	MCFG_SCREEN_UPDATE_DRIVER(quizdna_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_quizdna)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_quizdna);
 	MCFG_PALETTE_ADD("palette", 2048)
 
 

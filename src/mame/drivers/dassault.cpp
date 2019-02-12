@@ -550,7 +550,7 @@ MACHINE_CONFIG_START(dassault_state::dassault)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248)  // same as robocop2(cninja.cpp)? verify this from real pcb.
 	MCFG_SCREEN_UPDATE_DRIVER(dassault_state, screen_update_dassault)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dassault)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_dassault);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 4096);
 
 	MCFG_DEVICE_ADD("spriteram1", BUFFERED_SPRITERAM16)

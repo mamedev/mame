@@ -565,7 +565,6 @@ void harddriv_state::driver_gsp_map(address_map &map)
 	map.unmap_value_high();
 	map(0x00000000, 0x0000200f).noprw();                 /* hit during self-test */
 	map(0x02000000, 0x0207ffff).rw(FUNC(harddriv_state::hdgsp_vram_2bpp_r), FUNC(harddriv_state::hdgsp_vram_1bpp_w));
-	map(0xc0000000, 0xc00001ff).rw("gsp", FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xf4000000, 0xf40000ff).rw(FUNC(harddriv_state::hdgsp_control_lo_r), FUNC(harddriv_state::hdgsp_control_lo_w)).share("gsp_control_lo");
 	map(0xf4800000, 0xf48000ff).rw(FUNC(harddriv_state::hdgsp_control_hi_r), FUNC(harddriv_state::hdgsp_control_hi_w)).share("gsp_control_hi");
 	map(0xf5000000, 0xf5000fff).rw(FUNC(harddriv_state::hdgsp_paletteram_lo_r), FUNC(harddriv_state::hdgsp_paletteram_lo_w)).share("gsp_palram_lo");
@@ -579,7 +578,6 @@ void harddriv_state::driver_msp_map(address_map &map)
 	map.unmap_value_high();
 	map(0x00000000, 0x000fffff).ram().share("msp_ram");
 	map(0x00700000, 0x007fffff).ram().share("msp_ram");
-	map(0xc0000000, 0xc00001ff).rw("msp", FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xfff00000, 0xffffffff).ram().share("msp_ram");
 }
 
@@ -616,7 +614,6 @@ void harddriv_state::multisync_gsp_map(address_map &map)
 	map.unmap_value_high();
 	map(0x00000000, 0x0000200f).noprw();                 /* hit during self-test */
 	map(0x02000000, 0x020fffff).rw(FUNC(harddriv_state::hdgsp_vram_2bpp_r), FUNC(harddriv_state::hdgsp_vram_2bpp_w));
-	map(0xc0000000, 0xc00001ff).r("gsp", FUNC(tms34010_device::io_register_r)).w(FUNC(harddriv_state::hdgsp_io_w));
 	map(0xf4000000, 0xf40000ff).rw(FUNC(harddriv_state::hdgsp_control_lo_r), FUNC(harddriv_state::hdgsp_control_lo_w)).share("gsp_control_lo");
 	map(0xf4800000, 0xf48000ff).rw(FUNC(harddriv_state::hdgsp_control_hi_r), FUNC(harddriv_state::hdgsp_control_hi_w)).share("gsp_control_hi");
 	map(0xf5000000, 0xf5000fff).rw(FUNC(harddriv_state::hdgsp_paletteram_lo_r), FUNC(harddriv_state::hdgsp_paletteram_lo_w)).share("gsp_palram_lo");
@@ -658,7 +655,6 @@ void harddriv_state::multisync2_gsp_map(address_map &map)
 	map.unmap_value_high();
 	map(0x00000000, 0x0000200f).noprw();                 /* hit during self-test */
 	map(0x02000000, 0x020fffff).rw(FUNC(harddriv_state::hdgsp_vram_2bpp_r), FUNC(harddriv_state::hdgsp_vram_2bpp_w));
-	map(0xc0000000, 0xc00001ff).r("gsp", FUNC(tms34010_device::io_register_r)).w(FUNC(harddriv_state::hdgsp_io_w));
 	map(0xf4000000, 0xf40000ff).rw(FUNC(harddriv_state::hdgsp_control_lo_r), FUNC(harddriv_state::hdgsp_control_lo_w)).share("gsp_control_lo");
 	map(0xf4800000, 0xf48000ff).rw(FUNC(harddriv_state::hdgsp_control_hi_r), FUNC(harddriv_state::hdgsp_control_hi_w)).share("gsp_control_hi");
 	map(0xf5000000, 0xf5000fff).rw(FUNC(harddriv_state::hdgsp_paletteram_lo_r), FUNC(harddriv_state::hdgsp_paletteram_lo_w)).share("gsp_palram_lo");
@@ -1540,6 +1536,7 @@ void harddriv_state::multisync_nomsp(machine_config &config)
 	m_gsp->set_addrmap(AS_PROGRAM, &harddriv_state::multisync_gsp_map);
 	m_gsp->set_pixel_clock(6000000);
 	m_gsp->set_pixels_per_clock(2);
+	m_gsp->ioreg_pre_write().set(FUNC(harddriv_state::hdgsp_io_w));
 	m_gsp->set_scanline_ind16_callback(FUNC(harddriv_state::scanline_multisync));
 
 	/* video hardware */

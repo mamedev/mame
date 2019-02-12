@@ -17,24 +17,27 @@
 #include "pconfig.h"
 
 #if !defined(__clang__) && !defined(_MSC_VER) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 6))
+#if !(__GNUC__ > 7 || (__GNUC__ == 7 && __GNUC_MINOR__ > 3))
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
 #endif
 
 namespace plib
 {
 	template<typename VT, typename T>
-	void vec_set_scalar (const std::size_t n, VT &v, const T & scalar)
+	void vec_set_scalar (const std::size_t n, VT &v, T && scalar)
 	{
+		const T s(std::forward<T>(scalar));
 		for ( std::size_t i = 0; i < n; i++ )
-			v[i] = scalar;
+			v[i] = s;
 	}
 
 	template<typename VT, typename VS>
 	void vec_set (const std::size_t n, VT &v, const VS & source)
 	{
 		for ( std::size_t i = 0; i < n; i++ )
-			v[i] = source [i];
+			v[i] = source[i];
 	}
 
 	template<typename T, typename V1, typename V2>
@@ -56,21 +59,23 @@ namespace plib
 	}
 
 	template<typename VV, typename T, typename VR>
-	void vec_mult_scalar (const std::size_t n, const VV & v, const T & scalar, VR & result)
+	void vec_mult_scalar (const std::size_t n, const VV & v, T && scalar, VR & result)
 	{
+		const T s(std::forward<T>(scalar));
 		for ( std::size_t i = 0; i < n; i++ )
-			result[i] = scalar * v[i];
+			result[i] = s * v[i];
 	}
 
 	template<typename VV, typename T, typename VR>
-	void vec_add_mult_scalar (const std::size_t n, const VV & v, const T scalar, VR & result)
+	void vec_add_mult_scalar (const std::size_t n, const VV & v, T && scalar, VR & result)
 	{
+		const T s(std::forward<T>(scalar));
 		for ( std::size_t i = 0; i < n; i++ )
-			result[i] = result[i] + scalar * v[i];
+			result[i] = result[i] + s * v[i];
 	}
 
 	template<typename T>
-	void vec_add_mult_scalar_p(const std::size_t & n, const T * RESTRICT v, const T scalar, T * RESTRICT result)
+	void vec_add_mult_scalar_p(const std::size_t & n, const T * v, T scalar, T * result)
 	{
 		for ( std::size_t i = 0; i < n; i++ )
 			result[i] += scalar * v[i];
@@ -91,10 +96,11 @@ namespace plib
 	}
 
 	template<typename V, typename T>
-	void vec_scale(const std::size_t n, V & v, const T scalar)
+	void vec_scale(const std::size_t n, V & v, T &&scalar)
 	{
+		const T s(std::forward<T>(scalar));
 		for ( std::size_t i = 0; i < n; i++ )
-			v[i] = scalar * v[i];
+			v[i] = s * v[i];
 	}
 
 	template<typename T, typename V>
@@ -106,10 +112,12 @@ namespace plib
 
 		return ret;
 	}
-}
+} // namespace plib
 
 #if !defined(__clang__) && !defined(_MSC_VER) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 6))
+#if !(__GNUC__ > 7 || (__GNUC__ == 7 && __GNUC_MINOR__ > 3))
 #pragma GCC diagnostic pop
+#endif
 #endif
 
 #endif /* PLIB_VECTOR_OPS_H_ */

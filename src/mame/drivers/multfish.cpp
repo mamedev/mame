@@ -657,6 +657,31 @@ void igrosoft_gamble_state::init_fcockt2ent()
 	m_xor_paltype = 2;
 	ent_decode(machine(), 0x33, 0xcc, 0xaa, 0x88, 0x14140);
 }
+void igrosoft_gamble_state::init_sweetlent()
+{
+	m_xor_palette = 0xeadb;
+	m_xor_paltype = 2;
+	ent_decode(machine(), 0x44, 0xdd, 0xdd, 0x22, 0x6c6c0);
+}
+void igrosoft_gamble_state::init_islandent()
+{
+	m_xor_palette = 0xdadb;
+	m_xor_paltype = 2;
+	ent_decode(machine(), 0x66, 0x22, 0x33, 0xcc, 0x64e40);
+}
+void igrosoft_gamble_state::init_pirateent()
+{
+	m_xor_palette = 0xbcdb;
+	m_xor_paltype = 2;
+	ent_decode(machine(), 0x99, 0x22, 0xee, 0x66, 0x54d40);
+}
+
+void igrosoft_gamble_state::init_rollfruit()
+{
+	// m_xor_palette = 0xbff7;
+	// needs gfx and palette descrambles
+	// encryption looks similar to Crazy Monkey 2
+}
 
 void igrosoft_gamble_state::init_crzmon2()
 {
@@ -952,8 +977,11 @@ void igrosoft_gamble_state::igrosoft_gamble_portmap(address_map &map)
 	map(0xb5, 0xb5).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Garage Ent banking
 	map(0xb6, 0xb6).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Resident Ent banking
 	map(0xb7, 0xb7).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Rock Climber Ent banking
+	map(0xb8, 0xb8).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Sweet Life Ent banking
 	map(0xb9, 0xb9).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Sweet Life 2 Ent banking
+	map(0xba, 0xba).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Island Ent banking
 	map(0xbb, 0xbb).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Island 2 Ent banking
+	map(0xbc, 0xbc).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Pirate Ent banking
 	map(0xbd, 0xbd).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Pirate 2 Ent banking
 	map(0xbe, 0xbe).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Keks Ent banking
 	map(0xbf, 0xbf).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Gnome Ent banking
@@ -963,7 +991,7 @@ void igrosoft_gamble_state::igrosoft_gamble_portmap(address_map &map)
 	map(0xcc, 0xcc).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Sweet Life 2 lottery banking
 	map(0xcd, 0xcd).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Island 2 lottery banking
 	map(0xce, 0xce).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Pirate 2 lottery banking
-	map(0xd0, 0xd0).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // rollfr_4 banking
+	map(0xd0, 0xd0).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // rollfr_4 rollfr_5 banking
 	map(0xe1, 0xe1).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Island 2 banking
 	map(0xe5, 0xe5).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Gnome banking
 	map(0xe8, 0xe8).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Sweet Life 2 banking
@@ -1043,7 +1071,7 @@ MACHINE_CONFIG_START(igrosoft_gamble_state::igrosoft_gamble)
 	MCFG_SCREEN_UPDATE_DRIVER(igrosoft_gamble_state, screen_update_igrosoft_gamble)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_igrosoft_gamble)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_igrosoft_gamble);
 	MCFG_PALETTE_ADD("palette", 0x1000)
 
 
@@ -1962,6 +1990,24 @@ ROM_START( sweetl_2 ) // 070412
 	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(b5deda35) SHA1(adc4dbbd73f9c4305abc594617218c32c31e0b8c) )
 ROM_END
 
+ROM_START( sweetl_3 ) // 090720 entertainment
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "sl_e_090720.rom", 0x00000, 0x40000, CRC(97b2f1dd) SHA1(1c14dbeb35fe58f65c2a438e7443d3c37a00d48f) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "sweetlife_ent.001", 0x000000, 0x80000, CRC(954cec46) SHA1(1068cfe2d68f68db7523c4cd9aad67f9eba5f370) )
+	ROM_LOAD( "sweetlife_ent.002", 0x100000, 0x80000, CRC(39a4dfef) SHA1(2344aa37b4943777fa8276fe7c9829e4e6f5fe21) )
+	ROM_LOAD( "sweetlife_ent.003", 0x200000, 0x80000, CRC(5448a09a) SHA1(6c72e42094eeb9cbbc9e67d029376a31c01762dd) )
+	ROM_LOAD( "sweetlife_ent.004", 0x300000, 0x80000, CRC(b7a5f2cb) SHA1(75f9c9f031fc5c2f249020bafbed23caa233efcc) )
+	ROM_LOAD( "sweetlife_ent.005", 0x080000, 0x80000, CRC(b2b45395) SHA1(65b4516da1698ac6e02accd7b07b4e3ad55bcd17) )
+	ROM_LOAD( "sweetlife_ent.006", 0x180000, 0x80000, CRC(b9b5a8fe) SHA1(a985c59813cfba99abd5817c3bd9d3fe2c0ae38e) )
+	ROM_LOAD( "sweetlife_ent.007", 0x280000, 0x80000, CRC(28b33238) SHA1(3668fb0eed46c9cccc155246e4832fc902be597d) )
+	ROM_LOAD( "sweetlife_ent.008", 0x380000, 0x80000, CRC(7aa675a7) SHA1(9027b889d5370d9daf1f880d43b1252a381aade8) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(fd66d54b) SHA1(769cc41e1f3c25518aaf4c4d9ab3fe0a3e525bd7) )
+ROM_END
+
 
 /*********************************************************
    Sweet Life 2
@@ -2222,6 +2268,23 @@ ROM_START( rollfr_4 ) // 080331, bank D0
 	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(8d69b6ab) SHA1(e4080e181acf1e84115efbd1de641256faf71c4d) )
 ROM_END
 
+ROM_START( rollfr_5 ) // 100924, bank D0
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "rf1-100924.rom",  0x00000, 0x40000, CRC(27b68b41) SHA1(a98ddd9da2ec1d3dd235e8a14efa96fda3d13c05) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "rollfruit1.001", 0x000000, 0x80000, CRC(1e4e6cc7) SHA1(3c301094a0879c42dc93678a5504d6a1a3ca6f37) )
+	ROM_LOAD( "rollfruit1.002", 0x100000, 0x80000, CRC(5b744953) SHA1(2d140e3f4022c635c2ca3926b203e66ea618229e) )
+	ROM_LOAD( "rollfruit1.003", 0x200000, 0x80000, CRC(f169bbd2) SHA1(35115ae187206d81d121e8fa57ec3edc8581ec2b) )
+	ROM_LOAD( "rollfruit1.004", 0x300000, 0x80000, CRC(d877bd31) SHA1(254e6360ec56a99b103289850e585bd5f21621be) )
+	ROM_LOAD( "rollfruit1.005", 0x080000, 0x80000, CRC(a9c750ca) SHA1(630db2a329a520eb66e29f4520f6af7e3ac4ae53) )
+	ROM_LOAD( "rollfruit1.006", 0x180000, 0x80000, CRC(adfffc87) SHA1(5dc23e8af750639c1615d766dcc7d0133d683118) )
+	ROM_LOAD( "rollfruit1.007", 0x280000, 0x80000, CRC(04489de4) SHA1(b73e83475b10651db294788cac8cd5ff636c27f3) )
+	ROM_LOAD( "rollfruit1.008", 0x380000, 0x80000, CRC(8462b4ae) SHA1(6abac36f9466ecdf6761600b46bee33ea6e36270) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(8d69b6ab) SHA1(e4080e181acf1e84115efbd1de641256faf71c4d) )
+ROM_END
 
 
 /*********************************************************
@@ -2262,6 +2325,24 @@ ROM_START( island_2 ) // 070409
 
 	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
 	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(e606d0df) SHA1(25a31534a660abfc344b824a7c45595f4f9cf430) )
+ROM_END
+
+ROM_START( island_3 ) // 090806 entertainment
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "is_e_090806.rom", 0x00000, 0x40000, CRC(144565f9) SHA1(8f5d335516a7ec8b7b3f64610258d589e7006d0a) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "island_ent.001", 0x000000, 0x80000, CRC(a5ba250e) SHA1(a7f61f770a1edd8802b1eaa1659a3dd857335c63) )
+	ROM_LOAD( "island_ent.002", 0x100000, 0x80000, CRC(453e9414) SHA1(fcdaf3895b5482445e9c73f2f27042276cd402ca) )
+	ROM_LOAD( "island_ent.003", 0x200000, 0x80000, CRC(29466f14) SHA1(a52d1189ec893bac81824af8e08050ef43a8e8e6) )
+	ROM_LOAD( "island_ent.004", 0x300000, 0x80000, CRC(a483d9b0) SHA1(6e1420ceca4975db3609ae8c3947a10a9869364b) )
+	ROM_LOAD( "island_ent.005", 0x080000, 0x80000, CRC(3f7ce2c0) SHA1(fc65c5d5f1f765684b118523c0b935b69e63c344) )
+	ROM_LOAD( "island_ent.006", 0x180000, 0x80000, CRC(17517ff8) SHA1(0b4945fb4c3c6e168d130629509eb26077a900d0) )
+	ROM_LOAD( "island_ent.007", 0x280000, 0x80000, CRC(99d3baac) SHA1(d45c54fa2ef54e0d472b16850fda012a0cdaf586) )
+	ROM_LOAD( "island_ent.008", 0x380000, 0x80000, CRC(ceecd2ef) SHA1(a2d810f690258519497303ac9bd37291661706a9) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(1be1d844) SHA1(7d02dd6414f08595178941440150c0d2b6ab45ad) )
 ROM_END
 
 
@@ -2418,6 +2499,24 @@ ROM_START( pirate_4 ) // 070412
 
 	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
 	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(85054f45) SHA1(4d9e86a23a5a521083b6faa3b1b3fd8e7b8c85b0) )
+ROM_END
+
+ROM_START( pirate_5 ) // 090803 entertainment
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "pr_e_090803.rom", 0x00000, 0x40000, CRC(72a1260a) SHA1(84678a9a90ca795e4938d82945ce3c4d15c49ed1) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "pirate_ent.001", 0x000000, 0x80000, CRC(9b93cd27) SHA1(81cce41463322aa90866f5ac56b82fb73e191319) )
+	ROM_LOAD( "pirate_ent.002", 0x100000, 0x80000, CRC(5776a0dc) SHA1(2d81b7333ee418329ec0f0bb96b30dfaaf32cbf9) )
+	ROM_LOAD( "pirate_ent.003", 0x200000, 0x80000, CRC(bf91b15f) SHA1(933cde175e343c6e5511b023096aec43d49b8963) )
+	ROM_LOAD( "pirate_ent.004", 0x300000, 0x80000, CRC(5ad7299d) SHA1(d1246cd2b87a0b0b9e81083f1724d17fb69f64e5) )
+	ROM_LOAD( "pirate_ent.005", 0x080000, 0x80000, CRC(7af72c13) SHA1(c264c8a6eb8e4a6b22e9be7bc8bde05901d91c56) )
+	ROM_LOAD( "pirate_ent.006", 0x180000, 0x80000, CRC(9ea25f75) SHA1(0c8715b3f3fc5b875f3fbd80c79ae55ca9a32cb1) )
+	ROM_LOAD( "pirate_ent.007", 0x280000, 0x80000, CRC(dffa307e) SHA1(da231a501fe2cc2149fff9cc3370aa1766292091) )
+	ROM_LOAD( "pirate_ent.008", 0x380000, 0x80000, CRC(c9504ac4) SHA1(c8dc072b75348da02f5d811a580ba103728c2dd4) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(348f7ba9) SHA1(0f48481bf1c790760c7ee27f0caed45a833d3365) )
 ROM_END
 
 
@@ -2595,6 +2694,42 @@ ROM_START( keks_5 ) // 090727 entertainment
 
 	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
 	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(480de536) SHA1(bddc8269222ff3837c2924caf8ffac803e4aed18) )
+ROM_END
+
+ROM_START( keks_6 ) // 110816
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "ks_m_110816.rom", 0x00000, 0x40000, CRC(9e244f5d) SHA1(49f8a2cdbef309b26bcc95bfc78e5b4a83c30583) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "keks_m.001", 0x000000, 0x80000, CRC(f4c20f66) SHA1(bed42ef01dfaa9d5d6ebb703e44ce7c11b8a373c) )
+	ROM_LOAD( "keks_m.002", 0x100000, 0x80000, CRC(b7ec3fac) SHA1(c3c62690487a6056415c46888bde8254efca836f) )
+	ROM_LOAD( "keks_m.003", 0x200000, 0x80000, CRC(5b6e8568) SHA1(003297e9cd080d91fe6751286eabd3a2f37ceb76) )
+	ROM_LOAD( "keks_m.004", 0x300000, 0x80000, CRC(9dc32736) SHA1(7b2091ae802431d1c959b859a58e0076d32abef0) )
+	ROM_LOAD( "keks_m.005", 0x080000, 0x80000, CRC(c5b09267) SHA1(7fd0988e63752fdbb31fde60b4726cfd63149622) )
+	ROM_LOAD( "keks_m.006", 0x180000, 0x80000, CRC(583da5fd) SHA1(645228db20cdaacb53bfc68731fd1a66a6a8cf56) )
+	ROM_LOAD( "keks_m.007", 0x280000, 0x80000, CRC(311c166a) SHA1(5f0ad8d755a6141964d818b98b3f156cbda8fb0d) )
+	ROM_LOAD( "keks_m.008", 0x380000, 0x80000, CRC(f69b0831) SHA1(75392349ef02a39cf883206938e2c615445065fc) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(99307739) SHA1(cfcf9cd9426a1a977c29f8825288064a561df28d) )
+ROM_END
+
+ROM_START( keks_7 ) // 110816
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "ks_110816.rom", 0x00000, 0x40000, CRC(be6b2642) SHA1(47ea80529da40d3260a84fa322dbaf5fb581dfbe) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "keks.001",   0x000000, 0x80000, CRC(fc399595) SHA1(037afd4a613cd58d4a28627b9e395d48c3fa866a) )
+	ROM_LOAD( "keks.002",   0x100000, 0x80000, CRC(474b36e7) SHA1(e1e62acd4a706b2654fc1249850806b612fc1419) )
+	ROM_LOAD( "keks.003",   0x200000, 0x80000, CRC(7f885e3d) SHA1(09bb4690e86ed4a29eef75ee4e5753ce40a164dd) )
+	ROM_LOAD( "keks.004",   0x300000, 0x80000, CRC(a0fc654b) SHA1(3354bdb7aa372816a766b0d36408543de7d3482f) )
+	ROM_LOAD( "keks_m.005", 0x080000, 0x80000, CRC(c5b09267) SHA1(7fd0988e63752fdbb31fde60b4726cfd63149622) )
+	ROM_LOAD( "keks_m.006", 0x180000, 0x80000, CRC(583da5fd) SHA1(645228db20cdaacb53bfc68731fd1a66a6a8cf56) )
+	ROM_LOAD( "keks_m.007", 0x280000, 0x80000, CRC(311c166a) SHA1(5f0ad8d755a6141964d818b98b3f156cbda8fb0d) )
+	ROM_LOAD( "keks_m.008", 0x380000, 0x80000, CRC(f69b0831) SHA1(75392349ef02a39cf883206938e2c615445065fc) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(1464bf6c) SHA1(5c1a984825dbd129e8295c3c6de6f82bfe5dc99e) )
 ROM_END
 
 
@@ -2912,7 +3047,7 @@ ROM_END
 
 ROM_START( crzmon2 ) // 100310
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "cm2_100310.rom", 0x00000, 0x40000, CRC(c7fa01c8) SHA1(180b5ce0e456abe9178255b8ea09afb953986310) )
+	ROM_LOAD( "cm2_m_100310.rom", 0x00000, 0x40000, CRC(c7fa01c8) SHA1(180b5ce0e456abe9178255b8ea09afb953986310) )
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "crazymonkey2.001", 0x000000, 0x80000, CRC(8c8edfa7) SHA1(a68d4ebc370a09d588b906e5c254bccac4f53001) )
@@ -2962,6 +3097,24 @@ ROM_START( crzmon2_3 ) // 100315 entertainment
 
 	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
 	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(84b6f391) SHA1(8ffc43ed73f614268c3d089b6f304e095ac21fe9) )
+ROM_END
+
+ROM_START( crzmon2_4 ) // 100618
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "cm2_100618.rom", 0x00000, 0x40000, CRC(3519e933) SHA1(1dad2fa2084e4c25f5d75cba3b631c7f3a1bdce6) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "crazymonkey2.001", 0x000000, 0x80000, CRC(8c8edfa7) SHA1(a68d4ebc370a09d588b906e5c254bccac4f53001) )
+	ROM_LOAD( "crazymonkey2.002", 0x100000, 0x80000, CRC(6379769f) SHA1(3b3ffc3ce4436168db41f7e643b58dca94f250da) )
+	ROM_LOAD( "crazymonkey2.003", 0x200000, 0x80000, CRC(b12f8080) SHA1(218fd38c3c2b2886084a1c694ce181f497c54085) )
+	ROM_LOAD( "crazymonkey2.004", 0x300000, 0x80000, CRC(1da8ed1a) SHA1(9681e631eaeb26d242daba4d1c362302de6ca1bd) )
+	ROM_LOAD( "crazymonkey2.005", 0x080000, 0x80000, CRC(82bfb2d3) SHA1(ca4c4a8b105fbcb3e120fc2d89866f3e66624e96) )
+	ROM_LOAD( "crazymonkey2.006", 0x180000, 0x80000, CRC(e3dfdf6a) SHA1(67608c09d8c92f3278ddc11c27ddba8f3146c2c6) )
+	ROM_LOAD( "crazymonkey2.007", 0x280000, 0x80000, CRC(329f4c3d) SHA1(27e1ed25b7e11c604abcf435f87b165201918def) )
+	ROM_LOAD( "crazymonkey2.008", 0x380000, 0x80000, CRC(f7c8e613) SHA1(6dec3f6f27773cd0af83ca914d8481c8f17f1d3f) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(9849f5ec) SHA1(9d9bd0a85fe0214e254cb2f5817696b39cffe4a4) )
 ROM_END
 
 
@@ -3024,6 +3177,7 @@ GAME( 2003, lhaunt_11,   lhaunt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_ga
 GAME( 2003, rollfr_2,    rollfr_4, rollfr,          rollfr,          igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Roll Fruit (040318)", MACHINE_SUPPORTS_SAVE ) /* World */
 GAME( 2003, rollfr_3,    rollfr_4, rollfr,          rollfr,          igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Roll Fruit (080327)", MACHINE_SUPPORTS_SAVE ) /* World */
 GAME( 2003, rollfr_4,    0,        rollfr,          rollfr,          igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Roll Fruit (080331)", MACHINE_SUPPORTS_SAVE ) /* World */
+GAME( 2003, rollfr_5,    rollfr_4, rollfr,          rollfr,          igrosoft_gamble_state, init_rollfruit,  ROT0, "Igrosoft", "Roll Fruit (100924)", MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE ) /* World */
 
 GAME( 2004, garage_4,    garage_5, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Garage (040219 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
 GAME( 2004, garage_5,    0,        igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Garage (050311 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
@@ -3037,8 +3191,9 @@ GAME( 2004, rclimb_4,    rclimb_3, igrosoft_gamble, igrosoft_gamble, igrosoft_ga
 GAME( 2004, rclimb_5,    rclimb_3, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Rock Climber (070621 Russia)", MACHINE_SUPPORTS_SAVE ) /* Russia */
 GAME( 2004, rclimb_7,    rclimb_3, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_rclimbent,  ROT0, "Igrosoft", "Rock Climber (090716 Entertainment)", MACHINE_SUPPORTS_SAVE ) /* Entertainment */
 
-GAME( 2004, sweetl,      0,        igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Sweet Life (041220 World)",  MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2004, sweetl_2,    sweetl,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Sweet Life (070412 Russia)", MACHINE_SUPPORTS_SAVE ) /* Russia */
+GAME( 2004, sweetl,      0,        igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Sweet Life (041220 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
+GAME( 2004, sweetl_2,    sweetl,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Sweet Life (070412 Russia)",        MACHINE_SUPPORTS_SAVE ) /* Russia */
+GAME( 2004, sweetl_3,    sweetl,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_sweetlent,  ROT0, "Igrosoft", "Sweet Life (090720 Entertainment)", MACHINE_SUPPORTS_SAVE ) /* Entertainment */
 
 GAME( 2004, resdnt,      resdnt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Resident (040415 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
 GAME( 2004, resdnt_2,    resdnt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Resident (040513 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
@@ -3047,12 +3202,14 @@ GAME( 2004, resdnt_6,    0,        igrosoft_gamble, igrosoft_gamble, igrosoft_ga
 GAME( 2004, resdnt_8,    resdnt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_resdntent,  ROT0, "Igrosoft", "Resident (100311 Entertainment)", MACHINE_SUPPORTS_SAVE ) /* Entertainment */
 GAME( 2004, resdnt_9,    resdnt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Resident (100316 Russia)",        MACHINE_SUPPORTS_SAVE ) /* Russia */
 
-GAME( 2005, island,      0,        igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Island (050713 World)",  MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2005, island_2,    island,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Island (070409 Russia)", MACHINE_SUPPORTS_SAVE ) /* Russia */
+GAME( 2005, island,      0,        igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Island (050713 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
+GAME( 2005, island_2,    island,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Island (070409 Russia)",        MACHINE_SUPPORTS_SAVE ) /* Russia */
+GAME( 2005, island_3,    island,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_islandent,  ROT0, "Igrosoft", "Island (090806 Entertainment)", MACHINE_SUPPORTS_SAVE ) /* Entertainment */
 
-GAME( 2005, pirate_2,    pirate_3, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Pirate (060210 World)",  MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2005, pirate_3,    0,        igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Pirate (060803 World)",  MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2005, pirate_4,    pirate_3, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Pirate (070412 Russia)", MACHINE_SUPPORTS_SAVE ) /* Russia */
+GAME( 2005, pirate_2,    pirate_3, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Pirate (060210 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
+GAME( 2005, pirate_3,    0,        igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Pirate (060803 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
+GAME( 2005, pirate_4,    pirate_3, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Pirate (070412 Russia)",        MACHINE_SUPPORTS_SAVE ) /* Russia */
+GAME( 2005, pirate_5,    pirate_3, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_pirateent,  ROT0, "Igrosoft", "Pirate (090803 Entertainment)", MACHINE_SUPPORTS_SAVE ) /* Entertainment */
 
 GAME( 2006, island2,     0,        igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Island 2 (060529 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
 GAME( 2006, island2_3,   island2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Island 2 (061218 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
@@ -3065,11 +3222,13 @@ GAME( 2006, pirate2_2,   pirate2,  igrosoft_gamble, igrosoft_gamble, igrosoft_ga
 GAME( 2006, pirate2_3,   pirate2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_pirate2l,   ROT0, "Igrosoft", "Pirate 2 (090528 Lottery)",       MACHINE_SUPPORTS_SAVE ) /* Lottery */
 GAME( 2006, pirate2_4,   pirate2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_pirate2ent, ROT0, "Igrosoft", "Pirate 2 (090730 Entertainment)", MACHINE_SUPPORTS_SAVE ) /* Entertainment */
 
-GAME( 2006, keks,        keks_2,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Keks (060328 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2006, keks_2,      0,        igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Keks (060403 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2006, keks_3,      keks_2,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Keks (070119 Russia)",        MACHINE_SUPPORTS_SAVE )  /* Russia */
-GAME( 2006, keks_4,      keks_2,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_keksl,      ROT0, "Igrosoft", "Keks (090604 Lottery)",       MACHINE_SUPPORTS_SAVE )  /* Lottery */
-GAME( 2006, keks_5,      keks_2,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_keksent,    ROT0, "Igrosoft", "Keks (090727 Entertainment)", MACHINE_SUPPORTS_SAVE )  /* Entertainment */
+GAME( 2006, keks,        keks_6,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Keks (060328 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
+GAME( 2006, keks_2,      keks_6,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Keks (060403 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
+GAME( 2006, keks_3,      keks_6,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Keks (070119 Russia)",        MACHINE_SUPPORTS_SAVE )  /* Russia */
+GAME( 2006, keks_4,      keks_6,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_keksl,      ROT0, "Igrosoft", "Keks (090604 Lottery)",       MACHINE_SUPPORTS_SAVE )  /* Lottery */
+GAME( 2006, keks_5,      keks_6,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_keksent,    ROT0, "Igrosoft", "Keks (090727 Entertainment)", MACHINE_SUPPORTS_SAVE )  /* Entertainment */
+GAME( 2006, keks_6,      0,        igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Keks (110816 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
+GAME( 2006, keks_7,      keks_6,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Keks (110816 Russia)",        MACHINE_SUPPORTS_SAVE ) /* Russia */
 
 GAME( 2007, gnome,       gnome_9,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Gnome (070906 Russia)",        MACHINE_SUPPORTS_SAVE ) /* Russia */
 GAME( 2007, gnome_2,     gnome_9,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Gnome (071115 Russia)",        MACHINE_SUPPORTS_SAVE ) /* Russia */
@@ -3094,6 +3253,7 @@ GAME( 2008, fcockt2_5,   fcockt2,  igrosoft_gamble, igrosoft_gamble, igrosoft_ga
 GAME( 2008, fcockt2_6,   fcockt2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_fcockt2l,   ROT0, "Igrosoft", "Fruit Cocktail 2 (090528 Lottery)",       MACHINE_SUPPORTS_SAVE ) /* Lottery */
 GAME( 2008, fcockt2_7,   fcockt2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_fcockt2ent, ROT0, "Igrosoft", "Fruit Cocktail 2 (090813 Entertainment)", MACHINE_SUPPORTS_SAVE ) /* Entertainment */
 
-GAME( 2010, crzmon2,     0,        igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_crzmon2,    ROT0, "Igrosoft", "Crazy Monkey 2 (100310)",                MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE ) /* World */ // xored and bitswapped palette and gfx roms
+GAME( 2010, crzmon2,     0,        igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_crzmon2,    ROT0, "Igrosoft", "Crazy Monkey 2 (100310 World)",          MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE ) /* World */ // xored and bitswapped palette and gfx roms
 GAME( 2010, crzmon2_2,   crzmon2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_crzmon2lot, ROT0, "Igrosoft", "Crazy Monkey 2 (100311 Lottery)",        MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE ) /* Lottery */
 GAME( 2010, crzmon2_3,   crzmon2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_crzmon2ent, ROT0, "Igrosoft", "Crazy Monkey 2 (100315 Entertainment)",  MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE ) /* Entertainment */
+GAME( 2010, crzmon2_4,   crzmon2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_crzmon2,    ROT0, "Igrosoft", "Crazy Monkey 2 (100618 Russia)",         MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE ) /* Russia */

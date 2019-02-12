@@ -296,7 +296,7 @@ MACHINE_CONFIG_START(v6809_state::v6809)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", sy6545_1_device, screen_update)
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_v6809)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_v6809);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -9,13 +9,15 @@
 ****************************************************************************/
 
 #include "netlist/plib/pmain.h"
-#include "netlist/nl_setup.h"
-#include "netlist/nl_parser.h"
 #include "netlist/devices/net_lib.h"
-#include "netlist/tools/nl_convert.h"
+#include "netlist/nl_parser.h"
+#include "netlist/nl_setup.h"
 #include "netlist/solver/nld_solver.h"
+#include "netlist/tools/nl_convert.h"
 
 #include <cstring>
+
+#define NLTOOL_VERSION	20190202
 
 class tool_app_t : public plib::app
 {
@@ -36,7 +38,7 @@ public:
 		opt_name(*this,     "n", "name",        "",         "the netlist in file specified by ""-f"" option to run; default is first one"),
 
 		opt_grp3(*this,     "Options for run command",      "These options are only used by the run command."),
-		opt_ttr (*this,     "t", "time_to_run", 1.0,        "time to run the emulation (seconds)"),
+		opt_ttr (*this,     "t", "time_to_run", 1.0,        "time to run the emulation (seconds)\n\n  abc def\n\n xyz"),
 		opt_logs(*this,     "l", "log" ,                    "define terminal to log. This option may be specified repeatedly."),
 		opt_inp(*this,      "i", "input",       "",         "input file to process (default is none)"),
 		opt_loadstate(*this,"",  "loadstate",   "",         "load state from file and continue from there"),
@@ -83,8 +85,8 @@ public:
 	plib::option_example opt_ex2;
 	plib::option_example opt_ex3;
 
-	int execute();
-	pstring usage();
+	int execute() override;
+	pstring usage() override;
 
 private:
 	void run();
@@ -98,6 +100,8 @@ private:
 	void create_docheader();
 
 	void listdevices();
+
+	std::vector<pstring> m_options;
 
 };
 
@@ -123,7 +127,7 @@ public:
 	{
 	}
 
-	virtual std::unique_ptr<plib::pistream> stream(const pstring &file) override;
+	std::unique_ptr<plib::pistream> stream(const pstring &file) override;
 
 private:
 	pstring m_folder;
@@ -168,10 +172,6 @@ public:
 	{
 	}
 
-	~netlist_tool_t()
-	{
-	}
-
 	void init()
 	{
 	}
@@ -186,7 +186,7 @@ public:
 		// read the netlist ...
 
 		for (auto & d : defines)
-			setup().register_define(d);
+			setup().add_define(d);
 
 		for (auto & r : roms)
 			setup().register_source(plib::make_unique_base<netlist::source_t, netlist_data_folder_t>(setup(), r));
@@ -277,14 +277,16 @@ void netlist_tool_callbacks_t::vlog(const plib::plog_level &l, const pstring &ls
 struct input_t
 {
 	input_t(const netlist::setup_t &setup, const pstring &line)
+	: m_value(0.0)
 	{
-		char buf[400];
+		std::array<char, 400> buf; // NOLINT(cppcoreguidelines-pro-type-member-init)
 		double t;
-		int e = sscanf(line.c_str(), "%lf,%[^,],%lf", &t, buf, &m_value);
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
+		int e = sscanf(line.c_str(), "%lf,%[^,],%lf", &t, buf.data(), &m_value);
 		if (e != 3)
 			throw netlist::nl_exception(plib::pfmt("error {1} scanning line {2}\n")(e)(line));
 		m_time = netlist::netlist_time::from_double(t);
-		m_param = setup.find_param(pstring(buf), true);
+		m_param = setup.find_param(pstring(buf.data()), true);
 	}
 
 	void setparam()
@@ -333,78 +335,82 @@ static std::vector<input_t> read_input(const netlist::setup_t &setup, pstring fn
 void tool_app_t::run()
 {
 	plib::chrono::timer<plib::chrono::system_ticks> t;
-	t.start();
-
+	std::vector<input_t> inps;
+	netlist::netlist_time ttr;
 	netlist_tool_t nt(*this, "netlist");
-	//plib::perftime_t<plib::exact_ticks> t;
 
-	nt.init();
+	{
+		auto t_guard(t.guard());
+		//plib::perftime_t<plib::exact_ticks> t;
 
-	if (!opt_verb())
-		nt.log().verbose.set_enabled(false);
-	if (opt_quiet())
-		nt.log().warning.set_enabled(false);
+		nt.init();
 
-	nt.read_netlist(opt_file(), opt_name(),
-			opt_logs(),
-			opt_defines(), opt_rfolders());
+		if (!opt_verb())
+			nt.log().verbose.set_enabled(false);
+		if (opt_quiet())
+			nt.log().warning.set_enabled(false);
 
-	std::vector<input_t> inps = read_input(nt.setup(), opt_inp());
+		nt.read_netlist(opt_file(), opt_name(),
+				opt_logs(),
+				m_options, opt_rfolders());
 
-	netlist::netlist_time ttr = netlist::netlist_time::from_double(opt_ttr());
-	t.stop();
+		inps = read_input(nt.setup(), opt_inp());
+		ttr = netlist::netlist_time::from_double(opt_ttr());
+	}
+
 
 	pout("startup time ==> {1:5.3f}\n", t.as_seconds() );
 
 	t.reset();
-	t.start();
 
-	// FIXME: error handling
-	if (opt_loadstate.was_specified())
-	{
-		plib::pifilestream strm(opt_loadstate());
-		plib::pbinary_reader reader(strm);
-		std::vector<char> loadstate;
-		reader.read(loadstate);
-		nt.load_state(loadstate);
-		pout("Loaded state, run will continue at {1:.6f}\n", nt.time().as_double());
-	}
-
-	unsigned pos = 0;
 	netlist::netlist_time nlt = nt.time();
-
-
-	while (pos < inps.size()
-			&& inps[pos].m_time < ttr
-			&& inps[pos].m_time >= nlt)
 	{
-		nt.process_queue(inps[pos].m_time - nlt);
-		inps[pos].setparam();
-		nlt = inps[pos].m_time;
-		pos++;
+		auto t_guard(t.guard());
+
+		// FIXME: error handling
+		if (opt_loadstate.was_specified())
+		{
+			plib::pifilestream strm(opt_loadstate());
+			plib::pbinary_reader reader(strm);
+			std::vector<char> loadstate;
+			reader.read(loadstate);
+			nt.load_state(loadstate);
+			pout("Loaded state, run will continue at {1:.6f}\n", nt.time().as_double());
+		}
+
+		unsigned pos = 0;
+
+
+		while (pos < inps.size()
+				&& inps[pos].m_time < ttr
+				&& inps[pos].m_time >= nlt)
+		{
+			nt.process_queue(inps[pos].m_time - nlt);
+			inps[pos].setparam();
+			nlt = inps[pos].m_time;
+			pos++;
+		}
+
+		pout("runnning ...\n");
+
+		if (ttr > nlt)
+			nt.process_queue(ttr - nlt);
+		else
+		{
+			pout("end time {1:.6f} less than saved time {2:.6f}\n",
+					ttr.as_double(), nlt.as_double());
+			ttr = nlt;
+		}
+
+		if (opt_savestate.was_specified())
+		{
+			auto savestate = nt.save_state();
+			plib::pofilestream strm(opt_savestate());
+			plib::pbinary_writer writer(strm);
+			writer.write(savestate);
+		}
+		nt.stop();
 	}
-
-	pout("runnning ...\n");
-
-	if (ttr > nlt)
-		nt.process_queue(ttr - nlt);
-	else
-	{
-		pout("end time {1:.6f} less than saved time {2:.6f}\n",
-				ttr.as_double(), nlt.as_double());
-		ttr = nlt;
-	}
-
-	if (opt_savestate.was_specified())
-	{
-		auto savestate = nt.save_state();
-		plib::pofilestream strm(opt_savestate());
-		plib::pbinary_writer writer(strm);
-		writer.write(savestate);
-	}
-	nt.stop();
-
-	t.stop();
 
 	double emutime = t.as_seconds();
 	pout("{1:f} seconds emulation took {2:f} real time ==> {3:5.2f}%\n",
@@ -423,7 +429,7 @@ void tool_app_t::static_compile()
 
 	nt.read_netlist(opt_file(), opt_name(),
 			opt_logs(),
-			opt_defines(), opt_rfolders());
+			m_options, opt_rfolders());
 
 	plib::putf8_writer w(&pout_strm);
 	std::map<pstring, pstring> mp;
@@ -470,12 +476,12 @@ void tool_app_t::cmac(const netlist::factory::element_t *e)
 {
 	auto v = plib::psplit(e->param_desc(), ",");
 	pstring vs;
-	for (auto s : v)
+	for (const auto &s : v)
 		vs += ", p" + plib::replace_all(plib::replace_all(s, "+", ""), ".", "_");
 	mac_out("#define " + e->name() + "(name" + vs + ")");
 	mac_out("\tNET_REGISTER_DEV(" + e->name() +", name)");
 
-	for (auto s : v)
+	for (const auto &s : v)
 	{
 		pstring r(plib::replace_all(plib::replace_all(s, "+", ""), ".", "_"));
 		if (plib::startsWith(s, "+"))
@@ -490,7 +496,7 @@ void tool_app_t::mac(const netlist::factory::element_t *e)
 {
 	auto v = plib::psplit(e->param_desc(), ",");
 	pstring vs;
-	for (auto s : v)
+	for (const auto &s : v)
 	{
 		vs += ", " + plib::replace_all(plib::replace_all(s, "+", ""), ".", "_");
 	}
@@ -498,7 +504,7 @@ void tool_app_t::mac(const netlist::factory::element_t *e)
 	if (v.size() > 0)
 	{
 		pout("/*\n");
-		for (auto s : v)
+		for (const auto &s : v)
 		{
 			pstring r(plib::replace_all(plib::replace_all(s, "+", ""), ".", "_"));
 			if (plib::startsWith(s, "+"))
@@ -543,9 +549,9 @@ void tool_app_t::create_header()
 		if (last_source != e->sourcefile())
 		{
 			last_source = e->sourcefile();
-			pout("{1}\n", plib::rpad(pstring("// "), pstring("-"), 72));
+			pout("{1}\n", plib::rpad(pstring("// "), pstring("-"), opt_linewidth()));
 			pout("{1}{2}\n", pstring("// Source: "), plib::replace_all(e->sourcefile(), "../", ""));
-			pout("{1}\n", plib::rpad(pstring("// "), pstring("-"), 72));
+			pout("{1}\n", plib::rpad(pstring("// "), pstring("-"), opt_linewidth()));
 		}
 		cmac(e.get());
 	}
@@ -637,7 +643,7 @@ void tool_app_t::listdevices()
 		std::vector<pstring> terms(nt.setup().get_terminals_for_device_name(d->name()));
 
 		out += "," + f->param_desc();
-		for (auto p : plib::psplit(f->param_desc(),",") )
+		for (const auto &p : plib::psplit(f->param_desc(),",") )
 		{
 			if (plib::startsWith(p, "+"))
 			{
@@ -645,15 +651,15 @@ void tool_app_t::listdevices()
 			}
 		}
 		out += ")";
-		printf("%s\n", out.c_str());
+		pout("{}\n", out);
 		if (terms.size() > 0)
 		{
 			pstring t = "";
 			for (auto & j : terms)
 				t += "," + j;
-			printf("\tTerminals: %s\n", t.substr(1).c_str());
+			pout("\tTerminals: {}\n", t.substr(1));
 		}
-		devs.push_back(std::move(d));
+		devs.emplace_back(std::move(d));
 	}
 }
 
@@ -697,7 +703,7 @@ int tool_app_t::execute()
 	if (opt_version())
 	{
 		pout(
-			"nltool (netlist) 0.1\n"
+			"nltool (netlist) " PSTRINGIFY(NLTOOL_VERSION) "\n"
 			"Copyright (C) 2019 Couriersud\n"
 			"License GPLv2+: GNU GPL version 2 or later <http://gnu.org/licenses/gpl.html>.\n"
 			"This is free software: you are free to change and redistribute it.\n"
@@ -705,6 +711,9 @@ int tool_app_t::execute()
 			"Written by Couriersud.\n");
 		return 0;
 	}
+
+	m_options = opt_defines();
+	m_options.emplace_back("NLTOOL_VERSION=" PSTRINGIFY(NLTOOL_VERSION));
 
 	try
 	{

@@ -225,7 +225,7 @@ MACHINE_CONFIG_START(microtan_state::microtan)
 	MCFG_SCREEN_UPDATE_DRIVER(microtan_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_microtan)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_microtan);
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
@@ -236,8 +236,8 @@ MACHINE_CONFIG_START(microtan_state::microtan)
 	AY8910(config, m_ay8910[1], 1000000).add_route(ALL_OUTPUTS, "speaker", 0.5);
 
 	/* snapshot/quickload */
-	MCFG_SNAPSHOT_ADD("snapshot", microtan_state, microtan, "m65", 0.5)
-	MCFG_QUICKLOAD_ADD("quickload", microtan_state, microtan, "hex", 0.5)
+	MCFG_SNAPSHOT_ADD("snapshot", microtan_state, microtan, "m65", attotime::from_msec(500))
+	MCFG_QUICKLOAD_ADD("quickload", microtan_state, microtan, "hex", attotime::from_msec(500))
 
 	/* cassette */
 	CASSETTE(config, m_cassette);

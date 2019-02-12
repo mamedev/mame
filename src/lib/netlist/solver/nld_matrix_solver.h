@@ -62,7 +62,7 @@ public:
 
 		const std::size_t term_count = this->count();
 		const std::size_t railstart = this->m_railstart;
-		const FT * const * RESTRICT other_cur_analog = this->connected_net_V();
+		const FT * const * other_cur_analog = this->connected_net_V();
 
 		for (std::size_t i = 0; i < railstart; i++)
 		{
@@ -114,7 +114,6 @@ public:
 	: analog_output_t(dev, aname)
 	, m_proxied_net(pnet)
 	{ }
-	virtual ~proxied_analog_output_t();
 
 	analog_net_t *proxied_net() const { return m_proxied_net;}
 private:
@@ -136,14 +135,12 @@ public:
 		PREFER_BAND_MATRIX
 	};
 
-	virtual ~matrix_solver_t() override;
-
 	void setup(analog_net_t::list_t &nets)
 	{
 		vsetup(nets);
 	}
 
-	void solve_base(netlist_time time);
+	void solve_base();
 
 	/* after every call to solve, update inputs must be called.
 	 * this can be done as well as a batch to ease parallel processing.
@@ -181,7 +178,7 @@ public:
 
 protected:
 
-	matrix_solver_t(netlist_base_t &anetlist, const pstring &name,
+	matrix_solver_t(netlist_state_t &anetlist, const pstring &name,
 			eSortType sort, const solver_parameters_t *params);
 
 	void sort_terms(eSortType sort);
@@ -196,10 +193,10 @@ protected:
 	/* virtual */ void  add_term(std::size_t net_idx, terminal_t *term);
 
 	template <typename T>
-	void store(const T & RESTRICT V);
+	void store(const T & V);
 
 	template <typename T>
-	auto delta(const T & RESTRICT V) -> typename std::decay<decltype(V[0])>::type;
+	auto delta(const T & V) -> typename std::decay<decltype(V[0])>::type;
 
 	template <typename T>
 	void build_LE_A(T &child);
@@ -239,7 +236,7 @@ private:
 };
 
 template <typename T>
-auto matrix_solver_t::delta(const T & RESTRICT V) -> typename std::decay<decltype(V[0])>::type
+auto matrix_solver_t::delta(const T & V) -> typename std::decay<decltype(V[0])>::type
 {
 	/* NOTE: Ideally we should also include currents (RHS) here. This would
 	 * need a reevaluation of the right hand side after voltages have been updated
@@ -254,7 +251,7 @@ auto matrix_solver_t::delta(const T & RESTRICT V) -> typename std::decay<decltyp
 }
 
 template <typename T>
-void matrix_solver_t::store(const T & RESTRICT V)
+void matrix_solver_t::store(const T & V)
 {
 	const std::size_t iN = this->m_terms.size();
 	for (std::size_t i = 0; i < iN; i++)
@@ -264,7 +261,7 @@ void matrix_solver_t::store(const T & RESTRICT V)
 template <typename T>
 void matrix_solver_t::build_LE_A(T &child)
 {
-	typedef typename T::float_type float_type;
+	using float_type = typename T::float_type;
 	static_assert(std::is_base_of<matrix_solver_t, T>::value, "T must derive from matrix_solver_t");
 
 	const std::size_t iN = child.size();
@@ -278,7 +275,7 @@ void matrix_solver_t::build_LE_A(T &child)
 
 		const std::size_t terms_count = terms->count();
 		const std::size_t railstart =  terms->m_railstart;
-		const float_type * const RESTRICT gt = terms->gt();
+		const float_type * const gt = terms->gt();
 
 		{
 			float_type akk  = 0.0;
@@ -288,8 +285,8 @@ void matrix_solver_t::build_LE_A(T &child)
 			Ak[k] = akk;
 		}
 
-		const float_type * const RESTRICT go = terms->go();
-		int * RESTRICT net_other = terms->connected_net_idx();
+		const float_type * const go = terms->go();
+		int * net_other = terms->connected_net_idx();
 
 		for (std::size_t i = 0; i < railstart; i++)
 			Ak[net_other[i]] -= go[i];
@@ -300,7 +297,7 @@ template <typename T>
 void matrix_solver_t::build_LE_RHS(T &child)
 {
 	static_assert(std::is_base_of<matrix_solver_t, T>::value, "T must derive from matrix_solver_t");
-	typedef typename T::float_type float_type;
+	using float_type = typename T::float_type;
 
 	const std::size_t iN = child.size();
 	for (std::size_t k = 0; k < iN; k++)
@@ -309,9 +306,9 @@ void matrix_solver_t::build_LE_RHS(T &child)
 		float_type rhsk_b = 0.0;
 
 		const std::size_t terms_count = m_terms[k]->count();
-		const float_type * const RESTRICT go = m_terms[k]->go();
-		const float_type * const RESTRICT Idr = m_terms[k]->Idr();
-		const float_type * const * RESTRICT other_cur_analog = m_terms[k]->connected_net_V();
+		const float_type * const go = m_terms[k]->go();
+		const float_type * const Idr = m_terms[k]->Idr();
+		const float_type * const * other_cur_analog = m_terms[k]->connected_net_V();
 
 		for (std::size_t i = 0; i < terms_count; i++)
 			rhsk_a = rhsk_a + Idr[i];

@@ -883,9 +883,10 @@ MACHINE_CONFIG_START(hx20_state::hx20)
 
 	RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr);
 	CASSETTE(config, m_cassette);
-	MCFG_EPSON_SIO_ADD("sio", "tf20")
-	MCFG_EPSON_SIO_RX(WRITELINE(*this, hx20_state, sio_rx_w))
-	MCFG_EPSON_SIO_PIN(WRITELINE(*this, hx20_state, sio_pin_w))
+
+	EPSON_SIO(config, m_sio, "tf20");
+	m_sio->rx_callback().set(FUNC(hx20_state::sio_rx_w));
+	m_sio->pin_callback().set(FUNC(hx20_state::sio_pin_w));
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("32K");

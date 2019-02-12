@@ -1529,9 +1529,9 @@ MACHINE_CONFIG_START(px4_state::px4)
 	TIMER(config, m_ext_cas_timer).configure_generic(FUNC(px4_state::ext_cassette_read));
 
 	// sio port
-	MCFG_EPSON_SIO_ADD("sio", nullptr)
-	MCFG_EPSON_SIO_RX(WRITELINE(*this, px4_state, sio_rx_w))
-	MCFG_EPSON_SIO_PIN(WRITELINE(*this, px4_state, sio_pin_w))
+	EPSON_SIO(config, m_sio, nullptr);
+	m_sio->rx_callback().set(FUNC(px4_state::sio_rx_w));
+	m_sio->pin_callback().set(FUNC(px4_state::sio_pin_w));
 
 	// rs232 port
 	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);

@@ -459,7 +459,7 @@ MACHINE_CONFIG_START(badlands_state::badlands)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_badlands)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_badlands);
 	palette_device &palette(PALETTE(config, "palette"));
 	palette.set_format(palette_device::IRGB_1555, 256);
 	palette.set_membits(8);

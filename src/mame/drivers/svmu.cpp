@@ -341,8 +341,8 @@ void svmu_state::svmu(machine_config &config)
 	/* devices */
 	ATMEL_29C010(config, m_flash);
 
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(svmu_state, svmu), this), "vms,bin", 0);
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
+	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(svmu_state, svmu), this), "vms,bin");
 	quickload.set_interface("svmu_quik");
 
 	/* Software lists */

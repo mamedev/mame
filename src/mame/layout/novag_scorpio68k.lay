@@ -277,7 +277,7 @@
 
 	<!-- lcd panel -->
 
-		<screen index="0">
+		<screen tag="screen">
 			<bounds x="48.25" y="93" width="24.25" height="2.5" />
 		</screen>
 

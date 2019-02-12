@@ -373,7 +373,7 @@ MACHINE_CONFIG_START(blueprnt_state::blueprnt)
 	MCFG_SCREEN_UPDATE_DRIVER(blueprnt_state, screen_update_blueprnt)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_blueprnt)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_blueprnt);
 	PALETTE(config, m_palette, FUNC(blueprnt_state::blueprnt_palette), 128*4+8);
 
 	/* sound hardware */

@@ -22,9 +22,10 @@
 class fidelbase_state : public driver_device
 {
 public:
-	fidelbase_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	fidelbase_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_irq_on(*this, "irq_on"),
 		m_inp_matrix(*this, "IN.%u", 0),
 		m_out_x(*this, "%u.%u", 0U, 0U),
 		m_out_a(*this, "%u.a", 0U),
@@ -40,6 +41,7 @@ public:
 
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
+	optional_device<timer_device> m_irq_on;
 	optional_ioport_array<11> m_inp_matrix; // max 11
 	output_finder<0x20, 0x20> m_out_x;
 	output_finder<0x20> m_out_a;
@@ -60,6 +62,9 @@ public:
 	u16 read_inputs(int columns);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(scc_cartridge);
 	virtual DECLARE_READ8_MEMBER(cartridge_r);
+
+	template<int L> TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(L, ASSERT_LINE); }
+	template<int L> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(L, CLEAR_LINE); }
 
 	// display common
 	int m_display_wait;             // led/lamp off-delay in milliseconds (default 33ms)

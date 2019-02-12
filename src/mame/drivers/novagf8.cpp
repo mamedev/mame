@@ -32,8 +32,8 @@ Delta-1:
 class novagf8_state : public novagbase_state
 {
 public:
-	novagf8_state(const machine_config &mconfig, device_type type, const char *tag)
-		: novagbase_state(mconfig, type, tag)
+	novagf8_state(const machine_config &mconfig, device_type type, const char *tag) :
+		novagbase_state(mconfig, type, tag)
 	{ }
 
 	void delta1(machine_config &config);

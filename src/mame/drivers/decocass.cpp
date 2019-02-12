@@ -978,7 +978,7 @@ MACHINE_CONFIG_START(decocass_state::decocass)
 	MCFG_SCREEN_UPDATE_DRIVER(decocass_state, screen_update_decocass)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_decocass)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_decocass);
 	PALETTE(config, m_palette, FUNC(decocass_state::decocass_palette), 64, 32);
 
 	/* sound hardware */

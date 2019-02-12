@@ -200,7 +200,7 @@ MACHINE_CONFIG_START(mustache_state::mustache)
 	MCFG_SCREEN_UPDATE_DRIVER(mustache_state, screen_update)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mustache)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mustache);
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 
 	/* sound hardware */

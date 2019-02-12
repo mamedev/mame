@@ -481,7 +481,7 @@ MACHINE_CONFIG_START(olibochu_state::olibochu)
 	MCFG_SCREEN_UPDATE_DRIVER(olibochu_state, screen_update_olibochu)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_olibochu)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_olibochu);
 	PALETTE(config, m_palette, FUNC(olibochu_state::olibochu_palette), 512);
 
 	/* sound hardware */

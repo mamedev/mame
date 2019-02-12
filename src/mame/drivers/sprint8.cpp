@@ -473,7 +473,7 @@ MACHINE_CONFIG_START(sprint8_state::sprint8)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sprint8_state, screen_vblank))
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_sprint8)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sprint8);
 	PALETTE(config, m_palette, FUNC(sprint8_state::sprint8_palette), 36, 18);
 
 	sprint8_audio(config);

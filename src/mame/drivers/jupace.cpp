@@ -772,7 +772,7 @@ MACHINE_CONFIG_START(ace_state::ace)
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ace)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_ace);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -790,7 +790,7 @@ MACHINE_CONFIG_START(ace_state::ace)
 	m_cassette->set_default_state(CASSETTE_STOPPED);
 	m_cassette->set_interface("jupace_cass");
 
-	MCFG_SNAPSHOT_ADD("snapshot", ace_state, ace, "ace", 1)
+	MCFG_SNAPSHOT_ADD("snapshot", ace_state, ace, "ace", attotime::from_seconds(1))
 
 	I8255A(config, m_ppi);
 	m_ppi->in_pb_callback().set(FUNC(ace_state::sby_r));

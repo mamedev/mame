@@ -8,24 +8,27 @@
 #ifndef PPARSER_H_
 #define PPARSER_H_
 
-#include "pstring.h"
+#include <cstdint>
+#include <unordered_map>
+
 #include "plists.h"
 #include "pstream.h"
+#include "pstring.h"
 
-#include <unordered_map>
-#include <cstdint>
 
 namespace plib {
-class ptokenizer : nocopyassignmove
+class ptokenizer
 {
 public:
 	template <typename T>
-	ptokenizer(T &&strm)
-	: m_strm(std::move(strm)), m_lineno(0), m_cur_line(""), m_px(m_cur_line.begin()), m_unget(0), m_string('"')
+	ptokenizer(T &&strm) // NOLINT(misc-forwarding-reference-overload, bugprone-forwarding-reference-overload)
+	: m_strm(std::forward<T>(strm)), m_lineno(0), m_cur_line(""), m_px(m_cur_line.begin()), m_unget(0), m_string('"')
 	{
 	}
 
-	virtual ~ptokenizer();
+	COPYASSIGNMOVE(ptokenizer, delete)
+
+	virtual ~ptokenizer() = default;
 
 	enum token_type
 	{
@@ -163,13 +166,15 @@ public:
 		pstring m_replace;
 	};
 
-	explicit ppreprocessor(std::vector<define_t> *defines = nullptr);
-	virtual ~ppreprocessor() override {}
+	using defines_map_type = std::unordered_map<pstring, define_t>;
+
+	explicit ppreprocessor(defines_map_type *defines = nullptr);
+	~ppreprocessor() override = default;
 
 	template <typename T>
 	ppreprocessor & process(T &&istrm)
 	{
-		putf8_reader reader(std::move(istrm));
+		putf8_reader reader(std::forward<T>(istrm));
 		pstring line;
 		while (reader.readline(line))
 		{
@@ -180,13 +185,17 @@ public:
 		return *this;
 	}
 
-	ppreprocessor(ppreprocessor &&s)
-	: m_defines(s.m_defines)
-	, m_expr_sep(s.m_expr_sep)
+	COPYASSIGN(ppreprocessor, delete)
+	ppreprocessor &operator=(ppreprocessor &&src) = delete;
+
+
+	ppreprocessor(ppreprocessor &&s) noexcept
+	: m_defines(std::move(s.m_defines))
+	, m_expr_sep(std::move(s.m_expr_sep))
 	, m_ifflag(s.m_ifflag)
 	, m_level(s.m_level)
 	, m_lineno(s.m_lineno)
-	, m_buf(s.m_buf)
+	, m_buf(std::move(s.m_buf))
 	, m_pos(s.m_pos)
 	, m_state(s.m_state)
 	, m_comment(s.m_comment)
@@ -195,9 +204,13 @@ public:
 
 protected:
 
-	virtual size_type vread(value_type *buf, const size_type n) override;
-	virtual void vseek(const pos_type n) override {  }
-	virtual pos_type vtell() const override { return m_pos; }
+	size_type vread(value_type *buf, const size_type n) override;
+	void vseek(const pos_type n) override
+	{
+		plib::unused_var(n);
+		/* FIXME throw exception - should be done in base unless implemented */
+	}
+	pos_type vtell() const override { return m_pos; }
 
 	int expr(const std::vector<pstring> &sexpr, std::size_t &start, int prio);
 	define_t *get_define(const pstring &name);
@@ -214,7 +227,7 @@ private:
 	pstring process_line(pstring line);
 	pstring process_comments(pstring line);
 
-	std::unordered_map<pstring, define_t> m_defines;
+	defines_map_type m_defines;
 	std::vector<pstring> m_expr_sep;
 
 	std::uint_least64_t m_ifflag; // 31 if levels
@@ -227,6 +240,6 @@ private:
 	bool m_comment;
 };
 
-}
+} // namespace plib
 
 #endif /* PPARSER_H_ */

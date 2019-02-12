@@ -482,7 +482,7 @@ MACHINE_CONFIG_START(nanos_state::nanos)
 	MCFG_SCREEN_VISIBLE_AREA(0,80*8-1,0,25*10-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nanos)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_nanos);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* devices */

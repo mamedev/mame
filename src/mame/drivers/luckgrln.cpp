@@ -882,7 +882,7 @@ MACHINE_CONFIG_START(luckgrln_state::luckgrln)
 	MCFG_SCREEN_UPDATE_DRIVER(luckgrln_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_luckgrln)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_luckgrln);
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
 	SPEAKER(config, "mono").front_center();

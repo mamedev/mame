@@ -22,12 +22,11 @@ DEFINE_DEVICE_TYPE(C64_DELA_EP64, c64_dela_ep64_cartridge_device, "c64_dela_ep64
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(c64_dela_ep64_cartridge_device::device_add_mconfig)
-	MCFG_GENERIC_SOCKET_ADD("eprom1", generic_linear_slot, nullptr)
-	MCFG_GENERIC_EXTENSIONS("rom,bin")
-	MCFG_GENERIC_SOCKET_ADD("eprom2", generic_linear_slot, nullptr)
-	MCFG_GENERIC_EXTENSIONS("rom,bin")
-MACHINE_CONFIG_END
+void c64_dela_ep64_cartridge_device::device_add_mconfig(machine_config &config)
+{
+	GENERIC_SOCKET(config, m_eprom1, generic_linear_slot, nullptr, "rom,bin");
+	GENERIC_SOCKET(config, m_eprom2, generic_linear_slot, nullptr, "rom,bin");
+}
 
 
 //**************************************************************************

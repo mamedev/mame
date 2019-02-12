@@ -114,13 +114,14 @@ UPD7220_DISPLAY_PIXELS_MEMBER( wangpc_tig_device::hgdc_display_pixels )
 //  MACHINE_CONFIG_START( wangpc_tig )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(wangpc_tig_device::device_add_mconfig)
-	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
-	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, wangpc_tig_device, screen_update)
-	MCFG_SCREEN_SIZE(80*10, 25*12)
-	MCFG_SCREEN_VISIBLE_AREA(0, 80*10-1, 0, 25*12-1)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_REFRESH_RATE(60)
+void wangpc_tig_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen.set_screen_update(FUNC(wangpc_tig_device::screen_update));
+	screen.set_size(80*10, 25*12);
+	screen.set_visarea(0, 80*10-1, 0, 25*12-1);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_refresh_hz(60);
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
 
@@ -133,7 +134,7 @@ MACHINE_CONFIG_START(wangpc_tig_device::device_add_mconfig)
 	m_hgdc1->set_addrmap(0, &wangpc_tig_device::upd7220_1_map);
 	m_hgdc1->set_display_pixels_callback(FUNC(wangpc_tig_device::hgdc_display_pixels), this);
 	m_hgdc1->set_screen(SCREEN_TAG);
-MACHINE_CONFIG_END
+}
 
 
 //**************************************************************************

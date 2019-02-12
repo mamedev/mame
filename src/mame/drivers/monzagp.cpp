@@ -140,15 +140,15 @@ void monzagp_state::monzagp_palette(palette_device &palette) const
 
 		// red component
 		bit0 = BIT(d, 2);
-		int const r = combine_3_weights(rweights, bit0, bit1, bit2);
+		int const r = combine_weights(rweights, bit0, bit1, bit2);
 
 		// green component
 		bit0 = BIT(d, 1);
-		int const g = combine_3_weights(gweights, bit0, bit1, bit2);
+		int const g = combine_weights(gweights, bit0, bit1, bit2);
 
 		// blue component
 		bit0 = BIT(d, 0);
-		int const b = combine_3_weights(bweights, bit0, bit1, bit2);
+		int const b = combine_weights(bweights, bit0, bit1, bit2);
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}

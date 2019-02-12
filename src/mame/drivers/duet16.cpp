@@ -426,7 +426,7 @@ MACHINE_CONFIG_START(duet16_state::duet16)
 	MCFG_PALETTE_ADD("palette", 8)
 	PALETTE(config, m_chrpal, palette_device::BRG_3BIT);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "chrpal", gfx_duet16)
+	GFXDECODE(config, "gfxdecode", m_chrpal, gfx_duet16);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

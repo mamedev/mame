@@ -22,13 +22,12 @@ DEFINE_DEVICE_TYPE(C64_16KB, c64_16kb_cartridge_device, "c64_16kb", "C64 16KB EP
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(c64_16kb_cartridge_device::device_add_mconfig)
-	MCFG_GENERIC_CARTSLOT_ADD("roml", generic_linear_slot, nullptr)
-	MCFG_GENERIC_EXTENSIONS("rom,bin,80")
+void c64_16kb_cartridge_device::device_add_mconfig(machine_config &config)
+{
+	GENERIC_CARTSLOT(config, m_low, generic_linear_slot, nullptr, "rom,bin,80");
 
-	MCFG_GENERIC_CARTSLOT_ADD("romh", generic_linear_slot, nullptr)
-	MCFG_GENERIC_EXTENSIONS("rom,bin,a0,e0")
-MACHINE_CONFIG_END
+	GENERIC_CARTSLOT(config, m_high, generic_linear_slot, nullptr, "rom,bin,a0,e0");
+}
 
 
 //-------------------------------------------------

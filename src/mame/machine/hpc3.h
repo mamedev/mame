@@ -11,7 +11,6 @@
 
 #pragma once
 
-#include "cpu/mips/mips3.h"
 #include "machine/ds1386.h"
 #include "machine/eepromser.h"
 #include "machine/hal2.h"
@@ -132,7 +131,7 @@ protected:
 		HPC3_DMACTRL_ENABLE = 0x10,
 	};
 
-	required_device<mips3_device> m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	required_device<wd33c93b_device> m_wd33c93;
 	optional_device<wd33c93b_device> m_wd33c93_2;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;

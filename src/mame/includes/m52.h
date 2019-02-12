@@ -73,7 +73,8 @@ private:
 	DECLARE_WRITE8_MEMBER(m52_flipscreen_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	void init_palette();
-	void init_sprite_palette(const int *resistances_3, const int *resistances_2, double *weights_r, double *weights_g, double *weights_b, double scale);
+	template <size_t N, size_t O, size_t P>
+	void init_sprite_palette(const int *resistances_3, const int *resistances_2, double (&weights_r)[N], double (&weights_g)[O], double (&weights_b)[P], double scale);
 	uint32_t screen_update_m52(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect, int xpos, int ypos, int image);
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, int initoffs);

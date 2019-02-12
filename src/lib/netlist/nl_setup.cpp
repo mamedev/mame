@@ -6,16 +6,16 @@
  */
 
 #include "plib/palloc.h"
-#include "plib/putil.h"
-#include "nl_base.h"
-#include "nl_setup.h"
-#include "nl_parser.h"
-#include "nl_factory.h"
-#include "devices/nlid_system.h"
-#include "devices/nlid_proxy.h"
 #include "analog/nld_twoterm.h"
-#include "solver/nld_solver.h"
+#include "devices/nlid_proxy.h"
+#include "devices/nlid_system.h"
 #include "devices/nlid_truthtable.h"
+#include "nl_base.h"
+#include "nl_factory.h"
+#include "nl_parser.h"
+#include "nl_setup.h"
+#include "plib/putil.h"
+#include "solver/nld_solver.h"
 
 #include <cmath>
 
@@ -27,20 +27,21 @@ namespace netlist
 {
 setup_t::setup_t(netlist_t &netlist)
 	: m_netlist(netlist)
+	, m_netlist_params(nullptr)
 	, m_factory(*this)
 	, m_proxy_cnt(0)
 	, m_frontier_cnt(0)
 {
 }
 
-setup_t::~setup_t()
+setup_t::~setup_t() noexcept
 {
+	// FIXME: can't see a need any longer
 	m_links.clear();
 	m_alias.clear();
 	m_params.clear();
 	m_terminals.clear();
 	m_param_values.clear();
-
 	m_sources.clear();
 }
 
@@ -87,17 +88,24 @@ void setup_t::register_dev(const pstring &classname, const pstring &name)
 	auto f = factory().factory_by_name(classname);
 	if (f == nullptr)
 		log().fatal(MF_1_CLASS_1_NOT_FOUND, classname);
-	/* make sure we parse macro library entries */
-	f->macro_actions(netlist(), name);
-	pstring key = build_fqn(name);
-	if (device_exists(key))
-		log().fatal(MF_1_DEVICE_ALREADY_EXISTS_1, name);
-	m_device_factory[key] = f;
+	else
+	{
+		/* make sure we parse macro library entries */
+		f->macro_actions(netlist(), name);
+		pstring key = build_fqn(name);
+		if (device_exists(key))
+			log().fatal(MF_1_DEVICE_ALREADY_EXISTS_1, name);
+		else
+			m_device_factory.insert(m_device_factory.end(), {key, f});
+	}
 }
 
 bool setup_t::device_exists(const pstring &name) const
 {
-	return (m_device_factory.find(name) != m_device_factory.end());
+	for (auto &d : m_device_factory)
+		if (d.first == name)
+			return true;
+	return false;
 }
 
 
@@ -397,7 +405,7 @@ devices::nld_base_proxy *setup_t::get_d_a_proxy(detail::core_terminal_t &out)
 {
 	nl_assert(out.is_logic());
 
-	logic_output_t &out_cast = static_cast<logic_output_t &>(out);
+	auto &out_cast = static_cast<logic_output_t &>(out);
 	devices::nld_base_proxy *proxy = out_cast.get_proxy();
 
 	if (proxy == nullptr)
@@ -423,7 +431,7 @@ devices::nld_base_proxy *setup_t::get_d_a_proxy(detail::core_terminal_t &out)
 
 		proxy = new_proxy.get();
 
-		m_netlist.nlstate().add_dev(std::move(new_proxy));
+		m_netlist.nlstate().add_dev(new_proxy->name(), std::move(new_proxy));
 	}
 	return proxy;
 }
@@ -432,7 +440,7 @@ devices::nld_base_proxy *setup_t::get_a_d_proxy(detail::core_terminal_t &inp)
 {
 	nl_assert(inp.is_logic());
 
-	logic_input_t &incast = dynamic_cast<logic_input_t &>(inp);
+	auto &incast = dynamic_cast<logic_input_t &>(inp);
 	devices::nld_base_proxy *proxy = incast.get_proxy();
 
 	if (proxy != nullptr)
@@ -462,7 +470,7 @@ devices::nld_base_proxy *setup_t::get_a_d_proxy(detail::core_terminal_t &inp)
 			inp.net().m_core_terms.clear(); // clear the list
 		}
 		ret->out().net().add_terminal(inp);
-		m_netlist.nlstate().add_dev(std::move(new_proxy));
+		m_netlist.nlstate().add_dev(new_proxy->name(), std::move(new_proxy));
 		return ret;
 	}
 }
@@ -597,7 +605,7 @@ static detail::core_terminal_t &resolve_proxy(detail::core_terminal_t &term)
 {
 	if (term.is_logic())
 	{
-		logic_t &out = dynamic_cast<logic_t &>(term);
+		auto &out = dynamic_cast<logic_t &>(term);
 		if (out.has_proxy())
 			return out.get_proxy()->proxy_term();
 	}
@@ -758,13 +766,13 @@ void setup_t::register_dynamic_log_devices()
 	{
 		log().debug("Creating dynamic logs ...");
 		std::vector<pstring> loglist(plib::psplit(env, ":"));
-		for (pstring ll : loglist)
+		for (const pstring &ll : loglist)
 		{
 			pstring name = "log_" + ll;
 			auto nc = factory().factory_by_name("LOG")->Create(netlist(), name);
 			register_link(name + ".I", ll);
 			log().debug("    dynamic link {1}: <{2}>\n",ll, name);
-			m_netlist.nlstate().add_dev(std::move(nc));
+			m_netlist.nlstate().add_dev(nc->name(), std::move(nc));
 		}
 	}
 }
@@ -857,7 +865,7 @@ nl_double setup_t::model_value(detail::model_map_t &map, const pstring &entity)
 {
 	pstring tmp = model_value_str(map, entity);
 
-	nl_double factor = NL_FCONST(1.0);
+	nl_double factor = plib::constants<nl_double>::one();
 	auto p = std::next(tmp.begin(), static_cast<pstring::difference_type>(tmp.size() - 1));
 	switch (*p)
 	{
@@ -873,7 +881,7 @@ nl_double setup_t::model_value(detail::model_map_t &map, const pstring &entity)
 			if (*p < '0' || *p > '9')
 			log().fatal(MF_1_UNKNOWN_NUMBER_FACTOR_IN_1, entity);
 	}
-	if (factor != NL_FCONST(1.0))
+	if (factor != plib::constants<nl_double>::one())
 		tmp = plib::left(tmp, tmp.size() - 1);
 	// FIXME: check for errors
 	return plib::pstonum<nl_double>(tmp) * factor;
@@ -882,18 +890,18 @@ nl_double setup_t::model_value(detail::model_map_t &map, const pstring &entity)
 class logic_family_std_proxy_t : public logic_family_desc_t
 {
 public:
-	logic_family_std_proxy_t() { }
-	virtual plib::owned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_base_t &anetlist,
+	logic_family_std_proxy_t() = default;
+	plib::owned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_state_t &anetlist,
 			const pstring &name, logic_output_t *proxied) const override;
-	virtual plib::owned_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_base_t &anetlist, const pstring &name, logic_input_t *proxied) const override;
+	plib::owned_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, logic_input_t *proxied) const override;
 };
 
-plib::owned_ptr<devices::nld_base_d_to_a_proxy> logic_family_std_proxy_t::create_d_a_proxy(netlist_base_t &anetlist,
+plib::owned_ptr<devices::nld_base_d_to_a_proxy> logic_family_std_proxy_t::create_d_a_proxy(netlist_state_t &anetlist,
 		const pstring &name, logic_output_t *proxied) const
 {
 	return plib::owned_ptr<devices::nld_base_d_to_a_proxy>::Create<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
 }
-plib::owned_ptr<devices::nld_base_a_to_d_proxy> logic_family_std_proxy_t::create_a_d_proxy(netlist_base_t &anetlist, const pstring &name, logic_input_t *proxied) const
+plib::owned_ptr<devices::nld_base_a_to_d_proxy> logic_family_std_proxy_t::create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, logic_input_t *proxied) const
 {
 	return plib::owned_ptr<devices::nld_base_a_to_d_proxy>::Create<devices::nld_a_to_d_proxy>(anetlist, name, proxied);
 }
@@ -970,13 +978,13 @@ std::unique_ptr<plib::pistream> setup_t::get_data_stream(const pstring &name)
 	return std::unique_ptr<plib::pistream>(nullptr);
 }
 
-void setup_t::register_define(const pstring &defstr)
+void setup_t::add_define(const pstring &defstr)
 {
 	auto p = defstr.find("=");
 	if (p != pstring::npos)
-		register_define(plib::left(defstr, p), defstr.substr(p+1));
+		add_define(plib::left(defstr, p), defstr.substr(p+1));
 	else
-		register_define(defstr, "1");
+		add_define(defstr, "1");
 }
 
 // ----------------------------------------------------------------------------------------
@@ -992,6 +1000,7 @@ void setup_t::delete_empty_nets()
 				if (x->num_cons() == 0)
 				{
 					x->state().log().verbose("Deleting net {1} ...", x->name());
+					x->state().run_state_manager().remove_save_items(x.get());
 					return true;
 				}
 				else
@@ -1016,15 +1025,14 @@ void setup_t::prepare_to_run()
 		if ( factory().is_class<devices::NETLIB_NAME(solver)>(e.second)
 				|| factory().is_class<devices::NETLIB_NAME(netlistparams)>(e.second))
 		{
-			auto dev = plib::owned_ptr<device_t>(e.second->Create(netlist(), e.first));
-			m_netlist.nlstate().add_dev(std::move(dev));
+			m_netlist.nlstate().add_dev(e.first, plib::owned_ptr<device_t>(e.second->Create(netlist(), e.first)));
 		}
 	}
 
 	log().debug("Searching for solver and parameters ...\n");
 
 	auto solver = netlist().get_single_device<devices::NETLIB_NAME(solver)>("solver");
-	netlist().m_params = netlist().get_single_device<devices::NETLIB_NAME(netlistparams)>("parameter");
+	m_netlist_params = netlist().get_single_device<devices::NETLIB_NAME(netlistparams)>("parameter");
 
 	/* create devices */
 
@@ -1035,28 +1043,43 @@ void setup_t::prepare_to_run()
 				&& !factory().is_class<devices::NETLIB_NAME(netlistparams)>(e.second))
 		{
 			auto dev = plib::owned_ptr<device_t>(e.second->Create(netlist(), e.first));
-			m_netlist.nlstate().add_dev(std::move(dev));
+			m_netlist.nlstate().add_dev(dev->name(), std::move(dev));
 		}
 	}
 
-	bool use_deactivate = (netlist().m_params->m_use_deactivate() ? true : false);
+	log().debug("Looking for unknown parameters ...\n");
+	for (auto &p : m_param_values)
+	{
+		auto f = m_params.find(p.first);
+		if (f == m_params.end())
+		{
+			if (plib::endsWith(p.first, pstring(".HINT_NO_DEACTIVATE")))
+			{
+				// FIXME: get device name, check for device
+			}
+			else
+				log().info("Unknown parameter: {}", p.first);
+		}
+	}
+
+	bool use_deactivate = m_netlist_params->m_use_deactivate() ? true : false;
 
 	for (auto &d : netlist().devices())
 	{
 		if (use_deactivate)
 		{
-			auto p = m_param_values.find(d->name() + ".HINT_NO_DEACTIVATE");
+			auto p = m_param_values.find(d.second->name() + ".HINT_NO_DEACTIVATE");
 			if (p != m_param_values.end())
 			{
 				//FIXME: check for errors ...
-				double v = plib::pstonum<double>(p->second);
+				auto v = plib::pstonum<double>(p->second);
 				if (std::abs(v - std::floor(v)) > 1e-6 )
 					log().fatal(MF_1_HND_VAL_NOT_SUPPORTED, p->second);
-				d->set_hint_deactivate(v == 0.0);
+				d.second->set_hint_deactivate(v == 0.0);
 			}
 		}
 		else
-			d->set_hint_deactivate(false);
+			d.second->set_hint_deactivate(false);
 	}
 
 	/* resolve inputs */
@@ -1112,16 +1135,19 @@ bool source_t::parse(const pstring &name)
 
 std::unique_ptr<plib::pistream> source_string_t::stream(const pstring &name)
 {
+	plib::unused_var(name);
 	return plib::make_unique_base<plib::pistream, plib::pimemstream>(m_str.c_str(), std::strlen(m_str.c_str()));
 }
 
 std::unique_ptr<plib::pistream> source_mem_t::stream(const pstring &name)
 {
+	plib::unused_var(name);
 	return plib::make_unique_base<plib::pistream, plib::pimemstream>(m_str.c_str(), std::strlen(m_str.c_str()));
 }
 
 std::unique_ptr<plib::pistream> source_file_t::stream(const pstring &name)
 {
+	plib::unused_var(name);
 	return plib::make_unique_base<plib::pistream, plib::pifilestream>(m_filename);
 }
 
@@ -1138,9 +1164,10 @@ bool source_proc_t::parse(const pstring &name)
 
 std::unique_ptr<plib::pistream> source_proc_t::stream(const pstring &name)
 {
+	plib::unused_var(name);
 	std::unique_ptr<plib::pistream> p(nullptr);
 	return p;
 }
 
-}
+} // namespace netlist
 

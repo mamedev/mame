@@ -894,7 +894,7 @@ MACHINE_CONFIG_START(rohga_state::rohga)
 	MCFG_SCREEN_UPDATE_DRIVER(rohga_state, screen_update_rohga)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rohga)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_rohga);
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	DECOCOMN(config, m_decocomn, 0);
@@ -986,7 +986,7 @@ MACHINE_CONFIG_START(rohga_state::wizdfire)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(rohga_state, screen_update_wizdfire)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wizdfire)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_wizdfire);
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	DECOCOMN(config, m_decocomn, 0);
@@ -1083,7 +1083,7 @@ MACHINE_CONFIG_START(rohga_state::nitrobal)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(rohga_state, screen_update_nitrobal)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wizdfire)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_wizdfire);
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	DECOCOMN(config, m_decocomn, 0);
@@ -1181,7 +1181,7 @@ MACHINE_CONFIG_START(rohga_state::schmeisr)
 	MCFG_SCREEN_UPDATE_DRIVER(rohga_state, screen_update_rohga)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_schmeisr)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_schmeisr);
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	DECOCOMN(config, m_decocomn, 0);

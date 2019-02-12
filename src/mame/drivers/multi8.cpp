@@ -581,7 +581,7 @@ MACHINE_CONFIG_START(multi8_state::multi8)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
 	PALETTE(config, m_palette, palette_device::BRG_3BIT);
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_multi8)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_multi8);
 
 	/* Audio */
 	SPEAKER(config, "mono").front_center();

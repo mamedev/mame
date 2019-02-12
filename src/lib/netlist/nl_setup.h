@@ -8,20 +8,20 @@
 #ifndef NLSETUP_H_
 #define NLSETUP_H_
 
-#include "plib/pstring.h"
-#include "plib/putil.h"
-#include "plib/pstream.h"
 #include "plib/pparser.h"
 #include "plib/pstate.h"
+#include "plib/pstream.h"
+#include "plib/pstring.h"
+#include "plib/putil.h"
 
-#include "nl_factory.h"
-#include "nl_config.h"
 #include "netlist_types.h"
+#include "nl_config.h"
 #include "nl_errstr.h"
+#include "nl_factory.h"
 
+#include <memory>
 #include <stack>
 #include <vector>
-#include <memory>
 
 //============================================================
 //  MACROS / inline netlist definitions
@@ -100,10 +100,10 @@ void NETLIST_NAME(name)(netlist::setup_t &setup)                               \
 		desc.family = "";
 
 #define TT_HEAD(x) \
-		desc.desc.push_back(x);
+		desc.desc.emplace_back(x);
 
 #define TT_LINE(x) \
-		desc.desc.push_back(x);
+		desc.desc.emplace_back(x);
 
 #define TT_FAMILY(x) \
 		desc.family = x;
@@ -119,11 +119,12 @@ namespace netlist
 	namespace detail {
 		class core_terminal_t;
 		class net_t;
-	}
+	} // namespace detail
 
 	namespace devices {
 		class nld_base_proxy;
-	}
+		class nld_netlistparams;
+	} // namespace devices
 
 	class core_device_t;
 	class param_t;
@@ -139,6 +140,7 @@ namespace netlist
 
 	struct tt_desc
 	{
+		tt_desc() : ni(0), no(0) { }
 		pstring name;
 		pstring classname;
 		unsigned long ni;
@@ -171,6 +173,9 @@ namespace netlist
 	class source_t
 	{
 	public:
+
+		friend class setup_t;
+
 		enum type_t
 		{
 			SOURCE,
@@ -183,13 +188,17 @@ namespace netlist
 		: m_setup(setup), m_type(type)
 		{}
 
-		virtual ~source_t() { }
+		COPYASSIGNMOVE(source_t, delete)
+
+		virtual ~source_t() noexcept = default;
 
 		virtual bool parse(const pstring &name);
-		virtual std::unique_ptr<plib::pistream> stream(const pstring &name) = 0;
-
 		setup_t &setup() { return m_setup; }
 		type_t type() const { return m_type; }
+
+	protected:
+		virtual std::unique_ptr<plib::pistream> stream(const pstring &name) = 0;
+
 	private:
 		setup_t &m_setup;
 		const type_t m_type;
@@ -200,15 +209,16 @@ namespace netlist
 	// ----------------------------------------------------------------------------------------
 
 
-	class setup_t : plib::nocopyassignmove
+	class setup_t
 	{
 	public:
 
 		using link_t = std::pair<pstring, pstring>;
 
 		explicit setup_t(netlist_t &netlist);
-		~setup_t();
+		~setup_t() noexcept;
 
+		COPYASSIGNMOVE(setup_t, delete)
 
 		netlist_state_t &netlist();
 		const netlist_state_t &netlist() const;
@@ -274,8 +284,12 @@ namespace netlist
 			m_sources.push_back(std::move(src));
 		}
 
-		void register_define(pstring def, pstring val) { m_defines.push_back(plib::ppreprocessor::define_t(def, val)); }
-		void register_define(const pstring &defstr);
+		void add_define(pstring def, pstring val)
+		{
+			m_defines.insert({ def, plib::ppreprocessor::define_t(def, val)});
+		}
+
+		void add_define(const pstring &defstr);
 
 		factory::list_t &factory() { return m_factory; }
 		const factory::list_t &factory() const { return m_factory; }
@@ -329,22 +343,25 @@ namespace netlist
 		devices::nld_base_proxy *get_d_a_proxy(detail::core_terminal_t &out);
 		devices::nld_base_proxy *get_a_d_proxy(detail::core_terminal_t &inp);
 
-		//std::vector<std::pair<pstring, factory::element_t *>> m_device_factory;
-		std::unordered_map<pstring, factory::element_t *> m_device_factory;
+		/* need to preserve order of device creation ... */
+		std::vector<std::pair<pstring, factory::element_t *>> m_device_factory;
+		//std::unordered_map<pstring, factory::element_t *> m_device_factory;
 
 		std::unordered_map<pstring, pstring> m_alias;
 		std::unordered_map<pstring, pstring> m_param_values;
 		std::unordered_map<pstring, detail::core_terminal_t *> m_terminals;
 
 		netlist_t                                   &m_netlist;
+		devices::nld_netlistparams			 		*m_netlist_params;
 		std::unordered_map<pstring, param_ref_t>    m_params;
+
 		std::vector<link_t>                         m_links;
 		factory::list_t                             m_factory;
 		std::unordered_map<pstring, pstring>        m_models;
 
 		std::stack<pstring>                         m_namespace_stack;
 		source_t::list_t                            m_sources;
-		std::vector<plib::ppreprocessor::define_t>  m_defines;
+		plib::ppreprocessor::defines_map_type	    m_defines;
 
 		unsigned m_proxy_cnt;
 		unsigned m_frontier_cnt;
@@ -363,7 +380,8 @@ namespace netlist
 		{
 		}
 
-		virtual std::unique_ptr<plib::pistream> stream(const pstring &name) override;
+	protected:
+		std::unique_ptr<plib::pistream> stream(const pstring &name) override;
 
 	private:
 		pstring m_str;
@@ -378,7 +396,8 @@ namespace netlist
 		{
 		}
 
-		virtual std::unique_ptr<plib::pistream> stream(const pstring &name) override;
+	protected:
+		std::unique_ptr<plib::pistream> stream(const pstring &name) override;
 
 	private:
 		pstring m_filename;
@@ -392,7 +411,8 @@ namespace netlist
 		{
 		}
 
-		virtual std::unique_ptr<plib::pistream> stream(const pstring &name) override;
+	protected:
+		std::unique_ptr<plib::pistream> stream(const pstring &name) override;
 
 	private:
 		pstring m_str;
@@ -408,8 +428,10 @@ namespace netlist
 		{
 		}
 
-		virtual bool parse(const pstring &name) override;
-		virtual std::unique_ptr<plib::pistream> stream(const pstring &name) override;
+		bool parse(const pstring &name) override;
+
+	protected:
+		std::unique_ptr<plib::pistream> stream(const pstring &name) override;
 
 	private:
 		void (*m_setup_func)(setup_t &);
@@ -420,7 +442,7 @@ namespace netlist
 	// inline implementations
 	// -----------------------------------------------------------------------------
 
-}
+} // namespace netlist
 
 
 #endif /* NLSETUP_H_ */

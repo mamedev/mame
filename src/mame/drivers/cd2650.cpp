@@ -314,8 +314,8 @@ void cd2650_state::cd2650(machine_config &config)
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* quickload */
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(cd2650_state, cd2650), this), "pgm", 1);
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
+	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(cd2650_state, cd2650), this), "pgm", attotime::from_seconds(1));
 
 	/* Sound */
 	SPEAKER(config, "mono").front_center();

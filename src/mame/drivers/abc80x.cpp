@@ -1113,7 +1113,7 @@ MACHINE_CONFIG_START(abc800_state::common)
 	SOFTWARE_LIST(config, "hdd_list").set_original("abc800_hdd");
 
 	// quickload
-	MCFG_QUICKLOAD_ADD("quickload", abc800_state, bac, "bac", 2)
+	MCFG_QUICKLOAD_ADD("quickload", abc800_state, bac, "bac", attotime::from_seconds(2))
 MACHINE_CONFIG_END
 
 

@@ -544,7 +544,7 @@ MACHINE_CONFIG_START(intv_state::intvkbd)
 	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_intvkbd)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_intvkbd);
 
 	/* crt controller */
 	TMS9927(config, m_crtc, XTAL(7'159'090)/8);

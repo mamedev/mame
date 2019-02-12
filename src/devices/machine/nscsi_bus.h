@@ -308,6 +308,7 @@ protected:
 
 	virtual void scsi_message();
 	virtual void scsi_command();
+	virtual bool scsi_command_done(uint8_t command, uint8_t length);
 
 	void scsi_unknown_command();
 	void scsi_status_complete(uint8_t st);
@@ -448,7 +449,6 @@ private:
 	void target_recv_byte();
 	void target_send_byte(uint8_t val);
 	void target_send_buffer_byte();
-	bool command_done();
 };
 
 

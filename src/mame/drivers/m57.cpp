@@ -247,7 +247,7 @@ MACHINE_CONFIG_START(m57_state::m57)
 	MCFG_SCREEN_UPDATE_DRIVER(m57_state, screen_update_m57)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_m57)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_m57);
 	PALETTE(config, m_palette, FUNC(m57_state::m57_palette), 32*8+32*8, 256+16);
 
 	/* sound hardware */

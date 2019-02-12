@@ -455,7 +455,7 @@ MACHINE_CONFIG_START(gundealr_state::gundealr)
 	MCFG_SCREEN_UPDATE_DRIVER(gundealr_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gundealr)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gundealr);
 	MCFG_PALETTE_ADD("palette", 512)
 
 	/* sound hardware */

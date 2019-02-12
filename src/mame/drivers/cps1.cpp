@@ -3403,7 +3403,7 @@ MACHINE_CONFIG_START(cps_state::cps1_10MHz)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, cps_state, screen_vblank_cps1))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cps1)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);
 	MCFG_PALETTE_ADD("palette", 0xc00)
 
 	/* sound hardware */

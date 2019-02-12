@@ -342,7 +342,7 @@ MACHINE_CONFIG_START(buster_state::buster)
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_buster)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_buster);
 
 	PALETTE(config, m_palette, palette_device::RGB_3BIT);
 

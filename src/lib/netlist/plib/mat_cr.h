@@ -11,16 +11,19 @@
 #define MAT_CR_H_
 
 #include <algorithm>
-#include <type_traits>
 #include <array>
-#include <vector>
 #include <cmath>
 #include <cstdlib>
+#include <type_traits>
+#include <vector>
 
-#include "pconfig.h"
 #include "palloc.h"
-#include "pstate.h"
 #include "parray.h"
+#include "pconfig.h"
+#include "pomp.h"
+#include "pstate.h"
+#include "ptypes.h"
+#include "putil.h"
 
 namespace plib
 {
@@ -28,8 +31,10 @@ namespace plib
 	template<typename T, int N, typename C = uint16_t>
 	struct matrix_compressed_rows_t
 	{
-		typedef C index_type;
-		typedef T value_type;
+		using index_type = C;
+		using value_type = T;
+
+		COPYASSIGNMOVE(matrix_compressed_rows_t, default)
 
 		enum constants_e
 		{
@@ -62,9 +67,7 @@ namespace plib
 				A[i] = 0;
 		}
 
-		~matrix_compressed_rows_t()
-		{
-		}
+		~matrix_compressed_rows_t() = default;
 
 		index_type size() const { return m_size; }
 
@@ -285,7 +288,7 @@ namespace plib
 
 
 		template <typename VTV, typename VTR>
-		void mult_vec(VTR & RESTRICT res, const VTV & RESTRICT x)
+		void mult_vec(VTR & res, const VTV & x)
 		{
 			/*
 			 * res = A * x
@@ -513,6 +516,6 @@ namespace plib
 		index_type m_size;
 	};
 
-}
+} // namespace plib
 
 #endif /* MAT_CR_H_ */

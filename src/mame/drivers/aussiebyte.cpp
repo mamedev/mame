@@ -590,7 +590,7 @@ MACHINE_CONFIG_START(aussiebyte_state::aussiebyte)
 	MSM5832(config, m_rtc, 32.768_kHz_XTAL);
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", aussiebyte_state, aussiebyte, "com,cpm", 3)
+	MCFG_QUICKLOAD_ADD("quickload", aussiebyte_state, aussiebyte, "com,cpm", attotime::from_seconds(3))
 
 MACHINE_CONFIG_END
 

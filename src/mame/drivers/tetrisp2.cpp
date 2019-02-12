@@ -1712,7 +1712,7 @@ MACHINE_CONFIG_START(tetrisp2_state::tetrisp2)
 	MCFG_SCREEN_UPDATE_DRIVER(tetrisp2_state, screen_update_tetrisp2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tetrisp2)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tetrisp2);
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
 	MCFG_VIDEO_START_OVERRIDE(tetrisp2_state,tetrisp2)
@@ -1747,7 +1747,7 @@ MACHINE_CONFIG_START(tetrisp2_state::nndmseal)
 	MCFG_SCREEN_UPDATE_DRIVER(tetrisp2_state, screen_update_tetrisp2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tetrisp2)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tetrisp2);
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
 	MCFG_VIDEO_START_OVERRIDE(tetrisp2_state,nndmseal)  // bg layer offset
@@ -1780,7 +1780,7 @@ MACHINE_CONFIG_START(tetrisp2_state::rockn)
 	MCFG_SCREEN_UPDATE_DRIVER(tetrisp2_state, screen_update_rockntread)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tetrisp2)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tetrisp2);
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
 	MCFG_VIDEO_START_OVERRIDE(tetrisp2_state,rockntread)
@@ -1815,7 +1815,7 @@ MACHINE_CONFIG_START(tetrisp2_state::rockn2)
 	MCFG_SCREEN_UPDATE_DRIVER(tetrisp2_state, screen_update_rockntread)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tetrisp2)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tetrisp2);
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
 	MCFG_VIDEO_START_OVERRIDE(tetrisp2_state,rockntread)
@@ -1847,10 +1847,10 @@ MACHINE_CONFIG_START(tetrisp2_state::rocknms)
 
 	/* video hardware */
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tetrisp2)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tetrisp2);
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
-	MCFG_DEVICE_ADD("sub_gfxdecode", GFXDECODE, "sub_palette", gfx_rocknms_sub)
+	GFXDECODE(config, m_sub_gfxdecode, m_sub_palette, gfx_rocknms_sub);
 	MCFG_PALETTE_ADD("sub_palette", 0x8000)
 
 	config.set_default_layout(layout_rocknms);
@@ -1926,16 +1926,16 @@ MACHINE_CONFIG_START(stepstag_state::stepstag)
 	rscreen.set_palette("rpalette");
 
 	MCFG_VIDEO_START_OVERRIDE(stepstag_state, stepstag )
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tetrisp2)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tetrisp2);
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
-	MCFG_DEVICE_ADD("gfxdecode_l", GFXDECODE, "lpalette", gfx_vj_lscreen)
+	GFXDECODE(config, m_vj_gfxdecode_l, m_vj_palette_l, gfx_vj_lscreen);
 	MCFG_PALETTE_ADD("lpalette", 0x8000)
 
-	MCFG_DEVICE_ADD("gfxdecode_m", GFXDECODE, "mpalette", gfx_vj_mscreen)
+	GFXDECODE(config, m_vj_gfxdecode_m, m_vj_palette_m, gfx_vj_mscreen);
 	MCFG_PALETTE_ADD("mpalette", 0x8000)
 
-	MCFG_DEVICE_ADD("gfxdecode_r", GFXDECODE, "rpalette", gfx_vj_rscreen)
+	GFXDECODE(config, m_vj_gfxdecode_r, m_vj_palette_r, gfx_vj_rscreen);
 	MCFG_PALETTE_ADD("rpalette", 0x8000)
 
 	config.set_default_layout(layout_stepstag);
@@ -1999,16 +1999,16 @@ MACHINE_CONFIG_START(stepstag_state::vjdash)    // 4 Screens
 	MCFG_SCREEN_PALETTE("rpalette")
 
 	MCFG_VIDEO_START_OVERRIDE(stepstag_state, stepstag )
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tetrisp2)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tetrisp2);
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
-	MCFG_DEVICE_ADD("gfxdecode_l", GFXDECODE, "lpalette", gfx_vj_lscreen)
+	GFXDECODE(config, m_vj_gfxdecode_l, m_vj_palette_l, gfx_vj_lscreen);
 	MCFG_PALETTE_ADD("lpalette", 0x8000)
 
-	MCFG_DEVICE_ADD("gfxdecode_m", GFXDECODE, "mpalette", gfx_vj_mscreen)
+	GFXDECODE(config, m_vj_gfxdecode_m, m_vj_palette_m, gfx_vj_mscreen);
 	MCFG_PALETTE_ADD("mpalette", 0x8000)
 
-	MCFG_DEVICE_ADD("gfxdecode_r", GFXDECODE, "rpalette", gfx_vj_rscreen)
+	GFXDECODE(config, m_vj_gfxdecode_r, m_vj_palette_r, gfx_vj_rscreen);
 	MCFG_PALETTE_ADD("rpalette", 0x8000)
 
 	config.set_default_layout(layout_vjdash);

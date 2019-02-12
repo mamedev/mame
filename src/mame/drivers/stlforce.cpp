@@ -214,7 +214,7 @@ MACHINE_CONFIG_START(stlforce_state::stlforce)
 	MCFG_SCREEN_UPDATE_DRIVER(stlforce_state, screen_update)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_stlforce)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_stlforce);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x800);
 
 	EDEVICES_SFORCE_VID(config, m_video, 0);

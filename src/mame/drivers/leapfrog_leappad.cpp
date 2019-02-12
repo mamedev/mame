@@ -125,6 +125,6 @@ ROM_START( mfleappad )
 	ROM_LOAD( "myfirstleappadbios.bin", 0x000000, 0x400000, CRC(19174c16) SHA1(e0ba644fdf38fd5f91ab8c4b673c4a658cc3e612) ) // contains "Feb 13 2004.10:58:53.152-10573.MFLP US Base ROM - 2004" and "Copyright (c) 2004 LeapFrog Enterprises, Inc."
 ROM_END
 
-//    year, name,         parent,  compat, machine,      input,        class,              init,       company,  fullname,                             flags
-CONS( 2001, leappad,      0,       0,      leapfrog_leappad,   leapfrog_leappad, leapfrog_leappad_state, empty_init, "LeapFrog", "LeapPad", MACHINE_IS_SKELETON )
-CONS( 2004, mfleappad,    0,       0,      leapfrog_mfleappad, leapfrog_leappad, leapfrog_leappad_state, empty_init, "LeapFrog", "My First LeapPad", MACHINE_IS_SKELETON )
+//    year, name,      parent,  compat, machine,            input,            class,                  init,       company,    fullname,                flags
+CONS( 2001, leappad,   0,       0,      leapfrog_leappad,   leapfrog_leappad, leapfrog_leappad_state, empty_init, "LeapFrog", "LeapPad (Germany)",     MACHINE_IS_SKELETON )
+CONS( 2004, mfleappad, 0,       0,      leapfrog_mfleappad, leapfrog_leappad, leapfrog_leappad_state, empty_init, "LeapFrog", "My First LeapPad (UK)", MACHINE_IS_SKELETON )

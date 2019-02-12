@@ -177,7 +177,7 @@ MACHINE_CONFIG_START(sm1800_state::sm1800)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	PALETTE(config, m_palette, FUNC(sm1800_state::sm1800_palette), 3);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_sm1800)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_sm1800);
 
 	/* Devices */
 	I8255(config, m_ppi);

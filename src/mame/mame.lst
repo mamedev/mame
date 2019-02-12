@@ -997,6 +997,7 @@ alcat7100                       //
 aleck64                         // (c) 1998 Nintendo/Seta
 doncdoon                        // (c) 2003 Aruze (Arcade TV Game List - P.90, Right, 8 from bottom)
 hipai                           // (c) 2003 Seta/Aruze (Arcade TV Game List - P.92, Right, 16 from top)
+hipai2                          // (c) 2004 Seta/Aruze/Paon
 kurufev                         // (c) 2003 Aruze (Arcade TV Game List - P.75, Right, 1st entry on top)
 mayjin3                         // (c) 2000 Seta (Arcade TV Game List - P.101, Right, 9 from top)
 mtetrisc                        // (c) 1998 Capcom
@@ -2828,6 +2829,7 @@ metrocrsa                       // (c) 1985
 barata                          //
 
 @source:barni.cpp
+champion                        //
 redbarnp                        //
 
 @source:bartop52.cpp
@@ -12762,6 +12764,7 @@ fanucspgm                       // 1983
 @source:fastfred.cpp
 boggy84                         // (c) 1984 Kaneko
 boggy84b                        // bootleg
+boggy84b2                       // bootleg
 fastfred                        // 136009   (c) 1982 Atari
 flyboy                          // (c) 1982 Kaneko
 flyboyb                         // bootleg
@@ -12907,6 +12910,7 @@ feagv10                         //
 feagv11                         //
 feagv2                          //
 feagv2a                         //
+feagv5                          //
 feagv7                          //
 feagv7a                         //
 feagv9                          //
@@ -13278,6 +13282,7 @@ bang                            // (c) 1998 - Ref ???
 bangj                           // (c) 1999 - Ref ???
 play2000                        // (c) 1999 - Ref ???
 play2000a                       // (c) 1999 - Ref ???
+play2000b                       // (c) 1999 - Ref ???
 maniacsq                        // (c) 1996 - Ref 940411
 maniacsqa                       // (c) 1996 - Ref 940411
 maniacsqu                       // (c) 1996 - Ref 940411 - (unprotected)
@@ -14174,7 +14179,7 @@ goal92                          // bootleg
 
 @source:goindol.cpp
 goindol                         // (c) 1987 Sun a Electronics
-goindolk                        // (c) 1987 Sun a Electronics
+goindolj                        // (c) 1987 Sun a Electronics
 goindolu                        // (c) 1987 Sun a Electronics
 homo                            // bootleg
 
@@ -15056,6 +15061,7 @@ gnw_dkjr                        // Nintendo
 gnw_dkong                       // Nintendo
 gnw_dkong2                      // Nintendo
 gnw_egg                         // Nintendo
+gnw_fire                        // Nintendo
 gnw_ghouse                      // Nintendo
 gnw_lboat                       // Nintendo
 gnw_manhole                     // Nintendo
@@ -28699,6 +28705,7 @@ mugsmash                        // (c) Electronic Devices (Italy) / 3D Games (En
 crzmon2                         // (c) 2010
 crzmon2_2                       // (c) 2010
 crzmon2_3                       // (c) 2010
+crzmon2_4                       // (c) 2010
 czmon_13                        // (c) 2003
 czmon_15                        // (c) 2003
 czmon_16                        // (c) 2003
@@ -28740,6 +28747,7 @@ gnome_9                         // (c) 2007
 goldfish                        // (c) 2002 - Prototype of Multifish
 island                          // (c) 2005
 island_2                        // (c) 2005
+island_3                        // (c) 2005
 island2                         // (c) 2006
 island2_3                       // (c) 2006
 island2_4                       // (c) 2006
@@ -28750,6 +28758,8 @@ keks_2                          // (c) 2006
 keks_3                          // (c) 2006
 keks_4                          // (c) 2006
 keks_5                          // (c) 2006
+keks_6                          // (c) 2006
+keks_7                          // (c) 2006
 lhaunt_10                       // (c) 2003
 lhaunt_11                       // (c) 2003
 lhaunt_2                        // (c) 2003
@@ -28767,6 +28777,7 @@ mfish_8                         // (c) 2002
 pirate_2                        // (c) 2005
 pirate_3                        // (c) 2005
 pirate_4                        // (c) 2005
+pirate_5                        // (c) 2005
 pirate2                         // (c) 2006
 pirate2_2                       // (c) 2006
 pirate2_3                       // (c) 2006
@@ -28784,9 +28795,11 @@ resdnt_8                        // (c) 2004
 resdnt_9                        // (c) 2004
 rollfr_2                        // (c) 2003
 rollfr_3                        // (c) 2003
-rollfr_4                        // (c) 2003 (bootleg?)
+rollfr_4                        // (c) 2003
+rollfr_5                        // (c) 2003
 sweetl                          // (c) 2004
 sweetl_2                        // (c) 2004
+sweetl_3                        // (c) 2004
 sweetl2                         // (c) 2007
 sweetl2_2                       // (c) 2007
 sweetl2_3                       // (c) 2007
@@ -29630,6 +29643,7 @@ karous                          // 2006.11 Karous
 keyboard                        // 2001.11 La Keyboard
 kick4csh                        // 2004.?? Kick '4' Cash
 kingrt66                        // 2002.02 The King of Route 66 (Rev A)
+kingrt66p                       // 2002.01 The King of Route 66 (prototype)
 kofnw                           // 2004.07 The King of Fighters Neo Wave
 kofnwj                          // 2004.07 The King of Fighters Neo Wave (Japan)
 kofxi                           // 2005.10 The King of Fighters XI
@@ -30311,6 +30325,7 @@ svcpcba                         // 0269 (c) 2003 Playmore / Capcom - JAMMA PCB
 98best44                        //
 neoprint                        //
 npcartv1                        //
+npmillen                        //
 nprsp                           //
 
 @source:neptunp2.cpp
@@ -30990,6 +31005,7 @@ sprglbpg                        // German bootleg
 sprglobp                        // (c) 1983 Epos Corporation
 superabc                        // hack
 superabco                       // hack
+theglobme                       // (c) 1983 Magic Electronics
 theglobp                        // (c) 1983 Epos Corporation
 titanpac                        // hack
 pacmanfm                        // bootleg (FAMARE S.A.)
@@ -33297,6 +33313,7 @@ ww3                             // M27 (c) 1981
 redclash                        // (c) 1981 Tehkan
 redclasha                       // (c) 1981 Tehkan
 redclashk                       // (c) Kaneko (bootleg?)
+redclashs                       // (c) Suntronics (licensed?)
 zerohour                        // 8011 (c) Universal
 zerohoura                       // 8011 (c) Universal
 zerohouri                       //
@@ -37461,6 +37478,7 @@ ti83p                           // 1999 TI-83 Plus (Boot Code 1.00) (Z80 6 MHz)
 ti83pb                          // 20?? TI-83 Plus (Bootleg) (Z80 6 MHz)
 ti83pse                         // 2001 TI-83 Plus Silver Edition (Boot Code 1.00)
 ti83pseb                        // 20?? TI-83 Plus Silver Edition (Bootleg)
+ti83pcev15                      //
 ti84p                           // 2004 TI-84 Plus (Boot Code 1.00)
 ti84pv2                         // 200? TI-84 Plus (Boot Code 1.02)
 ti84pv3                         // 2011 TI-84 Plus (Boot Code 1.03)
@@ -37472,6 +37490,7 @@ ti84pob                         // 201? TI-84 Plus Orion (Bootleg)
 ti84pov2                        // 201? TI-84 Plus Orion (Boot Code 1.02)
 ti84pov3                        // 201? TI-84 Plus Orion (Boot Code 1.03)
 ti84pcse                        // 20?? TI-84 Plus Color Silver Edition (Boot Code 4.0)
+ti84pcsev2                      //
 ti84pce                         // 2015 TI-84 Plus Color Edition (Boot Code 5.00)
 ti84pcev15                      // 2016 TI-84 Plus Color Edition (Boot Code 5.15)
 ti84pcev30                      // 2017 TI-84 Plus Color Edition (Boot Code 5.30)
@@ -38040,6 +38059,7 @@ ht1080z2                        // Hradstechnika Szvetkezet HT-1080Z Series II
 lnw80                           // LNW Research LNW-80
 radionic                        // Radionic
 sys80                           // EACA System 80
+sys80p                          // EACA System 80
 trs80                           // TRS-80 Model I - Level I BASIC
 trs80l2                         // TRS-80 Model I - Level II BASIC
 
@@ -38652,8 +38672,12 @@ jak_fan4                        //
 jak_just                        //
 jak_dora                        //
 jak_disf                        //
+jak_disp                        //
 jak_sith                        //
 jak_sdoo                        //
+jak_dbz                         //
+jak_mpac                        //
+jak_wof                         //
 vii                             // KenSingTon / Jungle Soft / Siatronics Vii
 wrlshunt                        // Wireless: Hunting Video Game System
 wirels60                        // Wireless 60
@@ -38671,6 +38695,7 @@ mattelcs                        //
 vsmile                          //
 vsmilef                         //
 vsmileg                         //
+vsmilem                         //
 
 @source:vsmileb.cpp
 vsmileb                         //
@@ -39800,6 +39825,7 @@ rad_ping                        //
 rad_pingp                       //
 rad_mtrk                        //
 rad_mtrkp                       //
+rad_bb                          //
 rad_bb2                         //
 rad_box                         //
 rad_boxp                        //
@@ -39830,6 +39856,7 @@ ekaraa                          //
 ekaraj                          //
 ekarag                          //
 ekaraphs                        //
+epitch                          //
 ddrfammt                        //
 popira                          //
 taikodp                         //
@@ -39837,15 +39864,20 @@ ttv_sw                          //
 ttv_lotr                        //
 ttv_mx                          //
 drgqst                          //
+tmy_thom                        //
 xavtenni                        //
 xavbaseb                        //
 xavbassf                        //
 xavbowl                         //
 xavbox                          //
 xavjmat                         //
-tmy_thom                        //
+xavmusic                        //
 domfitex                        //
 domfitch                        //
+domdance                        //
+
+@source:xavix2.cpp
+ltv_naru                        //
 domfitad                        //
 dombikec                        //
 

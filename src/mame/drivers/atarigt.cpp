@@ -185,9 +185,9 @@ READ8_MEMBER(atarigt_state::analog_port_r)
 		return 0xff;
 	}
 #else
-	uint8_t result = m_adc->data_r(space, 0);
+	uint8_t result = m_adc->data_r();
 	if (!machine().side_effects_disabled())
-		m_adc->address_offset_start_w(space, offset, 0);
+		m_adc->address_offset_start_w(offset, 0);
 	return result;
 #endif
 }
@@ -815,7 +815,7 @@ MACHINE_CONFIG_START(atarigt_state::atarigt)
 	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_atarigt)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_atarigt);
 	MCFG_PALETTE_ADD("palette", MRAM_ENTRIES)
 
 	MCFG_TILEMAP_ADD_CUSTOM("playfield", "gfxdecode", 2, atarigt_state, get_playfield_tile_info, 8,8, atarigt_playfield_scan, 128,64)

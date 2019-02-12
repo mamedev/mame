@@ -441,7 +441,7 @@ MACHINE_CONFIG_START(progolf_state::progolf)
 	MCFG_SCREEN_UPDATE_DRIVER(progolf_state, screen_update)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_progolf)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_progolf);
 	PALETTE(config, m_palette, FUNC(progolf_state::progolf_palette), 32 * 3);
 
 	mc6845_device &crtc(MC6845(config, "crtc", 3000000/4)); /* hand tuned to get ~57 fps */

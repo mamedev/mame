@@ -258,7 +258,7 @@ MACHINE_CONFIG_START(thunderj_state::thunderj)
 	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_thunderj)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_thunderj);
 	PALETTE(config, "palette").set_format(palette_device::IRGB_1555, 2048);
 
 	ATARI_VAD(config, m_vad, 0, m_screen);

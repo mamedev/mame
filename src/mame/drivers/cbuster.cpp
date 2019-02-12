@@ -317,7 +317,7 @@ MACHINE_CONFIG_START(cbuster_state::twocrude)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cbuster_state, screen_update_twocrude)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cbuster)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_cbuster);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 2048);
 
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)

@@ -1059,7 +1059,7 @@ MACHINE_CONFIG_START(snookr10_state::snookr10)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_snookr10)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_snookr10);
 	PALETTE(config, "palette", FUNC(snookr10_state::snookr10_palette), 256);
 
 	/* sound hardware */
