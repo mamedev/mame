@@ -523,7 +523,7 @@ void hpc1_device::fetch_chain()
 	m_scsi_dma.m_ctrl = m_cpu_space->read_dword(m_scsi_dma.m_desc);
 	m_scsi_dma.m_addr = m_cpu_space->read_dword(m_scsi_dma.m_desc+4);
 	m_scsi_dma.m_next = m_cpu_space->read_dword(m_scsi_dma.m_desc+8);
-	m_scsi_dma.m_length = m_scsi_dma.m_ctrl & 0x3fff;
+	m_scsi_dma.m_length = m_scsi_dma.m_ctrl & 0x1fff;
 
 	LOGMASKED(LOG_CHAIN, "Fetching chain from %08x:\n", m_scsi_dma.m_desc);
 	LOGMASKED(LOG_CHAIN, "    Addr: %08x\n", m_scsi_dma.m_addr);
