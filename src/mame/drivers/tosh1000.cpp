@@ -49,17 +49,16 @@
 #include "softlist.h"
 
 
-#define VERBOSE_DBG 1       /* general debug messages */
+//#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
+#define LOG_KEYBOARD  (1U <<  1)
+#define LOG_DEBUG     (1U <<  2)
 
-#define DBG_LOG(N,M,A) \
-	do { \
-	if(VERBOSE_DBG>=N) \
-		{ \
-			if( M ) \
-				logerror("%11.6f at %s: %-10s",machine().time().as_double(),machine().describe_context(),(char*)M ); \
-			logerror A; \
-		} \
-	} while (0)
+//#define VERBOSE (LOG_DEBUG)
+//#define LOG_OUTPUT_FUNC printf
+#include "logmacro.h"
+
+#define LOGKBD(...) LOGMASKED(LOG_KEYBOARD, __VA_ARGS__)
+#define LOGDBG(...) LOGMASKED(LOG_DEBUG, __VA_ARGS__)
 
 
 class tosh1000_state : public driver_device
@@ -119,7 +118,7 @@ MACHINE_RESET_MEMBER(tosh1000_state, tosh1000)
 
 WRITE8_MEMBER(tosh1000_state::romdos_bank_w)
 {
-	DBG_LOG(2,"ROM-DOS", ("<- %02x (%s, accessing bank %d)\n", data, BIT(data, 7)?"enable":"disable", data&7));
+	LOGDBG("ROM-DOS <- %02x (%s, accessing bank %d)\n", data, BIT(data, 7)?"enable":"disable", data&7);
 
 	if (BIT(data, 7))
 	{
@@ -133,14 +132,14 @@ WRITE8_MEMBER(tosh1000_state::romdos_bank_w)
 
 WRITE8_MEMBER(tosh1000_state::bram_w)
 {
-	DBG_LOG(2, "BRAM", ("%02x <- %02x\n", 0xc0 + offset, data));
+	LOGDBG("BRAM %02x <- %02x\n", 0xc0 + offset, data);
 
 	switch (offset)
 	{
 	case 1:
 		if (m_bram_latch)
 		{
-			DBG_LOG(1, "Backup RAM", ("%02x <- %02x\n", m_bram_offset % 160, data));
+			LOG("Backup RAM %02x <- %02x\n", m_bram_offset % 160, data);
 			m_bram->write(m_bram_offset % 160, data);
 			m_bram_offset++;
 		}
@@ -188,7 +187,7 @@ READ8_MEMBER(tosh1000_state::bram_r)
 		if (m_bram_state == READ_DATA)
 		{
 			data = m_bram->read(m_bram_offset % 160);
-			DBG_LOG(1, "BRAM", ("@ %02x == %02x\n", m_bram_offset % 160, data));
+			LOG("BRAM @ %02x == %02x\n", m_bram_offset % 160, data);
 			m_bram_offset++;
 		}
 		break;
@@ -212,7 +211,7 @@ READ8_MEMBER(tosh1000_state::bram_r)
 		break;
 	}
 
-	DBG_LOG(2, "BRAM", ("%02x == %02x\n", 0xc0 + offset, data));
+	LOGDBG("BRAM %02x == %02x\n", 0xc0 + offset, data);
 
 	return data;
 }

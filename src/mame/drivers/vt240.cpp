@@ -23,17 +23,6 @@
 #include "screen.h"
 
 
-#define VERBOSE_DBG 0       /* general debug messages */
-
-#define DBG_LOG(N,M,A) \
-	do { \
-		if(VERBOSE_DBG>=N) \
-		{ \
-			logerror("%11.6f at %s: ",machine().time().as_double(),machine().describe_context()); \
-			logerror A; \
-		} \
-	} while (0)
-
 class vt240_state : public driver_device
 {
 public:

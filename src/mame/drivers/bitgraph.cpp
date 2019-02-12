@@ -75,17 +75,18 @@
 #define PSG_TAG "psg"
 #define EAROM_TAG "earom"
 
-#define VERBOSE_DBG 1       /* general debug messages */
 
-#define DBG_LOG(N,M,A) \
-	do { \
-		if(VERBOSE_DBG>=N) \
-		{ \
-			if( M ) \
-				logerror("%11.6f at %s: %-24s",machine().time().as_double(),machine().describe_context(),(char*)M ); \
-			logerror A; \
-		} \
-	} while (0)
+//#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
+#define LOG_PIA       (1U <<  1)
+#define LOG_DEBUG     (1U <<  2)
+
+//#define VERBOSE (LOG_DEBUG)
+//#define LOG_OUTPUT_FUNC printf
+#include "logmacro.h"
+
+#define LOGPIA(...) LOGMASKED(LOG_PIA, __VA_ARGS__)
+#define LOGDBG(...) LOGMASKED(LOG_DEBUG, __VA_ARGS__)
+
 
 class bitgraph_state : public driver_device
 {
@@ -222,13 +223,13 @@ DEVICE_INPUT_DEFAULTS_END
 
 READ8_MEMBER(bitgraph_state::pia_r)
 {
-	DBG_LOG(3, "PIA", ("R %d\n", offset));
+	LOGPIA("PIA R %d\n", offset);
 	return m_pia->read(space, 3 - offset);
 }
 
 WRITE8_MEMBER(bitgraph_state::pia_w)
 {
-	DBG_LOG(3, "PIA", ("W %d < %02X\n", offset, data));
+	LOGPIA("PIA W %d < %02X\n", offset, data);
 	return m_pia->write(space, 3 - offset, data);
 }
 
@@ -245,13 +246,13 @@ WRITE_LINE_MEMBER(bitgraph_state::pia_cb2_w)
 READ8_MEMBER(bitgraph_state::pia_pa_r)
 {
 	uint8_t data = BIT(m_pia_b, 3) ? m_earom->data() : m_pia_a;
-	DBG_LOG(2, "PIA", ("A == %02X (%s)\n", data, BIT(m_pia_b, 3) ? "earom" : "pia"));
+	LOGDBG("PIA A == %02X (%s)\n", data, BIT(m_pia_b, 3) ? "earom" : "pia");
 	return data;
 }
 
 WRITE8_MEMBER(bitgraph_state::pia_pa_w)
 {
-	DBG_LOG(2, "PIA", ("A <- %02X\n", data));
+	LOGDBG("PIA A <- %02X\n", data);
 	m_pia_a = data;
 }
 
@@ -267,13 +268,13 @@ WRITE8_MEMBER(bitgraph_state::pia_pa_w)
 */
 READ8_MEMBER(bitgraph_state::pia_pb_r)
 {
-	DBG_LOG(2, "PIA", ("B == %02X\n", m_pia_b));
+	LOGDBG("PIA B == %02X\n", m_pia_b);
 	return m_pia_b;
 }
 
 WRITE8_MEMBER(bitgraph_state::pia_pb_w)
 {
-	DBG_LOG(2, "PIA", ("B <- %02X\n", data));
+	LOGDBG("PIA B <- %02X\n", data);
 	m_pia_b = data;
 
 	switch (m_pia_b & 0x03)
@@ -288,7 +289,7 @@ WRITE8_MEMBER(bitgraph_state::pia_pb_w)
 
 	if (BIT(m_pia_b, 3))
 	{
-		DBG_LOG(2, "EAROM", ("data <- %02X\n", m_pia_a));
+		LOGDBG("EAROM data <- %02X\n", m_pia_a);
 		m_earom->set_data(m_pia_a);
 	}
 	// CS1, ~CS2, C1, C2
@@ -303,14 +304,14 @@ WRITE8_MEMBER(bitgraph_state::pia_pb_w)
 
 WRITE8_MEMBER(bitgraph_state::earom_write)
 {
-	DBG_LOG(2, "EAROM", ("addr <- %02X (%02X)\n", data & 0x3f, data));
+	LOGDBG("EAROM addr <- %02X (%02X)\n", data & 0x3f, data);
 	m_earom->set_address(data & 0x3f);
 }
 
 // written once and never changed
 WRITE8_MEMBER(bitgraph_state::misccr_write)
 {
-	DBG_LOG(1, "MISCCR", ("<- %02X (DTR %d MAP %d)\n", data, BIT(data, 3), (data & 3)));
+	LOG("MISCCR <- %02X (DTR %d MAP %d)\n", data, BIT(data, 3), (data & 3));
 	m_misccr = data;
 }
 
@@ -335,7 +336,7 @@ WRITE_LINE_MEMBER(bitgraph_state::system_clock_write)
 // rev B writes EE5E -- 9600 HOST, 9600 PNT, 300 KBD, 9600 DBG
 WRITE16_MEMBER(bitgraph_state::baud_write)
 {
-	DBG_LOG(1,"Baud", ("%04X\n", data));
+	LOG("Baud %04X\n", data);
 	m_dbrgb->str_w(data & 15);      // 2 DBG
 	m_dbrga->stt_w((data >> 4) & 15);   // 1 KBD
 	m_dbrgb->stt_w((data >> 8) & 15);   // 3 PNT
@@ -371,13 +372,13 @@ WRITE_LINE_MEMBER(bitgraph_state::com8116_b_ft_w)
 
 READ8_MEMBER(bitgraph_state::adlc_r)
 {
-	DBG_LOG(1, "ADLC", ("R %d\n", offset));
+	LOG("ADLC R %d\n", offset);
 	return m_adlc ? m_adlc->read(space, 3 - offset) : 0xff;
 }
 
 WRITE8_MEMBER(bitgraph_state::adlc_w)
 {
-	DBG_LOG(1, "ADLC", ("W %d < %02X\n", offset, data));
+	LOG("ADLC W %d < %02X\n", offset, data);
 	if (m_adlc) return m_adlc->write(space, 3 - offset, data);
 }
 
@@ -421,13 +422,13 @@ uint32_t bitgraph_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 READ8_MEMBER(bitgraph_state::ppu_read)
 {
 	uint8_t data = m_ppu[offset];
-	DBG_LOG(2, "PPU", ("%d == %02X\n", offset, data));
+	LOGDBG("PPU %d == %02X\n", offset, data);
 	return data;
 }
 
 WRITE8_MEMBER(bitgraph_state::ppu_write)
 {
-	DBG_LOG(2, "PPU", ("%d <- %02X\n", offset, data));
+	LOGDBG("PPU %d <- %02X\n", offset, data);
 	m_ppu[offset] = data;
 }
 
@@ -446,7 +447,7 @@ void bitgraph_state::ppu_io(address_map &map)
 */
 WRITE8_MEMBER(bitgraph_state::ppu_i8243_w)
 {
-	DBG_LOG(1, "PPU", ("8243 %d <- %02X\n", offset + 4, data));
+	LOG("PPU 8243 %d <- %02X\n", offset + 4, data);
 	switch (offset)
 	{
 	case 0:
