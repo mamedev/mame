@@ -420,6 +420,8 @@ void leland_80186_sound_device::device_reset()
 	m_ext_start = 0;
 	m_ext_stop = 0;
 	m_ext_active = 0;
+	if (m_type == TYPE_WSF)
+		m_dacvol[3]->write(0xff);  //TODO: determine how to set this if at all
 }
 
 DEFINE_DEVICE_TYPE(LELAND_80186, leland_80186_sound_device, "leland_80186_sound", "80186 DAC (Leland)")
@@ -658,14 +660,14 @@ WRITE16_MEMBER( leland_80186_sound_device::ataxx_dac_control )
 			dac_w(space, 0x40, data, 0x00ff);
 			return;
 		case 0x01:
-			dac_w(space, 0x63, data, 0x00ff);
+			dac_w(space, 0x61, data, 0x00ff);
 			return;
 		case 0x02:
 			dac_w(space, 2, data, 0x00ff);
 			return;
 		case 0x03:
 			m_dacvol[0]->write((data & 7) << 5);
-			m_dacvol[3]->write(((data >> 3) & 7) << 5);
+			m_dacvol[1]->write(((data >> 3) & 7) << 5);
 			m_dacvol[2]->write(((data >> 6) & 3) << 6);
 			return;
 		}
