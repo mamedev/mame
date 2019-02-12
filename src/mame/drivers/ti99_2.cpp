@@ -164,7 +164,6 @@
 
 #include "emu.h"
 #include "bus/ti99/ti99defs.h"
-#include "machine/tms9901.h"
 #include "cpu/tms9900/tms9995.h"
 #include "bus/ti99/internal/992board.h"
 #include "machine/ram.h"
