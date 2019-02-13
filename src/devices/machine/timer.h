@@ -122,7 +122,7 @@ public:
 	attotime time_left() const { return m_timer->remaining(); }
 	attotime start_time() const { return m_timer->start(); }
 	attotime fire_time() const { return m_timer->expire(); }
-	attotime period() const { return m_period; } // only for TIMER_TYPE_PERIODIC
+	attotime period() const { return m_timer ? m_timer->period() : m_period; }
 
 private:
 	// device-level overrides
