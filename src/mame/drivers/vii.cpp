@@ -13,10 +13,25 @@
         Justice League
         Dora the Explorer
         Mattel Classic Sports
+		Disney Princess (GKR)
+		(all GameKeyReady units?)
 
         "SunPlus QL8041C" ( known as Sunplus SPG2?? ) see clickstart.cpp instead
 
         "SunPlus PA7801" ( known as Sunplus SPG110? ) see spg110.cpp instead
+		Classic Arcade Pinball
+		EA Sports (NHL95 + Madden 95)
+ 
+		It is unknown if the following are close to this architecture or not (no dumps yet)
+
+		"SunPlus QU7073-P69A"
+		Mortal Kombat
+
+		"Sunplus QL8167"
+		Disney Princess (older)
+ 
+
+Disney Princess non-GKR is Sunplus QL8167.
 
     Status:
 
