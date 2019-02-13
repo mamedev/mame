@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-04-28 15:32+1000\n"
-"PO-Revision-Date: 2019-02-05 17:50-0300\n"
+"PO-Revision-Date: 2019-12-05 22:37-0300\n"
 "Last-Translator: Katananja, Ashura-X\n"
 "Language-Team: MAME Language Team\n"
 "Language: pt_BR\n"
@@ -1335,7 +1335,7 @@ msgstr "Opções Diversas"
 
 #: src/frontend/mame/ui/submenu.cpp:23
 msgid "Re-select last machine played"
-msgstr "Re-selecione a última máquina jogada"
+msgstr "Lembrar da última máquina selecionada"
 
 #: src/frontend/mame/ui/submenu.cpp:24
 msgid "Enlarge images in the right panel"
@@ -1343,19 +1343,19 @@ msgstr "Aumentar as imagens no painel direito"
 
 #: src/frontend/mame/ui/submenu.cpp:26
 msgid "Show mouse pointer"
-msgstr "Mostrar o ponteiro do mouse"
+msgstr "Exibir o ponteiro do mouse"
 
 #: src/frontend/mame/ui/submenu.cpp:27
 msgid "Confirm quit from machines"
-msgstr "Confirmar saída das máquinas"
+msgstr "Confirmar ao sair"
 
 #: src/frontend/mame/ui/submenu.cpp:28
 msgid "Skip information screen at startup"
-msgstr "Pular a tela de informação ao iniciar"
+msgstr "Omitir a tela de informação ao iniciar"
 
 #: src/frontend/mame/ui/submenu.cpp:29
 msgid "Force 4:3 aspect for snapshot display"
-msgstr "Forçar o aspecto 4:3 para a tela de snapshot"
+msgstr "Manter aspecto 4:3 para instantâneos de tela"
 
 #: src/frontend/mame/ui/submenu.cpp:30
 msgid "Use image as background"
@@ -1363,11 +1363,11 @@ msgstr "Usar imagem como plano de fundo"
 
 #: src/frontend/mame/ui/submenu.cpp:31
 msgid "Skip BIOS selection menu"
-msgstr "Pular o menu de seleção de BIOS"
+msgstr "Omitir a tela de seleção de BIOS"
 
 #: src/frontend/mame/ui/submenu.cpp:32
 msgid "Skip software parts selection menu"
-msgstr "Pular menu de seleção para o programa em partes"
+msgstr "Omitir a lista de seleção de segmentos de software"
 
 #: src/frontend/mame/ui/submenu.cpp:33
 msgid "Info auto audit"
@@ -1387,15 +1387,15 @@ msgstr "Opções de Performance"
 
 #: src/frontend/mame/ui/submenu.cpp:40
 msgid "Auto frame skip"
-msgstr "Pulo de quadro Automático"
+msgstr "Salto de quadro Automático"
 
 #: src/frontend/mame/ui/submenu.cpp:41
 msgid "Frame skip"
-msgstr "Pulo de quadro"
+msgstr "Salto de quadro"
 
 #: src/frontend/mame/ui/submenu.cpp:42
 msgid "Throttle"
-msgstr "Suprimir"
+msgstr "Supressão da velocidade"
 
 #: src/frontend/mame/ui/submenu.cpp:43
 msgid "Sleep"
@@ -1491,7 +1491,7 @@ msgstr "Opções de Entrada"
 
 #: src/frontend/mame/ui/submenu.cpp:72
 msgid "Coin lockout"
-msgstr "Trava da ficha"
+msgstr "Ignora ficha"
 
 #: src/frontend/mame/ui/submenu.cpp:73
 msgid "Mouse"
@@ -1615,7 +1615,7 @@ msgstr "Modo Janelado"
 
 #: src/frontend/mame/ui/submenu.cpp:112
 msgid "Enforce Aspect Ratio"
-msgstr "Forçar Razão de Aspecto"
+msgstr "Manter a proporção da tela"
 
 #: src/frontend/mame/ui/submenu.cpp:113
 msgid "Start Out Maximized"
@@ -1623,7 +1623,7 @@ msgstr "Iniciar Maximizado"
 
 #: src/frontend/mame/ui/submenu.cpp:114
 msgid "Synchronized Refresh"
-msgstr "Atualização de Quadros Sincronizada"
+msgstr "Atualização Sincronizada de Quadros"
 
 #: src/frontend/mame/ui/submenu.cpp:115
 msgid "Wait Vertical Sync"
