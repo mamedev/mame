@@ -514,10 +514,10 @@ ROM_START( saltcrdi ) // REF 970410
 	ROM_FILL(                              0x0220000, 0x0020000, 0x00 )         /* to decode GFX as 5bpp */
 
 	ROM_REGION( 0x0800, "iomcu", 0 ) // on IO board
-	ROM_LOAD( "st62t15c6",   0x0800, 0x1000, NO_DUMP ) // 2KBytes internal ROM
+	ROM_LOAD( "st62t15c6", 0x0000, 0x0800, NO_DUMP ) // 2KBytes internal ROM
 
-	ROM_REGION( 0x104, "pals", 0 )
-	ROM_LOAD( "6.pal16l8.u12",   0x0000, 0x104, NO_DUMP )
+	ROM_REGION( 0x0104, "pals", 0 )
+	ROM_LOAD( "6.pal16l8.u12", 0x0000, 0x0104, NO_DUMP )
 ROM_END
 
 
