@@ -552,7 +552,8 @@ ioport_constructor tx1j_sound_device::device_input_ports() const
 	return INPUT_PORTS_NAME(tx1j_inputs);
 }
 
-MACHINE_CONFIG_START(tx1_sound_device::device_add_mconfig)
+void tx1_sound_device::device_add_mconfig(machine_config &config)
+{
 	Z80(config, m_audiocpu, TX1_PIXEL_CLOCK / 2);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &tx1_sound_device::tx1_sound_prg);
 	m_audiocpu->set_addrmap(AS_IO, &tx1_sound_device::tx1_sound_io);
@@ -575,10 +576,9 @@ MACHINE_CONFIG_START(tx1_sound_device::device_add_mconfig)
 	aysnd.add_route(ALL_OUTPUTS, "frontleft", 0.1);
 	aysnd.add_route(ALL_OUTPUTS, "frontright", 0.1);
 
-	MCFG_DEVICE_MODIFY(DEVICE_SELF)
-	MCFG_SOUND_ROUTE(0, "frontleft", 0.2)
-	MCFG_SOUND_ROUTE(1, "frontright", 0.2)
-MACHINE_CONFIG_END
+	this->add_route(0, "frontleft", 0.2);
+	this->add_route(1, "frontright", 0.2);
+}
 
 /*************************************
  *
@@ -1059,7 +1059,8 @@ ioport_constructor buggyboyjr_sound_device::device_input_ports() const
 	return INPUT_PORTS_NAME(buggyboyjr_inputs);
 }
 
-MACHINE_CONFIG_START(buggyboy_sound_device::device_add_mconfig)
+void buggyboy_sound_device::device_add_mconfig(machine_config &config)
+{
 	Z80(config, m_audiocpu, BUGGYBOY_ZCLK / 2);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &buggyboy_sound_device::buggyboy_sound_prg);
 	m_audiocpu->set_addrmap(AS_IO, &buggyboy_sound_device::buggyboy_sound_io);
@@ -1085,12 +1086,12 @@ MACHINE_CONFIG_START(buggyboy_sound_device::device_add_mconfig)
 	m_ym[1]->port_b_write_callback().set(FUNC(buggyboy_sound_device::ym2_b_w));
 	m_ym[1]->add_route(ALL_OUTPUTS, "frontright", 0.15);
 
-	MCFG_DEVICE_MODIFY(DEVICE_SELF)
-	MCFG_SOUND_ROUTE(0, "frontleft", 0.2)
-	MCFG_SOUND_ROUTE(1, "frontright", 0.2)
-MACHINE_CONFIG_END
+	this->add_route(0, "frontleft", 0.2);
+	this->add_route(1, "frontright", 0.2);
+}
 
-MACHINE_CONFIG_START(buggyboyjr_sound_device::device_add_mconfig)
+void buggyboyjr_sound_device::device_add_mconfig(machine_config &config)
+{
 	Z80(config, m_audiocpu, BUGGYBOY_ZCLK / 2);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &buggyboyjr_sound_device::buggybjr_sound_prg);
 	m_audiocpu->set_addrmap(AS_IO, &buggyboyjr_sound_device::buggyboy_sound_io);
@@ -1111,7 +1112,6 @@ MACHINE_CONFIG_START(buggyboyjr_sound_device::device_add_mconfig)
 	m_ym[1]->port_b_write_callback().set(FUNC(buggyboy_sound_device::ym2_b_w));
 	m_ym[1]->add_route(ALL_OUTPUTS, "frontright", 0.15);
 
-	MCFG_DEVICE_MODIFY(DEVICE_SELF)
-	MCFG_SOUND_ROUTE(0, "frontleft", 0.2)
-	MCFG_SOUND_ROUTE(1, "frontright", 0.2)
-MACHINE_CONFIG_END
+	this->add_route(0, "frontleft", 0.2);
+	this->add_route(1, "frontright", 0.2);
+}

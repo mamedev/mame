@@ -657,18 +657,18 @@ INPUT_PORTS_END
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(gottlieb_sound_r2_device::device_add_mconfig)
+void gottlieb_sound_r2_device::device_add_mconfig(machine_config &config)
+{
 	// audio CPUs
-	MCFG_DEVICE_ADD("audiocpu", M6502, SOUND2_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(gottlieb_sound_r2_map)
+	M6502(config, m_audiocpu, SOUND2_CLOCK/4);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &gottlieb_sound_r2_device::gottlieb_sound_r2_map);
 
-	MCFG_DEVICE_ADD("speechcpu", M6502, SOUND2_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(gottlieb_speech_r2_map)
+	M6502(config, m_speechcpu, SOUND2_CLOCK/4);
+	m_speechcpu->set_addrmap(AS_PROGRAM, &gottlieb_sound_r2_device::gottlieb_speech_r2_map);
 
 	// sound hardware
-	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, *this, 0.075) // unknown DAC
-	MCFG_DEVICE_ADD("dacvol", DAC_8BIT_R2R, 0) // unknown DAC
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 0.075); // unknown DAC
+	DAC_8BIT_R2R(config, "dacvol", 0).add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT).add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT); // unknown DAC
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.set_output(5.0);
 	vref.add_route(0, "dacvol", 1.0, DAC_VREF_POS_INPUT);
@@ -677,9 +677,8 @@ MACHINE_CONFIG_START(gottlieb_sound_r2_device::device_add_mconfig)
 
 	AY8913(config, m_ay2, SOUND2_CLOCK/2).add_route(ALL_OUTPUTS, *this, 0.15);
 
-	MCFG_DEVICE_ADD("spsnd", SP0250, SOUND2_SPEECH_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, *this, 1.0)
-MACHINE_CONFIG_END
+	SP0250(config, m_sp0250, SOUND2_SPEECH_CLOCK).add_route(ALL_OUTPUTS, *this, 1.0);
+}
 
 
 //-------------------------------------------------

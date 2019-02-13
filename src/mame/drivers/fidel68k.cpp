@@ -568,11 +568,11 @@ INPUT_PORTS_END
     Machine Drivers
 ******************************************************************************/
 
-MACHINE_CONFIG_START(fidel68k_state::fex68k)
-
+void fidel68k_state::fex68k(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 12_MHz_XTAL) // HD68HC000P12
-	MCFG_DEVICE_PROGRAM_MAP(fex68k_map)
+	M68000(config, m_maincpu, 12_MHz_XTAL); // HD68HC000P12
+	m_maincpu->set_addrmap(AS_PROGRAM, &fidel68k_state::fex68k_map);
 
 	const attotime irq_period = attotime::from_hz(618); // theoretical frequency from 556 timer (22nF, 91K + 20K POT @ 14.8K, 0.1K), measurement was 580Hz
 	TIMER(config, m_irq_on).configure_periodic(FUNC(fidel68k_state::irq_on<M68K_IRQ_2>), irq_period);
@@ -584,34 +584,34 @@ MACHINE_CONFIG_START(fidel68k_state::fex68k)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
 	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(fidel68k_state::fex68km2)
+void fidel68k_state::fex68km2(machine_config &config)
+{
 	fex68k(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(fex68km2_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &fidel68k_state::fex68km2_map);
+}
 
-MACHINE_CONFIG_START(fidel68k_state::fex68km3)
+void fidel68k_state::fex68km3(machine_config &config)
+{
 	fex68k(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(16_MHz_XTAL) // factory overclock
-	MCFG_DEVICE_PROGRAM_MAP(fex68km3_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_clock(16_MHz_XTAL); // factory overclock
+	m_maincpu->set_addrmap(AS_PROGRAM, &fidel68k_state::fex68km3_map);
+}
 
-MACHINE_CONFIG_START(fidel68k_state::fdes2265)
-
+void fidel68k_state::fdes2265(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL) // MC68HC000P12F
-	MCFG_DEVICE_PROGRAM_MAP(fdes2265_map)
+	M68000(config, m_maincpu, 16_MHz_XTAL); // MC68HC000P12F
+	m_maincpu->set_addrmap(AS_PROGRAM, &fidel68k_state::fdes2265_map);
 
 	const attotime irq_period = attotime::from_hz(597); // from 555 timer, measured
 	TIMER(config, m_irq_on).configure_periodic(FUNC(fidel68k_state::irq_on<M68K_IRQ_4>), irq_period);
@@ -623,27 +623,27 @@ MACHINE_CONFIG_START(fidel68k_state::fdes2265)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
 	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(fidel68k_state::fdes2325)
+void fidel68k_state::fdes2325(machine_config &config)
+{
 	fdes2265(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REPLACE("maincpu", M68EC020, 20_MHz_XTAL) // MC68EC020RP25
-	MCFG_DEVICE_PROGRAM_MAP(fdes2325_map)
+	M68EC020(config.replace(), m_maincpu, 20_MHz_XTAL); // MC68EC020RP25
+	m_maincpu->set_addrmap(AS_PROGRAM, &fidel68k_state::fdes2325_map);
 
 	config.set_default_layout(layout_fidel_desdis_68kg);
-MACHINE_CONFIG_END
+}
 
 MACHINE_CONFIG_START(fidel68k_state::eag_base)
-
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(eag_map)
+	M68000(config, m_maincpu, 16_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &fidel68k_state::eag_map);
 
 	const attotime irq_period = attotime::from_hz(4.9152_MHz_XTAL/0x2000); // 600Hz
 	TIMER(config, m_irq_on).configure_periodic(FUNC(fidel68k_state::irq_on<M68K_IRQ_2>), irq_period);
@@ -657,7 +657,7 @@ MACHINE_CONFIG_START(fidel68k_state::eag_base)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
 	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
@@ -675,51 +675,56 @@ void fidel68k_state::eag(machine_config &config)
 	RAM(config, m_ram).set_default_size("1M").set_extra_options("128K, 512K, 1M");
 }
 
-MACHINE_CONFIG_START(fidel68k_state::eagv5)
+void fidel68k_state::eagv5(machine_config &config)
+{
 	eag(config);
 
 	/* basic machine hardware */
 	m_ram->set_default_size("128K");
 
-	MCFG_DEVICE_ADD("subcpu", M68000, 16_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(eagv5_slave_map)
-MACHINE_CONFIG_END
+	m68000_device &subcpu(M68000(config, "subcpu", 16_MHz_XTAL));
+	subcpu.set_addrmap(AS_PROGRAM, &fidel68k_state::eagv5_slave_map);
+}
 
-MACHINE_CONFIG_START(fidel68k_state::eagv7)
+void fidel68k_state::eagv7(machine_config &config)
+{
 	eag_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REPLACE("maincpu", M68020, 20_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(eagv7_map)
-MACHINE_CONFIG_END
+	M68020(config.replace(), m_maincpu, 20_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &fidel68k_state::eagv7_map);
+}
 
-MACHINE_CONFIG_START(fidel68k_state::eagv9)
+void fidel68k_state::eagv9(machine_config &config)
+{
 	eagv7(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REPLACE("maincpu", M68030, 32_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(eagv7_map)
-MACHINE_CONFIG_END
+	M68030(config.replace(), m_maincpu, 32_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &fidel68k_state::eagv7_map);
+}
 
-MACHINE_CONFIG_START(fidel68k_state::eagv10)
+void fidel68k_state::eagv10(machine_config &config)
+{
 	eagv7(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REPLACE("maincpu", M68040, 25_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(eagv11_map)
-MACHINE_CONFIG_END
+	M68040(config.replace(), m_maincpu, 25_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &fidel68k_state::eagv11_map);
+}
 
-MACHINE_CONFIG_START(fidel68k_state::eagv11)
+void fidel68k_state::eagv11(machine_config &config)
+{
 	eagv7(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REPLACE("maincpu", M68EC040, 36_MHz_XTAL*2*2) // wrong! should be M68EC060 @ 72MHz
-	MCFG_DEVICE_PROGRAM_MAP(eagv11_map)
+	M68EC040(config.replace(), m_maincpu, 36_MHz_XTAL*2*2); // wrong! should be M68EC060 @ 72MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &fidel68k_state::eagv11_map);
+	m_maincpu->set_periodic_int(FUNC(fidel68k_state::irq2_line_hold), attotime::from_hz(600));
 
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(fidel68k_state, irq2_line_hold, 600)
 	config.device_remove("irq_on"); // 8.25us is too long
 	config.device_remove("irq_off");
-MACHINE_CONFIG_END
+}
 
 
 

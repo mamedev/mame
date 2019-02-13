@@ -32,23 +32,6 @@
 
 #define PC1512_MOUSE_PORT_TAG "mous"
 
-#define MCFG_PC1512_MOUSE_PORT_ADD(_tag, _slot_intf, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, PC1512_MOUSE_PORT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-
-#define MCFG_PC1512_MOUSE_PORT_X_CB(_write) \
-	downcast<pc1512_mouse_port_device &>(*device).set_x_wr_callback(DEVCB_##_write);
-
-#define MCFG_PC1512_MOUSE_PORT_Y_CB(_write) \
-	downcast<pc1512_mouse_port_device &>(*device).set_y_wr_callback(DEVCB_##_write);
-
-#define MCFG_PC1512_MOUSE_PORT_M1_CB(_write) \
-	downcast<pc1512_mouse_port_device &>(*device).set_m1_wr_callback(DEVCB_##_write);
-
-#define MCFG_PC1512_MOUSE_PORT_M2_CB(_write) \
-	downcast<pc1512_mouse_port_device &>(*device).set_m2_wr_callback(DEVCB_##_write);
-
-
 
 //**************************************************************************
 //  TYPE DEFINITIONS

@@ -531,8 +531,7 @@ MACHINE_CONFIG_START(wildpkr_state::tabpkr)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("dac", AD557, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	AD557(config, m_dac, 0).add_route(ALL_OUTPUTS, "mono", 0.50);
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);

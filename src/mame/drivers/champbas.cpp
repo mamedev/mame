@@ -608,7 +608,7 @@ MACHINE_CONFIG_START(champbas_state::champbas)
 
 	AY8910(config, "ay1", XTAL(18'432'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.3);
 
-	MCFG_DEVICE_ADD("dac", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.7) // unknown DAC
+	DAC_6BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.7); // unknown DAC
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
@@ -727,8 +727,8 @@ MACHINE_CONFIG_START(exctsccr_state::exctsccr)
 
 	AY8910(config, "ay4", XTAL(14'318'181)/8).add_route(ALL_OUTPUTS, "speaker", 0.08);
 
-	MCFG_DEVICE_ADD("dac1", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3) // unknown DAC
-	MCFG_DEVICE_ADD("dac2", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3) // unknown DAC
+	DAC_6BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.3); // unknown DAC
+	DAC_6BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.3); // unknown DAC
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.set_output(5.0);
 	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
@@ -779,7 +779,7 @@ MACHINE_CONFIG_START(exctsccr_state::exctsccrb)
 
 	AY8910(config, "ay1", XTAL(18'432'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.3);
 
-	MCFG_DEVICE_ADD("dac", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.7) // unknown DAC
+	DAC_6BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.7); // unknown DAC
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);

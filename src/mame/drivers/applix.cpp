@@ -878,8 +878,8 @@ MACHINE_CONFIG_START(applix_state::applix)
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("ldac", DAC0800, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) // 74ls374.u20 + dac0800.u21 + 4052.u23
-	MCFG_DEVICE_ADD("rdac", DAC0800, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // 74ls374.u20 + dac0800.u21 + 4052.u23
+	DAC0800(config, "ldac", 0).add_route(ALL_OUTPUTS, "lspeaker", 1.0); // 74ls374.u20 + dac0800.u21 + 4052.u23
+	DAC0800(config, "rdac", 0).add_route(ALL_OUTPUTS, "rspeaker", 1.0); // 74ls374.u20 + dac0800.u21 + 4052.u23
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.set_output(5.0);
 	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);

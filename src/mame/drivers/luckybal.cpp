@@ -565,12 +565,12 @@ INPUT_PORTS_END
 *           Machine Driver            *
 **************************************/
 
-MACHINE_CONFIG_START(luckybal_state::luckybal)
-
+void luckybal_state::luckybal(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z180, CPU_CLOCK / 2)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_IO_MAP(main_io)
+	Z180(config, m_maincpu, CPU_CLOCK / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &luckybal_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &luckybal_state::main_io);
 
 	I8255A(config, m_ppi);
 	m_ppi->out_pa_callback().set(FUNC(luckybal_state::output_port_a_w));
@@ -578,11 +578,11 @@ MACHINE_CONFIG_START(luckybal_state::luckybal)
 	m_ppi->in_pc_callback().set(FUNC(luckybal_state::input_port_c_r));
 	m_ppi->out_pc_callback().set(FUNC(luckybal_state::output_port_c_w));
 
-	MCFG_DEVICE_ADD("latch1", CD4099, 0)
+	CD4099(config, "latch1", 0);
 
-	MCFG_DEVICE_ADD("latch2", CD4099, 0)
+	CD4099(config, "latch2", 0);
 
-	MCFG_DEVICE_ADD("latch3", CD4099, 0)
+	CD4099(config, "latch3", 0);
 
 	/* nvram */
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -596,13 +596,12 @@ MACHINE_CONFIG_START(luckybal_state::luckybal)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", DAC08, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	DAC08(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
-
-MACHINE_CONFIG_END
+}
 
 
 /**************************************

@@ -282,9 +282,9 @@ MACHINE_CONFIG_START(gamecom_state::gamecom)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	/* TODO: much more complex than this */
-	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC (Digital audio)
-	MCFG_DEVICE_ADD("dac0", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.05) // unknown DAC (Frequency modulation)
-	MCFG_DEVICE_ADD("dac1", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.05) // unknown DAC (Frequency modulation)
+	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC (Digital audio)
+	DAC_4BIT_R2R(config, m_dac0, 0).add_route(ALL_OUTPUTS, "speaker", 0.05); // unknown DAC (Frequency modulation)
+	DAC_4BIT_R2R(config, m_dac1, 0).add_route(ALL_OUTPUTS, "speaker", 0.05); // unknown DAC (Frequency modulation)
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);

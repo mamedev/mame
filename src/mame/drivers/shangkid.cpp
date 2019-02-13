@@ -375,19 +375,19 @@ void shangkid_state::sound_portmap(address_map &map)
 
 /***************************************************************************************/
 
-MACHINE_CONFIG_START(shangkid_state::chinhero)
-
+void shangkid_state::chinhero(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, Z80, XTAL(18'432'000)/6) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(chinhero_main_map)
+	Z80(config, m_maincpu, XTAL(18'432'000)/6); /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &shangkid_state::chinhero_main_map);
 
-	MCFG_DEVICE_ADD(m_bbx, Z80, XTAL(18'432'000)/6) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(chinhero_bbx_map)
-	MCFG_DEVICE_IO_MAP(chinhero_bbx_portmap)
+	Z80(config, m_bbx, XTAL(18'432'000)/6); /* verified on pcb */
+	m_bbx->set_addrmap(AS_PROGRAM, &shangkid_state::chinhero_bbx_map);
+	m_bbx->set_addrmap(AS_IO, &shangkid_state::chinhero_bbx_portmap);
 
-	MCFG_DEVICE_ADD(m_audiocpu, Z80, XTAL(18'432'000)/6) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(chinhero_sound_map)
-	MCFG_DEVICE_IO_MAP(sound_portmap)
+	Z80(config, m_audiocpu, XTAL(18'432'000)/6); /* verified on pcb */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &shangkid_state::chinhero_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &shangkid_state::sound_portmap);
 
 	ls259_device &mainlatch(LS259(config, "mainlatch"));
 	mainlatch.q_out_cb<0>().set_inputline(m_bbx, INPUT_LINE_RESET).invert(); // RESET2
@@ -420,7 +420,7 @@ MACHINE_CONFIG_START(shangkid_state::chinhero)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
@@ -430,10 +430,11 @@ MACHINE_CONFIG_START(shangkid_state::chinhero)
 	m_aysnd->port_a_write_callback().set(FUNC(shangkid_state::chinhero_ay8910_porta_w));
 	m_aysnd->port_b_write_callback().set(FUNC(shangkid_state::ay8910_portb_w));
 	m_aysnd->add_route(ALL_OUTPUTS, "speaker", 0.1);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(shangkid_state::shangkid)
+void shangkid_state::shangkid(machine_config &config)
+{
 	chinhero(config);
 
 	/* basic machine hardware */
@@ -455,7 +456,7 @@ MACHINE_CONFIG_START(shangkid_state::shangkid)
 	m_gfxdecode->set_info(gfx_shangkid);
 
 	m_aysnd->port_a_write_callback().set(FUNC(shangkid_state::shangkid_ay8910_porta_w));
-MACHINE_CONFIG_END
+}
 
 
 

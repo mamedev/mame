@@ -1355,13 +1355,11 @@ MACHINE_CONFIG_START(hp85_state::hp85)
 
 	// Beeper
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("dac" , DAC_1BIT , 0)
-	MCFG_MIXER_ROUTE(ALL_OUTPUTS , "mono" , 0.5 , 0)
+	DAC_1BIT(config, m_dac , 0).add_route(ALL_OUTPUTS, "mono", 0.5, AUTO_ALLOC_INPUT, 0);
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	MCFG_DEVICE_ADD("beeper" , BEEP , MASTER_CLOCK / 8192)
-	MCFG_MIXER_ROUTE(ALL_OUTPUTS , "mono" , 0.5 , 0)
+	BEEP(config, m_beep, MASTER_CLOCK / 8192).add_route(ALL_OUTPUTS, "mono", 0.5, AUTO_ALLOC_INPUT, 0);
 
 	// Tape drive
 	MCFG_DEVICE_ADD("tape" , HP_1MA6 , 0)

@@ -219,13 +219,13 @@ void timeplt_audio_device::device_add_mconfig(machine_config &config)
 }
 
 
-MACHINE_CONFIG_START(locomotn_audio_device::device_add_mconfig)
+void locomotn_audio_device::device_add_mconfig(machine_config &config)
+{
 	timeplt_audio_device::device_add_mconfig(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("tpsound")
-	MCFG_DEVICE_PROGRAM_MAP(locomotn_sound_map)
-MACHINE_CONFIG_END
+	m_soundcpu->set_addrmap(AS_PROGRAM, &locomotn_audio_device::locomotn_sound_map);
+}
 
 //-------------------------------------------------
 //  sound_stream_update - handle a stream update

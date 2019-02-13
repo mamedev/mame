@@ -6348,23 +6348,24 @@ void galaxian_state::mshuttle(machine_config &config)
 }
 
 
-MACHINE_CONFIG_START(galaxian_state::kingball)
+void galaxian_state::kingball(machine_config &config)
+{
 	mooncrst(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("audiocpu", Z80,5000000/2)
-	MCFG_DEVICE_PROGRAM_MAP(kingball_sound_map)
-	MCFG_DEVICE_IO_MAP(kingball_sound_portmap)
+	Z80(config, m_audiocpu, 5000000/2);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &galaxian_state::kingball_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &galaxian_state::kingball_sound_portmap);
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("dac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.53) // unknown DAC
+	DAC_4BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.53); // unknown DAC
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
-MACHINE_CONFIG_END
+}
 
 
 void galaxian_state::frogger(machine_config &config)
@@ -6559,7 +6560,8 @@ MACHINE_CONFIG_START(galaxian_state::scorpion)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(galaxian_state::sfx)
+void galaxian_state::sfx(machine_config &config)
+{
 	scramble_base(config);
 
 	config.device_remove("watchdog");
@@ -6568,9 +6570,9 @@ MACHINE_CONFIG_START(galaxian_state::sfx)
 	m_maincpu->set_addrmap(AS_PROGRAM, &galaxian_state::sfx_map);
 
 	/* 3rd CPU for the sample player */
-	MCFG_DEVICE_ADD("audio2", Z80, KONAMI_SOUND_CLOCK/8)
-	MCFG_DEVICE_PROGRAM_MAP(sfx_sample_map)
-	MCFG_DEVICE_IO_MAP(sfx_sample_portmap)
+	Z80(config, m_audio2, KONAMI_SOUND_CLOCK/8);
+	m_audio2->set_addrmap(AS_PROGRAM, &galaxian_state::sfx_sample_map);
+	m_audio2->set_addrmap(AS_IO, &galaxian_state::sfx_sample_portmap);
 
 	I8255A(config, m_ppi8255[2]);
 	m_ppi8255[2]->in_pa_callback().set("soundlatch2", FUNC(generic_latch_8_device::read));
@@ -6582,12 +6584,12 @@ MACHINE_CONFIG_START(galaxian_state::sfx)
 	m_ay8910[1]->port_b_write_callback().set(FUNC(galaxian_state::sfx_sample_control_w));
 
 	/* DAC for the sample player */
-	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // 16-pin IC (not identified by schematics)
+	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // 16-pin IC (not identified by schematics)
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
-MACHINE_CONFIG_END
+}
 
 
 void galaxian_state::monsterz(machine_config &config)

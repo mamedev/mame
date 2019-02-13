@@ -955,9 +955,10 @@ void midway_squawk_n_talk_device::squawkntalk_alt_map(address_map &map)
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(midway_squawk_n_talk_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("cpu", M6802, DERIVED_CLOCK(1, 1))
-	MCFG_DEVICE_PROGRAM_MAP(squawkntalk_map)
+void midway_squawk_n_talk_device::device_add_mconfig(machine_config &config)
+{
+	M6802(config, m_cpu, DERIVED_CLOCK(1, 1));
+	m_cpu->set_addrmap(AS_PROGRAM, &midway_squawk_n_talk_device::squawkntalk_map);
 
 	PIA6821(config, m_pia0, 0);
 	m_pia0->writepa_handler().set(FUNC(midway_squawk_n_talk_device::porta1_w));
@@ -971,12 +972,11 @@ MACHINE_CONFIG_START(midway_squawk_n_talk_device::device_add_mconfig)
 	m_pia1->irqb_handler().set(FUNC(midway_squawk_n_talk_device::irq_w));
 
 	// only used on Discs of Tron, which is stereo
-	MCFG_DEVICE_ADD("tms5200", TMS5200, 640000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, *this, 0.60)
+	TMS5200(config, m_tms5200, 640000).add_route(ALL_OUTPUTS, *this, 0.60);
 
 	// the board also supports an AY-8912 and/or an 8-bit DAC, neither of
 	// which are populated on the Discs of Tron board
-MACHINE_CONFIG_END
+}
 
 
 //-------------------------------------------------

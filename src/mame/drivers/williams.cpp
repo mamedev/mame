@@ -1514,7 +1514,7 @@ MACHINE_CONFIG_START(williams_state::williams)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // mc1408.ic6
+	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // mc1408.ic6
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
@@ -1689,12 +1689,13 @@ MACHINE_CONFIG_START(blaster_state::blastkit)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(blaster_state::blaster)
+void blaster_state::blaster(machine_config &config)
+{
 	blastkit(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("soundcpu_b", M6808, SOUND_CLOCK) // internal clock divider of 4, effective frequency is 894.886kHz
-	MCFG_DEVICE_PROGRAM_MAP(sound_map_b)
+	M6808(config, m_soundcpu_b, SOUND_CLOCK); // internal clock divider of 4, effective frequency is 894.886kHz
+	m_soundcpu_b->set_addrmap(AS_PROGRAM, &blaster_state::sound_map_b);
 
 	/* pia */
 	m_pia[0]->readpb_handler().set("mux_b", FUNC(ls157_device::output_r)).mask(0x0f);
@@ -1728,13 +1729,13 @@ MACHINE_CONFIG_START(blaster_state::blaster)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("ldac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) // unknown DAC
-	MCFG_DEVICE_ADD("rdac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25) // unknown DAC
+	MC1408(config, "ldac", 0).add_route(ALL_OUTPUTS, "lspeaker", 0.25); // unknown DAC
+	MC1408(config, "rdac", 0).add_route(ALL_OUTPUTS, "rspeaker", 0.25); // unknown DAC
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.set_output(5.0);
 	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
 	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
-MACHINE_CONFIG_END
+}
 
 
 MACHINE_CONFIG_START(williams2_state::williams2)
@@ -1773,7 +1774,7 @@ MACHINE_CONFIG_START(williams2_state::williams2)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
