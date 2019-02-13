@@ -221,15 +221,15 @@ SCN2672_DRAW_CHARACTER_MEMBER(pcx_video_device::display_pixels)
 	uint16_t data = m_charrom[charcode * 16 + linecount + (attrcode & 0x20 ? 4096 : 0)];
 
 	if (cursor && blink)
-		data = 0x3ff;
+		data = 0x7ff;
 	else
 	{
 		data <<= 1;
 		data |= data << 1;
 	}
 
-	if (m_p1 & 0x20)
-		data ^= 0x3ff;
+	if (BIT(m_p1, 5))
+		data ^= 0x7ff;
 
 	for (int i = 0; i < 12; i++)
 	{
