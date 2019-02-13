@@ -192,7 +192,7 @@ SCN2674_DRAW_CHARACTER_MEMBER(pcd_video_device::display_pixels)
 		int bgnd = 0, fgnd = 1;
 		data = m_charram[m_vram[address] * 16 + linecount];
 		attr = m_vram[address + 1];
-		if(cursor && blink)
+		if(cursor)
 			data = 0xff;
 		if(ul && (attr & 0x20))
 			data = 0xff;
@@ -220,7 +220,7 @@ SCN2672_DRAW_CHARACTER_MEMBER(pcx_video_device::display_pixels)
 {
 	uint16_t data = m_charrom[charcode * 16 + linecount + (attrcode & 0x20 ? 4096 : 0)];
 
-	if (cursor && blink)
+	if (cursor)
 		data = 0x7ff;
 	else
 	{
