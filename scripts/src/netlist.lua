@@ -63,7 +63,7 @@ project "netlist"
 		MAME_DIR .. "src/lib/netlist/plib/pdynlib.h",
 		MAME_DIR .. "src/lib/netlist/plib/pmain.cpp",
 		MAME_DIR .. "src/lib/netlist/plib/pmain.h",
-    MAME_DIR .. "src/lib/netlist/plib/pmempool.h",
+		MAME_DIR .. "src/lib/netlist/plib/pmempool.h",
 		MAME_DIR .. "src/lib/netlist/plib/pomp.h",
 		MAME_DIR .. "src/lib/netlist/plib/poptions.cpp",
 		MAME_DIR .. "src/lib/netlist/plib/poptions.h",
