@@ -179,7 +179,7 @@ READ16_MEMBER(harddriv_sound_board_device::hdsnd68k_status_r)
 //            D14 = 'Sound Flag'
 //            D13 = Test Switch
 //            D12 = 5220 Ready Flag (0=Ready)
-	logerror("%s:hdsnd68k_status_r(%04X)\n", machine().describe_context(), offset);
+	//logerror("%s:hdsnd68k_status_r(%04X)\n", machine().describe_context(), offset);
 	return (m_mainflag << 15) | (m_soundflag << 14) | 0x2000 | 0;//((ioport("IN0")->read() & 0x0020) << 8) | 0;
 }
 
