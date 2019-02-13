@@ -466,6 +466,7 @@ void hmcs40_cpu_device::do_interrupt()
 		m_irt = 0;
 
 	standard_irq_callback(line);
+	m_prev_pc = m_pc;
 }
 
 void hmcs40_cpu_device::execute_set_input(int line, int state)

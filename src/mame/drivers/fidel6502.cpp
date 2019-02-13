@@ -32,13 +32,17 @@ Memory map:
 0800-0FFF: 1K of RAM (note: mirrored twice)
 1000-17FF: PIA 0 (display, TSI speech chip)
 1800-1FFF: PIA 1 (keypad, LEDs)
-2000-3FFF: 101-64019 ROM (also used on the regular sensory chess challenger)
+2000-3FFF: 101-64019 ROM*
 4000-7FFF: mirror of 0000-3FFF
 8000-9FFF: not used
 A000-BFFF: 101-1025A03 ROM
 C000-DFFF: 101-1025A02 ROM
 E000-FDFF: 101-1025A01 ROM
 FE00-FFFF: 512 byte 74S474 PROM
+
+*: 101-64019 is also used on the VSC(fidelz80.cpp). It contains the opening book
+and "64 greatest games", as well as some Z80 code. Obviously the latter is unused
+on the CSC.
 
 CPU is a 6502 running at 1.95MHz (3.9MHz resonator, divided by 2)
 
