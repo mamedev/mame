@@ -78,17 +78,16 @@ ksm|DVK KSM,
 #define KSM_STATUSLINE_VRAM 0xF8B0
 
 
-#define VERBOSE_DBG 0       /* general debug messages */
+//#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
+#define LOG_KEYBOARD  (1U <<  1)
+#define LOG_DEBUG     (1U <<  2)
 
-#define DBG_LOG(N,M,A) \
-	do { \
-		if(VERBOSE_DBG>=N) \
-		{ \
-			if( M ) \
-				logerror("%11.6f at %s: %-24s",machine().time().as_double(),machine().describe_context(),(char*)M ); \
-			logerror A; \
-		} \
-	} while (0)
+//#define VERBOSE (LOG_DEBUG)
+//#define LOG_OUTPUT_FUNC printf
+#include "logmacro.h"
+
+#define LOGKBD(...) LOGMASKED(LOG_KEYBOARD, __VA_ARGS__)
+#define LOGDBG(...) LOGMASKED(LOG_DEBUG, __VA_ARGS__)
 
 
 class ksm_state : public driver_device
@@ -250,7 +249,7 @@ void ksm_state::video_start()
 
 WRITE8_MEMBER(ksm_state::ksm_ppi_porta_w)
 {
-	DBG_LOG(1, "PPI port A", ("line %d\n", data));
+	LOG("PPI port A line %d\n", data);
 	m_video.line = data;
 }
 
@@ -258,7 +257,7 @@ WRITE8_MEMBER(ksm_state::ksm_ppi_portc_w)
 {
 	brgc = (data >> 5) & 3;
 
-	DBG_LOG(1, "PPI port C", ("raw %02x blink %d speed %d\n", data, BIT(data, 7), brgc));
+	LOG("PPI port C raw %02x blink %d speed %d\n", data, BIT(data, 7), brgc);
 
 	update_brg(brga, brgb, brgc);
 }
@@ -283,7 +282,7 @@ WRITE_LINE_MEMBER(ksm_state::write_brgb)
 
 void ksm_state::update_brg(bool a, bool b, int c)
 {
-	DBG_LOG(2, "brg", ("%d %d %d\n", a, b, c));
+	LOGDBG("brg %d %d %d\n", a, b, c);
 
 	if (a && b) return;
 
@@ -371,9 +370,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(ksm_state::scanline_callback)
 	uint16_t y = m_screen->vpos();
 	uint16_t offset;
 
-	DBG_LOG(2,"scanline_cb",
-		("addr %02x frame %d x %.4d y %.3d row %.2d\n",
-		m_video.line, (int)m_screen->frame_number(), m_screen->hpos(), y, y%11));
+	LOGDBG("scanline_cb addr %02x frame %d x %.4d y %.3d row %.2d\n",
+		m_video.line, (int)m_screen->frame_number(), m_screen->hpos(), y, y%11);
 
 	if (y < KSM_VERT_START) return;
 	y -= KSM_VERT_START;

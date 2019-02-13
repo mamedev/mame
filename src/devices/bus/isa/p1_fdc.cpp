@@ -12,18 +12,6 @@
 #include "cpu/i86/i86.h"
 #include "formats/pc_dsk.h"
 
-#define VERBOSE_DBG 0
-
-#define DBG_LOG(N,M,A) \
-	do { \
-		if(VERBOSE_DBG>=N) \
-		{ \
-			if( M ) \
-				logerror("%11.6f: %-24s",machine().time().as_double(),(char*)M ); \
-			logerror A; \
-		} \
-	} while (0)
-
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -87,7 +75,6 @@ const tiny_rom_entry *p1_fdc_device::device_rom_region() const
 
 uint8_t p1_fdc_device::p1_wd17xx_motor_r()
 {
-	DBG_LOG(1, "p1_fdc_motor_r", ("R = $%02x\n", 0));
 	// XXX always on for now
 	return 0;
 }
@@ -118,8 +105,6 @@ uint8_t p1_fdc_device::p1_wd17xx_aux_r()
 */
 void p1_fdc_device::p1_wd17xx_aux_w(int data)
 {
-	DBG_LOG(1, "p1_fdc_aux_w", ("W $%02x\n", data));
-
 	floppy_image_device *floppy0 = m_fdc->subdevice<floppy_connector>("0")->get_device();
 	floppy_image_device *floppy1 = m_fdc->subdevice<floppy_connector>("1")->get_device();
 	floppy_image_device *floppy = ((data & 2) ? floppy1 : floppy0);

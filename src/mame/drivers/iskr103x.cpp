@@ -25,7 +25,6 @@
 #include "machine/ram.h"
 #include "softlist.h"
 
-#define DBG_LOG(a,b,c)
 
 class iskr103x_state : public driver_device
 {
