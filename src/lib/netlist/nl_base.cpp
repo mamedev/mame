@@ -9,6 +9,7 @@
 #include "solver/nld_solver.h"
 
 #include "plib/palloc.h"
+#include "plib/pmempool.h"
 #include "plib/putil.h"
 
 #include "devices/nlid_proxy.h"
@@ -29,10 +30,8 @@ namespace detail
 
 	static plib::mempool *pool()
 	{
-		static plib::mempool *s_pool = nullptr;
-		if (s_pool == nullptr)
-			s_pool = new plib::mempool(65536, 16);
-		return s_pool;
+		static plib::mempool s_pool(655360, 32);
+		return &s_pool;
 	}
 
 	void * object_t::operator new (size_t size)

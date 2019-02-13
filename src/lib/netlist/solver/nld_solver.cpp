@@ -343,8 +343,8 @@ void NETLIB_NAME(solver)::post_start()
 				break;
 #endif
 #if 0
-			case 87:
-				ms = create_solver<87,87>(87, sname);
+			case 86:
+				ms = create_solver<double,86>(86, sname);
 				break;
 #endif
 #endif

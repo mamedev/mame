@@ -151,44 +151,6 @@ private:
 	bool m_is_owned;
 };
 
-class mempool
-{
-private:
-	struct block
-	{
-		block() : m_num_alloc(0), m_free(0), cur_ptr(nullptr), data(nullptr) { }
-		std::size_t m_num_alloc;
-		std::size_t m_free;
-		char *cur_ptr;
-		char *data;
-	};
-
-	block * new_block();
-	size_t mininfosize();
-
-	struct info
-	{
-		info() : m_block(nullptr) { }
-		block * m_block;
-	};
-
-	size_t m_min_alloc;
-	size_t m_min_align;
-
-	std::vector<block *> m_blocks;
-
-public:
-	mempool(size_t min_alloc, size_t min_align);
-
-	COPYASSIGNMOVE(mempool, delete)
-
-	~mempool();
-
-	void *alloc(size_t size);
-	void free(void *ptr);
-
-};
-
 } // namespace plib
 
 #endif /* PALLOC_H_ */

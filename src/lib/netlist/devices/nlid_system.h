@@ -28,7 +28,7 @@ namespace netlist
 	{
 		NETLIB_CONSTRUCTOR(netlistparams)
 		, m_use_deactivate(*this, "USE_DEACTIVATE", false)
-		, m_startup_strategy(*this, "STARTUP_STRATEGY", 0)
+		, m_startup_strategy(*this, "STARTUP_STRATEGY", 1)
 		{
 		}
 		NETLIB_UPDATEI() { }

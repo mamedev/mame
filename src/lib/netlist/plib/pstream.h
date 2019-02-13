@@ -626,11 +626,11 @@ public:
 	{
 		std::size_t sz = 0;
 		read(sz);
-		auto buf = new plib::string_info<pstring>::mem_t[sz+1];
+		auto buf = plib::palloc_array<plib::string_info<pstring>::mem_t>(sz+1);
 		m_strm.read(reinterpret_cast<pistream::value_type *>(buf), sz);
 		buf[sz] = 0;
 		s = pstring(buf);
-		delete [] buf;
+		plib::pfree_array(buf);
 	}
 
 	template <typename T>

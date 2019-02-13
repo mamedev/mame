@@ -8,20 +8,21 @@
 #ifndef NLSETUP_H_
 #define NLSETUP_H_
 
+#include <memory>
+#include <stack>
+#include <unordered_map>
+#include <vector>
+
 #include "plib/pparser.h"
-#include "plib/pstate.h"
+//#include "plib/pstate.h"
 #include "plib/pstream.h"
 #include "plib/pstring.h"
 #include "plib/putil.h"
 
 #include "netlist_types.h"
 #include "nl_config.h"
-#include "nl_errstr.h"
+//#include "nl_errstr.h"
 #include "nl_factory.h"
-
-#include <memory>
-#include <stack>
-#include <vector>
 
 //============================================================
 //  MACROS / inline netlist definitions
@@ -111,7 +112,6 @@ void NETLIST_NAME(name)(netlist::setup_t &setup)                               \
 #define TRUTHTABLE_END() \
 		setup.tt_factory_create(desc, __FILE__);       \
 	}
-
 
 namespace netlist
 {

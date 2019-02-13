@@ -7,8 +7,8 @@
 
 #include <array>
 
-#include  "nlid_truthtable.h"
-#include "nld_7448.h"
+#include  "nld_7448.h"
+#include "nlid_truthtable.h"
 
 namespace netlist
 {
