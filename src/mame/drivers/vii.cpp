@@ -49,7 +49,8 @@ Disney Princess non-GKR is Sunplus QL8167.
         walle:
             Game seems unhappy with NVRAM, clears contents on each boot.
 		jak_pooh:
-		    In the 'Light Tag' minigame (select the rock) you can't move left, and sometimes it softlocks?
+		    In the 'Light Tag' minigame (select the rock) you can't move left with the DRC (ok with -nodrc)
+			and the game usually softlocks when you find a friend (with or without DRC)
 		
 		vii:
             When loading a cart from file manager, sometimes MAME will crash.
