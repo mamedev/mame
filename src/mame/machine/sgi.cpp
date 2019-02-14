@@ -193,7 +193,6 @@ void sgi_mc_device::set_cpu_buserr(uint32_t address)
 
 uint32_t sgi_mc_device::dma_translate(uint32_t address)
 {
-	machine().debug_break();
 	for (int entry = 0; entry < 4; entry++)
 	{
 		if ((address & 0xffe00000) == (m_dma_tlb_entry_hi[entry] & 0xffe00000))
@@ -705,6 +704,9 @@ void sgi_mc_device::device_timer(emu_timer &timer, device_timer_id id, int param
 	}
 	else if (id == TIMER_DMA)
 	{
-		dma_tick();
+		while (m_dma_run & (1 << 6))
+		{
+			dma_tick();
+		}
 	}
 }
