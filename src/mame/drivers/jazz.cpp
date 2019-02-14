@@ -142,7 +142,7 @@ void jazz_state::jazz_common_map(address_map &map)
 	map(0x80007000, 0x80007007).rw(m_ace[1], FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
 	map(0x80008000, 0x80008007).rw(m_lpt, FUNC(pc_lpt_device::read), FUNC(pc_lpt_device::write)).umask64(0xffffffff);
 	map(0x80009000, 0x8000afff).ram().share("nvram"); // 9000-9fff unprotected/a000-afff protected?
-	map(0x8000b000, 0x8000b007).lr8("mac", [this](offs_t offset)
+	map(0x8000b000, 0x8000b007).lr8("mac", [](offs_t offset)
 	{
 		// mac address and checksum
 		static u8 const mac[] = { 0x00, 0x00, 0x6b, 0x12, 0x34, 0x56, 0x00, 0xf7 };
