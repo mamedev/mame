@@ -79,7 +79,7 @@
 #define ODD_REGS 0x00010840U
 
 // address computation
-#define ADDR(r, o) (m_64 ? ((r) + (o)) : s64(s32((r) + (o))))
+#define ADDR(r, o) (cp0_64() ? ((r) + (o)) : s64(s32((r) + (o))))
 
 #define SR         m_cp0[CP0_Status]
 #define CAUSE      m_cp0[CP0_Cause]
@@ -200,7 +200,6 @@ void r4000_base_device::device_reset()
 	m_cp0[CP0_Count] = 0;
 
 	m_cp0_timer_zero = total_cycles();
-	m_64 = false;
 
 	if (m_ll_watch)
 	{
@@ -332,7 +331,7 @@ void r4000_base_device::cpu_execute(u32 const op)
 			break;
 		//case 0x01: // *
 		case 0x02: // SRL
-			m_r[RDREG] = u32(m_r[RTREG]) >> SHIFT;
+			m_r[RDREG] = s64(s32(u32(m_r[RTREG]) >> SHIFT));
 			break;
 		case 0x03: // SRA
 			m_r[RDREG] = s64(s32(m_r[RTREG]) >> SHIFT);
@@ -342,7 +341,7 @@ void r4000_base_device::cpu_execute(u32 const op)
 			break;
 		//case 0x05: // *
 		case 0x06: // SRLV
-			m_r[RDREG] = u32(m_r[RTREG]) >> (m_r[RSREG] & 31);
+			m_r[RDREG] = s64(s32(u32(m_r[RTREG]) >> (m_r[RSREG] & 31)));
 			break;
 		case 0x07: // SRAV
 			m_r[RDREG] = s64(s32(m_r[RTREG]) >> (m_r[RSREG] & 31));
@@ -481,8 +480,8 @@ void r4000_base_device::cpu_execute(u32 const op)
 		case 0x1b: // DIVU
 			if (m_r[RTREG])
 			{
-				m_lo = s64(u32(m_r[RSREG]) / u32(m_r[RTREG]));
-				m_hi = s64(u32(m_r[RSREG]) % u32(m_r[RTREG]));
+				m_lo = s64(s32(u32(m_r[RSREG]) / u32(m_r[RTREG])));
+				m_hi = s64(s32(u32(m_r[RSREG]) % u32(m_r[RTREG])));
 			}
 			m_icount -= 35;
 			break;
@@ -503,9 +502,9 @@ void r4000_base_device::cpu_execute(u32 const op)
 				m_hi = p4 + (p2 >> 32) + (p3 >> 32) + carry;
 
 				// adjust for sign
-				if (m_r[RSREG] < 0)
+				if (s64(m_r[RSREG]) < 0)
 					m_hi -= m_r[RTREG];
-				if (m_r[RTREG] < 0)
+				if (s64(m_r[RTREG]) < 0)
 					m_hi -= m_r[RSREG];
 
 				m_icount -= 7;
@@ -721,7 +720,7 @@ void r4000_base_device::cpu_execute(u32 const op)
 				cpu_exception(EXCEPTION_TR);
 			break;
 		case 0x09: // TGEIU
-			if (m_r[RSREG] >= u16(op))
+			if (m_r[RSREG] >= u64(s64(s16(op))))
 				cpu_exception(EXCEPTION_TR);
 			break;
 		case 0x0a: // TLTI
@@ -729,16 +728,16 @@ void r4000_base_device::cpu_execute(u32 const op)
 				cpu_exception(EXCEPTION_TR);
 			break;
 		case 0x0b: // TLTIU
-			if (m_r[RSREG] >= u16(op))
+			if (m_r[RSREG] >= u64(s64(s16(op))))
 				cpu_exception(EXCEPTION_TR);
 			break;
 		case 0x0c: // TEQI
-			if (m_r[RSREG] == u16(op))
+			if (m_r[RSREG] == u64(s64(s16(op))))
 				cpu_exception(EXCEPTION_TR);
 			break;
 		//case 0x0d: // *
 		case 0x0e: // TNEI
-			if (m_r[RSREG] != u16(op))
+			if (m_r[RSREG] != u64(s64(s16(op))))
 				cpu_exception(EXCEPTION_TR);
 			break;
 		//case 0x0f: // *
@@ -854,7 +853,7 @@ void r4000_base_device::cpu_execute(u32 const op)
 		m_r[RTREG] = s64(m_r[RSREG]) < s64(s16(op));
 		break;
 	case 0x0b: // SLTIU
-		m_r[RTREG] = u64(m_r[RSREG]) < u64(s16(op));
+		m_r[RTREG] = m_r[RSREG] < u64(s64(s16(op)));
 		break;
 	case 0x0c: // ANDI
 		m_r[RTREG] = m_r[RSREG] & u16(op);
@@ -866,7 +865,7 @@ void r4000_base_device::cpu_execute(u32 const op)
 		m_r[RTREG] = m_r[RSREG] ^ u16(op);
 		break;
 	case 0x0f: // LUI
-		m_r[RTREG] = s64(s32(u16(op) << 16));
+		m_r[RTREG] = s64(s16(op)) << 16;
 		break;
 	case 0x10: // COP0
 		cp0_execute(op);
@@ -929,13 +928,13 @@ void r4000_base_device::cpu_execute(u32 const op)
 		m_r[RTREG] = m_r[RSREG] + s64(s16(op));
 		break;
 	case 0x1a: // LDL
-		if (m_64 || !(SR & SR_KSU) || (SR & SR_EXL) || (SR & SR_ERL))
+		if (!(SR & SR_KSU) || (SR & (SR_EXL | SR_ERL)) || cp0_64())
 			cpu_ldl(op);
 		else
 			cpu_exception(EXCEPTION_RI);
 		break;
 	case 0x1b: // LDR
-		if (m_64 || !(SR & SR_KSU) || (SR & SR_EXL) || (SR & SR_ERL))
+		if (!(SR & SR_KSU) || (SR & (SR_EXL | SR_ERL)) || cp0_64())
 			cpu_ldr(op);
 		else
 			cpu_exception(EXCEPTION_RI);
@@ -1005,13 +1004,13 @@ void r4000_base_device::cpu_execute(u32 const op)
 		store<u32>(ADDR(m_r[RSREG], s16(op)), u32(m_r[RTREG]));
 		break;
 	case 0x2c: // SDL
-		if (m_64 || !(SR & SR_KSU) || (SR & SR_EXL) || (SR & SR_ERL))
+		if (!(SR & SR_KSU) || (SR & (SR_EXL | SR_ERL)) || cp0_64())
 			cpu_sdl(op);
 		else
 			cpu_exception(EXCEPTION_RI);
 		break;
 	case 0x2d: // SDR
-		if (m_64 || !(SR & SR_KSU) || (SR & SR_EXL) || (SR & SR_ERL))
+		if (!(SR & SR_KSU) || (SR & (SR_EXL | SR_ERL)) || cp0_64())
 			cpu_sdr(op);
 		else
 			cpu_exception(EXCEPTION_RI);
@@ -1224,8 +1223,6 @@ void r4000_base_device::cpu_exception(u32 exception, u16 const vector)
 		}
 
 		SR |= SR_EXL;
-
-		m_64 = m_cp0[CP0_Status] & SR_KX;
 	}
 	else
 		CAUSE = (CAUSE & (CAUSE_BD | CAUSE_IP)) | exception;
@@ -1336,7 +1333,7 @@ void r4000_base_device::cp0_execute(u32 const op)
 		// 64-bit non-Kernel (User or Supervisor) mode. These instructions
 		// cause a reserved instruction exception if 64-bit operation is
 		// not enabled in User or Supervisor mode.
-		if (!(SR & SR_KSU) || (SR & (SR_EXL | SR_ERL)) || m_64)
+		if (!(SR & SR_KSU) || (SR & (SR_EXL | SR_ERL)) || cp0_64())
 			m_r[RTREG] = cp0_get(RDREG);
 		else
 			cpu_exception(EXCEPTION_RI);
@@ -1353,7 +1350,7 @@ void r4000_base_device::cp0_execute(u32 const op)
 		// 64-bit non-Kernel (User or Supervisor) mode. These instructions
 		// cause a reserved instruction exception if 64-bit operation is
 		// not enabled in User or Supervisor mode.
-		if (!(SR & SR_KSU) || (SR & (SR_EXL | SR_ERL)) || m_64)
+		if (!(SR & SR_KSU) || (SR & (SR_EXL | SR_ERL)) || cp0_64())
 			cp0_set(RDREG, m_r[RTREG]);
 		else
 			cpu_exception(EXCEPTION_RI);
@@ -1419,7 +1416,6 @@ void r4000_base_device::cp0_execute(u32 const op)
 				m_pc = m_cp0[CP0_EPC];
 				SR &= ~SR_EXL;
 			}
-			cp0_mode_check();
 
 			if (m_ll_watch)
 			{
@@ -1491,9 +1487,6 @@ void r4000_base_device::cp0_set(unsigned const reg, u64 const data)
 
 	case CP0_Status:
 		m_cp0[CP0_Status] = u32(data);
-
-		// reevaluate operating mode
-		cp0_mode_check();
 
 		// FIXME: software interrupt check
 		if (CAUSE & SR & SR_IMSW)
@@ -1597,7 +1590,7 @@ void r4000_base_device::cp0_tlbp()
 	{
 		tlb_entry_t const &entry = m_tlb[index];
 
-		u64 const mask = (m_64 ? EH_R | (EH_VPN2_64 & ~entry.mask) : (EH_VPN2_32 & ~entry.mask))
+		u64 const mask = (cp0_64() ? EH_R | (EH_VPN2_64 & ~entry.mask) : (EH_VPN2_32 & ~entry.mask))
 			| ((entry.vpn & EH_G) ? 0 : EH_ASID);
 
 		if ((entry.vpn & mask) == (m_cp0[CP0_EntryHi] & mask))
@@ -1629,17 +1622,16 @@ TIMER_CALLBACK_MEMBER(r4000_base_device::cp0_timer_callback)
 	m_cp0[CP0_Cause] |= CAUSE_IPEX5;
 }
 
-void r4000_base_device::cp0_mode_check()
+bool r4000_base_device::cp0_64() const
 {
-	if (!(m_cp0[CP0_Status] & (SR_EXL | SR_ERL)))
-		switch (m_cp0[CP0_Status] & SR_KSU)
-		{
-		case SR_KSU_K: m_64 = m_cp0[CP0_Status] & SR_KX; break;
-		case SR_KSU_S: m_64 = m_cp0[CP0_Status] & SR_SX; break;
-		case SR_KSU_U: m_64 = m_cp0[CP0_Status] & SR_UX; break;
-		}
-	else
-		m_64 = m_cp0[CP0_Status] & SR_KX;
+	switch (SR & (SR_KSU | SR_ERL | SR_EXL))
+	{
+	case SR_KSU_U: return bool(SR & SR_UX);
+	case SR_KSU_S: return bool(SR & SR_SX);
+
+	default:
+		return bool(SR & SR_KX);
+	}
 }
 
 void r4000_base_device::cp1_execute(u32 const op)
@@ -2485,7 +2477,7 @@ void r4000_base_device::cp2_execute(u32 const op)
 			// 64-bit non-Kernel (User or Supervisor) mode. These instructions
 			// cause a reserved instruction exception if 64-bit operation is
 			// not enabled in User or Supervisor mode.
-			if (!(SR & SR_KSU) || (SR & (SR_EXL | SR_ERL)) || m_64)
+			if (!(SR & SR_KSU) || (SR & (SR_EXL | SR_ERL)) || cp0_64())
 				logerror("dmfc2 unimplemented (%s)\n", machine().describe_context());
 			else
 				cpu_exception(EXCEPTION_RI);
@@ -2503,7 +2495,7 @@ void r4000_base_device::cp2_execute(u32 const op)
 			// 64-bit non-Kernel (User or Supervisor) mode. These instructions
 			// cause a reserved instruction exception if 64-bit operation is
 			// not enabled in User or Supervisor mode.
-			if (!(SR & SR_KSU) || (SR & (SR_EXL | SR_ERL)) || m_64)
+			if (!(SR & SR_KSU) || (SR & (SR_EXL | SR_ERL)) || cp0_64())
 				logerror("dmtc2 unimplemented (%s)\n", machine().describe_context());
 			else
 				cpu_exception(EXCEPTION_RI);

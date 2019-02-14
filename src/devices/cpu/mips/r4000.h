@@ -343,7 +343,7 @@ protected:
 	// cp0 helpers
 	TIMER_CALLBACK_MEMBER(cp0_timer_callback);
 	void cp0_update_timer(bool start = false);
-	void cp0_mode_check();
+	bool cp0_64() const;
 
 	// cp1 implementation
 	void cp1_execute(u32 const op);
@@ -405,7 +405,6 @@ protected:
 	}
 	m_tlb[48];
 	unsigned m_tlb_mru[3][48];
-	bool m_64;
 
 	// cp1 state
 	u64 m_f[32]; // floating point registers
