@@ -6,8 +6,8 @@
 	<!-- for test mode, hold UP, press A, press DOWN -->
 	<software name="nrxdig"> <!-- has SEEPROM -->
 		<description>New Rally X &amp; Dig Dug (01 APR 2005 A SKU E)</description>
-		<publisher>JAKKS Pacific Inc / Namco / HotGen Ltd</publisher>
 		<year>2005</year>
+		<publisher>JAKKS Pacific Inc / Namco / HotGen Ltd</publisher>
 		<part name="cart" interface="jakks_gamekey">
 			<feature name="slot" value="rom_24lc04"/>
 			<dataarea name="rom" size="0x800000">
@@ -18,8 +18,8 @@
 
 	<software name="pacbosrx"> <!-- has SEEPROM -->
 		<description>Pac-Man &amp; Bosconian &amp; Rally X (11 JUL 2005 A SKU I)</description>
-		<publisher>JAKKS Pacific Inc / Namco / HotGen Ltd</publisher>
 		<year>2005</year>
+		<publisher>JAKKS Pacific Inc / Namco / HotGen Ltd</publisher>
 		<part name="cart" interface="jakks_gamekey">
 			<feature name="slot" value="rom_24lc04"/>
 			<dataarea name="rom" size="0x800000">
