@@ -581,6 +581,8 @@ void pcd_state::pcx(machine_config &config)
 	subdevice<pcd_keyboard_device>("keyboard")->out_tx_handler().set("video", FUNC(pcx_video_device::rx_w));
 
 	m_usart[1]->txd_handler().set_nop();
+
+	SOFTWARE_LIST(config, "flop_ls").set_original("pcx_flop");
 }
 
 //**************************************************************************
