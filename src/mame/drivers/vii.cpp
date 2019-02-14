@@ -663,6 +663,9 @@ static INPUT_PORTS_START( jak_sdoo_i2c ) // GameKeyReady units had 2 main button
 	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_UNUSED ) // debug input, skips levels!
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x00c0, IP_ACTIVE_HIGH, IPT_UNUSED ) // must be low or other inputs don't work?
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Menu / Pause")
+	PORT_BIT( 0x001f, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P3")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, jakks_gkr_state,i2c_gkr_r, nullptr) // is this correct? doesn't seem to work
