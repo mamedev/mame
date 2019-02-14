@@ -207,7 +207,7 @@ protected:
 	std::vector<analog_net_t *> m_nets;
 	std::vector<std::unique_ptr<proxied_analog_output_t>> m_inps;
 
-	std::vector<terms_for_net_t *> m_rails_temp;
+	std::vector<std::unique_ptr<terms_for_net_t>> m_rails_temp;
 
 	const solver_parameters_t &m_params;
 

@@ -593,11 +593,12 @@ void setup_t::connect_terminals(detail::core_terminal_t &t1, detail::core_termin
 	{
 		log().debug("adding analog net ...\n");
 		// FIXME: Nets should have a unique name
-		auto anet = plib::palloc<analog_net_t>(netlist(),"net." + t1.name());
-		netlist().register_net(plib::owned_ptr<analog_net_t>(anet, true));
-		t1.set_net(anet);
-		anet->add_terminal(t2);
-		anet->add_terminal(t1);
+		auto anet = plib::owned_ptr<analog_net_t>::Create(netlist(),"net." + t1.name());
+		auto anetp = anet.get();
+		netlist().register_net(std::move(anet));
+		t1.set_net(anetp);
+		anetp->add_terminal(t2);
+		anetp->add_terminal(t1);
 	}
 }
 
@@ -647,8 +648,6 @@ bool setup_t::connect_input_input(detail::core_terminal_t &t1, detail::core_term
 	}
 	return ret;
 }
-
-
 
 bool setup_t::connect(detail::core_terminal_t &t1_in, detail::core_terminal_t &t2_in)
 {

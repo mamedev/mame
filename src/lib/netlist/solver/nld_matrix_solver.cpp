@@ -100,7 +100,7 @@ void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 	{
 		m_nets.push_back(net);
 		m_terms.push_back(plib::make_unique<terms_for_net_t>());
-		m_rails_temp.push_back(plib::palloc<terms_for_net_t>());
+		m_rails_temp.push_back(plib::make_unique<terms_for_net_t>());
 	}
 
 	for (std::size_t k = 0; k < nets.size(); k++)
@@ -271,12 +271,12 @@ void matrix_solver_t::setup_matrix()
 		m_terms[k]->set_pointers();
 	}
 
-	for (terms_for_net_t *rt : m_rails_temp)
+	for (auto &rt : m_rails_temp)
 	{
 		rt->clear(); // no longer needed
-		plib::pfree(rt); // no longer needed
 	}
 
+	// free all - no longer needed
 	m_rails_temp.clear();
 
 	sort_terms(m_sort);

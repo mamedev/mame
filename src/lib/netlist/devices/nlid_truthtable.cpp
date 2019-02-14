@@ -453,7 +453,7 @@ netlist_base_factory_truthtable_t::netlist_base_factory_truthtable_t(const pstri
 
 #define ENTRYY(n, m, s)    case (n * 100 + m): \
 	{ using xtype = netlist_factory_truthtable_t<n, m>; \
-		ret = plib::palloc<xtype>(desc.name, desc.classname, desc.def_param, s); } break
+		ret = plib::make_unique<xtype>(desc.name, desc.classname, desc.def_param, s); } break
 
 #define ENTRY(n, s) ENTRYY(n, 1, s); ENTRYY(n, 2, s); ENTRYY(n, 3, s); \
 					ENTRYY(n, 4, s); ENTRYY(n, 5, s); ENTRYY(n, 6, s); \
@@ -461,7 +461,7 @@ netlist_base_factory_truthtable_t::netlist_base_factory_truthtable_t(const pstri
 
 void tt_factory_create(setup_t &setup, tt_desc &desc, const pstring &sourcefile)
 {
-	netlist_base_factory_truthtable_t *ret;
+	std::unique_ptr<netlist_base_factory_truthtable_t> ret;
 
 	switch (desc.ni * 100 + desc.no)
 	{
@@ -484,7 +484,7 @@ void tt_factory_create(setup_t &setup, tt_desc &desc, const pstring &sourcefile)
 	ret->m_desc = desc.desc;
 	if (desc.family != "")
 		ret->m_family = setup.family_from_model(desc.family);
-	setup.factory().register_device(std::unique_ptr<netlist_base_factory_truthtable_t>(ret));
+	setup.factory().register_device(std::move(ret));
 }
 
 	} //namespace devices

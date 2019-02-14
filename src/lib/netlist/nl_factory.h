@@ -27,7 +27,7 @@
 	static std::unique_ptr<factory::element_t> NETLIB_NAME(p_alias ## _c) \
 			(const pstring &classname) \
 	{ \
-		return std::unique_ptr<factory::element_t>(plib::palloc<factory::device_element_t<ns :: NETLIB_NAME(chip)>>(p_name, classname, p_def_param, pstring(__FILE__))); \
+		return plib::make_unique<factory::device_element_t<ns :: NETLIB_NAME(chip)>>(p_name, classname, p_def_param, pstring(__FILE__)); \
 	} \
 	\
 	factory::constructor_ptr_t decl_ ## p_alias = NETLIB_NAME(p_alias ## _c);
@@ -101,7 +101,7 @@ namespace factory {
 		void register_device(const pstring &name, const pstring &classname,
 			const pstring &def_param)
 		{
-			register_device(std::unique_ptr<element_t>(plib::palloc<device_element_t<device_class>>(name, classname, def_param)));
+			register_device(plib::make_unique<device_element_t<device_class>>(name, classname, def_param));
 		}
 
 		void register_device(std::unique_ptr<element_t> &&factory);
@@ -128,7 +128,7 @@ namespace factory {
 	std::unique_ptr<element_t> constructor_t(const pstring &name, const pstring &classname,
 			const pstring &def_param)
 	{
-		return std::unique_ptr<element_t>(plib::palloc<device_element_t<T>>(name, classname, def_param));
+		return plib::make_unique<device_element_t<T>>(name, classname, def_param);
 	}
 
 	// -----------------------------------------------------------------------------
