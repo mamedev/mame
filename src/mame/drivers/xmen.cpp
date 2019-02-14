@@ -298,28 +298,29 @@ TIMER_DEVICE_CALLBACK_MEMBER(xmen_state::xmen_scanline)
 
 }
 
-MACHINE_CONFIG_START(xmen_state::xmen)
-
+void xmen_state::xmen(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	M68000(config, m_maincpu, XTAL(16'000'000)); /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &xmen_state::main_map);
+
 	TIMER(config, "scantimer").configure_scanline(FUNC(xmen_state::xmen_scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(16'000'000)/2) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	Z80(config, m_audiocpu, XTAL(16'000'000)/2); /* verified on pcb */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &xmen_state::sound_map);
 
 	EEPROM_ER5911_8BIT(config, "eeprom");
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59.17)   /* verified on pcb */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(13*8, (64-13)*8-1, 2*8, 30*8-1 )   /* correct, same issue of TMNT2 */
-	MCFG_SCREEN_UPDATE_DRIVER(xmen_state, screen_update_xmen)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(59.17);   /* verified on pcb */
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(13*8, (64-13)*8-1, 2*8, 30*8-1 );   /* correct, same issue of tmnt2 */
+	m_screen->set_screen_update(FUNC(xmen_state::screen_update_xmen));
+	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 2048).enable_shadows();
 
@@ -342,20 +343,21 @@ MACHINE_CONFIG_START(xmen_state::xmen)
 
 	YM2151(config, "ymsnd", XTAL(16'000'000)/4).add_route(0, "lspeaker", 0.20).add_route(1, "rspeaker", 0.20);  /* verified on pcb */
 
-	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
-	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
-MACHINE_CONFIG_END
+	K054539(config, m_k054539, XTAL(18'432'000));
+	m_k054539->add_route(0, "rspeaker", 1.00);
+	m_k054539->add_route(1, "lspeaker", 1.00);
+}
 
-MACHINE_CONFIG_START(xmen_state::xmen6p)
-
+void xmen_state::xmen6p(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(_6p_main_map)
+	M68000(config, m_maincpu, XTAL(16'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &xmen_state::_6p_main_map);
+
 	TIMER(config, "scantimer").configure_scanline(FUNC(xmen_state::xmen_scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(16'000'000)/2)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	Z80(config, m_audiocpu, XTAL(16'000'000)/2);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &xmen_state::sound_map);
 
 	EEPROM_ER5911_8BIT(config, "eeprom");
 
@@ -365,22 +367,22 @@ MACHINE_CONFIG_START(xmen_state::xmen6p)
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 2048).enable_shadows();
 	config.set_default_layout(layout_dualhsxs);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(12*8, 48*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(xmen_state, screen_update_xmen6p_left)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(12*8, 48*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(xmen_state::screen_update_xmen6p_left));
+	m_screen->set_palette("palette");
 
-	MCFG_SCREEN_ADD("screen2", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(16*8, 52*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(xmen_state, screen_update_xmen6p_right)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, xmen_state, screen_vblank_xmen6p))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen2(SCREEN(config, "screen2", SCREEN_TYPE_RASTER));
+	screen2.set_refresh_hz(60);
+	screen2.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen2.set_size(64*8, 32*8);
+	screen2.set_visarea(16*8, 52*8-1, 2*8, 30*8-1);
+	screen2.set_screen_update(FUNC(xmen_state::screen_update_xmen6p_right));
+	screen2.screen_vblank().set(FUNC(xmen_state::screen_vblank_xmen6p));
+	screen2.set_palette("palette");
 
 	MCFG_VIDEO_START_OVERRIDE(xmen_state,xmen6p)
 
@@ -404,10 +406,10 @@ MACHINE_CONFIG_START(xmen_state::xmen6p)
 
 	YM2151(config, "ymsnd", XTAL(16'000'000)/4).add_route(0, "lspeaker", 0.20).add_route(1, "rspeaker", 0.20);
 
-	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
-	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
-MACHINE_CONFIG_END
+	K054539(config, m_k054539, XTAL(18'432'000));
+	m_k054539->add_route(0, "rspeaker", 1.00);
+	m_k054539->add_route(1, "lspeaker", 1.00);
+}
 
 
 /***************************************************************************

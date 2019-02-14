@@ -414,11 +414,12 @@ static void z80ne_floppies(device_slot_interface &device)
 	device.option_add("sssd", FLOPPY_525_SSSD);
 }
 
-MACHINE_CONFIG_START(z80ne_state::z80ne)
+void z80ne_state::z80ne(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("z80ne", Z80, Z80NE_CPU_SPEED_HZ)
-	MCFG_DEVICE_PROGRAM_MAP(z80ne_mem)
-	MCFG_DEVICE_IO_MAP(z80ne_io)
+	Z80(config, m_maincpu, Z80NE_CPU_SPEED_HZ);
+	m_maincpu->set_addrmap(AS_PROGRAM, &z80ne_state::z80ne_mem);
+	m_maincpu->set_addrmap(AS_IO, &z80ne_state::z80ne_io);
 
 	MCFG_MACHINE_START_OVERRIDE(z80ne_state,z80ne)
 	MCFG_MACHINE_RESET_OVERRIDE(z80ne_state,z80ne)
@@ -444,14 +445,14 @@ MACHINE_CONFIG_START(z80ne_state::z80ne)
 
 	// all known tapes require LX.388 expansion
 	//SOFTWARE_LIST(config, "cass_list").set_original("z80ne_cass");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(z80ne_state::z80net)
+void z80ne_state::z80net(machine_config &config)
+{
 	z80ne(config);
 
-	MCFG_DEVICE_MODIFY("z80ne")
-	MCFG_DEVICE_PROGRAM_MAP(z80net_mem)
-	MCFG_DEVICE_IO_MAP(z80net_io)
+	m_maincpu->set_addrmap(AS_PROGRAM, &z80ne_state::z80net_mem);
+	m_maincpu->set_addrmap(AS_IO, &z80ne_state::z80net_io);
 
 	MCFG_MACHINE_START_OVERRIDE(z80ne_state, z80net )
 	MCFG_MACHINE_RESET_OVERRIDE(z80ne_state, z80net )
@@ -483,13 +484,14 @@ MACHINE_CONFIG_START(z80ne_state::z80net)
 	m_ram->set_default_size("32K").set_extra_options("1K");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("z80ne_cass");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(z80ne_state::z80netb)
+void z80ne_state::z80netb(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("z80ne", Z80, Z80NE_CPU_SPEED_HZ)
-	MCFG_DEVICE_PROGRAM_MAP(z80netb_mem)
-	MCFG_DEVICE_IO_MAP(z80net_io)
+	Z80(config, m_maincpu, Z80NE_CPU_SPEED_HZ);
+	m_maincpu->set_addrmap(AS_PROGRAM, &z80ne_state::z80netb_mem);
+	m_maincpu->set_addrmap(AS_IO, &z80ne_state::z80net_io);
 
 	MCFG_MACHINE_START_OVERRIDE(z80ne_state,z80netb)
 	MCFG_MACHINE_RESET_OVERRIDE(z80ne_state,z80netb)
@@ -535,13 +537,14 @@ MACHINE_CONFIG_START(z80ne_state::z80netb)
 	RAM(config, m_ram).set_default_size("32K").set_extra_options("1K");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("z80ne_cass");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(z80netf_state::z80netf)
+void z80netf_state::z80netf(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("z80ne", Z80, Z80NE_CPU_SPEED_HZ)
-	MCFG_DEVICE_PROGRAM_MAP(z80netf_mem)
-	MCFG_DEVICE_IO_MAP(z80netf_io)
+	Z80(config, m_maincpu, Z80NE_CPU_SPEED_HZ);
+	m_maincpu->set_addrmap(AS_PROGRAM, &z80netf_state::z80netf_mem);
+	m_maincpu->set_addrmap(AS_IO, &z80netf_state::z80netf_io);
 
 	MCFG_MACHINE_START_OVERRIDE(z80netf_state,z80netf)
 	MCFG_MACHINE_RESET_OVERRIDE(z80netf_state,z80netf)
@@ -584,7 +587,7 @@ MACHINE_CONFIG_START(z80netf_state::z80netf)
 
 	SOFTWARE_LIST(config, "cass_list").set_original("z80ne_cass");
 	SOFTWARE_LIST(config, "flop_list").set_original("z80ne_flop");
-MACHINE_CONFIG_END
+}
 
 /******************************************************************************
  ROM Definitions

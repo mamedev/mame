@@ -590,7 +590,7 @@ uint32_t pc1512_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( pc1512 )
+//  machine_config( pc1512 )
 //-------------------------------------------------
 
 void pc1512_state::pc1512_video(machine_config &config)

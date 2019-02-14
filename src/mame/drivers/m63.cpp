@@ -755,8 +755,8 @@ INTERRUPT_GEN_MEMBER(m63_state::vblank_irq)
 		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-MACHINE_CONFIG_START(m63_state::m63)
-
+void m63_state::m63(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(12'000'000)/4); /* 3 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &m63_state::m63_map);

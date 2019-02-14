@@ -54,11 +54,12 @@ void wyse_state::io_map(address_map &map)
 static INPUT_PORTS_START( wyse )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(wyse_state::wyse)
-	MCFG_DEVICE_ADD("maincpu", I8031, 11'000'000)
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
-MACHINE_CONFIG_END
+void wyse_state::wyse(machine_config &config)
+{
+	i8031_device &maincpu(I8031(config, "maincpu", 11'000'000));
+	maincpu.set_addrmap(AS_PROGRAM, &wyse_state::mem_map);
+	maincpu.set_addrmap(AS_IO, &wyse_state::io_map);
+}
 
 ROM_START( wy30p )
 	ROM_REGION( 0x10000, "maincpu", 0 )

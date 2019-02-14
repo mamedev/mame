@@ -676,7 +676,7 @@ void fastfred_state::fastfred(machine_config &config)
 	AY8910(config, "ay8910.1", XTAL(12'432'000)/8).add_route(ALL_OUTPUTS, "mono", 0.25); /* 1.554 MHz; xtal from pcb pics, divider not verified */
 
 	AY8910(config, "ay8910.2", XTAL(12'432'000)/8).add_route(ALL_OUTPUTS, "mono", 0.25); /* 1.554 MHz; xtal from pcb pics, divider not verified */
-MACHINE_CONFIG_END
+}
 
 void fastfred_state::jumpcoas(machine_config &config)
 {

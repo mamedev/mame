@@ -579,7 +579,7 @@ void pyl601_state::pyl601(machine_config &config)
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("576K"); // 64 + 512
-MACHINE_CONFIG_END
+}
 
 void pyl601_state::pyl601a(machine_config &config)
 {

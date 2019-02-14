@@ -487,7 +487,7 @@ MACHINE_CONFIG_START(sorcerer_state::sorcererd)
 
 	MICROPOLIS(config, m_fdc, 0);
 	m_fdc->set_default_drive_tags();
-	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(sorcerer_floppy_interface)
+	legacy_floppy_image_device::add_4drives(config, &sorcerer_floppy_interface);
 
 	FD1793(config, m_fdc2, 8_MHz_XTAL / 8);  // confirmed clock
 	m_fdc2->set_force_ready(true); // should be able to get rid of this when fdc issue is fixed

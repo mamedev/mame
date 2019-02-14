@@ -577,8 +577,8 @@ WRITE16_MEMBER( sengokmj_state::layer_scroll_w )
 }
 
 
-MACHINE_CONFIG_START(sengokmj_state::sengokmj)
-
+void sengokmj_state::sengokmj(machine_config &config)
+{
 	/* basic machine hardware */
 	V30(config, m_maincpu, 16000000/2); /* V30-8 */
 	m_maincpu->set_addrmap(AS_PROGRAM, &sengokmj_state::sengokmj_map);

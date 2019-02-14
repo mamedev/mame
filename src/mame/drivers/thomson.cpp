@@ -668,18 +668,14 @@ MACHINE_CONFIG_START(thomson_state::to7_base)
 /* floppy */
 	MCFG_DEVICE_ADD("mc6843", MC6843, 16_MHz_XTAL / 16 / 2)
 
-	MCFG_DEVICE_ADD(m_floppy_image[0], LEGACY_FLOPPY, 0)
-	MCFG_LEGACY_FLOPPY_CONFIG(thomson_floppy_interface)
-	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(*this, thomson_state, fdc_index_0_w))
-	MCFG_DEVICE_ADD(m_floppy_image[1], LEGACY_FLOPPY, 0)
-	MCFG_LEGACY_FLOPPY_CONFIG(thomson_floppy_interface)
-	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(*this, thomson_state, fdc_index_1_w))
-	MCFG_DEVICE_ADD(m_floppy_image[2], LEGACY_FLOPPY, 0)
-	MCFG_LEGACY_FLOPPY_CONFIG(thomson_floppy_interface)
-	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(*this, thomson_state, fdc_index_2_w))
-	MCFG_DEVICE_ADD(m_floppy_image[3], LEGACY_FLOPPY, 0)
-	MCFG_LEGACY_FLOPPY_CONFIG(thomson_floppy_interface)
-	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(*this, thomson_state, fdc_index_3_w))
+	LEGACY_FLOPPY(config, m_floppy_image[0], 0, &thomson_floppy_interface);
+	m_floppy_image[0]->out_idx_cb().set(FUNC(thomson_state::fdc_index_0_w));
+	LEGACY_FLOPPY(config, m_floppy_image[1], 0, &thomson_floppy_interface);
+	m_floppy_image[1]->out_idx_cb().set(FUNC(thomson_state::fdc_index_1_w));
+	LEGACY_FLOPPY(config, m_floppy_image[2], 0, &thomson_floppy_interface);
+	m_floppy_image[2]->out_idx_cb().set(FUNC(thomson_state::fdc_index_2_w));
+	LEGACY_FLOPPY(config, m_floppy_image[3], 0, &thomson_floppy_interface);
+	m_floppy_image[3]->out_idx_cb().set(FUNC(thomson_state::fdc_index_3_w));
 
 	WD2793(config, m_wd2793_fdc, 16_MHz_XTAL / 16);
 	FLOPPY_CONNECTOR(config, "wd2793:0", cd90_640_floppies, "dd", thomson_state::cd90_640_formats);

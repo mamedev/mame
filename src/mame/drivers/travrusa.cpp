@@ -338,7 +338,7 @@ void travrusa_state::shtrider(machine_config &config)
 	/* video hardware */
 	m_gfxdecode->set_info(gfx_shtrider);
 	m_palette->set_init(FUNC(travrusa_state::shtrider_palette));
-MACHINE_CONFIG_END
+}
 
 void travrusa_state::shtriderb(machine_config &config)
 {

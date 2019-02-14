@@ -1272,7 +1272,7 @@ void wangpc_state::on_disk1_unload(floppy_image_device *image)
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( wangpc )
+//  machine_config( wangpc )
 //-------------------------------------------------
 
 void wangpc_state::wangpc(machine_config &config)

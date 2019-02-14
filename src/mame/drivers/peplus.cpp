@@ -1371,7 +1371,8 @@ void peplus_state::machine_start()
 *     Machine Driver     *
 *************************/
 
-MACHINE_CONFIG_START(peplus_state::peplus)
+void peplus_state::peplus(machine_config &config)
+{
 	// basic machine hardware
 	I80C32(config, m_maincpu, XTAL(20'000'000)/2); // 10MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &peplus_state::main_map);

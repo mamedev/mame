@@ -117,25 +117,26 @@ static void wswan_cart(device_slot_interface &device)
 	device.option_add_internal("ws_eeprom",  WS_ROM_EEPROM);
 }
 
-MACHINE_CONFIG_START(wswan_state::wswan)
+void wswan_state::wswan(machine_config &config)
+{
 	/* Basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, V30MZ, 3.072_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(wswan_mem)
-	MCFG_DEVICE_IO_MAP(wswan_io)
+	V30MZ(config, m_maincpu, 3.072_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &wswan_state::wswan_mem);
+	m_maincpu->set_addrmap(AS_IO, &wswan_state::wswan_io);
 
 	WSWAN_VIDEO(config, m_vdp, 0);
 	m_vdp->set_vdp_type(VDP_TYPE_WSWAN);
 	m_vdp->set_irq_callback(FUNC(wswan_state::set_irq_line), this);
 	m_vdp->set_dmasnd_callback(FUNC(wswan_state::dma_sound_cb), this);
 
-	MCFG_SCREEN_ADD("screen", LCD)
-//  MCFG_SCREEN_REFRESH_RATE(75)
-//  MCFG_SCREEN_VBLANK_TIME(0)
-	MCFG_SCREEN_UPDATE_DEVICE("vdp", wswan_video_device, screen_update)
-//  MCFG_SCREEN_SIZE(WSWAN_X_PIXELS, WSWAN_Y_PIXELS)
-//  MCFG_SCREEN_VISIBLE_AREA(0*8, WSWAN_X_PIXELS - 1, 0, WSWAN_Y_PIXELS - 1)
-	MCFG_SCREEN_RAW_PARAMS(3.072_MHz_XTAL, 256, 0, WSWAN_X_PIXELS, 159, 0, WSWAN_Y_PIXELS)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+//  screen.set_refresh_rate(75);
+//  screen.set_vblank_time(0);
+	screen.set_screen_update("vdp", FUNC(wswan_video_device::screen_update));
+//  screen.set_size(WSWAN_X_PIXELS, WSWAN_Y_PIXELS);
+//  screen.set_visarea(0*8, WSWAN_X_PIXELS - 1, 0, WSWAN_Y_PIXELS - 1);
+	screen.set_raw(3.072_MHz_XTAL, 256, 0, WSWAN_X_PIXELS, 159, 0, WSWAN_Y_PIXELS);
+	screen.set_palette("palette");
 
 	config.set_default_layout(layout_wswan);
 
@@ -149,20 +150,20 @@ MACHINE_CONFIG_START(wswan_state::wswan)
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD(m_sound, WSWAN_SND, 3.072_MHz_XTAL)
-	MCFG_DEVICE_ADDRESS_MAP(0, wswan_snd)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
+	WSWAN_SND(config, m_sound, 3.072_MHz_XTAL);
+	m_sound->set_addrmap(0, &wswan_state::wswan_snd);
+	m_sound->add_route(0, "lspeaker", 0.50);
+	m_sound->add_route(1, "rspeaker", 0.50);
 
 	/* cartridge */
-	MCFG_DEVICE_ADD(m_cart, WS_CART_SLOT, 3.072_MHz_XTAL / 8, wswan_cart, nullptr)
+	WS_CART_SLOT(config, m_cart, 3.072_MHz_XTAL / 8, wswan_cart, nullptr);
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("wswan");
 	SOFTWARE_LIST(config, "wsc_list").set_compatible("wscolor");
 
 	SOFTWARE_LIST(config, "pc2_list").set_compatible("pockchalv2");
-MACHINE_CONFIG_END
+}
 
 void wscolor_state::wscolor(machine_config &config)
 {

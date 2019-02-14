@@ -515,14 +515,14 @@ void wmg_state::init_wmg()
  *  Machine Driver
  *
  *************************************/
-MACHINE_CONFIG_START(wmg_state::wmg)
-
+void wmg_state::wmg(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809E, MASTER_CLOCK/3/4)
-	MCFG_DEVICE_PROGRAM_MAP(wmg_cpu1)
+	MC6809E(config, m_maincpu, MASTER_CLOCK/3/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &wmg_state::wmg_cpu1);
 
-	MCFG_DEVICE_ADD("soundcpu", M6808, SOUND_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(wmg_cpu2)
+	M6808(config, m_soundcpu, SOUND_CLOCK);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &wmg_state::wmg_cpu2);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -537,10 +537,10 @@ MACHINE_CONFIG_START(wmg_state::wmg)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE | VIDEO_ALWAYS_UPDATE)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK*2/3, 512, 6, 298, 260, 7, 247)
-	MCFG_SCREEN_UPDATE_DRIVER(williams_state, screen_update_williams)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_SCANLINE | VIDEO_ALWAYS_UPDATE);
+	m_screen->set_raw(MASTER_CLOCK*2/3, 512, 6, 298, 260, 7, 247);
+	m_screen->set_screen_update(FUNC(williams_state::screen_update_williams));
 
 	MCFG_VIDEO_START_OVERRIDE(williams_state,williams)
 
@@ -575,7 +575,7 @@ MACHINE_CONFIG_START(wmg_state::wmg)
 	pia2.writepa_handler().set("dac", FUNC(dac_byte_interface::data_w));
 	pia2.irqa_handler().set("soundirq", FUNC(input_merger_any_high_device::in_w<0>));
 	pia2.irqb_handler().set("soundirq", FUNC(input_merger_any_high_device::in_w<1>));
-MACHINE_CONFIG_END
+}
 
 /*************************************
  *

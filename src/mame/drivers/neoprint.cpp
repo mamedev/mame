@@ -500,7 +500,8 @@ void neoprint_state::machine_start()
 	m_upd4990a->c2_w(1);
 }
 
-MACHINE_CONFIG_START(neoprint_state::neoprint)
+void neoprint_state::neoprint(machine_config &config)
+{
 	M68000(config, m_maincpu, 12000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &neoprint_state::neoprint_map);
 	m_maincpu->set_periodic_int(FUNC(neoprint_state::irq3_line_hold), attotime::from_hz(45)); /* camera / printer irq, unknown timing */

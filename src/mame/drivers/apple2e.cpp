@@ -4263,7 +4263,8 @@ static const floppy_interface floppy_interface =
 	"floppy_5_25"
 };
 
-MACHINE_CONFIG_START(apple2e_state::apple2cp)
+void apple2e_state::apple2cp(machine_config &config)
+{
 	apple2c(config);
 	M65C02(config.replace(), m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::apple2c_memexp_map);
@@ -4271,11 +4272,13 @@ MACHINE_CONFIG_START(apple2e_state::apple2cp)
 	config.device_remove("sl4");
 	config.device_remove("sl6");
 	IWM(config, m_iicpiwm, &a2cp_interface);
-	MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(floppy_interface,15,16)
-	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADDITIONAL_ADD(apple2cp_floppy35_floppy_interface)
+	FLOPPY_APPLE(config, FLOPPY_0, &floppy_interface, 15, 16);
+	FLOPPY_APPLE(config, FLOPPY_1, &floppy_interface, 15, 16);
+	FLOPPY_SONY(config, FLOPPY_2, &apple2cp_floppy35_floppy_interface);
+	FLOPPY_SONY(config, FLOPPY_3, &apple2cp_floppy35_floppy_interface);
 
 	m_ram->set_default_size("128K").set_extra_options("128K, 384K, 640K, 896K, 1152K");
-MACHINE_CONFIG_END
+}
 
 void apple2e_state::apple2c_iwm(machine_config &config)
 {
@@ -4307,13 +4310,15 @@ const applefdc_interface fdc_interface =
 	apple525_read_status    /* read_status */
 };
 
-MACHINE_CONFIG_START(apple2e_state::laser128)
+void apple2e_state::laser128(machine_config &config)
+{
 	apple2c(config);
 	M65C02(config.replace(), m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::laser128_map);
 
 	APPLEFDC(config, m_laserudc, &fdc_interface);
-	MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(floppy_interface,15,16)
+	FLOPPY_APPLE(config, FLOPPY_0, &floppy_interface, 15, 16);
+	FLOPPY_APPLE(config, FLOPPY_1, &floppy_interface, 15, 16);
 
 	config.device_remove("sl4");
 	config.device_remove("sl6");
@@ -4327,15 +4332,17 @@ MACHINE_CONFIG_START(apple2e_state::laser128)
 	A2BUS_SLOT(config, "sl7", m_a2bus, apple2_cards, nullptr);
 
 	m_ram->set_default_size("128K").set_extra_options("128K, 384K, 640K, 896K, 1152K");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(apple2e_state::laser128ex2)
+void apple2e_state::laser128ex2(machine_config &config)
+{
 	apple2c(config);
 	M65C02(config.replace(), m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::laser128_map);
 
 	APPLEFDC(config, m_laserudc, &fdc_interface);
-	MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(floppy_interface,15,16)
+	FLOPPY_APPLE(config, FLOPPY_0, &floppy_interface, 15, 16);
+	FLOPPY_APPLE(config, FLOPPY_1, &floppy_interface, 15, 16);
 
 	config.device_remove("sl4");
 	config.device_remove("sl6");
@@ -4349,7 +4356,7 @@ MACHINE_CONFIG_START(apple2e_state::laser128ex2)
 	A2BUS_LASER128(config, "sl7", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
 
 	m_ram->set_default_size("128K").set_extra_options("128K, 384K, 640K, 896K, 1152K");
-MACHINE_CONFIG_END
+}
 
 void apple2e_state::ceci(machine_config &config)
 {

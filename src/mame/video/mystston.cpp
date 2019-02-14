@@ -213,7 +213,7 @@ void mystston_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
  *
  *************************************/
 
-VIDEO_START_MEMBER(mystston_state,mystston)
+void mystston_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mystston_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS_FLIP_X, 16, 16, 16, 32);
 
@@ -232,7 +232,7 @@ VIDEO_START_MEMBER(mystston_state,mystston)
  *
  *************************************/
 
-VIDEO_RESET_MEMBER(mystston_state,mystston)
+void mystston_state::video_reset()
 {
 	m_interrupt_timer->adjust(m_screen->time_until_pos(FIRST_INT_VPOS - 1, INT_HPOS), FIRST_INT_VPOS);
 }
@@ -310,15 +310,13 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(mystston_state::mystston_video)
-	MCFG_VIDEO_START_OVERRIDE(mystston_state,mystston)
-	MCFG_VIDEO_RESET_OVERRIDE(mystston_state,mystston)
-
+void mystston_state::mystston_video(machine_config &config)
+{
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mystston);
-	MCFG_PALETTE_ADD("palette", 0x40)
+	PALETTE(config, m_palette).set_entries(0x40);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(mystston_state, screen_update_mystston)
-	MCFG_SCREEN_PALETTE("palette")
-MACHINE_CONFIG_END
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
+	m_screen->set_screen_update(FUNC(mystston_state::screen_update_mystston));
+	m_screen->set_palette("palette");
+}

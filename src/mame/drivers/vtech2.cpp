@@ -526,7 +526,7 @@ MACHINE_CONFIG_START(vtech2_state::laser350)
 	MCFG_GENERIC_LOAD(vtech2_state, cart_load)
 
 	/* 5.25" Floppy drive */
-	MCFG_LEGACY_FLOPPY_DRIVE_ADD( FLOPPY_0, vtech2_floppy_interface )
+	LEGACY_FLOPPY(config, FLOPPY_0, 0, &vtech2_floppy_interface);
 MACHINE_CONFIG_END
 
 
@@ -541,7 +541,8 @@ void vtech2_state::laser500(machine_config &config)
 }
 
 
-MACHINE_CONFIG_START(vtech2_state::laser700)
+void vtech2_state::laser700(machine_config &config)
+{
 	laser350(config);
 
 	ADDRESS_MAP_BANK(config.replace(), "banka").set_map(&vtech2_state::m_map700).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
@@ -550,8 +551,8 @@ MACHINE_CONFIG_START(vtech2_state::laser700)
 	ADDRESS_MAP_BANK(config.replace(), "bankd").set_map(&vtech2_state::m_map700).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
 
 	/* Second 5.25" floppy drive */
-	MCFG_LEGACY_FLOPPY_DRIVE_ADD( FLOPPY_1, vtech2_floppy_interface )
-MACHINE_CONFIG_END
+	LEGACY_FLOPPY(config, FLOPPY_1, 0, &vtech2_floppy_interface);
+	}
 
 
 ROM_START(laser350)

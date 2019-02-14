@@ -175,7 +175,7 @@ WRITE_LINE_MEMBER( abc802_state::vs_w )
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( abc802_video )
+//  machine_config( abc802_video )
 //-------------------------------------------------
 
 void abc802_state::abc802_video(machine_config &config)
