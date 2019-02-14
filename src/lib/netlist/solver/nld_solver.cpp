@@ -122,13 +122,13 @@ NETLIB_UPDATE(solver)
 }
 
 template <class C>
-std::unique_ptr<matrix_solver_t> create_it(netlist_state_t &nl, pstring name, solver_parameters_t &params, std::size_t size)
+poolptr<matrix_solver_t> create_it(netlist_state_t &nl, pstring name, solver_parameters_t &params, std::size_t size)
 {
-	return plib::make_unique<C>(nl, name, &params, size);
+	return pool().make_poolptr<C>(nl, name, &params, size);
 }
 
 template <typename FT, int SIZE>
-std::unique_ptr<matrix_solver_t> NETLIB_NAME(solver)::create_solver(std::size_t size, const pstring &solvername)
+poolptr<matrix_solver_t> NETLIB_NAME(solver)::create_solver(std::size_t size, const pstring &solvername)
 {
 	if (m_method() == "SOR_MAT")
 	{
@@ -172,7 +172,7 @@ std::unique_ptr<matrix_solver_t> NETLIB_NAME(solver)::create_solver(std::size_t 
 	else
 	{
 		log().fatal(MF_1_UNKNOWN_SOLVER_TYPE, m_method());
-		return nullptr;
+		return poolptr<matrix_solver_t>();
 	}
 }
 
@@ -276,7 +276,7 @@ void NETLIB_NAME(solver)::post_start()
 	log().verbose("Found {1} net groups in {2} nets\n", splitter.groups.size(), state().nets().size());
 	for (auto & grp : splitter.groups)
 	{
-		std::unique_ptr<matrix_solver_t> ms;
+		poolptr<matrix_solver_t> ms;
 		std::size_t net_count = grp.size();
 		pstring sname = plib::pfmt("Solver_{1}")(m_mat_solvers.size());
 
@@ -285,13 +285,13 @@ void NETLIB_NAME(solver)::post_start()
 #if 1
 			case 1:
 				if (use_specific)
-					ms = plib::make_unique<matrix_solver_direct1_t<double>>(state(), sname, &m_params);
+					ms = pool().make_poolptr<matrix_solver_direct1_t<double>>(state(), sname, &m_params);
 				else
 					ms = create_solver<double, 1>(1, sname);
 				break;
 			case 2:
 				if (use_specific)
-					ms =  plib::make_unique<matrix_solver_direct2_t<double>>(state(), sname, &m_params);
+					ms = pool().make_poolptr<matrix_solver_direct2_t<double>>(state(), sname, &m_params);
 				else
 					ms = create_solver<double, 2>(2, sname);
 				break;

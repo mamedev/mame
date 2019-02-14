@@ -76,9 +76,9 @@ namespace netlist { namespace factory
 	// factory_lib_entry_t: factory class to wrap macro based chips/elements
 	// -----------------------------------------------------------------------------
 
-	plib::owned_ptr<device_t> library_element_t::Create(netlist_state_t &anetlist, const pstring &name)
+	poolptr<device_t> library_element_t::Create(netlist_state_t &anetlist, const pstring &name)
 	{
-		return plib::owned_ptr<device_t>::Create<NETLIB_NAME(wrapper)>(anetlist, name);
+		return pool().make_poolptr<NETLIB_NAME(wrapper)>(anetlist, name);
 	}
 
 	void library_element_t::macro_actions(netlist_state_t &anetlist, const pstring &name)

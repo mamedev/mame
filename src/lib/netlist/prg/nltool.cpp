@@ -138,7 +138,7 @@ std::unique_ptr<plib::pistream> netlist_data_folder_t::stream(const pstring &fil
 	pstring name = m_folder + "/" + file;
 	try
 	{
-		auto strm = plib::make_unique_base<plib::pistream, plib::pifilestream>(name);
+		auto strm = plib::make_unique<plib::pifilestream>(name);
 		return strm;
 	}
 	catch (const plib::pexception &e)
@@ -189,10 +189,9 @@ public:
 			setup().add_define(d);
 
 		for (auto & r : roms)
-			setup().register_source(plib::make_unique_base<netlist::source_t, netlist_data_folder_t>(setup(), r));
+			setup().register_source(plib::make_unique<netlist_data_folder_t>(setup(), r));
 
-		setup().register_source(plib::make_unique_base<netlist::source_t,
-				netlist::source_file_t>(setup(), filename));
+		setup().register_source(plib::make_unique<netlist::source_file_t>(setup(), filename));
 		setup().include(name);
 		create_dynamic_logs(logs);
 
@@ -525,8 +524,7 @@ void tool_app_t::create_header()
 	nt.log().verbose.set_enabled(false);
 	nt.log().warning.set_enabled(false);
 
-	nt.setup().register_source(plib::make_unique_base<netlist::source_t,
-			netlist::source_proc_t>(nt.setup(), "dummy", &netlist_dummy));
+	nt.setup().register_source(plib::make_unique<netlist::source_proc_t>(nt.setup(), "dummy", &netlist_dummy));
 	nt.setup().include("dummy");
 
 	pout("// license:GPL-2.0+\n");
@@ -570,8 +568,7 @@ void tool_app_t::create_docheader()
 	nt.log().verbose.set_enabled(false);
 	nt.log().warning.set_enabled(false);
 
-	nt.setup().register_source(plib::make_unique_base<netlist::source_t,
-			netlist::source_proc_t>(nt.setup(), "dummy", &netlist_dummy));
+	nt.setup().register_source(plib::make_unique<netlist::source_proc_t>(nt.setup(), "dummy", &netlist_dummy));
 	nt.setup().include("dummy");
 
 	std::vector<pstring> devs;
@@ -623,14 +620,13 @@ void tool_app_t::listdevices()
 
 	netlist::factory::list_t &list = nt.setup().factory();
 
-	nt.setup().register_source(plib::make_unique_base<netlist::source_t,
-			netlist::source_proc_t>(nt.setup(), "dummy", &netlist_dummy));
+	nt.setup().register_source(plib::make_unique<netlist::source_proc_t>(nt.setup(), "dummy", &netlist_dummy));
 	nt.setup().include("dummy");
 
 
 	nt.setup().prepare_to_run();
 
-	std::vector<plib::owned_ptr<netlist::core_device_t>> devs;
+	std::vector<netlist::poolptr<netlist::core_device_t>> devs;
 
 	for (auto & f : list)
 	{

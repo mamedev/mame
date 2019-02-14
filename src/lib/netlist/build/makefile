@@ -235,7 +235,7 @@ native:
 	$(MAKE) CEXTRAFLAGS="-march=native -Wall -Wpedantic -Wsign-compare -Wextra -Wno-unused-parameter"
 
 clang:
-	$(MAKE) CC=clang++-9 LD=clang++-9 CEXTRAFLAGS="-march=native -Wno-unused-parameter -Weverything -Werror -Wno-non-virtual-dtor -Wno-unreachable-code -Wno-padded -Wno-weak-vtables -Wno-missing-variable-declarations -Wconversion -Wno-c++98-compat -Wno-float-equal -Wno-global-constructors -Wno-c++98-compat-pedantic -Wno-format-nonliteral -Wweak-template-vtables -Wno-exit-time-destructors"
+	$(MAKE) CC=clang++-9 LD=clang++-9 CEXTRAFLAGS="-march=native -Wno-unused-parameter -Weverything -Werror -Wno-unused-template -Wno-non-virtual-dtor -Wno-unreachable-code -Wno-padded -Wno-weak-vtables -Wno-missing-variable-declarations -Wconversion -Wno-c++98-compat -Wno-float-equal -Wno-global-constructors -Wno-c++98-compat-pedantic -Wno-format-nonliteral -Wweak-template-vtables -Wno-exit-time-destructors"
 
 clang-5:
 	$(MAKE) CC=clang++-5.0 LD=clang++-5.0 CEXTRAFLAGS="-march=native -Weverything -Werror -Wno-inconsistent-missing-destructor-override -Wno-unreachable-code -Wno-padded -Wno-weak-vtables -Wno-missing-variable-declarations -Wconversion -Wno-c++98-compat -Wno-float-equal -Wno-global-constructors -Wno-c++98-compat-pedantic -Wno-format-nonliteral -Wno-weak-template-vtables -Wno-exit-time-destructors"

@@ -105,7 +105,7 @@ namespace devices
 	{
 		const std::size_t iN = this->size();
 
-		alignas(128) plib::parray<FT, SIZE> RHS(iN);
+		plib::parray<FT, SIZE> RHS(iN);
 		//float_type new_V[storage_N];
 
 		m_ops.m_mat.set_scalar(0.0);

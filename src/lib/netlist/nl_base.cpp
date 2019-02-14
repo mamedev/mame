@@ -28,12 +28,13 @@ namespace netlist
 namespace detail
 {
 
-	static plib::mempool *pool()
-	{
-		static plib::mempool s_pool(655360, 32);
-		return &s_pool;
-	}
+	//static plib::mempool *pool()
+	//{
+	//	static plib::mempool s_pool(655360, 32);
+	//	return &s_pool;
+	//}
 
+#if 0
 	void * object_t::operator new (size_t size)
 	{
 		void *ret = nullptr;
@@ -43,14 +44,14 @@ namespace detail
 			ret = ::operator new(size);
 		return ret;
 	}
-
+#endif
 	void object_t::operator delete (void * mem)
 	{
 		if (mem)
 		{
-			if ((USE_MEMPOOL))
-				pool()->free(mem);
-			else
+			//if ((USE_MEMPOOL))
+			//	pool()->free(mem);
+			//else
 				::operator delete(mem);
 		}
 	}
@@ -81,17 +82,17 @@ public:
 		m_R_low = 1.0;
 		m_R_high = 130.0;
 	}
-	plib::owned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_state_t &anetlist, const pstring &name, logic_output_t *proxied) const override;
-	plib::owned_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, logic_input_t *proxied) const override;
+	poolptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_state_t &anetlist, const pstring &name, logic_output_t *proxied) const override;
+	poolptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, logic_input_t *proxied) const override;
 };
 
-plib::owned_ptr<devices::nld_base_d_to_a_proxy> logic_family_ttl_t::create_d_a_proxy(netlist_state_t &anetlist, const pstring &name, logic_output_t *proxied) const
+poolptr<devices::nld_base_d_to_a_proxy> logic_family_ttl_t::create_d_a_proxy(netlist_state_t &anetlist, const pstring &name, logic_output_t *proxied) const
 {
-	return plib::owned_ptr<devices::nld_base_d_to_a_proxy>::Create<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
+	return pool().make_poolptr<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
 }
-plib::owned_ptr<devices::nld_base_a_to_d_proxy> logic_family_ttl_t::create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, logic_input_t *proxied) const
+poolptr<devices::nld_base_a_to_d_proxy> logic_family_ttl_t::create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, logic_input_t *proxied) const
 {
-	return plib::owned_ptr<devices::nld_base_a_to_d_proxy>::Create<devices::nld_a_to_d_proxy>(anetlist, name, proxied);
+	return pool().make_poolptr<devices::nld_a_to_d_proxy>(anetlist, name, proxied);
 }
 
 class logic_family_cd4xxx_t : public logic_family_desc_t
@@ -108,17 +109,18 @@ public:
 		m_R_low = 10.0;
 		m_R_high = 10.0;
 	}
-	plib::owned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_state_t &anetlist, const pstring &name, logic_output_t *proxied) const override;
-	plib::owned_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, logic_input_t *proxied) const override;
+	poolptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_state_t &anetlist, const pstring &name, logic_output_t *proxied) const override;
+	poolptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, logic_input_t *proxied) const override;
 };
 
-plib::owned_ptr<devices::nld_base_d_to_a_proxy> logic_family_cd4xxx_t::create_d_a_proxy(netlist_state_t &anetlist, const pstring &name, logic_output_t *proxied) const
+poolptr<devices::nld_base_d_to_a_proxy> logic_family_cd4xxx_t::create_d_a_proxy(netlist_state_t &anetlist, const pstring &name, logic_output_t *proxied) const
 {
-	return plib::owned_ptr<devices::nld_base_d_to_a_proxy>::Create<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
+	return pool().make_poolptr<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
 }
-plib::owned_ptr<devices::nld_base_a_to_d_proxy> logic_family_cd4xxx_t::create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, logic_input_t *proxied) const
+
+poolptr<devices::nld_base_a_to_d_proxy> logic_family_cd4xxx_t::create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, logic_input_t *proxied) const
 {
-	return plib::owned_ptr<devices::nld_base_a_to_d_proxy>::Create<devices::nld_a_to_d_proxy>(anetlist, name, proxied);
+	return pool().make_poolptr<devices::nld_a_to_d_proxy>(anetlist, name, proxied);
 }
 
 const logic_family_desc_t *family_TTL()
@@ -576,7 +578,7 @@ core_device_t::core_device_t(core_device_t &owner, const pstring &name)
 	set_logic_family(owner.logic_family());
 	if (logic_family() == nullptr)
 		set_logic_family(family_TTL());
-	state().add_dev(this->name(), plib::owned_ptr<core_device_t>(this, false));
+	state().add_dev(this->name(), poolptr<core_device_t>(this, false));
 }
 
 void core_device_t::set_default_delegate(detail::core_terminal_t &term)
@@ -892,7 +894,7 @@ logic_output_t::logic_output_t(core_device_t &dev, const pstring &aname)
 	, m_my_net(dev.state(), name() + ".net", this)
 {
 	this->set_net(&m_my_net);
-	state().register_net(plib::owned_ptr<logic_net_t>(&m_my_net, false));
+	state().register_net(poolptr<logic_net_t>(&m_my_net, false));
 	set_logic_family(dev.logic_family());
 	state().setup().register_term(*this);
 }
@@ -921,7 +923,7 @@ analog_output_t::analog_output_t(core_device_t &dev, const pstring &aname)
 	: analog_t(dev, aname, STATE_OUT)
 	, m_my_net(dev.state(), name() + ".net", this)
 {
-	state().register_net(plib::owned_ptr<analog_net_t>(&m_my_net, false));
+	state().register_net(poolptr<analog_net_t>(&m_my_net, false));
 	this->set_net(&m_my_net);
 
 	//net().m_cur_Analog = NL_FCONST(0.0);

@@ -97,14 +97,14 @@ protected:
 	param_logic_t  m_log_stats;
 
 private:
-	std::vector<std::unique_ptr<matrix_solver_t>> m_mat_solvers;
+	std::vector<poolptr<matrix_solver_t>> m_mat_solvers;
 	std::vector<matrix_solver_t *> m_mat_solvers_all;
 	std::vector<matrix_solver_t *> m_mat_solvers_timestepping;
 
 	solver_parameters_t m_params;
 
 	template <typename FT, int SIZE>
-	std::unique_ptr<matrix_solver_t> create_solver(std::size_t size, const pstring &solvername);
+	poolptr<matrix_solver_t> create_solver(std::size_t size, const pstring &solvername);
 };
 
 	} //namespace devices

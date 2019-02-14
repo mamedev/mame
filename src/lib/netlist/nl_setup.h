@@ -69,7 +69,7 @@ void NETLIST_NAME(name)(netlist::setup_t &setup)                               \
 #define NETLIST_END()  }
 
 #define LOCAL_SOURCE(name)                                                     \
-		setup.register_source(plib::make_unique_base<netlist::source_t, netlist::source_proc_t>(setup, # name, &NETLIST_NAME(name)));
+		setup.register_source(plib::make_unique<netlist::source_proc_t>(setup, # name, &NETLIST_NAME(name)));
 
 #define LOCAL_LIB_ENTRY(name)                                                  \
 		LOCAL_SOURCE(name)                                                     \
@@ -208,6 +208,20 @@ namespace netlist
 	// setup_t
 	// ----------------------------------------------------------------------------------------
 
+	//	setup.register_alias(# alias, # name);
+	//	setup.register_model(model);
+	//	setup.register_dippins_arr( # pin1 ", " # __VA_ARGS__);
+	//		setup.register_dev(# type, # name);
+	//		setup.register_link(# name "." # input, # output);
+	//		setup.register_link_arr( # term1 ", " # __VA_ARGS__);
+	//		setup.register_param(# name, val);
+	//		setup.register_lib_entry(# name, __FILE__);
+	//		setup.include(# name);
+	//		setup.namespace_push(# name);
+	//		NETLIST_NAME(model)(setup);
+	//		setup.namespace_pop();
+	//		setup.register_frontier(# attach, r_in, r_out);
+	//		setup.tt_factory_create(desc, __FILE__);
 
 	class setup_t
 	{

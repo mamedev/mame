@@ -13,6 +13,7 @@
 
 #include "plib/palloc.h"
 #include "plib/ptypes.h"
+#include "netlist_types.h"
 
 #define NETLIB_DEVICE_IMPL_ALIAS(p_alias, chip, p_name, p_def_param) \
 	NETLIB_DEVICE_IMPL_BASE(devices, p_alias, chip, p_name, p_def_param) \
@@ -53,7 +54,7 @@ namespace factory {
 
 		COPYASSIGNMOVE(element_t, default)
 
-		virtual plib::owned_ptr<device_t> Create(netlist_state_t &anetlist, const pstring &name) = 0;
+		virtual poolptr<device_t> Create(netlist_state_t &anetlist, const pstring &name) = 0;
 		virtual void macro_actions(netlist_state_t &anetlist, const pstring &name)
 		{
 			plib::unused_var(anetlist);
@@ -83,9 +84,9 @@ namespace factory {
 				const pstring &def_param, const pstring &sourcefile)
 		: element_t(name, classname, def_param, sourcefile) { }
 
-		plib::owned_ptr<device_t> Create(netlist_state_t &anetlist, const pstring &name) override
+		poolptr<device_t> Create(netlist_state_t &anetlist, const pstring &name) override
 		{
-			return plib::owned_ptr<device_t>::Create<C>(anetlist, name);
+			return pool().make_poolptr<C>(anetlist, name);
 		}
 	};
 
@@ -147,7 +148,7 @@ namespace factory {
 			plib::unused_var(setup);
 		}
 
-		plib::owned_ptr<device_t> Create(netlist_state_t &anetlist, const pstring &name) override;
+		poolptr<device_t> Create(netlist_state_t &anetlist, const pstring &name) override;
 
 		void macro_actions(netlist_state_t &anetlist, const pstring &name) override;
 

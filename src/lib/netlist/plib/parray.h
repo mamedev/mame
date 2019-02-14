@@ -109,8 +109,9 @@ namespace plib {
 		const FT * data() const noexcept { return m_a.data(); }
 
 	private:
-		base_type m_a;
-		size_type m_size;
+		PALIGNAS_VECTOROPT()
+		base_type 				m_a;
+		size_type 				m_size;
 	};
 } // namespace plib
 

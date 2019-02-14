@@ -72,7 +72,7 @@ namespace plib
 
 		~matrix_compressed_rows_t() = default;
 
-		constexpr index_type size() const { return (N>0) ? N : m_size; }
+		constexpr index_type size() const { return static_cast<index_type>((N>0) ? N : m_size); }
 
 		void set_scalar(const T scalar)
 		{

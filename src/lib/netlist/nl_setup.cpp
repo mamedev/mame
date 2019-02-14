@@ -80,7 +80,7 @@ void setup_t::namespace_pop()
 
 void setup_t::register_lib_entry(const pstring &name, const pstring &sourcefile)
 {
-	factory().register_device(plib::make_unique_base<factory::element_t, factory::library_element_t>(*this, name, name, "", sourcefile));
+	factory().register_device(plib::make_unique<factory::library_element_t>(*this, name, name, "", sourcefile));
 }
 
 void setup_t::register_dev(const pstring &classname, const pstring &name)
@@ -593,7 +593,7 @@ void setup_t::connect_terminals(detail::core_terminal_t &t1, detail::core_termin
 	{
 		log().debug("adding analog net ...\n");
 		// FIXME: Nets should have a unique name
-		auto anet = plib::owned_ptr<analog_net_t>::Create(netlist(),"net." + t1.name());
+		auto anet = pool().make_poolptr<analog_net_t>(netlist(),"net." + t1.name());
 		auto anetp = anet.get();
 		netlist().register_net(std::move(anet));
 		t1.set_net(anetp);
@@ -890,19 +890,19 @@ class logic_family_std_proxy_t : public logic_family_desc_t
 {
 public:
 	logic_family_std_proxy_t() = default;
-	plib::owned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_state_t &anetlist,
+	poolptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_state_t &anetlist,
 			const pstring &name, logic_output_t *proxied) const override;
-	plib::owned_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, logic_input_t *proxied) const override;
+	poolptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, logic_input_t *proxied) const override;
 };
 
-plib::owned_ptr<devices::nld_base_d_to_a_proxy> logic_family_std_proxy_t::create_d_a_proxy(netlist_state_t &anetlist,
+poolptr<devices::nld_base_d_to_a_proxy> logic_family_std_proxy_t::create_d_a_proxy(netlist_state_t &anetlist,
 		const pstring &name, logic_output_t *proxied) const
 {
-	return plib::owned_ptr<devices::nld_base_d_to_a_proxy>::Create<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
+	return pool().make_poolptr<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
 }
-plib::owned_ptr<devices::nld_base_a_to_d_proxy> logic_family_std_proxy_t::create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, logic_input_t *proxied) const
+poolptr<devices::nld_base_a_to_d_proxy> logic_family_std_proxy_t::create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, logic_input_t *proxied) const
 {
-	return plib::owned_ptr<devices::nld_base_a_to_d_proxy>::Create<devices::nld_a_to_d_proxy>(anetlist, name, proxied);
+	return pool().make_poolptr<devices::nld_a_to_d_proxy>(anetlist, name, proxied);
 }
 
 
@@ -920,7 +920,7 @@ const logic_family_desc_t *setup_t::family_from_model(const pstring &model)
 		if (e.first == model)
 			return e.second.get();
 
-	auto ret = plib::make_unique_base<logic_family_desc_t, logic_family_std_proxy_t>();
+	auto ret = plib::make_unique<logic_family_std_proxy_t>();
 
 	ret->m_fixed_V = model_value(map, "FV");
 	ret->m_low_thresh_PCNT = model_value(map, "IVL");
@@ -994,7 +994,7 @@ void setup_t::delete_empty_nets()
 {
 	netlist().nets().erase(
 		std::remove_if(netlist().nets().begin(), netlist().nets().end(),
-			[](plib::owned_ptr<detail::net_t> &x)
+			[](poolptr<detail::net_t> &x)
 			{
 				if (x->num_cons() == 0)
 				{
@@ -1024,7 +1024,7 @@ void setup_t::prepare_to_run()
 		if ( factory().is_class<devices::NETLIB_NAME(solver)>(e.second)
 				|| factory().is_class<devices::NETLIB_NAME(netlistparams)>(e.second))
 		{
-			m_netlist.nlstate().add_dev(e.first, plib::owned_ptr<device_t>(e.second->Create(netlist(), e.first)));
+			m_netlist.nlstate().add_dev(e.first, poolptr<device_t>(e.second->Create(netlist(), e.first)));
 		}
 	}
 
@@ -1041,7 +1041,7 @@ void setup_t::prepare_to_run()
 		if ( !factory().is_class<devices::NETLIB_NAME(solver)>(e.second)
 				&& !factory().is_class<devices::NETLIB_NAME(netlistparams)>(e.second))
 		{
-			auto dev = plib::owned_ptr<device_t>(e.second->Create(netlist(), e.first));
+			auto dev = poolptr<device_t>(e.second->Create(netlist(), e.first));
 			m_netlist.nlstate().add_dev(dev->name(), std::move(dev));
 		}
 	}
@@ -1135,19 +1135,19 @@ bool source_t::parse(const pstring &name)
 std::unique_ptr<plib::pistream> source_string_t::stream(const pstring &name)
 {
 	plib::unused_var(name);
-	return plib::make_unique_base<plib::pistream, plib::pimemstream>(m_str.c_str(), std::strlen(m_str.c_str()));
+	return plib::make_unique<plib::pimemstream>(m_str.c_str(), std::strlen(m_str.c_str()));
 }
 
 std::unique_ptr<plib::pistream> source_mem_t::stream(const pstring &name)
 {
 	plib::unused_var(name);
-	return plib::make_unique_base<plib::pistream, plib::pimemstream>(m_str.c_str(), std::strlen(m_str.c_str()));
+	return plib::make_unique<plib::pimemstream>(m_str.c_str(), std::strlen(m_str.c_str()));
 }
 
 std::unique_ptr<plib::pistream> source_file_t::stream(const pstring &name)
 {
 	plib::unused_var(name);
-	return plib::make_unique_base<plib::pistream, plib::pifilestream>(m_filename);
+	return plib::make_unique<plib::pifilestream>(m_filename);
 }
 
 bool source_proc_t::parse(const pstring &name)

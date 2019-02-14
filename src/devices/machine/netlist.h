@@ -12,6 +12,7 @@
 #define MAME_MACHINE_NETLIST_H
 
 #include "netlist/nl_time.h"
+#include "netlist/netlist_types.h"
 
 class nld_sound_out;
 class nld_sound_in;
@@ -141,7 +142,7 @@ private:
 	netlist::netlist_time        m_rem;
 	netlist::netlist_time        m_old;
 
-	netlist_mame_t *    m_netlist;
+	netlist::poolptr<netlist_mame_t> m_netlist;
 
 	void (*m_setup_func)(netlist::setup_t &);
 };

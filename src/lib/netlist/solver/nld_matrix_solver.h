@@ -205,7 +205,7 @@ protected:
 
 	std::vector<std::unique_ptr<terms_for_net_t>> m_terms;
 	std::vector<analog_net_t *> m_nets;
-	std::vector<std::unique_ptr<proxied_analog_output_t>> m_inps;
+	std::vector<poolptr<proxied_analog_output_t>> m_inps;
 
 	std::vector<std::unique_ptr<terms_for_net_t>> m_rails_temp;
 

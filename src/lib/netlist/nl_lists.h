@@ -96,7 +96,7 @@ namespace netlist
 
 	/* Use TS = true for a threadsafe queue */
 	template <class T, bool TS, bool KEEPSTAT, class QueueOp = typename T::QueueOp>
-	class timed_queue_linear : plib::nocopyassignmove
+	class PALIGNAS_CACHELINE() timed_queue_linear : plib::nocopyassignmove
 	{
 	public:
 

@@ -75,11 +75,13 @@ namespace plib
 			}
 		}
 
-		mat_type m_mat;
-		mat_type m_LU;
-		bool m_use_iLU_preconditioning;
-		std::size_t m_ILU_scale;
-		std::size_t m_band_width;
+		PALIGNAS_VECTOROPT()
+		mat_type 				m_mat;
+		PALIGNAS_VECTOROPT()
+		mat_type 				m_LU;
+		bool 					m_use_iLU_preconditioning;
+		std::size_t 			m_ILU_scale;
+		std::size_t 			m_band_width;
 	};
 
 	template <typename FT, int SIZE>
