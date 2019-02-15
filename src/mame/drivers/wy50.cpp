@@ -2,7 +2,7 @@
 // copyright-holders:AJR
 /*******************************************************************************
 
-    Skeleton driver for Wyse WY-50 and similar display terminals.
+    Preliminary driver for Wyse WY-50 and similar display terminals.
 
     Wyse Technology introduced the WY-50 green screen terminal in the fall of
     1983. It was soon followed by the WY-75 ANSI X3.64-compatible terminal and
@@ -28,6 +28,7 @@
 #include "cpu/mcs51/mcs51.h"
 #include "machine/er1400.h"
 #include "machine/mc2661.h"
+#include "machine/wy50kb.h"
 #include "video/scn2674.h"
 #include "screen.h"
 
@@ -37,6 +38,7 @@ public:
 	wy50_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_keyboard(*this, "keyboard")
 		, m_earom(*this, "earom")
 		, m_pvtc(*this, "pvtc")
 		, m_sio(*this, "sio")
@@ -71,6 +73,7 @@ private:
 	void row_buffer_map(address_map &map);
 
 	required_device<mcs51_cpu_device> m_maincpu;
+	required_device<wy50_keyboard_device> m_keyboard;
 	required_device<er1400_device> m_earom;
 	required_device<scn2672_device> m_pvtc;
 	required_device<mc2661_device> m_sio;
@@ -107,6 +110,9 @@ void wy50_state::machine_reset()
 {
 	keyboard_w(0);
 	earom_w(0);
+
+	m_sio->cts_w(0);
+	m_sio->dsr_w(0);
 }
 
 u8 wy50_state::pvtc_videoram_r(offs_t offset)
@@ -117,6 +123,12 @@ u8 wy50_state::pvtc_videoram_r(offs_t offset)
 
 SCN2672_DRAW_CHARACTER_MEMBER(wy50_state::draw_character)
 {
+	// Attribute bit 0 = Dim
+	// Attribute bit 1 = Blink
+	// Attribute bit 2 = Blank
+	// Attribute bit 3 = Underline
+	// Attribute bit 4 = Reverse video
+
 	const bool attr = (charcode & 0xe0) == 0x80;
 	const bool prot = (charcode & 0xe0) > 0x80 && !m_font2;
 	if (attr)
@@ -124,24 +136,27 @@ SCN2672_DRAW_CHARACTER_MEMBER(wy50_state::draw_character)
 	else if (x == 0)
 		m_cur_attr = m_last_row_attr;
 
-	u16 dots;
-	if (attr || (BIT(m_cur_attr, 1) && blink) || BIT(m_cur_attr, 2))
-		dots = 0;
-	else if (BIT(m_cur_attr, 3) && ul)
-		dots = 0x3ff;
-	else
-		dots = m_chargen[(charcode & (m_font2 ? 0xff : 0x7f)) << 4 | linecount] << 2;
-
+	u16 dots = 0;
 	if (!attr)
 	{
-		if (BIT(m_cur_attr, 4))
-			dots = ~dots;
-		if (prot && m_rev_prot)
+		// Blinking suppresses underline but blank attribute doesn't
+		if (!BIT(m_cur_attr, 1) || !blink)
+		{
+			// Shift register load inhibited by blanking conditions or underline
+			if (BIT(m_cur_attr, 3) && ul)
+				dots = 0x3ff;
+			else if (!BIT(m_cur_attr, 2))
+				dots = m_chargen[(charcode & (m_font2 ? 0xff : 0x7f)) << 4 | linecount] << 2;
+		}
+
+		// Reverse video for non-attribute characters (XOR of two conditions)
+		if (BIT(m_cur_attr, 4) != (prot && m_rev_prot))
 			dots = ~dots;
 	}
 	if (cursor)
 		dots = ~dots;
 
+	// Apply dimming conditions
 	const rgb_t fg = BIT(m_cur_attr, 0) || (prot && !m_rev_prot) ? rgb_t(0xc0, 0xc0, 0xc0) : rgb_t::white();
 	for (int i = 0; i < 9; i++)
 	{
@@ -186,12 +201,25 @@ u8 wy50_state::rbreg_r()
 
 void wy50_state::keyboard_w(u8 data)
 {
+	// Bit 0 = J3-6
+	// Bit 1 = J3-5
+	// Bit 2 = J3-4
+	// Bit 3 = J3-7
+	// Bit 4 = J3-10
+	// Bit 5 = J3-9
+	// Bit 6 = J3-8
+	// Bit 7 = /HSYNC CLAMP
+	m_keyboard->scan_w(data & 0x7f);
 }
 
 void wy50_state::earom_w(u8 data)
 {
+	// Bit 0 = EAROM D
+	// Bit 1 = EAROM CLK
+	// Bit 2 = EAROM C3
+	// Bit 3 = EAROM C2
+	// Bit 4 = EAROM C1
 	// Bit 5 = UPCHAR/NORM
-
 	m_earom->clock_w(BIT(data, 1));
 	m_earom->c3_w(BIT(data, 2));
 	m_earom->c2_w(BIT(data, 3));
@@ -205,7 +233,7 @@ u8 wy50_state::p1_r()
 	// P1.0 = AUX RDY
 	// P1.1 = NVD OUT
 	// P1.4 = KEY (inverted, active high)
-	return 0xed | (m_earom->data_r() << 1);
+	return 0xed | (m_earom->data_r() << 1) | (m_keyboard->sense_r() ? 0x00 : 0x10);
 }
 
 void wy50_state::p1_w(u8 data)
@@ -258,6 +286,8 @@ void wy50_state::wy50(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &wy50_state::io_map);
 	m_maincpu->port_in_cb<1>().set(FUNC(wy50_state::p1_r));
 	m_maincpu->port_out_cb<1>().set(FUNC(wy50_state::p1_w));
+
+	WY50_KEYBOARD(config, m_keyboard);
 
 	ER1400(config, m_earom);
 

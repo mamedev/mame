@@ -1216,6 +1216,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"vtech",
 		"wang",
 		"wavemate",
+		"wyse",
 		"westinghouse",
 		"xerox",
 		"xussrpc",
@@ -3668,6 +3669,16 @@ files {
 	MAME_DIR .. "src/mame/includes/jupiter.h",
 }
 
+createMESSProjects(_target, _subtarget, "wyse")
+files {
+	MAME_DIR .. "src/mame/drivers/wy100.cpp",
+	MAME_DIR .. "src/mame/drivers/wy50.cpp",
+	MAME_DIR .. "src/mame/drivers/wy85.cpp",
+	MAME_DIR .. "src/mame/drivers/wyse.cpp",
+	MAME_DIR .. "src/mame/machine/wy50kb.cpp",
+	MAME_DIR .. "src/mame/machine/wy50kb.h",
+}
+
 createMESSProjects(_target, _subtarget, "xerox")
 files {
 	MAME_DIR .. "src/mame/drivers/xerox820.cpp",
@@ -3941,10 +3952,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/vp415.cpp",
 	MAME_DIR .. "src/mame/drivers/vsmilepro.cpp",
 	MAME_DIR .. "src/mame/drivers/wicat.cpp",
-	MAME_DIR .. "src/mame/drivers/wy100.cpp",
-	MAME_DIR .. "src/mame/drivers/wy50.cpp",
-	MAME_DIR .. "src/mame/drivers/wy85.cpp",
-	MAME_DIR .. "src/mame/drivers/wyse.cpp",
 	MAME_DIR .. "src/mame/drivers/xor100.cpp",
 	MAME_DIR .. "src/mame/includes/xor100.h",
 	MAME_DIR .. "src/mame/drivers/zms8085.cpp",
