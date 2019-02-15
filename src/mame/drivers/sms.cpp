@@ -641,41 +641,12 @@ MACHINE_CONFIG_START(smssdisp_state::sms_sdisp)
 	config.device_remove("mycard");
 	config.device_remove("smsexp");
 
-	SMS_CART_SLOT(config, "slot2", sms_cart, nullptr);
-	SMS_CART_SLOT(config, "slot3", sms_cart, nullptr);
-	SMS_CART_SLOT(config, "slot4", sms_cart, nullptr);
-	SMS_CART_SLOT(config, "slot5", sms_cart, nullptr);
-	SMS_CART_SLOT(config, "slot6", sms_cart, nullptr);
-	SMS_CART_SLOT(config, "slot7", sms_cart, nullptr);
-	SMS_CART_SLOT(config, "slot8", sms_cart, nullptr);
-	SMS_CART_SLOT(config, "slot9", sms_cart, nullptr);
-	SMS_CART_SLOT(config, "slot10", sms_cart, nullptr);
-	SMS_CART_SLOT(config, "slot11", sms_cart, nullptr);
-	SMS_CART_SLOT(config, "slot12", sms_cart, nullptr);
-	SMS_CART_SLOT(config, "slot13", sms_cart, nullptr);
-	SMS_CART_SLOT(config, "slot14", sms_cart, nullptr);
-	SMS_CART_SLOT(config, "slot15", sms_cart, nullptr);
-	SMS_CART_SLOT(config, "slot16", sms_cart, nullptr);
-
-	SMS_CARD_SLOT(config, "slot17", sms_cart, nullptr);
-	SMS_CARD_SLOT(config, "slot18", sms_cart, nullptr);
-	SMS_CARD_SLOT(config, "slot19", sms_cart, nullptr);
-	SMS_CARD_SLOT(config, "slot20", sms_cart, nullptr);
-	SMS_CARD_SLOT(config, "slot21", sms_cart, nullptr);
-	SMS_CARD_SLOT(config, "slot22", sms_cart, nullptr);
-	SMS_CARD_SLOT(config, "slot23", sms_cart, nullptr);
-	SMS_CARD_SLOT(config, "slot24", sms_cart, nullptr);
-	SMS_CARD_SLOT(config, "slot25", sms_cart, nullptr);
-	SMS_CARD_SLOT(config, "slot26", sms_cart, nullptr);
-	SMS_CARD_SLOT(config, "slot27", sms_cart, nullptr);
-	SMS_CARD_SLOT(config, "slot28", sms_cart, nullptr);
-	SMS_CARD_SLOT(config, "slot29", sms_cart, nullptr);
-	SMS_CARD_SLOT(config, "slot30", sms_cart, nullptr);
-	SMS_CARD_SLOT(config, "slot31", sms_cart, nullptr);
-	SMS_CARD_SLOT(config, "slot32", sms_cart, nullptr);
+	for (int i = 1; i < 16; i++)
+		SMS_CART_SLOT(config, m_slots[i], sms_cart, nullptr);
+	for (int i = 0; i < 16; i++)
+		SMS_CARD_SLOT(config, m_cards[i], sms_cart, nullptr);
 
 	m_has_bios_full = false;
-	m_is_sdisp = true;
 	m_has_pwr_led = false;
 MACHINE_CONFIG_END
 

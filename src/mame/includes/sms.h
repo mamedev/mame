@@ -63,14 +63,12 @@ public:
 		m_is_gamegear(false),
 		m_is_smsj(false),
 		m_is_mark_iii(false),
-		m_is_sdisp(false),
 		m_ioctrl_region_is_japan(false),
 		m_has_bios_0400(false),
 		m_has_bios_2000(false),
 		m_has_bios_full(false),
 		m_has_jpn_sms_cart_slot(false),
-		m_has_pwr_led(false),
-		m_store_cart_selection_data(false)
+		m_has_pwr_led(false)
 	{ }
 
 	void sms_base(machine_config &config);
@@ -213,7 +211,6 @@ protected:
 	bool m_is_gamegear;
 	bool m_is_smsj;
 	bool m_is_mark_iii;
-	bool m_is_sdisp;
 	bool m_ioctrl_region_is_japan;
 	bool m_has_bios_0400;
 	bool m_has_bios_2000;
@@ -259,12 +256,6 @@ protected:
 	sega8_card_slot_device *m_cardslot;
 	sms_expansion_slot_device *m_smsexpslot;
 	sg1000_expansion_slot_device *m_sgexpslot;
-
-	// these are only used by the Store Display unit, but we keep them here temporarily to avoid the need of separate start/reset
-	sega8_cart_slot_device *m_slots[16];
-	sega8_card_slot_device *m_cards[16];
-	uint8_t m_store_control;
-	uint8_t m_store_cart_selection_data;
 };
 
 class smssdisp_state : public sms_state
@@ -272,21 +263,36 @@ class smssdisp_state : public sms_state
 public:
 	smssdisp_state(const machine_config &mconfig, device_type type, const char *tag) :
 		sms_state(mconfig, type, tag),
-		m_control_cpu(*this, "control")
+		m_control_cpu(*this, "control"),
+		m_slots(*this, {"slot", "slot2", "slot3", "slot4", "slot5", "slot6", "slot7", "slot8", "slot9", "slot10", "slot11", "slot12", "slot13", "slot14", "slot15", "slot16"}),
+		m_cards(*this, "slot%u", 17U),
+		m_store_cart_selection_data(0)
 	{ }
 
-	required_device<cpu_device> m_control_cpu;
+	void sms_sdisp(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void device_post_load() override;
+
+private:
 	DECLARE_READ8_MEMBER(sms_store_cart_select_r);
 	DECLARE_WRITE8_MEMBER(sms_store_cart_select_w);
+	void store_select_cart(uint8_t data);
 	DECLARE_WRITE8_MEMBER(sms_store_control_w);
-	void init_smssdisp();
 
 	DECLARE_READ8_MEMBER(store_cart_peek);
 
 	DECLARE_WRITE_LINE_MEMBER(sms_store_int_callback);
-	void sms_sdisp(machine_config &config);
 	void sms_store_mem(address_map &map);
+
+	required_device<cpu_device> m_control_cpu;
+	required_device_array<sega8_cart_slot_device, 16> m_slots;
+	required_device_array<sega8_card_slot_device, 16> m_cards;
+
+	uint8_t m_store_control;
+	uint8_t m_store_cart_selection_data;
 };
 
 
