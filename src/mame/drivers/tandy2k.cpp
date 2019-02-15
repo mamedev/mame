@@ -313,7 +313,7 @@ void tandy2k_state::tandy2k_io(address_map &map)
 	map(0x00100, 0x0017f).rw(m_vpac, FUNC(crt9007_device::read), FUNC(crt9007_device::write)).umask16(0x00ff);
 	map(0x00100, 0x0017f).w(FUNC(tandy2k_state::addr_ctrl_w)).umask16(0xff00);
 	map(0x00180, 0x00180).r(FUNC(tandy2k_state::hires_status_r)).umask16(0x00ff);
-	map(0x00190, 0x0019f).w(m_colpal, FUNC(palette_device::write8)).umask16(0x00ff).share("colpal");
+	map(0x00180, 0x0018f).mirror(0x10).w(m_colpal, FUNC(palette_device::write8)).umask16(0x00ff).share("colpal");
 	map(0x001a0, 0x001a0).w(FUNC(tandy2k_state::hires_plane_w)).umask16(0x00ff);
 }
 
