@@ -18,4 +18,15 @@
 		</part>
 	</software>
 
+	<software name="volbird">
+		<description>Nicktoons Vollyball &amp; Birdie Putt</description>
+		<year>2005</year>
+		<publisher>JAKKS Pacific / Handheld Games</publisher>
+		<part name="cart" interface="jakks_gamekey">
+			<dataarea name="rom" size="0x800000">
+				<rom name="nicktoonsgkvolleyballbirdie.bin" size="0x200000" crc="7eccb308" sha1="bf7f7ff752ea2652ad099d26e53dade4e4f9e9a1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

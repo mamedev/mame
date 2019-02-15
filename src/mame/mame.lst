@@ -38681,6 +38681,7 @@ jak_mpac                        //
 jak_wof                         //
 jak_spdm                        //
 jak_pooh                        //
+jak_nick                        //
 lexizeus                        // Lexibook
 vii                             // KenSingTon / Jungle Soft / Siatronics Vii
 wrlshunt                        // Wireless: Hunting Video Game System
@@ -38694,6 +38695,7 @@ rad_sktv                        //
 rad_crik                        //
 rad_fb2                         //
 mattelcs                        //
+dreamlif                        //
 
 @source:vsmile.cpp
 vsmile                          //
@@ -39857,6 +39859,7 @@ rad_sbw                         //
 rad_bdp                         //
 has_wamg                        //
 ltv_tam                         //
+ban_onep                        //
 ekara                           //
 ekaraa                          //
 ekaraj                          //

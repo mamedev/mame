@@ -14,9 +14,13 @@
         Dora the Explorer
         Mattel Classic Sports
 		Disney Princess (GKR)
+		Wheel of Fortune (GKR)
 		(all GameKeyReady units?)
 
-        "SunPlus QL8041C" ( known as Sunplus SPG2?? ) see clickstart.cpp instead
+        "SunPlus QL8041C" ( known as Sunplus SPG2?? )
+		Clickstart ( see clickstart.cpp instead)
+		Wheel of Fortune 2nd Edition
+
 
         "SunPlus PA7801" ( known as Sunplus SPG110? ) see spg110.cpp instead
 		Classic Arcade Pinball
@@ -29,7 +33,8 @@
 
 		"Sunplus QL8167"
 		Disney Princess (older)
- 
+		Go Diego Go
+
 
 Disney Princess non-GKR is Sunplus QL8167.
 
@@ -1502,6 +1507,11 @@ ROM_START( jak_dora )
 	ROM_LOAD16_WORD_SWAP( "jakksdoragkr.bin", 0x000000, 0x200000, CRC(bcaa132d) SHA1(3894b980fbc4144731b2a7a94acebb29e30de67c) )
 ROM_END
 
+ROM_START( jak_nick )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jakksnicktoonsgkr.bin", 0x000000, 0x200000, CRC(4dec1656) SHA1(b3002ab15e75068102f4955a3f0c52fb6d5cda56) )
+ROM_END
+
 ROM_START( jak_dorr )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "jakksdora2gkr.bin", 0x000000, 0x200000, CRC(6c09bcd9) SHA1(4bcad79658832f319d16b4f63257e127f6862d79) )
@@ -1610,6 +1620,11 @@ ROM_END
 ROM_START( mattelcs )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "mattelclassicsports.bin", 0x000000, 0x100000, CRC(e633e7ad) SHA1(bf3e325a930cf645a7e32195939f3c79c6d35dac) )
+ROM_END
+
+ROM_START( dreamlif )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "dreamlife.bin", 0x000000, 0x800000, CRC(632e0237) SHA1(a8586e8a626d75cf7782f13cfd9f1b938af23d56) )
 ROM_END
 
 /*
@@ -1797,6 +1812,7 @@ CONS( 2005, jak_fan4, 0, 0, jakks_gkr_1m_i2c, jak_gkr_i2c,  jakks_gkr_state, emp
 CONS( 2005, jak_just, 0, 0, jakks_gkr_1m_i2c, jak_gkr_i2c,  jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Taniko",                  "Justice League (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // DC (no game-keys released)
 CONS( 2005, jak_dora, 0, 0, jakks_gkr_nk,     jak_gkr,      jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Handheld Games",          "Dora the Explorer - Nursery Rhyme Adventure (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // uses NK keys (same as Nicktoons & Spongebob) (3 released) - The upper part of this one is pink/purple.
 CONS( 2005, jak_dorr, 0, 0, jakks_gkr_nk_i2c, jak_gkr_i2c,  jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Handheld Games",          "Dora the Explorer - Race to Play Park (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // uses NK keys (same as Nicktoons & Spongebob) (3 released) - The upper part of this one is blue
+CONS( 2004, jak_nick, 0, 0, jakks_gkr_nk_i2c, jak_gkr_i2c,  jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Handheld Games",          "Nicktoons (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // uses NK keys
 CONS( 2005, jak_sdoo, 0, 0, jakks_gkr_2m_i2c, jak_sdoo_i2c, jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Jolliford Management",    "Scooby-Doo! and the Mystery of the Castle (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) //  SD (no game-keys released)
 CONS( 2005, jak_disf, 0, 0, jakks_gkr_dy_i2c, jak_gkr_i2c,  jakks_gkr_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",              "Disney Friends (JAKKS Pacific TV Game, Game-Key Ready) (17 MAY 2005 A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // uses DY keys (3 released)
 CONS( 2005, jak_disp, 0, 0, jakks_gkr_dp_i2c, jak_disp_i2c, jakks_gkr_state, empty_init, "JAKKS Pacific Inc / 5000ft, Inc",             "Disney Princess (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // uses DP keys (1 key released)
@@ -1805,11 +1821,10 @@ CONS( 2005, jak_sith, 0, 0, jakks_gkr_sw_i2c, jak_sith_i2c, jakks_gkr_state, emp
 CONS( 2005, jak_dbz,  0, 0, jakks_gkr_1m_i2c, jak_gkr_i2c,  jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Handheld Games",          "Dragon Ball Z (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // DB (no game-keys released, 1 in development but cancelled)
 CONS( 2005, jak_mpac, 0, 0, jakks_gkr_nm_i2c, jak_nm_i2c,   jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Namco / HotGen Ltd",      "Ms. Pac-Man 5-in-1 (Ms. Pac-Man, Pole Position, Galaga, Xevious, Mappy) (JAKKS Pacific TV Game, Game-Key Ready) (07 FEB 2005 A SKU F)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // uses NM (3 keys available [Dig Dug, New Rally-X], [Rally-X, Pac-Man, Bosconian], [Pac-Man, Bosconian])
 CONS( 2005, jak_wof,  0, 0, jakks_gkr_wf_i2c, jak_wf_i2c,   jakks_gkr_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",              "Wheel of Fortune (JAKKS Pacific TV Game, Game-Key Ready)",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // uses WF keys (no game-keys released)  analog wheel not emulated
-// There is a 'Second Edition' version of Wheel of Fortune with a Gold case, GameKey port removed, and a '2' over the usual Game Key Ready logo, it is not yet verified to be the same code.
+// There is a 'Second Edition' version of Wheel of Fortune with a Gold case, GameKey port removed, and a '2' over the usual Game Key Ready logo, internals are different too, not Game-Key Ready
 CONS( 2004, jak_spdm, 0, 0, jakks_gkr_mv_i2c, jak_gkr_i2c,  jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Digital Eclipse",         "Spider-Man (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) //  MV (1 key available)
 CONS( 2005, jak_pooh, 0, 0, jakks_gkr_wp,     jak_pooh,     jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Backbone Entertainment",  "Winnie the Pooh - Piglet's Special Day (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // WP (no game-keys released)
 
-// Nicktoons                                   NK (3 keys available) (same keys as Dora the Explorer)
 // SpongeBob SquarePants: The Fry Cook Games   NK (3 keys available)  ^^                
 
 // no keys released for the following, some were in development but cancelled
@@ -1825,6 +1840,9 @@ CONS( 2007, rad_fb2,   0,        0, rad_skat, rad_fb2,    spg2xx_game_state, ini
 
 // Mattel games
 CONS( 2005, mattelcs,  0,        0, rad_skat, mattelcs,   spg2xx_game_state, empty_init, "Mattel", "Mattel Classic Sports",     MACHINE_IMPERFECT_SOUND )
+
+// Hasbro games
+CONS( 2007, dreamlif,  0,        0, rad_skat, rad_crik,   spg2xx_game_state, empty_init, "Hasbro ", "Dream Life",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // might not fit here.  First 0x8000 bytes are blank (not too uncommon for these) then rest of rom looks like it's probably encrypted at least
 // could be later model VT based instead? even after decrypting (simple word xor) the vectors have a different format and are at a different location to the SunPlus titles

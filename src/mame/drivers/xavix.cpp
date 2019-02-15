@@ -1514,10 +1514,6 @@ ROM_START( epo_epp )
 	ROM_LOAD("excitepingpong.bin", 0x000000, 0x100000, CRC(1fdb9cbd) SHA1(8ed0c1f6d2708ab6e79f0b9553e587c6446e8338) )
 ROM_END
 
-ROM_START( epo_ebox )
-	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
-	ROM_LOAD("exciteboxing.bin", 0x000000, 0x400000, CRC(e25ae4f5) SHA1(7f7b613f0ab8f43f5cad0d13de538921e77cae9c) )
-ROM_END
 
 ROM_START( epo_guru )
 	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
@@ -1543,6 +1539,8 @@ ROM_START( ltv_tam )
 	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("letstvtamagotchi.bin", 0x000000, 0x400000, CRC(e3723272) SHA1(e72e128a7a24afb96baafe5f13e13a0d74db4033) )
 ROM_END
+
+
 
 /*
     The e-kara cartridges require the BIOS rom to map into 2nd external bus space as they fetch palette data from
@@ -1676,8 +1674,6 @@ CONS( 2000, epo_epp,   0,          0,  xavix,            epo_epp,  xavix_state, 
 
 CONS( 200?, epo_efdx,  0,          0,  xavix_i2c_24c08,  epo_efdx, xavix_i2c_state,      init_epo_efdx, "Epoch / SSD Company LTD",                      "Excite Fishing DX (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-CONS( 2002, epo_ebox,  0,          0,  xavix,            epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Excite Boxing (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-
 CONS( 2005, epo_guru,  0,          0,  xavix,            xavix,    xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Gururin World (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 CONS( 2002, epo_dmon, 0,           0,  xavix_i2c_24c02,  xavix_i2c,xavix_i2c_state,      init_xavix,    "Epoch / SSD Company LTD",                      "Doraemon Wakuwaku Kuukihou (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // full / proper title?
@@ -1717,6 +1713,8 @@ CONS( 2006, ltv_tam,  0,           0,  xavix_i2c_24lc04,  ltv_tam,xavix_i2c_ltv_
 
    these use the SSD 2000 NEC 85605-621 type CPU
 
+   XavixPort Golf is "SSD 2003 SuperXaviX MXIC 2003 3009" (not dumped yet, but actually marked as SuperXaviX unlike the others!)
+
    This CPU type adds extra opcodes that don't appear to be present in the 97/98 types
    It does not appear to support the bitmap modes or 16-bit ROMs found in the 2002 type
 */
@@ -1725,6 +1723,12 @@ ROM_START( epo_sdb )
 	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("superdashball.bin", 0x000000, 0x400000, CRC(a004a764) SHA1(47a96822d4d7d6a0f6be5cd729c3747dbab65979) )
 ROM_END
+
+ROM_START( epo_ebox )
+	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("exciteboxing.bin", 0x000000, 0x400000, CRC(e25ae4f5) SHA1(7f7b613f0ab8f43f5cad0d13de538921e77cae9c) )
+ROM_END
+
 
 ROM_START( ttv_sw )
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
@@ -1746,12 +1750,21 @@ ROM_START( drgqst )
 	ROM_LOAD( "dragonquest.bin", 0x000000, 0x800000, CRC(3d24413f) SHA1(1677e81cedcf349de7bf091a232dc82c6424efba) )
 ROM_END
 
+ROM_START( ban_onep )
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("onepiece.bin", 0x000000, 0x800000, CRC(c5cb5a5f) SHA1(db85f6cc48d77c5a4967b9b8e2999167e3dfc8c8) )
+ROM_END
+
+CONS( 2002, epo_ebox, 0, 0, xavix2000_nv,        epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",       "Excite Boxing (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // doesn't use XaviX2000 extra opcodes, but had that type of CPU
 CONS( 2004, epo_sdb,  0, 0, xavix2000_nv,        epo_sdb,     xavix_state,          init_xavix, "Epoch / SSD Company LTD",       "Super Dash Ball (Japan)",  MACHINE_IMPERFECT_SOUND )
 
 CONS( 2005, ttv_sw,   0, 0, xavix2000_i2c_24c02, ttv_lotr,    xavix_i2c_lotr_state, init_xavix, "Tiger / SSD Company LTD",       "Star Wars Saga Edition - Lightsaber Battle Game", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 CONS( 2005, ttv_lotr, 0, 0, xavix2000_i2c_24c02, ttv_lotr,    xavix_i2c_lotr_state, init_xavix, "Tiger / SSD Company LTD",       "Lord Of The Rings - Warrior of Middle-Earth", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 CONS( 2005, ttv_mx,   0, 0, xavix2000_i2c_24c04, ttv_mx,      xavix_i2c_state,      init_xavix, "Tiger / SSD Company LTD",       "MX Dirt Rebel", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 CONS( 2003, drgqst,   0, 0, xavix2000_i2c_24c02, ttv_lotr,    xavix_i2c_lotr_state, init_xavix, "Square Enix / SSD Company LTD", "Kenshin Dragon Quest: Yomigaerishi Densetsu no Ken", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+// hangs after starting a game, or after quite a long time in attract mode (first problem could be bad save data read with the eeprom code, 2nd problem might just be how it is, ends up in a dead loop, not executing invalid code)
+CONS( 2004, ban_onep, 0, 0, xavix2000_i2c_24c04, ttv_mx,      xavix_i2c_state,      init_xavix, "Bandai / SSD Company LTD",      "One Piece - Virtual Punching Battle (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 /* SuperXaviX (XaviX 2002 type CPU) hardware titles (3rd XaviX generation?)
 
