@@ -19,6 +19,7 @@
 #include "machine/tandy2kb.h"
 #include "machine/timer.h"
 #include "machine/upd765.h"
+#include "machine/bankdev.h"
 #include "sound/spkrdev.h"
 #include "video/crt9007.h"
 #include "video/crt9021.h"
@@ -58,7 +59,8 @@ public:
 		m_drb0(*this, CRT9212_0_TAG),
 		m_drb1(*this, CRT9212_1_TAG),
 		m_vac(*this, CRT9021B_TAG),
-		m_palette(*this, "palette"),
+		m_colpal(*this, "colpal"),
+		m_vrambank(*this, "vrambank"),
 		m_timer_vidldsh(*this, "vidldsh"),
 		m_centronics(*this, CENTRONICS_TAG),
 		m_speaker(*this, "speaker"),
@@ -121,7 +123,8 @@ private:
 	required_device<crt9212_device> m_drb0;
 	required_device<crt9212_device> m_drb1;
 	required_device<crt9021_device> m_vac;
-	required_device<palette_device> m_palette;
+	required_device<palette_device> m_colpal;
+	required_device<address_map_bank_device> m_vrambank;
 	required_device<timer_device> m_timer_vidldsh;
 	required_device<centronics_device> m_centronics;
 	required_device<speaker_sound_device> m_speaker;
@@ -150,8 +153,6 @@ private:
 	DECLARE_WRITE8_MEMBER( enable_w );
 	DECLARE_WRITE8_MEMBER( dma_mux_w );
 	DECLARE_READ8_MEMBER( kbint_clr_r );
-	DECLARE_READ16_MEMBER( vpac_r );
-	DECLARE_WRITE16_MEMBER( vpac_w );
 	DECLARE_READ8_MEMBER( fldtc_r );
 	DECLARE_WRITE8_MEMBER( fldtc_w );
 	DECLARE_WRITE8_MEMBER( addr_ctrl_w );
@@ -168,6 +169,9 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( vpac_cblank_w );
 	DECLARE_WRITE_LINE_MEMBER( vpac_slg_w );
 	DECLARE_WRITE_LINE_MEMBER( vpac_sld_w );
+	DECLARE_READ8_MEMBER( hires_status_r );
+	DECLARE_WRITE8_MEMBER( hires_plane_w );
+	DECLARE_WRITE8_MEMBER( hires_palette_w );
 	DECLARE_WRITE8_MEMBER( vidla_w );
 	DECLARE_WRITE8_MEMBER( drb_attr_w );
 	DECLARE_WRITE_LINE_MEMBER( kbdclk_w );
@@ -183,6 +187,7 @@ private:
 	CRT9021_DRAW_CHARACTER_MEMBER( vac_draw_character );
 	TIMER_DEVICE_CALLBACK_MEMBER( vidldsh_tick );
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static rgb_t IRGB(uint32_t raw);
 
 	enum
 	{
@@ -223,6 +228,7 @@ private:
 	int m_sld;
 	uint8_t m_cgra;
 	uint8_t m_vidla;
+	uint8_t m_hires_en;
 
 	/* sound state */
 	int m_outspkr;
@@ -238,6 +244,7 @@ private:
 	void tandy2k_io(address_map &map);
 	void tandy2k_mem(address_map &map);
 	void vpac_mem(address_map &map);
+	void vrambank_mem(address_map &map);
 };
 
 #endif // MAME_INCLUDES_TANDY2K_H
