@@ -964,7 +964,7 @@ void witch_state::witch(machine_config &config)
 	/* 2nd z80 */
 	Z80(config, m_subcpu, CPU_CLOCK);    /* 3 MHz */
 	m_subcpu->set_addrmap(AS_PROGRAM, &witch_state::witch_sub_map);
-	m_maincpu->set_vblank_int("screen", FUNC(witch_state::irq0_line_assert));
+	m_subcpu->set_vblank_int("screen", FUNC(witch_state::irq0_line_assert));
 
 	config.m_minimum_quantum = attotime::from_hz(6000);
 
