@@ -121,7 +121,7 @@ language switches:
 When PB.6 is pulled low, the language switches can be read.  There are four.
 They connect to the button rows.  When enabled, the row(s) will read low if
 the jumper is present.  English only VCC's do not have the 367 or any pads stuffed.
-The jumpers are labelled: French, German, Spanish, and special.
+The jumpers are labeled: French, German, Spanish, and special.
 
 language latch:
 ---------------
@@ -142,9 +142,9 @@ determination and give you a language option on power up or something.
 
 ******************************************************************************
 
-Chess Challenger 10 (CC10)
+Chess Challenger 10 (CCX)
 -------------------
-4 versions are known to exist: A,B,C,D. Strangely, version C has an 8080
+4 versions are known to exist: A,B,C,D. Strangely, version C(UCC10) has an 8080
 instead of Z80. Chess Challenger 1,3 and 7 also run on very similar hardware.
 
 This is an earlier hardware upon which the VCC and UVC above were based on;
@@ -190,6 +190,7 @@ PC.7 - button column D (W)
 
 Chess Challenger 7 (BCC)
 ------------------------
+model CC7 is an older version
 RE information from netlist by Berger
 
 Zilog Z80A, 3.579MHz from XTAL
@@ -1957,7 +1958,7 @@ void fidelz80_state::dsc(machine_config &config)
     ROM Definitions
 ******************************************************************************/
 
-ROM_START( cc10 )
+ROM_START( cc10 ) // model CCX
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cn19053n_cc10b", 0x0000, 0x1000, CRC(afd3ca99) SHA1(870d09b2b52ccb8572d69642c59b5215d5fb26ab) ) // 2332
 ROM_END
@@ -2153,8 +2154,8 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME      PARENT  CMP MACHINE INPUT  CLASS           INIT        COMPANY                 FULLNAME, FLAGS
-CONS( 1978, cc10,     0,       0, cc10,   cc10,  fidelz80_state, empty_init, "Fidelity Electronics", "Chess Challenger 10 (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1979, cc7,      0,       0, bcc,    bcc,   fidelz80_state, empty_init, "Fidelity Electronics", "Chess Challenger 7 (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1978, cc10,     0,       0, cc10,   cc10,  fidelz80_state, empty_init, "Fidelity Electronics", "Chess Challenger 10 (model CCX, rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1979, cc7,      0,       0, bcc,    bcc,   fidelz80_state, empty_init, "Fidelity Electronics", "Chess Challenger 7 (model BCC, rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1979, backgamc, 0,       0, bkc,    bkc,   fidelz80_state, empty_init, "Fidelity Electronics", "Backgammon Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )
 
 CONS( 1980, fscc8,    0,       0, scc,    scc,   fidelz80_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger 8", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )

@@ -846,10 +846,14 @@ bool video_manager::finish_screen_updates()
 	// finish updating the screens
 	screen_device_iterator iter(machine().root_device());
 
+	bool has_screen = false;
 	for (screen_device &screen : iter)
+	{
 		screen.update_partial(screen.visible_area().max_y);
+		has_screen = true;
+	}
 
-	bool anything_changed = (iter.count() == 0) || m_output_changed;
+	bool anything_changed = !has_screen || m_output_changed;
 	m_output_changed = false;
 
 	// now add the quads for all the screens
