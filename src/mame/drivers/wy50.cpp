@@ -25,6 +25,7 @@
 *******************************************************************************/
 
 #include "emu.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/mcs51/mcs51.h"
 #include "machine/er1400.h"
 #include "machine/mc2661.h"
@@ -110,9 +111,6 @@ void wy50_state::machine_reset()
 {
 	keyboard_w(0);
 	earom_w(0);
-
-	m_sio->cts_w(0);
-	m_sio->dsr_w(0);
 }
 
 u8 wy50_state::pvtc_videoram_r(offs_t offset)
@@ -264,7 +262,8 @@ void wy50_state::io_map(address_map &map)
 	map(0x0000, 0x07ff).mirror(0x1800).ram().share("videoram0");
 	map(0x2000, 0x27ff).mirror(0x1800).ram().share("videoram1");
 	map(0x4000, 0x47ff).mirror(0x1800).rw(FUNC(wy50_state::pvtc_r), FUNC(wy50_state::pvtc_w));
-	map(0x6000, 0x63ff).mirror(0x1c00).rw(FUNC(wy50_state::sio_r), FUNC(wy50_state::sio_w));
+	map(0x6000, 0x63ff).mirror(0x0c00).r(FUNC(wy50_state::sio_r));
+	map(0x7000, 0x73ff).mirror(0x0c00).w(FUNC(wy50_state::sio_w));
 	map(0x8000, 0x8000).mirror(0x1fff).r(FUNC(wy50_state::rbreg_r));
 	map(0xa000, 0xa000).mirror(0x1fff).w(FUNC(wy50_state::keyboard_w));
 	map(0xc000, 0xc000).mirror(0x1fff).w(FUNC(wy50_state::earom_w));
@@ -309,6 +308,14 @@ void wy50_state::wy50(machine_config &config)
 
 	MC2661(config, m_sio, 4.9152_MHz_XTAL); // SCN2661B
 	m_sio->rxrdy_handler().set_inputline(m_maincpu, MCS51_INT1_LINE);
+	m_sio->txd_handler().set("modem", FUNC(rs232_port_device::write_txd));
+	m_sio->dtr_handler().set("modem", FUNC(rs232_port_device::write_dtr));
+	m_sio->rts_handler().set("modem", FUNC(rs232_port_device::write_rts));
+
+	rs232_port_device &modem(RS232_PORT(config, "modem", default_rs232_devices, "loopback"));
+	modem.rxd_handler().set(m_sio, FUNC(mc2661_device::rx_w));
+	modem.cts_handler().set(m_sio, FUNC(mc2661_device::cts_w));
+	modem.dcd_handler().set(m_sio, FUNC(mc2661_device::dcd_w));
 }
 
 ROM_START(wy50)
