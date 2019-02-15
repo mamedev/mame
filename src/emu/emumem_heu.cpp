@@ -7,7 +7,7 @@
 #include "emumem_heu.h"
 
 
-template<int Width, int AddrShift, int Endian> handler_entry_read_units<Width, AddrShift, Endian>::handler_entry_read_units(const memory_units_descriptor<Width, AddrShift, Endian> &descriptor, u8 ukey, address_space *space) :
+template<int Width, int AddrShift, int Endian> handler_entry_read_units<Width, AddrShift, Endian>::handler_entry_read_units(const memory_units_descriptor<Width, AddrShift> &descriptor, u8 ukey, address_space *space) :
 	handler_entry_read<Width, AddrShift, Endian>(space, inh::F_UNITS),
 	m_subunits(0)
 {
@@ -16,7 +16,7 @@ template<int Width, int AddrShift, int Endian> handler_entry_read_units<Width, A
 	std::sort(m_subunit_infos, m_subunit_infos + m_subunits, [](const subunit_info &a, const subunit_info &b) { return a.m_offset < b.m_offset; });
 }
 
-template<int Width, int AddrShift, int Endian> handler_entry_read_units<Width, AddrShift, Endian>::handler_entry_read_units(const memory_units_descriptor<Width, AddrShift, Endian> &descriptor, u8 ukey, const handler_entry_read_units *src) :
+template<int Width, int AddrShift, int Endian> handler_entry_read_units<Width, AddrShift, Endian>::handler_entry_read_units(const memory_units_descriptor<Width, AddrShift> &descriptor, u8 ukey, const handler_entry_read_units *src) :
 	handler_entry_read<Width, AddrShift, Endian>(src->m_space, inh::F_UNITS),
 	m_subunits(0)
 {
@@ -48,7 +48,7 @@ template<int Width, int AddrShift, int Endian> void handler_entry_read_units<Wid
 		refs.add(m_subunit_infos[i].m_handler);
 }
 
-template<int Width, int AddrShift, int Endian> void handler_entry_read_units<Width, AddrShift, Endian>::fill(const memory_units_descriptor<Width, AddrShift, Endian> &descriptor, const std::vector<typename memory_units_descriptor<Width, AddrShift, Endian>::entry> &entries)
+template<int Width, int AddrShift, int Endian> void handler_entry_read_units<Width, AddrShift, Endian>::fill(const memory_units_descriptor<Width, AddrShift> &descriptor, const std::vector<typename memory_units_descriptor<Width, AddrShift>::entry> &entries)
 {
 	handler_entry *handler = descriptor.get_subunit_handler();
 	handler->ref(entries.size());
@@ -122,7 +122,7 @@ template<int Width, int AddrShift, int Endian> std::string handler_entry_read_un
 
 
 
-template<int Width, int AddrShift, int Endian> handler_entry_write_units<Width, AddrShift, Endian>::handler_entry_write_units(const memory_units_descriptor<Width, AddrShift, Endian> &descriptor, u8 ukey, address_space *space) :
+template<int Width, int AddrShift, int Endian> handler_entry_write_units<Width, AddrShift, Endian>::handler_entry_write_units(const memory_units_descriptor<Width, AddrShift> &descriptor, u8 ukey, address_space *space) :
 	handler_entry_write<Width, AddrShift, Endian>(space, inh::F_UNITS),
 	m_subunits(0)
 {
@@ -131,7 +131,7 @@ template<int Width, int AddrShift, int Endian> handler_entry_write_units<Width, 
 	std::sort(m_subunit_infos, m_subunit_infos + m_subunits, [](const subunit_info &a, const subunit_info &b) { return a.m_offset < b.m_offset; });
 }
 
-template<int Width, int AddrShift, int Endian> handler_entry_write_units<Width, AddrShift, Endian>::handler_entry_write_units(const memory_units_descriptor<Width, AddrShift, Endian> &descriptor, u8 ukey, const handler_entry_write_units<Width, AddrShift, Endian> *src) :
+template<int Width, int AddrShift, int Endian> handler_entry_write_units<Width, AddrShift, Endian>::handler_entry_write_units(const memory_units_descriptor<Width, AddrShift> &descriptor, u8 ukey, const handler_entry_write_units<Width, AddrShift, Endian> *src) :
 	handler_entry_write<Width, AddrShift, Endian>(src->m_space, inh::F_UNITS),
 	m_subunits(0)
 {
@@ -163,7 +163,7 @@ template<int Width, int AddrShift, int Endian> void handler_entry_write_units<Wi
 		refs.add(m_subunit_infos[i].m_handler);
 }
 
-template<int Width, int AddrShift, int Endian> void handler_entry_write_units<Width, AddrShift, Endian>::fill(const memory_units_descriptor<Width, AddrShift, Endian> &descriptor, const std::vector<typename memory_units_descriptor<Width, AddrShift, Endian>::entry> &entries)
+template<int Width, int AddrShift, int Endian> void handler_entry_write_units<Width, AddrShift, Endian>::fill(const memory_units_descriptor<Width, AddrShift> &descriptor, const std::vector<typename memory_units_descriptor<Width, AddrShift>::entry> &entries)
 {
 	handler_entry *handler = descriptor.get_subunit_handler();
 	handler->ref(entries.size());

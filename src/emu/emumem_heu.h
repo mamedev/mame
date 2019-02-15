@@ -11,8 +11,8 @@ public:
 	using uX = typename emu::detail::handler_entry_size<Width>::uX;
 	using inh = handler_entry_read<Width, AddrShift, Endian>;
 
-	handler_entry_read_units(const memory_units_descriptor<Width, AddrShift, Endian> &descriptor, u8 ukey, address_space *space);
-	handler_entry_read_units(const memory_units_descriptor<Width, AddrShift, Endian> &descriptor, u8 ukey, const handler_entry_read_units *src);
+	handler_entry_read_units(const memory_units_descriptor<Width, AddrShift> &descriptor, u8 ukey, address_space *space);
+	handler_entry_read_units(const memory_units_descriptor<Width, AddrShift> &descriptor, u8 ukey, const handler_entry_read_units *src);
 	~handler_entry_read_units();
 
 	uX read(offs_t offset, uX mem_mask) override;
@@ -42,7 +42,7 @@ private:
 	uX                   m_unmap;                        // "unmapped" value to add to reads
 	u8                   m_subunits;                     // number of subunits
 
-	void fill(const memory_units_descriptor<Width, AddrShift, Endian> &descriptor, const std::vector<typename memory_units_descriptor<Width, AddrShift, Endian>::entry> &entries);
+	void fill(const memory_units_descriptor<Width, AddrShift> &descriptor, const std::vector<typename memory_units_descriptor<Width, AddrShift>::entry> &entries);
 	static std::string m2r(uX mask);
 };
 
@@ -52,8 +52,8 @@ public:
 	using uX = typename emu::detail::handler_entry_size<Width>::uX;
 	using inh = handler_entry_write<Width, AddrShift, Endian>;
 
-	handler_entry_write_units(const memory_units_descriptor<Width, AddrShift, Endian> &descriptor, u8 ukey, address_space *space);
-	handler_entry_write_units(const memory_units_descriptor<Width, AddrShift, Endian> &descriptor, u8 ukey, const handler_entry_write_units<Width, AddrShift, Endian> *src);
+	handler_entry_write_units(const memory_units_descriptor<Width, AddrShift> &descriptor, u8 ukey, address_space *space);
+	handler_entry_write_units(const memory_units_descriptor<Width, AddrShift> &descriptor, u8 ukey, const handler_entry_write_units<Width, AddrShift, Endian> *src);
 	~handler_entry_write_units();
 
 	void write(offs_t offset, uX data, uX mem_mask) override;
@@ -82,7 +82,7 @@ private:
 	subunit_info         m_subunit_infos[SUBUNIT_COUNT]; // subunit information
 	u8                   m_subunits;                     // number of subunits
 
-	void fill(const memory_units_descriptor<Width, AddrShift, Endian> &descriptor, const std::vector<typename memory_units_descriptor<Width, AddrShift, Endian>::entry> &entries);
+	void fill(const memory_units_descriptor<Width, AddrShift> &descriptor, const std::vector<typename memory_units_descriptor<Width, AddrShift>::entry> &entries);
 	static std::string m2r(uX mask);
 };
 

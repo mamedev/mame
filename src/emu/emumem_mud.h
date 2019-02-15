@@ -3,7 +3,7 @@
 
 // Descriptors for subunit support
 
-template<int Width, int AddrShift, int Endian> class memory_units_descriptor {
+template<int Width, int AddrShift> class memory_units_descriptor {
 public:
 	using uX = typename emu::detail::handler_entry_size<Width>::uX;
 
@@ -15,7 +15,7 @@ public:
 		u8 m_offset;
 	};
 
-	memory_units_descriptor(u8 access_width, u8 access_endian, handler_entry *handler, offs_t addrstart, offs_t addrend, offs_t mask, uX unitmask, int cswidth);
+	memory_units_descriptor(u8 access_width, u8 access_endian, handler_entry *handler, offs_t addrstart, offs_t addrend, offs_t mask, uX unitmask, int cswidth, endianness_t endian);
 
 	offs_t get_handler_start() const { return m_handler_start; }
 	offs_t get_handler_mask() const { return m_handler_mask; }
@@ -37,5 +37,5 @@ private:
 	u8 m_access_width;
 	u8 m_access_endian;
 
-	void generate(u8 ukey, uX umask, u32 cswidth, u32 bits_per_access, u8 base_shift, s8 shift, u32 active_count);
+	void generate(u8 ukey, uX umask, u32 cswidth, endianness_t endian, u32 bits_per_access, u8 base_shift, s8 shift, u32 active_count);
 };

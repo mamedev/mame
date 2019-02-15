@@ -35,7 +35,7 @@ template<> u8 mask_to_ukey<u64>(u64 mask)
 		(mask & 0x00000000000000ff ? 0x01 : 0x00);
 }
 
-template<int Width, int AddrShift, int Endian> memory_units_descriptor<Width, AddrShift, Endian>::memory_units_descriptor(u8 access_width, u8 access_endian, handler_entry *handler, offs_t addrstart, offs_t addrend, offs_t mask, typename emu::detail::handler_entry_size<Width>::uX unitmask, int cswidth) : m_handler(handler), m_access_width(access_width), m_access_endian(access_endian)
+template<int Width, int AddrShift> memory_units_descriptor<Width, AddrShift>::memory_units_descriptor(u8 access_width, u8 access_endian, handler_entry *handler, offs_t addrstart, offs_t addrend, offs_t mask, typename emu::detail::handler_entry_size<Width>::uX unitmask, int cswidth, endianness_t endian) : m_handler(handler), m_access_width(access_width), m_access_endian(access_endian)
 {
 	constexpr u32 NATIVE_MASK = Width + AddrShift >= 0 ? make_bitmask<u32>(Width + AddrShift) : 0;
 	u32 bits_per_access = 8 << access_width;
@@ -79,10 +79,10 @@ template<int Width, int AddrShift, int Endian> memory_units_descriptor<Width, Ad
 
 	for(u32 i=0; i<4; i++)
 		if(m_entries_for_key.find(m_keymap[i]) == m_entries_for_key.end())
-			generate(m_keymap[i], umasks[i], cswidth, bits_per_access, base_shift, shift, active_count);
+			generate(m_keymap[i], umasks[i], cswidth, endian, bits_per_access, base_shift, shift, active_count);
 }
 
-template<int Width, int AddrShift, int Endian> void memory_units_descriptor<Width, AddrShift, Endian>::generate(u8 ukey, typename emu::detail::handler_entry_size<Width>::uX umask, u32 cswidth, u32 bits_per_access, u8 base_shift, s8 shift, u32 active_count)
+template<int Width, int AddrShift> void memory_units_descriptor<Width, AddrShift>::generate(u8 ukey, typename emu::detail::handler_entry_size<Width>::uX umask, u32 cswidth, endianness_t endian, u32 bits_per_access, u8 base_shift, s8 shift, u32 active_count)
 {
 	auto &entries = m_entries_for_key[ukey];
 
@@ -99,29 +99,19 @@ template<int Width, int AddrShift, int Endian> void memory_units_descriptor<Widt
 		uX numask = dmask << i;
 		if(umask & numask) {
 			uX amask = csmask << (i & ~(cswidth - 1));
-			entries.emplace_back(entry{ amask, numask, shift, u8(i), u8(Endian == ENDIANNESS_BIG ? active_count - 1 - offset : offset) });
+			entries.emplace_back(entry{ amask, numask, shift, u8(i), u8(endian == ENDIANNESS_BIG ? active_count - 1 - offset : offset) });
 			offset ++;
 		}
 	}
 }
 
-template class memory_units_descriptor<1,  3, ENDIANNESS_LITTLE>;
-template class memory_units_descriptor<1,  3, ENDIANNESS_BIG>;
-template class memory_units_descriptor<1,  0, ENDIANNESS_LITTLE>;
-template class memory_units_descriptor<1,  0, ENDIANNESS_BIG>;
-template class memory_units_descriptor<1, -1, ENDIANNESS_LITTLE>;
-template class memory_units_descriptor<1, -1, ENDIANNESS_BIG>;
-template class memory_units_descriptor<2,  0, ENDIANNESS_LITTLE>;
-template class memory_units_descriptor<2,  0, ENDIANNESS_BIG>;
-template class memory_units_descriptor<2, -1, ENDIANNESS_LITTLE>;
-template class memory_units_descriptor<2, -1, ENDIANNESS_BIG>;
-template class memory_units_descriptor<2, -2, ENDIANNESS_LITTLE>;
-template class memory_units_descriptor<2, -2, ENDIANNESS_BIG>;
-template class memory_units_descriptor<3,  0, ENDIANNESS_LITTLE>;
-template class memory_units_descriptor<3,  0, ENDIANNESS_BIG>;
-template class memory_units_descriptor<3, -1, ENDIANNESS_LITTLE>;
-template class memory_units_descriptor<3, -1, ENDIANNESS_BIG>;
-template class memory_units_descriptor<3, -2, ENDIANNESS_LITTLE>;
-template class memory_units_descriptor<3, -2, ENDIANNESS_BIG>;
-template class memory_units_descriptor<3, -3, ENDIANNESS_LITTLE>;
-template class memory_units_descriptor<3, -3, ENDIANNESS_BIG>;
+template class memory_units_descriptor<1,  3>;
+template class memory_units_descriptor<1,  0>;
+template class memory_units_descriptor<1, -1>;
+template class memory_units_descriptor<2,  0>;
+template class memory_units_descriptor<2, -1>;
+template class memory_units_descriptor<2, -2>;
+template class memory_units_descriptor<3,  0>;
+template class memory_units_descriptor<3, -1>;
+template class memory_units_descriptor<3, -2>;
+template class memory_units_descriptor<3, -3>;
