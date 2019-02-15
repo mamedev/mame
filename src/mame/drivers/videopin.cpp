@@ -359,11 +359,11 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(videopin_state::videopin)
-
+void videopin_state::videopin(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, 12096000 / 16)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	M6502(config, m_maincpu, 12096000 / 16);
+	m_maincpu->set_addrmap(AS_PROGRAM, &videopin_state::main_map);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -383,7 +383,7 @@ MACHINE_CONFIG_START(videopin_state::videopin)
 	SPEAKER(config, "mono").front_center();
 
 	DISCRETE(config, m_discrete, videopin_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
-MACHINE_CONFIG_END
+}
 
 
 

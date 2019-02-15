@@ -340,10 +340,11 @@ static void unixpc_floppies(device_slot_interface &device)
 	device.option_add("525dd", FLOPPY_525_DD);
 }
 
-MACHINE_CONFIG_START(unixpc_state::unixpc)
+void unixpc_state::unixpc(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", M68010, 40_MHz_XTAL / 4)
-	MCFG_DEVICE_PROGRAM_MAP(unixpc_mem)
+	M68010(config, m_maincpu, 40_MHz_XTAL / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &unixpc_state::unixpc_mem);
 
 	LS259(config, m_gcr); // 7K
 	m_gcr->q_out_cb<0>().set(FUNC(unixpc_state::error_enable_w));
@@ -364,10 +365,10 @@ MACHINE_CONFIG_START(unixpc_state::unixpc)
 	// bit 7 (D15) = VBL ack (must go high-low-high to ack)
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_UPDATE_DRIVER(unixpc_state, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(40_MHz_XTAL / 2, 896, 0, 720, 367, 0, 348)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_screen_update(FUNC(unixpc_state::screen_update));
+	screen.set_raw(40_MHz_XTAL / 2, 896, 0, 720, 367, 0, 348);
+	screen.set_palette("palette");
 	// vsync should actually last 17264 pixels
 
 	config.set_default_layout(layout_unixpc);
@@ -407,7 +408,7 @@ MACHINE_CONFIG_START(unixpc_state::unixpc)
 	centronics_device &printer(CENTRONICS(config, "printer", centronics_devices, nullptr));
 	output_latch_device &printlatch(OUTPUT_LATCH(config, "printlatch"));
 	printer.set_output_latch(printlatch);
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

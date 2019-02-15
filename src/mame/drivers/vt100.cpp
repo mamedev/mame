@@ -311,12 +311,13 @@ static GFXDECODE_START( gfx_vt100 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, vt100_charlayout, 0, 1 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(vt100_state::vt100)
+void vt100_state::vt100(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8080, XTAL(24'883'200) / 9)
-	MCFG_DEVICE_PROGRAM_MAP(vt100_mem)
-	MCFG_DEVICE_IO_MAP(vt100_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("rstbuf", rst_pos_buffer_device, inta_cb)
+	I8080(config, m_maincpu, XTAL(24'883'200) / 9);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vt100_state::vt100_mem);
+	m_maincpu->set_addrmap(AS_IO, &vt100_state::vt100_io);
+	m_maincpu->set_irq_acknowledge_callback("rstbuf", FUNC(rst_pos_buffer_device::inta_cb));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
@@ -326,7 +327,7 @@ MACHINE_CONFIG_START(vt100_state::vt100)
 	screen.set_palette("vt100_video:palette");
 
 	GFXDECODE(config, "gfxdecode", "vt100_video:palette", gfx_vt100);
-//  MCFG_PALETTE_ADD_MONOCHROME("palette")
+//  PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	config.set_default_layout(layout_vt100);
 
@@ -361,7 +362,7 @@ MACHINE_CONFIG_START(vt100_state::vt100)
 	m_kbduart->set_auto_rdav(true);
 
 	RST_POS_BUFFER(config, m_rstbuf, 0).int_callback().set_inputline(m_maincpu, 0);
-MACHINE_CONFIG_END
+}
 
 void vt100_state::stp_mem(address_map &map)
 {
@@ -422,13 +423,14 @@ void vt100_state::vt180(machine_config &config)
 	z80cpu.set_io_map(&vt100_state::vt180_io);
 }
 
-MACHINE_CONFIG_START(vt100_state::vt101)
+void vt100_state::vt101(machine_config &config)
+{
 	vt100(config);
 
-	MCFG_DEVICE_REPLACE(m_maincpu, I8085A, XTAL(24'073'400) / 4)
-	MCFG_DEVICE_PROGRAM_MAP(vt100_mem)
-	MCFG_DEVICE_IO_MAP(vt100_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(vt100_state, vt102_irq_callback)
+	I8085A(config.replace(), m_maincpu, XTAL(24'073'400) / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vt100_state::vt100_mem);
+	m_maincpu->set_addrmap(AS_IO, &vt100_state::vt100_io);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(vt100_state::vt102_irq_callback));
 
 	m_pusart->set_clock(XTAL(24'073'400) / 8);
 	m_pusart->txrdy_handler().set_inputline(m_maincpu, I8085_RST55_LINE); // 8085 pin 9, mislabeled RST 7.5 on schematics
@@ -438,13 +440,13 @@ MACHINE_CONFIG_START(vt100_state::vt101)
 	dbrg.ft_handler().set(m_pusart, FUNC(i8251_device::write_txc));
 
 	m_kbduart->write_tbmt_callback().set_inputline(m_maincpu, I8085_RST65_LINE);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(vt100_state::vt102)
+void vt100_state::vt102(machine_config &config)
+{
 	vt101(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(vt102_io)
+	m_maincpu->set_addrmap(AS_IO, &vt100_state::vt102_io);
 
 	ins8250_device &printuart(INS8250(config, "printuart", XTAL(24'073'400) / 16));
 	printuart.out_tx_callback().set("printer", FUNC(rs232_port_device::write_txd));
@@ -453,7 +455,7 @@ MACHINE_CONFIG_START(vt100_state::vt102)
 	rs232_port_device &printer(RS232_PORT(config, "printer", default_rs232_devices, nullptr));
 	printer.rxd_handler().set("printuart", FUNC(ins8250_device::rx_w));
 	printer.dsr_handler().set("printuart", FUNC(ins8250_device::dsr_w));
-MACHINE_CONFIG_END
+}
 
 /* VT1xx models:
  * VT100 - 1978 base model. the 'later' ROM is from 1979 or 1980.

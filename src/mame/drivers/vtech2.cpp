@@ -486,10 +486,10 @@ static const floppy_interface vtech2_floppy_interface =
 
 MACHINE_CONFIG_START(vtech2_state::laser350)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 3694700)        /* 3.694700 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vtech2_state,  vtech2_interrupt)
+	Z80(config, m_maincpu, 3694700);        /* 3.694700 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &vtech2_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &vtech2_state::io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(vtech2_state::vtech2_interrupt));
 	config.m_minimum_quantum = attotime::from_hz(60);
 
 	ADDRESS_MAP_BANK(config, "banka").set_map(&vtech2_state::m_map350).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
@@ -498,13 +498,13 @@ MACHINE_CONFIG_START(vtech2_state::laser350)
 	ADDRESS_MAP_BANK(config, "bankd").set_map(&vtech2_state::m_map350).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(0)
-	MCFG_SCREEN_SIZE(88*8, 24*8+32)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 88*8-1, 0*8, 24*8+32-1)
-	MCFG_SCREEN_UPDATE_DRIVER(vtech2_state, screen_update_laser)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(0);
+	screen.set_size(88*8, 24*8+32);
+	screen.set_visarea(0*8, 88*8-1, 0*8, 24*8+32-1);
+	screen.set_screen_update(FUNC(vtech2_state::screen_update_laser));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_vtech2);
 	PALETTE(config, m_palette, FUNC(vtech2_state::vtech2_palette), 512 + 16, 16);

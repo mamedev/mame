@@ -187,22 +187,24 @@ static INPUT_PORTS_START( ut88mini )
 INPUT_PORTS_END
 
 /* Machine driver */
-MACHINE_CONFIG_START(ut88_state::ut88)
+void ut88_state::ut88(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8080, 2000000)
-	MCFG_DEVICE_PROGRAM_MAP(ut88_mem)
-	MCFG_DEVICE_IO_MAP(ut88_io)
+	I8080(config, m_maincpu, 2000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ut88_state::ut88_mem);
+	m_maincpu->set_addrmap(AS_IO, &ut88_state::ut88_io);
 	MCFG_MACHINE_RESET_OVERRIDE(ut88_state, ut88 )
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(64*8, 28*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 28*8-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(64*8, 28*8);
+	screen.set_visarea(0, 64*8-1, 0, 28*8-1);
+	screen.set_screen_update(FUNC(ut88_state::screen_update_ut88));
+	screen.set_palette(m_palette);
+
 	MCFG_VIDEO_START_OVERRIDE(ut88_state,ut88)
-	MCFG_SCREEN_UPDATE_DRIVER(ut88_state, screen_update_ut88)
-	MCFG_SCREEN_PALETTE(m_palette)
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ut88);
@@ -228,13 +230,14 @@ MACHINE_CONFIG_START(ut88_state::ut88)
 	m_cassette->set_interface("ut88_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("ut88");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(ut88_state::ut88mini)
+void ut88_state::ut88mini(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8080, 2000000)
-	MCFG_DEVICE_PROGRAM_MAP(ut88mini_mem)
-	MCFG_DEVICE_IO_MAP(ut88mini_io)
+	I8080(config, m_maincpu, 2000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ut88_state::ut88mini_mem);
+	m_maincpu->set_addrmap(AS_IO, &ut88_state::ut88mini_io);
 	MCFG_MACHINE_START_OVERRIDE(ut88_state,ut88mini)
 	MCFG_MACHINE_RESET_OVERRIDE(ut88_state, ut88mini )
 
@@ -251,7 +254,7 @@ MACHINE_CONFIG_START(ut88_state::ut88mini)
 	m_cassette->set_interface("ut88_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("ut88");
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( ut88 )

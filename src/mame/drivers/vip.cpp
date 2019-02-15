@@ -695,7 +695,7 @@ QUICKLOAD_LOAD_MEMBER( vip_state, vip )
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( vip )
+//  machine_config( vip )
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(vip_state::vip)
@@ -753,7 +753,7 @@ MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( vp111 )
+//  machine_config( vp111 )
 //-------------------------------------------------
 
 void vip_state::vp111(machine_config &config)

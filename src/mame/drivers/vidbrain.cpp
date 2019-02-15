@@ -392,7 +392,7 @@ void vidbrain_state::machine_reset()
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( vidbrain )
+//  machine_config( vidbrain )
 //-------------------------------------------------
 
 void vidbrain_state::vidbrain(machine_config &config)

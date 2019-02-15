@@ -366,12 +366,12 @@ void vg5k_state::init_vg5k()
 }
 
 
-MACHINE_CONFIG_START(vg5k_state::vg5k)
-
+void vg5k_state::vg5k(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(vg5k_mem)
-	MCFG_DEVICE_IO_MAP(vg5k_io)
+	Z80(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &vg5k_state::vg5k_mem);
+	m_maincpu->set_addrmap(AS_IO, &vg5k_state::vg5k_io);
 
 	TIMER(config, "vg5k_scanline").configure_scanline(FUNC(vg5k_state::vg5k_scanline), "screen", 0, 10);
 
@@ -381,15 +381,15 @@ MACHINE_CONFIG_START(vg5k_state::vg5k)
 	m_ef9345->set_palette_tag("palette");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DEVICE("ef9345", ef9345_device, screen_update)
-	MCFG_SCREEN_SIZE(336, 300)
-	MCFG_SCREEN_VISIBLE_AREA(00, 336-1, 00, 270-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update("ef9345", FUNC(ef9345_device::screen_update));
+	screen.set_size(336, 300);
+	screen.set_visarea(00, 336-1, 00, 270-1);
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_vg5k);
-	MCFG_PALETTE_ADD("palette", 8)
+	PALETTE(config, "palette").set_entries(8);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -414,7 +414,7 @@ MACHINE_CONFIG_START(vg5k_state::vg5k)
 
 	/* Software lists */
 	SOFTWARE_LIST(config, "cass_list").set_original("vg5k");
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( vg5k )
