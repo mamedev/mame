@@ -849,9 +849,10 @@ bool video_manager::finish_screen_updates()
 	for (screen_device &screen : iter)
 		screen.update_partial(screen.visible_area().max_y);
 
-	// now add the quads for all the screens
-	bool anything_changed = m_output_changed;
+	bool anything_changed = (iter.count() == 0) || m_output_changed;
 	m_output_changed = false;
+
+	// now add the quads for all the screens
 	for (screen_device &screen : iter)
 		if (screen.update_quads())
 			anything_changed = true;
