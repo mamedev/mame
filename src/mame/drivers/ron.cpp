@@ -451,9 +451,9 @@ WRITE8_MEMBER(ron_state::audio_p1_w)
 	//machine().debug_break();
 
 	if(m_ay_address_sel == true)
-		m_ay->address_w(space, 0, data);
+		m_ay->address_w(data);
 	else
-		m_ay->data_w(space, 0, data);
+		m_ay->data_w(data);
 }
 
 WRITE8_MEMBER(ron_state::audio_p2_w)

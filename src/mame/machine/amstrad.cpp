@@ -505,9 +505,9 @@ void amstrad_state::amstrad_plus_dma_parse(int channel)
 	{
 	case 0x0000:  // Load PSG register
 		{
-			m_ay->address_w(generic_space(), 0, (command & 0x0f00) >> 8);
-			m_ay->data_w(generic_space(), 0, command & 0x00ff);
-			m_ay->address_w(generic_space(), 0, m_prev_reg);
+			m_ay->address_w((command & 0x0f00) >> 8);
+			m_ay->data_w(command & 0x00ff);
+			m_ay->address_w(m_prev_reg);
 		}
 		logerror("DMA %i: LOAD %i, %i\n",channel,(command & 0x0f00) >> 8, command & 0x00ff);
 		break;
@@ -2303,11 +2303,11 @@ void amstrad_state::amstrad_handle_snapshot(unsigned char *pSnapshot)
 	/* PSG */
 	for (i=0; i<16; i++)
 	{
-		m_ay->address_w(space, 0, i);
-		m_ay->data_w(space, 0, pSnapshot[0x05b + i] & 0x0ff);
+		m_ay->address_w(i);
+		m_ay->data_w(pSnapshot[0x05b + i] & 0x0ff);
 	}
 
-	m_ay->address_w(space, 0, pSnapshot[0x05a]);
+	m_ay->address_w(pSnapshot[0x05a]);
 
 	{
 		int MemSize;
@@ -2511,12 +2511,12 @@ void amstrad_state::update_psg()
 		} break;
 	case 1:
 		{/* b6 = 1 ? : Read from selected PSG register and make the register data available to PPI Port A */
-			m_ppi_port_inputs[amstrad_ppi_PortA] = m_ay->data_r(space, 0);
+			m_ppi_port_inputs[amstrad_ppi_PortA] = m_ay->data_r();
 		}
 		break;
 	case 2:
 		{/* b7 = 1 ? : Write to selected PSG register and write data to PPI Port A */
-			m_ay->data_w(space, 0, m_ppi_port_outputs[amstrad_ppi_PortA]);
+			m_ay->data_w(m_ppi_port_outputs[amstrad_ppi_PortA]);
 		}
 		break;
 	case 3:
@@ -2524,7 +2524,7 @@ void amstrad_state::update_psg()
 			/* ignore if an invalid PSG register is selected, usually when the PPI port directions are changed after selecting the PSG register */
 			if(m_ppi_port_outputs[amstrad_ppi_PortA] <= 15)
 			{
-				m_ay->address_w(space, 0, m_ppi_port_outputs[amstrad_ppi_PortA]);
+				m_ay->address_w(m_ppi_port_outputs[amstrad_ppi_PortA]);
 				m_prev_reg = m_ppi_port_outputs[amstrad_ppi_PortA];
 			}
 		}

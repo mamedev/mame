@@ -357,7 +357,7 @@ READ8_MEMBER(orion_state::orionz80_io_r)
 {
 	if (offset == 0xFFFD)
 	{
-		return m_ay8912->data_r(space, 0);
+		return m_ay8912->data_r();
 	}
 	return 0xff;
 }
@@ -375,10 +375,10 @@ WRITE8_MEMBER(orion_state::orionz80_io_w)
 	}
 	switch(offset)
 	{
-		case 0xfffd : m_ay8912->address_w(space, 0, data);
+		case 0xfffd : m_ay8912->address_w(data);
 						break;
 		case 0xbffd :
-		case 0xbefd : m_ay8912->data_w(space, 0, data);
+		case 0xbefd : m_ay8912->data_w(data);
 						break;
 	}
 }
@@ -548,7 +548,7 @@ READ8_MEMBER(orion_state::orionpro_io_r)
 	}
 	if (offset == 0xFFFD)
 	{
-		return m_ay8912->data_r(space, 0);
+		return m_ay8912->data_r();
 	}
 	return 0xff;
 }
@@ -586,10 +586,10 @@ WRITE8_MEMBER(orion_state::orionpro_io_w)
 	}
 	switch(offset)
 	{
-		case 0xfffd : m_ay8912->address_w(space, 0, data);
+		case 0xfffd : m_ay8912->address_w(data);
 						break;
 		case 0xbffd :
-		case 0xbefd : m_ay8912->data_w(space, 0, data);
+		case 0xbefd : m_ay8912->data_w(data);
 						break;
 	}
 }

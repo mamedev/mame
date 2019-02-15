@@ -178,9 +178,9 @@ WRITE8_MEMBER(skeetsht_state::hc11_porta_w)
 WRITE8_MEMBER(skeetsht_state::ay8910_w)
 {
 	if (m_ay_sel)
-		m_ay->data_w(space, 0, data);
+		m_ay->data_w(data);
 	else
-		m_ay->address_w(space, 0, data);
+		m_ay->address_w(data);
 }
 
 

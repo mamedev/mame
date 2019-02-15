@@ -92,11 +92,11 @@ WRITE_LINE_MEMBER(kchamp_state::sound_reset_w)
 	{
 		m_ay[0]->reset();
 		m_ay[1]->reset();
-		sound_control_w(machine().dummy_space(), 0, 0);
+		sound_control_w(0);
 	}
 }
 
-WRITE8_MEMBER(kchamp_state::sound_control_w)
+void kchamp_state::sound_control_w(u8 data)
 {
 	m_msm->reset_w(!(data & 1));
 	m_sound_nmi_enable = ((data >> 1) & 1);

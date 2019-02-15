@@ -113,7 +113,7 @@ READ8_MEMBER( tiki100_state::iorq_r )
 		switch (offset & 0x03)
 		{
 		case 3:
-			data = m_psg->data_r(space, 0);
+			data = m_psg->data_r();
 			break;
 		}
 		break;
@@ -160,11 +160,11 @@ WRITE8_MEMBER( tiki100_state::iorq_w )
 			break;
 
 		case 2:
-			m_psg->address_w(space, 0, data);
+			m_psg->address_w(data);
 			break;
 
 		case 3:
-			m_psg->data_w(space, 0, data);
+			m_psg->data_w(data);
 			break;
 		}
 		break;

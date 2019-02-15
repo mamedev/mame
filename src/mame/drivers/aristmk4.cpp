@@ -798,13 +798,13 @@ READ8_MEMBER(aristmk4_state::via_a_r)
 
 	if (m_ay8910_1&0x03) // SW1 read.
 	{
-		psg_ret = m_ay1->data_r(space, 0);
+		psg_ret = m_ay1->data_r();
 		//logerror("PSG porta ay1 returned %02X\n",psg_ret);
 	}
 
 	else if (m_ay8910_2&0x03) //i don't think we read anything from Port A on ay2, Can be removed once game works ok.
 	{
-		psg_ret = m_ay2->data_r(space, 0);
+		psg_ret = m_ay2->data_r();
 		//logerror("PSG porta ay2 returned %02X\n",psg_ret);
 	}
 	return psg_ret;
@@ -898,13 +898,13 @@ WRITE8_MEMBER(aristmk4_state::via_b_w)
 		break;
 	case 0x06:  //WRITE
 	{
-		m_ay1->data_w(space, 0 , m_psg_data);
+		m_ay1->data_w(m_psg_data);
 		//logerror("VIA Port A write data ay1: %02X\n",m_psg_data);
 		break;
 	}
 	case 0x07:  //LATCH Address (set register)
 	{
-		m_ay1->address_w(space, 0 , m_psg_data);
+		m_ay1->address_w(m_psg_data);
 		//logerror("VIA Port B write register ay1: %02X\n",m_psg_data);
 		break;
 	}
@@ -925,13 +925,13 @@ WRITE8_MEMBER(aristmk4_state::via_b_w)
 		break;
 	case 0x06:  //WRITE
 	{
-		m_ay2->data_w(space, 0, m_psg_data);
+		m_ay2->data_w(m_psg_data);
 		//logerror("VIA Port A write data ay2: %02X\n",m_psg_data);
 		break;
 	}
 	case 0x07:  //LATCH Address (set register)
 	{
-		m_ay2->address_w(space, 0, m_psg_data);
+		m_ay2->address_w(m_psg_data);
 		//logerror("VIA Port B write register ay2: %02X\n",m_psg_data);
 		break;
 	}

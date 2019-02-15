@@ -189,10 +189,10 @@ READ8_MEMBER(zac1b111xx_melody_base::melodypia_porta_r)
 	u8 data = 0xff;
 
 	if (0x01 == (control & 0x03))
-		data &= m_melodypsg1->data_r(space, 0);
+		data &= m_melodypsg1->data_r();
 
 	if (0x04 == (control & 0x0c))
-		data &= m_melodypsg2->data_r(space, 0);
+		data &= m_melodypsg2->data_r();
 
 	return data;
 }
@@ -202,19 +202,19 @@ WRITE8_MEMBER(zac1b111xx_melody_base::melodypia_porta_w)
 	u8 const control = m_melodypia->b_output();
 
 	if (control & 0x02)
-		m_melodypsg1->data_address_w(space, (control >> 0) & 0x01, data);
+		m_melodypsg1->data_address_w((control >> 0) & 0x01, data);
 
 	if (control & 0x08)
-		m_melodypsg2->data_address_w(space, (control >> 2) & 0x01, data);
+		m_melodypsg2->data_address_w((control >> 2) & 0x01, data);
 }
 
 WRITE8_MEMBER(zac1b111xx_melody_base::melodypia_portb_w)
 {
 	if (data & 0x02)
-		m_melodypsg1->data_address_w(space, (data >> 0) & 0x01, m_melodypia->a_output());
+		m_melodypsg1->data_address_w((data >> 0) & 0x01, m_melodypia->a_output());
 
 	if (data & 0x08)
-		m_melodypsg2->data_address_w(space, (data >> 2) & 0x01, m_melodypia->a_output());
+		m_melodypsg2->data_address_w((data >> 2) & 0x01, m_melodypia->a_output());
 }
 
 READ8_MEMBER(zac1b111xx_melody_base::melodypsg1_portb_r)

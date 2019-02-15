@@ -1696,11 +1696,11 @@ WRITE8_MEMBER(goldnpkr_state::wcfalcon_snd_w)
 {
 	if (wcfalcon_flag == 0)
 	{
-		m_ay8910->data_address_w(space, 0, data);
+		m_ay8910->data_address_w(0, data);
 	}
 	else
 	{
-		m_ay8910->data_address_w(space, 1, data);
+		m_ay8910->data_address_w(1, data);
 	}
 
 	wcfalcon_flag = wcfalcon_flag ^ 1;

@@ -239,13 +239,13 @@ WRITE8_MEMBER( dragon_alpha_state::pia2_pa_w )
 		case 0x00:      /* Inactive, do nothing */
 			break;
 		case 0x01:      /* Write to selected port */
-			m_ay8912->data_w(space, 0, m_pia_2->b_output());
+			m_ay8912->data_w(m_pia_2->b_output());
 			break;
 		case 0x02:      /* Read from selected port */
-			m_pia_2->write_portb(m_ay8912->data_r(space, 0));
+			m_pia_2->write_portb(m_ay8912->data_r());
 			break;
 		case 0x03:      /* Select port to write to */
-			m_ay8912->address_w(space, 0, m_pia_2->b_output());
+			m_ay8912->address_w(m_pia_2->b_output());
 			break;
 	}
 }

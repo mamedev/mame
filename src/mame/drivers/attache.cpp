@@ -506,7 +506,7 @@ READ8_MEMBER(attache_state::pio_portA_r)
 	switch(m_pio_select)
 	{
 	case PIO_SEL_8910_DATA:
-		ret = m_psg->data_r(space,0);
+		ret = m_psg->data_r();
 		logerror("PSG: data read %02x\n",ret);
 		break;
 	case PIO_SEL_5832_WRITE:
@@ -560,10 +560,10 @@ void attache_state::operation_strobe(address_space& space, uint8_t data)
 	switch(m_pio_select)
 	{
 	case PIO_SEL_8910_ADDR:
-		m_psg->address_w(space,0,data);
+		m_psg->address_w(data);
 		break;
 	case PIO_SEL_8910_DATA:
-		m_psg->data_w(space,0,data);
+		m_psg->data_w(data);
 		break;
 	case PIO_SEL_5832_WRITE:
 		m_rtc->cs_w(1);
