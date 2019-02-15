@@ -96,9 +96,6 @@ public:
 	uint32_t screen_update_sms(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
-	void store_post_load();
-	void store_select_cart(uint8_t data);
-
 	DECLARE_READ8_MEMBER(read_0000);
 	DECLARE_READ8_MEMBER(read_4000);
 	DECLARE_READ8_MEMBER(read_8000);
