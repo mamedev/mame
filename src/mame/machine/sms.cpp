@@ -1033,10 +1033,7 @@ void sms_state::machine_start()
 		m_led_pwr = 1;
 	}
 
-	m_cartslot = machine().device<sega8_cart_slot_device>("slot");
-	m_cardslot = machine().device<sega8_card_slot_device>("mycard");
-	m_smsexpslot = machine().device<sms_expansion_slot_device>("smsexp");
-	m_sgexpslot = machine().device<sg1000_expansion_slot_device>("sgexp");
+	m_cartslot = m_slot.target();
 	m_space = &m_maincpu->space(AS_PROGRAM);
 
 	if (m_mainram == nullptr)
@@ -1158,11 +1155,11 @@ void sms_state::machine_reset()
 
 void smssdisp_state::machine_reset()
 {
-	sms_state::machine_reset();
-
 	m_store_control = 0;
 	m_store_cart_selection_data = 0;
 	store_select_cart(m_store_cart_selection_data);
+
+	sms_state::machine_reset();
 }
 
 READ8_MEMBER(smssdisp_state::sms_store_cart_select_r)

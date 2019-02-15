@@ -68,7 +68,11 @@ public:
 		m_has_bios_2000(false),
 		m_has_bios_full(false),
 		m_has_jpn_sms_cart_slot(false),
-		m_has_pwr_led(false)
+		m_has_pwr_led(false),
+		m_slot(*this, "slot"),
+		m_cardslot(*this, "mycard"),
+		m_smsexpslot(*this, "smsexp"),
+		m_sgexpslot(*this, "sgexp")
 	{ }
 
 	void sms_base(machine_config &config);
@@ -250,9 +254,10 @@ protected:
 
 	// slot devices
 	sega8_cart_slot_device *m_cartslot;
-	sega8_card_slot_device *m_cardslot;
-	sms_expansion_slot_device *m_smsexpslot;
-	sg1000_expansion_slot_device *m_sgexpslot;
+	optional_device<sega8_cart_slot_device> m_slot;
+	optional_device<sega8_card_slot_device> m_cardslot;
+	optional_device<sms_expansion_slot_device> m_smsexpslot;
+	optional_device<sg1000_expansion_slot_device> m_sgexpslot;
 };
 
 class smssdisp_state : public sms_state
