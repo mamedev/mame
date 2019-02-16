@@ -640,7 +640,8 @@ void fidel68k_state::fdes2325(machine_config &config)
 	config.set_default_layout(layout_fidel_desdis_68kg);
 }
 
-MACHINE_CONFIG_START(fidel68k_state::eag_base)
+void fidel68k_state::eag_base(machine_config &config)
+{
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 16_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &fidel68k_state::eag_map);
@@ -663,11 +664,11 @@ MACHINE_CONFIG_START(fidel68k_state::eag_base)
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "fidel_scc")
-	MCFG_GENERIC_EXTENSIONS("bin,dat")
-	MCFG_GENERIC_LOAD(fidelbase_state, scc_cartridge)
+	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "fidel_scc", "bin,dat"));
+	cartslot.set_device_load(device_image_load_delegate(&fidelbase_state::device_image_load_scc_cartridge, this));
+
 	SOFTWARE_LIST(config, "cart_list").set_original("fidel_scc");
-MACHINE_CONFIG_END
+}
 
 void fidel68k_state::eag(machine_config &config)
 {

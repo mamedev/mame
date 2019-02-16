@@ -663,8 +663,8 @@ public:
 
 private:
 	// devices/pointers
-	optional_device<i8041_device> m_mcu;
-	optional_device<i8243_device> m_i8243;
+	required_device<i8041_device> m_mcu;
+	required_device<i8243_device> m_i8243;
 
 	void vbrc_prepare_display();
 	DECLARE_WRITE8_MEMBER(vbrc_speech_w);
@@ -924,6 +924,7 @@ void ccx_state::ccx_prepare_display()
 	set_display_segmask(0xf, 0x7f);
 	display_matrix(8, 4, outdata, m_led_select >> 2 & 0xf);
 }
+
 
 // I8255 PPI
 
