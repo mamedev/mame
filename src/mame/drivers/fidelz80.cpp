@@ -519,58 +519,20 @@ class fidelz80_state : public fidelbase_state
 public:
 	fidelz80_state(const machine_config &mconfig, device_type type, const char *tag) :
 		fidelbase_state(mconfig, type, tag),
-		m_mcu(*this, "mcu"),
 		m_z80pio(*this, "z80pio"),
-		m_ppi8255(*this, "ppi8255"),
-		m_i8243(*this, "i8243"),
-		m_beeper_off(*this, "beeper_off"),
-		m_beeper(*this, "beeper")
+		m_ppi8255(*this, "ppi8255")
 	{ }
 
-	void ccx(machine_config &config);
-	void vcc(machine_config &config);
 	void bcc(machine_config &config);
 	void bkc(machine_config &config);
 	void scc(machine_config &config);
 	void vsc(machine_config &config);
-	void brc_base(machine_config &config);
-	void ubc(machine_config &config);
-	void vbrc(machine_config &config);
-	void bv3(machine_config &config);
 	void dsc(machine_config &config);
-
-	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 
 private:
 	// devices/pointers
-	optional_device<i8041_device> m_mcu;
 	optional_device<z80pio_device> m_z80pio;
 	optional_device<i8255_device> m_ppi8255;
-	optional_device<i8243_device> m_i8243;
-	optional_device<timer_device> m_beeper_off;
-	optional_device<beep_device> m_beeper;
-
-	// CCX
-	void ccx_prepare_display();
-	DECLARE_WRITE8_MEMBER(ccx_ppi_porta_w);
-	DECLARE_WRITE8_MEMBER(ccx_ppi_portb_w);
-	DECLARE_READ8_MEMBER(ccx_ppi_portc_r);
-	DECLARE_WRITE8_MEMBER(ccx_ppi_portc_w);
-	TIMER_DEVICE_CALLBACK_MEMBER(beeper_off_callback);
-	void ccx_io(address_map &map);
-	void ccx_map(address_map &map);
-
-	// VCC/UVC
-	void vcc_prepare_display();
-	DECLARE_READ8_MEMBER(vcc_speech_r);
-	DECLARE_WRITE8_MEMBER(vcc_ppi_porta_w);
-	DECLARE_READ8_MEMBER(vcc_ppi_portb_r);
-	DECLARE_WRITE8_MEMBER(vcc_ppi_portb_w);
-	DECLARE_READ8_MEMBER(vcc_ppi_portc_r);
-	DECLARE_WRITE8_MEMBER(vcc_ppi_portc_w);
-	DECLARE_MACHINE_START(vcc);
-	void vcc_io(address_map &map);
-	void vcc_map(address_map &map);
 
 	// BCC, BKC
 	DECLARE_READ8_MEMBER(bcc_input_r);
@@ -586,6 +548,7 @@ private:
 
 	// VSC
 	void vsc_prepare_display();
+	DECLARE_READ8_MEMBER(vsc_speech_r);
 	DECLARE_READ8_MEMBER(vsc_io_trampoline_r);
 	DECLARE_WRITE8_MEMBER(vsc_io_trampoline_w);
 	DECLARE_WRITE8_MEMBER(vsc_ppi_porta_w);
@@ -596,15 +559,6 @@ private:
 	DECLARE_WRITE8_MEMBER(vsc_pio_portb_w);
 	void vsc_io(address_map &map);
 	void vsc_map(address_map &map);
-
-	// VBRC/UBC, BV3
-	void vbrc_prepare_display();
-	DECLARE_WRITE8_MEMBER(vbrc_speech_w);
-	DECLARE_WRITE8_MEMBER(vbrc_mcu_p1_w);
-	DECLARE_READ8_MEMBER(vbrc_mcu_p2_r);
-	template<int P> void vbrc_ioexp_port_w(uint8_t data);
-	void vbrc_main_io(address_map &map);
-	void vbrc_main_map(address_map &map);
 
 	// DSC
 	void dsc_prepare_display();
@@ -656,6 +610,112 @@ void fidelbase_state::machine_start()
 void fidelbase_state::machine_reset()
 {
 }
+
+
+
+class ccx_state : public fidelbase_state
+{
+public:
+	ccx_state(const machine_config &mconfig, device_type type, const char *tag) :
+		fidelbase_state(mconfig, type, tag),
+		m_ppi8255(*this, "ppi8255"),
+		m_beeper_off(*this, "beeper_off"),
+		m_beeper(*this, "beeper")
+	{ }
+
+	void ccx(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
+
+private:
+	// devices/pointers
+	required_device<i8255_device> m_ppi8255;
+	required_device<timer_device> m_beeper_off;
+	required_device<beep_device> m_beeper;
+
+	TIMER_DEVICE_CALLBACK_MEMBER(beeper_off) { m_beeper->set_state(0); }
+
+	void ccx_prepare_display();
+	DECLARE_WRITE8_MEMBER(ccx_ppi_porta_w);
+	DECLARE_WRITE8_MEMBER(ccx_ppi_portb_w);
+	DECLARE_READ8_MEMBER(ccx_ppi_portc_r);
+	DECLARE_WRITE8_MEMBER(ccx_ppi_portc_w);
+	void ccx_io(address_map &map);
+	void ccx_map(address_map &map);
+};
+
+
+class card_state : public fidelbase_state
+{
+public:
+	card_state(const machine_config &mconfig, device_type type, const char *tag) :
+		fidelbase_state(mconfig, type, tag),
+		m_mcu(*this, "mcu"),
+		m_i8243(*this, "i8243")
+	{ }
+
+	void brc_base(machine_config &config);
+	void ubc(machine_config &config);
+	void vbrc(machine_config &config);
+	void bv3(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
+
+private:
+	// devices/pointers
+	optional_device<i8041_device> m_mcu;
+	optional_device<i8243_device> m_i8243;
+
+	void vbrc_prepare_display();
+	DECLARE_WRITE8_MEMBER(vbrc_speech_w);
+	DECLARE_WRITE8_MEMBER(vbrc_mcu_p1_w);
+	DECLARE_READ8_MEMBER(vbrc_mcu_p2_r);
+	template<int P> void vbrc_ioexp_port_w(uint8_t data);
+	void vbrc_main_io(address_map &map);
+	void vbrc_main_map(address_map &map);
+};
+
+
+class vcc_state : public fidelbase_state
+{
+public:
+	vcc_state(const machine_config &mconfig, device_type type, const char *tag) :
+		fidelbase_state(mconfig, type, tag),
+		m_ppi8255(*this, "ppi8255")
+	{ }
+
+	void vcc(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	// devices/pointers
+	required_device<i8255_device> m_ppi8255;
+
+	void vcc_prepare_display();
+	DECLARE_READ8_MEMBER(vcc_speech_r);
+	DECLARE_WRITE8_MEMBER(vcc_ppi_porta_w);
+	DECLARE_READ8_MEMBER(vcc_ppi_portb_r);
+	DECLARE_WRITE8_MEMBER(vcc_ppi_portb_w);
+	DECLARE_READ8_MEMBER(vcc_ppi_portc_r);
+	DECLARE_WRITE8_MEMBER(vcc_ppi_portc_w);
+	void vcc_io(address_map &map);
+	void vcc_map(address_map &map);
+};
+
+void vcc_state::machine_start()
+{
+	fidelbase_state::machine_start();
+
+	// game relies on RAM initialized filled with 1
+	for (int i = 0; i < 0x400; i++)
+		m_maincpu->space(AS_PROGRAM).write_byte(i + 0x4000, 0xff);
+}
+
+
 
 
 
@@ -753,15 +813,6 @@ u16 fidelbase_state::read_inputs(int columns)
 	return ret;
 }
 
-INPUT_CHANGED_MEMBER(fidelz80_state::reset_button)
-{
-	// when RE button is directly wired to RESET pin(s)
-	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
-
-	if (m_mcu)
-		m_mcu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
-}
-
 
 // cartridge
 
@@ -800,7 +851,7 @@ READ8_MEMBER(fidelbase_state::cartridge_r)
 
 // misc handlers
 
-void fidelz80_state::vcc_prepare_display()
+void vcc_state::vcc_prepare_display()
 {
 	// 4 7seg leds (note: sel d0 for extra leds)
 	u8 outdata = (m_7seg_data & 0x7f) | (m_led_select << 7 & 0x80);
@@ -808,24 +859,15 @@ void fidelz80_state::vcc_prepare_display()
 	display_matrix(8, 4, outdata, m_led_select >> 2 & 0xf);
 }
 
-READ8_MEMBER(fidelz80_state::vcc_speech_r)
+READ8_MEMBER(vcc_state::vcc_speech_r)
 {
 	return m_speech_rom[m_speech_bank << 12 | offset];
-}
-
-MACHINE_START_MEMBER(fidelz80_state,vcc)
-{
-	machine_start();
-
-	// game relies on RAM initialized filled with 1
-	for (int i = 0; i < 0x400; i++)
-		m_maincpu->space(AS_PROGRAM).write_byte(i + 0x4000, 0xff);
 }
 
 
 // I8255 PPI
 
-WRITE8_MEMBER(fidelz80_state::vcc_ppi_porta_w)
+WRITE8_MEMBER(vcc_state::vcc_ppi_porta_w)
 {
 	// d0-d6: digit segment data, bits are xABCDEFG
 	m_7seg_data = bitswap<8>(data,7,0,1,2,3,4,5,6);
@@ -845,13 +887,13 @@ WRITE8_MEMBER(fidelz80_state::vcc_ppi_porta_w)
 	}
 }
 
-READ8_MEMBER(fidelz80_state::vcc_ppi_portb_r)
+READ8_MEMBER(vcc_state::vcc_ppi_portb_r)
 {
 	// d7: TSI BUSY line
 	return (m_speech->busy_r()) ? 0x80 : 0x00;
 }
 
-WRITE8_MEMBER(fidelz80_state::vcc_ppi_portb_w)
+WRITE8_MEMBER(vcc_state::vcc_ppi_portb_w)
 {
 	// d0,d2-d5: digit/led select
 	// _d6: enable language switches
@@ -859,14 +901,14 @@ WRITE8_MEMBER(fidelz80_state::vcc_ppi_portb_w)
 	vcc_prepare_display();
 }
 
-READ8_MEMBER(fidelz80_state::vcc_ppi_portc_r)
+READ8_MEMBER(vcc_state::vcc_ppi_portc_r)
 {
 	// d0-d3: multiplexed inputs (active low), also language switches
 	u8 lan = (~m_led_select & 0x40) ? m_inp_matrix[4]->read() : 0;
 	return ~(lan | read_inputs(4)) & 0xf;
 }
 
-WRITE8_MEMBER(fidelz80_state::vcc_ppi_portc_w)
+WRITE8_MEMBER(vcc_state::vcc_ppi_portc_w)
 {
 	// d4-d7: input mux (inverted)
 	m_inp_mux = ~data >> 4 & 0xf;
@@ -875,7 +917,7 @@ WRITE8_MEMBER(fidelz80_state::vcc_ppi_portc_w)
 
 // CCX-specific (no speech chip, 1-bit beeper instead)
 
-void fidelz80_state::ccx_prepare_display()
+void ccx_state::ccx_prepare_display()
 {
 	// 4 7seg leds (note: sel d0 for extra leds)
 	u8 outdata = (m_7seg_data & 0x7f) | (m_led_select << 7 & 0x80);
@@ -883,14 +925,9 @@ void fidelz80_state::ccx_prepare_display()
 	display_matrix(8, 4, outdata, m_led_select >> 2 & 0xf);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(fidelz80_state::beeper_off_callback)
-{
-	m_beeper->set_state(0);
-}
-
 // I8255 PPI
 
-WRITE8_MEMBER(fidelz80_state::ccx_ppi_porta_w)
+WRITE8_MEMBER(ccx_state::ccx_ppi_porta_w)
 {
 	// d7: enable beeper on falling edge (555 monostable)
 	if (m_beeper && ~data & m_7seg_data & 0x80)
@@ -904,20 +941,20 @@ WRITE8_MEMBER(fidelz80_state::ccx_ppi_porta_w)
 	ccx_prepare_display();
 }
 
-WRITE8_MEMBER(fidelz80_state::ccx_ppi_portb_w)
+WRITE8_MEMBER(ccx_state::ccx_ppi_portb_w)
 {
 	// d0,d2-d5: digit/led select
 	m_led_select = data;
 	ccx_prepare_display();
 }
 
-READ8_MEMBER(fidelz80_state::ccx_ppi_portc_r)
+READ8_MEMBER(ccx_state::ccx_ppi_portc_r)
 {
 	// d0-d3: multiplexed inputs (active low)
 	return ~read_inputs(4) & 0xf;
 }
 
-WRITE8_MEMBER(fidelz80_state::ccx_ppi_portc_w)
+WRITE8_MEMBER(ccx_state::ccx_ppi_portc_w)
 {
 	// d4-d7: input mux (inverted)
 	m_inp_mux = ~data >> 4 & 0xf;
@@ -996,6 +1033,11 @@ void fidelz80_state::vsc_prepare_display()
 	display_matrix(16, 8, m_led_data << 8 | m_7seg_data, m_led_select);
 }
 
+READ8_MEMBER(fidelz80_state::vsc_speech_r)
+{
+	return m_speech_rom[m_speech_bank << 12 | offset];
+}
+
 
 // I8255 PPI
 
@@ -1069,7 +1111,7 @@ WRITE8_MEMBER(fidelz80_state::vsc_pio_portb_w)
 
 // misc handlers
 
-void fidelz80_state::vbrc_prepare_display()
+void card_state::vbrc_prepare_display()
 {
 	// 14seg led segments, d15(12) is extra led
 	u16 outdata = bitswap<16>(m_7seg_data,12,13,1,6,5,2,0,7,15,11,10,14,4,3,9,8);
@@ -1077,7 +1119,7 @@ void fidelz80_state::vbrc_prepare_display()
 	display_matrix(16, 8, outdata, m_led_select);
 }
 
-WRITE8_MEMBER(fidelz80_state::vbrc_speech_w)
+WRITE8_MEMBER(card_state::vbrc_speech_w)
 {
 	if (m_speech == nullptr)
 		return;
@@ -1091,7 +1133,7 @@ WRITE8_MEMBER(fidelz80_state::vbrc_speech_w)
 // I8243 I/O expander
 
 template<int P>
-void fidelz80_state::vbrc_ioexp_port_w(uint8_t data)
+void card_state::vbrc_ioexp_port_w(uint8_t data)
 {
 	// P4x-P7x: digit segment data
 	m_7seg_data = (m_7seg_data & ~(0xf << (4*P))) | ((data & 0xf) << (4*P));
@@ -1105,14 +1147,14 @@ void fidelz80_state::vbrc_ioexp_port_w(uint8_t data)
 
 // I8041 MCU
 
-WRITE8_MEMBER(fidelz80_state::vbrc_mcu_p1_w)
+WRITE8_MEMBER(card_state::vbrc_mcu_p1_w)
 {
 	// P10-P17: select digits, input mux
 	m_inp_mux = m_led_select = data;
 	vbrc_prepare_display();
 }
 
-READ8_MEMBER(fidelz80_state::vbrc_mcu_p2_r)
+READ8_MEMBER(card_state::vbrc_mcu_p2_r)
 {
 	// P20-P23: I8243 P2
 	// P24-P27: multiplexed inputs (active low)
@@ -1166,7 +1208,7 @@ READ8_MEMBER(fidelz80_state::dsc_input_r)
 
 // CCX, VCC/UVC
 
-void fidelz80_state::ccx_map(address_map &map)
+void ccx_state::ccx_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0x3fff);
@@ -1175,20 +1217,20 @@ void fidelz80_state::ccx_map(address_map &map)
 	map(0x3000, 0x30ff).mirror(0x0f00).ram();
 }
 
-void fidelz80_state::ccx_io(address_map &map)
+void ccx_state::ccx_io(address_map &map)
 {
 	map.global_mask(0x03);
 	map(0x00, 0x03).rw(m_ppi8255, FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
 
-void fidelz80_state::vcc_map(address_map &map)
+void vcc_state::vcc_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x2fff).rom();
 	map(0x4000, 0x43ff).mirror(0x1c00).ram();
 }
 
-void fidelz80_state::vcc_io(address_map &map)
+void vcc_state::vcc_io(address_map &map)
 {
 	map.global_mask(0x03);
 	map(0x00, 0x03).rw(m_ppi8255, FUNC(i8255_device::read), FUNC(i8255_device::write));
@@ -1266,15 +1308,15 @@ void fidelz80_state::vsc_io(address_map &map)
 
 // VBRC/UBC, BV3
 
-void fidelz80_state::vbrc_main_map(address_map &map)
+void card_state::vbrc_main_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x5fff).rom();
 	map(0x6000, 0x63ff).mirror(0x1c00).ram();
-	map(0xe000, 0xe000).mirror(0x1fff).w(FUNC(fidelz80_state::vbrc_speech_w));
+	map(0xe000, 0xe000).mirror(0x1fff).w(FUNC(card_state::vbrc_speech_w));
 }
 
-void fidelz80_state::vbrc_main_io(address_map &map)
+void card_state::vbrc_main_io(address_map &map)
 {
 	map.global_mask(0x01);
 	map(0x00, 0x01).rw(m_mcu, FUNC(i8041_device::upi41_master_r), FUNC(i8041_device::upi41_master_w));
@@ -1300,6 +1342,12 @@ void fidelz80_state::dsc_map(address_map &map)
 ******************************************************************************/
 
 // static or boardless games
+
+INPUT_CHANGED_MEMBER(vcc_state::reset_button)
+{
+	// RE button is directly wired to maincpu RESET pin
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
+}
 
 static INPUT_PORTS_START( vcc_base )
 	PORT_START("IN.0")
@@ -1327,8 +1375,14 @@ static INPUT_PORTS_START( vcc_base )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("H8") PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_CODE(KEYCODE_H)
 
 	PORT_START("RESET") // is not on matrix IN.0 d0
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RE") PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, fidelz80_state, reset_button, nullptr)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RE") PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, vcc_state, reset_button, nullptr)
 INPUT_PORTS_END
+
+INPUT_CHANGED_MEMBER(ccx_state::reset_button)
+{
+	// RE button is directly wired to maincpu RESET pin
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
+}
 
 static INPUT_PORTS_START( ccx )
 	PORT_START("IN.0")
@@ -1356,7 +1410,7 @@ static INPUT_PORTS_START( ccx )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("H8") PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_CODE(KEYCODE_H)
 
 	PORT_START("RESET") // is not on matrix IN.0 d0
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RE") PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, fidelz80_state, reset_button, nullptr)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RE") PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, ccx_state, reset_button, nullptr)
 
 	PORT_START("LEVEL") // hardwired (VCC/GND?)
 	PORT_CONFNAME( 0x80, 0x00, "Maximum Levels" )
@@ -1446,6 +1500,12 @@ static INPUT_PORTS_START( bkc )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("0") PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD)
 INPUT_PORTS_END
 
+INPUT_CHANGED_MEMBER(card_state::reset_button)
+{
+	// reset button is directly wired to maincpu/mcu RESET pins
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
+	m_mcu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
+}
 
 static INPUT_PORTS_START( vbrc )
 	PORT_START("IN.0")
@@ -1497,7 +1557,7 @@ static INPUT_PORTS_START( vbrc )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Clubs")
 
 	PORT_START("RESET") // is not on matrix IN.7 d0
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, fidelz80_state, reset_button, nullptr) PORT_NAME("RE")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, reset_button, nullptr) PORT_NAME("RE")
 
 	PORT_START("BARCODE")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_NAME("Card Scanner")
@@ -1554,7 +1614,7 @@ static INPUT_PORTS_START( bv3 )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Clubs")
 
 	PORT_START("RESET") // is not on matrix IN.7 d0
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, fidelz80_state, reset_button, nullptr) PORT_NAME("Reset")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, reset_button, nullptr) PORT_NAME("Reset")
 
 	PORT_START("BARCODE")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_NAME("Card Scanner")
@@ -1849,21 +1909,21 @@ void fidelz80_state::scc(machine_config &config)
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
-void fidelz80_state::ccx(machine_config &config)
+void ccx_state::ccx(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 4_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &fidelz80_state::ccx_map);
-	m_maincpu->set_addrmap(AS_IO, &fidelz80_state::ccx_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ccx_state::ccx_map);
+	m_maincpu->set_addrmap(AS_IO, &ccx_state::ccx_io);
 
 	I8255(config, m_ppi8255);
-	m_ppi8255->out_pa_callback().set(FUNC(fidelz80_state::ccx_ppi_porta_w));
+	m_ppi8255->out_pa_callback().set(FUNC(ccx_state::ccx_ppi_porta_w));
 	m_ppi8255->tri_pa_callback().set_constant(0);
 	m_ppi8255->in_pb_callback().set_ioport("LEVEL");
-	m_ppi8255->out_pb_callback().set(FUNC(fidelz80_state::ccx_ppi_portb_w));
-	m_ppi8255->in_pc_callback().set(FUNC(fidelz80_state::ccx_ppi_portc_r));
+	m_ppi8255->out_pb_callback().set(FUNC(ccx_state::ccx_ppi_portb_w));
+	m_ppi8255->in_pc_callback().set(FUNC(ccx_state::ccx_ppi_portc_r));
 	m_ppi8255->tri_pb_callback().set_constant(0);
-	m_ppi8255->out_pc_callback().set(FUNC(fidelz80_state::ccx_ppi_portc_w));
+	m_ppi8255->out_pc_callback().set(FUNC(ccx_state::ccx_ppi_portc_w));
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_fidel_cc10);
@@ -1872,34 +1932,32 @@ void fidelz80_state::ccx(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 	BEEP(config, m_beeper, 1360); // approximation, from 556 timer ic
 	m_beeper->add_route(ALL_OUTPUTS, "speaker", 0.25);
-	TIMER(config, "beeper_off").configure_generic(FUNC(fidelz80_state::beeper_off_callback));
+	TIMER(config, "beeper_off").configure_generic(FUNC(ccx_state::beeper_off));
 }
 
-void fidelz80_state::vcc(machine_config &config)
+void vcc_state::vcc(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 4_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &fidelz80_state::vcc_map);
-	m_maincpu->set_addrmap(AS_IO, &fidelz80_state::vcc_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vcc_state::vcc_map);
+	m_maincpu->set_addrmap(AS_IO, &vcc_state::vcc_io);
 
 	I8255(config, m_ppi8255);
-	m_ppi8255->out_pa_callback().set(FUNC(fidelz80_state::vcc_ppi_porta_w));
+	m_ppi8255->out_pa_callback().set(FUNC(vcc_state::vcc_ppi_porta_w));
 	m_ppi8255->tri_pa_callback().set_constant(0);
-	m_ppi8255->in_pb_callback().set(FUNC(fidelz80_state::vcc_ppi_portb_r));
-	m_ppi8255->out_pb_callback().set(FUNC(fidelz80_state::vcc_ppi_portb_w));
+	m_ppi8255->in_pb_callback().set(FUNC(vcc_state::vcc_ppi_portb_r));
+	m_ppi8255->out_pb_callback().set(FUNC(vcc_state::vcc_ppi_portb_w));
 	m_ppi8255->tri_pb_callback().set_constant(0);
-	m_ppi8255->in_pc_callback().set(FUNC(fidelz80_state::vcc_ppi_portc_r));
-	m_ppi8255->out_pc_callback().set(FUNC(fidelz80_state::vcc_ppi_portc_w));
+	m_ppi8255->in_pc_callback().set(FUNC(vcc_state::vcc_ppi_portc_r));
+	m_ppi8255->out_pc_callback().set(FUNC(vcc_state::vcc_ppi_portc_w));
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_fidel_vcc);
 
-	MCFG_MACHINE_START_OVERRIDE(fidelz80_state,vcc)
-
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	S14001A(config, m_speech, 25000); // R/C circuit, around 25khz
-	m_speech->ext_read().set(FUNC(fidelz80_state::vcc_speech_r));
+	m_speech->ext_read().set(FUNC(vcc_state::vcc_speech_r));
 	m_speech->add_route(ALL_OUTPUTS, "speaker", 0.75);
 }
 
@@ -1931,21 +1989,21 @@ void fidelz80_state::vsc(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	S14001A(config, m_speech, 25000); // R/C circuit, around 25khz
-	m_speech->ext_read().set(FUNC(fidelz80_state::vcc_speech_r));
+	m_speech->ext_read().set(FUNC(fidelz80_state::vsc_speech_r));
 	m_speech->add_route(ALL_OUTPUTS, "speaker", 0.75);
 }
 
-void fidelz80_state::brc_base(machine_config &config)
+void card_state::brc_base(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 5_MHz_XTAL/2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &fidelz80_state::vbrc_main_map);
-	m_maincpu->set_addrmap(AS_IO, &fidelz80_state::vbrc_main_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &card_state::vbrc_main_map);
+	m_maincpu->set_addrmap(AS_IO, &card_state::vbrc_main_io);
 	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	I8041(config, m_mcu, 5_MHz_XTAL);
-	m_mcu->p1_out_cb().set(FUNC(fidelz80_state::vbrc_mcu_p1_w));
-	m_mcu->p2_in_cb().set(FUNC(fidelz80_state::vbrc_mcu_p2_r));
+	m_mcu->p1_out_cb().set(FUNC(card_state::vbrc_mcu_p1_w));
+	m_mcu->p2_in_cb().set(FUNC(card_state::vbrc_mcu_p2_r));
 	m_mcu->p2_out_cb().set(m_i8243, FUNC(i8243_device::p2_w));
 	m_mcu->prog_out_cb().set(m_i8243, FUNC(i8243_device::prog_w));
 	m_mcu->t0_in_cb().set_ioport("BARCODE"); // card scanner
@@ -1955,16 +2013,16 @@ void fidelz80_state::brc_base(machine_config &config)
 	m_mcu->t1_in_cb().set("t1_clock", FUNC(clock_device::signal_r)).invert();
 
 	I8243(config, m_i8243);
-	m_i8243->p4_out_cb().set(FUNC(fidelz80_state::vbrc_ioexp_port_w<0>));
-	m_i8243->p5_out_cb().set(FUNC(fidelz80_state::vbrc_ioexp_port_w<1>));
-	m_i8243->p6_out_cb().set(FUNC(fidelz80_state::vbrc_ioexp_port_w<2>));
-	m_i8243->p7_out_cb().set(FUNC(fidelz80_state::vbrc_ioexp_port_w<3>));
+	m_i8243->p4_out_cb().set(FUNC(card_state::vbrc_ioexp_port_w<0>));
+	m_i8243->p5_out_cb().set(FUNC(card_state::vbrc_ioexp_port_w<1>));
+	m_i8243->p6_out_cb().set(FUNC(card_state::vbrc_ioexp_port_w<2>));
+	m_i8243->p7_out_cb().set(FUNC(card_state::vbrc_ioexp_port_w<3>));
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_fidel_vbrc);
 }
 
-void fidelz80_state::ubc(machine_config &config)
+void card_state::ubc(machine_config &config)
 {
 	brc_base(config);
 
@@ -1976,7 +2034,7 @@ void fidelz80_state::ubc(machine_config &config)
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
-void fidelz80_state::vbrc(machine_config &config)
+void card_state::vbrc(machine_config &config)
 {
 	brc_base(config);
 
@@ -1987,7 +2045,7 @@ void fidelz80_state::vbrc(machine_config &config)
 	m_speech->add_route(ALL_OUTPUTS, "speaker", 0.75);
 }
 
-void fidelz80_state::bv3(machine_config &config)
+void card_state::bv3(machine_config &config)
 {
 	vbrc(config);
 	config.set_default_layout(layout_fidel_bv3);
@@ -2217,29 +2275,29 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME      PARENT  CMP MACHINE INPUT  CLASS           INIT        COMPANY                 FULLNAME, FLAGS
-CONS( 1978, cc10,     0,       0, ccx,    ccx,   fidelz80_state, empty_init, "Fidelity Electronics", "Chess Challenger 10 (model CCX, rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1978, cc10,     0,       0, ccx,    ccx,   ccx_state, empty_init, "Fidelity Electronics", "Chess Challenger 10 (model CCX, rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1979, cc7,      0,       0, bcc,    bcc,   fidelz80_state, empty_init, "Fidelity Electronics", "Chess Challenger 7 (model BCC, rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1979, backgamc, 0,       0, bkc,    bkc,   fidelz80_state, empty_init, "Fidelity Electronics", "Backgammon Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )
 
 CONS( 1980, fscc8,    0,       0, scc,    scc,   fidelz80_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger 8", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 
-CONS( 1979, vcc,      0,       0, vcc,    vcc,   fidelz80_state, empty_init, "Fidelity Electronics", "Voice Chess Challenger (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1979, vccsp,    vcc,     0, vcc,    vccsp, fidelz80_state, empty_init, "Fidelity Electronics", "Voice Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1979, vccg,     vcc,     0, vcc,    vccg,  fidelz80_state, empty_init, "Fidelity Electronics", "Voice Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1979, vccfr,    vcc,     0, vcc,    vccfr, fidelz80_state, empty_init, "Fidelity Electronics", "Voice Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1979, vcc,      0,       0, vcc,    vcc,   vcc_state, empty_init, "Fidelity Electronics", "Voice Chess Challenger (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1979, vccsp,    vcc,     0, vcc,    vccsp, vcc_state, empty_init, "Fidelity Electronics", "Voice Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1979, vccg,     vcc,     0, vcc,    vccg,  vcc_state, empty_init, "Fidelity Electronics", "Voice Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1979, vccfr,    vcc,     0, vcc,    vccfr, vcc_state, empty_init, "Fidelity Electronics", "Voice Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1980, uvc,      vcc,     0, vcc,    vcc,   fidelz80_state, empty_init, "Fidelity Electronics", "Advanced Voice Chess Challenger (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1980, uvcsp,    vcc,     0, vcc,    vccsp, fidelz80_state, empty_init, "Fidelity Electronics", "Advanced Voice Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1980, uvcg,     vcc,     0, vcc,    vccg,  fidelz80_state, empty_init, "Fidelity Electronics", "Advanced Voice Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1980, uvcfr,    vcc,     0, vcc,    vccfr, fidelz80_state, empty_init, "Fidelity Electronics", "Advanced Voice Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1980, uvc,      vcc,     0, vcc,    vcc,   vcc_state, empty_init, "Fidelity Electronics", "Advanced Voice Chess Challenger (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1980, uvcsp,    vcc,     0, vcc,    vccsp, vcc_state, empty_init, "Fidelity Electronics", "Advanced Voice Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1980, uvcg,     vcc,     0, vcc,    vccg,  vcc_state, empty_init, "Fidelity Electronics", "Advanced Voice Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1980, uvcfr,    vcc,     0, vcc,    vccfr, vcc_state, empty_init, "Fidelity Electronics", "Advanced Voice Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1980, vsc,      0,       0, vsc,    vsc,   fidelz80_state, empty_init, "Fidelity Electronics", "Voice Sensory Chess Challenger (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 CONS( 1980, vscsp,    vsc,     0, vsc,    vscsp, fidelz80_state, empty_init, "Fidelity Electronics", "Voice Sensory Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 CONS( 1980, vscg,     vsc,     0, vsc,    vscg,  fidelz80_state, empty_init, "Fidelity Electronics", "Voice Sensory Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 CONS( 1980, vscfr,    vsc,     0, vsc,    vscfr, fidelz80_state, empty_init, "Fidelity Electronics", "Voice Sensory Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 
-CONS( 1980, vbrc,     0,       0, vbrc,   vbrc,  fidelz80_state, empty_init, "Fidelity Electronics", "Voice Bridge Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )
-CONS( 1980, bridgeca, vbrc,    0, ubc,    vbrc,  fidelz80_state, empty_init, "Fidelity Electronics", "Advanced Bridge Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )
-CONS( 1982, bridgec3, 0,       0, bv3,    bv3,   fidelz80_state, empty_init, "Fidelity Electronics", "Bridge Challenger III", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )
+CONS( 1980, vbrc,     0,       0, vbrc,   vbrc,  card_state, empty_init, "Fidelity Electronics", "Voice Bridge Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )
+CONS( 1980, bridgeca, vbrc,    0, ubc,    vbrc,  card_state, empty_init, "Fidelity Electronics", "Advanced Bridge Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )
+CONS( 1982, bridgec3, 0,       0, bv3,    bv3,   card_state, empty_init, "Fidelity Electronics", "Bridge Challenger III", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )
 
 CONS( 1981, damesc,   0,       0, dsc,    dsc,   fidelz80_state, empty_init, "Fidelity Electronics", "Dame Sensory Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
