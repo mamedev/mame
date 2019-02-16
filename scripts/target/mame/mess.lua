@@ -3024,6 +3024,7 @@ files {
 	MAME_DIR .. "src/mame/includes/megadriv_rad.h",
 	MAME_DIR .. "src/mame/drivers/segapico.cpp",
 	MAME_DIR .. "src/mame/drivers/sega_sawatte.cpp",
+	MAME_DIR .. "src/mame/drivers/sega_beena.cpp",
 	MAME_DIR .. "src/mame/drivers/segapm.cpp",
 	MAME_DIR .. "src/mame/drivers/sg1000.cpp",
 	MAME_DIR .. "src/mame/includes/sg1000.h",

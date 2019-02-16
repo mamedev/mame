@@ -34202,6 +34202,9 @@ wg3dh                           // (c) 1996 Atari Games
 @source:seattlecmp.cpp
 scp300f                         // Seattle SCP-300F
 
+@source:sega_beena.cpp
+beena                           //
+
 @source:sega_sawatte.cpp
 sawatte                         //
 
