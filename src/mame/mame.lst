@@ -12849,6 +12849,9 @@ feversoc                        // (c) 2004
 fgoal                           // TF  (c) 1979 Taito Corporation
 fgoala                          // MF  (c) 1979 Taito Corporation
 
+@source:fidel_sc6.cpp
+fscc6                           //
+
 @source:fidel6502.cpp
 chesster                        //
 chesstera                       //
@@ -12920,9 +12923,6 @@ fex68ka                         //
 fex68kb                         //
 fex68km2                        //
 fex68km3                        //
-
-@source:fidelmcs48.cpp
-fscc6                           //
 
 @source:fidelz80.cpp
 backgamc                        //

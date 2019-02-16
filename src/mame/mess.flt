@@ -239,9 +239,9 @@ fb01.cpp
 fc100.cpp
 fccpu20.cpp
 fccpu30.cpp
+fidel_sc6.cpp
 fidel6502.cpp
 fidel68k.cpp
-fidelmcs48.cpp
 fidelz80.cpp
 fk1.cpp
 fm7.cpp
