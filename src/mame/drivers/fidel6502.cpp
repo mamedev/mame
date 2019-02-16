@@ -614,6 +614,7 @@ private:
 	// Chesster
 	DECLARE_WRITE8_MEMBER(chesster_control_w);
 	DECLARE_WRITE8_MEMBER(kishon_control_w);
+	DECLARE_READ8_MEMBER(chesster_input_r);
 	void chesster_map(address_map &map);
 	void kishon_map(address_map &map);
 
@@ -1281,6 +1282,12 @@ WRITE8_MEMBER(fidel6502_state::kishon_control_w)
 	m_rombank->set_entry(bank);
 }
 
+READ8_MEMBER(fidel6502_state::chesster_input_r)
+{
+	// a0-a2,d7: multiplexed inputs (active low)
+	return (read_inputs(9) >> offset & 1) ? 0 : 0x80;
+}
+
 void fidel6502_state::init_chesster()
 {
 	m_rombank->configure_entries(0, memregion("rombank")->bytes() / 0x4000, memregion("rombank")->base(), 0x4000);
@@ -1463,7 +1470,7 @@ void fidel6502_state::fphantom_map(address_map &map)
 void fidel6502_state::chesster_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
-	map(0x2000, 0x2007).mirror(0x1ff8).rw(FUNC(fidel6502_state::fdesdis_input_r), FUNC(fidel6502_state::chesster_control_w));
+	map(0x2000, 0x2007).mirror(0x1ff8).rw(FUNC(fidel6502_state::chesster_input_r), FUNC(fidel6502_state::chesster_control_w));
 	map(0x4000, 0x7fff).bankr("rombank");
 	map(0x6000, 0x6000).mirror(0x1fff).w("dac8", FUNC(dac_byte_interface::data_w));
 	map(0x8000, 0xffff).rom();
@@ -1472,7 +1479,7 @@ void fidel6502_state::chesster_map(address_map &map)
 void fidel6502_state::kishon_map(address_map &map)
 {
 	chesster_map(map);
-	map(0x2000, 0x2007).mirror(0x1ff8).rw(FUNC(fidel6502_state::fdesdis_input_r), FUNC(fidel6502_state::kishon_control_w));
+	map(0x2000, 0x2007).mirror(0x1ff8).rw(FUNC(fidel6502_state::chesster_input_r), FUNC(fidel6502_state::kishon_control_w));
 }
 
 
