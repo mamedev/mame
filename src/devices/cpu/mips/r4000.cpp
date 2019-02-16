@@ -1793,8 +1793,12 @@ void r4000_base_device::cp1_execute(u32 const op)
 				break;
 			case 0x05: // ABS.S
 				if ((SR & SR_FR) || !(op & ODD_REGS))
+				{
 					if (f32_lt(float32_t{ u32(m_f[FSREG]) }, float32_t{ 0 }))
 						cp1_set(FDREG, f32_mul(float32_t{ u32(m_f[FSREG]) }, i32_to_f32(-1)).v);
+					else
+						m_f[FDREG] = m_f[FSREG];
+				}
 				break;
 			case 0x06: // MOV.S
 				if ((SR & SR_FR) || !(op & ODD_REGS))
@@ -2077,8 +2081,12 @@ void r4000_base_device::cp1_execute(u32 const op)
 				break;
 			case 0x05: // ABS.D
 				if ((SR & SR_FR) || !(op & ODD_REGS))
+				{
 					if (f64_lt(float64_t{ m_f[FSREG] }, float64_t{ 0 }))
 						cp1_set(FDREG, f64_mul(float64_t{ m_f[FSREG] }, i32_to_f64(-1)).v);
+					else
+						m_f[FDREG] = m_f[FSREG];
+				}
 				break;
 			case 0x06: // MOV.D
 				if ((SR & SR_FR) || !(op & ODD_REGS))
