@@ -120,6 +120,8 @@ void newport_video_device::device_start()
 
 	save_item(NAME(m_rex3.m_x_save));
 	save_item(NAME(m_rex3.m_xy_move));
+	save_item(NAME(m_rex3.m_x_move));
+	save_item(NAME(m_rex3.m_y_move));
 	save_item(NAME(m_rex3.m_bres_d));
 	save_item(NAME(m_rex3.m_bres_s1));
 	save_item(NAME(m_rex3.m_bres_octant_inc1));
@@ -133,6 +135,9 @@ void newport_video_device::device_start()
 	save_item(NAME(m_rex3.m_x_end_f));
 	save_item(NAME(m_rex3.m_y_end_f));
 	save_item(NAME(m_rex3.m_x_start_i));
+	save_item(NAME(m_rex3.m_y_start_i));
+	save_item(NAME(m_rex3.m_x_end_i));
+	save_item(NAME(m_rex3.m_y_end_i));
 	save_item(NAME(m_rex3.m_xy_start_i));
 	save_item(NAME(m_rex3.m_xy_end_i));
 	save_item(NAME(m_rex3.m_x_start_end_i));
@@ -155,6 +160,8 @@ void newport_video_device::device_start()
 	save_item(NAME(m_rex3.m_dcb_data_lsw));
 	save_item(NAME(m_rex3.m_top_scanline));
 	save_item(NAME(m_rex3.m_xy_window));
+	save_item(NAME(m_rex3.m_x_window));
+	save_item(NAME(m_rex3.m_y_window));
 	save_item(NAME(m_rex3.m_clip_mode));
 	save_item(NAME(m_rex3.m_config));
 	save_item(NAME(m_rex3.m_status));
@@ -1152,18 +1159,24 @@ void newport_video_device::write_pixel(int16_t x, int16_t y, uint8_t color)
 {
 	if (m_rex3.m_clip_mode & 0x1f)
 	{
-		for (uint8_t bit = 0; bit < 5; bit++)
+		uint8_t bit = 0;
+		for (; bit < 5; bit++)
 		{
 			if (!BIT(m_rex3.m_clip_mode, bit))
 				continue;
 			if (x < ((m_rex3.m_smask_x[bit] >> 16) & 0x0fff))
-				return;
+				continue;
 			if (x > (m_rex3.m_smask_x[bit] & 0x0fff))
-				return;
+				continue;
 			if (y < ((m_rex3.m_smask_y[bit] >> 16) & 0x0fff))
-				return;
+				continue;
 			if (y > (m_rex3.m_smask_y[bit] & 0x0fff))
-				return;
+				continue;
+			break;
+		}
+		if (bit == 5)
+		{
+			return;
 		}
 	}
 	if (x < 0 || y < 0 || x >= 1280 || y >= 1024)
@@ -1389,6 +1402,8 @@ void newport_video_device::do_rex3_command()
 
 	switch (mode0)
 	{
+	case 0x00000000: // NoOp
+		break;
 	case 0x00000006: // Block, Draw
 	{
 		LOGMASKED(LOG_COMMANDS, "%04x, %04x = %02x\n", start_x, start_y, m_rex3.m_zero_fract & 0xff);
@@ -1447,7 +1462,11 @@ void newport_video_device::do_rex3_command()
 	}
 	case 0x00000102: // StopOnX, Span, Draw
 	case 0x00000122: // StopOnX, DoSetup, Span, Draw
+	case 0x00080122: // LROnly, StopOnX, DoSetup, Span, Draw
 	{
+		if (BIT(mode0, 19) && dx < 0) // LROnly
+			break;
+
 		end_x += dx;
 		end_y += dy;
 
@@ -1504,11 +1523,18 @@ void newport_video_device::do_rex3_command()
 		write_y_start(start_y << 11);
 		break;
 	}
+	case 0x0000000a: // I_Line, Draw
 	case 0x0000032a: // StopOnX, StopOnY, DoSetup, I_Line, Draw
 	case 0x00000b2a: // SkipLast, StopOnX, StopOnY, DoSetup, I_Line, Draw
+	case 0x0000232e: // EnLSPattern, StopOnX, StopOnY, DoSetup, F_Line, Draw
 	{
-		LOGMASKED(LOG_COMMANDS, "ILine: %04x, %04x to %04x, %04x = %08x\n", start_x, start_y, end_x, end_y, m_cmap0.m_palette[m_rex3.m_zero_fract]);
-		if (start_x == end_x)
+		LOGMASKED(LOG_COMMANDS, "%cLine: %04x, %04x to %04x, %04x = %08x\n", (mode0 & 0x1c) == 3 ? 'F' : 'I',
+			start_x, start_y, end_x, end_y, m_cmap0.m_palette[m_rex3.m_zero_fract]);
+		if (start_x == end_x && start_y == end_y)
+		{
+			write_pixel(m_cmap0.m_palette[m_rex3.m_zero_fract]);
+		}
+		else if (start_x == end_x)
 		{
 			do_v_iline(m_cmap0.m_palette[m_rex3.m_zero_fract], BIT(mode0, 11));
 		}
@@ -1620,13 +1646,13 @@ WRITE64_MEMBER(newport_video_device::rex3_w)
 			case 0x02:
 				LOGMASKED(LOG_REX3, "    Planes Enabled:     R/W RGBA\n");
 				break;
-			case 0x03:
+			case 0x04:
 				LOGMASKED(LOG_REX3, "    Planes Enabled:     R/W OLAY\n");
 				break;
-			case 0x04:
+			case 0x05:
 				LOGMASKED(LOG_REX3, "    Planes Enabled:     R/W PUP\n");
 				break;
-			case 0x05:
+			case 0x06:
 				LOGMASKED(LOG_REX3, "    Planes Enabled:     R/W CID\n");
 				break;
 			default:
