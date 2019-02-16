@@ -671,6 +671,7 @@ sdk80.cpp
 sdk85.cpp
 sdk86.cpp
 seattlecmp.cpp
+sega_beena.cpp
 sega_sawatte.cpp
 segapico.cpp
 segapm.cpp

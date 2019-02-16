@@ -34203,6 +34203,9 @@ wg3dh                           // (c) 1996 Atari Games
 @source:seattlecmp.cpp
 scp300f                         // Seattle SCP-300F
 
+@source:sega_beena.cpp
+beena                           //
+
 @source:sega_sawatte.cpp
 sawatte                         //
 
@@ -38673,6 +38676,7 @@ jak_wwe                         //
 jak_fan4                        //
 jak_just                        //
 jak_dora                        //
+jak_dorr                        //
 jak_disf                        //
 jak_disp                        //
 jak_sith                        //
@@ -38680,6 +38684,9 @@ jak_sdoo                        //
 jak_dbz                         //
 jak_mpac                        //
 jak_wof                         //
+jak_spdm                        //
+jak_pooh                        //
+jak_nick                        //
 lexizeus                        // Lexibook
 vii                             // KenSingTon / Jungle Soft / Siatronics Vii
 wrlshunt                        // Wireless: Hunting Video Game System
@@ -38693,6 +38700,7 @@ rad_sktv                        //
 rad_crik                        //
 rad_fb2                         //
 mattelcs                        //
+dreamlif                        //
 
 @source:vsmile.cpp
 vsmile                          //
@@ -39843,8 +39851,11 @@ rad_snow                        //
 rad_snowp                       //
 rad_madf                        //
 rad_fb                          //
+rad_socr                        //
 epo_epp                         //
+epo_epp3                        //
 epo_efdx                        //
+epo_ebox                        //
 epo_sdb                         //
 epo_guru                        //
 epo_dmon                        //
@@ -39855,6 +39866,7 @@ rad_sbw                         //
 rad_bdp                         //
 has_wamg                        //
 ltv_tam                         //
+ban_onep                        //
 ekara                           //
 ekaraa                          //
 ekaraj                          //
