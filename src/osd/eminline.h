@@ -268,10 +268,10 @@ inline float recip_approx(float value)
 #ifndef mul_64x64
 inline int64_t mul_64x64(int64_t a, int64_t b, int64_t *hi)
 {
-	uint64_t const a_hi = uint32_t(a >> 32);
-	uint64_t const b_hi = uint32_t(b >> 32);
-	uint64_t const a_lo = uint32_t(a);
-	uint64_t const b_lo = uint32_t(b);
+	uint64_t const a_hi = uint64_t(a) >> 32;
+	uint64_t const b_hi = uint64_t(b) >> 32;
+	uint64_t const a_lo = uint32_t(uint64_t(a));
+	uint64_t const b_lo = uint32_t(uint64_t(b));
 
 	uint64_t const ab_lo = a_lo * b_lo;
 	uint64_t const ab_m1 = a_hi * b_lo;
@@ -316,6 +316,8 @@ inline uint64_t mulu_64x64(uint64_t a, uint64_t b, uint64_t *hi)
 	return ab_lo + (ab_m1 << 32) + (ab_m2 << 32);
 }
 #endif
+
+
 
 /***************************************************************************
     INLINE BIT MANIPULATION FUNCTIONS
