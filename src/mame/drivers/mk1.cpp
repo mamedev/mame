@@ -185,13 +185,12 @@ void mk1_state::machine_start()
 
 MACHINE_CONFIG_START(mk1_state::mk1)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD( "maincpu", F8, 1000000 ) // MK3850
+	MCFG_DEVICE_ADD( "maincpu", F8, 2000000 ) // MK3850
 	MCFG_DEVICE_PROGRAM_MAP(mk1_mem)
 	MCFG_DEVICE_IO_MAP(mk1_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("f3853", f3853_device, int_acknowledge)
-	config.m_minimum_quantum = attotime::from_hz(60);
 
-	f3853_device &f3853(F3853(config, "f3853", 1000000));
+	f3853_device &f3853(F3853(config, "f3853", 2000000));
 	f3853.int_req_callback().set_inputline("maincpu", F8_INPUT_LINE_INT_REQ);
 
 	/* video hardware */
