@@ -527,7 +527,7 @@ public:
 		m_beeper(*this, "beeper")
 	{ }
 
-	void cc10(machine_config &config);
+	void ccx(machine_config &config);
 	void vcc(machine_config &config);
 	void bcc(machine_config &config);
 	void bkc(machine_config &config);
@@ -550,7 +550,17 @@ private:
 	optional_device<timer_device> m_beeper_off;
 	optional_device<beep_device> m_beeper;
 
-	// CC10, VCC/UVC
+	// CCX
+	void ccx_prepare_display();
+	DECLARE_WRITE8_MEMBER(ccx_ppi_porta_w);
+	DECLARE_WRITE8_MEMBER(ccx_ppi_portb_w);
+	DECLARE_READ8_MEMBER(ccx_ppi_portc_r);
+	DECLARE_WRITE8_MEMBER(ccx_ppi_portc_w);
+	TIMER_DEVICE_CALLBACK_MEMBER(beeper_off_callback);
+	void ccx_io(address_map &map);
+	void ccx_map(address_map &map);
+
+	// VCC/UVC
 	void vcc_prepare_display();
 	DECLARE_READ8_MEMBER(vcc_speech_r);
 	DECLARE_WRITE8_MEMBER(vcc_ppi_porta_w);
@@ -558,10 +568,7 @@ private:
 	DECLARE_WRITE8_MEMBER(vcc_ppi_portb_w);
 	DECLARE_READ8_MEMBER(vcc_ppi_portc_r);
 	DECLARE_WRITE8_MEMBER(vcc_ppi_portc_w);
-	DECLARE_WRITE8_MEMBER(cc10_ppi_porta_w);
-	TIMER_DEVICE_CALLBACK_MEMBER(beeper_off_callback);
 	DECLARE_MACHINE_START(vcc);
-	void cc10_map(address_map &map);
 	void vcc_io(address_map &map);
 	void vcc_map(address_map &map);
 
@@ -788,7 +795,7 @@ READ8_MEMBER(fidelbase_state::cartridge_r)
 // Devices, I/O
 
 /******************************************************************************
-    CC10, VCC/UVC
+    CCX, VCC/UVC
 ******************************************************************************/
 
 // misc handlers
@@ -866,25 +873,54 @@ WRITE8_MEMBER(fidelz80_state::vcc_ppi_portc_w)
 }
 
 
-// CC10-specific (no speech chip, 1-bit beeper instead)
+// CCX-specific (no speech chip, 1-bit beeper instead)
+
+void fidelz80_state::ccx_prepare_display()
+{
+	// 4 7seg leds (note: sel d0 for extra leds)
+	u8 outdata = (m_7seg_data & 0x7f) | (m_led_select << 7 & 0x80);
+	set_display_segmask(0xf, 0x7f);
+	display_matrix(8, 4, outdata, m_led_select >> 2 & 0xf);
+}
 
 TIMER_DEVICE_CALLBACK_MEMBER(fidelz80_state::beeper_off_callback)
 {
 	m_beeper->set_state(0);
 }
 
-WRITE8_MEMBER(fidelz80_state::cc10_ppi_porta_w)
+// I8255 PPI
+
+WRITE8_MEMBER(fidelz80_state::ccx_ppi_porta_w)
 {
-	// d7: enable beeper on falling edge
+	// d7: enable beeper on falling edge (555 monostable)
 	if (m_beeper && ~data & m_7seg_data & 0x80)
 	{
 		m_beeper->set_state(1);
 		m_beeper_off->adjust(attotime::from_msec(80)); // duration is approximate
 	}
 
-	// d0-d6: digit segment data (same as VCC)
+	// d0-d6: digit segment data
 	m_7seg_data = bitswap<8>(data,7,0,1,2,3,4,5,6);
-	vcc_prepare_display();
+	ccx_prepare_display();
+}
+
+WRITE8_MEMBER(fidelz80_state::ccx_ppi_portb_w)
+{
+	// d0,d2-d5: digit/led select
+	m_led_select = data;
+	ccx_prepare_display();
+}
+
+READ8_MEMBER(fidelz80_state::ccx_ppi_portc_r)
+{
+	// d0-d3: multiplexed inputs (active low)
+	return ~read_inputs(4) & 0xf;
+}
+
+WRITE8_MEMBER(fidelz80_state::ccx_ppi_portc_w)
+{
+	// d4-d7: input mux (inverted)
+	m_inp_mux = ~data >> 4 & 0xf;
 }
 
 
@@ -1128,15 +1164,21 @@ READ8_MEMBER(fidelz80_state::dsc_input_r)
     Address Maps
 ******************************************************************************/
 
-// CC10, VCC/UVC
+// CCX, VCC/UVC
 
-void fidelz80_state::cc10_map(address_map &map)
+void fidelz80_state::ccx_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0x3fff);
 	map(0x0000, 0x0fff).rom();
 	map(0x1000, 0x10ff).mirror(0x0f00).ram();
 	map(0x3000, 0x30ff).mirror(0x0f00).ram();
+}
+
+void fidelz80_state::ccx_io(address_map &map)
+{
+	map.global_mask(0x03);
+	map(0x00, 0x03).rw(m_ppi8255, FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
 
 void fidelz80_state::vcc_map(address_map &map)
@@ -1288,11 +1330,33 @@ static INPUT_PORTS_START( vcc_base )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RE") PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, fidelz80_state, reset_button, nullptr)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( cc10 )
-	PORT_INCLUDE( vcc_base )
+static INPUT_PORTS_START( ccx )
+	PORT_START("IN.0")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("LV") PORT_CODE(KEYCODE_L)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("A1") PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_CODE(KEYCODE_A)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("E5") PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_CODE(KEYCODE_E)
 
-	PORT_START("IN.4")
-	PORT_BIT(0x0f, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_START("IN.1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Speaker") PORT_CODE(KEYCODE_SPACE)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("DM") PORT_CODE(KEYCODE_M)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("B2") PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_CODE(KEYCODE_B)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("F6") PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_CODE(KEYCODE_F)
+
+	PORT_START("IN.2")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("CL") PORT_CODE(KEYCODE_DEL)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("PB") PORT_CODE(KEYCODE_P)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("C3") PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_CODE(KEYCODE_C)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("G7") PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_CODE(KEYCODE_G)
+
+	PORT_START("IN.3")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("EN") PORT_CODE(KEYCODE_ENTER)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("PV") PORT_CODE(KEYCODE_V)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("D4") PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_CODE(KEYCODE_D)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("H8") PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_CODE(KEYCODE_H)
+
+	PORT_START("RESET") // is not on matrix IN.0 d0
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RE") PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, fidelz80_state, reset_button, nullptr)
 
 	PORT_START("LEVEL") // hardwired (VCC/GND?)
 	PORT_CONFNAME( 0x80, 0x00, "Maximum Levels" )
@@ -1785,21 +1849,21 @@ void fidelz80_state::scc(machine_config &config)
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
-void fidelz80_state::cc10(machine_config &config)
+void fidelz80_state::ccx(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 4_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &fidelz80_state::cc10_map);
-	m_maincpu->set_addrmap(AS_IO, &fidelz80_state::vcc_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &fidelz80_state::ccx_map);
+	m_maincpu->set_addrmap(AS_IO, &fidelz80_state::ccx_io);
 
 	I8255(config, m_ppi8255);
-	m_ppi8255->out_pa_callback().set(FUNC(fidelz80_state::cc10_ppi_porta_w));
+	m_ppi8255->out_pa_callback().set(FUNC(fidelz80_state::ccx_ppi_porta_w));
 	m_ppi8255->tri_pa_callback().set_constant(0);
 	m_ppi8255->in_pb_callback().set_ioport("LEVEL");
-	m_ppi8255->out_pb_callback().set(FUNC(fidelz80_state::vcc_ppi_portb_w));
-	m_ppi8255->in_pc_callback().set(FUNC(fidelz80_state::vcc_ppi_portc_r));
+	m_ppi8255->out_pb_callback().set(FUNC(fidelz80_state::ccx_ppi_portb_w));
+	m_ppi8255->in_pc_callback().set(FUNC(fidelz80_state::ccx_ppi_portc_r));
 	m_ppi8255->tri_pb_callback().set_constant(0);
-	m_ppi8255->out_pc_callback().set(FUNC(fidelz80_state::vcc_ppi_portc_w));
+	m_ppi8255->out_pc_callback().set(FUNC(fidelz80_state::ccx_ppi_portc_w));
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_fidel_cc10);
@@ -2153,7 +2217,7 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME      PARENT  CMP MACHINE INPUT  CLASS           INIT        COMPANY                 FULLNAME, FLAGS
-CONS( 1978, cc10,     0,       0, cc10,   cc10,  fidelz80_state, empty_init, "Fidelity Electronics", "Chess Challenger 10 (model CCX, rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1978, cc10,     0,       0, ccx,    ccx,   fidelz80_state, empty_init, "Fidelity Electronics", "Chess Challenger 10 (model CCX, rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1979, cc7,      0,       0, bcc,    bcc,   fidelz80_state, empty_init, "Fidelity Electronics", "Chess Challenger 7 (model BCC, rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1979, backgamc, 0,       0, bkc,    bkc,   fidelz80_state, empty_init, "Fidelity Electronics", "Backgammon Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )
 
