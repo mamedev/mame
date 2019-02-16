@@ -3,18 +3,6 @@
 // thanks-to:yoyo_chessboard
 /******************************************************************************
 
-    Fidelity Electronics generic MCS-48 based chess computer driver
-
-    NOTE: MAME doesn't include a generalized implementation for boardpieces yet,
-    greatly affecting user playability of emulated electronic board games.
-    As workaround for the chess games, use an external chess GUI on the side,
-    such as Arena(in editmode).
-
-    TODO:
-    - nothing
-
-******************************************************************************
-
 Sensory Chess Challenger 6 (model SC6):
 - PCB label 510-1045B01
 - INS8040N-11 MCU, 11MHz XTAL
@@ -41,10 +29,10 @@ SC6 program is contained in BO6 and CG6.
 #include "fidel_sc6.lh" // clickable
 
 
-class fidelmcs48_state : public fidelbase_state
+class sc6_state : public fidelbase_state
 {
 public:
-	fidelmcs48_state(const machine_config &mconfig, device_type type, const char *tag) :
+	sc6_state(const machine_config &mconfig, device_type type, const char *tag) :
 		fidelbase_state(mconfig, type, tag),
 		m_maincpu(*this, "maincpu")
 	{ }
@@ -52,30 +40,31 @@ public:
 	void sc6(machine_config &config);
 
 private:
+	// devices/pointers
 	required_device<mcs48_cpu_device> m_maincpu;
 
-	// SC6
+	void sc6_map(address_map &map);
+
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(sc6_cartridge);
+
+	// I/O handlers
 	void sc6_prepare_display();
 	DECLARE_WRITE8_MEMBER(sc6_mux_w);
 	DECLARE_WRITE8_MEMBER(sc6_select_w);
 	DECLARE_READ8_MEMBER(sc6_input_r);
 	DECLARE_READ_LINE_MEMBER(sc6_input6_r);
 	DECLARE_READ_LINE_MEMBER(sc6_input7_r);
-	void sc6_map(address_map &map);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(sc6_cartridge);
 };
 
 
 
-// Devices, I/O
-
 /******************************************************************************
-    SC6
+    Devices, I/O
 ******************************************************************************/
 
 // cartridge
 
-DEVICE_IMAGE_LOAD_MEMBER(fidelmcs48_state, sc6_cartridge)
+DEVICE_IMAGE_LOAD_MEMBER(sc6_state, sc6_cartridge)
 {
 	u32 size = m_cart->common_get_size("rom");
 
@@ -95,14 +84,14 @@ DEVICE_IMAGE_LOAD_MEMBER(fidelmcs48_state, sc6_cartridge)
 
 // MCU ports/generic
 
-void fidelmcs48_state::sc6_prepare_display()
+void sc6_state::sc6_prepare_display()
 {
 	// 2 7seg leds
 	set_display_segmask(3, 0x7f);
 	display_matrix(7, 2, m_7seg_data, m_led_select);
 }
 
-WRITE8_MEMBER(fidelmcs48_state::sc6_mux_w)
+WRITE8_MEMBER(sc6_state::sc6_mux_w)
 {
 	// P24-P27: 7442 A-D
 	u16 sel = 1 << (data >> 4 & 0xf) & 0x3ff;
@@ -116,26 +105,26 @@ WRITE8_MEMBER(fidelmcs48_state::sc6_mux_w)
 	m_dac->write(BIT(sel, 9));
 }
 
-WRITE8_MEMBER(fidelmcs48_state::sc6_select_w)
+WRITE8_MEMBER(sc6_state::sc6_select_w)
 {
 	// P16,P17: digit select
 	m_led_select = ~data >> 6 & 3;
 	sc6_prepare_display();
 }
 
-READ8_MEMBER(fidelmcs48_state::sc6_input_r)
+READ8_MEMBER(sc6_state::sc6_input_r)
 {
 	// P10-P15: multiplexed inputs low
 	return (~read_inputs(9) & 0x3f) | 0xc0;
 }
 
-READ_LINE_MEMBER(fidelmcs48_state::sc6_input6_r)
+READ_LINE_MEMBER(sc6_state::sc6_input6_r)
 {
 	// T0: multiplexed inputs bit 6
 	return ~read_inputs(9) >> 6 & 1;
 }
 
-READ_LINE_MEMBER(fidelmcs48_state::sc6_input7_r)
+READ_LINE_MEMBER(sc6_state::sc6_input7_r)
 {
 	// T1: multiplexed inputs bit 7
 	return ~read_inputs(9) >> 7 & 1;
@@ -147,9 +136,7 @@ READ_LINE_MEMBER(fidelmcs48_state::sc6_input7_r)
     Address Maps
 ******************************************************************************/
 
-// SC6
-
-void fidelmcs48_state::sc6_map(address_map &map)
+void sc6_state::sc6_map(address_map &map)
 {
 	map(0x0000, 0x0fff).r("cartslot", FUNC(generic_slot_device::read_rom));
 }
@@ -180,16 +167,16 @@ INPUT_PORTS_END
     Machine Drivers
 ******************************************************************************/
 
-void fidelmcs48_state::sc6(machine_config &config)
+void sc6_state::sc6(machine_config &config)
 {
 	/* basic machine hardware */
 	I8040(config, m_maincpu, 11_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &fidelmcs48_state::sc6_map);
-	m_maincpu->p2_out_cb().set(FUNC(fidelmcs48_state::sc6_mux_w));
-	m_maincpu->p1_in_cb().set(FUNC(fidelmcs48_state::sc6_input_r));
-	m_maincpu->p1_out_cb().set(FUNC(fidelmcs48_state::sc6_select_w));
-	m_maincpu->t0_in_cb().set(FUNC(fidelmcs48_state::sc6_input6_r));
-	m_maincpu->t1_in_cb().set(FUNC(fidelmcs48_state::sc6_input7_r));
+	m_maincpu->set_addrmap(AS_PROGRAM, &sc6_state::sc6_map);
+	m_maincpu->p2_out_cb().set(FUNC(sc6_state::sc6_mux_w));
+	m_maincpu->p1_in_cb().set(FUNC(sc6_state::sc6_input_r));
+	m_maincpu->p1_out_cb().set(FUNC(sc6_state::sc6_select_w));
+	m_maincpu->t0_in_cb().set(FUNC(sc6_state::sc6_input6_r));
+	m_maincpu->t1_in_cb().set(FUNC(sc6_state::sc6_input7_r));
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_fidel_sc6);
@@ -203,7 +190,7 @@ void fidelmcs48_state::sc6(machine_config &config)
 
 	/* cartridge */
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "fidel_sc6", "bin"));
-	cartslot.set_device_load(device_image_load_delegate(&fidelmcs48_state::device_image_load_sc6_cartridge, this));
+	cartslot.set_device_load(device_image_load_delegate(&sc6_state::device_image_load_sc6_cartridge, this));
 	cartslot.set_must_be_loaded(true);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("fidel_sc6");
@@ -226,5 +213,5 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME   PARENT  CMP MACHINE  INPUT  CLASS             INIT        COMPANY                 FULLNAME                      FLAGS
-CONS( 1982, fscc6, 0,       0, sc6,     sc6,   fidelmcs48_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger 6", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+//    YEAR  NAME   PARENT  CMP MACHINE  INPUT  CLASS      INIT        COMPANY                 FULLNAME                      FLAGS
+CONS( 1982, fscc6, 0,       0, sc6,     sc6,   sc6_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger 6", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
