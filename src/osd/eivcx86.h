@@ -403,4 +403,24 @@ static inline float _recip_approx(float z)
 }
 #endif
 
+
+/*-------------------------------------------------
+    mul_64x64 - perform a signed 64 bit x 64 bit
+    multiply and return the full 128 bit result
+-------------------------------------------------*/
+
+#ifdef PTR64
+#define mul_64x64 _mul128
+#endif
+
+
+/*-------------------------------------------------
+    mulu_64x64 - perform an unsigned 64 bit x 64
+    bit multiply and return the full 128 bit result
+-------------------------------------------------*/
+
+#ifdef PTR64
+#define mulu_64x64 _umul128
+#endif
+
 #endif // MAME_OSD_EIVCX86_H

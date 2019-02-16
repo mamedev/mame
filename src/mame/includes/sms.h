@@ -26,7 +26,6 @@
 #include "bus/sg1000_exp/sg1000exp.h"
 #include "bus/sms_ctrl/smsctrl.h"
 #include "bus/sms_exp/smsexp.h"
-#include "sound/sn76496.h"
 #include "sound/ym2413.h"
 #include "video/315_5124.h"
 
@@ -41,8 +40,6 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_vdp(*this, "sms_vdp"),
 		m_main_scr(*this, "screen"),
-		m_psg_sms(*this, "segapsg"),
-		m_psg_gg(*this, "gamegear"),
 		m_ym(*this, "ym2413"),
 		m_port_ctrl1(*this, CONTROL1_TAG),
 		m_port_ctrl2(*this, CONTROL2_TAG),
@@ -120,8 +117,6 @@ protected:
 	DECLARE_READ8_MEMBER(gg_sio_r);
 	DECLARE_WRITE8_MEMBER(gg_sio_w);
 	DECLARE_WRITE8_MEMBER(gg_psg_stereo_w);
-	DECLARE_WRITE8_MEMBER(gg_psg_w);
-	DECLARE_WRITE8_MEMBER(sms_psg_w);
 	DECLARE_READ8_MEMBER(smsj_audio_control_r);
 	DECLARE_WRITE8_MEMBER(smsj_audio_control_w);
 	DECLARE_WRITE8_MEMBER(smsj_ym2413_register_port_w);
@@ -169,8 +164,6 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<sega315_5124_device> m_vdp;
 	required_device<screen_device> m_main_scr;
-	optional_device<segapsg_device> m_psg_sms;
-	optional_device<gamegear_device> m_psg_gg;
 	optional_device<ym2413_device> m_ym;
 	optional_device<sms_control_port_device> m_port_ctrl1;
 	optional_device<sms_control_port_device> m_port_ctrl2;

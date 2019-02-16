@@ -654,7 +654,7 @@ void zeropnt2_state::machine_start()
 void zeropnt2_state::zeropnt2(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 32_MHz_XTAL/2); /* 16MHz */
+	M68EC020(config, m_maincpu, 32_MHz_XTAL/2); /* 16MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &zeropnt2_state::zeropnt2_map);
 	m_maincpu->set_vblank_int("screen", FUNC(zeropnt2_state::irq2_line_hold));
 

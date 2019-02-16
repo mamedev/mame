@@ -46,6 +46,16 @@ class nes_ntb_slot_device : public device_t,
 	friend class nes_sunsoft_dcs_device;
 public:
 	// construction/destruction
+	template <typename T>
+	nes_ntb_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts)
+		: nes_ntb_slot_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(nullptr);
+		set_fixed(false);
+	}
+
 	nes_ntb_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~nes_ntb_slot_device();
 
@@ -76,11 +86,6 @@ protected:
 
 // device type definition
 DECLARE_DEVICE_TYPE(NES_NTB_SLOT, nes_ntb_slot_device)
-
-
-#define MCFG_NTB_MINICART_ADD(_tag, _slot_intf) \
-		MCFG_DEVICE_ADD(_tag, NES_NTB_SLOT, 0) \
-		MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, nullptr, false)
 
 
 //-----------------------------------------------

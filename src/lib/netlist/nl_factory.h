@@ -35,6 +35,7 @@
 
 namespace netlist {
 	class device_t;
+	class nlparse_t;
 	class setup_t;
 	class netlist_state_t;
 
@@ -55,9 +56,9 @@ namespace factory {
 		COPYASSIGNMOVE(element_t, default)
 
 		virtual poolptr<device_t> Create(netlist_state_t &anetlist, const pstring &name) = 0;
-		virtual void macro_actions(netlist_state_t &anetlist, const pstring &name)
+		virtual void macro_actions(nlparse_t &nparser, const pstring &name)
 		{
-			plib::unused_var(anetlist);
+			plib::unused_var(nparser);
 			plib::unused_var(name);
 		}
 
@@ -93,7 +94,7 @@ namespace factory {
 	class list_t : public std::vector<std::unique_ptr<element_t>>
 	{
 	public:
-		explicit list_t(setup_t &m_setup);
+		explicit list_t(log_type &alog);
 		~list_t() = default;
 
 		COPYASSIGNMOVE(list_t, delete)
@@ -116,7 +117,7 @@ namespace factory {
 		}
 
 	private:
-		setup_t &m_setup;
+		log_type &m_log;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -140,17 +141,15 @@ namespace factory {
 	{
 	public:
 
-		library_element_t(setup_t &setup, const pstring &name, const pstring &classname,
+		library_element_t(const pstring &name, const pstring &classname,
 				const pstring &def_param, const pstring &source)
 		: element_t(name, classname, def_param, source)
 		{
-			// FIXME: if it is not used, remove it
-			plib::unused_var(setup);
 		}
 
 		poolptr<device_t> Create(netlist_state_t &anetlist, const pstring &name) override;
 
-		void macro_actions(netlist_state_t &anetlist, const pstring &name) override;
+		void macro_actions(nlparse_t &nparser, const pstring &name) override;
 
 	private:
 	};

@@ -21,6 +21,13 @@ Sensory Chess Challenger 6 (model SC6):
 - external 4KB ROM 2332 101-1035A01, in module slot
 - buzzer, 2 7seg LEDs, 8*8 chessboard buttons
 
+released modules, * denotes not dumped yet:
+- *BO6: Book Openings I
+- *CG6: Greatest Chess Games 1
+- SC6: pack-in, original program
+
+SC6 program is contained in BO6 and CG6.
+
 ******************************************************************************/
 
 #include "emu.h"
@@ -38,12 +45,15 @@ class fidelmcs48_state : public fidelbase_state
 {
 public:
 	fidelmcs48_state(const machine_config &mconfig, device_type type, const char *tag) :
-		fidelbase_state(mconfig, type, tag)
+		fidelbase_state(mconfig, type, tag),
+		m_maincpu(*this, "maincpu")
 	{ }
 
 	void sc6(machine_config &config);
 
 private:
+	required_device<mcs48_cpu_device> m_maincpu;
+
 	// SC6
 	void sc6_prepare_display();
 	DECLARE_WRITE8_MEMBER(sc6_mux_w);
@@ -52,6 +62,7 @@ private:
 	DECLARE_READ_LINE_MEMBER(sc6_input6_r);
 	DECLARE_READ_LINE_MEMBER(sc6_input7_r);
 	void sc6_map(address_map &map);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(sc6_cartridge);
 };
 
 
@@ -61,6 +72,26 @@ private:
 /******************************************************************************
     SC6
 ******************************************************************************/
+
+// cartridge
+
+DEVICE_IMAGE_LOAD_MEMBER(fidelmcs48_state, sc6_cartridge)
+{
+	u32 size = m_cart->common_get_size("rom");
+
+	// 4KB ROM only?
+	if (size != 0x1000)
+	{
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid file size");
+		return image_init_result::FAIL;
+	}
+
+	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
+
+	return image_init_result::PASS;
+}
+
 
 // MCU ports/generic
 
@@ -120,7 +151,7 @@ READ_LINE_MEMBER(fidelmcs48_state::sc6_input7_r)
 
 void fidelmcs48_state::sc6_map(address_map &map)
 {
-	map(0x0000, 0x0fff).rom();
+	map(0x0000, 0x0fff).r("cartslot", FUNC(generic_slot_device::read_rom));
 }
 
 
@@ -152,13 +183,13 @@ INPUT_PORTS_END
 void fidelmcs48_state::sc6(machine_config &config)
 {
 	/* basic machine hardware */
-	i8040_device &maincpu(I8040(config, m_maincpu, 11_MHz_XTAL));
-	maincpu.set_addrmap(AS_PROGRAM, &fidelmcs48_state::sc6_map);
-	maincpu.p2_out_cb().set(FUNC(fidelmcs48_state::sc6_mux_w));
-	maincpu.p1_in_cb().set(FUNC(fidelmcs48_state::sc6_input_r));
-	maincpu.p1_out_cb().set(FUNC(fidelmcs48_state::sc6_select_w));
-	maincpu.t0_in_cb().set(FUNC(fidelmcs48_state::sc6_input6_r));
-	maincpu.t1_in_cb().set(FUNC(fidelmcs48_state::sc6_input7_r));
+	I8040(config, m_maincpu, 11_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &fidelmcs48_state::sc6_map);
+	m_maincpu->p2_out_cb().set(FUNC(fidelmcs48_state::sc6_mux_w));
+	m_maincpu->p1_in_cb().set(FUNC(fidelmcs48_state::sc6_input_r));
+	m_maincpu->p1_out_cb().set(FUNC(fidelmcs48_state::sc6_select_w));
+	m_maincpu->t0_in_cb().set(FUNC(fidelmcs48_state::sc6_input6_r));
+	m_maincpu->t1_in_cb().set(FUNC(fidelmcs48_state::sc6_input7_r));
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_fidel_sc6);
@@ -169,6 +200,13 @@ void fidelmcs48_state::sc6(machine_config &config)
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
 	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+
+	/* cartridge */
+	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "fidel_sc6", "bin"));
+	cartslot.set_device_load(device_image_load_delegate(&fidelmcs48_state::device_image_load_sc6_cartridge, this));
+	cartslot.set_must_be_loaded(true);
+
+	SOFTWARE_LIST(config, "cart_list").set_original("fidel_sc6");
 }
 
 
@@ -178,8 +216,8 @@ void fidelmcs48_state::sc6(machine_config &config)
 ******************************************************************************/
 
 ROM_START( fscc6 )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD("101-1035a01", 0x0000, 0x1000, CRC(0024971f) SHA1(76b16364913ada2fb94b9e6a8524b924e6832ddf) ) // 2332
+	ROM_REGION( 0x1000, "maincpu", ROMREGION_ERASE00 )
+	// none here, it's in the module slot
 ROM_END
 
 

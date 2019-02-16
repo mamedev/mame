@@ -429,9 +429,4 @@ DECLARE_DEVICE_TYPE(NES_CART_SLOT, nes_cart_slot_device)
 #define NESSLOT_PRGROM_REGION_TAG ":cart:prg_rom"
 #define NESSLOT_CHRROM_REGION_TAG ":cart:chr_rom"
 
-
-#define MCFG_NES_CARTRIDGE_NOT_MANDATORY                                     \
-	static_cast<nes_cart_slot_device *>(device)->set_must_be_loaded(false);
-
-
 #endif // MAME_BUS_NES_NES_SLOT_H

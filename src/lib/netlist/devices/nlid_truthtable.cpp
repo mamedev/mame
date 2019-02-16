@@ -232,7 +232,12 @@ namespace netlist
 					m_ttbl.m_timing_index.data(), m_ttbl.m_timing_nt.data());
 
 			desc_s.parse(m_desc);
-			return pool().make_poolptr<tt_type>(anetlist, name, m_family, m_ttbl, m_desc);
+
+			/* update truthtable family definitions */
+			if (m_family_name != "")
+				m_family_desc = anetlist.setup().family_from_model(m_family_name);
+
+			return pool().make_poolptr<tt_type>(anetlist, name, m_family_desc, m_ttbl, m_desc);
 		}
 	private:
 		typename nld_truthtable_t<m_NI, m_NO>::truthtable_t m_ttbl;
@@ -447,7 +452,7 @@ void truthtable_parser::parse(const std::vector<pstring> &truthtable)
 
 netlist_base_factory_truthtable_t::netlist_base_factory_truthtable_t(const pstring &name, const pstring &classname,
 		const pstring &def_param, const pstring &sourcefile)
-: factory::element_t(name, classname, def_param, sourcefile), m_family(family_TTL())
+: factory::element_t(name, classname, def_param, sourcefile), m_family_desc(family_TTL())
 {
 }
 
@@ -459,7 +464,7 @@ netlist_base_factory_truthtable_t::netlist_base_factory_truthtable_t(const pstri
 					ENTRYY(n, 4, s); ENTRYY(n, 5, s); ENTRYY(n, 6, s); \
 					ENTRYY(n, 7, s); ENTRYY(n, 8, s)
 
-void tt_factory_create(setup_t &setup, tt_desc &desc, const pstring &sourcefile)
+std::unique_ptr<netlist_base_factory_truthtable_t> tt_factory_create(tt_desc &desc, const pstring &sourcefile)
 {
 	std::unique_ptr<netlist_base_factory_truthtable_t> ret;
 
@@ -482,9 +487,9 @@ void tt_factory_create(setup_t &setup, tt_desc &desc, const pstring &sourcefile)
 			nl_assert_always(false, msg);
 	}
 	ret->m_desc = desc.desc;
-	if (desc.family != "")
-		ret->m_family = setup.family_from_model(desc.family);
-	setup.factory().register_device(std::move(ret));
+	ret->m_family_name = desc.family;
+
+	return ret;
 }
 
 	} //namespace devices

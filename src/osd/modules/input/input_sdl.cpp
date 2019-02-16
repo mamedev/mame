@@ -63,24 +63,265 @@ struct key_lookup_table
 
 static key_lookup_table sdl_lookup_table[] =
 {
-	KE7(UNKNOWN,    BACKSPACE,  TAB,        CLEAR,      RETURN,     PAUSE,      ESCAPE)
-	KE(SPACE)
-	KE5(COMMA,      MINUS,      PERIOD,     SLASH,      0)
-	KE8(1,          2,          3,              4,          5,          6,          7,          8)
-	KE3(9,          SEMICOLON,      EQUALS)
-	KE5(LEFTBRACKET,BACKSLASH,  RIGHTBRACKET,   A,          B)
-	KE8(C,          D,          E,              F,          G,          H,          I,          J)
-	KE8(K,          L,          M,              N,          O,          P,          Q,          R)
-	KE8(S,          T,          U,              V,          W,          X,          Y,          Z)
-	KE8(DELETE,     KP_0,       KP_1,           KP_2,       KP_3,       KP_4,       KP_5,       KP_6)
-	KE8(KP_7,       KP_8,       KP_9,           KP_PERIOD,  KP_DIVIDE,  KP_MULTIPLY,KP_MINUS,   KP_PLUS)
-	KE8(KP_ENTER,   KP_EQUALS,  UP,             DOWN,       RIGHT,      LEFT,       INSERT,     HOME)
-	KE8(END,        PAGEUP,     PAGEDOWN,       F1,         F2,         F3,         F4,         F5)
-	KE8(F6,         F7,         F8,             F9,         F10,        F11,        F12,        F13)
-	KE8(F14,        F15,        NUMLOCKCLEAR,   CAPSLOCK,   SCROLLLOCK, RSHIFT,     LSHIFT,     RCTRL)
-	KE5(LCTRL,      RALT,       LALT,           LGUI,       RGUI)
-	KE8(GRAVE,      LEFTBRACKET,RIGHTBRACKET,   SEMICOLON,  APOSTROPHE, BACKSLASH,  PRINTSCREEN,MENU)
-	KE(UNDO)
+    KE(UNKNOWN)
+
+    KE(A)
+    KE(B)
+    KE(C)
+    KE(D)
+    KE(E)
+    KE(F)
+    KE(G)
+    KE(H)
+    KE(I)
+    KE(J)
+    KE(K)
+    KE(L)
+    KE(M)
+    KE(N)
+    KE(O)
+    KE(P)
+    KE(Q)
+    KE(R)
+    KE(S)
+    KE(T)
+    KE(U)
+    KE(V)
+    KE(W)
+    KE(X)
+    KE(Y)
+    KE(Z)
+
+    KE(1)
+    KE(2)
+    KE(3)
+    KE(4)
+    KE(5)
+    KE(6)
+    KE(7)
+    KE(8)
+    KE(9)
+    KE(0)
+
+    KE(RETURN)
+    KE(ESCAPE)
+    KE(BACKSPACE)
+    KE(TAB)
+    KE(SPACE)
+
+    KE(MINUS)
+    KE(EQUALS)
+    KE(LEFTBRACKET)
+    KE(RIGHTBRACKET)
+    KE(BACKSLASH)
+    KE(NONUSHASH)
+    KE(SEMICOLON)
+    KE(APOSTROPHE)
+    KE(GRAVE)
+    KE(COMMA)
+    KE(PERIOD)
+    KE(SLASH)
+
+    KE(CAPSLOCK)
+
+    KE(F1)
+    KE(F2)
+    KE(F3)
+    KE(F4)
+    KE(F5)
+    KE(F6)
+    KE(F7)
+    KE(F8)
+    KE(F9)
+    KE(F10)
+    KE(F11)
+    KE(F12)
+
+    KE(PRINTSCREEN)
+    KE(SCROLLLOCK)
+    KE(PAUSE)
+    KE(INSERT)
+    KE(HOME)
+    KE(PAGEUP)
+    KE(DELETE)
+    KE(END)
+    KE(PAGEDOWN)
+    KE(RIGHT)
+    KE(LEFT)
+    KE(DOWN)
+    KE(UP)
+
+    KE(NUMLOCKCLEAR)
+    KE(KP_DIVIDE)
+    KE(KP_MULTIPLY)
+    KE(KP_MINUS)
+    KE(KP_PLUS)
+    KE(KP_ENTER)
+    KE(KP_1)
+    KE(KP_2)
+    KE(KP_3)
+    KE(KP_4)
+    KE(KP_5)
+    KE(KP_6)
+    KE(KP_7)
+    KE(KP_8)
+    KE(KP_9)
+    KE(KP_0)
+    KE(KP_PERIOD)
+
+    KE(NONUSBACKSLASH)
+    KE(APPLICATION)
+    KE(POWER)
+    KE(KP_EQUALS)
+    KE(F13)
+    KE(F14)
+    KE(F15)
+    KE(F16)
+    KE(F17)
+    KE(F18)
+    KE(F19)
+    KE(F20)
+    KE(F21)
+    KE(F22)
+    KE(F23)
+    KE(F24)
+    KE(EXECUTE)
+    KE(HELP)
+    KE(MENU)
+    KE(SELECT)
+    KE(STOP)
+    KE(AGAIN)
+    KE(UNDO)
+    KE(CUT)
+    KE(COPY)
+    KE(PASTE)
+    KE(FIND)
+    KE(MUTE)
+    KE(VOLUMEUP)
+    KE(VOLUMEDOWN)
+    KE(KP_COMMA)
+    KE(KP_EQUALSAS400)
+
+    KE(INTERNATIONAL1)
+    KE(INTERNATIONAL2)
+    KE(INTERNATIONAL3)
+    KE(INTERNATIONAL4)
+    KE(INTERNATIONAL5)
+    KE(INTERNATIONAL6)
+    KE(INTERNATIONAL7)
+    KE(INTERNATIONAL8)
+    KE(INTERNATIONAL9)
+    KE(LANG1)
+    KE(LANG2)
+    KE(LANG3)
+    KE(LANG4)
+    KE(LANG5)
+    KE(LANG6)
+    KE(LANG7)
+    KE(LANG8)
+    KE(LANG9)
+
+    KE(ALTERASE)
+    KE(SYSREQ)
+    KE(CANCEL)
+    KE(CLEAR)
+    KE(PRIOR)
+    KE(RETURN2)
+    KE(SEPARATOR)
+    KE(OUT)
+    KE(OPER)
+    KE(CLEARAGAIN)
+    KE(CRSEL)
+    KE(EXSEL)
+
+    KE(KP_00)
+    KE(KP_000)
+    KE(THOUSANDSSEPARATOR)
+    KE(DECIMALSEPARATOR)
+    KE(CURRENCYUNIT)
+    KE(CURRENCYSUBUNIT)
+    KE(KP_LEFTPAREN)
+    KE(KP_RIGHTPAREN)
+    KE(KP_LEFTBRACE)
+    KE(KP_RIGHTBRACE)
+    KE(KP_TAB)
+    KE(KP_BACKSPACE)
+    KE(KP_A)
+    KE(KP_B)
+    KE(KP_C)
+    KE(KP_D)
+    KE(KP_E)
+    KE(KP_F)
+    KE(KP_XOR)
+    KE(KP_POWER)
+    KE(KP_PERCENT)
+    KE(KP_LESS)
+    KE(KP_GREATER)
+    KE(KP_AMPERSAND)
+    KE(KP_DBLAMPERSAND)
+    KE(KP_VERTICALBAR)
+    KE(KP_DBLVERTICALBAR)
+    KE(KP_COLON)
+    KE(KP_HASH)
+    KE(KP_SPACE)
+    KE(KP_AT)
+    KE(KP_EXCLAM)
+    KE(KP_MEMSTORE)
+    KE(KP_MEMRECALL)
+    KE(KP_MEMCLEAR)
+    KE(KP_MEMADD)
+    KE(KP_MEMSUBTRACT)
+    KE(KP_MEMMULTIPLY)
+    KE(KP_MEMDIVIDE)
+    KE(KP_PLUSMINUS)
+    KE(KP_CLEAR)
+    KE(KP_CLEARENTRY)
+    KE(KP_BINARY)
+    KE(KP_OCTAL)
+    KE(KP_DECIMAL)
+    KE(KP_HEXADECIMAL)
+
+    KE(LCTRL)
+    KE(LSHIFT)
+    KE(LALT)
+    KE(LGUI)
+    KE(RCTRL)
+    KE(RSHIFT)
+    KE(RALT)
+    KE(RGUI)
+
+    KE(MODE)
+    KE(AUDIONEXT)
+    KE(AUDIOPREV)
+    KE(AUDIOSTOP)
+    KE(AUDIOPLAY)
+    KE(AUDIOMUTE)
+    KE(MEDIASELECT)
+    KE(WWW)
+    KE(MAIL)
+    KE(CALCULATOR)
+    KE(COMPUTER)
+    KE(AC_SEARCH)
+    KE(AC_HOME)
+    KE(AC_BACK)
+    KE(AC_FORWARD)
+    KE(AC_STOP)
+    KE(AC_REFRESH)
+    KE(AC_BOOKMARKS)
+
+    KE(BRIGHTNESSDOWN)
+    KE(BRIGHTNESSUP)
+    KE(DISPLAYSWITCH)
+    KE(KBDILLUMTOGGLE)
+    KE(KBDILLUMDOWN)
+    KE(KBDILLUMUP)
+    KE(EJECT)
+    KE(SLEEP)
+
+    KE(APP1)
+    KE(APP2)
+
+
 {
 	-1, ""
 }
@@ -126,7 +367,6 @@ protected:
 //  sdl_keyboard_device
 //============================================================
 
-#define OSD_SDL_INDEX_KEYSYM(keysym) ((keysym)->scancode)
 class sdl_keyboard_device : public sdl_device
 {
 public:
@@ -143,13 +383,13 @@ public:
 		switch (sdlevent.type)
 		{
 		case SDL_KEYDOWN:
-			keyboard.state[OSD_SDL_INDEX_KEYSYM(&sdlevent.key.keysym)] = 0x80;
+			keyboard.state[sdlevent.key.keysym.scancode] = 0x80;
 			if (sdlevent.key.keysym.sym < 0x20)
 				machine().ui_input().push_char_event(osd_common_t::s_window_list.front()->target(), sdlevent.key.keysym.sym);
 			break;
 
 		case SDL_KEYUP:
-			keyboard.state[OSD_SDL_INDEX_KEYSYM(&sdlevent.key.keysym)] = 0x00;
+			keyboard.state[sdlevent.key.keysym.scancode] = 0x00;
 			break;
 
 		case SDL_TEXTINPUT:
@@ -567,11 +807,6 @@ private:
 		char *keymap_filename;
 		FILE *keymap_file;
 		int line = 1;
-		int index, len, sk, vk, ak;
-		char buf[256];
-		char mks[41];
-		char sks[41];
-		char kns[41];
 		int  sdl2section = 0;
 
 		keyboard_trans_table &default_table = keyboard_trans_table::instance();
@@ -601,41 +836,42 @@ private:
 
 		while (!feof(keymap_file))
 		{
+			char buf[256];
+
 			char *ret = fgets(buf, 255, keymap_file);
 			if (ret && buf[0] != '\n' && buf[0] != '#')
 			{
 				buf[255] = 0;
-				len = strlen(buf);
+				int len = strlen(buf);
 				if (len && buf[len - 1] == '\n')
 					buf[len - 1] = 0;
 				if (strncmp(buf, "[SDL2]", 6) == 0)
 				{
 					sdl2section = 1;
 				}
-				else if (((SDLMAME_SDL2) ^ sdl2section) == 0)
+				else if (sdl2section == 1)
 				{
-					mks[0] = 0;
-					sks[0] = 0;
-					memset(kns, 0, ARRAY_LENGTH(kns));
-					sscanf(buf, "%40s %40s %x %x %40c\n",
-						mks, sks, &vk, &ak, kns);
+					char mks[41] = {0};
+					char sks[41] = {0};
+					char kns[41] = {0};
 
-					index = default_table.lookup_mame_index(mks);
-					sk = lookup_sdl_code(sks);
+					int n = sscanf(buf, "%40s %40s %40c\n", mks, sks, kns);
+					if (n != 3)
+						osd_printf_error("Keymap: Error on line %d : Expected 3 parameters, got %d\n", line, n);
+
+					int index = default_table.lookup_mame_index(mks);
+					int sk = lookup_sdl_code(sks);
 
 					if (sk >= 0 && index >= 0)
 					{
 						key_trans_entry &entry = (*custom_table)[index];
-						entry.sdl_key = sk;
-						// vk and ak are not really needed
-						//key_trans_table[index][VIRTUAL_KEY] = vk;
-						//key_trans_table[index][ASCII_KEY] = ak;
+						entry.sdl_scancode = sk;
 						entry.ui_name = auto_alloc_array(machine, char, strlen(kns) + 1);
 						strcpy(entry.ui_name, kns);
 						osd_printf_verbose("Keymap: Mapped <%s> to <%s> with ui-text <%s>\n", sks, mks, kns);
 					}
 					else
-						osd_printf_warning("Keymap: Error on line %d - %s key not found: %s\n", line, (sk<0) ? "sdl" : "mame", buf);
+						osd_printf_error("Keymap: Error on line %d - %s key not found: %s\n", line, (sk<0) ? "sdl" : "mame", buf);
 				}
 			}
 			line++;

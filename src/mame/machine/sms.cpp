@@ -3,7 +3,6 @@
 #include "emu.h"
 #include "crsshair.h"
 #include "video/315_5124.h"
-#include "sound/sn76496.h"
 #include "sound/ym2413.h"
 #include "includes/sms.h"
 
@@ -203,9 +202,9 @@ WRITE8_MEMBER(sms_state::sms_io_control_w)
 READ8_MEMBER(sms_state::sms_count_r)
 {
 	if (offset & 0x01)
-		return m_vdp->hcount_read(*m_space, offset);
+		return m_vdp->hcount_read();
 	else
-		return m_vdp->vcount_read(*m_space, offset);
+		return m_vdp->vcount_read();
 }
 
 
@@ -467,9 +466,9 @@ void sms_state::smsj_set_audio_control(uint8_t data)
 	    1,1 : Both PSG and FM enabled
 	*/
 	if (m_smsj_audio_control == 0x00 || m_smsj_audio_control == 0x03)
-		m_psg_sms->set_output_gain(ALL_OUTPUTS, 1.0);
+		m_vdp->set_output_gain(ALL_OUTPUTS, 1.0);
 	else
-		m_psg_sms->set_output_gain(ALL_OUTPUTS, 0.0);
+		m_vdp->set_output_gain(ALL_OUTPUTS, 0.0);
 
 	if (m_smsj_audio_control == 0x01 || m_smsj_audio_control == 0x03)
 		m_ym->set_output_gain(ALL_OUTPUTS, 1.0);
@@ -526,24 +525,12 @@ WRITE8_MEMBER(sms_state::smsj_ym2413_data_port_w)
 }
 
 
-WRITE8_MEMBER(sms_state::sms_psg_w)
-{
-	m_psg_sms->write(data);
-}
-
-
-WRITE8_MEMBER(sms_state::gg_psg_w)
-{
-	m_psg_gg->write(data);
-}
-
-
 WRITE8_MEMBER(sms_state::gg_psg_stereo_w)
 {
 	if (m_cartslot->exists() && m_cartslot->get_sms_mode())
 		return;
 
-	m_psg_gg->stereo_w(data);
+	m_vdp->psg_stereo_w(data);
 }
 
 

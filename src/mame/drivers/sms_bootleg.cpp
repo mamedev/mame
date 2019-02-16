@@ -264,7 +264,7 @@ void smsbootleg_state::sms_supergame_io(address_map &map)
 	map(0x14, 0x14).nopr(); //AM_READ_PORT("IN1") // seem to be from a coinage / timer MCU, changing them directly changes the credits / time value
 	map(0x18, 0x18).w(FUNC(smsbootleg_state::port18_w));
 
-	map(0x40, 0x7f).rw(FUNC(smsbootleg_state::sms_count_r), FUNC(smsbootleg_state::sms_psg_w));
+	map(0x40, 0x7f).r(FUNC(smsbootleg_state::sms_count_r)).w(m_vdp, FUNC(sega315_5124_device::psg_w));
 	map(0x80, 0x80).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::data_read), FUNC(sega315_5124_device::data_write));
 	map(0x81, 0x81).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::control_read), FUNC(sega315_5124_device::control_write));
 
@@ -275,17 +275,14 @@ void smsbootleg_state::sms_supergame_io(address_map &map)
 
 MACHINE_CONFIG_START(smsbootleg_state::sms_supergame)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(10'738'635)/3)
-	MCFG_DEVICE_PROGRAM_MAP(sms_supergame_map)
-	MCFG_DEVICE_IO_MAP(sms_supergame_io)
+	Z80(config, m_maincpu, XTAL(10'738'635)/3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &smsbootleg_state::sms_supergame_map);
+	m_maincpu->set_addrmap(AS_IO, &smsbootleg_state::sms_supergame_io);
 
 	config.m_minimum_quantum = attotime::from_hz(60);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-
-	MCFG_DEVICE_ADD("segapsg", SEGAPSG, XTAL(10'738'635)/3)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(10'738'635)/2, \
@@ -294,11 +291,12 @@ MACHINE_CONFIG_START(smsbootleg_state::sms_supergame)
 	MCFG_SCREEN_REFRESH_RATE(XTAL(10'738'635)/2 / (sega315_5124_device::WIDTH * sega315_5124_device::HEIGHT_NTSC))
 	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms)
 
-	SEGA315_5246(config, m_vdp, 0);
+	SEGA315_5246(config, m_vdp, XTAL(10'738'635));
 	m_vdp->set_screen(m_main_scr);
 	m_vdp->set_is_pal(false);
 	m_vdp->irq().set_inputline(m_maincpu, 0);
 	m_vdp->pause().set(FUNC(sms_state::sms_pause_callback));
+	m_vdp->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 MACHINE_CONFIG_END
 
