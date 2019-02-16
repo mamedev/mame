@@ -476,7 +476,6 @@ public:
 	fidel6502_state(const machine_config &mconfig, device_type type, const char *tag) :
 		fidelbase_state(mconfig, type, tag),
 		m_ppi8255(*this, "ppi8255"),
-		m_rombank(*this, "rombank"),
 		m_mainmap(*this, "mainmap"),
 		m_div_config(*this, "div_config")
 	{ }
@@ -529,7 +528,6 @@ public:
 private:
 	// devices/pointers
 	optional_device<i8255_device> m_ppi8255;
-	optional_memory_bank m_rombank;
 	optional_device<address_map_bank_device> m_mainmap;
 	optional_ioport m_div_config;
 
@@ -1190,7 +1188,8 @@ WRITE8_MEMBER(fidel6502_state::fdesdis_control_w)
 	display_matrix(9, 2, m_inp_mux, ~m_led_select & 3, false);
 
 	// 74259 Q2: book rom A14
-	m_rombank->set_entry(~m_led_select >> 2 & 1);
+	if (m_rombank != nullptr)
+		m_rombank->set_entry(~m_led_select >> 2 & 1);
 
 	// 74259 Q3: lcd common, update on rising edge
 	if (~q3_old & m_led_select & 8)

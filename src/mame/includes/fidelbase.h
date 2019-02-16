@@ -26,6 +26,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_irq_on(*this, "irq_on"),
+		m_rombank(*this, "rombank"),
 		m_inp_matrix(*this, "IN.%u", 0),
 		m_out_x(*this, "%u.%u", 0U, 0U),
 		m_out_a(*this, "%u.a", 0U),
@@ -42,6 +43,7 @@ public:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
 	optional_device<timer_device> m_irq_on;
+	optional_memory_bank m_rombank;
 	optional_ioport_array<11> m_inp_matrix; // max 11
 	output_finder<0x20, 0x20> m_out_x;
 	output_finder<0x20> m_out_a;
