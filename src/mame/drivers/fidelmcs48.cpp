@@ -45,12 +45,15 @@ class fidelmcs48_state : public fidelbase_state
 {
 public:
 	fidelmcs48_state(const machine_config &mconfig, device_type type, const char *tag) :
-		fidelbase_state(mconfig, type, tag)
+		fidelbase_state(mconfig, type, tag),
+		m_maincpu(*this, "maincpu")
 	{ }
 
 	void sc6(machine_config &config);
 
 private:
+	required_device<mcs48_cpu_device> m_maincpu;
+
 	// SC6
 	void sc6_prepare_display();
 	DECLARE_WRITE8_MEMBER(sc6_mux_w);
@@ -180,13 +183,13 @@ INPUT_PORTS_END
 void fidelmcs48_state::sc6(machine_config &config)
 {
 	/* basic machine hardware */
-	i8040_device &maincpu(I8040(config, m_maincpu, 11_MHz_XTAL));
-	maincpu.set_addrmap(AS_PROGRAM, &fidelmcs48_state::sc6_map);
-	maincpu.p2_out_cb().set(FUNC(fidelmcs48_state::sc6_mux_w));
-	maincpu.p1_in_cb().set(FUNC(fidelmcs48_state::sc6_input_r));
-	maincpu.p1_out_cb().set(FUNC(fidelmcs48_state::sc6_select_w));
-	maincpu.t0_in_cb().set(FUNC(fidelmcs48_state::sc6_input6_r));
-	maincpu.t1_in_cb().set(FUNC(fidelmcs48_state::sc6_input7_r));
+	I8040(config, m_maincpu, 11_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &fidelmcs48_state::sc6_map);
+	m_maincpu->p2_out_cb().set(FUNC(fidelmcs48_state::sc6_mux_w));
+	m_maincpu->p1_in_cb().set(FUNC(fidelmcs48_state::sc6_input_r));
+	m_maincpu->p1_out_cb().set(FUNC(fidelmcs48_state::sc6_select_w));
+	m_maincpu->t0_in_cb().set(FUNC(fidelmcs48_state::sc6_input6_r));
+	m_maincpu->t1_in_cb().set(FUNC(fidelmcs48_state::sc6_input7_r));
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_fidel_sc6);
