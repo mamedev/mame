@@ -223,9 +223,22 @@ void sgi_mc_device::dma_tick()
 		}
 		else
 		{
-			m_space->write_byte(addr, m_space->read_byte(m_dma_gio64_addr));
-			m_dma_mem_addr++;
-			m_dma_count--;
+			const uint32_t remaining = m_dma_count & 0x0000ffff;
+			uint32_t length = 8;
+			uint64_t shift = 56;
+			if (remaining < 8)
+				length = remaining;
+
+			uint64_t data = m_space->read_qword(m_dma_gio64_addr);
+			for (uint32_t i = 0; i < length; i++)
+			{
+				m_space->write_byte(addr, (uint8_t)(data >> shift));
+				addr++;
+				shift -= 8;
+			}
+
+			m_dma_mem_addr += length;
+			m_dma_count -= length;
 		}
 	}
 	else
