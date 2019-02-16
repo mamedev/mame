@@ -42,7 +42,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_irq_on(*this, "irq_on"),
 		m_dac(*this, "dac"),
-		m_speaker_off_timer(*this, "speaker_off"),
+		m_speaker_off(*this, "speaker_off"),
 		m_inp_matrix(*this, "IN.%u", 0),
 		m_out_x(*this, "%u.%u", 0U, 0U),
 		m_out_a(*this, "%u.a", 0U),
@@ -56,7 +56,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<timer_device> m_irq_on;
 	required_device<dac_bit_interface> m_dac;
-	required_device<timer_device> m_speaker_off_timer;
+	required_device<timer_device> m_speaker_off;
 	optional_ioport_array<10> m_inp_matrix; // max 10
 	output_finder<0x20, 0x20> m_out_x;
 	output_finder<0x20> m_out_a;
@@ -87,7 +87,7 @@ public:
 	void display_matrix(int maxx, int maxy, u32 setx, u32 sety, bool update = true);
 
 	// Chess 2001
-	TIMER_DEVICE_CALLBACK_MEMBER(speaker_off_callback);
+	TIMER_DEVICE_CALLBACK_MEMBER(speaker_off) { m_dac->write(0); }
 	DECLARE_WRITE8_MEMBER(ch2001_speaker_on_w);
 	DECLARE_WRITE8_MEMBER(ch2001_leds_w);
 	DECLARE_READ8_MEMBER(ch2001_input_r);
@@ -231,16 +231,11 @@ u16 cxgz80_state::read_inputs(int columns)
 
 // TTL
 
-TIMER_DEVICE_CALLBACK_MEMBER(cxgz80_state::speaker_off_callback)
-{
-	m_dac->write(0);
-}
-
 WRITE8_MEMBER(cxgz80_state::ch2001_speaker_on_w)
 {
 	// 74ls109 clock pulse to speaker
 	m_dac->write(1);
-	m_speaker_off_timer->adjust(attotime::from_usec(200)); // not accurate
+	m_speaker_off->adjust(attotime::from_usec(200)); // not accurate
 }
 
 WRITE8_MEMBER(cxgz80_state::ch2001_leds_w)
@@ -408,7 +403,7 @@ void cxgz80_state::ch2001(machine_config &config)
 	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(18300)); // active for 18.3us
 	TIMER(config, "irq_off").configure_periodic(FUNC(cxgz80_state::irq_off<INPUT_LINE_IRQ0>), irq_period);
 
-	TIMER(config, m_speaker_off_timer).configure_generic(FUNC(cxgz80_state::speaker_off_callback));
+	TIMER(config, m_speaker_off).configure_generic(FUNC(cxgz80_state::speaker_off));
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(cxgz80_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_cxg_ch2001);
