@@ -220,10 +220,12 @@ namespace devices
 				const pstring &def_param, const pstring &sourcefile);
 
 		std::vector<pstring> m_desc;
-		const logic_family_desc_t *m_family;
+		pstring m_family_name;
+		const logic_family_desc_t *m_family_desc;
 	};
 
-	void tt_factory_create(setup_t &setup, tt_desc &desc, const pstring &sourcefile);
+	/* the returned element is still missing a pointer to the family ... */
+	std::unique_ptr<netlist_base_factory_truthtable_t> tt_factory_create(tt_desc &desc, const pstring &sourcefile);
 
 } //namespace devices
 } // namespace netlist

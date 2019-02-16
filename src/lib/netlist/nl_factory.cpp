@@ -47,8 +47,8 @@ namespace netlist { namespace factory
 	// net_device_t_base_factory
 	// ----------------------------------------------------------------------------------------
 
-	list_t::list_t( setup_t &setup)
-	: m_setup(setup)
+	list_t::list_t(log_type &alog)
+	: m_log(alog)
 	{
 	}
 
@@ -56,7 +56,7 @@ namespace netlist { namespace factory
 	{
 		for (auto & e : *this)
 			if (e->name() == factory->name())
-				m_setup.log().fatal(MF_1_FACTORY_ALREADY_CONTAINS_1, factory->name());
+				m_log.fatal(MF_1_FACTORY_ALREADY_CONTAINS_1, factory->name());
 		push_back(std::move(factory));
 	}
 
@@ -68,7 +68,7 @@ namespace netlist { namespace factory
 				return e.get();
 		}
 
-		m_setup.log().fatal(MF_1_CLASS_1_NOT_FOUND, devname);
+		m_log.fatal(MF_1_CLASS_1_NOT_FOUND, devname);
 		return nullptr; // appease code analysis
 	}
 
@@ -81,11 +81,11 @@ namespace netlist { namespace factory
 		return pool().make_poolptr<NETLIB_NAME(wrapper)>(anetlist, name);
 	}
 
-	void library_element_t::macro_actions(netlist_state_t &anetlist, const pstring &name)
+	void library_element_t::macro_actions(nlparse_t &nparser, const pstring &name)
 	{
-		anetlist.setup().namespace_push(name);
-		anetlist.setup().include(this->name());
-		anetlist.setup().namespace_pop();
+		nparser.namespace_push(name);
+		nparser.include(this->name());
+		nparser.namespace_pop();
 	}
 
 

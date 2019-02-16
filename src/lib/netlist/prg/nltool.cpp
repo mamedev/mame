@@ -139,7 +139,7 @@ std::unique_ptr<plib::pistream> netlist_data_folder_t::stream(const pstring &fil
 	try
 	{
 		auto strm = plib::make_unique<plib::pifilestream>(name);
-		return strm;
+		return std::move(strm);
 	}
 	catch (const plib::pexception &e)
 	{
@@ -632,7 +632,7 @@ void tool_app_t::listdevices()
 	{
 		pstring out = plib::pfmt("{1:-20} {2}(<id>")(f->classname())(f->name());
 
-		f->macro_actions(nt.setup().netlist(), f->name() + "_lc");
+		f->macro_actions(nt.setup(), f->name() + "_lc");
 		auto d = f->Create(nt.setup().netlist(), f->name() + "_lc");
 		// get the list of terminals ...
 

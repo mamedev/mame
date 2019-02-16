@@ -14,14 +14,12 @@
 #include <vector>
 
 #include "plib/pparser.h"
-//#include "plib/pstate.h"
 #include "plib/pstream.h"
 #include "plib/pstring.h"
 #include "plib/putil.h"
 
 #include "netlist_types.h"
 #include "nl_config.h"
-//#include "nl_errstr.h"
 #include "nl_factory.h"
 
 //============================================================
@@ -208,26 +206,70 @@ namespace netlist
 	// setup_t
 	// ----------------------------------------------------------------------------------------
 
-	//	setup.register_alias(# alias, # name);
-	//	setup.register_model(model);
-	//	setup.register_dippins_arr( # pin1 ", " # __VA_ARGS__);
-	//		setup.register_dev(# type, # name);
-	//		setup.register_link(# name "." # input, # output);
-	//		setup.register_link_arr( # term1 ", " # __VA_ARGS__);
-	//		setup.register_param(# name, val);
-	//		setup.register_lib_entry(# name, __FILE__);
-	//		setup.include(# name);
-	//		setup.namespace_push(# name);
-	//		NETLIST_NAME(model)(setup);
-	//		setup.namespace_pop();
-	//		setup.register_frontier(# attach, r_in, r_out);
-	//		setup.tt_factory_create(desc, __FILE__);
-
-	class setup_t
+	class nlparse_t
 	{
 	public:
-
 		using link_t = std::pair<pstring, pstring>;
+
+		nlparse_t(netlist_t &netlist);
+
+		void register_model(const pstring &model_in);
+		void register_alias(const pstring &alias, const pstring &out);
+		void register_dippins_arr(const pstring &terms);
+		void register_dev(const pstring &classname, const pstring &name);
+		void register_link(const pstring &sin, const pstring &sout);
+		void register_link_arr(const pstring &terms);
+		void register_param(const pstring &param, const pstring &value);
+		void register_param(const pstring &param, const double value);
+		void register_lib_entry(const pstring &name, const pstring &sourcefile);
+		void register_frontier(const pstring &attach, const double r_IN, const double r_OUT);
+		void tt_factory_create(tt_desc &desc, const pstring &sourcefile);
+
+		/* handle namespace */
+
+		void namespace_push(const pstring &aname);
+		void namespace_pop();
+
+		/* include other files */
+
+		void include(const pstring &netlist_name);
+		/* parse a source */
+
+		pstring build_fqn(const pstring &obj_name) const;
+		void register_alias_nofqn(const pstring &alias, const pstring &out);
+
+		/* also called from devices for latebinding connected terminals */
+		void register_link_fqn(const pstring &sin, const pstring &sout);
+
+		/* used from netlist.cpp (mame) */
+		bool device_exists(const pstring &name) const;
+
+	protected:
+		std::unordered_map<pstring, pstring>        m_models;
+		std::stack<pstring>                         m_namespace_stack;
+		std::unordered_map<pstring, pstring> 		m_alias;
+		std::vector<link_t>                         m_links;
+		std::unordered_map<pstring, pstring> 		m_param_values;
+
+		source_t::list_t                            m_sources;
+
+		factory::list_t                             m_factory;
+
+		/* need to preserve order of device creation ... */
+		std::vector<std::pair<pstring, factory::element_t *>> m_device_factory;
+
+
+	private:
+		log_type &log() { return m_log; }
+		const log_type &log() const { return m_log; }
+
+		log_type &m_log;
+		unsigned m_frontier_cnt;
+	};
+
+	class setup_t : public nlparse_t
+	{
+	public:
 
 		explicit setup_t(netlist_t &netlist);
 		~setup_t() noexcept;
@@ -240,52 +282,20 @@ namespace netlist
 		netlist_t &exec() { return m_netlist; }
 		const netlist_t &exec() const { return m_netlist; }
 
-		pstring build_fqn(const pstring &obj_name) const;
-
-		void register_param(const pstring &name, param_t &param);
+		void register_param_t(const pstring &name, param_t &param);
 
 		pstring get_initial_param_val(const pstring &name, const pstring &def) const;
 
 		void register_term(detail::core_terminal_t &obj);
 
-		void register_dev(const pstring &classname, const pstring &name);
-
-		void register_lib_entry(const pstring &name, const pstring &sourcefile);
-
-		void register_model(const pstring &model_in);
-		void register_alias(const pstring &alias, const pstring &out);
-		void register_dippins_arr(const pstring &terms);
-
-		void register_alias_nofqn(const pstring &alias, const pstring &out);
-
-		void register_link_arr(const pstring &terms);
-		void register_link_fqn(const pstring &sin, const pstring &sout);
-		void register_link(const pstring &sin, const pstring &sout);
-
-		void register_param(const pstring &param, const pstring &value);
-		void register_param(const pstring &param, const double value);
-
-		void register_frontier(const pstring &attach, const double r_IN, const double r_OUT);
-
 		void remove_connections(const pstring &attach);
 
 		bool connect(detail::core_terminal_t &t1, detail::core_terminal_t &t2);
-
-		bool device_exists(const pstring &name) const;
 
 		param_t *find_param(const pstring &param_in, bool required = true) const;
 
 		void register_dynamic_log_devices();
 		void resolve_inputs();
-
-		/* handle namespace */
-
-		void namespace_push(const pstring &aname);
-		void namespace_pop();
-
-		/* parse a source */
-
-		void include(const pstring &netlist_name);
 
 		std::unique_ptr<plib::pistream> get_data_stream(const pstring &name);
 
@@ -316,8 +326,6 @@ namespace netlist
 		void model_parse(const pstring &model, detail::model_map_t &map);
 
 		const logic_family_desc_t *family_from_model(const pstring &model);
-
-		void tt_factory_create(tt_desc &desc, const pstring &sourcefile);
 
 		/* helper - also used by nltool */
 		const pstring resolve_alias(const pstring &name) const;
@@ -357,28 +365,15 @@ namespace netlist
 		devices::nld_base_proxy *get_d_a_proxy(detail::core_terminal_t &out);
 		devices::nld_base_proxy *get_a_d_proxy(detail::core_terminal_t &inp);
 
-		/* need to preserve order of device creation ... */
-		std::vector<std::pair<pstring, factory::element_t *>> m_device_factory;
-		//std::unordered_map<pstring, factory::element_t *> m_device_factory;
-
-		std::unordered_map<pstring, pstring> m_alias;
-		std::unordered_map<pstring, pstring> m_param_values;
 		std::unordered_map<pstring, detail::core_terminal_t *> m_terminals;
 
 		netlist_t                                   &m_netlist;
 		devices::nld_netlistparams			 		*m_netlist_params;
 		std::unordered_map<pstring, param_ref_t>    m_params;
 
-		std::vector<link_t>                         m_links;
-		factory::list_t                             m_factory;
-		std::unordered_map<pstring, pstring>        m_models;
-
-		std::stack<pstring>                         m_namespace_stack;
-		source_t::list_t                            m_sources;
 		plib::ppreprocessor::defines_map_type	    m_defines;
 
 		unsigned m_proxy_cnt;
-		unsigned m_frontier_cnt;
 	};
 
 	// ----------------------------------------------------------------------------------------

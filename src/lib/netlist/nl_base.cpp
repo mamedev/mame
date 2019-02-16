@@ -954,7 +954,7 @@ logic_input_t::logic_input_t(core_device_t &dev, const pstring &aname,
 param_t::param_t(device_t &device, const pstring &name)
 	: device_object_t(device, device.name() + "." + name)
 {
-	device.setup().register_param(this->name(), *this);
+	device.setup().register_param_t(this->name(), *this);
 }
 
 param_t::param_type_t param_t::param_type() const
