@@ -626,41 +626,42 @@ READ8_MEMBER(apple2_state::switches_r)
 
 READ8_MEMBER(apple2_state::flags_r)
 {
+	uint8_t busdata = read_floatingbus() & 0x7f;
+
 	// Y output of 74LS251 at H14 read as D7
 	switch (offset)
 	{
 	case 0: // cassette in
-		return (m_cassette->input() > 0.0 ? 0x80 : 0) | (read_floatingbus() & 0x7f);
+		return (m_cassette->input() > 0.0 ? 0x80 : 0) | busdata;
 
 	case 1:  // button 0
-		return ((m_joybuttons->read() & 0x10) ? 0x80 : 0) | (read_floatingbus() & 0x7f);
+		return (BIT(m_joybuttons->read(), 4) ? 0x80 : 0) | busdata;
 
 	case 2:  // button 1
-		return ((m_joybuttons->read() & 0x20) ? 0x80 : 0) | (read_floatingbus() & 0x7f);
+		return (BIT(m_joybuttons->read(), 5) ? 0x80 : 0) | busdata;
 
 	case 3:  // button 2
 		// check if SHIFT key mod configured
-		if (m_sysconfig->read() & 0x04)
-		{
-			return (((m_joybuttons->read() & 0x40) || (m_kbspecial->read() & 0x06)) ? 0x80 : 0) | (read_floatingbus() & 0x3f);
-		}
-		return ((m_joybuttons->read() & 0x40) ? 0x80 : 0) | (read_floatingbus() & 0x7f);
+		if (BIT(m_sysconfig->read(), 2))
+			return ((BIT(m_joybuttons->read(), 6) || (m_kbspecial->read() & 0x06) != 0) ? 0x80 : 0) | busdata;
+		else
+			return (BIT(m_joybuttons->read(), 6) ? 0x80 : 0) | busdata;
 
 	case 4:  // joy 1 X axis
-		return ((machine().time().as_double() < m_joystick_x1_time) ? 0x80 : 0) | (read_floatingbus() & 0x7f);
+		return ((machine().time().as_double() < m_joystick_x1_time) ? 0x80 : 0) | busdata;
 
 	case 5:  // joy 1 Y axis
-		return ((machine().time().as_double() < m_joystick_y1_time) ? 0x80 : 0) | (read_floatingbus() & 0x7f);
+		return ((machine().time().as_double() < m_joystick_y1_time) ? 0x80 : 0) | busdata;
 
 	case 6: // joy 2 X axis
-		return ((machine().time().as_double() < m_joystick_x2_time) ? 0x80 : 0) | (read_floatingbus() & 0x7f);
+		return ((machine().time().as_double() < m_joystick_x2_time) ? 0x80 : 0) | busdata;
 
 	case 7: // joy 2 Y axis
-		return ((machine().time().as_double() < m_joystick_y2_time) ? 0x80 : 0) | (read_floatingbus() & 0x7f);
+		return ((machine().time().as_double() < m_joystick_y2_time) ? 0x80 : 0) | busdata;
 	}
 
 	// this is never reached
-	return 0;
+	return busdata;
 }
 
 READ8_MEMBER(apple2_state::controller_strobe_r)
