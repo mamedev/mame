@@ -126,15 +126,4 @@ DECLARE_DEVICE_TYPE(PCE_CART_SLOT, pce_cart_slot_device)
 
 #define PCESLOT_ROM_REGION_TAG ":cart:rom"
 
-#define MCFG_PCE_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
-	MCFG_DEVICE_ADD(_tag, PCE_CART_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-	static_cast<pce_cart_slot_device *>(device)->set_intf("pce_cart");
-
-#define MCFG_TG16_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
-	MCFG_DEVICE_ADD(_tag, PCE_CART_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-	static_cast<pce_cart_slot_device *>(device)->set_intf("tg16_cart");
-
-
 #endif // MAME_BUS_PCE_PCE_SLOT_H
