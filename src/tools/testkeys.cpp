@@ -16,6 +16,7 @@
 #include <wchar.h>
 
 #include "SDL2/SDL.h"
+#include "osdcore.h"
 
 //#include "unicode.h"
 
@@ -303,11 +304,7 @@ static const char * lookup_key_name(const key_lookup_table *kt, int kc)
 	return NULL;
 }
 
-#ifdef SDLMAME_WIN32
-int utf8_main(int argc, char *argv[])
-#else
 int main(int argc, char *argv[])
-#endif
 {
 	SDL_Event event;
 	int quit = 0;

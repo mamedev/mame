@@ -796,37 +796,47 @@ end
 -- testkeys
 --------------------------------------------------
 
-if _OPTIONS["targetos"] ~= "windows" then
-  if (_OPTIONS["osd"] == "sdl") then
-    project("testkeys")
-    uuid ("b3f5a5b8-3203-11e9-93e4-670b4f4e359d")
-    kind "ConsoleApp"
-    
-    flags {
-      "Symbols", -- always include minimum symbols for executables
-    }
-    
-    if _OPTIONS["SEPARATE_BIN"]~="1" then
-      targetdir(MAME_DIR)
-    end
-    
-    links {
-    }
-    
-    dofile("osd/sdl_cfg.lua")
+if (_OPTIONS["osd"] == "sdl") then
+  project("testkeys")
+  uuid ("b3f5a5b8-3203-11e9-93e4-670b4f4e359d")
+  kind "ConsoleApp"
   
-    includedirs {
-    }
-   
-    files {
-      MAME_DIR .. "src/tools/testkeys.cpp",
-    }
-    
-    configuration { "mingw*" or "vs*" }
-      targetextension ".exe"
-    
-    configuration { }
-    
-    strip()
+  flags {
+    "Symbols", -- always include minimum symbols for executables
+  }
+  
+  if _OPTIONS["SEPARATE_BIN"]~="1" then
+    targetdir(MAME_DIR)
   end
+  
+  if _OPTIONS["targetos"] == "macosx" then
+    links {
+      "ocore_" .. _OPTIONS["osd"],
+      ext_lib("utf8proc"),
+    }
+  else
+    links {
+      "SDL2",
+      "SDL2main",
+      "ocore_" .. _OPTIONS["osd"],
+      ext_lib("utf8proc"),
+    }
+  end
+  
+  dofile("osd/sdl_cfg.lua")
+
+  includedirs {
+    MAME_DIR .. "src/osd",
+  }
+ 
+  files {
+    MAME_DIR .. "src/tools/testkeys.cpp",
+  }
+  
+  configuration { "mingw*" or "vs*" }
+    targetextension ".exe"
+  
+  configuration { }
+  
+  strip()
 end
