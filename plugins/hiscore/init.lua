@@ -60,9 +60,9 @@ function hiscore.startplugin()
 	local function parse_table ( dsting )
 	  local _table = {};
 	  for line in string.gmatch(dsting, '([^\n]+)') do
-		local delay = line:match('^@delay=([%d])')
+		local delay = line:match('^@delay=([.%d]*)')
 		if delay and #delay > 0 then
-			delaytime = os.time() + tonumber(delay)
+			delaytime = emu.time() + tonumber(delay)
 		else
 			local cpu, mem;
 			local cputag, space, offs, len, chk_st, chk_ed, fill = string.match(line, '^@([^,]+),([^,]+),([^,]+),([^,]+),([^,]+),([^,]+),?(%x?%x?)');
@@ -217,7 +217,7 @@ function hiscore.startplugin()
 
 	local function init ()
 	  if not scores_have_been_read then
-		if (delaytime <= os.time()) and check_mem( positions ) then
+		if (delaytime <= emu.time()) and check_mem( positions ) then
 		  default_checksum = check_scores( positions );
 		  if read_scores( positions ) then
 			emu.print_verbose( "hiscore: scores read OK" );
