@@ -33,6 +33,21 @@
 		</part>
 	</software>
 
+	<software name="aplpanic">
+		<description>Apple Panic</description>
+		<year>1981</year>
+		<publisher>Broderbund</publisher>
+		<info name="release" value="2019-02-17"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--  It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="94985">
+				<rom name="apple panic.woz" size="94985" crc="ff3e6db7" sha1="f6c7468a1e2f4cecbf69cfd2869d19af6d8825e1" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="alambush">
 		<description>Alien Ambush</description>
 		<year>1981</year>
@@ -119,6 +134,21 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="226901">
 				<rom name="archon.woz" size="226901" crc="259acee7" sha1="96f118b0b49cba85fb79ee1d36c1bfe88f69d9fe" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="archon2">
+		<description>Archon II: Adept</description>
+		<year>1985</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="release" value="2019-02-08"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="233486">
+				<rom name="archon ii - adept.woz" size="233486" crc="65a07c33" sha1="d8d959347c7862eef02fe8311a9a453cd9c526fe" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -310,6 +340,21 @@
 		</part>
 	</software>
 
+	<software name="brucelee">
+		<description>Bruce Lee</description>
+		<year>1984</year>
+		<publisher>DataSoft</publisher>
+		<info name="release" value="2019-02-16"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="208112">
+				<rom name="bruce lee.woz" size="208112" crc="fbdc4cd0" sha1="7729ee00d0ec840f1506252202236440e7dc7b41" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="boa">
 		<description>Boa</description>
 		<year>1983</year>
@@ -411,6 +456,28 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="233478">
 				<rom name="commando.woz" size="233478" crc="b28e4e2b" sha1="4d41326be376d529d4172d75365bf8e8162a944e" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="conan">
+		<description>Conan</description>
+		<year>1984</year>
+		<publisher>DataSoft</publisher>
+		<info name="release" value="2019-02-15"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="251151">
+				<rom name="conan side a.woz" size="251151" crc="507ac26c" sha1="2f29e393dd1009e1020766dd3efa6c83d9ccd6a5" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="238759">
+				<rom name="conan side b.woz" size="238759" crc="488b2831" sha1="8e4676a1a537fa92a358b9f0b198d0ce7a700ab3" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1002,6 +1069,21 @@
 		</part>
 	</software>
 
+	<software name="gremlins">
+		<description>Gremlins</description>
+		<year>1984</year>
+		<publisher>Atarisoft</publisher>
+		<info name="release" value="2019-02-10"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="113621">
+				<rom name="gremlins.woz" size="113621" crc="c873f47a" sha1="5e71bf3e881e31a47162ef9bfafa9a1759cb5c2f" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gumball">
 		<description>Gumball</description>
 		<year>1983</year>
@@ -1575,6 +1657,27 @@
 		</part>
 	</software>
 
+	<software name="amfvr77">
+		<description>A Mind Forever Voyaging R77 / 850814</description>
+		<year>1985</year>
+		<publisher>Infocom</publisher>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 128K Apple //e, //c, or IIgs. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234780">
+				<rom name="a mind forever voyaging r77 side a.woz" size="234780" crc="7e43ff20" sha1="7f4449324384309b961244225ba9a89f3d3f811f" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234624">
+				<rom name="a mind forever voyaging r77 side b.woz" size="234624" crc="fe5964a9" sha1="a267a52c2f576d204ffee229119f794583a274d1" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="minr2049">
 		<description>Miner 2049er</description>
 		<year>1982</year>
@@ -1665,6 +1768,21 @@
 		</part>
 	</software>
 
+	<software name="mypscrab">
+		<description>Monty Plays Scrabble 4.0</description>
+		<year>1984</year>
+		<publisher>Ritam Corporation</publisher>
+		<info name="release" value="2019-02-11"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="233478">
+				<rom name="monty plays scrabble.woz" size="233478" crc="bc9f3b91" sha1="235ff32a0072411f954088b46fe6de6ea5e40531" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mpatrol">
 		<description>Moon Patrol</description>
 		<year>1983</year>
@@ -1698,6 +1816,21 @@
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="233451">
 				<rom name="the movie monster game side b.woz" size="233451" crc="338a8ad1" sha1="b1a996b703cf00c509e15639c53019ce812341c8" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mrdo">
+		<description>Mr. Do</description>
+		<year>1985</year>
+		<publisher>DataSoft</publisher>
+		<info name="release" value="2019-02-14"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="202491">
+				<rom name="mr. do.woz" size="202491" crc="2c7de9a0" sha1="4aedb92aece762105c2f27494e96d4be790432d8" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2519,6 +2652,21 @@
 		</part>
 	</software>
 
+	<software name="spraid20">
+		<description>Space Raiders version 2</description>
+		<year>1983</year>
+		<publisher>U.S.A. Software</publisher>
+		<info name="release" value="2019-02-09"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="53792">
+				<rom name="space raiders v2.woz" size="53792" crc="6d8b5ae2" sha1="f103a71acefc106b849cbf29dd63a5aed03d5b8e" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sparechg">
 		<description>Spare Change</description>
 		<year>1983</year>
@@ -2979,6 +3127,20 @@
 			<feature name="part_id" value="Sample Shots Disk"/>
 			<dataarea name="flop" size="140273">
 				<rom name="trick shot disk 2 (sample shots).woz" size="140273" crc="e053b0ed" sha1="3fa54660d25e39e6797fe038bbadb4a7c3a3d976" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trkfield">
+		<description>Track and Field</description>
+		<year>1984</year>
+		<publisher>Atarisoft</publisher>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="233452">
+				<rom name="track and field.woz" size="233452" crc="462adf6e" sha1="220a604b368c61644265678ec820b71ace25f318" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
