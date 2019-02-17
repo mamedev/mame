@@ -146,7 +146,7 @@ tmp68301_device::tmp68301_device(const machine_config &mconfig, const char *tag,
 		m_scr(0),
 		m_pdir(0),
 		m_pdr(0),
-	  m_space_config("regs", ENDIANNESS_LITTLE, 16, 10, 0, address_map_constructor(), address_map_constructor(FUNC(tmp68301_device::tmp68301_regs), this))
+	  m_space_config("regs", ENDIANNESS_LITTLE, 16, 10, 0, address_map_constructor(FUNC(tmp68301_device::tmp68301_regs), this))
 {
 	memset(m_regs, 0, sizeof(m_regs));
 	memset(m_icr, 0, sizeof(m_icr));

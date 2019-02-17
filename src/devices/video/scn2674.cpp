@@ -25,7 +25,8 @@ DEFINE_DEVICE_TYPE(SCN2674, scn2674_device, "scn2674", "Signetics SCN2674 AVDC")
 // default address map
 void scn2674_device::scn2674_vram(address_map &map)
 {
-	map(0x0000, (1 << space_config(0)->addr_width()) - 1).noprw();
+	if (!has_configured_map(0))
+		map(0x0000, (1 << space_config(0)->addr_width()) - 1).noprw();
 }
 
 scn2672_device::scn2672_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -89,8 +90,8 @@ scn2674_device::scn2674_device(const machine_config &mconfig, device_type type, 
 	, m_breq_timer(nullptr)
 	, m_vblank_timer(nullptr)
 	, m_char_space(nullptr), m_attr_space(nullptr)
-	, m_char_space_config("charram", ENDIANNESS_LITTLE, 8, extend_addressing ? 16 : 14, 0, address_map_constructor(), address_map_constructor(FUNC(scn2674_device::scn2674_vram), this))
-	, m_attr_space_config("attrram", ENDIANNESS_LITTLE, 8, extend_addressing ? 16 : 14, 0, address_map_constructor(), address_map_constructor(FUNC(scn2674_device::scn2674_vram), this))
+	, m_char_space_config("charram", ENDIANNESS_LITTLE, 8, extend_addressing ? 16 : 14, 0, address_map_constructor(FUNC(scn2674_device::scn2674_vram), this))
+	, m_attr_space_config("attrram", ENDIANNESS_LITTLE, 8, extend_addressing ? 16 : 14, 0)
 {
 }
 

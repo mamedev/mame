@@ -1438,7 +1438,8 @@ device_memory_interface::space_config_vector mos8563_device::memory_space_config
 // default address maps
 void mos8563_device::mos8563_videoram_map(address_map &map)
 {
-	map(0x0000, 0xffff).ram();
+	if (!has_configured_map(0))
+		map(0x0000, 0xffff).ram();
 }
 
 
@@ -1505,7 +1506,7 @@ mos8563_device::mos8563_device(const machine_config &mconfig, device_type type, 
 	: mc6845_device(mconfig, type, tag, owner, clock),
 		device_memory_interface(mconfig, *this),
 		device_palette_interface(mconfig, *this),
-		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(), address_map_constructor(FUNC(mos8563_device::mos8563_videoram_map), this))
+		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(mos8563_device::mos8563_videoram_map), this))
 {
 	set_clock_scale(1.0/8);
 }

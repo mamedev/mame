@@ -164,7 +164,8 @@ void sega315_5377_device::sega315_5377_palette(palette_device &palette) const
 // default address map
 void sega315_5124_device::sega315_5124(address_map &map)
 {
-	map(0x0000, VRAM_SIZE-1).ram();
+	if (!has_configured_map(0))
+		map(0x0000, VRAM_SIZE-1).ram();
 }
 
 
@@ -189,7 +190,7 @@ sega315_5124_device::sega315_5124_device(const machine_config &mconfig, device_t
 	, m_int_cb(*this)
 	, m_csync_cb(*this)
 	, m_pause_cb(*this)
-	, m_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, address_map_constructor(), address_map_constructor(FUNC(sega315_5124_device::sega315_5124), this))
+	, m_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, address_map_constructor(FUNC(sega315_5124_device::sega315_5124), this))
 	, m_palette(*this, "palette")
 	, m_snsnd(*this, "snsnd")
 {
