@@ -2129,6 +2129,7 @@ files {
 	MAME_DIR .. "src/mame/includes/fidelbase.h",
 	MAME_DIR .. "src/mame/drivers/fidel_sc6.cpp",
 	MAME_DIR .. "src/mame/drivers/fidel6502.cpp",
+	MAME_DIR .. "src/mame/includes/fidel_desdis_common.h",
 	MAME_DIR .. "src/mame/drivers/fidel68k.cpp",
 }
 

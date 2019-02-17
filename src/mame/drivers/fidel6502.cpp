@@ -441,6 +441,7 @@ I/O is via TTL, very similar to Designer Display
 
 #include "emu.h"
 #include "includes/fidelbase.h"
+#include "includes/fidel_desdis_common.h"
 
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6502/r65c02.h"
@@ -634,11 +635,11 @@ void fidel6502_state::machine_reset()
 
 
 
-class desdis_state : public fidelbase_state
+class desdis_state : public desdis_common_state
 {
 public:
 	desdis_state(const machine_config &mconfig, device_type type, const char *tag) :
-		fidelbase_state(mconfig, type, tag)
+		desdis_common_state(mconfig, type, tag)
 	{ }
 
 	void fdes2000d(machine_config &config);
@@ -647,11 +648,6 @@ public:
 
 private:
 	void fdes2100d_map(address_map &map);
-
-	// I/O handlers
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_WRITE8_MEMBER(lcd_w);
-	DECLARE_READ8_MEMBER(input_r);
 };
 
 
@@ -1182,7 +1178,7 @@ READ8_MEMBER(fidel6502_state::fexcel_ttl_r)
 
 // TTL/generic
 
-WRITE8_MEMBER(desdis_state::control_w)
+WRITE8_MEMBER(desdis_common_state::control_w)
 {
 	u8 q3_old = m_led_select & 8;
 
@@ -1217,7 +1213,7 @@ WRITE8_MEMBER(desdis_state::control_w)
 	display_update();
 }
 
-WRITE8_MEMBER(desdis_state::lcd_w)
+WRITE8_MEMBER(desdis_common_state::lcd_w)
 {
 	// a0-a2,d0-d3: 4*74259 to lcd digit segments
 	u32 mask = bitswap<8>(1 << offset,3,7,6,0,1,2,4,5);
@@ -1228,7 +1224,7 @@ WRITE8_MEMBER(desdis_state::lcd_w)
 	}
 }
 
-READ8_MEMBER(desdis_state::input_r)
+READ8_MEMBER(desdis_common_state::input_r)
 {
 	// a0-a2,d7: multiplexed inputs (active low)
 	return (read_inputs(9) >> offset & 1) ? 0 : 0x80;
@@ -1815,7 +1811,7 @@ static INPUT_PORTS_START( fdes )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( desdis )
+INPUT_PORTS_START( desdis )
 	PORT_INCLUDE( fidel_cb_buttons )
 
 	PORT_START("IN.8")

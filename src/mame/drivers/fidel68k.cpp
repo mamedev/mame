@@ -181,6 +181,7 @@ B0000x-xxxxxx: see V7, -800000
 
 #include "emu.h"
 #include "includes/fidelbase.h"
+#include "includes/fidel_desdis_common.h"
 
 #include "cpu/m68000/m68000.h"
 #include "machine/ram.h"
@@ -232,11 +233,11 @@ private:
 };
 
 
-class desmaster_state : public fidelbase_state
+class desmas_state : public desdis_common_state
 {
 public:
-	desmaster_state(const machine_config &mconfig, device_type type, const char *tag) :
-		fidelbase_state(mconfig, type, tag)
+	desmas_state(const machine_config &mconfig, device_type type, const char *tag) :
+		desdis_common_state(mconfig, type, tag)
 	{ }
 
 	void fdes2265(machine_config &config);
@@ -249,9 +250,8 @@ private:
 	void fdes2325_map(address_map &map);
 
 	// I/O handlers
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_WRITE8_MEMBER(lcd_w);
+	virtual DECLARE_WRITE8_MEMBER(control_w) override;
+	virtual DECLARE_WRITE8_MEMBER(lcd_w) override;
 };
 
 
@@ -336,55 +336,19 @@ WRITE8_MEMBER(excel68k_state::mux_w)
     Designer Master
 ******************************************************************************/
 
-WRITE8_MEMBER(desmaster_state::control_w)
+WRITE8_MEMBER(desmas_state::control_w)
 {
-	u8 q3_old = m_led_select & 8;
-
-	// a1-a3,d0: 74259
-	u8 mask = 1 << offset;
-	m_led_select = (m_led_select & ~mask) | ((data & 1) ? mask : 0);
-
-	// 74259 Q4-Q7: 7442 a0-a3
-	// 7442 0-8: led data, input mux
-	u16 sel = 1 << (m_led_select >> 4 & 0xf) & 0x3ff;
-	m_inp_mux = sel & 0x1ff;
-
-	// 7442 9: speaker out
-	m_dac->write(BIT(sel, 9));
-
-	// 74259 Q0,Q1: led select (active low)
-	display_matrix(9, 2, m_inp_mux, ~m_led_select & 3, false);
-
-	// 74259 Q3: lcd common, update on rising edge
-	if (~q3_old & m_led_select & 8)
-	{
-		for (int i = 0; i < 4; i++)
-			m_display_state[i+2] = m_7seg_data >> (8*i) & 0xff;
-	}
-
-	m_display_maxy += 4;
-	set_display_segmask(0x3c, 0x7f);
-	display_update();
+	// same as desdis, d0 instead of d7
+	desdis_common_state::control_w(space, offset, data << 7);
 }
 
-READ8_MEMBER(desmaster_state::input_r)
+WRITE8_MEMBER(desmas_state::lcd_w)
 {
-	// a1-a3,d7(d15): multiplexed inputs (active low)
-	return (read_inputs(9) >> offset & 1) ? 0 : 0x80;
+	// same as desdis, inverted data
+	desdis_common_state::lcd_w(space, offset, ~data);
 }
 
-WRITE8_MEMBER(desmaster_state::lcd_w)
-{
-	// a1-a3,d0-d3: 4*74259 to lcd digit segments
-	u32 mask = bitswap<8>(1 << offset,3,7,6,0,1,2,4,5);
-	for (int i = 0; i < 4; i++)
-	{
-		m_7seg_data = (m_7seg_data & ~mask) | ((data >> i & 1) ? mask : 0);
-		mask <<= 8;
-	}
-}
-
-void desmaster_state::init_fdes2265()
+void desmas_state::init_fdes2265()
 {
 	u16 *rom = (u16*)memregion("maincpu")->base();
 	const u32 len = memregion("maincpu")->bytes() / 2;
@@ -486,24 +450,24 @@ void excel68k_state::fex68km3_map(address_map &map)
 
 // Designer Master
 
-void desmaster_state::fdes2265_map(address_map &map)
+void desmas_state::fdes2265_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x00ffff).rom();
-	map(0x000000, 0x00000f).w(FUNC(desmaster_state::lcd_w)).umask16(0x00ff);
+	map(0x000000, 0x00000f).w(FUNC(desmas_state::lcd_w)).umask16(0x00ff);
 	map(0x044000, 0x047fff).ram();
 	map(0x100000, 0x10ffff).ram();
-	map(0x140000, 0x14000f).r(FUNC(desmaster_state::input_r)).umask16(0xff00);
-	map(0x140000, 0x14000f).w(FUNC(desmaster_state::control_w)).umask16(0x00ff);
+	map(0x140000, 0x14000f).r(FUNC(desmas_state::input_r)).umask16(0xff00);
+	map(0x140000, 0x14000f).w(FUNC(desmas_state::control_w)).umask16(0x00ff);
 }
 
-void desmaster_state::fdes2325_map(address_map &map)
+void desmas_state::fdes2325_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x00ffff).rom();
-	map(0x100000, 0x10000f).w(FUNC(desmaster_state::lcd_w)).umask32(0x00ff00ff);
-	map(0x140000, 0x14000f).w(FUNC(desmaster_state::control_w)).umask32(0x00ff00ff);
-	map(0x180000, 0x18000f).r(FUNC(desmaster_state::input_r)).umask32(0xff00ff00);
+	map(0x100000, 0x10000f).w(FUNC(desmas_state::lcd_w)).umask32(0x00ff00ff);
+	map(0x140000, 0x14000f).w(FUNC(desmas_state::control_w)).umask32(0x00ff00ff);
+	map(0x180000, 0x18000f).r(FUNC(desmas_state::input_r)).umask32(0xff00ff00);
 	map(0x300000, 0x37ffff).ram();
 	map(0x500000, 0x507fff).ram();
 }
@@ -586,21 +550,6 @@ static INPUT_PORTS_START( excel68k )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( desmaster )
-	PORT_INCLUDE( fidel_cb_buttons )
-
-	PORT_START("IN.8")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_NAME("Clear")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_NAME("Move / Alternate")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_NAME("Hint / Info")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F) PORT_NAME("Take Back / Replay")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_C) PORT_NAME("Level / New")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_B) PORT_NAME("Option / Time")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_NAME("Verify / Problem")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_NAME("Shift")
-INPUT_PORTS_END
-
-
 static INPUT_PORTS_START( eag )
 	PORT_INCLUDE( fidel_cb_magnets )
 
@@ -669,16 +618,16 @@ void excel68k_state::fex68km3(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &excel68k_state::fex68km3_map);
 }
 
-void desmaster_state::fdes2265(machine_config &config)
+void desmas_state::fdes2265(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 16_MHz_XTAL); // MC68HC000P12F
-	m_maincpu->set_addrmap(AS_PROGRAM, &desmaster_state::fdes2265_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &desmas_state::fdes2265_map);
 
 	const attotime irq_period = attotime::from_hz(597); // from 555 timer, measured
-	TIMER(config, m_irq_on).configure_periodic(FUNC(desmaster_state::irq_on<M68K_IRQ_4>), irq_period);
+	TIMER(config, m_irq_on).configure_periodic(FUNC(desmas_state::irq_on<M68K_IRQ_4>), irq_period);
 	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(6000)); // active for 6us
-	TIMER(config, "irq_off").configure_periodic(FUNC(desmaster_state::irq_off<M68K_IRQ_4>), irq_period);
+	TIMER(config, "irq_off").configure_periodic(FUNC(desmas_state::irq_off<M68K_IRQ_4>), irq_period);
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_fidel_desdis_68kr);
@@ -691,13 +640,13 @@ void desmaster_state::fdes2265(machine_config &config)
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
-void desmaster_state::fdes2325(machine_config &config)
+void desmas_state::fdes2325(machine_config &config)
 {
 	fdes2265(config);
 
 	/* basic machine hardware */
 	M68EC020(config.replace(), m_maincpu, 20_MHz_XTAL); // MC68EC020RP25
-	m_maincpu->set_addrmap(AS_PROGRAM, &desmaster_state::fdes2325_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &desmas_state::fdes2325_map);
 
 	config.set_default_layout(layout_fidel_desdis_68kg);
 }
@@ -910,8 +859,8 @@ CONS( 1987, fex68kb,  fex68k,   0, fex68k,   excel68k,  excel68k_state, empty_in
 CONS( 1988, fex68km2, fex68k,   0, fex68km2, excel68k,  excel68k_state, empty_init,    "Fidelity Electronics",  "Excel 68000 Mach II (rev. C+)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 CONS( 1988, fex68km3, fex68k,   0, fex68km3, excel68k,  excel68k_state, empty_init,    "Fidelity Electronics",  "Excel 68000 Mach III Master", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 
-CONS( 1989, fdes2265, 0,        0, fdes2265, desmaster, desmaster_state, init_fdes2265, "Fidelity Electronics",  "Designer Mach III Master 2265", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1991, fdes2325, fdes2265, 0, fdes2325, desmaster, desmaster_state, empty_init,    "Fidelity Electronics",  "Designer Mach IV Master 2325", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1989, fdes2265, 0,        0, fdes2265, desdis, desmas_state, init_fdes2265, "Fidelity Electronics",  "Designer Mach III Master 2265", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1991, fdes2325, fdes2265, 0, fdes2325, desdis, desmas_state, empty_init,    "Fidelity Electronics",  "Designer Mach IV Master 2325", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 
 CONS( 1989, feagv2,   0,        0, eag,      eag,     eag_state, init_eag,      "Fidelity Electronics",  "Elite Avant Garde (model 6114-2/3/4, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 CONS( 1989, feagv2a,  feagv2,   0, eag,      eag,     eag_state, init_eag,      "Fidelity Electronics",  "Elite Avant Garde (model 6114-2/3/4, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
