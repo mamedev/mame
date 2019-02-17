@@ -34,15 +34,14 @@ Chess 2001:
 #include "cxg_ch2001.lh" // clickable
 
 
-class cxgz80_state : public driver_device
+class cxgbase_state : public driver_device
 {
 public:
-	cxgz80_state(const machine_config &mconfig, device_type type, const char *tag) :
+	cxgbase_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_irq_on(*this, "irq_on"),
 		m_dac(*this, "dac"),
-		m_speaker_off(*this, "speaker_off"),
 		m_inp_matrix(*this, "IN.%u", 0),
 		m_out_x(*this, "%u.%u", 0U, 0U),
 		m_out_a(*this, "%u.a", 0U),
@@ -54,9 +53,8 @@ public:
 
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
-	required_device<timer_device> m_irq_on;
-	required_device<dac_bit_interface> m_dac;
-	required_device<timer_device> m_speaker_off;
+	optional_device<timer_device> m_irq_on;
+	optional_device<dac_bit_interface> m_dac;
 	optional_ioport_array<10> m_inp_matrix; // max 10
 	output_finder<0x20, 0x20> m_out_x;
 	output_finder<0x20> m_out_a;
@@ -86,14 +84,6 @@ public:
 	void set_display_size(int maxx, int maxy);
 	void display_matrix(int maxx, int maxy, u32 setx, u32 sety, bool update = true);
 
-	// Chess 2001
-	TIMER_DEVICE_CALLBACK_MEMBER(speaker_off) { m_dac->write(0); }
-	DECLARE_WRITE8_MEMBER(ch2001_speaker_on_w);
-	DECLARE_WRITE8_MEMBER(ch2001_leds_w);
-	DECLARE_READ8_MEMBER(ch2001_input_r);
-	void ch2001_map(address_map &map);
-	void ch2001(machine_config &config);
-
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -102,7 +92,7 @@ protected:
 
 // machine start/reset
 
-void cxgz80_state::machine_start()
+void cxgbase_state::machine_start()
 {
 	// resolve handlers
 	m_out_x.resolve();
@@ -132,10 +122,34 @@ void cxgz80_state::machine_start()
 	save_item(NAME(m_led_data));
 }
 
-void cxgz80_state::machine_reset()
+void cxgbase_state::machine_reset()
 {
 }
 
+
+class ch2001_state : public cxgbase_state
+{
+public:
+	ch2001_state(const machine_config &mconfig, device_type type, const char *tag) :
+		cxgbase_state(mconfig, type, tag),
+		m_speaker_off(*this, "speaker_off")
+	{ }
+
+	void ch2001(machine_config &config);
+
+private:
+	// devices/pointers
+	required_device<timer_device> m_speaker_off;
+
+	void main_map(address_map &map);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(speaker_off) { m_dac->write(0); }
+
+	// I/O handlers
+	DECLARE_WRITE8_MEMBER(speaker_w);
+	DECLARE_WRITE8_MEMBER(leds_w);
+	DECLARE_READ8_MEMBER(input_r);
+};
 
 
 /***************************************************************************
@@ -147,7 +161,7 @@ void cxgz80_state::machine_reset()
 // The device may strobe the outputs very fast, it is unnoticeable to the user.
 // To prevent flickering here, we need to simulate a decay.
 
-void cxgz80_state::display_update()
+void cxgbase_state::display_update()
 {
 	for (int y = 0; y < m_display_maxy; y++)
 	{
@@ -176,7 +190,7 @@ void cxgz80_state::display_update()
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(cxgz80_state::display_decay_tick)
+TIMER_DEVICE_CALLBACK_MEMBER(cxgbase_state::display_decay_tick)
 {
 	// slowly turn off unpowered segments
 	for (int y = 0; y < m_display_maxy; y++)
@@ -187,13 +201,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(cxgz80_state::display_decay_tick)
 	display_update();
 }
 
-void cxgz80_state::set_display_size(int maxx, int maxy)
+void cxgbase_state::set_display_size(int maxx, int maxy)
 {
 	m_display_maxx = maxx;
 	m_display_maxy = maxy;
 }
 
-void cxgz80_state::display_matrix(int maxx, int maxy, u32 setx, u32 sety, bool update)
+void cxgbase_state::display_matrix(int maxx, int maxy, u32 setx, u32 sety, bool update)
 {
 	set_display_size(maxx, maxy);
 
@@ -209,7 +223,7 @@ void cxgz80_state::display_matrix(int maxx, int maxy, u32 setx, u32 sety, bool u
 
 // generic input handlers
 
-u16 cxgz80_state::read_inputs(int columns)
+u16 cxgbase_state::read_inputs(int columns)
 {
 	u16 ret = 0;
 
@@ -231,14 +245,14 @@ u16 cxgz80_state::read_inputs(int columns)
 
 // TTL
 
-WRITE8_MEMBER(cxgz80_state::ch2001_speaker_on_w)
+WRITE8_MEMBER(ch2001_state::speaker_w)
 {
 	// 74ls109 clock pulse to speaker
 	m_dac->write(1);
 	m_speaker_off->adjust(attotime::from_usec(200)); // not accurate
 }
 
-WRITE8_MEMBER(cxgz80_state::ch2001_leds_w)
+WRITE8_MEMBER(ch2001_state::leds_w)
 {
 	// d0-d7: 74ls273 (WR to CLK)
 	// 74ls273 Q1-Q4: 74ls145 A-D
@@ -251,7 +265,7 @@ WRITE8_MEMBER(cxgz80_state::ch2001_leds_w)
 	display_matrix(8, 10, led_data, m_inp_mux);
 }
 
-READ8_MEMBER(cxgz80_state::ch2001_input_r)
+READ8_MEMBER(ch2001_state::input_r)
 {
 	// d0-d7: multiplexed inputs
 	return ~read_inputs(10);
@@ -265,12 +279,12 @@ READ8_MEMBER(cxgz80_state::ch2001_input_r)
 
 // Chess 2001
 
-void cxgz80_state::ch2001_map(address_map &map)
+void ch2001_state::main_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x47ff).mirror(0x3800).ram();
-	map(0x8000, 0x8000).mirror(0x3fff).rw(FUNC(cxgz80_state::ch2001_input_r), FUNC(cxgz80_state::ch2001_leds_w));
-	map(0xc000, 0xc000).mirror(0x3fff).w(FUNC(cxgz80_state::ch2001_speaker_on_w));
+	map(0x8000, 0x8000).mirror(0x3fff).rw(FUNC(ch2001_state::input_r), FUNC(ch2001_state::leds_w));
+	map(0xc000, 0xc000).mirror(0x3fff).w(FUNC(ch2001_state::speaker_w));
 }
 
 
@@ -279,7 +293,7 @@ void cxgz80_state::ch2001_map(address_map &map)
     Input Ports
 ******************************************************************************/
 
-static INPUT_PORTS_START( cb_magnets )
+INPUT_PORTS_START( cxg_cb_magnets )
 	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
@@ -363,7 +377,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( ch2001 )
-	PORT_INCLUDE( cb_magnets )
+	PORT_INCLUDE( cxg_cb_magnets )
 
 	PORT_START("IN.8")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Black")
@@ -392,20 +406,20 @@ INPUT_PORTS_END
     Machine Drivers
 ******************************************************************************/
 
-void cxgz80_state::ch2001(machine_config &config)
+void ch2001_state::ch2001(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 8_MHz_XTAL/2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &cxgz80_state::ch2001_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ch2001_state::main_map);
 
 	const attotime irq_period = attotime::from_hz(484); // theoretical frequency from 555 timer (22nF, 100K+33K, 1K2), measurement was 568Hz
-	TIMER(config, m_irq_on).configure_periodic(FUNC(cxgz80_state::irq_on<INPUT_LINE_IRQ0>), irq_period);
+	TIMER(config, m_irq_on).configure_periodic(FUNC(ch2001_state::irq_on<INPUT_LINE_IRQ0>), irq_period);
 	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(18300)); // active for 18.3us
-	TIMER(config, "irq_off").configure_periodic(FUNC(cxgz80_state::irq_off<INPUT_LINE_IRQ0>), irq_period);
+	TIMER(config, "irq_off").configure_periodic(FUNC(ch2001_state::irq_off<INPUT_LINE_IRQ0>), irq_period);
 
-	TIMER(config, m_speaker_off).configure_generic(FUNC(cxgz80_state::speaker_off));
+	TIMER(config, m_speaker_off).configure_generic(FUNC(ch2001_state::speaker_off));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(cxgz80_state::display_decay_tick), attotime::from_msec(1));
+	TIMER(config, "display_decay").configure_periodic(FUNC(cxgbase_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_cxg_ch2001);
 
 	/* sound hardware */
@@ -434,4 +448,4 @@ ROM_END
 ******************************************************************************/
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME      FLAGS */
-CONS( 1984, ch2001, 0,      0,      ch2001,  ch2001, cxgz80_state, empty_init, "CXG",   "Chess 2001", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1984, ch2001, 0,      0,      ch2001,  ch2001, ch2001_state, empty_init, "CXG",   "Chess 2001", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
