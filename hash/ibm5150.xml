@@ -3592,6 +3592,18 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="spot">
+		<description>Spot</description>
+		<year>1991</year>
+		<publisher>Virgin Games</publisher>
+		<info name="developer" value="Virgin Mastertronic" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Spot [Virgin Games] [1991] [3.5DD] [Disk 1 of 1].img" size="737280" crc="71084708" sha1="cfd29a97c4fa9fb479525b5907a0567c5fa0a366" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="strecalc">
 		<description>StretchCalc</description>
@@ -7132,6 +7144,35 @@ has been replaced with an all-zero block. -->
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="bartvssm">
+		<description>The Simpsons - Bart vs The Space Mutants</description>
+		<year>1991</year>
+		<publisher>Acclaim / Ocean</publisher>
+		<info name="developer" value="Imagineering Inc." />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="The Simpsons - Bart vs The Space Mutants [Acclaim] [1991] [3.5DD] [Disk A].img" size="737280" crc="d1af2bbc" sha1="a3fc285f27158654497030c71a7e5a28481fc012" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="The Simpsons - Bart vs The Space Mutants [Acclaim] [1991] [3.5DD] [Disk B].img" size="737280" crc="93b23da0" sha1="a7bba2e280a280240cad7b5bed03cc1a51d734a6" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="bartvssma" cloneof="bartvssm">
+		<description>The Simpsons - Bart vs The Space Mutants (Hit-Squad release)</description>
+		<year>1991</year>
+		<publisher>Acclaim / Ocean</publisher>
+		<info name="developer" value="Imagineering Inc." />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="The Simpsons - Bart vs The Space Mutants (Hit-Squad release) [Acclaim] [1991] [3.5DD] [Disk 1 of 1].img" size="737280" crc="06caf370" sha1="a32d288c62f47b574a2e17da5d5173de6f77b15b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="brdtale">
 		<description>The Bard's Tale - Tales of the Unknown (5.25")</description>
@@ -7378,10 +7419,11 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="bublbobl">
-		<description>Bubble Bobble</description>
+		<description>Bubble Bobble (5.25")</description>
 		<year>1989</year>
-		<publisher>Taito America</publisher>
-		<info name="developer" value="Nova Logic" />
+		<publisher>Taito Software</publisher>
+		<info name="developer" value="Taito Software" />
+		<info name="ported by" value="NovaLogic" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Bubble Bobble (USA) (Disk 1).img" size="368640" crc="1dad38e6" sha1="6b2f5f9655ed5002dfd72b33b2cfb857c432752a" offset="0"/>
@@ -7394,6 +7436,21 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="bublbobl35" cloneof="bublbobl">
+		<!-- Dumped via Kryoflux -->
+		<description>Bubble Bobble (3.5")</description>
+		<year>1989</year>
+		<publisher>Taito Software</publisher>
+		<info name="developer" value="Taito Software" />
+		<info name="ported by" value="NovaLogic" />
+		<part name="flop1" interface="floppy_3_5">
+			<!-- Copy-protected key disk -->
+			<dataarea name="flop" size = "2166169">
+				<rom name="Bubble Bobble [Taito] [1989] [3.5DD] [Disk 1 of 1].mfm" size="2166169" crc="11a8c23d" sha1="5e6a8bb49f98deb370de7b146dc4c22c2324e56a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="budokan">
 		<description>Budokan - The Martial Spirit</description>
 		<year>1989</year>
@@ -11056,10 +11113,27 @@ has been replaced with an all-zero block. -->
 	<software name="zool">
 		<description>Zool</description>
 		<year>1993</year>
-		<publisher>Gremlin Graphics</publisher>
+		<publisher>Gremlin Graphics Software</publisher>
+		<info name="developer" value="Gremlin Graphics Software" />
+		<info name="ported by" value="Cygnus Software" />
+		<info name="version" value="10/03/93" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Zool (1993)(Gremlin Graphics).dsk" size="737280" crc="43856c04" sha1="714f5b4d7049b98a1aca94b80a1f32bb1c9da049" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="zoola" cloneof="zool">
+		<description>Zool (Big Games release)</description>
+		<year>1993</year>
+		<publisher>Gremlin Graphics Software</publisher>
+		<info name="developer" value="Gremlin Graphics Software" />
+		<info name="ported by" value="Cygnus Software" />
+		<info name="version" value="14/09/93" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Zool (Big Games release) [Gremlin Graphics] [1993] [3.5DD] [Disk 1 of 1].img" size="737280" crc="249c26b1" sha1="5f7f8920efb21370a21bf3929ed6fd294afead21" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
