@@ -21,6 +21,7 @@
 #include "natkeyboard.h"
 #include "render.h"
 #include <ctype.h>
+#include <algorithm>
 #include <fstream>
 
 
@@ -3215,13 +3216,6 @@ void debugger_commands::execute_memdump(int ref, const std::vector<std::string> 
     execute_symlist - execute the symlist command
 -------------------------------------------------*/
 
-static int CLIB_DECL symbol_sort_compare(const void *item1, const void *item2)
-{
-	const char *str1 = *(const char **)item1;
-	const char *str2 = *(const char **)item2;
-	return strcmp(str1, str2);
-}
-
 void debugger_commands::execute_symlist(int ref, const std::vector<std::string> &params)
 {
 	device_t *cpu = nullptr;
@@ -3257,7 +3251,9 @@ void debugger_commands::execute_symlist(int ref, const std::vector<std::string> 
 
 	/* sort the symbols */
 	if (count > 1)
-		qsort((void *)namelist, count, sizeof(namelist[0]), symbol_sort_compare);
+		std::sort(&namelist[0], &namelist[count], [](const char *item1, const char *item2) {
+			return strcmp(item1, item2) < 0;
+		});
 
 	/* iterate over symbols and print out relevant ones */
 	for (symnum = 0; symnum < count; symnum++)
