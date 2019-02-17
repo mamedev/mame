@@ -67,7 +67,7 @@ void NETLIST_NAME(name)(netlist::nlparse_t &setup)                             \
 #define NETLIST_END()  }
 
 #define LOCAL_SOURCE(name)                                                     \
-		setup.register_source(plib::make_unique<netlist::source_proc_t>(setup, # name, &NETLIST_NAME(name)));
+		setup.register_source(plib::make_unique<netlist::source_proc_t>(# name, &NETLIST_NAME(name)));
 
 #define LOCAL_LIB_ENTRY(name)                                                  \
 		LOCAL_SOURCE(name)                                                     \
@@ -182,24 +182,22 @@ namespace netlist
 
 		using list_t = std::vector<std::unique_ptr<source_t>>;
 
-		source_t(nlparse_t &setup, const type_t type = SOURCE)
-		: m_setup(setup)
-		, m_type(type)
+		source_t(const type_t type = SOURCE)
+		: m_type(type)
 		{}
 
 		COPYASSIGNMOVE(source_t, delete)
 
 		virtual ~source_t() noexcept = default;
 
-		virtual bool parse(const pstring &name);
-		nlparse_t &setup() { return m_setup; }
+		virtual bool parse(nlparse_t &setup, const pstring &name);
+
 		type_t type() const { return m_type; }
 
 	protected:
 		virtual std::unique_ptr<plib::pistream> stream(const pstring &name) = 0;
 
 	private:
-		nlparse_t &m_setup;
 		const type_t m_type;
 	};
 
@@ -400,8 +398,8 @@ namespace netlist
 	{
 	public:
 
-		source_string_t(setup_t &setup, const pstring &source)
-		: source_t(setup), m_str(source)
+		source_string_t(const pstring &source)
+		: source_t(), m_str(source)
 		{
 		}
 
@@ -416,8 +414,8 @@ namespace netlist
 	{
 	public:
 
-		source_file_t(setup_t &setup, const pstring &filename)
-		: source_t(setup), m_filename(filename)
+		source_file_t(const pstring &filename)
+		: source_t(), m_filename(filename)
 		{
 		}
 
@@ -431,8 +429,8 @@ namespace netlist
 	class source_mem_t : public source_t
 	{
 	public:
-		source_mem_t(setup_t &setup, const char *mem)
-		: source_t(setup), m_str(mem)
+		source_mem_t(const char *mem)
+		: source_t(), m_str(mem)
 		{
 		}
 
@@ -446,14 +444,14 @@ namespace netlist
 	class source_proc_t : public source_t
 	{
 	public:
-		source_proc_t(nlparse_t &setup, pstring name, void (*setup_func)(nlparse_t &))
-		: source_t(setup),
+		source_proc_t(pstring name, void (*setup_func)(nlparse_t &))
+		: source_t(),
 			m_setup_func(setup_func),
 			m_setup_func_name(name)
 		{
 		}
 
-		bool parse(const pstring &name) override;
+		bool parse(nlparse_t &setup, const pstring &name) override;
 
 	protected:
 		std::unique_ptr<plib::pistream> stream(const pstring &name) override;

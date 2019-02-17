@@ -120,9 +120,8 @@ NETLIST_END()
 class netlist_data_folder_t : public netlist::source_t
 {
 public:
-	netlist_data_folder_t(netlist::setup_t &setup,
-			pstring folder)
-	: netlist::source_t(setup, netlist::source_t::DATA)
+	netlist_data_folder_t(pstring folder)
+	: netlist::source_t(netlist::source_t::DATA)
 	, m_folder(folder)
 	{
 	}
@@ -189,9 +188,9 @@ public:
 			setup().add_define(d);
 
 		for (auto & r : roms)
-			setup().register_source(plib::make_unique<netlist_data_folder_t>(setup(), r));
+			setup().register_source(plib::make_unique<netlist_data_folder_t>(r));
 
-		setup().register_source(plib::make_unique<netlist::source_file_t>(setup(), filename));
+		setup().register_source(plib::make_unique<netlist::source_file_t>(filename));
 		setup().include(name);
 		create_dynamic_logs(logs);
 
@@ -524,7 +523,7 @@ void tool_app_t::create_header()
 	nt.log().verbose.set_enabled(false);
 	nt.log().warning.set_enabled(false);
 
-	nt.setup().register_source(plib::make_unique<netlist::source_proc_t>(nt.setup(), "dummy", &netlist_dummy));
+	nt.setup().register_source(plib::make_unique<netlist::source_proc_t>("dummy", &netlist_dummy));
 	nt.setup().include("dummy");
 
 	pout("// license:GPL-2.0+\n");
@@ -568,7 +567,7 @@ void tool_app_t::create_docheader()
 	nt.log().verbose.set_enabled(false);
 	nt.log().warning.set_enabled(false);
 
-	nt.setup().register_source(plib::make_unique<netlist::source_proc_t>(nt.setup(), "dummy", &netlist_dummy));
+	nt.setup().register_source(plib::make_unique<netlist::source_proc_t>("dummy", &netlist_dummy));
 	nt.setup().include("dummy");
 
 	std::vector<pstring> devs;
@@ -620,7 +619,7 @@ void tool_app_t::listdevices()
 
 	netlist::factory::list_t &list = nt.setup().factory();
 
-	nt.setup().register_source(plib::make_unique<netlist::source_proc_t>(nt.setup(), "dummy", &netlist_dummy));
+	nt.setup().register_source(plib::make_unique<netlist::source_proc_t>("dummy", &netlist_dummy));
 	nt.setup().include("dummy");
 
 

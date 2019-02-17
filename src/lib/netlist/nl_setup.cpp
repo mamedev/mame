@@ -101,7 +101,7 @@ namespace netlist
 	{
 		for (auto &source : m_sources)
 		{
-			if (source->parse(netlist_name))
+			if (source->parse(*this, netlist_name))
 				return;
 		}
 		log().fatal(MF_1_NOT_FOUND_IN_SOURCE_COLLECTION, netlist_name);
@@ -1136,13 +1136,13 @@ void setup_t::prepare_to_run()
 // base sources
 // ----------------------------------------------------------------------------------------
 
-bool source_t::parse(const pstring &name)
+bool source_t::parse(nlparse_t &setup, const pstring &name)
 {
 	if (m_type != SOURCE)
 		return false;
 	else
 	{
-		return m_setup.parse_stream(stream(name), name);
+		return setup.parse_stream(stream(name), name);
 	}
 }
 
@@ -1164,11 +1164,11 @@ std::unique_ptr<plib::pistream> source_file_t::stream(const pstring &name)
 	return plib::make_unique<plib::pifilestream>(m_filename);
 }
 
-bool source_proc_t::parse(const pstring &name)
+bool source_proc_t::parse(nlparse_t &setup, const pstring &name)
 {
 	if (name == m_setup_func_name)
 	{
-		m_setup_func(setup());
+		m_setup_func(setup);
 		return true;
 	}
 	else

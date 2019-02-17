@@ -1453,18 +1453,15 @@ namespace netlist
 		void print_stats() const;
 
 	private:
+		std::unique_ptr<netlist_state_t>    m_state;
+		devices::NETLIB_NAME(solver) *      m_solver;
+
 		/* mostly rw */
 		PALIGNAS_CACHELINE()
 		netlist_time                        m_time;
-		PALIGNAS_CACHELINE()
 		devices::NETLIB_NAME(mainclock) *   m_mainclock;
 
-		PALIGNAS_CACHELINE()
-		std::unique_ptr<netlist_state_t>    m_state;
-		PALIGNAS_CACHELINE()
 		detail::queue_t                     m_queue;
-
-		devices::NETLIB_NAME(solver) *      m_solver;
 
 		// performance
 		nperftime_t<NL_KEEP_STATISTICS>     m_stat_mainloop;

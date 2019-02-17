@@ -184,6 +184,15 @@ public:
 	void pongd(machine_config &config);
 	void pong(machine_config &config);
 	void pongf(machine_config &config);
+
+	NETLIST_START(pong)
+
+		MEMREGION_SOURCE("maincpu")
+		PARAM(NETLIST.USE_DEACTIVATE, 1)
+		INCLUDE(pong_schematics)
+
+	NETLIST_END()
+
 protected:
 
 	// driver_device overrides
@@ -260,6 +269,7 @@ private:
 
 };
 
+#if 0
 static NETLIST_START(pong)
 
 	MEMREGION_SOURCE("maincpu")
@@ -267,6 +277,7 @@ static NETLIST_START(pong)
 	INCLUDE(pong_schematics)
 
 NETLIST_END()
+#endif
 
 INPUT_CHANGED_MEMBER(pong_state::input_changed)
 {
@@ -379,7 +390,8 @@ MACHINE_CONFIG_START(pong_state::pong)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)
-	MCFG_NETLIST_SETUP(pong)
+	//MCFG_NETLIST_SETUP(pong)
+	MCFG_NETLIST_SETUP_MEMBER(this, &pong_state::NETLIST_NAME(pong))
 
 	MCFG_NETLIST_ANALOG_INPUT("maincpu", "vr0", "ic_b9_R.R")
 	MCFG_NETLIST_ANALOG_MULT_OFFSET(1.0 / 100.0 * RES_K(50), RES_K(56) )

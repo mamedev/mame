@@ -237,13 +237,13 @@ detail::terminal_type detail::core_terminal_t::type() const
 // ----------------------------------------------------------------------------------------
 
 netlist_t::netlist_t(const pstring &aname, std::unique_ptr<callbacks_t> callbacks)
-	: m_time(netlist_time::zero())
-	, m_mainclock(nullptr)
-	, m_state(plib::make_unique<netlist_state_t>(aname,
+	: m_state(plib::make_unique<netlist_state_t>(aname,
 		std::move(callbacks),
 		plib::make_unique<setup_t>(*this))) // FIXME, ugly but needed to have netlist_state_t constructed first
-	, m_queue(*m_state)
 	, m_solver(nullptr)
+	, m_time(netlist_time::zero())
+	, m_mainclock(nullptr)
+	, m_queue(*m_state)
 {
 	devices::initialize_factory(nlstate().setup().factory());
 	NETLIST_NAME(base)(nlstate().setup());

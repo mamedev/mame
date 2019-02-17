@@ -37,6 +37,7 @@ namespace netlist
 		void lock() noexcept{ while (m_lock.test_and_set(std::memory_order_acquire)) { } }
 		void unlock() noexcept { m_lock.clear(std::memory_order_release); }
 	private:
+		PALIGNAS_CACHELINE()
 		std::atomic_flag m_lock = ATOMIC_FLAG_INIT;
 	};
 
@@ -96,7 +97,7 @@ namespace netlist
 
 	/* Use TS = true for a threadsafe queue */
 	template <class T, bool TS, bool KEEPSTAT, class QueueOp = typename T::QueueOp>
-	class PALIGNAS_CACHELINE() timed_queue_linear : plib::nocopyassignmove
+	class timed_queue_linear : plib::nocopyassignmove
 	{
 	public:
 
@@ -192,6 +193,7 @@ namespace netlist
 		using lock_guard_type = std::lock_guard<mutex_type>;
 
 		mutex_type      m_lock;
+		PALIGNAS_CACHELINE()
 		T             * m_end;
 		std::vector<T>  m_list;
 

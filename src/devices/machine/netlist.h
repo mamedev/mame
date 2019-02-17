@@ -11,6 +11,8 @@
 #ifndef MAME_MACHINE_NETLIST_H
 #define MAME_MACHINE_NETLIST_H
 
+#include <functional>
+
 #include "netlist/nl_time.h"
 #include "netlist/netlist_types.h"
 
@@ -31,6 +33,9 @@ namespace netlist {
 
 #define MCFG_NETLIST_SETUP(_setup)                                                  \
 	downcast<netlist_mame_device &>(*device).set_constructor(NETLIST_NAME(_setup));
+
+#define MCFG_NETLIST_SETUP_MEMBER(_obj, _setup)                                \
+	downcast<netlist_mame_device &>(*device).set_constructor(_obj, _setup);
 
 #define MCFG_NETLIST_ANALOG_INPUT(_basetag, _tag, _name)                            \
 	MCFG_DEVICE_ADD(_basetag ":" _tag, NETLIST_ANALOG_INPUT, 0)                     \
@@ -80,9 +85,10 @@ namespace netlist {
 #define NETLIST_ANALOG_PORT_CHANGED(_base, _tag)                                    \
 	PORT_CHANGED_MEMBER(_base ":" _tag, netlist_mame_analog_input_device, input_changed, 0)
 
+/* This macro can only be called from device member */
 
 #define MEMREGION_SOURCE(_name) \
-		netlist_mame_device::register_memregion_source(setup, _name);
+		netlist_mame_device::register_memregion_source(setup, *this,  _name);
 
 #define NETDEV_ANALOG_CALLBACK_MEMBER(_name) \
 	void _name(const double data, const attotime &time)
@@ -102,11 +108,22 @@ public:
 	class netlist_mame_t;
 	class netlist_mame_callbacks_t;
 
+	using func_type = std::function<void(netlist::nlparse_t &)>;
+
 	// construction/destruction
 	netlist_mame_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~netlist_mame_device();
 
-	void set_constructor(void (*setup_func)(netlist::nlparse_t &));
+	void set_constructor(void (*setup_func)(netlist::nlparse_t &))
+	{
+		m_setup_func = func_type(setup_func);
+	}
+
+	template <typename T, typename F>
+	void set_constructor(T *obj, F && f)
+	{
+		m_setup_func = std::move(std::bind(std::forward<F>(f), obj, std::placeholders::_1));
+	}
 
 	ATTR_HOT inline netlist::setup_t &setup();
 	ATTR_HOT inline netlist_mame_t &netlist() { return *m_netlist; }
@@ -114,7 +131,7 @@ public:
 	ATTR_HOT void update_icount(netlist::netlist_time time);
 	ATTR_HOT void check_mame_abort_slice();
 
-	static void register_memregion_source(netlist::nlparse_t &setup, const char *name);
+	static void register_memregion_source(netlist::nlparse_t &setup, device_t &dev, const char *name);
 
 	int m_icount;
 
@@ -145,7 +162,7 @@ private:
 
 	netlist::poolptr<netlist_mame_t> m_netlist;
 
-	void (*m_setup_func)(netlist::nlparse_t &);
+	func_type m_setup_func;
 };
 
 // ----------------------------------------------------------------------------------------
