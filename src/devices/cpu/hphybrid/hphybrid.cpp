@@ -243,11 +243,8 @@ void hp_hybrid_cpu_device::device_start()
 	set_icountptr(m_icount);
 
 	m_pa_changed_func.resolve_safe();
-	m_opcode_func.resolve();
+	m_opcode_func.resolve_safe();
 	m_stm_func.resolve();
-	// Cache active state of m_stm_func & m_opcode_func
-	m_opcode_func_defd = bool(m_opcode_func);
-	m_stm_func_defd = bool(m_stm_func);
 }
 
 void hp_hybrid_cpu_device::device_reset()
@@ -960,7 +957,7 @@ uint16_t hp_hybrid_cpu_device::RM(uint32_t addr)
 		// Any access to internal registers removes forcing of BSC 2x
 		m_forced_bsc_25 = false;
 
-		if (m_stm_func_defd) {
+		if (m_stm_func) {
 			m_stm_func(m_curr_cycle | CYCLE_RAL_MASK | CYCLE_RD_MASK);
 			m_curr_cycle = 0;
 		}
@@ -1029,7 +1026,7 @@ uint16_t hp_hybrid_cpu_device::RM(uint32_t addr)
 		return tmp;
 	} else {
 		m_icount -= m_r_cycles;
-		if (m_stm_func_defd) {
+		if (m_stm_func) {
 			m_stm_func(m_curr_cycle | CYCLE_RD_MASK);
 			m_curr_cycle = 0;
 		}
@@ -1082,7 +1079,7 @@ void hp_hybrid_cpu_device::WM(uint32_t addr , uint16_t v)
 		// Any access to internal registers removes forcing of BSC 2x
 		m_forced_bsc_25 = false;
 
-		if (m_stm_func_defd) {
+		if (m_stm_func) {
 			m_stm_func(m_curr_cycle | CYCLE_RAL_MASK | CYCLE_WR_MASK);
 			m_curr_cycle = 0;
 		}
@@ -1152,7 +1149,7 @@ void hp_hybrid_cpu_device::WM(uint32_t addr , uint16_t v)
 		m_icount -= REGISTER_RW_CYCLES;
 	} else {
 		m_icount -= m_w_cycles;
-		if (m_stm_func_defd) {
+		if (m_stm_func) {
 			m_stm_func(m_curr_cycle | CYCLE_WR_MASK);
 			m_curr_cycle = 0;
 		}
@@ -1201,9 +1198,7 @@ uint16_t hp_hybrid_cpu_device::fetch_at(uint32_t addr)
 {
 	m_curr_cycle |= CYCLE_IFETCH_MASK;
 	uint16_t opcode = RM(addr);
-	if (m_opcode_func_defd) {
-		m_opcode_func(opcode);
-	}
+	m_opcode_func(opcode);
 	return opcode;
 }
 
@@ -1622,7 +1617,7 @@ bool hp_5061_3011_cpu_device::execute_no_bpc(uint16_t opcode , uint16_t& next_pc
 					// 16 bits units.
 					WM(tmp_addr >> 1 , tmp);
 				} else {
-					if (m_stm_func_defd) {
+					if (m_stm_func) {
 						m_stm_func(m_curr_cycle | CYCLE_WR_MASK);
 						m_curr_cycle = 0;
 					}
@@ -1996,7 +1991,7 @@ bool hp_09825_67907_cpu_device::execute_no_bpc(uint16_t opcode , uint16_t& next_
 					// 16 bits units.
 					WM(tmp_addr , tmp);
 				} else {
-					if (m_stm_func_defd) {
+					if (m_stm_func) {
 						m_stm_func(m_curr_cycle | CYCLE_WR_MASK);
 						m_curr_cycle = 0;
 					}

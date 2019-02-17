@@ -299,7 +299,7 @@ namespace netlist
 
 		std::unique_ptr<plib::pistream> get_data_stream(const pstring &name);
 
-		bool parse_stream(std::unique_ptr<plib::pistream> istrm, const pstring &name);
+		bool parse_stream(std::unique_ptr<plib::pistream> &&istrm, const pstring &name);
 
 		/* register a source */
 

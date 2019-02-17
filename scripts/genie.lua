@@ -87,7 +87,7 @@ function addprojectflags()
 		end
 		if version >= 60000 then
 			buildoptions_cpp {
-				--"-flifetime-dse=1",
+				"-flifetime-dse=1",
 			}
 		end
 	end

@@ -750,7 +750,7 @@ namespace netlist
 
 		void update_devs() NL_NOEXCEPT;
 
-		const netlist_time next_scheduled_time() const noexcept { return m_next_scheduled_time; }
+		netlist_time next_scheduled_time() const noexcept { return m_next_scheduled_time; }
 		void set_next_scheduled_time(netlist_time ntime) noexcept { m_next_scheduled_time = ntime; }
 
 		bool isRailNet() const noexcept { return !(m_railterminal == nullptr); }
@@ -1416,7 +1416,7 @@ namespace netlist
 
 		/* run functions */
 
-		const netlist_time time() const NL_NOEXCEPT { return m_time; }
+		netlist_time time() const NL_NOEXCEPT { return m_time; }
 
 		void process_queue(const netlist_time delta) NL_NOEXCEPT;
 		void abort_current_queue_slice() NL_NOEXCEPT { m_queue.retime(detail::queue_t::entry_t(m_time, nullptr)); }

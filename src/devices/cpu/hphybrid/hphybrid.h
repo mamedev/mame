@@ -157,9 +157,7 @@ protected:
 
 	devcb_write8 m_pa_changed_func;
 	uint8_t m_last_pa;
-	bool m_opcode_func_defd;
 	devcb_write16 m_opcode_func;
-	bool m_stm_func_defd;
 	devcb_write8 m_stm_func;
 
 	int m_icount;

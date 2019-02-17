@@ -971,7 +971,7 @@ const logic_family_desc_t *setup_t::family_from_model(const pstring &model)
 // Sources
 // ----------------------------------------------------------------------------------------
 
-bool setup_t::parse_stream(std::unique_ptr<plib::pistream> istrm, const pstring &name)
+bool setup_t::parse_stream(std::unique_ptr<plib::pistream> &&istrm, const pstring &name)
 {
 	return parser_t(std::move(plib::ppreprocessor(&m_defines).process(std::move(istrm))), *this).parse(name);
 }

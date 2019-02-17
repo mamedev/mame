@@ -80,7 +80,7 @@ private:
 
 	static void sdl_callback(void *userdata, Uint8 *stream, int len);
 
-	int lock_buffer();
+	void lock_buffer();
 	void unlock_buffer();
 	void attenuate(int16_t *data, int bytes);
 	void copy_sample_data(bool is_throttled, const int16_t *data, int bytes_to_copy);
@@ -179,7 +179,7 @@ int sound_sdl::ring_buffer::pop(void *data, size_t size)
 //============================================================
 //  lock_buffer
 //============================================================
-int sound_sdl::lock_buffer()
+void sound_sdl::lock_buffer()
 {
 	if (!buf_locked)
 		SDL_LockAudio();
@@ -187,8 +187,6 @@ int sound_sdl::lock_buffer()
 
 	if (LOG_SOUND)
 		*sound_log << "locking\n";
-
-	return 0;
 }
 
 //============================================================
