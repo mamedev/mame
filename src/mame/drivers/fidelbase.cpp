@@ -972,7 +972,7 @@ void ccx_state::prepare_display()
 WRITE8_MEMBER(ccx_state::ppi_porta_w)
 {
 	// d7: enable beeper on falling edge (555 monostable)
-	if (m_beeper && ~data & m_7seg_data & 0x80)
+	if (~data & m_7seg_data & 0x80 && !m_beeper_off->enabled())
 	{
 		m_beeper->set_state(1);
 		m_beeper_off->adjust(attotime::from_msec(80)); // duration is approximate
