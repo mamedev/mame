@@ -182,23 +182,24 @@ void palm_state::palm_map(address_map &map)
     MACHINE DRIVERS
 ***************************************************************************/
 
-MACHINE_CONFIG_START(palm_state::palm)
+void palm_state::palm(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD( "maincpu", M68000, 32768*506 )        /* 16.580608 MHz */
-	MCFG_DEVICE_PROGRAM_MAP( palm_map)
-	MCFG_DEVICE_DISASSEMBLE_OVERRIDE(palm_state, palm_dasm_override)
+	M68000(config, m_maincpu, 32768*506);        /* 16.580608 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &palm_state::palm_map);
+	m_maincpu->set_dasm_override(FUNC(palm_state::palm_dasm_override));
 
-	config.m_minimum_quantum =  attotime::from_hz(60);
+	config.m_minimum_quantum = attotime::from_hz(60);
 
-	MCFG_SCREEN_ADD( "screen", LCD )
-	MCFG_SCREEN_REFRESH_RATE( 60 )
-	MCFG_SCREEN_VBLANK_TIME( ATTOSECONDS_IN_USEC(1260) )
 	/* video hardware */
-	MCFG_SCREEN_VIDEO_ATTRIBUTES( VIDEO_UPDATE_BEFORE_VBLANK )
-	MCFG_SCREEN_SIZE( 160, 220 )
-	MCFG_SCREEN_VISIBLE_AREA( 0, 159, 0, 219 )
-	MCFG_SCREEN_UPDATE_DEVICE(MC68328_TAG, mc68328_device, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(1260));
+	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	screen.set_size(160, 220);
+	screen.set_visarea(0, 159, 0, 219);
+	screen.set_screen_update(MC68328_TAG, FUNC(mc68328_device::screen_update));
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(palm_state::palm_palette), 2);
 
@@ -217,7 +218,7 @@ MACHINE_CONFIG_START(palm_state::palm)
 	m_lsi->out_spim().set(FUNC(palm_state::palm_spim_out));
 	m_lsi->in_spim().set(FUNC(palm_state::palm_spim_in));
 	m_lsi->spim_xch_trigger().set(FUNC(palm_state::palm_spim_exchange));
-MACHINE_CONFIG_END
+}
 
 static INPUT_PORTS_START( palm )
 	PORT_START( "PENX" )
