@@ -1835,6 +1835,8 @@ files {
 
 createMESSProjects(_target, _subtarget, "chessking")
 files {
+	MAME_DIR .. "src/mame/drivers/ckingbase.cpp",
+	MAME_DIR .. "src/mame/includes/ckingbase.h",
 	MAME_DIR .. "src/mame/drivers/cking_master.cpp",
 }
 
@@ -1897,6 +1899,8 @@ files {
 
 createMESSProjects(_target, _subtarget, "cxg")
 files {
+	MAME_DIR .. "src/mame/drivers/cxgbase.cpp",
+	MAME_DIR .. "src/mame/includes/cxgbase.h",
 	MAME_DIR .. "src/mame/drivers/cxg_ch2001.cpp",
 }
 
