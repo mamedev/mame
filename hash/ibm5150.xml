@@ -3593,18 +3593,6 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 	
-	<software name="spot">
-		<description>Spot</description>
-		<year>1991</year>
-		<publisher>Virgin Games</publisher>
-		<info name="developer" value="Virgin Mastertronic" />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "737280">
-				<rom name="Spot [Virgin Games] [1991] [3.5DD] [Disk 1 of 1].img" size="737280" crc="71084708" sha1="cfd29a97c4fa9fb479525b5907a0567c5fa0a366" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="strecalc">
 		<description>StretchCalc</description>
 		<year>1983</year>
@@ -7145,35 +7133,6 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 	
-	<software name="bartvssm">
-		<description>The Simpsons - Bart vs The Space Mutants</description>
-		<year>1991</year>
-		<publisher>Acclaim / Ocean</publisher>
-		<info name="developer" value="Imagineering Inc." />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "737280">
-				<rom name="The Simpsons - Bart vs The Space Mutants [Acclaim] [1991] [3.5DD] [Disk A].img" size="737280" crc="d1af2bbc" sha1="a3fc285f27158654497030c71a7e5a28481fc012" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<dataarea name="flop" size = "737280">
-				<rom name="The Simpsons - Bart vs The Space Mutants [Acclaim] [1991] [3.5DD] [Disk B].img" size="737280" crc="93b23da0" sha1="a7bba2e280a280240cad7b5bed03cc1a51d734a6" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-	
-	<software name="bartvssma" cloneof="bartvssm">
-		<description>The Simpsons - Bart vs The Space Mutants (Hit-Squad release)</description>
-		<year>1991</year>
-		<publisher>Acclaim / Ocean</publisher>
-		<info name="developer" value="Imagineering Inc." />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "737280">
-				<rom name="The Simpsons - Bart vs The Space Mutants (Hit-Squad release) [Acclaim] [1991] [3.5DD] [Disk 1 of 1].img" size="737280" crc="06caf370" sha1="a32d288c62f47b574a2e17da5d5173de6f77b15b" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="brdtale">
 		<description>The Bard's Tale - Tales of the Unknown (5.25")</description>
 		<year>1987</year>
@@ -7280,22 +7239,6 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
-	<software name="batlches">
-		<description>Battle Chess</description>
-		<year>1988</year>
-		<publisher>Interplay</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "737280">
-				<rom name="Battle Chess (1988)(Interplay)(Disk 1 of 2)[cp codebook].dsk" size="737280" crc="21763440" sha1="680ebdcd55b52910df9bd92792f12df5e80d9412" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<dataarea name="flop" size = "737280">
-				<rom name="Battle Chess (1988)(Interplay)(Disk 2 of 2)[cp codebook].dsk" size="737280" crc="8c0a720f" sha1="9a0b9b8adda97a65da4b2a1490c31f605dfef4a8" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<!-- glitches on the bottom of the screen -->
 	<software name="batmanmv" supported="partial">
 		<!-- Dumped via Kryoflux -->
@@ -7317,7 +7260,23 @@ has been replaced with an all-zero block. -->
 			</dataarea>
 		</part>
 	</software>
-	
+
+	<software name="batlches">
+		<description>Battle Chess</description>
+		<year>1988</year>
+		<publisher>Interplay</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Battle Chess (1988)(Interplay)(Disk 1 of 2)[cp codebook].dsk" size="737280" crc="21763440" sha1="680ebdcd55b52910df9bd92792f12df5e80d9412" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Battle Chess (1988)(Interplay)(Disk 2 of 2)[cp codebook].dsk" size="737280" crc="8c0a720f" sha1="9a0b9b8adda97a65da4b2a1490c31f605dfef4a8" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bibpaint">
 		<description>Bible Paint and Learn</description>
 		<year>1992</year>
@@ -8618,6 +8577,20 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="moktar">
+		<!-- Dumped via Kryoflux -->
+		<description>Lagaf': Les Aventures de Moktar - Vol 1: La Zoubida</description>
+		<year>1991</year>
+		<publisher>Titus</publisher>
+		<info name="developer" value="Titus" />
+		<part name="flop1" interface="floppy_3_5">
+			<!-- Copy-protected key disk -->
+			<dataarea name="flop" size = "2162593">
+				<rom name="Les Aventures de Moktar [Titus] [1991] [3.5DD] [Disk 1 of 1].mfm" size="2162593" crc="49c51dbf" sha1="c20705be599f3daac5f98c235bc7a5ddaaead4a6" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="lakecelt">
 		<description>Lakers vs Celtics and the NBA Playoffs</description>
 		<year>1989</year>
@@ -9299,20 +9272,6 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 	
-	<software name="moktar">
-		<!-- Dumped via Kryoflux -->
-		<description>Lagaf': Les Adventures De Moktar - Vol 1: La Zoubida</description>
-		<year>1991</year>
-		<publisher>Titus</publisher>
-		<info name="developer" value="Titus" />
-		<part name="flop1" interface="floppy_3_5">
-			<!-- Copy-protected key disk -->
-			<dataarea name="flop" size = "2162593">
-				<rom name="Les Adventures De Moktar [Titus] [1991] [3.5DD] [Disk 1 of 1].mfm" size="2162593" crc="49c51dbf" sha1="c20705be599f3daac5f98c235bc7a5ddaaead4a6" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="monopoly">
 		<description>Monopoly v2.00 (Shareware)</description>
 		<year>1989</year>
@@ -9477,7 +9436,7 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<!-- matches dump of 3.5" "International Version" -->
-	<software name="nova9a" cloneof ="nova9">
+	<software name="nova9a" cloneof="nova9">
 		<description>Nova 9: The Return of Gir Draxon (version 1.0)</description>
 		<year>1991</year>
 		<publisher>Sierra</publisher>
@@ -10304,6 +10263,35 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="bartvssm">
+		<description>The Simpsons - Bart vs. the Space Mutants</description>
+		<year>1991</year>
+		<publisher>Acclaim / Ocean</publisher>
+		<info name="developer" value="Imagineering Inc." />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="The Simpsons - Bart vs. the Space Mutants [Acclaim] [1991] [3.5DD] [Disk A].img" size="737280" crc="d1af2bbc" sha1="a3fc285f27158654497030c71a7e5a28481fc012" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="The Simpsons - Bart vs. the Space Mutants [Acclaim] [1991] [3.5DD] [Disk B].img" size="737280" crc="93b23da0" sha1="a7bba2e280a280240cad7b5bed03cc1a51d734a6" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="bartvssma" cloneof="bartvssm">
+		<description>The Simpsons - Bart vs. the Space Mutants (Hit-Squad release)</description>
+		<year>1991</year>
+		<publisher>Acclaim / Ocean</publisher>
+		<info name="developer" value="Imagineering Inc." />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="The Simpsons - Bart vs. the Space Mutants (Hit-Squad release) [Acclaim] [1991] [3.5DD] [Disk 1 of 1].img" size="737280" crc="06caf370" sha1="a32d288c62f47b574a2e17da5d5173de6f77b15b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="skatedie">
 		<description>Skate or Die (5.25")</description>
 		<year>1988</year>
@@ -10416,6 +10404,18 @@ has been replaced with an all-zero block. -->
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Speedball 2 - Brutal Deluxe (1990)(Imageworks)(Disk 2 of 2).dsk" size="368640" crc="09fc221a" sha1="a71468919cb0d32706de00dae2cc14ca0b471a62" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spot">
+		<description>Spot</description>
+		<year>1991</year>
+		<publisher>Virgin Games</publisher>
+		<info name="developer" value="Virgin Mastertronic" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Spot [Virgin Games] [1991] [3.5DD] [Disk 1 of 1].img" size="737280" crc="71084708" sha1="cfd29a97c4fa9fb479525b5907a0567c5fa0a366" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10949,17 +10949,6 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
-	<software name="wclead">
-		<description>World Class Leader Board</description>
-		<year>1988</year>
-		<publisher>Access Software</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size = "368640">
-				<rom name="World Class Leader Board [1988] [Access Software] [5.25] [1 of 1].img" size="368640" crc="73172ed6" sha1="08fdd895bcaace7ec060fb82a4461871603c9816" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="wndrland">
 		<!-- Dumped via Kryoflux, track 0 shows as modified on all disks -->
 		<description>Wonderland</description>
@@ -10989,6 +10978,17 @@ has been replaced with an all-zero block. -->
 		<part name="flop5" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="disk5.img" size="737280" crc="3c52c940" sha1="f383946bcf6c93a04011ae55203366150af7d920" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wclead">
+		<description>World Class Leader Board</description>
+		<year>1988</year>
+		<publisher>Access Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="World Class Leader Board [1988] [Access Software] [5.25] [1 of 1].img" size="368640" crc="73172ed6" sha1="08fdd895bcaace7ec060fb82a4461871603c9816" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
