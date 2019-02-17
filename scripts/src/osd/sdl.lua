@@ -107,7 +107,7 @@ function maintargetosdoptions(_target,_subtarget)
 		targetprefix "sdl"
 		links {
 			"psapi",
-			"Ole32",
+			"ole32",
 		}
 	configuration { }
 
