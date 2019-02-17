@@ -213,7 +213,7 @@ private:
 class netlist_source_memregion_t : public netlist::source_t
 {
 public:
-	netlist_source_memregion_t(netlist::setup_t &setup, pstring name)
+	netlist_source_memregion_t(netlist::nlparse_t &setup, pstring name)
 	: netlist::source_t(setup), m_name(name)
 	{
 	}
@@ -238,7 +238,7 @@ public:
 
 std::unique_ptr<plib::pistream> netlist_source_memregion_t::stream(const pstring &name)
 {
-	memory_region *mem = static_cast<netlist_mame_device::netlist_mame_t &>(setup().exec()).machine().root_device().memregion(m_name.c_str());
+	memory_region *mem = static_cast<netlist_mame_device::netlist_mame_t &>(setup().setup().exec()).machine().root_device().memregion(m_name.c_str());
 	return plib::make_unique<plib::pimemstream>(mem->base(), mem->bytes());
 }
 
@@ -249,7 +249,7 @@ netlist_data_memregions_t::netlist_data_memregions_t(netlist::setup_t &setup)
 
 std::unique_ptr<plib::pistream> netlist_data_memregions_t::stream(const pstring &name)
 {
-	memory_region *mem = static_cast<netlist_mame_device::netlist_mame_t &>(setup().exec()).parent().memregion(name.c_str());
+	memory_region *mem = static_cast<netlist_mame_device::netlist_mame_t &>(setup().setup().exec()).parent().memregion(name.c_str());
 	if (mem != nullptr)
 	{
 		return plib::make_unique<plib::pimemstream>(mem->base(), mem->bytes());
@@ -454,7 +454,7 @@ netlist::setup_t &netlist_mame_device::setup()
 	return m_netlist->nlstate().setup();
 }
 
-void netlist_mame_device::register_memregion_source(netlist::setup_t &setup, const char *name)
+void netlist_mame_device::register_memregion_source(netlist::nlparse_t &setup, const char *name)
 {
 	setup.register_source(plib::make_unique<netlist_source_memregion_t>(setup, pstring(name)));
 }
@@ -826,7 +826,7 @@ netlist_mame_device::~netlist_mame_device()
 	LOGDEVCALLS("~netlist_mame_device\n");
 }
 
-void netlist_mame_device::set_constructor(void (*setup_func)(netlist::setup_t &))
+void netlist_mame_device::set_constructor(void (*setup_func)(netlist::nlparse_t &))
 {
 	if (LOG_DEV_CALLS) logerror("set_constructor\n");
 	m_setup_func = setup_func;

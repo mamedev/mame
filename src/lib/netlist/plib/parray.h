@@ -66,11 +66,11 @@ namespace plib {
 		{
 		}
 
-#if 0
+#if 1
 		/* allow construction in fixed size arrays */
 		template <int X = SIZE >
-		parray(typename std::enable_if<X==0, int>::type = 0)
-		: m_size(0)
+		parray(typename std::enable_if<(X > 0), int>::type = 0)
+		: m_size(X)
 		{
 		}
 #endif

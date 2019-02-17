@@ -19,6 +19,7 @@ class nld_sound_in;
 
 namespace netlist {
 	class setup_t;
+	class nlparse_t;
 	template <typename T>
 	class param_num_t;
 	class param_ptr_t;
@@ -105,7 +106,7 @@ public:
 	netlist_mame_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~netlist_mame_device();
 
-	void set_constructor(void (*setup_func)(netlist::setup_t &));
+	void set_constructor(void (*setup_func)(netlist::nlparse_t &));
 
 	ATTR_HOT inline netlist::setup_t &setup();
 	ATTR_HOT inline netlist_mame_t &netlist() { return *m_netlist; }
@@ -113,7 +114,7 @@ public:
 	ATTR_HOT void update_icount(netlist::netlist_time time);
 	ATTR_HOT void check_mame_abort_slice();
 
-	static void register_memregion_source(netlist::setup_t &setup, const char *name);
+	static void register_memregion_source(netlist::nlparse_t &setup, const char *name);
 
 	int m_icount;
 
@@ -144,7 +145,7 @@ private:
 
 	netlist::poolptr<netlist_mame_t> m_netlist;
 
-	void (*m_setup_func)(netlist::setup_t &);
+	void (*m_setup_func)(netlist::nlparse_t &);
 };
 
 // ----------------------------------------------------------------------------------------

@@ -11,9 +11,9 @@
 
 #include <vector>
 
+#include "netlist_types.h"
 #include "plib/palloc.h"
 #include "plib/ptypes.h"
-#include "netlist_types.h"
 
 #define NETLIB_DEVICE_IMPL_ALIAS(p_alias, chip, p_name, p_def_param) \
 	NETLIB_DEVICE_IMPL_BASE(devices, p_alias, chip, p_name, p_def_param) \

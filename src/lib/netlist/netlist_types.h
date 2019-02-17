@@ -15,8 +15,8 @@
 #include "nl_config.h"
 #include "plib/pchrono.h"
 #include "plib/pfmtlog.h"
-#include "plib/pstring.h"
 #include "plib/pmempool.h"
+#include "plib/pstring.h"
 
 
 namespace netlist

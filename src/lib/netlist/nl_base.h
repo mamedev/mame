@@ -19,10 +19,10 @@
 #include "plib/palloc.h" // owned_ptr
 #include "plib/pdynlib.h"
 #include "plib/pfmtlog.h"
+#include "plib/pmempool.h"
 #include "plib/ppmf.h"
 #include "plib/pstate.h"
 #include "plib/pstream.h"
-#include "plib/pmempool.h"
 
 #include "netlist_types.h"
 #include "nl_errstr.h"
@@ -1454,7 +1454,9 @@ namespace netlist
 
 	private:
 		/* mostly rw */
+		PALIGNAS_CACHELINE()
 		netlist_time                        m_time;
+		PALIGNAS_CACHELINE()
 		devices::NETLIB_NAME(mainclock) *   m_mainclock;
 
 		PALIGNAS_CACHELINE()

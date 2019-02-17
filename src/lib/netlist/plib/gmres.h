@@ -145,10 +145,10 @@ namespace plib
 		static constexpr const std::size_t storage_N = plib::sizeabs<FT, SIZE>::ABS();
 
 		gmres_t(std::size_t size)
-			: m_use_more_precise_stop_condition(false)
-			, residual(size)
+			: residual(size)
 			, Ax(size)
 			, m_size(size)
+			, m_use_more_precise_stop_condition(false)
 			{
 			}
 
@@ -326,23 +326,24 @@ namespace plib
 
 	private:
 
-		bool m_use_more_precise_stop_condition;
-
 		//typedef typename plib::mat_cr_t<FT, SIZE>::index_type mattype;
 
 		plib::parray<float_type, SIZE> residual;
 		plib::parray<float_type, SIZE> Ax;
 
-		std::array<float_type, RESTART + 1> m_c;  			/* mr + 1 */
-		std::array<float_type, RESTART + 1> m_g;  			/* mr + 1 */
-		std::array<std::array<float_type, RESTART>, RESTART + 1> m_ht;  /* (mr + 1), mr */
-		std::array<float_type, RESTART + 1> m_s;   			/* mr + 1 */
-		std::array<float_type, RESTART + 1> m_y;       		/* mr + 1 */
+		plib::parray<float_type, RESTART + 1> m_c;  			/* mr + 1 */
+		plib::parray<float_type, RESTART + 1> m_g;  			/* mr + 1 */
+		plib::parray<plib::parray<float_type, RESTART>, RESTART + 1> m_ht;  /* (mr + 1), mr */
+		plib::parray<float_type, RESTART + 1> m_s;   			/* mr + 1 */
+		plib::parray<float_type, RESTART + 1> m_y;       		/* mr + 1 */
 
 		//plib::parray<float_type, SIZE> m_v[RESTART + 1];  /* mr + 1, n */
 		std::array<std::array<float_type, storage_N>, RESTART + 1> m_v;  /* mr + 1, n */
 
 		std::size_t m_size;
+
+		bool m_use_more_precise_stop_condition;
+
 
 	};
 
