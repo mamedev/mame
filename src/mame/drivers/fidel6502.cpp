@@ -19,6 +19,7 @@
       Is the problem here is due to timing of CPU addressbus changes? We can only 'sense'
       the addressbus at read or write accesses.
     - granits gives error beeps at start, need to press clear to play
+	- granits buttons seem too sensitive
     - finish fphantom emulation
 
 ******************************************************************************
@@ -30,8 +31,8 @@ Memory map:
 -----------
 0000-07FF: 2K of RAM
 0800-0FFF: 1K of RAM (note: mirrored twice)
-1000-17FF: PIA 0 (display, TSI speech chip)
-1800-1FFF: PIA 1 (keypad, LEDs)
+1000-17FF: PIA 1 (display, TSI speech chip)
+1800-1FFF: PIA 0 (keypad, LEDs)
 2000-3FFF: 101-64019 ROM*
 4000-7FFF: mirror of 0000-3FFF
 8000-9FFF: not used
@@ -50,7 +51,7 @@ NMI is not used.
 IRQ is connected to a 600Hz oscillator (38.4KHz divided by 64).
 Reset is connected to a power-on reset circuit.
 
-PIA 0:
+PIA 1:
 ------
 PA0 - 7seg segments E, TSI A0
 PA1 - 7seg segments D, TSI A1
@@ -76,7 +77,7 @@ CA2 - violet wire
 CB1 - NC
 CB2 - NC (connects to pin 14 of soldered connector)
 
-PIA 1:
+PIA 0:
 ------
 PA0 - button row 1
 PA1 - button row 2
@@ -102,7 +103,7 @@ CA2 - selector bit 3
 CB1 - button row 8
 CB2 - selector bit 2
 
-Selector: (attached to PIA 1, outputs 1 of 10 pins low. 7442)
+Selector: (attached to PIA 0, outputs 1 of 10 pins low. 7442)
 ---------
 output # (selected turns this column on, and all others off)
 0 - LED column A, button column A, 7seg digit 1
@@ -142,7 +143,7 @@ column D - LV
 column E - DM
 column F - ST
 
-these 6 buttons use row 9 (connects to PIA 0)
+these 6 buttons use row 9 (connects to PIA 1)
 
 LED display:
 ------------
@@ -184,7 +185,7 @@ Another distinction is the board color and layout, the 1981 version is green.
 8*(8+1) buttons, 8*8+1 LEDs
 1KB RAM(2*2114), 4KB ROM
 MOS MPS 6502B CPU, frequency unknown
-MOS MPS 6520 PIA, I/O is nearly same as CSC's PIA 1
+MOS MPS 6520 PIA, I/O is nearly same as CSC's PIA 0
 PCB label 510-1035A01
 
 
@@ -481,22 +482,11 @@ public:
 		m_div_config(*this, "div_config")
 	{ }
 
-	void csc(machine_config &config);
-	void su9(machine_config &config);
-	void rsc(machine_config &config);
-	DECLARE_INPUT_CHANGED_MEMBER(su9_cpu_freq);
-
 	void eas_base(machine_config &config);
 	void eas(machine_config &config);
 	void eag(machine_config &config);
 	void pc(machine_config &config);
 	void init_eag();
-
-	void sc9b(machine_config &config);
-	void sc9c(machine_config &config);
-	void sc9d(machine_config &config);
-	void playmatic(machine_config &config);
-	DECLARE_INPUT_CHANGED_MEMBER(sc9c_cpu_freq);
 
 	void sc12_map(address_map &map);
 	void sc12(machine_config &config);
@@ -504,23 +494,8 @@ public:
 
 	void as12(machine_config &config);
 
-	void fexcel(machine_config &config);
-	void fexcelb(machine_config &config);
-	void fexcel4(machine_config &config);
-	void fexceld(machine_config &config);
-	void fexcelv(machine_config &config);
-	void fexcelp(machine_config &config);
-	void granits(machine_config &config);
-	void fdes2100(machine_config &config);
-	void fdes2000(machine_config &config);
-	DECLARE_INPUT_CHANGED_MEMBER(fexcelv_bankswitch);
-
 	void fphantom(machine_config &config);
 	void init_fphantom();
-
-	void chesster(machine_config &config);
-	void kishon(machine_config &config);
-	void init_chesster();
 
 private:
 	// devices/pointers
@@ -535,28 +510,9 @@ private:
 	void div_trampoline(address_map &map);
 	u16 m_div_status;
 
-	// CSC, SU9, RSC
-	void csc_prepare_display();
-	DECLARE_READ8_MEMBER(csc_speech_r);
-	DECLARE_WRITE8_MEMBER(csc_pia0_pa_w);
-	DECLARE_WRITE8_MEMBER(csc_pia0_pb_w);
-	DECLARE_READ8_MEMBER(csc_pia0_pb_r);
-	DECLARE_WRITE_LINE_MEMBER(csc_pia0_ca2_w);
-	DECLARE_WRITE8_MEMBER(csc_pia1_pa_w);
-	DECLARE_WRITE8_MEMBER(csc_pia1_pb_w);
-	DECLARE_READ8_MEMBER(csc_pia1_pa_r);
-	DECLARE_WRITE_LINE_MEMBER(csc_pia1_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(csc_pia1_cb2_w);
-	DECLARE_READ_LINE_MEMBER(csc_pia1_ca1_r);
-	DECLARE_READ_LINE_MEMBER(csc_pia1_cb1_r);
-	DECLARE_MACHINE_RESET(su9);
-	void su9_set_cpu_freq();
-	void csc_map(address_map &map);
-	void su9_map(address_map &map);
-	void rsc_map(address_map &map);
-
 	// EAS, EAG, PC
 	void eas_prepare_display();
+	DECLARE_READ8_MEMBER(eas_speech_r);
 	DECLARE_WRITE8_MEMBER(eas_segment_w);
 	DECLARE_WRITE8_MEMBER(eas_led_w);
 	DECLARE_READ8_MEMBER(eas_input_r);
@@ -566,17 +522,6 @@ private:
 	void eas_map(address_map &map);
 	void eag_map(address_map &map);
 	void pc_map(address_map &map);
-
-	// SC9
-	void sc9_prepare_display();
-	DECLARE_WRITE8_MEMBER(sc9_control_w);
-	DECLARE_WRITE8_MEMBER(sc9_led_w);
-	DECLARE_READ8_MEMBER(sc9_input_r);
-	DECLARE_READ8_MEMBER(sc9d_input_r);
-	DECLARE_MACHINE_RESET(sc9c);
-	void sc9c_set_cpu_freq();
-	void sc9_map(address_map &map);
-	void sc9d_map(address_map &map);
 
 	// SC12
 	DECLARE_WRITE8_MEMBER(sc12_control_w);
@@ -589,26 +534,12 @@ private:
 	DECLARE_READ8_MEMBER(as12_input_r);
 	void as12_map(address_map &map);
 
-	// Excellence
-	DECLARE_READ8_MEMBER(fexcelv_speech_r);
-	DECLARE_WRITE8_MEMBER(fexcel_ttl_w);
-	DECLARE_READ8_MEMBER(fexcelb_ttl_r);
-	DECLARE_READ8_MEMBER(fexcel_ttl_r);
-	void fexcel_map(address_map &map);
-	void fexcelb_map(address_map &map);
-	void fexcelp_map(address_map &map);
 
 
 	// Phantom
 	DECLARE_MACHINE_RESET(fphantom);
 	void fphantom_map(address_map &map);
 
-	// Chesster
-	DECLARE_WRITE8_MEMBER(chesster_control_w);
-	DECLARE_WRITE8_MEMBER(kishon_control_w);
-	DECLARE_READ8_MEMBER(chesster_input_r);
-	void chesster_map(address_map &map);
-	void kishon_map(address_map &map);
 
 protected:
 	virtual void machine_start() override;
@@ -631,6 +562,167 @@ void fidel6502_state::machine_reset()
 	fidelbase_state::machine_reset();
 
 	m_div_status = ~0;
+}
+
+
+class sc9_state : public fidelbase_state
+{
+public:
+	sc9_state(const machine_config &mconfig, device_type type, const char *tag) :
+		fidelbase_state(mconfig, type, tag)
+	{ }
+
+	void sc9b(machine_config &config);
+	void sc9c(machine_config &config);
+	void sc9d(machine_config &config);
+	void playmatic(machine_config &config);
+
+protected:
+	// SC9
+	void sc9_prepare_display();
+	DECLARE_WRITE8_MEMBER(sc9_control_w);
+	DECLARE_WRITE8_MEMBER(sc9_led_w);
+	DECLARE_READ8_MEMBER(sc9_input_r);
+	DECLARE_READ8_MEMBER(sc9d_input_r);
+	void sc9_map(address_map &map);
+	void sc9d_map(address_map &map);
+};
+
+class sc9c_state : public sc9_state
+{
+public:
+	sc9c_state(const machine_config &mconfig, device_type type, const char *tag) :
+		sc9_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_INPUT_CHANGED_MEMBER(sc9c_cpu_freq) { sc9c_set_cpu_freq(); }
+
+protected:
+	virtual void machine_reset() override;
+	void sc9c_set_cpu_freq();
+};
+
+void sc9c_state::machine_reset()
+{
+	sc9_state::machine_reset();
+	sc9c_set_cpu_freq();
+}
+
+void sc9c_state::sc9c_set_cpu_freq()
+{
+	// SC9(C01) was released with 1.5MHz, 1.6MHz, or 1.9MHz CPU
+	u8 inp = ioport("FAKE")->read();
+	m_maincpu->set_unscaled_clock((inp & 2) ? 1900000 : ((inp & 1) ? 1600000 : 1500000));
+}
+
+
+
+
+
+class excel_state : public fidelbase_state
+{
+public:
+	excel_state(const machine_config &mconfig, device_type type, const char *tag) :
+		fidelbase_state(mconfig, type, tag)
+	{ }
+
+	void fexcel(machine_config &config);
+	void fexcelb(machine_config &config);
+	void fexcel4(machine_config &config);
+	void fexceld(machine_config &config);
+	void fexcelv(machine_config &config);
+	void fexcelp(machine_config &config);
+	void granits(machine_config &config);
+	void fdes2100(machine_config &config);
+	void fdes2000(machine_config &config);
+	DECLARE_INPUT_CHANGED_MEMBER(fexcelv_bankswitch);
+
+private:
+	DECLARE_READ8_MEMBER(fexcelv_speech_r);
+	DECLARE_WRITE8_MEMBER(fexcel_ttl_w);
+	DECLARE_READ8_MEMBER(fexcelb_ttl_r);
+	void fexcel_map(address_map &map);
+	void fexcelb_map(address_map &map);
+};
+
+
+class chesster_state : public fidelbase_state
+{
+public:
+	chesster_state(const machine_config &mconfig, device_type type, const char *tag) :
+		fidelbase_state(mconfig, type, tag)
+	{ }
+
+	void chesster(machine_config &config);
+	void kishon(machine_config &config);
+	void init_chesster();
+
+private:
+	int m_numbanks;
+
+	DECLARE_WRITE8_MEMBER(chesster_control_w);
+	DECLARE_READ8_MEMBER(chesster_input_r);
+	void chesster_map(address_map &map);
+};
+
+
+
+class csc_state : public fidelbase_state
+{
+public:
+	csc_state(const machine_config &mconfig, device_type type, const char *tag) :
+		fidelbase_state(mconfig, type, tag),
+		m_pia(*this, "pia%u", 0)
+	{ }
+
+	void csc(machine_config &config);
+	void su9(machine_config &config);
+	void rsc(machine_config &config);
+
+protected:
+	optional_device_array<pia6821_device, 2> m_pia;
+	void csc_prepare_display();
+	DECLARE_READ8_MEMBER(csc_speech_r);
+	DECLARE_WRITE8_MEMBER(csc_pia0_pa_w);
+	DECLARE_WRITE8_MEMBER(csc_pia0_pb_w);
+	DECLARE_READ8_MEMBER(csc_pia0_pa_r);
+	DECLARE_WRITE_LINE_MEMBER(csc_pia0_ca2_w);
+	DECLARE_WRITE_LINE_MEMBER(csc_pia0_cb2_w);
+	DECLARE_READ_LINE_MEMBER(csc_pia0_ca1_r);
+	DECLARE_READ_LINE_MEMBER(csc_pia0_cb1_r);
+	DECLARE_WRITE8_MEMBER(csc_pia1_pa_w);
+	DECLARE_WRITE8_MEMBER(csc_pia1_pb_w);
+	DECLARE_READ8_MEMBER(csc_pia1_pb_r);
+	DECLARE_WRITE_LINE_MEMBER(csc_pia1_ca2_w);
+	void csc_map(address_map &map);
+	void su9_map(address_map &map);
+	void rsc_map(address_map &map);
+};
+
+class su9_state : public csc_state
+{
+public:
+	su9_state(const machine_config &mconfig, device_type type, const char *tag) :
+		csc_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_INPUT_CHANGED_MEMBER(su9_cpu_freq) { su9_set_cpu_freq(); }
+
+protected:
+	virtual void machine_reset() override;
+	void su9_set_cpu_freq();
+};
+
+void su9_state::machine_reset()
+{
+	csc_state::machine_reset();
+	su9_set_cpu_freq();
+}
+
+void su9_state::su9_set_cpu_freq()
+{
+	// SU9 CPU is clocked 1.95MHz, DS9 is 2.5MHz
+	m_maincpu->set_unscaled_clock((ioport("FAKE")->read() & 1) ? (5_MHz_XTAL/2) : (3.9_MHz_XTAL/2));
 }
 
 
@@ -695,7 +787,7 @@ void fidel6502_state::div_trampoline(address_map &map)
 	map(0x0000, 0xffff).rw(FUNC(fidel6502_state::div_trampoline_r), FUNC(fidel6502_state::div_trampoline_w));
 }
 
-static INPUT_PORTS_START( cpu_div_2 )
+INPUT_PORTS_START( fidel_cpu_div_2 )
 	PORT_START("div_config") // hardwired, default to /2
 	PORT_CONFNAME( 0x03, 0x02, "CPU Divider" )
 	PORT_CONFSETTING(    0x00, "Disabled" )
@@ -703,7 +795,7 @@ static INPUT_PORTS_START( cpu_div_2 )
 	PORT_CONFSETTING(    0x03, "4" )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( cpu_div_4 )
+INPUT_PORTS_START( fidel_cpu_div_4 )
 	PORT_START("div_config") // hardwired, default to /4
 	PORT_CONFNAME( 0x03, 0x03, "CPU Divider" )
 	PORT_CONFSETTING(    0x00, "Disabled" )
@@ -721,7 +813,7 @@ INPUT_PORTS_END
 
 // misc handlers
 
-void fidel6502_state::csc_prepare_display()
+void csc_state::csc_prepare_display()
 {
 	// 7442 0-8: led select, input mux
 	m_inp_mux = 1 << m_led_select & 0x3ff;
@@ -734,27 +826,64 @@ void fidel6502_state::csc_prepare_display()
 	display_matrix(16, 9, m_led_data << 8 | m_7seg_data, m_inp_mux);
 }
 
-READ8_MEMBER(fidel6502_state::csc_speech_r)
+READ8_MEMBER(csc_state::csc_speech_r)
 {
 	return m_speech_rom[m_speech_bank << 12 | offset];
-}
-
-void fidel6502_state::su9_set_cpu_freq()
-{
-	// SU9 CPU is clocked 1.95MHz, DS9 is 2.5MHz
-	m_maincpu->set_unscaled_clock((ioport("FAKE")->read() & 1) ? (5_MHz_XTAL/2) : (3.9_MHz_XTAL/2));
-}
-
-MACHINE_RESET_MEMBER(fidel6502_state, su9)
-{
-	fidel6502_state::machine_reset();
-	su9_set_cpu_freq();
 }
 
 
 // 6821 PIA 0
 
-WRITE8_MEMBER(fidel6502_state::csc_pia0_pa_w)
+READ8_MEMBER(csc_state::csc_pia0_pa_r)
+{
+	// d0-d5: button row 0-5 (active low)
+	return (read_inputs(9) & 0x3f) ^ 0xff;
+}
+
+WRITE8_MEMBER(csc_state::csc_pia0_pa_w)
+{
+	// d6,d7: 7442 A0,A1
+	m_led_select = (m_led_select & ~3) | (data >> 6 & 3);
+	csc_prepare_display();
+}
+
+WRITE8_MEMBER(csc_state::csc_pia0_pb_w)
+{
+	// d0-d7: led row data
+	m_led_data = data;
+	csc_prepare_display();
+}
+
+READ_LINE_MEMBER(csc_state::csc_pia0_ca1_r)
+{
+	// button row 6 (active low)
+	return ~read_inputs(9) >> 6 & 1;
+}
+
+READ_LINE_MEMBER(csc_state::csc_pia0_cb1_r)
+{
+	// button row 7 (active low)
+	return ~read_inputs(9) >> 7 & 1;
+}
+
+WRITE_LINE_MEMBER(csc_state::csc_pia0_cb2_w)
+{
+	// 7442 A2
+	m_led_select = (m_led_select & ~4) | (state ? 4 : 0);
+	csc_prepare_display();
+}
+
+WRITE_LINE_MEMBER(csc_state::csc_pia0_ca2_w)
+{
+	// 7442 A3
+	m_led_select = (m_led_select & ~8) | (state ? 8 : 0);
+	csc_prepare_display();
+}
+
+
+// 6821 PIA 1
+
+WRITE8_MEMBER(csc_state::csc_pia1_pa_w)
 {
 	// d0-d5: TSI C0-C5
 	m_speech->data_w(space, 0, data & 0x3f);
@@ -764,7 +893,7 @@ WRITE8_MEMBER(fidel6502_state::csc_pia0_pa_w)
 	csc_prepare_display();
 }
 
-WRITE8_MEMBER(fidel6502_state::csc_pia0_pb_w)
+WRITE8_MEMBER(csc_state::csc_pia1_pb_w)
 {
 	// d0: speech ROM A12
 	m_speech->force_update(); // update stream to now
@@ -777,7 +906,7 @@ WRITE8_MEMBER(fidel6502_state::csc_pia0_pb_w)
 	m_speech->set_output_gain(0, (data & 0x10) ? 0.5 : 1.0);
 }
 
-READ8_MEMBER(fidel6502_state::csc_pia0_pb_r)
+READ8_MEMBER(csc_state::csc_pia1_pb_r)
 {
 	// d2: printer?
 	u8 data = 0x04;
@@ -793,59 +922,11 @@ READ8_MEMBER(fidel6502_state::csc_pia0_pb_r)
 	return data;
 }
 
-WRITE_LINE_MEMBER(fidel6502_state::csc_pia0_ca2_w)
+WRITE_LINE_MEMBER(csc_state::csc_pia1_ca2_w)
 {
 	// printer?
 }
 
-
-// 6821 PIA 1
-
-READ8_MEMBER(fidel6502_state::csc_pia1_pa_r)
-{
-	// d0-d5: button row 0-5 (active low)
-	return (read_inputs(9) & 0x3f) ^ 0xff;
-}
-
-WRITE8_MEMBER(fidel6502_state::csc_pia1_pa_w)
-{
-	// d6,d7: 7442 A0,A1
-	m_led_select = (m_led_select & ~3) | (data >> 6 & 3);
-	csc_prepare_display();
-}
-
-WRITE8_MEMBER(fidel6502_state::csc_pia1_pb_w)
-{
-	// d0-d7: led row data
-	m_led_data = data;
-	csc_prepare_display();
-}
-
-READ_LINE_MEMBER(fidel6502_state::csc_pia1_ca1_r)
-{
-	// button row 6 (active low)
-	return ~read_inputs(9) >> 6 & 1;
-}
-
-READ_LINE_MEMBER(fidel6502_state::csc_pia1_cb1_r)
-{
-	// button row 7 (active low)
-	return ~read_inputs(9) >> 7 & 1;
-}
-
-WRITE_LINE_MEMBER(fidel6502_state::csc_pia1_cb2_w)
-{
-	// 7442 A2
-	m_led_select = (m_led_select & ~4) | (state ? 4 : 0);
-	csc_prepare_display();
-}
-
-WRITE_LINE_MEMBER(fidel6502_state::csc_pia1_ca2_w)
-{
-	// 7442 A3
-	m_led_select = (m_led_select & ~8) | (state ? 8 : 0);
-	csc_prepare_display();
-}
 
 
 
@@ -860,6 +941,11 @@ void fidel6502_state::eas_prepare_display()
 	// 4/8 7seg leds+H, 8*8(+1) chessboard leds
 	set_display_segmask(0x1ef, 0x7f);
 	display_matrix(16, 9, m_led_data << 8 | m_7seg_data, m_led_select);
+}
+
+READ8_MEMBER(fidel6502_state::eas_speech_r)
+{
+	return m_speech_rom[m_speech_bank << 12 | offset];
 }
 
 WRITE8_MEMBER(fidel6502_state::eas_segment_w)
@@ -950,13 +1036,13 @@ READ8_MEMBER(fidel6502_state::eas_ppi_portb_r)
 
 // TTL/generic
 
-void fidel6502_state::sc9_prepare_display()
+void sc9_state::sc9_prepare_display()
 {
 	// 8*8 chessboard leds + 1 corner led
 	display_matrix(8, 9, m_led_data, m_inp_mux);
 }
 
-WRITE8_MEMBER(fidel6502_state::sc9_control_w)
+WRITE8_MEMBER(sc9_state::sc9_control_w)
 {
 	// d0-d3: 74245 P0-P3
 	// 74245 Q0-Q8: input mux, led select
@@ -971,36 +1057,23 @@ WRITE8_MEMBER(fidel6502_state::sc9_control_w)
 	// d6,d7: N/C
 }
 
-WRITE8_MEMBER(fidel6502_state::sc9_led_w)
+WRITE8_MEMBER(sc9_state::sc9_led_w)
 {
 	// a0-a2,d0: led data via NE591N
 	m_led_data = (data & 1) << offset;
 	sc9_prepare_display();
 }
 
-READ8_MEMBER(fidel6502_state::sc9_input_r)
+READ8_MEMBER(sc9_state::sc9_input_r)
 {
 	// multiplexed inputs (active low)
 	return read_inputs(9) ^ 0xff;
 }
 
-READ8_MEMBER(fidel6502_state::sc9d_input_r)
+READ8_MEMBER(sc9_state::sc9d_input_r)
 {
 	// a0-a2,d7: multiplexed inputs (active low)
 	return (read_inputs(9) >> offset & 1) ? 0 : 0x80;
-}
-
-void fidel6502_state::sc9c_set_cpu_freq()
-{
-	// SC9(C01) was released with 1.5MHz, 1.6MHz, or 1.9MHz CPU
-	u8 inp = ioport("FAKE")->read();
-	m_maincpu->set_unscaled_clock((inp & 2) ? 1900000 : ((inp & 1) ? 1600000 : 1500000));
-}
-
-MACHINE_RESET_MEMBER(fidel6502_state, sc9c)
-{
-	fidel6502_state::machine_reset();
-	sc9c_set_cpu_freq();
 }
 
 
@@ -1085,14 +1158,14 @@ READ8_MEMBER(fidel6502_state::as12_input_r)
 
 // misc handlers
 
-INPUT_CHANGED_MEMBER(fidel6502_state::fexcelv_bankswitch)
+INPUT_CHANGED_MEMBER(excel_state::fexcelv_bankswitch)
 {
 	// tied to speech ROM highest bits
 	m_speech->force_update();
 	m_speech_bank = (m_speech_bank & 1) | newval << 1;
 }
 
-READ8_MEMBER(fidel6502_state::fexcelv_speech_r)
+READ8_MEMBER(excel_state::fexcelv_speech_r)
 {
 	// TSI A11 is A12, program controls A11, user controls A13,A14(language switches)
 	offset = (offset & 0x7ff) | (offset << 1 & 0x1000);
@@ -1102,7 +1175,7 @@ READ8_MEMBER(fidel6502_state::fexcelv_speech_r)
 
 // TTL
 
-WRITE8_MEMBER(fidel6502_state::fexcel_ttl_w)
+WRITE8_MEMBER(excel_state::fexcel_ttl_w)
 {
 	// a0-a2,d0: 74259(1)
 	u8 mask = 1 << offset;
@@ -1149,26 +1222,21 @@ WRITE8_MEMBER(fidel6502_state::fexcel_ttl_w)
 	}
 }
 
-READ8_MEMBER(fidel6502_state::fexcelb_ttl_r)
-{
-	// a0-a2,d6: from speech board: language switches and TSI BUSY line, otherwise tied to VCC
-	u8 d6 = (m_inp_matrix[9].read_safe(0xff) >> offset & 1) ? 0x40 : 0;
-
-	// a0-a2,d7: multiplexed inputs (active low)
-	return d6 | ((read_inputs(9) >> offset & 1) ? 0 : 0x80);
-}
-
-READ8_MEMBER(fidel6502_state::fexcel_ttl_r)
+READ8_MEMBER(excel_state::fexcelb_ttl_r)
 {
 	u8 d7 = 0x80;
 
 	// 74259(1) Q7 + 74251 I0: battery status
-	if (m_inp_mux == 1 && ~m_led_select & 0x80)
-		d7 = m_inp_matrix[9]->read() & 0x80;
+	if (m_inp_matrix[10] != nullptr && m_inp_mux == 1 && ~m_led_select & 0x80)
+		d7 = m_inp_matrix[10]->read() & 0x80;
+
+	// a0-a2,d6: from speech board: language switches and TSI BUSY line, otherwise tied to VCC
+	u8 d6 = (m_inp_matrix[9].read_safe(0xff) >> offset & 1) ? 0x40 : 0;
 
 	// a0-a2,d7: multiplexed inputs (active low)
-	return d7 & ((read_inputs(9) >> offset & 1) ? 0 : 0x80);
+	return ((read_inputs(9) >> offset & 1) ? 0 : d7) | d6 | 0x3f;
 }
+
 
 
 
@@ -1262,7 +1330,7 @@ void fidel6502_state::init_fphantom()
 
 // TTL/generic
 
-WRITE8_MEMBER(fidel6502_state::chesster_control_w)
+WRITE8_MEMBER(chesster_state::chesster_control_w)
 {
 	// a0-a2,d7: 74259(1)
 	u8 mask = 1 << offset;
@@ -1277,29 +1345,22 @@ WRITE8_MEMBER(fidel6502_state::chesster_control_w)
 	display_matrix(9, 2, m_inp_mux, ~m_led_select & 3);
 
 	// 74259 Q2,Q3: speechrom A14,A15
-	// a0-a2,d0: 74259(2) where Q3 is speechrom A16, other outputs unconnected
+	// a0-a2,d0: 74259(2) Q3,Q2,Q0 to A16,A17,A18
 	m_speech_bank = (m_speech_bank & ~mask) | ((data & 1) ? mask : 0);
-	m_rombank->set_entry((m_led_select >> 2 & 3) | (m_speech_bank >> 1 & 4));
-}
-
-WRITE8_MEMBER(fidel6502_state::kishon_control_w)
-{
-	chesster_control_w(space, offset, data);
-
-	// 2 more bankswitch bits: 74259(2) Q2 to A17, Q0 to A18
 	u8 bank = (m_led_select >> 2 & 3) | bitswap<3>(m_speech_bank, 0,2,3) << 2;
-	m_rombank->set_entry(bank);
+	m_rombank->set_entry(bank & (m_numbanks - 1));
 }
 
-READ8_MEMBER(fidel6502_state::chesster_input_r)
+READ8_MEMBER(chesster_state::chesster_input_r)
 {
 	// a0-a2,d7: multiplexed inputs (active low)
 	return (read_inputs(9) >> offset & 1) ? 0 : 0x80;
 }
 
-void fidel6502_state::init_chesster()
+void chesster_state::init_chesster()
 {
-	m_rombank->configure_entries(0, memregion("rombank")->bytes() / 0x4000, memregion("rombank")->base(), 0x4000);
+	m_numbanks = memregion("rombank")->bytes() / 0x4000;
+	m_rombank->configure_entries(0, m_numbanks, memregion("rombank")->base(), 0x4000);
 }
 
 
@@ -1310,33 +1371,33 @@ void fidel6502_state::init_chesster()
 
 // CSC, SU9, RSC
 
-void fidel6502_state::csc_map(address_map &map)
+void csc_state::csc_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x07ff).mirror(0x4000).ram();
 	map(0x0800, 0x0bff).mirror(0x4400).ram();
-	map(0x1000, 0x1003).mirror(0x47fc).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x1800, 0x1803).mirror(0x47fc).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x1000, 0x1003).mirror(0x47fc).rw(m_pia[1], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x1800, 0x1803).mirror(0x47fc).rw(m_pia[0], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x2000, 0x3fff).mirror(0x4000).rom();
 	map(0xa000, 0xffff).rom();
 }
 
-void fidel6502_state::su9_map(address_map &map)
+void csc_state::su9_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x0fff).ram();
-	map(0x1000, 0x1003).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x1800, 0x1803).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x1000, 0x1003).rw(m_pia[1], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x1800, 0x1803).rw(m_pia[0], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x2000, 0x3fff).rom();
 	map(0xa000, 0xa7ff).rom();
 	map(0xc000, 0xffff).rom();
 }
 
-void fidel6502_state::rsc_map(address_map &map)
+void csc_state::rsc_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x03ff).ram();
-	map(0x2000, 0x2003).rw("pia", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x2000, 0x2003).rw(m_pia[0], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xf000, 0xffff).rom();
 }
 
@@ -1388,21 +1449,21 @@ void fidel6502_state::pc_map(address_map &map)
 
 // SC9
 
-void fidel6502_state::sc9_map(address_map &map)
+void sc9_state::sc9_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x07ff).mirror(0x1800).ram();
-	map(0x2000, 0x5fff).r(FUNC(fidel6502_state::cartridge_r));
-	map(0x6000, 0x6000).mirror(0x1fff).w(FUNC(fidel6502_state::sc9_control_w));
-	map(0x8000, 0x8007).mirror(0x1ff8).w(FUNC(fidel6502_state::sc9_led_w)).nopr();
-	map(0xa000, 0xa000).mirror(0x1fff).r(FUNC(fidel6502_state::sc9_input_r));
+	map(0x2000, 0x5fff).r(FUNC(sc9_state::cartridge_r));
+	map(0x6000, 0x6000).mirror(0x1fff).w(FUNC(sc9_state::sc9_control_w));
+	map(0x8000, 0x8007).mirror(0x1ff8).w(FUNC(sc9_state::sc9_led_w)).nopr();
+	map(0xa000, 0xa000).mirror(0x1fff).r(FUNC(sc9_state::sc9_input_r));
 	map(0xc000, 0xffff).rom();
 }
 
-void fidel6502_state::sc9d_map(address_map &map)
+void sc9_state::sc9d_map(address_map &map)
 {
 	sc9_map(map);
-	map(0xa000, 0xa007).mirror(0x1ff8).r(FUNC(fidel6502_state::sc9d_input_r));
+	map(0xa000, 0xa007).mirror(0x1ff8).r(FUNC(sc9_state::sc9d_input_r));
 }
 
 
@@ -1435,25 +1496,18 @@ void fidel6502_state::as12_map(address_map &map)
 
 // Excellence
 
-void fidel6502_state::fexcel_map(address_map &map)
+void excel_state::fexcel_map(address_map &map)
 {
 	map(0x0000, 0x07ff).mirror(0x3800).ram();
-	map(0x4000, 0x4007).mirror(0x3ff8).rw(FUNC(fidel6502_state::fexcel_ttl_r), FUNC(fidel6502_state::fexcel_ttl_w));
+	map(0x4000, 0x4007).mirror(0x3ff8).rw(FUNC(excel_state::fexcelb_ttl_r), FUNC(excel_state::fexcel_ttl_w));
 	//map(0x8000, 0x8000).nopr(); // checks for opening book module, but hw doesn't have a module slot
 	map(0xc000, 0xffff).rom();
 }
 
-void fidel6502_state::fexcelp_map(address_map &map)
+void excel_state::fexcelb_map(address_map &map)
 {
 	map(0x0000, 0x1fff).mirror(0x2000).ram();
-	map(0x4000, 0x4007).mirror(0x3ff8).rw(FUNC(fidel6502_state::fexcel_ttl_r), FUNC(fidel6502_state::fexcel_ttl_w));
-	map(0x8000, 0xffff).rom();
-}
-
-void fidel6502_state::fexcelb_map(address_map &map)
-{
-	map(0x0000, 0x1fff).mirror(0x2000).ram();
-	map(0x4000, 0x4007).mirror(0x3ff8).rw(FUNC(fidel6502_state::fexcelb_ttl_r), FUNC(fidel6502_state::fexcel_ttl_w));
+	map(0x4000, 0x4007).mirror(0x3ff8).rw(FUNC(excel_state::fexcelb_ttl_r), FUNC(excel_state::fexcel_ttl_w));
 	map(0x8000, 0xffff).rom();
 }
 
@@ -1476,20 +1530,15 @@ void fidel6502_state::fphantom_map(address_map &map)
 	map(0x8000, 0xffff).rom();
 }
 
-void fidel6502_state::chesster_map(address_map &map)
+void chesster_state::chesster_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
-	map(0x2000, 0x2007).mirror(0x1ff8).rw(FUNC(fidel6502_state::chesster_input_r), FUNC(fidel6502_state::chesster_control_w));
+	map(0x2000, 0x2007).mirror(0x1ff8).rw(FUNC(chesster_state::chesster_input_r), FUNC(chesster_state::chesster_control_w));
 	map(0x4000, 0x7fff).bankr("rombank");
 	map(0x6000, 0x6000).mirror(0x1fff).w("dac8", FUNC(dac_byte_interface::data_w));
 	map(0x8000, 0xffff).rom();
 }
 
-void fidel6502_state::kishon_map(address_map &map)
-{
-	chesster_map(map);
-	map(0x2000, 0x2007).mirror(0x1ff8).rw(FUNC(fidel6502_state::chesster_input_r), FUNC(fidel6502_state::kishon_control_w));
-}
 
 
 
@@ -1581,15 +1630,10 @@ static INPUT_PORTS_START( su9 )
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("PB / King")
 
 	PORT_START("FAKE")
-	PORT_CONFNAME( 0x01, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, fidel6502_state, su9_cpu_freq, nullptr) // factory set
+	PORT_CONFNAME( 0x01, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, su9_state, su9_cpu_freq, nullptr) // factory set
 	PORT_CONFSETTING(    0x00, "1.95MHz (SU9)" )
 	PORT_CONFSETTING(    0x01, "2.5MHz (DS9)" )
 INPUT_PORTS_END
-
-INPUT_CHANGED_MEMBER(fidel6502_state::su9_cpu_freq)
-{
-	su9_set_cpu_freq();
-}
 
 static INPUT_PORTS_START( su9sp )
 	PORT_INCLUDE( su9 )
@@ -1614,8 +1658,8 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( eas )
+	PORT_INCLUDE( fidel_cpu_div_4 )
 	PORT_INCLUDE( fidel_cb_magnets )
-	PORT_INCLUDE( cpu_div_4 )
 
 	PORT_MODIFY("IN.0")
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_NAME("DM")
@@ -1663,8 +1707,8 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( eag )
+	PORT_INCLUDE( fidel_cpu_div_4 )
 	PORT_INCLUDE( fidel_cb_magnets )
-	PORT_INCLUDE( cpu_div_4 )
 
 	PORT_MODIFY("IN.0")
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_NAME("CL")
@@ -1724,47 +1768,64 @@ static INPUT_PORTS_START( sc12_sidepanel )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sc12 )
+	PORT_INCLUDE( fidel_cpu_div_2 )
 	PORT_INCLUDE( fidel_cb_buttons )
 	PORT_INCLUDE( sc12_sidepanel )
-	PORT_INCLUDE( cpu_div_2 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sc12b )
+	PORT_INCLUDE( fidel_cpu_div_4 )
 	PORT_INCLUDE( fidel_cb_buttons )
 	PORT_INCLUDE( sc12_sidepanel )
-	PORT_INCLUDE( cpu_div_4 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( as12 )
+	PORT_INCLUDE( fidel_cpu_div_4 )
 	PORT_INCLUDE( fidel_cb_magnets )
-	PORT_INCLUDE( sc12_sidepanel )
-	PORT_INCLUDE( cpu_div_4 )
+
+	PORT_START("IN.8")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("RV / Pawn")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("DM / Knight")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("TB / Bishop")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("LV / Rook")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("PV / Queen")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("PB / King")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_NAME("CL")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("RE")
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( sc9_sidepanel )
+	PORT_START("IN.8")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("RV / Pawn")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("DM / Knight")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("TB / Bishop")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("LV / Rook")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("PV / Queen")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("PB / King")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_NAME("CL")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("RE")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( playmatic )
 	PORT_INCLUDE( fidel_cb_magnets )
-	PORT_INCLUDE( sc12_sidepanel )
+	PORT_INCLUDE( sc9_sidepanel )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sc9 )
 	PORT_INCLUDE( fidel_cb_buttons )
-	PORT_INCLUDE( sc12_sidepanel )
+	PORT_INCLUDE( sc9_sidepanel )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sc9c )
 	PORT_INCLUDE( sc9 )
 
 	PORT_START("FAKE")
-	PORT_CONFNAME( 0x03, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, fidel6502_state, sc9c_cpu_freq, nullptr) // factory set
+	PORT_CONFNAME( 0x03, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, sc9c_state, sc9c_cpu_freq, nullptr) // factory set
 	PORT_CONFSETTING(    0x00, "1.5MHz" )
 	PORT_CONFSETTING(    0x01, "1.6MHz" )
 	PORT_CONFSETTING(    0x02, "1.9MHz" )
 INPUT_PORTS_END
-
-INPUT_CHANGED_MEMBER(fidel6502_state::sc9c_cpu_freq)
-{
-	sc9c_set_cpu_freq();
-}
 
 
 static INPUT_PORTS_START( fexcelb )
@@ -1785,7 +1846,7 @@ static INPUT_PORTS_START( fexcelv )
 	PORT_INCLUDE( fexcelb )
 
 	PORT_START("IN.9")
-	PORT_CONFNAME( 0x03, 0x00, DEF_STR( Language ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, fidel6502_state, fexcelv_bankswitch, 0)
+	PORT_CONFNAME( 0x03, 0x00, DEF_STR( Language ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, excel_state, fexcelv_bankswitch, 0)
 	PORT_CONFSETTING(    0x00, DEF_STR( English ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( German ) )
 	PORT_CONFSETTING(    0x02, DEF_STR( French ) )
@@ -1797,7 +1858,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( fexcel )
 	PORT_INCLUDE( fexcelb )
 
-	PORT_START("IN.9")
+	PORT_START("IN.10")
 	PORT_CONFNAME( 0x80, 0x00, "Battery Status" )
 	PORT_CONFSETTING(    0x80, "Low" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Normal ) )
@@ -1806,7 +1867,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( fdes )
 	PORT_INCLUDE( fexcel )
 
-	PORT_MODIFY("IN.9")
+	PORT_MODIFY("IN.10")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED) // no low-voltage detection circuit (still works in software though)
 INPUT_PORTS_END
 
@@ -1850,25 +1911,25 @@ INPUT_PORTS_END
     Machine Drivers
 ******************************************************************************/
 
-void fidel6502_state::rsc(machine_config &config)
+void csc_state::rsc(machine_config &config)
 {
 	/* basic machine hardware */
 	M6502(config, m_maincpu, 1800000); // measured approx 1.81MHz
-	m_maincpu->set_addrmap(AS_PROGRAM, &fidel6502_state::rsc_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &csc_state::rsc_map);
 
 	const attotime irq_period = attotime::from_hz(546); // from 555 timer, measured
-	TIMER(config, m_irq_on).configure_periodic(FUNC(fidel6502_state::irq_on<M6502_IRQ_LINE>), irq_period);
+	TIMER(config, m_irq_on).configure_periodic(FUNC(csc_state::irq_on<M6502_IRQ_LINE>), irq_period);
 	m_irq_on->set_start_delay(irq_period - attotime::from_usec(38)); // active for 38us
-	TIMER(config, "irq_off").configure_periodic(FUNC(fidel6502_state::irq_off<M6502_IRQ_LINE>), irq_period);
+	TIMER(config, "irq_off").configure_periodic(FUNC(csc_state::irq_off<M6502_IRQ_LINE>), irq_period);
 
-	pia6821_device &pia(PIA6821(config, "pia", 0)); // MOS 6520
-	pia.readpa_handler().set(FUNC(fidel6502_state::csc_pia1_pa_r));
-	pia.readca1_handler().set(FUNC(fidel6502_state::csc_pia1_ca1_r));
-	pia.readcb1_handler().set(FUNC(fidel6502_state::csc_pia1_cb1_r));
-	pia.writepa_handler().set(FUNC(fidel6502_state::csc_pia1_pa_w));
-	pia.writepb_handler().set(FUNC(fidel6502_state::csc_pia1_pb_w));
-	pia.ca2_handler().set(FUNC(fidel6502_state::csc_pia1_ca2_w));
-	pia.cb2_handler().set(FUNC(fidel6502_state::csc_pia1_cb2_w));
+	PIA6821(config, m_pia[0], 0); // MOS 6520
+	m_pia[0]->readpa_handler().set(FUNC(csc_state::csc_pia0_pa_r));
+	m_pia[0]->readca1_handler().set(FUNC(csc_state::csc_pia0_ca1_r));
+	m_pia[0]->readcb1_handler().set(FUNC(csc_state::csc_pia0_cb1_r));
+	m_pia[0]->writepa_handler().set(FUNC(csc_state::csc_pia0_pa_w));
+	m_pia[0]->writepb_handler().set(FUNC(csc_state::csc_pia0_pb_w));
+	m_pia[0]->ca2_handler().set(FUNC(csc_state::csc_pia0_ca2_w));
+	m_pia[0]->cb2_handler().set(FUNC(csc_state::csc_pia0_cb2_w));
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_fidel_rsc_v2);
@@ -1881,40 +1942,40 @@ void fidel6502_state::rsc(machine_config &config)
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
-void fidel6502_state::csc(machine_config &config)
+void csc_state::csc(machine_config &config)
 {
 	/* basic machine hardware */
 	M6502(config, m_maincpu, 3.9_MHz_XTAL/2); // from 3.9MHz resonator
-	m_maincpu->set_addrmap(AS_PROGRAM, &fidel6502_state::csc_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &csc_state::csc_map);
 
 	const attotime irq_period = attotime::from_hz(38.4_kHz_XTAL/64); // through 4060 IC, 600Hz
-	TIMER(config, m_irq_on).configure_periodic(FUNC(fidel6502_state::irq_on<M6502_IRQ_LINE>), irq_period);
+	TIMER(config, m_irq_on).configure_periodic(FUNC(csc_state::irq_on<M6502_IRQ_LINE>), irq_period);
 	m_irq_on->set_start_delay(irq_period - attotime::from_hz(38.4_kHz_XTAL*2)); // edge!
-	TIMER(config, "irq_off").configure_periodic(FUNC(fidel6502_state::irq_off<M6502_IRQ_LINE>), irq_period);
+	TIMER(config, "irq_off").configure_periodic(FUNC(csc_state::irq_off<M6502_IRQ_LINE>), irq_period);
 
-	pia6821_device &pia0(PIA6821(config, "pia0", 0));
-	pia0.readpb_handler().set(FUNC(fidel6502_state::csc_pia0_pb_r));
-	pia0.writepa_handler().set(FUNC(fidel6502_state::csc_pia0_pa_w));
-	pia0.writepb_handler().set(FUNC(fidel6502_state::csc_pia0_pb_w));
-	pia0.ca2_handler().set(FUNC(fidel6502_state::csc_pia0_ca2_w));
+	PIA6821(config, m_pia[0], 0);
+	m_pia[0]->readpa_handler().set(FUNC(csc_state::csc_pia0_pa_r));
+	m_pia[0]->readca1_handler().set(FUNC(csc_state::csc_pia0_ca1_r));
+	m_pia[0]->readcb1_handler().set(FUNC(csc_state::csc_pia0_cb1_r));
+	m_pia[0]->writepa_handler().set(FUNC(csc_state::csc_pia0_pa_w));
+	m_pia[0]->writepb_handler().set(FUNC(csc_state::csc_pia0_pb_w));
+	m_pia[0]->ca2_handler().set(FUNC(csc_state::csc_pia0_ca2_w));
+	m_pia[0]->cb2_handler().set(FUNC(csc_state::csc_pia0_cb2_w));
 
-	pia6821_device &pia1(PIA6821(config, "pia1", 0));
-	pia1.readpa_handler().set(FUNC(fidel6502_state::csc_pia1_pa_r));
-	pia1.readca1_handler().set(FUNC(fidel6502_state::csc_pia1_ca1_r));
-	pia1.readcb1_handler().set(FUNC(fidel6502_state::csc_pia1_cb1_r));
-	pia1.writepa_handler().set(FUNC(fidel6502_state::csc_pia1_pa_w));
-	pia1.writepb_handler().set(FUNC(fidel6502_state::csc_pia1_pb_w));
-	pia1.ca2_handler().set(FUNC(fidel6502_state::csc_pia1_ca2_w));
-	pia1.cb2_handler().set(FUNC(fidel6502_state::csc_pia1_cb2_w));
+	PIA6821(config, m_pia[1], 0);
+	m_pia[1]->readpb_handler().set(FUNC(csc_state::csc_pia1_pb_r));
+	m_pia[1]->writepa_handler().set(FUNC(csc_state::csc_pia1_pa_w));
+	m_pia[1]->writepb_handler().set(FUNC(csc_state::csc_pia1_pb_w));
+	m_pia[1]->ca2_handler().set(FUNC(csc_state::csc_pia1_ca2_w));
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_fidel_csc);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	s14001a_device &speech(S14001A(config, "speech", 25000)); // R/C circuit, around 25khz
-	speech.ext_read().set(FUNC(fidel6502_state::csc_speech_r));
-	speech.add_route(ALL_OUTPUTS, "speaker", 0.75);
+	S14001A(config, m_speech, 25000); // R/C circuit, around 25khz
+	m_speech->ext_read().set(FUNC(csc_state::csc_speech_r));
+	m_speech->add_route(ALL_OUTPUTS, "speaker", 0.75);
 
 	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
@@ -1922,14 +1983,11 @@ void fidel6502_state::csc(machine_config &config)
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
-void fidel6502_state::su9(machine_config &config)
+void csc_state::su9(machine_config &config)
 {
 	csc(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &fidel6502_state::su9_map);
-
-	MCFG_MACHINE_RESET_OVERRIDE(fidel6502_state, su9)
-
+	m_maincpu->set_addrmap(AS_PROGRAM, &csc_state::su9_map);
 	config.set_default_layout(layout_fidel_su9);
 }
 
@@ -1952,9 +2010,9 @@ void fidel6502_state::eas_base(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	s14001a_device &speech(S14001A(config, "speech", 25000)); // R/C circuit, around 25khz
-	speech.ext_read().set(FUNC(fidel6502_state::csc_speech_r));
-	speech.add_route(ALL_OUTPUTS, "speaker", 0.75);
+	S14001A(config, m_speech, 25000); // R/C circuit, around 25khz
+	m_speech->ext_read().set(FUNC(fidel6502_state::eas_speech_r));
+	m_speech->add_route(ALL_OUTPUTS, "speaker", 0.75);
 
 	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
@@ -1987,7 +2045,6 @@ void fidel6502_state::pc(machine_config &config)
 
 	/* basic machine hardware */
 	m_maincpu->set_clock(4_MHz_XTAL); // R65C02P4
-
 	m_mainmap->set_addrmap(AS_PROGRAM, &fidel6502_state::pc_map);
 	TIMER(config.replace(), "dummy_timer").configure_periodic(timer_device::expired_delegate(), attotime::from_hz(4_MHz_XTAL));
 
@@ -2000,30 +2057,28 @@ void fidel6502_state::eag(machine_config &config)
 
 	/* basic machine hardware */
 	m_maincpu->set_clock(5_MHz_XTAL); // R65C02P4
-
 	m_mainmap->set_addrmap(AS_PROGRAM, &fidel6502_state::eag_map);
 	TIMER(config.replace(), "dummy_timer").configure_periodic(timer_device::expired_delegate(), attotime::from_hz(5_MHz_XTAL));
 
 	config.set_default_layout(layout_fidel_eag);
 }
 
-void fidel6502_state::sc9d(machine_config &config)
+void sc9_state::sc9d(machine_config &config)
 {
 	/* basic machine hardware */
 	M6502(config, m_maincpu, 3.9_MHz_XTAL/2); // R6502AP, 3.9MHz resonator
-	m_maincpu->set_addrmap(AS_PROGRAM, &fidel6502_state::sc9d_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sc9_state::sc9d_map);
 
 	const attotime irq_period = attotime::from_hz(610); // from 555 timer (22nF, 102K, 2.7K)
-	TIMER(config, m_irq_on).configure_periodic(FUNC(fidel6502_state::irq_on<M6502_IRQ_LINE>), irq_period);
+	TIMER(config, m_irq_on).configure_periodic(FUNC(sc9_state::irq_on<M6502_IRQ_LINE>), irq_period);
 	m_irq_on->set_start_delay(irq_period - attotime::from_usec(41)); // active for 41us
-	TIMER(config, "irq_off").configure_periodic(FUNC(fidel6502_state::irq_off<M6502_IRQ_LINE>), irq_period);
+	TIMER(config, "irq_off").configure_periodic(FUNC(sc9_state::irq_off<M6502_IRQ_LINE>), irq_period);
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_fidel_sc9);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-
 	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.set_output(5.0);
@@ -2036,30 +2091,21 @@ void fidel6502_state::sc9d(machine_config &config)
 	SOFTWARE_LIST(config, "cart_list").set_original("fidel_scc");
 }
 
-void fidel6502_state::sc9b(machine_config &config)
+void sc9_state::sc9b(machine_config &config)
 {
 	sc9d(config);
 
 	/* basic machine hardware */
-	M6502(config.replace(), m_maincpu, 1500000); // from ceramic resonator "681 JSA", measured
-	m_maincpu->set_addrmap(AS_PROGRAM, &fidel6502_state::sc9_map);
+	m_maincpu->set_clock(1500000); // from ceramic resonator "681 JSA", measured
+	m_maincpu->set_addrmap(AS_PROGRAM, &sc9_state::sc9_map);
 }
 
-void fidel6502_state::sc9c(machine_config &config)
-{
-	sc9b(config);
-
-	/* basic machine hardware */
-	MCFG_MACHINE_RESET_OVERRIDE(fidel6502_state, sc9c)
-}
-
-void fidel6502_state::playmatic(machine_config &config)
+void sc9_state::playmatic(machine_config &config)
 {
 	sc9b(config);
 
 	/* basic machine hardware */
 	m_maincpu->set_clock(3100000); // approximation
-
 	config.set_default_layout(layout_fidel_playmatic);
 }
 
@@ -2082,7 +2128,6 @@ void fidel6502_state::sc12(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-
 	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.set_output(5.0);
@@ -2101,14 +2146,13 @@ void fidel6502_state::sc12b(machine_config &config)
 
 	/* basic machine hardware */
 	m_maincpu->set_clock(4_MHz_XTAL); // R65C02P4
+	TIMER(config.replace(), "dummy_timer").configure_periodic(timer_device::expired_delegate(), attotime::from_hz(4_MHz_XTAL));
 
 	// change irq timer frequency
 	const attotime irq_period = attotime::from_hz(596); // from 556 timer (22nF, 82K+26K, 1K)
 	TIMER(config.replace(), m_irq_on).configure_periodic(FUNC(fidel6502_state::irq_on<M6502_IRQ_LINE>), irq_period);
 	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(15250)); // active for 15.25us
 	TIMER(config.replace(), "irq_off").configure_periodic(FUNC(fidel6502_state::irq_off<M6502_IRQ_LINE>), irq_period);
-
-	TIMER(config.replace(), "dummy_timer").configure_periodic(timer_device::expired_delegate(), attotime::from_hz(4_MHz_XTAL));
 }
 
 void fidel6502_state::as12(machine_config &config)
@@ -2127,16 +2171,16 @@ void fidel6502_state::as12(machine_config &config)
 	config.set_default_layout(layout_fidel_as12);
 }
 
-void fidel6502_state::fexcel(machine_config &config)
+void excel_state::fexcel(machine_config &config)
 {
 	/* basic machine hardware */
 	M65SC02(config, m_maincpu, 12_MHz_XTAL/4); // G65SC102P-3, 12.0M ceramic resonator
-	m_maincpu->set_addrmap(AS_PROGRAM, &fidel6502_state::fexcel_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &excel_state::fexcel_map);
 
 	const attotime irq_period = attotime::from_hz(630); // from 556 timer (22nF, 102K, 1K)
-	TIMER(config, m_irq_on).configure_periodic(FUNC(fidel6502_state::irq_on<M6502_IRQ_LINE>), irq_period);
+	TIMER(config, m_irq_on).configure_periodic(FUNC(excel_state::irq_on<M6502_IRQ_LINE>), irq_period);
 	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(15250)); // active for 15.25us
-	TIMER(config, "irq_off").configure_periodic(FUNC(fidel6502_state::irq_off<M6502_IRQ_LINE>), irq_period);
+	TIMER(config, "irq_off").configure_periodic(FUNC(excel_state::irq_off<M6502_IRQ_LINE>), irq_period);
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_fidel_ex);
@@ -2149,33 +2193,33 @@ void fidel6502_state::fexcel(machine_config &config)
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
-void fidel6502_state::fexcel4(machine_config &config)
+void excel_state::fexcel4(machine_config &config)
 {
 	fexcel(config);
 
 	/* basic machine hardware */
 	R65C02(config.replace(), m_maincpu, 4_MHz_XTAL); // R65C02P4
-	m_maincpu->set_addrmap(AS_PROGRAM, &fidel6502_state::fexcel_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &excel_state::fexcel_map);
 }
 
-void fidel6502_state::fexcelb(machine_config &config)
+void excel_state::fexcelb(machine_config &config)
 {
 	fexcel(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &fidel6502_state::fexcelb_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &excel_state::fexcelb_map);
 }
 
-void fidel6502_state::fexcelp(machine_config &config)
+void excel_state::fexcelp(machine_config &config)
 {
 	fexcel(config);
 
 	/* basic machine hardware */
 	R65C02(config.replace(), m_maincpu, 5_MHz_XTAL); // R65C02P4
-	m_maincpu->set_addrmap(AS_PROGRAM, &fidel6502_state::fexcelp_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &excel_state::fexcelb_map);
 }
 
-void fidel6502_state::granits(machine_config &config)
+void excel_state::granits(machine_config &config)
 {
 	fexcelp(config);
 
@@ -2183,43 +2227,43 @@ void fidel6502_state::granits(machine_config &config)
 	m_maincpu->set_clock(8_MHz_XTAL); // overclocked
 }
 
-void fidel6502_state::fdes2100(machine_config &config)
+void excel_state::fdes2100(machine_config &config)
 {
 	fexcel(config);
 
 	/* basic machine hardware */
 	M65C02(config.replace(), m_maincpu, 5_MHz_XTAL); // WDC 65C02
-	m_maincpu->set_addrmap(AS_PROGRAM, &fidel6502_state::fexcelp_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &excel_state::fexcelb_map);
 
 	// change irq timer frequency
 	const attotime irq_period = attotime::from_hz(630); // from 556 timer (22nF, 102K, 1K)
-	TIMER(config.replace(), m_irq_on).configure_periodic(FUNC(fidel6502_state::irq_on<M6502_IRQ_LINE>), irq_period);
+	TIMER(config.replace(), m_irq_on).configure_periodic(FUNC(excel_state::irq_on<M6502_IRQ_LINE>), irq_period);
 	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(15250)); // active for 15.25us
-	TIMER(config.replace(), "irq_off").configure_periodic(FUNC(fidel6502_state::irq_off<M6502_IRQ_LINE>), irq_period);
+	TIMER(config.replace(), "irq_off").configure_periodic(FUNC(excel_state::irq_off<M6502_IRQ_LINE>), irq_period);
 
 	config.set_default_layout(layout_fidel_des);
 }
 
-void fidel6502_state::fdes2000(machine_config &config)
+void excel_state::fdes2000(machine_config &config)
 {
 	fdes2100(config);
 
 	/* basic machine hardware */
 	R65C02(config.replace(), m_maincpu, 3_MHz_XTAL); // RP65C02G
-	m_maincpu->set_addrmap(AS_PROGRAM, &fidel6502_state::fexcelp_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &excel_state::fexcelb_map);
 }
 
-void fidel6502_state::fexcelv(machine_config &config)
+void excel_state::fexcelv(machine_config &config)
 {
 	fexcelb(config);
 
 	/* sound hardware */
 	S14001A(config, m_speech, 25000); // R/C circuit, around 25khz
-	m_speech->ext_read().set(FUNC(fidel6502_state::fexcelv_speech_r));
+	m_speech->ext_read().set(FUNC(excel_state::fexcelv_speech_r));
 	m_speech->add_route(ALL_OUTPUTS, "speaker", 0.75);
 }
 
-void fidel6502_state::fexceld(machine_config &config)
+void excel_state::fexceld(machine_config &config)
 {
 	fexcelb(config);
 
@@ -2278,16 +2322,16 @@ void fidel6502_state::fphantom(machine_config &config)
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
-void fidel6502_state::chesster(machine_config &config)
+void chesster_state::chesster(machine_config &config)
 {
 	/* basic machine hardware */
 	R65C02(config, m_maincpu, 5_MHz_XTAL); // RP65C02G
-	m_maincpu->set_addrmap(AS_PROGRAM, &fidel6502_state::chesster_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &chesster_state::chesster_map);
 
 	const attotime irq_period = attotime::from_hz(9615); // R/C circuit, measured
-	TIMER(config, m_irq_on).configure_periodic(FUNC(fidel6502_state::irq_on<M6502_IRQ_LINE>), irq_period);
+	TIMER(config, m_irq_on).configure_periodic(FUNC(chesster_state::irq_on<M6502_IRQ_LINE>), irq_period);
 	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(2600)); // active for 2.6us
-	TIMER(config, "irq_off").configure_periodic(FUNC(fidel6502_state::irq_off<M6502_IRQ_LINE>), irq_period);
+	TIMER(config, "irq_off").configure_periodic(FUNC(chesster_state::irq_off<M6502_IRQ_LINE>), irq_period);
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_fidel_chesster);
@@ -2301,13 +2345,12 @@ void fidel6502_state::chesster(machine_config &config)
 	vref.add_route(0, "dac8", -1.0, DAC_VREF_NEG_INPUT);
 }
 
-void fidel6502_state::kishon(machine_config &config)
+void chesster_state::kishon(machine_config &config)
 {
 	chesster(config);
 
 	/* basic machine hardware */
 	m_maincpu->set_clock(3.579545_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &fidel6502_state::kishon_map);
 }
 
 
@@ -2862,17 +2905,17 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME        PARENT   CMP MACHINE    INPUT      STATE            INIT           COMPANY                 FULLNAME                                      FLAGS
-CONS( 1981, reversic,   0,        0, rsc,       rsc,       fidel6502_state, empty_init,    "Fidelity Electronics", "Reversi Sensory Challenger (green version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1981, reversic,   0,        0, rsc,       rsc,       csc_state, empty_init,    "Fidelity Electronics", "Reversi Sensory Challenger (green version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 
-CONS( 1981, csc,        0,        0, csc,       csc,       fidel6502_state, empty_init,    "Fidelity Electronics", "Champion Sensory Chess Challenger (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1981, cscsp,      csc,      0, csc,       cscsp,     fidel6502_state, empty_init,    "Fidelity Electronics", "Champion Sensory Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1981, cscg,       csc,      0, csc,       cscg,      fidel6502_state, empty_init,    "Fidelity Electronics", "Champion Sensory Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1981, cscfr,      csc,      0, csc,       cscfr,     fidel6502_state, empty_init,    "Fidelity Electronics", "Champion Sensory Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1981, csc,        0,        0, csc,       csc,       csc_state, empty_init,    "Fidelity Electronics", "Champion Sensory Chess Challenger (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1981, cscsp,      csc,      0, csc,       cscsp,     csc_state, empty_init,    "Fidelity Electronics", "Champion Sensory Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1981, cscg,       csc,      0, csc,       cscg,      csc_state, empty_init,    "Fidelity Electronics", "Champion Sensory Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1981, cscfr,      csc,      0, csc,       cscfr,     csc_state, empty_init,    "Fidelity Electronics", "Champion Sensory Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 
-CONS( 1983, super9cc,   0,        0, su9,       su9,       fidel6502_state, empty_init,    "Fidelity Electronics", "Super 9 Sensory Chess Challenger (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1983, super9ccsp, super9cc, 0, su9,       su9sp,     fidel6502_state, empty_init,    "Fidelity Electronics", "Super 9 Sensory Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1983, super9ccg,  super9cc, 0, su9,       su9g,      fidel6502_state, empty_init,    "Fidelity Electronics", "Super 9 Sensory Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1983, super9ccfr, super9cc, 0, su9,       su9fr,     fidel6502_state, empty_init,    "Fidelity Electronics", "Super 9 Sensory Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1983, super9cc,   0,        0, su9,       su9,       su9_state, empty_init,    "Fidelity Electronics", "Super 9 Sensory Chess Challenger (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1983, super9ccsp, super9cc, 0, su9,       su9sp,     su9_state, empty_init,    "Fidelity Electronics", "Super 9 Sensory Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1983, super9ccg,  super9cc, 0, su9,       su9g,      su9_state, empty_init,    "Fidelity Electronics", "Super 9 Sensory Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1983, super9ccfr, super9cc, 0, su9,       su9fr,     su9_state, empty_init,    "Fidelity Electronics", "Super 9 Sensory Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 
 CONS( 1983, feasbu,     0,        0, eas,       eas,       fidel6502_state, empty_init,    "Fidelity Electronics", "Elite A/S Challenger (Budapest program, English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 CONS( 1983, feasbusp,   feasbu,   0, eas,       eassp,     fidel6502_state, empty_init,    "Fidelity Electronics", "Elite A/S Challenger (Budapest program, Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
@@ -2897,34 +2940,34 @@ CONS( 1986, feag2100sp, feag2100, 0, eag,       eagsp,     fidel6502_state, init
 CONS( 1986, feag2100g,  feag2100, 0, eag,       eagg,      fidel6502_state, init_eag,      "Fidelity Electronics", "Elite Avant Garde 2100 (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 CONS( 1986, feag2100fr, feag2100, 0, eag,       eagfr,     fidel6502_state, init_eag,      "Fidelity Electronics", "Elite Avant Garde 2100 (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 
-CONS( 1982, fscc9,      0,        0, sc9d,      sc9,       fidel6502_state, empty_init,    "Fidelity Electronics", "Sensory Chess Challenger 9 (rev. D)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS ) // aka version "B"
-CONS( 1982, fscc9b,     fscc9,    0, sc9b,      sc9,       fidel6502_state, empty_init,    "Fidelity Electronics", "Sensory Chess Challenger 9 (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1982, fscc9c,     fscc9,    0, sc9c,      sc9c,      fidel6502_state, empty_init,    "Fidelity Electronics", "Sensory Chess Challenger 9 (rev. C)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1983, fscc9ps,    fscc9,    0, playmatic, playmatic, fidel6502_state, empty_init,    "Fidelity Electronics", "Sensory 9 Playmatic 'S'", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS ) // Fidelity West Germany
+CONS( 1982, fscc9,      0,        0, sc9d,      sc9,       sc9_state, empty_init,    "Fidelity Electronics", "Sensory Chess Challenger 9 (rev. D)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS ) // aka version "B"
+CONS( 1982, fscc9b,     fscc9,    0, sc9b,      sc9,       sc9_state, empty_init,    "Fidelity Electronics", "Sensory Chess Challenger 9 (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1982, fscc9c,     fscc9,    0, sc9b,      sc9c,      sc9c_state, empty_init,    "Fidelity Electronics", "Sensory Chess Challenger 9 (rev. C)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1983, fscc9ps,    fscc9,    0, playmatic, playmatic, sc9_state, empty_init,    "Fidelity Electronics", "Sensory 9 Playmatic 'S'", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS ) // Fidelity West Germany
 
 CONS( 1984, fscc12,     0,        0, sc12,      sc12,      fidel6502_state, empty_init,    "Fidelity Electronics", "Sensory Chess Challenger 12", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_TIMING )
 CONS( 1984, fscc12b,    fscc12,   0, sc12b,     sc12b,     fidel6502_state, empty_init,    "Fidelity Electronics", "Sensory Chess Challenger 12-B", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_TIMING )
 
 CONS( 1985, feleg,      0,        0, as12,      as12,      fidel6502_state, empty_init,    "Fidelity Electronics", "Elegance Chess Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_TIMING )
 
-CONS( 1987, fexcel,     0,        0, fexcelb,   fexcelb,   fidel6502_state, empty_init,    "Fidelity Electronics", "The Excellence (model 6080B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1987, fexcelv,    fexcel,   0, fexcelv,   fexcelv,   fidel6502_state, empty_init,    "Fidelity Electronics", "Voice Excellence", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1987, fexceld,    fexcel,   0, fexceld,   fexcelb,   fidel6502_state, empty_init,    "Fidelity Electronics", "Excel Display", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1985, fexcel12,   fexcel,   0, fexcel,    fexcel,    fidel6502_state, empty_init,    "Fidelity Electronics", "The Excellence (model EP12, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS ) // 1st version of The Excellence
-CONS( 1985, fexcel124,  fexcel,   0, fexcel4,   fexcel,    fidel6502_state, empty_init,    "Fidelity Electronics", "The Excellence (model EP12, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1985, fexcela,    fexcel,   0, fexcel,    fexcel,    fidel6502_state, empty_init,    "Fidelity Electronics", "The Excellence (model 6080)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1987, fexcel,     0,        0, fexcelb,   fexcelb,   excel_state, empty_init,    "Fidelity Electronics", "The Excellence (model 6080B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1987, fexcelv,    fexcel,   0, fexcelv,   fexcelv,   excel_state, empty_init,    "Fidelity Electronics", "Voice Excellence", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1987, fexceld,    fexcel,   0, fexceld,   fexcelb,   excel_state, empty_init,    "Fidelity Electronics", "Excel Display", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1985, fexcel12,   fexcel,   0, fexcel,    fexcel,    excel_state, empty_init,    "Fidelity Electronics", "The Excellence (model EP12, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS ) // 1st version of The Excellence
+CONS( 1985, fexcel124,  fexcel,   0, fexcel4,   fexcel,    excel_state, empty_init,    "Fidelity Electronics", "The Excellence (model EP12, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1985, fexcela,    fexcel,   0, fexcel,    fexcel,    excel_state, empty_init,    "Fidelity Electronics", "The Excellence (model 6080)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 
-CONS( 1986, fexcelp,    0,        0, fexcelp,   fexcel,    fidel6502_state, empty_init,    "Fidelity Electronics", "The Par Excellence", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1986, fexcelpb,   fexcelp,  0, fexcelp,   fexcel,    fidel6502_state, empty_init,    "Fidelity Electronics", "The Par Excellence (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1986, granits,    fexcelp,  0, granits,   fexcel,    fidel6502_state, empty_init,    "hack (RCS)", "Granit 'S'", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1988, fdes2000,   fexcelp,  0, fdes2000,  fdes,      fidel6502_state, empty_init,    "Fidelity Electronics", "Designer 2000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS ) // Excellence series hardware
-CONS( 1988, fdes2100,   fexcelp,  0, fdes2100,  fdes,      fidel6502_state, empty_init,    "Fidelity Electronics", "Designer 2100", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS ) // "
+CONS( 1986, fexcelp,    0,        0, fexcelp,   fexcel,    excel_state, empty_init,    "Fidelity Electronics", "The Par Excellence", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1986, fexcelpb,   fexcelp,  0, fexcelp,   fexcel,    excel_state, empty_init,    "Fidelity Electronics", "The Par Excellence (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1986, granits,    fexcelp,  0, granits,   fexcel,    excel_state, empty_init,    "hack (RCS)", "Granit 'S'", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1988, fdes2000,   fexcelp,  0, fdes2000,  fdes,      excel_state, empty_init,    "Fidelity Electronics", "Designer 2000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1988, fdes2100,   fexcelp,  0, fdes2100,  fdes,      excel_state, empty_init,    "Fidelity Electronics", "Designer 2100", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 
 CONS( 1988, fdes2100d,  0,        0, fdes2100d, desdis,   desdis_state, init_fdes2100d,  "Fidelity Electronics", "Designer 2100 Display (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 CONS( 1988, fdes2000d,  fdes2100d,0, fdes2000d, desdis,   desdis_state, init_fdes2100d,  "Fidelity Electronics", "Designer 2000 Display", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 
 CONS( 1988, fphantom,   0,        0, fphantom,  fphantom,  fidel6502_state, init_fphantom, "Fidelity Electronics", "Phantom (Fidelity)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 
-CONS( 1990, chesster,   0,        0, chesster,  chesster,  fidel6502_state, init_chesster, "Fidelity Electronics", "Chesster Challenger (V1.3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1990, chesstera,  chesster, 0, chesster,  chesster,  fidel6502_state, init_chesster, "Fidelity Electronics", "Chesster Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1991, kishon,     chesster, 0, kishon,    chesster,  fidel6502_state, init_chesster, "Fidelity Electronics", "Kishon Chesster", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1990, chesster,   0,        0, chesster,  chesster,  chesster_state, init_chesster, "Fidelity Electronics", "Chesster Challenger (V1.3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1990, chesstera,  chesster, 0, chesster,  chesster,  chesster_state, init_chesster, "Fidelity Electronics", "Chesster Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1991, kishon,     chesster, 0, kishon,    chesster,  chesster_state, init_chesster, "Fidelity Electronics", "Kishon Chesster", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )

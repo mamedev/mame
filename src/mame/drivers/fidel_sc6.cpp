@@ -29,6 +29,8 @@ SC6 program is contained in BO6 and CG6.
 #include "fidel_sc6.lh" // clickable
 
 
+namespace {
+
 class sc6_state : public fidelbase_state
 {
 public:
@@ -206,6 +208,8 @@ ROM_START( fscc6 )
 	ROM_REGION( 0x1000, "maincpu", ROMREGION_ERASE00 )
 	// none here, it's in the module slot
 ROM_END
+
+} // anonymous namespace
 
 
 

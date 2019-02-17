@@ -214,7 +214,7 @@ public:
 
 	void init_eag();
 
-private:
+protected:
 	// devices/pointers
 	optional_device<ram_device> m_ram;
 
@@ -225,11 +225,11 @@ private:
 
 	// I/O handlers
 	void prepare_display();
+	virtual DECLARE_WRITE8_MEMBER(mux_w);
 	DECLARE_READ8_MEMBER(input1_r);
 	DECLARE_READ8_MEMBER(input2_r);
 	DECLARE_WRITE8_MEMBER(leds_w);
 	DECLARE_WRITE8_MEMBER(digit_w);
-	DECLARE_WRITE8_MEMBER(mux_w);
 };
 
 
@@ -255,11 +255,11 @@ private:
 };
 
 
-class excel68k_state : public fidelbase_state
+class excel68k_state : public eag_state
 {
 public:
 	excel68k_state(const machine_config &mconfig, device_type type, const char *tag) :
-		fidelbase_state(mconfig, type, tag)
+		eag_state(mconfig, type, tag)
 	{ }
 
 	void fex68k(machine_config &config);
@@ -272,11 +272,7 @@ private:
 	void fex68km3_map(address_map &map);
 
 	// I/O handlers
-	void prepare_display();
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_WRITE8_MEMBER(leds_w);
-	DECLARE_WRITE8_MEMBER(digit_w);
-	DECLARE_WRITE8_MEMBER(mux_w);
+	virtual DECLARE_WRITE8_MEMBER(mux_w) override;
 };
 
 
@@ -287,34 +283,6 @@ private:
     Excel 68000
 ******************************************************************************/
 
-void excel68k_state::prepare_display()
-{
-	// 4*7seg leds, 8*8 chessboard leds
-	u8 seg_data = bitswap<8>(m_7seg_data,0,1,3,2,7,5,6,4);
-	set_display_segmask(0x55, 0x7f);
-	display_matrix(16, 8, m_led_data << 8 | seg_data, m_inp_mux);
-}
-
-READ8_MEMBER(excel68k_state::input_r)
-{
-	// a1-a3,d7: multiplexed inputs (active low)
-	return (read_inputs(9) >> offset & 1) ? 0 : 0x80;
-}
-
-WRITE8_MEMBER(excel68k_state::leds_w)
-{
-	// a1-a3,d0: led data
-	m_led_data = (m_led_data & ~(1 << offset)) | ((data & 1) << offset);
-	prepare_display();
-}
-
-WRITE8_MEMBER(excel68k_state::digit_w)
-{
-	// a1-a3,d0(d8): digit segment data
-	m_7seg_data = (m_7seg_data & ~(1 << offset)) | ((data & 1) << offset);
-	prepare_display();
-}
-
 WRITE8_MEMBER(excel68k_state::mux_w)
 {
 	// a1-a3,d0: 74259
@@ -322,12 +290,7 @@ WRITE8_MEMBER(excel68k_state::mux_w)
 	m_led_select = (m_led_select & ~mask) | ((data & 1) ? mask : 0);
 
 	// 74259 Q0-Q3: 74145 A-D (Q4-Q7 N/C)
-	// 74145 0-8: input mux, digit/led select
-	// 74145 9: speaker out
-	u16 sel = 1 << (m_led_select & 0xf);
-	m_dac->write(BIT(sel, 9));
-	m_inp_mux = sel & 0x1ff;
-	prepare_display();
+	eag_state::mux_w(space, offset, m_led_select & 0xf);
 }
 
 
@@ -374,10 +337,22 @@ void desmas_state::init_fdes2265()
 
 void eag_state::prepare_display()
 {
-	// 8*7seg leds(2 panels), (8+1)*8 chessboard leds
+	// Excel 68000: 4*7seg leds, 8*8 chessboard leds
+	// EAG: 8*7seg leds(2 panels), (8+1)*8 chessboard leds
 	u8 seg_data = bitswap<8>(m_7seg_data,0,1,3,2,7,5,6,4);
-	set_display_segmask(0x1ef, 0x7f);
+	set_display_segmask(0x1ff, 0x7f);
 	display_matrix(16, 9, m_led_data << 8 | seg_data, m_inp_mux);
+}
+
+WRITE8_MEMBER(eag_state::mux_w)
+{
+	// d0-d3: 74145 A-D
+	// 74145 0-8: input mux, digit/led select
+	// 74145 9: speaker out
+	u16 sel = 1 << (data & 0xf);
+	m_dac->write(BIT(sel, 9));
+	m_inp_mux = sel & 0x1ff;
+	prepare_display();
 }
 
 READ8_MEMBER(eag_state::input1_r)
@@ -406,16 +381,6 @@ WRITE8_MEMBER(eag_state::digit_w)
 	prepare_display();
 }
 
-WRITE8_MEMBER(eag_state::mux_w)
-{
-	// d0-d3: 74145 A-D
-	// 74145 0-8: input mux, digit/led select
-	// 74145 9: speaker out
-	u16 sel = 1 << (data & 0xf);
-	m_dac->write(BIT(sel, 9));
-	m_inp_mux = sel & 0x1ff;
-	prepare_display();
-}
 
 
 
@@ -431,7 +396,7 @@ void excel68k_state::fex68k_map(address_map &map)
 	map(0x000000, 0x00000f).mirror(0x00fff0).w(FUNC(excel68k_state::leds_w)).umask16(0x00ff);
 	map(0x000000, 0x00000f).mirror(0x00fff0).w(FUNC(excel68k_state::digit_w)).umask16(0xff00);
 	map(0x044000, 0x047fff).ram();
-	map(0x100000, 0x10000f).mirror(0x03fff0).r(FUNC(excel68k_state::input_r)).umask16(0x00ff);
+	map(0x100000, 0x10000f).mirror(0x03fff0).r(FUNC(excel68k_state::input1_r)).umask16(0x00ff);
 	map(0x140000, 0x14000f).mirror(0x03fff0).w(FUNC(excel68k_state::mux_w)).umask16(0x00ff);
 }
 
