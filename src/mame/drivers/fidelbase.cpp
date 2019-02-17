@@ -513,62 +513,6 @@ expect that the software reads these once on startup only.
 #include "fidel_bv3.lh" // clickable
 #include "fidel_vsc.lh" // clickable
 
-
-class fidelz80_state : public fidelbase_state
-{
-public:
-	fidelz80_state(const machine_config &mconfig, device_type type, const char *tag) :
-		fidelbase_state(mconfig, type, tag),
-		m_z80pio(*this, "z80pio"),
-		m_ppi8255(*this, "ppi8255")
-	{ }
-
-	void bcc(machine_config &config);
-	void bkc(machine_config &config);
-	void scc(machine_config &config);
-	void vsc(machine_config &config);
-	void dsc(machine_config &config);
-
-private:
-	// devices/pointers
-	optional_device<z80pio_device> m_z80pio;
-	optional_device<i8255_device> m_ppi8255;
-
-	// BCC, BKC
-	DECLARE_READ8_MEMBER(bcc_input_r);
-	DECLARE_WRITE8_MEMBER(bcc_control_w);
-	void bcc_io(address_map &map);
-	void bcc_map(address_map &map);
-
-	// SCC
-	DECLARE_READ8_MEMBER(scc_input_r);
-	DECLARE_WRITE8_MEMBER(scc_control_w);
-	void scc_io(address_map &map);
-	void scc_map(address_map &map);
-
-	// VSC
-	void vsc_prepare_display();
-	DECLARE_READ8_MEMBER(vsc_speech_r);
-	DECLARE_READ8_MEMBER(vsc_io_trampoline_r);
-	DECLARE_WRITE8_MEMBER(vsc_io_trampoline_w);
-	DECLARE_WRITE8_MEMBER(vsc_ppi_porta_w);
-	DECLARE_WRITE8_MEMBER(vsc_ppi_portb_w);
-	DECLARE_WRITE8_MEMBER(vsc_ppi_portc_w);
-	DECLARE_READ8_MEMBER(vsc_pio_porta_r);
-	DECLARE_READ8_MEMBER(vsc_pio_portb_r);
-	DECLARE_WRITE8_MEMBER(vsc_pio_portb_w);
-	void vsc_io(address_map &map);
-	void vsc_map(address_map &map);
-
-	// DSC
-	void dsc_prepare_display();
-	DECLARE_WRITE8_MEMBER(dsc_control_w);
-	DECLARE_WRITE8_MEMBER(dsc_select_w);
-	DECLARE_READ8_MEMBER(dsc_input_r);
-	void dsc_map(address_map &map);
-};
-
-
 // machine start/reset
 
 void fidelbase_state::machine_start()
@@ -613,6 +557,98 @@ void fidelbase_state::machine_reset()
 
 
 
+class scc_state : public fidelbase_state
+{
+public:
+	scc_state(const machine_config &mconfig, device_type type, const char *tag) :
+		fidelbase_state(mconfig, type, tag)
+	{ }
+
+	void scc(machine_config &config);
+
+private:
+	void main_map(address_map &map);
+	void main_io(address_map &map);
+
+	// I/O handlers
+	DECLARE_READ8_MEMBER(input_r);
+	DECLARE_WRITE8_MEMBER(control_w);
+};
+
+
+class dsc_state : public fidelbase_state
+{
+public:
+	dsc_state(const machine_config &mconfig, device_type type, const char *tag) :
+		fidelbase_state(mconfig, type, tag)
+	{ }
+
+	void dsc(machine_config &config);
+
+private:
+	void main_map(address_map &map);
+
+	// I/O handlers
+	void prepare_display();
+	DECLARE_WRITE8_MEMBER(control_w);
+	DECLARE_WRITE8_MEMBER(select_w);
+	DECLARE_READ8_MEMBER(input_r);
+};
+
+
+class bcc_state : public fidelbase_state
+{
+public:
+	bcc_state(const machine_config &mconfig, device_type type, const char *tag) :
+		fidelbase_state(mconfig, type, tag)
+	{ }
+
+	void bcc(machine_config &config);
+	void bkc(machine_config &config);
+
+private:
+	void main_map(address_map &map);
+	void main_io(address_map &map);
+
+	// I/O handlers
+	DECLARE_READ8_MEMBER(input_r);
+	DECLARE_WRITE8_MEMBER(control_w);
+};
+
+
+class vsc_state : public fidelbase_state
+{
+public:
+	vsc_state(const machine_config &mconfig, device_type type, const char *tag) :
+		fidelbase_state(mconfig, type, tag),
+		m_z80pio(*this, "z80pio"),
+		m_ppi8255(*this, "ppi8255")
+	{ }
+
+	void vsc(machine_config &config);
+
+private:
+	// devices/pointers
+	required_device<z80pio_device> m_z80pio;
+	required_device<i8255_device> m_ppi8255;
+
+	void main_map(address_map &map);
+	void main_io(address_map &map);
+	DECLARE_READ8_MEMBER(main_io_trampoline_r);
+	DECLARE_WRITE8_MEMBER(main_io_trampoline_w);
+
+	// I/O handlers
+	void prepare_display();
+	DECLARE_READ8_MEMBER(speech_r);
+	DECLARE_WRITE8_MEMBER(ppi_porta_w);
+	DECLARE_WRITE8_MEMBER(ppi_portb_w);
+	DECLARE_WRITE8_MEMBER(ppi_portc_w);
+	DECLARE_READ8_MEMBER(pio_porta_r);
+	DECLARE_READ8_MEMBER(pio_portb_r);
+	DECLARE_WRITE8_MEMBER(pio_portb_w);
+};
+
+
 class ccx_state : public fidelbase_state
 {
 public:
@@ -635,13 +671,15 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(beeper_off) { m_beeper->set_state(0); }
 
-	void ccx_prepare_display();
-	DECLARE_WRITE8_MEMBER(ccx_ppi_porta_w);
-	DECLARE_WRITE8_MEMBER(ccx_ppi_portb_w);
-	DECLARE_READ8_MEMBER(ccx_ppi_portc_r);
-	DECLARE_WRITE8_MEMBER(ccx_ppi_portc_w);
-	void ccx_io(address_map &map);
-	void ccx_map(address_map &map);
+	void main_map(address_map &map);
+	void main_io(address_map &map);
+
+	// I/O handlers
+	void prepare_display();
+	DECLARE_WRITE8_MEMBER(ppi_porta_w);
+	DECLARE_WRITE8_MEMBER(ppi_portb_w);
+	DECLARE_READ8_MEMBER(ppi_portc_r);
+	DECLARE_WRITE8_MEMBER(ppi_portc_w);
 };
 
 
@@ -666,13 +704,14 @@ private:
 	required_device<i8041_device> m_mcu;
 	required_device<i8243_device> m_i8243;
 
-	void vbrc_prepare_display();
-	DECLARE_WRITE8_MEMBER(vbrc_speech_w);
-	DECLARE_WRITE8_MEMBER(vbrc_mcu_p1_w);
-	DECLARE_READ8_MEMBER(vbrc_mcu_p2_r);
-	template<int P> void vbrc_ioexp_port_w(uint8_t data);
-	void vbrc_main_io(address_map &map);
-	void vbrc_main_map(address_map &map);
+	void main_map(address_map &map);
+	void main_io(address_map &map);
+
+	void prepare_display();
+	DECLARE_WRITE8_MEMBER(speech_w);
+	DECLARE_WRITE8_MEMBER(mcu_p1_w);
+	DECLARE_READ8_MEMBER(mcu_p2_r);
+	template<int P> void ioexp_port_w(uint8_t data);
 };
 
 
@@ -695,15 +734,17 @@ private:
 	// devices/pointers
 	required_device<i8255_device> m_ppi8255;
 
-	void vcc_prepare_display();
-	DECLARE_READ8_MEMBER(vcc_speech_r);
-	DECLARE_WRITE8_MEMBER(vcc_ppi_porta_w);
-	DECLARE_READ8_MEMBER(vcc_ppi_portb_r);
-	DECLARE_WRITE8_MEMBER(vcc_ppi_portb_w);
-	DECLARE_READ8_MEMBER(vcc_ppi_portc_r);
-	DECLARE_WRITE8_MEMBER(vcc_ppi_portc_w);
-	void vcc_io(address_map &map);
-	void vcc_map(address_map &map);
+	void main_map(address_map &map);
+	void main_io(address_map &map);
+
+	// I/O handlers
+	void prepare_display();
+	DECLARE_READ8_MEMBER(speech_r);
+	DECLARE_WRITE8_MEMBER(ppi_porta_w);
+	DECLARE_READ8_MEMBER(ppi_portb_r);
+	DECLARE_WRITE8_MEMBER(ppi_portb_w);
+	DECLARE_READ8_MEMBER(ppi_portc_r);
+	DECLARE_WRITE8_MEMBER(ppi_portc_w);
 };
 
 void vcc_state::machine_start()
@@ -851,7 +892,7 @@ READ8_MEMBER(fidelbase_state::cartridge_r)
 
 // misc handlers
 
-void vcc_state::vcc_prepare_display()
+void vcc_state::prepare_display()
 {
 	// 4 7seg leds (note: sel d0 for extra leds)
 	u8 outdata = (m_7seg_data & 0x7f) | (m_led_select << 7 & 0x80);
@@ -859,7 +900,7 @@ void vcc_state::vcc_prepare_display()
 	display_matrix(8, 4, outdata, m_led_select >> 2 & 0xf);
 }
 
-READ8_MEMBER(vcc_state::vcc_speech_r)
+READ8_MEMBER(vcc_state::speech_r)
 {
 	return m_speech_rom[m_speech_bank << 12 | offset];
 }
@@ -867,11 +908,11 @@ READ8_MEMBER(vcc_state::vcc_speech_r)
 
 // I8255 PPI
 
-WRITE8_MEMBER(vcc_state::vcc_ppi_porta_w)
+WRITE8_MEMBER(vcc_state::ppi_porta_w)
 {
 	// d0-d6: digit segment data, bits are xABCDEFG
 	m_7seg_data = bitswap<8>(data,7,0,1,2,3,4,5,6);
-	vcc_prepare_display();
+	prepare_display();
 
 	// d0-d5: TSI C0-C5
 	// d7: TSI START line
@@ -887,28 +928,28 @@ WRITE8_MEMBER(vcc_state::vcc_ppi_porta_w)
 	}
 }
 
-READ8_MEMBER(vcc_state::vcc_ppi_portb_r)
+READ8_MEMBER(vcc_state::ppi_portb_r)
 {
 	// d7: TSI BUSY line
 	return (m_speech->busy_r()) ? 0x80 : 0x00;
 }
 
-WRITE8_MEMBER(vcc_state::vcc_ppi_portb_w)
+WRITE8_MEMBER(vcc_state::ppi_portb_w)
 {
 	// d0,d2-d5: digit/led select
 	// _d6: enable language switches
 	m_led_select = data;
-	vcc_prepare_display();
+	prepare_display();
 }
 
-READ8_MEMBER(vcc_state::vcc_ppi_portc_r)
+READ8_MEMBER(vcc_state::ppi_portc_r)
 {
 	// d0-d3: multiplexed inputs (active low), also language switches
 	u8 lan = (~m_led_select & 0x40) ? m_inp_matrix[4]->read() : 0;
 	return ~(lan | read_inputs(4)) & 0xf;
 }
 
-WRITE8_MEMBER(vcc_state::vcc_ppi_portc_w)
+WRITE8_MEMBER(vcc_state::ppi_portc_w)
 {
 	// d4-d7: input mux (inverted)
 	m_inp_mux = ~data >> 4 & 0xf;
@@ -917,7 +958,7 @@ WRITE8_MEMBER(vcc_state::vcc_ppi_portc_w)
 
 // CCX-specific (no speech chip, 1-bit beeper instead)
 
-void ccx_state::ccx_prepare_display()
+void ccx_state::prepare_display()
 {
 	// 4 7seg leds (note: sel d0 for extra leds)
 	u8 outdata = (m_7seg_data & 0x7f) | (m_led_select << 7 & 0x80);
@@ -928,7 +969,7 @@ void ccx_state::ccx_prepare_display()
 
 // I8255 PPI
 
-WRITE8_MEMBER(ccx_state::ccx_ppi_porta_w)
+WRITE8_MEMBER(ccx_state::ppi_porta_w)
 {
 	// d7: enable beeper on falling edge (555 monostable)
 	if (m_beeper && ~data & m_7seg_data & 0x80)
@@ -939,23 +980,23 @@ WRITE8_MEMBER(ccx_state::ccx_ppi_porta_w)
 
 	// d0-d6: digit segment data
 	m_7seg_data = bitswap<8>(data,7,0,1,2,3,4,5,6);
-	ccx_prepare_display();
+	prepare_display();
 }
 
-WRITE8_MEMBER(ccx_state::ccx_ppi_portb_w)
+WRITE8_MEMBER(ccx_state::ppi_portb_w)
 {
 	// d0,d2-d5: digit/led select
 	m_led_select = data;
-	ccx_prepare_display();
+	prepare_display();
 }
 
-READ8_MEMBER(ccx_state::ccx_ppi_portc_r)
+READ8_MEMBER(ccx_state::ppi_portc_r)
 {
 	// d0-d3: multiplexed inputs (active low)
 	return ~read_inputs(4) & 0xf;
 }
 
-WRITE8_MEMBER(ccx_state::ccx_ppi_portc_w)
+WRITE8_MEMBER(ccx_state::ppi_portc_w)
 {
 	// d4-d7: input mux (inverted)
 	m_inp_mux = ~data >> 4 & 0xf;
@@ -969,7 +1010,7 @@ WRITE8_MEMBER(ccx_state::ccx_ppi_portc_w)
 
 // TTL
 
-WRITE8_MEMBER(fidelz80_state::bcc_control_w)
+WRITE8_MEMBER(bcc_state::control_w)
 {
 	// a0-a2,d7: digit segment data via NE591
 	u8 mask = 1 << (offset & 7);
@@ -986,7 +1027,7 @@ WRITE8_MEMBER(fidelz80_state::bcc_control_w)
 	m_inp_mux = data & 0xf;
 }
 
-READ8_MEMBER(fidelz80_state::bcc_input_r)
+READ8_MEMBER(bcc_state::input_r)
 {
 	// d0-d3: multiplexed inputs
 	return read_inputs(4);
@@ -1000,7 +1041,7 @@ READ8_MEMBER(fidelz80_state::bcc_input_r)
 
 // TTL
 
-WRITE8_MEMBER(fidelz80_state::scc_control_w)
+WRITE8_MEMBER(scc_state::control_w)
 {
 	// a0-a2,d7: led data
 	u8 mask = 1 << (offset & 7);
@@ -1013,7 +1054,7 @@ WRITE8_MEMBER(fidelz80_state::scc_control_w)
 	display_matrix(8, 9, m_led_data, (m_inp_mux & 0xff) | (data << 4 & 0x100));
 }
 
-READ8_MEMBER(fidelz80_state::scc_input_r)
+READ8_MEMBER(scc_state::input_r)
 {
 	// d0-d7: multiplexed inputs (active low)
 	return ~read_inputs(9);
@@ -1027,14 +1068,14 @@ READ8_MEMBER(fidelz80_state::scc_input_r)
 
 // misc handlers
 
-void fidelz80_state::vsc_prepare_display()
+void vsc_state::prepare_display()
 {
 	// 4 7seg leds+H, 8*8 chessboard leds
 	set_display_segmask(0xf, 0x7f);
 	display_matrix(16, 8, m_led_data << 8 | m_7seg_data, m_led_select);
 }
 
-READ8_MEMBER(fidelz80_state::vsc_speech_r)
+READ8_MEMBER(vsc_state::speech_r)
 {
 	return m_speech_rom[m_speech_bank << 12 | offset];
 }
@@ -1042,42 +1083,42 @@ READ8_MEMBER(fidelz80_state::vsc_speech_r)
 
 // I8255 PPI
 
-WRITE8_MEMBER(fidelz80_state::vsc_ppi_porta_w)
+WRITE8_MEMBER(vsc_state::ppi_porta_w)
 {
 	// d0-d5: TSI C0-C5
 	m_speech->data_w(space, 0, data & 0x3f);
 
 	// d0-d7: data for the 4 7seg leds, bits are HGCBAFED (H is extra led)
 	m_7seg_data = bitswap<8>(data,7,6,2,1,0,5,4,3);
-	vsc_prepare_display();
+	prepare_display();
 }
 
-WRITE8_MEMBER(fidelz80_state::vsc_ppi_portb_w)
+WRITE8_MEMBER(vsc_state::ppi_portb_w)
 {
 	// d0-d7: led row data
 	m_led_data = data;
-	vsc_prepare_display();
+	prepare_display();
 }
 
-WRITE8_MEMBER(fidelz80_state::vsc_ppi_portc_w)
+WRITE8_MEMBER(vsc_state::ppi_portc_w)
 {
 	// d0-d3: select digits
 	// d0-d7: select leds, input mux low bits
 	m_inp_mux = (m_inp_mux & ~0xff) | data;
 	m_led_select = data;
-	vsc_prepare_display();
+	prepare_display();
 }
 
 
 // Z80 PIO
 
-READ8_MEMBER(fidelz80_state::vsc_pio_porta_r)
+READ8_MEMBER(vsc_state::pio_porta_r)
 {
 	// d0-d7: multiplexed inputs
 	return read_inputs(11);
 }
 
-READ8_MEMBER(fidelz80_state::vsc_pio_portb_r)
+READ8_MEMBER(vsc_state::pio_portb_r)
 {
 	u8 data = 0;
 
@@ -1087,7 +1128,7 @@ READ8_MEMBER(fidelz80_state::vsc_pio_portb_r)
 	return data;
 }
 
-WRITE8_MEMBER(fidelz80_state::vsc_pio_portb_w)
+WRITE8_MEMBER(vsc_state::pio_portb_w)
 {
 	// d0,d1: input mux highest bits
 	// d5: enable language switch
@@ -1112,7 +1153,7 @@ WRITE8_MEMBER(fidelz80_state::vsc_pio_portb_w)
 
 // misc handlers
 
-void card_state::vbrc_prepare_display()
+void card_state::prepare_display()
 {
 	// 14seg led segments, d15(12) is extra led
 	u16 outdata = bitswap<16>(m_7seg_data,12,13,1,6,5,2,0,7,15,11,10,14,4,3,9,8);
@@ -1120,7 +1161,7 @@ void card_state::vbrc_prepare_display()
 	display_matrix(16, 8, outdata, m_led_select);
 }
 
-WRITE8_MEMBER(card_state::vbrc_speech_w)
+WRITE8_MEMBER(card_state::speech_w)
 {
 	if (m_speech == nullptr)
 		return;
@@ -1134,11 +1175,11 @@ WRITE8_MEMBER(card_state::vbrc_speech_w)
 // I8243 I/O expander
 
 template<int P>
-void card_state::vbrc_ioexp_port_w(uint8_t data)
+void card_state::ioexp_port_w(uint8_t data)
 {
 	// P4x-P7x: digit segment data
 	m_7seg_data = (m_7seg_data & ~(0xf << (4*P))) | ((data & 0xf) << (4*P));
-	vbrc_prepare_display();
+	prepare_display();
 
 	// P71 is tone (not on speech model)
 	if (P == 3 && m_dac != nullptr)
@@ -1148,14 +1189,14 @@ void card_state::vbrc_ioexp_port_w(uint8_t data)
 
 // I8041 MCU
 
-WRITE8_MEMBER(card_state::vbrc_mcu_p1_w)
+WRITE8_MEMBER(card_state::mcu_p1_w)
 {
 	// P10-P17: select digits, input mux
 	m_inp_mux = m_led_select = data;
-	vbrc_prepare_display();
+	prepare_display();
 }
 
-READ8_MEMBER(card_state::vbrc_mcu_p2_r)
+READ8_MEMBER(card_state::mcu_p2_r)
 {
 	// P20-P23: I8243 P2
 	// P24-P27: multiplexed inputs (active low)
@@ -1170,32 +1211,32 @@ READ8_MEMBER(card_state::vbrc_mcu_p2_r)
 
 // TTL
 
-void fidelz80_state::dsc_prepare_display()
+void dsc_state::prepare_display()
 {
 	// 4 7seg leds
 	set_display_segmask(0xf, 0x7f);
 	display_matrix(8, 4, m_7seg_data, m_led_select);
 }
 
-WRITE8_MEMBER(fidelz80_state::dsc_control_w)
+WRITE8_MEMBER(dsc_state::control_w)
 {
 	// d0-d7: input mux, 7seg data
 	m_inp_mux = ~data;
 	m_7seg_data = data;
-	dsc_prepare_display();
+	prepare_display();
 }
 
-WRITE8_MEMBER(fidelz80_state::dsc_select_w)
+WRITE8_MEMBER(dsc_state::select_w)
 {
 	// d4: speaker out
 	m_dac->write(BIT(~data, 4));
 
 	// d0-d3: digit select
 	m_led_select = data & 0xf;
-	dsc_prepare_display();
+	prepare_display();
 }
 
-READ8_MEMBER(fidelz80_state::dsc_input_r)
+READ8_MEMBER(dsc_state::input_r)
 {
 	// d0-d7: multiplexed inputs (active low)
 	return ~read_inputs(8);
@@ -1209,7 +1250,7 @@ READ8_MEMBER(fidelz80_state::dsc_input_r)
 
 // CCX, VCC/UVC
 
-void ccx_state::ccx_map(address_map &map)
+void ccx_state::main_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0x3fff);
@@ -1218,20 +1259,20 @@ void ccx_state::ccx_map(address_map &map)
 	map(0x3000, 0x30ff).mirror(0x0f00).ram();
 }
 
-void ccx_state::ccx_io(address_map &map)
+void ccx_state::main_io(address_map &map)
 {
 	map.global_mask(0x03);
 	map(0x00, 0x03).rw(m_ppi8255, FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
 
-void vcc_state::vcc_map(address_map &map)
+void vcc_state::main_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x2fff).rom();
 	map(0x4000, 0x43ff).mirror(0x1c00).ram();
 }
 
-void vcc_state::vcc_io(address_map &map)
+void vcc_state::main_io(address_map &map)
 {
 	map.global_mask(0x03);
 	map(0x00, 0x03).rw(m_ppi8255, FUNC(i8255_device::read), FUNC(i8255_device::write));
@@ -1240,7 +1281,7 @@ void vcc_state::vcc_io(address_map &map)
 
 // BCC, BKC
 
-void fidelz80_state::bcc_map(address_map &map)
+void bcc_state::main_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0x3fff);
@@ -1248,31 +1289,31 @@ void fidelz80_state::bcc_map(address_map &map)
 	map(0x3000, 0x30ff).mirror(0x0f00).ram();
 }
 
-void fidelz80_state::bcc_io(address_map &map)
+void bcc_state::main_io(address_map &map)
 {
 	map.global_mask(0x07);
-	map(0x00, 0x07).rw(FUNC(fidelz80_state::bcc_input_r), FUNC(fidelz80_state::bcc_control_w));
+	map(0x00, 0x07).rw(FUNC(bcc_state::input_r), FUNC(bcc_state::control_w));
 }
 
 
 // SCC
 
-void fidelz80_state::scc_map(address_map &map)
+void scc_state::main_map(address_map &map)
 {
 	map(0x0000, 0x0fff).rom();
 	map(0x5000, 0x50ff).ram();
 }
 
-void fidelz80_state::scc_io(address_map &map)
+void scc_state::main_io(address_map &map)
 {
 	map.global_mask(0x07);
-	map(0x00, 0x07).rw(FUNC(fidelz80_state::scc_input_r), FUNC(fidelz80_state::scc_control_w));
+	map(0x00, 0x07).rw(FUNC(scc_state::input_r), FUNC(scc_state::control_w));
 }
 
 
 // VSC
 
-void fidelz80_state::vsc_map(address_map &map)
+void vsc_state::main_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x3fff).rom();
@@ -1281,7 +1322,7 @@ void fidelz80_state::vsc_map(address_map &map)
 }
 
 // VSC io: A2 is 8255 _CE, A3 is Z80 PIO _CE - in theory, both chips can be accessed simultaneously
-READ8_MEMBER(fidelz80_state::vsc_io_trampoline_r)
+READ8_MEMBER(vsc_state::main_io_trampoline_r)
 {
 	u8 data = 0xff; // open bus
 	if (~offset & 4)
@@ -1292,7 +1333,7 @@ READ8_MEMBER(fidelz80_state::vsc_io_trampoline_r)
 	return data;
 }
 
-WRITE8_MEMBER(fidelz80_state::vsc_io_trampoline_w)
+WRITE8_MEMBER(vsc_state::main_io_trampoline_w)
 {
 	if (~offset & 4)
 		m_ppi8255->write(offset & 3, data);
@@ -1300,24 +1341,24 @@ WRITE8_MEMBER(fidelz80_state::vsc_io_trampoline_w)
 		m_z80pio->write(space, offset & 3, data);
 }
 
-void fidelz80_state::vsc_io(address_map &map)
+void vsc_state::main_io(address_map &map)
 {
 	map.global_mask(0x0f);
-	map(0x00, 0x0f).rw(FUNC(fidelz80_state::vsc_io_trampoline_r), FUNC(fidelz80_state::vsc_io_trampoline_w));
+	map(0x00, 0x0f).rw(FUNC(vsc_state::main_io_trampoline_r), FUNC(vsc_state::main_io_trampoline_w));
 }
 
 
 // VBRC/UBC, BV3
 
-void card_state::vbrc_main_map(address_map &map)
+void card_state::main_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x5fff).rom();
 	map(0x6000, 0x63ff).mirror(0x1c00).ram();
-	map(0xe000, 0xe000).mirror(0x1fff).w(FUNC(card_state::vbrc_speech_w));
+	map(0xe000, 0xe000).mirror(0x1fff).w(FUNC(card_state::speech_w));
 }
 
-void card_state::vbrc_main_io(address_map &map)
+void card_state::main_io(address_map &map)
 {
 	map.global_mask(0x01);
 	map(0x00, 0x01).rw(m_mcu, FUNC(i8041_device::upi41_master_r), FUNC(i8041_device::upi41_master_w));
@@ -1326,13 +1367,13 @@ void card_state::vbrc_main_io(address_map &map)
 
 // DSC
 
-void fidelz80_state::dsc_map(address_map &map)
+void dsc_state::main_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x1fff).rom();
-	map(0x4000, 0x4000).mirror(0x1fff).w(FUNC(fidelz80_state::dsc_control_w));
-	map(0x6000, 0x6000).mirror(0x1fff).w(FUNC(fidelz80_state::dsc_select_w));
-	map(0x8000, 0x8000).mirror(0x1fff).r(FUNC(fidelz80_state::dsc_input_r));
+	map(0x4000, 0x4000).mirror(0x1fff).w(FUNC(dsc_state::control_w));
+	map(0x6000, 0x6000).mirror(0x1fff).w(FUNC(dsc_state::select_w));
+	map(0x8000, 0x8000).mirror(0x1fff).r(FUNC(dsc_state::input_r));
 	map(0xa000, 0xa3ff).mirror(0x1c00).ram();
 }
 
@@ -1868,18 +1909,18 @@ INPUT_PORTS_END
     Machine Drivers
 ******************************************************************************/
 
-void fidelz80_state::bkc(machine_config &config)
+void bcc_state::bkc(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 3.579545_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &fidelz80_state::bcc_map);
-	m_maincpu->set_addrmap(AS_IO, &fidelz80_state::bcc_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bcc_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &bcc_state::main_io);
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_fidel_bkc);
 }
 
-void fidelz80_state::bcc(machine_config &config)
+void bcc_state::bcc(machine_config &config)
 {
 	bkc(config);
 	config.set_default_layout(layout_fidel_bcc);
@@ -1892,12 +1933,12 @@ void fidelz80_state::bcc(machine_config &config)
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
-void fidelz80_state::scc(machine_config &config)
+void scc_state::scc(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 3.9_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &fidelz80_state::scc_map);
-	m_maincpu->set_addrmap(AS_IO, &fidelz80_state::scc_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &scc_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &scc_state::main_io);
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_fidel_sc8);
@@ -1914,17 +1955,17 @@ void ccx_state::ccx(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 4_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &ccx_state::ccx_map);
-	m_maincpu->set_addrmap(AS_IO, &ccx_state::ccx_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ccx_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &ccx_state::main_io);
 
 	I8255(config, m_ppi8255);
-	m_ppi8255->out_pa_callback().set(FUNC(ccx_state::ccx_ppi_porta_w));
+	m_ppi8255->out_pa_callback().set(FUNC(ccx_state::ppi_porta_w));
 	m_ppi8255->tri_pa_callback().set_constant(0);
 	m_ppi8255->in_pb_callback().set_ioport("LEVEL");
-	m_ppi8255->out_pb_callback().set(FUNC(ccx_state::ccx_ppi_portb_w));
-	m_ppi8255->in_pc_callback().set(FUNC(ccx_state::ccx_ppi_portc_r));
+	m_ppi8255->out_pb_callback().set(FUNC(ccx_state::ppi_portb_w));
+	m_ppi8255->in_pc_callback().set(FUNC(ccx_state::ppi_portc_r));
 	m_ppi8255->tri_pb_callback().set_constant(0);
-	m_ppi8255->out_pc_callback().set(FUNC(ccx_state::ccx_ppi_portc_w));
+	m_ppi8255->out_pc_callback().set(FUNC(ccx_state::ppi_portc_w));
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_fidel_cc10);
@@ -1940,17 +1981,17 @@ void vcc_state::vcc(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 4_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &vcc_state::vcc_map);
-	m_maincpu->set_addrmap(AS_IO, &vcc_state::vcc_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vcc_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &vcc_state::main_io);
 
 	I8255(config, m_ppi8255);
-	m_ppi8255->out_pa_callback().set(FUNC(vcc_state::vcc_ppi_porta_w));
+	m_ppi8255->out_pa_callback().set(FUNC(vcc_state::ppi_porta_w));
 	m_ppi8255->tri_pa_callback().set_constant(0);
-	m_ppi8255->in_pb_callback().set(FUNC(vcc_state::vcc_ppi_portb_r));
-	m_ppi8255->out_pb_callback().set(FUNC(vcc_state::vcc_ppi_portb_w));
+	m_ppi8255->in_pb_callback().set(FUNC(vcc_state::ppi_portb_r));
+	m_ppi8255->out_pb_callback().set(FUNC(vcc_state::ppi_portb_w));
 	m_ppi8255->tri_pb_callback().set_constant(0);
-	m_ppi8255->in_pc_callback().set(FUNC(vcc_state::vcc_ppi_portc_r));
-	m_ppi8255->out_pc_callback().set(FUNC(vcc_state::vcc_ppi_portc_w));
+	m_ppi8255->in_pc_callback().set(FUNC(vcc_state::ppi_portc_r));
+	m_ppi8255->out_pc_callback().set(FUNC(vcc_state::ppi_portc_w));
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_fidel_vcc);
@@ -1958,31 +1999,31 @@ void vcc_state::vcc(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	S14001A(config, m_speech, 25000); // R/C circuit, around 25khz
-	m_speech->ext_read().set(FUNC(vcc_state::vcc_speech_r));
+	m_speech->ext_read().set(FUNC(vcc_state::speech_r));
 	m_speech->add_route(ALL_OUTPUTS, "speaker", 0.75);
 }
 
-void fidelz80_state::vsc(machine_config &config)
+void vsc_state::vsc(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 3.9_MHz_XTAL); // 3.9MHz resonator
-	m_maincpu->set_addrmap(AS_PROGRAM, &fidelz80_state::vsc_map);
-	m_maincpu->set_addrmap(AS_IO, &fidelz80_state::vsc_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vsc_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &vsc_state::main_io);
 
 	const attotime irq_period = attotime::from_hz(587); // 555 timer, measured
-	TIMER(config, m_irq_on).configure_periodic(FUNC(fidelz80_state::irq_on<INPUT_LINE_NMI>), irq_period);
+	TIMER(config, m_irq_on).configure_periodic(FUNC(vsc_state::irq_on<INPUT_LINE_NMI>), irq_period);
 	m_irq_on->set_start_delay(irq_period - attotime::from_usec(845)); // active for 0.845ms (approx half)
-	TIMER(config, "irq_off").configure_periodic(FUNC(fidelz80_state::irq_off<INPUT_LINE_NMI>), irq_period);
+	TIMER(config, "irq_off").configure_periodic(FUNC(vsc_state::irq_off<INPUT_LINE_NMI>), irq_period);
 
 	I8255(config, m_ppi8255);
-	m_ppi8255->out_pa_callback().set(FUNC(fidelz80_state::vsc_ppi_porta_w));
-	m_ppi8255->out_pb_callback().set(FUNC(fidelz80_state::vsc_ppi_portb_w));
-	m_ppi8255->out_pc_callback().set(FUNC(fidelz80_state::vsc_ppi_portc_w));
+	m_ppi8255->out_pa_callback().set(FUNC(vsc_state::ppi_porta_w));
+	m_ppi8255->out_pb_callback().set(FUNC(vsc_state::ppi_portb_w));
+	m_ppi8255->out_pc_callback().set(FUNC(vsc_state::ppi_portc_w));
 
 	Z80PIO(config, m_z80pio, 3.9_MHz_XTAL);
-	m_z80pio->in_pa_callback().set(FUNC(fidelz80_state::vsc_pio_porta_r));
-	m_z80pio->in_pb_callback().set(FUNC(fidelz80_state::vsc_pio_portb_r));
-	m_z80pio->out_pb_callback().set(FUNC(fidelz80_state::vsc_pio_portb_w));
+	m_z80pio->in_pa_callback().set(FUNC(vsc_state::pio_porta_r));
+	m_z80pio->in_pb_callback().set(FUNC(vsc_state::pio_portb_r));
+	m_z80pio->out_pb_callback().set(FUNC(vsc_state::pio_portb_w));
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_fidel_vsc);
@@ -1990,7 +2031,7 @@ void fidelz80_state::vsc(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	S14001A(config, m_speech, 25000); // R/C circuit, around 25khz
-	m_speech->ext_read().set(FUNC(fidelz80_state::vsc_speech_r));
+	m_speech->ext_read().set(FUNC(vsc_state::speech_r));
 	m_speech->add_route(ALL_OUTPUTS, "speaker", 0.75);
 }
 
@@ -1998,13 +2039,13 @@ void card_state::brc_base(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 5_MHz_XTAL/2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &card_state::vbrc_main_map);
-	m_maincpu->set_addrmap(AS_IO, &card_state::vbrc_main_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &card_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &card_state::main_io);
 	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	I8041(config, m_mcu, 5_MHz_XTAL);
-	m_mcu->p1_out_cb().set(FUNC(card_state::vbrc_mcu_p1_w));
-	m_mcu->p2_in_cb().set(FUNC(card_state::vbrc_mcu_p2_r));
+	m_mcu->p1_out_cb().set(FUNC(card_state::mcu_p1_w));
+	m_mcu->p2_in_cb().set(FUNC(card_state::mcu_p2_r));
 	m_mcu->p2_out_cb().set(m_i8243, FUNC(i8243_device::p2_w));
 	m_mcu->prog_out_cb().set(m_i8243, FUNC(i8243_device::prog_w));
 	m_mcu->t0_in_cb().set_ioport("BARCODE"); // card scanner
@@ -2014,10 +2055,10 @@ void card_state::brc_base(machine_config &config)
 	m_mcu->t1_in_cb().set("t1_clock", FUNC(clock_device::signal_r)).invert();
 
 	I8243(config, m_i8243);
-	m_i8243->p4_out_cb().set(FUNC(card_state::vbrc_ioexp_port_w<0>));
-	m_i8243->p5_out_cb().set(FUNC(card_state::vbrc_ioexp_port_w<1>));
-	m_i8243->p6_out_cb().set(FUNC(card_state::vbrc_ioexp_port_w<2>));
-	m_i8243->p7_out_cb().set(FUNC(card_state::vbrc_ioexp_port_w<3>));
+	m_i8243->p4_out_cb().set(FUNC(card_state::ioexp_port_w<0>));
+	m_i8243->p5_out_cb().set(FUNC(card_state::ioexp_port_w<1>));
+	m_i8243->p6_out_cb().set(FUNC(card_state::ioexp_port_w<2>));
+	m_i8243->p7_out_cb().set(FUNC(card_state::ioexp_port_w<3>));
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_fidel_vbrc);
@@ -2052,16 +2093,16 @@ void card_state::bv3(machine_config &config)
 	config.set_default_layout(layout_fidel_bv3);
 }
 
-void fidelz80_state::dsc(machine_config &config)
+void dsc_state::dsc(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 3.9_MHz_XTAL); // 3.9MHz resonator
-	m_maincpu->set_addrmap(AS_PROGRAM, &fidelz80_state::dsc_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &dsc_state::main_map);
 
 	const attotime irq_period = attotime::from_hz(523); // from 555 timer (22nF, 120K, 2.7K)
-	TIMER(config, m_irq_on).configure_periodic(FUNC(fidelz80_state::irq_on<INPUT_LINE_IRQ0>), irq_period);
+	TIMER(config, m_irq_on).configure_periodic(FUNC(dsc_state::irq_on<INPUT_LINE_IRQ0>), irq_period);
 	m_irq_on->set_start_delay(irq_period - attotime::from_usec(41)); // active for 41us
-	TIMER(config, "irq_off").configure_periodic(FUNC(fidelz80_state::irq_off<INPUT_LINE_IRQ0>), irq_period);
+	TIMER(config, "irq_off").configure_periodic(FUNC(dsc_state::irq_off<INPUT_LINE_IRQ0>), irq_period);
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_fidel_dsc);
@@ -2277,10 +2318,10 @@ ROM_END
 
 //    YEAR  NAME      PARENT  CMP MACHINE INPUT  CLASS           INIT        COMPANY                 FULLNAME, FLAGS
 CONS( 1978, cc10,     0,       0, ccx,    ccx,   ccx_state, empty_init, "Fidelity Electronics", "Chess Challenger 10 (model CCX, rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1979, cc7,      0,       0, bcc,    bcc,   fidelz80_state, empty_init, "Fidelity Electronics", "Chess Challenger 7 (model BCC, rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1979, backgamc, 0,       0, bkc,    bkc,   fidelz80_state, empty_init, "Fidelity Electronics", "Backgammon Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )
+CONS( 1979, cc7,      0,       0, bcc,    bcc,   bcc_state, empty_init, "Fidelity Electronics", "Chess Challenger 7 (model BCC, rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1979, backgamc, 0,       0, bkc,    bkc,   bcc_state, empty_init, "Fidelity Electronics", "Backgammon Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )
 
-CONS( 1980, fscc8,    0,       0, scc,    scc,   fidelz80_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger 8", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1980, fscc8,    0,       0, scc,    scc,   scc_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger 8", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 
 CONS( 1979, vcc,      0,       0, vcc,    vcc,   vcc_state, empty_init, "Fidelity Electronics", "Voice Chess Challenger (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1979, vccsp,    vcc,     0, vcc,    vccsp, vcc_state, empty_init, "Fidelity Electronics", "Voice Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
@@ -2292,13 +2333,13 @@ CONS( 1980, uvcsp,    vcc,     0, vcc,    vccsp, vcc_state, empty_init, "Fidelit
 CONS( 1980, uvcg,     vcc,     0, vcc,    vccg,  vcc_state, empty_init, "Fidelity Electronics", "Advanced Voice Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1980, uvcfr,    vcc,     0, vcc,    vccfr, vcc_state, empty_init, "Fidelity Electronics", "Advanced Voice Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1980, vsc,      0,       0, vsc,    vsc,   fidelz80_state, empty_init, "Fidelity Electronics", "Voice Sensory Chess Challenger (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1980, vscsp,    vsc,     0, vsc,    vscsp, fidelz80_state, empty_init, "Fidelity Electronics", "Voice Sensory Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1980, vscg,     vsc,     0, vsc,    vscg,  fidelz80_state, empty_init, "Fidelity Electronics", "Voice Sensory Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1980, vscfr,    vsc,     0, vsc,    vscfr, fidelz80_state, empty_init, "Fidelity Electronics", "Voice Sensory Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1980, vsc,      0,       0, vsc,    vsc,   vsc_state, empty_init, "Fidelity Electronics", "Voice Sensory Chess Challenger (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1980, vscsp,    vsc,     0, vsc,    vscsp, vsc_state, empty_init, "Fidelity Electronics", "Voice Sensory Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1980, vscg,     vsc,     0, vsc,    vscg,  vsc_state, empty_init, "Fidelity Electronics", "Voice Sensory Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1980, vscfr,    vsc,     0, vsc,    vscfr, vsc_state, empty_init, "Fidelity Electronics", "Voice Sensory Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 
 CONS( 1980, vbrc,     0,       0, vbrc,   vbrc,  card_state, empty_init, "Fidelity Electronics", "Voice Bridge Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )
 CONS( 1980, bridgeca, vbrc,    0, ubc,    vbrc,  card_state, empty_init, "Fidelity Electronics", "Advanced Bridge Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )
 CONS( 1982, bridgec3, 0,       0, bv3,    bv3,   card_state, empty_init, "Fidelity Electronics", "Bridge Challenger III", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )
 
-CONS( 1981, damesc,   0,       0, dsc,    dsc,   fidelz80_state, empty_init, "Fidelity Electronics", "Dame Sensory Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1981, damesc,   0,       0, dsc,    dsc,   dsc_state, empty_init, "Fidelity Electronics", "Dame Sensory Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )

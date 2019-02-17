@@ -138,7 +138,8 @@ chessmst.cpp
 chesstrv.cpp
 cit101.cpp
 cit220.cpp
-ckz80.cpp
+cking_master.cpp
+ckingbase.cpp
 clcd.cpp
 clickstart.cpp
 cm1800.cpp
@@ -163,7 +164,8 @@ crimson.cpp
 crvision.cpp
 ct486.cpp
 cvicny.cpp
-cxgz80.cpp
+cxg_ch2001.cpp
+cxgbase.cpp
 cxhumax.cpp
 cybiko.cpp
 cz101.cpp
@@ -239,10 +241,10 @@ fb01.cpp
 fc100.cpp
 fccpu20.cpp
 fccpu30.cpp
+fidel_sc6.cpp
 fidel6502.cpp
 fidel68k.cpp
-fidelmcs48.cpp
-fidelz80.cpp
+fidelbase.cpp
 fk1.cpp
 fm7.cpp
 fmtowns.cpp

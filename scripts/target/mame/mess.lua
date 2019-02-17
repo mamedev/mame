@@ -1835,7 +1835,9 @@ files {
 
 createMESSProjects(_target, _subtarget, "chessking")
 files {
-	MAME_DIR .. "src/mame/drivers/ckz80.cpp",
+	MAME_DIR .. "src/mame/drivers/ckingbase.cpp",
+	MAME_DIR .. "src/mame/includes/ckingbase.h",
+	MAME_DIR .. "src/mame/drivers/cking_master.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "chromatics")
@@ -1897,7 +1899,9 @@ files {
 
 createMESSProjects(_target, _subtarget, "cxg")
 files {
-	MAME_DIR .. "src/mame/drivers/cxgz80.cpp",
+	MAME_DIR .. "src/mame/drivers/cxgbase.cpp",
+	MAME_DIR .. "src/mame/includes/cxgbase.h",
+	MAME_DIR .. "src/mame/drivers/cxg_ch2001.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "cybiko")
@@ -2125,11 +2129,12 @@ files {
 
 createMESSProjects(_target, _subtarget, "fidelity")
 files {
-	MAME_DIR .. "src/mame/drivers/fidelz80.cpp",
+	MAME_DIR .. "src/mame/drivers/fidelbase.cpp",
 	MAME_DIR .. "src/mame/includes/fidelbase.h",
+	MAME_DIR .. "src/mame/drivers/fidel_sc6.cpp",
 	MAME_DIR .. "src/mame/drivers/fidel6502.cpp",
+	MAME_DIR .. "src/mame/includes/fidel_desdis_common.h",
 	MAME_DIR .. "src/mame/drivers/fidel68k.cpp",
-	MAME_DIR .. "src/mame/drivers/fidelmcs48.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "force")

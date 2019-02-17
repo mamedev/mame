@@ -441,6 +441,7 @@ I/O is via TTL, very similar to Designer Display
 
 #include "emu.h"
 #include "includes/fidelbase.h"
+#include "includes/fidel_desdis_common.h"
 
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6502/r65c02.h"
@@ -476,7 +477,6 @@ public:
 	fidel6502_state(const machine_config &mconfig, device_type type, const char *tag) :
 		fidelbase_state(mconfig, type, tag),
 		m_ppi8255(*this, "ppi8255"),
-		m_rombank(*this, "rombank"),
 		m_mainmap(*this, "mainmap"),
 		m_div_config(*this, "div_config")
 	{ }
@@ -515,10 +515,6 @@ public:
 	void fdes2000(machine_config &config);
 	DECLARE_INPUT_CHANGED_MEMBER(fexcelv_bankswitch);
 
-	void fdes2000d(machine_config &config);
-	void fdes2100d(machine_config &config);
-	void init_fdesdis();
-
 	void fphantom(machine_config &config);
 	void init_fphantom();
 
@@ -529,7 +525,6 @@ public:
 private:
 	// devices/pointers
 	optional_device<i8255_device> m_ppi8255;
-	optional_memory_bank m_rombank;
 	optional_device<address_map_bank_device> m_mainmap;
 	optional_ioport m_div_config;
 
@@ -603,11 +598,6 @@ private:
 	void fexcelb_map(address_map &map);
 	void fexcelp_map(address_map &map);
 
-	// Designer Display
-	DECLARE_WRITE8_MEMBER(fdesdis_control_w);
-	DECLARE_WRITE8_MEMBER(fdesdis_lcd_w);
-	DECLARE_READ8_MEMBER(fdesdis_input_r);
-	void fdesdis_map(address_map &map);
 
 	// Phantom
 	DECLARE_MACHINE_RESET(fphantom);
@@ -616,6 +606,7 @@ private:
 	// Chesster
 	DECLARE_WRITE8_MEMBER(chesster_control_w);
 	DECLARE_WRITE8_MEMBER(kishon_control_w);
+	DECLARE_READ8_MEMBER(chesster_input_r);
 	void chesster_map(address_map &map);
 	void kishon_map(address_map &map);
 
@@ -641,6 +632,23 @@ void fidel6502_state::machine_reset()
 
 	m_div_status = ~0;
 }
+
+
+
+class desdis_state : public desdis_common_state
+{
+public:
+	desdis_state(const machine_config &mconfig, device_type type, const char *tag) :
+		desdis_common_state(mconfig, type, tag)
+	{ }
+
+	void fdes2000d(machine_config &config);
+	void fdes2100d(machine_config &config);
+	void init_fdes2100d();
+
+private:
+	void fdes2100d_map(address_map &map);
+};
 
 
 
@@ -1170,7 +1178,7 @@ READ8_MEMBER(fidel6502_state::fexcel_ttl_r)
 
 // TTL/generic
 
-WRITE8_MEMBER(fidel6502_state::fdesdis_control_w)
+WRITE8_MEMBER(desdis_common_state::control_w)
 {
 	u8 q3_old = m_led_select & 8;
 
@@ -1190,7 +1198,8 @@ WRITE8_MEMBER(fidel6502_state::fdesdis_control_w)
 	display_matrix(9, 2, m_inp_mux, ~m_led_select & 3, false);
 
 	// 74259 Q2: book rom A14
-	m_rombank->set_entry(~m_led_select >> 2 & 1);
+	if (m_rombank != nullptr)
+		m_rombank->set_entry(~m_led_select >> 2 & 1);
 
 	// 74259 Q3: lcd common, update on rising edge
 	if (~q3_old & m_led_select & 8)
@@ -1204,7 +1213,7 @@ WRITE8_MEMBER(fidel6502_state::fdesdis_control_w)
 	display_update();
 }
 
-WRITE8_MEMBER(fidel6502_state::fdesdis_lcd_w)
+WRITE8_MEMBER(desdis_common_state::lcd_w)
 {
 	// a0-a2,d0-d3: 4*74259 to lcd digit segments
 	u32 mask = bitswap<8>(1 << offset,3,7,6,0,1,2,4,5);
@@ -1215,13 +1224,13 @@ WRITE8_MEMBER(fidel6502_state::fdesdis_lcd_w)
 	}
 }
 
-READ8_MEMBER(fidel6502_state::fdesdis_input_r)
+READ8_MEMBER(desdis_common_state::input_r)
 {
 	// a0-a2,d7: multiplexed inputs (active low)
 	return (read_inputs(9) >> offset & 1) ? 0 : 0x80;
 }
 
-void fidel6502_state::init_fdesdis()
+void desdis_state::init_fdes2100d()
 {
 	m_rombank->configure_entries(0, 2, memregion("rombank")->base(), 0x4000);
 }
@@ -1280,6 +1289,12 @@ WRITE8_MEMBER(fidel6502_state::kishon_control_w)
 	// 2 more bankswitch bits: 74259(2) Q2 to A17, Q0 to A18
 	u8 bank = (m_led_select >> 2 & 3) | bitswap<3>(m_speech_bank, 0,2,3) << 2;
 	m_rombank->set_entry(bank);
+}
+
+READ8_MEMBER(fidel6502_state::chesster_input_r)
+{
+	// a0-a2,d7: multiplexed inputs (active low)
+	return (read_inputs(9) >> offset & 1) ? 0 : 0x80;
 }
 
 void fidel6502_state::init_chesster()
@@ -1445,12 +1460,12 @@ void fidel6502_state::fexcelb_map(address_map &map)
 
 // Designer Display, Phantom, Chesster
 
-void fidel6502_state::fdesdis_map(address_map &map)
+void desdis_state::fdes2100d_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
-	map(0x2000, 0x2007).mirror(0x1ff8).rw(FUNC(fidel6502_state::fdesdis_input_r), FUNC(fidel6502_state::fdesdis_control_w));
+	map(0x2000, 0x2007).mirror(0x1ff8).rw(FUNC(desdis_state::input_r), FUNC(desdis_state::control_w));
 	map(0x4000, 0x7fff).bankr("rombank");
-	map(0x6000, 0x6007).mirror(0x1ff8).w(FUNC(fidel6502_state::fdesdis_lcd_w));
+	map(0x6000, 0x6007).mirror(0x1ff8).w(FUNC(desdis_state::lcd_w));
 	map(0x8000, 0xffff).rom();
 }
 
@@ -1464,7 +1479,7 @@ void fidel6502_state::fphantom_map(address_map &map)
 void fidel6502_state::chesster_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
-	map(0x2000, 0x2007).mirror(0x1ff8).rw(FUNC(fidel6502_state::fdesdis_input_r), FUNC(fidel6502_state::chesster_control_w));
+	map(0x2000, 0x2007).mirror(0x1ff8).rw(FUNC(fidel6502_state::chesster_input_r), FUNC(fidel6502_state::chesster_control_w));
 	map(0x4000, 0x7fff).bankr("rombank");
 	map(0x6000, 0x6000).mirror(0x1fff).w("dac8", FUNC(dac_byte_interface::data_w));
 	map(0x8000, 0xffff).rom();
@@ -1473,7 +1488,7 @@ void fidel6502_state::chesster_map(address_map &map)
 void fidel6502_state::kishon_map(address_map &map)
 {
 	chesster_map(map);
-	map(0x2000, 0x2007).mirror(0x1ff8).rw(FUNC(fidel6502_state::fdesdis_input_r), FUNC(fidel6502_state::kishon_control_w));
+	map(0x2000, 0x2007).mirror(0x1ff8).rw(FUNC(fidel6502_state::chesster_input_r), FUNC(fidel6502_state::kishon_control_w));
 }
 
 
@@ -1796,7 +1811,7 @@ static INPUT_PORTS_START( fdes )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( fdesdis )
+INPUT_PORTS_START( desdis )
 	PORT_INCLUDE( fidel_cb_buttons )
 
 	PORT_START("IN.8")
@@ -1811,13 +1826,17 @@ static INPUT_PORTS_START( fdesdis )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( chesster )
-	PORT_INCLUDE( fdesdis )
+	PORT_INCLUDE( fidel_cb_buttons )
 
-	PORT_MODIFY("IN.8")
+	PORT_START("IN.8")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_NAME("Clear")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_NAME("Move / No")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_NAME("Hint / Yes")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F) PORT_NAME("Take Back / Repeat")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_C) PORT_NAME("Level / New")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_B) PORT_NAME("Option / Replay")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_NAME("Verify / Problem")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_NAME("Shift")
 INPUT_PORTS_END
 
 
@@ -2208,16 +2227,16 @@ void fidel6502_state::fexceld(machine_config &config)
 	config.set_default_layout(layout_fidel_exd);
 }
 
-void fidel6502_state::fdes2100d(machine_config &config)
+void desdis_state::fdes2100d(machine_config &config)
 {
 	/* basic machine hardware */
 	M65C02(config, m_maincpu, 6_MHz_XTAL); // W65C02P-6
-	m_maincpu->set_addrmap(AS_PROGRAM, &fidel6502_state::fdesdis_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &desdis_state::fdes2100d_map);
 
 	const attotime irq_period = attotime::from_hz(630); // from 556 timer (22nF, 102K, 1K)
-	TIMER(config, m_irq_on).configure_periodic(FUNC(fidel6502_state::irq_on<M6502_IRQ_LINE>), irq_period);
+	TIMER(config, m_irq_on).configure_periodic(FUNC(desdis_state::irq_on<M6502_IRQ_LINE>), irq_period);
 	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(15250)); // active for 15.25us
-	TIMER(config, "irq_off").configure_periodic(FUNC(fidel6502_state::irq_off<M6502_IRQ_LINE>), irq_period);
+	TIMER(config, "irq_off").configure_periodic(FUNC(desdis_state::irq_off<M6502_IRQ_LINE>), irq_period);
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_fidel_desdis);
@@ -2230,13 +2249,13 @@ void fidel6502_state::fdes2100d(machine_config &config)
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
-void fidel6502_state::fdes2000d(machine_config &config)
+void desdis_state::fdes2000d(machine_config &config)
 {
 	fdes2100d(config);
 
 	/* basic machine hardware */
 	R65C02(config.replace(), m_maincpu, 3_MHz_XTAL); // R65C02P3
-	m_maincpu->set_addrmap(AS_PROGRAM, &fidel6502_state::fdesdis_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &desdis_state::fdes2100d_map);
 }
 
 void fidel6502_state::fphantom(machine_config &config)
@@ -2901,8 +2920,8 @@ CONS( 1986, granits,    fexcelp,  0, granits,   fexcel,    fidel6502_state, empt
 CONS( 1988, fdes2000,   fexcelp,  0, fdes2000,  fdes,      fidel6502_state, empty_init,    "Fidelity Electronics", "Designer 2000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS ) // Excellence series hardware
 CONS( 1988, fdes2100,   fexcelp,  0, fdes2100,  fdes,      fidel6502_state, empty_init,    "Fidelity Electronics", "Designer 2100", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS ) // "
 
-CONS( 1988, fdes2100d,  0,        0, fdes2100d, fdesdis,   fidel6502_state, init_fdesdis,  "Fidelity Electronics", "Designer 2100 Display (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1988, fdes2000d,  fdes2100d,0, fdes2000d, fdesdis,   fidel6502_state, init_fdesdis,  "Fidelity Electronics", "Designer 2000 Display", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1988, fdes2100d,  0,        0, fdes2100d, desdis,   desdis_state, init_fdes2100d,  "Fidelity Electronics", "Designer 2100 Display (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1988, fdes2000d,  fdes2100d,0, fdes2000d, desdis,   desdis_state, init_fdes2100d,  "Fidelity Electronics", "Designer 2000 Display", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 
 CONS( 1988, fphantom,   0,        0, fphantom,  fphantom,  fidel6502_state, init_fphantom, "Fidelity Electronics", "Phantom (Fidelity)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 

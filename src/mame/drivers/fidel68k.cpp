@@ -181,6 +181,7 @@ B0000x-xxxxxx: see V7, -800000
 
 #include "emu.h"
 #include "includes/fidelbase.h"
+#include "includes/fidel_desdis_common.h"
 
 #include "cpu/m68000/m68000.h"
 #include "machine/ram.h"
@@ -195,21 +196,13 @@ B0000x-xxxxxx: see V7, -800000
 #include "fidel_eag_68k.lh" // clickable
 
 
-class fidel68k_state : public fidelbase_state
+class eag_state : public fidelbase_state
 {
 public:
-	fidel68k_state(const machine_config &mconfig, device_type type, const char *tag) :
+	eag_state(const machine_config &mconfig, device_type type, const char *tag) :
 		fidelbase_state(mconfig, type, tag),
 		m_ram(*this, "ram")
 	{ }
-
-	void fex68k(machine_config &config);
-	void fex68km2(machine_config &config);
-	void fex68km3(machine_config &config);
-
-	void fdes2265(machine_config &config);
-	void fdes2325(machine_config &config);
-	void init_fdes2265();
 
 	void eag_base(machine_config &config);
 	void eag(machine_config &config);
@@ -218,35 +211,72 @@ public:
 	void eagv9(machine_config &config);
 	void eagv10(machine_config &config);
 	void eagv11(machine_config &config);
+
 	void init_eag();
 
 private:
+	// devices/pointers
 	optional_device<ram_device> m_ram;
 
-	// Excel 68000
-	DECLARE_WRITE8_MEMBER(fex68k_mux_w);
-	void fex68k_map(address_map &map);
-	void fex68km2_map(address_map &map);
-	void fex68km3_map(address_map &map);
-
-	// Designer Master
-	DECLARE_WRITE8_MEMBER(fdes68k_control_w);
-	DECLARE_READ8_MEMBER(fdes68k_input_r);
-	DECLARE_WRITE8_MEMBER(fdes68k_lcd_w);
-	void fdes2265_map(address_map &map);
-	void fdes2325_map(address_map &map);
-
-	// EAG(6114/6117)
-	void eag_prepare_display();
-	DECLARE_READ8_MEMBER(eag_input1_r);
-	DECLARE_WRITE8_MEMBER(eag_leds_w);
-	DECLARE_WRITE8_MEMBER(eag_7seg_w);
-	DECLARE_WRITE8_MEMBER(eag_mux_w);
-	DECLARE_READ8_MEMBER(eag_input2_r);
 	void eag_map(address_map &map);
 	void eagv7_map(address_map &map);
 	void eagv11_map(address_map &map);
 	void eagv5_slave_map(address_map &map);
+
+	// I/O handlers
+	void prepare_display();
+	DECLARE_READ8_MEMBER(input1_r);
+	DECLARE_READ8_MEMBER(input2_r);
+	DECLARE_WRITE8_MEMBER(leds_w);
+	DECLARE_WRITE8_MEMBER(digit_w);
+	DECLARE_WRITE8_MEMBER(mux_w);
+};
+
+
+class desmas_state : public desdis_common_state
+{
+public:
+	desmas_state(const machine_config &mconfig, device_type type, const char *tag) :
+		desdis_common_state(mconfig, type, tag)
+	{ }
+
+	void fdes2265(machine_config &config);
+	void fdes2325(machine_config &config);
+
+	void init_fdes2265();
+
+private:
+	void fdes2265_map(address_map &map);
+	void fdes2325_map(address_map &map);
+
+	// I/O handlers
+	virtual DECLARE_WRITE8_MEMBER(control_w) override;
+	virtual DECLARE_WRITE8_MEMBER(lcd_w) override;
+};
+
+
+class excel68k_state : public fidelbase_state
+{
+public:
+	excel68k_state(const machine_config &mconfig, device_type type, const char *tag) :
+		fidelbase_state(mconfig, type, tag)
+	{ }
+
+	void fex68k(machine_config &config);
+	void fex68km2(machine_config &config);
+	void fex68km3(machine_config &config);
+
+private:
+	void fex68k_map(address_map &map);
+	void fex68km2_map(address_map &map);
+	void fex68km3_map(address_map &map);
+
+	// I/O handlers
+	void prepare_display();
+	DECLARE_READ8_MEMBER(input_r);
+	DECLARE_WRITE8_MEMBER(leds_w);
+	DECLARE_WRITE8_MEMBER(digit_w);
+	DECLARE_WRITE8_MEMBER(mux_w);
 };
 
 
@@ -257,14 +287,47 @@ private:
     Excel 68000
 ******************************************************************************/
 
-WRITE8_MEMBER(fidel68k_state::fex68k_mux_w)
+void excel68k_state::prepare_display()
+{
+	// 4*7seg leds, 8*8 chessboard leds
+	u8 seg_data = bitswap<8>(m_7seg_data,0,1,3,2,7,5,6,4);
+	set_display_segmask(0x55, 0x7f);
+	display_matrix(16, 8, m_led_data << 8 | seg_data, m_inp_mux);
+}
+
+READ8_MEMBER(excel68k_state::input_r)
+{
+	// a1-a3,d7: multiplexed inputs (active low)
+	return (read_inputs(9) >> offset & 1) ? 0 : 0x80;
+}
+
+WRITE8_MEMBER(excel68k_state::leds_w)
+{
+	// a1-a3,d0: led data
+	m_led_data = (m_led_data & ~(1 << offset)) | ((data & 1) << offset);
+	prepare_display();
+}
+
+WRITE8_MEMBER(excel68k_state::digit_w)
+{
+	// a1-a3,d0(d8): digit segment data
+	m_7seg_data = (m_7seg_data & ~(1 << offset)) | ((data & 1) << offset);
+	prepare_display();
+}
+
+WRITE8_MEMBER(excel68k_state::mux_w)
 {
 	// a1-a3,d0: 74259
 	u8 mask = 1 << offset;
 	m_led_select = (m_led_select & ~mask) | ((data & 1) ? mask : 0);
 
 	// 74259 Q0-Q3: 74145 A-D (Q4-Q7 N/C)
-	eag_mux_w(space, offset, m_led_select & 0xf);
+	// 74145 0-8: input mux, digit/led select
+	// 74145 9: speaker out
+	u16 sel = 1 << (m_led_select & 0xf);
+	m_dac->write(BIT(sel, 9));
+	m_inp_mux = sel & 0x1ff;
+	prepare_display();
 }
 
 
@@ -273,55 +336,19 @@ WRITE8_MEMBER(fidel68k_state::fex68k_mux_w)
     Designer Master
 ******************************************************************************/
 
-WRITE8_MEMBER(fidel68k_state::fdes68k_control_w)
+WRITE8_MEMBER(desmas_state::control_w)
 {
-	u8 q3_old = m_led_select & 8;
-
-	// a1-a3,d0: 74259
-	u8 mask = 1 << offset;
-	m_led_select = (m_led_select & ~mask) | ((data & 1) ? mask : 0);
-
-	// 74259 Q4-Q7: 7442 a0-a3
-	// 7442 0-8: led data, input mux
-	u16 sel = 1 << (m_led_select >> 4 & 0xf) & 0x3ff;
-	m_inp_mux = sel & 0x1ff;
-
-	// 7442 9: speaker out
-	m_dac->write(BIT(sel, 9));
-
-	// 74259 Q0,Q1: led select (active low)
-	display_matrix(9, 2, m_inp_mux, ~m_led_select & 3, false);
-
-	// 74259 Q3: lcd common, update on rising edge
-	if (~q3_old & m_led_select & 8)
-	{
-		for (int i = 0; i < 4; i++)
-			m_display_state[i+2] = m_7seg_data >> (8*i) & 0xff;
-	}
-
-	m_display_maxy += 4;
-	set_display_segmask(0x3c, 0x7f);
-	display_update();
+	// same as desdis, d0 instead of d7
+	desdis_common_state::control_w(space, offset, data << 7);
 }
 
-READ8_MEMBER(fidel68k_state::fdes68k_input_r)
+WRITE8_MEMBER(desmas_state::lcd_w)
 {
-	// a1-a3,d7(d15): multiplexed inputs (active low)
-	return (read_inputs(9) >> offset & 1) ? 0 : 0x80;
+	// same as desdis, inverted data
+	desdis_common_state::lcd_w(space, offset, ~data);
 }
 
-WRITE8_MEMBER(fidel68k_state::fdes68k_lcd_w)
-{
-	// a1-a3,d0-d3: 4*74259 to lcd digit segments
-	u32 mask = bitswap<8>(1 << offset,3,7,6,0,1,2,4,5);
-	for (int i = 0; i < 4; i++)
-	{
-		m_7seg_data = (m_7seg_data & ~mask) | ((data >> i & 1) ? mask : 0);
-		mask <<= 8;
-	}
-}
-
-void fidel68k_state::init_fdes2265()
+void desmas_state::init_fdes2265()
 {
 	u16 *rom = (u16*)memregion("maincpu")->base();
 	const u32 len = memregion("maincpu")->bytes() / 2;
@@ -345,42 +372,41 @@ void fidel68k_state::init_fdes2265()
 
 // TTL/generic
 
-void fidel68k_state::eag_prepare_display()
+void eag_state::prepare_display()
 {
-	// Excel 68000: 4*7seg leds, 8*8 chessboard leds
-	// EAG: 8*7seg leds(2 panels), (8+1)*8 chessboard leds
+	// 8*7seg leds(2 panels), (8+1)*8 chessboard leds
 	u8 seg_data = bitswap<8>(m_7seg_data,0,1,3,2,7,5,6,4);
-	set_display_segmask(0x1ff, 0x7f);
+	set_display_segmask(0x1ef, 0x7f);
 	display_matrix(16, 9, m_led_data << 8 | seg_data, m_inp_mux);
 }
 
-READ8_MEMBER(fidel68k_state::eag_input1_r)
+READ8_MEMBER(eag_state::input1_r)
 {
 	// a1-a3,d7: multiplexed inputs (active low)
 	return (read_inputs(9) >> offset & 1) ? 0 : 0x80;
 }
 
-READ8_MEMBER(fidel68k_state::eag_input2_r)
+READ8_MEMBER(eag_state::input2_r)
 {
 	// d7: multiplexed inputs highest bit
 	return (read_inputs(9) & 0x100) ? 0x80 : 0;
 }
 
-WRITE8_MEMBER(fidel68k_state::eag_leds_w)
+WRITE8_MEMBER(eag_state::leds_w)
 {
 	// a1-a3,d0: led data
 	m_led_data = (m_led_data & ~(1 << offset)) | ((data & 1) << offset);
-	eag_prepare_display();
+	prepare_display();
 }
 
-WRITE8_MEMBER(fidel68k_state::eag_7seg_w)
+WRITE8_MEMBER(eag_state::digit_w)
 {
 	// a1-a3,d0(d8): digit segment data
 	m_7seg_data = (m_7seg_data & ~(1 << offset)) | ((data & 1) << offset);
-	eag_prepare_display();
+	prepare_display();
 }
 
-WRITE8_MEMBER(fidel68k_state::eag_mux_w)
+WRITE8_MEMBER(eag_state::mux_w)
 {
 	// d0-d3: 74145 A-D
 	// 74145 0-8: input mux, digit/led select
@@ -388,7 +414,7 @@ WRITE8_MEMBER(fidel68k_state::eag_mux_w)
 	u16 sel = 1 << (data & 0xf);
 	m_dac->write(BIT(sel, 9));
 	m_inp_mux = sel & 0x1ff;
-	eag_prepare_display();
+	prepare_display();
 }
 
 
@@ -399,23 +425,23 @@ WRITE8_MEMBER(fidel68k_state::eag_mux_w)
 
 // Excel 68000
 
-void fidel68k_state::fex68k_map(address_map &map)
+void excel68k_state::fex68k_map(address_map &map)
 {
 	map(0x000000, 0x00ffff).rom();
-	map(0x000000, 0x00000f).mirror(0x00fff0).w(FUNC(fidel68k_state::eag_leds_w)).umask16(0x00ff);
-	map(0x000000, 0x00000f).mirror(0x00fff0).w(FUNC(fidel68k_state::eag_7seg_w)).umask16(0xff00);
+	map(0x000000, 0x00000f).mirror(0x00fff0).w(FUNC(excel68k_state::leds_w)).umask16(0x00ff);
+	map(0x000000, 0x00000f).mirror(0x00fff0).w(FUNC(excel68k_state::digit_w)).umask16(0xff00);
 	map(0x044000, 0x047fff).ram();
-	map(0x100000, 0x10000f).mirror(0x03fff0).r(FUNC(fidel68k_state::eag_input1_r)).umask16(0x00ff);
-	map(0x140000, 0x14000f).mirror(0x03fff0).w(FUNC(fidel68k_state::fex68k_mux_w)).umask16(0x00ff);
+	map(0x100000, 0x10000f).mirror(0x03fff0).r(FUNC(excel68k_state::input_r)).umask16(0x00ff);
+	map(0x140000, 0x14000f).mirror(0x03fff0).w(FUNC(excel68k_state::mux_w)).umask16(0x00ff);
 }
 
-void fidel68k_state::fex68km2_map(address_map &map)
+void excel68k_state::fex68km2_map(address_map &map)
 {
 	fex68k_map(map);
 	map(0x200000, 0x21ffff).ram();
 }
 
-void fidel68k_state::fex68km3_map(address_map &map)
+void excel68k_state::fex68km3_map(address_map &map)
 {
 	fex68k_map(map);
 	map(0x200000, 0x20ffff).ram();
@@ -424,24 +450,24 @@ void fidel68k_state::fex68km3_map(address_map &map)
 
 // Designer Master
 
-void fidel68k_state::fdes2265_map(address_map &map)
+void desmas_state::fdes2265_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x00ffff).rom();
-	map(0x000000, 0x00000f).w(FUNC(fidel68k_state::fdes68k_lcd_w)).umask16(0x00ff);
+	map(0x000000, 0x00000f).w(FUNC(desmas_state::lcd_w)).umask16(0x00ff);
 	map(0x044000, 0x047fff).ram();
 	map(0x100000, 0x10ffff).ram();
-	map(0x140000, 0x14000f).r(FUNC(fidel68k_state::fdes68k_input_r)).umask16(0xff00);
-	map(0x140000, 0x14000f).w(FUNC(fidel68k_state::fdes68k_control_w)).umask16(0x00ff);
+	map(0x140000, 0x14000f).r(FUNC(desmas_state::input_r)).umask16(0xff00);
+	map(0x140000, 0x14000f).w(FUNC(desmas_state::control_w)).umask16(0x00ff);
 }
 
-void fidel68k_state::fdes2325_map(address_map &map)
+void desmas_state::fdes2325_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x00ffff).rom();
-	map(0x100000, 0x10000f).w(FUNC(fidel68k_state::fdes68k_lcd_w)).umask32(0x00ff00ff);
-	map(0x140000, 0x14000f).w(FUNC(fidel68k_state::fdes68k_control_w)).umask32(0x00ff00ff);
-	map(0x180000, 0x18000f).r(FUNC(fidel68k_state::fdes68k_input_r)).umask32(0xff00ff00);
+	map(0x100000, 0x10000f).w(FUNC(desmas_state::lcd_w)).umask32(0x00ff00ff);
+	map(0x140000, 0x14000f).w(FUNC(desmas_state::control_w)).umask32(0x00ff00ff);
+	map(0x180000, 0x18000f).r(FUNC(desmas_state::input_r)).umask32(0xff00ff00);
 	map(0x300000, 0x37ffff).ram();
 	map(0x500000, 0x507fff).ram();
 }
@@ -449,55 +475,55 @@ void fidel68k_state::fdes2325_map(address_map &map)
 
 // EAG
 
-void fidel68k_state::init_eag()
+void eag_state::init_eag()
 {
 	// eag_map: DRAM slots at $200000-$2fffff - V1/V2/V5: 128K, V3: 512K, V4: 1M
 	m_maincpu->space(AS_PROGRAM).install_ram(0x200000, 0x200000 + m_ram->size() - 1, m_ram->pointer());
 }
 
-void fidel68k_state::eag_map(address_map &map)
+void eag_state::eag_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
 	map(0x104000, 0x107fff).ram();
-	map(0x300000, 0x30000f).mirror(0x000010).w(FUNC(fidel68k_state::eag_7seg_w)).umask16(0xff00).nopr();
-	map(0x300000, 0x30000f).mirror(0x000010).rw(FUNC(fidel68k_state::eag_input1_r), FUNC(fidel68k_state::eag_leds_w)).umask16(0x00ff);
-	map(0x400000, 0x407fff).r(FUNC(fidel68k_state::cartridge_r)).umask16(0xff00);
-	map(0x400001, 0x400001).w(FUNC(fidel68k_state::eag_mux_w));
+	map(0x300000, 0x30000f).mirror(0x000010).w(FUNC(eag_state::digit_w)).umask16(0xff00).nopr();
+	map(0x300000, 0x30000f).mirror(0x000010).rw(FUNC(eag_state::input1_r), FUNC(eag_state::leds_w)).umask16(0x00ff);
+	map(0x400000, 0x407fff).r(FUNC(eag_state::cartridge_r)).umask16(0xff00);
+	map(0x400001, 0x400001).w(FUNC(eag_state::mux_w));
 	map(0x400002, 0x400007).nopw(); // ?
 	map(0x604000, 0x607fff).ram().share("nvram");
-	map(0x700003, 0x700003).r(FUNC(fidel68k_state::eag_input2_r));
+	map(0x700003, 0x700003).r(FUNC(eag_state::input2_r));
 }
 
-void fidel68k_state::eagv7_map(address_map &map)
+void eag_state::eagv7_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
 	map(0x104000, 0x107fff).ram();
 	map(0x200000, 0x2fffff).ram();
-	map(0x300000, 0x30000f).mirror(0x000010).w(FUNC(fidel68k_state::eag_7seg_w)).umask32(0xff00ff00).nopr();
-	map(0x300000, 0x30000f).mirror(0x000010).rw(FUNC(fidel68k_state::eag_input1_r), FUNC(fidel68k_state::eag_leds_w)).umask32(0x00ff00ff);
-	map(0x400000, 0x407fff).r(FUNC(fidel68k_state::cartridge_r)).umask32(0xff00ff00);
-	map(0x400001, 0x400001).w(FUNC(fidel68k_state::eag_mux_w));
+	map(0x300000, 0x30000f).mirror(0x000010).w(FUNC(eag_state::digit_w)).umask32(0xff00ff00).nopr();
+	map(0x300000, 0x30000f).mirror(0x000010).rw(FUNC(eag_state::input1_r), FUNC(eag_state::leds_w)).umask32(0x00ff00ff);
+	map(0x400000, 0x407fff).r(FUNC(eag_state::cartridge_r)).umask32(0xff00ff00);
+	map(0x400001, 0x400001).w(FUNC(eag_state::mux_w));
 	map(0x400004, 0x400007).nopw(); // ?
 	map(0x604000, 0x607fff).ram().share("nvram");
-	map(0x700003, 0x700003).r(FUNC(fidel68k_state::eag_input2_r));
+	map(0x700003, 0x700003).r(FUNC(eag_state::input2_r));
 	map(0x800000, 0x807fff).ram();
 }
 
-void fidel68k_state::eagv11_map(address_map &map)
+void eag_state::eagv11_map(address_map &map)
 {
 	map(0x00000000, 0x0001ffff).rom();
 	map(0x00200000, 0x003fffff).ram();
-	map(0x00b00000, 0x00b0000f).mirror(0x00000010).w(FUNC(fidel68k_state::eag_7seg_w)).umask32(0xff00ff00).nopr();
-	map(0x00b00000, 0x00b0000f).mirror(0x00000010).rw(FUNC(fidel68k_state::eag_input1_r), FUNC(fidel68k_state::eag_leds_w)).umask32(0x00ff00ff);
-	map(0x00c00000, 0x00c07fff).r(FUNC(fidel68k_state::cartridge_r)).umask32(0xff00ff00);
-	map(0x00c00001, 0x00c00001).w(FUNC(fidel68k_state::eag_mux_w));
+	map(0x00b00000, 0x00b0000f).mirror(0x00000010).w(FUNC(eag_state::digit_w)).umask32(0xff00ff00).nopr();
+	map(0x00b00000, 0x00b0000f).mirror(0x00000010).rw(FUNC(eag_state::input1_r), FUNC(eag_state::leds_w)).umask32(0x00ff00ff);
+	map(0x00c00000, 0x00c07fff).r(FUNC(eag_state::cartridge_r)).umask32(0xff00ff00);
+	map(0x00c00001, 0x00c00001).w(FUNC(eag_state::mux_w));
 	map(0x00c00004, 0x00c00007).nopw(); // ?
 	map(0x00e04000, 0x00e07fff).ram().share("nvram");
-	map(0x00f00003, 0x00f00003).r(FUNC(fidel68k_state::eag_input2_r));
+	map(0x00f00003, 0x00f00003).r(FUNC(eag_state::input2_r));
 	map(0x01000000, 0x0101ffff).ram();
 }
 
-void fidel68k_state::eagv5_slave_map(address_map &map)
+void eag_state::eagv5_slave_map(address_map &map)
 {
 	map(0x000000, 0x00ffff).rom();
 	map(0x044000, 0x047fff).ram();
@@ -509,7 +535,7 @@ void fidel68k_state::eagv5_slave_map(address_map &map)
     Input Ports
 ******************************************************************************/
 
-static INPUT_PORTS_START( fex68k )
+static INPUT_PORTS_START( excel68k )
 	PORT_INCLUDE( fidel_cb_buttons )
 
 	PORT_START("IN.8")
@@ -521,21 +547,6 @@ static INPUT_PORTS_START( fex68k )
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("Options / Queen")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("Verify / King")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_CODE(KEYCODE_N) PORT_NAME("New Game")
-INPUT_PORTS_END
-
-
-static INPUT_PORTS_START( fdes68k )
-	PORT_INCLUDE( fidel_cb_buttons )
-
-	PORT_START("IN.8")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_NAME("Clear")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_NAME("Move / Alternate")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_NAME("Hint / Info")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F) PORT_NAME("Take Back / Replay")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_C) PORT_NAME("Level / New")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_B) PORT_NAME("Option / Time")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_NAME("Verify / Problem")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_NAME("Shift")
 INPUT_PORTS_END
 
 
@@ -568,16 +579,16 @@ INPUT_PORTS_END
     Machine Drivers
 ******************************************************************************/
 
-void fidel68k_state::fex68k(machine_config &config)
+void excel68k_state::fex68k(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 12_MHz_XTAL); // HD68HC000P12
-	m_maincpu->set_addrmap(AS_PROGRAM, &fidel68k_state::fex68k_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &excel68k_state::fex68k_map);
 
 	const attotime irq_period = attotime::from_hz(618); // theoretical frequency from 556 timer (22nF, 91K + 20K POT @ 14.8K, 0.1K), measurement was 580Hz
-	TIMER(config, m_irq_on).configure_periodic(FUNC(fidel68k_state::irq_on<M68K_IRQ_2>), irq_period);
+	TIMER(config, m_irq_on).configure_periodic(FUNC(excel68k_state::irq_on<M68K_IRQ_2>), irq_period);
 	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(1528)); // active for 1.525us
-	TIMER(config, "irq_off").configure_periodic(FUNC(fidel68k_state::irq_off<M68K_IRQ_2>), irq_period);
+	TIMER(config, "irq_off").configure_periodic(FUNC(excel68k_state::irq_off<M68K_IRQ_2>), irq_period);
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_fidel_ex_68k);
@@ -590,33 +601,33 @@ void fidel68k_state::fex68k(machine_config &config)
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
-void fidel68k_state::fex68km2(machine_config &config)
+void excel68k_state::fex68km2(machine_config &config)
 {
 	fex68k(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &fidel68k_state::fex68km2_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &excel68k_state::fex68km2_map);
 }
 
-void fidel68k_state::fex68km3(machine_config &config)
+void excel68k_state::fex68km3(machine_config &config)
 {
 	fex68k(config);
 
 	/* basic machine hardware */
 	m_maincpu->set_clock(16_MHz_XTAL); // factory overclock
-	m_maincpu->set_addrmap(AS_PROGRAM, &fidel68k_state::fex68km3_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &excel68k_state::fex68km3_map);
 }
 
-void fidel68k_state::fdes2265(machine_config &config)
+void desmas_state::fdes2265(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 16_MHz_XTAL); // MC68HC000P12F
-	m_maincpu->set_addrmap(AS_PROGRAM, &fidel68k_state::fdes2265_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &desmas_state::fdes2265_map);
 
 	const attotime irq_period = attotime::from_hz(597); // from 555 timer, measured
-	TIMER(config, m_irq_on).configure_periodic(FUNC(fidel68k_state::irq_on<M68K_IRQ_4>), irq_period);
+	TIMER(config, m_irq_on).configure_periodic(FUNC(desmas_state::irq_on<M68K_IRQ_4>), irq_period);
 	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(6000)); // active for 6us
-	TIMER(config, "irq_off").configure_periodic(FUNC(fidel68k_state::irq_off<M68K_IRQ_4>), irq_period);
+	TIMER(config, "irq_off").configure_periodic(FUNC(desmas_state::irq_off<M68K_IRQ_4>), irq_period);
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_fidel_desdis_68kr);
@@ -629,27 +640,27 @@ void fidel68k_state::fdes2265(machine_config &config)
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
-void fidel68k_state::fdes2325(machine_config &config)
+void desmas_state::fdes2325(machine_config &config)
 {
 	fdes2265(config);
 
 	/* basic machine hardware */
 	M68EC020(config.replace(), m_maincpu, 20_MHz_XTAL); // MC68EC020RP25
-	m_maincpu->set_addrmap(AS_PROGRAM, &fidel68k_state::fdes2325_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &desmas_state::fdes2325_map);
 
 	config.set_default_layout(layout_fidel_desdis_68kg);
 }
 
-void fidel68k_state::eag_base(machine_config &config)
+void eag_state::eag_base(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 16_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &fidel68k_state::eag_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &eag_state::eag_map);
 
 	const attotime irq_period = attotime::from_hz(4.9152_MHz_XTAL/0x2000); // 600Hz
-	TIMER(config, m_irq_on).configure_periodic(FUNC(fidel68k_state::irq_on<M68K_IRQ_2>), irq_period);
+	TIMER(config, m_irq_on).configure_periodic(FUNC(eag_state::irq_on<M68K_IRQ_2>), irq_period);
 	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(8250)); // active for 8.25us
-	TIMER(config, "irq_off").configure_periodic(FUNC(fidel68k_state::irq_off<M68K_IRQ_2>), irq_period);
+	TIMER(config, "irq_off").configure_periodic(FUNC(eag_state::irq_off<M68K_IRQ_2>), irq_period);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -670,13 +681,13 @@ void fidel68k_state::eag_base(machine_config &config)
 	SOFTWARE_LIST(config, "cart_list").set_original("fidel_scc");
 }
 
-void fidel68k_state::eag(machine_config &config)
+void eag_state::eag(machine_config &config)
 {
 	eag_base(config);
 	RAM(config, m_ram).set_default_size("1M").set_extra_options("128K, 512K, 1M");
 }
 
-void fidel68k_state::eagv5(machine_config &config)
+void eag_state::eagv5(machine_config &config)
 {
 	eag(config);
 
@@ -684,44 +695,44 @@ void fidel68k_state::eagv5(machine_config &config)
 	m_ram->set_default_size("128K");
 
 	m68000_device &subcpu(M68000(config, "subcpu", 16_MHz_XTAL));
-	subcpu.set_addrmap(AS_PROGRAM, &fidel68k_state::eagv5_slave_map);
+	subcpu.set_addrmap(AS_PROGRAM, &eag_state::eagv5_slave_map);
 }
 
-void fidel68k_state::eagv7(machine_config &config)
+void eag_state::eagv7(machine_config &config)
 {
 	eag_base(config);
 
 	/* basic machine hardware */
 	M68020(config.replace(), m_maincpu, 20_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &fidel68k_state::eagv7_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &eag_state::eagv7_map);
 }
 
-void fidel68k_state::eagv9(machine_config &config)
+void eag_state::eagv9(machine_config &config)
 {
 	eagv7(config);
 
 	/* basic machine hardware */
 	M68030(config.replace(), m_maincpu, 32_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &fidel68k_state::eagv7_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &eag_state::eagv7_map);
 }
 
-void fidel68k_state::eagv10(machine_config &config)
+void eag_state::eagv10(machine_config &config)
 {
 	eagv7(config);
 
 	/* basic machine hardware */
 	M68040(config.replace(), m_maincpu, 25_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &fidel68k_state::eagv11_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &eag_state::eagv11_map);
 }
 
-void fidel68k_state::eagv11(machine_config &config)
+void eag_state::eagv11(machine_config &config)
 {
 	eagv7(config);
 
 	/* basic machine hardware */
 	M68EC040(config.replace(), m_maincpu, 36_MHz_XTAL*2*2); // wrong! should be M68EC060 @ 72MHz
-	m_maincpu->set_addrmap(AS_PROGRAM, &fidel68k_state::eagv11_map);
-	m_maincpu->set_periodic_int(FUNC(fidel68k_state::irq2_line_hold), attotime::from_hz(600));
+	m_maincpu->set_addrmap(AS_PROGRAM, &eag_state::eagv11_map);
+	m_maincpu->set_periodic_int(FUNC(eag_state::irq2_line_hold), attotime::from_hz(600));
 
 	config.device_remove("irq_on"); // 8.25us is too long
 	config.device_remove("irq_off");
@@ -842,20 +853,20 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME      PARENT   CMP MACHINE   INPUT    CLASS           INIT           COMPANY                  FULLNAME, FLAGS
-CONS( 1987, fex68k,   0,        0, fex68k,   fex68k,  fidel68k_state, empty_init,    "Fidelity Electronics",  "Excel 68000 (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1987, fex68ka,  fex68k,   0, fex68k,   fex68k,  fidel68k_state, empty_init,    "Fidelity Electronics",  "Excel 68000 (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1987, fex68kb,  fex68k,   0, fex68k,   fex68k,  fidel68k_state, empty_init,    "Fidelity Electronics",  "Excel 68000 (set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1988, fex68km2, fex68k,   0, fex68km2, fex68k,  fidel68k_state, empty_init,    "Fidelity Electronics",  "Excel 68000 Mach II (rev. C+)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1988, fex68km3, fex68k,   0, fex68km3, fex68k,  fidel68k_state, empty_init,    "Fidelity Electronics",  "Excel 68000 Mach III Master", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1987, fex68k,   0,        0, fex68k,   excel68k,  excel68k_state, empty_init,    "Fidelity Electronics",  "Excel 68000 (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1987, fex68ka,  fex68k,   0, fex68k,   excel68k,  excel68k_state, empty_init,    "Fidelity Electronics",  "Excel 68000 (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1987, fex68kb,  fex68k,   0, fex68k,   excel68k,  excel68k_state, empty_init,    "Fidelity Electronics",  "Excel 68000 (set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1988, fex68km2, fex68k,   0, fex68km2, excel68k,  excel68k_state, empty_init,    "Fidelity Electronics",  "Excel 68000 Mach II (rev. C+)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1988, fex68km3, fex68k,   0, fex68km3, excel68k,  excel68k_state, empty_init,    "Fidelity Electronics",  "Excel 68000 Mach III Master", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 
-CONS( 1989, fdes2265, 0,        0, fdes2265, fdes68k, fidel68k_state, init_fdes2265, "Fidelity Electronics",  "Designer Mach III Master 2265", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1991, fdes2325, fdes2265, 0, fdes2325, fdes68k, fidel68k_state, empty_init,    "Fidelity Electronics",  "Designer Mach IV Master 2325", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1989, fdes2265, 0,        0, fdes2265, desdis, desmas_state, init_fdes2265, "Fidelity Electronics",  "Designer Mach III Master 2265", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1991, fdes2325, fdes2265, 0, fdes2325, desdis, desmas_state, empty_init,    "Fidelity Electronics",  "Designer Mach IV Master 2325", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 
-CONS( 1989, feagv2,   0,        0, eag,      eag,     fidel68k_state, init_eag,      "Fidelity Electronics",  "Elite Avant Garde (model 6114-2/3/4, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1989, feagv2a,  feagv2,   0, eag,      eag,     fidel68k_state, init_eag,      "Fidelity Electronics",  "Elite Avant Garde (model 6114-2/3/4, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1989, feagv5,   feagv2,   0, eagv5,    eag,     fidel68k_state, empty_init,    "Fidelity Electronics",  "Elite Avant Garde (model 6114-5)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )
-CONS( 1990, feagv7,   feagv2,   0, eagv7,    eag,     fidel68k_state, empty_init,    "Fidelity Electronics",  "Elite Avant Garde (model 6117-7, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1990, feagv7a,  feagv2,   0, eagv7,    eag,     fidel68k_state, empty_init,    "Fidelity Electronics",  "Elite Avant Garde (model 6117-7, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1990, feagv9,   feagv2,   0, eagv9,    eag,     fidel68k_state, empty_init,    "Fidelity Electronics",  "Elite Avant Garde (model 6117-9)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1990, feagv10,  feagv2,   0, eagv10,   eag,     fidel68k_state, empty_init,    "Fidelity Electronics",  "Elite Avant Garde (model 6117-10)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_TIMING )
-CONS( 2002, feagv11,  feagv2,   0, eagv11,   eag,     fidel68k_state, empty_init,    "hack (Wilfried Bucke)", "Elite Avant Garde (model 6117-11)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_TIMING )
+CONS( 1989, feagv2,   0,        0, eag,      eag,     eag_state, init_eag,      "Fidelity Electronics",  "Elite Avant Garde (model 6114-2/3/4, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1989, feagv2a,  feagv2,   0, eag,      eag,     eag_state, init_eag,      "Fidelity Electronics",  "Elite Avant Garde (model 6114-2/3/4, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1989, feagv5,   feagv2,   0, eagv5,    eag,     eag_state, empty_init,    "Fidelity Electronics",  "Elite Avant Garde (model 6114-5)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )
+CONS( 1990, feagv7,   feagv2,   0, eagv7,    eag,     eag_state, empty_init,    "Fidelity Electronics",  "Elite Avant Garde (model 6117-7, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1990, feagv7a,  feagv2,   0, eagv7,    eag,     eag_state, empty_init,    "Fidelity Electronics",  "Elite Avant Garde (model 6117-7, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1990, feagv9,   feagv2,   0, eagv9,    eag,     eag_state, empty_init,    "Fidelity Electronics",  "Elite Avant Garde (model 6117-9)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1990, feagv10,  feagv2,   0, eagv10,   eag,     eag_state, empty_init,    "Fidelity Electronics",  "Elite Avant Garde (model 6117-10)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_TIMING )
+CONS( 2002, feagv11,  feagv2,   0, eagv11,   eag,     eag_state, empty_init,    "hack (Wilfried Bucke)", "Elite Avant Garde (model 6117-11)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_TIMING )

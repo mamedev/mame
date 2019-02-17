@@ -9897,7 +9897,7 @@ citycon                         // (c) 1985 Jaleco
 citycona                        // (c) 1985 Jaleco
 cruisin                         // (c) 1985 Jaleco/Kitkorp
 
-@source:ckz80.cpp
+@source:cking_master.cpp
 ckmaster                        //
 
 @source:clayshoo.cpp
@@ -10915,7 +10915,7 @@ wallst                          // (c) 1982 Century
 @source:cwheel.cpp
 cwheel                          // (c) 19?? Gamebar
 
-@source:cxgz80.cpp
+@source:cxg_ch2001.cpp
 ch2001                          //
 
 @source:cxhumax.cpp
@@ -12849,6 +12849,9 @@ feversoc                        // (c) 2004
 fgoal                           // TF  (c) 1979 Taito Corporation
 fgoala                          // MF  (c) 1979 Taito Corporation
 
+@source:fidel_sc6.cpp
+fscc6                           //
+
 @source:fidel6502.cpp
 chesster                        //
 chesstera                       //
@@ -12921,10 +12924,7 @@ fex68kb                         //
 fex68km2                        //
 fex68km3                        //
 
-@source:fidelmcs48.cpp
-fscc6                           //
-
-@source:fidelz80.cpp
+@source:fidelbase.cpp
 backgamc                        //
 bridgec3                        //
 bridgeca                        //

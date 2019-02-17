@@ -14,11 +14,11 @@
         - HDL is also connected to WP/TS input where TS is used to detect motor status
         - 3 second motor off delay timer
     - video (video RAM is at memory top - 0x1400, i.e. 0x1ec00)
-    - keyboard ROM
-    - hires graphics board
+    - keyboard ROM, same as earlier tandy 1000
     - WD1010
     - hard disk
-    - mouse
+    - clock/mouse 8042 mcu ROM, probably same as tandy 1000 isa clock/mouse adapter
+    - sab3019 rtc
 
 */
 
@@ -219,6 +219,77 @@ READ8_MEMBER( tandy2k_state::kbint_clr_r )
 	return 0xff;
 }
 
+READ8_MEMBER( tandy2k_state::clkmouse_r )
+{
+	uint8_t ret = 0;
+	switch (offset)
+	{
+		case 0:
+			if (!m_clkmouse_cnt)
+				return 0;
+			ret = m_clkmouse_cmd[--m_clkmouse_cnt];
+			m_pic1->ir2_w(0);
+			if (m_clkmouse_cnt > 0)
+				m_mcu_delay->adjust(attotime::from_msec(1));
+			break;
+		case 2:
+			ret = m_buttons->read();
+			if (m_clkmouse_cnt)
+				ret |= 1;
+			break;
+	}
+	return ret;
+}
+
+WRITE8_MEMBER( tandy2k_state::clkmouse_w )
+{
+	switch (offset)
+	{
+		case 0:
+			m_pic1->ir2_w(0);
+			if (m_clkmouse_cnt < 8)
+				m_clkmouse_cmd[m_clkmouse_cnt++] = data;
+			break;
+		case 1:
+			break;
+		case 2:
+			if (m_clkmouse_cnt < 8)
+				m_clkmouse_cmd[m_clkmouse_cnt++] = data;
+			switch (m_clkmouse_cmd[0])
+			{
+				case 0x01: //set time
+					break;
+				case 0x02: //read time
+					break;
+				case 0x08:
+					if(m_clkmouse_cmd[1] > 0)
+						m_clkmouse_irq |= MO_IRQ;
+					else
+						m_clkmouse_irq &= ~MO_IRQ;
+					if(m_clkmouse_cmd[2] > 0)
+						m_clkmouse_irq |= BT_IRQ;
+					else
+						m_clkmouse_irq &= ~BT_IRQ;
+					break;
+				case 0x20:
+					if(m_clkmouse_cmd[1] > 0)
+						m_mouse_timer->adjust(attotime::from_hz(40), 0, attotime::from_hz(40));
+					else
+						m_mouse_timer->adjust(attotime::never);
+					break;
+			}
+			m_clkmouse_cnt = 0;
+			break;
+		case 3:
+			m_pic1->ir2_w(0);
+			m_clkmouse_cnt = 0;
+			m_clkmouse_irq = 0;
+			m_mouse_x = m_x_axis->read();
+			m_mouse_y = m_y_axis->read();
+			break;
+	}
+}
+
 READ8_MEMBER( tandy2k_state::fldtc_r )
 {
 	if (LOG) logerror("FLDTC\n");
@@ -315,6 +386,7 @@ void tandy2k_state::tandy2k_io(address_map &map)
 	map(0x00180, 0x00180).r(FUNC(tandy2k_state::hires_status_r)).umask16(0x00ff);
 	map(0x00180, 0x0018f).mirror(0x10).w(m_colpal, FUNC(palette_device::write8)).umask16(0x00ff).share("colpal");
 	map(0x001a0, 0x001a0).w(FUNC(tandy2k_state::hires_plane_w)).umask16(0x00ff);
+	map(0x002fc, 0x002ff).rw(FUNC(tandy2k_state::clkmouse_r), FUNC(tandy2k_state::clkmouse_w));
 }
 
 void tandy2k_state::tandy2k_hd_io(address_map &map)
@@ -368,7 +440,46 @@ static INPUT_PORTS_START( tandy2k )
 	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Home") PORT_CODE(KEYCODE_HOME) /* HOME                        58  D8 */
 	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F11") PORT_CODE(KEYCODE_F11) /* F11                         59  D9 */
 	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F12") PORT_CODE(KEYCODE_F12) /* F12                         5a  Da */
+
+	PORT_START("MOUSEBTN")
+	PORT_BIT( 0xff8f, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(MOUSECODE_BUTTON1) PORT_CHANGED_MEMBER(DEVICE_SELF, tandy2k_state, input_changed, nullptr)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(MOUSECODE_BUTTON2) PORT_CHANGED_MEMBER(DEVICE_SELF, tandy2k_state, input_changed, nullptr)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )  /* this would be button three but AFAIK no tandy mouse ever had one */
+
+	PORT_START("MOUSEX")
+	PORT_BIT( 0xffff, 0x00, IPT_MOUSE_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(0) PORT_CHANGED_MEMBER(DEVICE_SELF, tandy2k_state, input_changed, nullptr)
+
+	PORT_START("MOUSEY")
+	PORT_BIT( 0xffff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(0) PORT_CHANGED_MEMBER(DEVICE_SELF, tandy2k_state, input_changed, nullptr)
 INPUT_PORTS_END
+
+INPUT_CHANGED_MEMBER(tandy2k_state::input_changed)
+{
+	if (m_clkmouse_cnt || !m_clkmouse_irq)
+		return;
+	if ((m_clkmouse_irq & BT_IRQ) && (field.name()[5] == 'B'))
+	{
+		m_clkmouse_cnt = 1;
+		m_clkmouse_cmd[0] = 'B';
+	}
+	else if ((m_clkmouse_irq & MO_IRQ))
+	{
+		uint16_t x = m_x_axis->read();
+		uint16_t y = m_y_axis->read();
+		uint16_t dx = x - m_mouse_x;
+		uint16_t dy = y - m_mouse_y;
+		m_mouse_x = x;
+		m_mouse_y = y;
+		m_clkmouse_cnt = 5;
+		m_clkmouse_cmd[4] = 'M';
+		m_clkmouse_cmd[3] = dx & 0xff;
+		m_clkmouse_cmd[2] = dx >> 8;
+		m_clkmouse_cmd[1] = dy & 0xff;
+		m_clkmouse_cmd[0] = dy >> 8;
+	}
+	m_pic1->ir2_w(1);
+}
 
 // Video
 
@@ -788,7 +899,8 @@ void tandy2k_state::machine_start()
 	program.install_ram(0x00000, ram_size - 1, ram);
 
 	m_char_ram.allocate(0x1000);
-	m_hires_en = 0;
+	m_mouse_timer = timer_alloc(MOUS_TIMER);
+	m_mcu_delay = timer_alloc(MCU_DELAY);
 
 	// register for state saving
 	save_item(NAME(m_dma_mux));
@@ -804,11 +916,51 @@ void tandy2k_state::machine_start()
 	save_item(NAME(m_clkcnt));
 	save_item(NAME(m_outspkr));
 	save_item(NAME(m_spkrdata));
+	save_item(NAME(m_clkmouse_cmd));
+	save_item(NAME(m_clkmouse_cnt));
+	save_item(NAME(m_clkmouse_irq));
+	save_item(NAME(m_mouse_x));
+	save_item(NAME(m_mouse_y));
+	save_item(NAME(m_hires_en));
+}
+
+void tandy2k_state::machine_reset()
+{
+	m_hires_en = 0;
+	m_clkmouse_cnt = 0;
+	m_clkmouse_irq = 0;
 }
 
 void tandy2k_state::device_reset_after_children()
 {
 	m_pc_keyboard->enable(0);
+}
+
+void tandy2k_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+		case MOUS_TIMER:
+		{
+			uint16_t x = m_x_axis->read();
+			uint16_t y = m_y_axis->read();
+			uint16_t dx = x - m_mouse_x;
+			uint16_t dy = y - m_mouse_y;
+			m_mouse_x = x;
+			m_mouse_y = y;
+			m_clkmouse_cnt = 5;
+			m_clkmouse_cmd[4] = 'A';
+			m_clkmouse_cmd[3] = dx & 0xff;
+			m_clkmouse_cmd[2] = dx >> 8;
+			m_clkmouse_cmd[1] = dy & 0xff;
+			m_clkmouse_cmd[0] = dy >> 8;
+			m_pic1->ir2_w(1);
+			break;
+		}
+		case MCU_DELAY:
+			m_pic1->ir2_w(1);
+			break;
+	}
 }
 
 rgb_t tandy2k_state::IRGB(uint32_t raw)

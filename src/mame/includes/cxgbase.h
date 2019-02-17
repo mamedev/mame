@@ -2,39 +2,30 @@
 // copyright-holders:hap
 /******************************************************************************
 *
-*  Fidelity Electronics chess machines base class
-*  main driver is fidelz80.cpp
+*  CXG chess computer driver base class
 *
 ******************************************************************************/
 
 #pragma once
 
-#ifndef MAME_INCLUDES_FIDELBASE_H
-#define MAME_INCLUDES_FIDELBASE_H
+#ifndef MAME_INCLUDES_CXGBASE_H
+#define MAME_INCLUDES_CXGBASE_H
 
 #include "machine/timer.h"
 #include "sound/dac.h"
-#include "sound/s14001a.h"
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
-#include "softlist.h"
 
-class fidelbase_state : public driver_device
+class cxgbase_state : public driver_device
 {
 public:
-	fidelbase_state(const machine_config &mconfig, device_type type, const char *tag) :
+	cxgbase_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_irq_on(*this, "irq_on"),
-		m_rombank(*this, "rombank"),
+		m_dac(*this, "dac"),
 		m_inp_matrix(*this, "IN.%u", 0),
 		m_out_x(*this, "%u.%u", 0U, 0U),
 		m_out_a(*this, "%u.a", 0U),
 		m_out_digit(*this, "digit%u", 0U),
-		m_speech(*this, "speech"),
-		m_speech_rom(*this, "speech"),
-		m_dac(*this, "dac"),
-		m_cart(*this, "cartslot"),
 		m_display_wait(33),
 		m_display_maxy(1),
 		m_display_maxx(0)
@@ -43,30 +34,21 @@ public:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
 	optional_device<timer_device> m_irq_on;
-	optional_memory_bank m_rombank;
-	optional_ioport_array<11> m_inp_matrix; // max 11
+	optional_device<dac_bit_interface> m_dac;
+	optional_ioport_array<10> m_inp_matrix; // max 10
 	output_finder<0x20, 0x20> m_out_x;
 	output_finder<0x20> m_out_a;
 	output_finder<0x20> m_out_digit;
-	optional_device<s14001a_device> m_speech;
-	optional_region_ptr<u8> m_speech_rom;
-	optional_device<dac_bit_interface> m_dac;
-	optional_device<generic_slot_device> m_cart;
-
-	// misc common
-	u16 m_inp_mux;                  // multiplexed keypad/leds mask
-	u16 m_led_select;
-	u32 m_7seg_data;                // data for seg leds
-	u16 m_led_data;
-	u8 m_speech_data;
-	u8 m_speech_bank;               // speech rom higher address bits
-
-	u16 read_inputs(int columns);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(scc_cartridge);
-	virtual DECLARE_READ8_MEMBER(cartridge_r);
 
 	template<int L> TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(L, ASSERT_LINE); }
 	template<int L> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(L, CLEAR_LINE); }
+
+	// misc common
+	u16 m_inp_mux;                  // multiplexed keypad mask
+	u16 m_led_select;
+	u16 m_led_data;
+
+	u16 read_inputs(int columns);
 
 	// display common
 	int m_display_wait;             // led/lamp off-delay in milliseconds (default 33ms)
@@ -80,7 +62,6 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
 	void display_update();
 	void set_display_size(int maxx, int maxy);
-	void set_display_segmask(u32 digits, u32 mask);
 	void display_matrix(int maxx, int maxy, u32 setx, u32 sety, bool update = true);
 
 protected:
@@ -89,7 +70,6 @@ protected:
 };
 
 
-INPUT_PORTS_EXTERN( fidel_cb_buttons );
-INPUT_PORTS_EXTERN( fidel_cb_magnets );
+INPUT_PORTS_EXTERN( cxg_cb_magnets );
 
-#endif // MAME_INCLUDES_FIDELBASE_H
+#endif // MAME_INCLUDES_CXGBASE_H
