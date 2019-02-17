@@ -1,20 +1,22 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles, Couriersud,Stephane Humbert, Robbbert
+// copyright-holders:Aaron Giles, Couriersud, Stephane Humbert, Robbbert
 /***************************************************************************
 
-    Galaxian-derived hardware
+    Galaxian hardware and derivatives
 
-    Galaxian is the root hardware for many, many systems developed in the
-    1980-1982 timeframe. The basic design, which originated with Namco(?),
-    was replicated, tweaked, bootlegged, and used numerous times.
+    Galaxian and its hardware is the root for many arcade games developed
+    in the 1980-1982 timeframe. The basic design, which originated with
+    Namco, was replicated, tweaked, bootlegged, and used numerous times.
 
     The basic hardware design comprises three sections on a single PCB:
-    a CPU section, a sound section, and a video section.
-
-    The CPU section is based around a Z80 (though there are modified
-    designs that changed this to an S2650). The base galaxian hardware
-    is designed to allow access to up to 16k of program ROM and 2k of
-    working RAM.
+        - CPU section; uses a Z80, which at the bare minimum the basic
+                       hardware can use 16K of program ROM and 2K of
+                       work RAM. Modifications exist where the CPU is
+                       changed to an S2650, used by few manufacturers
+                       such as Century Electronics.
+        - sound section; composed entirely of discrete TTL. Read below
+                         for more information.
+        - video section; see video/galaxian.cpp for a description.
 
     The sound section consists of three parts. The first part is
     a programmable 8-bit down counter that clocks a 4-bit counter which
@@ -29,8 +31,6 @@
     circuits. A "HIT" line enables a simple on/off control of one
     filtered output, while a "FIRE" line triggers a fixed short duration
     pulse (controlled by another 555 timer) of modulated noise.
-
-    See video/galaxian.cpp for a description of the video section.
 
 ****************************************************************************
 
@@ -890,8 +890,10 @@ WRITE8_MEMBER(galaxian_state::theend_coin_counter_w)
 WRITE8_MEMBER(galaxian_state::theend_protection_w)
 {
 	/*
-	    Handled by a PAL16VR8(?) at 6J. Both inputs and outputs are a nibble.
-	    Logic is not exactly known, but this implementation works well enough.
+		Handled by a PAL16VR8(?) at 6J. Both inputs and outputs are a
+		nibble. Logic is not exactly known, but this implementation works
+		well enough. Likely fixed sequences, given the simplicity of the
+        hardware.
 	*/
 	m_protection_state = (m_protection_state << 4) | (data & 0x0f);
 
@@ -2012,6 +2014,7 @@ void galaxian_state::amigo2_map(address_map &map)
 	map(0xa800, 0xa800).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 }
 
+
 void galaxian_state::turpins_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
@@ -2120,6 +2123,27 @@ void galaxian_state::frogf_map(address_map &map)
 	map(0xb800, 0xb800).mirror(0x07ff).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 	map(0xc000, 0xffff).rw(FUNC(galaxian_state::frogf_ppi8255_r), FUNC(galaxian_state::frogf_ppi8255_w));
 }
+
+/* map NOT derived from schematics; similar to frogf */
+void galaxian_state::frogf2_map(address_map &map)
+{
+	map(0x0000, 0x2fff).rom();
+	map(0x4800, 0x4800).portr("IN0").w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x4801, 0x4801).portr("IN1");
+	map(0x4802, 0x4802).portr("IN2");
+	map(0x4803, 0x4803).portr("IN3");
+	map(0x5000, 0x5000).w(FUNC(galaxian_state::konami_sound_control_w));
+	map(0x8000, 0x87ff).ram();
+	map(0x8800, 0x8bff).ram().w(FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
+	map(0x9000, 0x90ff).ram().w(FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
+	map(0xa801, 0xa801).w(FUNC(galaxian_state::irq_enable_w));
+	map(0xa802, 0xa802).w(FUNC(galaxian_state::galaxian_flip_screen_x_w));
+	map(0xa806, 0xa806).w(FUNC(galaxian_state::galaxian_flip_screen_y_w));
+	map(0xa808, 0xa808).w(FUNC(galaxian_state::coin_count_1_w));
+	map(0xa80e, 0xa80e).w(FUNC(galaxian_state::coin_count_0_w));
+	map(0xb800, 0xb800).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+}
+
 
 
 /* mooncrst */
@@ -4461,6 +4485,71 @@ static INPUT_PORTS_START( frogger )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( frogf2 ) /* inputs entirely preliminary */
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY /* repurposed as down */
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START1 )
+
+	PORT_START("IN2")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN3")
+	PORT_BIT( 0xff, 0x00, IPT_UNUSED )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( froggermc )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
@@ -6508,7 +6597,7 @@ MACHINE_CONFIG_START(galaxian_state::takeoff) // Sidam 10900, with 1 x AY-3-8912
 	config.device_remove("8910.0");
 	config.device_remove("8910.1");
 
-	ay8912_device &ay8912(AY8912(config, "8912", XTAL(12'000'000) / 8));
+	ay8912_device &ay8912(AY8912(config, "8912", 12_MHz_XTAL / 8));
 	ay8912.port_a_read_callback().set(FUNC(galaxian_state::explorer_sound_latch_r));
 	ay8912.add_route(ALL_OUTPUTS, "speaker", 0.25);
 MACHINE_CONFIG_END
@@ -6532,6 +6621,25 @@ MACHINE_CONFIG_START(galaxian_state::amigo2) // marked "AMI", but similar to abo
 	m_ay8910[0]->add_route(ALL_OUTPUTS, "speaker", 0.25);
 
 	AY8910(config, m_ay8910[1], 12_MHz_XTAL / 2 / 2 / 2).add_route(ALL_OUTPUTS, "speaker", 0.25); /* matches PCB, needs verification */
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(galaxian_state::frogf2) // origins unknown, but is akin to other bootlegs with Sidam(?) origin
+	sidam_bootleg_base(config);
+
+	// alternate memory map
+	m_maincpu->set_addrmap(AS_PROGRAM, &galaxian_state::frogf2_map);
+
+	// 2nd CPU to drive sound
+	MCFG_DEVICE_ADD("audiocpu", Z80, 12_MHz_XTAL / 2 / 2 / 2) /* verified on PCB */
+	MCFG_DEVICE_PROGRAM_MAP(frogger_sound_map)
+	MCFG_DEVICE_IO_MAP(frogger_sound_portmap)
+	GENERIC_LATCH_8(config, m_soundlatch);
+
+	/* sound hardware */
+	AY8910(config, m_ay8910[0], 12_MHz_XTAL / 2 / 2 / 2); /* verified on PCB */
+	m_ay8910[0]->port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
+	m_ay8910[0]->port_b_read_callback().set(FUNC(galaxian_state::frogger_sound_timer_r));
+	m_ay8910[0]->add_route(ALL_OUTPUTS, "speaker", 0.25);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(galaxian_state::scorpion)
@@ -7550,6 +7658,10 @@ void galaxian_state::init_theend()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
+	/* protection */
+	save_item(NAME(m_protection_state));
+	save_item(NAME(m_protection_result));
+
 	/* video extensions */
 	common_init(&galaxian_state::theend_draw_bullet, &galaxian_state::galaxian_draw_background, nullptr, nullptr);
 
@@ -7560,6 +7672,10 @@ void galaxian_state::init_theend()
 
 void galaxian_state::init_scramble()
 {
+	/* protection */
+	save_item(NAME(m_protection_state));
+	save_item(NAME(m_protection_result));
+
 	/* video extensions */
 	common_init(&galaxian_state::scramble_draw_bullet, &galaxian_state::scramble_draw_background, nullptr, nullptr);
 }
@@ -7619,6 +7735,13 @@ void galaxian_state::init_amigo2()
 {
 	/* video extensions */
 	init_turtles();
+	init_sidam();
+}
+
+void galaxian_state::init_frogf2()
+{
+	/* video extensions */
+	init_quaak();
 	init_sidam();
 }
 
@@ -10821,6 +10944,24 @@ ROM_START( froggers )
 	ROM_LOAD( "pr-91.6l",     0x0000, 0x0020, CRC(413703bf) SHA1(66648b2b28d3dcbda5bdb2605d1977428939dd3c) )
 ROM_END
 
+ROM_START( frogf2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "10l.bin",      0x0000, 0x1000, CRC(42ab72e2) SHA1(2fb644139f4006378d2d4d3ee3bc6e070ac97434) ) // 2532
+	ROM_LOAD( "9l.bin",       0x1000, 0x1000, CRC(08984e34) SHA1(1b5f161daf8d2d780f501fceda3b538ba459cdf5) ) // 2532
+	ROM_LOAD( "8l.bin",       0x2000, 0x1000, CRC(d2bf8f62) SHA1(9a413912781d61a7339a244f4f6aa3e17a04d2e3) ) // 2532
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "3b.bin",      0x0000, 0x1000, CRC(9a529450) SHA1(245344099517742cb218a6ba4a6baf754e8d74f7) ) // 2532
+	ROM_LOAD( "4b.bin",      0x1000, 0x0800, CRC(31d7eb27) SHA1(2e1d34ae4da385fd7cac94707d25eeddf4604e1a) ) // 2716
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "5h.bin",      0x0000, 0x1000, CRC(736ba4ee) SHA1(0d72abbbd8e2efb27898fc669c0b7fa1cd0b43bd) ) // 2716
+	ROM_LOAD( "4h.bin",      0x1000, 0x1000, CRC(2c73137f) SHA1(0b6060b44bd4a47cf3c59d9eb16b63159d7f9679) ) // 2516
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "82s123",      0x0000, 0x0020, CRC(413703bf) SHA1(66648b2b28d3dcbda5bdb2605d1977428939dd3c) )
+ROM_END
+
 ROM_START( frogf )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "6.bin",        0x0000, 0x1000, CRC(8ff0a973) SHA1(adb1c28617d915fbcfa9190bd8589a56a8858e25) )
@@ -12771,6 +12912,7 @@ GAME( 1981, froggers3,   frogger,  frogger,    frogger,    galaxian_state, init_
 GAME( 1981, froggermc,   frogger,  froggermc,  froggermc,  galaxian_state, init_froggermc,  ROT90,  "Konami (Sega license)", "Frogger (Moon Cresta hardware)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, froggers,    frogger,  froggers,   frogger,    galaxian_state, init_froggers,   ROT90,  "bootleg", "Frog", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, frogf,       frogger,  frogf,      frogger,    galaxian_state, init_froggers,   ROT90,  "bootleg (Falcon)", "Frog (Falcon bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, frogf2,      frogger,  frogf2,     frogf2,     galaxian_state, init_frogf2,     ROT90,  "bootleg", "Frog (Falcon bootleg, set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // came from an unmarked board, likely not Falcon; sound timer might be different?
 GAME( 1981, frogg,       frogger,  frogg,      frogg,      galaxian_state, init_frogg,      ROT90,  "bootleg", "Frog (Galaxian hardware)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, froggrs,     frogger,  froggers,   frogger,    galaxian_state, init_froggrs,    ROT90,  "bootleg (Coin Music)", "Frogger (Coin Music, bootleg on Scramble hardware)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, froggervd,   frogger,  froggervd,  frogger,    galaxian_state, init_quaak,      ROT90,  "bootleg (Hermatic)", "Frogger (Hermatic, bootleg on Scramble hardware from Video Dens)", MACHINE_SUPPORTS_SAVE )

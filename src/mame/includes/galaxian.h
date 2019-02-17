@@ -210,6 +210,7 @@ public:
 	void init_sidam();
 	void init_explorer();
 	void init_amigo2();
+	void init_frogf2();
 	void init_mandinga();
 	void init_sfx();
 	void init_atlantis();
@@ -339,6 +340,7 @@ public:
 	void scorpion(machine_config &config);
 	void frogf(machine_config &config);
 	void amigo2(machine_config &config);
+	void frogf2(machine_config &config);
 	void zigzag(machine_config &config);
 	void checkman(machine_config &config);
 	void jungsub(machine_config &config);
@@ -354,6 +356,7 @@ public:
 
 protected:
 	void amigo2_map(address_map &map);
+	void frogf2_map(address_map &map);
 	void anteaterg_map(address_map &map);
 	void anteatergg_map(address_map &map);
 	void anteateruk_map(address_map &map);
