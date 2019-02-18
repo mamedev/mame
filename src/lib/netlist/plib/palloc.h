@@ -113,7 +113,7 @@ namespace plib {
 			r.release();
 		}
 
-		~owned_ptr()
+		~owned_ptr() noexcept
 		{
 			if (m_is_owned && (m_ptr != nullptr))
 			{
@@ -141,7 +141,6 @@ namespace plib {
 		D m_deleter;
 		bool m_is_owned;
 	};
-
 
 	template<typename T, typename... Args>
 	std::unique_ptr<T> make_unique(Args&&... args)

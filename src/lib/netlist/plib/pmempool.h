@@ -23,6 +23,22 @@
 
 namespace plib {
 
+	template <typename P, typename T>
+	struct pool_deleter
+	{
+		constexpr pool_deleter() noexcept = default;
+
+		template<typename PU, typename U, typename = typename
+		       std::enable_if<std::is_convertible< U*, T*>::value>::type>
+	    pool_deleter(const pool_deleter<PU, U>&) noexcept { }
+
+		void operator()(T *p) const
+		{
+			p->~T();
+			P::free(p);
+		}
+	};
+
 	//============================================================
 	//  Memory pool
 	//============================================================
@@ -56,8 +72,9 @@ namespace plib {
 		struct info
 		{
 			info(block *b, std::size_t p) : m_block(b), m_pos(p) { }
-			info(const info &) = default;
-			info(info &&) = default;
+			~info() = default;
+			COPYASSIGNMOVE(info, default)
+
 			block * m_block;
 			std::size_t m_pos;
 		};
@@ -143,11 +160,11 @@ namespace plib {
 		{
 			auto it = sinfo().find(ptr);
 			if (it == sinfo().end())
-				printf("pointer not found\n");
+				plib::terminate("mempool::free - pointer not found\n");
 			info i = it->second;
 			block *b = i.m_block;
 			if (b->m_num_alloc == 0)
-				throw plib::pexception("mempool::free - double free was called\n");
+				plib::terminate("mempool::free - double free was called\n");
 			else
 			{
 				//b->m_free = m_min_alloc;
@@ -159,23 +176,7 @@ namespace plib {
 		}
 
 		template <typename T>
-		struct pool_deleter
-		{
-			constexpr pool_deleter() noexcept = default;
-
-			template<typename U, typename = typename
-			       std::enable_if<std::is_convertible< U*, T*>::value>::type>
-		    pool_deleter(const pool_deleter<U>&) noexcept { }
-
-			void operator()(T *p) const
-			{
-				p->~T();
-				mempool::free(p);
-			}
-		};
-
-		template <typename T>
-		using poolptr = plib::owned_ptr<T, pool_deleter<T>>;
+		using poolptr = plib::owned_ptr<T, pool_deleter<mempool, T>>;
 
 		template<typename T, typename... Args>
 		poolptr<T> make_poolptr(Args&&... args)
@@ -204,9 +205,7 @@ namespace plib {
 
 		COPYASSIGNMOVE(mempool_default, delete)
 
-		~mempool_default()
-		{
-		}
+		~mempool_default() = default;
 
 		void *alloc(size_t size)
 		{
@@ -222,7 +221,7 @@ namespace plib {
 		}
 
 		template <typename T>
-		using poolptr = plib::owned_ptr<T>;
+		using poolptr = plib::owned_ptr<T, pool_deleter<mempool_default, T>>;
 
 		template<typename T, typename... Args>
 		poolptr<T> make_poolptr(Args&&... args)

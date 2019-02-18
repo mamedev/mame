@@ -22,11 +22,12 @@ namespace netlist
 		, m_clk(*this, "CLK", NETLIB_DELEGATE(74107A, clk))
 		, m_Q(*this, "Q")
 		, m_QQ(*this, "QQ")
-		, m_delay(delay_107A)
 		, m_J(*this, "J")
 		, m_K(*this, "K")
 		, m_clrQ(*this, "CLRQ")
 		{
+			m_delay[0] = delay_107A[0];
+			m_delay[1] = delay_107A[1];
 		}
 
 		friend class NETLIB_NAME(74107_dip);
@@ -43,7 +44,7 @@ namespace netlist
 		logic_output_t m_Q;
 		logic_output_t m_QQ;
 
-		const netlist_time *m_delay;
+		netlist_time m_delay[2];
 
 		logic_input_t m_J;
 		logic_input_t m_K;
@@ -61,7 +62,8 @@ namespace netlist
 	public:
 		NETLIB_CONSTRUCTOR_DERIVED(74107, 74107A)
 		{
-			m_delay = delay_107;
+			m_delay[0] = delay_107[0];
+			m_delay[1] = delay_107[1];
 		}
 	};
 

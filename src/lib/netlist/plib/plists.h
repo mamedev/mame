@@ -205,7 +205,7 @@ public:
 		iter_t& operator=(const iter_t &rhs) { iter_t t(rhs); std::swap(*this, t); return *this; }
 		iter_t& operator=(iter_t &&rhs) noexcept { std::swap(*this, rhs); return *this; }
 		iter_t& operator++() noexcept {p = p->next();return *this;}
-		iter_t operator++(int) noexcept {iter_t tmp(*this); operator++(); return tmp;}
+		iter_t operator++(int) noexcept {const iter_t tmp(*this); operator++(); return tmp;}
 
 		~iter_t() = default;
 

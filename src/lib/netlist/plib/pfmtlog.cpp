@@ -11,9 +11,11 @@
 #include <algorithm>
 #include <cstdarg>
 #include <cstdlib>
+#include <cstdio>
 #include <cstring>
 #include <iostream>
 #include <locale>
+#include <array>
 
 namespace plib {
 
@@ -23,7 +25,7 @@ pfmt &pfmt::format_element(const char *l, const unsigned cfmt_spec,  ...)
 	// NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
 	va_start(ap, cfmt_spec);
 	pstring fmt("%");
-	char buf[2048]; // FIXME
+	std::array<char, 2048> buf;
 	std::size_t sl;
 
 	m_arg++;
@@ -81,9 +83,9 @@ pfmt &pfmt::format_element(const char *l, const unsigned cfmt_spec,  ...)
 	}
 	else
 		fmt += cfmt_spec;
-	vsprintf(buf, fmt.c_str(), ap);
+	std::vsnprintf(buf.data(), buf.size(), fmt.c_str(), ap);
 	if (p != pstring::npos)
-		m_str = m_str.substr(0, p) + pstring(buf) + m_str.substr(p + sl);
+		m_str = m_str.substr(0, p) + pstring(buf.data()) + m_str.substr(p + sl);
 	va_end(ap);
 	return *this;
 }

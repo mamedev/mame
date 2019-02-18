@@ -14,7 +14,7 @@ VSBUILD = $(SRC)/buildVS
 DOC = $(SRC)/documentation
 TIDY_DB = ../compile_commands.json
 
-TIDY_FLAGSX = -checks=*,-google*,-hicpp*,-readability*,-fuchsia*,-cert-*,-android-*,
+TIDY_FLAGSX = -checks=*,-google*,-hicpp*,-readability*,-fuchsia*,cert-*,-android-*,
 TIDY_FLAGSX += -llvm-header-guard,-cppcoreguidelines-pro-type-reinterpret-cast,
 TIDY_FLAGSX += -cppcoreguidelines-pro-bounds-pointer-arithmetic,-cppcoreguidelines-owning-memory, 
 TIDY_FLAGSX += -modernize-use-default-member-init,-cppcoreguidelines-pro-bounds-constant-array-index,
