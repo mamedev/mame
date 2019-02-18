@@ -2,45 +2,96 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="leapfrog_leappad_cart" description="LeapFrog LeapPad cartridges">
 
-	<software name="rsknowg" supported="no">
-		<description>Was ist das? - Von Richard Scarry (Germany)</description>
-		<year>1999</year>
+	<software name="tadshop" supported="no">
+		<description>Pre Math - Tad goes shopping (UK)</description>
+		<year>2001</year>
 		<publisher>LeapFrog</publisher>
-		<info name="serial" value="500-10632 UBL"/>
+		<info name="serial" value="500-00104"/>
 		<part name="cart" interface="leapfrog_leappad_cart">
-			<feature name="pcb" value="57000-003-2612"/>
-			<feature name="pcb_rev" value="REV.01"/>
-			<feature name="u1" value="Sunplus16m-b"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<feature name="u1" value="MR27V1602E"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x200000">
-				<rom name="500-10632 UBL - Was ist das - Von Richard Scarry (GER).bin" size="0x200000" crc="744cd1f4" sha1="797b9856ef6f96c92978303c6604c2f1ae2e9278" offset="0" />
+				<rom name="500-00104 - Pre Math - Tad goes shopping.bin" size="0x200000" crc="3535938c" sha1="77f32751db017c7980eacec48119c877314638d7" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="lplearng" supported="no">
-		<description>LeapPad Lernsystem (Germany)</description>
+	<software name="goosesng" supported="no">
+		<description>Music - Mother Goose Songbook (UK)</description>
 		<year>2001</year>
 		<publisher>LeapFrog</publisher>
-		<info name="serial" value="500-10633 UBL"/>
+		<info name="serial" value="500-00250"/>
 		<part name="cart" interface="leapfrog_leappad_cart">
-			<feature name="u1" value="MR27V3202J"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<feature name="u1" value="LeapFrog 2000 16Mb DIE ROM"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-00250 - Music - Mother Goose Songbook.bin" size="0x200000" crc="dcd2170b" sha1="f3d89f764d1b61a0085974ed3ca91dc3d20d36a4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tiggerbnc" supported="no">
+		<description>Reading - Disney's Bounce, Tigger, Bounce (UK)</description>
+		<year>2001</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-00258"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="u1" value="LeapFrog 2000 16Mb DIE ROM"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-00258 - Reading - Bounce, Tigger, Bounce.bin" size="0x200000" crc="73b7d409" sha1="0ef5d716be974329d5b4dff936599825d2e76570" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rsblwbe" supported="no">
+		<description>Vocabulary - Richard Scarry's Best Little Word Book Ever! (UK)</description>
+		<year>2001</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-00260"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="u1" value="LeapFrog 2000 8Mb DIE ROM"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x100000">
+				<rom name="500-00260 - Vocabulary - Richard Scarry's Best Little Word Book Ever!.bin" size="0x100000" crc="8797ae77" sha1="fa24e718287a0e15f4ae3b371e9ee73c590abaf5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thomasrue" supported="no">
+		<description>Pre Reading - Thomas the Really Useful Engine (UK)</description>
+		<year>2002</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-00531"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="u1" value="MR27V1602E"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-00531 - Pre Reading - Thomas the Really Useful Engine.bin" size="0x200000" crc="8122325d" sha1="f76b2e6c4d56fd8616c90bf86d720f267724723e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dinobdark" supported="no">
+		<description>- Great Reader Series - Dinosaurs Before Dark (UK)</description>
+		<year>2002</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-00696"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="PCBC FR4A"/>
+			<feature name="u1" value="MR27V3202E"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x400000">
-				<rom name="500-10633 UBL - LeapPad Lernsystem (GER).bin" size="0x400000" crc="32b7e173" sha1="a34090d4581087fea6277bfc25460f7fbb8a2a81" offset="0" />
+				<rom name="500-00696 - Great Reader Series - Dinosaurs Before Dark.bin" size="0x400000" crc="c4acf022" sha1="96e2b42f7c092b98fdad6aa36320dadc6c6a6ff8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="tadg" supported="no">
-		<description>Einkaufen mit Tad (Germany)</description>
-		<year>2001</year>
+	<software name="leapsbond" supported="no">
+		<description>Leap's Pond - Activity &amp; Game Book (UK)</description>
+		<year>2003</year>
 		<publisher>LeapFrog</publisher>
-		<info name="serial" value="500-10634 UBL"/>
+		<info name="serial" value="500-01512"/>
 		<part name="cart" interface="leapfrog_leappad_cart">
-			<feature name="pcb" value="57000-003-7211"/>
+			<feature name="pcb" value="57000-003-7011"/>
 			<feature name="pcb_rev" value="REV.01"/>
-			<feature name="u1" value="OKi 16M(F)"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<feature name="u1" value="Matronix 16M"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x200000">
-				<rom name="500-10634 UBL - Einkaufen mit Tad (GER).bin" size="0x200000" crc="378d1155" sha1="7ec4f6263754f39852592d9fb75d02dd7f55929b" offset="0" />
+				<rom name="500-01512 - Leap's Pond.bin" size="0x200000" crc="124271ad" sha1="32a4ebc71d4e0965b36e379d72ee2534fda47f79" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -90,21 +141,6 @@
 		</part>
 	</software>
 
-	<software name="poohpotsg" supported="no">
-		<description>Disney Jede Menge Honigt&#246;pfe (Germany)</description>
-		<year>1999</year>
-		<publisher>LeapFrog</publisher>
-		<info name="serial" value="500-11535"/>
-		<part name="cart" interface="leapfrog_leappad_cart">
-			<feature name="pcb" value="57000-003-7011"/>
-			<feature name="pcb_rev" value="REV.01"/>
-			<feature name="u1" value="Matronix 16M"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
-			<dataarea name="rom" size="0x200000">
-				<rom name="500-11535 - Jede Menge Honigtopfe (GER).bin" size="0x200000" crc="71475f1c" sha1="100f113a0406101b0aba557b32f1c43a2fe3089d" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="angelg" supported="no">
 		<description>Das Angel-Abenteuer (Germany)</description>
 		<year>2002</year>
@@ -148,12 +184,27 @@
 		</part>
 	</software>
 
+	<software name="spongebobg" supported="no">
+		<description>Spongebob Schwammkopf - Meeres-Geschichten (Germany)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-11540"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-7223"/>
+			<feature name="pcb_rev" value="Rev.00"/>
+			<feature name="u1" value="OKI 32(J)"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-11540 - Spongebob Schwammkopf - Meeres-Geschichten (GER).bin" size="0x400000" crc="cf81398e" sha1="52c8cd56c49d53a20129b3870527f180e22683b4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="letsgo1g" supported="no">
 		<description>Englisch Kurs - Let's go 1 (Germany)</description>
 		<year>2004</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-11546"/>
-		<part name="cart" interface="leapfrog_mfleappad_cart">
+		<part name="cart" interface="leapfrog_leappad_cart">
 			<feature name="pcb" value="30338-003-0033"/>
 			<feature name="pcb_rev" value="REV : 01"/>
 			<feature name="u1" value="OKI 32M VER : J"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
