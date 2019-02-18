@@ -913,6 +913,20 @@ protected:
 	required_device<i2cmem_device> m_i2cmem;
 };
 
+class xavix_popira2_cart_state : public xavix_cart_state
+{
+public:
+	xavix_popira2_cart_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_cart_state(mconfig,type,tag)
+	{ }
+
+	DECLARE_CUSTOM_INPUT_MEMBER(i2c_r);
+
+protected:
+	virtual void write_io1(uint8_t data, uint8_t direction) override;
+
+};
+
 
 class xavix_ekara_state : public xavix_cart_state
 {

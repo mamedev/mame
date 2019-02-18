@@ -132,14 +132,14 @@
 
 	    e-Kara units, Popira, Taiko de Popira and DDR all of them have pin 4 of the cart connector going to VCC and pin 32 going to ground.  So none of them can communicate with the SEEPROM in G10
 
-	    Unless Popira 2 is different (unlikely) it doesn't look like the SEEPROM in this cartridge can be used (unfinished design?) -->
+	    Popira 2 however can make use of these pins -->
 	
 	<software name="gc0010">
 		<description>BAT Volume 4 (Japan) (GC0010-BAT)</description>
 		<year>2002</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
-			<feature name="slot" value="rom_24lc02"/> <!-- no 74HC125, doesn't seem possible that this SEEPROM is actually used, see note above -->
+			<feature name="slot" value="rom_24lc02_gc0010"/>
 			<dataarea name="rom" size="0x100000">
 				<rom name="gc0010-bat.u1" size="0x100000" crc="c08be376" sha1="28cb6baacf64e0382fd9c8bb7167d7fdd96f57ee" offset="0" />
 			</dataarea>
