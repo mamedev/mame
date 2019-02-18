@@ -322,7 +322,7 @@ void apple2_state::machine_start()
 		m_slotdevice[i] = m_a2bus->get_a2bus_card(i);
 	}
 
-	for (int adr = 0; adr < 0x10000; adr += 2)
+	for (int adr = 0; adr < m_ram_size; adr += 2)
 	{
 		m_ram_ptr[adr] = 0;
 		m_ram_ptr[adr+1] = 0xff;
@@ -632,37 +632,39 @@ READ8_MEMBER(apple2_state::switches_r)
 
 READ8_MEMBER(apple2_state::flags_r)
 {
+	u8 uFloatingBus7 = read_floatingbus() & 0x7f;
+
 	// Y output of 74LS251 at H14 read as D7
 	switch (offset)
 	{
-	case 0: // cassette in
-		return (m_cassette->input() > 0.0 ? 0x80 : 0) | (read_floatingbus() & 0x7f);
+	case 0: // cassette in (accidentally read at $C068 by ProDOS to attempt IIgs STATE register)
+		return (m_cassette->input() > 0.0 ? 0x80 : 0) | uFloatingBus7;
 
 	case 1:  // button 0
-		return ((m_joybuttons->read() & 0x10) ? 0x80 : 0) | (read_floatingbus() & 0x7f);
+		return ((m_joybuttons->read() & 0x10) ? 0x80 : 0) | uFloatingBus7;
 
 	case 2:  // button 1
-		return ((m_joybuttons->read() & 0x20) ? 0x80 : 0) | (read_floatingbus() & 0x7f);
+		return ((m_joybuttons->read() & 0x20) ? 0x80 : 0) | uFloatingBus7;
 
 	case 3:  // button 2
 		// check if SHIFT key mod configured
 		if (m_sysconfig->read() & 0x04)
 		{
-			return (((m_joybuttons->read() & 0x40) || (m_kbspecial->read() & 0x06)) ? 0x80 : 0) | (read_floatingbus() & 0x3f);
+			return (((m_joybuttons->read() & 0x40) || (m_kbspecial->read() & 0x06)) ? 0x80 : 0) | uFloatingBus7;
 		}
 		return ((m_joybuttons->read() & 0x40) ? 0x80 : 0) | (read_floatingbus() & 0x7f);
 
 	case 4:  // joy 1 X axis
-		return ((machine().time().as_double() < m_joystick_x1_time) ? 0x80 : 0) | (read_floatingbus() & 0x7f);
+		return ((machine().time().as_double() < m_joystick_x1_time) ? 0x80 : 0) | uFloatingBus7;
 
 	case 5:  // joy 1 Y axis
-		return ((machine().time().as_double() < m_joystick_y1_time) ? 0x80 : 0) | (read_floatingbus() & 0x7f);
+		return ((machine().time().as_double() < m_joystick_y1_time) ? 0x80 : 0) | uFloatingBus7;
 
 	case 6: // joy 2 X axis
-		return ((machine().time().as_double() < m_joystick_x2_time) ? 0x80 : 0) | (read_floatingbus() & 0x7f);
+		return ((machine().time().as_double() < m_joystick_x2_time) ? 0x80 : 0) | uFloatingBus7;
 
 	case 7: // joy 2 Y axis
-		return ((machine().time().as_double() < m_joystick_y2_time) ? 0x80 : 0) | (read_floatingbus() & 0x7f);
+		return ((machine().time().as_double() < m_joystick_y2_time) ? 0x80 : 0) | uFloatingBus7;
 	}
 
 	// this is never reached
