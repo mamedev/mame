@@ -12889,6 +12889,28 @@ fex68kb                         //
 fex68km2                        //
 fex68km3                        //
 
+@source:fidel_elite.cpp
+feasbu                          // EAS: Elite A/S Challenger (Budapest program, English)
+feasbufr                        // * French
+feasbug                         // * German
+feasbusp                        // * Spanish
+feasgla                         // EAS: Elite A/S Challenger (Glasgow program, English)
+feasglafr                       // * French
+feasglag                        // * German
+feasglasp                       // * Spanish
+feag2100                        // EAG: Elite Avant Garde 2100 (English)
+feag2100fr                      // * French
+feag2100g                       // * German
+feag2100sp                      // * Spanish
+fpres                           //
+fpressp                         //
+fpresg                          //
+fpresfr                         //
+fpresbu                         //
+fpresbusp                       //
+fpresbug                        //
+fpresbufr                       //
+
 @source:fidel_excel.cpp
 fdes2000                        //
 fdes2100                        //
@@ -12917,28 +12939,6 @@ fscc9                           //
 fscc9b                          //
 fscc9c                          //
 fscc9ps                         //
-
-@source:fidel6502.cpp
-feasbu                          // EAS: Elite A/S Challenger (Budapest program, English)
-feasbufr                        // * French
-feasbug                         // * German
-feasbusp                        // * Spanish
-feasgla                         // EAS: Elite A/S Challenger (Glasgow program, English)
-feasglafr                       // * French
-feasglag                        // * German
-feasglasp                       // * Spanish
-feag2100                        // EAG: Elite Avant Garde 2100 (English)
-feag2100fr                      // * French
-feag2100g                       // * German
-feag2100sp                      // * Spanish
-fpres                           //
-fpressp                         //
-fpresg                          //
-fpresfr                         //
-fpresbu                         //
-fpresbusp                       //
-fpresbug                        //
-fpresbufr                       //
 
 @source:fidelbase.cpp
 backgamc                        //
