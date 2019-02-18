@@ -177,6 +177,7 @@ public:
 		m_ram(*this, "ram")
 	{ }
 
+	// machine drivers
 	void eag_base(machine_config &config);
 	void eag(machine_config &config);
 	void eagv5(machine_config &config);
@@ -191,6 +192,7 @@ protected:
 	// devices/pointers
 	optional_device<ram_device> m_ram;
 
+	// address maps
 	void eag_map(address_map &map);
 	void eagv7_map(address_map &map);
 	void eagv11_map(address_map &map);
@@ -212,11 +214,13 @@ public:
 		eag_state(mconfig, type, tag)
 	{ }
 
+	// machine drivers
 	void fex68k(machine_config &config);
 	void fex68km2(machine_config &config);
 	void fex68km3(machine_config &config);
 
 private:
+	// address maps
 	void fex68k_map(address_map &map);
 	void fex68km2_map(address_map &map);
 	void fex68km3_map(address_map &map);

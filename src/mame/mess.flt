@@ -243,6 +243,7 @@ fccpu20.cpp
 fccpu30.cpp
 fidel_desdis.cpp
 fidel_eag68k.cpp
+fidel_excel.cpp
 fidel_sc6.cpp
 fidel6502.cpp
 fidelbase.cpp

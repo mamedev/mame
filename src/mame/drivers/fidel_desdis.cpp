@@ -57,6 +57,7 @@ public:
 		fidelbase_state(mconfig, type, tag)
 	{ }
 
+	// machine drivers
 	void fdes2000d(machine_config &config);
 	void fdes2100d(machine_config &config);
 
@@ -78,12 +79,14 @@ public:
 		desdis_state(mconfig, type, tag)
 	{ }
 
+	// machine drivers
 	void fdes2265(machine_config &config);
 	void fdes2325(machine_config &config);
 
 	void init_fdes2265();
 
 private:
+	// address maps
 	void fdes2265_map(address_map &map);
 	void fdes2325_map(address_map &map);
 
@@ -211,7 +214,6 @@ void desmas_state::fdes2325_map(address_map &map)
 	map(0x300000, 0x37ffff).ram();
 	map(0x500000, 0x507fff).ram();
 }
-
 
 
 
