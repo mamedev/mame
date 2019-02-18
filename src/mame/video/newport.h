@@ -11,6 +11,8 @@
 
 #include "machine/hpc3.h"
 
+#define ENABLE_NEWVIEW_LOG		(0)
+
 class newport_video_device : public device_t
 {
 public:
@@ -207,6 +209,13 @@ private:
 	std::unique_ptr<uint8_t[]> m_pup;
 	std::unique_ptr<uint8_t[]> m_cid;
 	cmap_t m_cmap0;
+
+#if ENABLE_NEWVIEW_LOG
+	void start_logging();
+	void stop_logging();
+
+	FILE *m_newview_log;
+#endif
 };
 
 DECLARE_DEVICE_TYPE(NEWPORT_VIDEO, newport_video_device)
