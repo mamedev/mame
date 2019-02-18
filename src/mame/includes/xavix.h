@@ -122,7 +122,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ioevent_trg04);
 	DECLARE_WRITE_LINE_MEMBER(ioevent_trg08);
 
-
 	int m_rgnlen;
 	uint8_t* m_rgn;
 
@@ -210,6 +209,11 @@ private:
 	virtual void machine_reset() override;
 
 	virtual void video_start() override;
+
+	DECLARE_WRITE8_MEMBER(debug_mem_w)
+	{
+		m_mainram[offset] = data;
+	};
 
 	virtual uint8_t opcodes_000000_r(offs_t offset)
 	{

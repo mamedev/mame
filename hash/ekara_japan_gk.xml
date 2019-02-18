@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="ekara_japan_gk" description="Takara e-kara (Japan) GK-xx series cartridges">
+	<!-- cartridges contain the ROM only, the XaviX CPU and BIOS are in the base unit -->
+	<!--
+	Japanese cart listing (by GK code)  * = dumped
+	 * = dumped
+
+	These don't seem to have a secondary numbering scheme (eg GKxxxx-xxx)
+
+	(check what units these are for)
+
+	*GK-1  (unknown)
+	 GK-2  (unknown)
+	 GK-3  (seen)
+
+	(more? what's the GK highest number?)
+
+	-->
+
+	<software name="gk1">
+		<description>GK-1 - Detective Conan (Japan)</description>
+		<year>2004</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="ekaragk1.bin" size="0x200000" crc="775608cd" sha1="8b53fd4e8ced709df2716c839abfd7e41cc719d2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
