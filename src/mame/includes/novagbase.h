@@ -60,8 +60,9 @@ protected:
 
 	u16 read_inputs(int columns);
 
-	template<int L> TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(L, ASSERT_LINE); }
-	template<int L> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(L, CLEAR_LINE); }
+	// periodic interrupts
+	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(Line, ASSERT_LINE); }
+	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(Line, CLEAR_LINE); }
 
 	// display common
 	int m_display_wait;             // led/lamp off-delay in milliseconds (default 33ms)

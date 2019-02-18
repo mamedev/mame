@@ -543,6 +543,7 @@ void fidelbase_state::machine_start()
 	save_item(NAME(m_display_decay));
 	save_item(NAME(m_display_segmask));
 
+	save_item(NAME(m_div_status));
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_led_select));
 	save_item(NAME(m_led_data));
@@ -553,6 +554,7 @@ void fidelbase_state::machine_start()
 
 void fidelbase_state::machine_reset()
 {
+	m_div_status = ~0;
 }
 
 
@@ -661,8 +663,6 @@ public:
 
 	void ccx(machine_config &config);
 
-	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
-
 private:
 	// devices/pointers
 	required_device<i8255_device> m_ppi8255;
@@ -697,7 +697,7 @@ public:
 	void vbrc(machine_config &config);
 	void bv3(machine_config &config);
 
-	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
+	virtual DECLARE_INPUT_CHANGED_MEMBER(reset_button) override;
 
 private:
 	// devices/pointers
@@ -724,8 +724,6 @@ public:
 	{ }
 
 	void vcc(machine_config &config);
-
-	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 
 protected:
 	virtual void machine_start() override;
@@ -884,6 +882,60 @@ READ8_MEMBER(fidelbase_state::cartridge_r)
 
 
 
+// Offset-dependent CPU divider on some machines
+
+void fidelbase_state::div_set_cpu_freq(offs_t offset)
+{
+	static const u16 mask = 0x6000;
+	u16 status = (offset & mask) | m_div_config->read();
+
+	if (status != m_div_status && status & 2)
+	{
+		// when a13/a14 is high, XTAL goes through divider(s)
+		// (depending on factory-set jumper, either one or two 7474)
+		float div = (status & 1) ? 0.25 : 0.5;
+		m_maincpu->set_clock_scale((offset & mask) ? div : 1.0);
+	}
+
+	m_div_status = status;
+}
+
+void fidelbase_state::div_trampoline_w(offs_t offset, u8 data)
+{
+	div_set_cpu_freq(offset);
+	m_mainmap->write8(offset, data);
+}
+
+u8 fidelbase_state::div_trampoline_r(offs_t offset)
+{
+	if (!machine().side_effects_disabled())
+		div_set_cpu_freq(offset);
+
+	return m_mainmap->read8(offset);
+}
+
+void fidelbase_state::div_trampoline(address_map &map)
+{
+	map(0x0000, 0xffff).rw(FUNC(fidelbase_state::div_trampoline_r), FUNC(fidelbase_state::div_trampoline_w));
+}
+
+INPUT_PORTS_START( fidel_cpu_div_2 )
+	PORT_START("div_config") // hardwired, default to /2
+	PORT_CONFNAME( 0x03, 0x02, "CPU Divider" )
+	PORT_CONFSETTING(    0x00, "Disabled" )
+	PORT_CONFSETTING(    0x02, "2" )
+	PORT_CONFSETTING(    0x03, "4" )
+INPUT_PORTS_END
+
+INPUT_PORTS_START( fidel_cpu_div_4 )
+	PORT_START("div_config") // hardwired, default to /4
+	PORT_CONFNAME( 0x03, 0x03, "CPU Divider" )
+	PORT_CONFSETTING(    0x00, "Disabled" )
+	PORT_CONFSETTING(    0x02, "2" )
+	PORT_CONFSETTING(    0x03, "4" )
+INPUT_PORTS_END
+
+
 // Devices, I/O
 
 /******************************************************************************
@@ -944,8 +996,10 @@ WRITE8_MEMBER(vcc_state::ppi_portb_w)
 
 READ8_MEMBER(vcc_state::ppi_portc_r)
 {
-	// d0-d3: multiplexed inputs (active low), also language switches
-	u8 lan = (~m_led_select & 0x40) ? m_inp_matrix[4]->read() : 0;
+	// d0-d3: multiplexed inputs (active low)
+	// also language switches, hardwired with 4 jumpers
+	// 0(none wired): English, 1: German, 2: French, 4: Spanish, 8:Special(unused)
+	u8 lan = (~m_led_select & 0x40) ? m_language : 0;
 	return ~(lan | read_inputs(4)) & 0xf;
 }
 
@@ -1115,7 +1169,9 @@ WRITE8_MEMBER(vsc_state::ppi_portc_w)
 READ8_MEMBER(vsc_state::pio_porta_r)
 {
 	// d0-d7: multiplexed inputs
-	return read_inputs(11);
+	// also language switches(hardwired with 2 diodes)
+	u8 lan = (m_inp_mux & 0x400) ? m_language : 0;
+	return read_inputs(10) | lan;
 }
 
 READ8_MEMBER(vsc_state::pio_portb_r)
@@ -1385,13 +1441,7 @@ void dsc_state::main_map(address_map &map)
 
 // static or boardless games
 
-INPUT_CHANGED_MEMBER(vcc_state::reset_button)
-{
-	// RE button is directly wired to maincpu RESET pin
-	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
-}
-
-static INPUT_PORTS_START( vcc_base )
+static INPUT_PORTS_START( vcc )
 	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("LV") PORT_CODE(KEYCODE_L)
@@ -1419,12 +1469,6 @@ static INPUT_PORTS_START( vcc_base )
 	PORT_START("RESET") // is not on matrix IN.0 d0
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RE") PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, vcc_state, reset_button, nullptr)
 INPUT_PORTS_END
-
-INPUT_CHANGED_MEMBER(ccx_state::reset_button)
-{
-	// RE button is directly wired to maincpu RESET pin
-	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
-}
 
 static INPUT_PORTS_START( ccx )
 	PORT_START("IN.0")
@@ -1458,34 +1502,6 @@ static INPUT_PORTS_START( ccx )
 	PORT_CONFNAME( 0x80, 0x00, "Maximum Levels" )
 	PORT_CONFSETTING(    0x00, "10" ) // factory setting
 	PORT_CONFSETTING(    0x80, "3" )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( vcc )
-	PORT_INCLUDE( vcc_base )
-
-	PORT_START("IN.4") // language setting, hardwired with 4 jumpers (0: English, 1: German, 2: French, 4: Spanish, 8:Special(unused))
-	PORT_BIT(0x0f, 0x00, IPT_CUSTOM)
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( vccsp )
-	PORT_INCLUDE( vcc )
-
-	PORT_MODIFY("IN.4") // set to Spanish
-	PORT_BIT(0x0f, 0x04, IPT_CUSTOM)
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( vccg )
-	PORT_INCLUDE( vcc )
-
-	PORT_MODIFY("IN.4") // set to German
-	PORT_BIT(0x0f, 0x01, IPT_CUSTOM)
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( vccfr )
-	PORT_INCLUDE( vcc )
-
-	PORT_MODIFY("IN.4") // set to French
-	PORT_BIT(0x0f, 0x02, IPT_CUSTOM)
 INPUT_PORTS_END
 
 
@@ -1856,30 +1872,6 @@ static INPUT_PORTS_START( vsc )
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_NAME("DM")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("ST")
 	PORT_BIT(0xc0, IP_ACTIVE_HIGH, IPT_UNUSED)
-
-	PORT_START("IN.10") // language setting, hardwired with 2 diodes (0: English, 1: German, 2: French, 3: Spanish)
-	PORT_BIT(0x03, 0x00, IPT_CUSTOM)
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( vscsp )
-	PORT_INCLUDE( vsc )
-
-	PORT_MODIFY("IN.10") // set to Spanish
-	PORT_BIT(0x03, 0x03, IPT_CUSTOM)
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( vscg )
-	PORT_INCLUDE( vsc )
-
-	PORT_MODIFY("IN.10") // set to German
-	PORT_BIT(0x03, 0x01, IPT_CUSTOM)
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( vscfr )
-	PORT_INCLUDE( vsc )
-
-	PORT_MODIFY("IN.10") // set to French
-	PORT_BIT(0x03, 0x02, IPT_CUSTOM)
 INPUT_PORTS_END
 
 
@@ -2156,16 +2148,6 @@ ROM_START( vcc )
 	ROM_RELOAD(           0x1000, 0x1000)
 ROM_END
 
-ROM_START( vccsp )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("cn19256n_101-32013", 0x0000, 0x1000, CRC(257bb5ab) SHA1(f7589225bb8e5f3eac55f23e2bd526be780b38b5) )
-	ROM_LOAD("cn19174n_vcc2", 0x1000, 0x1000, CRC(f33095e7) SHA1(692fcab1b88c910b74d04fe4d0660367aee3f4f0) )
-	ROM_LOAD("cn19175n_vcc3", 0x2000, 0x1000, CRC(624f0cd5) SHA1(7c1a4f4497fe5882904de1d6fecf510c07ee6fc6) )
-
-	ROM_REGION( 0x2000, "speech", 0 )
-	ROM_LOAD("101-64106", 0x0000, 0x2000, CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9) ) // dumped from Spanish VCC, is same as data in fexcelv
-ROM_END
-
 ROM_START( vccg )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("cn19256n_101-32013", 0x0000, 0x1000, CRC(257bb5ab) SHA1(f7589225bb8e5f3eac55f23e2bd526be780b38b5) )
@@ -2174,6 +2156,16 @@ ROM_START( vccg )
 
 	ROM_REGION( 0x2000, "speech", 0 )
 	ROM_LOAD("101-64101", 0x0000, 0x2000, BAD_DUMP CRC(6c85e310) SHA1(20d1d6543c1e6a1f04184a2df2a468f33faec3ff) ) // taken from fexcelv, assume correct
+ROM_END
+
+ROM_START( vccsp )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("cn19256n_101-32013", 0x0000, 0x1000, CRC(257bb5ab) SHA1(f7589225bb8e5f3eac55f23e2bd526be780b38b5) )
+	ROM_LOAD("cn19174n_vcc2", 0x1000, 0x1000, CRC(f33095e7) SHA1(692fcab1b88c910b74d04fe4d0660367aee3f4f0) )
+	ROM_LOAD("cn19175n_vcc3", 0x2000, 0x1000, CRC(624f0cd5) SHA1(7c1a4f4497fe5882904de1d6fecf510c07ee6fc6) )
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROM_LOAD("101-64106", 0x0000, 0x2000, CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9) ) // dumped from Spanish VCC, is same as data in fexcelv
 ROM_END
 
 ROM_START( vccfr )
@@ -2197,15 +2189,6 @@ ROM_START( uvc )
 	ROM_RELOAD(           0x1000, 0x1000)
 ROM_END
 
-ROM_START( uvcsp )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("101-64017", 0x0000, 0x2000, CRC(f1133abf) SHA1(09dd85051c4e7d364d43507c1cfea5c2d08d37f4) )
-	ROM_LOAD("101-32010", 0x2000, 0x1000, CRC(624f0cd5) SHA1(7c1a4f4497fe5882904de1d6fecf510c07ee6fc6) )
-
-	ROM_REGION( 0x2000, "speech", 0 )
-	ROM_LOAD("101-64106", 0x0000, 0x2000, CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9) )
-ROM_END
-
 ROM_START( uvcg )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("101-64017", 0x0000, 0x2000, CRC(f1133abf) SHA1(09dd85051c4e7d364d43507c1cfea5c2d08d37f4) )
@@ -2213,6 +2196,15 @@ ROM_START( uvcg )
 
 	ROM_REGION( 0x2000, "speech", 0 )
 	ROM_LOAD("101-64101", 0x0000, 0x2000, BAD_DUMP CRC(6c85e310) SHA1(20d1d6543c1e6a1f04184a2df2a468f33faec3ff) ) // taken from fexcelv, assume correct
+ROM_END
+
+ROM_START( uvcsp )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("101-64017", 0x0000, 0x2000, CRC(f1133abf) SHA1(09dd85051c4e7d364d43507c1cfea5c2d08d37f4) )
+	ROM_LOAD("101-32010", 0x2000, 0x1000, CRC(624f0cd5) SHA1(7c1a4f4497fe5882904de1d6fecf510c07ee6fc6) )
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROM_LOAD("101-64106", 0x0000, 0x2000, CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9) )
 ROM_END
 
 ROM_START( uvcfr )
@@ -2236,16 +2228,6 @@ ROM_START( vsc )
 	ROM_RELOAD(           0x1000, 0x1000)
 ROM_END
 
-ROM_START( vscsp )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("101-64018", 0x0000, 0x2000, CRC(c9c98490) SHA1(e6db883df088d60463e75db51433a4b01a3e7626) )
-	ROM_LOAD("101-64019", 0x2000, 0x2000, CRC(08a3577c) SHA1(69fe379d21a9d4b57c84c3832d7b3e7431eec341) )
-	ROM_LOAD("101-32024", 0x4000, 0x1000, CRC(2a078676) SHA1(db2f0aba7e8ac0f84a17bae7155210cdf0813afb) )
-
-	ROM_REGION( 0x2000, "speech", 0 )
-	ROM_LOAD("101-64106", 0x0000, 0x2000, BAD_DUMP CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9) ) // taken from vcc/fexcelv, assume correct
-ROM_END
-
 ROM_START( vscg )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("101-64018", 0x0000, 0x2000, CRC(c9c98490) SHA1(e6db883df088d60463e75db51433a4b01a3e7626) )
@@ -2254,6 +2236,16 @@ ROM_START( vscg )
 
 	ROM_REGION( 0x2000, "speech", 0 )
 	ROM_LOAD("101-64101", 0x0000, 0x2000, BAD_DUMP CRC(6c85e310) SHA1(20d1d6543c1e6a1f04184a2df2a468f33faec3ff) ) // taken from fexcelv, assume correct
+ROM_END
+
+ROM_START( vscsp )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("101-64018", 0x0000, 0x2000, CRC(c9c98490) SHA1(e6db883df088d60463e75db51433a4b01a3e7626) )
+	ROM_LOAD("101-64019", 0x2000, 0x2000, CRC(08a3577c) SHA1(69fe379d21a9d4b57c84c3832d7b3e7431eec341) )
+	ROM_LOAD("101-32024", 0x4000, 0x1000, CRC(2a078676) SHA1(db2f0aba7e8ac0f84a17bae7155210cdf0813afb) )
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROM_LOAD("101-64106", 0x0000, 0x2000, BAD_DUMP CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9) ) // taken from vcc/fexcelv, assume correct
 ROM_END
 
 ROM_START( vscfr )
@@ -2323,20 +2315,20 @@ CONS( 1979, backgamc, 0,       0, bkc,    bkc,   bcc_state, empty_init, "Fidelit
 
 CONS( 1980, fscc8,    0,       0, scc,    scc,   scc_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger 8", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 
-CONS( 1979, vcc,      0,       0, vcc,    vcc,   vcc_state, empty_init, "Fidelity Electronics", "Voice Chess Challenger (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1979, vccsp,    vcc,     0, vcc,    vccsp, vcc_state, empty_init, "Fidelity Electronics", "Voice Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1979, vccg,     vcc,     0, vcc,    vccg,  vcc_state, empty_init, "Fidelity Electronics", "Voice Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1979, vccfr,    vcc,     0, vcc,    vccfr, vcc_state, empty_init, "Fidelity Electronics", "Voice Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1979, vcc,      0,       0, vcc,    vcc,   vcc_state, init_language<0>, "Fidelity Electronics", "Voice Chess Challenger (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1979, vccg,     vcc,     0, vcc,    vcc,   vcc_state, init_language<1>, "Fidelity Electronics", "Voice Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1979, vccsp,    vcc,     0, vcc,    vcc,   vcc_state, init_language<2>, "Fidelity Electronics", "Voice Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1979, vccfr,    vcc,     0, vcc,    vcc,   vcc_state, init_language<4>, "Fidelity Electronics", "Voice Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1980, uvc,      vcc,     0, vcc,    vcc,   vcc_state, empty_init, "Fidelity Electronics", "Advanced Voice Chess Challenger (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1980, uvcsp,    vcc,     0, vcc,    vccsp, vcc_state, empty_init, "Fidelity Electronics", "Advanced Voice Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1980, uvcg,     vcc,     0, vcc,    vccg,  vcc_state, empty_init, "Fidelity Electronics", "Advanced Voice Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1980, uvcfr,    vcc,     0, vcc,    vccfr, vcc_state, empty_init, "Fidelity Electronics", "Advanced Voice Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1980, uvc,      vcc,     0, vcc,    vcc,   vcc_state, init_language<0>, "Fidelity Electronics", "Advanced Voice Chess Challenger (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1980, uvcg,     vcc,     0, vcc,    vcc,   vcc_state, init_language<1>, "Fidelity Electronics", "Advanced Voice Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1980, uvcsp,    vcc,     0, vcc,    vcc,   vcc_state, init_language<2>, "Fidelity Electronics", "Advanced Voice Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1980, uvcfr,    vcc,     0, vcc,    vcc,   vcc_state, init_language<4>, "Fidelity Electronics", "Advanced Voice Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1980, vsc,      0,       0, vsc,    vsc,   vsc_state, empty_init, "Fidelity Electronics", "Voice Sensory Chess Challenger (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1980, vscsp,    vsc,     0, vsc,    vscsp, vsc_state, empty_init, "Fidelity Electronics", "Voice Sensory Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1980, vscg,     vsc,     0, vsc,    vscg,  vsc_state, empty_init, "Fidelity Electronics", "Voice Sensory Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1980, vscfr,    vsc,     0, vsc,    vscfr, vsc_state, empty_init, "Fidelity Electronics", "Voice Sensory Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1980, vsc,      0,       0, vsc,    vsc, vsc_state, init_language<0>, "Fidelity Electronics", "Voice Sensory Chess Challenger (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1980, vscg,     vsc,     0, vsc,    vsc, vsc_state, init_language<1>, "Fidelity Electronics", "Voice Sensory Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1980, vscsp,    vsc,     0, vsc,    vsc, vsc_state, init_language<2>, "Fidelity Electronics", "Voice Sensory Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1980, vscfr,    vsc,     0, vsc,    vsc, vsc_state, init_language<3>, "Fidelity Electronics", "Voice Sensory Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 
 CONS( 1980, vbrc,     0,       0, vbrc,   vbrc,  card_state, empty_init, "Fidelity Electronics", "Voice Bridge Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )
 CONS( 1980, bridgeca, vbrc,    0, ubc,    vbrc,  card_state, empty_init, "Fidelity Electronics", "Advanced Bridge Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )

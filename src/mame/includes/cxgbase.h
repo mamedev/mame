@@ -40,15 +40,16 @@ public:
 	output_finder<0x20> m_out_a;
 	output_finder<0x20> m_out_digit;
 
-	template<int L> TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(L, ASSERT_LINE); }
-	template<int L> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(L, CLEAR_LINE); }
-
 	// misc common
 	u16 m_inp_mux;                  // multiplexed keypad mask
 	u16 m_led_select;
 	u16 m_led_data;
 
 	u16 read_inputs(int columns);
+
+	// periodic interrupts
+	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(Line, ASSERT_LINE); }
+	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(Line, CLEAR_LINE); }
 
 	// display common
 	int m_display_wait;             // led/lamp off-delay in milliseconds (default 33ms)

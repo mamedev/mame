@@ -12,6 +12,7 @@
 #ifndef MAME_INCLUDES_FIDELBASE_H
 #define MAME_INCLUDES_FIDELBASE_H
 
+#include "machine/bankdev.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
 #include "sound/s14001a.h"
@@ -27,6 +28,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_irq_on(*this, "irq_on"),
 		m_rombank(*this, "rombank"),
+		m_mainmap(*this, "mainmap"),
+		m_div_config(*this, "div_config"),
 		m_inp_matrix(*this, "IN.%u", 0),
 		m_out_x(*this, "%u.%u", 0U, 0U),
 		m_out_a(*this, "%u.a", 0U),
@@ -44,6 +47,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<timer_device> m_irq_on;
 	optional_memory_bank m_rombank;
+	optional_device<address_map_bank_device> m_mainmap;
+	optional_ioport m_div_config;
 	optional_ioport_array<11> m_inp_matrix; // max 11
 	output_finder<0x20, 0x20> m_out_x;
 	output_finder<0x20> m_out_a;
@@ -62,11 +67,28 @@ public:
 	u8 m_speech_bank;               // speech rom higher address bits
 
 	u16 read_inputs(int columns);
+
+	// cross-compatible cartridges(opening book modules)
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(scc_cartridge);
 	virtual DECLARE_READ8_MEMBER(cartridge_r);
 
-	template<int L> TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(L, ASSERT_LINE); }
-	template<int L> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(L, CLEAR_LINE); }
+	// in case reset button is directly tied to maincpu reset pin
+	virtual DECLARE_INPUT_CHANGED_MEMBER(reset_button) { m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE); }
+
+	// speech rom language, normally 0=English, 1=German, 2=French, 3=Spanish
+	template<int Language> void init_language() { m_language = Language; }
+	int m_language;
+
+	// periodic interrupts
+	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(Line, ASSERT_LINE); }
+	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(Line, CLEAR_LINE); }
+
+	// dynamic cpu divider
+	void div_trampoline_w(offs_t offset, u8 data);
+	u8 div_trampoline_r(offs_t offset);
+	void div_set_cpu_freq(offs_t offset);
+	void div_trampoline(address_map &map);
+	u16 m_div_status;
 
 	// display common
 	int m_display_wait;             // led/lamp off-delay in milliseconds (default 33ms)
@@ -88,6 +110,9 @@ protected:
 	virtual void machine_reset() override;
 };
 
+
+INPUT_PORTS_EXTERN( fidel_cpu_div_2 );
+INPUT_PORTS_EXTERN( fidel_cpu_div_4 );
 
 INPUT_PORTS_EXTERN( fidel_cb_buttons );
 INPUT_PORTS_EXTERN( fidel_cb_magnets );
