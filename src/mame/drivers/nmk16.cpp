@@ -7324,7 +7324,7 @@ Other: Lattice pLSI 1032 x 2
 
 void nmk16_state::init_redhawk()
 {
-	decryptcode( machine(), 23, 22, 21, 20,  19, 18, 16, 15,  14, 17, 13, 12,  11, 10, 9, 8,  7, 6, 5, 4,  3, 2, 1, 0 );
+	decryptcode( machine(), 23, 22, 21, 20, 19, 18, 16, 15, 14, 17, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 );
 }
 
 ROM_START( redhawk ) /* U.S.A., Canada & South America, (c) 1997 */
@@ -7666,12 +7666,7 @@ ROM_END
 
 void nmk16_state::init_grdnstrmg()
 {
-	// todo collapse to one bitswap
-	decryptcode( machine(),23, 22, 21, 20,   19,  18, 13,17,   16,15, 14, 12,    11, 10, 9, 8,       7, 6, 5, 4,     3, 2, 1, 0 );
-	decryptcode( machine(),23, 22, 21, 20,   19,  18, 17,16,   14,15, 13, 12,    11, 10, 9, 8,       7, 6, 5, 4,     3, 2, 1, 0 );
-	decryptcode( machine(),23, 22, 21, 20,   19,  18, 17,15,   16,14, 13, 12,    11, 10, 9, 8,       7, 6, 5, 4,     3, 2, 1, 0 );
-	decryptcode( machine(),23, 22, 21, 20,   19,  18, 16,17,   15,14, 13, 12,    11, 10, 9, 8,       7, 6, 5, 4,     3, 2, 1, 0 );
-
+	decryptcode( machine(), 23, 22, 21, 20, 19, 18, 13, 16, 15 ,14, 17, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 );
 }
 
 ROM_START( grdnstrmg ) /* Germany */
@@ -7688,7 +7683,7 @@ ROM_START( grdnstrmg ) /* Germany */
 	ROM_LOAD16_BYTE( "gs10_br4.uc11",0x100001, 0x080000, CRC(1d3b57e1) SHA1(a2da598d6cbe257de5b66905a5ad9de90711ccc7) )
 	ROM_LOAD16_BYTE( "gs9_br2.uc4",  0x100000, 0x080000, CRC(4d2c220b) SHA1(066067f7e80973ba0483559ac04f99292cc82dce) )
 
-	// the other sets have larger regions here because they contain 2 sets of tiles in the ROMs, one for each orientation.
+	// some other sets have larger regions here because they contain 2 sets of tiles in the ROMs, one for each orientation.
 	// this set only contains the tile data for the required orientation.
 	ROM_REGION( 0x200000, "bgtile", 0 )   /* Layer 0, 16x16x8 */
 	ROM_LOAD( "gs10_cr5.uc15", 0x000000, 0x080000, CRC(2c8c23e3) SHA1(4c1a460dfc250f9aea77e2ddd82278ee816365be) )
@@ -7701,6 +7696,38 @@ ROM_START( grdnstrmg ) /* Germany */
 
 	ROM_REGION( 0x40000, "oki1", 0 )    /* Samples */
 	ROM_LOAD( "gs2_s2.uc18", 0x00000, 0x40000, CRC(e911ce33) SHA1(a29c4dea98a22235122303325c63c15fadd3431d) ) //
+ROM_END
+
+void nmk16_state::init_grdnstrmau()
+{
+	decryptcode( machine(), 23, 22, 21, 20, 19, 18, 13, 16, 14, 15, 17, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 );
+}
+
+ROM_START( grdnstrmau )
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* 68000 Code */
+	ROM_LOAD16_BYTE( "uc9_27c020.10", 0x000000, 0x040000, CRC(548932b4) SHA1(c90c7e769235d12b07b24deac436202c650cf3e8) )
+	ROM_LOAD16_BYTE( "uc1_27c020.9",  0x000001, 0x040000, CRC(269e2fbc) SHA1(17c3511a44f044927c23f2e5bb8e75c29e3fbcc2) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )        /* Z80 Code */
+	ROM_LOAD( "uc14_27c512.8", 0x00000, 0x10000, CRC(5d8cf28e) SHA1(2a440bf5136f95af137b6688e566a14e65be94b1) )
+
+	ROM_REGION( 0x200000, "sprites", 0 )   /* Sprites, 16x16x4 */
+	ROM_LOAD16_BYTE( "uc3_27c040.8",  0x000000, 0x80000, CRC(9fc36932) SHA1(bc1617b1c4452114171b0d4fc4478346e8db4e00) )
+	ROM_LOAD16_BYTE( "uc10_27c040.9", 0x000001, 0x80000, CRC(6e809d09) SHA1(c884b387a30930df7cd60b9bd80431577de9f356) )
+	ROM_LOAD16_BYTE( "uc4_27c040.10", 0x100000, 0x80000, CRC(73bd6451) SHA1(a620d115f9c1b33f2c37a5263d6e53255af87cfb) )
+	ROM_LOAD16_BYTE( "uc11_27c040.8", 0x100001, 0x80000, CRC(e699a3c9) SHA1(db9337581a8231c72c8dd5e05b0a35121c3a1552) )
+
+	ROM_REGION( 0x200000, "bgtile", 0 )   /* Layer 0, 16x16x8 */
+	ROM_LOAD( "uc15_27c040.10", 0x000000, 0x80000, CRC(0822f7e0) SHA1(b6ce51bbeeea021d4f8678e35df4e14166bd4d8b) )
+	ROM_LOAD( "uc19_27c040.8",  0x080000, 0x80000, CRC(fa078e35) SHA1(e65175cc5a5e7214068b3f4686e37b872396424d) )
+	ROM_LOAD( "uc6_27c040.9",   0x100000, 0x80000, CRC(ec288b95) SHA1(59e3728ce553d1af81bd023700669345b114c8e3) )
+	ROM_LOAD( "uc12_27c040.10", 0x180000, 0x80000, CRC(a9ceec33) SHA1(d4f76f7a8203755fe756a9e17100f830db34eaab) )
+
+	ROM_REGION( 0x10000, "fgtile", 0 )    /* Layer 1, 8x8x4 */
+	ROM_LOAD( "uc2_27c512.9",  0x00000, 0x10000, BAD_DUMP CRC(07a53a1b) SHA1(7dae6e7486886b718e7ad47fc8089c6be2f2f625) ) // suspected bad dump, see corruption on the FG layer
+
+	ROM_REGION( 0x40000, "oki1", 0 )    /* Samples */
+	ROM_LOAD( "uc18_27c020.9", 0x00000, 0x40000, CRC(e911ce33) SHA1(a29c4dea98a22235122303325c63c15fadd3431d) )
 ROM_END
 
 // 紅狐戰機 II (Hóng Hú Zhànjī II)
@@ -7728,10 +7755,7 @@ ROM_END
 
 void nmk16_state::init_redfoxwp2a()
 {
-	// todo collapse to one bitswap
-	decryptcode( machine(),23, 22, 21, 20,   19, 18, 17, 16, /* */  13,15, 14, /* */ 12,    11, 10, 9, 8,       7, 6, 5, 4,     3, 2, 1, 0 );
-	decryptcode( machine(),23, 22, 21, 20,   19, 18, 17, 16, /* */14,15, /* */    13,12,    11, 10, 9, 8,       7, 6, 5, 4,     3, 2, 1, 0 );
-	decryptcode( machine(),23, 22, 21, 20,   19, 18, /* */ 16, 17, /* */    15,14,13,12,    11, 10, 9, 8,       7, 6, 5, 4,     3, 2, 1, 0 );
+	decryptcode( machine(), 23, 22, 21, 20, 19, 18, 16, 17, 13, 14, 15, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 );
 }
 
 // 紅狐戰機 II (Hóng Hú Zhànjī II)
@@ -8239,7 +8263,7 @@ UC1, UC2 & UC3 have solder pads for both MX29F1610 Flash & 27C160 EPROMs
 
 void nmk16_state::init_spec2k()
 {
-	decryptcode( machine(), 23, 22, 21, 20, 19, 18, 17, 13, 14, 15, 16, 12, 11, 10, 9,  8, 7,  6,  5,  4, 3,  2,  1,  0 );
+	decryptcode( machine(), 23, 22, 21, 20, 19, 18, 17, 13, 14, 15, 16, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 );
 }
 
 ROM_START( spec2kh )
@@ -8447,6 +8471,7 @@ GAME( 1998, grdnstrmk,  grdnstrm, grdnstrmk,    grdnstrk,     nmk16_state, init_
 GAME( 1998, redfoxwp2,  grdnstrm, grdnstrmk,    grdnstrk,     nmk16_state, init_grdnstrm,        ROT270, "Afega",                             "Hong Hu Zhanji II (China, set 1)", 0 )
 GAME( 1998, redfoxwp2a, grdnstrm, grdnstrmk,    grdnstrk,     nmk16_state, init_redfoxwp2a,      ROT270, "Afega",                             "Hong Hu Zhanji II (China, set 2)", 0 )
 GAME( 1998, grdnstrmg,  grdnstrm, grdnstrmk,    grdnstrk,     nmk16_state, init_grdnstrmg,       ROT270, "Afega",                             "Guardian Storm (Germany)", 0 )
+GAME( 1998, grdnstrmau, grdnstrm, grdnstrm,     grdnstrm,     nmk16_state, init_grdnstrmau,      ORIENTATION_FLIP_Y, "Afega",                 "Guardian Storm (horizontal, Australia)", MACHINE_IMPERFECT_GRAPHICS ) // GFX issues. Bad dump of the FG tile ROM?
 
 // is there a 'bubble 2000' / 'hot bubble' version with Afega copyright, or is the only Afega release dolmen above, this seems like a sequel, not a clone?
 GAME( 1998, bubl2000,   0,        popspops,     bubl2000,     nmk16_state, init_bubl2000,        ROT0,   "Afega (Tuning license)",            "Bubble 2000", 0 ) // on a tuning board - Has a Demo Sound DSW
