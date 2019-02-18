@@ -12849,6 +12849,12 @@ feversoc                        // (c) 2004
 fgoal                           // TF  (c) 1979 Taito Corporation
 fgoala                          // MF  (c) 1979 Taito Corporation
 
+@source:fidel_desdis.cpp
+fdes2000d                       //
+fdes2100d                       //
+fdes2265                        //
+fdes2325                        //
+
 @source:fidel_sc6.cpp
 fscc6                           //
 
@@ -12862,8 +12868,6 @@ cscg                            // * German
 cscsp                           // * Spanish
 fdes2000                        //
 fdes2100                        //
-fdes2000d                       //
-fdes2100d                       //
 feasbu                          // EAS: Elite A/S Challenger (Budapest program, English)
 feasbufr                        // * French
 feasbug                         // * German
@@ -12908,8 +12912,6 @@ super9ccg                       // * German
 super9ccsp                      // * Spanish
 
 @source:fidel68k.cpp
-fdes2265                        //
-fdes2325                        //
 feagv10                         //
 feagv11                         //
 feagv2                          //

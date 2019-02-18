@@ -442,7 +442,6 @@ I/O is via TTL, very similar to Designer Display
 
 #include "emu.h"
 #include "includes/fidelbase.h"
-#include "includes/fidel_desdis_common.h"
 
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6502/r65c02.h"
@@ -459,7 +458,6 @@ I/O is via TTL, very similar to Designer Display
 #include "fidel_chesster.lh" // clickable
 #include "fidel_csc.lh" // clickable, with preliminary boardpieces simulation
 #include "fidel_des.lh" // clickable
-#include "fidel_desdis.lh" // clickable
 #include "fidel_eag.lh" // clickable
 #include "fidel_eas.lh" // clickable
 #include "fidel_ex.lh" // clickable
@@ -724,23 +722,6 @@ void su9_state::su9_set_cpu_freq()
 	// SU9 CPU is clocked 1.95MHz, DS9 is 2.5MHz
 	m_maincpu->set_unscaled_clock((ioport("FAKE")->read() & 1) ? (5_MHz_XTAL/2) : (3.9_MHz_XTAL/2));
 }
-
-
-
-class desdis_state : public desdis_common_state
-{
-public:
-	desdis_state(const machine_config &mconfig, device_type type, const char *tag) :
-		desdis_common_state(mconfig, type, tag)
-	{ }
-
-	void fdes2000d(machine_config &config);
-	void fdes2100d(machine_config &config);
-	void init_fdes2100d();
-
-private:
-	void fdes2100d_map(address_map &map);
-};
 
 
 
@@ -1240,70 +1221,6 @@ READ8_MEMBER(excel_state::fexcelb_ttl_r)
 
 
 
-/******************************************************************************
-    Designer Display
-******************************************************************************/
-
-// TTL/generic
-
-WRITE8_MEMBER(desdis_common_state::control_w)
-{
-	u8 q3_old = m_led_select & 8;
-
-	// a0-a2,d7: 74259
-	u8 mask = 1 << offset;
-	m_led_select = (m_led_select & ~mask) | ((data & 0x80) ? mask : 0);
-
-	// 74259 Q4-Q7: 7442 a0-a3
-	// 7442 0-8: led data, input mux
-	u16 sel = 1 << (m_led_select >> 4 & 0xf) & 0x3ff;
-	m_inp_mux = sel & 0x1ff;
-
-	// 7442 9: speaker out
-	m_dac->write(BIT(sel, 9));
-
-	// 74259 Q0,Q1: led select (active low)
-	display_matrix(9, 2, m_inp_mux, ~m_led_select & 3, false);
-
-	// 74259 Q2: book rom A14
-	if (m_rombank != nullptr)
-		m_rombank->set_entry(~m_led_select >> 2 & 1);
-
-	// 74259 Q3: lcd common, update on rising edge
-	if (~q3_old & m_led_select & 8)
-	{
-		for (int i = 0; i < 4; i++)
-			m_display_state[i+2] = m_7seg_data >> (8*i) & 0xff;
-	}
-
-	m_display_maxy += 4;
-	set_display_segmask(0x3c, 0x7f);
-	display_update();
-}
-
-WRITE8_MEMBER(desdis_common_state::lcd_w)
-{
-	// a0-a2,d0-d3: 4*74259 to lcd digit segments
-	u32 mask = bitswap<8>(1 << offset,3,7,6,0,1,2,4,5);
-	for (int i = 0; i < 4; i++)
-	{
-		m_7seg_data = (m_7seg_data & ~mask) | ((data >> i & 1) ? 0 : mask);
-		mask <<= 8;
-	}
-}
-
-READ8_MEMBER(desdis_common_state::input_r)
-{
-	// a0-a2,d7: multiplexed inputs (active low)
-	return (read_inputs(9) >> offset & 1) ? 0 : 0x80;
-}
-
-void desdis_state::init_fdes2100d()
-{
-	m_rombank->configure_entries(0, 2, memregion("rombank")->base(), 0x4000);
-}
-
-
 
 /******************************************************************************
     Phantom
@@ -1513,15 +1430,6 @@ void excel_state::fexcelb_map(address_map &map)
 
 
 // Designer Display, Phantom, Chesster
-
-void desdis_state::fdes2100d_map(address_map &map)
-{
-	map(0x0000, 0x1fff).ram();
-	map(0x2000, 0x2007).mirror(0x1ff8).rw(FUNC(desdis_state::input_r), FUNC(desdis_state::control_w));
-	map(0x4000, 0x7fff).bankr("rombank");
-	map(0x6000, 0x6007).mirror(0x1ff8).w(FUNC(desdis_state::lcd_w));
-	map(0x8000, 0xffff).rom();
-}
 
 void fidel6502_state::fphantom_map(address_map &map)
 {
@@ -1871,20 +1779,6 @@ static INPUT_PORTS_START( fdes )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED) // no low-voltage detection circuit (still works in software though)
 INPUT_PORTS_END
 
-
-INPUT_PORTS_START( desdis )
-	PORT_INCLUDE( fidel_cb_buttons )
-
-	PORT_START("IN.8")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_NAME("Clear")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_NAME("Move / Alternate")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_NAME("Hint / Info")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F) PORT_NAME("Take Back / Replay")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_C) PORT_NAME("Level / New")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_B) PORT_NAME("Option / Time")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_NAME("Verify / Problem")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_NAME("Shift")
-INPUT_PORTS_END
 
 static INPUT_PORTS_START( chesster )
 	PORT_INCLUDE( fidel_cb_buttons )
@@ -2271,36 +2165,6 @@ void excel_state::fexceld(machine_config &config)
 	config.set_default_layout(layout_fidel_exd);
 }
 
-void desdis_state::fdes2100d(machine_config &config)
-{
-	/* basic machine hardware */
-	M65C02(config, m_maincpu, 6_MHz_XTAL); // W65C02P-6
-	m_maincpu->set_addrmap(AS_PROGRAM, &desdis_state::fdes2100d_map);
-
-	const attotime irq_period = attotime::from_hz(630); // from 556 timer (22nF, 102K, 1K)
-	TIMER(config, m_irq_on).configure_periodic(FUNC(desdis_state::irq_on<M6502_IRQ_LINE>), irq_period);
-	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(15250)); // active for 15.25us
-	TIMER(config, "irq_off").configure_periodic(FUNC(desdis_state::irq_off<M6502_IRQ_LINE>), irq_period);
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_fidel_desdis);
-
-	/* sound hardware */
-	SPEAKER(config, "speaker").front_center();
-	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.set_output(5.0);
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-}
-
-void desdis_state::fdes2000d(machine_config &config)
-{
-	fdes2100d(config);
-
-	/* basic machine hardware */
-	R65C02(config.replace(), m_maincpu, 3_MHz_XTAL); // R65C02P3
-	m_maincpu->set_addrmap(AS_PROGRAM, &desdis_state::fdes2100d_map);
-}
 
 void fidel6502_state::fphantom(machine_config &config)
 {
@@ -2849,22 +2713,6 @@ ROM_START( fdes2100 ) // model 6103, PCB label 510.1129A01
 ROM_END
 
 
-ROM_START( fdes2100d ) // model 6106, PCB label 510.1130A01. The 'rev B' dump came from a post-release bugfix by Fidelity
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("i9_orange.ic9", 0x8000, 0x8000, CRC(83fec02a) SHA1(6f43ab05bc605061989b05d0592dbd184efff9d4) ) // WSI 27C256L-12
-
-	ROM_REGION( 0x8000, "rombank", 0 )
-	ROM_LOAD("bk3_white.ic10", 0x0000, 0x8000, CRC(3857cc35) SHA1(f073dafb9fd885c7ddb7fbff10e3653f343ef1c6) ) // WSI 27C256L-12
-ROM_END
-
-ROM_START( fdes2000d ) // model 6105, PCB label 510.1130A01
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("27c256.ic9", 0x8000, 0x8000, CRC(b136d1a1) SHA1(8438790a62f45284ff33a0255c5c89f526726d3e) ) // 27C256, no label
-
-	ROM_REGION( 0x8000, "rombank", ROMREGION_ERASEFF ) // no rom in ic10
-ROM_END
-
-
 ROM_START( fphantom ) // model 6100, PCB label 510.1128A01
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("u_3c_yellow.u3", 0x8000, 0x8000, CRC(fb7c38ae) SHA1(a1aa7637705052cb4eec92644dc79aee7ba4d77c) ) // 27C256
@@ -2962,9 +2810,6 @@ CONS( 1986, fexcelpb,   fexcelp,  0, fexcelp,   fexcel,    excel_state, empty_in
 CONS( 1986, granits,    fexcelp,  0, granits,   fexcel,    excel_state, empty_init,    "hack (RCS)", "Granit 'S'", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 CONS( 1988, fdes2000,   fexcelp,  0, fdes2000,  fdes,      excel_state, empty_init,    "Fidelity Electronics", "Designer 2000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 CONS( 1988, fdes2100,   fexcelp,  0, fdes2100,  fdes,      excel_state, empty_init,    "Fidelity Electronics", "Designer 2100", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-
-CONS( 1988, fdes2100d,  0,        0, fdes2100d, desdis,   desdis_state, init_fdes2100d,  "Fidelity Electronics", "Designer 2100 Display (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1988, fdes2000d,  fdes2100d,0, fdes2000d, desdis,   desdis_state, init_fdes2100d,  "Fidelity Electronics", "Designer 2000 Display", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 
 CONS( 1988, fphantom,   0,        0, fphantom,  fphantom,  fidel6502_state, init_fphantom, "Fidelity Electronics", "Phantom (Fidelity)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 
