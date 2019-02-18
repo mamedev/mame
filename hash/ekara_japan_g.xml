@@ -101,7 +101,7 @@
 	</software>
 
 	<software name="gc0008">
-		<description>MIN Volume 1 (Japan) (GC0008-MIN) (set 1)</description>
+		<description>Mini Moni Volume 1 (Japan) (GC0008-MIN) (set 1)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
@@ -148,7 +148,7 @@
 
 
 	<software name="gc0014">
-		<description>MIN Volume 2 (GC0014-MIN)</description>
+		<description>Mini Moni Volume 2 (GC0014-MIN)</description>
 		<year>2002</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
