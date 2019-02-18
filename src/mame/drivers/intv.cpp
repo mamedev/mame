@@ -559,8 +559,8 @@ MACHINE_CONFIG_START(intv_state::intvkbd)
 	MCFG_SCREEN_UPDATE_DRIVER(intv_state, screen_update_intvkbd)
 
 	/* I/O cartslots for BASIC */
-	MCFG_GENERIC_CARTSLOT_ADD("ioslot1", generic_plain_slot, "intbasic_cart")
-	MCFG_GENERIC_CARTSLOT_ADD("ioslot2", generic_plain_slot, "intbasic_cart")
+	GENERIC_CARTSLOT(config, m_iocart1, generic_plain_slot, "intbasic_cart");
+	GENERIC_CARTSLOT(config, m_iocart2, generic_plain_slot, "intbasic_cart");
 MACHINE_CONFIG_END
 
 ROM_START(intv) // the intv1 exec rom should be two roms: RO-3-9502-011.U5 and RO-3-9504-021.U6

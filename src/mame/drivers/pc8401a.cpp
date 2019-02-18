@@ -599,12 +599,10 @@ MACHINE_CONFIG_START(pc8401a_state::pc8401a)
 	pc8401a_video(config);
 
 	/* option ROM cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, nullptr)
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, nullptr, "bin,rom");
 
 	/* I/O ROM cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("io_cart", generic_linear_slot, nullptr)
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
+	GENERIC_CARTSLOT(config, m_io_cart, generic_linear_slot, nullptr, "bin,rom");
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K").set_extra_options("96K");
@@ -639,12 +637,10 @@ MACHINE_CONFIG_START(pc8500_state::pc8500)
 	pc8500_video(config);
 
 	/* option ROM cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, nullptr)
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, nullptr, "bin,rom");
 
 	/* I/O ROM cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("io_cart", generic_linear_slot, nullptr)
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
+	GENERIC_CARTSLOT(config, m_io_cart, generic_linear_slot, nullptr, "bin,rom");
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K").set_extra_options("96K");

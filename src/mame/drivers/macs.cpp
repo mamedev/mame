@@ -501,7 +501,8 @@ uint8_t macs_state::dma_offset()
 	return m_cart_bank;
 }
 
-MACHINE_CONFIG_START(macs_state::macs)
+void macs_state::macs(machine_config &config)
+{
 	/* basic machine hardware */
 	ST0016_CPU(config, m_maincpu, 8000000); // 8 MHz ?
 	m_maincpu->set_memory_map(&macs_state::macs_mem);
@@ -518,12 +519,9 @@ MACHINE_CONFIG_START(macs_state::macs)
 	screen.set_palette("maincpu:palette");
 	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_IRQ0, HOLD_LINE); // FIXME: HOLD_LINE is bad juju
 
-	MCFG_GENERIC_CARTSLOT_ADD_WITH_DEFAULT("slot_a", generic_plain_slot, "macs_cart", "rom")
-	MCFG_SET_IMAGE_LOADABLE(false)
-	MCFG_GENERIC_CARTSLOT_ADD_WITH_DEFAULT("slot_b", generic_plain_slot, "macs_cart", "rom")
-	MCFG_SET_IMAGE_LOADABLE(false)
-
-MACHINE_CONFIG_END
+	GENERIC_CARTSLOT(config, m_cart1, generic_plain_slot, "macs_cart", "rom").set_user_loadable(false);
+	GENERIC_CARTSLOT(config, m_cart2, generic_plain_slot, "macs_cart", "rom").set_user_loadable(false);
+}
 
 
 #define MACS_BIOS \

@@ -1502,15 +1502,14 @@ MACHINE_CONFIG_START(pc6001_state::pc6001)
 	m_ppi->out_pc_callback().set(FUNC(pc6001_state::ppi_portc_w));
 
 	/* uart */
-	MCFG_DEVICE_ADD("uart", I8251, 0)
+	I8251(config, "uart", 0);
 
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "pc6001_cart")
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "pc6001_cart");
 
 //  CASSETTE(config, m_cassette);
 //  m_cassette->set_formats(pc6001_cassette_formats);
 //  m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
-	MCFG_GENERIC_CARTSLOT_ADD("cas_hack", generic_plain_slot, "pc6001_cass")
-	MCFG_GENERIC_EXTENSIONS("cas,p6")
+	GENERIC_CARTSLOT(config, m_cas_hack, generic_plain_slot, "pc6001_cass", "cas,p6");
 
 	SPEAKER(config, "mono").front_center();
 	ay8910_device &ay8910(AY8910(config, "ay8910", PC6001_MAIN_CLOCK/4));

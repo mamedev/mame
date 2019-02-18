@@ -517,7 +517,7 @@ MACHINE_CONFIG_START(mephisto_montec_state::smondial2)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(smondial2_mem)
 
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "smondial2_cart")
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "smondial2_cart");
 	SOFTWARE_LIST(config, "cart_list").set_original("smondial2");
 
 	config.set_default_layout(layout_mephisto_smondial2);

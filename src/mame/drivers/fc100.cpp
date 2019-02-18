@@ -515,11 +515,12 @@ void fc100_state::init_fc100()
 	membank("bankr")->configure_entry(1, &ram[0]);
 }
 
-MACHINE_CONFIG_START(fc100_state::fc100)
+void fc100_state::fc100(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(7'159'090)/2)
-	MCFG_DEVICE_PROGRAM_MAP(fc100_mem)
-	MCFG_DEVICE_IO_MAP(fc100_io)
+	Z80(config, m_maincpu, XTAL(7'159'090)/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &fc100_state::fc100_mem);
+	m_maincpu->set_addrmap(AS_IO, &fc100_state::fc100_io);
 
 	/* video hardware */
 	M5C6847P1(config, m_vdg, XTAL(7'159'090)/3);  // Clock not verified
@@ -558,7 +559,7 @@ MACHINE_CONFIG_START(fc100_state::fc100)
 	TIMER(config, "timer_p").configure_periodic(FUNC(fc100_state::timer_p), attotime::from_hz(40000)); // cass read
 	TIMER(config, "timer_k").configure_periodic(FUNC(fc100_state::timer_k), attotime::from_hz(300)); // keyb scan
 
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "fc100_cart")
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "fc100_cart");
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->ack_handler().set("cent_status_in", FUNC(input_buffer_device::write_bit4));
@@ -568,7 +569,7 @@ MACHINE_CONFIG_START(fc100_state::fc100)
 	m_centronics->set_output_latch(cent_data_out);
 
 	INPUT_BUFFER(config, "cent_status_in");
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( fc100 )
