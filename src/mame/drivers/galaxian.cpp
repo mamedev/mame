@@ -6136,6 +6136,7 @@ MACHINE_CONFIG_START(galaxian_state::konami_sound_1x_ay8910)
 
 	/* 2nd CPU to drive sound */
 	MCFG_DEVICE_ADD("audiocpu", Z80, KONAMI_SOUND_CLOCK/8)
+
 	MCFG_DEVICE_PROGRAM_MAP(frogger_sound_map)
 	MCFG_DEVICE_IO_MAP(frogger_sound_portmap)
 
@@ -6160,6 +6161,7 @@ MACHINE_CONFIG_START(galaxian_state::konami_sound_2x_ay8910)
 
 	/* 2nd CPU to drive sound */
 	MCFG_DEVICE_ADD("audiocpu", Z80, KONAMI_SOUND_CLOCK/8)
+
 	MCFG_DEVICE_PROGRAM_MAP(konami_sound_map)
 	MCFG_DEVICE_IO_MAP(konami_sound_portmap)
 
@@ -6392,6 +6394,7 @@ MACHINE_CONFIG_START(galaxian_state::checkman)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("audiocpu", Z80, 1620000)  /* 1.62 MHz */
+
 	MCFG_DEVICE_PROGRAM_MAP(checkman_sound_map)
 	MCFG_DEVICE_IO_MAP(checkman_sound_portmap)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", galaxian_state,  irq0_line_hold)   /* NMIs are triggered by the main CPU */
@@ -6410,6 +6413,7 @@ MACHINE_CONFIG_START(galaxian_state::checkmaj)
 	m_maincpu->set_addrmap(AS_PROGRAM, &galaxian_state::galaxian_map_base); // no discrete sound
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, 1620000)
+
 	MCFG_DEVICE_PROGRAM_MAP(checkmaj_sound_map)
 
 	TIMER(config, "irq0").configure_scanline(FUNC(galaxian_state::checkmaj_irq0_gen), "screen", 0, 8);
@@ -6441,7 +6445,8 @@ MACHINE_CONFIG_START(galaxian_state::kingball)
 	mooncrst(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("audiocpu", Z80,5000000/2)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 5000000/2)
+
 	MCFG_DEVICE_PROGRAM_MAP(kingball_sound_map)
 	MCFG_DEVICE_IO_MAP(kingball_sound_portmap)
 
@@ -6550,7 +6555,10 @@ MACHINE_CONFIG_START(galaxian_state::jungsub)
 	m_maincpu->set_addrmap(AS_PROGRAM, &galaxian_state::jungsub_map);
 	m_maincpu->set_addrmap(AS_IO, &galaxian_state::jungsub_io_map);
 
+	/* 2nd CPU to drive sound */
 	MCFG_DEVICE_ADD("audiocpu", Z80, GALAXIAN_PIXEL_CLOCK / 3 / 2) // clock not verified
+
+	// sound CPU meemory map appears to closely follow Checkman
 	MCFG_DEVICE_PROGRAM_MAP(checkman_sound_map)
 	MCFG_DEVICE_IO_MAP(checkman_sound_portmap)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", galaxian_state, irq0_line_hold)
@@ -6570,6 +6578,8 @@ MACHINE_CONFIG_START(galaxian_state::explorer) // Sidam 10800
 
 	/* 2nd CPU to drive sound */
 	MCFG_DEVICE_ADD("audiocpu", Z80, 12_MHz_XTAL / 2 / 2 / 2) /* clock not verified */
+
+	// sound CPU memory map is exactly the same as standard Konami sound boards
 	MCFG_DEVICE_PROGRAM_MAP(konami_sound_map)
 	MCFG_DEVICE_IO_MAP(konami_sound_portmap)
 
@@ -6588,7 +6598,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(galaxian_state::takeoff) // Sidam 10900, with 1 x AY-3-8912
 	explorer(config);
 
-	/* 2nd CPU to drive sound */
+	// the sound CPU memory map needs to be compensated for lack of a second AY-3-8912
 	MCFG_DEVICE_MODIFY("audiocpu")
 	MCFG_DEVICE_PROGRAM_MAP(takeoff_sound_map)
 	MCFG_DEVICE_IO_MAP(takeoff_sound_portmap)
@@ -6608,8 +6618,10 @@ MACHINE_CONFIG_START(galaxian_state::amigo2) // marked "AMI", but similar to abo
 	// alternate memory map
 	m_maincpu->set_addrmap(AS_PROGRAM, &galaxian_state::amigo2_map);
 
-	// 2nd CPU to drive sound
+	/* 2nd CPU to drive sound */
 	MCFG_DEVICE_ADD("audiocpu", Z80, 12_MHz_XTAL / 2 / 2 / 2) // clock not verified
+
+	// sound CPU memory map is exactly the same as standard Konami sound boards
 	MCFG_DEVICE_PROGRAM_MAP(konami_sound_map)
 	MCFG_DEVICE_IO_MAP(konami_sound_portmap)
 	GENERIC_LATCH_8(config, m_soundlatch);
@@ -6629,8 +6641,10 @@ MACHINE_CONFIG_START(galaxian_state::frogf2) // origins unknown, but is akin to 
 	// alternate memory map
 	m_maincpu->set_addrmap(AS_PROGRAM, &galaxian_state::frogf2_map);
 
-	// 2nd CPU to drive sound
+	/* 2nd CPU to drive sound */
 	MCFG_DEVICE_ADD("audiocpu", Z80, 12_MHz_XTAL / 2 / 2 / 2) /* verified on PCB */
+
+	// sound CPU memory map is exactly the same as Frogger
 	MCFG_DEVICE_PROGRAM_MAP(frogger_sound_map)
 	MCFG_DEVICE_IO_MAP(frogger_sound_portmap)
 	GENERIC_LATCH_8(config, m_soundlatch);
@@ -6675,6 +6689,7 @@ MACHINE_CONFIG_START(galaxian_state::sfx)
 
 	/* 3rd CPU for the sample player */
 	MCFG_DEVICE_ADD("audio2", Z80, KONAMI_SOUND_CLOCK/8)
+
 	MCFG_DEVICE_PROGRAM_MAP(sfx_sample_map)
 	MCFG_DEVICE_IO_MAP(sfx_sample_portmap)
 
