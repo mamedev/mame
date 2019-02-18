@@ -3,6 +3,10 @@
 // thanks-to:Berger,yoyo_chessboard
 /******************************************************************************
 
+Fidelity Designer Display series (6502-based displayless Designer is in fidel_excel.cpp)
+
+*******************************************************************************
+
 Designer 2100 Display (model 6106)
 ----------------
 8KB RAM(MS6264L-10), 2*32KB ROM(27C256)
@@ -12,7 +16,7 @@ PCB label 510.1130A01
 
 Designer 2000 Display (model 6105): same hardware, no bookrom, 3MHz
 
-******************************************************************************
+*******************************************************************************
 
 Designer Mach III Master 2265 (model 6113)
 ------------------------------------------

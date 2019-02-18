@@ -17,6 +17,15 @@
       sub driverclass, and separate files.
     - card games aren't playable without the barcode scanner
     - Z80 WAIT pin is not fully emulated, affecting VBRC speech busy state
+    TODO:
+    - Source organization is a big mess. Each machine family could be in its own
+      sub driverclass, and separate files.
+    - verify cpu speed and rom labels where unknown
+    - improve EAS/SC12/etc CPU divider? it seems a little bit slower than the real machine.
+      Currently, a dummy timer workaround is needed, or it's much worse.
+      Is the problem here is due to timing of CPU addressbus changes? We can only 'sense'
+      the addressbus at read or write accesses.
+    - finish fphantom emulation
 
     Read the official manual(s) on how to play.
 
@@ -45,7 +54,7 @@
     Board hardware descriptions below.
     Detailed RE work done by Kevin 'kevtris' Horton, except where noted
 
-******************************************************************************
+*******************************************************************************
 
 Voice Chess Challenger (VCC) (version A and B?)
 Advanced Voice Chess Challenger (UVC)
@@ -139,7 +148,7 @@ automatically select the correct ROM(s).  I have to test whether it will do auto
 determination and give you a language option on power up or something.
 
 
-******************************************************************************
+*******************************************************************************
 
 Chess Challenger 10 (CCX)
 -------------------
@@ -185,7 +194,7 @@ PC.6 - button column C (W)
 PC.7 - button column D (W)
 
 
-******************************************************************************
+*******************************************************************************
 
 Chess Challenger 7 (BCC)
 ------------------------
@@ -221,7 +230,7 @@ Port map (Read):
 D0-D3: keypad row
 
 
-******************************************************************************
+*******************************************************************************
 
 Voice Bridge Challenger (Model VBRC, later reissued as Model 7002)
 and Bridge Challenger 3 (Model 7014)
@@ -352,7 +361,7 @@ by the grids.  hi = grid on, hi = segment on.
 A detailed description of the hardware can be found also in the patent 4,373,719.
 
 
-******************************************************************************
+*******************************************************************************
 
 Voice Sensory Chess Challenger (VSC)
 ------------------------------------

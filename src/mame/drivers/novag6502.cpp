@@ -17,7 +17,7 @@
     - sforte/sexpert led handling is correct?
     - printer port
 
-******************************************************************************
+*******************************************************************************
 
 Super Constellation Chess Computer (model 844):
 - UMC UM6502C @ 4 MHz (8MHz XTAL), 600Hz? IRQ(source unknown?)
@@ -26,7 +26,7 @@ Super Constellation Chess Computer (model 844):
 - external ports for clock and printer, not emulated here
 
 
-******************************************************************************
+*******************************************************************************
 
 Constellation Forte:
 - R65C02P4 @ 5MHz (10MHz XTAL)
@@ -38,7 +38,7 @@ When it was first added to MAME as skeleton driver in mmodular.c, cforteb romset
 was assumed to be Super Forte B, but it definitely isn't. I/O is similar to supercon.
 
 
-******************************************************************************
+*******************************************************************************
 
 Super Expert (model 878/887/902):
 - 65C02 @ 5MHz or 6MHz (10MHz or 12MHz XTAL)

@@ -9,7 +9,7 @@ TODO:
 - granits gives error beeps at start, need to press clear to play
 - granits buttons seem too sensitive
 
-******************************************************************************
+*******************************************************************************
 
 Voice Excellence (model 6092)
 ----------------
@@ -110,7 +110,7 @@ VFD display, and some buttons for controlling the clock. IRQ frequency is double
 presumedly for using the blinking led as seconds counter. It only tracks player time,
 not of the opponent. And it obviously doesn't show chessmove coordinates either.
 
-******************************************************************************
+*******************************************************************************
 
 Designer 2000 (model 6102)
 ----------------

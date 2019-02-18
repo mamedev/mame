@@ -14,7 +14,7 @@
     - is presto led handling correct? mux data needs to be auto cleared
       similar to diablo/sexpert
 
-******************************************************************************
+*******************************************************************************
 
 Presto:
 - NEC D80C49C MCU(serial 186), OSC from LC circuit measured ~6MHz

@@ -10,7 +10,7 @@
     - hardware is similar to MK I, the drivers can be merged in theory.
       But I prefer my source code to be licensed BSD3, mk1.cpp is GPL2.
 
-******************************************************************************
+*******************************************************************************
 
 Delta-1:
 - 3850PK CPU at ~2MHz, 3853PK memory interface
