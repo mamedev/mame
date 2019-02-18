@@ -123,22 +123,12 @@ void sms_multitap_device::peripheral_w(uint8_t data)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-READ32_MEMBER( sms_multitap_device::pixel_r )
-{
-	return m_port->pixel_r();
-}
-
-
 void sms_multitap_device::device_add_mconfig(machine_config &config)
 {
 	// Controller subports setup, without the TH callback declaration,
 	// because the circuit scheme shows TH of subports without connection.
 	SMS_CONTROL_PORT(config, m_subctrl1_port, sms_control_port_devices, "joypad");
-	m_subctrl1_port->pixel_handler().set(FUNC(sms_multitap_device::pixel_r));
 	SMS_CONTROL_PORT(config, m_subctrl2_port, sms_control_port_devices, "joypad");
-	m_subctrl2_port->pixel_handler().set(FUNC(sms_multitap_device::pixel_r));
 	SMS_CONTROL_PORT(config, m_subctrl3_port, sms_control_port_devices, "joypad");
-	m_subctrl3_port->pixel_handler().set(FUNC(sms_multitap_device::pixel_r));
 	SMS_CONTROL_PORT(config, m_subctrl4_port, sms_control_port_devices, "joypad");
-	m_subctrl4_port->pixel_handler().set(FUNC(sms_multitap_device::pixel_r));
 }

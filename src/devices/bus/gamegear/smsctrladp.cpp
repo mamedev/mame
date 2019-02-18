@@ -70,12 +70,6 @@ WRITE_LINE_MEMBER( sms_ctrl_adaptor_device::th_pin_w )
 }
 
 
-READ32_MEMBER( sms_ctrl_adaptor_device::pixel_r )
-{
-	return m_port->pixel_r();
-}
-
-
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
@@ -84,6 +78,5 @@ void sms_ctrl_adaptor_device::device_add_mconfig(machine_config &config)
 {
 	SMS_CONTROL_PORT(config, m_subctrl_port, sms_control_port_devices, "joypad");
 	m_subctrl_port->th_input_handler().set(FUNC(sms_ctrl_adaptor_device::th_pin_w));
-	m_subctrl_port->pixel_handler().set(FUNC(sms_ctrl_adaptor_device::pixel_r));
 }
 
