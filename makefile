@@ -505,7 +505,9 @@ endif
 # reverse logic for this one
 
 ifdef USE_BUNDLED_LIB_SDL2
+ifneq '$(USE_BUNDLED_LIB_SDL2)' '0'
 PARAMS += --with-bundled-sdl2
+endif
 endif
 
 #-------------------------------------------------
