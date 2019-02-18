@@ -3,21 +3,18 @@
 // thanks-to:Berger,yoyo_chessboard
 /******************************************************************************
 
-    Fidelity Electronics 68000 based board driver
+Fidelity 68000-based Elite Avant Garde driver
+For 6502-based EAG, see fidel_elite.cpp
+Excel 68000 I/O is very similar to EAG, so it's handled in this driver as well
 
-    NOTE: MAME doesn't include a generalized implementation for boardpieces yet,
-    greatly affecting user playability of emulated electronic board games.
-    As workaround for the chess games, use an external chess GUI on the side,
-    such as Arena(in editmode).
-
-    TODO:
-    - USART is not emulated
-	- V5 CPU comms is unemulated, it's still playable but not at all as intended
-    - V9(68030 @ 32MHz) is faster than V10(68040 @ 25MHz) but it should be the other
-      way around, culprit is unemulated cache?
-    - V11 CPU should be M68EC060, not yet emulated. Now using M68EC040 in its place
-      at twice the frequency due to lack of superscalar.
-    - V11 beeper is too high pitched, obviously related to wrong CPU type too
+TODO:
+- USART is not emulated
+- V5 CPU comms is unemulated, it's still playable but not at all as intended
+- V9(68030 @ 32MHz) is faster than V10(68040 @ 25MHz) but it should be the other
+  way around, culprit is unemulated cache?
+- V11 CPU should be M68EC060, not yet emulated. Now using M68EC040 in its place
+  at twice the frequency due to lack of superscalar.
+- V11 beeper is too high pitched, obviously related to wrong CPU type too
 
 ******************************************************************************
 
@@ -34,7 +31,6 @@ Mach III has wire mods from U22/U23 to U8/U9(2*8KB + 2*32KB piggybacked).
 Mach IV has 2*256KB DRAM, and a daughterboard(510.1123B01) for the 68020.
 
 I/O is via TTL, overall very similar to EAG.
-
 
 ******************************************************************************
 
@@ -85,7 +81,6 @@ Memory map: (of what is known)
 400000-4????? R hi: external module slot
 700002-700003 R lo d7: 74251: keypad row 8
 604000-607FFF: 16KB EEPROM
-
 
 ******************************************************************************
 
@@ -172,6 +167,8 @@ B0000x-xxxxxx: see V7, -800000
 #include "fidel_eag_68k.lh" // clickable
 
 
+namespace {
+
 class eag_state : public fidelbase_state
 {
 public:
@@ -208,7 +205,6 @@ protected:
 	DECLARE_WRITE8_MEMBER(digit_w);
 };
 
-
 class excel68k_state : public eag_state
 {
 public:
@@ -225,35 +221,13 @@ private:
 	void fex68km2_map(address_map &map);
 	void fex68km3_map(address_map &map);
 
-	// I/O handlers
+	// I/O handlers, mux_w is a little different
 	virtual DECLARE_WRITE8_MEMBER(mux_w) override;
 };
 
 
-
-// Devices, I/O
-
 /******************************************************************************
-    Excel 68000
-******************************************************************************/
-
-WRITE8_MEMBER(excel68k_state::mux_w)
-{
-	// a1-a3,d0: 74259
-	u8 mask = 1 << offset;
-	m_led_select = (m_led_select & ~mask) | ((data & 1) ? mask : 0);
-
-	// 74259 Q0-Q3: 74145 A-D (Q4-Q7 N/C)
-	eag_state::mux_w(space, offset, m_led_select & 0xf);
-}
-
-
-
-
-
-
-/******************************************************************************
-    EAG
+    Devices, I/O
 ******************************************************************************/
 
 // TTL/generic
@@ -276,6 +250,16 @@ WRITE8_MEMBER(eag_state::mux_w)
 	m_dac->write(BIT(sel, 9));
 	m_inp_mux = sel & 0x1ff;
 	prepare_display();
+}
+
+WRITE8_MEMBER(excel68k_state::mux_w)
+{
+	// a1-a3,d0: 74259
+	u8 mask = 1 << offset;
+	m_led_select = (m_led_select & ~mask) | ((data & 1) ? mask : 0);
+
+	// 74259 Q0-Q3: 74145 A-D (Q4-Q7 N/C)
+	eag_state::mux_w(space, offset, m_led_select & 0xf);
 }
 
 READ8_MEMBER(eag_state::input1_r)
@@ -306,7 +290,6 @@ WRITE8_MEMBER(eag_state::digit_w)
 
 
 
-
 /******************************************************************************
     Address Maps
 ******************************************************************************/
@@ -334,7 +317,6 @@ void excel68k_state::fex68km3_map(address_map &map)
 	fex68k_map(map);
 	map(0x200000, 0x20ffff).ram();
 }
-
 
 
 // EAG
@@ -662,24 +644,25 @@ ROM_START( feagv11 )
 	ROM_LOAD32_BYTE("19", 0x00003, 0x08000, CRC(a70c5468) SHA1(7f6b4f46577d5cfdaa84d387c7ce35d941e5bbc7) ) // "
 ROM_END
 
+} // anonymous namespace
 
 
 /******************************************************************************
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME      PARENT   CMP MACHINE   INPUT    CLASS           INIT           COMPANY                  FULLNAME, FLAGS
-CONS( 1987, fex68k,   0,        0, fex68k,   excel68k,  excel68k_state, empty_init,    "Fidelity Electronics",  "Excel 68000 (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1987, fex68ka,  fex68k,   0, fex68k,   excel68k,  excel68k_state, empty_init,    "Fidelity Electronics",  "Excel 68000 (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1987, fex68kb,  fex68k,   0, fex68k,   excel68k,  excel68k_state, empty_init,    "Fidelity Electronics",  "Excel 68000 (set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1988, fex68km2, fex68k,   0, fex68km2, excel68k,  excel68k_state, empty_init,    "Fidelity Electronics",  "Excel 68000 Mach II (rev. C+)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1988, fex68km3, fex68k,   0, fex68km3, excel68k,  excel68k_state, empty_init,    "Fidelity Electronics",  "Excel 68000 Mach III Master", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+//    YEAR  NAME      PARENT   CMP MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
+CONS( 1987, fex68k,   0,        0, fex68k,   excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1987, fex68ka,  fex68k,   0, fex68k,   excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1987, fex68kb,  fex68k,   0, fex68k,   excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 (set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1988, fex68km2, fex68k,   0, fex68km2, excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 Mach II (rev. C+)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1988, fex68km3, fex68k,   0, fex68km3, excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 Mach III Master", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 
-CONS( 1989, feagv2,   0,        0, eag,      eag,     eag_state, init_eag,      "Fidelity Electronics",  "Elite Avant Garde (model 6114-2/3/4, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1989, feagv2a,  feagv2,   0, eag,      eag,     eag_state, init_eag,      "Fidelity Electronics",  "Elite Avant Garde (model 6114-2/3/4, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1989, feagv5,   feagv2,   0, eagv5,    eag,     eag_state, empty_init,    "Fidelity Electronics",  "Elite Avant Garde (model 6114-5)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )
-CONS( 1990, feagv7,   feagv2,   0, eagv7,    eag,     eag_state, empty_init,    "Fidelity Electronics",  "Elite Avant Garde (model 6117-7, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1990, feagv7a,  feagv2,   0, eagv7,    eag,     eag_state, empty_init,    "Fidelity Electronics",  "Elite Avant Garde (model 6117-7, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1990, feagv9,   feagv2,   0, eagv9,    eag,     eag_state, empty_init,    "Fidelity Electronics",  "Elite Avant Garde (model 6117-9)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1990, feagv10,  feagv2,   0, eagv10,   eag,     eag_state, empty_init,    "Fidelity Electronics",  "Elite Avant Garde (model 6117-10)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_TIMING )
-CONS( 2002, feagv11,  feagv2,   0, eagv11,   eag,     eag_state, empty_init,    "hack (Wilfried Bucke)", "Elite Avant Garde (model 6117-11)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_TIMING )
+CONS( 1989, feagv2,   0,        0, eag,      eag,      eag_state,      init_eag,   "Fidelity Electronics", "Elite Avant Garde (model 6114-2/3/4, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1989, feagv2a,  feagv2,   0, eag,      eag,      eag_state,      init_eag,   "Fidelity Electronics", "Elite Avant Garde (model 6114-2/3/4, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1989, feagv5,   feagv2,   0, eagv5,    eag,      eag_state,      empty_init, "Fidelity Electronics", "Elite Avant Garde (model 6114-5)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )
+CONS( 1990, feagv7,   feagv2,   0, eagv7,    eag,      eag_state,      empty_init, "Fidelity Electronics", "Elite Avant Garde (model 6117-7, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1990, feagv7a,  feagv2,   0, eagv7,    eag,      eag_state,      empty_init, "Fidelity Electronics", "Elite Avant Garde (model 6117-7, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1990, feagv9,   feagv2,   0, eagv9,    eag,      eag_state,      empty_init, "Fidelity Electronics", "Elite Avant Garde (model 6117-9)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1990, feagv10,  feagv2,   0, eagv10,   eag,      eag_state,      empty_init, "Fidelity Electronics", "Elite Avant Garde (model 6117-10)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_TIMING )
+CONS( 2002, feagv11,  feagv2,   0, eagv11,   eag,      eag_state,      empty_init, "hack (Wilfried Bucke)", "Elite Avant Garde (model 6117-11)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_TIMING )

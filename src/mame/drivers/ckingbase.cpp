@@ -2,12 +2,12 @@
 // copyright-holders:hap
 /******************************************************************************
 
-    Chess King chess computer driver base class
+Chess King chess computer driver base class
 
-    NOTE: MAME doesn't include a generalized implementation for boardpieces yet,
-    greatly affecting user playability of emulated electronic board games.
-    As workaround for the chess games, use an external chess GUI on the side,
-    such as Arena(in editmode).
+NOTE: MAME doesn't include a generalized implementation for boardpieces yet,
+greatly affecting user playability of emulated electronic board games.
+As workaround for the chess games, use an external chess GUI on the side,
+such as Arena(in editmode).
 
 ******************************************************************************/
 
@@ -52,11 +52,8 @@ void ckingbase_state::machine_reset()
 }
 
 
-
 /***************************************************************************
-
-  Helper Functions
-
+    Helper Functions
 ***************************************************************************/
 
 // The device may strobe the outputs very fast, it is unnoticeable to the user.
