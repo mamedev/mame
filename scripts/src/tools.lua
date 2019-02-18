@@ -797,46 +797,92 @@ end
 --------------------------------------------------
 
 if (_OPTIONS["osd"] == "sdl") then
-  project("testkeys")
-  uuid ("b3f5a5b8-3203-11e9-93e4-670b4f4e359d")
-  kind "ConsoleApp"
+	project("testkeys")
+	uuid ("b3f5a5b8-3203-11e9-93e4-670b4f4e359d")
+	kind "ConsoleApp"
   
-  flags {
-    "Symbols", -- always include minimum symbols for executables
-  }
+	flags {
+		"Symbols", -- always include minimum symbols for executables
+	}
   
-  if _OPTIONS["SEPARATE_BIN"]~="1" then
-    targetdir(MAME_DIR)
-  end
+	if _OPTIONS["SEPARATE_BIN"]~="1" then
+		targetdir(MAME_DIR)
+	end
   
-  if _OPTIONS["targetos"] == "macosx" then
-    links {
-      "ocore_" .. _OPTIONS["osd"],
-      ext_lib("utf8proc"),
-    }
-  else
-    links {
-      "SDL2",
-      "SDL2main",
-      "ocore_" .. _OPTIONS["osd"],
-      ext_lib("utf8proc"),
-    }
-  end
-  
-  dofile("osd/sdl_cfg.lua")
+	links {
+		"ocore_" .. _OPTIONS["osd"],
+		ext_lib("utf8proc"),
+	}
 
-  includedirs {
-    MAME_DIR .. "src/osd",
-  }
+	if _OPTIONS["targetos"]=="windows" then
+		if _OPTIONS["with-bundled-sdl2"]~=nil then
+			configuration { "mingw*"}
+				links {
+					"SDL2",
+					"Imm32",
+					"Version",
+					"Ole32",
+					"OleAut32",
+				}
+			configuration { "vs*" }
+				links {
+					"SDL2",
+					"Imm32",
+					"Version",
+				}
+			configuration { }
+		else
+			if _OPTIONS["USE_LIBSDL"]~="1" then
+				configuration { "mingw*"}
+					links {
+						"SDL2main",
+						"SDL2",
+					}
+				configuration { "vs*" }
+					links {
+						"SDL2",
+						"Imm32",
+						"Version",
+					}
+				configuration { }
+			else
+				local str = backtick(sdlconfigcmd() .. " --libs | sed 's/ -lSDLmain//'")
+				addlibfromstring(str)
+				addoptionsfromstring(str)
+			end
+			configuration { "x32", "vs*" }
+				libdirs {
+					path.join(_OPTIONS["SDL_INSTALL_ROOT"],"lib","x86")
+				}
+			configuration { "x64", "vs*" }
+				libdirs {
+					path.join(_OPTIONS["SDL_INSTALL_ROOT"],"lib","x64")
+				}
+		end
+	end
+
+	if BASE_TARGETOS=="unix" then
+		if _OPTIONS["with-bundled-sdl2"]~=nil then
+			links {
+				"SDL2",
+			}
+		end
+	end
+  
+	dofile("osd/sdl_cfg.lua")
+
+	includedirs {
+		MAME_DIR .. "src/osd",
+	}
  
-  files {
-    MAME_DIR .. "src/tools/testkeys.cpp",
-  }
+	files {
+		MAME_DIR .. "src/tools/testkeys.cpp",
+	}
   
-  configuration { "mingw*" or "vs*" }
-    targetextension ".exe"
-  
-  configuration { }
-  
-  strip()
+	configuration { "mingw*" or "vs*" }
+		targetextension ".exe"
+
+	configuration { }
+
+	strip()
 end

@@ -91,11 +91,11 @@ function maintargetosdoptions(_target,_subtarget)
 				libdirs {
 					path.join(_OPTIONS["SDL_INSTALL_ROOT"],"lib","x64")
 				}
+			configuration { }
 		end
 		links {
 			"psapi",
 		}
-		configuration {}
 	elseif _OPTIONS["targetos"]=="haiku" then
 		links {
 			"network",
