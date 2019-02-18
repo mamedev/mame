@@ -12855,6 +12855,21 @@ fdes2100d                       //
 fdes2265                        //
 fdes2325                        //
 
+@source:fidel_eag68k.cpp
+feagv10                         //
+feagv11                         //
+feagv2                          //
+feagv2a                         //
+feagv5                          //
+feagv7                          //
+feagv7a                         //
+feagv9                          //
+fex68k                          //
+fex68ka                         //
+fex68kb                         //
+fex68km2                        //
+fex68km3                        //
+
 @source:fidel_sc6.cpp
 fscc6                           //
 
@@ -12910,21 +12925,6 @@ super9cc                        // SU9: Super 9 Sensory Chess Challenger (Englis
 super9ccfr                      // * French
 super9ccg                       // * German
 super9ccsp                      // * Spanish
-
-@source:fidel68k.cpp
-feagv10                         //
-feagv11                         //
-feagv2                          //
-feagv2a                         //
-feagv5                          //
-feagv7                          //
-feagv7a                         //
-feagv9                          //
-fex68k                          //
-fex68ka                         //
-fex68kb                         //
-fex68km2                        //
-fex68km3                        //
 
 @source:fidelbase.cpp
 backgamc                        //
