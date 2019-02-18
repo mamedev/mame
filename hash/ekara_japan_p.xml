@@ -41,7 +41,7 @@
 	</software>
 
 	<software name="pc0002a" cloneof="pc0002">
-		<description>TV Pop Volume 2 (Japan) (PC0002-TPJ) (set 2)</description>
+		<description>TV Pop Volume 2 (Japan) (PC0002-TPJ) ('World Trade Center' image removed)</description> <!-- The song 'Run Run Run' features an image containing the twin towers in the original release, it is swapped for another here -->
 		<year>2001</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
