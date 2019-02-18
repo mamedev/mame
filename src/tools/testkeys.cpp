@@ -10,25 +10,21 @@
 //
 //============================================================
 
-#include <stdio.h>
-#include <ctype.h>
-#include <string.h>
-#include <wchar.h>
+#include "osdcore.h"
 
 #include "SDL2/SDL.h"
-#include "osdcore.h"
+
+#include <iostream>
+#include <string>
 
 //#include "unicode.h"
 
-struct key_lookup_table
-{
-	int code;
-	const char *name;
-};
 
-#define KE(x) { SDL_SCANCODE_ ## x, "SDL_SCANCODE_" #x },
+struct key_lookup_table { int code; const char *name; };
 
-static key_lookup_table sdl_lookup[] =
+#define KE(x) { SDL_SCANCODE_##x, "SDL_SCANCODE_" #x },
+
+static constexpr key_lookup_table sdl_lookup[] =
 {
     KE(UNKNOWN)
 
@@ -287,65 +283,63 @@ static key_lookup_table sdl_lookup[] =
 
     KE(APP1)
     KE(APP2)
-
-
-	{-1, ""}
 };
 
-static const char * lookup_key_name(const key_lookup_table *kt, int kc)
+static char const *lookup_key_name(int kc)
 {
-	int i=0;
-	while (kt[i].code>=0)
+	for (key_lookup_table const &k : sdl_lookup)
 	{
-		if (kc==kt[i].code)
-			return kt[i].name;
-		i++;
+		if (k.code == kc)
+			return k.name;
 	}
-	return NULL;
+	return nullptr;
 }
 
 int main(int argc, char *argv[])
 {
-	SDL_Event event;
-	int quit = 0;
-	char lasttext[20] = "";
-
-	if ( SDL_Init(SDL_INIT_VIDEO) < 0 ) {
-		fprintf(stderr, "Couldn't initialize SDL: %s\n",
-							SDL_GetError());
+	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+		fprintf(stderr, "Couldn't initialize SDL: %s\n", SDL_GetError());
 		exit(1);
 	}
-	SDL_CreateWindow("Input Test", 0, 0, 100, 100,0 );
+	SDL_CreateWindow("Input Test", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 100, 100, 0);
 
-	while(SDL_PollEvent(&event) || !quit) {
+	SDL_Event event;
+	bool quit = false;
+	std::string lasttext;
+	while (SDL_PollEvent(&event) || !quit) {
 		switch(event.type) {
 		case SDL_QUIT:
-			quit = 1;
+			quit = true;
 			break;
 		case SDL_KEYDOWN:
-			if (event.key.keysym.sym == SDLK_ESCAPE)
-				quit=1;
-			else
-			{
-				printf("ITEM_ID_XY %s %s\n",
-					lookup_key_name(sdl_lookup, event.key.keysym.scancode), "");
-				lasttext[0] = 0;
+			if (event.key.keysym.sym == SDLK_ESCAPE) {
+				quit = true;
+			} else {
+				std::cout
+					<< "ITEM_ID_XY "
+					<< lookup_key_name(event.key.keysym.scancode)
+					<< ' '
+					<< std::endl;
+				lasttext.clear();
 			}
 			break;
 		case SDL_KEYUP:
-			printf("ITEM_ID_XY %s %s\n",
-					lookup_key_name(sdl_lookup, event.key.keysym.scancode), lasttext);
+			std::cout
+				<< "ITEM_ID_XY "
+				<< lookup_key_name(event.key.keysym.scancode)
+				<< ' '
+				<< lasttext
+				<< std::endl;
 			break;
-
 		case SDL_TEXTINPUT:
-			strcpy(lasttext, event.text.text);
+			lasttext = event.text.text;
 			break;
 		}
 		event.type = 0;
 
-		#ifdef SDLMAME_OS2
-		SDL_Delay( 10 );
-		#endif
+#ifdef SDLMAME_OS2
+		SDL_Delay(10);
+#endif
 	}
 	SDL_Quit();
 	return(0);
