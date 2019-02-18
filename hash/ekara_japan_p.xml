@@ -35,7 +35,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="ekarap2.bin" size="0x100000" crc="2ce065ed" sha1="1c0ae8050f7093a53f74637f27063f720f19610c" offset="0" />
+				<rom name="pc0002-tpj.u1" size="0x100000" crc="2ce065ed" sha1="1c0ae8050f7093a53f74637f27063f720f19610c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -46,7 +46,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="ekarap2ver2.bin" size="0x100000" crc="f8c54474" sha1="4ae876d8deed068c710700499cba22b88bea3d17" offset="0" />
+				<rom name="pc0002-tpj(alt).u1" size="0x100000" crc="f8c54474" sha1="4ae876d8deed068c710700499cba22b88bea3d17" offset="0" />
 			</dataarea>
 		</part>
 	</software>

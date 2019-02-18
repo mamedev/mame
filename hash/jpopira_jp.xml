@@ -11,8 +11,8 @@
 
 	These are for use with Jumping Popira ONLY (form factor is the same as e-Kara cartridges)
 
-	*JP-01  (unknown)
-	*JP-02  'Super Cartridge' SP-2
+	*JP-01  'Jumping Popira' JP-1
+	*JP-02  'Jumping Popira' JP-2
 
 	(more? what's the highest JP number?)
 
@@ -25,7 +25,7 @@
 		<part name="cart" interface="ekara_cart">
 			<!--<feature name="slot" value="rom_24lc04"/>-->
 			<dataarea name="rom" size="0x200000">
-				<rom name="ekarajp1.bin" size="0x200000" crc="106544c5" sha1="1bff363ce13c0eaf344a8f36ed004c78e0ddd007" offset="0" />
+				<rom name="jp1.bin" size="0x200000" crc="106544c5" sha1="1bff363ce13c0eaf344a8f36ed004c78e0ddd007" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -37,7 +37,7 @@
 		<part name="cart" interface="ekara_cart">
 			<!--<feature name="slot" value="rom_24lc04"/>-->
 			<dataarea name="rom" size="0x200000">
-				<rom name="ekarajp2.bin" size="0x200000" crc="f66d8ee8" sha1="3624c89197b1579fc60d5c40ff30bca248428a6c" offset="0" />
+				<rom name="jp2.bin" size="0x200000" crc="f66d8ee8" sha1="3624c89197b1579fc60d5c40ff30bca248428a6c" offset="0" />
 			</dataarea>
 		</part>
 	</software>

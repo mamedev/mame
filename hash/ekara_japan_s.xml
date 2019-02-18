@@ -46,7 +46,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="ekaras3.bin" size="0x100000" crc="935e3445" sha1="e86949467e65d515523629ca1e8f8b47cdaaacf0" offset="0" />
+				<rom name="sc0003-.u1" size="0x100000" crc="935e3445" sha1="e86949467e65d515523629ca1e8f8b47cdaaacf0" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -123,7 +123,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="ekaras18.bin" size="0x100000" crc="23545417" sha1="64b84de483c6c5d1129826324b30580a189077ea" offset="0" />
+				<rom name="sc0018-sai.u1" size="0x100000" crc="23545417" sha1="64b84de483c6c5d1129826324b30580a189077ea" offset="0" />
 			</dataarea>
 		</part>
 	</software>
