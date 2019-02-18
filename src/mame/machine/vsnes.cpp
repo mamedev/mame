@@ -10,6 +10,7 @@ Nintendo VS UniSystem and DualSystem - (c) 1984 Nintendo of America
 ***************************************************************************/
 
 #include "emu.h"
+#include "screen.h"
 #include "video/ppu2c0x.h"
 #include "includes/vsnes.h"
 
@@ -375,7 +376,7 @@ WRITE8_MEMBER(vsnes_state::gun_in0_w)
 		uint8_t realy = (int)y;
 
 		/* get the pixel at the gun position */
-		rgb_t col = m_ppu1->get_pixel(x, realy);
+		rgb_t col = m_ppu1->screen().pixel(x, realy);
 		uint8_t bright = col.brightness();
 		// todo, calculate how bright it is with pix.r * 0.3 + pix.g * 0.59 + pix.b * 0.11 ?
 		// the mame calc above is uint8_t brightness() const { return (r() * 222 + g() * 707 + b() * 71) / 1000; }  (from lib/util/palette.h)

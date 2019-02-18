@@ -94,7 +94,6 @@ public:
 	void spriteram_dma(address_space &space, const uint8_t page);
 	void render(bitmap_rgb32 &bitmap, int flipx, int flipy, int sx, int sy);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	rgb_t get_pixel(int x, int y);
 
 	int get_current_scanline() { return m_scanline; }
 	void set_scanline_callback( scanline_delegate &&cb ) { m_scanline_callback_proc = std::move(cb); m_scanline_callback_proc.bind_relative_to(*owner()); }

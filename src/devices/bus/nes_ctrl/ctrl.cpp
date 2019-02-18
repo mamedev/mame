@@ -125,7 +125,6 @@ nes_control_port_device::~nes_control_port_device()
 void nes_control_port_device::device_start()
 {
 	m_device = dynamic_cast<device_nes_control_port_interface *>(get_card_device());
-	m_brightpixel_cb.bind_relative_to(*owner());
 }
 
 

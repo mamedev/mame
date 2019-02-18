@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Ernesto Corvi,Brad Oliver
 #include "emu.h"
+#include "screen.h"
 #include "includes/playch10.h"
 
 #include "machine/nvram.h"
@@ -225,7 +226,7 @@ READ8_MEMBER(playch10_state::pc10_in1_r)
 		ret |= 0x08;
 
 		/* get the pixel at the gun position */
-		rgb_t pix = m_ppu->get_pixel(x, y);
+		rgb_t pix = m_ppu->screen().pixel(x, y);
 
 		/* look at the screen and see if the cursor is over a bright pixel */
 		// FIXME: still a gross hack

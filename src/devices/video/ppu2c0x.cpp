@@ -1342,20 +1342,3 @@ uint32_t ppu2c0x_device::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	render(bitmap, 0, 0, 0, 0);
 	return 0;
 }
-
-/*************************************
- *
- *  Utility functions
- *
- *************************************/
-
-rgb_t ppu2c0x_device::get_pixel(int x, int y)
-{
-	if (x >= VISIBLE_SCREEN_WIDTH)
-		x = VISIBLE_SCREEN_WIDTH - 1;
-
-	if (y >= VISIBLE_SCREEN_HEIGHT)
-		y = VISIBLE_SCREEN_HEIGHT - 1;
-
-	return rgb_t(m_bitmap->pix32(y, x));
-}
