@@ -92,6 +92,7 @@ private:
 	{
 		uint32_t m_draw_mode0;
 		uint32_t m_draw_mode1;
+		uint32_t m_write_width;
 		uint32_t m_ls_mode;
 		uint32_t m_ls_pattern;
 		uint32_t m_ls_pattern_saved;
@@ -137,7 +138,7 @@ private:
 		uint32_t m_slope_green;
 		uint32_t m_slope_blue;
 		uint32_t m_write_mask;
-		uint32_t m_zero_fract;
+		uint32_t m_color_i;
 		uint32_t m_zero_overflow;
 		uint64_t m_host_dataport;
 		uint32_t m_dcb_mode;
@@ -164,7 +165,7 @@ private:
 		uint32_t m_palette[0x10000];
 	};
 
-	uint32_t get_cursor_pixel(int x, int y);
+	uint8_t get_cursor_pixel(int x, int y);
 
 	// internal state
 
@@ -183,8 +184,11 @@ private:
 	void write_x_end(int32_t val);
 	void write_y_end(int32_t val);
 
+	bool pixel_clip_pass(int16_t x, int16_t y);
 	void write_pixel(uint8_t color);
 	void write_pixel(int16_t x, int16_t y, uint8_t color);
+	void store_pixel(uint8_t *dest_buf, const uint8_t src);
+
 	void do_v_iline(uint8_t color, bool skip_last);
 	void do_h_iline(uint8_t color, bool skip_last);
 	void do_iline(uint8_t color, bool skip_last);
@@ -198,7 +202,10 @@ private:
 	xmap_t m_xmap0;
 	xmap_t m_xmap1;
 	rex3_t m_rex3;
-	std::unique_ptr<uint8_t[]> m_base;
+	std::unique_ptr<uint8_t[]> m_rgbci;
+	std::unique_ptr<uint8_t[]> m_olay;
+	std::unique_ptr<uint8_t[]> m_pup;
+	std::unique_ptr<uint8_t[]> m_cid;
 	cmap_t m_cmap0;
 };
 
