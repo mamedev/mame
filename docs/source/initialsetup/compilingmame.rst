@@ -438,7 +438,7 @@ a **CFLAGS** or **CXXFLAGS** environment variable).  You can check to see
 whether the ``_FORTIFY_SOURCE`` macro is a built-in macro with your version of
 GCC with a command like this:
 
-**gcc -dM -E - | grep _FORTIFY_SOURCE**
+**gcc -dM -E - < /dev/null | grep _FORTIFY_SOURCE**
 
 If ``_FORTIFY_SOURCE`` is defined to a non-zero value by default, you can work
 around it by adding **-U_FORTIFY_SOURCE** to the compiler flags (e.g. by using
@@ -465,7 +465,7 @@ like this:
 **make TARGETOS=windows PTR64=1 OVERRIDE_CC=x86_64-w64-mingw32-gcc OVERRIDE_CXX=x86_64-w64-mingw32-g++ OVERRIDE_LD=x86_64-w64-mingw32-ld MINGW64=/usr**
 
 (The additional packages required for producing a standard MinGW32 x64 build on
-a Fedora Linux host are `mingw64-gcc-c++`, `mingw64-winpthreads-static` and
+a Fedora Linux host are ``mingw64-gcc-c++``, ``mingw64-winpthreads-static`` and
 their dependencies.  Non-standard builds may require additional packages.)
 
 Using libc++ on Linux
