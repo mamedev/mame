@@ -2142,7 +2142,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/fidel_sc12.cpp",
 	MAME_DIR .. "src/mame/drivers/fidel_sc6.cpp",
 	MAME_DIR .. "src/mame/drivers/fidel_sc9.cpp",
-	MAME_DIR .. "src/mame/drivers/fidel6502.cpp",
+	MAME_DIR .. "src/mame/drivers/fidel_elite.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "force")
