@@ -406,7 +406,7 @@ uint8_t c128_state::read_memory(address_space &space, offs_t offset, offs_t vma,
 	}
 	if (!BIT(plaout, PLA_OUT_VIC))
 	{
-		data = m_vic->read(space, offset & 0x3f);
+		data = m_vic->read(offset & 0x3f);
 	}
 	if (!BIT(plaout, PLA_OUT_FROM1) && m_from->exists())
 	{
@@ -417,7 +417,7 @@ uint8_t c128_state::read_memory(address_space &space, offs_t offset, offs_t vma,
 		switch ((BIT(offset, 11) << 2) | ((offset >> 8) & 0x03))
 		{
 		case 0: // SID
-			data = m_sid->read(space, offset & 0x1f);
+			data = m_sid->read(offset & 0x1f);
 			break;
 
 		case 2: // CS8563
@@ -494,14 +494,14 @@ void c128_state::write_memory(address_space &space, offs_t offset, offs_t vma, u
 	}
 	if (!BIT(plaout, PLA_OUT_VIC))
 	{
-		m_vic->write(space, offset & 0x3f, data);
+		m_vic->write(offset & 0x3f, data);
 	}
 	if (!BIT(plaout, PLA_OUT_IOCS) && BIT(offset, 10))
 	{
 		switch ((BIT(offset, 11) << 2) | ((offset >> 8) & 0x03))
 		{
 		case 0: // SID
-			m_sid->write(space, offset & 0x1f, data);
+			m_sid->write(offset & 0x1f, data);
 			break;
 
 		case 2: // CS8563

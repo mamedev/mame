@@ -125,11 +125,11 @@ READ8_MEMBER( vic10_state::read )
 	}
 	else if (offset >= 0xd000 && offset < 0xd400)
 	{
-		data = m_vic->read(space, offset & 0x3f);
+		data = m_vic->read(offset & 0x3f);
 	}
 	else if (offset >= 0xd400 && offset < 0xd800)
 	{
-		data = m_sid->read(space, offset & 0x1f);
+		data = m_sid->read(offset & 0x1f);
 	}
 	else if (offset >= 0xd800 && offset < 0xdc00)
 	{
@@ -168,11 +168,11 @@ WRITE8_MEMBER( vic10_state::write )
 	}
 	else if (offset >= 0xd000 && offset < 0xd400)
 	{
-		m_vic->write(space, offset & 0x3f, data);
+		m_vic->write(offset & 0x3f, data);
 	}
 	else if (offset >= 0xd400 && offset < 0xd800)
 	{
-		m_sid->write(space, offset & 0x1f, data);
+		m_sid->write(offset & 0x1f, data);
 	}
 	else if (offset >= 0xd800 && offset < 0xdc00)
 	{

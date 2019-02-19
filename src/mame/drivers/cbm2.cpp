@@ -530,7 +530,7 @@ READ8_MEMBER( cbm2_state::read )
 		}
 		if (!sidcs)
 		{
-			data = m_sid->read(space, offset & 0x1f);
+			data = m_sid->read(offset & 0x1f);
 		}
 		if (!extprtcs && m_ext_cia)
 		{
@@ -623,7 +623,7 @@ WRITE8_MEMBER( cbm2_state::write )
 		}
 		if (!sidcs)
 		{
-			m_sid->write(space, offset & 0x1f, data);
+			m_sid->write(offset & 0x1f, data);
 		}
 		if (!extprtcs && m_ext_cia)
 		{
@@ -917,11 +917,11 @@ uint8_t p500_state::read_memory(address_space &space, offs_t offset, offs_t va, 
 		}
 		if (!viccs && !viddaten && viddat_tr)
 		{
-			data = m_vic->read(space, offset & 0x3f);
+			data = m_vic->read(offset & 0x3f);
 		}
 		if (!sidcs)
 		{
-			data = m_sid->read(space, offset & 0x1f);
+			data = m_sid->read(offset & 0x1f);
 		}
 		if (!ciacs)
 		{
@@ -1005,11 +1005,11 @@ void p500_state::write_memory(address_space &space, offs_t offset, uint8_t data,
 		}
 		if (!viccs && !viddaten && !viddat_tr)
 		{
-			m_vic->write(space, offset & 0x3f, data);
+			m_vic->write(offset & 0x3f, data);
 		}
 		if (!sidcs)
 		{
-			m_sid->write(space, offset & 0x1f, data);
+			m_sid->write(offset & 0x1f, data);
 		}
 		if (!ciacs)
 		{

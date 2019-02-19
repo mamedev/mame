@@ -119,7 +119,7 @@ void mos6581_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( mos6581_device::read )
+uint8_t mos6581_device::read(offs_t offset)
 {
 	uint8_t data;
 
@@ -146,7 +146,7 @@ READ8_MEMBER( mos6581_device::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( mos6581_device::write )
+void mos6581_device::write(offs_t offset, uint8_t data)
 {
 	m_token->port_w(offset, data);
 }

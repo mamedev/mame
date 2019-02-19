@@ -524,13 +524,13 @@ bool c1551_device::tpi1_selected(offs_t offset)
 //  plus4_cd_r - cartridge data read
 //-------------------------------------------------
 
-uint8_t c1551_device::plus4_cd_r(address_space &space, offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h)
+uint8_t c1551_device::plus4_cd_r(offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h)
 {
-	data = m_exp->cd_r(space, offset, data, ba, cs0, c1l, c2l, cs1, c1h, c2h);
+	data = m_exp->cd_r(offset, data, ba, cs0, c1l, c2l, cs1, c1h, c2h);
 
 	if (tpi1_selected(offset))
 	{
-		data = m_tpi1->read(space, offset & 0x07);
+		data = m_tpi1->read(machine().dummy_space(), offset & 0x07);
 	}
 
 	return data;
@@ -541,12 +541,12 @@ uint8_t c1551_device::plus4_cd_r(address_space &space, offs_t offset, uint8_t da
 //  plus4_cd_w - cartridge data write
 //-------------------------------------------------
 
-void c1551_device::plus4_cd_w(address_space &space, offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h)
+void c1551_device::plus4_cd_w(offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h)
 {
 	if (tpi1_selected(offset))
 	{
-		m_tpi1->write(space, offset & 0x07, data);
+		m_tpi1->write(machine().dummy_space(), offset & 0x07, data);
 	}
 
-	m_exp->cd_w(space, offset, data, ba, cs0, c1l, c2l, cs1, c1h, c2h);
+	m_exp->cd_w(offset, data, ba, cs0, c1l, c2l, cs1, c1h, c2h);
 }

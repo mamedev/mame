@@ -332,14 +332,14 @@ uint8_t c64_state::read_memory(address_space &space, offs_t offset, offs_t va, i
 		case 1:
 		case 2:
 		case 3: // VIC
-			data = m_vic->read(space, offset & 0x3f);
+			data = m_vic->read(offset & 0x3f);
 			break;
 
 		case 4:
 		case 5:
 		case 6:
 		case 7: // SID
-			data = m_sid->read(space, offset & 0x1f);
+			data = m_sid->read(offset & 0x1f);
 			break;
 
 		case 0x8:
@@ -404,14 +404,14 @@ void c64_state::write_memory(address_space &space, offs_t offset, uint8_t data, 
 		case 1:
 		case 2:
 		case 3: // VIC
-			m_vic->write(space, offset & 0x3f, data);
+			m_vic->write(offset & 0x3f, data);
 			break;
 
 		case 4:
 		case 5:
 		case 6:
 		case 7: // SID
-			m_sid->write(space, offset & 0x1f, data);
+			m_sid->write(offset & 0x1f, data);
 			break;
 
 		case 0x8:
