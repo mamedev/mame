@@ -313,8 +313,7 @@ WRITE8_MEMBER( taito_state::io_w )
 
 WRITE_LINE_MEMBER( taito_state::pia_cb2_w )
 {
-	address_space& space = m_maincpu->space(AS_PROGRAM);
-	m_votrax->write(space, 0, m_votrax_cmd);
+	m_votrax->write(m_votrax_cmd);
 }
 
 READ8_MEMBER( taito_state::pia_pb_r )

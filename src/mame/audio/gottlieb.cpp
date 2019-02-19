@@ -358,8 +358,8 @@ void gottlieb_sound_r1_with_votrax_device::device_post_load()
 
 WRITE8_MEMBER( gottlieb_sound_r1_with_votrax_device::votrax_data_w )
 {
-	m_votrax->inflection_w(space, offset, data >> 6);
-	m_votrax->write(space, offset, ~data & 0x3f);
+	m_votrax->inflection_w(data >> 6);
+	m_votrax->write(~data & 0x3f);
 }
 
 

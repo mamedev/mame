@@ -90,7 +90,7 @@ void vic20_speakeasy_device::vic20_cd_w(offs_t offset, uint8_t data, int ram1, i
 {
 	if (!io2)
 	{
-		m_votrax->write(machine().dummy_space(), 0, data & 0x3f);
-		m_votrax->inflection_w(machine().dummy_space(), 0, data >> 6);
+		m_votrax->write(data & 0x3f);
+		m_votrax->inflection_w(data >> 6);
 	}
 }
