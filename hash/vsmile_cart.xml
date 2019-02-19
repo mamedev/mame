@@ -122,8 +122,8 @@ Game cartridges
 |                                                                                                                                                                                       |
 +========+===================+==========================================================================================================================================================+
 |   XX   | 80-092000(US)     | Alphabet Park Adventure (Red Haired Girl Version)                                                                                                        |
-|   XX   | 80-092000-101(US) | Alphabet Park Adventure (Blond Haired Girl Version)                                                                                                      |
-|   XX   | 80-092000-101(US) | Alphabet Park Adventure (Blond Haired Girl Version, ALT)                                                                                                 |
+|   XX   | 80-092000(US)     | Alphabet Park Adventure (Red Haired Girl Version, ALT)                                                                                                   |
+|   XX   | 80-092000-101(US) | Alphabet Park Adventure (Blond Haired Girl Version)                                                                                                 |
 |        |          (IT)     | Avventura nel parco dell'alfabeto                                                                                                                        |
 |        | 80-092002(NL)     | Alfabet Pretpark                                                                                                                                         |
 |        | 80-092003(UK)     | Alphabet Park Adventure (Red Haired Girl Version)                                                                                                        |
@@ -574,11 +574,11 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="alphaprk1" cloneof="alphaprk" supported="yes">
+	<software name="alphaprka" cloneof="alphaprk" supported="yes">
 		<description>Alphabet Park Adventure (USA, alt)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
-		<info name="serial" value="80-092000-101(US)" />
+		<info name="serial" value="80-092000(US)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="707180" />
@@ -591,7 +591,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="alphaprk1a" cloneof="alphaprk" supported="yes">
+	<software name="alphaprk1" cloneof="alphaprk" supported="yes">
 		<description>Alphabet Park Adventure (USA, alt, Rev. 2?)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
