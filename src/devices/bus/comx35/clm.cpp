@@ -215,7 +215,7 @@ int comx_clm_device::comx_ef4_r()
 //  comx_mrd_r - memory read
 //-------------------------------------------------
 
-uint8_t comx_clm_device::comx_mrd_r(address_space &space, offs_t offset, int *extrom)
+uint8_t comx_clm_device::comx_mrd_r(offs_t offset, int *extrom)
 {
 	uint8_t data = 0xff;
 
@@ -229,7 +229,7 @@ uint8_t comx_clm_device::comx_mrd_r(address_space &space, offs_t offset, int *ex
 	}
 	else if (offset == 0xd801)
 	{
-		data = m_crtc->register_r(space, 0);
+		data = m_crtc->register_r(machine().dummy_space(), 0);
 	}
 
 	return data;
@@ -240,7 +240,7 @@ uint8_t comx_clm_device::comx_mrd_r(address_space &space, offs_t offset, int *ex
 //  comx_mwr_w - memory write
 //-------------------------------------------------
 
-void comx_clm_device::comx_mwr_w(address_space &space, offs_t offset, uint8_t data)
+void comx_clm_device::comx_mwr_w(offs_t offset, uint8_t data)
 {
 	if (offset >= 0xd000 && offset < 0xd800)
 	{
@@ -248,10 +248,10 @@ void comx_clm_device::comx_mwr_w(address_space &space, offs_t offset, uint8_t da
 	}
 	else if (offset == 0xd800)
 	{
-		m_crtc->address_w(space, 0, data);
+		m_crtc->address_w(machine().dummy_space(), 0, data);
 	}
 	else if (offset == 0xd801)
 	{
-		m_crtc->register_w(space, 0, data);
+		m_crtc->register_w(machine().dummy_space(), 0, data);
 	}
 }

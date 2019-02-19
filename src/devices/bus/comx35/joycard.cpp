@@ -98,7 +98,7 @@ void comx_joy_device::device_reset()
 //  comx_mrd_r - I/O read
 //-------------------------------------------------
 
-uint8_t comx_joy_device::comx_io_r(address_space &space, offs_t offset)
+uint8_t comx_joy_device::comx_io_r(offs_t offset)
 {
 	uint8_t data = 0;
 
