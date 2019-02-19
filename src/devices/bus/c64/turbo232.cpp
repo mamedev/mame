@@ -138,7 +138,7 @@ uint8_t c64_turbo232_cartridge_device::c64_cd_r(address_space &space, offs_t off
 			switch (offset & 0x07)
 			{
 			case 0: case 1: case 2: case 3:
-				data = m_acia->read(space, offset & 0x03);
+				data = m_acia->read(offset & 0x03);
 				break;
 
 			case 7:
@@ -165,11 +165,11 @@ void c64_turbo232_cartridge_device::c64_cd_w(address_space &space, offs_t offset
 			switch (offset & 0x07)
 			{
 			case 0: case 1: case 2:
-				m_acia->write(space, offset & 0x03, data);
+				m_acia->write(offset & 0x03, data);
 				break;
 
 			case 3:
-				m_acia->write(space, offset & 0x03, data);
+				m_acia->write(offset & 0x03, data);
 
 				if (data & 0x0f)
 					m_es &= ~ES_M;

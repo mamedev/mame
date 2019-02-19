@@ -284,7 +284,7 @@ uint8_t superpet_device::pet_bd_r(address_space &space, offs_t offset, uint8_t d
 	case 0xeff1:
 	case 0xeff2:
 	case 0xeff3:
-		data = m_acia->read(space, offset & 0x03);
+		data = m_acia->read(offset & 0x03);
 		break;
 	}
 
@@ -322,7 +322,7 @@ void superpet_device::pet_bd_w(address_space &space, offs_t offset, uint8_t data
 	case 0xeff1:
 	case 0xeff2:
 	case 0xeff3:
-		m_acia->write(space, offset & 0x03, data);
+		m_acia->write(offset & 0x03, data);
 		break;
 
 	case 0xeff8:

@@ -295,7 +295,7 @@ uint8_t plus4_state::read_memory(address_space &space, offs_t offset, int ba, in
 	}
 	else if (!_6551 && m_acia)
 	{
-		data = m_acia->read(space, offset & 0x03);
+		data = m_acia->read(offset & 0x03);
 	}
 	else if (!keyport)
 	{
@@ -416,7 +416,7 @@ WRITE8_MEMBER( plus4_state::write )
 	}
 	else if (!_6551 && m_acia)
 	{
-		m_acia->write(space, offset & 0x03, data);
+		m_acia->write(offset & 0x03, data);
 	}
 	else if (!addr_clk)
 	{

@@ -131,7 +131,7 @@ uint8_t c64_swiftlink_cartridge_device::c64_cd_r(address_space &space, offs_t of
 	if (((m_cs == DE00) && !io1) || ((m_cs == DF00) && !io2) ||
 		((m_cs == D700) && ((offset & 0xff00) == 0xd700)))
 	{
-		data = m_acia->read(space, offset & 0x03);
+		data = m_acia->read(offset & 0x03);
 	}
 
 	return data;
@@ -147,7 +147,7 @@ void c64_swiftlink_cartridge_device::c64_cd_w(address_space &space, offs_t offse
 	if (((m_cs == DE00) && !io1) || ((m_cs == DF00) && !io2) ||
 		((m_cs == D700) && ((offset & 0xff00) == 0xd700)))
 	{
-		m_acia->write(space, offset & 0x03, data);
+		m_acia->write(offset & 0x03, data);
 	}
 }
 

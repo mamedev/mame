@@ -363,7 +363,7 @@ WRITE_LINE_MEMBER(bitgraph_state::com8116_b_fr_w)
 
 WRITE_LINE_MEMBER(bitgraph_state::com8116_b_ft_w)
 {
-	if (m_acia3)
+	if (m_acia3.found())
 	{
 		m_acia3->write_txc(state);
 		m_acia3->write_rxc(state);
@@ -373,13 +373,13 @@ WRITE_LINE_MEMBER(bitgraph_state::com8116_b_ft_w)
 READ8_MEMBER(bitgraph_state::adlc_r)
 {
 	LOG("ADLC R %d\n", offset);
-	return m_adlc ? m_adlc->read(space, 3 - offset) : 0xff;
+	return m_adlc.found() ? m_adlc->read(3 - offset) : 0xff;
 }
 
 WRITE8_MEMBER(bitgraph_state::adlc_w)
 {
 	LOG("ADLC W %d < %02X\n", offset, data);
-	if (m_adlc) return m_adlc->write(space, 3 - offset, data);
+	if (m_adlc.found()) return m_adlc->write(3 - offset, data);
 }
 
 uint32_t bitgraph_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

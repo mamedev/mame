@@ -542,7 +542,7 @@ READ8_MEMBER( cbm2_state::read )
 		}
 		if (!aciacs)
 		{
-			data = m_acia->read(space, offset & 0x03);
+			data = m_acia->read(offset & 0x03);
 		}
 		if (!tript1cs)
 		{
@@ -635,7 +635,7 @@ WRITE8_MEMBER( cbm2_state::write )
 		}
 		if (!aciacs)
 		{
-			m_acia->write(space, offset & 0x03, data);
+			m_acia->write(offset & 0x03, data);
 		}
 		if (!tript1cs)
 		{
@@ -929,7 +929,7 @@ uint8_t p500_state::read_memory(address_space &space, offs_t offset, offs_t va, 
 		}
 		if (!aciacs)
 		{
-			data = m_acia->read(space, offset & 0x03);
+			data = m_acia->read(offset & 0x03);
 		}
 		if (!tript1cs)
 		{
@@ -1017,7 +1017,7 @@ void p500_state::write_memory(address_space &space, offs_t offset, uint8_t data,
 		}
 		if (!aciacs)
 		{
-			m_acia->write(space, offset & 0x03, data);
+			m_acia->write(offset & 0x03, data);
 		}
 		if (!tript1cs)
 		{

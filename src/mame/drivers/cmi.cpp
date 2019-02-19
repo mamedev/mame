@@ -1674,10 +1674,10 @@ void cmi_state::install_peripherals(int cpunum)
 	else
 		space->install_readwrite_handler(0xfc5f, 0xfc5f, read8_delegate(FUNC(cmi_state::map_r<0>),this), write8_delegate(FUNC(cmi_state::map_w<0>),this));
 
-	space->install_readwrite_handler(0xfc80, 0xfc83, read8_delegate(FUNC(mos6551_device::read),m_q133_acia[0].target()), write8_delegate(FUNC(mos6551_device::write),m_q133_acia[0].target()));
-	space->install_readwrite_handler(0xfc84, 0xfc87, read8_delegate(FUNC(mos6551_device::read),m_q133_acia[1].target()), write8_delegate(FUNC(mos6551_device::write),m_q133_acia[1].target()));
-	space->install_readwrite_handler(0xfc88, 0xfc8b, read8_delegate(FUNC(mos6551_device::read),m_q133_acia[2].target()), write8_delegate(FUNC(mos6551_device::write),m_q133_acia[2].target()));
-	space->install_readwrite_handler(0xfc8c, 0xfc8f, read8_delegate(FUNC(mos6551_device::read),m_q133_acia[3].target()), write8_delegate(FUNC(mos6551_device::write),m_q133_acia[3].target()));
+	space->install_readwrite_handler(0xfc80, 0xfc83, read8sm_delegate(FUNC(mos6551_device::read),m_q133_acia[0].target()), write8sm_delegate(FUNC(mos6551_device::write),m_q133_acia[0].target()));
+	space->install_readwrite_handler(0xfc84, 0xfc87, read8sm_delegate(FUNC(mos6551_device::read),m_q133_acia[1].target()), write8sm_delegate(FUNC(mos6551_device::write),m_q133_acia[1].target()));
+	space->install_readwrite_handler(0xfc88, 0xfc8b, read8sm_delegate(FUNC(mos6551_device::read),m_q133_acia[2].target()), write8sm_delegate(FUNC(mos6551_device::write),m_q133_acia[2].target()));
+	space->install_readwrite_handler(0xfc8c, 0xfc8f, read8sm_delegate(FUNC(mos6551_device::read),m_q133_acia[3].target()), write8sm_delegate(FUNC(mos6551_device::write),m_q133_acia[3].target()));
 	space->install_readwrite_handler(0xfc90, 0xfc97, read8sm_delegate(FUNC(ptm6840_device::read),m_q133_ptm.target()), write8sm_delegate(FUNC(ptm6840_device::write),m_q133_ptm.target()));
 
 	space->install_readwrite_handler(0xfcbc, 0xfcbc, read8_delegate(FUNC(cmi_state::cmi07_r),this), write8_delegate(FUNC(cmi_state::cmi07_w),this));

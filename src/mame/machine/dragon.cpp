@@ -82,7 +82,7 @@ READ8_MEMBER( dragon64_state::ff00_read )
 			break;
 
 		case 4: case 5: case 6: case 7:
-			result = m_acia->read(space, offset, mem_mask);
+			result = m_acia->read(offset);
 			break;
 	}
 	return result;
@@ -103,7 +103,7 @@ WRITE8_MEMBER( dragon64_state::ff00_write )
 			break;
 
 		case 4: case 5: case 6: case 7:
-			m_acia->write(space, offset, data, mem_mask);
+			m_acia->write(offset, data);
 			break;
 	}
 }

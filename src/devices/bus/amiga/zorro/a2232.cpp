@@ -344,13 +344,13 @@ WRITE16_MEMBER( a2232_device::reset_high_w )
 template<int N>
 READ8_MEMBER( a2232_device::acia_r )
 {
-	return m_acia[N]->read(space, offset >> 1);
+	return m_acia[N]->read(offset >> 1);
 }
 
 template<int N>
 WRITE8_MEMBER( a2232_device::acia_w )
 {
-	m_acia[N]->write(space, offset >> 1, data);
+	m_acia[N]->write(offset >> 1, data);
 }
 
 

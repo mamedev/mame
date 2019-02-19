@@ -244,7 +244,7 @@ uint8_t c64_tdos_cartridge_device::c64_cd_r(address_space &space, offs_t offset,
 		switch ((offset >> 1) & 0x7f)
 		{
 		case 0:
-			data = m_ssda->read(space, offset & 0x01);
+			data = m_ssda->read(offset & 0x01);
 			break;
 
 		case 1:
@@ -286,7 +286,7 @@ void c64_tdos_cartridge_device::c64_cd_w(address_space &space, offs_t offset, ui
 		switch ((offset >> 1) & 0x7f)
 		{
 		case 0:
-			m_ssda->write(space, offset & 0x01, data);
+			m_ssda->write(offset & 0x01, data);
 			break;
 
 		case 1:
