@@ -46,7 +46,6 @@ public:
 	sound_sdl() :
 		osd_module(OSD_SOUND_PROVIDER, "sdl"), sound_module(),
 		stream_in_initialized(0),
-		stream_loop(0),
 		attenuation(0), buf_locked(0), stream_buffer(nullptr), stream_buffer_size(0), buffer_underflows(0), buffer_overflows(0)
 {
 		sdl_xfer_samples = SDL_XFER_SAMPLES;
@@ -89,7 +88,6 @@ private:
 
 	int sdl_xfer_samples;
 	int stream_in_initialized;
-	int stream_loop;
 	int attenuation;
 
 	int              buf_locked;
@@ -357,7 +355,6 @@ int sound_sdl::init(const osd_options &options)
 
 		sdl_xfer_samples = SDL_XFER_SAMPLES;
 		stream_in_initialized = 0;
-		stream_loop = 0;
 
 		// set up the audio specs
 		aspec.freq = sample_rate();
