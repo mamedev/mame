@@ -884,7 +884,7 @@ DEVICE_IMAGE_LOAD_MEMBER(fidelbase_state, scc_cartridge)
 READ8_MEMBER(fidelbase_state::cartridge_r)
 {
 	if (m_cart->exists())
-		return m_cart->read_rom(space, offset);
+		return m_cart->read_rom(offset);
 	else
 		return 0;
 }

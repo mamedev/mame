@@ -131,7 +131,7 @@ uint8_t electron_rombox_device::expbus_r(address_space &space, offs_t offset)
 		case 3:
 			if (m_rom_base == 0 && m_rom[m_romsel + 4]->exists())
 			{
-				data = m_rom[m_romsel + 4]->read_rom(space, offset & 0x3fff);
+				data = m_rom[m_romsel + 4]->read_rom(offset & 0x3fff);
 			}
 			break;
 		case 4:
@@ -140,7 +140,7 @@ uint8_t electron_rombox_device::expbus_r(address_space &space, offs_t offset)
 		case 7:
 			if (m_rom[m_romsel - 4]->exists())
 			{
-				data = m_rom[m_romsel - 4]->read_rom(space, offset & 0x3fff);
+				data = m_rom[m_romsel - 4]->read_rom(offset & 0x3fff);
 			}
 			break;
 		case 12:
@@ -149,7 +149,7 @@ uint8_t electron_rombox_device::expbus_r(address_space &space, offs_t offset)
 		case 15:
 			if (m_rom_base == 12 && m_rom[m_romsel - 8]->exists())
 			{
-				data = m_rom[m_romsel - 8]->read_rom(space, offset & 0x3fff);
+				data = m_rom[m_romsel - 8]->read_rom(offset & 0x3fff);
 			}
 			break;
 		}

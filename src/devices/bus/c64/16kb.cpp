@@ -102,11 +102,11 @@ uint8_t c64_16kb_cartridge_device::c64_cd_r(address_space &space, offs_t offset,
 {
 	if (!roml)
 	{
-		data = m_low->read_rom(space, offset & 0x1fff);
+		data = m_low->read_rom(offset & 0x1fff);
 	}
 	else if (!romh)
 	{
-		data = m_high->read_rom(space, offset & 0x1fff);
+		data = m_high->read_rom(offset & 0x1fff);
 	}
 
 	return data;

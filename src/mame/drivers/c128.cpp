@@ -410,7 +410,7 @@ uint8_t c128_state::read_memory(address_space &space, offs_t offset, offs_t vma,
 	}
 	if (!BIT(plaout, PLA_OUT_FROM1) && m_from->exists())
 	{
-		data = m_from->read_rom(space, offset & 0x7fff);
+		data = m_from->read_rom(offset & 0x7fff);
 	}
 	if (!BIT(plaout, PLA_OUT_IOCS) && BIT(offset, 10))
 	{

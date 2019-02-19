@@ -72,7 +72,7 @@ READ8_MEMBER( vector06_state::vector06_romdisk_portb_r )
 {
 	uint16_t addr = ((m_romdisk_msb & 0x7f) << 8) | m_romdisk_lsb;
 	if ((m_romdisk_msb & 0x80) && m_cart->exists() && addr < m_cart->get_rom_size())
-		return m_cart->read_rom(space, addr);
+		return m_cart->read_rom(addr);
 	else
 		return m_ay->data_r();
 }

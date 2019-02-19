@@ -555,7 +555,7 @@ READ8_MEMBER( pet_state::read )
 		if (norom)
 		{
 			if (m_cart_9000 && m_cart_9000->exists())
-				data = m_cart_9000->read_rom(space, offset & 0xfff);
+				data = m_cart_9000->read_rom(offset & 0xfff);
 			else
 				data = m_rom->base()[offset - 0x9000];
 		}
@@ -565,7 +565,7 @@ READ8_MEMBER( pet_state::read )
 		if (norom)
 		{
 			if (m_cart_a000 && m_cart_a000->exists())
-				data = m_cart_a000->read_rom(space, offset & 0xfff);
+				data = m_cart_a000->read_rom(offset & 0xfff);
 			else
 				data = m_rom->base()[offset - 0x9000];
 		}
@@ -575,7 +575,7 @@ READ8_MEMBER( pet_state::read )
 		if (norom)
 		{
 			if (m_cart_b000 && m_cart_b000->exists())
-				data = m_cart_b000->read_rom(space, offset & 0xfff);
+				data = m_cart_b000->read_rom(offset & 0xfff);
 			else
 				data = m_rom->base()[offset - 0x9000];
 		}
@@ -788,14 +788,14 @@ READ8_MEMBER( cbm8296_state::read )
 	if (!cs9)
 	{
 		if (m_cart_9000 && m_cart_9000->exists())
-			data = m_cart_9000->read_rom(space, offset & 0xfff);
+			data = m_cart_9000->read_rom(offset & 0xfff);
 		else
 			data = m_rom->base()[offset & 0xfff];
 	}
 	if (!csa)
 	{
 		if (m_cart_a000 && m_cart_a000->exists())
-			data = m_cart_a000->read_rom(space, offset & 0xfff);
+			data = m_cart_a000->read_rom(offset & 0xfff);
 		else
 			data = m_rom->base()[0x1000 | (offset & 0xfff)];
 	}

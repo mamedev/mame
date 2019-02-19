@@ -90,8 +90,8 @@ uint8_t c64_dela_ep64_cartridge_device::c64_cd_r(address_space &space, offs_t of
 			offs_t addr = (m_bank << 13) | (offset & 0x1fff);
 
 			if (!m_rom0_ce) data |= m_roml[offset & 0x1fff];
-			if (!m_rom1_ce) data |= m_eprom1->read_rom(space, addr);
-			if (!m_rom2_ce) data |= m_eprom2->read_rom(space, addr);
+			if (!m_rom1_ce) data |= m_eprom1->read_rom(addr);
+			if (!m_rom2_ce) data |= m_eprom2->read_rom(addr);
 		}
 	}
 

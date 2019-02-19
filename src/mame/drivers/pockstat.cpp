@@ -795,11 +795,11 @@ READ32_MEMBER(pockstat_state::ps_rombank_r)
 			if (m_ftlb_regs.entry[index] == bank)
 			{
 				//printf( "Address %08x is assigned to %08x in entry %d\n", 0x02000000 + (offset << 2), index * 0x2000 + ((offset << 2) & 0x1fff), index );
-				return m_cart->read32_rom(space, index * (0x2000/4) + (offset & (0x1fff/4)), mem_mask);
+				return m_cart->read32_rom(index * (0x2000/4) + (offset & (0x1fff/4)), mem_mask);
 			}
 		}
 	}
-	return m_cart->read32_rom(space, offset & 0x7fff, mem_mask);
+	return m_cart->read32_rom(offset & 0x7fff, mem_mask);
 }
 
 
@@ -831,7 +831,7 @@ WRITE32_MEMBER(pockstat_state::ps_flash_w)
 
 READ32_MEMBER(pockstat_state::ps_flash_r)
 {
-	return m_cart->read32_rom(space, offset, mem_mask);
+	return m_cart->read32_rom(offset, mem_mask);
 }
 
 READ32_MEMBER(pockstat_state::ps_audio_r)

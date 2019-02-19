@@ -98,7 +98,7 @@ uint8_t c64_rex_ep256_cartridge_device::c64_cd_r(address_space &space, offs_t of
 		else
 		{
 			offs_t addr = (m_bank << 13) | (offset & 0x1fff);
-			data = m_eproms[m_socket]->read_rom(space, addr);
+			data = m_eproms[m_socket]->read_rom(addr);
 		}
 	}
 	else if (!io2)

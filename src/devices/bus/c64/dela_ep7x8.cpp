@@ -83,13 +83,13 @@ uint8_t c64_dela_ep7x8_cartridge_device::c64_cd_r(address_space &space, offs_t o
 		offs_t addr = offset & 0x1fff;
 
 		if (!BIT(m_bank, 0)) data |= m_roml[addr];
-		if (!BIT(m_bank, 1)) data |= m_eprom[0]->read_rom(space, addr);
-		if (!BIT(m_bank, 2)) data |= m_eprom[1]->read_rom(space, addr);
-		if (!BIT(m_bank, 3)) data |= m_eprom[2]->read_rom(space, addr);
-		if (!BIT(m_bank, 4)) data |= m_eprom[3]->read_rom(space, addr);
-		if (!BIT(m_bank, 5)) data |= m_eprom[4]->read_rom(space, addr);
-		if (!BIT(m_bank, 6)) data |= m_eprom[5]->read_rom(space, addr);
-		if (!BIT(m_bank, 7)) data |= m_eprom[6]->read_rom(space, addr);
+		if (!BIT(m_bank, 1)) data |= m_eprom[0]->read_rom(addr);
+		if (!BIT(m_bank, 2)) data |= m_eprom[1]->read_rom(addr);
+		if (!BIT(m_bank, 3)) data |= m_eprom[2]->read_rom(addr);
+		if (!BIT(m_bank, 4)) data |= m_eprom[3]->read_rom(addr);
+		if (!BIT(m_bank, 5)) data |= m_eprom[4]->read_rom(addr);
+		if (!BIT(m_bank, 6)) data |= m_eprom[5]->read_rom(addr);
+		if (!BIT(m_bank, 7)) data |= m_eprom[6]->read_rom(addr);
 	}
 
 	return data;

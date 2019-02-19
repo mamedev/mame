@@ -1437,9 +1437,9 @@ void x07_state::machine_start()
 	{
 		// 0x4000 - 0x4fff   4KB RAM
 		// 0x6000 - 0x7fff   8KB ROM
-		program.install_read_handler(ram_size, ram_size + 0xfff, read8_delegate(FUNC(generic_slot_device::read_ram),(generic_slot_device*)m_card));
-		program.install_write_handler(ram_size, ram_size + 0xfff, write8_delegate(FUNC(generic_slot_device::write_ram),(generic_slot_device*)m_card));
-		program.install_read_handler(0x6000, 0x7fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_card));
+		program.install_read_handler(ram_size, ram_size + 0xfff, read8sm_delegate(FUNC(generic_slot_device::read_ram),(generic_slot_device*)m_card));
+		program.install_write_handler(ram_size, ram_size + 0xfff, write8sm_delegate(FUNC(generic_slot_device::write_ram),(generic_slot_device*)m_card));
+		program.install_read_handler(0x6000, 0x7fff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_card));
 
 		m_card->save_ram();
 	}

@@ -103,7 +103,7 @@ uint8_t c64_reu_cartridge_device::c64_cd_r(address_space &space, offs_t offset, 
 {
 	if (!m_dmac->romsel_r(roml, romh))
 	{
-		data = m_eprom->read_rom(space, offset & 0x7fff);
+		data = m_eprom->read_rom(offset & 0x7fff);
 	}
 	else if (!io2)
 	{

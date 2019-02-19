@@ -109,7 +109,7 @@ READ8_MEMBER( sv603_device::mreq_r )
 	m_expander->romdis_w(0);
 
 	if (offset < 0x8000)
-		return m_cart_rom->read_rom(space, offset);
+		return m_cart_rom->read_rom(offset);
 
 	if (offset >= 0x8000 && offset < 0xa000)
 	{

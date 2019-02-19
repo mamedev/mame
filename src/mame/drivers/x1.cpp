@@ -700,7 +700,7 @@ READ8_MEMBER( x1_state::x1_rom_r )
 {
 //  logerror("%06x\n",m_rom_index[0]<<16|m_rom_index[1]<<8|m_rom_index[2]<<0);
 	if (m_cart->exists())
-		return m_cart->read_rom(space, (m_rom_index[0] << 16) | (m_rom_index[1] << 8) | (m_rom_index[2] << 0));
+		return m_cart->read_rom((m_rom_index[0] << 16) | (m_rom_index[1] << 8) | (m_rom_index[2] << 0));
 	else
 		return 0;
 }
