@@ -29,25 +29,25 @@ Main CPU:
 #include "speaker.h"
 
 
-WRITE8_MEMBER(kingofb_state::video_interrupt_w)
+void kingofb_state::video_interrupt_w(uint8_t data)
 {
 	m_video_cpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
-WRITE8_MEMBER(kingofb_state::sprite_interrupt_w)
+void kingofb_state::sprite_interrupt_w(uint8_t data)
 {
 	m_sprite_cpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
-WRITE8_MEMBER(kingofb_state::scroll_interrupt_w)
+void kingofb_state::scroll_interrupt_w(uint8_t data)
 {
-	sprite_interrupt_w(space, offset, data);
+	sprite_interrupt_w(data);
 	*m_scroll_y = data;
 }
 
-WRITE8_MEMBER(kingofb_state::sound_command_w)
+void kingofb_state::sound_command_w(uint8_t data)
 {
-	m_soundlatch->write(space, 0, data);
+	m_soundlatch->write(machine().dummy_space(), 0, data);
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
@@ -459,7 +459,7 @@ void kingofb_state::machine_start()
 
 void kingofb_state::machine_reset()
 {
-	kingofb_f800_w(machine().dummy_space(), 0, 0); // LS174 reset
+	kingofb_f800_w(0); // LS174 reset
 }
 
 MACHINE_CONFIG_START(kingofb_state::kingofb)
