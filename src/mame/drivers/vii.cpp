@@ -261,6 +261,28 @@ private:
 	uint8_t m_controller_input[8];
 };
 
+class icanguit_state : public spg2xx_game_state
+{
+public:
+	icanguit_state(const machine_config &mconfig, device_type type, const char *tag)
+		: spg2xx_game_state(mconfig, type, tag)
+		, m_cart(*this, "cartslot")
+		, m_cart_region(nullptr)
+	{ }
+
+	void icanguit(machine_config &config);
+
+private:
+	virtual void machine_start() override;
+	//virtual void machine_reset() override;
+
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(icanguit_cart);
+
+	required_device<generic_slot_device> m_cart;
+	memory_region *m_cart_region;
+};
+
+
 /*************************
 *    Machine Hardware    *
 *************************/
@@ -1253,6 +1275,37 @@ static INPUT_PORTS_START( lexizeus ) // how many buttons does this have?  I acci
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
+void icanguit_state::machine_start()
+{
+	spg2xx_game_state::machine_start();
+
+	// if there's a cart, override the standard banking
+	if (m_cart && m_cart->exists())
+	{
+		std::string region_tag;
+		m_cart_region = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+		m_bank->configure_entries(0, (m_cart_region->bytes() + 0x7fffff) / 0x800000, m_cart_region->base(), 0x800000);
+		m_bank->set_entry(0);
+	}
+}
+
+DEVICE_IMAGE_LOAD_MEMBER(icanguit_state, icanguit_cart)
+{
+	uint32_t size = m_cart->common_get_size("rom");
+
+	if (size < 0x800000)
+	{
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+		return image_init_result::FAIL;
+	}
+
+	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
+
+	return image_init_result::PASS;
+}
+
+
 
 void vii_state::machine_start()
 {
@@ -1403,6 +1456,25 @@ void vii_state::vii(machine_config &config)
 
 	SOFTWARE_LIST(config, "vii_cart").set_original("vii");
 }
+
+void icanguit_state::icanguit(machine_config &config)
+{
+	SPG24X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
+
+	spg2xx_base(config);
+
+	m_spg->porta_in().set_ioport("P1");
+	m_spg->portb_in().set_ioport("P2");
+	m_spg->portc_in().set_ioport("P3");
+
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "icanguit_cart");
+	m_cart->set_width(GENERIC_ROM16_WIDTH);
+	m_cart->set_device_load(device_image_load_delegate(&icanguit_state::device_image_load_icanguit_cart, this));
+	m_cart->set_must_be_loaded(true);
+
+	SOFTWARE_LIST(config, "icanguit_cart").set_original("icanguit");
+}
+
 
 void spg2xx_game_state::wireless60(machine_config &config)
 {
@@ -1778,8 +1850,7 @@ ROM_END
 
 ROM_START( icanguit )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
-	// TODO, no internal ROM, this is a cartridge, move it to a Software List
-	ROM_LOAD16_WORD_SWAP( "icanplayguitar_guitarfavorites.bin", 0x000000, 0x800000, CRC(c804822e) SHA1(81e10a033355f4ba4be23a6741bd9d81c5627544) )
+	// no internal ROM, requires a cartridge
 ROM_END
 
 
@@ -2000,7 +2071,7 @@ CONS( 2005, mattelcs,  0,        0, rad_skat, mattelcs,   spg2xx_game_state, emp
 // Hasbro games
 CONS( 2007, dreamlif,  0,        0, rad_skat, rad_crik,   spg2xx_game_state, empty_init, "Hasbro", "Dream Life",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-CONS( 2007, icanguit,  0,        0, rad_skat, icanguit,   spg2xx_game_state, empty_init, "Mattel / Fisher-Price", "I Can Play Guitar",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2007, icanguit,  0,        0, icanguit, icanguit,   icanguit_state, empty_init, "Mattel / Fisher-Price", "I Can Play Guitar",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // might not fit here.  First 0x8000 bytes are blank (not too uncommon for these) then rest of rom looks like it's probably encrypted at least
 // could be later model VT based instead? even after decrypting (simple word xor) the vectors have a different format and are at a different location to the SunPlus titles
