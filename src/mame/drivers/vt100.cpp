@@ -89,18 +89,19 @@ private:
 	required_device<rst_pos_buffer_device> m_rstbuf;
 	required_device<rs232_port_device> m_rs232;
 	optional_device<ins8250_device> m_printer_uart;
-	DECLARE_READ8_MEMBER(flags_r);
-	DECLARE_WRITE8_MEMBER(baud_rate_w);
-	DECLARE_READ8_MEMBER(modem_r);
-	DECLARE_WRITE8_MEMBER(nvr_latch_w);
-	DECLARE_READ8_MEMBER(printer_r);
-	DECLARE_WRITE8_MEMBER(printer_w);
-	DECLARE_READ8_MEMBER(video_ram_r);
-	DECLARE_WRITE8_MEMBER(uart_clock_w);
-	required_shared_ptr<uint8_t> m_p_ram;
+	required_shared_ptr<u8> m_p_ram;
+
+	u8 flags_r();
+	u8 modem_r();
+	void nvr_latch_w(u8 data);
+	u8 printer_r(offs_t offset);
+	void printer_w(offs_t offset, u8 data);
+	u8 video_ram_r(offs_t offset);
+	void uart_clock_w(u8 data);
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	uint32_t screen_update_vt100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_vt100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	IRQ_CALLBACK_MEMBER(vt102_irq_callback);
 	void vt100_mem(address_map &map);
 	void vt100_io(address_map &map);
@@ -148,9 +149,9 @@ void vt100_state::vt180_io(address_map &map)
 // 5 - NVR data H
 // 6 - LBA 7 H
 // 7 - Keyboard TBMT H
-READ8_MEMBER(vt100_state::flags_r)
+u8 vt100_state::flags_r()
 {
-	uint8_t ret = 0;
+	u8 ret = 0;
 
 	ret |= m_pusart->txrdy_r();
 	ret |= !m_nvr->data_r() << 5;
@@ -159,9 +160,9 @@ READ8_MEMBER(vt100_state::flags_r)
 	return ret;
 }
 
-READ8_MEMBER(vt100_state::modem_r)
+u8 vt100_state::modem_r()
 {
-	uint8_t ret = 0x0f;
+	u8 ret = 0x0f;
 
 	ret |= m_rs232->cts_r() << 7;
 	ret |= m_rs232->si_r() << 6;
@@ -171,7 +172,7 @@ READ8_MEMBER(vt100_state::modem_r)
 	return ret;
 }
 
-WRITE8_MEMBER(vt100_state::nvr_latch_w)
+void vt100_state::nvr_latch_w(u8 data)
 {
 	// data inverted due to negative logic
 	m_nvr->c3_w(!BIT(data, 3));
@@ -211,14 +212,14 @@ void vt100_state::vt100_io(address_map &map)
 	// map (0xe2, 0xe2)
 }
 
-READ8_MEMBER(vt100_state::printer_r)
+u8 vt100_state::printer_r(offs_t offset)
 {
-	return m_printer_uart->ins8250_r(space, offset >> 2);
+	return m_printer_uart->ins8250_r(machine().dummy_space(), offset >> 2);
 }
 
-WRITE8_MEMBER(vt100_state::printer_w)
+void vt100_state::printer_w(offs_t offset, u8 data)
 {
-	m_printer_uart->ins8250_w(space, offset >> 2, data);
+	m_printer_uart->ins8250_w(machine().dummy_space, offset >> 2, data);
 }
 
 void vt100_state::vt102_io(address_map &map)
@@ -232,7 +233,7 @@ void vt100_state::vt102_io(address_map &map)
 static INPUT_PORTS_START( vt100 )
 INPUT_PORTS_END
 
-uint32_t vt100_state::screen_update_vt100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 vt100_state::screen_update_vt100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_crtc->video_update(bitmap, cliprect);
 	return 0;
@@ -274,15 +275,15 @@ void vt100_state::machine_start()
 
 void vt100_state::machine_reset()
 {
-	nvr_latch_w(machine().dummy_space(), 0, 0);
+	nvr_latch_w(0);
 }
 
-READ8_MEMBER(vt100_state::video_ram_r)
+u8 vt100_state::video_ram_r(offs_t offset)
 {
 	return m_p_ram[offset];
 }
 
-WRITE8_MEMBER(vt100_state::uart_clock_w)
+void vt100_state::uart_clock_w(u8 data)
 {
 	m_kbduart->write_tcp(BIT(data, 1));
 	m_kbduart->write_rcp(BIT(data, 1));
