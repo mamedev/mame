@@ -530,10 +530,10 @@ void pet_state::update_speaker()
 READ8_MEMBER( pet_state::read )
 {
 	int sel = offset >> 12;
-	int norom = m_exp->norom_r(space, offset, sel);
+	int norom = m_exp->norom_r(offset, sel);
 	uint8_t data = 0;
 
-	data = m_exp->read(space, offset, data, sel);
+	data = m_exp->read(offset, data, sel);
 
 	switch (sel)
 	{
@@ -629,7 +629,7 @@ WRITE8_MEMBER( pet_state::write )
 {
 	int sel = offset >> 12;
 
-	m_exp->write(space, offset, data, sel);
+	m_exp->write(offset, data, sel);
 
 	switch (sel)
 	{
@@ -758,7 +758,7 @@ void cbm8296_state::read_pla2_eprom(offs_t offset, int phi2, int brw, int casena
 
 READ8_MEMBER( cbm8296_state::read )
 {
-	int norom = m_exp->norom_r(space, offset, offset >> 12) && !BIT(m_cr, 7);
+	int norom = m_exp->norom_r(offset, offset >> 12) && !BIT(m_cr, 7);
 	int phi2 = 1, brw = 1, noscreen = 1, noio = BIT(m_cr, 6);
 	int ramsela = BIT(m_via_pa, 0), ramsel9 = BIT(m_via_pa, 1), ramon = BIT(m_via_pa, 2);
 	int cswff = 1, cs9 = 1, csa = 1, csio = 1, cse = 1, cskb = 1, fa12 = 1, fa15 = 1, casena1 = 1, casena2 = 1, endra = 1;
@@ -839,7 +839,7 @@ READ8_MEMBER( cbm8296_state::read )
 
 WRITE8_MEMBER( cbm8296_state::write )
 {
-	int norom = m_exp->norom_r(space, offset, offset >> 12) && !BIT(m_cr, 7);
+	int norom = m_exp->norom_r(offset, offset >> 12) && !BIT(m_cr, 7);
 	int phi2 = 1, brw = 0, noscreen = 1, noio = BIT(m_cr, 6);
 	int ramsela = BIT(m_via_pa, 0), ramsel9 = BIT(m_via_pa, 1), ramon = BIT(m_via_pa, 2);
 	int cswff = 1, cs9 = 1, csa = 1, csio = 1, cse = 1, cskb = 1, fa12 = 1, fa15 = 1, casena1 = 1, casena2 = 1, endra = 1;

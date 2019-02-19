@@ -178,7 +178,7 @@ void cbm8000_hsg_device::device_reset()
 //  pet_norom_r - NO ROM read
 //-------------------------------------------------
 
-int cbm8000_hsg_device::pet_norom_r(address_space &space, offs_t offset, int sel)
+int cbm8000_hsg_device::pet_norom_r(offs_t offset, int sel)
 {
 	return !(offset >= 0x9000 && offset < 0xaf00);
 }
@@ -188,7 +188,7 @@ int cbm8000_hsg_device::pet_norom_r(address_space &space, offs_t offset, int sel
 //  pet_bd_r - buffered data read
 //-------------------------------------------------
 
-uint8_t cbm8000_hsg_device::pet_bd_r(address_space &space, offs_t offset, uint8_t data, int &sel)
+uint8_t cbm8000_hsg_device::pet_bd_r(offs_t offset, uint8_t data, int &sel)
 {
 	switch (sel)
 	{
@@ -224,7 +224,7 @@ uint8_t cbm8000_hsg_device::pet_bd_r(address_space &space, offs_t offset, uint8_
 		}
 		else if (offset >= 0xaf70 && offset < 0xaf80)
 		{
-			data = m_gdc->data_r(space, offset & 0x0f);
+			data = m_gdc->data_r(machine().dummy_space(), offset & 0x0f);
 		}
 		break;
 	}
@@ -237,7 +237,7 @@ uint8_t cbm8000_hsg_device::pet_bd_r(address_space &space, offs_t offset, uint8_
 //  pet_bd_w - buffered data write
 //-------------------------------------------------
 
-void cbm8000_hsg_device::pet_bd_w(address_space &space, offs_t offset, uint8_t data, int &sel)
+void cbm8000_hsg_device::pet_bd_w(offs_t offset, uint8_t data, int &sel)
 {
 	if (offset == 0xaf00)
 	{
@@ -258,6 +258,6 @@ void cbm8000_hsg_device::pet_bd_w(address_space &space, offs_t offset, uint8_t d
 	}
 	else if (offset >= 0xaf70 && offset < 0xaf80)
 	{
-		m_gdc->data_w(space, offset & 0x0f, data);
+		m_gdc->data_w(machine().dummy_space(), offset & 0x0f, data);
 	}
 }

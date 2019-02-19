@@ -225,7 +225,7 @@ void superpet_device::device_reset()
 //  pet_norom_r - NO ROM read
 //-------------------------------------------------
 
-int superpet_device::pet_norom_r(address_space &space, offs_t offset, int sel)
+int superpet_device::pet_norom_r(offs_t offset, int sel)
 {
 	return BIT(m_system, 0);
 }
@@ -235,9 +235,9 @@ int superpet_device::pet_norom_r(address_space &space, offs_t offset, int sel)
 //  pet_bd_r - buffered data read
 //-------------------------------------------------
 
-uint8_t superpet_device::pet_bd_r(address_space &space, offs_t offset, uint8_t data, int &sel)
+uint8_t superpet_device::pet_bd_r(offs_t offset, uint8_t data, int &sel)
 {
-	int norom = pet_norom_r(space, offset, sel);
+	int norom = pet_norom_r(offset, sel);
 
 	switch (sel)
 	{
@@ -277,7 +277,7 @@ uint8_t superpet_device::pet_bd_r(address_space &space, offs_t offset, uint8_t d
 	case 0xefe1:
 	case 0xefe2:
 	case 0xefe3:
-		data = m_dongle->read(space, offset & 0x03);
+		data = m_dongle->read(offset & 0x03);
 		break;
 
 	case 0xeff0:
@@ -296,7 +296,7 @@ uint8_t superpet_device::pet_bd_r(address_space &space, offs_t offset, uint8_t d
 //  pet_bd_w - buffered data write
 //-------------------------------------------------
 
-void superpet_device::pet_bd_w(address_space &space, offs_t offset, uint8_t data, int &sel)
+void superpet_device::pet_bd_w(offs_t offset, uint8_t data, int &sel)
 {
 	switch (sel)
 	{
@@ -314,7 +314,7 @@ void superpet_device::pet_bd_w(address_space &space, offs_t offset, uint8_t data
 	case 0xefe1:
 	case 0xefe2:
 	case 0xefe3:
-		m_dongle->write(space, offset & 0x03, data);
+		m_dongle->write(offset & 0x03, data);
 		printf("6702 %u %02x\n", offset & 0x03, data);
 		break;
 
