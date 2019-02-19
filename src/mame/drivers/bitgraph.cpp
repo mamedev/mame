@@ -224,13 +224,13 @@ DEVICE_INPUT_DEFAULTS_END
 READ8_MEMBER(bitgraph_state::pia_r)
 {
 	LOGPIA("PIA R %d\n", offset);
-	return m_pia->read(space, 3 - offset);
+	return m_pia->read(3 - offset);
 }
 
 WRITE8_MEMBER(bitgraph_state::pia_w)
 {
 	LOGPIA("PIA W %d < %02X\n", offset, data);
-	return m_pia->write(space, 3 - offset, data);
+	return m_pia->write(3 - offset, data);
 }
 
 READ_LINE_MEMBER(bitgraph_state::pia_ca1_r)

@@ -327,7 +327,7 @@ MC6845_UPDATE_ROW( r2dtank_state::crtc_update_row )
 
 WRITE8_MEMBER(r2dtank_state::pia_comp_w)
 {
-	m_pia_main->write(machine().dummy_space(), offset, ~data);
+	m_pia_main->write(offset, ~data);
 }
 
 

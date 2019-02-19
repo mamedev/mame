@@ -595,11 +595,11 @@ READ8_MEMBER( pet_state::read )
 
 			if (BIT(offset, 4))
 			{
-				data &= m_pia1->read(space, offset & 0x03);
+				data &= m_pia1->read(offset & 0x03);
 			}
 			if (BIT(offset, 5))
 			{
-				data &= m_pia2->read(space, offset & 0x03);
+				data &= m_pia2->read(offset & 0x03);
 			}
 			if (BIT(offset, 6))
 			{
@@ -652,11 +652,11 @@ WRITE8_MEMBER( pet_state::write )
 		{
 			if (BIT(offset, 4))
 			{
-				m_pia1->write(space, offset & 0x03, data);
+				m_pia1->write(offset & 0x03, data);
 			}
 			if (BIT(offset, 5))
 			{
-				m_pia2->write(space, offset & 0x03, data);
+				m_pia2->write(offset & 0x03, data);
 			}
 			if (BIT(offset, 6))
 			{
@@ -813,11 +813,11 @@ READ8_MEMBER( cbm8296_state::read )
 
 		if (BIT(offset, 4))
 		{
-			data &= m_pia1->read(space, offset & 0x03);
+			data &= m_pia1->read(offset & 0x03);
 		}
 		if (BIT(offset, 5))
 		{
-			data &= m_pia2->read(space, offset & 0x03);
+			data &= m_pia2->read(offset & 0x03);
 		}
 		if (BIT(offset, 6))
 		{
@@ -868,11 +868,11 @@ WRITE8_MEMBER( cbm8296_state::write )
 	{
 		if (BIT(offset, 4))
 		{
-			m_pia1->write(space, offset & 0x03, data);
+			m_pia1->write(offset & 0x03, data);
 		}
 		if (BIT(offset, 5))
 		{
-			m_pia2->write(space, offset & 0x03, data);
+			m_pia2->write(offset & 0x03, data);
 		}
 		if (BIT(offset, 6))
 		{

@@ -138,7 +138,7 @@ READ8_MEMBER( dragon_alpha_state::ff20_read )
 			break;
 
 		case 4: case 5: case 6: case 7:
-			result = m_pia_2->read(space, offset, mem_mask);
+			result = m_pia_2->read(offset);
 			break;
 
 		case 8: case 9: case 10: case 11:
@@ -180,7 +180,7 @@ WRITE8_MEMBER( dragon_alpha_state::ff20_write )
 			break;
 
 		case 4: case 5: case 6: case 7:
-			m_pia_2->write(space, offset, data, mem_mask);
+			m_pia_2->write(offset, data);
 			break;
 
 		case 8: case 9: case 10: case 11:

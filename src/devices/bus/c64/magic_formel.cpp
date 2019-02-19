@@ -239,7 +239,7 @@ void c64_magic_formel_cartridge_device::c64_cd_w(address_space &space, offs_t of
 		offs_t addr = (offset >> 6) & 0x03;
 		uint8_t new_data = (BIT(data, 1) << 7) | (offset & 0x3f);
 
-		m_pia->write(space, addr, new_data);
+		m_pia->write(addr, new_data);
 	}
 	else if (offset == 0x0001)
 	{

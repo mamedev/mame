@@ -107,7 +107,7 @@ uint8_t c64_sequential_midi_cartridge_device::c64_cd_r(address_space &space, off
 		{
 		case 2:
 		case 3:
-			data = m_acia->read(space, offset & 1);
+			data = m_acia->read(offset & 1);
 			break;
 		}
 	}
@@ -128,7 +128,7 @@ void c64_sequential_midi_cartridge_device::c64_cd_w(address_space &space, offs_t
 		{
 		case 0:
 		case 1:
-			m_acia->write(space, offset & 1, data);
+			m_acia->write(offset & 1, data);
 			break;
 		}
 	}
