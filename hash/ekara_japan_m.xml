@@ -16,7 +16,7 @@
 	M-9   MC0009-KSM  JPop Mix Mini Vol 1
 	M-10  MC0010-ATM  Artist Mini Volume 6 (untranslated artist)
 	M-11  MC0011-     KSM? unknown Vol 4
-	M-12  MC0012-ATM  Artist Mini Volume 7 (untranslated artist)
+	M-12 *MC0012-ATM  Artist Mini Volume 7 (untranslated artist)
 	M-13 *MC0013-KSM  KSM Mini Volume 5
 	M-14 *MC0014-ATM  Artist Mini Volume 8 (BoA)
 	M-15  MC0015-     KSM? TPM? unknown Vol 6 (TV Pop)
@@ -65,6 +65,17 @@
 			</dataarea>
 		</part>
 	</software>	
+
+	<software name="mc0012">
+		<description>Artist Mini Volume 7 (untranslated artist) (Japan) (MC0012-ATM)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x080000">
+				<rom name="mc0012-atm.u1" size="0x080000" crc="f31d3de9" sha1="41e4de960b2f348a4bed3b9b6d51229878e8c8f3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="mc0013">
 		<description>KSM Mini Volume 5 (Japan) (MC0013-KSM)</description>
