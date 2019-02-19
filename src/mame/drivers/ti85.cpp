@@ -374,10 +374,10 @@ void ti85_state::ti83p_banked_mem(address_map &map)
 
 void ti85_state::ti83p_asic_mem(address_map &map)
 {
-	map(0x0000, 0x3fff).rw(m_membank1, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0x4000, 0x7fff).w(m_membank2, FUNC(address_map_bank_device::write8)).r(FUNC(ti85_state::ti83p_membank2_r));
-	map(0x8000, 0xbfff).w(m_membank3, FUNC(address_map_bank_device::write8)).r(FUNC(ti85_state::ti83p_membank3_r));
-	map(0xc000, 0xffff).rw(m_membank4, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0x0000, 0x3fff).rw(m_membank[0], FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0x4000, 0x7fff).w(m_membank[1], FUNC(address_map_bank_device::write8)).r(FUNC(ti85_state::ti83p_membank2_r));
+	map(0x8000, 0xbfff).w(m_membank[2], FUNC(address_map_bank_device::write8)).r(FUNC(ti85_state::ti83p_membank3_r));
+	map(0xc000, 0xffff).rw(m_membank[3], FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
 }
 
 /* keyboard input */
@@ -578,97 +578,94 @@ static INPUT_PORTS_START (ti83)
 INPUT_PORTS_END
 
 /* machine definition */
-MACHINE_CONFIG_START(ti85_state::ti81)
+void ti85_state::ti81(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 2000000)        /* 2 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(ti81_mem)
-	MCFG_DEVICE_IO_MAP(ti81_io)
+	Z80(config, m_maincpu, 2000000);        /* 2 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &ti85_state::ti81_mem);
+	m_maincpu->set_addrmap(AS_IO, &ti85_state::ti81_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(0)
-	MCFG_SCREEN_SIZE(96, 64)
-	MCFG_SCREEN_VISIBLE_AREA(0, 96-1, 0, 64-1)
-	MCFG_SCREEN_UPDATE_DRIVER(ti85_state, screen_update_ti85)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(0);
+	screen.set_size(96, 64);
+	screen.set_visarea(0, 96-1, 0, 64-1);
+	screen.set_screen_update(FUNC(ti85_state::screen_update_ti85));
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(ti85_state::ti85_palette), 224, 224);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(ti85_state::ti85)
+void ti85_state::ti85(machine_config &config)
+{
 	ti81(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(6000000)        /* 6 MHz */
-	MCFG_DEVICE_IO_MAP(ti85_io)
+	m_maincpu->set_clock(6000000);        /* 6 MHz */
+	m_maincpu->set_addrmap(AS_IO, &ti85_state::ti85_io);
 
 	MCFG_MACHINE_RESET_OVERRIDE(ti85_state, ti85 )
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_SIZE(128, 64)
-	MCFG_SCREEN_VISIBLE_AREA(0, 128-1, 0, 64-1)
+	subdevice<screen_device>("screen")->set_size(128, 64);
+	subdevice<screen_device>("screen")->set_visarea(0, 128-1, 0, 64-1);
 
-	MCFG_DEVICE_ADD("linkport", TI8X_LINK_PORT, default_ti8x_link_devices, nullptr)
-MACHINE_CONFIG_END
+	TI8X_LINK_PORT(config, m_link_port, default_ti8x_link_devices, nullptr);
+}
 
 
 MACHINE_CONFIG_START(ti85_state::ti85d)
 	ti85(config);
 	MCFG_SNAPSHOT_ADD("snapshot", ti85_state, ti8x, "sav")
-	//MCFG_TI85SERIAL_ADD( "tiserial" )
+	//TI85SERIAL(config, "tiserial");
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(ti85_state::ti82)
+void ti85_state::ti82(machine_config &config)
+{
 	ti81(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(6000000)        /* 6 MHz */
-	MCFG_DEVICE_IO_MAP(ti82_io)
+	m_maincpu->set_clock(6000000);        /* 6 MHz */
+	m_maincpu->set_addrmap(AS_IO, &ti85_state::ti82_io);
 
 	MCFG_MACHINE_RESET_OVERRIDE(ti85_state, ti85 )
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DEVICE("t6a04", t6a04_device, screen_update)
+	subdevice<screen_device>("screen")->set_screen_update("t6a04", FUNC(t6a04_device::screen_update));
 
 	subdevice<palette_device>("palette")->set_entries(2).set_init(FUNC(ti85_state::ti82_palette));
 
 	T6A04(config, "t6a04", 0).set_size(96, 64);
 
-	MCFG_DEVICE_ADD("linkport", TI8X_LINK_PORT, default_ti8x_link_devices, nullptr)
-MACHINE_CONFIG_END
+	TI8X_LINK_PORT(config, m_link_port, default_ti8x_link_devices, nullptr);
+}
 
-MACHINE_CONFIG_START(ti85_state::ti81v2)
+void ti85_state::ti81v2(machine_config &config)
+{
 	ti82(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(ti81v2_io)
+	m_maincpu->set_addrmap(AS_IO, &ti85_state::ti81v2_io);
 
 	config.device_remove("linkport");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(ti85_state::ti83)
+void ti85_state::ti83(machine_config &config)
+{
 	ti81(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(6000000)        /* 6 MHz */
-	MCFG_DEVICE_IO_MAP(ti83_io)
+	m_maincpu->set_clock(6000000);        /* 6 MHz */
+	m_maincpu->set_addrmap(AS_IO, &ti85_state::ti83_io);
 
 	MCFG_MACHINE_RESET_OVERRIDE(ti85_state, ti85 )
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DEVICE("t6a04", t6a04_device, screen_update)
+	subdevice<screen_device>("screen")->set_screen_update("t6a04", FUNC(t6a04_device::screen_update));
 
 	subdevice<palette_device>("palette")->set_entries(2).set_init(FUNC(ti85_state::ti82_palette));
 
 	T6A04(config, "t6a04", 0).set_size(96, 64);
-MACHINE_CONFIG_END
+}
 
 MACHINE_CONFIG_START(ti85_state::ti86)
 	ti85(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(ti86_mem)
-	MCFG_DEVICE_IO_MAP(ti86_io)
+	m_maincpu->set_addrmap(AS_PROGRAM, &ti85_state::ti86_mem);
+	m_maincpu->set_addrmap(AS_IO, &ti85_state::ti86_io);
 
 	MCFG_MACHINE_START_OVERRIDE(ti85_state, ti86 )
 	MCFG_MACHINE_RESET_OVERRIDE(ti85_state, ti85 )
@@ -676,77 +673,70 @@ MACHINE_CONFIG_START(ti85_state::ti86)
 	MCFG_SNAPSHOT_ADD("snapshot", ti85_state, ti8x, "sav")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(ti85_state::ti83p)
+void ti85_state::ti83p(machine_config &config)
+{
 	ti81(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(6000000)        /* 8 MHz running at 6 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(ti83p_asic_mem)
-	MCFG_DEVICE_IO_MAP(ti83p_io)
+	m_maincpu->set_clock(6000000);        /* 8 MHz running at 6 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &ti85_state::ti83p_asic_mem);
+	m_maincpu->set_addrmap(AS_IO, &ti85_state::ti83p_io);
 
 	MCFG_MACHINE_START_OVERRIDE(ti85_state, ti83p )
 	MCFG_MACHINE_RESET_OVERRIDE(ti85_state, ti83p )
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DEVICE("t6a04", t6a04_device, screen_update)
+	subdevice<screen_device>("screen")->set_screen_update("t6a04", FUNC(t6a04_device::screen_update));
 
 	subdevice<palette_device>("palette")->set_entries(2).set_init(FUNC(ti85_state::ti82_palette));
 
-	ADDRESS_MAP_BANK(config, "membank1").set_map(&ti85_state::ti83p_banked_mem).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
-	ADDRESS_MAP_BANK(config, "membank2").set_map(&ti85_state::ti83p_banked_mem).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
-	ADDRESS_MAP_BANK(config, "membank3").set_map(&ti85_state::ti83p_banked_mem).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
-	ADDRESS_MAP_BANK(config, "membank4").set_map(&ti85_state::ti83p_banked_mem).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
+	ADDRESS_MAP_BANK(config, m_membank[0]).set_map(&ti85_state::ti83p_banked_mem).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
+	ADDRESS_MAP_BANK(config, m_membank[1]).set_map(&ti85_state::ti83p_banked_mem).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
+	ADDRESS_MAP_BANK(config, m_membank[2]).set_map(&ti85_state::ti83p_banked_mem).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
+	ADDRESS_MAP_BANK(config, m_membank[3]).set_map(&ti85_state::ti83p_banked_mem).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
 
 	T6A04(config, "t6a04", 0).set_size(96, 64);
 
-	MCFG_DEVICE_ADD("linkport", TI8X_LINK_PORT, default_ti8x_link_devices, nullptr)
+	TI8X_LINK_PORT(config, m_link_port, default_ti8x_link_devices, nullptr);
 
-	AMD_29F400T(config, "flash");
-MACHINE_CONFIG_END
+	AMD_29F400T(config, m_flash);
+}
 
-MACHINE_CONFIG_START(ti85_state::ti83pse)
+void ti85_state::ti83pse(machine_config &config)
+{
 	ti83p(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK( 15000000)
-	MCFG_DEVICE_IO_MAP(ti83pse_io)
+	m_maincpu->set_clock(15000000);
+	m_maincpu->set_addrmap(AS_IO, &ti85_state::ti83pse_io);
 
-	MCFG_DEVICE_MODIFY("membank1")
-	MCFG_DEVICE_PROGRAM_MAP(ti83pse_banked_mem)
+	m_membank[0]->set_map(&ti85_state::ti83pse_banked_mem);
 
-	MCFG_DEVICE_MODIFY("membank2")
-	MCFG_DEVICE_PROGRAM_MAP(ti83pse_banked_mem)
+	m_membank[1]->set_map(&ti85_state::ti83pse_banked_mem);
 
-	MCFG_DEVICE_MODIFY("membank3")
-	MCFG_DEVICE_PROGRAM_MAP(ti83pse_banked_mem)
+	m_membank[2]->set_map(&ti85_state::ti83pse_banked_mem);
 
-	MCFG_DEVICE_MODIFY("membank4")
-	MCFG_DEVICE_PROGRAM_MAP(ti83pse_banked_mem)
+	m_membank[3]->set_map(&ti85_state::ti83pse_banked_mem);
 
 	MCFG_MACHINE_START_OVERRIDE(ti85_state, ti83pse )
-	MCFG_DEVICE_REPLACE("flash", FUJITSU_29F160T, 0)
-MACHINE_CONFIG_END
+	FUJITSU_29F160T(config.replace(), m_flash, 0);
+}
 
-MACHINE_CONFIG_START(ti85_state::ti84p)
+void ti85_state::ti84p(machine_config &config)
+{
 	ti83pse(config);
-	MCFG_DEVICE_MODIFY("membank1")
-	MCFG_DEVICE_PROGRAM_MAP(ti84p_banked_mem)
+	m_membank[0]->set_map(&ti85_state::ti84p_banked_mem);
 
-	MCFG_DEVICE_MODIFY("membank2")
-	MCFG_DEVICE_PROGRAM_MAP(ti84p_banked_mem)
+	m_membank[1]->set_map(&ti85_state::ti84p_banked_mem);
 
-	MCFG_DEVICE_MODIFY("membank3")
-	MCFG_DEVICE_PROGRAM_MAP(ti84p_banked_mem)
+	m_membank[2]->set_map(&ti85_state::ti84p_banked_mem);
 
-	MCFG_DEVICE_MODIFY("membank4")
-	MCFG_DEVICE_PROGRAM_MAP(ti84p_banked_mem)
+	m_membank[3]->set_map(&ti85_state::ti84p_banked_mem);
 
 	MCFG_MACHINE_START_OVERRIDE(ti85_state, ti84p )
-	MCFG_DEVICE_REPLACE("flash", AMD_29F800T , 0)
-MACHINE_CONFIG_END
+	AMD_29F800T(config.replace(), m_flash, 0);
+}
 
-MACHINE_CONFIG_START(ti85_state::ti84pse)
+void ti85_state::ti84pse(machine_config &config)
+{
 	ti83pse(config);
 	MCFG_MACHINE_START_OVERRIDE(ti85_state, ti84pse )
-MACHINE_CONFIG_END
+}
 
 void ti85_state::ti73(machine_config &config)
 {

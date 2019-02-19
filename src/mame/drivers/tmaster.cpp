@@ -366,9 +366,11 @@ int tmaster_compute_addr(uint16_t reg_low, uint16_t reg_mid, uint16_t reg_high)
 	return (reg_low & 0xff) | ((reg_mid & 0x1ff) << 8) | (reg_high << 17);
 }
 
-MACHINE_CONFIG_START(tmaster_state::tm)
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000) / 2) /* 12MHz */
-	MCFG_DEVICE_PROGRAM_MAP(tmaster_map)
+void tmaster_state::tm(machine_config &config)
+{
+	M68000(config, m_maincpu, XTAL(24'000'000) / 2); /* 12MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &tmaster_state::tmaster_map);
+
 	TIMER(config, "scantimer").configure_scanline(FUNC(tmaster_state::scanline_interrupt), "screen", 0, 1);
 
 	MC68681(config, m_duart, XTAL(8'664'000) / 2 /*??*/);
@@ -380,13 +382,13 @@ MACHINE_CONFIG_START(tmaster_state::tm)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(400, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 400-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tmaster_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(400, 256);
+	m_screen->set_visarea(0, 400-1, 0, 256-1);
+	m_screen->set_screen_update(FUNC(tmaster_state::screen_update));
+	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x1000);
 
@@ -397,9 +399,8 @@ MACHINE_CONFIG_START(tmaster_state::tm)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(24'000'000) / 16, okim6295_device::PIN7_HIGH)  /* 1.5Mhz? clock frequency & pin 7 not verified */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, XTAL(24'000'000) / 16, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); /* 1.5Mhz? clock frequency & pin 7 not verified */
+}
 
 void tmaster_state::tmds1204(machine_config &config)
 {

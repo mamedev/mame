@@ -821,7 +821,8 @@ void tm990189_state::tm990_189_cru_map(address_map &map)
 	map(0x0400, 0x05ff).w(m_tms9902, FUNC(tms9902_device::cruwrite));   /* optional tms9902 */
 }
 
-MACHINE_CONFIG_START(tm990189_state::tm990_189)
+void tm990189_state::tm990_189(machine_config &config)
+{
 	/* basic machine hardware */
 	TMS9980A(config, m_tms9980a, 8_MHz_XTAL); // clock divided by 4 internally
 	m_tms9980a->set_addrmap(AS_PROGRAM, &tm990189_state::tm990_189_memmap);
@@ -877,9 +878,10 @@ MACHINE_CONFIG_START(tm990189_state::tm990_189)
 	// Need to delay the timer, or it will spoil the initial LOAD
 	// TODO: Fix this, probably inside CPU
 	display_timer.set_start_delay(attotime::from_msec(150));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(tm990189_state::tm990_189_v)
+void tm990189_state::tm990_189_v(machine_config &config)
+{
 	/* basic machine hardware */
 	TMS9980A(config, m_tms9980a, 8_MHz_XTAL);
 	m_tms9980a->set_addrmap(AS_PROGRAM, &tm990189_state::tm990_189_v_memmap);
@@ -938,7 +940,7 @@ MACHINE_CONFIG_START(tm990189_state::tm990_189_v)
 	timer_device &display_timer(TIMER(config, "display_timer"));
 	display_timer.configure_periodic(FUNC(tm990189_state::display_callback), attotime::from_hz(30));
 	display_timer.set_start_delay(attotime::from_msec(150));
-MACHINE_CONFIG_END
+}
 
 
 /*
