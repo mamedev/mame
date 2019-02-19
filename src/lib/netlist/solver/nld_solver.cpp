@@ -31,10 +31,6 @@
 #pragma GCC optimize "ivopts"
 #endif
 
-#include <algorithm>
-#include <cmath>  // <<= needed by windows build
-#include <memory>
-
 #include "../nl_lists.h"
 
 #include "../plib/pomp.h"
@@ -57,6 +53,9 @@
 #include "nld_ms_sor.h"
 #include "nld_ms_sor_mat.h"
 #include "nld_ms_w.h"
+
+#include <algorithm>
+#include <cmath>
 
 namespace netlist
 {

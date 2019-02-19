@@ -801,8 +801,8 @@ MACHINE_CONFIG_START(qx10_state::qx10)
 
 	UPD7220(config, m_hgdc, MAIN_CLK/6); // unk clock
 	m_hgdc->set_addrmap(0, &qx10_state::upd7220_map);
-	m_hgdc->set_display_pixels_callback(FUNC(qx10_state::hgdc_display_pixels), this);
-	m_hgdc->set_draw_text_callback(FUNC(qx10_state::hgdc_draw_text), this);
+	m_hgdc->set_display_pixels(FUNC(qx10_state::hgdc_display_pixels));
+	m_hgdc->set_draw_text(FUNC(qx10_state::hgdc_draw_text));
 	m_hgdc->set_screen("screen");
 
 	MC146818(config, m_rtc, 32.768_kHz_XTAL);

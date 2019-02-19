@@ -168,7 +168,7 @@ MACHINE_CONFIG_START(mz6500_state::mz6500)
 	/* Devices */
 	UPD7220(config, m_hgdc, 8000000/6); // unk clock
 	m_hgdc->set_addrmap(0, &mz6500_state::upd7220_map);
-	m_hgdc->set_display_pixels_callback(FUNC(mz6500_state::hgdc_display_pixels), this);
+	m_hgdc->set_display_pixels(FUNC(mz6500_state::hgdc_display_pixels));
 
 	UPD765A(config, m_fdc, 8000000, true, true);
 	FLOPPY_CONNECTOR(config, "upd765:0", mz6500_floppies, "525hd", floppy_image_device::default_floppy_formats);

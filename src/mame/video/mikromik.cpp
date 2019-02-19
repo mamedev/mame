@@ -150,6 +150,6 @@ void mm1_state::mm1m6_video(machine_config &config)
 
 	UPD7220(config, m_hgdc, XTAL(18'720'000)/8);
 	m_hgdc->set_addrmap(0, &mm1_state::mm1_upd7220_map);
-	m_hgdc->set_display_pixels_callback(FUNC(mm1_state::hgdc_display_pixels), this);
+	m_hgdc->set_display_pixels(FUNC(mm1_state::hgdc_display_pixels));
 	m_hgdc->set_screen(SCREEN_TAG);
 }

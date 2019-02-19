@@ -3233,7 +3233,7 @@ MACHINE_CONFIG_START(rainbow_state::rainbow)
 	m_hgdc->vsync_wr_callback().set(FUNC(rainbow_state::GDC_vblank_irq)); // "The vsync callback line needs to be below the 7220 DEVICE_ADD line."
 
 	m_hgdc->set_addrmap(0, &rainbow_state::upd7220_map);
-	m_hgdc->set_display_pixels_callback(FUNC(rainbow_state::hgdc_display_pixels), this);
+	m_hgdc->set_display_pixels(FUNC(rainbow_state::hgdc_display_pixels));
 	m_hgdc->set_screen(m_screen2); // set_screen needs to be added after 7720 device in the machine config, not after the screen.
 
 	MCFG_PALETTE_ADD("palette2", 32)
