@@ -523,10 +523,10 @@ ngen.cpp
 ngp.cpp
 nokia_3310.cpp
 notetaker.cpp
-novag6502.cpp
-novag68k.cpp
-novagf8.cpp
-novagmcs48.cpp
+novag_delta1.cpp
+novag_diablo.cpp
+novag_presto.cpp
+novagbase.cpp
 o2.cpp
 ob68k1a.cpp
 octane.cpp

@@ -30696,7 +30696,18 @@ pkunwarj                        // UPL-????? (c) 1985 (Arcade Game TV List - P.9
 raiders5                        // UPL-85004 (c) 1985
 raiders5t                       // UPL-85004 (c) 1985 Taito license
 
-@source:novag6502.cpp
+@source:novag_delta1.cpp
+ccdelta1                        //
+
+@source:novag_diablo.cpp
+diablo68                        //
+scorpio68                       //
+
+@source:novag_presto.cpp
+nocto                           //
+npresto                         //
+
+@source:novagbase.cpp
 cfortea                         //
 cforteb                         //
 sexperta                        //
@@ -30708,17 +30719,6 @@ sfortea1                        //
 sforteb                         //
 sfortec                         //
 supercon                        //
-
-@source:novag68k.cpp
-diablo68                        //
-scorpio68                       //
-
-@source:novagf8.cpp
-ccdelta1                        //
-
-@source:novagmcs48.cpp
-nocto                           //
-npresto                         //
 
 @source:nsg6809.cpp
 pitchhit                        //
