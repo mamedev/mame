@@ -187,9 +187,35 @@ protected:
 	// cartridges (e.g. - Orch-90, Multi-Pak interface) for their control registers, independently
 	// of the SCS or CTS lines
 	address_space &cartridge_space();
-	void install_read_handler(uint16_t addrstart, uint16_t addrend, read8_delegate rhandler);
-	void install_write_handler(uint16_t addrstart, uint16_t addrend, write8_delegate whandler);
-	void install_readwrite_handler(uint16_t addrstart, uint16_t addrend, read8_delegate rhandler, write8_delegate whandler);
+	template<typename R> void install_read_handler(u16 addrstart, u16 addrend, R rhandler)
+	{
+		address_space &space(cartridge_space());
+		space.install_read_handler(addrstart, addrend, rhandler);
+	}
+	template<typename W> void install_write_handler(u16 addrstart, u16 addrend, W whandler)
+	{
+		address_space &space(cartridge_space());
+		space.install_write_handler(addrstart, addrend, whandler);
+	}
+	template<typename R, typename W> void install_readwrite_handler(u16 addrstart, u16 addrend, R rhandler, W whandler)
+	{
+		address_space &space(cartridge_space());
+		space.install_read_handler(addrstart, addrend, rhandler);
+		space.install_write_handler(addrstart, addrend, whandler);
+	}
+
+	void install_read_handler(u16 addrstart, u16 addrend, read8_delegate rhandler) { install_read_handler<read8_delegate>(addrstart, addrend, rhandler); }
+	void install_write_handler(u16 addrstart, u16 addrend, write8_delegate whandler) { install_write_handler<write8_delegate>(addrstart, addrend, whandler); }
+	void install_read_handler(u16 addrstart, u16 addrend, read8m_delegate rhandler) { install_read_handler<read8m_delegate>(addrstart, addrend, rhandler); }
+	void install_write_handler(u16 addrstart, u16 addrend, write8m_delegate whandler) { install_write_handler<write8m_delegate>(addrstart, addrend, whandler); }
+	void install_read_handler(u16 addrstart, u16 addrend, read8s_delegate rhandler) { install_read_handler<read8s_delegate>(addrstart, addrend, rhandler); }
+	void install_write_handler(u16 addrstart, u16 addrend, write8s_delegate whandler) { install_write_handler<write8s_delegate>(addrstart, addrend, whandler); }
+	void install_read_handler(u16 addrstart, u16 addrend, read8sm_delegate rhandler) { install_read_handler<read8sm_delegate>(addrstart, addrend, rhandler); }
+	void install_write_handler(u16 addrstart, u16 addrend, write8sm_delegate whandler) { install_write_handler<write8sm_delegate>(addrstart, addrend, whandler); }
+	void install_read_handler(u16 addrstart, u16 addrend, read8mo_delegate rhandler) { install_read_handler<read8mo_delegate>(addrstart, addrend, rhandler); }
+	void install_write_handler(u16 addrstart, u16 addrend, write8mo_delegate whandler) { install_write_handler<write8mo_delegate>(addrstart, addrend, whandler); }
+	void install_read_handler(u16 addrstart, u16 addrend, read8smo_delegate rhandler) { install_read_handler<read8smo_delegate>(addrstart, addrend, rhandler); }
+	void install_write_handler(u16 addrstart, u16 addrend, write8smo_delegate whandler) { install_write_handler<write8smo_delegate>(addrstart, addrend, whandler); }
 
 	// setting line values
 	void set_line_value(cococart_slot_device::line line, cococart_slot_device::line_value value);

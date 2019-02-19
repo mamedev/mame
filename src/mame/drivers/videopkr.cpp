@@ -911,11 +911,11 @@ WRITE8_MEMBER(videopkr_state::baby_sound_p3_w)
 		case 0x00:  break;
 		case 0x01:  break;
 		case 0x02:  break;
-		case 0x03:  m_aysnd->data_w(space, 1, m_sbp0); break;
+		case 0x03:  m_aysnd->data_w(m_sbp0); break;
 		case 0x04:  break;
-		case 0x05:  m_sbp0 = m_aysnd->data_r(space, m_sbp0); break;
+		case 0x05:  m_sbp0 = m_aysnd->data_r(); break;
 		case 0x06:  break;
-		case 0x07:  m_aysnd->address_w(space, 0, m_sbp0); break;
+		case 0x07:  m_aysnd->address_w(m_sbp0); break;
 	}
 }
 

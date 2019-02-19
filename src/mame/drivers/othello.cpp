@@ -251,14 +251,14 @@ WRITE8_MEMBER(othello_state::ack_w)
 
 WRITE8_MEMBER(othello_state::ay_address_w)
 {
-	if (m_ay_select & 1) m_ay[0]->address_w(space, 0, data);
-	if (m_ay_select & 2) m_ay[1]->address_w(space, 0, data);
+	if (m_ay_select & 1) m_ay[0]->address_w(data);
+	if (m_ay_select & 2) m_ay[1]->address_w(data);
 }
 
 WRITE8_MEMBER(othello_state::ay_data_w)
 {
-	if (m_ay_select & 1) m_ay[0]->data_w(space, 0, data);
-	if (m_ay_select & 2) m_ay[1]->data_w(space, 0, data);
+	if (m_ay_select & 1) m_ay[0]->data_w(data);
+	if (m_ay_select & 2) m_ay[1]->data_w(data);
 }
 
 void othello_state::audio_map(address_map &map)

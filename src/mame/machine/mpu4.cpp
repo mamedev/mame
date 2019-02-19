@@ -1114,14 +1114,14 @@ void mpu4_state::update_ay(device_t *device)
 
 		case 0x02:
 			/* CA2 = 0 CB2 = 1? : Write to selected PSG register and write data to Port A */
-			m_ay8913->data_w(generic_space(), 0, m_pia6->a_output());
+			m_ay8913->data_w(m_pia6->a_output());
 			LOG(("AY Chip Write \n"));
 			break;
 
 		case 0x03:
 			/* CA2 = 1 CB2 = 1? : The register will now be selected and the user can read from or write to it.
 			The register will remain selected until another is chosen.*/
-			m_ay8913->address_w(generic_space(), 0, m_pia6->a_output());
+			m_ay8913->address_w(m_pia6->a_output());
 			LOG(("AY Chip Select \n"));
 			break;
 

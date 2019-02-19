@@ -178,12 +178,12 @@ WRITE8_MEMBER(_4enraya_state::sound_control_w)
 	{
 		case 0: case 3:
 			// latch address
-			m_ay->address_w(space, 0, m_soundlatch);
+			m_ay->address_w(m_soundlatch);
 			break;
 
 		case 2:
 			// write to psg
-			m_ay->data_w(space, 0, m_soundlatch);
+			m_ay->data_w(m_soundlatch);
 			break;
 
 		default:

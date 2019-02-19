@@ -413,13 +413,13 @@ WRITE8_MEMBER(m63_state::snd_irq_w)
 WRITE8_MEMBER(m63_state::snddata_w)
 {
 	if ((m_p2 & 0xf0) == 0xe0)
-		m_ay1->address_w(space, 0, offset);
+		m_ay1->address_w(offset);
 	else if ((m_p2 & 0xf0) == 0xa0)
-		m_ay1->data_w(space, 0, offset);
+		m_ay1->data_w(offset);
 	else if (m_ay2 != nullptr && (m_p1 & 0xe0) == 0x60)
-		m_ay2->address_w(space, 0, offset);
+		m_ay2->address_w(offset);
 	else if (m_ay2 != nullptr && (m_p1 & 0xe0) == 0x40)
-			m_ay2->data_w(space, 0, offset);
+			m_ay2->data_w(offset);
 	else if ((m_p2 & 0xf0) == 0x70 )
 		m_sound_status = offset;
 }

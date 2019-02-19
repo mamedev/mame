@@ -201,10 +201,10 @@ READ8_MEMBER(r2dtank_state::AY8910_port_r)
 	uint8_t ret = 0;
 
 	if (m_AY8910_selected & 0x08)
-		ret = m_ay1->data_r(space, 0);
+		ret = m_ay1->data_r();
 
 	if (m_AY8910_selected & 0x10)
-		ret = m_ay2->data_r(space, 0);
+		ret = m_ay2->data_r();
 
 	return ret;
 }
@@ -213,10 +213,10 @@ READ8_MEMBER(r2dtank_state::AY8910_port_r)
 WRITE8_MEMBER(r2dtank_state::AY8910_port_w)
 {
 	if (m_AY8910_selected & 0x08)
-		m_ay1->data_address_w(space, m_AY8910_selected >> 2, data);
+		m_ay1->data_address_w(m_AY8910_selected >> 2, data);
 
 	if (m_AY8910_selected & 0x10)
-		m_ay2->data_address_w(space, m_AY8910_selected >> 2, data);
+		m_ay2->data_address_w(m_AY8910_selected >> 2, data);
 }
 
 

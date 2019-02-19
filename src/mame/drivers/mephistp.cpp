@@ -87,9 +87,9 @@ WRITE8_MEMBER(mephisto_pinball_state::t0_t1_w)
 void mephisto_pinball_state::ay8910_update()
 {
 	if (m_ay8910_bdir)
-		m_aysnd->data_address_w(machine().dummy_space(), m_ay8910_bc1, m_ay8910_data);
+		m_aysnd->data_address_w(m_ay8910_bc1, m_ay8910_data);
 	else if (m_ay8910_bc1)
-		m_ay8910_data = m_aysnd->data_r(machine().dummy_space(), 0);
+		m_ay8910_data = m_aysnd->data_r();
 }
 
 WRITE8_MEMBER(mephisto_pinball_state::ay8910_columns_w)

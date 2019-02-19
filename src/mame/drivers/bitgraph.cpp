@@ -280,10 +280,10 @@ WRITE8_MEMBER(bitgraph_state::pia_pb_w)
 	switch (m_pia_b & 0x03)
 	{
 	case 2:
-		m_psg->data_w(space, 0, m_pia_a);
+		m_psg->data_w(m_pia_a);
 		break;
 	case 3:
-		m_psg->address_w(space, 0, m_pia_a);
+		m_psg->address_w(m_pia_a);
 		break;
 	}
 

@@ -201,11 +201,11 @@ WRITE8_MEMBER(drw80pkr_state::io_w)
 
 		// ay8910 control port
 		if (m_p1 == 0xfc)
-			m_aysnd->address_w(space, 0, data);
+			m_aysnd->address_w(data);
 
 		// ay8910_write_port_0_w
 		if (m_p1 == 0xfe)
-			m_aysnd->data_w(space, 0, data);
+			m_aysnd->data_w(data);
 	}
 }
 
