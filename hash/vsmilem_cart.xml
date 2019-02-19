@@ -37,6 +37,7 @@ Language:
 |        | 80-084022(NL)     | Dora: Dora's Reparatie Avontuur                                            |
 |        | 80-084023(UK)     | Dora the Explorer: Dora's Fix It Adventure                                 |
 |   XX   | 80-084024(GE)     | Dora: Doras Reparatur-Abenteuer                                            |
+|   XX   | 80-084024(GE)     | Dora: Doras Reparatur-Abenteuer (Rev. 2)                                   |
 |        | 80-084025(FR)     | Dora L'Exploratrice : Les Adventures De Dora Apprentie Mecano              |
 |        | 80-084026(PT)     | Dora : em busca das pecas perdidas                                         |
 |        | 80-084027(SP)     | Dora : La Aventura arregla-todo de Dora                                    |
@@ -74,6 +75,7 @@ Language:
 |        | 80-084160(US)     | Disney's Little Einsteins: The Glass Slipper Ball                          |
 |        | 80-084163(UK)     | Disney's Little Einsteins: The Glass Slipper Ball                          |
 |   XX   | 80-084164(GE)     | Disney's Kleine Einsteins: Der Glaspantoffel-Ball                          |
+|   XX   | 80-084164(GE)     | Disney's Kleine Einsteins: Der Glaspantoffel-Ball (Rev. 2?)                |
 |        | 80-084167(SP)     | Little Einsteins de Disney: El Baile del Zapatito de Cristal               |
 +========+===================+============================================================================+
 |        | 80-084180(US)     | Mickey Mouse Clubhouse                                                     |
@@ -201,13 +203,14 @@ Language:
 |        | 80-084580(US)     | Cars 2  (motion version)                                                   |
 |        | 80-084581(US)     | Cars 2  (pocket version)                                                   |
 |        | 80-084583(UK)     | Cars 2                                                                     |
-|        | 80-084584(GE)     | Cars 2                                                                     |
+|   XX   | 80-084584(GE)     | Cars 2                                                                     |
 |        | 80-084585(FR)     | Cars 2                                                                     |
 |        | 80-084587(SP)     | Cars 2                                                                     |
 +========+===================+============================================================================+
 |        | 80-084600(US)     | <Unknown> (Should be Orange colored Cinderella - Cinderella's Magic Wishes)|
 |        | 80-084603(UK)     | Cinderella - Cinderella's Magic Wishes                                     |
 |   XX   | 80-084604(GE)     | Cinderella - Lernen im Maerchenland                                        |
+|   XX   | 80-084604(GE)     | Cinderella - Lernen im Maerchenland (Rev. 2?)                              |
 |        | 80-084605(FR)     | Cendrillon - ?????                                                         |
 +========+===================+============================================================================+
 |        | 80-084620(US)     | <Unknown> (Should be Orange colored Finding Nemo)                          |
@@ -216,7 +219,7 @@ Language:
 |        | 80-084627(SP)     | Buscando a Nemo - Los Descubrimientos de Nemo                              |
 +========+===================+============================================================================+
 |        | 80-084640(US)     | <Unknown> (Should be Orange colored Spongebob)                             |
-|        | 80-084644(GE)     | Spongebob Schwammkopf - Der Tag des Schwamms                               |
+|   XX   | 80-084644(GE)     | Spongebob Schwammkopf - Der Tag des Schwamms                               |
 |        | 80-084647(SP)     | Bob Esponja - Un día en la vida de una esponja                             |
 +========+===================+============================================================================+
 
@@ -237,11 +240,11 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 
 <softwarelist name="vsmilem_cart" description="VTech V.Smile Motion cartridges">
 
-	<software name="actnmnia" supported="no">
+	<software name="actnmnias" supported="no">
 		<description>Action Manía (Sp)</description>
 		<year>201?</year>
 		<publisher>VTech</publisher>
-		<info name="serial" value="80-084006(SP)" />
+		<info name="serial" value="80-084007(SP)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="pcb" value="708201" />
 			<feature name="pcb_model" value="708201-4" />
@@ -252,7 +255,7 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 		</part>
 	</software>
 
-	<software name="cars" supported="no">
+	<software name="carsg" supported="no">
 		<description>Cars: Vollgas in Radiator Springs (Ger)</description>
 		<year>2009</year>
 		<publisher>VTech</publisher>
@@ -267,8 +270,24 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 		</part>
 	</software>
 
-	<software name="cinderla" supported="no">
-		<description>Disney Princess Cinderella - Lernen im Märchenland (Ger)</description>
+	<software name="cars2g" supported="no">
+		<description>Disney/Pixar Cars 2 (Ger)</description>
+		<year>2011</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084404(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708106" />
+			<feature name="pcb_model" value="708106-3" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="0x1000000">
+				<rom name="cars2_low.bin" size="0x0800000" crc="8d5eeb71" sha1="f53867b360464c12d905ca90aaf03855ca5fa455" offset="0x0000000" />
+				<rom name="cars2_high.bin" size="0x0800000" crc="7a5b9ead" sha1="8c01a52ed392b50f2a7e91ae628ae4f6f06a5fc3" offset="0x0800000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cinderlag" supported="no">
+		<description>Disneys Princess Cinderella - Lernen im Märchenland (Ger)</description>
 		<year>2010?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084604(GE)" />
@@ -282,9 +301,9 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 		</part>
 	</software>
 
-	<software name="cinderla2" cloneof="cinderla" supported="no">
-		<description>Disney Princess Cinderella - Lernen im Märchenland (Ger, Rev. 2?)</description>
-		<year>2010?</year>
+	<software name="cinderla2g" cloneof="cinderla" supported="no">
+		<description>Disneys Princess Cinderella - Lernen im Märchenland (Ger, Rev. 2?)</description>
+		<year>2010</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084604(GE)" />
 		<part name="cart" interface="vsmile_cart">
@@ -294,7 +313,7 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 		</part>
 	</software>
 
-	<software name="kfpanda" supported="no">
+	<software name="kfpandag" supported="no">
 		<description>DreamWorks Kung Fu Panda - Der Weg des Panda (Ger)</description>
 		<year>2008?</year>
 		<publisher>VTech</publisher>
@@ -309,9 +328,9 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 		</part>
 	</software>
 
-	<software name="dora" supported="no">
-		<description>Dora - Doras Reparatur-Abenteuer (Ger)</description>
-		<year>2009?</year>
+	<software name="dorag" supported="no">
+		<description>Nick Dora - Doras Reparatur-Abenteuer (Ger)</description>
+		<year>2009</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084024(GE)" />
 		<part name="cart" interface="vsmile_cart">
@@ -324,8 +343,8 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 		</part>
 	</software>
 
-	<software name="dora2" cloneof="dora" supported="no">
-		<description>Dora - Doras Reparatur-Abenteuer (Ger, Rev. 2)</description>
+	<software name="dora2g" cloneof="dorag" supported="no">
+		<description>Nick Dora - Doras Reparatur-Abenteuer (Ger, Rev. 2)</description>
 		<year>2009?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084024(GE)" />
@@ -339,8 +358,8 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 		</part>
 	</software>
 
-	<software name="kleinstn" supported="no">
-		<description>Kleine Einsteins (Ger)</description>
+	<software name="kleinstng" supported="no">
+		<description>Disney's Kleine Einsteins (Ger)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084164(GE)" />
@@ -351,9 +370,9 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 		</part>
 	</software>
 
-	<software name="kleinstn2" cloneof="kleinstn" supported="no">
-		<description>Kleine Einsteins (Ger, Rev. 2?)</description>
-		<year>200?</year>
+	<software name="kleinstn2g" cloneof="kleinstn" supported="no">
+		<description>Disney's Kleine Einsteins (Ger, Rev. 2?)</description>
+		<year>2009</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084164(GE)" />
 		<part name="cart" interface="vsmile_cart">
@@ -363,7 +382,7 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 		</part>
 	</software>
 
-	<software name="mypuppy" supported="no">
+	<software name="mypuppyg" supported="no">
 		<description>Mein erster Hund (Ger)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -378,7 +397,7 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 		</part>
 	</software>
 
-	<software name="pooh" supported="no">
+	<software name="poohg" supported="no">
 		<description>Winnie Puuh - Die Honigjagd (Ger)</description>
 		<year>2009?</year>
 		<publisher>VTech</publisher>
@@ -393,7 +412,7 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 		</part>
 	</software>
 
-	<software name="prinfrog" supported="no">
+	<software name="prinfrogg" supported="no">
 		<description>Küss den Frosch - Tianas großer Traum (Ger)</description>
 		<year>2010</year>
 		<publisher>VTech</publisher>
@@ -421,7 +440,7 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 		</part>
 	</software>
 
-	<software name="fimshrek" supported="no">
+	<software name="shrekfag" cloneof="shrekfa" supported="no">
 		<description>Für immer Shrek (Ger)</description>
 		<year>2010</year>
 		<publisher>VTech</publisher>
@@ -437,8 +456,8 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 		</part>
 	</software>
 
-	<software name="spidermn" supported="no">
-		<description>Spider-Man &amp; Freunde - Geheime Missionen (Ger)</description>
+	<software name="spidermng" supported="no">
+		<description>Marvel Spider-Man &amp; Freunde - Geheime Missionen (Ger)</description>
 		<year>2010</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084144(GE)" />
@@ -452,8 +471,8 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 		</part>
 	</software>
 
-	<software name="spongeb" supported="no">
-		<description>Spongebob Schwammkopf - Der Tag des Schwamms (Ger)</description>
+	<software name="spongebg" supported="no">
+		<description>Nickelodeon Spongebob Schwammkopf - Der Tag des Schwamms (Ger)</description>
 		<year>2011</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084644(GE)" />
@@ -467,7 +486,7 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 		</part>
 	</software>
 
-	<software name="thomas" supported="no">
+	<software name="thomasg" supported="no">
 		<description>Thomas - Freunde halten zusammen (Ger)</description>
 		<year>2007?</year>
 		<publisher>VTech</publisher>
@@ -479,7 +498,7 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 		</part>
 	</software>
 
-	<software name="tinker" supported="no">
+	<software name="tinkerg" supported="no">
 		<description>TinkerBell (Ger)</description>
 		<year>2009?</year>
 		<publisher>VTech</publisher>
@@ -510,7 +529,7 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 		</part>
 	</software>
 
-	<software name="wintrspt" supported="no">
+	<software name="wintrsptg" supported="no">
 		<description>Wintersport (Ger)</description>
 		<year>2009?</year>
 		<publisher>VTech</publisher>
