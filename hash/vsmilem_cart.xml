@@ -301,7 +301,7 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 		</part>
 	</software>
 
-	<software name="cinderla2g" cloneof="cinderla" supported="no">
+	<software name="cinderla2g" cloneof="cinderlag" supported="no">
 		<description>Disneys Princess Cinderella - Lernen im Märchenland (Ger, Rev. 2?)</description>
 		<year>2010</year>
 		<publisher>VTech</publisher>
@@ -370,7 +370,7 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 		</part>
 	</software>
 
-	<software name="kleinstn2g" cloneof="kleinstn" supported="no">
+	<software name="kleinstn2g" cloneof="kleinstng" supported="no">
 		<description>Disney's Kleine Einsteins (Ger, Rev. 2?)</description>
 		<year>2009</year>
 		<publisher>VTech</publisher>
