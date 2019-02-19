@@ -1957,6 +1957,8 @@ files {
 	MAME_DIR .. "src/mame/machine/decioga.h",
 	MAME_DIR .. "src/mame/drivers/dectalk.cpp",
 	MAME_DIR .. "src/mame/drivers/decwritr.cpp",
+	MAME_DIR .. "src/mame/drivers/jensen.cpp",
+	MAME_DIR .. "src/mame/includes/jensen.h",
 	MAME_DIR .. "src/mame/drivers/pdp11.cpp",
 	MAME_DIR .. "src/mame/drivers/vax11.cpp",
 	MAME_DIR .. "src/mame/drivers/rainbow.cpp",
@@ -2401,12 +2403,6 @@ files {
 	MAME_DIR .. "src/mame/includes/jazz.h",
 	MAME_DIR .. "src/mame/machine/jazz_mct_adr.cpp",
 	MAME_DIR .. "src/mame/machine/jazz_mct_adr.h",
-}
-
-createMESSProjects(_target, _subtarget, "jensen")
-files {
-	MAME_DIR .. "src/mame/drivers/jensen.cpp",
-	MAME_DIR .. "src/mame/includes/jensen.h",
 }
 
 createMESSProjects(_target, _subtarget, "kaypro")
