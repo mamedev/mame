@@ -32,10 +32,10 @@ Addons (w/ yellow Smartridges)
 +========+===================+============================================================================+
 |        | 80-03600(US)      | V.Smile PC Pal Island                                                      |
 +========+===================+============================================================================+
-|        | 80-036800(US)     | V.Smile PC Pal Island (cart serial)                                        |
+|   XX   | 80-036800(US)     | V.Smile PC Pal Island (cart serial)                                        |
 |        | 80-036822(SP)     | V.Smile PC Pal Island (cart serial)                                        |
 +========+===================+============================================================================+
-|        | 80-067000(US)     | V.Smile Art Studio                                                         |
+|   XX   | 80-067000(US)     | V.Smile Art Studio                                                         |
 |        | 80-067003(UK)     | V.Smile Art Studio                                                         |
 |   XX   | 80-067004(GE)     | V.Smile Zeichenatelier (Magic Malboard)                                    |
 |        | 80-067005(FR)     | V.Smile Studio De Dessin                                                   |
@@ -1662,6 +1662,21 @@ Game cartridges
 		</part>
 	</software>
 
+	<software name="pcpalis" supported="yes">
+		<description>V.Smile PC Pal Island (USA, Rev. 3?)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-036800(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="yellow" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="vsmile36800-3.bin" size="8388608" crc="7e53c0a1" sha1="68b8d09c933b17e1342ef31cfb283dc5609e990a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="upg" supported="yes">
 		<description>Disney/Pixar Oben (Ger)</description>
 		<year>2009?</year>
@@ -2507,6 +2522,26 @@ Game cartridges
 	</software>
 
 	<software name="techart" supported="no">
+		<description>V.Smile Art Studio (USA)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-067000(USA)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_nvram" />
+			<feature name="pcb" value="67000C" />
+			<feature name="pcb_model" value="67000C-2" />
+			<feature name="cart_type" value="yellow" />
+			<feature name="u2" value="U2" /> <!-- SRAM -->
+			<feature name="u3" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="4194304">
+				<rom name="vsmile67000.bin" size="4194304" crc="3bbfb917" sha1="62eff99609f4958f7059408f588aaed4ba6fc2be" offset="0" />
+			</dataarea>
+			<dataarea name="nvram" size="131072">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="techartg" cloneof="techart" supported="no">
 		<description>V.Smile Zeichenatelier (Ger)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
