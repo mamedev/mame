@@ -7,7 +7,7 @@ Fidelity Excellence series hardware (for Excel 68000, see fidel_eag68k.cpp)
 
 TODO:
 - granits gives error beeps at start, need to press clear to play
-- granits buttons seem too sensitive
+- granits chessboard buttons seem too sensitive (detects input on falling edge if held too long)
 
 *******************************************************************************
 

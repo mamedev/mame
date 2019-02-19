@@ -3,7 +3,7 @@
 // thanks-to:Berger,yoyo_chessboard
 /******************************************************************************
 
-Sensory Chess Challenger "9" (SC9)
+Fidelity Sensory Chess Challenger "9" (SC9)
 3 versions were available, the newest "B" version was 2MHz and included the Budapest program.
 The Playmatic S was only released in Germany, it's basically a 'deluxe' version of SC9
 with magnet sensors and came with CB9 and CB16.

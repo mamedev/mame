@@ -12852,6 +12852,13 @@ fgoala                          // MF  (c) 1979 Taito Corporation
 @source:fidel_as12.cpp
 feleg                           //
 
+@source:fidel_cc10.cpp
+cc10                            //
+
+@source:fidel_cc7.cpp
+backgamc                        //
+cc7                             //
+
 @source:fidel_chesster.cpp
 chesster                        //
 chesstera                       //
@@ -12867,6 +12874,9 @@ super9cc                        // SU9: Super 9 Sensory Chess Challenger (Englis
 super9ccfr                      // * French
 super9ccg                       // * German
 super9ccsp                      // * Spanish
+
+@source:fidel_dames.cpp
+damesc                          //
 
 @source:fidel_desdis.cpp
 fdes2000d                       //
@@ -12934,6 +12944,9 @@ fscc12b                         //
 @source:fidel_sc6.cpp
 fscc6                           //
 
+@source:fidel_sc8.cpp
+fscc8                           //
+
 @source:fidel_sc9.cpp
 fscc9                           //
 fscc9b                          //
@@ -12941,13 +12954,8 @@ fscc9c                          //
 fscc9ps                         //
 
 @source:fidelbase.cpp
-backgamc                        //
 bridgec3                        //
 bridgeca                        //
-cc10                            //
-cc7                             //
-damesc                          //
-fscc8                           //
 uvc                             // UVC: Advanced Voice Chess Challenger (English)
 uvcfr                           // * French
 uvcg                            // * German

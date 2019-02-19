@@ -150,85 +150,6 @@ determination and give you a language option on power up or something.
 
 *******************************************************************************
 
-Chess Challenger 10 (CCX)
--------------------
-4 versions are known to exist: A,B,C,D. Strangely, version C(UCC10) has an 8080
-instead of Z80. Chess Challenger 1,3 and 7 also run on very similar hardware.
-
-This is an earlier hardware upon which the VCC and UVC above were based on;
-The hardware is nearly the same; in fact the only significant differences are
-the RAM being located in a different place, the lack of a speech chip, and
-the connections to ports A and B on the PPI:
-
-8255 connections:
------------------
-PA.0 - segment G (W)
-PA.1 - segment F (W)
-PA.2 - segment E (W)
-PA.3 - segment D (W)
-PA.4 - segment C (W)
-PA.5 - segment B (W)
-PA.6 - segment A (W)
-PA.7 - 'beeper' direct speaker output (W)
-
-The beeper is via a 556 timer, fixed-frequency at around 1300-1400Hz.
-Not all hardware configurations include the beeper.
-
-PB.0 - dot commons (W)
-PB.1 - NC
-PB.2 - digit 0, bottom dot (W)
-PB.3 - digit 1, top dot (W)
-PB.4 - digit 2 (W)
-PB.5 - digit 3 (W)
-PB.6 - NC
-PB.7 - Mode select (cc3 vs cc10, R) - note: there is no CC3 with 16 buttons
-
-(button rows pulled up to 5V through 2.2K resistors)
-PC.0 - button row 0 (R)
-PC.1 - button row 1 (R)
-PC.2 - button row 2 (R)
-PC.3 - button row 3 (R)
-PC.4 - button column A (W)
-PC.5 - button column B (W)
-PC.6 - button column C (W)
-PC.7 - button column D (W)
-
-
-*******************************************************************************
-
-Chess Challenger 7 (BCC)
-------------------------
-model CC7 is an older version
-RE information from netlist by Berger
-
-Zilog Z80A, 3.579MHz from XTAL
-Z80 IRQ/NMI unused, no timer IC.
-This is a cost-reduced design from CC10, no special I/O chips.
-
-Backgammon Challenger (BKC) is the same PCB, with the speaker connection going
-to the display panel instead.
-
-Memory map:
------------
-0000-0FFF: 4K 2332 ROM CN19103N BCC-REVB.
-2000-2FFF: ROM/RAM bus conflict!
-3000-3FFF: 256 bytes RAM (2111 SRAM x2)
-4000-FFFF: Z80 A14/A15 not connected
-
-Port map (Write):
----------
-D0-D3: digit select and keypad mux
-D4: LOSE led
-D5: CHECK led
-A0-A2: NE591 A0-A2
-D7: NE591 D (_C not used)
-NE591 Q0-Q6: digit segments A-G
-NE591 Q7: buzzer
-
-Port map (Read):
----------
-D0-D3: keypad row
-
 
 *******************************************************************************
 
@@ -507,16 +428,10 @@ expect that the software reads these once on startup only.
 #include "machine/i8255.h"
 #include "machine/i8243.h"
 #include "machine/z80pio.h"
-#include "sound/beep.h"
 #include "sound/volt_reg.h"
 #include "speaker.h"
 
 // internal artwork
-#include "fidel_cc10.lh" // clickable
-#include "fidel_bcc.lh" // clickable
-#include "fidel_bkc.lh" // clickable
-#include "fidel_dsc.lh" // clickable
-#include "fidel_sc8.lh" // clickable
 #include "fidel_vcc.lh" // clickable
 #include "fidel_vbrc.lh" // clickable
 #include "fidel_bv3.lh" // clickable
@@ -568,63 +483,6 @@ void fidelbase_state::machine_reset()
 
 
 
-class scc_state : public fidelbase_state
-{
-public:
-	scc_state(const machine_config &mconfig, device_type type, const char *tag) :
-		fidelbase_state(mconfig, type, tag)
-	{ }
-
-	void scc(machine_config &config);
-
-private:
-	void main_map(address_map &map);
-	void main_io(address_map &map);
-
-	// I/O handlers
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_WRITE8_MEMBER(control_w);
-};
-
-
-class dsc_state : public fidelbase_state
-{
-public:
-	dsc_state(const machine_config &mconfig, device_type type, const char *tag) :
-		fidelbase_state(mconfig, type, tag)
-	{ }
-
-	void dsc(machine_config &config);
-
-private:
-	void main_map(address_map &map);
-
-	// I/O handlers
-	void prepare_display();
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_WRITE8_MEMBER(select_w);
-	DECLARE_READ8_MEMBER(input_r);
-};
-
-
-class bcc_state : public fidelbase_state
-{
-public:
-	bcc_state(const machine_config &mconfig, device_type type, const char *tag) :
-		fidelbase_state(mconfig, type, tag)
-	{ }
-
-	void bcc(machine_config &config);
-	void bkc(machine_config &config);
-
-private:
-	void main_map(address_map &map);
-	void main_io(address_map &map);
-
-	// I/O handlers
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_WRITE8_MEMBER(control_w);
-};
 
 
 class vsc_state : public fidelbase_state
@@ -659,37 +517,6 @@ private:
 	DECLARE_WRITE8_MEMBER(pio_portb_w);
 };
 
-
-class ccx_state : public fidelbase_state
-{
-public:
-	ccx_state(const machine_config &mconfig, device_type type, const char *tag) :
-		fidelbase_state(mconfig, type, tag),
-		m_ppi8255(*this, "ppi8255"),
-		m_beeper_off(*this, "beeper_off"),
-		m_beeper(*this, "beeper")
-	{ }
-
-	void ccx(machine_config &config);
-
-private:
-	// devices/pointers
-	required_device<i8255_device> m_ppi8255;
-	required_device<timer_device> m_beeper_off;
-	required_device<beep_device> m_beeper;
-
-	TIMER_DEVICE_CALLBACK_MEMBER(beeper_off) { m_beeper->set_state(0); }
-
-	void main_map(address_map &map);
-	void main_io(address_map &map);
-
-	// I/O handlers
-	void prepare_display();
-	DECLARE_WRITE8_MEMBER(ppi_porta_w);
-	DECLARE_WRITE8_MEMBER(ppi_portb_w);
-	DECLARE_READ8_MEMBER(ppi_portc_r);
-	DECLARE_WRITE8_MEMBER(ppi_portc_w);
-};
 
 
 class card_state : public fidelbase_state
@@ -1021,49 +848,6 @@ WRITE8_MEMBER(vcc_state::ppi_portc_w)
 
 // CCX-specific (no speech chip, 1-bit beeper instead)
 
-void ccx_state::prepare_display()
-{
-	// 4 7seg leds (note: sel d0 for extra leds)
-	u8 outdata = (m_7seg_data & 0x7f) | (m_led_select << 7 & 0x80);
-	set_display_segmask(0xf, 0x7f);
-	display_matrix(8, 4, outdata, m_led_select >> 2 & 0xf);
-}
-
-
-// I8255 PPI
-
-WRITE8_MEMBER(ccx_state::ppi_porta_w)
-{
-	// d7: enable beeper on falling edge (555 monostable)
-	if (~data & m_7seg_data & 0x80 && !m_beeper_off->enabled())
-	{
-		m_beeper->set_state(1);
-		m_beeper_off->adjust(attotime::from_msec(80)); // duration is approximate
-	}
-
-	// d0-d6: digit segment data
-	m_7seg_data = bitswap<8>(data,7,0,1,2,3,4,5,6);
-	prepare_display();
-}
-
-WRITE8_MEMBER(ccx_state::ppi_portb_w)
-{
-	// d0,d2-d5: digit/led select
-	m_led_select = data;
-	prepare_display();
-}
-
-READ8_MEMBER(ccx_state::ppi_portc_r)
-{
-	// d0-d3: multiplexed inputs (active low)
-	return ~read_inputs(4) & 0xf;
-}
-
-WRITE8_MEMBER(ccx_state::ppi_portc_w)
-{
-	// d4-d7: input mux (inverted)
-	m_inp_mux = ~data >> 4 & 0xf;
-}
 
 
 
@@ -1071,57 +855,6 @@ WRITE8_MEMBER(ccx_state::ppi_portc_w)
     BCC, BKC
 ******************************************************************************/
 
-// TTL
-
-WRITE8_MEMBER(bcc_state::control_w)
-{
-	// a0-a2,d7: digit segment data via NE591
-	u8 mask = 1 << (offset & 7);
-	m_7seg_data = (m_7seg_data & ~mask) | ((data & 0x80) ? mask : 0);
-
-	// BCC: NE591 Q7 is speaker out
-	if (m_dac != nullptr)
-		m_dac->write(BIT(m_7seg_data, 7));
-
-	// d0-d3: led select, input mux
-	// d4,d5: upper leds(direct)
-	set_display_segmask(0xf, 0x7f);
-	display_matrix(8, 6, m_7seg_data, data & 0x3f);
-	m_inp_mux = data & 0xf;
-}
-
-READ8_MEMBER(bcc_state::input_r)
-{
-	// d0-d3: multiplexed inputs
-	return read_inputs(4);
-}
-
-
-
-/******************************************************************************
-    SCC
-******************************************************************************/
-
-// TTL
-
-WRITE8_MEMBER(scc_state::control_w)
-{
-	// a0-a2,d7: led data
-	u8 mask = 1 << (offset & 7);
-	m_led_data = (m_led_data & ~mask) | ((data & 0x80) ? mask : 0);
-
-	// d0-d3: led select, input mux (row 9 is speaker out)
-	// d4: corner led(direct)
-	m_inp_mux = 1 << (data & 0xf);
-	m_dac->write(BIT(m_inp_mux, 9));
-	display_matrix(8, 9, m_led_data, (m_inp_mux & 0xff) | (data << 4 & 0x100));
-}
-
-READ8_MEMBER(scc_state::input_r)
-{
-	// d0-d7: multiplexed inputs (active low)
-	return ~read_inputs(9);
-}
 
 
 
@@ -1270,43 +1003,6 @@ READ8_MEMBER(card_state::mcu_p2_r)
 
 
 
-/******************************************************************************
-    DSC
-******************************************************************************/
-
-// TTL
-
-void dsc_state::prepare_display()
-{
-	// 4 7seg leds
-	set_display_segmask(0xf, 0x7f);
-	display_matrix(8, 4, m_7seg_data, m_led_select);
-}
-
-WRITE8_MEMBER(dsc_state::control_w)
-{
-	// d0-d7: input mux, 7seg data
-	m_inp_mux = ~data;
-	m_7seg_data = data;
-	prepare_display();
-}
-
-WRITE8_MEMBER(dsc_state::select_w)
-{
-	// d4: speaker out
-	m_dac->write(BIT(~data, 4));
-
-	// d0-d3: digit select
-	m_led_select = data & 0xf;
-	prepare_display();
-}
-
-READ8_MEMBER(dsc_state::input_r)
-{
-	// d0-d7: multiplexed inputs (active low)
-	return ~read_inputs(8);
-}
-
 
 
 /******************************************************************************
@@ -1314,21 +1010,6 @@ READ8_MEMBER(dsc_state::input_r)
 ******************************************************************************/
 
 // CCX, VCC/UVC
-
-void ccx_state::main_map(address_map &map)
-{
-	map.unmap_value_high();
-	map.global_mask(0x3fff);
-	map(0x0000, 0x0fff).rom();
-	map(0x1000, 0x10ff).mirror(0x0f00).ram();
-	map(0x3000, 0x30ff).mirror(0x0f00).ram();
-}
-
-void ccx_state::main_io(address_map &map)
-{
-	map.global_mask(0x03);
-	map(0x00, 0x03).rw(m_ppi8255, FUNC(i8255_device::read), FUNC(i8255_device::write));
-}
 
 void vcc_state::main_map(address_map &map)
 {
@@ -1346,34 +1027,6 @@ void vcc_state::main_io(address_map &map)
 
 // BCC, BKC
 
-void bcc_state::main_map(address_map &map)
-{
-	map.unmap_value_high();
-	map.global_mask(0x3fff);
-	map(0x0000, 0x0fff).rom();
-	map(0x3000, 0x30ff).mirror(0x0f00).ram();
-}
-
-void bcc_state::main_io(address_map &map)
-{
-	map.global_mask(0x07);
-	map(0x00, 0x07).rw(FUNC(bcc_state::input_r), FUNC(bcc_state::control_w));
-}
-
-
-// SCC
-
-void scc_state::main_map(address_map &map)
-{
-	map(0x0000, 0x0fff).rom();
-	map(0x5000, 0x50ff).ram();
-}
-
-void scc_state::main_io(address_map &map)
-{
-	map.global_mask(0x07);
-	map(0x00, 0x07).rw(FUNC(scc_state::input_r), FUNC(scc_state::control_w));
-}
 
 
 // VSC
@@ -1430,18 +1083,6 @@ void card_state::main_io(address_map &map)
 }
 
 
-// DSC
-
-void dsc_state::main_map(address_map &map)
-{
-	map.unmap_value_high();
-	map(0x0000, 0x1fff).rom();
-	map(0x4000, 0x4000).mirror(0x1fff).w(FUNC(dsc_state::control_w));
-	map(0x6000, 0x6000).mirror(0x1fff).w(FUNC(dsc_state::select_w));
-	map(0x8000, 0x8000).mirror(0x1fff).r(FUNC(dsc_state::input_r));
-	map(0xa000, 0xa3ff).mirror(0x1c00).ram();
-}
-
 
 
 /******************************************************************************
@@ -1479,93 +1120,7 @@ static INPUT_PORTS_START( vcc )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RE") PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, vcc_state, reset_button, nullptr)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( ccx )
-	PORT_START("IN.0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("LV") PORT_CODE(KEYCODE_L)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("A1") PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_CODE(KEYCODE_A)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("E5") PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_CODE(KEYCODE_E)
 
-	PORT_START("IN.1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Speaker") PORT_CODE(KEYCODE_SPACE)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("DM") PORT_CODE(KEYCODE_M)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("B2") PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_CODE(KEYCODE_B)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("F6") PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_CODE(KEYCODE_F)
-
-	PORT_START("IN.2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("CL") PORT_CODE(KEYCODE_DEL)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("PB") PORT_CODE(KEYCODE_P)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("C3") PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_CODE(KEYCODE_C)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("G7") PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_CODE(KEYCODE_G)
-
-	PORT_START("IN.3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("EN") PORT_CODE(KEYCODE_ENTER)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("PV") PORT_CODE(KEYCODE_V)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("D4") PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_CODE(KEYCODE_D)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("H8") PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_CODE(KEYCODE_H)
-
-	PORT_START("RESET") // is not on matrix IN.0 d0
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RE") PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, ccx_state, reset_button, nullptr)
-
-	PORT_START("LEVEL") // hardwired (VCC/GND?)
-	PORT_CONFNAME( 0x80, 0x00, "Maximum Levels" )
-	PORT_CONFSETTING(    0x00, "10" ) // factory setting
-	PORT_CONFSETTING(    0x80, "3" )
-INPUT_PORTS_END
-
-
-static INPUT_PORTS_START( bcc )
-	PORT_START("IN.0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("EN") PORT_CODE(KEYCODE_ENTER)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("PV") PORT_CODE(KEYCODE_V)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("D4") PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_CODE(KEYCODE_D)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("H8") PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_CODE(KEYCODE_H)
-
-	PORT_START("IN.1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("CL") PORT_CODE(KEYCODE_DEL)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("PB") PORT_CODE(KEYCODE_P)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("C3") PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_CODE(KEYCODE_C)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("G7") PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_CODE(KEYCODE_G)
-
-	PORT_START("IN.2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("CB") PORT_CODE(KEYCODE_SPACE)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("DM") PORT_CODE(KEYCODE_M)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("B2") PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_CODE(KEYCODE_B)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("F6") PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_CODE(KEYCODE_F)
-
-	PORT_START("IN.3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RE") PORT_CODE(KEYCODE_R)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("LV") PORT_CODE(KEYCODE_L)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("A1") PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_CODE(KEYCODE_A)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("E5") PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_CODE(KEYCODE_E)
-INPUT_PORTS_END
-
-
-static INPUT_PORTS_START( bkc )
-	PORT_START("IN.0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("EN") PORT_CODE(KEYCODE_ENTER)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("9") PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("6") PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("3") PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD)
-
-	PORT_START("IN.1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("CL") PORT_CODE(KEYCODE_DEL)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("8") PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("5") PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("2") PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD)
-
-	PORT_START("IN.2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("GM") PORT_CODE(KEYCODE_SPACE)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("7") PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("4") PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("1") PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD)
-
-	PORT_START("IN.3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RE") PORT_CODE(KEYCODE_R)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("PB") PORT_CODE(KEYCODE_P)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("PV") PORT_CODE(KEYCODE_V)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("0") PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD)
-INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER(card_state::reset_button)
 {
@@ -1574,7 +1129,17 @@ INPUT_CHANGED_MEMBER(card_state::reset_button)
 	m_mcu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
+static INPUT_PORTS_START( common )
+	PORT_START("RESET") // is not on matrix IN.7 d0
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, reset_button, nullptr) PORT_NAME("RE")
+
+	PORT_START("BARCODE")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_NAME("Card Scanner")
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( vbrc )
+	PORT_INCLUDE( common )
+
 	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_NAME("A")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_0) PORT_NAME("10")
@@ -1622,16 +1187,12 @@ static INPUT_PORTS_START( vbrc )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("BR")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME("DL")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Clubs")
-
-	PORT_START("RESET") // is not on matrix IN.7 d0
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, reset_button, nullptr) PORT_NAME("RE")
-
-	PORT_START("BARCODE")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_NAME("Card Scanner")
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( bv3 )
+	PORT_INCLUDE( common )
+
 	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_NAME("Ace")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_0) PORT_NAME("10")
@@ -1679,12 +1240,6 @@ static INPUT_PORTS_START( bv3 )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Review")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME("Dealer")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Clubs")
-
-	PORT_START("RESET") // is not on matrix IN.7 d0
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, reset_button, nullptr) PORT_NAME("Reset")
-
-	PORT_START("BARCODE")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_NAME("Card Scanner")
 INPUT_PORTS_END
 
 
@@ -1855,7 +1410,7 @@ INPUT_PORTS_START( fidel_cb_magnets )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( scc )
+static INPUT_PORTS_START( vsc )
 	PORT_INCLUDE( fidel_cb_buttons )
 
 	PORT_START("IN.8")
@@ -1867,11 +1422,6 @@ static INPUT_PORTS_START( scc )
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("King")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_NAME("CL")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("RE")
-INPUT_PORTS_END
-
-
-static INPUT_PORTS_START( vsc )
-	PORT_INCLUDE( scc )
 
 	PORT_START("IN.9")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("TM")
@@ -1884,99 +1434,12 @@ static INPUT_PORTS_START( vsc )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( dsc )
-	PORT_INCLUDE( fidel_cb_buttons )
-
-	PORT_MODIFY("IN.4")
-	PORT_BIT(0x8f, IP_ACTIVE_HIGH, IPT_UNUSED)
-
-	PORT_MODIFY("IN.6")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Black King")
-
-	PORT_MODIFY("IN.7")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Black")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("White King")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("White")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("RV")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("RE")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("PB")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("LV")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("CL")
-INPUT_PORTS_END
-
 
 
 /******************************************************************************
     Machine Drivers
 ******************************************************************************/
 
-void bcc_state::bkc(machine_config &config)
-{
-	/* basic machine hardware */
-	Z80(config, m_maincpu, 3.579545_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &bcc_state::main_map);
-	m_maincpu->set_addrmap(AS_IO, &bcc_state::main_io);
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_fidel_bkc);
-}
-
-void bcc_state::bcc(machine_config &config)
-{
-	bkc(config);
-	config.set_default_layout(layout_fidel_bcc);
-
-	/* sound hardware */
-	SPEAKER(config, "speaker").front_center();
-	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-}
-
-void scc_state::scc(machine_config &config)
-{
-	/* basic machine hardware */
-	Z80(config, m_maincpu, 3.9_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &scc_state::main_map);
-	m_maincpu->set_addrmap(AS_IO, &scc_state::main_io);
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_fidel_sc8);
-
-	/* sound hardware */
-	SPEAKER(config, "speaker").front_center();
-	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-}
-
-void ccx_state::ccx(machine_config &config)
-{
-	/* basic machine hardware */
-	Z80(config, m_maincpu, 4_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &ccx_state::main_map);
-	m_maincpu->set_addrmap(AS_IO, &ccx_state::main_io);
-
-	I8255(config, m_ppi8255);
-	m_ppi8255->out_pa_callback().set(FUNC(ccx_state::ppi_porta_w));
-	m_ppi8255->tri_pa_callback().set_constant(0);
-	m_ppi8255->in_pb_callback().set_ioport("LEVEL");
-	m_ppi8255->out_pb_callback().set(FUNC(ccx_state::ppi_portb_w));
-	m_ppi8255->in_pc_callback().set(FUNC(ccx_state::ppi_portc_r));
-	m_ppi8255->tri_pb_callback().set_constant(0);
-	m_ppi8255->out_pc_callback().set(FUNC(ccx_state::ppi_portc_w));
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_fidel_cc10);
-
-	/* sound hardware */
-	SPEAKER(config, "speaker").front_center();
-	BEEP(config, m_beeper, 1360); // approximation, from 556 timer ic
-	m_beeper->add_route(ALL_OUTPUTS, "speaker", 0.25);
-	TIMER(config, "beeper_off").configure_generic(FUNC(ccx_state::beeper_off));
-}
 
 void vcc_state::vcc(machine_config &config)
 {
@@ -2094,56 +1557,13 @@ void card_state::bv3(machine_config &config)
 	config.set_default_layout(layout_fidel_bv3);
 }
 
-void dsc_state::dsc(machine_config &config)
-{
-	/* basic machine hardware */
-	Z80(config, m_maincpu, 3.9_MHz_XTAL); // 3.9MHz resonator
-	m_maincpu->set_addrmap(AS_PROGRAM, &dsc_state::main_map);
-
-	const attotime irq_period = attotime::from_hz(523); // from 555 timer (22nF, 120K, 2.7K)
-	TIMER(config, m_irq_on).configure_periodic(FUNC(dsc_state::irq_on<INPUT_LINE_IRQ0>), irq_period);
-	m_irq_on->set_start_delay(irq_period - attotime::from_usec(41)); // active for 41us
-	TIMER(config, "irq_off").configure_periodic(FUNC(dsc_state::irq_off<INPUT_LINE_IRQ0>), irq_period);
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_fidel_dsc);
-
-	/* sound hardware */
-	SPEAKER(config, "speaker").front_center();
-	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-}
-
 
 
 /******************************************************************************
     ROM Definitions
 ******************************************************************************/
 
-ROM_START( cc10 ) // model CCX
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "cn19053n_cc10b", 0x0000, 0x1000, CRC(afd3ca99) SHA1(870d09b2b52ccb8572d69642c59b5215d5fb26ab) ) // 2332
-ROM_END
 
-
-ROM_START( cc7 ) // model BCC
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "cn19103n_bcc-revb", 0x0000, 0x1000, CRC(a397d471) SHA1(9b12bc442fccee40f4d8500c792bc9d886c5e1a5) ) // 2332
-ROM_END
-
-
-ROM_START( backgamc ) // model BKC, PCB label P-380A-5
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "cn19255n_101-32012", 0x0000, 0x1000, CRC(0a8a19b7) SHA1(d6f0dd44b33c9b79570cf0ceac02a036ec91ba57) ) // 2332
-ROM_END
-
-
-ROM_START( fscc8 ) // model SCC, PCB label 510-1011 REV.2
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "101-32017", 0x0000, 0x1000, CRC(5340820d) SHA1(e3494c7624b3cacbbb9a0a8cc9e1ed3e00326dfd) ) // 2732
-ROM_END
 
 
 ROM_START( vcc )
@@ -2306,11 +1726,6 @@ ROM_START( bridgec3 ) // model BV3 aka 7014, PCB label 510-1016 Rev.1
 ROM_END
 
 
-ROM_START( damesc ) // model DSC, PCB label 510-1030A01
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "101-1027a01", 0x0000, 0x2000, CRC(d86c985c) SHA1(20f923a24420050fd16e1172f5e889f144d17ac9) ) // MOS 2364
-ROM_END
-
 
 
 /******************************************************************************
@@ -2318,11 +1733,6 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME      PARENT  CMP MACHINE INPUT  CLASS           INIT        COMPANY                 FULLNAME, FLAGS
-CONS( 1978, cc10,     0,       0, ccx,    ccx,   ccx_state, empty_init, "Fidelity Electronics", "Chess Challenger 10 (model CCX, rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1979, cc7,      0,       0, bcc,    bcc,   bcc_state, empty_init, "Fidelity Electronics", "Chess Challenger 7 (model BCC, rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1979, backgamc, 0,       0, bkc,    bkc,   bcc_state, empty_init, "Fidelity Electronics", "Backgammon Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )
-
-CONS( 1980, fscc8,    0,       0, scc,    scc,   scc_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger 8", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 
 CONS( 1979, vcc,      0,       0, vcc,    vcc,   vcc_state, init_language<0>, "Fidelity Electronics", "Voice Chess Challenger (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1979, vccg,     vcc,     0, vcc,    vcc,   vcc_state, init_language<1>, "Fidelity Electronics", "Voice Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
@@ -2342,5 +1752,3 @@ CONS( 1980, vscfr,    vsc,     0, vsc,    vsc, vsc_state, init_language<3>, "Fid
 CONS( 1980, vbrc,     0,       0, vbrc,   vbrc,  card_state, empty_init, "Fidelity Electronics", "Voice Bridge Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )
 CONS( 1980, bridgeca, vbrc,    0, ubc,    vbrc,  card_state, empty_init, "Fidelity Electronics", "Advanced Bridge Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )
 CONS( 1982, bridgec3, 0,       0, bv3,    bv3,   card_state, empty_init, "Fidelity Electronics", "Bridge Challenger III", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )
-
-CONS( 1981, damesc,   0,       0, dsc,    dsc,   dsc_state, empty_init, "Fidelity Electronics", "Dame Sensory Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )

@@ -3,7 +3,7 @@
 // thanks-to:Berger,yoyo_chessboard
 /******************************************************************************
 
-Sensory 12 Chess Challenger (SC12-B, 6086)
+Fidelity Sensory 12 Chess Challenger (SC12-B, 6086)
 4 versions are known to exist: A,B,C, and X, with increasing CPU speed.
 ---------------------------------
 RE information from netlist by Berger

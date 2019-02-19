@@ -3,7 +3,7 @@
 // thanks-to:yoyo_chessboard
 /******************************************************************************
 
-Chesster (model 6120)
+Fidelity Chesster (model 6120)
 There is also a German version titled Kishon Chesster (model 6120G, or 6127)
 ----------------
 

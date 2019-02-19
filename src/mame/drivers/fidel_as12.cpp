@@ -3,7 +3,7 @@
 // thanks-to:yoyo_chessboard
 /******************************************************************************
 
-Elegance Chess Challenger (AS12)
+Fidelity Elegance Chess Challenger (AS12)
 ----------------
 R65C02P4 CPU @ 4MHz
 3*8KB ROM(TMM2764), 2*2KB RAM(HM6116)
@@ -170,7 +170,7 @@ void as12_state::as12(machine_config &config)
     ROM Definitions
 ******************************************************************************/
 
-ROM_START( feleg ) // model AS12(or 6085), PCB label 510-1084B01
+ROM_START( feleg ) // model AS12(or 6085)
 	ROM_REGION( 0x10000, "mainmap", 0 )
 	ROM_LOAD("feleg.1", 0x8000, 0x2000, CRC(e9df31e8) SHA1(31c52bb8f75580c82093eb950959c1bc294189a8) ) // TMM2764, no label
 	ROM_LOAD("feleg.2", 0xc000, 0x2000, CRC(bed9c84b) SHA1(c12f39765b054d2ad81f747e698715ad4246806d) ) // "

@@ -2132,8 +2132,11 @@ files {
 	MAME_DIR .. "src/mame/drivers/fidelbase.cpp",
 	MAME_DIR .. "src/mame/includes/fidelbase.h",
 	MAME_DIR .. "src/mame/drivers/fidel_as12.cpp",
+	MAME_DIR .. "src/mame/drivers/fidel_cc10.cpp",
+	MAME_DIR .. "src/mame/drivers/fidel_cc7.cpp",
 	MAME_DIR .. "src/mame/drivers/fidel_chesster.cpp",
 	MAME_DIR .. "src/mame/drivers/fidel_csc.cpp",
+	MAME_DIR .. "src/mame/drivers/fidel_dames.cpp",
 	MAME_DIR .. "src/mame/drivers/fidel_desdis.cpp",
 	MAME_DIR .. "src/mame/drivers/fidel_eag68k.cpp",
 	MAME_DIR .. "src/mame/drivers/fidel_elite.cpp",
@@ -2141,8 +2144,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/fidel_phantom.cpp",
 	MAME_DIR .. "src/mame/drivers/fidel_sc12.cpp",
 	MAME_DIR .. "src/mame/drivers/fidel_sc6.cpp",
+	MAME_DIR .. "src/mame/drivers/fidel_sc8.cpp",
 	MAME_DIR .. "src/mame/drivers/fidel_sc9.cpp",
-	MAME_DIR .. "src/mame/drivers/fidel_elite.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "force")

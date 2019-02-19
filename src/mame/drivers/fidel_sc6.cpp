@@ -3,7 +3,7 @@
 // thanks-to:yoyo_chessboard
 /******************************************************************************
 
-Sensory Chess Challenger 6 (model SC6):
+Fidelity Sensory Chess Challenger 6 (model SC6):
 - PCB label 510-1045B01
 - INS8040N-11 MCU, 11MHz XTAL
 - external 4KB ROM 2332 101-1035A01, in module slot
