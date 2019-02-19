@@ -242,6 +242,7 @@ fc100.cpp
 fccpu20.cpp
 fccpu30.cpp
 fidel_as12.cpp
+fidel_card.cpp
 fidel_cc10.cpp
 fidel_cc7.cpp
 fidel_chesster.cpp
@@ -256,6 +257,8 @@ fidel_sc12.cpp
 fidel_sc6.cpp
 fidel_sc8.cpp
 fidel_sc9.cpp
+fidel_vcc.cpp
+fidel_vsc.cpp
 fidelbase.cpp
 fk1.cpp
 fm7.cpp

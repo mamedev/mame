@@ -12852,6 +12852,11 @@ fgoala                          // MF  (c) 1979 Taito Corporation
 @source:fidel_as12.cpp
 feleg                           //
 
+@source:fidel_card.cpp
+bridgec3                        //
+bridgeca                        //
+vbrc                            //
+
 @source:fidel_cc10.cpp
 cc10                            //
 
@@ -12953,18 +12958,17 @@ fscc9b                          //
 fscc9c                          //
 fscc9ps                         //
 
-@source:fidelbase.cpp
-bridgec3                        //
-bridgeca                        //
+@source:fidel_vcc.cpp
 uvc                             // UVC: Advanced Voice Chess Challenger (English)
 uvcfr                           // * French
 uvcg                            // * German
 uvcsp                           // * Spanish
-vbrc                            //
 vcc                             // VCC: Voice Chess Challenger (English)
 vccfr                           // * German
 vccg                            // * Spanish
 vccsp                           // * French
+
+@source:fidel_vsc.cpp
 vsc                             // VSC: Voice Sensory Chess Challenger (English)
 vscfr                           // * French
 vscg                            // * German
