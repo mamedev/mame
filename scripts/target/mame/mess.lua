@@ -2400,6 +2400,12 @@ files {
 	MAME_DIR .. "src/mame/machine/jazz_mct_adr.h",
 }
 
+createMESSProjects(_target, _subtarget, "jensen")
+files {
+	MAME_DIR .. "src/mame/drivers/jensen.cpp",
+	MAME_DIR .. "src/mame/includes/jensen.h",
+}
+
 createMESSProjects(_target, _subtarget, "kaypro")
 files {
 	MAME_DIR .. "src/mame/drivers/kaypro.cpp",

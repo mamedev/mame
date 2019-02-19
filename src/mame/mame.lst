@@ -16142,6 +16142,11 @@ jclub2v220                      // v2.20      14 APR. 1998
 @source:jedi.cpp
 jedi                            // 136030           (c) 1984
 
+@source:jensen.cpp
+d2k300axp                       // DEC 2000 Model 300 AXP
+d2k500axp                       // DEC 2000 Model 500 AXP
+dpcaxp150                       // DECpc AXP 150
+
 @source:jeutel.cpp
 leking                          //
 olympic                         //
