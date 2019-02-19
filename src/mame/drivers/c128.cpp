@@ -452,7 +452,7 @@ uint8_t c128_state::read_memory(address_space &space, offs_t offset, offs_t vma,
 	int roml = BIT(plaout, PLA_OUT_ROML);
 	int romh = BIT(plaout, PLA_OUT_ROMH);
 
-	data = m_exp->cd_r(space, ca, data, sphi2, ba, roml, romh, io1, io2);
+	data = m_exp->cd_r(ca, data, sphi2, ba, roml, romh, io1, io2);
 
 	return m_mmu->read(offset, data);
 }
@@ -536,7 +536,7 @@ void c128_state::write_memory(address_space &space, offs_t offset, offs_t vma, u
 	int roml = BIT(plaout, PLA_OUT_ROML);
 	int romh = BIT(plaout, PLA_OUT_ROMH);
 
-	m_exp->cd_w(space, ca, data, sphi2, ba, roml, romh, io1, io2);
+	m_exp->cd_w(ca, data, sphi2, ba, roml, romh, io1, io2);
 
 	m_mmu->write(space, offset, data);
 }

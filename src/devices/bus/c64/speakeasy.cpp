@@ -69,7 +69,7 @@ void c64_speakeasy_cartridge_device::device_start()
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------
 
-uint8_t c64_speakeasy_cartridge_device::c64_cd_r(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+uint8_t c64_speakeasy_cartridge_device::c64_cd_r(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!io1)
 	{
@@ -84,11 +84,11 @@ uint8_t c64_speakeasy_cartridge_device::c64_cd_r(address_space &space, offs_t of
 //  c64_cd_w - cartridge data write
 //-------------------------------------------------
 
-void c64_speakeasy_cartridge_device::c64_cd_w(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+void c64_speakeasy_cartridge_device::c64_cd_w(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!io1)
 	{
-		m_votrax->write(space, 0, data & 0x3f);
-		m_votrax->inflection_w(space, 0, data >> 6);
+		m_votrax->write(machine().dummy_space(), 0, data & 0x3f);
+		m_votrax->inflection_w(machine().dummy_space(), 0, data >> 6);
 	}
 }

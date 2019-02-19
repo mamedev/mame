@@ -369,7 +369,7 @@ uint8_t c64_state::read_memory(address_space &space, offs_t offset, offs_t va, i
 
 	int roml = BIT(plaout, PLA_OUT_ROML);
 	int romh = BIT(plaout, PLA_OUT_ROMH);
-	return m_exp->cd_r(space, offset, data, sphi2, ba, roml, romh, io1, io2);
+	return m_exp->cd_r(offset, data, sphi2, ba, roml, romh, io1, io2);
 }
 
 
@@ -441,7 +441,7 @@ void c64_state::write_memory(address_space &space, offs_t offset, uint8_t data, 
 
 	int roml = BIT(plaout, PLA_OUT_ROML);
 	int romh = BIT(plaout, PLA_OUT_ROMH);
-	m_exp->cd_w(space, offset, data, sphi2, ba, roml, romh, io1, io2);
+	m_exp->cd_w(offset, data, sphi2, ba, roml, romh, io1, io2);
 }
 
 
