@@ -219,7 +219,7 @@ u8 vt100_state::printer_r(offs_t offset)
 
 void vt100_state::printer_w(offs_t offset, u8 data)
 {
-	m_printer_uart->ins8250_w(machine().dummy_space, offset >> 2, data);
+	m_printer_uart->ins8250_w(machine().dummy_space(), offset >> 2, data);
 }
 
 void vt100_state::vt102_io(address_map &map)
