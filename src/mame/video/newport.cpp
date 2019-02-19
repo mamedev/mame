@@ -40,7 +40,7 @@
 #define LOG_REJECTS		(1 << 8)
 #define LOG_ALL         (LOG_UNKNOWN | LOG_VC2 | LOG_CMAP0 | LOG_CMAP1 | LOG_XMAP0 | LOG_XMAP1 | LOG_REX3)
 
-#define VERBOSE (0)//(LOG_UNKNOWN | LOG_VC2 | LOG_CMAP0 | LOG_REX3 | LOG_COMMANDS | LOG_REJECTS)
+#define VERBOSE (0)//(LOG_UNKNOWN | LOG_VC2 | LOG_XMAP0 | LOG_CMAP0 | LOG_REX3 | LOG_COMMANDS | LOG_REJECTS)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(NEWPORT_VIDEO, newport_video_device, "newport_video", "SGI Newport graphics board")
@@ -275,7 +275,6 @@ uint32_t newport_video_device::screen_update(screen_device &device, bitmap_rgb32
 
 	const uint16_t cursor_msb = (uint16_t)m_xmap0.m_cursor_cmap << 5;
 	const uint16_t popup_msb = (uint16_t)m_xmap0.m_popup_cmap << 5;
-	const uint16_t ci_msb = (m_xmap0.m_mode_table[3] & 0xf8) << 5;
 
 	/* loop over rows and copy to the destination */
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
@@ -284,9 +283,26 @@ uint32_t newport_video_device::screen_update(screen_device &device, bitmap_rgb32
 		uint8_t *src_pup = &m_pup[1344 * y];
 		uint32_t *dest = &bitmap.pix32(y, cliprect.min_x);
 
+		m_vc2.m_did_frame_ptr = m_vc2.m_did_entry + (uint16_t)y;
+		m_vc2.m_did_line_ptr = m_vc2.m_ram[m_vc2.m_did_frame_ptr];
+
+		// Fetch the initial DID entry
+		uint16_t curr_did_entry = m_vc2.m_ram[m_vc2.m_did_line_ptr];
+		uint16_t ci_msb = (m_xmap0.m_mode_table[curr_did_entry & 0x1f] & 0xf8) << 5;
+
+		// Prepare for the next DID entry
+		m_vc2.m_did_line_ptr++;
+		curr_did_entry = m_vc2.m_ram[m_vc2.m_did_line_ptr];
+
 		/* loop over columns */
 		for (int x = cliprect.min_x; x < cliprect.max_x; x++)
 		{
+			if ((uint16_t)x == (curr_did_entry >> 5))
+			{
+				ci_msb = (m_xmap0.m_mode_table[curr_did_entry & 0x1f] & 0xf8) << 5;
+				m_vc2.m_did_line_ptr++;
+				curr_did_entry = m_vc2.m_ram[m_vc2.m_did_line_ptr];
+			}
 			uint8_t cursor_pixel = 0;
 			if (x >= (m_vc2.m_cursor_x - 31) && x <= m_vc2.m_cursor_x && y >= (m_vc2.m_cursor_y - 31) && y <= m_vc2.m_cursor_y && enable_cursor)
 			{
@@ -1279,13 +1295,25 @@ bool newport_video_device::pixel_clip_pass(int16_t x, int16_t y)
 			int16_t max_y = (int16_t)m_rex3.m_smask_y[bit] - 0x1000;
 
 			if (x < min_x)
+			{
+				LOGMASKED(LOG_REJECTS, "Skipping Mask %d because %04x,%04x is outside %04x,%04x to %04x,%04x (MinX)\n", bit, x, y, min_x, min_y, max_x, max_y);
 				continue;
+			}
 			if (x > max_x)
+			{
+				LOGMASKED(LOG_REJECTS, "Skipping Mask %d because %04x,%04x is outside %04x,%04x to %04x,%04x (MaxX)\n", bit, x, y, min_x, min_y, max_x, max_y);
 				continue;
+			}
 			if (y < min_y)
+			{
+				LOGMASKED(LOG_REJECTS, "Skipping Mask %d because %04x,%04x is outside %04x,%04x to %04x,%04x (MinY)\n", bit, x, y, min_x, min_y, max_x, max_y);
 				continue;
+			}
 			if (y > max_y)
+			{
+				LOGMASKED(LOG_REJECTS, "Skipping Mask %d because %04x,%04x is outside %04x,%04x to %04x,%04x (MaxY)\n", bit, x, y, min_x, min_y, max_x, max_y);
 				continue;
+			}
 			break;
 		}
 		if (bit == 5)
@@ -1295,7 +1323,7 @@ bool newport_video_device::pixel_clip_pass(int16_t x, int16_t y)
 		}
 	}
 
-	if (x < 0 || y < 0 || x >= 1280 || y >= 1024)
+	if (x < 0 || y < 0 || x >= (1280+64) || y >= 1024)
 	{
 		LOGMASKED(LOG_REJECTS, "Rejecting pixel at %d,%d due to VRAM clipping\n", x, y);
 		return false;
@@ -2477,6 +2505,11 @@ WRITE64_MEMBER(newport_video_device::rex3_w)
 			default:
 				LOGMASKED(LOG_REX3 | LOG_UNKNOWN, "REX3 Display Control Bus Data MSW Write: %08x\n", data32);
 				break;
+			}
+			if (BIT(m_rex3.m_dcb_mode, 3))
+			{
+				m_rex3.m_dcb_reg_select++;
+				m_rex3.m_dcb_reg_select &= 7;
 			}
 		}
 		if (ACCESSING_BITS_0_31)
