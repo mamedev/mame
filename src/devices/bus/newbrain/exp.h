@@ -75,11 +75,11 @@ public:
 	newbrain_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// computer interface
-	uint8_t mreq_r(address_space &space, offs_t offset, uint8_t data, bool &romov, int &exrm, bool &raminh);
-	void mreq_w(address_space &space, offs_t offset, uint8_t data, bool &romov, int &exrm, bool &raminh);
+	uint8_t mreq_r(offs_t offset, uint8_t data, bool &romov, int &exrm, bool &raminh);
+	void mreq_w(offs_t offset, uint8_t data, bool &romov, int &exrm, bool &raminh);
 
-	uint8_t iorq_r(address_space &space, offs_t offset, uint8_t data, bool &prtov);
-	void iorq_w(address_space &space, offs_t offset, uint8_t data, bool &prtov);
+	uint8_t iorq_r(offs_t offset, uint8_t data, bool &prtov);
+	void iorq_w(offs_t offset, uint8_t data, bool &prtov);
 
 protected:
 	// device-level overrides
@@ -97,12 +97,12 @@ class device_newbrain_expansion_slot_interface : public device_slot_card_interfa
 {
 public:
 	// memory access
-	virtual uint8_t mreq_r(address_space &space, offs_t offset, uint8_t data, bool &romov, int &exrm, bool &raminh) { return data; }
-	virtual void mreq_w(address_space &space, offs_t offset, uint8_t data, bool &romov, int &exrm, bool &raminh) { }
+	virtual uint8_t mreq_r(offs_t offset, uint8_t data, bool &romov, int &exrm, bool &raminh) { return data; }
+	virtual void mreq_w(offs_t offset, uint8_t data, bool &romov, int &exrm, bool &raminh) { }
 
 	// I/O access
-	virtual uint8_t iorq_r(address_space &space, offs_t offset, uint8_t data, bool &prtov) { return data; }
-	virtual void iorq_w(address_space &space, offs_t offset, uint8_t data, bool &prtov) { }
+	virtual uint8_t iorq_r(offs_t offset, uint8_t data, bool &prtov) { return data; }
+	virtual void iorq_w(offs_t offset, uint8_t data, bool &prtov) { }
 
 protected:
 	// construction/destruction
