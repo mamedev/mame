@@ -459,7 +459,7 @@ WRITE8_MEMBER(peplus_state::crtc_display_w)
 	m_bg_tilemap->mark_tile_dirty(m_vid_address);
 
 	/* An access here triggers a device read !*/
-	m_crtc->register_r(space, 0);
+	m_crtc->register_r();
 }
 
 WRITE8_MEMBER(peplus_state::duart_w)

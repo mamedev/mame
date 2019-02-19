@@ -241,7 +241,7 @@ uint8_t a2bus_videx80_device::read_c0nx(uint8_t offset)
 
 	if (offset == 1)
 	{
-		return m_crtc->read_register();   // status_r?
+		return m_crtc->register_r();   // status_r?
 	}
 
 	return 0xff;
@@ -256,11 +256,11 @@ void a2bus_videx80_device::write_c0nx(uint8_t offset, uint8_t data)
 {
 	if (offset == 0)
 	{
-		m_crtc->write_address(data);
+		m_crtc->address_w(data);
 	}
 	else if (offset == 1)
 	{
-		m_crtc->write_register(data);
+		m_crtc->register_w(data);
 	}
 
 	m_rambank = ((offset>>2) & 3) * 512;

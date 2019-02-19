@@ -624,19 +624,19 @@ void avt_state::avt_palette(palette_device &palette) const
 WRITE8_MEMBER( avt_state::avt_6845_address_w )
 {
 	m_crtc_index = data;
-	m_crtc->address_w(space, offset, data);
+	m_crtc->address_w(data);
 }
 
 WRITE8_MEMBER( avt_state::avt_6845_data_w )
 {
 	m_crtc_vreg[m_crtc_index] = data;
-	m_crtc->register_w(space, offset, data);
+	m_crtc->register_w(data);
 }
 
 READ8_MEMBER( avt_state::avt_6845_data_r )
 {
 	//m_crtc_vreg[m_crtc_index] = data;
-	return m_crtc->register_r(space, offset);
+	return m_crtc->register_r();
 }
 
 /*********************************************

@@ -131,8 +131,8 @@ public:
 
 	inline void check_interrupts();
 	int read_pla(offs_t offset, offs_t ca, offs_t vma, int ba, int rw, int aec, int z80io, int ms3, int ms2, int ms1, int ms0);
-	uint8_t read_memory(address_space &space, offs_t offset, offs_t vma, int ba, int aec, int z80io);
-	void write_memory(address_space &space, offs_t offset, offs_t vma, uint8_t data, int ba, int aec, int z80io);
+	uint8_t read_memory(offs_t offset, offs_t vma, int ba, int aec, int z80io);
+	void write_memory(offs_t offset, offs_t vma, uint8_t data, int ba, int aec, int z80io);
 	inline void update_iec();
 
 	DECLARE_READ8_MEMBER( z80_r );
@@ -335,7 +335,7 @@ int c128_state::read_pla(offs_t offset, offs_t ca, offs_t vma, int ba, int rw, i
 //  read_memory -
 //-------------------------------------------------
 
-uint8_t c128_state::read_memory(address_space &space, offs_t offset, offs_t vma, int ba, int aec, int z80io)
+uint8_t c128_state::read_memory(offs_t offset, offs_t vma, int ba, int aec, int z80io)
 {
 	int rw = 1, ms0 = 1, ms1 = 1, ms2 = 1, ms3 = 1, cas0 = 1, cas1 = 1;
 	int io1 = 1, io2 = 1;
@@ -423,11 +423,11 @@ uint8_t c128_state::read_memory(address_space &space, offs_t offset, offs_t vma,
 		case 2: // CS8563
 			if (BIT(offset, 0))
 			{
-				data = m_vdc->register_r(space, 0);
+				data = m_vdc->register_r();
 			}
 			else
 			{
-				data = m_vdc->status_r(space, 0);
+				data = m_vdc->status_r();
 			}
 			break;
 
@@ -462,7 +462,7 @@ uint8_t c128_state::read_memory(address_space &space, offs_t offset, offs_t vma,
 //  write_memory -
 //-------------------------------------------------
 
-void c128_state::write_memory(address_space &space, offs_t offset, offs_t vma, uint8_t data, int ba, int aec, int z80io)
+void c128_state::write_memory(offs_t offset, offs_t vma, uint8_t data, int ba, int aec, int z80io)
 {
 	int rw = 0, ms0 = 1, ms1 = 1, ms2 = 1, ms3 = 1, cas0 = 1, cas1 = 1;
 	int io1 = 1, io2 = 1;
@@ -507,11 +507,11 @@ void c128_state::write_memory(address_space &space, offs_t offset, offs_t vma, u
 		case 2: // CS8563
 			if (BIT(offset, 0))
 			{
-				m_vdc->register_w(space, 0, data);
+				m_vdc->register_w(data);
 			}
 			else
 			{
-				m_vdc->address_w(space, 0, data);
+				m_vdc->address_w(data);
 			}
 			break;
 
@@ -538,7 +538,7 @@ void c128_state::write_memory(address_space &space, offs_t offset, offs_t vma, u
 
 	m_exp->cd_w(ca, data, sphi2, ba, roml, romh, io1, io2);
 
-	m_mmu->write(space, offset, data);
+	m_mmu->write(offset, data);
 }
 
 
@@ -551,7 +551,7 @@ READ8_MEMBER( c128_state::z80_r )
 	int ba = 1, aec = 1, z80io = 1;
 	offs_t vma = 0;
 
-	return read_memory(space, offset, vma, ba, aec, z80io);
+	return read_memory(offset, vma, ba, aec, z80io);
 }
 
 
@@ -564,7 +564,7 @@ WRITE8_MEMBER( c128_state::z80_w )
 	int ba = 1, aec = 1, z80io = 1;
 	offs_t vma = 0;
 
-	write_memory(space, offset, vma, data, ba, aec, z80io);
+	write_memory(offset, vma, data, ba, aec, z80io);
 }
 
 
@@ -577,7 +577,7 @@ READ8_MEMBER( c128_state::z80_io_r )
 	int ba = 1, aec = 1, z80io = 0;
 	offs_t vma = 0;
 
-	return read_memory(space, offset, vma, ba, aec, z80io);
+	return read_memory(offset, vma, ba, aec, z80io);
 }
 
 
@@ -590,7 +590,7 @@ WRITE8_MEMBER( c128_state::z80_io_w )
 	int ba = 1, aec = 1, z80io = 0;
 	offs_t vma = 0;
 
-	write_memory(space, offset, vma, data, ba, aec, z80io);
+	write_memory(offset, vma, data, ba, aec, z80io);
 }
 
 
@@ -603,7 +603,7 @@ READ8_MEMBER( c128_state::read )
 	int ba = 1, aec = 1, z80io = 1;
 	offs_t vma = 0;
 
-	return read_memory(space, offset, vma, ba, aec, z80io);
+	return read_memory(offset, vma, ba, aec, z80io);
 }
 
 
@@ -616,7 +616,7 @@ WRITE8_MEMBER( c128_state::write )
 	int ba = 1, aec = 1, z80io = 1;
 	offs_t vma = 0;
 
-	write_memory(space, offset, vma, data, ba, aec, z80io);
+	write_memory(offset, vma, data, ba, aec, z80io);
 }
 
 
@@ -628,7 +628,7 @@ READ8_MEMBER( c128_state::vic_videoram_r )
 {
 	int ba = 0, aec = 0, z80io = 1;
 
-	return read_memory(space, 0, offset, ba, aec, z80io);
+	return read_memory(0, offset, ba, aec, z80io);
 }
 
 
@@ -1512,7 +1512,7 @@ READ8_MEMBER( c128_state::exp_dma_cd_r )
 	int ba = 0, aec = 1, z80io = 1;
 	offs_t vma = 0;
 
-	return read_memory(space, offset, vma, ba, aec, z80io);
+	return read_memory(offset, vma, ba, aec, z80io);
 }
 
 WRITE8_MEMBER( c128_state::exp_dma_cd_w )
@@ -1520,7 +1520,7 @@ WRITE8_MEMBER( c128_state::exp_dma_cd_w )
 	int ba = 0, aec = 1, z80io = 1;
 	offs_t vma = 0;
 
-	return write_memory(space, offset, data, vma, ba, aec, z80io);
+	return write_memory(offset, data, vma, ba, aec, z80io);
 }
 
 WRITE_LINE_MEMBER( c128_state::exp_dma_w )

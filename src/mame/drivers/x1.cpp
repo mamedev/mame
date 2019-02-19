@@ -1069,12 +1069,12 @@ WRITE8_MEMBER( x1_state::x1_6845_w )
 	if(offset == 0)
 	{
 		m_crtc_index = data & 31;
-		m_crtc->address_w(space, offset, data);
+		m_crtc->address_w(data);
 	}
 	else
 	{
 		m_crtc_vreg[m_crtc_index] = data;
-		m_crtc->register_w(space, offset, data);
+		m_crtc->register_w(data);
 	}
 }
 

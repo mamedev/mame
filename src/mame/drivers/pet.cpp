@@ -607,7 +607,7 @@ READ8_MEMBER( pet_state::read )
 			}
 			if (m_crtc && BIT(offset, 7) && BIT(offset, 0))
 			{
-				data &= m_crtc->register_r(space, 0);
+				data &= m_crtc->register_r();
 			}
 		}
 		else if (norom)
@@ -666,11 +666,11 @@ WRITE8_MEMBER( pet_state::write )
 			{
 				if (BIT(offset, 0))
 				{
-					m_crtc->register_w(space, 0, data);
+					m_crtc->register_w(data);
 				}
 				else
 				{
-					m_crtc->address_w(space, 0, data);
+					m_crtc->address_w(data);
 				}
 			}
 		}
@@ -825,7 +825,7 @@ READ8_MEMBER( cbm8296_state::read )
 		}
 		if (BIT(offset, 7) && BIT(offset, 0))
 		{
-			data &= m_crtc->register_r(space, 0);
+			data &= m_crtc->register_r();
 		}
 	}
 
@@ -882,11 +882,11 @@ WRITE8_MEMBER( cbm8296_state::write )
 		{
 			if (BIT(offset, 0))
 			{
-				m_crtc->register_w(space, 0, data);
+				m_crtc->register_w(data);
 			}
 			else
 			{
-				m_crtc->address_w(space, 0, data);
+				m_crtc->address_w(data);
 			}
 		}
 	}

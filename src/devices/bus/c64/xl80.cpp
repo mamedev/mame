@@ -192,7 +192,7 @@ uint8_t c64_xl80_device::c64_cd_r(offs_t offset, uint8_t data, int sphi2, int ba
 	{
 		if (offset & 0x01)
 		{
-			data = m_crtc->register_r(machine().dummy_space(), 0);
+			data = m_crtc->register_r();
 		}
 	}
 	else if (offset >= 0x8000 && offset < 0x9000)
@@ -222,11 +222,11 @@ void c64_xl80_device::c64_cd_w(offs_t offset, uint8_t data, int sphi2, int ba, i
 	{
 		if (offset & 0x01)
 		{
-			m_crtc->register_w(machine().dummy_space(), 0, data);
+			m_crtc->register_w(data);
 		}
 		else
 		{
-			m_crtc->address_w(machine().dummy_space(), 0, data);
+			m_crtc->address_w(data);
 		}
 	}
 }

@@ -78,8 +78,8 @@ void nascom_avc_device::device_start()
 
 void nascom_avc_device::device_reset()
 {
-	io_space().install_write_handler(0xb0, 0xb0, write8_delegate(FUNC(mc6845_device::address_w), m_crtc.target()));
-	io_space().install_readwrite_handler(0xb1, 0xb1, read8_delegate(FUNC(mc6845_device::register_r), m_crtc.target()), write8_delegate(FUNC(mc6845_device::register_w), m_crtc.target()));
+	io_space().install_write_handler(0xb0, 0xb0, write8smo_delegate(FUNC(mc6845_device::address_w), m_crtc.target()));
+	io_space().install_readwrite_handler(0xb1, 0xb1, read8smo_delegate(FUNC(mc6845_device::register_r), m_crtc.target()), write8smo_delegate(FUNC(mc6845_device::register_w), m_crtc.target()));
 	io_space().install_write_handler(0xb2, 0xb2, write8_delegate(FUNC(nascom_avc_device::control_w), this));
 }
 

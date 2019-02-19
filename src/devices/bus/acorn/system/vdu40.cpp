@@ -82,8 +82,8 @@ void acorn_vdu40_device::device_reset()
 	address_space &space = m_bus->memspace();
 
 	space.install_ram(0x0400, 0x07ff, m_videoram.get());
-	space.install_readwrite_handler(0x0800, 0x0800, read8_delegate(FUNC(mc6845_device::status_r), m_crtc.target()), write8_delegate(FUNC(mc6845_device::address_w), m_crtc.target()));
-	space.install_readwrite_handler(0x0801, 0x0801, read8_delegate(FUNC(mc6845_device::register_r), m_crtc.target()), write8_delegate(FUNC(mc6845_device::register_w), m_crtc.target()));
+	space.install_readwrite_handler(0x0800, 0x0800, read8smo_delegate(FUNC(mc6845_device::status_r), m_crtc.target()), write8smo_delegate(FUNC(mc6845_device::address_w), m_crtc.target()));
+	space.install_readwrite_handler(0x0801, 0x0801, read8smo_delegate(FUNC(mc6845_device::register_r), m_crtc.target()), write8smo_delegate(FUNC(mc6845_device::register_w), m_crtc.target()));
 }
 
 

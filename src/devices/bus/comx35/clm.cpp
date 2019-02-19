@@ -229,7 +229,7 @@ uint8_t comx_clm_device::comx_mrd_r(offs_t offset, int *extrom)
 	}
 	else if (offset == 0xd801)
 	{
-		data = m_crtc->register_r(machine().dummy_space(), 0);
+		data = m_crtc->register_r();
 	}
 
 	return data;
@@ -248,10 +248,10 @@ void comx_clm_device::comx_mwr_w(offs_t offset, uint8_t data)
 	}
 	else if (offset == 0xd800)
 	{
-		m_crtc->address_w(machine().dummy_space(), 0, data);
+		m_crtc->address_w(data);
 	}
 	else if (offset == 0xd801)
 	{
-		m_crtc->register_w(machine().dummy_space(), 0, data);
+		m_crtc->register_w(data);
 	}
 }

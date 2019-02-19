@@ -221,7 +221,7 @@ uint8_t vic20_video_pak_device::vic20_cd_r(offs_t offset, uint8_t data, int ram1
 	{
 		if (offset == 0x1bf9)
 		{
-			data = m_crtc->register_r(machine().dummy_space(), 0);
+			data = m_crtc->register_r();
 		}
 	}
 
@@ -293,11 +293,11 @@ void vic20_video_pak_device::vic20_cd_w(offs_t offset, uint8_t data, int ram1, i
 		switch (offset)
 		{
 		case 0x1bf8:
-			m_crtc->address_w(machine().dummy_space(), 0, data);
+			m_crtc->address_w(data);
 			break;
 
 		case 0x1bf9:
-			m_crtc->register_w(machine().dummy_space(), 0, data);
+			m_crtc->register_w(data);
 			break;
 
 		case 0x1bfc:

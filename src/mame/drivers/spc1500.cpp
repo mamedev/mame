@@ -410,12 +410,12 @@ WRITE8_MEMBER( spc1500_state::crtc_w)
 	if((offset & 1) == 0)
 	{
 		m_crtc_index = data & 0x1f;
-		m_vdg->address_w(space, 0, data);
+		m_vdg->address_w(data);
 	}
 	else
 	{
 		m_crtc_vreg[m_crtc_index] = data;
-		m_vdg->register_w(space, 0, data);
+		m_vdg->register_w(data);
 	}
 }
 
@@ -423,7 +423,7 @@ READ8_MEMBER( spc1500_state::crtc_r)
 {
 	if (offset & 1)
 	{
-		return m_vdg->register_r(space, 0);
+		return m_vdg->register_r();
 	}
 	return 0;
 }

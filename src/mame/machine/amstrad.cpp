@@ -1867,9 +1867,9 @@ READ8_MEMBER(amstrad_state::amstrad_cpc_io_r)
 		{
 		case 0x02:
 			// CRTC Type 1 (UM6845R) only!!
-			//data = m_crtc->status_r( space, 0 );
+			//data = m_crtc->status_r();
 			if ( m_system_type == SYSTEM_PLUS || m_system_type == SYSTEM_GX4000 )  // All Plus systems are Type 3 (AMS40489)
-				data = m_crtc->register_r( space, 0 );
+				data = m_crtc->register_r();
 			else
 				data = 0xff;  // Type 0 (HD6845S/UM6845) and Type 2 (MC6845) return 0xff
 #if 0
@@ -1890,7 +1890,7 @@ READ8_MEMBER(amstrad_state::amstrad_cpc_io_r)
 			break;
 		case 0x03:
 			/* All CRTC type : Read from selected internal 6845 register Read only */
-			data = m_crtc->register_r( space, 0 );
+			data = m_crtc->register_r();
 			break;
 		}
 	}
@@ -2043,7 +2043,7 @@ WRITE8_MEMBER(amstrad_state::amstrad_cpc_io_w)
 		switch ((offset & 0x0300) >> 8) // r1r0
 		{
 		case 0x00:      /* Select internal 6845 register Write Only */
-			m_crtc->address_w( space, 0, data );
+			m_crtc->address_w(data);
 			if ( m_system_type == SYSTEM_PLUS || m_system_type == SYSTEM_GX4000 )
 				amstrad_plus_seqcheck(data);
 
@@ -2058,7 +2058,7 @@ WRITE8_MEMBER(amstrad_state::amstrad_cpc_io_w)
 				timer_set(attotime::from_usec(0), TIMER_VIDEO_UPDATE, 1);
 			else
 				timer_set(attotime::from_usec(0), TIMER_VIDEO_UPDATE, 0);
-			m_crtc->register_w( space, 0, data );
+			m_crtc->register_w(data);
 
 			/* printer port bit 8 */
 			if (m_printer_bit8_selected && m_system_type == SYSTEM_PLUS)
@@ -2196,7 +2196,6 @@ The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which
 /* load CPCEMU style snapshots */
 void amstrad_state::amstrad_handle_snapshot(unsigned char *pSnapshot)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int RegData;
 	int i;
 
@@ -2284,11 +2283,11 @@ void amstrad_state::amstrad_handle_snapshot(unsigned char *pSnapshot)
 	/* init CRTC */
 	for (i=0; i<18; i++)
 	{
-		m_crtc->address_w( space, 0, i );
-		m_crtc->register_w( space, 0, pSnapshot[0x043+i] & 0xff );
+		m_crtc->address_w(i);
+		m_crtc->register_w(pSnapshot[0x043+i] & 0xff);
 	}
 
-	m_crtc->address_w( space, 0, i );
+	m_crtc->address_w(i);
 
 	/* upper rom selection */
 	m_gate_array.upper_bank = pSnapshot[0x055];

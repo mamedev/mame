@@ -203,7 +203,7 @@ WRITE8_MEMBER( v6809_state::videoram_w )
 
 WRITE8_MEMBER( v6809_state::v6809_address_w )
 {
-	m_crtc->address_w( space, 0, data );
+	m_crtc->address_w(data);
 
 	m_video_index = data & 0x1f;
 
@@ -215,7 +215,7 @@ WRITE8_MEMBER( v6809_state::v6809_register_w )
 {
 	uint16_t temp = m_video_address;
 
-	m_crtc->register_w( space, 0, data );
+	m_crtc->register_w(data);
 
 	// Get transparent address
 	if (m_video_index == 18)

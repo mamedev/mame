@@ -535,7 +535,7 @@ WRITE8_MEMBER( pasopia7_state::pasopia7_6845_w )
 	if(offset == 0)
 	{
 		m_addr_latch = data;
-		m_crtc->address_w(space, offset, data);
+		m_crtc->address_w(data);
 	}
 	else
 	{
@@ -547,7 +547,7 @@ WRITE8_MEMBER( pasopia7_state::pasopia7_6845_w )
 		else if(m_addr_latch == 0x0f)
 			m_cursor_addr = (m_cursor_addr & 0x3f00) | (data & 0xff);
 
-		m_crtc->register_w(space, offset, data);
+		m_crtc->register_w(data);
 
 		/* double pump the pixel clock if we are in 640 x 200 mode */
 		if(m_screen_type == 1) // raster

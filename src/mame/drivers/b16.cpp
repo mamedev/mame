@@ -142,13 +142,13 @@ READ16_MEMBER( b16_state::vblank_r )
 WRITE8_MEMBER( b16_state::b16_6845_address_w )
 {
 	m_crtc_index = data;
-	m_mc6845->address_w(space,offset, data);
+	m_mc6845->address_w(data);
 }
 
 WRITE8_MEMBER( b16_state::b16_6845_data_w )
 {
 	m_crtc_vreg[m_crtc_index] = data;
-	m_mc6845->register_w(space, offset, data);
+	m_mc6845->register_w(data);
 }
 
 /*

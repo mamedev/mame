@@ -521,11 +521,11 @@ READ8_MEMBER( cbm2_state::read )
 		{
 			if (A0)
 			{
-				data = m_crtc->register_r(space, 0);
+				data = m_crtc->register_r();
 			}
 			else
 			{
-				data = m_crtc->status_r(space, 0);
+				data = m_crtc->status_r();
 			}
 		}
 		if (!sidcs)
@@ -614,11 +614,11 @@ WRITE8_MEMBER( cbm2_state::write )
 		{
 			if (A0)
 			{
-				m_crtc->register_w(space, 0, data);
+				m_crtc->register_w(data);
 			}
 			else
 			{
-				m_crtc->address_w(space, 0, data);
+				m_crtc->address_w(data);
 			}
 		}
 		if (!sidcs)
