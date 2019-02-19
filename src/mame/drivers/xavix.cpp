@@ -1544,6 +1544,7 @@ void xavix_cart_state::xavix_cart_ekara(machine_config &config)
 	SOFTWARE_LIST(config, "cart_list_japan_web").set_original("ekara_japan_web");
 	SOFTWARE_LIST(config, "cart_list_japan_a").set_original("ekara_japan_a");
 	SOFTWARE_LIST(config, "cart_list_japan_gk").set_original("ekara_japan_gk");
+	SOFTWARE_LIST(config, "cart_list_japan_bh").set_original("ekara_japan_bh");
 	SOFTWARE_LIST(config, "cart_list_jpopira_jp").set_original("jpopira_jp"); // NOTE, these are for Jumping Popira only, they don't work with the karaoke or regular popira units
 }
 
