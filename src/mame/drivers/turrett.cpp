@@ -373,7 +373,7 @@ void turrett_state::turrett(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	turrett_device &ttsound(TURRETT(config, "ttsound", R3041_CLOCK)); // ?
-	ttsound.set_addrmap(0, turrett_sound_map);
+	ttsound.set_addrmap(0, &turrett_state::turrett_sound_map);
 	ttsound.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	ttsound.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 }
