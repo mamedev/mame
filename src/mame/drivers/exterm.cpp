@@ -418,7 +418,6 @@ void exterm_state::exterm(machine_config &config)
 	AD7528(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // ad7528j.e2
 	AD7528(config, "dacvol", 0).add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT).add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT); // ad7528j.e2
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.set_output(5.0);
 	vref.add_route(0, "dacvol", 1.0, DAC_VREF_POS_INPUT);
 
 	YM2151(config, m_ym2151, 4000000).add_route(ALL_OUTPUTS, "speaker", 1.0);

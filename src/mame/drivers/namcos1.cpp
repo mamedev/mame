@@ -1076,7 +1076,6 @@ void namcos1_state::ns1(machine_config &config)
 	m_dac[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
 
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac0", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac0", -1.0, DAC_VREF_NEG_INPUT);
 	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT);

@@ -588,7 +588,7 @@ void sbrkout_state::sbrkout(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
-	VOLTAGE_REGULATOR(config, "vref").set_output(5.0).add_route(0, m_dac, 1.0, DAC_VREF_POS_INPUT);
+	VOLTAGE_REGULATOR(config, "vref").add_route(0, m_dac, 1.0, DAC_VREF_POS_INPUT);
 }
 
 

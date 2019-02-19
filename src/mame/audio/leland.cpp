@@ -163,7 +163,6 @@ void leland_80186_sound_device::device_add_mconfig(machine_config &config)
 	m_dacvol[5]->add_route(0, "dac6", -1.0, DAC_VREF_NEG_INPUT);
 
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac1vol", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac2vol", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac3vol", 1.0, DAC_VREF_POS_INPUT);
@@ -224,7 +223,6 @@ void redline_80186_sound_device::device_add_mconfig(machine_config &config)
 	m_dacvol[7]->add_route(0, "dac8", -1.0, DAC_VREF_NEG_INPUT); // unknown DAC
 
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac1vol", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac2vol", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac3vol", 1.0, DAC_VREF_POS_INPUT);
@@ -284,7 +282,6 @@ void ataxx_80186_sound_device::device_add_mconfig(machine_config &config)
 	m_dacvol[3]->add_route(0, "dac4", -1.0, DAC_VREF_NEG_INPUT);
 
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac1vol", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac2vol", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac3vol", 1.0, DAC_VREF_POS_INPUT);
@@ -330,7 +327,6 @@ void wsf_80186_sound_device::device_add_mconfig(machine_config &config)
 	m_dacvol[3]->add_route(0, "dac4", -1.0, DAC_VREF_NEG_INPUT); // unknown DAC
 
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac1vol", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac2vol", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac3vol", 1.0, DAC_VREF_POS_INPUT);
