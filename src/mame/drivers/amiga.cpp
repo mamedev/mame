@@ -617,7 +617,7 @@ WRITE16_MEMBER( a500p_state::clock_w )
 READ8_MEMBER( cdtv_state::dmac_scsi_data_read )
 {
 	if (offset >= 0xb0 && offset <= 0xbf)
-		return m_tpi->read(space, offset);
+		return m_tpi->read(offset);
 
 	return 0xff;
 }
@@ -625,7 +625,7 @@ READ8_MEMBER( cdtv_state::dmac_scsi_data_read )
 WRITE8_MEMBER( cdtv_state::dmac_scsi_data_write )
 {
 	if (offset >= 0xb0 && offset <= 0xbf)
-		m_tpi->write(space, offset, data);
+		m_tpi->write(offset, data);
 }
 
 READ8_MEMBER( cdtv_state::dmac_io_read )
@@ -1160,7 +1160,7 @@ WRITE8_MEMBER( cd32_state::akiko_cia_0_port_a_write )
 	// bit 1, power led
 	m_power_led = BIT(~data, 1);
 
-	handle_joystick_cia(data, m_cia_0->read(space, 2));
+	handle_joystick_cia(data, m_cia_0->read(2));
 }
 
 

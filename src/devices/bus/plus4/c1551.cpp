@@ -57,7 +57,7 @@ const tiny_rom_entry *c1551_device::device_rom_region() const
 //  M6510_INTERFACE( cpu_intf )
 //-------------------------------------------------
 
-READ8_MEMBER( c1551_device::port_r )
+uint8_t c1551_device::port_r()
 {
 	/*
 
@@ -85,7 +85,7 @@ READ8_MEMBER( c1551_device::port_r )
 	return data;
 }
 
-WRITE8_MEMBER( c1551_device::port_w )
+void c1551_device::port_w(uint8_t data)
 {
 	/*
 
@@ -120,7 +120,7 @@ WRITE8_MEMBER( c1551_device::port_w )
 //  tpi6525_interface tpi0_intf
 //-------------------------------------------------
 
-READ8_MEMBER( c1551_device::tcbm_data_r )
+uint8_t c1551_device::tcbm_data_r()
 {
 	/*
 
@@ -140,7 +140,7 @@ READ8_MEMBER( c1551_device::tcbm_data_r )
 	return m_tcbm_data;
 }
 
-WRITE8_MEMBER( c1551_device::tcbm_data_w )
+void c1551_device::tcbm_data_w(uint8_t data)
 {
 	/*
 
@@ -160,9 +160,9 @@ WRITE8_MEMBER( c1551_device::tcbm_data_w )
 	m_tcbm_data = data;
 }
 
-READ8_MEMBER( c1551_device::tpi0_r )
+uint8_t c1551_device::tpi0_r(offs_t offset)
 {
-	uint8_t data = m_tpi0->read(space, offset);
+	uint8_t data = m_tpi0->read(offset);
 
 	m_ga->ted_w(0);
 	m_ga->ted_w(1);
@@ -170,15 +170,15 @@ READ8_MEMBER( c1551_device::tpi0_r )
 	return data;
 }
 
-WRITE8_MEMBER( c1551_device::tpi0_w )
+void c1551_device::tpi0_w(offs_t offset, uint8_t data)
 {
-	m_tpi0->write(space, offset, data);
+	m_tpi0->write(offset, data);
 
 	m_ga->ted_w(0);
 	m_ga->ted_w(1);
 }
 
-READ8_MEMBER( c1551_device::tpi0_pc_r )
+uint8_t c1551_device::tpi0_pc_r()
 {
 	/*
 
@@ -209,7 +209,7 @@ READ8_MEMBER( c1551_device::tpi0_pc_r )
 	return data;
 }
 
-WRITE8_MEMBER( c1551_device::tpi0_pc_w )
+void c1551_device::tpi0_pc_w(uint8_t data)
 {
 	/*
 
@@ -243,7 +243,7 @@ WRITE8_MEMBER( c1551_device::tpi0_pc_w )
 //  tpi6525_interface tpi1_intf
 //-------------------------------------------------
 
-READ8_MEMBER( c1551_device::tpi1_pb_r )
+uint8_t c1551_device::tpi1_pb_r()
 {
 	/*
 
@@ -263,7 +263,7 @@ READ8_MEMBER( c1551_device::tpi1_pb_r )
 	return m_status & 0x03;
 }
 
-READ8_MEMBER( c1551_device::tpi1_pc_r )
+uint8_t c1551_device::tpi1_pc_r()
 {
 	/*
 
@@ -288,7 +288,7 @@ READ8_MEMBER( c1551_device::tpi1_pc_r )
 	return data;
 }
 
-WRITE8_MEMBER( c1551_device::tpi1_pc_w )
+void c1551_device::tpi1_pc_w(uint8_t data)
 {
 	/*
 
@@ -530,7 +530,7 @@ uint8_t c1551_device::plus4_cd_r(offs_t offset, uint8_t data, int ba, int cs0, i
 
 	if (tpi1_selected(offset))
 	{
-		data = m_tpi1->read(machine().dummy_space(), offset & 0x07);
+		data = m_tpi1->read(offset & 0x07);
 	}
 
 	return data;
@@ -545,7 +545,7 @@ void c1551_device::plus4_cd_w(offs_t offset, uint8_t data, int ba, int cs0, int 
 {
 	if (tpi1_selected(offset))
 	{
-		m_tpi1->write(machine().dummy_space(), offset & 0x07, data);
+		m_tpi1->write(offset & 0x07, data);
 	}
 
 	m_exp->cd_w(offset, data, ba, cs0, c1l, c2l, cs1, c1h, c2h);

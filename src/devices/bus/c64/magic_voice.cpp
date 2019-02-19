@@ -308,7 +308,7 @@ uint8_t c64_magic_voice_cartridge_device::c64_cd_r(address_space &space, offs_t 
 	if (!io2 && sphi2)
 	{
 		m_ca = offset;
-		data = m_tpi->read(space, offset & 0x07);
+		data = m_tpi->read(offset & 0x07);
 	}
 
 	if (PB6 && A13 && A15)
@@ -333,7 +333,7 @@ void c64_magic_voice_cartridge_device::c64_cd_w(address_space &space, offs_t off
 {
 	if (!io2 && sphi2)
 	{
-		m_tpi->write(space, offset & 0x07, data);
+		m_tpi->write(offset & 0x07, data);
 	}
 
 	int roml2 = !(!roml || (roml && !PB5 && A12 && A13 && !A14 && A15));

@@ -212,7 +212,7 @@ uint8_t c64_ieee488_device::c64_cd_r(address_space &space, offs_t offset, uint8_
 	}
 	else if (!io2)
 	{
-		data = m_tpi->read(space, offset & 0x07);
+		data = m_tpi->read(offset & 0x07);
 	}
 
 	return data;
@@ -227,7 +227,7 @@ void c64_ieee488_device::c64_cd_w(address_space &space, offs_t offset, uint8_t d
 {
 	if (!io2)
 	{
-		m_tpi->write(space, offset & 0x07, data);
+		m_tpi->write(offset & 0x07, data);
 	}
 
 	m_exp->cd_w(space, offset, data, sphi2, ba, roml, romh, io1, io2);

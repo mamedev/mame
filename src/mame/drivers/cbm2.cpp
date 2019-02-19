@@ -534,11 +534,11 @@ READ8_MEMBER( cbm2_state::read )
 		}
 		if (!extprtcs && m_ext_cia)
 		{
-			data = m_ext_cia->read(space, offset & 0x0f);
+			data = m_ext_cia->read(offset & 0x0f);
 		}
 		if (!ciacs)
 		{
-			data = m_cia->read(space, offset & 0x0f);
+			data = m_cia->read(offset & 0x0f);
 		}
 		if (!aciacs)
 		{
@@ -546,11 +546,11 @@ READ8_MEMBER( cbm2_state::read )
 		}
 		if (!tript1cs)
 		{
-			data = m_tpi1->read(space, offset & 0x07);
+			data = m_tpi1->read(offset & 0x07);
 		}
 		if (!tript2cs)
 		{
-			data = m_tpi2->read(space, offset & 0x07);
+			data = m_tpi2->read(offset & 0x07);
 		}
 
 		data = m_exp->read(space, offset & 0x1fff, data, csbank1, csbank2, csbank3);
@@ -627,11 +627,11 @@ WRITE8_MEMBER( cbm2_state::write )
 		}
 		if (!extprtcs && m_ext_cia)
 		{
-			m_ext_cia->write(space, offset & 0x0f, data);
+			m_ext_cia->write(offset & 0x0f, data);
 		}
 		if (!ciacs)
 		{
-			m_cia->write(space, offset & 0x0f, data);
+			m_cia->write(offset & 0x0f, data);
 		}
 		if (!aciacs)
 		{
@@ -639,11 +639,11 @@ WRITE8_MEMBER( cbm2_state::write )
 		}
 		if (!tript1cs)
 		{
-			m_tpi1->write(space, offset & 0x07, data);
+			m_tpi1->write(offset & 0x07, data);
 		}
 		if (!tript2cs)
 		{
-			m_tpi2->write(space, offset & 0x07, data);
+			m_tpi2->write(offset & 0x07, data);
 		}
 
 		m_exp->write(space, offset & 0x1fff, data, csbank1, csbank2, csbank3);
@@ -925,7 +925,7 @@ uint8_t p500_state::read_memory(address_space &space, offs_t offset, offs_t va, 
 		}
 		if (!ciacs)
 		{
-			data = m_cia->read(space, offset & 0x0f);
+			data = m_cia->read(offset & 0x0f);
 		}
 		if (!aciacs)
 		{
@@ -933,11 +933,11 @@ uint8_t p500_state::read_memory(address_space &space, offs_t offset, offs_t va, 
 		}
 		if (!tript1cs)
 		{
-			data = m_tpi1->read(space, offset & 0x07);
+			data = m_tpi1->read(offset & 0x07);
 		}
 		if (!tript2cs)
 		{
-			data = m_tpi2->read(space, offset & 0x07);
+			data = m_tpi2->read(offset & 0x07);
 		}
 
 		data = m_exp->read(space, offset & 0x1fff, data, csbank1, csbank2, csbank3);
@@ -1013,7 +1013,7 @@ void p500_state::write_memory(address_space &space, offs_t offset, uint8_t data,
 		}
 		if (!ciacs)
 		{
-			m_cia->write(space, offset & 0x0f, data);
+			m_cia->write(offset & 0x0f, data);
 		}
 		if (!aciacs)
 		{
@@ -1021,11 +1021,11 @@ void p500_state::write_memory(address_space &space, offs_t offset, uint8_t data,
 		}
 		if (!tript1cs)
 		{
-			m_tpi1->write(space, offset & 0x07, data);
+			m_tpi1->write(offset & 0x07, data);
 		}
 		if (!tript2cs)
 		{
-			m_tpi2->write(space, offset & 0x07, data);
+			m_tpi2->write(offset & 0x07, data);
 		}
 
 		m_exp->write(space, offset & 0x1fff, data, csbank1, csbank2, csbank3);
