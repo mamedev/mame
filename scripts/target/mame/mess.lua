@@ -683,6 +683,7 @@ MACHINES["Z8038"] = true
 MACHINES["AIC6250"] = true
 MACHINES["DC7085"] = true
 MACHINES["I82357"] = true
+MACHINES["XC1700E"] = true
 
 --------------------------------------------------
 -- specify available bus cores
