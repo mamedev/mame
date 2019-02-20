@@ -2,6 +2,10 @@
 // copyright-holders:hap
 // thanks-to:Berger,yoyo_chessboard
 /******************************************************************************
+*
+* fidel_sc12.cpp, subdriver of fidelbase.cpp
+
+*******************************************************************************
 
 Fidelity Sensory 12 Chess Challenger (SC12-B, 6086)
 4 versions are known to exist: A,B,C, and X, with increasing CPU speed.

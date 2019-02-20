@@ -2,6 +2,10 @@
 // copyright-holders:hap
 // thanks-to:Berger,yoyo_chessboard
 /******************************************************************************
+*
+* fidel_sc9.cpp, subdriver of fidelbase.cpp
+
+*******************************************************************************
 
 Fidelity Sensory Chess Challenger "9" (SC9)
 3 versions were available, the newest "B" version was 2MHz and included the Budapest program.

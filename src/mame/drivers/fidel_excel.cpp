@@ -2,8 +2,11 @@
 // copyright-holders:hap
 // thanks-to:Berger,yoyo_chessboard
 /******************************************************************************
+*
+* fidel_vsc.cpp, subdriver of fidelbase.cpp
 
-Fidelity Excellence series hardware (for Excel 68000, see fidel_eag68k.cpp)
+Fidelity Excellence series hardware
+(for Excel 68000, see fidel_eag68k.cpp)
 
 TODO:
 - granits gives error beeps at start, need to press clear to play

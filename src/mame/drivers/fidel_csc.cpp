@@ -2,6 +2,8 @@
 // copyright-holders:Kevin Horton,Jonathan Gevaryahu,Sandro Ronco,hap
 // thanks-to:Berger,yoyo_chessboard
 /******************************************************************************
+*
+* fidel_csc.cpp, subdriver of fidelbase.cpp
 
 Fidelity CSC(and derived) hardware
 - Champion Sensory Chess Challenger

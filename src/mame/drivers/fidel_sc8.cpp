@@ -2,6 +2,10 @@
 // copyright-holders:hap
 // thanks-to:yoyo_chessboard
 /******************************************************************************
+*
+* fidel_sc8.cpp, subdriver of fidelbase.cpp
+
+*******************************************************************************
 
 Fidelity Sensory Chess Challenger 8
 ---------------

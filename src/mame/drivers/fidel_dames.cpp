@@ -2,6 +2,10 @@
 // copyright-holders:hap
 // thanks-to:yoyo_chessboard
 /******************************************************************************
+*
+* fidel_dames.cpp, subdriver of fidelbase.cpp
+
+*******************************************************************************
 
 Fidelity Dame Sensory Challenger (DSC)
 It's a checkers game for once instead of chess

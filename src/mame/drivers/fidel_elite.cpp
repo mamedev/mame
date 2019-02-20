@@ -2,6 +2,8 @@
 // copyright-holders:hap
 // thanks-to:Berger
 /******************************************************************************
+*
+* fidel_elite.cpp, subdriver of fidelbase.cpp
 
 Fidelity Elite A/S series hardware (EAS, EAG, PC)
 see fidel_eag68k.cpp for 68000-based EAG hardware

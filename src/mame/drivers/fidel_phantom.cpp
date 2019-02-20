@@ -1,11 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 /******************************************************************************
-
-Fidelity Phantom Chess Challenger
+*
+* fidel_phantom.cpp, subdriver of fidelbase.cpp
 
 TODO:
-- everything
+- everything, this is a skeleton driver
 
 *******************************************************************************
 

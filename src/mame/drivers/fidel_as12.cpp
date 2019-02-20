@@ -2,6 +2,10 @@
 // copyright-holders:hap
 // thanks-to:yoyo_chessboard
 /******************************************************************************
+*
+* fidel_as12.cpp, subdriver of fidelbase.cpp
+
+*******************************************************************************
 
 Fidelity Elegance Chess Challenger (AS12)
 ----------------

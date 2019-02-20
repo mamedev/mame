@@ -2,6 +2,10 @@
 // copyright-holders:hap
 // thanks-to:yoyo_chessboard
 /******************************************************************************
+*
+* fidel_sc6.cpp, subdriver of fidelbase.cpp
+
+*******************************************************************************
 
 Fidelity Sensory Chess Challenger 6 (model SC6):
 - PCB label 510-1045B01

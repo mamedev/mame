@@ -2,6 +2,10 @@
 // copyright-holders:Jonathan Gevaryahu,Sandro Ronco,hap
 // thanks-to:Berger
 /******************************************************************************
+*
+* fidel_cc10.cpp, subdriver of fidelbase.cpp
+
+*******************************************************************************
 
 Fidelity Chess Challenger 10 (CCX)
 -------------------

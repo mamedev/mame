@@ -3,14 +3,13 @@
 /******************************************************************************
 *
 *  Fidelity Electronics chess machines base class
-*  main driver is fidelz80.cpp
 *
 ******************************************************************************/
 
-#pragma once
-
 #ifndef MAME_INCLUDES_FIDELBASE_H
 #define MAME_INCLUDES_FIDELBASE_H
+
+#pragma once
 
 #include "machine/bankdev.h"
 #include "machine/timer.h"

@@ -2,11 +2,14 @@
 // copyright-holders:hap
 // thanks-to:yoyo_chessboard
 /******************************************************************************
+*
+* fidel_chesster.cpp, subdriver of fidelbase.cpp
+
+*******************************************************************************
 
 Fidelity Chesster (model 6120)
 There is also a German version titled Kishon Chesster (model 6120G, or 6127)
 ----------------
-
 8*(8+1) buttons, 8+8+1 LEDs
 8KB RAM(UM6264-12), 32KB ROM(M27C256B)
 Ricoh RP65C02G CPU, 5MHz XTAL

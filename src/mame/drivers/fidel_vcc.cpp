@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Kevin Horton,Jonathan Gevaryahu,Sandro Ronco,hap
 /******************************************************************************
+*
+* fidel_vcc.cpp, subdriver of fidelbase.cpp
 
 Fidelity Voice Chess Challenger series hardware
 - Voice Chess Challenger (VCC) (version A and B?)

@@ -1,6 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Kevin Horton,Jonathan Gevaryahu,Sandro Ronco,hap
 /******************************************************************************
+*
+* fidel_vsc.cpp, subdriver of fidelbase.cpp
+
+*******************************************************************************
 
 Fidelity Voice Sensory Chess Challenger (VSC)
 ---------------------------------------------
