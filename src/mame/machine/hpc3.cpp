@@ -13,10 +13,11 @@
 #define LOG_PBUS_DMA    (1 << 1)
 #define LOG_SCSI        (1 << 2)
 #define LOG_SCSI_DMA    (1 << 3)
-#define LOG_ETHERNET    (1 << 4)
-#define LOG_PBUS4       (1 << 5)
-#define LOG_CHAIN       (1 << 6)
-#define LOG_ALL         (LOG_UNKNOWN | LOG_PBUS_DMA | LOG_SCSI | LOG_SCSI_DMA | LOG_ETHERNET | LOG_PBUS4 | LOG_CHAIN)
+#define LOG_SCSI_IRQ    (1 << 4)
+#define LOG_ETHERNET    (1 << 5)
+#define LOG_PBUS4       (1 << 6)
+#define LOG_CHAIN       (1 << 7)
+#define LOG_ALL         (LOG_UNKNOWN | LOG_PBUS_DMA | LOG_SCSI | LOG_SCSI_DMA | LOG_SCSI_IRQ | LOG_ETHERNET | LOG_PBUS4 | LOG_CHAIN)
 
 #define VERBOSE         (0)
 #include "logmacro.h"
@@ -61,13 +62,13 @@ void hpc3_device::device_start()
 	for (uint32_t i = 0; i < 8; i++)
 	{
 		save_item(NAME(m_pbus_dma[i].m_active), i);
-		save_item(NAME(m_pbus_dma[i].m_buf_ptr), i);
 		save_item(NAME(m_pbus_dma[i].m_cur_ptr), i);
 		save_item(NAME(m_pbus_dma[i].m_desc_ptr), i);
 		save_item(NAME(m_pbus_dma[i].m_desc_flags), i);
 		save_item(NAME(m_pbus_dma[i].m_next_ptr), i);
 		save_item(NAME(m_pbus_dma[i].m_bytes_left), i);
 		save_item(NAME(m_pbus_dma[i].m_config), i);
+		save_item(NAME(m_pbus_dma[i].m_control), i);
 
 		m_pbus_dma[i].m_timer = timer_alloc(TIMER_PBUS_DMA + i);
 		m_pbus_dma[i].m_timer->adjust(attotime::never);
@@ -86,12 +87,12 @@ void hpc3_device::device_reset()
 	{
 		m_pbus_dma[i].m_active = 0;
 		m_pbus_dma[i].m_cur_ptr = 0;
-		m_pbus_dma[i].m_buf_ptr = 0;
 		m_pbus_dma[i].m_desc_ptr = 0;
 		m_pbus_dma[i].m_desc_flags = 0;
 		m_pbus_dma[i].m_next_ptr = 0;
 		m_pbus_dma[i].m_bytes_left = 0;
 		m_pbus_dma[i].m_config = 0;
+		m_pbus_dma[i].m_control = 0;
 
 		m_pbus_dma[i].m_active = false;
 		m_pbus_dma[i].m_timer->adjust(attotime::never);
@@ -470,7 +471,7 @@ READ32_MEMBER(hpc3_device::pbusdma_r)
 	switch (offset & 0x07ff)
 	{
 	case 0x0000/4:
-		ret = dma.m_buf_ptr;
+		ret = dma.m_cur_ptr;
 		LOGMASKED(LOG_PBUS_DMA, "%s: PBUS DMA Channel %d Buffer Pointer Read: %08x & %08x\n", machine().describe_context(), channel, ret, mem_mask);
 		break;
 	case 0x0004/4:
@@ -495,21 +496,17 @@ WRITE32_MEMBER(hpc3_device::pbusdma_w)
 
 	switch (offset & 0x07ff)
 	{
-	case 0x0000/4:
-		LOGMASKED(LOG_PBUS_DMA, "%s: PBUS DMA Channel %d Buffer Pointer Write: %08x\n", machine().describe_context(), channel, data);
-		dma.m_buf_ptr = data;
-		break;
 	case 0x0004/4:
 		LOGMASKED(LOG_PBUS_DMA, "%s: PBUS DMA Channel %d Descriptor Pointer Write: %08x\n", machine().describe_context(), channel, data);
 		dma.m_desc_ptr = data;
-		LOGMASKED(LOG_PBUS_DMA, "%s: PBUS_DMA_DescPtr = %08x\n", machine().describe_context(), dma.m_desc_ptr); fflush(stdout);
+		LOGMASKED(LOG_PBUS_DMA, "%s: PBUS_DMA_DescPtr = %08x\n", machine().describe_context(), dma.m_desc_ptr);
 		dma.m_cur_ptr = space.read_dword(dma.m_desc_ptr);
 		dma.m_desc_flags = space.read_dword(dma.m_desc_ptr + 4);
 		dma.m_next_ptr = space.read_dword(dma.m_desc_ptr + 8);
 		dma.m_bytes_left = dma.m_desc_flags & 0x7fffffff;
-		LOGMASKED(LOG_PBUS_DMA, "%s: PBUS_DMA_CurPtr = %08x\n", machine().describe_context(), dma.m_cur_ptr); fflush(stdout);
-		LOGMASKED(LOG_PBUS_DMA, "%s: PBUS_DMA_BytesLeft = %08x\n", machine().describe_context(), dma.m_bytes_left); fflush(stdout);
-		LOGMASKED(LOG_PBUS_DMA, "%s: PBUS_DMA_NextPtr = %08x\n", machine().describe_context(), dma.m_next_ptr); fflush(stdout);
+		LOGMASKED(LOG_PBUS_DMA, "%s: PBUS_DMA_CurPtr = %08x\n", machine().describe_context(), dma.m_cur_ptr);
+		LOGMASKED(LOG_PBUS_DMA, "%s: PBUS_DMA_BytesLeft = %08x\n", machine().describe_context(), dma.m_bytes_left);
+		LOGMASKED(LOG_PBUS_DMA, "%s: PBUS_DMA_NextPtr = %08x\n", machine().describe_context(), dma.m_next_ptr);
 		break;
 	case 0x1000/4:
 		LOGMASKED(LOG_PBUS_DMA, "%s: PBUS DMA Channel %d Control Register Write: %08x\n", machine().describe_context(), channel, data);
@@ -535,7 +532,7 @@ WRITE32_MEMBER(hpc3_device::pbusdma_w)
 		LOGMASKED(LOG_PBUS_DMA, "    FIFO Begin: Row %04x\n", (data & PBUS_CTRL_FIFO_BEG) >> 16);
 		LOGMASKED(LOG_PBUS_DMA, "    FIFO End: Row %04x\n", (data & PBUS_CTRL_FIFO_END) >> 24);
 
-		if (((data & PBUS_CTRL_DMASTART) && (data & PBUS_CTRL_LOAD_EN)) && (channel == 1 || channel == 2))
+		if (((data & PBUS_CTRL_DMASTART) && (data & PBUS_CTRL_LOAD_EN)) && channel < 4)
 		{
 			LOGMASKED(LOG_PBUS_DMA, "    Starting DMA\n");
 			dma.m_timer->adjust(attotime::from_hz(44100));
@@ -827,6 +824,7 @@ WRITE_LINE_MEMBER(hpc3_device::scsi0_irq)
 {
 	if (state)
 	{
+		LOGMASKED(LOG_SCSI_IRQ, "Raising SCSI 0 IRQ\n");
 		//if (m_wd33c93->get_dma_count() && m_scsi_dma[0].m_active)
 		//  scsi_dma(0);
 
@@ -834,6 +832,7 @@ WRITE_LINE_MEMBER(hpc3_device::scsi0_irq)
 	}
 	else
 	{
+		LOGMASKED(LOG_SCSI_IRQ, "Lowering SCSI 0 IRQ\n");
 		m_ioc2->lower_local_irq(0, ioc2_device::INT3_LOCAL0_SCSI0);
 	}
 }
@@ -842,6 +841,8 @@ WRITE_LINE_MEMBER(hpc3_device::scsi1_irq)
 {
 	if (state)
 	{
+		LOGMASKED(LOG_SCSI_IRQ, "Raising SCSI 1 IRQ\n");
+
 		//if (m_wd33c93_2->get_dma_count() && m_scsi_dma[1].m_active)
 		//  scsi_dma(1);
 
@@ -849,6 +850,8 @@ WRITE_LINE_MEMBER(hpc3_device::scsi1_irq)
 	}
 	else
 	{
+		LOGMASKED(LOG_SCSI_IRQ, "Lowering SCSI 0 IRQ\n");
+
 		m_ioc2->lower_local_irq(0, ioc2_device::INT3_LOCAL0_SCSI1);
 	}
 }
