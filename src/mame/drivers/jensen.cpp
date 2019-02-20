@@ -41,21 +41,15 @@ void jensen_state::machine_reset()
 	unpack_srom();
 }
 
-u8 jensen_state::get_srom_byte(unsigned const start_bit)
+u32 jensen_state::get_srom(unsigned const bits)
 {
-	unsigned const byte_offset = start_bit >> 3;
+	u32 data = 0;
 
-	// check if byte-aligned
-	if (start_bit & 7)
-	{
-		unsigned const shift = start_bit & 7;
+	for (unsigned i = 0; i < bits; i++)
+		if (m_srom->data_r())
+			data |= (1U << i);
 
-		return
-			(m_srom->as_u8(byte_offset + 0) >> shift) |
-			(m_srom->as_u8(byte_offset + 1) << (8 - shift));
-	}
-	else
-		return m_srom->as_u8(byte_offset);
+	return data;
 }
 
 void jensen_state::unpack_srom()
@@ -66,23 +60,40 @@ void jensen_state::unpack_srom()
 	 * with the data being written into the primary instruction cache.
 	 */
 
-	// the bit offsets to each instruction
-	unsigned const lw_bit_offset[] = { 0, 157, 32, 189, 64, 221, 96, 253 };
-
 	unsigned ram_offset = 0;
+	u32 lw_data[8];
+
+	m_srom->reset();
 
 	// there are up to 256 blocks of 293 bits each
 	for (unsigned block = 0; block < 256; block++)
 	{
-		// each block contains 8 instruction longwords
-		for (unsigned lw = 0; lw < 8; lw++)
+		// lw0 lw2 lw4 lw6
+		lw_data[0] = get_srom(32);
+		lw_data[2] = get_srom(32);
+		lw_data[4] = get_srom(32);
+		lw_data[6] = get_srom(32);
+
+		get_srom(21); // tag
+		get_srom(6);  // asn
+		get_srom(1);  // asm
+		get_srom(1);  // v
+
+		// lw1 lw3 lw5 lw7
+		lw_data[1] = get_srom(32);
+		lw_data[3] = get_srom(32);
+		lw_data[5] = get_srom(32);
+		lw_data[7] = get_srom(32);
+
+		get_srom(8); // bht
+
+		// copy each instruction longword to ram
+		for (u32 const lw : lw_data)
 		{
-			unsigned const srom_offset = block * 293 + lw_bit_offset[lw];
-			
-			m_ram->write(BYTE4_XOR_LE(ram_offset + 0), get_srom_byte(srom_offset + 0));
-			m_ram->write(BYTE4_XOR_LE(ram_offset + 1), get_srom_byte(srom_offset + 8));
-			m_ram->write(BYTE4_XOR_LE(ram_offset + 2), get_srom_byte(srom_offset + 16));
-			m_ram->write(BYTE4_XOR_LE(ram_offset + 3), get_srom_byte(srom_offset + 24));
+			m_ram->write(BYTE4_XOR_LE(ram_offset + 0), lw >> 0);
+			m_ram->write(BYTE4_XOR_LE(ram_offset + 1), lw >> 8);
+			m_ram->write(BYTE4_XOR_LE(ram_offset + 2), lw >> 16);
+			m_ram->write(BYTE4_XOR_LE(ram_offset + 3), lw >> 24);
 
 			ram_offset += 4;
 		}
@@ -159,6 +170,8 @@ void jensen_state::jensen(machine_config &config)
 	m_ram->set_extra_options("32M,64M,80M,128M");
 	m_ram->set_default_value(0);
 
+	XC1765E(config, m_srom);
+
 	// TODO: 1x1M + 1x256K flash?
 	INTEL_E28F008SA(config, m_feprom[0]);
 	INTEL_E28F008SA(config, m_feprom[1]);
@@ -216,7 +229,7 @@ void jensen_state::jensen(machine_config &config)
 	// 30-40385-01 Compaq QVision 1024/E (1MB VGA)
 
 	// Optional
-	// DE422-SA DEC EtherWORKS EISA board (10 Mbps TP and BNC connectors)
+	// DE422-SA Digital EISA Ethernet Controller (10 Mbps TP and BNC connectors)
 }
 
 void jensen_state::d2k300axp(machine_config &config)
@@ -271,11 +284,18 @@ ROM_START(dpcaxp150)
 	 * sizes and content.
 	 */
 	ROM_REGION32_LE(0x100000, "feprom1", 0)
+
+	// source: dumped from physical board
 	ROM_SYSTEM_BIOS(0, "v19", "Version 1.9, 22-JUN-1995")
 	ROMX_LOAD("001z5__bl07.v19", 0x00000, 0x100000, CRC(26da3478) SHA1(baa7c92b01244aad84420268a06d04c6e2a30754), ROM_BIOS(0))
 
+	// source: extracted from ftp://ftp.hp.com/pub/alphaserver/firmware/retired_platforms/alphapc/dec2000_axp150/
 	ROM_SYSTEM_BIOS(1, "v22", "Version 2.2, 12-FEB-1996")
 	ROMX_LOAD("001z5__bl07.v22", 0x00000, 0x100000, CRC(1edb9c98) SHA1(a45f0dde236e189a57afc1ed354201180ab2f234), ROM_BIOS(1))
+
+	// source: extracted from https://archive.org/details/decpcaxp
+	ROM_SYSTEM_BIOS(2, "v13", "Version 1.3, 10-JUN-1994")
+	ROMX_LOAD("001z5__bl07.v13", 0x00000, 0x100000, CRC(8035f370) SHA1(2ebd75267ab7373d344efe44e700645ed31b44cd), ROM_BIOS(2))
 ROM_END
 
 /*    YEAR   NAME       PARENT  COMPAT  MACHINE    INPUT  CLASS         INIT         COMPANY  FULLNAME                  FLAGS */

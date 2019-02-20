@@ -10,6 +10,7 @@
 
 // memory
 #include "machine/ram.h"
+#include "machine/xc1700e.h"
 #include "machine/intelfsh.h"
 
 // various hardware
@@ -48,7 +49,7 @@ protected:
 	virtual void machine_reset() override;
 
 	void unpack_srom();
-	u8 get_srom_byte(unsigned const start_bit);
+	u32 get_srom(unsigned const bits);
 
 	// address maps
 	void local_memory(address_map &map);
@@ -60,7 +61,7 @@ private:
 	// devices
 	required_device<alpha_device> m_cpu;
 	required_device<ram_device> m_ram;
-	required_memory_region m_srom;
+	required_device<xc1765e_device> m_srom;
 	required_device_array<intel_e28f008sa_device, 2> m_feprom;
 
 	required_device<i82357_device> m_isp;
