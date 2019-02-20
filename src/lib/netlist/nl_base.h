@@ -30,7 +30,7 @@
 #include "nl_time.h"
 
 //============================================================
-//  MACROS / New Syntax
+//  MACROS / New Syntax999
 //============================================================
 
 /*! Construct a netlist device name */
@@ -130,11 +130,11 @@ class NETLIB_NAME(name) : public device_t
 
 #define NETLIB_DELEGATE(chip, name) nldelegate(&NETLIB_NAME(chip) :: name, this)
 
-#define NETLIB_UPDATE_TERMINALSI() public: virtual void update_terminals() override
-#define NETLIB_HANDLERI(name) private: virtual void name() NL_NOEXCEPT
-#define NETLIB_UPDATEI() public: virtual void update() NL_NOEXCEPT override
-#define NETLIB_UPDATE_PARAMI() public: virtual void update_param() override
-#define NETLIB_RESETI() public: virtual void reset() override
+#define NETLIB_UPDATE_TERMINALSI() virtual void update_terminals() override
+#define NETLIB_HANDLERI(name) virtual void name() NL_NOEXCEPT
+#define NETLIB_UPDATEI() virtual void update() NL_NOEXCEPT override
+#define NETLIB_UPDATE_PARAMI() virtual void update_param() override
+#define NETLIB_RESETI() virtual void reset() override
 
 #define NETLIB_TIMESTEP(chip) void NETLIB_NAME(chip) :: timestep(const nl_double step)
 
