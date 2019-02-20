@@ -802,7 +802,7 @@
 	</software>
 
 	<software name="ec0069"> <!-- custom presentation -->
-		<description>ETZ (Japan) (EC0069-ETZ)</description> <!-- guess, seems related to ec0079 -->
+		<description>ETZ (Japan) (EC0069-ETZ)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
@@ -846,12 +846,12 @@
 	</software>
 
 	<software name="ec0073">
-		<description>untranslated volume 1 (Japan) (EC0073-)</description>
+		<description>MKC volume 1 (Japan) (EC0073-MKC)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="ec0073-.u1" size="0x100000" crc="e1ffa625" sha1="ee1bcd579a10085c4c094037e25345c17c063c7c" offset="0" />
+				<rom name="ec0073-mkc.u1" size="0x100000" crc="e1ffa625" sha1="ee1bcd579a10085c4c094037e25345c17c063c7c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
