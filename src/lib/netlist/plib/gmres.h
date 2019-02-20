@@ -338,7 +338,7 @@ namespace plib
 		plib::parray<float_type, RESTART + 1> m_y;       		/* mr + 1 */
 
 		//plib::parray<float_type, SIZE> m_v[RESTART + 1];  /* mr + 1, n */
-		std::array<std::array<float_type, storage_N>, RESTART + 1> m_v;  /* mr + 1, n */
+		plib::parray<plib::parray<float_type, storage_N>, RESTART + 1> m_v;  /* mr + 1, n */
 
 		std::size_t m_size;
 

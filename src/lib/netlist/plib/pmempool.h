@@ -48,17 +48,18 @@ namespace plib {
 	private:
 		struct block
 		{
-			block(mempool *mp)
+			block(mempool *mp, std::size_t min_bytes)
 			: m_num_alloc(0)
-			, m_free(mp->m_min_alloc)
 			, m_cur(0)
 			, m_data(nullptr)
 			, m_mempool(mp)
 			{
-				std::size_t alloc_bytes = (mp->m_min_alloc + mp->m_min_align - 1) & ~(mp->m_min_align - 1);
+				min_bytes = std::max(mp->m_min_alloc, min_bytes);
+				m_free = min_bytes;
+				std::size_t alloc_bytes = (min_bytes + mp->m_min_align - 1) & ~(mp->m_min_align - 1);
 				m_data_allocated = static_cast<char *>(::operator new(alloc_bytes));
 				void *r = m_data_allocated;
-				std::align(mp->m_min_align, mp->m_min_alloc, r, alloc_bytes);
+				std::align(mp->m_min_align, min_bytes, r, alloc_bytes);
 				m_data  = reinterpret_cast<char *>(r);
 			}
 			std::size_t m_num_alloc;
@@ -80,9 +81,9 @@ namespace plib {
 		};
 
 
-		block * new_block()
+		block * new_block(std::size_t min_bytes)
 		{
-			auto *b = new block(this);
+			auto *b = new block(this, min_bytes);
 			m_blocks.push_back(b);
 			return b;
 		}
@@ -144,7 +145,7 @@ namespace plib {
 				}
 			}
 			{
-				block *b = new_block();
+				block *b = new_block(rs);
 				b->m_num_alloc = 1;
 				b->m_free = m_min_alloc - rs;
 				auto ret = reinterpret_cast<void *>(b->m_data + b->m_cur);
