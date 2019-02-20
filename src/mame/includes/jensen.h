@@ -48,9 +48,6 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	void unpack_srom();
-	u32 get_srom(unsigned const bits);
-
 	// address maps
 	void local_memory(address_map &map);
 	void local_io(address_map &map);

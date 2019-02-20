@@ -12,7 +12,8 @@ public:
 	// configuration
 	auto cascade_r() { return m_cascade_cb.bind(); }
 
-	// output line
+	// input/output lines
+	void reset_w(int state);
 	int data_r();
 
 protected:
@@ -20,7 +21,6 @@ protected:
 
 	// device_t overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 private:
 	// device configuration
@@ -30,6 +30,7 @@ private:
 	devcb_read_line m_cascade_cb;
 
 	// device state
+	bool m_reset;
 	unsigned m_address;
 };
 

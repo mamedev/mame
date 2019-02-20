@@ -13,6 +13,10 @@ class alpha_device : public cpu_device
 public:
 	void set_dasm_type(alpha_disassembler::dasm_type type) { m_dasm_type = type; }
 
+	// input/output lines
+	auto srom_oe_w() { return m_srom_oe_cb.bind(); }
+	auto srom_data_r() { return m_srom_data_cb.bind(); }
+
 protected:
 	alpha_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
@@ -48,9 +52,15 @@ protected:
 	template <typename T, typename U> std::enable_if_t<std::is_convertible<U, T>::value, void> store(u64 address, U data, T mem_mask = ~T(0));
 	void fetch(u64 address, std::function<void(u32)> &&apply);
 
+	// cache helpers
+	u32 read_srom(unsigned const bits);
+	virtual u32 icache_fetch(u64 const address) = 0;
+
 	// configuration
-	address_space_config m_as_config[4];
 	alpha_disassembler::dasm_type m_dasm_type;
+	address_space_config m_as_config[4];
+	devcb_write_line m_srom_oe_cb;
+	devcb_read_line m_srom_data_cb;
 
 	// emulation state
 	int m_icount;
@@ -68,7 +78,7 @@ class alpha_ev4_device : public alpha_device
 public:
 	alpha_ev4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-private:
+protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -103,6 +113,22 @@ private:
 		IBX_SL_XMIT      = 22, // w
 	};
 
+	enum ibx_itb_pte_mask : u64
+	{
+		IBX_ITB_PTE_W_ASM = 0x00000000'00000010, // address space match
+		IBX_ITB_PTE_W_KRE = 0x00000000'00000100, // kernel read-enable
+		IBX_ITB_PTE_W_ERE = 0x00000000'00000200, // executive read-enable
+		IBX_ITB_PTE_W_SRE = 0x00000000'00000400, // supervisor read-enable
+		IBX_ITB_PTE_W_URE = 0x00000000'00000800, // user read-enable
+		IBX_ITB_PTE_W_PFN = 0x001fffff'00000000, // page frame number
+
+		IBX_ITB_PTE_R_KRE = 0x00000000'00000200, // kernel read-enable
+		IBX_ITB_PTE_R_ERE = 0x00000000'00000400, // executive read-enable
+		IBX_ITB_PTE_R_SRE = 0x00000000'00000800, // supervisor read-enable
+		IBX_ITB_PTE_R_URE = 0x00000000'00001000, // user read-enable
+		IBX_ITB_PTE_R_PFN = 0x00000003'ffffe000, // page frame number
+		IBX_ITB_PTE_R_ASM = 0x00000004'00000000, // address space match
+	};
 	enum ibx_iccsr_mask : u64
 	{
 		IBX_ICCSR_W_PC1    = 0x00000000'00000001, // performance counter 1 interrupt enable
@@ -228,6 +254,29 @@ class dec_21064_device : public alpha_ev4_device
 {
 public:
 	dec_21064_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	virtual void device_reset() override;
+
+	virtual u32 icache_fetch(u64 const address) override;
+
+private:
+	struct icache_block
+	{
+		u32 lw[8]; // instruction longwords
+		u32 tag;   // cache tag
+		u8 aav;    // asn, asm and v fields
+		u8 bht;    // branch history table
+	};
+
+	enum aav_mask : u8
+	{
+		AAV_ASN = 0x3f, // address space number
+		AAV_ASM = 0x40, // address space match
+		AAV_V   = 0x80, // valid
+	};
+
+	icache_block m_icache[256];
 };
 
 DECLARE_DEVICE_TYPE(DEC_21064, dec_21064_device)

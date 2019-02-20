@@ -38,66 +38,6 @@ void jensen_state::machine_start()
 
 void jensen_state::machine_reset()
 {
-	unpack_srom();
-}
-
-u32 jensen_state::get_srom(unsigned const bits)
-{
-	u32 data = 0;
-
-	for (unsigned i = 0; i < bits; i++)
-		if (m_srom->data_r())
-			data |= (1U << i);
-
-	return data;
-}
-
-void jensen_state::unpack_srom()
-{
-	/*
-	 * Read the packed data fields from the srom dump and turn them into
-	 * executable code. This should actually be done by the Alpha itself,
-	 * with the data being written into the primary instruction cache.
-	 */
-
-	unsigned ram_offset = 0;
-	u32 lw_data[8];
-
-	m_srom->reset();
-
-	// there are up to 256 blocks of 293 bits each
-	for (unsigned block = 0; block < 256; block++)
-	{
-		// lw0 lw2 lw4 lw6
-		lw_data[0] = get_srom(32);
-		lw_data[2] = get_srom(32);
-		lw_data[4] = get_srom(32);
-		lw_data[6] = get_srom(32);
-
-		get_srom(21); // tag
-		get_srom(6);  // asn
-		get_srom(1);  // asm
-		get_srom(1);  // v
-
-		// lw1 lw3 lw5 lw7
-		lw_data[1] = get_srom(32);
-		lw_data[3] = get_srom(32);
-		lw_data[5] = get_srom(32);
-		lw_data[7] = get_srom(32);
-
-		get_srom(8); // bht
-
-		// copy each instruction longword to ram
-		for (u32 const lw : lw_data)
-		{
-			m_ram->write(BYTE4_XOR_LE(ram_offset + 0), lw >> 0);
-			m_ram->write(BYTE4_XOR_LE(ram_offset + 1), lw >> 8);
-			m_ram->write(BYTE4_XOR_LE(ram_offset + 2), lw >> 16);
-			m_ram->write(BYTE4_XOR_LE(ram_offset + 3), lw >> 24);
-
-			ram_offset += 4;
-		}
-	}
 }
 
 void jensen_state::init_common()
@@ -164,6 +104,8 @@ void jensen_state::jensen(machine_config &config)
 	m_cpu->set_addrmap(2, &jensen_state::local_io);
 	m_cpu->set_addrmap(4, &jensen_state::eisa_memory);
 	m_cpu->set_addrmap(6, &jensen_state::eisa_io);
+	m_cpu->srom_oe_w().set(m_srom, FUNC(xc1765e_device::reset_w));
+	m_cpu->srom_data_r().set(m_srom, FUNC(xc1765e_device::data_r));
 
 	RAM(config, m_ram);
 	m_ram->set_default_size("16M");

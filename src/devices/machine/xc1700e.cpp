@@ -17,8 +17,7 @@
  *   XC1704L   4,194,304
  *
  * The input C̅E̅ and CLK lines have not been explicitly implemented; these are
- * assumed to be asserted as expected before/during data read. Similarly, the
- * RESET/O̅E̅ or OE/R̅E̅S̅E̅T̅ is implicitly handled by device_reset(). The effect of
+ * assumed to be asserted as expected before/during data read. The effect of
  * C̅E̅O̅ can be obtained by connecting the cascade_r callback to the data_r of
  * the cascaded device and resetting all devices when needed.
  *
@@ -53,6 +52,8 @@ base_xc1700e_device::base_xc1700e_device(const machine_config &mconfig, device_t
 	, m_capacity(capacity)
 	, m_region(*this, DEVICE_SELF)
 	, m_cascade_cb(*this)
+	, m_reset(true)
+	, m_address(0)
 {
 }
 
@@ -60,16 +61,23 @@ void base_xc1700e_device::device_start()
 {
 	m_cascade_cb.resolve_safe(1);
 
+	save_item(NAME(m_reset));
 	save_item(NAME(m_address));
 }
 
-void base_xc1700e_device::device_reset()
+void base_xc1700e_device::reset_w(int state)
 {
-	m_address = 0;
+	if (state)
+		m_address = 0;
+
+	m_reset = bool(state);
 }
 
 int base_xc1700e_device::data_r()
 {
+	if (m_reset)
+		return 1;
+
 	if (m_address < m_capacity)
 	{
 		int const data = BIT(m_region->as_u8(m_address >> 3), m_address & 7);

@@ -4,7 +4,7 @@
 /*
  * An implementation of the Digital Alpha CPU family.
  *
- * Sources
+ * Sources:
  *
  *   http://bitsavers.org/pdf/dec/alpha/21064-aa-RISC%20Microprocessor%20Preliminary%20Data%20Sheet-apr92.pdf
  *   http://bitsavers.org/pdf/dec/alpha/Sites_AlphaAXPArchitectureReferenceManual_2ed_1995.pdf
@@ -52,6 +52,7 @@ alpha_ev4_device::alpha_ev4_device(const machine_config &mconfig, device_type ty
 
 alpha_device::alpha_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: cpu_device(mconfig, type, tag, owner, clock)
+	, m_dasm_type(alpha_disassembler::dasm_type::TYPE_UNKNOWN)
 	, m_as_config
 		{
 			address_space_config("0", ENDIANNESS_LITTLE, 64, 32, 0),
@@ -59,7 +60,8 @@ alpha_device::alpha_device(const machine_config &mconfig, device_type type, cons
 			address_space_config("2", ENDIANNESS_LITTLE, 64, 32, 0),
 			address_space_config("3", ENDIANNESS_LITTLE, 64, 32, 0)
 		}
-	, m_dasm_type(alpha_disassembler::dasm_type::TYPE_UNKNOWN)
+	, m_srom_oe_cb(*this)
+	, m_srom_data_cb(*this)
 	, m_icount(0)
 {
 }
@@ -86,6 +88,9 @@ void alpha_device::device_start()
 	// floating point registers
 	for (unsigned i = 0; i < 32; i++)
 		state_add(i + 32, util::string_format("F%d", i).c_str(), m_f[i]);
+
+	m_srom_oe_cb.resolve_safe();
+	m_srom_data_cb.resolve_safe(0);
 }
 
 void alpha_device::device_reset()
@@ -129,8 +134,8 @@ device_memory_interface::space_config_vector alpha_device::memory_space_config()
 	 * the top two bits to select one of four memory spaces with the other 32
 	 * bits giving the offset within each space. This approach works out quite
 	 * well for the jensen hardware, which uses the first space for memory, and
-	 * the others for a variety of I/O memory mapping. 
-	 * 
+	 * the others for a variety of I/O memory mapping.
+	 *
 	 * Note: space numbers are multiplied by two to avoid the special handling
 	 * applied to the decrypted opcode space (number 3).
 	 */
@@ -700,9 +705,20 @@ template <typename T, typename U> std::enable_if_t<std::is_convertible<U, T>::va
 
 void alpha_device::fetch(u64 address, std::function<void(u32)> &&apply)
 {
-	unsigned const s = (address >> 31) & 6;
+	cpu_translate(address, TRANSLATE_FETCH);
 
-	apply(space(s).read_dword(address));
+	apply(icache_fetch(address));
+}
+
+u32 alpha_device::read_srom(unsigned const bits)
+{
+	u32 data = 0;
+
+	for (unsigned i = 0; i < bits; i++)
+		if (m_srom_data_cb())
+			data |= (1U << i);
+
+	return data;
 }
 
 void alpha_ev4_device::device_start()
@@ -925,5 +941,55 @@ void alpha_ev4_device::abx_set(u8 reg, u64 data)
 		logerror("invalid mtpr/a register %d (%s)\n", reg, machine().describe_context());
 		break;
 	}
+}
 
+void dec_21064_device::device_reset()
+{
+	alpha_ev4_device::device_reset();
+
+	m_srom_oe_cb(0);
+
+	// load icache from srom
+	for (icache_block &block : m_icache)
+	{
+		block.lw[0] = read_srom(32);
+		block.lw[2] = read_srom(32);
+		block.lw[4] = read_srom(32);
+		block.lw[6] = read_srom(32);
+
+		block.tag = read_srom(21);
+		block.aav = read_srom(8);
+
+		block.lw[1] = read_srom(32);
+		block.lw[3] = read_srom(32);
+		block.lw[5] = read_srom(32);
+		block.lw[7] = read_srom(32);
+
+		block.bht = read_srom(8);
+	}
+
+	m_srom_oe_cb(1);
+}
+
+u32 dec_21064_device::icache_fetch(u64 const address)
+{
+	icache_block &block = m_icache[(address >> 5) & 0xff];
+
+	// check tag, valid, and asm or asn
+	if ((block.tag != (address >> 13)) || !(block.aav & AAV_V) || (!(block.aav & AAV_ASM) && ((block.aav & AAV_ASN) != (((m_ibx[IBX_ICCSR] & IBX_ICCSR_R_ASN) >> 28)))))
+	{
+		// fetch a new block
+		block.tag = address >> 13;
+		block.aav = AAV_V | ((m_ibx[IBX_ICCSR] & IBX_ICCSR_R_ASN) >> 28); // TODO: set ASM depending on PTE
+
+		// always set ASM if istream superpage mapping is enabled
+		if (m_ibx[IBX_ICCSR] & IBX_ICCSR_R_MAP)
+			block.aav |= AAV_ASM;
+
+		address_space &s = space((address >> 31) & 6);
+		for (unsigned i = 0; i < 8; i++)
+			block.lw[i] = s.read_dword(address | (i << 2));
+	}
+
+	return block.lw[(address >> 2) & 7];
 }
