@@ -187,13 +187,13 @@ WRITE32_MEMBER(midzeus_state::cmos_protect_w)
 
 READ32_MEMBER(midzeus2_state::zeus2_timekeeper_r)
 {
-	return m_m48t35->read(space, offset, 0xff) | 0xffffff00;
+	return m_m48t35->read(offset) | 0xffffff00;
 }
 
 WRITE32_MEMBER(midzeus2_state::zeus2_timekeeper_w)
 {
 	if (disk_asic_jr[2] && !cmos_protected)
-		m_m48t35->write(space, offset, data, 0xff);
+		m_m48t35->write(offset, data);
 	else
 		logerror("%s:zeus2_timekeeper_w with disk_asic_jr[2] = %d, cmos_protected = %d\n", machine().describe_context(), disk_asic_jr[2], cmos_protected);
 	cmos_protected = true;

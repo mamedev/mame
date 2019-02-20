@@ -309,19 +309,19 @@ WRITE8_MEMBER(igrosoft_gamble_state::igrosoft_gamble_bank_w)
 
 READ8_MEMBER(igrosoft_gamble_state::igrosoft_gamble_timekeeper_r)
 {
-	return m_m48t35->read(space, offset + 0x6000, 0xff);
+	return m_m48t35->read(offset + 0x6000);
 }
 
 WRITE8_MEMBER(igrosoft_gamble_state::igrosoft_gamble_timekeeper_w)
 {
-	m_m48t35->write(space, offset + 0x6000, data, 0xff);
+	m_m48t35->write(offset + 0x6000, data);
 }
 
 READ8_MEMBER(igrosoft_gamble_state::bankedram_r)
 {
 	if ((m_rambk & 0x80) == 0x00)
 	{
-		return m_m48t35->read(space, offset + 0x2000*(m_rambk & 0x03), 0xff);
+		return m_m48t35->read(offset + 0x2000*(m_rambk & 0x03));
 	}
 	else
 	{
@@ -334,7 +334,7 @@ WRITE8_MEMBER(igrosoft_gamble_state::bankedram_w)
 {
 	if ((m_rambk & 0x80) == 0x00)
 	{
-		m_m48t35->write(space, offset + 0x2000*(m_rambk & 0x03), data, 0xff);
+		m_m48t35->write(offset + 0x2000*(m_rambk & 0x03), data);
 	}
 	else
 	{
