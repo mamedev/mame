@@ -10,7 +10,8 @@ As workaround for the chess games, use an external chess GUI on the side,
 such as Arena(in editmode).
 
 TODO: (see each driver for more specific)
-- verify cpu speed and rom labels where unknown
+- verify cpu speed and rom labels where uncertain
+- support for printer
 - improve EAS/SC12/etc CPU divider? it seems a little bit slower than the real machine.
   Currently, a dummy timer workaround is needed, or it's much worse.
   Is the problem here is due to timing of CPU addressbus changes? We can only 'sense'

@@ -84,7 +84,7 @@ WRITE8_MEMBER(delta1_state::io0_w)
 
 	// update display here
 	set_display_segmask(0xf, 0x7f);
-	display_matrix(7, 4, m_led_data, sel >> 4);
+	display_matrix(7, 4, m_7seg_data, sel >> 4);
 }
 
 READ8_MEMBER(delta1_state::io0_r)
@@ -100,7 +100,7 @@ WRITE8_MEMBER(delta1_state::io1_w)
 	// IO17: segment commons, active low (always 0?)
 	// IO10-16: digit segments A-G
 	data = (data & 0x80) ? 0 : (data & 0x7f);
-	m_led_data = bitswap<7>(data, 0,1,2,3,4,5,6);
+	m_7seg_data = bitswap<7>(data, 0,1,2,3,4,5,6);
 }
 
 READ8_MEMBER(delta1_state::io1_r)

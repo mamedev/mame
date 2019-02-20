@@ -205,8 +205,8 @@ INPUT_PORTS_END
     Machine Drivers
 ******************************************************************************/
 
-MACHINE_CONFIG_START(diablo_state::diablo68k)
-
+void diablo_state::diablo68k(machine_config &config)
+{
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 16_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &diablo_state::diablo68k_map);
@@ -222,13 +222,14 @@ MACHINE_CONFIG_START(diablo_state::diablo68k)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(60) // arbitrary
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(6*16+1, 10)
-	MCFG_SCREEN_VISIBLE_AREA(0, 6*16, 0, 10-1)
-	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(60); // arbitrary
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_size(6*16+1, 10);
+	screen.set_visarea(0, 6*16, 0, 10-1);
+	screen.set_screen_update("hd44780", FUNC(hd44780_device::screen_update));
+	screen.set_palette("palette");
+
 	PALETTE(config, "palette", FUNC(diablo_state::novag_lcd_palette), 3);
 
 	HD44780(config, m_lcd, 0);
@@ -242,7 +243,7 @@ MACHINE_CONFIG_START(diablo_state::diablo68k)
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beeper, 32.768_kHz_XTAL/32); // 1024Hz
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
-MACHINE_CONFIG_END
+}
 
 void diablo_state::scorpio68k(machine_config &config)
 {

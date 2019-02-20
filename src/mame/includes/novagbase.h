@@ -24,6 +24,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_irq_on(*this, "irq_on"),
+		m_rombank(*this, "rombank"),
 		m_beeper(*this, "beeper"),
 		m_dac(*this, "dac"),
 		m_lcd(*this, "hd44780"),
@@ -39,6 +40,7 @@ public:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
 	optional_device<timer_device> m_irq_on;
+	optional_memory_bank m_rombank;
 	optional_device<beep_device> m_beeper;
 	optional_device<dac_bit_interface> m_dac;
 	optional_device<hd44780_device> m_lcd;
@@ -51,6 +53,7 @@ public:
 	u16 m_inp_mux;                  // multiplexed keypad mask
 	u16 m_led_select;
 	u16 m_led_data;
+	u8 m_7seg_data;
 	u8 m_lcd_control;
 	u8 m_lcd_data;
 

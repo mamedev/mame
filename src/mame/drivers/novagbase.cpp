@@ -3,19 +3,19 @@
 // thanks-to:Berger
 /******************************************************************************
 
-    Novag generic 6502 based chess computer driver
+Novag chess computer driver base class
 
-    NOTE: MAME doesn't include a generalized implementation for boardpieces yet,
-    greatly affecting user playability of emulated electronic board games.
-    As workaround for the chess games, use an external chess GUI on the side,
-    such as Arena(in editmode).
+NOTE: MAME doesn't include a generalized implementation for boardpieces yet,
+greatly affecting user playability of emulated electronic board games.
+As workaround for the chess games, use an external chess GUI on the side,
+such as Arena(in editmode).
 
-    TODO:
-    - cforte ACIA?
-    - verify supercon IRQ and beeper frequency
-    - sforte irq active time (21.5us is too long)
-    - sforte/sexpert led handling is correct?
-    - printer port
+TODO:
+- printer port
+
+- verify supercon IRQ and beeper frequency
+- sforte irq active time (21.5us is too long)
+- sforte/sexpert led handling is correct?
 
 *******************************************************************************
 
@@ -34,8 +34,7 @@ Constellation Forte:
 - HLCD0538P, 10-digit 7seg LCD display
 - TTL, 18 LEDs, 8*8 chessboard buttons
 
-When it was first added to MAME as skeleton driver in mmodular.c, cforteb romset
-was assumed to be Super Forte B, but it definitely isn't. I/O is similar to supercon.
+I/O is similar to supercon
 
 
 *******************************************************************************
@@ -49,6 +48,7 @@ Super Expert (model 878/887/902):
 - printer port, magnetic sensors, 8*8 chessboard leds
 
 I/O via TTL, hardware design was very awkward.
+
 Super Forte is very similar, just a cheaper plastic case and chessboard buttons
 instead of magnet sensors.
 
@@ -74,43 +74,21 @@ instead of magnet sensors.
 #include "novag_supercon.lh" // clickable
 
 
-class novag6502_state : public novagbase_state
+class sexpert_state : public novagbase_state
 {
 public:
-	novag6502_state(const machine_config &mconfig, device_type type, const char *tag) :
-		novagbase_state(mconfig, type, tag),
-		m_hlcd0538(*this, "hlcd0538"),
-		m_rombank(*this, "rombank")
+	sexpert_state(const machine_config &mconfig, device_type type, const char *tag) :
+		novagbase_state(mconfig, type, tag)
 	{ }
 
-	void supercon(machine_config &config);
-	void cforte(machine_config &config);
-	void sforte_map(address_map &map);
 	void sexpert(machine_config &config);
 	void sforte(machine_config &config);
 
 	void init_sexpert();
 
-	DECLARE_INPUT_CHANGED_MEMBER(sexpert_cpu_freq);
+	DECLARE_INPUT_CHANGED_MEMBER(sexpert_cpu_freq) { sexpert_set_cpu_freq(); }
 
 private:
-	optional_device<hlcd0538_device> m_hlcd0538;
-	optional_memory_bank m_rombank;
-
-	// Super Constellation
-	DECLARE_WRITE8_MEMBER(supercon_mux_w);
-	DECLARE_WRITE8_MEMBER(supercon_control_w);
-	DECLARE_READ8_MEMBER(supercon_input1_r);
-	DECLARE_READ8_MEMBER(supercon_input2_r);
-	void supercon_map(address_map &map);
-
-	// Constellation Forte
-	void cforte_prepare_display();
-	DECLARE_WRITE64_MEMBER(cforte_lcd_output_w);
-	DECLARE_WRITE8_MEMBER(cforte_mux_w);
-	DECLARE_WRITE8_MEMBER(cforte_control_w);
-	void cforte_map(address_map &map);
-
 	// Super Expert
 	DECLARE_WRITE8_MEMBER(sexpert_leds_w);
 	DECLARE_WRITE8_MEMBER(sexpert_mux_w);
@@ -125,6 +103,73 @@ private:
 	// Super Forte
 	DECLARE_WRITE8_MEMBER(sforte_lcd_control_w);
 	DECLARE_WRITE8_MEMBER(sforte_lcd_data_w);
+	void sforte_map(address_map &map);
+protected:
+	virtual void machine_reset() override;
+};
+
+void sexpert_state::sexpert_set_cpu_freq()
+{
+	// machines were released with either 5MHz or 6MHz CPU
+	m_maincpu->set_unscaled_clock((ioport("FAKE")->read() & 1) ? (12_MHz_XTAL/2) : (10_MHz_XTAL/2));
+}
+
+void sexpert_state::machine_reset()
+{
+	novagbase_state::machine_reset();
+
+	sexpert_set_cpu_freq();
+	m_rombank->set_entry(0);
+}
+
+void sexpert_state::init_sexpert()
+{
+	m_rombank->configure_entries(0, 2, memregion("maincpu")->base() + 0x8000, 0x8000);
+}
+
+
+
+class cforte_state : public novagbase_state
+{
+public:
+	cforte_state(const machine_config &mconfig, device_type type, const char *tag) :
+		novagbase_state(mconfig, type, tag),
+		m_hlcd0538(*this, "hlcd0538")
+	{ }
+
+	void cforte(machine_config &config);
+
+private:
+	optional_device<hlcd0538_device> m_hlcd0538;
+
+	// Constellation Forte
+	void cforte_prepare_display();
+	DECLARE_WRITE64_MEMBER(cforte_lcd_output_w);
+	DECLARE_WRITE8_MEMBER(cforte_mux_w);
+	DECLARE_WRITE8_MEMBER(cforte_control_w);
+	DECLARE_READ8_MEMBER(cforte_input1_r);
+	DECLARE_READ8_MEMBER(cforte_input2_r);
+	void cforte_map(address_map &map);
+};
+
+
+class scon_state : public novagbase_state
+{
+public:
+	scon_state(const machine_config &mconfig, device_type type, const char *tag) :
+		novagbase_state(mconfig, type, tag)
+	{ }
+
+	void supercon(machine_config &config);
+
+private:
+
+	// Super Constellation
+	DECLARE_WRITE8_MEMBER(supercon_mux_w);
+	DECLARE_WRITE8_MEMBER(supercon_control_w);
+	DECLARE_READ8_MEMBER(supercon_input1_r);
+	DECLARE_READ8_MEMBER(supercon_input2_r);
+	void supercon_map(address_map &map);
 };
 
 
@@ -145,6 +190,7 @@ void novagbase_state::machine_start()
 	m_inp_mux = 0;
 	m_led_select = 0;
 	m_led_data = 0;
+	m_7seg_data = 0;
 	m_lcd_control = 0;
 	m_lcd_data = 0;
 
@@ -160,6 +206,7 @@ void novagbase_state::machine_start()
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_led_select));
 	save_item(NAME(m_led_data));
+	save_item(NAME(m_7seg_data));
 	save_item(NAME(m_lcd_control));
 	save_item(NAME(m_lcd_data));
 }
@@ -297,14 +344,14 @@ u16 novagbase_state::read_inputs(int columns)
 
 // TTL
 
-WRITE8_MEMBER(novag6502_state::supercon_mux_w)
+WRITE8_MEMBER(scon_state::supercon_mux_w)
 {
 	// d0-d7: input mux, led data
 	m_inp_mux = m_led_data = data;
 	display_matrix(8, 3, m_led_data, m_led_select);
 }
 
-WRITE8_MEMBER(novag6502_state::supercon_control_w)
+WRITE8_MEMBER(scon_state::supercon_control_w)
 {
 	// d0-d3: ?
 	// d4-d6: select led row
@@ -315,13 +362,13 @@ WRITE8_MEMBER(novag6502_state::supercon_control_w)
 	m_beeper->set_state(data >> 7 & 1);
 }
 
-READ8_MEMBER(novag6502_state::supercon_input1_r)
+READ8_MEMBER(scon_state::supercon_input1_r)
 {
 	// d0-d7: multiplexed inputs (chessboard squares)
 	return ~read_inputs(8) & 0xff;
 }
 
-READ8_MEMBER(novag6502_state::supercon_input2_r)
+READ8_MEMBER(scon_state::supercon_input2_r)
 {
 	// d0-d5: ?
 	// d6,d7: multiplexed inputs (side panel)
@@ -336,7 +383,7 @@ READ8_MEMBER(novag6502_state::supercon_input2_r)
 
 // TTL/generic
 
-void novag6502_state::cforte_prepare_display()
+void cforte_state::cforte_prepare_display()
 {
 	// 3 led rows
 	display_matrix(8, 3, m_led_data, m_led_select, false);
@@ -347,7 +394,7 @@ void novag6502_state::cforte_prepare_display()
 	display_update();
 }
 
-WRITE64_MEMBER(novag6502_state::cforte_lcd_output_w)
+WRITE64_MEMBER(cforte_state::cforte_lcd_output_w)
 {
 	// 4 rows used
 	u32 rowdata[4];
@@ -367,14 +414,14 @@ WRITE64_MEMBER(novag6502_state::cforte_lcd_output_w)
 	cforte_prepare_display();
 }
 
-WRITE8_MEMBER(novag6502_state::cforte_mux_w)
+WRITE8_MEMBER(cforte_state::cforte_mux_w)
 {
 	// d0-d7: input mux, led data
 	m_inp_mux = m_led_data = data;
 	cforte_prepare_display();
 }
 
-WRITE8_MEMBER(novag6502_state::cforte_control_w)
+WRITE8_MEMBER(cforte_state::cforte_control_w)
 {
 	// d0: HLCD0538 data in
 	// d1: HLCD0538 clk
@@ -393,6 +440,18 @@ WRITE8_MEMBER(novag6502_state::cforte_control_w)
 	m_beeper->set_state(data >> 7 & 1);
 }
 
+READ8_MEMBER(cforte_state::cforte_input1_r)
+{
+	// d0-d7: multiplexed inputs (chessboard squares)
+	return ~read_inputs(8) & 0xff;
+}
+
+READ8_MEMBER(cforte_state::cforte_input2_r)
+{
+	// d0-d5: ?
+	// d6,d7: multiplexed inputs (side panel)
+	return (read_inputs(8) >> 2 & 0xc0) ^ 0xff;
+}
 
 
 /******************************************************************************
@@ -401,7 +460,7 @@ WRITE8_MEMBER(novag6502_state::cforte_control_w)
 
 // TTL/generic
 
-WRITE8_MEMBER(novag6502_state::sexpert_lcd_control_w)
+WRITE8_MEMBER(sexpert_state::sexpert_lcd_control_w)
 {
 	// d0: HD44780 RS
 	// d1: HD44780 R/W
@@ -411,19 +470,19 @@ WRITE8_MEMBER(novag6502_state::sexpert_lcd_control_w)
 	m_lcd_control = data & 7;
 }
 
-WRITE8_MEMBER(novag6502_state::sexpert_lcd_data_w)
+WRITE8_MEMBER(sexpert_state::sexpert_lcd_data_w)
 {
 	// d0-d7: HD44780 data
 	m_lcd_data = data;
 }
 
-WRITE8_MEMBER(novag6502_state::sexpert_leds_w)
+WRITE8_MEMBER(sexpert_state::sexpert_leds_w)
 {
 	// d0-d7: chessboard leds
 	m_led_data = data;
 }
 
-WRITE8_MEMBER(novag6502_state::sexpert_mux_w)
+WRITE8_MEMBER(sexpert_state::sexpert_mux_w)
 {
 	// d0: rom bankswitch
 	m_rombank->set_entry(data & 1);
@@ -437,37 +496,19 @@ WRITE8_MEMBER(novag6502_state::sexpert_mux_w)
 	m_led_data = 0; // ?
 }
 
-READ8_MEMBER(novag6502_state::sexpert_input1_r)
+READ8_MEMBER(sexpert_state::sexpert_input1_r)
 {
 	// d0-d7: multiplexed inputs (chessboard squares)
 	return ~read_inputs(8) & 0xff;
 }
 
-READ8_MEMBER(novag6502_state::sexpert_input2_r)
+READ8_MEMBER(sexpert_state::sexpert_input2_r)
 {
 	// d0-d2: printer port
 	// d5-d7: multiplexed inputs (side panel)
 	return ~read_inputs(8) >> 3 & 0xe0;
 }
 
-void novag6502_state::sexpert_set_cpu_freq()
-{
-	// machines were released with either 5MHz or 6MHz CPU
-	m_maincpu->set_unscaled_clock((ioport("FAKE")->read() & 1) ? (12_MHz_XTAL/2) : (10_MHz_XTAL/2));
-}
-
-MACHINE_RESET_MEMBER(novag6502_state, sexpert)
-{
-	novagbase_state::machine_reset();
-
-	sexpert_set_cpu_freq();
-	m_rombank->set_entry(0);
-}
-
-void novag6502_state::init_sexpert()
-{
-	m_rombank->configure_entries(0, 2, memregion("maincpu")->base() + 0x8000, 0x8000);
-}
 
 
 
@@ -475,16 +516,16 @@ void novag6502_state::init_sexpert()
     Super Forte
 ******************************************************************************/
 
-WRITE8_MEMBER(novag6502_state::sforte_lcd_control_w)
+WRITE8_MEMBER(sexpert_state::sforte_lcd_control_w)
 {
 	// d3: rom bankswitch
 	m_rombank->set_entry(data >> 3 & 1);
 
 	// assume same as sexpert
-	sexpert_lcd_control_w(space, 0, data);
+	sexpert_lcd_control_w(space, offset, data);
 }
 
-WRITE8_MEMBER(novag6502_state::sforte_lcd_data_w)
+WRITE8_MEMBER(sexpert_state::sforte_lcd_data_w)
 {
 	// d0-d2: input mux/led select
 	m_inp_mux = 1 << (data & 7);
@@ -501,7 +542,7 @@ WRITE8_MEMBER(novag6502_state::sforte_lcd_data_w)
 	}
 
 	// assume same as sexpert
-	sexpert_lcd_data_w(space, 0, data);
+	sexpert_lcd_data_w(space, offset, data);
 }
 
 
@@ -512,47 +553,59 @@ WRITE8_MEMBER(novag6502_state::sforte_lcd_data_w)
 
 // Super Constellation / Constellation Forte
 
-void novag6502_state::supercon_map(address_map &map)
+void scon_state::supercon_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram().share("nvram");
 	map(0x1c00, 0x1c00).nopw(); // printer/clock?
 	map(0x1d00, 0x1d00).nopw(); // printer/clock?
-	map(0x1e00, 0x1e00).rw(FUNC(novag6502_state::supercon_input2_r), FUNC(novag6502_state::supercon_mux_w));
-	map(0x1f00, 0x1f00).rw(FUNC(novag6502_state::supercon_input1_r), FUNC(novag6502_state::supercon_control_w));
+	map(0x1e00, 0x1e00).rw(FUNC(scon_state::supercon_input2_r), FUNC(scon_state::supercon_mux_w));
+	map(0x1f00, 0x1f00).rw(FUNC(scon_state::supercon_input1_r), FUNC(scon_state::supercon_control_w));
 	map(0x2000, 0xffff).rom();
 }
 
-void novag6502_state::cforte_map(address_map &map)
+void cforte_state::cforte_map(address_map &map)
 {
-	supercon_map(map);
-	map(0x1e00, 0x1e00).rw(FUNC(novag6502_state::supercon_input2_r), FUNC(novag6502_state::cforte_mux_w));
-	map(0x1f00, 0x1f00).rw(FUNC(novag6502_state::supercon_input1_r), FUNC(novag6502_state::cforte_control_w));
+	map(0x0000, 0x0fff).ram().share("nvram");
+	map(0x1c00, 0x1c00).nopw(); // printer?
+	map(0x1d00, 0x1d00).nopw(); // printer?
+	map(0x1e00, 0x1e00).rw(FUNC(cforte_state::cforte_input2_r), FUNC(cforte_state::cforte_mux_w));
+	map(0x1f00, 0x1f00).rw(FUNC(cforte_state::cforte_input1_r), FUNC(cforte_state::cforte_control_w));
+	map(0x2000, 0xffff).rom();
 }
 
 
 // Super Expert / Super Forte
 
-void novag6502_state::sforte_map(address_map &map)
+void sexpert_state::sforte_map(address_map &map)
 {
 	map(0x0000, 0x1fef).ram().share("nvram"); // 8KB RAM, but RAM CE pin is deactivated on $1ff0-$1fff
-	map(0x1ff0, 0x1ff0).r(FUNC(novag6502_state::sexpert_input1_r));
-	map(0x1ff1, 0x1ff1).r(FUNC(novag6502_state::sexpert_input2_r));
+	map(0x1ff0, 0x1ff0).r(FUNC(sexpert_state::sexpert_input1_r));
+	map(0x1ff1, 0x1ff1).r(FUNC(sexpert_state::sexpert_input2_r));
 	map(0x1ff2, 0x1ff2).nopw(); // printer
 	map(0x1ff3, 0x1ff3).nopw(); // printer
-	map(0x1ff6, 0x1ff6).w(FUNC(novag6502_state::sforte_lcd_control_w));
-	map(0x1ff7, 0x1ff7).w(FUNC(novag6502_state::sforte_lcd_data_w));
+	map(0x1ff4, 0x1ff4).nopw();
+	map(0x1ff5, 0x1ff5).nopw();
+	map(0x1ff6, 0x1ff6).w(FUNC(sexpert_state::sforte_lcd_control_w));
+	map(0x1ff7, 0x1ff7).w(FUNC(sexpert_state::sforte_lcd_data_w));
 	map(0x1ffc, 0x1fff).rw("acia", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0x2000, 0x7fff).rom();
 	map(0x8000, 0xffff).bankr("rombank");
 }
 
-void novag6502_state::sexpert_map(address_map &map)
+void sexpert_state::sexpert_map(address_map &map)
 {
-	sforte_map(map);
-	map(0x1ff4, 0x1ff4).w(FUNC(novag6502_state::sexpert_leds_w));
-	map(0x1ff5, 0x1ff5).w(FUNC(novag6502_state::sexpert_mux_w));
-	map(0x1ff6, 0x1ff6).w(FUNC(novag6502_state::sexpert_lcd_control_w));
-	map(0x1ff7, 0x1ff7).w(FUNC(novag6502_state::sexpert_lcd_data_w));
+	map(0x0000, 0x1fef).ram().share("nvram"); // 8KB RAM, but RAM CE pin is deactivated on $1ff0-$1fff
+	map(0x1ff0, 0x1ff0).r(FUNC(sexpert_state::sexpert_input1_r));
+	map(0x1ff1, 0x1ff1).r(FUNC(sexpert_state::sexpert_input2_r));
+	map(0x1ff2, 0x1ff2).nopw(); // printer
+	map(0x1ff3, 0x1ff3).nopw(); // printer
+	map(0x1ff4, 0x1ff4).w(FUNC(sexpert_state::sexpert_leds_w));
+	map(0x1ff5, 0x1ff5).w(FUNC(sexpert_state::sexpert_mux_w));
+	map(0x1ff6, 0x1ff6).w(FUNC(sexpert_state::sexpert_lcd_control_w));
+	map(0x1ff7, 0x1ff7).w(FUNC(sexpert_state::sexpert_lcd_data_w));
+	map(0x1ffc, 0x1fff).rw("acia", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
+	map(0x2000, 0x7fff).rom();
+	map(0x8000, 0xffff).bankr("rombank");
 }
 
 
@@ -842,15 +895,11 @@ static INPUT_PORTS_START( sexy_shared )
 	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_NAME("Print Board / Interface")
 
 	PORT_START("FAKE")
-	PORT_CONFNAME( 0x01, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, novag6502_state, sexpert_cpu_freq, nullptr) // factory set
+	PORT_CONFNAME( 0x01, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, sexpert_state, sexpert_cpu_freq, nullptr) // factory set
 	PORT_CONFSETTING(    0x00, "5MHz" )
 	PORT_CONFSETTING(    0x01, "6MHz" )
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER(novag6502_state::sexpert_cpu_freq)
-{
-	sexpert_set_cpu_freq();
-}
 
 static INPUT_PORTS_START( sexpert )
 	PORT_INCLUDE( novag_cb_magnets )
@@ -868,60 +917,60 @@ INPUT_PORTS_END
     Machine Drivers
 ******************************************************************************/
 
-MACHINE_CONFIG_START(novag6502_state::supercon)
-
+void scon_state::supercon(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, 8_MHz_XTAL/2)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(novag6502_state, irq0_line_hold, 600) // guessed
-	MCFG_DEVICE_PROGRAM_MAP(supercon_map)
+	M6502(config, m_maincpu, 8_MHz_XTAL/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &scon_state::supercon_map);
+	m_maincpu->set_periodic_int(FUNC(scon_state::irq0_line_hold), attotime::from_hz(600)); // guessed
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(novag6502_state::display_decay_tick), attotime::from_msec(1));
+	TIMER(config, "display_decay").configure_periodic(FUNC(scon_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_novag_supercon);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beeper, 1024); // guessed
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(novag6502_state::cforte)
-
+void cforte_state::cforte(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", R65C02, 10_MHz_XTAL/2)
-	MCFG_DEVICE_PROGRAM_MAP(cforte_map)
+	R65C02(config, m_maincpu, 10_MHz_XTAL/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cforte_state::cforte_map);
 
 	const attotime irq_period = attotime::from_hz(32.768_kHz_XTAL/128); // 256Hz
-	TIMER(config, m_irq_on).configure_periodic(FUNC(novag6502_state::irq_on<M6502_IRQ_LINE>), irq_period);
+	TIMER(config, m_irq_on).configure_periodic(FUNC(cforte_state::irq_on<M6502_IRQ_LINE>), irq_period);
 	m_irq_on->set_start_delay(irq_period - attotime::from_usec(11)); // active for 11us
-	TIMER(config, "irq_off").configure_periodic(FUNC(novag6502_state::irq_off<M6502_IRQ_LINE>), irq_period);
+	TIMER(config, "irq_off").configure_periodic(FUNC(cforte_state::irq_off<M6502_IRQ_LINE>), irq_period);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* video hardware */
 	HLCD0538(config, m_hlcd0538, 0);
-	m_hlcd0538->write_cols_callback().set(FUNC(novag6502_state::cforte_lcd_output_w));
+	m_hlcd0538->write_cols_callback().set(FUNC(cforte_state::cforte_lcd_output_w));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(novag6502_state::display_decay_tick), attotime::from_msec(1));
+	TIMER(config, "display_decay").configure_periodic(FUNC(cforte_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_novag_cforte);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beeper, 32.768_kHz_XTAL/32); // 1024Hz
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(novag6502_state::sexpert)
-
+void sexpert_state::sexpert(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M65C02, 10_MHz_XTAL/2) // or 12_MHz_XTAL/2
-	MCFG_DEVICE_PROGRAM_MAP(sexpert_map)
+	M65C02(config, m_maincpu, 10_MHz_XTAL/2); // or 12_MHz_XTAL/2
+	m_maincpu->set_addrmap(AS_PROGRAM, &sexpert_state::sexpert_map);
 
 	const attotime irq_period = attotime::from_hz(32.768_kHz_XTAL/128); // 256Hz
-	TIMER(config, m_irq_on).configure_periodic(FUNC(novag6502_state::irq_on<M6502_IRQ_LINE>), irq_period);
+	TIMER(config, m_irq_on).configure_periodic(FUNC(sexpert_state::irq_on<M6502_IRQ_LINE>), irq_period);
 	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(21500)); // active for 21.5us
-	TIMER(config, "irq_off").configure_periodic(FUNC(novag6502_state::irq_off<M6502_IRQ_LINE>), irq_period);
+	TIMER(config, "irq_off").configure_periodic(FUNC(sexpert_state::irq_off<M6502_IRQ_LINE>), irq_period);
 
 	mos6551_device &acia(MOS6551(config, "acia", 0)); // R65C51P2 - RTS to CTS, DCD to GND
 	acia.set_xtal(1.8432_MHz_XTAL);
@@ -936,42 +985,41 @@ MACHINE_CONFIG_START(novag6502_state::sexpert)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	MCFG_MACHINE_RESET_OVERRIDE(novag6502_state, sexpert)
-
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(60) // arbitrary
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(6*16+1, 10)
-	MCFG_SCREEN_VISIBLE_AREA(0, 6*16, 0, 10-1)
-	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-	PALETTE(config, "palette", FUNC(novag6502_state::novag_lcd_palette), 3);
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(60); // arbitrary
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_size(6*16+1, 10);
+	screen.set_visarea(0, 6*16, 0, 10-1);
+	screen.set_screen_update("hd44780", FUNC(hd44780_device::screen_update));
+	screen.set_palette("palette");
+
+	PALETTE(config, "palette", FUNC(sexpert_state::novag_lcd_palette), 3);
 
 	HD44780(config, m_lcd, 0);
 	m_lcd->set_lcd_size(2, 8);
-	m_lcd->set_pixel_update_cb(FUNC(novag6502_state::novag_lcd_pixel_update), this);
+	m_lcd->set_pixel_update_cb(FUNC(sexpert_state::novag_lcd_pixel_update), this);
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(novag6502_state::display_decay_tick), attotime::from_msec(1));
+	TIMER(config, "display_decay").configure_periodic(FUNC(sexpert_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_novag_sexpert);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beeper, 32.768_kHz_XTAL/32); // 1024Hz
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(novag6502_state::sforte)
+void sexpert_state::sforte(machine_config &config)
+{
 	sexpert(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(sforte_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &sexpert_state::sforte_map);
 
 	m_irq_on->set_start_delay(m_irq_on->period() - attotime::from_usec(11)); // active for ?us (assume same as cforte)
 
 	config.set_default_layout(layout_novag_sforte);
-MACHINE_CONFIG_END
+}
 
 
 
@@ -1063,17 +1111,17 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME       PARENT    COMPAT  MACHINE   INPUT     CLASS            INIT          COMPANY  FULLNAME               FLAGS
-CONS( 1984, supercon,  0,        0,      supercon, supercon, novag6502_state, empty_init,   "Novag", "Super Constellation", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1984, supercon,  0,        0,      supercon, supercon, scon_state, empty_init,   "Novag", "Super Constellation", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 
-CONS( 1986, cfortea,   0,        0,      cforte,   cforte,   novag6502_state, empty_init,   "Novag", "Constellation Forte (version A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1986, cforteb,   cfortea,  0,      cforte,   cforte,   novag6502_state, empty_init,   "Novag", "Constellation Forte (version B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1986, cfortea,   0,        0,      cforte,   cforte,   cforte_state, empty_init,   "Novag", "Constellation Forte (version A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1986, cforteb,   cfortea,  0,      cforte,   cforte,   cforte_state, empty_init,   "Novag", "Constellation Forte (version B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 
-CONS( 1987, sfortea,   0,        0,      sforte,   sforte,   novag6502_state, init_sexpert, "Novag", "Super Forte (version A, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1987, sfortea1,  sfortea,  0,      sforte,   sforte,   novag6502_state, init_sexpert, "Novag", "Super Forte (version A, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1988, sforteb,   sfortea,  0,      sforte,   sforte,   novag6502_state, init_sexpert, "Novag", "Super Forte (version B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1990, sfortec,   sfortea,  0,      sforte,   sforte,   novag6502_state, init_sexpert, "Novag", "Super Forte (version C)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1987, sfortea,   0,        0,      sforte,   sforte,   sexpert_state, init_sexpert, "Novag", "Super Forte (version A, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1987, sfortea1,  sfortea,  0,      sforte,   sforte,   sexpert_state, init_sexpert, "Novag", "Super Forte (version A, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1988, sforteb,   sfortea,  0,      sforte,   sforte,   sexpert_state, init_sexpert, "Novag", "Super Forte (version B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1990, sfortec,   sfortea,  0,      sforte,   sforte,   sexpert_state, init_sexpert, "Novag", "Super Forte (version C)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 
-CONS( 1987, sexperta,  0,        0,      sexpert,  sexpert,  novag6502_state, init_sexpert, "Novag", "Super Expert (version A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1988, sexpertb,  sexperta, 0,      sexpert,  sexpert,  novag6502_state, init_sexpert, "Novag", "Super Expert (version B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1990, sexpertc,  sexperta, 0,      sexpert,  sexpert,  novag6502_state, init_sexpert, "Novag", "Super Expert (version C, V3.6)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1990, sexpertc1, sexperta, 0,      sexpert,  sexpert,  novag6502_state, init_sexpert, "Novag", "Super Expert (version C, V1.2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1987, sexperta,  0,        0,      sexpert,  sexpert,  sexpert_state, init_sexpert, "Novag", "Super Expert (version A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1988, sexpertb,  sexperta, 0,      sexpert,  sexpert,  sexpert_state, init_sexpert, "Novag", "Super Expert (version B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1990, sexpertc,  sexperta, 0,      sexpert,  sexpert,  sexpert_state, init_sexpert, "Novag", "Super Expert (version C, V3.6)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1990, sexpertc1, sexperta, 0,      sexpert,  sexpert,  sexpert_state, init_sexpert, "Novag", "Super Expert (version C, V1.2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )

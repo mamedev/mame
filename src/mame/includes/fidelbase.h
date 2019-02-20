@@ -60,8 +60,8 @@ public:
 	// misc common
 	u16 m_inp_mux;                  // multiplexed keypad/leds mask
 	u16 m_led_select;
-	u32 m_7seg_data;                // data for seg leds
 	u16 m_led_data;
+	u32 m_7seg_data;                // data for seg leds
 	u8 m_speech_data;
 	u8 m_speech_bank;               // speech rom higher address bits
 
