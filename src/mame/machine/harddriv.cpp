@@ -464,7 +464,7 @@ READ16_MEMBER( harddriv_state::hd68k_zram_r )
 		data |= m_210e->read(space, offset, mem_mask);
 
 	if (ACCESSING_BITS_8_15)
-		data |= m_200e->read(space, offset, mem_mask >> 8) << 8;
+		data |= m_200e->read(offset) << 8;
 
 	return data;
 }
@@ -478,7 +478,7 @@ WRITE16_MEMBER( harddriv_state::hd68k_zram_w )
 			m_210e->write(space, offset, data, mem_mask);
 
 		if (ACCESSING_BITS_8_15)
-			m_200e->write(space, offset, data >> 8, mem_mask >> 8);
+			m_200e->write(offset, data >> 8);
 	}
 }
 

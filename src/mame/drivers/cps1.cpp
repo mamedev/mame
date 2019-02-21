@@ -13167,7 +13167,7 @@ READ16_MEMBER(cps_state::ganbare_ram_r)
 	uint16_t result = 0xffff;
 
 	if (ACCESSING_BITS_0_7)
-		result = (result & ~0x00ff) | m_m48t35->read(space, offset, 0xff);
+		result = (result & ~0x00ff) | m_m48t35->read(offset);
 	if (ACCESSING_BITS_8_15)
 		result = (result & ~0xff00) | (m_mainram[offset] & 0xff00);
 
@@ -13179,7 +13179,7 @@ WRITE16_MEMBER(cps_state::ganbare_ram_w)
 	COMBINE_DATA(&m_mainram[offset]);
 
 	if (ACCESSING_BITS_0_7)
-		m_m48t35->write(space, offset, data & 0xff, 0xff);
+		m_m48t35->write(offset, data & 0xff);
 }
 
 void cps_state::init_ganbare()
