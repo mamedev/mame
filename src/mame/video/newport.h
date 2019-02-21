@@ -187,13 +187,13 @@ private:
 	void write_y_end(int32_t val);
 
 	bool pixel_clip_pass(int16_t x, int16_t y);
-	void write_pixel(uint8_t color);
+	void write_pixel(uint8_t color, bool shade);
 	void write_pixel(int16_t x, int16_t y, uint8_t color);
 	void store_pixel(uint8_t *dest_buf, const uint8_t src);
 
-	void do_v_iline(uint8_t color, bool skip_last);
-	void do_h_iline(uint8_t color, bool skip_last);
-	void do_iline(uint8_t color, bool skip_last);
+	void do_v_iline(uint8_t color, bool skip_last, bool shade);
+	void do_h_iline(uint8_t color, bool skip_last, bool shade);
+	void do_iline(uint8_t color, bool skip_last, bool shade);
 	uint8_t do_pixel_read();
 	uint64_t do_pixel_word_read();
 	void do_rex3_command();

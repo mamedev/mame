@@ -1244,9 +1244,12 @@ READ64_MEMBER(newport_video_device::rex3_r)
 	return ret;
 }
 
-void newport_video_device::write_pixel(uint8_t color)
+void newport_video_device::write_pixel(uint8_t color, bool shade)
 {
-	write_pixel(m_rex3.m_x_start_i, m_rex3.m_y_start_i, color);
+	if (shade)
+		write_pixel(m_rex3.m_x_start_i, m_rex3.m_y_start_i, (uint8_t)(m_rex3.m_color_red >> 11));
+	else
+		write_pixel(m_rex3.m_x_start_i, m_rex3.m_y_start_i, color);
 }
 
 bool newport_video_device::pixel_clip_pass(int16_t x, int16_t y)
@@ -1388,7 +1391,7 @@ void newport_video_device::write_pixel(int16_t x, int16_t y, uint8_t color)
 	}
 }
 
-void newport_video_device::do_v_iline(uint8_t color, bool skip_last)
+void newport_video_device::do_v_iline(uint8_t color, bool skip_last, bool shade)
 {
 	int16_t x1 = m_rex3.m_x_start_i;
 	int16_t y1 = m_rex3.m_y_start_i;
@@ -1398,19 +1401,30 @@ void newport_video_device::do_v_iline(uint8_t color, bool skip_last)
 
 	do
 	{
-        write_pixel(x1, y1, color);
+		if (shade)
+        	write_pixel(x1, y1, (uint8_t)(m_rex3.m_color_red >> 11));
+        else
+        	write_pixel(x1, y1, color);
+
         y1 += incy;
+
+		if (shade)
+			m_rex3.m_color_red += m_rex3.m_slope_red;
 	} while (y1 != y2);
 
-    if (!skip_last) {
-        write_pixel(x1, y1, color);
+    if (!skip_last)
+    {
+		if (shade)
+        	write_pixel(x1, y1, (uint8_t)(m_rex3.m_color_red >> 11));
+        else
+        	write_pixel(x1, y1, color);
     }
 
     write_x_start(x1 << 11);
     write_y_start(y1 << 11);
 }
 
-void newport_video_device::do_h_iline(uint8_t color, bool skip_last)
+void newport_video_device::do_h_iline(uint8_t color, bool skip_last, bool shade)
 {
 	int16_t x1 = m_rex3.m_x_start_i;
 	int16_t y1 = m_rex3.m_y_start_i;
@@ -1420,19 +1434,29 @@ void newport_video_device::do_h_iline(uint8_t color, bool skip_last)
 
 	do
 	{
-		write_pixel(x1, y1, color);
+		if (shade)
+			write_pixel(x1, y1, (uint8_t)(m_rex3.m_color_red >> 11));
+		else
+			write_pixel(x1, y1, color);
+
 		x1 += incx;
+
+		if (shade)
+			m_rex3.m_color_red += m_rex3.m_slope_red;
 	} while (x1 != x2);
 
     if (!skip_last) {
-        write_pixel(x1, y1, color);
+		if (shade)
+        	write_pixel(x1, y1, (uint8_t)(m_rex3.m_color_red >> 11));
+        else
+        	write_pixel(x1, y1, color);
     }
 
     write_x_start(x1 << 11);
     write_y_start(y1 << 11);
 }
 
-void newport_video_device::do_iline(uint8_t color, bool skip_last)
+void newport_video_device::do_iline(uint8_t color, bool skip_last, bool shade)
 {
 	int16_t x1 = m_rex3.m_x_start_i;
 	int16_t y1 = m_rex3.m_y_start_i;
@@ -1486,7 +1510,10 @@ void newport_video_device::do_iline(uint8_t color, bool skip_last)
 	{
 		do
 		{
-			write_pixel(x1, y1, color);
+			if (shade)
+				write_pixel(x1, y1, (uint8_t)(m_rex3.m_color_red >> 11));
+			else
+				write_pixel(x1, y1, color);
 
 			if (e > 0)
 			{
@@ -1499,13 +1526,18 @@ void newport_video_device::do_iline(uint8_t color, bool skip_last)
 			}
 
 			x1++;
+			if (shade)
+				m_rex3.m_color_red += m_rex3.m_slope_red;
 		} while (x1 != x2);
 	}
 	else
 	{
 		do
 		{
-			write_pixel(x1, y1, color);
+			if (shade)
+				write_pixel(x1, y1, (uint8_t)(m_rex3.m_color_red >> 11));
+			else
+				write_pixel(x1, y1, color);
 
 			if (e > 0)
 			{
@@ -1518,11 +1550,17 @@ void newport_video_device::do_iline(uint8_t color, bool skip_last)
 			}
 
 			x1++;
+			if (shade)
+				m_rex3.m_color_red += m_rex3.m_slope_red;
 		} while (x1 != x2);
 	}
 
-    if (!skip_last) {
-        write_pixel(x1, y1, color);
+    if (!skip_last)
+    {
+		if (shade)
+        	write_pixel(x1, y1, (uint8_t)(m_rex3.m_color_red >> 11));
+        else
+        	write_pixel(x1, y1, color);
     }
 
     write_x_start(x1 << 11);
@@ -1595,7 +1633,7 @@ void newport_video_device::do_rex3_command()
 	{
 		LOGMASKED(LOG_COMMANDS, "%04x, %04x = %02x\n", start_x, start_y, m_rex3.m_color_i & 0xff);
 		m_rex3.m_bres_octant_inc1 = 0;
-		write_pixel(m_rex3.m_color_i & 0xff);
+		write_pixel(m_rex3.m_color_i & 0xff, false);
 		start_x++;
 		if (start_x > end_x)
 		{
@@ -1651,6 +1689,7 @@ void newport_video_device::do_rex3_command()
 	case 0x00000122: // StopOnX, DoSetup, Span, Draw
 	case 0x00022102: // LSOpaque, EnLSPattern, StopOnX, Span, Draw
 	case 0x00080122: // LROnly, StopOnX, DoSetup, Span, Draw
+	case 0x000c0122: // Shade, LROnly, StopOnX, DoSetup, Span, Draw
 	{
 		if (BIT(mode0, 19) && dx < 0) // LROnly
 			break;
@@ -1715,27 +1754,32 @@ void newport_video_device::do_rex3_command()
 	case 0x0000032a: // StopOnX, StopOnY, DoSetup, I_Line, Draw
 	case 0x00000b2a: // SkipLast, StopOnX, StopOnY, DoSetup, I_Line, Draw
 	case 0x0000232e: // EnLSPattern, StopOnX, StopOnY, DoSetup, F_Line, Draw
+	case 0x0004232e: // Shade, EnLSPattern, StopOnX, StopOnY, DoSetup, F_Line, Draw
 	{
+		const bool skip_last = BIT(mode0, 11);
+		const bool shade = BIT(mode0, 18);
+
 		LOGMASKED(LOG_COMMANDS, "%cLine: %04x, %04x to %04x, %04x = %08x\n", (mode0 & 0x1c) == 3 ? 'F' : 'I',
 			start_x, start_y, end_x, end_y, m_cmap0.m_palette[m_rex3.m_color_i]);
 		if (start_x == end_x && start_y == end_y)
 		{
-			write_pixel(m_rex3.m_color_i);
+			write_pixel(m_rex3.m_color_i, shade);
 		}
 		else if (start_x == end_x)
 		{
-			do_v_iline(m_rex3.m_color_i, BIT(mode0, 11));
+			do_v_iline(m_rex3.m_color_i, skip_last, shade);
 		}
 		else if (start_y == end_y)
 		{
-			do_h_iline(m_rex3.m_color_i, BIT(mode0, 11));
+			do_h_iline(m_rex3.m_color_i, skip_last, shade);
 		}
 		else
 		{
-			do_iline(m_rex3.m_color_i, BIT(mode0, 11));
+			do_iline(m_rex3.m_color_i, skip_last, shade);
 		}
 		break;
 	}
+	case 0x00001106: // EnZPattern, StopOnX, Block, Draw
 	case 0x00002106: // EnLSPattern, StopOnX, Block, Draw
 	case 0x00009106: // Length32, EnZPattern, StopOnX, Block, Draw
 	case 0x00022106: // LSOpaque, EnLSPattern, StopOnX, Block, Draw
