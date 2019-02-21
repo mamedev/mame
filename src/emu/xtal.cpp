@@ -148,6 +148,7 @@ const double XTAL::known_xtals[] = {
 	 10'137'600, /* 10.1376_MHz_XTAL       Wyse WY-100 */
 	 10'245'000, /* 10.245_MHz_XTAL        PES Speech box */
 	 10'380'000, /* 10.38_MHz_XTAL         Fairlight Q219 Lightpen/Graphics Card */
+	 10'480'000, /* 10.48_MHz_XTAL         System-80 (50 Hz) */
 	 10'500'000, /* 10.5_MHz_XTAL          Agat-7 */
 	 10'595'000, /* 10.595_MHz_XTAL        Mad Alien */
 	 10'644'500, /* 10.6445_MHz_XTAL       TRS-80 Model I */
@@ -395,6 +396,7 @@ const double XTAL::known_xtals[] = {
 	 80'000'000, /* 80_MHz_XTAL            ARM710 */
 	 87'183'360, /* 87.18336_MHz_XTAL      AT&T 630 MTG */
 	 92'940'500, /* 92.9405_MHz_XTAL       Sun cgthree */
+	 99'522'000, /* 99.522_MHz_XTAL        Radius Two Page Display */
 	100'000'000, /* 100_MHz_XTAL           PSX-based Namco System 12, Vegas, Sony ZN1-2-based */
 	101'491'200, /* 101.4912_MHz_XTAL      PSX-based Namco System 10 */
 	108'108'000, /* 108.108_MHz_XTAL       HP 98550 high-res color card */

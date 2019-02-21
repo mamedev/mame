@@ -317,7 +317,7 @@ namespace netlist
 			for (int i=0; i < m_N(); i++)
 			{
 				pstring n = plib::pfmt("A{1}")(i);
-				m_I.push_back(plib::make_unique<analog_input_t>(*this, n));
+				m_I.push_back(pool().make_poolptr<analog_input_t>(*this, n));
 				inps.push_back(n);
 				m_vals.push_back(0.0);
 			}
@@ -334,7 +334,7 @@ namespace netlist
 		param_int_t m_N;
 		param_str_t m_func;
 		analog_output_t m_Q;
-		std::vector<std::unique_ptr<analog_input_t>> m_I;
+		std::vector<poolptr<analog_input_t>> m_I;
 
 		std::vector<double> m_vals;
 		plib::pfunction m_compiled;

@@ -52,12 +52,13 @@ public:
 	public:
 		using list_t = std::vector<callback_t *>;
 
-		virtual ~callback_t() = default;
-
 		virtual void register_state(state_manager_t &manager, const pstring &module) = 0;
 		virtual void on_pre_save(state_manager_t &manager) = 0;
 		virtual void on_post_load(state_manager_t &manager) = 0;
 	protected:
+		callback_t() = default;
+		~callback_t() = default;
+		COPYASSIGNMOVE(callback_t, default)
 	};
 
 	struct entry_t
@@ -71,8 +72,6 @@ public:
 		entry_t(const pstring &stname, const void *owner, callback_t *callback)
 		: m_name(stname), m_dt(datatype_t(true)), m_owner(owner), m_callback(callback), m_count(0), m_ptr(nullptr) { }
 
-		~entry_t() = default;
-
 		pstring             m_name;
 		const datatype_t    m_dt;
 		const void *        m_owner;
@@ -82,7 +81,6 @@ public:
 	};
 
 	state_manager_t() = default;
-	~state_manager_t() = default;
 
 	template<typename C>
 	void save_item(const void *owner, C &state, const pstring &stname)
@@ -118,7 +116,13 @@ public:
 	void post_load();
 	void remove_save_items(const void *owner);
 
-	const entry_t::list_t &save_list() const { return m_save; }
+	const std::vector<const entry_t *> save_list() const
+	{
+		std::vector<const entry_t *> ret;
+		for (auto &i : m_save)
+			ret.push_back(i.get());
+		return ret;
+	}
 
 	void save_state_ptr(const void *owner, const pstring &stname, const datatype_t &dt, const std::size_t count, void *ptr);
 

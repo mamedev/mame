@@ -691,6 +691,7 @@ WRITE8_MEMBER( ti99_8_state::external_operation )
 */
 WRITE_LINE_MEMBER( ti99_8_state::clock_out )
 {
+	m_tms9901->phi_line(state);
 	m_mainboard->clock_in(state);
 }
 
@@ -747,7 +748,7 @@ void ti99_8_state::ti99_8(machine_config& config)
 	m_cpu->holda_cb().set(TI998_MAINBOARD_TAG, FUNC(mainboard8_device::holda_line));
 
 	// 9901 configuration
-	TMS9901(config, m_tms9901, XTAL(10'738'635)/4.0);
+	TMS9901(config, m_tms9901, 0);
 	m_tms9901->read_cb().set(FUNC(ti99_8_state::read_by_9901));
 	m_tms9901->p_out_cb(0).set(FUNC(ti99_8_state::keyC0));
 	m_tms9901->p_out_cb(1).set(FUNC(ti99_8_state::keyC1));

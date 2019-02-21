@@ -8,18 +8,21 @@
 #define PDYNLIB_H_
 
 #include "pstring.h"
+#include "ptypes.h"
 
 namespace plib {
 // ----------------------------------------------------------------------------------------
 // pdynlib: dynamic loading of libraries  ...
 // ----------------------------------------------------------------------------------------
 
-class dynlib
+class dynlib : public nocopyassignmove
 {
 public:
 	explicit dynlib(const pstring libname);
 	dynlib(const pstring path, const pstring libname);
+
 	~dynlib();
+	COPYASSIGNMOVE(dynlib, delete)
 
 	bool isLoaded() const;
 

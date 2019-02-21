@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="sega_beena_cart" description="Sega Beena Cartridges">
+
+  <!-- you must byteswap ROMs to see text, due to endian? -->
+  
+	<software name="fpc" supported="no"> 
+		<description>Fresh Pretty Cure</description> <!-- is this the correct title? -->
+		<year>2009</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sega_beena_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="beena.bin" size="0x800000" crc="afa3466c" sha1="b49914f97db95f611489487f558d13d7cceb3299" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

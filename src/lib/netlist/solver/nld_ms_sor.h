@@ -27,9 +27,9 @@ class matrix_solver_SOR_t: public matrix_solver_direct_t<FT, SIZE>
 {
 public:
 
-	typedef FT float_type;
+	using float_type = FT;
 
-	matrix_solver_SOR_t(netlist_base_t &anetlist, const pstring &name, const solver_parameters_t *params, const std::size_t size)
+	matrix_solver_SOR_t(netlist_state_t &anetlist, const pstring &name, const solver_parameters_t *params, const std::size_t size)
 		: matrix_solver_direct_t<FT, SIZE>(anetlist, name, matrix_solver_t::ASCENDING, params, size)
 		, m_lp_fact(*this, "m_lp_fact", 0)
 		, w(size, 0.0)
@@ -38,8 +38,6 @@ public:
 		//, new_V(size, 0.0)
 		{
 		}
-
-	~matrix_solver_SOR_t() override = default;
 
 	void vsetup(analog_net_t::list_t &nets) override;
 	unsigned vsolve_non_dynamic(const bool newton_raphson) override;
@@ -90,7 +88,7 @@ unsigned matrix_solver_SOR_t<FT, SIZE>::vsolve_non_dynamic(const bool newton_rap
 		const float_type * const gt = this->m_terms[k]->gt();
 		const float_type * const go = this->m_terms[k]->go();
 		const float_type * const Idr = this->m_terms[k]->Idr();
-		const float_type * const *other_cur_analog = this->m_terms[k]->connected_net_V();
+		auto other_cur_analog = this->m_terms[k]->connected_net_V();
 
 		this->m_new_V[k] = this->m_nets[k]->Q_Analog();
 

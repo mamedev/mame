@@ -9983,7 +9983,7 @@
 	<software name="hook">
 		<description>Hook</description>
 		<year>1992</year>
-		<publisher>Ocean Software Ltd.</publisher>
+		<publisher>Ocean Software</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="disk1.img" size="737280" crc="95e41749" sha1="4a319888e029ea2ba9bd748b74163865dd560843" offset="0" />
@@ -10263,7 +10263,7 @@
 	<software name="indycar">
 		<description>IndyCar Racing</description>
 		<year>1993</year>
-		<publisher>Papyrus Publishing Inc.</publisher>
+		<publisher>Papyrus Publishing</publisher>
 		<info name="version" value="1.02" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
@@ -10735,6 +10735,19 @@
 		</part>
 	</software>
 
+	<software name="micromac">
+		<description>Micro Machines</description>
+		<year>1994</year>
+		<publisher>Codemasters</publisher>
+		<info name="developer" value="Codemasters" />
+		<info name="ported by" value="The Big Red Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Micro Machines [Codemasters] [1994] [3.5DD] [Disk 1 of 1].img" size="737280" crc="3bc676f8" sha1="da941c58f12b7e07b19356716bf5f028106488f5" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="micromc2">
 		<description>Micro Machines 2: Turbo Tournament</description>
 		<year>1995</year>
@@ -11285,6 +11298,35 @@
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="The Secret of Monkey Island [Kixx] [1993] [3.5HD] [Disk 3 of 3].img" size="1474560" crc="aa3cc8ba" sha1="d8f774bd3be4a85ac4d02e7f6c13ecee254aa560" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="monkeyit" cloneof="monkeyk">
+		<description>The Secret of Monkey Island (Italian)</description>
+		<year>1991</year>
+		<publisher>Lucasfilm Games</publisher>
+		<info name="developer" value="Lucasfilm Games" />
+		<info name="distributor" value="CTO Software" />
+		<info name="version" value="(VGA) Italian 1.0, 24 May 1991" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Secret of Monkey Island (Italian) [Lucasfilm Games] [1991] [3.5HD] [Disk 1 of 4].img" size="1474560" crc="855256e3" sha1="045f3698543055e11ce6dd570f39e7233feca51a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Secret of Monkey Island (Italian) [Lucasfilm Games] [1991] [3.5HD] [Disk 2 of 4].img" size="1474560" crc="56320b7b" sha1="e4c6ac3d5409b4b2d6a397d96a45c0c40b558c5f" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Secret of Monkey Island (Italian) [Lucasfilm Games] [1991] [3.5HD] [Disk 3 of 4].img" size="1474560" crc="456bfda5" sha1="14f1075199e39f9a033c073ba4dbed85c8937ebf" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Secret of Monkey Island (Italian) [Lucasfilm Games] [1991] [3.5HD] [Disk 4 of 4].img" size="1474560" crc="2aab0101" sha1="689d2958ec39ab1dbdee508c66b4d8aedde71126" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

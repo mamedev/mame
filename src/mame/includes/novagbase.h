@@ -3,9 +3,9 @@
 /******************************************************************************
 *
 *  Novag chess machines base class
-*  main driver is novag6502.cpp
 *
 ******************************************************************************/
+
 #ifndef MAME_INCLUDES_NOVAGBASE_H
 #define MAME_INCLUDES_NOVAGBASE_H
 
@@ -22,8 +22,10 @@ class novagbase_state : public driver_device
 public:
 	novagbase_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_beeper(*this, "beeper"),
 		m_maincpu(*this, "maincpu"),
+		m_irq_on(*this, "irq_on"),
+		m_rombank(*this, "rombank"),
+		m_beeper(*this, "beeper"),
 		m_dac(*this, "dac"),
 		m_lcd(*this, "hd44780"),
 		m_inp_matrix(*this, "IN.%u", 0),
@@ -35,13 +37,11 @@ public:
 		m_display_maxx(0)
 	{ }
 
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
 	// devices/pointers
-	optional_device<beep_device> m_beeper;
 	required_device<cpu_device> m_maincpu;
+	optional_device<timer_device> m_irq_on;
+	optional_memory_bank m_rombank;
+	optional_device<beep_device> m_beeper;
 	optional_device<dac_bit_interface> m_dac;
 	optional_device<hd44780_device> m_lcd;
 	optional_ioport_array<9> m_inp_matrix; // max 9
@@ -53,10 +53,18 @@ protected:
 	u16 m_inp_mux;                  // multiplexed keypad mask
 	u16 m_led_select;
 	u16 m_led_data;
+	u8 m_7seg_data;
 	u8 m_lcd_control;
 	u8 m_lcd_data;
 
 	u16 read_inputs(int columns);
+
+	// in case reset button is directly tied to maincpu reset pin
+	virtual DECLARE_INPUT_CHANGED_MEMBER(reset_button) { m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE); }
+
+	// periodic interrupts
+	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(Line, ASSERT_LINE); }
+	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(Line, CLEAR_LINE); }
 
 	// display common
 	int m_display_wait;             // led/lamp off-delay in milliseconds (default 33ms)
@@ -74,6 +82,10 @@ protected:
 	void set_display_size(int maxx, int maxy);
 	void set_display_segmask(u32 digits, u32 mask);
 	void display_matrix(int maxx, int maxy, u32 setx, u32 sety, bool update = true);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 };
 
 

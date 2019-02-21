@@ -89,9 +89,12 @@ DEFINE_DEVICE_TYPE(PPU_2C05_04, ppu2c05_04_device, "ppu2c05_04", "2C05_04 PPU")
 // default address map
 void ppu2c0x_device::ppu2c0x(address_map &map)
 {
-	map(0x0000, 0x3eff).ram();
-	map(0x3f00, 0x3fff).rw(FUNC(ppu2c0x_device::palette_read), FUNC(ppu2c0x_device::palette_write));
+	if (!has_configured_map(0))
+	{
+		map(0x0000, 0x3eff).ram();
+		map(0x3f00, 0x3fff).rw(FUNC(ppu2c0x_device::palette_read), FUNC(ppu2c0x_device::palette_write));
 //  AM_RANGE(0x0000, 0x3fff) AM_RAM
+	}
 }
 
 //-------------------------------------------------
@@ -125,7 +128,7 @@ ppu2c0x_device::ppu2c0x_device(const machine_config &mconfig, device_type type, 
 	, device_memory_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
 	, device_palette_interface(mconfig, *this)
-	, m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, address_map_constructor(), address_map_constructor(FUNC(ppu2c0x_device::ppu2c0x), this))
+	, m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, address_map_constructor(FUNC(ppu2c0x_device::ppu2c0x), this))
 	, m_cpu(*this, finder_base::DUMMY_TAG)
 	, m_scanline(0)  // reset the scanline count
 	, m_int_callback(*this)

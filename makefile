@@ -505,7 +505,9 @@ endif
 # reverse logic for this one
 
 ifdef USE_BUNDLED_LIB_SDL2
+ifneq '$(USE_BUNDLED_LIB_SDL2)' '0'
 PARAMS += --with-bundled-sdl2
+endif
 endif
 
 #-------------------------------------------------
@@ -971,7 +973,11 @@ FASTBUILD_PARAMS += $(FASTBUILD_TARGET)-x32
 endif
 endif
 else
+ifdef OVERRIDE_CC
+GCC_VERSION      := $(shell $(TOOLCHAIN)$(subst @,,$(OVERRIDE_CC)) -dumpversion 2> /dev/null)
+else
 GCC_VERSION      := $(shell $(TOOLCHAIN)$(subst @,,$(CC)) -dumpversion 2> /dev/null)
+endif
 ifneq ($(OS),solaris)
 CLANG_VERSION    := $(shell $(TOOLCHAIN)$(subst @,,$(CC))  --version  2> /dev/null | head -n 1 | grep -e 'version [0-9]\+\.[0-9]\+\(\.[0-9]\+\)\?' -o | grep -e '[0-9]\+\.[0-9]\+\(\.[0-9]\+\)\?' -o | tail -n 1)
 endif

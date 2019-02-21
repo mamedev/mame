@@ -647,6 +647,7 @@ WRITE8_MEMBER( geneve_state::external_operation )
 */
 WRITE_LINE_MEMBER( geneve_state::clock_out )
 {
+	m_tms9901->phi_line(state);
 	m_mapper->clock_in(state);
 }
 
@@ -749,7 +750,7 @@ MACHINE_CONFIG_START(geneve_state::geneve_common)
 	screen.set_screen_update(TI_VDP_TAG, FUNC(v99x8_device::screen_update));
 
 	// Main board components
-	TMS9901(config, m_tms9901, 3000000);
+	TMS9901(config, m_tms9901, 0);
 	m_tms9901->read_cb().set(FUNC(geneve_state::read_by_9901));
 	m_tms9901->p_out_cb(0).set(FUNC(geneve_state::peripheral_bus_reset));
 	m_tms9901->p_out_cb(1).set(FUNC(geneve_state::VDP_reset));

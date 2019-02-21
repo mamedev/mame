@@ -92,7 +92,7 @@ READ8_MEMBER( newbrain_state::mreq_r )
 {
 	bool romov = 1, raminh = 0;
 	int exrm = 0;
-	uint8_t data = m_exp->mreq_r(space, offset, 0xff, romov, exrm, raminh);
+	uint8_t data = m_exp->mreq_r(offset, 0xff, romov, exrm, raminh);
 
 	int rom0 = 1, rom1 = 1, rom2 = 1;
 	int a15_14_13 = romov ? (offset >> 13) : exrm;
@@ -138,7 +138,7 @@ WRITE8_MEMBER( newbrain_state::mreq_w )
 {
 	bool romov = 1, raminh = 0;
 	int exrm = 0;
-	m_exp->mreq_w(space, offset, data, romov, exrm, raminh);
+	m_exp->mreq_w(offset, data, romov, exrm, raminh);
 
 	int a15_14_13 = romov ? (offset >> 13) : exrm;
 	if (!m_pwrup) a15_14_13 = 7;
@@ -158,7 +158,7 @@ WRITE8_MEMBER( newbrain_state::mreq_w )
 READ8_MEMBER( newbrain_state::iorq_r )
 {
 	bool prtov = 0;
-	uint8_t data = m_exp->iorq_r(space, offset, 0xff, prtov);
+	uint8_t data = m_exp->iorq_r(offset, 0xff, prtov);
 
 	if (!prtov)
 	{
@@ -201,7 +201,7 @@ READ8_MEMBER( newbrain_state::iorq_r )
 WRITE8_MEMBER( newbrain_state::iorq_w )
 {
 	bool prtov = 0;
-	m_exp->iorq_w(space, offset, 0xff, prtov);
+	m_exp->iorq_w(offset, 0xff, prtov);
 
 	if (!prtov)
 	{

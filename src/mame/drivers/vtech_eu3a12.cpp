@@ -27,18 +27,18 @@ uint32_t vreadere_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 static INPUT_PORTS_START( vreadere )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(vreadere_state::vreadere)
-	/* basic machine hardware */
-	// MCFG_DEVICE_ADD("maincpu", unknown, unknown) // CPU type is unknown, epoxy blob
+void vreadere_state::vreadere(machine_config &config)
+{
+	// UNKNOWN(config, "maincpu", unknown); // CPU type is unknown, epoxy blob
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER( vreadere_state, screen_update )
-MACHINE_CONFIG_END
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(512, 256);
+	screen.set_visarea(0, 512-1, 0, 256-1);
+	screen.set_screen_update(FUNC(vreadere_state::screen_update));
+}
 
 ROM_START( vreadere )
 	ROM_REGION(0x400000, "maincpu", 0)

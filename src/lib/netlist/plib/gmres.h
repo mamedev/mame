@@ -23,7 +23,7 @@ namespace plib
 	template <typename FT, int SIZE>
 	struct mat_precondition_ILU
 	{
-		typedef plib::matrix_compressed_rows_t<FT, SIZE> mat_type;
+		using mat_type = plib::matrix_compressed_rows_t<FT, SIZE>;
 
 		mat_precondition_ILU(std::size_t size, int ilu_scale = 4
 			, std::size_t bw = plib::matrix_compressed_rows_t<FT, SIZE>::FILL_INFINITY)
@@ -75,11 +75,13 @@ namespace plib
 			}
 		}
 
-		mat_type m_mat;
-		mat_type m_LU;
-		bool m_use_iLU_preconditioning;
-		std::size_t m_ILU_scale;
-		std::size_t m_band_width;
+		PALIGNAS_VECTOROPT()
+		mat_type 				m_mat;
+		PALIGNAS_VECTOROPT()
+		mat_type 				m_LU;
+		bool 					m_use_iLU_preconditioning;
+		std::size_t 			m_ILU_scale;
+		std::size_t 			m_band_width;
 	};
 
 	template <typename FT, int SIZE>
@@ -138,15 +140,15 @@ namespace plib
 	{
 	public:
 
-		typedef FT float_type;
+		using float_type = FT;
 		// FIXME: dirty hack to make this compile
 		static constexpr const std::size_t storage_N = plib::sizeabs<FT, SIZE>::ABS();
 
 		gmres_t(std::size_t size)
-			: m_use_more_precise_stop_condition(false)
-			, residual(size)
+			: residual(size)
 			, Ax(size)
 			, m_size(size)
+			, m_use_more_precise_stop_condition(false)
 			{
 			}
 
@@ -324,23 +326,24 @@ namespace plib
 
 	private:
 
-		bool m_use_more_precise_stop_condition;
-
 		//typedef typename plib::mat_cr_t<FT, SIZE>::index_type mattype;
 
 		plib::parray<float_type, SIZE> residual;
 		plib::parray<float_type, SIZE> Ax;
 
-		std::array<float_type, RESTART + 1> m_c;  			/* mr + 1 */
-		std::array<float_type, RESTART + 1> m_g;  			/* mr + 1 */
-		std::array<std::array<float_type, RESTART>, RESTART + 1> m_ht;  /* (mr + 1), mr */
-		std::array<float_type, RESTART + 1> m_s;   			/* mr + 1 */
-		std::array<float_type, RESTART + 1> m_y;       		/* mr + 1 */
+		plib::parray<float_type, RESTART + 1> m_c;  			/* mr + 1 */
+		plib::parray<float_type, RESTART + 1> m_g;  			/* mr + 1 */
+		plib::parray<plib::parray<float_type, RESTART>, RESTART + 1> m_ht;  /* (mr + 1), mr */
+		plib::parray<float_type, RESTART + 1> m_s;   			/* mr + 1 */
+		plib::parray<float_type, RESTART + 1> m_y;       		/* mr + 1 */
 
 		//plib::parray<float_type, SIZE> m_v[RESTART + 1];  /* mr + 1, n */
-		std::array<std::array<float_type, storage_N>, RESTART + 1> m_v;  /* mr + 1, n */
+		plib::parray<plib::parray<float_type, storage_N>, RESTART + 1> m_v;  /* mr + 1, n */
 
 		std::size_t m_size;
+
+		bool m_use_more_precise_stop_condition;
+
 
 	};
 

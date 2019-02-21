@@ -29,23 +29,23 @@ Main CPU:
 #include "speaker.h"
 
 
-WRITE8_MEMBER(kingofb_state::video_interrupt_w)
+void kingofb_state::video_interrupt_w(uint8_t data)
 {
 	m_video_cpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
-WRITE8_MEMBER(kingofb_state::sprite_interrupt_w)
+void kingofb_state::sprite_interrupt_w(uint8_t data)
 {
 	m_sprite_cpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
-WRITE8_MEMBER(kingofb_state::scroll_interrupt_w)
+void kingofb_state::scroll_interrupt_w(uint8_t data)
 {
-	sprite_interrupt_w(space, offset, data);
+	sprite_interrupt_w(data);
 	*m_scroll_y = data;
 }
 
-WRITE8_MEMBER(kingofb_state::sound_command_w)
+void kingofb_state::sound_command_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
@@ -459,7 +459,7 @@ void kingofb_state::machine_start()
 
 void kingofb_state::machine_reset()
 {
-	kingofb_f800_w(machine().dummy_space(), 0, 0); // LS174 reset
+	kingofb_f800_w(0); // LS174 reset
 }
 
 MACHINE_CONFIG_START(kingofb_state::kingofb)
@@ -511,9 +511,10 @@ MACHINE_CONFIG_START(kingofb_state::kingofb)
 	aysnd.port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
 	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.25);
 
-	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.125) // 100K (R30-44 even)/200K (R31-45 odd) ladder network
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.125); // 100K (R30-44 even)/200K (R31-45 odd) ladder network
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 MACHINE_CONFIG_END
 
 
@@ -567,9 +568,10 @@ MACHINE_CONFIG_START(kingofb_state::ringking)
 	aysnd.port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
 	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.25);
 
-	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.125) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.125); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 MACHINE_CONFIG_END
 
 

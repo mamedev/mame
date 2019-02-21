@@ -66,19 +66,19 @@ void cloak_state::set_pen(int i)
 	bit0 = (~palette_ram[i] >> 6) & 0x01;
 	bit1 = (~palette_ram[i] >> 7) & 0x01;
 	bit2 = (~palette_ram[i] >> 8) & 0x01;
-	r = combine_3_weights(weights, bit0, bit1, bit2);
+	r = combine_weights(weights, bit0, bit1, bit2);
 
 	/* green component */
 	bit0 = (~palette_ram[i] >> 3) & 0x01;
 	bit1 = (~palette_ram[i] >> 4) & 0x01;
 	bit2 = (~palette_ram[i] >> 5) & 0x01;
-	g = combine_3_weights(weights, bit0, bit1, bit2);
+	g = combine_weights(weights, bit0, bit1, bit2);
 
 	/* blue component */
 	bit0 = (~palette_ram[i] >> 0) & 0x01;
 	bit1 = (~palette_ram[i] >> 1) & 0x01;
 	bit2 = (~palette_ram[i] >> 2) & 0x01;
-	b = combine_3_weights(weights, bit0, bit1, bit2);
+	b = combine_weights(weights, bit0, bit1, bit2);
 
 	m_palette->set_pen_color(i, rgb_t(r, g, b));
 }

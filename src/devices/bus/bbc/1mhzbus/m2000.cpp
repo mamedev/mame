@@ -100,13 +100,13 @@ READ8_MEMBER(bbc_m2000_device::fred_r)
 		switch (offset & 0x06)
 		{
 		case 0x00:
-			data = m_acia1->read(space, offset & 1);
+			data = m_acia1->read(offset & 1);
 			break;
 		case 0x02:
-			data = m_acia2->read(space, offset & 1);
+			data = m_acia2->read(offset & 1);
 			break;
 		case 0x04:
-			data = m_acia3->read(space, offset & 1);
+			data = m_acia3->read(offset & 1);
 			break;
 		case 0x06:
 			break;
@@ -125,13 +125,13 @@ WRITE8_MEMBER(bbc_m2000_device::fred_w)
 		switch (offset & 0x06)
 		{
 		case 0x00:
-			m_acia1->write(space, offset & 1, data);
+			m_acia1->write(offset & 1, data);
 			break;
 		case 0x02:
-			m_acia2->write(space, offset & 1, data);
+			m_acia2->write(offset & 1, data);
 			break;
 		case 0x04:
-			m_acia3->write(space, offset & 1, data);
+			m_acia3->write(offset & 1, data);
 			break;
 		case 0x06:
 			break;

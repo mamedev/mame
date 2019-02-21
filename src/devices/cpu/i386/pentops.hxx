@@ -203,6 +203,7 @@ void i386_device::pentium_prefetch_m8()    // Opcode 0x0f 18
 {
 	uint8_t modrm = FETCH();
 	uint32_t ea = GetEA(modrm,0);
+	// TODO: manage the cache if present
 	CYCLES(1+(ea & 1)); // TODO: correct cycle count
 }
 
@@ -1045,7 +1046,7 @@ void i386_device::pentium_movnti_m16_r16() // Opcode 0f c3
 		// unsupported by cpu
 		CYCLES(1);     // TODO: correct cycle count
 	} else {
-		// since cache is not implemented
+		// TODO: manage the cache if present
 		uint32_t ea = GetEA(modrm, 0);
 		WRITE16(ea,LOAD_RM16(modrm));
 		CYCLES(1);     // TODO: correct cycle count
@@ -1059,7 +1060,7 @@ void i386_device::pentium_movnti_m32_r32() // Opcode 0f c3
 		// unsupported by cpu
 		CYCLES(1);     // TODO: correct cycle count
 	} else {
-		// since cache is not implemented
+		// TODO: manage the cache if present
 		uint32_t ea = GetEA(modrm, 0);
 		WRITE32(ea,LOAD_RM32(modrm));
 		CYCLES(1);     // TODO: correct cycle count
@@ -1116,7 +1117,7 @@ void i386_device::pentium_movntq_m64_r64() // Opcode 0f e7
 	if( modrm >= 0xc0 ) {
 		CYCLES(1);     // unsupported
 	} else {
-		// since cache is not implemented
+		// TODO: manage the cache if present
 		uint32_t ea = GetEA(modrm, 0);
 		WRITEMMX(ea, MMX((modrm >> 3) & 0x7));
 		CYCLES(1);     // TODO: correct cycle count
@@ -3317,7 +3318,7 @@ void i386_device::sse_movntps_m128_r128() // Opcode 0f 2b
 		// unsupported by cpu
 		CYCLES(1);     // TODO: correct cycle count
 	} else {
-		// since cache is not implemented
+		// TODO: manage the cache if present
 		uint32_t ea = GetEA(modrm, 0);
 		WRITEXMM(ea, XMM((modrm >> 3) & 0x7));
 		CYCLES(1);     // TODO: correct cycle count
@@ -5962,7 +5963,7 @@ void i386_device::sse_movntdq_m128_r128()  // Opcode 66 0f e7
 	if( modrm >= 0xc0 ) {
 		CYCLES(1);     // unsupported
 	} else {
-		// since cache is not implemented
+		// TODO: manage the cache if present
 		uint32_t ea = GetEA(modrm, 0);
 		WRITEXMM(ea, XMM((modrm >> 3) & 0x7));
 		CYCLES(1);     // TODO: correct cycle count
@@ -6276,7 +6277,7 @@ void i386_device::sse_movntpd_m128_r128()  // Opcode 66 0f 2b
 		// unsupported by cpu
 		CYCLES(1);     // TODO: correct cycle count
 	} else {
-		// since cache is not implemented
+		// TODO: manage the cache if present
 		uint32_t ea = GetEA(modrm, 0);
 		WRITEXMM(ea, XMM((modrm >> 3) & 0x7));
 		CYCLES(1);     // TODO: correct cycle count

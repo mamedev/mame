@@ -664,6 +664,7 @@ READ8_MEMBER( ti99_4x_state::interrupt_level )
 */
 WRITE_LINE_MEMBER( ti99_4x_state::clock_out )
 {
+	m_tms9901->phi_line(state);
 	m_datamux->clock_in(state);
 	m_ioport->clock_in(state);
 }
@@ -867,8 +868,8 @@ void ti99_4x_state::ti99_4_common(machine_config& config)
 	m_cpu->clkout_cb().set(FUNC(ti99_4x_state::clock_out));
 	m_cpu->dbin_cb().set(FUNC(ti99_4x_state::dbin_line));
 
-	// Main board
-	TMS9901(config, m_tms9901, 3000000);
+	// Programmable system interface (driven by CLKOUT)
+	TMS9901(config, m_tms9901, 0);
 	m_tms9901->read_cb().set(FUNC(ti99_4x_state::read_by_9901));
 	m_tms9901->p_out_cb(2).set(FUNC(ti99_4x_state::keyC0));
 	m_tms9901->p_out_cb(3).set(FUNC(ti99_4x_state::keyC1));

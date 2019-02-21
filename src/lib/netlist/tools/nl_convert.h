@@ -13,6 +13,7 @@
 #include "../plib/plists.h"
 #include "../plib/pparser.h"
 #include "../plib/pstring.h"
+#include "../plib/ptypes.h"
 #include <memory>
 
 /*-------------------------------------------------
@@ -22,6 +23,8 @@
 class nl_convert_base_t
 {
 public:
+
+	COPYASSIGNMOVE(nl_convert_base_t, delete)
 
 	virtual ~nl_convert_base_t();
 
@@ -140,7 +143,6 @@ class nl_convert_spice_t : public nl_convert_base_t
 public:
 
 	nl_convert_spice_t() : nl_convert_base_t() {}
-	~nl_convert_spice_t() override = default;
 
 	void convert(const pstring &contents) override;
 
@@ -157,7 +159,6 @@ class nl_convert_eagle_t : public nl_convert_base_t
 public:
 
 	nl_convert_eagle_t() : nl_convert_base_t() {}
-	~nl_convert_eagle_t() override = default;
 
 	class tokenizer : public plib::ptokenizer
 	{
@@ -191,7 +192,6 @@ class nl_convert_rinf_t : public nl_convert_base_t
 public:
 
 	nl_convert_rinf_t() : nl_convert_base_t() {}
-	~nl_convert_rinf_t() override = default;
 
 	class tokenizer : public plib::ptokenizer
 	{

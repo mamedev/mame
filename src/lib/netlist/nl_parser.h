@@ -17,7 +17,7 @@ namespace netlist
 	{
 	public:
 		template <typename T>
-		parser_t(T &&strm, setup_t &setup)
+		parser_t(T &&strm, nlparse_t &setup)
 			: plib::ptokenizer(std::forward<T>(strm))
 			, m_setup(setup)
 		{
@@ -43,7 +43,7 @@ namespace netlist
 		void net_truthtable_start(const pstring &nlname);
 
 		/* for debugging messages */
-		netlist_state_t &netlist() { return m_setup.netlist(); }
+		//netlist_state_t &netlist() { return m_setup.netlist(); }
 
 		void verror(const pstring &msg, int line_num, const pstring &line) override;
 	private:
@@ -72,7 +72,7 @@ namespace netlist
 		token_id_t m_tok_TT_LINE;
 		token_id_t m_tok_TT_FAMILY;
 
-		setup_t &m_setup;
+		nlparse_t &m_setup;
 };
 
 } // namespace netlist

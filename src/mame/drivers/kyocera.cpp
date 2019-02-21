@@ -383,7 +383,7 @@ READ8_MEMBER( pc8201_state::romrd_r )
 	uint8_t data = 0xff;
 
 	if (m_rom_sel)
-		data = m_cas_cart->read_rom(space, m_rom_addr & 0x1ffff);
+		data = m_cas_cart->read_rom(m_rom_addr & 0x1ffff);
 
 	return data;
 }

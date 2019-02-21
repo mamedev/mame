@@ -30,6 +30,8 @@ namespace netlist
 
 		constexpr ptime() noexcept : m_time(0) {}
 
+		~ptime() noexcept = default;
+
 		constexpr ptime(const ptime &rhs) noexcept = default;
 		constexpr ptime(ptime &&rhs) noexcept = default;
 		constexpr explicit ptime(const internal_type &time) noexcept : m_time(time) {}
@@ -139,9 +141,9 @@ namespace netlist
 	//  MACROS
 	//============================================================
 
-	template <typename T> inline constexpr netlist_time NLTIME_FROM_NS(T &&t) { return netlist_time::from_nsec(t); }
-	template <typename T> inline constexpr netlist_time NLTIME_FROM_US(T &&t) { return netlist_time::from_usec(t); }
-	template <typename T> inline constexpr netlist_time NLTIME_FROM_MS(T &&t) { return netlist_time::from_msec(t); }
+	template <typename T> inline constexpr netlist_time NLTIME_FROM_NS(T &&t) noexcept { return netlist_time::from_nsec(t); }
+	template <typename T> inline constexpr netlist_time NLTIME_FROM_US(T &&t) noexcept { return netlist_time::from_usec(t); }
+	template <typename T> inline constexpr netlist_time NLTIME_FROM_MS(T &&t) noexcept { return netlist_time::from_msec(t); }
 
 } // namespace netlist
 

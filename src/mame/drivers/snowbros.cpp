@@ -2034,7 +2034,7 @@ void snowbros_state::yutnori(machine_config &config)
 
 	okim6295_device &oki2(OKIM6295(config, "oki2", XTAL(16'000'000)/16, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
 	oki2.add_route(ALL_OUTPUTS, "mono", 1.0);
-MACHINE_CONFIG_END
+}
 
 /***************************************************************************
 

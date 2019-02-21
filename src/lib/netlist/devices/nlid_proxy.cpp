@@ -20,7 +20,7 @@ namespace netlist
 	// nld_base_proxy
 	// -----------------------------------------------------------------------------
 
-	nld_base_proxy::nld_base_proxy(netlist_base_t &anetlist, const pstring &name,
+	nld_base_proxy::nld_base_proxy(netlist_state_t &anetlist, const pstring &name,
 			logic_t *inout_proxied, detail::core_terminal_t *proxy_inout)
 			: device_t(anetlist, name)
 	{
@@ -33,14 +33,14 @@ namespace netlist
 	// nld_a_to_d_proxy
 	// ----------------------------------------------------------------------------------------
 
-	nld_base_a_to_d_proxy::nld_base_a_to_d_proxy(netlist_base_t &anetlist, const pstring &name,
+	nld_base_a_to_d_proxy::nld_base_a_to_d_proxy(netlist_state_t &anetlist, const pstring &name,
 			logic_input_t *in_proxied, detail::core_terminal_t *in_proxy)
 			: nld_base_proxy(anetlist, name, in_proxied, in_proxy)
 	, m_Q(*this, "Q")
 	{
 	}
 
-	nld_a_to_d_proxy::nld_a_to_d_proxy(netlist_base_t &anetlist, const pstring &name, logic_input_t *in_proxied)
+	nld_a_to_d_proxy::nld_a_to_d_proxy(netlist_state_t &anetlist, const pstring &name, logic_input_t *in_proxied)
 			: nld_base_a_to_d_proxy(anetlist, name, in_proxied, &m_I)
 	, m_I(*this, "I")
 	{
@@ -71,35 +71,32 @@ namespace netlist
 	// nld_d_to_a_proxy
 	// ----------------------------------------------------------------------------------------
 
-	nld_base_d_to_a_proxy::nld_base_d_to_a_proxy(netlist_base_t &anetlist, const pstring &name,
+	nld_base_d_to_a_proxy::nld_base_d_to_a_proxy(netlist_state_t &anetlist, const pstring &name,
 			logic_output_t *out_proxied, detail::core_terminal_t &proxy_out)
 	: nld_base_proxy(anetlist, name, out_proxied, &proxy_out)
 	, m_I(*this, "I")
 	{
 	}
 
-	nld_d_to_a_proxy::nld_d_to_a_proxy(netlist_base_t &anetlist, const pstring &name, logic_output_t *out_proxied)
+	nld_d_to_a_proxy::nld_d_to_a_proxy(netlist_state_t &anetlist, const pstring &name, logic_output_t *out_proxied)
 	: nld_base_d_to_a_proxy(anetlist, name, out_proxied, m_RV.m_P)
 	, m_GNDHack(*this, "_Q")
 	, m_RV(*this, "RV")
 	, m_last_state(*this, "m_last_var", -1)
 	, m_is_timestep(false)
 	{
-		const pstring power_syms[3][2] ={ {"VCC", "VEE"}, {"VCC", "GND"}, {"VDD", "VSS"}};
-		//register_sub(m_RV);
-		//register_term("1", m_RV.m_P);
-		//register_term("2", m_RV.m_N);
+		const std::vector<std::pair<pstring, pstring>> power_syms = { {"VCC", "VEE"}, {"VCC", "GND"}, {"VDD", "VSS"}};
 
 		register_subalias("Q", m_RV.m_P);
 
 		connect(m_RV.m_N, m_GNDHack);
 		bool f = false;
-		for (int i = 0; i < 3; i++)
+		for (auto & pwr_sym : power_syms)
 		{
 			pstring devname = out_proxied->device().name();
-			auto tp = setup().find_terminal(devname + "." + power_syms[i][0],
+			auto tp = setup().find_terminal(devname + "." + pwr_sym.first,
 					detail::terminal_type::INPUT, false);
-			auto tn = setup().find_terminal(devname + "." + power_syms[i][1],
+			auto tn = setup().find_terminal(devname + "." + pwr_sym.second,
 					detail::terminal_type::INPUT, false);
 			if (tp != nullptr && tn != nullptr)
 			{

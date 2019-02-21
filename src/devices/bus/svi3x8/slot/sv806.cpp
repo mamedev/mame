@@ -137,7 +137,7 @@ WRITE8_MEMBER( sv806_device::mreq_w )
 READ8_MEMBER( sv806_device::iorq_r )
 {
 	if (offset == 0x51)
-		return m_crtc->register_r(space, 0);
+		return m_crtc->register_r();
 
 	return 0xff;
 }
@@ -146,8 +146,8 @@ WRITE8_MEMBER( sv806_device::iorq_w )
 {
 	switch (offset)
 	{
-	case 0x50: m_crtc->address_w(space, 0, data); break;
-	case 0x51: m_crtc->register_w(space, 0, data); break;
+	case 0x50: m_crtc->address_w(data); break;
+	case 0x51: m_crtc->register_w(data); break;
 	case 0x58: m_ram_enabled = data; break;
 	}
 }

@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_BUS_UTS_KBD_H
-#define MAME_BUS_UTS_KBD_H 1
+#ifndef MAME_BUS_UTS_KBD_UTS_KBD_H
+#define MAME_BUS_UTS_KBD_UTS_KBD_H
 
 #pragma once
 
@@ -98,4 +98,4 @@ WRITE_LINE_MEMBER(uts_keyboard_port_device::ready_w)
 		m_kbd->ready_w(state);
 }
 
-#endif // MAME_BUS_UTS_KBD_H
+#endif // MAME_BUS_UTS_KBD_UTS_KBD_H

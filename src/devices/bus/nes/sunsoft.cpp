@@ -585,10 +585,10 @@ WRITE8_MEMBER(nes_sunsoft_5_device::write_h)
 	switch (offset & 0x6000)
 	{
 		case 0x4000:
-			m_ym2149->address_w(space, 0, data & 0x0f);
+			m_ym2149->address_w(data & 0x0f);
 			break;
 		case 0x6000:
-			m_ym2149->data_w(space, 0, data);
+			m_ym2149->data_w(data);
 			break;
 		default:
 			fme7_write(space, offset, data, mem_mask);

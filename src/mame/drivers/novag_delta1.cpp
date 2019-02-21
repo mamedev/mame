@@ -2,20 +2,20 @@
 // copyright-holders:hap
 // thanks-to:Berger
 /******************************************************************************
+*
+* novag_delta1.cpp, subdriver of novagbase.cpp
 
-    Novag generic F8 based chess computer driver
+TODO:
+- ccdelta1 doesn't work, goes bonkers when you press Enter. CPU core bug?
+  I suspect related to interrupts
 
-    TODO:
-    - ccdelta1 doesn't work, goes bonkers when you press Enter. CPU core bug?
-    - hardware is similar to MK I, the drivers can be merged in theory.
-      But I prefer my source code to be licensed BSD3, mk1.cpp is GPL2.
+*******************************************************************************
 
-******************************************************************************
-
-Delta-1:
-- 3850PK CPU at ~2MHz, 3853PK memory interface
-- 4KB ROM(2332A), 256 bytes RAM(2*2111A-4)
-- 4-digit 7seg panel, no sound, no chessboard
+Novag Delta-1
+-------------
+3850PK CPU at ~2MHz, 3853PK memory interface
+4KB ROM(2332A), 256 bytes RAM(2*2111A-4)
+4-digit 7seg panel, no sound, no chessboard
 
 ******************************************************************************/
 
@@ -29,53 +29,52 @@ Delta-1:
 #include "novag_delta1.lh"
 
 
-class novagf8_state : public novagbase_state
+namespace {
+
+class delta1_state : public novagbase_state
 {
 public:
-	novagf8_state(const machine_config &mconfig, device_type type, const char *tag)
-		: novagbase_state(mconfig, type, tag)
+	delta1_state(const machine_config &mconfig, device_type type, const char *tag) :
+		novagbase_state(mconfig, type, tag)
 	{ }
 
+	// machine drivers
 	void delta1(machine_config &config);
 
-	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
+protected:
+	virtual void machine_start() override;
 
 private:
+	// address maps
+	void main_map(address_map &map);
+	void main_io(address_map &map);
+
+	// I/O handlers
+	DECLARE_WRITE8_MEMBER(io0_w);
+	DECLARE_WRITE8_MEMBER(io1_w);
+	DECLARE_READ8_MEMBER(io0_r);
+	DECLARE_READ8_MEMBER(io1_r);
+
 	u8 m_io[2]; // F8 CPU I/O ports
-
-	// Delta-1
-	DECLARE_WRITE8_MEMBER(delta1_io0_w);
-	DECLARE_WRITE8_MEMBER(delta1_io1_w);
-	DECLARE_READ8_MEMBER(delta1_io0_r);
-	DECLARE_READ8_MEMBER(delta1_io1_r);
-	void delta1_io(address_map &map);
-	void delta1_map(address_map &map);
-
-	virtual void machine_start() override;
 };
 
-void novagf8_state::machine_start()
+void delta1_state::machine_start()
 {
 	novagbase_state::machine_start();
 
-	// zerofill
+	// zerofill/register for savestates
 	memset(m_io, 0, sizeof(m_io));
-
-	// register for savestates
 	save_item(NAME(m_io));
 }
 
 
-
-// Devices, I/O
-
 /******************************************************************************
-    Delta-1
+    Devices, I/O
 ******************************************************************************/
 
 // CPU I/O ports
 
-WRITE8_MEMBER(novagf8_state::delta1_io0_w)
+WRITE8_MEMBER(delta1_state::io0_w)
 {
 	m_io[0] = data;
 
@@ -87,26 +86,26 @@ WRITE8_MEMBER(novagf8_state::delta1_io0_w)
 
 	// update display here
 	set_display_segmask(0xf, 0x7f);
-	display_matrix(7, 4, m_led_data, sel >> 4);
+	display_matrix(7, 4, m_7seg_data, sel >> 4);
 }
 
-READ8_MEMBER(novagf8_state::delta1_io0_r)
+READ8_MEMBER(delta1_state::io0_r)
 {
 	// IO04-07: multiplexed inputs
 	return read_inputs(5) << 4 | m_io[0];
 }
 
-WRITE8_MEMBER(novagf8_state::delta1_io1_w)
+WRITE8_MEMBER(delta1_state::io1_w)
 {
 	m_io[1] = data;
 
 	// IO17: segment commons, active low (always 0?)
 	// IO10-16: digit segments A-G
 	data = (data & 0x80) ? 0 : (data & 0x7f);
-	m_led_data = bitswap<7>(data, 0,1,2,3,4,5,6);
+	m_7seg_data = bitswap<7>(data, 0,1,2,3,4,5,6);
 }
 
-READ8_MEMBER(novagf8_state::delta1_io1_r)
+READ8_MEMBER(delta1_state::io1_r)
 {
 	// unused?
 	return m_io[1];
@@ -118,19 +117,17 @@ READ8_MEMBER(novagf8_state::delta1_io1_r)
     Address Maps
 ******************************************************************************/
 
-// Delta-1
-
-void novagf8_state::delta1_map(address_map &map)
+void delta1_state::main_map(address_map &map)
 {
 	map.global_mask(0x3fff);
 	map(0x0000, 0x0fff).mirror(0x1000).rom(); // _A13
 	map(0x2000, 0x20ff).mirror(0x1f00).ram(); // A13
 }
 
-void novagf8_state::delta1_io(address_map &map)
+void delta1_state::main_io(address_map &map)
 {
-	map(0x0, 0x0).rw(FUNC(novagf8_state::delta1_io0_r), FUNC(novagf8_state::delta1_io0_w));
-	map(0x1, 0x1).rw(FUNC(novagf8_state::delta1_io1_r), FUNC(novagf8_state::delta1_io1_w));
+	map(0x0, 0x0).rw(FUNC(delta1_state::io0_r), FUNC(delta1_state::io0_w));
+	map(0x1, 0x1).rw(FUNC(delta1_state::io1_r), FUNC(delta1_state::io1_w));
 	map(0xc, 0xf).rw("f3853", FUNC(f3853_device::read), FUNC(f3853_device::write));
 }
 
@@ -139,12 +136,6 @@ void novagf8_state::delta1_io(address_map &map)
 /******************************************************************************
     Input Ports
 ******************************************************************************/
-
-INPUT_CHANGED_MEMBER(novagf8_state::reset_button)
-{
-	// wired directly to CPU reset pin
-	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
-}
 
 static INPUT_PORTS_START( delta1 )
 	PORT_START("IN.0")
@@ -176,7 +167,7 @@ static INPUT_PORTS_START( delta1 )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Enter")
 
 	PORT_START("RESET") // not on matrix
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_CHANGED_MEMBER(DEVICE_SELF, novagf8_state, reset_button, nullptr) PORT_NAME("New Game")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_CHANGED_MEMBER(DEVICE_SELF, delta1_state, reset_button, nullptr) PORT_NAME("New Game")
 INPUT_PORTS_END
 
 
@@ -185,20 +176,20 @@ INPUT_PORTS_END
     Machine Drivers
 ******************************************************************************/
 
-MACHINE_CONFIG_START(novagf8_state::delta1)
-
+void delta1_state::delta1(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", F8, 2000000) // LC circuit, measured 2MHz
-	MCFG_DEVICE_PROGRAM_MAP(delta1_map)
-	MCFG_DEVICE_IO_MAP(delta1_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("f3853", f3853_device, int_acknowledge)
+	F8(config, m_maincpu, 2000000); // LC circuit, measured 2MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &delta1_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &delta1_state::main_io);
+	m_maincpu->set_irq_acknowledge_callback("f3853", FUNC(f3853_device::int_acknowledge));
 
 	f3853_device &f3853(F3853(config, "f3853", 2000000));
 	f3853.int_req_callback().set_inputline("maincpu", F8_INPUT_LINE_INT_REQ);
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(novagf8_state::display_decay_tick), attotime::from_msec(1));
+	TIMER(config, "display_decay").configure_periodic(FUNC(delta1_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_novag_delta1);
-MACHINE_CONFIG_END
+}
 
 
 
@@ -211,11 +202,13 @@ ROM_START( ccdelta1 )
 	ROM_LOAD("ma_winke_y1d", 0x0000, 0x1000, CRC(ddc04aca) SHA1(bbf334c82bc89b2f131f5a50f0a617bc3bc4c329) ) // 2332a
 ROM_END
 
+} // anonymous namespace
+
 
 
 /******************************************************************************
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT   CLASS          INIT        COMPANY  FULLNAME                   FLAGS
-CONS( 1979, ccdelta1, 0,      0,      delta1,  delta1, novagf8_state, empty_init, "Novag", "Chess Champion: Delta-1", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT CMP MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
+CONS( 1979, ccdelta1, 0,      0, delta1,  delta1, delta1_state, empty_init, "Novag", "Chess Champion: Delta-1", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )

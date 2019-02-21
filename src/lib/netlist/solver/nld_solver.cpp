@@ -31,9 +31,6 @@
 #pragma GCC optimize "ivopts"
 #endif
 
-#include <algorithm>
-#include <cmath>  // <<= needed by windows build
-
 #include "../nl_lists.h"
 
 #include "../plib/pomp.h"
@@ -56,6 +53,9 @@
 #include "nld_ms_sor.h"
 #include "nld_ms_sor_mat.h"
 #include "nld_ms_w.h"
+
+#include <algorithm>
+#include <cmath>
 
 namespace netlist
 {
@@ -80,14 +80,6 @@ void NETLIB_NAME(solver)::stop()
 		s->log_stats();
 }
 
-NETLIB_NAME(solver)::~NETLIB_NAME(solver)()
-{
-	for (auto &s : m_mat_solvers)
-	{
-		plib::pfree(s);
-	}
-}
-
 NETLIB_UPDATE(solver)
 {
 	if (m_params.m_dynamic_ts)
@@ -100,7 +92,7 @@ NETLIB_UPDATE(solver)
 
 	std::size_t nthreads = std::min(static_cast<std::size_t>(m_parallel()), plib::omp::get_max_threads());
 
-	std::vector<matrix_solver_t *> &solvers = (force_solve ? m_mat_solvers : m_mat_solvers_timestepping);
+	std::vector<matrix_solver_t *> &solvers = (force_solve ? m_mat_solvers_all : m_mat_solvers_timestepping);
 
 	if (nthreads > 1 && solvers.size() > 1)
 	{
@@ -129,13 +121,13 @@ NETLIB_UPDATE(solver)
 }
 
 template <class C>
-matrix_solver_t * create_it(netlist_base_t &nl, pstring name, solver_parameters_t &params, std::size_t size)
+poolptr<matrix_solver_t> create_it(netlist_state_t &nl, pstring name, solver_parameters_t &params, std::size_t size)
 {
-	return plib::palloc<C>(nl, name, &params, size);
+	return pool().make_poolptr<C>(nl, name, &params, size);
 }
 
 template <typename FT, int SIZE>
-matrix_solver_t * NETLIB_NAME(solver)::create_solver(std::size_t size, const pstring &solvername)
+poolptr<matrix_solver_t> NETLIB_NAME(solver)::create_solver(std::size_t size, const pstring &solvername)
 {
 	if (m_method() == "SOR_MAT")
 	{
@@ -179,7 +171,7 @@ matrix_solver_t * NETLIB_NAME(solver)::create_solver(std::size_t size, const pst
 	else
 	{
 		log().fatal(MF_1_UNKNOWN_SOLVER_TYPE, m_method());
-		return nullptr;
+		return poolptr<matrix_solver_t>();
 	}
 }
 
@@ -214,7 +206,7 @@ struct net_splitter
 		}
 	}
 
-	void run(netlist_base_t &netlist)
+	void run(netlist_state_t &netlist)
 	{
 		for (auto & net : netlist.nets())
 		{
@@ -283,7 +275,7 @@ void NETLIB_NAME(solver)::post_start()
 	log().verbose("Found {1} net groups in {2} nets\n", splitter.groups.size(), state().nets().size());
 	for (auto & grp : splitter.groups)
 	{
-		matrix_solver_t *ms;
+		poolptr<matrix_solver_t> ms;
 		std::size_t net_count = grp.size();
 		pstring sname = plib::pfmt("Solver_{1}")(m_mat_solvers.size());
 
@@ -292,13 +284,13 @@ void NETLIB_NAME(solver)::post_start()
 #if 1
 			case 1:
 				if (use_specific)
-					ms = plib::palloc<matrix_solver_direct1_t<double>>(state(), sname, &m_params);
+					ms = pool().make_poolptr<matrix_solver_direct1_t<double>>(state(), sname, &m_params);
 				else
 					ms = create_solver<double, 1>(1, sname);
 				break;
 			case 2:
 				if (use_specific)
-					ms =  plib::palloc<matrix_solver_direct2_t<double>>(state(), sname, &m_params);
+					ms = pool().make_poolptr<matrix_solver_direct2_t<double>>(state(), sname, &m_params);
 				else
 					ms = create_solver<double, 2>(2, sname);
 				break;
@@ -350,8 +342,8 @@ void NETLIB_NAME(solver)::post_start()
 				break;
 #endif
 #if 0
-			case 87:
-				ms = create_solver<87,87>(87, sname);
+			case 86:
+				ms = create_solver<double,86>(86, sname);
 				break;
 #endif
 #endif
@@ -403,9 +395,11 @@ void NETLIB_NAME(solver)::post_start()
 			}
 		}
 
-		m_mat_solvers.push_back(ms);
+		m_mat_solvers_all.push_back(ms.get());
 		if (ms->has_timestep_devices())
-			m_mat_solvers_timestepping.push_back(ms);
+			m_mat_solvers_timestepping.push_back(ms.get());
+
+		m_mat_solvers.emplace_back(std::move(ms));
 	}
 }
 

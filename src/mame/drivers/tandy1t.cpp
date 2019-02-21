@@ -688,13 +688,17 @@ MACHINE_CONFIG_START(tandy1000_state::tandy1000_common)
 	SOFTWARE_LIST(config, "pc_list").set_compatible("ibm5150");
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(tandy1000_state::tandy1000_90key)
-	MCFG_PC_KEYB_ADD("pc_keyboard", WRITELINE("mb:pic8259", pic8259_device, ir1_w))
-MACHINE_CONFIG_END
+void tandy1000_state::tandy1000_90key(machine_config &config)
+{
+	PC_KEYB(config, m_keyboard);
+	m_keyboard->keypress().set("mb:pic8259", FUNC(pic8259_device::ir1_w));
+}
 
-MACHINE_CONFIG_START(tandy1000_state::tandy1000_101key)
-	MCFG_AT_KEYB_ADD("pc_keyboard", 1, WRITELINE("mb:pic8259", pic8259_device, ir1_w))
-MACHINE_CONFIG_END
+void tandy1000_state::tandy1000_101key(machine_config &config)
+{
+	AT_KEYB(config, m_keyboard, pc_keyboard_device::KEYBOARD_TYPE::AT, 1);
+	m_keyboard->keypress().set("mb:pic8259", FUNC(pic8259_device::ir1_w));
+}
 
 MACHINE_CONFIG_START(tandy1000_state::t1000hx)
 	MCFG_DEVICE_ADD("maincpu", I8088, 8000000)

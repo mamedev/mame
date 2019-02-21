@@ -801,7 +801,7 @@ DEVICE_IMAGE_LOAD_MEMBER(hx20_state, optrom_load)
 READ8_MEMBER(hx20_state::optrom_r)
 {
 	if (m_optrom->exists())
-		return m_optrom->read_rom(space, offset);
+		return m_optrom->read_rom(offset);
 	else
 		return 0;
 }

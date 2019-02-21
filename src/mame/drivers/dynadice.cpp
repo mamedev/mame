@@ -119,10 +119,10 @@ WRITE8_MEMBER(dynadice_state::sound_control_w)
 
 */
 	if ((data & 7) == 7)
-		m_ay8910->address_w(space, 0, m_ay_data);
+		m_ay8910->address_w(m_ay_data);
 
 	if ((data & 7) == 6)
-		m_ay8910->data_w(space, 0, m_ay_data);
+		m_ay8910->data_w(m_ay_data);
 }
 
 

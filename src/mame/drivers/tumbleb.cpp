@@ -2065,24 +2065,24 @@ MACHINE_RESET_MEMBER(tumbleb_state,tumbleb)
 	memset(m_control_0, 0, sizeof(m_control_0));
 }
 
-MACHINE_CONFIG_START(tumbleb_state::tumblepb)
-
+void tumbleb_state::tumblepb(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 14000000)
-	MCFG_DEVICE_PROGRAM_MAP(tumblepopb_main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tumbleb_state,  irq6_line_hold)
+	M68000(config, m_maincpu, 14000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tumbleb_state::tumblepopb_main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(tumbleb_state::irq6_line_hold));
 
 	MCFG_MACHINE_START_OVERRIDE(tumbleb_state,tumbleb)
 	MCFG_MACHINE_RESET_OVERRIDE(tumbleb_state,tumbleb)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tumbleb_state, screen_update_tumblepb)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(58);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(529));
+	m_screen->set_size(40*8, 32*8);
+	m_screen->set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
+	m_screen->set_screen_update(FUNC(tumbleb_state::screen_update_tumblepb));
+	m_screen->set_palette(m_palette);
 
 	DECO_SPRITE(config, m_sprgen, 0);
 	m_sprgen->set_gfx_region(3);
@@ -2097,34 +2097,33 @@ MACHINE_CONFIG_START(tumbleb_state::tumblepb)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 8000000/10, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, 8000000/10, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.70);
+}
 
-MACHINE_CONFIG_START(tumbleb_state::tumblepba)
+void tumbleb_state::tumblepba(machine_config &config)
+{
 	tumblepb(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(tumblepopba_main_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &tumbleb_state::tumblepopba_main_map);
+}
 
-MACHINE_CONFIG_START(tumbleb_state::tumbleb2)
-
+void tumbleb_state::tumbleb2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, M68000, 14000000)
-	MCFG_DEVICE_PROGRAM_MAP(tumblepopb_main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tumbleb_state,  tumbleb2_interrupt)
+	M68000(config, m_maincpu, 14000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tumbleb_state::tumblepopb_main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(tumbleb_state::tumbleb2_interrupt));
 
 	MCFG_MACHINE_START_OVERRIDE(tumbleb_state,tumbleb)
 	MCFG_MACHINE_RESET_OVERRIDE(tumbleb_state,tumbleb)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tumbleb_state, screen_update_tumblepb)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(58);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(529));
+	m_screen->set_size(40*8, 32*8);
+	m_screen->set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
+	m_screen->set_screen_update(FUNC(tumbleb_state::screen_update_tumblepb));
+	m_screen->set_palette(m_palette);
 
 	DECO_SPRITE(config, m_sprgen, 0);
 	m_sprgen->set_gfx_region(3);
@@ -2139,9 +2138,8 @@ MACHINE_CONFIG_START(tumbleb_state::tumbleb2)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 8000000/10, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, 8000000/10, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.70);
+}
 
 void tumbleb_state::funkyjetb(machine_config &config)
 {
@@ -2151,28 +2149,28 @@ void tumbleb_state::funkyjetb(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(tumbleb_state::irq6_line_hold));
 }
 
-MACHINE_CONFIG_START(tumbleb_state::jumpkids)
-
+void tumbleb_state::jumpkids(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)
-	MCFG_DEVICE_PROGRAM_MAP(jumpkids_main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tumbleb_state,  irq6_line_hold)
+	M68000(config, m_maincpu, 12000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tumbleb_state::jumpkids_main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(tumbleb_state::irq6_line_hold));
 
 	/* z80? */
-	MCFG_DEVICE_ADD("audiocpu", Z80, 8000000/2)
-	MCFG_DEVICE_PROGRAM_MAP(jumpkids_sound_map)
+	Z80(config, m_audiocpu, 8000000/2);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &tumbleb_state::jumpkids_sound_map);
 
 	MCFG_MACHINE_START_OVERRIDE(tumbleb_state,tumbleb)
 	MCFG_MACHINE_RESET_OVERRIDE(tumbleb_state,tumbleb)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tumbleb_state, screen_update_jumpkids)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(529));
+	m_screen->set_size(40*8, 32*8);
+	m_screen->set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
+	m_screen->set_screen_update(FUNC(tumbleb_state::screen_update_jumpkids));
+	m_screen->set_palette(m_palette);
 
 	DECO_SPRITE(config, m_sprgen, 0);
 	m_sprgen->set_gfx_region(3);
@@ -2189,28 +2187,27 @@ MACHINE_CONFIG_START(tumbleb_state::jumpkids)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 8000000/8, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, 8000000/8, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.70);
+}
 
-MACHINE_CONFIG_START(tumbleb_state::fncywld)
-
+void tumbleb_state::fncywld(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)
-	MCFG_DEVICE_PROGRAM_MAP(fncywld_main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tumbleb_state,  irq6_line_hold)
+	M68000(config, m_maincpu, 12000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tumbleb_state::fncywld_main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(tumbleb_state::irq6_line_hold));
 
 	MCFG_MACHINE_START_OVERRIDE(tumbleb_state,tumbleb)
 	MCFG_MACHINE_RESET_OVERRIDE(tumbleb_state,tumbleb)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tumbleb_state, screen_update_fncywld)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(529));
+	m_screen->set_size(40*8, 32*8);
+	m_screen->set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
+	m_screen->set_screen_update(FUNC(tumbleb_state::screen_update_fncywld));
+	m_screen->set_palette(m_palette);
 
 	DECO_SPRITE(config, m_sprgen, 0);
 	m_sprgen->set_gfx_region(3);
@@ -2228,29 +2225,28 @@ MACHINE_CONFIG_START(tumbleb_state::fncywld)
 
 	YM2151(config, "ymsnd", 32220000/9).add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1023924, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, 1023924, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // clock frequency & pin 7 not verified
+}
 
 /// OSCs: 12MHz, 4MHz, 28.63636MHz, not the same PCB as fncywld
-MACHINE_CONFIG_START(tumbleb_state::magipur)
-
+void tumbleb_state::magipur(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(12'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(magipur_main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tumbleb_state,  irq6_line_hold)
+	M68000(config, m_maincpu, XTAL(12'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &tumbleb_state::magipur_main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(tumbleb_state::irq6_line_hold));
 
 	MCFG_MACHINE_START_OVERRIDE(tumbleb_state,tumbleb)
 	MCFG_MACHINE_RESET_OVERRIDE(tumbleb_state,tumbleb)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60) // refresh rate not verified
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tumbleb_state, screen_update_fncywld)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60); // refresh rate not verified
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(529));
+	m_screen->set_size(40*8, 32*8);
+	m_screen->set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
+	m_screen->set_screen_update(FUNC(tumbleb_state::screen_update_fncywld));
+	m_screen->set_palette(m_palette);
 
 	DECO_SPRITE(config, m_sprgen, 0);
 	m_sprgen->set_gfx_region(3);
@@ -2268,9 +2264,8 @@ MACHINE_CONFIG_START(tumbleb_state::magipur)
 
 	YM2151(config, "ymsnd", XTAL(4'000'000)).add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(4'000'000)/4, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, XTAL(4'000'000)/4, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // clock frequency & pin 7 not verified
+}
 
 
 MACHINE_RESET_MEMBER(tumbleb_state,htchctch)

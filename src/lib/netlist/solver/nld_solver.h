@@ -8,11 +8,13 @@
 #ifndef NLD_SOLVER_H_
 #define NLD_SOLVER_H_
 
-#include <map>
-
 #include "../nl_base.h"
 #include "../plib/pstream.h"
 #include "nld_matrix_solver.h"
+
+#include <map>
+#include <memory>
+#include <vector>
 
 //#define ATTR_ALIGNED(N) __attribute__((aligned(N)))
 #define ATTR_ALIGNED(N) ATTR_ALIGN
@@ -63,8 +65,6 @@ NETLIB_OBJECT(solver)
 		connect(m_fb_step, m_Q_step);
 	}
 
-	~NETLIB_NAME(solver)() override;
-
 	void post_start();
 	void stop();
 
@@ -97,13 +97,14 @@ protected:
 	param_logic_t  m_log_stats;
 
 private:
-	std::vector<matrix_solver_t *> m_mat_solvers;
+	std::vector<poolptr<matrix_solver_t>> m_mat_solvers;
+	std::vector<matrix_solver_t *> m_mat_solvers_all;
 	std::vector<matrix_solver_t *> m_mat_solvers_timestepping;
 
 	solver_parameters_t m_params;
 
 	template <typename FT, int SIZE>
-	matrix_solver_t * create_solver(std::size_t size, const pstring &solvername);
+	poolptr<matrix_solver_t> create_solver(std::size_t size, const pstring &solvername);
 };
 
 	} //namespace devices

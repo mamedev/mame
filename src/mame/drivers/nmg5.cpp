@@ -978,8 +978,8 @@ void nmg5_state::machine_reset()
 	m_input_data = 0;
 }
 
-MACHINE_CONFIG_START(nmg5_state::nmg5)
-
+void nmg5_state::nmg5(machine_config &config)
+{
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 16000000);    /* 16 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &nmg5_state::nmg5_map);

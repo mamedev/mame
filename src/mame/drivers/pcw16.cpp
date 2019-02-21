@@ -1074,7 +1074,8 @@ MACHINE_CONFIG_START(pcw16_state::pcw16)
 	INTEL_E28F008SA(config, "flash0");
 	INTEL_E28F008SA(config, "flash1");
 
-	MCFG_AT_KEYB_ADD("at_keyboard", 3, WRITELINE(*this, pcw16_state, pcw16_keyboard_callback))
+	AT_KEYB(config, m_keyboard, pc_keyboard_device::KEYBOARD_TYPE::AT, 3);
+	m_keyboard->keypress().set(FUNC(pcw16_state::pcw16_keyboard_callback));
 
 	/* video ints */
 	TIMER(config, "video_timer").configure_periodic(FUNC(pcw16_state::pcw16_timer_callback), attotime::from_usec(5830));

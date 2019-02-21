@@ -56,7 +56,7 @@ namespace netlist
 			return b ? *h : d2;
 		}
 		template<>
-		inline core_device_t &bselect(bool b, netlist_base_t &d1, core_device_t &d2)
+		inline core_device_t &bselect(bool b, netlist_state_t &d1, core_device_t &d2)
 		{
 			plib::unused_var(d1);
 			if (b)
@@ -120,7 +120,6 @@ NETLIB_OBJECT_DERIVED(R_base, twoterm)
 	{
 	}
 
-public:
 	void set_R(const nl_double R)
 	{
 		const nl_double G = plib::constants<nl_double>::one() / R;
@@ -128,8 +127,9 @@ public:
 				-G,  G, 0.0);
 	}
 
-protected:
 	NETLIB_RESETI();
+
+protected:
 	//NETLIB_UPDATEI();
 
 };
@@ -235,9 +235,9 @@ public:
 	NETLIB_TIMESTEPI();
 
 	param_double_t m_C;
+	NETLIB_RESETI();
 
 protected:
-	NETLIB_RESETI();
 	//NETLIB_UPDATEI();
 	NETLIB_UPDATE_PARAMI();
 
@@ -265,11 +265,11 @@ public:
 
 	NETLIB_IS_TIMESTEP(true)
 	NETLIB_TIMESTEPI();
+	NETLIB_RESETI();
 
 	param_double_t m_L;
 
 protected:
-	NETLIB_RESETI();
 	//NETLIB_UPDATEI();
 	NETLIB_UPDATE_PARAMI();
 
@@ -381,11 +381,11 @@ public:
 
 	NETLIB_IS_DYNAMIC(true)
 	NETLIB_UPDATE_TERMINALSI();
+	NETLIB_RESETI();
 
 	diode_model_t m_model;
 
 protected:
-	NETLIB_RESETI();
 	//NETLIB_UPDATEI();
 	NETLIB_UPDATE_PARAMI();
 

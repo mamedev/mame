@@ -551,7 +551,7 @@ MACHINE_CONFIG_START(sg1000_state::sg1000)
 	SG1000_EXPANSION_SLOT(config, m_sgexpslot, sg1000_expansion_devices, nullptr, false);
 
 	/* cartridge */
-	MCFG_SG1000_CARTRIDGE_ADD(CARTSLOT_TAG, sg1000_cart, nullptr)
+	SG1000_CART_SLOT(config, CARTSLOT_TAG, sg1000_cart, nullptr);
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("sg1000");
@@ -571,7 +571,7 @@ MACHINE_CONFIG_START(sg1000_state::omv)
 	MCFG_DEVICE_IO_MAP(omv_io_map)
 
 	config.device_remove(CARTSLOT_TAG);
-	MCFG_OMV_CARTRIDGE_ADD(CARTSLOT_TAG, sg1000_cart, nullptr)
+	OMV_CART_SLOT(config, CARTSLOT_TAG, sg1000_cart, nullptr);
 
 	m_ram->set_default_size("2K");
 MACHINE_CONFIG_END
@@ -603,7 +603,7 @@ MACHINE_CONFIG_START(sc3000_state::sc3000)
 	SG1000_EXPANSION_SLOT(config, m_sgexpslot, sg1000_expansion_devices, "sk1100", true);
 
 	/* cartridge */
-	MCFG_SC3000_CARTRIDGE_ADD(CARTSLOT_TAG, sg1000_cart, nullptr)
+	SC3000_CART_SLOT(config, CARTSLOT_TAG, sg1000_cart, nullptr);
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("sg1000");

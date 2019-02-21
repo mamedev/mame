@@ -77,6 +77,7 @@ crt9028_device::crt9028_device(const machine_config &mconfig, device_type type, 
 	, m_wide_gfx_pattern(wide_gfx_pattern)
 	, m_thin_gfx_seg{thin_gfx_seg1, thin_gfx_seg2, thin_gfx_seg3, thin_gfx_seg4}
 	, m_thin_gfx_dots{thin_gfx_dots1, thin_gfx_dots2, thin_gfx_dots3, thin_gfx_dots4}
+	, m_address_register(0)
 {
 	// Mostly unused now
 	(void)m_hsync_delay;
@@ -166,6 +167,8 @@ void crt9028_device::device_resolve_objects()
 void crt9028_device::device_start()
 {
 	m_space = &space(0);
+
+	save_item(NAME(m_address_register));
 }
 
 
@@ -180,12 +183,121 @@ u32 crt9028_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 
 
 //-------------------------------------------------
+//  chip_reset - software reset command
+//-------------------------------------------------
+
+void crt9028_device::chip_reset()
+{
+	logerror("%s: Chip reset\n", machine().describe_context());
+}
+
+
+//-------------------------------------------------
+//  status_r - read status register
+//-------------------------------------------------
+
+u8 crt9028_device::status_r()
+{
+	return 0x80;
+}
+
+
+//-------------------------------------------------
+//  filadd_w - set fill address register
+//-------------------------------------------------
+
+void crt9028_device::filadd_w(u8 data)
+{
+	logerror("%s: Fill address = %03X\n", machine().describe_context(), data << 4);
+}
+
+
+//-------------------------------------------------
+//  tosadd_w - set top of screen address register
+//-------------------------------------------------
+
+void crt9028_device::tosadd_w(u8 data)
+{
+	logerror("%s: Top of screen address = %03X\n", machine().describe_context(), data << 4);
+}
+
+
+//-------------------------------------------------
+//  curlo_w - set cursor low register
+//-------------------------------------------------
+
+void crt9028_device::curlo_w(u8 data)
+{
+	logerror("%s: Cursor low = %02X\n", machine().describe_context(), data);
+}
+
+
+//-------------------------------------------------
+//  curhi_w - set cursor high/scroll register
+//-------------------------------------------------
+
+void crt9028_device::curhi_w(u8 data)
+{
+	logerror("%s: Cursor high = %02X\n", machine().describe_context(), data);
+}
+
+
+//-------------------------------------------------
+//  attdat_w - set attribute data register
+//-------------------------------------------------
+
+void crt9028_device::attdat_w(u8 data)
+{
+	logerror("%s: Attribute data = %02X\n", machine().describe_context(), data);
+}
+
+
+//-------------------------------------------------
+//  mode_w - set mode register
+//-------------------------------------------------
+
+void crt9028_device::mode_w(u8 data)
+{
+	logerror("%s: Auto increment %sabled\n", machine().describe_context(), BIT(data, 7) ? "en" : "dis");
+}
+
+
+//-------------------------------------------------
+//  character_r - read character from memory
+//-------------------------------------------------
+
+u8 crt9028_device::character_r()
+{
+	return 0;
+}
+
+
+//-------------------------------------------------
+//  character_w - write character to memory
+//-------------------------------------------------
+
+void crt9028_device::character_w(u8 data)
+{
+	logerror("%s: Character = %02X\n", machine().describe_context(), data);
+}
+
+
+//-------------------------------------------------
 //  read - read from data or status register
 //-------------------------------------------------
 
 u8 crt9028_device::read(offs_t offset)
 {
-	return 0xff;
+	if (BIT(offset, 0))
+		return status_r();
+	else if (m_address_register == 0xe)
+		return character_r();
+	else
+	{
+		if (!machine().side_effects_disabled())
+			logerror("Read from unknown or write-only register %X\n", m_address_register);
+		return 0;
+	}
 }
 
 
@@ -195,7 +307,46 @@ u8 crt9028_device::read(offs_t offset)
 
 void crt9028_device::write(offs_t offset, u8 data)
 {
-	logerror("%s: Writing %02X to %s register\n", machine().describe_context(), data, BIT(offset, 0) ? "address" : "data");
+	if (BIT(offset, 0))
+		m_address_register = data & 0x0f;
+	else switch (m_address_register)
+	{
+	case 0x6:
+		chip_reset();
+		break;
+
+	case 0x8:
+		tosadd_w(data);
+		break;
+
+	case 0x9:
+		curlo_w(data);
+		break;
+
+	case 0xa:
+		curhi_w(data);
+		break;
+
+	case 0xb:
+		filadd_w(data);
+		break;
+
+	case 0xc:
+		attdat_w(data);
+		break;
+
+	case 0xd:
+		character_w(data);
+		break;
+
+	case 0xe:
+		mode_w(data);
+		break;
+
+	default:
+		logerror("%s: Unknown register %X = %02X\n", machine().describe_context(), m_address_register, data);
+		break;
+	}
 }
 
 

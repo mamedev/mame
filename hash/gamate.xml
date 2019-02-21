@@ -11,7 +11,6 @@ C1034 - Superboy (Unreleased?)
 C1039 - Column #5 (Unreleased?)
 C1040 - ??
 C1041 - Mighty Boxer
-C1050 - Fortress of Fierceness
 C1051 - Incantational Couple
 C1055 - ??
 C1059 - ??
@@ -536,6 +535,18 @@ C1066 - ??
 		</part>
 	</software>
 
+	<software name="fortress">
+		<description>Fortress of Fierceness</description>
+		<year>1991</year>
+		<publisher>Bit Corporation</publisher>
+		<info name="serial" value="C1050" />
+		<part name="cart" interface="gamate_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="fortress.bin" size="32768" crc="c771e16b" sha1="aa971e546da8957de29837e5310452c129771967" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="famous7">
 		<description>Famous 7</description>
 		<year>1993</year>

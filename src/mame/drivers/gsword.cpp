@@ -318,12 +318,12 @@ void gsword_state_base::machine_reset()
 
 WRITE8_MEMBER(gsword_state_base::ay8910_control_port_0_w)
 {
-	m_ay0->address_w(space,offset,data);
+	m_ay0->address_w(data);
 	m_fake8910_0 = data;
 }
 WRITE8_MEMBER(gsword_state_base::ay8910_control_port_1_w)
 {
-	m_ay1->address_w(space,offset,data);
+	m_ay1->address_w(data);
 	m_fake8910_1 = data;
 }
 

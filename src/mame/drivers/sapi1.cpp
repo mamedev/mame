@@ -37,6 +37,7 @@ ZPS stands for "Základní Počítačová Sestava" (basic computer system).
 //#include "cpu/z80/z80.h"
 #include "bus/rs232/rs232.h"
 #include "machine/ay31015.h"
+#include "machine/clock.h"
 #include "machine/keyboard.h"
 #include "machine/ram.h"
 #include "video/mc6845.h"
@@ -57,6 +58,7 @@ public:
 		m_line4(*this, "LINE4"),
 		m_maincpu(*this, "maincpu"),
 		m_uart(*this, "uart"),
+		m_uart_clock(*this, "uart_clock"),
 		m_v24(*this, "v24"),
 		m_palette(*this, "palette")
 	{
@@ -115,6 +117,7 @@ private:
 	required_ioport m_line4;
 	required_device<cpu_device> m_maincpu;
 	optional_device<ay31015_device> m_uart;
+	optional_device<clock_device> m_uart_clock;
 	optional_device<rs232_port_device> m_v24;
 
 	optional_device<palette_device> m_palette;
@@ -625,7 +628,7 @@ void sapi1_state::init_sapizps3b()
 /* Machine driver */
 MACHINE_CONFIG_START(sapi1_state::sapi1)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, I8080A, XTAL(18'000'000) / 9) // Tesla MHB8080A + MHB8224 + MHB8228
+	MCFG_DEVICE_ADD(m_maincpu, I8080A, 18_MHz_XTAL / 9) // Tesla MHB8080A + MHB8224 + MHB8228
 	MCFG_DEVICE_PROGRAM_MAP(sapi1_mem)
 	MCFG_MACHINE_RESET_OVERRIDE(sapi1_state, sapi1)
 
@@ -696,18 +699,20 @@ DEVICE_INPUT_DEFAULTS_END
 
 MACHINE_CONFIG_START(sapi1_state::sapi3a)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8080A, XTAL(18'000'000) / 9) // Tesla MHB8080A + MHB8224 + MHB8228
+	MCFG_DEVICE_ADD("maincpu", I8080A, 18_MHz_XTAL / 9) // Tesla MHB8080A + MHB8224 + MHB8228
 	MCFG_DEVICE_PROGRAM_MAP(sapi3a_mem)
 	MCFG_DEVICE_IO_MAP(sapi3a_io)
 	MCFG_MACHINE_RESET_OVERRIDE(sapi1_state, sapizps3 )
 
 	/* video hardware */
 	AY51013(config, m_uart); // Tesla MHB1012
-	m_uart->set_tx_clock(XTAL(12'288'000) / 80); // not actual rate?
-	m_uart->set_rx_clock(XTAL(12'288'000) / 80); // not actual rate?
 	m_uart->read_si_callback().set(m_v24, FUNC(rs232_port_device::rxd_r));
 	m_uart->write_so_callback().set(m_v24, FUNC(rs232_port_device::write_txd));
 	m_uart->set_auto_rdav(true); // RDAV not actually tied to RDE, but pulsed by K155AG3 (=74123N): R25=22k, C14=220
+
+	CLOCK(config, m_uart_clock, 12.288_MHz_XTAL / 80); // TODO: divider selectable by jumpers
+	m_uart_clock->signal_handler().set(m_uart, FUNC(ay51013_device::write_tcp));
+	m_uart_clock->signal_handler().append(m_uart, FUNC(ay51013_device::write_rcp));
 
 	RS232_PORT(config, m_v24, default_rs232_devices, "terminal").set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 

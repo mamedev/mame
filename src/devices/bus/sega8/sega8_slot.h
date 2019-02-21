@@ -131,18 +131,14 @@ public:
 
 	void save_ram() { if (m_cart && m_cart->get_ram_size()) m_cart->save_ram(); }
 
-	void set_mandatory(bool val) { m_must_be_loaded = val; }
-	void set_intf(const char * interface) { m_interface = interface; }
-	void set_ext(const char * extensions) { m_extensions = extensions; }
-
 	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
 	virtual bool is_readable()  const override { return 1; }
 	virtual bool is_writeable() const override { return 0; }
 	virtual bool is_creatable() const override { return 0; }
-	virtual bool must_be_loaded() const override { return m_must_be_loaded; }
 	virtual bool is_reset_on_load() const override { return 1; }
-	virtual const char *image_interface() const override { return m_interface; }
-	virtual const char *file_extensions() const override { return m_extensions; }
+	virtual bool must_be_loaded() const override { return false; }
+	virtual const char *image_interface() const override { return "sms_cart"; }
+	virtual const char *file_extensions() const override { return "bin"; }
 
 	// slot interface overrides
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
@@ -160,15 +156,13 @@ public:
 	int get_sms_mode() { return m_cart->get_sms_mode(); }
 
 protected:
-	sega8_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_card);
+	sega8_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_card = false);
 
 	// device-level overrides
 	virtual void device_start() override;
 
 	int m_type;
-	bool m_must_be_loaded, m_is_card;
-	const char *m_interface;
-	const char *m_extensions;
+	bool m_is_card;
 	device_sega8_cart_interface*       m_cart;
 };
 
@@ -182,71 +176,194 @@ public:
 
 	virtual const char *custom_instance_name() const override { return "card"; }
 	virtual const char *custom_brief_instance_name() const override { return "card"; }
+
+protected:
+	// construction/destruction
+	sega8_card_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 };
 
+// ======================> sg1000_cart_slot_device
+
+class sg1000_cart_slot_device : public sega8_cart_slot_device
+{
+public:
+	// construction/destruction
+	template <typename T>
+	sg1000_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
+		: sg1000_cart_slot_device(mconfig, tag, owner, u32(0))
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
+	sg1000_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual bool must_be_loaded() const override { return true; }
+	virtual const char *image_interface() const override { return "sg1000_cart"; }
+	virtual const char *file_extensions() const override { return "bin,sg"; }
+};
+
+// ======================> omv_cart_slot_device
+
+class omv_cart_slot_device : public sega8_cart_slot_device
+{
+public:
+	// construction/destruction
+	template <typename T>
+	omv_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
+		: omv_cart_slot_device(mconfig, tag, owner, u32(0))
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
+	omv_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual bool must_be_loaded() const override { return false; }
+	virtual const char *image_interface() const override { return "sg1000_cart"; }
+	virtual const char *file_extensions() const override { return "bin,sg"; }
+};
+
+// ======================> sc3000_cart_slot_device
+
+class sc3000_cart_slot_device : public sega8_cart_slot_device
+{
+public:
+	// construction/destruction
+	template <typename T>
+	sc3000_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
+		: sc3000_cart_slot_device(mconfig, tag, owner, u32(0))
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
+	sc3000_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual bool must_be_loaded() const override { return true; }
+	virtual const char *image_interface() const override { return "sg1000_cart"; }
+	virtual const char *file_extensions() const override { return "bin,sg,sc"; }
+};
+
+// ======================> sg1000mk3_cart_slot_device
+
+class sg1000mk3_cart_slot_device : public sega8_cart_slot_device
+{
+public:
+	// construction/destruction
+	template <typename T>
+	sg1000mk3_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
+		: sg1000mk3_cart_slot_device(mconfig, tag, owner, u32(0))
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
+	sg1000mk3_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual bool must_be_loaded() const override { return false; }
+	virtual const char *image_interface() const override { return "sms_cart,sg1000_cart"; }
+	virtual const char *file_extensions() const override { return "bin,sms,sg"; }
+};
+
+// ======================> sms_cart_slot_device
+
+class sms_cart_slot_device : public sega8_cart_slot_device
+{
+public:
+	// construction/destruction
+	template <typename T>
+	sms_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
+		: sms_cart_slot_device(mconfig, tag, owner, u32(0))
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
+	sms_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual bool must_be_loaded() const override { return false; }
+	virtual const char *image_interface() const override { return "sms_cart"; }
+	virtual const char *file_extensions() const override { return "bin,sms"; }
+};
+
+// ======================> gamegear_cart_slot_device
+
+class gamegear_cart_slot_device : public sega8_cart_slot_device
+{
+public:
+	// construction/destruction
+	template <typename T>
+	gamegear_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
+		: gamegear_cart_slot_device(mconfig, tag, owner, u32(0))
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
+	gamegear_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual bool must_be_loaded() const override { return true; }
+	virtual const char *image_interface() const override { return "gamegear_cart"; }
+	virtual const char *file_extensions() const override { return "bin,gg"; }
+};
+
+
+// ======================> sms_card_slot_device
+
+class sms_card_slot_device : public sega8_card_slot_device
+{
+public:
+	// construction/destruction
+	template <typename T>
+	sms_card_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
+		: sms_card_slot_device(mconfig, tag, owner, u32(0))
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
+	sms_card_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual bool must_be_loaded() const override { return false; }
+	virtual const char *image_interface() const override { return "sms_card"; }
+	virtual const char *file_extensions() const override { return "bin"; }
+};
+
+// ======================> sg1000_card_slot_device
+
+class sg1000_card_slot_device : public sega8_card_slot_device
+{
+public:
+	// construction/destruction
+	template <typename T>
+	sg1000_card_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
+		: sg1000_card_slot_device(mconfig, tag, owner, u32(0))
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
+	sg1000_card_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual const char *image_interface() const override { return "sg1000_cart"; }
+	virtual const char *file_extensions() const override { return "bin,sg"; }
+};
+
+DECLARE_DEVICE_TYPE(SG1000_CART_SLOT,    sg1000_cart_slot_device)
+DECLARE_DEVICE_TYPE(OMV_CART_SLOT,       omv_cart_slot_device)
+DECLARE_DEVICE_TYPE(SC3000_CART_SLOT,    sc3000_cart_slot_device)
+DECLARE_DEVICE_TYPE(SG1000MK3_CART_SLOT, sg1000mk3_cart_slot_device)
+DECLARE_DEVICE_TYPE(SMS_CART_SLOT,       sms_cart_slot_device)
+DECLARE_DEVICE_TYPE(GAMEGEAR_CART_SLOT,  gamegear_cart_slot_device)
+DECLARE_DEVICE_TYPE(SMS_CARD_SLOT,       sms_card_slot_device)
+DECLARE_DEVICE_TYPE(SG1000_CARD_SLOT,    sg1000_card_slot_device)
 
 /***************************************************************************
  DEVICE CONFIGURATION MACROS
  ***************************************************************************/
 
 #define S8SLOT_ROM_REGION_TAG ":cart:rom"
-
-
-#define MCFG_SG1000_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
-	MCFG_DEVICE_ADD(_tag, SEGA8_CART_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-	static_cast<sega8_cart_slot_device *>(device)->set_mandatory(true); \
-	static_cast<sega8_cart_slot_device *>(device)->set_intf("sg1000_cart"); \
-	static_cast<sega8_cart_slot_device *>(device)->set_ext("bin,sg");
-
-#define MCFG_OMV_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
-	MCFG_DEVICE_ADD(_tag, SEGA8_CART_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-	static_cast<sega8_cart_slot_device *>(device)->set_mandatory(false); \
-	static_cast<sega8_cart_slot_device *>(device)->set_intf("sg1000_cart"); \
-	static_cast<sega8_cart_slot_device *>(device)->set_ext("bin,sg");
-
-#define MCFG_SC3000_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
-	MCFG_DEVICE_ADD(_tag, SEGA8_CART_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-	static_cast<sega8_cart_slot_device *>(device)->set_mandatory(true); \
-	static_cast<sega8_cart_slot_device *>(device)->set_intf("sg1000_cart"); \
-	static_cast<sega8_cart_slot_device *>(device)->set_ext("bin,sg,sc");
-
-#define MCFG_SG1000MK3_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
-	MCFG_DEVICE_ADD(_tag, SEGA8_CART_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-	static_cast<sega8_cart_slot_device *>(device)->set_mandatory(false); \
-	static_cast<sega8_cart_slot_device *>(device)->set_intf("sms_cart,sg1000_cart"); \
-	static_cast<sega8_cart_slot_device *>(device)->set_ext("bin,sms,sg");
-
-#define MCFG_SMS_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
-	MCFG_DEVICE_ADD(_tag, SEGA8_CART_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-	static_cast<sega8_cart_slot_device *>(device)->set_mandatory(false); \
-	static_cast<sega8_cart_slot_device *>(device)->set_intf("sms_cart"); \
-	static_cast<sega8_cart_slot_device *>(device)->set_ext("bin,sms");
-
-#define MCFG_GG_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
-	MCFG_DEVICE_ADD(_tag, SEGA8_CART_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-	static_cast<sega8_cart_slot_device *>(device)->set_mandatory(true); \
-	static_cast<sega8_cart_slot_device *>(device)->set_intf("gamegear_cart"); \
-	static_cast<sega8_cart_slot_device *>(device)->set_ext("bin,gg");
-
-
-
-#define MCFG_SMS_CARD_ADD(_tag,_slot_intf,_def_slot) \
-	MCFG_DEVICE_ADD(_tag, SEGA8_CARD_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-	static_cast<sega8_card_slot_device *>(device)->set_mandatory(false); \
-	static_cast<sega8_card_slot_device *>(device)->set_intf("sms_card"); \
-	static_cast<sega8_card_slot_device *>(device)->set_ext("bin");
-#define MCFG_SG1000_CARD_ADD(_tag,_slot_intf,_def_slot) \
-	MCFG_DEVICE_ADD(_tag, SEGA8_CARD_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-	static_cast<sega8_card_slot_device *>(device)->set_intf("sg1000_cart"); \
-	static_cast<sega8_card_slot_device *>(device)->set_ext("bin,sg");
 
 
 // slot interfaces

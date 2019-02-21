@@ -19,29 +19,240 @@
 
 #include <cmath>
 
-// ----------------------------------------------------------------------------------------
-// setup_t
-// ----------------------------------------------------------------------------------------
-
 namespace netlist
 {
-setup_t::setup_t(netlist_t &netlist)
-	: m_netlist(netlist)
-	, m_netlist_params(nullptr)
-	, m_factory(*this)
-	, m_proxy_cnt(0)
+	// ----------------------------------------------------------------------------------------
+	// nl_parse_t
+	// ----------------------------------------------------------------------------------------
+
+	nlparse_t::nlparse_t(setup_t &setup, log_type &log)
+	: m_factory(log)
+	, m_setup(setup)
+	, m_log(log)
 	, m_frontier_cnt(0)
+	{ }
+
+	void nlparse_t::register_model(const pstring &model_in)
+	{
+		auto pos = model_in.find(" ");
+		if (pos == pstring::npos)
+			log().fatal(MF_1_UNABLE_TO_PARSE_MODEL_1, model_in);
+		pstring model = plib::ucase(plib::trim(plib::left(model_in, pos)));
+		pstring def = plib::trim(model_in.substr(pos + 1));
+		if (!m_models.insert({model, def}).second)
+			log().fatal(MF_1_MODEL_ALREADY_EXISTS_1, model_in);
+	}
+
+	void nlparse_t::register_alias(const pstring &alias, const pstring &out)
+	{
+		pstring alias_fqn = build_fqn(alias);
+		pstring out_fqn = build_fqn(out);
+		register_alias_nofqn(alias_fqn, out_fqn);
+	}
+
+	void nlparse_t::register_dippins_arr(const pstring &terms)
+	{
+		std::vector<pstring> list(plib::psplit(terms,", "));
+		if (list.size() == 0 || (list.size() % 2) == 1)
+			log().fatal(MF_1_DIP_PINS_MUST_BE_AN_EQUAL_NUMBER_OF_PINS_1,
+					build_fqn(""));
+		std::size_t n = list.size();
+		for (std::size_t i = 0; i < n / 2; i++)
+		{
+			register_alias(plib::pfmt("{1}")(i+1), list[i * 2]);
+			register_alias(plib::pfmt("{1}")(n-i), list[i * 2 + 1]);
+		}
+	}
+
+	void nlparse_t::register_dev(const pstring &classname, const pstring &name)
+	{
+		auto f = m_factory.factory_by_name(classname);
+		if (f == nullptr)
+			log().fatal(MF_1_CLASS_1_NOT_FOUND, classname);
+		else
+		{
+			/* make sure we parse macro library entries */
+			f->macro_actions(*this, name);
+			pstring key = build_fqn(name);
+			if (device_exists(key))
+				log().fatal(MF_1_DEVICE_ALREADY_EXISTS_1, name);
+			else
+				m_device_factory.insert(m_device_factory.end(), {key, f});
+		}
+	}
+
+	void nlparse_t::register_link(const pstring &sin, const pstring &sout)
+	{
+		register_link_fqn(build_fqn(sin), build_fqn(sout));
+	}
+
+	void nlparse_t::register_link_arr(const pstring &terms)
+	{
+		std::vector<pstring> list(plib::psplit(terms,", "));
+		if (list.size() < 2)
+			log().fatal(MF_2_NET_C_NEEDS_AT_LEAST_2_TERMINAL);
+		for (std::size_t i = 1; i < list.size(); i++)
+		{
+			register_link(list[0], list[i]);
+		}
+	}
+
+	void nlparse_t::include(const pstring &netlist_name)
+	{
+		for (auto &source : m_sources)
+		{
+			if (source->parse(*this, netlist_name))
+				return;
+		}
+		log().fatal(MF_1_NOT_FOUND_IN_SOURCE_COLLECTION, netlist_name);
+	}
+
+
+	void nlparse_t::namespace_push(const pstring &aname)
+	{
+		if (m_namespace_stack.empty())
+			//m_namespace_stack.push(netlist().name() + "." + aname);
+			m_namespace_stack.push(aname);
+		else
+			m_namespace_stack.push(m_namespace_stack.top() + "." + aname);
+	}
+
+	void nlparse_t::namespace_pop()
+	{
+		m_namespace_stack.pop();
+	}
+
+	void nlparse_t::register_param(const pstring &param, const double value)
+	{
+		if (std::abs(value - std::floor(value)) > 1e-30 || std::abs(value) > 1e9)
+			register_param(param, plib::pfmt("{1:.9}").e(value));
+		else
+			register_param(param, plib::pfmt("{1}")(static_cast<long>(value)));
+	}
+
+	void nlparse_t::register_param(const pstring &param, const pstring &value)
+	{
+		pstring fqn = build_fqn(param);
+
+		auto idx = m_param_values.find(fqn);
+		if (idx == m_param_values.end())
+		{
+			if (!m_param_values.insert({fqn, value}).second)
+				log().fatal(MF_1_ADDING_PARAMETER_1_TO_PARAMETER_LIST,
+						param);
+		}
+		else
+		{
+			log().warning(MW_3_OVERWRITING_PARAM_1_OLD_2_NEW_3, fqn, idx->second,
+					value);
+			m_param_values[fqn] = value;
+		}
+	}
+
+	void nlparse_t::register_lib_entry(const pstring &name, const pstring &sourcefile)
+	{
+		m_factory.register_device(plib::make_unique<factory::library_element_t>(name, name, "", sourcefile));
+	}
+
+	void nlparse_t::register_frontier(const pstring &attach, const double r_IN, const double r_OUT)
+	{
+		pstring frontier_name = plib::pfmt("frontier_{1}")(m_frontier_cnt);
+		m_frontier_cnt++;
+		register_dev("FRONTIER_DEV", frontier_name);
+		register_param(frontier_name + ".RIN", r_IN);
+		register_param(frontier_name + ".ROUT", r_OUT);
+		register_link(frontier_name + ".G", "GND");
+		pstring attfn = build_fqn(attach);
+		pstring front_fqn = build_fqn(frontier_name);
+		bool found = false;
+		for (auto & link  : m_links)
+		{
+			if (link.first == attfn)
+			{
+				link.first = front_fqn + ".I";
+				found = true;
+			}
+			else if (link.second == attfn)
+			{
+				link.second = front_fqn + ".I";
+				found = true;
+			}
+		}
+		if (!found)
+			log().fatal(MF_1_FOUND_NO_OCCURRENCE_OF_1, attach);
+		register_link(attach, frontier_name + ".Q");
+	}
+
+	void nlparse_t::tt_factory_create(tt_desc &desc, const pstring &sourcefile)
+	{
+		auto fac = devices::tt_factory_create(desc, sourcefile);
+		m_factory.register_device(std::move(fac));
+	}
+
+	pstring nlparse_t::build_fqn(const pstring &obj_name) const
+	{
+		if (m_namespace_stack.empty())
+			//return netlist().name() + "." + obj_name;
+			return obj_name;
+		else
+			return m_namespace_stack.top() + "." + obj_name;
+	}
+
+	void nlparse_t::register_alias_nofqn(const pstring &alias, const pstring &out)
+	{
+		if (!m_alias.insert({alias, out}).second)
+			log().fatal(MF_1_ADDING_ALI1_TO_ALIAS_LIST, alias);
+	}
+
+	void nlparse_t::register_link_fqn(const pstring &sin, const pstring &sout)
+	{
+		link_t temp = link_t(sin, sout);
+		log().debug("link {1} <== {2}\n", sin, sout);
+		m_links.push_back(temp);
+	}
+
+	bool nlparse_t::device_exists(const pstring &name) const
+	{
+		for (auto &d : m_device_factory)
+			if (d.first == name)
+				return true;
+		return false;
+	}
+
+	bool nlparse_t::parse_stream(std::unique_ptr<plib::pistream> &&istrm, const pstring &name)
+	{
+		return parser_t(std::move(plib::ppreprocessor(&m_defines).process(std::move(istrm))), *this).parse(name);
+	}
+
+	void nlparse_t::add_define(const pstring &defstr)
+	{
+		auto p = defstr.find("=");
+		if (p != pstring::npos)
+			add_define(plib::left(defstr, p), defstr.substr(p+1));
+		else
+			add_define(defstr, "1");
+	}
+
+	// ----------------------------------------------------------------------------------------
+	// setup_t
+	// ----------------------------------------------------------------------------------------
+
+
+setup_t::setup_t(netlist_t &netlist)
+	: nlparse_t(*this, netlist.log())
+	, m_netlist(netlist)
+	, m_netlist_params(nullptr)
+	, m_proxy_cnt(0)
 {
 }
 
-setup_t::~setup_t()
+setup_t::~setup_t() noexcept
 {
+	// FIXME: can't see a need any longer
 	m_links.clear();
-	m_alias.clear();
 	m_params.clear();
 	m_terminals.clear();
 	m_param_values.clear();
-
 	m_sources.clear();
 }
 
@@ -52,99 +263,6 @@ netlist_state_t &setup_t::netlist()
 const netlist_state_t &setup_t::netlist() const
 {
 	return m_netlist.nlstate();
-}
-
-
-pstring setup_t::build_fqn(const pstring &obj_name) const
-{
-	if (m_namespace_stack.empty())
-		//return netlist().name() + "." + obj_name;
-		return obj_name;
-	else
-		return m_namespace_stack.top() + "." + obj_name;
-}
-
-void setup_t::namespace_push(const pstring &aname)
-{
-	if (m_namespace_stack.empty())
-		//m_namespace_stack.push(netlist().name() + "." + aname);
-		m_namespace_stack.push(aname);
-	else
-		m_namespace_stack.push(m_namespace_stack.top() + "." + aname);
-}
-
-void setup_t::namespace_pop()
-{
-	m_namespace_stack.pop();
-}
-
-void setup_t::register_lib_entry(const pstring &name, const pstring &sourcefile)
-{
-	factory().register_device(plib::make_unique_base<factory::element_t, factory::library_element_t>(*this, name, name, "", sourcefile));
-}
-
-void setup_t::register_dev(const pstring &classname, const pstring &name)
-{
-	auto f = factory().factory_by_name(classname);
-	if (f == nullptr)
-		log().fatal(MF_1_CLASS_1_NOT_FOUND, classname);
-	else
-	{
-		/* make sure we parse macro library entries */
-		f->macro_actions(netlist(), name);
-		pstring key = build_fqn(name);
-		if (device_exists(key))
-			log().fatal(MF_1_DEVICE_ALREADY_EXISTS_1, name);
-		else
-			m_device_factory.insert(m_device_factory.end(), {key, f});
-	}
-}
-
-bool setup_t::device_exists(const pstring &name) const
-{
-	for (auto &d : m_device_factory)
-		if (d.first == name)
-			return true;
-	return false;
-}
-
-
-void setup_t::register_model(const pstring &model_in)
-{
-	auto pos = model_in.find(" ");
-	if (pos == pstring::npos)
-		log().fatal(MF_1_UNABLE_TO_PARSE_MODEL_1, model_in);
-	pstring model = plib::ucase(plib::trim(plib::left(model_in, pos)));
-	pstring def = plib::trim(model_in.substr(pos + 1));
-	if (!m_models.insert({model, def}).second)
-		log().fatal(MF_1_MODEL_ALREADY_EXISTS_1, model_in);
-}
-
-void setup_t::register_alias_nofqn(const pstring &alias, const pstring &out)
-{
-	if (!m_alias.insert({alias, out}).second)
-		log().fatal(MF_1_ADDING_ALI1_TO_ALIAS_LIST, alias);
-}
-
-void setup_t::register_alias(const pstring &alias, const pstring &out)
-{
-	pstring alias_fqn = build_fqn(alias);
-	pstring out_fqn = build_fqn(out);
-	register_alias_nofqn(alias_fqn, out_fqn);
-}
-
-void setup_t::register_dippins_arr(const pstring &terms)
-{
-	std::vector<pstring> list(plib::psplit(terms,", "));
-	if (list.size() == 0 || (list.size() % 2) == 1)
-		log().fatal(MF_1_DIP_PINS_MUST_BE_AN_EQUAL_NUMBER_OF_PINS_1,
-				build_fqn(""));
-	std::size_t n = list.size();
-	for (std::size_t i = 0; i < n / 2; i++)
-	{
-		register_alias(plib::pfmt("{1}")(i+1), list[i * 2]);
-		register_alias(plib::pfmt("{1}")(n-i), list[i * 2 + 1]);
-	}
 }
 
 pstring setup_t::termtype_as_str(detail::core_terminal_t &in) const
@@ -171,12 +289,6 @@ pstring setup_t::get_initial_param_val(const pstring &name, const pstring &def) 
 		return def;
 }
 
-void setup_t::register_param(const pstring &name, param_t &param)
-{
-	if (!m_params.insert({param.name(), param_ref_t(param.name(), param.device(), param)}).second)
-		log().fatal(MF_1_ADDING_PARAMETER_1_TO_PARAMETER_LIST, name);
-}
-
 void setup_t::register_term(detail::core_terminal_t &term)
 {
 	if (!m_terminals.insert({term.name(), &term}).second)
@@ -185,29 +297,10 @@ void setup_t::register_term(detail::core_terminal_t &term)
 	log().debug("{1} {2}\n", termtype_as_str(term), term.name());
 }
 
-void setup_t::register_link_arr(const pstring &terms)
-{
-	std::vector<pstring> list(plib::psplit(terms,", "));
-	if (list.size() < 2)
-		log().fatal(MF_2_NET_C_NEEDS_AT_LEAST_2_TERMINAL);
-	for (std::size_t i = 1; i < list.size(); i++)
-	{
-		register_link(list[0], list[i]);
-	}
-}
 
 
-void setup_t::register_link_fqn(const pstring &sin, const pstring &sout)
-{
-	link_t temp = link_t(sin, sout);
-	log().debug("link {1} <== {2}\n", sin, sout);
-	m_links.push_back(temp);
-}
 
-void setup_t::register_link(const pstring &sin, const pstring &sout)
-{
-	register_link_fqn(build_fqn(sin), build_fqn(sout));
-}
+
 
 void setup_t::remove_connections(const pstring &pin)
 {
@@ -230,62 +323,14 @@ void setup_t::remove_connections(const pstring &pin)
 }
 
 
-void setup_t::register_frontier(const pstring &attach, const double r_IN, const double r_OUT)
+
+void setup_t::register_param_t(const pstring &name, param_t &param)
 {
-	pstring frontier_name = plib::pfmt("frontier_{1}")(m_frontier_cnt);
-	m_frontier_cnt++;
-	register_dev("FRONTIER_DEV", frontier_name);
-	register_param(frontier_name + ".RIN", r_IN);
-	register_param(frontier_name + ".ROUT", r_OUT);
-	register_link(frontier_name + ".G", "GND");
-	pstring attfn = build_fqn(attach);
-	pstring front_fqn = build_fqn(frontier_name);
-	bool found = false;
-	for (auto & link  : m_links)
-	{
-		if (link.first == attfn)
-		{
-			link.first = front_fqn + ".I";
-			found = true;
-		}
-		else if (link.second == attfn)
-		{
-			link.second = front_fqn + ".I";
-			found = true;
-		}
-	}
-	if (!found)
-		log().fatal(MF_1_FOUND_NO_OCCURRENCE_OF_1, attach);
-	register_link(attach, frontier_name + ".Q");
+	if (!m_params.insert({param.name(), param_ref_t(param.name(), param.device(), param)}).second)
+		log().fatal(MF_1_ADDING_PARAMETER_1_TO_PARAMETER_LIST, name);
 }
 
 
-void setup_t::register_param(const pstring &param, const double value)
-{
-	if (std::abs(value - std::floor(value)) > 1e-30 || std::abs(value) > 1e9)
-		register_param(param, plib::pfmt("{1:.9}").e(value));
-	else
-		register_param(param, plib::pfmt("{1}")(static_cast<long>(value)));
-}
-
-void setup_t::register_param(const pstring &param, const pstring &value)
-{
-	pstring fqn = build_fqn(param);
-
-	auto idx = m_param_values.find(fqn);
-	if (idx == m_param_values.end())
-	{
-		if (!m_param_values.insert({fqn, value}).second)
-			log().fatal(MF_1_ADDING_PARAMETER_1_TO_PARAMETER_LIST,
-					param);
-	}
-	else
-	{
-		log().warning(MW_3_OVERWRITING_PARAM_1_OLD_2_NEW_3, fqn, idx->second,
-				value);
-		m_param_values[fqn] = value;
-	}
-}
 
 const pstring setup_t::resolve_alias(const pstring &name) const
 {
@@ -593,11 +638,12 @@ void setup_t::connect_terminals(detail::core_terminal_t &t1, detail::core_termin
 	{
 		log().debug("adding analog net ...\n");
 		// FIXME: Nets should have a unique name
-		auto anet = plib::palloc<analog_net_t>(netlist(),"net." + t1.name());
-		netlist().register_net(plib::owned_ptr<analog_net_t>(anet, true));
-		t1.set_net(anet);
-		anet->add_terminal(t2);
-		anet->add_terminal(t1);
+		auto anet = pool().make_poolptr<analog_net_t>(netlist(),"net." + t1.name());
+		auto anetp = anet.get();
+		netlist().register_net(std::move(anet));
+		t1.set_net(anetp);
+		anetp->add_terminal(t2);
+		anetp->add_terminal(t1);
 	}
 }
 
@@ -647,8 +693,6 @@ bool setup_t::connect_input_input(detail::core_terminal_t &t1, detail::core_term
 	}
 	return ret;
 }
-
-
 
 bool setup_t::connect(detail::core_terminal_t &t1_in, detail::core_terminal_t &t2_in)
 {
@@ -766,7 +810,7 @@ void setup_t::register_dynamic_log_devices()
 	{
 		log().debug("Creating dynamic logs ...");
 		std::vector<pstring> loglist(plib::psplit(env, ":"));
-		for (pstring ll : loglist)
+		for (const pstring &ll : loglist)
 		{
 			pstring name = "log_" + ll;
 			auto nc = factory().factory_by_name("LOG")->Create(netlist(), name);
@@ -891,19 +935,19 @@ class logic_family_std_proxy_t : public logic_family_desc_t
 {
 public:
 	logic_family_std_proxy_t() = default;
-	plib::owned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_base_t &anetlist,
+	poolptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_state_t &anetlist,
 			const pstring &name, logic_output_t *proxied) const override;
-	plib::owned_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_base_t &anetlist, const pstring &name, logic_input_t *proxied) const override;
+	poolptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, logic_input_t *proxied) const override;
 };
 
-plib::owned_ptr<devices::nld_base_d_to_a_proxy> logic_family_std_proxy_t::create_d_a_proxy(netlist_base_t &anetlist,
+poolptr<devices::nld_base_d_to_a_proxy> logic_family_std_proxy_t::create_d_a_proxy(netlist_state_t &anetlist,
 		const pstring &name, logic_output_t *proxied) const
 {
-	return plib::owned_ptr<devices::nld_base_d_to_a_proxy>::Create<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
+	return pool().make_poolptr<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
 }
-plib::owned_ptr<devices::nld_base_a_to_d_proxy> logic_family_std_proxy_t::create_a_d_proxy(netlist_base_t &anetlist, const pstring &name, logic_input_t *proxied) const
+poolptr<devices::nld_base_a_to_d_proxy> logic_family_std_proxy_t::create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, logic_input_t *proxied) const
 {
-	return plib::owned_ptr<devices::nld_base_a_to_d_proxy>::Create<devices::nld_a_to_d_proxy>(anetlist, name, proxied);
+	return pool().make_poolptr<devices::nld_a_to_d_proxy>(anetlist, name, proxied);
 }
 
 
@@ -921,7 +965,7 @@ const logic_family_desc_t *setup_t::family_from_model(const pstring &model)
 		if (e.first == model)
 			return e.second.get();
 
-	auto ret = plib::make_unique_base<logic_family_desc_t, logic_family_std_proxy_t>();
+	auto ret = plib::make_unique<logic_family_std_proxy_t>();
 
 	ret->m_fixed_V = model_value(map, "FV");
 	ret->m_low_thresh_PCNT = model_value(map, "IVL");
@@ -938,30 +982,9 @@ const logic_family_desc_t *setup_t::family_from_model(const pstring &model)
 	return retp;
 }
 
-void setup_t::tt_factory_create(tt_desc &desc, const pstring &sourcefile)
-{
-	devices::tt_factory_create(*this, desc, sourcefile);
-}
-
-
 // ----------------------------------------------------------------------------------------
 // Sources
 // ----------------------------------------------------------------------------------------
-
-bool setup_t::parse_stream(std::unique_ptr<plib::pistream> istrm, const pstring &name)
-{
-	return parser_t(std::move(plib::ppreprocessor(&m_defines).process(std::move(istrm))), *this).parse(name);
-}
-
-void setup_t::include(const pstring &netlist_name)
-{
-	for (auto &source : m_sources)
-	{
-		if (source->parse(netlist_name))
-			return;
-	}
-	log().fatal(MF_1_NOT_FOUND_IN_SOURCE_COLLECTION, netlist_name);
-}
 
 std::unique_ptr<plib::pistream> setup_t::get_data_stream(const pstring &name)
 {
@@ -978,14 +1001,6 @@ std::unique_ptr<plib::pistream> setup_t::get_data_stream(const pstring &name)
 	return std::unique_ptr<plib::pistream>(nullptr);
 }
 
-void setup_t::add_define(const pstring &defstr)
-{
-	auto p = defstr.find("=");
-	if (p != pstring::npos)
-		add_define(plib::left(defstr, p), defstr.substr(p+1));
-	else
-		add_define(defstr, "1");
-}
 
 // ----------------------------------------------------------------------------------------
 // Device handling
@@ -995,11 +1010,12 @@ void setup_t::delete_empty_nets()
 {
 	netlist().nets().erase(
 		std::remove_if(netlist().nets().begin(), netlist().nets().end(),
-			[](plib::owned_ptr<detail::net_t> &x)
+			[](poolptr<detail::net_t> &x)
 			{
 				if (x->num_cons() == 0)
 				{
 					x->state().log().verbose("Deleting net {1} ...", x->name());
+					x->state().run_state_manager().remove_save_items(x.get());
 					return true;
 				}
 				else
@@ -1015,8 +1031,6 @@ void setup_t::prepare_to_run()
 {
 	register_dynamic_log_devices();
 
-	/* load the library ... */
-
 	/* make sure the solver and parameters are started first! */
 
 	for (auto & e : m_device_factory)
@@ -1024,7 +1038,7 @@ void setup_t::prepare_to_run()
 		if ( factory().is_class<devices::NETLIB_NAME(solver)>(e.second)
 				|| factory().is_class<devices::NETLIB_NAME(netlistparams)>(e.second))
 		{
-			m_netlist.nlstate().add_dev(e.first, plib::owned_ptr<device_t>(e.second->Create(netlist(), e.first)));
+			m_netlist.nlstate().add_dev(e.first, poolptr<device_t>(e.second->Create(netlist(), e.first)));
 		}
 	}
 
@@ -1041,7 +1055,7 @@ void setup_t::prepare_to_run()
 		if ( !factory().is_class<devices::NETLIB_NAME(solver)>(e.second)
 				&& !factory().is_class<devices::NETLIB_NAME(netlistparams)>(e.second))
 		{
-			auto dev = plib::owned_ptr<device_t>(e.second->Create(netlist(), e.first));
+			auto dev = poolptr<device_t>(e.second->Create(netlist(), e.first));
 			m_netlist.nlstate().add_dev(dev->name(), std::move(dev));
 		}
 	}
@@ -1122,39 +1136,39 @@ void setup_t::prepare_to_run()
 // base sources
 // ----------------------------------------------------------------------------------------
 
-bool source_t::parse(const pstring &name)
+bool source_t::parse(nlparse_t &setup, const pstring &name)
 {
 	if (m_type != SOURCE)
 		return false;
 	else
 	{
-		return m_setup.parse_stream(stream(name), name);
+		return setup.parse_stream(stream(name), name);
 	}
 }
 
 std::unique_ptr<plib::pistream> source_string_t::stream(const pstring &name)
 {
 	plib::unused_var(name);
-	return plib::make_unique_base<plib::pistream, plib::pimemstream>(m_str.c_str(), std::strlen(m_str.c_str()));
+	return plib::make_unique<plib::pimemstream>(m_str.c_str(), std::strlen(m_str.c_str()));
 }
 
 std::unique_ptr<plib::pistream> source_mem_t::stream(const pstring &name)
 {
 	plib::unused_var(name);
-	return plib::make_unique_base<plib::pistream, plib::pimemstream>(m_str.c_str(), std::strlen(m_str.c_str()));
+	return plib::make_unique<plib::pimemstream>(m_str.c_str(), std::strlen(m_str.c_str()));
 }
 
 std::unique_ptr<plib::pistream> source_file_t::stream(const pstring &name)
 {
 	plib::unused_var(name);
-	return plib::make_unique_base<plib::pistream, plib::pifilestream>(m_filename);
+	return plib::make_unique<plib::pifilestream>(m_filename);
 }
 
-bool source_proc_t::parse(const pstring &name)
+bool source_proc_t::parse(nlparse_t &setup, const pstring &name)
 {
 	if (name == m_setup_func_name)
 	{
-		m_setup_func(setup());
+		m_setup_func(setup);
 		return true;
 	}
 	else

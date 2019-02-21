@@ -52,8 +52,8 @@ DEFINE_DEVICE_TYPE(EFO90501, efo90501_device, "efo90501", "EFO90501 VDP")
 */
 void tms9928a_device::memmap(address_map &map)
 {
-	map.global_mask(0x3fff);
-	map(0x0000, 0x3fff).ram();
+	if (!has_configured_map(0))
+		map(0x0000, 0x3fff).ram();
 }
 
 tms9928a_device::tms9928a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_50hz, bool is_reva, bool is_99)
@@ -67,7 +67,7 @@ tms9928a_device::tms9928a_device(const machine_config &mconfig, device_type type
 	, m_50hz(is_50hz)
 	, m_reva(is_reva)
 	, m_99(is_99)
-	, m_space_config("vram", ENDIANNESS_BIG, 8, 14, 0, address_map_constructor(), address_map_constructor(FUNC(tms9928a_device::memmap), this))
+	, m_space_config("vram", ENDIANNESS_BIG, 8, 14, 0, address_map_constructor(FUNC(tms9928a_device::memmap), this))
 {
 }
 

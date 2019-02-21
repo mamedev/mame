@@ -141,8 +141,8 @@ MACHINE_CONFIG_START(gammagic_state::gammagic)
 //  I82371SB(config, "i82371sb", 0);
 //  MCFG_I82439TX_ADD("i82439tx", "maincpu", "user")
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-//  MCFG_PCI_BUS_DEVICE(0, "i82439tx", i82439tx_pci_read, i82439tx_pci_write)
-//  MCFG_PCI_BUS_DEVICE(1, "i82371sb", i82371sb_pci_read, i82371sb_pci_write)
+//  MCFG_PCI_BUS_LEGACY_DEVICE(0, "i82439tx", i82439tx_pci_read, i82439tx_pci_write)
+//  MCFG_PCI_BUS_LEGACY_DEVICE(1, "i82371sb", i82371sb_pci_read, i82371sb_pci_write)
 	/* video hardware */
 	pcvideo_vga(config);
 

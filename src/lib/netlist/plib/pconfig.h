@@ -33,6 +33,20 @@
 #define PHAS_INT128 (0)
 #endif
 
+/*
+ * Standard alignment macros
+ */
+
+#define PALIGNAS_CACHELINE()	PALIGNAS(64)
+#define PALIGNAS_VECTOROPT()	PALIGNAS(64)
+
+/* Breaks mame build on windows due to -Wattribute */
+#if defined(_WIN32) && defined(__GNUC__)
+#define PALIGNAS(x)
+#else
+#define PALIGNAS(x) alignas(x)
+#endif
+
 /*============================================================
  *  Check for CPP Version
  *

@@ -85,11 +85,11 @@ void tiki100_hdc_device::device_reset()
 //  tiki100bus_iorq_r - I/O read
 //-------------------------------------------------
 
-uint8_t tiki100_hdc_device::iorq_r(address_space &space, offs_t offset, uint8_t data)
+uint8_t tiki100_hdc_device::iorq_r(offs_t offset, uint8_t data)
 {
 	if ((offset & 0xf8) == 0x20)
 	{
-		data = m_hdc->read(space, offset & 0x07);
+		data = m_hdc->read(offset & 0x07);
 	}
 
 	return data;
@@ -100,10 +100,10 @@ uint8_t tiki100_hdc_device::iorq_r(address_space &space, offs_t offset, uint8_t 
 //  tiki100bus_iorq_w - I/O write
 //-------------------------------------------------
 
-void tiki100_hdc_device::iorq_w(address_space &space, offs_t offset, uint8_t data)
+void tiki100_hdc_device::iorq_w(offs_t offset, uint8_t data)
 {
 	if ((offset & 0xf8) == 0x20)
 	{
-		m_hdc->write(space, offset, data);
+		m_hdc->write(offset, data);
 	}
 }

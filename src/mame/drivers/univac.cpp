@@ -562,7 +562,8 @@ static const z80_daisy_config daisy_chain[] =
 };
 
 // All frequencies confirmed
-MACHINE_CONFIG_START(univac_state::uts20)
+void univac_state::uts20(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 18.432_MHz_XTAL / 6); // 3.072 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &univac_state::mem_map);
@@ -585,9 +586,9 @@ MACHINE_CONFIG_START(univac_state::uts20)
 	latch_e0.q_out_cb<6>().set(FUNC(univac_state::porte6_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_UPDATE_DRIVER(univac_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER, rgb_t::green());
+	m_screen->set_screen_update(FUNC(univac_state::screen_update));
+	m_screen->set_palette("palette");
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_uts);
 
@@ -627,13 +628,13 @@ MACHINE_CONFIG_START(univac_state::uts20)
 
 	RS232_PORT(config, m_printer, default_rs232_devices, nullptr);
 	m_printer->dcd_handler().set(FUNC(univac_state::aux_dsr_w));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(univac_state::uts10)
+void univac_state::uts10(machine_config &config)
+{
 	uts20(config);
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP(uts10_map)
-	MCFG_DEVICE_IO_MAP(uts10_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &univac_state::uts10_map);
+	m_maincpu->set_addrmap(AS_IO, &univac_state::uts10_io_map);
 
 	config.device_remove("keybclk");
 	m_ctc->zc_callback<2>().set(m_sio, FUNC(z80sio_device::rxtxcb_w));
@@ -644,7 +645,7 @@ MACHINE_CONFIG_START(univac_state::uts10)
 
 	UTS_KEYBOARD(config.replace(), m_keyboard, uts10_keyboards, "extw");
 	m_keyboard->rxd_callback().set(FUNC(univac_state::aux_rxd_w));
-MACHINE_CONFIG_END
+}
 
 
 /* ROM definition */

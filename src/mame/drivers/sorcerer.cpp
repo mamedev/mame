@@ -430,9 +430,11 @@ MACHINE_CONFIG_START(sorcerer_state::sorcerer)
 	WAVE(config, "wave2", m_cassette2).add_route(ALL_OUTPUTS, "mono", 0.05); // cass2 speaker
 
 	AY31015(config, m_uart);
-	m_uart->set_tx_clock(ES_UART_CLOCK);
-	m_uart->set_rx_clock(ES_UART_CLOCK);
 	m_uart->set_auto_rdav(true);
+
+	CLOCK(config, m_uart_clock, ES_UART_CLOCK);
+	m_uart_clock->signal_handler().set(m_uart, FUNC(ay31015_device::write_tcp));
+	m_uart_clock->signal_handler().append(m_uart, FUNC(ay31015_device::write_rcp));
 
 	RS232_PORT(config, "rs232", default_rs232_devices, "null_modem").set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 
@@ -485,7 +487,7 @@ MACHINE_CONFIG_START(sorcerer_state::sorcererd)
 
 	MICROPOLIS(config, m_fdc, 0);
 	m_fdc->set_default_drive_tags();
-	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(sorcerer_floppy_interface)
+	legacy_floppy_image_device::add_4drives(config, &sorcerer_floppy_interface);
 
 	FD1793(config, m_fdc2, 8_MHz_XTAL / 8);  // confirmed clock
 	m_fdc2->set_force_ready(true); // should be able to get rid of this when fdc issue is fixed

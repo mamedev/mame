@@ -472,13 +472,14 @@ WRITE_LINE_MEMBER( hankin_state::ic2_cb2_w )
 	m_ic2_cb2 = state;
 }
 
-MACHINE_CONFIG_START(hankin_state::hankin)
+void hankin_state::hankin(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6802, 3276800)
-	MCFG_DEVICE_PROGRAM_MAP(hankin_map)
+	M6802(config, m_maincpu, 3276800);
+	m_maincpu->set_addrmap(AS_PROGRAM, &hankin_state::hankin_map);
 
-	MCFG_DEVICE_ADD("audiocpu", M6802, 3276800) // guess, xtal value not shown
-	MCFG_DEVICE_PROGRAM_MAP(hankin_sub_map)
+	M6802(config, m_audiocpu, 3276800); // guess, xtal value not shown
+	m_audiocpu->set_addrmap(AS_PROGRAM, &hankin_state::hankin_sub_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -489,9 +490,10 @@ MACHINE_CONFIG_START(hankin_state::hankin)
 	genpin_audio(config);
 
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	DAC_4BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	/* Devices */
 	PIA6821(config, m_ic10, 0);
@@ -526,7 +528,7 @@ MACHINE_CONFIG_START(hankin_state::hankin)
 
 	TIMER(config, "timer_x").configure_periodic(FUNC(hankin_state::timer_x), attotime::from_hz(120)); // mains freq*2
 	TIMER(config, "timer_s").configure_periodic(FUNC(hankin_state::timer_s), attotime::from_hz(94000)); // 555 on sound board*2
-MACHINE_CONFIG_END
+}
 
 /*--------------------------------
 / FJ Holden

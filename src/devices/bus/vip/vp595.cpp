@@ -73,7 +73,7 @@ void vp595_device::device_start()
 //  vip_io_w - I/O write
 //-------------------------------------------------
 
-void vp595_device::vip_io_w(address_space &space, offs_t offset, uint8_t data)
+void vp595_device::vip_io_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0x03)
 	{

@@ -9,6 +9,7 @@
 #define PCHRONO_H_
 
 #include "pconfig.h"
+#include "ptypes.h"
 
 #include <chrono>
 #include <cstdint>
@@ -18,7 +19,7 @@ namespace chrono {
 	template <typename T>
 	struct sys_ticks
 	{
-		typedef typename T::rep type;
+		using type = typename T::rep;
 		static inline type start() { return T::now().time_since_epoch().count(); }
 		static inline type stop() { return T::now().time_since_epoch().count(); }
 		static inline constexpr type per_second() { return T::period::den / T::period::num; }
@@ -145,7 +146,7 @@ namespace chrono {
 	struct counter
 	{
 		counter() : m_count(0) { }
-		typedef uint_least64_t type;
+		using type = uint_least64_t;
 		type operator()() const { return m_count; }
 		void inc() { ++m_count; }
 		void reset() { m_count = 0; }
@@ -157,7 +158,7 @@ namespace chrono {
 	template<>
 	struct counter<false>
 	{
-		typedef uint_least64_t type;
+		using type = uint_least64_t;
 		constexpr type operator()() const { return 0; }
 		void inc() const { }
 		void reset() const { }
@@ -168,17 +169,18 @@ namespace chrono {
 	template< typename T, bool enabled_ = true>
 	struct timer
 	{
-		typedef typename T::type type;
-		typedef uint_least64_t   ctype;
+		using type = typename T::type;
+		using ctype = uint_least64_t;
 		constexpr static bool enabled = enabled_;
 
 		struct guard_t
 		{
 			guard_t() = delete;
-			guard_t(const guard_t &g) noexcept = default;
-			guard_t(guard_t &&g) noexcept = default;
 			guard_t(timer &m) noexcept : m_m(m) { m_m.m_time -= T::start(); }
 			~guard_t() { m_m.m_time += T::stop(); ++m_m.m_count; }
+
+			COPYASSIGNMOVE(guard_t, default)
+
 		private:
 			timer &m_m;
 		};
@@ -206,14 +208,13 @@ namespace chrono {
 	template<typename T>
 	struct timer<T, false>
 	{
-		typedef typename T::type type;
-		typedef uint_least64_t   ctype;
+		using type = typename T::type;
+		using ctype = uint_least64_t;
 
 		struct guard_t
 		{
 			guard_t() = default;
-			guard_t(const guard_t &g) noexcept = default;
-			guard_t(guard_t &&g) noexcept = default;
+			COPYASSIGNMOVE(guard_t, default)
 			/* using default constructor will trigger warning on
 			 * unused local variable.
 			 */

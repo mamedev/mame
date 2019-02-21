@@ -2,26 +2,24 @@
 // copyright-holders:hap
 // thanks-to:Berger
 /******************************************************************************
+*
+* novag_presto.cpp, subdriver of novagbase.cpp
 
-    Novag generic MCS-48 based chess computer driver
+TODO:
+- is led handling correct? mux data needs to be auto cleared
+  similar to diablo/sexpert
 
-    NOTE: MAME doesn't include a generalized implementation for boardpieces yet,
-    greatly affecting user playability of emulated electronic board games.
-    As workaround for the chess games, use an external chess GUI on the side,
-    such as Arena(in editmode).
+*******************************************************************************
 
-    TODO:
-    - is presto led handling correct? mux data needs to be auto cleared
-      similar to diablo/sexpert
+Presto
+----------
+NEC D80C49C MCU(serial 186), OSC from LC circuit measured ~6MHz
+buzzer, 16+4 LEDs, 8*8 chessboard buttons
 
-******************************************************************************
+Octo
+----------
+NEC D80C49HC MCU(serial 111), OSC from LC circuit measured ~12MHz
 
-Presto:
-- NEC D80C49C MCU(serial 186), OSC from LC circuit measured ~6MHz
-- buzzer, 16+4 LEDs, 8*8 chessboard buttons
-
-Octo:
-- NEC D80C49HC MCU(serial 111), OSC from LC circuit measured ~12MHz
 The buzzer has a little electronic circuit going on, not sure whatfor.
 Otherwise, it's identical to Presto. The MCU internal ROM is same too.
 
@@ -38,45 +36,71 @@ Otherwise, it's identical to Presto. The MCU internal ROM is same too.
 #include "novag_presto.lh" // clickable
 
 
-class novagmcs48_state : public novagbase_state
+namespace {
+
+class presto_state : public novagbase_state
 {
 public:
-	novagmcs48_state(const machine_config &mconfig, device_type type, const char *tag)
-		: novagbase_state(mconfig, type, tag)
+	presto_state(const machine_config &mconfig, device_type type, const char *tag) :
+		novagbase_state(mconfig, type, tag),
+		m_maincpu(*this, "maincpu")
 	{ }
 
+	// machine drivers
 	void presto(machine_config &config);
 	void octo(machine_config &config);
 
-	DECLARE_INPUT_CHANGED_MEMBER(octo_cpu_freq);
+protected:
+	// devices/pointers
+	required_device<mcs48_cpu_device> m_maincpu;
 
-private:
-	// Presto/Octo
-	DECLARE_WRITE8_MEMBER(presto_mux_w);
-	DECLARE_WRITE8_MEMBER(presto_control_w);
-	DECLARE_READ8_MEMBER(presto_input_r);
-	DECLARE_MACHINE_RESET(octo);
+	// I/O handlers
+	DECLARE_WRITE8_MEMBER(mux_w);
+	DECLARE_WRITE8_MEMBER(control_w);
+	DECLARE_READ8_MEMBER(input_r);
+};
+
+class octo_state : public presto_state
+{
+public:
+	octo_state(const machine_config &mconfig, device_type type, const char *tag) :
+		presto_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_INPUT_CHANGED_MEMBER(octo_cpu_freq) { octo_set_cpu_freq(); }
+
+protected:
+	virtual void machine_reset() override;
 	void octo_set_cpu_freq();
 };
 
+void octo_state::machine_reset()
+{
+	presto_state::machine_reset();
+	octo_set_cpu_freq();
+}
 
+void octo_state::octo_set_cpu_freq()
+{
+	// Octo was released with either 12MHz or 15MHz CPU
+	m_maincpu->set_unscaled_clock((ioport("FAKE")->read() & 1) ? (15000000) : (12000000));
+}
 
-// Devices, I/O
 
 /******************************************************************************
-    Presto/Octo
+    Devices, I/O
 ******************************************************************************/
 
 // MCU ports/generic
 
-WRITE8_MEMBER(novagmcs48_state::presto_mux_w)
+WRITE8_MEMBER(presto_state::mux_w)
 {
 	// D0-D7: input mux low, led data
 	m_inp_mux = (m_inp_mux & ~0xff) | (~data & 0xff);
 	display_matrix(8, 3, m_inp_mux, m_led_select);
 }
 
-WRITE8_MEMBER(novagmcs48_state::presto_control_w)
+WRITE8_MEMBER(presto_state::control_w)
 {
 	// P21: input mux high
 	m_inp_mux = (m_inp_mux & 0xff) | (~data << 7 & 0x100);
@@ -89,22 +113,10 @@ WRITE8_MEMBER(novagmcs48_state::presto_control_w)
 	m_inp_mux &= ~0xff; // ?
 }
 
-READ8_MEMBER(novagmcs48_state::presto_input_r)
+READ8_MEMBER(presto_state::input_r)
 {
 	// P10-P17: multiplexed inputs
 	return ~read_inputs(9) & 0xff;
-}
-
-void novagmcs48_state::octo_set_cpu_freq()
-{
-	// Octo was released with either 12MHz or 15MHz CPU
-	m_maincpu->set_unscaled_clock((ioport("FAKE")->read() & 1) ? (15000000) : (12000000));
-}
-
-MACHINE_RESET_MEMBER(novagmcs48_state, octo)
-{
-	novagbase_state::machine_reset();
-	octo_set_cpu_freq();
 }
 
 
@@ -131,15 +143,10 @@ static INPUT_PORTS_START( octo )
 	PORT_INCLUDE( presto )
 
 	PORT_START("FAKE")
-	PORT_CONFNAME( 0x01, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, novagmcs48_state, octo_cpu_freq, nullptr) // factory set
+	PORT_CONFNAME( 0x01, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, octo_state, octo_cpu_freq, nullptr) // factory set
 	PORT_CONFSETTING(    0x00, "12MHz" )
 	PORT_CONFSETTING(    0x01, "15MHz" )
 INPUT_PORTS_END
-
-INPUT_CHANGED_MEMBER(novagmcs48_state::octo_cpu_freq)
-{
-	octo_set_cpu_freq();
-}
 
 
 
@@ -147,33 +154,30 @@ INPUT_CHANGED_MEMBER(novagmcs48_state::octo_cpu_freq)
     Machine Drivers
 ******************************************************************************/
 
-MACHINE_CONFIG_START(novagmcs48_state::presto)
-
+void presto_state::presto(machine_config &config)
+{
 	/* basic machine hardware */
-	i8049_device &maincpu(I8049(config, m_maincpu, 6000000)); // LC circuit, measured 6MHz
-	maincpu.p1_in_cb().set(FUNC(novagmcs48_state::presto_input_r));
-	maincpu.p2_out_cb().set(FUNC(novagmcs48_state::presto_control_w));
-	maincpu.bus_out_cb().set(FUNC(novagmcs48_state::presto_mux_w));
+	I8049(config, m_maincpu, 6000000); // LC circuit, measured 6MHz
+	m_maincpu->p1_in_cb().set(FUNC(presto_state::input_r));
+	m_maincpu->p2_out_cb().set(FUNC(presto_state::control_w));
+	m_maincpu->bus_out_cb().set(FUNC(presto_state::mux_w));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(novagmcs48_state::display_decay_tick), attotime::from_msec(1));
+	TIMER(config, "display_decay").configure_periodic(FUNC(presto_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_novag_presto);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
-MACHINE_CONFIG_END
+	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+}
 
-MACHINE_CONFIG_START(novagmcs48_state::octo)
+void presto_state::octo(machine_config &config)
+{
 	presto(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(12000000) // LC circuit, measured, see octo_set_cpu_freq
-
-	MCFG_MACHINE_RESET_OVERRIDE(novagmcs48_state, octo)
-MACHINE_CONFIG_END
+	m_maincpu->set_clock(12000000); // LC circuit, measured, see octo_set_cpu_freq
+}
 
 
 
@@ -191,12 +195,14 @@ ROM_START( nocto )
 	ROM_LOAD("d80c49hc_111", 0x0000, 0x0800, CRC(29a0eb4c) SHA1(e058d6018e53ddcaa3b5ec25b33b8bff091b04db) ) // same program as npresto
 ROM_END
 
+} // anonymous namespace
+
 
 
 /******************************************************************************
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT   CLASS             INIT        COMPANY  FULLNAME          FLAGS
-CONS( 1984, npresto, 0,       0,      presto,  presto, novagmcs48_state, empty_init, "Novag", "Presto (Novag)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1987, nocto,   npresto, 0,      octo,    octo,   novagmcs48_state, empty_init, "Novag", "Octo (Novag)",   MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+//    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
+CONS( 1984, npresto, 0,       0,      presto,  presto, presto_state, empty_init, "Novag", "Presto (Novag)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1987, nocto,   npresto, 0,      octo,    octo,   octo_state,   empty_init, "Novag", "Octo (Novag)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )

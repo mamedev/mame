@@ -403,14 +403,14 @@ MACHINE_CONFIG_START(tourvision_state::tourvision)
 
 	config.m_minimum_quantum = attotime::from_hz(60);
 
-	MCFG_DEVICE_ADD("subcpu", I8085A, 18000000/3 /*?*/)
-	MCFG_DEVICE_PROGRAM_MAP(tourvision_8085_map)
+	I8085A(config, m_subcpu, 18000000/3 /*?*/);
+	m_subcpu->set_addrmap(AS_PROGRAM, &tourvision_state::tourvision_8085_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PCE_MAIN_CLOCK, huc6260_device::WPF, 64, 64 + 1024 + 64, huc6260_device::LPF, 18, 18 + 242)
-	MCFG_SCREEN_UPDATE_DRIVER( pce_common_state, screen_update )
-	MCFG_SCREEN_PALETTE("huc6260")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(PCE_MAIN_CLOCK, huc6260_device::WPF, 64, 64 + 1024 + 64, huc6260_device::LPF, 18, 18 + 242);
+	screen.set_screen_update(FUNC(pce_common_state::screen_update));
+	screen.set_palette(m_huc6260);
 
 	HUC6260(config, m_huc6260, PCE_MAIN_CLOCK);
 	m_huc6260->next_pixel_data().set("huc6270", FUNC(huc6270_device::next_pixel));
@@ -437,8 +437,6 @@ MACHINE_CONFIG_START(tourvision_state::tourvision)
 	MCFG_GENERIC_MANDATORY
 
 	SOFTWARE_LIST(config, "tv_list").set_original("pce_tourvision");
-
-
 MACHINE_CONFIG_END
 
 #define TOURVISION_BIOS \

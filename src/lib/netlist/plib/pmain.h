@@ -10,6 +10,7 @@
 #ifndef PMAIN_H_
 #define PMAIN_H_
 
+#include "palloc.h"
 #include "poptions.h"
 #include "pstream.h"
 #include "pstring.h"
@@ -36,6 +37,9 @@ namespace plib {
 	{
 	public:
 		app();
+
+		COPYASSIGNMOVE(app, delete)
+
 		virtual ~app() = default;
 
 		virtual pstring usage() = 0;
@@ -50,7 +54,7 @@ namespace plib {
 		template <class C, typename T>
 		static int mainrun(int argc, T **argv)
 		{
-			auto a = std::unique_ptr<C>(new C);
+			auto a = plib::make_unique<C>();
 			return a->main_utfX(argc, argv);
 		}
 

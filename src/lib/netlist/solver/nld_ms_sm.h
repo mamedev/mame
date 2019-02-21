@@ -51,15 +51,13 @@ class matrix_solver_sm_t: public matrix_solver_t
 
 public:
 
-	typedef FT float_ext_type;
-	typedef FT float_type;
+	using float_ext_type = FT;
+	using float_type = FT;
 	// FIXME: dirty hack to make this compile
 	static constexpr const std::size_t storage_N = 100;
 
-	matrix_solver_sm_t(netlist_base_t &anetlist, const pstring &name,
+	matrix_solver_sm_t(netlist_state_t &anetlist, const pstring &name,
 			const solver_parameters_t *params, const std::size_t size);
-
-	~matrix_solver_sm_t() override = default;
 
 	void vsetup(analog_net_t::list_t &nets) override;
 	void reset() override { matrix_solver_t::reset(); }
@@ -298,7 +296,7 @@ unsigned matrix_solver_sm_t<FT, SIZE>::vsolve_non_dynamic(const bool newton_raph
 }
 
 template <typename FT, int SIZE>
-matrix_solver_sm_t<FT, SIZE>::matrix_solver_sm_t(netlist_base_t &anetlist, const pstring &name,
+matrix_solver_sm_t<FT, SIZE>::matrix_solver_sm_t(netlist_state_t &anetlist, const pstring &name,
 		const solver_parameters_t *params, const std::size_t size)
 : matrix_solver_t(anetlist, name, NOSORT, params)
 , m_dim(size)

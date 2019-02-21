@@ -411,7 +411,7 @@ WRITE8_MEMBER( cubo_state::akiko_cia_0_port_a_write )
 	/* bit 1 = Power Led on Amiga */
 	m_power_led = BIT(~data, 1);
 
-	handle_joystick_cia(data, m_cia_0->read(space, 2));
+	handle_joystick_cia(data, m_cia_0->read(2));
 }
 
 

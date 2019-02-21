@@ -239,10 +239,10 @@ MACHINE_CONFIG_START(s11a_state::s11a)
 	MCFG_DEVICE_PROGRAM_MAP(s11a_audio_map)
 
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
+	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
 
 	SPEAKER(config, "speech").front_center();
 	MCFG_DEVICE_ADD("hc55516", HC55516, 0)
@@ -265,7 +265,7 @@ MACHINE_CONFIG_START(s11a_state::s11a)
 	m_ym->irq_handler().set(FUNC(s11a_state::ym2151_irq_w));
 	m_ym->add_route(ALL_OUTPUTS, "bg", 0.50);
 
-	MCFG_DEVICE_ADD("dac1", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bg", 0.25)
+	MC1408(config, "dac1", 0).add_route(ALL_OUTPUTS, "bg", 0.25);
 
 	PIA6821(config, m_pia40, 0);
 	m_pia40->writepa_handler().set("dac1", FUNC(dac_byte_interface::data_w));

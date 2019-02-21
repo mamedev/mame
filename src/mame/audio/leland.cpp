@@ -163,7 +163,6 @@ void leland_80186_sound_device::device_add_mconfig(machine_config &config)
 	m_dacvol[5]->add_route(0, "dac6", -1.0, DAC_VREF_NEG_INPUT);
 
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac1vol", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac2vol", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac3vol", 1.0, DAC_VREF_POS_INPUT);
@@ -224,7 +223,6 @@ void redline_80186_sound_device::device_add_mconfig(machine_config &config)
 	m_dacvol[7]->add_route(0, "dac8", -1.0, DAC_VREF_NEG_INPUT); // unknown DAC
 
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac1vol", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac2vol", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac3vol", 1.0, DAC_VREF_POS_INPUT);
@@ -284,7 +282,6 @@ void ataxx_80186_sound_device::device_add_mconfig(machine_config &config)
 	m_dacvol[3]->add_route(0, "dac4", -1.0, DAC_VREF_NEG_INPUT);
 
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac1vol", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac2vol", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac3vol", 1.0, DAC_VREF_POS_INPUT);
@@ -330,7 +327,6 @@ void wsf_80186_sound_device::device_add_mconfig(machine_config &config)
 	m_dacvol[3]->add_route(0, "dac4", -1.0, DAC_VREF_NEG_INPUT); // unknown DAC
 
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac1vol", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac2vol", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac3vol", 1.0, DAC_VREF_POS_INPUT);
@@ -420,6 +416,8 @@ void leland_80186_sound_device::device_reset()
 	m_ext_start = 0;
 	m_ext_stop = 0;
 	m_ext_active = 0;
+	if (m_type == TYPE_WSF)
+		m_dacvol[3]->write(0xff);  //TODO: determine how to set this if at all
 }
 
 DEFINE_DEVICE_TYPE(LELAND_80186, leland_80186_sound_device, "leland_80186_sound", "80186 DAC (Leland)")
@@ -622,9 +620,9 @@ WRITE16_MEMBER( leland_80186_sound_device::dac_w )
 	/* handle value changes */
 	if (ACCESSING_BITS_0_7)
 	{
-		if((offset & 0x60) == 0x40)
+		if ((offset & 0x60) == 0x40)
 			m_audiocpu->drq0_w(CLEAR_LINE);
-		else if((offset & 0x60) == 0x60)
+		else if ((offset & 0x60) == 0x60)
 			m_audiocpu->drq1_w(CLEAR_LINE);
 
 		m_dac[dac]->write(data & 0xff);
@@ -655,9 +653,13 @@ WRITE16_MEMBER( leland_80186_sound_device::ataxx_dac_control )
 		switch (offset & 0x1f)
 		{
 		case 0x00:
+			dac_w(space, 0x40, data, 0x00ff);
+			return;
 		case 0x01:
+			dac_w(space, 0x61, data, 0x00ff);
+			return;
 		case 0x02:
-			dac_w(space, offset, data, 0x00ff);
+			dac_w(space, 2, data, 0x00ff);
 			return;
 		case 0x03:
 			m_dacvol[0]->write((data & 7) << 5);
@@ -671,7 +673,7 @@ WRITE16_MEMBER( leland_80186_sound_device::ataxx_dac_control )
 	switch (m_type)
 	{
 	case TYPE_WSF:
-		switch (offset & 0x3f)
+		switch (offset)
 		{
 		case 0x04:
 			m_ext_active = 1;
@@ -767,6 +769,7 @@ READ16_MEMBER( leland_80186_sound_device::peripheral_r )
 WRITE16_MEMBER( leland_80186_sound_device::peripheral_w )
 {
 	int select = offset / 0x40;
+	offset &= 0x3f;
 
 	switch (select)
 	{
@@ -787,7 +790,7 @@ WRITE16_MEMBER( leland_80186_sound_device::peripheral_w )
 					m_pit[1]->write(offset & 3, data);
 			}
 			else if(m_type == TYPE_WSF)
-				m_ymsnd->write(offset & 0x3f, data);
+				m_ymsnd->write(offset, data);
 			break;
 
 		case 4:
@@ -805,7 +808,7 @@ WRITE16_MEMBER( leland_80186_sound_device::peripheral_w )
 
 		case 5: /* Ataxx/WSF/Indy Heat only */
 			if (m_type > TYPE_REDLINE)
-				ataxx_dac_control(space, offset & 0x7f, data, mem_mask);
+				ataxx_dac_control(space, offset, data, mem_mask);
 			break;
 
 		default:

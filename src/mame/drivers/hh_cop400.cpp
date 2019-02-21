@@ -1581,8 +1581,7 @@ void bship82_state::bship82(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	DAC_4BIT_BINARY_WEIGHTED_SIGN_MAGNITUDE(config, "dac", 0).add_route(ALL_OUTPUTS, "mono", 0.125); // see above
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
@@ -1785,7 +1784,7 @@ static INPUT_PORTS_START( vidchal )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) // TODO: light sensor
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_NAME("Light Sensor")
 INPUT_PORTS_END
 
 void vidchal_state::vidchal(machine_config &config)
@@ -1805,8 +1804,7 @@ void vidchal_state::vidchal(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	DAC_4BIT_BINARY_WEIGHTED_SIGN_MAGNITUDE(config, "dac", 0).add_route(ALL_OUTPUTS, "mono", 0.125); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }

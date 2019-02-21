@@ -378,7 +378,7 @@ READ8_MEMBER( svi3x8_state::mreq_r )
 		offset ^= 0x8000;
 
 	if (CCS1 || CCS2 || CCS3 || CCS4)
-		return m_cart_rom->read_rom(space, offset);
+		return m_cart_rom->read_rom(offset);
 
 	uint8_t data = m_expander->mreq_r(space, offset);
 

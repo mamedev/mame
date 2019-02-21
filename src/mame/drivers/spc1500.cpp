@@ -410,12 +410,12 @@ WRITE8_MEMBER( spc1500_state::crtc_w)
 	if((offset & 1) == 0)
 	{
 		m_crtc_index = data & 0x1f;
-		m_vdg->address_w(space, 0, data);
+		m_vdg->address_w(data);
 	}
 	else
 	{
 		m_crtc_vreg[m_crtc_index] = data;
-		m_vdg->register_w(space, 0, data);
+		m_vdg->register_w(data);
 	}
 }
 
@@ -423,7 +423,7 @@ READ8_MEMBER( spc1500_state::crtc_r)
 {
 	if (offset & 1)
 	{
-		return m_vdg->register_r(space, 0);
+		return m_vdg->register_r();
 	}
 	return 0;
 }
@@ -648,8 +648,8 @@ WRITE8_MEMBER( spc1500_state::double_w)
 		if (offset < 0x1900) { crtc_w(space, offset, data); } else
 		if (offset < 0x1a00) {} else
 		if (offset < 0x1b00) { m_pio->write(offset, data); } else
-		if (offset < 0x1c00) { m_sound->data_w(space, offset, data);} else
-		if (offset < 0x1d00) { m_sound->address_w(space, offset, data);} else
+		if (offset < 0x1c00) { m_sound->data_w(data);} else
+		if (offset < 0x1d00) { m_sound->address_w(data);} else
 		if (offset < 0x1e00) { romsel(space, offset, data);} else
 		if (offset < 0x1f00) { ramsel(space, offset, data);} else
 		if (offset < 0x2000) {} else
@@ -675,7 +675,7 @@ READ8_MEMBER( spc1500_state::io_r)
 	if (offset < 0x1900) { return crtc_r(space, offset); } else
 	if (offset < 0x1a00) { return keyboard_r(space, offset); } else
 	if (offset < 0x1b00) { return m_pio->read(offset); } else
-	if (offset < 0x1c00) { return m_sound->data_r(space, offset); } else
+	if (offset < 0x1c00) { return m_sound->data_r(); } else
 	if (offset < 0x2000) {} else
 	if (offset < 0x10000){
 		if (offset < 0x4000)

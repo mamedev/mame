@@ -5289,7 +5289,23 @@ ROM_START( overrev ) /* Over Rev Revision A, Model 2C */
 	ROM_LOAD16_WORD_SWAP( "mpr-20004.34", 0x400000, 0x400000, CRC(0b9c5410) SHA1(e5bb30702fc853ccc03316be07a334269d3ebb4a) )
 ROM_END
 
-ROM_START( overrevb ) /* Over Rev Revision B, Model 2B, Sega Game ID# 836-13274, ROM board ID# 836-13275 */
+/*
+
+Over Rev on MODEL2 B-CRX:
+
+The set below has been found labeled as:
+Main board ID# 837-10854-02-91
+ Sega Game ID# 836-12788
+ ROM board ID# 836-12789
+
+As well as:
+Main board ID# 837-10854-02-91
+ Sega Game ID# 836-13274 OVER REV
+ ROM board ID# 836-13275
+
+These ID numbers have been verfied on multiple board sets for both revision A and revision B program ROMs
+*/
+ROM_START( overrevb ) /* Over Rev Revision B, Model 2B */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD( "epr-19992b.15", 0x000000, 0x080000, CRC(6d3e78d5) SHA1(40d18ee284ea2e038f7e3d04db56e793ab3e3dd5) ) /* sum16 492A printed on label */
 	ROM_LOAD32_WORD( "epr-19993b.16", 0x000002, 0x080000, CRC(765dc9ce) SHA1(a718c32ca27ec1fb5ed2d7d3797ea7e906510a04) ) /* sum16 B955 printed on label */

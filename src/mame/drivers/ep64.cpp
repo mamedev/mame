@@ -543,7 +543,7 @@ INPUT_PORTS_END
 void ep64_state::machine_start()
 {
 	if (m_cart->exists())
-		m_dave->space(AS_PROGRAM).install_read_handler(0x010000, 0x01ffff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+		m_dave->space(AS_PROGRAM).install_read_handler(0x010000, 0x01ffff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 
 	// state saving
 	save_item(NAME(m_key));

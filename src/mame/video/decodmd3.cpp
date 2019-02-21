@@ -74,7 +74,7 @@ WRITE16_MEMBER( decodmd_type3_device::crtc_address_w )
 {
 	if(ACCESSING_BITS_8_15)
 	{
-		m_mc6845->address_w(space,offset,data >> 8);
+		m_mc6845->address_w(data >> 8);
 		m_crtc_index = data >> 8;
 	}
 }
@@ -82,7 +82,7 @@ WRITE16_MEMBER( decodmd_type3_device::crtc_address_w )
 READ16_MEMBER( decodmd_type3_device::crtc_status_r )
 {
 	if(ACCESSING_BITS_8_15)
-		return m_mc6845->register_r(space,offset);
+		return m_mc6845->register_r();
 	else
 		return 0xff;
 }
@@ -93,7 +93,7 @@ WRITE16_MEMBER( decodmd_type3_device::crtc_register_w )
 	{
 		if(m_crtc_index == 9)  // hack!!
 			data -= 0x100;
-		m_mc6845->register_w(space,offset,data >> 8);
+		m_mc6845->register_w(data >> 8);
 		m_crtc_reg[m_crtc_index] = data >> 8;
 	}
 }

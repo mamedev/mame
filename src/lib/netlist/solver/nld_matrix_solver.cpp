@@ -70,7 +70,7 @@ void terms_for_net_t::set_pointers()
 // matrix_solver
 // ----------------------------------------------------------------------------------------
 
-matrix_solver_t::matrix_solver_t(netlist_base_t &anetlist, const pstring &name,
+matrix_solver_t::matrix_solver_t(netlist_state_t &anetlist, const pstring &name,
 		const eSortType sort, const solver_parameters_t *params)
 	: device_t(anetlist, name)
 	, m_params(*params)
@@ -100,7 +100,7 @@ void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 	{
 		m_nets.push_back(net);
 		m_terms.push_back(plib::make_unique<terms_for_net_t>());
-		m_rails_temp.push_back(plib::palloc<terms_for_net_t>());
+		m_rails_temp.push_back(plib::make_unique<terms_for_net_t>());
 	}
 
 	for (std::size_t k = 0; k < nets.size(); k++)
@@ -143,7 +143,7 @@ void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 						{
 							pstring nname = this->name() + "." + pstring(plib::pfmt("m{1}")(m_inps.size()));
 							nl_assert(p->net().is_analog());
-							auto net_proxy_output_u = plib::make_unique<proxied_analog_output_t>(*this, nname, static_cast<analog_net_t *>(&p->net()));
+							auto net_proxy_output_u = pool().make_poolptr<proxied_analog_output_t>(*this, nname, static_cast<analog_net_t *>(&p->net()));
 							net_proxy_output = net_proxy_output_u.get();
 							m_inps.push_back(std::move(net_proxy_output_u));
 						}
@@ -271,12 +271,12 @@ void matrix_solver_t::setup_matrix()
 		m_terms[k]->set_pointers();
 	}
 
-	for (terms_for_net_t *rt : m_rails_temp)
+	for (auto &rt : m_rails_temp)
 	{
 		rt->clear(); // no longer needed
-		plib::pfree(rt); // no longer needed
 	}
 
+	// free all - no longer needed
 	m_rails_temp.clear();
 
 	sort_terms(m_sort);
@@ -374,8 +374,8 @@ void matrix_solver_t::setup_matrix()
 		for (std::size_t k = 0; k < iN; k++)
 		{
 			pstring line = plib::pfmt("{1:3}")(k);
-			for (std::size_t j = 0; j < m_terms[k]->m_nzrd.size(); j++)
-				line += plib::pfmt(" {1:3}")(m_terms[k]->m_nzrd[j]);
+			for (const auto & nzrd : m_terms[k]->m_nzrd)
+				line += plib::pfmt(" {1:3}")(nzrd);
 			log().verbose("{1}", line);
 		}
 

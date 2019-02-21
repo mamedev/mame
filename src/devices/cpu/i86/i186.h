@@ -22,8 +22,8 @@ public:
 	auto tmrout1_handler() { return m_out_tmrout1_func.bind(); }
 
 	IRQ_CALLBACK_MEMBER(int_callback);
-	DECLARE_WRITE_LINE_MEMBER(drq0_w) { if(state) drq_callback(0); m_dma[0].drq_state = state; }
-	DECLARE_WRITE_LINE_MEMBER(drq1_w) { if(state) drq_callback(1); m_dma[1].drq_state = state; }
+	DECLARE_WRITE_LINE_MEMBER(drq0_w) { m_dma[0].drq_state = state; }
+	DECLARE_WRITE_LINE_MEMBER(drq1_w) { m_dma[1].drq_state = state; }
 	DECLARE_WRITE_LINE_MEMBER(tmrin0_w) { if(state && (m_timer[0].control & 0x8004) == 0x8004) { inc_timer(0); } }
 	DECLARE_WRITE_LINE_MEMBER(tmrin1_w) { if(state && (m_timer[1].control & 0x8004) == 0x8004) { inc_timer(1); } }
 	DECLARE_WRITE_LINE_MEMBER(int0_w) { external_int(0, state); }
@@ -132,6 +132,7 @@ private:
 	dma_state       m_dma[2];
 	intr_state      m_intr;
 	mem_state       m_mem;
+	bool		m_last_dma;
 
 	static const device_timer_id TIMER_INT0 = 0;
 	static const device_timer_id TIMER_INT1 = 1;

@@ -26,10 +26,8 @@ namespace netlist
 	NETLIB_OBJECT(base_proxy)
 	{
 	public:
-		nld_base_proxy(netlist_base_t &anetlist, const pstring &name,
+		nld_base_proxy(netlist_state_t &anetlist, const pstring &name,
 				logic_t *inout_proxied, detail::core_terminal_t *proxy_inout);
-
-		~nld_base_proxy() override = default;
 
 		logic_t &term_proxied() const { return *m_term_proxied; }
 		detail::core_terminal_t &proxy_term() const { return *m_proxy_term; }
@@ -49,13 +47,11 @@ namespace netlist
 	{
 	public:
 
-		~nld_base_a_to_d_proxy() override = default;
-
 		virtual logic_output_t &out() { return m_Q; }
 
 	protected:
 
-		nld_base_a_to_d_proxy(netlist_base_t &anetlist, const pstring &name,
+		nld_base_a_to_d_proxy(netlist_state_t &anetlist, const pstring &name,
 				logic_input_t *in_proxied, detail::core_terminal_t *in_proxy);
 
 	private:
@@ -67,9 +63,7 @@ namespace netlist
 	NETLIB_OBJECT_DERIVED(a_to_d_proxy, base_a_to_d_proxy)
 	{
 	public:
-		nld_a_to_d_proxy(netlist_base_t &anetlist, const pstring &name, logic_input_t *in_proxied);
-
-		~nld_a_to_d_proxy() override = default;
+		nld_a_to_d_proxy(netlist_state_t &anetlist, const pstring &name, logic_input_t *in_proxied);
 
 		analog_input_t m_I;
 
@@ -88,12 +82,11 @@ namespace netlist
 	NETLIB_OBJECT_DERIVED(base_d_to_a_proxy, base_proxy)
 	{
 	public:
-		~nld_base_d_to_a_proxy() override = default;
 
 		virtual logic_input_t &in() { return m_I; }
 
 	protected:
-		nld_base_d_to_a_proxy(netlist_base_t &anetlist, const pstring &name,
+		nld_base_d_to_a_proxy(netlist_state_t &anetlist, const pstring &name,
 				logic_output_t *out_proxied, detail::core_terminal_t &proxy_out);
 
 		logic_input_t m_I;
@@ -104,8 +97,7 @@ namespace netlist
 	NETLIB_OBJECT_DERIVED(d_to_a_proxy, base_d_to_a_proxy)
 	{
 	public:
-		nld_d_to_a_proxy(netlist_base_t &anetlist, const pstring &name, logic_output_t *out_proxied);
-		~nld_d_to_a_proxy() override = default;
+		nld_d_to_a_proxy(netlist_state_t &anetlist, const pstring &name, logic_output_t *out_proxied);
 
 	protected:
 

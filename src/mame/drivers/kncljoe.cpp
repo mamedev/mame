@@ -77,7 +77,7 @@ WRITE8_MEMBER(kncljoe_state::m6803_port2_w)
 	{
 		/* control or data port? */
 		if (m_port2 & 0x08)
-			m_ay8910->data_address_w(space, m_port2 >> 2, m_port1);
+			m_ay8910->data_address_w(m_port2 >> 2, m_port1);
 	}
 	m_port2 = data;
 }
@@ -85,7 +85,7 @@ WRITE8_MEMBER(kncljoe_state::m6803_port2_w)
 READ8_MEMBER(kncljoe_state::m6803_port1_r)
 {
 	if (m_port2 & 0x08)
-		return m_ay8910->data_r(space, 0);
+		return m_ay8910->data_r();
 	return 0xff;
 }
 

@@ -65,6 +65,17 @@ class pce_cart_slot_device : public device_t,
 {
 public:
 	// construction/destruction
+	template <typename T>
+	pce_cart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt, const char *interface)
+		: pce_cart_slot_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+		set_intf(interface);
+	}
+
 	pce_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~pce_cart_slot_device();
 
@@ -114,16 +125,5 @@ DECLARE_DEVICE_TYPE(PCE_CART_SLOT, pce_cart_slot_device)
  ***************************************************************************/
 
 #define PCESLOT_ROM_REGION_TAG ":cart:rom"
-
-#define MCFG_PCE_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
-	MCFG_DEVICE_ADD(_tag, PCE_CART_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-	static_cast<pce_cart_slot_device *>(device)->set_intf("pce_cart");
-
-#define MCFG_TG16_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
-	MCFG_DEVICE_ADD(_tag, PCE_CART_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-	static_cast<pce_cart_slot_device *>(device)->set_intf("tg16_cart");
-
 
 #endif // MAME_BUS_PCE_PCE_SLOT_H

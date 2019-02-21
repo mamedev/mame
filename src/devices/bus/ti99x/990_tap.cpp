@@ -956,9 +956,6 @@ void ti990_tape_image_device::call_unload()
 	tpc->set_tape(tape_get_id(), this, false, false, true);
 }
 
-#define MCFG_TI990_TAPE_ADD(_tag)   \
-	MCFG_DEVICE_ADD((_tag),  TI990_TAPE, 0)
-
 
 DEFINE_DEVICE_TYPE(TI990_TAPE_CTRL, tap_990_device, "ti990_tap", "Generic TI-900 Tape Controller")
 
@@ -989,9 +986,10 @@ void tap_990_device::device_start()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(tap_990_device::device_add_mconfig)
-	MCFG_TI990_TAPE_ADD("tape0")
-	MCFG_TI990_TAPE_ADD("tape1")
-	MCFG_TI990_TAPE_ADD("tape2")
-	MCFG_TI990_TAPE_ADD("tape3")
-MACHINE_CONFIG_END
+void tap_990_device::device_add_mconfig(machine_config &config)
+{
+	TI990_TAPE(config, "tape0", 0);
+	TI990_TAPE(config, "tape1", 0);
+	TI990_TAPE(config, "tape2", 0);
+	TI990_TAPE(config, "tape3", 0);
+}

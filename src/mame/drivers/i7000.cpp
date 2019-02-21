@@ -237,7 +237,7 @@ void i7000_state::machine_start()
 	if (m_card->exists())
 	{
 		// 0x4000 - 0xbfff   32KB ROM
-		program.install_read_handler(0x4000, 0xbfff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_card));
+		program.install_read_handler(0x4000, 0xbfff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_card));
 	}
 }
 

@@ -11,6 +11,7 @@
 #include "netlist/nl_base.h"
 #include "netlist/nl_errstr.h"
 #include "netlist/plib/putil.h"
+#include "netlist/plib/vector_ops.h"
 
 namespace netlist
 {
@@ -54,27 +55,41 @@ public:
 
 	void set_pointers();
 
+	/* FIXME: this works a bit better for larger matrices */
 	template <typename AP, typename FT>
-	void fill_matrix(AP &tcr, FT &RHS)
+	void fill_matrix/*_larger*/(AP &tcr, FT &RHS)
 	{
-		FT gtot_t = 0.0;
-		FT RHS_t = 0.0;
 
 		const std::size_t term_count = this->count();
 		const std::size_t railstart = this->m_railstart;
-		const FT * const * other_cur_analog = this->connected_net_V();
+		const FT * const * other_cur_analog = m_connected_net_V.data();
+		const FT * p_go = m_go.data();
+		const FT * p_gt = m_gt.data();
+		const FT * p_Idr = m_Idr.data();
 
 		for (std::size_t i = 0; i < railstart; i++)
 		{
-			*tcr[i]       -= m_go[i];
-			gtot_t        += m_gt[i];
-			RHS_t         += m_Idr[i];
+			*tcr[i]       -= p_go[i];
 		}
+
+#if 1
+		FT gtot_t = 0.0;
+		FT RHS_t = 0.0;
+
+		for (std::size_t i = 0; i < term_count; i++)
+		{
+			gtot_t        += p_gt[i];
+			RHS_t         += p_Idr[i];
+		}
+		// FIXME: Code above is faster than vec_sum - Check this
+#else
+		auto gtot_t = plib::vec_sum<FT>(term_count, p_gt);
+		auto RHS_t = plib::vec_sum<FT>(term_count, p_Idr);
+#endif
 
 		for (std::size_t i = railstart; i < term_count; i++)
 		{
-			RHS_t += (m_Idr[i] + m_go[i] * *other_cur_analog[i]);
-			gtot_t += m_gt[i];
+			RHS_t += (/*m_Idr[i]*/ + p_go[i] * *other_cur_analog[i]);
 		}
 
 		RHS = RHS_t;
@@ -114,7 +129,6 @@ public:
 	: analog_output_t(dev, aname)
 	, m_proxied_net(pnet)
 	{ }
-	~proxied_analog_output_t() override = default;
 
 	analog_net_t *proxied_net() const { return m_proxied_net;}
 private:
@@ -135,8 +149,6 @@ public:
 		PREFER_IDENTITY_TOP_LEFT,
 		PREFER_BAND_MATRIX
 	};
-
-	~matrix_solver_t() override = default;
 
 	void setup(analog_net_t::list_t &nets)
 	{
@@ -181,7 +193,7 @@ public:
 
 protected:
 
-	matrix_solver_t(netlist_base_t &anetlist, const pstring &name,
+	matrix_solver_t(netlist_state_t &anetlist, const pstring &name,
 			eSortType sort, const solver_parameters_t *params);
 
 	void sort_terms(eSortType sort);
@@ -208,9 +220,9 @@ protected:
 
 	std::vector<std::unique_ptr<terms_for_net_t>> m_terms;
 	std::vector<analog_net_t *> m_nets;
-	std::vector<std::unique_ptr<proxied_analog_output_t>> m_inps;
+	std::vector<poolptr<proxied_analog_output_t>> m_inps;
 
-	std::vector<terms_for_net_t *> m_rails_temp;
+	std::vector<std::unique_ptr<terms_for_net_t>> m_rails_temp;
 
 	const solver_parameters_t &m_params;
 
@@ -264,7 +276,7 @@ void matrix_solver_t::store(const T & V)
 template <typename T>
 void matrix_solver_t::build_LE_A(T &child)
 {
-	typedef typename T::float_type float_type;
+	using float_type = typename T::float_type;
 	static_assert(std::is_base_of<matrix_solver_t, T>::value, "T must derive from matrix_solver_t");
 
 	const std::size_t iN = child.size();
@@ -300,7 +312,7 @@ template <typename T>
 void matrix_solver_t::build_LE_RHS(T &child)
 {
 	static_assert(std::is_base_of<matrix_solver_t, T>::value, "T must derive from matrix_solver_t");
-	typedef typename T::float_type float_type;
+	using float_type = typename T::float_type;
 
 	const std::size_t iN = child.size();
 	for (std::size_t k = 0; k < iN; k++)

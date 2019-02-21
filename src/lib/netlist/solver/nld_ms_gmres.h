@@ -29,13 +29,13 @@ namespace devices
 	{
 	public:
 
-		typedef FT float_type;
+		using float_type = FT;
 
 		/* Sort rows in ascending order. This should minimize fill-in and thus
 		 * maximize the efficiency of the incomplete LUT.
 		 * This is already preconditioning.
 		 */
-		matrix_solver_GMRES_t(netlist_base_t &anetlist, const pstring &name, const solver_parameters_t *params, const std::size_t size)
+		matrix_solver_GMRES_t(netlist_state_t &anetlist, const pstring &name, const solver_parameters_t *params, const std::size_t size)
 			: matrix_solver_direct_t<FT, SIZE>(anetlist, name, matrix_solver_t::PREFER_BAND_MATRIX, params, size)
 			, m_term_cr(size)
 			//, m_ops(size, 2)
@@ -44,14 +44,12 @@ namespace devices
 			{
 			}
 
-		~matrix_solver_GMRES_t() override = default;
-
 		void vsetup(analog_net_t::list_t &nets) override;
 		unsigned vsolve_non_dynamic(const bool newton_raphson) override;
 
 	private:
 
-		typedef typename plib::matrix_compressed_rows_t<FT, SIZE>::index_type mattype;
+		using mattype = typename plib::matrix_compressed_rows_t<FT, SIZE>::index_type;
 
 		plib::parray<std::vector<FT *>, SIZE> m_term_cr;
 		plib::mat_precondition_ILU<FT, SIZE> m_ops;
@@ -76,9 +74,9 @@ namespace devices
 		{
 			fill[k].resize(iN, decltype(m_ops.m_mat)::FILL_INFINITY);
 			terms_for_net_t * row = this->m_terms[k].get();
-			for (std::size_t j=0; j < row->m_nz.size(); j++)
+			for (const auto &nz_j : row->m_nz)
 			{
-				fill[k][static_cast<mattype>(row->m_nz[j])] = 0;
+				fill[k][static_cast<mattype>(nz_j)] = 0;
 			}
 		}
 

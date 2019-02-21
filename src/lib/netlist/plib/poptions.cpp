@@ -62,11 +62,6 @@ namespace plib {
 		}
 	}
 
-	options::~options()
-	{
-		m_opts.clear();
-	}
-
 	void options::register_option(option_base *opt)
 	{
 		m_opts.push_back(opt);

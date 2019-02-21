@@ -413,13 +413,13 @@ WRITE8_MEMBER(m63_state::snd_irq_w)
 WRITE8_MEMBER(m63_state::snddata_w)
 {
 	if ((m_p2 & 0xf0) == 0xe0)
-		m_ay1->address_w(space, 0, offset);
+		m_ay1->address_w(offset);
 	else if ((m_p2 & 0xf0) == 0xa0)
-		m_ay1->data_w(space, 0, offset);
+		m_ay1->data_w(offset);
 	else if (m_ay2 != nullptr && (m_p1 & 0xe0) == 0x60)
-		m_ay2->address_w(space, 0, offset);
+		m_ay2->address_w(offset);
 	else if (m_ay2 != nullptr && (m_p1 & 0xe0) == 0x40)
-			m_ay2->data_w(space, 0, offset);
+			m_ay2->data_w(offset);
 	else if ((m_p2 & 0xf0) == 0x70 )
 		m_sound_status = offset;
 }
@@ -755,8 +755,8 @@ INTERRUPT_GEN_MEMBER(m63_state::vblank_irq)
 		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-MACHINE_CONFIG_START(m63_state::m63)
-
+void m63_state::m63(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(12'000'000)/4); /* 3 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &m63_state::m63_map);

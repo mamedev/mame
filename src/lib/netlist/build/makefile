@@ -14,26 +14,30 @@ VSBUILD = $(SRC)/buildVS
 DOC = $(SRC)/documentation
 TIDY_DB = ../compile_commands.json
 
-TIDY_FLAGSX = -checks=*,-google*,-hicpp*,-readability*,-fuchsia*,-llvm-header-guard,
-TIDY_FLAGSX += -modernize-use-using,-cppcoreguidelines-pro-type-reinterpret-cast,
+TIDY_FLAGSX = -checks=*,-google*,-hicpp*,-readability*,-fuchsia*,cert-*,-android-*,
+TIDY_FLAGSX += -llvm-header-guard,-cppcoreguidelines-pro-type-reinterpret-cast,
 TIDY_FLAGSX += -cppcoreguidelines-pro-bounds-pointer-arithmetic,-cppcoreguidelines-owning-memory, 
-TIDY_FLAGSX += -modernize-use-default-member-init,-cert-*,-cppcoreguidelines-pro-bounds-constant-array-index,
-TIDY_FLAGSX += -modernize-pass-by-value,-misc-macro-parentheses,-cppcoreguidelines-pro-type-static-cast-downcast,
-TIDY_FLAGSX += -cppcoreguidelines-special-member-functions,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,
-TIDY_FLAGSX += -performance-unnecessary-value-param,-android-*,-cppcoreguidelines-avoid-magic-numbers,
-TIDY_FLAGSX += -cppcoreguidelines-macro-usage,-misc-non-private-member-variables-in-classes,
-TIDY_FLAGSX += -cppcoreguidelines-non-private-member-variables-in-classes,
+TIDY_FLAGSX += -modernize-use-default-member-init,-cppcoreguidelines-pro-bounds-constant-array-index,
+TIDY_FLAGSX += -modernize-pass-by-value,-cppcoreguidelines-pro-type-static-cast-downcast,
+#TIDY_FLAGSX += -cppcoreguidelines-special-member-functions,
+#TIDY_FLAGSX += -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
+TIDY_FLAGSX += -performance-unnecessary-value-param,-cppcoreguidelines-avoid-magic-numbers,
+TIDY_FLAGSX += -cppcoreguidelines-macro-usage,
+TIDY_FLAGSX += -cppcoreguidelines-non-private-member-variables-in-classes,-misc-non-private-member-variables-in-classes,
 #TIDY_FLAGSX += -cppcoreguidelines-avoid-c-arrays,-modernize-avoid-c-arrays,
+#TIDY_FLAGSX += -modernize-use-using,
 TIDY_FLAGSX += -performance-unnecessary-copy-initialization,
-TIDY_FLAGSX += -bugprone-macro-parentheses
+TIDY_FLAGSX += -bugprone-macro-parentheses,-misc-macro-parentheses
 
 space := 
 space += 
 TIDY_FLAGS = $(subst $(space),,$(TIDY_FLAGSX))
 
+#TIDY_FLAGS = -checks=llvm-include-order,llvm-namespace-comment,modernize-use-override,modernize-use-using -fix
 #TIDY_FLAGS = -checks=llvm-include-order -fix
 #TIDY_FLAGS = -checks=llvm-namespace-comment -fix
 #TIDY_FLAGS = -checks=modernize-use-override -fix
+#TIDY_FLAGS = -checks=modernize-use-using -fix
 
 ifeq ($(subst Windows_NT,windows,$(OS)),windows)
 OBJ = obj/mingw
@@ -76,7 +80,6 @@ OBJS = $(POBJS) $(NLOBJS)
 
 POBJS := \
 	$(POBJ)/pstring.o \
-	$(POBJ)/palloc.o \
 	$(POBJ)/pchrono.o \
 	$(POBJ)/pdynlib.o \
 	$(POBJ)/pexception.o \
@@ -229,10 +232,10 @@ maketree: $(sort $(OBJDIRS))
 .PHONY: clang clang-5 mingw doc native
 
 native: 
-	$(MAKE) CEXTRAFLAGS="-march=native -Wall -Wpedantic -Wsign-compare -Wextra -Wno-unused-parameter"
+	$(MAKE) CEXTRAFLAGS="-march=native -Wall -Wpedantic -Wsign-compare -Wextra "
 
 clang:
-	$(MAKE) CC=clang++-9 LD=clang++-9 CEXTRAFLAGS="-march=native -Wno-unused-parameter -Weverything -Werror -Wno-unreachable-code -Wno-padded -Wno-weak-vtables -Wno-missing-variable-declarations -Wconversion -Wno-c++98-compat -Wno-float-equal -Wno-global-constructors -Wno-c++98-compat-pedantic -Wno-format-nonliteral -Wweak-template-vtables -Wno-exit-time-destructors"
+	$(MAKE) CC=clang++-9 LD=clang++-9 CEXTRAFLAGS="-march=native -Weverything -Werror -Wno-unused-template -Wno-non-virtual-dtor -Wno-unreachable-code -Wno-padded -Wno-weak-vtables -Wno-missing-variable-declarations -Wconversion -Wno-c++98-compat -Wno-float-equal -Wno-global-constructors -Wno-c++98-compat-pedantic -Wno-format-nonliteral -Wweak-template-vtables -Wno-exit-time-destructors"
 
 clang-5:
 	$(MAKE) CC=clang++-5.0 LD=clang++-5.0 CEXTRAFLAGS="-march=native -Weverything -Werror -Wno-inconsistent-missing-destructor-override -Wno-unreachable-code -Wno-padded -Wno-weak-vtables -Wno-missing-variable-declarations -Wconversion -Wno-c++98-compat -Wno-float-equal -Wno-global-constructors -Wno-c++98-compat-pedantic -Wno-format-nonliteral -Wno-weak-template-vtables -Wno-exit-time-destructors"

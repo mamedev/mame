@@ -49,6 +49,16 @@ class nes_kstudio_slot_device : public device_t,
 	friend class nes_karaokestudio_device;
 public:
 	// construction/destruction
+	template <typename T>
+	nes_kstudio_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts)
+		: nes_kstudio_slot_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(nullptr);
+		set_fixed(false);
+	}
+
 	nes_kstudio_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~nes_kstudio_slot_device();
 
@@ -80,11 +90,6 @@ protected:
 
 // device type definition
 DECLARE_DEVICE_TYPE(NES_KSEXPANSION_SLOT, nes_kstudio_slot_device)
-
-
-#define MCFG_KSTUDIO_MINICART_ADD(_tag, _slot_intf) \
-	MCFG_DEVICE_ADD(_tag, NES_KSEXPANSION_SLOT, 0) \
-MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, nullptr, false)
 
 
 //-----------------------------------------------

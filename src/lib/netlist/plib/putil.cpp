@@ -163,29 +163,6 @@ namespace plib
 	}
 	std::string penum_base::nthstr(int n, const char *str)
 	{
-		char buf[64];
-		char *bufp = buf;
-		int cur = 0;
-		while (*str)
-		{
-			if (cur == n)
-			{
-				if (*str == ',')
-				{
-					*bufp = 0;
-					return pstring(buf);
-				}
-				else if (*str != ' ')
-					*bufp++ = *str;
-			}
-			else
-			{
-				if (*str == ',')
-					cur++;
-			}
-			str++;
-		}
-		*bufp = 0;
-		return std::string(buf);
+		return psplit(str, ",", false)[static_cast<std::size_t>(n)];
 	}
 } // namespace plib

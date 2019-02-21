@@ -282,10 +282,8 @@ MACHINE_CONFIG_START(primo_state::primoa32)
 	cbm_iec_slot_device::add(config, m_iec, nullptr);
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot1", generic_plain_slot, nullptr)
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot2", generic_plain_slot, nullptr)
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
+	GENERIC_CARTSLOT(config, m_cart1, generic_plain_slot, nullptr, "bin,rom");
+	GENERIC_CARTSLOT(config, m_cart2, generic_plain_slot, nullptr, "bin,rom");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(primo_state::primoa48)

@@ -1023,7 +1023,7 @@ ROM_START( astrob )
 	ROM_LOAD( "812a.speech-u3", 0x1800, 0x0800, CRC(410ad0d2) SHA1(9b5f05bb64a6ecfe3543025a10c6ec67de797333) )
 
 	ROM_REGION( 0x0440, "proms", 0 ) // not dumped for this set, but believed identical
-	ROM_LOAD( "316-0806.video1-u52", 0x0000, 0x0020, CRC(358128B6) SHA1(b6b4b9ecfdcc69b45e69e7a8614153d83be4c62b) ) /* 6331 */
+	ROM_LOAD( "316-0806.video1-u52", 0x0000, 0x0020, CRC(358128b6) SHA1(b6b4b9ecfdcc69b45e69e7a8614153d83be4c62b) ) /* 6331 */
 	ROM_LOAD( "316-0764.cpu-u15",    0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) ) /* 6331, CPU board addressing */
 	ROM_LOAD( "pr84.speech-u30",     0x0420, 0x0020, CRC(adcb81d0) SHA1(74b0efc7e8362b0c98e54a6107981cff656d87e1) ) /* 7051, speech board addressing */
 ROM_END
@@ -1061,7 +1061,7 @@ ROM_START( astrob2 )
 	ROM_LOAD( "812a.speech-u3", 0x1800, 0x0800, CRC(410ad0d2) SHA1(9b5f05bb64a6ecfe3543025a10c6ec67de797333) )
 
 	ROM_REGION( 0x0440, "proms", 0 ) // not dumped for this set, but believed identical
-	ROM_LOAD( "316-0806.video1-u52", 0x0000, 0x0020, CRC(358128B6) SHA1(b6b4b9ecfdcc69b45e69e7a8614153d83be4c62b) ) /* 6331 */
+	ROM_LOAD( "316-0806.video1-u52", 0x0000, 0x0020, CRC(358128b6) SHA1(b6b4b9ecfdcc69b45e69e7a8614153d83be4c62b) ) /* 6331 */
 	ROM_LOAD( "316-0764.cpu-u15",    0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) ) /* 6331, CPU board addressing */
 	ROM_LOAD( "pr84.speech-u30",     0x0420, 0x0020, CRC(adcb81d0) SHA1(74b0efc7e8362b0c98e54a6107981cff656d87e1) ) /* 7051, speech board addressing */
 ROM_END
@@ -1099,7 +1099,7 @@ ROM_START( astrob2a )
 	ROM_LOAD( "812a.speech-u3", 0x1800, 0x0800, CRC(410ad0d2) SHA1(9b5f05bb64a6ecfe3543025a10c6ec67de797333) )
 
 	ROM_REGION( 0x0440, "proms", 0 )
-	ROM_LOAD( "316-0806.video1-u52", 0x0000, 0x0020, CRC(358128B6) SHA1(b6b4b9ecfdcc69b45e69e7a8614153d83be4c62b) ) /* 6331 */
+	ROM_LOAD( "316-0806.video1-u52", 0x0000, 0x0020, CRC(358128b6) SHA1(b6b4b9ecfdcc69b45e69e7a8614153d83be4c62b) ) /* 6331 */
 	ROM_LOAD( "316-0764.cpu-u15",    0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) ) /* 6331, CPU board addressing */
 	ROM_LOAD( "pr84.speech-u30",     0x0420, 0x0020, CRC(adcb81d0) SHA1(74b0efc7e8362b0c98e54a6107981cff656d87e1) ) /* 7051, speech board addressing */
 ROM_END
@@ -1137,7 +1137,7 @@ ROM_START( astrob2b ) // This was dumped from 2 different PCB sets, with matchin
 	ROM_LOAD( "812a.speech-u3", 0x1800, 0x0800, CRC(410ad0d2) SHA1(9b5f05bb64a6ecfe3543025a10c6ec67de797333) )
 
 	ROM_REGION( 0x0440, "proms", 0 )
-	ROM_LOAD( "316-0806.video1-u52", 0x0000, 0x0020, CRC(358128B6) SHA1(b6b4b9ecfdcc69b45e69e7a8614153d83be4c62b) ) /* 6331 */
+	ROM_LOAD( "316-0806.video1-u52", 0x0000, 0x0020, CRC(358128b6) SHA1(b6b4b9ecfdcc69b45e69e7a8614153d83be4c62b) ) /* 6331 */
 	ROM_LOAD( "316-0764.cpu-u15",    0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) ) /* 6331, CPU board addressing */
 	ROM_LOAD( "pr84.speech-u30",     0x0420, 0x0020, CRC(adcb81d0) SHA1(74b0efc7e8362b0c98e54a6107981cff656d87e1) ) /* 7051, speech board addressing */
 ROM_END
@@ -1172,7 +1172,7 @@ ROM_START( astrob1 )
 	ROM_LOAD( "812a.speech-u3", 0x1800, 0x0800, CRC(410ad0d2) SHA1(9b5f05bb64a6ecfe3543025a10c6ec67de797333) )
 
 	ROM_REGION( 0x0440, "proms", 0 ) // not dumped for this set, but believed identical
-	ROM_LOAD( "316-0806.video1-u52", 0x0000, 0x0020, CRC(358128B6) SHA1(b6b4b9ecfdcc69b45e69e7a8614153d83be4c62b) ) /* 6331 */
+	ROM_LOAD( "316-0806.video1-u52", 0x0000, 0x0020, CRC(358128b6) SHA1(b6b4b9ecfdcc69b45e69e7a8614153d83be4c62b) ) /* 6331 */
 	ROM_LOAD( "316-0764.cpu-u15",    0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) ) /* 6331, CPU board addressing */
 	ROM_LOAD( "pr84.speech-u30",     0x0420, 0x0020, CRC(adcb81d0) SHA1(74b0efc7e8362b0c98e54a6107981cff656d87e1) ) /* 7051, speech board addressing */
 ROM_END
@@ -1207,7 +1207,7 @@ ROM_START( astrobg )
 	ROM_LOAD( "833_speech_de.u03", 0x1800, 0x0800, CRC(08f11459) SHA1(da6dc2bf30b95882f95c21739ec02fc89d286a66) )
 
 	ROM_REGION( 0x0440, "proms", 0 ) // not dumped for this set, but believed identical
-	ROM_LOAD( "316-0806.video1-u52", 0x0000, 0x0020, CRC(358128B6) SHA1(b6b4b9ecfdcc69b45e69e7a8614153d83be4c62b) ) /* 6331 */
+	ROM_LOAD( "316-0806.video1-u52", 0x0000, 0x0020, CRC(358128b6) SHA1(b6b4b9ecfdcc69b45e69e7a8614153d83be4c62b) ) /* 6331 */
 	ROM_LOAD( "316-0764.cpu-u15",    0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) ) /* 6331, CPU board addressing */
 	ROM_LOAD( "pr84.speech-u30",     0x0420, 0x0020, CRC(adcb81d0) SHA1(74b0efc7e8362b0c98e54a6107981cff656d87e1) ) /* 7051, speech board addressing */
 ROM_END

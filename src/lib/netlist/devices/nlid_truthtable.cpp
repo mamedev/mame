@@ -24,7 +24,7 @@ namespace netlist
 	template <typename T>
 	struct sbitset
 	{
-		typedef T type;
+		using type = T;
 
 		sbitset() : m_bs(0) { }
 		/* explicit */ sbitset(T v) : m_bs(v) { }
@@ -224,15 +224,20 @@ namespace netlist
 		: netlist_base_factory_truthtable_t(name, classname, def_param, sourcefile)
 		{ }
 
-		plib::owned_ptr<device_t> Create(netlist_base_t &anetlist, const pstring &name) override
+		poolptr<device_t> Create(netlist_state_t &anetlist, const pstring &name) override
 		{
-			typedef nld_truthtable_t<m_NI, m_NO> tt_type;
+			using tt_type = nld_truthtable_t<m_NI, m_NO>;
 			truthtable_parser desc_s(m_NO, m_NI, &m_ttbl.m_initialized,
 					packed_int(m_ttbl.m_out_state.data(), sizeof(m_ttbl.m_out_state[0]) * 8),
 					m_ttbl.m_timing_index.data(), m_ttbl.m_timing_nt.data());
 
 			desc_s.parse(m_desc);
-			return plib::owned_ptr<device_t>::Create<tt_type>(anetlist, name, m_family, m_ttbl, m_desc);
+
+			/* update truthtable family definitions */
+			if (m_family_name != "")
+				m_family_desc = anetlist.setup().family_from_model(m_family_name);
+
+			return pool().make_poolptr<tt_type>(anetlist, name, m_family_desc, m_ttbl, m_desc);
 		}
 	private:
 		typename nld_truthtable_t<m_NI, m_NO>::truthtable_t m_ttbl;
@@ -447,21 +452,21 @@ void truthtable_parser::parse(const std::vector<pstring> &truthtable)
 
 netlist_base_factory_truthtable_t::netlist_base_factory_truthtable_t(const pstring &name, const pstring &classname,
 		const pstring &def_param, const pstring &sourcefile)
-: factory::element_t(name, classname, def_param, sourcefile), m_family(family_TTL())
+: factory::element_t(name, classname, def_param, sourcefile), m_family_desc(family_TTL())
 {
 }
 
 #define ENTRYY(n, m, s)    case (n * 100 + m): \
 	{ using xtype = netlist_factory_truthtable_t<n, m>; \
-		ret = plib::palloc<xtype>(desc.name, desc.classname, desc.def_param, s); } break
+		ret = plib::make_unique<xtype>(desc.name, desc.classname, desc.def_param, s); } break
 
 #define ENTRY(n, s) ENTRYY(n, 1, s); ENTRYY(n, 2, s); ENTRYY(n, 3, s); \
 					ENTRYY(n, 4, s); ENTRYY(n, 5, s); ENTRYY(n, 6, s); \
 					ENTRYY(n, 7, s); ENTRYY(n, 8, s)
 
-void tt_factory_create(setup_t &setup, tt_desc &desc, const pstring &sourcefile)
+std::unique_ptr<netlist_base_factory_truthtable_t> tt_factory_create(tt_desc &desc, const pstring &sourcefile)
 {
-	netlist_base_factory_truthtable_t *ret;
+	std::unique_ptr<netlist_base_factory_truthtable_t> ret;
 
 	switch (desc.ni * 100 + desc.no)
 	{
@@ -482,9 +487,9 @@ void tt_factory_create(setup_t &setup, tt_desc &desc, const pstring &sourcefile)
 			nl_assert_always(false, msg);
 	}
 	ret->m_desc = desc.desc;
-	if (desc.family != "")
-		ret->m_family = setup.family_from_model(desc.family);
-	setup.factory().register_device(std::unique_ptr<netlist_base_factory_truthtable_t>(ret));
+	ret->m_family_name = desc.family;
+
+	return ret;
 }
 
 	} //namespace devices

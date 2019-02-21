@@ -374,7 +374,6 @@ void tceptor_state::tceptor(machine_config &config)
 	dac.add_route(ALL_OUTPUTS, "rspeaker", 0.4);
 
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
