@@ -648,7 +648,8 @@ MACHINE_CONFIG_START(studio2_state::studio2_cartslot)
 	SOFTWARE_LIST(config, "cart_list").set_original("studio2");
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(studio2_state::studio2)
+void studio2_state::studio2(machine_config &config)
+{
 	/* basic machine hardware */
 	CDP1802(config, m_maincpu, 1760000); /* the real clock is derived from an oscillator circuit */
 	m_maincpu->set_addrmap(AS_PROGRAM, &studio2_state::studio2_map);
@@ -672,9 +673,10 @@ MACHINE_CONFIG_START(studio2_state::studio2)
 	BEEP(config, m_beeper, 300).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	studio2_cartslot(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(visicom_state::visicom)
+void visicom_state::visicom(machine_config &config)
+{
 	/* basic machine hardware */
 	CDP1802(config, m_maincpu, XTAL(3'579'545)/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &visicom_state::visicom_map);
@@ -699,14 +701,14 @@ MACHINE_CONFIG_START(visicom_state::visicom)
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beeper, 300).add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "visicom_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "visicom_cart", "bin,rom");
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("visicom");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(mpt02_state::mpt02)
+void mpt02_state::mpt02(machine_config &config)
+{
 	/* basic machine hardware */
 	CDP1802(config, m_maincpu, 1.75_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mpt02_state::mpt02_map);
@@ -735,7 +737,7 @@ MACHINE_CONFIG_START(mpt02_state::mpt02)
 	m_cti->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	studio2_cartslot(config);
-MACHINE_CONFIG_END
+}
 
 /* ROMs */
 

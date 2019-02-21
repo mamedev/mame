@@ -504,22 +504,22 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(spiders_state::spiders)
-
+void spiders_state::spiders(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809, 2800000)
-	MCFG_DEVICE_PROGRAM_MAP(spiders_main_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(spiders_state, update_pia_1,  25)
+	MC6809(config, m_maincpu, 2800000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &spiders_state::spiders_main_map);
+	m_maincpu->set_periodic_int(FUNC(spiders_state::update_pia_1), attotime::from_hz(25));
 
-	MCFG_DEVICE_ADD("audiocpu", M6802, 3000000)
-	MCFG_DEVICE_PROGRAM_MAP(spiders_audio_map)
+	M6802(config, m_audiocpu, 3000000);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &spiders_state::spiders_audio_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 256, 0, 256, 256, 0, 256)   /* temporary, CRTC will configure screen */
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(PIXEL_CLOCK, 256, 0, 256, 256, 0, 256);   /* temporary, CRTC will configure screen */
+	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
 	PALETTE(config, m_palette, palette_device::RGB_3BIT);
 
@@ -567,8 +567,7 @@ MACHINE_CONFIG_START(spiders_state::spiders)
 
 	/* audio hardware */
 	spiders_audio(config);
-
-MACHINE_CONFIG_END
+}
 
 
 

@@ -294,13 +294,13 @@ static GFXDECODE_START( gfx_starshp1 )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(starshp1_state::starshp1)
-
+void starshp1_state::starshp1(machine_config &config)
+{
 	/* basic machine hardware */
 
-	MCFG_DEVICE_ADD("maincpu", M6502, STARSHP1_CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(starshp1_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", starshp1_state,  starshp1_interrupt)
+	M6502(config, m_maincpu, STARSHP1_CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &starshp1_state::starshp1_map);
+	m_maincpu->set_vblank_int("screen", FUNC(starshp1_state::starshp1_interrupt));
 
 	f9334_device &misclatch(F9334(config, "misclatch")); // C8
 	misclatch.q_out_cb<0>().set(FUNC(starshp1_state::ship_explode_w));
@@ -315,11 +315,11 @@ MACHINE_CONFIG_START(starshp1_state::starshp1)
 	/* video hardware */
 
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(STARSHP1_PIXEL_CLOCK, STARSHP1_HTOTAL, STARSHP1_HBEND, STARSHP1_HBSTART, STARSHP1_VTOTAL, STARSHP1_VBEND, STARSHP1_VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(starshp1_state, screen_update_starshp1)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, starshp1_state, screen_vblank_starshp1))
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(STARSHP1_PIXEL_CLOCK, STARSHP1_HTOTAL, STARSHP1_HBEND, STARSHP1_HBSTART, STARSHP1_VTOTAL, STARSHP1_VBEND, STARSHP1_VBSTART);
+	m_screen->set_screen_update(FUNC(starshp1_state::screen_update_starshp1));
+	m_screen->screen_vblank().set(FUNC(starshp1_state::screen_vblank_starshp1));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_starshp1);
 	PALETTE(config, m_palette, FUNC(starshp1_state::starshp1_palette), 19, 8);
@@ -327,8 +327,7 @@ MACHINE_CONFIG_START(starshp1_state::starshp1)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE, starshp1_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	DISCRETE(config, m_discrete, starshp1_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	f9334_device &audiolatch(F9334(config, "audiolatch")); // D9
 	audiolatch.q_out_cb<0>().set(FUNC(starshp1_state::attract_w));
@@ -338,7 +337,7 @@ MACHINE_CONFIG_START(starshp1_state::starshp1)
 	audiolatch.q_out_cb<4>().set("discrete", FUNC(discrete_device::write_line<STARSHP1_SL2>));
 	audiolatch.q_out_cb<5>().set("discrete", FUNC(discrete_device::write_line<STARSHP1_MOLVL>));
 	audiolatch.q_out_cb<6>().set("discrete", FUNC(discrete_device::write_line<STARSHP1_NOISE_FREQ>));
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

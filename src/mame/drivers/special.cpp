@@ -364,20 +364,22 @@ static void specimx_floppies(device_slot_interface &device)
 }
 
 /* Machine driver */
-MACHINE_CONFIG_START(special_state::special)
+void special_state::special(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8080, 2000000)
-	MCFG_DEVICE_PROGRAM_MAP(specialist_mem)
+	I8080(config, m_maincpu, 2000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &special_state::specialist_mem);
+
 	MCFG_MACHINE_RESET_OVERRIDE(special_state, special )
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(384, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(special_state, screen_update_special)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(384, 256);
+	screen.set_visarea(0, 384-1, 0, 256-1);
+	screen.set_screen_update(FUNC(special_state::screen_update_special));
+	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
@@ -404,19 +406,19 @@ MACHINE_CONFIG_START(special_state::special)
 	m_cassette->set_interface("special_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("special_cass");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(special_state::specialp)
+void special_state::specialp(machine_config &config)
+{
 	special(config);
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(specialp_mem)
+	m_maincpu->set_addrmap(AS_PROGRAM, &special_state::specialp_mem);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(special_state, screen_update_specialp)
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-MACHINE_CONFIG_END
+	screen_device &screen(*subdevice<screen_device>("screen"));
+	screen.set_screen_update(FUNC(special_state::screen_update_specialp));
+	screen.set_size(512, 256);
+	screen.set_visarea(0, 512-1, 0, 256-1);
+}
 
 void special_state::specialm(machine_config &config)
 {
@@ -429,17 +431,17 @@ void special_state::specialm(machine_config &config)
 	m_ppi->out_pc_callback().set(FUNC(special_state::specialist_8255_portc_w));
 }
 
-MACHINE_CONFIG_START(special_state::specimx)
+void special_state::specimx(machine_config &config)
+{
 	special(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(specimx_mem)
+	m_maincpu->set_addrmap(AS_PROGRAM, &special_state::specimx_mem);
 
 	MCFG_MACHINE_START_OVERRIDE (special_state, specimx )
 	MCFG_MACHINE_RESET_OVERRIDE (special_state, specimx )
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(special_state, screen_update_specimx)
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(special_state::screen_update_specimx));
+
 	MCFG_VIDEO_START_OVERRIDE(special_state,specimx)
 
 	m_palette->set_init(FUNC(special_state::specimx_palette));
@@ -472,23 +474,25 @@ MACHINE_CONFIG_START(special_state::specimx)
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("128K").set_default_value(0x00);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(special_state::erik)
+void special_state::erik(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)
-	MCFG_DEVICE_PROGRAM_MAP(erik_mem)
-	MCFG_DEVICE_IO_MAP(erik_io_map)
+	Z80(config, m_maincpu, 4000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &special_state::erik_mem);
+	m_maincpu->set_addrmap(AS_IO, &special_state::erik_io_map);
+
 	MCFG_MACHINE_RESET_OVERRIDE(special_state, erik )
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(384, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(special_state, screen_update_erik)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(384, 256);
+	screen.set_visarea(0, 384-1, 0, 256-1);
+	screen.set_screen_update(FUNC(special_state::screen_update_erik));
+	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette, FUNC(special_state::erik_palette), 8);
 
@@ -521,7 +525,7 @@ MACHINE_CONFIG_START(special_state::erik)
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("192K").set_default_value(0x00);
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( special )

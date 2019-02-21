@@ -422,25 +422,26 @@ GFXDECODE_END
 *     Machine Drivers     *
 **************************/
 
-MACHINE_CONFIG_START(supercrd_state::supercrd)
+void supercrd_state::supercrd(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/8)    /* 2MHz, guess */
-	MCFG_DEVICE_PROGRAM_MAP(supercrd_map)
+	Z80(config, m_maincpu, MASTER_CLOCK/8);    /* 2MHz, guess */
+	m_maincpu->set_addrmap(AS_PROGRAM, &supercrd_state::supercrd_map);
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-//  MCFG_DEVICE_ADD("ppi8255_0", I8255, 0)
-//  MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
+//  I8255(config, "ppi8255_0", 0);
+//  I8255(config, "ppi8255_1", 0);
 
 	/* video hardware */
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE((124+1)*4, (30+1)*8)               /* Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1) */
-	MCFG_SCREEN_VISIBLE_AREA(0*4, 96*4-1, 0*8, 29*8-1)  /* Taken from MC6845 init, registers 01 & 06 */
-	MCFG_SCREEN_UPDATE_DRIVER(supercrd_state, screen_update_supercrd)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size((124+1)*4, (30+1)*8);               /* Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1) */
+	screen.set_visarea(0*4, 96*4-1, 0*8, 29*8-1);  /* Taken from MC6845 init, registers 01 & 06 */
+	screen.set_screen_update(FUNC(supercrd_state::screen_update_supercrd));
+	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_supercrd);
 	PALETTE(config, "palette", FUNC(supercrd_state::supercrd_palette), 0x200);
@@ -453,8 +454,8 @@ MACHINE_CONFIG_START(supercrd_state::supercrd)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-MACHINE_CONFIG_END
+//  .add_route(ALL_OUTPUTS, "mono", 0.75);
+}
 
 
 /*************************

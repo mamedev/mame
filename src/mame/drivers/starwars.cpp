@@ -298,17 +298,17 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(starwars_state::starwars)
-
+void starwars_state::starwars(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809E, MASTER_CLOCK / 8)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(starwars_state, irq0_line_assert, CLOCK_3KHZ / 12)
+	MC6809E(config, m_maincpu, MASTER_CLOCK / 8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &starwars_state::main_map);
+	m_maincpu->set_periodic_int(FUNC(starwars_state::irq0_line_assert), attotime::from_hz(CLOCK_3KHZ / 12));
 
 	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_hz(CLOCK_3KHZ / 128));
 
-	MCFG_DEVICE_ADD("audiocpu", MC6809E, MASTER_CLOCK / 8)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MC6809E(config, m_audiocpu, MASTER_CLOCK / 8);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &starwars_state::sound_map);
 
 	adc0809_device &adc(ADC0809(config, "adc", MASTER_CLOCK / 16)); // designated as "137243-001" on parts list and "157249-120" on schematics
 	adc.in_callback<0>().set_ioport("STICKY"); // pitch
@@ -336,11 +336,11 @@ MACHINE_CONFIG_START(starwars_state::starwars)
 
 	/* video hardware */
 	VECTOR(config, "vector", 0);
-	MCFG_SCREEN_ADD("screen", VECTOR)
-	MCFG_SCREEN_REFRESH_RATE(CLOCK_3KHZ / 12 / 6)
-	MCFG_SCREEN_SIZE(400, 300)
-	MCFG_SCREEN_VISIBLE_AREA(0, 250, 0, 280)
-	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_VECTOR));
+	screen.set_refresh_hz(CLOCK_3KHZ / 12 / 6);
+	screen.set_size(400, 300);
+	screen.set_visarea(0, 250, 0, 280);
+	screen.set_screen_update("vector", FUNC(vector_device::screen_update));
 
 	avg_device &avg(AVG_STARWARS(config, "avg", 0));
 	avg.set_vector_tag("vector");
@@ -362,19 +362,19 @@ MACHINE_CONFIG_START(starwars_state::starwars)
 	GENERIC_LATCH_8(config, m_mainlatch);
 	m_mainlatch->data_pending_callback().set(m_riot, FUNC(riot6532_device::pa6_w));
 	m_mainlatch->data_pending_callback().append(FUNC(starwars_state::boost_interleave_hack));
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(starwars_state::esb)
+void starwars_state::esb(machine_config &config)
+{
 	starwars(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(esb_main_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &starwars_state::esb_main_map);
 
 	SLAPSTIC(config, m_slapstic_device, 101, false);
 
 	subdevice<ls259_device>("outlatch")->q_out_cb<4>().append_membank("bank2");
-MACHINE_CONFIG_END
+}
 
 
 

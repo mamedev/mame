@@ -408,18 +408,18 @@ DEVICE_INPUT_DEFAULTS_END
 
 MACHINE_CONFIG_START(sorcerer_state::sorcerer)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, ES_CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(sorcerer_mem)
-	MCFG_DEVICE_IO_MAP(sorcerer_io)
+	Z80(config, m_maincpu, ES_CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sorcerer_state::sorcerer_mem);
+	m_maincpu->set_addrmap(AS_IO, &sorcerer_state::sorcerer_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(200))
-	MCFG_SCREEN_SIZE(64*8, 30*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(sorcerer_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(200));
+	screen.set_size(64*8, 30*8);
+	screen.set_visarea(0, 64*8-1, 0, 30*8-1);
+	screen.set_screen_update(FUNC(sorcerer_state::screen_update));
+	screen.set_palette("palette");
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_sorcerer);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
@@ -461,8 +461,7 @@ MACHINE_CONFIG_START(sorcerer_state::sorcerer)
 	m_cassette2->set_interface("sorcerer_cass");
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "sorcerer_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "sorcerer_cart", "bin,rom");
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("sorcerer_cart");
@@ -477,11 +476,11 @@ static void floppies(device_slot_interface &device)
 	device.option_add("525qd", FLOPPY_525_QD);
 }
 
-MACHINE_CONFIG_START(sorcerer_state::sorcererd)
+void sorcerer_state::sorcererd(machine_config &config)
+{
 	sorcerer(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(sorcererd_mem)
-	MCFG_DEVICE_IO_MAP(sorcererd_io)
+	m_maincpu->set_addrmap(AS_PROGRAM, &sorcerer_state::sorcererd_mem);
+	m_maincpu->set_addrmap(AS_IO, &sorcerer_state::sorcererd_io);
 
 	MCFG_MACHINE_START_OVERRIDE(sorcerer_state, sorcererd )
 
@@ -497,7 +496,7 @@ MACHINE_CONFIG_START(sorcerer_state::sorcererd)
 	FLOPPY_CONNECTOR(config, "fdc2:1", floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
 
 	SOFTWARE_LIST(config, "flop_list").set_original("sorcerer_flop");
-MACHINE_CONFIG_END
+}
 
 
 void sorcerer_state::init_sorcerer()

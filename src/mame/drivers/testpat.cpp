@@ -116,7 +116,7 @@ MACHINE_CONFIG_START(tp1983_state::tp1983)
 	m_video->set_fieldcount(1);
 	m_video->set_threshold(1);
 	m_video->set_gain(0.36);
-}
+MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(tp1985_state::tp1985)
 	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK);

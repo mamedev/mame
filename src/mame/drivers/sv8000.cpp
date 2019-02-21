@@ -376,10 +376,10 @@ READ8_MEMBER( sv8000_state::mc6847_videoram_r )
 
 MACHINE_CONFIG_START(sv8000_state::sv8000)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(10'738'635)/3)  /* Not verified */
-	MCFG_DEVICE_PROGRAM_MAP(sv8000_mem)
-	MCFG_DEVICE_IO_MAP(sv8000_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sv8000_state,  irq0_line_hold)
+	Z80(config, m_maincpu, XTAL(10'738'635)/3);  /* Not verified */
+	m_maincpu->set_addrmap(AS_PROGRAM, &sv8000_state::sv8000_mem);
+	m_maincpu->set_addrmap(AS_IO, &sv8000_state::sv8000_io);
+	m_maincpu->set_vblank_int("screen", FUNC(sv8000_state::irq0_line_hold));
 
 	i8255_device &ppi(I8255(config, "i8255"));
 	ppi.in_pa_callback().set(FUNC(sv8000_state::i8255_porta_r));

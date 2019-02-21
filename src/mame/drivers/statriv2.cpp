@@ -605,13 +605,14 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(statriv2_state::statriv2)
+void statriv2_state::statriv2(machine_config &config)
+{
 	/* basic machine hardware */
 	/* FIXME: The 8085A had a max clock of 6MHz, internally divided by 2! */
-	MCFG_DEVICE_ADD("maincpu", I8085A, MASTER_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(statriv2_map)
-	MCFG_DEVICE_IO_MAP(statriv2_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", statriv2_state, statriv2_interrupt)
+	I8085A(config, m_maincpu, MASTER_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &statriv2_state::statriv2_map);
+	m_maincpu->set_addrmap(AS_IO, &statriv2_state::statriv2_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(statriv2_state::statriv2_interrupt));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -625,10 +626,10 @@ MACHINE_CONFIG_START(statriv2_state::statriv2)
 	ppi.out_pc_callback().set(FUNC(statriv2_state::ppi_portc_hi_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 384, 0, 320, 270, 0, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(statriv2_state, screen_update_statriv2)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(MASTER_CLOCK/2, 384, 0, 320, 270, 0, 240);
+	screen.set_screen_update(FUNC(statriv2_state::screen_update_statriv2));
+	screen.set_palette(m_palette);
 
 	TMS9927(config, m_tms, MASTER_CLOCK/2/8).set_char_width(8);
 
@@ -639,28 +640,28 @@ MACHINE_CONFIG_START(statriv2_state::statriv2)
 	SPEAKER(config, "mono").front_center();
 
 	AY8910(config, "aysnd", MASTER_CLOCK/8).add_route(ALL_OUTPUTS, "mono", 1.0);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(statriv2_state::statriv2v)
+void statriv2_state::statriv2v(machine_config &config)
+{
 	statriv2(config);
 
 	/* basic machine hardware */
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 392, 0, 256, 262, 0, 256)
+	subdevice<screen_device>("screen")->set_raw(MASTER_CLOCK/2, 392, 0, 256, 262, 0, 256);
 
 	MCFG_VIDEO_START_OVERRIDE(statriv2_state, vertical)
 	m_gfxdecode->set_info(gfx_vertical);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(statriv2_state::funcsino)
+void statriv2_state::funcsino(machine_config &config)
+{
 	statriv2(config);
 
 	/* basic machine hardware */
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(MASTER_CLOCK/2)  /* 3 MHz?? seems accurate */
-MACHINE_CONFIG_END
+	m_maincpu->set_clock(MASTER_CLOCK/2);  /* 3 MHz?? seems accurate */
+}
 
 
 

@@ -424,7 +424,7 @@ MACHINE_CONFIG_START(bionicc_state::bionicc)
 
 	PALETTE(config, m_palette).set_format(2, &bionicc_state::RRRRGGGGBBBBIIII, 1024);
 
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
+	BUFFERED_SPRITERAM16(config, m_spriteram);
 
 	SPEAKER(config, "mono").front_center();
 

@@ -1040,67 +1040,60 @@ GFXDECODE_END
 *     Machine Drivers     *
 **************************/
 
-MACHINE_CONFIG_START(snookr10_state::snookr10)
-
+void snookr10_state::snookr10(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M65SC02, MASTER_CLOCK/8)    /* 2 MHz (1.999 MHz measured) */
-	MCFG_DEVICE_PROGRAM_MAP(snookr10_map)
+	M65SC02(config, m_maincpu, MASTER_CLOCK/8);    /* 2 MHz (1.999 MHz measured) */
+	m_maincpu->set_addrmap(AS_PROGRAM, &snookr10_state::snookr10_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(96*4, 30*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*4, 96*4-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(snookr10_state, screen_update_snookr10)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(96*4, 30*8);
+	screen.set_visarea(0*4, 96*4-1, 0*8, 30*8-1);
+	screen.set_screen_update(FUNC(snookr10_state::screen_update_snookr10));
+	screen.set_palette("palette");
+	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_snookr10);
 	PALETTE(config, "palette", FUNC(snookr10_state::snookr10_palette), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("oki", OKIM6295, MASTER_CLOCK/16, okim6295_device::PIN7_HIGH)   /* 1 MHz (995.5 kHz measured); pin7 checked HIGH on PCB */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.8)
+	OKIM6295(config, "oki", MASTER_CLOCK/16, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.8);   /* 1 MHz (995.5 kHz measured); pin7 checked HIGH on PCB */
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(snookr10_state::apple10)
+void snookr10_state::apple10(machine_config &config)
+{
 	snookr10(config);
-
-	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
 
 	/* video hardware */
 	subdevice<palette_device>("palette")->set_init(FUNC(snookr10_state::apple10_palette));
 	MCFG_VIDEO_START_OVERRIDE(snookr10_state, apple10)
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(snookr10_state::tenballs)
+void snookr10_state::tenballs(machine_config &config)
+{
 	snookr10(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(tenballs_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &snookr10_state::tenballs_map);
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(snookr10_state::crystalc)
+void snookr10_state::crystalc(machine_config &config)
+{
 	snookr10(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(crystalc_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &snookr10_state::crystalc_map);
 
 	subdevice<palette_device>("palette")->set_init(FUNC(snookr10_state::crystalc_palette));
 	MCFG_VIDEO_START_OVERRIDE(snookr10_state, crystalc)
-
-MACHINE_CONFIG_END
+}
 
 
 /*************************
