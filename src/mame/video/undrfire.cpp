@@ -348,7 +348,6 @@ void undrfire_state::draw_sprites_cbombers(screen_device &screen, bitmap_ind16 &
 
 uint32_t undrfire_state::screen_update_undrfire(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	address_space &space = machine().dummy_space();
 	uint8_t layer[5];
 	uint8_t scclayer[3];
 	uint16_t priority;
@@ -443,7 +442,7 @@ uint32_t undrfire_state::screen_update_undrfire(screen_device &screen, bitmap_in
 #endif
 	/* Sprites have variable priority (we kludge this on road levels) */
 	{
-		if ((m_tc0480scp->pri_reg_r(space, 0) & 0x3) == 3)  /* on road levels kludge sprites up 1 priority */
+		if ((m_tc0480scp->pri_reg_r() & 0x3) == 3)  /* on road levels kludge sprites up 1 priority */
 		{
 			static const int primasks[4] = {0xfff0, 0xff00, 0x0, 0x0};
 			draw_sprites(screen, bitmap, cliprect, primasks, 44, -574);
@@ -489,7 +488,6 @@ uint32_t undrfire_state::screen_update_undrfire(screen_device &screen, bitmap_in
 
 uint32_t undrfire_state::screen_update_cbombers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	address_space &space = machine().dummy_space();
 	uint8_t layer[5];
 	uint8_t scclayer[3];
 	uint16_t priority;
@@ -556,6 +554,7 @@ uint32_t undrfire_state::screen_update_cbombers(screen_device &screen, bitmap_in
    pointless - it's always hidden by other layers. Does it
    serve some blending pupose ? */
 
+	// TODO : Wrong; TC0360PRI isn't hooked up
 	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, scclayer[0], TILEMAP_DRAW_OPAQUE, 0);
 	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, scclayer[1], 0, 0);
 
@@ -584,7 +583,7 @@ uint32_t undrfire_state::screen_update_cbombers(screen_device &screen, bitmap_in
 #endif
 	/* Sprites have variable priority (we kludge this on road levels) */
 	{
-		if ((m_tc0480scp->pri_reg_r(space, 0) & 0x3) == 3)  /* on road levels kludge sprites up 1 priority */
+		if ((m_tc0480scp->pri_reg_r() & 0x3) == 3)  /* on road levels kludge sprites up 1 priority */
 		{
 			static const int primasks[4] = {0xfff0, 0xff00, 0x0, 0x0};
 			draw_sprites_cbombers(screen, bitmap, cliprect, primasks, 80, -208);
