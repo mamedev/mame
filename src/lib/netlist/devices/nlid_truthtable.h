@@ -225,7 +225,7 @@ namespace devices
 	};
 
 	/* the returned element is still missing a pointer to the family ... */
-	std::unique_ptr<netlist_base_factory_truthtable_t> tt_factory_create(tt_desc &desc, const pstring &sourcefile);
+	plib::unique_ptr<netlist_base_factory_truthtable_t> tt_factory_create(tt_desc &desc, const pstring &sourcefile);
 
 } //namespace devices
 } // namespace netlist

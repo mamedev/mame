@@ -219,7 +219,7 @@ namespace netlist
 		return false;
 	}
 
-	bool nlparse_t::parse_stream(std::unique_ptr<plib::pistream> &&istrm, const pstring &name)
+	bool nlparse_t::parse_stream(plib::unique_ptr<plib::pistream> &&istrm, const pstring &name)
 	{
 		return parser_t(std::move(plib::ppreprocessor(&m_defines).process(std::move(istrm))), *this).parse(name);
 	}
@@ -986,7 +986,7 @@ const logic_family_desc_t *setup_t::family_from_model(const pstring &model)
 // Sources
 // ----------------------------------------------------------------------------------------
 
-std::unique_ptr<plib::pistream> setup_t::get_data_stream(const pstring &name)
+plib::unique_ptr<plib::pistream> setup_t::get_data_stream(const pstring &name)
 {
 	for (auto &source : m_sources)
 	{
@@ -998,7 +998,7 @@ std::unique_ptr<plib::pistream> setup_t::get_data_stream(const pstring &name)
 		}
 	}
 	log().warning(MW_1_DATA_1_NOT_FOUND, name);
-	return std::unique_ptr<plib::pistream>(nullptr);
+	return plib::unique_ptr<plib::pistream>(nullptr);
 }
 
 
@@ -1146,19 +1146,19 @@ bool source_t::parse(nlparse_t &setup, const pstring &name)
 	}
 }
 
-std::unique_ptr<plib::pistream> source_string_t::stream(const pstring &name)
+plib::unique_ptr<plib::pistream> source_string_t::stream(const pstring &name)
 {
 	plib::unused_var(name);
 	return plib::make_unique<plib::pimemstream>(m_str.c_str(), std::strlen(m_str.c_str()));
 }
 
-std::unique_ptr<plib::pistream> source_mem_t::stream(const pstring &name)
+plib::unique_ptr<plib::pistream> source_mem_t::stream(const pstring &name)
 {
 	plib::unused_var(name);
 	return plib::make_unique<plib::pimemstream>(m_str.c_str(), std::strlen(m_str.c_str()));
 }
 
-std::unique_ptr<plib::pistream> source_file_t::stream(const pstring &name)
+plib::unique_ptr<plib::pistream> source_file_t::stream(const pstring &name)
 {
 	plib::unused_var(name);
 	return plib::make_unique<plib::pifilestream>(m_filename);
@@ -1175,10 +1175,10 @@ bool source_proc_t::parse(nlparse_t &setup, const pstring &name)
 		return false;
 }
 
-std::unique_ptr<plib::pistream> source_proc_t::stream(const pstring &name)
+plib::unique_ptr<plib::pistream> source_proc_t::stream(const pstring &name)
 {
 	plib::unused_var(name);
-	std::unique_ptr<plib::pistream> p(nullptr);
+	plib::unique_ptr<plib::pistream> p(nullptr);
 	return p;
 }
 

@@ -65,7 +65,8 @@ private:
 	plib::parray<FT, SIZE> RHS;
 	plib::parray<FT, SIZE> new_V;
 
-	std::array<std::vector<FT *>, storage_N> m_term_cr;
+	std::array<plib::aligned_vector<FT *, PALIGN_VECTOROPT>, storage_N> m_term_cr;
+//	std::array<std::vector<FT *>, storage_N> m_term_cr;
 
 	mat_type mat;
 

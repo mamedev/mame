@@ -124,14 +124,14 @@ private:
 
 private:
 
-	void add_device(std::unique_ptr<dev_t> dev);
+	void add_device(plib::unique_ptr<dev_t> dev);
 
 	plib::postringstream m_buf;
 
-	std::vector<std::unique_ptr<dev_t>> m_devs;
-	std::unordered_map<pstring, std::unique_ptr<net_t> > m_nets;
+	std::vector<plib::unique_ptr<dev_t>> m_devs;
+	std::unordered_map<pstring, plib::unique_ptr<net_t> > m_nets;
 	std::vector<pstring> m_ext_alias;
-	std::unordered_map<pstring, std::unique_ptr<pin_alias_t>> m_pins;
+	std::unordered_map<pstring, plib::unique_ptr<pin_alias_t>> m_pins;
 
 	static unit_t m_units[];
 	pstring m_numberchars;

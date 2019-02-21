@@ -51,7 +51,7 @@ namespace devices
 
 		using mattype = typename plib::matrix_compressed_rows_t<FT, SIZE>::index_type;
 
-		plib::parray<std::vector<FT *>, SIZE> m_term_cr;
+		plib::parray<plib::aligned_vector<FT *, PALIGN_VECTOROPT>, SIZE> m_term_cr;
 		plib::mat_precondition_ILU<FT, SIZE> m_ops;
 		//plib::mat_precondition_diag<FT, SIZE> m_ops;
 		plib::gmres_t<FT, SIZE> m_gmres;

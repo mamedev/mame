@@ -10,6 +10,7 @@
 
 #include "netlist/nl_base.h"
 #include "netlist/nl_errstr.h"
+#include "netlist/plib/palloc.h"
 #include "netlist/plib/putil.h"
 #include "netlist/plib/vector_ops.h"
 
@@ -103,9 +104,6 @@ public:
 	std::vector<unsigned> m_nzrd; /* non zero right of the diagonal for elimination, may include RHS element */
 	std::vector<unsigned> m_nzbd; /* non zero below of the diagonal for elimination */
 
-
-
-
 	/* state */
 	nl_double m_last_V;
 	nl_double m_DD_n_m_1;
@@ -113,10 +111,10 @@ public:
 
 private:
 	std::vector<int> m_connected_net_idx;
-	std::vector<nl_double> m_go;
-	std::vector<nl_double> m_gt;
-	std::vector<nl_double> m_Idr;
-	std::vector<nl_double *> m_connected_net_V;
+	plib::aligned_vector<nl_double, PALIGN_VECTOROPT> m_go;
+	plib::aligned_vector<nl_double, PALIGN_VECTOROPT> m_gt;
+	plib::aligned_vector<nl_double, PALIGN_VECTOROPT> m_Idr;
+	plib::aligned_vector<nl_double *, PALIGN_VECTOROPT> m_connected_net_V;
 	std::vector<terminal_t *> m_terms;
 
 };
@@ -218,11 +216,11 @@ protected:
 	template <typename T>
 	void build_LE_RHS(T &child);
 
-	std::vector<std::unique_ptr<terms_for_net_t>> m_terms;
+	std::vector<plib::unique_ptr<terms_for_net_t>> m_terms;
 	std::vector<analog_net_t *> m_nets;
 	std::vector<poolptr<proxied_analog_output_t>> m_inps;
 
-	std::vector<std::unique_ptr<terms_for_net_t>> m_rails_temp;
+	std::vector<plib::unique_ptr<terms_for_net_t>> m_rails_temp;
 
 	const solver_parameters_t &m_params;
 

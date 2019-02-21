@@ -25,7 +25,7 @@
 	NETLIB_DEVICE_IMPL_BASE(ns, chip, chip, p_name, p_def_param) \
 
 #define NETLIB_DEVICE_IMPL_BASE(ns, p_alias, chip, p_name, p_def_param) \
-	static std::unique_ptr<factory::element_t> NETLIB_NAME(p_alias ## _c) \
+	static plib::unique_ptr<factory::element_t> NETLIB_NAME(p_alias ## _c) \
 			(const pstring &classname) \
 	{ \
 		return plib::make_unique<factory::device_element_t<ns :: NETLIB_NAME(chip)>>(p_name, classname, p_def_param, pstring(__FILE__)); \
@@ -91,7 +91,7 @@ namespace factory {
 		}
 	};
 
-	class list_t : public std::vector<std::unique_ptr<element_t>>
+	class list_t : public std::vector<plib::unique_ptr<element_t>>
 	{
 	public:
 		explicit list_t(log_type &alog);
@@ -106,7 +106,7 @@ namespace factory {
 			register_device(plib::make_unique<device_element_t<device_class>>(name, classname, def_param));
 		}
 
-		void register_device(std::unique_ptr<element_t> &&factory);
+		void register_device(plib::unique_ptr<element_t> &&factory);
 
 		element_t * factory_by_name(const pstring &devname);
 
@@ -124,10 +124,10 @@ namespace factory {
 	// factory_creator_ptr_t
 	// -----------------------------------------------------------------------------
 
-	using constructor_ptr_t = std::unique_ptr<element_t> (*)(const pstring &classname);
+	using constructor_ptr_t = plib::unique_ptr<element_t> (*)(const pstring &classname);
 
 	template <typename T>
-	std::unique_ptr<element_t> constructor_t(const pstring &name, const pstring &classname,
+	plib::unique_ptr<element_t> constructor_t(const pstring &name, const pstring &classname,
 			const pstring &def_param)
 	{
 		return plib::make_unique<device_element_t<T>>(name, classname, def_param);

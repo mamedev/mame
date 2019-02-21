@@ -34,11 +34,22 @@
 #endif
 
 /*
+ * Set this to one if you want to use aligned storage optimizations.
+ */
+
+#ifndef USE_ALIGNED_OPTIMIZATIONS
+#define USE_ALIGNED_OPTIMIZATIONS (0)
+#endif
+
+/*
  * Standard alignment macros
  */
 
-#define PALIGNAS_CACHELINE()	PALIGNAS(64)
-#define PALIGNAS_VECTOROPT()	PALIGNAS(64)
+#define PALIGN_CACHELINE		(64)
+#define PALIGN_VECTOROPT		(16)
+
+#define PALIGNAS_CACHELINE()	PALIGNAS(PALIGN_CACHELINE)
+#define PALIGNAS_VECTOROPT()	PALIGNAS(PALIGN_VECTOROPT)
 
 /* Breaks mame build on windows due to -Wattribute */
 #if defined(_WIN32) && defined(__GNUC__)

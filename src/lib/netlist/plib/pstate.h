@@ -10,6 +10,7 @@
 
 #include "pstring.h"
 #include "ptypes.h"
+#include "palloc.h"
 
 #include <array>
 #include <memory>
@@ -63,7 +64,7 @@ public:
 
 	struct entry_t
 	{
-		using list_t = std::vector<std::unique_ptr<entry_t>>;
+		using list_t = std::vector<plib::unique_ptr<entry_t>>;
 
 		entry_t(const pstring &stname, const datatype_t &dt, const void *owner,
 				const std::size_t count, void *ptr)

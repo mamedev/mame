@@ -10,6 +10,7 @@
 
 #include "pconfig.h"
 #include "pexception.h"
+#include "palloc.h"
 
 #include <array>
 #include <memory>
@@ -30,7 +31,7 @@ namespace plib {
 	struct sizeabs<FT, 0>
 	{
 		static constexpr const std::size_t ABS = 0;
-		using container = typename std::vector<FT> ;
+		using container = typename std::vector<FT, aligned_allocator<FT, PALIGN_VECTOROPT>>;
 	};
 
 	/**
@@ -102,11 +103,17 @@ namespace plib {
 			return m_a[i];
 		}
 #else
-		reference operator[](size_type i) noexcept { return m_a[i]; }
-		constexpr const_reference operator[](size_type i) const noexcept { return m_a[i]; }
+		reference operator[](size_type i) noexcept
+		{
+			return assume_aligned_ptr<FT, PALIGN_VECTOROPT>(&m_a[0])[i];
+		}
+		constexpr const_reference operator[](size_type i) const noexcept
+		{
+			return assume_aligned_ptr<FT, PALIGN_VECTOROPT>(&m_a[0])[i];
+		}
 #endif
-		FT * data() noexcept { return m_a.data(); }
-		const FT * data() const noexcept { return m_a.data(); }
+		FT * data() noexcept { return assume_aligned_ptr<FT, PALIGN_VECTOROPT>(m_a.data()); }
+		const FT * data() const noexcept { return assume_aligned_ptr<FT, PALIGN_VECTOROPT>(m_a.data()); }
 
 	private:
 		PALIGNAS_VECTOROPT()

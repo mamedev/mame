@@ -166,7 +166,7 @@ public:
 		return success;
 	}
 
-	void process(std::vector<std::unique_ptr<plib::pistream>> &is)
+	void process(std::vector<plib::unique_ptr<plib::pistream>> &is)
 	{
 		std::vector<plib::putf8_reader> readers;
 		for (auto &i : is)
@@ -431,7 +431,7 @@ public:
 private:
 	void convert_wav();
 	void convert_vcd(vcdwriter::format_e format);
-	std::vector<std::unique_ptr<plib::pistream>> m_instrms;
+	std::vector<plib::unique_ptr<plib::pistream>> m_instrms;
 	plib::postream *m_outstrm;
 };
 
@@ -440,8 +440,8 @@ void nlwav_app::convert_wav()
 
 	double dt = 1.0 / static_cast<double>(opt_rate());
 
-	std::unique_ptr<wavwriter> wo = plib::make_unique<wavwriter>(*m_outstrm, m_instrms.size(), opt_rate(), opt_amp());
-	std::unique_ptr<aggregator> ago = plib::make_unique<aggregator>(m_instrms.size(), dt, aggregator::callback_type(&wavwriter::process, wo.get()));
+	plib::unique_ptr<wavwriter> wo = plib::make_unique<wavwriter>(*m_outstrm, m_instrms.size(), opt_rate(), opt_amp());
+	plib::unique_ptr<aggregator> ago = plib::make_unique<aggregator>(m_instrms.size(), dt, aggregator::callback_type(&wavwriter::process, wo.get()));
 	aggregator::callback_type agcb = log_processor::callback_type(&aggregator::process, ago.get());
 
 	log_processor lp(m_instrms.size(), agcb);
@@ -462,7 +462,7 @@ void nlwav_app::convert_wav()
 void nlwav_app::convert_vcd(vcdwriter::format_e format)
 {
 
-	std::unique_ptr<vcdwriter> wo = plib::make_unique<vcdwriter>(*m_outstrm, opt_args(),
+	plib::unique_ptr<vcdwriter> wo = plib::make_unique<vcdwriter>(*m_outstrm, opt_args(),
 		format, opt_high(), opt_low());
 	log_processor::callback_type agcb = log_processor::callback_type(&vcdwriter::process, wo.get());
 
@@ -510,11 +510,11 @@ int nlwav_app::execute()
 		return 0;
 	}
 
-	m_outstrm = (opt_out() == "-" ? &pout_strm : plib::palloc<plib::pofilestream>(opt_out()));
+	m_outstrm = (opt_out() == "-" ? &pout_strm : plib::pnew<plib::pofilestream>(opt_out()));
 
 	for (auto &oi: opt_args())
 	{
-		std::unique_ptr<plib::pistream> fin = (oi == "-" ?
+		plib::unique_ptr<plib::pistream> fin = (oi == "-" ?
 			  plib::make_unique<plib::pstdin>()
 			: plib::make_unique<plib::pifilestream>(oi));
 		m_instrms.push_back(std::move(fin));
@@ -534,7 +534,7 @@ int nlwav_app::execute()
 	}
 
 	if (opt_out() != "-")
-		plib::pfree(m_outstrm);
+		plib::pdelete(m_outstrm);
 
 	return 0;
 }

@@ -218,7 +218,7 @@ public:
 	{
 	}
 
-	virtual std::unique_ptr<plib::pistream> stream(const pstring &name) override;
+	virtual plib::unique_ptr<plib::pistream> stream(const pstring &name) override;
 private:
 	device_t &m_dev;
 	pstring m_name;
@@ -229,7 +229,7 @@ class netlist_data_memregions_t : public netlist::source_t
 public:
 	netlist_data_memregions_t(device_t &dev);
 
-	virtual std::unique_ptr<plib::pistream> stream(const pstring &name) override;
+	virtual plib::unique_ptr<plib::pistream> stream(const pstring &name) override;
 
 private:
 	device_t &m_dev;
@@ -240,7 +240,7 @@ private:
 // memregion source support
 // ----------------------------------------------------------------------------------------
 
-std::unique_ptr<plib::pistream> netlist_source_memregion_t::stream(const pstring &name)
+plib::unique_ptr<plib::pistream> netlist_source_memregion_t::stream(const pstring &name)
 {
 	//memory_region *mem = static_cast<netlist_mame_device::netlist_mame_t &>(setup().setup().exec()).machine().root_device().memregion(m_name.c_str());
 	memory_region *mem = m_dev.machine().root_device().memregion(m_name.c_str());
@@ -252,7 +252,7 @@ netlist_data_memregions_t::netlist_data_memregions_t(device_t &dev)
 {
 }
 
-std::unique_ptr<plib::pistream> netlist_data_memregions_t::stream(const pstring &name)
+plib::unique_ptr<plib::pistream> netlist_data_memregions_t::stream(const pstring &name)
 {
 	//memory_region *mem = static_cast<netlist_mame_device::netlist_mame_t &>(setup().setup().exec()).parent().memregion(name.c_str());
 	memory_region *mem = m_dev.memregion(name.c_str());
@@ -264,7 +264,7 @@ std::unique_ptr<plib::pistream> netlist_data_memregions_t::stream(const pstring 
 	{
 		// This should be the last data provider being called - last resort
 		fatalerror("data named %s not found in device rom regions\n", name.c_str());
-		return std::unique_ptr<plib::pistream>(nullptr);
+		return plib::unique_ptr<plib::pistream>(nullptr);
 	}
 }
 

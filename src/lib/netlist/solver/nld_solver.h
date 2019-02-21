@@ -105,6 +105,9 @@ private:
 
 	template <typename FT, int SIZE>
 	poolptr<matrix_solver_t> create_solver(std::size_t size, const pstring &solvername);
+
+	template <typename FT, int SIZE>
+	poolptr<matrix_solver_t> create_solver_x(std::size_t size, const pstring &solvername);
 };
 
 	} //namespace devices

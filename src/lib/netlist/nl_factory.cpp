@@ -52,7 +52,7 @@ namespace netlist { namespace factory
 	{
 	}
 
-	void list_t::register_device(std::unique_ptr<element_t> &&factory)
+	void list_t::register_device(plib::unique_ptr<element_t> &&factory)
 	{
 		for (auto & e : *this)
 			if (e->name() == factory->name())

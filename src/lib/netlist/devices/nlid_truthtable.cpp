@@ -464,9 +464,9 @@ netlist_base_factory_truthtable_t::netlist_base_factory_truthtable_t(const pstri
 					ENTRYY(n, 4, s); ENTRYY(n, 5, s); ENTRYY(n, 6, s); \
 					ENTRYY(n, 7, s); ENTRYY(n, 8, s)
 
-std::unique_ptr<netlist_base_factory_truthtable_t> tt_factory_create(tt_desc &desc, const pstring &sourcefile)
+plib::unique_ptr<netlist_base_factory_truthtable_t> tt_factory_create(tt_desc &desc, const pstring &sourcefile)
 {
-	std::unique_ptr<netlist_base_factory_truthtable_t> ret;
+	plib::unique_ptr<netlist_base_factory_truthtable_t> ret;
 
 	switch (desc.ni * 100 + desc.no)
 	{

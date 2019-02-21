@@ -447,7 +447,7 @@ private:
 template <typename T>
 struct constructor_helper
 {
-	std::unique_ptr<pistream> operator()(T &&s) { return std::move(plib::make_unique<T>(std::move(s))); }
+	plib::unique_ptr<pistream> operator()(T &&s) { return std::move(plib::make_unique<T>(std::move(s))); }
 };
 
 // NOLINTNEXTLINE(cppcoreguidelines-special-member-functions)
@@ -489,20 +489,20 @@ public:
 	}
 
 private:
-	std::unique_ptr<pistream> m_strm;
+	plib::unique_ptr<pistream> m_strm;
 	putf8string m_linebuf;
 };
 
 template <>
 struct constructor_helper<putf8_reader>
 {
-	std::unique_ptr<pistream> operator()(putf8_reader &&s) { return std::move(s.m_strm); }
+	plib::unique_ptr<pistream> operator()(putf8_reader &&s) { return std::move(s.m_strm); }
 };
 
 template <>
-struct constructor_helper<std::unique_ptr<pistream>>
+struct constructor_helper<plib::unique_ptr<pistream>>
 {
-	std::unique_ptr<pistream> operator()(std::unique_ptr<pistream> &&s) { return std::move(s); }
+	plib::unique_ptr<pistream> operator()(plib::unique_ptr<pistream> &&s) { return std::move(s); }
 };
 
 
@@ -626,11 +626,11 @@ public:
 	{
 		std::size_t sz = 0;
 		read(sz);
-		auto buf = plib::palloc_array<plib::string_info<pstring>::mem_t>(sz+1);
+		auto buf = plib::pnew_array<plib::string_info<pstring>::mem_t>(sz+1);
 		m_strm.read(reinterpret_cast<pistream::value_type *>(buf), sz);
 		buf[sz] = 0;
 		s = pstring(buf);
-		plib::pfree_array(buf);
+		plib::pdelete_array(buf);
 	}
 
 	template <typename T>

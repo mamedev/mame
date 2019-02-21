@@ -336,9 +336,9 @@ void matrix_solver_t::setup_matrix()
 	 * This should reduce cache misses ...
 	 */
 
-	auto **touched = plib::palloc_array<bool *>(iN);
+	auto **touched = plib::pnew_array<bool *>(iN);
 	for (std::size_t k=0; k<iN; k++)
-		touched[k] = plib::palloc_array<bool>(iN);
+		touched[k] = plib::pnew_array<bool>(iN);
 
 	for (std::size_t k = 0; k < iN; k++)
 	{
@@ -397,8 +397,8 @@ void matrix_solver_t::setup_matrix()
 	}
 
 	for (std::size_t k=0; k<iN; k++)
-		plib::pfree_array(touched[k]);
-	plib::pfree_array(touched);
+		plib::pdelete_array(touched[k]);
+	plib::pdelete_array(touched);
 }
 
 void matrix_solver_t::update_inputs()

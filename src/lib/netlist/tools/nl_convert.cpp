@@ -81,7 +81,7 @@ void nl_convert_base_t::add_ext_alias(const pstring &alias)
 	m_ext_alias.push_back(alias);
 }
 
-void nl_convert_base_t::add_device(std::unique_ptr<dev_t> dev)
+void nl_convert_base_t::add_device(plib::unique_ptr<dev_t> dev)
 {
 	for (auto & d : m_devs)
 		if (d->name() == dev->name())

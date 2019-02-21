@@ -126,13 +126,13 @@ public:
 	{
 	}
 
-	std::unique_ptr<plib::pistream> stream(const pstring &file) override;
+	plib::unique_ptr<plib::pistream> stream(const pstring &file) override;
 
 private:
 	pstring m_folder;
 };
 
-std::unique_ptr<plib::pistream> netlist_data_folder_t::stream(const pstring &file)
+plib::unique_ptr<plib::pistream> netlist_data_folder_t::stream(const pstring &file)
 {
 	pstring name = m_folder + "/" + file;
 	try
@@ -145,7 +145,7 @@ std::unique_ptr<plib::pistream> netlist_data_folder_t::stream(const pstring &fil
 		if (dynamic_cast<const plib::file_open_e *>(&e) == nullptr )
 			throw;
 	}
-	return std::unique_ptr<plib::pistream>(nullptr);
+	return plib::unique_ptr<plib::pistream>(nullptr);
 }
 
 class netlist_tool_callbacks_t : public netlist::callbacks_t

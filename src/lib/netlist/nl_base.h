@@ -30,7 +30,7 @@
 #include "nl_time.h"
 
 //============================================================
-//  MACROS / New Syntax999
+//  MACROS / New Syntax
 //============================================================
 
 /*! Construct a netlist device name */
@@ -1070,7 +1070,7 @@ namespace netlist
 		{
 		}
 
-		std::unique_ptr<plib::pistream> stream();
+		plib::unique_ptr<plib::pistream> stream();
 	protected:
 		void changed() override { }
 	};
@@ -1276,8 +1276,8 @@ namespace netlist
 		/* need to preserve order of device creation ... */
 		using devices_collection_type = std::vector<std::pair<pstring, poolptr<core_device_t>>>;
 		netlist_state_t(const pstring &aname,
-			std::unique_ptr<callbacks_t> &&callbacks,
-			std::unique_ptr<setup_t> &&setup);
+			plib::unique_ptr<callbacks_t> &&callbacks,
+			plib::unique_ptr<setup_t> &&setup);
 
 		COPYASSIGNMOVE(netlist_state_t, delete)
 
@@ -1371,7 +1371,7 @@ namespace netlist
 		}
 
 		/* sole use is to manage lifetime of family objects */
-		std::vector<std::pair<pstring, std::unique_ptr<logic_family_desc_t>>> m_family_cache;
+		std::vector<std::pair<pstring, plib::unique_ptr<logic_family_desc_t>>> m_family_cache;
 
 		setup_t &setup() NL_NOEXCEPT { return *m_setup; }
 		const setup_t &setup() const NL_NOEXCEPT { return *m_setup; }
@@ -1387,11 +1387,11 @@ namespace netlist
 		void reset();
 
 		pstring                             m_name;
-		std::unique_ptr<plib::dynlib>       m_lib; // external lib needs to be loaded as long as netlist exists
+		plib::unique_ptr<plib::dynlib>      m_lib; // external lib needs to be loaded as long as netlist exists
 		plib::state_manager_t               m_state;
-		std::unique_ptr<callbacks_t>        m_callbacks;
+		plib::unique_ptr<callbacks_t>       m_callbacks;
 		log_type                            m_log;
-		std::unique_ptr<setup_t>            m_setup;
+		plib::unique_ptr<setup_t>           m_setup;
 
 		nets_collection_type                m_nets;
 		/* sole use is to manage lifetime of net objects */
@@ -1409,7 +1409,7 @@ namespace netlist
 	{
 	public:
 
-		explicit netlist_t(const pstring &aname, std::unique_ptr<callbacks_t> callbacks);
+		explicit netlist_t(const pstring &aname, plib::unique_ptr<callbacks_t> callbacks);
 
 		COPYASSIGNMOVE(netlist_t, delete)
 
@@ -1454,7 +1454,7 @@ namespace netlist
 		void print_stats() const;
 
 	private:
-		std::unique_ptr<netlist_state_t>    m_state;
+		plib::unique_ptr<netlist_state_t>   m_state;
 		devices::NETLIB_NAME(solver) *      m_solver;
 
 		/* mostly rw */
