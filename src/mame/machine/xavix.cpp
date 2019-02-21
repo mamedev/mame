@@ -663,6 +663,25 @@ WRITE8_MEMBER(xavix_i2c_jmat_state::write_extended_io2)
 	LOG("%s: io2_data_w %02x\n", machine().describe_context(), data);
 }
 
+// the cart pins Popira 2 uses for IO with cart gc0010 are not controllable by the CPU on other ekara systems
+
+CUSTOM_INPUT_MEMBER(xavix_popira2_cart_state::i2c_r)
+{
+	if (m_cartslot->has_cart())
+		return m_cartslot->read_sda();
+	else 
+		return 0x0;
+}
+
+void xavix_popira2_cart_state::write_io1(uint8_t data, uint8_t direction)
+{
+	if (m_cartslot->has_cart())
+	{
+		m_cartslot->write_sda((data & 0x08) >> 3);
+		m_cartslot->write_scl((data & 0x10) >> 4);
+	}
+}
+
 
 /* General IO port handling */
 

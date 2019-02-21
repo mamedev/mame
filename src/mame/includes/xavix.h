@@ -122,7 +122,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ioevent_trg04);
 	DECLARE_WRITE_LINE_MEMBER(ioevent_trg08);
 
-
 	int m_rgnlen;
 	uint8_t* m_rgn;
 
@@ -210,6 +209,11 @@ private:
 	virtual void machine_reset() override;
 
 	virtual void video_start() override;
+
+	DECLARE_WRITE8_MEMBER(debug_mem_w)
+	{
+		m_mainram[offset] = data;
+	};
 
 	virtual uint8_t opcodes_000000_r(offs_t offset)
 	{
@@ -907,6 +911,20 @@ protected:
 	virtual void write_io1(uint8_t data, uint8_t direction) override;
 
 	required_device<i2cmem_device> m_i2cmem;
+};
+
+class xavix_popira2_cart_state : public xavix_cart_state
+{
+public:
+	xavix_popira2_cart_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_cart_state(mconfig,type,tag)
+	{ }
+
+	DECLARE_CUSTOM_INPUT_MEMBER(i2c_r);
+
+protected:
+	virtual void write_io1(uint8_t data, uint8_t direction) override;
+
 };
 
 
