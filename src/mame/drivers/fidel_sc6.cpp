@@ -43,12 +43,14 @@ public:
 		m_maincpu(*this, "maincpu")
 	{ }
 
+	// machine drivers
 	void sc6(machine_config &config);
 
 private:
 	// devices/pointers
 	required_device<mcs48_cpu_device> m_maincpu;
 
+	// address maps
 	void main_map(address_map &map);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cartridge);

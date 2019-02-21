@@ -48,9 +48,11 @@ public:
 	void fphantom(machine_config &config);
 	void init_fphantom();
 
+protected:
+	virtual void machine_reset() override;
+
 private:
 	void main_map(address_map &map);
-	virtual void machine_reset() override;
 };
 
 void phantom_state::machine_reset()

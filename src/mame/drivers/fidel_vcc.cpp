@@ -123,6 +123,7 @@ public:
 		m_ppi8255(*this, "ppi8255")
 	{ }
 
+	// machine drivers
 	void vcc(machine_config &config);
 
 protected:

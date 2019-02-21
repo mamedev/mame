@@ -44,6 +44,7 @@ public:
 		m_mainmap(*this, "mainmap")
 	{ }
 
+	// machine drivers
 	void master(machine_config &config);
 
 	void init_master();
@@ -53,6 +54,7 @@ private:
 	required_device<dac_2bit_binary_weighted_ones_complement_device> m_dac;
 	required_device<address_map_bank_device> m_mainmap;
 
+	// address maps
 	void main_map(address_map &map);
 	void main_trampoline(address_map &map);
 	u8 main_trampoline_r(offs_t offset);

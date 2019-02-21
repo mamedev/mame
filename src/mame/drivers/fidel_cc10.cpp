@@ -80,6 +80,7 @@ public:
 		m_beeper(*this, "beeper")
 	{ }
 
+	// machine drivers
 	void ccx(machine_config &config);
 
 private:

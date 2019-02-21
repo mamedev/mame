@@ -6,7 +6,7 @@
 * novag_presto.cpp, subdriver of novagbase.cpp
 
 TODO:
-- is presto led handling correct? mux data needs to be auto cleared
+- is led handling correct? mux data needs to be auto cleared
   similar to diablo/sexpert
 
 *******************************************************************************

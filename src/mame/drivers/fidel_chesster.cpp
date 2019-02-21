@@ -50,6 +50,7 @@ public:
 	void init_chesster();
 
 private:
+	// address maps
 	void main_map(address_map &map);
 
 	int m_numbanks;

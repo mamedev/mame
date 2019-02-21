@@ -167,6 +167,7 @@ public:
 		m_ppi8255(*this, "ppi8255")
 	{ }
 
+	// machine drivers
 	void vsc(machine_config &config);
 
 private:

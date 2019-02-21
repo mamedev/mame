@@ -74,6 +74,7 @@ public:
 	void sc12b(machine_config &config);
 
 private:
+	// address maps
 	void main_map(address_map &map);
 
 	// I/O handlers

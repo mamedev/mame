@@ -38,9 +38,11 @@ public:
 		fidelbase_state(mconfig, type, tag)
 	{ }
 
+	// machine drivers
 	void as12(machine_config &config);
 
 private:
+	// address maps
 	void main_map(address_map &map);
 
 	// I/O handlers

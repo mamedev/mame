@@ -11,8 +11,8 @@ TODO:
 
 *******************************************************************************
 
-Delta-1
-------------
+Novag Delta-1
+-------------
 3850PK CPU at ~2MHz, 3853PK memory interface
 4KB ROM(2332A), 256 bytes RAM(2*2111A-4)
 4-digit 7seg panel, no sound, no chessboard
@@ -38,7 +38,11 @@ public:
 		novagbase_state(mconfig, type, tag)
 	{ }
 
+	// machine drivers
 	void delta1(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
 
 private:
 	// address maps
@@ -52,8 +56,6 @@ private:
 	DECLARE_READ8_MEMBER(io1_r);
 
 	u8 m_io[2]; // F8 CPU I/O ports
-
-	virtual void machine_start() override;
 };
 
 void delta1_state::machine_start()

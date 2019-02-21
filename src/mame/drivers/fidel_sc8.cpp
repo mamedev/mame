@@ -36,6 +36,7 @@ public:
 		fidelbase_state(mconfig, type, tag)
 	{ }
 
+	// machine drivers
 	void scc(machine_config &config);
 
 private:

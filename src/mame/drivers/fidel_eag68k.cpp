@@ -258,16 +258,6 @@ WRITE8_MEMBER(eag_state::mux_w)
 	prepare_display();
 }
 
-WRITE8_MEMBER(excel68k_state::mux_w)
-{
-	// a1-a3,d0: 74259
-	u8 mask = 1 << offset;
-	m_led_select = (m_led_select & ~mask) | ((data & 1) ? mask : 0);
-
-	// 74259 Q0-Q3: 74145 A-D (Q4-Q7 N/C)
-	eag_state::mux_w(space, offset, m_led_select & 0xf);
-}
-
 READ8_MEMBER(eag_state::input1_r)
 {
 	// a1-a3,d7: multiplexed inputs (active low)
@@ -292,6 +282,19 @@ WRITE8_MEMBER(eag_state::digit_w)
 	// a1-a3,d0(d8): digit segment data
 	m_7seg_data = (m_7seg_data & ~(1 << offset)) | ((data & 1) << offset);
 	prepare_display();
+}
+
+
+// fex68k-specific
+
+WRITE8_MEMBER(excel68k_state::mux_w)
+{
+	// a1-a3,d0: 74259
+	u8 mask = 1 << offset;
+	m_led_select = (m_led_select & ~mask) | ((data & 1) ? mask : 0);
+
+	// 74259 Q0-Q3: 74145 A-D (Q4-Q7 N/C)
+	eag_state::mux_w(space, offset, m_led_select & 0xf);
 }
 
 

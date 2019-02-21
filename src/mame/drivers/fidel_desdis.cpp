@@ -71,6 +71,7 @@ public:
 	void init_fdes2100d();
 
 protected:
+	// address maps
 	void fdes2100d_map(address_map &map);
 
 	// I/O handlers
