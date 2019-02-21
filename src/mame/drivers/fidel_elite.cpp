@@ -65,7 +65,6 @@ public:
 	{ }
 
 	// machine drivers
-	void eas_base(machine_config &config);
 	void eas(machine_config &config);
 	void eag(machine_config &config);
 	void pc(machine_config &config);
@@ -73,6 +72,8 @@ public:
 	template <int Language> void init_eag();
 
 private:
+	void eas_base(machine_config &config);
+
 	// devices/pointers
 	optional_device<i8255_device> m_ppi8255;
 
@@ -315,7 +316,7 @@ void elite_state::eas_base(machine_config &config)
 	m_irq_on->set_start_delay(irq_period - attotime::from_hz(38.4_kHz_XTAL*2)); // edge!
 	TIMER(config, "irq_off").configure_periodic(FUNC(elite_state::irq_off<M6502_IRQ_LINE>), irq_period);
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
+	TIMER(config, "display_decay").configure_periodic(FUNC(elite_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_fidel_eas);
 
 	/* sound hardware */
@@ -329,7 +330,7 @@ void elite_state::eas_base(machine_config &config)
 
 	/* cartridge */
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "fidel_scc", "bin,dat"));
-	cartslot.set_device_load(device_image_load_delegate(&fidelbase_state::device_image_load_scc_cartridge, this));
+	cartslot.set_device_load(device_image_load_delegate(&elite_state::device_image_load_scc_cartridge, this));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("fidel_scc");
 }

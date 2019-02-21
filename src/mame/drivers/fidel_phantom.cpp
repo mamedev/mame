@@ -109,7 +109,7 @@ void phantom_state::fphantom(machine_config &config)
 	m_maincpu->set_periodic_int(FUNC(phantom_state::irq0_line_hold), attotime::from_hz(600)); // guessed
 	m_maincpu->set_addrmap(AS_PROGRAM, &phantom_state::main_map);
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
+	TIMER(config, "display_decay").configure_periodic(FUNC(phantom_state::display_decay_tick), attotime::from_msec(1));
 	//config.set_default_layout(layout_fidel_phantom);
 
 	/* sound hardware */

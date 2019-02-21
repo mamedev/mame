@@ -232,7 +232,7 @@ void ccx_state::ccx(machine_config &config)
 	m_ppi8255->tri_pb_callback().set_constant(0);
 	m_ppi8255->out_pc_callback().set(FUNC(ccx_state::ppi_portc_w));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
+	TIMER(config, "display_decay").configure_periodic(FUNC(ccx_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_fidel_cc10);
 
 	/* sound hardware */

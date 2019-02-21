@@ -185,7 +185,7 @@ void sc6_state::sc6(machine_config &config)
 	m_maincpu->t0_in_cb().set(FUNC(sc6_state::input6_r));
 	m_maincpu->t1_in_cb().set(FUNC(sc6_state::input7_r));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
+	TIMER(config, "display_decay").configure_periodic(FUNC(sc6_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_fidel_sc6);
 
 	/* sound hardware */

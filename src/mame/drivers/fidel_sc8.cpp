@@ -126,7 +126,7 @@ void scc_state::scc(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &scc_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &scc_state::main_io);
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
+	TIMER(config, "display_decay").configure_periodic(FUNC(scc_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_fidel_sc8);
 
 	/* sound hardware */

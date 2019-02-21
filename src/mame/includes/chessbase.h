@@ -28,6 +28,7 @@ public:
 		m_display_maxx(0)
 	{ }
 
+protected:
 	// devices/pointers
 	optional_ioport_array<16> m_inp_matrix; // max 16
 	output_finder<0x20, 0x20> m_out_x;
@@ -57,7 +58,6 @@ public:
 	void set_display_segmask(u32 digits, u32 mask);
 	void display_matrix(int maxx, int maxy, u32 setx, u32 sety, bool update = true);
 
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 };

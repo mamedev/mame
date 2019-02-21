@@ -33,6 +33,10 @@ public:
 		m_lcd(*this, "hd44780")
 	{ }
 
+	// in case reset button is directly tied to maincpu reset pin
+	virtual DECLARE_INPUT_CHANGED_MEMBER(reset_button) { m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE); }
+
+protected:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
 	optional_device<timer_device> m_irq_on;
@@ -40,9 +44,6 @@ public:
 	optional_device<beep_device> m_beeper;
 	optional_device<dac_bit_interface> m_dac;
 	optional_device<hd44780_device> m_lcd;
-
-	// in case reset button is directly tied to maincpu reset pin
-	virtual DECLARE_INPUT_CHANGED_MEMBER(reset_button) { m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE); }
 
 	// periodic interrupts
 	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(Line, ASSERT_LINE); }
@@ -54,7 +55,6 @@ public:
 	u8 m_lcd_control;
 	u8 m_lcd_data;
 
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 };

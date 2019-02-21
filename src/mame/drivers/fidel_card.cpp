@@ -179,7 +179,6 @@ public:
 	{ }
 
 	// machine drivers
-	void brc_base(machine_config &config);
 	void ubc(machine_config &config);
 	void vbrc(machine_config &config);
 	void bv3(machine_config &config);
@@ -187,6 +186,8 @@ public:
 	virtual DECLARE_INPUT_CHANGED_MEMBER(reset_button) override;
 
 private:
+	void brc_base(machine_config &config);
+
 	// devices/pointers
 	required_device<i8041_device> m_mcu;
 	required_device<i8243_device> m_i8243;
@@ -436,7 +437,7 @@ void card_state::brc_base(machine_config &config)
 	m_i8243->p6_out_cb().set(FUNC(card_state::ioexp_port_w<2>));
 	m_i8243->p7_out_cb().set(FUNC(card_state::ioexp_port_w<3>));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
+	TIMER(config, "display_decay").configure_periodic(FUNC(card_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_fidel_vbrc);
 }
 

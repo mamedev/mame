@@ -375,7 +375,7 @@ void vsc_state::vsc(machine_config &config)
 	m_z80pio->in_pb_callback().set(FUNC(vsc_state::pio_portb_r));
 	m_z80pio->out_pb_callback().set(FUNC(vsc_state::pio_portb_w));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
+	TIMER(config, "display_decay").configure_periodic(FUNC(vsc_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_fidel_vsc);
 
 	/* sound hardware */

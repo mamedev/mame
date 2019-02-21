@@ -38,6 +38,13 @@ public:
 		m_cart(*this, "cartslot")
 	{ }
 
+	// in case reset button is directly tied to maincpu reset pin
+	virtual DECLARE_INPUT_CHANGED_MEMBER(reset_button) { m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE); }
+
+	// speech rom language, normally 0=English, 1=German, 2=French, 3=Spanish
+	template<int Language> void init_language() { m_language = Language; }
+
+protected:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
 	optional_device<timer_device> m_irq_on;
@@ -49,19 +56,14 @@ public:
 	optional_device<dac_bit_interface> m_dac;
 	optional_device<generic_slot_device> m_cart;
 
-	// cross-compatible cartridges(opening book modules)
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(scc_cartridge);
-	virtual DECLARE_READ8_MEMBER(cartridge_r);
-
-	// in case reset button is directly tied to maincpu reset pin
-	virtual DECLARE_INPUT_CHANGED_MEMBER(reset_button) { m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE); }
-
-	// speech rom language, normally 0=English, 1=German, 2=French, 3=Spanish
-	template<int Language> void init_language() { m_language = Language; }
 	int m_language;
 
 	u8 m_speech_data;
 	u8 m_speech_bank; // speech rom higher address bits
+
+	// cross-compatible cartridges(opening book modules)
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(scc_cartridge);
+	virtual DECLARE_READ8_MEMBER(cartridge_r);
 
 	// periodic interrupts
 	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(Line, ASSERT_LINE); }
@@ -74,7 +76,6 @@ public:
 	void div_trampoline(address_map &map);
 	u16 m_div_status;
 
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 };

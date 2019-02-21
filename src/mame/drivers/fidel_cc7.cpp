@@ -199,7 +199,7 @@ void bcc_state::bkc(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &bcc_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &bcc_state::main_io);
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
+	TIMER(config, "display_decay").configure_periodic(FUNC(bcc_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_fidel_bkc);
 }
 

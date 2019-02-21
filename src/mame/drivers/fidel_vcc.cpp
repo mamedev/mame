@@ -304,7 +304,7 @@ void vcc_state::vcc(machine_config &config)
 	m_ppi8255->in_pc_callback().set(FUNC(vcc_state::ppi_portc_r));
 	m_ppi8255->out_pc_callback().set(FUNC(vcc_state::ppi_portc_w));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
+	TIMER(config, "display_decay").configure_periodic(FUNC(vcc_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_fidel_vcc);
 
 	/* sound hardware */

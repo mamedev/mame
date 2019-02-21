@@ -180,7 +180,6 @@ public:
 	{ }
 
 	// machine drivers
-	void eag_base(machine_config &config);
 	void eag(machine_config &config);
 	void eagv5(machine_config &config);
 	void eagv7(machine_config &config);
@@ -191,6 +190,8 @@ public:
 	void init_eag();
 
 protected:
+	void eag_base(machine_config &config);
+
 	// devices/pointers
 	optional_device<ram_device> m_ram;
 
@@ -445,7 +446,7 @@ void excel68k_state::fex68k(machine_config &config)
 	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(1528)); // active for 1.525us
 	TIMER(config, "irq_off").configure_periodic(FUNC(excel68k_state::irq_off<M68K_IRQ_2>), irq_period);
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
+	TIMER(config, "display_decay").configure_periodic(FUNC(excel68k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_fidel_ex_68k);
 
 	/* sound hardware */
@@ -484,7 +485,7 @@ void eag_state::eag_base(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
+	TIMER(config, "display_decay").configure_periodic(FUNC(eag_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_fidel_eag_68k);
 
 	/* sound hardware */
@@ -494,7 +495,7 @@ void eag_state::eag_base(machine_config &config)
 
 	/* cartridge */
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "fidel_scc", "bin,dat"));
-	cartslot.set_device_load(device_image_load_delegate(&fidelbase_state::device_image_load_scc_cartridge, this));
+	cartslot.set_device_load(device_image_load_delegate(&eag_state::device_image_load_scc_cartridge, this));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("fidel_scc");
 }
