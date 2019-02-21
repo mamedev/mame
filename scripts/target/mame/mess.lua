@@ -1839,7 +1839,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/cking_master.cpp",
 	MAME_DIR .. "src/mame/drivers/cxg_ch2001.cpp",
 
-	MAME_DIR .. "src/mame/drivers/fidelbase.cpp",
+	MAME_DIR .. "src/mame/machine/fidelbase.cpp",
 	MAME_DIR .. "src/mame/includes/fidelbase.h",
 	MAME_DIR .. "src/mame/drivers/fidel_as12.cpp",
 	MAME_DIR .. "src/mame/drivers/fidel_card.cpp",
@@ -1860,7 +1860,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/fidel_vcc.cpp",
 	MAME_DIR .. "src/mame/drivers/fidel_vsc.cpp",
 
-	MAME_DIR .. "src/mame/drivers/novagbase.cpp",
+	MAME_DIR .. "src/mame/machine/novagbase.cpp",
 	MAME_DIR .. "src/mame/includes/novagbase.h",
 	MAME_DIR .. "src/mame/drivers/novag_cforte.cpp",
 	MAME_DIR .. "src/mame/drivers/novag_delta1.cpp",
