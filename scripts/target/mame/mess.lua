@@ -3698,6 +3698,8 @@ files {
 createMESSProjects(_target, _subtarget, "wyse")
 files {
 	MAME_DIR .. "src/mame/drivers/wy100.cpp",
+	MAME_DIR .. "src/mame/drivers/wy150.cpp",
+	MAME_DIR .. "src/mame/drivers/wy30p.cpp",
 	MAME_DIR .. "src/mame/drivers/wy50.cpp",
 	MAME_DIR .. "src/mame/drivers/wy85.cpp",
 	MAME_DIR .. "src/mame/drivers/wyse.cpp",
