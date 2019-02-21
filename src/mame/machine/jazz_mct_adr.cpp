@@ -44,7 +44,6 @@ jazz_mct_adr_device::jazz_mct_adr_device(const machine_config &mconfig, const ch
 	, m_dma_r{ *this, *this, *this, *this }
 	, m_dma_w{ *this, *this, *this, *this }
 {
-	(void)m_dma_address;
 }
 
 void jazz_mct_adr_device::map(address_map &map)
@@ -53,7 +52,7 @@ void jazz_mct_adr_device::map(address_map &map)
 	map(0x008, 0x00f).lr32("revision_level", [](){ return 1; });
 	map(0x010, 0x017).lr32("invalid_address", []() { return 0; });
 	map(0x018, 0x01f).lrw32("translation_base", [this]() { return m_trans_tbl_base; }, [this](u32 data) { LOG("tbl base 0x%08x\n", data); m_trans_tbl_base = data; });
-	map(0x020, 0x027).lrw32("translation_limit", [this]() { return m_trans_tbl_limit; }, [this](u32 data) { m_trans_tbl_limit = data; });
+	map(0x020, 0x027).lrw32("translation_limit", [this]() { return m_trans_tbl_limit; }, [this](u32 data) { LOG("tbl limit 0x%08x\n", data); m_trans_tbl_limit = data; });
 	map(0x028, 0x02f).lrw32("translation_invalidate", []() { return 0; }, [](u32 data) { });
 	map(0x030, 0x037).lw32("cache_maintenance", [this](u32 data) { m_ioc_maint = data; });
 	map(0x038, 0x03f).lr32("remote_failed_address", []() { return 0; });
@@ -258,7 +257,7 @@ TIMER_CALLBACK_MEMBER(jazz_mct_adr_device::dma_check)
 		{
 			u8 const data = m_bus->read_byte(address);
 
-			//LOG("dma_w data 0x%02x address 0x%08x\n", data, m_dma_reg[(number << 2) + 3]);
+			//LOG("dma_w data 0x%02x address 0x%08x\n", data, address);
 
 			m_dma_w[channel](data);
 		}
@@ -266,7 +265,7 @@ TIMER_CALLBACK_MEMBER(jazz_mct_adr_device::dma_check)
 		{
 			u8 const data = m_dma_r[channel]();
 
-			//LOG("dma_r data 0x%02x address 0x%08x\n", data, m_dma_reg[(number << 2) + 3]);
+			//LOG("dma_r data 0x%02x address 0x%08x\n", data, address);
 
 			m_bus->write_byte(address, data);
 		}
@@ -303,5 +302,9 @@ u32 jazz_mct_adr_device::translate_address(u32 logical_address)
 		return m_bus->read_dword(entry_address) | (logical_address & 0xfff);
 	}
 	else
+	{
+		logerror("failed to translate address 0x%08x\n", logical_address);
+
 		return 0; // FIXME: address error
+	}
 }
