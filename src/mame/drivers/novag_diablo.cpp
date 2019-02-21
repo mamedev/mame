@@ -3,7 +3,7 @@
 // thanks-to:yoyo_chessboard
 /******************************************************************************
 *
-* novag_diablo.cpp, subdriver of novagbase.cpp
+* novag_diablo.cpp, subdriver of machine/novagbase.cpp, machine/chessbase.cpp
 
 TODO:
 - RS232 port (when connected, I'm only getting "New Game")
@@ -190,12 +190,12 @@ static INPUT_PORTS_START( diablo68k_sidepanel )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( diablo68k )
-	PORT_INCLUDE( novag_cb_magnets )
+	PORT_INCLUDE( generic_cb_magnets )
 	PORT_INCLUDE( diablo68k_sidepanel )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( scorpio68k )
-	PORT_INCLUDE( novag_cb_buttons )
+	PORT_INCLUDE( generic_cb_buttons )
 	PORT_INCLUDE( diablo68k_sidepanel )
 INPUT_PORTS_END
 

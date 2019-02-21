@@ -3,7 +3,7 @@
 // thanks-to:Berger,yoyo_chessboard
 /******************************************************************************
 *
-* fidel_sc12.cpp, subdriver of fidelbase.cpp
+* fidel_sc12.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
 
 *******************************************************************************
 
@@ -151,13 +151,13 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( sc12 )
 	PORT_INCLUDE( fidel_cpu_div_2 )
-	PORT_INCLUDE( fidel_cb_buttons )
+	PORT_INCLUDE( generic_cb_buttons )
 	PORT_INCLUDE( sc12_sidepanel )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sc12b )
 	PORT_INCLUDE( fidel_cpu_div_4 )
-	PORT_INCLUDE( fidel_cb_buttons )
+	PORT_INCLUDE( generic_cb_buttons )
 	PORT_INCLUDE( sc12_sidepanel )
 INPUT_PORTS_END
 

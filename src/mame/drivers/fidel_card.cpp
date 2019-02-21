@@ -2,7 +2,7 @@
 // copyright-holders:Kevin Horton,Jonathan Gevaryahu,Sandro Ronco,hap
 /******************************************************************************
 *
-* fidel_card.cpp, subdriver of fidelbase.cpp
+* fidel_card.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
 
 Fidelity electronic card games
 - *Bridge Challenger (BRC)

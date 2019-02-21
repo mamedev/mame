@@ -3,7 +3,7 @@
 // thanks-to:yoyo_chessboard
 /******************************************************************************
 *
-* fidel_dames.cpp, subdriver of fidelbase.cpp
+* fidel_dames.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
 
 *******************************************************************************
 
@@ -112,7 +112,7 @@ void dsc_state::main_map(address_map &map)
 ******************************************************************************/
 
 static INPUT_PORTS_START( dsc )
-	PORT_INCLUDE( fidel_cb_buttons )
+	PORT_INCLUDE( generic_cb_buttons )
 
 	PORT_MODIFY("IN.4")
 	PORT_BIT(0x8f, IP_ACTIVE_HIGH, IPT_UNUSED)

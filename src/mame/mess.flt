@@ -139,7 +139,6 @@ chesstrv.cpp
 cit101.cpp
 cit220.cpp
 cking_master.cpp
-ckingbase.cpp
 clcd.cpp
 clickstart.cpp
 cm1800.cpp
@@ -165,7 +164,6 @@ crvision.cpp
 ct486.cpp
 cvicny.cpp
 cxg_ch2001.cpp
-cxgbase.cpp
 cxhumax.cpp
 cybiko.cpp
 cz101.cpp
@@ -259,7 +257,6 @@ fidel_sc8.cpp
 fidel_sc9.cpp
 fidel_vcc.cpp
 fidel_vsc.cpp
-fidelbase.cpp
 fk1.cpp
 fm7.cpp
 fmtowns.cpp
@@ -529,7 +526,6 @@ novag_diablo.cpp
 novag_presto.cpp
 novag_scon.cpp
 novag_sexpert.cpp
-novagbase.cpp
 o2.cpp
 ob68k1a.cpp
 octane.cpp

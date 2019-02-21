@@ -3,7 +3,7 @@
 // thanks-to:Berger,yoyo_chessboard
 /******************************************************************************
 *
-* fidel_desdis.cpp, subdriver of fidelbase.cpp
+* fidel_desdis.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
 
 Fidelity Designer Display series, 6502 and 68000
 (6502-based displayless Designer is in fidel_excel.cpp)
@@ -230,7 +230,7 @@ void desmas_state::fdes2325_map(address_map &map)
 ******************************************************************************/
 
 static INPUT_PORTS_START( desdis )
-	PORT_INCLUDE( fidel_cb_buttons )
+	PORT_INCLUDE( generic_cb_buttons )
 
 	PORT_START("IN.8")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_NAME("Clear")

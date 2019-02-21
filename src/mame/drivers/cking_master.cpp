@@ -3,7 +3,7 @@
 // thanks-to:Berger
 /******************************************************************************
 *
-* cking_master.cpp, subdriver of ckingbase.cpp
+* cking_master.cpp, subdriver of machine/chessbase.cpp
 
 TODO:
 - 1 WAIT CLK per M1, workaround with z80_set_cycle_tables is possible
@@ -21,7 +21,7 @@ Master: (yes, it's plainly named "Master")
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/ckingbase.h"
+#include "includes/chessbase.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/bankdev.h"
@@ -35,11 +35,13 @@ Master: (yes, it's plainly named "Master")
 
 namespace {
 
-class master_state : public ckingbase_state
+class master_state : public chessbase_state
 {
 public:
 	master_state(const machine_config &mconfig, device_type type, const char *tag) :
-		ckingbase_state(mconfig, type, tag),
+		chessbase_state(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_irq_on(*this, "irq_on"),
 		m_dac(*this, "dac"),
 		m_mainmap(*this, "mainmap")
 	{ }
@@ -51,8 +53,14 @@ public:
 
 private:
 	// devices/pointers
+	required_device<cpu_device> m_maincpu;
+	required_device<timer_device> m_irq_on;
 	required_device<dac_2bit_binary_weighted_ones_complement_device> m_dac;
 	required_device<address_map_bank_device> m_mainmap;
+
+	// periodic interrupts
+	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(Line, ASSERT_LINE); }
+	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(Line, CLEAR_LINE); }
 
 	// address maps
 	void main_map(address_map &map);
@@ -156,7 +164,7 @@ void master_state::main_trampoline(address_map &map)
 ******************************************************************************/
 
 static INPUT_PORTS_START( master )
-	PORT_INCLUDE( cking_cb_buttons )
+	PORT_INCLUDE( generic_cb_buttons )
 
 	PORT_START("IN.8")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_NAME("Change Position")
@@ -197,7 +205,7 @@ void master_state::master(machine_config &config)
 	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(22870)); // active for 22.87us
 	TIMER(config, "irq_off").configure_periodic(FUNC(master_state::irq_off<INPUT_LINE_IRQ0>), irq_period);
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(ckingbase_state::display_decay_tick), attotime::from_msec(1));
+	TIMER(config, "display_decay").configure_periodic(FUNC(master_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_ck_master);
 
 	/* sound hardware */

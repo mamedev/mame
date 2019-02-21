@@ -3,7 +3,7 @@
 // thanks-to:Berger,yoyo_chessboard
 /******************************************************************************
 *
-* fidel_vsc.cpp, subdriver of fidelbase.cpp
+* fidel_vsc.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
 
 Fidelity Excellence series hardware
 (for Excel 68000, see fidel_eag68k.cpp)
@@ -162,7 +162,7 @@ public:
 	void fdes2100(machine_config &config);
 	void fdes2000(machine_config &config);
 
-	DECLARE_INPUT_CHANGED_MEMBER(lan_bankswitch);
+	DECLARE_INPUT_CHANGED_MEMBER(speech_bankswitch);
 
 private:
 	// address maps
@@ -182,7 +182,7 @@ private:
 
 // misc handlers
 
-INPUT_CHANGED_MEMBER(excel_state::lan_bankswitch)
+INPUT_CHANGED_MEMBER(excel_state::speech_bankswitch)
 {
 	// tied to speech ROM highest bits
 	m_speech->force_update();
@@ -289,7 +289,7 @@ void excel_state::fexcelb_map(address_map &map)
 ******************************************************************************/
 
 static INPUT_PORTS_START( fexcelb )
-	PORT_INCLUDE( fidel_cb_buttons )
+	PORT_INCLUDE( generic_cb_buttons )
 
 	PORT_START("IN.8")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_NAME("Clear")
@@ -306,7 +306,7 @@ static INPUT_PORTS_START( fexcelv )
 	PORT_INCLUDE( fexcelb )
 
 	PORT_START("IN.9")
-	PORT_CONFNAME( 0x03, 0x00, DEF_STR( Language ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, excel_state, lan_bankswitch, 0)
+	PORT_CONFNAME( 0x03, 0x00, DEF_STR( Language ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, excel_state, speech_bankswitch, 0)
 	PORT_CONFSETTING(    0x00, DEF_STR( English ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( German ) )
 	PORT_CONFSETTING(    0x02, DEF_STR( French ) )

@@ -2,7 +2,7 @@
 // copyright-holders:hap
 /******************************************************************************
 *
-* fidel_phantom.cpp, subdriver of fidelbase.cpp
+* fidel_phantom.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
 
 TODO:
 - everything, this is a skeleton driver
@@ -93,7 +93,7 @@ void phantom_state::main_map(address_map &map)
 ******************************************************************************/
 
 static INPUT_PORTS_START( fphantom )
-	PORT_INCLUDE( fidel_cb_buttons )
+	PORT_INCLUDE( generic_cb_buttons )
 INPUT_PORTS_END
 
 

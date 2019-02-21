@@ -3,7 +3,7 @@
 // thanks-to:Berger,yoyo_chessboard
 /******************************************************************************
 *
-* fidel_sc9.cpp, subdriver of fidelbase.cpp
+* fidel_sc9.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
 
 *******************************************************************************
 
@@ -182,12 +182,12 @@ static INPUT_PORTS_START( sc9_sidepanel )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sc9 )
-	PORT_INCLUDE( fidel_cb_buttons )
+	PORT_INCLUDE( generic_cb_buttons )
 	PORT_INCLUDE( sc9_sidepanel )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( playmatic )
-	PORT_INCLUDE( fidel_cb_magnets )
+	PORT_INCLUDE( generic_cb_magnets )
 	PORT_INCLUDE( sc9_sidepanel )
 INPUT_PORTS_END
 

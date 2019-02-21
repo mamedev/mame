@@ -3,7 +3,7 @@
 // thanks-to:Berger
 /******************************************************************************
 *
-* novag_sexpert.cpp, subdriver of novagbase.cpp
+* novag_sexpert.cpp, subdriver of machine/novagbase.cpp, machine/chessbase.cpp
 
 TODO:
 - sforte irq active time (21.5us is too long)
@@ -286,12 +286,12 @@ static INPUT_PORTS_START( sexy_shared )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sexpert )
-	PORT_INCLUDE( novag_cb_magnets )
+	PORT_INCLUDE( generic_cb_magnets )
 	PORT_INCLUDE( sexy_shared )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sforte )
-	PORT_INCLUDE( novag_cb_buttons )
+	PORT_INCLUDE( generic_cb_buttons )
 	PORT_INCLUDE( sexy_shared )
 INPUT_PORTS_END
 

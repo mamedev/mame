@@ -2,7 +2,7 @@
 // copyright-holders:hap
 /******************************************************************************
 *
-* novag_scon.cpp, subdriver of novagbase.cpp
+* novag_scon.cpp, subdriver of machine/novagbase.cpp, machine/chessbase.cpp
 
 TODO:
 - verify IRQ and beeper frequency
@@ -113,7 +113,7 @@ void scon_state::main_map(address_map &map)
 ******************************************************************************/
 
 static INPUT_PORTS_START( scon )
-	PORT_INCLUDE( novag_cb_buttons )
+	PORT_INCLUDE( generic_cb_buttons )
 
 	PORT_MODIFY("IN.0")
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME("New Game")

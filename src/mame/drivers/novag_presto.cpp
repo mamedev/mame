@@ -3,7 +3,7 @@
 // thanks-to:Berger
 /******************************************************************************
 *
-* novag_presto.cpp, subdriver of novagbase.cpp
+* novag_presto.cpp, subdriver of machine/novagbase.cpp, machine/chessbase.cpp
 
 TODO:
 - is led handling correct? mux data needs to be auto cleared
@@ -126,7 +126,7 @@ READ8_MEMBER(presto_state::input_r)
 ******************************************************************************/
 
 static INPUT_PORTS_START( presto )
-	PORT_INCLUDE( novag_cb_buttons )
+	PORT_INCLUDE( generic_cb_buttons )
 
 	PORT_START("IN.8")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Black/White") // Octo calls it "Change Color"

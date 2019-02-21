@@ -1033,7 +1033,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"cccp",
 		"cce",
 		"ccs",
-		"chessking",
+		"chess",
 		"chromatics",
 		"chrysler",
 		"coleco",
@@ -1042,7 +1042,6 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"comx",
 		"concept",
 		"conitec",
-		"cxg",
 		"cybiko",
 		"dai",
 		"ddr",
@@ -1065,7 +1064,6 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"exidy",
 		"fairch",
 		"fairlight",
-		"fidelity",
 		"force",
 		"fujitsu",
 		"funtech",
@@ -1834,11 +1832,42 @@ files {
 	MAME_DIR .. "src/mame/drivers/ccs300.cpp",
 }
 
-createMESSProjects(_target, _subtarget, "chessking")
+createMESSProjects(_target, _subtarget, "chess")
 files {
-	MAME_DIR .. "src/mame/drivers/ckingbase.cpp",
-	MAME_DIR .. "src/mame/includes/ckingbase.h",
+	MAME_DIR .. "src/mame/machine/chessbase.cpp",
+	MAME_DIR .. "src/mame/includes/chessbase.h",
 	MAME_DIR .. "src/mame/drivers/cking_master.cpp",
+	MAME_DIR .. "src/mame/drivers/cxg_ch2001.cpp",
+
+	MAME_DIR .. "src/mame/drivers/fidelbase.cpp",
+	MAME_DIR .. "src/mame/includes/fidelbase.h",
+	MAME_DIR .. "src/mame/drivers/fidel_as12.cpp",
+	MAME_DIR .. "src/mame/drivers/fidel_card.cpp",
+	MAME_DIR .. "src/mame/drivers/fidel_cc10.cpp",
+	MAME_DIR .. "src/mame/drivers/fidel_cc7.cpp",
+	MAME_DIR .. "src/mame/drivers/fidel_chesster.cpp",
+	MAME_DIR .. "src/mame/drivers/fidel_csc.cpp",
+	MAME_DIR .. "src/mame/drivers/fidel_dames.cpp",
+	MAME_DIR .. "src/mame/drivers/fidel_desdis.cpp",
+	MAME_DIR .. "src/mame/drivers/fidel_eag68k.cpp",
+	MAME_DIR .. "src/mame/drivers/fidel_elite.cpp",
+	MAME_DIR .. "src/mame/drivers/fidel_excel.cpp",
+	MAME_DIR .. "src/mame/drivers/fidel_phantom.cpp",
+	MAME_DIR .. "src/mame/drivers/fidel_sc12.cpp",
+	MAME_DIR .. "src/mame/drivers/fidel_sc6.cpp",
+	MAME_DIR .. "src/mame/drivers/fidel_sc8.cpp",
+	MAME_DIR .. "src/mame/drivers/fidel_sc9.cpp",
+	MAME_DIR .. "src/mame/drivers/fidel_vcc.cpp",
+	MAME_DIR .. "src/mame/drivers/fidel_vsc.cpp",
+
+	MAME_DIR .. "src/mame/drivers/novagbase.cpp",
+	MAME_DIR .. "src/mame/includes/novagbase.h",
+	MAME_DIR .. "src/mame/drivers/novag_cforte.cpp",
+	MAME_DIR .. "src/mame/drivers/novag_delta1.cpp",
+	MAME_DIR .. "src/mame/drivers/novag_diablo.cpp",
+	MAME_DIR .. "src/mame/drivers/novag_presto.cpp",
+	MAME_DIR .. "src/mame/drivers/novag_scon.cpp",
+	MAME_DIR .. "src/mame/drivers/novag_sexpert.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "chromatics")
@@ -1896,13 +1925,6 @@ files {
 	MAME_DIR .. "src/mame/includes/prof80.h",
 	MAME_DIR .. "src/mame/machine/prof80mmu.cpp",
 	MAME_DIR .. "src/mame/machine/prof80mmu.h",
-}
-
-createMESSProjects(_target, _subtarget, "cxg")
-files {
-	MAME_DIR .. "src/mame/drivers/cxgbase.cpp",
-	MAME_DIR .. "src/mame/includes/cxgbase.h",
-	MAME_DIR .. "src/mame/drivers/cxg_ch2001.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "cybiko")
@@ -2128,30 +2150,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/cmi.cpp",
 	MAME_DIR .. "src/mame/audio/cmi01a.cpp",
 	MAME_DIR .. "src/mame/audio/cmi01a.h",
-}
-
-createMESSProjects(_target, _subtarget, "fidelity")
-files {
-	MAME_DIR .. "src/mame/drivers/fidelbase.cpp",
-	MAME_DIR .. "src/mame/includes/fidelbase.h",
-	MAME_DIR .. "src/mame/drivers/fidel_as12.cpp",
-	MAME_DIR .. "src/mame/drivers/fidel_card.cpp",
-	MAME_DIR .. "src/mame/drivers/fidel_cc10.cpp",
-	MAME_DIR .. "src/mame/drivers/fidel_cc7.cpp",
-	MAME_DIR .. "src/mame/drivers/fidel_chesster.cpp",
-	MAME_DIR .. "src/mame/drivers/fidel_csc.cpp",
-	MAME_DIR .. "src/mame/drivers/fidel_dames.cpp",
-	MAME_DIR .. "src/mame/drivers/fidel_desdis.cpp",
-	MAME_DIR .. "src/mame/drivers/fidel_eag68k.cpp",
-	MAME_DIR .. "src/mame/drivers/fidel_elite.cpp",
-	MAME_DIR .. "src/mame/drivers/fidel_excel.cpp",
-	MAME_DIR .. "src/mame/drivers/fidel_phantom.cpp",
-	MAME_DIR .. "src/mame/drivers/fidel_sc12.cpp",
-	MAME_DIR .. "src/mame/drivers/fidel_sc6.cpp",
-	MAME_DIR .. "src/mame/drivers/fidel_sc8.cpp",
-	MAME_DIR .. "src/mame/drivers/fidel_sc9.cpp",
-	MAME_DIR .. "src/mame/drivers/fidel_vcc.cpp",
-	MAME_DIR .. "src/mame/drivers/fidel_vsc.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "force")
@@ -2741,14 +2739,6 @@ files {
 
 createMESSProjects(_target, _subtarget, "novag")
 files {
-	MAME_DIR .. "src/mame/drivers/novagbase.cpp",
-	MAME_DIR .. "src/mame/includes/novagbase.h",
-	MAME_DIR .. "src/mame/drivers/novag_cforte.cpp",
-	MAME_DIR .. "src/mame/drivers/novag_delta1.cpp",
-	MAME_DIR .. "src/mame/drivers/novag_diablo.cpp",
-	MAME_DIR .. "src/mame/drivers/novag_presto.cpp",
-	MAME_DIR .. "src/mame/drivers/novag_scon.cpp",
-	MAME_DIR .. "src/mame/drivers/novag_sexpert.cpp",
 	MAME_DIR .. "src/mame/drivers/mk1.cpp",
 	MAME_DIR .. "src/mame/drivers/mk2.cpp",
 	MAME_DIR .. "src/mame/drivers/ssystem3.cpp",

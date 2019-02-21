@@ -3,7 +3,7 @@
 // thanks-to:Berger
 /******************************************************************************
 *
-* novag_delta1.cpp, subdriver of novagbase.cpp
+* novag_delta1.cpp, subdriver of machine/novagbase.cpp, machine/chessbase.cpp
 
 TODO:
 - ccdelta1 doesn't work, goes bonkers when you press Enter. CPU core bug?

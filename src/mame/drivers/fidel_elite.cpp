@@ -3,7 +3,7 @@
 // thanks-to:Berger
 /******************************************************************************
 *
-* fidel_elite.cpp, subdriver of fidelbase.cpp
+* fidel_elite.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
 
 Fidelity Elite A/S series hardware (EAS, EAG, PC)
 see fidel_eag68k.cpp for 68000-based EAG hardware
@@ -11,10 +11,12 @@ see fidel_eag68k.cpp for 68000-based EAG hardware
 *******************************************************************************
 
 Elite A/S Challenger (EAS)
+---------------------------------
 This came out in 1982. 2 program updates were released in 1983 and 1984,
 named Budapest and Glasgow, places where Fidelity won chess computer matches.
 A/S stands for auto sensory, it's the 1st Fidelity board with magnet sensors.
----------------------------------
+The magnetic chessboard was licensed from AVE Micro Systems, in fact it's the
+exact same one as in AVE's ARB.
 
 8*8 magnet sensors, 11 buttons, 8*(8+1) LEDs + 4*7seg LEDs
 R65C02P4 or R6502BP CPU, default frequency 3MHz*
@@ -247,7 +249,7 @@ void elite_state::pc_map(address_map &map)
 
 static INPUT_PORTS_START( eas )
 	PORT_INCLUDE( fidel_cpu_div_4 )
-	PORT_INCLUDE( fidel_cb_magnets )
+	PORT_INCLUDE( generic_cb_magnets )
 
 	PORT_MODIFY("IN.0")
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_NAME("DM")
@@ -271,7 +273,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( eag )
 	PORT_INCLUDE( fidel_cpu_div_4 )
-	PORT_INCLUDE( fidel_cb_magnets )
+	PORT_INCLUDE( generic_cb_magnets )
 
 	PORT_MODIFY("IN.0")
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_NAME("CL")
