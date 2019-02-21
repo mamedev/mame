@@ -819,7 +819,7 @@ void tsamurai_state::m660(machine_config &config)
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(24'000'000)/8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tsamurai_state::m660_map);
-	m_maincpu->set_addrmap(AS_PROGRAM, &tsamurai_state::z80_m660_io_map);
+	m_maincpu->set_addrmap(AS_IO, &tsamurai_state::z80_m660_io_map);
 
 	Z80(config, m_audiocpu, XTAL(24'000'000)/8);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &tsamurai_state::sound1_m660_map);
