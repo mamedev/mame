@@ -6,7 +6,7 @@
 * novag_diablo.cpp, subdriver of machine/novagbase.cpp, machine/chessbase.cpp
 
 TODO:
-- RS232 port (when connected, I'm only getting "New Game")
+- hook up RS232 port (when connected, I'm only getting "New Game")
 
 *******************************************************************************
 
@@ -25,6 +25,7 @@ Scorpio 68000 hardware is very similar, but with chessboard buttons and side led
 #include "emu.h"
 #include "includes/novagbase.h"
 
+#include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/mos6551.h"
 #include "machine/nvram.h"
@@ -42,7 +43,10 @@ class diablo_state : public novagbase_state
 {
 public:
 	diablo_state(const machine_config &mconfig, device_type type, const char *tag) :
-		novagbase_state(mconfig, type, tag)
+		novagbase_state(mconfig, type, tag),
+		m_screen(*this, "screen"),
+		m_acia(*this, "acia"),
+		m_rs232(*this, "rs232")
 	{ }
 
 	// machine drivers
@@ -50,6 +54,11 @@ public:
 	void scorpio68k(machine_config &config);
 
 private:
+	// devices/pointers
+	required_device<screen_device> m_screen;
+	required_device<mos6551_device> m_acia;
+	required_device<rs232_port_device> m_rs232;
+
 	// address maps
 	void diablo68k_map(address_map &map);
 	void scorpio68k_map(address_map &map);
@@ -216,19 +225,19 @@ void diablo_state::diablo68k(machine_config &config)
 	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(1100)); // active for 1.1us
 	TIMER(config, "irq_off").configure_periodic(FUNC(diablo_state::irq_off<M68K_IRQ_2>), irq_period);
 
-	mos6551_device &acia(MOS6551(config, "acia", 0));
-	acia.set_xtal(1.8432_MHz_XTAL);
+	MOS6551(config, m_acia).set_xtal(1.8432_MHz_XTAL);
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
-	screen.set_refresh_hz(60); // arbitrary
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	screen.set_size(6*16+1, 10);
-	screen.set_visarea(0, 6*16, 0, 10-1);
-	screen.set_screen_update("hd44780", FUNC(hd44780_device::screen_update));
-	screen.set_palette("palette");
+	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	m_screen->set_refresh_hz(60); // arbitrary
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_size(6*16+1, 10);
+	m_screen->set_visarea(0, 6*16, 0, 10-1);
+	m_screen->set_screen_update("hd44780", FUNC(hd44780_device::screen_update));
+	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(diablo_state::novag_lcd_palette), 3);
 

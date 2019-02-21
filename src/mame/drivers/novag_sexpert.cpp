@@ -48,7 +48,10 @@ class sexpert_state : public novagbase_state
 {
 public:
 	sexpert_state(const machine_config &mconfig, device_type type, const char *tag) :
-		novagbase_state(mconfig, type, tag)
+		novagbase_state(mconfig, type, tag),
+		m_screen(*this, "screen"),
+		m_acia(*this, "acia"),
+		m_rs232(*this, "rs232")
 	{ }
 
 	// machine drivers
@@ -59,6 +62,11 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(sexpert_cpu_freq) { sexpert_set_cpu_freq(); }
 
 protected:
+	// devices/pointers
+	required_device<screen_device> m_screen;
+	required_device<mos6551_device> m_acia;
+	required_device<rs232_port_device> m_rs232;
+
 	virtual void machine_reset() override;
 
 	void sexpert_set_cpu_freq();
@@ -312,27 +320,26 @@ void sexpert_state::sexpert(machine_config &config)
 	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(21500)); // active for 21.5us
 	TIMER(config, "irq_off").configure_periodic(FUNC(sexpert_state::irq_off<M6502_IRQ_LINE>), irq_period);
 
-	mos6551_device &acia(MOS6551(config, "acia", 0)); // R65C51P2 - RTS to CTS, DCD to GND
-	acia.set_xtal(1.8432_MHz_XTAL);
-	acia.irq_handler().set_inputline("maincpu", m65c02_device::NMI_LINE);
-	acia.rts_handler().set("acia", FUNC(mos6551_device::write_cts));
-	acia.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
-	acia.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
+	MOS6551(config, m_acia).set_xtal(1.8432_MHz_XTAL); // R65C51P2 - RTS to CTS, DCD to GND
+	m_acia->irq_handler().set_inputline("maincpu", m65c02_device::NMI_LINE);
+	m_acia->rts_handler().set("acia", FUNC(mos6551_device::write_cts));
+	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_acia->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 
-	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
-	rs232.rxd_handler().set("acia", FUNC(mos6551_device::write_rxd));
-	rs232.dsr_handler().set("acia", FUNC(mos6551_device::write_dsr));
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
+	m_rs232->rxd_handler().set("acia", FUNC(mos6551_device::write_rxd));
+	m_rs232->dsr_handler().set("acia", FUNC(mos6551_device::write_dsr));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
-	screen.set_refresh_hz(60); // arbitrary
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	screen.set_size(6*16+1, 10);
-	screen.set_visarea(0, 6*16, 0, 10-1);
-	screen.set_screen_update("hd44780", FUNC(hd44780_device::screen_update));
-	screen.set_palette("palette");
+	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	m_screen->set_refresh_hz(60); // arbitrary
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_size(6*16+1, 10);
+	m_screen->set_visarea(0, 6*16, 0, 10-1);
+	m_screen->set_screen_update("hd44780", FUNC(hd44780_device::screen_update));
+	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(sexpert_state::novag_lcd_palette), 3);
 

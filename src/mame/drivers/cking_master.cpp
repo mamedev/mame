@@ -12,11 +12,12 @@ TODO:
 
 *******************************************************************************
 
-Master: (yes, it's plainly named "Master")
-- Z80 CPU(NEC D780C-1) @ 4MHz(8MHz XTAL), IRQ from 555 timer
-- 8KB ROM(NEC D2764C-3), 2KB RAM(NEC D4016C), ROM is scrambled for easy PCB placement
-- simple I/O via 2*74373 and a 74145
-- 8*8 chessboard buttons, 32+1 border leds, piezo
+Chess King Master (yes, it's plainly named "Master")
+---------------
+Z80 CPU(NEC D780C-1) @ 4MHz(8MHz XTAL), IRQ from 555 timer
+8KB ROM(NEC D2764C-3), 2KB RAM(NEC D4016C), ROM is scrambled for easy PCB placement
+simple I/O via 2*74373 and a 74145
+8*8 chessboard buttons, 32+1 border leds, piezo
 
 ******************************************************************************/
 
@@ -210,7 +211,7 @@ void master_state::master(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	DAC_2BIT_BINARY_WEIGHTED_ONES_COMPLEMENT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	DAC_2BIT_BINARY_WEIGHTED_ONES_COMPLEMENT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
