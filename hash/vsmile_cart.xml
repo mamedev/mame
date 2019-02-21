@@ -1984,7 +1984,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="soccerchg" supported="yes">
+	<software name="soccerch" supported="yes">
 		<description>V.Smile Soccer Challenge (USA)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -2001,7 +2001,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="soccerchg" supported="yes">
+	<software name="soccerchg" cloneof="soccerch" supported="yes">
 		<description>V.Smile Fußball Schule (Ger)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
