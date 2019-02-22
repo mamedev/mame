@@ -79,17 +79,17 @@ private:
 	attotime m_watchdog_delay;
 protected:
 	u32 const m_size;
-	u32 m_offset_watchdog;
-	u32 m_offset_control;
-	u32 m_offset_seconds;
-	u32 m_offset_minutes;
-	u32 m_offset_hours;
-	u32 m_offset_day;
-	u32 m_offset_date;
-	u32 m_offset_month;
-	u32 m_offset_year;
-	u32 m_offset_century;
-	u32 m_offset_flags;
+	s32 m_offset_watchdog;
+	s32 m_offset_control;
+	s32 m_offset_seconds;
+	s32 m_offset_minutes;
+	s32 m_offset_hours;
+	s32 m_offset_day;
+	s32 m_offset_date;
+	s32 m_offset_month;
+	s32 m_offset_year;
+	s32 m_offset_century;
+	s32 m_offset_flags;
 };
 
 class m48t02_device : public timekeeper_device

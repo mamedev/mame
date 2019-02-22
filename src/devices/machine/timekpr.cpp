@@ -69,21 +69,15 @@ DEFINE_DEVICE_TYPE(MK48T12, mk48t12_device, "mk48t12", "MK48T12 Timekeeper")
     INLINE FUNCTIONS
 ***************************************************************************/
 
-static void counter_to_ram(u8 *data, u32 offset, u8 counter)
+inline void counter_to_ram(u8 *data, s32 offset, u8 counter)
 {
 	if (offset >= 0)
-	{
 		data[offset] = counter;
-	}
 }
 
-static int counter_from_ram(u8 *data, u32 offset)
+inline int counter_from_ram(u8 const *data, s32 offset, u8 unmap = 0)
 {
-	if (offset >= 0)
-	{
-		return data[offset];
-	}
-	return 0;
+	return (offset >= 0) ? data[offset] : unmap;
 }
 
 //**************************************************************************
