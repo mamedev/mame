@@ -598,24 +598,8 @@ static INPUT_PORTS_START( play2000 )
 INPUT_PORTS_END
 
 
-void gaelco2_state::init_play2000_70i()
+void gaelco2_state::init_play2000()
 {
-	// HACK
-	// the game will randomly hang on scene transitions waiting for the sound trigger / length to be clear
-	// this might be related to the problems with Touch and Go not playing all sound effects too.
-	// for now patch it
-	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
-	rom[0x23c4e/2] = 0x4e71;
-
-	m_global_spritexoff = 1; // aligns flashing sprites with backgrounds
-}
-
-void gaelco2_state::init_play2000_40i()
-{
-	// see init_play2000
-	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
-	rom[0x232ae/2] = 0x4e71;
-
 	m_global_spritexoff = 1; // aligns flashing sprites with backgrounds
 }
 
@@ -626,8 +610,6 @@ ROM_START( play2000 )
 
 	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) /* DS5002FP code - had 7.0 sticker on too */
 	// This has only been dumped from a single MCU, so there is potential for bad bits as there is risk in the dumping process.  The majority of the ROM is data and thus difficult to verify.
-	// The game still seems to get 'stuck' on some win conditions in attract (but doesn't hang, you can still coin up) it warrants investigation to see if this is MCU related and if anything
-	// odd happens during normal gameplay.  It could just be poor design.
 	ROM_LOAD( "ds5002fp_70i.mcu", 0x00000, 0x8000, BAD_DUMP CRC(b51ad3da) SHA1(4a730238b4b875c74dd2e4df6e7880d03659b7d5) )
 
 	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
@@ -2342,9 +2324,10 @@ GAME( 1998, bang,        0,         bang,             bang,     bang_state,    i
 GAME( 1998, bangj,       bang,      bang,             bang,     bang_state,    init_bang,     ROT0, "Gaelco", "Gun Gabacho (Japan)", 0 )
 
 // 2-in-1 gambling game, appears to be cloned Gaelco hardware complete with DS5002FP, or possibly manufactured by Gaelco for Nova Desitec but without any Gaelco branding.
-GAME( 1999, play2000,    0,         play2000,         play2000, gaelco2_state, init_play2000_70i,ROT0, "Nova Desitec", "Play 2000 (Super Slot & Gran Tesoro) (v7.0i) (Italy)",  0 )
-GAME( 1999, play2000_50i,play2000,  play2000,         play2000, gaelco2_state, empty_init,       ROT0, "Nova Desitec", "Play 2000 (Super Slot & Gran Tesoro) (v5.0i) (Italy)",  MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // bad dump
-GAME( 1999, play2000_40i,play2000,  play2000,         play2000, gaelco2_state, init_play2000_40i,ROT0, "Nova Desitec", "Play 2000 (Super Slot & Gran Tesoro) (v4.0i) (Italy)",  0 )
+// these are Italian versions, English versions also exist
+GAME( 1999, play2000,    0,         play2000,         play2000, gaelco2_state, init_play2000, ROT0, "Nova Desitec", "Play 2000 (Super Slot & Gran Tesoro) (v7.0i) (Italy)",  0 )
+GAME( 1999, play2000_50i,play2000,  play2000,         play2000, gaelco2_state, empty_init,    ROT0, "Nova Desitec", "Play 2000 (Super Slot & Gran Tesoro) (v5.0i) (Italy)",  MACHINE_NOT_WORKING ) // bad dump
+GAME( 1999, play2000_40i,play2000,  play2000,         play2000, gaelco2_state, init_play2000, ROT0, "Nova Desitec", "Play 2000 (Super Slot & Gran Tesoro) (v4.0i) (Italy)",  0 )
 
 // Gym exercise bike
 GAME( 1997, saltcrdi,   0,          saltcrdi,         saltcrdi, gaelco2_state, empty_init,    ROT0, "Salter Fitness / Gaelco", "Pro Tele Cardioline (Salter Fitness Bike V.1.0, Checksum 02AB)", MACHINE_NOT_WORKING ) // there are other machines in the Cardioline series, without TV displays
