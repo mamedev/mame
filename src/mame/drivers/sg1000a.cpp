@@ -468,11 +468,12 @@ WRITE8_MEMBER(sg1000a_state::sg1000a_coin_counter_w)
  *
  *************************************/
 
-MACHINE_CONFIG_START(sg1000a_state::sg1000a)
+void sg1000a_state::sg1000a(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(3'579'545))
-	MCFG_DEVICE_PROGRAM_MAP(program_map)
-	MCFG_DEVICE_IO_MAP(io_map)
+	Z80(config, m_maincpu, XTAL(3'579'545));
+	m_maincpu->set_addrmap(AS_PROGRAM, &sg1000a_state::program_map);
+	m_maincpu->set_addrmap(AS_IO, &sg1000a_state::io_map);
 
 	i8255_device &ppi(I8255(config, "ppi8255"));
 	ppi.in_pa_callback().set_ioport("P1");
@@ -490,9 +491,8 @@ MACHINE_CONFIG_START(sg1000a_state::sg1000a)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("snsnd", SN76489A, XTAL(3'579'545))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	SN76489A(config, "snsnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 void sg1000a_state::sg1000ax(machine_config &config)
 {
@@ -504,14 +504,14 @@ void sg1000a_state::sg1000ax(machine_config &config)
 	maincpu.set_decrypted_tag(":decrypted_opcodes");
 }
 
-MACHINE_CONFIG_START(sg1000a_state::sderbys)
+void sg1000a_state::sderbys(machine_config &config)
+{
 	sg1000a(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(XTAL(10'738'635) / 3)
-	MCFG_DEVICE_IO_MAP(sderby_io_map)
+	m_maincpu->set_clock(XTAL(10'738'635) / 3);
+	m_maincpu->set_addrmap(AS_IO, &sg1000a_state::sderby_io_map);
 
 	// Actually uses a Sega 315-5066 chip, which is a TMS9918 and SN76489 in the same package but with RGB output
-MACHINE_CONFIG_END
+}
 
 /*************************************
  *

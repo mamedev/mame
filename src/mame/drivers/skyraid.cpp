@@ -222,23 +222,23 @@ static GFXDECODE_START( gfx_skyraid )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(skyraid_state::skyraid)
-
+void skyraid_state::skyraid(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, 12096000 / 12)
-	MCFG_DEVICE_PROGRAM_MAP(skyraid_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", skyraid_state,  irq0_line_hold)
+	M6502(config, m_maincpu, 12096000 / 12);
+	m_maincpu->set_addrmap(AS_PROGRAM, &skyraid_state::skyraid_map);
+	m_maincpu->set_vblank_int("screen", FUNC(skyraid_state::irq0_line_hold));
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 4);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(22 * 1000000 / 15750))
-	MCFG_SCREEN_SIZE(512, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(skyraid_state, screen_update_skyraid)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(22 * 1000000 / 15750));
+	screen.set_size(512, 240);
+	screen.set_visarea(0, 511, 0, 239);
+	screen.set_screen_update(FUNC(skyraid_state::screen_update_skyraid));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_skyraid);
 
@@ -248,7 +248,7 @@ MACHINE_CONFIG_START(skyraid_state::skyraid)
 	SPEAKER(config, "mono").front_center();
 
 	DISCRETE(config, m_discrete, skyraid_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( skyraid )

@@ -293,41 +293,39 @@ IRQ_CALLBACK_MEMBER(seibucats_state::spi_irq_callback)
 }
 #endif
 
-MACHINE_CONFIG_START(seibucats_state::seibucats)
-
+void seibucats_state::seibucats(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",I386, MAIN_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(seibucats_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seibuspi_state, spi_interrupt)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(seibuspi_state, spi_irq_callback)
+	I386(config, m_maincpu, MAIN_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &seibucats_state::seibucats_map);
+	m_maincpu->set_vblank_int("screen", FUNC(seibuspi_state::spi_interrupt));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(seibuspi_state::spi_irq_callback));
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
 	//JRC6355E(config, m_rtc, XTAL(32'768));
 
-	MCFG_DEVICE_ADD("usart1", I8251, 0)
-	MCFG_DEVICE_ADD("usart2", I8251, 0)
+	I8251(config, "usart1", 0);
+	I8251(config, "usart2", 0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-//  MCFG_SCREEN_UPDATE_DRIVER(seibucats_state, screen_update)
-	MCFG_SCREEN_UPDATE_DRIVER(seibuspi_state, screen_update_sys386f)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, SPI_HTOTAL, SPI_HBEND, SPI_HBSTART, SPI_VTOTAL, SPI_VBEND, SPI_VBSTART)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+//  screen.set_screen_update(FUNC(seibucats_state::screen_update));
+	screen.set_screen_update(FUNC(seibuspi_state::screen_update_sys386f));
+	screen.set_raw(PIXEL_CLOCK, SPI_HTOTAL, SPI_HBEND, SPI_HBSTART, SPI_VTOTAL, SPI_VBEND, SPI_VBSTART);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_seibucats);
 
-	MCFG_DEVICE_ADD(m_palette, PALETTE, palette_device::BLACK, 8192);
-//  MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	//MCFG_PALETTE_INIT_OWNER(seibucats_state, seibucats)
+	PALETTE(config, m_palette, palette_device::BLACK, 8192);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymz", YMZ280B, XTAL(16'384'000))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	ymz280b_device &ymz(YMZ280B(config, "ymz", XTAL(16'384'000)));
+	ymz.add_route(0, "lspeaker", 1.0);
+	ymz.add_route(0, "rspeaker", 1.0);
+}
 
 
 /***************************************************************************

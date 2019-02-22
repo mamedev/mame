@@ -192,14 +192,14 @@ WRITE_LINE_MEMBER(sbasketb_state::vblank_irq)
 		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
-MACHINE_CONFIG_START(sbasketb_state::sbasketb)
-
+void sbasketb_state::sbasketb(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, KONAMI1, 1400000)        /* 1.400 MHz ??? */
-	MCFG_DEVICE_PROGRAM_MAP(sbasketb_map)
+	KONAMI1(config, m_maincpu, 1400000);        /* 1.400 MHz ??? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &sbasketb_state::sbasketb_map);
 
-	MCFG_DEVICE_ADD(m_audiocpu, Z80, XTAL(14'318'181) / 4) /* 3.5795 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(sbasketb_sound_map)
+	Z80(config, m_audiocpu, XTAL(14'318'181) / 4); /* 3.5795 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &sbasketb_state::sbasketb_sound_map);
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // B3
 	mainlatch.q_out_cb<0>().set(FUNC(sbasketb_state::flipscreen_w)); // FLIP
@@ -213,14 +213,14 @@ MACHINE_CONFIG_START(sbasketb_state::sbasketb)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(sbasketb_state, screen_update_sbasketb)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sbasketb_state, vblank_irq))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(sbasketb_state::screen_update_sbasketb));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(sbasketb_state::vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sbasketb);
 	PALETTE(config, m_palette, FUNC(sbasketb_state::sbasketb_palette), 16*16+16*16*16, 256);
@@ -230,25 +230,24 @@ MACHINE_CONFIG_START(sbasketb_state::sbasketb)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD(m_soundbrd, TRACKFLD_AUDIO, 0, m_audiocpu, m_vlm)
+	TRACKFLD_AUDIO(config, m_soundbrd, 0, m_audiocpu, m_vlm);
 
 	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // unknown DAC
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
-	MCFG_DEVICE_ADD(m_sn, SN76489, XTAL(14'318'181) / 8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	SN76489(config, m_sn, XTAL(14'318'181) / 8).add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	MCFG_DEVICE_ADD(m_vlm, VLM5030, XTAL(3'579'545)) /* Schematics say 3.58MHz, but board uses 3.579545MHz xtal */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-MACHINE_CONFIG_END
+	VLM5030(config, m_vlm, XTAL(3'579'545)).add_route(ALL_OUTPUTS, "speaker", 1.0); /* Schematics say 3.58MHz, but board uses 3.579545MHz xtal */
+}
 
-MACHINE_CONFIG_START(sbasketb_state::sbasketbu)
+void sbasketb_state::sbasketbu(machine_config &config)
+{
 	sbasketb(config);
-	MCFG_DEVICE_REPLACE(m_maincpu, MC6809E, 1400000)        /* 6809E at 1.400 MHz ??? */
-	MCFG_DEVICE_PROGRAM_MAP(sbasketb_map)
-MACHINE_CONFIG_END
+	MC6809E(config.replace(), m_maincpu, 1400000);        /* 6809E at 1.400 MHz ??? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &sbasketb_state::sbasketb_map);
+}
 
 
 

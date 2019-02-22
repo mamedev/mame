@@ -525,14 +525,15 @@ void sf7000_state::machine_reset()
 ***************************************************************************/
 
 /*-------------------------------------------------
-    MACHINE_CONFIG_START( sg1000 )
+    machine_config( sg1000 )
 -------------------------------------------------*/
 
-MACHINE_CONFIG_START(sg1000_state::sg1000)
+void sg1000_state::sg1000(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(10'738'635)/3)
-	MCFG_DEVICE_PROGRAM_MAP(sg1000_map)
-	MCFG_DEVICE_IO_MAP(sg1000_io_map)
+	Z80(config, m_maincpu, XTAL(10'738'635)/3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sg1000_state::sg1000_map);
+	m_maincpu->set_addrmap(AS_IO, &sg1000_state::sg1000_io_map);
 
 	/* video hardware */
 	tms9918a_device &vdp(TMS9918A(config, TMS9918A_TAG, XTAL(10'738'635)));
@@ -544,8 +545,7 @@ MACHINE_CONFIG_START(sg1000_state::sg1000)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD(SN76489AN_TAG, SN76489A, XTAL(10'738'635)/3)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	SN76489A(config, SN76489AN_TAG, XTAL(10'738'635)/3).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* expansion slot */
 	SG1000_EXPANSION_SLOT(config, m_sgexpslot, sg1000_expansion_devices, nullptr, false);
@@ -558,33 +558,35 @@ MACHINE_CONFIG_START(sg1000_state::sg1000)
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("1K");
-MACHINE_CONFIG_END
+}
 
 /*-------------------------------------------------
-    MACHINE_CONFIG_START( omv )
+    machine_config( omv )
 -------------------------------------------------*/
 
-MACHINE_CONFIG_START(sg1000_state::omv)
+void sg1000_state::omv(machine_config &config)
+{
 	sg1000(config);
-	MCFG_DEVICE_MODIFY(Z80_TAG)
-	MCFG_DEVICE_PROGRAM_MAP(omv_map)
-	MCFG_DEVICE_IO_MAP(omv_io_map)
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &sg1000_state::omv_map);
+	m_maincpu->set_addrmap(AS_IO, &sg1000_state::omv_io_map);
 
 	config.device_remove(CARTSLOT_TAG);
 	OMV_CART_SLOT(config, CARTSLOT_TAG, sg1000_cart, nullptr);
 
 	m_ram->set_default_size("2K");
-MACHINE_CONFIG_END
+}
 
 /*-------------------------------------------------
-    MACHINE_CONFIG_START( sc3000 )
+    machine_config( sc3000 )
 -------------------------------------------------*/
 
-MACHINE_CONFIG_START(sc3000_state::sc3000)
+void sc3000_state::sc3000(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(10'738'635)/3) // LH0080A
-	MCFG_DEVICE_PROGRAM_MAP(sc3000_map)
-	MCFG_DEVICE_IO_MAP(sc3000_io_map)
+	Z80(config, m_maincpu, XTAL(10'738'635)/3); // LH0080A
+	m_maincpu->set_addrmap(AS_PROGRAM, &sc3000_state::sc3000_map);
+	m_maincpu->set_addrmap(AS_IO, &sc3000_state::sc3000_io_map);
 
 	/* video hardware */
 	tms9918a_device &vdp(TMS9918A(config, TMS9918A_TAG, XTAL(10'738'635)));
@@ -596,8 +598,7 @@ MACHINE_CONFIG_START(sc3000_state::sc3000)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD(SN76489AN_TAG, SN76489A, XTAL(10'738'635)/3)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	SN76489A(config, SN76489AN_TAG, XTAL(10'738'635)/3).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* sc3000 has all sk1100 features built-in, so add it as a fixed slot */
 	SG1000_EXPANSION_SLOT(config, m_sgexpslot, sg1000_expansion_devices, "sk1100", true);
@@ -611,17 +612,18 @@ MACHINE_CONFIG_START(sc3000_state::sc3000)
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("2K");
-MACHINE_CONFIG_END
+}
 
 /*-------------------------------------------------
-    MACHINE_CONFIG_START( sf7000 )
+    machine_config( sf7000 )
 -------------------------------------------------*/
 
-MACHINE_CONFIG_START(sf7000_state::sf7000)
+void sf7000_state::sf7000(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(10'738'635)/3)
-	MCFG_DEVICE_PROGRAM_MAP(sf7000_map)
-	MCFG_DEVICE_IO_MAP(sf7000_io_map)
+	Z80(config, m_maincpu, XTAL(10'738'635)/3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sf7000_state::sf7000_map);
+	m_maincpu->set_addrmap(AS_IO, &sf7000_state::sf7000_io_map);
 
 	/* video hardware */
 	tms9918a_device &vdp(TMS9918A(config, TMS9918A_TAG, XTAL(10'738'635)));
@@ -633,8 +635,7 @@ MACHINE_CONFIG_START(sf7000_state::sf7000)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD(SN76489AN_TAG, SN76489A, XTAL(10'738'635)/3)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	SN76489A(config, SN76489AN_TAG, XTAL(10'738'635)/3).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* devices */
 	i8255_device &ppi(I8255(config, UPD9255_1_TAG));
@@ -667,7 +668,7 @@ MACHINE_CONFIG_START(sf7000_state::sf7000)
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("64K");
-MACHINE_CONFIG_END
+}
 
 /***************************************************************************
     ROMS

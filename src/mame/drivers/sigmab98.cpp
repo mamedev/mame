@@ -2841,11 +2841,12 @@ INTERRUPT_GEN_MEMBER(sigmab98_state::sigmab98_vblank_interrupt)
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x5a);
 }
 
-MACHINE_CONFIG_START(sigmab98_state::sigmab98)
-	MCFG_DEVICE_ADD("maincpu", Z80, 10000000)  // !! TAXAN KY-80, clock @X1? !!
-	MCFG_DEVICE_PROGRAM_MAP(gegege_mem_map)
-	MCFG_DEVICE_IO_MAP(gegege_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sigmab98_state,  sigmab98_vblank_interrupt)
+void sigmab98_state::sigmab98(machine_config &config)
+{
+	Z80(config, m_maincpu, 10000000);  // !! TAXAN KY-80, clock @X1? !!
+	m_maincpu->set_addrmap(AS_PROGRAM, &sigmab98_state::gegege_mem_map);
+	m_maincpu->set_addrmap(AS_IO, &sigmab98_state::gegege_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(sigmab98_state::sigmab98_vblank_interrupt));
 
 	MCFG_MACHINE_RESET_OVERRIDE(sigmab98_state, sigmab98)
 
@@ -2855,13 +2856,13 @@ MACHINE_CONFIG_START(sigmab98_state::sigmab98)
 	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW );
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)                    // ?
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)   // game reads vblank state
-	MCFG_SCREEN_SIZE(0x140, 0x100)
-	MCFG_SCREEN_VISIBLE_AREA(0,0x140-1, 0,0xf0-1)
-	MCFG_SCREEN_UPDATE_DRIVER(sigmab98_state, screen_update_sigmab98)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);                    // ?
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);   // game reads vblank state
+	m_screen->set_size(0x140, 0x100);
+	m_screen->set_visarea(0,0x140-1, 0,0xf0-1);
+	m_screen->set_screen_update(FUNC(sigmab98_state::screen_update_sigmab98));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sigmab98);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x1000 + 1);
@@ -2873,33 +2874,36 @@ MACHINE_CONFIG_START(sigmab98_state::sigmab98)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymz", YMZ280B, 16934400)    // clock @X2?
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	ymz280b_device &ymz(YMZ280B(config, "ymz", 16934400));    // clock @X2?
+	ymz.add_route(0, "lspeaker", 1.0);
+	ymz.add_route(1, "rspeaker", 1.0);
+}
 
-MACHINE_CONFIG_START(sigmab98_state::dodghero)
+void sigmab98_state::dodghero(machine_config &config)
+{
 	sigmab98(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP( dodghero_mem_map )
-	MCFG_DEVICE_IO_MAP( dodghero_io_map )
-MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(sigmab98_state::gegege)
-	sigmab98(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP( gegege_mem_map )
-	MCFG_DEVICE_IO_MAP( gegege_io_map )
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &sigmab98_state::dodghero_mem_map);
+	m_maincpu->set_addrmap(AS_IO, &sigmab98_state::dodghero_io_map);
+}
 
-MACHINE_CONFIG_START(sigmab98_state::dashhero)
+void sigmab98_state::gegege(machine_config &config)
+{
 	sigmab98(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP( gegege_mem_map )
-	MCFG_DEVICE_IO_MAP( dashhero_io_map )
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &sigmab98_state::gegege_mem_map);
+	m_maincpu->set_addrmap(AS_IO, &sigmab98_state::gegege_io_map);
+}
+
+void sigmab98_state::dashhero(machine_config &config)
+{
+	sigmab98(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &sigmab98_state::gegege_mem_map);
+	m_maincpu->set_addrmap(AS_IO, &sigmab98_state::dashhero_io_map);
 
 	config.device_remove("nvram"); // FIXME: does not survive between sessions otherwise
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************
@@ -2924,10 +2928,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(lufykzku_state::lufykzku_irq)
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_timer1_vector); // this needs to be called often or the state of the door is not read at boot (at least 5 times before bb9 is called)
 }
 
-MACHINE_CONFIG_START(lufykzku_state::lufykzku)
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(20'000'000) / 2)  // !! TAXAN KY-80, clock @X1? !!
-	MCFG_DEVICE_PROGRAM_MAP(lufykzku_mem_map)
-	MCFG_DEVICE_IO_MAP(lufykzku_io_map)
+void lufykzku_state::lufykzku(machine_config &config)
+{
+	Z80(config, m_maincpu, XTAL(20'000'000) / 2);  // !! TAXAN KY-80, clock @X1? !!
+	m_maincpu->set_addrmap(AS_PROGRAM, &lufykzku_state::lufykzku_mem_map);
+	m_maincpu->set_addrmap(AS_IO, &lufykzku_state::lufykzku_io_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(lufykzku_state::lufykzku_irq), "screen", 0, 1);
 
 	MCFG_MACHINE_RESET_OVERRIDE(lufykzku_state, lufykzku)
@@ -2935,7 +2940,7 @@ MACHINE_CONFIG_START(lufykzku_state::lufykzku)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);   // battery backed RAM
 	// No EEPROM
 
-	MCFG_DEVICE_ADD("watchdog_mb3773", MB3773, 0)
+	MB3773(config, m_watchdog, 0);
 	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW );
 
 	// 2 x 8-bit parallel/serial converters
@@ -2948,13 +2953,13 @@ MACHINE_CONFIG_START(lufykzku_state::lufykzku)
 	m_dsw_shifter[1]->qh_callback().set(FUNC(lufykzku_state::dsw_w));
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)                    // ?
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)   // game reads vblank state
-	MCFG_SCREEN_SIZE(0x140, 0x100)
-	MCFG_SCREEN_VISIBLE_AREA(0,0x140-1, 0,0xf0-1)
-	MCFG_SCREEN_UPDATE_DRIVER(sigmab98_state, screen_update_sigmab98)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);                    // ?
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);   // game reads vblank state
+	m_screen->set_size(0x140, 0x100);
+	m_screen->set_visarea(0,0x140-1, 0,0xf0-1);
+	m_screen->set_screen_update(FUNC(sigmab98_state::screen_update_sigmab98));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lufykzku);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x1000 + 1);
@@ -2965,10 +2970,10 @@ MACHINE_CONFIG_START(lufykzku_state::lufykzku)
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("oki", OKIM9810, XTAL(4'096'000))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
-MACHINE_CONFIG_END
+	okim9810_device &oki(OKIM9810(config, "oki", XTAL(4'096'000)));
+	oki.add_route(0, "lspeaker", 0.80);
+	oki.add_route(1, "rspeaker", 0.80);
+}
 
 
 /***************************************************************************
@@ -2994,10 +2999,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(sigmab98_state::sammymdl_irq)
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_timer1_vector);
 }
 
-MACHINE_CONFIG_START(sigmab98_state::sammymdl)
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(20'000'000) / 2)    // !! KL5C80A120FP @ 10MHz? (actually 4 times faster than Z80) !!
-	MCFG_DEVICE_PROGRAM_MAP( animalc_map )
-	MCFG_DEVICE_IO_MAP( animalc_io )
+void sigmab98_state::sammymdl(machine_config &config)
+{
+	Z80(config, m_maincpu, XTAL(20'000'000) / 2);    // !! KL5C80A120FP @ 10MHz? (actually 4 times faster than Z80) !!
+	m_maincpu->set_addrmap(AS_PROGRAM, &sigmab98_state::animalc_map);
+	m_maincpu->set_addrmap(AS_IO, &sigmab98_state::animalc_io);
+
 	TIMER(config, "scantimer").configure_scanline(FUNC(sigmab98_state::sammymdl_irq), "screen", 0, 1);
 
 	MCFG_MACHINE_RESET_OVERRIDE(sigmab98_state, sammymdl )
@@ -3010,14 +3017,14 @@ MACHINE_CONFIG_START(sigmab98_state::sammymdl)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)                    // ?
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)   // game reads vblank state
-	MCFG_SCREEN_SIZE(0x140, 0x100)
-	MCFG_SCREEN_VISIBLE_AREA(0, 0x140-1, 0, 0xf0-1)
-	MCFG_SCREEN_UPDATE_DRIVER(sigmab98_state, screen_update_sigmab98)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sigmab98_state, screen_vblank_sammymdl))
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);                    // ?
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);   // game reads vblank state
+	m_screen->set_size(0x140, 0x100);
+	m_screen->set_visarea(0, 0x140-1, 0, 0xf0-1);
+	m_screen->set_screen_update(FUNC(sigmab98_state::screen_update_sigmab98));
+	m_screen->screen_vblank().set(FUNC(sigmab98_state::screen_vblank_sammymdl));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sigmab98);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x1000 + 1);
@@ -3029,59 +3036,64 @@ MACHINE_CONFIG_START(sigmab98_state::sammymdl)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("oki", OKIM9810, XTAL(4'096'000))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
-MACHINE_CONFIG_END
+	okim9810_device &oki(OKIM9810(config, "oki", XTAL(4'096'000)));
+	oki.add_route(0, "lspeaker", 0.80);
+	oki.add_route(1, "rspeaker", 0.80);
+}
 
-MACHINE_CONFIG_START(sigmab98_state::animalc)
+void sigmab98_state::animalc(machine_config &config)
+{
 	sammymdl(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP( animalc_map )
-	MCFG_DEVICE_IO_MAP( animalc_io )
-MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(sigmab98_state::gocowboy)
+	m_maincpu->set_addrmap(AS_PROGRAM, &sigmab98_state::animalc_map);
+	m_maincpu->set_addrmap(AS_IO, &sigmab98_state::animalc_io);
+}
+
+void sigmab98_state::gocowboy(machine_config &config)
+{
 	sammymdl(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP( gocowboy_map )
-	MCFG_DEVICE_IO_MAP( gocowboy_io )
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &sigmab98_state::gocowboy_map);
+	m_maincpu->set_addrmap(AS_IO, &sigmab98_state::gocowboy_io);
 
 	config.device_remove("hopper");
 	TICKET_DISPENSER(config, m_hopper_small, attotime::from_msec(1000), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW );
 	TICKET_DISPENSER(config, m_hopper_large, attotime::from_msec(1000), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW );
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(sigmab98_state::haekaka)
+void sigmab98_state::haekaka(machine_config &config)
+{
 	sammymdl(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP( haekaka_map )
-	MCFG_DEVICE_IO_MAP( haekaka_io )
-MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(sigmab98_state::itazuram)
+	m_maincpu->set_addrmap(AS_PROGRAM, &sigmab98_state::haekaka_map);
+	m_maincpu->set_addrmap(AS_IO, &sigmab98_state::haekaka_io);
+}
+
+void sigmab98_state::itazuram(machine_config &config)
+{
 	sammymdl(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP( itazuram_map )
-	MCFG_DEVICE_IO_MAP( itazuram_io )
-MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(sigmab98_state::pyenaget)
+	m_maincpu->set_addrmap(AS_PROGRAM, &sigmab98_state::itazuram_map);
+	m_maincpu->set_addrmap(AS_IO, &sigmab98_state::itazuram_io);
+}
+
+void sigmab98_state::pyenaget(machine_config &config)
+{
 	sammymdl(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP( haekaka_map )
-	MCFG_DEVICE_IO_MAP( pyenaget_io )
-MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(sigmab98_state::tdoboon)
+	m_maincpu->set_addrmap(AS_PROGRAM, &sigmab98_state::haekaka_map);
+	m_maincpu->set_addrmap(AS_IO, &sigmab98_state::pyenaget_io);
+}
+
+void sigmab98_state::tdoboon(machine_config &config)
+{
 	sammymdl(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP( tdoboon_map )
-	MCFG_DEVICE_IO_MAP( tdoboon_io )
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0,0x140-1, 0+4,0xf0+4-1)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &sigmab98_state::tdoboon_map);
+	m_maincpu->set_addrmap(AS_IO, &sigmab98_state::tdoboon_io);
+
+	m_screen->set_visarea(0,0x140-1, 0+4,0xf0+4-1);
+}
 
 
 /***************************************************************************

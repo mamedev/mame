@@ -599,149 +599,143 @@ GFXDECODE_END
 *      Machine Drivers      *
 ****************************/
 
-MACHINE_CONFIG_START(sderby_state::sderby)
-
-	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)
-	MCFG_DEVICE_PROGRAM_MAP(sderby_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sderby_state,  irq2_line_hold)
+void sderby_state::sderby(machine_config &config)
+{
+	M68000(config, m_maincpu, 12000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sderby_state::sderby_map);
+	m_maincpu->set_vblank_int("screen", FUNC(sderby_state::irq2_line_hold));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA(4*8, 44*8-1, 3*8, 33*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(sderby_state, screen_update_sderby)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 64*8);
+	screen.set_visarea(4*8, 44*8-1, 3*8, 33*8-1);
+	screen.set_screen_update(FUNC(sderby_state::screen_update_sderby));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sderby);
 	PALETTE(config, m_palette).set_format(palette_device::RGBx_555, 0x1000);
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) /* clock frequency & pin 7 not verified */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); /* clock frequency & pin 7 not verified */
+}
 
-MACHINE_CONFIG_START(sderby_state::sderbya)
-
-	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)
-	MCFG_DEVICE_PROGRAM_MAP(sderbya_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sderby_state,  irq2_line_hold)
+void sderby_state::sderbya(machine_config &config)
+{
+	M68000(config, m_maincpu, 12000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sderby_state::sderbya_map);
+	m_maincpu->set_vblank_int("screen", FUNC(sderby_state::irq2_line_hold));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA(4*8, 44*8-1, 3*8, 33*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(sderby_state, screen_update_sderby)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 64*8);
+	screen.set_visarea(4*8, 44*8-1, 3*8, 33*8-1);
+	screen.set_screen_update(FUNC(sderby_state::screen_update_sderby));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sderby);
 	PALETTE(config, m_palette).set_format(palette_device::RGBx_555, 0x1000);
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) /* clock frequency & pin 7 not verified */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); /* clock frequency & pin 7 not verified */
+}
 
-MACHINE_CONFIG_START(sderby_state::luckboom)
-
-	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)
-	MCFG_DEVICE_PROGRAM_MAP(luckboom_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sderby_state,  irq4_line_hold)
+void sderby_state::luckboom(machine_config &config)
+{
+	M68000(config, m_maincpu, 12000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sderby_state::luckboom_map);
+	m_maincpu->set_vblank_int("screen", FUNC(sderby_state::irq4_line_hold));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA(4*8, 44*8-1, 3*8, 33*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(sderby_state, screen_update_sderby)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 64*8);
+	screen.set_visarea(4*8, 44*8-1, 3*8, 33*8-1);
+	screen.set_screen_update(FUNC(sderby_state::screen_update_sderby));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sderby);
 	PALETTE(config, m_palette).set_format(palette_device::RGBx_555, 0x1000);
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) /* clock frequency & pin 7 not verified */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); /* clock frequency & pin 7 not verified */
+}
 
-MACHINE_CONFIG_START(sderby_state::spacewin)
-
-	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)
-	MCFG_DEVICE_PROGRAM_MAP(spacewin_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sderby_state,  irq2_line_hold)
+void sderby_state::spacewin(machine_config &config)
+{
+	M68000(config, m_maincpu, 12000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sderby_state::spacewin_map);
+	m_maincpu->set_vblank_int("screen", FUNC(sderby_state::irq2_line_hold));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA(4*8, 44*8-1, 3*8, 33*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(sderby_state, screen_update_pmroulet)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 64*8);
+	screen.set_visarea(4*8, 44*8-1, 3*8, 33*8-1);
+	screen.set_screen_update(FUNC(sderby_state::screen_update_pmroulet));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sderby);
 	PALETTE(config, m_palette).set_format(palette_device::RGBx_555, 0x1000);
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) /* clock frequency & pin 7 not verified */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); /* clock frequency & pin 7 not verified */
+}
 
-MACHINE_CONFIG_START(sderby_state::shinygld)
-
-	MCFG_DEVICE_ADD("maincpu", M68000, 24_MHz_XTAL / 2) // verified
-	MCFG_DEVICE_PROGRAM_MAP(shinygld_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sderby_state, irq4_line_hold)
+void sderby_state::shinygld(machine_config &config)
+{
+	M68000(config, m_maincpu, 24_MHz_XTAL / 2); // verified
+	m_maincpu->set_addrmap(AS_PROGRAM, &sderby_state::shinygld_map);
+	m_maincpu->set_vblank_int("screen", FUNC(sderby_state::irq4_line_hold));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57.47) // measured on PCB
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA(4*8, 44*8-1, 3*8, 33*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(sderby_state, screen_update_sderby)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(57.47); // measured on PCB
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 64*8);
+	screen.set_visarea(4*8, 44*8-1, 3*8, 33*8-1);
+	screen.set_screen_update(FUNC(sderby_state::screen_update_sderby));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sderby);
 	PALETTE(config, m_palette).set_format(palette_device::RGBx_555, 0x1000);
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH) /* clock frequency & pin 7 verified */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki", 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); /* clock frequency & pin 7 verified */
+}
 
-MACHINE_CONFIG_START(sderby_state::pmroulet)
-
-	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)
-	MCFG_DEVICE_PROGRAM_MAP(roulette_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sderby_state,  irq2_line_hold)
+void sderby_state::pmroulet(machine_config &config)
+{
+	M68000(config, m_maincpu, 12000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sderby_state::roulette_map);
+	m_maincpu->set_vblank_int("screen", FUNC(sderby_state::irq2_line_hold));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(64*8, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA(4*8, 44*8-1, 3*8, 33*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(sderby_state, screen_update_pmroulet)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(64*8, 64*8);
+	screen.set_visarea(4*8, 44*8-1, 3*8, 33*8-1);
+	screen.set_screen_update(FUNC(sderby_state::screen_update_pmroulet));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sderby);
 	PALETTE(config, m_palette).set_format(palette_device::RGBx_555, 0x1000);
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) /* clock frequency & pin 7 not verified */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); /* clock frequency & pin 7 not verified */
+}
 
 
 /****************************

@@ -412,21 +412,22 @@ void sbowling_state::sbowling_palette(palette_device &palette) const
 	}
 }
 
-MACHINE_CONFIG_START(sbowling_state::sbowling)
-	MCFG_DEVICE_ADD("maincpu", I8080, XTAL(19'968'000)/10)   /* ? */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_IO_MAP(port_map)
+void sbowling_state::sbowling(machine_config &config)
+{
+	I8080(config, m_maincpu, XTAL(19'968'000)/10);   /* ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &sbowling_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &sbowling_state::port_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(sbowling_state::interrupt), "screen", 0, 1);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(32*8, 262)     /* vert size taken from mw8080bw */
-	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 4*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(sbowling_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_size(32*8, 262);     /* vert size taken from mw8080bw */
+	screen.set_visarea(1*8, 31*8-1, 4*8, 32*8-1);
+	screen.set_screen_update(FUNC(sbowling_state::screen_update));
+	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_sbowling);
 
@@ -436,7 +437,7 @@ MACHINE_CONFIG_START(sbowling_state::sbowling)
 	SPEAKER(config, "mono").front_center();
 
 	AY8910(config, "aysnd", XTAL(19'968'000)/16).add_route(ALL_OUTPUTS, "mono", 0.33);  /* ? */
-MACHINE_CONFIG_END
+}
 
 ROM_START( sbowling )
 	ROM_REGION( 0x10000, "maincpu", 0 )

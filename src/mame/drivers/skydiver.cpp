@@ -335,12 +335,12 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(skydiver_state::skydiver)
-
+void skydiver_state::skydiver(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6800, 12.096_MHz_XTAL / 16)     /* ???? */
-	MCFG_DEVICE_PROGRAM_MAP(skydiver_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(skydiver_state, interrupt,  5*60)
+	M6800(config, m_maincpu, 12.096_MHz_XTAL / 16);     /* ???? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &skydiver_state::skydiver_map);
+	m_maincpu->set_periodic_int(FUNC(skydiver_state::interrupt), attotime::from_hz(5*60));
 
 	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 8);    // 128V clocks the same as VBLANK
 
@@ -372,10 +372,10 @@ MACHINE_CONFIG_START(skydiver_state::skydiver)
 	latch3.q_out_cb<7>().set("discrete", FUNC(discrete_device::write_line<SKYDIVER_NOISE_RST>));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(12.096_MHz_XTAL / 2, 384, 0, 256, 262, 0, 224)
-	MCFG_SCREEN_UPDATE_DRIVER(skydiver_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(12.096_MHz_XTAL / 2, 384, 0, 256, 262, 0, 224);
+	screen.set_screen_update(FUNC(skydiver_state::screen_update));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_skydiver);
 	PALETTE(config, m_palette, FUNC(skydiver_state::skydiver_palette), ARRAY_LENGTH(colortable_source));
@@ -384,7 +384,7 @@ MACHINE_CONFIG_START(skydiver_state::skydiver)
 	SPEAKER(config, "mono").front_center();
 
 	DISCRETE(config, m_discrete, skydiver_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
-MACHINE_CONFIG_END
+}
 
 
 

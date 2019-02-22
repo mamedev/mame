@@ -214,11 +214,11 @@ INPUT_PORTS_END
 /* machine driver */
 
 
-MACHINE_CONFIG_START(sbugger_state::sbugger)
-
-	MCFG_DEVICE_ADD("maincpu", I8085A, 6000000)        /* 3.00 MHz??? */
-	MCFG_DEVICE_PROGRAM_MAP(sbugger_map)
-	MCFG_DEVICE_IO_MAP(sbugger_io_map)
+void sbugger_state::sbugger(machine_config &config)
+{
+	I8085A(config, m_maincpu, 6000000);        /* 3.00 MHz??? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &sbugger_state::sbugger_map);
+	m_maincpu->set_addrmap(AS_IO, &sbugger_state::sbugger_io_map);
 
 	i8156_device &i8156(I8156(config, "i8156", 200000));     /* freq is an approximation */
 	i8156.in_pa_callback().set_ioport("INPUTS");
@@ -228,25 +228,23 @@ MACHINE_CONFIG_START(sbugger_state::sbugger)
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_sbugger);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(sbugger_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 64*8-1, 0*8, 32*8-1);
+	screen.set_screen_update(FUNC(sbugger_state::screen_update));
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(sbugger_state::sbugger_palette), 512);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("sn76489.1", SN76489, 3000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	SN76489(config, "sn76489.1", 3000000).add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("sn76489.2", SN76489, 3000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	SN76489(config, "sn76489.2", 3000000).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 /* rom loading */

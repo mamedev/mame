@@ -2309,11 +2309,12 @@ INTERRUPT_GEN_MEMBER(seta2_state::samshoot_interrupt)
 	m_tmp68301->external_interrupt_2();   // to do: hook up x1-10 interrupts
 }
 
-MACHINE_CONFIG_START(seta2_state::seta2)
-	MCFG_DEVICE_ADD(m_maincpu, M68301, XTAL(50'000'000)/3)   // !! TMP68301 !!
-	MCFG_DEVICE_PROGRAM_MAP(mj4simai_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta2_state,  seta2_interrupt)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("tmp68301",tmp68301_device,irq_callback)
+void seta2_state::seta2(machine_config &config)
+{
+	M68301(config, m_maincpu, XTAL(50'000'000)/3);   // !! TMP68301 !!
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta2_state::mj4simai_map);
+	m_maincpu->set_vblank_int("screen", FUNC(seta2_state::seta2_interrupt));
+	m_maincpu->set_irq_acknowledge_callback("tmp68301", FUNC(tmp68301_device::irq_callback));
 
 	TMP68301(config, m_tmp68301, 0);
 	m_tmp68301->set_cputag(m_maincpu);
@@ -2321,15 +2322,15 @@ MACHINE_CONFIG_START(seta2_state::seta2)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(0x200, 0x100)
-	MCFG_SCREEN_VISIBLE_AREA(0x00, 0x180-1, 0x00, 0xf0-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta2_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, seta2_state, screen_vblank))
-	MCFG_SCREEN_PALETTE(m_palette)
-	//MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_size(0x200, 0x100);
+	m_screen->set_visarea(0x00, 0x180-1, 0x00, 0xf0-1);
+	m_screen->set_screen_update(FUNC(seta2_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(seta2_state::screen_vblank));
+	m_screen->set_palette(m_palette);
+	//m_screen->set_video_attributes(VIDEO_UPDATE_SCANLINE);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_seta2);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x8000+0xf0);    // extra 0xf0 because we might draw 256-color object with 16-color granularity
@@ -2337,16 +2338,16 @@ MACHINE_CONFIG_START(seta2_state::seta2)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, XTAL(50'000'000)/3)   // clock?
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(0, x1_map)
-MACHINE_CONFIG_END
+	x1_010_device &x1snd(X1_010(config, "x1snd", XTAL(50'000'000)/3));   // clock?
+	x1snd.add_route(ALL_OUTPUTS, "mono", 1.0);
+	x1snd.set_addrmap(0, &seta2_state::x1_map);
+}
 
 
-MACHINE_CONFIG_START(seta2_state::gundamex)
+void seta2_state::gundamex(machine_config &config)
+{
 	seta2(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(gundamex_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta2_state::gundamex_map);
 
 	m_tmp68301->in_parallel_callback().set(FUNC(seta2_state::gundamex_eeprom_r));
 	m_tmp68301->out_parallel_callback().set(FUNC(seta2_state::gundamex_eeprom_w));
@@ -2354,125 +2355,117 @@ MACHINE_CONFIG_START(seta2_state::gundamex)
 	EEPROM_93C46_16BIT(config, "eeprom");
 
 	// video hardware
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0x00, 0x180-1, 0x000, 0x0e0-1)
-MACHINE_CONFIG_END
+	m_screen->set_visarea(0x00, 0x180-1, 0x000, 0x0e0-1);
+}
 
 
-MACHINE_CONFIG_START(seta2_state::grdians)
+void seta2_state::grdians(machine_config &config)
+{
 	seta2(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(grdians_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta2_state::grdians_map);
 
 	// video hardware
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0x00, 0x130-1, 0x00, 0xe8 -1)
-MACHINE_CONFIG_END
+	m_screen->set_visarea(0x00, 0x130-1, 0x00, 0xe8 -1);
+}
 
 
-MACHINE_CONFIG_START(seta2_state::myangel)
+void seta2_state::myangel(machine_config &config)
+{
 	seta2(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(myangel_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta2_state::myangel_map);
 
 	// video hardware
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, 0x178-1, 0x00, 0xf0-1)
-MACHINE_CONFIG_END
+	m_screen->set_visarea(0, 0x178-1, 0x00, 0xf0-1);
+}
 
 
-MACHINE_CONFIG_START(seta2_state::myangel2)
+void seta2_state::myangel2(machine_config &config)
+{
 	seta2(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(myangel2_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta2_state::myangel2_map);
 
 	// video hardware
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, 0x178-1, 0x00, 0xf0-1)
-MACHINE_CONFIG_END
+	m_screen->set_visarea(0, 0x178-1, 0x00, 0xf0-1);
+}
 
 
-MACHINE_CONFIG_START(seta2_state::pzlbowl)
+void seta2_state::pzlbowl(machine_config &config)
+{
 	seta2(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(pzlbowl_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta2_state::pzlbowl_map);
 
 	// video hardware
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0x00, 0x180-1, 0x00, 0xf0-1)
-MACHINE_CONFIG_END
+	m_screen->set_visarea(0x00, 0x180-1, 0x00, 0xf0-1);
+}
 
 
-MACHINE_CONFIG_START(seta2_state::penbros)
+void seta2_state::penbros(machine_config &config)
+{
 	seta2(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(penbros_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta2_state::penbros_map);
 
 	// video hardware
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, 0x140-1, 0x00, 0xe0-1)
-MACHINE_CONFIG_END
+	m_screen->set_visarea(0, 0x140-1, 0x00, 0xe0-1);
+}
 
-MACHINE_CONFIG_START(seta2_state::ablastb)
+void seta2_state::ablastb(machine_config &config)
+{
 	penbros(config);
-	MCFG_DEVICE_REPLACE("maincpu", M68000, XTAL(16'000'000)) // TMP68HC000P-16
-	MCFG_DEVICE_PROGRAM_MAP(ablastb_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta2_state, irq2_line_hold)
+	M68000(config.replace(), m_maincpu, XTAL(16'000'000)); // TMP68HC000P-16
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta2_state::ablastb_map);
+	m_maincpu->set_vblank_int("screen", FUNC(seta2_state::irq2_line_hold));
 
 	config.device_remove("tmp68301");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(seta2_state::reelquak)
+void seta2_state::reelquak(machine_config &config)
+{
 	seta2(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(reelquak_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta2_state::reelquak_map);
 
 	m_tmp68301->out_parallel_callback().set(FUNC(seta2_state::reelquak_leds_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	TICKET_DISPENSER(config, m_dispenser, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0x00, 0x140-1, 0x000, 0x0f0-1)
-MACHINE_CONFIG_END
+	m_screen->set_visarea(0x00, 0x140-1, 0x000, 0x0f0-1);
+}
 
 
-MACHINE_CONFIG_START(seta2_state::samshoot)
+void seta2_state::samshoot(machine_config &config)
+{
 	seta2(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(samshoot_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(seta2_state, samshoot_interrupt, 60)
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta2_state::samshoot_map);
+	m_maincpu->set_periodic_int(FUNC(seta2_state::samshoot_interrupt), attotime::from_hz(60));
 
 	m_tmp68301->in_parallel_callback().set_ioport("DSW2");
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0x00, 0x140-1, 0x000, 0x0f0-1)
-MACHINE_CONFIG_END
+	m_screen->set_visarea(0x00, 0x140-1, 0x000, 0x0f0-1);
+}
 
 
-MACHINE_CONFIG_START(staraudi_state::staraudi)
+void staraudi_state::staraudi(machine_config &config)
+{
 	seta2(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(staraudi_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &staraudi_state::staraudi_map);
 
 	SHARP_LH28F016S_16BIT(config, "flash");
 	UPD4992(config, m_rtc);
 
 	// video hardware
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))  // not accurate
-	MCFG_SCREEN_VISIBLE_AREA(0x00, 0x140-1, 0x000, 0x0f0-1)
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));  // not accurate
+	m_screen->set_visarea(0x00, 0x140-1, 0x000, 0x0f0-1);
 
 	m_gfxdecode->set_info(gfx_seta2);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(seta2_state::telpacfl)
+void seta2_state::telpacfl(machine_config &config)
+{
 	seta2(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(telpacfl_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta2_state::telpacfl_map);
 
 	m_tmp68301->in_parallel_callback().set_ioport("KNOB");
 
@@ -2482,9 +2475,8 @@ MACHINE_CONFIG_START(seta2_state::telpacfl)
 	HOPPER(config, m_dispenser, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
 
 	// video hardware
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0x0, 0x180-1, 0x00, 0xf0-1) // still off by 1 because of different CRTC regs?
-MACHINE_CONFIG_END
+	m_screen->set_visarea(0x0, 0x180-1, 0x00, 0xf0-1); // still off by 1 because of different CRTC regs?
+}
 
 
 /***************************************************************************
@@ -2515,15 +2507,15 @@ void funcube_state::machine_reset()
 	m_hopper_motor = 0;
 }
 
-MACHINE_CONFIG_START(funcube_state::funcube)
-
-	MCFG_DEVICE_ADD("maincpu", MCF5206E, XTAL(25'447'000))
-	MCFG_DEVICE_PROGRAM_MAP(funcube_map)
+void funcube_state::funcube(machine_config &config)
+{
+	MCF5206E(config, m_maincpu, XTAL(25'447'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &funcube_state::funcube_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(funcube_state::funcube_interrupt), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("sub", H83007, FUNCUBE_SUB_CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(funcube_sub_map)
-	MCFG_DEVICE_IO_MAP(funcube_sub_io)
+	H83007(config, m_sub, FUNCUBE_SUB_CPU_CLOCK);
+	m_sub->set_addrmap(AS_PROGRAM, &funcube_state::funcube_sub_map);
+	m_sub->set_addrmap(AS_IO, &funcube_state::funcube_sub_io);
 
 	MCF5206E_PERIPHERAL(config, "maincpu_onboard", 0);
 
@@ -2534,14 +2526,14 @@ MACHINE_CONFIG_START(funcube_state::funcube)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))  // not accurate
-	MCFG_SCREEN_SIZE(0x200, 0x200)
-	MCFG_SCREEN_VISIBLE_AREA(0x0+1, 0x140-1+1, 0x00, 0xf0-1)
-	MCFG_SCREEN_UPDATE_DRIVER(funcube_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, funcube_state, screen_vblank))
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));  // not accurate
+	m_screen->set_size(0x200, 0x200);
+	m_screen->set_visarea(0x0+1, 0x140-1+1, 0x00, 0xf0-1);
+	m_screen->set_screen_update(FUNC(funcube_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(funcube_state::screen_vblank));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_seta2);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x8000+0xf0);    // extra 0xf0 because we might draw 256-color object with 16-color granularity
@@ -2550,52 +2542,51 @@ MACHINE_CONFIG_START(funcube_state::funcube)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("oki", OKIM9810, XTAL(4'096'000))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
-MACHINE_CONFIG_END
+	OKIM9810(config, m_oki, XTAL(4'096'000));
+	m_oki->add_route(0, "lspeaker", 0.80);
+	m_oki->add_route(1, "rspeaker", 0.80);
+}
 
 
-MACHINE_CONFIG_START(funcube_state::funcube2)
+void funcube_state::funcube2(machine_config &config)
+{
 	funcube(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(funcube2_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &funcube_state::funcube2_map);
 
-	MCFG_DEVICE_MODIFY("sub")
-	MCFG_DEVICE_IO_MAP(funcube2_sub_io)
+	m_sub->set_addrmap(AS_IO, &funcube_state::funcube2_sub_io);
 
 	// video hardware
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0x0, 0x140-1, 0x00, 0xf0-1)
-MACHINE_CONFIG_END
+	m_screen->set_visarea(0x0, 0x140-1, 0x00, 0xf0-1);
+}
 
 
-MACHINE_CONFIG_START(funcube_state::funcube3)
+void funcube_state::funcube3(machine_config &config)
+{
 	funcube2(config);
 	// video hardware
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0x0, 0x140-1, 0x00, 0xf0-1)
-MACHINE_CONFIG_END
+	m_screen->set_visarea(0x0, 0x140-1, 0x00, 0xf0-1);
+}
 
 
-MACHINE_CONFIG_START(seta2_state::namcostr)
-	MCFG_DEVICE_ADD(m_maincpu, M68301, XTAL(50'000'000)/3)   // !! TMP68301 !!
-	MCFG_DEVICE_PROGRAM_MAP(namcostr_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta2_state,  seta2_interrupt)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("tmp68301",tmp68301_device,irq_callback)
+void seta2_state::namcostr(machine_config &config)
+{
+	M68301(config, m_maincpu, XTAL(50'000'000)/3);   // !! TMP68301 !!
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta2_state::namcostr_map);
+	m_maincpu->set_vblank_int("screen", FUNC(seta2_state::seta2_interrupt));
+	m_maincpu->set_irq_acknowledge_callback("tmp68301", FUNC(tmp68301_device::irq_callback));
 
 	TMP68301(config, m_tmp68301, 0);  // does this have a ticket dispenser?
 	m_tmp68301->set_cputag(m_maincpu);
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(0x200, 0x200)
-	MCFG_SCREEN_VISIBLE_AREA(0x40, 0x1c0-1, 0x00, 0xf0-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta2_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, seta2_state, screen_vblank))
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(0x200, 0x200);
+	m_screen->set_visarea(0x40, 0x1c0-1, 0x00, 0xf0-1);
+	m_screen->set_screen_update(FUNC(seta2_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(seta2_state::screen_vblank));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_seta2);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x8000+0xf0);    // extra 0xf0 because we might draw 256-color object with 16-color granularity
@@ -2604,10 +2595,10 @@ MACHINE_CONFIG_START(seta2_state::namcostr)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("oki", OKIM9810, XTAL(4'096'000))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
-MACHINE_CONFIG_END
+	OKIM9810(config, m_oki, XTAL(4'096'000));
+	m_oki->add_route(0, "lspeaker", 0.80);
+	m_oki->add_route(1, "rspeaker", 0.80);
+}
 
 
 /***************************************************************************

@@ -548,12 +548,12 @@ static GFXDECODE_START( gfx_senjyo )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(senjyo_state::senjyo)
-
+void senjyo_state::senjyo(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)   /* 4 MHz? */
-	MCFG_DEVICE_PROGRAM_MAP(senjyo_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", senjyo_state, irq0_line_assert)
+	Z80(config, m_maincpu, 4000000);   /* 4 MHz? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &senjyo_state::senjyo_map);
+	m_maincpu->set_vblank_int("screen", FUNC(senjyo_state::irq0_line_assert));
 
 	z80_device& sub(Z80(config, "sub", 2000000));   /* 2 MHz? */
 	sub.set_daisy_config(senjyo_daisy_chain);
@@ -570,12 +570,12 @@ MACHINE_CONFIG_START(senjyo_state::senjyo)
 	ctc.zc_callback<2>().set(FUNC(senjyo_state::sound_line_clock));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(senjyo_state, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(senjyo_state::screen_update));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_senjyo);
 
@@ -585,20 +585,17 @@ MACHINE_CONFIG_START(senjyo_state::senjyo)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_DEVICE_ADD("sn1", SN76496, 2000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	SN76496(config, "sn1", 2000000).add_route(ALL_OUTPUTS, "speaker", 0.5);
 
-	MCFG_DEVICE_ADD("sn2", SN76496, 2000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	SN76496(config, "sn2", 2000000).add_route(ALL_OUTPUTS, "speaker", 0.5);
 
-	MCFG_DEVICE_ADD("sn3", SN76496, 2000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	SN76496(config, "sn3", 2000000).add_route(ALL_OUTPUTS, "speaker", 0.5);
 
 	DAC_4BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.05); // unknown DAC
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
-MACHINE_CONFIG_END
+}
 
 
 
@@ -623,16 +620,15 @@ void senjyo_state::senjyox_a(machine_config &config)
 }
 
 
-MACHINE_CONFIG_START(senjyo_state::starforb)
+void senjyo_state::starforb(machine_config &config)
+{
 	senjyox_e(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(starforb_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &senjyo_state::starforb_map);
 
-	MCFG_DEVICE_MODIFY("sub")
-	MCFG_DEVICE_PROGRAM_MAP(starforb_sound_map)
-MACHINE_CONFIG_END
+	subdevice<z80_device>("sub")->set_addrmap(AS_PROGRAM, &senjyo_state::starforb_sound_map);
+}
 
 
 /***************************************************************************
