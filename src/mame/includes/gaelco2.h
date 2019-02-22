@@ -40,8 +40,7 @@ public:
 	void init_snowboar();
 	void init_alighunt();
 	void init_wrally2();
-	void init_play2000_70i();
-	void init_play2000_40i();
+	void init_play2000();
 
 	DECLARE_WRITE_LINE_MEMBER(coin1_counter_w);
 	DECLARE_WRITE_LINE_MEMBER(coin2_counter_w);
