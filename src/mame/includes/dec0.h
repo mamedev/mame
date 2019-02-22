@@ -51,6 +51,7 @@ public:
 	void midresbj(machine_config &config);
 	void slyspy(machine_config &config);
 	void hbarrel(machine_config &config);
+	void bandit(machine_config &config);
 	void midresb(machine_config &config);
 	void ffantasybl(machine_config &config);
 	void drgninjab(machine_config &config);
@@ -141,6 +142,7 @@ private:
 	DECLARE_VIDEO_START(dec0);
 
 	uint32_t screen_update_hbarrel(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_bandit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_baddudes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_birdtry(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_robocop(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
