@@ -154,7 +154,6 @@ Super 9 Sensory Chess Challenger (SU9/DS9)
 This is basically the Fidelity Elite A/S program on CSC hardware.
 Model DS9(Deluxe) has a 5MHz XTAL, but is otherwise same.
 ---------------------------------
-
 R6502AP CPU, 1.95MHz(3.9MHz resonator)
 2 RAM chips, assume 4KB
 2*8KB ROM + 1*2KB ROM
@@ -168,7 +167,6 @@ Reversi Sensory Challenger (RSC)
 The 1st version came out in 1980, a program revision was released in 1981.
 Another distinction is the board color and layout, the 1981 version is green.
 ---------------------------------
-
 8*(8+1) buttons, 8*8+1 LEDs
 1KB RAM(2*2114), 4KB ROM
 MOS MPS 6502B CPU, frequency unknown

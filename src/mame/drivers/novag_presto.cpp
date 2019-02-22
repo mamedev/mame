@@ -11,15 +11,11 @@ TODO:
 
 *******************************************************************************
 
-Presto
-----------
-NEC D80C49C MCU(serial 186), OSC from LC circuit measured ~6MHz
-buzzer, 16+4 LEDs, 8*8 chessboard buttons
+Novag Presto overview:
+- NEC D80C49C MCU(serial 186), OSC from LC circuit measured ~6MHz
+- buzzer, 16+4 LEDs, 8*8 chessboard buttons
 
-Octo
-----------
-NEC D80C49HC MCU(serial 111), OSC from LC circuit measured ~12MHz
-
+Octo has a NEC D80C49HC MCU(serial 111), OSC from LC circuit measured ~12MHz
 The buzzer has a little electronic circuit going on, not sure whatfor.
 Otherwise, it's identical to Presto. The MCU internal ROM is same too.
 

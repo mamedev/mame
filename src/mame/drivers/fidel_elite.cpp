@@ -16,15 +16,16 @@ This came out in 1982. 2 program updates were released in 1983 and 1984,
 named Budapest and Glasgow, places where Fidelity won chess computer matches.
 A/S stands for auto sensory, it's the 1st Fidelity board with magnet sensors.
 The magnetic chessboard was licensed from AVE Micro Systems, in fact it's the
-exact same one as in AVE's ARB.
+exact same one as in AVE's ARB (ave_arb.cpp driver).
 
-8*8 magnet sensors, 11 buttons, 8*(8+1) LEDs + 4*7seg LEDs
-R65C02P4 or R6502BP CPU, default frequency 3MHz*
-4KB RAM (2*HM6116), 24KB ROM
-TSI S14001A + speech ROM
-I/O with 8255 PPI and bunch of TTL
-module slot and printer port
-PCB label 510-1071A01
+hardware overview:
+- 8*8 magnet sensors, 11 buttons, 8*(8+1) LEDs + 4*7seg LEDs
+- R65C02P4 or R6502BP CPU, default frequency 3MHz*
+- 4KB RAM (2*HM6116), 24KB ROM
+- TSI S14001A + speech ROM
+- I/O with 8255 PPI and bunch of TTL
+- module slot and printer port
+- PCB label 510-1071A01
 
 *It was advertised as 3.2, 3.6, or 4MHz, with unofficial modifications up to 8MHz.
 PCB photos show only a 3MHz XTAL.
@@ -35,7 +36,8 @@ Elite Avant Garde (models 6081,6088,6089) is on the same hardware.
 
 Prestige Challenger (PC) hardware is very similar. They stripped the 8255 PPI,
 and added more RAM(7*TMM2016P). Some were released at 3.6MHz instead of 4MHz,
-perhaps due to hardware instability?
+perhaps due to hardware instability? Opening module PC16 was included by default,
+this module is the same as CB16 but at different form factor.
 
 ******************************************************************************/
 

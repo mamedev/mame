@@ -14,14 +14,13 @@ their own version. It has a small LCD panel added, the rest looks nearly the sam
 the outside. After Fidelity was taken over by H&G, it was rereleased in 1990 as the
 Mephisto Phantom. This is assumed to be identical.
 
-Phantom (model 6100)
-----------------
-R65C02P4, XTAL marked 4.91?200
-2*32KB ROM 27C256-15, 8KB RAM MS6264L-10
-LCD driver, display panel for digits
-magnetized x/y motor under chessboard, chesspieces have magnet underneath
-piezo speaker, LEDs, 8*8 chessboard buttons
-PCB label 510.1128A01
+Fidelity Phantom (model 6100) overview:
+- R65C02P4, XTAL marked 4.91?200
+- 2*32KB ROM 27C256-15, 8KB RAM MS6264L-10
+- LCD driver, display panel for digits
+- magnetized x/y motor under chessboard, chesspieces have magnet underneath
+- piezo speaker, LEDs, 8*8 chessboard buttons
+- PCB label 510.1128A01
 
 ******************************************************************************/
 

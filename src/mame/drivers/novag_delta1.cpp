@@ -11,11 +11,10 @@ TODO:
 
 *******************************************************************************
 
-Novag Delta-1
--------------
-3850PK CPU at ~2MHz, 3853PK memory interface
-4KB ROM(2332A), 256 bytes RAM(2*2111A-4)
-4-digit 7seg panel, no sound, no chessboard
+Novag Delta-1 overview:
+- 3850PK CPU at ~2MHz, 3853PK memory interface
+- 4KB ROM(2332A), 256 bytes RAM(2*2111A-4)
+- 4-digit 7seg panel, no sound, no chessboard
 
 ******************************************************************************/
 

@@ -9,12 +9,11 @@ TODO:
 
 *******************************************************************************
 
-Novag Super Constellation Chess Computer (model 844)
---------------------
-UMC UM6502C @ 4 MHz (8MHz XTAL), 600Hz? IRQ(source unknown?)
-2*2KB RAM TC5516APL-2 battery-backed, 2*32KB ROM custom label
-TTL, buzzer, 24 LEDs, 8*8 chessboard buttons
-external ports for clock and printer, not emulated here
+Novag Super Constellation Chess Computer (model 844) overview:
+- UMC UM6502C @ 4 MHz (8MHz XTAL), 600Hz? IRQ(source unknown?)
+- 2*2KB RAM TC5516APL-2 battery-backed, 2*32KB ROM custom label
+- TTL, buzzer, 24 LEDs, 8*8 chessboard buttons
+- external ports for clock and printer, not emulated here
 
 ******************************************************************************/
 

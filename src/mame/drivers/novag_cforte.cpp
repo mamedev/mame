@@ -10,12 +10,11 @@ TODO:
 
 *******************************************************************************
 
-Novag Constellation Forte
--------------------------
-R65C02P4 @ 5MHz (10MHz XTAL)
-2*2KB RAM(NEC D449C-3), 2*32KB ROM(27C256)
-HLCD0538P, 10-digit 7seg LCD display
-TTL, 18 LEDs, 8*8 chessboard buttons
+Novag Constellation Forte overview:
+- R65C02P4 @ 5MHz (10MHz XTAL)
+- 2*2KB RAM(NEC D449C-3), 2*32KB ROM(27C256)
+- HLCD0538P, 10-digit 7seg LCD display
+- TTL, 18 LEDs, 8*8 chessboard buttons
 
 I/O is similar to supercon
 

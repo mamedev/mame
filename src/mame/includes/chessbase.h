@@ -39,6 +39,7 @@ protected:
 	u16 m_inp_mux;                  // multiplexed keypad/leds mask
 	u16 m_led_select;
 	u16 m_led_data;
+	u16 m_led_latch;
 	u32 m_7seg_data;                // data for seg leds
 
 	u16 read_inputs(int columns);

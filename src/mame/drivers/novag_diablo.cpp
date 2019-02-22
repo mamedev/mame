@@ -10,13 +10,12 @@ TODO:
 
 *******************************************************************************
 
-Diablo 68000
-----------------
-M68000 @ 16MHz, IPL1 256Hz, IPL2 from ACIA IRQ(always high)
-2*8KB RAM TC5565 battery-backed, 2*32KB hashtable RAM TC55257 3*32KB ROM
-HD44780 LCD controller (16x1)
-R65C51P2 ACIA @ 1.8432MHz, RS232
-magnetic sensors, 8*8 chessboard leds
+Novag Diablo 68000 overview:
+- M68000 @ 16MHz, IPL1 256Hz, IPL2 from ACIA IRQ(always high)
+- 2*8KB RAM TC5565 battery-backed, 2*32KB hashtable RAM TC55257 3*32KB ROM
+- HD44780 LCD controller (16x1)
+- R65C51P2 ACIA @ 1.8432MHz, RS232
+- magnetic sensors, 8*8 chessboard leds
 
 Scorpio 68000 hardware is very similar, but with chessboard buttons and side leds.
 

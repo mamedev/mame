@@ -7,11 +7,10 @@
 
 *******************************************************************************
 
-Fidelity Elegance Chess Challenger (AS12)
-----------------
-R65C02P4 CPU @ 4MHz
-3*8KB ROM(TMM2764), 2*2KB RAM(HM6116)
-PCB label 510-1084B01
+Fidelity Elegance Chess Challenger (AS12) overview:
+- R65C02P4 CPU @ 4MHz
+- 3*8KB ROM(TMM2764), 2*2KB RAM(HM6116)
+- PCB label 510-1084B01
 
 This is on the SC12B board, with enough modifications to support more leds and
 magnetic chess board sensors. See fidel_sc12.cpp for a more technical description.

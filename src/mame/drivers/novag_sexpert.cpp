@@ -11,14 +11,13 @@ TODO:
 
 *******************************************************************************
 
-Novag Super Expert (model 878/887/902):
---------------------
-65C02 @ 5MHz or 6MHz (10MHz or 12MHz XTAL)
-8KB RAM battery-backed, 3*32KB ROM
-HD44780 LCD controller (16x1)
-beeper(32KHz/32), IRQ(32KHz/128) via MC14060
-optional R65C51P2 ACIA @ 1.8432MHz, for IBM PC interface (only works in version C?)
-printer port, magnetic sensors, 8*8 chessboard leds
+Novag Super Expert (model 878/887/902) overview:
+- 65C02 @ 5MHz or 6MHz (10MHz or 12MHz XTAL)
+- 8KB RAM battery-backed, 3*32KB ROM
+- HD44780 LCD controller (16x1)
+- beeper(32KHz/32), IRQ(32KHz/128) via MC14060
+- optional R65C51P2 ACIA @ 1.8432MHz, for IBM PC interface (only works in version C?)
+- printer port, magnetic sensors, 8*8 chessboard leds
 
 I/O via TTL, hardware design was very awkward.
 

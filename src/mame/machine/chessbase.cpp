@@ -34,6 +34,7 @@ void chessbase_state::machine_start()
 	m_inp_mux = 0;
 	m_led_select = 0;
 	m_led_data = 0;
+	m_led_latch = 0;
 	m_7seg_data = 0;
 
 	// register for savestates
@@ -48,6 +49,7 @@ void chessbase_state::machine_start()
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_led_select));
 	save_item(NAME(m_led_data));
+	save_item(NAME(m_led_latch));
 	save_item(NAME(m_7seg_data));
 }
 

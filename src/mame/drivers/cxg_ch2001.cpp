@@ -7,11 +7,10 @@
 
 *******************************************************************************
 
-CXG Chess 2001
---------------
-Zilog Z8400APS @ 4 MHz (8MHz XTAL)
-2KB RAM HM6116, 16KB ROM D27128D
-TTL, piezo, 8*8+9 LEDs, magnetic sensors
+CXG Chess 2001 overview:
+- Zilog Z8400APS @ 4 MHz (8MHz XTAL)
+- 2KB RAM HM6116, 16KB ROM D27128D
+- TTL, piezo, 8*8+9 LEDs, magnetic sensors
 
 ******************************************************************************/
 

@@ -20,12 +20,11 @@ TODO:
 
 *******************************************************************************
 
-Excel 68000 (model 6094)
-------------------------
-16KB RAM(2*SRM2264C-10 @ U8/U9), 64KB ROM(2*AT27C256-15DC @ U6/U7)
-HD68HC000P12 CPU, 12MHz XTAL
-PCB label 510-1129A01
-PCB has edge connector for module, but no external slot
+Excel 68000 (model 6094) overview:
+- 16KB RAM(2*SRM2264C-10 @ U8/U9), 64KB ROM(2*AT27C256-15DC @ U6/U7)
+- HD68HC000P12 CPU, 12MHz XTAL
+- PCB label 510-1129A01
+- PCB has edge connector for module, but no external slot
 
 There's room for 2 SIMMs at U22 and U23, unpopulated in Excel 68000 and Mach III.
 Mach II has 2*64KB DRAM with a MB1422A DRAM controller @ 25MHz.

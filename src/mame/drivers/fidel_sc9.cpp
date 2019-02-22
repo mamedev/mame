@@ -7,22 +7,21 @@
 
 *******************************************************************************
 
-Fidelity Sensory Chess Challenger "9" (SC9)
-3 versions were available, the newest "B" version was 2MHz and included the Budapest program.
-The Playmatic S was only released in Germany, it's basically a 'deluxe' version of SC9
-with magnet sensors and came with CB9 and CB16.
----------------------------------
-
-8*(8+1) buttons, 8*8+1 LEDs
-36-pin edge connector, assume same as SC12
-2KB RAM(TMM2016P), 2*8KB ROM(HN48364P)
-R6502-13, 1.4MHz from resonator, another pcb with the same resonator was measured 1.49MHz*
-PCB label 510-1046C01 2-1-82
+Fidelity Sensory Chess Challenger "9" (SC9) overview:
+- 8*(8+1) buttons, 8*8+1 LEDs
+- 36-pin edge connector, assume same as SC12
+- 2KB RAM(TMM2016P), 2*8KB ROM(HN48364P)
+- R6502-13, 1.4MHz from resonator, another pcb with the same resonator was measured 1.49MHz*
+- PCB label 510-1046C01 2-1-82
 
 *: 2 other boards were measured 1.60MHz and 1.88MHz(newest serial). Online references
 suggest 3 versions of SC9(C01) total: 1.5MHz, 1.6MHz, and 1.9MHz.
 
 I/O is via TTL, not further documented here
+
+3 versions were available, the newest "B" version was 2MHz and included the Budapest program.
+The Playmatic S was only released in Germany, it's basically a 'deluxe' version of SC9
+with magnet sensors and came with CB9 and CB16.
 
 ******************************************************************************/
 

@@ -7,12 +7,11 @@
 
 *******************************************************************************
 
-Fidelity Sensory Chess Challenger 8
----------------
-Z80A CPU @ 3.9MHz
-4KB ROM(MOS 2732), 256 bytes RAM(35391CP)
-chessboard buttons, 8*8+1 leds
-PCB label 510-1011 REV.2
+Fidelity Sensory Chess Challenger 8 overview:
+- Z80A CPU @ 3.9MHz
+- 4KB ROM(MOS 2732), 256 bytes RAM(35391CP)
+- chessboard buttons, 8*8+1 leds
+- PCB label 510-1011 REV.2
 
 ******************************************************************************/
 

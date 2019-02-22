@@ -1836,6 +1836,7 @@ createMESSProjects(_target, _subtarget, "chess")
 files {
 	MAME_DIR .. "src/mame/machine/chessbase.cpp",
 	MAME_DIR .. "src/mame/includes/chessbase.h",
+	MAME_DIR .. "src/mame/drivers/ave_arb.cpp",
 	MAME_DIR .. "src/mame/drivers/cking_master.cpp",
 	MAME_DIR .. "src/mame/drivers/cxg_ch2001.cpp",
 

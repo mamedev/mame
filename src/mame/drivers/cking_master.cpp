@@ -12,12 +12,11 @@ TODO:
 
 *******************************************************************************
 
-Chess King Master (yes, it's plainly named "Master")
----------------
-Z80 CPU(NEC D780C-1) @ 4MHz(8MHz XTAL), IRQ from 555 timer
-8KB ROM(NEC D2764C-3), 2KB RAM(NEC D4016C), ROM is scrambled for easy PCB placement
-simple I/O via 2*74373 and a 74145
-8*8 chessboard buttons, 32+1 border leds, piezo
+Chess King Master overview (yes, it's plainly named "Master"):
+- Z80 CPU(NEC D780C-1) @ 4MHz(8MHz XTAL), IRQ from 555 timer
+- 8KB ROM(NEC D2764C-3), 2KB RAM(NEC D4016C), ROM is scrambled for easy PCB placement
+- simple I/O via 2*74373 and a 74145
+- 8*8 chessboard buttons, 32+1 border leds, piezo
 
 ******************************************************************************/
 
