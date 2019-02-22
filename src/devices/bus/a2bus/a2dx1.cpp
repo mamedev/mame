@@ -37,7 +37,6 @@ void a2bus_dx1_device::device_add_mconfig(machine_config &config)
 	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
 	DAC_8BIT_R2R(config, m_dacvol, 0).add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT).add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT); // unknown DAC
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.set_output(5.0);
 	vref.add_route(0, "dacvol", 1.0, DAC_VREF_POS_INPUT);
 }
 

@@ -97,7 +97,7 @@ void generic_ram_linear_device::device_start()
  mapper specific handlers
  -------------------------------------------------*/
 
-READ8_MEMBER(generic_ram_plain_device::read_ram)
+uint8_t generic_ram_plain_device::read_ram(offs_t offset)
 {
 	if (offset < m_ram.size())
 		return m_ram[offset];
@@ -105,19 +105,19 @@ READ8_MEMBER(generic_ram_plain_device::read_ram)
 		return 0xff;
 }
 
-WRITE8_MEMBER(generic_ram_plain_device::write_ram)
+void generic_ram_plain_device::write_ram(offs_t offset, uint8_t data)
 {
 	if (offset < m_ram.size())
 		m_ram[offset] = data;
 }
 
 
-READ8_MEMBER(generic_ram_linear_device::read_ram)
+uint8_t generic_ram_linear_device::read_ram(offs_t offset)
 {
 	return m_ram[offset % m_ram.size()];
 }
 
-WRITE8_MEMBER(generic_ram_linear_device::write_ram)
+void generic_ram_linear_device::write_ram(offs_t offset, uint8_t data)
 {
 	m_ram[offset % m_ram.size()] = data;
 }

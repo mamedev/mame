@@ -1146,7 +1146,7 @@ READ8_MEMBER( px4p_state::ramdisk_data_r )
 	else if (m_ramdisk_address < 0x40000)
 	{
 		// read from rom
-		ret = m_rdsocket->read_rom(space, m_ramdisk_address);
+		ret = m_rdsocket->read_rom(m_ramdisk_address);
 	}
 
 	m_ramdisk_address = (m_ramdisk_address & 0xffff00) | ((m_ramdisk_address & 0xff) + 1);

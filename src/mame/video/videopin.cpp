@@ -89,14 +89,14 @@ uint32_t videopin_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 }
 
 
-WRITE8_MEMBER(videopin_state::ball_w)
+void videopin_state::ball_w(uint8_t data)
 {
 	m_ball_x = data & 15;
 	m_ball_y = data >> 4;
 }
 
 
-WRITE8_MEMBER(videopin_state::video_ram_w)
+void videopin_state::video_ram_w(offs_t offset, uint8_t data)
 {
 	m_video_ram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);

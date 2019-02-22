@@ -759,23 +759,23 @@ static INPUT_PORTS_START( venom )
 	PORT_BIT( 0x000f, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(snesb_state::kinstb)
-
+void snesb_state::kinstb(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", _5A22, 3580000*6)   /* 2.68Mhz, also 3.58Mhz */
-	MCFG_DEVICE_PROGRAM_MAP(snesb_map)
+	_5A22(config, m_maincpu, 3580000*6);   /* 2.68Mhz, also 3.58Mhz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &snesb_state::snesb_map);
 
 	/* audio CPU */
 	// runs at 24.576 MHz / 12 = 2.048 MHz
-	MCFG_DEVICE_ADD("soundcpu", SPC700, XTAL(24'576'000) / 12)
-	MCFG_DEVICE_PROGRAM_MAP(spc_mem)
+	SPC700(config, m_soundcpu, XTAL(24'576'000) / 12);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &snesb_state::spc_mem);
 
 	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(DOTCLK_NTSC, SNES_HTOTAL, 0, SNES_SCR_WIDTH, SNES_VTOTAL_NTSC, 0, SNES_SCR_HEIGHT_NTSC)
-	MCFG_SCREEN_UPDATE_DRIVER( snes_state, screen_update )
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(DOTCLK_NTSC, SNES_HTOTAL, 0, SNES_SCR_WIDTH, SNES_VTOTAL_NTSC, 0, SNES_SCR_HEIGHT_NTSC);
+	m_screen->set_screen_update(FUNC(snes_state::screen_update));
 
 	SNES_PPU(config, m_ppu, MCLK_NTSC);
 	m_ppu->open_bus_callback().set([this] { return snes_open_bus_r(); }); // lambda because overloaded function name
@@ -784,22 +784,23 @@ MACHINE_CONFIG_START(snesb_state::kinstb)
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("spc700", SNES_SOUND)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
-MACHINE_CONFIG_END
+	SNES_SOUND(config, m_spc700);
+	m_spc700->add_route(0, "lspeaker", 1.00);
+	m_spc700->add_route(1, "rspeaker", 1.00);
+}
 
 void snesb_state::mcu_io_map(address_map &map)
 {
 }
 
 
-MACHINE_CONFIG_START(snesb_state::mk3snes)
+void snesb_state::mk3snes(machine_config &config)
+{
 	kinstb(config);
 
-	MCFG_DEVICE_ADD("mcu", I8751, XTAL(8'000'000))
-	MCFG_DEVICE_IO_MAP(mcu_io_map)
-MACHINE_CONFIG_END
+	i8751_device &mcu(I8751(config, "mcu", XTAL(8'000'000)));
+	mcu.set_addrmap(AS_IO, &snesb_state::mcu_io_map);
+}
 
 
 MACHINE_RESET_MEMBER( snesb_state, ffight2b )
@@ -811,10 +812,11 @@ MACHINE_RESET_MEMBER( snesb_state, ffight2b )
 	cpu0space.write_byte(0x7eadce, 0x00);
 }
 
-MACHINE_CONFIG_START(snesb_state::ffight2b)
+void snesb_state::ffight2b(machine_config &config)
+{
 	kinstb(config);
 	MCFG_MACHINE_RESET_OVERRIDE( snesb_state, ffight2b )
-MACHINE_CONFIG_END
+}
 
 void snesb_state::init_kinstb()
 {

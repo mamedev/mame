@@ -634,16 +634,16 @@ void ssem_state::machine_reset()
 
 MACHINE_CONFIG_START(ssem_state::ssem)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SSEMCPU, 700)
-	MCFG_DEVICE_PROGRAM_MAP(ssem_map)
+	SSEMCPU(config, m_maincpu, 700);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ssem_state::ssem_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 280)
-	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 279)
-	MCFG_SCREEN_UPDATE_DRIVER(ssem_state, screen_update_ssem)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(50);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(256, 280);
+	m_screen->set_visarea(0, 255, 0, 279);
+	m_screen->set_screen_update(FUNC(ssem_state::screen_update_ssem));
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* quickload */

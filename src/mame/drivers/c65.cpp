@@ -267,7 +267,7 @@ WRITE8_MEMBER(c65_state::vic4567_dummy_w)
 			m_VIC3_ControlB = data;
 			break;
 		default:
-			printf("%02x %02x\n",offset,data);
+			printf("%02x %02x\n", offset, data);
 			break;
 	}
 
@@ -402,9 +402,9 @@ READ8_MEMBER(c65_state::CIASelect_r)
 		switch((offset & 0x700) | 0x800)
 		{
 			case 0xc00:
-				return m_cia0->read(space,offset);
+				return m_cia0->read(offset);
 			case 0xd00:
-				return m_cia1->read(space,offset);
+				return m_cia1->read(offset);
 			default:
 				printf("Unknown I/O access read to offset %04x\n",offset);
 				break;
@@ -425,14 +425,14 @@ WRITE8_MEMBER(c65_state::CIASelect_w)
 		switch((offset & 0x700) | 0x800)
 		{
 			case 0xc00:
-				m_cia0->write(space,offset,data);
+				m_cia0->write(offset, data);
 				break;
 
 			case 0xd00:
-				m_cia1->write(space,offset,data);
+				m_cia1->write(offset, data);
 				break;
 			default:
-				printf("Unknown I/O access write to offset %04x data = %02x\n",offset,data);
+				printf("Unknown I/O access write to offset %04x data = %02x\n", offset, data);
 				break;
 		}
 	}

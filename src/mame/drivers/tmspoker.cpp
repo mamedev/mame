@@ -564,8 +564,8 @@ GFXDECODE_END
 *    Machine Drivers     *
 *************************/
 
-MACHINE_CONFIG_START(tmspoker_state::tmspoker)
-
+void tmspoker_state::tmspoker(machine_config &config)
+{
 	// CPU TMS9980A; no line connections
 	TMS9980A(config, m_maincpu, MASTER_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tmspoker_state::tmspoker_map);
@@ -573,13 +573,13 @@ MACHINE_CONFIG_START(tmspoker_state::tmspoker)
 	m_maincpu->set_vblank_int("screen", FUNC(tmspoker_state::tmspoker_interrupt));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tmspoker_state, screen_update_tmspoker)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
+	screen.set_screen_update(FUNC(tmspoker_state::screen_update_tmspoker));
+	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_tmspoker);
 	PALETTE(config, "palette", FUNC(tmspoker_state::tmspoker_palette), 256);
@@ -588,8 +588,7 @@ MACHINE_CONFIG_START(tmspoker_state::tmspoker)
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
-
-MACHINE_CONFIG_END
+}
 
 
 /*************************

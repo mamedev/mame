@@ -2385,24 +2385,25 @@ INPUT_PORTS_END
                                 Bishou Jan
 ***************************************************************************/
 
-MACHINE_CONFIG_START(subsino2_state::bishjan)
-	MCFG_DEVICE_ADD("maincpu", H83044, XTAL(44'100'000) / 3)
-	MCFG_DEVICE_PROGRAM_MAP( bishjan_map )
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", subsino2_state, irq0_line_hold)
+void subsino2_state::bishjan(machine_config &config)
+{
+	H83044(config, m_maincpu, XTAL(44'100'000) / 3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &subsino2_state::bishjan_map);
+	m_maincpu->set_vblank_int("screen", FUNC(subsino2_state::irq0_line_hold));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SIZE( 512, 256 )
-	MCFG_SCREEN_VISIBLE_AREA( 0, 512-1, 0, 256-16-1 )
-	MCFG_SCREEN_REFRESH_RATE( 60 )
-	MCFG_SCREEN_UPDATE_DRIVER(subsino2_state, screen_update_subsino2)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_size(512, 256);
+	m_screen->set_visarea(0, 512-1, 0, 256-16-1);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_screen_update(FUNC(subsino2_state::screen_update_subsino2));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ss9601);
-	MCFG_PALETTE_ADD( "palette", 256 )
+	PALETTE(config, m_palette).set_entries(256);
 
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // HMC HM86171 VGA 256 colour RAMDAC
 	ramdac.set_addrmap(0, &subsino2_state::ramdac_map);
@@ -2411,50 +2412,51 @@ MACHINE_CONFIG_START(subsino2_state::bishjan)
 
 	// sound hardware
 	// SS9904
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(subsino2_state::new2001)
+void subsino2_state::new2001(machine_config &config)
+{
 	bishjan(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP( new2001_map )
+	m_maincpu->set_addrmap(AS_PROGRAM, &subsino2_state::new2001_map);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_SIZE( 640, 256 )
-	MCFG_SCREEN_VISIBLE_AREA( 0, 640-1, 0, 256-16-1 )
-MACHINE_CONFIG_END
+	m_screen->set_size(640, 256);
+	m_screen->set_visarea(0, 640-1, 0, 256-16-1);
+}
 
-MACHINE_CONFIG_START(subsino2_state::humlan)
+void subsino2_state::humlan(machine_config &config)
+{
 	bishjan(config);
-	MCFG_DEVICE_REPLACE("maincpu", H83044, XTAL(48'000'000) / 3)
-	MCFG_DEVICE_PROGRAM_MAP( humlan_map )
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", subsino2_state, irq0_line_hold)
+	H83044(config.replace(), m_maincpu, XTAL(48'000'000) / 3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &subsino2_state::humlan_map);
+	m_maincpu->set_vblank_int("screen", FUNC(subsino2_state::irq0_line_hold));
 
 	// sound hardware
 	// SS9804
-MACHINE_CONFIG_END
+}
 
 /***************************************************************************
                                 Magic Train
 ***************************************************************************/
 
-MACHINE_CONFIG_START(subsino2_state::mtrain)
-	MCFG_DEVICE_ADD("maincpu", Z180, XTAL(12'000'000) / 8)   /* Unknown clock */
-	MCFG_DEVICE_PROGRAM_MAP( mtrain_map )
-	MCFG_DEVICE_IO_MAP( mtrain_io )
+void subsino2_state::mtrain(machine_config &config)
+{
+	Z180(config, m_maincpu, XTAL(12'000'000) / 8);   /* Unknown clock */
+	m_maincpu->set_addrmap(AS_PROGRAM, &subsino2_state::mtrain_map);
+	m_maincpu->set_addrmap(AS_IO, &subsino2_state::mtrain_io);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SIZE( 512, 256 )
-	MCFG_SCREEN_VISIBLE_AREA( 0, 512-1, 0, 256-32-1 )
-	MCFG_SCREEN_REFRESH_RATE( 58.7270 )
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)   // game reads vblank state
-	MCFG_SCREEN_UPDATE_DRIVER(subsino2_state, screen_update_subsino2)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_size(512, 256);
+	m_screen->set_visarea(0, 512-1, 0, 256-32-1);
+	m_screen->set_refresh_hz(58.7270);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);   // game reads vblank state
+	m_screen->set_screen_update(FUNC(subsino2_state::screen_update_subsino2));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ss9601);
-	MCFG_PALETTE_ADD( "palette", 256 )
+	PALETTE(config, m_palette).set_entries(256);
 
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // HMC HM86171 VGA 256 colour RAMDAC
 	ramdac.set_addrmap(0, &subsino2_state::ramdac_map);
@@ -2464,32 +2466,33 @@ MACHINE_CONFIG_START(subsino2_state::mtrain)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(8'467'200) / 8, okim6295_device::PIN7_HIGH)    // probably
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, XTAL(8'467'200) / 8, okim6295_device::PIN7_HIGH);    // probably
+	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 /***************************************************************************
                           Sakura Love - Ying Hua Lian
 ***************************************************************************/
 
-MACHINE_CONFIG_START(subsino2_state::saklove)
-	MCFG_DEVICE_ADD("maincpu", I80188, XTAL(20'000'000)*2 )    // !! AMD AM188-EM !!
-	MCFG_DEVICE_PROGRAM_MAP( saklove_map )
-	MCFG_DEVICE_IO_MAP( saklove_io )
+void subsino2_state::saklove(machine_config &config)
+{
+	I80188(config, m_maincpu, XTAL(20'000'000)*2);    // !! AMD AM188-EM !!
+	m_maincpu->set_addrmap(AS_PROGRAM, &subsino2_state::saklove_map);
+	m_maincpu->set_addrmap(AS_IO, &subsino2_state::saklove_io);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SIZE( 512, 256 )
-	MCFG_SCREEN_VISIBLE_AREA( 0, 512-1, 0, 256-16-1 )
-	MCFG_SCREEN_REFRESH_RATE( 58.7270 )
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)   // game reads vblank state
-	MCFG_SCREEN_UPDATE_DRIVER(subsino2_state, screen_update_subsino2)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_size(512, 256);
+	m_screen->set_visarea(0, 512-1, 0, 256-16-1);
+	m_screen->set_refresh_hz(58.7270);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);   // game reads vblank state
+	m_screen->set_screen_update(FUNC(subsino2_state::screen_update_subsino2));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ss9601);
-	MCFG_PALETTE_ADD( "palette", 256 )
+	PALETTE(config, m_palette).set_entries(256);
 
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // HMC HM86171 VGA 256 colour RAMDAC
 	ramdac.set_addrmap(0, &subsino2_state::ramdac_map);
@@ -2499,36 +2502,35 @@ MACHINE_CONFIG_START(subsino2_state::saklove)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(8'467'200) / 8, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	OKIM6295(config, m_oki, XTAL(8'467'200) / 8, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(12'000'000) / 4) // ? chip and clock unknown
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_CONFIG_END
+	YM3812(config, "ymsnd", XTAL(12'000'000) / 4).add_route(ALL_OUTPUTS, "mono", 0.80); // ? chip and clock unknown
+}
 
 /***************************************************************************
                                 X-Plan
 ***************************************************************************/
 
-MACHINE_CONFIG_START(subsino2_state::xplan)
-	MCFG_DEVICE_ADD("maincpu", I80188, XTAL(20'000'000)*2 )    // !! AMD AM188-EM !!
-	MCFG_DEVICE_PROGRAM_MAP( xplan_map )
-	MCFG_DEVICE_IO_MAP( xplan_io )
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", subsino2_state, am188em_int0_irq)
+void subsino2_state::xplan(machine_config &config)
+{
+	I80188(config, m_maincpu, XTAL(20'000'000)*2);    // !! AMD AM188-EM !!
+	m_maincpu->set_addrmap(AS_PROGRAM, &subsino2_state::xplan_map);
+	m_maincpu->set_addrmap(AS_IO, &subsino2_state::xplan_io);
+	m_maincpu->set_vblank_int("screen", FUNC(subsino2_state::am188em_int0_irq));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SIZE( 512, 256 )
-	MCFG_SCREEN_VISIBLE_AREA( 0, 512-1, 0, 256-16-1 )
-	MCFG_SCREEN_REFRESH_RATE( 58.7270 )
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)   // game reads vblank state
-	MCFG_SCREEN_UPDATE_DRIVER(subsino2_state, screen_update_subsino2)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_size(512, 256);
+	m_screen->set_visarea(0, 512-1, 0, 256-16-1);
+	m_screen->set_refresh_hz(58.7270);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);   // game reads vblank state
+	m_screen->set_screen_update(FUNC(subsino2_state::screen_update_subsino2));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ss9601);
-	MCFG_PALETTE_ADD( "palette", 256 )
+	PALETTE(config, m_palette).set_entries(256);
 
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // HMC HM86171 VGA 256 colour RAMDAC
 	ramdac.set_addrmap(0, &subsino2_state::ramdac_map);
@@ -2538,21 +2540,20 @@ MACHINE_CONFIG_START(subsino2_state::xplan)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(8'467'200) / 8, okim6295_device::PIN7_HIGH)    // probably
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, XTAL(8'467'200) / 8, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);    // probably
+}
 
-MACHINE_CONFIG_START(subsino2_state::xtrain)
+void subsino2_state::xtrain(machine_config &config)
+{
 	xplan(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(xtrain_io)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_IO, &subsino2_state::xtrain_io);
+}
 
-MACHINE_CONFIG_START(subsino2_state::expcard)
+void subsino2_state::expcard(machine_config &config)
+{
 	xplan(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(expcard_io)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_IO, &subsino2_state::expcard_io);
+}
 
 
 /***************************************************************************

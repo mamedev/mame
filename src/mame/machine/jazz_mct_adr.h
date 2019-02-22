@@ -138,8 +138,6 @@ private:
 	u32 m_memory_refresh_rate;
 	u32 m_nvram_protect;
 
-	u32 m_dma_address[4];
-
 	bool m_out_int_timer_asserted;
 	bool m_out_int_device_asserted;
 };

@@ -320,7 +320,7 @@ MACHINE_CONFIG_START(cbuster_state::twocrude)
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_cbuster);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 2048);
 
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
+	BUFFERED_SPRITERAM16(config, m_spriteram);
 
 	DECO16IC(config, m_deco_tilegen[0], 0);
 	m_deco_tilegen[0]->set_split(0);

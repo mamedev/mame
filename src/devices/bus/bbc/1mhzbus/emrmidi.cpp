@@ -87,7 +87,7 @@ READ8_MEMBER(bbc_emrmidi_device::fred_r)
 
 	if (offset >= 0xf0 && offset < 0xf2)
 	{
-		data = m_acia->read(space, offset & 1);
+		data = m_acia->read(offset & 1);
 	}
 
 	return data;
@@ -97,7 +97,7 @@ WRITE8_MEMBER(bbc_emrmidi_device::fred_w)
 {
 	if (offset >= 0xf0 && offset < 0xf2)
 	{
-		m_acia->write(space, offset & 1, data);
+		m_acia->write(offset & 1, data);
 	}
 }
 

@@ -2,14 +2,17 @@
 // copyright-holders:hap
 // thanks-to:Berger,yoyo_chessboard
 /******************************************************************************
+*
+* fidel_vsc.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
 
-Fidelity Excellence series hardware (for Excel 68000, see fidel_eag68k.cpp)
+Fidelity Excellence series hardware
+(for Excel 68000, see fidel_eag68k.cpp)
 
 TODO:
 - granits gives error beeps at start, need to press clear to play
-- granits buttons seem too sensitive
+- granits chessboard buttons seem too sensitive (detects input on falling edge if held too long)
 
-******************************************************************************
+*******************************************************************************
 
 Voice Excellence (model 6092)
 ----------------
@@ -110,7 +113,7 @@ VFD display, and some buttons for controlling the clock. IRQ frequency is double
 presumedly for using the blinking led as seconds counter. It only tracks player time,
 not of the opponent. And it obviously doesn't show chessmove coordinates either.
 
-******************************************************************************
+*******************************************************************************
 
 Designer 2000 (model 6102)
 ----------------
@@ -159,7 +162,7 @@ public:
 	void fdes2100(machine_config &config);
 	void fdes2000(machine_config &config);
 
-	DECLARE_INPUT_CHANGED_MEMBER(lan_bankswitch);
+	DECLARE_INPUT_CHANGED_MEMBER(speech_bankswitch);
 
 private:
 	// address maps
@@ -179,7 +182,7 @@ private:
 
 // misc handlers
 
-INPUT_CHANGED_MEMBER(excel_state::lan_bankswitch)
+INPUT_CHANGED_MEMBER(excel_state::speech_bankswitch)
 {
 	// tied to speech ROM highest bits
 	m_speech->force_update();
@@ -286,7 +289,7 @@ void excel_state::fexcelb_map(address_map &map)
 ******************************************************************************/
 
 static INPUT_PORTS_START( fexcelb )
-	PORT_INCLUDE( fidel_cb_buttons )
+	PORT_INCLUDE( generic_cb_buttons )
 
 	PORT_START("IN.8")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_NAME("Clear")
@@ -303,7 +306,7 @@ static INPUT_PORTS_START( fexcelv )
 	PORT_INCLUDE( fexcelb )
 
 	PORT_START("IN.9")
-	PORT_CONFNAME( 0x03, 0x00, DEF_STR( Language ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, excel_state, lan_bankswitch, 0)
+	PORT_CONFNAME( 0x03, 0x00, DEF_STR( Language ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, excel_state, speech_bankswitch, 0)
 	PORT_CONFSETTING(    0x00, DEF_STR( English ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( German ) )
 	PORT_CONFSETTING(    0x02, DEF_STR( French ) )
@@ -345,15 +348,13 @@ void excel_state::fexcel(machine_config &config)
 	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(15250)); // active for 15.25us
 	TIMER(config, "irq_off").configure_periodic(FUNC(excel_state::irq_off<M6502_IRQ_LINE>), irq_period);
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
+	TIMER(config, "display_decay").configure_periodic(FUNC(excel_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_fidel_ex);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.set_output(5.0);
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
 void excel_state::fexcel4(machine_config &config)

@@ -12849,6 +12849,40 @@ feversoc                        // (c) 2004
 fgoal                           // TF  (c) 1979 Taito Corporation
 fgoala                          // MF  (c) 1979 Taito Corporation
 
+@source:fidel_as12.cpp
+feleg                           //
+
+@source:fidel_card.cpp
+bridgec3                        //
+bridgeca                        //
+vbrc                            //
+
+@source:fidel_cc10.cpp
+cc10                            //
+
+@source:fidel_cc7.cpp
+backgamc                        //
+cc7                             //
+
+@source:fidel_chesster.cpp
+chesster                        //
+chesstera                       //
+kishon                          //
+
+@source:fidel_csc.cpp
+csc                             // CSC: Champion Sensory Chess Challenger (English)
+cscfr                           // * French
+cscg                            // * German
+cscsp                           // * Spanish
+reversic                        //
+super9cc                        // SU9: Super 9 Sensory Chess Challenger (English)
+super9ccfr                      // * French
+super9ccg                       // * German
+super9ccsp                      // * Spanish
+
+@source:fidel_dames.cpp
+damesc                          //
+
 @source:fidel_desdis.cpp
 fdes2000d                       //
 fdes2100d                       //
@@ -12870,6 +12904,28 @@ fex68kb                         //
 fex68km2                        //
 fex68km3                        //
 
+@source:fidel_elite.cpp
+feasbu                          // EAS: Elite A/S Challenger (Budapest program, English)
+feasbufr                        // * French
+feasbug                         // * German
+feasbusp                        // * Spanish
+feasgla                         // EAS: Elite A/S Challenger (Glasgow program, English)
+feasglafr                       // * French
+feasglag                        // * German
+feasglasp                       // * Spanish
+feag2100                        // EAG: Elite Avant Garde 2100 (English)
+feag2100fr                      // * French
+feag2100g                       // * German
+feag2100sp                      // * Spanish
+fpres                           //
+fpressp                         //
+fpresg                          //
+fpresfr                         //
+fpresbu                         //
+fpresbusp                       //
+fpresbug                        //
+fpresbufr                       //
+
 @source:fidel_excel.cpp
 fdes2000                        //
 fdes2100                        //
@@ -12883,68 +12939,36 @@ fexcelpb                        //
 fexcelv                         //
 granits                         // RCS
 
+@source:fidel_phantom.cpp
+fphantom                        //
+
+@source:fidel_sc12.cpp
+fscc12                          //
+fscc12b                         //
+
 @source:fidel_sc6.cpp
 fscc6                           //
 
-@source:fidel6502.cpp
-chesster                        //
-chesstera                       //
-kishon                          //
-csc                             // CSC: Champion Sensory Chess Challenger (English)
-cscfr                           // * French
-cscg                            // * German
-cscsp                           // * Spanish
-feasbu                          // EAS: Elite A/S Challenger (Budapest program, English)
-feasbufr                        // * French
-feasbug                         // * German
-feasbusp                        // * Spanish
-feasgla                         // EAS: Elite A/S Challenger (Glasgow program, English)
-feasglafr                       // * French
-feasglag                        // * German
-feasglasp                       // * Spanish
-feag2100                        // EAG: Elite Avant Garde 2100 (English)
-feag2100fr                      // * French
-feag2100g                       // * German
-feag2100sp                      // * Spanish
-feleg                           //
-fphantom                        //
-fpres                           //
-fpressp                         //
-fpresg                          //
-fpresfr                         //
-fpresbu                         //
-fpresbusp                       //
-fpresbug                        //
-fpresbufr                       //
+@source:fidel_sc8.cpp
+fscc8                           //
+
+@source:fidel_sc9.cpp
 fscc9                           //
 fscc9b                          //
 fscc9c                          //
 fscc9ps                         //
-fscc12                          //
-fscc12b                         //
-reversic                        //
-super9cc                        // SU9: Super 9 Sensory Chess Challenger (English)
-super9ccfr                      // * French
-super9ccg                       // * German
-super9ccsp                      // * Spanish
 
-@source:fidelbase.cpp
-backgamc                        //
-bridgec3                        //
-bridgeca                        //
-cc10                            //
-cc7                             //
-damesc                          //
-fscc8                           //
+@source:fidel_vcc.cpp
 uvc                             // UVC: Advanced Voice Chess Challenger (English)
 uvcfr                           // * French
 uvcg                            // * German
 uvcsp                           // * Spanish
-vbrc                            //
 vcc                             // VCC: Voice Chess Challenger (English)
 vccfr                           // * German
 vccg                            // * Spanish
 vccsp                           // * French
+
+@source:fidel_vsc.cpp
 vsc                             // VSC: Voice Sensory Chess Challenger (English)
 vscfr                           // * French
 vscg                            // * German
@@ -16129,6 +16153,11 @@ jclub2v220                      // v2.20      14 APR. 1998
 
 @source:jedi.cpp
 jedi                            // 136030           (c) 1984
+
+@source:jensen.cpp
+d2k300axp                       // DEC 2000 Model 300 AXP
+d2k500axp                       // DEC 2000 Model 500 AXP
+dpcaxp150                       // DECpc AXP 150
 
 @source:jeutel.cpp
 leking                          //
@@ -30667,9 +30696,25 @@ pkunwarj                        // UPL-????? (c) 1985 (Arcade Game TV List - P.9
 raiders5                        // UPL-85004 (c) 1985
 raiders5t                       // UPL-85004 (c) 1985 Taito license
 
-@source:novag6502.cpp
+@source:novag_cforte.cpp
 cfortea                         //
 cforteb                         //
+
+@source:novag_delta1.cpp
+ccdelta1                        //
+
+@source:novag_diablo.cpp
+diablo68                        //
+scorpio68                       //
+
+@source:novag_presto.cpp
+nocto                           //
+npresto                         //
+
+@source:novag_scon.cpp
+supercon                        //
+
+@source:novag_sexpert.cpp
 sexperta                        //
 sexpertb                        //
 sexpertc                        //
@@ -30678,18 +30723,6 @@ sfortea                         //
 sfortea1                        //
 sforteb                         //
 sfortec                         //
-supercon                        //
-
-@source:novag68k.cpp
-diablo68                        //
-scorpio68                       //
-
-@source:novagf8.cpp
-ccdelta1                        //
-
-@source:novagmcs48.cpp
-nocto                           //
-npresto                         //
 
 @source:nsg6809.cpp
 pitchhit                        //
@@ -38708,6 +38741,7 @@ rad_crik                        //
 rad_fb2                         //
 mattelcs                        //
 dreamlif                        //
+icanguit                        //
 
 @source:vsmile.cpp
 vsmile                          //
@@ -39792,6 +39826,14 @@ wwfsstaru4                      // TA-0024 (c) 1989 (US)
 @source:wy100.cpp
 wy100                           // WY-100
 
+@source:wy150.cpp
+wy120                           // WY-120
+wy150                           // WY-150
+wy160                           // WY-160
+
+@source:wy30p.cpp
+wy30p                           // WY-30+
+
 @source:wy50.cpp
 wy50                            // WY-50
 wy75                            // WY-75
@@ -39802,10 +39844,6 @@ wy85                            // WY-85
 @source:wyse.cpp
 wy55                            // WY-55
 wy60                            // WY-60
-wy120                           // WY-120
-wy150                           // WY-150
-wy160                           // WY-160
-wy30p                           // WY-30+
 
 @source:wyvernf0.cpp
 wyvernf0                        // A39 (c) 1985 Taito Corporation (Japan)
@@ -39882,6 +39920,7 @@ ekaraphs                        //
 epitch                          //
 ddrfammt                        //
 popira                          //
+popira2                         //
 taikodp                         //
 ttv_sw                          //
 ttv_lotr                        //

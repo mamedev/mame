@@ -586,25 +586,24 @@ void triforce_state::machine_start()
 	descrambler(&rom[0x100], 0x1afe00);
 }
 
-MACHINE_CONFIG_START(triforce_state::triforce_base)
-
+void triforce_state::triforce_base(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", PPC603, 64000000) /* Correct CPU is a PowerPC 750 (what Apple called "G3") with paired-single vector instructions added */
-	MCFG_DEVICE_PROGRAM_MAP(gc_map)
+	PPC603(config, m_maincpu, 64000000); /* Correct CPU is a PowerPC 750 (what Apple called "G3") with paired-single vector instructions added */
+	m_maincpu->set_addrmap(AS_PROGRAM, &triforce_state::gc_map);
 
 	config.m_minimum_quantum = attotime::from_hz(6000);
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
-	MCFG_SCREEN_UPDATE_DRIVER(triforce_state, screen_update_triforce)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 639, 0, 479);
+	screen.set_screen_update(FUNC(triforce_state::screen_update_triforce));
 
-	MCFG_PALETTE_ADD("palette", 65536)
-
-MACHINE_CONFIG_END
+	PALETTE(config, "palette").set_entries(65536);
+}
 
 void triforce_state::triforcegd(machine_config &config)
 {

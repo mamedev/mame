@@ -1114,14 +1114,14 @@ void mpu4_state::update_ay(device_t *device)
 
 		case 0x02:
 			/* CA2 = 0 CB2 = 1? : Write to selected PSG register and write data to Port A */
-			m_ay8913->data_w(generic_space(), 0, m_pia6->a_output());
+			m_ay8913->data_w(m_pia6->a_output());
 			LOG(("AY Chip Write \n"));
 			break;
 
 		case 0x03:
 			/* CA2 = 1 CB2 = 1? : The register will now be selected and the user can read from or write to it.
 			The register will remain selected until another is chosen.*/
-			m_ay8913->address_w(generic_space(), 0, m_pia6->a_output());
+			m_ay8913->address_w(m_pia6->a_output());
 			LOG(("AY Chip Select \n"));
 			break;
 
@@ -1422,7 +1422,7 @@ calculate the oscillation frequency in advance. We're running the timer for inte
 purposes, but the frequency calculation is done by plucking the values out as they are written.*/
 WRITE8_MEMBER(mpu4_state::ic3ss_w)
 {
-	m_ptm_ic3ss->write(space, offset,data);
+	m_ptm_ic3ss->write(offset,data);
 
 	if (offset == 3)
 	{
@@ -2135,8 +2135,8 @@ void mpu4_state::mpu4_install_mod4oki_space(address_space &space)
 {
 	pia6821_device *pia_ic4ss = subdevice<pia6821_device>("pia_ic4ss");
 
-	space.install_readwrite_handler(0x0880, 0x0883, read8_delegate(FUNC(pia6821_device::read), pia_ic4ss), write8_delegate(FUNC(pia6821_device::write), pia_ic4ss));
-	space.install_read_handler(0x08c0, 0x08c7, read8_delegate(FUNC(ptm6840_device::read), (ptm6840_device*)m_ptm_ic3ss));
+	space.install_readwrite_handler(0x0880, 0x0883, read8sm_delegate(FUNC(pia6821_device::read), pia_ic4ss), write8sm_delegate(FUNC(pia6821_device::write), pia_ic4ss));
+	space.install_read_handler(0x08c0, 0x08c7, read8sm_delegate(FUNC(ptm6840_device::read), (ptm6840_device*)m_ptm_ic3ss));
 	space.install_write_handler(0x08c0, 0x08c7, write8_delegate(FUNC(mpu4_state::ic3ss_w),this));
 }
 

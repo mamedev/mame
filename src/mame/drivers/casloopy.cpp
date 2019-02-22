@@ -421,7 +421,7 @@ WRITE8_MEMBER(casloopy_state::bitmap_w)
 
 READ32_MEMBER(casloopy_state::cart_r)
 {
-	return m_cart->read32_rom(space, offset, mem_mask);
+	return m_cart->read32_rom(offset, mem_mask);
 }
 
 

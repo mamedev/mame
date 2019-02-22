@@ -1678,7 +1678,7 @@ void thomson_state::to7_network_reset()
 READ8_MEMBER( thomson_state::to7_network_r )
 {
 	if ( offset < 4 )
-		return m_mc6854->read( space, offset );
+		return m_mc6854->read( offset );
 
 	if ( offset == 8 )
 	{
@@ -1697,7 +1697,7 @@ READ8_MEMBER( thomson_state::to7_network_r )
 WRITE8_MEMBER( thomson_state::to7_network_w )
 {
 	if ( offset < 4 )
-		m_mc6854->write( space, offset, data );
+		m_mc6854->write( offset, data );
 	else
 	{
 		logerror( "%f $%04x to7_network_w: invalid write offset %i (data=$%02X)\n",

@@ -64,7 +64,7 @@ void isa8_number_9_rev_device::device_add_mconfig(machine_config &config)
 
 	UPD7220(config, m_upd7220, XTAL(4'433'619)/2); // unknown clock
 	m_upd7220->set_addrmap(0, &isa8_number_9_rev_device::upd7220_map);
-	m_upd7220->set_display_pixels_callback(FUNC(isa8_number_9_rev_device::hgdc_display_pixels), this);
+	m_upd7220->set_display_pixels(FUNC(isa8_number_9_rev_device::hgdc_display_pixels));
 	m_upd7220->set_screen("screen");
 }
 

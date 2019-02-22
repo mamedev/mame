@@ -2448,7 +2448,7 @@ uint32_t mos6566_device::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( mos6566_device::read )
+uint8_t mos6566_device::read(offs_t offset)
 {
 	uint8_t val = 0;
 
@@ -2593,7 +2593,7 @@ READ8_MEMBER( mos6566_device::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( mos6566_device::write )
+void mos6566_device::write(offs_t offset, uint8_t data)
 {
 	DBG_LOG(2, "vic write", ("%.2x:%.2x\n", offset, data));
 	offset &= 0x3f;

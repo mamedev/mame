@@ -313,8 +313,7 @@ WRITE8_MEMBER( taito_state::io_w )
 
 WRITE_LINE_MEMBER( taito_state::pia_cb2_w )
 {
-	address_space& space = m_maincpu->space(AS_PROGRAM);
-	m_votrax->write(space, 0, m_votrax_cmd);
+	m_votrax->write(m_votrax_cmd);
 }
 
 READ8_MEMBER( taito_state::pia_pb_r )
@@ -368,7 +367,6 @@ void taito_state::taito(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.475); // unknown DAC
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 

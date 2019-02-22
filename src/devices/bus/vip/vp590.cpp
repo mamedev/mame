@@ -159,7 +159,7 @@ void vp590_device::device_start()
 //  vip_program_w - program write
 //-------------------------------------------------
 
-void vp590_device::vip_program_w(address_space &space, offs_t offset, uint8_t data, int cdef, int *minh)
+void vp590_device::vip_program_w(offs_t offset, uint8_t data, int cdef, int *minh)
 {
 	if (offset >= 0xc000 && offset < 0xe000)
 	{
@@ -185,7 +185,7 @@ void vp590_device::vip_program_w(address_space &space, offs_t offset, uint8_t da
 //  vip_io_w - I/O write
 //-------------------------------------------------
 
-void vp590_device::vip_io_w(address_space &space, offs_t offset, uint8_t data)
+void vp590_device::vip_io_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -205,7 +205,7 @@ void vp590_device::vip_io_w(address_space &space, offs_t offset, uint8_t data)
 //  vip_dma_w - DMA write
 //-------------------------------------------------
 
-void vp590_device::vip_dma_w(address_space &space, offs_t offset, uint8_t data)
+void vp590_device::vip_dma_w(offs_t offset, uint8_t data)
 {
 	uint8_t mask = 0xff;
 
@@ -217,7 +217,7 @@ void vp590_device::vip_dma_w(address_space &space, offs_t offset, uint8_t data)
 
 	m_color = m_color_ram[offset & mask];
 
-	m_cgc->dma_w(space, offset, data);
+	m_cgc->dma_w(data);
 }
 
 

@@ -49,7 +49,6 @@ void midway_cheap_squeak_deluxe_device::device_add_mconfig(machine_config &confi
 
 	AD7533(config, m_dac, 0).add_route(ALL_OUTPUTS, *this, 1.0);
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }

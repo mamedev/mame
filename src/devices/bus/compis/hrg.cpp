@@ -89,7 +89,7 @@ void compis_hrg_device::device_add_mconfig(machine_config &config)
 
 	UPD7220(config, m_crtc, 2252500); // unknown clock
 	m_crtc->set_addrmap(0, &compis_hrg_device::hrg_map);
-	m_crtc->set_display_pixels_callback(FUNC(compis_hrg_device::display_pixels), this);
+	m_crtc->set_display_pixels(FUNC(compis_hrg_device::display_pixels));
 	m_crtc->set_screen(SCREEN_TAG);
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
@@ -108,7 +108,7 @@ void compis_uhrg_device::device_add_mconfig(machine_config &config)
 
 	UPD7220(config, m_crtc, 2252500*2); // unknown clock
 	m_crtc->set_addrmap(0, &compis_uhrg_device::uhrg_map);
-	m_crtc->set_display_pixels_callback(FUNC(compis_uhrg_device::display_pixels), this);
+	m_crtc->set_display_pixels(FUNC(compis_uhrg_device::display_pixels));
 	m_crtc->set_screen(SCREEN_TAG);
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);

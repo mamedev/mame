@@ -332,14 +332,14 @@ uint8_t c64_state::read_memory(address_space &space, offs_t offset, offs_t va, i
 		case 1:
 		case 2:
 		case 3: // VIC
-			data = m_vic->read(space, offset & 0x3f);
+			data = m_vic->read(offset & 0x3f);
 			break;
 
 		case 4:
 		case 5:
 		case 6:
 		case 7: // SID
-			data = m_sid->read(space, offset & 0x1f);
+			data = m_sid->read(offset & 0x1f);
 			break;
 
 		case 0x8:
@@ -350,11 +350,11 @@ uint8_t c64_state::read_memory(address_space &space, offs_t offset, offs_t va, i
 			break;
 
 		case 0xc: // CIA1
-			data = m_cia1->read(space, offset & 0x0f);
+			data = m_cia1->read(offset & 0x0f);
 			break;
 
 		case 0xd: // CIA2
-			data = m_cia2->read(space, offset & 0x0f);
+			data = m_cia2->read(offset & 0x0f);
 			break;
 
 		case 0xe: // I/O1
@@ -369,7 +369,7 @@ uint8_t c64_state::read_memory(address_space &space, offs_t offset, offs_t va, i
 
 	int roml = BIT(plaout, PLA_OUT_ROML);
 	int romh = BIT(plaout, PLA_OUT_ROMH);
-	return m_exp->cd_r(space, offset, data, sphi2, ba, roml, romh, io1, io2);
+	return m_exp->cd_r(offset, data, sphi2, ba, roml, romh, io1, io2);
 }
 
 
@@ -404,14 +404,14 @@ void c64_state::write_memory(address_space &space, offs_t offset, uint8_t data, 
 		case 1:
 		case 2:
 		case 3: // VIC
-			m_vic->write(space, offset & 0x3f, data);
+			m_vic->write(offset & 0x3f, data);
 			break;
 
 		case 4:
 		case 5:
 		case 6:
 		case 7: // SID
-			m_sid->write(space, offset & 0x1f, data);
+			m_sid->write(offset & 0x1f, data);
 			break;
 
 		case 0x8:
@@ -422,11 +422,11 @@ void c64_state::write_memory(address_space &space, offs_t offset, uint8_t data, 
 			break;
 
 		case 0xc: // CIA1
-			m_cia1->write(space, offset & 0x0f, data);
+			m_cia1->write(offset & 0x0f, data);
 			break;
 
 		case 0xd: // CIA2
-			m_cia2->write(space, offset & 0x0f, data);
+			m_cia2->write(offset & 0x0f, data);
 			break;
 
 		case 0xe: // I/O1
@@ -441,7 +441,7 @@ void c64_state::write_memory(address_space &space, offs_t offset, uint8_t data, 
 
 	int roml = BIT(plaout, PLA_OUT_ROML);
 	int romh = BIT(plaout, PLA_OUT_ROMH);
-	m_exp->cd_w(space, offset, data, sphi2, ba, roml, romh, io1, io2);
+	m_exp->cd_w(offset, data, sphi2, ba, roml, romh, io1, io2);
 }
 
 
@@ -692,7 +692,7 @@ READ8_MEMBER( c64_state::sid_potx_r )
 {
 	uint8_t data = 0xff;
 
-	switch (m_cia1->read_pa() >> 6)
+	switch (m_cia1->pa_r() >> 6)
 	{
 	case 1: data = m_joy1->read_pot_x(); break;
 	case 2: data = m_joy2->read_pot_x(); break;
@@ -719,7 +719,7 @@ READ8_MEMBER( c64_state::sid_poty_r )
 {
 	uint8_t data = 0xff;
 
-	switch (m_cia1->read_pa() >> 6)
+	switch (m_cia1->pa_r() >> 6)
 	{
 	case 1: data = m_joy1->read_pot_y(); break;
 	case 2: data = m_joy2->read_pot_y(); break;
@@ -773,7 +773,7 @@ READ8_MEMBER( c64_state::cia1_pa_r )
 	data &= ~(!BIT(joy_b, 5) << 4);
 
 	// keyboard
-	uint8_t cia1_pb = m_cia1->read_pb();
+	uint8_t cia1_pb = m_cia1->pb_r();
 	uint32_t row[8] = { m_row[0]->read(), m_row[1]->read() & m_lock->read(), m_row[2]->read(), m_row[3]->read(),
 						m_row[4]->read(), m_row[5]->read(), m_row[6]->read(), m_row[7]->read() };
 
@@ -841,7 +841,7 @@ READ8_MEMBER( c64_state::cia1_pb_r )
 	data &= ~(!BIT(joy_a, 5) << 4);
 
 	// keyboard
-	uint8_t cia1_pa = m_cia1->read_pa();
+	uint8_t cia1_pa = m_cia1->pa_r();
 
 	if (!BIT(cia1_pa, 7)) data &= m_row[7]->read();
 	if (!BIT(cia1_pa, 6)) data &= m_row[6]->read();

@@ -42,14 +42,14 @@ public:
 	using string_type = typename T::string_type;
 	using traits_type = typename T::traits_type;
 
-	pstring_const_iterator() noexcept : p() { }
+	constexpr pstring_const_iterator() noexcept : p() { }
 	explicit constexpr pstring_const_iterator(const typename string_type::const_iterator &x) noexcept : p(x) { }
 
 	pstring_const_iterator& operator++() noexcept { p += static_cast<difference_type>(traits_type::codelen(&(*p))); return *this; }
-	const pstring_const_iterator operator++(int) noexcept { pstring_const_iterator tmp(*this); operator++(); return tmp; }
+	pstring_const_iterator operator++(int) noexcept { pstring_const_iterator tmp(*this); operator++(); return tmp; }
 
-	bool operator==(const pstring_const_iterator& rhs) const noexcept { return p == rhs.p; }
-	bool operator!=(const pstring_const_iterator& rhs) const noexcept { return p != rhs.p; }
+	constexpr bool operator==(const pstring_const_iterator& rhs) const noexcept { return p == rhs.p; }
+	constexpr bool operator!=(const pstring_const_iterator& rhs) const noexcept { return p != rhs.p; }
 
 	reference operator*() const noexcept { return *reinterpret_cast<pointer>(&(*p)); }
 	pointer operator->() const noexcept { return reinterpret_cast<pointer>(&(*p)); }

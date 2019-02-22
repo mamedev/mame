@@ -30,7 +30,7 @@
 #include "nl_time.h"
 
 //============================================================
-//  MACROS / New Syntax
+//  MACROS / New Syntax999
 //============================================================
 
 /*! Construct a netlist device name */
@@ -71,7 +71,7 @@ class NETLIB_NAME(name) : public device_t
 	/*! Used to define the destructor of a netlist device.
 	*  The use of a destructor for netlist device should normally not be necessary.
 	*/
-#define NETLIB_DESTRUCTOR(name) public: virtual ~NETLIB_NAME(name)()
+#define NETLIB_DESTRUCTOR(name) public: virtual ~NETLIB_NAME(name)() noexcept
 
 	/*! Define an extended constructor and add further parameters to it.
 	*  The macro allows to add further parameters to a device constructor. This is
@@ -130,11 +130,11 @@ class NETLIB_NAME(name) : public device_t
 
 #define NETLIB_DELEGATE(chip, name) nldelegate(&NETLIB_NAME(chip) :: name, this)
 
-#define NETLIB_UPDATE_TERMINALSI() public: virtual void update_terminals() override
-#define NETLIB_HANDLERI(name) private: virtual void name() NL_NOEXCEPT
-#define NETLIB_UPDATEI() public: virtual void update() NL_NOEXCEPT override
-#define NETLIB_UPDATE_PARAMI() public: virtual void update_param() override
-#define NETLIB_RESETI() public: virtual void reset() override
+#define NETLIB_UPDATE_TERMINALSI() virtual void update_terminals() override
+#define NETLIB_HANDLERI(name) virtual void name() NL_NOEXCEPT
+#define NETLIB_UPDATEI() virtual void update() NL_NOEXCEPT override
+#define NETLIB_UPDATE_PARAMI() virtual void update_param() override
+#define NETLIB_RESETI() virtual void reset() override
 
 #define NETLIB_TIMESTEP(chip) void NETLIB_NAME(chip) :: timestep(const nl_double step)
 
@@ -418,11 +418,12 @@ namespace netlist
 		 */
 		pstring name() const;
 
+#if 0
 		void * operator new (size_t size, void *ptr) { plib::unused_var(size); return ptr; }
 		void operator delete (void *ptr, void *) { plib::unused_var(ptr); }
-
 		void * operator new (size_t size) = delete;
-		void operator delete (void * mem);
+		void operator delete (void * mem) = delete;
+#endif
 	protected:
 		~object_t() noexcept = default; // only childs should be destructible
 
@@ -451,7 +452,7 @@ namespace netlist
 		const netlist_t & exec() const noexcept { return m_netlist; }
 
 	protected:
-		~netlist_ref() = default; // prohibit polymorphic destruction
+		~netlist_ref() noexcept = default; // prohibit polymorphic destruction
 
 	private:
 		netlist_t & m_netlist;
@@ -941,7 +942,7 @@ namespace netlist
 		param_type_t param_type() const;
 
 	protected:
-		virtual ~param_t() = default; /* not intended to be destroyed */
+		virtual ~param_t() noexcept = default; /* not intended to be destroyed */
 
 		void update_param();
 
@@ -1182,7 +1183,7 @@ namespace netlist
 
 		COPYASSIGNMOVE(device_t, delete)
 
-		~device_t() override = default;
+		~device_t() noexcept override = default;
 
 		setup_t &setup();
 		const setup_t &setup() const;

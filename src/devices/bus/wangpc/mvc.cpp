@@ -309,11 +309,11 @@ void wangpc_mvc_device::wangpcbus_aiowc_w(address_space &space, offs_t offset, u
 		switch (offset & 0x7f)
 		{
 		case 0x00/2:
-			m_crtc->address_w(space, 0, data & 0xff);
+			m_crtc->address_w(data & 0xff);
 			break;
 
 		case 0x02/2:
-			m_crtc->register_w(space, 0, data & 0xff);
+			m_crtc->register_w(data & 0xff);
 			break;
 
 		case 0x10/2:

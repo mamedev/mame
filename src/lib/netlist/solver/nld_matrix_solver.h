@@ -11,6 +11,7 @@
 #include "netlist/nl_base.h"
 #include "netlist/nl_errstr.h"
 #include "netlist/plib/putil.h"
+#include "netlist/plib/vector_ops.h"
 
 namespace netlist
 {
@@ -54,27 +55,41 @@ public:
 
 	void set_pointers();
 
+	/* FIXME: this works a bit better for larger matrices */
 	template <typename AP, typename FT>
-	void fill_matrix(AP &tcr, FT &RHS)
+	void fill_matrix/*_larger*/(AP &tcr, FT &RHS)
 	{
-		FT gtot_t = 0.0;
-		FT RHS_t = 0.0;
 
 		const std::size_t term_count = this->count();
 		const std::size_t railstart = this->m_railstart;
-		const FT * const * other_cur_analog = this->connected_net_V();
+		const FT * const * other_cur_analog = m_connected_net_V.data();
+		const FT * p_go = m_go.data();
+		const FT * p_gt = m_gt.data();
+		const FT * p_Idr = m_Idr.data();
 
 		for (std::size_t i = 0; i < railstart; i++)
 		{
-			*tcr[i]       -= m_go[i];
-			gtot_t        += m_gt[i];
-			RHS_t         += m_Idr[i];
+			*tcr[i]       -= p_go[i];
 		}
+
+#if 1
+		FT gtot_t = 0.0;
+		FT RHS_t = 0.0;
+
+		for (std::size_t i = 0; i < term_count; i++)
+		{
+			gtot_t        += p_gt[i];
+			RHS_t         += p_Idr[i];
+		}
+		// FIXME: Code above is faster than vec_sum - Check this
+#else
+		auto gtot_t = plib::vec_sum<FT>(term_count, p_gt);
+		auto RHS_t = plib::vec_sum<FT>(term_count, p_Idr);
+#endif
 
 		for (std::size_t i = railstart; i < term_count; i++)
 		{
-			RHS_t += (m_Idr[i] + m_go[i] * *other_cur_analog[i]);
-			gtot_t += m_gt[i];
+			RHS_t += (/*m_Idr[i]*/ + p_go[i] * *other_cur_analog[i]);
 		}
 
 		RHS = RHS_t;

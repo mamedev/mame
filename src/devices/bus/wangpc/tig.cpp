@@ -127,12 +127,12 @@ void wangpc_tig_device::device_add_mconfig(machine_config &config)
 
 	UPD7220(config, m_hgdc0, XTAL(52'832'000)/28);
 	m_hgdc0->set_addrmap(0, &wangpc_tig_device::upd7220_0_map);
-	m_hgdc0->set_draw_text_callback(FUNC(wangpc_tig_device::hgdc_draw_text), this);
+	m_hgdc0->set_draw_text(FUNC(wangpc_tig_device::hgdc_draw_text));
 	m_hgdc0->set_screen(SCREEN_TAG);
 
 	UPD7220(config, m_hgdc1, XTAL(52'832'000)/28);
 	m_hgdc1->set_addrmap(0, &wangpc_tig_device::upd7220_1_map);
-	m_hgdc1->set_display_pixels_callback(FUNC(wangpc_tig_device::hgdc_display_pixels), this);
+	m_hgdc1->set_display_pixels(FUNC(wangpc_tig_device::hgdc_display_pixels));
 	m_hgdc1->set_screen(SCREEN_TAG);
 }
 

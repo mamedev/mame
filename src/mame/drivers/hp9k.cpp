@@ -239,7 +239,7 @@ READ16_MEMBER( hp9k_state::hp9k_videoram_r )
 	if (offset==0x0001)
 	{
 		//printf("m6845 read at [%x] mem_mask [%x]\n",offset,mem_mask);
-		return m_6845->register_r(space,0);
+		return m_6845->register_r();
 	}
 	else
 	{
@@ -262,13 +262,13 @@ WRITE16_MEMBER( hp9k_state::hp9k_videoram_w )
 	{
 		//printf("6845 address write [%x] at [%x] mask [%x]\n",data,offset,mem_mask);
 		data&=0x1f;
-		m_6845->address_w( space, 0, data );
+		m_6845->address_w(data);
 		crtc_curreg=data;
 	}
 	else if (offset==0x0001)
 	{
 		//printf("6845 register write [%x] at [%x] mask [%x]\n",data,offset,mem_mask);
-		m_6845->register_w( space, 0, data );
+		m_6845->register_w(data);
 		if (crtc_curreg==0x0c) crtc_addrStartHi=data;
 		if (crtc_curreg==0x0d) crtc_addrStartLow=data;
 	}

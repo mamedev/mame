@@ -378,7 +378,7 @@ READ8_MEMBER( svi3x8_state::mreq_r )
 		offset ^= 0x8000;
 
 	if (CCS1 || CCS2 || CCS3 || CCS4)
-		return m_cart_rom->read_rom(space, offset);
+		return m_cart_rom->read_rom(offset);
 
 	uint8_t data = m_expander->mreq_r(space, offset);
 
@@ -532,9 +532,9 @@ DEVICE_IMAGE_LOAD_MEMBER( svi3x8_state, cartridge )
 
 MACHINE_CONFIG_START(svi3x8_state::svi318)
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(10'738'635) / 3)
-	MCFG_DEVICE_PROGRAM_MAP(svi3x8_mem)
-	MCFG_DEVICE_IO_MAP(svi3x8_io)
+	Z80(config, m_maincpu, XTAL(10'738'635) / 3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &svi3x8_state::svi3x8_mem);
+	m_maincpu->set_addrmap(AS_IO, &svi3x8_state::svi3x8_io);
 
 	RAM(config, m_ram).set_default_size("16K");
 

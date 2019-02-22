@@ -162,7 +162,7 @@ void vic20_video_pak_device::device_reset()
 //  vic20_cd_r - cartridge data read
 //-------------------------------------------------
 
-uint8_t vic20_video_pak_device::vic20_cd_r(address_space &space, offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
+uint8_t vic20_video_pak_device::vic20_cd_r(offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
 {
 	if (!m_ram_enable)
 	{
@@ -221,7 +221,7 @@ uint8_t vic20_video_pak_device::vic20_cd_r(address_space &space, offs_t offset, 
 	{
 		if (offset == 0x1bf9)
 		{
-			data = m_crtc->register_r(space, 0);
+			data = m_crtc->register_r();
 		}
 	}
 
@@ -233,7 +233,7 @@ uint8_t vic20_video_pak_device::vic20_cd_r(address_space &space, offs_t offset, 
 //  vic20_cd_w - cartridge data write
 //-------------------------------------------------
 
-void vic20_video_pak_device::vic20_cd_w(address_space &space, offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
+void vic20_video_pak_device::vic20_cd_w(offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
 {
 	if (!m_ram_enable)
 	{
@@ -293,11 +293,11 @@ void vic20_video_pak_device::vic20_cd_w(address_space &space, offs_t offset, uin
 		switch (offset)
 		{
 		case 0x1bf8:
-			m_crtc->address_w(space, 0, data);
+			m_crtc->address_w(data);
 			break;
 
 		case 0x1bf9:
-			m_crtc->register_w(space, 0, data);
+			m_crtc->register_w(data);
 			break;
 
 		case 0x1bfc:

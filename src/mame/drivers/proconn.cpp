@@ -59,7 +59,7 @@ public:
 	void init_proconn();
 
 private:
-	template <unsigned N> DECLARE_WRITE8_MEMBER( ay_w ) { m_ay->address_data_w(space, N, data); }
+	template <unsigned N> DECLARE_WRITE8_MEMBER( ay_w ) { m_ay->address_data_w(N, data); }
 
 	template <unsigned N> DECLARE_WRITE8_MEMBER( ctc_w ) { m_z80ctc->write(space, N, data); }
 
@@ -70,8 +70,6 @@ private:
 	template <unsigned N> DECLARE_WRITE8_MEMBER( pio3_w ) { m_z80pio[2]->write(space, N, data); }
 	template <unsigned N> DECLARE_WRITE8_MEMBER( pio4_w ) { m_z80pio[3]->write(space, N, data); }
 	template <unsigned N> DECLARE_WRITE8_MEMBER( pio5_w ) { m_z80pio[4]->write(space, N, data); }
-
-	template <unsigned N> DECLARE_READ8_MEMBER( ay_r ) { return m_ay->data_r(space, N); }
 
 	template <unsigned N> DECLARE_READ8_MEMBER( ctc_r ) { return m_z80ctc->read(space, N); }
 
@@ -176,7 +174,7 @@ void proconn_state::proconn_portmap(address_map &map)
 	map(0x03fe, 0x03fe).rw(FUNC(proconn_state::ctc_r<3>), FUNC(proconn_state::ctc_w<3>));
 
 	// ay (meters connected to it?)
-	map(0x00fd, 0x00fd).rw(FUNC(proconn_state::ay_r<0>), FUNC(proconn_state::ay_w<0>));
+	map(0x00fd, 0x00fd).r(m_ay, FUNC(ay8910_device::data_r)).w(FUNC(proconn_state::ay_w<0>));
 	map(0x00fc, 0x00fc).w(FUNC(proconn_state::ay_w<1>));
 
 	// ??

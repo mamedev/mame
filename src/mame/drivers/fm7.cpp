@@ -851,8 +851,6 @@ READ8_MEMBER(fm7_state::fm77av_boot_mode_r)
  */
 void fm7_state::fm7_update_psg()
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
 	if(m_type == SYS_FM7)
 	{
 		switch(m_psg_regsel)
@@ -862,15 +860,15 @@ void fm7_state::fm7_update_psg()
 				break;
 			case 0x01:
 				// Data read
-				m_psg_data = m_psg->data_r(space, 0);
+				m_psg_data = m_psg->data_r();
 				break;
 			case 0x02:
 				// Data write
-				m_psg->data_w(space, 0,m_psg_data);
+				m_psg->data_w(m_psg_data);
 				break;
 			case 0x03:
 				// Address latch
-				m_psg->address_w(space, 0,m_psg_data);
+				m_psg->address_w(m_psg_data);
 				break;
 		}
 	}

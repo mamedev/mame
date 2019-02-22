@@ -167,7 +167,7 @@ READ16_MEMBER(intv_ecs_device::read_romf0)
 READ16_MEMBER(intv_ecs_device::read_ay)
 {
 	if (ACCESSING_BITS_0_7)
-		return m_snd->read(space, offset, mem_mask);
+		return m_snd->read(offset);
 	else
 		return 0xffff;
 }
@@ -179,7 +179,7 @@ READ16_MEMBER(intv_ecs_device::read_ay)
 WRITE16_MEMBER(intv_ecs_device::write_ay)
 {
 	if (ACCESSING_BITS_0_7)
-		return m_snd->write(space, offset, data, mem_mask);
+		return m_snd->write(offset, data);
 }
 
 

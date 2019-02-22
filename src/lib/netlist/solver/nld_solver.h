@@ -8,13 +8,13 @@
 #ifndef NLD_SOLVER_H_
 #define NLD_SOLVER_H_
 
-#include <map>
-#include <memory>
-#include <vector>
-
 #include "../nl_base.h"
 #include "../plib/pstream.h"
 #include "nld_matrix_solver.h"
+
+#include <map>
+#include <memory>
+#include <vector>
 
 //#define ATTR_ALIGNED(N) __attribute__((aligned(N)))
 #define ATTR_ALIGNED(N) ATTR_ALIGN

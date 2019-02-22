@@ -118,7 +118,7 @@ void tiki100_8088_device::device_reset()
 //  tiki100bus_iorq_r - I/O read
 //-------------------------------------------------
 
-uint8_t tiki100_8088_device::iorq_r(address_space &space, offs_t offset, uint8_t data)
+uint8_t tiki100_8088_device::iorq_r(offs_t offset, uint8_t data)
 {
 	if ((offset & 0xff) == 0x7f)
 	{
@@ -133,7 +133,7 @@ uint8_t tiki100_8088_device::iorq_r(address_space &space, offs_t offset, uint8_t
 //  tiki100bus_iorq_w - I/O write
 //-------------------------------------------------
 
-void tiki100_8088_device::iorq_w(address_space &space, offs_t offset, uint8_t data)
+void tiki100_8088_device::iorq_w(offs_t offset, uint8_t data)
 {
 	if ((offset & 0xff) == 0x7f)
 	{

@@ -89,7 +89,7 @@ READ8_MEMBER(p1_hdc_device::p1_HDC_r)
 	switch (offset >> 8)
 	{
 	case 8:
-		data = m_hdc->read(space, offset & 255);
+		data = m_hdc->read(offset & 255);
 	}
 	LOG("hdc R $%04x == $%02x\n", offset, data);
 
@@ -103,7 +103,7 @@ WRITE8_MEMBER(p1_hdc_device::p1_HDC_w)
 	switch (offset >> 8)
 	{
 	case 8:
-		m_hdc->write(space, offset & 255, data, 0);
+		m_hdc->write(offset & 255, data);
 	}
 }
 

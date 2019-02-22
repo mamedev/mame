@@ -668,8 +668,8 @@ INTERRUPT_GEN_MEMBER(spectrum_state::spec_interrupt)
 	m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32));
 }
 
-MACHINE_CONFIG_START(spectrum_state::spectrum_common)
-
+void spectrum_state::spectrum_common(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, X1 / 4);        /* This is verified only for the ZX Spectrum. Other clones are reported to have different clocks */
 	m_maincpu->set_addrmap(AS_PROGRAM, &spectrum_state::spectrum_mem);
@@ -714,7 +714,7 @@ MACHINE_CONFIG_START(spectrum_state::spectrum_common)
 	m_cassette->set_interface("spectrum_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("spectrum_cass");
-MACHINE_CONFIG_END
+}
 
 void spectrum_state::spectrum(machine_config &config)
 {

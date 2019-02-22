@@ -253,11 +253,12 @@ void tosh1000_state::cfg_fdc_35(device_t *device)
 	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option("");
 }
 
-MACHINE_CONFIG_START(tosh1000_state::tosh1000)
-	MCFG_DEVICE_ADD("maincpu", I8088, XTAL(5'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(tosh1000_map)
-	MCFG_DEVICE_IO_MAP(tosh1000_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
+void tosh1000_state::tosh1000(machine_config &config)
+{
+	I8088(config, m_maincpu, XTAL(5'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &tosh1000_state::tosh1000_map);
+	m_maincpu->set_addrmap(AS_IO, &tosh1000_state::tosh1000_io);
+	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
 	ADDRESS_MAP_BANK(config, "bankdev").set_map(&tosh1000_state::tosh1000_romdos).set_options(ENDIANNESS_LITTLE, 8, 20, 0x10000);
 
@@ -268,13 +269,12 @@ MACHINE_CONFIG_START(tosh1000_state::tosh1000)
 	TC8521(config, "rtc", XTAL(32'768));
 
 	// FIXME: determine ISA bus clock
-	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "cga", false)
-	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "fdc_xt", false)
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc_xt", cfg_fdc_35)
-	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "lpt", false)
-	MCFG_DEVICE_ADD("isa4", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "com", false)
-	MCFG_DEVICE_ADD("isa5", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa6", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
+	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, "cga", false);
+	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, "fdc_xt", false).set_option_machine_config("fdc_xt", cfg_fdc_35);
+	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, "lpt", false);
+	ISA8_SLOT(config, "isa4", 0, "mb:isa", pc_isa8_cards, "com", false);
+	ISA8_SLOT(config, "isa5", 0, "mb:isa", pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa6", 0, "mb:isa", pc_isa8_cards, nullptr, false);
 
 //  SOFTWARE_LIST(config, "flop_list").set_original("tosh1000");
 
@@ -284,7 +284,7 @@ MACHINE_CONFIG_START(tosh1000_state::tosh1000)
 	RAM(config, RAM_TAG).set_default_size("512K");
 
 	TOSH1000_BRAM(config, m_bram, 0);
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( tosh1000 )

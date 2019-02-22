@@ -349,20 +349,21 @@ void stratos_state::stratos_mem(address_map &map)
 static INPUT_PORTS_START( stratos )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(stratos_state::stratos)
-	MCFG_DEVICE_ADD("maincpu", M65C02, 5670000)
-	MCFG_DEVICE_PROGRAM_MAP(stratos_mem)
+void stratos_state::stratos(machine_config &config)
+{
+	M65C02(config, maincpu, 5670000);
+	maincpu->set_addrmap(AS_PROGRAM, &stratos_state::stratos_mem);
 
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(240, 64)
-	MCFG_SCREEN_VISIBLE_AREA(0, 239, 0, 63)
-	MCFG_SCREEN_UPDATE_DRIVER(stratos_state, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(50);
+	screen.set_size(240, 64);
+	screen.set_visarea(0, 239, 0, 63);
+	screen.set_screen_update(FUNC(stratos_state::screen_update));
 
 	TIMER(config, "irq").configure_periodic(FUNC(stratos_state::irq_timer), attotime::from_hz(1000));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-MACHINE_CONFIG_END
+}
 
 ROM_START( stratos )
 	ROM_REGION(0x20000, "roms_8000", 0)

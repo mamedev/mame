@@ -152,15 +152,15 @@ void acorn_vdu80_device::device_reset()
 	{
 		space.install_ram(0xf000, 0x0f7ff, m_videoram.get());
 
-		space.install_readwrite_handler(0xe840, 0xe840, 0, 0x3f, 0, read8_delegate(FUNC(mc6845_device::status_r), m_crtc.target()), write8_delegate(FUNC(mc6845_device::address_w), m_crtc.target()));
-		space.install_readwrite_handler(0xe841, 0xe841, 0, 0x3e, 0, read8_delegate(FUNC(mc6845_device::register_r), m_crtc.target()), write8_delegate(FUNC(mc6845_device::register_w), m_crtc.target()));
+		space.install_readwrite_handler(0xe840, 0xe840, 0, 0x3f, 0, read8smo_delegate(FUNC(mc6845_device::status_r), m_crtc.target()), write8smo_delegate(FUNC(mc6845_device::address_w), m_crtc.target()));
+		space.install_readwrite_handler(0xe841, 0xe841, 0, 0x3e, 0, read8smo_delegate(FUNC(mc6845_device::register_r), m_crtc.target()), write8smo_delegate(FUNC(mc6845_device::register_w), m_crtc.target()));
 	}
 	else
 	{
 		space.install_ram(0x1000, 0x017ff, m_videoram.get());
 
-		space.install_readwrite_handler(0x1840, 0x1840, 0, 0x3f, 0, read8_delegate(FUNC(mc6845_device::status_r), m_crtc.target()), write8_delegate(FUNC(mc6845_device::address_w), m_crtc.target()));
-		space.install_readwrite_handler(0x1841, 0x1841, 0, 0x3e, 0, read8_delegate(FUNC(mc6845_device::register_r), m_crtc.target()), write8_delegate(FUNC(mc6845_device::register_w), m_crtc.target()));
+		space.install_readwrite_handler(0x1840, 0x1840, 0, 0x3f, 0, read8smo_delegate(FUNC(mc6845_device::status_r), m_crtc.target()), write8smo_delegate(FUNC(mc6845_device::address_w), m_crtc.target()));
+		space.install_readwrite_handler(0x1841, 0x1841, 0, 0x3e, 0, read8smo_delegate(FUNC(mc6845_device::register_r), m_crtc.target()), write8smo_delegate(FUNC(mc6845_device::register_w), m_crtc.target()));
 	}
 }
 

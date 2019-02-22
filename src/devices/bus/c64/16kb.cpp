@@ -98,15 +98,15 @@ void c64_16kb_cartridge_device::device_reset()
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------
 
-uint8_t c64_16kb_cartridge_device::c64_cd_r(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+uint8_t c64_16kb_cartridge_device::c64_cd_r(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!roml)
 	{
-		data = m_low->read_rom(space, offset & 0x1fff);
+		data = m_low->read_rom(offset & 0x1fff);
 	}
 	else if (!romh)
 	{
-		data = m_high->read_rom(space, offset & 0x1fff);
+		data = m_high->read_rom(offset & 0x1fff);
 	}
 
 	return data;

@@ -196,23 +196,23 @@ uint32_t stlforce_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return m_video->draw(screen, bitmap, cliprect);
 }
 
-MACHINE_CONFIG_START(stlforce_state::stlforce)
-
+void stlforce_state::stlforce(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 15000000)
-	MCFG_DEVICE_PROGRAM_MAP(stlforce_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", stlforce_state, irq4_line_hold)
+	M68000(config, m_maincpu, 15000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &stlforce_state::stlforce_map);
+	m_maincpu->set_vblank_int("screen", FUNC(stlforce_state::irq4_line_hold));
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(8, 48*8-1-8-2, 0, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(stlforce_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(58);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(8, 48*8-1-8-2, 0, 30*8-1);
+	screen.set_screen_update(FUNC(stlforce_state::screen_update));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_stlforce);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x800);
@@ -233,27 +233,24 @@ MACHINE_CONFIG_START(stlforce_state::stlforce)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(32'000'000)/32, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki", XTAL(32'000'000)/32, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-MACHINE_CONFIG_START(stlforce_state::twinbrat)
+void stlforce_state::twinbrat(machine_config &config)
+{
 	stlforce(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(XTAL(14'745'600))
+	m_maincpu->set_clock(XTAL(14'745'600));
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(3*8, 44*8-1, 0*8, 30*8-1)
+	subdevice<screen_device>("screen")->set_visarea(3*8, 44*8-1, 0*8, 30*8-1);
 
 	/* modify m_video */
 	m_video->set_spritexoffset(10);
 
-	MCFG_DEVICE_MODIFY("oki")
-	MCFG_DEVICE_CLOCK(XTAL(30'000'000) / 32) // verified on 2 PCBs
-	MCFG_DEVICE_ADDRESS_MAP(0, twinbrat_oki_map)
-MACHINE_CONFIG_END
+	subdevice<okim6295_device>("oki")->set_clock(XTAL(30'000'000) / 32); // verified on 2 PCBs
+	subdevice<okim6295_device>("oki")->set_addrmap(0, &stlforce_state::twinbrat_oki_map);
+}
 
 ROM_START( stlforce )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */

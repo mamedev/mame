@@ -44,7 +44,6 @@ namespace detail
 			ret = ::operator new(size);
 		return ret;
 	}
-#endif
 	void object_t::operator delete (void * mem)
 	{
 		if (mem)
@@ -55,6 +54,7 @@ namespace detail
 				::operator delete(mem);
 		}
 	}
+#endif
 
 } // namespace detail
 

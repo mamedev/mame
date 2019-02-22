@@ -700,7 +700,7 @@ READ8_MEMBER( x1_state::x1_rom_r )
 {
 //  logerror("%06x\n",m_rom_index[0]<<16|m_rom_index[1]<<8|m_rom_index[2]<<0);
 	if (m_cart->exists())
-		return m_cart->read_rom(space, (m_rom_index[0] << 16) | (m_rom_index[1] << 8) | (m_rom_index[2] << 0));
+		return m_cart->read_rom((m_rom_index[0] << 16) | (m_rom_index[1] << 8) | (m_rom_index[2] << 0));
 	else
 		return 0;
 }
@@ -1069,12 +1069,12 @@ WRITE8_MEMBER( x1_state::x1_6845_w )
 	if(offset == 0)
 	{
 		m_crtc_index = data & 31;
-		m_crtc->address_w(space, offset, data);
+		m_crtc->address_w(data);
 	}
 	else
 	{
 		m_crtc_vreg[m_crtc_index] = data;
-		m_crtc->register_w(space, offset, data);
+		m_crtc->register_w(data);
 	}
 }
 

@@ -162,12 +162,12 @@ WRITE_LINE_MEMBER(proteus_state::ptm_o3_callback)
 
 READ8_MEMBER(proteus_state::network_r)
 {
-	return m_adlc->read(space, offset >> 1);
+	return m_adlc->read(offset >> 1);
 }
 
 WRITE8_MEMBER(proteus_state::network_w)
 {
-	m_adlc->write(space, offset >> 1, data);
+	m_adlc->write(offset >> 1, data);
 }
 
 

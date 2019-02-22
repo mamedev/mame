@@ -60,7 +60,7 @@ MACHINE_CONFIG_START(macp_state::macp)
 	MCFG_DEVICE_IO_MAP(macp_io)
 
 	/* video hardware */
-	//MCFG_DEFAULT_LAYOUT()
+	//config.set_default_layout();
 
 	//I8279
 

@@ -1287,8 +1287,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(pc6001_state::cassette_callback)
 			else
 				cas_data_i>>=1;
 		#else
-			address_space &space = m_maincpu->space(AS_PROGRAM);
-			m_cur_keycode = m_cas_hack->read_rom(space, m_cas_offset++);
+			m_cur_keycode = m_cas_hack->read_rom(m_cas_offset++);
 			popmessage("%04x %04x", m_cas_offset, m_cas_maxsize);
 			if(m_cas_offset > m_cas_maxsize)
 			{
@@ -1350,7 +1349,7 @@ void pc6001_state::machine_reset()
 	set_videoram_bank(0xc000);
 
 	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0x5fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0x5fff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 
 	std::string region_tag;
 	m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());

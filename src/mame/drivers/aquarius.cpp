@@ -180,7 +180,7 @@ READ8_MEMBER(aquarius_state::cartridge_r)
 {
 	uint8_t data = 0;
 	if (m_cart->exists())
-		data = m_cart->read_rom(space, offset);
+		data = m_cart->read_rom(offset);
 
 	return data ^ m_scrambler;
 }

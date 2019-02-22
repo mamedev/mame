@@ -267,7 +267,7 @@ WRITE8_MEMBER( pc8401a_state::rtc_ctrl_w )
 READ8_MEMBER( pc8401a_state::io_rom_data_r )
 {
 	//logerror("I/O ROM read from %05x\n", m_io_addr);
-	return m_io_cart->read_rom(space, m_io_addr);
+	return m_io_cart->read_rom(m_io_addr);
 }
 
 WRITE8_MEMBER( pc8401a_state::io_rom_addr_w )

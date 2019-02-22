@@ -304,7 +304,7 @@ READ8_MEMBER(apple3_state::apple3_c0xx_r)
 		case 0xf1:
 		case 0xf2:
 		case 0xf3:
-			result = m_acia->read(space, offset & 0x03);
+			result = m_acia->read(offset & 0x03);
 			break;
 	}
 	return result;
@@ -470,7 +470,7 @@ WRITE8_MEMBER(apple3_state::apple3_c0xx_w)
 		case 0xf1:
 		case 0xf2:
 		case 0xf3:
-			m_acia->write(space, offset & 0x03, data);
+			m_acia->write(offset & 0x03, data);
 			break;
 	}
 }
