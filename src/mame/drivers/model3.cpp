@@ -5213,7 +5213,7 @@ ROM_START( harleya )    /* Step 2.0, Sega game ID# is 833-13325, ROM board ID# 8
 	ROM_FILL( 0x000000, 0x1000000, 0x0000 )
 ROM_END
 
-ROM_START( fvipers2 )   /* Step 2.0 */
+ROM_START( fvipers2 )   /* Step 2.0, Sega game ID# is 833-13407 FIGHTING VIPERS2, ROM board ID# 834-13408 FIGHTING VIPERS2, Security board ID# 837-13423-COM */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-20596a.17", 0x000006, 0x200000, CRC(969ab801) SHA1(a7a2aa71204d1c38a6a8c0605331fd859cb224f1) )

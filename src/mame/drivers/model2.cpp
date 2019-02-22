@@ -5303,7 +5303,7 @@ Main board ID# 837-10854-02-91
  Sega Game ID# 836-13274 OVER REV
  ROM board ID# 836-13275
 
-These ID numbers have been verfied on multiple board sets for both revision A and revision B program ROMs
+These ID numbers have been verified on multiple board sets for both revision A and revision B program ROMs
 */
 ROM_START( overrevb ) /* Over Rev Revision B, Model 2B */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
