@@ -2342,9 +2342,9 @@ GAME( 1998, bang,        0,         bang,             bang,     bang_state,    i
 GAME( 1998, bangj,       bang,      bang,             bang,     bang_state,    init_bang,     ROT0, "Gaelco", "Gun Gabacho (Japan)", 0 )
 
 // 2-in-1 gambling game, appears to be cloned Gaelco hardware complete with DS5002FP, or possibly manufactured by Gaelco for Nova Desitec but without any Gaelco branding.
-GAME( 1999, play2000,    0,         play2000,         play2000, gaelco2_state, init_play2000_70i,ROT0, "Nova Desitec", "Play 2000 (Super Slot & Gran Tesoro) (v7.0i) (Italy)",  MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1999, play2000,    0,         play2000,         play2000, gaelco2_state, init_play2000_70i,ROT0, "Nova Desitec", "Play 2000 (Super Slot & Gran Tesoro) (v7.0i) (Italy)",  0 )
 GAME( 1999, play2000_50i,play2000,  play2000,         play2000, gaelco2_state, empty_init,       ROT0, "Nova Desitec", "Play 2000 (Super Slot & Gran Tesoro) (v5.0i) (Italy)",  MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // bad dump
-GAME( 1999, play2000_40i,play2000,  play2000,         play2000, gaelco2_state, init_play2000_40i,ROT0, "Nova Desitec", "Play 2000 (Super Slot & Gran Tesoro) (v4.0i) (Italy)",  MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1999, play2000_40i,play2000,  play2000,         play2000, gaelco2_state, init_play2000_40i,ROT0, "Nova Desitec", "Play 2000 (Super Slot & Gran Tesoro) (v4.0i) (Italy)",  0 )
 
 // Gym exercise bike
 GAME( 1997, saltcrdi,   0,          saltcrdi,         saltcrdi, gaelco2_state, empty_init,    ROT0, "Salter Fitness / Gaelco", "Pro Tele Cardioline (Salter Fitness Bike V.1.0, Checksum 02AB)", MACHINE_NOT_WORKING ) // there are other machines in the Cardioline series, without TV displays
