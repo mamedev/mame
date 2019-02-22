@@ -120,7 +120,7 @@ NETLIST_END()
 class netlist_data_folder_t : public netlist::source_t
 {
 public:
-	netlist_data_folder_t(pstring folder)
+	netlist_data_folder_t(const pstring &folder)
 	: netlist::source_t(netlist::source_t::DATA)
 	, m_folder(folder)
 	{
@@ -311,7 +311,7 @@ struct input_t
 	double m_value;
 };
 
-static std::vector<input_t> read_input(const netlist::setup_t &setup, pstring fname)
+static std::vector<input_t> read_input(const netlist::setup_t &setup, const pstring &fname)
 {
 	std::vector<input_t> ret;
 	if (fname != "")

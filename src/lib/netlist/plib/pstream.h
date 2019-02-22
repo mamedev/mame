@@ -530,7 +530,8 @@ public:
 
 	void write(const pstring &text) const
 	{
-		putf8string conv_utf8(text);
+		// NOLINTNEXTLINE(performance-unnecessary-copy-initialization)
+		const putf8string conv_utf8(text);
 		m_strm->write(reinterpret_cast<const pistream::value_type *>(conv_utf8.c_str()), conv_utf8.mem_t_size());
 	}
 

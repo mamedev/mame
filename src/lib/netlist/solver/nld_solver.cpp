@@ -213,7 +213,7 @@ struct net_splitter
 			return;
 		/* add the net */
 		groups.back().push_back(n);
-		for (auto &p : n->m_core_terms)
+		for (auto &p : n->core_terms())
 		{
 			if (p->is_type(detail::terminal_type::TERMINAL))
 			{
@@ -399,7 +399,7 @@ void NETLIB_NAME(solver)::post_start()
 		for (auto &n : grp)
 		{
 			log().verbose("Net {1}", n->name());
-			for (const auto &pcore : n->m_core_terms)
+			for (const auto &pcore : n->core_terms())
 			{
 				log().verbose("   {1}", pcore->name());
 			}

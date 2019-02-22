@@ -361,7 +361,7 @@ void netlist_state_t::reset()
 			std::vector<nldelegate *> t;
 			log().verbose("Using default startup strategy");
 			for (auto &n : m_nets)
-				for (auto & term : n->m_core_terms)
+				for (auto & term : n->core_terms())
 					if (term->m_delegate.has_object())
 					{
 						if (!plib::container::contains(t, &term->m_delegate))

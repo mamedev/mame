@@ -105,7 +105,7 @@ void nl_convert_base_t::add_device(const pstring &atype, const pstring &aname)
 	add_device(plib::make_unique<dev_t>(atype, aname));
 }
 
-void nl_convert_base_t::add_term(pstring netname, pstring termname)
+void nl_convert_base_t::add_term(const pstring &netname, const pstring &termname)
 {
 	net_t * net = nullptr;
 	auto idx = m_nets.find(netname);

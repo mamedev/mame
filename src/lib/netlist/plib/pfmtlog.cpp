@@ -9,13 +9,13 @@
 #include "palloc.h"
 
 #include <algorithm>
+#include <array>
 #include <cstdarg>
-#include <cstdlib>
 #include <cstdio>
+#include <cstdlib>
 #include <cstring>
 #include <iostream>
 #include <locale>
-#include <array>
 
 namespace plib {
 
@@ -27,6 +27,8 @@ pfmt &pfmt::format_element(const char *l, const unsigned cfmt_spec,  ...)
 	pstring fmt("%");
 	std::array<char, 2048> buf;
 	std::size_t sl;
+
+	buf[0] = 0;
 
 	m_arg++;
 

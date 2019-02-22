@@ -43,7 +43,8 @@ namespace plib
 	template<typename T, typename V1, typename V2>
 	T vec_mult (const std::size_t n, const V1 & v1, const V2 & v2 )
 	{
-		PALIGNAS_VECTOROPT() T value[8] = {0};
+		using b8 = T[8];
+		PALIGNAS_VECTOROPT() b8 value = {0};
 		for (std::size_t i = 0; i < n ; i++ )
 		{
 			value[i & 7] += v1[i] * v2[i];
@@ -54,7 +55,8 @@ namespace plib
 	template<typename T, typename VT>
 	T vec_mult2 (const std::size_t n, const VT &v)
 	{
-		PALIGNAS_VECTOROPT() T value[8] = {0};
+		using b8 = T[8];
+		PALIGNAS_VECTOROPT() b8 value = {0};
 		for (std::size_t i = 0; i < n ; i++ )
 		{
 			value[i & 7] += v[i] * v[i];
@@ -67,7 +69,7 @@ namespace plib
 	{
 		if (n<8)
 		{
-			PALIGNAS_VECTOROPT() T value(0);
+			T value(0);
 			for (std::size_t i = 0; i < n ; i++ )
 				value += v[i];
 
@@ -75,7 +77,8 @@ namespace plib
 		}
 		else
 		{
-			PALIGNAS_VECTOROPT() T value[8] = {0};
+			using b8 = T[8];
+			PALIGNAS_VECTOROPT() b8 value = {0};
 			for (std::size_t i = 0; i < n ; i++ )
 				value[i & 7] += v[i];
 

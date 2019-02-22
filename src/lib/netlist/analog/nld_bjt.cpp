@@ -209,15 +209,13 @@ NETLIB_OBJECT_DERIVED(QBJT_switch, QBJT)
 	NETLIB_UPDATE_PARAMI();
 	NETLIB_UPDATE_TERMINALSI();
 
+private:
 	nld_twoterm m_RB;
 	nld_twoterm m_RC;
 
 	// FIXME: this is needed so we have all terminals belong to one net list
 
 	nld_twoterm m_BC_dummy;
-
-protected:
-
 
 	nl_double m_gB; // base conductance / switch on
 	nl_double m_gC; // collector conductance / switch on
@@ -261,10 +259,10 @@ protected:
 	NETLIB_UPDATE_PARAMI();
 	NETLIB_UPDATE_TERMINALSI();
 
+private:
 	generic_diode m_gD_BC;
 	generic_diode m_gD_BE;
 
-private:
 	nld_twoterm m_D_CB;  // gcc, gce - gcc, gec - gcc, gcc - gce | Ic
 	nld_twoterm m_D_EB;  // gee, gec - gee, gce - gee, gee - gec | Ie
 	nld_twoterm m_D_EC;  // 0, -gec, -gcc, 0 | 0

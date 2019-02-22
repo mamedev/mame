@@ -773,7 +773,7 @@ namespace netlist
 		void rebuild_list();     /* rebuild m_list after a load */
 		void move_connections(net_t &dest_net);
 
-		std::vector<core_terminal_t *> m_core_terms; // save post-start m_list ...
+		std::vector<core_terminal_t *> &core_terms() { return m_core_terms; }
 #if USE_COPY_INSTEAD_OF_REFERENCE
 		void update_inputs()
 		{
@@ -786,34 +786,20 @@ namespace netlist
 			/* nothing needs to be done */
 		}
 #endif
+
 	protected:
-		state_var<netlist_sig_t> m_new_Q;
-		state_var<netlist_sig_t> m_cur_Q;
-		state_var<queue_status>  m_in_queue;    /* 0: not in queue, 1: in queue, 2: last was taken */
 
-		state_var<netlist_time>  m_next_scheduled_time;
-
-	private:
-		plib::linkedlist_t<core_terminal_t> m_list_active;
-		core_terminal_t * m_railterminal;
-
-		template <typename T>
-		void process(const T mask, netlist_sig_t sig);
-	};
-
-	class logic_net_t : public detail::net_t
-	{
-	public:
-
-		logic_net_t(netlist_state_t &nl, const pstring &aname, detail::core_terminal_t *mr = nullptr);
-
+		/* only used for logic nets */
 		netlist_sig_t Q() const noexcept { return m_cur_Q; }
+
+		/* only used for logic nets */
 		void initial(const netlist_sig_t val) noexcept
 		{
 			m_cur_Q = m_new_Q = val;
 			update_inputs();
 		}
 
+		/* only used for logic nets */
 		void set_Q_and_push(const netlist_sig_t newQ, const netlist_time delay) NL_NOEXCEPT
 		{
 			if (newQ != m_new_Q)
@@ -822,15 +808,8 @@ namespace netlist
 				push_to_queue(delay);
 			}
 		}
-		void set_Q_and_push_force(const netlist_sig_t newQ, const netlist_time delay) NL_NOEXCEPT
-		{
-			if (newQ != m_new_Q || is_queued())
-			{
-				m_new_Q = newQ;
-				push_to_queue(delay);
-			}
-		}
 
+		/* only used for logic nets */
 		void set_Q_time(const netlist_sig_t newQ, const netlist_time at) NL_NOEXCEPT
 		{
 			if (newQ != m_new_Q)
@@ -845,10 +824,34 @@ namespace netlist
 		/* internal state support
 		 * FIXME: get rid of this and implement export/import in MAME
 		 */
+		/* only used for logic nets */
 		netlist_sig_t *Q_state_ptr() { return m_cur_Q.ptr(); }
 
-	protected:
 	private:
+		state_var<netlist_sig_t> m_new_Q;
+		state_var<netlist_sig_t> m_cur_Q;
+		state_var<queue_status>  m_in_queue;    /* 0: not in queue, 1: in queue, 2: last was taken */
+		state_var<netlist_time>  m_next_scheduled_time;
+
+		core_terminal_t * m_railterminal;
+		plib::linkedlist_t<core_terminal_t> m_list_active;
+		std::vector<core_terminal_t *> m_core_terms; // save post-start m_list ...
+
+		template <typename T>
+		void process(const T mask, netlist_sig_t sig);
+	};
+
+	class logic_net_t : public detail::net_t
+	{
+	public:
+
+		logic_net_t(netlist_state_t &nl, const pstring &aname, detail::core_terminal_t *mr = nullptr);
+
+		using detail::net_t::Q;
+		using detail::net_t::initial;
+		using detail::net_t::set_Q_and_push;
+		using detail::net_t::set_Q_time;
+		using detail::net_t::Q_state_ptr;
 
 	};
 
@@ -890,11 +893,6 @@ namespace netlist
 		void push(const netlist_sig_t newQ, const netlist_time delay) NL_NOEXCEPT
 		{
 			m_my_net.set_Q_and_push(newQ, delay); // take the shortcut
-		}
-
-		void push_force(const netlist_sig_t newQ, const netlist_time delay) NL_NOEXCEPT
-		{
-			m_my_net.set_Q_and_push_force(newQ, delay); // take the shortcut
 		}
 
 		void set_Q_time(const netlist_sig_t newQ, const netlist_time at) NL_NOEXCEPT
@@ -1462,6 +1460,7 @@ namespace netlist
 		netlist_time                        m_time;
 		devices::NETLIB_NAME(mainclock) *   m_mainclock;
 
+		PALIGNAS_CACHELINE()
 		detail::queue_t                     m_queue;
 
 		// performance

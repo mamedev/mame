@@ -90,8 +90,6 @@ namespace netlist
 				logic_output_t *out_proxied, detail::core_terminal_t &proxy_out);
 
 		logic_input_t m_I;
-
-	private:
 	};
 
 	NETLIB_OBJECT_DERIVED(d_to_a_proxy, base_d_to_a_proxy)

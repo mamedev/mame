@@ -141,7 +141,6 @@ NETLIB_OBJECT_DERIVED(R, R_base)
 	{
 	}
 
-	param_double_t m_R;
 
 protected:
 
@@ -150,6 +149,7 @@ protected:
 	NETLIB_UPDATE_PARAMI();
 
 private:
+	param_double_t m_R;
 	/* protect set_R ... it's a recipe to desaster when used to bypass the parameter */
 	using NETLIB_NAME(R_base)::set_R;
 };
@@ -267,13 +267,13 @@ public:
 	NETLIB_TIMESTEPI();
 	NETLIB_RESETI();
 
-	param_double_t m_L;
-
 protected:
 	//NETLIB_UPDATEI();
 	NETLIB_UPDATE_PARAMI();
 
 private:
+	param_double_t m_L;
+
 	nl_double m_GParallel;
 	nl_double m_G;
 	nl_double m_I;
@@ -286,7 +286,7 @@ private:
 class generic_diode
 {
 public:
-	generic_diode(device_t &dev, pstring name);
+	generic_diode(device_t &dev, const pstring &name);
 
 	void update_diode(const double nVd);
 
@@ -383,12 +383,12 @@ public:
 	NETLIB_UPDATE_TERMINALSI();
 	NETLIB_RESETI();
 
-	diode_model_t m_model;
-
 protected:
 	//NETLIB_UPDATEI();
 	NETLIB_UPDATE_PARAMI();
 
+private:
+	diode_model_t m_model;
 	generic_diode m_D;
 };
 

@@ -58,7 +58,7 @@ WCHAR *wstring_from_utf8(const char *utf8string)
 #endif
 
 namespace plib {
-dynlib::dynlib(const pstring libname)
+dynlib::dynlib(const pstring &libname)
 : m_isLoaded(false), m_lib(nullptr)
 {
 #ifdef _WIN32
@@ -88,7 +88,7 @@ dynlib::dynlib(const pstring libname)
 #endif
 	}
 
-dynlib::dynlib(const pstring path, const pstring libname)
+dynlib::dynlib(const pstring &path, const pstring &libname)
 : m_isLoaded(false), m_lib(nullptr)
 {
 	// FIXME: implement path search
@@ -141,7 +141,7 @@ bool dynlib::isLoaded() const
 	return m_isLoaded;
 }
 
-void *dynlib::getsym_p(const pstring name)
+void *dynlib::getsym_p(const pstring &name)
 {
 #ifdef _WIN32
 	return (void *) GetProcAddress((HMODULE) m_lib, name.c_str());

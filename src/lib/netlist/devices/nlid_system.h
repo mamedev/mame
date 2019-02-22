@@ -72,9 +72,9 @@ namespace netlist
 
 	public:
 		logic_output_t m_Q;
-
-		param_double_t m_freq;
 		netlist_time m_inc;
+	private:
+		param_double_t m_freq;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -96,7 +96,7 @@ namespace netlist
 		//NETLIB_RESETI();
 		NETLIB_UPDATE_PARAMI();
 
-	protected:
+	private:
 		logic_input_t m_feedback;
 		logic_output_t m_Q;
 
@@ -154,7 +154,7 @@ namespace netlist
 		NETLIB_HANDLERI(clk2);
 		NETLIB_HANDLERI(clk2_pow2);
 
-	protected:
+	private:
 
 		param_double_t m_freq;
 		param_str_t m_pattern;
@@ -187,7 +187,7 @@ namespace netlist
 		NETLIB_RESETI() { m_Q.initial(0); }
 		NETLIB_UPDATE_PARAMI() { m_Q.push(m_IN() & 1, netlist_time::from_nsec(1)); }
 
-	protected:
+	private:
 		logic_output_t m_Q;
 
 		param_logic_t m_IN;
@@ -206,7 +206,7 @@ namespace netlist
 		NETLIB_RESETI() { m_Q.initial(0.0); }
 		NETLIB_UPDATE_PARAMI() { m_Q.push(m_IN()); }
 
-	protected:
+	private:
 		analog_output_t m_Q;
 		param_double_t m_IN;
 	};
@@ -358,16 +358,17 @@ namespace netlist
 			register_subalias("2", m_R.m_N);
 		}
 
+		NETLIB_RESETI();
+		//NETLIB_UPDATE_PARAMI();
+		NETLIB_UPDATEI();
+
 		analog::NETLIB_SUB(R_base) m_R;
 		logic_input_t m_I;
 		param_double_t m_RON;
 		param_double_t m_ROFF;
 
-		NETLIB_RESETI();
-		//NETLIB_UPDATE_PARAMI();
-		NETLIB_UPDATEI();
-
 	private:
+
 		state_var<netlist_sig_t> m_last_state;
 	};
 

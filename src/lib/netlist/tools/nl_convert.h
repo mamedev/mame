@@ -43,7 +43,7 @@ protected:
 	void add_device(const pstring &atype, const pstring &aname, double aval);
 	void add_device(const pstring &atype, const pstring &aname);
 
-	void add_term(pstring netname, pstring termname);
+	void add_term(const pstring &netname, const pstring &termname);
 
 	void dump_nl();
 

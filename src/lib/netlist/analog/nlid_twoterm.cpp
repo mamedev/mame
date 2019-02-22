@@ -20,7 +20,7 @@ namespace netlist
 // generic_diode
 // ----------------------------------------------------------------------------------------
 
-generic_diode::generic_diode(device_t &dev, pstring name)
+generic_diode::generic_diode(device_t &dev, const pstring &name)
 	: m_Vd(dev, name + ".m_Vd", 0.7)
 	, m_Id(dev, name + ".m_Id", 0.0)
 	, m_G(dev,  name + ".m_G", 1e-15)

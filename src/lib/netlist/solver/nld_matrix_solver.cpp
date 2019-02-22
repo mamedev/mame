@@ -111,7 +111,7 @@ void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 
 		net->set_solver(this);
 
-		for (auto &p : net->m_core_terms)
+		for (auto &p : net->core_terms())
 		{
 			log().debug("{1} {2} {3}\n", p->name(), net->name(), net->isRailNet());
 			switch (p->type())
@@ -159,7 +159,7 @@ void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 					break;
 			}
 		}
-		log().debug("added net with {1} populated connections\n", net->m_core_terms.size());
+		log().debug("added net with {1} populated connections\n", net->core_terms().size());
 	}
 
 	/* now setup the matrix */
@@ -336,9 +336,7 @@ void matrix_solver_t::setup_matrix()
 	 * This should reduce cache misses ...
 	 */
 
-	auto **touched = plib::pnew_array<bool *>(iN);
-	for (std::size_t k=0; k<iN; k++)
-		touched[k] = plib::pnew_array<bool>(iN);
+	std::vector<std::vector<bool>> touched(iN, std::vector<bool>(iN));
 
 	for (std::size_t k = 0; k < iN; k++)
 	{
@@ -395,10 +393,6 @@ void matrix_solver_t::setup_matrix()
 		state().save(*this, m_terms[k]->gt(),"GT" + num, this->name(), m_terms[k]->count());
 		state().save(*this, m_terms[k]->Idr(),"IDR" + num, this->name(), m_terms[k]->count());
 	}
-
-	for (std::size_t k=0; k<iN; k++)
-		plib::pdelete_array(touched[k]);
-	plib::pdelete_array(touched);
 }
 
 void matrix_solver_t::update_inputs()

@@ -253,7 +253,7 @@ namespace netlist
 		/* FIXME: used by source_t - need a different approach at some time */
 		bool parse_stream(plib::unique_ptr<plib::pistream> &&istrm, const pstring &name);
 
-		void add_define(pstring def, pstring val)
+		void add_define(const pstring &def, const pstring &val)
 		{
 			m_defines.insert({ def, plib::ppreprocessor::define_t(def, val)});
 		}
@@ -444,7 +444,7 @@ namespace netlist
 	class source_proc_t : public source_t
 	{
 	public:
-		source_proc_t(pstring name, void (*setup_func)(nlparse_t &))
+		source_proc_t(const pstring &name, void (*setup_func)(nlparse_t &))
 		: source_t(),
 			m_setup_func(setup_func),
 			m_setup_func_name(name)

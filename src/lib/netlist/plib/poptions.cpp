@@ -14,13 +14,13 @@ namespace plib {
     Options
 ***************************************************************************/
 
-	option_base::option_base(options &parent, pstring help)
+	option_base::option_base(options &parent, const pstring &help)
 	: m_help(help)
 	{
 		parent.register_option(this);
 	}
 
-	option::option(options &parent, pstring ashort, pstring along, pstring help, bool has_argument)
+	option::option(options &parent, const pstring &ashort, const pstring &along, const pstring &help, bool has_argument)
 	: option_base(parent, help), m_short(ashort), m_long(along),
 	  m_has_argument(has_argument), m_specified(false)
 	{
@@ -174,7 +174,7 @@ namespace plib {
 		return argc;
 	}
 
-	pstring options::split_paragraphs(pstring text, unsigned width, unsigned indent,
+	pstring options::split_paragraphs(const pstring &text, unsigned width, unsigned indent,
 			unsigned firstline_indent)
 	{
 		auto paragraphs = psplit(text,"\n");
@@ -197,7 +197,7 @@ namespace plib {
 		return ret;
 	}
 
-	pstring options::help(pstring description, pstring usage,
+	pstring options::help(const pstring &description, const pstring &usage,
 			unsigned width, unsigned indent) const
 	{
 		pstring ret;
@@ -272,7 +272,7 @@ namespace plib {
 		return ret;
 	}
 
-	option *options::getopt_short(pstring arg) const
+	option *options::getopt_short(const pstring &arg) const
 	{
 		for (auto & optbase : m_opts)
 		{
@@ -282,7 +282,7 @@ namespace plib {
 		}
 		return nullptr;
 	}
-	option *options::getopt_long(pstring arg) const
+	option *options::getopt_long(const pstring &arg) const
 	{
 		for (auto & optbase : m_opts)
 		{

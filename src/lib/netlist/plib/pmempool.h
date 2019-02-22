@@ -139,8 +139,8 @@ namespace plib {
 					auto *ret = reinterpret_cast<void *>(b->m_data + b->m_cur);
 					auto capacity(rs);
 					ret = std::align(align, size, ret, capacity);
-					if (ret == nullptr)
-						printf("Oh no\n");
+					// FIXME: if (ret == nullptr)
+					//	printf("Oh no\n");
 					sinfo().insert({ ret, info(b, b->m_cur)});
 					rs -= (capacity - size);
 					b->m_cur += rs;
@@ -155,8 +155,8 @@ namespace plib {
 				auto *ret = reinterpret_cast<void *>(b->m_data + b->m_cur);
 				auto capacity(rs);
 				ret = std::align(align, size, ret, capacity);
-				if (ret == nullptr)
-					printf("Oh no\n");
+				// FIXME: if (ret == nullptr)
+				//	printf("Oh no\n");
 				sinfo().insert({ ret, info(b, b->m_cur)});
 				rs -= (capacity - size);
 				b->m_cur += rs;

@@ -8,9 +8,9 @@
 #ifndef PARRAY_H_
 #define PARRAY_H_
 
+#include "palloc.h"
 #include "pconfig.h"
 #include "pexception.h"
-#include "palloc.h"
 
 #include <array>
 #include <memory>

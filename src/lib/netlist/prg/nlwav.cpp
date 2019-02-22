@@ -363,16 +363,16 @@ public:
 		}
 	}
 
-	std::size_t m_channels;
-	double m_last_time;
-
 private:
-	void write(pstring line)
+	void write(const pstring &line)
 	{
 		auto p = static_cast<const char *>(line.c_str());
 		std::size_t len = std::strlen(p);
 		m_fo.write(p, len);
 	}
+
+	std::size_t m_channels;
+	double m_last_time;
 
 	plib::postream &m_fo;
 	std::vector<pstring> m_ids;
@@ -410,6 +410,14 @@ public:
 			"convert all files starting with \"log_V\" into a multichannel wav file"),
 		m_outstrm(nullptr)
 	{}
+
+	int execute() override;
+	pstring usage() override;
+
+private:
+	void convert_wav();
+	void convert_vcd(vcdwriter::format_e format);
+
 	plib::option_str_limit<unsigned> opt_fmt;
 	plib::option_str    opt_out;
 	plib::option_num<std::size_t>   opt_rate;
@@ -423,14 +431,8 @@ public:
 	plib::option_bool   opt_help;
 	plib::option_example   opt_ex1;
 	plib::option_example   opt_ex2;
-
-	int execute() override;
-	pstring usage() override;
-
 	plib::pstdin pin_strm;
-private:
-	void convert_wav();
-	void convert_vcd(vcdwriter::format_e format);
+
 	std::vector<plib::unique_ptr<plib::pistream>> m_instrms;
 	plib::postream *m_outstrm;
 };

@@ -23,7 +23,7 @@ namespace plib {
 	 *
 	 * \note could be enhanced by setting a termination handler
 	 */
-	[[noreturn]] void terminate(pstring msg) noexcept;
+	[[noreturn]] void terminate(const pstring &msg) noexcept;
 
 	//============================================================
 	//  exception base

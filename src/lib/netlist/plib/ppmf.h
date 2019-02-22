@@ -95,6 +95,7 @@ namespace plib {
 			if (PHAS_PMF_INTERNAL == 1)
 			{
 				// apply the "this" delta to the object first
+				// NOLINTNEXTLINE(clang-analyzer-core.UndefinedBinaryOperatorResult)
 				auto o_p_delta = reinterpret_cast<generic_class *>(reinterpret_cast<std::uint8_t *>(object) + m_this_delta);
 
 				// if the low bit of the vtable index is clear, then it is just a raw function pointer

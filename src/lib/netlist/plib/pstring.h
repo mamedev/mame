@@ -46,7 +46,8 @@ public:
 	explicit constexpr pstring_const_iterator(const typename string_type::const_iterator &x) noexcept : p(x) { }
 
 	pstring_const_iterator& operator++() noexcept { p += static_cast<difference_type>(traits_type::codelen(&(*p))); return *this; }
-	pstring_const_iterator operator++(int) noexcept { pstring_const_iterator tmp(*this); operator++(); return tmp; }
+	// NOLINTNEXTLINE(cert-dcl21-cpp)
+	pstring_const_iterator operator++(int) & noexcept { pstring_const_iterator tmp(*this); operator++(); return tmp; }
 
 	constexpr bool operator==(const pstring_const_iterator& rhs) const noexcept { return p == rhs.p; }
 	constexpr bool operator!=(const pstring_const_iterator& rhs) const noexcept { return p != rhs.p; }
@@ -207,10 +208,8 @@ public:
 
 	static const size_type npos = static_cast<size_type>(-1);
 
-protected:
-	string_type m_str;
-
 private:
+	string_type m_str;
 };
 
 struct pu8_traits

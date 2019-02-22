@@ -76,7 +76,7 @@ NETLIB_OBJECT(solver)
 	NETLIB_RESETI();
 	// NETLIB_UPDATE_PARAMI();
 
-protected:
+private:
 	logic_input_t m_fb_step;
 	logic_output_t m_Q_step;
 
@@ -96,7 +96,6 @@ protected:
 
 	param_logic_t  m_log_stats;
 
-private:
 	std::vector<poolptr<matrix_solver_t>> m_mat_solvers;
 	std::vector<matrix_solver_t *> m_mat_solvers_all;
 	std::vector<matrix_solver_t *> m_mat_solvers_timestepping;

@@ -84,7 +84,7 @@ void pfunction::compile_postfix(const std::vector<pstring> &inputs,
 		throw plib::pexception(plib::pfmt("nld_function: stack count different to one on <{2}>")(expr));
 }
 
-static int get_prio(pstring v)
+static int get_prio(const pstring &v)
 {
 	if (v == "(" || v == ")")
 		return 1;

@@ -40,18 +40,26 @@ namespace plib {
 	    }
 	    return p;
 #else
-		return aligned_alloc(alignment, size);
+	    return aligned_alloc(alignment, size);
 #endif
 	}
 
 	static inline void pfree( void *ptr )
 	{
+		// NOLINTNEXTLINE(cppcoreguidelines-no-malloc)
 		free(ptr);
 	}
+
+	static constexpr bool is_pow2(std::size_t v) noexcept { return !(v & (v-1)); }
 
 	template <typename T, std::size_t ALIGN>
 	inline C14CONSTEXPR T *assume_aligned_ptr(T *p) noexcept
 	{
+		static_assert(ALIGN >= alignof(T), "Alignment must be greater or equal to alignof(T)");
+		static_assert(is_pow2(ALIGN), "Alignment must be a power of 2");
+		//auto t = reinterpret_cast<std::uintptr_t>(p);
+		//if (t & (ALIGN-1))
+		//	printf("alignment error!");
 		return reinterpret_cast<T *>(__builtin_assume_aligned(p, ALIGN));
 	}
 
@@ -246,10 +254,14 @@ namespace plib {
 	    static_assert(ALIGN >= alignof(T) && (ALIGN % alignof(T)) == 0,
 	    	"ALIGN must be greater than alignof(T) and a multiple");
 
-   	    aligned_allocator() = default;
+   	    aligned_allocator() noexcept = default;
+   	    ~aligned_allocator() noexcept = default;
 
-	    aligned_allocator(const aligned_allocator&) = default;
-	    aligned_allocator& operator=(const aligned_allocator&) = delete;
+	    aligned_allocator(const aligned_allocator&) noexcept = default;
+	    aligned_allocator& operator=(const aligned_allocator&) noexcept = delete;
+
+	    aligned_allocator(aligned_allocator&&) noexcept = default;
+	    aligned_allocator& operator=(aligned_allocator&&) = delete;
 
 	    template <class U>
 	    aligned_allocator(const aligned_allocator<U, ALIGN>& rhs) noexcept
@@ -308,6 +320,8 @@ namespace plib {
 
 		using reference = typename base::reference;
 		using const_reference = typename base::const_reference;
+		using pointer = typename base::pointer;
+		using const_pointer = typename base::const_pointer;
 		using size_type = typename base::size_type;
 
 		using base::base;
@@ -320,6 +334,9 @@ namespace plib {
 		{
 			return assume_aligned_ptr<T, ALIGN>(this->data())[i];
 		}
+
+		pointer data() noexcept { return assume_aligned_ptr<T, ALIGN>(base::data()); }
+		const_pointer data() const noexcept { return assume_aligned_ptr<T, ALIGN>(base::data()); }
 
 	};
 

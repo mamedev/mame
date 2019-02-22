@@ -8,9 +8,9 @@
 #ifndef PSTATE_H_
 #define PSTATE_H_
 
+#include "palloc.h"
 #include "pstring.h"
 #include "ptypes.h"
-#include "palloc.h"
 
 #include <array>
 #include <memory>
