@@ -134,6 +134,9 @@ ifeq ($(platform),android)
 	ARCH :=
 	LIBRETRO_OS :=
 endif
+ifeq ($(platform),osx)
+  PLATFLAGS += DONT_USE_NETWORK=1
+endif
 ifneq ($(LIBRETRO_CPU),)
 	PLATFLAGS += ARCH="" LIBRETRO_CPU="$(LIBRETRO_CPU)"
 endif
