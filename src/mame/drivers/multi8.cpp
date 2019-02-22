@@ -278,8 +278,8 @@ WRITE8_MEMBER( multi8_state::pal_w )
 	}
 }
 
-READ8_MEMBER(multi8_state::ay8912_0_r){ return m_aysnd->data_r(space, 0); }
-READ8_MEMBER(multi8_state::ay8912_1_r){ return m_aysnd->data_r(space, 1); }
+READ8_MEMBER(multi8_state::ay8912_0_r){ return m_aysnd->data_r(); }
+READ8_MEMBER(multi8_state::ay8912_1_r){ return m_aysnd->data_r(); }
 
 READ8_MEMBER( multi8_state::kanji_r )
 {

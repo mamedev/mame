@@ -172,23 +172,22 @@ void taito_type_x_state::machine_reset()
 }
 
 // todo: different configs for the different machine types.
-MACHINE_CONFIG_START(taito_type_x_state::taito_type_x)
-
+void taito_type_x_state::taito_type_x(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", PENTIUM3, 733333333) /* Wrong, much newer processors, much faster. */
-	MCFG_DEVICE_PROGRAM_MAP(taito_type_x_map)
+	PENTIUM3(config, m_maincpu, 733333333); /* Wrong, much newer processors, much faster. */
+	m_maincpu->set_addrmap(AS_PROGRAM, &taito_type_x_state::taito_type_x_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DRIVER(taito_type_x_state, screen_update_taito_type_x)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 640-1, 0, 480-1);
+	screen.set_screen_update(FUNC(taito_type_x_state::screen_update_taito_type_x));
 
-	MCFG_PALETTE_ADD("palette", 0x10000)
-
-MACHINE_CONFIG_END
+	PALETTE(config, "palette").set_entries(0x10000);
+}
 
 
 

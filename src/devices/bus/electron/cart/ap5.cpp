@@ -107,7 +107,7 @@ uint8_t electron_ap5_device::read(address_space &space, offs_t offset, int infc,
 	}
 	else if (oe)
 	{
-		data = m_romslot[romqa]->read_rom(space, offset & 0x3fff);
+		data = m_romslot[romqa]->read_rom(offset & 0x3fff);
 	}
 	else if (oe2)
 	{

@@ -28,7 +28,7 @@
  * Your mileage may vary.
  *
  */
-#define USE_MEMPOOL                 (1)
+#define USE_MEMPOOL                 (0)
 
 /*! Store input values in logic_terminal_t.
  *

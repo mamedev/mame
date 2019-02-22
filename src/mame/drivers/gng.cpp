@@ -397,7 +397,7 @@ MACHINE_CONFIG_START(gng_state::gng)
 	mainlatch.q_out_cb<3>().set([this] (int state) { machine().bookkeeping().coin_counter_w(1, state); });
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
+	BUFFERED_SPRITERAM8(config, m_spriteram);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.59)    /* verified on pcb */

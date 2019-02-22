@@ -233,15 +233,15 @@ READ8_MEMBER(concept_state::io_r)
 		{
 		case 0:
 			/* NKBP keyboard */
-			return m_kbdacia->read(space, (offset & 3));
+			return m_kbdacia->read(offset & 3);
 
 		case 1:
 			/* NSR0 data comm port 0 */
-			return m_acia0->read(space, (offset & 3));
+			return m_acia0->read(offset & 3);
 
 		case 2:
 			/* NSR1 data comm port 1 */
-			return m_acia1->read(space, (offset & 3));
+			return m_acia1->read(offset & 3);
 
 		case 3:
 			/* NVIA versatile system interface */
@@ -339,17 +339,17 @@ WRITE8_MEMBER(concept_state::io_w)
 		{
 		case 0:
 			/* NKBP keyboard */
-			m_kbdacia->write(space, (offset & 3), data);
+			m_kbdacia->write(offset & 3, data);
 			break;
 
 		case 1:
 			/* NSR0 data comm port 0 */
-			m_acia0->write(space, (offset & 3), data);
+			m_acia0->write(offset & 3, data);
 			break;
 
 		case 2:
 			/* NSR1 data comm port 1 */
-			m_acia1->write(space, (offset & 3), data);
+			m_acia1->write(offset & 3, data);
 			break;
 
 		case 3:

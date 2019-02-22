@@ -657,7 +657,6 @@ MACHINE_CONFIG_START(lazercmd_state::lazercmd)
 	DAC_1BIT(config, m_dac2, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
 	DAC_1BIT(config, m_dac3, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac0", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT);
@@ -694,7 +693,6 @@ MACHINE_CONFIG_START(lazercmd_state::medlanes)
 	DAC_1BIT(config, m_dac2, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
 	DAC_1BIT(config, m_dac3, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac3", 1.0, DAC_VREF_POS_INPUT);
 MACHINE_CONFIG_END
@@ -729,7 +727,6 @@ MACHINE_CONFIG_START(lazercmd_state::bbonk)
 	DAC_1BIT(config, m_dac2, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
 	DAC_1BIT(config, m_dac3, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac3", 1.0, DAC_VREF_POS_INPUT);
 MACHINE_CONFIG_END

@@ -187,9 +187,25 @@ protected:
 	// cartridges (e.g. - Orch-90, Multi-Pak interface) for their control registers, independently
 	// of the SCS or CTS lines
 	address_space &cartridge_space();
-	void install_read_handler(uint16_t addrstart, uint16_t addrend, read8_delegate rhandler);
-	void install_write_handler(uint16_t addrstart, uint16_t addrend, write8_delegate whandler);
-	void install_readwrite_handler(uint16_t addrstart, uint16_t addrend, read8_delegate rhandler, write8_delegate whandler);
+	template <typename R>
+	void install_read_handler(u16 addrstart, u16 addrend, R &&rhandler)
+	{
+		address_space &space(cartridge_space());
+		space.install_read_handler(addrstart, addrend, std::forward<R>(rhandler));
+	}
+	template <typename W>
+	void install_write_handler(u16 addrstart, u16 addrend, W &&whandler)
+	{
+		address_space &space(cartridge_space());
+		space.install_write_handler(addrstart, addrend, std::forward<W>(whandler));
+	}
+	template <typename R, typename W>
+	void install_readwrite_handler(u16 addrstart, u16 addrend, R &&rhandler, W &&whandler)
+	{
+		address_space &space(cartridge_space());
+		space.install_read_handler(addrstart, addrend, std::forward<R>(rhandler));
+		space.install_write_handler(addrstart, addrend, std::forward<W>(whandler));
+	}
 
 	// setting line values
 	void set_line_value(cococart_slot_device::line line, cococart_slot_device::line_value value);

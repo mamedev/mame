@@ -88,7 +88,7 @@ unsigned matrix_solver_SOR_t<FT, SIZE>::vsolve_non_dynamic(const bool newton_rap
 		const float_type * const gt = this->m_terms[k]->gt();
 		const float_type * const go = this->m_terms[k]->go();
 		const float_type * const Idr = this->m_terms[k]->Idr();
-		const float_type * const *other_cur_analog = this->m_terms[k]->connected_net_V();
+		auto other_cur_analog = this->m_terms[k]->connected_net_V();
 
 		this->m_new_V[k] = this->m_nets[k]->Q_Analog();
 

@@ -668,39 +668,36 @@ void spyhuntertec_state::machine_reset()
 
 
 
-MACHINE_CONFIG_START(spyhuntertec_state::spyhuntertec)
-
+void spyhuntertec_state::spyhuntertec(machine_config &config)
+{
 // note: no ctc, no nvram
 // 2*z80, 3*ay8912
 // 2 XTALs: one 20MHz, other one near maincpu ?MHz
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 4000000 ) // NEC D780C-2 (rated 6MHz)
-	MCFG_DEVICE_PROGRAM_MAP(spyhuntertec_map)
-	MCFG_DEVICE_IO_MAP(spyhuntertec_portmap)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", spyhuntertec_state, irq0_line_hold)
+	Z80(config, m_maincpu, 4000000); // NEC D780C-2 (rated 6MHz)
+	m_maincpu->set_addrmap(AS_PROGRAM, &spyhuntertec_state::spyhuntertec_map);
+	m_maincpu->set_addrmap(AS_IO, &spyhuntertec_state::spyhuntertec_portmap);
+	m_maincpu->set_vblank_int("screen", FUNC(spyhuntertec_state::irq0_line_hold));
 	TIMER(config, m_analog_timer).configure_generic(FUNC(spyhuntertec_state::analog_count_callback));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(30*16, 30*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 30*16-1, 0, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(spyhuntertec_state, screen_update_spyhuntertec)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	m_screen->set_size(30*16, 30*8);
+	m_screen->set_visarea(0, 30*16-1, 0, 30*8-1);
+	m_screen->set_screen_update(FUNC(spyhuntertec_state::screen_update_spyhuntertec));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_spyhuntertec);
-	MCFG_PALETTE_ADD("palette", 64+4)
+	PALETTE(config, m_palette).set_entries(64+4); // FUNC(spyhuntertec_state::spyhunt)
 
-//  MCFG_PALETTE_INIT_OWNER(spyhuntertec_state,spyhunt)
-
-
-	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000 ) // SGS Z8400B1 (rated 2.5MHz?)
-	MCFG_DEVICE_PROGRAM_MAP(spyhuntertec_sound_map)
-	MCFG_DEVICE_IO_MAP(spyhuntertec_sound_portmap)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(spyhuntertec_state, irq0_line_assert, 1000)
+	Z80(config, m_audiocpu, 4000000); // SGS Z8400B1 (rated 2.5MHz?)
+	m_audiocpu->set_addrmap(AS_PROGRAM, &spyhuntertec_state::spyhuntertec_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &spyhuntertec_state::spyhuntertec_sound_portmap);
+	m_audiocpu->set_periodic_int(FUNC(spyhuntertec_state::irq0_line_assert), attotime::from_hz(1000));
 
 	SPEAKER(config, "mono").front_center();
 
@@ -718,8 +715,7 @@ MACHINE_CONFIG_START(spyhuntertec_state::spyhuntertec)
 	ay2.port_a_write_callback().set(FUNC(spyhuntertec_state::ay2_porta_w));
 
 	AY8912(config, "ay3", 3000000/2).add_route(ALL_OUTPUTS, "mono", 0.25); // "
-
-MACHINE_CONFIG_END
+}
 
 
 

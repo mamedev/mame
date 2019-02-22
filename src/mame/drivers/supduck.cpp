@@ -443,30 +443,29 @@ void supduck_state::machine_reset()
 
 
 MACHINE_CONFIG_START(supduck_state::supduck)
-
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(8'000'000)) /* Verified on PCB */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", supduck_state,  irq2_line_hold) // 2 & 4?
+	M68000(config, m_maincpu, XTAL(8'000'000)); /* Verified on PCB */
+	m_maincpu->set_addrmap(AS_PROGRAM, &supduck_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(supduck_state::irq2_line_hold)); // 2 & 4?
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(8'000'000)/4) /* 2MHz - verified on PCB */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	Z80(config, m_audiocpu, XTAL(8'000'000)/4); /* 2MHz - verified on PCB */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &supduck_state::sound_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_UPDATE_DRIVER(supduck_state, screen_update)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_screen_update(FUNC(supduck_state::screen_update));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
 
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
+	BUFFERED_SPRITERAM16(config, m_spriteram);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_supduck);
 
-	MCFG_DEVICE_ADD("spritegen", TIGEROAD_SPRITE, 0)
+	TIGEROAD_SPRITE(config, m_spritegen, 0);
 
 	MCFG_PALETTE_ADD("palette", 0x800/2)
 	MCFG_PALETTE_FORMAT(xRGBRRRRGGGGBBBB_bit4)
@@ -476,12 +475,10 @@ MACHINE_CONFIG_START(supduck_state::supduck)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(8'000'000)/8, okim6295_device::PIN7_HIGH) // 1MHz - Verified on PCB, pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
-
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL(8'000'000)/8, okim6295_device::PIN7_HIGH)); // 1MHz - Verified on PCB, pin 7 not verified
+	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
+	oki.set_addrmap(0, &supduck_state::oki_map);
 MACHINE_CONFIG_END
-
 
 
 /***************************************************************************

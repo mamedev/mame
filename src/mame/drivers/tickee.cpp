@@ -754,8 +754,8 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(tickee_state::tickee)
-
+void tickee_state::tickee(machine_config &config)
+{
 	/* basic machine hardware */
 	TMS34010(config, m_maincpu, XTAL(40'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &tickee_state::tickee_map);
@@ -775,9 +775,9 @@ MACHINE_CONFIG_START(tickee_state::tickee)
 
 	MCFG_VIDEO_START_OVERRIDE(tickee_state,tickee)
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK/2, 444, 0, 320, 233, 0, 200)
-	MCFG_SCREEN_UPDATE_DEVICE("maincpu", tms34010_device, tms340x0_rgb32)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(VIDEO_CLOCK/2, 444, 0, 320, 233, 0, 200);
+	m_screen->set_screen_update("maincpu", FUNC(tms34010_device::tms340x0_rgb32));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -791,20 +791,20 @@ MACHINE_CONFIG_START(tickee_state::tickee)
 	ym2.port_a_read_callback().set_ioport("IN0");
 	ym2.port_b_read_callback().set_ioport("IN2");
 	ym2.add_route(ALL_OUTPUTS, "mono", 0.50);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(tickee_state::ghoshunt)
+void tickee_state::ghoshunt(machine_config &config)
+{
 	tickee(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(ghoshunt_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &tickee_state::ghoshunt_map);
+}
 
 
-MACHINE_CONFIG_START(tickee_state::rapidfir)
-
+void tickee_state::rapidfir(machine_config &config)
+{
 	/* basic machine hardware */
 	TMS34010(config, m_maincpu, XTAL(50'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &tickee_state::rapidfir_map);
@@ -825,20 +825,19 @@ MACHINE_CONFIG_START(tickee_state::rapidfir)
 
 	MCFG_VIDEO_START_OVERRIDE(tickee_state,tickee)
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK/2, 444, 0, 320, 233, 0, 200)
-	MCFG_SCREEN_UPDATE_DEVICE("maincpu", tms34010_device, tms340x0_rgb32)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(VIDEO_CLOCK/2, 444, 0, 320, 233, 0, 200);
+	m_screen->set_screen_update("maincpu", FUNC(tms34010_device::tms340x0_rgb32));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, OKI_CLOCK, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, OKI_CLOCK, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.00);
+}
 
 
-MACHINE_CONFIG_START(tickee_state::mouseatk)
-
+void tickee_state::mouseatk(machine_config &config)
+{
 	/* basic machine hardware */
 	TMS34010(config, m_maincpu, XTAL(40'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &tickee_state::mouseatk_map);
@@ -856,9 +855,9 @@ MACHINE_CONFIG_START(tickee_state::mouseatk)
 	/* video hardware */
 	TLC34076(config, m_tlc34076, tlc34076_device::TLC34076_6_BIT);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK/2, 444, 0, 320, 233, 0, 200)
-	MCFG_SCREEN_UPDATE_DEVICE("maincpu", tms34010_device, tms340x0_rgb32)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(VIDEO_CLOCK/2, 444, 0, 320, 233, 0, 200);
+	m_screen->set_screen_update("maincpu", FUNC(tms34010_device::tms340x0_rgb32));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -868,9 +867,8 @@ MACHINE_CONFIG_START(tickee_state::mouseatk)
 	ym.port_b_read_callback().set_ioport("IN1");
 	ym.add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, OKI_CLOCK, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, OKI_CLOCK, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.00);
+}
 
 
 /*************************************

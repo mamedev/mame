@@ -193,7 +193,6 @@ void williams_cvsd_sound_device::device_add_mconfig(machine_config &config)
 
 	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 0.25);
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
@@ -515,7 +514,6 @@ void williams_narc_sound_device::device_add_mconfig(machine_config &config)
 	AD7224(config, "dac1", 0).add_route(ALL_OUTPUTS, *this, 0.25);
 	AD7224(config, "dac2", 0).add_route(ALL_OUTPUTS, *this, 0.25);
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
 	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT);
 
@@ -769,7 +767,6 @@ void williams_adpcm_sound_device::device_add_mconfig(machine_config &config)
 
 	AD7524(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 0.10);
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 

@@ -75,13 +75,13 @@ WRITE8_MEMBER(munchmo_state::sound_nmi_ack_w)
 
 READ8_MEMBER(munchmo_state::ay1reset_r)
 {
-	m_ay8910[0]->reset_w(space, 0, 0);
+	m_ay8910[0]->reset_w();
 	return 0;
 }
 
 READ8_MEMBER(munchmo_state::ay2reset_r)
 {
-	m_ay8910[1]->reset_w(space, 0, 0);
+	m_ay8910[1]->reset_w();
 	return 0;
 }
 

@@ -301,7 +301,7 @@ MACHINE_CONFIG_START(miragemj_state::mirage)
 	EEPROM_93C46_16BIT(config, "eeprom");  // 93C45
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
+	BUFFERED_SPRITERAM16(config, m_spriteram);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)

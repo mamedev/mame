@@ -183,23 +183,23 @@
 
 	<!-- chessboard leds -->
 
-		<bezel name="7.1" element="ledr"><bounds x="-1" y="7.5" width="2" height="1" /></bezel>
-		<bezel name="6.1" element="ledr"><bounds x="-1" y="17.5" width="2" height="1" /></bezel>
-		<bezel name="5.1" element="ledr"><bounds x="-1" y="27.5" width="2" height="1" /></bezel>
-		<bezel name="4.1" element="ledr"><bounds x="-1" y="37.5" width="2" height="1" /></bezel>
-		<bezel name="3.1" element="ledr"><bounds x="-1" y="47.5" width="2" height="1" /></bezel>
-		<bezel name="2.1" element="ledr"><bounds x="-1" y="57.5" width="2" height="1" /></bezel>
-		<bezel name="1.1" element="ledr"><bounds x="-1" y="67.5" width="2" height="1" /></bezel>
-		<bezel name="0.1" element="ledr"><bounds x="-1" y="77.5" width="2" height="1" /></bezel>
+		<bezel name="7.9" element="ledr"><bounds x="-1" y="7.5" width="2" height="1" /></bezel>
+		<bezel name="6.9" element="ledr"><bounds x="-1" y="17.5" width="2" height="1" /></bezel>
+		<bezel name="5.9" element="ledr"><bounds x="-1" y="27.5" width="2" height="1" /></bezel>
+		<bezel name="4.9" element="ledr"><bounds x="-1" y="37.5" width="2" height="1" /></bezel>
+		<bezel name="3.9" element="ledr"><bounds x="-1" y="47.5" width="2" height="1" /></bezel>
+		<bezel name="2.9" element="ledr"><bounds x="-1" y="57.5" width="2" height="1" /></bezel>
+		<bezel name="1.9" element="ledr"><bounds x="-1" y="67.5" width="2" height="1" /></bezel>
+		<bezel name="0.9" element="ledr"><bounds x="-1" y="77.5" width="2" height="1" /></bezel>
 
-		<bezel name="7.0" element="ledr"><bounds x="7" y="85" width="2" height="1" /></bezel>
-		<bezel name="6.0" element="ledr"><bounds x="17" y="85" width="2" height="1" /></bezel>
-		<bezel name="5.0" element="ledr"><bounds x="27" y="85" width="2" height="1" /></bezel>
-		<bezel name="4.0" element="ledr"><bounds x="37" y="85" width="2" height="1" /></bezel>
-		<bezel name="3.0" element="ledr"><bounds x="47" y="85" width="2" height="1" /></bezel>
-		<bezel name="2.0" element="ledr"><bounds x="57" y="85" width="2" height="1" /></bezel>
-		<bezel name="1.0" element="ledr"><bounds x="67" y="85" width="2" height="1" /></bezel>
-		<bezel name="0.0" element="ledr"><bounds x="77" y="85" width="2" height="1" /></bezel>
+		<bezel name="7.8" element="ledr"><bounds x="7" y="85" width="2" height="1" /></bezel>
+		<bezel name="6.8" element="ledr"><bounds x="17" y="85" width="2" height="1" /></bezel>
+		<bezel name="5.8" element="ledr"><bounds x="27" y="85" width="2" height="1" /></bezel>
+		<bezel name="4.8" element="ledr"><bounds x="37" y="85" width="2" height="1" /></bezel>
+		<bezel name="3.8" element="ledr"><bounds x="47" y="85" width="2" height="1" /></bezel>
+		<bezel name="2.8" element="ledr"><bounds x="57" y="85" width="2" height="1" /></bezel>
+		<bezel name="1.8" element="ledr"><bounds x="67" y="85" width="2" height="1" /></bezel>
+		<bezel name="0.8" element="ledr"><bounds x="77" y="85" width="2" height="1" /></bezel>
 
 	<!-- chessboard sensors -->
 

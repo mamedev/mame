@@ -224,13 +224,13 @@ DEVICE_INPUT_DEFAULTS_END
 READ8_MEMBER(bitgraph_state::pia_r)
 {
 	LOGPIA("PIA R %d\n", offset);
-	return m_pia->read(space, 3 - offset);
+	return m_pia->read(3 - offset);
 }
 
 WRITE8_MEMBER(bitgraph_state::pia_w)
 {
 	LOGPIA("PIA W %d < %02X\n", offset, data);
-	return m_pia->write(space, 3 - offset, data);
+	return m_pia->write(3 - offset, data);
 }
 
 READ_LINE_MEMBER(bitgraph_state::pia_ca1_r)
@@ -280,10 +280,10 @@ WRITE8_MEMBER(bitgraph_state::pia_pb_w)
 	switch (m_pia_b & 0x03)
 	{
 	case 2:
-		m_psg->data_w(space, 0, m_pia_a);
+		m_psg->data_w(m_pia_a);
 		break;
 	case 3:
-		m_psg->address_w(space, 0, m_pia_a);
+		m_psg->address_w(m_pia_a);
 		break;
 	}
 
@@ -363,7 +363,7 @@ WRITE_LINE_MEMBER(bitgraph_state::com8116_b_fr_w)
 
 WRITE_LINE_MEMBER(bitgraph_state::com8116_b_ft_w)
 {
-	if (m_acia3)
+	if (m_acia3.found())
 	{
 		m_acia3->write_txc(state);
 		m_acia3->write_rxc(state);
@@ -373,13 +373,13 @@ WRITE_LINE_MEMBER(bitgraph_state::com8116_b_ft_w)
 READ8_MEMBER(bitgraph_state::adlc_r)
 {
 	LOG("ADLC R %d\n", offset);
-	return m_adlc ? m_adlc->read(space, 3 - offset) : 0xff;
+	return m_adlc.found() ? m_adlc->read(3 - offset) : 0xff;
 }
 
 WRITE8_MEMBER(bitgraph_state::adlc_w)
 {
 	LOG("ADLC W %d < %02X\n", offset, data);
-	if (m_adlc) return m_adlc->write(space, 3 - offset, data);
+	if (m_adlc.found()) return m_adlc->write(3 - offset, data);
 }
 
 uint32_t bitgraph_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

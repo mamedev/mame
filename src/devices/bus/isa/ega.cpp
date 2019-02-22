@@ -1169,7 +1169,7 @@ READ8_MEMBER( isa8_ega_device::pc_ega8_3X0_r )
 
 	/* CRT Controller - data register */
 	case 1: case 3: case 5: case 7:
-		data = m_crtc_ega->register_r( space, offset );
+		data = m_crtc_ega->register_r();
 		break;
 
 	/* Input Status Register 1 */
@@ -1204,12 +1204,12 @@ WRITE8_MEMBER( isa8_ega_device::pc_ega8_3X0_w )
 	{
 	/* CRT Controller - address register */
 	case 0: case 2: case 4: case 6:
-		m_crtc_ega->address_w( space, offset, data );
+		m_crtc_ega->address_w(data);
 		break;
 
 	/* CRT Controller - data register */
 	case 1: case 3: case 5: case 7:
-		m_crtc_ega->register_w( space, offset, data );
+		m_crtc_ega->register_w(data);
 		break;
 
 	/* Set Light Pen Flip Flop */

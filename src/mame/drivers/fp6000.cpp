@@ -170,13 +170,13 @@ WRITE8_MEMBER(fp6000_state::fp6000_pcg_w)
 WRITE8_MEMBER(fp6000_state::fp6000_6845_address_w)
 {
 	m_crtc_index = data;
-	m_crtc->address_w(space, offset, data);
+	m_crtc->address_w(data);
 }
 
 WRITE8_MEMBER(fp6000_state::fp6000_6845_data_w)
 {
 	m_crtc_vreg[m_crtc_index] = data;
-	m_crtc->register_w(space, offset, data);
+	m_crtc->register_w(data);
 }
 
 void fp6000_state::fp6000_map(address_map &map)

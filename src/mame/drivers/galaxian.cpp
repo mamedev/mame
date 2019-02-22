@@ -748,8 +748,8 @@ READ8_MEMBER(galaxian_state::konami_ay8910_r)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	uint8_t result = 0xff;
-	if (offset & 0x20) result &= m_ay8910[1]->data_r(space, 0);
-	if (offset & 0x80) result &= m_ay8910[0]->data_r(space, 0);
+	if (offset & 0x20) result &= m_ay8910[1]->data_r();
+	if (offset & 0x80) result &= m_ay8910[0]->data_r();
 	return result;
 }
 
@@ -759,14 +759,14 @@ WRITE8_MEMBER(galaxian_state::konami_ay8910_w)
 	/* AV 4,5 ==> AY8910 #2 */
 	/* the decoding here is very simplistic, and you can address two simultaneously */
 	if (offset & 0x10)
-		m_ay8910[1]->address_w(space, 0, data);
+		m_ay8910[1]->address_w(data);
 	else if (offset & 0x20)
-		m_ay8910[1]->data_w(space, 0, data);
+		m_ay8910[1]->data_w(data);
 	/* AV6,7 ==> AY8910 #1 */
 	if (offset & 0x40)
-		m_ay8910[0]->address_w(space, 0, data);
+		m_ay8910[0]->address_w(data);
 	else if (offset & 0x80)
-		m_ay8910[0]->data_w(space, 0, data);
+		m_ay8910[0]->data_w(data);
 }
 
 
@@ -1082,7 +1082,7 @@ READ8_MEMBER(galaxian_state::frogger_ay8910_r)
 {
 	/* the decoding here is very simplistic */
 	uint8_t result = 0xff;
-	if (offset & 0x40) result &= m_ay8910[0]->data_r(space, 0);
+	if (offset & 0x40) result &= m_ay8910[0]->data_r();
 	return result;
 }
 
@@ -1092,9 +1092,9 @@ WRITE8_MEMBER(galaxian_state::frogger_ay8910_w)
 	/* the decoding here is very simplistic */
 	/* AV6,7 ==> AY8910 #1 */
 	if (offset & 0x40)
-		m_ay8910[0]->data_w(space, 0, data);
+		m_ay8910[0]->data_w(data);
 	else if (offset & 0x80)
-		m_ay8910[0]->address_w(space, 0, data);
+		m_ay8910[0]->address_w(data);
 }
 
 
@@ -1167,9 +1167,9 @@ READ8_MEMBER(galaxian_state::scorpion_ay8910_r)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	uint8_t result = 0xff;
-	if (offset & 0x08) result &= m_ay8910[2]->data_r(space, 0);
-	if (offset & 0x20) result &= m_ay8910[1]->data_r(space, 0);
-	if (offset & 0x80) result &= m_ay8910[0]->data_r(space, 0);
+	if (offset & 0x08) result &= m_ay8910[2]->data_r();
+	if (offset & 0x20) result &= m_ay8910[1]->data_r();
+	if (offset & 0x80) result &= m_ay8910[0]->data_r();
 	return result;
 }
 
@@ -1177,12 +1177,12 @@ READ8_MEMBER(galaxian_state::scorpion_ay8910_r)
 WRITE8_MEMBER(galaxian_state::scorpion_ay8910_w)
 {
 	/* the decoding here is very simplistic, and you can address all six simultaneously */
-	if (offset & 0x04) m_ay8910[2]->address_w(space, 0, data);
-	if (offset & 0x08) m_ay8910[2]->data_w(space, 0, data);
-	if (offset & 0x10) m_ay8910[1]->address_w(space, 0, data);
-	if (offset & 0x20) m_ay8910[1]->data_w(space, 0, data);
-	if (offset & 0x40) m_ay8910[0]->address_w(space, 0, data);
-	if (offset & 0x80) m_ay8910[0]->data_w(space, 0, data);
+	if (offset & 0x04) m_ay8910[2]->address_w(data);
+	if (offset & 0x08) m_ay8910[2]->data_w(data);
+	if (offset & 0x10) m_ay8910[1]->address_w(data);
+	if (offset & 0x20) m_ay8910[1]->data_w(data);
+	if (offset & 0x40) m_ay8910[0]->address_w(data);
+	if (offset & 0x80) m_ay8910[0]->data_w(data);
 }
 
 
@@ -1285,7 +1285,7 @@ WRITE8_MEMBER(galaxian_state::zigzag_ay8910_w)
 			/* bit 0 = WRITE */
 			/* bit 1 = C/D */
 			if ((offset & 1) != 0)
-				m_ay8910[0]->data_address_w(space, offset >> 1, m_zigzag_ay8910_latch);
+				m_ay8910[0]->data_address_w(offset >> 1, m_zigzag_ay8910_latch);
 			break;
 
 		case 0x100:
@@ -1377,21 +1377,21 @@ WRITE8_MEMBER(galaxian_state::mshuttle_ay8910_cs_w)
 WRITE8_MEMBER(galaxian_state::mshuttle_ay8910_control_w)
 {
 	if (!m_mshuttle_ay8910_cs)
-		m_ay8910_cclimber->address_w(space, offset, data);
+		m_ay8910_cclimber->address_w(data);
 }
 
 
 WRITE8_MEMBER(galaxian_state::mshuttle_ay8910_data_w)
 {
 	if (!m_mshuttle_ay8910_cs)
-		m_ay8910_cclimber->data_w(space, offset, data);
+		m_ay8910_cclimber->data_w(data);
 }
 
 
 READ8_MEMBER(galaxian_state::mshuttle_ay8910_data_r)
 {
 	if (!m_mshuttle_ay8910_cs)
-		return m_ay8910_cclimber->data_r(space, offset);
+		return m_ay8910_cclimber->data_r();
 	return 0xff;
 }
 
@@ -6362,7 +6362,6 @@ void galaxian_state::kingball(machine_config &config)
 	/* sound hardware */
 	DAC_4BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.53); // unknown DAC
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
@@ -6586,7 +6585,6 @@ void galaxian_state::sfx(machine_config &config)
 	/* DAC for the sample player */
 	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // 16-pin IC (not identified by schematics)
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }

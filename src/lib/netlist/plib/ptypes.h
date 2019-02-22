@@ -108,7 +108,7 @@ namespace plib
 		operator E() const {return m_v;} \
 		bool operator==(const ename &rhs) const {return m_v == rhs.m_v;} \
 		bool operator==(const E &rhs) const {return m_v == rhs;} \
-		const std::string name() const { \
+		std::string name() const { \
 			static char const *const strings = # __VA_ARGS__; \
 			return nthstr(static_cast<int>(m_v), strings); \
 		} \

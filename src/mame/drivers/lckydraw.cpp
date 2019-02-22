@@ -41,7 +41,7 @@ MACHINE_CONFIG_START(lckydraw_state::lckydraw)
 	MCFG_DEVICE_PROGRAM_MAP(maincpu_map)
 
 	/* video hardware */
-	//MCFG_DEFAULT_LAYOUT()
+	//config.set_default_layout();
 
 	/* sound hardware */
 	genpin_audio(config);

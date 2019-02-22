@@ -1959,7 +1959,7 @@ void cps_state::knightsb(machine_config &config)
 	m_msm_1->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MSM5205(config, m_msm_2, 24000000/64);  /* ? */
-	m_msm_1->vck_legacy_callback().set(FUNC(cps_state::m5205_int2));    /* interrupt function */
+	m_msm_2->vck_legacy_callback().set(FUNC(cps_state::m5205_int2));    /* interrupt function */
 	m_msm_2->set_prescaler_selector(msm5205_device::S96_4B);    /* 4KHz 4-bit */
 	m_msm_2->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -3371,7 +3371,7 @@ GAME( 1990, ffightbla, ffight,   fcrash,    fcrash,   cps_state, init_cps1,     
 
 GAME( 1991, kodb,      kod,      kodb,      kodb,     cps_state, init_kodb,     ROT0,   "bootleg (Playmark)", "The King of Dragons (bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 910731  "ETC"
 
-GAME( 1991, knightsb,  knights,  knightsb,  knights,  cps_state, init_dinopic,  ROT0,   "bootleg", "Knights of the Round (bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )    // 911127 - based on World version
+GAME( 1991, knightsb,  knights,  knightsb,  knights,  cps_state, init_dinopic,  ROT0,   "bootleg", "Knights of the Round (bootleg)", MACHINE_SUPPORTS_SAVE )    // 911127 - based on World version
 
 GAME( 1993, mtwinsb,   mtwins,   mtwinsb,   mtwins,   cps_state, init_mtwinsb,  ROT0,   "David Inc. (bootleg)", "Twins (Mega Twins bootleg)", MACHINE_SUPPORTS_SAVE ) // based on World version
 

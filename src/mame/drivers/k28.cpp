@@ -266,7 +266,7 @@ WRITE8_MEMBER(k28_state::mcu_p0_w)
 	// d3: SC-01 strobe, latch phoneme on rising edge
 	int strobe = data >> 3 & 1;
 	if (strobe && !m_speech_strobe)
-		m_speech->write(space, 0, m_phoneme);
+		m_speech->write(m_phoneme);
 	m_speech_strobe = strobe;
 
 	// d5: VFD driver data enable

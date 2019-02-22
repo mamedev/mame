@@ -479,7 +479,7 @@ WRITE8_MEMBER( popper_state::ay1_w )
 		m_ay[1]->reset();
 	}
 
-	m_ay[0]->write_bc1_bc2(space, offset, data);
+	m_ay[0]->write_bc1_bc2(offset, data);
 }
 
 

@@ -47,7 +47,7 @@ void adamlink_device::device_start()
 //  adam_bd_r - buffered data read
 //-------------------------------------------------
 
-uint8_t adamlink_device::adam_bd_r(address_space &space, offs_t offset, uint8_t data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2)
+uint8_t adamlink_device::adam_bd_r(offs_t offset, uint8_t data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2)
 {
 	if (!biorq)
 	{
@@ -69,7 +69,7 @@ uint8_t adamlink_device::adam_bd_r(address_space &space, offs_t offset, uint8_t 
 //  adam_bd_w - buffered data write
 //-------------------------------------------------
 
-void adamlink_device::adam_bd_w(address_space &space, offs_t offset, uint8_t data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2)
+void adamlink_device::adam_bd_w(offs_t offset, uint8_t data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2)
 {
 	if (!biorq)
 	{

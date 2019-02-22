@@ -203,7 +203,7 @@ READ8_MEMBER(bbc_ieee488_device::fred_r)
 
 	if (offset >= 0x20 && offset < 0x28)
 	{
-		data = m_tms9914->reg8_r(space, offset & 0x07);
+		data = m_tms9914->read(offset & 0x07);
 	}
 
 	data &= m_1mhzbus->fred_r(space, offset);
@@ -215,7 +215,7 @@ WRITE8_MEMBER(bbc_ieee488_device::fred_w)
 {
 	if (offset >= 0x20 && offset < 0x28)
 	{
-		m_tms9914->reg8_w(space, offset & 0x07, data);
+		m_tms9914->write(offset & 0x07, data);
 	}
 
 	m_1mhzbus->fred_w(space, offset, data);
@@ -242,7 +242,7 @@ READ8_MEMBER(bbc_b488_device::fred_r)
 
 	if (offset >= 0x20 && offset < 0x28)
 	{
-		data = m_tms9914->reg8_r(space, offset & 0x07);
+		data = m_tms9914->read(offset & 0x07);
 	}
 
 	return data;
@@ -252,7 +252,7 @@ WRITE8_MEMBER(bbc_b488_device::fred_w)
 {
 	if (offset >= 0x20 && offset < 0x28)
 	{
-		m_tms9914->reg8_w(space, offset & 0x07, data);
+		m_tms9914->write(offset & 0x07, data);
 	}
 }
 
@@ -263,7 +263,7 @@ WRITE8_MEMBER(bbc_b488_device::fred_w)
 
 	//if (offset >= 0x20 && offset < 0x28)
 	//{
-	//  data = mc68488_device->reg8_r(space, offset & 0x07);
+	//  data = mc68488_device->read(offset & 0x07);
 	//}
 
 	//return data;
@@ -273,6 +273,6 @@ WRITE8_MEMBER(bbc_b488_device::fred_w)
 //{
 	//if (offset >= 0x20 && offset < 0x28)
 	//{
-	//  mc68488_device->reg8_w(space, offset & 0x07, data);
+	//  mc68488_device->write(offset & 0x07, data);
 	//}
 //}

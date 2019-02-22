@@ -40,8 +40,8 @@
 class rzone_state : public hh_sm510_state
 {
 public:
-	rzone_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_sm510_state(mconfig, type, tag),
+	rzone_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag),
 		m_led_out(*this, "led"),
 		m_led_off(*this, "led_off")
 	{ }

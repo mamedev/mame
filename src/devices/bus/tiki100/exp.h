@@ -46,12 +46,12 @@ public:
 	device_tiki100bus_card_interface *next() const { return m_next; }
 
 	// memory access
-	virtual uint8_t mrq_r(address_space &space, offs_t offset, uint8_t data, bool &mdis) { mdis = 1; return data; }
-	virtual void mrq_w(address_space &space, offs_t offset, uint8_t data) { }
+	virtual uint8_t mrq_r(offs_t offset, uint8_t data, bool &mdis) { mdis = 1; return data; }
+	virtual void mrq_w(offs_t offset, uint8_t data) { }
 
 	// I/O access
-	virtual uint8_t iorq_r(address_space &space, offs_t offset, uint8_t data) { return data; }
-	virtual void iorq_w(address_space &space, offs_t offset, uint8_t data) { }
+	virtual uint8_t iorq_r(offs_t offset, uint8_t data) { return data; }
+	virtual void iorq_w(offs_t offset, uint8_t data) { }
 
 	virtual void busak_w(int state) { m_busak = state; }
 
@@ -131,11 +131,11 @@ public:
 	void add_card(device_tiki100bus_card_interface *card);
 
 	// computer interface
-	uint8_t mrq_r(address_space &space, offs_t offset, uint8_t data, bool &mdis);
-	DECLARE_WRITE8_MEMBER( mrq_w );
+	uint8_t mrq_r(offs_t offset, uint8_t data, bool &mdis);
+	void mrq_w(offs_t offset, uint8_t data);
 
-	uint8_t iorq_r(address_space &space, offs_t offset, uint8_t data);
-	DECLARE_WRITE8_MEMBER( iorq_w );
+	uint8_t iorq_r(offs_t offset, uint8_t data);
+	void iorq_w(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( busak_w );
 
@@ -143,8 +143,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_irq_cb(state); }
 	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_nmi_cb(state); }
 	DECLARE_WRITE_LINE_MEMBER( busrq_w ) { m_busrq_cb(state); }
-	DECLARE_READ8_MEMBER( exin_mrq_r ) { return m_in_mrq_cb(offset); }
-	DECLARE_WRITE8_MEMBER( exin_mrq_w ) { m_out_mrq_cb(offset, data); }
+	uint8_t exin_mrq_r(offs_t offset) { return m_in_mrq_cb(offset); }
+	void exin_mrq_w(offs_t offset, uint8_t data) { m_out_mrq_cb(offset, data); }
 
 protected:
 	// device-level overrides

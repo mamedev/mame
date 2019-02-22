@@ -137,7 +137,7 @@ void cgenie_fdc_device::device_reset()
 	// map extra socket
 	if (m_socket->exists())
 	{
-		m_slot->m_program->install_read_handler(0xe000, 0xefff, read8_delegate(FUNC(generic_slot_device::read_rom), (generic_slot_device *) m_socket));
+		m_slot->m_program->install_read_handler(0xe000, 0xefff, read8sm_delegate(FUNC(generic_slot_device::read_rom), (generic_slot_device *) m_socket));
 	}
 }
 

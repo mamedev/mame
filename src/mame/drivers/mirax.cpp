@@ -277,14 +277,14 @@ WRITE8_MEMBER(mirax_state::audio_w)
 
 WRITE8_MEMBER(mirax_state::ay1_sel)
 {
-	m_ay[0]->address_w(space,0,m_nAyCtrl);
-	m_ay[0]->data_w(space,0,data);
+	m_ay[0]->address_w(m_nAyCtrl);
+	m_ay[0]->data_w(data);
 }
 
 WRITE8_MEMBER(mirax_state::ay2_sel)
 {
-	m_ay[1]->address_w(space,0,m_nAyCtrl);
-	m_ay[1]->data_w(space,0,data);
+	m_ay[1]->address_w(m_nAyCtrl);
+	m_ay[1]->data_w(data);
 }
 
 WRITE_LINE_MEMBER(mirax_state::nmi_mask_w)

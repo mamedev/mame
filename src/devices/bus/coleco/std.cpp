@@ -47,7 +47,7 @@ void colecovision_standard_cartridge_device::device_start()
 //  read - cartridge data read
 //-------------------------------------------------
 
-uint8_t colecovision_standard_cartridge_device::bd_r(address_space &space, offs_t offset, uint8_t data, int _8000, int _a000, int _c000, int _e000)
+uint8_t colecovision_standard_cartridge_device::bd_r(offs_t offset, uint8_t data, int _8000, int _a000, int _c000, int _e000)
 {
 	if (!_8000 || !_a000 || !_c000 || !_e000)
 	{

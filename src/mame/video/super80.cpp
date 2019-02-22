@@ -449,12 +449,12 @@ WRITE8_MEMBER( super80_state::super80v_10_w )
 {
 	data &= 0x1f;
 	m_mc6845_ind = data;
-	m_crtc->address_w( space, 0, data );
+	m_crtc->address_w(data);
 }
 
 WRITE8_MEMBER( super80_state::super80v_11_w )
 {
 	m_mc6845_reg[m_mc6845_ind] = data & mc6845_mask[m_mc6845_ind];  /* save data in register */
-	m_crtc->register_w( space, 0, data );
+	m_crtc->register_w(data);
 	if ((m_mc6845_ind > 8) && (m_mc6845_ind < 12)) mc6845_cursor_configure();       /* adjust cursor shape - remove when mame fixed */
 }

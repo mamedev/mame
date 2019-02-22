@@ -77,7 +77,7 @@ void c64_dela_ep64_cartridge_device::device_reset()
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------
 
-uint8_t c64_dela_ep64_cartridge_device::c64_cd_r(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+uint8_t c64_dela_ep64_cartridge_device::c64_cd_r(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!roml)
 	{
@@ -90,8 +90,8 @@ uint8_t c64_dela_ep64_cartridge_device::c64_cd_r(address_space &space, offs_t of
 			offs_t addr = (m_bank << 13) | (offset & 0x1fff);
 
 			if (!m_rom0_ce) data |= m_roml[offset & 0x1fff];
-			if (!m_rom1_ce) data |= m_eprom1->read_rom(space, addr);
-			if (!m_rom2_ce) data |= m_eprom2->read_rom(space, addr);
+			if (!m_rom1_ce) data |= m_eprom1->read_rom(addr);
+			if (!m_rom2_ce) data |= m_eprom2->read_rom(addr);
 		}
 	}
 
@@ -103,7 +103,7 @@ uint8_t c64_dela_ep64_cartridge_device::c64_cd_r(address_space &space, offs_t of
 //  c64_cd_w - cartridge data write
 //-------------------------------------------------
 
-void c64_dela_ep64_cartridge_device::c64_cd_w(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+void c64_dela_ep64_cartridge_device::c64_cd_w(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!io1)
 	{

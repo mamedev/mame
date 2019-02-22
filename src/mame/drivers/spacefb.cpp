@@ -330,8 +330,8 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(spacefb_state::spacefb)
-
+void spacefb_state::spacefb(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, SPACEFB_MAIN_CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &spacefb_state::spacefb_main_map);
@@ -347,14 +347,13 @@ MACHINE_CONFIG_START(spacefb_state::spacefb)
 	config.m_minimum_quantum = attotime::from_hz(180);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(SPACEFB_PIXEL_CLOCK, SPACEFB_HTOTAL, SPACEFB_HBEND, SPACEFB_HBSTART, SPACEFB_VTOTAL, SPACEFB_VBEND, SPACEFB_VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(spacefb_state, screen_update)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(SPACEFB_PIXEL_CLOCK, SPACEFB_HTOTAL, SPACEFB_HBEND, SPACEFB_HBSTART, SPACEFB_VTOTAL, SPACEFB_VBEND, SPACEFB_VBSTART);
+	m_screen->set_screen_update(FUNC(spacefb_state::screen_update));
 
 	/* audio hardware */
 	spacefb_audio(config);
-
-MACHINE_CONFIG_END
+}
 
 
 

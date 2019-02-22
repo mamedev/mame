@@ -1055,7 +1055,6 @@ void mac_state::mac512ke_base(machine_config &config)
 	DAC_8BIT_PWM(config, m_dac, 0);
 	m_dac->add_route(ALL_OUTPUTS, "speaker", 0.25); // 2 x ls161
 	voltage_regulator_device &vreg(VOLTAGE_REGULATOR(config, "vref", 0));
-	vreg.set_output(5.0);
 	vreg.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vreg.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 

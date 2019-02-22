@@ -1334,23 +1334,23 @@ void snes_console_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(snes_console_state::snes)
-
+void snes_console_state::snes(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", _5A22, MCLK_NTSC)   /* 2.68 MHz, also 3.58 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(snes_map)
+	_5A22(config, m_maincpu, MCLK_NTSC);   /* 2.68 MHz, also 3.58 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &snes_console_state::snes_map);
 
 	// runs at 24.576 MHz / 12 = 2.048 MHz
-	MCFG_DEVICE_ADD("soundcpu", SPC700, XTAL(24'576'000) / 12)
-	MCFG_DEVICE_PROGRAM_MAP(spc_map)
+	SPC700(config, m_soundcpu, XTAL(24'576'000) / 12);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &snes_console_state::spc_map);
 
 	//config.m_minimum_quantum = attotime::from_hz(48000);
 	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(DOTCLK_NTSC * 2, SNES_HTOTAL * 2, 0, SNES_SCR_WIDTH * 2, SNES_VTOTAL_NTSC, 0, SNES_SCR_HEIGHT_NTSC)
-	MCFG_SCREEN_UPDATE_DRIVER( snes_state, screen_update )
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(DOTCLK_NTSC * 2, SNES_HTOTAL * 2, 0, SNES_SCR_WIDTH * 2, SNES_VTOTAL_NTSC, 0, SNES_SCR_HEIGHT_NTSC);
+	m_screen->set_screen_update(FUNC(snes_state::screen_update));
 
 	SNES_PPU(config, m_ppu, MCLK_NTSC);
 	m_ppu->open_bus_callback().set([this] { return snes_open_bus_r(); }); // lambda because overloaded function name
@@ -1365,9 +1365,9 @@ MACHINE_CONFIG_START(snes_console_state::snes)
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("spc700", SNES_SOUND)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
+	SNES_SOUND(config, m_spc700);
+	m_spc700->add_route(0, "lspeaker", 1.00);
+	m_spc700->add_route(1, "rspeaker", 1.00);
 
 	SNS_CART_SLOT(config, m_cartslot, MCLK_NTSC, snes_cart, nullptr);
 	m_cartslot->irq_callback().set_inputline(m_maincpu, G65816_LINE_IRQ);
@@ -1375,19 +1375,18 @@ MACHINE_CONFIG_START(snes_console_state::snes)
 	SOFTWARE_LIST(config, "cart_list").set_original("snes");
 	SOFTWARE_LIST(config, "bsx_list").set_original("snes_bspack");
 	SOFTWARE_LIST(config, "st_list").set_original("snes_strom");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(snes_console_state::snespal)
+void snes_console_state::snespal(machine_config &config)
+{
 	snes(config);
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_CLOCK( MCLK_PAL )
+	m_maincpu->set_clock(MCLK_PAL);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_RAW_PARAMS(DOTCLK_PAL, SNES_HTOTAL, 0, SNES_SCR_WIDTH, SNES_VTOTAL_PAL, 0, SNES_SCR_HEIGHT_PAL)
+	m_screen->set_raw(DOTCLK_PAL, SNES_HTOTAL, 0, SNES_SCR_WIDTH, SNES_VTOTAL_PAL, 0, SNES_SCR_HEIGHT_PAL);
 
 	m_ppu->set_clock(MCLK_PAL);
 	m_cartslot->set_clock(MCLK_PAL);
-MACHINE_CONFIG_END
+}
 
 
 

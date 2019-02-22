@@ -187,7 +187,6 @@ void cchasm_state::cchasm(machine_config &config)
 	DAC_1BIT(config, m_dac1, 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
 	DAC_1BIT(config, m_dac2, 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT);
 

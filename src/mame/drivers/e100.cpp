@@ -258,12 +258,12 @@ WRITE8_MEMBER( e100_state::pia_w )
 	if ((offset & 0x08) == 0x08)
 	{
 		LOG("- PIA1\n");
-		m_pia1->write(space, offset, data);
+		m_pia1->write(offset, data);
 	}
 	if ((offset & 0x10) == 0x10)
 	{
 		LOG("- PIA2\n");
-		m_pia2->write(space, offset, data);
+		m_pia2->write(offset, data);
 	}
 	if (VERBOSE && (offset & 0x18) == 0x18)
 	{
@@ -284,19 +284,19 @@ READ8_MEMBER( e100_state::pia_r )
 	{
 	case 0x18: // read PIA1 and PIA2 at the same time, should really only happen for writes...
 		{
-			uint8_t data1 =  m_pia1->read(space, offset);
-			uint8_t data2 =  m_pia2->read(space, offset);
+			uint8_t data1 =  m_pia1->read(offset);
+			uint8_t data2 =  m_pia2->read(offset);
 			logerror("%s: Dual device read may have caused unpredictable results on real hardware\n", FUNCNAME);
 			data = data1 & data2; // We assume that the stable behaviour is that data lines with a low level by either device succeeds
 			LOGCS("%s %s[%02x] %02x & %02x -> %02x Dual device read!!\n", PIA1_TAG "/" PIA2_TAG, FUNCNAME, offset, data1, data2, data);
 		}
 		break;
 	case 0x08: // PIA1
-		data = m_pia1->read(space, offset);
+		data = m_pia1->read(offset);
 		LOGCS("%s %s(%02x)\n", PIA1_TAG, FUNCNAME, data);
 		break;
 	case 0x10: // PIA2
-		data = m_pia2->read(space, offset);
+		data = m_pia2->read(offset);
 		LOGCS("%s %s(%02x)\n", PIA2_TAG, FUNCNAME, data);
 		break;
 	default: // None of the devices are selected

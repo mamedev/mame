@@ -493,7 +493,8 @@ static INPUT_PORTS_START( gg )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(sms_state::sms_base)
+void sms_state::sms_base(machine_config &config)
+{
 	/* basic machine hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -508,16 +509,17 @@ MACHINE_CONFIG_START(sms_state::sms_base)
 	SMS_CONTROL_PORT(config, m_port_ctrl2, sms_control_port_devices, "joypad");
 	m_port_ctrl2->th_input_handler().set(FUNC(sms_state::sms_ctrl2_th_input));
 	m_port_ctrl2->pixel_handler().set(FUNC(sms_state::sms_pixel_color));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(sms_state::sms_ntsc_base)
+void sms_state::sms_ntsc_base(machine_config &config)
+{
 	sms_base(config);
 	Z80(config, m_maincpu, XTAL(10'738'635)/3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &sms_state::sms_mem);
 	m_maincpu->set_addrmap(AS_IO, &sms_state::sms_io);
 
 	config.m_minimum_quantum = attotime::from_hz(60);
-MACHINE_CONFIG_END
+}
 
 /*
     For SMS drivers, the ratio between CPU and pixel clocks, set through dividers, is 2/3. The
@@ -625,7 +627,8 @@ MACHINE_CONFIG_START(sms_state::sms1_ntsc)
 	m_has_pwr_led = true;
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(smssdisp_state::sms_sdisp)
+void smssdisp_state::sms_sdisp(machine_config &config)
+{
 	sms1_ntsc(config);
 
 	m_vdp->irq().set(FUNC(smssdisp_state::sms_store_int_callback));
@@ -645,9 +648,10 @@ MACHINE_CONFIG_START(smssdisp_state::sms_sdisp)
 
 	m_has_bios_full = false;
 	m_has_pwr_led = false;
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(sms_state::sms_pal_base)
+void sms_state::sms_pal_base(machine_config &config)
+{
 	sms_base(config);
 	/* basic machine hardware */
 	Z80(config, m_maincpu, MASTER_CLOCK_PAL/15);
@@ -655,7 +659,7 @@ MACHINE_CONFIG_START(sms_state::sms_pal_base)
 	m_maincpu->set_addrmap(AS_IO, &sms_state::sms_io);
 
 	config.m_minimum_quantum = attotime::from_hz(50);
-MACHINE_CONFIG_END
+}
 
 MACHINE_CONFIG_START(sms_state::sms2_pal)
 	sms_pal_base(config);
@@ -716,7 +720,8 @@ MACHINE_CONFIG_START(sms_state::sms1_pal)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(sms_state::sms_paln_base)
+void sms_state::sms_paln_base(machine_config &config)
+{
 	sms_base(config);
 	/* basic machine hardware */
 	Z80(config, m_maincpu, MASTER_CLOCK_PALN/3);
@@ -724,7 +729,7 @@ MACHINE_CONFIG_START(sms_state::sms_paln_base)
 	m_maincpu->set_addrmap(AS_IO, &sms_state::sms_io);
 
 	config.m_minimum_quantum = attotime::from_hz(50);
-MACHINE_CONFIG_END
+}
 
 MACHINE_CONFIG_START(sms_state::sms3_paln)
 	sms_paln_base(config);
@@ -785,7 +790,8 @@ MACHINE_CONFIG_START(sms_state::sms1_paln)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(sms_state::sms_br_base)
+void sms_state::sms_br_base(machine_config &config)
+{
 	sms_base(config);
 	/* basic machine hardware */
 	Z80(config, m_maincpu, MASTER_CLOCK_PALM/3);
@@ -794,7 +800,7 @@ MACHINE_CONFIG_START(sms_state::sms_br_base)
 
 	// PAL-M has near the same frequency of NTSC
 	config.m_minimum_quantum = attotime::from_hz(60);
-MACHINE_CONFIG_END
+}
 
 MACHINE_CONFIG_START(sms_state::sms3_br)
 	sms_br_base(config);
@@ -856,7 +862,8 @@ MACHINE_CONFIG_START(sms_state::sms1_br)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(sms_state::sms2_kr)
+void sms_state::sms2_kr(machine_config &config)
+{
 	sms2_ntsc(config);
 
 	m_maincpu->set_addrmap(AS_IO, &sms_state::smskr_io);
@@ -867,9 +874,10 @@ MACHINE_CONFIG_START(sms_state::sms2_kr)
 
 	// Despite having a Japanese cartridge slot, this version is detected as Export region.
 	m_has_jpn_sms_cart_slot = true;
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(sms_state::sms1_kr)
+void sms_state::sms1_kr(machine_config &config)
+{
 	sms1_ntsc(config);
 
 	m_maincpu->set_addrmap(AS_IO, &sms_state::smskr_io);
@@ -891,22 +899,24 @@ MACHINE_CONFIG_START(sms_state::sms1_kr)
 	m_has_bios_2000 = true;
 	m_ioctrl_region_is_japan = true;
 	m_has_jpn_sms_cart_slot = true;
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(sms_state::smsj)
+void sms_state::smsj(machine_config &config)
+{
 	sms1_kr(config);
 
 	m_maincpu->set_addrmap(AS_IO, &sms_state::smsj_io);
 
-	MCFG_DEVICE_ADD("ym2413", YM2413, XTAL(10'738'635)/3)
+	YM2413(config, m_ym, XTAL(10'738'635)/3);
 	// if this output gain is changed, the gain set when unmute the output need
 	// to be changed too, probably along the gain set for the Mark III FM Unit.
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	m_ym->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	m_is_smsj = true;
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(sms_state::sg1000m3)
+void sms_state::sg1000m3(machine_config &config)
+{
 	sms1_ntsc(config);
 
 	m_maincpu->set_addrmap(AS_IO, &sms_state::sg1000m3_io);
@@ -929,7 +939,7 @@ MACHINE_CONFIG_START(sms_state::sg1000m3)
 	m_has_bios_full = false;
 	m_is_mark_iii = true;
 	m_has_jpn_sms_cart_slot = true;
-MACHINE_CONFIG_END
+}
 
 MACHINE_CONFIG_START(sms_state::gamegear)
 	/* basic machine hardware */
@@ -975,10 +985,11 @@ MACHINE_CONFIG_START(sms_state::gamegear)
 	m_has_pwr_led = true;
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(sms_state::gamegeaj)
+void sms_state::gamegeaj(machine_config &config)
+{
 	gamegear(config);
 	m_ioctrl_region_is_japan = true;
-MACHINE_CONFIG_END
+}
 
 
 ROM_START(sms1)

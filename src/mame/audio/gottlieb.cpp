@@ -129,7 +129,6 @@ void gottlieb_sound_r0_device::device_add_mconfig(machine_config &config)
 	// sound devices
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 0.25); // unknown DAC
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
@@ -263,7 +262,6 @@ void gottlieb_sound_r1_device::device_add_mconfig(machine_config &config)
 	// sound devices
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 0.25); // unknown DAC
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
@@ -360,8 +358,8 @@ void gottlieb_sound_r1_with_votrax_device::device_post_load()
 
 WRITE8_MEMBER( gottlieb_sound_r1_with_votrax_device::votrax_data_w )
 {
-	m_votrax->inflection_w(space, offset, data >> 6);
-	m_votrax->write(space, offset, ~data & 0x3f);
+	m_votrax->inflection_w(data >> 6);
+	m_votrax->write(~data & 0x3f);
 }
 
 
@@ -549,9 +547,9 @@ WRITE8_MEMBER( gottlieb_sound_r2_device::speech_control_w )
 			// bit 3 selects which of the two 8913 to enable
 			// bit 4 goes to the 8913 BC1 pin
 			if ((data & 0x08) != 0)
-				m_ay1->data_address_w(space, data >> 4, m_psg_latch);
+				m_ay1->data_address_w(data >> 4, m_psg_latch);
 			else
-				m_ay2->data_address_w(space, data >> 4, m_psg_latch);
+				m_ay2->data_address_w(data >> 4, m_psg_latch);
 		}
 	}
 	else
@@ -563,8 +561,8 @@ WRITE8_MEMBER( gottlieb_sound_r2_device::speech_control_w )
 		else
 		{
 			ay8913_device *ay = (data & 0x08) ? m_ay1 : m_ay2;
-			ay->address_w(space, 0, m_psg_latch);
-			ay->data_w(space, 0, m_psg_data_latch);
+			ay->address_w(m_psg_latch);
+			ay->data_w(m_psg_data_latch);
 		}
 	}
 
@@ -670,7 +668,6 @@ void gottlieb_sound_r2_device::device_add_mconfig(machine_config &config)
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 0.075); // unknown DAC
 	DAC_8BIT_R2R(config, "dacvol", 0).add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT).add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT); // unknown DAC
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.set_output(5.0);
 	vref.add_route(0, "dacvol", 1.0, DAC_VREF_POS_INPUT);
 
 	AY8913(config, m_ay1, SOUND2_CLOCK/2).add_route(ALL_OUTPUTS, *this, 0.15);

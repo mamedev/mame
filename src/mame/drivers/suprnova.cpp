@@ -787,9 +787,11 @@ GFXDECODE_END
 
 /***** MACHINE DRIVER *****/
 
-MACHINE_CONFIG_START(skns_state::skns)
-	MCFG_DEVICE_ADD("maincpu", SH2,28638000)
-	MCFG_DEVICE_PROGRAM_MAP(skns_map)
+void skns_state::skns(machine_config &config)
+{
+	SH2(config, m_maincpu, 28638000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &skns_state::skns_map);
+
 	TIMER(config, "scantimer").configure_scanline(FUNC(skns_state::irq), "screen", 0, 1);
 
 	MSM6242(config, "rtc", XTAL(32'768));
@@ -806,15 +808,15 @@ MACHINE_CONFIG_START(skns_state::skns)
 	int9_timer.configure_periodic(FUNC(skns_state::interrupt_callback), attotime::from_hz(28638000/1824));
 	int9_timer.config_param(9);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_SCREEN_REFRESH_RATE(59.5971) // measured by Guru
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(340,262)
-	MCFG_SCREEN_VISIBLE_AREA(0,319,0,239)
-	MCFG_SCREEN_UPDATE_DRIVER(skns_state, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_ALWAYS_UPDATE);
+	screen.set_refresh_hz(59.5971); // measured by Guru
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(340,262);
+	screen.set_visarea(0,319,0,239);
+	screen.set_screen_update(FUNC(skns_state::screen_update));
 
-	MCFG_PALETTE_ADD("palette", 32768)
+	PALETTE(config, m_palette).set_entries(32768);
 	GFXDECODE(config, m_gfxdecode, m_palette, skns_bg);
 
 	SKNS_SPRITE(config, m_spritegen, 0);
@@ -824,10 +826,10 @@ MACHINE_CONFIG_START(skns_state::skns)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymz", YMZ280B, 33333333 / 2)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	ymz280b_device &ymz(YMZ280B(config, "ymz", 33333333 / 2));
+	ymz.add_route(0, "lspeaker", 1.0);
+	ymz.add_route(1, "rspeaker", 1.0);
+}
 
 MACHINE_RESET_MEMBER(skns_state,sknsa)
 {
@@ -860,30 +862,35 @@ MACHINE_RESET_MEMBER(skns_state,sknsk)
 }
 
 
-MACHINE_CONFIG_START(skns_state::sknsa)
+void skns_state::sknsa(machine_config &config)
+{
 	skns(config);
 	MCFG_MACHINE_RESET_OVERRIDE(skns_state,sknsa)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(skns_state::sknsj)
+void skns_state::sknsj(machine_config &config)
+{
 	skns(config);
 	MCFG_MACHINE_RESET_OVERRIDE(skns_state,sknsj)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(skns_state::sknsu)
+void skns_state::sknsu(machine_config &config)
+{
 	skns(config);
 	MCFG_MACHINE_RESET_OVERRIDE(skns_state,sknsu)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(skns_state::sknse)
+void skns_state::sknse(machine_config &config)
+{
 	skns(config);
 	MCFG_MACHINE_RESET_OVERRIDE(skns_state,sknse)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(skns_state::sknsk)
+void skns_state::sknsk(machine_config &config)
+{
 	skns(config);
 	MCFG_MACHINE_RESET_OVERRIDE(skns_state,sknsk)
-MACHINE_CONFIG_END
+}
 
 /***** IDLE SKIPPING *****/
 

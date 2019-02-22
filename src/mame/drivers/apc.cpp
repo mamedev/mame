@@ -995,11 +995,11 @@ MACHINE_CONFIG_START(apc_state::apc)
 
 	UPD7220(config, m_hgdc1, 3579545); // unk clock
 	m_hgdc1->set_addrmap(0, &apc_state::upd7220_1_map);
-	m_hgdc1->set_draw_text_callback(FUNC(apc_state::hgdc_draw_text), this);
+	m_hgdc1->set_draw_text(FUNC(apc_state::hgdc_draw_text));
 
 	UPD7220(config, m_hgdc2, 3579545); // unk clock
 	m_hgdc2->set_addrmap(0, &apc_state::upd7220_2_map);
-	m_hgdc2->set_display_pixels_callback(FUNC(apc_state::hgdc_display_pixels), this);
+	m_hgdc2->set_display_pixels(FUNC(apc_state::hgdc_display_pixels));
 
 	/* sound hardware */
 	SPEAKER(config, m_speaker).front_center();

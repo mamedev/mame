@@ -762,12 +762,12 @@ FLOPPY_FORMATS_END
 
 READ8_MEMBER( c1541_prologic_dos_classic_device::pia_r )
 {
-	return m_pia->read(space, (offset >> 2) & 0x03);
+	return m_pia->read((offset >> 2) & 0x03);
 }
 
 WRITE8_MEMBER( c1541_prologic_dos_classic_device::pia_w )
 {
-	m_pia->write(space, (offset >> 2) & 0x03, data);
+	m_pia->write((offset >> 2) & 0x03, data);
 }
 
 WRITE8_MEMBER( c1541_prologic_dos_classic_device::pia_pa_w )

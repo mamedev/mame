@@ -2,18 +2,24 @@
 // copyright-holders:hap
 // thanks-to:Berger
 /******************************************************************************
+*
+* cxg_ch2001.cpp, subdriver of machine/chessbase.cpp
 
-Chess 2001:
-- Zilog Z8400APS @ 4 MHz (8MHz XTAL)
-- 2KB RAM HM6116, 16KB ROM D27128D
-- TTL, piezo, 8*8+9 LEDs, magnetic sensors
+*******************************************************************************
+
+CXG Chess 2001
+--------------
+Zilog Z8400APS @ 4 MHz (8MHz XTAL)
+2KB RAM HM6116, 16KB ROM D27128D
+TTL, piezo, 8*8+9 LEDs, magnetic sensors
 
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/cxgbase.h"
+#include "includes/chessbase.h"
 
 #include "cpu/z80/z80.h"
+#include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "speaker.h"
 
@@ -23,23 +29,35 @@ Chess 2001:
 
 namespace {
 
-class ch2001_state : public cxgbase_state
+class ch2001_state : public chessbase_state
 {
 public:
 	ch2001_state(const machine_config &mconfig, device_type type, const char *tag) :
-		cxgbase_state(mconfig, type, tag),
+		chessbase_state(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_irq_on(*this, "irq_on"),
+		m_dac(*this, "dac"),
 		m_speaker_off(*this, "speaker_off")
 	{ }
 
+	// machine drivers
 	void ch2001(machine_config &config);
 
 private:
 	// devices/pointers
+	required_device<cpu_device> m_maincpu;
+	required_device<timer_device> m_irq_on;
+	required_device<dac_bit_interface> m_dac;
 	required_device<timer_device> m_speaker_off;
 
-	void main_map(address_map &map);
+	// periodic interrupts
+	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(Line, ASSERT_LINE); }
+	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(Line, CLEAR_LINE); }
 
 	TIMER_DEVICE_CALLBACK_MEMBER(speaker_off) { m_dac->write(0); }
+
+	// address maps
+	void main_map(address_map &map);
 
 	// I/O handlers
 	DECLARE_WRITE8_MEMBER(speaker_w);
@@ -102,7 +120,7 @@ void ch2001_state::main_map(address_map &map)
 ******************************************************************************/
 
 static INPUT_PORTS_START( ch2001 )
-	PORT_INCLUDE( cxg_cb_magnets )
+	PORT_INCLUDE( generic_cb_magnets )
 
 	PORT_START("IN.8")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Black")
@@ -144,15 +162,13 @@ void ch2001_state::ch2001(machine_config &config)
 
 	TIMER(config, m_speaker_off).configure_generic(FUNC(ch2001_state::speaker_off));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(cxgbase_state::display_decay_tick), attotime::from_msec(1));
+	TIMER(config, "display_decay").configure_periodic(FUNC(ch2001_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_cxg_ch2001);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.set_output(5.0);
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
 

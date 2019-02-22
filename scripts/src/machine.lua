@@ -3869,3 +3869,15 @@ if (MACHINES["I82357"]~=null) then
 		MAME_DIR .. "src/devices/machine/i82357.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/machine/xc1700e.h,MACHINES["XC1700E"] = true
+---------------------------------------------------
+
+if (MACHINES["XC1700E"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/xc1700e.cpp",
+		MAME_DIR .. "src/devices/machine/xc1700e.h",
+	}
+end

@@ -1537,7 +1537,8 @@ INTERRUPT_GEN_MEMBER(tx0_state::tx0_interrupt)
 	}
 }
 
-MACHINE_CONFIG_START(tx0_state::tx0_64kw)
+void tx0_state::tx0_64kw(machine_config &config)
+{
 	/* basic machine hardware */
 	/* TX0 CPU @ approx. 167 kHz (no master clock, but the memory cycle time is approximately 6usec) */
 	TX0_64KW(config, m_maincpu, 166667);
@@ -1556,14 +1557,14 @@ MACHINE_CONFIG_START(tx0_state::tx0_64kw)
 	m_maincpu->set_vblank_int("screen", FUNC(tx0_state::tx0_interrupt));
 
 	/* video hardware (includes the control panel and typewriter output) */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(refresh_rate)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(virtual_width, virtual_height)
-	MCFG_SCREEN_VISIBLE_AREA(0, virtual_width-1, 0, virtual_height-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tx0_state, screen_update_tx0)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tx0_state, screen_vblank_tx0))
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(refresh_rate);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(virtual_width, virtual_height);
+	screen.set_visarea(0, virtual_width-1, 0, virtual_height-1);
+	screen.set_screen_update(FUNC(tx0_state::screen_update_tx0));
+	screen.screen_vblank().set(FUNC(tx0_state::screen_vblank_tx0));
+	screen.set_palette(m_palette);
 
 	CRT(config, m_crt, 0);
 	m_crt->set_num_levels(pen_crt_num_levels);
@@ -1577,18 +1578,17 @@ MACHINE_CONFIG_START(tx0_state::tx0_64kw)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tx0);
 	PALETTE(config, m_palette, FUNC(tx0_state::tx0_palette), total_colors_needed + sizeof(tx0_pens), total_colors_needed);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(tx0_state::tx0_8kw)
+void tx0_state::tx0_8kw(machine_config &config)
+{
 	tx0_64kw(config);
 
 	/* basic machine hardware */
 	/* TX0 CPU @ approx. 167 kHz (no master clock, but the memory cycle time is
 	approximately 6usec) */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(tx0_8kw_map)
-	/*MCFG_CPU_PORTS(readport, writeport)*/
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &tx0_state::tx0_8kw_map);
+}
 
 ROM_START(tx0_64kw)
 	/*CPU memory space*/

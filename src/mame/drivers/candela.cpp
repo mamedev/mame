@@ -305,19 +305,19 @@ READ8_MEMBER( can09t_state::read )
 		{
 		case X0XX: // ACIA
 			LOGPLA("-- ACIA\n");
-			byte = m_acia->read(space, offset & 1);
+			byte = m_acia->read(offset & 1);
 			break;
 		case X1XX: // SYSPIA
 			LOGPLA("-- SYSPIA\n");
-			byte = m_syspia->read_alt(space, offset & 3);
+			byte = m_syspia->read_alt(offset & 3);
 			break;
 		case X2XX: // USRPIA
 			LOGPLA("-- USRPIA\n");
-			byte = m_usrpia->read_alt(space, offset & 3);
+			byte = m_usrpia->read_alt(offset & 3);
 			break;
 		case X3XX: // PTM
 			LOGPLA("-- PTM\n");
-			byte = m_ptm->read(space, offset & 7);
+			byte = m_ptm->read(offset & 7);
 			break;
 		case X4XX: //
 			LOGPLA("-- XX4X\n");
@@ -387,19 +387,19 @@ WRITE8_MEMBER( can09t_state::write )
 		{
 		case X0XX: // ACIA
 			LOGPLA("-- ACIA\n");
-			m_acia->write(space, offset & 1, data);
+			m_acia->write(offset & 1, data);
 			break;
 		case X1XX: // SYSPIA
 			LOGPLA("-- SYSPIA\n");
-			m_syspia->write_alt(space, offset & 3, data);
+			m_syspia->write_alt(offset & 3, data);
 			break;
 		case X2XX: // USRPIA
 			LOGPLA("-- USRPIA\n");
-			m_usrpia->write_alt(space, offset & 3, data);
+			m_usrpia->write_alt(offset & 3, data);
 			break;
 		case X3XX: // PTM
 			LOGPLA("-- PTM\n");
-			m_ptm->write(space, offset & 7, data);
+			m_ptm->write(offset & 7, data);
 			break;
 		case X4XX: //
 			LOGPLA("-- XX4X\n");

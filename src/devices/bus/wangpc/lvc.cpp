@@ -246,7 +246,7 @@ uint16_t wangpc_lvc_device::wangpcbus_iorc_r(address_space &space, offs_t offset
 		switch (offset & 0x7f)
 		{
 		case 0x02/2:
-			data = 0xff00 | m_crtc->register_r(space, 0);
+			data = 0xff00 | m_crtc->register_r();
 			break;
 
 		case 0x30/2:
@@ -279,14 +279,14 @@ void wangpc_lvc_device::wangpcbus_aiowc_w(address_space &space, offs_t offset, u
 		case 0x00/2:
 			if (ACCESSING_BITS_0_7)
 			{
-				m_crtc->address_w(space, 0, data & 0xff);
+				m_crtc->address_w(data & 0xff);
 			}
 			break;
 
 		case 0x02/2:
 			if (ACCESSING_BITS_0_7)
 			{
-				m_crtc->register_w(space, 0, data & 0xff);
+				m_crtc->register_w(data & 0xff);
 			}
 			break;
 

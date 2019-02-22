@@ -340,11 +340,11 @@ WRITE16_MEMBER(ngen_state::peripheral_w)
 		break;
 	case 0x144:
 		if(ACCESSING_BITS_0_7)
-			m_crtc->address_w(space,0,data & 0xff);
+			m_crtc->address_w(data & 0xff);
 		break;
 	case 0x145:
 		if(ACCESSING_BITS_0_7)
-			m_crtc->register_w(space,0,data & 0xff);
+			m_crtc->register_w(data & 0xff);
 		break;
 	case 0x146:
 	case 0x147:
@@ -411,11 +411,11 @@ READ16_MEMBER(ngen_state::peripheral_r)
 		break;
 	case 0x144:
 		if(ACCESSING_BITS_0_7)
-			ret = m_crtc->status_r(space,0);
+			ret = m_crtc->status_r();
 		break;
 	case 0x145:
 		if(ACCESSING_BITS_0_7)
-			ret = m_crtc->register_r(space,0);
+			ret = m_crtc->register_r();
 		break;
 	case 0x146:
 	case 0x147:  // keyboard UART
@@ -534,7 +534,7 @@ WRITE16_MEMBER(ngen_state::hfd_w)
 		case 0x16:
 		case 0x17:
 			if(ACCESSING_BITS_0_7)
-				m_hdc->write(space,offset-0x10,data & 0xff);
+				m_hdc->write(offset-0x10,data & 0xff);
 			logerror("WD1010 register %i write %02x mask %04x\n",offset-0x10,data & 0xff,mem_mask);
 			break;
 		case 0x18:
@@ -583,7 +583,7 @@ READ16_MEMBER(ngen_state::hfd_r)
 		case 0x16:
 		case 0x17:
 			if(ACCESSING_BITS_0_7)
-				ret = m_hdc->read(space,offset-0x10);
+				ret = m_hdc->read(offset-0x10);
 			logerror("WD1010 register %i read, mask %04x\n",offset-0x10,mem_mask);
 			break;
 		case 0x18:
@@ -814,7 +814,7 @@ READ16_MEMBER( ngen_state::b38_crtc_r )
 	{
 	case 0:
 		if(ACCESSING_BITS_0_7)
-			ret = m_crtc->register_r(space,0);
+			ret = m_crtc->register_r();
 		break;
 	case 1:
 		if(ACCESSING_BITS_0_7)
@@ -830,11 +830,11 @@ WRITE16_MEMBER( ngen_state::b38_crtc_w )
 	{
 	case 0:
 		if(ACCESSING_BITS_0_7)
-			m_crtc->address_w(space,0,data & 0xff);
+			m_crtc->address_w(data & 0xff);
 		break;
 	case 1:
 		if(ACCESSING_BITS_0_7)
-			m_crtc->register_w(space,0,data & 0xff);
+			m_crtc->register_w(data & 0xff);
 		break;
 	}
 }

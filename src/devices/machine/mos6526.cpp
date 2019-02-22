@@ -788,7 +788,7 @@ void mos6526_device::execute_run()
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( mos6526_device::read )
+uint8_t mos6526_device::read(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -926,7 +926,7 @@ READ8_MEMBER( mos6526_device::read )
 	return data;
 }
 
-READ8_MEMBER( mos8520_device::read )
+uint8_t mos8520_device::read(offs_t offset)
 {
 	uint8_t data;
 
@@ -947,7 +947,7 @@ READ8_MEMBER( mos8520_device::read )
 		break;
 
 	default:
-		data = mos6526_device::read(space, offset);
+		data = mos6526_device::read(offset);
 	}
 
 	return data;
@@ -957,7 +957,7 @@ READ8_MEMBER( mos8520_device::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( mos6526_device::write )
+void mos6526_device::write(offs_t offset, uint8_t data)
 {
 	switch (offset & 0x0f)
 	{
@@ -1099,12 +1099,12 @@ WRITE8_MEMBER( mos6526_device::write )
 	}
 }
 
-WRITE8_MEMBER( mos8520_device::write )
+void mos8520_device::write(offs_t offset, uint8_t data)
 {
 	switch (offset & 0x0f)
 	{
 	default:
-		mos6526_device::write(space, offset, data);
+		mos6526_device::write(offset, data);
 		break;
 
 	case TOD_MIN:

@@ -195,7 +195,7 @@ uint8_t a2bus_videx160_device::read_c0nx(uint8_t offset)
 	switch (offset)
 	{
 		case 1:
-			return m_crtc->read_register();   // status_r?
+			return m_crtc->register_r();   // status_r?
 
 		case 2:
 			return m_ctrl1;
@@ -219,11 +219,11 @@ void a2bus_videx160_device::write_c0nx(uint8_t offset, uint8_t data)
 	switch (offset)
 	{
 		case 0:
-			m_crtc->write_address(data);
+			m_crtc->address_w(data);
 			break;
 
 		case 1:
-			m_crtc->write_register(data);
+			m_crtc->register_w(data);
 			break;
 
 		case 2:

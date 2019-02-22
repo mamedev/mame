@@ -103,8 +103,8 @@ INPUT_PORTS_END
 
 
 MACHINE_CONFIG_START(tp1983_state::tp1983)
-	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)
-	MCFG_NETLIST_SETUP(tp1983)
+	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK);
+	m_maincpu->set_constructor(netlist_tp1983);
 
 	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "vid0", "videomix", fixedfreq_device, update_composite_monochrome, "fixfreq")
 
@@ -119,8 +119,8 @@ MACHINE_CONFIG_START(tp1983_state::tp1983)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(tp1985_state::tp1985)
-	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)
-	MCFG_NETLIST_SETUP(tp1985)
+	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK);
+	m_maincpu->set_constructor(netlist_tp1985);
 
 	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "vid0", "videomix", tp1985_state, video_out_cb, "")
 

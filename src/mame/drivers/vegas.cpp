@@ -570,13 +570,13 @@ WRITE32_MEMBER( vegas_state::timekeeper_w )
 	if (m_cmos_unlocked)
 	{
 		if (ACCESSING_BITS_0_7)
-			m_timekeeper->write(space, offset * 4 + 0, data >> 0, 0xff);
+			m_timekeeper->write(offset * 4 + 0, data >> 0);
 		if (ACCESSING_BITS_8_15)
-			m_timekeeper->write(space, offset * 4 + 1, data >> 8, 0xff);
+			m_timekeeper->write(offset * 4 + 1, data >> 8);
 		if (ACCESSING_BITS_16_23)
-			m_timekeeper->write(space, offset * 4 + 2, data >> 16, 0xff);
+			m_timekeeper->write(offset * 4 + 2, data >> 16);
 		if (ACCESSING_BITS_24_31)
-			m_timekeeper->write(space, offset * 4 + 3, data >> 24, 0xff);
+			m_timekeeper->write(offset * 4 + 3, data >> 24);
 		if (offset*4 >= 0x7ff0)
 			if (LOG_TIMEKEEPER) logerror("%s timekeeper_w(%04X & %08X) = %08X\n", machine().describe_context(), offset*4, mem_mask, data);
 		m_cmos_unlocked = 0;
@@ -590,13 +590,13 @@ READ32_MEMBER( vegas_state::timekeeper_r )
 {
 	uint32_t result = 0xffffffff;
 	if (ACCESSING_BITS_0_7)
-		result = (result & ~0x000000ff) | (m_timekeeper->read(space, offset * 4 + 0, 0xff) << 0);
+		result = (result & ~0x000000ff) | (m_timekeeper->read(offset * 4 + 0) << 0);
 	if (ACCESSING_BITS_8_15)
-		result = (result & ~0x0000ff00) | (m_timekeeper->read(space, offset * 4 + 1, 0xff) << 8);
+		result = (result & ~0x0000ff00) | (m_timekeeper->read(offset * 4 + 1) << 8);
 	if (ACCESSING_BITS_16_23)
-		result = (result & ~0x00ff0000) | (m_timekeeper->read(space, offset * 4 + 2, 0xff) << 16);
+		result = (result & ~0x00ff0000) | (m_timekeeper->read(offset * 4 + 2) << 16);
 	if (ACCESSING_BITS_24_31)
-		result = (result & ~0xff000000) | (m_timekeeper->read(space, offset * 4 + 3, 0xff) << 24);
+		result = (result & ~0xff000000) | (m_timekeeper->read(offset * 4 + 3) << 24);
 	if (offset * 4 >= 0x7ff0) {
 		// Initial RTC check expects reads to the RTC to take some time
 		m_maincpu->eat_cycles(30);
@@ -822,7 +822,7 @@ WRITE8_MEMBER(vegas_state::sio_w)
 			break;
 		case 7:
 			// Watchdog
-			m_timekeeper->watchdog_write(space, offset, data);
+			m_timekeeper->watchdog_write();
 			if (0 && LOG_SIO)
 				logerror("sio_w: Watchdog: %08x index: %d data: %02X\n", offset, index, data);
 			//m_maincpu->eat_cycles(100);

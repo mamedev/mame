@@ -145,9 +145,9 @@ void newbrain_eim_device::device_reset()
 //  mreq_r - memory request read
 //-------------------------------------------------
 
-uint8_t newbrain_eim_device::mreq_r(address_space &space, offs_t offset, uint8_t data, bool &romov, int &exrm, bool &raminh)
+uint8_t newbrain_eim_device::mreq_r(offs_t offset, uint8_t data, bool &romov, int &exrm, bool &raminh)
 {
-	return m_exp->mreq_r(space, offset, data, romov, exrm, raminh);
+	return m_exp->mreq_r(offset, data, romov, exrm, raminh);
 }
 
 
@@ -155,9 +155,9 @@ uint8_t newbrain_eim_device::mreq_r(address_space &space, offs_t offset, uint8_t
 //  mreq_w - memory request write
 //-------------------------------------------------
 
-void newbrain_eim_device::mreq_w(address_space &space, offs_t offset, uint8_t data, bool &romov, int &exrm, bool &raminh)
+void newbrain_eim_device::mreq_w(offs_t offset, uint8_t data, bool &romov, int &exrm, bool &raminh)
 {
-	m_exp->mreq_w(space, offset, data, romov, exrm, raminh);
+	m_exp->mreq_w(offset, data, romov, exrm, raminh);
 }
 
 
@@ -165,9 +165,9 @@ void newbrain_eim_device::mreq_w(address_space &space, offs_t offset, uint8_t da
 //  iorq_r - I/O request read
 //-------------------------------------------------
 
-uint8_t newbrain_eim_device::iorq_r(address_space &space, offs_t offset, uint8_t data, bool &prtov)
+uint8_t newbrain_eim_device::iorq_r(offs_t offset, uint8_t data, bool &prtov)
 {
-	return m_exp->iorq_r(space, offset, data, prtov);
+	return m_exp->iorq_r(offset, data, prtov);
 }
 
 
@@ -175,9 +175,9 @@ uint8_t newbrain_eim_device::iorq_r(address_space &space, offs_t offset, uint8_t
 //  iorq_w - I/O request write
 //-------------------------------------------------
 
-void newbrain_eim_device::iorq_w(address_space &space, offs_t offset, uint8_t data, bool &prtov)
+void newbrain_eim_device::iorq_w(offs_t offset, uint8_t data, bool &prtov)
 {
-	m_exp->iorq_w(space, offset, data, prtov);
+	m_exp->iorq_w(offset, data, prtov);
 }
 
 

@@ -318,22 +318,22 @@ void symbolics_state::machine_reset()
 	*/
 }
 
-MACHINE_CONFIG_START(symbolics_state::symbolics)
+void symbolics_state::symbolics(machine_config &config)
+{
 	/* basic machine hardware */
 	// per page 159 of http://bitsavers.trailing-edge.com/pdf/symbolics/3600_series/Lisp_Machine_Hardware_Memos.pdf:
 	//XTALS: 16MHz @H11 (68k CPU clock)
 	//       4.9152MHz @J5 (driving the two MPSCs serial clocks)
 	//       66.67MHz @J10 (main lispcpu/system clock)
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)/2) /* MC68000L8 @A27; clock is derived from the 16Mhz xtal @ H11, verified from patent */
-	MCFG_DEVICE_PROGRAM_MAP(m68k_mem)
+	M68000(config, m_maincpu, XTAL(16'000'000)/2); /* MC68000L8 @A27; clock is derived from the 16Mhz xtal @ H11, verified from patent */
+	m_maincpu->set_addrmap(AS_PROGRAM, &symbolics_state::m68k_mem);
 
 	//ADD ME:
 	// Framebuffer
 	// DMA Controller
 	// I8274 MPSC #1 (synchronous serial for keyboard)
 	// I8274 MPSC #2 (EIA/debug console?)
-
-MACHINE_CONFIG_END
+}
 
 /******************************************************************************
  ROM Definitions

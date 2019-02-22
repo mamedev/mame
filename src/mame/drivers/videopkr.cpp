@@ -911,11 +911,11 @@ WRITE8_MEMBER(videopkr_state::baby_sound_p3_w)
 		case 0x00:  break;
 		case 0x01:  break;
 		case 0x02:  break;
-		case 0x03:  m_aysnd->data_w(space, 1, m_sbp0); break;
+		case 0x03:  m_aysnd->data_w(m_sbp0); break;
 		case 0x04:  break;
-		case 0x05:  m_sbp0 = m_aysnd->data_r(space, m_sbp0); break;
+		case 0x05:  m_sbp0 = m_aysnd->data_r(); break;
 		case 0x06:  break;
-		case 0x07:  m_aysnd->address_w(space, 0, m_sbp0); break;
+		case 0x07:  m_aysnd->address_w(m_sbp0); break;
 	}
 }
 
@@ -1261,7 +1261,6 @@ void videopkr_state::videopkr(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.275);
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }

@@ -379,20 +379,20 @@ static GFXDECODE_START( gfx_sprint4 )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(sprint4_state::sprint4)
-
+void sprint4_state::sprint4(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, PIXEL_CLOCK / 8)
-	MCFG_DEVICE_PROGRAM_MAP(sprint4_cpu_map)
+	M6502(config, m_maincpu, PIXEL_CLOCK / 8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sprint4_state::sprint4_cpu_map);
 
 	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count(m_screen, 8);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, 0, 256, VTOTAL, 0, 224)
-	MCFG_SCREEN_UPDATE_DRIVER(sprint4_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sprint4_state, screen_vblank))
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, 0, 256, VTOTAL, 0, 224);
+	m_screen->set_screen_update(FUNC(sprint4_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(sprint4_state::screen_vblank));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sprint4);
 	PALETTE(config, m_palette, FUNC(sprint4_state::sprint4_palette), 10, 6);
@@ -411,11 +411,10 @@ MACHINE_CONFIG_START(sprint4_state::sprint4)
 	latch.q_out_cb<6>().set("discrete", FUNC(discrete_device::write_line<SPRINT4_SCREECH_EN_3>));
 	latch.q_out_cb<7>().set("discrete", FUNC(discrete_device::write_line<SPRINT4_SCREECH_EN_4>));
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE, sprint4_discrete)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-
-MACHINE_CONFIG_END
+	DISCRETE(config, m_discrete, sprint4_discrete);
+	m_discrete->add_route(0, "lspeaker", 1.0);
+	m_discrete->add_route(1, "rspeaker", 1.0);
+}
 
 
 ROM_START( sprint4 )

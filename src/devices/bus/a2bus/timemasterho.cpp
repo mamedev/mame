@@ -157,7 +157,7 @@ uint8_t a2bus_timemasterho_device::read_c0nx(uint8_t offset)
 {
 	if (offset <= 3)
 	{
-		return m_pia->reg_r(offset);
+		return m_pia->read(offset);
 	}
 
 	return 0xff;
@@ -172,7 +172,7 @@ void a2bus_timemasterho_device::write_c0nx(uint8_t offset, uint8_t data)
 {
 	if (offset <= 3)
 	{
-		m_pia->reg_w(offset, data);
+		m_pia->write(offset, data);
 	}
 }
 

@@ -551,12 +551,13 @@ void smsmfg_state::machine_reset()
 	m_communication_port_status = 0;
 }
 
-MACHINE_CONFIG_START(smsmfg_state::sms)
-	MCFG_DEVICE_ADD("maincpu", I8088, XTAL(24'000'000)/8)
-	MCFG_DEVICE_PROGRAM_MAP(sms_map)
+void smsmfg_state::sms(machine_config &config)
+{
+	I8088(config, m_maincpu, XTAL(24'000'000)/8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &smsmfg_state::sms_map);
 
-	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(16'000'000)/8)
-	MCFG_DEVICE_PROGRAM_MAP(sub_map)
+	z80_device &soundcpu(Z80(config, "soundcpu", XTAL(16'000'000)/8));
+	soundcpu.set_addrmap(AS_PROGRAM, &smsmfg_state::sub_map);
 
 	config.m_minimum_quantum = attotime::from_hz(6000);
 
@@ -573,13 +574,13 @@ MACHINE_CONFIG_START(smsmfg_state::sms)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(0x1b0, 0x100)
-	MCFG_SCREEN_VISIBLE_AREA(0, 0x1af, 0, 0xff)
-	MCFG_SCREEN_UPDATE_DRIVER(smsmfg_state, screen_update_sms)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(0x1b0, 0x100);
+	m_screen->set_visarea(0, 0x1af, 0, 0xff);
+	m_screen->set_screen_update(FUNC(smsmfg_state::screen_update_sms));
+	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::BGR_3BIT);
 
@@ -587,16 +588,16 @@ MACHINE_CONFIG_START(smsmfg_state::sms)
 	SPEAKER(config, "mono").front_center();
 
 	AY8910(config, "aysnd", XTAL(16'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.25);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(smsmfg_state::sureshot)
+void smsmfg_state::sureshot(machine_config &config)
+{
 	sms(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(sureshot_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &smsmfg_state::sureshot_map);
 
 	MCFG_MACHINE_START_OVERRIDE(smsmfg_state,sureshot)
-MACHINE_CONFIG_END
+}
 
 /*************************************
  *
