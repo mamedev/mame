@@ -131,7 +131,7 @@ namespace netlist
 	};
 
 #if (PHAS_INT128)
-	using netlist_time = ptime<UINT128, NETLIST_INTERNAL_RES>;
+	using netlist_time = ptime<INT128, NETLIST_INTERNAL_RES>;
 #else
 	using netlist_time = ptime<std::int64_t, NETLIST_INTERNAL_RES>;
 	static_assert(noexcept(netlist_time::from_nsec(1)) == true, "Not evaluated as constexpr");
@@ -149,7 +149,8 @@ namespace netlist
 
 namespace plib {
 
-	template<> inline void state_manager_t::save_item(const void *owner, netlist::netlist_time &nlt, const pstring &stname)
+	template<>
+	inline void state_manager_t::save_item(const void *owner, netlist::netlist_time &nlt, const pstring &stname)
 	{
 		save_state_ptr(owner, stname, datatype_t(sizeof(netlist::netlist_time::internal_type), true, false), 1, nlt.get_internaltype_ptr());
 	}

@@ -103,7 +103,7 @@ unsigned matrix_solver_SOR_t<FT, SIZE>::vsolve_non_dynamic(const bool newton_rap
 
 		RHS[k] = RHS_t;
 
-		if (USE_GABS)
+		if (this->m_params.m_use_gabs)
 		{
 			for (std::size_t i = 0; i < term_count; i++)
 				gabs_t = gabs_t + std::abs(go[i]);

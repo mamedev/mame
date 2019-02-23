@@ -23,16 +23,6 @@ namespace devices
 	{
 	}
 
-	void terms_for_net_t::clear()
-	{
-		m_terms.clear();
-		m_connected_net_idx.clear();
-		m_gt.clear();
-		m_go.clear();
-		m_Idr.clear();
-		m_connected_net_V.clear();
-	}
-
 	void terms_for_net_t::add(terminal_t *term, int net_other, bool sorted)
 	{
 		if (sorted)
@@ -42,23 +32,20 @@ namespace devices
 				{
 					plib::container::insert_at(m_terms, i, term);
 					plib::container::insert_at(m_connected_net_idx, i, net_other);
-					plib::container::insert_at(m_gt, i, 0.0);
-					plib::container::insert_at(m_go, i, 0.0);
-					plib::container::insert_at(m_Idr, i, 0.0);
-					plib::container::insert_at(m_connected_net_V, i, nullptr);
 					return;
 				}
 			}
 		m_terms.push_back(term);
 		m_connected_net_idx.push_back(net_other);
-		m_gt.push_back(0.0);
-		m_go.push_back(0.0);
-		m_Idr.push_back(0.0);
-		m_connected_net_V.push_back(nullptr);
 	}
 
 	void terms_for_net_t::set_pointers()
 	{
+		m_gt.resize(count(), 0.0);
+		m_go.resize(count(), 0.0);
+		m_Idr.resize(count(), 0.0);
+		m_connected_net_V.resize(count(), nullptr);
+
 		for (std::size_t i = 0; i < count(); i++)
 		{
 			m_terms[i]->set_ptrs(&m_gt[i], &m_go[i], &m_Idr[i]);
@@ -269,11 +256,6 @@ namespace devices
 				this->m_terms[k]->add(m_rails_temp[k]->terms()[i], m_rails_temp[k]->connected_net_idx()[i], false);
 
 			m_terms[k]->set_pointers();
-		}
-
-		for (auto &rt : m_rails_temp)
-		{
-			rt->clear(); // no longer needed
 		}
 
 		// free all - no longer needed

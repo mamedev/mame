@@ -26,7 +26,7 @@
 
 /*
  * Set this to one if you want to use 128 bit int for ptime.
- * This is for tests only.
+ * This is about 5% slower on a kaby lake processor.
  */
 
 #ifndef PHAS_INT128

@@ -117,11 +117,10 @@ namespace devices
 			this->m_new_V[k] = this->m_nets[k]->Q_Analog();
 		}
 
-
 		const float_type accuracy = this->m_params.m_accuracy;
 
-		const std::size_t iter = std::max(1u, this->m_params.m_gs_loops);
-		std::size_t gsl = m_gmres.solve(m_ops, this->m_new_V, RHS, iter, accuracy);
+		auto iter = std::max(plib::constants<std::size_t>::one(), this->m_params.m_gs_loops);
+		auto gsl = m_gmres.solve(m_ops, this->m_new_V, RHS, iter, accuracy);
 
 		this->m_iterative_total += gsl;
 		this->m_stat_calculations++;

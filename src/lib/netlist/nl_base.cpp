@@ -476,7 +476,7 @@ void netlist_t::print_stats() const
 				[&](size_t i1, size_t i2) { return m_state->m_devices[i1].second->m_stat_total_time.total() < m_state->m_devices[i2].second->m_stat_total_time.total(); });
 
 		nperftime_t<NL_KEEP_STATISTICS>::type total_time(0);
-		netlist_time::mult_type total_count(0);
+		nperftime_t<NL_KEEP_STATISTICS>::ctype total_count(0);
 
 		for (auto & j : index)
 		{
@@ -489,7 +489,7 @@ void netlist_t::print_stats() const
 		}
 
 		log().verbose("Total calls : {1:12} {2:12} {3:12}", total_count,
-			total_time, total_time / total_count);
+			total_time, total_time / static_cast<decltype(total_time)>(total_count));
 
 		nperftime_t<NL_KEEP_STATISTICS> overhead;
 		nperftime_t<NL_KEEP_STATISTICS> test;

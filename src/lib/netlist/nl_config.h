@@ -37,7 +37,7 @@
  * This approach is stricter and should identify bugs in
  * the netlist core faster.
  * By default it is disabled since it is not as fast as
- * the default approach.
+ * the default approach. It is up to 5% slower.
  *
  */
 #define USE_COPY_INSTEAD_OF_REFERENCE (0)
@@ -52,15 +52,6 @@
 
 // How many times do we try to resolve links (connections)
 #define NL_MAX_LINK_RESOLVE_LOOPS   (100)
-
-//============================================================
-//  Solver defines
-//============================================================
-
-#define USE_GABS                    (1)
-// savings are eaten up by effort
-// FIXME: Convert into solver parameter
-#define USE_LINEAR_PREDICTION       (0)
 
 //============================================================
 //  DEBUGGING
