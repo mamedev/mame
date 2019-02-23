@@ -118,6 +118,14 @@ public:
 
 	void install_ram(offs_t addrstart, offs_t addrend, void *baseptr);
 
+	template<typename T> void install_io_device(offs_t addrstart, offs_t addrend, T &device, void (T::*map)(class address_map &map), uint64_t unitmask = ~u64(0))
+	{
+		m_io->install_device(addrstart, addrend, device, map, unitmask);
+
+		if (m_io_iop)
+			m_io_iop->install_device(addrstart, addrend, device, map, unitmask);
+	}
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
