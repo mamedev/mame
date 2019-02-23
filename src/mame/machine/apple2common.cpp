@@ -4,7 +4,7 @@
 
     apple2common.cpp
 
-    NEOGEO Memory card functions.
+    Apple II stuff shared between apple2/apple2e/apple2gs.
 
 *********************************************************************/
 
@@ -33,6 +33,10 @@ apple2_common_device::apple2_common_device(const machine_config &mconfig, const 
 
 void apple2_common_device::device_start()
 {
+	// precalculate joystick time constants
+	m_x_calibration = attotime::from_nsec(10800).as_double();
+	m_y_calibration = attotime::from_nsec(10800).as_double();
+	m_joystick_x1_time = m_joystick_x2_time = m_joystick_y1_time = m_joystick_y2_time = 0.0;
 }
 
 struct dasm_data
@@ -56,8 +60,11 @@ static const struct dasm_data p8_calls[] =
 static const struct dasm_data a2_stuff[] =
 {
 	{ 0x0020, "TXTLEFT" }, { 0x0021, "TXTWIDTH" }, { 0x0022, "TXTTOP" }, { 0x0023, "TXTBOTTOM" },
-	{ 0x0024, "CURSORHORZ" }, { 0x0025, "CURSORVERT" }, { 0x002b, "BOOTSLOT" }, { 0x002c, "GRLINEEND" },
-	{ 0x0030, "GRCOLOR" }, { 0x0032, "TEXTFORMAT" }, { 0x0033, "PROMPTCHAR" },
+	{ 0x0024, "CURSORHORZ" }, { 0x0025, "CURSORVERT" }, { 0x0028, "BASEADR" }, { 0x002b, "BOOTSLOT" }, { 0x002c, "GRLINEEND" },
+	{ 0x0030, "GRCOLOR" }, { 0x0032, "TEXTFORMAT" }, { 0x0033, "PROMPTCHAR" }, { 0x0036, "OUTHOOK" }, { 0x0038, "INHOOK" },
+	{ 0x0067, "BASICPRGBASE" }, { 0x0069, "BASICVARBASE" }, { 0x006b, "BASICARRBASE" }, { 0x6d, "BASICVAREND" },
+	{ 0x006f, "BASICSTREND" }, { 0x0075, "CURLINENUM" }, { 0x77, "ENDSTOPLINE" }, { 0x79, "CURLINEADR" },
+	{ 0x007b, "CURDATAADR" }, { 0x007d, "NEXTDATAADR" }, { 0x009d, "FAC" }, { 0x00a5, "ARG" }, { 0x00af, "BASICPRGEND" },
 
 	{ 0xc000, "KBD" }, { 0xc001, "80STOREON" }, { 0xc002, "RDMAINRAM" }, {0xc003, "RDCARDRAM" }, {0xc004, "WRMAINRAM" },
 	{ 0xc005, "WRCARDRAM" }, { 0xc006, "SETSLOTCXROM" }, { 0xc007, "SETINTCXROM" }, { 0xc008, "SETSTDZP" },
@@ -84,6 +91,7 @@ static const struct dasm_data a2_stuff[] =
 	{ 0xF944, "F8ROM:PRNTX" }, { 0xF948, "F8ROM:PRBLNK" }, { 0xF94A, "F8ROM:PRBL2" },  { 0xF953, "F8ROM:PCADJ" },
 	{ 0xF962, "F8ROM:TEXT2COPY" }, { 0xFA40, "F8ROM:OLDIRQ" }, { 0xFA4C, "F8ROM:BREAK" }, { 0xFA59, "F8ROM:OLDBRK" },
 	{ 0xFA62, "F8ROM:RESET" }, { 0xFAA6, "F8ROM:PWRUP" }, { 0xFABA, "F8ROM:SLOOP" }, { 0xFAD7, "F8ROM:REGDSP" },
+	{ 0xFADA, "F8ROM:RGDSP1" },
 	{ 0xFB19, "F8ROM:RTBL" }, { 0xFB1E, "F8ROM:PREAD" }, { 0xFB21, "F8ROM:PREAD4" }, { 0xFB2F, "F8ROM:INIT" },
 	{ 0xFB39, "F8ROM:SETTXT" }, { 0xFB40, "F8ROM:SETGR" }, { 0xFB4B, "F8ROM:SETWND" }, { 0xFB51, "F8ROM:SETWND2" },
 	{ 0xFB5B, "F8ROM:TABV" }, { 0xFB60, "F8ROM:APPLEII" }, { 0xFB6F, "F8ROM:SETPWRC" }, { 0xFB78, "F8ROM:VIDWAIT" },

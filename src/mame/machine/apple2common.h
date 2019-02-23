@@ -28,6 +28,13 @@ protected:
 	virtual void device_start() override;
 
 private:
+	double m_x_calibration, m_y_calibration;
+
+	double m_joystick_x1_time;
+	double m_joystick_y1_time;
+	double m_joystick_x2_time;
+	double m_joystick_y2_time;
+
 	offs_t com_2byte_op(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const char *opname);
 	offs_t com_3byte_op(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const char *opname);
 };
