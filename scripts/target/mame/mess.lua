@@ -3692,8 +3692,9 @@ files {
 	MAME_DIR .. "src/mame/drivers/wy150.cpp",
 	MAME_DIR .. "src/mame/drivers/wy30p.cpp",
 	MAME_DIR .. "src/mame/drivers/wy50.cpp",
+	MAME_DIR .. "src/mame/drivers/wy55.cpp",
+	MAME_DIR .. "src/mame/drivers/wy60.cpp",
 	MAME_DIR .. "src/mame/drivers/wy85.cpp",
-	MAME_DIR .. "src/mame/drivers/wyse.cpp",
 	MAME_DIR .. "src/mame/machine/wy50kb.cpp",
 	MAME_DIR .. "src/mame/machine/wy50kb.h",
 }

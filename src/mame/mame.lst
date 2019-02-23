@@ -39847,12 +39847,15 @@ wy30p                           // WY-30+
 wy50                            // WY-50
 wy75                            // WY-75
 
+@source:wy55.cpp
+wy55                            // WY-55
+
+@source:wy60.cpp
+wy60                            // WY-60
+wy60a                           // WY-60
+
 @source:wy85.cpp
 wy85                            // WY-85
-
-@source:wyse.cpp
-wy55                            // WY-55
-wy60                            // WY-60
 
 @source:wyvernf0.cpp
 wyvernf0                        // A39 (c) 1985 Taito Corporation (Japan)
