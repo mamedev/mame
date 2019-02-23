@@ -433,7 +433,7 @@ MACHINE_CONFIG_START(cmmb_state::cmmb)
 	MCFG_SCREEN_UPDATE_DRIVER(cmmb_state, screen_update_cmmb)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cmmb)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cmmb);
 
 	PALETTE(config, m_palette).set_format(palette_device::RGB_332_inverted, 512);
 

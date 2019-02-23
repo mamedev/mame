@@ -8,8 +8,8 @@
 #include "nld_opamps.h"
 #include "../nl_base.h"
 #include "../nl_errstr.h"
-#include "nlid_twoterm.h"
 #include "nlid_fourterm.h"
+#include "nlid_twoterm.h"
 
 #include <cmath>
 
@@ -240,5 +240,5 @@ namespace netlist
 
 	namespace devices {
 		NETLIB_DEVICE_IMPL_NS(analog, opamp, "OPAMP", "MODEL")
-	}
+	} // namespace devices
 } // namespace netlist

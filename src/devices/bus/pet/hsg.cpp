@@ -91,12 +91,13 @@ void cbm8000_hsg_b_device::hsg_b_map(address_map &map)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(cbm8000_hsg_a_device::device_add_mconfig)
-	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
-	MCFG_SCREEN_UPDATE_DEVICE(EF9365_TAG, ef9365_device, screen_update)
-	MCFG_SCREEN_SIZE(512, 512)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 512-1)
-	MCFG_SCREEN_REFRESH_RATE(25)
+void cbm8000_hsg_a_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen.set_screen_update(EF9365_TAG, FUNC(ef9365_device::screen_update));
+	screen.set_size(512, 512);
+	screen.set_visarea(0, 512-1, 0, 512-1);
+	screen.set_refresh_hz(25);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	EF9365(config, m_gdc, 1750000);
@@ -105,14 +106,15 @@ MACHINE_CONFIG_START(cbm8000_hsg_a_device::device_add_mconfig)
 	m_gdc->set_palette_tag("palette");
 	m_gdc->set_nb_bitplanes(1);
 	m_gdc->set_display_mode(ef9365_device::DISPLAY_MODE_512x512);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(cbm8000_hsg_b_device::device_add_mconfig)
-	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
-	MCFG_SCREEN_UPDATE_DEVICE(EF9366_TAG, ef9365_device, screen_update)
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_REFRESH_RATE(50)
+void cbm8000_hsg_b_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen.set_screen_update(EF9366_TAG, FUNC(ef9365_device::screen_update));
+	screen.set_size(512, 256);
+	screen.set_visarea(0, 512-1, 0, 256-1);
+	screen.set_refresh_hz(50);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	EF9365(config, m_gdc, 1750000); //EF9366
@@ -121,7 +123,7 @@ MACHINE_CONFIG_START(cbm8000_hsg_b_device::device_add_mconfig)
 	m_gdc->set_palette_tag("palette");
 	m_gdc->set_nb_bitplanes(1);
 	m_gdc->set_display_mode(ef9365_device::DISPLAY_MODE_512x256);
-MACHINE_CONFIG_END
+}
 
 
 
@@ -176,7 +178,7 @@ void cbm8000_hsg_device::device_reset()
 //  pet_norom_r - NO ROM read
 //-------------------------------------------------
 
-int cbm8000_hsg_device::pet_norom_r(address_space &space, offs_t offset, int sel)
+int cbm8000_hsg_device::pet_norom_r(offs_t offset, int sel)
 {
 	return !(offset >= 0x9000 && offset < 0xaf00);
 }
@@ -186,7 +188,7 @@ int cbm8000_hsg_device::pet_norom_r(address_space &space, offs_t offset, int sel
 //  pet_bd_r - buffered data read
 //-------------------------------------------------
 
-uint8_t cbm8000_hsg_device::pet_bd_r(address_space &space, offs_t offset, uint8_t data, int &sel)
+uint8_t cbm8000_hsg_device::pet_bd_r(offs_t offset, uint8_t data, int &sel)
 {
 	switch (sel)
 	{
@@ -222,7 +224,7 @@ uint8_t cbm8000_hsg_device::pet_bd_r(address_space &space, offs_t offset, uint8_
 		}
 		else if (offset >= 0xaf70 && offset < 0xaf80)
 		{
-			data = m_gdc->data_r(space, offset & 0x0f);
+			data = m_gdc->data_r(machine().dummy_space(), offset & 0x0f);
 		}
 		break;
 	}
@@ -235,7 +237,7 @@ uint8_t cbm8000_hsg_device::pet_bd_r(address_space &space, offs_t offset, uint8_
 //  pet_bd_w - buffered data write
 //-------------------------------------------------
 
-void cbm8000_hsg_device::pet_bd_w(address_space &space, offs_t offset, uint8_t data, int &sel)
+void cbm8000_hsg_device::pet_bd_w(offs_t offset, uint8_t data, int &sel)
 {
 	if (offset == 0xaf00)
 	{
@@ -256,6 +258,6 @@ void cbm8000_hsg_device::pet_bd_w(address_space &space, offs_t offset, uint8_t d
 	}
 	else if (offset >= 0xaf70 && offset < 0xaf80)
 	{
-		m_gdc->data_w(space, offset & 0x0f, data);
+		m_gdc->data_w(machine().dummy_space(), offset & 0x0f, data);
 	}
 }

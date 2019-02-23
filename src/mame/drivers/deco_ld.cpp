@@ -482,7 +482,7 @@ MACHINE_CONFIG_START(deco_ld_state::rblaster)
 
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rblaster)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rblaster);
 	PALETTE(config, m_palette).set_format(palette_device::BGR_233_inverted, 0x800);
 
 	//ACIA6850(config, m_acia, 0);

@@ -8,8 +8,8 @@
 #ifndef PFUNCTION_H_
 #define PFUNCTION_H_
 
-#include "pstring.h"
 #include "pstate.h"
+#include "pstring.h"
 
 #include <vector>
 
@@ -112,6 +112,6 @@ namespace plib {
 	};
 
 
-}
+} // namespace plib
 
 #endif /* PEXCEPTION_H_ */

@@ -528,7 +528,6 @@ void coolpool_state::amerdart_map(address_map &map)
 	map(0x04000000, 0x0400000f).w(FUNC(coolpool_state::amerdart_misc_w));
 	map(0x05000000, 0x0500000f).r(m_dsp2main, FUNC(generic_latch_16_device::read)).w(m_main2dsp, FUNC(generic_latch_16_device::write));
 	map(0x06000000, 0x06007fff).ram().w(FUNC(coolpool_state::nvram_thrash_data_w)).share("nvram");
-	map(0xc0000000, 0xc00001ff).rw(m_maincpu, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xffb00000, 0xffffffff).rom().region("maincpu", 0);
 }
 
@@ -541,7 +540,6 @@ void coolpool_state::coolpool_map(address_map &map)
 	map(0x03000000, 0x0300000f).w(FUNC(coolpool_state::coolpool_misc_w));
 	map(0x03000000, 0x03ffffff).rom().region("gfx1", 0);
 	map(0x06000000, 0x06007fff).ram().w(FUNC(coolpool_state::nvram_thrash_data_w)).share("nvram");
-	map(0xc0000000, 0xc00001ff).rw(m_maincpu, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xffe00000, 0xffffffff).rom().region("maincpu", 0);
 }
 
@@ -553,7 +551,6 @@ void coolpool_state::nballsht_map(address_map &map)
 	map(0x03000000, 0x0300000f).w(FUNC(coolpool_state::coolpool_misc_w));
 	map(0x04000000, 0x040000ff).rw(m_tlc34076, FUNC(tlc34076_device::read), FUNC(tlc34076_device::write)).umask16(0x00ff);    // IMSG176P-40
 	map(0x06000000, 0x0601ffff).mirror(0x00020000).ram().w(FUNC(coolpool_state::nvram_thrash_data_w)).share("nvram");
-	map(0xc0000000, 0xc00001ff).rw(m_maincpu, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xff000000, 0xff7fffff).rom().region("gfx1", 0);
 	map(0xffc00000, 0xffffffff).rom().region("maincpu", 0);
 }
@@ -713,8 +710,8 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(coolpool_state::amerdart)
-
+void coolpool_state::amerdart(machine_config &config)
+{
 	/* basic machine hardware */
 	TMS34010(config, m_maincpu, XTAL(40'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &coolpool_state::amerdart_map);
@@ -743,20 +740,21 @@ MACHINE_CONFIG_START(coolpool_state::amerdart)
 	TIMER(config, m_nvram_timer).configure_generic(FUNC(coolpool_state::nvram_write_timeout));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(40'000'000)/6, 212*2, 0, 161*2, 262, 0, 241)
-	MCFG_SCREEN_UPDATE_DEVICE("maincpu", tms34010_device, tms340x0_rgb32)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(40'000'000)/6, 212*2, 0, 161*2, 262, 0, 241);
+	screen.set_screen_update("maincpu", FUNC(tms34010_device::tms340x0_rgb32));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", MP1210, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	MP1210(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 
-MACHINE_CONFIG_START(coolpool_state::coolpool)
-
+void coolpool_state::coolpool(machine_config &config)
+{
 	/* basic machine hardware */
 	TMS34010(config, m_maincpu, XTAL(40'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &coolpool_state::coolpool_map);
@@ -790,16 +788,17 @@ MACHINE_CONFIG_START(coolpool_state::coolpool)
 	/* video hardware */
 	TLC34076(config, m_tlc34076, tlc34076_device::TLC34076_6_BIT);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(40'000'000)/6, 424, 0, 320, 262, 0, 240)
-	MCFG_SCREEN_UPDATE_DEVICE("maincpu", tms34010_device, tms340x0_rgb32)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(40'000'000)/6, 424, 0, 320, 262, 0, 240);
+	screen.set_screen_update("maincpu", FUNC(tms34010_device::tms340x0_rgb32));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", MP1210, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	MP1210(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 
 void coolpool_state::_9ballsht(machine_config &config)

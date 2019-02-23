@@ -122,7 +122,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ioevent_trg04);
 	DECLARE_WRITE_LINE_MEMBER(ioevent_trg08);
 
-
 	int m_rgnlen;
 	uint8_t* m_rgn;
 
@@ -190,7 +189,6 @@ protected:
 	required_device<screen_device> m_screen;
 	required_device<address_map_bank_device> m_lowbus;
 	address_space* m_cpuspace;
-	uint8_t m_extbusctrl[3];
 
 private:
 
@@ -211,6 +209,11 @@ private:
 	virtual void machine_reset() override;
 
 	virtual void video_start() override;
+
+	DECLARE_WRITE8_MEMBER(debug_mem_w)
+	{
+		m_mainram[offset] = data;
+	};
 
 	virtual uint8_t opcodes_000000_r(offs_t offset)
 	{
@@ -263,8 +266,6 @@ private:
 		}
 	}
 
-	DECLARE_READ8_MEMBER(extintrf_790x_r);
-	DECLARE_WRITE8_MEMBER(extintrf_790x_w);
 
 	DECLARE_READ8_MEMBER(ioevent_enable_r);
 	DECLARE_WRITE8_MEMBER(ioevent_enable_w);
@@ -577,8 +578,12 @@ private:
 protected:
 	optional_device<xavix2002_io_device> m_xavix2002io;
 
-	// additional SuperXaviX / XaviX2002 stuff
+	uint8_t m_extbusctrl[3];
 
+	virtual DECLARE_READ8_MEMBER(extintrf_790x_r);
+	virtual DECLARE_WRITE8_MEMBER(extintrf_790x_w);
+
+	// additional SuperXaviX / XaviX2002 stuff
 	uint8_t m_sx_extended_extbus[3];
 
 	DECLARE_WRITE8_MEMBER(extended_extbus_reg0_w);
@@ -624,6 +629,18 @@ private:
 	int hackaddress1;
 	int hackaddress2;
 };
+
+class xavix_i2c_ltv_tam_state : public xavix_i2c_state
+{
+public:
+	xavix_i2c_ltv_tam_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_i2c_state(mconfig, type, tag)
+	{ }
+
+private:
+	virtual void write_io1(uint8_t data, uint8_t direction) override;
+};
+
 
 class xavix_i2c_jmat_state : public xavix_i2c_state
 {
@@ -763,9 +780,26 @@ protected:
 		}
 	}
 
+	// TODO, use callbacks?
+	virtual DECLARE_READ8_MEMBER(extintrf_790x_r) override
+	{
+		return xavix_state::extintrf_790x_r(space,offset,mem_mask);
+	}
+
+	virtual DECLARE_WRITE8_MEMBER(extintrf_790x_w) override
+	{
+		xavix_state::extintrf_790x_w(space,offset,data, mem_mask);
+
+		if (offset < 3)
+		{
+			if (m_cartslot->has_cart())
+				m_cartslot->write_bus_control(space,offset,data,mem_mask);
+		}
+	};
+	
 	virtual uint8_t extbus_r(offs_t offset) override
 	{
-		if (m_extbusctrl[1] & 0x08)
+		if (m_cartslot->has_cart() && m_cartslot->is_read_access_not_rom())
 		{
 			logerror("%s: read from external bus %06x (SEEPROM READ?)\n", machine().describe_context(), offset);
 			return m_cartslot->read_extra(*m_cpuspace, offset);
@@ -791,7 +825,7 @@ protected:
 	}
 	virtual void extbus_w(offs_t offset, uint8_t data) override
 	{
-		if (m_extbusctrl[0] & 0x08)
+		if (m_cartslot->has_cart() && m_cartslot->is_write_access_not_rom())
 		{
 			logerror("%s: write to external bus %06x %02x (SEEPROM WRITE?)\n", machine().describe_context(), offset, data);
 			return m_cartslot->write_extra(*m_cpuspace, offset, data);
@@ -877,6 +911,20 @@ protected:
 	virtual void write_io1(uint8_t data, uint8_t direction) override;
 
 	required_device<i2cmem_device> m_i2cmem;
+};
+
+class xavix_popira2_cart_state : public xavix_cart_state
+{
+public:
+	xavix_popira2_cart_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_cart_state(mconfig,type,tag)
+	{ }
+
+	DECLARE_CUSTOM_INPUT_MEMBER(i2c_r);
+
+protected:
+	virtual void write_io1(uint8_t data, uint8_t direction) override;
+
 };
 
 

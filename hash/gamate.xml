@@ -11,7 +11,6 @@ C1034 - Superboy (Unreleased?)
 C1039 - Column #5 (Unreleased?)
 C1040 - ??
 C1041 - Mighty Boxer
-C1050 - Fortress of Fierceness
 C1051 - Incantational Couple
 C1055 - ??
 C1059 - ??
@@ -111,7 +110,7 @@ C1066 - ??
 		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1008" />
 		<part name="cart" interface="gamate_cart">
-	  <feature name="slot" value="banked" />
+			<feature name="slot" value="banked" />
 			<dataarea name="rom" size="65536">
 				<rom name="c1-008.bin" size="65536" crc="a67ba296" sha1="d01988984e2950fde8096a0156808995a0e5c515" offset="0" />
 			</dataarea>
@@ -196,8 +195,8 @@ C1066 - ??
 		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1016" />
 		<part name="cart" interface="gamate_cart">
-	  <feature name="slot" value="banked" />
-	  <dataarea name="rom" size="131072">
+			<feature name="slot" value="banked" />
+			<dataarea name="rom" size="131072">
 				<rom name="c1-016.bin" size="131072" crc="1c2921df" sha1="958f4936f3aa8db5e76d315ee6acc6aee0e010b4" offset="0" />
 			</dataarea>
 		</part>
@@ -378,8 +377,8 @@ C1066 - ??
 		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1033" />
 		<part name="cart" interface="gamate_cart">
-	  <feature name="slot" value="banked" />
-	  <dataarea name="rom" size="65536">
+			<feature name="slot" value="banked" />
+			<dataarea name="rom" size="65536">
 				<rom name="c1-033.bin" size="65536" crc="9002269d" sha1="899d1592f0da06f9684cb271ec34541c702f21ab" offset="0" />
 			</dataarea>
 		</part>
@@ -427,8 +426,8 @@ C1066 - ??
 		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1038" />
 		<part name="cart" interface="gamate_cart">
-	  <feature name="slot" value="banked" />
-	  <dataarea name="rom" size="65536">
+			<feature name="slot" value="banked" />
+			<dataarea name="rom" size="65536">
 				<rom name="c1-038.bin" size="65536" crc="19bba397" sha1="01163f89447c68554cd2fe60b22dea7b578f1605" offset="0" />
 			</dataarea>
 		</part>
@@ -440,8 +439,8 @@ C1066 - ??
 		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1042" />
 		<part name="cart" interface="gamate_cart">
-	  <feature name="slot" value="banked" />
-	  <dataarea name="rom" size="65536">
+			<feature name="slot" value="banked" />
+			<dataarea name="rom" size="65536">
 				<rom name="c1-042.bin" size="65536" crc="8363c32d" sha1="b07681e28b65af53fed23def3f6305ab929bb8f1" offset="0" />
 			</dataarea>
 		</part>
@@ -477,8 +476,8 @@ C1066 - ??
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="C1045" />
 		<part name="cart" interface="gamate_cart">
-	  <feature name="slot" value="banked" />
-	  <dataarea name="rom" size="65536">
+			<feature name="slot" value="banked" />
+			<dataarea name="rom" size="65536">
 				<rom name="c1-045.bin" size="65536" crc="c165094f" sha1="148bd0e461d8f967b483136460a770820d2e7226" offset="0" />
 			</dataarea>
 		</part>
@@ -490,8 +489,8 @@ C1066 - ??
 		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1046" />
 		<part name="cart" interface="gamate_cart">
-	  <feature name="slot" value="banked" />
-	  <dataarea name="rom" size="65536">
+			<feature name="slot" value="banked" />
+			<dataarea name="rom" size="65536">
 				<rom name="c1-046.bin" size="65536" crc="e492ef8e" sha1="fa2b9666c9c1090573c40cafa273c9ff5c1787be" offset="0" />
 			</dataarea>
 		</part>
@@ -503,8 +502,8 @@ C1066 - ??
 		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1047" />
 		<part name="cart" interface="gamate_cart">
-	  <feature name="slot" value="banked" />
-	  <dataarea name="rom" size="131072">
+			<feature name="slot" value="banked" />
+			<dataarea name="rom" size="131072">
 				<rom name="c1-047.bin" size="131072" crc="39660803" sha1="8719418a6b30c2cc9d013d35d1baacde86016da3" offset="0" />
 			</dataarea>
 		</part>
@@ -516,8 +515,8 @@ C1066 - ??
 		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1048" />
 		<part name="cart" interface="gamate_cart">
-	  <feature name="slot" value="banked" />
-	  <dataarea name="rom" size="65536">
+			<feature name="slot" value="banked" />
+			<dataarea name="rom" size="65536">
 				<rom name="c1-048.bin" size="65536" crc="daf715c5" sha1="f10e180c4aac41e9c710ce38ca9a93ca6f331f57" offset="0" />
 			</dataarea>
 		</part>
@@ -529,21 +528,33 @@ C1066 - ??
 		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1049" />
 		<part name="cart" interface="gamate_cart">
-	  <feature name="slot" value="banked" />
-	  <dataarea name="rom" size="65536">
+			<feature name="slot" value="banked" />
+			<dataarea name="rom" size="65536">
 				<rom name="c1-049.bin" size="65536" crc="aa2e0d32" sha1="1b3082be0698c12c8fc978db6a0c63c8958c33f8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
+	<software name="fortress">
+		<description>Fortress of Fierceness</description>
+		<year>1991</year>
+		<publisher>Bit Corporation</publisher>
+		<info name="serial" value="C1050" />
+		<part name="cart" interface="gamate_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="fortress.bin" size="32768" crc="c771e16b" sha1="aa971e546da8957de29837e5310452c129771967" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="famous7">
 		<description>Famous 7</description>
 		<year>1993</year>
 		<publisher>United Microelectronics Corporation</publisher>
 		<info name="serial" value="C1052" />
 		<part name="cart" interface="gamate_cart">
-	  <feature name="slot" value="banked" />
-	  <dataarea name="rom" size="65536">
+			<feature name="slot" value="banked" />
+			<dataarea name="rom" size="65536">
 				<rom name="c1-052.bin" size="65536" crc="0fa48c23" sha1="ea422fe969b260296b99397cdeff6ae053ac4a86" offset="0" />
 			</dataarea>
 		</part>
@@ -555,8 +566,8 @@ C1066 - ??
 		<publisher>United Microelectronics Corporation</publisher>
 		<info name="serial" value="C1053" />
 		<part name="cart" interface="gamate_cart">
-	  <feature name="slot" value="banked" />
-	  <dataarea name="rom" size="131072">
+			<feature name="slot" value="banked" />
+			<dataarea name="rom" size="131072">
 				<rom name="c1-053.bin" size="131072" crc="727299c7" sha1="5515f7dc5a00fa38677c4ac5b73af232008f3e51" offset="0" />
 			</dataarea>
 		</part>
@@ -580,8 +591,8 @@ C1066 - ??
 		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1056" />
 		<part name="cart" interface="gamate_cart">
-	  <feature name="slot" value="banked" />
-	  <dataarea name="rom" size="131072">
+			<feature name="slot" value="banked" />
+			<dataarea name="rom" size="131072">
 				<rom name="c1-056.bin" size="131072" crc="447595e4" sha1="1b471f8ac8ffb107c62ec3b765c43e268d90b73a" offset="0" />
 			</dataarea>
 		</part>
@@ -593,8 +604,8 @@ C1066 - ??
 		<publisher>United Microelectronics Corporation</publisher>
 		<info name="serial" value="C1057" />
 		<part name="cart" interface="gamate_cart">
-	  <feature name="slot" value="banked" />
-	  <dataarea name="rom" size="131072">
+			<feature name="slot" value="banked" />
+			<dataarea name="rom" size="131072">
 				<rom name="c1-057.bin" size="131072" crc="a542c61f" sha1="2eccf1fe8d400a54ffb2f026af8b9842442b6d9f" offset="0" />
 			</dataarea>
 		</part>
@@ -606,8 +617,8 @@ C1066 - ??
 		<publisher>United Microelectronics Corporation</publisher>
 		<info name="serial" value="C1058" />
 		<part name="cart" interface="gamate_cart">
-	  <feature name="slot" value="banked" />
-	  <dataarea name="rom" size="262144">
+			<feature name="slot" value="banked" />
+			<dataarea name="rom" size="262144">
 				<rom name="c1-058.bin" size="262144" crc="16a79cd8" sha1="7d638bf61286adfa612de974efff2d9b5b4b3331" offset="0" />
 			</dataarea>
 		</part>
@@ -619,8 +630,8 @@ C1066 - ??
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="C1060" />
 		<part name="cart" interface="gamate_cart">
-	  <feature name="slot" value="banked" />
-	  <dataarea name="rom" size="524288">
+			<feature name="slot" value="banked" />
+			<dataarea name="rom" size="524288">
 				<rom name="c1-060.bin" size="524288" crc="9aa13551" sha1="a1163f1da52e23bda0502f229488a5b4d04bbe8a" offset="0" />
 			</dataarea>
 		</part>
@@ -632,8 +643,8 @@ C1066 - ??
 		<publisher>Phinnex Co., Ltd.</publisher>
 		<info name="serial" value="C1061" />
 		<part name="cart" interface="gamate_cart">
-	  <feature name="slot" value="banked" />
-	  <dataarea name="rom" size="524288">
+			<feature name="slot" value="banked" />
+			<dataarea name="rom" size="524288">
 				<rom name="c1-061.bin" size="524288" crc="00356983" sha1="e93c671ee1eb40bb4d7298671dc213a07afef9e0" offset="0" />
 			</dataarea>
 		</part>
@@ -645,8 +656,8 @@ C1066 - ??
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="C1063" />
 		<part name="cart" interface="gamate_cart">
-	  <feature name="slot" value="banked" />
-	  <dataarea name="rom" size="262144">
+			<feature name="slot" value="banked" />
+			<dataarea name="rom" size="262144">
 				<rom name="c1-063.bin" size="262144" crc="93d5f365" sha1="91b9b9060b76d2012d5cbc6523839f67caa37aaf" offset="0" />
 			</dataarea>
 		</part>
@@ -658,8 +669,8 @@ C1066 - ??
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="C1064" />
 		<part name="cart" interface="gamate_cart">
-	  <feature name="slot" value="banked" />
-	  <dataarea name="rom" size="524288">
+			<feature name="slot" value="banked" />
+			<dataarea name="rom" size="524288">
 				<rom name="c1-064.bin" size="524288" crc="8574f0eb" sha1="ba42622b9ff4b2fa0cb70f322ee24b1d8c387222" offset="0" />
 			</dataarea>
 		</part>
@@ -671,8 +682,8 @@ C1066 - ??
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="C1065" />
 		<part name="cart" interface="gamate_cart">
-	  <feature name="slot" value="banked" />
-	  <dataarea name="rom" size="524288">
+			<feature name="slot" value="banked" />
+			<dataarea name="rom" size="524288">
 				<rom name="c1-065.bin" size="524288" crc="1ed9d0a3" sha1="568f87864c0ed6117fe34e3f79e56c01e911e482" offset="0" />
 			</dataarea>
 		</part>
@@ -684,8 +695,8 @@ C1066 - ??
 		<publisher>Phinnex Co., Ltd.</publisher>
 		<info name="serial" value="C1067" />
 		<part name="cart" interface="gamate_cart">
-	  <feature name="slot" value="banked" />
-	  <dataarea name="rom" size="524288">
+			<feature name="slot" value="banked" />
+			<dataarea name="rom" size="524288">
 				<rom name="c1-067.bin" size="524288" crc="76e26b63" sha1="bfb2f4b5b771277333ffc1e27cf3a5608e9ea163" offset="0" />
 			</dataarea>
 		</part>
@@ -697,8 +708,8 @@ C1066 - ??
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="C1068" />
 		<part name="cart" interface="gamate_cart">
-	  <feature name="slot" value="banked" />
-	  <dataarea name="rom" size="524288">
+			<feature name="slot" value="banked" />
+			<dataarea name="rom" size="524288">
 				<rom name="c1-068.bin" size="524288" crc="96386b08" sha1="69909b78598184760b3e261da897a9bc90af9dfb" offset="0" />
 			</dataarea>
 		</part>
@@ -710,8 +721,8 @@ C1066 - ??
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="C1069" />
 		<part name="cart" interface="gamate_cart">
-	  <feature name="slot" value="banked" />
-	  <dataarea name="rom" size="524288">
+			<feature name="slot" value="banked" />
+			<dataarea name="rom" size="524288">
 				<rom name="c1-069.bin" size="524288" crc="3bceb859" sha1="32187903c10dc80d62e9bf794b912921542d6d38" offset="0" />
 			</dataarea>
 		</part>
@@ -723,8 +734,8 @@ C1066 - ??
 		<publisher>United Microelectronics Corporation</publisher>
 		<info name="serial" value="C1070" />
 		<part name="cart" interface="gamate_cart">
-	  <feature name="slot" value="banked" />
-	  <dataarea name="rom" size="524288">
+			<feature name="slot" value="banked" />
+			<dataarea name="rom" size="524288">
 				<rom name="c1-070.bin" size="524288" crc="7ba8af6d" sha1="6aa0364010272c82c7cc8c7afd60254de148fa72" offset="0" />
 			</dataarea>
 		</part>
@@ -736,8 +747,8 @@ C1066 - ??
 		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1401" />
 		<part name="cart" interface="gamate_cart">
-	  <feature name="slot" value="4in1" />
-	  <dataarea name="rom" size="131072">
+			<feature name="slot" value="4in1" />
+			<dataarea name="rom" size="131072">
 				<rom name="c1-401.bin" size="131072" crc="10e81571" sha1="4dd20632eb31023e18241290eca7d5a5acb1fa84" offset="0" />
 			</dataarea>
 		</part>
@@ -749,8 +760,8 @@ C1066 - ??
 		<publisher>United Microelectronics Corporation</publisher>
 		<info name="serial" value="K1001" />
 		<part name="cart" interface="gamate_cart">
-	  <feature name="slot" value="banked" />
-	  <dataarea name="rom" size="524288">
+			<feature name="slot" value="banked" />
+			<dataarea name="rom" size="524288">
 				<rom name="k1-001.bin" size="524288" crc="ebb46efe" sha1="beae4f3365031f4e8ae192a5e6d27a28979ef84b" offset="0" />
 			</dataarea>
 		</part>

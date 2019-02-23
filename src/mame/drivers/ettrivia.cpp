@@ -138,20 +138,20 @@ WRITE8_MEMBER(ettrivia_state::b800_w)
 		/* special case to return the value written to 0xb000 */
 		/* does it reset the chips too ? */
 		case 0: break;
-		case 0xc4: m_b000_ret = m_ay[0]->data_r(space, 0);    break;
-		case 0x94: m_b000_ret = m_ay[1]->data_r(space, 0);    break;
-		case 0x86: m_b000_ret = m_ay[2]->data_r(space, 0);    break;
+		case 0xc4: m_b000_ret = m_ay[0]->data_r();    break;
+		case 0x94: m_b000_ret = m_ay[1]->data_r();    break;
+		case 0x86: m_b000_ret = m_ay[2]->data_r();    break;
 
 		case 0x80:
 			switch(m_b800_prev)
 			{
-				case 0xe0: m_ay[0]->address_w(space,0,m_b000_val);    break;
-				case 0x98: m_ay[1]->address_w(space,0,m_b000_val);    break;
-				case 0x83: m_ay[2]->address_w(space,0,m_b000_val);    break;
+				case 0xe0: m_ay[0]->address_w(m_b000_val);    break;
+				case 0x98: m_ay[1]->address_w(m_b000_val);    break;
+				case 0x83: m_ay[2]->address_w(m_b000_val);    break;
 
-				case 0xa0: m_ay[0]->data_w(space,0,m_b000_val);   break;
-				case 0x88: m_ay[1]->data_w(space,0,m_b000_val);   break;
-				case 0x81: m_ay[2]->data_w(space,0,m_b000_val);   break;
+				case 0xa0: m_ay[0]->data_w(m_b000_val);   break;
+				case 0x88: m_ay[1]->data_w(m_b000_val);   break;
+				case 0x81: m_ay[2]->data_w(m_b000_val);   break;
 
 			}
 		break;
@@ -258,17 +258,17 @@ void ettrivia_state::ettrivia_palette(palette_device &palette) const
 		// red component
 		bit0 = BIT(color_prom[i], 0);
 		bit1 = BIT(color_prom[i+0x100], 0);
-		int const r = combine_2_weights(weights, bit0, bit1);
+		int const r = combine_weights(weights, bit0, bit1);
 
 		// green component
 		bit0 = BIT(color_prom[i], 2);
 		bit1 = BIT(color_prom[i+0x100], 2);
-		int const g = combine_2_weights(weights, bit0, bit1);
+		int const g = combine_weights(weights, bit0, bit1);
 
 		// blue component
 		bit0 = BIT(color_prom[i], 1);
 		bit1 = BIT(color_prom[i+0x100], 1);
-		int const b = combine_2_weights(weights, bit0, bit1);
+		int const b = combine_weights(weights, bit0, bit1);
 
 		palette.set_pen_color(bitswap<8>(i,5,7,6,2,1,0,4,3), rgb_t(r, g, b));
 	}

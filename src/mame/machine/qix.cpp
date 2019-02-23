@@ -228,7 +228,7 @@ WRITE8_MEMBER(qixmcu_state::mcu_portb_w)
 
 TIMER_CALLBACK_MEMBER(qix_state::pia_w_callback)
 {
-	m_pia0->write(generic_space(), param >> 8, param & 0xff);
+	m_pia0->write(param >> 8, param & 0xff);
 }
 
 

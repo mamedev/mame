@@ -1173,11 +1173,11 @@ MACHINE_CONFIG_START(pc1512_state::pc1512)
 	m_kb->clock_wr_callback().set(FUNC(pc1512_state::kbclk_w));
 	m_kb->data_wr_callback().set(FUNC(pc1512_state::kbdata_w));
 
-	MCFG_PC1512_MOUSE_PORT_ADD(PC1512_MOUSE_PORT_TAG, pc1512_mouse_port_devices, "mouse")
-	MCFG_PC1512_MOUSE_PORT_X_CB(WRITE8(*this, pc1512_state, mouse_x_w))
-	MCFG_PC1512_MOUSE_PORT_Y_CB(WRITE8(*this, pc1512_state, mouse_y_w))
-	MCFG_PC1512_MOUSE_PORT_M1_CB(WRITELINE(PC1512_KEYBOARD_TAG, pc1512_keyboard_device, m1_w))
-	MCFG_PC1512_MOUSE_PORT_M2_CB(WRITELINE(PC1512_KEYBOARD_TAG, pc1512_keyboard_device, m2_w))
+	pc1512_mouse_port_device &mouse(PC1512_MOUSE_PORT(config, PC1512_MOUSE_PORT_TAG, pc1512_mouse_port_devices, "mouse"));
+	mouse.x_wr_callback().set(FUNC(pc1512_base_state::mouse_x_w));
+	mouse.y_wr_callback().set(FUNC(pc1512_base_state::mouse_y_w));
+	mouse.m1_wr_callback().set(m_kb, FUNC(pc1512_keyboard_device::m1_w));
+	mouse.m2_wr_callback().set(m_kb, FUNC(pc1512_keyboard_device::m2_w));
 
 	AM9517A(config, m_dmac, 24_MHz_XTAL / 6);
 	m_dmac->out_hreq_callback().set(FUNC(pc1512_state::hrq_w));
@@ -1307,11 +1307,11 @@ MACHINE_CONFIG_START(pc1640_state::pc1640)
 	m_kb->clock_wr_callback().set(FUNC(pc1512_base_state::kbclk_w));
 	m_kb->data_wr_callback().set(FUNC(pc1512_base_state::kbdata_w));
 
-	MCFG_PC1512_MOUSE_PORT_ADD(PC1512_MOUSE_PORT_TAG, pc1512_mouse_port_devices, "mouse")
-	MCFG_PC1512_MOUSE_PORT_X_CB(WRITE8(*this, pc1512_base_state, mouse_x_w))
-	MCFG_PC1512_MOUSE_PORT_Y_CB(WRITE8(*this, pc1512_base_state, mouse_y_w))
-	MCFG_PC1512_MOUSE_PORT_M1_CB(WRITELINE(PC1512_KEYBOARD_TAG, pc1512_keyboard_device, m1_w))
-	MCFG_PC1512_MOUSE_PORT_M2_CB(WRITELINE(PC1512_KEYBOARD_TAG, pc1512_keyboard_device, m2_w))
+	pc1512_mouse_port_device &mouse(PC1512_MOUSE_PORT(config, PC1512_MOUSE_PORT_TAG, pc1512_mouse_port_devices, "mouse"));
+	mouse.x_wr_callback().set(FUNC(pc1512_base_state::mouse_x_w));
+	mouse.y_wr_callback().set(FUNC(pc1512_base_state::mouse_y_w));
+	mouse.m1_wr_callback().set(m_kb, FUNC(pc1512_keyboard_device::m1_w));
+	mouse.m2_wr_callback().set(m_kb, FUNC(pc1512_keyboard_device::m2_w));
 
 	AM9517A(config, m_dmac, 24_MHz_XTAL / 6);
 	m_dmac->out_hreq_callback().set(FUNC(pc1640_state::hrq_w));

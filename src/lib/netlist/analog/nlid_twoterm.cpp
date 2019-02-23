@@ -7,8 +7,8 @@
 
 #include "../solver/nld_solver.h"
 
-#include "nlid_twoterm.h"
 #include "../nl_factory.h"
+#include "nlid_twoterm.h"
 
 #include <cmath>
 
@@ -20,7 +20,7 @@ namespace netlist
 // generic_diode
 // ----------------------------------------------------------------------------------------
 
-generic_diode::generic_diode(device_t &dev, pstring name)
+generic_diode::generic_diode(device_t &dev, const pstring &name)
 	: m_Vd(dev, name + ".m_Vd", 0.7)
 	, m_Id(dev, name + ".m_Id", 0.0)
 	, m_G(dev,  name + ".m_G", 1e-15)
@@ -70,7 +70,7 @@ void generic_diode::update_diode(const nl_double nVd)
 	}
 	else
 	{
-		const double a = std::max((nVd - m_Vd) * m_VtInv, NL_FCONST(-0.99));
+		const double a = std::max((nVd - m_Vd) * m_VtInv, plib::constants<nl_double>::cast(-0.99));
 		m_Vd = m_Vd + std::log1p(a) * m_Vt;
 		//const double IseVDVt = m_Is * std::exp(m_Vd * m_VtInv);
 		const double IseVDVt = std::exp(m_logIs + m_Vd * m_VtInv);
@@ -90,6 +90,15 @@ void NETLIB_NAME(twoterm)::solve_now()
 		m_P.solve_now();
 	else if (m_N.has_net() && !m_N.net().isRailNet())
 		m_N.solve_now();
+}
+
+void NETLIB_NAME(twoterm)::solve_later(netlist_time delay)
+{
+	/* we only need to call the non-rail terminal */
+	if (m_P.has_net() && !m_P.net().isRailNet())
+		m_P.schedule_solve_after(delay);
+	else if (m_N.has_net() && !m_N.net().isRailNet())
+		m_N.schedule_solve_after(delay);
 }
 
 
@@ -136,7 +145,7 @@ NETLIB_RESET(POT)
 		v = (std::exp(v) - 1.0) / (std::exp(1.0) - 1.0);
 
 	m_R1.set_R(std::max(m_R() * v, exec().gmin()));
-	m_R2.set_R(std::max(m_R() * (NL_FCONST(1.0) - v), exec().gmin()));
+	m_R2.set_R(std::max(m_R() * (plib::constants<nl_double>::one() - v), exec().gmin()));
 }
 
 NETLIB_UPDATE_PARAM(POT)
@@ -149,7 +158,7 @@ NETLIB_UPDATE_PARAM(POT)
 		v = (std::exp(v) - 1.0) / (std::exp(1.0) - 1.0);
 
 	m_R1.set_R(std::max(m_R() * v, exec().gmin()));
-	m_R2.set_R(std::max(m_R() * (NL_FCONST(1.0) - v), exec().gmin()));
+	m_R2.set_R(std::max(m_R() * (plib::constants<nl_double>::one() - v), exec().gmin()));
 
 }
 
@@ -279,6 +288,6 @@ NETLIB_UPDATE_TERMINALS(D)
 		NETLIB_DEVICE_IMPL_NS(analog, D,    "DIODE", "MODEL")
 		NETLIB_DEVICE_IMPL_NS(analog, VS,   "VS",    "V")
 		NETLIB_DEVICE_IMPL_NS(analog, CS,   "CS",    "I")
-	}
+	} // namespace devices
 
 } // namespace netlist

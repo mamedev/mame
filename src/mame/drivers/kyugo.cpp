@@ -548,7 +548,7 @@ MACHINE_CONFIG_START(kyugo_state::kyugo_base)
 	MCFG_SCREEN_UPDATE_DRIVER(kyugo_state, screen_update)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_kyugo)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_kyugo);
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 
 	/* sound hardware */

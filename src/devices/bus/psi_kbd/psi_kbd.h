@@ -30,21 +30,8 @@
 
 #pragma once
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_PSI_KEYBOARD_INTERFACE_ADD(_tag, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, PSI_KEYBOARD_INTERFACE, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(psi_keyboard_devices, _def_slot, false)
-
-#define MCFG_PSI_KEYBOARD_RX_HANDLER(_devcb) \
-	downcast<psi_keyboard_bus_device &>(*device).set_rx_handler(DEVCB_##_devcb);
-
-#define MCFG_PSI_KEYBOARD_KEY_STROBE_HANDLER(_devcb) \
-	downcast<psi_keyboard_bus_device &>(*device).set_key_strobe_handler(DEVCB_##_devcb);
-
+// supported devices
+void psi_keyboard_devices(device_slot_interface &device);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -58,12 +45,20 @@ class psi_keyboard_bus_device : public device_t, public device_slot_interface
 {
 public:
 	// construction/destruction
+	psi_keyboard_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *dflt)
+		: psi_keyboard_bus_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		option_reset();
+		psi_keyboard_devices(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
 	psi_keyboard_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~psi_keyboard_bus_device();
 
 	// callbacks
-	template <class Object> devcb_base &set_rx_handler(Object &&cb) { return m_rx_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_key_strobe_handler(Object &&cb) { return m_key_strobe_handler.set_callback(std::forward<Object>(cb)); }
+	auto rx() { return m_rx_handler.bind(); }
+	auto key_strobe() { return m_key_strobe_handler.bind(); }
 
 	// called from keyboard
 	DECLARE_WRITE_LINE_MEMBER( rx_w ) { m_rx_handler(state); }
@@ -104,12 +99,7 @@ protected:
 	psi_keyboard_bus_device *m_host;
 };
 
-
 // device type definition
 DECLARE_DEVICE_TYPE(PSI_KEYBOARD_INTERFACE, psi_keyboard_bus_device)
-
-// supported devices
-void psi_keyboard_devices(device_slot_interface &device);
-
 
 #endif // MAME_BUS_PSI_KBD_PSI_KBD_H

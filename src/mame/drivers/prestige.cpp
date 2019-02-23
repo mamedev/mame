@@ -764,7 +764,7 @@ MACHINE_CONFIG_START(prestige_state::prestige_base)
 	PALETTE(config, "palette", FUNC(prestige_state::prestige_palette), 2);
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "genius_cart")
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "genius_cart");
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("32K").set_extra_options("64K");

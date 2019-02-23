@@ -620,7 +620,7 @@ MACHINE_CONFIG_START(ddayjlc_state::ddayjlc)
 	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ddayjlc_state, vblank_irq))
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_ddayjlc)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ddayjlc);
 	PALETTE(config, m_palette, FUNC(ddayjlc_state::ddayjlc_palette), 0x200+4);
 
 	SPEAKER(config, "mono").front_center();

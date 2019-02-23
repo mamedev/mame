@@ -444,7 +444,7 @@ MACHINE_CONFIG_START(d6800_state::d6800)
 	TIMER(config, "d6800_p").configure_periodic(FUNC(d6800_state::d6800_p), attotime::from_hz(40000));
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", d6800_state, d6800, "bin,c8,ch8", 1)
+	MCFG_QUICKLOAD_ADD("quickload", d6800_state, d6800, "bin,c8,ch8", attotime::from_seconds(1))
 MACHINE_CONFIG_END
 
 /* ROMs */

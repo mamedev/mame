@@ -133,7 +133,7 @@ private:
 
 	INTERRUPT_GEN_MEMBER(interrupt);
 	void update_irq_state();
-	void sandscrp(address_map &map);
+	void sandscrp_mem(address_map &map);
 	void sandscrp_soundmem(address_map &map);
 	void sandscrp_soundport(address_map &map);
 };
@@ -278,7 +278,7 @@ WRITE8_MEMBER(sandscrp_state::soundlatch_w)
 	m_soundlatch[Latch]->write(space,0,data);
 }
 
-void sandscrp_state::sandscrp(address_map &map)
+void sandscrp_state::sandscrp_mem(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();     // ROM
 	map(0x100000, 0x100001).w(FUNC(sandscrp_state::irq_cause_w)); // IRQ Ack
@@ -467,28 +467,28 @@ GFXDECODE_END
 ***************************************************************************/
 
 
-MACHINE_CONFIG_START(sandscrp_state::sandscrp)
-
+void sandscrp_state::sandscrp(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000,12000000)    /* TMP68HC000N-12 */
-	MCFG_DEVICE_PROGRAM_MAP(sandscrp)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sandscrp_state,  interrupt)
+	M68000(config, m_maincpu, 12000000);    /* TMP68HC000N-12 */
+	m_maincpu->set_addrmap(AS_PROGRAM, &sandscrp_state::sandscrp_mem);
+	m_maincpu->set_vblank_int("screen", FUNC(sandscrp_state::interrupt));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80,4000000)   /* Z8400AB1, Reads the DSWs: it can't be disabled */
-	MCFG_DEVICE_PROGRAM_MAP(sandscrp_soundmem)
-	MCFG_DEVICE_IO_MAP(sandscrp_soundport)
+	Z80(config, m_audiocpu, 4000000);   /* Z8400AB1, Reads the DSWs: it can't be disabled */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &sandscrp_state::sandscrp_soundmem);
+	m_audiocpu->set_addrmap(AS_IO, &sandscrp_state::sandscrp_soundport);
 
 	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(3));  /* a guess, and certainly wrong */
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME( ATTOSECONDS_IN_USEC(2500) /* not accurate */ )
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(sandscrp_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sandscrp_state, screen_vblank))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time( ATTOSECONDS_IN_USEC(2500) /* not accurate */ );
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 256-1, 0+16, 256-16-1);
+	screen.set_screen_update(FUNC(sandscrp_state::screen_update));
+	screen.screen_vblank().set(FUNC(sandscrp_state::screen_vblank));
+	screen.set_palette("palette");
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_sandscrp);
 	PALETTE(config, "palette").set_format(palette_device::xGRB_555, 2048);
@@ -519,7 +519,7 @@ MACHINE_CONFIG_START(sandscrp_state::sandscrp)
 	ymsnd.port_a_read_callback().set_ioport("DSW1");
 	ymsnd.port_b_read_callback().set_ioport("DSW2");
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.5);
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

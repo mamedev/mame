@@ -270,7 +270,7 @@ MACHINE_CONFIG_START(rgum_state::rgum)
 	ppi.in_pb_callback().set_ioport("IN1");
 	ppi.in_pc_callback().set_ioport("IN2");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rgum)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rgum);
 	MCFG_PALETTE_ADD("palette", 0x100)
 
 	SPEAKER(config, "mono").front_center();

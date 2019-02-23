@@ -204,8 +204,8 @@ void msx_cart_msx_audio_nms1205_device::device_start()
 	address_space &space = machine().device<cpu_device>("maincpu")->space(AS_IO);
 	space.install_write_handler(0xc0, 0xc1, write8sm_delegate(FUNC(y8950_device::write), m_y8950.target()));
 	space.install_read_handler(0xc0, 0xc1, read8sm_delegate(FUNC(y8950_device::read), m_y8950.target()));
-	space.install_write_handler(0x00, 0x01, write8_delegate(FUNC(acia6850_device::write), m_acia6850.target()));
-	space.install_read_handler(0x04, 0x05, read8_delegate(FUNC(acia6850_device::read), m_acia6850.target()));
+	space.install_write_handler(0x00, 0x01, write8sm_delegate(FUNC(acia6850_device::write), m_acia6850.target()));
+	space.install_read_handler(0x04, 0x05, read8sm_delegate(FUNC(acia6850_device::read), m_acia6850.target()));
 }
 
 

@@ -410,7 +410,7 @@ MACHINE_CONFIG_START(atarig1_state::atarig1)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_atarig1)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_atarig1);
 	PALETTE(config, "palette").set_format(palette_device::IRGB_1555, 1280);
 
 	/* initialize the playfield */

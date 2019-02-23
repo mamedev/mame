@@ -1329,7 +1329,7 @@ DEFINE_DEVICE_TYPE(DUMMY_SPACE, dummy_space_device, "dummy_space", "Dummy Space"
 dummy_space_device::dummy_space_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, DUMMY_SPACE, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
-	m_space_config("dummy", ENDIANNESS_LITTLE, 8, 32, 0, address_map_constructor(), address_map_constructor(FUNC(dummy_space_device::dummy), this))
+	m_space_config("dummy", ENDIANNESS_LITTLE, 8, 32, 0, address_map_constructor(FUNC(dummy_space_device::dummy), this))
 {
 }
 

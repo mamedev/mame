@@ -96,29 +96,6 @@ namespace
 		// construction/destruction
 		coco_multipak_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-		// optional information overrides
-		virtual void device_add_mconfig(machine_config &config) override;
-
-		virtual uint8_t* get_cart_base() override;
-		virtual uint32_t get_cart_size() override;
-
-		// these are only public so they can be in a MACHINE_CONFIG_START
-		// declaration; don't think about them as publically accessable
-		DECLARE_WRITE_LINE_MEMBER(multi_slot1_cart_w);
-		DECLARE_WRITE_LINE_MEMBER(multi_slot1_nmi_w);
-		DECLARE_WRITE_LINE_MEMBER(multi_slot1_halt_w);
-		DECLARE_WRITE_LINE_MEMBER(multi_slot2_cart_w);
-		DECLARE_WRITE_LINE_MEMBER(multi_slot2_nmi_w);
-		DECLARE_WRITE_LINE_MEMBER(multi_slot2_halt_w);
-		DECLARE_WRITE_LINE_MEMBER(multi_slot3_cart_w);
-		DECLARE_WRITE_LINE_MEMBER(multi_slot3_nmi_w);
-		DECLARE_WRITE_LINE_MEMBER(multi_slot3_halt_w);
-		DECLARE_WRITE_LINE_MEMBER(multi_slot4_cart_w);
-		DECLARE_WRITE_LINE_MEMBER(multi_slot4_nmi_w);
-		DECLARE_WRITE_LINE_MEMBER(multi_slot4_halt_w);
-
-		virtual address_space &cartridge_space() override;
-		virtual ioport_constructor device_input_ports() const override;
 		INPUT_CHANGED_MEMBER( switch_changed );
 
 	protected:
@@ -128,6 +105,15 @@ namespace
 		virtual READ8_MEMBER(scs_read) override;
 		virtual WRITE8_MEMBER(scs_write) override;
 		virtual void set_sound_enable(bool sound_enable) override;
+
+		// optional information overrides
+		virtual void device_add_mconfig(machine_config &config) override;
+
+		virtual uint8_t* get_cart_base() override;
+		virtual uint32_t get_cart_size() override;
+
+		virtual address_space &cartridge_space() override;
+		virtual ioport_constructor device_input_ports() const override;
 
 	private:
 		// device references
@@ -149,6 +135,19 @@ namespace
 		DECLARE_READ8_MEMBER(ff7f_read);
 		DECLARE_WRITE8_MEMBER(ff7f_write);
 		void update_line(int slot_number, line ln);
+
+		DECLARE_WRITE_LINE_MEMBER(multi_slot1_cart_w);
+		DECLARE_WRITE_LINE_MEMBER(multi_slot1_nmi_w);
+		DECLARE_WRITE_LINE_MEMBER(multi_slot1_halt_w);
+		DECLARE_WRITE_LINE_MEMBER(multi_slot2_cart_w);
+		DECLARE_WRITE_LINE_MEMBER(multi_slot2_nmi_w);
+		DECLARE_WRITE_LINE_MEMBER(multi_slot2_halt_w);
+		DECLARE_WRITE_LINE_MEMBER(multi_slot3_cart_w);
+		DECLARE_WRITE_LINE_MEMBER(multi_slot3_nmi_w);
+		DECLARE_WRITE_LINE_MEMBER(multi_slot3_halt_w);
+		DECLARE_WRITE_LINE_MEMBER(multi_slot4_cart_w);
+		DECLARE_WRITE_LINE_MEMBER(multi_slot4_nmi_w);
+		DECLARE_WRITE_LINE_MEMBER(multi_slot4_halt_w);
 	};
 };
 
@@ -182,24 +181,25 @@ static void coco_cart_slot4(device_slot_interface &device)
 }
 
 
-MACHINE_CONFIG_START(coco_multipak_device::device_add_mconfig)
-	MCFG_COCO_CARTRIDGE_ADD(SLOT1_TAG, coco_cart_slot1_3, nullptr)
-	MCFG_COCO_CARTRIDGE_CART_CB(WRITELINE(DEVICE_SELF, coco_multipak_device, multi_slot1_cart_w))
-	MCFG_COCO_CARTRIDGE_NMI_CB(WRITELINE(DEVICE_SELF, coco_multipak_device, multi_slot1_nmi_w))
-	MCFG_COCO_CARTRIDGE_HALT_CB(WRITELINE(DEVICE_SELF, coco_multipak_device, multi_slot1_halt_w))
-	MCFG_COCO_CARTRIDGE_ADD(SLOT2_TAG, coco_cart_slot1_3, nullptr)
-	MCFG_COCO_CARTRIDGE_CART_CB(WRITELINE(DEVICE_SELF, coco_multipak_device, multi_slot2_cart_w))
-	MCFG_COCO_CARTRIDGE_NMI_CB(WRITELINE(DEVICE_SELF, coco_multipak_device, multi_slot2_nmi_w))
-	MCFG_COCO_CARTRIDGE_HALT_CB(WRITELINE(DEVICE_SELF, coco_multipak_device, multi_slot2_halt_w))
-	MCFG_COCO_CARTRIDGE_ADD(SLOT3_TAG, coco_cart_slot1_3, nullptr)
-	MCFG_COCO_CARTRIDGE_CART_CB(WRITELINE(DEVICE_SELF, coco_multipak_device, multi_slot3_cart_w))
-	MCFG_COCO_CARTRIDGE_NMI_CB(WRITELINE(DEVICE_SELF, coco_multipak_device, multi_slot3_nmi_w))
-	MCFG_COCO_CARTRIDGE_HALT_CB(WRITELINE(DEVICE_SELF, coco_multipak_device, multi_slot3_halt_w))
-	MCFG_COCO_CARTRIDGE_ADD(SLOT4_TAG, coco_cart_slot4, "fdcv11")
-	MCFG_COCO_CARTRIDGE_CART_CB(WRITELINE(DEVICE_SELF, coco_multipak_device, multi_slot4_cart_w))
-	MCFG_COCO_CARTRIDGE_NMI_CB(WRITELINE(DEVICE_SELF, coco_multipak_device, multi_slot4_nmi_w))
-	MCFG_COCO_CARTRIDGE_HALT_CB(WRITELINE(DEVICE_SELF, coco_multipak_device, multi_slot4_halt_w))
-MACHINE_CONFIG_END
+void coco_multipak_device::device_add_mconfig(machine_config &config)
+{
+	COCOCART_SLOT(config, m_slots[0], DERIVED_CLOCK(1, 1), coco_cart_slot1_3, nullptr);
+	m_slots[0]->cart_callback().set(FUNC(coco_multipak_device::multi_slot1_cart_w));
+	m_slots[0]->nmi_callback().set(FUNC(coco_multipak_device::multi_slot1_nmi_w));
+	m_slots[0]->halt_callback().set(FUNC(coco_multipak_device::multi_slot1_halt_w));
+	COCOCART_SLOT(config, m_slots[1], DERIVED_CLOCK(1, 1), coco_cart_slot1_3, nullptr);
+	m_slots[1]->cart_callback().set(FUNC(coco_multipak_device::multi_slot2_cart_w));
+	m_slots[1]->nmi_callback().set(FUNC(coco_multipak_device::multi_slot2_nmi_w));
+	m_slots[1]->halt_callback().set(FUNC(coco_multipak_device::multi_slot2_halt_w));
+	COCOCART_SLOT(config, m_slots[2], DERIVED_CLOCK(1, 1), coco_cart_slot1_3, nullptr);
+	m_slots[2]->cart_callback().set(FUNC(coco_multipak_device::multi_slot3_cart_w));
+	m_slots[2]->nmi_callback().set(FUNC(coco_multipak_device::multi_slot3_nmi_w));
+	m_slots[2]->halt_callback().set(FUNC(coco_multipak_device::multi_slot3_halt_w));
+	COCOCART_SLOT(config, m_slots[3], DERIVED_CLOCK(1, 1), coco_cart_slot4, "fdcv11");
+	m_slots[3]->cart_callback().set(FUNC(coco_multipak_device::multi_slot4_cart_w));
+	m_slots[3]->nmi_callback().set(FUNC(coco_multipak_device::multi_slot4_nmi_w));
+	m_slots[3]->halt_callback().set(FUNC(coco_multipak_device::multi_slot4_halt_w));
+}
 
 INPUT_PORTS_START( coco_multipack )
 	PORT_START( SWITCH_CONFIG_TAG )

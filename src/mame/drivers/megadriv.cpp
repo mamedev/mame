@@ -377,31 +377,31 @@ WRITE_LINE_MEMBER(md_cons_state::screen_vblank_console)
 	}
 }
 
-MACHINE_CONFIG_START(md_cons_state::ms_megadriv)
+void md_cons_state::ms_megadriv(machine_config &config)
+{
 	md_ntsc(config);
 
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megadriv)
 	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
 
-	MCFG_SCREEN_MODIFY("megadriv")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, md_cons_state, screen_vblank_console))
+	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
 
-	MCFG_MD_CARTRIDGE_ADD("mdslot", md_cart, nullptr)
+	MD_CART_SLOT(config, m_cart, md_cart, nullptr);
 	SOFTWARE_LIST(config, "cart_list").set_original("megadriv");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(md_cons_state::ms_megadpal)
+void md_cons_state::ms_megadpal(machine_config &config)
+{
 	md_pal(config);
 
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megadriv)
 	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
 
-	MCFG_SCREEN_MODIFY("megadriv")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, md_cons_state, screen_vblank_console))
+	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
 
-	MCFG_MD_CARTRIDGE_ADD("mdslot", md_cart, nullptr)
+	MD_CART_SLOT(config, m_cart, md_cart, nullptr);
 	SOFTWARE_LIST(config, "cart_list").set_original("megadriv");
-MACHINE_CONFIG_END
+}
 
 void md_cons_state::genesis_tmss(machine_config &config)
 {
@@ -409,19 +409,19 @@ void md_cons_state::genesis_tmss(machine_config &config)
 	subdevice<software_list_device>("cart_list")->set_filter("TMSS");
 }
 
-MACHINE_CONFIG_START(md_cons_state::dcat16_megadriv)
+void md_cons_state::dcat16_megadriv(machine_config &config)
+{
 	dcat16_megadriv_base(config);
 
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, md_common)
 	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, megadriv)
 
-	MCFG_SCREEN_MODIFY("megadriv")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, md_cons_state, screen_vblank_console))
+	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
 
 //  has SD card slot instead?
-//  MCFG_MD_CARTRIDGE_ADD("mdslot", md_cart, nullptr)
+//  MD_CART_SLOT(config, m_cart, md_cart, nullptr);
 //  SOFTWARE_LIST(config, "cart_list").set_original("megadriv");
-MACHINE_CONFIG_END
+}
 
 /*************************************
  *
@@ -615,16 +615,15 @@ MACHINE_CONFIG_START(md_cons_state::genesis_32x)
 	SEGA_32X_NTSC(config, m_32x, (MASTER_CLOCK_NTSC * 3) / 7, m_maincpu, m_scan_timer);
 	m_32x->set_palette_tag("gen_vdp:palette");
 
-	MCFG_SCREEN_MODIFY("megadriv")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, md_cons_state, screen_vblank_console))
+	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
 
 	// we need to remove and re-add the YM because the balance is different
 	// due to MAME / MESS having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is silent?!)
 	config.device_remove("ymsnd");
 
-	MCFG_DEVICE_ADD("ymsnd", YM2612, MASTER_CLOCK_NTSC/7)
-	MCFG_SOUND_ROUTE(0, "lspeaker", (0.50)/2)
-	MCFG_SOUND_ROUTE(1, "rspeaker", (0.50)/2)
+	YM2612(config, m_ymsnd, MASTER_CLOCK_NTSC/7);
+	m_ymsnd->add_route(0, "lspeaker", (0.50)/2);
+	m_ymsnd->add_route(1, "rspeaker", (0.50)/2);
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "_32x_cart")
 	MCFG_GENERIC_EXTENSIONS("32x,bin")
@@ -651,16 +650,15 @@ MACHINE_CONFIG_START(md_cons_state::mdj_32x)
 	SEGA_32X_NTSC(config, m_32x, (MASTER_CLOCK_NTSC * 3) / 7, m_maincpu, m_scan_timer);
 	m_32x->set_palette_tag("gen_vdp:palette");
 
-	MCFG_SCREEN_MODIFY("megadriv")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, md_cons_state, screen_vblank_console))
+	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
 
 	// we need to remove and re-add the sound system because the balance is different
 	// due to MAME / MESS having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is silent?!)
 	config.device_remove("ymsnd");
 
-	MCFG_DEVICE_ADD("ymsnd", YM2612, MASTER_CLOCK_NTSC/7)
-	MCFG_SOUND_ROUTE(0, "lspeaker", (0.50)/2)
-	MCFG_SOUND_ROUTE(1, "rspeaker", (0.50)/2)
+	YM2612(config, m_ymsnd, MASTER_CLOCK_NTSC/7);
+	m_ymsnd->add_route(0, "lspeaker", (0.50)/2);
+	m_ymsnd->add_route(1, "rspeaker", (0.50)/2);
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "_32x_cart")
 	MCFG_GENERIC_EXTENSIONS("32x,bin")
@@ -687,16 +685,15 @@ MACHINE_CONFIG_START(md_cons_state::md_32x)
 	SEGA_32X_PAL(config, m_32x, (MASTER_CLOCK_PAL * 3) / 7, m_maincpu, m_scan_timer);
 	m_32x->set_palette_tag("gen_vdp:palette");
 
-	MCFG_SCREEN_MODIFY("megadriv")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, md_cons_state, screen_vblank_console))
+	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
 
 	// we need to remove and re-add the sound system because the balance is different
 	// due to MAME / MESS having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is silent?!)
 	config.device_remove("ymsnd");
 
-	MCFG_DEVICE_ADD("ymsnd", YM2612, MASTER_CLOCK_NTSC/7)
-	MCFG_SOUND_ROUTE(0, "lspeaker", (0.50)/2)
-	MCFG_SOUND_ROUTE(1, "rspeaker", (0.50)/2)
+	YM2612(config, m_ymsnd, MASTER_CLOCK_NTSC/7);
+	m_ymsnd->add_route(0, "lspeaker", (0.50)/2);
+	m_ymsnd->add_route(1, "rspeaker", (0.50)/2);
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "_32x_cart")
 	MCFG_GENERIC_EXTENSIONS("32x,bin")
@@ -739,56 +736,59 @@ ROM_END
 
 /****************************************** SegaCD emulation ****************************************/
 
-MACHINE_CONFIG_START(md_cons_state::genesis_scd)
+void md_cons_state::genesis_scd(machine_config &config)
+{
 	md_ntsc(config);
 
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megacd)
 	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
 
-	MCFG_SCREEN_MODIFY("megadriv")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, md_cons_state, screen_vblank_console))
+	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
 
 	SEGA_SEGACD_US(config, m_segacd, 0);
 	m_segacd->set_palette("gen_vdp:palette");
+	m_segacd->set_hostcpu(m_maincpu);
 
 	CDROM(config, "cdrom").set_interface("scd_cdrom");
 
 	SOFTWARE_LIST(config, "cd_list").set_original("segacd");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(md_cons_state::md_scd)
+void md_cons_state::md_scd(machine_config &config)
+{
 	md_pal(config);
 
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megacd)
 	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
 
-	MCFG_SCREEN_MODIFY("megadriv")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, md_cons_state, screen_vblank_console))
+	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
 
 	SEGA_SEGACD_EUROPE(config, m_segacd, 0);
 	m_segacd->set_palette("gen_vdp:palette");
+	m_segacd->set_hostcpu(m_maincpu);
 
 	CDROM(config, "cdrom").set_interface("scd_cdrom");
 
 	SOFTWARE_LIST(config, "cd_list").set_original("megacd");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(md_cons_state::mdj_scd)
+void md_cons_state::mdj_scd(machine_config &config)
+{
 	md_ntsc(config);
 
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megacd)
 	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
 
-	MCFG_SCREEN_MODIFY("megadriv")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, md_cons_state, screen_vblank_console))
+	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
 
 	SEGA_SEGACD_JAPAN(config, m_segacd, 0);
 	m_segacd->set_palette("gen_vdp:palette");
+	m_segacd->set_hostcpu(m_maincpu);
 
 	CDROM(config, "cdrom").set_interface("scd_cdrom");
 
 	SOFTWARE_LIST(config, "cd_list").set_original("megacdj");
-MACHINE_CONFIG_END
+}
 
 /******************SEGA CD + 32X****************************/
 
@@ -797,6 +797,7 @@ MACHINE_CONFIG_START(md_cons_state::genesis_32x_scd)
 
 	SEGA_SEGACD_US(config, m_segacd, 0);
 	m_segacd->set_palette("gen_vdp:palette");
+	m_segacd->set_hostcpu(m_maincpu);
 
 	CDROM(config, "cdrom").set_interface("scd_cdrom");
 
@@ -816,6 +817,7 @@ MACHINE_CONFIG_START(md_cons_state::md_32x_scd)
 
 	SEGA_SEGACD_EUROPE(config, m_segacd, 0);
 	m_segacd->set_palette("gen_vdp:palette");
+	m_segacd->set_hostcpu(m_maincpu);
 
 	CDROM(config, "cdrom").set_interface("scd_cdrom");
 
@@ -835,6 +837,7 @@ MACHINE_CONFIG_START(md_cons_state::mdj_32x_scd)
 
 	SEGA_SEGACD_JAPAN(config, m_segacd, 0);
 	m_segacd->set_palette("gen_vdp:palette");
+	m_segacd->set_hostcpu(m_maincpu);
 
 	CDROM(config, "cdrom").set_interface("scd_cdrom");
 

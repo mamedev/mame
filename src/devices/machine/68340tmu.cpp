@@ -308,6 +308,16 @@ void mc68340_timer_module_device::device_start()
 	m_tin_in_cb.resolve_safe();
 }
 
+void mc68340_timer_module_device::device_reset()
+{
+	module_reset();
+}
+
+void mc68340_timer_module_device::module_reset()
+{
+	// TODO
+}
+
 void mc68340_timer_module_device::do_timer_irq()
 {
 	assert((m_sr & (REG_SR_TO | REG_SR_TG | REG_SR_TC)) != 0);

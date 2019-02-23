@@ -107,7 +107,7 @@ namespace netlist
 
 	NETLIB_UPDATE(7483)
 	{
-		uint8_t r = static_cast<uint8_t>(m_a + m_b + m_C0());
+		auto r = static_cast<uint8_t>(m_a + m_b + m_C0());
 
 		if (r != m_lastr)
 		{

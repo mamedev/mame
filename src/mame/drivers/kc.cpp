@@ -140,7 +140,7 @@ void kc_state::kc85_3(machine_config &config)
 
 	/* devices */
 	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(kc_state, kc), this), "kcc", 2);
+	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(kc_state, kc), this), "kcc", attotime::from_seconds(2));
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(kc_cassette_formats);
@@ -218,8 +218,8 @@ void kc85_4_state::kc85_4(machine_config &config)
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* devices */
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(kc_state, kc), this), "kcc", 2);
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
+	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(kc_state, kc), this), "kcc", attotime::from_seconds(2));
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(kc_cassette_formats);

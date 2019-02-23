@@ -10,9 +10,9 @@
 
 #include "nl_factory.h"
 #include "nl_base.h"
+#include "nl_errstr.h"
 #include "nl_setup.h"
 #include "plib/putil.h"
-#include "nl_errstr.h"
 
 namespace netlist { namespace factory
 {
@@ -20,13 +20,13 @@ namespace netlist { namespace factory
 	class NETLIB_NAME(wrapper) : public device_t
 	{
 	public:
-		NETLIB_NAME(wrapper)(netlist_base_t &anetlist, const pstring &name)
+		NETLIB_NAME(wrapper)(netlist_state_t &anetlist, const pstring &name)
 		: device_t(anetlist, name)
 		{
 		}
 	protected:
 		NETLIB_RESETI() { }
-		NETLIB_UPDATEI() { };
+		NETLIB_UPDATEI() { }
 	};
 
 	element_t::element_t(const pstring &name, const pstring &classname,
@@ -43,29 +43,20 @@ namespace netlist { namespace factory
 	{
 	}
 
-	element_t::~element_t()
-	{
-	}
-
 	// ----------------------------------------------------------------------------------------
 	// net_device_t_base_factory
 	// ----------------------------------------------------------------------------------------
 
-	list_t::list_t( setup_t &setup)
-	: m_setup(setup)
+	list_t::list_t(log_type &alog)
+	: m_log(alog)
 	{
 	}
 
-	list_t::~list_t()
-	{
-		clear();
-	}
-
-	void list_t::register_device(std::unique_ptr<element_t> &&factory)
+	void list_t::register_device(plib::unique_ptr<element_t> &&factory)
 	{
 		for (auto & e : *this)
 			if (e->name() == factory->name())
-				m_setup.log().fatal(MF_1_FACTORY_ALREADY_CONTAINS_1, factory->name());
+				m_log.fatal(MF_1_FACTORY_ALREADY_CONTAINS_1, factory->name());
 		push_back(std::move(factory));
 	}
 
@@ -77,7 +68,7 @@ namespace netlist { namespace factory
 				return e.get();
 		}
 
-		m_setup.log().fatal(MF_1_CLASS_1_NOT_FOUND, devname);
+		m_log.fatal(MF_1_CLASS_1_NOT_FOUND, devname);
 		return nullptr; // appease code analysis
 	}
 
@@ -85,17 +76,18 @@ namespace netlist { namespace factory
 	// factory_lib_entry_t: factory class to wrap macro based chips/elements
 	// -----------------------------------------------------------------------------
 
-	plib::owned_ptr<device_t> library_element_t::Create(netlist_base_t &anetlist, const pstring &name)
+	poolptr<device_t> library_element_t::Create(netlist_state_t &anetlist, const pstring &name)
 	{
-		return plib::owned_ptr<device_t>::Create<NETLIB_NAME(wrapper)>(anetlist, name);
+		return pool().make_poolptr<NETLIB_NAME(wrapper)>(anetlist, name);
 	}
 
-	void library_element_t::macro_actions(netlist_base_t &anetlist, const pstring &name)
+	void library_element_t::macro_actions(nlparse_t &nparser, const pstring &name)
 	{
-		anetlist.setup().namespace_push(name);
-		anetlist.setup().include(this->name());
-		anetlist.setup().namespace_pop();
+		nparser.namespace_push(name);
+		nparser.include(this->name());
+		nparser.namespace_pop();
 	}
 
 
-} }
+} // namespace factory
+ } // namespace netlist

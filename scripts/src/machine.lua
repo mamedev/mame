@@ -3857,3 +3857,27 @@ if (MACHINES["DC7085"]~=null) then
 		MAME_DIR .. "src/devices/machine/dc7085.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/machine/i82357.h,MACHINES["I82357"] = true
+---------------------------------------------------
+
+if (MACHINES["I82357"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/i82357.cpp",
+		MAME_DIR .. "src/devices/machine/i82357.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/xc1700e.h,MACHINES["XC1700E"] = true
+---------------------------------------------------
+
+if (MACHINES["XC1700E"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/xc1700e.cpp",
+		MAME_DIR .. "src/devices/machine/xc1700e.h",
+	}
+end

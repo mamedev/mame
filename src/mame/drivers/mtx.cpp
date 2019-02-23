@@ -323,7 +323,7 @@ MACHINE_CONFIG_START(mtx_state::mtx512)
 	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
 	m_centronics->set_output_latch(cent_data_out);
 
-	MCFG_SNAPSHOT_ADD("snapshot", mtx_state, mtx, "mtx", 1)
+	MCFG_SNAPSHOT_ADD("snapshot", mtx_state, mtx, "mtx", attotime::from_seconds(1))
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED);
 	m_cassette->set_interface("mtx_cass");

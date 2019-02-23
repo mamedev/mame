@@ -926,7 +926,7 @@ MACHINE_CONFIG_START(mz2000_state::mz2000)
 	MCFG_SCREEN_UPDATE_DRIVER(mz2000_state, screen_update_mz2000)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mz2000)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_mz2000);
 	PALETTE(config, m_palette, palette_device::BRG_3BIT);
 
 	SPEAKER(config, "mono").front_center();

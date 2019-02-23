@@ -1368,7 +1368,7 @@ MACHINE_CONFIG_START(arkanoid_state::arkanoid)
 	MCFG_SCREEN_UPDATE_DRIVER(arkanoid_state, screen_update_arkanoid)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_arkanoid)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_arkanoid);
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 512);
 
 	/* sound hardware */
@@ -1442,7 +1442,7 @@ MACHINE_CONFIG_START(arkanoid_state::hexa)
 	MCFG_SCREEN_UPDATE_DRIVER(arkanoid_state, screen_update_hexa)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hexa)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_hexa);
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 
 	/* sound hardware */
@@ -1485,7 +1485,7 @@ MACHINE_CONFIG_START(arkanoid_state::brixian)
 	MCFG_SCREEN_UPDATE_DRIVER(arkanoid_state, screen_update_hexa)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_arkanoid)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_arkanoid);
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 512);
 
 	/* sound hardware */

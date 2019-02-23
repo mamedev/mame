@@ -371,7 +371,7 @@ private:
 	{
 		return 0;
 	}
-	void anzterm(address_map &map);
+	void anzterm_mem(address_map &map);
 };
 
 
@@ -404,7 +404,7 @@ GFXDECODE_START( gfx_anzterm )
 GFXDECODE_END
 
 
-void anzterm_state::anzterm(address_map &map)
+void anzterm_state::anzterm_mem(address_map &map)
 {
 	// There are two battery-backed 2kB SRAM chips with a 4kb SRAM chip for parity
 	// There are two 64kB DRAM banks (with parity)
@@ -414,25 +414,26 @@ void anzterm_state::anzterm(address_map &map)
 }
 
 
-MACHINE_CONFIG_START(anzterm_state::anzterm)
-	MCFG_DEVICE_ADD("maincpu", M6809, 15974400/4)
-	MCFG_DEVICE_PROGRAM_MAP(anzterm)
+void anzterm_state::anzterm(machine_config &config)
+{
+	m6809_device &maincpu(M6809(config, "maincpu", 15974400/4));
+	maincpu.set_addrmap(AS_PROGRAM, &anzterm_state::anzterm_mem);
 
-	MCFG_DEVICE_ADD("pic.ic39", I8214, 0)
-	MCFG_DEVICE_ADD("adlc.ic16", MC6854, 0)
-	MCFG_DEVICE_ADD("adlc.1c19", MC6854, 0)
-	MCFG_DEVICE_ADD("acia.ic17", ACIA6850, 0)
-	MCFG_DEVICE_ADD("acia.ic18", ACIA6850, 0)
+	I8214(config, "pic.ic39", 0);
+	MC6854(config, "adlc.ic16", 0);
+	MC6854(config, "adlc.1c19", 0);
+	ACIA6850(config, "acia.ic17", 0);
+	ACIA6850(config, "acia.ic18", 0);
 
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_UPDATE_DRIVER(anzterm_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_RAW_PARAMS(15974400/4, 1024, 0, 104*8, 260, 0, 24*10) // this is totally wrong, it just stops a validation error
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen.set_screen_update(FUNC(anzterm_state::screen_update));
+	screen.set_palette("palette");
+	screen.set_raw(15974400/4, 1024, 0, 104*8, 260, 0, 24*10); // this is totally wrong, it just stops a validation error
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_anzterm)
-MACHINE_CONFIG_END
+	GFXDECODE(config, "gfxdecode", "palette", gfx_anzterm);
+}
 
 
 INPUT_PORTS_START( anzterm )

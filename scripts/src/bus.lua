@@ -1305,6 +1305,19 @@ if (BUSES["ISBX"]~=null) then
 	}
 end
 
+---------------------------------------------------
+--
+--@src/devices/bus/jakks_gamekey/slot.h,BUSES["JAKKS_GAMEKEY"] = true
+---------------------------------------------------
+
+if (BUSES["JAKKS_GAMEKEY"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/jakks_gamekey/slot.cpp",
+		MAME_DIR .. "src/devices/bus/jakks_gamekey/slot.h",
+		MAME_DIR .. "src/devices/bus/jakks_gamekey/rom.cpp",
+		MAME_DIR .. "src/devices/bus/jakks_gamekey/rom.h",
+	}
+end
 
 ---------------------------------------------------
 --

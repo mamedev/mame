@@ -424,22 +424,23 @@ static INPUT_PORTS_START( wpc_dcs )
 
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(wpc_dcs_state::wpc_dcs)
+void wpc_dcs_state::wpc_dcs(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6809, XTAL(8'000'000)/4)
-	MCFG_DEVICE_PROGRAM_MAP(wpc_dcs_map)
+	M6809(config, maincpu, XTAL(8'000'000)/4);
+	maincpu->set_addrmap(AS_PROGRAM, &wpc_dcs_state::wpc_dcs_map);
+	maincpu->set_periodic_int(FUNC(wpc_dcs_state::irq0_line_assert), attotime::from_hz(XTAL(8'000'000)/8192.0));
 
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(wpc_dcs_state, irq0_line_assert, XTAL(8'000'000)/8192.0)
 	TIMER(config, "zero_crossing").configure_periodic(FUNC(wpc_dcs_state::zc_timer), attotime::from_hz(120)); // Mains power zero crossing
 
-	MCFG_DEVICE_ADD("lamp", WPC_LAMP, 0)
-	MCFG_DEVICE_ADD("out", WPC_OUT, 0, 3)
-	MCFG_DEVICE_ADD("shift", WPC_SHIFT, 0)
+	WPC_LAMP(config, lamp, 0);
+	WPC_OUT(config, out, 0, 3);
+	WPC_SHIFT(config, "shift", 0);
 	WPC_DMD(config, "dmd", 0).scanline_callback().set(FUNC(wpc_dcs_state::scanline_irq));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	DCS_AUDIO_8K(config, dcs, 0);
-MACHINE_CONFIG_END
+}
 
 /*-------------
 / Demolition Man #50028

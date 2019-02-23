@@ -3,10 +3,11 @@
 #include "emu.h"
 #include "machine/nscsi_cd.h"
 
-#define VERBOSE 1
+#define VERBOSE 0
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(NSCSI_CDROM, nscsi_cdrom_device, "scsi_cdrom", "SCSI CD-ROM")
+DEFINE_DEVICE_TYPE(NSCSI_CDROM_SGI, nscsi_cdrom_sgi_device, "scsi_cdrom_sgi", "SCSI CD-ROM SGI")
 DEFINE_DEVICE_TYPE(NSCSI_RRD45, nscsi_dec_rrd45_device, "nrrd45", "RRD45 CD-ROM (New)")
 DEFINE_DEVICE_TYPE(NSCSI_XM3301, nscsi_toshiba_xm3301_device, "nxm3301", "XM-3301TA CD-ROM (New)")
 DEFINE_DEVICE_TYPE(NSCSI_XM5301SUN, nscsi_toshiba_xm5301_sun_device, "nxm5301sun", "XM-5301B Sun 4x CD-ROM (New)")
@@ -16,6 +17,11 @@ DEFINE_DEVICE_TYPE(NSCSI_XM5701SUN, nscsi_toshiba_xm5701_sun_device, "nxm5701sun
 
 nscsi_cdrom_device::nscsi_cdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	nscsi_cdrom_device(mconfig, NSCSI_CDROM, tag, owner, "Sony", "CDU-76S", "1.0", 0x00, 0x05)
+{
+}
+
+nscsi_cdrom_sgi_device::nscsi_cdrom_sgi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	nscsi_cdrom_device(mconfig, NSCSI_CDROM_SGI, tag, owner, "Sony", "CDU-76S", "1.0", 0x00, 0x05)
 {
 }
 
@@ -557,5 +563,48 @@ void nscsi_cdrom_device::scsi_command()
 	default:
 		nscsi_full_device::scsi_command();
 		break;
+	}
+}
+
+enum sgi_scsi_command_e : uint8_t {
+	/*
+	 * The SGI supplied CD-ROM drives (and possibly those from some other vendors)
+	 * identify themselves as hard disk drives at poweron, and after SCSI bus resets,
+	 * until issued a vendor specific command (0xc9).  This is done because older
+	 * systems would otherwise be unable to boot and load miniroots from CD, due to
+	 * their design (they attempted to protect the user from booting from
+	 * "ridiculous" devices, long before CD-ROM drives existed).  The SGI drives are
+	 * sent a command to "revert" to CD-ROM inquiry information during boot if on
+	 * a SCSI bus handled by the PROM, but not all possible buses are handled by all
+	 * PROMs; additionally, a SCSI bus reset causes the CD-ROM drives to revert to
+	 * the poweron default, and this could happen before the hardware inventory code
+	 * in the kernel runs, if there are SCSI problems.
+	 */
+	SGI_HD2CDROM = 0xc9,
+};
+
+void nscsi_cdrom_sgi_device::scsi_command()
+{
+	switch (scsi_cmdbuf[0]) {
+	case SGI_HD2CDROM:
+		LOG("command SGI_HD2CDROM");
+		// No need to do anything (yet). Just acknowledge the command.
+		scsi_status_complete(SS_GOOD);
+		break;
+
+	default:
+		nscsi_cdrom_device::scsi_command();
+		break;
+	}
+}
+
+bool nscsi_cdrom_sgi_device::scsi_command_done(uint8_t command, uint8_t length)
+{
+	switch (command) {
+	case SGI_HD2CDROM:
+		return length == 10;
+
+	default:
+		return nscsi_full_device::scsi_command_done(command, length);
 	}
 }

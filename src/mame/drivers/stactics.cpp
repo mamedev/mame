@@ -308,12 +308,12 @@ void stactics_state::machine_start()
  *
  *************************************/
 
-MACHINE_CONFIG_START(stactics_state::stactics)
-
+void stactics_state::stactics(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8080, 1933560)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", stactics_state,  interrupt)
+	I8080(config, m_maincpu, 1933560);
+	m_maincpu->set_addrmap(AS_PROGRAM, &stactics_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(stactics_state::interrupt));
 
 	LS259(config, m_outlatch); // 50
 	m_outlatch->q_out_cb<0>().set(FUNC(stactics_state::coin_lockout_1_w)); // COIN REJECT 1
@@ -344,7 +344,7 @@ MACHINE_CONFIG_START(stactics_state::stactics)
 	stactics_video(config);
 
 	/* audio hardware */
-MACHINE_CONFIG_END
+}
 
 
 

@@ -116,13 +116,14 @@ WRITE_LINE_MEMBER( wangpc_lvc_device::vsync_w )
 //  MACHINE_CONFIG_START( wangpc_lvc )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(wangpc_lvc_device::device_add_mconfig)
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_UPDATE_DEVICE(MC6845_TAG, mc6845_device, screen_update)
-	MCFG_SCREEN_SIZE(80*8, 25*9)
-	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 25*9-1)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_REFRESH_RATE(60)
+void wangpc_lvc_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_screen_update(MC6845_TAG, FUNC(mc6845_device::screen_update));
+	screen.set_size(80*8, 25*9);
+	screen.set_visarea(0, 80*8-1, 0, 25*9-1);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_refresh_hz(60);
 
 	MC6845_1(config, m_crtc, XTAL(14'318'181)/16);
 	m_crtc->set_screen(SCREEN_TAG);
@@ -130,7 +131,7 @@ MACHINE_CONFIG_START(wangpc_lvc_device::device_add_mconfig)
 	m_crtc->set_char_width(8);
 	m_crtc->set_update_row_callback(FUNC(wangpc_lvc_device::crtc_update_row), this);
 	m_crtc->out_vsync_callback().set(FUNC(wangpc_lvc_device::vsync_w));
-MACHINE_CONFIG_END
+}
 
 
 
@@ -245,7 +246,7 @@ uint16_t wangpc_lvc_device::wangpcbus_iorc_r(address_space &space, offs_t offset
 		switch (offset & 0x7f)
 		{
 		case 0x02/2:
-			data = 0xff00 | m_crtc->register_r(space, 0);
+			data = 0xff00 | m_crtc->register_r();
 			break;
 
 		case 0x30/2:
@@ -278,14 +279,14 @@ void wangpc_lvc_device::wangpcbus_aiowc_w(address_space &space, offs_t offset, u
 		case 0x00/2:
 			if (ACCESSING_BITS_0_7)
 			{
-				m_crtc->address_w(space, 0, data & 0xff);
+				m_crtc->address_w(data & 0xff);
 			}
 			break;
 
 		case 0x02/2:
 			if (ACCESSING_BITS_0_7)
 			{
-				m_crtc->register_w(space, 0, data & 0xff);
+				m_crtc->register_w(data & 0xff);
 			}
 			break;
 

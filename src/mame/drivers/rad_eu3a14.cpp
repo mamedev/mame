@@ -1374,7 +1374,7 @@ MACHINE_CONFIG_START(radica_eu3a14_state::radica_eu3a14)
 
 	ADDRESS_MAP_BANK(config, "bank").set_map(&radica_eu3a14_state::bank_map).set_options(ENDIANNESS_LITTLE, 8, 24, 0x8000);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_helper)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_helper);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

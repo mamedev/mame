@@ -220,7 +220,7 @@ WRITE8_MEMBER( atomeb_state::eprom_w )
 READ8_MEMBER( atomeb_state::ext_r )
 {
 	if (m_ext[m_eprom & 0x0f]->exists())
-		return m_ext[m_eprom & 0x0f]->read_rom(space, offset);
+		return m_ext[m_eprom & 0x0f]->read_rom(offset);
 	else
 		return 0xff;
 }
@@ -232,9 +232,9 @@ READ8_MEMBER( atomeb_state::ext_r )
 READ8_MEMBER( atomeb_state::dos_r )
 {
 	if (m_e0->exists() && !BIT(m_eprom, 7))
-		return m_e0->read_rom(space, offset);
+		return m_e0->read_rom(offset);
 	else if (m_e1->exists() && BIT(m_eprom, 7))
-		return m_e1->read_rom(space, offset);
+		return m_e1->read_rom(offset);
 	else
 		return 0xff;
 }
@@ -663,7 +663,7 @@ void atom_state::machine_start()
 	m_baseram[0x0b] = machine().rand() & 0x0ff;
 
 	if (m_cart.found() && m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0xa000, 0xafff, read8_delegate(FUNC(generic_slot_device::read_rom), &*m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xa000, 0xafff, read8sm_delegate(FUNC(generic_slot_device::read_rom), &*m_cart));
 }
 
 /*-------------------------------------------------
@@ -757,7 +757,7 @@ MACHINE_CONFIG_START(atom_state::atom)
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
 	m_cassette->set_interface("atom_cass");
 
-	MCFG_QUICKLOAD_ADD("quickload", atom_state, atom_atm, "atm", 0)
+	MCFG_QUICKLOAD_ADD("quickload", atom_state, atom_atm, "atm")
 
 	/* utility rom slot */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "atom_cart")

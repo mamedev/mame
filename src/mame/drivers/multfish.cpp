@@ -309,19 +309,19 @@ WRITE8_MEMBER(igrosoft_gamble_state::igrosoft_gamble_bank_w)
 
 READ8_MEMBER(igrosoft_gamble_state::igrosoft_gamble_timekeeper_r)
 {
-	return m_m48t35->read(space, offset + 0x6000, 0xff);
+	return m_m48t35->read(offset + 0x6000);
 }
 
 WRITE8_MEMBER(igrosoft_gamble_state::igrosoft_gamble_timekeeper_w)
 {
-	m_m48t35->write(space, offset + 0x6000, data, 0xff);
+	m_m48t35->write(offset + 0x6000, data);
 }
 
 READ8_MEMBER(igrosoft_gamble_state::bankedram_r)
 {
 	if ((m_rambk & 0x80) == 0x00)
 	{
-		return m_m48t35->read(space, offset + 0x2000*(m_rambk & 0x03), 0xff);
+		return m_m48t35->read(offset + 0x2000*(m_rambk & 0x03));
 	}
 	else
 	{
@@ -334,7 +334,7 @@ WRITE8_MEMBER(igrosoft_gamble_state::bankedram_w)
 {
 	if ((m_rambk & 0x80) == 0x00)
 	{
-		m_m48t35->write(space, offset + 0x2000*(m_rambk & 0x03), data, 0xff);
+		m_m48t35->write(offset + 0x2000*(m_rambk & 0x03), data);
 	}
 	else
 	{
@@ -1071,7 +1071,7 @@ MACHINE_CONFIG_START(igrosoft_gamble_state::igrosoft_gamble)
 	MCFG_SCREEN_UPDATE_DRIVER(igrosoft_gamble_state, screen_update_igrosoft_gamble)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_igrosoft_gamble)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_igrosoft_gamble);
 	MCFG_PALETTE_ADD("palette", 0x1000)
 
 

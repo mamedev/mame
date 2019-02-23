@@ -8,12 +8,12 @@
 #ifndef NLD_MS_GMRES_H_
 #define NLD_MS_GMRES_H_
 
+#include "../plib/gmres.h"
 #include "../plib/mat_cr.h"
 #include "../plib/parray.h"
+#include "../plib/vector_ops.h"
 #include "nld_ms_direct.h"
 #include "nld_solver.h"
-#include "../plib/vector_ops.h"
-#include "../plib/gmres.h"
 
 #include <algorithm>
 #include <cmath>
@@ -29,13 +29,13 @@ namespace devices
 	{
 	public:
 
-		typedef FT float_type;
+		using float_type = FT;
 
 		/* Sort rows in ascending order. This should minimize fill-in and thus
 		 * maximize the efficiency of the incomplete LUT.
 		 * This is already preconditioning.
 		 */
-		matrix_solver_GMRES_t(netlist_base_t &anetlist, const pstring &name, const solver_parameters_t *params, const std::size_t size)
+		matrix_solver_GMRES_t(netlist_state_t &anetlist, const pstring &name, const solver_parameters_t *params, const std::size_t size)
 			: matrix_solver_direct_t<FT, SIZE>(anetlist, name, matrix_solver_t::PREFER_BAND_MATRIX, params, size)
 			, m_term_cr(size)
 			//, m_ops(size, 2)
@@ -44,18 +44,14 @@ namespace devices
 			{
 			}
 
-		virtual ~matrix_solver_GMRES_t() override
-		{
-		}
-
-		virtual void vsetup(analog_net_t::list_t &nets) override;
-		virtual unsigned vsolve_non_dynamic(const bool newton_raphson) override;
+		void vsetup(analog_net_t::list_t &nets) override;
+		unsigned vsolve_non_dynamic(const bool newton_raphson) override;
 
 	private:
 
-		typedef typename plib::matrix_compressed_rows_t<FT, SIZE>::index_type mattype;
+		using mattype = typename plib::matrix_compressed_rows_t<FT, SIZE>::index_type;
 
-		plib::parray<std::vector<FT *>, SIZE> m_term_cr;
+		plib::parray<plib::aligned_vector<FT *, PALIGN_VECTOROPT>, SIZE> m_term_cr;
 		plib::mat_precondition_ILU<FT, SIZE> m_ops;
 		//plib::mat_precondition_diag<FT, SIZE> m_ops;
 		plib::gmres_t<FT, SIZE> m_gmres;
@@ -77,10 +73,10 @@ namespace devices
 		for (std::size_t k=0; k<iN; k++)
 		{
 			fill[k].resize(iN, decltype(m_ops.m_mat)::FILL_INFINITY);
-			terms_for_net_t * RESTRICT row = this->m_terms[k].get();
-			for (std::size_t j=0; j < row->m_nz.size(); j++)
+			terms_for_net_t * row = this->m_terms[k].get();
+			for (const auto &nz_j : row->m_nz)
 			{
-				fill[k][static_cast<mattype>(row->m_nz[j])] = 0;
+				fill[k][static_cast<mattype>(nz_j)] = 0;
 			}
 		}
 

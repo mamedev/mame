@@ -351,8 +351,8 @@ void ravens_state::ravens(machine_config &config)
 	config.set_default_layout(layout_ravens);
 
 	/* quickload */
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(ravens_state, ravens), this), "pgm", 1);
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
+	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(ravens_state, ravens), this), "pgm", attotime::from_seconds(1));
 
 	/* cassette */
 	CASSETTE(config, m_cass);
@@ -376,8 +376,8 @@ void ravens_state::ravens2(machine_config &config)
 	m_terminal->set_keyboard_callback(FUNC(ravens_state::kbd_put));
 
 	/* quickload */
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(ravens_state, ravens), this), "pgm", 1);
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
+	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(ravens_state, ravens), this), "pgm", attotime::from_seconds(1));
 
 	/* cassette */
 	CASSETTE(config, m_cass);

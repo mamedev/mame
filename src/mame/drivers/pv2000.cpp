@@ -356,7 +356,7 @@ WRITE_LINE_MEMBER( pv2000_state::pv2000_vdp_interrupt )
 void pv2000_state::machine_start()
 {
 	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000, 0xffff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000, 0xffff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 }
 
 void pv2000_state::machine_reset()

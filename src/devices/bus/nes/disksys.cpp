@@ -51,9 +51,10 @@ static const floppy_interface nes_floppy_interface =
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(nes_disksys_device::device_add_mconfig)
-	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, nes_floppy_interface)
-MACHINE_CONFIG_END
+void nes_disksys_device::device_add_mconfig(machine_config &config)
+{
+	LEGACY_FLOPPY(config, FLOPPY_0, 0, &nes_floppy_interface);
+}
 
 
 ROM_START( disksys )

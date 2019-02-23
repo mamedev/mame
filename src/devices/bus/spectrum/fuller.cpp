@@ -92,8 +92,8 @@ void spectrum_fuller_device::device_reset()
 {
 	m_exp->set_io_space(&io_space());
 
-	io_space().install_write_handler(0x3f, 0x3f, 0, 0xff00, 0, write8_delegate(FUNC(ay8910_device::address_w), m_psg.target()));
-	io_space().install_readwrite_handler(0x5f, 0x5f, 0, 0xff00, 0, read8_delegate(FUNC(ay8910_device::data_r), m_psg.target()), write8_delegate(FUNC(ay8910_device::data_w), m_psg.target()));
+	io_space().install_write_handler(0x3f, 0x3f, 0, 0xff00, 0, write8smo_delegate(FUNC(ay8910_device::address_w), m_psg.target()));
+	io_space().install_readwrite_handler(0x5f, 0x5f, 0, 0xff00, 0, read8smo_delegate(FUNC(ay8910_device::data_r), m_psg.target()), write8smo_delegate(FUNC(ay8910_device::data_w), m_psg.target()));
 	io_space().install_read_handler(0x7f, 0x7f, 0, 0xff00, 0, read8_delegate(FUNC(spectrum_fuller_device::joystick_r), this));
 }
 

@@ -614,7 +614,7 @@ MACHINE_CONFIG_START(apple1_state::apple1)
 	A1BUS(config, A1_BUS_TAG, 0).set_cputag(m_maincpu);
 	A1BUS_SLOT(config, "exp", 0, A1_BUS_TAG, apple1_cards, "cassette");
 
-	MCFG_SNAPSHOT_ADD("snapshot", apple1_state, apple1, "snp", 0)
+	MCFG_SNAPSHOT_ADD("snapshot", apple1_state, apple1, "snp")
 
 	SOFTWARE_LIST(config, "cass_list").set_original("apple1");
 

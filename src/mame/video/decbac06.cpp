@@ -25,7 +25,7 @@ configuration is 2 chips of 16*16 tiles, 1 of 8*8.
    bank 0:
    0:
         bit 0 (0x1) set = 8*8 tiles, else 16*16 tiles
-        Bit 1 (0x2) unknown
+        Bit 1 (0x2) set = row major tile layout, else column major*
         bit 2 (0x4) set enables rowscroll
         bit 3 (0x8) set enables colscroll
         bit 7 (0x80) set in playfield 1 is reverse screen (set via dip-switch)
@@ -44,6 +44,9 @@ configuration is 2 chips of 16*16 tiles, 1 of 8*8.
    The shift register controls the granularity of the scroll offsets
    (more details given later).
 
+   * Bandit is the only game known to use column major tile layout, when in this
+   mode X scrolling is also inverted, and tile character data is flipped on X.
+   
 Playfield priority (Bad Dudes, etc):
     In the bottommost playfield, pens 8-15 can have priority over the next playfield.
     In that next playfield, pens 8-15 can have priority over sprites.
@@ -59,6 +62,8 @@ Priority word (Midres):
             ~ = Sprites are on top of playfields
     Bit 2
     Bit 3 set = ...
+
+	Note that priority mixing is handled outside of the BAC-06 chip.
 
 */
 
@@ -139,31 +144,43 @@ void deco_bac06_device::set_flip_screen(bool flip)
 
 TILEMAP_MAPPER_MEMBER(deco_bac06_device::tile_shape0_scan)
 {
+	if ((m_pf_control_0[0]&2)==0)
+		return (row & 0xf) + ((0x3f - (col & 0x3f)) << 4);
 	return (col & 0xf) + ((row & 0xf) << 4) + ((col & 0x1f0) << 4);
 }
 
 TILEMAP_MAPPER_MEMBER(deco_bac06_device::tile_shape1_scan)
 {
+	//if (m_pf_control_0[0]&2) // Needs testing on real hardware, not used by any game
+	//	return (row & 0xf) + ((col & 0x1f) << 4) + ((col & 0xf0) << 5);
 	return (col & 0xf) + ((row & 0x1f) << 4) + ((col & 0xf0) << 5);
 }
 
 TILEMAP_MAPPER_MEMBER(deco_bac06_device::tile_shape2_scan)
 {
+	//if (m_pf_control_0[0]&2)  // Needs testing on real hardware, not used by any game
+	//	return (col & 0xf) + ((row & 0x3f) << 4) + ((row & 0x70) << 6);
 	return (col & 0xf) + ((row & 0x3f) << 4) + ((col & 0x70) << 6);
 }
 
 TILEMAP_MAPPER_MEMBER(deco_bac06_device::tile_shape0_8x8_scan)
 {
+	//if (m_pf_control_0[0]&2)   // Needs testing on real hardware, not used by any game
+	//	return (col & 0x1f) + ((row & 0x1f) << 5) + ((row & 0x60) << 5);
 	return (col & 0x1f) + ((row & 0x1f) << 5) + ((col & 0x60) << 5);
 }
 
 TILEMAP_MAPPER_MEMBER(deco_bac06_device::tile_shape1_8x8_scan)
 {
+	//if (m_pf_control_0[0]&2)   // Needs testing on real hardware, not used by any game
+	//	return (row & 0x1f) + ((col & 0x1f) << 5) + ((col & 0x20) << 5) + ((row & 0x20) << 6);
 	return (col & 0x1f) + ((row & 0x1f) << 5) + ((row & 0x20) << 5) + ((col & 0x20) << 6);
 }
 
 TILEMAP_MAPPER_MEMBER(deco_bac06_device::tile_shape2_8x8_scan)
 {
+	//if (m_pf_control_0[0]&2)   // Needs testing on real hardware, not used by any game
+	//	return (row & 0x1f) + ((col & 0x7f) << 5);
 	return (col & 0x1f) + ((row & 0x7f) << 5);
 }
 
@@ -172,7 +189,8 @@ TILE_GET_INFO_MEMBER(deco_bac06_device::get_pf8x8_tile_info)
 	if (m_rambank&1) tile_index+=0x1000;
 	int tile=m_pf_data[tile_index];
 	int colourpri=(tile>>12);
-	SET_TILE_INFO_MEMBER(m_tile_region_8,tile&0xfff,0,0);
+	int flags=(m_pf_control_0[0]&2) ? 0 : TILE_FLIPX;
+	SET_TILE_INFO_MEMBER(m_tile_region_8,tile&0xfff,0,flags);
 	tileinfo.category = colourpri;
 }
 
@@ -181,7 +199,8 @@ TILE_GET_INFO_MEMBER(deco_bac06_device::get_pf16x16_tile_info)
 	if (m_rambank&1) tile_index+=0x1000;
 	int tile=m_pf_data[tile_index];
 	int colourpri=(tile>>12);
-	SET_TILE_INFO_MEMBER(m_tile_region_16,tile&0xfff,0,0);
+	int flags=(m_pf_control_0[0]&2) ? 0 : TILE_FLIPX;
+	SET_TILE_INFO_MEMBER(m_tile_region_16,tile&0xfff,0,flags);
 	tileinfo.category = colourpri;
 }
 
@@ -238,7 +257,10 @@ void deco_bac06_device::custom_tilemap_draw(bitmap_ind16 &bitmap,
 
 	if (control1)
 	{
-		scrollx = control1[0];
+		if ((control0 && control0[0]&2)==0) // Use of column major mode inverts scroll direction
+			scrollx = -control1[0] - 0x100;
+		else
+			scrollx = control1[0];
 		scrolly = control1[1];
 	}
 

@@ -17,60 +17,93 @@
 #include "pconfig.h"
 
 #if !defined(__clang__) && !defined(_MSC_VER) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 6))
+#if !(__GNUC__ > 7 || (__GNUC__ == 7 && __GNUC_MINOR__ > 3))
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
 #endif
 
 namespace plib
 {
 	template<typename VT, typename T>
-	void vec_set_scalar (const std::size_t n, VT &v, const T & scalar)
+	void vec_set_scalar (const std::size_t n, VT &v, T && scalar)
 	{
+		const typename std::remove_reference<decltype(v[0])>::type s(std::forward<T>(scalar));
 		for ( std::size_t i = 0; i < n; i++ )
-			v[i] = scalar;
+			v[i] = s;
 	}
 
 	template<typename VT, typename VS>
 	void vec_set (const std::size_t n, VT &v, const VS & source)
 	{
 		for ( std::size_t i = 0; i < n; i++ )
-			v[i] = source [i];
+			v[i] = source[i];
 	}
 
 	template<typename T, typename V1, typename V2>
 	T vec_mult (const std::size_t n, const V1 & v1, const V2 & v2 )
 	{
-		T value = 0.0;
-		for ( std::size_t i = 0; i < n; i++ )
-			value += v1[i] * v2[i];
-		return value;
+		using b8 = T[8];
+		PALIGNAS_VECTOROPT() b8 value = {0};
+		for (std::size_t i = 0; i < n ; i++ )
+		{
+			value[i & 7] += v1[i] * v2[i];
+		}
+		return value[0] + value[1] + value[2] + value[3] + value[4] + value[5] + value[6] + value[7];
 	}
 
 	template<typename T, typename VT>
 	T vec_mult2 (const std::size_t n, const VT &v)
 	{
-		T value = 0.0;
-		for ( std::size_t i = 0; i < n; i++ )
-			value += v[i] * v[i];
-		return value;
+		using b8 = T[8];
+		PALIGNAS_VECTOROPT() b8 value = {0};
+		for (std::size_t i = 0; i < n ; i++ )
+		{
+			value[i & 7] += v[i] * v[i];
+		}
+		return value[0] + value[1] + value[2] + value[3] + value[4] + value[5] + value[6] + value[7];
+	}
+
+	template<typename T, typename VT>
+	T vec_sum (const std::size_t n, const VT &v)
+	{
+		if (n<8)
+		{
+			T value(0);
+			for (std::size_t i = 0; i < n ; i++ )
+				value += v[i];
+
+			return value;
+		}
+		else
+		{
+			using b8 = T[8];
+			PALIGNAS_VECTOROPT() b8 value = {0};
+			for (std::size_t i = 0; i < n ; i++ )
+				value[i & 7] += v[i];
+
+			return ((value[0] + value[1]) + (value[2] + value[3])) + ((value[4] + value[5]) + (value[6] + value[7]));
+		}
 	}
 
 	template<typename VV, typename T, typename VR>
-	void vec_mult_scalar (const std::size_t n, const VV & v, const T & scalar, VR & result)
+	void vec_mult_scalar (const std::size_t n, const VV & v, T && scalar, VR & result)
 	{
+		const typename std::remove_reference<decltype(v[0])>::type s(std::forward<T>(scalar));
 		for ( std::size_t i = 0; i < n; i++ )
-			result[i] = scalar * v[i];
+			result[i] = s * v[i];
 	}
 
 	template<typename VV, typename T, typename VR>
-	void vec_add_mult_scalar (const std::size_t n, const VV & v, const T scalar, VR & result)
+	void vec_add_mult_scalar (const std::size_t n, const VV & v, T && scalar, VR & result)
 	{
+		const typename std::remove_reference<decltype(v[0])>::type s(std::forward<T>(scalar));
 		for ( std::size_t i = 0; i < n; i++ )
-			result[i] = result[i] + scalar * v[i];
+			result[i] += s * v[i];
 	}
 
 	template<typename T>
-	void vec_add_mult_scalar_p(const std::size_t & n, const T * RESTRICT v, const T scalar, T * RESTRICT result)
+	void vec_add_mult_scalar_p(const std::size_t & n, const T * v, T scalar, T * result)
 	{
 		for ( std::size_t i = 0; i < n; i++ )
 			result[i] += scalar * v[i];
@@ -91,10 +124,11 @@ namespace plib
 	}
 
 	template<typename V, typename T>
-	void vec_scale(const std::size_t n, V & v, const T scalar)
+	void vec_scale(const std::size_t n, V & v, T &&scalar)
 	{
+		const typename std::remove_reference<decltype(v[0])>::type s(std::forward<T>(scalar));
 		for ( std::size_t i = 0; i < n; i++ )
-			v[i] = scalar * v[i];
+			v[i] *= s;
 	}
 
 	template<typename T, typename V>
@@ -106,10 +140,12 @@ namespace plib
 
 		return ret;
 	}
-}
+} // namespace plib
 
 #if !defined(__clang__) && !defined(_MSC_VER) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 6))
+#if !(__GNUC__ > 7 || (__GNUC__ == 7 && __GNUC_MINOR__ > 3))
 #pragma GCC diagnostic pop
+#endif
 #endif
 
 #endif /* PLIB_VECTOR_OPS_H_ */

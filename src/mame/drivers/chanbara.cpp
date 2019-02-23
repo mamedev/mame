@@ -411,7 +411,7 @@ MACHINE_CONFIG_START(chanbara_state::chanbara)
 	MCFG_SCREEN_UPDATE_DRIVER(chanbara_state, screen_update_chanbara)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_chanbara)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_chanbara);
 
 	PALETTE(config, m_palette, FUNC(chanbara_state::chanbara_palette), 256);
 

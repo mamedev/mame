@@ -172,7 +172,8 @@ static void ggenie_sub_cart(device_slot_interface &device)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(md_rom_ggenie_device::device_add_mconfig)
-	MCFG_MD_CARTRIDGE_ADD("subslot", ggenie_sub_cart, nullptr)
-	MCFG_MD_CARTRIDGE_NOT_MANDATORY
-MACHINE_CONFIG_END
+void md_rom_ggenie_device::device_add_mconfig(machine_config &config)
+{
+	MD_CART_SLOT(config, m_exp, ggenie_sub_cart, nullptr);
+	m_exp->set_must_be_loaded(false);
+}

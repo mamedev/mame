@@ -351,7 +351,7 @@ MACHINE_CONFIG_START(rampart_state::rampart)
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 8);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rampart)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_rampart);
 	PALETTE(config, "palette").set_format(palette_device::IRGB_1555, 512).set_membits(8);
 
 	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, rampart_state::s_mob_config);

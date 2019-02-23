@@ -236,7 +236,7 @@ MACHINE_CONFIG_START(badlandsbl_state::badlandsb)
 	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_badlandsb)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_badlandsb);
 	palette_device &palette(PALETTE(config, "palette"));
 	palette.set_format(palette_device::IRGB_1555, 256);
 	palette.set_membits(8);

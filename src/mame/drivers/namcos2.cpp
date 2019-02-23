@@ -1815,7 +1815,7 @@ MACHINE_CONFIG_START(namcos2_state::base_noio)
 
 	configure_c116_standard(config);
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_c116, gfx_namcos2)
+	GFXDECODE(config, m_gfxdecode, m_c116, gfx_namcos2);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -1895,7 +1895,7 @@ MACHINE_CONFIG_START(namcos2_state::gollygho)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update)
 	MCFG_SCREEN_PALETTE(m_c116)
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_c116, gfx_namcos2)
+	GFXDECODE(config, m_gfxdecode, m_c116, gfx_namcos2);
 
 	configure_c123tmap_standard(config);
 
@@ -1947,7 +1947,7 @@ MACHINE_CONFIG_START(namcos2_state::finallap_noio)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_finallap)
 	MCFG_SCREEN_PALETTE(m_c116)
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_c116, gfx_namcos2)
+	GFXDECODE(config, m_gfxdecode, m_c116, gfx_namcos2);
 
 	configure_c123tmap_standard(config);
 
@@ -2023,7 +2023,7 @@ MACHINE_CONFIG_START(namcos2_state::sgunner)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_sgunner)
 	MCFG_SCREEN_PALETTE(m_c116)
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_c116, gfx_c355)
+	GFXDECODE(config, m_gfxdecode, m_c116, gfx_c355);
 
 	NAMCO_C355SPR(config, m_c355spr, 0);
 	m_c355spr->set_screen(m_screen);
@@ -2077,7 +2077,7 @@ MACHINE_CONFIG_START(namcos2_state::sgunner2)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_sgunner)
 	MCFG_SCREEN_PALETTE(m_c116)
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_c116, gfx_c355)
+	GFXDECODE(config, m_gfxdecode, m_c116, gfx_c355);
 
 	NAMCO_C355SPR(config, m_c355spr, 0);
 	m_c355spr->set_screen(m_screen);
@@ -2131,7 +2131,7 @@ MACHINE_CONFIG_START(namcos2_state::suzuka8h)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_luckywld)
 	MCFG_SCREEN_PALETTE(m_c116)
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_c116, gfx_c355)
+	GFXDECODE(config, m_gfxdecode, m_c116, gfx_c355);
 
 	NAMCO_C355SPR(config, m_c355spr, 0);
 	m_c355spr->set_screen(m_screen);
@@ -2206,7 +2206,7 @@ MACHINE_CONFIG_START(namcos2_state::metlhawk)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_metlhawk)
 	MCFG_SCREEN_PALETTE(m_c116)
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_c116, gfx_metlhawk)
+	GFXDECODE(config, m_gfxdecode, m_c116, gfx_metlhawk);
 
 	NAMCO_C169ROZ(config, m_c169roz, 0);
 	m_c169roz->set_palette(m_c116);

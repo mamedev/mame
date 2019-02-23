@@ -12,13 +12,13 @@ Notes:
 4. Only difference between all TI-86 drivers is ROM version.
 5. Video engine (with grayscale support) based on the idea found in VTI source
    emulator written by Rusty Wagner.
-6. NVRAM is saved properly only when calculator is turned off before exiting MESS.
+6. NVRAM is saved properly only when calculator is turned off before exiting MAME.
 7. To receive data from TI press "R" immediately after TI starts to send data.
 8. To request screen dump from calculator press "S".
 9. TI-81 does not have a serial link.
 
 Needed:
-1. Info about ports 3 (bit 2 seems to be allways 0) and 4.
+1. Info about ports 3 (bit 2 seems to be always 0) and 4.
 2. Any info on TI-81 hardware.
 3. ROM dumps of unemulated models.
 4. Artworks.
@@ -374,10 +374,10 @@ void ti85_state::ti83p_banked_mem(address_map &map)
 
 void ti85_state::ti83p_asic_mem(address_map &map)
 {
-	map(0x0000, 0x3fff).rw(m_membank1, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0x4000, 0x7fff).w(m_membank2, FUNC(address_map_bank_device::write8)).r(FUNC(ti85_state::ti83p_membank2_r));
-	map(0x8000, 0xbfff).w(m_membank3, FUNC(address_map_bank_device::write8)).r(FUNC(ti85_state::ti83p_membank3_r));
-	map(0xc000, 0xffff).rw(m_membank4, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0x0000, 0x3fff).rw(m_membank[0], FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0x4000, 0x7fff).w(m_membank[1], FUNC(address_map_bank_device::write8)).r(FUNC(ti85_state::ti83p_membank2_r));
+	map(0x8000, 0xbfff).w(m_membank[2], FUNC(address_map_bank_device::write8)).r(FUNC(ti85_state::ti83p_membank3_r));
+	map(0xc000, 0xffff).rw(m_membank[3], FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
 }
 
 /* keyboard input */
@@ -578,175 +578,165 @@ static INPUT_PORTS_START (ti83)
 INPUT_PORTS_END
 
 /* machine definition */
-MACHINE_CONFIG_START(ti85_state::ti81)
+void ti85_state::ti81(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 2000000)        /* 2 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(ti81_mem)
-	MCFG_DEVICE_IO_MAP(ti81_io)
+	Z80(config, m_maincpu, 2000000);        /* 2 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &ti85_state::ti81_mem);
+	m_maincpu->set_addrmap(AS_IO, &ti85_state::ti81_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(0)
-	MCFG_SCREEN_SIZE(96, 64)
-	MCFG_SCREEN_VISIBLE_AREA(0, 96-1, 0, 64-1)
-	MCFG_SCREEN_UPDATE_DRIVER(ti85_state, screen_update_ti85)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(0);
+	screen.set_size(96, 64);
+	screen.set_visarea(0, 96-1, 0, 64-1);
+	screen.set_screen_update(FUNC(ti85_state::screen_update_ti85));
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(ti85_state::ti85_palette), 224, 224);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(ti85_state::ti85)
+void ti85_state::ti85(machine_config &config)
+{
 	ti81(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(6000000)        /* 6 MHz */
-	MCFG_DEVICE_IO_MAP(ti85_io)
+	m_maincpu->set_clock(6000000);        /* 6 MHz */
+	m_maincpu->set_addrmap(AS_IO, &ti85_state::ti85_io);
 
 	MCFG_MACHINE_RESET_OVERRIDE(ti85_state, ti85 )
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_SIZE(128, 64)
-	MCFG_SCREEN_VISIBLE_AREA(0, 128-1, 0, 64-1)
+	subdevice<screen_device>("screen")->set_size(128, 64);
+	subdevice<screen_device>("screen")->set_visarea(0, 128-1, 0, 64-1);
 
-	MCFG_DEVICE_ADD("linkport", TI8X_LINK_PORT, default_ti8x_link_devices, nullptr)
-MACHINE_CONFIG_END
+	TI8X_LINK_PORT(config, m_link_port, default_ti8x_link_devices, nullptr);
+}
 
 
 MACHINE_CONFIG_START(ti85_state::ti85d)
 	ti85(config);
-	MCFG_SNAPSHOT_ADD("snapshot", ti85_state, ti8x, "sav", 0)
-	//MCFG_TI85SERIAL_ADD( "tiserial" )
+	MCFG_SNAPSHOT_ADD("snapshot", ti85_state, ti8x, "sav")
+	//TI85SERIAL(config, "tiserial");
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(ti85_state::ti82)
+void ti85_state::ti82(machine_config &config)
+{
 	ti81(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(6000000)        /* 6 MHz */
-	MCFG_DEVICE_IO_MAP(ti82_io)
+	m_maincpu->set_clock(6000000);        /* 6 MHz */
+	m_maincpu->set_addrmap(AS_IO, &ti85_state::ti82_io);
 
 	MCFG_MACHINE_RESET_OVERRIDE(ti85_state, ti85 )
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DEVICE("t6a04", t6a04_device, screen_update)
+	subdevice<screen_device>("screen")->set_screen_update("t6a04", FUNC(t6a04_device::screen_update));
 
 	subdevice<palette_device>("palette")->set_entries(2).set_init(FUNC(ti85_state::ti82_palette));
 
 	T6A04(config, "t6a04", 0).set_size(96, 64);
 
-	MCFG_DEVICE_ADD("linkport", TI8X_LINK_PORT, default_ti8x_link_devices, nullptr)
-MACHINE_CONFIG_END
+	TI8X_LINK_PORT(config, m_link_port, default_ti8x_link_devices, nullptr);
+}
 
-MACHINE_CONFIG_START(ti85_state::ti81v2)
+void ti85_state::ti81v2(machine_config &config)
+{
 	ti82(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(ti81v2_io)
+	m_maincpu->set_addrmap(AS_IO, &ti85_state::ti81v2_io);
 
 	config.device_remove("linkport");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(ti85_state::ti83)
+void ti85_state::ti83(machine_config &config)
+{
 	ti81(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(6000000)        /* 6 MHz */
-	MCFG_DEVICE_IO_MAP(ti83_io)
+	m_maincpu->set_clock(6000000);        /* 6 MHz */
+	m_maincpu->set_addrmap(AS_IO, &ti85_state::ti83_io);
 
 	MCFG_MACHINE_RESET_OVERRIDE(ti85_state, ti85 )
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DEVICE("t6a04", t6a04_device, screen_update)
+	subdevice<screen_device>("screen")->set_screen_update("t6a04", FUNC(t6a04_device::screen_update));
 
 	subdevice<palette_device>("palette")->set_entries(2).set_init(FUNC(ti85_state::ti82_palette));
 
 	T6A04(config, "t6a04", 0).set_size(96, 64);
-MACHINE_CONFIG_END
+}
 
 MACHINE_CONFIG_START(ti85_state::ti86)
 	ti85(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(ti86_mem)
-	MCFG_DEVICE_IO_MAP(ti86_io)
+	m_maincpu->set_addrmap(AS_PROGRAM, &ti85_state::ti86_mem);
+	m_maincpu->set_addrmap(AS_IO, &ti85_state::ti86_io);
 
 	MCFG_MACHINE_START_OVERRIDE(ti85_state, ti86 )
 	MCFG_MACHINE_RESET_OVERRIDE(ti85_state, ti85 )
 
-	MCFG_SNAPSHOT_ADD("snapshot", ti85_state, ti8x, "sav", 0)
+	MCFG_SNAPSHOT_ADD("snapshot", ti85_state, ti8x, "sav")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(ti85_state::ti83p)
+void ti85_state::ti83p(machine_config &config)
+{
 	ti81(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(6000000)        /* 8 MHz running at 6 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(ti83p_asic_mem)
-	MCFG_DEVICE_IO_MAP(ti83p_io)
+	m_maincpu->set_clock(6000000);        /* 8 MHz running at 6 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &ti85_state::ti83p_asic_mem);
+	m_maincpu->set_addrmap(AS_IO, &ti85_state::ti83p_io);
 
 	MCFG_MACHINE_START_OVERRIDE(ti85_state, ti83p )
 	MCFG_MACHINE_RESET_OVERRIDE(ti85_state, ti83p )
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DEVICE("t6a04", t6a04_device, screen_update)
+	subdevice<screen_device>("screen")->set_screen_update("t6a04", FUNC(t6a04_device::screen_update));
 
 	subdevice<palette_device>("palette")->set_entries(2).set_init(FUNC(ti85_state::ti82_palette));
 
-	ADDRESS_MAP_BANK(config, "membank1").set_map(&ti85_state::ti83p_banked_mem).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
-	ADDRESS_MAP_BANK(config, "membank2").set_map(&ti85_state::ti83p_banked_mem).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
-	ADDRESS_MAP_BANK(config, "membank3").set_map(&ti85_state::ti83p_banked_mem).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
-	ADDRESS_MAP_BANK(config, "membank4").set_map(&ti85_state::ti83p_banked_mem).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
+	ADDRESS_MAP_BANK(config, m_membank[0]).set_map(&ti85_state::ti83p_banked_mem).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
+	ADDRESS_MAP_BANK(config, m_membank[1]).set_map(&ti85_state::ti83p_banked_mem).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
+	ADDRESS_MAP_BANK(config, m_membank[2]).set_map(&ti85_state::ti83p_banked_mem).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
+	ADDRESS_MAP_BANK(config, m_membank[3]).set_map(&ti85_state::ti83p_banked_mem).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
 
 	T6A04(config, "t6a04", 0).set_size(96, 64);
 
-	MCFG_DEVICE_ADD("linkport", TI8X_LINK_PORT, default_ti8x_link_devices, nullptr)
+	TI8X_LINK_PORT(config, m_link_port, default_ti8x_link_devices, nullptr);
 
-	AMD_29F400T(config, "flash");
-MACHINE_CONFIG_END
+	AMD_29F400T(config, m_flash);
+}
 
-MACHINE_CONFIG_START(ti85_state::ti83pse)
+void ti85_state::ti83pse(machine_config &config)
+{
 	ti83p(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK( 15000000)
-	MCFG_DEVICE_IO_MAP(ti83pse_io)
+	m_maincpu->set_clock(15000000);
+	m_maincpu->set_addrmap(AS_IO, &ti85_state::ti83pse_io);
 
-	MCFG_DEVICE_MODIFY("membank1")
-	MCFG_DEVICE_PROGRAM_MAP(ti83pse_banked_mem)
+	m_membank[0]->set_map(&ti85_state::ti83pse_banked_mem);
 
-	MCFG_DEVICE_MODIFY("membank2")
-	MCFG_DEVICE_PROGRAM_MAP(ti83pse_banked_mem)
+	m_membank[1]->set_map(&ti85_state::ti83pse_banked_mem);
 
-	MCFG_DEVICE_MODIFY("membank3")
-	MCFG_DEVICE_PROGRAM_MAP(ti83pse_banked_mem)
+	m_membank[2]->set_map(&ti85_state::ti83pse_banked_mem);
 
-	MCFG_DEVICE_MODIFY("membank4")
-	MCFG_DEVICE_PROGRAM_MAP(ti83pse_banked_mem)
+	m_membank[3]->set_map(&ti85_state::ti83pse_banked_mem);
 
 	MCFG_MACHINE_START_OVERRIDE(ti85_state, ti83pse )
-	MCFG_DEVICE_REPLACE("flash", FUJITSU_29F160T, 0)
-MACHINE_CONFIG_END
+	FUJITSU_29F160T(config.replace(), m_flash, 0);
+}
 
-MACHINE_CONFIG_START(ti85_state::ti84p)
+void ti85_state::ti84p(machine_config &config)
+{
 	ti83pse(config);
-	MCFG_DEVICE_MODIFY("membank1")
-	MCFG_DEVICE_PROGRAM_MAP(ti84p_banked_mem)
+	m_membank[0]->set_map(&ti85_state::ti84p_banked_mem);
 
-	MCFG_DEVICE_MODIFY("membank2")
-	MCFG_DEVICE_PROGRAM_MAP(ti84p_banked_mem)
+	m_membank[1]->set_map(&ti85_state::ti84p_banked_mem);
 
-	MCFG_DEVICE_MODIFY("membank3")
-	MCFG_DEVICE_PROGRAM_MAP(ti84p_banked_mem)
+	m_membank[2]->set_map(&ti85_state::ti84p_banked_mem);
 
-	MCFG_DEVICE_MODIFY("membank4")
-	MCFG_DEVICE_PROGRAM_MAP(ti84p_banked_mem)
+	m_membank[3]->set_map(&ti85_state::ti84p_banked_mem);
 
 	MCFG_MACHINE_START_OVERRIDE(ti85_state, ti84p )
-	MCFG_DEVICE_REPLACE("flash", AMD_29F800T , 0)
-MACHINE_CONFIG_END
+	AMD_29F800T(config.replace(), m_flash, 0);
+}
 
-MACHINE_CONFIG_START(ti85_state::ti84pse)
+void ti85_state::ti84pse(machine_config &config)
+{
 	ti83pse(config);
 	MCFG_MACHINE_START_OVERRIDE(ti85_state, ti84pse )
-MACHINE_CONFIG_END
+}
 
 void ti85_state::ti73(machine_config &config)
 {
@@ -1089,7 +1079,13 @@ ROM_START (ti84pcse)
 	ROMX_LOAD( "ti84pcsev40.bin", 0x00000, 0x400000, CRC(e0b8ec78) SHA1(a4ffdfa0d2a8fc1b1356429675efc96b4f25fbc5), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "v42", "V 4.2" )
 	ROMX_LOAD( "ti84pcsev42.bin", 0x00000, 0x400000, CRC(57d5373d) SHA1(06acbd22c9cb31320e022791ac03ba695f058654), ROM_BIOS(1) )
+ROM_END
 
+ROM_START (ti84pcsev2)
+	ROM_REGION (0x400000, "flash",0)
+	ROM_DEFAULT_BIOS("v42")
+	ROM_SYSTEM_BIOS( 0, "v42", "V 4.2" )
+	ROMX_LOAD( "ti84pcsev42.bin", 0x00000, 0x400000, CRC(4b6c2342) SHA1(e2a9d0124f852af79643438c994f13abc47e07af), ROM_BIOS(0) )
 ROM_END
 
 ROM_START (ti84pce)
@@ -1109,47 +1105,77 @@ ROM_START (ti84pce)
 	ROMX_LOAD( "ti84pcev522.bin", 0x00000, 0x400000, CRC(49ce1768) SHA1(f949c8f2832edd33a1b0dd4da0ab4c1f23e47b21), ROM_BIOS(5) )
 	ROM_SYSTEM_BIOS( 6, "v530", "V 5.30" )
 	ROMX_LOAD( "ti84pcev530.bin", 0x00000, 0x400000, CRC(c72f36b8) SHA1(6856fb2a9d0a2e338a89b91bb7680180a69482d3), ROM_BIOS(6) )
+	ROM_SYSTEM_BIOS( 7, "v531", "V 5.31" )
+	ROMX_LOAD( "ti84pcev531.bin", 0x00000, 0x400000, CRC(6d269f68) SHA1(9f9321a0cff17c331c92be127ec67ef67317968b), ROM_BIOS(7) )
+ROM_END
+
+ROM_START (ti83pcev15)
+	ROM_REGION (0x400000, "flash",0)
+	ROM_DEFAULT_BIOS("v530") // 5.30 is the default because 5.31 disables some features
+	ROM_SYSTEM_BIOS( 0, "v515", "V 5.15" )
+	ROMX_LOAD( "ti83pcev15v515.bin", 0x00000, 0x400000, CRC(f924d8e6) SHA1(ffb100c0d0478c414e7ba4dd9d73791d026b40ca), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 1, "v520", "V 5.20" )
+	ROMX_LOAD( "ti83pcev15v520.bin", 0x00000, 0x400000, CRC(a403db1a) SHA1(a565d96e75bed354483c6904b9ee2b8054adc31e), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 2, "v521", "V 5.21" )
+	ROMX_LOAD( "ti83pcev15v521.bin", 0x00000, 0x400000, CRC(1dc2e3e3) SHA1(d8e44e1a8a6591b289766a881a81d33eca9a0ecc), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS( 3, "v522", "V 5.22" )
+	ROMX_LOAD( "ti83pcev15v522.bin", 0x00000, 0x400000, CRC(6971746d) SHA1(321c7aeda6af8b42742d080e802979188421e06a), ROM_BIOS(3) )
+	ROM_SYSTEM_BIOS( 4, "v530", "V 5.30" )
+	ROMX_LOAD( "ti83pcev15v530.bin", 0x00000, 0x400000, CRC(08ae7388) SHA1(6d9d98d090ac1b250d1f8ba8ef7c26eb448e7f8c), ROM_BIOS(4) )
+	ROM_SYSTEM_BIOS( 5, "v531", "V 5.31" )
+	ROMX_LOAD( "ti83pcev15v531.bin", 0x00000, 0x400000, CRC(6643adb3) SHA1(b380e15946c1749a56600d18fee7d9d3c658dee3), ROM_BIOS(5) )
 ROM_END
 
 ROM_START (ti84pcev15)
 	ROM_REGION (0x400000, "flash",0)
-	ROM_DEFAULT_BIOS("v530")
-	ROM_SYSTEM_BIOS( 0, "v530", "V 5.30" )
-	ROMX_LOAD( "ti84pcev15v530.bin", 0x00000, 0x400000, CRC(0148cc26) SHA1(72a10379bbd9d427c6e73afa9fe316cbd502f53c), ROM_BIOS(0) )
+	ROM_DEFAULT_BIOS("v530") // 5.30 is the default because 5.31 disables some features
+	ROM_SYSTEM_BIOS( 0, "v515", "V 5.15" )
+	ROMX_LOAD( "ti84pcev15v515.bin", 0x00000, 0x400000, CRC(0318a913) SHA1(44256e23708c71b8f63660d3100e767d597c377f), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 1, "v520", "V 5.20" )
+	ROMX_LOAD( "ti84pcev15v520.bin", 0x00000, 0x400000, CRC(c2029323) SHA1(827c1e7ead58f4eabe5b7b942d0f24abd46f1633), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 2, "v521", "V 5.21" )
+	ROMX_LOAD( "ti84pcev15v521.bin", 0x00000, 0x400000, CRC(880eefc9) SHA1(3449363553c093b6bb555306d91a4dd6dac8e891), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS( 3, "v522", "V 5.22" )
+	ROMX_LOAD( "ti84pcev15v522.bin", 0x00000, 0x400000, CRC(b95fefd9) SHA1(db1515b3bd4eebeb5ee3c29597991fc7f1e8b84e), ROM_BIOS(3) )
+	ROM_SYSTEM_BIOS( 4, "v530", "V 5.30" )
+	ROMX_LOAD( "ti84pcev15v530.bin", 0x00000, 0x400000, CRC(0148cc26) SHA1(72a10379bbd9d427c6e73afa9fe316cbd502f53c), ROM_BIOS(4) )
+	ROM_SYSTEM_BIOS( 5, "v531", "V 5.31" )
+	ROMX_LOAD( "ti84pcev15v531.bin", 0x00000, 0x400000, CRC(86511ea0) SHA1(ff14ec454fd1e0a2c436b4eed1eefca0d16aabfb), ROM_BIOS(5) )
 ROM_END
 
 ROM_START (ti84pcev30)
 	ROM_REGION (0x400000, "flash",0)
-	ROM_DEFAULT_BIOS("v530")
+	ROM_DEFAULT_BIOS("v530") // 5.30 is the default because 5.31 disables some features
 	ROM_SYSTEM_BIOS( 0, "v530", "V 5.30" )
 	ROMX_LOAD( "ti84pcev30v530.bin", 0x00000, 0x400000, CRC(cc7a7047) SHA1(0d348e60dc57276b1f8d5ff87935e47cdd27455c), ROM_BIOS(0) )
 ROM_END
 
 //    YEAR  NAME        PARENT   COMPAT  MACHINE  INPUT  STATE       INIT        COMPANY              FULLNAME                                           FLAGS
+COMP( 201?, ti84pob,    ti84p,   0,      ti84p,   ti82,  ti85_state, empty_init, "Texas Instruments", "Orion TI-84 Plus (bootleg)",                      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 201?, ti84pov2,   ti84p,   0,      ti84p,   ti82,  ti85_state, empty_init, "Texas Instruments", "Orion TI-84 Plus (Boot Code 1.02)",               MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 201?, ti84pov3,   ti84p,   0,      ti84p,   ti82,  ti85_state, empty_init, "Texas Instruments", "Orion TI-84 Plus (Boot Code 1.03)",               MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 COMP( 1998, ti73,       0,       0,      ti73,    ti82,  ti85_state, empty_init, "Texas Instruments", "TI-73 Explorer",                                  MACHINE_NO_SOUND_HW )
+COMP( 20??, ti73b,      ti73,    0,      ti73,    ti82,  ti85_state, empty_init, "Texas Instruments", "TI-73 Explorer (bootleg)",                        MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
 COMP( 1990, ti81,       0,       0,      ti81,    ti81,  ti85_state, empty_init, "Texas Instruments", "TI-81",                                           MACHINE_NO_SOUND_HW )
 COMP( 1994, ti81v2,     ti81,    0,      ti81v2,  ti81,  ti85_state, empty_init, "Texas Instruments", "TI-81 v2.0",                                      MACHINE_NO_SOUND_HW )
 COMP( 1993, ti82,       0,       0,      ti82,    ti82,  ti85_state, empty_init, "Texas Instruments", "TI-82",                                           MACHINE_NO_SOUND_HW )
 COMP( 1996, ti83,       0,       0,      ti83,    ti83,  ti85_state, empty_init, "Texas Instruments", "TI-83",                                           MACHINE_NO_SOUND_HW )
-COMP( 1992, ti85,       0,       0,      ti85d,   ti85,  ti85_state, empty_init, "Texas Instruments", "TI-85",                                           MACHINE_NO_SOUND_HW )
-COMP( 1997, ti86,       0,       0,      ti86,    ti85,  ti85_state, empty_init, "Texas Instruments", "TI-86",                                           MACHINE_NO_SOUND_HW )
-COMP( 20??, ti73b,      ti73,    0,      ti73,    ti82,  ti85_state, empty_init, "Texas Instruments", "TI-73 Explorer (bootleg)",                        MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
 COMP( 1999, ti83p,      0,       0,      ti83p,   ti82,  ti85_state, empty_init, "Texas Instruments", "TI-83 Plus (Boot Code 1.00)",                     MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
 COMP( 20??, ti83pb,     ti83p,   0,      ti83p,   ti82,  ti85_state, empty_init, "Texas Instruments", "TI-83 Plus (bootleg)",                            MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
 COMP( 2001, ti83pse,    0,       0,      ti83pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-83 Plus Silver Edition (Boot Code 1.00)",      MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
 COMP( 20??, ti83pseb,   ti83pse, 0,      ti83pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-83 Plus Silver Edition (bootleg)",             MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+COMP( 201?, ti83pcev15, ti84pse, 0,      ti84pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-83 Premium CE (Boot Code 5.1.5.0014)",         MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
 COMP( 2004, ti84p,      0,       0,      ti84p,   ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus (Boot Code 1.00)",                     MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-COMP( 20??, ti84pb,     ti84p,   0,      ti84p,   ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus (bootleg)",                            MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-COMP( 2015, ti84pce,    ti84pse, 0,      ti84pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus Color Edition (Boot Code 5.0.0.0089)", MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-COMP( 2016, ti84pcev15, ti84pse, 0,      ti84pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus Color Edition (Boot Code 5.1.5.0014)", MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-COMP( 2017, ti84pcev30, ti84pse, 0,      ti84pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus Color Edition (Boot Code 5.3.0.0037)", MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-COMP( 20??, ti84pcse,   ti84pse, 0,      ti84pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus Color Silver Edition (Boot Code 4.0)", MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-COMP( 201?, ti84pob,    ti84p,   0,      ti84p,   ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus Orion (bootleg)",                      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-COMP( 201?, ti84pov2,   ti84p,   0,      ti84p,   ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus Orion (Boot Code 1.02)",               MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-COMP( 201?, ti84pov3,   ti84p,   0,      ti84p,   ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus Orion (Boot Code 1.03)",               MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 COMP( 200?, ti84pv2,    ti84p,   0,      ti84p,   ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus (Boot Code 1.02)",                     MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
 COMP( 2011, ti84pv3,    ti84p,   0,      ti84p,   ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus (Boot Code 1.03)",                     MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+COMP( 20??, ti84pb,     ti84p,   0,      ti84p,   ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus (bootleg)",                            MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+COMP( 20??, ti84pcse,   ti84pse, 0,      ti84pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus C Silver Edition (Boot Code 4.0)",     MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+COMP( 20??, ti84pcsev2, ti84pse, 0,      ti84pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus C Silver Edition (Boot Code 4.2)",     MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+COMP( 2015, ti84pce,    ti84pse, 0,      ti84pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus CE (Boot Code 5.0.0.0089)",            MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+COMP( 2016, ti84pcev15, ti84pse, 0,      ti84pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus CE (Boot Code 5.1.5.0014)",            MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+COMP( 2017, ti84pcev30, ti84pse, 0,      ti84pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus CE (Boot Code 5.3.0.0037)",            MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
 COMP( 2004, ti84pse,    0,       0,      ti84pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus Silver Edition (Boot Code 1.00)",      MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-COMP( 20??, ti84pseb,   ti84pse, 0,      ti84pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus Silver Edition (bootleg)",             MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
 COMP( 2011, ti84psev3,  ti84pse, 0,      ti84pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus Silver Edition (Boot Code 1.03)",      MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-
+COMP( 20??, ti84pseb,   ti84pse, 0,      ti84pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus Silver Edition (bootleg)",             MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+COMP( 1992, ti85,       0,       0,      ti85d,   ti85,  ti85_state, empty_init, "Texas Instruments", "TI-85",                                           MACHINE_NO_SOUND_HW )
+COMP( 1997, ti86,       0,       0,      ti86,    ti85,  ti85_state, empty_init, "Texas Instruments", "TI-86",                                           MACHINE_NO_SOUND_HW )

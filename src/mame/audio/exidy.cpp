@@ -750,9 +750,10 @@ void venture_sound_device::venture_audio_map(address_map &map)
 }
 
 
-MACHINE_CONFIG_START(venture_sound_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("audiocpu", M6502, 3579545/4)
-	MCFG_DEVICE_PROGRAM_MAP(venture_audio_map)
+void venture_sound_device::device_add_mconfig(machine_config &config)
+{
+	m6502_device &audiocpu(M6502(config, "audiocpu", 3579545/4));
+	audiocpu.set_addrmap(AS_PROGRAM, &venture_sound_device::venture_audio_map);
 
 	RIOT6532(config, m_riot, SH6532_CLOCK);
 	m_riot->in_pa_callback().set(FUNC(venture_sound_device::r6532_porta_r));
@@ -772,9 +773,8 @@ MACHINE_CONFIG_START(venture_sound_device::device_add_mconfig)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_MODIFY(DEVICE_SELF)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	this->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
 
@@ -833,17 +833,17 @@ void mtrap_sound_device::cvsd_iomap(address_map &map)
 }
 
 
-MACHINE_CONFIG_START(mtrap_sound_device::device_add_mconfig)
+void mtrap_sound_device::device_add_mconfig(machine_config &config)
+{
 	venture_sound_device::device_add_mconfig(config);
 
-	MCFG_DEVICE_ADD("cvsdcpu", Z80, CVSD_Z80_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(cvsd_map)
-	MCFG_DEVICE_IO_MAP(cvsd_iomap)
+	Z80(config, m_cvsdcpu, CVSD_Z80_CLOCK);
+	m_cvsdcpu->set_addrmap(AS_PROGRAM, &mtrap_sound_device::cvsd_map);
+	m_cvsdcpu->set_addrmap(AS_IO, &mtrap_sound_device::cvsd_iomap);
 
 	/* audio hardware */
-	MCFG_DEVICE_ADD("cvsd", MC3417, CVSD_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_CONFIG_END
+	MC3417(config, m_cvsd, CVSD_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.80);
+}
 
 
 /*************************************
@@ -980,9 +980,10 @@ void victory_sound_device::victory_audio_map(address_map &map)
 }
 
 
-MACHINE_CONFIG_START(victory_sound_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("audiocpu", M6502, VICTORY_AUDIO_CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(victory_audio_map)
+void victory_sound_device::device_add_mconfig(machine_config &config)
+{
+	m6502_device &audiocpu(M6502(config, "audiocpu", VICTORY_AUDIO_CPU_CLOCK));
+	audiocpu.set_addrmap(AS_PROGRAM, &victory_sound_device::victory_audio_map);
 
 	RIOT6532(config, m_riot, SH6532_CLOCK);
 	m_riot->in_pa_callback().set(FUNC(victory_sound_device::r6532_porta_r));
@@ -1000,9 +1001,7 @@ MACHINE_CONFIG_START(victory_sound_device::device_add_mconfig)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_MODIFY(DEVICE_SELF)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	this->add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("tms", TMS5220, 640000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	TMS5220(config, m_tms, 640000).add_route(ALL_OUTPUTS, "mono", 1.0);
+}

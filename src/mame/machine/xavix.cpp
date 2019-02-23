@@ -587,6 +587,21 @@ void xavix_i2c_state::write_io1(uint8_t data, uint8_t direction)
 	}
 }
 
+// ltv_tam
+void xavix_i2c_ltv_tam_state::write_io1(uint8_t data, uint8_t direction)
+{
+	if (direction & 0x08)
+	{
+		m_i2cmem->write_sda((data & 0x08) >> 3);
+	}
+
+	if (direction & 0x04)
+	{
+		m_i2cmem->write_scl((data & 0x04) >> 2);
+	}
+}
+
+
 // for taikodp
 void xavix_i2c_cart_state::write_io1(uint8_t data, uint8_t direction)
 {
@@ -646,6 +661,25 @@ WRITE8_MEMBER(xavix_i2c_jmat_state::write_extended_io1)
 WRITE8_MEMBER(xavix_i2c_jmat_state::write_extended_io2)
 {
 	LOG("%s: io2_data_w %02x\n", machine().describe_context(), data);
+}
+
+// the cart pins Popira 2 uses for IO with cart gc0010 are not controllable by the CPU on other ekara systems
+
+CUSTOM_INPUT_MEMBER(xavix_popira2_cart_state::i2c_r)
+{
+	if (m_cartslot->has_cart())
+		return m_cartslot->read_sda();
+	else 
+		return 0x0;
+}
+
+void xavix_popira2_cart_state::write_io1(uint8_t data, uint8_t direction)
+{
+	if (m_cartslot->has_cart())
+	{
+		m_cartslot->write_sda((data & 0x08) >> 3);
+		m_cartslot->write_scl((data & 0x10) >> 4);
+	}
 }
 
 
@@ -1144,7 +1178,7 @@ void xavix_state::machine_reset()
 
 	m_sound_irqstatus = 0x00;
 
-	m_sound_regbase = 0x00;
+	m_sound_regbase = 0x02; // rad_bb doesn't initialize this and expects it here.  It is possible the default is 0x00, but since 0x00 and 0x01 are special (zero page and stack) those values would also use bank 0x02
 
 	m_adc_control = 0x00;
 

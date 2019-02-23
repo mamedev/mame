@@ -662,7 +662,7 @@ MACHINE_CONFIG_START(fp1100_state::fp1100)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", h46505_device, screen_update)
 	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fp1100)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_fp1100);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

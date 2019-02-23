@@ -13,18 +13,6 @@
 #include "machine/68230pit.h"
 #include "machine/terminal.h"
 
-#define VERBOSE_DBG 1       /* general debug messages */
-
-#define DBG_LOG(N,M,A) \
-	do { \
-		if(VERBOSE_DBG>=N) \
-		{ \
-			if( M ) \
-				logerror("%11.6f at %s: %-24s",machine().time().as_double(),machine().describe_context(),(char*)M ); \
-			logerror A; \
-		} \
-	} while (0)
-
 
 class besta_state : public driver_device
 {
@@ -62,11 +50,6 @@ READ8_MEMBER( besta_state::mpcc_reg_r )
 {
 	uint8_t ret;
 
-	if (!(offset == 0 && !m_mpcc_regs[0])) {
-	DBG_LOG(1,"mpcc_reg_r",("(%d) = %02X at %s\n", offset,
-		(offset > 31 ? -1 : m_mpcc_regs[offset]), machine().describe_context()));
-	}
-
 	switch (offset) {
 		case 0: /* r_stat aka ... */
 			return (m_term_data) ? 0x80 : 0;
@@ -81,8 +64,6 @@ READ8_MEMBER( besta_state::mpcc_reg_r )
 
 WRITE8_MEMBER( besta_state::mpcc_reg_w )
 {
-	DBG_LOG(1,"mpcc_reg_w",("(%d) <- %02X at %s\n", offset, data, machine().describe_context()));
-
 	switch (offset) {
 		case 2:
 			kbd_put(data);

@@ -41,6 +41,7 @@
 #define LOG_CACHE     (1U << 2)
 #define LOG_EXCEPTION (1U << 3)
 #define LOG_SYSCALL   (1U << 4)
+#define LOG_STATS     (1U << 5)
 
 #define VERBOSE       (LOG_GENERAL)
 
@@ -78,14 +79,14 @@
 #define ODD_REGS 0x00010840U
 
 // address computation
-#define ADDR(r, o) (m_64 ? (r + s16(o)) : s64(s32(u32(r) + s16(o))))
+#define ADDR(r, o) (cp0_64() ? ((r) + (o)) : s64(s32((r) + (o))))
 
 #define SR         m_cp0[CP0_Status]
 #define CAUSE      m_cp0[CP0_Cause]
 
 DEFINE_DEVICE_TYPE(R4000, r4000_device, "r4000", "MIPS R4000")
-DEFINE_DEVICE_TYPE(R4400, r4400_device, "r4400", "MIPS R4000")
-DEFINE_DEVICE_TYPE(R4600, r4600_device, "r4600", "QED R4000")
+DEFINE_DEVICE_TYPE(R4400, r4400_device, "r4400", "MIPS R4400")
+DEFINE_DEVICE_TYPE(R4600, r4600_device, "r4600", "QED R4600")
 
 r4000_base_device::r4000_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 prid, cache_size_t icache_size, cache_size_t dcache_size)
 	: cpu_device(mconfig, type, tag, owner, clock)
@@ -171,6 +172,7 @@ void r4000_base_device::device_start()
 	state_add(MIPS3_LO,        "LO",       m_lo).formatstr("%016X");
 
 	// floating point registers
+	state_add(MIPS3_FCR30,     "FCR30",    m_fcr30).formatstr("%08X");
 	state_add(MIPS3_FCR31,     "FCR31",    m_fcr31).formatstr("%08X");
 	for (unsigned i = 0; i < 32; i++)
 		state_add(MIPS3_F0 + i, util::string_format("F%d", i).c_str(), m_f[i]);
@@ -198,7 +200,6 @@ void r4000_base_device::device_reset()
 	m_cp0[CP0_Count] = 0;
 
 	m_cp0_timer_zero = total_cycles();
-	m_64 = false;
 
 	if (m_ll_watch)
 	{
@@ -209,15 +210,29 @@ void r4000_base_device::device_reset()
 	m_cp0[CP0_WatchLo] = 0;
 	m_cp0[CP0_WatchHi] = 0;
 
-	m_icache_hit = 0;
-	m_icache_miss = 0;
+	// initialize tlb mru index with identity mapping
+	for (unsigned i = 0; i < ARRAY_LENGTH(m_tlb); i++)
+	{
+		m_tlb_mru[TRANSLATE_READ][i] = i;
+		m_tlb_mru[TRANSLATE_WRITE][i] = i;
+		m_tlb_mru[TRANSLATE_FETCH][i] = i;
+	}
+
+	// initialize statistics
+	m_tlb_scans = 0;
+	m_tlb_loops = 0;
+	m_icache_hits = 0;
+	m_icache_misses = 0;
 }
 
 void r4000_base_device::device_stop()
 {
-	if (ICACHE)
-		LOGMASKED(LOG_CACHE, "icache hit ratio %.3f%% (%d hits %d misses)\n",
-			double(m_icache_hit) / double(m_icache_hit + m_icache_miss) * 100.0, m_icache_hit, m_icache_miss);
+	if ((m_icache_hits + m_icache_misses) > 0)
+		LOGMASKED(LOG_STATS, "icache hit ratio %.3f%% (%d hits %d misses)\n",
+			double(m_icache_hits) / double(m_icache_hits + m_icache_misses) * 100.0, m_icache_hits, m_icache_misses);
+
+	if (m_tlb_scans > 0)
+		LOGMASKED(LOG_STATS, "tlb scans %d loops %d average %.3f loops per scan\n", m_tlb_scans, m_tlb_loops, double(m_tlb_loops) / double(m_tlb_scans));
 }
 
 device_memory_interface::space_config_vector r4000_base_device::memory_space_config() const
@@ -316,7 +331,7 @@ void r4000_base_device::cpu_execute(u32 const op)
 			break;
 		//case 0x01: // *
 		case 0x02: // SRL
-			m_r[RDREG] = u32(m_r[RTREG]) >> SHIFT;
+			m_r[RDREG] = s64(s32(u32(m_r[RTREG]) >> SHIFT));
 			break;
 		case 0x03: // SRA
 			m_r[RDREG] = s64(s32(m_r[RTREG]) >> SHIFT);
@@ -326,7 +341,7 @@ void r4000_base_device::cpu_execute(u32 const op)
 			break;
 		//case 0x05: // *
 		case 0x06: // SRLV
-			m_r[RDREG] = u32(m_r[RTREG]) >> (m_r[RSREG] & 31);
+			m_r[RDREG] = s64(s32(u32(m_r[RTREG]) >> (m_r[RSREG] & 31)));
 			break;
 		case 0x07: // SRAV
 			m_r[RDREG] = s64(s32(m_r[RTREG]) >> (m_r[RSREG] & 31));
@@ -465,54 +480,18 @@ void r4000_base_device::cpu_execute(u32 const op)
 		case 0x1b: // DIVU
 			if (m_r[RTREG])
 			{
-				m_lo = s64(u32(m_r[RSREG]) / u32(m_r[RTREG]));
-				m_hi = s64(u32(m_r[RSREG]) % u32(m_r[RTREG]));
+				m_lo = s64(s32(u32(m_r[RSREG]) / u32(m_r[RTREG])));
+				m_hi = s64(s32(u32(m_r[RSREG]) % u32(m_r[RTREG])));
 			}
 			m_icount -= 35;
 			break;
 		case 0x1c: // DMULT
-			{
-				u64 const a_hi = u32(m_r[RSREG] >> 32);
-				u64 const b_hi = u32(m_r[RTREG] >> 32);
-				u64 const a_lo = u32(m_r[RSREG]);
-				u64 const b_lo = u32(m_r[RTREG]);
-
-				u64 const p1 = a_lo * b_lo;
-				u64 const p2 = a_hi * b_lo;
-				u64 const p3 = a_lo * b_hi;
-				u64 const p4 = a_hi * b_hi;
-				u64 const carry = u32(((p1 >> 32) + u32(p2) + u32(p3)) >> 32);
-
-				m_lo = p1 + (p2 << 32) + (p3 << 32);
-				m_hi = p4 + (p2 >> 32) + (p3 >> 32) + carry;
-
-				// adjust for sign
-				if (m_r[RSREG] < 0)
-					m_hi -= m_r[RTREG];
-				if (m_r[RTREG] < 0)
-					m_hi -= m_r[RSREG];
-
-				m_icount -= 7;
-			}
+			m_lo = mul_64x64(m_r[RSREG], m_r[RTREG], reinterpret_cast<s64 *>(&m_hi));
+			m_icount -= 7;
 			break;
 		case 0x1d: // DMULTU
-			{
-				u64 const a_hi = u32(m_r[RSREG] >> 32);
-				u64 const b_hi = u32(m_r[RTREG] >> 32);
-				u64 const a_lo = u32(m_r[RSREG]);
-				u64 const b_lo = u32(m_r[RTREG]);
-
-				u64 const p1 = a_lo * b_lo;
-				u64 const p2 = a_hi * b_lo;
-				u64 const p3 = a_lo * b_hi;
-				u64 const p4 = a_hi * b_hi;
-				u64 const carry = u32(((p1 >> 32) + u32(p2) + u32(p3)) >> 32);
-
-				m_lo = p1 + (p2 << 32) + (p3 << 32);
-				m_hi = p4 + (p2 >> 32) + (p3 >> 32) + carry;
-
-				m_icount -= 7;
-			}
+			m_lo = mulu_64x64(m_r[RSREG], m_r[RTREG], &m_hi);
+			m_icount -= 7;
 			break;
 		case 0x1e: // DDIV
 			if (m_r[RTREG])
@@ -668,21 +647,21 @@ void r4000_base_device::cpu_execute(u32 const op)
 			if (s64(m_r[RSREG]) < 0)
 			{
 				m_branch_state = BRANCH;
-				m_branch_target = ADDR(m_pc, (s16(op) << 2) + 4);
+				m_branch_target = ADDR(m_pc + 4, s32(s16(op)) << 2);
 			}
 			break;
 		case 0x01: // BGEZ
 			if (s64(m_r[RSREG]) >= 0)
 			{
 				m_branch_state = BRANCH;
-				m_branch_target = ADDR(m_pc, (s16(op) << 2) + 4);
+				m_branch_target = ADDR(m_pc + 4, s32(s16(op)) << 2);
 			}
 			break;
 		case 0x02: // BLTZL
 			if (s64(m_r[RSREG]) < 0)
 			{
 				m_branch_state = BRANCH;
-				m_branch_target = ADDR(m_pc, (s16(op) << 2) + 4);
+				m_branch_target = ADDR(m_pc + 4, s32(s16(op)) << 2);
 			}
 			else
 				m_branch_state = NULLIFY;
@@ -691,7 +670,7 @@ void r4000_base_device::cpu_execute(u32 const op)
 			if (s64(m_r[RSREG]) >= 0)
 			{
 				m_branch_state = BRANCH;
-				m_branch_target = ADDR(m_pc, (s16(op) << 2) + 4);
+				m_branch_target = ADDR(m_pc + 4, s32(s16(op)) << 2);
 			}
 			else
 				m_branch_state = NULLIFY;
@@ -705,7 +684,7 @@ void r4000_base_device::cpu_execute(u32 const op)
 				cpu_exception(EXCEPTION_TR);
 			break;
 		case 0x09: // TGEIU
-			if (m_r[RSREG] >= u16(op))
+			if (m_r[RSREG] >= u64(s64(s16(op))))
 				cpu_exception(EXCEPTION_TR);
 			break;
 		case 0x0a: // TLTI
@@ -713,16 +692,16 @@ void r4000_base_device::cpu_execute(u32 const op)
 				cpu_exception(EXCEPTION_TR);
 			break;
 		case 0x0b: // TLTIU
-			if (m_r[RSREG] >= u16(op))
+			if (m_r[RSREG] >= u64(s64(s16(op))))
 				cpu_exception(EXCEPTION_TR);
 			break;
 		case 0x0c: // TEQI
-			if (m_r[RSREG] == u16(op))
+			if (m_r[RSREG] == u64(s64(s16(op))))
 				cpu_exception(EXCEPTION_TR);
 			break;
 		//case 0x0d: // *
 		case 0x0e: // TNEI
-			if (m_r[RSREG] != u16(op))
+			if (m_r[RSREG] != u64(s64(s16(op))))
 				cpu_exception(EXCEPTION_TR);
 			break;
 		//case 0x0f: // *
@@ -730,7 +709,7 @@ void r4000_base_device::cpu_execute(u32 const op)
 			if (s64(m_r[RSREG]) < 0)
 			{
 				m_branch_state = BRANCH;
-				m_branch_target = ADDR(m_pc, (s16(op) << 2) + 4);
+				m_branch_target = ADDR(m_pc + 4, s32(s16(op)) << 2);
 			}
 			m_r[31] = ADDR(m_pc, 8);
 			break;
@@ -738,7 +717,7 @@ void r4000_base_device::cpu_execute(u32 const op)
 			if (s64(m_r[RSREG]) >= 0)
 			{
 				m_branch_state = BRANCH;
-				m_branch_target = ADDR(m_pc, (s16(op) << 2) + 4);
+				m_branch_target = ADDR(m_pc + 4, s32(s16(op)) << 2);
 			}
 			m_r[31] = ADDR(m_pc, 8);
 			break;
@@ -746,7 +725,7 @@ void r4000_base_device::cpu_execute(u32 const op)
 			if (s64(m_r[RSREG]) < 0)
 			{
 				m_branch_state = BRANCH;
-				m_branch_target = ADDR(m_pc, (s16(op) << 2) + 4);
+				m_branch_target = ADDR(m_pc + 4, s32(s16(op)) << 2);
 			}
 			else
 				m_branch_state = NULLIFY;
@@ -756,7 +735,7 @@ void r4000_base_device::cpu_execute(u32 const op)
 			if (s64(m_r[RSREG]) >= 0)
 			{
 				m_branch_state = BRANCH;
-				m_branch_target = ADDR(m_pc, (s16(op) << 2) + 4);
+				m_branch_target = ADDR(m_pc + 4, s32(s16(op)) << 2);
 			}
 			else
 				m_branch_state = NULLIFY;
@@ -796,28 +775,28 @@ void r4000_base_device::cpu_execute(u32 const op)
 		if (m_r[RSREG] == m_r[RTREG])
 		{
 			m_branch_state = BRANCH;
-			m_branch_target = ADDR(m_pc, (s16(op) << 2) + 4);
+			m_branch_target = ADDR(m_pc + 4, s32(s16(op)) << 2);
 		}
 		break;
 	case 0x05: // BNE
 		if (m_r[RSREG] != m_r[RTREG])
 		{
 			m_branch_state = BRANCH;
-			m_branch_target = ADDR(m_pc, (s16(op) << 2) + 4);
+			m_branch_target = ADDR(m_pc + 4, s32(s16(op)) << 2);
 		}
 		break;
 	case 0x06: // BLEZ
 		if (s64(m_r[RSREG]) <= 0)
 		{
 			m_branch_state = BRANCH;
-			m_branch_target = ADDR(m_pc, (s16(op) << 2) + 4);
+			m_branch_target = ADDR(m_pc + 4, s32(s16(op)) << 2);
 		}
 		break;
 	case 0x07: // BGTZ
 		if (s64(m_r[RSREG]) > 0)
 		{
 			m_branch_state = BRANCH;
-			m_branch_target = ADDR(m_pc, (s16(op) << 2) + 4);
+			m_branch_target = ADDR(m_pc + 4, s32(s16(op)) << 2);
 		}
 		break;
 	case 0x08: // ADDI
@@ -838,7 +817,7 @@ void r4000_base_device::cpu_execute(u32 const op)
 		m_r[RTREG] = s64(m_r[RSREG]) < s64(s16(op));
 		break;
 	case 0x0b: // SLTIU
-		m_r[RTREG] = u64(m_r[RSREG]) < u64(s16(op));
+		m_r[RTREG] = m_r[RSREG] < u64(s64(s16(op)));
 		break;
 	case 0x0c: // ANDI
 		m_r[RTREG] = m_r[RSREG] & u16(op);
@@ -850,7 +829,7 @@ void r4000_base_device::cpu_execute(u32 const op)
 		m_r[RTREG] = m_r[RSREG] ^ u16(op);
 		break;
 	case 0x0f: // LUI
-		m_r[RTREG] = s64(s32(u16(op) << 16));
+		m_r[RTREG] = s64(s16(op)) << 16;
 		break;
 	case 0x10: // COP0
 		cp0_execute(op);
@@ -866,7 +845,7 @@ void r4000_base_device::cpu_execute(u32 const op)
 		if (m_r[RSREG] == m_r[RTREG])
 		{
 			m_branch_state = BRANCH;
-			m_branch_target = ADDR(m_pc, (s16(op) << 2) + 4);
+			m_branch_target = ADDR(m_pc + 4, s32(s16(op)) << 2);
 		}
 		else
 			m_branch_state = NULLIFY;
@@ -875,7 +854,7 @@ void r4000_base_device::cpu_execute(u32 const op)
 		if (m_r[RSREG] != m_r[RTREG])
 		{
 			m_branch_state = BRANCH;
-			m_branch_target = ADDR(m_pc, (s16(op) << 2) + 4);
+			m_branch_target = ADDR(m_pc + 4, s32(s16(op)) << 2);
 		}
 		else
 			m_branch_state = NULLIFY;
@@ -884,7 +863,7 @@ void r4000_base_device::cpu_execute(u32 const op)
 		if (s64(m_r[RSREG]) <= 0)
 		{
 			m_branch_state = BRANCH;
-			m_branch_target = ADDR(m_pc, (s16(op) << 2) + 4);
+			m_branch_target = ADDR(m_pc + 4, s32(s16(op)) << 2);
 		}
 		else
 			m_branch_state = NULLIFY;
@@ -893,7 +872,7 @@ void r4000_base_device::cpu_execute(u32 const op)
 		if (s64(m_r[RSREG]) > 0)
 		{
 			m_branch_state = BRANCH;
-			m_branch_target = ADDR(m_pc, (s16(op) << 2) + 4);
+			m_branch_target = ADDR(m_pc + 4, s32(s16(op)) << 2);
 		}
 		else
 			m_branch_state = NULLIFY;
@@ -913,13 +892,13 @@ void r4000_base_device::cpu_execute(u32 const op)
 		m_r[RTREG] = m_r[RSREG] + s64(s16(op));
 		break;
 	case 0x1a: // LDL
-		if (m_64 || !(SR & SR_KSU) || (SR & SR_EXL) || (SR & SR_ERL))
+		if (!(SR & SR_KSU) || (SR & (SR_EXL | SR_ERL)) || cp0_64())
 			cpu_ldl(op);
 		else
 			cpu_exception(EXCEPTION_RI);
 		break;
 	case 0x1b: // LDR
-		if (m_64 || !(SR & SR_KSU) || (SR & SR_EXL) || (SR & SR_ERL))
+		if (!(SR & SR_KSU) || (SR & (SR_EXL | SR_ERL)) || cp0_64())
 			cpu_ldr(op);
 		else
 			cpu_exception(EXCEPTION_RI);
@@ -929,14 +908,14 @@ void r4000_base_device::cpu_execute(u32 const op)
 	//case 0x1e: // *
 	//case 0x1f: // *
 	case 0x20: // LB
-		load<s8>(ADDR(m_r[RSREG], op),
+		load<s8>(ADDR(m_r[RSREG], s16(op)),
 			[this, op](s8 data)
 			{
 				m_r[RTREG] = data;
 			});
 		break;
 	case 0x21: // LH
-		load<s16>(ADDR(m_r[RSREG], op),
+		load<s16>(ADDR(m_r[RSREG], s16(op)),
 			[this, op](s16 data)
 			{
 				m_r[RTREG] = data;
@@ -946,21 +925,21 @@ void r4000_base_device::cpu_execute(u32 const op)
 		cpu_lwl(op);
 		break;
 	case 0x23: // LW
-		load<s32>(ADDR(m_r[RSREG], op),
+		load<s32>(ADDR(m_r[RSREG], s16(op)),
 			[this, op](s32 data)
 			{
 				m_r[RTREG] = data;
 			});
 		break;
 	case 0x24: // LBU
-		load<s8>(ADDR(m_r[RSREG], op),
+		load<s8>(ADDR(m_r[RSREG], s16(op)),
 			[this, op](u8 data)
 			{
 				m_r[RTREG] = data;
 			});
 		break;
 	case 0x25: // LHU
-		load<u16>(ADDR(m_r[RSREG], op),
+		load<u16>(ADDR(m_r[RSREG], s16(op)),
 			[this, op](u16 data)
 			{
 				m_r[RTREG] = data;
@@ -970,32 +949,32 @@ void r4000_base_device::cpu_execute(u32 const op)
 		cpu_lwr(op);
 		break;
 	case 0x27: // LWU
-		load<u32>(ADDR(m_r[RSREG], op),
+		load<u32>(ADDR(m_r[RSREG], s16(op)),
 			[this, op](u32 data)
 			{
 				m_r[RTREG] = data;
 			});
 		break;
 	case 0x28: // SB
-		store<u8>(ADDR(m_r[RSREG], op), u8(m_r[RTREG]));
+		store<u8>(ADDR(m_r[RSREG], s16(op)), u8(m_r[RTREG]));
 		break;
 	case 0x29: // SH
-		store<u16>(ADDR(m_r[RSREG], op), u16(m_r[RTREG]));
+		store<u16>(ADDR(m_r[RSREG], s16(op)), u16(m_r[RTREG]));
 		break;
 	case 0x2a: // SWL
 		cpu_swl(op);
 		break;
 	case 0x2b: // SW
-		store<u32>(ADDR(m_r[RSREG], op), u32(m_r[RTREG]));
+		store<u32>(ADDR(m_r[RSREG], s16(op)), u32(m_r[RTREG]));
 		break;
 	case 0x2c: // SDL
-		if (m_64 || !(SR & SR_KSU) || (SR & SR_EXL) || (SR & SR_ERL))
+		if (!(SR & SR_KSU) || (SR & (SR_EXL | SR_ERL)) || cp0_64())
 			cpu_sdl(op);
 		else
 			cpu_exception(EXCEPTION_RI);
 		break;
 	case 0x2d: // SDR
-		if (m_64 || !(SR & SR_KSU) || (SR & SR_EXL) || (SR & SR_ERL))
+		if (!(SR & SR_KSU) || (SR & (SR_EXL | SR_ERL)) || cp0_64())
 			cpu_sdr(op);
 		else
 			cpu_exception(EXCEPTION_RI);
@@ -1015,14 +994,14 @@ void r4000_base_device::cpu_execute(u32 const op)
 		case 0x00: // index invalidate (I)
 			if (ICACHE)
 			{
-				m_icache_tag[(ADDR(m_r[RSREG], op) & m_icache_mask_hi) >> m_icache_shift] &= ~ICACHE_V;
+				m_icache_tag[(ADDR(m_r[RSREG], s16(op)) & m_icache_mask_hi) >> m_icache_shift] &= ~ICACHE_V;
 				break;
 			}
 
 		case 0x04: // index load tag (I)
 			if (ICACHE)
 			{
-				u32 const tag = m_icache_tag[(ADDR(m_r[RSREG], op) & m_icache_mask_hi) >> m_icache_shift];
+				u32 const tag = m_icache_tag[(ADDR(m_r[RSREG], s16(op)) & m_icache_mask_hi) >> m_icache_shift];
 
 				m_cp0[CP0_TagLo] = ((tag & ICACHE_PTAG) << 8) | ((tag & ICACHE_V) >> 18) | ((tag & ICACHE_P) >> 25);
 				m_cp0[CP0_ECC] = 0; // data ecc or parity
@@ -1034,7 +1013,7 @@ void r4000_base_device::cpu_execute(u32 const op)
 			if (ICACHE)
 			{
 				// FIXME: compute parity
-				m_icache_tag[(ADDR(m_r[RSREG], op) & m_icache_mask_hi) >> m_icache_shift] =
+				m_icache_tag[(ADDR(m_r[RSREG], s16(op)) & m_icache_mask_hi) >> m_icache_shift] =
 					(m_cp0[CP0_TagLo] & TAGLO_PTAGLO) >> 8 | (m_cp0[CP0_TagLo] & TAGLO_PSTATE) << 18;
 
 				break;
@@ -1075,7 +1054,7 @@ void r4000_base_device::cpu_execute(u32 const op)
 		}
 		break;
 	case 0x30: // LL
-		load_linked<s32>(ADDR(m_r[RSREG], op),
+		load_linked<s32>(ADDR(m_r[RSREG], s16(op)),
 			[this, op](u64 address, s32 data)
 			{
 				// remove existing tap
@@ -1106,7 +1085,7 @@ void r4000_base_device::cpu_execute(u32 const op)
 		break;
 	//case 0x33: // *
 	case 0x34: // LLD
-		load_linked<u64>(ADDR(m_r[RSREG], op),
+		load_linked<u64>(ADDR(m_r[RSREG], s16(op)),
 			[this, op](u64 address, u64 data)
 			{
 				// remove existing tap
@@ -1133,7 +1112,7 @@ void r4000_base_device::cpu_execute(u32 const op)
 		cp2_execute(op);
 		break;
 	case 0x37: // LD
-		load<u64>(ADDR(m_r[RSREG], op),
+		load<u64>(ADDR(m_r[RSREG], s16(op)),
 			[this, op](u64 data)
 			{
 				m_r[RTREG] = data;
@@ -1145,7 +1124,7 @@ void r4000_base_device::cpu_execute(u32 const op)
 			m_ll_watch->remove();
 			m_ll_watch = nullptr;
 
-			store<u32>(ADDR(m_r[RSREG], op), u32(m_r[RTREG]));
+			store<u32>(ADDR(m_r[RSREG], s16(op)), u32(m_r[RTREG]));
 			m_r[RTREG] = 1;
 		}
 		else
@@ -1164,7 +1143,7 @@ void r4000_base_device::cpu_execute(u32 const op)
 			m_ll_watch->remove();
 			m_ll_watch = nullptr;
 
-			store<u64>(ADDR(m_r[RSREG], op), m_r[RTREG]);
+			store<u64>(ADDR(m_r[RSREG], s16(op)), m_r[RTREG]);
 			m_r[RTREG] = 1;
 		}
 		else
@@ -1177,7 +1156,7 @@ void r4000_base_device::cpu_execute(u32 const op)
 		cp2_execute(op);
 		break;
 	case 0x3f: // SD
-		store<u64>(ADDR(m_r[RSREG], op), m_r[RTREG]);
+		store<u64>(ADDR(m_r[RSREG], s16(op)), m_r[RTREG]);
 		break;
 
 	default:
@@ -1208,8 +1187,6 @@ void r4000_base_device::cpu_exception(u32 exception, u16 const vector)
 		}
 
 		SR |= SR_EXL;
-
-		m_64 = m_cp0[CP0_Status] & SR_KX;
 	}
 	else
 		CAUSE = (CAUSE & (CAUSE_BD | CAUSE_IP)) | exception;
@@ -1223,8 +1200,7 @@ void r4000_base_device::cpu_exception(u32 exception, u16 const vector)
 
 void r4000_base_device::cpu_lwl(u32 const op)
 {
-	unsigned const reverse = (SR & SR_RE) && ((SR & SR_KSU) == SR_KSU_U) ? 7 : 0;
-	u64 const offset = u64(ADDR(m_r[RSREG], op)) ^ reverse;
+	u64 const offset = ADDR(m_r[RSREG], s16(op));
 	unsigned const shift = ((offset & 3) ^ R4000_ENDIAN_LE_BE(3, 0)) << 3;
 
 	load<u32>(offset & ~3,
@@ -1236,8 +1212,7 @@ void r4000_base_device::cpu_lwl(u32 const op)
 
 void r4000_base_device::cpu_lwr(u32 const op)
 {
-	unsigned const reverse = (SR & SR_RE) && ((SR & SR_KSU) == SR_KSU_U) ? 7 : 0;
-	u64 const offset = u64(ADDR(m_r[RSREG], op)) ^ reverse;
+	u64 const offset = ADDR(m_r[RSREG], s16(op));
 	unsigned const shift = ((offset & 0x3) ^ R4000_ENDIAN_LE_BE(0, 3)) << 3;
 
 	load<u32>(offset & ~3,
@@ -1249,8 +1224,7 @@ void r4000_base_device::cpu_lwr(u32 const op)
 
 void r4000_base_device::cpu_swl(u32 const op)
 {
-	unsigned const reverse = (SR & SR_RE) && ((SR & SR_KSU) == SR_KSU_U) ? 7 : 0;
-	u64 const offset = u64(ADDR(m_r[RSREG], op)) ^ reverse;
+	u64 const offset = ADDR(m_r[RSREG], s16(op));
 	unsigned const shift = ((offset & 3) ^ R4000_ENDIAN_LE_BE(3, 0)) << 3;
 
 	store<u32>(offset & ~3, u32(m_r[RTREG]) >> shift, ~u32(0) >> shift);
@@ -1258,8 +1232,7 @@ void r4000_base_device::cpu_swl(u32 const op)
 
 void r4000_base_device::cpu_swr(u32 const op)
 {
-	unsigned const reverse = (SR & SR_RE) && ((SR & SR_KSU) == SR_KSU_U) ? 7 : 0;
-	u64 const offset = u64(ADDR(m_r[RSREG], op)) ^ reverse;
+	u64 const offset = ADDR(m_r[RSREG], s16(op));
 	unsigned const shift = ((offset & 3) ^ R4000_ENDIAN_LE_BE(0, 3)) << 3;
 
 	store<u32>(offset & ~3, u32(m_r[RTREG]) << shift, ~u32(0) << shift);
@@ -1267,8 +1240,7 @@ void r4000_base_device::cpu_swr(u32 const op)
 
 void r4000_base_device::cpu_ldl(u32 const op)
 {
-	unsigned const reverse = (SR & SR_RE) && ((SR & SR_KSU) == SR_KSU_U) ? 7 : 0;
-	u64 const offset = u64(ADDR(m_r[RSREG], op)) ^ reverse;
+	u64 const offset = ADDR(m_r[RSREG], s16(op));
 	unsigned const shift = ((offset & 7) ^ R4000_ENDIAN_LE_BE(7, 0)) << 3;
 
 	load<u64>(offset & ~7,
@@ -1280,8 +1252,7 @@ void r4000_base_device::cpu_ldl(u32 const op)
 
 void r4000_base_device::cpu_ldr(u32 const op)
 {
-	unsigned const reverse = (SR & SR_RE) && ((SR & SR_KSU) == SR_KSU_U) ? 7 : 0;
-	u64 const offset = u64(ADDR(m_r[RSREG], op)) ^ reverse;
+	u64 const offset = ADDR(m_r[RSREG], s16(op));
 	unsigned const shift = ((offset & 7) ^ R4000_ENDIAN_LE_BE(0, 7)) << 3;
 
 	load<u64>(offset & ~7,
@@ -1293,8 +1264,7 @@ void r4000_base_device::cpu_ldr(u32 const op)
 
 void r4000_base_device::cpu_sdl(u32 const op)
 {
-	unsigned const reverse = (SR & SR_RE) && ((SR & SR_KSU) == SR_KSU_U) ? 7 : 0;
-	u64 const offset = u64(ADDR(m_r[RSREG], op)) ^ reverse;
+	u64 const offset = ADDR(m_r[RSREG], s16(op));
 	unsigned const shift = ((offset & 7) ^ R4000_ENDIAN_LE_BE(7, 0)) << 3;
 
 	store<u64>(offset & ~7, m_r[RTREG] >> shift, ~u64(0) >> shift);
@@ -1302,8 +1272,7 @@ void r4000_base_device::cpu_sdl(u32 const op)
 
 void r4000_base_device::cpu_sdr(u32 const op)
 {
-	unsigned const reverse = (SR & SR_RE) && ((SR & SR_KSU) == SR_KSU_U) ? 7 : 0;
-	u64 const offset = u64(ADDR(m_r[RSREG], op)) ^ reverse;
+	u64 const offset = ADDR(m_r[RSREG], s16(op));
 	unsigned const shift = ((offset & 7) ^ R4000_ENDIAN_LE_BE(0, 7)) << 3;
 
 	store<u64>(offset & ~7, m_r[RTREG] << shift, ~u64(0) << shift);
@@ -1328,7 +1297,7 @@ void r4000_base_device::cp0_execute(u32 const op)
 		// 64-bit non-Kernel (User or Supervisor) mode. These instructions
 		// cause a reserved instruction exception if 64-bit operation is
 		// not enabled in User or Supervisor mode.
-		if (!(SR & SR_KSU) || (SR & (SR_EXL | SR_ERL)) || m_64)
+		if (!(SR & SR_KSU) || (SR & (SR_EXL | SR_ERL)) || cp0_64())
 			m_r[RTREG] = cp0_get(RDREG);
 		else
 			cpu_exception(EXCEPTION_RI);
@@ -1345,7 +1314,7 @@ void r4000_base_device::cp0_execute(u32 const op)
 		// 64-bit non-Kernel (User or Supervisor) mode. These instructions
 		// cause a reserved instruction exception if 64-bit operation is
 		// not enabled in User or Supervisor mode.
-		if (!(SR & SR_KSU) || (SR & (SR_EXL | SR_ERL)) || m_64)
+		if (!(SR & SR_KSU) || (SR & (SR_EXL | SR_ERL)) || cp0_64())
 			cp0_set(RDREG, m_r[RTREG]);
 		else
 			cpu_exception(EXCEPTION_RI);
@@ -1411,7 +1380,6 @@ void r4000_base_device::cp0_execute(u32 const op)
 				m_pc = m_cp0[CP0_EPC];
 				SR &= ~SR_EXL;
 			}
-			cp0_mode_check();
 
 			if (m_ll_watch)
 			{
@@ -1483,9 +1451,6 @@ void r4000_base_device::cp0_set(unsigned const reg, u64 const data)
 
 	case CP0_Status:
 		m_cp0[CP0_Status] = u32(data);
-
-		// reevaluate operating mode
-		cp0_mode_check();
 
 		// FIXME: software interrupt check
 		if (CAUSE & SR & SR_IMSW)
@@ -1589,7 +1554,7 @@ void r4000_base_device::cp0_tlbp()
 	{
 		tlb_entry_t const &entry = m_tlb[index];
 
-		u64 const mask = (m_64 ? EH_R | (EH_VPN2_64 & ~entry.mask) : (EH_VPN2_32 & ~entry.mask))
+		u64 const mask = (cp0_64() ? EH_R | (EH_VPN2_64 & ~entry.mask) : (EH_VPN2_32 & ~entry.mask))
 			| ((entry.vpn & EH_G) ? 0 : EH_ASID);
 
 		if ((entry.vpn & mask) == (m_cp0[CP0_EntryHi] & mask))
@@ -1610,28 +1575,27 @@ void r4000_base_device::cp0_update_timer(bool start)
 	if (start || m_cp0_timer->enabled())
 	{
 		u32 const count = (total_cycles() - m_cp0_timer_zero) / 2;
-		u64 const delta = m_cp0[CP0_Compare] - count;
+		u32 const delta = m_cp0[CP0_Compare] - count;
 
-		m_cp0_timer->adjust(cycles_to_attotime(delta * 2));
+		m_cp0_timer->adjust(cycles_to_attotime(u64(delta) * 2));
 	}
 }
 
 TIMER_CALLBACK_MEMBER(r4000_base_device::cp0_timer_callback)
 {
-	set_input_line(5, ASSERT_LINE);
+	m_cp0[CP0_Cause] |= CAUSE_IPEX5;
 }
 
-void r4000_base_device::cp0_mode_check()
+bool r4000_base_device::cp0_64() const
 {
-	if (!(m_cp0[CP0_Status] & (SR_EXL | SR_ERL)))
-		switch (m_cp0[CP0_Status] & SR_KSU)
-		{
-		case SR_KSU_K: m_64 = m_cp0[CP0_Status] & SR_KX; break;
-		case SR_KSU_S: m_64 = m_cp0[CP0_Status] & SR_SX; break;
-		case SR_KSU_U: m_64 = m_cp0[CP0_Status] & SR_UX; break;
-		}
-	else
-		m_64 = m_cp0[CP0_Status] & SR_KX;
+	switch (SR & (SR_KSU | SR_ERL | SR_EXL))
+	{
+	case SR_KSU_U: return bool(SR & SR_UX);
+	case SR_KSU_S: return bool(SR & SR_SX);
+
+	default:
+		return bool(SR & SR_KX);
+	}
 }
 
 void r4000_base_device::cp1_execute(u32 const op)
@@ -1668,6 +1632,7 @@ void r4000_base_device::cp1_execute(u32 const op)
 			switch (RDREG)
 			{
 			case 0:  m_r[RTREG] = m_fcr0; break;
+			case 30: m_r[RTREG] = m_fcr30; break;
 			case 31: m_r[RTREG] = m_fcr31; break;
 
 			default:
@@ -1695,6 +1660,10 @@ void r4000_base_device::cp1_execute(u32 const op)
 			switch (RDREG)
 			{
 			case 0: // register is read-only
+				break;
+
+			case 30: // unknown
+				m_fcr30 = u32(m_r[RTREG]);
 				break;
 
 			case 31:
@@ -1727,21 +1696,21 @@ void r4000_base_device::cp1_execute(u32 const op)
 				if (!(m_fcr31 & FCR31_C))
 				{
 					m_branch_state = BRANCH;
-					m_branch_target = ADDR(m_pc, (s16(op) << 2) + 4);
+					m_branch_target = ADDR(m_pc + 4, s32(s16(op)) << 2);
 				}
 				break;
 			case 0x01: // BC1T
 				if (m_fcr31 & FCR31_C)
 				{
 					m_branch_state = BRANCH;
-					m_branch_target = ADDR(m_pc, (s16(op) << 2) + 4);
+					m_branch_target = ADDR(m_pc + 4, s32(s16(op)) << 2);
 				}
 				break;
 			case 0x02: // BC1FL
 				if (!(m_fcr31 & FCR31_C))
 				{
 					m_branch_state = BRANCH;
-					m_branch_target = ADDR(m_pc, (s16(op) << 2) + 4);
+					m_branch_target = ADDR(m_pc + 4, s32(s16(op)) << 2);
 				}
 				else
 					m_branch_state = NULLIFY;
@@ -1750,7 +1719,7 @@ void r4000_base_device::cp1_execute(u32 const op)
 				if (m_fcr31 & FCR31_C)
 				{
 					m_branch_state = BRANCH;
-					m_branch_target = ADDR(m_pc, (s16(op) << 2) + 4);
+					m_branch_target = ADDR(m_pc + 4, s32(s16(op)) << 2);
 				}
 				else
 					m_branch_state = NULLIFY;
@@ -1788,8 +1757,12 @@ void r4000_base_device::cp1_execute(u32 const op)
 				break;
 			case 0x05: // ABS.S
 				if ((SR & SR_FR) || !(op & ODD_REGS))
+				{
 					if (f32_lt(float32_t{ u32(m_f[FSREG]) }, float32_t{ 0 }))
 						cp1_set(FDREG, f32_mul(float32_t{ u32(m_f[FSREG]) }, i32_to_f32(-1)).v);
+					else
+						cp1_set(FDREG, m_f[FSREG]);
+				}
 				break;
 			case 0x06: // MOV.S
 				if ((SR & SR_FR) || !(op & ODD_REGS))
@@ -2072,8 +2045,12 @@ void r4000_base_device::cp1_execute(u32 const op)
 				break;
 			case 0x05: // ABS.D
 				if ((SR & SR_FR) || !(op & ODD_REGS))
+				{
 					if (f64_lt(float64_t{ m_f[FSREG] }, float64_t{ 0 }))
 						cp1_set(FDREG, f64_mul(float64_t{ m_f[FSREG] }, i32_to_f64(-1)).v);
+					else
+						cp1_set(FDREG, m_f[FSREG]);
+				}
 				break;
 			case 0x06: // MOV.D
 				if ((SR & SR_FR) || !(op & ODD_REGS))
@@ -2377,7 +2354,7 @@ void r4000_base_device::cp1_execute(u32 const op)
 		break;
 
 	case 0x31: // LWC1
-		load<u32>(ADDR(m_r[RSREG], op),
+		load<u32>(ADDR(m_r[RSREG], s16(op)),
 			[this, op](u32 data)
 			{
 				if (SR & SR_FR)
@@ -2393,7 +2370,7 @@ void r4000_base_device::cp1_execute(u32 const op)
 		break;
 
 	case 0x35: // LDC1
-		load<u64>(ADDR(m_r[RSREG], op),
+		load<u64>(ADDR(m_r[RSREG], s16(op)),
 			[this, op](u64 data)
 			{
 				if ((SR & SR_FR) || !(RTREG & 1))
@@ -2403,19 +2380,19 @@ void r4000_base_device::cp1_execute(u32 const op)
 
 	case 0x39: // SWC1
 		if (SR & SR_FR)
-			store<u32>(ADDR(m_r[RSREG], op), u32(m_f[RTREG]));
+			store<u32>(ADDR(m_r[RSREG], s16(op)), u32(m_f[RTREG]));
 		else
 			if (RTREG & 1)
 				// store the high half of the even floating point register
-				store<u32>(ADDR(m_r[RSREG], op), u32(m_f[RTREG & ~1] >> 32));
+				store<u32>(ADDR(m_r[RSREG], s16(op)), u32(m_f[RTREG & ~1] >> 32));
 			else
 				// store the low half of the even floating point register
-				store<u32>(ADDR(m_r[RSREG], op), u32(m_f[RTREG & ~1]));
+				store<u32>(ADDR(m_r[RSREG], s16(op)), u32(m_f[RTREG & ~1]));
 		break;
 
 	case 0x3d: // SDC1
 		if ((SR & SR_FR) || !(RTREG & 1))
-			store<u64>(ADDR(m_r[RSREG], op), m_f[RTREG]);
+			store<u64>(ADDR(m_r[RSREG], s16(op)), m_f[RTREG]);
 		break;
 	}
 }
@@ -2472,7 +2449,7 @@ void r4000_base_device::cp2_execute(u32 const op)
 			// 64-bit non-Kernel (User or Supervisor) mode. These instructions
 			// cause a reserved instruction exception if 64-bit operation is
 			// not enabled in User or Supervisor mode.
-			if (!(SR & SR_KSU) || (SR & (SR_EXL | SR_ERL)) || m_64)
+			if (!(SR & SR_KSU) || (SR & (SR_EXL | SR_ERL)) || cp0_64())
 				logerror("dmfc2 unimplemented (%s)\n", machine().describe_context());
 			else
 				cpu_exception(EXCEPTION_RI);
@@ -2490,7 +2467,7 @@ void r4000_base_device::cp2_execute(u32 const op)
 			// 64-bit non-Kernel (User or Supervisor) mode. These instructions
 			// cause a reserved instruction exception if 64-bit operation is
 			// not enabled in User or Supervisor mode.
-			if (!(SR & SR_KSU) || (SR & (SR_EXL | SR_ERL)) || m_64)
+			if (!(SR & SR_KSU) || (SR & (SR_EXL | SR_ERL)) || cp0_64())
 				logerror("dmtc2 unimplemented (%s)\n", machine().describe_context());
 			else
 				cpu_exception(EXCEPTION_RI);
@@ -2588,8 +2565,62 @@ r4000_base_device::translate_t r4000_base_device::translate(int intention, u64 &
 
 	bool extended = false;
 
-	if (!(SR & SR_KSU) || (SR & SR_EXL) || (SR & SR_ERL))
+	switch (SR & (SR_KSU | SR_ERL | SR_EXL))
 	{
+	case SR_KSU_U:
+		// user mode
+		if (SR & SR_UX)
+		{
+			// 64-bit user mode
+			if (address & 0xffff'ff00'0000'0000)
+				return ERROR; // exception
+			else
+				extended = true; // xuseg
+		}
+		else
+		{
+			// 32-bit user mode
+			if (address & 0xffff'ffff'8000'0000)
+				return ERROR; // exception
+			else
+				extended = false; // useg
+		}
+		break;
+
+	case SR_KSU_S:
+		// supervisor mode
+		if (SR & SR_SX)
+		{
+			// 64-bit supervisor mode
+			if (address & 0xffff'ff00'0000'0000)
+				if ((address & 0xffff'ff00'0000'0000) == 0x4000'0000'0000'0000)
+					extended = true; // xsseg
+				else
+					if ((address & 0xffff'ffff'e000'0000) == 0xffff'ffff'c000'0000)
+						extended = true; // csseg
+					else
+						return ERROR; // exception
+			else
+				extended = true; // xsuseg
+		}
+		else
+		{
+			// 32-bit supervisor mode
+			if (address & 0xffff'ffff'8000'0000)
+				if ((address & 0xffff'ffff'e000'0000) == 0xffff'ffff'c000'0000)
+					extended = false; // sseg
+				else
+					return ERROR; // exception
+			else
+				extended = false; // suseg
+		}
+		break;
+
+	case SR_KSU_U | SR_KSU_S:
+		fatalerror("invalid ksu bits 0x%08x (%s)\n", u32(SR), machine().describe_context().c_str());
+		break;
+
+	default:
 		// kernel mode
 		if (SR & SR_KX)
 		{
@@ -2646,65 +2677,21 @@ r4000_base_device::translate_t r4000_base_device::translate(int intention, u64 &
 				else
 					extended = false; // kuseg
 		}
-	}
-	else if ((SR & SR_KSU) == SR_KSU_S)
-	{
-		// supervisor mode
-		if (SR & SR_SX)
-		{
-			// 64-bit supervisor mode
-			if (address & 0xffff'ff00'0000'0000)
-				if ((address & 0xffff'ff00'0000'0000) == 0x4000'0000'0000'0000)
-					extended = true; // xsseg
-				else
-					if ((address & 0xffff'ffff'e000'0000) == 0xffff'ffff'c000'0000)
-						extended = true; // csseg
-					else
-						return ERROR; // exception
-			else
-				extended = true; // xsuseg
-		}
-		else
-		{
-			// 32-bit supervisor mode
-			if (address & 0xffff'ffff'8000'0000)
-				if ((address & 0xffff'ffff'e000'0000) == 0xffff'ffff'c000'0000)
-					extended = false; // sseg
-				else
-					return ERROR; // exception
-			else
-				extended = false; // suseg
-		}
-	}
-	else
-	{
-		// user mode
-		if (SR & SR_UX)
-		{
-			// 64-bit user mode
-			if (address & 0xffff'ff00'0000'0000)
-				return ERROR; // exception
-			else
-				extended = true; // xuseg
-		}
-		else
-		{
-			// 32-bit user mode
-			if (address & 0xffff'ffff'8000'0000)
-				return ERROR; // exception
-			else
-				extended = false; // useg
-		}
+		break;
 	}
 
 	// address needs translation, using a combination of VPN2 and ASID
 	u64 const key = (address & (extended ? (EH_R | EH_VPN2_64) : EH_VPN2_32)) | (m_cp0[CP0_EntryHi] & EH_ASID);
 
+	unsigned *mru = m_tlb_mru[intention & TRANSLATE_TYPE_MASK];
+	if (LOG_STATS)
+		m_tlb_scans++;
+
 	bool invalid = false;
 	bool modify = false;
 	for (unsigned i = 0; i < ARRAY_LENGTH(m_tlb); i++)
 	{
-		unsigned const index = (m_last[intention & TRANSLATE_TYPE_MASK] + i) % ARRAY_LENGTH(m_tlb);
+		unsigned const index = mru[i];
 		tlb_entry_t const &entry = m_tlb[index];
 
 		// test vpn and asid
@@ -2713,6 +2700,9 @@ r4000_base_device::translate_t r4000_base_device::translate(int intention, u64 &
 
 		if ((entry.vpn & mask) != (key & mask))
 			continue;
+
+		if (LOG_STATS)
+			m_tlb_loops += i + 1;
 
 		u64 const pfn = entry.pfn[BIT(address, entry.low_bit)];
 
@@ -2734,10 +2724,11 @@ r4000_base_device::translate_t r4000_base_device::translate(int intention, u64 &
 		address &= (entry.mask >> 1) | 0xfff;
 		address |= ((pfn & EL_PFN) << 6) & ~(entry.mask >> 1);
 
-		// remember the last-used tlb entry
-		m_last[intention & TRANSLATE_TYPE_MASK] = index;
+		// promote the entry in the mru index
+		if (i > 0)
+			std::swap(mru[i - 1], mru[i]);
 
-		return (pfn & EL_C) == C_2 ? UNCACHED : CACHED;
+		return ((pfn & EL_C) == C_2) ? UNCACHED : CACHED;
 	}
 
 	// tlb miss, invalid entry, or a store to a non-dirty entry
@@ -2781,6 +2772,9 @@ void r4000_base_device::address_error(int intention, u64 const address)
 			m_cp0[CP0_BadVAddr] = address;
 
 		cpu_exception((intention & TRANSLATE_WRITE) ? EXCEPTION_ADES : EXCEPTION_ADEL);
+
+		// address errors shouldn't typically occur, so a breakpoint is handy
+		machine().debug_break();
 	}
 }
 
@@ -2967,7 +2961,7 @@ bool r4000_base_device::fetch(u64 address, std::function<void(u32)> &&apply)
 		if (!(tag & ICACHE_V) || (tag & ICACHE_PTAG) != (address >> 12))
 		{
 			// cache miss
-			m_icache_miss++;
+			m_icache_misses++;
 
 			// reload the cache line
 			tag = ICACHE_V | (address >> 12);
@@ -2980,7 +2974,7 @@ bool r4000_base_device::fetch(u64 address, std::function<void(u32)> &&apply)
 			}
 		}
 		else
-			m_icache_hit++;
+			m_icache_hits++;
 
 		// apply the result
 		apply(m_icache_data[cache_address >> 2]);

@@ -36,8 +36,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	// device_tiki100bus_card_interface overrides
-	virtual uint8_t iorq_r(address_space &space, offs_t offset, uint8_t data) override;
-	virtual void iorq_w(address_space &space, offs_t offset, uint8_t data) override;
+	virtual uint8_t iorq_r(offs_t offset, uint8_t data) override;
+	virtual void iorq_w(offs_t offset, uint8_t data) override;
 
 private:
 	required_device<wd2010_device> m_hdc;

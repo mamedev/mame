@@ -182,8 +182,9 @@ DEFINE_DEVICE_TYPE(M2COMM, m2comm_device, "m2comm", "Model 2 Communication Board
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(m2comm_device::device_add_mconfig)
-MACHINE_CONFIG_END
+void m2comm_device::device_add_mconfig(machine_config &config)
+{
+}
 
 //**************************************************************************
 //  LIVE DEVICE

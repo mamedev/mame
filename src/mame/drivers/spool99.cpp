@@ -367,21 +367,21 @@ INPUT_PORTS_END
 
 
 
-MACHINE_CONFIG_START(spool99_state::spool99)
-
-	MCFG_DEVICE_ADD("maincpu", Z80, 24000000/8)
-	MCFG_DEVICE_PROGRAM_MAP(spool99_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", spool99_state,  irq0_line_hold)
+void spool99_state::spool99(machine_config &config)
+{
+	Z80(config, m_maincpu, 24000000/8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &spool99_state::spool99_map);
+	m_maincpu->set_vblank_int("screen", FUNC(spool99_state::irq0_line_hold));
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_spool99);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(7*8, 55*8-1, 1*8, 31*8-1) //384x240,raw guess
-	MCFG_SCREEN_UPDATE_DRIVER(spool99_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(7*8, 55*8-1, 1*8, 31*8-1); //384x240,raw guess
+	screen.set_screen_update(FUNC(spool99_state::screen_update));
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 0x200);
 
@@ -391,20 +391,18 @@ MACHINE_CONFIG_START(spool99_state::spool99)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, 1000000, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	m_oki->add_route(ALL_OUTPUTS, "lspeaker", 0.47);
+	m_oki->add_route(ALL_OUTPUTS, "rspeaker", 0.47);
+}
 
-MACHINE_CONFIG_START(spool99_state::vcarn)
+void spool99_state::vcarn(machine_config &config)
+{
 	spool99(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(vcarn_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &spool99_state::vcarn_map);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 1*8, 31*8-1) //512x240, raw guess
-
-MACHINE_CONFIG_END
+	subdevice<screen_device>("screen")->set_visarea(0*8, 64*8-1, 1*8, 31*8-1); //512x240, raw guess
+}
 
 
 ROM_START( spool99 )

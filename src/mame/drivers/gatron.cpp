@@ -587,7 +587,7 @@ MACHINE_CONFIG_START(gatron_state::gat)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gat)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_gat);
 	MCFG_PALETTE_ADD("palette", 8)
 
 	/* sound hardware */

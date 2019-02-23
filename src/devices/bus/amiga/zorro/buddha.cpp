@@ -143,18 +143,18 @@ void buddha_device::autoconfig_base_address(offs_t address)
 		logerror("-> installing buddha\n");
 
 	// stop responding to default autoconfig
-	m_slot->m_space->unmap_readwrite(0xe80000, 0xe8007f);
+	m_slot->space().unmap_readwrite(0xe80000, 0xe8007f);
 
 	// buddha registers
-	m_slot->m_space->install_device(address, address + 0xfff, *this, &buddha_device::mmio_map);
+	m_slot->space().install_device(address, address + 0xfff, *this, &buddha_device::mmio_map);
 
 	// install autoconfig handler to new location
-	m_slot->m_space->install_readwrite_handler(address, address + 0x7f,
+	m_slot->space().install_readwrite_handler(address, address + 0x7f,
 		read16_delegate(FUNC(amiga_autoconfig::autoconfig_read), static_cast<amiga_autoconfig *>(this)),
 		write16_delegate(FUNC(amiga_autoconfig::autoconfig_write), static_cast<amiga_autoconfig *>(this)), 0xffff);
 
 	// install access to the rom space
-	m_slot->m_space->install_rom(address + 0x1000, address + 0xffff, memregion("bootrom")->base() + 0x1000);
+	m_slot->space().install_rom(address + 0x1000, address + 0xffff, memregion("bootrom")->base() + 0x1000);
 
 	// we're done
 	m_slot->cfgout_w(0);
@@ -181,7 +181,7 @@ WRITE_LINE_MEMBER( buddha_device::cfgin_w )
 		autoconfig_rom_vector(0x1000);
 
 		// install autoconfig handler
-		m_slot->m_space->install_readwrite_handler(0xe80000, 0xe8007f,
+		m_slot->space().install_readwrite_handler(0xe80000, 0xe8007f,
 			read16_delegate(FUNC(amiga_autoconfig::autoconfig_read), static_cast<amiga_autoconfig *>(this)),
 			write16_delegate(FUNC(amiga_autoconfig::autoconfig_write), static_cast<amiga_autoconfig *>(this)), 0xffff);
 	}
@@ -231,8 +231,8 @@ READ16_MEMBER( buddha_device::ide_0_interrupt_r )
 
 	data = m_ide_0_interrupt << 15;
 
-	if (VERBOSE && 0)
-		logerror("ide_0_interrupt_r %04x [mask = %04x]\n", data, mem_mask);
+//	if (VERBOSE)
+//		logerror("ide_0_interrupt_r %04x [mask = %04x]\n", data, mem_mask);
 
 	return data;
 }
@@ -243,8 +243,8 @@ READ16_MEMBER( buddha_device::ide_1_interrupt_r )
 
 	data = m_ide_1_interrupt << 15;
 
-	if (VERBOSE && 0)
-		logerror("ide_1_interrupt_r %04x [mask = %04x]\n", data, mem_mask);
+//	if (VERBOSE)
+//		logerror("ide_1_interrupt_r %04x [mask = %04x]\n", data, mem_mask);
 
 	return data;
 }

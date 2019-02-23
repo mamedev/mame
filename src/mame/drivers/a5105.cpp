@@ -585,8 +585,8 @@ MACHINE_CONFIG_START(a5105_state::a5105)
 	/* Devices */
 	UPD7220(config, m_hgdc, XTAL(15'000'000) / 16); // unk clock
 	m_hgdc->set_addrmap(0, &a5105_state::upd7220_map);
-	m_hgdc->set_display_pixels_callback(FUNC(a5105_state::hgdc_display_pixels), this);
-	m_hgdc->set_draw_text_callback(FUNC(a5105_state::hgdc_draw_text), this);
+	m_hgdc->set_display_pixels(FUNC(a5105_state::hgdc_display_pixels));
+	m_hgdc->set_draw_text(FUNC(a5105_state::hgdc_draw_text));
 
 	z80ctc_device& ctc(Z80CTC(config, "z80ctc", XTAL(15'000'000) / 4));
 	ctc.intr_callback().set_inputline(m_maincpu, 0);

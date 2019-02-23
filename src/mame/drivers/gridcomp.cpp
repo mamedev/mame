@@ -82,17 +82,16 @@
 #include "speaker.h"
 
 
-#define VERBOSE_DBG 1
+//#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
+#define LOG_KEYBOARD  (1U <<  1)
+#define LOG_DEBUG     (1U <<  2)
 
-#define DBG_LOG(N,M,A) \
-	do { \
-		if(VERBOSE_DBG>=N) \
-		{ \
-			if( M ) \
-				logerror("%11.6f at %s: %-10s",machine().time().as_double(),machine().describe_context(),(char*)M ); \
-			logerror A; \
-		} \
-	} while (0)
+//#define VERBOSE (LOG_DEBUG)
+//#define LOG_OUTPUT_FUNC printf
+#include "logmacro.h"
+
+#define LOGKBD(...) LOGMASKED(LOG_KEYBOARD, __VA_ARGS__)
+#define LOGDBG(...) LOGMASKED(LOG_DEBUG, __VA_ARGS__)
 
 
 #define I80130_TAG      "osp"
@@ -166,7 +165,7 @@ READ16_MEMBER(gridcomp_state::grid_9ff0_r)
 		break;
 	}
 
-	DBG_LOG(1, "9FF0", ("%02x == %02x\n", 0x9ff00 + (offset << 1), data));
+	LOGDBG("9FF0: %02x == %02x\n", 0x9ff00 + (offset << 1), data);
 
 	return data;
 }
@@ -189,14 +188,14 @@ READ16_MEMBER(gridcomp_state::grid_keyb_r)
 		break;
 	}
 
-	DBG_LOG(1, "Keyb", ("%02x == %02x\n", 0xdffc0 + (offset << 1), data));
+	LOGKBD("%02x == %02x\n", 0xdffc0 + (offset << 1), data);
 
 	return data;
 }
 
 WRITE16_MEMBER(gridcomp_state::grid_keyb_w)
 {
-	DBG_LOG(1, "Keyb", ("%02x <- %02x\n", 0xdffc0 + (offset << 1), data));
+	LOGKBD("%02x <- %02x\n", 0xdffc0 + (offset << 1), data);
 }
 
 void gridcomp_state::kbd_put(u16 data)
@@ -224,7 +223,7 @@ READ16_MEMBER(gridcomp_state::grid_gpib_r)
 		break;
 	}
 
-	DBG_LOG(1, "GPIB", ("%02x == %02x\n", 0xdff80 + (offset << 1), data));
+	LOG("GPIB %02x == %02x\n", 0xdff80 + (offset << 1), data);
 
 	return data;
 }
@@ -238,7 +237,7 @@ WRITE16_MEMBER(gridcomp_state::grid_gpib_w)
 		break;
 	}
 
-	DBG_LOG(1, "GPIB", ("%02x <- %02x\n", 0xdff80 + (offset << 1), data));
+	LOG("GPIB %02x <- %02x\n", 0xdff80 + (offset << 1), data);
 }
 
 
@@ -292,14 +291,11 @@ uint32_t gridcomp_state::screen_update_113x(screen_device &screen, bitmap_ind16 
 
 void gridcomp_state::init_gridcomp()
 {
-	DBG_LOG(0, "init", ("driver_init()\n"));
 }
 
 MACHINE_START_MEMBER(gridcomp_state, gridcomp)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-
-	DBG_LOG(0, "init", ("machine_start()\n"));
 
 	program.install_readwrite_bank(0, m_ram->size() - 1, "bank10");
 	membank("bank10")->set_base(m_ram->pointer());
@@ -309,8 +305,6 @@ MACHINE_START_MEMBER(gridcomp_state, gridcomp)
 
 MACHINE_RESET_MEMBER(gridcomp_state, gridcomp)
 {
-	DBG_LOG(0, "init", ("machine_reset()\n"));
-
 	m_kbd_ready = false;
 }
 
@@ -327,7 +321,7 @@ void gridcomp_state::grid1101_map(address_map &map)
 	map(0xdfea0, 0xdfeaf).unmaprw(); // ??
 	map(0xdfec0, 0xdfecf).rw(m_modem, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff); // incl. DTMF generator
 	map(0xdff40, 0xdff5f).noprw();   // ?? machine ID EAROM, RTC
-	map(0xdff80, 0xdff8f).rw("hpib", FUNC(tms9914_device::reg8_r), FUNC(tms9914_device::reg8_w)).umask16(0x00ff);
+	map(0xdff80, 0xdff8f).rw("hpib", FUNC(tms9914_device::read), FUNC(tms9914_device::write)).umask16(0x00ff);
 	map(0xdffc0, 0xdffcf).rw(FUNC(gridcomp_state::grid_keyb_r), FUNC(gridcomp_state::grid_keyb_w)); // Intel 8741 MCU
 	map(0xfc000, 0xfffff).rom().region("user1", 0);
 }
@@ -344,7 +338,7 @@ void gridcomp_state::grid1121_map(address_map &map)
 	map(0xdfea0, 0xdfeaf).unmaprw(); // ??
 	map(0xdfec0, 0xdfecf).rw(m_modem, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff); // incl. DTMF generator
 	map(0xdff40, 0xdff5f).noprw();   // ?? machine ID EAROM, RTC
-	map(0xdff80, 0xdff8f).rw("hpib", FUNC(tms9914_device::reg8_r), FUNC(tms9914_device::reg8_w)).umask16(0x00ff);
+	map(0xdff80, 0xdff8f).rw("hpib", FUNC(tms9914_device::read), FUNC(tms9914_device::write)).umask16(0x00ff);
 	map(0xdffc0, 0xdffcf).rw(FUNC(gridcomp_state::grid_keyb_r), FUNC(gridcomp_state::grid_keyb_w)); // Intel 8741 MCU
 	map(0xfc000, 0xfffff).rom().region("user1", 0);
 }

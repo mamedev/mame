@@ -84,9 +84,10 @@ const tiny_rom_entry *lba_enhancer_device::device_rom_region() const
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
-MACHINE_CONFIG_START( lba_enhancer_device::device_add_mconfig )
-//  MCFG_DEVICE_ADD("lba_enhancer", lba_enhancer, 0)
-MACHINE_CONFIG_END
+void lba_enhancer_device::device_add_mconfig(machine_config &config)
+{
+//  lba_enhancer(config, "lba_enhancer", 0);
+}
 
 
 //-------------------------------------------------

@@ -118,11 +118,11 @@ std::string colecovision_cartridge_slot_device::get_default_card_software(get_de
 //  bd_r - cartridge data read
 //-------------------------------------------------
 
-uint8_t colecovision_cartridge_slot_device::bd_r(address_space &space, offs_t offset, uint8_t data, int _8000, int _a000, int _c000, int _e000)
+uint8_t colecovision_cartridge_slot_device::bd_r(offs_t offset, uint8_t data, int _8000, int _a000, int _c000, int _e000)
 {
 	if (m_card != nullptr)
 	{
-		data = m_card->bd_r(space, offset, data, _8000, _a000, _c000, _e000);
+		data = m_card->bd_r(offset, data, _8000, _a000, _c000, _e000);
 	}
 
 	return data;

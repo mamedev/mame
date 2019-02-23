@@ -663,7 +663,7 @@ MACHINE_CONFIG_START(popobear_state::popobear)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_popobear)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_popobear);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(42'000'000)/16)  // XTAL CORRECT, DIVISOR GUESSED
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

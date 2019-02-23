@@ -503,10 +503,10 @@ void voyager_state::machine_reset()
 }
 
 MACHINE_CONFIG_START(voyager_state::voyager)
-	MCFG_DEVICE_ADD("maincpu", PENTIUM3, 133000000) // actually AMD Duron CPU of unknown clock
-	MCFG_DEVICE_PROGRAM_MAP(voyager_map)
-	MCFG_DEVICE_IO_MAP(voyager_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+	PENTIUM3(config, m_maincpu, 133000000); // actually AMD Duron CPU of unknown clock
+	m_maincpu->set_addrmap(AS_PROGRAM, &voyager_state::voyager_map);
+	m_maincpu->set_addrmap(AS_IO, &voyager_state::voyager_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
 
 	pcat_common(config);
 

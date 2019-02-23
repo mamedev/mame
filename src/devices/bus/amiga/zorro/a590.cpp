@@ -260,7 +260,7 @@ void a590_device::device_start()
 	set_zorro_device();
 
 	// setup DMAC
-	m_dmac->set_address_space(m_slot->m_space);
+	m_dmac->set_address_space(&m_slot->space());
 	m_dmac->set_rom(memregion("bootrom")->base());
 }
 
@@ -269,7 +269,7 @@ void a2091_device::device_start()
 	set_zorro_device();
 
 	// setup DMAC
-	m_dmac->set_address_space(m_slot->m_space);
+	m_dmac->set_address_space(&m_slot->space());
 	m_dmac->set_rom(memregion("bootrom")->base());
 }
 

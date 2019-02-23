@@ -323,7 +323,7 @@ MACHINE_CONFIG_START(molecula_state::molecula)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_molecula)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_molecula);
 
 	PALETTE(config, "palette", FUNC(molecula_state::molecula_palette), 8);
 

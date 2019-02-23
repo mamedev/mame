@@ -431,7 +431,6 @@ void ncr5390_device::step(bool timeout)
 		}
 
 		command_length = fifo_pos + tcounter;
-		logerror("command_length %d\n", command_length);
 		state = DISC_SEL_ARBITRATION;
 		step(false);
 		break;

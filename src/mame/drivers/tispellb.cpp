@@ -369,8 +369,8 @@ void tispellb_state::rev1(machine_config &config)
 }
 
 
-MACHINE_CONFIG_START(tispellb_state::rev2)
-
+void tispellb_state::rev2(machine_config &config)
+{
 	/* basic machine hardware */
 	tms0270_cpu_device &tms(TMS0270(config, m_maincpu, 350000)); // approximation
 	tms.k().set(FUNC(tispellb_state::main_read_k));
@@ -387,9 +387,8 @@ MACHINE_CONFIG_START(tispellb_state::rev2)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 

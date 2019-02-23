@@ -345,8 +345,8 @@ void turrett_devices(device_slot_interface &device)
  *
  *************************************/
 
-MACHINE_CONFIG_START(turrett_state::turrett)
-
+void turrett_state::turrett(machine_config &config)
+{
 	/* basic machine hardware */
 	R3041(config, m_maincpu, R3041_CLOCK);
 	m_maincpu->set_endianness(ENDIANNESS_BIG);
@@ -359,12 +359,12 @@ MACHINE_CONFIG_START(turrett_state::turrett)
 	ATA_INTERFACE(config, m_ata).options(turrett_devices, "hdd", nullptr, true);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	// TODO: Likely not correct. Refresh rate empirically determined
 	// to ensure in-sync streaming sound
-	MCFG_SCREEN_RAW_PARAMS(4000000, 512, 0, 336, 259, 0, 244)
-	MCFG_SCREEN_UPDATE_DRIVER(turrett_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	m_screen->set_raw(4000000, 512, 0, 336, 259, 0, 244);
+	m_screen->set_screen_update(FUNC(turrett_state::screen_update));
+	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::RGB_555);
 
@@ -372,11 +372,11 @@ MACHINE_CONFIG_START(turrett_state::turrett)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ttsound", TURRETT, R3041_CLOCK) // ?
-	MCFG_DEVICE_ADDRESS_MAP(0, turrett_sound_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	turrett_device &ttsound(TURRETT(config, "ttsound", R3041_CLOCK)); // ?
+	ttsound.set_addrmap(0, &turrett_state::turrett_sound_map);
+	ttsound.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	ttsound.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+}
 
 
 

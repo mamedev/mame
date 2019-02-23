@@ -54,7 +54,8 @@ void at_mb_device::at_softlists(machine_config &config)
 	SOFTWARE_LIST(config, "at_cdrom_list").set_original("ibm5170_cdrom");
 }
 
-MACHINE_CONFIG_START(at_mb_device::device_add_mconfig)
+void at_mb_device::device_add_mconfig(machine_config &config)
+{
 	PIT8254(config, m_pit8254, 0);
 	m_pit8254->set_clk<0>(4772720/4); /* heartbeat IRQ */
 	m_pit8254->out_handler<0>().set("pic8259_master", FUNC(pic8259_device::ir0_w));
@@ -134,8 +135,7 @@ MACHINE_CONFIG_START(at_mb_device::device_add_mconfig)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	at_keyboard_controller_device &keybc(AT_KEYBOARD_CONTROLLER(config, "keybc", 12_MHz_XTAL));
 	keybc.hot_res().set_inputline(":maincpu", INPUT_LINE_RESET);
@@ -144,10 +144,10 @@ MACHINE_CONFIG_START(at_mb_device::device_add_mconfig)
 	keybc.kbd_clk().set("pc_kbdc", FUNC(pc_kbdc_device::clock_write_from_mb));
 	keybc.kbd_data().set("pc_kbdc", FUNC(pc_kbdc_device::data_write_from_mb));
 
-	MCFG_DEVICE_ADD("pc_kbdc", PC_KBDC, 0)
-	MCFG_PC_KBDC_OUT_CLOCK_CB(WRITELINE("keybc", at_keyboard_controller_device, kbd_clk_w))
-	MCFG_PC_KBDC_OUT_DATA_CB(WRITELINE("keybc", at_keyboard_controller_device, kbd_data_w))
-MACHINE_CONFIG_END
+	pc_kbdc_device &pc_kbdc(PC_KBDC(config, "pc_kbdc", 0));
+	pc_kbdc.out_clock_cb().set("keybc", FUNC(at_keyboard_controller_device::kbd_clk_w));
+	pc_kbdc.out_data_cb().set("keybc", FUNC(at_keyboard_controller_device::kbd_data_w));
+}
 
 
 void at_mb_device::map(address_map &map)

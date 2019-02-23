@@ -218,23 +218,23 @@ static GFXDECODE_START( gfx_usgames )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(usgames_state::usg32)
-
+void usgames_state::usg32(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809, 18_MHz_XTAL / 3) // 68B09P (divider not verified)
-	MCFG_DEVICE_PROGRAM_MAP(usgames_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(usgames_state, irq0_line_hold, 5*60) /* ?? */
+	MC6809(config, m_maincpu, 18_MHz_XTAL / 3); // 68B09P (divider not verified)
+	m_maincpu->set_addrmap(AS_PROGRAM, &usgames_state::usgames_map);
+	m_maincpu->set_periodic_int(FUNC(usgames_state::irq0_line_hold), attotime::from_hz(5*60)); /* ?? */
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(7*8, 57*8-1, 0*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(usgames_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(7*8, 57*8-1, 0*8, 31*8-1);
+	screen.set_screen_update(FUNC(usgames_state::screen_update));
+	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_usgames);
 	PALETTE(config, "palette", FUNC(usgames_state::usgames_palette), 2*256);
@@ -248,13 +248,13 @@ MACHINE_CONFIG_START(usgames_state::usg32)
 	SPEAKER(config, "mono").front_center();
 
 	AY8912(config, "aysnd", 2000000).add_route(ALL_OUTPUTS, "mono", 0.30);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(usgames_state::usg185)
+void usgames_state::usg185(machine_config &config)
+{
 	usg32(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(usg185_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &usgames_state::usg185_map);
+}
 
 
 ROM_START( usg32 )

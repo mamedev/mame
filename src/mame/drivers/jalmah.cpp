@@ -1164,7 +1164,7 @@ MACHINE_CONFIG_START(urashima_state::urashima)
 	config.device_remove("scroll2");
 	config.device_remove("scroll3");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_urashima)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_urashima);
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(urashima_state, screen_update_urashima)

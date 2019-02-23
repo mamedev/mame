@@ -76,9 +76,9 @@ Notes:
 READ8_MEMBER( ob68k1a_state::pia_r )
 {
 	if (offset) {
-		return m_pia1->read(space,0);
+		return m_pia1->read(0);
 	} else {
-		return m_pia0->read(space,0);
+		return m_pia0->read(0);
 	}
 }
 
@@ -90,9 +90,9 @@ READ8_MEMBER( ob68k1a_state::pia_r )
 WRITE8_MEMBER( ob68k1a_state::pia_w )
 {
 	if (offset) {
-		m_pia1->write(space,0,data);
+		m_pia1->write(0,data);
 	} else {
-		m_pia0->write(space,0,data);
+		m_pia0->write(0,data);
 	}
 }
 

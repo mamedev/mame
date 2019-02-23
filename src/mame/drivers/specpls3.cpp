@@ -378,14 +378,14 @@ static GFXDECODE_START( specpls3 )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(spectrum_state::spectrum_plus3)
+void spectrum_state::spectrum_plus3(machine_config &config)
+{
 	spectrum_128(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(spectrum_plus3_mem)
-	MCFG_DEVICE_IO_MAP(spectrum_plus3_io)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(50.01)
+	m_maincpu->set_addrmap(AS_PROGRAM, &spectrum_state::spectrum_plus3_mem);
+	m_maincpu->set_addrmap(AS_IO, &spectrum_state::spectrum_plus3_io);
+
+	m_screen->set_refresh_hz(50.01);
 
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(specpls3);
 
@@ -395,11 +395,12 @@ MACHINE_CONFIG_START(spectrum_state::spectrum_plus3)
 	FLOPPY_CONNECTOR(config, "upd765:0", specpls3_floppies, "3ssdd", floppy_image_device::default_floppy_formats);
 	FLOPPY_CONNECTOR(config, "upd765:1", specpls3_floppies, "3ssdd", floppy_image_device::default_floppy_formats);
 
-	MCFG_DEVICE_MODIFY("exp")
-	MCFG_DEVICE_SLOT_INTERFACE(specpls3_expansion_devices, nullptr, false)
+	SPECTRUM_EXPANSION_SLOT(config.replace(), m_exp, specpls3_expansion_devices, nullptr);
+	m_exp->irq_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_exp->nmi_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	SOFTWARE_LIST(config, "flop_list").set_original("specpls3_flop");
-MACHINE_CONFIG_END
+}
 
 /***************************************************************************
 

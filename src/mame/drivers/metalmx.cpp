@@ -527,7 +527,6 @@ void metalmx_state::gsp_map(address_map &map)
 {
 	map(0x88800000, 0x8880000f).ram(); /* ? */
 	map(0x88c00000, 0x88c0000f).ram(); /* ? */
-	map(0xc0000000, 0xc00003ff).rw(m_gsp, FUNC(tms34020_device::io_register_r), FUNC(tms34020_device::io_register_w));
 	map(0xff000000, 0xff7fffff).ram().share("gsp_dram");
 	map(0xff800000, 0xffffffff).ram().share("gsp_vram");
 }

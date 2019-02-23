@@ -2,20 +2,15 @@
 // copyright-holders:hap
 // thanks-to:yoyo_chessboard
 /******************************************************************************
+*
+* novag_diablo.cpp, subdriver of machine/novagbase.cpp, machine/chessbase.cpp
 
-    Novag generic 68000 based chess computer driver
+TODO:
+- hook up RS232 port (when connected, I'm only getting "New Game")
 
-    NOTE: MAME doesn't include a generalized implementation for boardpieces yet,
-    greatly affecting user playability of emulated electronic board games.
-    As workaround for the chess games, use an external chess GUI on the side,
-    such as Arena(in editmode).
+*******************************************************************************
 
-    TODO:
-    - RS232 port
-
-******************************************************************************
-
-Diablo 68000:
+Novag Diablo 68000 overview:
 - M68000 @ 16MHz, IPL1 256Hz, IPL2 from ACIA IRQ(always high)
 - 2*8KB RAM TC5565 battery-backed, 2*32KB hashtable RAM TC55257 3*32KB ROM
 - HD44780 LCD controller (16x1)
@@ -29,6 +24,7 @@ Scorpio 68000 hardware is very similar, but with chessboard buttons and side led
 #include "emu.h"
 #include "includes/novagbase.h"
 
+#include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/mos6551.h"
 #include "machine/nvram.h"
@@ -40,44 +36,48 @@ Scorpio 68000 hardware is very similar, but with chessboard buttons and side led
 #include "novag_scorpio68k.lh" // clickable
 
 
-class novag68k_state : public novagbase_state
+namespace {
+
+class diablo_state : public novagbase_state
 {
 public:
-	novag68k_state(const machine_config &mconfig, device_type type, const char *tag)
-		: novagbase_state(mconfig, type, tag)
+	diablo_state(const machine_config &mconfig, device_type type, const char *tag) :
+		novagbase_state(mconfig, type, tag),
+		m_screen(*this, "screen"),
+		m_acia(*this, "acia"),
+		m_rs232(*this, "rs232")
 	{ }
 
+	// machine drivers
 	void diablo68k(machine_config &config);
 	void scorpio68k(machine_config &config);
 
 private:
-	TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(M68K_IRQ_2, ASSERT_LINE); }
-	TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE); }
+	// devices/pointers
+	required_device<screen_device> m_screen;
+	required_device<mos6551_device> m_acia;
+	required_device<rs232_port_device> m_rs232;
 
-	// Diablo 68000
-	DECLARE_WRITE8_MEMBER(diablo68k_control_w);
-	DECLARE_WRITE8_MEMBER(diablo68k_lcd_data_w);
-	DECLARE_WRITE8_MEMBER(diablo68k_leds_w);
-	DECLARE_READ8_MEMBER(diablo68k_input1_r);
-	DECLARE_READ8_MEMBER(diablo68k_input2_r);
+	// address maps
 	void diablo68k_map(address_map &map);
-
-	// Scorpio 68000
-	DECLARE_WRITE8_MEMBER(scorpio68k_control_w);
 	void scorpio68k_map(address_map &map);
+
+	// I/O handlers
+	DECLARE_WRITE8_MEMBER(control_w);
+	DECLARE_WRITE8_MEMBER(lcd_data_w);
+	DECLARE_WRITE8_MEMBER(leds_w);
+	DECLARE_READ8_MEMBER(input1_r);
+	DECLARE_READ8_MEMBER(input2_r);
 };
 
 
-
-// Devices, I/O
-
 /******************************************************************************
-    Diablo 68000
+    Devices, I/O
 ******************************************************************************/
 
 // TTL
 
-WRITE8_MEMBER(novag68k_state::diablo68k_control_w)
+WRITE8_MEMBER(diablo_state::control_w)
 {
 	// d0: HD44780 E
 	// d1: HD44780 RS
@@ -88,31 +88,34 @@ WRITE8_MEMBER(novag68k_state::diablo68k_control_w)
 	// d7: enable beeper
 	m_beeper->set_state(data >> 7 & 1);
 
+	// d2,d3: side leds(scorpio)
+	u8 leds2 = ~data >> 2 & 3;
+
 	// d4-d6: input mux, led select
 	m_inp_mux = 1 << (data >> 4 & 0x7) & 0xff;
-	display_matrix(8, 8, m_led_data, m_inp_mux);
+	display_matrix(8+2, 8, m_led_data | leds2 << 8, m_inp_mux);
 	m_led_data = 0; // ?
 }
 
-WRITE8_MEMBER(novag68k_state::diablo68k_lcd_data_w)
+WRITE8_MEMBER(diablo_state::lcd_data_w)
 {
 	// d0-d7: HD44780 data
 	m_lcd_data = data;
 }
 
-WRITE8_MEMBER(novag68k_state::diablo68k_leds_w)
+WRITE8_MEMBER(diablo_state::leds_w)
 {
 	// d0-d7: chessboard leds
 	m_led_data = data;
 }
 
-READ8_MEMBER(novag68k_state::diablo68k_input1_r)
+READ8_MEMBER(diablo_state::input1_r)
 {
 	// d0-d7: multiplexed inputs (chessboard squares)
 	return ~read_inputs(8) & 0xff;
 }
 
-READ8_MEMBER(novag68k_state::diablo68k_input2_r)
+READ8_MEMBER(diablo_state::input2_r)
 {
 	// d0-d2: multiplexed inputs (side panel)
 	// other: ?
@@ -122,52 +125,27 @@ READ8_MEMBER(novag68k_state::diablo68k_input2_r)
 
 
 /******************************************************************************
-    Scorpio 68000
-******************************************************************************/
-
-WRITE8_MEMBER(novag68k_state::scorpio68k_control_w)
-{
-	// d0: HD44780 E
-	// d1: HD44780 RS
-	if (m_lcd_control & ~data & 1)
-		m_lcd->write(m_lcd_control >> 1 & 1, m_lcd_data);
-	m_lcd_control = data & 3;
-
-	// d7: enable beeper
-	m_beeper->set_state(data >> 7 & 1);
-
-	// d4-d6: input mux, led select
-	// d2,d3: led data
-	m_inp_mux = 1 << (data >> 4 & 0x7) & 0xff;
-	display_matrix(2, 8, ~data >> 2 & 3, m_inp_mux);
-}
-
-
-
-/******************************************************************************
     Address Maps
 ******************************************************************************/
 
-// Diablo 68000 / Scorpio 68000
-
-void novag68k_state::diablo68k_map(address_map &map)
+void diablo_state::diablo68k_map(address_map &map)
 {
 	map(0x000000, 0x00ffff).rom();
 	map(0x200000, 0x20ffff).rom().region("maincpu", 0x10000);
 	map(0x280000, 0x28ffff).ram();
 	map(0x300000, 0x300007).rw("acia", FUNC(mos6551_device::read), FUNC(mos6551_device::write)).umask16(0xff00);
 	map(0x380000, 0x380001).nopr();
-	map(0x380000, 0x380000).w(FUNC(novag68k_state::diablo68k_leds_w));
-	map(0x3a0000, 0x3a0000).w(FUNC(novag68k_state::diablo68k_lcd_data_w));
-	map(0x3c0000, 0x3c0000).rw(FUNC(novag68k_state::diablo68k_input2_r), FUNC(novag68k_state::diablo68k_control_w));
-	map(0x3e0000, 0x3e0000).r(FUNC(novag68k_state::diablo68k_input1_r));
+	map(0x380000, 0x380000).w(FUNC(diablo_state::leds_w));
+	map(0x3a0000, 0x3a0000).w(FUNC(diablo_state::lcd_data_w));
+	map(0x3c0000, 0x3c0000).rw(FUNC(diablo_state::input2_r), FUNC(diablo_state::control_w));
+	map(0x3e0000, 0x3e0000).r(FUNC(diablo_state::input1_r));
 	map(0xff8000, 0xffbfff).ram().share("nvram");
 }
 
-void novag68k_state::scorpio68k_map(address_map &map)
+void diablo_state::scorpio68k_map(address_map &map)
 {
 	diablo68k_map(map);
-	map(0x380000, 0x380000).w(FUNC(novag68k_state::scorpio68k_control_w));
+	map(0x380000, 0x380000).w(FUNC(diablo_state::control_w));
 	map(0x3c0000, 0x3c0001).nopw();
 }
 
@@ -220,12 +198,12 @@ static INPUT_PORTS_START( diablo68k_sidepanel )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( diablo68k )
-	PORT_INCLUDE( novag_cb_magnets )
+	PORT_INCLUDE( generic_cb_magnets )
 	PORT_INCLUDE( diablo68k_sidepanel )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( scorpio68k )
-	PORT_INCLUDE( novag_cb_buttons )
+	PORT_INCLUDE( generic_cb_buttons )
 	PORT_INCLUDE( diablo68k_sidepanel )
 INPUT_PORTS_END
 
@@ -235,53 +213,54 @@ INPUT_PORTS_END
     Machine Drivers
 ******************************************************************************/
 
-MACHINE_CONFIG_START(novag68k_state::diablo68k)
-
+void diablo_state::diablo68k(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(diablo68k_map)
-	timer_device &irq_on(TIMER(config, "irq_on"));
-	irq_on.configure_periodic(FUNC(novag68k_state::irq_on), attotime::from_hz(32.768_kHz_XTAL/128)); // 256Hz
-	irq_on.set_start_delay(attotime::from_hz(32.768_kHz_XTAL/128) - attotime::from_nsec(1100)); // active for 1.1us
-	TIMER(config, "irq_off").configure_periodic(FUNC(novag68k_state::irq_off), attotime::from_hz(32.768_kHz_XTAL/128));
+	M68000(config, m_maincpu, 16_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &diablo_state::diablo68k_map);
 
-	mos6551_device &acia(MOS6551(config, "acia", 0));
-	acia.set_xtal(1.8432_MHz_XTAL);
+	const attotime irq_period = attotime::from_hz(32.768_kHz_XTAL/128); // 256Hz
+	TIMER(config, m_irq_on).configure_periodic(FUNC(diablo_state::irq_on<M68K_IRQ_2>), irq_period);
+	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(1100)); // active for 1.1us
+	TIMER(config, "irq_off").configure_periodic(FUNC(diablo_state::irq_off<M68K_IRQ_2>), irq_period);
+
+	MOS6551(config, m_acia).set_xtal(1.8432_MHz_XTAL);
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(60) // arbitrary
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(6*16+1, 10)
-	MCFG_SCREEN_VISIBLE_AREA(0, 6*16, 0, 10-1)
-	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-	PALETTE(config, "palette", FUNC(novag68k_state::novag_lcd_palette), 3);
+	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	m_screen->set_refresh_hz(60); // arbitrary
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_size(6*16+1, 10);
+	m_screen->set_visarea(0, 6*16, 0, 10-1);
+	m_screen->set_screen_update("hd44780", FUNC(hd44780_device::screen_update));
+	m_screen->set_palette("palette");
+
+	PALETTE(config, "palette", FUNC(diablo_state::novag_lcd_palette), 3);
 
 	HD44780(config, m_lcd, 0);
 	m_lcd->set_lcd_size(2, 8);
-	m_lcd->set_pixel_update_cb(FUNC(novag68k_state::novag_lcd_pixel_update), this);
+	m_lcd->set_pixel_update_cb(FUNC(diablo_state::novag_lcd_pixel_update), this);
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(novag68k_state::display_decay_tick), attotime::from_msec(1));
+	TIMER(config, "display_decay").configure_periodic(FUNC(diablo_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_novag_diablo68k);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beeper, 32.768_kHz_XTAL/32); // 1024Hz
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(novag68k_state::scorpio68k)
+void diablo_state::scorpio68k(machine_config &config)
+{
 	diablo68k(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(scorpio68k_map)
-
+	m_maincpu->set_addrmap(AS_PROGRAM, &diablo_state::scorpio68k_map);
 	config.set_default_layout(layout_novag_scorpio68k);
-MACHINE_CONFIG_END
+}
 
 
 
@@ -304,12 +283,15 @@ ROM_START( scorpio68 )
 	ROM_LOAD16_BYTE("502.u4",       0x10000, 0x8000, CRC(553a5c8c) SHA1(ccb5460ff10766a5ca8008ae2cffcff794318108) ) // no odd rom
 ROM_END
 
+} // anonymous namespace
+
 
 
 /******************************************************************************
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME       PARENT CMP MACHINE     INPUT       CLASS           INIT        COMPANY  FULLNAME         FLAGS
-CONS( 1991, diablo68,  0,      0, diablo68k,  diablo68k,  novag68k_state, empty_init, "Novag", "Diablo 68000",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1991, scorpio68, 0,      0, scorpio68k, scorpio68k, novag68k_state, empty_init, "Novag", "Scorpio 68000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+//    YEAR  NAME       PARENT CMP MACHINE     INPUT       CLASS         INIT        COMPANY, FULLNAME, FLAGS
+CONS( 1991, diablo68,  0,      0, diablo68k,  diablo68k,  diablo_state, empty_init, "Novag", "Diablo 68000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+
+CONS( 1991, scorpio68, 0,      0, scorpio68k, scorpio68k, diablo_state, empty_init, "Novag", "Scorpio 68000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )

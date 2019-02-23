@@ -662,7 +662,6 @@ void jpmimpct_state::tms_program_map(address_map &map)
 //  AM_RANGE(0x01000000, 0x0100003f) AM_MIRROR(0xf87fffc0) AM_READWRITE(jpmimpct_bt477_r, jpmimpct_bt477_w)
 	map(0x01000000, 0x017fffff).mirror(0xf8000000).mask(0x1f).rw(FUNC(jpmimpct_state::jpmimpct_bt477_r), FUNC(jpmimpct_state::jpmimpct_bt477_w));
 	map(0x07800000, 0x07bfffff).mirror(0xf8400000).ram();
-	map(0xc0000000, 0xc00001ff).rw(m_dsp, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 }
 
 

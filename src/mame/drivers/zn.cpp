@@ -4202,6 +4202,14 @@ ROM_START( cbaj )
 
 	ROM_REGION( 0x8, "cat702_2", 0 )
 	ROM_LOAD( "mg03", 0x000000, 0x000008, CRC(8be79633) SHA1(f38f881b6139eb8368e593904cb50b6e68bdf2e9) )
+
+	ROM_REGION( 0xc00, "misc", 0 )
+	ROM_LOAD( "gal16v8d-15lp.sop-rom1.uo117",   0x000, 0x117, CRC(cf8ebc23) SHA1(0662f8ba418eb9187fb7a86cc8c0d86220dcdbf0) )
+	ROM_LOAD( "gal16v8d-15lp.sop-rom2b.uo4138", 0x200, 0x117, CRC(098662c1) SHA1(5fcf66b16f840129aa61e9cf2b2951c37a5cbabf) )
+	ROM_LOAD( "gal16v8d-15lp.sop-rom3.uo3125",  0x400, 0x117, CRC(f9c92db7) SHA1(1c2818f0fceedca914a0cbb74c2237a8c3798906) )
+	ROM_LOAD( "gal16v8d-15lp.sop-rom4c.uo4131", 0x600, 0x117, CRC(e87179ef) SHA1(9942ff71d39924d938aa5e7c3d0c1aa9a38c5e77) )
+	ROM_LOAD( "gal16v8d-15lp.sop-rom5b.uo4128", 0x800, 0x117, CRC(f32a1803) SHA1(8251bad3fe5a0ebf6cba4c1a67aa09e391289c65) )
+	ROM_LOAD( "gal16v8d-15lp.sop-rom6a.uo4134", 0xa00, 0x117, CRC(40e1f6f2) SHA1(e7703e6db5d4f23c34c633ec147a88d2b0f681d5) )
 ROM_END
 
 ROM_START( shngmtkb )

@@ -1691,7 +1691,7 @@ void horshoes_state::horshoes(machine_config &config)
 
 	UPD4701A(config, m_upd4701, 0);
 	m_upd4701->set_portx_tag("AN0");
-	m_upd4701->set_portx_tag("AN1");
+	m_upd4701->set_porty_tag("AN1");
 }
 
 

@@ -509,6 +509,34 @@ configuration { "Release", "vs20*" }
 		"NoIncrementalLink",
 	}
 
+configuration { "vsllvm" }
+	buildoptions {
+		"/bigobj",
+	}
+	flags {
+		"NoPCH",
+		"ExtraWarnings",
+	}
+	if not _OPTIONS["NOWERROR"] then
+		flags{
+			"FatalWarnings",
+		}
+	end
+
+
+configuration { "Debug", "vsllvm" }
+	flags {
+		"Symbols",
+		"NoMultiProcessorCompilation",
+	}
+
+configuration { "Release", "vsllvm" }
+	flags {
+		"Optimize",
+		"NoEditAndContinue",
+		"NoIncrementalLink",
+	}
+
 -- Force VS2015/17 targets to use bundled SDL2
 if string.sub(_ACTION,1,4) == "vs20" and _OPTIONS["osd"]=="sdl" then
 	if _OPTIONS["with-bundled-sdl2"]==nil then
@@ -1266,6 +1294,15 @@ configuration { "mingw-clang" }
 		}
 	end
 
+configuration { "vsllvm" }
+	defines {
+		"XML_STATIC",
+		"WIN32",
+		"_WIN32",
+		"_CRT_NONSTDC_NO_DEPRECATE",
+		"_CRT_SECURE_NO_DEPRECATE",
+		"_CRT_STDIO_LEGACY_WIDE_SPECIFIERS",
+	}
 
 configuration { "vs20*" }
 		defines {
@@ -1276,6 +1313,7 @@ configuration { "vs20*" }
 			"_CRT_SECURE_NO_DEPRECATE",
 			"_CRT_STDIO_LEGACY_WIDE_SPECIFIERS",
 		}
+		
 -- Windows Store/Phone projects already link against the available libraries.
 if _OPTIONS["vs"]==nil or not (string.startswith(_OPTIONS["vs"], "winstore8") or string.startswith(_OPTIONS["vs"], "winphone8")) then
 		links {
@@ -1417,6 +1455,32 @@ configuration { "winphone8* or winstore8*" }
 	linkoptions {
 		"/ignore:4264" -- LNK4264: archiving object file compiled with /ZW into a static library; note that when authoring Windows Runtime types it is not recommended to link with a static library that contains Windows Runtime metadata
 	}
+configuration { "vsllvm" }
+		buildoptions {
+			"-Wno-tautological-constant-out-of-range-compare",
+			"-Wno-ignored-qualifiers",
+			"-Wno-missing-field-initializers",
+			"-Wno-ignored-pragma-optimize",
+			"-Wno-unknown-warning-option",
+			"-Wno-unused-function",
+			"-Wno-unused-label",
+			"-Wno-unused-local-typedef",
+			"-Wno-unused-const-variable",
+			"-Wno-unused-parameter",
+			"-Wno-unneeded-internal-declaration",
+			"-Wno-unused-private-field",
+			"-Wno-missing-braces",
+			"-Wno-unused-variable",
+			"-Wno-tautological-pointer-compare",
+			"-Wno-nonportable-include-path",
+			"-Wno-enum-conversion",
+			"-Wno-pragma-pack",
+			"-Wno-new-returns-null",
+			"-Wno-sign-compare",
+			"-Wno-switch",
+			"-Wno-tautological-undefined-compare",
+			"-Wno-deprecated-declarations",
+		}
 
 
 -- adding this till we sort out asserts in debug mode

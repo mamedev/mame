@@ -158,7 +158,7 @@ MACHINE_CONFIG_START(nitedrvr_state::nitedrvr)
 	MCFG_SCREEN_UPDATE_DRIVER(nitedrvr_state, screen_update_nitedrvr)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nitedrvr)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_nitedrvr);
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 

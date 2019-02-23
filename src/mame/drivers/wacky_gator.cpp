@@ -281,8 +281,8 @@ void wackygtr_state::program_map(address_map &map)
 	map(0x8000, 0xffff).rom();
 }
 
-MACHINE_CONFIG_START(wackygtr_state::wackygtr)
-
+void wackygtr_state::wackygtr(machine_config &config)
+{
 	MC6809(config, m_maincpu, XTAL(3'579'545)); // HD68B09P
 	m_maincpu->set_addrmap(AS_PROGRAM, &wackygtr_state::program_map);
 	m_maincpu->set_periodic_int(FUNC(wackygtr_state::irq0_line_assert), attotime::from_hz(50)); // FIXME

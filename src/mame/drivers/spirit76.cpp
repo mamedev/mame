@@ -121,14 +121,16 @@ void spirit76_state::machine_reset()
 	m_t_c = 0;
 }
 
-MACHINE_CONFIG_START(spirit76_state::spirit76)
+void spirit76_state::spirit76(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6800, 500000)
-	MCFG_DEVICE_PROGRAM_MAP(maincpu_map)
+	M6800(config, m_maincpu, 500000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &spirit76_state::maincpu_map);
+
 	TIMER(config, "irq").configure_periodic(FUNC(spirit76_state::irq), attotime::from_hz(120));
 
 	/* video hardware */
-	//MCFG_DEFAULT_LAYOUT()
+	//config.set_default_layout();
 
 	//6821pia
 	pia6821_device &pia(PIA6821(config, "pia", 0));
@@ -143,7 +145,7 @@ MACHINE_CONFIG_START(spirit76_state::spirit76)
 
 	/* sound hardware */
 	genpin_audio(config);
-MACHINE_CONFIG_END
+}
 
 
 ROM_START(spirit76)

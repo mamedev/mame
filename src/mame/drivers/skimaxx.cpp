@@ -397,7 +397,6 @@ void skimaxx_state::tms_program_map(address_map &map)
 	map(0x02000000, 0x0200000f).ram();
 	map(0x02100000, 0x0210000f).ram();
 	map(0x04000000, 0x047fffff).rom().region("tmsgfx", 0);
-	map(0xc0000000, 0xc00001ff).rw(m_tms, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xff800000, 0xffffffff).rom().region("tms", 0);
 }
 
@@ -558,8 +557,11 @@ void skimaxx_state::skimaxx(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	OKIM6295(config, "oki1", XTAL(4'000'000), okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "lspeaker", 1.0);     // ?
+
 	OKIM6295(config, "oki2", XTAL(4'000'000)/2, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "lspeaker", 1.0);  // ?
+
 	OKIM6295(config, "oki3", XTAL(4'000'000), okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "rspeaker", 1.0);     // ?
+
 	OKIM6295(config, "oki4", XTAL(4'000'000)/2, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "rspeaker", 1.0);  // ?
 }
 

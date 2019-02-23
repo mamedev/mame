@@ -815,7 +815,7 @@ MACHINE_CONFIG_START(atarigt_state::atarigt)
 	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_atarigt)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_atarigt);
 	MCFG_PALETTE_ADD("palette", MRAM_ENTRIES)
 
 	MCFG_TILEMAP_ADD_CUSTOM("playfield", "gfxdecode", 2, atarigt_state, get_playfield_tile_info, 8,8, atarigt_playfield_scan, 128,64)

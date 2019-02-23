@@ -377,7 +377,7 @@ MACHINE_CONFIG_START(backfire_state::backfire)
 	/* video hardware */
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_backfire)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_backfire);
 	config.set_default_layout(layout_dualhsxs);
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)

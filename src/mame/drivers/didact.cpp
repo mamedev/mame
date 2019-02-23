@@ -25,17 +25,17 @@
  *  TODO:
  *  Didact designs:    mp68a, md6802, Modulab
  * ------------------------------------------
- *  - Add PCB layouts   OK     OK     OK     
- *  - Dump ROM:s,       OK     OK     OK     
- *  - Keyboard          OK     OK     OK     
- *  - Display/CRT       OK     OK     OK     
+ *  - Add PCB layouts   OK     OK     OK
+ *  - Dump ROM:s,       OK     OK     OK
+ *  - Keyboard          OK     OK     OK
+ *  - Display/CRT       OK     OK     OK
  *  - Clickable Artwork RQ     RQ     OK
  *  - Sound             NA     NA
- *  - Cassette i/f                      
+ *  - Cassette i/f
  *  - Expansion bus
  *  - Expansion overlay
- *  - Interrupts        OK              
- *  - Serial                   XX       
+ *  - Interrupts        OK
+ *  - Serial                   XX
  *   XX = needs debug
  *********************************************/
 
@@ -110,7 +110,7 @@ protected:
 	uint8_t m_reset;
 	uint8_t m_shift;
 	optional_device<rs232_port_device> m_rs232;
-	output_finder<1> m_led;
+	output_finder<> m_led;
 };
 
 
@@ -248,7 +248,7 @@ WRITE8_MEMBER( md6802_state::pia2_kbB_w )
 WRITE_LINE_MEMBER( md6802_state::pia2_ca2_w )
 {
 	LOGKBD("--->%s(%02x) LED is connected through resisitor to +5v so logical 0 will lit it\n", FUNCNAME, state);
-	m_led[0] = state ? 0 :1;
+	m_led = state ? 0 :1;
 
 	// Serial Out - needs debug/verification
 	m_rs232->write_txd(state);
@@ -369,8 +369,8 @@ INPUT_CHANGED_MEMBER(didact_state::trigger_shift)
 	{
 		LOGKBD("SHIFT is pressed\n");
 		m_shift = 1;
-		m_led[0] = 1;
-	} 
+		m_led = 1;
+	}
 }
 
 READ8_MEMBER( mp68a_state::pia2_kbA_r )
@@ -430,7 +430,7 @@ READ8_MEMBER( mp68a_state::pia2_kbB_r )
 	{
 		pb |= 0x80;   // Set shift bit (PB7)
 		m_shift = 0;  // Reset flip flop
-		m_led[0] = 0;
+		m_led = 0;
 		LOGKBD(" SHIFT is released\n");
 	}
 
@@ -449,10 +449,8 @@ READ_LINE_MEMBER( mp68a_state::pia2_cb1_r )
 	for (unsigned i = 0U; 4U > i; ++i)
 		m_lines[i] = m_io_lines[i]->read();
 
-#if VERBOSE
-	if (m_lines[0] | m_lines[1] | m_lines[2] | m_lines[3])
+	if ((VERBOSE & LOG_GENERAL) && (m_lines[0] | m_lines[1] | m_lines[2] | m_lines[3]))
 		LOG("%s()-->%02x %02x %02x %02x\n", FUNCNAME, m_lines[0], m_lines[1], m_lines[2], m_lines[3]);
-#endif
 
 	return (m_lines[0] | m_lines[1] | m_lines[2] | m_lines[3]) ? 0 : 1;
 }
@@ -488,7 +486,7 @@ void mp68a_state::mp68a_map(address_map &map)
 //===================
 
 /*   The Modulab CPU board, by Didact/Esselte ca 1984
- *  __________________________________________________________________________________________ 
+ *  __________________________________________________________________________________________
  * |                                                    ADRESS               DATA             |
  * |              PORT A                      +-_--++-_--++-_--++-_--+   +-_--++-_--+   VCC   |
  * |    o   o   o   o   o   o   o   o         || | ||| | ||| | ||| | |   || | ||| | |    O    |
@@ -561,12 +559,12 @@ private:
 	};
 
 	// Simple emulation of 6 cascaded 74164 that drives the AAAADD BCD display elements, right to left
-        class shift8
+	class shift8
 	{
 	public:
-	  shift8(){ byte = 0; }
-	  void shiftIn(uint8_t in){ byte = ((byte << 1) & 0xfe) | (in & 1 ? 1 : 0); };
-	  uint8_t byte; 
+		shift8(){ byte = 0; }
+		void shiftIn(uint8_t in){ byte = ((byte << 1) & 0xfe) | (in & 1 ? 1 : 0); }
+		uint8_t byte;
 	};
 	shift8 m_74164[6];
 
@@ -586,15 +584,15 @@ READ8_MEMBER(modulab_state::io_r)
 	switch (offset)
 	{
 	case 3: // Poll Data available signal
-	  return m_da & 0x01; // Data Available signal gated by an 8097 hexbuffer to DB0
-	  break;
+		return m_da & 0x01; // Data Available signal gated by an 8097 hexbuffer to DB0
+		break;
 	case 2:
-	  LOG("--->%s Read Keyboard @ %04x\n", FUNCNAME, offset);
-	  return m_kb->read();
-	  break;
+		LOG("--->%s Read Keyboard @ %04x\n", FUNCNAME, offset);
+		return m_kb->read();
+		break;
 	default:
-	  LOG("--->%s BAD access @ %04x\n", FUNCNAME, offset);
-	  break;
+		LOG("--->%s BAD access @ %04x\n", FUNCNAME, offset);
+		break;
 	}
 	return 0;
 }
@@ -609,14 +607,14 @@ WRITE8_MEMBER(modulab_state::io_w)
 		// Update the BCD elements with a data bit b shifted in right to left, CS is used as clock for all 164's
 		for (int i = 0; i < 6; i++)
 		{
-	  		uint8_t c = (m_74164[i].byte & 0x80) ? 1 : 0; // Bit 7 is connected to the next BCD right to left
+			uint8_t c = (m_74164[i].byte & 0x80) ? 1 : 0; // Bit 7 is connected to the next BCD right to left
 			m_74164[i].shiftIn(b);
 			m_7segs[i] = ~m_74164[i].byte & 0x7f;  // Bit 0 to 6 drives the 7 seg display
-			b = c; // bit 7 prior shift will be shifted in next (simultaneous in real life) 
+			b = c; // bit 7 prior shift will be shifted in next (simultaneous in real life)
 		}
 		LOGDISPLAY("Shifted: %02x %02x %02x %02x %02x %02x\n",
-			   ~m_74164[0].byte & 0x7f, ~m_74164[1].byte & 0x7f, ~m_74164[2].byte & 0x7f, 
-			   ~m_74164[3].byte & 0x7f, ~m_74164[4].byte & 0x7f, ~m_74164[5].byte & 0x7f);
+				~m_74164[0].byte & 0x7f, ~m_74164[1].byte & 0x7f, ~m_74164[2].byte & 0x7f,
+				~m_74164[3].byte & 0x7f, ~m_74164[4].byte & 0x7f, ~m_74164[5].byte & 0x7f);
 		break;
 	default:
 		break;
@@ -626,7 +624,7 @@ WRITE8_MEMBER(modulab_state::io_w)
 void modulab_state::machine_reset()
 {
 	LOG("--->%s()\n", FUNCNAME);
-	
+
 	m_maincpu->reset();
 }
 
@@ -770,7 +768,7 @@ INPUT_CHANGED_MEMBER(didact_state::trigger_reset)
 		LOGKBD("RESET is released, resetting the CPU\n");
 		machine_reset();
 		m_shift = 0;
-		m_led[0] = 0;
+		m_led = 0;
 	}
 }
 
@@ -790,7 +788,7 @@ void modulab_state::modulab(machine_config &config)
 	m_kb->x2_rd_callback().set_ioport("LINE1");
 	m_kb->x3_rd_callback().set_ioport("LINE2");
 	m_kb->x4_rd_callback().set_ioport("LINE3");
-	
+
 	/* PIA #1 0x????-0x??? -  */
 	INS8154(config, m_pia1);
 	//m_ins8154->in_a().set(FUNC(modulab_state::ins8154_pa_r));
@@ -892,10 +890,10 @@ ROM_START( modulab )
 
 	ROM_SYSTEM_BIOS(0, "modulabv1", "Modulab Version 1")
 	ROMX_LOAD( "mlab1_00.bin", 0x0000, 0x0800, NO_DUMP, ROM_BIOS(0) )
-	
+
 	ROM_SYSTEM_BIOS(1, "modulabv2", "Modulab Version 2")
 	ROMX_LOAD( "mlab2_00.bin", 0x0000, 0x0800, NO_DUMP, ROM_BIOS(1) )
-	
+
 	ROM_SYSTEM_BIOS(2, "modulabvl", "Modulab Prototype")
 	ROMX_LOAD( "modulab_levererad.bin", 0x0000, 0x0800, CRC(40774ef4) SHA1(9cf188342993fbcff13dbbecc62d1ee49010d6f4), ROM_BIOS(2) )
 ROM_END

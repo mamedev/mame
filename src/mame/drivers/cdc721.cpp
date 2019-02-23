@@ -327,7 +327,7 @@ MACHINE_CONFIG_START(cdc721_state::cdc721)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 	MCFG_SCREEN_PALETTE("palette")
 	PALETTE(config, "palette", FUNC(cdc721_state::cdc721_palette), 3);
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cdc721)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_cdc721);
 
 	CRT5037(config, m_crtc, 12.936_MHz_XTAL / 8).set_char_width(8);
 	m_crtc->set_screen("screen");

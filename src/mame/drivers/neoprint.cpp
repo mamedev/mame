@@ -55,6 +55,7 @@ public:
 	void nprsp(machine_config &config);
 
 	void init_98best44();
+	void init_npmillen();
 	void init_npcartv1();
 	void init_nprsp();
 	void init_unkneo();
@@ -499,7 +500,8 @@ void neoprint_state::machine_start()
 	m_upd4990a->c2_w(1);
 }
 
-MACHINE_CONFIG_START(neoprint_state::neoprint)
+void neoprint_state::neoprint(machine_config &config)
+{
 	M68000(config, m_maincpu, 12000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &neoprint_state::neoprint_map);
 	m_maincpu->set_periodic_int(FUNC(neoprint_state::irq3_line_hold), attotime::from_hz(45)); /* camera / printer irq, unknown timing */
@@ -659,6 +661,23 @@ ROM_START( nprsp )
 	// 8bpp might be possible with another ROM?
 ROM_END
 
+ROM_START( npmillen )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "p093-ep1.bin", 0x000000, 0x080000, CRC(47783f56) SHA1(1845e90b05a58010054c4158ef08e167e61ea370) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )
+	ROM_LOAD( "p016-m1.bin", 0x00000, 0x20000, CRC(f40cf036) SHA1(63041318d8bec144a4688cc5f45107f8331809bf) )
+
+	ROM_REGION( 0x200000, "ymsnd", 0 )
+	ROM_LOAD( "p016-v1.bin", 0x000000, 0x200000, CRC(400ca9ce) SHA1(f8636a4600200ef9000a25e80cf20f252703ad37) )
+
+	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE00 )
+	ROM_LOAD32_BYTE( "p093-c1.bin", 0x000000, 0x80000, CRC(bbb8266b) SHA1(3cbe8c9a6a82d9927910833b5874fe0a4a8c8384) )
+	ROM_LOAD32_BYTE( "p093-c2.bin", 0x000001, 0x80000, CRC(a82e79f4) SHA1(cc3a0171d488167212c2baaeda7c6cf13bb19611) )
+	ROM_LOAD32_BYTE( "p093-c3.bin", 0x200001, 0x80000, CRC(11554065) SHA1(4a75dbcc04b5f6bf82cf22093ed3d29ae8ee4c5d) )
+	ROM_LOAD32_BYTE( "p093-c4.bin", 0x200002, 0x80000, CRC(01d9c22a) SHA1(bf3f40de7f70cb5bb0fe487021ab110192c3b247) )
+ROM_END
+
 /* FIXME: get rid of these two, probably something to do with irq3 and camera / printer devices */
 void neoprint_state::init_npcartv1()
 {
@@ -675,6 +694,15 @@ void neoprint_state::init_98best44()
 	uint16_t *ROM = (uint16_t *)memregion( "maincpu" )->base();
 
 	ROM[0x1312/2] = 0x4e71;
+}
+
+void neoprint_state::init_npmillen()
+{
+	uint16_t *ROM = (uint16_t *)memregion( "maincpu" )->base();
+
+	ROM[0x1312/2] = 0x4e71;
+
+	ROM[0x42a8/2] = 0x4e71; //ROM checksum
 }
 
 void neoprint_state::init_nprsp()
@@ -695,7 +723,8 @@ void neoprint_state::init_unkneo()
 	ROM[0x12c2/2] = 0x4e71;
 }
 
-GAME( 1996, neoprint,    0,        neoprint,    neoprint, neoprint_state, init_unkneo,   ROT0, "SNK", "Neo Print (Japan) (T2d)",                           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1996, npcartv1,    0,        neoprint,    neoprint, neoprint_state, init_npcartv1, ROT0, "SNK", "Neo Print V1 (World) (E1a)",                        MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1998, 98best44,    0,        neoprint,    neoprint, neoprint_state, init_98best44, ROT0, "SNK", "Neo Print - '98 NeoPri Best 44 (Japan) (T4i 3.07)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1996, nprsp,       0,        nprsp,       neoprint, neoprint_state, init_nprsp,    ROT0, "SNK", "NeopriSP Retro Collection (Japan)",                 MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1996, neoprint,    0,        neoprint,    neoprint, neoprint_state, init_unkneo,   ROT0, "SNK", "Neo Print (Japan) (T2d)",                                       MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1996, npcartv1,    0,        neoprint,    neoprint, neoprint_state, init_npcartv1, ROT0, "SNK", "Neo Print V1 (World) (E1a)",                                    MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1998, 98best44,    0,        neoprint,    neoprint, neoprint_state, init_98best44, ROT0, "SNK", "Neo Print - '98 NeoPri Best 44 (Japan) (T4i 3.07)",             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1999, npmillen,    0,        neoprint,    neoprint, neoprint_state, init_npmillen, ROT0, "SNK", "Neo Print - Millennium Multi Shot Edition (World) (T4i 3.07)",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1996, nprsp,       0,        nprsp,       neoprint, neoprint_state, init_nprsp,    ROT0, "SNK", "NeopriSP Retro Collection (Japan)",                             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )

@@ -3403,7 +3403,7 @@ MACHINE_CONFIG_START(cps_state::cps1_10MHz)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, cps_state, screen_vblank_cps1))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cps1)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);
 	MCFG_PALETTE_ADD("palette", 0xc00)
 
 	/* sound hardware */
@@ -13167,7 +13167,7 @@ READ16_MEMBER(cps_state::ganbare_ram_r)
 	uint16_t result = 0xffff;
 
 	if (ACCESSING_BITS_0_7)
-		result = (result & ~0x00ff) | m_m48t35->read(space, offset, 0xff);
+		result = (result & ~0x00ff) | m_m48t35->read(offset);
 	if (ACCESSING_BITS_8_15)
 		result = (result & ~0xff00) | (m_mainram[offset] & 0xff00);
 
@@ -13179,7 +13179,7 @@ WRITE16_MEMBER(cps_state::ganbare_ram_w)
 	COMBINE_DATA(&m_mainram[offset]);
 
 	if (ACCESSING_BITS_0_7)
-		m_m48t35->write(space, offset, data & 0xff, 0xff);
+		m_m48t35->write(offset, data & 0xff);
 }
 
 void cps_state::init_ganbare()

@@ -752,7 +752,7 @@ MACHINE_CONFIG_START(atarisy1_state::atarisy1)
 	TIMER(config, m_yscroll_reset_timer).configure_generic(FUNC(atarisy1_state::atarisy1_reset_yscroll_callback));
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_atarisy1)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_atarisy1);
 
 	PALETTE(config, m_palette).set_format(palette_device::IRGB_4444, 1024);
 

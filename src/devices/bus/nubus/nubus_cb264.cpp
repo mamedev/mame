@@ -40,13 +40,14 @@ DEFINE_DEVICE_TYPE(NUBUS_CB264, nubus_cb264_device, "nb_c264", "RasterOps ColorB
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(nubus_cb264_device::device_add_mconfig)
-	MCFG_SCREEN_ADD( CB264_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, nubus_cb264_device, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
-	MCFG_SCREEN_SIZE(1024,768)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-MACHINE_CONFIG_END
+void nubus_cb264_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, CB264_SCREEN_NAME, SCREEN_TYPE_RASTER));
+	screen.set_screen_update(FUNC(nubus_cb264_device::screen_update));
+	screen.set_raw(25175000, 800, 0, 640, 525, 0, 480);
+	screen.set_size(1024, 768);
+	screen.set_visarea(0, 640-1, 0, 480-1);
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

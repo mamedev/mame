@@ -432,7 +432,7 @@ void rx78_state::machine_reset()
 {
 	address_space &prg = m_maincpu->space(AS_PROGRAM);
 	if (m_cart->exists())
-		prg.install_read_handler(0x2000, 0x5fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+		prg.install_read_handler(0x2000, 0x5fff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 }
 
 DEVICE_IMAGE_LOAD_MEMBER( rx78_state, rx78_cart )
@@ -490,7 +490,7 @@ MACHINE_CONFIG_START(rx78_state::rx78)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 16+1) //+1 for the background color
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rx78)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_rx78);
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "rx78_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")

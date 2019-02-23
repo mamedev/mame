@@ -372,8 +372,8 @@ void xavix_state::draw_tilemap_line(screen_device &screen, bitmap_ind16 &bitmap,
 		int scrollx = tileregs[0x4];
 
 		int basereg;
-		int flipx = 0;
-		int flipy = 0;
+		int flipx = (tileregs[0x03]&0x40)>>6;
+		int flipy = (tileregs[0x03]&0x80)>>7;
 		int gfxbase;
 
 		// tile 0 is always skipped, doesn't even point to valid data packets in alt mode

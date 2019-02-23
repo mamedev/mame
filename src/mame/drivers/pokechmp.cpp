@@ -246,7 +246,7 @@ MACHINE_CONFIG_START(pokechmp_state::pokechmp)
 	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	screen.screen_vblank().append(FUNC(pokechmp_state::sound_irq));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pokechmp)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pokechmp);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x400);
 
 	/* sound hardware */

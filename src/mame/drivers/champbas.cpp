@@ -556,7 +556,7 @@ MACHINE_CONFIG_START(champbas_state::talbot)
 	MCFG_SCREEN_UPDATE_DRIVER(champbas_state, screen_update_champbas)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_talbot)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_talbot);
 	PALETTE(config, m_palette, FUNC(champbas_state::champbas_palette), 512, 32);
 
 	/* sound hardware */
@@ -598,7 +598,7 @@ MACHINE_CONFIG_START(champbas_state::champbas)
 	MCFG_SCREEN_UPDATE_DRIVER(champbas_state, screen_update_champbas)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_champbas)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_champbas);
 	PALETTE(config, m_palette, FUNC(champbas_state::champbas_palette), 512, 32);
 
 	/* sound hardware */
@@ -608,9 +608,10 @@ MACHINE_CONFIG_START(champbas_state::champbas)
 
 	AY8910(config, "ay1", XTAL(18'432'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.3);
 
-	MCFG_DEVICE_ADD("dac", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.7) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	DAC_6BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.7); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(champbas_state::champbasj)
@@ -708,7 +709,7 @@ MACHINE_CONFIG_START(exctsccr_state::exctsccr)
 	MCFG_SCREEN_UPDATE_DRIVER(exctsccr_state, screen_update_exctsccr)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_exctsccr)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_exctsccr);
 	PALETTE(config, m_palette, FUNC(exctsccr_state::exctsccr_palette), 512, 32);
 
 	/* sound hardware */
@@ -725,11 +726,11 @@ MACHINE_CONFIG_START(exctsccr_state::exctsccr)
 
 	AY8910(config, "ay4", XTAL(14'318'181)/8).add_route(ALL_OUTPUTS, "speaker", 0.08);
 
-	MCFG_DEVICE_ADD("dac1", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3) // unknown DAC
-	MCFG_DEVICE_ADD("dac2", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
+	DAC_6BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.3); // unknown DAC
+	DAC_6BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.3); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT);
 MACHINE_CONFIG_END
 
 /* Bootleg running on a modified Champion Baseball board */
@@ -766,7 +767,7 @@ MACHINE_CONFIG_START(exctsccr_state::exctsccrb)
 	MCFG_SCREEN_UPDATE_DRIVER(exctsccr_state, screen_update_exctsccr)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_exctsccr)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_exctsccr);
 	PALETTE(config, m_palette, FUNC(exctsccr_state::exctsccr_palette), 512, 32);
 
 	/* sound hardware */
@@ -776,9 +777,10 @@ MACHINE_CONFIG_START(exctsccr_state::exctsccrb)
 
 	AY8910(config, "ay1", XTAL(18'432'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.3);
 
-	MCFG_DEVICE_ADD("dac", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.7) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	DAC_6BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.7); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 MACHINE_CONFIG_END
 
 

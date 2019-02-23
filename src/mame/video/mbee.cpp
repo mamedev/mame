@@ -256,7 +256,7 @@ WRITE8_MEMBER ( mbee_state::m6545_index_w )
 {
 	data &= 0x1f;
 	m_sy6545_ind = data;
-	m_crtc->address_w( space, 0, data );
+	m_crtc->address_w(data);
 }
 
 WRITE8_MEMBER ( mbee_state::m6545_data_w )
@@ -272,7 +272,7 @@ WRITE8_MEMBER ( mbee_state::m6545_data_w )
 		break;
 	}
 	m_sy6545_reg[m_sy6545_ind] = data & sy6545_mask[m_sy6545_ind];  /* save data in register */
-	m_crtc->register_w( space, 0, data );
+	m_crtc->register_w(data);
 	if ((m_sy6545_ind > 8) && (m_sy6545_ind < 12)) sy6545_cursor_configure();       /* adjust cursor shape - remove when mame fixed */
 }
 

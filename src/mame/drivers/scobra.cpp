@@ -866,16 +866,16 @@ static INPUT_PORTS_START( mimonsco )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(scobra_state::type1)
-
+void scobra_state::type1(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 18432000/6)    /* 3.072 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(type1_map)
+	Z80(config, m_maincpu, 18432000/6);    /* 3.072 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &scobra_state::type1_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80,14318000/8)    /* 1.78975 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(scobra_sound_map)
-	MCFG_DEVICE_IO_MAP(scobra_sound_io_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(scramble_state,scramble_sh_irq_callback)
+	Z80(config, m_audiocpu, 14318000/8);    /* 1.78975 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &scobra_state::scobra_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &scobra_state::scobra_sound_io_map);
+	m_audiocpu->set_irq_acknowledge_callback(FUNC(scramble_state::scramble_sh_irq_callback));
 
 	ttl7474_device &konami_7474(TTL7474(config, "konami_7474", 0));
 	konami_7474.comp_output_cb().set(FUNC(scobra_state::scramble_sh_7474_q_callback));
@@ -902,13 +902,13 @@ MACHINE_CONFIG_START(scobra_state::type1)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(16000.0/132/2)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(scobra_state, screen_update_galaxold)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(16000.0/132/2);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(scobra_state::screen_update_galaxold));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_scobra);
 	PALETTE(config, m_palette, FUNC(scobra_state::scrambold_palette), 32+64+2+1); // 32 for characters, 64 for stars, 2 for bullets, 1 for background
@@ -926,13 +926,14 @@ MACHINE_CONFIG_START(scobra_state::type1)
 	ay2.port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
 	ay2.port_b_read_callback().set(FUNC(scramble_state::scramble_portB_r));
 	ay2.add_route(ALL_OUTPUTS, "mono", 0.16);
-MACHINE_CONFIG_END
+}
 
 
 
 /* Rescue, Minefield and Strategy X have extra colors, and custom video initialise */
 /* routines to set up the graduated color backgound they use */
-MACHINE_CONFIG_START(scobra_state::rescue)
+void scobra_state::rescue(machine_config &config)
+{
 	type1(config);
 
 	/* basic machine hardware */
@@ -942,14 +943,14 @@ MACHINE_CONFIG_START(scobra_state::rescue)
 	m_palette->set_init(FUNC(scobra_state::rescue_palette));
 
 	MCFG_VIDEO_START_OVERRIDE(scobra_state,rescue)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(scobra_state::rescuefe)
+void scobra_state::rescuefe(machine_config &config)
+{
 	rescue(config);
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(rescuefe_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &scobra_state::rescuefe_map);
+}
 
 void scobra_state::rescueb(machine_config &config)
 {
@@ -958,55 +959,55 @@ void scobra_state::rescueb(machine_config &config)
 }
 
 
-MACHINE_CONFIG_START(scobra_state::minefld)
+void scobra_state::minefld(machine_config &config)
+{
 	type1(config);
-
-	/* basic machine hardware */
 
 	/* video hardware */
 	m_palette->set_entries(32+64+2+256); // 32 for characters, 64 for stars, 2 for bullets, 256 for background
 	m_palette->set_init(FUNC(scobra_state::minefld_palette));
 
 	MCFG_VIDEO_START_OVERRIDE(scobra_state,minefld)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(scobra_state::minefldfe)
+void scobra_state::minefldfe(machine_config &config)
+{
 	minefld(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(minefldfe_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &scobra_state::minefldfe_map);
+}
 
 
-MACHINE_CONFIG_START(scobra_state::mimonkey)
+void scobra_state::mimonkey(machine_config &config)
+{
 	type1(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(mimonkey_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &scobra_state::mimonkey_map);
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(scobra_state,mimonkey)
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(scobra_state::type2)
+void scobra_state::type2(machine_config &config)
+{
 	type1(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(type2_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &scobra_state::type2_map);
+}
 
-MACHINE_CONFIG_START(scobra_state::tazmani3)
+void scobra_state::tazmani3(machine_config &config)
+{
 	type2(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(tazmani3_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &scobra_state::tazmani3_map);
+}
 
 
-MACHINE_CONFIG_START(scobra_state::stratgyx)
+void scobra_state::stratgyx(machine_config &config)
+{
 	type2(config);
 
 	/* basic machine hardware */
@@ -1020,32 +1021,31 @@ MACHINE_CONFIG_START(scobra_state::stratgyx)
 	m_palette->set_init(FUNC(scobra_state::stratgyx_palette));
 
 	MCFG_VIDEO_START_OVERRIDE(scobra_state,stratgyx)
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(scobra_state::darkplnt)
+void scobra_state::darkplnt(machine_config &config)
+{
 	type2(config);
-
-	/* basic machine hardware */
 
 	/* video hardware */
 	m_palette->set_entries(32+64+2); // 32 for characters, 64 (buffer) for stars, 2 for bullets
 	m_palette->set_init(FUNC(scobra_state::darkplnt_palette));
 
 	MCFG_VIDEO_START_OVERRIDE(scobra_state,darkplnt)
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(scobra_state::hustler)
-
+void scobra_state::hustler(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 18432000/6)    /* 3.072 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(hustler_map)
+	Z80(config, m_maincpu, 18432000/6);    /* 3.072 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &scobra_state::hustler_map);
 
-	MCFG_DEVICE_ADD("audiocpu",Z80,14318000/8) /* 1.78975 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(hustler_sound_map)
-	MCFG_DEVICE_IO_MAP(hustler_sound_io_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(scramble_state,scramble_sh_irq_callback)
+	Z80(config, m_audiocpu, 14318000/8); /* 1.78975 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &scobra_state::hustler_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &scobra_state::hustler_sound_io_map);
+	m_audiocpu->set_irq_acknowledge_callback(FUNC(scramble_state::scramble_sh_irq_callback));
 
 	ttl7474_device &konami_7474(TTL7474(config, "konami_7474", 0));
 	konami_7474.comp_output_cb().set(FUNC(scobra_state::scramble_sh_7474_q_callback));
@@ -1072,13 +1072,13 @@ MACHINE_CONFIG_START(scobra_state::hustler)
 	m_ppi8255_1->out_pb_callback().set(FUNC(scramble_state::scramble_sh_irqtrigger_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(16000.0/132/2)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(scobra_state, screen_update_galaxold)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(16000.0/132/2);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(scobra_state::screen_update_galaxold));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_scobra);
 	PALETTE(config, m_palette, FUNC(scobra_state::galaxold_palette), 32+64+2); // 32 for characters, 64 for stars, 2 for bullets
@@ -1093,27 +1093,26 @@ MACHINE_CONFIG_START(scobra_state::hustler)
 	aysnd.port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
 	aysnd.port_b_read_callback().set(FUNC(scramble_state::hustler_portB_r));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.33);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(scobra_state::hustlerb)
+void scobra_state::hustlerb(machine_config &config)
+{
 	hustler(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(hustlerb_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &scobra_state::hustlerb_map);
 
-	MCFG_DEVICE_MODIFY("audiocpu")
-	MCFG_DEVICE_PROGRAM_MAP(hustlerb_sound_map)
-	MCFG_DEVICE_IO_MAP(hustlerb_sound_io_map)
-MACHINE_CONFIG_END
+	m_audiocpu->set_addrmap(AS_PROGRAM, &scobra_state::hustlerb_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &scobra_state::hustlerb_sound_io_map);
+}
 
-MACHINE_CONFIG_START(scobra_state::hustlerb4)
+void scobra_state::hustlerb4(machine_config &config)
+{
 	hustler(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(hustlerb_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &scobra_state::hustlerb_map);
+}
 
 
 

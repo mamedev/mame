@@ -3435,7 +3435,7 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 	m_vgmplay->set_addrmap(AS_IO, &vgmplay_state::soundchips_map);
 	m_vgmplay->set_addrmap(AS_IO16, &vgmplay_state::soundchips16_map);
 
-	MCFG_QUICKLOAD_ADD("quickload", vgmplay_state, load_file, "vgm,vgz", 0)
+	MCFG_QUICKLOAD_ADD("quickload", vgmplay_state, load_file, "vgm,vgz")
 	MCFG_QUICKLOAD_INTERFACE("vgm_quik")
 
 	SOFTWARE_LIST(config, "vgm_list").set_original("vgmplay");

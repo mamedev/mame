@@ -64,6 +64,29 @@ public:
 	void set_relative_mode(bool rela) { m_relative_mode = rela; }
 	void set_rw_cycles(unsigned read_cycles , unsigned write_cycles) { m_r_cycles = read_cycles; m_w_cycles = write_cycles; }
 
+	// Possible combinations:
+	// 00   No r/w cycle in progress
+	// 01   Non-ifetch rd cycle
+	// 05   Ifetch rd cycle
+	// 09   DMA rd cycle
+	// 02   Wr cycle
+	// 0a   DMA wr cycle
+	//
+	// CYCLE_RAL_MASK is set when access is into register space [0..1f]
+	enum : uint8_t {
+		CYCLE_RD_MASK = 0x01,
+		CYCLE_WR_MASK = 0x02,
+		CYCLE_IFETCH_MASK = 0x04,
+		CYCLE_DMA_MASK = 0x08,
+		CYCLE_RAL_MASK = 0x10
+	};
+
+	// Called at start of each memory access
+	auto stm_cb() { return m_stm_func.bind(); }
+
+	// Tap into fetched opcodes
+	auto opcode_cb() { return m_opcode_func.bind(); }
+
 protected:
 	hp_hybrid_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t addrwidth);
 
@@ -123,6 +146,7 @@ protected:
 	void WIO(uint8_t pa , uint8_t ic , uint16_t v);
 
 	uint16_t fetch();
+	uint16_t fetch_at(uint32_t addr);
 	virtual uint16_t get_indirect_target(uint32_t addr);
 	virtual void enter_isr();
 	virtual void handle_dma() = 0;
@@ -133,6 +157,8 @@ protected:
 
 	devcb_write8 m_pa_changed_func;
 	uint8_t m_last_pa;
+	devcb_write16 m_opcode_func;
+	devcb_write8 m_stm_func;
 
 	int m_icount;
 	uint32_t m_addr_mask;
@@ -159,6 +185,8 @@ protected:
 	uint16_t m_dmac;      // DMA counter
 	uint16_t m_reg_I;     // Instruction register
 	uint32_t m_genpc; // Full PC
+	uint8_t m_curr_cycle;   // Current cycle type
+
 	// EMC registers
 	uint16_t m_reg_ar2[ 4 ];  // AR2 register
 	uint16_t m_reg_se;    // SE register (4 bits)

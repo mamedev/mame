@@ -308,14 +308,15 @@ INPUT_PORTS_END
 void pencil2_state::machine_start()
 {
 	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0xffff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0xffff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 }
 
-MACHINE_CONFIG_START(pencil2_state::pencil2)
+void pencil2_state::pencil2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(10'738'635)/3)
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
+	Z80(config, m_maincpu, XTAL(10'738'635)/3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pencil2_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &pencil2_state::io_map);
 
 	/* video hardware */
 	tms9929a_device &vdp(TMS9929A(config, "tms9928a", XTAL(10'738'635)));
@@ -325,8 +326,7 @@ MACHINE_CONFIG_START(pencil2_state::pencil2)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("sn76489a", SN76489A, XTAL(10'738'635)/3) // guess
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	SN76489A(config, "sn76489a", XTAL(10'738'635)/3).add_route(ALL_OUTPUTS, "mono", 1.00); // guess
 	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* cassette */
@@ -334,7 +334,7 @@ MACHINE_CONFIG_START(pencil2_state::pencil2)
 	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "pencil2_cart")
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "pencil2_cart");
 
 	/* printer */
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
@@ -346,7 +346,7 @@ MACHINE_CONFIG_START(pencil2_state::pencil2)
 
 	/* Software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("pencil2");
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( pencil2 )

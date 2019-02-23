@@ -6,8 +6,8 @@
  */
 
 #include "nld_mm5837.h"
-#include "../solver/nld_matrix_solver.h"
 #include "../analog/nlid_twoterm.h"
+#include "../solver/nld_matrix_solver.h"
 
 #define R_LOW (1000.0)
 #define R_HIGH (1000.0)
@@ -69,13 +69,13 @@ namespace netlist
 	{
 		//m_V0.initial(0.0);
 		//m_RV.do_reset();
-		m_RV.set(NL_FCONST(1.0) / R_LOW, 0.0, 0.0);
+		m_RV.set(plib::constants<nl_double>::one() / R_LOW, 0.0, 0.0);
 		m_inc = netlist_time::from_double(1.0 / m_FREQ());
 		if (m_FREQ() < 24000 || m_FREQ() > 56000)
 			log().warning(MW_1_FREQUENCY_OUTSIDE_OF_SPECS_1, m_FREQ());
 
 		m_shift = 0x1ffff;
-		m_is_timestep = m_RV.m_P.net().solver()->is_timestep();
+		m_is_timestep = m_RV.m_P.net().solver()->has_timestep_devices();
 	}
 
 	NETLIB_UPDATE_PARAM(MM5837_dip)
@@ -108,8 +108,8 @@ namespace netlist
 			// We only need to update the net first if this is a time stepping net
 			if (m_is_timestep)
 				m_RV.update();
-			m_RV.set(NL_FCONST(1.0) / R, V, 0.0);
-			m_RV.m_P.schedule_solve_after(NLTIME_FROM_NS(1));
+			m_RV.set(plib::constants<nl_double>::one() / R, V, plib::constants<nl_double>::zero());
+			m_RV.solve_later(NLTIME_FROM_NS(1));
 		}
 
 	}

@@ -285,9 +285,10 @@ static void ntb_cart(device_slot_interface &device)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(nes_sunsoft_dcs_device::device_add_mconfig)
-	MCFG_NTB_MINICART_ADD("ntb_slot", ntb_cart)
-MACHINE_CONFIG_END
+void nes_sunsoft_dcs_device::device_add_mconfig(machine_config &config)
+{
+	NES_NTB_SLOT(config, m_subslot, ntb_cart);
+}
 
 
 //-------------------------------------------------

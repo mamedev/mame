@@ -19,6 +19,7 @@
 #include "machine/tandy2kb.h"
 #include "machine/timer.h"
 #include "machine/upd765.h"
+#include "machine/bankdev.h"
 #include "sound/spkrdev.h"
 #include "video/crt9007.h"
 #include "video/crt9021.h"
@@ -58,7 +59,8 @@ public:
 		m_drb0(*this, CRT9212_0_TAG),
 		m_drb1(*this, CRT9212_1_TAG),
 		m_vac(*this, CRT9021B_TAG),
-		m_palette(*this, "palette"),
+		m_colpal(*this, "colpal"),
+		m_vrambank(*this, "vrambank"),
 		m_timer_vidldsh(*this, "vidldsh"),
 		m_centronics(*this, CENTRONICS_TAG),
 		m_speaker(*this, "speaker"),
@@ -98,7 +100,10 @@ public:
 		m_centronics_fault(0),
 		m_centronics_select(0),
 		m_centronics_perror(0),
-		m_centronics_busy(0)
+		m_centronics_busy(0),
+		m_buttons(*this, "MOUSEBTN"),
+		m_x_axis(*this, "MOUSEX"),
+		m_y_axis(*this, "MOUSEY")
 	{
 		for (auto & elem : m_busdmarq)
 		{
@@ -108,6 +113,7 @@ public:
 
 	void tandy2k_hd(machine_config &config);
 	void tandy2k(machine_config &config);
+	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
 
 private:
 	required_device<i80186_cpu_device> m_maincpu;
@@ -121,7 +127,8 @@ private:
 	required_device<crt9212_device> m_drb0;
 	required_device<crt9212_device> m_drb1;
 	required_device<crt9021_device> m_vac;
-	required_device<palette_device> m_palette;
+	required_device<palette_device> m_colpal;
+	required_device<address_map_bank_device> m_vrambank;
 	required_device<timer_device> m_timer_vidldsh;
 	required_device<centronics_device> m_centronics;
 	required_device<speaker_sound_device> m_speaker;
@@ -135,7 +142,9 @@ private:
 	required_device<pc_keyboard_device> m_pc_keyboard; // temporary until the tandy keyboard has a rom dump
 
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	virtual void device_reset_after_children() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -150,8 +159,6 @@ private:
 	DECLARE_WRITE8_MEMBER( enable_w );
 	DECLARE_WRITE8_MEMBER( dma_mux_w );
 	DECLARE_READ8_MEMBER( kbint_clr_r );
-	DECLARE_READ16_MEMBER( vpac_r );
-	DECLARE_WRITE16_MEMBER( vpac_w );
 	DECLARE_READ8_MEMBER( fldtc_r );
 	DECLARE_WRITE8_MEMBER( fldtc_w );
 	DECLARE_WRITE8_MEMBER( addr_ctrl_w );
@@ -168,10 +175,15 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( vpac_cblank_w );
 	DECLARE_WRITE_LINE_MEMBER( vpac_slg_w );
 	DECLARE_WRITE_LINE_MEMBER( vpac_sld_w );
+	DECLARE_READ8_MEMBER( hires_status_r );
+	DECLARE_WRITE8_MEMBER( hires_plane_w );
+	DECLARE_WRITE8_MEMBER( hires_palette_w );
 	DECLARE_WRITE8_MEMBER( vidla_w );
 	DECLARE_WRITE8_MEMBER( drb_attr_w );
 	DECLARE_WRITE_LINE_MEMBER( kbdclk_w );
 	DECLARE_WRITE_LINE_MEMBER( kbddat_w );
+	DECLARE_READ8_MEMBER( clkmouse_r );
+	DECLARE_WRITE8_MEMBER( clkmouse_w );
 	DECLARE_READ8_MEMBER( irq_callback );
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_hdl_w );
@@ -183,6 +195,7 @@ private:
 	CRT9021_DRAW_CHARACTER_MEMBER( vac_draw_character );
 	TIMER_DEVICE_CALLBACK_MEMBER( vidldsh_tick );
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static rgb_t IRGB(uint32_t raw);
 
 	enum
 	{
@@ -223,6 +236,7 @@ private:
 	int m_sld;
 	uint8_t m_cgra;
 	uint8_t m_vidla;
+	uint8_t m_hires_en;
 
 	/* sound state */
 	int m_outspkr;
@@ -234,10 +248,32 @@ private:
 	int m_centronics_perror;
 	int m_centronics_busy;
 
+	enum
+	{
+		MO_IRQ = 1,
+		BT_IRQ = 2
+	};
+
+	enum
+	{
+		MOUS_TIMER,
+		MCU_DELAY
+	};
+
+	uint8_t m_clkmouse_cmd[8];
+	int m_clkmouse_cnt;
+	uint8_t m_clkmouse_irq;
+	uint16_t m_mouse_x, m_mouse_y;
+	emu_timer *m_mouse_timer;
+	emu_timer *m_mcu_delay;
+
 	void tandy2k_hd_io(address_map &map);
 	void tandy2k_io(address_map &map);
 	void tandy2k_mem(address_map &map);
 	void vpac_mem(address_map &map);
+	void vrambank_mem(address_map &map);
+
+	required_ioport m_buttons, m_x_axis, m_y_axis;
 };
 
 #endif // MAME_INCLUDES_TANDY2K_H

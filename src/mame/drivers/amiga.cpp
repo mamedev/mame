@@ -29,6 +29,14 @@
 
 
 //**************************************************************************
+//  CONSTANTS / MACROS
+//**************************************************************************
+
+#define EXP_SLOT_TAG "exp"
+#define ZORROBUS_TAG "zorrobus"
+
+
+//**************************************************************************
 //  PRIVATE DEVICES
 //**************************************************************************
 
@@ -609,7 +617,7 @@ WRITE16_MEMBER( a500p_state::clock_w )
 READ8_MEMBER( cdtv_state::dmac_scsi_data_read )
 {
 	if (offset >= 0xb0 && offset <= 0xbf)
-		return m_tpi->read(space, offset);
+		return m_tpi->read(offset);
 
 	return 0xff;
 }
@@ -617,7 +625,7 @@ READ8_MEMBER( cdtv_state::dmac_scsi_data_read )
 WRITE8_MEMBER( cdtv_state::dmac_scsi_data_write )
 {
 	if (offset >= 0xb0 && offset <= 0xbf)
-		m_tpi->write(space, offset, data);
+		m_tpi->write(offset, data);
 }
 
 READ8_MEMBER( cdtv_state::dmac_io_read )
@@ -1152,7 +1160,7 @@ WRITE8_MEMBER( cd32_state::akiko_cia_0_port_a_write )
 	// bit 1, power led
 	m_power_led = BIT(~data, 1);
 
-	handle_joystick_cia(data, m_cia_0->read(space, 2));
+	handle_joystick_cia(data, m_cia_0->read(2));
 }
 
 
@@ -1687,17 +1695,19 @@ MACHINE_CONFIG_START(a2000_state::a2000)
 	MSM6242(config, m_rtc, XTAL(32'768));
 
 	// cpu slot
-	MCFG_EXPANSION_SLOT_ADD("maincpu", a2000_expansion_cards, nullptr)
+	EXP_SLOT(config, EXP_SLOT_TAG, 0).set_space(m_maincpu, AS_PROGRAM);
+	ZORRO_SLOT(config, "slot", EXP_SLOT_TAG, a2000_expansion_cards, nullptr);
 
 	// zorro slots
-	MCFG_ZORRO2_ADD("maincpu")
-	MCFG_ZORRO2_INT2_HANDLER(WRITELINE(*this, a2000_state, zorro2_int2_w))
-	MCFG_ZORRO2_INT6_HANDLER(WRITELINE(*this, a2000_state, zorro2_int6_w))
-	MCFG_ZORRO2_SLOT_ADD("zorro1", zorro2_cards, nullptr)
-	MCFG_ZORRO2_SLOT_ADD("zorro2", zorro2_cards, nullptr)
-	MCFG_ZORRO2_SLOT_ADD("zorro3", zorro2_cards, nullptr)
-	MCFG_ZORRO2_SLOT_ADD("zorro4", zorro2_cards, nullptr)
-	MCFG_ZORRO2_SLOT_ADD("zorro5", zorro2_cards, nullptr)
+	ZORRO2(config, m_zorro, 0);
+	m_zorro->set_space(m_maincpu, AS_PROGRAM);
+	m_zorro->int2_handler().set(FUNC(a2000_state::zorro2_int2_w));
+	m_zorro->int6_handler().set(FUNC(a2000_state::zorro2_int6_w));
+	ZORRO_SLOT(config, "zorro1", m_zorro, zorro2_cards, nullptr);
+	ZORRO_SLOT(config, "zorro2", m_zorro, zorro2_cards, nullptr);
+	ZORRO_SLOT(config, "zorro3", m_zorro, zorro2_cards, nullptr);
+	ZORRO_SLOT(config, "zorro4", m_zorro, zorro2_cards, nullptr);
+	ZORRO_SLOT(config, "zorro5", m_zorro, zorro2_cards, nullptr);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(a2000_state::a2000n)
@@ -1731,9 +1741,10 @@ MACHINE_CONFIG_START(a500_state::a500)
 	ADDRESS_MAP_BANK(config, "overlay").set_map(&amiga_state::overlay_1mb_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
 
 	// cpu slot
-	MCFG_EXPANSION_SLOT_ADD("maincpu", a500_expansion_cards, nullptr)
-	MCFG_EXPANSION_SLOT_INT2_HANDLER(WRITELINE(*this, a500_state, side_int2_w))
-	MCFG_EXPANSION_SLOT_INT6_HANDLER(WRITELINE(*this, a500_state, side_int6_w))
+	EXP_SLOT(config, m_side, 0).set_space(m_maincpu, AS_PROGRAM);
+	m_side->int2_handler().set(FUNC(a500_state::side_int2_w));
+	m_side->int6_handler().set(FUNC(a500_state::side_int6_w));
+	ZORRO_SLOT(config, "slot", m_side, a500_expansion_cards, nullptr);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(a500_state::a500n)
@@ -1882,7 +1893,8 @@ MACHINE_CONFIG_START(a500p_state::a500p)
 	MSM6242(config, m_rtc, XTAL(32'768));
 
 	// cpu slot
-	MCFG_EXPANSION_SLOT_ADD("maincpu", a500_expansion_cards, nullptr)
+	EXP_SLOT(config, m_side, 0).set_space(m_maincpu, AS_PROGRAM);
+	ZORRO_SLOT(config, "slot", m_side, a500_expansion_cards, nullptr);
 
 	// software
 	SOFTWARE_LIST(config, "ecs_list").set_original("amigaecs_flop");

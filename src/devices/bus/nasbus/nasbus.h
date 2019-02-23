@@ -122,20 +122,14 @@ public:
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(false);
-		set_nasbus_slot(this, NASBUS_TAG);
 	}
 	nasbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	// inline configuration
-	void set_nasbus_slot(device_t *owner, const char *nasbus_tag) { m_owner = owner; m_nasbus_tag = nasbus_tag; }
 
 protected:
 	nasbus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
-
-	// configuration
-	const char *m_nasbus_tag;
 };
 
 // device type definition

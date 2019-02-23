@@ -509,7 +509,7 @@ private:
 	DECLARE_WRITE8_MEMBER(trigsnd_w);
 	DECLARE_READ8_MEMBER(pia0_b_r);
 	DECLARE_READ8_MEMBER(pia1_b_r);
-	DECLARE_WRITE8_MEMBER(fclown_ay8910_w);
+	void fclown_ay8910_w(offs_t offset, u8 data);
 	TILE_GET_INFO_MEMBER(get_fclown_tile_info);
 	void _5clown_palette(palette_device &palette) const;
 	uint32_t screen_update_fclown(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -714,10 +714,10 @@ WRITE8_MEMBER(_5clown_state::cpu_d800_w)
 *  AY3-8910 R/W Handlers        *
 ********************************/
 
-WRITE8_MEMBER(_5clown_state::fclown_ay8910_w)
+void _5clown_state::fclown_ay8910_w(offs_t offset, u8 data)
 {
-	m_ay8910->address_w(space, 0, offset);
-	m_ay8910->data_w(space, 0, data);
+	m_ay8910->address_w(offset);
+	m_ay8910->data_w(data);
 }
 
 
@@ -742,7 +742,7 @@ WRITE8_MEMBER(_5clown_state::snd_800_w)
 
 	if (m_snd_latch_0a02 == 0x00)
 	{
-		fclown_ay8910_w(space, m_ay8910_addr, m_snd_latch_0800);
+		fclown_ay8910_w(m_ay8910_addr, m_snd_latch_0800);
 	}
 }
 

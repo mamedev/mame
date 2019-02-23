@@ -10,10 +10,11 @@
 #ifndef NL_CONVERT_H_
 #define NL_CONVERT_H_
 
-#include <memory>
-#include "../plib/pstring.h"
 #include "../plib/plists.h"
 #include "../plib/pparser.h"
+#include "../plib/pstring.h"
+#include "../plib/ptypes.h"
+#include <memory>
 
 /*-------------------------------------------------
     convert - convert a spice netlist
@@ -22,6 +23,8 @@
 class nl_convert_base_t
 {
 public:
+
+	COPYASSIGNMOVE(nl_convert_base_t, delete)
 
 	virtual ~nl_convert_base_t();
 
@@ -40,7 +43,7 @@ protected:
 	void add_device(const pstring &atype, const pstring &aname, double aval);
 	void add_device(const pstring &atype, const pstring &aname);
 
-	void add_term(pstring netname, pstring termname);
+	void add_term(const pstring &netname, const pstring &termname);
 
 	void dump_nl();
 
@@ -121,14 +124,14 @@ private:
 
 private:
 
-	void add_device(std::unique_ptr<dev_t> dev);
+	void add_device(plib::unique_ptr<dev_t> dev);
 
 	plib::postringstream m_buf;
 
-	std::vector<std::unique_ptr<dev_t>> m_devs;
-	std::unordered_map<pstring, std::unique_ptr<net_t> > m_nets;
+	std::vector<plib::unique_ptr<dev_t>> m_devs;
+	std::unordered_map<pstring, plib::unique_ptr<net_t> > m_nets;
 	std::vector<pstring> m_ext_alias;
-	std::unordered_map<pstring, std::unique_ptr<pin_alias_t>> m_pins;
+	std::unordered_map<pstring, plib::unique_ptr<pin_alias_t>> m_pins;
 
 	static unit_t m_units[];
 	pstring m_numberchars;
@@ -140,9 +143,6 @@ class nl_convert_spice_t : public nl_convert_base_t
 public:
 
 	nl_convert_spice_t() : nl_convert_base_t() {}
-	virtual ~nl_convert_spice_t() override
-	{
-	}
 
 	void convert(const pstring &contents) override;
 
@@ -159,9 +159,6 @@ class nl_convert_eagle_t : public nl_convert_base_t
 public:
 
 	nl_convert_eagle_t() : nl_convert_base_t() {}
-	virtual ~nl_convert_eagle_t() override
-	{
-	}
 
 	class tokenizer : public plib::ptokenizer
 	{
@@ -175,7 +172,7 @@ public:
 
 	protected:
 
-		virtual void verror(const pstring &msg, int line_num, const pstring &line) override;
+		void verror(const pstring &msg, int line_num, const pstring &line) override;
 
 	private:
 		nl_convert_eagle_t &m_convert;
@@ -195,9 +192,6 @@ class nl_convert_rinf_t : public nl_convert_base_t
 public:
 
 	nl_convert_rinf_t() : nl_convert_base_t() {}
-	virtual ~nl_convert_rinf_t() override
-	{
-	}
 
 	class tokenizer : public plib::ptokenizer
 	{
@@ -216,7 +210,7 @@ public:
 
 	protected:
 
-		virtual void verror(const pstring &msg, int line_num, const pstring &line) override;
+		void verror(const pstring &msg, int line_num, const pstring &line) override;
 
 	private:
 		nl_convert_rinf_t &m_convert;

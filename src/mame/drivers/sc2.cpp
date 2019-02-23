@@ -212,12 +212,12 @@ WRITE8_MEMBER( sc2_state::pio_port_b_w )
 		m_kp_matrix = data;
 }
 
-MACHINE_CONFIG_START(sc2_state::sc2)
+void sc2_state::sc2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(sc2_mem)
-	MCFG_DEVICE_IO_MAP(sc2_io)
-
+	Z80(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &sc2_state::sc2_mem);
+	m_maincpu->set_addrmap(AS_IO, &sc2_state::sc2_io);
 
 	/* video hardware */
 	config.set_default_layout(layout_sc2);
@@ -231,9 +231,8 @@ MACHINE_CONFIG_START(sc2_state::sc2)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD( "beeper", BEEP, 3250 )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 0.50 )
-MACHINE_CONFIG_END
+	BEEP(config, m_beep, 3250).add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 /* ROM definition */
 ROM_START( sc2 )

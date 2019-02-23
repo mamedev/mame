@@ -66,6 +66,7 @@ DEFINE_DEVICE_TYPE(SPG28X, spg28x_device, "spg28x", "SPG280-series System-on-a-C
 spg2xx_device::spg2xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
+	, m_rowscrolloffset(15)
 	, m_porta_out(*this)
 	, m_portb_out(*this)
 	, m_portc_out(*this)
@@ -359,7 +360,7 @@ void spg2xx_device::blit(const rectangle &cliprect, uint32_t line, uint32_t xoff
 		bits &= 0xffff;
 
 		if (RowScroll)
-			xx -= (int16_t)m_scrollram[yy + 15];
+			xx -= (int16_t)m_scrollram[(yy + m_rowscrolloffset) & 0x1ff];
 
 		xx &= 0x01ff;
 		if (xx >= 0x01c0)
@@ -1933,6 +1934,9 @@ void spg2xx_device::device_timer(emu_timer &timer, device_timer_id id, int param
 				check_video_irq();
 			}
 			m_screen->update_partial(m_screen->vpos());
+
+			// fire again, jak_dbz pinball needs this
+			m_screenpos_timer->adjust(m_screen->time_until_pos(m_video_regs[0x36], m_video_regs[0x37] << 1));
 			break;
 		}
 

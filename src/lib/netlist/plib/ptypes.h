@@ -8,11 +8,21 @@
 #ifndef PTYPES_H_
 #define PTYPES_H_
 
-#include "pconfig.h"
-#include "pstring.h"
-
-#include <type_traits>
 #include <limits>
+#include <string>
+#include <type_traits>
+
+#include "pconfig.h"
+
+#define COPYASSIGNMOVE(name, def)  \
+		name(const name &) = def; \
+		name(name &&) noexcept = def; \
+		name &operator=(const name &) = def; \
+		name &operator=(name &&) noexcept = def;
+
+#define COPYASSIGN(name, def)  \
+		name(const name &) = def; \
+		name &operator=(const name &) = def; \
 
 namespace plib
 {
@@ -45,24 +55,24 @@ namespace plib
 
 	struct nocopyassignmove
 	{
-	protected:
-		nocopyassignmove() = default;
-		~nocopyassignmove() = default;
-	private:
 		nocopyassignmove(const nocopyassignmove &) = delete;
 		nocopyassignmove(nocopyassignmove &&) = delete;
 		nocopyassignmove &operator=(const nocopyassignmove &) = delete;
 		nocopyassignmove &operator=(nocopyassignmove &&) = delete;
+	protected:
+		nocopyassignmove() = default;
+		~nocopyassignmove() = default;
 	};
 
 	struct nocopyassign
 	{
+		nocopyassign(const nocopyassign &) = delete;
+		nocopyassign &operator=(const nocopyassign &) = delete;
 	protected:
 		nocopyassign() = default;
 		~nocopyassign() = default;
-	private:
-		nocopyassign(const nocopyassign &) = delete;
-		nocopyassign &operator=(const nocopyassign &) = delete;
+		nocopyassign(nocopyassign &&) = default;
+		nocopyassign &operator=(nocopyassign &&) = default;
 	};
 
 	//============================================================
@@ -81,16 +91,16 @@ namespace plib
 	{
 	protected:
 		static int from_string_int(const char *str, const char *x);
-		static pstring nthstr(int n, const char *str);
+		static std::string nthstr(int n, const char *str);
 	};
 
-}
+} // namespace plib
 
 #define P_ENUM(ename, ...) \
 	struct ename : public plib::penum_base { \
 		enum E { __VA_ARGS__ }; \
 		ename (E v) : m_v(v) { } \
-		bool set_from_string (const pstring &s) { \
+		bool set_from_string (const std::string &s) { \
 			static char const *const strings = # __VA_ARGS__; \
 			int f = from_string_int(strings, s.c_str()); \
 			if (f>=0) { m_v = static_cast<E>(f); return true; } else { return false; } \
@@ -98,7 +108,7 @@ namespace plib
 		operator E() const {return m_v;} \
 		bool operator==(const ename &rhs) const {return m_v == rhs.m_v;} \
 		bool operator==(const E &rhs) const {return m_v == rhs;} \
-		const pstring name() const { \
+		std::string name() const { \
 			static char const *const strings = # __VA_ARGS__; \
 			return nthstr(static_cast<int>(m_v), strings); \
 		} \
