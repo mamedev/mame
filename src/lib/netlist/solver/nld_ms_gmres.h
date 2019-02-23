@@ -89,7 +89,7 @@ namespace devices
 			for (std::size_t j=0; j< this->m_terms[k]->m_railstart;j++)
 			{
 				for (std::size_t i = m_ops.m_mat.row_idx[k]; i<m_ops.m_mat.row_idx[k+1]; i++)
-					if (this->m_terms[k]->connected_net_idx()[j] == static_cast<int>(m_ops.m_mat.col_idx[i]))
+					if (this->m_terms[k]->m_connected_net_idx[j] == static_cast<int>(m_ops.m_mat.col_idx[i]))
 					{
 						m_term_cr[k].push_back(&m_ops.m_mat.A[i]);
 						break;

@@ -237,7 +237,7 @@ namespace devices
 		/* rebuild */
 		for (auto &term : m_terms)
 		{
-			int *other = term->connected_net_idx();
+			int *other = term->m_connected_net_idx.data();
 			for (std::size_t i = 0; i < term->count(); i++)
 				//FIXME: this is weird
 				if (other[i] != -1)
@@ -253,7 +253,7 @@ namespace devices
 		{
 			m_terms[k]->m_railstart = m_terms[k]->count();
 			for (std::size_t i = 0; i < m_rails_temp[k]->count(); i++)
-				this->m_terms[k]->add(m_rails_temp[k]->terms()[i], m_rails_temp[k]->connected_net_idx()[i], false);
+				this->m_terms[k]->add(m_rails_temp[k]->terms()[i], m_rails_temp[k]->m_connected_net_idx.data()[i], false);
 
 			m_terms[k]->set_pointers();
 		}
@@ -268,7 +268,7 @@ namespace devices
 		{
 			terms_for_net_t * t = m_terms[k].get();
 			/* pretty brutal */
-			int *other = t->connected_net_idx();
+			int *other = t->m_connected_net_idx.data();
 
 			t->m_nz.clear();
 
@@ -290,7 +290,7 @@ namespace devices
 		{
 			terms_for_net_t * t = m_terms[k].get();
 			/* pretty brutal */
-			int *other = t->connected_net_idx();
+			int *other = t->m_connected_net_idx.data();
 
 			if (k==0)
 				t->m_nzrd.clear();
@@ -371,9 +371,9 @@ namespace devices
 			state().save(*this, m_terms[k]->m_h_n_m_1, this->name(), "m_h_n_m_1." + num);
 
 			// FIXME: This shouldn't be necessary, recalculate on each entry ...
-			state().save(*this, m_terms[k]->go(),"GO" + num, this->name(), m_terms[k]->count());
-			state().save(*this, m_terms[k]->gt(),"GT" + num, this->name(), m_terms[k]->count());
-			state().save(*this, m_terms[k]->Idr(),"IDR" + num, this->name(), m_terms[k]->count());
+			state().save(*this, m_terms[k]->m_go.data(),"GO" + num, this->name(), m_terms[k]->count());
+			state().save(*this, m_terms[k]->m_gt.data(),"GT" + num, this->name(), m_terms[k]->count());
+			state().save(*this, m_terms[k]->m_Idr.data(),"IDR" + num, this->name(), m_terms[k]->count());
 		}
 	}
 

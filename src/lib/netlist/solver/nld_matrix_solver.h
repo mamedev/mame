@@ -50,11 +50,6 @@ namespace devices
 		std::size_t count() const { return m_terms.size(); }
 
 		terminal_t **terms() { return m_terms.data(); }
-		int *connected_net_idx() { return m_connected_net_idx.data(); }
-		nl_double *gt() { return m_gt.data(); }
-		nl_double *go() { return m_go.data(); }
-		nl_double *Idr() { return m_Idr.data(); }
-		nl_double * const *connected_net_V() const { return m_connected_net_V.data(); }
 
 		void set_pointers();
 
@@ -105,12 +100,12 @@ namespace devices
 		nl_double m_DD_n_m_1;
 		nl_double m_h_n_m_1;
 
-	private:
 		std::vector<int> m_connected_net_idx;
 		plib::aligned_vector<nl_double, PALIGN_VECTOROPT> m_go;
 		plib::aligned_vector<nl_double, PALIGN_VECTOROPT> m_gt;
 		plib::aligned_vector<nl_double, PALIGN_VECTOROPT> m_Idr;
 		plib::aligned_vector<nl_double *, PALIGN_VECTOROPT> m_connected_net_V;
+	private:
 		std::vector<terminal_t *> m_terms;
 
 	};
@@ -284,7 +279,7 @@ namespace devices
 
 			const std::size_t terms_count = terms->count();
 			const std::size_t railstart =  terms->m_railstart;
-			const float_type * const gt = terms->gt();
+			const float_type * const gt = terms->m_gt.data();
 
 			{
 				float_type akk  = 0.0;
@@ -294,8 +289,8 @@ namespace devices
 				Ak[k] = akk;
 			}
 
-			const float_type * const go = terms->go();
-			int * net_other = terms->connected_net_idx();
+			const float_type * const go = terms->m_go.data();
+			int * net_other = terms->m_connected_net_idx.data();
 
 			for (std::size_t i = 0; i < railstart; i++)
 				Ak[net_other[i]] -= go[i];
@@ -315,9 +310,9 @@ namespace devices
 			float_type rhsk_b = 0.0;
 
 			const std::size_t terms_count = m_terms[k]->count();
-			const float_type * const go = m_terms[k]->go();
-			const float_type * const Idr = m_terms[k]->Idr();
-			const float_type * const * other_cur_analog = m_terms[k]->connected_net_V();
+			const float_type * const go = m_terms[k]->m_go.data();
+			const float_type * const Idr = m_terms[k]->m_Idr.data();
+			const float_type * const * other_cur_analog = m_terms[k]->m_connected_net_V.data();
 
 			for (std::size_t i = 0; i < terms_count; i++)
 				rhsk_a = rhsk_a + Idr[i];
