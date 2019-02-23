@@ -6,7 +6,8 @@
 
 This is a Soviet electronic board game console, a dozen or so cartridge games were
 made for it(can't say for certain how many released). PCB labels have prefix ДМП,
-it's assumed to have been designed by НИИ БРЭА (SRI BREA). First shown in 1983.
+it's assumed to have been designed by НИИ БРЭА (SRI BREA). First shown in 1983,
+produced during around 1985-1992.
 
 hardware notes:
 - КР580ВМ80А CPU (i8080 clone), speed unknown
@@ -46,7 +47,7 @@ TODO:
 #include "softlist.h"
 
 // internal artwork
-#include "intellect02.lh"
+#include "intellect02.lh" // clickable
 
 
 namespace {
@@ -311,4 +312,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME     PARENT CMP MACHINE  INPUT    STATE          INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1983, intel02, 0,      0, intel02, intel02, intel02_state, empty_init, "BREA Research Institute", "Intellect-02", MACHINE_SUPPORTS_SAVE )
+CONS( 1985, intel02, 0,      0, intel02, intel02, intel02_state, empty_init, "BREA Research Institute", "Intellect-02", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
