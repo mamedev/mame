@@ -26,7 +26,7 @@
 
 	<element name="text_b1"><text string="RESET"><color red="0.8" green="0.8" blue="0.8" /></text></element>
 	<element name="text_b2"><text string="SELECT"><color red="0.8" green="0.8" blue="0.8" /></text></element>
-	<element name="text_b3"><text string=" "><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_b3"><text string="POS."><color red="0.8" green="0.8" blue="0.8" /></text></element>
 	<element name="text_b4"><text string="A1"><color red="0.8" green="0.8" blue="0.8" /></text></element>
 	<element name="text_b5"><text string="B2"><color red="0.8" green="0.8" blue="0.8" /></text></element>
 	<element name="text_b6"><text string="C3"><color red="0.8" green="0.8" blue="0.8" /></text></element>
@@ -34,7 +34,7 @@
 	<element name="text_b8"><text string="E5"><color red="0.8" green="0.8" blue="0.8" /></text></element>
 	<element name="text_b9"><text string="INPUT"><color red="0.8" green="0.8" blue="0.8" /></text></element>
 	<element name="text_b10"><text string="ERASE"><color red="0.8" green="0.8" blue="0.8" /></text></element>
-	<element name="text_b11"><text string=" "><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_b11"><text string="LEVEL"><color red="0.8" green="0.8" blue="0.8" /></text></element>
 	<element name="text_b12"><text string="F6"><color red="0.8" green="0.8" blue="0.8" /></text></element>
 	<element name="text_b13"><text string="G7"><color red="0.8" green="0.8" blue="0.8" /></text></element>
 	<element name="text_b14"><text string="H8"><color red="0.8" green="0.8" blue="0.8" /></text></element>

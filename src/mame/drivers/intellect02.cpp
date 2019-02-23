@@ -13,11 +13,13 @@ hardware notes:
 - КР580ВМ80А CPU (i8080A clone), speed unknown
 - КР580ИК55 (i8255 clone)
 - 1 KB RAM (8*КР565РУ2), cartridge port
-- 4-digit 7seg panel, 2 leds, 16 buttons
+- 4-digit 7seg panel, 2 leds, 16 buttons, game board above it
+
+The chess/checkers board is detachable, with a board for Kalah underneath it.
 
 The hardware is very similar to Fidelity Chess Challenger 3. Actually, one of the
 first cartridges for this system, a Chess program, is a modified Chess Challenger 3 ROM.
-The chess engine was kept identical.
+The chess engine was kept identical. (note: the "lose" LED is used for "check")
 
 Intellect-01 looks like it didn't get further than a prototype. It was a dedicated
 chess computer, probably a clone of CC3.
@@ -28,8 +30,8 @@ keypad legend:
 ВВ - ввод (input)
 ВИ - выбор игры (game select)
 СТ - стирание (erase)
-ПП - ?
-УИ - ?
+ПП - просмотр позиции (view position)
+УИ - уровень игры (game level)
 
 TODO:
 - identify ПП, УИ, 0, 9 buttons (only the chess program is dumped and it doesn't use them)
