@@ -12925,6 +12925,10 @@ feag2100                        // EAG: Elite Avant Garde 2100 (English)
 feag2100fr                      // * French
 feag2100g                       // * German
 feag2100sp                      // * Spanish
+fepriv                          //
+feprivfr                        //
+feprivg                         //
+feprivsp                        //
 fpres                           //
 fpressp                         //
 fpresg                          //
