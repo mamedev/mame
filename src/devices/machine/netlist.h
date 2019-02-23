@@ -13,8 +13,7 @@
 
 #include <functional>
 
-#include "netlist/nl_time.h"
-#include "netlist/netlist_types.h"
+#include "../../lib/netlist/nl_types.h"
 
 class nld_sound_out;
 class nld_sound_in;

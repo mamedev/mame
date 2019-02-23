@@ -8,10 +8,10 @@
 #ifndef NLD_MS_GMRES_H_
 #define NLD_MS_GMRES_H_
 
-#include "../plib/gmres.h"
-#include "../plib/mat_cr.h"
-#include "../plib/parray.h"
-#include "../plib/vector_ops.h"
+#include "plib/gmres.h"
+#include "plib/mat_cr.h"
+#include "plib/parray.h"
+#include "plib/vector_ops.h"
 #include "nld_ms_direct.h"
 #include "nld_solver.h"
 

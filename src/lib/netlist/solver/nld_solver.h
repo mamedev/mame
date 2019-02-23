@@ -9,7 +9,7 @@
 #define NLD_SOLVER_H_
 
 #include "../nl_base.h"
-#include "../plib/pstream.h"
+#include "plib/pstream.h"
 #include "nld_matrix_solver.h"
 
 #include <map>

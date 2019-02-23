@@ -9,7 +9,7 @@
 #define NLID_FOURTERM_H_
 
 #include "../nl_base.h"
-#include "../plib/putil.h"
+#include "plib/putil.h"
 
 namespace netlist {
 	namespace analog {

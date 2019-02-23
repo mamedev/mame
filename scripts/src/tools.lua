@@ -499,6 +499,7 @@ links {
 
 includedirs {
 	MAME_DIR .. "src/lib",
+  MAME_DIR .. "src/lib/netlist",
 }
 
 files {
@@ -543,6 +544,7 @@ links {
 
 includedirs {
 	MAME_DIR .. "src/lib",
+  MAME_DIR .. "src/lib/netlist",
 }
 
 files {

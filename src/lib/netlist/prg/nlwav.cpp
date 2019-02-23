@@ -1,11 +1,11 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-#include "../plib/pstring.h"
+#include "plib/pstring.h"
 #include "../nl_setup.h"
-#include "../plib/plists.h"
-#include "../plib/pmain.h"
-#include "../plib/ppmf.h"
-#include "../plib/pstream.h"
+#include "plib/plists.h"
+#include "plib/pmain.h"
+#include "plib/ppmf.h"
+#include "plib/pstream.h"
 #include <cstring>
 
 

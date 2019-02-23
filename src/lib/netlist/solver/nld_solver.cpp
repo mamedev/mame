@@ -33,7 +33,7 @@
 
 #include "../nl_lists.h"
 
-#include "../plib/pomp.h"
+#include "plib/pomp.h"
 
 #include "../nl_factory.h"
 

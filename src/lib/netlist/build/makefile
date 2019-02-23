@@ -49,7 +49,7 @@ endif
 
 # LTO = -flto=4  -fuse-linker-plugin -flto-partition=balanced -Wodr
 
-CFLAGS =  $(LTO) -g -O3 -std=c++11 -I../.. $(CEXTRAFLAGS)
+CFLAGS =  $(LTO) -g -O3 -std=c++11 -I$(CURDIR)/.. -I$(CURDIR)/../.. $(CEXTRAFLAGS)
 LDFLAGS = $(LTO) -g -O3 -std=c++11 $(LDEXTRAFLAGS)
 LIBS = -lpthread -ldl
 
