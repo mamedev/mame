@@ -643,6 +643,21 @@ ROM_START( 98best44 )
 	ROM_LOAD32_BYTE( "pt060-c2", 0x000001, 0x100000, CRC(66a8e56a) SHA1(adfd1e52d52806a785f1e9b1ae2ac969b6ed60af) )
 ROM_END
 
+ROM_START( npusagif )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "p061-ep1 neo-mvs progbk1.ep1", 0x000000, 0x080000, CRC(ec6d7fda) SHA1(f219f8a9763f92ef952236ea3e01fe9b684823df) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 program */
+	ROM_LOAD( "pt004-m1 neo-pstm cha136.m1", 0x00000, 0x20000, CRC(6d77cdaa) SHA1(f88a93b3085b18b6663b4e51fccaa41958aafae1) ) // same as 98best44
+
+	ROM_REGION( 0x200000, "ymsnd", 0 ) /* Samples */
+	ROM_LOAD( "pt004-v1 neo-mvs progbk1.v1", 0x000000, 0x200000, CRC(118a84fd) SHA1(9059297a42a329eca47a82327c301853219013bd) ) // same as 98best44
+
+	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE00 )
+	ROM_LOAD32_BYTE( "p061-c1 neo-pstm cha136.c1", 0x000000, 0x100000, CRC(9686c78d) SHA1(a72a191540bbe3121e3be9e05e683ba9f2714aba) )
+	ROM_LOAD32_BYTE( "p061-c2 neo-pstm cha136.c2", 0x000001, 0x100000, CRC(f354b86b) SHA1(1058465af35fef6923f7fbe2cccf4c01509528d6) )
+ROM_END
+
 ROM_START( nprsp )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "s038a-ep1.bin", 0x000000, 0x080000, CRC(529fb4fa) SHA1(f31ba8998bb01458f43df1934222995f22d590a1) ) // program ROM
@@ -726,5 +741,6 @@ void neoprint_state::init_unkneo()
 GAME( 1996, neoprint,    0,        neoprint,    neoprint, neoprint_state, init_unkneo,   ROT0, "SNK", "Neo Print (Japan) (T2d)",                                       MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 GAME( 1996, npcartv1,    0,        neoprint,    neoprint, neoprint_state, init_npcartv1, ROT0, "SNK", "Neo Print V1 (World) (E1a)",                                    MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 GAME( 1998, 98best44,    0,        neoprint,    neoprint, neoprint_state, init_98best44, ROT0, "SNK", "Neo Print - '98 NeoPri Best 44 (Japan) (T4i 3.07)",             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1998, npusagif,    0,        neoprint,    neoprint, neoprint_state, init_98best44, ROT0, "SNK", "Neo Print - Usagi Frame (T4i 3.07)",                            MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 GAME( 1999, npmillen,    0,        neoprint,    neoprint, neoprint_state, init_npmillen, ROT0, "SNK", "Neo Print - Millennium Multi Shot Edition (World) (T4i 3.07)",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 GAME( 1996, nprsp,       0,        nprsp,       neoprint, neoprint_state, init_nprsp,    ROT0, "SNK", "NeopriSP Retro Collection (Japan)",                             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )

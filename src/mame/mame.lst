@@ -11308,7 +11308,7 @@ ffantasyb                       // EX (c) 1989 Data East Corporation (World)
 ffantasybl                      // bootleg
 hbarrel                         // (c) 1987 Data East USA (US)
 hbarrelw                        // (c) 1987 Data East Corporation (World)
-bandit							// (c) 1989 Data East USA (US)
+bandit                          // (c) 1989 Data East USA (US)
 hippodrm                        // EW (c) 1989 Data East USA (US)
 midres                          // (c) 1989 Data East Corporation (World)
 midresb                         // bootleg
@@ -30370,6 +30370,7 @@ neoprint                        //
 npcartv1                        //
 npmillen                        //
 nprsp                           //
+npusagif                        //
 
 @source:neptunp2.cpp
 neptunp2                        //
