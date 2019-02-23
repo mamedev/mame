@@ -12917,6 +12917,10 @@ feasgla                         // EAS: Elite A/S Challenger (Glasgow program, E
 feasglafr                       // * French
 feasglag                        // * German
 feasglasp                       // * Spanish
+feag                            //
+feagfr                          //
+feagg                           //
+feagsp                          //
 feag2100                        // EAG: Elite Avant Garde 2100 (English)
 feag2100fr                      // * French
 feag2100g                       // * German
