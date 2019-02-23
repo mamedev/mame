@@ -26,7 +26,7 @@
 #ifndef NLD_74194_H_
 #define NLD_74194_H_
 
-#include "../nl_setup.h"
+#include "netlist/nl_setup.h"
 
 #define TTL_74194(name, cCLK, cS0, cS1, cSRIN, cA, cB, cC, cD, cSLIN, cCLRQ)    \
 		NET_REGISTER_DEV(TTL_74194, name)   \

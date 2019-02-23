@@ -31,11 +31,11 @@
 #pragma GCC optimize "ivopts"
 #endif
 
-#include "../nl_lists.h"
+#include "netlist/nl_lists.h"
 
 #include "plib/pomp.h"
 
-#include "../nl_factory.h"
+#include "netlist/nl_factory.h"
 
 #include "nld_matrix_solver.h"
 #include "nld_solver.h"

@@ -2,12 +2,16 @@
 // copyright-holders:Couriersud
 /*!
  *
- * \file nl_types.h
+ * \file nltypes.h
  *
  */
 
-#ifndef NL_TYPES_H_
-#define NL_TYPES_H_
+/* \note never change the name to nl_types.h. This creates a conflict
+ * with nl_types.h file provided by libc++ (clang, macosx)
+ */
+
+#ifndef NLTYPES_H_
+#define NLTYPES_H_
 
 #include "nl_config.h"
 #include "plib/ptime.h"
@@ -137,4 +141,4 @@ namespace plib {
 	}
 } // namespace plib
 
-#endif /* NL_TYPES_H_ */
+#endif /* NLTYPES_H_ */

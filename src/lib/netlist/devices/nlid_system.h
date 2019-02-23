@@ -11,9 +11,9 @@
 #ifndef NLID_SYSTEM_H_
 #define NLID_SYSTEM_H_
 
-#include "../analog/nlid_twoterm.h"
-#include "../nl_base.h"
-#include "../nl_setup.h"
+#include "netlist/analog/nlid_twoterm.h"
+#include "netlist/nl_base.h"
+#include "netlist/nl_setup.h"
 #include "plib/putil.h"
 
 namespace netlist

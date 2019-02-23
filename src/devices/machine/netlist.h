@@ -13,7 +13,7 @@
 
 #include <functional>
 
-#include "../../lib/netlist/nl_types.h"
+#include "../../lib/netlist/nltypes.h"
 
 class nld_sound_out;
 class nld_sound_in;

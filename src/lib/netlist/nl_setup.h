@@ -20,7 +20,7 @@
 
 #include "nl_config.h"
 #include "nl_factory.h"
-#include "nl_types.h"
+#include "nltypes.h"
 
 //============================================================
 //  MACROS / inline netlist definitions

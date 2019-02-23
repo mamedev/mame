@@ -46,8 +46,8 @@
  */
 
 #include "nld_ne555.h"
-#include "../analog/nlid_twoterm.h"
-#include "../solver/nld_solver.h"
+#include "netlist/analog/nlid_twoterm.h"
+#include "netlist/solver/nld_solver.h"
 
 #define R_OFF (1E20)
 #define R_ON (25)   // Datasheet states a maximum discharge of 200mA, R = 5V / 0.2

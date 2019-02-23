@@ -8,7 +8,7 @@
 #ifndef NLD_SOLVER_H_
 #define NLD_SOLVER_H_
 
-#include "../nl_base.h"
+#include "netlist/nl_base.h"
 #include "plib/pstream.h"
 #include "nld_matrix_solver.h"
 

@@ -6,7 +6,7 @@
  */
 
 #include "nld_2102A.h"
-#include "../nl_base.h"
+#include "netlist/nl_base.h"
 
 #define ADDR2BYTE(a)    ((a) >> 3)
 #define ADDR2BIT(a)     ((a) & 0x7)

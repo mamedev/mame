@@ -2,8 +2,8 @@
 // copyright-holders:Couriersud
 #include "nlm_ttl74xx.h"
 
-#include "../devices/nld_schmitt.h"
-#include "../devices/nld_system.h"
+#include "netlist/devices/nld_schmitt.h"
+#include "netlist/devices/nld_system.h"
 
 
 /*

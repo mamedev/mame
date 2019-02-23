@@ -20,7 +20,8 @@
 #include <mutex>
 #include <thread>
 #include <utility>
-#include "nl_types.h"
+
+#include "nltypes.h"
 
 // ----------------------------------------------------------------------------------------
 // timed queue

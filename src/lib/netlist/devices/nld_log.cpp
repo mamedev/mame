@@ -5,7 +5,7 @@
  *
  */
 
-#include "../nl_base.h"
+#include "netlist/nl_base.h"
 #include "plib/pfmtlog.h"
 #include "plib/pstream.h"
 #include "nld_log.h"

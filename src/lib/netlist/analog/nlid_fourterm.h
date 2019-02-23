@@ -8,7 +8,7 @@
 #ifndef NLID_FOURTERM_H_
 #define NLID_FOURTERM_H_
 
-#include "../nl_base.h"
+#include "netlist/nl_base.h"
 #include "plib/putil.h"
 
 namespace netlist {

@@ -5,8 +5,8 @@
  *
  */
 
-#include "../solver/nld_solver.h"
-#include "../nl_factory.h"
+#include "netlist/solver/nld_solver.h"
+#include "netlist/nl_factory.h"
 #include "nlid_fourterm.h"
 
 #include <cmath>

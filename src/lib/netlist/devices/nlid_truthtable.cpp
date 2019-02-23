@@ -6,7 +6,7 @@
  */
 
 #include  "nlid_truthtable.h"
-#include "../nl_setup.h"
+#include "netlist/nl_setup.h"
 #include "plib/palloc.h"
 #include "plib/plists.h"
 

@@ -27,7 +27,7 @@
 #ifndef NLD_4020_H_
 #define NLD_4020_H_
 
-#include "../nl_setup.h"
+#include "netlist/nl_setup.h"
 
 /* FIXME: only used in mario.c */
 #define CD4020_WI(name, cIP, cRESET, cVDD, cVSS)                                \
