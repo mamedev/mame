@@ -190,8 +190,8 @@ void sc12_state::sc12(machine_config &config)
 	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
 	/* cartridge */
-	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "fidel_scc", "bin,dat"));
-	cartslot.set_device_load(device_image_load_delegate(&sc12_state::device_image_load_scc_cartridge, this));
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "fidel_scc", "bin,dat");
+	m_cart->set_device_load(device_image_load_delegate(&sc12_state::device_image_load_scc_cartridge, this));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("fidel_scc");
 }

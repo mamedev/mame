@@ -15753,6 +15753,9 @@ inteladv
 intlc44                         //
 intlc440                        //
 
+@source:intellect02.cpp
+intel02                         //
+
 @source:interact.cpp
 hector1                         //
 interact                        //

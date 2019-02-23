@@ -3858,6 +3858,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/ikt5a.cpp",
 	MAME_DIR .. "src/mame/drivers/imsai.cpp",
 	MAME_DIR .. "src/mame/drivers/indiana.cpp",
+	MAME_DIR .. "src/mame/drivers/intellect02.cpp",
 	MAME_DIR .. "src/mame/drivers/is48x.cpp",
 	MAME_DIR .. "src/mame/drivers/itt1700.cpp",
 	MAME_DIR .. "src/mame/machine/itt1700_kbd.cpp",

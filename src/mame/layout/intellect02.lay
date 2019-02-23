@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="digit" defstate="0">
+		<led7seg><color red="0.15" green="1.0" blue="0.05" /></led7seg>
+	</element>
+
+	<element name="led" defstate="0">
+		<disk state="1"><color red="1.0" green="0.1" blue="0.15" /></disk>
+		<disk state="0"><color red="0.1" green="0.01" blue="0.015" /></disk>
+	</element>
+
+	<element name="text_l1"><text string="PROGRESS INDICATOR" align="1"><color red="0.2" green="0.2" blue="0.2" /></text></element>
+	<element name="text_l2"><text string="YOU WIN" align="1"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_l3"><text string="YOU LOSE" align="1"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="7.5" right="41" top="7" bottom="19" />
+
+		<bezel element="text_l1"><bounds x="21" y="7.9" width="20" height="1.5" /></bezel>
+		<bezel element="text_l2"><bounds x="8.5" y="7.9" width="8" height="1.5" /></bezel>
+		<bezel element="text_l3"><bounds x="8.5" y="16.4" width="8" height="1.5" /></bezel>
+
+		<bezel name="led1" element="led"><bounds x="16" y="8" width="1.5" height="1.5" /></bezel>
+		<bezel name="led0" element="led"><bounds x="16" y="16.5" width="1.5" height="1.5" /></bezel>
+
+		<bezel name="digit0" element="digit"><bounds x="20" y="10" width="4" height="6" /></bezel>
+		<bezel name="digit1" element="digit"><bounds x="24" y="10" width="4" height="6" /></bezel>
+		<bezel name="digit2" element="digit"><bounds x="32" y="10" width="4" height="6" /></bezel>
+		<bezel name="digit3" element="digit"><bounds x="36" y="10" width="4" height="6" /></bezel>
+
+	</view>
+</mamelayout>
