@@ -24,16 +24,8 @@
 
 #pragma once
 
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_CG_PARALLEL_SLOT_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, CG_PARALLEL_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(cg_parallel_slot_carts, nullptr, false)
-
+// include here so drivers don't need to
+#include "carts.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -45,6 +37,14 @@ class cg_parallel_slot_device : public device_t, public device_slot_interface
 {
 public:
 	// construction/destruction
+	cg_parallel_slot_device(machine_config const &mconfig, char const *tag, device_t *owner)
+		: cg_parallel_slot_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		option_reset();
+		cg_parallel_slot_carts(*this);
+		set_default_option(nullptr);
+		set_fixed(false);
+	}
 	cg_parallel_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~cg_parallel_slot_device();
 
@@ -85,8 +85,5 @@ protected:
 
 // device type definition
 DECLARE_DEVICE_TYPE(CG_PARALLEL_SLOT, cg_parallel_slot_device)
-
-// include here so drivers don't need to
-#include "carts.h"
 
 #endif // MAME_BUS_CGENIE_PARALLEL_PARALLEL_H

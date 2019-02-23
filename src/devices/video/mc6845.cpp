@@ -129,13 +129,13 @@ void mc6845_device::call_on_update_address(int strobe)
 }
 
 
-void mc6845_device::write_address(uint8_t data)
+void mc6845_device::address_w(uint8_t data)
 {
 	m_register_address_latch = data & 0x1f;
 }
 
 
-uint8_t mc6845_device::read_status()
+uint8_t mc6845_device::status_r()
 {
 	uint8_t ret = 0;
 
@@ -178,7 +178,7 @@ void mc6845_device::transparent_update()
 }
 
 
-uint8_t mc6845_device::read_register()
+uint8_t mc6845_device::register_r()
 {
 	uint8_t ret = 0;
 
@@ -200,7 +200,7 @@ uint8_t mc6845_device::read_register()
 }
 
 
-void mc6845_device::write_register(uint8_t data)
+void mc6845_device::register_w(uint8_t data)
 {
 	LOG("%s:M6845 reg 0x%02x = 0x%02x\n", machine().describe_context(), m_register_address_latch, data);
 
@@ -253,13 +253,13 @@ void mc6845_device::write_register(uint8_t data)
 }
 
 
-WRITE8_MEMBER( mos8563_device::address_w )
+void mos8563_device::address_w(uint8_t data)
 {
 	m_register_address_latch = data & 0x3f;
 }
 
 
-READ8_MEMBER( mos8563_device::status_r )
+uint8_t mos8563_device::status_r()
 {
 	uint8_t ret = m_revision;
 
@@ -279,7 +279,7 @@ READ8_MEMBER( mos8563_device::status_r )
 }
 
 
-READ8_MEMBER( mos8563_device::register_r )
+uint8_t mos8563_device::register_r()
 {
 	uint8_t ret = 0xff;
 
@@ -329,7 +329,7 @@ READ8_MEMBER( mos8563_device::register_r )
 }
 
 
-WRITE8_MEMBER( mos8563_device::register_w )
+void mos8563_device::register_w(uint8_t data)
 {
 	LOG("%s:MOS8563 reg 0x%02x = 0x%02x\n", machine().describe_context(), m_register_address_latch, data);
 
@@ -392,13 +392,13 @@ WRITE8_MEMBER( mos8563_device::register_w )
 	recompute_parameters(false);
 }
 
-WRITE8_MEMBER( hd6345_device::address_w )
+void hd6345_device::address_w(uint8_t data)
 {
 	m_register_address_latch = data & 0x3f;
 }
 
 
-READ8_MEMBER( hd6345_device::register_r )
+uint8_t hd6345_device::register_r()
 {
 	uint8_t ret = 0xff;
 
@@ -416,7 +416,7 @@ READ8_MEMBER( hd6345_device::register_r )
 	return ret;
 }
 
-WRITE8_MEMBER( hd6345_device::register_w )
+void hd6345_device::register_w(uint8_t data)
 {
 	LOG("%s:HD6345 reg 0x%02x = 0x%02x\n", machine().describe_context(), m_register_address_latch, data);
 
@@ -1438,7 +1438,8 @@ device_memory_interface::space_config_vector mos8563_device::memory_space_config
 // default address maps
 void mos8563_device::mos8563_videoram_map(address_map &map)
 {
-	map(0x0000, 0xffff).ram();
+	if (!has_configured_map(0))
+		map(0x0000, 0xffff).ram();
 }
 
 
@@ -1505,7 +1506,7 @@ mos8563_device::mos8563_device(const machine_config &mconfig, device_type type, 
 	: mc6845_device(mconfig, type, tag, owner, clock),
 		device_memory_interface(mconfig, *this),
 		device_palette_interface(mconfig, *this),
-		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(), address_map_constructor(FUNC(mos8563_device::mos8563_videoram_map), this))
+		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(mos8563_device::mos8563_videoram_map), this))
 {
 	set_clock_scale(1.0/8);
 }

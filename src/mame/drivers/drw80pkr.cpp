@@ -201,11 +201,11 @@ WRITE8_MEMBER(drw80pkr_state::io_w)
 
 		// ay8910 control port
 		if (m_p1 == 0xfc)
-			m_aysnd->address_w(space, 0, data);
+			m_aysnd->address_w(data);
 
 		// ay8910_write_port_0_w
 		if (m_p1 == 0xfe)
-			m_aysnd->data_w(space, 0, data);
+			m_aysnd->data_w(data);
 	}
 }
 
@@ -476,7 +476,7 @@ MACHINE_CONFIG_START(drw80pkr_state::drw80pkr)
 	MCFG_SCREEN_UPDATE_DRIVER(drw80pkr_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_drw80pkr)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_drw80pkr);
 	PALETTE(config, "palette", FUNC(drw80pkr_state::drw80pkr_palette), 16 * 16);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);

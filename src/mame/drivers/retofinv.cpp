@@ -220,8 +220,8 @@ void retofinv_state::sound_map(address_map &map)
 	map(0x2000, 0x27ff).ram(); /* 6116 sram at IC28 */
 	map(0x4000, 0x4000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x6000, 0x6000).w(FUNC(retofinv_state::cpu2_m6000_w));
-	map(0x8000, 0x8000).w("sn1", FUNC(sn76489a_device::command_w));
-	map(0xa000, 0xa000).w("sn2", FUNC(sn76489a_device::command_w));
+	map(0x8000, 0x8000).w("sn1", FUNC(sn76489a_device::write));
+	map(0xa000, 0xa000).w("sn2", FUNC(sn76489a_device::write));
 	map(0xe000, 0xffff).rom();         /* space for diagnostic ROM */
 }
 
@@ -429,7 +429,7 @@ MACHINE_CONFIG_START(retofinv_state::retofinv)
 
 	MCFG_DEVICE_ADD("68705", TAITO68705_MCU, XTAL(18'432'000)/6)    /* XTAL and divider verified, 3.072 MHz */
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - enough for the sound CPU to read all commands */
+	config.m_minimum_quantum = attotime::from_hz(6000);  /* 100 CPU slices per frame - enough for the sound CPU to read all commands */
 
 	LS259(config, m_mainlatch); // IC72 - probably shared between CPUs
 	m_mainlatch->q_out_cb<0>().set(FUNC(retofinv_state::irq0_ack_w));
@@ -481,7 +481,7 @@ MACHINE_CONFIG_START(retofinv_state::retofinvb_nomcu)
 
 	m_mainlatch->q_out_cb<3>().set_nop();
 
-	MCFG_DEVICE_REMOVE("68705")
+	config.device_remove("68705");
 MACHINE_CONFIG_END
 
 /* bootleg which has different pallete clut and also has no mcu */
@@ -492,7 +492,7 @@ MACHINE_CONFIG_START(retofinv_state::retofinvb1_nomcu)
 
 	m_mainlatch->q_out_cb<3>().set_nop();
 
-	MCFG_DEVICE_REMOVE("68705")
+	config.device_remove("68705");
 MACHINE_CONFIG_END
 
 /***************************************************************************

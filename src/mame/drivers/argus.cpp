@@ -483,31 +483,31 @@ static GFXDECODE_START( gfx_butasan )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(argus_state::argus)
-
+void argus_state::argus(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 5000000)           /* 4 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(argus_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", argus_state, scanline, "screen", 0, 1)
+	Z80(config, m_maincpu, 5000000);           /* 4 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &argus_state::argus_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(argus_state::scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 5000000)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map_a)
-	MCFG_DEVICE_IO_MAP(sound_portmap_1)
+	Z80(config, m_audiocpu, 5000000);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &argus_state::sound_map_a);
+	m_audiocpu->set_addrmap(AS_IO, &argus_state::sound_portmap_1);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	config.m_minimum_quantum = attotime::from_hz(600);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(54)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)  /* This value is referred to psychic5 driver */)
-	MCFG_SCREEN_SIZE(32*16, 32*16)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(argus_state, screen_update_argus)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(54);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));  /* This value is referred to psychic5 driver */
+	m_screen->set_size(32*16, 32*16);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(argus_state::screen_update_argus));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_argus)
-	MCFG_PALETTE_ADD("palette", 896)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_argus);
+	PALETTE(config, m_palette).set_entries(896);
 
-	MCFG_DEVICE_ADD("blend", JALECO_BLEND, 0)
+	JALECO_BLEND(config, m_blend, 0);
 
 	MCFG_VIDEO_START_OVERRIDE(argus_state,argus)
 	MCFG_VIDEO_RESET_OVERRIDE(argus_state,argus)
@@ -517,39 +517,39 @@ MACHINE_CONFIG_START(argus_state::argus)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ym1", YM2203, 6000000 / 4)
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.15)
-	MCFG_SOUND_ROUTE(1, "mono", 0.15)
-	MCFG_SOUND_ROUTE(2, "mono", 0.15)
-	MCFG_SOUND_ROUTE(3, "mono", 0.50)
-MACHINE_CONFIG_END
+	ym2203_device &ym1(YM2203(config, "ym1", 6000000 / 4));
+	ym1.irq_handler().set_inputline(m_audiocpu, 0);
+	ym1.add_route(0, "mono", 0.15);
+	ym1.add_route(1, "mono", 0.15);
+	ym1.add_route(2, "mono", 0.15);
+	ym1.add_route(3, "mono", 0.50);
+}
 
-MACHINE_CONFIG_START(argus_state::valtric)
-
+void argus_state::valtric(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 5000000)           /* 5 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(valtric_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", argus_state, scanline, "screen", 0, 1)
+	Z80(config, m_maincpu, 5000000);    /* 5 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &argus_state::valtric_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(argus_state::scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 5000000)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map_a)
-	MCFG_DEVICE_IO_MAP(sound_portmap_2)
+	Z80(config, m_audiocpu, 5000000);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &argus_state::sound_map_a);
+	m_audiocpu->set_addrmap(AS_IO, &argus_state::sound_portmap_2);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	config.m_minimum_quantum = attotime::from_hz(600);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(54)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)  /* This value is referred to psychic5 driver */)
-	MCFG_SCREEN_SIZE(32*16, 32*16)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(argus_state, screen_update_valtric)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(54);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));  /* This value is referred to psychic5 driver */
+	m_screen->set_size(32*16, 32*16);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(argus_state::screen_update_valtric));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_valtric)
-	MCFG_PALETTE_ADD("palette", 768)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_valtric);
+	PALETTE(config, m_palette).set_entries(768);
 
-	MCFG_DEVICE_ADD("blend", JALECO_BLEND, 0)
+	JALECO_BLEND(config, m_blend, 0);
 
 	MCFG_VIDEO_START_OVERRIDE(argus_state,valtric)
 	MCFG_VIDEO_RESET_OVERRIDE(argus_state,valtric)
@@ -559,45 +559,45 @@ MACHINE_CONFIG_START(argus_state::valtric)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ym1", YM2203, 6000000 / 4)
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.15)
-	MCFG_SOUND_ROUTE(1, "mono", 0.15)
-	MCFG_SOUND_ROUTE(2, "mono", 0.15)
-	MCFG_SOUND_ROUTE(3, "mono", 0.50)
+	ym2203_device &ym1(YM2203(config, "ym1", 6000000 / 4));
+	ym1.irq_handler().set_inputline(m_audiocpu, 0);
+	ym1.add_route(0, "mono", 0.15);
+	ym1.add_route(1, "mono", 0.15);
+	ym1.add_route(2, "mono", 0.15);
+	ym1.add_route(3, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("ym2", YM2203, 6000000 / 4)
-	MCFG_SOUND_ROUTE(0, "mono", 0.15)
-	MCFG_SOUND_ROUTE(1, "mono", 0.15)
-	MCFG_SOUND_ROUTE(2, "mono", 0.15)
-	MCFG_SOUND_ROUTE(3, "mono", 0.50)
-MACHINE_CONFIG_END
+	ym2203_device &ym2(YM2203(config, "ym2", 6000000 / 4));
+	ym2.add_route(0, "mono", 0.15);
+	ym2.add_route(1, "mono", 0.15);
+	ym2.add_route(2, "mono", 0.15);
+	ym2.add_route(3, "mono", 0.50);
+}
 
-MACHINE_CONFIG_START(argus_state::butasan)
-
+void argus_state::butasan(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 5000000)           /* 5 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(butasan_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", argus_state, butasan_scanline, "screen", 0, 1)
+	Z80(config, m_maincpu, 5000000);    /* 5 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &argus_state::butasan_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(argus_state::butasan_scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 5000000)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map_b)
-	MCFG_DEVICE_IO_MAP(sound_portmap_2)
+	Z80(config, m_audiocpu, 5000000);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &argus_state::sound_map_b);
+	m_audiocpu->set_addrmap(AS_IO, &argus_state::sound_portmap_2);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	config.m_minimum_quantum = attotime::from_hz(600);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(54)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)  /* This value is taken from psychic5 driver */)
-	MCFG_SCREEN_SIZE(32*16, 32*16)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(argus_state, screen_update_butasan)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(54);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));  /* This value is taken from psychic5 driver */
+	m_screen->set_size(32*16, 32*16);
+	m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
+	m_screen->set_screen_update(FUNC(argus_state::screen_update_butasan));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_butasan)
-	MCFG_PALETTE_ADD("palette", 768)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_butasan);
+	PALETTE(config, m_palette).set_entries(768);
 
-	MCFG_DEVICE_ADD("blend", JALECO_BLEND, 0)
+	JALECO_BLEND(config, m_blend, 0);
 
 	MCFG_VIDEO_START_OVERRIDE(argus_state,butasan)
 	MCFG_VIDEO_RESET_OVERRIDE(argus_state,butasan)
@@ -607,19 +607,19 @@ MACHINE_CONFIG_START(argus_state::butasan)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ym1", YM2203, 6000000 / 4)
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.30)
-	MCFG_SOUND_ROUTE(1, "mono", 0.30)
-	MCFG_SOUND_ROUTE(2, "mono", 0.30)
-	MCFG_SOUND_ROUTE(3, "mono", 1.0)
+	ym2203_device &ym1(YM2203(config, "ym1", 6000000 / 4));
+	ym1.irq_handler().set_inputline(m_audiocpu, 0);
+	ym1.add_route(0, "mono", 0.30);
+	ym1.add_route(1, "mono", 0.30);
+	ym1.add_route(2, "mono", 0.30);
+	ym1.add_route(3, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("ym2", YM2203, 6000000 / 4)
-	MCFG_SOUND_ROUTE(0, "mono", 0.30)
-	MCFG_SOUND_ROUTE(1, "mono", 0.30)
-	MCFG_SOUND_ROUTE(2, "mono", 0.30)
-	MCFG_SOUND_ROUTE(3, "mono", 1.0)
-MACHINE_CONFIG_END
+	ym2203_device &ym2(YM2203(config, "ym2", 6000000 / 4));
+	ym2.add_route(0, "mono", 0.30);
+	ym2.add_route(1, "mono", 0.30);
+	ym2.add_route(2, "mono", 0.30);
+	ym2.add_route(3, "mono", 1.0);
+}
 
 
 /***************************************************************************

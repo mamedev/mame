@@ -20,11 +20,12 @@
 
 #define LOG_GENERAL (1U << 0)
 #define LOG_TLB     (1U << 1)
+#define LOG_IOP     (1U << 2)
+#define LOG_RISCOS  (1U << 3)
 
 //#define VERBOSE     (LOG_GENERAL|LOG_TLB)
-#include "logmacro.h"
 
-#define ENABLE_IOP_KPUTS    (0)
+#include "logmacro.h"
 
 #define RSREG           ((op >> 21) & 31)
 #define RTREG           ((op >> 16) & 31)
@@ -270,24 +271,172 @@ std::unique_ptr<util::disasm_interface> mips1core_device_base::create_disassembl
 	return std::make_unique<mips1_disassembler>();
 }
 
-void mips1core_device_base::generate_exception(int exception, bool refill)
+void mips1core_device_base::generate_exception(u32 exception, bool refill)
 {
+	if ((VERBOSE & LOG_RISCOS) && (exception == EXCEPTION_SYSCALL))
+	{
+		static char const *const sysv_syscalls[] =
+		{
+			"syscall",      "exit",         "fork",         "read",         "write",        "open",         "close",        "wait",         "creat",        "link",
+			"unlink",       "execv",        "chdir",        "time",         "mknod",        "chmod",        "chown",        "brk",          "stat",         "lseek",
+			"getpid",       "mount",        "umount",       "setuid",       "getuid",       "stime",        "ptrace",       "alarm",        "fstat",        "pause",
+			"utime",        "stty",         "gtty",         "access",       "nice",         "statfs",       "sync",         "kill",         "fstatfs",      "setpgrp",
+			nullptr,        "dup",          "pipe",         "times",        "profil",       "plock",        "setgid",       "getgid",       "signal",       "msgsys",
+			"sysmips",      "acct",         "shmsys",       "semsys",       "ioctl",        "uadmin",       nullptr,        "utssys",       nullptr,        "execve",
+			"umask",        "chroot",       "ofcntl",       "ulimit",       nullptr,        nullptr,        nullptr,        nullptr,        nullptr,        nullptr,
+			"advfs",        "unadvfs",      "rmount",       "rumount",      "rfstart",      nullptr,        "rdebug",       "rfstop",       "rfsys",        "rmdir",
+			"mkdir",        "getdents",     nullptr,        nullptr,        "sysfs",        "getmsg",       "putmsg",       "poll",         "sigreturn",    "accept",
+			"bind",         "connect",      "gethostid",    "getpeername",  "getsockname",  "getsockopt",   "listen",       "recv",         "recvfrom",     "recvmsg",
+			"select",       "send",         "sendmsg",      "sendto",       "sethostid",    "setsockopt",   "shutdown",     "socket",       "gethostname",  "sethostname",
+			"getdomainname","setdomainname","truncate",     "ftruncate",    "rename",       "symlink",      "readlink",     "lstat",        "nfsmount",     "nfssvc",
+			"getfh",        "async_daemon", "old_exportfs", "mmap",         "munmap",       "getitimer",    "setitimer",    nullptr,        nullptr,        nullptr,
+			nullptr,        nullptr,        nullptr,        nullptr,        nullptr,        nullptr,        nullptr,        nullptr,        nullptr,        nullptr,
+			nullptr,        nullptr,        nullptr,        nullptr,        nullptr,        nullptr,        nullptr,        nullptr,        nullptr,        nullptr,
+			"cacheflush",   "cachectl",     "fchown",       "fchmod",       "wait3",        "mmap",         "munmap",       "madvise",      "getpagesize",  "setreuid",
+			"setregid",     "setpgid",      "getgroups",    "setgroups",    "gettimeofday", "getrusage",    "getrlimit",    "setrlimit",    "exportfs",     "fcntl"
+		};
+
+		static char const *const bsd_syscalls[] =
+		{
+			"syscall",      "exit",         "fork",         "read",         "write",        "open",         "close",        nullptr,        "creat",        "link",
+			"unlink",       "execv",        "chdir",        nullptr,        "mknod",        "chmod",        "chown",        "brk",          nullptr,        "lseek",
+			"getpid",       "omount",       "oumount",      nullptr,        "getuid",       nullptr,        "ptrace",       nullptr,        nullptr,        nullptr,
+			nullptr,        nullptr,        nullptr,        "access",       nullptr,        nullptr,        "sync",         "kill",         "stat",         nullptr,
+			"lstat",        "dup",          "pipe",         nullptr,        "profil",       nullptr,        nullptr,        "getgid",       nullptr,        nullptr,
+			nullptr,        "acct",         nullptr,        nullptr,        "ioctl",        "reboot",       nullptr,        "symlink",      "readlink",     "execve",
+			"umask",        "chroot",       "fstat",        nullptr,        "getpagesize",  "mremap",       "vfork",        nullptr,        nullptr,        "sbrk",
+			"sstk",         "mmap",         "vadvise",      "munmap",       "mprotec",      "madvise",      "vhangup",      nullptr,        "mincore",      "getgroups",
+			"setgroups",    "getpgrp",      "setpgrp",      "setitimer",    "wait3",        "swapon",       "getitimer",    "gethostname",  "sethostname",  "getdtablesize",
+			"dup2",         "getdopt",      "fcntl",        "select",       "setdopt",      "fsync",        "setpriority",  "socket",       "connect",      "accept",
+			"getpriority",  "send",         "recv",         "sigreturn",    "bind",         "setsockopt",   "listen",       nullptr,        "sigvec",       "sigblock",
+			"sigsetmask",   "sigpause",     "sigstack",     "recvmsg",      "sendmsg",      nullptr,        "gettimeofday", "getrusage",    "getsockopt",   nullptr,
+			"readv",        "writev",       "settimeofday", "fchown",       "fchmod",       "recvfrom",     "setreuid",     "setregid",     "rename",       "truncate",
+			"ftruncate",    "flock",        nullptr,        "sendto",       "shutdown",     "socketpair",   "mkdir",        "rmdir",        "utimes",       "sigcleanup",
+			"adjtime",      "getpeername",  "gethostid",    "sethostid",    "getrlimit",    "setrlimit",    "killpg",       nullptr,        "setquota",     "quota",
+			"getsockname",  "sysmips",      "cacheflush",   "cachectl",     "debug",        nullptr,        nullptr,        nullptr,        "nfssvc",       "getdirentries",
+			"statfs",       "fstatfs",      "unmount",      "async_daemon", "getfh",        "getdomainname","setdomainname",nullptr,        "quotactl",     "old_exportfs",
+			"mount",        "hdwconf",      "exportfs",     "nfsfh_open",   "libattach",    "libdetach"
+		};
+
+		static char const *const msg_syscalls[] = { "msgget", "msgctl", "msgrcv", "msgsnd" };
+		static char const *const shm_syscalls[] = { "shmat", "shmctl", "shmdt", "shmget" };
+		static char const *const sem_syscalls[] = { "semctl", "semget", "semop" };
+		static char const *const mips_syscalls[] = { "mipskopt", "mipshwconf", "mipsgetrusage", "mipswait", "mipscacheflush", "mipscachectl" };
+
+		int const asid = (m_cpr[0][COP0_EntryHi] & EH_ASID) >> 6;
+		switch (m_r[2])
+		{
+		case 1000: // indirect
+			switch (m_r[4])
+			{
+			case 1049: // msgsys
+				LOGMASKED(LOG_RISCOS, "asid %d syscall msgsys:%s() (%s)\n",
+					asid, (m_r[5] < ARRAY_LENGTH(msg_syscalls)) ? msg_syscalls[m_r[5]] : "unknown", machine().describe_context());
+				break;
+
+			case 1052: // shmsys
+				LOGMASKED(LOG_RISCOS, "asid %d syscall shmsys:%s() (%s)\n",
+					asid, (m_r[5] < ARRAY_LENGTH(shm_syscalls)) ? shm_syscalls[m_r[5]] : "unknown", machine().describe_context());
+				break;
+
+			case 1053: // semsys
+				LOGMASKED(LOG_RISCOS, "asid %d syscall semsys:%s() (%s)\n",
+					asid, (m_r[5] < ARRAY_LENGTH(sem_syscalls)) ? sem_syscalls[m_r[5]] : "unknown", machine().describe_context());
+				break;
+
+			case 2151: // bsd_sysmips
+				switch (m_r[5])
+				{
+				case 0x100: // mipskopt
+					LOGMASKED(LOG_RISCOS, "asid %d syscall bsd_sysmips:mipskopt(\"%s\") (%s)\n",
+						asid, debug_string(m_r[6]), machine().describe_context());
+					break;
+
+				default:
+					if ((m_r[5] > 0x100) && (m_r[5] - 0x100) < ARRAY_LENGTH(mips_syscalls))
+						LOGMASKED(LOG_RISCOS, "asid %d syscall bsd_sysmips:%s() (%s)\n",
+							asid, mips_syscalls[m_r[5] - 0x100], machine().describe_context());
+					else
+						LOGMASKED(LOG_RISCOS, "asid %d syscall bsd_sysmips:unknown %d (%s)\n",
+							asid, m_r[5], machine().describe_context());
+					break;
+				}
+				break;
+
+			default:
+				if ((m_r[4] > 2000) && (m_r[4] - 2000 < ARRAY_LENGTH(bsd_syscalls)) && bsd_syscalls[m_r[4] - 2000])
+					LOGMASKED(LOG_RISCOS, "asid %d syscall bsd_%s() (%s)\n",
+						asid, bsd_syscalls[m_r[4] - 2000], machine().describe_context());
+				else
+					LOGMASKED(LOG_RISCOS, "asid %d syscall indirect:unknown %d (%s)\n",
+						asid, m_r[4], machine().describe_context());
+				break;
+			}
+			break;
+
+		case 1003: // read
+		case 1006: // close
+		case 1054: // ioctl
+		case 1169: // fcntl
+			LOGMASKED(LOG_RISCOS, "asid %d syscall %s(%d) (%s)\n",
+				asid, sysv_syscalls[m_r[2] - 1000], m_r[4], machine().describe_context());
+			break;
+
+		case 1004: // write
+			if (m_r[4] == 1 || m_r[4] == 2)
+				LOGMASKED(LOG_RISCOS, "asid %d syscall %s(%d, \"%s\") (%s)\n",
+					asid, sysv_syscalls[m_r[2] - 1000], m_r[4], debug_string(m_r[5], m_r[6]), machine().describe_context());
+			else
+				LOGMASKED(LOG_RISCOS, "asid %d syscall %s(%d) (%s)\n",
+					asid, sysv_syscalls[m_r[2] - 1000], m_r[4], machine().describe_context());
+			break;
+
+		case 1005: // open
+		case 1008: // creat
+		case 1009: // link
+		case 1010: // unlink
+		case 1012: // chdir
+		case 1018: // stat
+		case 1033: // access
+			LOGMASKED(LOG_RISCOS, "asid %d syscall %s(\"%s\") (%s)\n",
+				asid, sysv_syscalls[m_r[2] - 1000], debug_string(m_r[4]), machine().describe_context());
+			break;
+
+		case 1059: // execve
+			LOGMASKED(LOG_RISCOS, "asid %d syscall execve(\"%s\", [ %s ], [ %s ]) (%s)\n",
+				asid, debug_string(m_r[4]), debug_string_array(m_r[5]), debug_string_array(m_r[6]), machine().describe_context());
+			break;
+
+		case 1060: // umask
+			LOGMASKED(LOG_RISCOS, "asid %d syscall umask(%#o) (%s)\n",
+				asid, m_r[4] & 0777, machine().describe_context());
+			break;
+
+		default:
+			if ((m_r[2] > 1000) && (m_r[2] - 1000 < ARRAY_LENGTH(sysv_syscalls)) && sysv_syscalls[m_r[2] - 1000])
+				LOGMASKED(LOG_RISCOS, "asid %d syscall %s() (%s)\n", asid, sysv_syscalls[m_r[2] - 1000], machine().describe_context());
+			else
+				LOGMASKED(LOG_RISCOS, "asid %d syscall unknown %d (%s)\n", asid, m_r[2], machine().describe_context());
+			break;
+		}
+	}
+
 	// set the exception PC
 	m_cpr[0][COP0_EPC] = m_pc;
 
-	// put the cause in the low 8 bits and clear the branch delay flag
-	CAUSE = (CAUSE & ~0x800000ff) | (exception << 2);
+	// load the cause register
+	CAUSE = (CAUSE & CAUSE_IP) | exception;
 
 	// if in a branch delay slot, restart the branch
 	if (m_branch_state == DELAY)
 	{
 		m_cpr[0][COP0_EPC] -= 4;
-		CAUSE |= 0x80000000;
+		CAUSE |= CAUSE_BD;
 	}
 	m_branch_state = EXCEPTION;
 
 	// shift the exception bits
-	SR = (SR & 0xffffffc0) | ((SR << 2) & 0x3c);
+	SR = (SR & ~SR_KUIE) | ((SR << 2) & SR_KUIEop);
 
 	if (refill)
 		m_pc = (SR & SR_BEV) ? 0xbfc00100 : 0x80000000;
@@ -299,16 +448,16 @@ void mips1core_device_base::generate_exception(int exception, bool refill)
 
 void mips1core_device_base::check_irqs()
 {
-	if ((CAUSE & SR & 0xff00) && (SR & SR_IEc))
+	if ((CAUSE & SR & SR_IM) && (SR & SR_IEc))
 		generate_exception(EXCEPTION_INTERRUPT);
 }
 
 void mips1core_device_base::set_irq_line(int irqline, int state)
 {
 	if (state != CLEAR_LINE)
-		CAUSE |= 0x400 << irqline;
+		CAUSE |= CAUSE_IPEX0 << irqline;
 	else
-		CAUSE &= ~(0x400 << irqline);
+		CAUSE &= ~(CAUSE_IPEX0 << irqline);
 
 	check_irqs();
 }
@@ -331,7 +480,7 @@ void mips1core_device_base::set_cop0_reg(int const index, u32 const data)
 {
 	if (index == COP0_Cause)
 	{
-		CAUSE = (CAUSE & 0xfc00) | (data & ~0xfc00);
+		CAUSE = (CAUSE & CAUSE_IPEX) | (data & ~CAUSE_IPEX);
 
 		// update interrupts -- software ints can occur this way
 		check_irqs();
@@ -392,7 +541,7 @@ void mips1core_device_base::handle_cop0(u32 const op)
 				case 0x02:  /* TLBWI */                                              break;
 				case 0x06:  /* TLBWR */                                              break;
 				case 0x08:  /* TLBP */                                               break;
-				case 0x10:  /* RFE */   SR = (SR & 0xfffffff0) | ((SR >> 2) & 0x0f); break;
+				case 0x10:  /* RFE */   SR = (SR & ~SR_KUIEpc) | ((SR >> 2) & SR_KUIEpc); break;
 				case 0x18:  /* ERET */  generate_exception(EXCEPTION_INVALIDOP);     break;
 				default:    generate_exception(EXCEPTION_INVALIDOP);                 break;
 			}
@@ -421,7 +570,7 @@ void mips1_device_base::handle_cop0(u32 const op)
 			m_tlb[index][0] = m_cpr[0][COP0_EntryHi];
 			m_tlb[index][1] = m_cpr[0][COP0_EntryLo];
 
-			LOGMASKED(LOG_TLB, "tlbwi %d asid %d vpn 0x%08x pfn 0x%08x %c%c%c%c (%s)\n",
+			LOGMASKED(LOG_TLB, "tlb write index %d asid %d vpn 0x%08x pfn 0x%08x %c%c%c%c (%s)\n",
 				index, (m_cpr[0][COP0_EntryHi] & EH_ASID) >> 6, m_cpr[0][COP0_EntryHi] & EH_VPN, m_cpr[0][COP0_EntryLo] & EL_PFN,
 				m_cpr[0][COP0_EntryLo] & EL_N ? 'N' : '-',
 				m_cpr[0][COP0_EntryLo] & EL_D ? 'D' : '-',
@@ -438,7 +587,7 @@ void mips1_device_base::handle_cop0(u32 const op)
 			m_tlb[random][0] = m_cpr[0][COP0_EntryHi];
 			m_tlb[random][1] = m_cpr[0][COP0_EntryLo];
 
-			LOGMASKED(LOG_TLB, "tlbwr %d asid %d vpn 0x%08x pfn 0x%08x %c%c%c%c (%s)\n",
+			LOGMASKED(LOG_TLB, "tlb write random %d asid %d vpn 0x%08x pfn 0x%08x %c%c%c%c (%s)\n",
 				random, (m_cpr[0][COP0_EntryHi] & EH_ASID) >> 6, m_cpr[0][COP0_EntryHi] & EH_VPN, m_cpr[0][COP0_EntryLo] & EL_PFN,
 				m_cpr[0][COP0_EntryLo] & EL_N ? 'N' : '-',
 				m_cpr[0][COP0_EntryLo] & EL_D ? 'D' : '-',
@@ -570,22 +719,23 @@ void mips1core_device_base::execute_run()
 		// debugging
 		debugger_instruction_hook(m_pc);
 
-#if ENABLE_IOP_KPUTS
-		if ((m_pc & 0x1fffffff) == 0x00012C48 || (m_pc & 0x1fffffff) == 0x0001420C || (m_pc & 0x1fffffff) == 0x0001430C)
+		if (VERBOSE & LOG_IOP)
 		{
-			u32 ptr = m_r[5];
-			u32 length = m_r[6];
-			if (length >= 4096)
-				length = 4095;
-			while (length)
+			if ((m_pc & 0x1fffffff) == 0x00012C48 || (m_pc & 0x1fffffff) == 0x0001420C || (m_pc & 0x1fffffff) == 0x0001430C)
 			{
-				load<u8>(ptr, [this](char c) { printf("%c", c); });
-				ptr++;
-				length--;
+				u32 ptr = m_r[5];
+				u32 length = m_r[6];
+				if (length >= 4096)
+					length = 4095;
+				while (length)
+				{
+					load<u8>(ptr, [](char c) { printf("%c", c); });
+					ptr++;
+					length--;
+				}
+				fflush(stdout);
 			}
-			fflush(stdout);
 		}
-#endif
 
 		// fetch and execute instruction
 		fetch(m_pc, [this](u32 const op)
@@ -734,25 +884,25 @@ void mips1core_device_base::execute_run()
 					if (!(SR & SR_KUc) || (SR & SR_COP0))
 						handle_cop0(op);
 					else
-						generate_exception(EXCEPTION_BADCOP);
+						generate_exception(EXCEPTION_BADCOP0);
 					break;
 				case 0x11: // COP1
 					if (SR & SR_COP1)
 						handle_cop1(op);
 					else
-						generate_exception(EXCEPTION_BADCOP);
+						generate_exception(EXCEPTION_BADCOP1);
 					break;
 				case 0x12: // COP2
 					if (SR & SR_COP2)
 						handle_cop<2>(op);
 					else
-						generate_exception(EXCEPTION_BADCOP);
+						generate_exception(EXCEPTION_BADCOP2);
 					break;
 				case 0x13: // COP3
 					if (SR & SR_COP3)
 						handle_cop<3>(op);
 					else
-						generate_exception(EXCEPTION_BADCOP);
+						generate_exception(EXCEPTION_BADCOP3);
 					break;
 				case 0x14:  /* BEQL */      generate_exception(EXCEPTION_INVALIDOP);               break;
 				case 0x15:  /* BNEL */      generate_exception(EXCEPTION_INVALIDOP);               break;
@@ -946,10 +1096,13 @@ bool mips1core_device_base::memory_translate(int spacenum, int intention, offs_t
 		}
 		else if (SR & SR_KUc)
 		{
-			// exception
-			m_cpr[0][COP0_BadVAddr] = address;
+			if (!machine().side_effects_disabled())
+			{
+				// exception
+				m_cpr[0][COP0_BadVAddr] = address;
 
-			generate_exception((intention & TRANSLATE_WRITE) ? EXCEPTION_ADDRSTORE : EXCEPTION_ADDRLOAD);
+				generate_exception((intention & TRANSLATE_WRITE) ? EXCEPTION_ADDRSTORE : EXCEPTION_ADDRLOAD);
+			}
 			return false;
 		}
 	}
@@ -982,18 +1135,21 @@ bool mips1_device_base::memory_translate(int spacenum, int intention, offs_t &ad
 		}
 		else if (SR & SR_KUc)
 		{
-			// exception
-			m_cpr[0][COP0_BadVAddr] = address;
+			if (!machine().side_effects_disabled())
+			{
+				// exception
+				m_cpr[0][COP0_BadVAddr] = address;
 
-			generate_exception((intention & TRANSLATE_WRITE) ? EXCEPTION_ADDRSTORE : EXCEPTION_ADDRLOAD);
+				generate_exception((intention & TRANSLATE_WRITE) ? EXCEPTION_ADDRSTORE : EXCEPTION_ADDRLOAD);
+			}
 			return false;
 		}
 	}
 
 	// key is a combination of VPN and ASID
 	u32 const key = (address & EH_VPN) | (m_cpr[0][COP0_EntryHi] & EH_ASID);
-	bool refill = !BIT(m_cpr[0][COP0_BadVAddr], 31);
-	bool dirty = false;
+	bool refill = !BIT(address, 31);
+	bool modify = false;
 
 	for (u32 const *entry : m_tlb)
 	{
@@ -1013,7 +1169,7 @@ bool mips1_device_base::memory_translate(int spacenum, int intention, offs_t &ad
 		if ((intention & TRANSLATE_WRITE) && !(entry[1] & EL_D))
 		{
 			refill = false;
-			dirty = true;
+			modify = true;
 			break;
 		}
 
@@ -1023,19 +1179,83 @@ bool mips1_device_base::memory_translate(int spacenum, int intention, offs_t &ad
 		return true;
 	}
 
-	if (!(intention & TRANSLATE_DEBUG_MASK))
+	if (!machine().side_effects_disabled() && !(intention & TRANSLATE_DEBUG_MASK))
 	{
-		if ((VERBOSE & LOG_TLB) && !dirty)
-			LOGMASKED(LOG_TLB, "tlb miss %c asid %d address 0x%08x (%s)\n",
-				(intention & TRANSLATE_WRITE) ? 'w' : 'r', (m_cpr[0][COP0_EntryHi] & EH_ASID) >> 6, address, machine().describe_context());
+		if (VERBOSE & LOG_TLB)
+		{
+			if (modify)
+				LOGMASKED(LOG_TLB, "tlb modify asid %d address 0x%08x (%s)\n",
+					(m_cpr[0][COP0_EntryHi] & EH_ASID) >> 6, address, machine().describe_context());
+			else
+				LOGMASKED(LOG_TLB, "tlb miss %c asid %d address 0x%08x (%s)\n",
+					(intention & TRANSLATE_WRITE) ? 'w' : 'r', (m_cpr[0][COP0_EntryHi] & EH_ASID) >> 6, address, machine().describe_context());
+		}
 
 		// load tlb exception registers
 		m_cpr[0][COP0_BadVAddr] = address;
 		m_cpr[0][COP0_EntryHi] = key;
 		m_cpr[0][COP0_Context] = (m_cpr[0][COP0_Context] & PTE_BASE) | ((address >> 10) & BAD_VPN);
 
-		generate_exception(dirty ? EXCEPTION_TLBMOD : (intention & TRANSLATE_WRITE) ? EXCEPTION_TLBSTORE : EXCEPTION_TLBLOAD, refill);
+		generate_exception(modify ? EXCEPTION_TLBMOD : (intention & TRANSLATE_WRITE) ? EXCEPTION_TLBSTORE : EXCEPTION_TLBLOAD, refill);
 	}
 
 	return false;
+}
+
+std::string mips1core_device_base::debug_string(u32 string_pointer, int const limit)
+{
+	auto const suppressor(machine().disable_side_effects());
+
+	bool done = false;
+	bool mapped = false;
+	std::string result("");
+
+	while (!done)
+	{
+		done = true;
+		load<u8>(string_pointer++, [limit, &done, &mapped, &result](u8 byte)
+		{
+			mapped = true;
+			if (byte != 0)
+			{
+				result += byte;
+
+				done = result.length() == limit;
+			}
+		});
+	}
+
+	if (!mapped)
+		result.assign("[unmapped]");
+
+	return result;
+}
+
+std::string mips1core_device_base::debug_string_array(u32 array_pointer)
+{
+	auto const suppressor(machine().disable_side_effects());
+
+	bool done = false;
+	std::string result("");
+
+	while (!done)
+	{
+		done = true;
+		load<u32>(array_pointer, [this, &done, &result](u32 string_pointer)
+		{
+			if (string_pointer != 0)
+			{
+				if (!result.empty())
+					result += ", ";
+
+				result += '\"' + debug_string(string_pointer) + '\"';
+
+				done = false;
+			}
+		});
+
+		array_pointer += 4;
+	}
+
+	return result;
 }

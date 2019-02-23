@@ -81,20 +81,20 @@ void a2065_device::autoconfig_base_address(offs_t address)
 	LOG("-> installing a2065\n");
 
 	// stop responding to default autoconfig
-	m_slot->m_space->unmap_readwrite(0xe80000, 0xe8007f);
+	m_slot->space().unmap_readwrite(0xe80000, 0xe8007f);
 
 	// install autoconfig handler to new location
-	m_slot->m_space->install_readwrite_handler(address, address + 0x7f,
+	m_slot->space().install_readwrite_handler(address, address + 0x7f,
 		read16_delegate(FUNC(amiga_autoconfig::autoconfig_read), static_cast<amiga_autoconfig *>(this)),
 		write16_delegate(FUNC(amiga_autoconfig::autoconfig_write), static_cast<amiga_autoconfig *>(this)), 0xffff);
 
 	// install access to lance registers
-	m_slot->m_space->install_readwrite_handler(address + 0x4000, address + 0x4003,
+	m_slot->space().install_readwrite_handler(address + 0x4000, address + 0x4003,
 		read16_delegate(FUNC(am7990_device::regs_r), &(*m_lance)),
 		write16_delegate(FUNC(am7990_device::regs_w), &(*m_lance)), 0xffff);
 
 	// install access to onboard ram (32k)
-	m_slot->m_space->install_readwrite_handler(address + 0x8000, address + 0x8000 + 0x7fff,
+	m_slot->space().install_readwrite_handler(address + 0x8000, address + 0x8000 + 0x7fff,
 		read16_delegate(FUNC(a2065_device::host_ram_r), this),
 		write16_delegate(FUNC(a2065_device::host_ram_w), this), 0xffff);
 
@@ -123,7 +123,7 @@ WRITE_LINE_MEMBER( a2065_device::cfgin_w )
 		autoconfig_can_shutup(true); // ?
 
 		// install autoconfig handler
-		m_slot->m_space->install_readwrite_handler(0xe80000, 0xe8007f,
+		m_slot->space().install_readwrite_handler(0xe80000, 0xe8007f,
 			read16_delegate(FUNC(amiga_autoconfig::autoconfig_read), static_cast<amiga_autoconfig *>(this)),
 			write16_delegate(FUNC(amiga_autoconfig::autoconfig_write), static_cast<amiga_autoconfig *>(this)), 0xffff);
 	}

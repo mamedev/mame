@@ -1057,7 +1057,6 @@ void cosmic_state::panic(machine_config &config)
 
 	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
@@ -1113,7 +1112,6 @@ void cosmic_state::cosmicg(machine_config &config)
 
 	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // NE556
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	// Other DACs include 3-bit binary-weighted (100K/50K/25K) DAC combined with another NE556 for attack march
 }
@@ -1137,7 +1135,6 @@ void cosmic_state::magspot(machine_config &config)
 
 	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
@@ -1167,7 +1164,6 @@ void cosmic_state::nomnlnd(machine_config &config)
 
 	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 

@@ -58,13 +58,12 @@ DEFINE_DEVICE_TYPE(PDS_SEDISPLAY, macpds_sedisplay_device, "pds_sefp", "Radius S
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(macpds_sedisplay_device::device_add_mconfig)
-	MCFG_SCREEN_ADD( SEDISPLAY_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, macpds_sedisplay_device, screen_update)
-	MCFG_SCREEN_SIZE(1280, 960)
-	MCFG_SCREEN_REFRESH_RATE(70)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 870-1)
-MACHINE_CONFIG_END
+void macpds_sedisplay_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, SEDISPLAY_SCREEN_NAME, SCREEN_TYPE_RASTER));
+	screen.set_screen_update(FUNC(macpds_sedisplay_device::screen_update));
+	screen.set_raw(55_MHz_XTAL, 800, 0, 640, 1024, 0, 870);
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

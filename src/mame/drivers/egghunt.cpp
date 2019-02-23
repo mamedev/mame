@@ -449,7 +449,7 @@ MACHINE_CONFIG_START(egghunt_state::egghunt)
 	MCFG_SCREEN_UPDATE_DRIVER(egghunt_state, screen_update_egghunt)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_egghunt)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_egghunt);
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x400);
 

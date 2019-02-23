@@ -1692,28 +1692,28 @@ void stepstag_state::init_stepstag()
 }
 
 
-MACHINE_CONFIG_START(tetrisp2_state::tetrisp2)
-
+void tetrisp2_state::tetrisp2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)
-	MCFG_DEVICE_PROGRAM_MAP(tetrisp2_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tetrisp2_state,  irq2_line_hold)
+	M68000(config, m_maincpu, 12000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tetrisp2_state::tetrisp2_map);
+	m_maincpu->set_vblank_int("screen", FUNC(tetrisp2_state::irq2_line_hold));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 8);    /* guess */
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(0x140, 0xe0)
-	MCFG_SCREEN_VISIBLE_AREA(0, 0x140-1, 0, 0xe0-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tetrisp2_state, screen_update_tetrisp2)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(0x140, 0xe0);
+	screen.set_visarea(0, 0x140-1, 0, 0xe0-1);
+	screen.set_screen_update(FUNC(tetrisp2_state::screen_update_tetrisp2));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tetrisp2)
-	MCFG_PALETTE_ADD("palette", 0x8000)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tetrisp2);
+	PALETTE(config, m_palette).set_entries(0x8000);
 
 	MCFG_VIDEO_START_OVERRIDE(tetrisp2_state,tetrisp2)
 
@@ -1721,67 +1721,66 @@ MACHINE_CONFIG_START(tetrisp2_state::tetrisp2)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymz", YMZ280B, 16934400)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	ymz280b_device &ymz(YMZ280B(config, "ymz", 16934400));
+	ymz.add_route(0, "lspeaker", 1.0);
+	ymz.add_route(1, "rspeaker", 1.0);
+}
 
 
-MACHINE_CONFIG_START(tetrisp2_state::nndmseal)
-
+void tetrisp2_state::nndmseal(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(12'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(nndmseal_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tetrisp2_state,  irq2_line_hold)
+	M68000(config, m_maincpu, XTAL(12'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &tetrisp2_state::nndmseal_map);
+	m_maincpu->set_vblank_int("screen", FUNC(tetrisp2_state::irq2_line_hold));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(0x180, 0xf0)
-	MCFG_SCREEN_VISIBLE_AREA(0, 0x180-1, 0, 0xf0-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tetrisp2_state, screen_update_tetrisp2)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(0x180, 0xf0);
+	screen.set_visarea(0, 0x180-1, 0, 0xf0-1);
+	screen.set_screen_update(FUNC(tetrisp2_state::screen_update_tetrisp2));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tetrisp2)
-	MCFG_PALETTE_ADD("palette", 0x8000)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tetrisp2);
+	PALETTE(config, m_palette).set_entries(0x8000);
 
 	MCFG_VIDEO_START_OVERRIDE(tetrisp2_state,nndmseal)  // bg layer offset
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(2'000'000), okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki", XTAL(2'000'000), okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
-MACHINE_CONFIG_START(tetrisp2_state::rockn)
-
+void tetrisp2_state::rockn(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)
-	MCFG_DEVICE_PROGRAM_MAP(rockn1_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tetrisp2_state,  irq2_line_hold)
+	M68000(config, m_maincpu, 12000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tetrisp2_state::rockn1_map);
+	m_maincpu->set_vblank_int("screen", FUNC(tetrisp2_state::irq2_line_hold));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(0x140, 0xe0)
-	MCFG_SCREEN_VISIBLE_AREA(0, 0x140-1, 0, 0xe0-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tetrisp2_state, screen_update_rockntread)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(0x140, 0xe0);
+	screen.set_visarea(0, 0x140-1, 0, 0xe0-1);
+	screen.set_screen_update(FUNC(tetrisp2_state::screen_update_rockntread));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tetrisp2)
-	MCFG_PALETTE_ADD("palette", 0x8000)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tetrisp2);
+	PALETTE(config, m_palette).set_entries(0x8000);
 
 	MCFG_VIDEO_START_OVERRIDE(tetrisp2_state,rockntread)
 
@@ -1789,34 +1788,34 @@ MACHINE_CONFIG_START(tetrisp2_state::rockn)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymz", YMZ280B, 16934400)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	ymz280b_device &ymz(YMZ280B(config, "ymz", 16934400));
+	ymz.add_route(0, "lspeaker", 1.0);
+	ymz.add_route(1, "rspeaker", 1.0);
+}
 
 
-MACHINE_CONFIG_START(tetrisp2_state::rockn2)
-
+void tetrisp2_state::rockn2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)
-	MCFG_DEVICE_PROGRAM_MAP(rockn2_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tetrisp2_state,  irq2_line_hold)
+	M68000(config, m_maincpu, 12000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tetrisp2_state::rockn2_map);
+	m_maincpu->set_vblank_int("screen", FUNC(tetrisp2_state::irq2_line_hold));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(0x140, 0xe0)
-	MCFG_SCREEN_VISIBLE_AREA(0, 0x140-1, 0, 0xe0-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tetrisp2_state, screen_update_rockntread)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(0x140, 0xe0);
+	screen.set_visarea(0, 0x140-1, 0, 0xe0-1);
+	screen.set_screen_update(FUNC(tetrisp2_state::screen_update_rockntread));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tetrisp2)
-	MCFG_PALETTE_ADD("palette", 0x8000)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tetrisp2);
+	PALETTE(config, m_palette).set_entries(0x8000);
 
 	MCFG_VIDEO_START_OVERRIDE(tetrisp2_state,rockntread)
 
@@ -1824,22 +1823,22 @@ MACHINE_CONFIG_START(tetrisp2_state::rockn2)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymz", YMZ280B, 16934400)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	ymz280b_device &ymz(YMZ280B(config, "ymz", 16934400));
+	ymz.add_route(0, "lspeaker", 1.0);
+	ymz.add_route(1, "rspeaker", 1.0);
+}
 
 
-MACHINE_CONFIG_START(tetrisp2_state::rocknms)
-
+void tetrisp2_state::rocknms(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)
-	MCFG_DEVICE_PROGRAM_MAP(rocknms_main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", tetrisp2_state,  irq2_line_hold)
+	M68000(config, m_maincpu, 12000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tetrisp2_state::rocknms_main_map);
+	m_maincpu->set_vblank_int("lscreen", FUNC(tetrisp2_state::irq2_line_hold));
 
-	MCFG_DEVICE_ADD("sub", M68000, 12000000)
-	MCFG_DEVICE_PROGRAM_MAP(rocknms_sub_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", tetrisp2_state,  irq2_line_hold)
+	M68000(config, m_subcpu, 12000000);
+	m_subcpu->set_addrmap(AS_PROGRAM, &tetrisp2_state::rocknms_sub_map);
+	m_subcpu->set_vblank_int("lscreen", FUNC(tetrisp2_state::irq2_line_hold));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -1847,11 +1846,11 @@ MACHINE_CONFIG_START(tetrisp2_state::rocknms)
 
 	/* video hardware */
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tetrisp2)
-	MCFG_PALETTE_ADD("palette", 0x8000)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tetrisp2);
+	PALETTE(config, m_palette).set_entries(0x8000);
 
-	MCFG_DEVICE_ADD("sub_gfxdecode", GFXDECODE, "sub_palette", gfx_rocknms_sub)
-	MCFG_PALETTE_ADD("sub_palette", 0x8000)
+	GFXDECODE(config, m_sub_gfxdecode, m_sub_palette, gfx_rocknms_sub);
+	PALETTE(config, m_sub_palette).set_entries(0x8000);
 
 	config.set_default_layout(layout_rocknms);
 
@@ -1877,20 +1876,21 @@ MACHINE_CONFIG_START(tetrisp2_state::rocknms)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymz", YMZ280B, 16934400)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	ymz280b_device &ymz(YMZ280B(config, "ymz", 16934400));
+	ymz.add_route(0, "lspeaker", 1.0);
+	ymz.add_route(1, "rspeaker", 1.0);
+}
 
 
-MACHINE_CONFIG_START(stepstag_state::stepstag)
-	MCFG_DEVICE_ADD("maincpu", M68000, 12000000 )
-	MCFG_DEVICE_PROGRAM_MAP(stepstag_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("mscreen", tetrisp2_state,  irq2_line_hold) // lev 4 triggered by system timer
+void stepstag_state::stepstag(machine_config &config)
+{
+	M68000(config, m_maincpu, 12000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &stepstag_state::stepstag_map);
+	m_maincpu->set_vblank_int("mscreen", FUNC(tetrisp2_state::irq2_line_hold)); // lev 4 triggered by system timer
 
-	MCFG_DEVICE_ADD("sub", M68000, 16000000 ) //??
-	MCFG_DEVICE_PROGRAM_MAP(stepstag_sub_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", tetrisp2_state,  irq4_line_hold) // lev 6 triggered by main CPU
+	M68000(config, m_subcpu, 16000000); //??
+	m_subcpu->set_addrmap(AS_PROGRAM, &stepstag_state::stepstag_sub_map);
+	m_subcpu->set_vblank_int("lscreen", FUNC(tetrisp2_state::irq4_line_hold)); // lev 6 triggered by main CPU
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -1905,7 +1905,7 @@ MACHINE_CONFIG_START(stepstag_state::stepstag)
 	lscreen.set_size(0x160, 0xf0);
 	lscreen.set_visarea(0, 0x160-1, 0, 0xf0-1);
 	lscreen.set_screen_update(FUNC(stepstag_state::screen_update_stepstag_left));
-//  lscreen.set_palette("lpalette"));
+//  lscreen.set_palette(m_vj_palette_l));
 
 	screen_device &mscreen(SCREEN(config, "mscreen", SCREEN_TYPE_RASTER));
 	mscreen.set_orientation(ROT0);
@@ -1914,7 +1914,7 @@ MACHINE_CONFIG_START(stepstag_state::stepstag)
 	mscreen.set_size(0x160, 0xf0);
 	mscreen.set_visarea(0, 0x160-1, 0, 0xf0-1);
 	mscreen.set_screen_update(FUNC(stepstag_state::screen_update_stepstag_mid));
-//  mscreen.set_palette("mpalette"));
+//  mscreen.set_palette(m_vj_palette_m));
 
 	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
 	rscreen.set_orientation(ROT270);;
@@ -1923,20 +1923,20 @@ MACHINE_CONFIG_START(stepstag_state::stepstag)
 	rscreen.set_size(0x160, 0xf0);
 	rscreen.set_visarea(0, 0x160-1, 0, 0xf0-1);
 	rscreen.set_screen_update(FUNC(stepstag_state::screen_update_stepstag_right));
-	rscreen.set_palette("rpalette");
+	rscreen.set_palette(m_vj_palette_r);
 
 	MCFG_VIDEO_START_OVERRIDE(stepstag_state, stepstag )
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tetrisp2)
-	MCFG_PALETTE_ADD("palette", 0x8000)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tetrisp2);
+	PALETTE(config, m_palette).set_entries(0x8000);
 
-	MCFG_DEVICE_ADD("gfxdecode_l", GFXDECODE, "lpalette", gfx_vj_lscreen)
-	MCFG_PALETTE_ADD("lpalette", 0x8000)
+	GFXDECODE(config, m_vj_gfxdecode_l, m_vj_palette_l, gfx_vj_lscreen);
+	PALETTE(config, m_vj_palette_l).set_entries(0x8000);
 
-	MCFG_DEVICE_ADD("gfxdecode_m", GFXDECODE, "mpalette", gfx_vj_mscreen)
-	MCFG_PALETTE_ADD("mpalette", 0x8000)
+	GFXDECODE(config, m_vj_gfxdecode_m, m_vj_palette_m, gfx_vj_mscreen);
+	PALETTE(config, m_vj_palette_m).set_entries(0x8000);
 
-	MCFG_DEVICE_ADD("gfxdecode_r", GFXDECODE, "rpalette", gfx_vj_rscreen)
-	MCFG_PALETTE_ADD("rpalette", 0x8000)
+	GFXDECODE(config, m_vj_gfxdecode_r, m_vj_palette_r, gfx_vj_rscreen);
+	PALETTE(config, m_vj_palette_r).set_entries(0x8000);
 
 	config.set_default_layout(layout_stepstag);
 
@@ -1946,70 +1946,71 @@ MACHINE_CONFIG_START(stepstag_state::stepstag)
 
 	GENERIC_LATCH_16(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ymz", YMZ280B, 16934400)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	ymz280b_device &ymz(YMZ280B(config, "ymz", 16934400));
+	ymz.add_route(0, "lspeaker", 1.0);
+	ymz.add_route(1, "rspeaker", 1.0);
+}
 
-MACHINE_CONFIG_START(stepstag_state::vjdash)    // 4 Screens
-	MCFG_DEVICE_ADD("maincpu", M68000, 12000000 )
-	MCFG_DEVICE_PROGRAM_MAP(vjdash_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tetrisp2_state,  irq2_line_hold) // lev 4 triggered by system timer
+void stepstag_state::vjdash(machine_config &config)    // 4 Screens
+{
+	M68000(config, m_maincpu, 12000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &stepstag_state::vjdash_map);
+	m_maincpu->set_vblank_int("screen", FUNC(tetrisp2_state::irq2_line_hold)); // lev 4 triggered by system timer
 
-	MCFG_DEVICE_ADD("sub", M68000, 16000000 ) //??
-	MCFG_DEVICE_PROGRAM_MAP(stepstag_sub_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("mscreen", tetrisp2_state,  irq4_line_hold) // lev 6 triggered by main CPU
+	M68000(config, m_subcpu, 16000000); //??
+	m_subcpu->set_addrmap(AS_PROGRAM, &stepstag_state::stepstag_sub_map);
+	m_subcpu->set_vblank_int("mscreen", FUNC(tetrisp2_state::irq4_line_hold)); // lev 6 triggered by main CPU
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(0x160, 0xf0)
-	MCFG_SCREEN_VISIBLE_AREA(0, 0x140-1, 0, 0xe0-1)
-	MCFG_SCREEN_UPDATE_DRIVER(stepstag_state, screen_update_stepstag_main)
-//  MCFG_SCREEN_UPDATE_DRIVER(tetrisp2_state, screen_update_rockntread)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(0x160, 0xf0);
+	screen.set_visarea(0, 0x140-1, 0, 0xe0-1);
+	screen.set_screen_update(FUNC(stepstag_state::screen_update_stepstag_main));
+//  screen.set_screen_update(FUNC(tetrisp2_state::screen_update_rockntread));
+	screen.set_palette(m_palette);
 
-	MCFG_SCREEN_ADD("lscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(30)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(0x160, 0xf0)
-	MCFG_SCREEN_VISIBLE_AREA(0, 0x160-1, 0, 0xf0-1)
-	MCFG_SCREEN_UPDATE_DRIVER(stepstag_state, screen_update_stepstag_left)
-//  MCFG_SCREEN_PALETTE("lpalette")
+	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	lscreen.set_refresh_hz(30);
+	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	lscreen.set_size(0x160, 0xf0);
+	lscreen.set_visarea(0, 0x160-1, 0, 0xf0-1);
+	lscreen.set_screen_update(FUNC(stepstag_state::screen_update_stepstag_left));
+//  lscreen.set_palette(m_vj_palette_l);
 
-	MCFG_SCREEN_ADD("mscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(30)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(0x160, 0xf0)
-	MCFG_SCREEN_VISIBLE_AREA(0, 0x160-1, 0, 0xf0-1)
-	MCFG_SCREEN_UPDATE_DRIVER(stepstag_state, screen_update_stepstag_mid)
-//  MCFG_SCREEN_PALETTE("mpalette")
+	screen_device &mscreen(SCREEN(config, "mscreen", SCREEN_TYPE_RASTER));
+	mscreen.set_refresh_hz(30);
+	mscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	mscreen.set_size(0x160, 0xf0);
+	mscreen.set_visarea(0, 0x160-1, 0, 0xf0-1);
+	mscreen.set_screen_update(FUNC(stepstag_state::screen_update_stepstag_mid));
+//  mscreen.set_palette(m_vj_palette_m);
 
-	MCFG_SCREEN_ADD("rscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(30)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(0x160, 0xf0)
-	MCFG_SCREEN_VISIBLE_AREA(0, 0x160-1, 0, 0xf0-1)
-	MCFG_SCREEN_UPDATE_DRIVER(stepstag_state, screen_update_stepstag_right)
-	MCFG_SCREEN_PALETTE("rpalette")
+	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	rscreen.set_refresh_hz(30);
+	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	rscreen.set_size(0x160, 0xf0);
+	rscreen.set_visarea(0, 0x160-1, 0, 0xf0-1);
+	rscreen.set_screen_update(FUNC(stepstag_state::screen_update_stepstag_right));
+	rscreen.set_palette(m_vj_palette_r);
 
 	MCFG_VIDEO_START_OVERRIDE(stepstag_state, stepstag )
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tetrisp2)
-	MCFG_PALETTE_ADD("palette", 0x8000)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tetrisp2);
+	PALETTE(config, m_palette).set_entries(0x8000);
 
-	MCFG_DEVICE_ADD("gfxdecode_l", GFXDECODE, "lpalette", gfx_vj_lscreen)
-	MCFG_PALETTE_ADD("lpalette", 0x8000)
+	GFXDECODE(config, m_vj_gfxdecode_l, m_vj_palette_l, gfx_vj_lscreen);
+	PALETTE(config, m_vj_palette_l).set_entries(0x8000);
 
-	MCFG_DEVICE_ADD("gfxdecode_m", GFXDECODE, "mpalette", gfx_vj_mscreen)
-	MCFG_PALETTE_ADD("mpalette", 0x8000)
+	GFXDECODE(config, m_vj_gfxdecode_m, m_vj_palette_m, gfx_vj_mscreen);
+	PALETTE(config, m_vj_palette_m).set_entries(0x8000);
 
-	MCFG_DEVICE_ADD("gfxdecode_r", GFXDECODE, "rpalette", gfx_vj_rscreen)
-	MCFG_PALETTE_ADD("rpalette", 0x8000)
+	GFXDECODE(config, m_vj_gfxdecode_r, m_vj_palette_r, gfx_vj_rscreen);
+	PALETTE(config, m_vj_palette_r).set_entries(0x8000);
 
 	config.set_default_layout(layout_vjdash);
 
@@ -2019,10 +2020,10 @@ MACHINE_CONFIG_START(stepstag_state::vjdash)    // 4 Screens
 
 	GENERIC_LATCH_16(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ymz", YMZ280B, 16934400)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	ymz280b_device &ymz(YMZ280B(config, "ymz", 16934400));
+	ymz.add_route(0, "lspeaker", 1.0);
+	ymz.add_route(1, "rspeaker", 1.0);
+}
 
 
 /***************************************************************************
@@ -2080,6 +2081,33 @@ ROM_START( tetrisp2 ) /* Version 2.8 */
 	ROM_REGION( 0x100000, "maincpu", 0 )        /* 68000 Code */
 	ROM_LOAD16_BYTE( "tet2_4_ver2.8.ic59", 0x000000, 0x080000, CRC(e67f9c51) SHA1(d8b2937699d648267b163c7c3f591426877f3701) )
 	ROM_LOAD16_BYTE( "tet2_1_ver2.8.ic65", 0x000001, 0x080000, CRC(5020a4ed) SHA1(9c0f02fe3700761771ac026a2e375144e86e5eb7) )
+
+	ROM_REGION( 0x800000, "gfx1", 0 )   /* 8x8x8 (Sprites) */
+	ROM_LOAD32_WORD( "96019-01.9", 0x000000, 0x400000, CRC(06f7dc64) SHA1(722c51b707b9854c0293afdff18b27ec7cae6719) )
+	ROM_LOAD32_WORD( "96019-02.8", 0x000002, 0x400000, CRC(3e613bed) SHA1(038b5e43fa3d69654107c8093126eeb2e8fa4ddc) )
+
+	/* If t2p_m01&2 from this board were correctly read, since they hold the same data of the above but with swapped halves, it
+	       means they had to invert the top bit of the "page select" register in the sprite's hardware on this board! */
+
+	ROM_REGION( 0x800000, "gfx2", 0 )   /* 16x16x8 (Background) */
+	ROM_LOAD( "96019-06.13", 0x000000, 0x400000, CRC(16f7093c) SHA1(2be77c6a692c5d762f5553ae24e8c415ab194cc6) )
+	//ROM_LOAD( "96019-04.6",  0x400000, 0x100000, CRC(b849dec9) SHA1(fa7ac00fbe587a74c3fb8c74a0f91f7afeb8682f) )
+
+	ROM_REGION( 0x100000, "gfx3", 0 )   /* 16x16x8 (Rotation) */
+	ROM_COPY( "gfx2",        0x400000, 0x000000, 0x100000 )
+	ROM_LOAD( "96019-04.6",  0x000000, 0x100000, CRC(b849dec9) SHA1(fa7ac00fbe587a74c3fb8c74a0f91f7afeb8682f) )
+
+	ROM_REGION( 0x080000, "gfx4", 0 )   /* 8x8x8 (Foreground) */
+	ROM_LOAD( "tetp2-10.ic27", 0x000000, 0x080000, CRC(34dd1bad) SHA1(9bdf1dde11f82839676400de5dd7acb06ea8cdb2) )   // 11111xxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x400000, "ymz", 0 )    /* Samples */
+	ROM_LOAD( "96019-07.7", 0x000000, 0x400000, CRC(a8a61954) SHA1(86c3db10b348ba1f44ff696877b8b20845fa53de) )
+ROM_END
+
+ROM_START( tetrisp2a ) /* Version 2.7 */
+	ROM_REGION( 0x100000, "maincpu", 0 )        /* 68000 Code */
+	ROM_LOAD16_BYTE( "tet2_4_ver2.7.ic59", 0x000000, 0x080000, CRC(3070bfde) SHA1(ba4f69961411fb7d64bcdf83763322e8ff097a59) )
+	ROM_LOAD16_BYTE( "tet2_1_ver2.7.ic65", 0x000001, 0x080000, CRC(fe3eb1d2) SHA1(7ab27de254a0701a5ba8879456db794e871e6d69) )
 
 	ROM_REGION( 0x800000, "gfx1", 0 )   /* 8x8x8 (Sprites) */
 	ROM_LOAD32_WORD( "96019-01.9", 0x000000, 0x400000, CRC(06f7dc64) SHA1(722c51b707b9854c0293afdff18b27ec7cae6719) )
@@ -2823,7 +2851,8 @@ ROM_END
 ***************************************************************************/
 
 //    YEAR, NAME,      PARENT,   MACHINE,  INPUT,     STATE,          INIT,     MONITOR, COMPANY,                       FULLNAME,                               FLAGS
-GAME( 1997, tetrisp2,  0,        tetrisp2, tetrisp2,  tetrisp2_state, empty_init,   ROT0,    "Jaleco / The Tetris Company", "Tetris Plus 2 (World)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1997, tetrisp2,  0,        tetrisp2, tetrisp2,  tetrisp2_state, empty_init,   ROT0,    "Jaleco / The Tetris Company", "Tetris Plus 2 (World, V2.8)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1997, tetrisp2a, tetrisp2, tetrisp2, tetrisp2,  tetrisp2_state, empty_init,   ROT0,    "Jaleco / The Tetris Company", "Tetris Plus 2 (World, V2.7)",          MACHINE_SUPPORTS_SAVE )
 GAME( 1997, tetrisp2j, tetrisp2, tetrisp2, tetrisp2j, tetrisp2_state, empty_init,   ROT0,    "Jaleco / The Tetris Company", "Tetris Plus 2 (Japan, V2.2)",          MACHINE_SUPPORTS_SAVE )
 GAME( 1997, tetrisp2ja,tetrisp2, tetrisp2, tetrisp2j, tetrisp2_state, empty_init,   ROT0,    "Jaleco / The Tetris Company", "Tetris Plus 2 (Japan, V2.1)",          MACHINE_SUPPORTS_SAVE )
 

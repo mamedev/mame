@@ -553,7 +553,8 @@ About the Deroon DeroDero listed below:
  This set contains less Japanese text and English translations for some game aspects such as game menus.
  Coining up displays "TECMO STACKERS" but this set doesn't seem to include a "How to Play" demo like the parent set
 
- Possibly a Korean set, contained genuine Tecmo dvelopment labels - Still missing the full English version titled Temco Stackers.
+ PCB contained genuine Tecmo dvelopment labels, it's unknown which specific region this set was intended for.
+ Still missing the full English version titled Temco Stackers if it exists.
 
 */
 ROM_START( deroon2 )
@@ -722,6 +723,6 @@ void tecmosys_state::init_tkdensha()
 }
 
 GAME( 1995, deroon,           0, tecmosys, tecmosys, tecmosys_state, init_deroon,     ROT0, "Tecmo", "Deroon DeroDero (earlier)",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, deroon2,     deroon, tecmosys, tecmosys, tecmosys_state, init_deroon,     ROT0, "Tecmo", "Deroon DeroDero (newer)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // some parts translated in English, attract without 'how to play'
+GAME( 1996, deroon2,     deroon, tecmosys, tecmosys, tecmosys_state, init_deroon,     ROT0, "Tecmo", "Deroon DeroDero / Tecmo Stackers",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // some parts translated in English, attract without 'how to play'
 GAME( 1996, tkdensho,         0, tecmosys, tecmosys, tecmosys_state, init_tkdensho,   ROT0, "Tecmo", "Toukidenshou - Angel Eyes (VER. 960614)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1996, tkdenshoa, tkdensho, tecmosys, tecmosys, tecmosys_state, init_tkdensha,   ROT0, "Tecmo", "Toukidenshou - Angel Eyes (VER. 960427)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

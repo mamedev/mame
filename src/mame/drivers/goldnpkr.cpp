@@ -1696,11 +1696,11 @@ WRITE8_MEMBER(goldnpkr_state::wcfalcon_snd_w)
 {
 	if (wcfalcon_flag == 0)
 	{
-		m_ay8910->data_address_w(space, 0, data);
+		m_ay8910->data_address_w(0, data);
 	}
 	else
 	{
-		m_ay8910->data_address_w(space, 1, data);
+		m_ay8910->data_address_w(1, data);
 	}
 
 	wcfalcon_flag = wcfalcon_flag ^ 1;
@@ -4403,7 +4403,7 @@ void goldnpkr_state::wildcard(machine_config &config)
 	m_pia[0]->writepa_handler().set(FUNC(goldnpkr_state::mux_port_w));
 
 	/* video hardware */
-//  MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_wildcard)
+//  m_gfxdecode->set_info(gfx_wildcard);
 	m_palette->set_init(FUNC(goldnpkr_state::witchcrd_palette));
 //  MCFG_VIDEO_START_OVERRIDE(goldnpkr_state,wildcard)
 
@@ -4447,7 +4447,7 @@ void goldnpkr_state::wildcrdb(machine_config &config)
 	m_pia[1]->writepa_handler().set(FUNC(goldnpkr_state::wcfalcon_snd_w));
 
 	/* video hardware */
-//  MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_wildcard)
+//  m_gfxdecode->set_info(gfx_wildcard);
 	m_palette->set_init(FUNC(goldnpkr_state::witchcrd_palette));
 //  MCFG_VIDEO_START_OVERRIDE(goldnpkr_state,wildcard)
 

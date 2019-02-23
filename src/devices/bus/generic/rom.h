@@ -30,9 +30,9 @@ public:
 	generic_rom_plain_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom) override;
-	virtual DECLARE_READ16_MEMBER(read16_rom) override;
-	virtual DECLARE_READ32_MEMBER(read32_rom) override;
+	virtual uint8_t read_rom(offs_t offset) override;
+	virtual uint16_t read16_rom(offs_t offset, uint16_t mem_mask) override;
+	virtual uint32_t read32_rom(offs_t offset, uint32_t mem_mask) override;
 
 protected:
 	generic_rom_plain_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -48,8 +48,8 @@ public:
 	generic_romram_plain_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_ram) override;
-	virtual DECLARE_WRITE8_MEMBER(write_ram) override;
+	virtual uint8_t read_ram(offs_t offset) override;
+	virtual void write_ram(offs_t offset, uint8_t data) override;
 };
 
 
@@ -62,9 +62,9 @@ public:
 	generic_rom_linear_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom) override;
-	virtual DECLARE_READ16_MEMBER(read16_rom) override;
-	virtual DECLARE_READ32_MEMBER(read32_rom) override;
+	virtual uint8_t read_rom(offs_t offset) override;
+	virtual uint16_t read16_rom(offs_t offset, uint16_t mem_mask) override;
+	virtual uint32_t read32_rom(offs_t offset, uint32_t mem_mask) override;
 };
 
 

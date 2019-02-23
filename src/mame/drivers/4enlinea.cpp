@@ -515,7 +515,9 @@ MACHINE_CONFIG_START(_4enlinea_state::_4enlinea)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(_4enlinea_state, _4enlinea_audio_irq, 60) //TODO
 
 	// FIXME: determine ISA bus clock
-	ISA8(config, "isa", 0).set_cputag("maincpu");
+	isa8_device &isa(ISA8(config, "isa", 0));
+	isa.set_memspace("maincpu", AS_PROGRAM);
+	isa.set_iospace("maincpu", AS_IO);
 
 	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "isa", _4enlinea_isa8_cards, "4enlinea", true)
 

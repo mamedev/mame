@@ -212,18 +212,18 @@ MACHINE_CONFIG_START(poly88_state::poly88)
 	MCFG_SCREEN_UPDATE_DRIVER(poly88_state, screen_update_poly88)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_poly88)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_poly88);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_CREATE_OPTS(&poly88_cassette_options)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_create_opts(&poly88_cassette_options);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED);
 
 	/* uart */
 	I8251(config, m_uart, XTAL(16'588'800) / 9);
@@ -231,7 +231,7 @@ MACHINE_CONFIG_START(poly88_state::poly88)
 	m_uart->rxrdy_handler().set(FUNC(poly88_state::poly88_usart_rxready));
 
 	/* snapshot */
-	MCFG_SNAPSHOT_ADD("snapshot", poly88_state, poly88, "img", 2)
+	MCFG_SNAPSHOT_ADD("snapshot", poly88_state, poly88, "img", attotime::from_seconds(2))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(poly88_state::poly8813)

@@ -143,7 +143,6 @@
   - finish bshipb SN76477 sound
   - improve elecbowl driver
   - is alphie(patent) the same as the final version?
-  - h2hhockey R9 timing is wrong: passing seems too slow, and in-game clock too fast
 
 ***************************************************************************/
 
@@ -1494,7 +1493,8 @@ public:
 
 	required_device<timer_device> m_cap_empty_timer;
 	TIMER_DEVICE_CALLBACK_MEMBER(cap_empty_callback);
-	bool m_cap;
+	bool m_cap_state;
+	attotime m_cap_charge;
 
 	void prepare_display();
 	DECLARE_WRITE16_MEMBER(write_r);
@@ -1511,7 +1511,7 @@ protected:
 TIMER_DEVICE_CALLBACK_MEMBER(h2hhockey_state::cap_empty_callback)
 {
 	if (~m_r & 0x200)
-		m_cap = false;
+		m_cap_state = false;
 }
 
 void h2hhockey_state::prepare_display()
@@ -1534,10 +1534,24 @@ WRITE16_MEMBER(h2hhockey_state::write_r)
 	m_speaker->level_w(data >> 8 & 1);
 
 	// R9: K8 and 15uF cap to V- (used as timer)
-	if (data & 0x200)
-		m_cap = true;
-	else if (m_r & 0x200) // falling edge
-		m_cap_empty_timer->adjust(attotime::from_msec(28)); // not accurate
+	// rising edge, remember the time
+	if (data & ~m_r & 0x200)
+	{
+		m_cap_state = true;
+		m_cap_charge = machine().time();
+	}
+	// falling edge, determine how long K8 should stay up
+	if (~data & m_r & 0x200)
+	{
+		const attotime full = attotime::from_usec(1300); // approx. charge time
+		const int factor = 27; // approx. factor for charge/discharge to logic 0
+
+		attotime charge = machine().time() - m_cap_charge;
+		if (charge > full)
+			charge = full;
+
+		m_cap_empty_timer->adjust(charge * factor);
+	}
 
 	// R0-R7: led select
 	m_r = data;
@@ -1554,7 +1568,7 @@ WRITE16_MEMBER(h2hhockey_state::write_o)
 READ8_MEMBER(h2hhockey_state::read_k)
 {
 	// K1-K4: multiplexed inputs, K8: R9 and capacitor
-	return (read_inputs(4) & 7) | (m_cap ? 8 : 0);
+	return (read_inputs(4) & 7) | (m_cap_state ? 8 : 0);
 }
 
 // config
@@ -1590,8 +1604,11 @@ void h2hhockey_state::machine_start()
 	hh_tms1k_state::machine_start();
 
 	// zerofill/register for savestates
-	m_cap = false;
-	save_item(NAME(m_cap));
+	m_cap_state = false;
+	m_cap_charge = attotime::zero;
+
+	save_item(NAME(m_cap_state));
+	save_item(NAME(m_cap_charge));
 }
 
 void h2hhockey_state::h2hhockey(machine_config &config)

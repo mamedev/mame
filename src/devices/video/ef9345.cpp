@@ -35,7 +35,8 @@ DEFINE_DEVICE_TYPE(TS9347, ts9347_device, "ts9347", "TS9347")
 // default address map
 void ef9345_device::ef9345(address_map &map)
 {
-	map(0x0000, 0x3fff).ram();
+	if (!has_configured_map(0))
+		map(0x0000, 0x3fff).ram();
 }
 
 //-------------------------------------------------
@@ -113,7 +114,7 @@ ef9345_device::ef9345_device(const machine_config &mconfig, device_type type, co
 	device_t(mconfig, type, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
-	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(), address_map_constructor(FUNC(ef9345_device::ef9345), this)),
+	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(ef9345_device::ef9345), this)),
 	m_charset(*this, DEVICE_SELF),
 	m_variant(variant),
 	m_palette(*this, finder_base::DUMMY_TAG)
@@ -212,7 +213,7 @@ void ef9345_device::device_timer(emu_timer &timer, device_timer_id id, int param
 void ef9345_device::set_busy_flag(int period)
 {
 	m_bf = 1;
-	m_busy_timer->adjust(attotime::from_usec(period));
+	m_busy_timer->adjust(attotime::from_nsec(period));
 }
 
 // draw a char in 40 char line mode
@@ -753,7 +754,7 @@ void ef9345_device::ef9345_exec(uint8_t cmd)
 	{
 		case 0x00:  //KRF: R1,R2,R3->ram
 		case 0x01:  //KRF: R1,R2,R3->ram + increment
-			set_busy_flag(4);
+			set_busy_flag(4000);
 			m_videoram->write_byte(a, m_registers[1]);
 			m_videoram->write_byte(a + 0x0800, m_registers[2]);
 			m_videoram->write_byte(a + 0x1000, m_registers[3]);
@@ -761,14 +762,14 @@ void ef9345_device::ef9345_exec(uint8_t cmd)
 			break;
 		case 0x02:  //KRG: R1,R2->ram
 		case 0x03:  //KRG: R1,R2->ram + increment
-			set_busy_flag(5.5);
+			set_busy_flag(5500);
 			m_videoram->write_byte(a, m_registers[1]);
 			m_videoram->write_byte(a + 0x0800, m_registers[2]);
 			if (cmd&1) inc_x(7);
 			break;
 		case 0x08:  //KRF: ram->R1,R2,R3
 		case 0x09:  //KRF: ram->R1,R2,R3 + increment
-			set_busy_flag(7.5);
+			set_busy_flag(7500);
 			m_registers[1] = m_videoram->read_byte(a);
 			m_registers[2] = m_videoram->read_byte(a + 0x0800);
 			m_registers[3] = m_videoram->read_byte(a + 0x1000);
@@ -776,14 +777,14 @@ void ef9345_device::ef9345_exec(uint8_t cmd)
 			break;
 		case 0x0a:  //KRG: ram->R1,R2
 		case 0x0b:  //KRG: ram->R1,R2 + increment
-			set_busy_flag(7.5);
+			set_busy_flag(7500);
 			m_registers[1] = m_videoram->read_byte(a);
 			m_registers[2] = m_videoram->read_byte(a + 0x0800);
 			if (cmd&1) inc_x(7);
 			break;
 		case 0x30:  //OCT: R1->RAM, main pointer
 		case 0x31:  //OCT: R1->RAM, main pointer + inc
-			set_busy_flag(4);
+			set_busy_flag(4000);
 			m_videoram->write_byte(indexram(7), m_registers[1]);
 
 			if (cmd&1)
@@ -795,7 +796,7 @@ void ef9345_device::ef9345_exec(uint8_t cmd)
 			break;
 		case 0x34:  //OCT: R1->RAM, aux pointer
 		case 0x35:  //OCT: R1->RAM, aux pointer + inc
-			set_busy_flag(4);
+			set_busy_flag(4000);
 			m_videoram->write_byte(indexram(5), m_registers[1]);
 
 			if (cmd&1)
@@ -803,7 +804,7 @@ void ef9345_device::ef9345_exec(uint8_t cmd)
 			break;
 		case 0x38:  //OCT: RAM->R1, main pointer
 		case 0x39:  //OCT: RAM->R1, main pointer + inc
-			set_busy_flag(4.5);
+			set_busy_flag(4500);
 			m_registers[1] = m_videoram->read_byte(indexram(7));
 
 			if (cmd&1)
@@ -816,7 +817,7 @@ void ef9345_device::ef9345_exec(uint8_t cmd)
 			break;
 		case 0x3c:  //OCT: RAM->R1, aux pointer
 		case 0x3d:  //OCT: RAM->R1, aux pointer + inc
-			set_busy_flag(4.5);
+			set_busy_flag(4500);
 			m_registers[1] = m_videoram->read_byte(indexram(5));
 
 			if (cmd&1)
@@ -824,7 +825,7 @@ void ef9345_device::ef9345_exec(uint8_t cmd)
 			break;
 		case 0x50:  //KRL: 80 uint8_t - 12 bits write
 		case 0x51:  //KRL: 80 uint8_t - 12 bits write + inc
-			set_busy_flag(12.5);
+			set_busy_flag(12500);
 			m_videoram->write_byte(a, m_registers[1]);
 			switch((a / 0x0800) & 1)
 			{
@@ -850,7 +851,7 @@ void ef9345_device::ef9345_exec(uint8_t cmd)
 			break;
 		case 0x58:  //KRL: 80 uint8_t - 12 bits read
 		case 0x59:  //KRL: 80 uint8_t - 12 bits read + inc
-			set_busy_flag(11.5);
+			set_busy_flag(11500);
 			m_registers[1] = m_videoram->read_byte(a);
 			switch((a / 0x0800) & 1)
 			{
@@ -879,7 +880,7 @@ void ef9345_device::ef9345_exec(uint8_t cmd)
 		case 0x83:  //IND: R1->PAT
 		case 0x84:  //IND: R1->DOR
 		case 0x87:  //IND: R1->ROR
-			set_busy_flag(2);
+			set_busy_flag(2000);
 			switch(cmd&7)
 			{
 				case 1:     m_tgs = m_registers[1]; break;
@@ -897,7 +898,7 @@ void ef9345_device::ef9345_exec(uint8_t cmd)
 		case 0x8b:  //IND: PAT->R1
 		case 0x8c:  //IND: DOR->R1
 		case 0x8f:  //IND: ROR->R1
-			set_busy_flag(3.5);
+			set_busy_flag(3500);
 			switch(cmd&7)
 			{
 				case 0:     m_registers[1] = m_charset[indexrom(7) & 0x1fff]; break;
@@ -915,7 +916,7 @@ void ef9345_device::ef9345_exec(uint8_t cmd)
 		case 0x99:  //VSM: vertical sync mask set
 			break;
 		case 0xb0:  //INY: increment Y
-			set_busy_flag(2);
+			set_busy_flag(2000);
 			inc_y(6);
 			m_state &= 0x8f;  //reset S4(LXa), S5(LXm), S6(Al)
 			break;
@@ -936,7 +937,7 @@ void ef9345_device::ef9345_exec(uint8_t cmd)
 			uint8_t n = (cmd>>4) - 0x0c;
 			uint8_t r1 = (cmd&0x04) ? 7 : 5;
 			uint8_t r2 = (cmd&0x04) ? 5 : 7;
-			int busy = 2;
+			int busy = 2000;
 
 			for(i = 0; i < 1280; i++)
 			{
@@ -959,7 +960,7 @@ void ef9345_device::ef9345_exec(uint8_t cmd)
 					inc_y(6);
 				}
 
-				busy += 4 * n;
+				busy += 4000 * n;
 			}
 			m_state &= 0x8f;  //reset S4(LXa), S5(LXm), S6(Al)
 			set_busy_flag(busy);
@@ -994,7 +995,7 @@ void ef9345_device::update_scanline(uint16_t scanline)
 	if (scanline == 250)
 		m_state &= 0xfb;
 
-	set_busy_flag(104);
+	set_busy_flag(104000);
 
 	if (m_char_mode == MODE12x80 || m_char_mode == MODE8x80)
 	{

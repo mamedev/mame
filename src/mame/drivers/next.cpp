@@ -995,11 +995,11 @@ static void next_scsi_devices(device_slot_interface &device)
 
 void next_state::ncr5390(device_t *device)
 {
-	devcb_base *devcb;
-	(void)devcb;
-	MCFG_DEVICE_CLOCK(10000000)
-	MCFG_NCR5390_IRQ_HANDLER(WRITELINE(*this, next_state, scsi_irq))
-	MCFG_NCR5390_DRQ_HANDLER(WRITELINE(*this, next_state, scsi_drq))
+	ncr5390_device &adapter = downcast<ncr5390_device &>(*device);
+
+	adapter.set_clock(10000000);
+	adapter.irq_handler_cb().set(*this, FUNC(next_state::scsi_irq));
+	adapter.drq_handler_cb().set(*this, FUNC(next_state::scsi_drq));
 }
 
 MACHINE_CONFIG_START(next_state::next_base)
@@ -1014,9 +1014,9 @@ MACHINE_CONFIG_START(next_state::next_base)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, next_state, vblank_w))
 
 	// devices
-	MCFG_NSCSI_BUS_ADD("scsibus")
+	NSCSI_BUS(config, "scsibus");
 
-	MCFG_DEVICE_ADD("rtc", MCCS1850, XTAL(32'768))
+	MCCS1850(config, rtc, XTAL(32'768));
 
 	SCC8530(config, scc, XTAL(25'000'000));
 	scc->intrq_callback().set(FUNC(next_state::scc_irq));
@@ -1026,15 +1026,14 @@ MACHINE_CONFIG_START(next_state::next_base)
 	keyboard->int_power_wr_callback().set(FUNC(next_state::power_irq));
 	keyboard->int_nmi_wr_callback().set(FUNC(next_state::nmi_irq));
 
-	MCFG_NSCSI_ADD("scsibus:0", next_scsi_devices, "harddisk", false)
-	MCFG_NSCSI_ADD("scsibus:1", next_scsi_devices, "cdrom", false)
-	MCFG_NSCSI_ADD("scsibus:2", next_scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:3", next_scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:4", next_scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:5", next_scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:6", next_scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:7", next_scsi_devices, "ncr5390", true)
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("ncr5390", [this] (device_t *device) { ncr5390(device); })
+	NSCSI_CONNECTOR(config, "scsibus:0", next_scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "scsibus:1", next_scsi_devices, "cdrom");
+	NSCSI_CONNECTOR(config, "scsibus:2", next_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:3", next_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:4", next_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:5", next_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:6", next_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:7", next_scsi_devices, "ncr5390", true).set_option_machine_config("ncr5390", [this] (device_t *device) { ncr5390(device); });
 
 	MB8795(config, net, 0);
 	net->tx_irq().set(FUNC(next_state::net_tx_irq));
@@ -1053,16 +1052,17 @@ MACHINE_CONFIG_START(next_state::next)
 	MCFG_DEVICE_PROGRAM_MAP(next_0b_m_nofdc_mem)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(next_state::next_fdc_base)
+void next_state::next_fdc_base(machine_config &config)
+{
 	next_base(config);
 	N82077AA(config, fdc, n82077aa_device::MODE_PS2);
 	fdc->intrq_wr_callback().set(FUNC(next_state::fdc_irq));
 	fdc->drq_wr_callback().set(FUNC(next_state::fdc_drq));
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", next_floppies, "35ed", next_state::floppy_formats)
+	FLOPPY_CONNECTOR(config, "fdc:0", next_floppies, "35ed", next_state::floppy_formats);
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "next")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "flop_list").set_original("next");
+}
 
 MACHINE_CONFIG_START(next_state::nexts)
 	next_fdc_base(config);

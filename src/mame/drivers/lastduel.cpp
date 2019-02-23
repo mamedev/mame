@@ -514,33 +514,33 @@ void lastduel_state::machine_reset()
 		m_vctrl[i] = 0;
 }
 
-MACHINE_CONFIG_START(lastduel_state::lastduel)
-
+void lastduel_state::lastduel(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 10000000) // Unconfirmed - could be 8MHz
-	MCFG_DEVICE_PROGRAM_MAP(lastduel_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lastduel_state, irq2_line_hold)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_irq", lastduel_state, lastduel_timer_cb, attotime::from_hz(120))
+	M68000(config, m_maincpu, 10000000); // Unconfirmed - could be 8MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &lastduel_state::lastduel_map);
+	m_maincpu->set_vblank_int("screen", FUNC(lastduel_state::irq2_line_hold));
+	TIMER(config, "timer_irq").configure_periodic(FUNC(lastduel_state::lastduel_timer_cb), attotime::from_hz(120));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	Z80(config, m_audiocpu, XTAL(3'579'545));
+	m_audiocpu->set_addrmap(AS_PROGRAM, &lastduel_state::sound_map);
 
 	MCFG_MACHINE_START_OVERRIDE(lastduel_state,lastduel)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(lastduel_state, screen_update_lastduel)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(8*8, (64-8)*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(lastduel_state::screen_update_lastduel));
+	screen.screen_vblank().set("spriteram", FUNC(buffered_spriteram16_device::vblank_copy_rising));
+	screen.set_palette(m_palette);
 
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lastduel)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lastduel);
 	PALETTE(config, m_palette).set_format(2, &lastduel_state::lastduel_RRRRGGGGBBBBIIII, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(lastduel_state,lastduel)
@@ -550,42 +550,41 @@ MACHINE_CONFIG_START(lastduel_state::lastduel)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(3'579'545))
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	ym2203_device &ym1(YM2203(config, "ym1", XTAL(3'579'545)));
+	ym1.irq_handler().set_inputline(m_audiocpu, 0);
+	ym1.add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	MCFG_DEVICE_ADD("ym2", YM2203, XTAL(3'579'545))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-MACHINE_CONFIG_END
+	ym2203_device &ym2(YM2203(config, "ym2", XTAL(3'579'545)));
+	ym2.add_route(ALL_OUTPUTS, "mono", 0.40);
+}
 
-
-MACHINE_CONFIG_START(lastduel_state::madgear)
-
+void lastduel_state::madgear(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(10'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(madgear_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lastduel_state, irq5_line_hold)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_irq", lastduel_state, madgear_timer_cb, attotime::from_hz(120))
+	M68000(config, m_maincpu, XTAL(10'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &lastduel_state::madgear_map);
+	m_maincpu->set_vblank_int("screen", FUNC(lastduel_state::irq5_line_hold));
+	TIMER(config, "timer_irq").configure_periodic(FUNC(lastduel_state::madgear_timer_cb), attotime::from_hz(120));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
-	MCFG_DEVICE_PROGRAM_MAP(madgear_sound_map)
+	Z80(config, m_audiocpu, XTAL(3'579'545));
+	m_audiocpu->set_addrmap(AS_PROGRAM, &lastduel_state::madgear_sound_map);
 
 	MCFG_MACHINE_START_OVERRIDE(lastduel_state,madgear)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(57.4444)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(lastduel_state, screen_update_madgear)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	screen.set_refresh_hz(57.4444);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(8*8, (64-8)*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(lastduel_state::screen_update_madgear));
+	screen.screen_vblank().set("spriteram", FUNC(buffered_spriteram16_device::vblank_copy_rising));
+	screen.set_palette(m_palette);
 
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lastduel)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lastduel);
 	PALETTE(config, m_palette).set_format(2, &lastduel_state::lastduel_RRRRGGGGBBBBIIII, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(lastduel_state,madgear)
@@ -595,16 +594,16 @@ MACHINE_CONFIG_START(lastduel_state::madgear)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(3'579'545))
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	ym2203_device &ym1(YM2203(config, "ym1", XTAL(3'579'545)));
+	ym1.irq_handler().set_inputline(m_audiocpu, 0);
+	ym1.add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	MCFG_DEVICE_ADD("ym2", YM2203, XTAL(3'579'545))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	ym2203_device &ym2(YM2203(config, "ym2", XTAL(3'579'545)));
+	ym2.add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(10'000'000)/10, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.98)
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL(10'000'000)/10, okim6295_device::PIN7_HIGH));
+	oki.add_route(ALL_OUTPUTS, "mono", 0.98);
+}
 
 /******************************************************************************/
 

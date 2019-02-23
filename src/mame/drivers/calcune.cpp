@@ -267,31 +267,31 @@ MACHINE_CONFIG_START(calcune_state::calcune)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(calcune_state, screen_update_calcune)
 
-	MCFG_DEVICE_ADD("gen_vdp", SEGA315_5313, MASTER_CLOCK_NTSC, "maincpu")
-	MCFG_SEGA315_5313_IS_PAL(false)
-	MCFG_SEGA315_5313_SND_IRQ_CALLBACK(WRITELINE(*this, calcune_state, vdp_sndirqline_callback_genesis_z80));
-	MCFG_SEGA315_5313_LV6_IRQ_CALLBACK(WRITELINE(*this, calcune_state, vdp_lv6irqline_callback_genesis_68k));
-	MCFG_SEGA315_5313_LV4_IRQ_CALLBACK(WRITELINE(*this, calcune_state, vdp_lv4irqline_callback_genesis_68k));
-	MCFG_SEGA315_5313_ALT_TIMING(1);
-	MCFG_SEGA315_5313_PAL_WRITE_BASE(0x0000);
-	MCFG_SEGA315_5313_PALETTE("palette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25)
+	SEGA315_5313(config, m_vdp, MASTER_CLOCK_NTSC, m_maincpu);
+	m_vdp->set_is_pal(false);
+	m_vdp->snd_irq().set(FUNC(calcune_state::vdp_sndirqline_callback_genesis_z80));
+	m_vdp->lv6_irq().set(FUNC(calcune_state::vdp_lv6irqline_callback_genesis_68k));
+	m_vdp->lv4_irq().set(FUNC(calcune_state::vdp_lv4irqline_callback_genesis_68k));
+	m_vdp->set_alt_timing(1);
+	m_vdp->set_pal_write_base(0x0000);
+	m_vdp->set_palette(m_palette);
+	m_vdp->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
+	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
 
-	MCFG_DEVICE_ADD("gen_vdp2", SEGA315_5313, MASTER_CLOCK_NTSC, "maincpu")
-	MCFG_SEGA315_5313_IS_PAL(false)
+	SEGA315_5313(config, m_vdp2, MASTER_CLOCK_NTSC, m_maincpu);
+	m_vdp2->set_is_pal(false);
 //  are these not hooked up or should they OR with the other lines?
-//  MCFG_SEGA315_5313_SND_IRQ_CALLBACK(WRITELINE(*this, calcune_state, vdp_sndirqline_callback_genesis_z80));
-//  MCFG_SEGA315_5313_LV6_IRQ_CALLBACK(WRITELINE(*this, calcune_state, vdp_lv6irqline_callback_genesis_68k));
-//  MCFG_SEGA315_5313_LV4_IRQ_CALLBACK(WRITELINE(*this, calcune_state, vdp_lv4irqline_callback_genesis_68k));
-	MCFG_SEGA315_5313_ALT_TIMING(1);
-	MCFG_SEGA315_5313_PAL_WRITE_BASE(0x0c0);
-	MCFG_SEGA315_5313_PALETTE("palette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25)
+//  m_vdp2->snd_irq().set(FUNC(calcune_state::vdp_sndirqline_callback_genesis_z80));
+//  m_vdp2->lv6_irq().set(FUNC(calcune_state::vdp_lv6irqline_callback_genesis_68k));
+//  m_vdp2->lv4_irq().set(FUNC(calcune_state::vdp_lv4irqline_callback_genesis_68k));
+	m_vdp2->set_alt_timing(1);
+	m_vdp2->set_pal_write_base(0x0c0);
+	m_vdp2->set_palette(m_palette);
+	m_vdp2->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
+	m_vdp2->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
 
-	MCFG_TIMER_DEVICE_ADD_SCANLINE("scantimer", "gen_vdp", sega315_5313_device, megadriv_scanline_timer_callback_alt_timing, "megadriv", 0, 1)
-	MCFG_TIMER_DEVICE_ADD_SCANLINE("scantimer2", "gen_vdp2", sega315_5313_device, megadriv_scanline_timer_callback_alt_timing, "megadriv", 0, 1)
+	TIMER(config, "scantimer").configure_scanline("gen_vdp", FUNC(sega315_5313_device::megadriv_scanline_timer_callback_alt_timing), "megadriv", 0, 1);
+	TIMER(config, "scantimer2").configure_scanline("gen_vdp2", FUNC(sega315_5313_device::megadriv_scanline_timer_callback_alt_timing), "megadriv", 0, 1);
 
 	MCFG_PALETTE_ADD("palette", 0xc0*2)
 

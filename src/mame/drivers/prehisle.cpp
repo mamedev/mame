@@ -198,8 +198,8 @@ void prehisle_state::machine_start()
 
 /******************************************************************************/
 
-MACHINE_CONFIG_START(prehisle_state::prehisle)
-
+void prehisle_state::prehisle(machine_config &config)
+{
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(18'000'000)/2);   /* verified on pcb */
 	m_maincpu->set_addrmap(AS_PROGRAM, &prehisle_state::prehisle_map);
@@ -210,13 +210,13 @@ MACHINE_CONFIG_START(prehisle_state::prehisle)
 	m_audiocpu->set_addrmap(AS_IO, &prehisle_state::prehisle_sound_io_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	// the screen parameters are guessed but should be accurate. They
 	// give a theoretical refresh rate of 59.1856Hz while the measured
 	// rate on a snk68.c with very similar hardware board is 59.16Hz.
-	MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000)/4, 384, 0, 256, 264, 16, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(prehisle_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen.set_raw(XTAL(24'000'000)/4, 384, 0, 256, 264, 16, 240);
+	screen.set_screen_update(FUNC(prehisle_state::screen_update));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_prehisle);
 	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 1024);
@@ -226,13 +226,13 @@ MACHINE_CONFIG_START(prehisle_state::prehisle)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(4'000'000))  /* verified on pcb */
-	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL(4'000'000)));  /* verified on pcb */
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("upd", UPD7759)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
-MACHINE_CONFIG_END
+	UPD7759(config, m_upd7759);
+	m_upd7759->add_route(ALL_OUTPUTS, "mono", 0.90);
+}
 
 /******************************************************************************/
 

@@ -6,8 +6,8 @@
  */
 
 #include "../solver/nld_solver.h"
-#include "nlid_twoterm.h"
 #include "../nl_setup.h"
+#include "nlid_twoterm.h"
 
 #include <cmath>
 
@@ -137,9 +137,9 @@ public:
 	//NETLIB_RESETI();
 	NETLIB_UPDATEI();
 
-	inline q_type qtype() const { return m_qtype; }
-	inline bool is_qtype(q_type atype) const { return m_qtype == atype; }
-	inline void set_qtype(q_type atype) { m_qtype = atype; }
+	q_type qtype() const { return m_qtype; }
+	bool is_qtype(q_type atype) const { return m_qtype == atype; }
+	void set_qtype(q_type atype) { m_qtype = atype; }
 protected:
 
 	bjt_model_t m_model;
@@ -185,8 +185,8 @@ NETLIB_OBJECT_DERIVED(QBJT_switch, QBJT)
 		, m_RB(*this, "m_RB", true)
 		, m_RC(*this, "m_RC", true)
 		, m_BC_dummy(*this, "m_BC", true)
-		, m_gB(NETLIST_GMIN_DEFAULT)
-		, m_gC(NETLIST_GMIN_DEFAULT)
+		, m_gB(1e-9)
+		, m_gC(1e-9)
 		, m_V(0.0)
 		, m_state_on(*this, "m_state_on", 0)
 	{
@@ -209,15 +209,13 @@ NETLIB_OBJECT_DERIVED(QBJT_switch, QBJT)
 	NETLIB_UPDATE_PARAMI();
 	NETLIB_UPDATE_TERMINALSI();
 
+private:
 	nld_twoterm m_RB;
 	nld_twoterm m_RC;
 
 	// FIXME: this is needed so we have all terminals belong to one net list
 
 	nld_twoterm m_BC_dummy;
-
-protected:
-
 
 	nl_double m_gB; // base conductance / switch on
 	nl_double m_gC; // collector conductance / switch on
@@ -248,10 +246,6 @@ public:
 		register_subalias("B", m_D_EB.m_N);   // Anode
 
 		register_subalias("C", m_D_CB.m_P);   // Cathode
-		//register_term("_B1", m_D_CB.m_N); // Anode
-
-		//register_term("_E1", m_D_EC.m_P);
-		//register_term("_C1", m_D_EC.m_N);
 
 		connect(m_D_EB.m_P, m_D_EC.m_P);
 		connect(m_D_EB.m_N, m_D_CB.m_N);
@@ -265,10 +259,10 @@ protected:
 	NETLIB_UPDATE_PARAMI();
 	NETLIB_UPDATE_TERMINALSI();
 
+private:
 	generic_diode m_gD_BC;
 	generic_diode m_gD_BE;
 
-private:
 	nld_twoterm m_D_CB;  // gcc, gce - gcc, gec - gcc, gcc - gce | Ic
 	nld_twoterm m_D_EB;  // gee, gec - gee, gce - gee, gee - gec | Ie
 	nld_twoterm m_D_EC;  // 0, -gec, -gcc, 0 | 0
@@ -299,10 +293,10 @@ NETLIB_RESET(QBJT_switch)
 
 	m_state_on = 0;
 
-	m_RB.set(netlist().gmin(), 0.0, 0.0);
-	m_RC.set(netlist().gmin(), 0.0, 0.0);
+	m_RB.set(exec().gmin(), 0.0, 0.0);
+	m_RC.set(exec().gmin(), 0.0, 0.0);
 
-	m_BC_dummy.set(netlist().gmin() / 10.0, 0.0, 0.0);
+	m_BC_dummy.set(exec().gmin() / 10.0, 0.0, 0.0);
 
 }
 
@@ -341,8 +335,8 @@ NETLIB_UPDATE_PARAM(QBJT_switch)
 
 	//m_gB = d.gI(0.005 / alpha);
 
-	if (m_gB < netlist().gmin())
-		m_gB = netlist().gmin();
+	if (m_gB < exec().gmin())
+		m_gB = exec().gmin();
 	m_gC =  d.gI(0.005); // very rough estimate
 }
 
@@ -353,8 +347,8 @@ NETLIB_UPDATE_TERMINALS(QBJT_switch)
 	const unsigned new_state = (m_RB.deltaV() * m > m_V ) ? 1 : 0;
 	if (m_state_on ^ new_state)
 	{
-		const nl_double gb = new_state ? m_gB : netlist().gmin();
-		const nl_double gc = new_state ? m_gC : netlist().gmin();
+		const nl_double gb = new_state ? m_gB : exec().gmin();
+		const nl_double gc = new_state ? m_gC : exec().gmin();
 		const nl_double v  = new_state ? m_V * m : 0;
 
 		m_RB.set(gb, v,   0.0);
@@ -423,15 +417,15 @@ NETLIB_UPDATE_PARAM(QBJT_EB)
 	m_alpha_f = BF / (1.0 + BF);
 	m_alpha_r = BR / (1.0 + BR);
 
-	m_gD_BE.set_param(IS / m_alpha_f, NF, netlist().gmin());
-	m_gD_BC.set_param(IS / m_alpha_r, NR, netlist().gmin());
+	m_gD_BE.set_param(IS / m_alpha_f, NF, exec().gmin());
+	m_gD_BC.set_param(IS / m_alpha_r, NR, exec().gmin());
 }
 
 	} //namespace analog
 
 	namespace devices {
-		NETLIB_DEVICE_IMPL_NS(analog, QBJT_EB)
-		NETLIB_DEVICE_IMPL_NS(analog, QBJT_switch)
-	}
+		NETLIB_DEVICE_IMPL_NS(analog, QBJT_EB, "QBJT_EB", "MODEL")
+		NETLIB_DEVICE_IMPL_NS(analog, QBJT_switch, "QBJT_SW", "MODEL")
+	} // namespace devices
 
 } // namespace netlist

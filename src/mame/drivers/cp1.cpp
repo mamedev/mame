@@ -264,7 +264,8 @@ QUICKLOAD_LOAD_MEMBER( cp1_state, quickload )
 	return image_init_result::PASS;
 }
 
-MACHINE_CONFIG_START(cp1_state::cp1)
+void cp1_state::cp1(machine_config &config)
+{
 	/* basic machine hardware */
 	i8049_device &maincpu(I8049(config, m_maincpu, 6_MHz_XTAL));
 	maincpu.set_addrmap(AS_IO, &cp1_state::cp1_io);
@@ -287,10 +288,10 @@ MACHINE_CONFIG_START(cp1_state::cp1)
 
 	config.set_default_layout(layout_cp1);
 
-	MCFG_CASSETTE_ADD("cassette")
+	CASSETTE(config, m_cassette);
 
-	MCFG_QUICKLOAD_ADD("quickload", cp1_state, quickload, "obj", 1)
-MACHINE_CONFIG_END
+	QUICKLOAD(config, "quickload").set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(cp1_state, quickload), this), "obj", attotime::from_seconds(1));
+}
 
 /* ROM definition */
 /*

@@ -15,25 +15,6 @@
 
 #include "a2bus.h"
 
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_A2EAUXSLOT_CPU(_cputag) \
-	downcast<a2eauxslot_device &>(*device).set_cputag(_cputag);
-
-#define MCFG_A2EAUXSLOT_OUT_IRQ_CB(_devcb) \
-	downcast<a2eauxslot_device &>(*device).set_out_irq_callback(DEVCB_##_devcb);
-
-#define MCFG_A2EAUXSLOT_OUT_NMI_CB(_devcb) \
-	downcast<a2eauxslot_device &>(*device).set_out_nmi_callback(DEVCB_##_devcb);
-
-#define MCFG_A2EAUXSLOT_SLOT_ADD(_nbtag, _tag, _slot_intf, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, A2EAUXSLOT_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-	downcast<a2eauxslot_slot_device &>(*device).set_a2eauxslot_slot(_nbtag, _tag);
-#define MCFG_A2EAUXSLOT_SLOT_REMOVE(_tag)    \
-	MCFG_DEVICE_REMOVE(_tag)
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -46,7 +27,18 @@ class a2eauxslot_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	a2eauxslot_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T>
+	a2eauxslot_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt, char const *slottag)
+		: a2eauxslot_slot_device(mconfig, tag, owner, 0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+		set_a2eauxslot_slot(slottag, tag);
+	}
+
+	a2eauxslot_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -75,9 +67,9 @@ public:
 	a2eauxslot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration
-	void set_cputag(const char *tag) { m_cputag = tag; }
-	template <class Object> devcb_base &set_out_irq_callback(Object &&cb) { return m_out_irq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_nmi_callback(Object &&cb) { return m_out_nmi_cb.set_callback(std::forward<Object>(cb)); }
+	template <typename T> void set_cputag(T &&tag) { m_maincpu.set_tag(std::forward<T>(tag)); }
+	auto out_irq_callback() { return m_out_irq_cb.bind(); }
+	auto out_nmi_callback() { return m_out_nmi_cb.bind(); }
 
 	void add_a2eauxslot_card(device_a2eauxslot_card_interface *card);
 	device_a2eauxslot_card_interface *get_a2eauxslot_card();
@@ -96,13 +88,12 @@ protected:
 	virtual void device_reset() override;
 
 	// internal state
-	cpu_device   *m_maincpu;
+	required_device<cpu_device> m_maincpu;
 
 	devcb_write_line    m_out_irq_cb;
 	devcb_write_line    m_out_nmi_cb;
 
 	device_a2eauxslot_card_interface *m_device;
-	const char *m_cputag;
 };
 
 

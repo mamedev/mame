@@ -68,22 +68,23 @@ DEVICE_INPUT_DEFAULTS_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(cms_4080term_device::device_add_mconfig)
+void cms_4080term_device::device_add_mconfig(machine_config &config)
+{
 	/* video hardware */
-	device = &SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(50);
 	m_screen->set_size(768, 312);
 	m_screen->set_visarea(0, 492 - 1, 0, 270 - 1);
-	MCFG_SCREEN_UPDATE_DEVICE("ef9345", ef9345_device, screen_update)
+	m_screen->set_screen_update("ef9345", FUNC(ef9345_device::screen_update));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cms_4080term)
-	MCFG_PALETTE_ADD("palette", 8)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_cms_4080term);
+	PALETTE(config, "palette").set_entries(8);
 
 	EF9345(config, m_ef9345, 0);
 	m_ef9345->set_screen("screen");
 	m_ef9345->set_palette_tag("palette");
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", cms_4080term_device, update_scanline, "screen", 0, 10)
+	TIMER(config, "scantimer").configure_scanline(FUNC(cms_4080term_device::update_scanline), "screen", 0, 10);
 
 	VIA6522(config, m_via, 1_MHz_XTAL);
 	m_via->writepa_handler().set("cent_data_out", FUNC(output_latch_device::bus_w));
@@ -107,8 +108,9 @@ MACHINE_CONFIG_START(cms_4080term_device::device_add_mconfig)
 	/* printer */
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->ack_handler().set(m_via, FUNC(via6522_device::write_ca1));
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
-MACHINE_CONFIG_END
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
+}
 
 
 const tiny_rom_entry *cms_4080term_device::device_rom_region() const
@@ -147,7 +149,7 @@ void cms_4080term_device::device_start()
 
 	space.install_readwrite_handler(0xfd20, 0xfd2f, read8_delegate(FUNC(ef9345_device::data_r), m_ef9345.target()), write8_delegate(FUNC(ef9345_device::data_w), m_ef9345.target()));
 	space.install_readwrite_handler(0xfd30, 0xfd3f, read8sm_delegate(FUNC(via6522_device::read), m_via.target()), write8sm_delegate(FUNC(via6522_device::write), m_via.target()));
-	space.install_readwrite_handler(0xfd40, 0xfd4f, read8_delegate(FUNC(mos6551_device::read), m_acia.target()), write8_delegate(FUNC(mos6551_device::write), m_acia.target()));
+	space.install_readwrite_handler(0xfd40, 0xfd4f, read8sm_delegate(FUNC(mos6551_device::read), m_acia.target()), write8sm_delegate(FUNC(mos6551_device::write), m_acia.target()));
 
 	uint8_t *FNT = memregion("ef9345")->base();
 	uint16_t dest = 0x2000;

@@ -66,7 +66,7 @@ WRITE16_MEMBER(kickgoal_state::actionhw_snd_w)
 		case 0xfe:  m_okibank->set_entry(1); break;
 		case 0xff:  m_okibank->set_entry(3); break;
 		case 0x78:
-				m_oki->write_command(data);
+				m_oki->write(data);
 				m_snd_sam[0] = 00; m_snd_sam[1]= 00; m_snd_sam[2] = 00; m_snd_sam[3] = 00;
 				break;
 		default:
@@ -75,44 +75,44 @@ WRITE16_MEMBER(kickgoal_state::actionhw_snd_w)
 					if ((data & 0x80) && (m_snd_sam[3] != m_snd_new))
 					{
 						logerror("About to play sample %02x at vol %02x\n", m_snd_new, data);
-						if ((m_oki->read_status() & 0x08) != 0x08)
+						if ((m_oki->read() & 0x08) != 0x08)
 						{
 							logerror("Playing sample %02x at vol %02x\n", m_snd_new, data);
-							m_oki->write_command(m_snd_new);
-							m_oki->write_command(data);
+							m_oki->write(m_snd_new);
+							m_oki->write(data);
 						}
 						m_snd_new = 00;
 					}
 					if ((data & 0x40) && (m_snd_sam[2] != m_snd_new))
 					{
 						logerror("About to play sample %02x at vol %02x\n", m_snd_new, data);
-						if ((m_oki->read_status() & 0x04) != 0x04)
+						if ((m_oki->read() & 0x04) != 0x04)
 						{
 							logerror("Playing sample %02x at vol %02x\n", m_snd_new, data);
-							m_oki->write_command(m_snd_new);
-							m_oki->write_command(data);
+							m_oki->write(m_snd_new);
+							m_oki->write(data);
 						}
 						m_snd_new = 00;
 					}
 					if ((data & 0x20) && (m_snd_sam[1] != m_snd_new))
 					{
 						logerror("About to play sample %02x at vol %02x\n", m_snd_new, data);
-						if ((m_oki->read_status() & 0x02) != 0x02)
+						if ((m_oki->read() & 0x02) != 0x02)
 						{
 							logerror("Playing sample %02x at vol %02x\n", m_snd_new, data);
-							m_oki->write_command(m_snd_new);
-							m_oki->write_command(data);
+							m_oki->write(m_snd_new);
+							m_oki->write(data);
 						}
 						m_snd_new = 00;
 					}
 					if ((data & 0x10) && (m_snd_sam[0] != m_snd_new))
 					{
 						logerror("About to play sample %02x at vol %02x\n", m_snd_new, data);
-						if ((m_oki->read_status() & 0x01) != 0x01)
+						if ((m_oki->read() & 0x01) != 0x01)
 						{
 							logerror("Playing sample %02x at vol %02x\n", m_snd_new, data);
-							m_oki->write_command(m_snd_new);
-							m_oki->write_command(data);
+							m_oki->write(m_snd_new);
+							m_oki->write(data);
 						}
 						m_snd_new = 00;
 					}
@@ -127,7 +127,7 @@ WRITE16_MEMBER(kickgoal_state::actionhw_snd_w)
 				else /* Turn a channel off */
 				{
 					logerror("Turning channel %02x off\n", data);
-					m_oki->write_command(data);
+					m_oki->write(data);
 					if (data & 0x40) m_snd_sam[3] = 00;
 					if (data & 0x20) m_snd_sam[2] = 00;
 					if (data & 0x10) m_snd_sam[1] = 00;
@@ -394,7 +394,7 @@ WRITE8_MEMBER(kickgoal_state::soundio_port_c_w)
 	{
 		if (!(data & 0x01))
 		{
-			m_pic_portb = m_oki->read_status();
+			m_pic_portb = m_oki->read();
 		}
 	}
 
@@ -402,7 +402,7 @@ WRITE8_MEMBER(kickgoal_state::soundio_port_c_w)
 	{
 		if (!(data & 0x02))
 		{
-			m_oki->write_command(m_pic_portb);
+			m_oki->write(m_pic_portb);
 		}
 	}
 

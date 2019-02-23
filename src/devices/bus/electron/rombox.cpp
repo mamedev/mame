@@ -51,36 +51,31 @@ ioport_constructor electron_rombox_device::device_input_ports() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(electron_rombox_device::device_add_mconfig)
+void electron_rombox_device::device_add_mconfig(machine_config &config)
+{
 	/* rom sockets */
-	MCFG_GENERIC_SOCKET_ADD("rom1", generic_plain_slot, "electron_rom")
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_LOAD(electron_rombox_device, rom1_load)
-	MCFG_GENERIC_SOCKET_ADD("rom2", generic_plain_slot, "electron_rom")
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_LOAD(electron_rombox_device, rom2_load)
-	MCFG_GENERIC_SOCKET_ADD("rom3", generic_plain_slot, "electron_rom")
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_LOAD(electron_rombox_device, rom3_load)
-	MCFG_GENERIC_SOCKET_ADD("rom4", generic_plain_slot, "electron_rom")
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_LOAD(electron_rombox_device, rom4_load)
-	MCFG_GENERIC_SOCKET_ADD("rom5", generic_plain_slot, "electron_rom")
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_LOAD(electron_rombox_device, rom5_load)
-	MCFG_GENERIC_SOCKET_ADD("rom6", generic_plain_slot, "electron_rom")
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_LOAD(electron_rombox_device, rom6_load)
-	MCFG_GENERIC_SOCKET_ADD("rom7", generic_plain_slot, "electron_rom")
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_LOAD(electron_rombox_device, rom7_load)
-	MCFG_GENERIC_SOCKET_ADD("rom8", generic_plain_slot, "electron_rom")
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_LOAD(electron_rombox_device, rom8_load)
+	GENERIC_SOCKET(config, m_rom[0], generic_plain_slot, "electron_rom", "bin,rom");
+	m_rom[0]->set_device_load(device_image_load_delegate(&electron_rombox_device::device_image_load_rom1_load, this));
+	GENERIC_SOCKET(config, m_rom[1], generic_plain_slot, "electron_rom", "bin,rom");
+	m_rom[1]->set_device_load(device_image_load_delegate(&electron_rombox_device::device_image_load_rom2_load, this));
+	GENERIC_SOCKET(config, m_rom[2], generic_plain_slot, "electron_rom", "bin,rom");
+	m_rom[2]->set_device_load(device_image_load_delegate(&electron_rombox_device::device_image_load_rom3_load, this));
+	GENERIC_SOCKET(config, m_rom[3], generic_plain_slot, "electron_rom", "bin,rom");
+	m_rom[3]->set_device_load(device_image_load_delegate(&electron_rombox_device::device_image_load_rom4_load, this));
+	GENERIC_SOCKET(config, m_rom[4], generic_plain_slot, "electron_rom", "bin,rom");
+	m_rom[4]->set_device_load(device_image_load_delegate(&electron_rombox_device::device_image_load_rom5_load, this));
+	GENERIC_SOCKET(config, m_rom[5], generic_plain_slot, "electron_rom", "bin,rom");
+	m_rom[5]->set_device_load(device_image_load_delegate(&electron_rombox_device::device_image_load_rom6_load, this));
+	GENERIC_SOCKET(config, m_rom[6], generic_plain_slot, "electron_rom", "bin,rom");
+	m_rom[6]->set_device_load(device_image_load_delegate(&electron_rombox_device::device_image_load_rom7_load, this));
+	GENERIC_SOCKET(config, m_rom[7], generic_plain_slot, "electron_rom", "bin,rom");
+	m_rom[7]->set_device_load(device_image_load_delegate(&electron_rombox_device::device_image_load_rom8_load, this));
 
 	/* pass-through */
-	MCFG_ELECTRON_PASSTHRU_EXPANSION_SLOT_ADD(nullptr)
-MACHINE_CONFIG_END
+	ELECTRON_EXPANSION_SLOT(config, m_exp, DERIVED_CLOCK(1, 1), electron_expansion_devices, nullptr);
+	m_exp->irq_handler().set(DEVICE_SELF_OWNER, FUNC(electron_expansion_slot_device::irq_w));
+	m_exp->nmi_handler().set(DEVICE_SELF_OWNER, FUNC(electron_expansion_slot_device::nmi_w));
+}
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -122,8 +117,10 @@ void electron_rombox_device::device_reset()
 //  expbus_r - expansion data read
 //-------------------------------------------------
 
-uint8_t electron_rombox_device::expbus_r(address_space &space, offs_t offset, uint8_t data)
+uint8_t electron_rombox_device::expbus_r(address_space &space, offs_t offset)
 {
+	uint8_t data = 0xff;
+
 	if (offset >= 0x8000 && offset < 0xc000)
 	{
 		switch (m_romsel)
@@ -134,7 +131,7 @@ uint8_t electron_rombox_device::expbus_r(address_space &space, offs_t offset, ui
 		case 3:
 			if (m_rom_base == 0 && m_rom[m_romsel + 4]->exists())
 			{
-				data = m_rom[m_romsel + 4]->read_rom(space, offset & 0x3fff);
+				data = m_rom[m_romsel + 4]->read_rom(offset & 0x3fff);
 			}
 			break;
 		case 4:
@@ -143,7 +140,7 @@ uint8_t electron_rombox_device::expbus_r(address_space &space, offs_t offset, ui
 		case 7:
 			if (m_rom[m_romsel - 4]->exists())
 			{
-				data = m_rom[m_romsel - 4]->read_rom(space, offset & 0x3fff);
+				data = m_rom[m_romsel - 4]->read_rom(offset & 0x3fff);
 			}
 			break;
 		case 12:
@@ -152,13 +149,13 @@ uint8_t electron_rombox_device::expbus_r(address_space &space, offs_t offset, ui
 		case 15:
 			if (m_rom_base == 12 && m_rom[m_romsel - 8]->exists())
 			{
-				data = m_rom[m_romsel - 8]->read_rom(space, offset & 0x3fff);
+				data = m_rom[m_romsel - 8]->read_rom(offset & 0x3fff);
 			}
 			break;
 		}
 	}
 
-	data &= m_exp->expbus_r(space, offset, data);
+	data &= m_exp->expbus_r(space, offset);
 
 	return data;
 }

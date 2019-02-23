@@ -201,7 +201,10 @@ dmvcart_slot_device::dmvcart_slot_device(const machine_config &mconfig, const ch
 	m_prog_write_cb(*this),
 	m_out_int_cb(*this),
 	m_out_irq_cb(*this),
-	m_out_thold_cb(*this), m_cart(nullptr)
+	m_out_thold_cb(*this),
+	m_memspace(*this, finder_base::DUMMY_TAG, -1),
+	m_iospace(*this, finder_base::DUMMY_TAG, -1),
+	m_cart(nullptr)
 {
 }
 

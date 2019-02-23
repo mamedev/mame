@@ -3152,9 +3152,9 @@ void vgmplay_state::file_map(address_map &map)
 void vgmplay_state::soundchips_map(address_map &map)
 {
 	map(vgmplay_device::REG_SIZE, vgmplay_device::REG_SIZE + 3).r(FUNC(vgmplay_state::file_size_r));
-	map(vgmplay_device::A_SN76489_0 + 0, vgmplay_device::A_SN76489_0 + 0).w(m_sn76489[0], FUNC(sn76489_device::command_w));
+	map(vgmplay_device::A_SN76489_0 + 0, vgmplay_device::A_SN76489_0 + 0).w(m_sn76489[0], FUNC(sn76489_device::write));
 	//map(vgmplay_device::A_SN76489_0 + 1, vgmplay_device::A_SN76489_0 + 1).w(m_sn76489[0], FUNC(sn76489_device::stereo_w)); // TODO: GG stereo
-	map(vgmplay_device::A_SN76489_1 + 0, vgmplay_device::A_SN76489_1 + 0).w(m_sn76489[1], FUNC(sn76489_device::command_w));
+	map(vgmplay_device::A_SN76489_1 + 0, vgmplay_device::A_SN76489_1 + 0).w(m_sn76489[1], FUNC(sn76489_device::write));
 	//map(vgmplay_device::A_SN76489_1 + 1, vgmplay_device::A_SN76489_1 + 1).w(m_sn76489[1], FUNC(sn76489_device::stereo_w)); // TODO: GG stereo
 	map(vgmplay_device::A_YM2413_0, vgmplay_device::A_YM2413_0 + 1).w(m_ym2413[0], FUNC(ym2413_device::write));
 	map(vgmplay_device::A_YM2413_1, vgmplay_device::A_YM2413_1 + 1).w(m_ym2413[1], FUNC(ym2413_device::write));
@@ -3435,10 +3435,10 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 	m_vgmplay->set_addrmap(AS_IO, &vgmplay_state::soundchips_map);
 	m_vgmplay->set_addrmap(AS_IO16, &vgmplay_state::soundchips16_map);
 
-	MCFG_QUICKLOAD_ADD("quickload", vgmplay_state, load_file, "vgm,vgz", 0)
+	MCFG_QUICKLOAD_ADD("quickload", vgmplay_state, load_file, "vgm,vgz")
 	MCFG_QUICKLOAD_INTERFACE("vgm_quik")
 
-	MCFG_SOFTWARE_LIST_ADD("vgm_list", "vgmplay")
+	SOFTWARE_LIST(config, "vgm_list").set_original("vgmplay");
 
 	config.set_default_layout(layout_vgmplay);
 

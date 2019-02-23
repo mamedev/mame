@@ -931,8 +931,7 @@ MACHINE_CONFIG_START(jack_state::jack)
 	MCFG_SCREEN_UPDATE_DRIVER(jack_state, screen_update_jack)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_jack)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jack);
 	PALETTE(config, m_palette).set_format(palette_device::BGR_233_inverted, 32);
 
 	/* sound hardware */
@@ -994,7 +993,7 @@ MACHINE_CONFIG_START(jack_state::joinem)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(jack_state, screen_update_joinem)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_joinem)
+	m_gfxdecode->set_info(gfx_joinem);
 
 	PALETTE(config.replace(), m_palette, FUNC(jack_state::joinem_palette), 64);
 

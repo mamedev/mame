@@ -343,7 +343,7 @@ MACHINE_CONFIG_START(beathead_state::beathead)
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_TIMER_DRIVER_ADD(m_scan_timer, beathead_state, scanline_callback)
+	TIMER(config, m_scan_timer).configure_generic(FUNC(beathead_state::scanline_callback));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

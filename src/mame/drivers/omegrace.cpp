@@ -539,7 +539,7 @@ MACHINE_CONFIG_START(omegrace_state::omegrace)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_VECTOR_ADD("vector")
+	VECTOR(config, "vector", 0);
 	MCFG_SCREEN_ADD("screen", VECTOR)
 	MCFG_SCREEN_REFRESH_RATE(40)
 	MCFG_SCREEN_SIZE(400, 300)

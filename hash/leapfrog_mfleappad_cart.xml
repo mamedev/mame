@@ -1,0 +1,107 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="leapfrog_mfleappad_cart" description="LeapFrog My First LeapPad cartridges">
+
+	<software name="thomasst" supported="no">
+		<description>Thomas &amp; Friends - Thomas and the School Trip (UK)</description>
+		<year>2002</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-00543"/>
+		<part name="cart" interface="leapfrog_mfleappad_cart">
+			<feature name="pcb" value="57000-003-7011"/>
+			<feature name="pcb_rev" value="REV.01"/>
+			<feature name="u1" value="Matronix 16M"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-00543 - Thomas &amp; Friends - Thomas and the School Trip (UK).bin" size="0x200000" crc="a66f7afb" sha1="49ee00ad8ca64fac28c2ab3c8e2b2116e121884e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="leapbigday" supported="no">
+		<description>Leap's Big Day (UK)</description>
+		<year>2002</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-00547"/>
+		<part name="cart" interface="leapfrog_mfleappad_cart">
+			<feature name="pcb" value="57000-003-7011"/>
+			<feature name="pcb_rev" value="REV.01"/>
+			<feature name="u1" value="Matronix 16M"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-00547 - Leap's Big Day (UK).bin" size="0x200000" crc="ecab224a" sha1="2f5155eb4017c91d3129b722201b3d05cf2454b6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iknowmyabc" supported="no">
+		<description>I Know My abc's (UK) (Dec 18 2002)</description>
+		<year>2002</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-01120"/>
+		<part name="cart" interface="leapfrog_mfleappad_cart">
+			<feature name="pcb" value="57000-003-7210"/>
+			<feature name="pcb_rev" value="REV.00"/>
+			<feature name="u1" value="OKi 16M"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-01120 - I Know My abc's (UK) (Dec 18 2002).bin" size="0x200000" crc="017d6820" sha1="6f30e0731b82c931759b07151a03b5a91e412e58" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iknowmyabco" supported="no">
+		<description>I Know My abc's (UK) (Feb 12 2002)</description>
+		<year>2002</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-01120"/>
+		<part name="cart" interface="leapfrog_mfleappad_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-01120 - I Know My abc's (UK) (Feb 12 2002).bin" size="0x200000" crc="1f265010" sha1="a5fa878f5bcf92e80cb606d5f869d166d3805e05" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="joyjetplane" supported="no">
+		<description>Joy Joy - The Jet Plane - High-Flying Adventures (UK)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-01121"/>
+		<part name="cart" interface="leapfrog_mfleappad_cart">
+			<feature name="pcb" value="57000-003-2611"/>
+			<feature name="pcb_rev" value="REV.02"/>
+			<feature name="u1" value="SunPlus 16m"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-01121 - Joy Joy - The Jet Plane - High-Flying Adventures (UK).bin" size="0x200000" crc="239437dc" sha1="874006ea723d4c824fe150be394635df3af5ab47" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="footbook" supported="no">
+		<description>The Foot Book - Based on the Book by Dr. Seuss (UK)</description>
+		<year>2004</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-10523"/>
+		<part name="cart" interface="leapfrog_mfleappad_cart">
+			<feature name="pcb" value="57000-003-2612"/>
+			<feature name="pcb_rev" value="REV.0"/>
+			<feature name="u1" value="Sunplus16m-b"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-10523 - The Foot Book (UK).bin" size="0x200000" crc="3708694c" sha1="359b118bbb795763e65da0434dc6ddb2e8284388" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vroom" supported="no">
+		<description>Vroom! Vroom! - On the Go (UK)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-11282 UBL"/>
+		<part name="cart" interface="leapfrog_mfleappad_cart">
+			<feature name="pcb" value="57000-003-7223"/>
+			<feature name="pcb_rev" value="REV:00"/>
+			<feature name="u1" value="OKI 32(J)"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-11282 UBL - Vroom! Vroom! - On the Go (UK).bin" size="0x400000" crc="88c24bd7" sha1="723a4c6d10d1a5205330c7401594cdc3217a137d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

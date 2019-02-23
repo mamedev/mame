@@ -785,7 +785,7 @@ MACHINE_CONFIG_START(dlair_state::dleuro)
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_PAL("screen", "ld_22vp932")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_dlair)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dlair);
 	PALETTE(config, m_palette, FUNC(dlair_state::dleuro_palette), 16);
 
 	/* sound hardware */

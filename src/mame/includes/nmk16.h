@@ -6,14 +6,15 @@
 
 #pragma once
 
-#include "sound/okim6295.h"
 #include "audio/seibu.h"
-#include "machine/nmk004.h"
 #include "machine/gen_latch.h"
+#include "machine/nmk004.h"
 #include "machine/timer.h"
+#include "sound/okim6295.h"
 #include "emupal.h"
+#include "screen.h"
 
-class nmk16_state : public driver_device, protected seibu_sound_common
+class nmk16_state : public driver_device, public seibu_sound_common
 {
 public:
 	nmk16_state(const machine_config &mconfig, device_type type, const char *tag) :
@@ -22,6 +23,7 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_oki(*this, "oki%u", 1U),
 		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_nmk004(*this, "nmk004"),
 		m_soundlatch(*this, "soundlatch"),
@@ -85,6 +87,7 @@ public:
 	void init_bubl2000();
 	void init_banked_audiocpu();
 	void init_grdnstrm();
+	void init_grdnstrmau();
 	void init_spec2k();
 	void init_redfoxwp2a();
 	void init_grdnstrmg();
@@ -106,6 +109,7 @@ protected:
 	optional_device<cpu_device> m_audiocpu;
 	optional_device_array<okim6295_device, 2> m_oki;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	optional_device<nmk004_device> m_nmk004;
 	optional_device<generic_latch_8_device> m_soundlatch;
@@ -170,6 +174,10 @@ protected:
 	DECLARE_WRITE16_MEMBER(nmk16_x0016_w);
 	DECLARE_WRITE16_MEMBER(nmk16_bioship_x0016_w);
 	void save_protregs();
+
+	void set_hacky_interrupt_timing(machine_config &config);
+	void set_hacky_screen_lowres(machine_config &config);
+	void set_hacky_screen_hires(machine_config &config);
 
 	TILEMAP_MAPPER_MEMBER(tilemap_scan_pages);
 	template<int Layer, int Gfx> TILE_GET_INFO_MEMBER(common_get_bg_tile_info);

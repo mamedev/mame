@@ -321,12 +321,12 @@ WRITE16_MEMBER(tumbleb_state::tumblepb_oki_w)
 {
 	if (mem_mask == 0xffff)
 	{
-		m_oki->write(space, 0, data & 0xff);
+		m_oki->write(data & 0xff);
 		//printf("tumbleb_oki_w %04x %04x\n", data, mem_mask);
 	}
 	else
 	{
-		m_oki->write(space, 0, (data >> 8) & 0xff);
+		m_oki->write((data >> 8) & 0xff);
 		//printf("tumbleb_oki_w %04x %04x\n", data, mem_mask);
 	}
 	/* STUFF IN OTHER BYTE TOO..*/
@@ -428,14 +428,14 @@ command 1 - stop?
 
 void tumbleb_state::tumbleb2_playmusic(okim6295_device *oki)
 {
-	int status = oki->read_status();
+	int status = oki->read();
 
 	if (m_music_is_playing)
 	{
 		if (!BIT(status, 3))
 		{
-			oki->write_command(0x80 | m_music_command);
-			oki->write_command(0x00 | 0x82);
+			oki->write(0x80 | m_music_command);
+			oki->write(0x00 | 0x82);
 		}
 	}
 }
@@ -476,22 +476,22 @@ void tumbleb_state::tumbleb2_set_music_bank( int bank )
 
 void tumbleb_state::tumbleb2_play_sound( okim6295_device *oki, int data )
 {
-	int status = oki->read_status();
+	int status = oki->read();
 
 	if (!BIT(status, 0))
 	{
-		oki->write_command(0x80 | data);
-		oki->write_command(0x00 | 0x12);
+		oki->write(0x80 | data);
+		oki->write(0x00 | 0x12);
 	}
 	else if (!BIT(status, 1))
 	{
-		oki->write_command(0x80 | data);
-		oki->write_command(0x00 | 0x22);
+		oki->write(0x80 | data);
+		oki->write(0x00 | 0x22);
 	}
 	else if (!BIT(status, 2))
 	{
-		oki->write_command(0x80 | data);
-		oki->write_command(0x00 | 0x42);
+		oki->write(0x80 | data);
+		oki->write(0x00 | 0x42);
 	}
 }
 
@@ -509,13 +509,13 @@ void tumbleb_state::tumbleb2_play_sound( okim6295_device *oki, int data )
 
 void tumbleb_state::process_tumbleb2_music_command( okim6295_device *oki, int data )
 {
-	int status = oki->read_status();
+	int status = oki->read();
 
 	if (data == 1) // stop?
 	{
 		if (BIT(status, 3))
 		{
-			oki->write_command(0x40);       /* Stop playing music */
+			oki->write(0x40);       /* Stop playing music */
 			m_music_is_playing = 0;
 		}
 	}
@@ -524,7 +524,7 @@ void tumbleb_state::process_tumbleb2_music_command( okim6295_device *oki, int da
 		if (m_music_is_playing != data)
 		{
 			m_music_is_playing = data;
-			oki->write_command(0x40); // stop the current music
+			oki->write(0x40); // stop the current music
 			switch (data)
 			{
 				case 0x04: // map screen
@@ -665,6 +665,22 @@ void tumbleb_state::tumblepopba_main_map(address_map &map)
 	//map(0x300000, 0x30000f).w(FUNC(tumbleb_state::tumblepb_control_0_w)); // 0x180000?
 	map(0x320000, 0x320fff).w(FUNC(tumbleb_state::tumblepb_pf1_data_w)).share("pf1_data");
 	map(0x322000, 0x322fff).w(FUNC(tumbleb_state::tumblepb_pf2_data_w)).share("pf2_data");
+}
+
+void tumbleb_state::funkyjetb_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x120000, 0x1207ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x140000, 0x143fff).ram().share("mainram");
+	map(0x160000, 0x1607ff).ram().share("spriteram");
+	map(0x1d0382, 0x1d0383).portr("DSW");
+	map(0x242102, 0x242103).portr("SYSTEM");
+	map(0x200000, 0x2007ff).ram(); // writes 0x180
+	map(0x300000, 0x30000f).w(FUNC(tumbleb_state::tumblepb_control_0_w));
+	map(0x320000, 0x320fff).w(FUNC(tumbleb_state::tumblepb_pf1_data_w)).share("pf1_data");
+	map(0x322000, 0x322fff).w(FUNC(tumbleb_state::tumblepb_pf2_data_w)).share("pf2_data");
+	//map(0x340000, 0x340bff).ram().share("pf1_rowscroll");
+	//map(0x342000, 0x342bff).ram().share("pf2_rowscroll");
 }
 
 void tumbleb_state::unico_base_map(address_map &map)
@@ -2049,31 +2065,31 @@ MACHINE_RESET_MEMBER(tumbleb_state,tumbleb)
 	memset(m_control_0, 0, sizeof(m_control_0));
 }
 
-MACHINE_CONFIG_START(tumbleb_state::tumblepb)
-
+void tumbleb_state::tumblepb(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 14000000)
-	MCFG_DEVICE_PROGRAM_MAP(tumblepopb_main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tumbleb_state,  irq6_line_hold)
+	M68000(config, m_maincpu, 14000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tumbleb_state::tumblepopb_main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(tumbleb_state::irq6_line_hold));
 
 	MCFG_MACHINE_START_OVERRIDE(tumbleb_state,tumbleb)
 	MCFG_MACHINE_RESET_OVERRIDE(tumbleb_state,tumbleb)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tumbleb_state, screen_update_tumblepb)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(58);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(529));
+	m_screen->set_size(40*8, 32*8);
+	m_screen->set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
+	m_screen->set_screen_update(FUNC(tumbleb_state::screen_update_tumblepb));
+	m_screen->set_palette(m_palette);
 
 	DECO_SPRITE(config, m_sprgen, 0);
 	m_sprgen->set_gfx_region(3);
 	m_sprgen->set_is_bootleg(true);
 	m_sprgen->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_tumbleb)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tumbleb);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(tumbleb_state,tumblepb)
@@ -2081,41 +2097,40 @@ MACHINE_CONFIG_START(tumbleb_state::tumblepb)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 8000000/10, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, 8000000/10, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.70);
+}
 
-MACHINE_CONFIG_START(tumbleb_state::tumblepba)
+void tumbleb_state::tumblepba(machine_config &config)
+{
 	tumblepb(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(tumblepopba_main_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &tumbleb_state::tumblepopba_main_map);
+}
 
-MACHINE_CONFIG_START(tumbleb_state::tumbleb2)
-
+void tumbleb_state::tumbleb2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 14000000)
-	MCFG_DEVICE_PROGRAM_MAP(tumblepopb_main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tumbleb_state,  tumbleb2_interrupt)
+	M68000(config, m_maincpu, 14000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tumbleb_state::tumblepopb_main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(tumbleb_state::tumbleb2_interrupt));
 
 	MCFG_MACHINE_START_OVERRIDE(tumbleb_state,tumbleb)
 	MCFG_MACHINE_RESET_OVERRIDE(tumbleb_state,tumbleb)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tumbleb_state, screen_update_tumblepb)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(58);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(529));
+	m_screen->set_size(40*8, 32*8);
+	m_screen->set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
+	m_screen->set_screen_update(FUNC(tumbleb_state::screen_update_tumblepb));
+	m_screen->set_palette(m_palette);
 
 	DECO_SPRITE(config, m_sprgen, 0);
 	m_sprgen->set_gfx_region(3);
 	m_sprgen->set_is_bootleg(true);
 	m_sprgen->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_tumbleb)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tumbleb);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(tumbleb_state,tumblepb)
@@ -2123,39 +2138,46 @@ MACHINE_CONFIG_START(tumbleb_state::tumbleb2)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 8000000/10, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, 8000000/10, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.70);
+}
 
-MACHINE_CONFIG_START(tumbleb_state::jumpkids)
+void tumbleb_state::funkyjetb(machine_config &config)
+{
+	tumbleb2(config);
 
+	m_maincpu->set_addrmap(AS_PROGRAM, &tumbleb_state::funkyjetb_map);
+	m_maincpu->set_vblank_int("screen", FUNC(tumbleb_state::irq6_line_hold));
+}
+
+void tumbleb_state::jumpkids(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)
-	MCFG_DEVICE_PROGRAM_MAP(jumpkids_main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tumbleb_state,  irq6_line_hold)
+	M68000(config, m_maincpu, 12000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tumbleb_state::jumpkids_main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(tumbleb_state::irq6_line_hold));
 
 	/* z80? */
-	MCFG_DEVICE_ADD("audiocpu", Z80, 8000000/2)
-	MCFG_DEVICE_PROGRAM_MAP(jumpkids_sound_map)
+	Z80(config, m_audiocpu, 8000000/2);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &tumbleb_state::jumpkids_sound_map);
 
 	MCFG_MACHINE_START_OVERRIDE(tumbleb_state,tumbleb)
 	MCFG_MACHINE_RESET_OVERRIDE(tumbleb_state,tumbleb)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tumbleb_state, screen_update_jumpkids)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(529));
+	m_screen->set_size(40*8, 32*8);
+	m_screen->set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
+	m_screen->set_screen_update(FUNC(tumbleb_state::screen_update_jumpkids));
+	m_screen->set_palette(m_palette);
 
 	DECO_SPRITE(config, m_sprgen, 0);
 	m_sprgen->set_gfx_region(3);
 	m_sprgen->set_is_bootleg(true);
 	m_sprgen->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_tumbleb)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tumbleb);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(tumbleb_state,tumblepb)
@@ -2165,28 +2187,27 @@ MACHINE_CONFIG_START(tumbleb_state::jumpkids)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 8000000/8, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, 8000000/8, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.70);
+}
 
-MACHINE_CONFIG_START(tumbleb_state::fncywld)
-
+void tumbleb_state::fncywld(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)
-	MCFG_DEVICE_PROGRAM_MAP(fncywld_main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tumbleb_state,  irq6_line_hold)
+	M68000(config, m_maincpu, 12000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tumbleb_state::fncywld_main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(tumbleb_state::irq6_line_hold));
 
 	MCFG_MACHINE_START_OVERRIDE(tumbleb_state,tumbleb)
 	MCFG_MACHINE_RESET_OVERRIDE(tumbleb_state,tumbleb)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tumbleb_state, screen_update_fncywld)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(529));
+	m_screen->set_size(40*8, 32*8);
+	m_screen->set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
+	m_screen->set_screen_update(FUNC(tumbleb_state::screen_update_fncywld));
+	m_screen->set_palette(m_palette);
 
 	DECO_SPRITE(config, m_sprgen, 0);
 	m_sprgen->set_gfx_region(3);
@@ -2194,7 +2215,7 @@ MACHINE_CONFIG_START(tumbleb_state::fncywld)
 	m_sprgen->set_transpen(15);
 	m_sprgen->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_fncywld)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fncywld);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 0x800);
 
 	MCFG_VIDEO_START_OVERRIDE(tumbleb_state,fncywld)
@@ -2204,29 +2225,28 @@ MACHINE_CONFIG_START(tumbleb_state::fncywld)
 
 	YM2151(config, "ymsnd", 32220000/9).add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1023924, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, 1023924, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // clock frequency & pin 7 not verified
+}
 
 /// OSCs: 12MHz, 4MHz, 28.63636MHz, not the same PCB as fncywld
-MACHINE_CONFIG_START(tumbleb_state::magipur)
-
+void tumbleb_state::magipur(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(12'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(magipur_main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tumbleb_state,  irq6_line_hold)
+	M68000(config, m_maincpu, XTAL(12'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &tumbleb_state::magipur_main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(tumbleb_state::irq6_line_hold));
 
 	MCFG_MACHINE_START_OVERRIDE(tumbleb_state,tumbleb)
 	MCFG_MACHINE_RESET_OVERRIDE(tumbleb_state,tumbleb)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60) // refresh rate not verified
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tumbleb_state, screen_update_fncywld)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60); // refresh rate not verified
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(529));
+	m_screen->set_size(40*8, 32*8);
+	m_screen->set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
+	m_screen->set_screen_update(FUNC(tumbleb_state::screen_update_fncywld));
+	m_screen->set_palette(m_palette);
 
 	DECO_SPRITE(config, m_sprgen, 0);
 	m_sprgen->set_gfx_region(3);
@@ -2244,9 +2264,8 @@ MACHINE_CONFIG_START(tumbleb_state::magipur)
 
 	YM2151(config, "ymsnd", XTAL(4'000'000)).add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(4'000'000)/4, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, XTAL(4'000'000)/4, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // clock frequency & pin 7 not verified
+}
 
 
 MACHINE_RESET_MEMBER(tumbleb_state,htchctch)
@@ -2523,6 +2542,40 @@ ROM_START( tumblepba )
 	ROM_REGION( 0x100000, "oki", 0 ) /* Oki samples */
 	ROM_LOAD( "3.ic24", 0x00000, 0x80000, CRC(63e45de7) SHA1(417f945ee8cf820b1733c4dee26ef05e91e80457) )
 	ROM_RELOAD(0x80000,0x80000)
+ROM_END
+
+ROM_START( funkyjetb )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
+	ROM_LOAD16_BYTE( "4-27c020.bin", 0x00000, 0x40000, CRC(4e5bfda3) SHA1(b1bcc4ad1343d379de9a143a72a84db9830c8fa0) )
+	ROM_LOAD16_BYTE( "3-27c020.bin", 0x00001, 0x40000, CRC(e253e20c) SHA1(6fe1704872bf807ed24f500c997f62c880f6c5c1) )
+
+	ROM_REGION( 0x2000, "pic", 0 )    /* Sound CPU */
+	ROM_LOAD( "1-pic16c57-xt.bin",   0x00000, 0x2000, NO_DUMP ) // protected
+
+	ROM_REGION( 0x080000, "tilegfx", 0 )
+	ROM_LOAD16_BYTE( "5-27c020.bin", 0x000000, 0x40000, CRC(f75ff923) SHA1(4177e94ba1e3a82861d0277ba5d0abc24482ffe2) )
+	ROM_LOAD16_BYTE( "6-27c020.bin", 0x000001, 0x40000, CRC(91a2bcb5) SHA1(c659b5deff2a4b2b69bddb956a3df1ed79a50ab0) )
+
+	ROM_REGION( 0x100000, "sprgfx", 0 )
+	ROM_LOAD16_BYTE( "8-27c020.bin",  0x000000, 0x40000, CRC(49aab1d6) SHA1(2c215df271af1d49eeff472298e7aa00879c1799) ) /* sprites */
+	ROM_LOAD16_BYTE( "7-27c020.bin",  0x000001, 0x40000, CRC(f6e362bf) SHA1(8e5c82eb19b8948f064360215107311efa9ea12f) )
+	ROM_LOAD16_BYTE( "10-27c020.bin", 0x080000, 0x40000, CRC(ffe70cc2) SHA1(e81720c86ea0df7554af060dae66901bf612b4db) )
+	ROM_LOAD16_BYTE( "9-27c020.bin",  0x080001, 0x40000, CRC(d13437a6) SHA1(cc848e5e8cc91f6fb5c1de219cc1db57b84337a9) )
+
+	ROM_REGION( 0x80000, "oki", 0 ) /* ADPCM samples */
+	ROM_LOAD( "2-27c4001.bin",    0x00000, 0x80000, CRC(7dbc988b) SHA1(0bf89e651a992672ee4041addc9c4614b475c48a) )
+
+	ROM_REGION( 0x1600, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "p1-palce16v8h-25pc.bin",  0x0000, 0x0117, CRC(bb8f5dd6) SHA1(b09f36293f7b4ae30b8bebebcca6457a64b87d0f) )
+	ROM_LOAD( "p2-palce22v10h-25pc.bin", 0x0200, 0x02dd, CRC(d53c01da) SHA1(e90eaa95a8b429643cfb0bce7dff86e850ec01d8) )
+	ROM_LOAD( "p3-palce22v10h-25pc.bin", 0x0500, 0x02dd, CRC(5c0b43af) SHA1(ef5cfabde32063707c97a9aed63f8bf1bde2cb6d) )
+	ROM_LOAD( "p4-palce16v8h-25pc.bin",  0x0800, 0x0117, CRC(36749fe3) SHA1(d2a88d5c2d3d32aeade59d5c4e4474982d19447e) )
+	ROM_LOAD( "p5-palce20v8h-25pc.bin",  0x0a00, 0x0157, CRC(1c9b6557) SHA1(ceb78bf78e511251143984626f6b8421e5d627d5) )
+	ROM_LOAD( "p6-palce16v8h-25pc.bin",  0x0c00, 0x0117, CRC(76b06a9a) SHA1(32a5d5d6ce4819ae5cceb6499f5f95b77e6b4f33) )
+	ROM_LOAD( "p7-palce16v8h-25pc.bin",  0x0e00, 0x0117, CRC(070f48ec) SHA1(51fed4c1072762f4a4d2c0706d6a6cab4c769376) )
+	ROM_LOAD( "p8-palce16v8h-25pc.bin",  0x1000, 0x0117, CRC(747270a6) SHA1(7ec39a172400e536bd4136250f8ec391c6b1320f) )
+	ROM_LOAD( "p9-palce16v8h-25pc.bin",  0x1000, 0x0117, CRC(954b7413) SHA1(207972f0021f26b5b99f6b96eb650cc3213ae490) )
+	ROM_LOAD( "p10-hy18cv8s-25.bin",     0x1400, 0x0155, CRC(6dc83459) SHA1(1121aaedf1f913cccae81dcc1f95e20c24d263fb) )
 ROM_END
 
 /*
@@ -3702,6 +3755,8 @@ void tumbleb_state::init_dquizgo()
 GAME( 1991, tumbleb,  tumblep, tumblepb,    tumblepb, tumbleb_state, init_tumblepb, ROT0, "bootleg", "Tumble Pop (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE  )
 GAME( 1991, tumbleb2, tumblep, tumbleb2,    tumblepb, tumbleb_state, init_tumbleb2, ROT0, "bootleg", "Tumble Pop (bootleg with PIC)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE  ) // PIC is protected, sound simulation not 100%
 GAME( 1991, tumblepba,tumblep, tumblepba,   tumblepb, tumbleb_state, init_tumblepba,ROT0, "bootleg (Playmark)", "Tumble Pop (Playmark bootleg)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING  ) // Playmark stickers on ROMs, offset pf1_alt tilemap, OKI not hooked up
+
+GAME( 1992, funkyjetb,funkyjet,funkyjetb,   tumblepb, tumbleb_state, init_tumblepb, ROT0, "bootleg", "Funky Jet (bootleg)", MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // wrong palette, inputs not working, undumped PIC driving an OKI
 
 GAME( 1993, jumpkids, 0,       jumpkids,    tumblepb, tumbleb_state, init_jumpkids, ROT0, "Comad",    "Jump Kids", MACHINE_SUPPORTS_SAVE )
 

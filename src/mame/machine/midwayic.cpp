@@ -28,6 +28,33 @@
 
 /*************************************
  *
+ *  Serial number input kludge
+ *
+ *************************************/
+
+static INPUT_PORTS_START( pic_serial_adjust )
+	PORT_START("SERIAL_DIGIT")
+	PORT_DIPNAME( 0x0f, 0x06, "Serial Low Digit")
+	PORT_DIPSETTING(    0x00, "0")
+	PORT_DIPSETTING(    0x01, "1")
+	PORT_DIPSETTING(    0x02, "2")
+	PORT_DIPSETTING(    0x03, "3")
+	PORT_DIPSETTING(    0x04, "4")
+	PORT_DIPSETTING(    0x05, "5")
+	PORT_DIPSETTING(    0x06, "6")
+	PORT_DIPSETTING(    0x07, "7")
+	PORT_DIPSETTING(    0x08, "8")
+	PORT_DIPSETTING(    0x09, "9")
+	PORT_BIT( 0xf0, 0x00, IPT_UNUSED )
+INPUT_PORTS_END
+
+ioport_constructor midway_serial_pic_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(pic_serial_adjust);
+}
+
+/*************************************
+ *
  *  Serial number encoding
  *
  *************************************/
@@ -38,8 +65,9 @@ void midway_serial_pic_device::generate_serial_data(int upper)
 	uint32_t serial_number, temp;
 	uint8_t serial_digit[9];
 
-	serial_number = 123456;
+	serial_number = 123450;
 	serial_number += upper * 1000000;
+	serial_number += m_io_serial_digit->read() & 0x0f;
 
 	serial_digit[0] = (serial_number / 100000000) % 10;
 	serial_digit[1] = (serial_number / 10000000) % 10;
@@ -119,6 +147,7 @@ midway_serial_pic_device::midway_serial_pic_device(const machine_config &mconfig
 
 midway_serial_pic_device::midway_serial_pic_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
+	m_io_serial_digit(*this, "SERIAL_DIGIT"),
 	m_upper(0),
 	m_buff(0),
 	m_idx(0),
@@ -136,9 +165,12 @@ midway_serial_pic_device::midway_serial_pic_device(const machine_config &mconfig
 void midway_serial_pic_device::device_start()
 {
 	serial_register_state();
-	generate_serial_data(m_upper);
 }
 
+void midway_serial_pic_device::device_reset()
+{
+	generate_serial_data(m_upper);
+}
 
 WRITE_LINE_MEMBER(midway_serial_pic_device::reset_w)
 {
@@ -151,13 +183,13 @@ WRITE_LINE_MEMBER(midway_serial_pic_device::reset_w)
 }
 
 
-READ8_MEMBER(midway_serial_pic_device::status_r)
+u8 midway_serial_pic_device::status_r()
 {
 	return m_status;
 }
 
 
-READ8_MEMBER(midway_serial_pic_device::read)
+u8 midway_serial_pic_device::read()
 {
 	logerror("%s:security R = %04X\n", machine().describe_context(), m_buff);
 	m_status = 1;
@@ -165,7 +197,7 @@ READ8_MEMBER(midway_serial_pic_device::read)
 }
 
 
-WRITE8_MEMBER(midway_serial_pic_device::write)
+void midway_serial_pic_device::write(u8 data)
 {
 	logerror("%s:security W = %04X\n", machine().describe_context(), data);
 
@@ -354,7 +386,7 @@ void midway_serial_pic2_device::set_default_nvram(const uint8_t *nvram)
 }
 
 
-READ8_MEMBER(midway_serial_pic2_device::status_r)
+u8 midway_serial_pic2_device::status_r()
 {
 	uint8_t result = 0;
 
@@ -373,7 +405,7 @@ READ8_MEMBER(midway_serial_pic2_device::status_r)
 }
 
 
-READ8_MEMBER(midway_serial_pic2_device::read)
+u8 midway_serial_pic2_device::read()
 {
 	uint8_t result = 0;
 
@@ -393,7 +425,7 @@ READ8_MEMBER(midway_serial_pic2_device::read)
 }
 
 
-WRITE8_MEMBER(midway_serial_pic2_device::write)
+void midway_serial_pic2_device::write(u8 data)
 {
 	static FILE *nvramlog;
 	if (LOG_NVRAM && !nvramlog)
@@ -1028,7 +1060,7 @@ READ32_MEMBER( midway_ioasic_device::read )
 			break;
 
 		case IOASIC_PICIN:
-			result = midway_serial_pic2_device::read(space,0) | (midway_serial_pic2_device::status_r(space,0) << 8);
+			result = midway_serial_pic2_device::read() | (midway_serial_pic2_device::status_r() << 8);
 			break;
 
 		default:
@@ -1161,11 +1193,11 @@ WRITE32_MEMBER( midway_ioasic_device::write )
 
 		case IOASIC_PICOUT:
 			if (m_shuffle_type == MIDWAY_IOASIC_VAPORTRX)
-				midway_serial_pic2_device::write(space, 0, newreg ^ 0x0a);
+				midway_serial_pic2_device::write(newreg ^ 0x0a);
 			else if (m_shuffle_type == MIDWAY_IOASIC_SFRUSHRK)
-				midway_serial_pic2_device::write(space, 0, newreg ^ 0x05);
+				midway_serial_pic2_device::write(newreg ^ 0x05);
 			else
-				midway_serial_pic2_device::write(space, 0, newreg);
+				midway_serial_pic2_device::write(newreg);
 			break;
 
 		case IOASIC_PICIN:

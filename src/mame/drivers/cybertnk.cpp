@@ -831,7 +831,7 @@ MACHINE_CONFIG_START(cybertnk_state::cybertnk)
 	MCFG_DEVICE_ADD("audiocpu", Z80,XTAL(3'579'545))
 	MCFG_DEVICE_PROGRAM_MAP(sound_mem)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60000))//arbitrary value,needed to get the communication to work
+	config.m_minimum_quantum = attotime::from_hz(60000); //arbitrary value, needed to get the communication to work
 
 	/* video hardware */
 	config.set_default_layout(layout_dualhsxs);

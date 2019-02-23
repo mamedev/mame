@@ -162,9 +162,9 @@ void vicdual_state::carnival_psg_latch(address_space &space)
 	{
 		// BDIR W, BC1 selects address or data
 		if (m_psgBus & 2)
-			m_psg->address_w(space, 0, m_psgData);
+			m_psg->address_w(m_psgData);
 		else
-			m_psg->data_w(space, 0, m_psgData);
+			m_psg->data_w(m_psgData);
 	}
 }
 

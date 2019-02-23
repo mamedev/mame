@@ -205,7 +205,7 @@ void pv2000_state::pv2000_io_map(address_map &map)
 	map(0x20, 0x20).rw(FUNC(pv2000_state::keys_lo_r), FUNC(pv2000_state::keys_w));
 
 	//sn76489a
-	map(0x40, 0x40).r(FUNC(pv2000_state::keys_mod_r)).w("sn76489a", FUNC(sn76489a_device::command_w));
+	map(0x40, 0x40).r(FUNC(pv2000_state::keys_mod_r)).w("sn76489a", FUNC(sn76489a_device::write));
 
 	/* Cassette input. Gets hit a lot after a GLOAD command */
 	map(0x60, 0x60).rw(FUNC(pv2000_state::cass_in), FUNC(pv2000_state::cass_out));
@@ -356,7 +356,7 @@ WRITE_LINE_MEMBER( pv2000_state::pv2000_vdp_interrupt )
 void pv2000_state::machine_start()
 {
 	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000, 0xffff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000, 0xffff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 }
 
 void pv2000_state::machine_reset()
@@ -406,11 +406,11 @@ MACHINE_CONFIG_START(pv2000_state::pv2000)
 	MCFG_DEVICE_ADD("sn76489a", SN76489A, XTAL(7'159'090)/2) /* 3.579545 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED)
+	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED);
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "pv2000_cart")
@@ -418,7 +418,7 @@ MACHINE_CONFIG_START(pv2000_state::pv2000)
 	MCFG_GENERIC_LOAD(pv2000_state, pv2000_cart)
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","pv2000")
+	SOFTWARE_LIST(config, "cart_list").set_original("pv2000");
 MACHINE_CONFIG_END
 
 

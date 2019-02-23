@@ -772,25 +772,27 @@ MACHINE_CONFIG_START(nakajies_state::nakajies210)
 	/* rtc */
 	RP5C01(config, "rtc", XTAL(32'768));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("kb_timer", nakajies_state, kb_timer, attotime::from_hz(250))
+	TIMER(config, "kb_timer").configure_periodic(FUNC(nakajies_state::kb_timer), attotime::from_hz(250));
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(nakajies_state::dator3k)
+void nakajies_state::dator3k(machine_config &config)
+{
 	nakajies210(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_dator3k)
-MACHINE_CONFIG_END
+	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_dator3k);
+}
 
-MACHINE_CONFIG_START(nakajies_state::nakajies220)
+void nakajies_state::nakajies220(machine_config &config)
+{
 	nakajies210(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_drwrt400)
-MACHINE_CONFIG_END
+	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_drwrt400);
+}
 
 MACHINE_CONFIG_START(nakajies_state::nakajies250)
 	nakajies210(config);
 	MCFG_SCREEN_MODIFY( "screen" )
 	MCFG_SCREEN_SIZE( 80 * 6, 16 * 8 )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 6 * 80 - 1, 0, 16 * 8 - 1 )
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_drwrt200)
+	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_drwrt200);
 MACHINE_CONFIG_END
 
 

@@ -607,7 +607,7 @@ MACHINE_CONFIG_START(jchan_state::jchan)
 
 	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)
 	MCFG_DEVICE_PROGRAM_MAP(jchan_main)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", jchan_state, vblank, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(jchan_state::vblank), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD("sub", M68000, 16000000)
 	MCFG_DEVICE_PROGRAM_MAP(jchan_sub)

@@ -305,7 +305,7 @@ uint8_t coco_state::floating_space_read(offs_t offset)
 	//
 	// Most of the time, the read below will result in floating_bus_read() being
 	// invoked
-	return m_floating->read8(m_floating->space(0), offset);
+	return m_floating->read8(offset);
 }
 
 
@@ -315,7 +315,7 @@ uint8_t coco_state::floating_space_read(offs_t offset)
 
 void coco_state::floating_space_write(offs_t offset, uint8_t data)
 {
-	m_floating->write8(m_floating->space(0), offset, data);
+	m_floating->write8(offset, data);
 }
 
 
@@ -336,7 +336,7 @@ void coco_state::floating_space_write(offs_t offset, uint8_t data)
 
 READ8_MEMBER( coco_state::ff00_read )
 {
-	return pia_0().read(space, offset, mem_mask);
+	return pia_0().read(offset);
 }
 
 
@@ -347,7 +347,7 @@ READ8_MEMBER( coco_state::ff00_read )
 
 WRITE8_MEMBER( coco_state::ff00_write )
 {
-	pia_0().write(space, offset, data, mem_mask);
+	pia_0().write(offset, data);
 }
 
 
@@ -446,7 +446,7 @@ WRITE_LINE_MEMBER( coco_state::pia0_irq_b )
 
 READ8_MEMBER( coco_state::ff20_read )
 {
-	return pia_1().read(space, offset, mem_mask);
+	return pia_1().read(offset);
 }
 
 
@@ -458,7 +458,7 @@ READ8_MEMBER( coco_state::ff20_read )
 WRITE8_MEMBER( coco_state::ff20_write )
 {
 	/* write to the PIA */
-	pia_1().write(space, offset, data, mem_mask);
+	pia_1().write(offset, data);
 
 	/* we have to do this to do something that approximates the cartridge Q line behavior */
 	m_cococart->twiddle_q_lines();

@@ -2483,12 +2483,14 @@ MACHINE_CONFIG_START(nbmj8688_state::NBMJDRV_4096)
 	psg.port_b_read_callback().set(FUNC(nbmj8688_state::dipsw2_r));     // DIPSW-B read
 	psg.add_route(ALL_OUTPUTS, "speaker", 0.35);
 
-	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(nbmj8688_state::NBMJDRV_256)
+void nbmj8688_state::NBMJDRV_256(machine_config &config)
+{
 	NBMJDRV_4096(config);
 
 	/* basic machine hardware */
@@ -2497,9 +2499,10 @@ MACHINE_CONFIG_START(nbmj8688_state::NBMJDRV_256)
 	subdevice<palette_device>("palette")->set_entries(256).set_init(FUNC(nbmj8688_state::mbmj8688_8bit));
 
 	MCFG_VIDEO_START_OVERRIDE(nbmj8688_state,mbmj8688_8bit)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(nbmj8688_state::NBMJDRV_65536)
+void nbmj8688_state::NBMJDRV_65536(machine_config &config)
+{
 	NBMJDRV_4096(config);
 
 	/* basic machine hardware */
@@ -2508,7 +2511,7 @@ MACHINE_CONFIG_START(nbmj8688_state::NBMJDRV_65536)
 	subdevice<palette_device>("palette")->set_entries(65536).set_init(FUNC(nbmj8688_state::mbmj8688_16bit));
 
 	MCFG_VIDEO_START_OVERRIDE(nbmj8688_state,mbmj8688_hybrid_16bit)
-MACHINE_CONFIG_END
+}
 
 // --------------------------------------------------------------------------------
 
@@ -2645,8 +2648,8 @@ MACHINE_CONFIG_START(nbmj8688_state::mbmj_p16bit_LCD)
 	lcd0.set_visarea(0, 480-1, 0, 64-1);
 	lcd0.set_screen_update("lcdc0", FUNC(hd61830_device::screen_update));
 	lcd0.set_palette("palette_lcd");
-	MCFG_DEVICE_ADD("lcdc0", HD61830B, 5000000/2) // ???
-	MCFG_VIDEO_SET_SCREEN("lcd0")
+	HD61830B(config, m_lcdc0,  5000000/2); // ???
+	m_lcdc0->set_screen("lcd0");
 
 	screen_device &lcd1(SCREEN(config, "lcd1", SCREEN_TYPE_LCD));
 	lcd1.set_physical_aspect(15, 3);
@@ -2657,8 +2660,8 @@ MACHINE_CONFIG_START(nbmj8688_state::mbmj_p16bit_LCD)
 	lcd1.set_visarea(0, 480-1, 0, 64-1);
 	lcd1.set_screen_update("lcdc1", FUNC(hd61830_device::screen_update));
 	lcd1.set_palette("palette_lcd");
-	MCFG_DEVICE_ADD("lcdc1", HD61830B, 5000000/2) // ???
-	MCFG_VIDEO_SET_SCREEN("lcd1")
+	HD61830B(config, m_lcdc1,  5000000/2); // ???
+	m_lcdc1->set_screen("lcd1");
 
 	MCFG_VIDEO_START_OVERRIDE(nbmj8688_state,mbmj8688_pure_16bit_LCD)
 
@@ -2670,9 +2673,10 @@ MACHINE_CONFIG_START(nbmj8688_state::mbmj_p16bit_LCD)
 	psg.port_b_read_callback().set(FUNC(nbmj8688_state::dipsw2_r));     // DIPSW-B read
 	psg.add_route(ALL_OUTPUTS, "speaker", 0.35);
 
-	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 MACHINE_CONFIG_END
 
 void nbmj8688_state::bijokkoy(machine_config &config)

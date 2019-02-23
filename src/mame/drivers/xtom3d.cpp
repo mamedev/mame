@@ -408,10 +408,10 @@ void xtom3d_state::machine_reset()
 }
 
 MACHINE_CONFIG_START(xtom3d_state::xtom3d)
-	MCFG_DEVICE_ADD("maincpu", PENTIUM2, 450000000/16)  // actually Pentium II 450
-	MCFG_DEVICE_PROGRAM_MAP(xtom3d_map)
-	MCFG_DEVICE_IO_MAP(xtom3d_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+	PENTIUM2(config, m_maincpu, 450000000/16);  // actually Pentium II 450
+	m_maincpu->set_addrmap(AS_PROGRAM, &xtom3d_state::xtom3d_map);
+	m_maincpu->set_addrmap(AS_IO, &xtom3d_state::xtom3d_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
 
 
 	pcat_common(config);

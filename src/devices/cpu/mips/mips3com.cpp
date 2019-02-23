@@ -273,6 +273,13 @@ uint32_t mips3_device::compute_config_register()
 		else if (c_icache_size <= 0x40000) configreg |= 6 << 9;
 		else                                   configreg |= 7 << 9;
 
+		if (c_secondary_cache_line_size != 0) {
+			configreg &= ~((0xf << 20) | (1 << 17));
+					if (c_secondary_cache_line_size <= 0x10) configreg |= 0 << 22;
+			else if (c_secondary_cache_line_size <= 0x20) configreg |= 1 << 22;
+			else if (c_secondary_cache_line_size <= 0x40) configreg |= 2 << 22;
+			else                                          configreg |= 3 << 22;
+		}
 		/* set the system clock divider */
 		int divisor = 2;
 		if (c_system_clock != 0)

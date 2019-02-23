@@ -562,21 +562,21 @@ void unico_state::machine_start()
                                 Burglar X
 ***************************************************************************/
 
-MACHINE_CONFIG_START(unico_state::burglarx)
-
+void unico_state::burglarx(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 32_MHz_XTAL/2) /* 16MHz */
-	MCFG_DEVICE_PROGRAM_MAP(burglarx_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", unico_state,  irq2_line_hold)
+	M68000(config, m_maincpu, 32_MHz_XTAL/2); /* 16MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &unico_state::burglarx_map);
+	m_maincpu->set_vblank_int("screen", FUNC(unico_state::irq2_line_hold));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(384, 224)
-	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(unico_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(384, 224);
+	screen.set_visarea(0, 384-1, 0, 224-1);
+	screen.set_screen_update(FUNC(unico_state::screen_update));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_unico);
 	PALETTE(config, m_palette).set_format(4, &unico_state::unico_R6G6B6X, 8192);
@@ -585,14 +585,14 @@ MACHINE_CONFIG_START(unico_state::burglarx)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(14'318'181)/4) /* 3.579545 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL(14'318'181)/4)); /* 3.579545 MHz */
+	ymsnd.add_route(ALL_OUTPUTS, "lspeaker", 0.40);
+	ymsnd.add_route(ALL_OUTPUTS, "rspeaker", 0.40);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 32_MHz_XTAL/32, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, 32_MHz_XTAL/32, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	m_oki->add_route(ALL_OUTPUTS, "lspeaker", 0.80);
+	m_oki->add_route(ALL_OUTPUTS, "rspeaker", 0.80);
+}
 
 
 
@@ -606,21 +606,21 @@ void zeropnt_state::machine_start()
 	m_okibank->configure_entries(0, 4, memregion("oki")->base() + 0x20000, 0x20000);
 }
 
-MACHINE_CONFIG_START(zeropnt_state::zeropnt)
-
+void zeropnt_state::zeropnt(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 32_MHz_XTAL/2) /* 16MHz */
-	MCFG_DEVICE_PROGRAM_MAP(zeropnt_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", unico_state,  irq2_line_hold)
+	M68000(config, m_maincpu, 32_MHz_XTAL/2); /* 16MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &zeropnt_state::zeropnt_map);
+	m_maincpu->set_vblank_int("screen", FUNC(zeropnt_state::irq2_line_hold));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(384, 224)
-	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(zeropnt_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(384, 224);
+	m_screen->set_visarea(0, 384-1, 0, 224-1);
+	m_screen->set_screen_update(FUNC(zeropnt_state::screen_update));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_unico);
 	PALETTE(config, m_palette).set_format(4, &zeropnt_state::unico_R6G6B6X, 8192);
@@ -629,15 +629,15 @@ MACHINE_CONFIG_START(zeropnt_state::zeropnt)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(14'318'181)/4) /* 3.579545 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL(14'318'181)/4)); /* 3.579545 MHz */
+	ymsnd.add_route(ALL_OUTPUTS, "lspeaker", 0.40);
+	ymsnd.add_route(ALL_OUTPUTS, "rspeaker", 0.40);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 32_MHz_XTAL/32, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_DEVICE_ADDRESS_MAP(0, zeropnt_oki_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, 32_MHz_XTAL/32, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	m_oki->set_addrmap(0, &zeropnt_state::zeropnt_oki_map);
+	m_oki->add_route(ALL_OUTPUTS, "lspeaker", 0.80);
+	m_oki->add_route(ALL_OUTPUTS, "rspeaker", 0.80);
+}
 
 
 
@@ -651,23 +651,23 @@ void zeropnt2_state::machine_start()
 	m_okibank->configure_entries(0, 4, memregion("oki1")->base() + 0x20000, 0x20000);
 }
 
-MACHINE_CONFIG_START(zeropnt2_state::zeropnt2)
-
+void zeropnt2_state::zeropnt2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68EC020, 32_MHz_XTAL/2) /* 16MHz */
-	MCFG_DEVICE_PROGRAM_MAP(zeropnt2_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", unico_state, irq2_line_hold)
+	M68EC020(config, m_maincpu, 32_MHz_XTAL/2); /* 16MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &zeropnt2_state::zeropnt2_map);
+	m_maincpu->set_vblank_int("screen", FUNC(zeropnt2_state::irq2_line_hold));
 
 	EEPROM_93C46_8BIT(config, "eeprom");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(384, 224)
-	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(zeropnt2_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(384, 224);
+	m_screen->set_visarea(0, 384-1, 0, 224-1);
+	m_screen->set_screen_update(FUNC(zeropnt2_state::screen_update));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_unico);
 	PALETTE(config, m_palette).set_format(4, &zeropnt2_state::unico_R6G6B6X, 8192);
@@ -678,15 +678,15 @@ MACHINE_CONFIG_START(zeropnt2_state::zeropnt2)
 
 	YM2151(config, "ymsnd", XTAL(14'318'181)/4).add_route(0, "lspeaker", 0.70).add_route(1, "rspeaker", 0.70); /* 3.579545 MHz */
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, 32_MHz_XTAL/32, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_DEVICE_ADDRESS_MAP(0, zeropnt_oki_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
+	okim6295_device &oki1(OKIM6295(config, "oki1", 32_MHz_XTAL/32, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
+	oki1.set_addrmap(0, &zeropnt2_state::zeropnt_oki_map);
+	oki1.add_route(ALL_OUTPUTS, "lspeaker", 0.40);
+	oki1.add_route(ALL_OUTPUTS, "rspeaker", 0.40);
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, XTAL(14'318'181)/4, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.20)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.20)
-MACHINE_CONFIG_END
+	okim6295_device &oki2(OKIM6295(config, "oki2", XTAL(14'318'181)/4, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
+	oki2.add_route(ALL_OUTPUTS, "lspeaker", 0.20);
+	oki2.add_route(ALL_OUTPUTS, "rspeaker", 0.20);
+}
 
 
 /***************************************************************************

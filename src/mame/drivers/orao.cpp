@@ -193,12 +193,12 @@ MACHINE_CONFIG_START(orao_state::orao)
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_CASSETTE_ADD( "cassette")
-	MCFG_CASSETTE_FORMATS(orao_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
-	MCFG_CASSETTE_INTERFACE("orao_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(orao_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cassette->set_interface("orao_cass");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list","orao")
+	SOFTWARE_LIST(config, "cass_list").set_original("orao");
 MACHINE_CONFIG_END
 
 /* ROM definition */

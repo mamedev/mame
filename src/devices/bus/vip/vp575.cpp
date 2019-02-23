@@ -45,32 +45,33 @@ void vp575_device::update_interrupts()
 //  MACHINE_CONFIG_START( vp575 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(vp575_device::device_add_mconfig)
-	MCFG_VIP_EXPANSION_SLOT_ADD("exp1", XTAL(3'521'280)/2, vip_expansion_cards, nullptr)
-	MCFG_VIP_EXPANSION_SLOT_INT_CALLBACK(WRITELINE(*this, vp575_device, exp1_int_w))
-	MCFG_VIP_EXPANSION_SLOT_DMA_OUT_CALLBACK(WRITELINE(*this, vp575_device, exp1_dma_out_w))
-	MCFG_VIP_EXPANSION_SLOT_DMA_IN_CALLBACK(WRITELINE(*this, vp575_device, exp1_dma_in_w))
+void vp575_device::device_add_mconfig(machine_config &config)
+{
+	VIP_EXPANSION_SLOT(config, m_expansion_slot[0], XTAL(3'521'280)/2, vip_expansion_cards, nullptr);
+	m_expansion_slot[0]->int_wr_callback().set(FUNC(vp575_device::exp1_int_w));
+	m_expansion_slot[0]->dma_out_wr_callback().set(FUNC(vp575_device::exp1_dma_out_w));
+	m_expansion_slot[0]->dma_in_wr_callback().set(FUNC(vp575_device::exp1_dma_in_w));
 
-	MCFG_VIP_EXPANSION_SLOT_ADD("exp2", XTAL(3'521'280)/2, vip_expansion_cards, nullptr)
-	MCFG_VIP_EXPANSION_SLOT_INT_CALLBACK(WRITELINE(*this, vp575_device, exp2_int_w))
-	MCFG_VIP_EXPANSION_SLOT_DMA_OUT_CALLBACK(WRITELINE(*this, vp575_device, exp2_dma_out_w))
-	MCFG_VIP_EXPANSION_SLOT_DMA_IN_CALLBACK(WRITELINE(*this, vp575_device, exp2_dma_in_w))
+	VIP_EXPANSION_SLOT(config, m_expansion_slot[1], XTAL(3'521'280)/2, vip_expansion_cards, nullptr);
+	m_expansion_slot[1]->int_wr_callback().set(FUNC(vp575_device::exp2_int_w));
+	m_expansion_slot[1]->dma_out_wr_callback().set(FUNC(vp575_device::exp2_dma_out_w));
+	m_expansion_slot[1]->dma_in_wr_callback().set(FUNC(vp575_device::exp2_dma_in_w));
 
-	MCFG_VIP_EXPANSION_SLOT_ADD("exp3", XTAL(3'521'280)/2, vip_expansion_cards, nullptr)
-	MCFG_VIP_EXPANSION_SLOT_INT_CALLBACK(WRITELINE(*this, vp575_device, exp3_int_w))
-	MCFG_VIP_EXPANSION_SLOT_DMA_OUT_CALLBACK(WRITELINE(*this, vp575_device, exp3_dma_out_w))
-	MCFG_VIP_EXPANSION_SLOT_DMA_IN_CALLBACK(WRITELINE(*this, vp575_device, exp3_dma_in_w))
+	VIP_EXPANSION_SLOT(config, m_expansion_slot[2], XTAL(3'521'280)/2, vip_expansion_cards, nullptr);
+	m_expansion_slot[2]->int_wr_callback().set(FUNC(vp575_device::exp3_int_w));
+	m_expansion_slot[2]->dma_out_wr_callback().set(FUNC(vp575_device::exp3_dma_out_w));
+	m_expansion_slot[2]->dma_in_wr_callback().set(FUNC(vp575_device::exp3_dma_in_w));
 
-	MCFG_VIP_EXPANSION_SLOT_ADD("exp4", XTAL(3'521'280)/2, vip_expansion_cards, nullptr)
-	MCFG_VIP_EXPANSION_SLOT_INT_CALLBACK(WRITELINE(*this, vp575_device, exp4_int_w))
-	MCFG_VIP_EXPANSION_SLOT_DMA_OUT_CALLBACK(WRITELINE(*this, vp575_device, exp4_dma_out_w))
-	MCFG_VIP_EXPANSION_SLOT_DMA_IN_CALLBACK(WRITELINE(*this, vp575_device, exp4_dma_in_w))
+	VIP_EXPANSION_SLOT(config, m_expansion_slot[3], XTAL(3'521'280)/2, vip_expansion_cards, nullptr);
+	m_expansion_slot[3]->int_wr_callback().set(FUNC(vp575_device::exp4_int_w));
+	m_expansion_slot[3]->dma_out_wr_callback().set(FUNC(vp575_device::exp4_dma_out_w));
+	m_expansion_slot[3]->dma_in_wr_callback().set(FUNC(vp575_device::exp4_dma_in_w));
 
-	MCFG_VIP_EXPANSION_SLOT_ADD("exp5", XTAL(3'521'280)/2, vip_expansion_cards, nullptr)
-	MCFG_VIP_EXPANSION_SLOT_INT_CALLBACK(WRITELINE(*this, vp575_device, exp5_int_w))
-	MCFG_VIP_EXPANSION_SLOT_DMA_OUT_CALLBACK(WRITELINE(*this, vp575_device, exp5_dma_out_w))
-	MCFG_VIP_EXPANSION_SLOT_DMA_IN_CALLBACK(WRITELINE(*this, vp575_device, exp5_dma_in_w))
-MACHINE_CONFIG_END
+	VIP_EXPANSION_SLOT(config, m_expansion_slot[4], XTAL(3'521'280)/2, vip_expansion_cards, nullptr);
+	m_expansion_slot[4]->int_wr_callback().set(FUNC(vp575_device::exp5_int_w));
+	m_expansion_slot[4]->dma_out_wr_callback().set(FUNC(vp575_device::exp5_dma_out_w));
+	m_expansion_slot[4]->dma_in_wr_callback().set(FUNC(vp575_device::exp5_dma_in_w));
+}
 
 
 
@@ -109,13 +110,13 @@ void vp575_device::device_start()
 //  vip_program_r - program read
 //-------------------------------------------------
 
-uint8_t vp575_device::vip_program_r(address_space &space, offs_t offset, int cs, int cdef, int *minh)
+uint8_t vp575_device::vip_program_r(offs_t offset, int cs, int cdef, int *minh)
 {
 	uint8_t data = 0xff;
 
 	for (auto & elem : m_expansion_slot)
 	{
-		data &= elem->program_r(space, offset, cs, cdef, minh);
+		data &= elem->program_r(offset, cs, cdef, minh);
 	}
 
 	return data;
@@ -126,11 +127,11 @@ uint8_t vp575_device::vip_program_r(address_space &space, offs_t offset, int cs,
 //  vip_program_w - program write
 //-------------------------------------------------
 
-void vp575_device::vip_program_w(address_space &space, offs_t offset, uint8_t data, int cdef, int *minh)
+void vp575_device::vip_program_w(offs_t offset, uint8_t data, int cdef, int *minh)
 {
 	for (auto & elem : m_expansion_slot)
 	{
-		elem->program_w(space, offset, data, cdef, minh);
+		elem->program_w(offset, data, cdef, minh);
 	}
 }
 
@@ -139,13 +140,13 @@ void vp575_device::vip_program_w(address_space &space, offs_t offset, uint8_t da
 //  vip_io_r - I/O read
 //-------------------------------------------------
 
-uint8_t vp575_device::vip_io_r(address_space &space, offs_t offset)
+uint8_t vp575_device::vip_io_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
 	for (auto & elem : m_expansion_slot)
 	{
-		data &= elem->io_r(space, offset);
+		data &= elem->io_r(offset);
 	}
 
 	return data;
@@ -156,11 +157,11 @@ uint8_t vp575_device::vip_io_r(address_space &space, offs_t offset)
 //  vip_io_w - I/O write
 //-------------------------------------------------
 
-void vp575_device::vip_io_w(address_space &space, offs_t offset, uint8_t data)
+void vp575_device::vip_io_w(offs_t offset, uint8_t data)
 {
 	for (auto & elem : m_expansion_slot)
 	{
-		elem->io_w(space, offset, data);
+		elem->io_w(offset, data);
 	}
 }
 
@@ -169,13 +170,13 @@ void vp575_device::vip_io_w(address_space &space, offs_t offset, uint8_t data)
 //  vip_dma_r - DMA read
 //-------------------------------------------------
 
-uint8_t vp575_device::vip_dma_r(address_space &space, offs_t offset)
+uint8_t vp575_device::vip_dma_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
 	for (auto & elem : m_expansion_slot)
 	{
-		data &= elem->dma_r(space, offset);
+		data &= elem->dma_r(offset);
 	}
 
 	return data;
@@ -186,11 +187,11 @@ uint8_t vp575_device::vip_dma_r(address_space &space, offs_t offset)
 //  vip_dma_w - DMA write
 //-------------------------------------------------
 
-void vp575_device::vip_dma_w(address_space &space, offs_t offset, uint8_t data)
+void vp575_device::vip_dma_w(offs_t offset, uint8_t data)
 {
 	for (auto & elem : m_expansion_slot)
 	{
-		elem->dma_w(space, offset, data);
+		elem->dma_w(offset, data);
 	}
 }
 
@@ -269,10 +270,9 @@ int vp575_device::vip_ef4_r()
 
 void vp575_device::vip_sc_w(int n, int sc)
 {
-	address_space &space = machine().dummy_space();
 	for (auto & elem : m_expansion_slot)
 	{
-		elem->sc_w(space, n, sc);
+		elem->sc_w(n, sc);
 	}
 }
 

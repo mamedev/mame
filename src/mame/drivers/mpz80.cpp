@@ -712,37 +712,38 @@ void mpz80_state::machine_reset()
 //  MACHINE_CONFIG( mpz80 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(mpz80_state::mpz80)
+void mpz80_state::mpz80(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(mpz80_mem)
-	MCFG_DEVICE_IO_MAP(mpz80_io)
+	Z80(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpz80_state::mpz80_mem);
+	m_maincpu->set_addrmap(AS_IO, &mpz80_state::mpz80_io);
 
 	// S-100
-	MCFG_DEVICE_ADD(S100_TAG, S100_BUS, XTAL(4'000'000) / 2)
-	MCFG_S100_IRQ_CALLBACK(WRITELINE(*this, mpz80_state, s100_pint_w))
-	MCFG_S100_NMI_CALLBACK(WRITELINE(*this, mpz80_state, s100_nmi_w))
-	MCFG_S100_RDY_CALLBACK(INPUTLINE(Z80_TAG, Z80_INPUT_LINE_BOGUSWAIT))
-	MCFG_S100_SLOT_ADD(S100_TAG ":1", mpz80_s100_cards, "mm65k16s")
-	MCFG_S100_SLOT_ADD(S100_TAG ":2", mpz80_s100_cards, "wunderbus")
-	MCFG_S100_SLOT_ADD(S100_TAG ":3", mpz80_s100_cards, "dj2db")
-	MCFG_S100_SLOT_ADD(S100_TAG ":4", mpz80_s100_cards, nullptr)//"hdcdma")
-	MCFG_S100_SLOT_ADD(S100_TAG ":5", mpz80_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD(S100_TAG ":6", mpz80_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD(S100_TAG ":7", mpz80_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD(S100_TAG ":8", mpz80_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD(S100_TAG ":9", mpz80_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD(S100_TAG ":10", mpz80_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD(S100_TAG ":11", mpz80_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD(S100_TAG ":12", mpz80_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD(S100_TAG ":13", mpz80_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD(S100_TAG ":14", mpz80_s100_cards, nullptr)
+	S100_BUS(config, m_s100, XTAL(4'000'000) / 2);
+	m_s100->irq().set(FUNC(mpz80_state::s100_pint_w));
+	m_s100->nmi().set(FUNC(mpz80_state::s100_nmi_w));
+	m_s100->rdy().set_inputline(m_maincpu, Z80_INPUT_LINE_BOGUSWAIT);
+	S100_SLOT(config, S100_TAG ":1", mpz80_s100_cards, "mm65k16s");
+	S100_SLOT(config, S100_TAG ":2", mpz80_s100_cards, "wunderbus");
+	S100_SLOT(config, S100_TAG ":3", mpz80_s100_cards, "dj2db");
+	S100_SLOT(config, S100_TAG ":4", mpz80_s100_cards, nullptr);//"hdcdma")
+	S100_SLOT(config, S100_TAG ":5", mpz80_s100_cards, nullptr);
+	S100_SLOT(config, S100_TAG ":6", mpz80_s100_cards, nullptr);
+	S100_SLOT(config, S100_TAG ":7", mpz80_s100_cards, nullptr);
+	S100_SLOT(config, S100_TAG ":8", mpz80_s100_cards, nullptr);
+	S100_SLOT(config, S100_TAG ":9", mpz80_s100_cards, nullptr);
+	S100_SLOT(config, S100_TAG ":10", mpz80_s100_cards, nullptr);
+	S100_SLOT(config, S100_TAG ":11", mpz80_s100_cards, nullptr);
+	S100_SLOT(config, S100_TAG ":12", mpz80_s100_cards, nullptr);
+	S100_SLOT(config, S100_TAG ":13", mpz80_s100_cards, nullptr);
+	S100_SLOT(config, S100_TAG ":14", mpz80_s100_cards, nullptr);
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("65K"); // 65K???
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "mpz80")
+	SOFTWARE_LIST(config, "flop_list").set_original("mpz80");
 MACHINE_CONFIG_END
 
 

@@ -158,11 +158,12 @@ static INPUT_PORTS_START( sc1 )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(sc1_state::sc1)
+void sc1_state::sc1(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(sc1_mem)
-	MCFG_DEVICE_IO_MAP(sc1_io)
+	Z80(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &sc1_state::sc1_mem);
+	m_maincpu->set_addrmap(AS_IO, &sc1_state::sc1_io);
 
 	/* video hardware */
 	config.set_default_layout(layout_sc1);
@@ -174,9 +175,8 @@ MACHINE_CONFIG_START(sc1_state::sc1)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 /* ROM definition */
 ROM_START( sc1 )

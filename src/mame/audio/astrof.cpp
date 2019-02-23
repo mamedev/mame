@@ -162,9 +162,10 @@ WRITE8_MEMBER(astrof_state::spfghmk2_audio_w)
 }
 
 
-MACHINE_CONFIG_START(astrof_state::spfghmk2_audio)
+void astrof_state::spfghmk2_audio(machine_config &config)
+{
 	/* nothing yet */
-MACHINE_CONFIG_END
+}
 
 
 

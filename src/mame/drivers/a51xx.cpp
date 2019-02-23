@@ -142,7 +142,7 @@ MACHINE_CONFIG_START(a51xx_state::a5120)
 	MCFG_SCREEN_UPDATE_DRIVER(a51xx_state, screen_update_a5120)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_a51xx)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_a51xx);
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 MACHINE_CONFIG_END

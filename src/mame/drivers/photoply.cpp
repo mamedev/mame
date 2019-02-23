@@ -309,7 +309,7 @@ MACHINE_CONFIG_START(photoply_state::photoply)
 
 	pcat_common(config);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "vga", gfx_photoply)
+	GFXDECODE(config, "gfxdecode", "vga", gfx_photoply);
 
 	ide_controller_32_device &ide(IDE_CONTROLLER_32(config, "ide").options(ata_devices, "hdd", nullptr, true));
 	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));

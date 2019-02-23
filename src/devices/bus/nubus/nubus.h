@@ -14,44 +14,6 @@
 #pragma once
 
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_NUBUS_CPU(_cputag) \
-	downcast<nubus_device &>(*device).set_cputag(_cputag);
-
-#define MCFG_NUBUS_OUT_IRQ9_CB(_devcb) \
-	downcast<nubus_device &>(*device).set_out_irq9_callback(DEVCB_##_devcb);
-
-#define MCFG_NUBUS_OUT_IRQA_CB(_devcb) \
-	downcast<nubus_device &>(*device).set_out_irqa_callback(DEVCB_##_devcb);
-
-#define MCFG_NUBUS_OUT_IRQB_CB(_devcb) \
-	downcast<nubus_device &>(*device).set_out_irqb_callback(DEVCB_##_devcb);
-
-#define MCFG_NUBUS_OUT_IRQC_CB(_devcb) \
-	downcast<nubus_device &>(*device).set_out_irqc_callback(DEVCB_##_devcb);
-
-#define MCFG_NUBUS_OUT_IRQD_CB(_devcb) \
-	downcast<nubus_device &>(*device).set_out_irqd_callback(DEVCB_##_devcb);
-
-#define MCFG_NUBUS_OUT_IRQE_CB(_devcb) \
-	downcast<nubus_device &>(*device).set_out_irqe_callback(DEVCB_##_devcb);
-
-#define MCFG_NUBUS_SLOT_ADD(_nbtag, _tag, _slot_intf, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, NUBUS_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-	downcast<nubus_slot_device &>(*device).set_nubus_slot(_nbtag, _tag);
-#define MCFG_NUBUS_SLOT_REMOVE(_tag)    \
-	MCFG_DEVICE_REMOVE(_tag)
-
-#define MCFG_NUBUS_ONBOARD_ADD(_nbtag, _tag, _dev_type, _def_inp) \
-	MCFG_DEVICE_ADD(_tag, _dev_type, 0) \
-	MCFG_DEVICE_INPUT_DEFAULTS(_def_inp) \
-	downcast<device_nubus_card_interface &>(*device).set_nubus_tag(_nbtag, _tag);
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -101,12 +63,6 @@ public:
 
 	// inline configuration
 	void set_cputag(const char *tag) { m_cputag = tag; }
-	template <class Object> devcb_base &set_out_irq9_callback(Object &&cb) { return m_out_irq9_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_irqa_callback(Object &&cb) { return m_out_irqa_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_irqb_callback(Object &&cb) { return m_out_irqb_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_irqc_callback(Object &&cb) { return m_out_irqc_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_irqd_callback(Object &&cb) { return m_out_irqd_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_irqe_callback(Object &&cb) { return m_out_irqe_cb.set_callback(std::forward<Object>(cb)); }
 	auto out_irq9_callback() { return m_out_irq9_cb.bind(); }
 	auto out_irqa_callback() { return m_out_irqa_cb.bind(); }
 	auto out_irqb_callback() { return m_out_irqb_cb.bind(); }

@@ -63,13 +63,26 @@
 		</part>
 	</software>
 
-	<software name="abe" supported="no">
+	<software name="abe">
 		<description>Advanced BASIC Editor</description>
 		<year>1988</year>
 		<publisher>P.R.E.S.</publisher>
 		<part name="rom1" interface="bbc_rom">
+			<feature name="slot" value="palabe" />
 			<dataarea name="rom" size="32768">
-				<rom name="ABE-1.00.rom" size="32768" crc="e0b93f43" sha1="8b5a7b4633c567a16fe5e885e4d742d85138e07c" offset="0"/>
+				<rom name="AdvancedBASICEditor-1.00.rom" size="32768" crc="e0b93f43" sha1="8b5a7b4633c567a16fe5e885e4d742d85138e07c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="abep">
+		<description>Advanced BASIC Editor Plus</description>
+		<year>1989</year>
+		<publisher>P.R.E.S.</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<feature name="slot" value="palabep" />
+			<dataarea name="rom" size="32768">
+				<rom name="AdvancedBASICEditorPlus-1.00.rom" size="32768" crc="7e3a119a" sha1="27e299a9f265415f347c028d14d8fb434c636d03" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -652,6 +665,17 @@
 		</part>
 	</software>
 
+	<software name="aerodrom">
+		<description>Aerodrome Training Aid</description>
+		<year>1986</year>
+		<publisher>Crown</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="AerodromeTrainingAid-1.4.rom" size="16384" crc="2d4b41f0" sha1="9395b7a817739fc46c5a944e68532b638589988c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="aid">
 		<description>AID</description>
 		<year>1983</year>
@@ -823,6 +847,7 @@
 		<year>1987</year>
 		<publisher>Advanced Memory Systems</publisher>
 		<part name="rom1" interface="bbc_rom">
+			<feature name="slot" value="cciword" />
 			<dataarea name="rom" size="32768">
 				<rom name="AMXDesign-1.00.rom" size="32768" crc="a72e2e59" sha1="a764545fd50c458c55cfcec8e18a641d5c51fd30" offset="0"/>
 			</dataarea>
@@ -1215,13 +1240,24 @@
 		</part>
 	</software>
 
-	<software name="beebaid">
-		<description>BeebAid</description>
+	<software name="beebaid101" cloneof="beebaid">
+		<description>BeebAid 1.01</description>
 		<year>1985</year>
 		<publisher>JaySoft</publisher>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="BeebAid-1.01.rom" size="16384" crc="e073abb2" sha1="49fa231d4b3503e9b1d19ab30063ecaf8e184849" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beebaid">
+		<description>BeebAid 1.02</description>
+		<year>1985</year>
+		<publisher>JaySoft</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="BeebAid-1.02.rom" size="16384" crc="2019a403" sha1="170b18df44188d3bfb79fd61ba9df900e6ed2727" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1419,6 +1455,18 @@
 		<part name="rom2" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="BeebugC-1.5-2.rom" size="16384" crc="7a894882" sha1="bbdf207326c2d46f473346d489150b3931129533" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bet">
+		<description>BASIC Editor &amp; Toolkit</description>
+		<year>1990</year>
+		<publisher>Ian Copestake Software</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<feature name="slot" value="palabep" />
+			<dataarea name="rom" size="32768">
+				<rom name="BASICEditorToolkit-1.00.rom" size="32768" crc="9dcf064e" sha1="80fb0c735a294b57e3fcc92614063a4ce319b41b" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1625,6 +1673,17 @@
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="Chauffeur-3.0.rom" size="16384" crc="edfa89c3" sha1="215531aa2f1d09dba64b6326ac367cfa146aee51" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cncdfs">
+		<description>CNCIS DFS 1.2S</description>
+		<year>198?</year>
+		<publisher>CNC Interfacing Systems</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="CNCIS-DFS-1.2S.rom" size="16384" crc="056f212e" sha1="f19d1aee7b9d4664cac5a9f0dd9f1a740698d4b4" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1921,12 +1980,12 @@
 		</part>
 	</software>
 
-	<software name="conquest" supported="no">
+	<software name="conquest">
 		<description>ConQuest</description>
 		<year>1987</year>
 		<publisher>Watford Electronics</publisher>
 		<part name="rom1" interface="bbc_rom">
-			<feature name="slot" value="wepal" />
+			<feature name="slot" value="palqst" />
 			<dataarea name="rom" size="32768">
 				<rom name="ConQuest-1.00.rom" size="32768" crc="f9634ece" sha1="d2785df6a617089dc72069baa0e1abb1f6e01b27" offset="0"/>
 			</dataarea>
@@ -2199,6 +2258,17 @@
 		</part>
 	</software>
 
+	<software name="ddt">
+		<description>DDT Version 7</description>
+		<year>1984</year>
+		<publisher>DDT Software</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="DDTv7.rom" size="8192" crc="948486f0" sha1="3bc59566d2893633fc0aee77aa3d5b1343e21d36" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="debug">
 		<description>Debug</description>
 		<year>1983</year>
@@ -2210,8 +2280,25 @@
 		</part>
 	</software>
 
+	<software name="demomc">
+		<description>Demo (Master Compact)</description>
+		<year>1985</year>
+		<publisher>Acorn</publisher>
+		<sharedfeat name="compatibility" value="M"/>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Demo-A-v1.rom" size="16384" crc="d22f9e93" sha1="e78dd4b226ded5c120ba573504b4d4fe362c0cc0" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="rom2" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Demo-B-v1.rom" size="16384" crc="793ee194" sha1="f37bbe9741cbe35a50be435f36bc286565c89250" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="demon">
-		<description>Demon</description>
+		<description>Demon Zromm 1.01</description>
 		<year>1984</year>
 		<publisher>Argonaut Software</publisher>
 		<part name="rom1" interface="bbc_rom">
@@ -2440,7 +2527,7 @@
 	</software>
 
 	<software name="disasm">
-		<description>DIS-ASM</description>
+		<description>Disassembler</description>
 		<year>1984</year>
 		<publisher>Watford Electronics</publisher>
 		<part name="rom1" interface="bbc_rom">
@@ -2597,6 +2684,7 @@
 		<description>DoubleView</description>
 		<year>1988</year>
 		<publisher>Tubelink</publisher>
+		<sharedfeat name="compatibility" value="M"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="DoubleView1-1.00.rom" size="16384" crc="b13e6a6d" sha1="650f768333198d89496f68684026643433a4c44e" offset="0"/>
@@ -2605,17 +2693,6 @@
 		<part name="rom2" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="DoubleView2-1.00.rom" size="16384" crc="62ba99bc" sha1="eea53ce0c94f5bf6b2563fcdc2d14142a02f3987" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="dtt">
-		<description>DTT Version 7</description>
-		<year>1984</year>
-		<publisher>DTT Software</publisher>
-		<part name="rom1" interface="bbc_rom">
-			<dataarea name="rom" size="8192">
-				<rom name="DTTversion7.rom" size="8192" crc="948486f0" sha1="3bc59566d2893633fc0aee77aa3d5b1343e21d36" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3238,6 +3315,36 @@
 		</part>
 	</software>
 
+	<software name="genie" supported="no">
+		<description>PMS Genie</description>
+		<year>1987</year>
+		<publisher>Permanent Memory Systems</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<feature name="slot" value="genie" />
+			<!-- Should be single 32K, 8K pages were dumped in-situ so may be corrupt and/or incorrect order. -->
+			<dataarea name="rom" size="32768">
+				<rom name="PMSGenie1-1.01.rom" size="8192" crc="3ee29106" sha1="8b4c14c0657fbb3b19fb85103cc39c06e026f280" offset="0x6000" status="baddump"/>
+				<rom name="PMSGenie2-1.01.rom" size="8192" crc="3d666c36" sha1="810869aeb66fec7599aaec01641c07b1a8968fdc" offset="0x4000" status="baddump"/>
+				<rom name="PMSGenie3-1.01.rom" size="8192" crc="297e99a8" sha1="4b225606cf052f72ef755fbc67d131ab6aa16438" offset="0x2000" status="baddump"/>
+				<rom name="PMSGenie4-1.01.rom" size="8192" crc="b828717b" sha1="4f8ff82bd05ace8cee99e6c7c8dbc35d6de3e92d" offset="0x0000" status="baddump"/>
+			</dataarea>
+			<dataarea name="nvram" size="32768" />
+			<dataarea name="ram" size="32768" />
+		</part>
+	</software>
+
+	<software name="genieclk">
+		<description>PMS Genie Real Time Clock</description>
+		<year>1988</year>
+		<publisher>Permanent Memory Systems</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<feature name="slot" value="pmsrtc" />
+			<dataarea name="rom" size="8192">
+				<rom name="PMSGenieClock-3.02.rom" size="8192" crc="556d8bf9" sha1="a33675c7464e935fd10672d5266d3ee0c82d3a8b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="geniejr">
 		<description>PMS Genie Junior</description>
 		<year>1987</year>
@@ -3490,6 +3597,30 @@
 		</part>
 	</software>
 
+	<software name="hibasic3">
+		<description>HiBASIC3</description>
+		<year>1983</year>
+		<publisher>Acorn</publisher>
+		<info name="usage" value="Requires 6502 2nd Processor" />
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="HiBASIC3.rom" size="16384" crc="6ea7affc" sha1="99234b55fde57680e4217b72ef4ccb8fc56edeff" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hibasic4">
+		<description>HiBASIC4</description>
+		<year>1984</year>
+		<publisher>Acorn</publisher>
+		<info name="usage" value="Requires 65C102 2nd Processor" />
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="HiBASIC4.rom" size="16384" crc="e08c3d53" sha1="570a95df09ce6719dbedc8166d328301ac49a926" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hyperdrv100" cloneof="hyperdrv">
 		<description>HyperDriver 1.00</description>
 		<year>1987</year>
@@ -3589,6 +3720,17 @@
 		</part>
 	</software>
 
+	<software name="imagep">
+		<description>Image Processor 0.9A</description>
+		<year>1984</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="ImageProcessor-0.9A.rom" size="8192" crc="95bc21cc" sha1="834f38484025be4db49cf89bc853ec5bcd4ad16f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="indxutil205b" cloneof="indxutil">
 		<description>Index Utility 2.05b</description>
 		<year>1984</year>
@@ -3622,11 +3764,12 @@
 		</part>
 	</software>
 
-	<software name="ibase" supported="no">
+	<software name="ibase">
 		<description>Inter-Base 2.0A</description>
 		<year>1987</year>
 		<publisher>Computer Concepts</publisher>
 		<part name="rom1" interface="bbc_rom">
+			<feature name="slot" value="ccibase" />
 			<dataarea name="rom" size="65536">
 				<rom name="InterBase-2.0A.rom" size="65536" crc="4332ed95" sha1="1308d8dfaa95d1e0160acc4af9bbc89cb53f6b14" offset="0"/>
 			</dataarea>
@@ -3778,24 +3921,38 @@
 		</part>
 	</software>
 
-	<software name="iword" supported="no">
+	<software name="iword">
 		<description>Inter-Word 1.02</description>
 		<year>1986</year>
 		<publisher>Computer Concepts</publisher>
 		<part name="rom1" interface="bbc_rom">
+			<feature name="slot" value="cciword" />
 			<dataarea name="rom" size="32768">
-				<rom name="InterWord-1.02.rom" size="32768" crc="9c48e363" sha1="e771ff00d0cda3697f33be1260d7ca9f95acea25" offset="0"/>
+				<rom name="InterWord-1.02.rom" size="32768" crc="c93e3c33" sha1="ab478e09e57775daac74b25aeabaf11139b05868" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="iword1o2" cloneof="iword" supported="no">
-		<description>Inter-Word 1.O2</description>
+	<software name="iworda1" cloneof="iword">
+		<description>Inter-Word 1.O2 [alt1]</description>
 		<year>1986</year>
 		<publisher>Computer Concepts</publisher>
 		<part name="rom1" interface="bbc_rom">
+			<feature name="slot" value="cciword" />
 			<dataarea name="rom" size="32768">
-				<rom name="InterWord-1.O2.rom" size="32768" crc="6702bdbb" sha1="447a19aa723acaabdf50aa718c1c7859d9a92299" offset="0"/>
+				<rom name="InterWord-1.O2[a1].rom" size="32768" crc="9c48e363" sha1="e771ff00d0cda3697f33be1260d7ca9f95acea25" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iworda2" cloneof="iword">
+		<description>Inter-Word 1.O2 [alt2]</description>
+		<year>1986</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<feature name="slot" value="cciword" />
+			<dataarea name="rom" size="32768">
+				<rom name="InterWord-1.O2[a2].rom" size="32768" crc="6702bdbb" sha1="447a19aa723acaabdf50aa718c1c7859d9a92299" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4068,7 +4225,7 @@
 	<software name="mass">
 		<description>MASS</description>
 		<year>1984</year>
-		<publisher>DTT Software</publisher>
+		<publisher>DDT Software</publisher>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="8192">
 				<rom name="MASS-1.0.rom" size="8192" crc="5e656ab8" sha1="b48dcfc8fb01c3ecd6cccdaa62a305f81c508409" offset="0"/>
@@ -4103,6 +4260,7 @@
 		<description>Master Emulation ROM 1.00</description>
 		<year>1987</year>
 		<publisher>Dabs Press</publisher>
+		<sharedfeat name="compatibility" value="B,B+"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="MasterEmulationROM-1.00.rom" size="16384" crc="d5924e24" sha1="d18dfc68ac514421815bd6760ef279b0a1796bc4" offset="0"/>
@@ -4114,6 +4272,7 @@
 		<description>Master Emulation ROM 2.01</description>
 		<year>1987</year>
 		<publisher>Dabs Press</publisher>
+		<sharedfeat name="compatibility" value="B,B+"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="MasterEmulationROM-2.01.rom" size="16384" crc="a11d80c6" sha1="798e7f4ce7f9dc61cd89d035c571f8dbd86b322c" offset="0"/>
@@ -4125,6 +4284,7 @@
 		<description>Master Emulation ROM 2.02</description>
 		<year>1988</year>
 		<publisher>Dabs Press</publisher>
+		<sharedfeat name="compatibility" value="B,B+"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="MasterEmulationROM-2.02.rom" size="16384" crc="a6dc835f" sha1="9f342ff0723a25e2f4b72eea8723131c5de4b253" offset="0"/>
@@ -4137,13 +4297,9 @@
 		<year>1987</year>
 		<publisher>Beebugsoft</publisher>
 		<part name="rom1" interface="bbc_rom">
-			<dataarea name="rom" size="16384">
-				<rom name="MasterROM-1.01-1.rom" size="16384" crc="2b932ce9" sha1="672c62db79189136fb66027176f1c0a980f3384f" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="rom2" interface="bbc_rom">
-			<dataarea name="rom" size="16384">
-				<rom name="MasterROM-1.01-2.rom" size="16384" crc="fd437c6d" sha1="8f415603773bb46a15f3e230a72071bf0e439042" offset="0"/>
+			<feature name="slot" value="cciword" />
+			<dataarea name="rom" size="32768">
+				<rom name="MasterROM-1.01.rom" size="32768" crc="be70b1f9" sha1="6d03e7ce0cbfe0b6b521a111b88b3c1398d9270e" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4153,13 +4309,9 @@
 		<year>1988</year>
 		<publisher>Beebugsoft</publisher>
 		<part name="rom1" interface="bbc_rom">
-			<dataarea name="rom" size="16384">
-				<rom name="MasterROM-1.03-1.rom" size="16384" crc="5eb04e88" sha1="f9bd09240ecf0503c3d5523c7b1c9d9c4a1be25f" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="rom2" interface="bbc_rom">
-			<dataarea name="rom" size="16384">
-				<rom name="MasterROM-1.03-2.rom" size="16384" crc="9b45e88e" sha1="b758a077908164e80672d6047972643c6d4d32c6" offset="0"/>
+			<feature name="slot" value="cciword" />
+			<dataarea name="rom" size="32768">
+				<rom name="MasterROM-1.03.rom" size="32768" crc="b5592ef3" sha1="97b405c6b5490b62335b839b725a640f88f69924" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4186,11 +4338,12 @@
 		</part>
 	</software>
 
-	<software name="mega3" supported="no">
+	<software name="mega3">
 		<description>Mega3</description>
 		<year>1987</year>
 		<publisher>Computer Concepts</publisher>
 		<part name="rom1" interface="bbc_rom">
+			<feature name="slot" value="ccispell" />
 			<dataarea name="rom" size="131072">
 				<rom name="Mega3-1.00.rom" size="131072" crc="faac60bb" sha1="560112e40794ca2d0e519ff1985472d37c01a394" offset="0"/>
 			</dataarea>
@@ -4426,16 +4579,17 @@
 		</part>
 	</software>
 
-	<software name="moffice2" supported="no">
+	<software name="moffice2">
 		<description>Instant Mini Office II</description>
 		<year>1986</year>
 		<publisher>Database Software</publisher>
 		<part name="rom1" interface="bbc_rom">
+			<feature name="slot" value="palmo2" />
 			<dataarea name="rom" size="131072">
-				<rom name="MiniOfficeII-1.rom" size="32768" crc="5e0f6853" sha1="3deef1b1680c9a1449009b11899bf5ab360f89ef" offset="0x00000"/>
-				<rom name="MiniOfficeII-2.rom" size="32768" crc="afb646cc" sha1="d7ead85e32930b0f35ad87d3a825f48896abc8e1" offset="0x08000"/>
-				<rom name="MiniOfficeII-3.rom" size="32768" crc="e8a1cbd8" sha1="9e31542d2099c98605032c175c196f3ea073de5f" offset="0x10000"/>
-				<rom name="MiniOfficeII-4.rom" size="32768" crc="d041fe31" sha1="cd0297096009c71ebb00709cfb32a6c56e7eea8b" offset="0x18000"/>
+				<rom name="MiniOfficeII-1.rom" size="32768" crc="5e0f6853" sha1="3deef1b1680c9a1449009b11899bf5ab360f89ef" offset="0x18000"/>
+				<rom name="MiniOfficeII-2.rom" size="32768" crc="afb646cc" sha1="d7ead85e32930b0f35ad87d3a825f48896abc8e1" offset="0x10000"/>
+				<rom name="MiniOfficeII-3.rom" size="32768" crc="e8a1cbd8" sha1="9e31542d2099c98605032c175c196f3ea073de5f" offset="0x08000"/>
+				<rom name="MiniOfficeII-4.rom" size="32768" crc="d041fe31" sha1="cd0297096009c71ebb00709cfb32a6c56e7eea8b" offset="0x00000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4552,14 +4706,17 @@
 		</part>
 	</software>
 
-	<software name="mrme00" supported="no">
+	<software name="mrme00">
 		<description>MRM E00 DFS 1.20</description>
 		<year>1985</year>
-		<publisher>MRM</publisher>
+		<publisher>MRM Software</publisher>
 		<part name="rom1" interface="bbc_rom">
+			<feature name="slot" value="mrme00" />
 			<dataarea name="rom" size="8192">
 				<rom name="MRM-E00-DFS-1.20.rom" size="8192" crc="944958b6" sha1="0db7be4deb303af2400f9af20a9a7211dcbaeae5" offset="0"/>
 			</dataarea>
+			<!-- TODO: Verify amount of RAM -->
+			<dataarea name="ram" size="4096" />
 		</part>
 	</software>
 
@@ -4885,6 +5042,17 @@
 		</part>
 	</software>
 
+	<software name="paramax">
+		<description>Para-Max II</description>
+		<year>198?</year>
+		<publisher>CNC Interfacing Systems</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="ParamaxII-1.00.rom" size="16384" crc="773078dc" sha1="3a456a9374e9a16fa913f6b974484561e8ccbc28" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pascalt">
 		<description>Pascal-T</description>
 		<year>1983</year>
@@ -5047,6 +5215,28 @@
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="PowerFontNTQ-5.01.rom" size="16384" crc="5d21bbe1" sha1="1e8398037c7fde903e0da042fb5434ff4ac35875" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="plotmta3">
+		<description>Plotmate A3 2.00</description>
+		<year>1986</year>
+		<publisher>Linear Graphics</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="PlotmateA3-2.00.rom" size="16384" crc="4cb56269" sha1="0267f9013087851d3d625725ec9d7cd7fb9fa32e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="plotmta4">
+		<description>Plotmate A4 1.90</description>
+		<year>1986</year>
+		<publisher>Linear Graphics</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="PlotmateA4-1.90.rom" size="16384" crc="236df01b" sha1="73cf140224bf5fa71365f12640e42e5e79b79a9c" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5339,6 +5529,18 @@
 		</part>
 	</software>
 
+	<software name="publishr">
+		<description>The Publisher 1.10</description>
+		<year>1988</year>
+		<publisher>Permanent Memory Systems</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<feature name="slot" value="ccibase" />
+			<dataarea name="rom" size="65536">
+				<rom name="ThePublisher-1.10.rom" size="65536" crc="8ff2e069" sha1="74c64ce449ff57bf1082509793fa1005ddaab6d7" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="qfs102">
 		<description>QFS 1.02</description>
 		<year>1984</year>
@@ -5374,24 +5576,24 @@
 		</part>
 	</software>
 
-	<software name="questpnt" supported="no">
+	<software name="questpnt">
 		<description>Quest Paint 1.10</description>
 		<year>1986</year>
 		<publisher>Watford Electronics</publisher>
 		<part name="rom1" interface="bbc_rom">
-			<feature name="slot" value="wepal" />
+			<feature name="slot" value="palqst" />
 			<dataarea name="rom" size="32768">
 				<rom name="QuestPaint-1.10.rom" size="32768" crc="839a9b34" sha1="e863067fc2a2b0f0c7129a17f189b31a0ee23594" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="questpnt104" cloneof="questpnt" supported="no">
+	<software name="questpnt104" cloneof="questpnt">
 		<description>Quest Paint 1.04</description>
 		<year>1986</year>
 		<publisher>Watford Electronics</publisher>
 		<part name="rom1" interface="bbc_rom">
-			<feature name="slot" value="wepal" />
+			<feature name="slot" value="palqst" />
 			<dataarea name="rom" size="32768">
 				<rom name="QuestPaint-1.04.rom" size="32768" crc="7880eb9a" sha1="a9ac2fafe0f97a567005abe5679707fa0dbd7ef3" offset="0"/>
 			</dataarea>
@@ -5464,6 +5666,31 @@
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="8192">
 				<rom name="Replay-8271-1.10.rom" size="8192" crc="4483ec6d" sha1="e6bfbcca5560f15d86d0cd1462e69ce155c618b3" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="replay2" supported="no">
+		<description>Replay System Mk2 2.00</description>
+		<year>1988</year>
+		<publisher>Vine Micros</publisher>
+		<sharedfeat name="compatibility" value="B"/>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="ReplayMk2-2.00.rom" size="16384" crc="f42d297c" sha1="5bab729b42906cd9612cb6531c6393b16211daac" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="replaym" supported="no">
+		<description>Master Replay</description>
+		<year>1987</year>
+		<publisher>Vine Micros</publisher>
+		<sharedfeat name="compatibility" value="M"/>
+		<!-- This is not a normal ROM, it's paged into the MOS region using an Overlay board. -->
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="MasterReplay.rom" size="16384" crc="a9619a78" sha1="2c6a18366568b139f2ec8ba6b31315a921b88c29" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5662,6 +5889,17 @@
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="Screenprint-1.00.rom" size="16384" crc="f432d479" sha1="d7a9655237a057820dd31bb6475d5c6ed53290b1" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scrnprnt102" cloneof="scrnprnt">
+		<description>Colour Screenprint 1.02s</description>
+		<year>1988</year>
+		<publisher>ESM</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Screenprint-1.02s.rom" size="16384" crc="dd0511e8" sha1="bc5bcc1063a2ba5358551795ec019124c3a8971a" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5964,11 +6202,12 @@
 		</part>
 	</software>
 
-	<software name="spellmst166" cloneof="spellmst" supported="no">
+	<software name="spellmst166" cloneof="spellmst">
 		<description>SpellMaster 1.66</description>
 		<year>1987</year>
 		<publisher>Computer Concepts</publisher>
 		<part name="rom1" interface="bbc_rom">
+			<feature name="slot" value="ccispell" />
 			<dataarea name="rom" size="131072">
 				<rom name="SpellMaster-1.66-128K.rom" size="65536" crc="4e096d33" sha1="c1d72d32528888c595a2565220f3f7686028bdbf" offset="0x0000"/>
 				<rom name="SpellMaster-1.66-Spell.rom" size="65536" crc="42457ecf" sha1="20fc4a01c0d295ee34be57fdcbd687608781cbae" offset="0x10000"/>
@@ -5976,11 +6215,12 @@
 		</part>
 	</software>
 
-	<software name="spellmst" supported="no">
+	<software name="spellmst">
 		<description>SpellMaster 1.69</description>
 		<year>1987</year>
 		<publisher>Computer Concepts</publisher>
 		<part name="rom1" interface="bbc_rom">
+			<feature name="slot" value="ccispell" />
 			<dataarea name="rom" size="131072">
 				<rom name="SpellMaster-1.69.rom" size="131072" crc="c26533ec" sha1="deb5e62b18caf75b24ab48dd565f77e200371f67" offset="0"/>
 			</dataarea>
@@ -6167,11 +6407,24 @@
 		<description>Solidisk ADFS 20/2 Issue 2</description>
 		<year>1985</year>
 		<publisher>Solidisk</publisher>
-		<info name="usage" value="Requires Acorn 1770 FDC" />
-		<sharedfeat name="compatibility" value="B,B+"/>
+		<info name="usage" value="Requires Solidisk 1770 DDFS Issue 2 FDC" />
+		<sharedfeat name="compatibility" value="B"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="Solidisk-ADFS-20-2.rom" size="16384" crc="9d010d41" sha1="086dae86b762cace6fdaa754e30235d3d438e443" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stladfs21" supported="no">
+		<description>Solidisk ADFS 2.1 11/10/85</description>
+		<year>1985</year>
+		<publisher>Solidisk</publisher>
+		<info name="usage" value="Requires Solidisk 1770 DDFS Issue 1 FDC" />
+		<sharedfeat name="compatibility" value="B"/>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Solidisk-ADFS-2.1-110185.rom" size="16384" crc="626b5fb1" sha1="46c0fedba004b8a1696405f9237f6337ae907b43" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6180,11 +6433,23 @@
 		<description>Solidisk ADFS 2.1D Issue 2</description>
 		<year>1985</year>
 		<publisher>Solidisk</publisher>
-		<info name="usage" value="Requires Acorn 1770 FDC" />
-		<sharedfeat name="compatibility" value="B,B+"/>
+		<info name="usage" value="Requires Solidisk 1770 DDFS Issue 2 FDC" />
+		<sharedfeat name="compatibility" value="B"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="Solidisk-ADFS-2.1D.rom" size="16384" crc="65f974b0" sha1="3a108f9ff4edf879741485e78cffe39e613d7de6" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stladfs21j" supported="no">
+		<description>Solidisk ADFS 2.1J (10MB)</description>
+		<year>1986</year>
+		<publisher>Solidisk</publisher>
+		<sharedfeat name="compatibility" value="B"/>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Solidisk-ADFS-2.1J-10MB.rom" size="16384" crc="8a5abd63" sha1="24f9ec81f7864d7c83fcede4a49433687154de0f" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6193,8 +6458,8 @@
 		<description>Solidisk ADFS 2.1M</description>
 		<year>1985</year>
 		<publisher>Solidisk</publisher>
-		<info name="usage" value="Requires Acorn 1770 FDC" />
-		<sharedfeat name="compatibility" value="B,B+"/>
+		<info name="usage" value="Requires Solidisk 1770 DDFS Issue 2 FDC" />
+		<sharedfeat name="compatibility" value="B"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="Solidisk-ADFS-2.1M.rom" size="16384" crc="516c343a" sha1="5f07b77813f508f79491c44d620244bb58ff870a" offset="0"/>
@@ -6206,8 +6471,8 @@
 		<description>Solidisk ADFS 2.1M Issue 2</description>
 		<year>1985</year>
 		<publisher>Solidisk</publisher>
-		<info name="usage" value="Requires Acorn 1770 FDC" />
-		<sharedfeat name="compatibility" value="B,B+"/>
+		<info name="usage" value="Requires Solidisk 1770 DDFS Issue 2 FDC" />
+		<sharedfeat name="compatibility" value="B"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="Solidisk-ADFS-2.1Miss2.rom" size="16384" crc="947da3c7" sha1="5a47dda61ec46d8f203b3203890546cc837d4e02" offset="0"/>
@@ -6219,9 +6484,22 @@
 		<description>Solidisk ADFS 2.1S</description>
 		<year>1985</year>
 		<publisher>Solidisk</publisher>
+		<info name="usage" value="Requires Solidisk 1770 DDFS Issue 1 FDC" />
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="Solidisk-ADFS-2.1S.rom" size="16384" crc="ee5db62c" sha1="4a16ca65097831b2abd9b53a150bc1d7904a86d2" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stlddfs14" supported="no">
+		<description>Solidisk DDFS 1.4</description>
+		<year>1984</year>
+		<publisher>Solidisk</publisher>
+		<sharedfeat name="compatibility" value="B"/>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="Solidisk-DDFS-1.4.rom" size="8192" crc="e691a633" sha1="a7270c107b430d95b8c707a578889783c7f3e707" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6230,6 +6508,7 @@
 		<description>Solidisk DDFS 1.5</description>
 		<year>1985</year>
 		<publisher>Solidisk</publisher>
+		<info name="usage" value="Requires Solidisk 1770 DDFS Issue 1 FDC" />
 		<sharedfeat name="compatibility" value="B"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="8192">
@@ -6242,6 +6521,7 @@
 		<description>Solidisk DDFS 1.9</description>
 		<year>1985</year>
 		<publisher>Solidisk</publisher>
+		<info name="usage" value="Requires Solidisk 1770 DDFS Issue 1 FDC" />
 		<sharedfeat name="compatibility" value="B"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="8192">
@@ -6250,10 +6530,37 @@
 		</part>
 	</software>
 
+	<software name="stldfs201" supported="no">
+		<description>Solidisk DFS 2.0 (Jan 85)</description>
+		<year>1985</year>
+		<publisher>Solidisk</publisher>
+		<info name="usage" value="Requires Solidisk 1770 DDFS Issue 1 FDC" />
+		<sharedfeat name="compatibility" value="B"/>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Solidisk-DFS-2.0-Feb85.rom" size="16384" crc="1f609389" sha1="706f3de07b9f128c0e89d69d80e4e49b1ebf6b29" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stldfs202" supported="no">
+		<description>Solidisk DFS 2.0 (Feb 85)</description>
+		<year>1985</year>
+		<publisher>Solidisk</publisher>
+		<info name="usage" value="Requires Solidisk 1770 DDFS Issue 1 FDC" />
+		<sharedfeat name="compatibility" value="B"/>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Solidisk-DFS-2.0-Feb85.rom" size="16384" crc="6389dac2" sha1="e926e92622dfb508f8830ae619f27f4ccaf0c75b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="stldfs20" supported="partial">
 		<description>Solidisk DFS 2.00 (8271/1770)</description>
 		<year>1985</year>
 		<publisher>Solidisk</publisher>
+		<info name="usage" value="Requires Solidisk 1770 DDFS Issue 1 FDC" />
 		<sharedfeat name="compatibility" value="B"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
@@ -6262,10 +6569,24 @@
 		</part>
 	</software>
 
+	<software name="stldfs20a" supported="no">
+		<description>Solidisk DFS 2.0A (8271/1770)</description>
+		<year>1985</year>
+		<publisher>Solidisk</publisher>
+		<info name="usage" value="Requires Solidisk 1770 DDFS Issue 1 FDC" />
+		<sharedfeat name="compatibility" value="B"/>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Solidisk-DFS-8271-1770-2.0A.rom" size="16384" crc="d6c63557" sha1="14aa1c6e93ac8950730aa130b50fd59cbd830f3c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="stldfs20j" supported="no">
 		<description>Solidisk DFS 2.0J (8271/1770)</description>
 		<year>1985</year>
 		<publisher>Solidisk</publisher>
+		<info name="usage" value="Requires Solidisk 1770 DDFS Issue 1 FDC" />
 		<sharedfeat name="compatibility" value="B"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
@@ -6278,6 +6599,7 @@
 		<description>Solidisk DFS 2.0L (8271/1770)</description>
 		<year>1985</year>
 		<publisher>Solidisk</publisher>
+		<info name="usage" value="Requires Solidisk 1770 DDFS Issue 1 FDC" />
 		<sharedfeat name="compatibility" value="B"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
@@ -6290,6 +6612,7 @@
 		<description>Solidisk DFS 2.0m (8271/1770)</description>
 		<year>1985</year>
 		<publisher>Solidisk</publisher>
+		<info name="usage" value="Requires Solidisk 1770 DDFS Issue 1 FDC" />
 		<sharedfeat name="compatibility" value="B"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
@@ -6299,13 +6622,14 @@
 	</software>
 
 	<software name="stldfs21" supported="no">
-		<description>Solidisk DFS 2.1 (8271/1770)</description>
+		<description>Solidisk DFS 2.1 (Mar 85)</description>
 		<year>1985</year>
 		<publisher>Solidisk</publisher>
+		<info name="usage" value="Requires Solidisk 1770 DDFS Issue 1 FDC" />
 		<sharedfeat name="compatibility" value="B"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="Solidisk-DFS-8271-1770-2.1.rom" size="16384" crc="cc3e6b4e" sha1="c820c15013070fbc79362dc0c2a1f1c1375c94dd" offset="0"/>
+				<rom name="Solidisk-DFS-8271-1770-2.1.rom" size="16384" crc="cc83d913" sha1="c761102ac11be629676339e9e496fb78734e4399" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6314,6 +6638,7 @@
 		<description>Solidisk DFS 2.1A (1770)</description>
 		<year>1985</year>
 		<publisher>Solidisk</publisher>
+		<info name="usage" value="Requires Solidisk 1770 DDFS Issue 1 FDC" />
 		<sharedfeat name="compatibility" value="B"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
@@ -6322,8 +6647,34 @@
 		</part>
 	</software>
 
+	<software name="stldfs21f2">
+		<description>Solidisk DFS 2.1F (1770) Issue 2</description>
+		<year>1985</year>
+		<publisher>Solidisk</publisher>
+		<info name="usage" value="Requires Solidisk 1770 DDFS Issue 2 FDC" />
+		<sharedfeat name="compatibility" value="B"/>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Solidisk-DFS-2.1F-Iss2.rom" size="16384" crc="bab70e96" sha1="e78d3ba97ea410c54d89ae82d2fc5eeb607a3f76" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stldfs21j" supported="no">
+		<description>Solidisk DFS 2.1J (1770)</description>
+		<year>1985</year>
+		<publisher>Solidisk</publisher>
+		<info name="usage" value="Requires Solidisk 1770 DDFS Issue 1 FDC" />
+		<sharedfeat name="compatibility" value="B"/>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Solidisk-DFS-2.1J.rom" size="16384" crc="b60296f1" sha1="22e60d4dda37335f61c27a92ba76ccc3e2102c4e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="stldfs21j1" supported="no">
-		<description>Solidisk DFS 2.1J Issue 1</description>
+		<description>Solidisk DFS 2.1J (1770) Issue 1</description>
 		<year>1985</year>
 		<publisher>Solidisk</publisher>
 		<sharedfeat name="compatibility" value="B"/>
@@ -6335,10 +6686,10 @@
 	</software>
 
 	<software name="stldfs21j2">
-		<description>Solidisk DFS 2.1J Issue 2</description>
+		<description>Solidisk DFS 2.1J (1770) Issue 2</description>
 		<year>1985</year>
 		<publisher>Solidisk</publisher>
-		<info name="usage" value="Requires Acorn 1770 FDC" />
+		<info name="usage" value="Requires Solidisk 1770 DDFS Issue 2 FDC" />
 		<sharedfeat name="compatibility" value="B"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
@@ -6348,10 +6699,10 @@
 	</software>
 
 	<software name="stldfs21m2">
-		<description>Solidisk DFS 2.1M Issue 2</description>
+		<description>Solidisk DFS 2.1M (1770) Issue 2</description>
 		<year>1985</year>
 		<publisher>Solidisk</publisher>
-		<info name="usage" value="Requires Acorn 1770 FDC" />
+		<info name="usage" value="Requires Solidisk 1770 DDFS Issue 2 FDC" />
 		<sharedfeat name="compatibility" value="B"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
@@ -6362,9 +6713,9 @@
 
 	<software name="stldfs22d">
 		<description>Solidisk DFS 2.2D</description>
-		<year>1985</year>
+		<year>1986</year>
 		<publisher>Solidisk</publisher>
-		<info name="usage" value="Requires Acorn 1770 FDC" />
+		<info name="usage" value="Requires Solidisk 1770 DDFS Issue 2 FDC" />
 		<sharedfeat name="compatibility" value="B"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
@@ -6375,9 +6726,9 @@
 
 	<software name="stldfs22f2">
 		<description>Solidisk DFS 2.2F Issue 2</description>
-		<year>1985</year>
+		<year>1986</year>
 		<publisher>Solidisk</publisher>
-		<info name="usage" value="Requires Acorn 1770 FDC" />
+		<info name="usage" value="Requires Solidisk 1770 DDFS Issue 2 FDC" />
 		<sharedfeat name="compatibility" value="B"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
@@ -6388,9 +6739,9 @@
 
 	<software name="stldfs22j2">
 		<description>Solidisk DFS 2.2J Issue 2</description>
-		<year>1985</year>
+		<year>1986</year>
 		<publisher>Solidisk</publisher>
-		<info name="usage" value="Requires Acorn 1770 FDC" />
+		<info name="usage" value="Requires Solidisk 1770 DDFS Issue 2 FDC" />
 		<sharedfeat name="compatibility" value="B"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
@@ -6401,9 +6752,9 @@
 
 	<software name="stldfs22m2">
 		<description>Solidisk DFS 2.2M Issue 2</description>
-		<year>1985</year>
+		<year>1986</year>
 		<publisher>Solidisk</publisher>
-		<info name="usage" value="Requires Acorn 1770 FDC" />
+		<info name="usage" value="Requires Solidisk 1770 DDFS Issue 2 FDC" />
 		<sharedfeat name="compatibility" value="B"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
@@ -6416,6 +6767,7 @@
 		<description>Solidisk DFS 2.2N Issue 2</description>
 		<year>1986</year>
 		<publisher>Solidisk</publisher>
+		<info name="usage" value="Requires Solidisk 1770 DDFS Issue 2 FDC" />
 		<sharedfeat name="compatibility" value="B"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
@@ -6424,11 +6776,26 @@
 		</part>
 	</software>
 
-	<software name="stlrtc" supported="no">
+	<software name="stldfs221" supported="no">
+		<description>Solidisk DFS 2.21 Issue 1</description>
+		<year>1986</year>
+		<publisher>Solidisk</publisher>
+		<info name="usage" value="Requires Solidisk 1770 DDFS Issue 1 FDC" />
+		<sharedfeat name="compatibility" value="B"/>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Solidisk-DFS-2.21-Iss1.rom" size="16384" crc="f240c5c2" sha1="3c86f290555ed32ed414c3b192fb747de0c23fe0" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stlrtc">
 		<description>STL Clock &amp; Desk</description>
 		<year>1986</year>
 		<publisher>Solidisk</publisher>
+		<sharedfeat name="compatibility" value="B"/>
 		<part name="rom1" interface="bbc_rom">
+			<feature name="slot" value="stlrtc" />
 			<dataarea name="rom" size="16384">
 				<rom name="Solidisk-RTC-1.00.rom" size="16384" crc="bc8eb078" sha1="cf812dba6fcec81e55582a6f4bfa21677bc97290" offset="0"/>
 			</dataarea>
@@ -6501,6 +6868,17 @@
 		</part>
 	</software>
 
+	<software name="suprutil">
+		<description>Super Utility</description>
+		<year>198?</year>
+		<publisher>GTM Computers</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="SuperUtility-GTM.rom" size="8192" crc="ea946786" sha1="8dce6a447cddaafaedefb3fd348dff474312f2d0" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="suprvisr">
 		<description>Supervisor</description>
 		<year>1985</year>
@@ -6567,33 +6945,12 @@
 		</part>
 	</software>
 
-	<software name="techcadr1">
-		<description>TechnoCAD R1</description>
-		<year>1987</year>
-		<publisher>Technomatic</publisher>
-		<part name="rom1" interface="bbc_rom">
-			<dataarea name="rom" size="16384">
-				<rom name="TechnoCAD-R1-1.00.rom" size="16384" crc="662a4f28" sha1="3a8a9c5c72212aeadf0c1f2ba8b3ff7f4a08ea2a" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="techcadr2">
-		<description>TechnoCAD R2</description>
-		<year>1988</year>
-		<publisher>Technomatic</publisher>
-		<part name="rom1" interface="bbc_rom">
-			<dataarea name="rom" size="16384">
-				<rom name="TechnoCAD-R2-1.00.rom" size="16384" crc="19fd969a" sha1="845f73dad31635a307db2d16a61b20ca4561f659" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ted" supported="no">
+	<software name="ted">
 		<description>TED 1.11</description>
 		<year>1987</year>
 		<publisher>Watford Electronics</publisher>
 		<part name="rom1" interface="bbc_rom">
+			<feature name="slot" value="palted" />
 			<dataarea name="rom" size="32768">
 				<rom name="TED-1.11.rom" size="32768" crc="2d4c6458" sha1="62d6ac9044c0e12f6841257a498df26545f5942e" offset="0"/>
 			</dataarea>
@@ -6712,7 +7069,7 @@
 
 	<software name="termultr">
 		<description>Termulator</description>
-		<year>198?</year>
+		<year>1985</year>
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="SBL23" />
 		<part name="rom1" interface="bbc_rom">
@@ -6722,11 +7079,13 @@
 		</part>
 	</software>
 
-	<software name="tictoc" supported="no">
+	<software name="tictoc">
 		<description>Tic-Toc RTC</description>
 		<year>1988</year>
 		<publisher>Computer and Technical Services</publisher>
+		<sharedfeat name="compatibility" value="B"/>
 		<part name="rom1" interface="bbc_rom">
+			<feature name="slot" value="stlrtc" />
 			<dataarea name="rom" size="16384">
 				<rom name="TicTocRTC-2.03.rom" size="16384" crc="9fc6e90f" sha1="a1a803bee553bb1e5da6536ef0a650f26391cd4f" offset="0"/>
 			</dataarea>
@@ -7065,6 +7424,16 @@
 	</software>
 
 	<software name="userram">
+		<description>UserRAM</description>
+		<year>1985</year>
+		<publisher>Acorn User</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<feature name="slot" value="ram" />
+			<dataarea name="ram" size="16384" />
+		</part>
+	</software>
+
+	<software name="userramd">
 		<description>UserRAM Demonstration ROM</description>
 		<year>1985</year>
 		<publisher>Acorn User</publisher>
@@ -7192,6 +7561,17 @@
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="8192">
 				<rom name="VDU-1.2.rom" size="8192" crc="7c929c4a" sha1="0bc797ccee37252baf65c0c6bdc5ab91ccf5093e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vdigitsr">
+		<description>Video Digitiser 1.03</description>
+		<year>1984</year>
+		<publisher>RH Electronics</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="VideoDigitiser-1.03.rom" size="8192" crc="f83e0d14" sha1="a19979b72108171612505711d7e97341c83545e1" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7407,6 +7787,17 @@
 		</part>
 	</software>
 
+	<software name="vnula" supported="no">
+		<description>VideoNuLA 1.02</description>
+		<year>2017</year>
+		<publisher>Rob Coleman</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="VideoNuLA-1.02.rom" size="16384" crc="47ced987" sha1="7784a1cc8e840026570eccae21c96d754b90086e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="vt100">
 		<description>VT100 1.60</description>
 		<year>1989</year>
@@ -7418,12 +7809,12 @@
 		</part>
 	</software>
 
-	<software name="wapping" supported="no">
-		<description>The Wapping Editor</description>
+	<software name="wapping">
+		<description>The Wapping Editor 1.30</description>
 		<year>1988</year>
 		<publisher>Watford Electronics</publisher>
 		<part name="rom1" interface="bbc_rom">
-			<feature name="slot" value="wepal" />
+			<feature name="slot" value="palwap" />
 			<dataarea name="rom" size="65536">
 				<rom name="WappingEditor-1.30.rom" size="65536" crc="26431b44" sha1="2bb36ec8f22ab1858ffd4da343d131140b29a46d" offset="0"/>
 			</dataarea>
@@ -7659,7 +8050,7 @@
 	</software>
 
 	<software name="wordpwr">
-		<description>Word Power</description>
+		<description>WordPower</description>
 		<year>1986</year>
 		<publisher>Ian Copestake</publisher>
 		<part name="rom1" interface="bbc_rom">

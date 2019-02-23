@@ -922,6 +922,7 @@ void vt100_video_device::device_add_mconfig(machine_config &config)
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 }
 
-MACHINE_CONFIG_START(rainbow_video_device::device_add_mconfig)
-	MCFG_PALETTE_ADD("palette", 4)
-MACHINE_CONFIG_END
+void rainbow_video_device::device_add_mconfig(machine_config &config)
+{
+	PALETTE(config, m_palette).set_entries(4);
+}

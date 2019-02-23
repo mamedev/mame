@@ -650,7 +650,7 @@ MACHINE_CONFIG_START(microvision_state::microvision)
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(0)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	MCFG_SCREEN_UPDATE_DRIVER(microvision_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, microvision_state, screen_vblank))
@@ -662,16 +662,17 @@ MACHINE_CONFIG_START(microvision_state::microvision)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", DAC_2BIT_BINARY_WEIGHTED_ONES_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	DAC_2BIT_BINARY_WEIGHTED_ONES_COMPLEMENT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "microvision_cart")
 	MCFG_GENERIC_MANDATORY
 	MCFG_GENERIC_LOAD(microvision_state, microvsn_cart)
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","microvision")
+	SOFTWARE_LIST(config, "cart_list").set_original("microvision");
 MACHINE_CONFIG_END
 
 

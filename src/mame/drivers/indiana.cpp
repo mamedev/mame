@@ -101,7 +101,6 @@ MACHINE_CONFIG_START(indiana_state::indiana)
 
 	// FIXME: determine ISA bus clock
 	isa16_device &isa(ISA16(config, ISABUS_TAG, 0));
-	isa.set_cputag(M68K_TAG);
 	isa.set_custom_spaces();
 
 	MCFG_DEVICE_ADD("isa1", ISA16_SLOT, 0, ISABUS_TAG, indiana_isa_cards, "vga", false)

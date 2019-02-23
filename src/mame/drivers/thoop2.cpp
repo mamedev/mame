@@ -263,15 +263,15 @@ static GFXDECODE_START( gfx_thoop2 )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(thoop2_state::thoop2)
-
+void thoop2_state::thoop2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000,XTAL(24'000'000) / 2) // 12MHz verified
-	MCFG_DEVICE_PROGRAM_MAP(thoop2_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", thoop2_state,  irq6_line_hold)
+	M68000(config, m_maincpu, XTAL(24'000'000) / 2); // 12MHz verified
+	m_maincpu->set_addrmap(AS_PROGRAM, &thoop2_state::thoop2_map);
+	m_maincpu->set_vblank_int("screen", FUNC(thoop2_state::irq6_line_hold));
 
-	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL(24'000'000) / 2) // 12MHz verified
-	MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
+	gaelco_ds5002fp_device &ds5002fp(GAELCO_DS5002FP(config, "gaelco_ds5002fp", XTAL(24'000'000) / 2)); // 12MHz verified
+	ds5002fp.set_addrmap(0, &thoop2_state::mcu_hostmem_map);
 
 	LS259(config, m_outlatch);
 	m_outlatch->q_out_cb<0>().set(FUNC(thoop2_state::coin1_lockout_w));
@@ -284,24 +284,24 @@ MACHINE_CONFIG_START(thoop2_state::thoop2)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59.24)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*16, 32*16)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(thoop2_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(59.24);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(32*16, 32*16);
+	screen.set_visarea(0, 320-1, 16, 256-1);
+	screen.set_screen_update(FUNC(thoop2_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_thoop2)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_thoop2);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(1'000'000), okim6295_device::PIN7_HIGH) // 1MHz resonator - pin 7 not connected
-	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL(1'000'000), okim6295_device::PIN7_HIGH)); // 1MHz resonator - pin 7 not connected
+	oki.set_addrmap(0, &thoop2_state::oki_map);
+	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 

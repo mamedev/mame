@@ -202,10 +202,14 @@ class gtrak10_state : public driver_device
 public:
 	gtrak10_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_video(*this, "fixfreq")
 	{
 	}
 
 	void gtrak10(machine_config &config);
+
+private:
+	required_device<fixedfreq_device> m_video;
 };
 
 static NETLIST_START(atarikee)
@@ -330,12 +334,13 @@ MACHINE_CONFIG_START(atarikee_state::atarikee)
 	MCFG_NETLIST_SETUP(atarikee)
 
 	/* video hardware */
-	MCFG_FIXFREQ_ADD("fixfreq", "screen")
-	MCFG_FIXFREQ_MONITOR_CLOCK(MASTER_CLOCK)
-	MCFG_FIXFREQ_HORZ_PARAMS(H_TOTAL-67,H_TOTAL-40,H_TOTAL-8,H_TOTAL)
-	MCFG_FIXFREQ_VERT_PARAMS(V_TOTAL-22,V_TOTAL-19,V_TOTAL-12,V_TOTAL)
-	MCFG_FIXFREQ_FIELDCOUNT(1)
-	MCFG_FIXFREQ_SYNC_THRESHOLD(0.30)
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	FIXFREQ(config, m_video).set_screen("screen");
+	m_video->set_monitor_clock(MASTER_CLOCK);
+	m_video->set_horz_params(H_TOTAL-67,H_TOTAL-40,H_TOTAL-8,H_TOTAL);
+	m_video->set_vert_params(V_TOTAL-22,V_TOTAL-19,V_TOTAL-12,V_TOTAL);
+	m_video->set_fieldcount(1);
+	m_video->set_threshold(0.30);
 MACHINE_CONFIG_END
 
 //#define STUNTCYC_NL_CLOCK (14318181*69)
@@ -360,12 +365,12 @@ MACHINE_CONFIG_START(stuntcyc_state::stuntcyc)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(stuntcyc_state, screen_update_stuntcyc)
 	MCFG_SCREEN_RAW_PARAMS(SC_HTOTAL*SC_VTOTAL*60, SC_HTOTAL, 0, SC_HTOTAL, SC_VTOTAL, 0, SC_VTOTAL)
-	//MCFG_FIXFREQ_ADD("fixfreq", "screen")
-	//MCFG_FIXFREQ_MONITOR_CLOCK(SC_VIDCLOCK)
-	//MCFG_FIXFREQ_HORZ_PARAMS(SC_HTOTAL-67,SC_HTOTAL-40,SC_HTOTAL-8, SC_HTOTAL)
-	//MCFG_FIXFREQ_VERT_PARAMS(SC_VTOTAL-22,SC_VTOTAL-19,SC_VTOTAL-12,SC_VTOTAL)
-	//MCFG_FIXFREQ_FIELDCOUNT(1)
-	//MCFG_FIXFREQ_SYNC_THRESHOLD(0.30)
+	//FIXFREQ(config, m_video).set_screen("screen");
+	//m_video->set_monitor_clock(SC_VIDCLOCK);
+	//m_video->set_horz_params(SC_HTOTAL-67,SC_HTOTAL-40,SC_HTOTAL-8, SC_HTOTAL);
+	//m_video->set_vert_params(SC_VTOTAL-22,SC_VTOTAL-19,SC_VTOTAL-12,SC_VTOTAL);
+	//m_video->set_fieldcount(1);
+	//m_video->set_threshold(0.30);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gtrak10_state::gtrak10)
@@ -373,7 +378,7 @@ MACHINE_CONFIG_START(gtrak10_state::gtrak10)
 	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)
 	MCFG_NETLIST_SETUP(gtrak10)
 
-	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "vid0", "VIDEO_OUT", fixedfreq_device, update_vid, "fixfreq")
+	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "vid0", "VIDEO_OUT", fixedfreq_device, update_composite_monochrome, "fixfreq")
 
 	/* video hardware */
 
@@ -396,15 +401,16 @@ MACHINE_CONFIG_START(gtrak10_state::gtrak10)
 	   Vert Back Porch  =   0
 	*/
 
-	MCFG_FIXFREQ_ADD("fixfreq", "screen")
-	MCFG_FIXFREQ_MONITOR_CLOCK(GTRAK10_VIDCLOCK)
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	FIXFREQ(config, m_video).set_screen("screen");
+	m_video->set_monitor_clock(GTRAK10_VIDCLOCK);
 	//                    Length of active video,   end of front-porch,   end of sync signal,  end of line/frame
-	MCFG_FIXFREQ_HORZ_PARAMS(GTRAK10_HTOTAL*1 - 32,  GTRAK10_HTOTAL*1 - 32,  GTRAK10_HTOTAL*1 - 31,     GTRAK10_HTOTAL*1)
-	//MCFG_FIXFREQ_HORZ_PARAMS(GTRAK10_HTOTAL - 32,  GTRAK10_HTOTAL - 32,  GTRAK10_HTOTAL - 31,     GTRAK10_HTOTAL)
-	MCFG_FIXFREQ_VERT_PARAMS( GTRAK10_VTOTAL - 8,   GTRAK10_VTOTAL - 8,       GTRAK10_VTOTAL,     GTRAK10_VTOTAL)
-	MCFG_FIXFREQ_FIELDCOUNT(2)
-	MCFG_FIXFREQ_SYNC_THRESHOLD(1.0)
-	//MCFG_FIXFREQ_GAIN(1.50)
+	m_video->set_horz_params(GTRAK10_HTOTAL*1 - 32,  GTRAK10_HTOTAL*1 - 32,  GTRAK10_HTOTAL*1 - 31,     GTRAK10_HTOTAL*1);
+	//m_video->set_horz_params(GTRAK10_HTOTAL - 32,  GTRAK10_HTOTAL - 32,  GTRAK10_HTOTAL - 31,     GTRAK10_HTOTAL);
+	m_video->set_vert_params( GTRAK10_VTOTAL - 8,   GTRAK10_VTOTAL - 8,       GTRAK10_VTOTAL,     GTRAK10_VTOTAL);
+	m_video->set_fieldcount(2);
+	m_video->set_threshold(1.0);
+	//m_video->set_gain(1.50);
 
 MACHINE_CONFIG_END
 

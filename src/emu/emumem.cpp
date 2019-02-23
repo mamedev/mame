@@ -962,8 +962,7 @@ address_space_config::address_space_config()
 		m_logaddr_width(0),
 		m_page_shift(0),
 		m_is_octal(false),
-		m_internal_map(address_map_constructor()),
-		m_default_map(address_map_constructor())
+		m_internal_map(address_map_constructor())
 {
 }
 
@@ -974,9 +973,8 @@ address_space_config::address_space_config()
  @param addrwidth address bits
  @param addrshift
  @param internal
- @param defmap
  */
-address_space_config::address_space_config(const char *name, endianness_t endian, u8 datawidth, u8 addrwidth, s8 addrshift, address_map_constructor internal, address_map_constructor defmap)
+address_space_config::address_space_config(const char *name, endianness_t endian, u8 datawidth, u8 addrwidth, s8 addrshift, address_map_constructor internal)
 	: m_name(name),
 		m_endianness(endian),
 		m_data_width(datawidth),
@@ -985,12 +983,11 @@ address_space_config::address_space_config(const char *name, endianness_t endian
 		m_logaddr_width(addrwidth),
 		m_page_shift(0),
 		m_is_octal(false),
-		m_internal_map(internal),
-		m_default_map(defmap)
+		m_internal_map(internal)
 {
 }
 
-address_space_config::address_space_config(const char *name, endianness_t endian, u8 datawidth, u8 addrwidth, s8 addrshift, u8 logwidth, u8 pageshift, address_map_constructor internal, address_map_constructor defmap)
+address_space_config::address_space_config(const char *name, endianness_t endian, u8 datawidth, u8 addrwidth, s8 addrshift, u8 logwidth, u8 pageshift, address_map_constructor internal)
 	: m_name(name),
 		m_endianness(endian),
 		m_data_width(datawidth),
@@ -999,8 +996,7 @@ address_space_config::address_space_config(const char *name, endianness_t endian
 		m_logaddr_width(logwidth),
 		m_page_shift(pageshift),
 		m_is_octal(false),
-		m_internal_map(internal),
-		m_default_map(defmap)
+		m_internal_map(internal)
 {
 }
 

@@ -112,8 +112,4 @@ DECLARE_DEVICE_TYPE(VECTREX_CART_SLOT, vectrex_cart_slot_device)
 
 #define VECSLOT_ROM_REGION_TAG ":cart:rom"
 
-#define MCFG_VECTREX_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
-	MCFG_DEVICE_ADD(_tag, VECTREX_CART_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-
 #endif // MAME_BUS_VECTREX_SLOT_H

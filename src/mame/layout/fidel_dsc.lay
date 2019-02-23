@@ -477,10 +477,10 @@
 			<bounds x="104" y="-11.5" width="5.66" height="8.5" />
 		</bezel>
 
-		<bezel name="x.x" element="led">
+		<bezel name="1.7" element="led">
 			<bounds x="96.76" y="-10" width="0.85" height="0.85" />
 		</bezel>
-		<bezel name="x.x" element="led">
+		<bezel name="0.7" element="led">
 			<bounds x="96.31" y="-5.35" width="0.85" height="0.85" />
 		</bezel>
 

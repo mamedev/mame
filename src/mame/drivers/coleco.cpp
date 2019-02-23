@@ -108,7 +108,7 @@ void coleco_state::coleco_io_map(address_map &map)
 	map(0xa0, 0xa0).mirror(0x1e).rw("tms9928a", FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));
 	map(0xa1, 0xa1).mirror(0x1e).rw("tms9928a", FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));
 	map(0xc0, 0xc0).mirror(0x1f).w(FUNC(coleco_state::paddle_on_w));
-	map(0xe0, 0xe0).mirror(0x1f).w("sn76489a", FUNC(sn76489a_device::command_w));
+	map(0xe0, 0xe0).mirror(0x1f).w("sn76489a", FUNC(sn76489a_device::write));
 	map(0xe0, 0xe0).mirror(0x1d).r(FUNC(coleco_state::paddle_1_r));
 	map(0xe2, 0xe2).mirror(0x1d).r(FUNC(coleco_state::paddle_2_r));
 }
@@ -232,7 +232,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(coleco_state::paddle_update_callback)
 
 READ8_MEMBER( coleco_state::cart_r )
 {
-	return m_cart->bd_r(space, offset & 0x7fff, 0, 0, 0, 0, 0);
+	return m_cart->bd_r(offset & 0x7fff, 0, 0, 0, 0, 0);
 }
 
 uint8_t coleco_state::coleco_scan_paddles(uint8_t *joy_status0, uint8_t *joy_status1)

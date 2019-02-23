@@ -759,7 +759,7 @@ MACHINE_CONFIG_START(ace_state::ace)
 	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(6'500'000)/2)
 	MCFG_DEVICE_PROGRAM_MAP(ace_mem)
 	MCFG_DEVICE_IO_MAP(ace_io)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	// video hardware
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
@@ -767,16 +767,16 @@ MACHINE_CONFIG_START(ace_state::ace)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(6'500'000), 416, 0, 336, 312, 0, 304)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("set_irq", ace_state, set_irq, SCREEN_TAG, 31*8, 264)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("clear_irq", ace_state, clear_irq, SCREEN_TAG, 32*8, 264)
+	TIMER(config, "set_irq").configure_scanline(FUNC(ace_state::set_irq), SCREEN_TAG, 31*8, 264);
+	TIMER(config, "clear_irq").configure_scanline(FUNC(ace_state::clear_irq), SCREEN_TAG, 32*8, 264);
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ace)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_ace);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	AY8910(config, AY8910_TAG, XTAL(6'500'000) / 2).add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -785,12 +785,12 @@ MACHINE_CONFIG_START(ace_state::ace)
 	m_sp0256->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	// devices
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_FORMATS(ace_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
-	MCFG_CASSETTE_INTERFACE("jupace_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(ace_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_STOPPED);
+	m_cassette->set_interface("jupace_cass");
 
-	MCFG_SNAPSHOT_ADD("snapshot", ace_state, ace, "ace", 1)
+	MCFG_SNAPSHOT_ADD("snapshot", ace_state, ace, "ace", attotime::from_seconds(1))
 
 	I8255A(config, m_ppi);
 	m_ppi->in_pb_callback().set(FUNC(ace_state::sby_r));
@@ -802,13 +802,15 @@ MACHINE_CONFIG_START(ace_state::ace)
 	m_z80pio->out_pa_callback().set(FUNC(ace_state::pio_pa_w));
 	m_z80pio->out_pb_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("1K").set_extra_options("16K,32K,48K");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "jupace_cass")
+	SOFTWARE_LIST(config, "cass_list").set_original("jupace_cass");
 MACHINE_CONFIG_END
 
 

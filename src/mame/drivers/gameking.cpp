@@ -308,16 +308,18 @@ MACHINE_CONFIG_START(gameking_state::gameking)
 	MCFG_GENERIC_LOAD(gameking_state, gameking_cart)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(gameking_state::gameking1)
+void gameking_state::gameking1(machine_config &config)
+{
 	gameking(config);
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "gameking")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_original("gameking");
+}
 
-MACHINE_CONFIG_START(gameking_state::gameking3)
+void gameking_state::gameking3(machine_config &config)
+{
 	gameking(config);
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "gameking")
-	MCFG_SOFTWARE_LIST_ADD("cart_list_3", "gameking3")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_original("gameking");
+	SOFTWARE_LIST(config, "cart_list_3").set_original("gameking3");
+}
 
 
 ROM_START(gameking)

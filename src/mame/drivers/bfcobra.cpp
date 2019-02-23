@@ -1684,11 +1684,10 @@ MACHINE_CONFIG_START(bfcobra_state::bfcobra)
 	m_acia6850_2->txd_handler().set(FUNC(bfcobra_state::data_acia_tx_w));
 	m_acia6850_2->irq_handler().set(FUNC(bfcobra_state::m6809_data_irq));
 
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, 31250*16) // What are the correct ACIA clocks ?
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, bfcobra_state, write_acia_clock))
+	clock_device &acia_clock(CLOCK(config, "acia_clock", 31250*16)); // What are the correct ACIA clocks ?
+	acia_clock.signal_handler().set(FUNC(bfcobra_state::write_acia_clock));
 
-	MCFG_DEVICE_ADD("meters", METERS, 0)
-	MCFG_METERS_NUMBER(8)
+	METERS(config, m_meters, 0).set_number(8);
 MACHINE_CONFIG_END
 
 /***************************************************************************

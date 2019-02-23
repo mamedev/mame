@@ -300,7 +300,7 @@ READ16_MEMBER( sun2_state::tl_mmu_r )
 		switch ((m_pagemap[entry] >> 22) & 7)
 		{
 			case 0: // type 0 space
-				return m_type0space->read16(space, tmp, mem_mask);
+				return m_type0space->read16(tmp, mem_mask);
 
 			case 1: // type 1 space
 				// EPROM space is special: the MMU has a trap door
@@ -326,13 +326,13 @@ READ16_MEMBER( sun2_state::tl_mmu_r )
 				}
 
 				//printf("read device space @ %x\n", tmp<<1);
-				return m_type1space->read16(space, tmp, mem_mask);
+				return m_type1space->read16(tmp, mem_mask);
 
 			case 2: // type 2 space
-				return m_type2space->read16(space, tmp, mem_mask);
+				return m_type2space->read16(tmp, mem_mask);
 
 			case 3: // type 3 space
-				return m_type3space->read16(space, tmp, mem_mask);
+				return m_type3space->read16(tmp, mem_mask);
 		}
 	}
 	else
@@ -445,20 +445,20 @@ WRITE16_MEMBER( sun2_state::tl_mmu_w )
 		switch ((m_pagemap[entry] >> 22) & 7)
 		{
 			case 0: // type 0
-				m_type0space->write16(space, tmp, data, mem_mask);
+				m_type0space->write16(tmp, data, mem_mask);
 				return;
 
 			case 1: // type 1
 				//printf("write device space @ %x\n", tmp<<1);
-				m_type1space->write16(space, tmp, data, mem_mask);
+				m_type1space->write16(tmp, data, mem_mask);
 				return;
 
 			case 2: // type 2
-				m_type2space->write16(space, tmp, data, mem_mask);
+				m_type2space->write16(tmp, data, mem_mask);
 				return;
 
 			case 3: // type 3
-				m_type3space->write16(space, tmp, data, mem_mask);
+				m_type3space->write16(tmp, data, mem_mask);
 				return;
 		}
 	}
@@ -611,10 +611,11 @@ void sun2_state::machine_reset()
 	m_maincpu->reset();
 }
 
-MACHINE_CONFIG_START(sun2_state::sun2vme)
+void sun2_state::sun2vme(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68010, 19.6608_MHz_XTAL / 2) // or 24_MHz_XTAL / 2 by jumper setting
-	MCFG_DEVICE_PROGRAM_MAP(sun2_mem)
+	M68010(config, m_maincpu, 19.6608_MHz_XTAL / 2); // or 24_MHz_XTAL / 2 by jumper setting
+	m_maincpu->set_addrmap(AS_PROGRAM, &sun2_state::sun2_mem);
 
 	RAM(config, RAM_TAG).set_default_size("2M").set_extra_options("4M,6M,8M").set_default_value(0x00);
 
@@ -630,11 +631,11 @@ MACHINE_CONFIG_START(sun2_state::sun2vme)
 	// MMU Type 3 device space
 	ADDRESS_MAP_BANK(config, "type3").set_map(&sun2_state::vmetype3space_map).set_options(ENDIANNESS_BIG, 16, 32, 0x1000000);
 
-	MCFG_SCREEN_ADD("bwtwo", RASTER)
-	MCFG_SCREEN_UPDATE_DRIVER(sun2_state, bw2_update)
-	MCFG_SCREEN_SIZE(1152,900)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1152-1, 0, 900-1)
-	MCFG_SCREEN_REFRESH_RATE(72)
+	screen_device &bwtwo(SCREEN(config, "bwtwo", SCREEN_TYPE_RASTER));
+	bwtwo.set_screen_update(FUNC(sun2_state::bw2_update));
+	bwtwo.set_size(1152,900);
+	bwtwo.set_visarea(0, 1152-1, 0, 900-1);
+	bwtwo.set_refresh_hz(72);
 
 	am9513a_device &timer(AM9513A(config, "timer", 19.6608_MHz_XTAL / 4));
 	timer.fout_cb().set("timer", FUNC(am9513_device::gate1_w));
@@ -644,8 +645,7 @@ MACHINE_CONFIG_START(sun2_state::sun2vme)
 	timer.out4_cb().set("irq5", FUNC(input_merger_device::in_w<2>));
 	timer.out5_cb().set("irq5", FUNC(input_merger_device::in_w<3>));
 
-	MCFG_INPUT_MERGER_ANY_HIGH("irq5") // 74LS05 open collectors
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M68K_IRQ_5))
+	INPUT_MERGER_ANY_HIGH(config, "irq5").output_handler().set_inputline(m_maincpu, M68K_IRQ_5); // 74LS05 open collectors
 
 	SCC8530N(config, SCC1_TAG, 19.6608_MHz_XTAL / 4);
 	scc8530_device& scc2(SCC8530N(config, SCC2_TAG, 19.6608_MHz_XTAL / 4));
@@ -662,12 +662,13 @@ MACHINE_CONFIG_START(sun2_state::sun2vme)
 	rs232b.rxd_handler().set(SCC2_TAG, FUNC(z80scc_device::rxb_w));
 	rs232b.dcd_handler().set(SCC2_TAG, FUNC(z80scc_device::dcdb_w));
 	rs232b.cts_handler().set(SCC2_TAG, FUNC(z80scc_device::ctsb_w));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(sun2_state::sun2mbus)
+void sun2_state::sun2mbus(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68010, 39.3216_MHz_XTAL / 4)
-	MCFG_DEVICE_PROGRAM_MAP(sun2_mem)
+	M68010(config, m_maincpu, 39.3216_MHz_XTAL / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sun2_state::sun2_mem);
 
 	RAM(config, RAM_TAG).set_default_size("2M").set_extra_options("4M").set_default_value(0x00);
 
@@ -683,11 +684,11 @@ MACHINE_CONFIG_START(sun2_state::sun2mbus)
 	// MMU Type 3 device space
 	ADDRESS_MAP_BANK(config, "type3").set_map(&sun2_state::mbustype3space_map).set_options(ENDIANNESS_BIG, 16, 32, 0x1000000);
 
-	MCFG_SCREEN_ADD("bwtwo", RASTER)
-	MCFG_SCREEN_UPDATE_DRIVER(sun2_state, bw2_update)
-	MCFG_SCREEN_SIZE(1152,900)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1152-1, 0, 900-1)
-	MCFG_SCREEN_REFRESH_RATE(72)
+	screen_device &bwtwo(SCREEN(config, "bwtwo", SCREEN_TYPE_RASTER));
+	bwtwo.set_screen_update(FUNC(sun2_state::bw2_update));
+	bwtwo.set_size(1152,900);
+	bwtwo.set_visarea(0, 1152-1, 0, 900-1);
+	bwtwo.set_refresh_hz(72);
 
 	am9513a_device &timer(AM9513A(config, "timer", 39.3216_MHz_XTAL / 8));
 	timer.fout_cb().set("timer", FUNC(am9513_device::gate1_w));
@@ -697,8 +698,7 @@ MACHINE_CONFIG_START(sun2_state::sun2mbus)
 	timer.out4_cb().set("irq5", FUNC(input_merger_device::in_w<2>));
 	timer.out5_cb().set("irq5", FUNC(input_merger_device::in_w<3>));
 
-	MCFG_INPUT_MERGER_ANY_HIGH("irq5") // 74LS05 open collectors
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M68K_IRQ_5))
+	INPUT_MERGER_ANY_HIGH(config, "irq5").output_handler().set_inputline(m_maincpu, M68K_IRQ_5); // 74LS05 open collectors
 
 	SCC8530N(config, SCC1_TAG, 39.3216_MHz_XTAL / 8);
 	scc8530_device& scc2(SCC8530N(config, SCC2_TAG, 39.3216_MHz_XTAL / 8));
@@ -717,7 +717,7 @@ MACHINE_CONFIG_START(sun2_state::sun2mbus)
 	rs232b.cts_handler().set(SCC2_TAG, FUNC(z80scc_device::ctsb_w));
 
 	MM58167(config, "rtc", 32.768_kHz_XTAL);
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( sun2_120 ) // ROMs are located on the '501-1007' CPU PCB at locations B11 and B10; J400 is set to 1-2 for 27128 EPROMs and 3-4 for 27256 EPROMs

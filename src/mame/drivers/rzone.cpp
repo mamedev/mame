@@ -40,8 +40,8 @@
 class rzone_state : public hh_sm510_state
 {
 public:
-	rzone_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_sm510_state(mconfig, type, tag),
+	rzone_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag),
 		m_led_out(*this, "led"),
 		m_led_off(*this, "led_off")
 	{ }
@@ -257,8 +257,8 @@ MACHINE_CONFIG_START(rzone_state::rzbatfor)
 	MCFG_SCREEN_SIZE(1368, 1080)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1368-1, 0, 1080-1)
 
-	MCFG_TIMER_DRIVER_ADD("led_off", rzone_state, led_off_callback)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, m_led_off).configure_generic(FUNC(rzone_state::led_off_callback));
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_rzone);
 
 	/* sound hardware */
@@ -283,8 +283,8 @@ MACHINE_CONFIG_START(rzone_state::rztoshden)
 	MCFG_SCREEN_SIZE(1392, 1080)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1392-1, 0, 1080-1)
 
-	MCFG_TIMER_DRIVER_ADD("led_off", rzone_state, led_off_callback)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, m_led_off).configure_generic(FUNC(rzone_state::led_off_callback));
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_rzone);
 
 	/* sound hardware */
@@ -309,8 +309,8 @@ MACHINE_CONFIG_START(rzone_state::rzindy500)
 	MCFG_SCREEN_SIZE(1425, 1080)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1425-1, 0, 1080-1)
 
-	MCFG_TIMER_DRIVER_ADD("led_off", rzone_state, led_off_callback)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, m_led_off).configure_generic(FUNC(rzone_state::led_off_callback));
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_rzone);
 
 	/* sound hardware */

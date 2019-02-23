@@ -310,7 +310,7 @@ TIMER_CALLBACK_MEMBER(m72_state::delayed_ram16_w)
 	uint16_t mem_mask = (BIT(param, 28) ? 0xff00 : 0x0000) | (BIT(param, 27) ? 0x00ff : 0x0000);
 
 	logerror("MB8421/MB8431 left_w(0x%03x, 0x%04x, 0x%04x)\n", offset, val, mem_mask);
-	m_dpram->left_w(machine().dummy_space(), offset, val, mem_mask);
+	m_dpram->left_w(offset, val, mem_mask);
 }
 
 TIMER_CALLBACK_MEMBER(m72_state::delayed_ram8_w)
@@ -319,9 +319,9 @@ TIMER_CALLBACK_MEMBER(m72_state::delayed_ram8_w)
 	uint16_t offset = (param >> 9) & 0x07ff;
 
 	if (BIT(param, 8))
-		m_dpram->right_w(machine().dummy_space(), offset, val << 8, 0xff00);
+		m_dpram->right_w(offset, val << 8, 0xff00);
 	else
-		m_dpram->right_w(machine().dummy_space(), offset, val, 0x00ff);
+		m_dpram->right_w(offset, val, 0x00ff);
 }
 
 
@@ -337,7 +337,7 @@ WRITE8_MEMBER(m72_state::mcu_data_w)
 
 READ8_MEMBER(m72_state::mcu_data_r)
 {
-	return (m_dpram->right_r(space, offset >> 1) >> (BIT(offset, 0) ? 8 : 0)) & 0xff;
+	return (m_dpram->right_r(offset >> 1) >> (BIT(offset, 0) ? 8 : 0)) & 0xff;
 }
 
 READ8_MEMBER(m72_state::mcu_sample_r)
@@ -1822,7 +1822,6 @@ void m72_state::m72_audio_chips(machine_config &config)
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.2); // unknown DAC
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
@@ -1971,7 +1970,7 @@ MACHINE_CONFIG_START(m72_state::rtype2)
 	m_upd71059c->out_int_callback().set_inputline(m_maincpu, 0);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rtype2)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rtype2);
 	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2016,7 +2015,7 @@ MACHINE_CONFIG_START(m72_state::cosmccop)
 	// upd71059c isn't needed because the V35 has its own IRQ controller
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rtype2)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rtype2);
 	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2061,7 +2060,7 @@ MACHINE_CONFIG_START(m72_state::m82)
 	m_upd71059c->out_int_callback().set_inputline(m_maincpu, 0);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_majtitle)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_majtitle);
 	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2104,7 +2103,7 @@ MACHINE_CONFIG_START(m72_state::poundfor)
 	m_upd4701[1]->set_porty_tag("TRACK1_Y");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rtype2)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rtype2);
 	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -535,7 +535,7 @@ WRITE8_MEMBER( pasopia7_state::pasopia7_6845_w )
 	if(offset == 0)
 	{
 		m_addr_latch = data;
-		m_crtc->address_w(space, offset, data);
+		m_crtc->address_w(data);
 	}
 	else
 	{
@@ -547,7 +547,7 @@ WRITE8_MEMBER( pasopia7_state::pasopia7_6845_w )
 		else if(m_addr_latch == 0x0f)
 			m_cursor_addr = (m_cursor_addr & 0x3f00) | (data & 0xff);
 
-		m_crtc->register_w(space, offset, data);
+		m_crtc->register_w(data);
 
 		/* double pump the pixel clock if we are in 640 x 200 mode */
 		if(m_screen_type == 1) // raster
@@ -919,7 +919,8 @@ static void pasopia7_floppies(device_slot_interface &device)
 	device.option_add("525hd", FLOPPY_525_HD);
 }
 
-MACHINE_CONFIG_START(pasopia7_state::p7_base)
+void pasopia7_state::p7_base(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(4'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &pasopia7_state::pasopia7_mem);
@@ -929,11 +930,9 @@ MACHINE_CONFIG_START(pasopia7_state::p7_base)
 	/* Audio */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("sn1", SN76489A, 1996800) // unknown clock / divider
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SN76489A(config, m_sn1, 1996800).add_route(ALL_OUTPUTS, "mono", 0.50); // unknown clock / divider
 
-	MCFG_DEVICE_ADD("sn2", SN76489A, 1996800) // unknown clock / divider
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SN76489A(config, m_sn2, 1996800).add_route(ALL_OUTPUTS, "mono", 0.50); // unknown clock / divider
 
 	/* Devices */
 	Z80CTC(config, m_ctc, XTAL(4'000'000));
@@ -965,9 +964,9 @@ MACHINE_CONFIG_START(pasopia7_state::p7_base)
 	m_ppi2->out_pc_callback().set(FUNC(pasopia7_state::nmi_reg_w));
 
 	UPD765A(config, m_fdc, 8'000'000, true, true);
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pasopia7_floppies, "525hd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pasopia7_floppies, "525hd", floppy_image_device::default_floppy_formats)
-MACHINE_CONFIG_END
+	FLOPPY_CONNECTOR(config, "fdc:0", pasopia7_floppies, "525hd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", pasopia7_floppies, "525hd", floppy_image_device::default_floppy_formats);
+}
 
 MACHINE_CONFIG_START(pasopia7_state::p7_raster)
 	p7_base(config);

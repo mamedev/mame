@@ -112,7 +112,7 @@ void vp550_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 //  vip_program_w - program write
 //-------------------------------------------------
 
-void vp550_device::vip_program_w(address_space &space, offs_t offset, uint8_t data, int cdef, int *minh)
+void vp550_device::vip_program_w(offs_t offset, uint8_t data, int cdef, int *minh)
 {
 	if (BIT(offset, 15))
 	{
@@ -122,14 +122,14 @@ void vp550_device::vip_program_w(address_space &space, offs_t offset, uint8_t da
 		{
 		case 1: m_pfg_a->write_str(data); break;
 		case 2: m_pfg_b->write_str(data); break;
-		case 3: octave_w(space, offset, data); break;
+		case 3: octave_w(data); break;
 		}
 
 		switch ((offset >> 4) & 0x03)
 		{
-		case 1: vlmna_w(space, offset, data); break;
-		case 2: vlmnb_w(space, offset, data); break;
-		case 3: sync_w(space, offset, data); break;
+		case 1: vlmna_w(data); break;
+		case 2: vlmnb_w(data); break;
+		case 3: sync_w(data); break;
 		}
 	}
 }
@@ -179,7 +179,7 @@ void vp550_device::vip_run_w(int state)
 //  octave_w - octave select write
 //-------------------------------------------------
 
-WRITE8_MEMBER( vp550_device::octave_w )
+void vp550_device::octave_w(uint8_t data)
 {
 	int channel = (data >> 2) & 0x03;
 	int clock2 = 0;
@@ -209,7 +209,7 @@ WRITE8_MEMBER( vp550_device::octave_w )
 //  vlmna_w - channel A amplitude write
 //-------------------------------------------------
 
-WRITE8_MEMBER( vp550_device::vlmna_w )
+void vp550_device::vlmna_w(uint8_t data)
 {
 	if (LOG) logerror("VP550 '%s' A Volume: %u\n", tag(), data & 0x0f);
 
@@ -223,7 +223,7 @@ WRITE8_MEMBER( vp550_device::vlmna_w )
 //  vlmnb_w - channel B amplitude write
 //-------------------------------------------------
 
-WRITE8_MEMBER( vp550_device::vlmnb_w )
+void vp550_device::vlmnb_w(uint8_t data)
 {
 	if (LOG) logerror("VP550 '%s' B Volume: %u\n", tag(), data & 0x0f);
 
@@ -237,7 +237,7 @@ WRITE8_MEMBER( vp550_device::vlmnb_w )
 //  sync_w - interrupt enable write
 //-------------------------------------------------
 
-WRITE8_MEMBER( vp550_device::sync_w )
+void vp550_device::sync_w(uint8_t data)
 {
 	if (LOG) logerror("VP550 '%s' Interrupt Enable: %u\n", tag(), BIT(data, 0));
 

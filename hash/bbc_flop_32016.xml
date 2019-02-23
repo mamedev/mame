@@ -3,11 +3,6 @@
 
 <!-- Acorn BBC Micro - 32016 Co-Processor Discs -->
 
-<!-- Loading Instructions:
-
-      Hold down the SHIFT key and press and release the BREAK key.
--->
-
 <softwarelist name="bbc_flop_32016" description="Acorn 32016 Co-Processor discs">
 
 	<software name="panos11" cloneof="panos14" supported="no">
@@ -15,7 +10,7 @@
 		<year>1985</year>
 		<publisher>Acorn Computers</publisher>
 		<info name="format" value="DFS" />
-		<info name="compatibility" value="32016 co-processor" />
+		<info name="usage" value="Requires 32016 co-processor" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="PanOS Startup and Utilities"/>
 			<dataarea name="flop" size="407552">
@@ -65,7 +60,7 @@
 		<year>1985</year>
 		<publisher>Acorn Computers</publisher>
 		<info name="format" value="DFS" />
-		<info name="compatibility" value="32016 co-processor" />
+		<info name="usage" value="Requires 32016 co-processor" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="PanOS Startup and Utilities"/>
 			<dataarea name="flop" size="384768">
@@ -109,5 +104,97 @@
 			</dataarea>
 		</part>
 	</software>
+
+	<!-- Scientific Software -->
+
+	<software name="gcal" supported="no">
+		<description>GCAL</description>
+		<year>1986</year>
+		<publisher>Acorn Computers</publisher>
+		<info name="release" value="SSS01" />
+		<info name="format" value="DFS" />
+		<info name="usage" value="Requires 32016 co-processor" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="346112">
+				<rom name="gcal.ssd" size="346112" crc="726d0a0f" sha1="918c63ee6f590fb4de5c8ec2f598f8bc7eede49a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bcpl" supported="no">
+		<description>BCPL</description>
+		<year>1986</year>
+		<publisher>Acorn Computers</publisher>
+		<info name="release" value="SSS02" />
+		<info name="format" value="DFS" />
+		<info name="usage" value="Requires 32016 co-processor" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="32016"/>
+			<dataarea name="flop" size="123136">
+				<rom name="bcpl_32016.ssd" size="123136" crc="bd2cb7b8" sha1="9531729ff41be02e243fd301594d2003bb5a6a29" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="16032"/>
+			<dataarea name="flop" size="166166">
+				<rom name="bcpl_16032.ssd" size="166144" crc="6b497945" sha1="8212ef33115da4c5cc2ecbd0a3013666dc0dae54" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- 1986 SSS03 SPICE -->
+
+	<software name="reduce" supported="no">
+		<description>Reduce</description>
+		<year>1986</year>
+		<publisher>Acorn Computers</publisher>
+		<info name="release" value="SSS04" />
+		<info name="format" value="DFS" />
+		<info name="usage" value="Requires 32016 co-processor" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disc 1"/>
+			<dataarea name="flop" size="373504">
+				<rom name="reduce_1_image_files.dsd" size="373504" crc="e35c610e" sha1="aeea0e8387104c55d010d3647d78ee368b81200a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disc 2"/>
+			<dataarea name="flop" size="380416">
+				<rom name="reduce_2_image_files.dsd" size="380416" crc="bb77b6b1" sha1="748a0de19608f3dc3cd48434f99d0a0f3bb93ff0" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disc 3"/>
+			<dataarea name="flop" size="381184">
+				<rom name="reduce_3_image_files.dsd" size="381184" crc="692d5b61" sha1="2b2ab33c40e04844cccbf59fc896087d55c8884e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disc 4: Documentation"/>
+			<dataarea name="flop" size="333824">
+				<rom name="reduce_4_documentation.dsd" size="333824" crc="7745de76" sha1="9b77bfe0adbdacdefce6ffae961623d9cd6994b2" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disc 5"/>
+			<dataarea name="flop" size="400128">
+				<rom name="reduce_5_source_files.dsd" size="400128" crc="1e18dfeb" sha1="e663538bbe926152ff347d63cf22d6bcd0e073ce" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disc 6"/>
+			<dataarea name="flop" size="404736">
+				<rom name="reduce_6_source_files.dsd" size="404736" crc="7f1b9386" sha1="2cef49e910be2b5cd007dca7aca0ba71a9f00871" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Disc 7"/>
+			<dataarea name="flop" size="402432">
+				<rom name="reduce_7_source_files.dsd" size="402432" crc="8df7cdb4" sha1="bb475e58ce61000d23edac85b91f1954a1e866de" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- 1987 SSS06 Kermit -->
 
 </softwarelist>

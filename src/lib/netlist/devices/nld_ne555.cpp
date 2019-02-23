@@ -98,8 +98,17 @@ namespace netlist
 		state_var<bool> m_last_out;
 		state_var<bool> m_ff;
 
-		inline nl_double clamp(const nl_double v, const nl_double a, const nl_double b);
+		nl_double clamp(const nl_double v, const nl_double a, const nl_double b)
+		{
+			nl_double ret = v;
+			nl_double vcc = m_R1.m_P();
 
+			if (ret >  vcc - a)
+				ret = vcc - a;
+			if (ret < b)
+				ret = b;
+			return ret;
+		}
 	};
 
 	NETLIB_OBJECT_DERIVED(NE555_dip, NE555)
@@ -117,24 +126,12 @@ namespace netlist
 		}
 	};
 
-	inline nl_double NETLIB_NAME(NE555)::clamp(const nl_double v, const nl_double a, const nl_double b)
-	{
-		nl_double ret = v;
-		nl_double vcc = m_R1.m_P();
-
-		if (ret >  vcc - a)
-			ret = vcc - a;
-		if (ret < b)
-			ret = b;
-		return ret;
-	}
-
 	NETLIB_RESET(NE555)
 	{
-		m_R1.do_reset();
-		m_R2.do_reset();
-		m_R3.do_reset();
-		m_RDIS.do_reset();
+		m_R1.reset();
+		m_R2.reset();
+		m_R3.reset();
+		m_RDIS.reset();
 
 		/* FIXME make resistance a parameter, properly model other variants */
 		m_R1.set_R(5000);
@@ -166,13 +163,13 @@ namespace netlist
 
 		if (m_last_out && !out)
 		{
-			m_RDIS.update_dev();
+			m_RDIS.update();
 			m_OUT.push(m_R3.m_N());
 			m_RDIS.set_R(R_ON);
 		}
 		else if (!m_last_out && out)
 		{
-			m_RDIS.update_dev();
+			m_RDIS.update();
 			// FIXME: Should be delayed by 100ns
 			m_OUT.push(m_R1.m_P());
 			m_RDIS.set_R(R_OFF);
@@ -180,8 +177,8 @@ namespace netlist
 		m_last_out = out;
 	}
 
-	NETLIB_DEVICE_IMPL(NE555)
-	NETLIB_DEVICE_IMPL(NE555_dip)
+	NETLIB_DEVICE_IMPL(NE555, 	  "NE555", "")
+	NETLIB_DEVICE_IMPL(NE555_dip, "NE555_DIP", "")
 
 	} //namespace devices
 } // namespace netlist

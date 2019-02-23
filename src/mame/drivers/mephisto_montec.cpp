@@ -500,7 +500,7 @@ MACHINE_CONFIG_START(mephisto_montec_state::mondial2)
 	MCFG_DEVICE_PROGRAM_MAP(mondial2_mem)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(mephisto_montec_state, nmi_line_pulse, XTAL(2'000'000) / (1 << 12))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("refresh_leds", mephisto_montec_state, refresh_leds, attotime::from_hz(10))
+	TIMER(config, "refresh_leds").configure_periodic(FUNC(mephisto_montec_state::refresh_leds), attotime::from_hz(10));
 	config.set_default_layout(layout_mephisto_mondial2);
 MACHINE_CONFIG_END
 
@@ -517,8 +517,8 @@ MACHINE_CONFIG_START(mephisto_montec_state::smondial2)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(smondial2_mem)
 
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "smondial2_cart")
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "smondial2")
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "smondial2_cart");
+	SOFTWARE_LIST(config, "cart_list").set_original("smondial2");
 
 	config.set_default_layout(layout_mephisto_smondial2);
 MACHINE_CONFIG_END

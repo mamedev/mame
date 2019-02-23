@@ -43,7 +43,7 @@ bool n8x300_disassembler::is_src_rot(uint16_t opcode)
 
 u32 n8x300_disassembler::opcode_alignment() const
 {
-	return 2;
+	return 1;
 }
 
 offs_t n8x300_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
@@ -51,7 +51,7 @@ offs_t n8x300_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 	unsigned startpc = pc;
 	uint16_t opcode = opcodes.r16(pc);
 	uint8_t inst = opcode >> 13;
-	pc+=2;
+	pc+=1;
 
 	// determine instruction
 	switch (inst)
@@ -127,7 +127,7 @@ offs_t n8x300_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 		}
 		break;
 	case 0x07:
-		util::stream_format(stream, "JMP  %04XH", (opcode & 0x1fff) << 1);
+		util::stream_format(stream, "JMP  %04XH", (opcode & 0x1fff));
 		break;
 	}
 

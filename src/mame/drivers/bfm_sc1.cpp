@@ -1073,10 +1073,11 @@ INPUT_PORTS_END
 // machine driver for scorpion1 board ///////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
-MACHINE_CONFIG_START(bfm_sc1_state::scorpion1)
-	MCFG_DEVICE_ADD("maincpu", M6809, MASTER_CLOCK/4)          // 6809 CPU at 1 Mhz
-	MCFG_DEVICE_PROGRAM_MAP(sc1_base)                      // setup read and write memorymap
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(bfm_sc1_state, timer_irq,  1000)               // generate 1000 IRQ's per second
+void bfm_sc1_state::scorpion1(machine_config &config)
+{
+	M6809(config, m_maincpu, MASTER_CLOCK/4);          // 6809 CPU at 1 Mhz
+	m_maincpu->set_addrmap(AS_PROGRAM, &bfm_sc1_state::sc1_base);                        // setup read and write memorymap
+	m_maincpu->set_periodic_int(FUNC(bfm_sc1_state::timer_irq), attotime::from_hz(1000));              // generate 1000 IRQ's per second
 
 	WATCHDOG_TIMER(config, "watchdog").set_time(PERIOD_OF_555_MONOSTABLE(120000,100e-9));
 
@@ -1102,37 +1103,37 @@ MACHINE_CONFIG_START(bfm_sc1_state::scorpion1)
 	REEL(config, m_reels[5], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
 	m_reels[5]->optic_handler().set(FUNC(bfm_sc1_state::reel_optic_cb<5>));
 
-	MCFG_DEVICE_ADD("meters", METERS, 0)
-	MCFG_METERS_NUMBER(8)
-MACHINE_CONFIG_END
+	METERS(config, m_meters, 0).set_number(8);
+}
 
 /////////////////////////////////////////////////////////////////////////////////////
 // machine driver for scorpion1 board + adder2 extension ////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
-MACHINE_CONFIG_START(bfm_sc1_state::scorpion1_adder2)
+void bfm_sc1_state::scorpion1_adder2(machine_config &config)
+{
 	scorpion1(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(sc1_adder2)                // setup read and write memorymap
+	m_maincpu->set_addrmap(AS_PROGRAM, &bfm_sc1_state::sc1_adder2); // setup read and write memorymap
 
 	config.set_default_layout(layout_sc1_vid);
 
 	BFM_ADDER2(config, "adder2", 0);
-MACHINE_CONFIG_END
+}
 
 /////////////////////////////////////////////////////////////////////////////////////
 // machine driver for scorpion1 board ///////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
-MACHINE_CONFIG_START(bfm_sc1_state::scorpion1_viper)
+void bfm_sc1_state::scorpion1_viper(machine_config &config)
+{
 	scorpion1(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(sc1_viper)                 // setup read and write memorymap
 
-	MCFG_DEVICE_ADD("upd",UPD7759)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &bfm_sc1_state::sc1_viper); // setup read and write memorymap
+
+	UPD7759(config, m_upd7759);
+	m_upd7759->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
 void bfm_sc1_state::sc1_common_init(int reels, int decrypt, int defaultbank)

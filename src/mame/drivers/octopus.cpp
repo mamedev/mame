@@ -968,17 +968,17 @@ MACHINE_CONFIG_START(octopus_state::octopus)
 	m_kb_uart->rts_handler().set(FUNC(octopus_state::beep_w));
 	rs232_port_device &keyboard_port(RS232_PORT(config, "keyboard_port", keyboard, "octopus"));
 	keyboard_port.rxd_handler().set(m_kb_uart, FUNC(i8251_device::write_rxd));
-	MCFG_DEVICE_ADD("keyboard_clock_rx", CLOCK, 9600 * 64)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(m_kb_uart,i8251_device,write_rxc))
-	MCFG_DEVICE_ADD("keyboard_clock_tx", CLOCK, 1200 * 64)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(m_kb_uart,i8251_device,write_txc))
+	clock_device &keyboard_clock_rx(CLOCK(config, "keyboard_clock_rx", 9600 * 64));
+	keyboard_clock_rx.signal_handler().set(m_kb_uart, FUNC(i8251_device::write_rxc));
+	clock_device &keyboard_clock_tx(CLOCK(config, "keyboard_clock_tx", 1200 * 64));
+	keyboard_clock_tx.signal_handler().set(m_kb_uart, FUNC(i8251_device::write_txc));
 
 	FD1793(config, m_fdc, 16_MHz_XTAL / 8);
 	m_fdc->intrq_wr_callback().set(m_pic1, FUNC(pic8259_device::ir5_w));
 	m_fdc->drq_wr_callback().set(m_dma2, FUNC(am9517a_device::dreq1_w));
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", octopus_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", octopus_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_SOFTWARE_LIST_ADD("fd_list","octopus")
+	FLOPPY_CONNECTOR(config, "fdc:0", octopus_floppies, "525dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", octopus_floppies, "525dd", floppy_image_device::default_floppy_formats);
+	SOFTWARE_LIST(config, "fd_list").set_original("octopus");
 
 	PIT8253(config, m_pit, 0);
 	m_pit->set_clk<0>(4.9152_MHz_XTAL / 2);  // DART channel A
@@ -1008,9 +1008,9 @@ MACHINE_CONFIG_START(octopus_state::octopus)
 	serial_b.cts_handler().set(m_serial, FUNC(z80sio_device::ctsb_w)).invert();
 	//serial_b.ri_handler().set(m_serial, FUNC(z80sio_device::rib_w)).invert();
 
-	MCFG_DEVICE_ADD(m_parallel, CENTRONICS, octopus_centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, octopus_state, parallel_busy_w))
-	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(*this, octopus_state, parallel_slctout_w))
+	CENTRONICS(config, m_parallel, octopus_centronics_devices, "printer");
+	m_parallel->busy_handler().set(FUNC(octopus_state::parallel_busy_w));
+	m_parallel->select_handler().set(FUNC(octopus_state::parallel_slctout_w));
 	// TODO: Winchester HD controller (Xebec/SASI compatible? uses TTL logic)
 
 	/* video hardware */

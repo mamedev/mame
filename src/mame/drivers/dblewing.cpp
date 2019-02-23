@@ -364,10 +364,9 @@ MACHINE_CONFIG_START(dblewing_state::dblewing)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_IO_MAP(sound_io)
 
-	MCFG_INPUT_MERGER_ANY_HIGH("soundirq")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", 0))
+	INPUT_MERGER_ANY_HIGH(config, "soundirq").output_handler().set_inputline(m_audiocpu, 0);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 
 	/* video hardware */
@@ -380,7 +379,7 @@ MACHINE_CONFIG_START(dblewing_state::dblewing)
 	MCFG_SCREEN_PALETTE("palette")
 
 	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 4096);
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dblewing)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_dblewing);
 
 	DECO16IC(config, m_deco_tilegen, 0);
 	m_deco_tilegen->set_split(0);

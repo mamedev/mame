@@ -10,13 +10,14 @@
             Walter Fath
 
     abcheck TODOs:
-    - GFX rom banking is a mystery (bad ROMs? Encryption?)
+    - Ending has a rowscroll GFX bug;
     - Where is the extra data ROM mapped?
 
     gynotai TODOs:
-    - printer (disable it in service mode);
+    - printer (disable it in service mode to suppress POST error);
     - ball sensors aren't understood;
-    - Seems to dislike our YGV608 row/colscroll handling;
+    - Seems to dislike our YGV608 row/colscroll handling
+      (for example vertical bounding box is halved offset & size wise for Pac-Man goal stage);
 
     To make abcheck run when the EEPROM is clear:
     - F2 to enter service mode
@@ -379,7 +380,7 @@ MACHINE_CONFIG_START(namcond1_state::namcond1)
 	MCFG_DEVICE_IO_MAP( nd1h8iomap)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcond1_state,  mcu_interrupt)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	YGV608(config, m_ygv608, 0);
 	m_ygv608->set_palette("palette");

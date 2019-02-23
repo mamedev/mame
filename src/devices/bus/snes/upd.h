@@ -37,9 +37,9 @@ protected:
 	void dsp_data_map_lorom(address_map &map);
 	void dsp_prg_map_lorom(address_map &map);
 
-private:
 	required_device<upd7725_device> m_upd7725;
 
+private:
 	std::vector<uint32_t> m_dsp_prg;
 	std::vector<uint16_t> m_dsp_data;
 };
@@ -71,9 +71,9 @@ protected:
 	void dsp_data_map_hirom(address_map &map);
 	void dsp_prg_map_hirom(address_map &map);
 
-private:
 	required_device<upd7725_device> m_upd7725;
 
+private:
 	std::vector<uint32_t> m_dsp_prg;
 	std::vector<uint16_t> m_dsp_data;
 };
@@ -102,9 +102,9 @@ protected:
 	void st01x_data_map(address_map &map);
 	void st01x_prg_map(address_map &map);
 
-private:
 	required_device<upd96050_device> m_upd96050;
 
+private:
 	std::vector<uint32_t> m_dsp_prg;
 	std::vector<uint16_t> m_dsp_data;
 };

@@ -30,7 +30,7 @@ namespace netlist
 		logic_input_t m_RC;
 		logic_input_t m_IN;
 
-		state_var<uint16_t[5]> m_buffer;
+		state_array<uint16_t, 5> m_buffer;
 
 		logic_output_t m_OUT;
 	};
@@ -116,7 +116,7 @@ namespace netlist
 		/* do nothing */
 	}
 
-	inline NETLIB_FUNC_VOID(Am2847_shifter, shift, (void))
+	NETLIB_FUNC_VOID(Am2847_shifter, shift, ())
 	{
 		uint32_t out = m_buffer[0] & 1;
 		uint32_t in = (m_RC() ? out : m_IN());
@@ -130,8 +130,8 @@ namespace netlist
 		m_OUT.push(out, NLTIME_FROM_NS(200));
 	}
 
-	NETLIB_DEVICE_IMPL(AM2847)
-	NETLIB_DEVICE_IMPL(AM2847_dip)
+	NETLIB_DEVICE_IMPL(AM2847,     "TTL_AM2847",     "+CP,+INA,+INB,+INC,+IND,+RCA,+RCB,+RCC,+RCD")
+	NETLIB_DEVICE_IMPL(AM2847_dip, "TTL_AM2847_DIP", "")
 
 	} //namespace devices
 } // namespace netlist

@@ -216,18 +216,18 @@ void nightgal_state::nightgal_palette(palette_device &palette) const
 		bit0 = BIT(color_prom[i], 0);
 		bit1 = BIT(color_prom[i], 1);
 		bit2 = BIT(color_prom[i], 2);
-		int const r = combine_3_weights(weights_rg, bit0, bit1, bit2);
+		int const r = combine_weights(weights_rg, bit0, bit1, bit2);
 
 		// green component
 		bit0 = BIT(color_prom[i], 3);
 		bit1 = BIT(color_prom[i], 4);
 		bit2 = BIT(color_prom[i], 5);
-		int const g = combine_3_weights(weights_rg, bit0, bit1, bit2);
+		int const g = combine_weights(weights_rg, bit0, bit1, bit2);
 
 		// blue component
 		bit0 = BIT(color_prom[i], 6);
 		bit1 = BIT(color_prom[i], 7);
-		int const b = combine_2_weights(weights_b, bit0, bit1);
+		int const b = combine_weights(weights_b, bit0, bit1);
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -794,14 +794,14 @@ MACHINE_CONFIG_START(nightgal_state::royalqn)
 	MCFG_DEVICE_ADD("maincpu", Z80,MASTER_CLOCK / 8)        /* ? MHz */
 	MCFG_DEVICE_PROGRAM_MAP(royalqn_map)
 	MCFG_DEVICE_IO_MAP(royalqn_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", nightgal_state,  irq0_line_hold)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", nightgal_state, irq0_line_hold)
 
 	MCFG_DEVICE_ADD("sub", NSC8105, MASTER_CLOCK / 8)
 	MCFG_DEVICE_PROGRAM_MAP(royalqn_nsc_map)
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
-	MCFG_JANGOU_BLITTER_ADD("blitter", MASTER_CLOCK/4)
+	JANGOU_BLITTER(config, m_blitter, MASTER_CLOCK/4);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -835,14 +835,15 @@ MACHINE_CONFIG_START(nightgal_state::sexygal)
 	MCFG_DEVICE_ADD("audiocpu", NSC8105, MASTER_CLOCK / 8)
 	MCFG_DEVICE_PROGRAM_MAP(sexygal_audio_map)
 
-	MCFG_DEVICE_ADD("sampleclk", CLOCK, 6000) // quite a wild guess
-	MCFG_CLOCK_SIGNAL_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	clock_device &sampleclk(CLOCK(config, "sampleclk", 6000)); // quite a wild guess
+	sampleclk.signal_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "mono", 0.25); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
-	MCFG_DEVICE_REMOVE("aysnd")
+	config.device_remove("aysnd");
 
 	ym2203_device &ymsnd(YM2203(config, "ymsnd", MASTER_CLOCK / 8));
 	ymsnd.port_a_read_callback().set(FUNC(nightgal_state::input_1p_r));
@@ -856,8 +857,8 @@ MACHINE_CONFIG_START(nightgal_state::sweetgal)
 	MCFG_DEVICE_PROGRAM_MAP(sweetgal_map)
 
 	// doesn't have the extra NSC8105 (so how does this play samples?)
-	MCFG_DEVICE_REMOVE("audiocpu")
-	MCFG_DEVICE_REMOVE("sampleclk")
+	config.device_remove("audiocpu");
+	config.device_remove("sampleclk");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nightgal_state::ngalsumr)
@@ -876,8 +877,8 @@ MACHINE_CONFIG_START(nightgal_state::sgaltrop)
 	MCFG_DEVICE_MODIFY("sub")
 	MCFG_DEVICE_PROGRAM_MAP(sgaltrop_nsc_map)
 
-	MCFG_DEVICE_REMOVE("audiocpu")
-	MCFG_DEVICE_REMOVE("sampleclk")
+	config.device_remove("audiocpu");
+	config.device_remove("sampleclk");
 MACHINE_CONFIG_END
 
 /*

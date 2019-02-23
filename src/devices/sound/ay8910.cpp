@@ -120,7 +120,7 @@
 
 /***************************************************************************
 
-  ay8910.c
+  ay8910.cpp
 
   Emulation of the AY-3-8910 / YM2149 sound chip.
 
@@ -511,6 +511,56 @@ Yamaha YMZ294: limited info: 0 I/O port
     between 4MHz (H) and 6MHz (L), while pin 10 is /TEST.
 OKI M5255, Winbond WF19054, JFC 95101, File KC89C72, Toshiba T7766A : differences to be listed
 
+AY8930 Expanded mode registers :
+	Bank Register Bits
+	A    0        xxxx xxxx Channel A Tone period fine tune
+	A    1        xxxx xxxx Channel A Tone period coarse tune
+	A    2        xxxx xxxx Channel B Tone period fine tune
+	A    3        xxxx xxxx Channel B Tone period coarse tune
+	A    4        xxxx xxxx Channel C Tone period fine tune
+	A    5        xxxx xxxx Channel C Tone period coarse tune
+	A    6        xxxx xxxx Noise period
+	A    7        x--- ---- I/O Port B input(0) / output(1)
+	              -x-- ---- I/O Port A input(0) / output(1)
+	              --x- ---- Channel C Noise enable(0) / disable(1)
+	              ---x ---- Channel B Noise enable(0) / disable(1)
+	              ---- x--- Channel A Noise enable(0) / disable(1)
+	              ---- -x-- Channel C Tone enable(0) / disable(1)
+	              ---- --x- Channel B Tone enable(0) / disable(1)
+	              ---- ---x Channel A Tone enable(0) / disable(1)
+	A    8        --x- ---- Channel A Envelope mode
+	              ---x xxxx Channel A Tone volume
+	A    9        --x- ---- Channel B Envelope mode
+	              ---x xxxx Channel B Tone volume
+	A    A        --x- ---- Channel C Envelope mode
+	              ---x xxxx Channel C Tone volume
+	A    B        xxxx xxxx Channel A Envelope period fine tune
+	A    C        xxxx xxxx Channel A Envelope period coarse tune
+	A    D        101- ---- 101 = Expanded mode enable, other AY-3-8910A Compatiblity mode
+	              ---0 ---- 0 for Register Bank A
+	              ---- xxxx Channel A Envelope Shape/Cycle
+	A    E        xxxx xxxx 8 bit Parallel I/O on Port A
+	A    F        xxxx xxxx 8 bit Parallel I/O on Port B
+
+	B    0        xxxx xxxx Channel B Envelope period fine tune
+	B    1        xxxx xxxx Channel B Envelope period coarse tune
+	B    2        xxxx xxxx Channel C Envelope period fine tune
+	B    3        xxxx xxxx Channel C Envelope period coarse tune
+	B    4        ---- xxxx Channel B Envelope Shape/Cycle
+	B    5        ---- xxxx Channel C Envelope Shape/Cycle
+	B    6        ---- xxxx Channel A Duty Cycle
+	B    7        ---- xxxx Channel B Duty Cycle
+	B    8        ---- xxxx Channel C Duty Cycle
+	B    9        xxxx xxxx Noise "And" Mask
+	B    A        xxxx xxxx Noise "Or" Mask
+	B    B        Reserved (Read as 0)
+	B    C        Reserved (Read as 0)
+	B    D        101- ---- 101 = Expanded mode enable, other AY-3-8910A Compatiblity mode
+	              ---1 ---- 1 for Register Bank B
+	              ---- xxxx Channel A Envelope Shape
+	B    E        Reserved (Read as 0)
+	B    F        Test (Function unknown)
+
 Decaps:
 AY-3-8914 - http://siliconpr0n.org/map/gi/ay-3-8914/mz_mit20x/
 AY-3-8910 - http://privatfrickler.de/blick-auf-den-chip-soundchip-general-instruments-ay-3-8910/
@@ -735,7 +785,7 @@ static const ay8910_device::mosfet_param ay8910_mosfet_param =
  *
  *************************************/
 
-static inline void build_3D_table(double rl, const ay8910_device::ay_ym_param *par, const ay8910_device::ay_ym_param *par_env, int normalize, double factor, int zero_is_off, int32_t *tab)
+static inline void build_3D_table(double rl, const ay8910_device::ay_ym_param *par, const ay8910_device::ay_ym_param *par_env, int normalize, double factor, int zero_is_off, s32 *tab)
 {
 	double min = 10.0,  max = 0.0;
 
@@ -794,7 +844,7 @@ static inline void build_3D_table(double rl, const ay8910_device::ay_ym_param *p
 	/* for (e=0;e<16;e++) printf("%d %d\n",e<<10, tab[e<<10]); */
 }
 
-static inline void build_single_table(double rl, const ay8910_device::ay_ym_param *par, int normalize, int32_t *tab, int zero_is_off)
+static inline void build_single_table(double rl, const ay8910_device::ay_ym_param *par, int normalize, s32 *tab, int zero_is_off)
 {
 	int j;
 	double rt;
@@ -833,7 +883,7 @@ static inline void build_single_table(double rl, const ay8910_device::ay_ym_para
 
 }
 
-static inline void build_mosfet_resistor_table(const ay8910_device::mosfet_param &par, const double rd, int32_t *tab)
+static inline void build_mosfet_resistor_table(const ay8910_device::mosfet_param &par, const double rd, s32 *tab)
 {
 	int j;
 
@@ -857,7 +907,7 @@ static inline void build_mosfet_resistor_table(const ay8910_device::mosfet_param
 }
 
 
-uint16_t ay8910_device::mix_3D()
+u16 ay8910_device::mix_3D()
 {
 	int indx = 0, chan;
 
@@ -889,6 +939,7 @@ uint16_t ay8910_device::mix_3D()
 void ay8910_device::ay8910_write_reg(int r, int v)
 {
 	//if (r >= 11 && r <= 13 ) printf("%d %x %02x\n", PSG->index, r, v);
+	device_type chip_type = type();
 	m_regs[r] = v;
 
 	switch( r )
@@ -930,6 +981,14 @@ void ay8910_device::ay8910_write_reg(int r, int v)
 			m_last_enable = m_regs[AY_ENABLE];
 			break;
 		case AY_ESHAPE:
+			if (chip_type == AY8930)
+			{
+				m_mode = (v >> 4) & 0xf;
+				if ((m_mode & 0xe) == 0xa) // AY8930 expanded mode
+					logerror("warning: activated unemulated extended mode at %s, bank %02x\n", name(), m_mode & 1);
+				else if (m_mode & 0xf)
+					logerror("warning: activated unknown mode %02x at %s\n", m_mode & 0xf, name());
+			}
 			if ( (v & 0x0f) > 0)
 				osd_printf_verbose("EShape\n");
 			m_attack = (m_regs[AY_ESHAPE] & 0x04) ? m_env_step_mask : 0x00;
@@ -1175,6 +1234,7 @@ void ay8910_device::ay8910_statesave()
 	save_item(NAME(m_attack));
 	save_item(NAME(m_holding));
 	save_item(NAME(m_rng));
+	save_item(NAME(m_mode));
 }
 
 //-------------------------------------------------
@@ -1202,7 +1262,7 @@ void ay8910_device::device_start()
 		m_streams = 1;
 	}
 
-	m_vol3d_table = make_unique_clear<int32_t[]>(8*32*32*32);
+	m_vol3d_table = make_unique_clear<s32[]>(8*32*32*32);
 
 	build_mixer_table();
 
@@ -1233,7 +1293,7 @@ void ay8910_device::ay8910_reset_ym()
 	m_count_env = 0;
 	m_prescale_noise = 0;
 	m_last_enable = -1;  /* force a write */
-	for (i = 0;i < AY_PORTA;i++)
+	for (i = 0; i < AY_PORTA; i++)
 		ay8910_write_reg(i,0);
 	m_ready = 1;
 #if ENABLE_REGISTER_TEST
@@ -1278,7 +1338,7 @@ void ay8910_device::device_clock_changed()
 	ay_set_clock(clock());
 }
 
-void ay8910_device::ay8910_write_ym(int addr, uint8_t data)
+void ay8910_device::ay8910_write_ym(int addr, u8 data)
 {
 	if (addr & 1)
 	{
@@ -1309,7 +1369,7 @@ void ay8910_device::ay8910_write_ym(int addr, uint8_t data)
 	}
 }
 
-uint8_t ay8910_device::ay8910_read_ym()
+u8 ay8910_device::ay8910_read_ym()
 {
 	device_type chip_type = type();
 	int r = m_register_latch;
@@ -1358,13 +1418,13 @@ uint8_t ay8910_device::ay8910_read_ym()
 	- YM2149: no anomaly
 	*/
 	if (chip_type == AY8910) {
-		const uint8_t mask[0x10]={
+		const u8 mask[0x10]={
 			0xff,0x0f,0xff,0x0f,0xff,0x0f,0x1f,0xff,0x1f,0x1f,0x1f,0xff,0xff,0x0f,0xff,0xff
 		};
 		return m_regs[r] & mask[r];
 	}
 	else if (chip_type == AY8914) {
-		const uint8_t mask[0x10]={
+		const u8 mask[0x10]={
 			0xff,0x0f,0xff,0x0f,0xff,0x0f,0x1f,0xff,0x3f,0x3f,0x3f,0xff,0xff,0x0f,0xff,0xff
 		};
 		return m_regs[r] & mask[r];
@@ -1394,74 +1454,69 @@ void ay8910_device::device_reset()
  *
  *************************************/
 
-READ8_MEMBER( ay8910_device::data_r )
-{
-	return ay8910_read_ym();
-}
-
-WRITE8_MEMBER( ay8910_device::address_w )
+void ay8910_device::address_w(u8 data)
 {
 #if ENABLE_REGISTER_TEST
 	return;
 #else
-	data_address_w(space, 1, data);
+	ay8910_write_ym(0, data);
 #endif
 }
 
-WRITE8_MEMBER( ay8910_device::data_w )
+void ay8910_device::data_w(u8 data)
 {
 #if ENABLE_REGISTER_TEST
 	return;
 #else
-	data_address_w(space, 0, data);
+	ay8910_write_ym(1, data);
 #endif
 }
 
 // here, BC1 is hooked up to A0 on the host and BC2 is hooked up to A1
-WRITE8_MEMBER( ay8910_device::write_bc1_bc2 )
+void ay8910_device::write_bc1_bc2(offs_t offset, u8 data)
 {
 	switch (offset & 3)
 	{
 	case 0: // latch address
-		address_w(space, 0, data);
+		address_w(data);
 		break;
 	case 1: // inactive
 		break;
 	case 2: // write to psg
-		data_w(space, 0, data);
+		data_w(data);
 		break;
 	case 3: // latch address
-		address_w(space, 0, data);
+		address_w(data);
 		break;
 	}
 }
 
-static const int mapping8914to8910[16] = { 0, 2, 4, 11, 1, 3, 5, 12, 7, 6, 13, 8, 9, 10, 14, 15 };
+static const u8 mapping8914to8910[16] = { 0, 2, 4, 11, 1, 3, 5, 12, 7, 6, 13, 8, 9, 10, 14, 15 };
 
-READ8_MEMBER( ay8914_device::read )
+u8 ay8914_device::read(offs_t offset)
 {
-	uint16_t rv;
-	address_w(space, 0, mapping8914to8910[offset & 0xf]);
-	rv = (uint16_t) data_r(space, 0);
+	u8 rv;
+	address_w(mapping8914to8910[offset & 0xf]);
+	rv = data_r();
 	return rv;
 }
 
-WRITE8_MEMBER( ay8914_device::write )
+void ay8914_device::write(offs_t offset, u8 data)
 {
-	address_w(space, 0, mapping8914to8910[offset & 0xf]);
-	data_w(space, 0, data & 0xff);
+	address_w(mapping8914to8910[offset & 0xf]);
+	data_w(data & 0xff);
 }
 
 
 
 DEFINE_DEVICE_TYPE(AY8910, ay8910_device, "ay8910", "AY-3-8910A PSG")
 
-ay8910_device::ay8910_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ay8910_device::ay8910_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: ay8910_device(mconfig, AY8910, tag, owner, clock, PSG_TYPE_AY, 3, 2)
 {
 }
 
-ay8910_device::ay8910_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock,
+ay8910_device::ay8910_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock,
 								psg_type_t psg_type, int streams, int ioports)
 	: device_t(mconfig, type, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
@@ -1483,6 +1538,7 @@ ay8910_device::ay8910_device(const machine_config &mconfig, device_type type, co
 		m_attack(0),
 		m_holding(0),
 		m_rng(0),
+		m_mode(0),
 		m_env_step_mask(psg_type == PSG_TYPE_AY ? 0x0f : 0x1f),
 		m_step(         psg_type == PSG_TYPE_AY ? 2 : 1),
 		m_zero_is_off(  psg_type == PSG_TYPE_AY ? 1 : 0),
@@ -1528,7 +1584,7 @@ void ay8910_device::set_type(psg_type_t psg_type)
 
 DEFINE_DEVICE_TYPE(AY8912, ay8912_device, "ay8912", "AY-3-8912A PSG")
 
-ay8912_device::ay8912_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ay8912_device::ay8912_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: ay8910_device(mconfig, AY8912, tag, owner, clock, PSG_TYPE_AY, 3, 1)
 {
 }
@@ -1536,7 +1592,7 @@ ay8912_device::ay8912_device(const machine_config &mconfig, const char *tag, dev
 
 DEFINE_DEVICE_TYPE(AY8913, ay8913_device, "ay8913", "AY-3-8913 PSG")
 
-ay8913_device::ay8913_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ay8913_device::ay8913_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: ay8910_device(mconfig, AY8913, tag, owner, clock, PSG_TYPE_AY, 3, 0)
 {
 }
@@ -1544,7 +1600,7 @@ ay8913_device::ay8913_device(const machine_config &mconfig, const char *tag, dev
 
 DEFINE_DEVICE_TYPE(AY8914, ay8914_device, "ay8914", "AY-3-8914A PSG")
 
-ay8914_device::ay8914_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ay8914_device::ay8914_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: ay8910_device(mconfig, AY8914, tag, owner, clock, PSG_TYPE_AY, 3, 2)
 {
 }
@@ -1552,7 +1608,7 @@ ay8914_device::ay8914_device(const machine_config &mconfig, const char *tag, dev
 
 DEFINE_DEVICE_TYPE(AY8930, ay8930_device, "ay8930", "AY8930 EPSG")
 
-ay8930_device::ay8930_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ay8930_device::ay8930_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: ay8910_device(mconfig, AY8930, tag, owner, clock, PSG_TYPE_AY, 3, 2)
 {
 }
@@ -1560,7 +1616,7 @@ ay8930_device::ay8930_device(const machine_config &mconfig, const char *tag, dev
 
 DEFINE_DEVICE_TYPE(YM2149, ym2149_device, "ym2149", "YM2149 SSG")
 
-ym2149_device::ym2149_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ym2149_device::ym2149_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: ay8910_device(mconfig, YM2149, tag, owner, clock, PSG_TYPE_YM, 3, 2)
 {
 }
@@ -1568,7 +1624,7 @@ ym2149_device::ym2149_device(const machine_config &mconfig, const char *tag, dev
 
 DEFINE_DEVICE_TYPE(YM3439, ym3439_device, "ym3439", "YM3439 SSGC")
 
-ym3439_device::ym3439_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ym3439_device::ym3439_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: ay8910_device(mconfig, YM3439, tag, owner, clock, PSG_TYPE_YM, 3, 2)
 {
 }
@@ -1576,7 +1632,7 @@ ym3439_device::ym3439_device(const machine_config &mconfig, const char *tag, dev
 
 DEFINE_DEVICE_TYPE(YMZ284, ymz284_device, "ymz284", "YMZ284 SSGL")
 
-ymz284_device::ymz284_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ymz284_device::ymz284_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: ay8910_device(mconfig, YMZ284, tag, owner, clock, PSG_TYPE_YM, 1, 0)
 {
 }
@@ -1584,7 +1640,7 @@ ymz284_device::ymz284_device(const machine_config &mconfig, const char *tag, dev
 
 DEFINE_DEVICE_TYPE(YMZ294, ymz294_device, "ymz294", "YMZ294 SSGLP")
 
-ymz294_device::ymz294_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ymz294_device::ymz294_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: ay8910_device(mconfig, YMZ294, tag, owner, clock, PSG_TYPE_YM, 1, 0)
 {
 }

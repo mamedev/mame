@@ -6,8 +6,8 @@
  */
 
 #include "../nl_base.h"
-#include "../nl_factory.h"
 #include "../analog/nlid_twoterm.h"
+#include "../nl_factory.h"
 
 namespace netlist
 {
@@ -39,7 +39,7 @@ namespace netlist
 
 	NETLIB_UPDATE_PARAM(r2r_dac)
 	{
-		update_dev();
+		solve_now();
 
 		double V = m_VIN() / static_cast<double>(1 << m_num())
 				* static_cast<double>(m_val());
@@ -49,7 +49,7 @@ namespace netlist
 	} //namespace analog
 
 	namespace devices {
-		NETLIB_DEVICE_IMPL_NS(analog, r2r_dac)
-	}
+		NETLIB_DEVICE_IMPL_NS(analog, r2r_dac, "R2R_DAC", "VIN,R,N")
+	} // namespace devices
 
 } // namespace netlist

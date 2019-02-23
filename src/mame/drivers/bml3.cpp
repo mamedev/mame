@@ -107,9 +107,6 @@ public:
 	DECLARE_WRITE8_MEMBER(bml3_firq_mask_w);
 	DECLARE_READ8_MEMBER(bml3_firq_status_r);
 	DECLARE_WRITE8_MEMBER(relay_w);
-	DECLARE_WRITE_LINE_MEMBER(bml3bus_nmi_w);
-	DECLARE_WRITE_LINE_MEMBER(bml3bus_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(bml3bus_firq_w);
 	DECLARE_WRITE_LINE_MEMBER(bml3_acia_tx_w);
 	DECLARE_WRITE_LINE_MEMBER(bml3_acia_rts_w);
 	DECLARE_WRITE_LINE_MEMBER(bml3_acia_irq_w);
@@ -195,9 +192,9 @@ private:
 READ8_MEMBER( bml3_state::bml3_6845_r )
 {
 	if (offset)
-		return m_crtc->register_r(space, 0);
+		return m_crtc->register_r();
 	else
-		return m_crtc->status_r(space, 0);
+		return m_crtc->status_r();
 }
 
 WRITE8_MEMBER( bml3_state::bml3_6845_w )
@@ -205,12 +202,12 @@ WRITE8_MEMBER( bml3_state::bml3_6845_w )
 	if(offset == 0)
 	{
 		m_crtc_index = data;
-		m_crtc->address_w(space, 0, data);
+		m_crtc->address_w(data);
 	}
 	else
 	{
 		m_crtc_vreg[m_crtc_index] = data;
-		m_crtc->register_w(space, 0, data);
+		m_crtc->register_w(data);
 	}
 }
 
@@ -305,14 +302,14 @@ READ8_MEMBER(bml3_state::bml3_ym2203_r)
 {
 	u8 dev_offs = ((m_psg_latch & 3) != 3);
 
-	return m_ym2203->read(space, dev_offs);
+	return m_ym2203->read(dev_offs);
 }
 
 WRITE8_MEMBER(bml3_state::bml3_ym2203_w)
 {
 	u8 dev_offs = ((m_psg_latch & 3) != 3);
 
-	m_ym2203->write(space, dev_offs, data);
+	m_ym2203->write(dev_offs, data);
 }
 
 READ8_MEMBER( bml3_state::bml3_vram_attr_r)
@@ -384,21 +381,6 @@ READ8_MEMBER( bml3_state::bml3_firq_status_r )
 	m_firq_status = 0;
 	m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 	return res;
-}
-
-WRITE_LINE_MEMBER(bml3_state::bml3bus_nmi_w)
-{
-	m_maincpu->set_input_line(INPUT_LINE_NMI, state);
-}
-
-WRITE_LINE_MEMBER(bml3_state::bml3bus_irq_w)
-{
-	m_maincpu->set_input_line(M6809_IRQ_LINE, state);
-}
-
-WRITE_LINE_MEMBER(bml3_state::bml3bus_firq_w)
-{
-	m_maincpu->set_input_line(M6809_FIRQ_LINE, state);
 }
 
 
@@ -959,7 +941,7 @@ static void bml3_cards(device_slot_interface &device)
 
 MACHINE_CONFIG_START(bml3_state::bml3_common)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",M6809, CPU_CLOCK)
+	MCFG_DEVICE_ADD(m_maincpu, MC6809, CPU_EXT_CLOCK)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bml3_state,  bml3_timer_firq)
 //  MCFG_DEVICE_PERIODIC_INT_DRIVER(bml3_state, bml3_firq, 45)
 
@@ -984,9 +966,9 @@ MACHINE_CONFIG_START(bml3_state::bml3_common)
 
 	// fire once per scan of an individual key
 	// According to the service manual (p.65), the keyboard timer is driven by the horizontal video sync clock.
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", bml3_state, keyboard_callback, attotime::from_hz(H_CLOCK/2))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("bml3_c", bml3_state, bml3_c, attotime::from_hz(4800))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("bml3_p", bml3_state, bml3_p, attotime::from_hz(40000))
+	TIMER(config, "keyboard_timer").configure_periodic(FUNC(bml3_state::keyboard_callback), attotime::from_hz(H_CLOCK/2));
+	TIMER(config, "bml3_c").configure_periodic(FUNC(bml3_state::bml3_c), attotime::from_hz(4800));
+	TIMER(config, "bml3_p").configure_periodic(FUNC(bml3_state::bml3_p), attotime::from_hz(40000));
 
 	pia6821_device &pia(PIA6821(config, "pia", 0));
 	pia.writepa_handler().set(FUNC(bml3_state::bml3_piaA_w));
@@ -1000,7 +982,7 @@ MACHINE_CONFIG_START(bml3_state::bml3_common)
 	acia_clock.signal_handler().set(m_acia, FUNC(acia6850_device::write_txc));
 	acia_clock.signal_handler().append(m_acia, FUNC(acia6850_device::write_rxc));
 
-	MCFG_CASSETTE_ADD( "cassette" )
+	CASSETTE(config, m_cass);
 
 	/* Audio */
 	SPEAKER(config, "mono").front_center();
@@ -1008,11 +990,11 @@ MACHINE_CONFIG_START(bml3_state::bml3_common)
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* slot devices */
-	MCFG_DEVICE_ADD("bml3bus", BML3BUS, 0)
-	MCFG_BML3BUS_CPU("maincpu")
-	MCFG_BML3BUS_OUT_NMI_CB(WRITELINE(*this, bml3_state, bml3bus_nmi_w))
-	MCFG_BML3BUS_OUT_IRQ_CB(WRITELINE(*this, bml3_state, bml3bus_irq_w))
-	MCFG_BML3BUS_OUT_FIRQ_CB(WRITELINE(*this, bml3_state, bml3bus_firq_w))
+	bml3bus_device &bus(BML3BUS(config, "bml3bus", 0));
+	bus.set_space(m_maincpu, AS_PROGRAM);
+	bus.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	bus.irq_callback().set_inputline(m_maincpu, M6809_IRQ_LINE);
+	bus.firq_callback().set_inputline(m_maincpu, M6809_FIRQ_LINE);
 	/* Default to MP-1805 disk (3" or 5.25" SS/SD), as our MB-6892 ROM dump includes
 	   the MP-1805 ROM.
 	   User may want to switch this to MP-1802 (5.25" DS/DD).

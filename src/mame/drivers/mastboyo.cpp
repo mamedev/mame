@@ -215,7 +215,7 @@ MACHINE_CONFIG_START(mastboyo_state::mastboyo)
 	MCFG_SCREEN_UPDATE_DRIVER(mastboyo_state, screen_update_mastboyo)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mastboyo)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_mastboyo);
 
 	PALETTE(config, "palette", FUNC(mastboyo_state::mastboyo_palette), 256);
 

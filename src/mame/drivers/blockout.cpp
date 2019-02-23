@@ -309,7 +309,7 @@ MACHINE_CONFIG_START(blockout_state::blockout)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, MAIN_CLOCK)       /* MRH - 8.76 makes gfx/adpcm samples sync better -- but 10 is correct speed*/
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", blockout_state, blockout_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(blockout_state::blockout_scanline), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, AUDIO_CLOCK)  /* 3.579545 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(audio_map)

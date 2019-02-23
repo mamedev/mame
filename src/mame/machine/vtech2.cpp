@@ -76,7 +76,7 @@ READ8_MEMBER( vtech2_state::cart_r )
 {
 	if (offset >= m_cart_size)
 		return 0xff;
-	return m_cart->read_rom(space, offset);
+	return m_cart->read_rom(offset);
 }
 
 

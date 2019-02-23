@@ -756,7 +756,7 @@ MACHINE_CONFIG_START(grchamp_state::grchamp)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(grchamp_state, irq0_line_hold,  (double)SOUND_CLOCK/4/16/16/10/16)
 
 	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count(m_screen, 8);
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	/* video hardware */
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_grchamp);

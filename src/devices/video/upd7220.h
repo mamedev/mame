@@ -62,8 +62,47 @@ public:
 	// construction/destruction
 	upd7220_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <typename... T> void set_display_pixels_callback(T &&... args) { m_display_cb = display_pixels_delegate(std::forward<T>(args)...); }
-	template <typename... T> void set_draw_text_callback(T &&... args) { m_draw_text_cb = draw_text_delegate(std::forward<T>(args)...); }
+	// FIXME: these should be aware of current device for resolving the tag
+	template <class FunctionClass>
+	void set_display_pixels(void (FunctionClass::*init)(bitmap_rgb32 &, int, int, uint32_t), const char *name)
+	{
+		m_display_cb = display_pixels_delegate(init, name, nullptr, static_cast<FunctionClass *>(nullptr));
+	}
+	template <class FunctionClass>
+	void set_display_pixels(void (FunctionClass::*init)(bitmap_rgb32 &, int, int, uint32_t) const, const char *name)
+	{
+		m_display_cb = display_pixels_delegate(init, name, nullptr, static_cast<FunctionClass *>(nullptr));
+	}
+	template <class FunctionClass>
+	void set_display_pixels(const char *devname, void (FunctionClass::*init)(bitmap_rgb32 &, int, int, uint32_t), const char *name)
+	{
+		m_display_cb = display_pixels_delegate(init, name, devname, static_cast<FunctionClass *>(nullptr));
+	}
+	template <class FunctionClass>
+	void set_display_pixels(const char *devname, void (FunctionClass::*init)(bitmap_rgb32 &, int, int, uint32_t) const, const char *name)
+	{
+		m_display_cb = display_pixels_delegate(init, name, devname, static_cast<FunctionClass *>(nullptr));
+	}
+	template <class FunctionClass>
+	void set_draw_text(void (FunctionClass::*init)(bitmap_rgb32 &, uint32_t, int, int, int, int, int, int), const char *name)
+	{
+		m_draw_text_cb = draw_text_delegate(init, name, nullptr, static_cast<FunctionClass *>(nullptr));
+	}
+	template <class FunctionClass>
+	void set_draw_text(void (FunctionClass::*init)(bitmap_rgb32 &, uint32_t, int, int, int, int, int, int) const, const char *name)
+	{
+		m_draw_text_cb = draw_text_delegate(init, name, nullptr, static_cast<FunctionClass *>(nullptr));
+	}
+	template <class FunctionClass>
+	void set_draw_text(const char *devname, void (FunctionClass::*init)(bitmap_rgb32 &, uint32_t, int, int, int, int, int, int), const char *name)
+	{
+		m_draw_text_cb = draw_text_delegate(init, name, devname, static_cast<FunctionClass *>(nullptr));
+	}
+	template <class FunctionClass>
+	void set_draw_text(const char *devname, void (FunctionClass::*init)(bitmap_rgb32 &, uint32_t, int, int, int, int, int, int) const, const char *name)
+	{
+		m_draw_text_cb = draw_text_delegate(init, name, devname, static_cast<FunctionClass *>(nullptr));
+	}
 
 	auto drq_wr_callback() { return m_write_drq.bind(); }
 	auto hsync_wr_callback() { return m_write_hsync.bind(); }

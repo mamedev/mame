@@ -71,7 +71,7 @@ READ8_MEMBER(bbc_beebsid_device::fred_r)
 
 	if (offset >= 0x20 && offset < 0x40)
 	{
-		data = m_sid->read(space, offset);
+		data = m_sid->read(offset);
 	}
 
 	data &= m_1mhzbus->fred_r(space, offset);
@@ -83,7 +83,7 @@ WRITE8_MEMBER(bbc_beebsid_device::fred_w)
 {
 	if (offset >= 0x20 && offset < 0x40)
 	{
-		m_sid->write(space, offset, data);
+		m_sid->write(offset, data);
 	}
 
 	m_1mhzbus->fred_w(space, offset, data);

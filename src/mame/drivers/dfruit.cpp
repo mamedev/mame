@@ -376,7 +376,7 @@ MACHINE_CONFIG_START(dfruit_state::dfruit)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu",Z80,MASTER_CLOCK/2) //!!! TC0091LVC !!!
 	MCFG_DEVICE_PROGRAM_MAP(dfruit_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", dfruit_state, dfruit_irq_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(dfruit_state::dfruit_irq_scanline), "screen", 0, 1);
 
 	//MCFG_MACHINE_START_OVERRIDE(dfruit_state,4enraya)
 	//MCFG_MACHINE_RESET_OVERRIDE(dfruit_state,4enraya)
@@ -391,7 +391,7 @@ MACHINE_CONFIG_START(dfruit_state::dfruit)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, dfruit_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dfruit )
+	GFXDECODE(config, "gfxdecode", "palette", gfx_dfruit);
 	MCFG_PALETTE_ADD("palette", 0x100)
 
 	TC0091LVC(config, m_vdp, 0);

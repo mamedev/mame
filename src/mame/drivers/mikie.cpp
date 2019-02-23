@@ -132,9 +132,9 @@ void mikie_state::sound_map(address_map &map)
 	map(0x4000, 0x43ff).ram();
 	map(0x8000, 0x8000).nopw();    // sound command latch
 	map(0x8001, 0x8001).nopw();    // ???
-	map(0x8002, 0x8002).w("sn1", FUNC(sn76489a_device::command_w)); // trigger read of latch
+	map(0x8002, 0x8002).w("sn1", FUNC(sn76489a_device::write)); // trigger read of latch
 	map(0x8003, 0x8003).r("soundlatch", FUNC(generic_latch_8_device::read));
-	map(0x8004, 0x8004).w("sn2", FUNC(sn76489a_device::command_w)); // trigger read of latch
+	map(0x8004, 0x8004).w("sn2", FUNC(sn76489a_device::write)); // trigger read of latch
 	map(0x8005, 0x8005).r(FUNC(mikie_state::mikie_sh_timer_r));
 	map(0x8079, 0x8079).nopw();    // ???
 	map(0xa003, 0xa003).nopw();    // ???

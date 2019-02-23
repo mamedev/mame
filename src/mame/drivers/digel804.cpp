@@ -424,44 +424,44 @@ INPUT_CHANGED_MEMBER( digel804_state::mode_change )
 /* ACIA Trampolines */
 READ8_MEMBER( digel804_state::acia_rxd_r )
 {
-	return m_acia->read(space, 0);
+	return m_acia->read(0);
 }
 
 WRITE8_MEMBER( digel804_state::acia_txd_w )
 {
-	m_acia->write(space, 0, data);
+	m_acia->write(0, data);
 }
 
 READ8_MEMBER( digel804_state::acia_status_r )
 {
-	return m_acia->read(space, 1);
+	return m_acia->read(1);
 }
 
 WRITE8_MEMBER( digel804_state::acia_reset_w )
 {
-	m_acia->write(space, 1, data);
+	m_acia->write(1, data);
 }
 
 READ8_MEMBER( digel804_state::acia_command_r )
 {
-	return m_acia->read(space, 2);
+	return m_acia->read(2);
 }
 
 WRITE8_MEMBER( digel804_state::acia_command_w )
 {
 	data |= 0x08;   // HACK for ep804 remote mode
 
-	m_acia->write(space, 2, data);
+	m_acia->write(2, data);
 }
 
 READ8_MEMBER( digel804_state::acia_control_r )
 {
-	return m_acia->read(space, 3);
+	return m_acia->read(3);
 }
 
 WRITE8_MEMBER( digel804_state::acia_control_w )
 {
-	m_acia->write(space, 3, data);
+	m_acia->write(3, data);
 }
 
 
@@ -636,19 +636,19 @@ MACHINE_CONFIG_START(digel804_state::digel804)
 	MCFG_DEVICE_ADD(m_maincpu, Z80, 3.6864_MHz_XTAL/2) /* Z80A, X1(aka E0 on schematics): 3.6864Mhz */
 	MCFG_DEVICE_PROGRAM_MAP(z80_mem_804_1_4)
 	MCFG_DEVICE_IO_MAP(z80_io_1_4)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	ROC10937(config, m_vfd); // RIGHT_TO_LEFT
 
 	/* video hardware */
 	config.set_default_layout(layout_digel804);
 
-	MCFG_DEVICE_ADD("74c923", MM74C923, 0)
-	MCFG_MM74C922_DA_CALLBACK(WRITELINE(*this, digel804_state, da_w))
-	MCFG_MM74C922_X1_CALLBACK(IOPORT("LINE0"))
-	MCFG_MM74C922_X2_CALLBACK(IOPORT("LINE1"))
-	MCFG_MM74C922_X3_CALLBACK(IOPORT("LINE2"))
-	MCFG_MM74C922_X4_CALLBACK(IOPORT("LINE3"))
+	MM74C923(config, m_kb, 0);
+	m_kb->da_wr_callback().set(FUNC(digel804_state::da_w));
+	m_kb->x1_rd_callback().set_ioport("LINE0");
+	m_kb->x2_rd_callback().set_ioport("LINE1");
+	m_kb->x3_rd_callback().set_ioport("LINE2");
+	m_kb->x4_rd_callback().set_ioport("LINE3");
 
 	/* acia */
 	MOS6551(config, m_acia, 0);

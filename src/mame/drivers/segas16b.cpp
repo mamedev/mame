@@ -1126,7 +1126,7 @@ WRITE16_MEMBER( segas16b_state::standard_io_w )
 
 WRITE16_MEMBER( segas16b_state::atomicp_sound_w )
 {
-	m_ym2413->write(space, offset, data >> 8);
+	m_ym2413->write(offset, data >> 8);
 }
 
 
@@ -3729,13 +3729,13 @@ void segas16b_state::system16b(machine_config &config)
 	m_mapper->pbf().set_inputline(m_soundcpu, 0);
 
 	// video hardware
-	GFXDECODE(config, m_gfxdecode, "palette", gfx_segas16b);
-	PALETTE(config, "palette").set_entries(2048*3);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_segas16b);
+	PALETTE(config, m_palette).set_entries(2048*3);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(MASTER_CLOCK_25MHz/4, 400, 0, 320, 262, 0, 224);
 	m_screen->set_screen_update(FUNC(segas16b_state::screen_update));
-	m_screen->set_palette("palette");
+	m_screen->set_palette(m_palette);
 
 	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
 	SEGAIC16VID(config, m_segaic16vid, 0, m_gfxdecode);
@@ -3913,28 +3913,28 @@ void segas16b_state::fpointbla(machine_config &config)
 	m_sprites->set_local_originx(60); // these align the pieces with the playfield
 }
 
-MACHINE_CONFIG_START(segas16b_state::lockonph)
-
+void segas16b_state::lockonph(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)/2) // ?
-	MCFG_DEVICE_PROGRAM_MAP(lockonph_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas16b_state, irq4_line_hold)
+	M68000(config, m_maincpu, XTAL(16'000'000)/2); // ?
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas16b_state::lockonph_map);
+	m_maincpu->set_vblank_int("screen", FUNC(segas16b_state::irq4_line_hold));
 
-	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(16'000'000)/4) // ?
-	MCFG_DEVICE_PROGRAM_MAP(lockonph_sound_map)
-	MCFG_DEVICE_IO_MAP(lockonph_sound_iomap)
+	Z80(config, m_soundcpu, XTAL(16'000'000)/4); // ?
+	m_soundcpu->set_addrmap(AS_PROGRAM, &segas16b_state::lockonph_sound_map);
+	m_soundcpu->set_addrmap(AS_IO, &segas16b_state::lockonph_sound_iomap);
 
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lockonph)
-	MCFG_PALETTE_ADD("palette", 0x2000*4)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lockonph);
+	PALETTE(config, m_palette).set_entries(0x2000*4);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK_25MHz/4, 400, 0, 320, 262, 0, 224) // wrong, other XTAL seems to be 17Mhz?
-	MCFG_SCREEN_UPDATE_DRIVER(segas16b_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MASTER_CLOCK_25MHz/4, 400, 0, 320, 262, 0, 224); // wrong, other XTAL seems to be 17Mhz?
+	m_screen->set_screen_update(FUNC(segas16b_state::screen_update));
+	m_screen->set_palette(m_palette);
 
 	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
 	SEGAIC16VID(config, m_segaic16vid, 0, m_gfxdecode);
@@ -3950,12 +3950,10 @@ MACHINE_CONFIG_START(segas16b_state::lockonph)
 	m_ym2151->add_route(0, "mono", 0.5);
 	m_ym2151->add_route(1, "mono", 0.5);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/16, okim6295_device::PIN7_LOW) // clock / pin not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.2)
-
-
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL(16'000'000)/16, okim6295_device::PIN7_LOW)); // clock / pin not verified
+	oki.add_route(ALL_OUTPUTS, "mono", 0.2);
+	oki.add_route(ALL_OUTPUTS, "mono", 0.2);
+}
 
 
 //**************************************************************************
@@ -3981,11 +3979,11 @@ void segas16b_state::atomicp(machine_config &config) // 10MHz CPU Clock verified
 }
 
 
-MACHINE_CONFIG_START(segas16b_state::system16c)
+void segas16b_state::system16c(machine_config &config)
+{
 	system16b(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(system16c_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas16b_state::system16c_map);
+}
 
 
 
@@ -4114,7 +4112,7 @@ ROM_START( aliensyn3 )
 	ROM_LOAD( "epr-10726.a10", 0x30000, 0x8000, CRC(d50b7736) SHA1(b1f8e3b0cf2ffee5382098100cfabe21b383cd51) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-0033.key", 0x0000, 0x2000, CRC(49e882e5) SHA1(29d87af8fc775b22a9a546c112f8f5e7f700ac1a) )
+	ROM_LOAD( "317-0033.key", 0x0000, 0x2000, CRC(68bb7745) SHA1(f0c60d8a503a90ba6a2443be856b18322e3ec759) )
 ROM_END
 
 
@@ -4200,7 +4198,7 @@ ROM_START( aliensynj )
 	ROM_LOAD( "epr-10726.a10", 0x30000, 0x8000, CRC(d50b7736) SHA1(b1f8e3b0cf2ffee5382098100cfabe21b383cd51) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-0033.key", 0x0000, 0x2000, CRC(49e882e5) SHA1(29d87af8fc775b22a9a546c112f8f5e7f700ac1a) )
+	ROM_LOAD( "317-0033.key", 0x0000, 0x2000, CRC(68bb7745) SHA1(f0c60d8a503a90ba6a2443be856b18322e3ec759) )
 ROM_END
 
 
@@ -4266,7 +4264,7 @@ ROM_START( afighterf )
 	ROM_LOAD( "epr10039.bin", 0x00000, 0x8000, CRC(b04757b0) SHA1(24bface5a23ed658675f414c9937bf9d7f7ed5ec) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-unknown.key", 0x0000, 0x2000, CRC(fee04be8) SHA1(c58d78299ef4cede517be823a8a8a90e46c6ba0d) )
+	ROM_LOAD( "317-0018.key", 0x0000, 0x2000, CRC(65b5b1af) SHA1(9a236c0c223064f9a2a56561e10b9ffed0f567a3) )
 ROM_END
 
 
@@ -4298,7 +4296,7 @@ ROM_START( afighterg )
 	ROM_LOAD( "epr10039.bin", 0x00000, 0x8000, CRC(b04757b0) SHA1(24bface5a23ed658675f414c9937bf9d7f7ed5ec) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-unknown.key", 0x0000, 0x2000, CRC(fee04be8) SHA1(c58d78299ef4cede517be823a8a8a90e46c6ba0d) )
+	ROM_LOAD( "317-0018.key", 0x0000, 0x2000, CRC(65b5b1af) SHA1(9a236c0c223064f9a2a56561e10b9ffed0f567a3) )
 ROM_END
 
 
@@ -4330,7 +4328,7 @@ ROM_START( afighterh )
 	ROM_LOAD( "epr10039.bin", 0x00000, 0x8000, CRC(b04757b0) SHA1(24bface5a23ed658675f414c9937bf9d7f7ed5ec) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-0018.key", 0x0000, 0x2000, CRC(fee04be8) SHA1(c58d78299ef4cede517be823a8a8a90e46c6ba0d) )
+	ROM_LOAD( "317-0018.key", 0x0000, 0x2000, CRC(65b5b1af) SHA1(9a236c0c223064f9a2a56561e10b9ffed0f567a3) )
 ROM_END
 
 
@@ -4904,7 +4902,7 @@ ROM_START( aurail1 )
 	ROM_RELOAD(                0x30000, 0x20000 )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-0168.key", 0x0000, 0x2000, CRC(bc2d1792) SHA1(e66d2582eb74ae35f27715fcc9df3e77aba67509) )
+	ROM_LOAD( "317-0168.key", 0x0000, 0x2000, CRC(fed38390) SHA1(b5f458bc70c069542be16d476645c153ed1d1b45) )
 ROM_END
 
 ROM_START( aurail1d )
@@ -5010,7 +5008,7 @@ ROM_START( aurailj )
 	ROM_RELOAD(                0x30000, 0x20000 )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-0167.key", 0x0000, 0x2000, CRC(bc2d1792) SHA1(e66d2582eb74ae35f27715fcc9df3e77aba67509) )
+	ROM_LOAD( "317-0167.key", 0x0000, 0x2000, CRC(fed38390) SHA1(b5f458bc70c069542be16d476645c153ed1d1b45) )
 ROM_END
 
 
@@ -5671,7 +5669,7 @@ ROM_START( dunkshot )
 	ROM_LOAD( "epr-10476.a10",  0x30000, 0x08000, CRC(a6be0956) SHA1(fc4d6e25e0b46679f94fddbb1850fb0b02f8d84b) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-0022.key", 0x0000, 0x2000, CRC(4eedc66d) SHA1(50588fa13bf25a2d1322579cdc9937450543c978) )
+	ROM_LOAD( "317-0022.key", 0x0000, 0x2000, CRC(3f218333) SHA1(6f73801070a2c9748fc319cc95ab7a802f8ea7b6) )
 ROM_END
 
 ROM_START( dunkshota ) // several ROMs had replacement? (different style to others) labels with 'T' markings, content identical.
@@ -5713,7 +5711,7 @@ ROM_START( dunkshota ) // several ROMs had replacement? (different style to othe
 	ROM_LOAD( "epr-10476.a10",  0x30000, 0x08000, CRC(a6be0956) SHA1(fc4d6e25e0b46679f94fddbb1850fb0b02f8d84b) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-0022.key", 0x0000, 0x2000, CRC(4eedc66d) SHA1(50588fa13bf25a2d1322579cdc9937450543c978) )
+	ROM_LOAD( "317-0022.key", 0x0000, 0x2000, CRC(3f218333) SHA1(6f73801070a2c9748fc319cc95ab7a802f8ea7b6) )
 ROM_END
 
 
@@ -5756,7 +5754,7 @@ ROM_START( dunkshoto )
 	ROM_LOAD( "epr-10476.a10",  0x30000, 0x08000, CRC(a6be0956) SHA1(fc4d6e25e0b46679f94fddbb1850fb0b02f8d84b) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-0022.key", 0x0000, 0x2000, CRC(4eedc66d) SHA1(50588fa13bf25a2d1322579cdc9937450543c978) )
+	ROM_LOAD( "317-0022.key", 0x0000, 0x2000, CRC(3f218333) SHA1(6f73801070a2c9748fc319cc95ab7a802f8ea7b6) )
 ROM_END
 
 
@@ -7448,6 +7446,34 @@ ROM_START( ryukyu )
 	ROM_LOAD( "opr-13350.a11", 0x10000, 0x20000, CRC(3c59a658) SHA1(2cef13ee9e666bb850fe6c6e6954d7b75df665a9) )
 ROM_END
 
+//*************************************************************************************************************************
+//  Ryukyu, Sega System 16B
+//  CPU: FD1094 8M2 (317-5023A)
+//  ROM Board type: ?
+//
+ROM_START( ryukyua )
+	ROM_REGION( 0x20000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "epr-13348a.a7", 0x00000, 0x10000, CRC(64f6ada9) SHA1(31e2adc8697c21ca4aa2d9357f7303644168d0a2) )
+	ROM_LOAD16_BYTE( "epr-13347a.a5", 0x00001, 0x10000, CRC(fade1f50) SHA1(46e6224060d526aa362df1a1026ba445832ad7f3) )
+
+	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
+	ROM_LOAD( "317-5023a.key", 0x0000, 0x2000, NO_DUMP )
+
+	ROM_REGION( 0x60000, "gfx1", 0 ) // tiles
+	ROM_LOAD( "opr-13351.a14", 0x00000, 0x20000, CRC(a68a4e6d) SHA1(ee3e317c7184b41af5dd383d41f7be3eebff0d04) )
+	ROM_LOAD( "opr-13352.a15", 0x20000, 0x20000, CRC(5e5531e4) SHA1(e8e16b35f7985e6cdd77353ca5235db518914744) )
+	ROM_LOAD( "opr-13353.a16", 0x40000, 0x20000, CRC(6d23dfd8) SHA1(21266340290b9854cee0b62fc107cc2981519a80) )
+
+	ROM_REGION16_BE( 0x80000, "sprites", 0 ) // sprites
+	ROM_LOAD16_BYTE( "opr-13354.b1", 0x00001, 0x20000, CRC(f07aad99) SHA1(71759525a5b7fe76d112cec93984f0f89cadbc00) )
+	ROM_LOAD16_BYTE( "opr-13356.b5", 0x00000, 0x20000, CRC(5498290b) SHA1(b3115b636d8cb6ecac22d5264b7961e3b807cf04) )
+	ROM_LOAD16_BYTE( "opr-13355.b2", 0x40001, 0x20000, CRC(67890019) SHA1(165c6a32f305273396ec0e9499e00329caadc484) )
+	ROM_LOAD16_BYTE( "opr-13357.b6", 0x40000, 0x20000, CRC(f9e7cf03) SHA1(2258111499c79443faf84fb0495007016282bb3c) )
+
+	ROM_REGION( 0x50000, "soundcpu", 0 ) // sound CPU
+	ROM_LOAD( "epr-13349.a10", 0x00000, 0x08000, CRC(b83183f8) SHA1(9d6127f51c04a16bb2637dc9992b843b94613c2b) )
+	ROM_LOAD( "opr-13350.a11", 0x10000, 0x20000, CRC(3c59a658) SHA1(2cef13ee9e666bb850fe6c6e6954d7b75df665a9) )
+ROM_END
 
 ROM_START( ryukyud )
 	ROM_REGION( 0x20000, "maincpu", 0 ) // 68000 code
@@ -7503,7 +7529,7 @@ ROM_START( defense )
 	ROM_LOAD( "10775.a7", 0x0000, 0x8000, CRC(4cbd55a8) SHA1(8af2c52ab61338c8a9f1a74a05470dd3d5e0c42f) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-0028.key", 0x0000, 0x2000, BAD_DUMP CRC(9a5307b2) SHA1(2fcc576ed95b96ff6ea71252c3fab33b8b3fc1f5) )
+	ROM_LOAD( "317-0028.key", 0x0000, 0x2000, BAD_DUMP CRC(1514662f) SHA1(d6241cb2a70c5b0442ecc2f8a10307608e5a0870) )
 ROM_END
 
 //*************************************************************************************************************************
@@ -7538,7 +7564,7 @@ ROM_START( sdib )
 	ROM_LOAD( "10775.a7", 0x0000, 0x8000, CRC(4cbd55a8) SHA1(8af2c52ab61338c8a9f1a74a05470dd3d5e0c42f) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-0028.key", 0x0000, 0x2000, BAD_DUMP CRC(9a5307b2) SHA1(2fcc576ed95b96ff6ea71252c3fab33b8b3fc1f5) )
+	ROM_LOAD( "317-0028.key", 0x0000, 0x2000, BAD_DUMP CRC(1514662f) SHA1(d6241cb2a70c5b0442ecc2f8a10307608e5a0870) )
 ROM_END
 
 //*************************************************************************************************************************
@@ -8087,7 +8113,7 @@ ROM_START( sjryuko )
 	ROM_LOAD( "epr-12248.a11",0x40000, 0x8000, CRC(d1eabdab) SHA1(f255a66e082353768e8d2bb574e883a4a45f7670) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-5021.key", 0x0000, 0x2000, CRC(c3e32937) SHA1(22bccea1c3d97adca3dce2fa418f7e7b058c0837) )
+	ROM_LOAD( "317-5021.key", 0x0000, 0x2000, CRC(8e40b2ab) SHA1(f3e2d70a17ac5270bec586cc67b2b8ba14bf53cf) )
 ROM_END
 
 
@@ -9261,6 +9287,7 @@ GAME( 1988, cencourt,   passsht,  system16b_mc8123,      cencourt, segas16b_stat
 GAME( 1991, riotcity,   0,        system16b,             riotcity, segas16b_state, init_generic_5704,       ROT0,   "Sega / Westone", "Riot City (Japan)", 0 )
 
 GAME( 1990, ryukyu,     0,        system16b_fd1094,      ryukyu,   segas16b_state, init_generic_5704,       ROT0,   "Success / Sega", "RyuKyu (Japan) (FD1094 317-5023)", 0 )
+GAME( 1990, ryukyua,    ryukyu,   system16b_fd1094,      ryukyu,   segas16b_state, init_generic_5704,       ROT0,   "Success / Sega", "RyuKyu (Japan) (FD1094 317-5023A)", MACHINE_NOT_WORKING ) // decryption key not available
 
 GAME( 1987, defense,    sdi,      system16b_fd1089a,     sdi,      segas16b_state, init_defense_5358_small, ROT0,   "Sega", "Defense (System 16B, FD1089A 317-0028)", 0 )
 GAME( 1987, sdib,       sdi,      system16b_fd1089a,     sdi,      segas16b_state, init_defense_5358_small, ROT0,   "Sega", "SDI - Strategic Defense Initiative (System 16B, FD1089A 317-0028)", 0 )
@@ -9818,23 +9845,23 @@ void isgsm_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(isgsm_state::isgsm)
+void isgsm_state::isgsm(machine_config &config)
+{
 	system16b(config);
 	// basic machine hardware
 
-	MCFG_DEVICE_REMOVE("maincpu")
-	MCFG_DEVICE_REMOVE("mapper")
+	config.device_remove("maincpu");
+	config.device_remove("mapper");
 
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000) // no obvious CPU, but seems to be clocked faster than an original system16 based on the boot times
-	MCFG_DEVICE_PROGRAM_MAP(isgsm_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", isgsm_state, irq4_line_hold)
+	M68000(config, m_maincpu, 16000000); // no obvious CPU, but seems to be clocked faster than an original system16 based on the boot times
+	m_maincpu->set_addrmap(AS_PROGRAM, &isgsm_state::isgsm_map);
+	m_maincpu->set_vblank_int("screen", FUNC(isgsm_state::irq4_line_hold));
 
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_DEVICE_PROGRAM_MAP(bootleg_sound_map)
-	MCFG_DEVICE_IO_MAP(bootleg_sound_portmap)
+	m_soundcpu->set_addrmap(AS_PROGRAM, &isgsm_state::bootleg_sound_map);
+	m_soundcpu->set_addrmap(AS_IO, &isgsm_state::bootleg_sound_portmap);
 
 	GENERIC_LATCH_8(config, m_soundlatch);
-MACHINE_CONFIG_END
+}
 
 void isgsm_state::init_isgsm()
 {

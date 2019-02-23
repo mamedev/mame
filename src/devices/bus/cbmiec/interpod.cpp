@@ -123,16 +123,17 @@ void interpod_device::interpod_mem(address_map &map)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(interpod_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(R6502_TAG, M6502, 1000000)
-	MCFG_DEVICE_PROGRAM_MAP(interpod_mem)
+void interpod_device::device_add_mconfig(machine_config &config)
+{
+	M6502(config, m_maincpu, 1000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &interpod_device::interpod_mem);
 
-	MCFG_DEVICE_ADD(R6522_TAG, VIA6522, 1000000)
-	MCFG_DEVICE_ADD(R6532_TAG, MOS6532_NEW, 1000000)
-	MCFG_DEVICE_ADD(MC6850_TAG, ACIA6850, 0)
+	VIA6522(config, m_via, 1000000);
+	MOS6532_NEW(config, m_riot, 1000000);
+	ACIA6850(config, m_acia, 0);
 
-	MCFG_CBM_IEEE488_ADD(nullptr)
-MACHINE_CONFIG_END
+	ieee488_device::add_cbm_devices(config, nullptr);
+}
 
 
 //**************************************************************************

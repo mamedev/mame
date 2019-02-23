@@ -294,12 +294,12 @@ WRITE_LINE_MEMBER( tpi6525_device::i4_w )
 	}
 }
 
-READ8_MEMBER( tpi6525_device::pa_r )
+uint8_t tpi6525_device::pa_r()
 {
 	uint8_t data = m_in_a;
 
 	if (!m_in_pa_cb.isnull())
-		data = m_in_pa_cb(offset);
+		data = m_in_pa_cb();
 
 	data = (data & ~m_ddr_a) | (m_ddr_a & m_port_a);
 
@@ -307,18 +307,18 @@ READ8_MEMBER( tpi6525_device::pa_r )
 }
 
 
-WRITE8_MEMBER( tpi6525_device::pa_w )
+void tpi6525_device::pa_w(uint8_t data)
 {
 	m_in_a = data;
 }
 
 
-READ8_MEMBER( tpi6525_device::pb_r )
+uint8_t tpi6525_device::pb_r()
 {
 	uint8_t data = m_in_b;
 
 	if (!m_in_pb_cb.isnull())
-		data = m_in_pb_cb(offset);
+		data = m_in_pb_cb();
 
 	data = (data & ~m_ddr_b) | (m_ddr_b & m_port_b);
 
@@ -326,18 +326,18 @@ READ8_MEMBER( tpi6525_device::pb_r )
 }
 
 
-WRITE8_MEMBER( tpi6525_device::pb_w )
+void tpi6525_device::pb_w(uint8_t data)
 {
 	m_in_b = data;
 }
 
 
-READ8_MEMBER( tpi6525_device::pc_r )
+uint8_t tpi6525_device::pc_r()
 {
 	uint8_t data = m_in_c;
 
 	if (!m_in_pc_cb.isnull())
-		data &= m_in_pc_cb(offset);
+		data &= m_in_pc_cb();
 
 	data = (data & ~m_ddr_c) | (m_ddr_c & m_port_c);
 
@@ -345,13 +345,13 @@ READ8_MEMBER( tpi6525_device::pc_r )
 }
 
 
-WRITE8_MEMBER( tpi6525_device::pc_w )
+void tpi6525_device::pc_w(uint8_t data)
 {
 	m_in_c = data;
 }
 
 
-READ8_MEMBER( tpi6525_device::read )
+uint8_t tpi6525_device::read(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -466,7 +466,7 @@ READ8_MEMBER( tpi6525_device::read )
 }
 
 
-WRITE8_MEMBER( tpi6525_device::write )
+void tpi6525_device::write(offs_t offset, uint8_t data)
 {
 	DBG_LOG(machine(), 2, "tpi6525", ("%s write %.2x %.2x\n", tag(), offset, data));
 

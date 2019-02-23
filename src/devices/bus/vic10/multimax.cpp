@@ -59,7 +59,7 @@ void vic10_multimax_device::device_reset()
 //  vic10_cd_r - cartridge data read
 //-------------------------------------------------
 
-uint8_t vic10_multimax_device::vic10_cd_r(address_space &space, offs_t offset, uint8_t data, int lorom, int uprom, int exram)
+uint8_t vic10_multimax_device::vic10_cd_r(offs_t offset, uint8_t data, int lorom, int uprom, int exram)
 {
 	if (!lorom)
 	{
@@ -85,7 +85,7 @@ uint8_t vic10_multimax_device::vic10_cd_r(address_space &space, offs_t offset, u
 //  vic10_cd_w - cartridge data write
 //-------------------------------------------------
 
-void vic10_multimax_device::vic10_cd_w(address_space &space, offs_t offset, uint8_t data, int lorom, int uprom, int exram)
+void vic10_multimax_device::vic10_cd_w(offs_t offset, uint8_t data, int lorom, int uprom, int exram)
 {
 	if (!exram)
 	{

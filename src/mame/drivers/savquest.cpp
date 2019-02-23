@@ -813,14 +813,13 @@ void savquest_isa16_cards(device_slot_interface &device)
 }
 
 MACHINE_CONFIG_START(savquest_state::savquest)
-	MCFG_DEVICE_ADD("maincpu", PENTIUM2, 450000000) // actually Pentium II 450
-	MCFG_DEVICE_PROGRAM_MAP(savquest_map)
-	MCFG_DEVICE_IO_MAP(savquest_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+	PENTIUM2(config, m_maincpu, 450000000); // actually Pentium II 450
+	m_maincpu->set_addrmap(AS_PROGRAM, &savquest_state::savquest_map);
+	m_maincpu->set_addrmap(AS_IO, &savquest_state::savquest_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
 
 	pcat_common(config);
-	MCFG_DEVICE_REMOVE("rtc")
-	MCFG_DS12885_ADD("rtc")
+	DS12885(config.replace(), "rtc");
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
 	MCFG_PCI_BUS_LEGACY_DEVICE(0, DEVICE_SELF, savquest_state, intel82439tx_pci_r, intel82439tx_pci_w)
@@ -836,18 +835,19 @@ MACHINE_CONFIG_START(savquest_state::savquest)
 	/* sound hardware */
 
 	isa16_device &isa(ISA16(config, "isa", 0)); // FIXME: determine ISA bus clock
-	isa.set_cputag("maincpu");
-	MCFG_DEVICE_ADD("isa1", ISA16_SLOT, 0, "isa", savquest_isa16_cards, "sb16", false)
+	isa.set_memspace("maincpu", AS_PROGRAM);
+	isa.set_iospace("maincpu", AS_IO);
+	ISA16_SLOT(config, "isa1", 0, "isa", savquest_isa16_cards, "sb16", false);
 
 	/* video hardware */
 	pcvideo_s3_vga(config);
 
-	MCFG_DEVICE_ADD("voodoo", VOODOO_2, STD_VOODOO_2_CLOCK)
-	MCFG_VOODOO_FBMEM(4)
-	MCFG_VOODOO_TMUMEM(4,4) /* this is the 12Mb card */
-	MCFG_VOODOO_SCREEN_TAG("screen")
-	MCFG_VOODOO_CPU_TAG("maincpu")
-	MCFG_VOODOO_VBLANK_CB(WRITELINE(*this, savquest_state,vblank_assert))
+	VOODOO_2(config, m_voodoo, STD_VOODOO_2_CLOCK);
+	m_voodoo->set_fbmem(4);
+	m_voodoo->set_tmumem(4, 4); /* this is the 12Mb card */
+	m_voodoo->set_screen_tag("screen");
+	m_voodoo->set_cpu_tag(m_maincpu);
+	m_voodoo->vblank_callback().set(FUNC(savquest_state::vblank_assert));
 MACHINE_CONFIG_END
 
 ROM_START( savquest )

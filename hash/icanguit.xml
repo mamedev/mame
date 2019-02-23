@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="icanguit_cart" description="Fisher-Price / Mattel I Can Play Guitar cartridges">
+	<software name="guitfav">
+		<description>Guitar Favorites</description>
+		<year>2007</year>
+		<publisher>Fisher-Price / Mattel</publisher>
+		<part name="cart" interface="icanguit_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="icanplayguitar_guitarfavorites.bin" size="0x800000" crc="c804822e" sha1="81e10a033355f4ba4be23a6741bd9d81c5627544" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

@@ -420,13 +420,13 @@ MACHINE_CONFIG_START(fk1_state::fk1)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(fk1_state,fk1_irq_callback)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(fk1_state, screen_update)
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(fk1_state::screen_update));
+	screen.set_size(512, 256);
+	screen.set_visarea(0, 512-1, 0, 256-1);
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
@@ -466,8 +466,8 @@ MACHINE_CONFIG_START(fk1_state::fk1)
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("80K"); // 64 + 16
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", fk1_state, keyboard_callback, attotime::from_hz(24000))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("vsync_timer", fk1_state, vsync_callback, attotime::from_hz(50))
+	TIMER(config, "keyboard_timer").configure_periodic(FUNC(fk1_state::keyboard_callback), attotime::from_hz(24000));
+	TIMER(config, "vsync_timer").configure_periodic(FUNC(fk1_state::vsync_callback), attotime::from_hz(50));
 MACHINE_CONFIG_END
 
 /* ROM definition */

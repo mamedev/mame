@@ -50,14 +50,6 @@ DEFINE_DEVICE_TYPE(A2BUS_SCSI, a2bus_scsi_device, "a2scsi", "Apple II SCSI Card"
 #define SCSI_BUS_TAG     "scsibus"
 #define SCSI_5380_TAG    "scsibus:7:ncr5380"
 
-void a2bus_scsi_device::ncr5380(device_t *device)
-{
-	devcb_base *devcb;
-	(void)devcb;
-	MCFG_DEVICE_CLOCK(10000000)
-	MCFG_NCR5380N_DRQ_HANDLER(WRITELINE("^^", a2bus_scsi_device, drq_w))
-}
-
 static void scsi_devices(device_slot_interface &device)
 {
 	device.option_add("cdrom", NSCSI_CDROM);
@@ -78,18 +70,21 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(a2bus_scsi_device::device_add_mconfig)
-	MCFG_NSCSI_BUS_ADD(SCSI_BUS_TAG)
-	MCFG_NSCSI_ADD("scsibus:0", scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:1", scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:2", scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:3", scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:4", scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:5", scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:6", scsi_devices, "harddisk", false)
-	MCFG_NSCSI_ADD("scsibus:7", scsi_devices, "ncr5380", true)
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("ncr5380", ncr5380)
-MACHINE_CONFIG_END
+void a2bus_scsi_device::device_add_mconfig(machine_config &config)
+{
+	NSCSI_BUS(config, m_scsibus);
+	NSCSI_CONNECTOR(config, "scsibus:0", scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsibus:1", scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsibus:2", scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsibus:3", scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsibus:4", scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsibus:5", scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsibus:6", scsi_devices, "harddisk", false);
+	NSCSI_CONNECTOR(config, "scsibus:7", scsi_devices, "ncr5380", true).set_option_machine_config("ncr5380", [this](device_t *device) {
+		device->set_clock(10000000);
+		downcast<ncr5380n_device &>(*device).drq_handler().set(*this, FUNC(a2bus_scsi_device::drq_w));
+	});
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

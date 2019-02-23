@@ -60,6 +60,9 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( rst1_line );
 
+	// Synchronous clock input
+	DECLARE_WRITE_LINE_MEMBER( phi_line );
+
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
@@ -83,6 +86,9 @@ private:
 	// Common method for device_reset and rst1_line
 	void do_reset();
 
+	// Common clock handling
+	void clock_in(line_state clk);
+
 	// State of the INT1-INT15 lines (must be inverted when queried)
 	// Note that the levels must also be delivered when reading the pins, which
 	// may require to latch the int levels.
@@ -92,6 +98,9 @@ private:
 
 	bool m_int_pending;         // status of the int* pin (connected to TMS9900)
 	bool m_timer_int_pending;   // timer int pending (overrides int3 pin if timer enabled)
+
+	bool m_clock_active;
+	int  m_clockdiv;            // Clock divider counter (for synchronous clock)
 
 	// PIO registers
 	int m_pio_direction;        // direction register for PIO
@@ -110,7 +119,7 @@ private:
 	// true = clock mode (read/write clock interval)
 	bool m_clock_mode;
 
-	// MESS timer, used to emulate the decrementer register
+	// Timer, used to emulate the decrementer register
 	emu_timer *m_decrementer;
 
 	// clock interval, loaded in decrementer when it reaches 0.

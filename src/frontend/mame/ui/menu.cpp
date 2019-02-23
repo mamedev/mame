@@ -31,6 +31,7 @@
 
 
 namespace ui {
+
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
@@ -85,14 +86,14 @@ menu::global_state::global_state(running_machine &machine, ui_options const &opt
 	, m_machine(machine)
 	, m_cleanup_callbacks()
 	, m_bgrnd_bitmap()
+	, m_bgrnd_texture(nullptr, machine.render())
 	, m_stack()
 	, m_free()
 {
 	render_manager &render(machine.render());
-	auto const texture_free([&render](render_texture *texture) { render.texture_free(texture); });
 
 	// create a texture for main menu background
-	m_bgrnd_texture = texture_ptr(render.texture_alloc(render_texture::hq_scale), texture_free);
+	m_bgrnd_texture.reset(render.texture_alloc(render_texture::hq_scale));
 	if (options.use_background_image() && (&machine.system() == &GAME_NAME(___empty)))
 	{
 		m_bgrnd_bitmap = std::make_unique<bitmap_argb32>(0, 0);
@@ -161,8 +162,17 @@ void menu::global_state::stack_reset()
 
 void menu::global_state::clear_free_list()
 {
+	// free stack is in reverse order - unwind it properly
+	std::unique_ptr<menu> reversed;
 	while (m_free)
-		m_free = std::move(m_free->m_parent);
+	{
+		std::unique_ptr<menu> menu(std::move(m_free));
+		m_free = std::move(menu->m_parent);
+		menu->m_parent = std::move(reversed);
+		reversed = std::move(menu);
+	}
+	while (reversed)
+		reversed = std::move(reversed->m_parent);
 }
 
 

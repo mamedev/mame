@@ -104,7 +104,6 @@
 
 
 #include "emu.h"
-#include "includes/mcr.h"
 #include "includes/mcr3.h"
 
 #include "machine/nvram.h"
@@ -260,11 +259,11 @@ WRITE8_MEMBER(mcr3_state::maxrpm_op6_w)
 
 	/* when the read is toggled is when the ADC value is latched */
 	if (!(data & 0x80))
-		m_latched_input = m_maxrpm_adc->read(space, 0);
+		m_latched_input = m_maxrpm_adc->read();
 
 	/* when both the write and the enable are low, it's a write to the ADC0844 */
 	if (!(data & 0x40) && !(data & 0x20))
-		m_maxrpm_adc->write(space, 0, bitswap<4>(m_maxrpm_adc_control, 2, 3, 1, 0));
+		m_maxrpm_adc->write(bitswap<4>(m_maxrpm_adc_control, 2, 3, 1, 0));
 
 	/* low 5 bits control the turbo CS */
 	m_turbo_cheap_squeak->write(space, offset, data);
@@ -390,7 +389,7 @@ WRITE8_MEMBER(mcr3_state::stargrds_op6_w)
 
 READ8_MEMBER(mcr3_state::spyhunt_ip1_r)
 {
-	return ioport("ssio:IP1")->read() | (m_cheap_squeak_deluxe->stat_r(space, 0) << 5);
+	return ioport("ssio:IP1")->read() | (m_cheap_squeak_deluxe->stat_r() << 5);
 }
 
 
@@ -430,7 +429,7 @@ WRITE8_MEMBER(mcr3_state::spyhunt_op4_w)
 	m_last_op4 = data;
 
 	/* low 5 bits go to control the Cheap Squeak Deluxe */
-	m_cheap_squeak_deluxe->sr_w(space, offset, data & 0x0f);
+	m_cheap_squeak_deluxe->sr_w(data & 0x0f);
 	m_cheap_squeak_deluxe->sirq_w(BIT(data, 4));
 }
 
@@ -1086,7 +1085,7 @@ MACHINE_CONFIG_START(mcr3_state::mcrmono)
 	m_maincpu->set_addrmap(AS_IO, &mcr3_state::mcrmono_portmap);
 	m_maincpu->set_daisy_config(mcr_daisy_chain);
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mcr3_state, mcr_interrupt, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(mcr3_state::mcr_interrupt), "screen", 0, 1);
 
 	Z80CTC(config, m_ctc, MASTER_CLOCK/4 /* same as "maincpu" */);
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -1108,10 +1107,10 @@ MACHINE_CONFIG_START(mcr3_state::mcrmono)
 	MCFG_SCREEN_SIZE(32*16, 30*16)
 	MCFG_SCREEN_VISIBLE_AREA(0*16, 32*16-1, 0*16, 30*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mcr3_state, screen_update_mcr3)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	GFXDECODE(config, "gfxdecode", "palette", gfx_mcr3);
-	PALETTE(config, "palette").set_entries(64);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mcr3);
+	PALETTE(config, m_palette).set_entries(64);
 MACHINE_CONFIG_END
 
 
@@ -1171,7 +1170,7 @@ MACHINE_CONFIG_START(mcr3_state::mcrscroll)
 	MCFG_SCREEN_SIZE(30*16, 30*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 30*16-1, 0, 30*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mcr3_state, screen_update_spyhunt)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_spyhunt)
+	m_gfxdecode->set_info(gfx_spyhunt);
 	subdevice<palette_device>("palette")->set_entries(64 + 4).set_init(FUNC(mcr3_state::spyhunt_palette));
 
 	MCFG_VIDEO_START_OVERRIDE(mcr3_state,spyhunt)

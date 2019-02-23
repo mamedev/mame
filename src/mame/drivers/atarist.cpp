@@ -1867,7 +1867,7 @@ void st_state::machine_start()
 	configure_memory();
 
 	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0xfa0000, 0xfbffff, read16_delegate(FUNC(generic_slot_device::read16_rom),(generic_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xfa0000, 0xfbffff, read16s_delegate(FUNC(generic_slot_device::read16_rom),(generic_slot_device*)m_cart));
 
 	// allocate timers
 	if (m_mousex.found())
@@ -1922,7 +1922,7 @@ void ste_state::machine_start()
 	configure_memory();
 
 	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0xfa0000, 0xfbffff, read16_delegate(FUNC(generic_slot_device::read16_rom),(generic_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xfa0000, 0xfbffff, read16s_delegate(FUNC(generic_slot_device::read16_rom),(generic_slot_device*)m_cart));
 
 	/* allocate timers */
 	m_dmasound_timer = timer_alloc(TIMER_DMASOUND_TICK);
@@ -1969,7 +1969,7 @@ void stbook_state::machine_start()
 	}
 
 	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0xfa0000, 0xfbffff, read16_delegate(FUNC(generic_slot_device::read16_rom),(generic_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xfa0000, 0xfbffff, read16s_delegate(FUNC(generic_slot_device::read16_rom),(generic_slot_device*)m_cart));
 
 	/* register for state saving */
 	ste_state::state_save();
@@ -2171,7 +2171,7 @@ void ste_state::ste(machine_config &config)
 	LMC1992(config, LMC1992_TAG);
 
 	// cartridge
-//  MCFG_SOFTWARE_LIST_ADD("cart_list", "ste_cart")
+//  SOFTWARE_LIST(config, "cart_list").set_original("ste_cart");
 
 	// internal ram
 	RAM(config, m_ram);

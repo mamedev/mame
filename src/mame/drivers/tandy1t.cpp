@@ -573,7 +573,7 @@ void tandy1000_state::tandy1000_io(address_map &map)
 	map(0x0000, 0x00ff).m(m_mb, FUNC(t1000_mb_device::map));
 	map(0x0060, 0x0063).rw(FUNC(tandy1000_state::tandy1000_pio_r), FUNC(tandy1000_state::tandy1000_pio_w));
 	map(0x00a0, 0x00a0).w(FUNC(tandy1000_state::nmi_vram_bank_w));
-	map(0x00c0, 0x00c0).w("sn76496", FUNC(ncr8496_device::command_w));
+	map(0x00c0, 0x00c0).w("sn76496", FUNC(ncr8496_device::write));
 	map(0x0200, 0x0207).rw("pc_joy", FUNC(pc_joy_device::joy_port_r), FUNC(pc_joy_device::joy_port_w));
 	map(0x0378, 0x037f).rw(FUNC(tandy1000_state::pc_t1t_p37x_r), FUNC(tandy1000_state::pc_t1t_p37x_w));
 	map(0x03d0, 0x03df).r(m_video, FUNC(pcvideo_t1000_device::read)).w(m_video, FUNC(pcvideo_t1000_device::write));
@@ -600,7 +600,7 @@ void tandy1000_state::tandy1000_16_io(address_map &map)
 	map(0x0060, 0x0063).rw(FUNC(tandy1000_state::tandy1000_pio_r), FUNC(tandy1000_state::tandy1000_pio_w));
 	map(0x0065, 0x0065).w(FUNC(tandy1000_state::devctrl_w));
 	map(0x00a0, 0x00a0).r(FUNC(tandy1000_state::unk_r));
-	map(0x00c0, 0x00c1).w("sn76496", FUNC(ncr8496_device::command_w));
+	map(0x00c0, 0x00c1).w("sn76496", FUNC(ncr8496_device::write));
 	map(0x0200, 0x0207).rw("pc_joy", FUNC(pc_joy_device::joy_port_r), FUNC(pc_joy_device::joy_port_w));
 	map(0x0378, 0x037f).rw(FUNC(tandy1000_state::pc_t1t_p37x_r), FUNC(tandy1000_state::pc_t1t_p37x_w));
 	map(0x03d0, 0x03df).r(m_video, FUNC(pcvideo_t1000_device::read)).w(m_video, FUNC(pcvideo_t1000_device::write));
@@ -665,7 +665,7 @@ MACHINE_CONFIG_START(tandy1000_state::tandy1000_common)
 	/* video hardware */
 	MCFG_DEVICE_ADD("pcvideo_t1000", PCVIDEO_T1000, 0)
 	MCFG_VIDEO_SET_SCREEN("pcvideo_t1000:screen")
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "pcvideo_t1000:palette", gfx_t1000)
+	GFXDECODE(config, "gfxdecode", "pcvideo_t1000:palette", gfx_t1000);
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("sn76496", NCR8496, XTAL(14'318'181)/4)
@@ -684,17 +684,21 @@ MACHINE_CONFIG_START(tandy1000_state::tandy1000_common)
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("640K");
 
-	MCFG_SOFTWARE_LIST_ADD("disk_list","t1000")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("pc_list","ibm5150")
+	SOFTWARE_LIST(config, "disk_list").set_original("t1000");
+	SOFTWARE_LIST(config, "pc_list").set_compatible("ibm5150");
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(tandy1000_state::tandy1000_90key)
-	MCFG_PC_KEYB_ADD("pc_keyboard", WRITELINE("mb:pic8259", pic8259_device, ir1_w))
-MACHINE_CONFIG_END
+void tandy1000_state::tandy1000_90key(machine_config &config)
+{
+	PC_KEYB(config, m_keyboard);
+	m_keyboard->keypress().set("mb:pic8259", FUNC(pic8259_device::ir1_w));
+}
 
-MACHINE_CONFIG_START(tandy1000_state::tandy1000_101key)
-	MCFG_AT_KEYB_ADD("pc_keyboard", 1, WRITELINE("mb:pic8259", pic8259_device, ir1_w))
-MACHINE_CONFIG_END
+void tandy1000_state::tandy1000_101key(machine_config &config)
+{
+	AT_KEYB(config, m_keyboard, pc_keyboard_device::KEYBOARD_TYPE::AT, 1);
+	m_keyboard->keypress().set("mb:pic8259", FUNC(pic8259_device::ir1_w));
+}
 
 MACHINE_CONFIG_START(tandy1000_state::t1000hx)
 	MCFG_DEVICE_ADD("maincpu", I8088, 8000000)
@@ -775,7 +779,7 @@ MACHINE_CONFIG_START(tandy1000_state::t1000tx)
 	MCFG_DEVICE_MODIFY( "maincpu" )
 	MCFG_DEVICE_IO_MAP(tandy1000tx_io)
 
-	MCFG_DEVICE_REMOVE("pc_keyboard")
+	config.device_remove("pc_keyboard");
 	tandy1000_90key(config);
 MACHINE_CONFIG_END
 

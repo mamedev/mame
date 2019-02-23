@@ -126,29 +126,30 @@ void mm1_state::mm1_palette(palette_device &palette) const
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( mm1m6_video )
+//  machine_config( mm1m6_video )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(mm1_state::mm1m6_video)
-	MCFG_SCREEN_ADD( SCREEN_TAG, RASTER )
-	MCFG_SCREEN_REFRESH_RATE( 50 )
-	MCFG_SCREEN_UPDATE_DRIVER(mm1_state, screen_update)
-	MCFG_SCREEN_SIZE( 800, 375 ) // (25 text rows * 15 vertical pixels / character)
-	MCFG_SCREEN_VISIBLE_AREA( 0, 800-1, 0, 375-1 )
-	//MCFG_SCREEN_RAW_PARAMS(XTAL(18'720'000), ...)
+void mm1_state::mm1m6_video(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz( 50 );
+	screen.set_screen_update(FUNC(mm1_state::screen_update));
+	screen.set_size( 800, 375 ); // (25 text rows * 15 vertical pixels / character)
+	screen.set_visarea( 0, 800-1, 0, 375-1 );
+	//screen.set_raw(XTAL(18'720'000), ...);
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_mm1);
 	PALETTE(config, m_palette, FUNC(mm1_state::mm1_palette), 3);
 
-	MCFG_DEVICE_ADD(I8275_TAG, I8275, XTAL(18'720'000)/8)
-	MCFG_I8275_CHARACTER_WIDTH(HORIZONTAL_CHARACTER_PIXELS)
-	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(mm1_state, crtc_display_pixels)
-	MCFG_I8275_DRQ_CALLBACK(WRITELINE(I8237_TAG, am9517a_device, dreq0_w))
-	MCFG_I8275_VRTC_CALLBACK(WRITELINE(UPD7220_TAG, upd7220_device, ext_sync_w))
-	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
+	I8275(config, m_crtc, XTAL(18'720'000)/8);
+	m_crtc->set_character_width(HORIZONTAL_CHARACTER_PIXELS);
+	m_crtc->set_display_callback(FUNC(mm1_state::crtc_display_pixels), this);
+	m_crtc->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq0_w));
+	m_crtc->vrtc_wr_callback().set(m_hgdc, FUNC(upd7220_device::ext_sync_w));
+	m_crtc->set_screen("screen");
 
 	UPD7220(config, m_hgdc, XTAL(18'720'000)/8);
 	m_hgdc->set_addrmap(0, &mm1_state::mm1_upd7220_map);
-	m_hgdc->set_display_pixels_callback(FUNC(mm1_state::hgdc_display_pixels), this);
+	m_hgdc->set_display_pixels(FUNC(mm1_state::hgdc_display_pixels));
 	m_hgdc->set_screen(SCREEN_TAG);
-MACHINE_CONFIG_END
+}

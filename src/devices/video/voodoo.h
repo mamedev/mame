@@ -1429,32 +1429,6 @@ enum
 #define STD_VOODOO_3_CLOCK          132000000
 
 
-
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_VOODOO_FBMEM(_value) \
-	downcast<voodoo_device &>(*device).set_fbmem(_value);
-
-#define MCFG_VOODOO_TMUMEM(_value1, _value2) \
-	downcast<voodoo_device &>(*device).set_tmumem(_value1, _value2);
-
-#define MCFG_VOODOO_SCREEN_TAG(_tag) \
-	downcast<voodoo_device &>(*device).set_screen_tag(_tag);
-
-#define MCFG_VOODOO_CPU_TAG(_tag) \
-	downcast<voodoo_device &>(*device).set_cpu_tag(_tag);
-
-#define MCFG_VOODOO_VBLANK_CB(_devcb) \
-	downcast<voodoo_device &>(*device).set_vblank_callback(DEVCB_##_devcb);
-
-#define MCFG_VOODOO_STALL_CB(_devcb) \
-	downcast<voodoo_device &>(*device).set_stall_callback(DEVCB_##_devcb);
-
-#define MCFG_VOODOO_PCIINT_CB(_devcb) \
-	downcast<voodoo_device &>(*device).set_pciint_callback(DEVCB_##_devcb);
-
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
@@ -1470,9 +1444,6 @@ public:
 	void set_tmumem(int value1, int value2) { m_tmumem0 = value1; m_tmumem1 = value2; }
 	template <typename T> void set_screen_tag(T &&tag) { m_screen_finder.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_cpu_tag(T &&tag) { m_cpu_finder.set_tag(std::forward<T>(tag)); }
-	template <class Object> devcb_base &set_vblank_callback(Object &&cb) { return m_vblank.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_stall_callback(Object &&cb)  { return m_stall.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_pciint_callback(Object &&cb) { return m_pciint.set_callback(std::forward<Object>(cb)); }
 	auto vblank_callback() { return m_vblank.bind(); }
 	auto stall_callback() { return m_stall.bind(); }
 	auto pciint_callback() { return m_pciint.bind(); }

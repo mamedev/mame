@@ -75,10 +75,11 @@ void c64_final_chesscard_device::c64_fcc_map(address_map &map)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(c64_final_chesscard_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(G65SC02P4_TAG, M65SC02, XTAL(5'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(c64_fcc_map)
-MACHINE_CONFIG_END
+void c64_final_chesscard_device::device_add_mconfig(machine_config &config)
+{
+	M65SC02(config, m_maincpu, XTAL(5'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &c64_final_chesscard_device::c64_fcc_map);
+}
 
 
 //-------------------------------------------------
@@ -147,7 +148,7 @@ void c64_final_chesscard_device::device_reset()
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------
 
-uint8_t c64_final_chesscard_device::c64_cd_r(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+uint8_t c64_final_chesscard_device::c64_cd_r(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!roml)
 	{
@@ -173,7 +174,7 @@ uint8_t c64_final_chesscard_device::c64_cd_r(address_space &space, offs_t offset
 //  c64_cd_w - cartridge data write
 //-------------------------------------------------
 
-void c64_final_chesscard_device::c64_cd_w(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+void c64_final_chesscard_device::c64_cd_w(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!roml)
 	{

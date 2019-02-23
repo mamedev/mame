@@ -591,17 +591,17 @@ WRITE_LINE_MEMBER(sfkick_state::irqhandler)
 	m_soundcpu->set_input_line_and_vector(0, state ? ASSERT_LINE : CLEAR_LINE, 0xff);
 }
 
-MACHINE_CONFIG_START(sfkick_state::sfkick)
+void sfkick_state::sfkick(machine_config &config)
+{
+	Z80(config, m_maincpu, MASTER_CLOCK/6);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sfkick_state::sfkick_map);
+	m_maincpu->set_addrmap(AS_IO, &sfkick_state::sfkick_io_map);
 
-	MCFG_DEVICE_ADD("maincpu",Z80,MASTER_CLOCK/6)
-	MCFG_DEVICE_PROGRAM_MAP(sfkick_map)
-	MCFG_DEVICE_IO_MAP(sfkick_io_map)
+	config.m_minimum_quantum = attotime::from_hz(60000);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
-
-	MCFG_DEVICE_ADD("soundcpu",Z80,MASTER_CLOCK/6)
-	MCFG_DEVICE_PROGRAM_MAP(sfkick_sound_map)
-	MCFG_DEVICE_IO_MAP(sfkick_sound_io_map)
+	Z80(config, m_soundcpu, MASTER_CLOCK/6);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &sfkick_state::sfkick_sound_map);
+	m_soundcpu->set_addrmap(AS_IO, &sfkick_state::sfkick_sound_io_map);
 
 	v9938_device &v9938(V9938(config, "v9938", MASTER_CLOCK));
 	v9938.set_screen_ntsc("screen");
@@ -618,15 +618,13 @@ MACHINE_CONFIG_START(sfkick_state::sfkick)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ym1", YM2203, MASTER_CLOCK/6)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(*this, sfkick_state, irqhandler))
-
-	MCFG_SOUND_ROUTE(0, "mono", 0.25)
-	MCFG_SOUND_ROUTE(1, "mono", 0.25)
-	MCFG_SOUND_ROUTE(2, "mono", 0.25)
-	MCFG_SOUND_ROUTE(3, "mono", 0.50)
-
-MACHINE_CONFIG_END
+	ym2203_device &ym1(YM2203(config, "ym1", MASTER_CLOCK/6));
+	ym1.irq_handler().set(FUNC(sfkick_state::irqhandler));
+	ym1.add_route(0, "mono", 0.25);
+	ym1.add_route(1, "mono", 0.25);
+	ym1.add_route(2, "mono", 0.25);
+	ym1.add_route(3, "mono", 0.50);
+}
 
 void sfkick_state::init_sfkick()
 {

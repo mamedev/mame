@@ -162,12 +162,12 @@ WRITE_LINE_MEMBER(proteus_state::ptm_o3_callback)
 
 READ8_MEMBER(proteus_state::network_r)
 {
-	return m_adlc->read(space, offset >> 1);
+	return m_adlc->read(offset >> 1);
 }
 
 WRITE8_MEMBER(proteus_state::network_w)
 {
-	m_adlc->write(space, offset >> 1, data);
+	m_adlc->write(offset >> 1, data);
 }
 
 
@@ -339,10 +339,8 @@ MACHINE_CONFIG_START(proteus_state::proteus)
 	m_fdc->hld_wr_callback().set(FUNC(proteus_state::motor_w));
 	m_fdc->set_force_ready(true);
 
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", proteus_floppies, "8dssd", proteus_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", proteus_floppies, "8dssd", proteus_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, "fdc:0", proteus_floppies, "8dssd", proteus_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", proteus_floppies, "8dssd", proteus_state::floppy_formats).enable_sound(true);
 
 	/* ram */
 	RAM(config, RAM_TAG).set_default_size("64K");
@@ -366,9 +364,10 @@ MACHINE_CONFIG_START(proteus_state::proteus)
 	m_pia->irqa_handler().set("irqs", FUNC(input_merger_device::in_w<2>));
 	m_pia->irqb_handler().set("irqs", FUNC(input_merger_device::in_w<3>));
 
-	MCFG_DEVICE_ADD("parallel", CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE("pia", pia6821_device, ca1_w))
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "parallel")
+	centronics_device &parallel(CENTRONICS(config, "parallel", centronics_devices, "printer"));
+	parallel.ack_handler().set(m_pia, FUNC(pia6821_device::ca1_w));
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	parallel.set_output_latch(cent_data_out);
 
 	/* terminal port */
 	ACIA6850(config, m_acia[0], 0);
@@ -413,8 +412,7 @@ MACHINE_CONFIG_START(proteus_state::proteus)
 	acia2_clock.signal_handler().append(m_acia[2], FUNC(acia6850_device::write_rxc));
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "poly_flop")
-	MCFG_SOFTWARE_LIST_FILTER("flop_list", "PROTEUS")
+	SOFTWARE_LIST(config, "flop_list").set_original("poly_flop").set_filter("PROTEUS");
 MACHINE_CONFIG_END
 
 

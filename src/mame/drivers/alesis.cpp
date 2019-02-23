@@ -434,12 +434,12 @@ MACHINE_CONFIG_START(alesis_state::hr16)
 
 	PALETTE(config, "palette", FUNC(alesis_state::alesis_palette), 2);
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
-	MCFG_CASSETTE_INTERFACE("hr16_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED);
+	m_cassette->set_interface("hr16_cass");
 
-	MCFG_HD44780_ADD("hd44780")
-	MCFG_HD44780_LCD_SIZE(2, 16)
+	HD44780(config, m_lcdc, 0);
+	m_lcdc->set_lcd_size(2, 16);
 
 	/* sound hardware */
 	ALESIS_DM3AG(config, "dm3ag", 12_MHz_XTAL/2);
@@ -461,9 +461,8 @@ MACHINE_CONFIG_START(alesis_state::sr16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 6*8-1, 0, 9*2-1)
 	config.set_default_layout(layout_sr16);
 
-	MCFG_DEVICE_MODIFY("hd44780")
-	MCFG_HD44780_LCD_SIZE(2, 8)
-	MCFG_HD44780_PIXEL_UPDATE_CB(alesis_state, sr16_pixel_update)
+	m_lcdc->set_lcd_size(2, 8);
+	m_lcdc->set_pixel_update_cb(FUNC(alesis_state::sr16_pixel_update), this);
 MACHINE_CONFIG_END
 
 void alesis_state::mmt8(machine_config &config)

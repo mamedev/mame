@@ -60,8 +60,9 @@ static INPUT_PORTS_START( unkfr )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START( unkfr_state::unkfr )
-MACHINE_CONFIG_END
+void unkfr_state::unkfr(machine_config &config)
+{
+}
 
 ROM_START( unkfr )
 	ROM_REGION( 0x800000, "unkroms", 0 )

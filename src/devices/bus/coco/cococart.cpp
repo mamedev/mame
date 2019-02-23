@@ -597,40 +597,6 @@ address_space &device_cococart_interface::cartridge_space()
 
 
 //-------------------------------------------------
-//  install_read_handler
-//-------------------------------------------------
-
-void device_cococart_interface::install_read_handler(uint16_t addrstart, uint16_t addrend, read8_delegate rhandler)
-{
-	address_space &space(cartridge_space());
-	space.install_read_handler(addrstart, addrend, rhandler);
-}
-
-
-//-------------------------------------------------
-//  install_write_handler
-//-------------------------------------------------
-
-void device_cococart_interface::install_write_handler(uint16_t addrstart, uint16_t addrend, write8_delegate whandler)
-{
-	address_space &space(cartridge_space());
-	space.install_write_handler(addrstart, addrend, whandler);
-}
-
-
-//-------------------------------------------------
-//  install_readwrite_handler
-//-------------------------------------------------
-
-void device_cococart_interface::install_readwrite_handler(uint16_t addrstart, uint16_t addrend, read8_delegate rhandler, write8_delegate whandler)
-{
-	address_space &space(cartridge_space());
-	space.install_read_handler(addrstart, addrend, rhandler);
-	space.install_write_handler(addrstart, addrend, whandler);
-}
-
-
-//-------------------------------------------------
 //  set_line_value
 //-------------------------------------------------
 

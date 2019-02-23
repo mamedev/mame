@@ -556,7 +556,7 @@ MACHINE_CONFIG_START(okean240_state::okean240a)
 	okean240t(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(okean240a_io)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_okean240a)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_okean240a);
 	subdevice<rs232_port_device>("rs232")->set_default_option("keyboard");
 
 	m_ppikbd->in_pa_callback().set(FUNC(okean240_state::okean240a_port40_r));
@@ -570,9 +570,9 @@ MACHINE_CONFIG_START(okean240_state::okean240)
 	okean240t(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(okean240_io)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_okean240)
-	MCFG_DEVICE_REMOVE("uart")
-	MCFG_DEVICE_REMOVE("rs232")
+	GFXDECODE(config, "gfxdecode", "palette", gfx_okean240);
+	config.device_remove("uart");
+	config.device_remove("rs232");
 	subdevice<pit8253_device>("pit")->out_handler<1>().set_nop();
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
 	keyboard.set_keyboard_callback(FUNC(okean240_state::kbd_put));

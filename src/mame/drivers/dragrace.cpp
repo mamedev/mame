@@ -281,7 +281,7 @@ MACHINE_CONFIG_START(dragrace_state::dragrace)
 
 	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 8);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("frame_timer", dragrace_state, dragrace_frame_callback, attotime::from_hz(60))
+	TIMER(config, "frame_timer").configure_periodic(FUNC(dragrace_state::dragrace_frame_callback), attotime::from_hz(60));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -291,7 +291,7 @@ MACHINE_CONFIG_START(dragrace_state::dragrace)
 	MCFG_SCREEN_UPDATE_DRIVER(dragrace_state, screen_update_dragrace)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dragrace)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_dragrace);
 	PALETTE(config, "palette", FUNC(dragrace_state::dragrace_palette), 16);
 
 	/* sound hardware */

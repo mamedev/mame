@@ -43,9 +43,9 @@ protected:
 	// device_comx_expansion_card_interface overrides
 	virtual int comx_ef4_r() override;
 	virtual void comx_q_w(int state) override;
-	virtual uint8_t comx_mrd_r(address_space &space, offs_t offset, int *extrom) override;
-	virtual uint8_t comx_io_r(address_space &space, offs_t offset) override;
-	virtual void comx_io_w(address_space &space, offs_t offset, uint8_t data) override;
+	virtual uint8_t comx_mrd_r(offs_t offset, int *extrom) override;
+	virtual uint8_t comx_io_r(offs_t offset) override;
+	virtual void comx_io_w(offs_t offset, uint8_t data) override;
 
 private:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );

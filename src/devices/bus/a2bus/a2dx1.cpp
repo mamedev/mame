@@ -31,14 +31,14 @@ DEFINE_DEVICE_TYPE(A2BUS_DX1, a2bus_dx1_device, "a2dx1", "Decillonix DX-1")
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(a2bus_dx1_device::device_add_mconfig)
+void a2bus_dx1_device::device_add_mconfig(machine_config &config)
+{
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
-	MCFG_DEVICE_ADD("dacvol", DAC_8BIT_R2R, 0) // unknown DAC
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dacvol", 1.0, DAC_VREF_POS_INPUT)
-MACHINE_CONFIG_END
+	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
+	DAC_8BIT_R2R(config, m_dacvol, 0).add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT).add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dacvol", 1.0, DAC_VREF_POS_INPUT);
+}
 
 //**************************************************************************
 //  LIVE DEVICE

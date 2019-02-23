@@ -197,7 +197,8 @@ void msx_cart_disk_device::initialize_cartridge()
 }
 
 
-MACHINE_CONFIG_START(msx_cart_vy0010_device::device_add_mconfig)
+void msx_cart_vy0010_device::device_add_mconfig(machine_config &config)
+{
 	// From VY-0010 schematic:
 	// HLT pulled high
 	// SSO/-ENMF + -DDEN + ENP + -5/8 - pulled low
@@ -206,60 +207,63 @@ MACHINE_CONFIG_START(msx_cart_vy0010_device::device_add_mconfig)
 	m_fdc->set_force_ready(true);
 
 	// Single sided 3.5" floppy drive
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", msx_floppies, "35ssdd", msx_cart_disk_device::floppy_formats)
+	FLOPPY_CONNECTOR(config, "fdc:0", msx_floppies, "35ssdd", msx_cart_disk_device::floppy_formats);
 
 	// Attach software lists
 	// We do not know in what kind of machine the user has inserted the floppy interface
 	// so we list all msx floppy software lists.
 	//
-	MCFG_SOFTWARE_LIST_ADD("flop_list","msx2_flop")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("msx1_flop_list","msx1_flop")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "flop_list").set_original("msx2_flop");
+	SOFTWARE_LIST(config, "msx1_flop_list").set_compatible("msx1_flop");
+}
 
-MACHINE_CONFIG_START(msx_cart_fsfd1_device::device_add_mconfig)
+void msx_cart_fsfd1_device::device_add_mconfig(machine_config &config)
+{
 	WD2793(config, m_fdc, 4_MHz_XTAL / 4);
 
 	// Double sided 3.5" floppy drive
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", msx_floppies, "35dd", msx_cart_disk_device::floppy_formats)
+	FLOPPY_CONNECTOR(config, "fdc:0", msx_floppies, "35dd", msx_cart_disk_device::floppy_formats);
 
 	// Attach software lists
 	// We do not know in what kind of machine the user has inserted the floppy interface
 	// so we list all msx floppy software lists.
 	//
-	MCFG_SOFTWARE_LIST_ADD("flop_list","msx2_flop")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("msx1_flop_list","msx1_flop")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "flop_list").set_original("msx2_flop");
+	SOFTWARE_LIST(config, "msx1_flop_list").set_compatible("msx1_flop");
+}
 
 
-MACHINE_CONFIG_START(msx_cart_fsfd1a_device::device_add_mconfig)
+void msx_cart_fsfd1a_device::device_add_mconfig(machine_config &config)
+{
 	TC8566AF(config, m_fdc, 16'000'000);
 
 	// Double sided 3.5" floppy drive
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", msx_floppies, "35dd", msx_cart_disk_device::floppy_formats)
+	FLOPPY_CONNECTOR(config, "fdc:0", msx_floppies, "35dd", msx_cart_disk_device::floppy_formats);
 
 	// Attach software lists
 	// We do not know in what kind of machine the user has inserted the floppy interface
 	// so we list all msx floppy software lists.
 	//
-	MCFG_SOFTWARE_LIST_ADD("flop_list","msx2_flop")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("msx1_flop_list","msx1_flop")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "flop_list").set_original("msx2_flop");
+	SOFTWARE_LIST(config, "msx1_flop_list").set_compatible("msx1_flop");
+}
 
 
-MACHINE_CONFIG_START(msx_cart_fscf351_device::device_add_mconfig)
+void msx_cart_fscf351_device::device_add_mconfig(machine_config &config)
+{
 	MB8877(config, m_fdc, 4_MHz_XTAL / 4);
 	m_fdc->set_force_ready(true);
 
 	// Double sided 3.5" floppy drive
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", msx_floppies, "35dd", msx_cart_disk_device::floppy_formats)
+	FLOPPY_CONNECTOR(config, "fdc:0", msx_floppies, "35dd", msx_cart_disk_device::floppy_formats);
 
 	// Attach software lists
 	// We do not know in what kind of machine the user has inserted the floppy interface
 	// so we list all msx floppy software lists.
 	//
-	MCFG_SOFTWARE_LIST_ADD("flop_list","msx2_flop")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("msx1_flop_list","msx1_flop")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "flop_list").set_original("msx2_flop");
+	SOFTWARE_LIST(config, "msx1_flop_list").set_compatible("msx1_flop");
+}
 
 
 void msx_cart_disk_type1_device::device_start()

@@ -168,7 +168,7 @@ MACHINE_CONFIG_START(higemaru_state::higemaru)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/4)  /* 3 MHz Sharp LH0080A Z80A-CPU-D */
 	MCFG_DEVICE_PROGRAM_MAP(higemaru_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", higemaru_state, higemaru_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(higemaru_state::higemaru_scanline), "screen", 0, 1);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -179,7 +179,7 @@ MACHINE_CONFIG_START(higemaru_state::higemaru)
 	MCFG_SCREEN_UPDATE_DRIVER(higemaru_state, screen_update_higemaru)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_higemaru)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_higemaru);
 
 	PALETTE(config, m_palette, FUNC(higemaru_state::higemaru_palette), 32*4+16*16, 32);
 

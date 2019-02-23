@@ -233,7 +233,7 @@ MACHINE_CONFIG_START(poolshrk_state::poolshrk)
 	MCFG_SCREEN_UPDATE_DRIVER(poolshrk_state, screen_update)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_poolshrk)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_poolshrk);
 	PALETTE(config, m_palette, FUNC(poolshrk_state::poolshrk_palette), 4);
 
 	/* sound hardware */

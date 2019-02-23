@@ -39,7 +39,7 @@ namespace netlist
 
 		logic_output_t m_DO;
 
-		state_var<uint8_t[128]> m_ram; // 1024x1 bits
+		state_array<uint8_t, 128> m_ram; // 1024x1 bits
 		param_ptr_t m_RAM;
 	};
 
@@ -97,8 +97,8 @@ namespace netlist
 			m_ram[i] = 0;
 	}
 
-	NETLIB_DEVICE_IMPL(2102A)
-	NETLIB_DEVICE_IMPL(2102A_dip)
+	NETLIB_DEVICE_IMPL(2102A,	 "RAM_2102A", 	"+CEQ,+A0,+A1,+A2,+A3,+A4,+A5,+A6,+A7,+A8,+A9,+RWQ,+DI")
+	NETLIB_DEVICE_IMPL(2102A_dip,"RAM_2102A_DIP","")
 
 	} //namespace devices
 } // namespace netlist

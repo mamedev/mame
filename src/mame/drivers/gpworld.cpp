@@ -513,7 +513,7 @@ MACHINE_CONFIG_START(gpworld_state::gpworld)
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gpworld)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gpworld);
 	MCFG_PALETTE_ADD("palette", 1024)
 
 	/* sound hardware */

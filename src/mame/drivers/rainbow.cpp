@@ -10,30 +10,27 @@ Baud rate generator by AJR (2018) and Shattered (2016), keyboard & GDC fixes by 
 To unlock floppy drives A-D compile with WORKAROUND_RAINBOW_B (prevents a side effect of ERROR 13).
 
 Native single sided 5.25" images with 80 tracks, 10 sectors are well tested (*.IMD / *.TD0=TeleDisk / *.IMG with 400 K).
-IMG files of DOS 180K, 360 K and VT180 disks are essentially untested (note that VT disks must be mounted "read only").
+VT180 images (184.320 Bytes) are very unreliable in CP/M - though a real machine can read them.
+5.25 MFM PC style drives and 720 K (3.5 " DS-DD MFM PC formatted disks) (on slots 3 + 4) show regressions / bugs
+  as of Dec.2018 (file content bad while dir is OK, seek errors, write fault errors when copying _to_ hard disk).
 
-To read a 40 track, PC-DOS formatted 5.25" image (*.TD0 preferred) mounted on drive slot 3 add:
-DEVICE=A:\idrive5.sys
-
-To access a 80 track, PC-DOS formatted 3.5" image (720K, IMG preferred) mounted on drive slot 4 add:
-DEVICE=A:\impdrv3.sys D:
-NOTE: content will be accessible via letter E: or F: (NOT D:).  No luck with Impdrv5, Impdrv5F, Impdrv5T...
-
-PLEASE USE THE RIGHT SLOT - AND ALWAYS SAVE YOUR DATA BEFORE MOUNTING FOREIGN DISK FORMATS!
+ALWAYS USE THE RIGHT SLOT AND SAVE YOUR DATA BEFORE MOUNTING FOREIGN DISK FORMATS!
 
 You * should * also reassign SETUP (away from F3, where it sits on a LK201).
 DATA LOSS POSSIBLE: when in partial emulation mode, F3 performs a hard reset!
 
 STATE AS OF DECEMBER 2018
-------------------------
+-------------------------
 Driver is based entirely on the DEC-100 'B' variant (DEC-190 and DEC-100 A models are treated as clones).
 While this is OK for the compatible -190, it doesn't do justice to ancient '100 A' hardware.
 The public domain file RBCONVERT.ZIP documents how model 'A' differs from version B.
-
-There is some evidence that the The Design Maturity Test was designed for the Rainbow-100-A.
 NVRAM files from -A and -B machines are not interchangeable. If problems arise, delete the NVRAM file.
 
-CPM 2.1 / DOS2.11 / DOS 3.x and UCSD systems (fort_sys, pas_sys) + diag disks boot.
+Venix 86-R (BSW) is working, just follow https://github.com/bsdimp/venix/blob/master/doc/MESS-RB-INSTALL.md
+
+CPM 2.1 / DOS2.11 / DOS 3.x / diag disks boot. UCSD systems (fort_sys, pas_sys) boot, but expect 4 QD drives
+  loaded with disks (reassign slots, reset and mount three empty 400 K images before startup at #2, #3, #4).
+
 It is possible to boot DOS 3.10 from floppy A: and later use a hard disk attached to E:.
 
 NB.: a single hard disk (5 - 67 MB, 512 byte sectors) may be attached before startup. It should remain there
@@ -359,7 +356,6 @@ W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 #include "screen.h"
 
 #include "rainbow.lh" // BEZEL - LAYOUT with LEDs for diag 1-7, keyboard 8-11 and floppy 20-23
-
 
 #define RD51_MAX_HEAD 8
 #define RD51_MAX_CYLINDER 1024
@@ -713,7 +709,7 @@ private:
 
 	uint16_t m_gdc_write_mask;
 
-	bool m_onboard_graphics_selected;   // (internal switch, on board video to mono out)
+	bool m_onboard_video_selected;   // (internal switch, on board video to mono out)
 	bool m_screen_blank;
 
 	uint8_t m_monitor_suggested;
@@ -806,12 +802,15 @@ private:
 
 UPD7220_DISPLAY_PIXELS_MEMBER( rainbow_state::hgdc_display_pixels )
 {
+	if(m_inp7->read() == 0)
+		return;
+
 	const rgb_t *paletteX = m_palette2->palette()->entry_list_raw();
 
 	uint16_t plane0, plane1, plane2, plane3;
 	uint8_t pen;
 
-	if (m_onboard_graphics_selected && (m_inp13->read() != DUAL_MONITOR))
+	if (m_onboard_video_selected && (m_inp13->read() != DUAL_MONITOR))
 	{
 		for (int xi = 0; xi < 16; xi++) // blank screen when VT102 output active (..)
 		{
@@ -1253,9 +1252,7 @@ void rainbow_state::machine_reset()
 	OPTION_RESET_PATTERNS
 
 	for (int i = 0; i < 32; i++)
-	{
 		m_gdc_color_map[i] = 0x00;
-	};
 	m_gdc_color_map_index = 0;
 	// *********** Z80
 
@@ -1353,7 +1350,7 @@ uint32_t rainbow_state::screen_update_rainbow(screen_device &screen, bitmap_ind1
 	}
 
 	int palette_selected;
-	if (m_onboard_graphics_selected && (m_monitor_suggested == COLOR_MONITOR))
+	if (m_onboard_video_selected && (m_monitor_suggested == COLOR_MONITOR))
 		 palette_selected = 2; // Color monitor; green text
 	else
 		 palette_selected = m_inp9->read();
@@ -1361,7 +1358,7 @@ uint32_t rainbow_state::screen_update_rainbow(screen_device &screen, bitmap_ind1
 	m_crtc->palette_select(palette_selected);
 	m_crtc->video_update(bitmap, cliprect);
 
-	if (m_screen_blank || ((!m_onboard_graphics_selected) && (m_inp13->read() != DUAL_MONITOR))) // dual monitor: never blank all
+	if (m_screen_blank || ((!m_onboard_video_selected) && (m_inp13->read() != DUAL_MONITOR))) // dual monitor: never blank all
 		m_crtc->video_blanking(bitmap, cliprect);
 	else
 		m_crtc->video_update(bitmap, cliprect);
@@ -1420,10 +1417,10 @@ WRITE_LINE_MEMBER(rainbow_state::mpsc_irq)
 // PORT 0x06 : Communication bit rates (see page 21 of PC 100 SPEC)
 WRITE8_MEMBER(rainbow_state::comm_bitrate_w)
 {
-	m_dbrg->write_str(data & 0x0f);  // PDF is wrong, low nibble is RECEIVE clock (verified in SETUP).
+	m_dbrg->str_w(data & 0x0f);  // PDF is wrong, low nibble is RECEIVE clock (verified in SETUP).
 	logerror("\n(COMM.) receive bitrate = %d ($%02x)\n", comm_rates[data & 0x0f] , data & 0x0f);
 
-	m_dbrg->write_stt( ((data & 0xf0) >> 4) );
+	m_dbrg->stt_w( ((data & 0xf0) >> 4) );
 	logerror("(COMM.) transmit bitrate = %d ($%02x)\n", comm_rates[((data & 0xf0) >> 4)] ,(data & 0xf0) >> 4);
 }
 
@@ -1744,7 +1741,7 @@ WRITE_LINE_MEMBER(rainbow_state::hdc_read_sector)
 
 	if (!m_hdc_write_gate) // do not read when WRITE GATE is on
 	{
-		uint8_t sdh = (m_hdc->read(generic_space(), 0x06));
+		uint8_t sdh = (m_hdc->read(0x06));
 		int drv = (sdh & (8 + 16)) >> 3; // get DRIVE from SDH register
 
 		if ((state == 0) && (last_state == 1) && (drv == 0))
@@ -1753,9 +1750,9 @@ WRITE_LINE_MEMBER(rainbow_state::hdc_read_sector)
 			output().set_value("led1", 0);
 			switch_off_timer->adjust(attotime::from_msec(500));
 
-			int hi = (m_hdc->read(generic_space(), 0x05)) & 0x07;
-			uint16_t cylinder = (m_hdc->read(generic_space(), 0x04)) | (hi << 8);
-			uint8_t sector_number = m_hdc->read(generic_space(), 0x03);
+			int hi = (m_hdc->read(0x05)) & 0x07;
+			uint16_t cylinder = (m_hdc->read(0x04)) | (hi << 8);
+			uint8_t sector_number = m_hdc->read(0x03);
 
 			hard_disk_file *local_hard_disk;
 			local_hard_disk = rainbow_hdc_file(0); // one hard disk for now.
@@ -1815,7 +1812,7 @@ WRITE_LINE_MEMBER(rainbow_state::hdc_write_sector)
 	else
 		m_hdc_write_gate = true;
 
-	int drv = ((m_hdc->read(generic_space(), 0x06)) & (8 + 16)) >> 3; // get DRIVE from SDH register
+	int drv = ((m_hdc->read(0x06)) & (8 + 16)) >> 3; // get DRIVE from SDH register
 
 	if (state == 0 && wg_last == 1 && drv == 0)  // Check correct state transition and DRIVE 0 ....
 	{
@@ -1869,13 +1866,13 @@ int rainbow_state::do_write_sector()
 			feedback = 10;
 			output().set_value("led1", 1); // OFF
 
-			uint8_t sdh = (m_hdc->read(generic_space(), 0x06));
+			uint8_t sdh = (m_hdc->read(0x06));
 
-			int hi = (m_hdc->read(generic_space(), 0x05)) & 0x07;
-			uint16_t cylinder = (m_hdc->read(generic_space(), 0x04)) | (hi << 8);
+			int hi = (m_hdc->read(0x05)) & 0x07;
+			uint16_t cylinder = (m_hdc->read(0x04)) | (hi << 8);
 
-			int sector_number = m_hdc->read(generic_space(), 0x03);
-			int sector_count = m_hdc->read(generic_space(), 0x02); // (1 = single sector)
+			int sector_number = m_hdc->read(0x03);
+			int sector_count = m_hdc->read(0x02); // (1 = single sector)
 
 			if (!(cylinder <= info->cylinders &&                     // filter invalid cylinders
 				SECTOR_SIZES[(sdh >> 5) & 0x03] == info->sectorbytes // 512, may not vary
@@ -1946,7 +1943,7 @@ READ8_MEMBER(rainbow_state::hd_status_68_r)
 		data = 0xa0; // A0 : OK, DRIVE IS READY (!)
 
 	int my_offset = 0x07;
-	int stat = m_hdc->read(space, my_offset);
+	int stat = m_hdc->read(my_offset);
 //  logerror("(x68) WD1010 register %04x (STATUS) read, result : %04x\n", my_offset, stat);
 
 	// NOTE: SEEK COMPLETE IS CURRENTLY HARD WIRED / NOT FULLY EMULATED -
@@ -2046,14 +2043,14 @@ positioned over cylinder 0 (the data track furthest away from the spindle).
 */
 READ8_MEMBER(rainbow_state::hd_status_69_r)
 {
-	int hs = m_hdc->read(space, 0x06) & (1 + 2 + 4); // SDH bits 0-2 = HEAD #
+	int hs = m_hdc->read(0x06) & (1 + 2 + 4); // SDH bits 0-2 = HEAD #
 //  logerror("(x69 READ) %i = HEAD SELECT WD1010\n", hs);
 
 	uint8_t data = (hs << 1);
 
 	// DRIVE SELECT: 2 bits in SDH register of WDx010 could address 4 drives.
 	// External circuit supports 1 drive here (DRIVE 0 selected or deselected)
-	int drv = ((m_hdc->read(space, 0x06) >> 3) & 0x01);  // 0x03 gives error R6 with DIAG.DISK
+	int drv = ((m_hdc->read(0x06) >> 3) & 0x01);  // 0x03 gives error R6 with DIAG.DISK
 	if (drv == 0)
 		data |= 1; //      logerror("(x69 READ) %i = _DRIVE # 0_ SELECT! \n", drv);
 
@@ -2067,7 +2064,7 @@ READ8_MEMBER(rainbow_state::hd_status_69_r)
 		data |= 64;
 
 	// Fake TRACK 0 signal  (normally FROM DRIVE)
-	if ((m_hdc->read(space, 0x04) == 0) && (m_hdc->read(space, 0x05) == 0)) // CYL.LO - CYL.HI
+	if ((m_hdc->read(0x04) == 0) && (m_hdc->read(0x05) == 0)) // CYL.LO - CYL.HI
 		data |= 128; //      logerror("(x69 READ) TRACK 00 detected\n");
 
 	return data;
@@ -2531,10 +2528,6 @@ IRQ_CALLBACK_MEMBER(rainbow_state::irq_callback)
 				if (i == IRQ_8088_VBL)  // If VBL IRQ acknowledged...
 					m_crtc->MHFU(MHFU_RESET); // ...reset counter (also: DC012_W)
 
-// Edstrom: "The call to m1_r() on line 2571 is not needed as the 7201 does not have an M1 input, instead it expects to get a software iack."
-//              if (i == IRQ_COMM_PTR_INTR_L)
-//                  m_mpsc->m1_r();  // serial interrupt acknowledge
-
 				intnum = vectors[i] | m_irq_high;
 				break;
 			}
@@ -2695,21 +2688,21 @@ WRITE8_MEMBER(rainbow_state::diagnostic_w) // 8088 (port 0A WRITTEN). Fig.4-28 +
 		m_fdc->reset(); // See formatter description p.197 or 5-13
 	}
 
-	m_screen_blank = BIT(data, 1);
+	m_screen_blank = BIT(data, 1)? false : true; // inverse logic
 
 	// Switch determines how the monochrome output pin is taken from:
 	//    0  = M(ono) out from system module (DC011/DC012). Default, also used to setup dual monitors.
 	//    1  = M(ono) output from GRAPHICS OPTION. (G)reen remains unused with a single COLOR monitor.
-	m_onboard_graphics_selected = (data & 0x04) ? false : true;
-	if (!m_onboard_graphics_selected)
+	m_onboard_video_selected = (data & 0x04) ? false : true;
+	if (!m_onboard_video_selected)
 	{
 		if (m_inp7->read() == 1)
 		{
 			printf("\nHINT: GRAPHICS OPTION ON. TEXT ONLY (DC011/DC012) OUTPUT NOW DISABLED.\n");
 		}
 		else
-		{   printf("\nALARM: GRAPHICS OPTION * SWITCHED OFF * VIA DIP. TEXT OUTPUT STILL ENABLED!\n");
-			m_onboard_graphics_selected = true;
+		{       printf("\nALARM: GRAPHICS OPTION * SWITCHED OFF * VIA DIP. TEXT OUTPUT STILL ENABLED!\n");
+			m_onboard_video_selected = true;
 		}
 		logerror("DATA: %x (PC=%x)\n", data, m_i8088->pc());
 	}
@@ -3226,7 +3219,7 @@ MACHINE_CONFIG_START(rainbow_state::rainbow)
 
 	MCFG_SCREEN_UPDATE_DRIVER(rainbow_state, screen_update_rainbow)
 	MCFG_SCREEN_PALETTE("vt100_video:palette")
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "vt100_video:palette", gfx_rainbow)
+	GFXDECODE(config, "gfxdecode", "vt100_video:palette", gfx_rainbow);
 
 	RAINBOW_VIDEO(config, m_crtc, 24.0734_MHz_XTAL);
 	m_crtc->set_screen("screen");
@@ -3240,7 +3233,7 @@ MACHINE_CONFIG_START(rainbow_state::rainbow)
 	m_hgdc->vsync_wr_callback().set(FUNC(rainbow_state::GDC_vblank_irq)); // "The vsync callback line needs to be below the 7220 DEVICE_ADD line."
 
 	m_hgdc->set_addrmap(0, &rainbow_state::upd7220_map);
-	m_hgdc->set_display_pixels_callback(FUNC(rainbow_state::hgdc_display_pixels), this);
+	m_hgdc->set_display_pixels(FUNC(rainbow_state::hgdc_display_pixels));
 	m_hgdc->set_screen(m_screen2); // set_screen needs to be added after 7720 device in the machine config, not after the screen.
 
 	MCFG_PALETTE_ADD("palette2", 32)
@@ -3258,13 +3251,13 @@ MACHINE_CONFIG_START(rainbow_state::rainbow)
 	MCFG_SCREEN_UPDATE_DEVICE("upd7220", upd7220_device, screen_update)
 
 	FD1793(config, m_fdc, 24.0734_MHz_XTAL / 24); // no separate 1 Mhz quartz
-	MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":0", rainbow_floppies, "525qd", rainbow_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":1", rainbow_floppies, "525qd", rainbow_state::floppy_formats)
-	//MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":2", rainbow_floppies, "525qd", rainbow_state::floppy_formats)
-	//MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":3", rainbow_floppies, "525qd", rainbow_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":2", rainbow_floppies, "525dd", rainbow_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":3", rainbow_floppies, "35dd", rainbow_state::floppy_formats)
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "rainbow")
+	FLOPPY_CONNECTOR(config, FD1793_TAG ":0", rainbow_floppies, "525qd", rainbow_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, FD1793_TAG ":1", rainbow_floppies, "525qd", rainbow_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, FD1793_TAG ":2", rainbow_floppies, "525qd", rainbow_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, FD1793_TAG ":3", rainbow_floppies, "525qd", rainbow_state::floppy_formats);
+	//FLOPPY_CONNECTOR(config, FD1793_TAG ":2", rainbow_floppies, "525dd", rainbow_state::floppy_formats);
+	//FLOPPY_CONNECTOR(config, FD1793_TAG ":3", rainbow_floppies, "35dd", rainbow_state::floppy_formats);
+	SOFTWARE_LIST(config, "flop_list").set_original("rainbow");
 
 	/// ********************************* HARD DISK CONTROLLER *****************************************
 	WD2010(config, m_hdc, 5000000); // 10 Mhz quartz on controller (divided by 2 for WCLK)
@@ -3342,7 +3335,7 @@ MACHINE_CONFIG_START(rainbow_state::rainbow)
 	prtbrg.set_stages(8);
 	prtbrg.count_out_cb().set(FUNC(rainbow_state::bitrate_counter_w));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("motor", rainbow_state, hd_motor_tick, attotime::from_hz(60))
+	TIMER(config, "motor").configure_periodic(FUNC(rainbow_state::hd_motor_tick), attotime::from_hz(60));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
@@ -3455,4 +3448,3 @@ ROM_END
 COMP(1982, rainbow100a, rainbow, 0,      rainbow, rainbow100b_in, rainbow_state, empty_init, "Digital Equipment Corporation", "Rainbow 100-A", MACHINE_IS_SKELETON)
 COMP(1983, rainbow,     0,       0,      rainbow, rainbow100b_in, rainbow_state, empty_init, "Digital Equipment Corporation", "Rainbow 100-B", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS)
 COMP(1985, rainbow190,  rainbow, 0,      rainbow, rainbow100b_in, rainbow_state, empty_init, "Digital Equipment Corporation", "Rainbow 190-B", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_COLORS)
-

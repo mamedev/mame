@@ -735,7 +735,7 @@ MACHINE_CONFIG_START(qx10_state::qx10)
 	m_screen->set_screen_update(FUNC(qx10_state::screen_update));
 	m_screen->set_size(640, 480);
 	m_screen->set_visarea(0, 640-1, 0, 480-1);
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_qx10)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_qx10);
 	PALETTE(config, m_palette, FUNC(qx10_state::qx10_palette), 8);
 
 	/* Devices */
@@ -801,8 +801,8 @@ MACHINE_CONFIG_START(qx10_state::qx10)
 
 	UPD7220(config, m_hgdc, MAIN_CLK/6); // unk clock
 	m_hgdc->set_addrmap(0, &qx10_state::upd7220_map);
-	m_hgdc->set_display_pixels_callback(FUNC(qx10_state::hgdc_display_pixels), this);
-	m_hgdc->set_draw_text_callback(FUNC(qx10_state::hgdc_draw_text), this);
+	m_hgdc->set_display_pixels(FUNC(qx10_state::hgdc_display_pixels));
+	m_hgdc->set_draw_text(FUNC(qx10_state::hgdc_draw_text));
 	m_hgdc->set_screen("screen");
 
 	MC146818(config, m_rtc, 32.768_kHz_XTAL);
@@ -824,9 +824,9 @@ MACHINE_CONFIG_START(qx10_state::qx10)
 	RAM(config, RAM_TAG).set_default_size("256K");
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "qx10_flop")
+	SOFTWARE_LIST(config, "flop_list").set_original("qx10_flop");
 
-	MCFG_QUICKLOAD_ADD("quickload", qx10_state, qx10, "com,cpm", 3)
+	MCFG_QUICKLOAD_ADD("quickload", qx10_state, qx10, "com,cpm", attotime::from_seconds(3))
 
 MACHINE_CONFIG_END
 

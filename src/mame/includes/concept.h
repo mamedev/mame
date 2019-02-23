@@ -41,6 +41,9 @@ public:
 		m_videoram(*this,"videoram")
 	{ }
 
+	void concept(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<mos6551_device> m_acia0;
 	required_device<mos6551_device> m_acia1;
@@ -54,8 +57,8 @@ public:
 	uint8_t m_pending_interrupts;
 	bool m_clock_enable;
 	uint8_t m_clock_address;
-	DECLARE_READ16_MEMBER(concept_io_r);
-	DECLARE_WRITE16_MEMBER(concept_io_w);
+	DECLARE_READ8_MEMBER(io_r);
+	DECLARE_WRITE8_MEMBER(io_w);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -67,8 +70,9 @@ public:
 	DECLARE_WRITE8_MEMBER(via_out_b);
 	DECLARE_WRITE_LINE_MEMBER(via_out_cb2);
 	DECLARE_WRITE_LINE_MEMBER(via_irq_func);
+	DECLARE_WRITE_LINE_MEMBER(ioc_interrupt);
 	void concept_set_interrupt(int level, int state);
-	void concept(machine_config &config);
+
 	void concept_memmap(address_map &map);
 };
 

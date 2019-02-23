@@ -194,7 +194,7 @@ WRITE8_MEMBER(human_interface_device::ieee488_dio_w)
 WRITE8_MEMBER(human_interface_device::gpib_w)
 {
 	if (offset & 0x08) {
-		m_tms9914->reg8_w(space, offset & 0x07, data);
+		m_tms9914->write(offset & 0x07, data);
 		return;
 	}
 
@@ -234,7 +234,7 @@ READ8_MEMBER(human_interface_device::gpib_r)
 	uint8_t data = 0xff;
 
 	if (offset & 0x8) {
-		data = m_tms9914->reg8_r(space, offset & 0x07);
+		data = m_tms9914->read(offset & 0x07);
 		return data;
 	}
 
@@ -360,14 +360,14 @@ void human_interface_device::dmack_w_in(int channel, uint8_t data)
 {
 	if (channel)
 		return;
-	m_tms9914->reg8_w(*program_space(), 7, data);
+	m_tms9914->write(7, data);
 }
 
 uint8_t human_interface_device::dmack_r_in(int channel)
 {
 	if (channel || !m_gpib_dma_enable)
 		return 0xff;
-	return m_tms9914->reg8_r(machine().dummy_space(), 7);
+	return m_tms9914->read(7);
 }
 
 } // namespace bus::hp_dio

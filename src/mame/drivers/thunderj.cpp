@@ -241,24 +241,24 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(thunderj_state::thunderj)
-
+void thunderj_state::thunderj(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	M68000(config, m_maincpu, ATARI_CLOCK_14MHz/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &thunderj_state::main_map);
 
-	MCFG_DEVICE_ADD("extra", M68000, ATARI_CLOCK_14MHz/2)
-	MCFG_DEVICE_PROGRAM_MAP(extra_map)
+	M68000(config, m_extra, ATARI_CLOCK_14MHz/2);
+	m_extra->set_addrmap(AS_PROGRAM, &thunderj_state::extra_map);
 
 	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* perfect synchronization due to shared RAM */
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_thunderj)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_thunderj);
 	PALETTE(config, "palette").set_format(palette_device::IRGB_1555, 2048);
 
 	ATARI_VAD(config, m_vad, 0, m_screen);
@@ -268,13 +268,13 @@ MACHINE_CONFIG_START(thunderj_state::thunderj)
 	TILEMAP(config, "vad:alpha", "gfxdecode", 2, 8, 8, TILEMAP_SCAN_ROWS, 64, 32, 0).set_info_callback(DEVICE_SELF_OWNER, FUNC(thunderj_state::get_alpha_tile_info));
 	ATARI_MOTION_OBJECTS(config, "vad:mob", 0, m_screen, thunderj_state::s_mob_config).set_gfxdecode("gfxdecode");
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses a VAD chip to generate video signals */
-	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(thunderj_state, screen_update_thunderj)
-	MCFG_SCREEN_PALETTE("palette")
+	m_screen->set_raw(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240);
+	m_screen->set_screen_update(FUNC(thunderj_state::screen_update_thunderj));
+	m_screen->set_palette("palette");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -283,7 +283,7 @@ MACHINE_CONFIG_START(thunderj_state::thunderj)
 	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_6);
 	m_jsa->test_read_cb().set_ioport("260012").bit(1);
 	m_jsa->add_route(ALL_OUTPUTS, "mono", 1.0);
-MACHINE_CONFIG_END
+}
 
 
 

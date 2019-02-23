@@ -605,7 +605,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(panicr_state::scanline)
 MACHINE_CONFIG_START(panicr_state::panicr)
 	MCFG_DEVICE_ADD("maincpu", V20,MASTER_CLOCK/2) /* Sony 8623h9 CXQ70116D-8 (V20 compatible) */
 	MCFG_DEVICE_PROGRAM_MAP(panicr_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", panicr_state, scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(panicr_state::scanline), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD("t5182", T5182, 0)
 

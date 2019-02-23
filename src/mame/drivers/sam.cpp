@@ -25,10 +25,11 @@ void sam_state::sam_map(address_map &map)
 static INPUT_PORTS_START( sam )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(sam_state::sam)
-	MCFG_DEVICE_ADD("maincpu", ARM7, XTAL(40'000'000)) // AT91R40008
-	MCFG_DEVICE_PROGRAM_MAP(sam_map)
-MACHINE_CONFIG_END
+void sam_state::sam(machine_config &config)
+{
+	arm7_cpu_device &maincpu(ARM7(config, "maincpu", XTAL(40'000'000))); // AT91R40008
+	maincpu.set_addrmap(AS_PROGRAM, &sam_state::sam_map);
+}
 
 #define ROM_LOAD_BOOT_EPROM \
 	ROM_REGION( 0x100000, "boot", ROMREGION_ERASEFF ) \

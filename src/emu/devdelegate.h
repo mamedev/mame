@@ -42,11 +42,15 @@ protected:
 template <typename Signature>
 class named_delegate : public delegate<Signature>
 {
-protected:
+private:
 	using basetype = delegate<Signature>;
-	template <class FunctionClass> using member_func_type = typename basetype::template traits<FunctionClass>::member_func_type;
-	template <class FunctionClass> using const_member_func_type = typename basetype::template traits<FunctionClass>::const_member_func_type;
-	template <class FunctionClass> using static_ref_func_type = typename basetype::template traits<FunctionClass>::static_ref_func_type;
+
+	const char *                m_name;             // name string
+
+protected:
+	template <class FunctionClass> using member_func_type = typename basetype::template member_func_type<FunctionClass>;
+	template <class FunctionClass> using const_member_func_type = typename basetype::template const_member_func_type<FunctionClass>;
+	template <class FunctionClass> using static_ref_func_type = typename basetype::template static_ref_func_type<FunctionClass>;
 
 public:
 	// create a standard set of constructors
@@ -60,9 +64,6 @@ public:
 	named_delegate &operator=(const basetype &src) { basetype::operator=(src); m_name = src.m_name; return *this; }
 
 	const char *name() const { return m_name; }
-
-private:
-	const char *                m_name;             // name string
 };
 
 // ======================> device_delegate

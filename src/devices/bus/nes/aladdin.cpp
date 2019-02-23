@@ -325,6 +325,7 @@ static void ade_cart(device_slot_interface &device)
 }
 
 
-MACHINE_CONFIG_START(nes_aladdin_device::device_add_mconfig)
-	MCFG_ALADDIN_MINICART_ADD("ade_slot", ade_cart)
-MACHINE_CONFIG_END
+void nes_aladdin_device::device_add_mconfig(machine_config &config)
+{
+	NES_ALADDIN_SLOT(config, m_subslot, ade_cart);
+}

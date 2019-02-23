@@ -474,10 +474,11 @@ void abc806_state::abc806_palette(palette_device &palette) const
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( abc806_video )
+//  machine_config( abc806_video )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(abc806_state::abc806_video)
+void abc806_state::abc806_video(machine_config &config)
+{
 	MC6845(config, m_crtc, ABC800_CCLK);
 	m_crtc->set_screen(SCREEN_TAG);
 	m_crtc->set_show_border_area(true);
@@ -486,9 +487,9 @@ MACHINE_CONFIG_START(abc806_state::abc806_video)
 	m_crtc->out_hsync_callback().set(FUNC(abc806_state::hs_w));
 	m_crtc->out_vsync_callback().set(FUNC(abc806_state::vs_w));
 
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_UPDATE_DRIVER(abc806_state, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000), 0x300, 0, 0x1e0, 0x13a, 0, 0xfa)
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_screen_update(FUNC(abc806_state::screen_update));
+	screen.set_raw(XTAL(12'000'000), 0x300, 0, 0x1e0, 0x13a, 0, 0xfa);
 
 	PALETTE(config, m_palette, FUNC(abc806_state::abc806_palette), 8);
-MACHINE_CONFIG_END
+}

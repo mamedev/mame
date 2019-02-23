@@ -292,7 +292,7 @@ MACHINE_CONFIG_START(pentagon_state::pentagon)
 	MCFG_VIDEO_START_OVERRIDE(pentagon_state, pentagon )
 
 	BETA_DISK(config, m_beta, 0);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_pentagon)
+	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_pentagon);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -303,9 +303,9 @@ MACHINE_CONFIG_START(pentagon_state::pentagon)
 	ay8912.add_route(1, "rspeaker", 0.25);
 	ay8912.add_route(2, "rspeaker", 0.50);
 
-	MCFG_DEVICE_REMOVE("exp")
+	config.device_remove("exp");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list_pen","pentagon_cass")
+	SOFTWARE_LIST(config, "cass_list_pen").set_original("pentagon_cass");
 MACHINE_CONFIG_END
 
 void pentagon_state::pent1024(machine_config &config)

@@ -15,12 +15,13 @@
 
 DEFINE_DEVICE_TYPE(CPC_HD20, cpc_hd20_device, "cpc_hd20", "Dobbertin HD20")
 
-MACHINE_CONFIG_START(cpc_hd20_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("hdc",ST11M_HDC,0)
-	MCFG_XTHDC_IRQ_HANDLER(WRITELINE(*this, cpc_hd20_device, irq_w))
-	MCFG_HARDDISK_ADD("hdc:primary")
+void cpc_hd20_device::device_add_mconfig(machine_config &config)
+{
+	ST11M_HDC(config, m_hdc,0);
+	m_hdc->irq_handler().set(FUNC(cpc_hd20_device::irq_w));
+	HARDDISK(config, "hdc:primary");
 	// no pass-through (?)
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( cpc_hd20 )

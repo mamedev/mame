@@ -10,6 +10,7 @@
 
 #define DUMP_VRAM 0
 #define PRINT_GCU 0
+#define PRINT_CMD_EXEC 0
 
 
 DEFINE_DEVICE_TYPE(K057714, k057714_device, "k057714", "k057714_device GCU")
@@ -35,6 +36,9 @@ void k057714_device::device_reset()
 	m_command_fifo1_ptr = 0;
 	m_vram_fifo0_addr = 0;
 	m_vram_fifo1_addr = 0;
+
+	m_fb_origin_x = 0;
+	m_fb_origin_y = 0;
 
 	for (auto & elem : m_frame)
 	{
@@ -106,9 +110,12 @@ WRITE32_MEMBER(k057714_device::write)
 				}
 			}
 			if (ACCESSING_BITS_0_15)
+			{
+				m_layer_select = data;
 #if PRINT_GCU
 				printf("%s_w: %02X, %08X, %08X\n", basetag(), reg, data, mem_mask);
 #endif
+			}
 			break;
 
 		case 0x14:      // ?
@@ -126,15 +133,31 @@ WRITE32_MEMBER(k057714_device::write)
 			break;
 
 		case 0x20:      // Framebuffer 0 Origin(?)
+			if (ACCESSING_BITS_16_31)
+				m_frame[0].y = (data >> 16) & 0xffff;
+			if (ACCESSING_BITS_0_15)
+				m_frame[0].x = data & 0xffff;
 			break;
 
 		case 0x24:      // Framebuffer 1 Origin(?)
+			if (ACCESSING_BITS_16_31)
+				m_frame[1].y = (data >> 16) & 0xffff;
+			if (ACCESSING_BITS_0_15)
+				m_frame[1].x = data & 0xffff;
 			break;
 
 		case 0x28:      // Framebuffer 2 Origin(?)
+			if (ACCESSING_BITS_16_31)
+				m_frame[2].y = (data >> 16) & 0xffff;
+			if (ACCESSING_BITS_0_15)
+				m_frame[2].x = data & 0xffff;
 			break;
 
 		case 0x2c:      // Framebuffer 3 Origin(?)
+			if (ACCESSING_BITS_16_31)
+				m_frame[3].y = (data >> 16) & 0xffff;
+			if (ACCESSING_BITS_0_15)
+				m_frame[3].x = data & 0xffff;
 			break;
 
 		case 0x30:      // Framebuffer 0 Dimensions
@@ -142,6 +165,9 @@ WRITE32_MEMBER(k057714_device::write)
 				m_frame[0].height = (data >> 16) & 0xffff;
 			if (ACCESSING_BITS_0_15)
 				m_frame[0].width = data & 0xffff;
+#if PRINT_GCU
+			printf("%s FB0 Dimensions: W %04X, H %04X\n", basetag(), data & 0xffff, (data >> 16) & 0xffff);
+#endif
 			break;
 
 		case 0x34:      // Framebuffer 1 Dimensions
@@ -149,6 +175,9 @@ WRITE32_MEMBER(k057714_device::write)
 				m_frame[1].height = (data >> 16) & 0xffff;
 			if (ACCESSING_BITS_0_15)
 				m_frame[1].width = data & 0xffff;
+#if PRINT_GCU
+			printf("%s FB1 Dimensions: W %04X, H %04X\n", basetag(), data & 0xffff, (data >> 16) & 0xffff);
+#endif
 			break;
 
 		case 0x38:      // Framebuffer 2 Dimensions
@@ -156,6 +185,9 @@ WRITE32_MEMBER(k057714_device::write)
 				m_frame[2].height = (data >> 16) & 0xffff;
 			if (ACCESSING_BITS_0_15)
 				m_frame[2].width = data & 0xffff;
+#if PRINT_GCU
+			printf("%s FB2 Dimensions: W %04X, H %04X\n", basetag(), data & 0xffff, (data >> 16) & 0xffff);
+#endif
 			break;
 
 		case 0x3c:      // Framebuffer 3 Dimensions
@@ -163,6 +195,9 @@ WRITE32_MEMBER(k057714_device::write)
 				m_frame[3].height = (data >> 16) & 0xffff;
 			if (ACCESSING_BITS_0_15)
 				m_frame[3].width = data & 0xffff;
+#if PRINT_GCU
+			printf("%s FB3 Dimensions: W %04X, H %04X\n", basetag(), data & 0xffff, (data >> 16) & 0xffff);
+#endif
 			break;
 
 		case 0x40:      // Framebuffer 0 Base
@@ -269,8 +304,15 @@ WRITE32_MEMBER(k057714_device::write)
 			}
 			break;
 
+		case 0x6c:
+			if (ACCESSING_BITS_0_15)
+			{
+				m_reg_6c = data & 0xffff;
+			}
+			break;
+
 		default:
-			//printf("%s_w: %02X, %08X, %08X at %s\n", basetag(), reg, data, mem_mask, m_maincpu->pc());
+			//printf("%s_w: %02X, %08X, %08X\n", basetag(), reg, data, mem_mask);
 			break;
 	}
 }
@@ -305,12 +347,41 @@ WRITE32_MEMBER(k057714_device::fifo_w)
 	}
 }
 
-int k057714_device::draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void k057714_device::draw_frame(int frame, bitmap_ind16 &bitmap, const rectangle &cliprect, bool inverse_trans)
 {
+	int height = m_frame[frame].height;
+	int width = m_frame[frame].width;
+
+	if (width == 0 || height == 0)
+		return;
+
 	uint16_t *vram16 = (uint16_t*)m_vram.get();
 
-	int x = 0;
-	int y = 0;
+	int fb_pitch = 1024;
+
+	uint16_t trans_value = inverse_trans ? 0x8000 : 0x0000;
+
+	if (m_frame[frame].y + height > cliprect.max_y)
+		height = cliprect.max_y - m_frame[frame].y;
+	if (m_frame[frame].x + width > cliprect.max_x)
+		width = cliprect.max_x - m_frame[frame].x;
+
+	for (int j = 0; j < height; j++)
+	{
+		uint16_t *d = &bitmap.pix16(j + m_frame[frame].y, m_frame[frame].x);
+		int li = (j * fb_pitch);
+		for (int i = 0; i < width; i++)
+		{
+			uint16_t pix = vram16[(m_frame[frame].base + li + i) ^ NATIVE_ENDIAN_VALUE_LE_BE(1, 0)];
+			if ((pix & 0x8000) != trans_value) {
+				d[i] = pix & 0x7fff;
+			}
+		}
+	}
+}
+
+int k057714_device::draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
 	int width = m_frame[0].width;
 	int height = m_frame[0].height;
 
@@ -325,45 +396,18 @@ int k057714_device::draw(screen_device &screen, bitmap_ind16 &bitmap, const rect
 		}
 	}
 
-	int fb_pitch = 1024;
+	bitmap.fill(0, cliprect);
 
-	for (int j=0; j < height; j++)
-	{
-		uint16_t *d = &bitmap.pix16(j, x);
-		int li = ((j+y) * fb_pitch) + x;
-		uint32_t fbaddr0 = m_frame[0].base + li;
-		uint32_t fbaddr1 = m_frame[1].base + li;
-		uint32_t fbaddr2 = m_frame[2].base + li;
-//      uint32_t fbaddr3 = m_frame[3].base + li;
+	bool inverse_trans = false;
 
-		for (int i=0; i < width; i++)
-		{
-			uint16_t pix0 = vram16[fbaddr0 ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0)];
-			uint16_t pix1 = vram16[fbaddr1 ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0)];
-			uint16_t pix2 = vram16[fbaddr2 ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0)];
-//          uint16_t pix3 = vram16[fbaddr3 ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0)];
+	// most likely wrong, inverse transparency is only used by kbm
+	if ((m_reg_6c & 0xf) != 0)
+		inverse_trans = true;
 
-			d[i] = 0;
-
-			if (pix2 & 0x8000)
-			{
-				d[i] = pix2 & 0x7fff;
-			}
-			if (pix1 & 0x8000)
-			{
-				d[i] = pix1 & 0x7fff;
-			}
-			if (pix0 & 0x8000)
-			{
-				d[i] = pix0 & 0x7fff;
-			}
-
-			fbaddr0++;
-			fbaddr1++;
-			fbaddr2++;
-//          fbaddr3++;
-		}
-	}
+	draw_frame((m_layer_select >> 8) & 3, bitmap, cliprect, inverse_trans);
+	draw_frame((m_layer_select >> 10) & 3, bitmap, cliprect, inverse_trans);
+	draw_frame((m_layer_select >> 12) & 3, bitmap, cliprect, inverse_trans);
+	draw_frame((m_layer_select >> 14) & 3, bitmap, cliprect, inverse_trans);
 
 	return 0;
 }
@@ -382,12 +426,19 @@ void k057714_device::draw_object(uint32_t *cmd)
 	// 0x01: ----x--- -------- -------- --------   object y flip
 	// 0x01: --xx---- -------- -------- --------   object alpha enable (different blend modes?)
 	// 0x01: -x------ -------- -------- --------   object transparency enable (?)
+	// 0x01: x------- -------- -------- --------   inverse transparency? (used by kbm)
 
 	// 0x02: -------- -------- ------xx xxxxxxxx   object width
 	// 0x02: -------- -----xxx xxxxxx-- --------   object x scale
+	// 0x02: xxxxx--- -------- -------- --------   ?
+	// 0x02: -----xxx xx------ -------- --------   translucency
+	// 0x02: -------- --xxx--- -------- --------   ?
 
 	// 0x03: -------- -------- ------xx xxxxxxxx   object height
 	// 0x03: -------- -----xxx xxxxxx-- --------   object y scale
+	// 0x03: xxxxx--- -------- -------- --------   ?
+	// 0x03: -----xxx xx------ -------- --------   ?
+	// 0x03: -------- --xxx--- -------- --------   ?
 
 	int x = cmd[1] & 0x3ff;
 	int y = (cmd[1] >> 10) & 0x3fff;
@@ -398,10 +449,12 @@ void k057714_device::draw_object(uint32_t *cmd)
 	bool xflip = (cmd[1] & 0x04000000) ? true : false;
 	bool yflip = (cmd[1] & 0x08000000) ? true : false;
 	bool alpha_enable = (cmd[1] & 0x30000000) ? true : false;
-	bool trans_enable = (cmd[1] & 0x40000000) ? true : false;
+	bool trans_enable = (cmd[1] & 0xc0000000) ? true : false;
 	uint32_t address = cmd[0] & 0xffffff;
-	int alpha_level = (cmd[2] >> 27) & 0x1f;
+	int alpha_level = (cmd[2] >> 22) & 0x1f;
 	bool relative_coords = (cmd[0] & 0x10000000) ? true : false;
+
+	uint16_t trans_value = (cmd[1] & 0x80000000) ? 0x0000 : 0x8000;
 
 	if (relative_coords)
 	{
@@ -416,12 +469,20 @@ void k057714_device::draw_object(uint32_t *cmd)
 		return;
 	}
 
-#if PRINT_GCU
-	printf("%s Draw Object %08X, x %d, y %d, w %d, h %d [%08X %08X %08X %08X]\n", basetag(), address, x, y, width, height, cmd[0], cmd[1], cmd[2], cmd[3]);
+#if PRINT_CMD_EXEC
+	printf("%s Draw Object %08X, x %d, y %d, w %d, h %d, sx: %f, sy: %f [%08X %08X %08X %08X]\n", basetag(), address, x, y, width, height, (float)(xscale) / 64.0f, (float)(yscale) / 64.0f, cmd[0], cmd[1], cmd[2], cmd[3]);
 #endif
 
 	width = (((width * 65536) / xscale) * 64) / 65536;
 	height = (((height * 65536) / yscale) * 64) / 65536;
+
+	int fb_width = m_frame[0].width;
+	int fb_height = m_frame[0].height;
+
+	if (width > fb_width)
+		width = fb_width;
+	if (height > fb_height)
+		height = fb_height;
 
 	int fb_pitch = 1024;
 
@@ -455,7 +516,7 @@ void k057714_device::draw_object(uint32_t *cmd)
 		for (int i=0; i < width; i++)
 		{
 			uint16_t pix = vram16[((index + (u >> 6)) ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0)) & 0xffffff];
-			bool draw = !trans_enable || (trans_enable && (pix & 0x8000));
+			bool draw = !trans_enable || (trans_enable && ((pix & 0x8000) == trans_value));
 			if (alpha_enable)
 			{
 				if (draw)
@@ -487,7 +548,7 @@ void k057714_device::draw_object(uint32_t *cmd)
 			{
 				if (draw)
 				{
-					vram16[fbaddr ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0)] = pix;
+					vram16[fbaddr ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0)] = (pix & 0xffff);
 				}
 			}
 
@@ -510,6 +571,7 @@ void k057714_device::fill_rect(uint32_t *cmd)
 
 	// 0x01: -------- -------- ------xx xxxxxxxx   x
 	// 0x01: -------- xxxxxxxx xxxxxx-- --------   y
+	// 0x01: ---x---- -------- -------- --------   ?
 
 	// 0x02: xxxxxxxx xxxxxxxx -------- --------   fill pattern pixel 0
 	// 0x02: -------- -------- xxxxxxxx xxxxxxxx   fill pattern pixel 1
@@ -535,7 +597,7 @@ void k057714_device::fill_rect(uint32_t *cmd)
 	color[2] = (cmd[3] >> 16);
 	color[3] = (cmd[3] & 0xffff);
 
-#if PRINT_GCU
+#if PRINT_CMD_EXEC
 	printf("%s Fill Rect x %d, y %d, w %d, h %d, %08X %08X [%08X %08X %08X %08X]\n", basetag(), x, y, width, height, cmd[2], cmd[3], cmd[0], cmd[1], cmd[2], cmd[3]);
 #endif
 
@@ -568,6 +630,7 @@ void k057714_device::draw_character(uint32_t *cmd)
 	// 0x01: -------- -------- ------xx xxxxxxxx   character x
 	// 0x01: -------- xxxxxxxx xxxxxx-- --------   character y
 	// 0x01: -------x -------- -------- --------   double height
+	// 0x01: --x----- -------- -------- --------   ?
 	// 0x01: -x------ -------- -------- --------   transparency enable
 
 	// 0x02: xxxxxxxx xxxxxxxx -------- --------   color 0
@@ -595,8 +658,8 @@ void k057714_device::draw_character(uint32_t *cmd)
 	color[2] = cmd[3] >> 16;
 	color[3] = cmd[3] & 0xffff;
 
-#if PRINT_GCU
-	printf("%s Draw Char %08X, x %d, y %d\n", basetag(), address, x, y);
+#if PRINT_CMD_EXEC
+	printf("%s Draw Char %08X, x %d, y %d [%08X %08X %08X %08X]\n", basetag(), address, x, y, cmd[0], cmd[1], cmd[2], cmd[3]);
 #endif
 
 	uint16_t *vram16 = (uint16_t*)m_vram.get();
@@ -615,7 +678,7 @@ void k057714_device::draw_character(uint32_t *cmd)
 			int p = (line >> ((7-i) * 2)) & 3;
 			bool draw = !trans_enable || (trans_enable && (color[p] & 0x8000));
 			if (draw)
-				vram16[(fbaddr+x+i) ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0)] = color[p] | 0x8000;
+				vram16[(fbaddr+x+i) ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0)] = color[p];
 		}
 	}
 }
@@ -630,7 +693,7 @@ void k057714_device::fb_config(uint32_t *cmd)
 
 	// 0x03: -------- -------- --xxxxxx xxxxxxxx   Framebuffer Origin Y
 
-#if PRINT_GCU
+#if PRINT_CMD_EXEC
 	printf("%s FB Config %08X %08X %08X %08X\n", basetag(), cmd[0], cmd[1], cmd[2], cmd[3]);
 #endif
 
@@ -644,7 +707,7 @@ void k057714_device::execute_display_list(uint32_t addr)
 
 	int counter = 0;
 
-#if PRINT_GCU
+#if PRINT_CMD_EXEC
 	printf("%s Exec Display List %08X\n", basetag(), addr);
 #endif
 
@@ -698,7 +761,7 @@ void k057714_device::execute_command(uint32_t* cmd)
 {
 	int command = (cmd[0] >> 29) & 0x7;
 
-#if PRINT_GCU
+#if PRINT_CMD_EXEC
 	printf("%s Exec Command %08X, %08X, %08X, %08X\n", basetag(), cmd[0], cmd[1], cmd[2], cmd[3]);
 #endif
 

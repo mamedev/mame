@@ -140,7 +140,7 @@ INPUT_PORTS_END
 void myvision_state::machine_start()
 {
 	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x5fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x5fff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 
 	save_item(NAME(m_column));
 }
@@ -242,7 +242,7 @@ MACHINE_CONFIG_START(myvision_state::myvision)
 	//MCFG_GENERIC_MANDATORY
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","myvision")
+	SOFTWARE_LIST(config, "cart_list").set_original("myvision");
 MACHINE_CONFIG_END
 
 /* ROM definition */

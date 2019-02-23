@@ -711,9 +711,9 @@ void sb16_lle_device::device_start()
 	m_isa->install_device(0x022c, 0x022d, read8_delegate(FUNC(sb16_lle_device::dsp_wbuf_status_r), this), write8_delegate(FUNC(sb16_lle_device::host_cmd_w), this) );
 	m_isa->install_device(0x022e, 0x022f, read8_delegate(FUNC(sb16_lle_device::dsp_rbuf_status_r), this), write8_delegate(FUNC(sb16_lle_device::invalid_w), this) );
 	m_isa->install_device(0x0330, 0x0331, read8_delegate(FUNC(sb16_lle_device::mpu401_r), this), write8_delegate(FUNC(sb16_lle_device::mpu401_w), this));
-	m_isa->install_device(0x0388, 0x0389, read8_delegate(FUNC(ymf262_device::read), ymf262), write8_delegate(FUNC(ymf262_device::write), ymf262));
-	m_isa->install_device(0x0220, 0x0223, read8_delegate(FUNC(ymf262_device::read), ymf262), write8_delegate(FUNC(ymf262_device::write), ymf262));
-	m_isa->install_device(0x0228, 0x0229, read8_delegate(FUNC(ymf262_device::read), ymf262), write8_delegate(FUNC(ymf262_device::write), ymf262));
+	m_isa->install_device(0x0388, 0x0389, read8sm_delegate(FUNC(ymf262_device::read), ymf262), write8sm_delegate(FUNC(ymf262_device::write), ymf262));
+	m_isa->install_device(0x0220, 0x0223, read8sm_delegate(FUNC(ymf262_device::read), ymf262), write8sm_delegate(FUNC(ymf262_device::write), ymf262));
+	m_isa->install_device(0x0228, 0x0229, read8sm_delegate(FUNC(ymf262_device::read), ymf262), write8sm_delegate(FUNC(ymf262_device::write), ymf262));
 	m_isa->set_dma_channel(1, this, false);
 	m_isa->set_dma_channel(5, this, false);
 	m_timer = timer_alloc();

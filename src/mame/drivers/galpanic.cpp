@@ -237,7 +237,7 @@ MACHINE_CONFIG_START(galpanic_state::galpanic)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(12'000'000)) /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(galpanic_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", galpanic_state, scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(galpanic_state::scanline), "screen", 0, 1);
 
 	WATCHDOG_TIMER(config, "watchdog");
 

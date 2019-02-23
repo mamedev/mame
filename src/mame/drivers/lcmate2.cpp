@@ -247,8 +247,8 @@ MACHINE_CONFIG_START(lcmate2_state::lcmate2)
 	PALETTE(config, "palette", FUNC(lcmate2_state::lcmate2_palette), 2);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_lcmate2);
 
-	MCFG_HD44780_ADD("hd44780")
-	MCFG_HD44780_LCD_SIZE(2, 20)
+	HD44780(config, m_lcdc, 0);
+	m_lcdc->set_lcd_size(2, 20);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

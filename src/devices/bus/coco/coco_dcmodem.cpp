@@ -58,8 +58,8 @@ namespace
 		virtual void device_start() override
 		{
 			install_readwrite_handler(0xFF6C, 0xFF6F,
-				read8_delegate(FUNC(mos6551_device::read), (mos6551_device *)m_uart),
-				write8_delegate(FUNC(mos6551_device::write), (mos6551_device *)m_uart));
+				read8sm_delegate(FUNC(mos6551_device::read), (mos6551_device *)m_uart),
+				write8sm_delegate(FUNC(mos6551_device::write), (mos6551_device *)m_uart));
 		}
 
 		virtual const tiny_rom_entry *device_rom_region() const override;

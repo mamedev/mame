@@ -57,6 +57,7 @@ Other things...
 #include "screen.h"
 #include "speaker.h"
 #include "machine/ay31015.h"
+#include "machine/clock.h"
 #include "bus/rs232/rs232.h"
 
 
@@ -389,15 +390,15 @@ MACHINE_CONFIG_START(micral_state::micral)
 	MCFG_MACHINE_RESET_OVERRIDE(micral_state, micral)
 
 	// video hardware
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(250))
-	MCFG_SCREEN_UPDATE_DRIVER(micral_state, screen_update)
-	MCFG_SCREEN_SIZE(640, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 239)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(250));
+	screen.set_screen_update(FUNC(micral_state::screen_update));
+	screen.set_size(640, 240);
+	screen.set_visarea(0, 639, 0, 239);
+	screen.set_palette("palette");
 	PALETTE(config, "palette", palette_device::MONOCHROME);
-	//MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_micral)
+	//GFXDECODE(config, "gfxdecode", "palette", gfx_micral);
 
 	CRT5037(config, m_crtc, 4000000 / 8);  // xtal freq unknown
 	m_crtc->set_char_width(8);  // unknown
@@ -410,10 +411,13 @@ MACHINE_CONFIG_START(micral_state::micral)
 	//MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	AY31015(config, m_uart); // CDP6402
-	m_uart->set_tx_clock(153600);
-	m_uart->set_rx_clock(153600);
 	m_uart->read_si_callback().set("rs232", FUNC(rs232_port_device::rxd_r));
 	m_uart->write_so_callback().set("rs232", FUNC(rs232_port_device::write_txd));
+
+	clock_device &uart_clock(CLOCK(config, "uart_clock", 153600));
+	uart_clock.signal_handler().set(m_uart, FUNC(ay31015_device::write_tcp));
+	uart_clock.signal_handler().append(m_uart, FUNC(ay31015_device::write_rcp));
+
 	RS232_PORT(config, "rs232", default_rs232_devices, "keyboard");
 MACHINE_CONFIG_END
 

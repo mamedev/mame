@@ -157,8 +157,8 @@ void pachifev_state::pachifev_map(address_map &map)
 	map(0xff08, 0xff08).portr("DSW3");
 	map(0xff10, 0xff10).rw("tms9928a", FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));
 	map(0xff12, 0xff12).rw("tms9928a", FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));
-	map(0xff20, 0xff20).w("y2404_1", FUNC(y2404_device::command_w));
-	map(0xff30, 0xff30).w("y2404_2", FUNC(y2404_device::command_w));
+	map(0xff20, 0xff20).w("y2404_1", FUNC(y2404_device::write));
+	map(0xff30, 0xff30).w("y2404_2", FUNC(y2404_device::write));
 	map(0xff40, 0xff40).w(FUNC(pachifev_state::controls_w));
 	map(0xff50, 0xff50).nopw(); /* unknown */
 	map(0xfffa, 0xfffb).noprw(); /* decrementer */
@@ -350,8 +350,8 @@ void pachifev_state::machine_start()
 	save_item(NAME(m_cnt));
 }
 
-MACHINE_CONFIG_START(pachifev_state::pachifev)
-
+void pachifev_state::pachifev(machine_config &config)
+{
 	// CPU TMS9995, standard variant; no line connections
 	TMS9995(config, m_maincpu, XTAL(12'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &pachifev_state::pachifev_map);
@@ -368,16 +368,14 @@ MACHINE_CONFIG_START(pachifev_state::pachifev)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 #if USE_MSM
-	MCFG_DEVICE_ADD("adpcm", MSM5205, XTAL(384'000))  /* guess */
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, pachifev_state,pf_adpcm_int))    /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)    /* 8kHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	msm5205_device &adpcm(MSM5205(config, "adpcm", XTAL(384'000))); /* guess */
+	adpcm.vck_legacy_callback().set(FUNC(pachifev_state::pf_adpcm_int));    /* interrupt function */
+	adpcm.set_prescaler_selector(msm5205_device::S48_4B);    /* 8kHz */
+	adpcm.add_route(ALL_OUTPUTS, "mono", 1.00);
 #endif
-	MCFG_DEVICE_ADD("y2404_1", Y2404, XTAL(10'738'635)/3) /* guess */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-	MCFG_DEVICE_ADD("y2404_2", Y2404, XTAL(10'738'635)/3) /* guess */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_CONFIG_END
+	Y2404(config, "y2404_1", XTAL(10'738'635)/3).add_route(ALL_OUTPUTS, "mono", 0.30); /* guess */
+	Y2404(config, "y2404_2", XTAL(10'738'635)/3).add_route(ALL_OUTPUTS, "mono", 0.30); /* guess */
+}
 
 ROM_START( pachifev )
 	ROM_REGION( 0x10000, "maincpu", 0 )

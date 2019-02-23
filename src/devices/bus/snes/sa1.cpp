@@ -1143,7 +1143,8 @@ void sns_sa1_device::sa1_map(address_map &map)
 }
 
 
-MACHINE_CONFIG_START(sns_sa1_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("sa1cpu", G65816, 10000000)
-	MCFG_DEVICE_PROGRAM_MAP(sa1_map)
-MACHINE_CONFIG_END
+void sns_sa1_device::device_add_mconfig(machine_config &config)
+{
+	G65816(config, m_sa1, 10000000);
+	m_sa1->set_addrmap(AS_PROGRAM, &sns_sa1_device::sa1_map);
+}

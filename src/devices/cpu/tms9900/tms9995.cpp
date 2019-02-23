@@ -1562,7 +1562,7 @@ void tms9995_device::prefetch_and_decode()
 		m_value_copy = m_current_value;
 		if (!m_iaq_line.isnull()) m_iaq_line(ASSERT_LINE);
 		m_address = PC;
-		LOGMASKED(LOG_DETAIL, "**** Prefetching new instruction at %04x ****\n", PC);
+		LOGMASKED(LOG_DETAIL, "** Prefetching new instruction at %04x **\n", PC);
 	}
 
 	word_read(); // changes m_mem_phase
@@ -1575,7 +1575,7 @@ void tms9995_device::prefetch_and_decode()
 		m_current_value = m_value_copy; // restore m_current_value
 		PC = (PC + 2) & 0xfffe;     // advance PC
 		if (!m_iaq_line.isnull()) m_iaq_line(CLEAR_LINE);
-		LOGMASKED(LOG_DETAIL, "++++ Prefetch done ++++\n");
+		LOGMASKED(LOG_DETAIL, "++ Prefetch done ++\n");
 	}
 }
 
@@ -1688,7 +1688,7 @@ void tms9995_device::service_interrupt()
 			vectorpos = 0x0008;
 			m_intmask = 0x0001;
 			PC = (PC + 2) & 0xfffe;
-			LOGMASKED(LOG_INT, "***** MID pending\n");
+			LOGMASKED(LOG_INT, "** MID pending\n");
 			m_mid_active = false;
 		}
 		else
@@ -1698,7 +1698,7 @@ void tms9995_device::service_interrupt()
 				vectorpos = 0xfffc;
 				m_int_pending &= ~PENDING_NMI;
 				m_intmask = 0;
-				LOGMASKED(LOG_INT, "***** NMI pending\n");
+				LOGMASKED(LOG_INT, "** NMI pending\n");
 			}
 			else
 			{
@@ -1706,9 +1706,12 @@ void tms9995_device::service_interrupt()
 				{
 					vectorpos = 0x0004;
 					m_int_pending &= ~PENDING_LEVEL1;
-					if (!m_int1_active) m_flag[2] = false;
+					// Latches must be reset when the interrupt is serviced
+					// Since the latch is edge-triggered, we should be allowed
+					// to clear it right here, without considering the line state
+					m_flag[2] = false;
 					m_intmask = 0;
-					LOGMASKED(LOG_INT, "***** INT1 pending\n");
+					LOGMASKED(LOG_INT, "** INT1 pending\n");
 				}
 				else
 				{
@@ -1717,7 +1720,7 @@ void tms9995_device::service_interrupt()
 						vectorpos = 0x0008;
 						m_int_pending &= ~PENDING_OVERFLOW;
 						m_intmask = 0x0001;
-						LOGMASKED(LOG_INT, "***** OVERFL pending\n");
+						LOGMASKED(LOG_INT, "** OVERFL pending\n");
 					}
 					else
 					{
@@ -1727,15 +1730,16 @@ void tms9995_device::service_interrupt()
 							m_intmask = 0x0002;
 							m_int_pending &= ~PENDING_DECR;
 							m_flag[3] = false;
-							LOGMASKED(LOG_DEC, "***** DECR pending\n");
+							LOGMASKED(LOG_DEC, "** DECR pending\n");
 						}
 						else
 						{
 							vectorpos = 0x0010;
 							m_intmask = 0x0003;
 							m_int_pending &= ~PENDING_LEVEL4;
-							if (!m_int4_active) m_flag[4] = false;
-							LOGMASKED(LOG_INT, "***** INT4 pending\n");
+							// See above for clearing the latch
+							m_flag[4] = false;
+							LOGMASKED(LOG_INT, "** INT4 pending\n");
 						}
 					}
 				}
@@ -1743,7 +1747,7 @@ void tms9995_device::service_interrupt()
 		}
 	}
 
-	LOGMASKED(LOG_INT, "********* triggered an interrupt with vector %04x/%04x\n", vectorpos, vectorpos+2);
+	LOGMASKED(LOG_INTD, "*** triggered an interrupt with vector %04x/%04x\n", vectorpos, vectorpos+2);
 
 	// just for debugging purposes
 	if (!m_reset) m_log_interrupt = true;

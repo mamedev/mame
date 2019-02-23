@@ -896,7 +896,7 @@ MACHINE_CONFIG_START(mediagx_state::mediagx)
 	ide_controller_32_device &ide(IDE_CONTROLLER_32(config, "ide").options(ata_devices, "hdd", nullptr, true));
 	ide.irq_handler().set(m_pic8259_2, FUNC(pic8259_device::ir6_w));
 
-	MCFG_TIMER_DRIVER_ADD("sound_timer", mediagx_state, sound_timer_callback)
+	TIMER(config, "sound_timer").configure_generic(FUNC(mediagx_state::sound_timer_callback));
 
 	RAMDAC(config, m_ramdac, 0, m_palette);
 	m_ramdac->set_addrmap(0, &mediagx_state::ramdac_map);
@@ -908,7 +908,7 @@ MACHINE_CONFIG_START(mediagx_state::mediagx)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(mediagx_state, screen_update)
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_cga)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cga);
 
 	MCFG_PALETTE_ADD(m_palette, 256)
 

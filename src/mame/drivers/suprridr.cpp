@@ -321,28 +321,28 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(suprridr_state::suprridr)
-
+void suprridr_state::suprridr(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(49'152'000)/16)     /* 3 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_IO_MAP(main_portmap)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", suprridr_state,  main_nmi_gen)
+	Z80(config, m_maincpu, XTAL(49'152'000)/16);     /* 3 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &suprridr_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &suprridr_state::main_portmap);
+	m_maincpu->set_vblank_int("screen", FUNC(suprridr_state::main_nmi_gen));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 10000000/4)       /* 2.5 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(sound_portmap)
+	Z80(config, m_audiocpu, 10000000/4);       /* 2.5 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &suprridr_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &suprridr_state::sound_portmap);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(suprridr_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(suprridr_state::screen_update));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_suprridr);
 	PALETTE(config, m_palette, FUNC(suprridr_state::suprridr_palette), 96);
@@ -359,7 +359,7 @@ MACHINE_CONFIG_START(suprridr_state::suprridr)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 	m_soundlatch->set_separate_acknowledge(true);
-MACHINE_CONFIG_END
+}
 
 
 

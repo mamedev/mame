@@ -25,7 +25,8 @@ DEFINE_DEVICE_TYPE(SCN2674, scn2674_device, "scn2674", "Signetics SCN2674 AVDC")
 // default address map
 void scn2674_device::scn2674_vram(address_map &map)
 {
-	map(0x0000, (1 << space_config(0)->addr_width()) - 1).noprw();
+	if (!has_configured_map(0))
+		map(0x0000, (1 << space_config(0)->addr_width()) - 1).noprw();
 }
 
 scn2672_device::scn2672_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -44,12 +45,15 @@ scn2674_device::scn2674_device(const machine_config &mconfig, device_type type, 
 	, device_memory_interface(mconfig, *this)
 	, m_intr_cb(*this)
 	, m_breq_cb(*this)
+	, m_mbc_cb(*this)
+	, m_mbc_char_cb(*this)
+	, m_mbc_attr_cb(*this)
 	, m_IR_pointer(0)
 	, m_screen1_address(0), m_screen2_address(0)
 	, m_cursor_address(0)
 	, m_irq_register(0), m_status_register(0), m_irq_mask(0)
 	, m_gfx_enabled(false)
-	, m_display_enabled(false), m_display_enabled_field(false), m_display_enabled_scanline(false)
+	, m_display_enabled(false), m_dadd_enabled(false), m_display_enabled_field(false), m_display_enabled_scanline(false)
 	, m_cursor_enabled(false)
 	, m_hpixels_per_column(0)
 	, m_double_ht_wd(false)
@@ -83,9 +87,11 @@ scn2674_device::scn2674_device(const machine_config &mconfig, device_type type, 
 	, m_char_buffer(0), m_attr_buffer(0)
 	, m_linecounter(0), m_address(0), m_start1change(0)
 	, m_scanline_timer(nullptr)
+	, m_breq_timer(nullptr)
+	, m_vblank_timer(nullptr)
 	, m_char_space(nullptr), m_attr_space(nullptr)
-	, m_char_space_config("charram", ENDIANNESS_LITTLE, 8, extend_addressing ? 16 : 14, 0, address_map_constructor(), address_map_constructor(FUNC(scn2674_device::scn2674_vram), this))
-	, m_attr_space_config("attrram", ENDIANNESS_LITTLE, 8, extend_addressing ? 16 : 14, 0, address_map_constructor(), address_map_constructor(FUNC(scn2674_device::scn2674_vram), this))
+	, m_char_space_config("charram", ENDIANNESS_LITTLE, 8, extend_addressing ? 16 : 14, 0, address_map_constructor(FUNC(scn2674_device::scn2674_vram), this))
+	, m_attr_space_config("attrram", ENDIANNESS_LITTLE, 8, extend_addressing ? 16 : 14, 0)
 {
 }
 
@@ -105,7 +111,12 @@ void scn2674_device::device_start()
 	m_display_cb.bind_relative_to(*owner());
 	m_intr_cb.resolve_safe();
 	m_breq_cb.resolve_safe();
-	m_scanline_timer = timer_alloc(TIMER_SCANLINE);
+	m_mbc_cb.resolve_safe();
+	m_mbc_char_cb.resolve();
+	m_mbc_attr_cb.resolve();
+	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(scn2674_device::scanline_timer), this));
+	m_breq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(scn2674_device::breq_timer), this));
+	m_vblank_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(scn2674_device::vblank_timer), this));
 	screen().register_screen_bitmap(m_bitmap);
 
 	m_char_space = &space(0);
@@ -123,6 +134,7 @@ void scn2674_device::device_start()
 	save_item(NAME(m_irq_mask));
 	save_item(NAME(m_gfx_enabled));
 	save_item(NAME(m_display_enabled));
+	save_item(NAME(m_dadd_enabled));
 	save_item(NAME(m_display_enabled_field));
 	save_item(NAME(m_display_enabled_scanline));
 	save_item(NAME(m_cursor_enabled));
@@ -174,6 +186,7 @@ void scn2674_device::device_reset()
 	m_irq_mask = 0;
 	m_gfx_enabled = false;
 	m_display_enabled = false;
+	m_dadd_enabled = false;
 	m_display_enabled_field = false;
 	m_display_enabled_scanline = false;
 	m_cursor_enabled = false;
@@ -551,9 +564,15 @@ void scn2674_device::set_display_enabled(bool enabled, int n)
 		m_display_enabled = false;
 
 		if (n == 1)
+		{
 			LOGMASKED(LOG_COMMAND, "%s: Display off - float DADD bus\n", machine().describe_context());
+			m_dadd_enabled = false;
+		}
 		else
+		{
 			LOGMASKED(LOG_COMMAND, "%s: Display off - no float DADD bus\n", machine().describe_context());
+			m_dadd_enabled = true;
+		}
 	}
 	else
 	{
@@ -710,6 +729,9 @@ void scn2674_device::write_delayed_command(uint8_t data)
 	case 0xbb:
 		// write from cursor address to pointer address
 		// TODO: transfer only during blank
+		m_display_enabled = false;
+		m_display_enabled_field = true;
+		m_display_enabled_scanline = false;
 		for (i = m_cursor_address; i != m_screen2_address; i = ((i + 1) & 0xffff))
 		{
 			m_char_space->write_byte(i, m_char_buffer);
@@ -762,13 +784,17 @@ void scn2674_device::write_command(uint8_t data)
 			m_IR_pointer = 0;
 			m_irq_register = 0x00;
 			m_status_register = 0x20; // RDFLG activated
-			m_linecounter = 0;
 			m_irq_mask = 0x00;
 			m_gfx_enabled = false;
 			m_display_enabled = false;
+			m_dadd_enabled = false;
 			m_cursor_enabled = false;
 			m_use_row_table = false;
 			m_intr_cb(CLEAR_LINE);
+			m_breq_cb(CLEAR_LINE);
+			m_mbc_cb(0);
+			m_breq_timer->adjust(attotime::never);
+			m_vblank_timer->adjust(attotime::never);
 		}
 		else
 		{
@@ -911,6 +937,8 @@ void scn2674_device::write(offs_t offset, uint8_t data)
 		m_screen1_address = (m_screen1_address & 0x3f00) | data;
 		if (!screen().vblank())
 			m_start1change = (m_linecounter / m_scanline_per_char_row) + 1;
+		else
+			m_start1change = 0;
 		break;
 
 	case 3:
@@ -924,6 +952,8 @@ void scn2674_device::write(offs_t offset, uint8_t data)
 		}
 		if (!screen().vblank())
 			m_start1change = (m_linecounter / m_scanline_per_char_row) + 1;
+		else
+			m_start1change = 0;
 		break;
 
 	case 4:
@@ -967,154 +997,200 @@ void scn2674_device::recompute_parameters()
 	rectangle visarea(0, max_visible_x, 0, max_visible_y);
 	screen().configure(horiz_pix_total, vert_pix_total, visarea, refresh.as_attoseconds());
 
-	m_scanline_timer->adjust(screen().time_until_pos(0, 0), 0, screen().scan_period());
+	m_linecounter = screen().vpos();
+	m_scanline_timer->adjust(screen().time_until_pos((m_linecounter + 1) % vert_pix_total, 0), 0, screen().scan_period());
 }
 
-void scn2674_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+TIMER_CALLBACK_MEMBER(scn2674_device::scanline_timer)
 {
-	switch (id)
+	int dw = m_double_ht_wd ? m_double[0] : 0;  // double width
+	if (((m_display_enabled_scanline) || (m_display_enabled_field && !m_interlace_enable)) && (!m_display_enabled))
 	{
-	case TIMER_SCANLINE:
+		m_display_enabled = true;
+		m_dadd_enabled = true;
+		m_display_enabled_scanline = false;
+		m_display_enabled_field = false;
+	}
+
+	m_linecounter++;
+
+	if (m_linecounter >= screen().height())
+	{
+		m_linecounter = 0;
+		m_address = m_screen1_address;
+	}
+
+	bool lastscan = m_linecounter == (m_rows_per_screen * m_scanline_per_char_row) - 1;
+	if (lastscan)
+	{
+		int horz_sync_begin = 2 * (m_equalizing_constant + 2 * m_horz_sync_width) - m_horz_sync_width - m_horz_back_porch;
+		m_vblank_timer->adjust(clocks_to_attotime(horz_sync_begin));
+	}
+
+	if (m_linecounter >= (m_rows_per_screen * m_scanline_per_char_row))
+	{
+		if (m_buffer_mode_select == 3 && m_linecounter == (screen().height() - 1))
+			m_breq_timer->adjust(clocks_to_attotime(m_character_per_row + 1), ASSERT_LINE);
+		return;
+	}
+
+	int charrow = m_linecounter % m_scanline_per_char_row;
+	int tilerow = charrow;
+
+	// should be triggered at the start of each ROW (line zero for that row)
+	if (charrow == 0)
+	{
+		m_status_register |= 0x08;
+		if (BIT(m_irq_mask, 3))
 		{
-			int dw = m_double_ht_wd ? m_double[0] : 0;  // double width
-			if (((m_display_enabled_scanline) || (m_display_enabled_field && !m_interlace_enable)) && (!m_display_enabled))
-			{
-				m_display_enabled = true;
-				m_display_enabled_scanline = false;
-				m_display_enabled_field = false;
-			}
-
-			m_linecounter++;
-
-			if (m_linecounter >= screen().height())
-			{
-				m_linecounter = 0;
-				m_address = m_screen1_address;
-			}
-
-			if (m_linecounter == (m_rows_per_screen * m_scanline_per_char_row))
-			{
-				m_status_register |= 0x10;
-				if (BIT(m_irq_mask, 4))
-				{
-					LOGMASKED(LOG_INTR, "V-Blank interrupt at line %d\n", m_linecounter);
-					m_irq_register |= 0x10;
-					m_intr_cb(ASSERT_LINE);
-				}
-			}
-
-			if (m_linecounter >= (m_rows_per_screen * m_scanline_per_char_row))
-				break;
-
-			int charrow = m_linecounter % m_scanline_per_char_row;
-			int tilerow = charrow;
-
-			// should be triggered at the start of each ROW (line zero for that row)
-			if (charrow == 0)
-			{
-				m_status_register |= 0x08;
-				if (BIT(m_irq_mask, 3))
-				{
-					LOGMASKED(LOG_INTR, "Line Zero interrupt at line %d\n", m_linecounter);
-					m_irq_register |= 0x08;
-					m_intr_cb(ASSERT_LINE);
-				}
-				if (m_buffer_mode_select == 3)
-					m_breq_cb(ASSERT_LINE);
-			}
-			else if (m_buffer_mode_select == 3)
-				m_breq_cb(CLEAR_LINE);
-
-			// Handle screen splits
-			for (int s = 0; s < 2; s++)
-			{
-				if ((m_linecounter == ((m_split_register[s] + 1) * m_scanline_per_char_row)) && m_linecounter)
-				{
-					uint8_t flag = (s == 0) ? 0x04 : 0x01;
-					m_status_register |= flag;
-					if ((m_irq_mask & flag) != 0)
-					{
-						LOGMASKED(LOG_INTR, "Split Screen %d interrupt at line %d\n", s + 1, m_linecounter);
-						m_irq_register |= flag;
-						m_intr_cb(ASSERT_LINE);
-					}
-					if (m_spl[s])
-						m_address = m_screen2_address;
-					if (!m_double_ht_wd)
-						dw = m_double[s];
-				}
-			}
-
-			if (!m_display_enabled)
-				break;
-
-			if (m_use_row_table)
-			{
-				if (m_double_ht_wd)
-					dw = m_screen1_address >> 14;
-				if (!charrow)
-				{
-					uint16_t addr = m_screen2_address;
-					uint16_t line = m_char_space->read_word(addr);
-					m_screen1_address = line;
-					if (m_double_ht_wd)
-					{
-						dw = line >> 14;
-						line &= ~0xc000;
-					}
-					m_address = line;
-					addr += 2;
-					m_screen2_address = addr & 0x3fff;
-				}
-			}
-			else if (m_start1change && (m_start1change == (m_linecounter / m_scanline_per_char_row)))
-			{
-				m_address = m_screen1_address;
-				m_start1change = 0;
-			}
-
-			if (dw == 2)
-				tilerow >>= 1;
-			else if (dw == 3)
-				tilerow = (charrow + m_scanline_per_char_row) >> 1;
-
-			uint16_t address = m_address;
-
-			for (int i = 0; i < m_character_per_row; i++)
-			{
-				bool cursor_on = ((address & 0x3fff) == m_cursor_address);
-
-				if (!m_display_cb.isnull())
-					m_display_cb(m_bitmap,
-									i * m_hpixels_per_column,
-									m_linecounter,
-									tilerow,
-									m_char_space->read_byte(address),
-									m_attr_space != nullptr ? m_attr_space->read_byte(address) : 0,
-									address,
-									(charrow >= m_cursor_first_scanline) && (charrow <= m_cursor_last_scanline) && cursor_on,
-									dw != 0,
-									m_gfx_enabled,
-									charrow == m_cursor_underline_position,
-									m_cursor_blink && (screen().frame_number() & m_cursor_rate_divisor));
-				address = (address + 1) & 0xffff;
-
-				if (address > ((m_display_buffer_last_address << 10) | 0x3ff))
-					address = m_display_buffer_first_address;
-			}
-
-			if (m_gfx_enabled || (charrow == (m_scanline_per_char_row - 1)))
-				m_address = address;
+			LOGMASKED(LOG_INTR, "Line Zero interrupt at line %d\n", m_linecounter);
+			m_irq_register |= 0x08;
+			m_intr_cb(ASSERT_LINE);
 		}
+		if (m_buffer_mode_select == 3)
+		{
+			m_mbc_cb(1);
+			m_breq_timer->adjust(clocks_to_attotime(m_character_per_row + 1), CLEAR_LINE);
+		}
+	}
+	else if (m_buffer_mode_select == 3 && charrow == (m_scanline_per_char_row - 1) && !lastscan)
+		m_breq_timer->adjust(clocks_to_attotime(m_character_per_row + 1), ASSERT_LINE);
+
+	// Handle screen splits
+	for (int s = 0; s < 2; s++)
+	{
+		if ((m_linecounter == ((m_split_register[s] + 1) * m_scanline_per_char_row)) && m_linecounter)
+		{
+			uint8_t flag = (s == 0) ? 0x04 : 0x01;
+			m_status_register |= flag;
+			if ((m_irq_mask & flag) != 0)
+			{
+				LOGMASKED(LOG_INTR, "Split Screen %d interrupt at line %d\n", s + 1, m_linecounter);
+				m_irq_register |= flag;
+				m_intr_cb(ASSERT_LINE);
+			}
+			if (m_spl[s])
+				m_address = m_screen2_address;
+			if (!m_double_ht_wd)
+				dw = m_double[s];
+		}
+	}
+
+	// WY-50 requires that normal row buffering take place even after a "display off" command
+	if (!m_dadd_enabled)
+		return;
+
+	if (m_use_row_table)
+	{
+		if (m_double_ht_wd)
+			dw = m_screen1_address >> 14;
+		if (!charrow)
+		{
+			uint16_t addr = m_screen2_address;
+			uint16_t line = m_char_space->read_word(addr);
+			m_screen1_address = line;
+			if (m_double_ht_wd)
+			{
+				dw = line >> 14;
+				line &= ~0xc000;
+			}
+			m_address = line;
+			addr += 2;
+			m_screen2_address = addr & 0x3fff;
+		}
+	}
+	else if (m_start1change && (m_start1change == (m_linecounter / m_scanline_per_char_row)))
+	{
+		m_address = m_screen1_address;
+		m_start1change = 0;
+	}
+
+	if (dw == 2)
+		tilerow >>= 1;
+	else if (dw == 3)
+		tilerow = (charrow + m_scanline_per_char_row) >> 1;
+
+	uint16_t address = m_address;
+
+	const bool mbc = (charrow == 0) && (m_buffer_mode_select == 3);
+	const bool blink_on = (screen().frame_number() & (m_character_blink_rate_divisor >> 1)) != 0;
+	for (int i = 0; i < m_character_per_row; i++)
+	{
+		u8 charcode, attrcode = 0;
+		if (mbc && !m_mbc_char_cb.isnull())
+		{
+			// row buffering DMA
+			charcode = m_mbc_char_cb(address);
+			m_char_space->write_byte(address, charcode);
+			if (m_attr_space != nullptr && !m_mbc_attr_cb.isnull())
+			{
+				attrcode = m_mbc_attr_cb(address);
+				m_attr_space->write_byte(address, attrcode);
+			}
+		}
+		else
+		{
+			charcode = m_char_space->read_byte(address);
+			if (m_attr_space != nullptr)
+				attrcode = m_attr_space->read_byte(address);
+		}
+
+		if (m_display_enabled && !m_display_cb.isnull())
+		{
+			bool cursor_on = ((address & 0x3fff) == m_cursor_address)
+				&& m_cursor_enabled
+				&& (charrow >= m_cursor_first_scanline)
+				&& (charrow <= m_cursor_last_scanline)
+				&& (!m_cursor_blink || (screen().frame_number() & (m_cursor_rate_divisor >> 1)) != 0);
+			m_display_cb(m_bitmap,
+							i * m_hpixels_per_column,
+							m_linecounter,
+							tilerow,
+							charcode,
+							attrcode,
+							address,
+							cursor_on,
+							dw != 0,
+							m_gfx_enabled,
+							charrow == m_cursor_underline_position,
+							blink_on);
+
+		}
+		address = (address + 1) & 0xffff;
+
+		if (address > ((m_display_buffer_last_address << 10) | 0x3ff))
+			address = m_display_buffer_first_address;
+	}
+
+	if (!m_display_enabled)
+		std::fill_n(&m_bitmap.pix32(m_linecounter), m_character_per_row * m_hpixels_per_column, rgb_t::black());
+
+	if (m_gfx_enabled || (charrow == (m_scanline_per_char_row - 1)))
+		m_address = address;
+}
+
+TIMER_CALLBACK_MEMBER(scn2674_device::breq_timer)
+{
+	LOGMASKED(LOG_INTR, "BREQ %sasserted at line %d\n", (param == ASSERT_LINE) ? "" : "de", m_linecounter);
+	m_breq_cb(param);
+	if (param == CLEAR_LINE)
+		m_mbc_cb(0);
+}
+
+TIMER_CALLBACK_MEMBER(scn2674_device::vblank_timer)
+{
+	m_status_register |= 0x10;
+	if (BIT(m_irq_mask, 4))
+	{
+		LOGMASKED(LOG_INTR, "V-Blank interrupt at line %d\n", m_linecounter);
+		m_irq_register |= 0x10;
+		m_intr_cb(ASSERT_LINE);
 	}
 }
 
 uint32_t scn2674_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	if (!m_display_enabled)
-		m_bitmap.fill(rgb_t::black(), cliprect);
-	else
-		copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 
 	return 0;
 }

@@ -61,12 +61,12 @@ WRITE8_MEMBER(speedatk_state::m6845_w)
 	if(offset == 0)
 	{
 		m_crtc_index = data;
-		m_crtc->address_w(space,0,data);
+		m_crtc->address_w(data);
 	}
 	else
 	{
 		m_crtc_vreg[m_crtc_index] = data;
-		m_crtc->register_w(space,0,data);
+		m_crtc->register_w(data);
 	}
 }
 

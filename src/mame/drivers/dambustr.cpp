@@ -271,7 +271,7 @@ MACHINE_CONFIG_START(dambustr_state::dambustr)
 	TTL7474(config, "7474_9m_1", 0).output_cb().set(FUNC(dambustr_state::galaxold_7474_9m_1_callback));
 	TTL7474(config, "7474_9m_2", 0).comp_output_cb().set(FUNC(dambustr_state::galaxold_7474_9m_2_q_callback));
 
-	MCFG_TIMER_DRIVER_ADD("int_timer", dambustr_state, galaxold_interrupt_timer)
+	TIMER(config, "int_timer").configure_generic(FUNC(dambustr_state::galaxold_interrupt_timer));
 
 	WATCHDOG_TIMER(config, "watchdog");
 

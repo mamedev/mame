@@ -77,40 +77,42 @@ UPD7220_DISPLAY_PIXELS_MEMBER( compis_uhrg_device::display_pixels )
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(compis_hrg_device::device_add_mconfig)
-	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
-	MCFG_SCREEN_SIZE(640, 400)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
-	MCFG_SCREEN_UPDATE_DEVICE(UPD7220_TAG, upd7220_device, screen_update)
+void compis_hrg_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
+	screen.set_size(640, 400);
+	screen.set_visarea(0, 640-1, 0, 400-1);
+	screen.set_screen_update(UPD7220_TAG, FUNC(upd7220_device::screen_update));
 
 	UPD7220(config, m_crtc, 2252500); // unknown clock
 	m_crtc->set_addrmap(0, &compis_hrg_device::hrg_map);
-	m_crtc->set_display_pixels_callback(FUNC(compis_hrg_device::display_pixels), this);
+	m_crtc->set_display_pixels(FUNC(compis_hrg_device::display_pixels));
 	m_crtc->set_screen(SCREEN_TAG);
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(compis_uhrg_device::device_add_mconfig)
-	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
-	MCFG_SCREEN_SIZE(1280, 800)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1280-1, 0, 800-1)
-	MCFG_SCREEN_UPDATE_DEVICE(UPD7220_TAG, upd7220_device, screen_update)
+void compis_uhrg_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
+	screen.set_size(1280, 800);
+	screen.set_visarea(0, 1280-1, 0, 800-1);
+	screen.set_screen_update(UPD7220_TAG, FUNC(upd7220_device::screen_update));
 
 	UPD7220(config, m_crtc, 2252500*2); // unknown clock
 	m_crtc->set_addrmap(0, &compis_uhrg_device::uhrg_map);
-	m_crtc->set_display_pixels_callback(FUNC(compis_uhrg_device::display_pixels), this);
+	m_crtc->set_display_pixels(FUNC(compis_uhrg_device::display_pixels));
 	m_crtc->set_screen(SCREEN_TAG);
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
-MACHINE_CONFIG_END
+}
 
 
 //**************************************************************************

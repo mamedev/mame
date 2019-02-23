@@ -609,22 +609,22 @@ MACHINE_CONFIG_START(cc40_state::cc40)
 
 	PALETTE(config, "palette", FUNC(cc40_state::cc40_palette), 3);
 
-	MCFG_HD44780_ADD("hd44780")
-	MCFG_HD44780_LCD_SIZE(2, 16) // 2*16 internal
-	MCFG_HD44780_PIXEL_UPDATE_CB(cc40_state, cc40_pixel_update)
+	hd44780_device &hd44780(HD44780(config, "hd44780", 0));
+	hd44780.set_lcd_size(2, 16); // 2*16 internal
+	hd44780.set_pixel_update_cb(FUNC(cc40_state::cc40_pixel_update), this);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "cc40_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,rom,256")
 	MCFG_GENERIC_LOAD(cc40_state, cc40_cartridge)
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "cc40_cart")
+	SOFTWARE_LIST(config, "cart_list").set_original("cc40_cart");
 MACHINE_CONFIG_END
 
 

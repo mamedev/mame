@@ -19,40 +19,10 @@
 #define VERBOSE 0
 
 
-void msx_state::msx_irq_source(int source, int level)
-{
-	assert(source >= 0 && source < ARRAY_LENGTH(m_irq_state));
-
-	m_irq_state[source] = level;
-	check_irq();
-}
-
-
-void msx_state::check_irq()
-{
-	int state = CLEAR_LINE;
-
-	for (auto & elem : m_irq_state)
-	{
-		if (elem != CLEAR_LINE)
-		{
-			state = ASSERT_LINE;
-		}
-	}
-
-	m_maincpu->set_input_line(0, state);
-}
-
-
 void msx_state::machine_reset()
 {
 	msx_memory_reset ();
 	msx_memory_map_all ();
-	for (auto & elem : m_irq_state)
-	{
-		elem = CLEAR_LINE;
-	}
-	check_irq();
 }
 
 
@@ -213,7 +183,6 @@ void msx_state::driver_start()
 	save_item(NAME(m_secondary_slot));
 	save_item(NAME(m_port_c_old));
 	save_item(NAME(m_keylatch));
-	save_item(NAME(m_irq_state));
 }
 
 void msx_state::device_post_load()
@@ -229,9 +198,9 @@ void msx_state::device_post_load()
 
 INTERRUPT_GEN_MEMBER(msx_state::msx_interrupt)
 {
-	m_mouse[0] = m_io_mouse0->read();
+	m_mouse[0] = m_io_mouse[0]->read();
 	m_mouse_stat[0] = -1;
-	m_mouse[1] = m_io_mouse1->read();
+	m_mouse[1] = m_io_mouse[1]->read();
 	m_mouse_stat[1] = -1;
 }
 
@@ -242,14 +211,12 @@ INTERRUPT_GEN_MEMBER(msx_state::msx_interrupt)
 
 READ8_MEMBER(msx_state::msx_psg_port_a_r)
 {
-	uint8_t data;
-
-	data = (m_cassette->input() > 0.0038 ? 0x80 : 0);
+	uint8_t data = (m_cassette->input() > 0.0038 ? 0x80 : 0);
 
 	if ( (m_psg_b ^ m_io_dsw->read() ) & 0x40)
 	{
 		/* game port 2 */
-		uint8_t inp = m_io_joy1->read();
+		uint8_t inp = m_io_joy[1]->read();
 		if ( !(inp & 0x80) )
 		{
 			/* joystick */
@@ -268,7 +235,7 @@ READ8_MEMBER(msx_state::msx_psg_port_a_r)
 	else
 	{
 		/* game port 1 */
-		uint8_t inp = m_io_joy0->read();
+		uint8_t inp = m_io_joy[0]->read();
 		if ( !(inp & 0x80) )
 		{
 			/* joystick */

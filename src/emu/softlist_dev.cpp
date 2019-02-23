@@ -113,14 +113,15 @@ void software_list_device::find_approx_matches(const std::string &name, int matc
 		return;
 
 	// initialize everyone's states
-	std::vector<int> penalty(matches);
+	std::vector<double> penalty(matches);
 	for (int matchnum = 0; matchnum < matches; matchnum++)
 	{
-		penalty[matchnum] = 9999;
+		penalty[matchnum] = 2.0;
 		list[matchnum] = nullptr;
 	}
 
 	// iterate over our info (will cause a parse if needed)
+	std::u32string const search(ustr_from_utf8(normalize_unicode(name, unicode_normalization_form::D, true)));
 	for (const software_info &swinfo : get_info())
 	{
 		for (const software_part &swpart : swinfo.parts())
@@ -128,13 +129,13 @@ void software_list_device::find_approx_matches(const std::string &name, int matc
 			if ((interface == nullptr || swpart.matches_interface(interface)) && is_compatible(swpart) == SOFTWARE_IS_COMPATIBLE)
 			{
 				// pick the best match between driver name and description
-				int longpenalty = driver_list::penalty_compare(name.c_str(), swinfo.longname().c_str());
-				int shortpenalty = driver_list::penalty_compare(name.c_str(), swinfo.shortname().c_str());
-				int curpenalty = std::min(longpenalty, shortpenalty);
+				double const longpenalty = util::edit_distance(search, ustr_from_utf8(normalize_unicode(swinfo.longname(), unicode_normalization_form::D, true)));
+				double const shortpenalty = util::edit_distance(search, ustr_from_utf8(normalize_unicode(swinfo.shortname(), unicode_normalization_form::D, true)));
+				double const curpenalty = (std::min)(longpenalty, shortpenalty);
 
 				// make sure it isn't already in the table
 				bool skip = false;
-				for (int matchnum = 0; matchnum < matches; matchnum++)
+				for (int matchnum = 0; !skip && (matchnum < matches) && list[matchnum]; matchnum++)
 				{
 					if ((penalty[matchnum] == curpenalty) && (swinfo.longname() == list[matchnum]->longname()) && (swinfo.shortname() == list[matchnum]->shortname()))
 						skip = true;
@@ -254,18 +255,16 @@ const software_info *software_list_device::find(const std::string &look_for)
 	// find a match (will cause a parse if needed when calling get_info)
 	const auto &info_list = get_info();
 	auto iter = std::find_if(
-		info_list.begin(),
-		info_list.end(),
-		[&](const software_info &info)
-	{
-		const char *shortname = info.shortname().c_str();
-		return (iswild && core_strwildcmp(look_for.c_str(), shortname) == 0)
-			|| core_stricmp(look_for.c_str(), shortname) == 0;
-	});
+			info_list.begin(),
+			info_list.end(),
+			[&look_for, iswild] (const software_info &info)
+			{
+				const char *shortname = info.shortname().c_str();
+				return (iswild && core_strwildcmp(look_for.c_str(), shortname) == 0)
+						|| core_stricmp(look_for.c_str(), shortname) == 0;
+			});
 
-	return iter != info_list.end()
-		? &*iter
-		: nullptr;
+	return iter != info_list.end() ? &*iter : nullptr;
 }
 
 

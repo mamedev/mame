@@ -80,21 +80,22 @@ void tr606_state::machine_start()
 	// register for savestates
 }
 
-MACHINE_CONFIG_START(tr606_state::tr606)
-
+void tr606_state::tr606(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NEC_D650, TP2_HZ)
+	NEC_D650(config, m_maincpu, TP2_HZ);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("tp3_clock", tr606_state, tp3_clock, TP3_PERIOD)
-	MCFG_TIMER_START_DELAY(TP3_PERIOD - TP3_LOW)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("tp3_clear", tr606_state, tp3_clear, TP3_PERIOD)
+	timer_device &tp3_clock(TIMER(config, "tp3_clock"));
+	tp3_clock.configure_periodic(FUNC(tr606_state::tp3_clock), TP3_PERIOD);
+	tp3_clock.set_start_delay(TP3_PERIOD - TP3_LOW);
+	TIMER(config, "tp3_clear").configure_periodic(FUNC(tr606_state::tp3_clear), TP3_PERIOD);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_ucom4_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_tr606);
 
 	/* sound hardware */
 	// discrete...
-MACHINE_CONFIG_END
+}
 
 
 

@@ -58,7 +58,10 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual ioport_constructor device_input_ports() const override;
+
+	static const device_timer_id TIMER_UPDATE = 0;
 
 private:
 	uint8_t m_inport;
@@ -111,6 +114,8 @@ private:
 	uint16_t            m_mouse_x;
 	uint16_t            m_mouse_y;
 	uint8_t             m_mouse_btn;
+
+	emu_timer *			m_update_timer;
 
 	DECLARE_WRITE_LINE_MEMBER( keyboard_w );
 };

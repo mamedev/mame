@@ -331,7 +331,7 @@ MACHINE_CONFIG_START(sparkz_state::sparkz)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_arcadecl)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_arcadecl);
 	palette_device &palette(PALETTE(config, "palette"));
 	palette.set_format(palette_device::IRGB_1555, 512);
 	palette.set_membits(8);
