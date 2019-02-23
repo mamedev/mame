@@ -67,7 +67,7 @@ private:
 	plib::parray<FT, SIZE> new_V;
 
 	std::array<plib::aligned_vector<FT *, PALIGN_VECTOROPT>, storage_N> m_term_cr;
-//  std::array<std::vector<FT *>, storage_N> m_term_cr;
+	//	std::array<std::vector<FT *>, storage_N> m_term_cr;
 
 	mat_type mat;
 
@@ -296,8 +296,8 @@ unsigned matrix_solver_GCR_t<FT, SIZE>::vsolve_non_dynamic(const bool newton_rap
 	mat.set_scalar(0.0);
 
 	/* populate matrix */
-	for (std::size_t k = 0; k < iN; k++)
-		this->m_terms[k]->fill_matrix(m_term_cr[k], RHS[k]);
+
+	this->fill_matrix(iN, m_term_cr, RHS);
 
 	/* now solve it */
 

@@ -53,42 +53,6 @@ namespace devices
 
 		void set_pointers();
 
-		/* FIXME: this works a bit better for larger matrices */
-		template <typename AP, typename FT>
-		void fill_matrix/*_larger*/(AP &tcr, FT &RHS)
-		{
-
-			const std::size_t term_count = this->count();
-			const std::size_t railstart = this->m_railstart;
-
-			for (std::size_t i = 0; i < railstart; i++)
-				*tcr[i]       -= m_go[i];
-
-	#if 1
-			FT gtot_t = 0.0;
-			FT RHS_t = 0.0;
-
-			for (std::size_t i = 0; i < term_count; i++)
-			{
-				gtot_t        += m_gt[i];
-				RHS_t         += m_Idr[i];
-			}
-			// FIXME: Code above is faster than vec_sum - Check this
-	#else
-			auto gtot_t = plib::vec_sum<FT>(term_count, m_gt);
-			auto RHS_t = plib::vec_sum<FT>(term_count, m_Idr);
-	#endif
-
-			for (std::size_t i = railstart; i < term_count; i++)
-			{
-				RHS_t += (/*m_Idr[i]*/ + m_go[i] * *m_connected_net_V[i]);
-			}
-
-			RHS = RHS_t;
-			// update diagonal element ...
-			*tcr[railstart] += gtot_t; //mat.A[mat.diag[k]] += gtot_t;
-		}
-
 		std::size_t m_railstart;
 
 		std::vector<unsigned> m_nz;   /* all non zero for multiplication */
@@ -206,6 +170,46 @@ namespace devices
 		void build_LE_A(T &child);
 		template <typename T>
 		void build_LE_RHS(T &child);
+
+		template <typename AP, typename FT>
+		void fill_matrix(std::size_t N, AP &tcr, FT &RHS)
+		{
+			for (std::size_t k = 0; k < N; k++)
+			{
+				auto *net = m_terms[k].get();
+				auto **tcr_r = tcr[k].data();
+
+				const std::size_t term_count = net->count();
+				const std::size_t railstart = net->m_railstart;
+
+				for (std::size_t i = 0; i < railstart; i++)
+					*tcr_r[i]       -= net->m_go[i];
+
+				typename FT::value_type gtot_t = 0.0;
+				typename FT::value_type RHS_t = 0.0;
+
+				for (std::size_t i = 0; i < term_count; i++)
+				{
+					gtot_t        += net->m_gt[i];
+					RHS_t         += net->m_Idr[i];
+				}
+				// FIXME: Code above is faster than vec_sum - Check this
+		#if 0
+				auto gtot_t = plib::vec_sum<FT>(term_count, m_gt);
+				auto RHS_t = plib::vec_sum<FT>(term_count, m_Idr);
+		#endif
+
+				for (std::size_t i = railstart; i < term_count; i++)
+				{
+					RHS_t += (/*m_Idr[i]*/ + net->m_go[i] * *net->m_connected_net_V[i]);
+				}
+
+				RHS[k] = RHS_t;
+				// update diagonal element ...
+				*tcr_r[railstart] += gtot_t; //mat.A[mat.diag[k]] += gtot_t;
+			}
+
+		}
 
 		std::vector<plib::unique_ptr<terms_for_net_t>> m_terms;
 		std::vector<analog_net_t *> m_nets;

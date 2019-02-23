@@ -111,9 +111,10 @@ namespace devices
 		m_ops.m_mat.set_scalar(0.0);
 
 		/* populate matrix and V for first estimate */
+		this->fill_matrix(iN, m_term_cr, RHS);
+
 		for (std::size_t k = 0; k < iN; k++)
 		{
-			this->m_terms[k]->fill_matrix(m_term_cr[k], RHS[k]);
 			this->m_new_V[k] = this->m_nets[k]->Q_Analog();
 		}
 
