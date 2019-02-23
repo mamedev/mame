@@ -1567,6 +1567,8 @@ files {
 	MAME_DIR .. "src/mame/video/apple2.h",
 	MAME_DIR .. "src/mame/drivers/tk2000.cpp",
 	MAME_DIR .. "src/mame/drivers/apple2gs.cpp",
+	MAME_DIR .. "src/mame/machine/apple2common.cpp",
+	MAME_DIR .. "src/mame/machine/apple2common.h",
 	MAME_DIR .. "src/mame/drivers/apple3.cpp",
 	MAME_DIR .. "src/mame/includes/apple3.h",
 	MAME_DIR .. "src/mame/machine/apple3.cpp",
