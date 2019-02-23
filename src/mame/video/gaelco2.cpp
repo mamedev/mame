@@ -261,6 +261,7 @@ WRITE16_MEMBER(gaelco2_state::gaelco2_palette_w)
 
 VIDEO_START_MEMBER(gaelco2_state,gaelco2)
 {
+	m_gfxdecode->gfx(0)->set_granularity(32);
 	m_videoram = m_spriteram->live();
 
 	/* create tilemaps */
@@ -281,6 +282,7 @@ VIDEO_START_MEMBER(gaelco2_state,gaelco2)
 
 VIDEO_START_MEMBER(gaelco2_state,gaelco2_dual)
 {
+	m_gfxdecode->gfx(0)->set_granularity(32);
 	m_videoram = m_spriteram->live();
 
 	/* create tilemaps */

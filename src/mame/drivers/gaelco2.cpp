@@ -43,30 +43,35 @@
 #include "speaker.h"
 
 
-#define TILELAYOUT16(NUM) static const gfx_layout tilelayout16_##NUM =              \
-{                                                                                   \
-	16,16,                                          /* 16x16 tiles */               \
-	NUM/32,                                         /* number of tiles */           \
-	5,                                              /* 5 bpp */                     \
-	{ 4*NUM*8, 3*NUM*8, 2*NUM*8, 1*NUM*8, 0*NUM*8 },                                \
-	{ 0,1,2,3,4,5,6,7, 16*8+0,16*8+1,16*8+2,16*8+3,16*8+4,16*8+5,16*8+6,16*8+7 },   \
-	{ 0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8, 8*8,9*8,10*8,11*8,12*8,13*8,14*8,15*8 },     \
-	32*8                                                                            \
+static const gfx_layout tilelayout16 =
+{
+	16,16,                                          /* 16x16 tiles */
+	RGN_FRAC(1,4),                                         /* number of tiles */
+	4,                                              /* 4 bpp */
+	{ RGN_FRAC(3,4), RGN_FRAC(2,4), RGN_FRAC(1,4), 0 },
+	{ STEP8(0,1), STEP8(16*8,1) },
+	{ STEP16(0,8) },
+	32*8
 };
 
-#define GFXDECODEINFO(NUM,ENTRIES) \
-static GFXDECODE_START( gfx_##NUM )\
-	GFXDECODE_ENTRY( "gfx1", 0x0000000, tilelayout16_##NUM,0,   ENTRIES )                       \
+static const gfx_layout tilelayout16_5bpp =
+{
+	16,16,                                          /* 16x16 tiles */
+	RGN_FRAC(1,5),                                         /* number of tiles */
+	5,                                              /* 5 bpp */
+	{ RGN_FRAC(4,5), RGN_FRAC(3,5), RGN_FRAC(2,5), RGN_FRAC(1,5), 0 },
+	{ STEP8(0,1), STEP8(16*8,1) },
+	{ STEP16(0,8) },
+	32*8
+};
+
+static GFXDECODE_START( gfx_gaelco2 )
+	GFXDECODE_ENTRY( "gfx1", 0, tilelayout16, 0, 128 )
 GFXDECODE_END
 
-
-TILELAYOUT16(0x0080000)
-GFXDECODEINFO(0x0080000, 128)
-TILELAYOUT16(0x0200000)
-GFXDECODEINFO(0x0200000, 128)
-TILELAYOUT16(0x0400000)
-GFXDECODEINFO(0x0400000, 128)
-
+static GFXDECODE_START( gfx_gaelco2_5bpp )
+	GFXDECODE_ENTRY( "gfx1", 0, tilelayout16_5bpp, 0, 128 )
+GFXDECODE_END
 
 
 /*============================================================================
@@ -197,7 +202,7 @@ void gaelco2_state::maniacsq(machine_config &config)
 	screen.screen_vblank().set("spriteram", FUNC(buffered_spriteram16_device::vblank_copy_rising));
 	screen.set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_0x0080000);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gaelco2);
 	PALETTE(config, m_palette).set_entries(4096*16 - 16);   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
 
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
@@ -234,7 +239,7 @@ ROM_START( maniacsq ) // REF 940411
 	DS5002FP_SET_RPCTL( 0x00 )
 	DS5002FP_SET_CRCR( 0x80 )
 
-	ROM_REGION( 0x0280000, "gfx1", 0 ) /* GFX + Sound */
+	ROM_REGION( 0x0200000, "gfx1", 0 ) /* GFX + Sound */
 	// all 4 roms on a sub-board, no IC positions marked
 	ROM_LOAD( "ms1",   0x0000000, 0x0080000, CRC(d8551b2f) SHA1(78b5b07112bd89fed18055180e7cc64f8e0bd0b1) )    /* GFX + Sound */
 	ROM_LOAD( "ms2",   0x0080000, 0x0080000, CRC(b269c427) SHA1(b7f9501529fbb7ee82700cff82740ba5770cf3c5) )    /* GFX + Sound */
@@ -242,7 +247,6 @@ ROM_START( maniacsq ) // REF 940411
 	ROM_FILL(          0x0120000, 0x0060000, 0x00 )         /* Empty */
 	ROM_LOAD( "ms4",   0x0180000, 0x0020000, CRC(578c3588) SHA1(c2e1fba29f21d6822677886fb2d26e050b336c14) )    /* GFX only */
 	ROM_FILL(          0x01a0000, 0x0060000, 0x00 )         /* Empty */
-	ROM_FILL(          0x0200000, 0x0080000, 0x00 )         /* to decode GFX as 5bpp */
 ROM_END
 
 /*
@@ -294,7 +298,7 @@ ROM_START( maniacsqa ) // REF 940411
 	DS5002FP_SET_RPCTL( 0x00 )
 	DS5002FP_SET_CRCR( 0x80 )
 
-	ROM_REGION( 0x0280000, "gfx1", 0 ) /* GFX + Sound */
+	ROM_REGION( 0x0200000, "gfx1", 0 ) /* GFX + Sound */
 	// all 4 roms on a sub-board, no IC positions marked
 	ROM_LOAD( "ms1",   0x0000000, 0x0080000, CRC(d8551b2f) SHA1(78b5b07112bd89fed18055180e7cc64f8e0bd0b1) )    /* GFX + Sound */
 	ROM_LOAD( "ms2",   0x0080000, 0x0080000, CRC(b269c427) SHA1(b7f9501529fbb7ee82700cff82740ba5770cf3c5) )    /* GFX + Sound */
@@ -302,7 +306,6 @@ ROM_START( maniacsqa ) // REF 940411
 	ROM_FILL(          0x0120000, 0x0060000, 0x00 )         /* Empty */
 	ROM_LOAD( "ms4",   0x0180000, 0x0020000, CRC(578c3588) SHA1(c2e1fba29f21d6822677886fb2d26e050b336c14) )    /* GFX only */
 	ROM_FILL(          0x01a0000, 0x0060000, 0x00 )         /* Empty */
-	ROM_FILL(          0x0200000, 0x0080000, 0x00 )         /* to decode GFX as 5bpp */
 ROM_END
 
 ROM_START( maniacsqu ) // REF 940411
@@ -310,14 +313,13 @@ ROM_START( maniacsqu ) // REF 940411
 	ROM_LOAD16_BYTE( "d8-d15.1m",   0x000000, 0x020000, CRC(9121d1b6) SHA1(ad8f0d996b6d42fc0c6645466608e82ca96e0b66) )
 	ROM_LOAD16_BYTE( "d0-d7.1m",    0x000001, 0x020000, CRC(a95cfd2a) SHA1(b5bad76f12d2a1f6bf6b35482f2f933ceb00e552) )
 
-	ROM_REGION( 0x0280000, "gfx1", 0 ) /* GFX + Sound */
+	ROM_REGION( 0x0200000, "gfx1", 0 ) /* GFX + Sound */
 	ROM_LOAD( "d0-d7.4m",   0x0000000, 0x0080000, CRC(d8551b2f) SHA1(78b5b07112bd89fed18055180e7cc64f8e0bd0b1) )    /* GFX + Sound */
 	ROM_LOAD( "d8-d15.4m",  0x0080000, 0x0080000, CRC(b269c427) SHA1(b7f9501529fbb7ee82700cff82740ba5770cf3c5) )    /* GFX + Sound */
 	ROM_LOAD( "d16-d23.1m", 0x0100000, 0x0020000, CRC(af4ea5e7) SHA1(ffaf09dc2588e32c124e7dd2f86ba009f1b8b176) )    /* GFX only */
 	ROM_FILL(               0x0120000, 0x0060000, 0x00 )         /* Empty */
 	ROM_LOAD( "d24-d31.1m", 0x0180000, 0x0020000, CRC(578c3588) SHA1(c2e1fba29f21d6822677886fb2d26e050b336c14) )    /* GFX only */
 	ROM_FILL(               0x01a0000, 0x0060000, 0x00 )         /* Empty */
-	ROM_FILL(               0x0200000, 0x0080000, 0x00 )         /* to decode GFX as 5bpp */
 ROM_END
 
 /*
@@ -398,14 +400,13 @@ ROM_START( maniacsqs ) // REF 960419/1
 	ROM_LOAD16_BYTE( "ms1.ic53", 0x000000, 0x020000, CRC(911fb089) SHA1(62bebf5072331421d4beedf0bde0cffc362b0514) )
 	ROM_LOAD16_BYTE( "ms2.ic55", 0x000001, 0x020000, CRC(e77a5537) SHA1(e7e1c7b794515238c4b5e5b8ef050eb945c96a3f) )
 
-	ROM_REGION( 0x0280000, "gfx1", 0 ) /* GFX + Sound - same data as other sets */
+	ROM_REGION( 0x0200000, "gfx1", 0 ) /* GFX + Sound - same data as other sets */
 	ROM_LOAD( "f0.bin",  0x0000000, 0x0080000, CRC(d8551b2f) SHA1(78b5b07112bd89fed18055180e7cc64f8e0bd0b1) )    /* GFX + Sound */
 	ROM_LOAD( "f1.bin",  0x0080000, 0x0080000, CRC(b269c427) SHA1(b7f9501529fbb7ee82700cff82740ba5770cf3c5) )    /* GFX + Sound */
 	ROM_LOAD( "f2.bin",  0x0100000, 0x0020000, CRC(af4ea5e7) SHA1(ffaf09dc2588e32c124e7dd2f86ba009f1b8b176) )    /* GFX only */
 	ROM_FILL(            0x0120000, 0x0060000, 0x00 )         /* Empty */
 	ROM_LOAD( "f3.bin",  0x0180000, 0x0020000, CRC(578c3588) SHA1(c2e1fba29f21d6822677886fb2d26e050b336c14) )    /* GFX only */
 	ROM_FILL(            0x01a0000, 0x0060000, 0x00 )         /* Empty */
-	ROM_FILL(            0x0200000, 0x0080000, 0x00 )         /* to decode GFX as 5bpp */
 ROM_END
 
 /*============================================================================
@@ -480,7 +481,7 @@ void gaelco2_state::saltcrdi(machine_config &config)
 	screen.screen_vblank().set("spriteram", FUNC(buffered_spriteram16_device::vblank_copy_rising));
 	screen.set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_0x0080000); /* gfx_0x0040000 */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gaelco2);
 	PALETTE(config, m_palette).set_entries(4096*16 - 16);   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
 
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
@@ -491,7 +492,7 @@ void gaelco2_state::saltcrdi(machine_config &config)
 
 	gaelco_gae1_device &gaelco(GAELCO_GAE1(config, "gaelco")); /* unused? ROMs contain no sound data */
 	gaelco.set_snd_data_tag("gfx1");
-	gaelco.set_bank_offsets(0 * 0x0080000, 1 * 0x0080000, 0, 0);
+	gaelco.set_bank_offsets(0 * 0x0040000, 1 * 0x0040000, 0, 0);
 	gaelco.add_route(0, "lspeaker", 1.0);
 	gaelco.add_route(1, "rspeaker", 1.0);
 }
@@ -501,17 +502,15 @@ ROM_START( saltcrdi ) // REF 970410
 	ROM_LOAD16_BYTE( "bi-n-21-27c512.u21",   0x000000, 0x010000, CRC(1d2e9a68) SHA1(b9bb4eeefe90850b648dc45689a08f3c28147856) )
 	ROM_LOAD16_BYTE( "bi-n-23-27c512.u23",   0x000001, 0x010000, CRC(5865351d) SHA1(a62b8ec88ef41d96b65a03ccaeadbec21803df34) )
 
-	ROM_REGION( 0x0280000, "gfx1", ROMREGION_ERASEFF ) /* GFX, no sound, machine has none? */
+	ROM_REGION( 0x0100000, "gfx1", ROMREGION_ERASEFF ) /* GFX, no sound, machine has none? */
 	ROM_LOAD( "bi-40-bank0-27c1001.u40",   0x0000000, 0x0020000, CRC(56822524) SHA1(aae133e9fb85ba8995c095cc540aa35b65c27777) )
-	ROM_LOAD( "bi-39-bank0-27c1001.u39",   0x0080000, 0x0020000, CRC(30dfcde1) SHA1(caf4429d0e1185c157eca436e9bb3a8513781a97) )
-	ROM_LOAD( "bi-38-bank0-27c1001.u38",   0x0100000, 0x0020000, CRC(84ec4b34) SHA1(01376f2534c4bc51d0a357d80db28b24c3fd71f6) )
-	ROM_LOAD( "bi-37-bank0-27c1001.u37",   0x0180000, 0x0020000, CRC(779fca47) SHA1(fce95893a5bcf0c6f26c223491c95154f072c92b) )
-	ROM_FILL(                              0x0200000, 0x0020000, 0x00 )         /* to decode GFX as 5bpp */
+	ROM_LOAD( "bi-39-bank0-27c1001.u39",   0x0040000, 0x0020000, CRC(30dfcde1) SHA1(caf4429d0e1185c157eca436e9bb3a8513781a97) )
+	ROM_LOAD( "bi-38-bank0-27c1001.u38",   0x0080000, 0x0020000, CRC(84ec4b34) SHA1(01376f2534c4bc51d0a357d80db28b24c3fd71f6) )
+	ROM_LOAD( "bi-37-bank0-27c1001.u37",   0x00c0000, 0x0020000, CRC(779fca47) SHA1(fce95893a5bcf0c6f26c223491c95154f072c92b) )
 	ROM_LOAD( "bi-44-bank1-27c1001.u44",   0x0020000, 0x0020000, CRC(171d2f88) SHA1(e2b406dad78e3ab5bebb673ed03db5d27879283e) )
-	ROM_LOAD( "bi-43-bank1-27c1001.u43",   0x00a0000, 0x0020000, CRC(69b35d81) SHA1(d9657e3d592079071df019cd75d676fa4b1bcba9) )
-	ROM_LOAD( "bi-42-bank1-27c1001.u42",   0x0120000, 0x0020000, CRC(eaef0565) SHA1(4214b05f1df3062eaeea91505b61816725556ed5) )
-	ROM_LOAD( "bi-41-bank1-27c1001.u41",   0x01a0000, 0x0020000, CRC(c4d24254) SHA1(e6ff7624e628dc6ace11a50b6ff89812844b52c5) )
-	ROM_FILL(                              0x0220000, 0x0020000, 0x00 )         /* to decode GFX as 5bpp */
+	ROM_LOAD( "bi-43-bank1-27c1001.u43",   0x0060000, 0x0020000, CRC(69b35d81) SHA1(d9657e3d592079071df019cd75d676fa4b1bcba9) )
+	ROM_LOAD( "bi-42-bank1-27c1001.u42",   0x00a0000, 0x0020000, CRC(eaef0565) SHA1(4214b05f1df3062eaeea91505b61816725556ed5) )
+	ROM_LOAD( "bi-41-bank1-27c1001.u41",   0x00e0000, 0x0020000, CRC(c4d24254) SHA1(e6ff7624e628dc6ace11a50b6ff89812844b52c5) )
 
 	ROM_REGION( 0x0800, "iomcu", 0 ) // on IO board
 	ROM_LOAD( "st62t15c6", 0x0000, 0x0800, NO_DUMP ) // 2KBytes internal ROM
@@ -736,7 +735,7 @@ void gaelco2_state::play2000(machine_config &config)
 	screen.screen_vblank().set("spriteram", FUNC(buffered_spriteram16_device::vblank_copy_rising));
 	screen.set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_0x0200000);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gaelco2_5bpp);
 	PALETTE(config, m_palette).set_entries(4096*16 - 16);   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
 
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
@@ -842,7 +841,7 @@ void bang_state::bang(machine_config &config)
 	screen.screen_vblank().set("spriteram", FUNC(buffered_spriteram16_device::vblank_copy_rising));
 	screen.set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_0x0200000);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gaelco2_5bpp);
 	PALETTE(config, m_palette).set_entries(4096*16 - 16);   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
 
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
@@ -1081,7 +1080,7 @@ void gaelco2_state::alighunt(machine_config &config)
 	screen.screen_vblank().set("spriteram", FUNC(buffered_spriteram16_device::vblank_copy_rising));
 	screen.set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_0x0400000);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gaelco2);
 	PALETTE(config, m_palette).set_entries(4096*16 - 16);   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
 
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
@@ -1164,9 +1163,8 @@ ROM_START( aligator )
 	DS5002FP_SET_RPCTL( 0x00 )
 	DS5002FP_SET_CRCR( 0x80 )
 
-	ROM_REGION( 0x1400000, "gfx1", 0 ) /* GFX + Sound */
+	ROM_REGION( 0x1000000, "gfx1", ROMREGION_ERASE00 ) /* GFX + Sound */
 	/* 0x0000000-0x0ffffff filled in in the DRIVER_INIT */
-	ROM_FILL(               0x1000000, 0x0400000, 0x00 )     /* to decode GFX as 5 bpp */
 
 	ROM_REGION( 0x1000000, "gfx2", 0 ) /* Temporary storage */
 	ROM_LOAD( "u48",        0x0000000, 0x0400000, CRC(19e03bf1) SHA1(2b3a4bb438b0aebf4f6a9fd26b071e5c9dd222b8) )    /* GFX only */
@@ -1189,9 +1187,8 @@ ROM_START( aligators )
 	DS5002FP_SET_RPCTL( 0x00 )
 	DS5002FP_SET_CRCR( 0x80 )
 
-	ROM_REGION( 0x1400000, "gfx1", 0 ) /* GFX + Sound */
+	ROM_REGION( 0x1000000, "gfx1", ROMREGION_ERASE00 ) /* GFX + Sound */
 	/* 0x0000000-0x0ffffff filled in in the DRIVER_INIT */
-	ROM_FILL(               0x1000000, 0x0400000, 0x00 )     /* to decode GFX as 5 bpp */
 
 	ROM_REGION( 0x1000000, "gfx2", 0 ) /* Temporary storage */
 	ROM_LOAD( "u48",        0x0000000, 0x0400000, CRC(19e03bf1) SHA1(2b3a4bb438b0aebf4f6a9fd26b071e5c9dd222b8) )    /* GFX only */
@@ -1205,9 +1202,8 @@ ROM_START( aligatorun )
 	ROM_LOAD16_BYTE(    "ahntu45n.040", 0x000000, 0x080000, CRC(fc02cb2d) SHA1(700aa60ec0d2bb705b1335de63daae678dcb8570) )
 	ROM_LOAD16_BYTE(    "ahntu44n.040", 0x000001, 0x080000, CRC(7fbea3a3) SHA1(89efa5b7908c2f010a3097954dbccd9cb7adc50c) )
 
-	ROM_REGION( 0x1400000, "gfx1", 0 ) /* GFX + Sound */
+	ROM_REGION( 0x1000000, "gfx1", ROMREGION_ERASE00 ) /* GFX + Sound */
 	/* 0x0000000-0x0ffffff filled in in the DRIVER_INIT */
-	ROM_FILL(               0x1000000, 0x0400000, 0x00 )     /* to decode GFX as 5 bpp */
 
 	ROM_REGION( 0x1000000, "gfx2", 0 ) /* Temporary storage */
 	ROM_LOAD( "u48",        0x0000000, 0x0400000, CRC(19e03bf1) SHA1(2b3a4bb438b0aebf4f6a9fd26b071e5c9dd222b8) )    /* GFX only */
@@ -1221,9 +1217,8 @@ ROM_START( aligatoruna )
 	ROM_LOAD16_BYTE(    "stm27c4001.45", 0x000000, 0x080000, CRC(a70301b8) SHA1(b6ffb7339a42ec81c3ec7a0681dfea878f11a538) )
 	ROM_LOAD16_BYTE(    "am27c040.44",   0x000001, 0x080000, CRC(d45a26ed) SHA1(bb261e7061aba35aa6af6567a8386d9704a9db83) )
 
-	ROM_REGION( 0x1400000, "gfx1", 0 ) /* GFX + Sound */
+	ROM_REGION( 0x1000000, "gfx1", ROMREGION_ERASE00 ) /* GFX + Sound */
 	/* 0x0000000-0x0ffffff filled in in the DRIVER_INIT */
-	ROM_FILL(               0x1000000, 0x0400000, 0x00 )     /* to decode GFX as 5 bpp */
 
 	ROM_REGION( 0x1000000, "gfx2", 0 ) /* Temporary storage */
 	ROM_LOAD( "u48",        0x0000000, 0x0400000, CRC(19e03bf1) SHA1(2b3a4bb438b0aebf4f6a9fd26b071e5c9dd222b8) )    /* GFX only */
@@ -1377,7 +1372,7 @@ void gaelco2_state::touchgo(machine_config &config)
 
 	/* video hardware */
 	BUFFERED_SPRITERAM16(config, m_spriteram);
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_0x0400000);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gaelco2_5bpp);
 	PALETTE(config, m_palette).set_entries(4096*16 - 16);   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
 	config.set_default_layout(layout_dualhsxs);
 
@@ -1533,7 +1528,7 @@ ROM_START( touchgo ) /* REF: 950906 */
 	DS5002FP_SET_RPCTL( 0x00 )
 	DS5002FP_SET_CRCR( 0x80 )
 
-	ROM_REGION( 0x1400000, "gfx1", 0 ) /* GFX + Sound */
+	ROM_REGION( 0x1400000, "gfx1", ROMREGION_ERASE00 ) /* GFX + Sound */
 	/* 0x0000000-0x0ffffff filled in in the DRIVER_INIT */
 	ROM_LOAD( "tg_ic69.ic69",  0x1000000, 0x0200000, CRC(18bb12d4) SHA1(ee6e7a63b86c56d71e62db0ae5892ab3ab94b0a0) ) /* GFX only */
 
@@ -1560,7 +1555,7 @@ ROM_START( touchgon ) /* REF 950906, no plug-in daughterboard, Non North America
 	DS5002FP_SET_RPCTL( 0x00 )
 	DS5002FP_SET_CRCR( 0x80 )
 
-	ROM_REGION( 0x1400000, "gfx1", 0 ) /* GFX + Sound */
+	ROM_REGION( 0x1400000, "gfx1", ROMREGION_ERASE00 ) /* GFX + Sound */
 	/* 0x0000000-0x0ffffff filled in in the DRIVER_INIT */
 	ROM_LOAD( "tg_ic69.ic69",  0x1000000, 0x0200000, CRC(18bb12d4) SHA1(ee6e7a63b86c56d71e62db0ae5892ab3ab94b0a0) ) /* GFX only */
 
@@ -1587,7 +1582,7 @@ ROM_START( touchgoe ) /* REF: 950510-1 */
 	DS5002FP_SET_RPCTL( 0x00 )
 	DS5002FP_SET_CRCR( 0x80 )
 
-	ROM_REGION( 0x1400000, "gfx1", 0 ) /* GFX + Sound */
+	ROM_REGION( 0x1400000, "gfx1", ROMREGION_ERASE00 ) /* GFX + Sound */
 	/* 0x0000000-0x0ffffff filled in in the DRIVER_INIT */
 	ROM_LOAD( "tg_ic69.ic69",  0x1000000, 0x0200000, CRC(18bb12d4) SHA1(ee6e7a63b86c56d71e62db0ae5892ab3ab94b0a0) ) /* GFX only */
 
@@ -1603,7 +1598,7 @@ ROM_START( touchgok ) /* REF: 950510-1 - ds5002fp unpopulated, game is unprotect
 	ROM_LOAD16_BYTE( "56.ic56", 0x000000, 0x080000, CRC(cbb87505) SHA1(f19832af60fb6273c3263ebdd93bb7705ab61e20) ) /* IC63 for REF: 950510-1, IC56 for REF: 950906 */
 	ROM_LOAD16_BYTE( "57.ic57", 0x000001, 0x080000, CRC(36bcc7e7) SHA1(2fff881ba0a99ebcfe3c03fdc61f4bf40e152c7f) ) /* IC64 for REF: 950510-1, IC57 for REF: 950906 */
 
-	ROM_REGION( 0x1400000, "gfx1", 0 ) /* GFX + Sound */
+	ROM_REGION( 0x1400000, "gfx1", ROMREGION_ERASE00 ) /* GFX + Sound */
 	/* 0x0000000-0x0ffffff filled in in the DRIVER_INIT */
 	ROM_LOAD( "tg_ic69.ic69",  0x1000000, 0x0200000, CRC(18bb12d4) SHA1(ee6e7a63b86c56d71e62db0ae5892ab3ab94b0a0) ) /* GFX only */
 
@@ -1695,7 +1690,7 @@ void gaelco2_state::snowboar(machine_config &config)
 	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
 	screen.set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_0x0400000);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gaelco2_5bpp);
 	PALETTE(config, m_palette).set_entries(4096*16 - 16);   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
 
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
@@ -1739,7 +1734,7 @@ void gaelco2_state::maniacsqs(machine_config &config)
 	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
 	screen.set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_0x0080000);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gaelco2);
 	PALETTE(config, m_palette).set_entries(4096*16 - 16);   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
 
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
@@ -1799,7 +1794,7 @@ ROM_START( snowboara ) // REF 960419/1
 	ROM_LOAD16_BYTE( "sb_53.ic53", 0x000000, 0x080000, CRC(e4eaefd4) SHA1(c7de2ae3a4a919fbe16d4997e3f9e2303b8c96b1) ) /* Version 2.0 program roms */
 	ROM_LOAD16_BYTE( "sb_55.ic55", 0x000001, 0x080000, CRC(e2476994) SHA1(2ad18652a1fc6ac058c8399373fb77e7a81d5bbd) ) /* Version 2.0 program roms */
 
-	ROM_REGION( 0x1400000, "gfx1", 0 )  /* GFX + Sound */
+	ROM_REGION( 0x1400000, "gfx1", ROMREGION_ERASE00 )  /* GFX + Sound */
 	/* 0x0000000-0x0ffffff filled in in the DRIVER_INIT */
 	ROM_LOAD( "sb_ic43.ic43", 0x1000000, 0x0200000, CRC(afce54ed) SHA1(1d2933d64790612918adbaabcd2a82dad79953c9) )    /* GFX only */
 	ROM_FILL(                 0x1200000, 0x0200000, 0x00 )         /* Empty */
@@ -1975,7 +1970,7 @@ void wrally2_state::wrally2(machine_config &config)
 
 	/* video hardware */
 	BUFFERED_SPRITERAM16(config, m_spriteram);
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_0x0200000);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gaelco2_5bpp);
 	PALETTE(config, m_palette).set_entries(4096*16 - 16);   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
 	config.set_default_layout(layout_dualhsxs);
 
@@ -2227,7 +2222,7 @@ ROM_START( wrally2 ) // REF: 950510-1
 	DS5002FP_SET_RPCTL( 0x00 )
 	DS5002FP_SET_CRCR( 0x80 )
 
-	ROM_REGION( 0x0a00000, "gfx1", 0 ) /* GFX + Sound */
+	ROM_REGION( 0x0a00000, "gfx1", ROMREGION_ERASE00 ) /* GFX + Sound */
 	/* 0x0000000-0x06fffff filled in in the DRIVER_INIT */
 	ROM_LOAD( "wr2_ic68.ic68",  0x0800000, 0x0100000, CRC(4a75ffaa) SHA1(ffae561ad4fa100398ab6b94d8dcb13e9fae4272) ) /* GFX only - read as 27C801 */
 
