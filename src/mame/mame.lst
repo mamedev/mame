@@ -30370,6 +30370,9 @@ neoprint                        //
 npcartv1                        //
 npmillen                        //
 nprsp                           //
+npskv                           //
+npsprg98                        //
+npsprgv4                        //
 npusagif                        //
 
 @source:neptunp2.cpp
