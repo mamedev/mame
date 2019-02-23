@@ -61,6 +61,7 @@ this module is the same as CB16 but at different form factor.
 // internal artwork
 #include "fidel_eag.lh" // clickable
 #include "fidel_eas.lh" // clickable
+#include "fidel_eas_priv.lh" // clickable
 #include "fidel_pc.lh" // clickable
 
 
@@ -379,6 +380,8 @@ void elite_state::eas_priv(machine_config &config)
 	M65C02(config.replace(), m_maincpu, 3.579545_MHz_XTAL); // UM6502C
 	m_maincpu->set_addrmap(AS_PROGRAM, &elite_state::div_trampoline);
 	TIMER(config.replace(), "dummy_timer").configure_periodic(timer_device::expired_delegate(), attotime::from_hz(3.579545_MHz_XTAL));
+
+	config.set_default_layout(layout_fidel_eas_priv);
 }
 
 void elite_state::eag(machine_config &config)
