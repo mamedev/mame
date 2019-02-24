@@ -4,15 +4,15 @@
 
     Sega Beena
 
-	non-video 'book' based learning system, like LeapPad etc.
+    non-video 'book' based learning system, like LeapPad etc.
 
-	unknown CPU type (inside Sega custom?)
+    unknown CPU type (inside Sega custom?)
 
-	cartridge ROM has 'edinburgh' in the header, maybe a system codename?
-	ROM is also full of OGG files containing the string 'Encoded with Speex speex-1.0.4'
-	as well as .mid files for music
+    cartridge ROM has 'edinburgh' in the header, maybe a system codename?
+    ROM is also full of OGG files containing the string 'Encoded with Speex speex-1.0.4'
+    as well as .mid files for music
 
-	TODO: component list!
+    TODO: component list!
 
 *******************************************************************************/
 

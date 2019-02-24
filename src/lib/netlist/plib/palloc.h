@@ -34,13 +34,13 @@ namespace plib {
 #if defined(_WIN32) || defined(_WIN64) || defined(_MSC_VER)
 		return _aligned_malloc(size, alignment);
 #elif defined(__APPLE__)
-	    void* p;
-	    if (::posix_memalign(&p, alignment, size) != 0) {
-	        p = nullptr;
-	    }
-	    return p;
+		void* p;
+		if (::posix_memalign(&p, alignment, size) != 0) {
+			p = nullptr;
+		}
+		return p;
 #else
-	    return aligned_alloc(alignment, size);
+		return aligned_alloc(alignment, size);
 #endif
 	}
 
@@ -59,7 +59,7 @@ namespace plib {
 		static_assert(is_pow2(ALIGN), "Alignment must be a power of 2");
 		//auto t = reinterpret_cast<std::uintptr_t>(p);
 		//if (t & (ALIGN-1))
-		//	printf("alignment error!");
+		//  printf("alignment error!");
 		return reinterpret_cast<T *>(__builtin_assume_aligned(p, ALIGN));
 	}
 
@@ -124,8 +124,8 @@ namespace plib {
 		constexpr pdefault_deleter() noexcept = default;
 
 		template<typename U, typename = typename
-		       std::enable_if<std::is_convertible< U*, T*>::value>::type>
-	    pdefault_deleter(const pdefault_deleter<U>&) noexcept { }
+			   std::enable_if<std::is_convertible< U*, T*>::value>::type>
+		pdefault_deleter(const pdefault_deleter<U>&) noexcept { }
 
 		void operator()(T *p) const
 		{
@@ -249,62 +249,62 @@ namespace plib {
 	class aligned_allocator
 	{
 	public:
-	    using value_type = T;
+		using value_type = T;
 
-	    static_assert(ALIGN >= alignof(T) && (ALIGN % alignof(T)) == 0,
-	    	"ALIGN must be greater than alignof(T) and a multiple");
+		static_assert(ALIGN >= alignof(T) && (ALIGN % alignof(T)) == 0,
+			"ALIGN must be greater than alignof(T) and a multiple");
 
-   	    aligned_allocator() noexcept = default;
-   	    ~aligned_allocator() noexcept = default;
+		aligned_allocator() noexcept = default;
+		~aligned_allocator() noexcept = default;
 
-	    aligned_allocator(const aligned_allocator&) noexcept = default;
-	    aligned_allocator& operator=(const aligned_allocator&) noexcept = delete;
+		aligned_allocator(const aligned_allocator&) noexcept = default;
+		aligned_allocator& operator=(const aligned_allocator&) noexcept = delete;
 
-	    aligned_allocator(aligned_allocator&&) noexcept = default;
-	    aligned_allocator& operator=(aligned_allocator&&) = delete;
+		aligned_allocator(aligned_allocator&&) noexcept = default;
+		aligned_allocator& operator=(aligned_allocator&&) = delete;
 
-	    template <class U>
-	    aligned_allocator(const aligned_allocator<U, ALIGN>& rhs) noexcept
-	    {
-	    	unused_var(rhs);
-	    }
-
-	    template <class U> struct rebind
+		template <class U>
+		aligned_allocator(const aligned_allocator<U, ALIGN>& rhs) noexcept
 		{
-	    	using other = aligned_allocator<U, ALIGN>;
+			unused_var(rhs);
+		}
+
+		template <class U> struct rebind
+		{
+			using other = aligned_allocator<U, ALIGN>;
 		};
 
-	    T* allocate(std::size_t n)
-	    {
-	        return reinterpret_cast<T *>(paligned_alloc(ALIGN, sizeof(T) * n));
-	    }
+		T* allocate(std::size_t n)
+		{
+			return reinterpret_cast<T *>(paligned_alloc(ALIGN, sizeof(T) * n));
+		}
 
-	    void deallocate(T* p, std::size_t n) noexcept
-	    {
-	    	unused_var(n);
-	        pfree(p);
-	    }
+		void deallocate(T* p, std::size_t n) noexcept
+		{
+			unused_var(n);
+			pfree(p);
+		}
 
-	    template <class T1, std::size_t A1, class U, std::size_t A2>
-	    friend bool operator==(const aligned_allocator<T1, A1>& lhs,
-	    	const aligned_allocator<U, A2>& rhs) noexcept;
+		template <class T1, std::size_t A1, class U, std::size_t A2>
+		friend bool operator==(const aligned_allocator<T1, A1>& lhs,
+			const aligned_allocator<U, A2>& rhs) noexcept;
 
-	    template <class U, std::size_t A> friend class aligned_allocator;
+		template <class U, std::size_t A> friend class aligned_allocator;
 	};
 
-    template <class T1, std::size_t A1, class U, std::size_t A2>
-    /*friend*/ inline bool operator==(const aligned_allocator<T1, A1>& lhs,
-    	const aligned_allocator<U, A2>& rhs) noexcept
-    {
-    	unused_var(lhs, rhs);
-	    return A1 == A2;
-    }
-    template <class T1, std::size_t A1, class U, std::size_t A2>
-    /*friend*/ inline bool operator!=(const aligned_allocator<T1, A1>& lhs,
-    	const aligned_allocator<U, A2>& rhs) noexcept
-    {
-	    return !(lhs == rhs);
-    }
+	template <class T1, std::size_t A1, class U, std::size_t A2>
+	/*friend*/ inline bool operator==(const aligned_allocator<T1, A1>& lhs,
+		const aligned_allocator<U, A2>& rhs) noexcept
+	{
+		unused_var(lhs, rhs);
+		return A1 == A2;
+	}
+	template <class T1, std::size_t A1, class U, std::size_t A2>
+	/*friend*/ inline bool operator!=(const aligned_allocator<T1, A1>& lhs,
+		const aligned_allocator<U, A2>& rhs) noexcept
+	{
+		return !(lhs == rhs);
+	}
 
 	// FIXME: needs to be somewhere else
 #if 0

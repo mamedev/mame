@@ -721,7 +721,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="ec0061">
 		<description>J-Pop Mix Volume 27 (Japan) (EC0061-JPM)</description>
 		<year>2001</year>
@@ -743,7 +743,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="ec0063">
 		<description>J-Pop Mix Volume 29 (Japan) (EC0063-JPM)</description>
 		<year>2001</year>
@@ -767,7 +767,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="ec0066">
 		<description>J-Pop Mix Volume 31 (Japan) (EC0066-JPM)</description>
 		<year>2001</year>
@@ -778,7 +778,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="ec0067">
 		<description>J-Pop Mix Volume 32 (Japan) (EC0067-JPM)</description>
 		<year>2001</year>
@@ -811,7 +811,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="ec0070">
 		<description>J-Pop Mix Volume 34 (Japan) (EC0070-JPM)</description>
 		<year>2001</year>
@@ -866,7 +866,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="ec0075">
 		<description>J-Pop Mix Volume 38 (Japan) (EC0075-JPM)</description>
 		<year>2001</year>
@@ -876,7 +876,7 @@
 				<rom name="ec0075-jpm.u1" size="0x100000" crc="cbb8e615" sha1="5fbbfbf4278ce7e289d859e389808b155bb16e4a" offset="0" />
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="ec0076">
 		<description>J-Pop Mix Volume 39 (Japan) (EC0076-JPM)</description>
@@ -888,7 +888,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="ec0077">
 		<description>Artist Selection Volume 15 - unknown artist (Japan) (EC0077-ATS)</description>
 		<year>2001</year>
@@ -898,8 +898,8 @@
 				<rom name="ec0077-ats.u1" size="0x100000" crc="368b0daf" sha1="8274a06ca2e3dbcd5176ac1b916be4a5a0df12ef" offset="0" />
 			</dataarea>
 		</part>
-	</software>	
-	
+	</software>
+
 	<software name="ec0078">
 		<description>J-Pop Mix Volume 40 (Japan) (EC0078-JPM)</description>
 		<year>2001</year>

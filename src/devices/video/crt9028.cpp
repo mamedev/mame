@@ -106,7 +106,7 @@ crt9028_000_device::crt9028_000_device(const machine_config &mconfig, const char
 						24, 10, false,
 						20, 4, 8,
 						72, 30, 10,
- 						2, 8, 9,
+						2, 8, 9,
 						0x3c0, 0x038, 0x007, 0x0f,
 						0x3e0, 0x020, 0x03f, 0x020,
 						0x10, 0xff, 0x10, 0xff)

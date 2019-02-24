@@ -560,7 +560,7 @@ void gaelco2_state::play2000_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();                                                                     /* ROM */
 	map(0x100000, 0x100001).portr("IN0");                                                        /* Coins + other buttons? */
-	map(0x110000, 0x110001).portr("IN1");                                                      
+	map(0x110000, 0x110001).portr("IN1");
 	map(0x200000, 0x20ffff).ram().w(FUNC(gaelco2_state::gaelco2_vram_w)).share("spriteram");                         /* Video RAM */
 	map(0x202890, 0x2028ff).rw("gaelco", FUNC(gaelco_gae1_device::gaelcosnd_r), FUNC(gaelco_gae1_device::gaelcosnd_w));    /* Sound Registers */
 	map(0x214000, 0x214fff).ram().w(FUNC(gaelco2_state::gaelco2_palette_w)).share("paletteram");                     /* Palette */

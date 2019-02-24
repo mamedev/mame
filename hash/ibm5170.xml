@@ -10747,7 +10747,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="micromc2">
 		<description>Micro Machines 2: Turbo Tournament</description>
 		<year>1995</year>
@@ -11301,7 +11301,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="monkeyit" cloneof="monkeyk">
 		<description>The Secret of Monkey Island (Italian)</description>
 		<year>1991</year>

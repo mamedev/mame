@@ -30,8 +30,8 @@ namespace detail
 
 	//static plib::mempool *pool()
 	//{
-	//	static plib::mempool s_pool(655360, 32);
-	//	return &s_pool;
+	//  static plib::mempool s_pool(655360, 32);
+	//  return &s_pool;
 	//}
 
 #if 0
@@ -49,7 +49,7 @@ namespace detail
 		if (mem)
 		{
 			//if ((USE_MEMPOOL))
-			//	pool()->free(mem);
+			//  pool()->free(mem);
 			//else
 				::operator delete(mem);
 		}
@@ -142,7 +142,7 @@ const logic_family_desc_t *family_CD4XXX()
 detail::queue_t::queue_t(netlist_state_t &nl)
 	: timed_queue<pqentry_t<net_t *, netlist_time>, false, NL_KEEP_STATISTICS>(512)
 	, netlist_ref(nl)
-//	, plib::state_manager_t::callback_t()
+//  , plib::state_manager_t::callback_t()
 	, m_qsize(0)
 	, m_times(512)
 	, m_net_ids(512)
@@ -192,7 +192,7 @@ detail::netlist_ref::netlist_ref(netlist_state_t &nl)
 // ----------------------------------------------------------------------------------------
 
 detail::object_t::object_t(const pstring &aname)
-//	: m_name(aname)
+//  : m_name(aname)
 {
 	name_hash().insert({this, aname});
 }

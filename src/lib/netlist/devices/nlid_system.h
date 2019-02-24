@@ -202,7 +202,7 @@ namespace netlist
 		{
 		}
 
-		NETLIB_UPDATEI() { 	}
+		NETLIB_UPDATEI() {  }
 		NETLIB_RESETI() { m_Q.initial(0.0); }
 		NETLIB_UPDATE_PARAMI() { m_Q.push(m_IN()); }
 

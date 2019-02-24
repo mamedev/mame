@@ -37,7 +37,7 @@
 #define LOG_XMAP1       (1 << 5)
 #define LOG_REX3        (1 << 6)
 #define LOG_COMMANDS    (1 << 7)
-#define LOG_REJECTS		(1 << 8)
+#define LOG_REJECTS     (1 << 8)
 #define LOG_ALL         (LOG_UNKNOWN | LOG_VC2 | LOG_CMAP0 | LOG_CMAP1 | LOG_XMAP0 | LOG_XMAP1 | LOG_REX3)
 
 #define VERBOSE (0)//(LOG_UNKNOWN | LOG_VC2 | LOG_XMAP0 | LOG_CMAP0 | LOG_REX3 | LOG_COMMANDS | LOG_REJECTS)
@@ -360,9 +360,9 @@ uint32_t newport_video_device::screen_update(screen_device &device, bitmap_rgb32
 					case 3:
 					{
 						const uint8_t pix_in = *src_ci;
-                    	const uint8_t r = (0x92 * BIT(pix_in, 2)) | (0x49 * BIT(pix_in, 1)) | (0x24 * BIT(pix_in, 0));
-                    	const uint8_t g = (0x92 * BIT(pix_in, 5)) | (0x49 * BIT(pix_in, 4)) | (0x24 * BIT(pix_in, 3));
-                    	const uint8_t b = (0xaa * BIT(pix_in, 7)) | (0x55 * BIT(pix_in, 6));
+						const uint8_t r = (0x92 * BIT(pix_in, 2)) | (0x49 * BIT(pix_in, 1)) | (0x24 * BIT(pix_in, 0));
+						const uint8_t g = (0x92 * BIT(pix_in, 5)) | (0x49 * BIT(pix_in, 4)) | (0x24 * BIT(pix_in, 3));
+						const uint8_t b = (0xaa * BIT(pix_in, 7)) | (0x55 * BIT(pix_in, 6));
 						*dest++ = (r << 16) | (g << 8) | b;
 						break;
 					}
@@ -1392,22 +1392,22 @@ void newport_video_device::store_pixel(uint8_t *dest_buf, uint8_t src)
 
 	switch ((m_rex3.m_draw_mode1 >> 28) & 15)
 	{
-		case 0:															break;
-		case 1:		*dest_buf |= (src & dst) & m_rex3.m_write_mask;		break;
-		case 2:		*dest_buf |= (src & ~dst) & m_rex3.m_write_mask;	break;
-		case 3:		*dest_buf |= (src) & m_rex3.m_write_mask; 			break;
-		case 4:		*dest_buf |= (~src & dst) & m_rex3.m_write_mask;	break;
-		case 5:		*dest_buf |= (dst) & m_rex3.m_write_mask;			break;
-		case 6:		*dest_buf |= (src ^ dst) & m_rex3.m_write_mask; 	break;
-		case 7:		*dest_buf |= (src | dst) & m_rex3.m_write_mask;		break;
-		case 8:		*dest_buf |= ~(src | dst) & m_rex3.m_write_mask;	break;
-		case 9:		*dest_buf |= ~(src ^ dst) & m_rex3.m_write_mask;	break;
-		case 10:	*dest_buf |= ~(dst) & m_rex3.m_write_mask;			break;
-		case 11:	*dest_buf |= (src | ~dst) & m_rex3.m_write_mask;	break;
-		case 12:	*dest_buf |= ~(src) & m_rex3.m_write_mask;			break;
-		case 13:	*dest_buf |= (~src | dst) & m_rex3.m_write_mask;	break;
-		case 14:	*dest_buf |= ~(src & dst) & m_rex3.m_write_mask;	break;
-		case 15:	*dest_buf |= 0xff & m_rex3.m_write_mask;			break;
+		case 0:                                                         break;
+		case 1:     *dest_buf |= (src & dst) & m_rex3.m_write_mask;     break;
+		case 2:     *dest_buf |= (src & ~dst) & m_rex3.m_write_mask;    break;
+		case 3:     *dest_buf |= (src) & m_rex3.m_write_mask;           break;
+		case 4:     *dest_buf |= (~src & dst) & m_rex3.m_write_mask;    break;
+		case 5:     *dest_buf |= (dst) & m_rex3.m_write_mask;           break;
+		case 6:     *dest_buf |= (src ^ dst) & m_rex3.m_write_mask;     break;
+		case 7:     *dest_buf |= (src | dst) & m_rex3.m_write_mask;     break;
+		case 8:     *dest_buf |= ~(src | dst) & m_rex3.m_write_mask;    break;
+		case 9:     *dest_buf |= ~(src ^ dst) & m_rex3.m_write_mask;    break;
+		case 10:    *dest_buf |= ~(dst) & m_rex3.m_write_mask;          break;
+		case 11:    *dest_buf |= (src | ~dst) & m_rex3.m_write_mask;    break;
+		case 12:    *dest_buf |= ~(src) & m_rex3.m_write_mask;          break;
+		case 13:    *dest_buf |= (~src | dst) & m_rex3.m_write_mask;    break;
+		case 14:    *dest_buf |= ~(src & dst) & m_rex3.m_write_mask;    break;
+		case 15:    *dest_buf |= 0xff & m_rex3.m_write_mask;            break;
 	}
 }
 
@@ -1452,26 +1452,26 @@ void newport_video_device::do_v_iline(uint8_t color, bool skip_last, bool shade)
 	do
 	{
 		if (shade)
-        	write_pixel(x1, y1, (uint8_t)(m_rex3.m_color_red >> 11));
-        else
-        	write_pixel(x1, y1, color);
+			write_pixel(x1, y1, (uint8_t)(m_rex3.m_color_red >> 11));
+		else
+			write_pixel(x1, y1, color);
 
-        y1 += incy;
+		y1 += incy;
 
 		if (shade)
 			m_rex3.m_color_red += m_rex3.m_slope_red;
 	} while (y1 != y2);
 
-    if (!skip_last)
-    {
+	if (!skip_last)
+	{
 		if (shade)
-        	write_pixel(x1, y1, (uint8_t)(m_rex3.m_color_red >> 11));
-        else
-        	write_pixel(x1, y1, color);
-    }
+			write_pixel(x1, y1, (uint8_t)(m_rex3.m_color_red >> 11));
+		else
+			write_pixel(x1, y1, color);
+	}
 
-    write_x_start(x1 << 11);
-    write_y_start(y1 << 11);
+	write_x_start(x1 << 11);
+	write_y_start(y1 << 11);
 }
 
 void newport_video_device::do_h_iline(uint8_t color, bool skip_last, bool shade)
@@ -1495,15 +1495,15 @@ void newport_video_device::do_h_iline(uint8_t color, bool skip_last, bool shade)
 			m_rex3.m_color_red += m_rex3.m_slope_red;
 	} while (x1 != x2);
 
-    if (!skip_last) {
+	if (!skip_last) {
 		if (shade)
-        	write_pixel(x1, y1, (uint8_t)(m_rex3.m_color_red >> 11));
-        else
-        	write_pixel(x1, y1, color);
-    }
+			write_pixel(x1, y1, (uint8_t)(m_rex3.m_color_red >> 11));
+		else
+			write_pixel(x1, y1, color);
+	}
 
-    write_x_start(x1 << 11);
-    write_y_start(y1 << 11);
+	write_x_start(x1 << 11);
+	write_y_start(y1 << 11);
 }
 
 void newport_video_device::do_iline(uint8_t color, bool skip_last, bool shade)
@@ -1621,8 +1621,8 @@ void newport_video_device::do_iline(uint8_t color, bool skip_last, bool shade)
 		}
 	}
 
-    write_x_start(x1 << 11);
-    write_y_start(y1 << 11);
+	write_x_start(x1 << 11);
+	write_y_start(y1 << 11);
 }
 
 uint8_t newport_video_device::do_pixel_read()
@@ -1763,8 +1763,8 @@ void newport_video_device::do_rex3_command()
 		{
 			//if (shade)
 			//{
-			//	write_pixel(start_x, start_y, (uint8_t)(m_rex3.m_color_red >> 11));
-			//	m_rex3.m_color_red += m_rex3.m_slope_red;
+			//  write_pixel(start_x, start_y, (uint8_t)(m_rex3.m_color_red >> 11));
+			//  m_rex3.m_color_red += m_rex3.m_slope_red;
 			//}
 			//else
 			//{

@@ -628,7 +628,7 @@ ROM_START( tetgiano )
 	ROM_REGION( 0x08000000, "rom_board", ROMREGION_ERASEFF)
 
 	// TETRIS - DEKARIS (romaji)
-	// / TETRIS® - GIANT
+	// / TETRISÂ® - GIANT
 	// MDA-C0076
 	DISK_REGION( "cflash" )
 	DISK_IMAGE( "mda-c0076", 0, SHA1(6987c888d2a3ada2d07f6396d47fdba507ca859d) )

@@ -426,7 +426,7 @@ public:
 	}
 
 protected:
-	// NETLIB_UPDATEI() { 	NETLIB_NAME(twoterm)::update(time); }
+	// NETLIB_UPDATEI() {   NETLIB_NAME(twoterm)::update(time); }
 
 	NETLIB_RESETI()
 	{

@@ -885,8 +885,8 @@ u16 ics2115_device::word_r(offs_t offset, u16 mem_mask)
 			break;
 		/*
 		case 3:
-			TODO : used for byte size only;
-			break;
+		    TODO : used for byte size only;
+		    break;
 		*/
 		default:
 #ifdef ICS2115_DEBUG
@@ -911,8 +911,8 @@ void ics2115_device::word_w(offs_t offset, u16 data, u16 mem_mask)
 			break;
 		/*
 		case 3:
-			TODO : used for byte size only;
-			break;
+		    TODO : used for byte size only;
+		    break;
 		*/
 		default:
 #ifdef ICS2115_DEBUG

@@ -3,24 +3,24 @@
 /******************************************************************************
 
     basic information
-	https://gbatemp.net/threads/the-c2-color-game-console-an-obscure-chinese-handheld.509320/
+    https://gbatemp.net/threads/the-c2-color-game-console-an-obscure-chinese-handheld.509320/
 
-	"The C2 is a glorious console with a D-Pad, Local 2.4GHz WiFi, Cartridge slot, A, B, and C buttons,
- 	 and has micro usb power! Don't be fooled though, there is no lithium battery, so you have to put in
-	 3 AA batteries if you don't want to play with it tethered to a charger. 
+    "The C2 is a glorious console with a D-Pad, Local 2.4GHz WiFi, Cartridge slot, A, B, and C buttons,
+     and has micro usb power! Don't be fooled though, there is no lithium battery, so you have to put in
+     3 AA batteries if you don't want to play with it tethered to a charger.
 
      It comes with a built in game based on the roco kingdom characters.
 
      In addition, there is a slot on the side of the console allowing cards to be swiped through. Those
-	 cards can add characters to the game. The console scans the barcode and a new character or item appears in the game for you to use.
+     cards can add characters to the game. The console scans the barcode and a new character or item appears in the game for you to use.
 
      The C2 comes with 9 holographic game cards that will melt your eyes."
 
-	also includes a link to the following video
-	https://www.youtube.com/watch?v=D3XO4aTZEko
+    also includes a link to the following video
+    https://www.youtube.com/watch?v=D3XO4aTZEko
 
-	TODO:
-	identify CPU type, and if the system ROM is needed to run carts or not
+    TODO:
+    identify CPU type, and if the system ROM is needed to run carts or not
 
 *******************************************************************************/
 

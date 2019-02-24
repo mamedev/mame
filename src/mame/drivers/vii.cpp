@@ -13,27 +13,27 @@
         Justice League
         Dora the Explorer
         Mattel Classic Sports
-		Disney Princess (GKR)
-		Wheel of Fortune (GKR)
-		(all GameKeyReady units?)
+        Disney Princess (GKR)
+        Wheel of Fortune (GKR)
+        (all GameKeyReady units?)
 
         "SunPlus QL8041C" ( known as Sunplus SPG2?? )
-		Clickstart ( see clickstart.cpp instead)
-		Wheel of Fortune 2nd Edition
+        Clickstart ( see clickstart.cpp instead)
+        Wheel of Fortune 2nd Edition
 
 
         "SunPlus PA7801" ( known as Sunplus SPG110? ) see spg110.cpp instead
-		Classic Arcade Pinball
-		EA Sports (NHL95 + Madden 95)
- 
-		It is unknown if the following are close to this architecture or not (no dumps yet)
+        Classic Arcade Pinball
+        EA Sports (NHL95 + Madden 95)
 
-		"SunPlus QU7073-P69A"
-		Mortal Kombat
+        It is unknown if the following are close to this architecture or not (no dumps yet)
 
-		"Sunplus QL8167"
-		Disney Princess (older)
-		Go Diego Go
+        "SunPlus QU7073-P69A"
+        Mortal Kombat
+
+        "Sunplus QL8167"
+        Disney Princess (older)
+        Go Diego Go
 
 
 Disney Princess non-GKR is Sunplus QL8167.
@@ -53,11 +53,11 @@ Disney Princess non-GKR is Sunplus QL8167.
 
         walle:
             Game seems unhappy with NVRAM, clears contents on each boot.
-		jak_pooh:
-		    In the 'Light Tag' minigame (select the rock) you can't move left with the DRC (ok with -nodrc)
-			and the game usually softlocks when you find a friend (with or without DRC)
-		
-		vii:
+        jak_pooh:
+            In the 'Light Tag' minigame (select the rock) you can't move left with the DRC (ok with -nodrc)
+            and the game usually softlocks when you find a friend (with or without DRC)
+
+        vii:
             When loading a cart from file manager, sometimes MAME will crash.
             The "MOTOR" option in the diagnostic menu does nothing when selected.
             The "SPEECH IC" option in the diagnostic menu does nothing when selected.
@@ -71,9 +71,9 @@ Disney Princess non-GKR is Sunplus QL8167.
         Test Modes:
         Justice League : press UP, DOWN, LEFT, BT3 on the JAKKS logo in that order, quickly, to get test menu
         WWE : press UP, BT1, BT2 together during startup logos
-		
-		Disney Friends, MS Pacman, WallE, Batman (and some other HotGen GameKKeys) for test mode, hold UP,
-		press A, press DOWN during startup
+
+        Disney Friends, MS Pacman, WallE, Batman (and some other HotGen GameKKeys) for test mode, hold UP,
+        press A, press DOWN during startup
 
     TODO:
         Work out how to access the hidden TEST menus for all games (most JAKKS games should have one at least)
@@ -1979,7 +1979,7 @@ void spg2xx_game_state::init_crc()
 
 	logerror("Calculated Byte Sum of bytes from 0x10 to 0x%08x is %08x)\n", length - 1, checksum);
 }
-	
+
 void spg2xx_game_state::init_zeus()
 {
 	uint16_t *ROM = (uint16_t*)memregion("maincpu")->base();
@@ -2052,11 +2052,11 @@ CONS( 2005, jak_wof,  0, 0, jakks_gkr_wf_i2c, jak_wf_i2c,   jakks_gkr_state, emp
 CONS( 2004, jak_spdm, 0, 0, jakks_gkr_mv_i2c, jak_gkr_i2c,  jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Digital Eclipse",         "Spider-Man (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) //  MV (1 key available)
 CONS( 2005, jak_pooh, 0, 0, jakks_gkr_wp,     jak_pooh,     jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Backbone Entertainment",  "Winnie the Pooh - Piglet's Special Day (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // WP (no game-keys released)
 
-// SpongeBob SquarePants: The Fry Cook Games   NK (3 keys available)  ^^                
+// SpongeBob SquarePants: The Fry Cook Games   NK (3 keys available)  ^^
 
 // no keys released for the following, some were in development but cancelled
 // Capcom 3-in-1                               CC (no game-keys released)
-// Care Bears                                  CB (no game-keys released)                           
+// Care Bears                                  CB (no game-keys released)
 
 // Radica TV games
 CONS( 2006, rad_skat,  0,        0, rad_skat, rad_skat,   spg2xx_game_state, init_crc, "Radica", "Play TV Skateboarder (NTSC)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

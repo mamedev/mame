@@ -329,7 +329,7 @@ Ferrari F355 Challenge (twin/deluxe, preview)   no cart  22848P* 21 (64Mb)   pre
 \Course Edition (twin/deluxe, prototype)        no cart  23399   21 (64Mb)   present  315-6206  317-0287-COM  content is the same as regular 171-7919A cart
 Inu No Osanpo / Dog Walking (Rev A)           840-0073C  22294A  16 (64Mb)   present  315-6206  317-0316-JPN  requires 837-13844 JVS IO with DIPSW 1 ON
 /Mushiking The King Of Beetle
-\(MUSHIUSA '04 1ST, Prototype)    			not present  none    11*(64Mb)   present  315-6206  not present   * only first 7 flash roms contain game data, PCB have label 840-0150B-FLS.
+\(MUSHIUSA '04 1ST, Prototype)              not present  none    11*(64Mb)   present  315-6206  not present   * only first 7 flash roms contain game data, PCB have label 840-0150B-FLS.
 Samba de Amigo (prototype)                      no cart  **      21*(64Mb)   present  315-6206  317-0270-COM  * only first 14 flash roms contain game data, ** instead of EPROM have tiny PCB with 2 flashroms on it
 /Shootout Pool Prize (Export) / Shootout
 \Pool The Medal (Japan) Version B (prototype) 840-0136C  **      21*(64Mb)   present  317-6206  not present   * only first 4 flash roms contain game data, ** instead of EPROM have tiny PCB with 2 flashroms on it
@@ -563,9 +563,9 @@ Marvel Vs. Capcom 2 New Age of Heroes (Korea, Rev A)    841-0007C-03 23085A  14 
 MushiKing The King of Beetles 2K3 2ND                   840-0150C    24217    6 (64Mb)   present  317-0394-COM  requires 610-0669 barcode reader, 838-14245-92 "MAPLE/232C CONVERT BD" (MIE-based), 838-14243 "RFID CHIP R/W BD" and RFID chip
 Quiz Ah Megamisama                                      840-0030C    23227   16 (64Mb)   present  317-0280-JPN
 Shootout Pool                                           840-0098C    23844    4 (64Mb)   present  317-0336-COM  requires regular 837-13551 and 837-13938 rotary JVS boards
-/Shootout Pool Prize (Export) / 
+/Shootout Pool Prize (Export) /
 \Shootout Pool The Medal (Japan, Rev A)                 840-0128C    24065A   4 (64Mb)   present  317-0367-COM  requires Naomi-based hopper controller
-/Shootout Pool Prize (Export) / 
+/Shootout Pool Prize (Export) /
 \Shootout Pool The Medal (Japan) Version B              840-0136C    24148    4 (64Mb)   present  317-0367-COM  requires Naomi-based or 837-14438 hopper controller (selected by P1 BUTTON1 bit)
 SWP Hopper Board                                        840-0130C    24083   20 (64Mb)   present  317-0339-COM  reused VF4 Evo ROM board with all maskROMs still in place; there is an additional 837-14381 IO board
 Touch de Uno! 2                                         840-0022C    23071    6 (64Mb)   present  317-0276-JPN  requires 837-13844 JVS IO with DIPSW 5 On, ELO AccuTouch-compatible touch screen controller and special printer.
@@ -9827,7 +9827,7 @@ ROM_START( clubk2k3 )
 	ROM_COPY( "rom_board", 0x1000000, 0x400000, 0xc00000 )
 
 /*  ROM_REGION(0x200, "some_eeprom", 0)
-	ROM_LOAD( "25lc040.ic13s", 0x000, 0x200, NO_DUMP ) */
+    ROM_LOAD( "25lc040.ic13s", 0x000, 0x200, NO_DUMP ) */
 
 	// 840-0139    2003     317-0382-COM   Naomi 2
 	ROM_PARAMETER( ":rom_board:key", "d8b0fa4c" )

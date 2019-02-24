@@ -2,74 +2,74 @@
 // copyright-holders:Ryan Holtz
 /******************************************************************************
 
-	Wireless Hunting Video Game System skeleton driver
+    Wireless Hunting Video Game System skeleton driver
 
-	System: Wireless Hunting Video Game System
-	Publisher: Hamy / Kids Station Toys Inc
-	Year: 2011
-	ROM: FDI MSP55LV100G
-	RAM: Micron Technology 48LC8M16A2
+    System: Wireless Hunting Video Game System
+    Publisher: Hamy / Kids Station Toys Inc
+    Year: 2011
+    ROM: FDI MSP55LV100G
+    RAM: Micron Technology 48LC8M16A2
 
-	Games:
-		Secret Mission
-		Predator
-		Delta Force
-		Toy Land
-		Dream Forest
-		Trophy Season
-		Freedom Force
-		Be Careful
-		Net Power
-		Open Training
-		Super Archer
-		Ultimate Frisbee
-		UFO Shooting
-		Happy Darts
-		Balloon Shoot
-		Avatair
-		Angry Pirate
-		Penguin War
-		Ghost Shooter
-		Duck Hunt
+    Games:
+        Secret Mission
+        Predator
+        Delta Force
+        Toy Land
+        Dream Forest
+        Trophy Season
+        Freedom Force
+        Be Careful
+        Net Power
+        Open Training
+        Super Archer
+        Ultimate Frisbee
+        UFO Shooting
+        Happy Darts
+        Balloon Shoot
+        Avatair
+        Angry Pirate
+        Penguin War
+        Ghost Shooter
+        Duck Hunt
 
 
-	ROM Board:
-		Package: SO44
-		Spacing: 1.27 mm
-		Width: 16.14 mm
-		Length: 27.78 mm
-		Voltage: 3V
-		Pinout:
+    ROM Board:
+        Package: SO44
+        Spacing: 1.27 mm
+        Width: 16.14 mm
+        Length: 27.78 mm
+        Voltage: 3V
+        Pinout:
 
-			  A25  A24
-				|  |
-		  +--------------------------+
-	A21 --|==   #  # `.__.'        ==|-- A20
-	A18 --|==                      ==|-- A19
-	A17 --|==                      ==|-- A8
-	 A7 --|==                      ==|-- A9
-	 A6 --|==                  o   ==|-- A10
-	 A5 --|==  +----------------+  ==|-- A11
-	 A4 --|==  |                |  ==|-- A12
-	 A3 --|==  |  MSP55LV100G   |  ==|-- A13
-	 A2 --|==  |  0834 M02H     |  ==|-- A14
-	 A1 --|==  |  JAPAN         |  ==|-- A15
-	 A0 --|==  |                |  ==|-- A16
-	#CE --|==  |                |  ==|-- A23
-	GND --|==  |                |  ==|-- A22
-	#OE --|==  |                |  ==|-- Q15
-	 Q0 --|==  |                |  ==|-- Q7
-	 Q8 --|==  |                |  ==|-- Q14
-	 Q1 --|==  +----------------+  ==|-- Q6
-	 Q9 --|==                      ==|-- Q13
-	 Q2 --|==       M55L100G       ==|-- Q5
-	Q10 --|==                      ==|-- Q12
-	 Q3 --|==                      ==|-- Q4
-	Q11 --|==                      ==|-- VCC
-		  +--------------------------+
+              A25  A24
+                |  |
+          +--------------------------+
+    A21 --|==   #  # `.__.'        ==|-- A20
+    A18 --|==                      ==|-- A19
+    A17 --|==                      ==|-- A8
+     A7 --|==                      ==|-- A9
+     A6 --|==                  o   ==|-- A10
+     A5 --|==  +----------------+  ==|-- A11
+     A4 --|==  |                |  ==|-- A12
+     A3 --|==  |  MSP55LV100G   |  ==|-- A13
+     A2 --|==  |  0834 M02H     |  ==|-- A14
+     A1 --|==  |  JAPAN         |  ==|-- A15
+     A0 --|==  |                |  ==|-- A16
+    #CE --|==  |                |  ==|-- A23
+    GND --|==  |                |  ==|-- A22
+    #OE --|==  |                |  ==|-- Q15
+     Q0 --|==  |                |  ==|-- Q7
+     Q8 --|==  |                |  ==|-- Q14
+     Q1 --|==  +----------------+  ==|-- Q6
+     Q9 --|==                      ==|-- Q13
+     Q2 --|==       M55L100G       ==|-- Q5
+    Q10 --|==                      ==|-- Q12
+     Q3 --|==                      ==|-- Q4
+    Q11 --|==                      ==|-- VCC
+          +--------------------------+
 
-	The only interesting string in this ROM is SPF2ALP,
-	which is also found in the Wireless Air 60 ROM.
+    The only interesting string in this ROM is SPF2ALP,
+    which is also found in the Wireless Air 60 ROM.
 
 *******************************************************************************/
 

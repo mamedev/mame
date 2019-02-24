@@ -2,11 +2,11 @@
 // copyright-holders:David Haywood
 /******************************************************************************
 
-	XaviX 2
+    XaviX 2
 
-	unknown architecture, does not appear to be 6502 derived like XaviX / SuperXaviX
+    unknown architecture, does not appear to be 6502 derived like XaviX / SuperXaviX
 
-	die is marked  "SSD 2002-2004 NEC 800208-51"
+    die is marked  "SSD 2002-2004 NEC 800208-51"
 
 *******************************************************************************/
 

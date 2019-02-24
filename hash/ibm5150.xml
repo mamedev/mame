@@ -3592,7 +3592,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="strecalc">
 		<description>StretchCalc</description>
 		<year>1983</year>
@@ -7132,7 +7132,7 @@ has been replaced with an all-zero block. -->
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="brdtale">
 		<description>The Bard's Tale - Tales of the Unknown (5.25")</description>
 		<year>1987</year>
@@ -7409,7 +7409,7 @@ has been replaced with an all-zero block. -->
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="budokan">
 		<description>Budokan - The Martial Spirit</description>
 		<year>1989</year>
@@ -7420,7 +7420,7 @@ has been replaced with an all-zero block. -->
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="budokana" cloneof="budokan">
 		<description>Budokan - The Martial Spirit (Big Games release)</description>
 		<year>1989</year>
@@ -8171,7 +8171,7 @@ has been replaced with an all-zero block. -->
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="gunboata" cloneof="gunboat">
 		<description>Gunboat: River Combat Simulation (Hit Squad release)</description>
 		<year>1990</year>
@@ -8357,7 +8357,7 @@ has been replaced with an all-zero block. -->
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="shogun">
 		<description>James Clavell's Shogun (set 1)</description>
 		<year>1987</year>
@@ -9271,7 +9271,7 @@ has been replaced with an all-zero block. -->
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="monopoly">
 		<description>Monopoly v2.00 (Shareware)</description>
 		<year>1989</year>
@@ -9298,7 +9298,7 @@ has been replaced with an all-zero block. -->
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="montypyt35" cloneof="montypyt">
 		<description>Monty Python's Flying Circus (3.5")</description>
 		<year>1990</year>
@@ -10279,7 +10279,7 @@ has been replaced with an all-zero block. -->
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="bartvssma" cloneof="bartvssm">
 		<description>The Simpsons - Bart vs. the Space Mutants (Hit-Squad release)</description>
 		<year>1991</year>
@@ -11038,7 +11038,7 @@ has been replaced with an all-zero block. -->
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="xenon">
 		<description>Xenon (5.25")</description>
 		<year>1988</year>
@@ -11056,7 +11056,7 @@ has been replaced with an all-zero block. -->
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="xenon35" cloneof="xenon">
 		<description>Xenon (16 Blitz Plus release) (3.5")</description>
 		<year>1990</year>
@@ -11123,7 +11123,7 @@ has been replaced with an all-zero block. -->
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="zoola" cloneof="zool">
 		<description>Zool (Big Games release)</description>
 		<year>1993</year>

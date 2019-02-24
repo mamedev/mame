@@ -5,9 +5,9 @@
     SunPlus SPG110-series SoC peripheral emulation
 
     0032xx looks like it could be the same as 003dxx on spg2xx
-	but the video seems to have differences, and data
-	is fetched from private buffers filled by DMA instead of
-	main space? tile attributes different? palette format different
+    but the video seems to have differences, and data
+    is fetched from private buffers filled by DMA instead of
+    main space? tile attributes different? palette format different
 
 **********************************************************************/
 
@@ -151,7 +151,7 @@ void spg110_device::blit_page(const rectangle &cliprect, uint32_t scanline, int 
 			blit<FlipXOn>(cliprect, tile_scanline, xx, yy, attr, ctrl, bitmap_addr, tile);
 		else
 			blit<FlipXOff>(cliprect, tile_scanline, xx, yy, attr, ctrl, bitmap_addr, tile);
-	
+
 	}
 }
 
@@ -214,11 +214,11 @@ GFXDECODE_END
 
 void spg110_device::device_add_mconfig(machine_config &config)
 {
-//	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x100);
-//	PALETTE(config, m_palette).set_format(palette_device::RGB_565, 0x100);
-//	PALETTE(config, m_palette).set_format(palette_device::IRGB_4444, 0x100);
-//	PALETTE(config, m_palette).set_format(palette_device::RGBI_4444, 0x100);
-//	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x100);
+//  PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x100);
+//  PALETTE(config, m_palette).set_format(palette_device::RGB_565, 0x100);
+//  PALETTE(config, m_palette).set_format(palette_device::IRGB_4444, 0x100);
+//  PALETTE(config, m_palette).set_format(palette_device::RGBI_4444, 0x100);
+//  PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x100);
 	PALETTE(config, m_palette, palette_device::BLACK, 256);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx);
@@ -337,7 +337,7 @@ WRITE16_MEMBER(spg110_device::dma_len_trigger_w)
 		uint16_t val = mem.read_word(source);
 
 		this->space(0).write_word(dest * 2, val, 0xffff);
-	
+
 		source+=m_dma_src_step;
 		dest+=m_dma_dst_step;
 	}
@@ -436,14 +436,14 @@ WRITE16_MEMBER(spg110_device::tmap1_regs_w)
 void spg110_device::map(address_map &map)
 {
 	map(0x000000, 0x000fff).ram();
-	
-	
+
+
 	// vregs are at 2000?
 	map(0x002010, 0x002015).rw(FUNC(spg110_device::tmap0_regs_r), FUNC(spg110_device::tmap0_regs_w));
 	map(0x002016, 0x00201b).rw(FUNC(spg110_device::tmap1_regs_r), FUNC(spg110_device::tmap1_regs_w));
 
 	map(0x00201c, 0x00201c).w(FUNC(spg110_device::spg110_201c_w));
-	
+
 	map(0x002020, 0x002020).w(FUNC(spg110_device::spg110_2020_w));
 
 	map(0x002028, 0x002028).rw(FUNC(spg110_device::spg110_2028_r), FUNC(spg110_device::spg110_2028_w));
@@ -484,7 +484,7 @@ void spg110_device::map(address_map &map)
 	map(0x00205d, 0x00205d).w(FUNC(spg110_device::spg110_205d_w));
 	map(0x00205e, 0x00205e).w(FUNC(spg110_device::spg110_205e_w));
 	map(0x00205f, 0x00205f).w(FUNC(spg110_device::spg110_205f_w));
-	
+
 	//map(0x002010, 0x00205f).ram();
 
 	// everything (dma? and interrupt flag?!)
@@ -498,9 +498,9 @@ void spg110_device::map(address_map &map)
 	map(0x002068, 0x002068).w(FUNC(spg110_device::dma_src_step_w));
 
 	map(0x002200, 0x0022ff).ram(); // looks like per-pen brightness or similar? strange because palette isn't memory mapped here
-	
+
 	map(0x003000, 0x00307f).ram(); // sound registers? seems to be 8 long entries, only uses up to 0x7f?
-	map(0x003080, 0x0030ff).ram(); 
+	map(0x003080, 0x0030ff).ram();
 
 	map(0x003100, 0x003100).w(FUNC(spg110_device::spg110_3100_w));
 	map(0x003101, 0x003101).w(FUNC(spg110_device::spg110_3101_w));
@@ -548,7 +548,7 @@ void spg110_device::map_video(address_map &map)
 
 	map(0x04000, 0x04fff).ram(); // seems to be 3 blocks, almost certainly spritelist
 
-//	map(0x08000, 0x081ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // probably? format unknown tho
+//  map(0x08000, 0x081ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // probably? format unknown tho
 	map(0x08000, 0x081ff).ram().share("palram");
 }
 
