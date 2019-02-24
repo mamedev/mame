@@ -3982,7 +3982,7 @@ GAME( 1988, robocop,    0,        robocop,    robocop,    dec0_state, empty_init
 GAME( 1988, robocopw,   robocop,  robocop,    robocop,    dec0_state, empty_init,      ROT0,   "Data East Corporation", "Robocop (World revision 3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, robocopj,   robocop,  robocop,    robocop,    dec0_state, empty_init,      ROT0,   "Data East Corporation", "Robocop (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, robocopu,   robocop,  robocop,    robocop,    dec0_state, empty_init,      ROT0,   "Data East USA",         "Robocop (US revision 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, bandit,     0,        bandit,     bandit,     dec0_state, init_hbarrel,    ROT90,  "Data East USA",         "Bandit (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bandit,     0,        bandit,     bandit,     dec0_state, init_hbarrel,    ROT90,  "Data East USA",         "Bandit (US)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1988, robocopu0,  robocop,  robocop,    robocop,    dec0_state, empty_init,      ROT0,   "Data East USA",         "Robocop (US revision 0)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, hippodrm,   0,        hippodrm,   hippodrm,   dec0_state, init_hippodrm,   ROT0,   "Data East USA",         "Hippodrome (US)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, ffantasy,   hippodrm, hippodrm,   ffantasy,   dec0_state, init_hippodrm,   ROT0,   "Data East Corporation", "Fighting Fantasy (Japan revision 3)", MACHINE_SUPPORTS_SAVE )
