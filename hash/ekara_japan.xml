@@ -357,7 +357,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="ekarae16.bin" size="0x100000" crc="1bac5cc7" sha1="d80e266d079ea2e8a5acb8c1ed97a94c5d31e6ec" offset="0" />
+				<rom name="ec0016-enk.u1" size="0x100000" crc="1bac5cc7" sha1="d80e266d079ea2e8a5acb8c1ed97a94c5d31e6ec" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -368,7 +368,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="ekarae17.bin" size="0x100000" crc="7f4efd49" sha1="32403cf65f4ae372da64cef25e03ddd66cdffa25" offset="0" />
+				<rom name="ec0017-g73.u1" size="0x100000" crc="7f4efd49" sha1="32403cf65f4ae372da64cef25e03ddd66cdffa25" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -390,7 +390,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="ekarae19.bin" size="0x100000" crc="c7de4c19" sha1="2cfc8c8b684f7b5ddac384840665fae97b8d9829" offset="0" />
+				<rom name="ec0019-bsc.u1" size="0x100000" crc="c7de4c19" sha1="2cfc8c8b684f7b5ddac384840665fae97b8d9829" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -401,7 +401,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="ekarae20.bin" size="0x100000" crc="ed3e5c2c" sha1="c9ca415b50a7b87d8bf54beb3c9f794bd928e489" offset="0" />
+				<rom name="ec0020-kid.u1" size="0x100000" crc="ed3e5c2c" sha1="c9ca415b50a7b87d8bf54beb3c9f794bd928e489" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -489,7 +489,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="ekarae28.bin" size="0x100000" crc="f671ce7e" sha1="d901d6196d7864f5e512fbb6d539ec0580417385" offset="0" />
+				<rom name="ec0028-jpm.u1" size="0x100000" crc="f671ce7e" sha1="d901d6196d7864f5e512fbb6d539ec0580417385" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -599,18 +599,18 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="ekarae38.bin" size="0x100000" crc="34817291" sha1="a6069419bf3fd143fb247ba625c41b42000cda27" offset="0" />
+				<rom name="ec0038-bsc.u1" size="0x100000" crc="34817291" sha1="a6069419bf3fd143fb247ba625c41b42000cda27" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 	
 	<software name="ec0039">
-		<description>Artist Selection Volume 7 (B's) (Japan) (EC0039-ATS)</description>
+		<description>Artist Selection Volume 7 (B'z) (Japan) (EC0039-ATS)</description>
 		<year>2000</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="ekarae39.bin" size="0x100000" crc="aa50b08a" sha1="91a97c0591e137e50b20f052b402ce52b70a16eb" offset="0" />
+				<rom name="ec0039-ats.u1" size="0x100000" crc="aa50b08a" sha1="91a97c0591e137e50b20f052b402ce52b70a16eb" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -621,7 +621,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="ekarae40.bin" size="0x100000" crc="e2cb7232" sha1="c9c1f7d316f0c239c659632296695081e50b85e5" offset="0" />
+				<rom name="ec0040-jpm.u1" size="0x100000" crc="e2cb7232" sha1="c9c1f7d316f0c239c659632296695081e50b85e5" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -654,7 +654,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="ekarae43.bin" size="0x100000" crc="c730037d" sha1="c283b99fe4ae51adc3e13a6fae4eaffb891ec20d" offset="0" />
+				<rom name="ec0043-enk.u1" size="0x100000" crc="c730037d" sha1="c283b99fe4ae51adc3e13a6fae4eaffb891ec20d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -734,7 +734,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
-				<rom name="ekarae50.bin" size="0x200000" crc="56ce5d3a" sha1="c499bae5faa00e0987b89185d0e2ec142054773a" offset="0" />
+				<rom name="ec0050-ats.u1" size="0x200000" crc="56ce5d3a" sha1="c499bae5faa00e0987b89185d0e2ec142054773a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -768,7 +768,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="ekarae53.bin" size="0x100000" crc="6f799665" sha1="bf029d5c10efb8b76bff7dda0806bf943d0fff01" offset="0" />
+				<rom name="ec0053-jpm.u1" size="0x100000" crc="6f799665" sha1="bf029d5c10efb8b76bff7dda0806bf943d0fff01" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -790,7 +790,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="ekarae55.bin" size="0x100000" crc="af6b0f2a" sha1="719bd1bc88517e4e067e99416547afe9ca1ff93f" offset="0" />
+				<rom name="ec0055-ats.u1" size="0x100000" crc="af6b0f2a" sha1="719bd1bc88517e4e067e99416547afe9ca1ff93f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -801,7 +801,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="ekarae56.bin" size="0x100000" crc="8c0b175b" sha1="697d7eb50a84001ddb66f50a50c682c63c21ed60" offset="0" />
+				<rom name="ec0056-jpm.u1" size="0x100000" crc="8c0b175b" sha1="697d7eb50a84001ddb66f50a50c682c63c21ed60" offset="0" />
 			</dataarea>
 		</part>
 	</software>	
@@ -812,7 +812,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="ekarae57.bin" size="0x100000" crc="15345511" sha1="7e5197a8f7a0ec0160d7f5214428b153f35619f6" offset="0" />
+				<rom name="ec0057-ats.u1" size="0x100000" crc="15345511" sha1="7e5197a8f7a0ec0160d7f5214428b153f35619f6" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -825,7 +825,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="ekarae59.bin" size="0x100000" crc="e72ab46f" sha1="ef1fc7fba2beae7549edce697b12dd3b48dd1103" offset="0" />
+				<rom name="ec0059-jpm.u1" size="0x100000" crc="e72ab46f" sha1="ef1fc7fba2beae7549edce697b12dd3b48dd1103" offset="0" />
 			</dataarea>
 		</part>
 	</software>
