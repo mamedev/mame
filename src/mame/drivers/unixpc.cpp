@@ -53,6 +53,8 @@ public:
 		m_ram(*this, RAM_TAG),
 		m_wd2797(*this, "wd2797"),
 		m_floppy(*this, "wd2797:0:525dd"),
+		m_hdc(*this, "hdc"),
+		m_hdr0(*this, "hdc:0"),
 		m_ramrombank(*this, "ramrombank"),
 		m_mapram(*this, "mapram"),
 		m_videoram(*this, "videoram")
@@ -100,6 +102,8 @@ private:
 	required_device<ram_device> m_ram;
 	required_device<wd2797_device> m_wd2797;
 	required_device<floppy_image_device> m_floppy;
+	required_device<wd1010_device> m_hdc;
+	required_device<harddisk_image_device> m_hdr0;
 	required_device<address_map_bank_device> m_ramrombank;
 
 	required_shared_ptr<uint16_t> m_mapram;
@@ -260,6 +264,13 @@ WRITE16_MEMBER(unixpc_state::disk_control_w)
 {
 	logerror("disk_control_w: %04x\n", data);
 
+	// TODO: bits 0-2 = head select
+
+	m_hdc->drdy_w(BIT(data, 3) && m_hdr0->exists());		
+
+	if (!BIT(data, 4))
+		m_hdc->reset();
+
 	m_floppy->mon_w(!BIT(data, 5));
 
 	// bit 6 = floppy selected / not selected
@@ -325,7 +336,7 @@ void unixpc_state::unixpc_mem(address_map &map)
 	map(0x4d0000, 0x4d7fff).w(FUNC(unixpc_state::diskdma_ptr_w));
 	map(0x4e0000, 0x4e0001).w(FUNC(unixpc_state::disk_control_w));
 	map(0x4f0001, 0x4f0001).w("printlatch", FUNC(output_latch_device::bus_w));
-	map(0xe00000, 0xe0000f).rw("hdc", FUNC(wd1010_device::read), FUNC(wd1010_device::write)).umask16(0x00ff);
+	map(0xe00000, 0xe0000f).rw(m_hdc, FUNC(wd1010_device::read), FUNC(wd1010_device::write)).umask16(0x00ff);
 	map(0xe10000, 0xe10007).rw(m_wd2797, FUNC(wd_fdc_device_base::read), FUNC(wd_fdc_device_base::write)).umask16(0x00ff);
 	map(0xe30000, 0xe30001).r(FUNC(unixpc_state::rtc_r));
 	map(0xe40000, 0xe40001).select(0x7000).w(FUNC(unixpc_state::gcr_w));
@@ -407,9 +418,9 @@ void unixpc_state::unixpc(machine_config &config)
 	m_wd2797->drq_wr_callback().set(FUNC(unixpc_state::wd2797_drq_w));
 	FLOPPY_CONNECTOR(config, "wd2797:0", unixpc_floppies, "525dd", floppy_image_device::default_floppy_formats);
 
-	wd1010_device &hdc(WD1010(config, "hdc", 40_MHz_XTAL / 8));
-	hdc.out_intrq_callback().set(FUNC(unixpc_state::wd1010_intrq_w));
-	HARDDISK(config, "hdc:0", 0);
+	WD1010(config, m_hdc, 40_MHz_XTAL / 8);
+	m_hdc->out_intrq_callback().set(FUNC(unixpc_state::wd1010_intrq_w));
+	HARDDISK(config, m_hdr0, 0);
 
 	upd7201_new_device &mpsc(UPD7201_NEW(config, "mpsc", 19.6608_MHz_XTAL / 8));
 	mpsc.out_txda_callback().set("rs232", FUNC(rs232_port_device::write_txd));
