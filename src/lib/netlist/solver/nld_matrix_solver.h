@@ -11,9 +11,9 @@
 #include "netlist/nl_base.h"
 #include "netlist/nl_errstr.h"
 #include "plib/palloc.h"
+#include "plib/pmatrix2d.h"
 #include "plib/putil.h"
 #include "plib/vector_ops.h"
-#include "plib/pmatrix2d.h"
 
 #include <cmath>
 
@@ -240,12 +240,12 @@ namespace devices
 		template <typename T>
 		using aligned_alloc = plib::aligned_allocator<T, PALIGN_VECTOROPT>;
 
-		plib::pmatrix2d<nl_double, aligned_alloc<nl_double>> 		m_gon;
-		plib::pmatrix2d<nl_double, aligned_alloc<nl_double>>  		m_gtn;
-		plib::pmatrix2d<nl_double, aligned_alloc<nl_double>>  		m_Idrn;
-		plib::pmatrix2d<nl_double *, aligned_alloc<nl_double *>>  	m_connected_net_Vn;
+		plib::pmatrix2d<nl_double, aligned_alloc<nl_double>>        m_gon;
+		plib::pmatrix2d<nl_double, aligned_alloc<nl_double>>        m_gtn;
+		plib::pmatrix2d<nl_double, aligned_alloc<nl_double>>        m_Idrn;
+		plib::pmatrix2d<nl_double *, aligned_alloc<nl_double *>>    m_connected_net_Vn;
 
-		plib::pmatrix2d<nl_double>  		m_test;
+		plib::pmatrix2d<nl_double>          m_test;
 
 		std::vector<plib::unique_ptr<terms_for_net_t>> m_terms;
 		std::vector<analog_net_t *> m_nets;

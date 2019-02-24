@@ -14,12 +14,12 @@
 #define NLTYPES_H_
 
 #include "nl_config.h"
-#include "plib/ptime.h"
 #include "plib/pchrono.h"
 #include "plib/pfmtlog.h"
 #include "plib/pmempool.h"
-#include "plib/pstring.h"
 #include "plib/pstate.h"
+#include "plib/pstring.h"
+#include "plib/ptime.h"
 
 #include <cstdint>
 #include <unordered_map>
@@ -126,9 +126,9 @@ namespace netlist
 	//  MACROS
 	//============================================================
 
-	template <typename T> inline constexpr netlist_time NLTIME_FROM_NS(T &&t) noexcept { return netlist_time::from_nsec(t); }
-	template <typename T> inline constexpr netlist_time NLTIME_FROM_US(T &&t) noexcept { return netlist_time::from_usec(t); }
-	template <typename T> inline constexpr netlist_time NLTIME_FROM_MS(T &&t) noexcept { return netlist_time::from_msec(t); }
+	template <typename T> inline constexpr const netlist_time NLTIME_FROM_NS(T &&t) noexcept { return netlist_time::from_nsec(t); }
+	template <typename T> inline constexpr const netlist_time NLTIME_FROM_US(T &&t) noexcept { return netlist_time::from_usec(t); }
+	template <typename T> inline constexpr const netlist_time NLTIME_FROM_MS(T &&t) noexcept { return netlist_time::from_msec(t); }
 
 } // namespace netlist
 

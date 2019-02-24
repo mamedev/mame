@@ -87,13 +87,13 @@ namespace plib
 // Define a "has member" trait.
 //============================================================
 
-#define PDEFINE_HAS_MEMBER(name, member)										\
-    template <typename T> class name											\
-	{																			\
-        template <typename U> static long test(decltype(&U:: member));			\
-        template <typename U> static char  test(...);							\
-    public:																		\
-        static constexpr const bool value = sizeof(test<T>(nullptr)) == sizeof(long);	\
-    }
+#define PDEFINE_HAS_MEMBER(name, member)                                        \
+	template <typename T> class name                                            \
+	{                                                                           \
+		template <typename U> static long test(decltype(&U:: member));          \
+		template <typename U> static char  test(...);                           \
+	public:                                                                     \
+		static constexpr const bool value = sizeof(test<T>(nullptr)) == sizeof(long);   \
+	}
 
 #endif /* PTYPES_H_ */

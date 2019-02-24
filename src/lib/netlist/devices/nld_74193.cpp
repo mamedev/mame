@@ -87,7 +87,7 @@ namespace netlist
 	}
 
 	// FIXME: Timing
-	static constexpr netlist_time delay[4] =
+	static constexpr const netlist_time delay[4] =
 	{
 			NLTIME_FROM_NS(40),
 			NLTIME_FROM_NS(40),

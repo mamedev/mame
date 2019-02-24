@@ -12,11 +12,11 @@
 
 #include "plib/mat_cr.h"
 
+#include "nld_ms_direct.h"
+#include "nld_solver.h"
 #include "plib/pdynlib.h"
 #include "plib/pstream.h"
 #include "plib/vector_ops.h"
-#include "nld_ms_direct.h"
-#include "nld_solver.h"
 
 #include <algorithm>
 
@@ -67,7 +67,7 @@ private:
 	plib::parray<FT, SIZE> new_V;
 
 	std::array<plib::aligned_vector<FT *, PALIGN_VECTOROPT>, storage_N> m_term_cr;
-	//	std::array<std::vector<FT *>, storage_N> m_term_cr;
+	//  std::array<std::vector<FT *>, storage_N> m_term_cr;
 
 	mat_type mat;
 

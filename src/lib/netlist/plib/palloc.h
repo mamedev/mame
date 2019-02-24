@@ -36,13 +36,13 @@ namespace plib {
 #if defined(_WIN32) || defined(_WIN64) || defined(_MSC_VER)
 		return _aligned_malloc(size, alignment);
 #elif defined(__APPLE__)
-	    void* p;
-	    if (::posix_memalign(&p, alignment, size) != 0) {
-	        p = nullptr;
-	    }
-	    return p;
+		void* p;
+		if (::posix_memalign(&p, alignment, size) != 0) {
+			p = nullptr;
+		}
+		return p;
 #else
-	    return aligned_alloc(alignment, size);
+		return aligned_alloc(alignment, size);
 #endif
 	}
 
@@ -90,7 +90,7 @@ namespace plib {
 		static_assert(is_pow2(ALIGN), "Alignment must be a power of 2");
 		//auto t = reinterpret_cast<std::uintptr_t>(p);
 		//if (t & (ALIGN-1))
-		//	printf("alignment error!");
+		//  printf("alignment error!");
 #if (USE_ALIGNED_HINTS)
 		return reinterpret_cast<T *>(__builtin_assume_aligned(p, ALIGN));
 #else
@@ -142,8 +142,8 @@ namespace plib {
 		constexpr pdefault_deleter() noexcept = default;
 
 		template<typename U, typename = typename
-		       std::enable_if<std::is_convertible< U*, T*>::value>::type>
-	    pdefault_deleter(const pdefault_deleter<U>&) noexcept { }
+			   std::enable_if<std::is_convertible< U*, T*>::value>::type>
+		pdefault_deleter(const pdefault_deleter<U>&) noexcept { }
 
 		void operator()(T *p) const
 		{
@@ -271,30 +271,30 @@ namespace plib {
 	class aligned_allocator
 	{
 	public:
-	    using value_type = T;
-	    static constexpr const std::size_t align_size = (USE_ALIGNED_ALLOCATION) ? ALIGN : alignof(std::max_align_t);
+		using value_type = T;
+		static constexpr const std::size_t align_size = (USE_ALIGNED_ALLOCATION) ? ALIGN : alignof(std::max_align_t);
 
-	    static_assert(align_size >= alignof(T) && (align_size % alignof(T)) == 0,
-	    	"ALIGN must be greater than alignof(T) and a multiple");
+		static_assert(align_size >= alignof(T) && (align_size % alignof(T)) == 0,
+			"ALIGN must be greater than alignof(T) and a multiple");
 
-   	    aligned_allocator() noexcept = default;
-   	    ~aligned_allocator() noexcept = default;
+		aligned_allocator() noexcept = default;
+		~aligned_allocator() noexcept = default;
 
-	    aligned_allocator(const aligned_allocator&) noexcept = default;
-	    aligned_allocator& operator=(const aligned_allocator&) noexcept = delete;
+		aligned_allocator(const aligned_allocator&) noexcept = default;
+		aligned_allocator& operator=(const aligned_allocator&) noexcept = delete;
 
-	    aligned_allocator(aligned_allocator&&) noexcept = default;
-	    aligned_allocator& operator=(aligned_allocator&&) = delete;
+		aligned_allocator(aligned_allocator&&) noexcept = default;
+		aligned_allocator& operator=(aligned_allocator&&) = delete;
 
-	    template <class U>
-	    aligned_allocator(const aligned_allocator<U, ALIGN>& rhs) noexcept
-	    {
-	    	unused_var(rhs);
-	    }
-
-	    template <class U> struct rebind
+		template <class U>
+		aligned_allocator(const aligned_allocator<U, ALIGN>& rhs) noexcept
 		{
-	    	using other = aligned_allocator<U, ALIGN>;
+			unused_var(rhs);
+		}
+
+		template <class U> struct rebind
+		{
+			using other = aligned_allocator<U, ALIGN>;
 		};
 
 		T* allocate(std::size_t n)
@@ -331,22 +331,22 @@ namespace plib {
 
 	//============================================================
 	// traits to determine alignment size and stride size
-    // from types supporting alignment
+	// from types supporting alignment
 	//============================================================
 
 	PDEFINE_HAS_MEMBER(has_align, align_size);
 
-    template <typename T, typename X = void>
-    struct align_traits
+	template <typename T, typename X = void>
+	struct align_traits
 	{
-    	static constexpr const std::size_t align_size = alignof(std::max_align_t);
+		static constexpr const std::size_t align_size = alignof(std::max_align_t);
 		static constexpr const std::size_t stride_size =
 			(sizeof(T) % align_size == 0 ? 1 //T is a multiple of align_size
 			 : (align_size % sizeof(T) != 0 ? align_size   // align_size is not a multiple of T
 			 : align_size / sizeof(T)));
 	};
 
-    template <typename T>
+	template <typename T>
 	struct align_traits<T, typename std::enable_if<has_align<T>::value, void>::type>
 	{
 		static constexpr const std::size_t align_size = T::align_size;
@@ -360,7 +360,7 @@ namespace plib {
 	// Aligned vector
 	//============================================================
 
-    // FIXME: needs a separate file
+	// FIXME: needs a separate file
 	template <class T, std::size_t ALIGN = alignof(T)>
 	class aligned_vector : public std::vector<T, aligned_allocator<T, ALIGN>>
 	{

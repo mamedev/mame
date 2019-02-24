@@ -6,9 +6,9 @@
  */
 
 #include "netlist/nl_base.h"
+#include "nld_log.h"
 #include "plib/pfmtlog.h"
 #include "plib/pstream.h"
-#include "nld_log.h"
 //#include "sound/wavwrite.h"
 
 namespace netlist

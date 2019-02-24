@@ -12,7 +12,7 @@
 
 #include <algorithm>
 #include <initializer_list>
-#include <vector> // <<= needed by windows build
+#include <vector>
 
 #define PSTRINGIFY_HELP(y) # y
 #define PSTRINGIFY(x) PSTRINGIFY_HELP(x)

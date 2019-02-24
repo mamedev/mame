@@ -200,9 +200,9 @@ public:
 		LC* p;
 	public:
 		explicit constexpr iter_t(LC* x) noexcept : p(x) { }
-		explicit constexpr iter_t(iter_t &rhs) noexcept : p(rhs.p) { }
+		constexpr iter_t(iter_t &rhs) noexcept : p(rhs.p) { }
 		iter_t(iter_t &&rhs) noexcept { std::swap(*this, rhs);  }
-		iter_t& operator=(const iter_t &rhs) { iter_t t(rhs); std::swap(*this, t); return *this; }
+		iter_t& operator=(const iter_t &rhs) noexcept { iter_t t(rhs); std::swap(*this, t); return *this; }
 		iter_t& operator=(iter_t &&rhs) noexcept { std::swap(*this, rhs); return *this; }
 		iter_t& operator++() noexcept {p = p->next();return *this;}
 		// NOLINTNEXTLINE(cert-dcl21-cpp)

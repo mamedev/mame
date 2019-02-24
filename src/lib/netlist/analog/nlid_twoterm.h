@@ -33,9 +33,9 @@
 #ifndef NLID_TWOTERM_H_
 #define NLID_TWOTERM_H_
 
-#include "plib/pfunction.h"
 #include "netlist/nl_base.h"
 #include "netlist/nl_setup.h"
+#include "plib/pfunction.h"
 
 // -----------------------------------------------------------------------------
 // Implementation
