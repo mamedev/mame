@@ -27,7 +27,7 @@
 #ifndef NLD_7483_H_
 #define NLD_7483_H_
 
-#include "../nl_setup.h"
+#include "netlist/nl_setup.h"
 
 #define TTL_7483(name, cA1, cA2, cA3, cA4, cB1, cB2, cB3, cB4, cCI)             \
 		NET_REGISTER_DEV(TTL_7483, name)                                        \

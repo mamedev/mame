@@ -5,8 +5,8 @@
  *
  */
 
-#include "../solver/nld_solver.h"
-#include "../nl_setup.h"
+#include "netlist/solver/nld_solver.h"
+#include "netlist/nl_setup.h"
 #include "nlid_twoterm.h"
 
 #include <cmath>

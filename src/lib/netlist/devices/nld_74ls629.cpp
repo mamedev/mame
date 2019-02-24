@@ -40,7 +40,7 @@
 
 
 #include "nld_74ls629.h"
-#include "../analog/nlid_twoterm.h"
+#include "netlist/analog/nlid_twoterm.h"
 
 namespace netlist
 {

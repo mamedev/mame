@@ -72,7 +72,7 @@ float_type matrix_solver_SOR_mat_t<m_N, storage_N>::vsolve()
 	 * enable linear prediction on first newton pass
 	 */
 
-	if (USE_LINEAR_PREDICTION)
+	if (this->m_params->use_linear_prediction)
 		for (unsigned k = 0; k < this->size(); k++)
 		{
 			this->m_last_V[k] = this->m_nets[k]->m_cur_Analog;
@@ -86,7 +86,7 @@ float_type matrix_solver_SOR_mat_t<m_N, storage_N>::vsolve()
 
 	this->solve_base(this);
 
-	if (USE_LINEAR_PREDICTION)
+	if (this->m_params->use_linear_prediction)
 	{
 		float_type sq = 0;
 		float_type sqo = 0;
@@ -183,7 +183,7 @@ unsigned matrix_solver_SOR_mat_t<FT, SIZE>::vsolve_non_dynamic(const bool newton
 				Idrive = Idrive + this->A(k,p[i]) * this->m_new_V[p[i]];
 
 			FT w = m_omega / this->A(k,k);
-			if (USE_GABS)
+			if (this->m_params.m_use_gabs)
 			{
 				FT gabs_t = 0.0;
 				for (std::size_t i = 0; i < e; i++)

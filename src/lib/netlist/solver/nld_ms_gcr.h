@@ -10,14 +10,15 @@
 #ifndef NLD_MS_GCR_H_
 #define NLD_MS_GCR_H_
 
-#include <algorithm>
-#include <netlist/plib/mat_cr.h>
+#include "plib/mat_cr.h"
 
-#include "../plib/pdynlib.h"
-#include "../plib/pstream.h"
-#include "../plib/vector_ops.h"
+#include "plib/pdynlib.h"
+#include "plib/pstream.h"
+#include "plib/vector_ops.h"
 #include "nld_ms_direct.h"
 #include "nld_solver.h"
+
+#include <algorithm>
 
 namespace netlist
 {

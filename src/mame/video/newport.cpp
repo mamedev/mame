@@ -288,7 +288,15 @@ uint32_t newport_video_device::screen_update(screen_device &device, bitmap_rgb32
 
 		// Fetch the initial DID entry
 		uint16_t curr_did_entry = m_vc2.m_ram[m_vc2.m_did_line_ptr];
-		uint16_t ci_msb = (m_xmap0.m_mode_table[curr_did_entry & 0x1f] & 0xf8) << 5;
+		uint32_t table_entry = m_xmap0.m_mode_table[curr_did_entry & 0x1f];
+		uint16_t ci_msb = 0;
+		switch ((table_entry >> 8) & 3)
+		{
+			case 0: ci_msb = (m_xmap0.m_mode_table[curr_did_entry & 0x1f] & 0xf8) << 5; break;
+			case 1: ci_msb = 0x1d00; break;
+			case 2: ci_msb = 0x1e00; break;
+			case 3: ci_msb = 0x1f00; break;
+		}
 
 		// Prepare for the next DID entry
 		m_vc2.m_did_line_ptr++;
@@ -299,7 +307,14 @@ uint32_t newport_video_device::screen_update(screen_device &device, bitmap_rgb32
 		{
 			if ((uint16_t)x == (curr_did_entry >> 5))
 			{
-				ci_msb = (m_xmap0.m_mode_table[curr_did_entry & 0x1f] & 0xf8) << 5;
+				table_entry = m_xmap0.m_mode_table[curr_did_entry & 0x1f];
+				switch ((table_entry >> 8) & 3)
+				{
+					case 0: ci_msb = (m_xmap0.m_mode_table[curr_did_entry & 0x1f] & 0xf8) << 5; break;
+					case 1: ci_msb = 0x1d00; break;
+					case 2: ci_msb = 0x1e00; break;
+					case 3: ci_msb = 0x1f00; break;
+				}
 				m_vc2.m_did_line_ptr++;
 				curr_did_entry = m_vc2.m_ram[m_vc2.m_did_line_ptr];
 			}
@@ -315,11 +330,43 @@ uint32_t newport_video_device::screen_update(screen_device &device, bitmap_rgb32
 			}
 			else if (*src_pup)
 			{
-				*dest++ = m_cmap0.m_palette[popup_msb | *src_pup];
+				const uint8_t src = (*src_pup >> 2) & 3;
+				*dest++ = m_cmap0.m_palette[popup_msb | src];
 			}
 			else
 			{
-				*dest++ = m_cmap0.m_palette[ci_msb | *src_ci];
+				switch ((table_entry >> 8) & 3)
+				{
+					case 0:
+						switch ((table_entry >> 10) & 3)
+						{
+							case 0: // 4bpp
+							{
+								const uint8_t shift = BIT(table_entry, 0) ? 4 : 0;
+								const uint8_t pix_in = *src_ci;
+								*dest++ = m_cmap0.m_palette[ci_msb | ((pix_in >> shift) & 0x0f)];
+								break;
+							}
+							case 1: // 8bpp
+								*dest++ = m_cmap0.m_palette[ci_msb | *src_ci];
+								break;
+							case 2: // 12bpp (not yet supported)
+							case 3: // 24bpp (not yet supported)
+								break;
+						}
+						break;
+					case 1:
+					case 2:
+					case 3:
+					{
+						const uint8_t pix_in = *src_ci;
+                    	const uint8_t r = (0x92 * BIT(pix_in, 2)) | (0x49 * BIT(pix_in, 1)) | (0x24 * BIT(pix_in, 0));
+                    	const uint8_t g = (0x92 * BIT(pix_in, 5)) | (0x49 * BIT(pix_in, 4)) | (0x24 * BIT(pix_in, 3));
+                    	const uint8_t b = (0xaa * BIT(pix_in, 7)) | (0x55 * BIT(pix_in, 6));
+						*dest++ = (r << 16) | (g << 8) | b;
+						break;
+					}
+				}
 			}
 
 			src_ci++;
@@ -1335,8 +1382,11 @@ bool newport_video_device::pixel_clip_pass(int16_t x, int16_t y)
 	return true;
 }
 
-void newport_video_device::store_pixel(uint8_t *dest_buf, const uint8_t src)
+void newport_video_device::store_pixel(uint8_t *dest_buf, uint8_t src)
 {
+	if (BIT(m_rex3.m_draw_mode1, 5))
+		src <<= 4;
+
 	const uint8_t dst = *dest_buf;
 	*dest_buf &= ~m_rex3.m_write_mask;
 
@@ -1383,7 +1433,7 @@ void newport_video_device::write_pixel(int16_t x, int16_t y, uint8_t color)
 			store_pixel(&m_olay[y * (1280 + 64) + x], color);
 			break;
 		case 5: // Popup planes
-			store_pixel(&m_pup[y * (1280 + 64) + x], color);
+			store_pixel(&m_pup[y * (1280 + 64) + x], (color << 2) | (color << 6));
 			break;
 		case 6: // CID planes
 			store_pixel(&m_cid[y * (1280 + 64) + x], color);
@@ -1511,9 +1561,9 @@ void newport_video_device::do_iline(uint8_t color, bool skip_last, bool shade)
 		do
 		{
 			if (shade)
-				write_pixel(x1, y1, (uint8_t)(m_rex3.m_color_red >> 11));
+				write_pixel(y1, x1, (uint8_t)(m_rex3.m_color_red >> 11));
 			else
-				write_pixel(x1, y1, color);
+				write_pixel(y1, x1, color);
 
 			if (e > 0)
 			{
@@ -1529,6 +1579,14 @@ void newport_video_device::do_iline(uint8_t color, bool skip_last, bool shade)
 			if (shade)
 				m_rex3.m_color_red += m_rex3.m_slope_red;
 		} while (x1 != x2);
+
+		if (!skip_last)
+		{
+			if (shade)
+				write_pixel(y1, x1, (uint8_t)(m_rex3.m_color_red >> 11));
+			else
+				write_pixel(y1, x1, color);
+		}
 	}
 	else
 	{
@@ -1553,15 +1611,15 @@ void newport_video_device::do_iline(uint8_t color, bool skip_last, bool shade)
 			if (shade)
 				m_rex3.m_color_red += m_rex3.m_slope_red;
 		} while (x1 != x2);
-	}
 
-    if (!skip_last)
-    {
-		if (shade)
-        	write_pixel(x1, y1, (uint8_t)(m_rex3.m_color_red >> 11));
-        else
-        	write_pixel(x1, y1, color);
-    }
+		if (!skip_last)
+		{
+			if (shade)
+				write_pixel(x1, y1, (uint8_t)(m_rex3.m_color_red >> 11));
+			else
+				write_pixel(x1, y1, color);
+		}
+	}
 
     write_x_start(x1 << 11);
     write_y_start(y1 << 11);
@@ -1697,11 +1755,21 @@ void newport_video_device::do_rex3_command()
 		end_x += dx;
 		end_y += dy;
 
+		//bool shade = BIT(mode0, 18);
+
 		uint32_t color = m_rex3.m_color_i & 0xff;
 		LOGMASKED(LOG_COMMANDS, "%04x, %04x to %04x, %04x = %08x\n", start_x, start_y, end_x, end_y, color);
 		for (; start_x != end_x; start_x += dx)
 		{
-			write_pixel(start_x, start_y, color);
+			//if (shade)
+			//{
+			//	write_pixel(start_x, start_y, (uint8_t)(m_rex3.m_color_red >> 11));
+			//	m_rex3.m_color_red += m_rex3.m_slope_red;
+			//}
+			//else
+			//{
+				write_pixel(start_x, start_y, color);
+			//}
 		}
 		start_y++;
 

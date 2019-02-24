@@ -391,6 +391,16 @@ WRITE16_MEMBER(dec0_state::dec0_control_w)
 	}
 }
 
+// Bandit tests P1 Y axis only
+// Hookup comes from Birdie Try service mode
+READ8_MEMBER(dec0_state::trackball_r)
+{
+	uint8_t port_num = offset >> 1;
+	if (offset & 1)
+		return m_in_trackball[port_num]->read() >> 8;
+
+	return m_in_trackball[port_num]->read() & 0xff;
+}
 
 WRITE16_MEMBER(dec0_automat_state::automat_control_w)
 {
@@ -454,6 +464,7 @@ void dec0_state::dec0_map(address_map &map)
 
 	map(0x300000, 0x300001).portr("AN0");
 	map(0x300008, 0x300009).portr("AN1");
+	map(0x300010, 0x30001f).r(FUNC(dec0_state::trackball_r)).umask16(0x00ff);
 	map(0x30c000, 0x30c00b).r(FUNC(dec0_state::dec0_controls_r));
 	map(0x30c010, 0x30c01f).w(FUNC(dec0_state::dec0_control_w));                                   /* Priority, sound, etc. */
 	map(0x30c012, 0x30c013).nopr(); // clr.w for sprite DMA
@@ -973,11 +984,40 @@ static INPUT_PORTS_START( rotary_ports )
 	PORT_BIT( 0xffff, 0x0000, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(10) PORT_KEYDELTA(1) PORT_REMAP_TABLE(rotary_table) PORT_PLAYER(2) PORT_REVERSE PORT_FULL_TURN_COUNT(12)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( trackball_ports )
+	PORT_START("track_0")
+	PORT_BIT( 0x0fff, 0, IPT_TRACKBALL_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(24) PORT_REVERSE PORT_PLAYER(1)
+
+	PORT_START("track_1")
+	PORT_BIT( 0x0fff, 0, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(24) PORT_PLAYER(1)
+
+	PORT_START("track_2")
+	PORT_BIT( 0x0fff, 0, IPT_TRACKBALL_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(24) PORT_REVERSE PORT_PLAYER(2)
+
+	PORT_START("track_3")
+	PORT_BIT( 0x0fff, 0, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(24) PORT_PLAYER(2)
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( rotary_null )
 	PORT_START("AN0")
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("AN1")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( trackball_null )
+	PORT_START("P1_TRACKX")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P1_TRACKY")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P2_TRACKX")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P2_TRACKY")
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
@@ -1036,6 +1076,7 @@ static INPUT_PORTS_START( hbarrel )
 	PORT_DIPUNUSED_DIPLOC( 0x8000, IP_ACTIVE_LOW, "SW1:8" ) // Always OFF
 
 	PORT_INCLUDE( rotary_ports )
+	PORT_INCLUDE( trackball_null )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( bandit )
@@ -1129,7 +1170,8 @@ static INPUT_PORTS_START( bandit )
     PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
     PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 
-    PORT_INCLUDE( rotary_ports )
+    PORT_INCLUDE( rotary_null )
+	PORT_INCLUDE( trackball_ports )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( birdtry )
@@ -1195,7 +1237,7 @@ static INPUT_PORTS_START( birdtry )
 	*/
 
 	PORT_INCLUDE( rotary_null )
-//  TODO: trackball inputs
+	PORT_INCLUDE( trackball_ports )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( baddudes )
@@ -1245,6 +1287,7 @@ static INPUT_PORTS_START( baddudes )
 	PORT_DIPUNUSED_DIPLOC( 0x8000, IP_ACTIVE_LOW, "SW2:8" ) // Always OFF
 
 	PORT_INCLUDE( rotary_null )
+	PORT_INCLUDE( trackball_null )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( drgninja )
@@ -1312,6 +1355,7 @@ static INPUT_PORTS_START( robocop )
 	PORT_DIPUNUSED_DIPLOC( 0x8000, IP_ACTIVE_LOW, "SW2:8" ) // Always OFF
 
 	PORT_INCLUDE( rotary_null )
+	PORT_INCLUDE( trackball_null )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( hippodrm )
@@ -1360,6 +1404,7 @@ static INPUT_PORTS_START( hippodrm )
 	PORT_DIPUNUSED_DIPLOC( 0x8000, IP_ACTIVE_LOW, "SW2:8" ) // Always OFF
 
 	PORT_INCLUDE( rotary_null )
+	PORT_INCLUDE( trackball_null )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ffantasy )
@@ -1429,6 +1474,7 @@ static INPUT_PORTS_START( slyspy )
 	PORT_DIPUNUSED_DIPLOC( 0x8000, IP_ACTIVE_LOW, "SW2:8" ) // Always OFF
 
 	PORT_INCLUDE( rotary_null )
+	PORT_INCLUDE( trackball_null )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( midres )
@@ -1475,6 +1521,7 @@ static INPUT_PORTS_START( midres )
 	PORT_DIPUNUSED_DIPLOC( 0x8000, IP_ACTIVE_LOW, "SW2:8" ) // Always OFF
 
 	PORT_INCLUDE( rotary_ports )
+	PORT_INCLUDE( trackball_null )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( midresu )
@@ -1531,6 +1578,7 @@ static INPUT_PORTS_START( midresb )
 	PORT_DIPUNUSED_DIPLOC( 0x8000, IP_ACTIVE_LOW, "SW2:8" ) // Always OFF
 
 	PORT_INCLUDE( rotary_ports )
+	PORT_INCLUDE( trackball_null )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( bouldash )
@@ -1607,6 +1655,7 @@ static INPUT_PORTS_START( bouldash )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 	PORT_INCLUDE( rotary_null )
+	PORT_INCLUDE( trackball_null )
 INPUT_PORTS_END
 
 /******************************************************************************/

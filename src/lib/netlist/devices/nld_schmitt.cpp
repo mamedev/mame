@@ -7,10 +7,10 @@
 
 #include "nld_schmitt.h"
 
-#include "../analog/nlid_twoterm.h"
-#include "../nl_base.h"
-#include "../nl_errstr.h"
-#include "../solver/nld_solver.h"
+#include "netlist/analog/nlid_twoterm.h"
+#include "netlist/nl_base.h"
+#include "netlist/nl_errstr.h"
+#include "netlist/solver/nld_solver.h"
 
 #include <cmath>
 

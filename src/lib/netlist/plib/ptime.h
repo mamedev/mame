@@ -1,15 +1,14 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
 /*
- * nltime.h
+ * ptime.h
  */
 
-#ifndef NLTIME_H_
-#define NLTIME_H_
+#ifndef PTIME_H_
+#define PTIME_H_
 
-#include "nl_config.h"
-#include "plib/pstate.h"
-#include "plib/ptypes.h"
+#include "pconfig.h"
+#include "ptypes.h"
 
 #include <cstdint>
 
@@ -17,7 +16,7 @@
 // netlist_time
 // ----------------------------------------------------------------------------------------
 
-namespace netlist
+namespace plib
 {
 
 	template <typename TYPE, TYPE RES>
@@ -130,29 +129,8 @@ namespace netlist
 		internal_type m_time;
 	};
 
-#if (PHAS_INT128)
-	using netlist_time = ptime<UINT128, NETLIST_INTERNAL_RES>;
-#else
-	using netlist_time = ptime<std::int64_t, NETLIST_INTERNAL_RES>;
-	static_assert(noexcept(netlist_time::from_nsec(1)) == true, "Not evaluated as constexpr");
-#endif
 
-	//============================================================
-	//  MACROS
-	//============================================================
-
-	template <typename T> inline constexpr netlist_time NLTIME_FROM_NS(T &&t) noexcept { return netlist_time::from_nsec(t); }
-	template <typename T> inline constexpr netlist_time NLTIME_FROM_US(T &&t) noexcept { return netlist_time::from_usec(t); }
-	template <typename T> inline constexpr netlist_time NLTIME_FROM_MS(T &&t) noexcept { return netlist_time::from_msec(t); }
-
-} // namespace netlist
-
-namespace plib {
-
-	template<> inline void state_manager_t::save_item(const void *owner, netlist::netlist_time &nlt, const pstring &stname)
-	{
-		save_state_ptr(owner, stname, datatype_t(sizeof(netlist::netlist_time::internal_type), true, false), 1, nlt.get_internaltype_ptr());
-	}
 } // namespace plib
 
-#endif /* NLTIME_H_ */
+
+#endif /* PTIME_H_ */

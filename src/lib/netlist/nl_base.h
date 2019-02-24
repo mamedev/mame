@@ -24,10 +24,10 @@
 #include "plib/pstate.h"
 #include "plib/pstream.h"
 
-#include "netlist_types.h"
+#include "nltypes.h"
 #include "nl_errstr.h"
 #include "nl_lists.h"
-#include "nl_time.h"
+#include "plib/ptime.h"
 
 //============================================================
 //  MACROS / New Syntax

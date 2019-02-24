@@ -6,9 +6,9 @@
  */
 
 #include  "nlid_truthtable.h"
-#include "../nl_setup.h"
-#include "../plib/palloc.h"
-#include "../plib/plists.h"
+#include "netlist/nl_setup.h"
+#include "plib/palloc.h"
+#include "plib/plists.h"
 
 #include <bitset>
 
@@ -399,7 +399,7 @@ void truthtable_parser::parse(const std::vector<pstring> &truthtable)
 			else
 				nl_assert_always(outs == "0", "Unknown value (not 0 or 1");
 			// FIXME: error handling
-			netlist_time t = netlist_time::from_nsec(plib::pstonum<netlist_time::internal_type>(plib::trim(times[j])));
+			netlist_time t = netlist_time::from_nsec(plib::pstonum<std::int64_t>(plib::trim(times[j])));
 			uint_least8_t k=0;
 			while (m_timing_nt[k] != netlist_time::zero() && m_timing_nt[k] != t)
 				k++;

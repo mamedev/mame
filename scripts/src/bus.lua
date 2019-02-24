@@ -209,6 +209,8 @@ if (BUSES["APRICOT_EXPANSION"]~=null) then
 		MAME_DIR .. "src/devices/bus/apricot/expansion/cards.h",
 		MAME_DIR .. "src/devices/bus/apricot/expansion/ram.cpp",
 		MAME_DIR .. "src/devices/bus/apricot/expansion/ram.h",
+		MAME_DIR .. "src/devices/bus/apricot/expansion/winchester.cpp",
+		MAME_DIR .. "src/devices/bus/apricot/expansion/winchester.h",
 	}
 end
 

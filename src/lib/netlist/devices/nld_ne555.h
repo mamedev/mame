@@ -4,7 +4,7 @@
 #ifndef NLD_NE555_H_
 #define NLD_NE555_H_
 
-#include "../nl_setup.h"
+#include "netlist/nl_setup.h"
 
 #define NE555(name)                                                             \
 		NET_REGISTER_DEV(NE555, name)

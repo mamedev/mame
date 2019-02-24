@@ -11,7 +11,7 @@
 
 #include <vector>
 
-#include "netlist_types.h"
+#include "nltypes.h"
 #include "plib/palloc.h"
 #include "plib/ptypes.h"
 

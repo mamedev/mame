@@ -8,8 +8,8 @@
 #ifndef NLID_CMOS_H_
 #define NLID_CMOS_H_
 
-#include "../nl_base.h"
-#include "../nl_setup.h"
+#include "netlist/nl_base.h"
+#include "netlist/nl_setup.h"
 
 namespace netlist
 {

@@ -11,10 +11,10 @@
 #ifndef NLID_SYSTEM_H_
 #define NLID_SYSTEM_H_
 
-#include "../analog/nlid_twoterm.h"
-#include "../nl_base.h"
-#include "../nl_setup.h"
-#include "../plib/putil.h"
+#include "netlist/analog/nlid_twoterm.h"
+#include "netlist/nl_base.h"
+#include "netlist/nl_setup.h"
+#include "plib/putil.h"
 
 namespace netlist
 {
@@ -127,7 +127,7 @@ namespace netlist
 				std::vector<pstring> pat(plib::psplit(m_pattern(),","));
 				m_off = netlist_time::from_double(m_offset());
 
-				std::array<netlist_time::mult_type, 32> pati = { 0 };
+				std::array<std::int64_t, 32> pati = { 0 };
 
 				m_size = static_cast<std::uint8_t>(pat.size());
 				netlist_time::mult_type total = 0;
@@ -135,7 +135,7 @@ namespace netlist
 				{
 					// FIXME: use pstonum_ne
 					//pati[i] = plib::pstonum<decltype(pati[i])>(pat[i]);
-					pati[i] = plib::pstonum<netlist_time::mult_type>(pat[i]);
+					pati[i] = plib::pstonum<std::int64_t>(pat[i]);
 					total += pati[i];
 				}
 				netlist_time ttotal = netlist_time::zero();

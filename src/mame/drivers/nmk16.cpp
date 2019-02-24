@@ -7724,7 +7724,7 @@ ROM_START( grdnstrmau )
 	ROM_LOAD( "uc12_27c040.10", 0x180000, 0x80000, CRC(a9ceec33) SHA1(d4f76f7a8203755fe756a9e17100f830db34eaab) )
 
 	ROM_REGION( 0x10000, "fgtile", 0 )    /* Layer 1, 8x8x4 */
-	ROM_LOAD( "uc2_27c512.9",  0x00000, 0x10000, BAD_DUMP CRC(07a53a1b) SHA1(7dae6e7486886b718e7ad47fc8089c6be2f2f625) ) // suspected bad dump, see corruption on the FG layer
+	ROM_LOAD( "uc2_27c512.9",  0x00000, 0x10000, CRC(b38d8446) SHA1(b2c8efb3db71b7428fcadc0d7098f8bc77dd6670) )
 
 	ROM_REGION( 0x40000, "oki1", 0 )    /* Samples */
 	ROM_LOAD( "uc18_27c020.9", 0x00000, 0x40000, CRC(e911ce33) SHA1(a29c4dea98a22235122303325c63c15fadd3431d) )
@@ -8471,7 +8471,7 @@ GAME( 1998, grdnstrmk,  grdnstrm, grdnstrmk,    grdnstrk,     nmk16_state, init_
 GAME( 1998, redfoxwp2,  grdnstrm, grdnstrmk,    grdnstrk,     nmk16_state, init_grdnstrm,        ROT270, "Afega",                             "Hong Hu Zhanji II (China, set 1)", 0 )
 GAME( 1998, redfoxwp2a, grdnstrm, grdnstrmk,    grdnstrk,     nmk16_state, init_redfoxwp2a,      ROT270, "Afega",                             "Hong Hu Zhanji II (China, set 2)", 0 )
 GAME( 1998, grdnstrmg,  grdnstrm, grdnstrmk,    grdnstrk,     nmk16_state, init_grdnstrmg,       ROT270, "Afega",                             "Guardian Storm (Germany)", 0 )
-GAME( 1998, grdnstrmau, grdnstrm, grdnstrm,     grdnstrm,     nmk16_state, init_grdnstrmau,      ORIENTATION_FLIP_Y, "Afega",                 "Guardian Storm (horizontal, Australia)", MACHINE_IMPERFECT_GRAPHICS ) // GFX issues. Bad dump of the FG tile ROM?
+GAME( 1998, grdnstrmau, grdnstrm, grdnstrm,     grdnstrm,     nmk16_state, init_grdnstrmau,      ORIENTATION_FLIP_Y, "Afega",                 "Guardian Storm (horizontal, Australia)", 0 )
 
 // is there a 'bubble 2000' / 'hot bubble' version with Afega copyright, or is the only Afega release dolmen above, this seems like a sequel, not a clone?
 GAME( 1998, bubl2000,   0,        popspops,     bubl2000,     nmk16_state, init_bubl2000,        ROT0,   "Afega (Tuning license)",            "Bubble 2000", 0 ) // on a tuning board - Has a Demo Sound DSW

@@ -49,7 +49,7 @@
 #ifndef NLD_74123_H_
 #define NLD_74123_H_
 
-#include "../nl_setup.h"
+#include "netlist/nl_setup.h"
 
 #define TTL_74123(name)                                                         \
 		NET_REGISTER_DEV(TTL_74123, name)

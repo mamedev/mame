@@ -11308,7 +11308,7 @@ ffantasyb                       // EX (c) 1989 Data East Corporation (World)
 ffantasybl                      // bootleg
 hbarrel                         // (c) 1987 Data East USA (US)
 hbarrelw                        // (c) 1987 Data East Corporation (World)
-bandit							// (c) 1989 Data East USA (US)
+bandit                          // (c) 1989 Data East USA (US)
 hippodrm                        // EW (c) 1989 Data East USA (US)
 midres                          // (c) 1989 Data East Corporation (World)
 midresb                         // bootleg
@@ -12917,10 +12917,18 @@ feasgla                         // EAS: Elite A/S Challenger (Glasgow program, E
 feasglafr                       // * French
 feasglag                        // * German
 feasglasp                       // * Spanish
+feag                            //
+feagfr                          //
+feagg                           //
+feagsp                          //
 feag2100                        // EAG: Elite Avant Garde 2100 (English)
 feag2100fr                      // * French
 feag2100g                       // * German
 feag2100sp                      // * Spanish
+fepriv                          //
+feprivfr                        //
+feprivg                         //
+feprivsp                        //
 fpres                           //
 fpressp                         //
 fpresg                          //
@@ -18286,6 +18294,7 @@ lemmings                        // prototype (c) 1991 Data East USA (US)
 lethalen                        // GX191 (c) 1992
 lethaleneaa                     // GX191 (c) 1992
 lethaleneab                     // GX191 (c) 1992
+lethalenead                     // GX191 (c) 1992
 lethaleneae                     // GX191 (c) 1992
 lethalenj                       // GX191 (c) 1992
 lethalenua                      // GX191 (c) 1992
@@ -30370,6 +30379,10 @@ neoprint                        //
 npcartv1                        //
 npmillen                        //
 nprsp                           //
+npskv                           //
+npsprg98                        //
+npsprgv4                        //
+npusagif                        //
 
 @source:neptunp2.cpp
 neptunp2                        //
@@ -39847,12 +39860,15 @@ wy30p                           // WY-30+
 wy50                            // WY-50
 wy75                            // WY-75
 
+@source:wy55.cpp
+wy55                            // WY-55
+
+@source:wy60.cpp
+wy60                            // WY-60
+wy60a                           // WY-60
+
 @source:wy85.cpp
 wy85                            // WY-85
-
-@source:wyse.cpp
-wy55                            // WY-55
-wy60                            // WY-60
 
 @source:wyvernf0.cpp
 wyvernf0                        // A39 (c) 1985 Taito Corporation (Japan)

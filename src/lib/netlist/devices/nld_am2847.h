@@ -21,7 +21,7 @@
 #ifndef NLD_AM2847_H_
 #define NLD_AM2847_H_
 
-#include "../nl_setup.h"
+#include "netlist/nl_setup.h"
 
 #define TTL_AM2847(name, cCP, cINA, cINB, cINC, cIND, cRCA, cRCB, cRCC, cRCD)   \
 		NET_REGISTER_DEV(TTL_AM2847, name)  \

@@ -31,11 +31,11 @@
 #pragma GCC optimize "ivopts"
 #endif
 
-#include "../nl_lists.h"
+#include "netlist/nl_lists.h"
 
-#include "../plib/pomp.h"
+#include "plib/pomp.h"
 
-#include "../nl_factory.h"
+#include "netlist/nl_factory.h"
 
 #include "nld_matrix_solver.h"
 #include "nld_solver.h"
@@ -261,6 +261,10 @@ void NETLIB_NAME(solver)::post_start()
 	m_params.m_min_timestep = m_dynamic_min_ts();
 	m_params.m_dynamic_ts = (m_dynamic_ts() == 1 ? true : false);
 	m_params.m_max_timestep = netlist_time::from_double(1.0 / m_freq()).as_double();
+
+	m_params.m_use_gabs = m_use_gabs();
+	m_params.m_use_linear_prediction = m_use_linear_prediction();
+
 
 	if (m_params.m_dynamic_ts)
 	{

@@ -18,9 +18,9 @@
 #include "plib/pstring.h"
 #include "plib/putil.h"
 
-#include "netlist_types.h"
 #include "nl_config.h"
 #include "nl_factory.h"
+#include "nltypes.h"
 
 //============================================================
 //  MACROS / inline netlist definitions

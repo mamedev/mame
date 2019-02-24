@@ -59,6 +59,7 @@ public:
 		m_floppy0(*this, "ic68:0"),
 		m_floppy1(*this, "ic68:1"),
 		m_palette(*this, "palette"),
+		m_exp(*this, "exp"),
 		m_screen_buffer(*this, "screen_buffer"),
 		m_video_mode(0),
 		m_display_on(1),
@@ -113,6 +114,7 @@ private:
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_device<palette_device> m_palette;
+	required_device<apricot_expansion_bus_device> m_exp;
 	required_shared_ptr<uint16_t> m_screen_buffer;
 
 	bool m_video_mode;
@@ -471,7 +473,9 @@ void apricot_state::apricot(machine_config &config)
 	SOFTWARE_LIST(config, "flop_list").set_original("apricot_flop");
 
 	// expansion bus
-	APRICOT_EXPANSION_BUS(config, "exp", m_cpu, m_iop);
+	APRICOT_EXPANSION_BUS(config, m_exp, m_cpu, m_iop);
+	m_exp->int2().set(m_pic, FUNC(pic8259_device::ir2_w));
+	m_exp->int3().set(m_pic, FUNC(pic8259_device::ir3_w));
 	APRICOT_EXPANSION_SLOT(config, "exp:1", apricot_expansion_cards, nullptr);
 	APRICOT_EXPANSION_SLOT(config, "exp:2", apricot_expansion_cards, nullptr);
 }

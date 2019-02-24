@@ -8,8 +8,8 @@
 #ifndef NLD_SOLVER_H_
 #define NLD_SOLVER_H_
 
-#include "../nl_base.h"
-#include "../plib/pstream.h"
+#include "netlist/nl_base.h"
+#include "plib/pstream.h"
 #include "nld_matrix_solver.h"
 
 #include <map>
@@ -57,6 +57,10 @@ NETLIB_OBJECT(solver)
 	, m_dynamic_lte(*this, "DYNAMIC_LTE", 1e-5)                     // diff/timestep
 	, m_dynamic_min_ts(*this, "DYNAMIC_MIN_TIMESTEP", 1e-6)   // nl_double timestep resolution
 
+	/* special */
+	, m_use_gabs(*this, "USE_GABS", true)
+	, m_use_linear_prediction(*this, "USE_LINEAR_PREDICTION", false) // // savings are eaten up by effort
+
 	, m_log_stats(*this, "LOG_STATS", true)   // log statistics on shutdown
 	, m_params()
 	{
@@ -93,6 +97,9 @@ private:
 	param_logic_t  m_dynamic_ts;
 	param_double_t m_dynamic_lte;
 	param_double_t m_dynamic_min_ts;
+
+	param_logic_t m_use_gabs;
+	param_logic_t m_use_linear_prediction;
 
 	param_logic_t  m_log_stats;
 

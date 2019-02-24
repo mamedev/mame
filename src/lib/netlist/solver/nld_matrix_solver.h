@@ -22,16 +22,18 @@ namespace devices
 
 	struct solver_parameters_t
 	{
-		int m_pivot;
+		bool m_pivot;
 		nl_double m_accuracy;
 		nl_double m_dynamic_lte;
 		nl_double m_min_timestep;
 		nl_double m_max_timestep;
 		nl_double m_gs_sor;
 		bool m_dynamic_ts;
-		unsigned m_gs_loops;
-		unsigned m_nr_loops;
+		std::size_t m_gs_loops;
+		std::size_t m_nr_loops;
 		netlist_time m_nr_recalc_delay;
+		bool m_use_gabs;
+		bool m_use_linear_prediction;
 		bool m_log_stats;
 	};
 
@@ -63,15 +65,9 @@ namespace devices
 
 			const std::size_t term_count = this->count();
 			const std::size_t railstart = this->m_railstart;
-			const FT * const * other_cur_analog = m_connected_net_V.data();
-			const FT * p_go = m_go.data();
-			const FT * p_gt = m_gt.data();
-			const FT * p_Idr = m_Idr.data();
 
 			for (std::size_t i = 0; i < railstart; i++)
-			{
-				*tcr[i]       -= p_go[i];
-			}
+				*tcr[i]       -= m_go[i];
 
 	#if 1
 			FT gtot_t = 0.0;
@@ -79,18 +75,18 @@ namespace devices
 
 			for (std::size_t i = 0; i < term_count; i++)
 			{
-				gtot_t        += p_gt[i];
-				RHS_t         += p_Idr[i];
+				gtot_t        += m_gt[i];
+				RHS_t         += m_Idr[i];
 			}
 			// FIXME: Code above is faster than vec_sum - Check this
 	#else
-			auto gtot_t = plib::vec_sum<FT>(term_count, p_gt);
-			auto RHS_t = plib::vec_sum<FT>(term_count, p_Idr);
+			auto gtot_t = plib::vec_sum<FT>(term_count, m_gt);
+			auto RHS_t = plib::vec_sum<FT>(term_count, m_Idr);
 	#endif
 
 			for (std::size_t i = railstart; i < term_count; i++)
 			{
-				RHS_t += (/*m_Idr[i]*/ + p_go[i] * *other_cur_analog[i]);
+				RHS_t += (/*m_Idr[i]*/ + m_go[i] * *m_connected_net_V[i]);
 			}
 
 			RHS = RHS_t;

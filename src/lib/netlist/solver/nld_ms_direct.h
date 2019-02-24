@@ -10,8 +10,8 @@
 
 #include <algorithm>
 #include <cmath>
-#include <netlist/plib/mat_cr.h>
-#include <netlist/plib/vector_ops.h>
+#include "plib/mat_cr.h"
+#include "plib/vector_ops.h"
 
 #include "nld_matrix_solver.h"
 #include "nld_solver.h"

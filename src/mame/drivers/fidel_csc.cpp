@@ -153,6 +153,7 @@ All three of the above are called "segment H".
 Super 9 Sensory Chess Challenger (SU9/DS9)
 This is basically the Fidelity Elite A/S program on CSC hardware.
 Model DS9(Deluxe) has a 5MHz XTAL, but is otherwise same.
+Septennial(SCC) is the same as well, but clocked even higher.
 ---------------------------------
 R6502AP CPU, 1.95MHz(3.9MHz resonator)
 2 RAM chips, assume 4KB
@@ -251,8 +252,9 @@ void su9_state::machine_reset()
 
 void su9_state::su9_set_cpu_freq()
 {
-	// SU9 CPU is clocked 1.95MHz, DS9 is 2.5MHz
-	m_maincpu->set_unscaled_clock((ioport("FAKE")->read() & 1) ? (5_MHz_XTAL/2) : (3.9_MHz_XTAL/2));
+	// SU9 CPU is clocked 1.95MHz, DS9 is 2.5MHz, SCC is 3MHz
+	u8 inp = ioport("FAKE")->read();
+	m_maincpu->set_unscaled_clock((inp & 2) ? (6_MHz_XTAL/2) : ((inp & 1) ? (5_MHz_XTAL/2) : (3.9_MHz_XTAL/2)));
 }
 
 
@@ -462,9 +464,10 @@ static INPUT_PORTS_START( su9 )
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("PB / King")
 
 	PORT_START("FAKE")
-	PORT_CONFNAME( 0x01, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, su9_state, su9_cpu_freq, nullptr) // factory set
+	PORT_CONFNAME( 0x03, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, su9_state, su9_cpu_freq, nullptr) // factory set
 	PORT_CONFSETTING(    0x00, "1.95MHz (SU9)" )
 	PORT_CONFSETTING(    0x01, "2.5MHz (DS9)" )
+	PORT_CONFSETTING(    0x02, "3MHz (SCC)" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( rsc )
