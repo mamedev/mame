@@ -12875,6 +12875,7 @@ kishon                          //
 
 @source:fidel_csc.cpp
 csc                             //
+cscetr
 reversic                        //
 super9cc                        //
 
