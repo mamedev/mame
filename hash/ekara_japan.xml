@@ -35,10 +35,11 @@
 	                                                P  (P-x on case, PCxxxx-xxx part numbers) (see ekara_japan_p.xml)  (for e-kara, Popira / 2, DDR Family Mat)
 	                                                D  (D-x on case, DCxxxx-xxx part numbers) (see ekara_japan_d.xml)  (for e-kara, Popira / 2, Taiko De Popira)
 	                                                SP (SP-x on case, no part numbers)        (see ekara_japan_sp.xml) (for e-kara, Popira / 2, Taiko de Popira, Jumping Popira)
-
+													A  (A-x on case, Pichi Pichi Pitch series)(see ekara_japan_a.xml)  (for e-kara / e-pitch)
+													JP (JP-x on case)                         (see ekara_japan_jp.xml) (for Jumping Popira Only)
+													
 	these exist but haven't got any
-	Some Japanese carts have a number starting with JP (for Jumping Popira Only?)
-	                                                A  (for Pichi Pichi Pitch Only?)
+	Some Japanese carts have a number starting with 	                                                
 	                                                KE (for Kids Lyric book device Only?)
 	                                                KD (for e-kara?)
 
