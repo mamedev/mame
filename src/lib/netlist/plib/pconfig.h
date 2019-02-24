@@ -41,6 +41,8 @@
 #define USE_ALIGNED_OPTIMIZATIONS (0)
 #endif
 
+#define USE_ALIGNED_ALLOCATION (USE_ALIGNED_OPTIMIZATIONS)
+#define USE_ALIGNED_HINTS	   (USE_ALIGNED_OPTIMIZATIONS)
 /*
  * Standard alignment macros
  */

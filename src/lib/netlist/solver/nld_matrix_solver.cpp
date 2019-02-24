@@ -39,20 +39,6 @@ namespace devices
 		m_connected_net_idx.push_back(net_other);
 	}
 
-	void terms_for_net_t::set_pointers()
-	{
-		m_gt.resize(count(), 0.0);
-		m_go.resize(count(), 0.0);
-		m_Idr.resize(count(), 0.0);
-		m_connected_net_V.resize(count(), nullptr);
-
-		for (std::size_t i = 0; i < count(); i++)
-		{
-			m_terms[i]->set_ptrs(&m_gt[i], &m_go[i], &m_Idr[i]);
-			m_connected_net_V[i] = m_terms[i]->otherterm()->net().Q_Analog_state_ptr();
-		}
-	}
-
 	// ----------------------------------------------------------------------------------------
 	// matrix_solver
 	// ----------------------------------------------------------------------------------------
@@ -254,14 +240,14 @@ namespace devices
 			m_terms[k]->m_railstart = m_terms[k]->count();
 			for (std::size_t i = 0; i < m_rails_temp[k]->count(); i++)
 				this->m_terms[k]->add(m_rails_temp[k]->terms()[i], m_rails_temp[k]->m_connected_net_idx.data()[i], false);
-
-			m_terms[k]->set_pointers();
 		}
 
 		// free all - no longer needed
 		m_rails_temp.clear();
 
 		sort_terms(m_sort);
+
+		this->set_pointers();
 
 		/* create a list of non zero elements. */
 		for (unsigned k = 0; k < iN; k++)
@@ -371,9 +357,9 @@ namespace devices
 			state().save(*this, m_terms[k]->m_h_n_m_1, this->name(), "m_h_n_m_1." + num);
 
 			// FIXME: This shouldn't be necessary, recalculate on each entry ...
-			state().save(*this, m_terms[k]->m_go.data(),"GO" + num, this->name(), m_terms[k]->count());
-			state().save(*this, m_terms[k]->m_gt.data(),"GT" + num, this->name(), m_terms[k]->count());
-			state().save(*this, m_terms[k]->m_Idr.data(),"IDR" + num, this->name(), m_terms[k]->count());
+			state().save(*this, m_gon[k],"GO" + num, this->name(), m_terms[k]->count());
+			state().save(*this, m_gtn[k],"GT" + num, this->name(), m_terms[k]->count());
+			state().save(*this, m_Idrn[k],"IDR" + num, this->name(), m_terms[k]->count());
 		}
 	}
 

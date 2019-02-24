@@ -9,6 +9,7 @@
 
 #include "pstring.h"
 #include "ptypes.h"
+#include "putil.h"
 
 #include <limits>
 

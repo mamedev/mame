@@ -10,9 +10,12 @@
 
 #include "netlist/nl_base.h"
 #include "netlist/nl_errstr.h"
-#include "netlist/plib/palloc.h"
-#include "netlist/plib/putil.h"
-#include "netlist/plib/vector_ops.h"
+#include "plib/palloc.h"
+#include "plib/putil.h"
+#include "plib/vector_ops.h"
+#include "plib/pmatrix2d.h"
+
+#include <cmath>
 
 namespace netlist
 {
@@ -51,8 +54,6 @@ namespace devices
 
 		terminal_t **terms() { return m_terms.data(); }
 
-		void set_pointers();
-
 		std::size_t m_railstart;
 
 		std::vector<unsigned> m_nz;   /* all non zero for multiplication */
@@ -65,10 +66,6 @@ namespace devices
 		nl_double m_h_n_m_1;
 
 		std::vector<int> m_connected_net_idx;
-		plib::aligned_vector<nl_double, PALIGN_VECTOROPT> m_go;
-		plib::aligned_vector<nl_double, PALIGN_VECTOROPT> m_gt;
-		plib::aligned_vector<nl_double, PALIGN_VECTOROPT> m_Idr;
-		plib::aligned_vector<nl_double *, PALIGN_VECTOROPT> m_connected_net_V;
 	private:
 		std::vector<terminal_t *> m_terms;
 
@@ -171,6 +168,31 @@ namespace devices
 		template <typename T>
 		void build_LE_RHS(T &child);
 
+		void set_pointers()
+		{
+			const std::size_t iN = this->m_nets.size();
+
+			std::size_t max_col = 0;
+			for (std::size_t k = 0; k < iN; k++)
+				max_col = std::max(max_col, m_terms[k]->count());
+
+			m_gtn.resize(iN, max_col);
+			m_gon.resize(iN, max_col);
+			m_Idrn.resize(iN, max_col);
+			m_connected_net_Vn.resize(iN, max_col);
+
+			for (std::size_t k = 0; k < iN; k++)
+			{
+				auto count = m_terms[k]->count();
+
+				for (std::size_t i = 0; i < count; i++)
+				{
+					m_terms[k]->terms()[i]->set_ptrs(&m_gtn[k][i], &m_gon[k][i], &m_Idrn[k][i]);
+					m_connected_net_Vn[k][i] = m_terms[k]->terms()[i]->otherterm()->net().Q_Analog_state_ptr();
+				}
+			}
+		}
+
 		template <typename AP, typename FT>
 		void fill_matrix(std::size_t N, AP &tcr, FT &RHS)
 		{
@@ -181,17 +203,21 @@ namespace devices
 
 				const std::size_t term_count = net->count();
 				const std::size_t railstart = net->m_railstart;
+				const auto &go = m_gon[k];
+				const auto &gt = m_gtn[k];
+				const auto &Idr = m_Idrn[k];
+				const auto &cnV = m_connected_net_Vn[k];
 
 				for (std::size_t i = 0; i < railstart; i++)
-					*tcr_r[i]       -= net->m_go[i];
+					*tcr_r[i]       -= go[i];
 
 				typename FT::value_type gtot_t = 0.0;
 				typename FT::value_type RHS_t = 0.0;
 
 				for (std::size_t i = 0; i < term_count; i++)
 				{
-					gtot_t        += net->m_gt[i];
-					RHS_t         += net->m_Idr[i];
+					gtot_t        += gt[i];
+					RHS_t         += Idr[i];
 				}
 				// FIXME: Code above is faster than vec_sum - Check this
 		#if 0
@@ -201,7 +227,7 @@ namespace devices
 
 				for (std::size_t i = railstart; i < term_count; i++)
 				{
-					RHS_t += (/*m_Idr[i]*/ + net->m_go[i] * *net->m_connected_net_V[i]);
+					RHS_t += (/*m_Idr[i]*/ + go[i] * *cnV[i]);
 				}
 
 				RHS[k] = RHS_t;
@@ -210,6 +236,16 @@ namespace devices
 			}
 
 		}
+
+		template <typename T>
+		using aligned_alloc = plib::aligned_allocator<T, PALIGN_VECTOROPT>;
+
+		plib::pmatrix2d<nl_double, aligned_alloc<nl_double>> 		m_gon;
+		plib::pmatrix2d<nl_double, aligned_alloc<nl_double>>  		m_gtn;
+		plib::pmatrix2d<nl_double, aligned_alloc<nl_double>>  		m_Idrn;
+		plib::pmatrix2d<nl_double *, aligned_alloc<nl_double *>>  	m_connected_net_Vn;
+
+		plib::pmatrix2d<nl_double>  		m_test;
 
 		std::vector<plib::unique_ptr<terms_for_net_t>> m_terms;
 		std::vector<analog_net_t *> m_nets;
@@ -283,7 +319,7 @@ namespace devices
 
 			const std::size_t terms_count = terms->count();
 			const std::size_t railstart =  terms->m_railstart;
-			const float_type * const gt = terms->m_gt.data();
+			const float_type * const gt = m_gtn[k];
 
 			{
 				float_type akk  = 0.0;
@@ -293,7 +329,7 @@ namespace devices
 				Ak[k] = akk;
 			}
 
-			const float_type * const go = terms->m_go.data();
+			const float_type * const go = m_gon[k];
 			int * net_other = terms->m_connected_net_idx.data();
 
 			for (std::size_t i = 0; i < railstart; i++)
@@ -314,9 +350,9 @@ namespace devices
 			float_type rhsk_b = 0.0;
 
 			const std::size_t terms_count = m_terms[k]->count();
-			const float_type * const go = m_terms[k]->m_go.data();
-			const float_type * const Idr = m_terms[k]->m_Idr.data();
-			const float_type * const * other_cur_analog = m_terms[k]->m_connected_net_V.data();
+			const float_type * const go = m_gon[k];
+			const float_type * const Idr = m_Idrn[k];
+			const float_type * const * other_cur_analog = m_connected_net_Vn[k];
 
 			for (std::size_t i = 0; i < terms_count; i++)
 				rhsk_a = rhsk_a + Idr[i];

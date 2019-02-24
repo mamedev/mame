@@ -139,12 +139,13 @@ namespace netlist
 					total += pati[i];
 				}
 				netlist_time ttotal = netlist_time::zero();
-				for (unsigned i=0; i<m_size - 1; i++)
+				auto sm1 = static_cast<uint8_t>(m_size - 1);
+				for (unsigned i=0; i < sm1; i++)
 				{
 					m_inc[i] = base * pati[i];
 					ttotal += m_inc[i];
 				}
-				m_inc[m_size - 1] = base * total - ttotal;
+				m_inc[sm1] = base * total - ttotal;
 			}
 		}
 		NETLIB_UPDATEI();

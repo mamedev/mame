@@ -232,7 +232,7 @@ maketree: $(sort $(OBJDIRS))
 .PHONY: clang clang-5 mingw doc native
 
 native: 
-	$(MAKE) CEXTRAFLAGS="-march=native -Wall -Wpedantic -Wsign-compare -Wextra "
+	$(MAKE) CEXTRAFLAGS="-march=native -msse4.2 -Wall -Wpedantic -Wsign-compare -Wextra "
 
 clang:
 	$(MAKE) CC=clang++-9 LD=clang++-9 CEXTRAFLAGS="-march=native -Weverything -Werror -Wno-unused-template -Wno-non-virtual-dtor -Wno-unreachable-code -Wno-padded -Wno-weak-vtables -Wno-missing-variable-declarations -Wconversion -Wno-c++98-compat -Wno-float-equal -Wno-global-constructors -Wno-c++98-compat-pedantic -Wno-format-nonliteral -Wweak-template-vtables -Wno-exit-time-destructors"

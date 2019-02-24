@@ -104,7 +104,7 @@ namespace plib {
 			return m_a[i];
 		}
 #else
-		reference operator[](size_type i) noexcept
+		C14CONSTEXPR reference operator[](size_type i) noexcept
 		{
 			return assume_aligned_ptr<FT, PALIGN_VECTOROPT>(&m_a[0])[i];
 		}
