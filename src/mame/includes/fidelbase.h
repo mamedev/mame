@@ -34,15 +34,13 @@ public:
 		m_div_config(*this, "div_config"),
 		m_speech(*this, "speech"),
 		m_speech_rom(*this, "speech"),
+		m_language(*this, "language"),
 		m_dac(*this, "dac"),
 		m_cart(*this, "cartslot")
 	{ }
 
 	// in case reset button is directly tied to maincpu reset pin
 	virtual DECLARE_INPUT_CHANGED_MEMBER(reset_button) { m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE); }
-
-	// speech rom language, normally 0=English, 1=German, 2=French, 3=Spanish
-	template<int Language> void init_language() { m_language = Language; }
 
 protected:
 	// devices/pointers
@@ -53,10 +51,9 @@ protected:
 	optional_ioport m_div_config;
 	optional_device<s14001a_device> m_speech;
 	optional_region_ptr<u8> m_speech_rom;
+	optional_region_ptr<u8> m_language;
 	optional_device<dac_bit_interface> m_dac;
 	optional_device<generic_slot_device> m_cart;
-
-	int m_language;
 
 	u8 m_speech_data;
 	u8 m_speech_bank; // speech rom higher address bits

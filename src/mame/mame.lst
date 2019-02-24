@@ -12874,15 +12874,9 @@ chesstera                       //
 kishon                          //
 
 @source:fidel_csc.cpp
-csc                             // CSC: Champion Sensory Chess Challenger (English)
-cscfr                           // * French
-cscg                            // * German
-cscsp                           // * Spanish
+csc                             //
 reversic                        //
-super9cc                        // SU9: Super 9 Sensory Chess Challenger (English)
-super9ccfr                      // * French
-super9ccg                       // * German
-super9ccsp                      // * Spanish
+super9cc                        //
 
 @source:fidel_dames.cpp
 damesc                          //
@@ -12909,34 +12903,13 @@ fex68km2                        //
 fex68km3                        //
 
 @source:fidel_elite.cpp
-feasbu                          // EAS: Elite A/S Challenger (Budapest program, English)
-feasbufr                        // * French
-feasbug                         // * German
-feasbusp                        // * Spanish
-feasgla                         // EAS: Elite A/S Challenger (Glasgow program, English)
-feasglafr                       // * French
-feasglag                        // * German
-feasglasp                       // * Spanish
+feasbu                          //
+feasgla                         //
 feag                            //
-feagfr                          //
-feagg                           //
-feagsp                          //
-feag2100                        // EAG: Elite Avant Garde 2100 (English)
-feag2100fr                      // * French
-feag2100g                       // * German
-feag2100sp                      // * Spanish
+feag2100                        //
 fepriv                          //
-feprivfr                        //
-feprivg                         //
-feprivsp                        //
 fpres                           //
-fpressp                         //
-fpresg                          //
-fpresfr                         //
 fpresbu                         //
-fpresbusp                       //
-fpresbug                        //
-fpresbufr                       //
 
 @source:fidel_excel.cpp
 fdes2000                        //
@@ -12971,20 +12944,11 @@ fscc9c                          //
 fscc9ps                         //
 
 @source:fidel_vcc.cpp
-uvc                             // UVC: Advanced Voice Chess Challenger (English)
-uvcfr                           // * French
-uvcg                            // * German
-uvcsp                           // * Spanish
-vcc                             // VCC: Voice Chess Challenger (English)
-vccfr                           // * German
-vccg                            // * Spanish
-vccsp                           // * French
+uvc                             //
+vcc                             //
 
 @source:fidel_vsc.cpp
-vsc                             // VSC: Voice Sensory Chess Challenger (English)
-vscfr                           // * French
-vscg                            // * German
-vscsp                           // * Spanish
+vsc                             //
 
 @source:finalizr.cpp
 finalizr                        // GX523 (c) 1985
