@@ -30,7 +30,9 @@
 
 	Some Japanese carts have a number starting with S  (S-x on case, SCxxxx-xxx part numbers) (see ekara_japan_s.xml)  (for e-kara - custom presentation)
 	                                                M  (M-x on case, MCxxxx-xxx part numbers) (see ekara_japan_m.xml)  (for e-kara - custom presentation)
-	                                                EN (EN-X on case, no part numbers)        (see ekara_japan_en.xml) (for e-kara - custom presentation) (check other compatibility)
+	                                                EN (EN-X on case, no part numbers)        (see ekara_japan_en.xml) (for e-kara - custom presentation)
+ 	                                                BH (BG-XX on case, BH-xxxx on PCB)        (see ekara_japan_bh.xml) (for e-kara - custom presentation)
+													GK (GK-X on case)                         (see ekara_japan_gk.xml) (for e-kara / e-pitch - custom presentation)
 	                                                G  (G-x on case, GCxxxx-xxx part numbers) (see ekara_japan_g.xml)  (for e-kara, Popira / 2)
 	                                                P  (P-x on case, PCxxxx-xxx part numbers) (see ekara_japan_p.xml)  (for e-kara, Popira / 2, DDR Family Mat)
 	                                                D  (D-x on case, DCxxxx-xxx part numbers) (see ekara_japan_d.xml)  (for e-kara, Popira / 2, Taiko De Popira)
@@ -42,6 +44,8 @@
 	Some Japanese carts have a number starting with 	                                                
 	                                                KE (for Kids Lyric book device Only?)
 	                                                KD (for e-kara?)
+													PR (seen a PR-02 AYY) (what is it?)
+													KR (seen a KR-1) (bundled with later units?)
 
 	(there are others, need to document them)
 
