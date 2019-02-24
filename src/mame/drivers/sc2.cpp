@@ -5,7 +5,7 @@
         Schachcomputer SC2
 
         Note:
-         The HW is very similar to Fidelity Chess Challenger series (see fidelz80.c)
+         The HW is very similar to Fidelity Chess Challenger series
 
         12/05/2009 Skeleton driver.
 
@@ -215,7 +215,7 @@ WRITE8_MEMBER( sc2_state::pio_port_b_w )
 void sc2_state::sc2(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(4'000'000));
+	Z80(config, m_maincpu, 9.8304_MHz_XTAL/4); // U880 Z80 clone
 	m_maincpu->set_addrmap(AS_PROGRAM, &sc2_state::sc2_mem);
 	m_maincpu->set_addrmap(AS_IO, &sc2_state::sc2_io);
 
@@ -223,7 +223,7 @@ void sc2_state::sc2(machine_config &config)
 	config.set_default_layout(layout_sc2);
 
 	/* devices */
-	z80pio_device& pio(Z80PIO(config, "z80pio", XTAL(4'000'000)));
+	z80pio_device& pio(Z80PIO(config, "z80pio", 9.8304_MHz_XTAL/4));
 	pio.in_pa_callback().set(FUNC(sc2_state::pio_port_a_r));
 	pio.out_pa_callback().set(FUNC(sc2_state::pio_port_a_w));
 	pio.in_pb_callback().set(FUNC(sc2_state::pio_port_b_r));

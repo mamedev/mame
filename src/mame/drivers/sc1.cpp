@@ -161,7 +161,7 @@ INPUT_PORTS_END
 void sc1_state::sc1(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(4'000'000));
+	Z80(config, m_maincpu, 9.8304_MHz_XTAL/4); // U880 Z80 clone
 	m_maincpu->set_addrmap(AS_PROGRAM, &sc1_state::sc1_mem);
 	m_maincpu->set_addrmap(AS_IO, &sc1_state::sc1_io);
 
