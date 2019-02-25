@@ -837,7 +837,7 @@ void plus4_state::machine_reset()
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( plus4 )
+//  machine_config( plus4 )
 //-------------------------------------------------
 
 void plus4_state::plus4(machine_config &config)
@@ -939,7 +939,7 @@ void plus4_state::plus4(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( plus4p )
+//  machine_config( plus4p )
 //-------------------------------------------------
 
 void c16_state::plus4p(machine_config &config)
@@ -958,7 +958,7 @@ void c16_state::plus4p(machine_config &config)
 }
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( plus4n )
+//  machine_config( plus4n )
 //-------------------------------------------------
 
 void c16_state::plus4n(machine_config &config)
@@ -978,7 +978,7 @@ void c16_state::plus4n(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( c16n )
+//  machine_config( c16n )
 //-------------------------------------------------
 
 void c16_state::c16n(machine_config &config)
@@ -999,7 +999,7 @@ void c16_state::c16n(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( c16p )
+//  machine_config( c16p )
 //-------------------------------------------------
 
 void c16_state::c16p(machine_config &config)
@@ -1027,7 +1027,7 @@ void c16_state::c232(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( v364 )
+//  machine_config( v364 )
 //-------------------------------------------------
 
 void c16_state::v364(machine_config &config)

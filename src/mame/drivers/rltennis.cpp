@@ -181,20 +181,20 @@ void rltennis_state::ramdac_map(address_map &map)
 	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb888_w));
 }
 
-MACHINE_CONFIG_START(rltennis_state::rltennis)
+void rltennis_state::rltennis(machine_config &config)
+{
+	M68000(config, m_maincpu, RLT_XTAL/2); /* 68000P8  ??? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &rltennis_state::rltennis_main);
+	m_maincpu->set_vblank_int("screen", FUNC(rltennis_state::interrupt));
 
-	MCFG_DEVICE_ADD("maincpu", M68000, RLT_XTAL/2) /* 68000P8  ??? */
-	MCFG_DEVICE_PROGRAM_MAP(rltennis_main)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rltennis_state, interrupt)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(RLT_REFRESH_RATE);
+	screen.set_size(320, 240);
+	screen.set_visarea(0, 319, 0, 239);
+	screen.set_screen_update(FUNC(rltennis_state::screen_update));
+	screen.set_palette("palette");
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE( RLT_REFRESH_RATE )
-	MCFG_SCREEN_SIZE(320, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0,319, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(rltennis_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_PALETTE_ADD("palette", 256)
+	PALETTE(config, "palette").set_entries(256);
 
 	EEPROM_2864(config, "eeprom");
 
@@ -209,7 +209,7 @@ MACHINE_CONFIG_START(rltennis_state::rltennis)
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
 	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT);
-MACHINE_CONFIG_END
+}
 
 ROM_START( rltennis )
 	ROM_REGION( 0x100000, "maincpu", 0 )

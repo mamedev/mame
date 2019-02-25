@@ -242,8 +242,8 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-MACHINE_CONFIG_START(rzone_state::rzbatfor)
-
+void rzone_state::rzbatfor(machine_config &config)
+{
 	/* basic machine hardware */
 	SM512(config, m_maincpu); // no external XTAL
 	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
@@ -252,10 +252,10 @@ MACHINE_CONFIG_START(rzone_state::rzbatfor)
 	m_maincpu->write_r().set(FUNC(rzone_state::t2_write_r));
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1368, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1368-1, 0, 1080-1)
+	screen_device &screen(SCREEN(config, "screen", "svg"));
+	screen.set_refresh_hz(50);
+	screen.set_size(1368, 1080);
+	screen.set_visarea(0, 1368-1, 0, 1080-1);
 
 	TIMER(config, m_led_off).configure_generic(FUNC(rzone_state::led_off_callback));
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
@@ -263,12 +263,11 @@ MACHINE_CONFIG_START(rzone_state::rzbatfor)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
-MACHINE_CONFIG_START(rzone_state::rztoshden)
-
+void rzone_state::rztoshden(machine_config &config)
+{
 	/* basic machine hardware */
 	SM510(config, m_maincpu);
 	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
@@ -278,10 +277,10 @@ MACHINE_CONFIG_START(rzone_state::rztoshden)
 	m_maincpu->write_r().set(FUNC(rzone_state::t1_write_r));
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1392, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1392-1, 0, 1080-1)
+	screen_device &screen(SCREEN(config, "screen", "svg"));
+	screen.set_refresh_hz(50);
+	screen.set_size(1392, 1080);
+	screen.set_visarea(0, 1392-1, 0, 1080-1);
 
 	TIMER(config, m_led_off).configure_generic(FUNC(rzone_state::led_off_callback));
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
@@ -289,12 +288,11 @@ MACHINE_CONFIG_START(rzone_state::rztoshden)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
-MACHINE_CONFIG_START(rzone_state::rzindy500)
-
+void rzone_state::rzindy500(machine_config &config)
+{
 	/* basic machine hardware */
 	SM510(config, m_maincpu); // no external XTAL
 	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT); // confirmed
@@ -304,10 +302,10 @@ MACHINE_CONFIG_START(rzone_state::rzindy500)
 	m_maincpu->write_r().set(FUNC(rzone_state::t1_write_r));
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1425, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1425-1, 0, 1080-1)
+	screen_device &screen(SCREEN(config, "screen", "svg"));
+	screen.set_refresh_hz(50);
+	screen.set_size(1425, 1080);
+	screen.set_visarea(0, 1425-1, 0, 1080-1);
 
 	TIMER(config, m_led_off).configure_generic(FUNC(rzone_state::led_off_callback));
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
@@ -315,9 +313,8 @@ MACHINE_CONFIG_START(rzone_state::rzindy500)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 

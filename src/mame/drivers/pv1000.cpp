@@ -177,12 +177,12 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	void pv1000(address_map &map);
+	void pv1000_mem(address_map &map);
 	void pv1000_io(address_map &map);
 };
 
 
-void pv1000_state::pv1000(address_map &map)
+void pv1000_state::pv1000_mem(address_map &map)
 {
 	//AM_RANGE(0x0000, 0x7fff)      // mapped by the cartslot
 	map(0xb800, 0xbbff).ram().share("videoram");
@@ -441,11 +441,9 @@ GFXDECODE_END
 
 
 MACHINE_CONFIG_START(pv1000_state::pv1000)
-
-	MCFG_DEVICE_ADD( "maincpu", Z80, 17897725/5 )
-	MCFG_DEVICE_PROGRAM_MAP( pv1000 )
-	MCFG_DEVICE_IO_MAP( pv1000_io )
-
+	Z80(config, m_maincpu, 17897725/5);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pv1000_state::pv1000_mem);
+	m_maincpu->set_addrmap(AS_IO, &pv1000_state::pv1000_io);
 
 	/* D65010G031 - Video & sound chip */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

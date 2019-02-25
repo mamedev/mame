@@ -256,7 +256,8 @@ static GFXDECODE_START( gfx_pcm )
 	GFXDECODE_ENTRY( "chargen", 0x0000, pcm_charlayout, 0, 1 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(pcm_state::pcm)
+void pcm_state::pcm(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(10'000'000) /4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pcm_state::pcm_mem);
@@ -264,13 +265,13 @@ MACHINE_CONFIG_START(pcm_state::pcm)
 	m_maincpu->set_daisy_config(pcm_daisy_chain);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(pcm_state, screen_update)
-	MCFG_SCREEN_SIZE(64*8, 16*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 16*8-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(pcm_state::screen_update));
+	screen.set_size(64*8, 16*8);
+	screen.set_visarea(0, 64*8-1, 0, 16*8-1);
+	screen.set_palette("palette");
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_pcm);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
@@ -304,7 +305,7 @@ MACHINE_CONFIG_START(pcm_state::pcm)
 	m_ctc_s->zc_callback<0>().append("sio", FUNC(z80sio_device::txca_w));
 	m_ctc_s->zc_callback<1>().set("sio", FUNC(z80sio_device::rxtxcb_w));
 	m_ctc_s->zc_callback<2>().set(FUNC(pcm_state::pcm_82_w));  // speaker
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( pcm )

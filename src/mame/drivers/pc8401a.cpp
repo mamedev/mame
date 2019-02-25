@@ -570,11 +570,12 @@ WRITE8_MEMBER( pc8401a_state::ppi_pc_w )
 
 /* Machine Drivers */
 
-MACHINE_CONFIG_START(pc8401a_state::pc8401a)
+void pc8401a_state::pc8401a(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, 4000000) // NEC uPD70008C
-	MCFG_DEVICE_PROGRAM_MAP(pc8401a_mem)
-	MCFG_DEVICE_IO_MAP(pc8401a_io)
+	Z80(config, m_maincpu, 4000000); // NEC uPD70008C
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc8401a_state::pc8401a_mem);
+	m_maincpu->set_addrmap(AS_IO, &pc8401a_state::pc8401a_io);
 
 	/* fake keyboard */
 	TIMER(config, "keyboard").configure_periodic(FUNC(pc8401a_state::pc8401a_keyboard_tick), attotime::from_hz(64));
@@ -606,13 +607,14 @@ MACHINE_CONFIG_START(pc8401a_state::pc8401a)
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K").set_extra_options("96K");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(pc8500_state::pc8500)
+void pc8500_state::pc8500(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, 4000000) // NEC uPD70008C
-	MCFG_DEVICE_PROGRAM_MAP(pc8401a_mem)
-	MCFG_DEVICE_IO_MAP(pc8500_io)
+	Z80(config, m_maincpu, 4000000); // NEC uPD70008C
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc8500_state::pc8401a_mem);
+	m_maincpu->set_addrmap(AS_IO, &pc8500_state::pc8500_io);
 
 	/* fake keyboard */
 	TIMER(config, "keyboard").configure_periodic(FUNC(pc8401a_state::pc8401a_keyboard_tick), attotime::from_hz(64));
@@ -644,7 +646,7 @@ MACHINE_CONFIG_START(pc8500_state::pc8500)
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K").set_extra_options("96K");
-MACHINE_CONFIG_END
+}
 
 /* ROMs */
 

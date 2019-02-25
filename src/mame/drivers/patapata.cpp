@@ -285,37 +285,36 @@ TIMER_DEVICE_CALLBACK_MEMBER(patapata_state::scanline)
 	if (param==128) m_maincpu->set_input_line(1, HOLD_LINE);
 }
 
-MACHINE_CONFIG_START(patapata_state::patapata)
+void patapata_state::patapata(machine_config &config)
+{
+	M68000(config, m_maincpu, 16_MHz_XTAL); // 16 MHz XTAL, 16 MHz CPU
+	m_maincpu->set_addrmap(AS_PROGRAM, &patapata_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(patapata_state::irq4_line_hold)); // 1 + 4 valid? (4 main VBL)
 
-	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL) // 16 MHz XTAL, 16 MHz CPU
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", patapata_state,  irq4_line_hold) // 1 + 4 valid? (4 main VBL)
 	TIMER(config, "scantimer").configure_scanline(FUNC(patapata_state::scanline), "screen", 0, 1);
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_patapata);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 60*8-1, 0*8, 44*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(patapata_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 64*8);
+	screen.set_visarea(0*8, 60*8-1, 0*8, 44*8-1);
+	screen.set_screen_update(FUNC(patapata_state::screen_update));
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette").set_format(palette_device::RRRRGGGGBBBBRGBx, 0x600/2);
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, 16_MHz_XTAL / 4, okim6295_device::PIN7_LOW) // not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	OKIM6295(config, "oki1", 16_MHz_XTAL / 4, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.40); // not verified
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, 16_MHz_XTAL / 4, okim6295_device::PIN7_LOW) // not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	OKIM6295(config, "oki2", 16_MHz_XTAL / 4, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.40); // not verified
 
 	nmk112_device &nmk112(NMK112(config, "nmk112", 0)); // or 212? difficult to read (maybe 212 is 2* 112?)
 	nmk112.set_rom0_tag("oki1");
 	nmk112.set_rom1_tag("oki2");
-MACHINE_CONFIG_END
+}
 
 ROM_START( patapata )
 	ROM_REGION( 0x80000, "maincpu", 0 )  /* 68000 code */

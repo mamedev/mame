@@ -338,24 +338,24 @@ void pktgaldx_state::machine_start()
 {
 }
 
-MACHINE_CONFIG_START(pktgaldx_state::pktgaldx)
-
+void pktgaldx_state::pktgaldx(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 28_MHz_XTAL / 2) // The clock input is 14.000MHz on pin 6
-	MCFG_DEVICE_PROGRAM_MAP(pktgaldx_map)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
+	M68000(config, m_maincpu, 28_MHz_XTAL / 2); // The clock input is 14.000MHz on pin 6
+	m_maincpu->set_addrmap(AS_PROGRAM, &pktgaldx_state::pktgaldx_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &pktgaldx_state::decrypted_opcodes_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(pktgaldx_state, screen_update_pktgaldx)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pktgaldx_state, vblank_w))
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(58);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(40*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(pktgaldx_state::screen_update_pktgaldx));
+	screen.screen_vblank().set(FUNC(pktgaldx_state::vblank_w));
+	screen.set_palette(m_palette);
 
-	PALETTE(config, "palette").set_format(palette_device::xBGR_888, 4096);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 4096);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pktgaldx);
 
@@ -389,31 +389,31 @@ MACHINE_CONFIG_START(pktgaldx_state::pktgaldx)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, 32.22_MHz_XTAL / 32, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
+	okim6295_device &oki1(OKIM6295(config, "oki1", 32.22_MHz_XTAL / 32, okim6295_device::PIN7_HIGH));
+	oki1.add_route(ALL_OUTPUTS, "lspeaker", 0.75);
+	oki1.add_route(ALL_OUTPUTS, "rspeaker", 0.75);
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, 32.22_MHz_XTAL / 16, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki2, 32.22_MHz_XTAL / 16, okim6295_device::PIN7_HIGH);
+	m_oki2->add_route(ALL_OUTPUTS, "lspeaker", 0.60);
+	m_oki2->add_route(ALL_OUTPUTS, "rspeaker", 0.60);
+}
 
 
-MACHINE_CONFIG_START(pktgaldx_state::pktgaldb)
-
+void pktgaldx_state::pktgaldb(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)
-	MCFG_DEVICE_PROGRAM_MAP(pktgaldb_map)
+	M68000(config, m_maincpu, 16000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pktgaldx_state::pktgaldb_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(pktgaldx_state, screen_update_pktgaldb)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pktgaldx_state, vblank_w))
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(58);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(40*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(pktgaldx_state::screen_update_pktgaldb));
+	screen.screen_vblank().set(FUNC(pktgaldx_state::vblank_w));
+	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 4096);
 
@@ -423,14 +423,14 @@ MACHINE_CONFIG_START(pktgaldx_state::pktgaldb)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, 32220000/32, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
+	okim6295_device &oki1(OKIM6295(config, "oki1", 32220000/32, okim6295_device::PIN7_HIGH));
+	oki1.add_route(ALL_OUTPUTS, "lspeaker", 0.75);
+	oki1.add_route(ALL_OUTPUTS, "rspeaker", 0.75);
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, 32220000/16, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki2, 32220000/16, okim6295_device::PIN7_HIGH);
+	m_oki2->add_route(ALL_OUTPUTS, "lspeaker", 0.60);
+	m_oki2->add_route(ALL_OUTPUTS, "rspeaker", 0.60);
+}
 
 
 ROM_START( pktgaldx )

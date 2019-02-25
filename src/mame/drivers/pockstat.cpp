@@ -981,16 +981,16 @@ DEVICE_IMAGE_LOAD_MEMBER( pockstat_state, pockstat_flash )
 
 MACHINE_CONFIG_START(pockstat_state::pockstat)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", ARM7, DEFAULT_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(pockstat_mem)
+	ARM7(config, m_maincpu, DEFAULT_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pockstat_state::pockstat_mem);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(32, 32)
-	MCFG_SCREEN_VISIBLE_AREA(0, 32-1, 0, 32-1)
-	MCFG_SCREEN_UPDATE_DRIVER(pockstat_state, screen_update_pockstat)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(32, 32);
+	screen.set_visarea(0, 32-1, 0, 32-1);
+	screen.set_screen_update(FUNC(pockstat_state::screen_update_pockstat));
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 

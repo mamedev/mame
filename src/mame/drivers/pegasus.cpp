@@ -490,19 +490,19 @@ void pegasus_state::init_pegasus()
 
 MACHINE_CONFIG_START(pegasus_state::pegasus)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809, XTAL(4'000'000))  // actually a 6809C - 4MHZ clock coming in, 1MHZ internally
-	MCFG_DEVICE_PROGRAM_MAP(pegasus_mem)
+	MC6809(config, m_maincpu, XTAL(4'000'000));  // actually a 6809C - 4MHZ clock coming in, 1MHZ internally
+	m_maincpu->set_addrmap(AS_PROGRAM, &pegasus_state::pegasus_mem);
 
 	TIMER(config, "pegasus_firq").configure_periodic(FUNC(pegasus_state::pegasus_firq), attotime::from_hz(400));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(pegasus_state, screen_update)
-	MCFG_SCREEN_SIZE(32*8, 16*16)
-	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 16*16-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(pegasus_state::screen_update));
+	screen.set_size(32*8, 16*16);
+	screen.set_visarea(0, 32*8-1, 0, 16*16-1);
+	screen.set_palette("palette");
 	GFXDECODE(config, "gfxdecode", "palette", gfx_pegasus);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
@@ -548,11 +548,11 @@ MACHINE_CONFIG_START(pegasus_state::pegasus)
 	SOFTWARE_LIST(config, "cart_list").set_original("pegasus_cart");
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(pegasus_state::pegasusm)
+void pegasus_state::pegasusm(machine_config &config)
+{
 	pegasus(config);
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP(pegasusm_mem)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &pegasus_state::pegasusm_mem);
+}
 
 
 /* ROM definition */
