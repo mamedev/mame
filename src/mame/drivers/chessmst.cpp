@@ -30,16 +30,16 @@
 class chessmst_state : public driver_device
 {
 public:
-	chessmst_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_pia2(*this, "z80pio2")
-		, m_speaker(*this, "speaker")
-		, m_beeper(*this, "beeper")
-		, m_extra(*this, "EXTRA")
-		, m_buttons(*this, "BUTTONS")
-		, m_digits(*this, "digit%u", 0U)
-		, m_leds(*this, "led_%c%u", unsigned('a'), 1U)
+	chessmst_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_pio(*this, "z80pio%u", 0),
+		m_speaker(*this, "speaker"),
+		m_beeper(*this, "beeper"),
+		m_extra(*this, "EXTRA"),
+		m_buttons(*this, "BUTTONS"),
+		m_digits(*this, "digit%u", 0U),
+		m_leds(*this, "led_%c%u", unsigned('a'), 1U)
 	{ }
 
 	DECLARE_INPUT_CHANGED_MEMBER(chessmst_sensor);
@@ -71,7 +71,7 @@ private:
 	void update_display();
 
 	required_device<z80_device> m_maincpu;
-	required_device<z80pio_device> m_pia2;
+	required_device_array<z80pio_device, 2> m_pio;
 	optional_device<speaker_sound_device> m_speaker;
 	optional_device<beep_device> m_beeper;
 	required_ioport m_extra;
@@ -109,8 +109,8 @@ void chessmst_state::chessmst_io(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	//AM_RANGE(0x00, 0x03) AM_MIRROR(0xf0) read/write in both, not used by the software
-	map(0x04, 0x07).mirror(0xf0).rw("z80pio1", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
-	map(0x08, 0x0b).mirror(0xf0).rw(m_pia2, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+	map(0x04, 0x07).mirror(0xf0).rw(m_pio[0], FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+	map(0x08, 0x0b).mirror(0xf0).rw(m_pio[1], FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 }
 
 void chessmst_state::chessmstdm_io(address_map &map)
@@ -121,8 +121,8 @@ void chessmst_state::chessmstdm_io(address_map &map)
 
 WRITE_LINE_MEMBER( chessmst_state::timer_555_w )
 {
-	m_pia2->strobe_b(state);
-	m_pia2->data_b_write(m_matrix);
+	m_pio[1]->strobe_b(state);
+	m_pio[1]->data_b_write(m_matrix);
 }
 
 INPUT_CHANGED_MEMBER(chessmst_state::reset_button)
@@ -237,7 +237,7 @@ static INPUT_PORTS_START( chessmst )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("New Game [0]")    PORT_CODE(KEYCODE_0)    PORT_CODE(KEYCODE_ENTER)
 
 	PORT_START("EXTRA")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Halt") PORT_CODE(KEYCODE_F2) PORT_WRITE_LINE_DEVICE_MEMBER("z80pio1", z80pio_device, strobe_a) // -> PIO(1) ASTB pin
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Halt") PORT_CODE(KEYCODE_F2) PORT_WRITE_LINE_DEVICE_MEMBER("z80pio0", z80pio_device, strobe_a) // -> PIO(0) ASTB pin
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, reset_button, 0) // -> Z80 RESET pin
 INPUT_PORTS_END
 
@@ -368,32 +368,32 @@ WRITE8_MEMBER( chessmst_state::pio2_port_b_w )
 
 static const z80_daisy_config chessmst_daisy_chain[] =
 {
-	{ "z80pio1" },
+	{ "z80pio0" },
 	{ nullptr }
 };
 
 static const z80_daisy_config chessmstdm_daisy_chain[] =
 {
-	{ "z80pio2" },
+	{ "z80pio1" },
 	{ nullptr }
 };
 
 void chessmst_state::chessmst(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 9.8304_MHz_XTAL/4); // U880 Z80 clone
+	Z80(config, m_maincpu, 9.8304_MHz_XTAL/4); // UB880 Z80 clone
 	m_maincpu->set_addrmap(AS_PROGRAM, &chessmst_state::chessmst_mem);
 	m_maincpu->set_addrmap(AS_IO, &chessmst_state::chessmst_io);
 	m_maincpu->set_daisy_config(chessmst_daisy_chain);
 
-	z80pio_device& pio1(Z80PIO(config, "z80pio1", 9.8304_MHz_XTAL/4));
-	pio1.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	pio1.out_pa_callback().set(FUNC(chessmst_state::pio1_port_a_w));
-	pio1.out_pb_callback().set(FUNC(chessmst_state::pio1_port_b_w));
+	Z80PIO(config, m_pio[0], 9.8304_MHz_XTAL/4);
+	m_pio[0]->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pio[0]->out_pa_callback().set(FUNC(chessmst_state::pio1_port_a_w));
+	m_pio[0]->out_pb_callback().set(FUNC(chessmst_state::pio1_port_b_w));
 
-	Z80PIO(config, m_pia2, 9.8304_MHz_XTAL/4);
-	m_pia2->in_pa_callback().set(FUNC(chessmst_state::pio2_port_a_r));
-	m_pia2->out_pb_callback().set(FUNC(chessmst_state::pio2_port_b_w));
+	Z80PIO(config, m_pio[1], 9.8304_MHz_XTAL/4);
+	m_pio[1]->in_pa_callback().set(FUNC(chessmst_state::pio2_port_a_r));
+	m_pio[1]->out_pb_callback().set(FUNC(chessmst_state::pio2_port_b_w));
 
 	config.set_default_layout(layout_chessmst);
 
@@ -405,19 +405,19 @@ void chessmst_state::chessmst(machine_config &config)
 void chessmst_state::chessmsta(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 8_MHz_XTAL/4); // U880 Z80 clone
+	Z80(config, m_maincpu, 8_MHz_XTAL/2); // UA880 Z80 clone
 	m_maincpu->set_addrmap(AS_PROGRAM, &chessmst_state::chessmst_mem);
 	m_maincpu->set_addrmap(AS_IO, &chessmst_state::chessmst_io);
 	m_maincpu->set_daisy_config(chessmst_daisy_chain);
 
-	z80pio_device& pio1(Z80PIO(config, "z80pio1", 8_MHz_XTAL/4));
-	pio1.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	pio1.out_pa_callback().set(FUNC(chessmst_state::pio1_port_a_w));
-	pio1.out_pb_callback().set(FUNC(chessmst_state::pio1_port_b_w));
+	Z80PIO(config, m_pio[0], 8_MHz_XTAL/2);
+	m_pio[0]->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pio[0]->out_pa_callback().set(FUNC(chessmst_state::pio1_port_a_w));
+	m_pio[0]->out_pb_callback().set(FUNC(chessmst_state::pio1_port_b_w));
 
-	Z80PIO(config, m_pia2, 8_MHz_XTAL/4);
-	m_pia2->in_pa_callback().set(FUNC(chessmst_state::pio2_port_a_r));
-	m_pia2->out_pb_callback().set(FUNC(chessmst_state::pio2_port_b_w));
+	Z80PIO(config, m_pio[1], 8_MHz_XTAL/2);
+	m_pio[1]->in_pa_callback().set(FUNC(chessmst_state::pio2_port_a_r));
+	m_pio[1]->out_pb_callback().set(FUNC(chessmst_state::pio2_port_b_w));
 
 	config.set_default_layout(layout_chessmst);
 
@@ -429,20 +429,20 @@ void chessmst_state::chessmsta(machine_config &config)
 void chessmst_state::chessmstdm(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 8_MHz_XTAL/2); // U880 Z80 clone
+	Z80(config, m_maincpu, 8_MHz_XTAL/2); // UA880 Z80 clone
 	m_maincpu->set_addrmap(AS_PROGRAM, &chessmst_state::chessmstdm_mem);
 	m_maincpu->set_addrmap(AS_IO, &chessmst_state::chessmstdm_io);
 	m_maincpu->set_daisy_config(chessmstdm_daisy_chain);
 
-	z80pio_device& pio1(Z80PIO(config, "z80pio1", 8_MHz_XTAL/4));
-	pio1.out_pa_callback().set(FUNC(chessmst_state::pio1_port_a_w));
-	pio1.out_pb_callback().set(FUNC(chessmst_state::pio1_port_b_dm_w));
-	pio1.in_pb_callback().set_ioport("EXTRA");
+	Z80PIO(config, m_pio[0], 8_MHz_XTAL/2);
+	m_pio[0]->out_pa_callback().set(FUNC(chessmst_state::pio1_port_a_w));
+	m_pio[0]->out_pb_callback().set(FUNC(chessmst_state::pio1_port_b_dm_w));
+	m_pio[0]->in_pb_callback().set_ioport("EXTRA");
 
-	Z80PIO(config, m_pia2, 8_MHz_XTAL/4);
-	m_pia2->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	m_pia2->in_pa_callback().set(FUNC(chessmst_state::pio2_port_a_r));
-	m_pia2->out_pb_callback().set(FUNC(chessmst_state::pio2_port_b_w));
+	Z80PIO(config, m_pio[1], 8_MHz_XTAL/2);
+	m_pio[1]->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pio[1]->in_pa_callback().set(FUNC(chessmst_state::pio2_port_a_r));
+	m_pio[1]->out_pb_callback().set(FUNC(chessmst_state::pio2_port_b_w));
 
 	config.set_default_layout(layout_chessmstdm);
 
