@@ -25,8 +25,8 @@ public:
 
 	virtual bool read(offs_t offset, uint8_t &data) { return false; }
 	virtual bool write(offs_t offset, uint8_t data) { return false; }
-	virtual void io_read(address_space &space, int ifsel, offs_t offset, uint8_t &data) { }
-	virtual void io_write(address_space &space, int ifsel, offs_t offset, uint8_t data) { }
+	virtual void io_read(int ifsel, offs_t offset, uint8_t &data) { }
+	virtual void io_write(int ifsel, offs_t offset, uint8_t data) { }
 
 	// slot 1
 	virtual void ram_read(uint8_t cas, offs_t offset, uint8_t &data) { }
@@ -87,8 +87,8 @@ public:
 	virtual bool write(offs_t offset, uint8_t data);
 	virtual void ram_read(uint8_t cas, offs_t offset, uint8_t &data);
 	virtual void ram_write(uint8_t cas, offs_t offset, uint8_t data);
-	virtual void io_read(address_space &space, int ifsel, offs_t offset, uint8_t &data);
-	virtual void io_write(address_space &space, int ifsel, offs_t offset, uint8_t data);
+	virtual void io_read(int ifsel, offs_t offset, uint8_t &data);
+	virtual void io_write(int ifsel, offs_t offset, uint8_t data);
 	virtual void hold_w(int state);
 	virtual void switch16_w(int state);
 	virtual void timint_w(int state);
