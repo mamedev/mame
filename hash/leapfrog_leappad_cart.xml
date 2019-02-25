@@ -2,6 +2,19 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="leapfrog_leappad_cart" description="LeapFrog LeapPad cartridges">
 
+	<software name="hititmstro" supported="no">
+		<description>Music - Hit it, Maestro! (UK)</description>
+		<year>2001</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-00090 RVB"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="u1" value="MX23L3211B"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-00090 RVB - Music - Hit it, Maestro!.bin" size="0x400000" crc="a2770684" sha1="4f389c6dbcd3ff2a647a6d18df86c472444074e4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="tadshop" supported="no">
 		<description>Pre Math - Tad goes shopping (UK)</description>
 		<year>2001</year>
@@ -81,6 +94,34 @@
 		</part>
 	</software>
 
+	<!-- Same ROM as 500-00263 - Phonics - Leap's Friends From A to Z -->
+	<software name="prlpfrnds" supported="no">
+		<description>Pre Reading - Leap's Friends From A to Z (UK)</description>
+		<year>2002</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-00804"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="u1" value="LeapFrog 2000 8M DIE ROM"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x100000">
+				<rom name="500-00804 - Pre Reading - Leap's Friends From A to Z.bin" size="0x100000" crc="cea3f327" sha1="c49779322dd046ef67bef93d144d2d07251eeadf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="findnemo" supported="no">
+		<description>Reading - Disney/Pixar Finding Nemo (UK)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-01148"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="335-13845-40"/>
+			<feature name="u1" value="MR27V1602E"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-01148 - Reading - Finding Nemo.bin" size="0x200000" crc="b299286b" sha1="3e8c63486f5646f65b5f86efeee4a6ee9d979f32" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="leapsbond" supported="no">
 		<description>Leap's Pond - Activity &amp; Game Book (UK)</description>
 		<year>2003</year>
@@ -96,6 +137,19 @@
 		</part>
 	</software>
 
+	<software name="hoppop" supported="no">
+		<description>Hop on Pop - Based on the Book by Dr. Seuss (UK)</description>
+		<year>2004</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-10438"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="u1" value="MR27V3202J-03-01"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-10438 - Hop on Pop.bin" size="0x400000" crc="49308dc4" sha1="50864fdd604f6b88a0545df45663cae60e30c0e4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dinosaurg" supported="no">
 		<description>Leap und die Welt der Dinosaurier (Germany)</description>
 		<year>2004</year>
@@ -107,6 +161,21 @@
 			<feature name="u1" value="Matronix 32m"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x400000">
 				<rom name="500-10635 - Leap und die Welt der Dinosaurier (GER).bin" size="0x400000" crc="5e306c92" sha1="7496f5b994a40ea07228b5ab27ec907fbcf603b4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="abcabent" supported="no">
+		<description>ABC-Abenteuer (Germany)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-10717 UBL"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-2911"/>
+			<feature name="pcb_rev" value="REV.01"/>
+			<feature name="u1" value="Sunplus32m"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-10717 UBL - ABC-Abenteuer (GER).bin" size="0x400000" crc="6c5c0180" sha1="3cfacb759d3cac16e52aad4629f0759bb8817f1a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -137,6 +206,21 @@
 			<feature name="u1" value="Sunplus16m-b"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x200000">
 				<rom name="500-10757 UBL - A Day at Moss Lake.bin" size="0x200000" crc="22c3c65d" sha1="b3c6f7de54552dd9b164b2f3a97f8565f8cc7879" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wwyoubbe" supported="no">
+		<description>What will you be? (UK)</description>
+		<year>2004</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-10760"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="30388-003-0032"/>
+			<feature name="pcb_rev" value="REV:00"/>
+			<feature name="u1" value="MX12L1611B"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-10760 - What will you be.bin" size="0x200000" crc="b6b36f74" sha1="5d017a501b7feabd8c4d90b8672af19c3d321f41" offset="0" />
 			</dataarea>
 		</part>
 	</software>
