@@ -29,8 +29,8 @@ namespace plib {
 		constexpr pool_deleter() noexcept = default;
 
 		template<typename PU, typename U, typename = typename
-		       std::enable_if<std::is_convertible< U*, T*>::value>::type>
-	    pool_deleter(const pool_deleter<PU, U>&) noexcept { }
+			   std::enable_if<std::is_convertible< U*, T*>::value>::type>
+		pool_deleter(const pool_deleter<PU, U>&) noexcept { }
 
 		void operator()(T *p) const
 		{
@@ -140,7 +140,7 @@ namespace plib {
 					auto capacity(rs);
 					ret = std::align(align, size, ret, capacity);
 					// FIXME: if (ret == nullptr)
-					//	printf("Oh no\n");
+					//  printf("Oh no\n");
 					sinfo().insert({ ret, info(b, b->m_cur)});
 					rs -= (capacity - size);
 					b->m_cur += rs;
@@ -156,7 +156,7 @@ namespace plib {
 				auto capacity(rs);
 				ret = std::align(align, size, ret, capacity);
 				// FIXME: if (ret == nullptr)
-				//	printf("Oh no\n");
+				//  printf("Oh no\n");
 				sinfo().insert({ ret, info(b, b->m_cur)});
 				rs -= (capacity - size);
 				b->m_cur += rs;

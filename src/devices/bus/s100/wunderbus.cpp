@@ -300,7 +300,7 @@ void s100_wunderbus_device::s100_vi2_w(int state)
 //  s100_sinp_r - I/O read
 //-------------------------------------------------
 
-uint8_t s100_wunderbus_device::s100_sinp_r(address_space &space, offs_t offset)
+uint8_t s100_wunderbus_device::s100_sinp_r(offs_t offset)
 {
 	uint8_t address = (m_7c->read() & 0x3e) << 2;
 	if ((offset & 0xf8) != address) return 0xff;
@@ -388,15 +388,15 @@ uint8_t s100_wunderbus_device::s100_sinp_r(address_space &space, offs_t offset)
 			break;
 
 		case 1:
-			data = m_ace1->ins8250_r(space, offset & 0x07);
+			data = m_ace1->ins8250_r(machine().dummy_space(), offset & 0x07);
 			break;
 
 		case 2:
-			data = m_ace2->ins8250_r(space, offset & 0x07);
+			data = m_ace2->ins8250_r(machine().dummy_space(), offset & 0x07);
 			break;
 
 		case 3:
-			data = m_ace3->ins8250_r(space, offset & 0x07);
+			data = m_ace3->ins8250_r(machine().dummy_space(), offset & 0x07);
 			break;
 		}
 	}
@@ -409,7 +409,7 @@ uint8_t s100_wunderbus_device::s100_sinp_r(address_space &space, offs_t offset)
 //  s100_sout_w - I/O write
 //-------------------------------------------------
 
-void s100_wunderbus_device::s100_sout_w(address_space &space, offs_t offset, uint8_t data)
+void s100_wunderbus_device::s100_sout_w(offs_t offset, uint8_t data)
 {
 	uint8_t address = (m_7c->read() & 0x3e) << 2;
 	if ((offset & 0xf8) != address) return;
@@ -511,15 +511,15 @@ void s100_wunderbus_device::s100_sout_w(address_space &space, offs_t offset, uin
 			break;
 
 		case 1:
-			m_ace1->ins8250_w(space, offset & 0x07, data);
+			m_ace1->ins8250_w(machine().dummy_space(), offset & 0x07, data);
 			break;
 
 		case 2:
-			m_ace2->ins8250_w(space, offset & 0x07, data);
+			m_ace2->ins8250_w(machine().dummy_space(), offset & 0x07, data);
 			break;
 
 		case 3:
-			m_ace3->ins8250_w(space, offset & 0x07, data);
+			m_ace3->ins8250_w(machine().dummy_space(), offset & 0x07, data);
 			break;
 		}
 	}

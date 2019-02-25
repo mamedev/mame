@@ -7449,7 +7449,9 @@ ROM_END
 //*************************************************************************************************************************
 //  Ryukyu, Sega System 16B
 //  CPU: FD1094 8M2 (317-5023A)
-//  ROM Board type: ?
+//  ROM Board type: 171-5704
+//  Sega game ID: 836-7666 RYUKYU
+//     ROM board: 836-7667
 //
 ROM_START( ryukyua )
 	ROM_REGION( 0x20000, "maincpu", 0 ) // 68000 code

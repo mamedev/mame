@@ -257,7 +257,7 @@ void deco_bac06_device::custom_tilemap_draw(bitmap_ind16 &bitmap,
 
 	if (control1)
 	{
-		if ((control0 && control0[0]&2)==0) // Use of column major mode inverts scroll direction
+		if (control0 && (control0[0]&2)==0) // Use of column major mode inverts scroll direction
 			scrollx = -control1[0] - 0x100;
 		else
 			scrollx = control1[0];
@@ -381,10 +381,23 @@ void deco_bac06_device::deco_bac06_pf_draw_bootleg(bitmap_ind16 &bitmap,const re
 
 WRITE16_MEMBER( deco_bac06_device::pf_control_0_w )
 {
+	int oldRegister0 = m_pf_control_0[0];
+
 	offset &= 3;
 
 	COMBINE_DATA(&m_pf_control_0[offset]);
 
+	bool dirtyAll = false;
+	if (offset==0)
+	{
+		if ((oldRegister0&2)!=(m_pf_control_0[offset]&2))
+		{
+			int flip = m_flip_screen;
+			set_flip_screen(flip^1);
+			set_flip_screen(flip); // Hack to force tilemap.cpp mappings_update() to be called
+			dirtyAll = true;
+		}
+	}
 	if (offset==2)
 	{
 		int newbank = m_pf_control_0[offset]&1;
@@ -395,14 +408,19 @@ WRITE16_MEMBER( deco_bac06_device::pf_control_0_w )
 			if (strcmp(machine().system().name,"stadhero"))
 				printf("tilemap ram bank change to %d\n", newbank&1);
 
+			dirtyAll = true;
 			m_rambank = newbank&1;
-			m_pf8x8_tilemap[0]->mark_all_dirty();
-			m_pf8x8_tilemap[1]->mark_all_dirty();
-			m_pf8x8_tilemap[2]->mark_all_dirty();
-			m_pf16x16_tilemap[0]->mark_all_dirty();
-			m_pf16x16_tilemap[1]->mark_all_dirty();
-			m_pf16x16_tilemap[2]->mark_all_dirty();
 		}
+	}
+	
+	if (dirtyAll)
+	{
+		m_pf8x8_tilemap[0]->mark_all_dirty();
+		m_pf8x8_tilemap[1]->mark_all_dirty();
+		m_pf8x8_tilemap[2]->mark_all_dirty();
+		m_pf16x16_tilemap[0]->mark_all_dirty();
+		m_pf16x16_tilemap[1]->mark_all_dirty();
+		m_pf16x16_tilemap[2]->mark_all_dirty();
 	}
 }
 

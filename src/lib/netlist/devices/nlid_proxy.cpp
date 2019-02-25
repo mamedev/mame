@@ -6,7 +6,7 @@
  */
 
 #include "nlid_proxy.h"
-#include "../solver/nld_solver.h"
+#include "netlist/solver/nld_solver.h"
 //#include "plib/pstream.h"
 //#include "plib/pfmtlog.h"
 //#include "nld_log.h"

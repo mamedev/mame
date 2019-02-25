@@ -18,9 +18,9 @@
 #include "plib/pstring.h"
 #include "plib/putil.h"
 
-#include "netlist_types.h"
 #include "nl_config.h"
 #include "nl_factory.h"
+#include "nltypes.h"
 
 //============================================================
 //  MACROS / inline netlist definitions
@@ -278,9 +278,9 @@ namespace netlist
 	protected:
 		std::unordered_map<pstring, pstring>        m_models;
 		std::stack<pstring>                         m_namespace_stack;
-		std::unordered_map<pstring, pstring> 		m_alias;
+		std::unordered_map<pstring, pstring>        m_alias;
 		std::vector<link_t>                         m_links;
-		std::unordered_map<pstring, pstring> 		m_param_values;
+		std::unordered_map<pstring, pstring>        m_param_values;
 
 		source_t::list_t                            m_sources;
 
@@ -291,7 +291,7 @@ namespace netlist
 
 
 	private:
-		plib::ppreprocessor::defines_map_type	    m_defines;
+		plib::ppreprocessor::defines_map_type       m_defines;
 
 		setup_t  &m_setup;
 		log_type &m_log;
@@ -384,7 +384,7 @@ namespace netlist
 		std::unordered_map<pstring, detail::core_terminal_t *> m_terminals;
 
 		netlist_t                                   &m_netlist;
-		devices::nld_netlistparams			 		*m_netlist_params;
+		devices::nld_netlistparams                  *m_netlist_params;
 		std::unordered_map<pstring, param_ref_t>    m_params;
 
 		unsigned m_proxy_cnt;

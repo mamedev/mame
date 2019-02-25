@@ -50,6 +50,7 @@ II Plus: RAM options reduced to 16/32/48 KB.
 #include "machine/kb3600.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
+#include "machine/apple2common.h"
 
 #include "sound/spkrdev.h"
 
@@ -111,6 +112,7 @@ public:
 		m_ram(*this, RAM_TAG),
 		m_ay3600(*this, A2_KBDC_TAG),
 		m_video(*this, A2_VIDEO_TAG),
+		m_a2common(*this, "a2common"),
 		m_a2bus(*this, "a2bus"),
 		m_joy1x(*this, "joystick_1_x"),
 		m_joy1y(*this, "joystick_1_y"),
@@ -133,6 +135,7 @@ public:
 	required_device<ram_device> m_ram;
 	required_device<ay3600_device> m_ay3600;
 	required_device<a2_video_device> m_video;
+	required_device<apple2_common_device> m_a2common;
 	required_device<a2bus_device> m_a2bus;
 	required_ioport m_joy1x, m_joy1y, m_joy2x, m_joy2y, m_joybuttons;
 	required_ioport m_kbspecial;
@@ -228,6 +231,8 @@ private:
 	device_a2bus_card_interface *m_slotdevice[8];
 
 	uint8_t read_floatingbus();
+
+	offs_t dasm_trampoline(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
 };
 
 /***************************************************************************
@@ -237,6 +242,11 @@ private:
 #define JOYSTICK_DELTA          80
 #define JOYSTICK_SENSITIVITY    50
 #define JOYSTICK_AUTOCENTER     80
+
+offs_t apple2_state::dasm_trampoline(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params)
+{
+	return m_a2common->dasm_override(stream, pc, opcodes, params);
+}
 
 WRITE_LINE_MEMBER(apple2_state::a2bus_irq_w)
 {
@@ -1382,11 +1392,14 @@ void apple2_state::apple2_common(machine_config &config)
 	/* basic machine hardware */
 	M6502(config, m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2_state::apple2_map);
+	m_maincpu->set_dasm_override(FUNC(apple2_state::dasm_trampoline));
+
 	TIMER(config, m_scantimer, 0);
 	m_scantimer->configure_scanline(FUNC(apple2_state::apple2_interrupt), "screen", 0, 1);
 	config.m_minimum_quantum = attotime::from_hz(60);
 
 	APPLE2_VIDEO(config, m_video, XTAL(14'318'181));
+	APPLE2_COMMON(config, m_a2common, XTAL(14'318'181));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(1021800*14, (65*7)*2, 0, (40*7)*2, 262, 0, 192);

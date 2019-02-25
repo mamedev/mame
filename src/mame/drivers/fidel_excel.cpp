@@ -388,7 +388,7 @@ void excel_state::granits(machine_config &config)
 	fexcelp(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_clock(8_MHz_XTAL); // overclocked
+	m_maincpu->set_clock(8_MHz_XTAL/2);
 }
 
 void excel_state::fdes2100(machine_config &config)

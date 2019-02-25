@@ -219,7 +219,7 @@ READ8_MEMBER( mpz80_state::mmu_r )
 	}
 	else
 	{
-		data = m_s100->smemr_r(space, m_addr);
+		data = m_s100->smemr_r(m_addr);
 	}
 
 	return data;
@@ -267,7 +267,7 @@ WRITE8_MEMBER( mpz80_state::mmu_w )
 	}
 	else
 	{
-		m_s100->mwrt_w(space, m_addr, data);
+		m_s100->mwrt_w(m_addr, data);
 	}
 }
 
@@ -294,7 +294,7 @@ inline offs_t mpz80_state::get_io_address(offs_t offset)
 
 READ8_MEMBER( mpz80_state::mmu_io_r )
 {
-	return m_s100->sinp_r(space, get_io_address(offset));
+	return m_s100->sinp_r(get_io_address(offset));
 }
 
 
@@ -304,7 +304,7 @@ READ8_MEMBER( mpz80_state::mmu_io_r )
 
 WRITE8_MEMBER( mpz80_state::mmu_io_w )
 {
-	m_s100->sout_w(space, get_io_address(offset), data);
+	m_s100->sout_w(get_io_address(offset), data);
 }
 
 

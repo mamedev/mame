@@ -10,14 +10,15 @@
 #ifndef NLD_MS_GCR_H_
 #define NLD_MS_GCR_H_
 
-#include <algorithm>
-#include <netlist/plib/mat_cr.h>
+#include "plib/mat_cr.h"
 
-#include "../plib/pdynlib.h"
-#include "../plib/pstream.h"
-#include "../plib/vector_ops.h"
 #include "nld_ms_direct.h"
 #include "nld_solver.h"
+#include "plib/pdynlib.h"
+#include "plib/pstream.h"
+#include "plib/vector_ops.h"
+
+#include <algorithm>
 
 namespace netlist
 {
@@ -66,7 +67,7 @@ private:
 	plib::parray<FT, SIZE> new_V;
 
 	std::array<plib::aligned_vector<FT *, PALIGN_VECTOROPT>, storage_N> m_term_cr;
-//	std::array<std::vector<FT *>, storage_N> m_term_cr;
+	//  std::array<std::vector<FT *>, storage_N> m_term_cr;
 
 	mat_type mat;
 
@@ -166,7 +167,7 @@ void matrix_solver_GCR_t<FT, SIZE>::vsetup(analog_net_t::list_t &nets)
 		/* build pointers into the compressed row format matrix for each terminal */
 		for (std::size_t j=0; j< this->m_terms[k]->m_railstart;j++)
 		{
-			int other = this->m_terms[k]->connected_net_idx()[j];
+			int other = this->m_terms[k]->m_connected_net_idx[j];
 			for (auto i = mat.row_idx[k]; i <  mat.row_idx[k+1]; i++)
 				if (other == static_cast<int>(mat.col_idx[i]))
 				{
@@ -295,8 +296,8 @@ unsigned matrix_solver_GCR_t<FT, SIZE>::vsolve_non_dynamic(const bool newton_rap
 	mat.set_scalar(0.0);
 
 	/* populate matrix */
-	for (std::size_t k = 0; k < iN; k++)
-		this->m_terms[k]->fill_matrix(m_term_cr[k], RHS[k]);
+
+	this->fill_matrix(iN, m_term_cr, RHS);
 
 	/* now solve it */
 

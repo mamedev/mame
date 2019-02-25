@@ -29,7 +29,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="jp02">
 		<description>JP-02 (Japan)</description>
 		<year>2004</year>
@@ -41,5 +41,5 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 </softwarelist>

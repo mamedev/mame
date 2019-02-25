@@ -279,10 +279,10 @@ void dmvcart_slot_device::ram_write(uint8_t cas, offs_t offset, uint8_t data)
     IO read
 -------------------------------------------------*/
 
-void dmvcart_slot_device::io_read(address_space &space, int ifsel, offs_t offset, uint8_t &data)
+void dmvcart_slot_device::io_read(int ifsel, offs_t offset, uint8_t &data)
 {
 	if (m_cart)
-		m_cart->io_read(space, ifsel, offset, data);
+		m_cart->io_read(ifsel, offset, data);
 }
 
 
@@ -290,10 +290,10 @@ void dmvcart_slot_device::io_read(address_space &space, int ifsel, offs_t offset
    IO write
 -------------------------------------------------*/
 
-void dmvcart_slot_device::io_write(address_space &space, int ifsel, offs_t offset, uint8_t data)
+void dmvcart_slot_device::io_write(int ifsel, offs_t offset, uint8_t data)
 {
 	if (m_cart)
-		m_cart->io_write(space, ifsel, offset, data);
+		m_cart->io_write(ifsel, offset, data);
 }
 
 /*-------------------------------------------------

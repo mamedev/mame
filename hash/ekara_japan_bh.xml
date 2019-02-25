@@ -9,7 +9,7 @@
 	A secondary 4-digit naming scheme BHxxxx (no extension) appears on a sticker on the cartridge PCB only
 
 	For e-kara only
-	
+
 	These are probably all just titled 'Best Hit Collection'
 
 	 BH-01  (unknown)
@@ -33,7 +33,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="bh03">
 		<description>BH-03 Best Hit Collection (Japan)</description>
 		<year>2005</year>
@@ -43,7 +43,7 @@
 				<rom name="bh03.bin" size="0x100000" crc="d17cafd4" sha1="b74fd0f77a726547d4001d4177a5ccd2ea35536a" offset="0" />
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="bh05">
 		<description>BH-05 Best Hit Collection (Japan)</description>
@@ -65,6 +65,6 @@
 				<rom name="bh06.bin" size="0x100000" crc="6e264ecb" sha1="6c3e4253565242c0c6dcdab7698f5b1e28544b2e" offset="0" />
 			</dataarea>
 		</part>
-	</software>		
+	</software>
 
 </softwarelist>

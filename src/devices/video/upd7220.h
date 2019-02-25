@@ -109,11 +109,11 @@ public:
 	auto vsync_wr_callback() { return m_write_vsync.bind(); }
 	auto blank_wr_callback() { return m_write_blank.bind(); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER( dack_r );
-	DECLARE_WRITE8_MEMBER( dack_w );
+	uint8_t dack_r();
+	void dack_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( ext_sync_w );
 	DECLARE_WRITE_LINE_MEMBER( lpen_w );

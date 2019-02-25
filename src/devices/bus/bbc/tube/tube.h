@@ -66,8 +66,8 @@ public:
 	// callbacks
 	auto irq_handler() { return m_irq_handler.bind(); }
 
-	DECLARE_READ8_MEMBER( host_r );
-	DECLARE_WRITE8_MEMBER( host_w );
+	uint8_t host_r(offs_t offset);
+	void host_w(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_irq_handler(state); }
 
@@ -90,8 +90,8 @@ class device_bbc_tube_interface : public device_slot_card_interface
 {
 public:
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(host_r) { return 0xfe; }
-	virtual DECLARE_WRITE8_MEMBER(host_w) { }
+	virtual uint8_t host_r(offs_t offset) { return 0xfe; }
+	virtual void host_w(offs_t offset, uint8_t data) { }
 
 protected:
 	device_bbc_tube_interface(const machine_config &mconfig, device_t &device);

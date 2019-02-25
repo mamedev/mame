@@ -512,54 +512,54 @@ Yamaha YMZ294: limited info: 0 I/O port
 OKI M5255, Winbond WF19054, JFC 95101, File KC89C72, Toshiba T7766A : differences to be listed
 
 AY8930 Expanded mode registers :
-	Bank Register Bits
-	A    0        xxxx xxxx Channel A Tone period fine tune
-	A    1        xxxx xxxx Channel A Tone period coarse tune
-	A    2        xxxx xxxx Channel B Tone period fine tune
-	A    3        xxxx xxxx Channel B Tone period coarse tune
-	A    4        xxxx xxxx Channel C Tone period fine tune
-	A    5        xxxx xxxx Channel C Tone period coarse tune
-	A    6        xxxx xxxx Noise period
-	A    7        x--- ---- I/O Port B input(0) / output(1)
-	              -x-- ---- I/O Port A input(0) / output(1)
-	              --x- ---- Channel C Noise enable(0) / disable(1)
-	              ---x ---- Channel B Noise enable(0) / disable(1)
-	              ---- x--- Channel A Noise enable(0) / disable(1)
-	              ---- -x-- Channel C Tone enable(0) / disable(1)
-	              ---- --x- Channel B Tone enable(0) / disable(1)
-	              ---- ---x Channel A Tone enable(0) / disable(1)
-	A    8        --x- ---- Channel A Envelope mode
-	              ---x xxxx Channel A Tone volume
-	A    9        --x- ---- Channel B Envelope mode
-	              ---x xxxx Channel B Tone volume
-	A    A        --x- ---- Channel C Envelope mode
-	              ---x xxxx Channel C Tone volume
-	A    B        xxxx xxxx Channel A Envelope period fine tune
-	A    C        xxxx xxxx Channel A Envelope period coarse tune
-	A    D        101- ---- 101 = Expanded mode enable, other AY-3-8910A Compatiblity mode
-	              ---0 ---- 0 for Register Bank A
-	              ---- xxxx Channel A Envelope Shape/Cycle
-	A    E        xxxx xxxx 8 bit Parallel I/O on Port A
-	A    F        xxxx xxxx 8 bit Parallel I/O on Port B
+    Bank Register Bits
+    A    0        xxxx xxxx Channel A Tone period fine tune
+    A    1        xxxx xxxx Channel A Tone period coarse tune
+    A    2        xxxx xxxx Channel B Tone period fine tune
+    A    3        xxxx xxxx Channel B Tone period coarse tune
+    A    4        xxxx xxxx Channel C Tone period fine tune
+    A    5        xxxx xxxx Channel C Tone period coarse tune
+    A    6        xxxx xxxx Noise period
+    A    7        x--- ---- I/O Port B input(0) / output(1)
+                  -x-- ---- I/O Port A input(0) / output(1)
+                  --x- ---- Channel C Noise enable(0) / disable(1)
+                  ---x ---- Channel B Noise enable(0) / disable(1)
+                  ---- x--- Channel A Noise enable(0) / disable(1)
+                  ---- -x-- Channel C Tone enable(0) / disable(1)
+                  ---- --x- Channel B Tone enable(0) / disable(1)
+                  ---- ---x Channel A Tone enable(0) / disable(1)
+    A    8        --x- ---- Channel A Envelope mode
+                  ---x xxxx Channel A Tone volume
+    A    9        --x- ---- Channel B Envelope mode
+                  ---x xxxx Channel B Tone volume
+    A    A        --x- ---- Channel C Envelope mode
+                  ---x xxxx Channel C Tone volume
+    A    B        xxxx xxxx Channel A Envelope period fine tune
+    A    C        xxxx xxxx Channel A Envelope period coarse tune
+    A    D        101- ---- 101 = Expanded mode enable, other AY-3-8910A Compatiblity mode
+                  ---0 ---- 0 for Register Bank A
+                  ---- xxxx Channel A Envelope Shape/Cycle
+    A    E        xxxx xxxx 8 bit Parallel I/O on Port A
+    A    F        xxxx xxxx 8 bit Parallel I/O on Port B
 
-	B    0        xxxx xxxx Channel B Envelope period fine tune
-	B    1        xxxx xxxx Channel B Envelope period coarse tune
-	B    2        xxxx xxxx Channel C Envelope period fine tune
-	B    3        xxxx xxxx Channel C Envelope period coarse tune
-	B    4        ---- xxxx Channel B Envelope Shape/Cycle
-	B    5        ---- xxxx Channel C Envelope Shape/Cycle
-	B    6        ---- xxxx Channel A Duty Cycle
-	B    7        ---- xxxx Channel B Duty Cycle
-	B    8        ---- xxxx Channel C Duty Cycle
-	B    9        xxxx xxxx Noise "And" Mask
-	B    A        xxxx xxxx Noise "Or" Mask
-	B    B        Reserved (Read as 0)
-	B    C        Reserved (Read as 0)
-	B    D        101- ---- 101 = Expanded mode enable, other AY-3-8910A Compatiblity mode
-	              ---1 ---- 1 for Register Bank B
-	              ---- xxxx Channel A Envelope Shape
-	B    E        Reserved (Read as 0)
-	B    F        Test (Function unknown)
+    B    0        xxxx xxxx Channel B Envelope period fine tune
+    B    1        xxxx xxxx Channel B Envelope period coarse tune
+    B    2        xxxx xxxx Channel C Envelope period fine tune
+    B    3        xxxx xxxx Channel C Envelope period coarse tune
+    B    4        ---- xxxx Channel B Envelope Shape/Cycle
+    B    5        ---- xxxx Channel C Envelope Shape/Cycle
+    B    6        ---- xxxx Channel A Duty Cycle
+    B    7        ---- xxxx Channel B Duty Cycle
+    B    8        ---- xxxx Channel C Duty Cycle
+    B    9        xxxx xxxx Noise "And" Mask
+    B    A        xxxx xxxx Noise "Or" Mask
+    B    B        Reserved (Read as 0)
+    B    C        Reserved (Read as 0)
+    B    D        101- ---- 101 = Expanded mode enable, other AY-3-8910A Compatiblity mode
+                  ---1 ---- 1 for Register Bank B
+                  ---- xxxx Channel A Envelope Shape
+    B    E        Reserved (Read as 0)
+    B    F        Test (Function unknown)
 
 Decaps:
 AY-3-8914 - http://siliconpr0n.org/map/gi/ay-3-8914/mz_mit20x/

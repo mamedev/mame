@@ -5,8 +5,8 @@
  *
  */
 
-#include "../solver/nld_solver.h"
-#include "../solver/nld_matrix_solver.h"
+#include "netlist/solver/nld_solver.h"
+#include "netlist/solver/nld_matrix_solver.h"
 #include "nlid_system.h"
 
 namespace netlist

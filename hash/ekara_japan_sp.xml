@@ -44,7 +44,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="sp03">
 		<description>SP-03 Super Cartridge (Japan)</description>
 		<year>2004</year>
@@ -55,8 +55,8 @@
 				<rom name="sp03.u1" size="0x200000" crc="cd7dbbaf" sha1="cc62c10f8f83015e4c472bc41e9a1fd7ac497655" offset="0" />
 			</dataarea>
 		</part>
-	</software>	
-	
+	</software>
+
 	<software name="sp04">
 		<description>SP-04 Super Cartridge (Japan)</description>
 		<year>2004</year>
@@ -67,6 +67,6 @@
 				<rom name="sp04.u1" size="0x200000" crc="77818ddb" sha1="708980b1ae30864bd3395ef663de1c57ecbc113c" offset="0" />
 			</dataarea>
 		</part>
-	</software>		
-	
+	</software>
+
 </softwarelist>

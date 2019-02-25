@@ -8,12 +8,12 @@
 #ifndef NLD_MS_GMRES_H_
 #define NLD_MS_GMRES_H_
 
-#include "../plib/gmres.h"
-#include "../plib/mat_cr.h"
-#include "../plib/parray.h"
-#include "../plib/vector_ops.h"
 #include "nld_ms_direct.h"
 #include "nld_solver.h"
+#include "plib/gmres.h"
+#include "plib/mat_cr.h"
+#include "plib/parray.h"
+#include "plib/vector_ops.h"
 
 #include <algorithm>
 #include <cmath>
@@ -89,7 +89,7 @@ namespace devices
 			for (std::size_t j=0; j< this->m_terms[k]->m_railstart;j++)
 			{
 				for (std::size_t i = m_ops.m_mat.row_idx[k]; i<m_ops.m_mat.row_idx[k+1]; i++)
-					if (this->m_terms[k]->connected_net_idx()[j] == static_cast<int>(m_ops.m_mat.col_idx[i]))
+					if (this->m_terms[k]->m_connected_net_idx[j] == static_cast<int>(m_ops.m_mat.col_idx[i]))
 					{
 						m_term_cr[k].push_back(&m_ops.m_mat.A[i]);
 						break;
@@ -111,9 +111,10 @@ namespace devices
 		m_ops.m_mat.set_scalar(0.0);
 
 		/* populate matrix and V for first estimate */
+		this->fill_matrix(iN, m_term_cr, RHS);
+
 		for (std::size_t k = 0; k < iN; k++)
 		{
-			this->m_terms[k]->fill_matrix(m_term_cr[k], RHS[k]);
 			this->m_new_V[k] = this->m_nets[k]->Q_Analog();
 		}
 

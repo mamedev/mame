@@ -65,7 +65,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_ppi8255(*this, "ppi8255"),
 		m_led_delay(*this, "led_delay_%u", 0),
-		m_buttons(*this, "IN.%u", 0),
+		m_keypad(*this, "IN.%u", 0),
 		m_dac(*this, "dac"),
 		m_cart(*this, "cartslot"),
 		m_digit(*this, "digit%u", 0U),
@@ -86,7 +86,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi8255;
 	required_device_array<timer_device, 6> m_led_delay;
-	required_ioport_array<2> m_buttons;
+	required_ioport_array<2> m_keypad;
 	required_device<dac_bit_interface> m_dac;
 	required_device<generic_slot_device> m_cart;
 	output_finder<4> m_digit;
@@ -178,7 +178,7 @@ READ8_MEMBER(intel02_state::input_r)
 {
 	// d0-d3: buttons through a priority encoder
 	// d4-d7: buttons (direct)
-	return (count_leading_zeros(m_buttons[0]->read()) - 17) | (~m_buttons[1]->read() << 4 & 0xf0);
+	return (count_leading_zeros(m_keypad[0]->read()) - 17) | (~m_keypad[1]->read() << 4 & 0xf0);
 }
 
 WRITE8_MEMBER(intel02_state::_7seg_w)
@@ -252,7 +252,7 @@ static INPUT_PORTS_START( intel02 )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Input") PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Game Select") PORT_CODE(KEYCODE_S)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Erase") PORT_CODE(KEYCODE_DEL)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Erase") PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE)
 
 	PORT_START("RESET")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Reset") PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, intel02_state, reset_button, nullptr)

@@ -31,11 +31,11 @@
 #pragma GCC optimize "ivopts"
 #endif
 
-#include "../nl_lists.h"
+#include "netlist/nl_lists.h"
 
-#include "../plib/pomp.h"
+#include "plib/pomp.h"
 
-#include "../nl_factory.h"
+#include "netlist/nl_factory.h"
 
 #include "nld_matrix_solver.h"
 #include "nld_solver.h"
@@ -192,7 +192,7 @@ poolptr<matrix_solver_t> NETLIB_NAME(solver)::create_solver_x(std::size_t size, 
 		else
 			return this->create_solver_x<FT, SIZE / 2>(size, solvername);
 	}
-};
+}
 
 struct net_splitter
 {

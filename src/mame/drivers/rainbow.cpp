@@ -2947,11 +2947,8 @@ READ8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_r)
 		break;
 
 	case 6:
-		data = m_hgdc->read(space, offset & 0x00);
-		break;
-
 	case 7:
-		data = m_hgdc->read(space, offset & 0x01);
+		data = m_hgdc->read(offset & 0x01);
 		break;
 
 	default:
@@ -3169,7 +3166,7 @@ WRITE8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_w)
 
 	case 6:
 	case 7:
-		m_hgdc->write(space, offset & 0x01, data);
+		m_hgdc->write(offset & 0x01, data);
 		break;
 	} // switch
 

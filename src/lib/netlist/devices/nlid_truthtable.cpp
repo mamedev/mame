@@ -6,9 +6,9 @@
  */
 
 #include  "nlid_truthtable.h"
-#include "../nl_setup.h"
-#include "../plib/palloc.h"
-#include "../plib/plists.h"
+#include "netlist/nl_setup.h"
+#include "plib/palloc.h"
+#include "plib/plists.h"
 
 #include <bitset>
 
@@ -77,8 +77,8 @@ namespace netlist
 			return ret;
 		}
 
-		static constexpr sbitset all_bits() { return sbitset(~static_cast<T>(0)); }
-		static constexpr sbitset no_bits() { return sbitset(static_cast<T>(0)); }
+		static constexpr const sbitset all_bits() noexcept { return sbitset(~static_cast<T>(0)); }
+		static constexpr const sbitset no_bits() noexcept{ return sbitset(static_cast<T>(0)); }
 	private:
 		T m_bs;
 	};

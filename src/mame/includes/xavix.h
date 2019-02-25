@@ -106,10 +106,10 @@ public:
 
 	void xavix(machine_config &config);
 	void xavix_nv(machine_config &config);
-	
+
 	void xavixp(machine_config &config);
 	void xavixp_nv(machine_config &config);
-	
+
 	void xavix2000(machine_config &config);
 	void xavix2000_nv(machine_config &config);
 
@@ -796,7 +796,7 @@ protected:
 				m_cartslot->write_bus_control(space,offset,data,mem_mask);
 		}
 	};
-	
+
 	virtual uint8_t extbus_r(offs_t offset) override
 	{
 		if (m_cartslot->has_cart() && m_cartslot->is_read_access_not_rom())

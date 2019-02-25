@@ -21,7 +21,7 @@
 #ifndef NLD_DM9314_H_
 #define NLD_DM9314_H_
 
-#include "../nl_setup.h"
+#include "netlist/nl_setup.h"
 
 #define TTL_9314(name, cEQ, cMRQ, cS0Q, cS1Q, cS2Q, cS3Q, cD0, cD1, cD2, cD3) \
 		NET_REGISTER_DEV(TTL_9314, name)    \

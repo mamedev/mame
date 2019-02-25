@@ -374,11 +374,10 @@ int i8089_channel_device::execute_run()
 			// do we need to read another byte?
 			if (BIT(m_r[PSW].w, 1) && !BIT(m_r[PSW].w, 0) && !m_store_hi)
 			{
+				m_store_hi = true;
+
 				if (CC_SYNC == 0x02)
-				{
-					m_store_hi = true;
 					m_dma_state = DMA_WAIT_FOR_DEST_DRQ;
-				}
 				else
 					m_dma_state = DMA_STORE_BYTE_HIGH;
 			}

@@ -10,9 +10,9 @@
 #ifndef NLID_TRUTHTABLE_H_
 #define NLID_TRUTHTABLE_H_
 
-#include "../nl_base.h"
-#include "../nl_setup.h"
-#include "../plib/putil.h"
+#include "netlist/nl_base.h"
+#include "netlist/nl_setup.h"
+#include "plib/putil.h"
 
 #define NETLIB_TRUTHTABLE(cname, nIN, nOUT)                                    \
 	class NETLIB_NAME(cname) : public nld_truthtable_t<nIN, nOUT>              \

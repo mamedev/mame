@@ -11,10 +11,10 @@
 #ifndef NLID_SYSTEM_H_
 #define NLID_SYSTEM_H_
 
-#include "../analog/nlid_twoterm.h"
-#include "../nl_base.h"
-#include "../nl_setup.h"
-#include "../plib/putil.h"
+#include "netlist/analog/nlid_twoterm.h"
+#include "netlist/nl_base.h"
+#include "netlist/nl_setup.h"
+#include "plib/putil.h"
 
 namespace netlist
 {
@@ -139,12 +139,13 @@ namespace netlist
 					total += pati[i];
 				}
 				netlist_time ttotal = netlist_time::zero();
-				for (unsigned i=0; i<m_size - 1; i++)
+				auto sm1 = static_cast<uint8_t>(m_size - 1);
+				for (unsigned i=0; i < sm1; i++)
 				{
 					m_inc[i] = base * pati[i];
 					ttotal += m_inc[i];
 				}
-				m_inc[m_size - 1] = base * total - ttotal;
+				m_inc[sm1] = base * total - ttotal;
 			}
 		}
 		NETLIB_UPDATEI();
@@ -202,7 +203,7 @@ namespace netlist
 		{
 		}
 
-		NETLIB_UPDATEI() { 	}
+		NETLIB_UPDATEI() {  }
 		NETLIB_RESETI() { m_Q.initial(0.0); }
 		NETLIB_UPDATE_PARAMI() { m_Q.push(m_IN()); }
 

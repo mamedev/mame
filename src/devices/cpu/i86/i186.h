@@ -132,7 +132,7 @@ private:
 	dma_state       m_dma[2];
 	intr_state      m_intr;
 	mem_state       m_mem;
-	bool		m_last_dma;
+	bool            m_last_dma;
 
 	static const device_timer_id TIMER_INT0 = 0;
 	static const device_timer_id TIMER_INT1 = 1;

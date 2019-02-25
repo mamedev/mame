@@ -12874,15 +12874,10 @@ chesstera                       //
 kishon                          //
 
 @source:fidel_csc.cpp
-csc                             // CSC: Champion Sensory Chess Challenger (English)
-cscfr                           // * French
-cscg                            // * German
-cscsp                           // * Spanish
+csc                             //
+cscetr
 reversic                        //
-super9cc                        // SU9: Super 9 Sensory Chess Challenger (English)
-super9ccfr                      // * French
-super9ccg                       // * German
-super9ccsp                      // * Spanish
+super9cc                        //
 
 @source:fidel_dames.cpp
 damesc                          //
@@ -12909,26 +12904,13 @@ fex68km2                        //
 fex68km3                        //
 
 @source:fidel_elite.cpp
-feasbu                          // EAS: Elite A/S Challenger (Budapest program, English)
-feasbufr                        // * French
-feasbug                         // * German
-feasbusp                        // * Spanish
-feasgla                         // EAS: Elite A/S Challenger (Glasgow program, English)
-feasglafr                       // * French
-feasglag                        // * German
-feasglasp                       // * Spanish
-feag2100                        // EAG: Elite Avant Garde 2100 (English)
-feag2100fr                      // * French
-feag2100g                       // * German
-feag2100sp                      // * Spanish
+feasbu                          //
+feasgla                         //
+feag                            //
+feag2100                        //
+fepriv                          //
 fpres                           //
-fpressp                         //
-fpresg                          //
-fpresfr                         //
 fpresbu                         //
-fpresbusp                       //
-fpresbug                        //
-fpresbufr                       //
 
 @source:fidel_excel.cpp
 fdes2000                        //
@@ -12963,20 +12945,11 @@ fscc9c                          //
 fscc9ps                         //
 
 @source:fidel_vcc.cpp
-uvc                             // UVC: Advanced Voice Chess Challenger (English)
-uvcfr                           // * French
-uvcg                            // * German
-uvcsp                           // * Spanish
-vcc                             // VCC: Voice Chess Challenger (English)
-vccfr                           // * German
-vccg                            // * Spanish
-vccsp                           // * French
+uvc                             //
+vcc                             //
 
 @source:fidel_vsc.cpp
-vsc                             // VSC: Voice Sensory Chess Challenger (English)
-vscfr                           // * French
-vscg                            // * German
-vscsp                           // * Spanish
+vsc                             //
 
 @source:finalizr.cpp
 finalizr                        // GX523 (c) 1985
@@ -18287,6 +18260,7 @@ lemmings                        // prototype (c) 1991 Data East USA (US)
 lethalen                        // GX191 (c) 1992
 lethaleneaa                     // GX191 (c) 1992
 lethaleneab                     // GX191 (c) 1992
+lethalenead                     // GX191 (c) 1992
 lethaleneae                     // GX191 (c) 1992
 lethalenj                       // GX191 (c) 1992
 lethalenua                      // GX191 (c) 1992
@@ -21814,6 +21788,7 @@ motoraid                        // 1997.10 Motor Raid Twin
 motoraiddx                      // 1997.10 Motor Raid DX
 overrev                         // 1997.09 Over Rev (Revision A)
 overrevb                        // 1997.09 Over Rev (Revision B)
+overrevba                       // 1997.09 Over Rev (Revision A)
 pltkids                         // 1999.03 Pilot Kids (Revision A)
 pltkidsa                        // 1999.03 Pilot Kids
 rascot2                         // 1997.?? Royal Ascot II
@@ -21826,6 +21801,7 @@ skisuprg                        // 1996.12 Sega Ski Super G
 skytargt                        // 1995.10 Sky Target
 srallyc                         // 1995.02 Sega Rally Championship TWIN (Revision C)
 srallycb                        // 1995.02 Sega Rally Championship TWIN (Revision B)
+srallycc                        // 1995.02 Sega Rally Championship TWIN (Revision A)
 srallycdx                       // 1995.02 Sega Rally Championship DX (Revision A)
 srallycdxa                      // 1995.02 Sega Rally Championship DX
 stcc                            // 1996.09 Sega Touring Car Championship
@@ -30371,6 +30347,9 @@ neoprint                        //
 npcartv1                        //
 npmillen                        //
 nprsp                           //
+npskv                           //
+npsprg98                        //
+npsprgv4                        //
 npusagif                        //
 
 @source:neptunp2.cpp
@@ -38738,6 +38717,7 @@ jak_wof                         //
 jak_spdm                        //
 jak_pooh                        //
 jak_nick                        //
+jak_sbfc                        //
 lexizeus                        // Lexibook
 vii                             // KenSingTon / Jungle Soft / Siatronics Vii
 wrlshunt                        // Wireless: Hunting Video Game System

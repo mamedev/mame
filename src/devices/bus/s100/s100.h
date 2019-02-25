@@ -99,12 +99,12 @@ public:
 	virtual void s100_vi7_w(int state) { }
 
 	// memory access
-	virtual uint8_t s100_smemr_r(address_space &space, offs_t offset) { return 0xff; }
-	virtual void s100_mwrt_w(address_space &space, offs_t offset, uint8_t data) { }
+	virtual uint8_t s100_smemr_r(offs_t offset) { return 0xff; }
+	virtual void s100_mwrt_w(offs_t offset, uint8_t data) { }
 
 	// I/O access
-	virtual uint8_t s100_sinp_r(address_space &space, offs_t offset) { return 0xff; }
-	virtual void s100_sout_w(address_space &space, offs_t offset, uint8_t data) { }
+	virtual uint8_t s100_sinp_r(offs_t offset) { return 0xff; }
+	virtual void s100_sout_w(offs_t offset, uint8_t data) { }
 
 	// configuration access
 	virtual void s100_phlda_w(int state) { }
@@ -159,11 +159,11 @@ public:
 
 	void add_card(device_s100_card_interface *card);
 
-	DECLARE_READ8_MEMBER( smemr_r );
-	DECLARE_WRITE8_MEMBER( mwrt_w );
+	uint8_t smemr_r(offs_t offset);
+	void mwrt_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER( sinp_r );
-	DECLARE_WRITE8_MEMBER( sout_w );
+	uint8_t sinp_r(offs_t offset);
+	void sout_w(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_write_irq(state); }
 	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_write_nmi(state); }

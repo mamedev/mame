@@ -108,7 +108,7 @@ READ8_MEMBER( bw2_state::read )
 		data = m_ram->pointer()[offset];
 	}
 
-	return m_exp->cd_r(space, offset, data, ram2, ram3, ram4, ram5, ram6);
+	return m_exp->cd_r(offset, data, ram2, ram3, ram4, ram5, ram6);
 }
 
 
@@ -159,7 +159,7 @@ WRITE8_MEMBER( bw2_state::write )
 		m_ram->pointer()[offset] = data;
 	}
 
-	m_exp->cd_w(space, offset, data, ram2, ram3, ram4, ram5, ram6);
+	m_exp->cd_w(offset, data, ram2, ram3, ram4, ram5, ram6);
 }
 
 

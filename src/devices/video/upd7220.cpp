@@ -1448,7 +1448,7 @@ void upd7220_device::continue_command()
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( upd7220_device::read )
+uint8_t upd7220_device::read(offs_t offset)
 {
 	uint8_t data;
 
@@ -1479,7 +1479,7 @@ READ8_MEMBER( upd7220_device::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( upd7220_device::write )
+void upd7220_device::write(offs_t offset, uint8_t data)
 {
 	if (offset & 1)
 	{
@@ -1502,7 +1502,7 @@ WRITE8_MEMBER( upd7220_device::write )
 //  dack_r -
 //-------------------------------------------------
 
-READ8_MEMBER( upd7220_device::dack_r )
+uint8_t upd7220_device::dack_r()
 {
 	return 0;
 }
@@ -1512,7 +1512,7 @@ READ8_MEMBER( upd7220_device::dack_r )
 //  dack_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( upd7220_device::dack_w )
+void upd7220_device::dack_w(uint8_t data)
 {
 }
 

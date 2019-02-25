@@ -10,7 +10,6 @@
 #ifndef NLLISTS_H_
 #define NLLISTS_H_
 
-#include "netlist_types.h"
 #include "nl_config.h"
 #include "plib/pchrono.h"
 #include "plib/plists.h"
@@ -21,6 +20,8 @@
 #include <mutex>
 #include <thread>
 #include <utility>
+
+#include "nltypes.h"
 
 // ----------------------------------------------------------------------------------------
 // timed queue

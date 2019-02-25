@@ -41,15 +41,17 @@
 #define USE_ALIGNED_OPTIMIZATIONS (0)
 #endif
 
+#define USE_ALIGNED_ALLOCATION (USE_ALIGNED_OPTIMIZATIONS)
+#define USE_ALIGNED_HINTS      (USE_ALIGNED_OPTIMIZATIONS)
 /*
  * Standard alignment macros
  */
 
-#define PALIGN_CACHELINE		(64)
-#define PALIGN_VECTOROPT		(32)
+#define PALIGN_CACHELINE        (64)
+#define PALIGN_VECTOROPT        (8)
 
-#define PALIGNAS_CACHELINE()	PALIGNAS(PALIGN_CACHELINE)
-#define PALIGNAS_VECTOROPT()	PALIGNAS(PALIGN_VECTOROPT)
+#define PALIGNAS_CACHELINE()    PALIGNAS(PALIGN_CACHELINE)
+#define PALIGNAS_VECTOROPT()    PALIGNAS(PALIGN_VECTOROPT)
 
 /* Breaks mame build on windows due to -Wattribute */
 #if defined(_WIN32) && defined(__GNUC__)

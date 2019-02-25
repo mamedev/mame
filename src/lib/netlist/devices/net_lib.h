@@ -85,16 +85,16 @@
 
 #include "nld_log.h"
 
-#include "../macro/nlm_cd4xxx.h"
-#include "../macro/nlm_opamp.h"
-#include "../macro/nlm_other.h"
-#include "../macro/nlm_ttl74xx.h"
+#include "netlist/macro/nlm_cd4xxx.h"
+#include "netlist/macro/nlm_opamp.h"
+#include "netlist/macro/nlm_other.h"
+#include "netlist/macro/nlm_ttl74xx.h"
 
-#include "../analog/nld_bjt.h"
-#include "../analog/nld_fourterm.h"
-#include "../analog/nld_opamps.h"
-#include "../analog/nld_switches.h"
-#include "../analog/nld_twoterm.h"
+#include "netlist/analog/nld_bjt.h"
+#include "netlist/analog/nld_fourterm.h"
+#include "netlist/analog/nld_opamps.h"
+#include "netlist/analog/nld_switches.h"
+#include "netlist/analog/nld_twoterm.h"
 
 #include "nld_legacy.h"
 #endif

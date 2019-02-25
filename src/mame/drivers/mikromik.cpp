@@ -123,7 +123,7 @@ READ8_MEMBER( mm1_state::read )
 			break;
 
 		case 7:
-			data = m_hgdc->read(space, offset & 0x01);
+			data = m_hgdc->read(offset & 0x01);
 			break;
 		}
 	}
@@ -192,7 +192,7 @@ WRITE8_MEMBER( mm1_state::write )
 			break;
 
 		case 7:
-			m_hgdc->write(space, offset & 0x01, data);
+			m_hgdc->write(offset & 0x01, data);
 			break;
 		}
 	}

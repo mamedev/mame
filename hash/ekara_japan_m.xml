@@ -54,7 +54,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="mc0006">
 		<description>KSM Mini Volume 2 (Japan) (MC0006-KSM)</description>
 		<year>2003</year>
@@ -64,7 +64,7 @@
 				<rom name="mc0006-ksm.u1" size="0x080000" crc="6d3c8c02" sha1="568a0e156a2189156149578277b6d615fe4e157f" offset="0" />
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="mc0012">
 		<description>Artist Mini Volume 7 (untranslated artist) (Japan) (MC0012-ATM)</description>
@@ -87,7 +87,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="mc0014">
 		<description>Artist Mini Volume 8 (BoA) (Japan) (MC0014-ATM)</description>
 		<year>2003</year>
@@ -97,6 +97,6 @@
 				<rom name="mc0014-atm.u1" size="0x080000" crc="170e02af" sha1="02b38146db7d74727f7dccf6dcc3d004979210a1" offset="0" />
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 </softwarelist>

@@ -6,7 +6,7 @@
  */
 
 #include "nld_74193.h"
-#include "../nl_base.h"
+#include "netlist/nl_base.h"
 
 namespace netlist
 {
@@ -87,7 +87,7 @@ namespace netlist
 	}
 
 	// FIXME: Timing
-	static constexpr netlist_time delay[4] =
+	static constexpr const netlist_time delay[4] =
 	{
 			NLTIME_FROM_NS(40),
 			NLTIME_FROM_NS(40),
@@ -139,7 +139,7 @@ namespace netlist
 		m_CARRYQ.push(tCarry, NLTIME_FROM_NS(20)); //FIXME timing
 	}
 
-	NETLIB_DEVICE_IMPL(74193, 	 "TTL_74193", "+A,+B,+C,+D,+CLEAR,+LOADQ,+CU,+CD")
+	NETLIB_DEVICE_IMPL(74193,    "TTL_74193", "+A,+B,+C,+D,+CLEAR,+LOADQ,+CU,+CD")
 	NETLIB_DEVICE_IMPL(74193_dip, "TTL_74193_DIP", "")
 
 	} //namespace devices

@@ -9,6 +9,7 @@
 
 #include "pstring.h"
 #include "ptypes.h"
+#include "putil.h"
 
 #include <limits>
 
@@ -34,7 +35,6 @@ struct ptype_traits_base
 template <>
 struct ptype_traits_base<bool>
 {
-	static unsigned int cast(bool &x) { return static_cast<unsigned int>(x); }
 	static unsigned int cast(const bool &x) { return static_cast<unsigned int>(x); }
 	static const bool is_signed = std::numeric_limits<bool>::is_signed;
 	static const char *size_spec() { return ""; }

@@ -231,8 +231,8 @@ READ16_MEMBER( buddha_device::ide_0_interrupt_r )
 
 	data = m_ide_0_interrupt << 15;
 
-//	if (VERBOSE)
-//		logerror("ide_0_interrupt_r %04x [mask = %04x]\n", data, mem_mask);
+//  if (VERBOSE)
+//      logerror("ide_0_interrupt_r %04x [mask = %04x]\n", data, mem_mask);
 
 	return data;
 }
@@ -243,8 +243,8 @@ READ16_MEMBER( buddha_device::ide_1_interrupt_r )
 
 	data = m_ide_1_interrupt << 15;
 
-//	if (VERBOSE)
-//		logerror("ide_1_interrupt_r %04x [mask = %04x]\n", data, mem_mask);
+//  if (VERBOSE)
+//      logerror("ide_1_interrupt_r %04x [mask = %04x]\n", data, mem_mask);
 
 	return data;
 }
