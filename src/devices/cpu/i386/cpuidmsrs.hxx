@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Ville Linde, Barry Rodewald, Carl, Philip Bennett, Samuele Zannoli
 
 uint64_t pentium_device::opcode_rdmsr(bool &valid_msr)
 {
@@ -253,8 +255,10 @@ void athlonxp_device::opcode_cpuid()
 
 uint64_t athlonxp_device::opcode_rdmsr(bool &valid_msr)
 {
+	uint64_t ret;
 	uint32_t offset = REG32(ECX);
 
+	ret = 0;
 	switch (offset)
 	{
 		case 0x10: // TSC
@@ -265,6 +269,7 @@ uint64_t athlonxp_device::opcode_rdmsr(bool &valid_msr)
 			// 7-0   MTRRCapVCnt - Number of variable range MTRRs (8)
 			// 8     MtrrCapFix  - Fixed range MTRRs available (1)
 			// 10    MtrrCapWc   - Write combining memory type available (1)
+			ret = 0x508;
 			break;
 		case 0x17b: // MCG_CTL
 			break;
@@ -361,7 +366,7 @@ uint64_t athlonxp_device::opcode_rdmsr(bool &valid_msr)
 			break;
 	}
 	valid_msr = true;
-	return 0;
+	return ret;
 }
 
 void athlonxp_device::opcode_wrmsr(uint64_t data, bool &valid_msr)

@@ -45,12 +45,14 @@ void i386_device::i486_cpuid()             // Opcode 0x0F A2
 void i386_device::i486_invd()              // Opcode 0x0f 08
 {
 	// TODO: manage the cache if present
+	opcode_invd();
 	CYCLES(CYCLES_INVD);
 }
 
 void i386_device::i486_wbinvd()            // Opcode 0x0f 09
 {
 	// TODO: manage the cache if present
+	opcode_wbinvd();
 }
 
 void i386_device::i486_cmpxchg_rm8_r8()    // Opcode 0x0f b0
