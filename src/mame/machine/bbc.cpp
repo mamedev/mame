@@ -360,12 +360,12 @@ READ8_MEMBER(bbc_state::bbcm_tube_r)
 	if (m_acccon_itu)
 	{
 		/* internal Tube */
-		if (m_intube) data = m_intube->host_r(space, offset);
+		if (m_intube) data = m_intube->host_r(offset);
 	}
 	else
 	{
 		/* external Tube */
-		if (m_extube) data = m_extube->host_r(space, offset);
+		if (m_extube) data = m_extube->host_r(offset);
 	}
 
 	return data;
@@ -376,12 +376,12 @@ WRITE8_MEMBER(bbc_state::bbcm_tube_w)
 	if (m_acccon_itu)
 	{
 		/* internal Tube */
-		if (m_intube) m_intube->host_w(space, offset, data);
+		if (m_intube) m_intube->host_w(offset, data);
 	}
 	else
 	{
 		/* external Tube */
-		if (m_extube) m_extube->host_w(space, offset, data);
+		if (m_extube) m_extube->host_w(offset, data);
 	}
 }
 

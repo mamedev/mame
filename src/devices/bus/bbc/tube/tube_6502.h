@@ -52,11 +52,11 @@ protected:
 
 	void add_common_devices(machine_config &config);
 
-	virtual DECLARE_READ8_MEMBER( host_r ) override;
-	virtual DECLARE_WRITE8_MEMBER( host_w ) override;
+	virtual uint8_t host_r(offs_t offset) override;
+	virtual void host_w(offs_t offset, uint8_t data) override;
 
-	virtual DECLARE_READ8_MEMBER( tube_r );
-	virtual DECLARE_WRITE8_MEMBER( tube_w );
+	virtual uint8_t tube_r(offs_t offset);
+	virtual void tube_w(offs_t offset, uint8_t data);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<address_map_bank_device> m_bankdev;
