@@ -21786,7 +21786,8 @@ manxttc                         // 1995.11 Manx T.T. (Revision C)
 motoraid                        // 1997.10 Motor Raid Twin
 motoraiddx                      // 1997.10 Motor Raid DX
 overrev                         // 1997.09 Over Rev (Revision A)
-overrevb                        // 1997.09 Over Rev (Revision B)
+overrevb                        // 1997.09 Over Rev (Revision B))
+overrevba                       // 1997.09 Over Rev (Revision A)
 pltkids                         // 1999.03 Pilot Kids (Revision A)
 pltkidsa                        // 1999.03 Pilot Kids
 rascot2                         // 1997.?? Royal Ascot II
@@ -21799,6 +21800,7 @@ skisuprg                        // 1996.12 Sega Ski Super G
 skytargt                        // 1995.10 Sky Target
 srallyc                         // 1995.02 Sega Rally Championship TWIN (Revision C)
 srallycb                        // 1995.02 Sega Rally Championship TWIN (Revision B)
+srallycc                        // 1995.02 Sega Rally Championship TWIN (Revision A)
 srallycdx                       // 1995.02 Sega Rally Championship DX (Revision A)
 srallycdxa                      // 1995.02 Sega Rally Championship DX
 stcc                            // 1996.09 Sega Touring Car Championship
