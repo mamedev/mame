@@ -590,7 +590,7 @@ READ8_MEMBER( portfolio_state::mem_r )
 		case CCM_A:
 			if (LOG) logerror("%s %s CCM0 read %05x\n", machine().time().as_string(), machine().describe_context(), offset & 0x1ffff);
 
-			data = m_ccm->nrdi_r(space, offset & 0x1ffff);
+			data = m_ccm->nrdi_r(offset & 0x1ffff);
 			break;
 
 		case CCM_B:
@@ -607,7 +607,7 @@ READ8_MEMBER( portfolio_state::mem_r )
 		data = m_rom[offset & 0x3ffff];
 	}
 
-	data = m_exp->nrdi_r(space, offset, data, iom, bcom, ncc1);
+	data = m_exp->nrdi_r(offset, data, iom, bcom, ncc1);
 
 	return data;
 }
@@ -638,7 +638,7 @@ WRITE8_MEMBER( portfolio_state::mem_w )
 		case CCM_A:
 			if (LOG) logerror("%s %s CCM0 write %05x:%02x\n", machine().time().as_string(), machine().describe_context(), offset & 0x1ffff, data);
 
-			m_ccm->nwri_w(space, offset & 0x1ffff, data);
+			m_ccm->nwri_w(offset & 0x1ffff, data);
 			break;
 
 		case CCM_B:
@@ -647,7 +647,7 @@ WRITE8_MEMBER( portfolio_state::mem_w )
 		}
 	}
 
-	m_exp->nwri_w(space, offset, data, iom, bcom, ncc1);
+	m_exp->nwri_w(offset, data, iom, bcom, ncc1);
 }
 
 
@@ -703,7 +703,7 @@ READ8_MEMBER( portfolio_state::io_r )
 		}
 	}
 
-	data = m_exp->nrdi_r(space, offset, data, iom, bcom, ncc1);
+	data = m_exp->nrdi_r(offset, data, iom, bcom, ncc1);
 
 	return data;
 }
@@ -767,7 +767,7 @@ WRITE8_MEMBER( portfolio_state::io_w )
 		}
 	}
 
-	m_exp->nwri_w(space, offset, data, iom, bcom, ncc1);
+	m_exp->nwri_w(offset, data, iom, bcom, ncc1);
 }
 
 

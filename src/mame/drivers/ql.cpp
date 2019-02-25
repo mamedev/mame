@@ -254,15 +254,15 @@ READ8_MEMBER( ql_state::read )
 	}
 	if (m_qimi_enabled)
 	{
-		data = m_qimi->read(space, offset, data);
+		data = m_qimi->read(offset, data);
 	}
 
 	m_cart->romoeh_w(cart_romoeh);
-	data = m_cart->read(space, offset & 0x7fff, data);
+	data = m_cart->read(offset & 0x7fff, data);
 	m_cart->romoeh_w(0);
 
 	m_exp->romoeh_w(exp_romoeh);
-	data = m_exp->read(space, offset, data);
+	data = m_exp->read(offset, data);
 	m_exp->romoeh_w(0);
 
 	return data;
@@ -309,14 +309,14 @@ WRITE8_MEMBER( ql_state::write )
 	}
 	if (m_qimi_enabled)
 	{
-		m_qimi->write(space, offset, data);
+		m_qimi->write(offset, data);
 	}
 
 	m_cart->romoeh_w(0);
-	m_cart->write(space, offset & 0x7fff, data);
+	m_cart->write(offset & 0x7fff, data);
 
 	m_exp->romoeh_w(0);
-	m_exp->write(space, offset, data);
+	m_exp->write(offset, data);
 }
 
 
