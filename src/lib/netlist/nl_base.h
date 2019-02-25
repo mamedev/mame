@@ -13,9 +13,6 @@
 #error "nl_base.h included. Please correct."
 #endif
 
-#include <unordered_map>
-#include <vector>
-
 #include "plib/palloc.h" // owned_ptr
 #include "plib/pdynlib.h"
 #include "plib/pfmtlog.h"
@@ -28,6 +25,9 @@
 #include "nl_lists.h"
 #include "nltypes.h"
 #include "plib/ptime.h"
+
+#include <unordered_map>
+#include <vector>
 
 //============================================================
 //  MACROS / New Syntax

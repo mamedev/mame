@@ -36,15 +36,17 @@ namespace plib
 		}
 
 		pmatrix2d(std::size_t N, std::size_t M)
-		: m_N(N), m_M(M), m_stride((M+stride_size-1) & ~(stride_size-1)), m_v(N * m_stride)
+		: m_N(N), m_M(M)
 		{
+			m_stride = ((M + stride_size-1) / stride_size) * stride_size;
+			m_v.resize(N * m_stride);
 		}
 
 		void resize(std::size_t N, std::size_t M)
 		{
 			m_N = N;
 			m_M = M;
-			m_stride = (M+stride_size-1) & ~(stride_size-1);
+			m_stride = ((M + stride_size-1) / stride_size) * stride_size;
 			m_v.resize(N * m_stride);
 		}
 

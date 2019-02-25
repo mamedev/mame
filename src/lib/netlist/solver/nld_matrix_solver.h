@@ -172,14 +172,19 @@ namespace devices
 		{
 			const std::size_t iN = this->m_nets.size();
 
-			std::size_t max_col = 0;
+			std::size_t max_count = 0;
+			std::size_t max_rail = 0;
 			for (std::size_t k = 0; k < iN; k++)
-				max_col = std::max(max_col, m_terms[k]->count());
+			{
+				max_count = std::max(max_count, m_terms[k]->count());
+				max_rail = std::max(max_rail, m_terms[k]->m_railstart);
+			}
 
-			m_gtn.resize(iN, max_col);
-			m_gon.resize(iN, max_col);
-			m_Idrn.resize(iN, max_col);
-			m_connected_net_Vn.resize(iN, max_col);
+			m_mat_ptr.resize(iN, max_rail+1);
+			m_gtn.resize(iN, max_count);
+			m_gon.resize(iN, max_count);
+			m_Idrn.resize(iN, max_count);
+			m_connected_net_Vn.resize(iN, max_count);
 
 			for (std::size_t k = 0; k < iN; k++)
 			{
@@ -199,7 +204,7 @@ namespace devices
 			for (std::size_t k = 0; k < N; k++)
 			{
 				auto *net = m_terms[k].get();
-				auto **tcr_r = tcr[k].data();
+				auto **tcr_r = &(tcr[k][0]);
 
 				const std::size_t term_count = net->count();
 				const std::size_t railstart = net->m_railstart;
@@ -243,6 +248,7 @@ namespace devices
 		plib::pmatrix2d<nl_double, aligned_alloc<nl_double>>        m_gon;
 		plib::pmatrix2d<nl_double, aligned_alloc<nl_double>>        m_gtn;
 		plib::pmatrix2d<nl_double, aligned_alloc<nl_double>>        m_Idrn;
+		plib::pmatrix2d<nl_double *, aligned_alloc<nl_double *>>    m_mat_ptr;
 		plib::pmatrix2d<nl_double *, aligned_alloc<nl_double *>>    m_connected_net_Vn;
 
 		plib::pmatrix2d<nl_double>          m_test;

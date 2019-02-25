@@ -28,8 +28,6 @@ namespace plib {
 	//  Memory allocation
 	//============================================================
 
-	static constexpr bool is_pow2(std::size_t v) noexcept { return !(v & (v-1)); }
-
 #if (USE_ALIGNED_ALLOCATION)
 	static inline void *paligned_alloc( size_t alignment, size_t size )
 	{
@@ -52,24 +50,6 @@ namespace plib {
 		free(ptr);
 	}
 
-	static constexpr bool is_pow2(std::size_t v) noexcept { return !(v & (v-1)); }
-
-	template <typename T, std::size_t ALIGN>
-	inline C14CONSTEXPR T *assume_aligned_ptr(T *p) noexcept
-	{
-		static_assert(ALIGN >= alignof(T), "Alignment must be greater or equal to alignof(T)");
-		static_assert(is_pow2(ALIGN), "Alignment must be a power of 2");
-		//auto t = reinterpret_cast<std::uintptr_t>(p);
-		//if (t & (ALIGN-1))
-		//  printf("alignment error!");
-		return reinterpret_cast<T *>(__builtin_assume_aligned(p, ALIGN));
-	}
-
-	template <typename T, std::size_t ALIGN>
-	inline C14CONSTEXPR const T *assume_aligned_ptr(const T *p) noexcept
-	{
-		return reinterpret_cast<const T *>(__builtin_assume_aligned(p, ALIGN));
-	}
 #else
 	static inline void *paligned_alloc( size_t alignment, size_t size )
 	{
@@ -84,7 +64,7 @@ namespace plib {
 #endif
 
 	template <typename T, std::size_t ALIGN>
-	inline C14CONSTEXPR T *assume_aligned_ptr(T *p) noexcept
+	/*inline */ C14CONSTEXPR T *assume_aligned_ptr(T *p) noexcept
 	{
 		static_assert(ALIGN >= alignof(T), "Alignment must be greater or equal to alignof(T)");
 		static_assert(is_pow2(ALIGN), "Alignment must be a power of 2");
@@ -99,7 +79,7 @@ namespace plib {
 	}
 
 	template <typename T, std::size_t ALIGN>
-	inline C14CONSTEXPR const T *assume_aligned_ptr(const T *p) noexcept
+	constexpr const T *assume_aligned_ptr(const T *p) noexcept
 	{
 		static_assert(ALIGN >= alignof(T), "Alignment must be greater or equal to alignof(T)");
 		static_assert(is_pow2(ALIGN), "Alignment must be a power of 2");
@@ -272,7 +252,7 @@ namespace plib {
 	{
 	public:
 		using value_type = T;
-		static constexpr const std::size_t align_size = (USE_ALIGNED_ALLOCATION) ? ALIGN : alignof(std::max_align_t);
+		static constexpr const std::size_t align_size = ALIGN;
 
 		static_assert(align_size >= alignof(T) && (align_size % alignof(T)) == 0,
 			"ALIGN must be greater than alignof(T) and a multiple");
@@ -340,20 +320,30 @@ namespace plib {
 	struct align_traits
 	{
 		static constexpr const std::size_t align_size = alignof(std::max_align_t);
+		static constexpr const std::size_t value_size = sizeof(typename T::value_type);
+#if 0
 		static constexpr const std::size_t stride_size =
-			(sizeof(T) % align_size == 0 ? 1 //T is a multiple of align_size
-			 : (align_size % sizeof(T) != 0 ? align_size   // align_size is not a multiple of T
-			 : align_size / sizeof(T)));
+			((value_size % align_size) == 0 ? 1 //T is a multiple of align_size
+			 : ((align_size % value_size) != 0 ? align_size   // align_size is not a multiple of T
+			 : align_size / value_size));
+#else
+		static constexpr const std::size_t stride_size = lcm(align_size, value_size) / value_size;
+#endif
 	};
 
 	template <typename T>
 	struct align_traits<T, typename std::enable_if<has_align<T>::value, void>::type>
 	{
 		static constexpr const std::size_t align_size = T::align_size;
+		static constexpr const std::size_t value_size = sizeof(typename T::value_type);
+#if 0
 		static constexpr const std::size_t stride_size =
-			(sizeof(T) % align_size == 0 ? 1 //T is a multiple of align_size
-			 : (align_size % sizeof(T) != 0 ? align_size   // align_size is not a multiple of T
-			 : align_size / sizeof(T)));
+			((value_size % align_size) == 0 ? 1 //T is a multiple of align_size
+			 : ((align_size % value_size) != 0 ? align_size   // align_size is not a multiple of T
+			 : align_size / value_size));
+#else
+		static constexpr const std::size_t stride_size = lcm(align_size, value_size) / value_size;
+#endif
 	};
 
 	//============================================================
@@ -377,11 +367,11 @@ namespace plib {
 
 		C14CONSTEXPR reference operator[](size_type i) noexcept
 		{
-			return assume_aligned_ptr<T, ALIGN>(&((*this)[0]))[i];
+			return assume_aligned_ptr<T, ALIGN>(&(base::operator[](0)))[i];
 		}
 		constexpr const_reference operator[](size_type i) const noexcept
 		{
-			return assume_aligned_ptr<T, ALIGN>(&((*this)[0]))[i];
+			return assume_aligned_ptr<T, ALIGN>(&(base::operator[](0)))[i];
 		}
 
 		pointer data() noexcept { return assume_aligned_ptr<T, ALIGN>(base::data()); }
