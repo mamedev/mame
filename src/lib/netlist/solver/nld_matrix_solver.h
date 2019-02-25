@@ -182,7 +182,7 @@ namespace devices
 
 			m_mat_ptr.resize(iN, max_rail+1);
 			m_gtn.resize(iN, max_count);
-			m_gon.resize(iN, max_count);
+			m_gonn.resize(iN, max_count);
 			m_Idrn.resize(iN, max_count);
 			m_connected_net_Vn.resize(iN, max_count);
 
@@ -192,7 +192,7 @@ namespace devices
 
 				for (std::size_t i = 0; i < count; i++)
 				{
-					m_terms[k]->terms()[i]->set_ptrs(&m_gtn[k][i], &m_gon[k][i], &m_Idrn[k][i]);
+					m_terms[k]->terms()[i]->set_ptrs(&m_gtn[k][i], &m_gonn[k][i], &m_Idrn[k][i]);
 					m_connected_net_Vn[k][i] = m_terms[k]->terms()[i]->otherterm()->net().Q_Analog_state_ptr();
 				}
 			}
@@ -208,13 +208,13 @@ namespace devices
 
 				const std::size_t term_count = net->count();
 				const std::size_t railstart = net->m_railstart;
-				const auto &go = m_gon[k];
+				const auto &go = m_gonn[k];
 				const auto &gt = m_gtn[k];
 				const auto &Idr = m_Idrn[k];
 				const auto &cnV = m_connected_net_Vn[k];
 
 				for (std::size_t i = 0; i < railstart; i++)
-					*tcr_r[i]       -= go[i];
+					*tcr_r[i]       += go[i];
 
 				typename FT::value_type gtot_t = 0.0;
 				typename FT::value_type RHS_t = 0.0;
@@ -232,7 +232,7 @@ namespace devices
 
 				for (std::size_t i = railstart; i < term_count; i++)
 				{
-					RHS_t += (/*m_Idr[i]*/ + go[i] * *cnV[i]);
+					RHS_t += (/*m_Idr[i]*/ (- go[i]) * *cnV[i]);
 				}
 
 				RHS[k] = RHS_t;
@@ -245,7 +245,7 @@ namespace devices
 		template <typename T>
 		using aligned_alloc = plib::aligned_allocator<T, PALIGN_VECTOROPT>;
 
-		plib::pmatrix2d<nl_double, aligned_alloc<nl_double>>        m_gon;
+		plib::pmatrix2d<nl_double, aligned_alloc<nl_double>>        m_gonn;
 		plib::pmatrix2d<nl_double, aligned_alloc<nl_double>>        m_gtn;
 		plib::pmatrix2d<nl_double, aligned_alloc<nl_double>>        m_Idrn;
 		plib::pmatrix2d<nl_double *, aligned_alloc<nl_double *>>    m_mat_ptr;
@@ -335,11 +335,11 @@ namespace devices
 				Ak[k] = akk;
 			}
 
-			const float_type * const go = m_gon[k];
+			const float_type * const go = m_gonn[k];
 			int * net_other = terms->m_connected_net_idx.data();
 
 			for (std::size_t i = 0; i < railstart; i++)
-				Ak[net_other[i]] -= go[i];
+				Ak[net_other[i]] += go[i];
 		}
 	}
 
@@ -356,7 +356,7 @@ namespace devices
 			float_type rhsk_b = 0.0;
 
 			const std::size_t terms_count = m_terms[k]->count();
-			const float_type * const go = m_gon[k];
+			const float_type * const go = m_gonn[k];
 			const float_type * const Idr = m_Idrn[k];
 			const float_type * const * other_cur_analog = m_connected_net_Vn[k];
 
@@ -365,7 +365,7 @@ namespace devices
 
 			for (std::size_t i = m_terms[k]->m_railstart; i < terms_count; i++)
 				//rhsk = rhsk + go[i] * terms[i]->m_otherterm->net().as_analog().Q_Analog();
-				rhsk_b = rhsk_b + go[i] * *other_cur_analog[i];
+				rhsk_b = rhsk_b - go[i] * *other_cur_analog[i];
 
 			child.RHS(k) = rhsk_a + rhsk_b;
 		}

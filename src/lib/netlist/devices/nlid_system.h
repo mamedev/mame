@@ -280,8 +280,8 @@ namespace netlist
 
 		NETLIB_RESETI()
 		{
-			m_RIN.set(1.0 / m_p_RIN(),0,0);
-			m_ROUT.set(1.0 / m_p_ROUT(),0,0);
+			m_RIN.set_G_V_I(1.0 / m_p_RIN(),0,0);
+			m_ROUT.set_G_V_I(1.0 / m_p_ROUT(),0,0);
 		}
 
 		NETLIB_UPDATEI()

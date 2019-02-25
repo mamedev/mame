@@ -601,17 +601,17 @@ namespace netlist
 
 		nl_double operator ()() const  NL_NOEXCEPT;
 
-		void set(const nl_double G) noexcept
+		void set_conductivity(const nl_double G) noexcept
 		{
-			set(G,G, 0.0);
+			set_go_gt_I(-G, G, 0.0);
 		}
 
-		void set(const nl_double GO, const nl_double GT)  noexcept
+		void set_go_gt(const nl_double GO, const nl_double GT)  noexcept
 		{
-			set(GO, GT, 0.0);
+			set_go_gt_I(GO, GT, 0.0);
 		}
 
-		void set(const nl_double GO, const nl_double GT, const nl_double I)  noexcept
+		void set_go_gt_I(const nl_double GO, const nl_double GT, const nl_double I)  noexcept
 		{
 			if (m_go1 != nullptr)
 			{

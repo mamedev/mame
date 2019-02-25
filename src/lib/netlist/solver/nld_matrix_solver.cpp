@@ -357,7 +357,7 @@ namespace devices
 			state().save(*this, m_terms[k]->m_h_n_m_1, this->name(), "m_h_n_m_1." + num);
 
 			// FIXME: This shouldn't be necessary, recalculate on each entry ...
-			state().save(*this, m_gon[k],"GO" + num, this->name(), m_terms[k]->count());
+			state().save(*this, m_gonn[k],"GO" + num, this->name(), m_terms[k]->count());
 			state().save(*this, m_gtn[k],"GT" + num, this->name(), m_terms[k]->count());
 			state().save(*this, m_Idrn[k],"IDR" + num, this->name(), m_terms[k]->count());
 		}
