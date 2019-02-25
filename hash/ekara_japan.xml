@@ -143,7 +143,7 @@
 	74  *EC0074-JPM  J-Pop Mix Volume 37
 	75  *EC0075-JPM  J-Pop Mix Volume 38
 	76  *EC0076-JPM  J-Pop Mix Volume 39
-	77  *EC0077-ATS  Artist Selection Volume 15 - unknown artist (should be Vol 15? sales sheet lists 5?)
+	77  *EC0077-ATS  Artist Selection Volume 15 - Keisuke Kuwata (should be Vol 15? sales sheet lists 5?)
 	78  *EC0078-JPM  J-Pop Mix Volume 40
 	79  *EC0079-ETZ  ETZ 2 (custom presentation etc.)
 	80  *EC0080-JPM  J-Pop Mix Volume 41
@@ -890,7 +890,7 @@
 	</software>
 
 	<software name="ec0077">
-		<description>Artist Selection Volume 15 - unknown artist (Japan) (EC0077-ATS)</description>
+		<description>Artist Selection Volume 15 - Keisuke Kuwata (Japan) (EC0077-ATS)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
