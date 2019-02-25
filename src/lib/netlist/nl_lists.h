@@ -10,10 +10,12 @@
 #ifndef NLLISTS_H_
 #define NLLISTS_H_
 
-#include "nl_config.h"
 #include "plib/pchrono.h"
 #include "plib/plists.h"
 #include "plib/ptypes.h"
+
+#include "nl_config.h"
+#include "nltypes.h"
 
 #include <algorithm>
 #include <atomic>
@@ -21,7 +23,6 @@
 #include <thread>
 #include <utility>
 
-#include "nltypes.h"
 
 // ----------------------------------------------------------------------------------------
 // timed queue

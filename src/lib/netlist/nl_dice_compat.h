@@ -29,6 +29,7 @@ sed -e 's/#define \(.*\)"\(.*\)"[ \t]*,[ \t]*\(.*\)/NET_ALIAS(\1,\2.\3)/' src/ma
 #include "analog/nld_twoterm.h"
 
 #include <cmath>
+
 #endif
 
 

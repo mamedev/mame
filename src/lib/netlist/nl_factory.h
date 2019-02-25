@@ -9,11 +9,11 @@
 #ifndef NLFACTORY_H_
 #define NLFACTORY_H_
 
-#include <vector>
-
 #include "nltypes.h"
 #include "plib/palloc.h"
 #include "plib/ptypes.h"
+
+#include <vector>
 
 #define NETLIB_DEVICE_IMPL_ALIAS(p_alias, chip, p_name, p_def_param) \
 	NETLIB_DEVICE_IMPL_BASE(devices, p_alias, chip, p_name, p_def_param) \

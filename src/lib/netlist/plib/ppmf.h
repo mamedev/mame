@@ -8,10 +8,10 @@
 #ifndef PPMF_H_
 #define PPMF_H_
 
+#include "pconfig.h"
+
 #include <cstdint>
 #include <utility>
-
-#include "pconfig.h"
 
 /*
  *

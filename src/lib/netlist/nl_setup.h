@@ -8,11 +8,6 @@
 #ifndef NLSETUP_H_
 #define NLSETUP_H_
 
-#include <memory>
-#include <stack>
-#include <unordered_map>
-#include <vector>
-
 #include "plib/pparser.h"
 #include "plib/pstream.h"
 #include "plib/pstring.h"
@@ -21,6 +16,12 @@
 #include "nl_config.h"
 #include "nl_factory.h"
 #include "nltypes.h"
+
+#include <memory>
+#include <stack>
+#include <unordered_map>
+#include <vector>
+
 
 //============================================================
 //  MACROS / inline netlist definitions

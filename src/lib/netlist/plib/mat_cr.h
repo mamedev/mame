@@ -10,13 +10,6 @@
 #ifndef MAT_CR_H_
 #define MAT_CR_H_
 
-#include <algorithm>
-#include <array>
-#include <cmath>
-#include <cstdlib>
-#include <type_traits>
-#include <vector>
-
 #include "palloc.h"
 #include "parray.h"
 #include "pconfig.h"
@@ -24,6 +17,13 @@
 #include "pstate.h"
 #include "ptypes.h"
 #include "putil.h"
+
+#include <algorithm>
+#include <array>
+#include <cmath>
+#include <cstdlib>
+#include <type_traits>
+#include <vector>
 
 namespace plib
 {

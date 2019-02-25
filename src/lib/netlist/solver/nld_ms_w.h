@@ -40,11 +40,11 @@
 #ifndef NLD_MS_W_H_
 #define NLD_MS_W_H_
 
-#include <algorithm>
-
 #include "nld_matrix_solver.h"
 #include "nld_solver.h"
 #include "plib/vector_ops.h"
+
+#include <algorithm>
 
 namespace netlist
 {

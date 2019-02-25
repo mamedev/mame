@@ -7,9 +7,6 @@
 #ifndef PSTREAM_H_
 #define PSTREAM_H_
 
-#include <array>
-#include <type_traits>
-#include <vector>
 
 #include "palloc.h"
 #include "pconfig.h"
@@ -19,13 +16,15 @@
 
 #define USE_CSTREAM (0)
 
+#include <array>
+#include <type_traits>
+#include <vector>
 
 #if USE_CSTREAM
 #include <fstream>
 //#include <strstream>
 #include <sstream>
 #endif
-
 
 namespace plib {
 

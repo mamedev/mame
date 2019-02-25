@@ -537,7 +537,6 @@ namespace devices
 		}
 	}
 
-
 	void matrix_solver_t::add_term(std::size_t k, terminal_t *term)
 	{
 		if (term->otherterm()->net().isRailNet())
@@ -603,8 +602,6 @@ namespace devices
 		return std::max(netlist_time::from_double(new_solver_timestep), netlist_time::quantum() * 2);
 	}
 
-
-
 	void matrix_solver_t::log_stats()
 	{
 		if (this->m_stat_calculations != 0 && this->m_stat_vsolver_calls && this->m_params.m_log_stats)
@@ -625,7 +622,6 @@ namespace devices
 					static_cast<double>(this->m_iterative_total) / static_cast<double>(this->m_stat_calculations));
 		}
 	}
-
 
 } // namespace devices
 } // namespace netlist

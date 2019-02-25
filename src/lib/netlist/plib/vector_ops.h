@@ -10,11 +10,11 @@
 #ifndef PLIB_VECTOR_OPS_H_
 #define PLIB_VECTOR_OPS_H_
 
+#include "pconfig.h"
+
 #include <algorithm>
 #include <cmath>
 #include <type_traits>
-
-#include "pconfig.h"
 
 #if !defined(__clang__) && !defined(_MSC_VER) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 6))
 #if !(__GNUC__ > 7 || (__GNUC__ == 7 && __GNUC_MINOR__ > 3))

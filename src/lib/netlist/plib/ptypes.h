@@ -8,11 +8,11 @@
 #ifndef PTYPES_H_
 #define PTYPES_H_
 
+#include "pconfig.h"
+
 #include <limits>
 #include <string>
 #include <type_traits>
-
-#include "pconfig.h"
 
 #define COPYASSIGNMOVE(name, def)  \
 		name(const name &) = def; \

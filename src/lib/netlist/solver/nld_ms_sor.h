@@ -12,10 +12,10 @@
 #ifndef NLD_MS_SOR_H_
 #define NLD_MS_SOR_H_
 
-#include <algorithm>
-
 #include "nld_ms_direct.h"
 #include "nld_solver.h"
+
+#include <algorithm>
 
 namespace netlist
 {

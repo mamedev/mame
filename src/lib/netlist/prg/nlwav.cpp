@@ -6,9 +6,8 @@
 #include "plib/pmain.h"
 #include "plib/ppmf.h"
 #include "plib/pstream.h"
+
 #include <cstring>
-
-
 
 /* From: https://ffmpeg.org/pipermail/ffmpeg-devel/2007-October/038122.html
  * The most compatible way to make a wav header for unknown length is to put

@@ -7,6 +7,8 @@
 #ifndef PSTRING_H_
 #define PSTRING_H_
 
+#include "ptypes.h"
+
 #include <cstring>
 #include <exception>
 #include <iterator>
@@ -14,8 +16,6 @@
 #include <stdexcept>
 #include <string>
 #include <type_traits>
-
-#include "ptypes.h"
 
 // ----------------------------------------------------------------------------------------
 // pstring: semi-immutable strings ...

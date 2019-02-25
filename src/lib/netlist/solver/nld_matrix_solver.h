@@ -85,7 +85,6 @@ namespace devices
 		analog_net_t *m_proxied_net; // only for proxy nets in analog input logic
 	};
 
-
 	class matrix_solver_t : public device_t
 	{
 	public:
