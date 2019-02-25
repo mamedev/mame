@@ -2,7 +2,22 @@
 // copyright-holders:Sandro Ronco
 /***************************************************************************
 
-    Schachcomputer SC 2
+Schachcomputer SC 2 driver
+
+VEB Mikroelektronik's 2nd chess computer. The chess program is based on
+Fidelity Chess Challenger 10.
+
+keypad legend:
+
+R - Rückstellen (reset)
+K - Programmstufen (level)
+W - Figurenwahl (white/black)
+P - Problemeingabe (problem mode)
+T - Tonabschaltung (sound on/off)
+L - Löschen (clear)
+Q - Quittierung (enter)
+
+Fidelity CC10 synonyms: RE, LV, RV, PB, ♪, CL, EN
 
 ****************************************************************************/
 
@@ -33,9 +48,11 @@ public:
 
 	void sc2(machine_config &config);
 
+	// Rückstellen is also tied to CPU RESET
+	DECLARE_INPUT_CHANGED_MEMBER(reset_button) { m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE); }
+
 protected:
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -54,7 +71,6 @@ private:
 	uint8_t m_digit_data;
 
 	void sc2_update_display();
-	DECLARE_READ8_MEMBER(pio_port_a_r);
 	DECLARE_READ8_MEMBER(pio_port_b_r);
 	DECLARE_WRITE8_MEMBER(pio_port_a_w);
 	DECLARE_WRITE8_MEMBER(pio_port_b_w);
@@ -67,16 +83,13 @@ void sc2_state::machine_start()
 	m_digits.resolve();
 	m_leds.resolve();
 
-	save_item(NAME(m_kp_matrix));
-	save_item(NAME(m_led_selected));
-	save_item(NAME(m_digit_data));
-}
-
-void sc2_state::machine_reset()
-{
 	m_kp_matrix = 0;
 	m_led_selected = 0;
 	m_digit_data = 0;
+
+	save_item(NAME(m_kp_matrix));
+	save_item(NAME(m_led_selected));
+	save_item(NAME(m_digit_data));
 }
 
 
@@ -109,14 +122,12 @@ void sc2_state::sc2_io(address_map &map)
 
 void sc2_state::sc2_update_display()
 {
-	uint8_t digit_data = bitswap<8>(m_digit_data,7,0,1,2,3,4,5,6) & 0x7f;
-
 	// latch display data
 	for (int i = 0; i < 4; i++)
 	{
 		if (!BIT(m_led_selected, i))
 		{
-			m_digits[i] = digit_data;
+			m_digits[i] = m_digit_data & 0x7f;
 
 			// schach/matt leds
 			if (i < 2)
@@ -125,14 +136,9 @@ void sc2_state::sc2_update_display()
 	}
 }
 
-READ8_MEMBER( sc2_state::pio_port_a_r )
-{
-	return m_digit_data;
-}
-
 READ8_MEMBER( sc2_state::pio_port_b_r )
 {
-	uint8_t data = m_led_selected & 0x0f;
+	uint8_t data = 0x0f;
 
 	// read keypad matrix
 	for (int i = 0; i < 4; i++)
@@ -144,11 +150,13 @@ READ8_MEMBER( sc2_state::pio_port_b_r )
 
 WRITE8_MEMBER( sc2_state::pio_port_a_w )
 {
-	m_digit_data = data;
+	// digit segment data
+	m_digit_data = bitswap<8>(data,7,0,1,2,3,4,5,6);
 }
 
 WRITE8_MEMBER( sc2_state::pio_port_b_w )
 {
+	// d0-d3: keypad mux(active high), led mux(active low)
 	if (data != 0xf1 && data != 0xf2 && data != 0xf4 && data != 0xf8)
 	{
 		m_led_selected = data;
@@ -165,8 +173,8 @@ static INPUT_PORTS_START( sc2 )
 	PORT_START("LINE1")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("T") PORT_CODE(KEYCODE_T)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("L") PORT_CODE(KEYCODE_L) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Q") PORT_CODE(KEYCODE_Q) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("L") PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Q") PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD)
 
 	PORT_START("LINE2")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("A1") PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_CODE(KEYCODE_A)
@@ -183,7 +191,7 @@ static INPUT_PORTS_START( sc2 )
 	PORT_START("LINE4")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("K") PORT_CODE(KEYCODE_K)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("W") PORT_CODE(KEYCODE_W)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("R") PORT_CODE(KEYCODE_R)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("R") PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, sc2_state, reset_button, nullptr)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("P") PORT_CODE(KEYCODE_O)
 INPUT_PORTS_END
 
@@ -202,7 +210,6 @@ void sc2_state::sc2(machine_config &config)
 
 	/* devices */
 	Z80PIO(config, m_pio, 9.8304_MHz_XTAL/4);
-	m_pio->in_pa_callback().set(FUNC(sc2_state::pio_port_a_r));
 	m_pio->out_pa_callback().set(FUNC(sc2_state::pio_port_a_w));
 	m_pio->in_pb_callback().set(FUNC(sc2_state::pio_port_b_r));
 	m_pio->out_pb_callback().set(FUNC(sc2_state::pio_port_b_w));

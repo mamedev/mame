@@ -2,19 +2,24 @@
 // copyright-holders:Sandro Ronco
 /***************************************************************************
 
-Schachcomputer SC 1
+Schachcomputer SC 1 driver
 
-ToDo:
-- speaker
-- LEDs
+VEB Mikroelektronik's 1st chess computer. It was canceled before wide release.
+
+TODO:
+- speaker, it's very noisy if hooked up as it is now, missing enable-bit?
+  it still toggles matrix d1 if T(tone off) is pressed
+- LEDs, they're not on digit d7
 - 7seg sometimes flashes
+- setting level doesn't work? game should boot with "PS 1"
 
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/z80pio.h"
-#include "sound/spkrdev.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "speaker.h"
 
 #include "sc1.lh"
@@ -29,9 +34,10 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_pio(*this, "z80pio"),
-		m_speaker(*this, "speaker"),
+		m_dac(*this, "dac"),
 		m_keypad(*this, "LINE%u", 1),
-		m_digits(*this, "digit%u", 0U)
+		m_digits(*this, "digit%u", 0U),
+		m_leds(*this, "led%u", 0U)
 	{ }
 
 	void sc1(machine_config &config);
@@ -42,24 +48,28 @@ protected:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<z80pio_device> m_pio;
-	required_device<speaker_sound_device> m_speaker;
+	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<8> m_keypad;
+
 	output_finder<4> m_digits;
+	output_finder<2> m_leds;
 
 	void sc1_io(address_map &map);
 	void sc1_mem(address_map &map);
 
 	uint8_t m_matrix;
 
-	DECLARE_WRITE8_MEMBER( matrix_w );
-	DECLARE_WRITE8_MEMBER( pio_port_a_w );
-	DECLARE_READ8_MEMBER( pio_port_b_r );
+	DECLARE_WRITE8_MEMBER(matrix_w);
+	DECLARE_WRITE8_MEMBER(pio_port_a_w);
+	DECLARE_READ8_MEMBER(pio_port_b_r);
 };
 
 void sc1_state::machine_start()
 {
 	m_digits.resolve();
+	m_leds.resolve();
 
+	m_matrix = 0;
 	save_item(NAME(m_matrix));
 }
 
@@ -69,8 +79,9 @@ void sc1_state::machine_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER( sc1_state::pio_port_a_w )
+WRITE8_MEMBER(sc1_state::pio_port_a_w)
 {
+	// digit segment data
 	uint8_t digit = bitswap<8>(data,3,4,6,0,1,2,7,5) & 0x7f;
 
 	if (m_matrix & 0x04)
@@ -90,12 +101,16 @@ WRITE8_MEMBER( sc1_state::pio_port_a_w )
 
 ***************************************************************************/
 
-WRITE8_MEMBER( sc1_state::matrix_w )
+WRITE8_MEMBER(sc1_state::matrix_w)
 {
+	// d1: speaker out
+	//m_dac->write(BIT(data, 1));
+
+	// keypad/led mux
 	m_matrix = data;
 }
 
-READ8_MEMBER( sc1_state::pio_port_b_r )
+READ8_MEMBER(sc1_state::pio_port_b_r)
 {
 	uint8_t data = 0;
 
@@ -157,7 +172,7 @@ static INPUT_PORTS_START( sc1 )
 
 	PORT_START("LINE8")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("T") PORT_CODE(KEYCODE_T)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("C") PORT_CODE(KEYCODE_C) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("C") PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE)
 INPUT_PORTS_END
 
 
@@ -179,8 +194,9 @@ void sc1_state::sc1(machine_config &config)
 	m_pio->in_pb_callback().set(FUNC(sc1_state::pio_port_b_r));
 
 	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
+	SPEAKER(config, "speaker").front_center();
+	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
 
@@ -197,4 +213,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY                       FULLNAME               FLAGS
-COMP( 1981, sc1,  0,      0,      sc1,     sc1,   sc1_state, empty_init, "VEB Mikroelektronik Erfurt", "Schachcomputer SC 1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1981, sc1,  0,      0,      sc1,     sc1,   sc1_state, empty_init, "VEB Mikroelektronik Erfurt", "Schachcomputer SC 1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
