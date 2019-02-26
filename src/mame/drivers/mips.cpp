@@ -499,8 +499,7 @@ static void mips_scsi_devices(device_slot_interface &device)
 void rx2030_state::rx2030(machine_config &config)
 {
 	R2000A(config, m_cpu, 33.333_MHz_XTAL / 2, 32768, 32768);
-	// TODO: FPU disabled until properly emulated
-	//m_cpu->set_fpurev(mips1_device_base::MIPS_R2010A);
+	m_cpu->set_fpu(mips1_device_base::MIPS_R2010A);
 	m_cpu->in_brcond<0>().set([]() { return 1; }); // writeback complete
 
 	V50(config, m_iop, 20_MHz_XTAL / 2);
@@ -772,7 +771,7 @@ void rx3230_state::rx3230(machine_config &config)
 {
 	R3000A(config, m_cpu, 50_MHz_XTAL / 2, 32768, 32768);
 	m_cpu->set_addrmap(AS_PROGRAM, &rx3230_state::rx3230_map);
-	//m_cpu->set_fpurev(mips1_device_base::MIPS_R3010A);
+	m_cpu->set_fpu(mips1_device_base::MIPS_R3010A);
 	m_cpu->in_brcond<0>().set([]() { return 1; }); // writeback complete
 
 	// 32 SIMM slots, 8-128MB memory, banks of 8 1MB or 4MB SIMMs
