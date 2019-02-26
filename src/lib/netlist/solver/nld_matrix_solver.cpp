@@ -227,7 +227,7 @@ namespace devices
 			for (std::size_t i = 0; i < term->count(); i++)
 				//FIXME: this is weird
 				if (other[i] != -1)
-					other[i] = get_net_idx(&term->terms()[i]->otherterm()->net());
+					other[i] = get_net_idx(&term->terms()[i]->connected_terminal()->net());
 		}
 	}
 
@@ -491,7 +491,7 @@ namespace devices
 
 		for (std::size_t i = 0; i < term->count(); i++)
 		{
-			auto col = get_net_idx(&term->terms()[i]->otherterm()->net());
+			auto col = get_net_idx(&term->terms()[i]->connected_terminal()->net());
 			if (col != -1)
 			{
 				if (col==row) col = diag;
@@ -519,7 +519,7 @@ namespace devices
 			auto &term = m_terms[row];
 			for (std::size_t i = 0; i < term->count(); i++)
 			{
-				auto col = get_net_idx(&term->terms()[i]->otherterm()->net());
+				auto col = get_net_idx(&term->terms()[i]->connected_terminal()->net());
 				if (col >= 0)
 				{
 					auto colu = static_cast<std::size_t>(col);
@@ -539,13 +539,13 @@ namespace devices
 
 	void matrix_solver_t::add_term(std::size_t k, terminal_t *term)
 	{
-		if (term->otherterm()->net().isRailNet())
+		if (term->connected_terminal()->net().isRailNet())
 		{
 			m_rails_temp[k]->add(term, -1, false);
 		}
 		else
 		{
-			int ot = get_net_idx(&term->otherterm()->net());
+			int ot = get_net_idx(&term->connected_terminal()->net());
 			if (ot>=0)
 			{
 				m_terms[k]->add(term, ot, true);

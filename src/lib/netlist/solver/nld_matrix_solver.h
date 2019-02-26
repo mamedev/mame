@@ -192,7 +192,7 @@ namespace devices
 				for (std::size_t i = 0; i < count; i++)
 				{
 					m_terms[k]->terms()[i]->set_ptrs(&m_gtn[k][i], &m_gonn[k][i], &m_Idrn[k][i]);
-					m_connected_net_Vn[k][i] = m_terms[k]->terms()[i]->otherterm()->net().Q_Analog_state_ptr();
+					m_connected_net_Vn[k][i] = m_terms[k]->terms()[i]->connected_terminal()->net().Q_Analog_state_ptr();
 				}
 			}
 		}

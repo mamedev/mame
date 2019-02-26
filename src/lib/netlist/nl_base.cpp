@@ -856,7 +856,7 @@ terminal_t::terminal_t(core_device_t &dev, const pstring &aname, terminal_t *oth
 , m_Idr1(nullptr)
 , m_go1(nullptr)
 , m_gt1(nullptr)
-, m_otherterm(otherterm)
+, m_connected_terminal(otherterm)
 {
 	state().setup().register_term(*this);
 }

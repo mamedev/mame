@@ -626,14 +626,14 @@ namespace netlist
 
 		void set_ptrs(nl_double *gt, nl_double *go, nl_double *Idr) noexcept;
 
-		terminal_t *otherterm() const noexcept { return m_otherterm; }
+		terminal_t *connected_terminal() const noexcept { return m_connected_terminal; }
 	private:
 
 		nl_double *m_Idr1; // drive current
 		nl_double *m_go1;  // conductance for Voltage from other term
 		nl_double *m_gt1;  // conductance for total conductance
 
-		terminal_t *m_otherterm;
+		terminal_t *m_connected_terminal;
 
 	};
 

@@ -187,30 +187,36 @@ namespace devices
 	struct net_splitter
 	{
 
-		bool already_processed(analog_net_t *n)
+		bool already_processed(const analog_net_t &n) const
 		{
-			if (n->isRailNet())
+			/* no need to process rail nets - these are known variables */
+			if (n.isRailNet())
 				return true;
+			/* if it's already processed - no need to continue */
 			for (auto & grp : groups)
-				if (plib::container::contains(grp, n))
+				if (plib::container::contains(grp, &n))
 					return true;
 			return false;
 		}
 
-		void process_net(analog_net_t *n)
+		void process_net(analog_net_t &n)
 		{
-			if (n->num_cons() == 0)
+			/* ignore empty nets. FIXME: print a warning message */
+			if (n.num_cons() == 0)
 				return;
 			/* add the net */
-			groups.back().push_back(n);
-			for (auto &p : n->core_terms())
+			groups.back().push_back(&n);
+			/* process all terminals connected to this net */
+			for (auto &term : n.core_terms())
 			{
-				if (p->is_type(detail::terminal_type::TERMINAL))
+				/* only process analog terminals */
+				if (term->is_type(detail::terminal_type::TERMINAL))
 				{
-					auto *pt = static_cast<terminal_t *>(p);
-					analog_net_t *other_net = &pt->otherterm()->net();
-					if (!already_processed(other_net))
-						process_net(other_net);
+					auto *pt = static_cast<terminal_t *>(term);
+					/* check the connected terminal */
+					analog_net_t &connected_net = pt->connected_terminal()->net();
+					if (!already_processed(connected_net))
+						process_net(connected_net);
 				}
 			}
 		}
@@ -224,7 +230,7 @@ namespace devices
 				{
 					netlist.log().debug("   ==> not a rail net\n");
 					/* Must be an analog net */
-					auto *n = static_cast<analog_net_t *>(net.get());
+					auto &n = *static_cast<analog_net_t *>(net.get());
 					if (!already_processed(n))
 					{
 						groups.emplace_back(analog_net_t::list_t());
