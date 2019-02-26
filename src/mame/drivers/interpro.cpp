@@ -976,7 +976,7 @@ void turquoise_state::turquoise(machine_config &config)
 	// cbus bus
 	CBUS_BUS(config, m_bus, 0);
 	m_bus->set_main_space(m_maincpu, 0);
-	m_bus->set_io_space(m_maincpu, 0);
+	m_bus->set_io_space(m_maincpu, 1);
 
 	m_bus->out_irq0_cb().set(m_ioga, FUNC(interpro_ioga_device::ir3_w));
 	m_bus->out_irq1_cb().set(m_ioga, FUNC(interpro_ioga_device::ir4_w));
@@ -1070,7 +1070,7 @@ void cbus_sapphire_state::cbus_sapphire(machine_config &config)
 	// cbus bus
 	CBUS_BUS(config, m_bus, 0);
 	m_bus->set_main_space(m_maincpu, 0);
-	m_bus->set_io_space(m_maincpu, 0);
+	m_bus->set_io_space(m_maincpu, 1);
 
 	m_bus->out_irq0_cb().set(m_ioga, FUNC(interpro_ioga_device::ir3_w));
 	m_bus->out_irq1_cb().set(m_ioga, FUNC(interpro_ioga_device::ir4_w));
