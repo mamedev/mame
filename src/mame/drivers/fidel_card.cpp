@@ -9,8 +9,8 @@ Fidelity electronic card games
 - Advanced Bridge Challenger (UBC)
 - Voice Bridge Challenger (VBRC)
 - Bridge Challenger III (English,*French) (BV3)
-- *Gin & Cribbage Challenger
-- *Skat Challenger
+- *Gin & Cribbage Challenger (GIN)
+- *Skat Challenger (SKT)
 
 *: not dumped yet
 
@@ -282,8 +282,8 @@ READ8_MEMBER(card_state::mcu_p2_r)
 
 READ_LINE_MEMBER(card_state::mcu_t0_r)
 {
-	// T0: card scanner light sensor (1=white, 0=black/none)
-	return m_barcode & 1;
+	// T0: card scanner light sensor (1=white/none, 0=black)
+	return ~m_barcode & 1;
 }
 
 
@@ -328,8 +328,7 @@ INPUT_CHANGED_MEMBER(card_state::start_scan)
 		code >>= 1;
 	}
 
-	// leftshift to give it a lead-in of white
-	m_barcode = ~(m_barcode << 12);
+	m_barcode <<= 1; // in case next barcode_shift timeout is soon
 }
 
 INPUT_CHANGED_MEMBER(card_state::reset_button)
