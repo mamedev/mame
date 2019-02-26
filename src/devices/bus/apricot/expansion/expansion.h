@@ -89,15 +89,13 @@ class apricot_expansion_bus_device : public device_t
 {
 public:
 	// construction/destruction
-	template <typename T, typename U>
-	apricot_expansion_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag, U &&iop_tag)
-		: apricot_expansion_bus_device(mconfig, tag, owner, (uint32_t)0)
-	{
-		m_cpu.set_tag(std::forward<T>(cpu_tag));
-		m_iop.set_tag(std::forward<U>(iop_tag));
-	}
 	apricot_expansion_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~apricot_expansion_bus_device();
+
+	template <typename T> void set_program_space(T &&tag, int spacenum) { m_program.set_tag(std::forward<T>(tag), spacenum); }
+	template <typename T> void set_io_space(T &&tag, int spacenum) { m_io.set_tag(std::forward<T>(tag), spacenum); }
+	template <typename T> void set_program_iop_space(T &&tag, int spacenum) { m_program_iop.set_tag(std::forward<T>(tag), spacenum); }
+	template <typename T> void set_io_iop_space(T &&tag, int spacenum) { m_io_iop.set_tag(std::forward<T>(tag), spacenum); }
 
 	auto dma1() { return m_dma1_handler.bind(); }
 	auto dma2() { return m_dma2_handler.bind(); }
@@ -129,16 +127,15 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 private:
 	simple_list<device_apricot_expansion_card_interface> m_dev;
 
 	// address spaces we have access to
-	address_space *m_program;
-	address_space *m_io;
-	address_space *m_program_iop;
-	address_space *m_io_iop;
+	required_address_space m_program;
+	required_address_space m_io;
+	optional_address_space m_program_iop;
+	optional_address_space m_io_iop;
 
 	devcb_write_line m_dma1_handler;
 	devcb_write_line m_dma2_handler;
@@ -146,10 +143,6 @@ private:
 	devcb_write_line m_ext2_handler;
 	devcb_write_line m_int2_handler;
 	devcb_write_line m_int3_handler;
-
-	// configuration
-	required_device<cpu_device> m_cpu;
-	required_device<cpu_device> m_iop;
 };
 
 // device type definition

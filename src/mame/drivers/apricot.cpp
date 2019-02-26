@@ -473,7 +473,11 @@ void apricot_state::apricot(machine_config &config)
 	SOFTWARE_LIST(config, "flop_list").set_original("apricot_flop");
 
 	// expansion bus
-	APRICOT_EXPANSION_BUS(config, m_exp, m_cpu, m_iop);
+	APRICOT_EXPANSION_BUS(config, m_exp, 0);
+	m_exp->set_program_space(m_cpu, AS_PROGRAM);
+	m_exp->set_io_space(m_cpu, AS_IO);
+	m_exp->set_program_iop_space(m_iop, AS_PROGRAM);
+	m_exp->set_io_iop_space(m_iop, AS_IO);
 	m_exp->int2().set(m_pic, FUNC(pic8259_device::ir2_w));
 	m_exp->int3().set(m_pic, FUNC(pic8259_device::ir3_w));
 	APRICOT_EXPANSION_SLOT(config, "exp:1", apricot_expansion_cards, nullptr);
