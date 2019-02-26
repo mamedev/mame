@@ -69,7 +69,7 @@ public:
 
 	spectrum_expansion_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 0);
 
-	void set_io_space(address_space *io);
+	template <typename T> void set_io_space(T &&tag, int spacenum) { m_io.set_tag(std::forward<T>(tag), spacenum); }
 
 	// callbacks
 	auto irq_handler() { return m_irq_handler.bind(); }
@@ -83,10 +83,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_irq_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_nmi_handler(state); }
 
-	address_space *m_io;
+	required_address_space m_io;
 
 protected:
 	// device-level overrides
+	virtual void device_config_complete() override;
 	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;

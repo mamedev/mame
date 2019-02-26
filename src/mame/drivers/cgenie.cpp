@@ -306,10 +306,6 @@ void cgenie_state::machine_start()
 {
 	// setup ram
 	m_maincpu->space(AS_PROGRAM).install_ram(0x4000, 0x4000 + m_ram->size() - 1, m_ram->pointer());
-
-	// setup expansion bus
-	m_exp->set_program_space(&m_maincpu->space(AS_PROGRAM));
-	m_exp->set_io_space(&m_maincpu->space(AS_IO));
 }
 
 
@@ -480,6 +476,8 @@ void cgenie_state::cgenie(machine_config &config)
 
 	// cartridge expansion slot
 	CG_EXP_SLOT(config, m_exp);
+	m_exp->set_program_space(m_maincpu, AS_PROGRAM);
+	m_exp->set_io_space(m_maincpu, AS_IO);
 	m_exp->int_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	// parallel slot

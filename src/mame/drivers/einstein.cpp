@@ -390,10 +390,6 @@ void einstein_state::machine_start()
 	m_bank1->configure_entry(1, m_bios->base());
 	m_bank2->set_base(m_ram->pointer());
 	m_bank3->set_base(m_ram->pointer() + 0x8000);
-
-	// setup expansion slot
-	m_pipe->set_program_space(&m_maincpu->space(AS_PROGRAM));
-	m_pipe->set_io_space(&m_maincpu->space(AS_IO));
 }
 
 void einstein_state::machine_reset()
@@ -674,6 +670,8 @@ void einstein_state::einstein(machine_config &config)
 
 	// tatung pipe connector
 	TATUNG_PIPE(config, m_pipe, XTAL_X002 / 2, tatung_pipe_cards, nullptr);
+	m_pipe->set_program_space(m_maincpu, AS_PROGRAM);
+	m_pipe->set_io_space(m_maincpu, AS_IO);
 	m_pipe->nmi_handler().set_inputline(IC_I001, INPUT_LINE_NMI);
 
 	// user port

@@ -518,7 +518,7 @@ MACHINE_CONFIG_START(vtech2_state::laser350)
 	m_cassette->set_formats(vtech2_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_PLAY);
 
-	VTECH_IOEXP_SLOT(config, "io");
+	VTECH_IOEXP_SLOT(config, "io").set_io_space(m_maincpu, AS_IO);
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "vtech_cart")
