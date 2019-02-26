@@ -381,21 +381,26 @@ void deco_bac06_device::deco_bac06_pf_draw_bootleg(bitmap_ind16 &bitmap,const re
 
 WRITE16_MEMBER( deco_bac06_device::pf_control_0_w )
 {
-	int oldRegister0 = m_pf_control_0[0];
+	int old_register0 = m_pf_control_0[0];
 
 	offset &= 3;
 
 	COMBINE_DATA(&m_pf_control_0[offset]);
 
-	bool dirtyAll = false;
+	bool dirty_all = false;
 	if (offset==0)
 	{
-		if ((oldRegister0&2)!=(m_pf_control_0[offset]&2))
+		if ((old_register0&2)!=(m_pf_control_0[offset]&2))
 		{
-			int flip = m_flip_screen;
-			set_flip_screen(flip^1);
-			set_flip_screen(flip); // Hack to force tilemap.cpp mappings_update() to be called
-			dirtyAll = true;
+			// The tilemap has changed from row major to column major or vice versa.
+			// Must force an update of the mapping.
+			m_pf8x8_tilemap[0]->mark_mapping_dirty();
+			m_pf8x8_tilemap[1]->mark_mapping_dirty();
+			m_pf8x8_tilemap[2]->mark_mapping_dirty();
+			m_pf16x16_tilemap[0]->mark_mapping_dirty();
+			m_pf16x16_tilemap[1]->mark_mapping_dirty();
+			m_pf16x16_tilemap[2]->mark_mapping_dirty();
+			dirty_all = true;
 		}
 	}
 	if (offset==2)
@@ -408,12 +413,12 @@ WRITE16_MEMBER( deco_bac06_device::pf_control_0_w )
 			if (strcmp(machine().system().name,"stadhero"))
 				printf("tilemap ram bank change to %d\n", newbank&1);
 
-			dirtyAll = true;
+			dirty_all = true;
 			m_rambank = newbank&1;
 		}
 	}
 	
-	if (dirtyAll)
+	if (dirty_all)
 	{
 		m_pf8x8_tilemap[0]->mark_all_dirty();
 		m_pf8x8_tilemap[1]->mark_all_dirty();
