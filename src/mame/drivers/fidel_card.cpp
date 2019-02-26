@@ -14,8 +14,10 @@ Fidelity electronic card games
 
 *: not dumped yet
 
+NOTE: The card scanner is simulated, but the player is kind of forced to cheat
+and has to peek at the card before it is scanned.
+
 TODO:
-- the barcode card scanner isn't implemented, the games can't be considered working without it
 - Z80 WAIT pin is not fully emulated, affecting VBRC speech busy state
 
 *******************************************************************************
@@ -184,6 +186,10 @@ public:
 	void bv3(machine_config &config);
 
 	virtual DECLARE_INPUT_CHANGED_MEMBER(reset_button) override;
+	DECLARE_INPUT_CHANGED_MEMBER(start_scan);
+
+protected:
+	virtual void machine_start() override;
 
 private:
 	void brc_base(machine_config &config);
@@ -196,13 +202,26 @@ private:
 	void main_map(address_map &map);
 	void main_io(address_map &map);
 
+	TIMER_DEVICE_CALLBACK_MEMBER(barcode_shift) { m_barcode >>= 1; }
+	u32 m_barcode;
+
 	// I/O handlers
 	void prepare_display();
 	DECLARE_WRITE8_MEMBER(speech_w);
 	DECLARE_WRITE8_MEMBER(mcu_p1_w);
 	DECLARE_READ8_MEMBER(mcu_p2_r);
+	DECLARE_READ_LINE_MEMBER(mcu_t0_r);
 	template<int P> void ioexp_port_w(uint8_t data);
 };
+
+void card_state::machine_start()
+{
+	fidelbase_state::machine_start();
+
+	// zerofill/register for savestates
+	m_barcode = 0;
+	save_item(NAME(m_barcode));
+}
 
 
 /******************************************************************************
@@ -261,6 +280,12 @@ READ8_MEMBER(card_state::mcu_p2_r)
 	return (m_i8243->p2_r() & 0x0f) | (read_inputs(8) << 4 ^ 0xf0);
 }
 
+READ_LINE_MEMBER(card_state::mcu_t0_r)
+{
+	// T0: card scanner light sensor (1=white, 0=black/none)
+	return m_barcode & 1;
+}
+
 
 
 /******************************************************************************
@@ -287,6 +312,26 @@ void card_state::main_io(address_map &map)
     Input Ports
 ******************************************************************************/
 
+INPUT_CHANGED_MEMBER(card_state::start_scan)
+{
+	if (!newval)
+		return;
+
+	u32 code = (u32)(uintptr_t)param;
+	m_barcode = 0;
+
+	// convert bits to rising/falling edges
+	for (int i = 0; i < 9; i++)
+	{
+		m_barcode <<= 2;
+		m_barcode |= 1 << (code & 1);
+		code >>= 1;
+	}
+
+	// leftshift to give it a lead-in of white
+	m_barcode = ~(m_barcode << 12);
+}
+
 INPUT_CHANGED_MEMBER(card_state::reset_button)
 {
 	// reset button is directly wired to maincpu/mcu RESET pins
@@ -294,16 +339,72 @@ INPUT_CHANGED_MEMBER(card_state::reset_button)
 	m_mcu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static INPUT_PORTS_START( common )
-	PORT_START("RESET") // is not on matrix IN.7 d0
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, reset_button, nullptr) PORT_NAME("RE")
+static INPUT_PORTS_START( scanner )
+	PORT_START("CARDS.0") // spades + jokers
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, start_scan, 0x6f) PORT_NAME("Scan: Spades A")
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, start_scan, 0x47) PORT_NAME("Scan: Spades 2")
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, start_scan, 0xd7) PORT_NAME("Scan: Spades 3")
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, start_scan, 0x27) PORT_NAME("Scan: Spades 4")
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, start_scan, 0xb7) PORT_NAME("Scan: Spades 5")
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, start_scan, 0x77) PORT_NAME("Scan: Spades 6")
+	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, start_scan, 0xe7) PORT_NAME("Scan: Spades 7")
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, start_scan, 0x0f) PORT_NAME("Scan: Spades 8")
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, start_scan, 0x9f) PORT_NAME("Scan: Spades 9")
+	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, start_scan, 0x5f) PORT_NAME("Scan: Spades 10")
+	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, start_scan, 0xcf) PORT_NAME("Scan: Spades J")
+	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, start_scan, 0x3f) PORT_NAME("Scan: Spades Q")
+	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, start_scan, 0xaf) PORT_NAME("Scan: Spades K")
+	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, start_scan, 0xf9) PORT_NAME("Scan: Joker 1")
+	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, start_scan, 0xed) PORT_NAME("Scan: Joker 2")
 
-	PORT_START("BARCODE")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_NAME("Card Scanner")
+	PORT_START("CARDS.1") // hearts
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, start_scan, 0x7b) PORT_NAME("Scan: Hearts A")
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, start_scan, 0x53) PORT_NAME("Scan: Hearts 2")
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, start_scan, 0xc3) PORT_NAME("Scan: Hearts 3")
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, start_scan, 0x33) PORT_NAME("Scan: Hearts 4")
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, start_scan, 0xa3) PORT_NAME("Scan: Hearts 5")
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, start_scan, 0x63) PORT_NAME("Scan: Hearts 6")
+	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, start_scan, 0xf3) PORT_NAME("Scan: Hearts 7")
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, start_scan, 0x1b) PORT_NAME("Scan: Hearts 8")
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, start_scan, 0x8b) PORT_NAME("Scan: Hearts 9")
+	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, start_scan, 0x4b) PORT_NAME("Scan: Hearts 10")
+	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, start_scan, 0xdb) PORT_NAME("Scan: Hearts J")
+	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, start_scan, 0x2b) PORT_NAME("Scan: Hearts Q")
+	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, start_scan, 0xbb) PORT_NAME("Scan: Hearts K")
+
+	PORT_START("CARDS.2") // clubs
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, start_scan, 0x69) PORT_NAME("Scan: Clubs A")
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, start_scan, 0x95) PORT_NAME("Scan: Clubs 2")
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, start_scan, 0xd1) PORT_NAME("Scan: Clubs 3")
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, start_scan, 0x93) PORT_NAME("Scan: Clubs 4")
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, start_scan, 0xb1) PORT_NAME("Scan: Clubs 5")
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, start_scan, 0x71) PORT_NAME("Scan: Clubs 6")
+	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, start_scan, 0xe1) PORT_NAME("Scan: Clubs 7")
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, start_scan, 0x87) PORT_NAME("Scan: Clubs 8")
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, start_scan, 0x99) PORT_NAME("Scan: Clubs 9")
+	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, start_scan, 0x59) PORT_NAME("Scan: Clubs 10")
+	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, start_scan, 0xc9) PORT_NAME("Scan: Clubs J")
+	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, start_scan, 0x39) PORT_NAME("Scan: Clubs Q")
+	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, start_scan, 0xa9) PORT_NAME("Scan: Clubs K")
+
+	PORT_START("CARDS.3") // diamonds
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, start_scan, 0x7d) PORT_NAME("Scan: Diamonds A")
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, start_scan, 0x55) PORT_NAME("Scan: Diamonds 2")
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, start_scan, 0xc5) PORT_NAME("Scan: Diamonds 3")
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, start_scan, 0x35) PORT_NAME("Scan: Diamonds 4")
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, start_scan, 0xa5) PORT_NAME("Scan: Diamonds 5")
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, start_scan, 0x65) PORT_NAME("Scan: Diamonds 6")
+	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, start_scan, 0xf5) PORT_NAME("Scan: Diamonds 7")
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, start_scan, 0x1d) PORT_NAME("Scan: Diamonds 8")
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, start_scan, 0x8d) PORT_NAME("Scan: Diamonds 9")
+	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, start_scan, 0x4d) PORT_NAME("Scan: Diamonds 10")
+	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, start_scan, 0xdd) PORT_NAME("Scan: Diamonds J")
+	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, start_scan, 0x2d) PORT_NAME("Scan: Diamonds Q")
+	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, start_scan, 0xbd) PORT_NAME("Scan: Diamonds K")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vbrc )
-	PORT_INCLUDE( common )
+	PORT_INCLUDE( scanner )
 
 	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_NAME("A")
@@ -330,32 +431,35 @@ static INPUT_PORTS_START( vbrc )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_NAME("NT")
 
 	PORT_START("IN.4")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("EN")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("EN")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("SC")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_X) PORT_NAME("PL")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Spades")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Spades")
 
 	PORT_START("IN.5")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_C) PORT_NAME("CL")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("CL")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_D) PORT_NAME("DB")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_V) PORT_NAME("VL")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Hearts")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Hearts")
 
 	PORT_START("IN.6")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_SPACE) PORT_NAME("Speaker")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_B) PORT_NAME("PB")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_NAME("CV")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Diamonds")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Diamonds")
 
 	PORT_START("IN.7")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("BR")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME("DL")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Clubs")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Clubs")
+
+	PORT_START("RESET") // is not on matrix IN.7 d0
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, reset_button, nullptr) PORT_NAME("RE")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( bv3 )
-	PORT_INCLUDE( common )
+	PORT_INCLUDE( scanner )
 
 	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_NAME("Ace")
@@ -382,28 +486,31 @@ static INPUT_PORTS_START( bv3 )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_NAME("No Trump")
 
 	PORT_START("IN.4")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("Yes/Enter")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Yes/Enter")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("No/Pass")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_X) PORT_NAME("Player")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Spades")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Spades")
 
 	PORT_START("IN.5")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_C) PORT_NAME("Clear")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("Clear")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_D) PORT_NAME("Double")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_V) PORT_NAME("Score")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Hearts")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Hearts")
 
 	PORT_START("IN.6")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_SPACE) PORT_NAME("Speaker")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_B) PORT_NAME("Auto")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_NAME("Conv")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Diamonds")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Diamonds")
 
 	PORT_START("IN.7")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Review")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME("Dealer")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Clubs")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Clubs")
+
+	PORT_START("RESET") // is not on matrix IN.7 d0
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, reset_button, nullptr) PORT_NAME("Reset")
 INPUT_PORTS_END
 
 
@@ -425,7 +532,7 @@ void card_state::brc_base(machine_config &config)
 	m_mcu->p2_in_cb().set(FUNC(card_state::mcu_p2_r));
 	m_mcu->p2_out_cb().set(m_i8243, FUNC(i8243_device::p2_w));
 	m_mcu->prog_out_cb().set(m_i8243, FUNC(i8243_device::prog_w));
-	m_mcu->t0_in_cb().set_ioport("BARCODE"); // card scanner
+	m_mcu->t0_in_cb().set(FUNC(card_state::mcu_t0_r));
 
 	// MCU T1 tied to master clock / 4
 	CLOCK(config, "t1_clock", 5_MHz_XTAL/4).signal_handler().set_nop();
@@ -436,6 +543,8 @@ void card_state::brc_base(machine_config &config)
 	m_i8243->p5_out_cb().set(FUNC(card_state::ioexp_port_w<1>));
 	m_i8243->p6_out_cb().set(FUNC(card_state::ioexp_port_w<2>));
 	m_i8243->p7_out_cb().set(FUNC(card_state::ioexp_port_w<3>));
+
+	TIMER(config, "barcode_shift").configure_periodic(FUNC(card_state::barcode_shift), attotime::from_msec(2));
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(card_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_fidel_vbrc);
@@ -520,7 +629,7 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME      PARENT CMP MACHINE  INPUT  STATE       INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1980, vbrc,     0,      0, vbrc,    vbrc,  card_state, empty_init, "Fidelity Electronics", "Voice Bridge Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )
-CONS( 1980, bridgeca, vbrc,   0, ubc,     vbrc,  card_state, empty_init, "Fidelity Electronics", "Advanced Bridge Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )
+CONS( 1980, vbrc,     0,      0, vbrc,    vbrc,  card_state, empty_init, "Fidelity Electronics", "Voice Bridge Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1980, bridgeca, vbrc,   0, ubc,     vbrc,  card_state, empty_init, "Fidelity Electronics", "Advanced Bridge Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 
-CONS( 1982, bridgec3, 0,      0, bv3,     bv3,   card_state, empty_init, "Fidelity Electronics", "Bridge Challenger III (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )
+CONS( 1982, bridgec3, 0,      0, bv3,     bv3,   card_state, empty_init, "Fidelity Electronics", "Bridge Challenger III", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
