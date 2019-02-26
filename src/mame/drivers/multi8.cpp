@@ -566,19 +566,20 @@ void multi8_state::machine_reset()
 	m_mcu_init = 0;
 }
 
-MACHINE_CONFIG_START(multi8_state::multi8)
+void multi8_state::multi8(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(multi8_mem)
-	MCFG_DEVICE_IO_MAP(multi8_io)
+	Z80(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &multi8_state::multi8_mem);
+	m_maincpu->set_addrmap(AS_IO, &multi8_state::multi8_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 200)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(640, 200);
+	screen.set_visarea(0, 320-1, 0, 200-1);
+	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
 	PALETTE(config, m_palette, palette_device::BRG_3BIT);
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_multi8);
@@ -588,8 +589,7 @@ MACHINE_CONFIG_START(multi8_state::multi8)
 	AY8912(config, m_aysnd, 1500000); //unknown clock / divider
 	m_aysnd->port_a_write_callback().set(FUNC(multi8_state::ym2203_porta_w));
 	m_aysnd->add_route(ALL_OUTPUTS, "mono", 0.50);
-	MCFG_DEVICE_ADD("beeper", BEEP, 1200) // guesswork
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
+	BEEP(config, m_beeper, 1200).add_route(ALL_OUTPUTS,"mono",0.50); // guesswork
 
 	/* devices */
 	TIMER(config, "keyboard_timer").configure_periodic(FUNC(multi8_state::keyboard_callback), attotime::from_hz(240/32));
@@ -615,7 +615,7 @@ MACHINE_CONFIG_START(multi8_state::multi8)
 
 	//UPD765A(config, "fdc", false, true);
 	//FLOPPY_CONNECTOR(config, "fdc:0", multi8_floppies, "525hd", floppy_image_device::default_floppy_formats);
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( multi8 )

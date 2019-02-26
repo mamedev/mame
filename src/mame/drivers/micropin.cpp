@@ -298,11 +298,12 @@ void micropin_state::init_micropin()
 {
 }
 
-MACHINE_CONFIG_START(micropin_state::micropin)
+void micropin_state::micropin(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("v1cpu", M6800, XTAL(2'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(micropin_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(micropin_state, irq0_line_hold, 500)
+	M6800(config, m_v1cpu, XTAL(2'000'000) / 2);
+	m_v1cpu->set_addrmap(AS_PROGRAM, &micropin_state::micropin_map);
+	m_v1cpu->set_periodic_int(FUNC(micropin_state::irq0_line_hold), attotime::from_hz(500));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -312,8 +313,7 @@ MACHINE_CONFIG_START(micropin_state::micropin)
 	/* Sound */
 	genpin_audio(config);
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("beeper", BEEP, 387)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	BEEP(config, m_beep, 387).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
 	pia6821_device &pia50(PIA6821(config, "pia50", 0));
@@ -333,20 +333,21 @@ MACHINE_CONFIG_START(micropin_state::micropin)
 	//m_pia51->cb2_handler().set(FUNC(micropin_state::p51cb2_w));
 
 	TIMER(config, "timer_a").configure_periodic(FUNC(micropin_state::timer_a), attotime::from_hz(100));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(micropin_state::pentacup2)
+void micropin_state::pentacup2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("v2cpu", I8085A, 2000000)
-	MCFG_DEVICE_PROGRAM_MAP(pentacup2_map)
-	MCFG_DEVICE_IO_MAP(pentacup2_io)
-	//MCFG_DEVICE_PERIODIC_INT_DRIVER(micropin_state, irq2_line_hold, 50)
+	I8085A(config, m_v2cpu, 2000000);
+	m_v2cpu->set_addrmap(AS_PROGRAM, &micropin_state::pentacup2_map);
+	m_v2cpu->set_addrmap(AS_IO, &micropin_state::pentacup2_io);
+	//m_v2cpu->set_periodic_int(FUNC(micropin_state::irq2_line_hold), attotime::from_hz(50));
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Sound */
 	genpin_audio(config);
-MACHINE_CONFIG_END
+}
 
 /*-------------------------------------------------------------------
 / Pentacup

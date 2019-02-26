@@ -2453,23 +2453,23 @@ READ8_MEMBER(nbmj8688_state::dipsw2_r)
 	return m_nb1413m3->dipsw2_r(space,offset);
 }
 
-MACHINE_CONFIG_START(nbmj8688_state::NBMJDRV_4096)
-
+void nbmj8688_state::NBMJDRV_4096(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 5000000)   /* 5.00 MHz */
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", nbmj8688_state, irq0_line_hold)
+	Z80(config, m_maincpu, 5000000);   /* 5.00 MHz */
+	m_maincpu->set_vblank_int("screen", FUNC(nbmj8688_state::irq0_line_hold));
 
 	NB1413M3(config, m_nb1413m3, 0);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 16, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(nbmj8688_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 256);
+	screen.set_visarea(0, 512-1, 16, 240-1);
+	screen.set_screen_update(FUNC(nbmj8688_state::screen_update));
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(nbmj8688_state::mbmj8688_12bit), 4096);
 
@@ -2487,7 +2487,7 @@ MACHINE_CONFIG_START(nbmj8688_state::NBMJDRV_4096)
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
-MACHINE_CONFIG_END
+}
 
 void nbmj8688_state::NBMJDRV_256(machine_config &config)
 {
@@ -2515,16 +2515,16 @@ void nbmj8688_state::NBMJDRV_65536(machine_config &config)
 
 // --------------------------------------------------------------------------------
 
-MACHINE_CONFIG_START(nbmj8688_state::crystalg)
+void nbmj8688_state::crystalg(machine_config &config)
+{
 	NBMJDRV_256(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(secolove_map)
-	MCFG_DEVICE_IO_MAP(crystalg_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8688_state::secolove_map);
+	m_maincpu->set_addrmap(AS_IO, &nbmj8688_state::crystalg_io_map);
 
 	m_nb1413m3->set_type(NB1413M3_CRYSTALG);
-MACHINE_CONFIG_END
+}
 
 void nbmj8688_state::crystal2(machine_config &config)
 {
@@ -2540,28 +2540,28 @@ void nbmj8688_state::nightlov(machine_config &config)
 	m_nb1413m3->set_type(NB1413M3_NIGHTLOV);
 }
 
-MACHINE_CONFIG_START(nbmj8688_state::apparel)
+void nbmj8688_state::apparel(machine_config &config)
+{
 	NBMJDRV_256(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(secolove_map)
-	MCFG_DEVICE_IO_MAP(secolove_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8688_state::secolove_map);
+	m_maincpu->set_addrmap(AS_IO, &nbmj8688_state::secolove_io_map);
 
 	m_nb1413m3->set_type(NB1413M3_APPAREL);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(nbmj8688_state::mbmj_h12bit)
+void nbmj8688_state::mbmj_h12bit(machine_config &config)
+{
 	NBMJDRV_4096(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(secolove_map)
-	MCFG_DEVICE_IO_MAP(secolove_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8688_state::secolove_map);
+	m_maincpu->set_addrmap(AS_IO, &nbmj8688_state::secolove_io_map);
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(nbmj8688_state,mbmj8688_hybrid_12bit)
-MACHINE_CONFIG_END
+}
 
 void nbmj8688_state::citylove(machine_config &config)
 {
@@ -2585,42 +2585,40 @@ void nbmj8688_state::secolove(machine_config &config)
 }
 
 /*Same as h12bit HW with different sound HW + NMI enable bit*/
-MACHINE_CONFIG_START(nbmj8688_state::barline)
+void nbmj8688_state::barline(machine_config &config)
+{
 	mbmj_h12bit(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(barline_io_map)
+	m_maincpu->set_addrmap(AS_IO, &nbmj8688_state::barline_io_map);
 
 	m_nb1413m3->set_type(NB1413M3_BARLINE);
 
-	MCFG_DEVICE_REPLACE("psg", YM3812, 20000000/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.35)
+	YM3812(config.replace(), "psg", 20000000/8).add_route(ALL_OUTPUTS, "speaker", 0.35);
 
 	config.device_remove("dac");
 	config.device_remove("vref");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(nbmj8688_state::mbmj_p16bit)
+void nbmj8688_state::mbmj_p16bit(machine_config &config)
+{
 	NBMJDRV_65536(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(secolove_map)
-	MCFG_DEVICE_IO_MAP(secolove_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8688_state::secolove_map);
+	m_maincpu->set_addrmap(AS_IO, &nbmj8688_state::secolove_io_map);
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(nbmj8688_state,mbmj8688_pure_16bit)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(nbmj8688_state::mbmj_p16bit_LCD)
-
+void nbmj8688_state::mbmj_p16bit_LCD(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 5000000)   /* 5.00 MHz */
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", nbmj8688_state, irq0_line_hold)
-	MCFG_DEVICE_PROGRAM_MAP(secolove_map)
-	MCFG_DEVICE_IO_MAP(secolove_io_map)
-	MCFG_DEVICE_IO_MAP(p16bit_LCD_io_map)
+	Z80(config, m_maincpu, 5000000);   /* 5.00 MHz */
+	m_maincpu->set_vblank_int("screen", FUNC(nbmj8688_state::irq0_line_hold));
+	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8688_state::secolove_map);
+	m_maincpu->set_addrmap(AS_IO, &nbmj8688_state::p16bit_LCD_io_map);
 
 	NB1413M3(config, m_nb1413m3, 0);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -2629,13 +2627,13 @@ MACHINE_CONFIG_START(nbmj8688_state::mbmj_p16bit_LCD)
 	PALETTE(config, "palette", FUNC(nbmj8688_state::mbmj8688_16bit), 65536);
 	config.set_default_layout(layout_nbmj8688);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 16, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(nbmj8688_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 256);
+	screen.set_visarea(0, 512-1, 16, 240-1);
+	screen.set_screen_update(FUNC(nbmj8688_state::screen_update));
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette_lcd", FUNC(nbmj8688_state::mbmj8688_lcd), 2);
 
@@ -2677,7 +2675,7 @@ MACHINE_CONFIG_START(nbmj8688_state::mbmj_p16bit_LCD)
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
-MACHINE_CONFIG_END
+}
 
 void nbmj8688_state::bijokkoy(machine_config &config)
 {
@@ -2735,16 +2733,16 @@ void nbmj8688_state::vipclub(machine_config &config)
 	m_nb1413m3->set_type(NB1413M3_VIPCLUB);
 }
 
-MACHINE_CONFIG_START(nbmj8688_state::seiha)
+void nbmj8688_state::seiha(machine_config &config)
+{
 	NBMJDRV_65536(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(secolove_map)
-	MCFG_DEVICE_IO_MAP(seiha_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8688_state::secolove_map);
+	m_maincpu->set_addrmap(AS_IO, &nbmj8688_state::seiha_io_map);
 
 	m_nb1413m3->set_type(NB1413M3_SEIHA);
-MACHINE_CONFIG_END
+}
 
 void nbmj8688_state::seiham(machine_config &config)
 {
@@ -2753,39 +2751,39 @@ void nbmj8688_state::seiham(machine_config &config)
 	m_nb1413m3->set_type(NB1413M3_SEIHAM);
 }
 
-MACHINE_CONFIG_START(nbmj8688_state::mjgaiden)
+void nbmj8688_state::mjgaiden(machine_config &config)
+{
 	NBMJDRV_4096(config);
 
 	/* basic machine hardware */
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(ojousan_map)
-	MCFG_DEVICE_IO_MAP(mjgaiden_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8688_state::ojousan_map);
+	m_maincpu->set_addrmap(AS_IO, &nbmj8688_state::mjgaiden_io_map);
 
 	m_nb1413m3->set_type(NB1413M3_OJOUSAN);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(nbmj8688_state::iemoto)
+void nbmj8688_state::iemoto(machine_config &config)
+{
 	NBMJDRV_65536(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(secolove_map)
-	MCFG_DEVICE_IO_MAP(iemoto_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8688_state::secolove_map);
+	m_maincpu->set_addrmap(AS_IO, &nbmj8688_state::iemoto_io_map);
 
 	m_nb1413m3->set_type(NB1413M3_IEMOTO);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(nbmj8688_state::ojousan)
+void nbmj8688_state::ojousan(machine_config &config)
+{
 	NBMJDRV_65536(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(ojousan_map)
-	MCFG_DEVICE_IO_MAP(iemoto_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8688_state::ojousan_map);
+	m_maincpu->set_addrmap(AS_IO, &nbmj8688_state::iemoto_io_map);
 
 	m_nb1413m3->set_type(NB1413M3_OJOUSAN);
-MACHINE_CONFIG_END
+}
 
 void nbmj8688_state::ojousanm(machine_config &config)
 {
@@ -2794,13 +2792,13 @@ void nbmj8688_state::ojousanm(machine_config &config)
 	m_nb1413m3->set_type(NB1413M3_OJOUSANM);
 }
 
-MACHINE_CONFIG_START(nbmj8688_state::swinggal)
+void nbmj8688_state::swinggal(machine_config &config)
+{
 	ojousan(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(secolove_map)
-	MCFG_DEVICE_IO_MAP(iemoto_io_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8688_state::secolove_map);
+	m_maincpu->set_addrmap(AS_IO, &nbmj8688_state::iemoto_io_map);
+}
 
 void nbmj8688_state::iemotom(machine_config &config)
 {
@@ -2830,14 +2828,14 @@ void nbmj8688_state::korinaim(machine_config &config)
 	m_nb1413m3->set_type(NB1413M3_KORINAIM);
 }
 
-MACHINE_CONFIG_START(nbmj8688_state::mbmj_p12bit)
+void nbmj8688_state::mbmj_p12bit(machine_config &config)
+{
 	NBMJDRV_4096(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(mjsikaku_map)
-	MCFG_DEVICE_IO_MAP(kaguya_io_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8688_state::mjsikaku_map);
+	m_maincpu->set_addrmap(AS_IO, &nbmj8688_state::kaguya_io_map);
+}
 
 void nbmj8688_state::kaguya(machine_config &config)
 {
@@ -2874,41 +2872,40 @@ void nbmj8688_state::idhimitu(machine_config &config)
 	m_nb1413m3->set_type(NB1413M3_IDHIMITU);
 }
 
-MACHINE_CONFIG_START(nbmj8688_state::mjsikaku)
+void nbmj8688_state::mjsikaku(machine_config &config)
+{
 	NBMJDRV_4096(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(mjsikaku_map)
-	MCFG_DEVICE_IO_MAP(mjsikaku_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8688_state::mjsikaku_map);
+	m_maincpu->set_addrmap(AS_IO, &nbmj8688_state::mjsikaku_io_map);
 
 	m_nb1413m3->set_type(NB1413M3_MJSIKAKU);
 
 	/* sound hardware */
-	MCFG_DEVICE_REPLACE("psg", YM3812, 20000000/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.7)
-MACHINE_CONFIG_END
+	YM3812(config.replace(), "psg", 20000000/8).add_route(ALL_OUTPUTS, "speaker", 0.7);
+}
 
-MACHINE_CONFIG_START(nbmj8688_state::mmsikaku)
+void nbmj8688_state::mmsikaku(machine_config &config)
+{
 	NBMJDRV_4096(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(secolove_map)
-	MCFG_DEVICE_IO_MAP(mmsikaku_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8688_state::secolove_map);
+	m_maincpu->set_addrmap(AS_IO, &nbmj8688_state::mmsikaku_io_map);
 
 	m_nb1413m3->set_type(NB1413M3_MMSIKAKU);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(nbmj8688_state::otonano)
+void nbmj8688_state::otonano(machine_config &config)
+{
 	mjsikaku(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(otonano_io_map)
+	m_maincpu->set_addrmap(AS_IO, &nbmj8688_state::otonano_io_map);
 
 	m_nb1413m3->set_type(NB1413M3_OTONANO);
-MACHINE_CONFIG_END
+}
 
 void nbmj8688_state::mjcamera(machine_config &config)
 {

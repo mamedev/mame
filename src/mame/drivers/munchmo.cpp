@@ -315,16 +315,16 @@ void munchmo_state::machine_start()
 	save_item(NAME(m_nmi_enable));
 }
 
-MACHINE_CONFIG_START(munchmo_state::mnchmobl)
-
+void munchmo_state::mnchmobl(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, Z80, XTAL(15'000'000)/4) // from pin 13 of XTAL-driven 163
-	MCFG_DEVICE_PROGRAM_MAP(mnchmobl_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(munchmo_state, generic_irq_ack) // IORQ clears flip-flop at 1-2C
+	Z80(config, m_maincpu, XTAL(15'000'000)/4); // from pin 13 of XTAL-driven 163
+	m_maincpu->set_addrmap(AS_PROGRAM, &munchmo_state::mnchmobl_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(munchmo_state::generic_irq_ack)); // IORQ clears flip-flop at 1-2C
 
-	MCFG_DEVICE_ADD(m_audiocpu, Z80, XTAL(15'000'000)/8) // from pin 12 of XTAL-driven 163
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(munchmo_state, generic_irq_ack) // IORQ clears flip-flop at 1-7H
+	Z80(config, m_audiocpu, XTAL(15'000'000)/8); // from pin 12 of XTAL-driven 163
+	m_audiocpu->set_addrmap(AS_PROGRAM, &munchmo_state::sound_map);
+	m_audiocpu->set_irq_acknowledge_callback(FUNC(munchmo_state::generic_irq_ack)); // IORQ clears flip-flop at 1-7H
 
 	LS259(config, m_mainlatch, 0); // 12E
 	m_mainlatch->q_out_cb<0>().set(FUNC(munchmo_state::palette_bank_0_w)); // BCL0 2-11E
@@ -336,14 +336,14 @@ MACHINE_CONFIG_START(munchmo_state::mnchmobl)
 	m_mainlatch->q_out_cb<6>().set(FUNC(munchmo_state::nmi_enable_w)); // ENI 1-10C
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(256+32+32, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 255+32+32,0, 255-16)
-	MCFG_SCREEN_UPDATE_DRIVER(munchmo_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, munchmo_state, vblank_irq))
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(57);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(256+32+32, 256);
+	screen.set_visarea(0, 255+32+32,0, 255-16);
+	screen.set_screen_update(FUNC(munchmo_state::screen_update));
+	screen.screen_vblank().set(FUNC(munchmo_state::vblank_irq));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mnchmobl);
 	PALETTE(config, m_palette, FUNC(munchmo_state::munchmo_palette), 256);
@@ -361,7 +361,7 @@ MACHINE_CONFIG_START(munchmo_state::mnchmobl)
 	AY8910(config, m_ay8910[1], XTAL(15'000'000)/8);
 	//m_ay8910[1]->set_flags(AY8910_SINGLE_OUTPUT);
 	m_ay8910[1]->add_route(ALL_OUTPUTS, "mono", 0.50);
-MACHINE_CONFIG_END
+}
 
 
 /*************************************

@@ -459,69 +459,69 @@ static INPUT_PORTS_START( smondial2 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD)        PORT_NAME("Clear")    PORT_CODE(KEYCODE_BACKSPACE)
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(mephisto_montec_state::montec)
-	MCFG_DEVICE_ADD("maincpu", M65C02, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP( montec_mem )
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(mephisto_montec_state, nmi_line_assert, XTAL(4'000'000) / (1 << 13))
+void mephisto_montec_state::montec(machine_config &config)
+{
+	M65C02(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &mephisto_montec_state::montec_mem);
+	m_maincpu->set_periodic_int(FUNC(mephisto_montec_state::nmi_line_assert), attotime::from_hz(XTAL(4'000'000) / (1 << 13)));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("beeper", BEEP, 3250)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	BEEP(config, m_beeper, 3250).add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	MEPHISTO_SENSORS_BOARD(config, m_board, 0);
 
 	config.set_default_layout(layout_mephisto_montec);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(mephisto_montec_state::monteciv)
+void mephisto_montec_state::monteciv(machine_config &config)
+{
 	montec(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK( XTAL(8'000'000) )
-MACHINE_CONFIG_END
+	m_maincpu->set_clock(XTAL(8'000'000));
+}
 
-MACHINE_CONFIG_START(mephisto_montec_state::megaiv)
+void mephisto_montec_state::megaiv(machine_config &config)
+{
 	montec(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK( XTAL(4'915'200) )
-	MCFG_DEVICE_PROGRAM_MAP(megaiv_mem)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(mephisto_montec_state, nmi_line_pulse, XTAL(4'915'200) / (1 << 13))
+	m_maincpu->set_clock(XTAL(4'915'200));
+	m_maincpu->set_addrmap(AS_PROGRAM, &mephisto_montec_state::megaiv_mem);
+	m_maincpu->set_periodic_int(FUNC(mephisto_montec_state::nmi_line_pulse), attotime::from_hz(XTAL(4'915'200) / (1 << 13)));
 
 	MEPHISTO_BUTTONS_BOARD(config.replace(), m_board, 0);
 	m_board->set_disable_leds(true);
 	config.set_default_layout(layout_mephisto_megaiv);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(mephisto_montec_state::mondial2)
+void mephisto_montec_state::mondial2(machine_config &config)
+{
 	megaiv(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK( XTAL(2'000'000) )
-	MCFG_DEVICE_PROGRAM_MAP(mondial2_mem)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(mephisto_montec_state, nmi_line_pulse, XTAL(2'000'000) / (1 << 12))
+	m_maincpu->set_clock(XTAL(2'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &mephisto_montec_state::mondial2_mem);
+	m_maincpu->set_periodic_int(FUNC(mephisto_montec_state::nmi_line_pulse), attotime::from_hz(XTAL(2'000'000) / (1 << 12)));
 
 	TIMER(config, "refresh_leds").configure_periodic(FUNC(mephisto_montec_state::refresh_leds), attotime::from_hz(10));
 	config.set_default_layout(layout_mephisto_mondial2);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(mephisto_montec_state::smondial)
+void mephisto_montec_state::smondial(machine_config &config)
+{
 	megaiv(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK( XTAL(4'000'000) )
-	MCFG_DEVICE_PROGRAM_MAP(smondial_mem)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(mephisto_montec_state, nmi_line_pulse, XTAL(4'000'000) / (1 << 13))
-MACHINE_CONFIG_END
+	m_maincpu->set_clock(XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &mephisto_montec_state::smondial_mem);
+	m_maincpu->set_periodic_int(FUNC(mephisto_montec_state::nmi_line_pulse), attotime::from_hz(XTAL(4'000'000) / (1 << 13)));
+}
 
-MACHINE_CONFIG_START(mephisto_montec_state::smondial2)
+void mephisto_montec_state::smondial2(machine_config &config)
+{
 	smondial(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(smondial2_mem)
+	m_maincpu->set_addrmap(AS_PROGRAM, &mephisto_montec_state::smondial2_mem);
 
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "smondial2_cart");
 	SOFTWARE_LIST(config, "cart_list").set_original("smondial2");
 
 	config.set_default_layout(layout_mephisto_smondial2);
-MACHINE_CONFIG_END
+}
 
 
 ROM_START(megaiv)

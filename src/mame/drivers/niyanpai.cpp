@@ -691,12 +691,12 @@ WRITE_LINE_MEMBER(niyanpai_state::vblank_irq)
 }
 
 
-MACHINE_CONFIG_START(niyanpai_state::niyanpai)
-
+void niyanpai_state::niyanpai(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, M68000, 12288000/2) /* TMP68301, 6.144 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(niyanpai_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("tmp68301",tmp68301_device,irq_callback)
+	M68000(config, m_maincpu, 12288000/2); /* TMP68301, 6.144 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &niyanpai_state::niyanpai_map);
+	m_maincpu->set_irq_acknowledge_callback("tmp68301", FUNC(tmp68301_device::irq_callback));
 
 	TMP68301(config, m_tmp68301, 0);
 	m_tmp68301->set_cputag(m_maincpu);
@@ -705,46 +705,46 @@ MACHINE_CONFIG_START(niyanpai_state::niyanpai)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(1024, 512)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(niyanpai_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, niyanpai_state, vblank_irq))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(1024, 512);
+	m_screen->set_visarea(0, 640-1, 0, 240-1);
+	m_screen->set_screen_update(FUNC(niyanpai_state::screen_update));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(niyanpai_state::vblank_irq));
 
-	MCFG_PALETTE_ADD("palette", 256*3)
+	PALETTE(config, m_palette).set_entries(256*3);
 
 	/* sound hardware */
 	NICHISND(config, "nichisnd", 0);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(niyanpai_state::musobana)
+void niyanpai_state::musobana(machine_config &config)
+{
 	niyanpai(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(musobana_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &niyanpai_state::musobana_map);
 
 	MCFG_MACHINE_START_OVERRIDE(niyanpai_state, musobana)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(niyanpai_state::mhhonban)
+void niyanpai_state::mhhonban(machine_config &config)
+{
 	musobana(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(mhhonban_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &niyanpai_state::mhhonban_map);
+}
 
-MACHINE_CONFIG_START(niyanpai_state::zokumahj)
+void niyanpai_state::zokumahj(machine_config &config)
+{
 	musobana(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(zokumahj_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &niyanpai_state::zokumahj_map);
+}
 
 
 ROM_START( niyanpai )

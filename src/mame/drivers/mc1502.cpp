@@ -229,7 +229,8 @@ static INPUT_PORTS_START( mc1502 )
 	PORT_INCLUDE( mc7007_3_keyboard )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(mc1502_state::mc1502)
+void mc1502_state::mc1502(machine_config &config)
+{
 	I8088(config, m_maincpu, XTAL(16'000'000)/3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mc1502_state::mc1502_map);
 	m_maincpu->set_addrmap(AS_IO, &mc1502_state::mc1502_io);
@@ -285,9 +286,9 @@ MACHINE_CONFIG_START(mc1502_state::mc1502)
 	isa.irq6_callback().set(m_pic8259, FUNC(pic8259_device::ir6_w));
 	isa.irq7_callback().set(m_pic8259, FUNC(pic8259_device::ir7_w));
 
-	MCFG_DEVICE_ADD("board0", ISA8_SLOT, 0, "isa", mc1502_isa8_cards, "cga_mc1502", true) // FIXME: determine ISA bus clock
-	MCFG_DEVICE_ADD("isa1",   ISA8_SLOT, 0, "isa", mc1502_isa8_cards, "fdc", false)
-	MCFG_DEVICE_ADD("isa2",   ISA8_SLOT, 0, "isa", mc1502_isa8_cards, "rom", false)
+	ISA8_SLOT(config, "board0", 0, "isa", mc1502_isa8_cards, "cga_mc1502", true); // FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "isa1", 0, "isa", mc1502_isa8_cards, "fdc", false);
+	ISA8_SLOT(config, "isa2", 0, "isa", mc1502_isa8_cards, "rom", false);
 
 	SPEAKER(config, "mono").front_center();
 	WAVE(config, "wave", m_cassette); // FIXME: really no output routes for the cassette sound?
@@ -311,7 +312,7 @@ MACHINE_CONFIG_START(mc1502_state::mc1502)
 //  SOFTWARE_LIST(config, "cass_list").set_original("mc1502_cass");
 
 	RAM(config, RAM_TAG).set_default_size("608K").set_extra_options("96K"); /* 96 base + 512 on expansion card */
-MACHINE_CONFIG_END
+}
 
 
 /*

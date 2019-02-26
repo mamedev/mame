@@ -508,11 +508,12 @@ void mycom_state::init_mycom()
 	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0x10000);
 }
 
-MACHINE_CONFIG_START(mycom_state::mycom)
+void mycom_state::mycom(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, 10_MHz_XTAL / 4)
-	MCFG_DEVICE_PROGRAM_MAP(mycom_map)
-	MCFG_DEVICE_IO_MAP(mycom_io)
+	Z80(config, m_maincpu, 10_MHz_XTAL / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mycom_state::mycom_map);
+	m_maincpu->set_addrmap(AS_IO, &mycom_state::mycom_io);
 
 	I8255(config, m_ppi0);
 	m_ppi0->out_pa_callback().set(FUNC(mycom_state::mycom_04_w));
@@ -525,17 +526,17 @@ MACHINE_CONFIG_START(mycom_state::mycom)
 	m_ppi1->out_pc_callback().set(FUNC(mycom_state::mycom_0a_w));
 
 	I8255(config, m_ppi2);
-	m_ppi2->in_pb_callback().set("rtc", FUNC(msm5832_device::data_r));
-	m_ppi2->out_pb_callback().set("rtc", FUNC(msm5832_device::data_w));
+	m_ppi2->in_pb_callback().set(m_rtc, FUNC(msm5832_device::data_r));
+	m_ppi2->out_pb_callback().set(m_rtc, FUNC(msm5832_device::data_w));
 	m_ppi2->out_pc_callback().set(FUNC(mycom_state::mycom_rtc_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 192-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 320-1, 0, 192-1);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_mycom);
 
@@ -551,11 +552,10 @@ MACHINE_CONFIG_START(mycom_state::mycom)
 
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 
-	MCFG_DEVICE_ADD("sn1", SN76489, 10_MHz_XTAL / 4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.50)
+	SN76489(config, m_audio, 10_MHz_XTAL / 4).add_route(ALL_OUTPUTS, "mono", 1.50);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("rtc", MSM5832, 32.768_kHz_XTAL)
+	MSM5832(config, m_rtc, 32.768_kHz_XTAL);
 
 	CASSETTE(config, m_cass);
 
@@ -564,7 +564,7 @@ MACHINE_CONFIG_START(mycom_state::mycom)
 	FLOPPY_CONNECTOR(config, "fdc:1", mycom_floppies, "525sd", floppy_image_device::default_floppy_formats).enable_sound(true);
 
 	TIMER(config, "keyboard_timer").configure_periodic(FUNC(mycom_state::mycom_kbd), attotime::from_hz(20));
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( mycom )

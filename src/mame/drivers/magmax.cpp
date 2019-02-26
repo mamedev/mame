@@ -325,27 +325,27 @@ static GFXDECODE_START( gfx_magmax )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(magmax_state::magmax)
-
+void magmax_state::magmax(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, M68000, XTAL(16'000'000)/2)   /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", magmax_state,  irq1_line_assert)
+	M68000(config, m_maincpu, XTAL(16'000'000)/2);   /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &magmax_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(magmax_state::irq1_line_assert));
 
-	MCFG_DEVICE_ADD(m_audiocpu, Z80,XTAL(20'000'000)/8) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(sound_io_map)
+	Z80(config, m_audiocpu, XTAL(20'000'000)/8); /* verified on pcb */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &magmax_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &magmax_state::sound_io_map);
 
 	config.m_minimum_quantum = attotime::from_hz(600);
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(magmax_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(magmax_state::screen_update));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_magmax);
 	PALETTE(config, m_palette, FUNC(magmax_state::magmax_palette), 1*16 + 16*16 + 256, 256);
@@ -365,7 +365,7 @@ MACHINE_CONFIG_START(magmax_state::magmax)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 	m_soundlatch->set_separate_acknowledge(true);
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( magmax )

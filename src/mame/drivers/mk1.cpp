@@ -183,12 +183,13 @@ void mk1_state::machine_start()
 }
 
 
-MACHINE_CONFIG_START(mk1_state::mk1)
+void mk1_state::mk1(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD( "maincpu", F8, 2000000 ) // MK3850
-	MCFG_DEVICE_PROGRAM_MAP(mk1_mem)
-	MCFG_DEVICE_IO_MAP(mk1_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("f3853", f3853_device, int_acknowledge)
+	F8(config, m_maincpu, 2000000); // MK3850
+	m_maincpu->set_addrmap(AS_PROGRAM, &mk1_state::mk1_mem);
+	m_maincpu->set_addrmap(AS_IO, &mk1_state::mk1_io);
+	m_maincpu->set_irq_acknowledge_callback("f3853", FUNC(f3853_device::int_acknowledge));
 
 	f3853_device &f3853(F3853(config, "f3853", 2000000));
 	f3853.int_req_callback().set_inputline("maincpu", F8_INPUT_LINE_INT_REQ);
@@ -197,7 +198,7 @@ MACHINE_CONFIG_START(mk1_state::mk1)
 	config.set_default_layout(layout_mk1);
 
 	TIMER(config, "led_timer").configure_periodic(FUNC(mk1_state::mk1_update_leds), attotime::from_hz(30));
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( ccmk1 )

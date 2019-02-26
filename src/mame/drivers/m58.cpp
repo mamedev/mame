@@ -192,25 +192,25 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(m58_state::yard)
-
+void m58_state::yard(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/3/2)
-	MCFG_DEVICE_PROGRAM_MAP(yard_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", m58_state,  irq0_line_hold)
+	Z80(config, m_maincpu, MASTER_CLOCK/3/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &m58_state::yard_map);
+	m_maincpu->set_vblank_int("screen", FUNC(m58_state::irq0_line_hold));
 
 	/* video hardware */
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_yard);
 	PALETTE(config, m_palette, FUNC(m58_state::m58_palette), 256+256+256, 256+256+16);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 0, 256, 282, 42, 266)
-	MCFG_SCREEN_UPDATE_DRIVER(m58_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MASTER_CLOCK/3, 384, 0, 256, 282, 42, 266);
+	m_screen->set_screen_update(FUNC(m58_state::screen_update));
+	m_screen->set_palette(m_palette);
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("irem_audio", IREM_M52_LARGE_AUDIO, 0)
-MACHINE_CONFIG_END
+	IREM_M52_LARGE_AUDIO(config, "irem_audio", 0);
+}
 
 
 

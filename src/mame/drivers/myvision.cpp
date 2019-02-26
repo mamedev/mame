@@ -216,9 +216,9 @@ WRITE8_MEMBER( myvision_state::ay_port_b_w )
 
 MACHINE_CONFIG_START(myvision_state::myvision)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(10'738'635)/3)  /* Not verified */
-	MCFG_DEVICE_PROGRAM_MAP(myvision_mem)
-	MCFG_DEVICE_IO_MAP(myvision_io)
+	Z80(config, m_maincpu, XTAL(10'738'635)/3);  /* Not verified */
+	m_maincpu->set_addrmap(AS_PROGRAM, &myvision_state::myvision_mem);
+	m_maincpu->set_addrmap(AS_IO, &myvision_state::myvision_io);
 
 	/* video hardware */
 	tms9918a_device &vdp(TMS9918A(config, "tms9918", XTAL(10'738'635)));  /* Exact model not verified */

@@ -395,9 +395,9 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(meritum_state::meritum)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 10_MHz_XTAL / 4) // U880D @ 2.5 MHz or 1.67 MHz by jumper selection
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
+	Z80(config, m_maincpu, 10_MHz_XTAL / 4); // U880D @ 2.5 MHz or 1.67 MHz by jumper selection
+	m_maincpu->set_addrmap(AS_PROGRAM, &meritum_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &meritum_state::io_map);
 
 	i8251_device &usart(I8251(config, "usart", 10_MHz_XTAL / 4)); // same as CPU clock
 	usart.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
@@ -420,14 +420,14 @@ MACHINE_CONFIG_START(meritum_state::meritum)
 	i8255_device &mainppi(I8255(config, "mainppi")); // parallel interface
 	mainppi.out_pc_callback().set("nmigate", FUNC(input_merger_device::in_w<0>)).bit(7).invert();
 
-	MCFG_DEVICE_ADD("flopppi", I8255, 0) // floppy disk interface
-	MCFG_DEVICE_ADD("audiopit", PIT8253, 0) // optional audio interface
+	I8255(config, "flopppi", 0); // floppy disk interface
+	PIT8253(config, "audiopit", 0); // optional audio interface
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(10_MHz_XTAL, 107 * 6, 0, 64 * 6, 312, 0, 192)
-	MCFG_SCREEN_UPDATE_DRIVER(meritum_state, screen_update_meritum)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(10_MHz_XTAL, 107 * 6, 0, 64 * 6, 312, 0, 192);
+	screen.set_screen_update(FUNC(meritum_state::screen_update_meritum));
+	screen.set_palette("palette");
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_meritum);
 	PALETTE(config, "palette", palette_device::MONOCHROME);

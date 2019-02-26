@@ -1401,7 +1401,7 @@ void brno_state::machine_reset()
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( m5 )
+//  machine_config( m5 )
 //-------------------------------------------------
 
 void m5_state::m5(machine_config &config)
@@ -1464,7 +1464,7 @@ void m5_state::m5(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( ntsc )
+//  machine_config( ntsc )
 //-------------------------------------------------
 
 void m5_state::ntsc(machine_config &config)
@@ -1480,7 +1480,7 @@ void m5_state::ntsc(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( pal )
+//  machine_config( pal )
 //-------------------------------------------------
 
 void m5_state::pal(machine_config &config)
@@ -1495,7 +1495,7 @@ void m5_state::pal(machine_config &config)
 }
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( m5p_brno )
+//  machine_config( m5p_brno )
 //-------------------------------------------------
 
 

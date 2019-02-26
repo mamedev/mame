@@ -258,14 +258,14 @@ WRITE_LINE_MEMBER(mikie_state::vblank_irq)
 		m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 
-MACHINE_CONFIG_START(mikie_state::mikie)
-
+void mikie_state::mikie(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809E, OSC/12) // 9A (surface scratched)
-	MCFG_DEVICE_PROGRAM_MAP(mikie_map)
+	MC6809E(config, m_maincpu, OSC/12); // 9A (surface scratched)
+	m_maincpu->set_addrmap(AS_PROGRAM, &mikie_state::mikie_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, CLK) // 4E (surface scratched)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	Z80(config, m_audiocpu, CLK); // 4E (surface scratched)
+	m_audiocpu->set_addrmap(AS_PROGRAM, &mikie_state::sound_map);
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // 6I
 	mainlatch.q_out_cb<0>().set(FUNC(mikie_state::coin_counter_1_w)); // COIN1
@@ -278,14 +278,14 @@ MACHINE_CONFIG_START(mikie_state::mikie)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60.59)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mikie_state, screen_update_mikie)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mikie_state, vblank_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60.59);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(mikie_state::screen_update_mikie));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(mikie_state::vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mikie);
 	PALETTE(config, m_palette, FUNC(mikie_state::mikie_palette), 16*8*16+16*8*16, 256);
@@ -295,12 +295,10 @@ MACHINE_CONFIG_START(mikie_state::mikie)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("sn1", SN76489A, XTAL/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
+	SN76489A(config, "sn1", XTAL/8).add_route(ALL_OUTPUTS, "mono", 0.60);
 
-	MCFG_DEVICE_ADD("sn2", SN76489A, CLK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
-MACHINE_CONFIG_END
+	SN76489A(config, "sn2", CLK).add_route(ALL_OUTPUTS, "mono", 0.60);
+}
 
 /*************************************
  *

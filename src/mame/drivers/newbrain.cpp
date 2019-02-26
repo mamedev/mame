@@ -806,7 +806,7 @@ void newbrain_state::device_timer(emu_timer &timer, device_timer_id id, int para
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( newbrain )
+//  machine_config( newbrain )
 //-------------------------------------------------
 
 void newbrain_state::newbrain(machine_config &config)
@@ -847,7 +847,7 @@ void newbrain_state::newbrain(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( newbrain_ad )
+//  machine_config( newbrain_ad )
 //-------------------------------------------------
 
 void newbrain_state::newbrain_ad(machine_config &config)
@@ -858,7 +858,7 @@ void newbrain_state::newbrain_ad(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( newbrain_a )
+//  machine_config( newbrain_a )
 //-------------------------------------------------
 
 void newbrain_state::newbrain_a(machine_config &config)
@@ -869,7 +869,7 @@ void newbrain_state::newbrain_a(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( newbrain_md )
+//  machine_config( newbrain_md )
 //-------------------------------------------------
 
 void newbrain_state::newbrain_md(machine_config &config)

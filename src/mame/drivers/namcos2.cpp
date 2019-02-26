@@ -1777,18 +1777,19 @@ void namcos2_state::configure_c123tmap_standard(machine_config &config)
 	m_c123tmap->set_color_base(16*256);
 }
 
-MACHINE_CONFIG_START(namcos2_state::base_noio)
-	MCFG_DEVICE_ADD("maincpu", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
-	MCFG_DEVICE_PROGRAM_MAP(master_default_am)
+void namcos2_state::base_noio(machine_config &config)
+{
+	M68000(config, m_maincpu, M68K_CPU_CLOCK); /* 12.288MHz (49.152MHz OSC/4) */
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos2_state::master_default_am);
 	TIMER(config, "scantimer").configure_scanline(FUNC(namcos2_state::screen_scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("slave", M68000, M68K_CPU_CLOCK) /*  12.288MHz (49.152MHz OSC/4) */
-	MCFG_DEVICE_PROGRAM_MAP(slave_default_am)
+	M68000(config, m_slave, M68K_CPU_CLOCK); /*  12.288MHz (49.152MHz OSC/4) */
+	m_slave->set_addrmap(AS_PROGRAM, &namcos2_state::slave_default_am);
 
-	MCFG_DEVICE_ADD("audiocpu", MC6809E, M68B09_CPU_CLOCK) /* 2.048MHz (49.152MHz OSC/24) - Sound handling */
-	MCFG_DEVICE_PROGRAM_MAP(sound_default_am)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos2_state, irq0_line_hold, 2*60)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos2_state, irq1_line_hold,  120)
+	MC6809E(config, m_audiocpu, M68B09_CPU_CLOCK); /* 2.048MHz (49.152MHz OSC/24) - Sound handling */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &namcos2_state::sound_default_am);
+	m_audiocpu->set_periodic_int(FUNC(namcos2_state::irq0_line_hold), attotime::from_hz(2*60));
+	m_audiocpu->set_periodic_int(FUNC(namcos2_state::irq1_line_hold), attotime::from_hz(120));
 
 	config.m_minimum_quantum = attotime::from_hz(12000); /* CPU slices per frame */
 
@@ -1797,10 +1798,10 @@ MACHINE_CONFIG_START(namcos2_state::base_noio)
 	configure_c148_standard(config);
 	NAMCO_C139(config, m_sci, 0);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MAIN_OSC_CLOCK/8, 384, 0*8, 36*8, 264, 0*8, 28*8)
-	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_c116)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MAIN_OSC_CLOCK/8, 384, 0*8, 36*8, 264, 0*8, 28*8);
+	m_screen->set_screen_update(FUNC(namcos2_state::screen_update));
+	m_screen->set_palette(m_c116);
 
 	configure_c123tmap_standard(config);
 
@@ -1826,7 +1827,7 @@ MACHINE_CONFIG_START(namcos2_state::base_noio)
 	m_c140->add_route(1, "rspeaker", 0.75);
 
 	YM2151(config, "ymsnd", YM2151_SOUND_CLOCK).add_route(0, "lspeaker", 0.80).add_route(1, "rspeaker", 0.80); /* 3.579545MHz */
-MACHINE_CONFIG_END
+}
 
 
 void namcos2_state::base(machine_config &config)
@@ -1868,18 +1869,19 @@ void namcos2_state::base3(machine_config &config)
 	YM2151(config.replace(), "ymsnd", YM2151_SOUND_CLOCK).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0); /* 3.579545MHz */
 }
 
-MACHINE_CONFIG_START(namcos2_state::gollygho)
-	MCFG_DEVICE_ADD("maincpu", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
-	MCFG_DEVICE_PROGRAM_MAP(master_default_am)
+void namcos2_state::gollygho(machine_config &config)
+{
+	M68000(config, m_maincpu, M68K_CPU_CLOCK); /* 12.288MHz (49.152MHz OSC/4) */
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos2_state::master_default_am);
 	TIMER(config, "scantimer").configure_scanline(FUNC(namcos2_state::screen_scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("slave", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
-	MCFG_DEVICE_PROGRAM_MAP(slave_default_am)
+	M68000(config, m_slave, M68K_CPU_CLOCK); /* 12.288MHz (49.152MHz OSC/4) */
+	m_slave->set_addrmap(AS_PROGRAM, &namcos2_state::slave_default_am);
 
-	MCFG_DEVICE_ADD("audiocpu", MC6809E, M68B09_CPU_CLOCK) /* 2.048MHz (49.152MHz OSC/24) - Sound handling */
-	MCFG_DEVICE_PROGRAM_MAP(sound_default_am)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos2_state, irq0_line_hold,  2*60)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos2_state, irq1_line_hold,  120)
+	MC6809E(config, m_audiocpu, M68B09_CPU_CLOCK); /* 2.048MHz (49.152MHz OSC/24) - Sound handling */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &namcos2_state::sound_default_am);
+	m_audiocpu->set_periodic_int(FUNC(namcos2_state::irq0_line_hold), attotime::from_hz(2*60));
+	m_audiocpu->set_periodic_int(FUNC(namcos2_state::irq1_line_hold), attotime::from_hz(120));
 
 	configure_c65_standard(config);
 
@@ -1890,10 +1892,10 @@ MACHINE_CONFIG_START(namcos2_state::gollygho)
 	configure_c148_standard(config);
 	NAMCO_C139(config, m_sci, 0);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MAIN_OSC_CLOCK/8, 384, 0*8, 36*8, 264, 0*8, 28*8)
-	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_c116)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MAIN_OSC_CLOCK/8, 384, 0*8, 36*8, 264, 0*8, 28*8);
+	m_screen->set_screen_update(FUNC(namcos2_state::screen_update));
+	m_screen->set_palette(m_c116);
 
 	GFXDECODE(config, m_gfxdecode, m_c116, gfx_namcos2);
 
@@ -1919,21 +1921,22 @@ MACHINE_CONFIG_START(namcos2_state::gollygho)
 	m_c140->add_route(1, "rspeaker", 0.75);
 
 	YM2151(config, "ymsnd", YM2151_SOUND_CLOCK).add_route(0, "lspeaker", 0.80).add_route(1, "rspeaker", 0.80); /* 3.579545MHz */
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(namcos2_state::finallap_noio)
-	MCFG_DEVICE_ADD("maincpu", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
-	MCFG_DEVICE_PROGRAM_MAP(master_finallap_am)
+void namcos2_state::finallap_noio(machine_config &config)
+{
+	M68000(config, m_maincpu, M68K_CPU_CLOCK); /* 12.288MHz (49.152MHz OSC/4) */
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos2_state::master_finallap_am);
 	TIMER(config, "scantimer").configure_scanline(FUNC(namcos2_state::screen_scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("slave", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
-	MCFG_DEVICE_PROGRAM_MAP(slave_finallap_am)
+	M68000(config, m_slave, M68K_CPU_CLOCK); /* 12.288MHz (49.152MHz OSC/4) */
+	m_slave->set_addrmap(AS_PROGRAM, &namcos2_state::slave_finallap_am);
 
-	MCFG_DEVICE_ADD("audiocpu", MC6809E, M68B09_CPU_CLOCK) /* 2.048MHz (49.152MHz OSC/24) - Sound handling */
-	MCFG_DEVICE_PROGRAM_MAP(sound_default_am)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos2_state, irq0_line_hold,  2*60)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos2_state, irq1_line_hold,  120)
+	MC6809E(config, m_audiocpu, M68B09_CPU_CLOCK); /* 2.048MHz (49.152MHz OSC/24) - Sound handling */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &namcos2_state::sound_default_am);
+	m_audiocpu->set_periodic_int(FUNC(namcos2_state::irq0_line_hold), attotime::from_hz(2*60));
+	m_audiocpu->set_periodic_int(FUNC(namcos2_state::irq1_line_hold), attotime::from_hz(120));
 
 	config.m_minimum_quantum = attotime::from_hz(6000); /* CPU slices per frame */
 
@@ -1942,10 +1945,10 @@ MACHINE_CONFIG_START(namcos2_state::finallap_noio)
 	configure_c148_standard(config);
 	NAMCO_C139(config, m_sci, 0);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MAIN_OSC_CLOCK/8, 384, 0*8, 36*8, 264, 0*8, 28*8)
-	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_finallap)
-	MCFG_SCREEN_PALETTE(m_c116)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MAIN_OSC_CLOCK/8, 384, 0*8, 36*8, 264, 0*8, 28*8);
+	m_screen->set_screen_update(FUNC(namcos2_state::screen_update_finallap));
+	m_screen->set_palette(m_c116);
 
 	GFXDECODE(config, m_gfxdecode, m_c116, gfx_namcos2);
 
@@ -1969,45 +1972,50 @@ MACHINE_CONFIG_START(namcos2_state::finallap_noio)
 	m_c140->add_route(1, "rspeaker", 0.75);
 
 	YM2151(config, "ymsnd", YM2151_SOUND_CLOCK).add_route(0, "lspeaker", 0.80).add_route(1, "rspeaker", 0.80); /* 3.579545MHz */
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(namcos2_state::finallap)
+void namcos2_state::finallap(machine_config &config)
+{
 	finallap_noio(config);
 	configure_c65_standard(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(namcos2_state::finallap_c68)
+void namcos2_state::finallap_c68(machine_config &config)
+{
 	finallap_noio(config);
 	configure_c68_standard(config);
-MACHINE_CONFIG_END
+}
 
 
 // finalap2 has different mangle
-MACHINE_CONFIG_START(namcos2_state::finalap2)
+void namcos2_state::finalap2(machine_config &config)
+{
 	finallap(config);
 
 	m_c123tmap->set_tile_callback(namco_c123tmap_device::c123_tilemap_delegate(&namcos2_state::TilemapCB_finalap2, this));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(namcos2_state::finalap3)
+void namcos2_state::finalap3(machine_config &config)
+{
 	finallap_c68(config);
 
 	m_c123tmap->set_tile_callback(namco_c123tmap_device::c123_tilemap_delegate(&namcos2_state::TilemapCB_finalap2, this));
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(namcos2_state::sgunner)
-	MCFG_DEVICE_ADD("maincpu", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
-	MCFG_DEVICE_PROGRAM_MAP(master_sgunner_am)
+void namcos2_state::sgunner(machine_config &config)
+{
+	M68000(config, m_maincpu, M68K_CPU_CLOCK); /* 12.288MHz (49.152MHz OSC/4) */
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos2_state::master_sgunner_am);
 	TIMER(config, "scantimer").configure_scanline(FUNC(namcos2_state::screen_scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("slave", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
-	MCFG_DEVICE_PROGRAM_MAP(slave_sgunner_am)
+	M68000(config, m_slave, M68K_CPU_CLOCK); /* 12.288MHz (49.152MHz OSC/4) */
+	m_slave->set_addrmap(AS_PROGRAM, &namcos2_state::slave_sgunner_am);
 
-	MCFG_DEVICE_ADD("audiocpu", MC6809E, M68B09_CPU_CLOCK) /* 2.048MHz (49.152MHz OSC/24) - Sound handling */
-	MCFG_DEVICE_PROGRAM_MAP(sound_default_am)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos2_state, irq0_line_hold,  2*60)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos2_state, irq1_line_hold,  120)
+	MC6809E(config, m_audiocpu, M68B09_CPU_CLOCK); /* 2.048MHz (49.152MHz OSC/24) - Sound handling */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &namcos2_state::sound_default_am);
+	m_audiocpu->set_periodic_int(FUNC(namcos2_state::irq0_line_hold), attotime::from_hz(2*60));
+	m_audiocpu->set_periodic_int(FUNC(namcos2_state::irq1_line_hold), attotime::from_hz(120));
 
 	configure_c65_standard(config);
 
@@ -2018,10 +2026,10 @@ MACHINE_CONFIG_START(namcos2_state::sgunner)
 	configure_c148_standard(config);
 	NAMCO_C139(config, m_sci, 0);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MAIN_OSC_CLOCK/8, 384, 0*8, 36*8, 264, 0*8, 28*8)
-	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_sgunner)
-	MCFG_SCREEN_PALETTE(m_c116)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MAIN_OSC_CLOCK/8, 384, 0*8, 36*8, 264, 0*8, 28*8);
+	m_screen->set_screen_update(FUNC(namcos2_state::screen_update_sgunner));
+	m_screen->set_palette(m_c116);
 
 	GFXDECODE(config, m_gfxdecode, m_c116, gfx_c355);
 
@@ -2048,20 +2056,21 @@ MACHINE_CONFIG_START(namcos2_state::sgunner)
 	m_c140->add_route(1, "rspeaker", 0.75);
 
 	YM2151(config, "ymsnd", YM2151_SOUND_CLOCK).add_route(0, "lspeaker", 0.80).add_route(1, "rspeaker", 0.80); /* 3.579545MHz */
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(namcos2_state::sgunner2)
-	MCFG_DEVICE_ADD("maincpu", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
-	MCFG_DEVICE_PROGRAM_MAP(master_sgunner_am)
+void namcos2_state::sgunner2(machine_config &config)
+{
+	M68000(config, m_maincpu, M68K_CPU_CLOCK); /* 12.288MHz (49.152MHz OSC/4) */
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos2_state::master_sgunner_am);
 	TIMER(config, "scantimer").configure_scanline(FUNC(namcos2_state::screen_scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("slave", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
-	MCFG_DEVICE_PROGRAM_MAP(slave_sgunner_am)
+	M68000(config, m_slave, M68K_CPU_CLOCK); /* 12.288MHz (49.152MHz OSC/4) */
+	m_slave->set_addrmap(AS_PROGRAM, &namcos2_state::slave_sgunner_am);
 
-	MCFG_DEVICE_ADD("audiocpu", MC6809E, M68B09_CPU_CLOCK) /* 2.048MHz (49.152MHz OSC/24) - Sound handling */
-	MCFG_DEVICE_PROGRAM_MAP(sound_default_am)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos2_state, irq0_line_hold,  2*60)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos2_state, irq1_line_hold,  120)
+	MC6809E(config, m_audiocpu, M68B09_CPU_CLOCK); /* 2.048MHz (49.152MHz OSC/24) - Sound handling */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &namcos2_state::sound_default_am);
+	m_audiocpu->set_periodic_int(FUNC(namcos2_state::irq0_line_hold), attotime::from_hz(2*60));
+	m_audiocpu->set_periodic_int(FUNC(namcos2_state::irq1_line_hold), attotime::from_hz(120));
 
 	configure_c68_standard(config);
 
@@ -2072,10 +2081,10 @@ MACHINE_CONFIG_START(namcos2_state::sgunner2)
 	configure_c148_standard(config);
 	NAMCO_C139(config, m_sci, 0);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MAIN_OSC_CLOCK/8, 384, 0*8, 36*8, 264, 0*8, 28*8)
-	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_sgunner)
-	MCFG_SCREEN_PALETTE(m_c116)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MAIN_OSC_CLOCK/8, 384, 0*8, 36*8, 264, 0*8, 28*8);
+	m_screen->set_screen_update(FUNC(namcos2_state::screen_update_sgunner));
+	m_screen->set_palette(m_c116);
 
 	GFXDECODE(config, m_gfxdecode, m_c116, gfx_c355);
 
@@ -2102,20 +2111,21 @@ MACHINE_CONFIG_START(namcos2_state::sgunner2)
 	m_c140->add_route(1, "rspeaker", 0.75);
 
 	YM2151(config, "ymsnd", YM2151_SOUND_CLOCK).add_route(0, "lspeaker", 0.80).add_route(1, "rspeaker", 0.80); /* 3.579545MHz */
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(namcos2_state::suzuka8h)
-	MCFG_DEVICE_ADD("maincpu", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
-	MCFG_DEVICE_PROGRAM_MAP(master_suzuka8h_am)
+void namcos2_state::suzuka8h(machine_config &config)
+{
+	M68000(config, m_maincpu, M68K_CPU_CLOCK); /* 12.288MHz (49.152MHz OSC/4) */
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos2_state::master_suzuka8h_am);
 	TIMER(config, "scantimer").configure_scanline(FUNC(namcos2_state::screen_scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("slave", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
-	MCFG_DEVICE_PROGRAM_MAP(slave_suzuka8h_am)
+	M68000(config, m_slave, M68K_CPU_CLOCK); /* 12.288MHz (49.152MHz OSC/4) */
+	m_slave->set_addrmap(AS_PROGRAM, &namcos2_state::slave_suzuka8h_am);
 
-	MCFG_DEVICE_ADD("audiocpu", MC6809E, M68B09_CPU_CLOCK) /* 2.048MHz (49.152MHz OSC/24) - Sound handling */
-	MCFG_DEVICE_PROGRAM_MAP(sound_default_am)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos2_state, irq0_line_hold, 2*60)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos2_state, irq1_line_hold, 120)
+	MC6809E(config, m_audiocpu, M68B09_CPU_CLOCK); /* 2.048MHz (49.152MHz OSC/24) - Sound handling */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &namcos2_state::sound_default_am);
+	m_audiocpu->set_periodic_int(FUNC(namcos2_state::irq0_line_hold), attotime::from_hz(2*60));
+	m_audiocpu->set_periodic_int(FUNC(namcos2_state::irq1_line_hold), attotime::from_hz(120));
 
 	configure_c68_standard(config);
 
@@ -2126,10 +2136,10 @@ MACHINE_CONFIG_START(namcos2_state::suzuka8h)
 	configure_c148_standard(config);
 	NAMCO_C139(config, m_sci, 0);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MAIN_OSC_CLOCK/8, 384, 0*8, 36*8, 264, 0*8, 28*8)
-	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_luckywld)
-	MCFG_SCREEN_PALETTE(m_c116)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MAIN_OSC_CLOCK/8, 384, 0*8, 36*8, 264, 0*8, 28*8);
+	m_screen->set_screen_update(FUNC(namcos2_state::screen_update_luckywld));
+	m_screen->set_palette(m_c116);
 
 	GFXDECODE(config, m_gfxdecode, m_c116, gfx_c355);
 
@@ -2159,16 +2169,15 @@ MACHINE_CONFIG_START(namcos2_state::suzuka8h)
 	m_c140->add_route(1, "rspeaker", 0.75);
 
 	YM2151(config, "ymsnd", YM2151_SOUND_CLOCK).add_route(0, "lspeaker", 0.80).add_route(1, "rspeaker", 0.80); /* 3.579545MHz */
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(namcos2_state::luckywld)
+void namcos2_state::luckywld(machine_config &config)
+{
 	suzuka8h(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(master_luckywld_am)
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos2_state::master_luckywld_am);
 
-	MCFG_DEVICE_MODIFY("slave")
-	MCFG_DEVICE_PROGRAM_MAP(slave_luckywld_am)
+	m_slave->set_addrmap(AS_PROGRAM, &namcos2_state::slave_luckywld_am);
 
 	NAMCO_C169ROZ(config, m_c169roz, 0);
 	m_c169roz->set_palette(m_c116);
@@ -2176,21 +2185,21 @@ MACHINE_CONFIG_START(namcos2_state::luckywld)
 	m_c169roz->set_ram_words(0x10000/2);
 	m_c169roz->set_tile_callback(namco_c169roz_device::c169_tilemap_delegate(&namcos2_state::RozCB_luckywld, this));
 	m_c169roz->set_color_base(0*256);
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(namcos2_state::metlhawk)
-	MCFG_DEVICE_ADD("maincpu", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
-	MCFG_DEVICE_PROGRAM_MAP(master_metlhawk_am)
+void namcos2_state::metlhawk(machine_config &config)
+{
+	M68000(config, m_maincpu, M68K_CPU_CLOCK); /* 12.288MHz (49.152MHz OSC/4) */
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos2_state::master_metlhawk_am);
 	TIMER(config, "scantimer").configure_scanline(FUNC(namcos2_state::screen_scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("slave", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
-	MCFG_DEVICE_PROGRAM_MAP(slave_metlhawk_am)
+	M68000(config, m_slave, M68K_CPU_CLOCK); /* 12.288MHz (49.152MHz OSC/4) */
+	m_slave->set_addrmap(AS_PROGRAM, &namcos2_state::slave_metlhawk_am);
 
-	MCFG_DEVICE_ADD("audiocpu", MC6809E, M68B09_CPU_CLOCK) /* 2.048MHz (49.152MHz OSC/24) - Sound handling */
-	MCFG_DEVICE_PROGRAM_MAP(sound_default_am)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos2_state, irq0_line_hold, 2*60)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos2_state, irq1_line_hold, 120)
+	MC6809E(config, m_audiocpu, M68B09_CPU_CLOCK); /* 2.048MHz (49.152MHz OSC/24) - Sound handling */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &namcos2_state::sound_default_am);
+	m_audiocpu->set_periodic_int(FUNC(namcos2_state::irq0_line_hold), attotime::from_hz(2*60));
+	m_audiocpu->set_periodic_int(FUNC(namcos2_state::irq1_line_hold), attotime::from_hz(120));
 
 	configure_c65_standard(config);
 
@@ -2201,10 +2210,10 @@ MACHINE_CONFIG_START(namcos2_state::metlhawk)
 	configure_c148_standard(config);
 	NAMCO_C139(config, m_sci, 0);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MAIN_OSC_CLOCK/8, 384, 0*8, 36*8, 264, 0*8, 28*8)
-	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_metlhawk)
-	MCFG_SCREEN_PALETTE(m_c116)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MAIN_OSC_CLOCK/8, 384, 0*8, 36*8, 264, 0*8, 28*8);
+	m_screen->set_screen_update(FUNC(namcos2_state::screen_update_metlhawk));
+	m_screen->set_palette(m_c116);
 
 	GFXDECODE(config, m_gfxdecode, m_c116, gfx_metlhawk);
 
@@ -2235,7 +2244,7 @@ MACHINE_CONFIG_START(namcos2_state::metlhawk)
 
 	YM2151(config, "ymsnd", YM2151_SOUND_CLOCK).add_route(0, "lspeaker", 0.80).add_route(1, "rspeaker", 0.80); /* 3.579545MHz */
 //  ymsnd.irq_handler().set_inputline("audiocpu", 1);
-MACHINE_CONFIG_END
+}
 
 
 /*************************************************************/

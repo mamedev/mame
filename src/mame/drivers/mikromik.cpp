@@ -456,7 +456,7 @@ void mm1_state::machine_reset()
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( mm1 )
+//  machine_config( mm1 )
 //-------------------------------------------------
 
 void mm1_state::mm1(machine_config &config)
@@ -525,7 +525,7 @@ void mm1_state::mm1(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( mm1m6 )
+//  machine_config( mm1m6 )
 //-------------------------------------------------
 
 void mm1_state::mm1m6(machine_config &config)
@@ -537,7 +537,7 @@ void mm1_state::mm1m6(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( mm1m7 )
+//  machine_config( mm1m7 )
 //-------------------------------------------------
 
 void mm1_state::mm1m7(machine_config &config)

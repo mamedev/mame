@@ -149,21 +149,22 @@ void mz6500_state::upd7220_map(address_map &map)
 }
 
 
-MACHINE_CONFIG_START(mz6500_state::mz6500)
+void mz6500_state::mz6500(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8086, 8000000) //unk clock
-	MCFG_DEVICE_PROGRAM_MAP(mz6500_map)
-	MCFG_DEVICE_IO_MAP(mz6500_io)
+	I8086(config, m_maincpu, 8000000); //unk clock
+	m_maincpu->set_addrmap(AS_PROGRAM, &mz6500_state::mz6500_map);
+	m_maincpu->set_addrmap(AS_IO, &mz6500_state::mz6500_io);
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DEVICE("upd7220", upd7220_device, screen_update)
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_PALETTE_ADD("palette", 8)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update("upd7220", FUNC(upd7220_device::screen_update));
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 640-1, 0, 480-1);
+	PALETTE(config, "palette").set_entries(8);
 
 	/* Devices */
 	UPD7220(config, m_hgdc, 8000000/6); // unk clock
@@ -173,7 +174,7 @@ MACHINE_CONFIG_START(mz6500_state::mz6500)
 	UPD765A(config, m_fdc, 8000000, true, true);
 	FLOPPY_CONNECTOR(config, "upd765:0", mz6500_floppies, "525hd", floppy_image_device::default_floppy_formats);
 	FLOPPY_CONNECTOR(config, "upd765:1", mz6500_floppies, "525hd", floppy_image_device::default_floppy_formats);
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( mz6500 )

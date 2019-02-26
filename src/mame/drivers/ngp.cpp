@@ -860,12 +860,11 @@ void ngp_state::ngp_common(machine_config &config)
 MACHINE_CONFIG_START(ngp_state::ngp)
 	ngp_common(config);
 
-	K1GE(config , m_k1ge, 6.144_MHz_XTAL, "screen");
+	K1GE(config, m_k1ge, 6.144_MHz_XTAL, "screen");
 	m_k1ge->vblank_callback().set(FUNC(ngp_state::ngp_vblank_pin_w));
 	m_k1ge->hblank_callback().set(FUNC(ngp_state::ngp_hblank_pin_w));
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_PALETTE("k1ge:palette")
+	subdevice<screen_device>("screen")->set_palette("k1ge:palette");
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "ngp_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,ngp,npc,ngc")
@@ -880,12 +879,11 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ngp_state::ngpc)
 	ngp_common(config);
-	K2GE(config , m_k1ge, 6.144_MHz_XTAL, "screen");
+	K2GE(config, m_k1ge, 6.144_MHz_XTAL, "screen");
 	m_k1ge->vblank_callback().set(FUNC(ngp_state::ngp_vblank_pin_w));
 	m_k1ge->hblank_callback().set(FUNC(ngp_state::ngp_hblank_pin_w));
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_PALETTE("k1ge:palette")
+	subdevice<screen_device>("screen")->set_palette("k1ge:palette");
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "ngp_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,ngp,npc,ngc")

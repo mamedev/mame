@@ -191,11 +191,11 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(mystston_state::mystston)
-
+void mystston_state::mystston(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	M6502(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mystston_state::main_map);
 
 	/* video hardware */
 	mystston_video(config);
@@ -206,7 +206,7 @@ MACHINE_CONFIG_START(mystston_state::mystston)
 	AY8910(config, m_ay8910[0], AY8910_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.30);
 
 	AY8910(config, m_ay8910[1], AY8910_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.30);
-MACHINE_CONFIG_END
+}
 
 
 

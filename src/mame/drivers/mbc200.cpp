@@ -302,23 +302,24 @@ static GFXDECODE_START( gfx_mbc200 )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(mbc200_state::mbc200)
+void mbc200_state::mbc200(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 8_MHz_XTAL / 2) // NEC D780C-1
-	MCFG_DEVICE_PROGRAM_MAP(mbc200_mem)
-	MCFG_DEVICE_IO_MAP(mbc200_io)
+	Z80(config, m_maincpu, 8_MHz_XTAL / 2); // NEC D780C-1
+	m_maincpu->set_addrmap(AS_PROGRAM, &mbc200_state::mbc200_mem);
+	m_maincpu->set_addrmap(AS_IO, &mbc200_state::mbc200_io);
 
-	MCFG_DEVICE_ADD("subcpu", Z80, 8_MHz_XTAL / 2) // NEC D780C-1
-	MCFG_DEVICE_PROGRAM_MAP(mbc200_sub_mem)
-	MCFG_DEVICE_IO_MAP(mbc200_sub_io)
+	z80_device &subcpu(Z80(config, "subcpu", 8_MHz_XTAL / 2)); // NEC D780C-1
+	subcpu.set_addrmap(AS_PROGRAM, &mbc200_state::mbc200_sub_mem);
+	subcpu.set_addrmap(AS_IO, &mbc200_state::mbc200_sub_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 400)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", h46505_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(640, 400);
+	screen.set_visarea(0, 640-1, 0, 400-1);
+	screen.set_screen_update("crtc", FUNC(h46505_device::screen_update));
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_mbc200);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
@@ -330,10 +331,8 @@ MACHINE_CONFIG_START(mbc200_state::mbc200)
 
 	// sound
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("beeper", BEEP, 1000) // frequency unknown
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	BEEP(config, m_beep, 1000).add_route(ALL_OUTPUTS, "mono", 0.50); // frequency unknown
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	I8255(config, "ppi_1").out_pc_callback().set(FUNC(mbc200_state::p1_portc_w));
 	I8255(config, "ppi_2").in_pa_callback().set(FUNC(mbc200_state::p2_porta_r));
@@ -356,7 +355,7 @@ MACHINE_CONFIG_START(mbc200_state::mbc200)
 
 	/* software lists */
 	SOFTWARE_LIST(config, "flop_list").set_original("mbc200");
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( mbc200 )

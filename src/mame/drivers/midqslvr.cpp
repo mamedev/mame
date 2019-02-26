@@ -418,10 +418,10 @@ void midqslvr_state::machine_reset()
 }
 
 MACHINE_CONFIG_START(midqslvr_state::midqslvr)
-	MCFG_DEVICE_ADD("maincpu", PENTIUM, 333000000) // actually Celeron 333
-	MCFG_DEVICE_PROGRAM_MAP(midqslvr_map)
-	MCFG_DEVICE_IO_MAP(midqslvr_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+	PENTIUM(config, m_maincpu, 333000000); // actually Celeron 333
+	m_maincpu->set_addrmap(AS_PROGRAM, &midqslvr_state::midqslvr_map);
+	m_maincpu->set_addrmap(AS_IO, &midqslvr_state::midqslvr_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
 
 	pcat_common(config);
 

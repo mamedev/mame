@@ -3115,12 +3115,12 @@ void naomi_state::naomigd_kb(machine_config &config)
  * Naomi 2
  */
 /*
-MACHINE_CONFIG_START((naomi2_state::naomi2)
+void naomi2_state::naomi2(machine_config &config)
+{
     naomi(config);
-    MCFG_DEVICE_MODIFY("maincpu")
-    MCFG_DEVICE_PROGRAM_MAP(naomi2_map)
-    MCFG_DEVICE_IO_MAP(naomi_port)
-MACHINE_CONFIG_END
+    m_maincpu->set_addrmap(AS_PROGRAM, &naomi2_state::naomi2_map);
+    m_maincpu->set_addrmap(AS_IO, &naomi2_state::naomi_port);
+}
 */
 /*
  * Naomi 2 GD-Rom

@@ -271,10 +271,6 @@ Namco System 21 Video Hardware
 #include "sound/ym2151.h"
 #include "emupal.h"
 
-// TODO: basic parameters to get 60.606060 Hz, x2 is for interlace
-#define MCFG_SCREEN_RAW_PARAMS_NAMCO480I \
-	MCFG_SCREEN_RAW_PARAMS(12288000*2, 768, 0, 496, 264*2,0,480)
-
 #define ENABLE_LOGGING      0
 
 #define NAMCOS21_NUM_COLORS 0x8000
@@ -810,18 +806,19 @@ void namcos21_c67_state::configure_c148_standard(machine_config &config)
 }
 
 // starblad, solvalou, aircomb, cybsled base state
-MACHINE_CONFIG_START(namcos21_c67_state::namcos21)
-	MCFG_DEVICE_ADD("maincpu", M68000,12288000) /* Master */
-	MCFG_DEVICE_PROGRAM_MAP(master_map)
+void namcos21_c67_state::namcos21(machine_config &config)
+{
+	M68000(config, m_maincpu, 12288000); /* Master */
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos21_c67_state::master_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(namcos21_c67_state::screen_scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("slave", M68000,12288000) /* Slave */
-	MCFG_DEVICE_PROGRAM_MAP(slave_map)
+	M68000(config, m_slave, 12288000); /* Slave */
+	m_slave->set_addrmap(AS_PROGRAM, &namcos21_c67_state::slave_map);
 
-	MCFG_DEVICE_ADD("audiocpu", MC6809E, 3072000) /* Sound */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos21_c67_state, irq0_line_hold, 2*60)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos21_c67_state, irq1_line_hold, 120)
+	MC6809E(config, m_audiocpu, 3072000); /* Sound */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &namcos21_c67_state::sound_map);
+	m_audiocpu->set_periodic_int(FUNC(namcos21_c67_state::irq0_line_hold), attotime::from_hz(2*60));
+	m_audiocpu->set_periodic_int(FUNC(namcos21_c67_state::irq1_line_hold), attotime::from_hz(120));
 
 	configure_c68_namcos21(config);
 
@@ -832,10 +829,11 @@ MACHINE_CONFIG_START(namcos21_c67_state::namcos21)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS_NAMCO480I
-	MCFG_SCREEN_UPDATE_DRIVER(namcos21_c67_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	// TODO: basic parameters to get 60.606060 Hz, x2 is for interlace
+	m_screen->set_raw(12288000*2, 768, 0, 496, 264*2, 0, 480);
+	m_screen->set_screen_update(FUNC(namcos21_c67_state::screen_update));
+	m_screen->set_palette(m_palette);
 
 	NAMCOS21_3D(config, m_namcos21_3d, 0);
 	m_namcos21_3d->set_zz_shift_mult(11, 0x200);
@@ -865,33 +863,37 @@ MACHINE_CONFIG_START(namcos21_c67_state::namcos21)
 	m_c140->add_route(1, "rspeaker", 0.50);
 
 	YM2151(config, "ymsnd", 3579580).add_route(0, "lspeaker", 0.30).add_route(1, "rspeaker", 0.30);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(namcos21_c67_state::aircomb)
+void namcos21_c67_state::aircomb(machine_config &config)
+{
 	namcos21(config);
 	m_namcos21_dsp_c67->set_gametype(namcos21_dsp_c67_device::NAMCOS21_AIRCOMBAT);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(namcos21_c67_state::starblad)
+void namcos21_c67_state::starblad(machine_config &config)
+{
 	namcos21(config);
 	m_namcos21_dsp_c67->set_gametype(namcos21_dsp_c67_device::NAMCOS21_STARBLADE);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(namcos21_c67_state::cybsled)
+void namcos21_c67_state::cybsled(machine_config &config)
+{
 	namcos21(config);
 	m_namcos21_dsp_c67->set_gametype(namcos21_dsp_c67_device::NAMCOS21_CYBERSLED);
-MACHINE_CONFIG_END
+}
 
 WRITE_LINE_MEMBER(namcos21_c67_state::yield_hack)
 {
 	m_maincpu->yield();
 }
 
-MACHINE_CONFIG_START(namcos21_c67_state::solvalou)
+void namcos21_c67_state::solvalou(machine_config &config)
+{
 	namcos21(config);
 	m_namcos21_dsp_c67->set_gametype(namcos21_dsp_c67_device::NAMCOS21_SOLVALOU);
 	m_namcos21_dsp_c67->yield_hack_callback().set(FUNC(namcos21_c67_state::yield_hack)); // VCK function
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( starblad )

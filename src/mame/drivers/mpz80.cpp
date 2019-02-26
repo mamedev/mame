@@ -709,7 +709,7 @@ void mpz80_state::machine_reset()
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( mpz80 )
+//  machine_config( mpz80 )
 //-------------------------------------------------
 
 void mpz80_state::mpz80(machine_config &config)
@@ -744,7 +744,7 @@ void mpz80_state::mpz80(machine_config &config)
 
 	// software list
 	SOFTWARE_LIST(config, "flop_list").set_original("mpz80");
-MACHINE_CONFIG_END
+}
 
 
 

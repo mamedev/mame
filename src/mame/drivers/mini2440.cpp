@@ -225,19 +225,19 @@ void mini2440_state::init_mini2440()
 	// do nothing
 }
 
-MACHINE_CONFIG_START(mini2440_state::mini2440)
-	MCFG_DEVICE_ADD("maincpu", ARM920T, 400000000)
-	MCFG_DEVICE_PROGRAM_MAP(mini2440_map)
+void mini2440_state::mini2440(machine_config &config)
+{
+	ARM920T(config, m_maincpu, 400000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mini2440_state::mini2440_map);
 
-	MCFG_PALETTE_ADD("palette", 32768)
+	PALETTE(config, "palette").set_entries(32768);
 
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(1024, 768)
-	MCFG_SCREEN_VISIBLE_AREA(0, 239, 0, 319)
-
-	MCFG_SCREEN_UPDATE_DEVICE("s3c2440", s3c2440_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(1024, 768);
+	screen.set_visarea(0, 239, 0, 319);
+	screen.set_screen_update("s3c2440", FUNC(s3c2440_device::screen_update));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -263,7 +263,7 @@ MACHINE_CONFIG_START(mini2440_state::mini2440)
 	NAND(config, m_nand, 0);
 	m_nand->set_nand_type(nand_device::chip::K9F1G08U0B);
 	m_nand->rnb_wr_callback().set(m_s3c2440, FUNC(s3c2440_device::frnb_w));
-MACHINE_CONFIG_END
+}
 
 static INPUT_PORTS_START( mini2440 )
 	PORT_START( "PENB" )

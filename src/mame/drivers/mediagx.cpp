@@ -883,10 +883,10 @@ void mediagx_state::ramdac_map(address_map &map)
 MACHINE_CONFIG_START(mediagx_state::mediagx)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, MEDIAGX, 166000000)
-	MCFG_DEVICE_PROGRAM_MAP(mediagx_map)
-	MCFG_DEVICE_IO_MAP(mediagx_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+	MEDIAGX(config, m_maincpu, 166000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mediagx_state::mediagx_map);
+	m_maincpu->set_addrmap(AS_IO, &mediagx_state::mediagx_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
 
 	pcat_common(config);
 
@@ -902,25 +902,23 @@ MACHINE_CONFIG_START(mediagx_state::mediagx)
 	m_ramdac->set_addrmap(0, &mediagx_state::ramdac_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(mediagx_state, screen_update)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(640, 480);
+	m_screen->set_visarea(0, 639, 0, 239);
+	m_screen->set_screen_update(FUNC(mediagx_state::screen_update));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cga);
 
-	MCFG_PALETTE_ADD(m_palette, 256)
+	PALETTE(config, m_palette).set_entries(256);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD(m_dmadac[0], DMADAC)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	DMADAC(config, m_dmadac[0]).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 
-	MCFG_DEVICE_ADD(m_dmadac[1], DMADAC)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	DMADAC(config, m_dmadac[1]).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 MACHINE_CONFIG_END
 
 

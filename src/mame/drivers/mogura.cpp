@@ -208,22 +208,22 @@ void mogura_state::machine_start()
 {
 }
 
-MACHINE_CONFIG_START(mogura_state::mogura)
-
+void mogura_state::mogura(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,3000000)         /* 3 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(mogura_map)
-	MCFG_DEVICE_IO_MAP(mogura_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mogura_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 3000000);         /* 3 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &mogura_state::mogura_map);
+	m_maincpu->set_addrmap(AS_IO, &mogura_state::mogura_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(mogura_state::irq0_line_hold));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60) // ?
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 512)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mogura_state, screen_update_mogura)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60); // ?
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 512);
+	screen.set_visarea(0, 320-1, 0, 256-1);
+	screen.set_screen_update(FUNC(mogura_state::screen_update_mogura));
+	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_mogura);
 	PALETTE(config, "palette", FUNC(mogura_state::mogura_palette), 32);
@@ -236,7 +236,7 @@ MACHINE_CONFIG_START(mogura_state::mogura)
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
 	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( mogura )

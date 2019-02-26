@@ -297,31 +297,31 @@ void molecula_state::molecula_palette(palette_device &palette) const
 {
 }
 
-MACHINE_CONFIG_START(molecula_state::molecula)
-
+void molecula_state::molecula(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("filecpu",Z80,Z80_CLOCK/2)
-	MCFG_DEVICE_PROGRAM_MAP(molecula_file_map)
-	MCFG_DEVICE_IO_MAP(molecula_file_io)
-	MCFG_DEVICE_DISABLE()
+	Z80(config, m_filecpu, Z80_CLOCK/2);
+	m_filecpu->set_addrmap(AS_PROGRAM, &molecula_state::molecula_file_map);
+	m_filecpu->set_addrmap(AS_IO, &molecula_state::molecula_file_io);
+	m_filecpu->set_disable();
 
-	MCFG_DEVICE_ADD("appcpu",Z80,Z80_CLOCK/2)
-	MCFG_DEVICE_PROGRAM_MAP(molecula_app_map)
-	MCFG_DEVICE_IO_MAP(molecula_app_io)
+	z80_device &appcpu(Z80(config, "appcpu", Z80_CLOCK/2));
+	appcpu.set_addrmap(AS_PROGRAM, &molecula_state::molecula_app_map);
+	appcpu.set_addrmap(AS_IO, &molecula_state::molecula_app_io);
 
-//  MCFG_DEVICE_ADD("sub",I8086,I86_CLOCK/2)
-//  MCFG_DEVICE_PROGRAM_MAP(molecula_map)
-//  MCFG_DEVICE_IO_MAP(molecula_io)
-//  MCFG_DEVICE_DISABLE()
+//  i8086_device &sub(I8086(config, "sub", I86_CLOCK/2));
+//  sub.set_addrmap(AS_PROGRAM, &molecula_state::molecula_map);
+//  sub.set_addrmap(AS_IO, &molecula_state::molecula_io);
+//  sub.set_disable();
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_UPDATE_DRIVER(molecula_state, screen_update)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_screen_update(FUNC(molecula_state::screen_update));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
+	screen.set_palette("palette");
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_molecula);
 
@@ -330,7 +330,7 @@ MACHINE_CONFIG_START(molecula_state::molecula)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 //  AY8910(config, "aysnd", MAIN_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 0.30);
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

@@ -264,7 +264,8 @@ static const z80_daisy_config daisy_chain[] =
 	{ nullptr }
 };
 
-MACHINE_CONFIG_START(m79152pc_state::m79152pc)
+void m79152pc_state::m79152pc(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 4'000'000); // UA880D
 	m_maincpu->set_addrmap(AS_PROGRAM, &m79152pc_state::mem_map);
@@ -342,7 +343,7 @@ MACHINE_CONFIG_START(m79152pc_state::m79152pc)
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beep, 1000);
 	m_beep->add_route(ALL_OUTPUTS, "mono", 0.50);
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( m79152pc )

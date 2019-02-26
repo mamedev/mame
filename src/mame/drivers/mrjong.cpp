@@ -185,22 +185,22 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(mrjong_state::mrjong)
-
+void mrjong_state::mrjong(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,15468000/6) /* 2.578 MHz?? */
-	MCFG_DEVICE_PROGRAM_MAP(mrjong_map)
-	MCFG_DEVICE_IO_MAP(mrjong_io_map)
+	Z80(config, m_maincpu,15468000/6); /* 2.578 MHz?? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &mrjong_state::mrjong_map);
+	m_maincpu->set_addrmap(AS_IO, &mrjong_state::mrjong_io_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 30*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mrjong_state, screen_update_mrjong)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 30*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(mrjong_state::screen_update_mrjong));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mrjong);
 	PALETTE(config, m_palette, FUNC(mrjong_state::mrjong_palette), 4 * 32, 16);
@@ -209,7 +209,7 @@ MACHINE_CONFIG_START(mrjong_state::mrjong)
 	SPEAKER(config, "mono").front_center();
 	SN76489(config, "sn1", 15468000 / 6).add_route(ALL_OUTPUTS, "mono", 1.0);
 	SN76489(config, "sn2", 15468000 / 6).add_route(ALL_OUTPUTS, "mono", 1.0);
-MACHINE_CONFIG_END
+}
 
 
 /*************************************

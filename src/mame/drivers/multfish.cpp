@@ -1053,26 +1053,27 @@ void igrosoft_gamble_state::machine_reset()
 	m_rambk = 0;
 }
 
-MACHINE_CONFIG_START(igrosoft_gamble_state::igrosoft_gamble)
+void igrosoft_gamble_state::igrosoft_gamble(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(24'000'000)/4)
-	MCFG_DEVICE_PROGRAM_MAP(igrosoft_gamble_map)
-	MCFG_DEVICE_IO_MAP(igrosoft_gamble_portmap)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", igrosoft_gamble_state, irq0_line_hold)
+	Z80(config, m_maincpu, XTAL(24'000'000)/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &igrosoft_gamble_state::igrosoft_gamble_map);
+	m_maincpu->set_addrmap(AS_IO, &igrosoft_gamble_state::igrosoft_gamble_portmap);
+	m_maincpu->set_vblank_int("screen", FUNC(igrosoft_gamble_state::irq0_line_hold));
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*16, 32*16)
-	MCFG_SCREEN_VISIBLE_AREA(17*16, 1024-16*7-1, 1*16, 32*16-1*16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(igrosoft_gamble_state, screen_update_igrosoft_gamble)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(64*16, 32*16);
+	m_screen->set_visarea(17*16, 1024-16*7-1, 1*16, 32*16-1*16-1);
+	m_screen->set_screen_update(FUNC(igrosoft_gamble_state::screen_update_igrosoft_gamble));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_igrosoft_gamble);
-	MCFG_PALETTE_ADD("palette", 0x1000)
+	PALETTE(config, m_palette).set_entries(0x1000);
 
 
 	SPEAKER(config, "mono").front_center();
@@ -1080,13 +1081,13 @@ MACHINE_CONFIG_START(igrosoft_gamble_state::igrosoft_gamble)
 
 	M48T35(config, m_m48t35, 0);
 	HOPPER(config, m_hopper, attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(igrosoft_gamble_state::rollfr)
+void igrosoft_gamble_state::rollfr(machine_config &config)
+{
 	igrosoft_gamble(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(rollfr_portmap)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_IO, &igrosoft_gamble_state::rollfr_portmap);
+}
 
 
 

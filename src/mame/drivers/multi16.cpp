@@ -138,7 +138,8 @@ void multi16_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(multi16_state::multi16)
+void multi16_state::multi16(machine_config &config)
+{
 	/* basic machine hardware */
 	I8086(config, m_maincpu, 8000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &multi16_state::multi16_map);
@@ -146,15 +147,15 @@ MACHINE_CONFIG_START(multi16_state::multi16)
 	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 200)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
-	MCFG_SCREEN_UPDATE_DRIVER(multi16_state, screen_update_multi16)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(640, 200);
+	screen.set_visarea(0, 640-1, 0, 200-1);
+	screen.set_screen_update(FUNC(multi16_state::screen_update_multi16));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 8)
+	PALETTE(config, m_palette).set_entries(8);
 
 	/* devices */
 	H46505(config, m_crtc, 16000000/5);    /* unknown clock, hand tuned to get ~60 fps */
@@ -164,7 +165,7 @@ MACHINE_CONFIG_START(multi16_state::multi16)
 
 	PIC8259(config, m_pic, 0);
 	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( multi16 )

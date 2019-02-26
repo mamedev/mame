@@ -553,13 +553,14 @@ MACHINE_RESET_MEMBER(namcofl_state,namcofl)
 }
 
 
-MACHINE_CONFIG_START(namcofl_state::namcofl)
-	MCFG_DEVICE_ADD("maincpu", I960, 80_MHz_XTAL/4) // i80960KA-20 == 20 MHz part
-	MCFG_DEVICE_PROGRAM_MAP(namcofl_mem)
+void namcofl_state::namcofl(machine_config &config)
+{
+	I960(config, m_maincpu, 80_MHz_XTAL/4); // i80960KA-20 == 20 MHz part
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcofl_state::namcofl_mem);
 
-	MCFG_DEVICE_ADD("mcu", NAMCO_C75, 48.384_MHz_XTAL/3)
-	MCFG_DEVICE_PROGRAM_MAP(namcoc75_am)
-	MCFG_DEVICE_IO_MAP(namcoc75_io)
+	NAMCO_C75(config, m_mcu, 48.384_MHz_XTAL/3);
+	m_mcu->set_addrmap(AS_PROGRAM, &namcofl_state::namcoc75_am);
+	m_mcu->set_addrmap(AS_IO, &namcofl_state::namcoc75_io);
 	/* TODO: irq generation for these */
 	TIMER(config, "mcu_irq0").configure_periodic(FUNC(namcofl_state::mcu_irq0_cb), attotime::from_hz(60));
 	TIMER(config, "mcu_irq2").configure_periodic(FUNC(namcofl_state::mcu_irq2_cb), attotime::from_hz(60));
@@ -569,12 +570,12 @@ MACHINE_CONFIG_START(namcofl_state::namcofl)
 	MCFG_MACHINE_RESET_OVERRIDE(namcofl_state,namcofl)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(NAMCOFL_HTOTAL, NAMCOFL_VTOTAL)
-	MCFG_SCREEN_VISIBLE_AREA(0, NAMCOFL_HBSTART-1, 0, NAMCOFL_VBSTART-1)
-	MCFG_SCREEN_UPDATE_DRIVER(namcofl_state, screen_update_namcofl)
-	MCFG_SCREEN_PALETTE(m_c116)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(NAMCOFL_HTOTAL, NAMCOFL_VTOTAL);
+	m_screen->set_visarea(0, NAMCOFL_HBSTART-1, 0, NAMCOFL_VBSTART-1);
+	m_screen->set_screen_update(FUNC(namcofl_state::screen_update_namcofl));
+	m_screen->set_palette(m_c116);
 
 	GFXDECODE(config, "gfxdecode", m_c116, gfx_namcofl);
 
@@ -605,12 +606,12 @@ MACHINE_CONFIG_START(namcofl_state::namcofl)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("c352", C352, 48.384_MHz_XTAL/2, 288)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
-	//MCFG_SOUND_ROUTE(2, "lspeaker", 1.00) // Second DAC not present.
-	//MCFG_SOUND_ROUTE(3, "rspeaker", 1.00)
-MACHINE_CONFIG_END
+	c352_device &c352(C352(config, "c352", 48.384_MHz_XTAL/2, 288));
+	c352.add_route(0, "lspeaker", 1.00);
+	c352.add_route(1, "rspeaker", 1.00);
+	//c352.add_route(2, "lspeaker", 1.00); // Second DAC not present.
+	//c352.add_route(3, "rspeaker", 1.00);
+}
 
 ROM_START( speedrcr )
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program

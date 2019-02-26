@@ -336,11 +336,11 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(offtwall_state::offtwall)
-
+void offtwall_state::offtwall(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	M68000(config, m_maincpu, ATARI_CLOCK_14MHz/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &offtwall_state::main_map);
 
 	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
@@ -355,13 +355,13 @@ MACHINE_CONFIG_START(offtwall_state::offtwall)
 	TILEMAP(config, "vad:playfield", "gfxdecode", 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64).set_info_callback(DEVICE_SELF_OWNER, FUNC(offtwall_state::get_playfield_tile_info));
 	ATARI_MOTION_OBJECTS(config, "vad:mob", 0, "screen", offtwall_state::s_mob_config).set_gfxdecode("gfxdecode");
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses a VAD chip to generate video signals */
-	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(offtwall_state, screen_update_offtwall)
-	MCFG_SCREEN_PALETTE("palette")
+	screen.set_raw(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240);
+	screen.set_screen_update(FUNC(offtwall_state::screen_update_offtwall));
+	screen.set_palette("palette");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -371,7 +371,7 @@ MACHINE_CONFIG_START(offtwall_state::offtwall)
 	m_jsa->test_read_cb().set_ioport("260010").bit(6);
 	m_jsa->add_route(ALL_OUTPUTS, "mono", 1.0);
 	config.device_remove("jsa:oki1");
-MACHINE_CONFIG_END
+}
 
 
 

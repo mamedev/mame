@@ -179,26 +179,26 @@ TIMER_DEVICE_CALLBACK_MEMBER(mustache_state::scanline)
 
 
 
-MACHINE_CONFIG_START(mustache_state::mustache)
-
+void mustache_state::mustache(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(memmap)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
+	Z80(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mustache_state::memmap);
+	m_maincpu->set_addrmap(AS_OPCODES, &mustache_state::decrypted_opcodes_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(mustache_state::scanline), "screen", 0, 1);
 
 	SEI80BU(config, "sei80bu", 0).set_device_rom_tag("maincpu");
 
-	MCFG_DEVICE_ADD("t5182", T5182, 0)
+	T5182(config, "t5182", 0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(56.747)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 0, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mustache_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(56.747);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(1*8, 31*8-1, 0, 31*8-1);
+	m_screen->set_screen_update(FUNC(mustache_state::screen_update));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mustache);
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
@@ -210,7 +210,7 @@ MACHINE_CONFIG_START(mustache_state::mustache)
 	ymsnd.irq_handler().set("t5182", FUNC(t5182_device::ym2151_irq_handler));
 	ymsnd.add_route(0, "mono", 1.0);
 	ymsnd.add_route(1, "mono", 1.0);
-MACHINE_CONFIG_END
+}
 
 ROM_START( mustache )
 	ROM_REGION( 0x20000, "maincpu", 0 )

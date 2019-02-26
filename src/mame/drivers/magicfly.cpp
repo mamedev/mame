@@ -940,22 +940,22 @@ GFXDECODE_END
 *              Machine Drivers               *
 *********************************************/
 
-MACHINE_CONFIG_START(magicfly_state::magicfly)
-
+void magicfly_state::magicfly(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK / 16) /* guess */
-	MCFG_DEVICE_PROGRAM_MAP(magicfly_map)
+	M6502(config, m_maincpu, MASTER_CLOCK / 16); /* guess */
+	m_maincpu->set_addrmap(AS_PROGRAM, &magicfly_state::magicfly_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE((39+1)*8, (31+1)*8)                /* Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1). */
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 29*8-1)  /* Taken from MC6845 init, registers 01 & 06. */
-	MCFG_SCREEN_UPDATE_DRIVER(magicfly_state, screen_update_magicfly)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size((39+1)*8, (31+1)*8);                /* Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1). */
+	screen.set_visarea(0*8, 32*8-1, 0*8, 29*8-1);  /* Taken from MC6845 init, registers 01 & 06. */
+	screen.set_screen_update(FUNC(magicfly_state::screen_update_magicfly));
+	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_magicfly);
 	PALETTE(config, "palette", FUNC(magicfly_state::magicfly_palette), 32);
@@ -971,16 +971,16 @@ MACHINE_CONFIG_START(magicfly_state::magicfly)
 	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(magicfly_state::_7mezzo)
+void magicfly_state::_7mezzo(machine_config &config)
+{
 	magicfly(config);
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(magicfly_state, 7mezzo)
-
-MACHINE_CONFIG_END
+}
 
 
 void magicfly_state::bchance(machine_config &config)
