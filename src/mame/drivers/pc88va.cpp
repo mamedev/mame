@@ -1585,30 +1585,30 @@ WRITE8_MEMBER(pc88va_state::dma_memw_cb)
 }
 
 
-MACHINE_CONFIG_START(pc88va_state::pc88va)
-
-	MCFG_DEVICE_ADD("maincpu", V30, 8000000)        /* 8 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(pc88va_map)
-	MCFG_DEVICE_IO_MAP(pc88va_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pc88va_state, pc88va_vrtc_irq)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
+void pc88va_state::pc88va(machine_config &config)
+{
+	V30(config, m_maincpu, 8000000);        /* 8 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc88va_state::pc88va_map);
+	m_maincpu->set_addrmap(AS_IO, &pc88va_state::pc88va_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(pc88va_state::pc88va_vrtc_irq));
+	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
 #if TEST_SUBFDC
-	MCFG_DEVICE_ADD("fdccpu", Z80, 8000000)        /* 8 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(pc88va_z80_map)
-	MCFG_DEVICE_IO_MAP(pc88va_z80_io_map)
+	z80_device &fdccpu(Z80(config, "fdccpu", 8000000));        /* 8 MHz */
+	fdccpu.set_addrmap(AS_PROGRAM, &pc88va_state::pc88va_z80_map);
+	fdccpu.set_addrmap(AS_IO, &pc88va_state::pc88va_z80_io_map);
 
 	config.m_perfect_cpu_quantum = subtag("maincpu");
 #endif
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
-	MCFG_SCREEN_UPDATE_DRIVER(pc88va_state, screen_update_pc88va)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(640, 480);
+	m_screen->set_visarea(0, 640-1, 0, 200-1);
+	m_screen->set_screen_update(FUNC(pc88va_state::screen_update_pc88va));
 
-	MCFG_PALETTE_ADD("palette", 32)
-//  MCFG_PALETTE_INIT_OWNER(pc88va_state, pc8801 )
+	PALETTE(config, m_palette).set_entries(32);
+//  m_palette->set_init(FUNC(pc88va_state::pc8801));
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pc88va);
 
 	i8255_device &d8255_2(I8255(config, "d8255_2"));
@@ -1664,12 +1664,12 @@ MACHINE_CONFIG_START(pc88va_state::pc88va)
 	ADDRESS_MAP_BANK(config, "sysbank").set_map(&pc88va_state::sysbank_map).set_options(ENDIANNESS_LITTLE, 16, 18+4, 0x40000);
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ym", YM2203, 3993600) //unknown clock / divider
-	MCFG_SOUND_ROUTE(0, "mono", 0.25)
-	MCFG_SOUND_ROUTE(1, "mono", 0.25)
-	MCFG_SOUND_ROUTE(2, "mono", 0.50)
-	MCFG_SOUND_ROUTE(3, "mono", 0.50)
-MACHINE_CONFIG_END
+	ym2203_device &ym(YM2203(config, "ym", 3993600)); //unknown clock / divider
+	ym.add_route(0, "mono", 0.25);
+	ym.add_route(1, "mono", 0.25);
+	ym.add_route(2, "mono", 0.50);
+	ym.add_route(3, "mono", 0.50);
+}
 
 
 ROM_START( pc88va2 )

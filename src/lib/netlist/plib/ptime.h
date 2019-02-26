@@ -47,19 +47,19 @@ namespace plib
 		C14CONSTEXPR ptime &operator-=(const ptime rhs) noexcept { m_time -= rhs.m_time; return *this; }
 		C14CONSTEXPR ptime &operator*=(const mult_type factor) noexcept { m_time *= static_cast<internal_type>(factor); return *this; }
 
-		friend C14CONSTEXPR ptime operator-(ptime lhs, const ptime rhs) noexcept
+		friend constexpr const ptime operator-(ptime lhs, const ptime rhs) noexcept
 		{
-			return lhs -= rhs;
+			return ptime(lhs.m_time - rhs.m_time);
 		}
 
-		friend C14CONSTEXPR ptime operator+(ptime lhs, const ptime rhs) noexcept
+		friend constexpr const ptime operator+(ptime lhs, const ptime rhs) noexcept
 		{
-			return lhs += rhs;
+			return ptime(lhs.m_time + rhs.m_time);
 		}
 
-		friend C14CONSTEXPR ptime operator*(ptime lhs, const mult_type &factor) noexcept
+		friend constexpr const ptime operator*(ptime lhs, const mult_type &factor) noexcept
 		{
-			return lhs *= factor;
+			return ptime(lhs.m_time * factor);
 		}
 
 		friend constexpr mult_type operator/(const ptime lhs, const ptime rhs) noexcept

@@ -24,7 +24,7 @@ public:
 	virtual ~ntb_cart_interface();
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read) { return m_rom[offset]; }
+	virtual uint8_t read(offs_t offset) { return m_rom[offset]; }
 
 	uint8_t *get_cart_base() { return m_rom; }
 
@@ -78,7 +78,7 @@ public:
 	// slot interface overrides
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
-	virtual DECLARE_READ8_MEMBER(read);
+	virtual uint8_t read(offs_t offset);
 
 protected:
 	ntb_cart_interface*      m_cart;
@@ -133,10 +133,10 @@ public:
 	// construction/destruction
 	nes_sunsoft_dcs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ8_MEMBER(read_m) override;
-	virtual DECLARE_READ8_MEMBER(read_h) override;
-	virtual DECLARE_WRITE8_MEMBER(write_m) override;
-	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+	virtual uint8_t read_m(offs_t offset) override;
+	virtual uint8_t read_h(offs_t offset) override;
+	virtual void write_m(offs_t offset, uint8_t data) override;
+	virtual void write_h(offs_t offset, uint8_t data) override;
 
 	virtual void pcb_reset() override;
 

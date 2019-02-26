@@ -12,11 +12,11 @@
 
 #include "plib/mat_cr.h"
 
+#include "nld_ms_direct.h"
+#include "nld_solver.h"
 #include "plib/pdynlib.h"
 #include "plib/pstream.h"
 #include "plib/vector_ops.h"
-#include "nld_ms_direct.h"
-#include "nld_solver.h"
 
 #include <algorithm>
 
@@ -65,9 +65,6 @@ private:
 	const std::size_t m_dim;
 	plib::parray<FT, SIZE> RHS;
 	plib::parray<FT, SIZE> new_V;
-
-	std::array<plib::aligned_vector<FT *, PALIGN_VECTOROPT>, storage_N> m_term_cr;
-//	std::array<std::vector<FT *>, storage_N> m_term_cr;
 
 	mat_type mat;
 
@@ -163,20 +160,21 @@ void matrix_solver_GCR_t<FT, SIZE>::vsetup(analog_net_t::list_t &nets)
 
 	for (mat_index_type k=0; k<iN; k++)
 	{
-		m_term_cr[k].clear();
+		std::size_t cnt(0);
 		/* build pointers into the compressed row format matrix for each terminal */
 		for (std::size_t j=0; j< this->m_terms[k]->m_railstart;j++)
 		{
-			int other = this->m_terms[k]->connected_net_idx()[j];
+			int other = this->m_terms[k]->m_connected_net_idx[j];
 			for (auto i = mat.row_idx[k]; i <  mat.row_idx[k+1]; i++)
 				if (other == static_cast<int>(mat.col_idx[i]))
 				{
-					m_term_cr[k].push_back(&mat.A[i]);
+					m_mat_ptr[k][j] = &mat.A[i];
+					cnt++;
 					break;
 				}
 		}
-		nl_assert(m_term_cr[k].size() == this->m_terms[k]->m_railstart);
-		m_term_cr[k].push_back(&mat.A[mat.diag[k]]);
+		nl_assert(cnt == this->m_terms[k]->m_railstart);
+		m_mat_ptr[k][this->m_terms[k]->m_railstart] = &mat.A[mat.diag[k]];
 	}
 
 	this->log().verbose("maximum fill: {1}", gr.first);
@@ -296,8 +294,8 @@ unsigned matrix_solver_GCR_t<FT, SIZE>::vsolve_non_dynamic(const bool newton_rap
 	mat.set_scalar(0.0);
 
 	/* populate matrix */
-	for (std::size_t k = 0; k < iN; k++)
-		this->m_terms[k]->fill_matrix(m_term_cr[k], RHS[k]);
+
+	this->fill_matrix(iN, m_mat_ptr, RHS);
 
 	/* now solve it */
 

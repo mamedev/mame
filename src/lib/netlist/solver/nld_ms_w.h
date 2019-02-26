@@ -42,9 +42,9 @@
 
 #include <algorithm>
 
-#include "plib/vector_ops.h"
 #include "nld_matrix_solver.h"
 #include "nld_solver.h"
+#include "plib/vector_ops.h"
 
 namespace netlist
 {

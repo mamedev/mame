@@ -221,20 +221,21 @@ READ8_MEMBER( p2000t_state::videoram_r )
 }
 
 /* Machine definition */
-MACHINE_CONFIG_START(p2000t_state::p2000t)
+void p2000t_state::p2000t(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 2500000)
-	MCFG_DEVICE_PROGRAM_MAP(p2000t_mem)
-	MCFG_DEVICE_IO_MAP(p2000t_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", p2000t_state,  p2000_interrupt)
+	Z80(config, m_maincpu, 2500000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &p2000t_state::p2000t_mem);
+	m_maincpu->set_addrmap(AS_IO, &p2000t_state::p2000t_io);
+	m_maincpu->set_vblank_int("screen", FUNC(p2000t_state::p2000_interrupt));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(40 * 12, 24 * 20)
-	MCFG_SCREEN_VISIBLE_AREA(0, 40 * 12 - 1, 0, 24 * 20 - 1)
-	MCFG_SCREEN_UPDATE_DEVICE("saa5050", saa5050_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_size(40 * 12, 24 * 20);
+	screen.set_visarea(0, 40 * 12 - 1, 0, 24 * 20 - 1);
+	screen.set_screen_update("saa5050", FUNC(saa5050_device::screen_update));
 
 	saa5050_device &saa5050(SAA5050(config, "saa5050", 6000000));
 	saa5050.d_cb().set(FUNC(p2000t_state::videoram_r));
@@ -242,28 +243,28 @@ MACHINE_CONFIG_START(p2000t_state::p2000t)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 /* Machine definition */
-MACHINE_CONFIG_START(p2000m_state::p2000m)
+void p2000m_state::p2000m(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 2500000)
-	MCFG_DEVICE_PROGRAM_MAP(p2000m_mem)
-	MCFG_DEVICE_IO_MAP(p2000t_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", p2000m_state,  p2000_interrupt)
+	Z80(config, m_maincpu, 2500000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &p2000m_state::p2000m_mem);
+	m_maincpu->set_addrmap(AS_IO, &p2000m_state::p2000t_io);
+	m_maincpu->set_vblank_int("screen", FUNC(p2000m_state::p2000_interrupt));
 	config.m_minimum_quantum = attotime::from_hz(60);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(80 * 12, 24 * 20)
-	MCFG_SCREEN_VISIBLE_AREA(0, 80 * 12 - 1, 0, 24 * 20 - 1)
-	MCFG_SCREEN_UPDATE_DRIVER(p2000m_state, screen_update_p2000m)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(80 * 12, 24 * 20);
+	screen.set_visarea(0, 80 * 12 - 1, 0, 24 * 20 - 1);
+	screen.set_screen_update(FUNC(p2000m_state::screen_update_p2000m));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_p2000m);
 	PALETTE(config, m_palette, FUNC(p2000m_state::p2000m_palette), 4);
@@ -271,7 +272,7 @@ MACHINE_CONFIG_START(p2000m_state::p2000m)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
-MACHINE_CONFIG_END
+}
 
 
 ROM_START(p2000t)

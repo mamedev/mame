@@ -92,23 +92,23 @@ public:
 	void add_card(device_wangpcbus_card_interface *card, int sid);
 
 	// computer interface
-	DECLARE_READ16_MEMBER( mrdc_r );
-	DECLARE_WRITE16_MEMBER( amwc_w );
+	uint16_t mrdc_r(offs_t offset, uint16_t mem_mask = 0xffff);
+	void amwc_w(offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ16_MEMBER( sad_r );
-	DECLARE_WRITE16_MEMBER( sad_w );
+	uint16_t sad_r(offs_t offset, uint16_t mem_mask = 0xffff);
+	void sad_w(offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	uint8_t dack_r(address_space &space, int line);
-	void dack_w(address_space &space, int line, uint8_t data);
+	uint8_t dack_r(int line);
+	void dack_w(int line, uint8_t data);
 
-	DECLARE_READ8_MEMBER( dack0_r ) { return dack_r(space, 0); }
-	DECLARE_WRITE8_MEMBER( dack0_w ) { dack_w(space, 0, data); }
-	DECLARE_READ8_MEMBER( dack1_r ) { return dack_r(space, 1); }
-	DECLARE_WRITE8_MEMBER( dack1_w ) { dack_w(space, 1, data); }
-	DECLARE_READ8_MEMBER( dack2_r ) { return dack_r(space, 2); }
-	DECLARE_WRITE8_MEMBER( dack2_w ) { dack_w(space, 2, data); }
-	DECLARE_READ8_MEMBER( dack3_r ) { return dack_r(space, 3); }
-	DECLARE_WRITE8_MEMBER( dack3_w ) { dack_w(space, 3, data); }
+	uint8_t dack0_r() { return dack_r(0); }
+	void dack0_w(uint8_t data) { dack_w(0, data); }
+	uint8_t dack1_r() { return dack_r(1); }
+	void dack1_w(uint8_t data) { dack_w(1, data); }
+	uint8_t dack2_r() { return dack_r(2); }
+	void dack2_w(uint8_t data) { dack_w(2, data); }
+	uint8_t dack3_r() { return dack_r(3); }
+	void dack3_w(uint8_t data) { dack_w(3, data); }
 
 	DECLARE_WRITE_LINE_MEMBER( tc_w );
 
@@ -160,17 +160,17 @@ public:
 	device_wangpcbus_card_interface *next() const { return m_next; }
 
 	// memory access
-	virtual uint16_t wangpcbus_mrdc_r(address_space &space, offs_t offset, uint16_t mem_mask) { return 0; }
-	virtual void wangpcbus_amwc_w(address_space &space, offs_t offset, uint16_t mem_mask, uint16_t data) { }
+	virtual uint16_t wangpcbus_mrdc_r(offs_t offset, uint16_t mem_mask) { return 0; }
+	virtual void wangpcbus_amwc_w(offs_t offset, uint16_t mem_mask, uint16_t data) { }
 
 	// I/O access
-	virtual uint16_t wangpcbus_iorc_r(address_space &space, offs_t offset, uint16_t mem_mask) { return 0; }
-	virtual void wangpcbus_aiowc_w(address_space &space, offs_t offset, uint16_t mem_mask, uint16_t data) { }
+	virtual uint16_t wangpcbus_iorc_r(offs_t offset, uint16_t mem_mask) { return 0; }
+	virtual void wangpcbus_aiowc_w(offs_t offset, uint16_t mem_mask, uint16_t data) { }
 	bool sad(offs_t offset) const { return (offset & 0xf80) == (0x800 | (m_sid << 7)); }
 
 	// DMA
-	virtual uint8_t wangpcbus_dack_r(address_space &space, int line) { return 0; }
-	virtual void wangpcbus_dack_w(address_space &space, int line, uint8_t data) { }
+	virtual uint8_t wangpcbus_dack_r(int line) { return 0; }
+	virtual void wangpcbus_dack_w(int line, uint8_t data) { }
 	virtual void wangpcbus_tc_w(int state) { }
 	virtual bool wangpcbus_have_dack(int line) { return false; }
 

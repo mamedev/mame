@@ -259,17 +259,17 @@ function cheatfind.startplugin()
 	local devtable = {}
 	local devsel = 1
 	local devcur = 1
-	
-	
+
+
 	--local formtable = { " I1", " i1", "<I2", ">I2", "<i2", ">i2", "<I4", ">I4", "<i4", ">i4", "<I8", ">I8", "<i8", ">i8", }-- " <f", " >f", " <d", " >d" }
 	--local formname = { "u8", "s8", "little u16", "big u16", "little s16", "big s16",
-	--		   "little u32", "big u32", "little s32", "big s32", "little u64", "big u64", "little s64", "big s64", }
-	--		   -- "little float", "big float", "little double", "big double" }
+	--         "little u32", "big u32", "little s32", "big s32", "little u64", "big u64", "little s64", "big s64", }
+	--         -- "little float", "big float", "little double", "big double" }
 	-- Reordered into likelyhood of use order: unsigned byte by big endian unsigned by little endian unsigned then unsigned in same order
 	local formtable = { " I1", ">I2", ">I4", ">I8", "<I2", "<I4", "<I8", " i1", ">i2", ">i4", ">i8", "<i2", "<i4", "<i8", }-- " <f", " >f", " <d", " >d" }
-	local formname = { "u8", "big u16", "big u32", "big u64", "little u16", "little u32", 
-			   "little u64", "s8", "big s16", "big s32", "big s64", "little s16", "little s32", "little s64", }			
-			   
+	local formname = { "u8", "big u16", "big u32", "big u64", "little u16", "little u32",
+			   "little u64", "s8", "big s16", "big s32", "big s64", "little s16", "little s32", "little s64", }
+
 	local width = 1
 	local bcd = 0
 	local align = 0
@@ -278,16 +278,16 @@ function cheatfind.startplugin()
 	local value = 0
 	local leftop = 1
 	local rightop = 1
-    local leftop_text = "Slot 1"
-    local rightop_text = "Slot 1"
-    local value_text = ""
-    local expression_text = "Slot 1 < Slot 1"
+	local leftop_text = "Slot 1"
+	local rightop_text = "Slot 1"
+	local value_text = ""
+	local expression_text = "Slot 1 < Slot 1"
 	local pausetable = { "Automatic", "Manual" }
 	local pausesel = 1
-	local pokevaltable = { "Slot 1 Value", "Last Slot Value", "0x00", "0x01", "0x02", "0x03", "0x04", "0x05", "0x06", "0x07", "0x08", "0x09", "0x63 (Decimal 99)", "0x99 (BCD 99)", 
+	local pokevaltable = { "Slot 1 Value", "Last Slot Value", "0x00", "0x01", "0x02", "0x03", "0x04", "0x05", "0x06", "0x07", "0x08", "0x09", "0x63 (Decimal 99)", "0x99 (BCD 99)",
 							"0xFF (Decimal 255)" , "0x3E7 (Decimal 999)", "0x999 (BCD 999)", "0x270F (Decimal 9999)", "0x9999 (BCD 9999)", "0xFFFF (Decimal 65535)" }
 	local pokevalsel = 1
-	
+
 	local matches = {}
 	local matchsel = 0
 	local matchpg = 0
@@ -350,12 +350,12 @@ function cheatfind.startplugin()
 	end
 
 	emu.register_start(start)
-	
+
 	local menu_is_showing = false
-    local tabbed_out = false
-	
+	local tabbed_out = false
+
 	local function menu_populate()
-	    if pausesel == 1 then
+		if pausesel == 1 then
 			emu.pause()
 			menu_is_showing = true
 		end
@@ -504,24 +504,24 @@ function cheatfind.startplugin()
 			local m = { _("Pause Mode"), pausetable[pausesel], 0 }
 			menu_lim(pausesel, 1, pausetable, m)
 			local function f(event)
-				if (event == "left" or event == "right") then					
+				if (event == "left" or event == "right") then
 					if pausesel == 1 then
 						pausesel = 2
 						menu_is_showing = false
 						manager:machine():popmessage(_("Manually pause & unpause the game when needed with the pause hotkey"))
-					else 
+					else
 						pausesel = 1
 						emu.pause()
-					end	
+					end
 				end
 
 				return true
 			end
-			return m, f			
-		end	
+			return m, f
+		end
 
-		
-		
+
+
 		menu[#menu + 1] = function()
 			local function f(event)
 				local ret = false
@@ -542,7 +542,7 @@ function cheatfind.startplugin()
 					leftop_text = "Slot 1"
 					rightop_text = "Slot 1"
 					value_text = ""
-					expression_text = "Slot 1 < Slot 1"							
+					expression_text = "Slot 1 < Slot 1"
 					matchsel = 0
 					return true
 				end
@@ -550,9 +550,9 @@ function cheatfind.startplugin()
 				local opsel = 1
 			return { _("Start new search"), "", 0 }, f
 		end
-		
 
-		
+
+
 		if #menu_blocks ~= 0 then
 			menu[#menu + 1] = function() return { "---", "", "off" }, nil end
 			menu[#menu + 1] = function()
@@ -562,7 +562,7 @@ function cheatfind.startplugin()
 							menu_blocks[num][#menu_blocks[num] + 1] = cheat.save(devtable[devcur].space, region.offset, region.size)
 						end
 						manager:machine():popmessage(string.format(_("Memory State saved to Slot %d"), #menu_blocks[1]))
-						
+
 						if (leftop == #menu_blocks[1] - 1 and rightop == #menu_blocks[1] - 2 ) then
 							leftop = #menu_blocks[1]
 							rightop = #menu_blocks[1]-1
@@ -571,7 +571,7 @@ function cheatfind.startplugin()
 							rightop = #menu_blocks[1]
 						elseif (leftop == #menu_blocks[1] - 1 ) then
 							leftop = #menu_blocks[1]
-						elseif (rightop == #menu_blocks[1] - 1) then	
+						elseif (rightop == #menu_blocks[1] - 1) then
 							rightop = #menu_blocks[1]
 						end
 						leftop_text = string.format("Slot %d", leftop)
@@ -618,27 +618,27 @@ function cheatfind.startplugin()
 						return true
 					end
 				end
-				
+
 				if optable[opsel] == "lt" then
 					if (value == 0 ) then
-                		expression_text = string.format("%s < %s", leftop_text, rightop_text)
-              		else
-                		expression_text = string.format("%s == %s - %d", leftop_text, rightop_text, value)
-              		end
+						expression_text = string.format("%s < %s", leftop_text, rightop_text)
+					else
+						expression_text = string.format("%s == %s - %d", leftop_text, rightop_text, value)
+					end
 				elseif optable[opsel] == "gt" then
 					if (value == 0 ) then
-                		expression_text = string.format("%s > %s", leftop_text, rightop_text)
-              		else
-                		expression_text = string.format("%s == %s + %d", leftop_text, rightop_text, value)
-              		end
+						expression_text = string.format("%s > %s", leftop_text, rightop_text)
+					else
+						expression_text = string.format("%s == %s + %d", leftop_text, rightop_text, value)
+					end
 				elseif optable[opsel] == "eq" then
 					expression_text = string.format("%s == %s", leftop_text, rightop_text)
 				elseif optable[opsel] == "ne" then
 					if (value == 0 ) then
-                		expression_text = string.format("%s != %s", leftop_text, rightop_text)
-              		else
-                		expression_text = string.format("%s == %s +/- %d", leftop_text, rightop_text, value)
-              		end
+						expression_text = string.format("%s != %s", leftop_text, rightop_text)
+					else
+						expression_text = string.format("%s == %s +/- %d", leftop_text, rightop_text, value)
+					end
 				elseif optable[opsel] == "beq" then
 					expression_text = string.format("%s BITWISE== %s", leftop_text, rightop_text)
 				elseif optable[opsel] == "bne" then
@@ -651,10 +651,10 @@ function cheatfind.startplugin()
 					expression_text = string.format("%s == %d", leftop_text, value)
 				elseif optable[opsel] == "nev" then
 					string.format("%s != %d", leftop_text, value)
-				end		
+				end
 				return { _("Perform Compare  :  ") .. expression_text, "", 0 }, f
 			end
-            menu[#menu + 1] = function() return { "---", "", "off" }, nil end
+			menu[#menu + 1] = function() return { "---", "", "off" }, nil end
 			menu[#menu + 1] = function()
 				local m = { _(leftop), "", 0 }
 				menu_lim(leftop, 1, #menu_blocks[1], m)
@@ -712,7 +712,7 @@ function cheatfind.startplugin()
 					m = { _("Value"), value, "" }
 				else
 					m = { _("Difference"), value, "" }
-				end	
+				end
 				local max = 100 -- max value?
 				menu_lim(value, 0, max, m)
 				if value == 0 and optable[opsel]:sub(3, 3) ~= "v" then
@@ -726,7 +726,7 @@ function cheatfind.startplugin()
 				menu_lim(width, 1, #formtable, m)
 				return m, function(event) local r width, r = incdec(event, width, 1, #formtable) return r end
 			end
-					
+
 			menu[#menu + 1] = function()
 				local m = { _("Test/Write Poke Value"), pokevaltable[pokevalsel], 0 }
 				menu_lim(pokevalsel, 1, #pokevaltable, m)
@@ -741,19 +741,19 @@ function cheatfind.startplugin()
 						elseif pokevalsel == 3 then
 							manager:machine():popmessage(_("Use this if you want to poke 0x00"))
 						elseif pokevalsel == 4 then
-							manager:machine():popmessage(_("Use this if you want to poke 0x01"))	
+							manager:machine():popmessage(_("Use this if you want to poke 0x01"))
 						elseif pokevalsel == 5 then
 							manager:machine():popmessage(_("Use this if you want to poke 0x02"))
 						elseif pokevalsel == 6 then
-							manager:machine():popmessage(_("Use this if you want to poke 0x03"))	
+							manager:machine():popmessage(_("Use this if you want to poke 0x03"))
 						elseif pokevalsel == 7 then
 							manager:machine():popmessage(_("Use this if you want to poke 0x04"))
 						elseif pokevalsel == 8 then
-							manager:machine():popmessage(_("Use this if you want to poke 0x05"))	
+							manager:machine():popmessage(_("Use this if you want to poke 0x05"))
 						elseif pokevalsel == 9 then
 							manager:machine():popmessage(_("Use this if you want to poke 0x06"))
 						elseif pokevalsel == 10 then
-							manager:machine():popmessage(_("Use this if you want to poke 0x07"))	
+							manager:machine():popmessage(_("Use this if you want to poke 0x07"))
 						elseif pokevalsel == 11 then
 							manager:machine():popmessage(_("Use this if you want to poke 0x08"))
 						elseif pokevalsel == 12 then
@@ -763,7 +763,7 @@ function cheatfind.startplugin()
 						elseif pokevalsel == 14 then
 							manager:machine():popmessage(_("Use this if you want to poke 0x99 (BCD 99)"))
 						elseif pokevalsel == 15 then
-							manager:machine():popmessage(_("Use this if you want to poke 0xFF (Decimal 255)"))	
+							manager:machine():popmessage(_("Use this if you want to poke 0xFF (Decimal 255)"))
 						elseif pokevalsel == 16 then
 							manager:machine():popmessage(_("Use this if you want to poke 0x3E7 (Decimal 999)"))
 						elseif pokevalsel == 17 then
@@ -773,15 +773,15 @@ function cheatfind.startplugin()
 						elseif pokevalsel == 19 then
 							manager:machine():popmessage(_("Use this if you want to poke 0x9999 (BCD 9999)"))
 						elseif pokevalsel == 20 then
-							manager:machine():popmessage(_("Use this if you want to poke 0xFFFF (Decimal 65535)"))		
+							manager:machine():popmessage(_("Use this if you want to poke 0xFFFF (Decimal 65535)"))
 						end
 					end
 					return r
 				end
 				return m, f
 			end
-			
-			
+
+
 			menu[#menu + 1] = function()
 				if optable[opsel] == "bne" or optable[opsel] == "beq" then
 					return nil
@@ -873,12 +873,12 @@ function cheatfind.startplugin()
 
 				local function match_exec(match)
 					local dev = devtable[devcur]
-					
+
 					local wid = formtable[width]:sub(3, 3)
 					local widchar
 					local pokevalue
 					local form
-					
+
 					if  pokevalsel == 1 then
 						pokevalue = match.oldval
 					elseif  pokevalsel == 2 then
@@ -914,25 +914,25 @@ function cheatfind.startplugin()
 					elseif  pokevalsel == 17 and wid == "1" then
 						pokevalue = 153
 					elseif  pokevalsel == 18 and wid == "1" then
-						pokevalue = 99	
+						pokevalue = 99
 					elseif  pokevalsel == 19 and wid == "1" then
-						pokevalue = 153	
+						pokevalue = 153
 					elseif  pokevalsel == 20 and wid == "1" then
-						pokevalue = 255	
+						pokevalue = 255
 					elseif  pokevalsel == 16 then
-						pokevalue = 999       
+						pokevalue = 999
 					elseif  pokevalsel == 17 then
-						pokevalue = 2457     
+						pokevalue = 2457
 					elseif  pokevalsel == 18 then
-						pokevalue = 9999	     
+						pokevalue = 9999
 					elseif  pokevalsel == 19 then
-						pokevalue = 39321     
+						pokevalue = 39321
 					elseif  pokevalsel == 20 then
-						pokevalue = 65535							
+						pokevalue = 65535
 					end
-					
+
 					local cheat = { desc = string.format(_("Test Cheat %08X:%02X"), match.addr, pokevalue), script = {} }
-					
+
 					if wid == "2" then
 						wid = "u16"
 						form = "%08x %04x"
@@ -958,7 +958,7 @@ function cheatfind.startplugin()
 						form = "%08x %02x"
 						widchar = "b"
 					end
-										
+
 					if getmetatable(dev.space).__name:match("device_t") then
 						cheat.ram = { ram = dev.tag }
 						cheat.script.run = "ram:write(" .. match.addr .. "," .. pokevalue .. ")"
@@ -1001,7 +1001,7 @@ function cheatfind.startplugin()
 						cheat_save.json = json.stringify({[1] = cheat}, {indent = true})
 						cheat_save.xml = string.format("<mamecheat version=\"1\">\n  <cheat desc=\"%%s\">\n    <script state=\"run\">\n      <action>%s.pp%s@%X=%X</action>\n    </script>\n  </cheat>\n</mamecheat>", dev.tag:sub(2), widchar, match.addr, match.newval)
 						cheat_save.simple = string.format("%s,%s,%X,%s,%X,%%s\n", setname, dev.tag, match.addr, widchar, pokevalue)
-						cheat_save.dat = string.format(":%s:40000000:%X:%08X:FFFFFFFF:%%s\n", setname,  match.addr, pokevalue)			
+						cheat_save.dat = string.format(":%s:40000000:%X:%08X:FFFFFFFF:%%s\n", setname,  match.addr, pokevalue)
 						manager:machine():popmessage(string.format(_("Default name is %s"), cheat_save.name))
 						return true
 					else
@@ -1026,7 +1026,7 @@ function cheatfind.startplugin()
 							match.mode = 1
 						end
 						local modes = { _("Test"), _("Write"), _("Watch") }
-						local m = { string.format("%08x" .. bitwidth .. bitwidth, match.addr, match.oldval, 
+						local m = { string.format("%08x" .. bitwidth .. bitwidth, match.addr, match.oldval,
 													  match.newval), modes[match.mode], 0 }
 						menu_lim(match.mode, 1, #modes, m)
 						local function f(event)
@@ -1081,12 +1081,12 @@ function cheatfind.startplugin()
 			local height = mame_manager:ui():get_line_height()
 			for num, watch in ipairs(watches) do
 				screen:draw_text("left", num * height, string.format(watch.format, watch.addr, watch.func()))
-			end			
+			end
 			if tabbed_out and manager:ui():is_menu_active()  then
 				emu.pause()
 				menu_is_showing = true
 				tabbed_out = false
-			end					
+			end
 		end)
 	emu.register_periodic(function ()
 		if menu_is_showing and not manager:ui():is_menu_active() then
@@ -1094,7 +1094,7 @@ function cheatfind.startplugin()
 			menu_is_showing = false
 			tabbed_out = true
 		end
-	end)	
+	end)
 end
 
 return exports

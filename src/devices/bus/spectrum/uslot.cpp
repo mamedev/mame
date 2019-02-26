@@ -64,8 +64,6 @@ void spectrum_uslot_device::device_start()
 
 void spectrum_uslot_device::device_reset()
 {
-	m_exp1->set_io_space(&io_space());
-	m_exp2->set_io_space(&io_space());
 }
 
 

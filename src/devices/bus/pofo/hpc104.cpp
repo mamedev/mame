@@ -147,15 +147,15 @@ void pofo_hpc104_device::device_reset()
 //  nrdi_r - read
 //-------------------------------------------------
 
-uint8_t pofo_hpc104_device::nrdi_r(address_space &space, offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1)
+uint8_t pofo_hpc104_device::nrdi_r(offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1)
 {
-	data = m_exp->nrdi_r(space, offset, data, iom, bcom, m_ncc1_out || ncc1);
+	data = m_exp->nrdi_r(offset, data, iom, bcom, m_ncc1_out || ncc1);
 
 	if (!iom)
 	{
 		if (!(!m_ncc1_out || ncc1))
 		{
-			data = m_ccm->nrdi_r(space, offset & 0x1ffff);
+			data = m_ccm->nrdi_r(offset & 0x1ffff);
 
 			if (LOG) logerror("%s %s CCM1 read %05x:%02x\n", machine().time().as_string(), machine().describe_context(), offset & 0x1ffff, data);
 		}
@@ -184,9 +184,9 @@ uint8_t pofo_hpc104_device::nrdi_r(address_space &space, offs_t offset, uint8_t 
 //  nwri_w - write
 //-------------------------------------------------
 
-void pofo_hpc104_device::nwri_w(address_space &space, offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1)
+void pofo_hpc104_device::nwri_w(offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1)
 {
-	m_exp->nwri_w(space, offset, data, iom, bcom, m_ncc1_out || ncc1);
+	m_exp->nwri_w(offset, data, iom, bcom, m_ncc1_out || ncc1);
 
 	if (!iom)
 	{
@@ -194,7 +194,7 @@ void pofo_hpc104_device::nwri_w(address_space &space, offs_t offset, uint8_t dat
 		{
 			if (LOG) logerror("%s %s CCM1 write %05x:%02x\n", machine().time().as_string(), machine().describe_context(), offset & 0x1ffff, data);
 
-			m_ccm->nwri_w(space, offset & 0x1ffff, data);
+			m_ccm->nwri_w(offset & 0x1ffff, data);
 		}
 
 		if (m_sw1)

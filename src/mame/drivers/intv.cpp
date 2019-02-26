@@ -457,24 +457,25 @@ INTERRUPT_GEN_MEMBER(intv_state::intv_interrupt2)
 	timer_set(m_keyboard->cycles_to_attotime(100), TIMER_INTV_INTERRUPT2_COMPLETE);
 }
 
-MACHINE_CONFIG_START(intv_state::intv)
+void intv_state::intv(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", CP1610, XTAL(3'579'545)/4)        /* Colorburst/4 */
-	MCFG_DEVICE_PROGRAM_MAP(intv_mem)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", intv_state,  intv_interrupt)
+	CP1610(config, m_maincpu, XTAL(3'579'545)/4);        /* Colorburst/4 */
+	m_maincpu->set_addrmap(AS_PROGRAM, &intv_state::intv_mem);
+	m_maincpu->set_vblank_int("screen", FUNC(intv_state::intv_interrupt));
 	config.m_minimum_quantum = attotime::from_hz(60);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("stic", STIC, XTAL(3'579'545))
-	MCFG_VIDEO_SET_SCREEN("screen")
+	STIC(config, m_stic, XTAL(3'579'545));
+	m_stic->set_screen("screen");
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59.92)
-	//MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2400)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(intv_state, screen_update_intv)
-	MCFG_SCREEN_SIZE(stic_device::SCREEN_WIDTH*INTV_X_SCALE, stic_device::SCREEN_HEIGHT*INTV_Y_SCALE)
-	MCFG_SCREEN_VISIBLE_AREA(0, stic_device::SCREEN_WIDTH*INTV_X_SCALE-1, 0, stic_device::SCREEN_HEIGHT*INTV_Y_SCALE-1)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(59.92);
+	//screen.set_vblank_time(ATTOSECONDS_IN_USEC(2400)); /* not accurate */
+	screen.set_screen_update(FUNC(intv_state::screen_update_intv));
+	screen.set_size(stic_device::SCREEN_WIDTH*INTV_X_SCALE, stic_device::SCREEN_HEIGHT*INTV_Y_SCALE);
+	screen.set_visarea(0, stic_device::SCREEN_WIDTH*INTV_X_SCALE-1, 0, stic_device::SCREEN_HEIGHT*INTV_Y_SCALE-1);
+	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette, FUNC(intv_state::intv_palette), 0x400, 32);
 
@@ -494,30 +495,30 @@ MACHINE_CONFIG_START(intv_state::intv)
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("intv");
 	SOFTWARE_LIST(config, "ecs_list").set_compatible("intvecs");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(intv_state::intv2)
+void intv_state::intv2(machine_config &config)
+{
 	intv(config);
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP(intv2_mem)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &intv_state::intv2_mem);
+}
 
-MACHINE_CONFIG_START(intv_state::intvoice)
+void intv_state::intvoice(machine_config &config)
+{
 	intv(config);
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP(intvoice_mem)
+	m_maincpu->set_addrmap(AS_PROGRAM, &intv_state::intvoice_mem);
 
 	config.device_remove("cartslot");
-	MCFG_DEVICE_ADD("voice", INTV_ROM_VOICE, 0)
-MACHINE_CONFIG_END
+	INTV_ROM_VOICE(config, "voice", 0);
+}
 
-MACHINE_CONFIG_START(intv_state::intvecs)
+void intv_state::intvecs(machine_config &config)
+{
 	intv(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(intvecs_mem)
+	m_maincpu->set_addrmap(AS_PROGRAM, &intv_state::intvecs_mem);
 
 	config.device_remove("cartslot");
-	MCFG_DEVICE_ADD("ecs", INTV_ROM_ECS, 0)
+	INTV_ROM_ECS(config, "ecs", 0);
 
 	sp0256_device &speech(SP0256(config, "speech", 3120000));
 	/* The Intellivoice uses a speaker with its own volume control so the relative volumes to use are subjective */
@@ -530,16 +531,16 @@ MACHINE_CONFIG_START(intv_state::intvecs)
 	config.device_remove("ecs_list");
 	SOFTWARE_LIST(config.replace(), "cart_list").set_original("intvecs");
 	SOFTWARE_LIST(config, "intv_list").set_compatible("intv");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(intv_state::intvkbd)
+void intv_state::intvkbd(machine_config &config)
+{
 	intv(config);
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP(intvkbd_mem)
+	m_maincpu->set_addrmap(AS_PROGRAM, &intv_state::intvkbd_mem);
 
-	MCFG_DEVICE_ADD("keyboard", M6502, XTAL(7'159'090)/8)
-	MCFG_DEVICE_PROGRAM_MAP(intvkbd2_mem)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", intv_state,  intv_interrupt2)
+	M6502(config, m_keyboard, XTAL(7'159'090)/8);
+	m_keyboard->set_addrmap(AS_PROGRAM, &intv_state::intvkbd2_mem);
+	m_keyboard->set_vblank_int("screen", FUNC(intv_state::intv_interrupt2));
 
 	config.m_minimum_quantum = attotime::from_hz(6000);
 
@@ -555,13 +556,12 @@ MACHINE_CONFIG_START(intv_state::intvkbd)
 		stic_device::OVERSCAN_TOP_HEIGHT*stic_device::Y_SCALE*INTVKBD_Y_SCALE,
 		stic_device::OVERSCAN_BOTTOM_HEIGHT*stic_device::Y_SCALE*INTVKBD_Y_SCALE);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(intv_state, screen_update_intvkbd)
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(intv_state::screen_update_intvkbd));
 
 	/* I/O cartslots for BASIC */
 	GENERIC_CARTSLOT(config, m_iocart1, generic_plain_slot, "intbasic_cart");
 	GENERIC_CARTSLOT(config, m_iocart2, generic_plain_slot, "intbasic_cart");
-MACHINE_CONFIG_END
+}
 
 ROM_START(intv) // the intv1 exec rom should be two roms: RO-3-9502-011.U5 and RO-3-9504-021.U6
 	ROM_REGION(0x10000<<1,"maincpu", ROMREGION_ERASEFF)

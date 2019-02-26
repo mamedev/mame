@@ -341,17 +341,11 @@ MACHINE_RESET_MEMBER(spectrum_state,spectrum_plus3)
 void spectrum_state::init_plus3()
 {
 	m_floppy = 1;
-
-	// setup expansion slot
-	m_exp->set_io_space(&m_maincpu->space(AS_IO));
 }
 
 void spectrum_state::init_plus2()
 {
 	m_floppy = 0;
-
-	// setup expansion slot
-	m_exp->set_io_space(&m_maincpu->space(AS_IO));
 }
 
 static void specpls3_floppies(device_slot_interface &device)
@@ -396,6 +390,7 @@ void spectrum_state::spectrum_plus3(machine_config &config)
 	FLOPPY_CONNECTOR(config, "upd765:1", specpls3_floppies, "3ssdd", floppy_image_device::default_floppy_formats);
 
 	SPECTRUM_EXPANSION_SLOT(config.replace(), m_exp, specpls3_expansion_devices, nullptr);
+	m_exp->set_io_space(m_maincpu, AS_IO);
 	m_exp->irq_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_exp->nmi_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
 

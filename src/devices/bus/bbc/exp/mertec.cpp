@@ -116,22 +116,22 @@ void bbc_mertec_device::upd7002_eoc(int data)
 
 READ8_MEMBER(bbc_mertec_device::fred_r)
 {
-	return m_2mhzbus->fred_r(space, offset);
+	return m_2mhzbus->fred_r(offset);
 }
 
 WRITE8_MEMBER(bbc_mertec_device::fred_w)
 {
-	m_2mhzbus->fred_w(space, offset, data);
+	m_2mhzbus->fred_w(offset, data);
 }
 
 READ8_MEMBER(bbc_mertec_device::jim_r)
 {
-	return m_2mhzbus->jim_r(space, offset);
+	return m_2mhzbus->jim_r(offset);
 }
 
 WRITE8_MEMBER(bbc_mertec_device::jim_w)
 {
-	m_2mhzbus->jim_w(space, offset, data);
+	m_2mhzbus->jim_w(offset, data);
 }
 
 READ8_MEMBER(bbc_mertec_device::sheila_r)

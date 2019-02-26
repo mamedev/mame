@@ -198,7 +198,7 @@ NETLIB_UPDATE_PARAM(POT2)
 NETLIB_RESET(C)
 {
 	// FIXME: Startup conditions
-	set(exec().gmin(), 0.0, -5.0 / exec().gmin());
+	set_G_V_I(exec().gmin(), 0.0, -5.0 / exec().gmin());
 	//set(exec().gmin(), 0.0, 0.0);
 }
 
@@ -255,7 +255,7 @@ NETLIB_RESET(D)
 	nl_double n = m_model.m_N;
 
 	m_D.set_param(Is, n, exec().gmin());
-	set(m_D.G(), 0.0, m_D.Ieq());
+	set_G_V_I(m_D.G(), 0.0, m_D.Ieq());
 }
 
 NETLIB_UPDATE_PARAM(D)

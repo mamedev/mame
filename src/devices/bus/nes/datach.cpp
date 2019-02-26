@@ -52,7 +52,7 @@ datach_cart_interface::~datach_cart_interface()
 {
 }
 
-READ8_MEMBER(datach_cart_interface::read)
+uint8_t datach_cart_interface::read(offs_t offset)
 {
 	if (offset < 0x4000)
 		return m_rom[(m_bank * 0x4000) + (offset & 0x3fff)];
@@ -84,10 +84,10 @@ void nes_datach_slot_device::device_start()
 	m_cart = dynamic_cast<datach_cart_interface *>(get_card_device());
 }
 
-READ8_MEMBER(nes_datach_slot_device::read)
+uint8_t nes_datach_slot_device::read(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->read(space, offset, mem_mask);
+		return m_cart->read(offset);
 
 	return 0xff;
 }
@@ -284,7 +284,7 @@ void nes_datach_device::pcb_reset()
  -------------------------------------------------*/
 
 
-READ8_MEMBER(nes_datach_device::read_m)
+uint8_t nes_datach_device::read_m(offs_t offset)
 {
 	LOG_MMC(("Datach read_m, offset: %04x\n", offset));
 	uint8_t i2c_val = 0;
@@ -301,19 +301,19 @@ READ8_MEMBER(nes_datach_device::read_m)
 }
 
 
-READ8_MEMBER(nes_datach_device::read_h)
+uint8_t nes_datach_device::read_h(offs_t offset)
 {
 	LOG_MMC(("Datach read_h, offset: %04x\n", offset));
 	// this shall be the proper code, but it's a bit slower, so we access directly the subcart below
-	//return m_subslot->read(space, offset, mem_mask);
+	//return m_subslot->read(offset);
 
 	if (m_subslot->m_cart)
-		return m_subslot->m_cart->read(space, offset, mem_mask);
+		return m_subslot->m_cart->read(offset);
 	else    // this is "fake" in the sense that we fill CPU space with 0xff if no Datach cart is loaded
 		return hi_access_rom(offset);
 }
 
-WRITE8_MEMBER(nes_datach_device::write_h)
+void nes_datach_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("Datach write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -353,7 +353,7 @@ WRITE8_MEMBER(nes_datach_device::write_h)
 #endif
 			break;
 		default:
-			fcg_write(space, offset & 0x0f, data, mem_mask);
+			fcg_write(offset & 0x0f, data);
 			break;
 	}
 }

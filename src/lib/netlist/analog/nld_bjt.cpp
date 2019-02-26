@@ -293,10 +293,10 @@ NETLIB_RESET(QBJT_switch)
 
 	m_state_on = 0;
 
-	m_RB.set(exec().gmin(), 0.0, 0.0);
-	m_RC.set(exec().gmin(), 0.0, 0.0);
+	m_RB.set_G_V_I(exec().gmin(), 0.0, 0.0);
+	m_RC.set_G_V_I(exec().gmin(), 0.0, 0.0);
 
-	m_BC_dummy.set(exec().gmin() / 10.0, 0.0, 0.0);
+	m_BC_dummy.set_G_V_I(exec().gmin() / 10.0, 0.0, 0.0);
 
 }
 
@@ -351,8 +351,8 @@ NETLIB_UPDATE_TERMINALS(QBJT_switch)
 		const nl_double gc = new_state ? m_gC : exec().gmin();
 		const nl_double v  = new_state ? m_V * m : 0;
 
-		m_RB.set(gb, v,   0.0);
-		m_RC.set(gc, 0.0, 0.0);
+		m_RB.set_G_V_I(gb, v,   0.0);
+		m_RC.set_G_V_I(gc, 0.0, 0.0);
 		m_state_on = new_state;
 	}
 }

@@ -13,9 +13,6 @@
 #error "nl_base.h included. Please correct."
 #endif
 
-#include <unordered_map>
-#include <vector>
-
 #include "plib/palloc.h" // owned_ptr
 #include "plib/pdynlib.h"
 #include "plib/pfmtlog.h"
@@ -24,10 +21,13 @@
 #include "plib/pstate.h"
 #include "plib/pstream.h"
 
-#include "nltypes.h"
 #include "nl_errstr.h"
 #include "nl_lists.h"
+#include "nltypes.h"
 #include "plib/ptime.h"
+
+#include <unordered_map>
+#include <vector>
 
 //============================================================
 //  MACROS / New Syntax
@@ -601,17 +601,17 @@ namespace netlist
 
 		nl_double operator ()() const  NL_NOEXCEPT;
 
-		void set(const nl_double G) noexcept
+		void set_conductivity(const nl_double G) noexcept
 		{
-			set(G,G, 0.0);
+			set_go_gt_I(-G, G, 0.0);
 		}
 
-		void set(const nl_double GO, const nl_double GT)  noexcept
+		void set_go_gt(const nl_double GO, const nl_double GT)  noexcept
 		{
-			set(GO, GT, 0.0);
+			set_go_gt_I(GO, GT, 0.0);
 		}
 
-		void set(const nl_double GO, const nl_double GT, const nl_double I)  noexcept
+		void set_go_gt_I(const nl_double GO, const nl_double GT, const nl_double I)  noexcept
 		{
 			if (m_go1 != nullptr)
 			{
@@ -1034,8 +1034,8 @@ namespace netlist
 			: m_value(param.model_value(name))
 			{
 			}
-			const double &operator()() const NL_NOEXCEPT { return m_value; }
-			operator const double&() const NL_NOEXCEPT { return m_value; }
+			const double &operator()() const noexcept { return m_value; }
+			operator const double&() const noexcept { return m_value; }
 		private:
 			const double m_value;
 		};
@@ -1164,7 +1164,7 @@ namespace netlist
 		virtual bool is_timestep() const { return false; }
 
 	private:
-		bool 			m_hint_deactivate;
+		bool            m_hint_deactivate;
 		state_var_s32   m_active_outputs;
 	};
 
@@ -1248,6 +1248,12 @@ namespace netlist
 	public:
 		using entry_t = pqentry_t<net_t *, netlist_time>;
 		explicit queue_t(netlist_state_t &nl);
+		virtual ~queue_t() noexcept = default;
+
+		queue_t(const queue_t &) = delete;
+		queue_t(queue_t &&) = delete;
+		queue_t &operator=(const queue_t &) = delete;
+		queue_t &operator=(queue_t &&) = delete;
 
 	protected:
 
@@ -1675,7 +1681,7 @@ namespace netlist
 	{
 		nl_assert(terminal_state() != STATE_INP_PASSIVE);
 		//if (net().Q() != m_Q)
-		//	printf("term: %s, %d %d TS %d\n", this->name().c_str(), net().Q(), m_Q, terminal_state());
+		//  printf("term: %s, %d %d TS %d\n", this->name().c_str(), net().Q(), m_Q, terminal_state());
 #if USE_COPY_INSTEAD_OF_REFERENCE
 		return m_Q;
 #else

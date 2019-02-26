@@ -658,7 +658,7 @@ inline void copystream(postream &dest, pistream &src)
 struct perrlogger
 {
 	template <typename ... Args>
-	perrlogger(Args&& ... args)
+	explicit perrlogger(Args&& ... args)
 	{
 		h()(std::forward<Args>(args)...);
 	}

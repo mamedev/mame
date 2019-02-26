@@ -16,12 +16,12 @@ public:
 	// construction/destruction
 	nes_somari_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE8_MEMBER(write_l) override { write_m(space, offset + 0x100, data, mem_mask); }
-	virtual DECLARE_WRITE8_MEMBER(write_m) override;
-	virtual DECLARE_WRITE8_MEMBER(mmc1_w);
-	virtual DECLARE_WRITE8_MEMBER(mmc3_w);
-	virtual DECLARE_WRITE8_MEMBER(vrc2_w);
-	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+	virtual void write_l(offs_t offset, uint8_t data) override { write_m(offset + 0x100, data); }
+	virtual void write_m(offs_t offset, uint8_t data) override;
+	void mmc1_w(offs_t offset, uint8_t data);
+	void mmc3_w(offs_t offset, uint8_t data);
+	void vrc2_w(offs_t offset, uint8_t data);
+	virtual void write_h(offs_t offset, uint8_t data) override;
 
 	virtual void pcb_reset() override;
 

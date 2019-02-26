@@ -250,12 +250,6 @@ void spectrum_state::spectrum_128_mem(address_map &map)
 	map(0xc000, 0xffff).bankrw("bank4");
 }
 
-void spectrum_state::init_spec128()
-{
-	// setup expansion slot
-	m_exp->set_io_space(&m_maincpu->space(AS_IO));
-}
-
 MACHINE_RESET_MEMBER(spectrum_state,spectrum_128)
 {
 	uint8_t *messram = m_ram->pointer();
@@ -319,6 +313,7 @@ void spectrum_state::spectrum_128(machine_config &config)
 
 	/* expansion port */
 	SPECTRUM_EXPANSION_SLOT(config.replace(), m_exp, spec128_expansion_devices, nullptr);
+	m_exp->set_io_space(m_maincpu, AS_IO);
 	m_exp->irq_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_exp->nmi_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
@@ -380,8 +375,8 @@ ROM_START(hc2000)
 	ROMX_LOAD("hc2000.v2",  0x14000,0x4000, CRC(65d90464) SHA1(5e2096e6460ff2120c8ada97579fdf82c1199c09), ROM_BIOS(1))
 ROM_END
 
-//    YEAR  NAME      PARENT   COMPAT  MACHINE       CLASS      STATE           INIT          COMPANY                  FULLNAME           FLAGS
-COMP( 1986, spec128,  0,       0,      spectrum_128, spec128,   spectrum_state, init_spec128, "Sinclair Research Ltd", "ZX Spectrum 128", 0 )
-COMP( 1986, specpls2, spec128, 0,      spectrum_128, spec_plus, spectrum_state, init_spec128, "Amstrad plc",           "ZX Spectrum +2",  0 )
-COMP( 1991, hc128,    spec128, 0,      spectrum_128, spec_plus, spectrum_state, init_spec128, "ICE-Felix",             "HC-128",          0 )
-COMP( 1992, hc2000,   spec128, 0,      spectrum_128, spec_plus, spectrum_state, init_spec128, "ICE-Felix",             "HC-2000",         MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT   COMPAT  MACHINE       CLASS      STATE           INIT        COMPANY                  FULLNAME           FLAGS
+COMP( 1986, spec128,  0,       0,      spectrum_128, spec128,   spectrum_state, empty_init, "Sinclair Research Ltd", "ZX Spectrum 128", 0 )
+COMP( 1986, specpls2, spec128, 0,      spectrum_128, spec_plus, spectrum_state, empty_init, "Amstrad plc",           "ZX Spectrum +2",  0 )
+COMP( 1991, hc128,    spec128, 0,      spectrum_128, spec_plus, spectrum_state, empty_init, "ICE-Felix",             "HC-128",          0 )
+COMP( 1992, hc2000,   spec128, 0,      spectrum_128, spec_plus, spectrum_state, empty_init, "ICE-Felix",             "HC-2000",         MACHINE_NOT_WORKING )

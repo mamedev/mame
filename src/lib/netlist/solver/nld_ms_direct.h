@@ -8,10 +8,10 @@
 #ifndef NLD_MS_DIRECT_H_
 #define NLD_MS_DIRECT_H_
 
-#include <algorithm>
-#include <cmath>
 #include "plib/mat_cr.h"
 #include "plib/vector_ops.h"
+#include <algorithm>
+#include <cmath>
 
 #include "nld_matrix_solver.h"
 #include "nld_solver.h"

@@ -278,36 +278,34 @@ void md_boot_state::puckpkmna_map(address_map &map)
 	map(0x70001c, 0x70001d).r(FUNC(md_boot_state::puckpkmna_70001c_r));
 }
 
-MACHINE_CONFIG_START(md_boot_state::puckpkmn)
+void md_boot_state::puckpkmn(machine_config &config)
+{
 	md_ntsc(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(puckpkmn_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &md_boot_state::puckpkmn_map);
 
 	MCFG_MACHINE_START_OVERRIDE(md_boot_state, md_bootleg)
 
 	config.device_remove("genesis_snd_z80");
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(4'000'000) / 4, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25)
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL(4'000'000) / 4, okim6295_device::PIN7_HIGH));
+	oki.add_route(ALL_OUTPUTS, "lspeaker", 0.25);
+	oki.add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+}
 
-MACHINE_CONFIG_START(md_boot_state::puckpkmna)
+void md_boot_state::puckpkmna(machine_config &config)
+{
 	puckpkmn(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(puckpkmna_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &md_boot_state::puckpkmna_map);
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(md_boot_state::jzth)
+void md_boot_state::jzth(machine_config &config)
+{
 	puckpkmn(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(jzth_map)
-
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &md_boot_state::jzth_map);
+}
 
 /* Genie's Hardware (contains no real sega parts) */
 

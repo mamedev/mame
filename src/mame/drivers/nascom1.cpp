@@ -120,7 +120,6 @@ public:
 	void nascom2(machine_config &config);
 	void nascom2c(machine_config &config);
 
-	void init_nascom2();
 	void init_nascom2c();
 
 private:
@@ -394,15 +393,6 @@ void nascom2_state::machine_reset()
 	m_maincpu->set_state_int(Z80_PC, m_lsw1->read() << 12);
 }
 
-void nascom2_state::init_nascom2()
-{
-	init_nascom();
-
-	// setup nasbus
-	m_nasbus->set_program_space(&m_maincpu->space(AS_PROGRAM));
-	m_nasbus->set_io_space(&m_maincpu->space(AS_IO));
-}
-
 // since we don't know for which regions we should disable ram, we just let other devices
 // overwrite the region they need, and re-install our ram when they are disabled
 WRITE_LINE_MEMBER( nascom2_state::ram_disable_w )
@@ -418,10 +408,6 @@ void nascom2_state::init_nascom2c()
 {
 	// install memory
 	m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x0000 + m_ram->size() - 1, m_ram->pointer());
-
-	// setup nasbus
-	m_nasbus->set_program_space(&m_maincpu->space(AS_PROGRAM));
-	m_nasbus->set_io_space(&m_maincpu->space(AS_IO));
 }
 
 WRITE_LINE_MEMBER( nascom2_state::ram_disable_cpm_w )
@@ -764,6 +750,8 @@ void nascom2_state::nascom2(machine_config &config)
 	// nasbus expansion bus
 	nasbus_device &nasbus(NASBUS(config, NASBUS_TAG));
 	nasbus.ram_disable().set(FUNC(nascom2_state::ram_disable_w));
+	nasbus.set_program_space(m_maincpu, AS_PROGRAM);
+	nasbus.set_io_space(m_maincpu, AS_IO);
 	NASBUS_SLOT(config, "nasbus1", nasbus_slot_cards, nullptr);
 	NASBUS_SLOT(config, "nasbus2", nasbus_slot_cards, nullptr);
 	NASBUS_SLOT(config, "nasbus3", nasbus_slot_cards, nullptr);
@@ -848,5 +836,5 @@ ROM_END
 
 //    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT     CLASS          INIT           COMPANY                  FULLNAME           FLAGS
 COMP( 1978, nascom1,  0,       0,      nascom1,  nascom1,  nascom1_state, init_nascom,   "Nascom Microcomputers", "Nascom 1",        MACHINE_NO_SOUND_HW )
-COMP( 1979, nascom2,  0,       0,      nascom2,  nascom2,  nascom2_state, init_nascom2,  "Nascom Microcomputers", "Nascom 2",        MACHINE_NO_SOUND_HW )
+COMP( 1979, nascom2,  0,       0,      nascom2,  nascom2,  nascom2_state, init_nascom,   "Nascom Microcomputers", "Nascom 2",        MACHINE_NO_SOUND_HW )
 COMP( 1980, nascom2c, nascom2, 0,      nascom2c, nascom2c, nascom2_state, init_nascom2c, "Nascom Microcomputers", "Nascom 2 (CP/M)", MACHINE_NO_SOUND_HW )

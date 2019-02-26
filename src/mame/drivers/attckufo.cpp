@@ -119,9 +119,10 @@ READ8_MEMBER(attckufo_state::vic_colorram_r)
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
-MACHINE_CONFIG_START(attckufo_state::attckufo)
-	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(14'318'181) / 14)
-	MCFG_DEVICE_PROGRAM_MAP(cpu_map)
+void attckufo_state::attckufo(machine_config &config)
+{
+	M6502(config, m_maincpu, XTAL(14'318'181) / 14);
+	m_maincpu->set_addrmap(AS_PROGRAM, &attckufo_state::cpu_map);
 
 	pia6821_device &pia(PIA6821(config, "pia", 0));
 	pia.readpa_handler().set_ioport("DSW");
@@ -129,19 +130,19 @@ MACHINE_CONFIG_START(attckufo_state::attckufo)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(MOS6560_VRETRACERATE)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE((MOS6560_XSIZE + 7) & ~7, MOS6560_YSIZE)
-	MCFG_SCREEN_VISIBLE_AREA(0, 23*8 - 1, 0, 22*8 - 1)
-	MCFG_SCREEN_UPDATE_DEVICE("mos6560", mos6560_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(MOS6560_VRETRACERATE);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_size((MOS6560_XSIZE + 7) & ~7, MOS6560_YSIZE);
+	screen.set_visarea(0, 23*8 - 1, 0, 22*8 - 1);
+	screen.set_screen_update("mos6560", FUNC(mos6560_device::screen_update));
 
-	MCFG_DEVICE_ADD("mos6560", MOS656X_ATTACK_UFO, XTAL(14'318'181) / 14)
-	MCFG_VIDEO_SET_SCREEN("screen")
-	MCFG_DEVICE_ADDRESS_MAP(0, vic_videoram_map)
-	MCFG_DEVICE_ADDRESS_MAP(1, vic_colorram_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	mos6560_device &mos6560(MOS656X_ATTACK_UFO(config, "mos6560", XTAL(14'318'181) / 14));
+	mos6560.set_screen("screen");
+	mos6560.set_addrmap(0, &attckufo_state::vic_videoram_map);
+	mos6560.set_addrmap(1, &attckufo_state::vic_colorram_map);
+	mos6560.add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 //**************************************************************************

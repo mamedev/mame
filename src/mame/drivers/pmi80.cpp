@@ -168,16 +168,17 @@ void pmi80_state::machine_start()
 }
 
 
-MACHINE_CONFIG_START(pmi80_state::pmi80)
+void pmi80_state::pmi80(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",I8080, XTAL(1'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(pmi80_mem)
-	MCFG_DEVICE_IO_MAP(pmi80_io)
+	I8080(config, m_maincpu, XTAL(1'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &pmi80_state::pmi80_mem);
+	m_maincpu->set_addrmap(AS_IO, &pmi80_state::pmi80_io);
 
 
 	/* video hardware */
 	config.set_default_layout(layout_pmi80);
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( pmi80 )

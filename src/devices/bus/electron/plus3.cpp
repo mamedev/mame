@@ -117,7 +117,7 @@ void electron_plus3_device::device_start()
 //  expbus_r - expansion data read
 //-------------------------------------------------
 
-uint8_t electron_plus3_device::expbus_r(address_space &space, offs_t offset)
+uint8_t electron_plus3_device::expbus_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -137,7 +137,7 @@ uint8_t electron_plus3_device::expbus_r(address_space &space, offs_t offset)
 		data = m_fdc->read(offset & 0x03);
 	}
 
-	data &= m_exp->expbus_r(space, offset);
+	data &= m_exp->expbus_r(offset);
 
 	return data;
 }
@@ -146,13 +146,13 @@ uint8_t electron_plus3_device::expbus_r(address_space &space, offs_t offset)
 //  expbus_w - expansion data write
 //-------------------------------------------------
 
-void electron_plus3_device::expbus_w(address_space &space, offs_t offset, uint8_t data)
+void electron_plus3_device::expbus_w(offs_t offset, uint8_t data)
 {
-	m_exp->expbus_w(space, offset, data);
+	m_exp->expbus_w(offset, data);
 
 	if (offset == 0xfcc0)
 	{
-		wd1770_status_w(space, offset, data);
+		wd1770_status_w(data);
 	}
 	else if (offset >= 0xfcc4 && offset < 0xfcc8)
 	{
@@ -169,7 +169,7 @@ void electron_plus3_device::expbus_w(address_space &space, offs_t offset, uint8_
 //  IMPLEMENTATION
 //**************************************************************************
 
-WRITE8_MEMBER(electron_plus3_device::wd1770_status_w)
+void electron_plus3_device::wd1770_status_w(uint8_t data)
 {
 	floppy_image_device *floppy = nullptr;
 

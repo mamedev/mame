@@ -99,7 +99,7 @@ void pofo_hpc101_device::device_reset()
 //  nrdi_r - read
 //-------------------------------------------------
 
-uint8_t pofo_hpc101_device::nrdi_r(address_space &space, offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1)
+uint8_t pofo_hpc101_device::nrdi_r(offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1)
 {
 	if (!bcom)
 	{
@@ -122,7 +122,7 @@ uint8_t pofo_hpc101_device::nrdi_r(address_space &space, offs_t offset, uint8_t 
 //  nwri_w - write
 //-------------------------------------------------
 
-void pofo_hpc101_device::nwri_w(address_space &space, offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1)
+void pofo_hpc101_device::nwri_w(offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1)
 {
 	if (!bcom)
 	{

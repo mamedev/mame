@@ -109,12 +109,12 @@ void bbc_tube_casper_device::device_start()
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ8_MEMBER(bbc_tube_casper_device::host_r)
+uint8_t bbc_tube_casper_device::host_r(offs_t offset)
 {
 	return m_via6522_0->read(offset & 0xf);
 }
 
-WRITE8_MEMBER(bbc_tube_casper_device::host_w)
+void bbc_tube_casper_device::host_w(offs_t offset, uint8_t data)
 {
 	m_via6522_0->write(offset & 0xf, data);
 }

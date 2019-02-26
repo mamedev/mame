@@ -158,8 +158,8 @@ public:
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	// reading and writing
-	virtual uint8_t read(address_space &space, offs_t offset, int infc, int infd, int romqa, int oe, int oe2);
-	virtual void write(address_space &space, offs_t offset, uint8_t data, int infc, int infd, int romqa, int oe, int oe2);
+	virtual uint8_t read(offs_t offset, int infc, int infd, int romqa, int oe, int oe2);
+	virtual void write(offs_t offset, uint8_t data, int infc, int infd, int romqa, int oe, int oe2);
 
 	DECLARE_WRITE_LINE_MEMBER(irq_w) { m_irq_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER(nmi_w) { m_nmi_handler(state); }
@@ -182,8 +182,8 @@ public:
 	virtual ~device_electron_cart_interface();
 
 	// reading and writing
-	virtual uint8_t read(address_space &space, offs_t offset, int infc, int infd, int romqa, int oe, int oe2) { return 0xff; }
-	virtual void write(address_space &space, offs_t offset, uint8_t data, int infc, int infd, int romqa, int oe, int oe2) { }
+	virtual uint8_t read(offs_t offset, int infc, int infd, int romqa, int oe, int oe2) { return 0xff; }
+	virtual void write(offs_t offset, uint8_t data, int infc, int infd, int romqa, int oe, int oe2) { }
 
 	void rom_alloc(uint32_t size, const char *tag);
 	void ram_alloc(uint32_t size);

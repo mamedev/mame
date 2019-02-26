@@ -61,8 +61,8 @@ DEFINE_DEVICE_TYPE(NASBUS, nasbus_device, "nasbus", "NASBUS Backplane")
 
 nasbus_device::nasbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, NASBUS, tag, owner, clock),
-	m_program(nullptr),
-	m_io(nullptr),
+	m_program(*this, finder_base::DUMMY_TAG, -1),
+	m_io(*this, finder_base::DUMMY_TAG, -1),
 	m_ram_disable_handler(*this)
 {
 }
@@ -102,24 +102,6 @@ void nasbus_device::add_card(device_nasbus_card_interface *card)
 {
 	card->set_nasbus_device(this);
 	m_dev.append(*card);
-}
-
-//-------------------------------------------------
-//  set_program_space - set address space we are attached to
-//-------------------------------------------------
-
-void nasbus_device::set_program_space(address_space *program)
-{
-	m_program = program;
-}
-
-//-------------------------------------------------
-//  set_io_space - set address space we are attached to
-//-------------------------------------------------
-
-void nasbus_device::set_io_space(address_space *io)
-{
-	m_io = io;
 }
 
 // callbacks from slot device to the host

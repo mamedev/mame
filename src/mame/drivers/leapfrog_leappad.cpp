@@ -2,24 +2,24 @@
 // copyright-holders:David Haywood
 /******************************************************************************
 
-	LEAPPAD:
-	Example-Video: https://www.youtube.com/watch?v=LtUhENu5TKc
-	The LEAPPAD is basically compareable to the SEGA PICO, but without
-	Screen-Output! Each "Game" consists of two parts (Book + Cartridge).
-	Insert the cartridge into the system and add the Book on the Top of the
-	"console" and you can click on each pages and hear sounds or
-	learning-stuff on each page...
+    LEAPPAD:
+    Example-Video: https://www.youtube.com/watch?v=LtUhENu5TKc
+    The LEAPPAD is basically compareable to the SEGA PICO, but without
+    Screen-Output! Each "Game" consists of two parts (Book + Cartridge).
+    Insert the cartridge into the system and add the Book on the Top of the
+    "console" and you can click on each pages and hear sounds or
+    learning-stuff on each page...
 
-	MY FIRST LEAPPAD:
-	Basically the same as the LEAPPAD, but for even younger kids! (Cartridge
-	internal PCB's are identical to LEAPPAD)
-	Example Video: https://www.youtube.com/watch?v=gsf8XYV1Tpg
+    MY FIRST LEAPPAD:
+    Basically the same as the LEAPPAD, but for even younger kids! (Cartridge
+    internal PCB's are identical to LEAPPAD)
+    Example Video: https://www.youtube.com/watch?v=gsf8XYV1Tpg
 
-	Don't get confused by the name "LEAPPAD", as it looks like Leapfrog
-	also released some kind of Tablet with this name, and they even released
-	a new "LEAPPAD" in around 2016:
-	https://www.youtube.com/watch?v=MXFSgj6xLTU , which nearly looks like the
-	same, but is most likely techically completely different..
+    Don't get confused by the name "LEAPPAD", as it looks like Leapfrog
+    also released some kind of Tablet with this name, and they even released
+    a new "LEAPPAD" in around 2016:
+    https://www.youtube.com/watch?v=MXFSgj6xLTU , which nearly looks like the
+    same, but is most likely techically completely different..
 
 *******************************************************************************/
 

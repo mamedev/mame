@@ -12,7 +12,7 @@
 
 #include <algorithm>
 #include <initializer_list>
-#include <vector> // <<= needed by windows build
+#include <vector>
 
 #define PSTRINGIFY_HELP(y) # y
 #define PSTRINGIFY(x) PSTRINGIFY_HELP(x)
@@ -93,6 +93,37 @@ namespace plib
 			const std::string &token,
 			const std::size_t maxsplit);
 
+
+	//============================================================
+	//  penum - strongly typed enumeration
+	//============================================================
+
+	struct penum_base
+	{
+	protected:
+		static int from_string_int(const char *str, const char *x);
+		static std::string nthstr(int n, const char *str);
+	};
+
 } // namespace plib
+
+#define P_ENUM(ename, ...) \
+	struct ename : public plib::penum_base { \
+		enum E { __VA_ARGS__ }; \
+		ename (E v) : m_v(v) { } \
+		bool set_from_string (const std::string &s) { \
+			static char const *const strings = # __VA_ARGS__; \
+			int f = from_string_int(strings, s.c_str()); \
+			if (f>=0) { m_v = static_cast<E>(f); return true; } else { return false; } \
+		} \
+		operator E() const {return m_v;} \
+		bool operator==(const ename &rhs) const {return m_v == rhs.m_v;} \
+		bool operator==(const E &rhs) const {return m_v == rhs;} \
+		std::string name() const { \
+			static char const *const strings = # __VA_ARGS__; \
+			return nthstr(static_cast<int>(m_v), strings); \
+		} \
+		private: E m_v; };
+
 
 #endif /* PUTIL_H_ */

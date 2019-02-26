@@ -669,7 +669,7 @@ CUSTOM_INPUT_MEMBER(xavix_popira2_cart_state::i2c_r)
 {
 	if (m_cartslot->has_cart())
 		return m_cartslot->read_sda();
-	else 
+	else
 		return 0x0;
 }
 

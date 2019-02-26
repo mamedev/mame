@@ -248,19 +248,19 @@ static const struct CassetteOptions primo_cassette_options = {
 
 MACHINE_CONFIG_START(primo_state::primoa32)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD( "maincpu", Z80, 2500000 )
-	MCFG_DEVICE_PROGRAM_MAP( primo32_mem)
-	MCFG_DEVICE_IO_MAP( primoa_port)
+	Z80(config, m_maincpu, 2500000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &primo_state::primo32_mem);
+	m_maincpu->set_addrmap(AS_IO, &primo_state::primoa_port);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE( 50 )
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE( 256, 192 )
-	MCFG_SCREEN_VISIBLE_AREA( 0, 256-1, 0, 192-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(primo_state, screen_update_primo)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, primo_state, vblank_irq))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(50);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(256, 192);
+	m_screen->set_visarea(0, 256-1, 0, 192-1);
+	m_screen->set_screen_update(FUNC(primo_state::screen_update_primo));
+	m_screen->set_palette("palette");
+	m_screen->screen_vblank().set(FUNC(primo_state::vblank_irq));
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
@@ -286,49 +286,49 @@ MACHINE_CONFIG_START(primo_state::primoa32)
 	GENERIC_CARTSLOT(config, m_cart2, generic_plain_slot, nullptr, "bin,rom");
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(primo_state::primoa48)
+void primo_state::primoa48(machine_config &config)
+{
 	primoa32(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(primo48_mem)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &primo_state::primo48_mem);
+}
 
-MACHINE_CONFIG_START(primo_state::primoa64)
+void primo_state::primoa64(machine_config &config)
+{
 	primoa32(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(primo64_mem)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &primo_state::primo64_mem);
+}
 
-MACHINE_CONFIG_START(primo_state::primob32)
+void primo_state::primob32(machine_config &config)
+{
 	primoa32(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(primob_port)
+	m_maincpu->set_addrmap(AS_IO, &primo_state::primob_port);
 
 	MCFG_MACHINE_RESET_OVERRIDE(primo_state, primob)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(primo_state::primob48)
+void primo_state::primob48(machine_config &config)
+{
 	primoa48(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(primob_port)
+	m_maincpu->set_addrmap(AS_IO, &primo_state::primob_port);
 
 	MCFG_MACHINE_RESET_OVERRIDE(primo_state, primob)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(primo_state::primob64)
+void primo_state::primob64(machine_config &config)
+{
 	primoa64(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(primob_port)
+	m_maincpu->set_addrmap(AS_IO, &primo_state::primob_port);
 
 	MCFG_MACHINE_RESET_OVERRIDE(primo_state, primob)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(primo_state::primoc64)
+void primo_state::primoc64(machine_config &config)
+{
 	primoa64(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(primob_port)
+	m_maincpu->set_addrmap(AS_IO, &primo_state::primob_port);
 
 	MCFG_MACHINE_RESET_OVERRIDE(primo_state, primob)
-MACHINE_CONFIG_END
+}
 
 ROM_START( primoa32 )
 	ROM_REGION( 0x14000, "maincpu", ROMREGION_ERASEFF )

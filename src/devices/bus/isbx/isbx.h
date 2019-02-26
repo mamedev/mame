@@ -47,12 +47,12 @@ class isbx_slot_device;
 class device_isbx_card_interface : public device_slot_card_interface
 {
 public:
-	virtual uint8_t mcs0_r(address_space &space, offs_t offset) { return 0xff; }
-	virtual void mcs0_w(address_space &space, offs_t offset, uint8_t data) { }
-	virtual uint8_t mcs1_r(address_space &space, offs_t offset) { return 0xff; }
-	virtual void mcs1_w(address_space &space, offs_t offset, uint8_t data) { }
-	virtual uint8_t mdack_r(address_space &space, offs_t offset) { return 0xff; }
-	virtual void mdack_w(address_space &space, offs_t offset, uint8_t data) { }
+	virtual uint8_t mcs0_r(offs_t offset) { return 0xff; }
+	virtual void mcs0_w(offs_t offset, uint8_t data) { }
+	virtual uint8_t mcs1_r(offs_t offset) { return 0xff; }
+	virtual void mcs1_w(offs_t offset, uint8_t data) { }
+	virtual uint8_t mdack_r(offs_t offset) { return 0xff; }
+	virtual void mdack_w(offs_t offset, uint8_t data) { }
 	virtual int opt0_r() { return 1; }
 	virtual void opt0_w(int state) { }
 	virtual int opt1_r() { return 1; }
@@ -92,12 +92,12 @@ public:
 	auto mwait() { return m_write_mwait.bind(); }
 
 	// computer interface
-	DECLARE_READ8_MEMBER( mcs0_r ) { return m_card ? m_card->mcs0_r(space, offset) : 0xff; }
-	DECLARE_WRITE8_MEMBER( mcs0_w ) { if (m_card) m_card->mcs0_w(space, offset, data); }
-	DECLARE_READ8_MEMBER( mcs1_r ) { return m_card ? m_card->mcs1_r(space, offset) : 0xff; }
-	DECLARE_WRITE8_MEMBER( mcs1_w ) { if (m_card) m_card->mcs1_w(space, offset, data); }
-	DECLARE_READ8_MEMBER( mdack_r ) { return m_card ? m_card->mdack_r(space, offset) : 0xff; }
-	DECLARE_WRITE8_MEMBER( mdack_w ) { if (m_card) m_card->mdack_w(space, offset, data); }
+	uint8_t mcs0_r(offs_t offset) { return m_card ? m_card->mcs0_r(offset) : 0xff; }
+	void mcs0_w(offs_t offset, uint8_t data) { if (m_card) m_card->mcs0_w(offset, data); }
+	uint8_t mcs1_r(offs_t offset) { return m_card ? m_card->mcs1_r(offset) : 0xff; }
+	void mcs1_w(offs_t offset, uint8_t data) { if (m_card) m_card->mcs1_w(offset, data); }
+	uint8_t mdack_r(offs_t offset) { return m_card ? m_card->mdack_r(offset) : 0xff; }
+	void mdack_w(offs_t offset, uint8_t data) { if (m_card) m_card->mdack_w(offset, data); }
 	DECLARE_READ_LINE_MEMBER( mpst_r ) { return m_card == nullptr; }
 	DECLARE_READ_LINE_MEMBER( opt0_r ) { return m_card ? m_card->opt0_r() : 1; }
 	DECLARE_WRITE_LINE_MEMBER( opt0_w ) { if (m_card) m_card->opt0_w(state); }

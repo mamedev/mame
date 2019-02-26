@@ -876,7 +876,7 @@ WRITE8_MEMBER( wangpc_state::memw_w )
 READ8_MEMBER( wangpc_state::ior2_r )
 {
 	if (m_disable_dreq2)
-		return m_bus->dack_r(space, 2);
+		return m_bus->dack_r(2);
 	else
 		return m_fdc->dma_r();
 }
@@ -884,7 +884,7 @@ READ8_MEMBER( wangpc_state::ior2_r )
 WRITE8_MEMBER( wangpc_state::iow2_w )
 {
 	if (m_disable_dreq2)
-		m_bus->dack_w(space, 2, data);
+		m_bus->dack_w(2, data);
 	else
 		m_fdc->dma_w(data);
 }

@@ -192,7 +192,7 @@ poolptr<matrix_solver_t> NETLIB_NAME(solver)::create_solver_x(std::size_t size, 
 		else
 			return this->create_solver_x<FT, SIZE / 2>(size, solvername);
 	}
-};
+}
 
 struct net_splitter
 {

@@ -239,7 +239,7 @@ void nes_konami_vrc7_device::pcb_reset()
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_konami_vrc1_device::write_h)
+void nes_konami_vrc1_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("VRC-1 write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -280,7 +280,7 @@ WRITE8_MEMBER(nes_konami_vrc1_device::write_h)
 
  -------------------------------------------------*/
 
-READ8_MEMBER(nes_konami_vrc2_device::read_m)
+uint8_t nes_konami_vrc2_device::read_m(offs_t offset)
 {
 	LOG_MMC(("VRC-2 read_m, offset: %04x\n", offset));
 
@@ -289,10 +289,10 @@ READ8_MEMBER(nes_konami_vrc2_device::read_m)
 	else if (!m_prgram.empty())
 		return m_prgram[offset & (m_prgram.size() - 1)];
 	else    // sort of protection? it returns open bus in $7000-$7fff and (open bus & 0xfe) | m_latch in $6000-$6fff
-		return (offset < 0x1000) ? ((m_open_bus & 0xfe) | (m_latch & 1)) : m_open_bus;
+		return (offset < 0x1000) ? ((get_open_bus() & 0xfe) | (m_latch & 1)) : get_open_bus();
 }
 
-WRITE8_MEMBER(nes_konami_vrc2_device::write_m)
+void nes_konami_vrc2_device::write_m(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("VRC-2 write_m, offset: %04x, data: %02x\n", offset, data));
 
@@ -304,7 +304,7 @@ WRITE8_MEMBER(nes_konami_vrc2_device::write_m)
 		m_latch = data;
 }
 
-WRITE8_MEMBER(nes_konami_vrc2_device::write_h)
+void nes_konami_vrc2_device::write_h(offs_t offset, uint8_t data)
 {
 	uint8_t bank, shift, mask;
 	uint16_t add_lines = ((offset << (9 - m_vrc_ls_prg_a)) & 0x200) | ((offset << (8 - m_vrc_ls_prg_b)) & 0x100);
@@ -385,7 +385,7 @@ void nes_konami_vrc3_device::device_timer(emu_timer &timer, device_timer_id id, 
 	}
 }
 
-WRITE8_MEMBER(nes_konami_vrc3_device::write_h)
+void nes_konami_vrc3_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("VRC-3 write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -482,7 +482,7 @@ void nes_konami_vrc4_device::set_prg()
 	}
 }
 
-WRITE8_MEMBER(nes_konami_vrc4_device::write_h)
+void nes_konami_vrc4_device::write_h(offs_t offset, uint8_t data)
 {
 	uint8_t bank, shift, mask;
 	uint16_t add_lines = ((offset << (9 - m_vrc_ls_prg_a)) & 0x200) | ((offset << (8 - m_vrc_ls_prg_b)) & 0x100);
@@ -564,7 +564,7 @@ WRITE8_MEMBER(nes_konami_vrc4_device::write_h)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_konami_vrc6_device::write_h)
+void nes_konami_vrc6_device::write_h(offs_t offset, uint8_t data)
 {
 	uint8_t bank;
 	uint16_t add_lines = ((offset << (9 - m_vrc_ls_prg_a)) & 0x200) | ((offset << (8 - m_vrc_ls_prg_b)) & 0x100);
@@ -579,10 +579,10 @@ WRITE8_MEMBER(nes_konami_vrc6_device::write_h)
 			prg8_cd(data);
 			break;
 		case 0x1000:    // pulse 1 & global control
-			m_vrc6snd->write(space, add_lines>>8, data);
+			m_vrc6snd->write(add_lines>>8, data);
 			break;
 		case 0x2000:    // pulse 2
-			m_vrc6snd->write(space, (add_lines>>8) | 0x100, data);
+			m_vrc6snd->write((add_lines>>8) | 0x100, data);
 			break;
 		case 0x3000:
 			if (add_lines == 0x300)
@@ -596,7 +596,7 @@ WRITE8_MEMBER(nes_konami_vrc6_device::write_h)
 				}
 			}
 			else    // saw
-				m_vrc6snd->write(space, (add_lines>>8) | 0x200, data);
+				m_vrc6snd->write((add_lines>>8) | 0x200, data);
 			break;
 		case 0x5000:
 		case 0x6000:
@@ -659,7 +659,7 @@ void nes_konami_vrc6_device::device_add_mconfig(machine_config &config)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_konami_vrc7_device::write_h)
+void nes_konami_vrc7_device::write_h(offs_t offset, uint8_t data)
 {
 	uint8_t bank;
 	LOG_MMC(("VRC-7 write_h, offset: %04x, data: %02x\n", offset, data));

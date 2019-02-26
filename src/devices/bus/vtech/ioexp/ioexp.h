@@ -54,14 +54,14 @@ public:
 	vtech_ioexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~vtech_ioexp_slot_device();
 
-	void set_io_space(address_space *io);
+	template <typename T> void set_io_space(T &&tag, int spacenum) { m_io.set_tag(std::forward<T>(tag), spacenum); }
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	address_space *m_io;
+	required_address_space m_io;
 
 	device_vtech_ioexp_interface *m_cart;
 };

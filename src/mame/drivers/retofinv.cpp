@@ -412,22 +412,22 @@ INTERRUPT_GEN_MEMBER(retofinv_state::sub_vblank_irq)
 }
 
 
-MACHINE_CONFIG_START(retofinv_state::retofinv)
-
+void retofinv_state::retofinv(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(18'432'000)/6)    /* XTAL and divider verified, 3.072 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", retofinv_state,  main_vblank_irq)
+	Z80(config, m_maincpu, XTAL(18'432'000)/6);    /* XTAL and divider verified, 3.072 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &retofinv_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(retofinv_state::main_vblank_irq));
 
-	MCFG_DEVICE_ADD("sub", Z80, XTAL(18'432'000)/6)    /* XTAL and divider verified, 3.072 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(sub_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", retofinv_state,  sub_vblank_irq)
+	Z80(config, m_subcpu, XTAL(18'432'000)/6);    /* XTAL and divider verified, 3.072 MHz */
+	m_subcpu->set_addrmap(AS_PROGRAM, &retofinv_state::sub_map);
+	m_subcpu->set_vblank_int("screen", FUNC(retofinv_state::sub_vblank_irq));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(18'432'000)/6)   /* XTAL and divider verified, 3.072 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(retofinv_state, nmi_line_pulse, 2*60) // wrong, should be ~128-132 per frame, not 120.
+	Z80(config, m_audiocpu, XTAL(18'432'000)/6);   /* XTAL and divider verified, 3.072 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &retofinv_state::sound_map);
+	m_audiocpu->set_periodic_int(FUNC(retofinv_state::nmi_line_pulse), attotime::from_hz(2*60)); // wrong, should be ~128-132 per frame, not 120.
 
-	MCFG_DEVICE_ADD("68705", TAITO68705_MCU, XTAL(18'432'000)/6)    /* XTAL and divider verified, 3.072 MHz */
+	TAITO68705_MCU(config, m_68705, XTAL(18'432'000)/6);    /* XTAL and divider verified, 3.072 MHz */
 
 	config.m_minimum_quantum = attotime::from_hz(6000);  /* 100 CPU slices per frame - enough for the sound CPU to read all commands */
 
@@ -442,13 +442,13 @@ MACHINE_CONFIG_START(retofinv_state::retofinv)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60.58) // vsync measured at 60.58hz
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)) // not accurate
-	MCFG_SCREEN_SIZE(36*8, 28*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(retofinv_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60.58); // vsync measured at 60.58hz
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0)); // not accurate
+	screen.set_size(36*8, 28*8);
+	screen.set_visarea(0*8, 36*8-1, 0*8, 28*8-1);
+	screen.set_screen_update(FUNC(retofinv_state::screen_update));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_retofinv);
 	PALETTE(config, m_palette, FUNC(retofinv_state::retofinv_palette), 256*2 + 64*16 + 64*16, 256);
@@ -458,42 +458,41 @@ MACHINE_CONFIG_START(retofinv_state::retofinv)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("sn1", SN76489A, XTAL(18'432'000)/6)   /* @IC5?; XTAL, chip type, and divider verified, 3.072 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	SN76489A(config, "sn1", XTAL(18'432'000)/6).add_route(ALL_OUTPUTS, "mono", 0.80);   /* @IC5?; XTAL, chip type, and divider verified, 3.072 MHz */
 
-	MCFG_DEVICE_ADD("sn2", SN76489A, XTAL(18'432'000)/6)   /* @IC6?; XTAL, chip type, and divider verified, 3.072 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_CONFIG_END
+	SN76489A(config, "sn2", XTAL(18'432'000)/6).add_route(ALL_OUTPUTS, "mono", 0.80);   /* @IC6?; XTAL, chip type, and divider verified, 3.072 MHz */
+}
 
 /* bootleg which has different palette clut */
-MACHINE_CONFIG_START(retofinv_state::retofinvb1)
+void retofinv_state::retofinvb1(machine_config &config)
+{
 	retofinv(config);
 
 	m_palette->set_init(FUNC(retofinv_state::retofinv_bl_palette));
-MACHINE_CONFIG_END
+}
 
 /* bootleg which has no mcu */
-MACHINE_CONFIG_START(retofinv_state::retofinvb_nomcu)
+void retofinv_state::retofinvb_nomcu(machine_config &config)
+{
 	retofinv(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(bootleg_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &retofinv_state::bootleg_map);
 
 	m_mainlatch->q_out_cb<3>().set_nop();
 
 	config.device_remove("68705");
-MACHINE_CONFIG_END
+}
 
-/* bootleg which has different pallete clut and also has no mcu */
-MACHINE_CONFIG_START(retofinv_state::retofinvb1_nomcu)
+/* bootleg which has different palette clut and also has no mcu */
+void retofinv_state::retofinvb1_nomcu(machine_config &config)
+{
 	retofinvb1(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(bootleg_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &retofinv_state::bootleg_map);
 
 	m_mainlatch->q_out_cb<3>().set_nop();
 
 	config.device_remove("68705");
-MACHINE_CONFIG_END
+}
 
 /***************************************************************************
 

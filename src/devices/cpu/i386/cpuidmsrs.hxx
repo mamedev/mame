@@ -280,15 +280,15 @@ uint64_t athlonxp_device::opcode_rdmsr(bool &valid_msr)
 			// 39-12 PhyBase27-0 - Base address for this memory range
 			/* Format of type field:
 			    Bits 2-0 specify the memory type with the following encoding
-				 0 UC Uncacheable
-				 1 WC Write Combining
-				 4 WT Write Through
-				 5 WP Write Protect
-				 6 WB Write Back
-				 7 UC Uncacheable used only in PAT register
-				Bit 3 WrMem 1 write to memory 0 write to mmio, present only in fixed range MTRRs
-				Bit 4 RdMem 1 read from memory 0 read from mmio, present only in fixed range MTRRs
-				Other bits are unused
+			     0 UC Uncacheable
+			     1 WC Write Combining
+			     4 WT Write Through
+			     5 WP Write Protect
+			     6 WB Write Back
+			     7 UC Uncacheable used only in PAT register
+			    Bit 3 WrMem 1 write to memory 0 write to mmio, present only in fixed range MTRRs
+			    Bit 4 RdMem 1 read from memory 0 read from mmio, present only in fixed range MTRRs
+			    Other bits are unused
 			*/
 			break;
 		case 0x201: // MTRRphysMask0-7

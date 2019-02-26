@@ -3,8 +3,8 @@
 <softwarelist name="sega_beena_cart" description="Sega Beena Cartridges">
 
   <!-- you must byteswap ROMs to see text, due to endian? -->
-  
-	<software name="fpc" supported="no"> 
+
+	<software name="fpc" supported="no">
 		<description>Fresh Pretty Cure</description> <!-- is this the correct title? -->
 		<year>2009</year>
 		<publisher>Sega</publisher>

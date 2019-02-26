@@ -216,22 +216,22 @@ void poolshrk_state::poolshrk_palette(palette_device &palette) const
 }
 
 
-MACHINE_CONFIG_START(poolshrk_state::poolshrk)
-
+void poolshrk_state::poolshrk(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6800, 11055000 / 8) /* ? */
-	MCFG_DEVICE_PROGRAM_MAP(poolshrk_cpu_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", poolshrk_state,  irq0_line_assert)
+	M6800(config, m_maincpu, 11055000 / 8); /* ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &poolshrk_state::poolshrk_cpu_map);
+	m_maincpu->set_vblank_int("screen", FUNC(poolshrk_state::irq0_line_assert));
 
 	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(1, 255, 24, 255)
-	MCFG_SCREEN_UPDATE_DRIVER(poolshrk_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_size(256, 256);
+	screen.set_visarea(1, 255, 24, 255);
+	screen.set_screen_update(FUNC(poolshrk_state::screen_update));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_poolshrk);
 	PALETTE(config, m_palette, FUNC(poolshrk_state::poolshrk_palette), 4);
@@ -239,9 +239,8 @@ MACHINE_CONFIG_START(poolshrk_state::poolshrk)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE, poolshrk_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	DISCRETE(config, m_discrete, poolshrk_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 ROM_START( poolshrk )

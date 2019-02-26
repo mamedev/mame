@@ -448,22 +448,22 @@ static GFXDECODE_START( gfx_pingpong )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(pingpong_state::pingpong)
-
+void pingpong_state::pingpong(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80,18432000/6)      /* 3.072 MHz (probably) */
-	MCFG_DEVICE_PROGRAM_MAP(pingpong_map)
+	Z80(config, m_maincpu,18432000/6);      /* 3.072 MHz (probably) */
+	m_maincpu->set_addrmap(AS_PROGRAM, &pingpong_state::pingpong_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(pingpong_state::pingpong_interrupt), "screen", 0, 1);
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(456, 262)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(pingpong_state, screen_update_pingpong)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(456, 262);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(pingpong_state::screen_update_pingpong));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pingpong);
 	PALETTE(config, m_palette, FUNC(pingpong_state::pingpong_palette), 64*4+64*4, 32);
@@ -471,19 +471,18 @@ MACHINE_CONFIG_START(pingpong_state::pingpong)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("snsnd", SN76496, 18432000/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	SN76496(config, "snsnd", 18432000/8).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 /* too fast! */
-MACHINE_CONFIG_START(pingpong_state::merlinmm)
+void pingpong_state::merlinmm(machine_config &config)
+{
 	pingpong(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(merlinmm_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &pingpong_state::merlinmm_map);
 	subdevice<timer_device>("scantimer")->set_callback(FUNC(pingpong_state::merlinmm_interrupt));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

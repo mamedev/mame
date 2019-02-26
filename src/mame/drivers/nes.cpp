@@ -165,21 +165,21 @@ void nes_state::setup_disk(nes_disksys_device *slot)
 		address_space &space = m_maincpu->space(AS_PROGRAM);
 
 		// Set up memory handlers
-		space.install_read_handler(0x4020, 0x40ff, read8_delegate(FUNC(nes_disksys_device::read_ex), (nes_disksys_device *)slot));
-		space.install_write_handler(0x4020, 0x40ff, write8_delegate(FUNC(nes_disksys_device::write_ex), (nes_disksys_device *)slot));
-		space.install_read_handler(0x4100, 0x5fff, read8_delegate(FUNC(device_nes_cart_interface::read_l), (device_nes_cart_interface *)slot));
-		space.install_write_handler(0x4100, 0x5fff, write8_delegate(FUNC(device_nes_cart_interface::write_l), (device_nes_cart_interface *)slot));
-		space.install_read_handler(0x6000, 0x7fff, read8_delegate(FUNC(nes_disksys_device::read_m), (nes_disksys_device *)slot));
-		space.install_write_handler(0x6000, 0x7fff, write8_delegate(FUNC(nes_disksys_device::write_m), (nes_disksys_device *)slot));
-		space.install_read_handler(0x8000, 0xffff, read8_delegate(FUNC(nes_disksys_device::read_h), (nes_disksys_device *)slot));
-		space.install_write_handler(0x8000, 0xffff, write8_delegate(FUNC(nes_disksys_device::write_h), (nes_disksys_device *)slot));
+		space.install_read_handler(0x4020, 0x40ff, read8sm_delegate(FUNC(nes_disksys_device::read_ex), (nes_disksys_device *)slot));
+		space.install_write_handler(0x4020, 0x40ff, write8sm_delegate(FUNC(nes_disksys_device::write_ex), (nes_disksys_device *)slot));
+		space.install_read_handler(0x4100, 0x5fff, read8sm_delegate(FUNC(device_nes_cart_interface::read_l), (device_nes_cart_interface *)slot));
+		space.install_write_handler(0x4100, 0x5fff, write8sm_delegate(FUNC(device_nes_cart_interface::write_l), (device_nes_cart_interface *)slot));
+		space.install_read_handler(0x6000, 0x7fff, read8sm_delegate(FUNC(nes_disksys_device::read_m), (nes_disksys_device *)slot));
+		space.install_write_handler(0x6000, 0x7fff, write8sm_delegate(FUNC(nes_disksys_device::write_m), (nes_disksys_device *)slot));
+		space.install_read_handler(0x8000, 0xffff, read8sm_delegate(FUNC(nes_disksys_device::read_h), (nes_disksys_device *)slot));
+		space.install_write_handler(0x8000, 0xffff, write8sm_delegate(FUNC(nes_disksys_device::write_h), (nes_disksys_device *)slot));
 
 		slot->vram_alloc(0x2000);
 		slot->prgram_alloc(0x8000);
 
 		slot->pcb_start(machine(), m_ciram.get(), false);
-		m_ppu->space(AS_PROGRAM).install_readwrite_handler(0, 0x1fff, read8_delegate(FUNC(device_nes_cart_interface::chr_r),(device_nes_cart_interface *)slot), write8_delegate(FUNC(device_nes_cart_interface::chr_w),(device_nes_cart_interface *)slot));
-		m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8_delegate(FUNC(device_nes_cart_interface::nt_r),(device_nes_cart_interface *)slot), write8_delegate(FUNC(device_nes_cart_interface::nt_w),(device_nes_cart_interface *)slot));
+		m_ppu->space(AS_PROGRAM).install_readwrite_handler(0, 0x1fff, read8sm_delegate(FUNC(device_nes_cart_interface::chr_r),(device_nes_cart_interface *)slot), write8sm_delegate(FUNC(device_nes_cart_interface::chr_w),(device_nes_cart_interface *)slot));
+		m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8sm_delegate(FUNC(device_nes_cart_interface::nt_r),(device_nes_cart_interface *)slot), write8sm_delegate(FUNC(device_nes_cart_interface::nt_w),(device_nes_cart_interface *)slot));
 		m_ppu->set_scanline_callback(ppu2c0x_device::scanline_delegate(FUNC(device_nes_cart_interface::scanline_irq),(device_nes_cart_interface *)slot));
 		m_ppu->set_hblank_callback(ppu2c0x_device::hblank_delegate(FUNC(nes_disksys_device::hblank_irq),(nes_disksys_device *)slot));
 		m_ppu->set_latch(ppu2c0x_device::latch_delegate(FUNC(device_nes_cart_interface::ppu_latch),(device_nes_cart_interface *)slot));

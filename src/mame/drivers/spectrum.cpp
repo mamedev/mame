@@ -617,9 +617,6 @@ void spectrum_state::init_spectrum()
 		case 16*1024:
 			space.install_ram(0x5b00, 0x7fff, nullptr);
 	}
-
-	// setup expansion slot
-	m_exp->set_io_space(&m_maincpu->space(AS_IO));
 }
 
 MACHINE_RESET_MEMBER(spectrum_state,spectrum)
@@ -699,6 +696,7 @@ void spectrum_state::spectrum_common(machine_config &config)
 
 	/* expansion port */
 	SPECTRUM_EXPANSION_SLOT(config, m_exp, spectrum_expansion_devices, "kempjoy");
+	m_exp->set_io_space(m_maincpu, AS_IO);
 	m_exp->irq_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_exp->nmi_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
 

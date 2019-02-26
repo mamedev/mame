@@ -107,9 +107,6 @@ void vtech_floppy_controller_device::device_start()
 
 void vtech_floppy_controller_device::device_reset()
 {
-	m_memexp->set_io_space(&io_space());
-	m_memexp->set_program_space(&program_space());
-
 	program_space().install_rom(0x4000, 0x5fff, memregion("software")->base());
 
 	io_space().install_device(0x10, 0x1f, *this, &vtech_floppy_controller_device::map);

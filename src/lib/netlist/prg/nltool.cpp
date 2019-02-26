@@ -17,7 +17,7 @@
 
 #include <cstring>
 
-#define NLTOOL_VERSION	20190202
+#define NLTOOL_VERSION  20190202
 
 class tool_app_t : public plib::app
 {
