@@ -1095,7 +1095,7 @@ void mac_state::add_macplus_additions(machine_config &config)
 void mac_state::add_nubus(machine_config &config, bool bank1, bool bank2)
 {
 	nubus_device &nubus(NUBUS(config, "nubus", 0));
-	nubus.set_cputag("maincpu");
+	nubus.set_space(m_maincpu, AS_PROGRAM);
 	nubus.out_irq9_callback().set(FUNC(mac_state::nubus_irq_9_w));
 	nubus.out_irqa_callback().set(FUNC(mac_state::nubus_irq_a_w));
 	nubus.out_irqb_callback().set(FUNC(mac_state::nubus_irq_b_w));
@@ -1119,7 +1119,7 @@ void mac_state::add_nubus(machine_config &config, bool bank1, bool bank2)
 template <typename T> void mac_state::add_nubus_pds(machine_config &config, const char *slot_tag, T &&opts)
 {
 	nubus_device &nubus(NUBUS(config, "pds", 0));
-	nubus.set_cputag("maincpu");
+	nubus.set_space(m_maincpu, AS_PROGRAM);
 	nubus.out_irq9_callback().set(FUNC(mac_state::nubus_irq_9_w));
 	nubus.out_irqa_callback().set(FUNC(mac_state::nubus_irq_a_w));
 	nubus.out_irqb_callback().set(FUNC(mac_state::nubus_irq_b_w));

@@ -62,7 +62,7 @@ public:
 	~nubus_device() { m_device_list.detach_all(); }
 
 	// inline configuration
-	void set_cputag(const char *tag) { m_cputag = tag; }
+	template <typename T> void set_space(T &&tag, int spacenum) { m_space.set_tag(std::forward<T>(tag), spacenum); }
 	auto out_irq9_callback() { return m_out_irq9_cb.bind(); }
 	auto out_irqa_callback() { return m_out_irqa_cb.bind(); }
 	auto out_irqb_callback() { return m_out_irqb_cb.bind(); }
@@ -90,11 +90,11 @@ protected:
 	nubus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	// internal state
-	cpu_device   *m_maincpu;
+	required_address_space m_space;
 
 	devcb_write_line    m_out_irq9_cb;
 	devcb_write_line    m_out_irqa_cb;
@@ -104,7 +104,6 @@ protected:
 	devcb_write_line    m_out_irqe_cb;
 
 	simple_list<device_nubus_card_interface> m_device_list;
-	const char *m_cputag;
 };
 
 
