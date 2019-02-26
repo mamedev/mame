@@ -145,7 +145,10 @@ void deco_bac06_device::set_flip_screen(bool flip)
 TILEMAP_MAPPER_MEMBER(deco_bac06_device::tile_shape0_scan)
 {
 	if ((m_pf_control_0[0]&2)==0)
-		return (row & 0xf) + ((0x3f - (col & 0x3f)) << 4);
+	{
+		int col_mask = num_cols - 1;		
+		return (row & 0xf) + ((col_mask - (col & col_mask)) << 4);
+	}
 	return (col & 0xf) + ((row & 0xf) << 4) + ((col & 0x1f0) << 4);
 }
 
