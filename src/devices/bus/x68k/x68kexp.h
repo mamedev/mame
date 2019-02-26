@@ -119,11 +119,14 @@ public:
 	x68k_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~x68k_expansion_slot_device();
 
+	template <typename T> void set_space(T &&tag, int spacenum) { m_space.set_tag(std::forward<T>(tag), spacenum); }
+
 	auto out_irq2_callback() { return m_out_irq2_cb.bind(); }
 	auto out_irq4_callback() { return m_out_irq4_cb.bind(); }
 	auto out_nmi_callback() { return m_out_nmi_cb.bind(); }
 	auto out_reset_callback() { return m_out_reset_cb.bind(); }
 
+	address_space &space() { return *m_space; }
 
 	DECLARE_WRITE_LINE_MEMBER( irq2_w );
 	DECLARE_WRITE_LINE_MEMBER( irq4_w );
@@ -136,6 +139,8 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	required_address_space m_space;
 
 	devcb_write_line    m_out_irq2_cb;
 	devcb_write_line    m_out_irq4_cb;

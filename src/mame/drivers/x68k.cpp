@@ -1628,6 +1628,7 @@ void x68k_state::x68000_base(machine_config &config)
 	SOFTWARE_LIST(config, "flop_list").set_original("x68k_flop");
 
 	X68K_EXPANSION_SLOT(config, m_expansion, x68000_exp_cards, nullptr);
+	m_expansion->set_space(m_maincpu, AS_PROGRAM);
 	m_expansion->out_irq2_callback().set(FUNC(x68k_state::irq2_line));
 	m_expansion->out_irq4_callback().set(FUNC(x68k_state::irq4_line));
 	m_expansion->out_nmi_callback().set_inputline(m_maincpu, M68K_IRQ_7);
