@@ -348,7 +348,7 @@ WRITE16_MEMBER(ninjaw_state::cpua_ctrl_w)
 }
 
 
-WRITE8_MEMBER(ninjaw_state::coin_control_w)
+void ninjaw_state::coin_control_w(u8 data)
 {
 	machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
 	machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
@@ -361,36 +361,15 @@ WRITE8_MEMBER(ninjaw_state::coin_control_w)
             SOUND
 *****************************************/
 
-WRITE8_MEMBER(ninjaw_state::sound_bankswitch_w)
+void ninjaw_state::sound_bankswitch_w(u8 data)
 {
 	m_z80bank->set_entry(data & 7);
-}
-
-WRITE16_MEMBER(ninjaw_state::sound_w)
-{
-	if (offset == 0)
-		m_tc0140syt->master_port_w(space, 0, data & 0xff);
-	else if (offset == 1)
-		m_tc0140syt->master_comm_w(space, 0, data & 0xff);
-
-#ifdef MAME_DEBUG
-	if (data & 0xff00)
-		popmessage("sound_w to high byte: %04x", data);
-#endif
-}
-
-READ16_MEMBER(ninjaw_state::sound_r)
-{
-	if (offset == 1)
-		return ((m_tc0140syt->master_comm_r(space, 0) & 0xff));
-	else
-		return 0;
 }
 
 
 /**** sound pan control ****/
 
-WRITE8_MEMBER(ninjaw_state::pancontrol_w)
+void ninjaw_state::pancontrol_w(offs_t offset, u8 data)
 {
 	filter_volume_device *flt = nullptr;
 	offset &= 3;
@@ -426,7 +405,8 @@ void ninjaw_state::ninjaw_master_map(address_map &map)
 	map(0x0c0000, 0x0cffff).ram();                                                     /* main ram */
 	map(0x200000, 0x200003).rw("tc0040ioc", FUNC(tc0040ioc_device::read), FUNC(tc0040ioc_device::write)).umask16(0x00ff);
 	map(0x210000, 0x210001).w(FUNC(ninjaw_state::cpua_ctrl_w));
-	map(0x220000, 0x220003).rw(FUNC(ninjaw_state::sound_r), FUNC(ninjaw_state::sound_w));
+	map(0x220001, 0x220001).w(m_tc0140syt, FUNC(tc0140syt_device::master_port_w));
+	map(0x220003, 0x220003).rw(m_tc0140syt, FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 	map(0x240000, 0x24ffff).ram().share("share1");
 	map(0x260000, 0x263fff).ram().share("spriteram");
 	map(0x280000, 0x293fff).r(m_tc0100scn[0], FUNC(tc0100scn_device::word_r)).w(FUNC(ninjaw_state::tc0100scn_triple_screen_w)); /* tilemaps (1st screen/all screens) */
@@ -462,7 +442,8 @@ void ninjaw_state::darius2_master_map(address_map &map)
 	map(0x0c0000, 0x0cffff).ram();                         /* main ram */
 	map(0x200000, 0x200003).rw("tc0040ioc", FUNC(tc0040ioc_device::read), FUNC(tc0040ioc_device::write)).umask16(0x00ff);
 	map(0x210000, 0x210001).w(FUNC(ninjaw_state::cpua_ctrl_w));
-	map(0x220000, 0x220003).rw(FUNC(ninjaw_state::sound_r), FUNC(ninjaw_state::sound_w));
+	map(0x220001, 0x220001).w(m_tc0140syt, FUNC(tc0140syt_device::master_port_w));
+	map(0x220003, 0x220003).rw(m_tc0140syt, FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 	map(0x240000, 0x24ffff).ram().share("share1");
 	map(0x260000, 0x263fff).ram().share("spriteram");
 	map(0x280000, 0x293fff).r(m_tc0100scn[0], FUNC(tc0100scn_device::word_r)).w(FUNC(ninjaw_state::tc0100scn_triple_screen_w)); /* tilemaps (1st screen/all screens) */

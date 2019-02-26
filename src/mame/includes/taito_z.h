@@ -116,12 +116,10 @@ private:
 	DECLARE_READ16_MEMBER(chasehq_motor_r);
 	DECLARE_WRITE16_MEMBER(chasehq_motor_w);
 	DECLARE_WRITE16_MEMBER(nightstr_motor_w);
-	DECLARE_WRITE8_MEMBER(coin_control_w);
+	void coin_control_w(u8 data);
 	DECLARE_READ16_MEMBER(aquajack_unknown_r);
-	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
-	DECLARE_WRITE16_MEMBER(taitoz_sound_w);
-	DECLARE_READ16_MEMBER(taitoz_sound_r);
-	DECLARE_WRITE8_MEMBER(taitoz_pancontrol);
+	void sound_bankswitch_w(u8 data);
+	void pancontrol_w(offs_t offset, u8 data);
 	DECLARE_READ16_MEMBER(sci_spriteframe_r);
 	DECLARE_WRITE16_MEMBER(sci_spriteframe_w);
 	DECLARE_WRITE16_MEMBER(contcirc_out_w);

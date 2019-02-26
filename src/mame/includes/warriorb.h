@@ -57,11 +57,9 @@ private:
 	/* misc */
 	int        m_pandata[4];
 
-	DECLARE_WRITE8_MEMBER(coin_control_w);
-	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
-	DECLARE_WRITE16_MEMBER(sound_w);
-	DECLARE_READ16_MEMBER(sound_r);
-	DECLARE_WRITE8_MEMBER(pancontrol_w);
+	void coin_control_w(u8 data);
+	void sound_bankswitch_w(u8 data);
+	void pancontrol_w(offs_t offset, u8 data);
 	DECLARE_WRITE16_MEMBER(tc0100scn_dual_screen_w);
 
 	virtual void machine_start() override;
