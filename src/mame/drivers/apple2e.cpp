@@ -1839,7 +1839,7 @@ WRITE8_MEMBER(apple2e_state::c000_w)
 		case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d:
 			if (m_auxslotdevice)
 			{
-				m_auxslotdevice->write_c07x(space, offset & 0xf, data);
+				m_auxslotdevice->write_c07x(offset & 0xf, data);
 
 				// card may have banked auxram; get a new bank pointer
 				m_aux_bank_ptr = m_auxslotdevice->get_auxbank_ptr();
@@ -4087,7 +4087,7 @@ void apple2e_state::apple2e(machine_config &config)
 	A2BUS_SLOT(config, "sl7", m_a2bus, apple2_cards, nullptr);
 
 	A2EAUXSLOT(config, m_a2eauxslot, 0);
-	m_a2eauxslot->set_cputag(m_maincpu);
+	m_a2eauxslot->set_space(m_maincpu, AS_PROGRAM);
 	m_a2eauxslot->out_irq_callback().set(FUNC(apple2e_state::a2bus_irq_w));
 	m_a2eauxslot->out_nmi_callback().set(FUNC(apple2e_state::a2bus_nmi_w));
 	A2EAUXSLOT_SLOT(config, "aux", apple2eaux_cards, "ext80", A2_AUXSLOT_TAG);

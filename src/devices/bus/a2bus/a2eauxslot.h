@@ -67,7 +67,7 @@ public:
 	a2eauxslot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration
-	template <typename T> void set_cputag(T &&tag) { m_maincpu.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_space(T &&tag, int spacenum) { m_space.set_tag(std::forward<T>(tag), spacenum); }
 	auto out_irq_callback() { return m_out_irq_cb.bind(); }
 	auto out_nmi_callback() { return m_out_nmi_cb.bind(); }
 
@@ -88,7 +88,7 @@ protected:
 	virtual void device_reset() override;
 
 	// internal state
-	required_device<cpu_device> m_maincpu;
+	required_address_space m_space;
 
 	devcb_write_line    m_out_irq_cb;
 	devcb_write_line    m_out_nmi_cb;
@@ -112,7 +112,7 @@ public:
 
 	virtual uint8_t read_auxram(uint16_t offset) { printf("a2eauxslot: unhandled auxram read @ %04x\n", offset); return 0xff; }
 	virtual void write_auxram(uint16_t offset, uint8_t data) { printf("a2eauxslot: unhandled auxram write %02x @ %04x\n", data, offset); }
-	virtual void write_c07x(address_space &space, uint8_t offset, uint8_t data) {}
+	virtual void write_c07x(uint8_t offset, uint8_t data) {}
 	virtual uint8_t *get_vram_ptr() = 0;
 	virtual uint8_t *get_auxbank_ptr() = 0;
 	virtual bool allow_dhr() { return true; }

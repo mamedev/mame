@@ -70,12 +70,13 @@ a2eauxslot_device::a2eauxslot_device(const machine_config &mconfig, const char *
 
 a2eauxslot_device::a2eauxslot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, m_maincpu(*this, finder_base::DUMMY_TAG)
+	, m_space(*this, finder_base::DUMMY_TAG, -1)
 	, m_out_irq_cb(*this)
 	, m_out_nmi_cb(*this)
 	, m_device(nullptr)
 {
 }
+
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
