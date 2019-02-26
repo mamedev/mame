@@ -437,7 +437,7 @@ void acrnsys_state::acrnsys2(machine_config &config)
 
 	/* Acorn Bus - 8 Slot Backplane */
 	ACORN_BUS(config, m_bus, 0);
-	m_bus->set_cputag(m_maincpu);
+	m_bus->set_space(m_maincpu, AS_PROGRAM);
 	m_bus->out_irq_callback().set(m_irqs, FUNC(input_merger_device::in_w<1>));
 	m_bus->out_nmi_callback().set(FUNC(acrnsys_state::bus_nmi_w));
 	ACORN_BUS_SLOT(config, "bus1", m_bus, acorn_bus_devices, "8k"); // 0x2000-0x3fff
@@ -461,7 +461,7 @@ void acrnsys_state::acrnsys3(machine_config &config)
 
 	/* Acorn Bus - 8 Slot Backplane */
 	ACORN_BUS(config, m_bus, 0);
-	m_bus->set_cputag(m_maincpu);
+	m_bus->set_space(m_maincpu, AS_PROGRAM);
 	m_bus->out_irq_callback().set(m_irqs, FUNC(input_merger_device::in_w<1>));
 	m_bus->out_nmi_callback().set(FUNC(acrnsys_state::bus_nmi_w));
 	ACORN_BUS_SLOT(config, "bus1", m_bus, acorn_bus_devices, "8k"); // 0x2000-0x3fff
@@ -485,7 +485,7 @@ void acrnsys_state::acrnsys3_6809(machine_config &config)
 
 	/* Acorn Bus - 8 Slot Backplane */
 	ACORN_BUS(config, m_bus, 0);
-	m_bus->set_cputag(m_maincpu);
+	m_bus->set_space(m_maincpu, AS_PROGRAM);
 	m_bus->out_irq_callback().set(m_irqs, FUNC(input_merger_device::in_w<1>));
 	m_bus->out_nmi_callback().set(FUNC(acrnsys_state::bus_nmi_w));
 	ACORN_BUS_SLOT(config, "bus1", m_bus, acorn_bus_devices, "8k"); // 0x0000-0x1fff
@@ -508,7 +508,7 @@ void acrnsys_state::acrnsys4(machine_config &config)
 
 	/* Acorn Bus - 14 Slot Backplane */
 	ACORN_BUS(config, m_bus, 0);
-	m_bus->set_cputag(m_maincpu);
+	m_bus->set_space(m_maincpu, AS_PROGRAM);
 	m_bus->out_irq_callback().set(m_irqs, FUNC(input_merger_device::in_w<1>));
 	m_bus->out_nmi_callback().set(FUNC(acrnsys_state::bus_nmi_w));
 	ACORN_BUS_SLOT(config, "bus1", m_bus, acorn_bus_devices, "8k"); // 0x2000-0x3fff
@@ -538,7 +538,7 @@ void acrnsys_state::acrnsys5(machine_config &config)
 
 	/* Acorn Bus - 7 Slot Backplane */
 	ACORN_BUS(config, m_bus, 0);
-	m_bus->set_cputag(m_maincpu);
+	m_bus->set_space(m_maincpu, AS_PROGRAM);
 	m_bus->out_irq_callback().set(m_irqs, FUNC(input_merger_device::in_w<1>));
 	m_bus->out_nmi_callback().set(FUNC(acrnsys_state::bus_nmi_w));
 	ACORN_BUS_SLOT(config, "bus1", m_bus, acorn_bus_devices, "32k"); // 32K
