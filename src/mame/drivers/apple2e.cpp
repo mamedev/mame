@@ -4090,7 +4090,7 @@ void apple2e_state::apple2e(machine_config &config)
 	m_a2eauxslot->set_space(m_maincpu, AS_PROGRAM);
 	m_a2eauxslot->out_irq_callback().set(FUNC(apple2e_state::a2bus_irq_w));
 	m_a2eauxslot->out_nmi_callback().set(FUNC(apple2e_state::a2bus_nmi_w));
-	A2EAUXSLOT_SLOT(config, "aux", apple2eaux_cards, "ext80", A2_AUXSLOT_TAG);
+	A2EAUXSLOT_SLOT(config, "aux", m_a2eauxslot, apple2eaux_cards, "ext80");
 
 	/* softlist config for baseline A2E
 	By default, filter lists where possible to compatible disks for A2E */

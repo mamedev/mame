@@ -45,7 +45,6 @@ a2eaux_ramworks3_device::a2eaux_ramworks3_device(const machine_config &mconfig, 
 
 void a2eaux_ramworks3_device::device_start()
 {
-	set_a2eauxslot_device();
 	save_item(NAME(m_ram));
 	save_item(NAME(m_bank));
 }

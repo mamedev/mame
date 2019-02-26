@@ -27,30 +27,28 @@ class a2eauxslot_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	template <typename T>
-	a2eauxslot_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt, char const *slottag)
+	template <typename T, typename U>
+	a2eauxslot_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&slottag, U &&opts, char const *dflt)
 		: a2eauxslot_slot_device(mconfig, tag, owner, 0)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(false);
-		set_a2eauxslot_slot(slottag, tag);
+		m_a2eauxslot.set_tag(std::forward<T>(slottag));
 	}
 
 	a2eauxslot_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// device-level overrides
-	virtual void device_start() override;
-
-	// inline configuration
-	void set_a2eauxslot_slot(const char *tag, const char *slottag) { m_a2eauxslot_tag = tag; m_a2eauxslot_slottag = slottag; }
+	virtual void device_resolve_objects() override;
+	virtual void device_start() override { }
 
 protected:
 	a2eauxslot_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	const char *m_a2eauxslot_tag, *m_a2eauxslot_slottag;
+	required_device<a2eauxslot_device> m_a2eauxslot;
 };
 
 // device type definition
@@ -119,21 +117,17 @@ public:
 
 	device_a2eauxslot_card_interface *next() const { return m_next; }
 
-	void set_a2eauxslot_device();
+	void set_a2eauxslot_device(a2eauxslot_device *a2eauxslot);
 
 	void raise_slot_irq() { m_a2eauxslot->set_irq_line(ASSERT_LINE); }
 	void lower_slot_irq() { m_a2eauxslot->set_irq_line(CLEAR_LINE); }
 	void raise_slot_nmi() { m_a2eauxslot->set_nmi_line(ASSERT_LINE); }
 	void lower_slot_nmi() { m_a2eauxslot->set_nmi_line(CLEAR_LINE); }
 
-	// inline configuration
-	void set_a2eauxslot_tag(const char *tag, const char *slottag) { m_a2eauxslot_tag = tag; m_a2eauxslot_slottag = slottag; }
-
 protected:
 	device_a2eauxslot_card_interface(const machine_config &mconfig, device_t &device);
 
 	a2eauxslot_device  *m_a2eauxslot;
-	const char *m_a2eauxslot_tag, *m_a2eauxslot_slottag;
 	int m_slot;
 	device_a2eauxslot_card_interface *m_next;
 };
