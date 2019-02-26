@@ -1511,8 +1511,8 @@ public:
 
 protected:
 	virtual u8 mem_pr8(offs_t address) override { return macache16->read_byte(address); };
-	virtual u16 mem_pr16(offs_t address) override { return macache16->read_byte(address); };
-	virtual u32 mem_pr32(offs_t address) override { return macache16->read_byte(address); };
+	virtual u16 mem_pr16(offs_t address) override { return macache16->read_word(address); };
+	virtual u32 mem_pr32(offs_t address) override { return macache16->read_dword(address); };
 };
 
 class i486_device : public i386_device
