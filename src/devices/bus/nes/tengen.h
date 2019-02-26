@@ -14,7 +14,7 @@ public:
 	// construction/destruction
 	nes_tengen008_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+	virtual void write_h(offs_t offset, uint8_t data) override;
 
 	virtual void pcb_reset() override;
 
@@ -32,8 +32,8 @@ public:
 	// construction/destruction
 	nes_tengen032_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE8_MEMBER(tengen032_write);
-	virtual DECLARE_WRITE8_MEMBER(write_h) override { tengen032_write(space, offset, data, mem_mask); }
+	void tengen032_write(offs_t offset, uint8_t data);
+	virtual void write_h(offs_t offset, uint8_t data) override { tengen032_write(offset, data); }
 
 	virtual void hblank_irq(int scanline, int vblank, int blanked) override;
 	virtual void pcb_reset() override;
@@ -74,7 +74,7 @@ public:
 	nes_tengen037_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+	virtual void write_h(offs_t offset, uint8_t data) override;
 	virtual void chr_cb(int start, int bank, int source) override;
 
 protected:

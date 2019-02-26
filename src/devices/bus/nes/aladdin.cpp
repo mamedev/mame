@@ -52,7 +52,7 @@ aladdin_cart_interface::~aladdin_cart_interface()
 {
 }
 
-READ8_MEMBER(aladdin_cart_interface::read)
+uint8_t aladdin_cart_interface::read(offs_t offset)
 {
 	if (offset < 0x4000)
 		return m_rom[(m_lobank * 0x4000) + (offset & 0x3fff)];
@@ -84,10 +84,10 @@ void nes_aladdin_slot_device::device_start()
 	m_cart = dynamic_cast<aladdin_cart_interface *>(get_card_device());
 }
 
-READ8_MEMBER(nes_aladdin_slot_device::read)
+uint8_t nes_aladdin_slot_device::read(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->read(space, offset, mem_mask);
+		return m_cart->read(offset);
 
 	return 0xff;
 }
@@ -296,19 +296,19 @@ void nes_aladdin_device::pcb_reset()
 
  -------------------------------------------------*/
 
-READ8_MEMBER(nes_aladdin_device::read_h)
+uint8_t nes_aladdin_device::read_h(offs_t offset)
 {
 	LOG_MMC(("aladdin read_h, offset: %04x\n", offset));
 	// this shall be the proper code, but it's a bit slower, so we access directly the subcart below
-	//return m_subslot->read(space, offset, mem_mask);
+	//return m_subslot->read(offset);
 
 	if (m_subslot->m_cart)
-		return m_subslot->m_cart->read(space, offset, mem_mask);
+		return m_subslot->m_cart->read(offset);
 	else    // this is "fake" in the sense that we fill CPU space with 0xff if no Aladdin cart is loaded
 		return hi_access_rom(offset);
 }
 
-WRITE8_MEMBER(nes_aladdin_device::write_h)
+void nes_aladdin_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("aladdin write_h, offset: %04x, data: %02x\n", offset, data));
 	m_subslot->write_prg(offset, data);

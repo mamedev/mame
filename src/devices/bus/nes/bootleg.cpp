@@ -570,7 +570,7 @@ void nes_ax5705_device::set_prg()
 	prg8_ab(m_mmc_prg_bank[1]);
 }
 
-WRITE8_MEMBER(nes_ax5705_device::write_h)
+void nes_ax5705_device::write_h(offs_t offset, uint8_t data)
 {
 	uint8_t bank;
 	LOG_MMC(("ax5705 write_h, offset: %04x, data: %02x\n", offset, data));
@@ -652,7 +652,7 @@ void nes_sc127_device::hblank_irq(int scanline, int vblank, int blanked)
 	}
 }
 
-WRITE8_MEMBER(nes_sc127_device::write_h)
+void nes_sc127_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("sc127 write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -715,7 +715,7 @@ void nes_mbaby_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 	}
 }
 
-WRITE8_MEMBER(nes_mbaby_device::write_h)
+void nes_mbaby_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("Mario Baby write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -746,7 +746,7 @@ WRITE8_MEMBER(nes_mbaby_device::write_h)
 	}
 }
 
-READ8_MEMBER(nes_mbaby_device::read_m)
+uint8_t nes_mbaby_device::read_m(offs_t offset)
 {
 	LOG_MMC(("Mario Baby read_m, offset: %04x\n", offset));
 	return m_prg[(m_latch * 0x2000) + (offset & 0x1fff)];
@@ -764,7 +764,7 @@ READ8_MEMBER(nes_mbaby_device::read_m)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_asn_device::write_h)
+void nes_asn_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("Ai Senshi Nicol write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -775,7 +775,7 @@ WRITE8_MEMBER(nes_asn_device::write_h)
 		m_latch = data;
 }
 
-READ8_MEMBER(nes_asn_device::read_m)
+uint8_t nes_asn_device::read_m(offs_t offset)
 {
 	LOG_MMC(("Ai Senshi Nicol read_m, offset: %04x\n", offset));
 	return m_prg[((m_latch * 0x2000) + (offset & 0x1fff)) & (m_prg_size - 1)];
@@ -811,7 +811,7 @@ void nes_smb3p_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 	}
 }
 
-WRITE8_MEMBER(nes_smb3p_device::write_h)
+void nes_smb3p_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("btl_smb3_w, offset: %04x, data: %02x\n", offset, data));
 	switch (offset & 0x0f)
@@ -879,7 +879,7 @@ void nes_btl_dn_device::hblank_irq(int scanline, int vblank, int blanked )
 	hold_irq_line();
 }
 
-WRITE8_MEMBER(nes_btl_dn_device::write_h)
+void nes_btl_dn_device::write_h(offs_t offset, uint8_t data)
 {
 	uint8_t bank;
 	LOG_MMC(("btl_dn write_h, offset: %04x, data: %02x\n", offset, data));
@@ -933,13 +933,13 @@ WRITE8_MEMBER(nes_btl_dn_device::write_h)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_whirl2706_device::write_h)
+void nes_whirl2706_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("whirl2706 write_h, offset: %04x, data: %02x\n", offset, data));
 	m_latch = data;
 }
 
-READ8_MEMBER(nes_whirl2706_device::read_m)
+uint8_t nes_whirl2706_device::read_m(offs_t offset)
 {
 	LOG_MMC(("whirl2706 read_m, offset: %04x\n", offset));
 	return m_prg[(m_latch * 0x2000 + (offset & 0x1fff)) & (m_prg_size - 1)];
@@ -975,7 +975,7 @@ void nes_smb2j_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 	}
 }
 
-WRITE8_MEMBER(nes_smb2j_device::write_l)
+void nes_smb2j_device::write_l(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("smb2j write_l, offset: %04x, data: %02x\n", offset, data));
 	offset += 0x100;
@@ -984,7 +984,7 @@ WRITE8_MEMBER(nes_smb2j_device::write_l)
 		m_irq_enable = data & 3;    // maybe also m_irq_count = 0?!?
 }
 
-WRITE8_MEMBER(nes_smb2j_device::write_h)
+void nes_smb2j_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("smb2j write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -992,7 +992,7 @@ WRITE8_MEMBER(nes_smb2j_device::write_h)
 		m_irq_enable = data & 3;
 }
 
-WRITE8_MEMBER(nes_smb2j_device::write_ex)
+void nes_smb2j_device::write_ex(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("smb2j write_ex, offset: %04x, data: %02x\n", offset, data));
 
@@ -1010,7 +1010,7 @@ WRITE8_MEMBER(nes_smb2j_device::write_ex)
 	}
 }
 
-READ8_MEMBER(nes_smb2j_device::read_l)
+uint8_t nes_smb2j_device::read_l(offs_t offset)
 {
 	LOG_MMC(("smb2j read_l, offset: %04x\n", offset));
 	offset += 0x100;
@@ -1018,10 +1018,10 @@ READ8_MEMBER(nes_smb2j_device::read_l)
 	if (offset >= 0x1000)
 		return m_prg[0x10000 + (offset & 0x0fff)];
 
-	return m_open_bus;   // open bus
+	return get_open_bus();   // open bus
 }
 
-READ8_MEMBER(nes_smb2j_device::read_m)
+uint8_t nes_smb2j_device::read_m(offs_t offset)
 {
 	LOG_MMC(("smb2j read_m, offset: %04x\n", offset));
 	return m_prg[0x4000 + offset];
@@ -1057,7 +1057,7 @@ void nes_smb2ja_device::device_timer(emu_timer &timer, device_timer_id id, int p
 	}
 }
 
-WRITE8_MEMBER(nes_smb2ja_device::write_h)
+void nes_smb2ja_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("smb2ja write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -1076,7 +1076,7 @@ WRITE8_MEMBER(nes_smb2ja_device::write_h)
 	}
 }
 
-READ8_MEMBER(nes_smb2ja_device::read_m)
+uint8_t nes_smb2ja_device::read_m(offs_t offset)
 {
 	LOG_MMC(("smb2ja read_m, offset: %04x\n", offset));
 	return m_prg[(0xfe * 0x2000 + (offset & 0x1fff)) & (m_prg_size - 1)];
@@ -1114,7 +1114,7 @@ void nes_smb2jb_device::device_timer(emu_timer &timer, device_timer_id id, int p
 	}
 }
 
-WRITE8_MEMBER(nes_smb2jb_device::write_l)
+void nes_smb2jb_device::write_l(offs_t offset, uint8_t data)
 {
 	uint8_t prg;
 	LOG_MMC(("smb2jb write_l, offset: %04x, data: %02x\n", offset, data));
@@ -1134,14 +1134,14 @@ WRITE8_MEMBER(nes_smb2jb_device::write_l)
 	}
 }
 
-READ8_MEMBER(nes_smb2jb_device::read_m)
+uint8_t nes_smb2jb_device::read_m(offs_t offset)
 {
 	LOG_MMC(("smb2jb read_m, offset: %04x\n", offset));
 	return m_prg[((0x0f * 0x2000) + (offset & 0x1fff)) & (m_prg_size - 1)];
 }
 
 /* This goes to 0x4020-0x403f & 0x40a0-0x40bf */
-WRITE8_MEMBER(nes_smb2jb_device::write_ex)
+void nes_smb2jb_device::write_ex(offs_t offset, uint8_t data)
 {
 	uint8_t prg;
 	LOG_MMC(("smb2jb write_ex, offset: %04x, data: %02x\n", offset, data));
@@ -1169,7 +1169,7 @@ WRITE8_MEMBER(nes_smb2jb_device::write_ex)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_09034a_device::write_ex)
+void nes_09034a_device::write_ex(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("09-034a write_ex, offset: %04x, data: %02x\n", offset, data));
 
@@ -1177,7 +1177,7 @@ WRITE8_MEMBER(nes_09034a_device::write_ex)
 		m_reg = data & 1;
 }
 
-READ8_MEMBER(nes_09034a_device::read_m)
+uint8_t nes_09034a_device::read_m(offs_t offset)
 {
 	LOG_MMC(("09-034a read_m, offset: %04x\n", offset));
 	// in 0x6000-0x7fff is mapped the 2nd PRG chip which starts after 32K (hence the +4)
@@ -1198,7 +1198,7 @@ READ8_MEMBER(nes_09034a_device::read_m)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_tobidase_device::write_l)
+void nes_tobidase_device::write_l(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("tobidase write_h, offset: %04x, data: %02x\n", offset, data));
 	offset += 0x4100;
@@ -1207,7 +1207,7 @@ WRITE8_MEMBER(nes_tobidase_device::write_l)
 		m_latch = data & 0x0f;
 }
 
-READ8_MEMBER(nes_tobidase_device::read_m)
+uint8_t nes_tobidase_device::read_m(offs_t offset)
 {
 	LOG_MMC(("tobidase read_m, offset: %04x\n", offset));
 	if (m_latch >= 0x0c)
@@ -1229,13 +1229,13 @@ READ8_MEMBER(nes_tobidase_device::read_m)
 
 -------------------------------------------------*/
 
-READ8_MEMBER(nes_lh32_device::read_m)
+uint8_t nes_lh32_device::read_m(offs_t offset)
 {
 	LOG_MMC(("lh32 read_m, offset: %04x\n", offset));
 	return m_prg[(m_latch * 0x2000) + (offset & 0x1fff)];
 }
 
-READ8_MEMBER(nes_lh32_device::read_h)
+uint8_t nes_lh32_device::read_h(offs_t offset)
 {
 //  LOG_MMC(("lh32 read_h, offset: %04x\n", offset));
 
@@ -1245,7 +1245,7 @@ READ8_MEMBER(nes_lh32_device::read_h)
 	return hi_access_rom(offset);
 }
 
-WRITE8_MEMBER(nes_lh32_device::write_m)
+void nes_lh32_device::write_m(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("lh32 write_m, offset: %04x, data: %02x\n", offset, data));
 
@@ -1256,7 +1256,7 @@ WRITE8_MEMBER(nes_lh32_device::write_m)
 	}
 }
 
-WRITE8_MEMBER(nes_lh32_device::write_h)
+void nes_lh32_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("lh32 write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -1285,13 +1285,13 @@ void nes_lh10_device::update_prg()
 	prg8_ab(m_reg[7]);
 }
 
-READ8_MEMBER(nes_lh10_device::read_m)
+uint8_t nes_lh10_device::read_m(offs_t offset)
 {
 	LOG_MMC(("lh10 read_m, offset: %04x\n", offset));
 	return m_prg[(0x0e * 0x2000) + (offset & 0x1fff)];
 }
 
-READ8_MEMBER(nes_lh10_device::read_h)
+uint8_t nes_lh10_device::read_h(offs_t offset)
 {
 //  LOG_MMC(("lh10 read_h, offset: %04x\n", offset));
 
@@ -1301,7 +1301,7 @@ READ8_MEMBER(nes_lh10_device::read_h)
 	return hi_access_rom(offset);
 }
 
-WRITE8_MEMBER(nes_lh10_device::write_h)
+void nes_lh10_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("lh10 write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -1354,13 +1354,13 @@ void nes_lh53_device::device_timer(emu_timer &timer, device_timer_id id, int par
 	}
 }
 
-READ8_MEMBER(nes_lh53_device::read_m)
+uint8_t nes_lh53_device::read_m(offs_t offset)
 {
 	LOG_MMC(("lh53 read_m, offset: %04x\n", offset));
 	return m_prg[(m_reg * 0x2000) + (offset & 0x1fff)];
 }
 
-READ8_MEMBER(nes_lh53_device::read_h)
+uint8_t nes_lh53_device::read_h(offs_t offset)
 {
 //  LOG_MMC(("lh53 read_h, offset: %04x\n", offset));
 
@@ -1370,7 +1370,7 @@ READ8_MEMBER(nes_lh53_device::read_h)
 	return hi_access_rom(offset);
 }
 
-WRITE8_MEMBER(nes_lh53_device::write_h)
+void nes_lh53_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("lh53 write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -1412,7 +1412,7 @@ WRITE8_MEMBER(nes_lh53_device::write_h)
 
  -------------------------------------------------*/
 
-READ8_MEMBER(nes_2708_device::read_m)
+uint8_t nes_2708_device::read_m(offs_t offset)
 {
 	LOG_MMC(("btl-2708 read_m, offset: %04x\n", offset));
 	if (!m_reg[1])
@@ -1421,14 +1421,14 @@ READ8_MEMBER(nes_2708_device::read_m)
 		return m_prg[(m_reg[0] * 0x2000) + (offset & 0x1fff)];
 }
 
-WRITE8_MEMBER(nes_2708_device::write_m)
+void nes_2708_device::write_m(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("btl-2708 write_m, offset: %04x, data: %02x\n", offset, data));
 //  if (!m_reg[1])
 		m_prgram[offset] = data;    // lower 8K of WRAM
 }
 
-READ8_MEMBER(nes_2708_device::read_h)
+uint8_t nes_2708_device::read_h(offs_t offset)
 {
 //  LOG_MMC(("btl-2708 read_h, offset: %04x\n", offset));
 
@@ -1438,7 +1438,7 @@ READ8_MEMBER(nes_2708_device::read_h)
 	return hi_access_rom(offset);
 }
 
-WRITE8_MEMBER(nes_2708_device::write_h)
+void nes_2708_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("btl-2708 write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -1475,20 +1475,20 @@ WRITE8_MEMBER(nes_2708_device::write_h)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_ac08_device::write_ex)
+void nes_ac08_device::write_ex(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("AC-08 write_ex, offset: %04x, data: %02x\n", offset, data));
 	if (offset == 5)    // $4025
 		set_nt_mirroring(!BIT(data, 3) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
 }
 
-READ8_MEMBER(nes_ac08_device::read_m)
+uint8_t nes_ac08_device::read_m(offs_t offset)
 {
 	LOG_MMC(("AC-08 read_m, offset: %04x\n", offset));
 	return m_prg[(m_latch * 0x2000) + (offset & 0x1fff)];
 }
 
-WRITE8_MEMBER(nes_ac08_device::write_h)
+void nes_ac08_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("AC-08 write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -1511,13 +1511,13 @@ WRITE8_MEMBER(nes_ac08_device::write_h)
 
  -------------------------------------------------*/
 
-READ8_MEMBER(nes_unl_bb_device::read_m)
+uint8_t nes_unl_bb_device::read_m(offs_t offset)
 {
 	LOG_MMC(("unl-bb read_m, offset: %04x\n", offset));
 	return m_prg[(((m_reg[0] & 3 & m_prg_mask) * 0x2000) + (offset & 0x1fff))];
 }
 
-WRITE8_MEMBER(nes_unl_bb_device::write_h)
+void nes_unl_bb_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("unl-bb write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -1549,7 +1549,7 @@ WRITE8_MEMBER(nes_unl_bb_device::write_h)
 
  -------------------------------------------------*/
 
-READ8_MEMBER(nes_mmalee_device::read_m)
+uint8_t nes_mmalee_device::read_m(offs_t offset)
 {
 	LOG_MMC(("mmalee read_m, offset: %04x\n", offset));
 
@@ -1561,7 +1561,7 @@ READ8_MEMBER(nes_mmalee_device::read_m)
 	return ((offset + 0x6000) & 0xff00) >> 8;
 }
 
-WRITE8_MEMBER(nes_mmalee_device::write_m)
+void nes_mmalee_device::write_m(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("mmalee write_m, offset: %04x, data: %02x\n", offset, data));
 
@@ -1594,7 +1594,7 @@ void nes_shuiguan_device::device_timer(emu_timer &timer, device_timer_id id, int
 	}
 }
 
-WRITE8_MEMBER(nes_shuiguan_device::write_h)
+void nes_shuiguan_device::write_h(offs_t offset, uint8_t data)
 {
 	int bank;
 	LOG_MMC(("shuiguan write_h, offset: %04x, data: %02x\n", offset, data));
@@ -1646,7 +1646,7 @@ WRITE8_MEMBER(nes_shuiguan_device::write_h)
 	}
 }
 
-READ8_MEMBER(nes_shuiguan_device::read_m)
+uint8_t nes_shuiguan_device::read_m(offs_t offset)
 {
 	// always first bank??
 	LOG_MMC(("shuiguan read_m, offset: %04x\n", offset));
@@ -1670,7 +1670,7 @@ READ8_MEMBER(nes_shuiguan_device::read_m)
 
  -------------------------------------------------*/
 
-READ8_MEMBER(nes_rt01_device::read_h)
+uint8_t nes_rt01_device::read_h(offs_t offset)
 {
 //  LOG_MMC(("rt01 read_h, offset: %04x\n", offset));
 

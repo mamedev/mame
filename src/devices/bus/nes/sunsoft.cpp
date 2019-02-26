@@ -209,7 +209,7 @@ void nes_sunsoft_fme7_device::pcb_reset()
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_sunsoft_1_device::write_m)
+void nes_sunsoft_1_device::write_m(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("Sunsoft 1 write_m, offset: %04x, data: %02x\n", offset, data));
 
@@ -235,7 +235,7 @@ WRITE8_MEMBER(nes_sunsoft_1_device::write_m)
 
 // there are two 'variants' depending on hardwired or mapper ctrl mirroring
 
-WRITE8_MEMBER(nes_sunsoft_2_device::write_h)
+void nes_sunsoft_2_device::write_h(offs_t offset, uint8_t data)
 {
 	uint8_t helper = (data & 0x07) | ((data & 0x80) ? 0x08 : 0x00);
 	LOG_MMC(("Sunsoft 2 write_h, offset: %04x, data: %02x\n", offset, data));
@@ -282,7 +282,7 @@ void nes_sunsoft_3_device::device_timer(emu_timer &timer, device_timer_id id, in
 	}
 }
 
-WRITE8_MEMBER(nes_sunsoft_3_device::write_h)
+void nes_sunsoft_3_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("Sunsoft 3 write_h, offset %04x, data: %02x\n", offset, data));
 
@@ -384,7 +384,7 @@ void nes_sunsoft_4_device::sun4_mirror( int mirror, int mirr0, int mirr1 )
 	}
 }
 
-WRITE8_MEMBER(nes_sunsoft_4_device::sun4_write)
+void nes_sunsoft_4_device::sun4_write(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("Sunsoft 4 write_h, offset %04x, data: %02x\n", offset, data));
 
@@ -424,7 +424,7 @@ WRITE8_MEMBER(nes_sunsoft_4_device::sun4_write)
 	}
 }
 
-WRITE8_MEMBER(nes_sunsoft_4_device::write_m)
+void nes_sunsoft_4_device::write_m(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("Sunsoft 4 write_m, offset: %04x, data: %02x\n", offset, data));
 
@@ -434,7 +434,7 @@ WRITE8_MEMBER(nes_sunsoft_4_device::write_m)
 		m_prgram[offset & (m_prgram.size() - 1)] = data;
 }
 
-READ8_MEMBER(nes_sunsoft_4_device::read_m)
+uint8_t nes_sunsoft_4_device::read_m(offs_t offset)
 {
 	LOG_MMC(("Sunsoft 4 read_m, offset: %04x\n", offset));
 
@@ -443,7 +443,7 @@ READ8_MEMBER(nes_sunsoft_4_device::read_m)
 	if (!m_prgram.empty() && m_wram_enable)
 		return m_prgram[offset & (m_prgram.size() - 1)];
 
-	return m_open_bus;   // open bus
+	return get_open_bus();   // open bus
 }
 
 /*-------------------------------------------------
@@ -475,7 +475,7 @@ void nes_sunsoft_fme7_device::device_timer(emu_timer &timer, device_timer_id id,
 	}
 }
 
-WRITE8_MEMBER(nes_sunsoft_fme7_device::fme7_write)
+void nes_sunsoft_fme7_device::fme7_write(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("fme7_write, offset %04x, data: %02x\n", offset, data));
 
@@ -533,7 +533,7 @@ WRITE8_MEMBER(nes_sunsoft_fme7_device::fme7_write)
 	}
 }
 
-WRITE8_MEMBER(nes_sunsoft_fme7_device::write_m)
+void nes_sunsoft_fme7_device::write_m(offs_t offset, uint8_t data)
 {
 	uint8_t bank = m_wram_bank & 0x3f;
 	LOG_MMC(("Sunsoft FME7 write_m, offset: %04x, data: %02x\n", offset, data));
@@ -549,7 +549,7 @@ WRITE8_MEMBER(nes_sunsoft_fme7_device::write_m)
 	}
 }
 
-READ8_MEMBER(nes_sunsoft_fme7_device::read_m)
+uint8_t nes_sunsoft_fme7_device::read_m(offs_t offset)
 {
 	uint8_t bank = m_wram_bank & 0x3f;
 	LOG_MMC(("Sunsoft FME7 read_m, offset: %04x\n", offset));
@@ -564,7 +564,7 @@ READ8_MEMBER(nes_sunsoft_fme7_device::read_m)
 			return m_prgram[((bank * 0x2000) + offset) & (m_prgram.size() - 1)];
 	}
 
-	return m_open_bus;   // open bus
+	return get_open_bus();   // open bus
 }
 
 
@@ -578,7 +578,7 @@ READ8_MEMBER(nes_sunsoft_fme7_device::read_m)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_sunsoft_5_device::write_h)
+void nes_sunsoft_5_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("sunsoft 5 write_h, offset %04x, data: %02x\n", offset, data));
 
@@ -591,7 +591,7 @@ WRITE8_MEMBER(nes_sunsoft_5_device::write_h)
 			m_ym2149->data_w(data);
 			break;
 		default:
-			fme7_write(space, offset, data, mem_mask);
+			fme7_write(offset, data);
 			break;
 	}
 }

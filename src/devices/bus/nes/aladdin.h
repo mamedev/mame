@@ -24,7 +24,7 @@ public:
 	virtual ~aladdin_cart_interface();
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read);
+	virtual uint8_t read(offs_t offset);
 
 	uint8_t *get_cart_base() { return m_rom; }
 	void set_cart_size(uint32_t size) { m_rom_size = size; m_rom_mask = (size / 0x4000) - 1; }
@@ -82,7 +82,7 @@ public:
 	// slot interface overrides
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
-	virtual DECLARE_READ8_MEMBER(read);
+	uint8_t read(offs_t offset);
 	void write_prg(uint32_t offset, uint8_t data) { if (m_cart) m_cart->write_prg(offset, data); }
 
 protected:
@@ -160,8 +160,8 @@ public:
 	// construction/destruction
 	nes_aladdin_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ8_MEMBER(read_h) override;
-	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+	virtual uint8_t read_h(offs_t offset) override;
+	virtual void write_h(offs_t offset, uint8_t data) override;
 
 	virtual void pcb_reset() override;
 

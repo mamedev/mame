@@ -86,7 +86,7 @@ void nes_benshieng_device::update_banks()
 	chr2_6(m_mmc_vrom_bank[3], CHRROM);
 }
 
-WRITE8_MEMBER(nes_benshieng_device::write_h)
+void nes_benshieng_device::write_h(offs_t offset, uint8_t data)
 {
 	uint8_t helper = (offset & 0xc00) >> 10;
 	LOG_MMC(("benshieng write_h, offset: %04x, data: %02x\n", offset, data));
