@@ -332,12 +332,12 @@ u8 m24_state::ctrlport_b_r()
 {
 	// Bit 0 = NC
 	// Bit 1 = SW4 (8087 present)
-	// Bit 2 = ~R11
+	// Bit 2 = ~RI1
 	// Bit 3 = ~DSR1
 	// Bit 4 = OUT2 (8253)
 	// Bit 5 = SPKR
 	// Bit 6 = IOCHK
-	// Bit 7 = memory parity error (page 4)
+	// Bit 7 = MBMERR (MRD parity check)
 
 	if (BIT(m_dsw0->read(), 4))
 		m_ctrlport_b |= 0x02;
@@ -356,7 +356,7 @@ void m24_state::alt_w(u8 data)
 
 WRITE_LINE_MEMBER(m24_state::chck_w)
 {
-	m_chck_active = (state == ASSERT_LINE);
+	m_chck_active = (state == 0);
 	if (m_chck_active)
 	{
 		if (!BIT(m_ctrlport_b, 6))
@@ -521,7 +521,8 @@ void m24_state::cfg_m20_format(device_t *device)
 	device->subdevice<floppy_connector>("fdc:1")->set_formats(m24_state::floppy_formats);
 }
 
-MACHINE_CONFIG_START(m24_state::olivetti)
+void m24_state::olivetti(machine_config &config)
+{
 	/* basic machine hardware */
 	I8086(config, m_maincpu, 24_MHz_XTAL / 3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &m24_state::m24_map);
@@ -531,8 +532,7 @@ MACHINE_CONFIG_START(m24_state::olivetti)
 	m_maincpu->esc_data_handler().set("ndp", FUNC(i8087_device::addr_w));
 
 	i8087_device &i8087(I8087(config, "ndp", 24_MHz_XTAL / 3));
-	i8087.set_addrmap(AS_PROGRAM, &m24_state::m24_map);
-	i8087.set_data_width(16);
+	i8087.set_space_86(m_maincpu, AS_PROGRAM);
 	i8087.irq().set(FUNC(m24_state::int87_w));
 	i8087.busy().set_inputline(m_maincpu, INPUT_LINE_TEST);
 
@@ -568,7 +568,8 @@ MACHINE_CONFIG_START(m24_state::olivetti)
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	ISA8(config, m_isabus, 24_MHz_XTAL / 6);
-	m_isabus->set_cputag(m_maincpu);
+	m_isabus->set_memspace(m_maincpu, AS_PROGRAM);
+	m_isabus->set_iospace(m_maincpu, AS_IO);
 	m_isabus->irq2_callback().set(m_pic, FUNC(pic8259_device::ir2_w));
 	m_isabus->irq3_callback().set(m_pic, FUNC(pic8259_device::ir3_w));
 	m_isabus->irq4_callback().set(m_pic, FUNC(pic8259_device::ir4_w));
@@ -580,18 +581,17 @@ MACHINE_CONFIG_START(m24_state::olivetti)
 	m_isabus->drq3_callback().set(m_dmac, FUNC(am9517a_device::dreq3_w));
 	m_isabus->iochck_callback().set(FUNC(m24_state::chck_w));
 
-	MCFG_DEVICE_ADD("mb1", ISA8_SLOT, 0, m_isabus, pc_isa8_cards, "cga_m24", true)
-	MCFG_DEVICE_ADD("mb2", ISA8_SLOT, 0, m_isabus, pc_isa8_cards, "fdc_xt", true)
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc_xt", cfg_m20_format)
-	MCFG_DEVICE_ADD("mb3", ISA8_SLOT, 0, m_isabus, pc_isa8_cards, "lpt", true)
-	MCFG_DEVICE_ADD("mb4", ISA8_SLOT, 0, m_isabus, pc_isa8_cards, "com", true)
+	ISA8_SLOT(config, "mb1", 0, m_isabus, pc_isa8_cards, "cga_m24", true);
+	ISA8_SLOT(config, "mb2", 0, m_isabus, pc_isa8_cards, "fdc_xt", true).set_option_machine_config("fdc_xt", cfg_m20_format);
+	ISA8_SLOT(config, "mb3", 0, m_isabus, pc_isa8_cards, "lpt", true);
+	ISA8_SLOT(config, "mb4", 0, m_isabus, pc_isa8_cards, "com", true);
 
-	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, m_isabus, pc_isa8_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, m_isabus, pc_isa8_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, m_isabus, pc_isa8_cards, nullptr, false)
+	ISA8_SLOT(config, "isa1", 0, m_isabus, pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa2", 0, m_isabus, pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa3", 0, m_isabus, pc_isa8_cards, nullptr, false);
 
-	/* internal ram */
-	RAM(config, m_ram).set_default_size("640K").set_extra_options("64K, 128K, 256K, 512K");
+	// 2 banks of 16 64Kx1 or 256Kx1 DRAMs on motherboard
+	RAM(config, m_ram).set_default_size("640K").set_extra_options("128K, 256K, 512K");
 
 	TMS7000(config, m_kbc, 24_MHz_XTAL / 6);
 	m_kbc->set_addrmap(AS_PROGRAM, &m24_state::kbc_map);
@@ -606,12 +606,12 @@ MACHINE_CONFIG_START(m24_state::olivetti)
 	mm58174an.set_mode24(1); // ?
 	mm58174an.set_day1(1);   // ?
 
-	M24_Z8000(config, m_z8000_apb, 0);
+	M24_Z8000(config, m_z8000_apb, 0); // TODO: make this a slot device (uses custom bus connector)
 	m_z8000_apb->halt_callback().set(FUNC(m24_state::halt_i86_w));
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("disk_list","ibm5150")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "disk_list").set_original("ibm5150");
+}
 
 ROM_START( m24 )
 	ROM_REGION16_LE(0x8000,"bios", 0)

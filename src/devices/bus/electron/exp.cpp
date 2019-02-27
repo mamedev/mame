@@ -32,15 +32,6 @@ device_electron_expansion_interface::device_electron_expansion_interface(const m
 }
 
 
-//-------------------------------------------------
-//  ~device_electron_expansion_interface - destructor
-//-------------------------------------------------
-
-device_electron_expansion_interface::~device_electron_expansion_interface()
-{
-}
-
-
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -55,15 +46,6 @@ electron_expansion_slot_device::electron_expansion_slot_device(const machine_con
 	m_card(nullptr),
 	m_irq_handler(*this),
 	m_nmi_handler(*this)
-{
-}
-
-
-//-------------------------------------------------
-//  expansion_slot_device - destructor
-//-------------------------------------------------
-
-electron_expansion_slot_device::~electron_expansion_slot_device()
 {
 }
 
@@ -93,11 +75,13 @@ void electron_expansion_slot_device::device_reset()
 //  expbus_r - expansion data read
 //-------------------------------------------------
 
-uint8_t electron_expansion_slot_device::expbus_r(address_space &space, offs_t offset, uint8_t data)
+uint8_t electron_expansion_slot_device::expbus_r(offs_t offset)
 {
+	uint8_t data = 0xff;
+
 	if (m_card != nullptr)
 	{
-		data = m_card->expbus_r(space, offset, data);
+		data = m_card->expbus_r(offset);
 	}
 
 	return data;
@@ -107,11 +91,11 @@ uint8_t electron_expansion_slot_device::expbus_r(address_space &space, offs_t of
 //  expbus_w - expansion data write
 //-------------------------------------------------
 
-void electron_expansion_slot_device::expbus_w(address_space &space, offs_t offset, uint8_t data)
+void electron_expansion_slot_device::expbus_w(offs_t offset, uint8_t data)
 {
 	if (m_card != nullptr)
 	{
-		m_card->expbus_w(space, offset, data);
+		m_card->expbus_w(offset, data);
 	}
 }
 
@@ -126,6 +110,7 @@ void electron_expansion_slot_device::expbus_w(address_space &space, offs_t offse
 //#include "fbprint.h"
 //#include "jafamode7.h"
 #include "plus1.h"
+#include "plus2.h"
 #include "plus3.h"
 #include "pwrjoy.h"
 #include "rombox.h"
@@ -140,6 +125,7 @@ void electron_expansion_devices(device_slot_interface &device)
 	//device.option_add("fbprint", ELECTRON_FBPRINT);
 	//device.option_add("jafamode7", ELECTRON_JAFAMODE7);
 	device.option_add("plus1", ELECTRON_PLUS1);
+	device.option_add("plus2", ELECTRON_PLUS2);
 	device.option_add("plus3", ELECTRON_PLUS3);
 	device.option_add("pwrjoy", ELECTRON_PWRJOY);
 	device.option_add("rombox", ELECTRON_ROMBOX);

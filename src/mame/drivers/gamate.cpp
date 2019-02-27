@@ -94,14 +94,14 @@ READ8_MEMBER( gamate_state::gamate_nmi_r )
 
 READ8_MEMBER(gamate_state::sound_r)
 {
-	m_ay->address_w(space, 0, offset);
-	return m_ay->data_r(space, 0);
+	m_ay->address_w(offset);
+	return m_ay->data_r();
 }
 
 WRITE8_MEMBER(gamate_state::sound_w)
 {
-	m_ay->address_w(space, 0, offset);
-	m_ay->data_w(space, 0, data);
+	m_ay->address_w(offset);
+	m_ay->data_w(data);
 }
 
 WRITE8_MEMBER(gamate_state::write_cart)
@@ -176,9 +176,10 @@ TIMER_CALLBACK_MEMBER(gamate_state::gamate_timer2)
 	timer2->reset(m_maincpu->cycles_to_attotime(32768/2));
 }
 
-MACHINE_CONFIG_START(gamate_state::gamate)
-	MCFG_DEVICE_ADD("maincpu", M6502, 4433000/2) // NCR 65CX02
-	MCFG_DEVICE_PROGRAM_MAP(gamate_mem)
+void gamate_state::gamate(machine_config &config)
+{
+	M6502(config, m_maincpu, 4433000/2); // NCR 65CX02
+	m_maincpu->set_addrmap(AS_PROGRAM, &gamate_state::gamate_mem);
 
 	GAMATE_VIDEO(config, "video", 0);
 
@@ -191,10 +192,10 @@ MACHINE_CONFIG_START(gamate_state::gamate)
 	m_ay->add_route(2, "lspeaker", 0.25);
 	m_ay->add_route(2, "rspeaker", 0.25);
 
-	MCFG_GAMATE_CARTRIDGE_ADD("cartslot", gamate_cart, nullptr)
+	GAMATE_CART_SLOT(config, m_cartslot, gamate_cart, nullptr);
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list","gamate")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_original("gamate");
+}
 
 
 /* ROM notes:

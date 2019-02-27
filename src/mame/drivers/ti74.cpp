@@ -504,7 +504,7 @@ void ti74_state::machine_start()
 	m_lamps.resolve();
 
 	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0xbfff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0xbfff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 
 	membank("sysbank")->configure_entries(0, 4, memregion("system")->base(), 0x2000);
 	membank("sysbank")->set_entry(0);
@@ -530,14 +530,15 @@ MACHINE_CONFIG_START(ti74_state::ti74)
 	NVRAM(config, "sysram.ic3", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(60) // arbitrary
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(6*31+1, 9*1+1+1)
-	MCFG_SCREEN_VISIBLE_AREA(0, 6*31, 0, 9*1+1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(60); // arbitrary
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_size(6*31+1, 9*1+1+1);
+	screen.set_visarea(0, 6*31, 0, 9*1+1);
+	screen.set_screen_update("hd44780", FUNC(hd44780_device::screen_update));
+	screen.set_palette("palette");
+
 	config.set_default_layout(layout_ti74);
-	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
 
 	PALETTE(config, "palette", FUNC(ti74_state::ti74_palette), 3);
 
@@ -550,7 +551,7 @@ MACHINE_CONFIG_START(ti74_state::ti74)
 	MCFG_GENERIC_EXTENSIONS("bin,rom,256")
 	MCFG_GENERIC_LOAD(ti74_state, ti74_cartridge)
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "ti74_cart")
+	SOFTWARE_LIST(config, "cart_list").set_original("ti74_cart");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ti74_state::ti95)
@@ -565,14 +566,15 @@ MACHINE_CONFIG_START(ti74_state::ti95)
 	NVRAM(config, "sysram.ic3", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(60) // arbitrary
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(200, 20)
-	MCFG_SCREEN_VISIBLE_AREA(0, 200-1, 0, 20-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(60); // arbitrary
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_size(200, 20);
+	screen.set_visarea(0, 200-1, 0, 20-1);
+	screen.set_screen_update("hd44780", FUNC(hd44780_device::screen_update));
+	screen.set_palette("palette");
+
 	config.set_default_layout(layout_ti95);
-	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
 
 	PALETTE(config, "palette", FUNC(ti74_state::ti74_palette), 3);
 
@@ -585,7 +587,7 @@ MACHINE_CONFIG_START(ti74_state::ti95)
 	MCFG_GENERIC_EXTENSIONS("bin,rom,256")
 	MCFG_GENERIC_LOAD(ti74_state, ti74_cartridge)
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "ti95_cart")
+	SOFTWARE_LIST(config, "cart_list").set_original("ti95_cart");
 MACHINE_CONFIG_END
 
 

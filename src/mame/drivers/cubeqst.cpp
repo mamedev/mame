@@ -574,7 +574,6 @@ void cubeqst_state::cubeqst(machine_config &config)
 		AD7521(config, m_dacs[i*2+1], 0).add_route(0, "lspeaker", 0.125);
 	}
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
 	vref.add_route(0, "rdac0", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "rdac0", -1.0, DAC_VREF_NEG_INPUT);
 	vref.add_route(0, "ldac0", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "ldac0", -1.0, DAC_VREF_NEG_INPUT);
 	vref.add_route(0, "rdac1", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "rdac1", -1.0, DAC_VREF_NEG_INPUT);

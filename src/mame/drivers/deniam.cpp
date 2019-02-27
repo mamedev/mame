@@ -253,11 +253,11 @@ void deniam_state::machine_reset()
 void deniam_state::deniam16b(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(25'000'000)/2);	/* 12.5Mhz verified */
+	M68000(config, m_maincpu, XTAL(25'000'000)/2);  /* 12.5Mhz verified */
 	m_maincpu->set_addrmap(AS_PROGRAM, &deniam_state::deniam16b_map);
 	m_maincpu->set_vblank_int("screen", FUNC(deniam_state::irq4_line_assert));
 
-	Z80(config, m_audiocpu, XTAL(25'000'000)/4);	/* 6.25Mhz verified */
+	Z80(config, m_audiocpu, XTAL(25'000'000)/4);    /* 6.25Mhz verified */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &deniam_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &deniam_state::sound_io_map);
 
@@ -291,7 +291,7 @@ void deniam_state::deniam16b(machine_config &config)
 void deniam_state::deniam16c(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(25'000'000)/2);	/* 12.5Mhz verified */
+	M68000(config, m_maincpu, XTAL(25'000'000)/2);  /* 12.5Mhz verified */
 	m_maincpu->set_addrmap(AS_PROGRAM, &deniam_state::deniam16c_map);
 	m_maincpu->set_vblank_int("screen", FUNC(deniam_state::irq4_line_assert));
 

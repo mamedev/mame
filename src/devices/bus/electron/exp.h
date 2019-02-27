@@ -91,33 +91,6 @@ AC RETURNS (pins 3,4) - adaptor. A total of 6W may be drawn from these lines as 
 
 
 //**************************************************************************
-//  CONSTANTS
-//**************************************************************************
-
-#define ELECTRON_EXPANSION_SLOT_TAG      "exp"
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_ELECTRON_EXPANSION_SLOT_ADD(_tag, _slot_intf, _def_slot, _fixed) \
-	MCFG_DEVICE_ADD(_tag, ELECTRON_EXPANSION_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _fixed)
-
-#define MCFG_ELECTRON_PASSTHRU_EXPANSION_SLOT_ADD(_def_slot) \
-	MCFG_ELECTRON_EXPANSION_SLOT_ADD(ELECTRON_EXPANSION_SLOT_TAG, electron_expansion_devices, _def_slot, false) \
-	MCFG_ELECTRON_EXPANSION_SLOT_IRQ_HANDLER(WRITELINE(DEVICE_SELF_OWNER, electron_expansion_slot_device, irq_w)) \
-	MCFG_ELECTRON_EXPANSION_SLOT_NMI_HANDLER(WRITELINE(DEVICE_SELF_OWNER, electron_expansion_slot_device, nmi_w))
-
-#define MCFG_ELECTRON_EXPANSION_SLOT_IRQ_HANDLER(_devcb) \
-	downcast<electron_expansion_slot_device &>(*device).set_irq_handler(DEVCB_##_devcb);
-
-#define MCFG_ELECTRON_EXPANSION_SLOT_NMI_HANDLER(_devcb) \
-	downcast<electron_expansion_slot_device &>(*device).set_nmi_handler(DEVCB_##_devcb);
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -129,15 +102,23 @@ class electron_expansion_slot_device : public device_t, public device_slot_inter
 {
 public:
 	// construction/destruction
+	template <typename T>
+	electron_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&opts, const char *dflt)
+		: electron_expansion_slot_device(mconfig, tag, owner, clock)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
 	electron_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual ~electron_expansion_slot_device();
 
 	// callbacks
-	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return m_irq_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_nmi_handler(Object &&cb) { return m_nmi_handler.set_callback(std::forward<Object>(cb)); }
+	auto irq_handler() { return m_irq_handler.bind(); }
+	auto nmi_handler() { return m_nmi_handler.bind(); }
 
-	uint8_t expbus_r(address_space &space, offs_t offset, uint8_t data);
-	void expbus_w(address_space &space, offs_t offset, uint8_t data);
+	uint8_t expbus_r(offs_t offset);
+	void expbus_w(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_irq_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_nmi_handler(state); }
@@ -160,11 +141,8 @@ private:
 class device_electron_expansion_interface : public device_slot_card_interface
 {
 public:
-	// construction/destruction
-	virtual ~device_electron_expansion_interface();
-
-	virtual uint8_t expbus_r(address_space &space, offs_t offset, uint8_t data) { return data; }
-	virtual void expbus_w(address_space &space, offs_t offset, uint8_t data) { }
+	virtual uint8_t expbus_r(offs_t offset) { return 0xff; }
+	virtual void expbus_w(offs_t offset, uint8_t data) { }
 
 protected:
 	device_electron_expansion_interface(const machine_config &mconfig, device_t &device);

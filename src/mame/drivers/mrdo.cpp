@@ -57,8 +57,8 @@ void mrdo_state::main_map(address_map &map)
 	map(0x8800, 0x8fff).ram().w(FUNC(mrdo_state::mrdo_fgvideoram_w)).share("fgvideoram");
 	map(0x9000, 0x90ff).writeonly().share("spriteram");
 	map(0x9800, 0x9800).w(FUNC(mrdo_state::mrdo_flipscreen_w));    /* screen flip + playfield priority */
-	map(0x9801, 0x9801).w("u8106_1", FUNC(u8106_device::command_w));
-	map(0x9802, 0x9802).w("u8106_2", FUNC(u8106_device::command_w));
+	map(0x9801, 0x9801).w("u8106_1", FUNC(u8106_device::write));
+	map(0x9802, 0x9802).w("u8106_2", FUNC(u8106_device::write));
 	map(0x9803, 0x9803).r(FUNC(mrdo_state::mrdo_SECRE_r));
 	map(0xa000, 0xa000).portr("P1");
 	map(0xa001, 0xa001).portr("P2");
@@ -175,18 +175,18 @@ static GFXDECODE_START( gfx_mrdo )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(mrdo_state::mrdo)
-
+void mrdo_state::mrdo(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_CLOCK/2)  /* Verified */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mrdo_state,  irq0_line_hold)
+	Z80(config, m_maincpu, MAIN_CLOCK/2);  /* Verified */
+	m_maincpu->set_addrmap(AS_PROGRAM, &mrdo_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(mrdo_state::irq0_line_hold));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK/4, 312, 8, 248, 262, 32, 224)
-	MCFG_SCREEN_UPDATE_DRIVER(mrdo_state, screen_update_mrdo)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(VIDEO_CLOCK/4, 312, 8, 248, 262, 32, 224);
+	screen.set_screen_update(FUNC(mrdo_state::screen_update_mrdo));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mrdo);
 	PALETTE(config, m_palette, FUNC(mrdo_state::mrdo_palette), 64*4 + 16*4, 256);
@@ -194,17 +194,16 @@ MACHINE_CONFIG_START(mrdo_state::mrdo)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("u8106_1", U8106, MAIN_CLOCK/2)  /* sn76489-equivalent?, Verified */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	U8106(config, "u8106_1", MAIN_CLOCK/2).add_route(ALL_OUTPUTS, "mono", 0.50);  /* sn76489-equivalent?, Verified */
 
-	MCFG_DEVICE_ADD("u8106_2", U8106, MAIN_CLOCK/2)  /* sn76489-equivalent?, Verified */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	U8106(config, "u8106_2", MAIN_CLOCK/2).add_route(ALL_OUTPUTS, "mono", 0.50);  /* sn76489-equivalent?, Verified */
+}
 
-MACHINE_CONFIG_START(mrdo_state::mrlo)
+void mrdo_state::mrlo(machine_config &config)
+{
 	mrdo(config);
-	//MCFG_DEVICE_REMOVE("pal16r6")
-MACHINE_CONFIG_END
+	//config.device_remove("pal16r6");
+}
 
 
 

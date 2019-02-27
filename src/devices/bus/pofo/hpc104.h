@@ -50,8 +50,8 @@ protected:
 	// device_portfolio_expansion_slot_interface overrides
 	virtual bool nmd1() override { return m_ccm->cdet_r(); }
 
-	virtual uint8_t nrdi_r(address_space &space, offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1) override;
-	virtual void nwri_w(address_space &space, offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1) override;
+	virtual uint8_t nrdi_r(offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1) override;
+	virtual void nwri_w(offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1) override;
 
 	virtual WRITE_LINE_MEMBER( iint_w ) override { m_exp->iint_w(state); }
 

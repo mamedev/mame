@@ -93,7 +93,7 @@ WRITE_LINE_MEMBER(si5500_state::gpibc_we_w)
 	if (!state)
 	{
 		u16 pio = m_gpibpsi->pio_outputs();
-		m_gpibc->reg8_w(machine().dummy_space(), (pio >> 8) & 7, pio & 0xff);
+		m_gpibc->write((pio >> 8) & 7, pio & 0xff);
 	}
 }
 
@@ -102,7 +102,7 @@ WRITE_LINE_MEMBER(si5500_state::gpibc_dbin_w)
 	if (state)
 	{
 		u16 pio = m_gpibpsi->pio_outputs();
-		m_gpib_data = m_gpibc->reg8_r(machine().dummy_space(), (pio >> 8) & 7);
+		m_gpib_data = m_gpibc->read((pio >> 8) & 7);
 	}
 }
 

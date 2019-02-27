@@ -321,7 +321,7 @@ READ8_MEMBER(taitol_1cpu_state::extport_select_and_ym2203_r)
 {
 	for (auto &mux : m_mux)
 		mux->select_w((offset >> 1) & 1);
-	return m_ymsnd->read(space, offset & 1);
+	return m_ymsnd->read(offset & 1);
 }
 
 WRITE8_MEMBER(taitol_state::mcu_control_w)
@@ -1477,14 +1477,14 @@ void taitol_state::l_system_video(machine_config &config)
 void fhawk_state::fhawk(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_main_cpu, XTAL(13'330'560)/2);	/* verified freq on pin122 of TC0090LVC cpu */
+	Z80(config, m_main_cpu, XTAL(13'330'560)/2);    /* verified freq on pin122 of TC0090LVC cpu */
 	m_main_cpu->set_addrmap(AS_PROGRAM, &fhawk_state::fhawk_map);
 	m_main_cpu->set_irq_acknowledge_callback(FUNC(taitol_state::irq_callback));
 
-	Z80(config, m_audio_cpu, 12_MHz_XTAL/3);		/* verified on pcb */
+	Z80(config, m_audio_cpu, 12_MHz_XTAL/3);        /* verified on pcb */
 	m_audio_cpu->set_addrmap(AS_PROGRAM, &fhawk_state::fhawk_3_map);
 
-	z80_device &slave(Z80(config, "slave", 12_MHz_XTAL/3));	/* verified on pcb */
+	z80_device &slave(Z80(config, "slave", 12_MHz_XTAL/3)); /* verified on pcb */
 	slave.set_addrmap(AS_PROGRAM, &fhawk_state::fhawk_2_map);
 	slave.set_vblank_int("screen", FUNC(taitol_state::irq0_line_hold));
 
@@ -1535,21 +1535,21 @@ void champwr_state::champwr(machine_config &config)
 	subdevice<ym2203_device>("ymsnd")->port_b_write_callback().set(FUNC(champwr_state::msm5205_volume_w));
 
 	MSM5205(config, m_msm, 384_kHz_XTAL);
-	m_msm->vck_legacy_callback().set(FUNC(champwr_state::msm5205_vck));	/* VCK function */
-	m_msm->set_prescaler_selector(msm5205_device::S48_4B);	/* 8 kHz */
+	m_msm->vck_legacy_callback().set(FUNC(champwr_state::msm5205_vck)); /* VCK function */
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  /* 8 kHz */
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.80);
 }
 
 void taitol_2cpu_state::raimais(machine_config &config)
 {
-	Z80(config, m_main_cpu, 13330560/2);	// needs verification from pin122 of TC0090LVC
+	Z80(config, m_main_cpu, 13330560/2);    // needs verification from pin122 of TC0090LVC
 	m_main_cpu->set_addrmap(AS_PROGRAM, &taitol_2cpu_state::raimais_map);
 	m_main_cpu->set_irq_acknowledge_callback(FUNC(taitol_state::irq_callback));
 
-	Z80(config, m_audio_cpu, 12000000/3);	// not verified
+	Z80(config, m_audio_cpu, 12000000/3);   // not verified
 	m_audio_cpu->set_addrmap(AS_PROGRAM, &taitol_2cpu_state::raimais_3_map);
 
-	z80_device &slave(Z80(config, "slave", 12000000/3));	// not verified
+	z80_device &slave(Z80(config, "slave", 12000000/3));    // not verified
 	slave.set_addrmap(AS_PROGRAM, &taitol_2cpu_state::raimais_2_map);
 	slave.set_vblank_int("screen", FUNC(taitol_state::irq0_line_hold));
 
@@ -1691,7 +1691,7 @@ void horshoes_state::horshoes(machine_config &config)
 
 	UPD4701A(config, m_upd4701, 0);
 	m_upd4701->set_portx_tag("AN0");
-	m_upd4701->set_portx_tag("AN1");
+	m_upd4701->set_porty_tag("AN1");
 }
 
 
@@ -1731,11 +1731,11 @@ void taitol_1cpu_state::cachat(machine_config &config)
 void taitol_2cpu_state::evilston(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_main_cpu, XTAL(13'330'560)/2);	/* not verified */
+	Z80(config, m_main_cpu, XTAL(13'330'560)/2);    /* not verified */
 	m_main_cpu->set_addrmap(AS_PROGRAM, &taitol_2cpu_state::evilston_map);
 	m_main_cpu->set_irq_acknowledge_callback(FUNC(taitol_state::irq_callback));
 
-	Z80(config, m_audio_cpu, 12_MHz_XTAL/3);		/* not verified */
+	Z80(config, m_audio_cpu, 12_MHz_XTAL/3);        /* not verified */
 	m_audio_cpu->set_addrmap(AS_PROGRAM, &taitol_2cpu_state::evilston_2_map);
 	m_audio_cpu->set_vblank_int("screen", FUNC(taitol_state::irq0_line_hold));
 

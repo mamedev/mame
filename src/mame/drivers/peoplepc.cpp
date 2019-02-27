@@ -243,7 +243,8 @@ static DEVICE_INPUT_DEFAULTS_START(keyboard)
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 DEVICE_INPUT_DEFAULTS_END
 
-MACHINE_CONFIG_START(peoplepc_state::olypeopl)
+void peoplepc_state::olypeopl(machine_config &config)
+{
 	/* basic machine hardware */
 	I8086(config, m_maincpu, XTAL(14'745'600)/3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &peoplepc_state::peoplepc_map);
@@ -269,11 +270,11 @@ MACHINE_CONFIG_START(peoplepc_state::olypeopl)
 
 	I8255(config, "ppi8255");
 
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_RAW_PARAMS(XTAL(22'000'000),640,0,640,475,0,475)
-	MCFG_SCREEN_UPDATE_DEVICE( "h46505", mc6845_device, screen_update )
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen.set_raw(XTAL(22'000'000), 640, 0, 640, 475, 0, 475);
+	screen.set_screen_update("h46505", FUNC(mc6845_device::screen_update));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfxdecode_device::empty);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	h46505_device &crtc(H46505(config, "h46505", XTAL(22'000'000)/8));
@@ -293,8 +294,8 @@ MACHINE_CONFIG_START(peoplepc_state::olypeopl)
 	UPD765A(config, m_fdc, 8'000'000, true, true);
 	m_fdc->intrq_wr_callback().set("pic8259_0", FUNC(pic8259_device::ir2_w));
 	m_fdc->drq_wr_callback().set(m_dmac, FUNC(i8257_device::dreq0_w));
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", peoplepc_floppies, "525qd", peoplepc_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", peoplepc_floppies, "525qd", peoplepc_state::floppy_formats)
+	FLOPPY_CONNECTOR(config, "upd765:0", peoplepc_floppies, "525qd", peoplepc_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765:1", peoplepc_floppies, "525qd", peoplepc_state::floppy_formats);
 
 	I8251(config, m_8251key, 0);
 	m_8251key->rxrdy_handler().set("pic8259_1", FUNC(pic8259_device::ir1_w));
@@ -305,7 +306,7 @@ MACHINE_CONFIG_START(peoplepc_state::olypeopl)
 	kbd.set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(keyboard));
 
 	I8251(config, m_8251ser, 0);
-MACHINE_CONFIG_END
+}
 
 ROM_START( olypeopl )
 	ROM_REGION(0x2000,"maincpu", 0)

@@ -122,38 +122,39 @@ WRITE_LINE_MEMBER(ondra_state::vblank_irq)
 }
 
 /* Machine driver */
-MACHINE_CONFIG_START(ondra_state::ondra)
+void ondra_state::ondra(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 2000000)
-	MCFG_DEVICE_PROGRAM_MAP(ondra_mem)
-	MCFG_DEVICE_IO_MAP(ondra_io)
+	Z80(config, m_maincpu, 2000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ondra_state::ondra_mem);
+	m_maincpu->set_addrmap(AS_IO, &ondra_state::ondra_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(320, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(ondra_state, screen_update_ondra)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ondra_state, vblank_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(320, 256);
+	screen.set_visarea(0, 320-1, 0, 256-1);
+	screen.set_screen_update(FUNC(ondra_state::screen_update_ondra));
+	screen.set_palette("palette");
+	screen.screen_vblank().set(FUNC(ondra_state::vblank_irq));
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("ondra_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_interface("ondra_cass");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list","ondra")
+	SOFTWARE_LIST(config, "cass_list").set_original("ondra");
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K").set_default_value(0x00);
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 

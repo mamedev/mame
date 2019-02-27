@@ -919,6 +919,7 @@ WRITE_LINE_MEMBER( ti99_4p_state::notconnected )
 */
 WRITE_LINE_MEMBER( ti99_4p_state::clock_out )
 {
+	m_tms9901->phi_line(state);
 	datamux_clock_in(state);
 	m_peribox->clock_in(state);
 }
@@ -1020,7 +1021,7 @@ void ti99_4p_state::ti99_4p_60hz(machine_config& config)
 	m_cpu->dbin_cb().set(FUNC(ti99_4p_state::dbin_line));
 
 	// tms9901
-	TMS9901(config, m_tms9901, 3000000);
+	TMS9901(config, m_tms9901, 0);
 	m_tms9901->read_cb().set(FUNC(ti99_4p_state::read_by_9901));
 	m_tms9901->p_out_cb(2).set(FUNC(ti99_4p_state::keyC0));
 	m_tms9901->p_out_cb(3).set(FUNC(ti99_4p_state::keyC1));

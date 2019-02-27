@@ -823,7 +823,7 @@ MACHINE_CONFIG_START(dunhuang_state::dunhuang)
 	MCFG_SCREEN_UPDATE_DRIVER(dunhuang_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dunhuang)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dunhuang);
 	MCFG_PALETTE_ADD("palette", 0x100)
 
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // HMC HM86171 VGA 256 colour RAMDAC

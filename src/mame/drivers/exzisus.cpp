@@ -247,7 +247,7 @@ MACHINE_CONFIG_START(exzisus_state::exzisus)
 	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
+	config.m_minimum_quantum = attotime::from_hz(600);   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -258,7 +258,7 @@ MACHINE_CONFIG_START(exzisus_state::exzisus)
 	MCFG_SCREEN_UPDATE_DRIVER(exzisus_state, screen_update)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_exzisus)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_exzisus);
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 1024);
 
 	/* sound hardware */

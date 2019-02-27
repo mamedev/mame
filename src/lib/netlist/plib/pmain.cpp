@@ -43,12 +43,7 @@ namespace plib {
 
 	}
 
-	app::~app()
-	{
-
-	}
-
-	int app::main_utfX(int argc, char *argv[])
+	int app::main_utfX(int argc, char **argv)
 	{
 		auto r = this->parse(argc, argv);
 		int ret = 0;

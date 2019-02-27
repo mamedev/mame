@@ -228,7 +228,7 @@ MACHINE_CONFIG_START(dietgo_state::dietgo)
 
 	PALETTE(config, "palette").set_format(palette_device::xBGR_888, 1024);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dietgo)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_dietgo);
 
 	DECO16IC(config, m_deco_tilegen, 0);
 	m_deco_tilegen->set_split(0);

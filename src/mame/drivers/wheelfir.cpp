@@ -732,15 +732,15 @@ void wheelfir_state::ramdac_map(address_map &map)
 	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb888_w));
 }
 
-MACHINE_CONFIG_START(wheelfir_state::wheelfir)
+void wheelfir_state::wheelfir(machine_config &config)
+{
+	M68000(config, m_maincpu, 32000000/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &wheelfir_state::wheelfir_main);
 
-	MCFG_DEVICE_ADD("maincpu", M68000, 32000000/2)
-	MCFG_DEVICE_PROGRAM_MAP(wheelfir_main)
+	M68000(config, m_subcpu, 32000000/2);
+	m_subcpu->set_addrmap(AS_PROGRAM, &wheelfir_state::wheelfir_sub);
 
-	MCFG_DEVICE_ADD("subcpu", M68000, 32000000/2)
-	MCFG_DEVICE_PROGRAM_MAP(wheelfir_sub)
-
-	//MCFG_QUANTUM_TIME(attotime::from_hz(12000))
+	//config.m_minimum_quantum = attotime::from_hz(12000);
 
 	adc0808_device &adc(ADC0808(config, "adc", 500000)); // unknown clock
 	adc.eoc_ff_callback().set(FUNC(wheelfir_state::adc_eoc_w));
@@ -750,15 +750,15 @@ MACHINE_CONFIG_START(wheelfir_state::wheelfir)
 
 	TIMER(config, "scan_timer").configure_scanline(FUNC(wheelfir_state::scanline_timer_callback), "screen", 0, 1);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(336, NUM_SCANLINES+NUM_VBLANK_LINES)
-	MCFG_SCREEN_VISIBLE_AREA(0,335, 0, NUM_SCANLINES-1)
-	MCFG_SCREEN_UPDATE_DRIVER(wheelfir_state, screen_update_wheelfir)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, wheelfir_state, screen_vblank_wheelfir))
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(336, NUM_SCANLINES+NUM_VBLANK_LINES);
+	m_screen->set_visarea(0,335, 0, NUM_SCANLINES-1);
+	m_screen->set_screen_update(FUNC(wheelfir_state::screen_update_wheelfir));
+	m_screen->screen_vblank().set(FUNC(wheelfir_state::screen_vblank_wheelfir));
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", NUM_COLORS)
+	PALETTE(config, m_palette).set_entries(NUM_COLORS);
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
 	ramdac.set_addrmap(0, &wheelfir_state::ramdac_map);
 
@@ -769,12 +769,12 @@ MACHINE_CONFIG_START(wheelfir_state::wheelfir)
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("ldac", DAC_10BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) // unknown DAC
-	MCFG_DEVICE_ADD("rdac", DAC_10BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC_10BIT_R2R(config, "ldac", 0).add_route(ALL_OUTPUTS, "lspeaker", 1.0); // unknown DAC
+	DAC_10BIT_R2R(config, "rdac", 0).add_route(ALL_OUTPUTS, "rspeaker", 1.0); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 
 ROM_START( wheelfir )

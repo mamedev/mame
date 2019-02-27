@@ -1000,6 +1000,20 @@ ROM_START(stwr_106s)
 	ROM_LOAD("s-wars.u21", 0x080000, 0x40000, CRC(7b08fdf1) SHA1(489d21a10e97e886f948d81dedd7f8de3acecd2b))
 ROM_END
 
+ROM_START(stwr_a046)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("starcpua.106", 0x0000, 0x10000, CRC(35d3cfd9) SHA1(14d8960f3657d7cd977b0a749e995aadb3fd4c7c))
+	ROM_REGION(0x10000, "cpu3", ROMREGION_ERASEFF)
+	ROM_REGION(0x80000, "gfx3", 0)
+	ROM_LOAD("sw4mrom1.a046", 0x00000, 0x40000, CRC(5ceac219) SHA1(76b7acf378f83bacf6c4adb020d6e544eacbac7a))
+	ROM_LOAD("sw4mrom0.a046", 0x40000, 0x40000, CRC(305e45be) SHA1(fbdc90175467a9ee59dc11c5ccbe83130b3644c8))
+	ROM_REGION(0x010000, "soundcpu", 0)
+	ROM_LOAD("s-wars.u7", 0x8000, 0x8000, CRC(cefa19d5) SHA1(7ddf9cc85ab601514305bc46083a07a3d087b286))
+	ROM_REGION(0x1000000, "bsmt", 0)
+	ROM_LOAD("s-wars.u17", 0x000000, 0x80000, CRC(7950a147) SHA1(f5bcd5cf6b35f9e4f14d62b084495c3a743d92a1))
+	ROM_LOAD("s-wars.u21", 0x080000, 0x40000, CRC(7b08fdf1) SHA1(489d21a10e97e886f948d81dedd7f8de3acecd2b))
+ROM_END
+
 ROM_START(stwr_104)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("starcpua.104", 0x0000, 0x10000, CRC(12b87cfa) SHA1(12e0ab52f6784beefce8291d29b8aff01b2f2818))
@@ -1314,6 +1328,7 @@ GAME(1992,  trek_110,  trek_201, de_3_dmd1, de_3, de_3_state, empty_init, ROT0, 
 GAME(1992,  trek_11a,  trek_201, de_3_dmd1, de_3, de_3_state, empty_init, ROT0, "Data East",    "Star Trek 25th Anniversary (1.10 Alpha Display)",  MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1992,  stwr_106,  0,        de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East",    "Star Wars (1.06)",                MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1992,  stwr_106s, stwr_106, de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East",    "Star Wars (1.06, Display S1.05)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1992,  stwr_a046, stwr_106, de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East",    "Star Wars (1.06, Display A0.46)", MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1992,  stwr_104,  stwr_106, de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East",    "Star Wars (1.04)",                MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1992,  stwr_103,  stwr_106, de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East",    "Star Wars (1.03)",                MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1992,  stwr_g11,  stwr_106, de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East",    "Star Wars (1.01 Germany)",        MACHINE_IS_SKELETON_MECHANICAL)

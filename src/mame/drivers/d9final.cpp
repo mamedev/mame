@@ -320,7 +320,7 @@ MACHINE_CONFIG_START(d9final_state::d9final)
 	MCFG_SCREEN_UPDATE_DRIVER(d9final_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_d9final)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_d9final);
 	PALETTE(config, "palette", palette_device::BLACK).set_format(palette_device::xBRG_444, 0x400);
 
 	SPEAKER(config, "mono").front_center();

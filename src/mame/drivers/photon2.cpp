@@ -358,29 +358,30 @@ void photon2_state::machine_start()
 	save_item(NAME(m_nmi_enable));
 }
 
-MACHINE_CONFIG_START(photon2_state::photon2)
+void photon2_state::photon2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 3500000)        /* 3.5 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(spectrum_mem)
-	MCFG_DEVICE_IO_MAP(spectrum_io)
+	Z80(config, m_maincpu, 3500000);        /* 3.5 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &photon2_state::spectrum_mem);
+	m_maincpu->set_addrmap(AS_IO, &photon2_state::spectrum_io);
 	TIMER(config, "scantimer").configure_scanline(FUNC(photon2_state::spec_interrupt_hack), "screen", 0, 1);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50.08)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(SPEC_SCREEN_WIDTH, SPEC_SCREEN_HEIGHT)
-	MCFG_SCREEN_VISIBLE_AREA(0, SPEC_SCREEN_WIDTH-1, 0, SPEC_SCREEN_HEIGHT-1)
-	MCFG_SCREEN_UPDATE_DRIVER(photon2_state, screen_update_spectrum)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, photon2_state, screen_vblank_spectrum))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50.08);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(SPEC_SCREEN_WIDTH, SPEC_SCREEN_HEIGHT);
+	screen.set_visarea(0, SPEC_SCREEN_WIDTH-1, 0, SPEC_SCREEN_HEIGHT-1);
+	screen.set_screen_update(FUNC(photon2_state::screen_update_spectrum));
+	screen.screen_vblank().set(FUNC(photon2_state::screen_vblank_spectrum));
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(photon2_state::photon2_palette), 16);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
-MACHINE_CONFIG_END
+}
 
 /*************************************
  *

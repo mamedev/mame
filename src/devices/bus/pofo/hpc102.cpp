@@ -99,7 +99,7 @@ uint8_t pofo_hpc102_device::eack_r()
 //  nrdi_r - read
 //-------------------------------------------------
 
-uint8_t pofo_hpc102_device::nrdi_r(address_space &space, offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1)
+uint8_t pofo_hpc102_device::nrdi_r(offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1)
 {
 	if (!bcom)
 	{
@@ -110,7 +110,7 @@ uint8_t pofo_hpc102_device::nrdi_r(address_space &space, offs_t offset, uint8_t 
 
 		if (!(offset & 0x08))
 		{
-			data = m_uart->ins8250_r(space, offset & 0x07);
+			data = m_uart->ins8250_r(machine().dummy_space(), offset & 0x07);
 		}
 	}
 
@@ -122,7 +122,7 @@ uint8_t pofo_hpc102_device::nrdi_r(address_space &space, offs_t offset, uint8_t 
 //  nwri_w - write
 //-------------------------------------------------
 
-void pofo_hpc102_device::nwri_w(address_space &space, offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1)
+void pofo_hpc102_device::nwri_w(offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1)
 {
 	if (!bcom)
 	{
@@ -133,7 +133,7 @@ void pofo_hpc102_device::nwri_w(address_space &space, offs_t offset, uint8_t dat
 
 		if (!(offset & 0x08))
 		{
-			m_uart->ins8250_w(space, offset & 0x07, data);
+			m_uart->ins8250_w(machine().dummy_space(), offset & 0x07, data);
 		}
 	}
 }

@@ -774,7 +774,6 @@ void m90_state::m90(machine_config &config)
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.1); // unknown DAC
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
@@ -1140,7 +1139,7 @@ ROM_START( newapunk )
 ROM_END
 
 //PCB is marked: "BOMBER LORD 030" and "lc" on component side ("LC" is the Italian for "Lato Componenti" which translates to "Components Side")
-//PCB is marked: "BOMBER LORD 030" and "ls" on solder side ("LS" is the Italian for "Lato Saldature" which translates to "Solders Side") 
+//PCB is marked: "BOMBER LORD 030" and "ls" on solder side ("LS" is the Italian for "Lato Saldature" which translates to "Solders Side")
 ROM_START( bomblord )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "27c020_3.u6",  0x00001, 0x40000, CRC(65d5c54a) SHA1(f794a193d5927b5fb838ab2351c176d8cbd37236) )

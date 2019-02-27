@@ -225,11 +225,12 @@ void junior_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(junior_state::junior)
+void junior_state::junior(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",M6502, 1_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(junior_mem)
-	MCFG_QUANTUM_TIME(attotime::from_hz(50))
+	M6502(config, m_maincpu, 1_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &junior_state::junior_mem);
+	config.m_minimum_quantum = attotime::from_hz(50);
 
 	/* video hardware */
 	config.set_default_layout(layout_junior);
@@ -242,9 +243,8 @@ MACHINE_CONFIG_START(junior_state::junior)
 	m_riot->pb_wr_callback().set(FUNC(junior_state::junior_riot_b_w));
 	m_riot->irq_wr_callback().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
-
 	TIMER(config, "led_timer").configure_periodic(FUNC(junior_state::junior_update_leds), attotime::from_hz(50));
-MACHINE_CONFIG_END
+}
 
 
 /* ROM definition */

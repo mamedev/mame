@@ -29,7 +29,7 @@
 #define LOG_REGS        (LOG_READS | LOG_WRITES)
 #define LOG_ALL         (LOG_REGS | LOG_COMMANDS | LOG_ERRORS | LOG_MISC | LOG_LINES | LOG_STATE | LOG_STEP)
 
-#define VERBOSE         (LOG_COMMANDS | LOG_ERRORS)
+#define VERBOSE         (0)
 #include "logmacro.h"
 
 enum register_addresses_e : uint8_t {
@@ -348,8 +348,8 @@ enum : uint16_t {
 //  LIVE DEVICE
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(WD33C92, wd33c92_device, "wd33c92", "Western Digital WD33C92 SCSI Controller")
-DEFINE_DEVICE_TYPE(WD33C93N, wd33c93n_device, "wd33c93n", "Western Digital WD33C93 SCSI Controller")
+DEFINE_DEVICE_TYPE(WD33C92,  wd33c92_device,  "wd33c92",  "Western Digital WD33C92 SCSI Controller")
+DEFINE_DEVICE_TYPE(WD33C93,  wd33c93_device,  "wd33c93",  "Western Digital WD33C93 SCSI Controller")
 DEFINE_DEVICE_TYPE(WD33C93A, wd33c93a_device, "wd33c93a", "Western Digital WD33C93A SCSI Controller")
 DEFINE_DEVICE_TYPE(WD33C93B, wd33c93b_device, "wd33c93b", "Western Digital WD33C93B SCSI Controller")
 
@@ -470,10 +470,10 @@ void wd33c9x_base_device::scsi_ctrl_changed()
 //  dir_r
 //-------------------------------------------------
 
-READ8_MEMBER(wd33c9x_base_device::dir_r)
+uint8_t wd33c9x_base_device::dir_r(offs_t offset)
 {
 	m_addr = offset & REGS_MASK;
-	return indir_reg_r(space, 0, mem_mask);
+	return indir_reg_r();
 }
 
 
@@ -481,10 +481,10 @@ READ8_MEMBER(wd33c9x_base_device::dir_r)
 //  dir_w
 //-------------------------------------------------
 
-WRITE8_MEMBER(wd33c9x_base_device::dir_w)
+void wd33c9x_base_device::dir_w(offs_t offset, uint8_t data)
 {
 	m_addr = offset & REGS_MASK;
-	indir_reg_w(space, 0, data, mem_mask);
+	indir_reg_w(data);
 }
 
 
@@ -492,13 +492,13 @@ WRITE8_MEMBER(wd33c9x_base_device::dir_w)
 //  indir_r
 //-------------------------------------------------
 
-READ8_MEMBER(wd33c9x_base_device::indir_r)
+uint8_t wd33c9x_base_device::indir_r(offs_t offset)
 {
 	switch (offset) {
 	case 0:
-		return indir_addr_r(space, 0, mem_mask);
+		return indir_addr_r();
 	case 1:
-		return indir_reg_r(space, 0, mem_mask);
+		return indir_reg_r();
 	default:
 		LOGMASKED(LOG_READS | LOG_ERRORS, "Read from invalid offset %d\n", offset);
 		break;
@@ -511,14 +511,14 @@ READ8_MEMBER(wd33c9x_base_device::indir_r)
 //  indir_w
 //-------------------------------------------------
 
-WRITE8_MEMBER(wd33c9x_base_device::indir_w)
+void wd33c9x_base_device::indir_w(offs_t offset, uint8_t data)
 {
 	switch (offset) {
 	case 0:
-		indir_addr_w(space, 0, data, mem_mask);
+		indir_addr_w(data);
 		break;
 	case 1:
-		indir_reg_w(space, 0, data, mem_mask);
+		indir_reg_w(data);
 		break;
 	default:
 		LOGMASKED(LOG_WRITES | LOG_ERRORS, "Write to invalid offset %d (data=%02x)\n", offset, data);
@@ -531,11 +531,8 @@ WRITE8_MEMBER(wd33c9x_base_device::indir_w)
 //  indir_addr_r
 //-------------------------------------------------
 
-READ8_MEMBER(wd33c9x_base_device::indir_addr_r)
+uint8_t wd33c9x_base_device::indir_addr_r()
 {
-	if (offset != 0) {
-		fatalerror("%s: Read from invalid address offset %d\n", shortname(), offset);
-	}
 	// Trick to push the interrupt flag after the fifo is empty to help cps3
 	return m_regs[AUXILIARY_STATUS] & 0x01 ? m_regs[AUXILIARY_STATUS] & 0x7f : m_regs[AUXILIARY_STATUS];
 }
@@ -545,11 +542,8 @@ READ8_MEMBER(wd33c9x_base_device::indir_addr_r)
 //  indir_addr_w
 //-------------------------------------------------
 
-WRITE8_MEMBER(wd33c9x_base_device::indir_addr_w)
+void wd33c9x_base_device::indir_addr_w(uint8_t data)
 {
-	if (offset != 0) {
-		fatalerror("%s: Write to invalid address offset %d (data=%02x)\n", shortname(), offset, data);
-	}
 	m_addr = data & REGS_MASK;
 }
 
@@ -558,12 +552,8 @@ WRITE8_MEMBER(wd33c9x_base_device::indir_addr_w)
 //  indir_reg_r
 //-------------------------------------------------
 
-READ8_MEMBER(wd33c9x_base_device::indir_reg_r)
+uint8_t wd33c9x_base_device::indir_reg_r()
 {
-	if (offset != 0) {
-		fatalerror("%s: Read from invalid indirect register offset %d\n", shortname(), offset);
-	}
-
 	uint8_t ret;
 	switch (m_addr) {
 	case DATA: {
@@ -614,12 +604,8 @@ READ8_MEMBER(wd33c9x_base_device::indir_reg_r)
 //  indir_reg_w
 //-------------------------------------------------
 
-WRITE8_MEMBER(wd33c9x_base_device::indir_reg_w)
+void wd33c9x_base_device::indir_reg_w(uint8_t data)
 {
-	if (offset != 0) {
-		fatalerror("%s: Write to invalid indirect register offset %d (data=%02x)\n", shortname(), offset, data);
-	}
-
 	switch (m_addr) {
 	case SCSI_STATUS:
 	case QUEUE_TAG: // Only for 92/93 and 93A
@@ -883,10 +869,10 @@ void wd33c9x_base_device::step(bool timeout)
 				case DISC_SEL_ARBITRATION:
 					m_xfr_phase = xfr_phase;
 					break;
-					
+
 				case INIT_XFR_WAIT_REQ:
 					break;
-					
+
 				default:
 					if (m_xfr_phase != xfr_phase) {
 						fatalerror("%s: Unexpected phase change during state.\n", shortname());
@@ -902,7 +888,7 @@ void wd33c9x_base_device::step(bool timeout)
 					set_scsi_state(FINISHED);
 					m_regs[COMMAND_PHASE] = COMMAND_PHASE_DISCONNECTED;
 					break;
-					
+
 				case COMMAND_PHASE_COMMAND_COMPLETE:
 					if (m_regs[CONTROL] & CONTROL_EDI) {
 						set_scsi_state(FINISHED);
@@ -912,7 +898,7 @@ void wd33c9x_base_device::step(bool timeout)
 						m_regs[CONTROL] |= CONTROL_EDI;
 					}
 					break;
-					
+
 				default:
 					fatalerror("%s: Unhandled command phase during Select-and-Transfer disconnect.\n", shortname());
 					break;
@@ -1729,8 +1715,8 @@ wd33c92_device::wd33c92_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-wd33c93n_device::wd33c93n_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: wd33c9x_base_device(mconfig, WD33C93N, tag, owner, clock)
+wd33c93_device::wd33c93_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: wd33c9x_base_device(mconfig, WD33C93, tag, owner, clock)
 {
 }
 

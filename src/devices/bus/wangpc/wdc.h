@@ -39,12 +39,12 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	// device_wangpcbus_card_interface overrides
-	virtual uint16_t wangpcbus_mrdc_r(address_space &space, offs_t offset, uint16_t mem_mask) override;
-	virtual void wangpcbus_amwc_w(address_space &space, offs_t offset, uint16_t mem_mask, uint16_t data) override;
-	virtual uint16_t wangpcbus_iorc_r(address_space &space, offs_t offset, uint16_t mem_mask) override;
-	virtual void wangpcbus_aiowc_w(address_space &space, offs_t offset, uint16_t mem_mask, uint16_t data) override;
-	virtual uint8_t wangpcbus_dack_r(address_space &space, int line) override;
-	virtual void wangpcbus_dack_w(address_space &space, int line, uint8_t data) override;
+	virtual uint16_t wangpcbus_mrdc_r(offs_t offset, uint16_t mem_mask) override;
+	virtual void wangpcbus_amwc_w(offs_t offset, uint16_t mem_mask, uint16_t data) override;
+	virtual uint16_t wangpcbus_iorc_r(offs_t offset, uint16_t mem_mask) override;
+	virtual void wangpcbus_aiowc_w(offs_t offset, uint16_t mem_mask, uint16_t data) override;
+	virtual uint8_t wangpcbus_dack_r(int line) override;
+	virtual void wangpcbus_dack_w(int line, uint8_t data) override;
 	virtual bool wangpcbus_have_dack(int line) override;
 
 private:

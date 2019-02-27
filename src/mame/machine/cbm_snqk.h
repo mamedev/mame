@@ -13,7 +13,7 @@
 
 #include "imagedev/snapquik.h"
 
-#define CBM_QUICKLOAD_DELAY_SECONDS 3
+#define CBM_QUICKLOAD_DELAY (attotime::from_seconds(3))
 
 image_init_result general_cbm_loadsnap(
 		device_image_interface &image,

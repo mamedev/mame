@@ -32,7 +32,7 @@ fixedfreq_device::fixedfreq_device(const machine_config &mconfig, device_type ty
 		device_video_interface(mconfig, *this, false),
 		m_htotal(0),
 		m_vtotal(0),
-		m_hscale(1),	// FIXME: this should be modified by static initialization
+		m_hscale(1),    // FIXME: this should be modified by static initialization
 		m_sync_signal(0),
 		m_last_x(0),
 		m_last_y(0),

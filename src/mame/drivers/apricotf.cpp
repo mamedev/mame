@@ -363,7 +363,7 @@ MACHINE_CONFIG_START(f1_state::act_f1)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_act_f1)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_act_f1);
 
 	/* Devices */
 	APRICOT_KEYBOARD(config, APRICOT_KEYBOARD_TAG, 0);
@@ -376,18 +376,19 @@ MACHINE_CONFIG_START(f1_state::act_f1)
 	m_ctc->zc_callback<1>().set(FUNC(f1_state::ctc_z1_w));
 	m_ctc->zc_callback<2>().set(FUNC(f1_state::ctc_z2_w));
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(m_sio, z80sio_device, ctsa_w))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(m_sio, FUNC(z80sio_device::ctsa_w));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+	OUTPUT_LATCH(config, m_cent_data_out);
+	m_centronics->set_output_latch(*m_cent_data_out);
 
 	// floppy
 	WD2797(config, m_fdc, 4_MHz_XTAL / 2 /* ? */);
 	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	m_fdc->drq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_TEST);
 
-	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":0", apricotf_floppies, "d32w", f1_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":1", apricotf_floppies, "d32w", f1_state::floppy_formats)
+	FLOPPY_CONNECTOR(config, WD2797_TAG ":0", apricotf_floppies, "d32w", f1_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, WD2797_TAG ":1", apricotf_floppies, "d32w", f1_state::floppy_formats);
 MACHINE_CONFIG_END
 
 

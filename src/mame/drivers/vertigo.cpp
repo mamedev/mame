@@ -106,12 +106,12 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(vertigo_state::vertigo)
-
+void vertigo_state::vertigo(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 24_MHz_XTAL / 3)
-	MCFG_DEVICE_PROGRAM_MAP(vertigo_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(vertigo_state, vertigo_interrupt, 60)
+	M68000(config, m_maincpu, 24_MHz_XTAL / 3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vertigo_state::vertigo_map);
+	m_maincpu->set_periodic_int(FUNC(vertigo_state::vertigo_interrupt), attotime::from_hz(60));
 
 	ADC0808(config, m_adc, 24_MHz_XTAL / 30); // E clock from 68000
 	m_adc->eoc_ff_callback().set(FUNC(vertigo_state::adc_eoc_w));
@@ -123,9 +123,9 @@ MACHINE_CONFIG_START(vertigo_state::vertigo)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("440audio", EXIDY440, EXIDY440_MC3418_CLOCK)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	EXIDY440(config, m_custom, EXIDY440_MC3418_CLOCK);
+	m_custom->add_route(0, "lspeaker", 1.0);
+	m_custom->add_route(1, "rspeaker", 1.0);
 
 	pit8254_device &pit(PIT8254(config, "pit", 0));
 	pit.set_clk<0>(24_MHz_XTAL / 100);
@@ -144,12 +144,12 @@ MACHINE_CONFIG_START(vertigo_state::vertigo)
 
 	/* video hardware */
 	VECTOR(config, m_vector, 0);
-	MCFG_SCREEN_ADD("screen", VECTOR)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(400, 300)
-	MCFG_SCREEN_VISIBLE_AREA(0, 510, 0, 400)
-	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
-MACHINE_CONFIG_END
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_VECTOR));
+	screen.set_refresh_hz(60);
+	screen.set_size(400, 300);
+	screen.set_visarea(0, 510, 0, 400);
+	screen.set_screen_update("vector", FUNC(vector_device::screen_update));
+}
 
 
 /*************************************

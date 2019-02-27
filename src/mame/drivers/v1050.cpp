@@ -1022,18 +1022,19 @@ void v1050_state::machine_reset()
 
 // Machine Driver
 
-MACHINE_CONFIG_START(v1050_state::v1050)
+void v1050_state::v1050(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, 16_MHz_XTAL/4)
-	MCFG_DEVICE_PROGRAM_MAP(v1050_mem)
-	MCFG_DEVICE_IO_MAP(v1050_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(v1050_state,v1050_int_ack)
+	Z80(config, m_maincpu, 16_MHz_XTAL/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &v1050_state::v1050_mem);
+	m_maincpu->set_addrmap(AS_IO, &v1050_state::v1050_io);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(v1050_state::v1050_int_ack));
 
-	MCFG_QUANTUM_PERFECT_CPU(Z80_TAG)
+	config.m_perfect_cpu_quantum = subtag(Z80_TAG);
 
-	MCFG_DEVICE_ADD(M6502_TAG, M6502, 15.36_MHz_XTAL/16)
-	MCFG_DEVICE_PROGRAM_MAP(v1050_crt_mem)
-	MCFG_QUANTUM_PERFECT_CPU(M6502_TAG)
+	M6502(config, m_subcpu, 15.36_MHz_XTAL/16);
+	m_subcpu->set_addrmap(AS_PROGRAM, &v1050_state::v1050_crt_mem);
+	config.m_perfect_cpu_quantum = subtag(M6502_TAG);
 
 	// keyboard HACK
 	TIMER(config, "keyboard").configure_periodic(FUNC(v1050_state::v1050_keyboard_tick), attotime::from_hz(60));
@@ -1101,42 +1102,44 @@ MACHINE_CONFIG_START(v1050_state::v1050)
 	MB8877(config, m_fdc, 16_MHz_XTAL/16);
 	m_fdc->intrq_wr_callback().set(FUNC(v1050_state::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(v1050_state::fdc_drq_w));
-	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":0", v1050_floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":1", v1050_floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":2", v1050_floppies, nullptr, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":3", v1050_floppies, nullptr, floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, MB8877_TAG":0", v1050_floppies, "525qd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, MB8877_TAG":1", v1050_floppies, "525qd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, MB8877_TAG":2", v1050_floppies, nullptr, floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, MB8877_TAG":3", v1050_floppies, nullptr, floppy_image_device::default_floppy_formats);
 
 	// SASI bus
 	SCSI_PORT(config, m_sasibus, 0);
-	m_sasibus->set_data_input_buffer("scsi_data_in");
-	m_sasibus->req_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit0)).exor(1);
-	m_sasibus->bsy_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit1));
-	m_sasibus->msg_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit2));
-	m_sasibus->cd_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit3));
+	m_sasibus->set_data_input_buffer(m_sasi_data_in);
+	m_sasibus->req_handler().set(m_sasi_ctrl_in, FUNC(input_buffer_device::write_bit0)).exor(1);
+	m_sasibus->bsy_handler().set(m_sasi_ctrl_in, FUNC(input_buffer_device::write_bit1));
+	m_sasibus->msg_handler().set(m_sasi_ctrl_in, FUNC(input_buffer_device::write_bit2));
+	m_sasibus->cd_handler().set(m_sasi_ctrl_in, FUNC(input_buffer_device::write_bit3));
 	m_sasibus->io_handler().set(FUNC(v1050_state::write_sasi_io)).exor(1); // bit4
-	MCFG_SCSIDEV_ADD(SASIBUS_TAG ":" SCSI_PORT_DEVICE1, "harddisk", S1410, SCSI_ID_0)
+	m_sasibus->set_slot_device(1, "harddisk", S1410, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
 
-	MCFG_SCSI_OUTPUT_LATCH_ADD("scsi_data_out", SASIBUS_TAG)
-	MCFG_DEVICE_ADD("scsi_data_in", INPUT_BUFFER, 0)
-	MCFG_DEVICE_ADD("scsi_ctrl_in", INPUT_BUFFER, 0)
+	OUTPUT_LATCH(config, m_sasi_data_out);
+	m_sasibus->set_output_latch(*m_sasi_data_out);
+	INPUT_BUFFER(config, m_sasi_data_in);
+	INPUT_BUFFER(config, m_sasi_ctrl_in);
 
 	TIMER(config, m_timer_ack).configure_generic(FUNC(v1050_state::sasi_ack_tick));
 	TIMER(config, m_timer_rst).configure_generic(FUNC(v1050_state::sasi_rst_tick));
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "v1050_flop")
-	MCFG_SOFTWARE_LIST_ADD("hdd_list", "v1050_hdd")
+	SOFTWARE_LIST(config, "flop_list").set_original("v1050_flop");
+	SOFTWARE_LIST(config, "hdd_list").set_original("v1050_hdd");
 
 	// printer
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, v1050_state, write_centronics_busy))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, v1050_state, write_centronics_perror))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(v1050_state::write_centronics_busy));
+	m_centronics->perror_handler().set(FUNC(v1050_state::write_centronics_perror));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("128K");
-MACHINE_CONFIG_END
+}
 
 // ROMs
 

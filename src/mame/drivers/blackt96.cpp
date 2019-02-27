@@ -447,14 +447,14 @@ WRITE8_MEMBER(blackt96_state::blackt96_soundio_port_c_w)
 	if (((data & 0x02) == 0x00) && ((m_port_c_data & 0x02) == 0x02)) // high -> low on bit 0x02 writes to selected OKI
 	{
 		//logerror("%s: blackt96_soundio_port_c_w (write to OKI %02x) (oki selected is %02x)\n", machine().describe_context().c_str(), m_port_b_latch, m_oki_selected);
-		if (m_oki_selected == 0) m_oki[0]->write(space, 0, m_port_b_latch);
-		else if (m_oki_selected == 1) m_oki[1]->write(space, 0, m_port_b_latch);
+		if (m_oki_selected == 0) m_oki[0]->write(m_port_b_latch);
+		else if (m_oki_selected == 1) m_oki[1]->write(m_port_b_latch);
 	}
 
 	if (((data & 0x01) == 0x00) && ((m_port_c_data & 0x01) == 0x01)) // high -> low on bit 0x01 reads to selected OKI
 	{
-		if (m_oki_selected == 0) m_port_b_latch = m_oki[0]->read(space, 0);
-		else if (m_oki_selected == 1) m_port_b_latch = m_oki[1]->read(space, 0);
+		if (m_oki_selected == 0) m_port_b_latch = m_oki[0]->read();
+		else if (m_oki_selected == 1) m_port_b_latch = m_oki[1]->read();
 	}
 
 	m_port_c_data = data;
@@ -489,7 +489,7 @@ MACHINE_CONFIG_START(blackt96_state::blackt96)
 	audiocpu.read_c().set(FUNC(blackt96_state::blackt96_soundio_port_c_r));
 	audiocpu.write_c().set(FUNC(blackt96_state::blackt96_soundio_port_c_w));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_blackt96)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_blackt96);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

@@ -650,8 +650,8 @@ static void mvme147_vme_cards(device_slot_interface &device)
  */
 MACHINE_CONFIG_START(mvme147_state::mvme147)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68030, 16_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(mvme147_mem)
+	M68030(config, m_maincpu, 16_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mvme147_state::mvme147_mem);
 	MCFG_VME_DEVICE_ADD("vme")
 	MCFG_VME_SLOT_ADD("vme", 1, mvme147_vme_cards, nullptr)
 

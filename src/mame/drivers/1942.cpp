@@ -576,7 +576,7 @@ MACHINE_CONFIG_START(_1942_state::_1942)
 
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_1942)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_1942);
 
 	PALETTE(config, m_palette, FUNC(_1942_state::_1942_palette), 64*4+4*32*8+16*16, 256);
 
@@ -641,7 +641,7 @@ MACHINE_CONFIG_START(_1942p_state::_1942p)
 
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_1942p)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_1942p);
 
 	PALETTE(config, m_palette, FUNC(_1942p_state::_1942p_palette), 0x500, 0x400);
 

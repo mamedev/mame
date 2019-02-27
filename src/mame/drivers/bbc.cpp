@@ -946,7 +946,7 @@ void bbc_state::bbcb(machine_config &config)
 	m_via6522_1->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<2>));
 
 	/* adc */
-	UPD7002(config, m_upd7002, 0);
+	UPD7002(config, m_upd7002, 16_MHz_XTAL / 16);
 	m_upd7002->set_get_analogue_callback(FUNC(bbc_state::get_analogue_input), this);
 	m_upd7002->set_eoc_callback(FUNC(bbc_state::upd7002_eoc), this);
 
@@ -1401,7 +1401,7 @@ void bbcm_state::bbcm(machine_config &config)
 	m_acia_clock->signal_handler().set(FUNC(bbc_state::write_acia_clock));
 
 	/* adc */
-	UPD7002(config, m_upd7002, 0);
+	UPD7002(config, m_upd7002, 16_MHz_XTAL / 16);
 	m_upd7002->set_get_analogue_callback(FUNC(bbc_state::get_analogue_input), this);
 	m_upd7002->set_eoc_callback(FUNC(bbc_state::upd7002_eoc), this);
 

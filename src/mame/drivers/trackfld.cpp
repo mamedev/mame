@@ -898,7 +898,7 @@ WRITE_LINE_MEMBER(trackfld_state::vblank_nmi)
 void trackfld_state::trackfld(machine_config &config)
 {
 	/* basic machine hardware */
-	KONAMI1(config, m_maincpu, MASTER_CLOCK/6/2);	/* a guess for now */
+	KONAMI1(config, m_maincpu, MASTER_CLOCK/6/2);   /* a guess for now */
 	m_maincpu->set_addrmap(AS_PROGRAM, &trackfld_state::main_map);
 
 	Z80(config, m_audiocpu, SOUND_CLOCK/4);
@@ -944,7 +944,6 @@ void trackfld_state::trackfld(machine_config &config)
 
 	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // ls374.8e + r34-r47(20k) + r35-r53(10k) + r54(20k) + upc324.8f
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
@@ -959,7 +958,7 @@ void trackfld_state::trackfld(machine_config &config)
 void trackfld_state::trackfldu(machine_config &config)
 {
 	trackfld(config);
-	MC6809E(config.replace(), m_maincpu, MASTER_CLOCK/6/2);	/* exact M6809 model unknown */
+	MC6809E(config.replace(), m_maincpu, MASTER_CLOCK/6/2); /* exact M6809 model unknown */
 	m_maincpu->set_addrmap(AS_PROGRAM, &trackfld_state::main_map);
 }
 
@@ -972,7 +971,7 @@ INTERRUPT_GEN_MEMBER(trackfld_state::yieartf_timer_irq)
 void trackfld_state::yieartf(machine_config &config)
 {
 	/* basic machine hardware */
-	MC6809E(config, m_maincpu, MASTER_CLOCK/6/2);	/* a guess for now */
+	MC6809E(config, m_maincpu, MASTER_CLOCK/6/2);   /* a guess for now */
 	m_maincpu->set_addrmap(AS_PROGRAM, &trackfld_state::yieartf_map);
 	m_maincpu->set_periodic_int(FUNC(trackfld_state::yieartf_timer_irq), attotime::from_hz(480));
 
@@ -1020,7 +1019,6 @@ void trackfld_state::yieartf(machine_config &config)
 
 	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // ls374.8e + r34-r47(20k) + r35-r53(10k) + r54(20k) + upc324.8f
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
@@ -1076,7 +1074,7 @@ void trackfld_state::hyprolyb(machine_config &config)
 
 	msm5205_device &msm(MSM5205(config, "msm", 384000));
 	msm.vck_legacy_callback().set("hyprolyb_adpcm", FUNC(hyprolyb_adpcm_device::vck_callback));
-	msm.set_prescaler_selector(msm5205_device::S96_4B);	/* 4 kHz */
+	msm.set_prescaler_selector(msm5205_device::S96_4B); /* 4 kHz */
 	msm.add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 
@@ -1092,7 +1090,7 @@ void trackfld_state::mastkin(machine_config &config)
 	trackfld(config);
 
 	/* basic machine hardware */
-	MC6809E(config.replace(), m_maincpu, MASTER_CLOCK/6/2);	/* a guess for now */
+	MC6809E(config.replace(), m_maincpu, MASTER_CLOCK/6/2); /* a guess for now */
 	m_maincpu->set_addrmap(AS_PROGRAM, &trackfld_state::mastkin_map);
 
 	m_mainlatch->q_out_cb<3>().set_nop(); // actually not used
@@ -1105,7 +1103,7 @@ void trackfld_state::wizzquiz(machine_config &config)
 
 	/* basic machine hardware */
 	// right cpu?
-	M6800(config.replace(), m_maincpu, 2048000);	/* 1.400 MHz ??? */
+	M6800(config.replace(), m_maincpu, 2048000);    /* 1.400 MHz ??? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &trackfld_state::wizzquiz_map);
 
 	m_screen->set_screen_vblank(DEVCB_WRITELINE(*this, trackfld_state, vblank_nmi));

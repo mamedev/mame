@@ -242,7 +242,7 @@ Compiled by Robbbert
 	<software name="black">
 		<description>Blackjack</description>
 		<year>198?</year>
-		<publisher>Dick Smith</publisher>
+		<publisher>Dick Smith Electronics</publisher>
 		<info name="serial" value="306ES" /><!-- Dick Smith X-3600 -->
 		<info name="developer" value="Ian Gilles"/>
 		<info name="usage" value="In Basic, CLOAD then RUN" />
@@ -257,6 +257,7 @@ Compiled by Robbbert
 		<year>1979</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="307ES" />
+		<info name="developer" value="Ivan Reid and BTF Tan"/>
 		<info name="usage" value="In Basic, CLOAD then RUN" />
 		<part name="cass" interface="sorcerer_cass">
 			<dataarea name="cass" size="5107532">
@@ -1083,6 +1084,102 @@ Compiled by Robbbert
 		<part name="cass" interface="sorcerer_cass">
 			<dataarea name="cass" size="14521900">
 				<rom name="luna.wav" size="14521900" crc="8240d8fc" sha1="78c7a2060bcadf2325112a93f452e964fe45e3e1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<!-- Added 2019-02-22 -->
+	<software name="adv2">
+		<description>Pirate Adventure</description>
+		<year>1979</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="Scott Adams"/>
+		<info name="usage" value="Boot to Monitor, LOG" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="13658750">
+				<rom name="adv2.wav" size="13658750" crc="fe930666" sha1="7e23e33ec0e33f8447bf7bed7c077b8d91b495f3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="adv6">
+		<description>Strange Odyssey</description>
+		<year>1979</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="Scott Adams"/>
+		<info name="usage" value="Boot to Monitor, LOG" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="13450400">
+				<rom name="adv6.wav" size="13450400" crc="397bbec2" sha1="91ffae2dd6c1470e5a7b400a5134149a403ad017" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="adv9">
+		<description>Ghost Town</description>
+		<year>1979</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="Scott Adams"/>
+		<info name="usage" value="Boot to Monitor, LOG" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="13450400">
+				<rom name="adv9.wav" size="13450400" crc="02c336c3" sha1="0e1bebddf95ac0f3dd1f0d753cf5ab1c4708f564" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="arrow2">
+		<description>Arrows and Alleys (16k version)</description>
+		<year>1980</year>
+		<publisher>Quality Software</publisher>
+		<info name="developer" value="Vic Tolomei"/>
+		<info name="usage" value="Boot to Monitor, LOG" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="5517892">
+				<rom name="arrow2.wav" size="5517892" crc="ca545956" sha1="bdab1b5c1fb76cd112d1e1a6a80f5cd0e88107c4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="disas2">
+		<description>Z80 Disassembler</description>
+		<year>1979</year>
+		<publisher>Quality Software</publisher>
+		<info name="developer" value="Vic Tolomei"/>
+		<info name="usage" value="In Basic, CLOAD then RUN" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="5488822">
+				<rom name="disas2.wav" size="5488822" crc="0620702b" sha1="2df63dfecf9a7b38ef2733f6d306341abc26c844" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="magicmaze">
+		<description>Magic Maze</description>
+		<year>1979</year>
+		<publisher>Quality Software</publisher>
+		<info name="developer" value="Vic Tolomei"/>
+		<info name="usage" value="In Basic, CLOAD then CLOAD then RUN" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="5790486">
+				<rom name="magicmaze.wav" size="5790486" crc="57d2b47b" sha1="5f28007e0baac142b66ff5eb8b3d7625ebef8a4c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="munch">
+		<description>Munch</description>
+		<year>1982</year>
+		<publisher>System Software</publisher>
+		<info name="developer" value="Matthew B. Hickey"/>
+		<info name="usage" value="Boot to Monitor, LOG" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="7181402">
+				<rom name="munch.wav" size="7181402" crc="512e0b0a" sha1="693fdbf38463b6b06dafbb407d5ae8470e15e532" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="wilde">
+		<description>Wilderness</description>
+		<year>198?</year>
+		<publisher>Dick Smith Electronics</publisher>
+		<info name="usage" value="In Basic, CLOAD then RUN" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="16216806">
+				<rom name="wilde.wav" size="16216806" crc="0909b034" sha1="f7561886212f1ec69f285f64a86e8999b33dc105" offset="0" />
 			</dataarea>
 		</part>
 	</software>

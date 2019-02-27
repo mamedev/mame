@@ -63,33 +63,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(FLOPPY_APPLE, apple525_floppy_image_device)
 
-#define MCFG_LEGACY_FLOPPY_APPLE_PARAMS(_dividend,_divisor) \
-	downcast<apple525_floppy_image_device *>(device)->set_params(_dividend,_divisor);
-
-#define MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(_config,_dividend,_divisor)   \
-	MCFG_DEVICE_ADD(FLOPPY_0, FLOPPY_APPLE, 0)      \
-	MCFG_LEGACY_FLOPPY_CONFIG(_config) \
-	MCFG_LEGACY_FLOPPY_APPLE_PARAMS(_dividend,_divisor) \
-	MCFG_DEVICE_ADD(FLOPPY_1, FLOPPY_APPLE, 0)      \
-	MCFG_LEGACY_FLOPPY_CONFIG(_config) \
-	MCFG_LEGACY_FLOPPY_APPLE_PARAMS(_dividend,_divisor)
-
-#define MCFG_LEGACY_FLOPPY_APPLE_4_DRIVES_ADD(_config,_dividend,_divisor)   \
-	MCFG_DEVICE_ADD(FLOPPY_0, FLOPPY_APPLE, 0)      \
-	MCFG_LEGACY_FLOPPY_CONFIG(_config) \
-	MCFG_LEGACY_FLOPPY_APPLE_PARAMS(_dividend,_divisor) \
-	MCFG_DEVICE_ADD(FLOPPY_1, FLOPPY_APPLE, 0)      \
-	MCFG_LEGACY_FLOPPY_CONFIG(_config) \
-	MCFG_LEGACY_FLOPPY_APPLE_PARAMS(_dividend,_divisor) \
-	MCFG_DEVICE_ADD(FLOPPY_2, FLOPPY_APPLE, 0)      \
-	MCFG_LEGACY_FLOPPY_CONFIG(_config) \
-	MCFG_LEGACY_FLOPPY_APPLE_PARAMS(_dividend,_divisor) \
-	MCFG_DEVICE_ADD(FLOPPY_3, FLOPPY_APPLE, 0)      \
-	MCFG_LEGACY_FLOPPY_CONFIG(_config) \
-	MCFG_LEGACY_FLOPPY_APPLE_PARAMS(_dividend,_divisor)
-
-#define MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_REMOVE()  \
-	MCFG_DEVICE_REMOVE(FLOPPY_0)        \
-	MCFG_DEVICE_REMOVE(FLOPPY_1)
-
 #endif // MAME_MACHINE_APPLDRIV_H

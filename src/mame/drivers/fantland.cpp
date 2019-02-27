@@ -820,7 +820,7 @@ MACHINE_CONFIG_START(fantland_state::fantland)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(fantland_state, fantland_sound_irq,  8000)
 	// NMI when soundlatch is written
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(8000))  // sound irq must feed the DAC at 8kHz
+	config.m_minimum_quantum = attotime::from_hz(8000);  // sound irq must feed the DAC at 8kHz
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -842,9 +842,10 @@ MACHINE_CONFIG_START(fantland_state::fantland)
 
 	YM2151(config, "ymsnd", 3000000).add_route(0, "speaker", 0.35).add_route(1, "speaker", 0.35);
 
-	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 MACHINE_CONFIG_END
 
 
@@ -934,10 +935,10 @@ void borntofi_state::machine_reset()
 void borntofi_state::borntofi(machine_config &config)
 {
 	/* basic machine hardware */
-	V20(config, m_maincpu, 16000000/2);		// D701080C-8 - NEC D70108C-8 V20 CPU, running at 8.000MHz [16/2]
+	V20(config, m_maincpu, 16000000/2);     // D701080C-8 - NEC D70108C-8 V20 CPU, running at 8.000MHz [16/2]
 	m_maincpu->set_addrmap(AS_PROGRAM, &borntofi_state::main_map);
 
-	I8088(config, m_audiocpu, 18432000/3);	// 8088 - AMD P8088-2 CPU, running at 6.144MHz [18.432/3]
+	I8088(config, m_audiocpu, 18432000/3);  // 8088 - AMD P8088-2 CPU, running at 6.144MHz [18.432/3]
 	m_audiocpu->set_addrmap(AS_PROGRAM, &borntofi_state::sound_map);
 
 	/* video hardware */
@@ -983,10 +984,10 @@ void borntofi_state::borntofi(machine_config &config)
 void fantland_state::wheelrun(machine_config &config)
 {
 	/* basic machine hardware */
-	V20(config, m_maincpu, XTAL(18'000'000)/2);		// D701080C-8 (V20)
+	V20(config, m_maincpu, XTAL(18'000'000)/2);     // D701080C-8 (V20)
 	m_maincpu->set_addrmap(AS_PROGRAM, &fantland_state::wheelrun_map);
 
-	Z80(config, m_audiocpu, XTAL(18'000'000)/2);	// Z8400BB1 (Z80B)
+	Z80(config, m_audiocpu, XTAL(18'000'000)/2);    // Z8400BB1 (Z80B)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &fantland_state::wheelrun_sound_map);
 	// IRQ by YM3526, NMI when soundlatch is written
 

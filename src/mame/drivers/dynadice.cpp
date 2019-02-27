@@ -119,10 +119,10 @@ WRITE8_MEMBER(dynadice_state::sound_control_w)
 
 */
 	if ((data & 7) == 7)
-		m_ay8910->address_w(space, 0, m_ay_data);
+		m_ay8910->address_w(m_ay_data);
 
 	if ((data & 7) == 6)
-		m_ay8910->data_w(space, 0, m_ay_data);
+		m_ay8910->data_w(m_ay_data);
 }
 
 
@@ -283,7 +283,7 @@ MACHINE_CONFIG_START(dynadice_state::dynadice)
 	MCFG_SCREEN_UPDATE_DRIVER(dynadice_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_dynadice)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_dynadice);
 	PALETTE(config, "palette", palette_device::BRG_3BIT);
 
 	SPEAKER(config, "mono").front_center();

@@ -391,7 +391,7 @@ MACHINE_CONFIG_START(dfruit_state::dfruit)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, dfruit_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dfruit )
+	GFXDECODE(config, "gfxdecode", "palette", gfx_dfruit);
 	MCFG_PALETTE_ADD("palette", 0x100)
 
 	TC0091LVC(config, m_vdp, 0);

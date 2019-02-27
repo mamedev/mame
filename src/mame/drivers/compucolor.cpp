@@ -438,7 +438,7 @@ MACHINE_CONFIG_START(compucolor2_state::compucolor2)
 	RAM(config, RAM_TAG).set_default_size("32K").set_extra_options("8K,16K");
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "compclr2_flop")
+	SOFTWARE_LIST(config, "flop_list").set_original("compclr2_flop");
 MACHINE_CONFIG_END
 
 ROM_START( compclr2 )

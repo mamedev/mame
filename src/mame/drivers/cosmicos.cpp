@@ -548,9 +548,9 @@ MACHINE_CONFIG_START(cosmicos_state::cosmicos)
 	m_cti->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
-	MCFG_QUICKLOAD_ADD("quickload", cosmicos_state, cosmicos, "bin", 0)
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
+	MCFG_QUICKLOAD_ADD("quickload", cosmicos_state, cosmicos, "bin")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("256").set_extra_options("4K,48K");

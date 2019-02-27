@@ -44,6 +44,7 @@ public:
 	spg2xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	void set_pal(bool pal) { m_pal_flag = pal ? 1 : 0; }
+	void set_rowscroll_offset(int offset) { m_rowscrolloffset = offset; }
 
 	void map(address_map &map);
 
@@ -54,7 +55,7 @@ public:
 	auto portb_in() { return m_portb_in.bind(); }
 	auto portc_in() { return m_portc_in.bind(); }
 
-	auto adc_in() { return m_adc_in.bind(); }
+	template <size_t Line> auto adc_in() { return m_adc_in[Line].bind(); }
 
 	auto eeprom_w() { return m_eeprom_w.bind(); }
 	auto eeprom_r() { return m_eeprom_r.bind(); }
@@ -384,6 +385,7 @@ protected:
 	virtual DECLARE_READ16_MEMBER(io_r);
 	virtual DECLARE_WRITE16_MEMBER(io_w);
 
+	void check_extint_irq(int channel);
 	void check_irqs(const uint16_t changed);
 	inline void check_video_irq();
 
@@ -497,6 +499,7 @@ protected:
 
 	uint16_t m_video_regs[0x100];
 	uint32_t m_sprite_limit;
+	int m_rowscrolloffset; // auto racing in 'zone60' minigames needs this to be 15, the JAKKS games (Star Wars Revenge of the sith - Gunship Battle, Wheel of Fortune, Namco Ms. Pac-Man 5-in-1 Pole Position) need it to be 0, where does it come from?
 	uint16_t m_pal_flag;
 
 	devcb_write16 m_porta_out;
@@ -506,7 +509,7 @@ protected:
 	devcb_read16 m_portb_in;
 	devcb_read16 m_portc_in;
 
-	devcb_read16 m_adc_in;
+	devcb_read16 m_adc_in[2];
 
 	devcb_write8 m_eeprom_w;
 	devcb_read8 m_eeprom_r;

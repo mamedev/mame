@@ -305,19 +305,19 @@ READ8_MEMBER( can09t_state::read )
 		{
 		case X0XX: // ACIA
 			LOGPLA("-- ACIA\n");
-			byte = m_acia->read(space, offset & 1);
+			byte = m_acia->read(offset & 1);
 			break;
 		case X1XX: // SYSPIA
 			LOGPLA("-- SYSPIA\n");
-			byte = m_syspia->read_alt(space, offset & 3);
+			byte = m_syspia->read_alt(offset & 3);
 			break;
 		case X2XX: // USRPIA
 			LOGPLA("-- USRPIA\n");
-			byte = m_usrpia->read_alt(space, offset & 3);
+			byte = m_usrpia->read_alt(offset & 3);
 			break;
 		case X3XX: // PTM
 			LOGPLA("-- PTM\n");
-			byte = m_ptm->read(space, offset & 7);
+			byte = m_ptm->read(offset & 7);
 			break;
 		case X4XX: //
 			LOGPLA("-- XX4X\n");
@@ -387,19 +387,19 @@ WRITE8_MEMBER( can09t_state::write )
 		{
 		case X0XX: // ACIA
 			LOGPLA("-- ACIA\n");
-			m_acia->write(space, offset & 1, data);
+			m_acia->write(offset & 1, data);
 			break;
 		case X1XX: // SYSPIA
 			LOGPLA("-- SYSPIA\n");
-			m_syspia->write_alt(space, offset & 3, data);
+			m_syspia->write_alt(offset & 3, data);
 			break;
 		case X2XX: // USRPIA
 			LOGPLA("-- USRPIA\n");
-			m_usrpia->write_alt(space, offset & 3, data);
+			m_usrpia->write_alt(offset & 3, data);
 			break;
 		case X3XX: // PTM
 			LOGPLA("-- PTM\n");
-			m_ptm->write(space, offset & 7, data);
+			m_ptm->write(offset & 7, data);
 			break;
 		case X4XX: //
 			LOGPLA("-- XX4X\n");
@@ -762,8 +762,8 @@ MACHINE_CONFIG_START(can09_state::can09)
 	/* Floppy */
 	WD1770(config, "wd1770", 8_MHz_XTAL); // TODO: Verify 8MHz UKI crystal assumed to be used
 #if 0
-	MCFG_FLOPPY_DRIVE_ADD("wd1770:0", candela_floppies, "3dd", floppy_image_device::default_floppy_formats)
-	MCFG_SOFTWARE_LIST_ADD("flop3_list", "candela")
+	FLOPPY_CONNECTOR(config, "wd1770:0", candela_floppies, "3dd", floppy_image_device::default_floppy_formats);
+	SOFTWARE_LIST(config, "flop3_list").set_original("candela");
 #endif
 
 	/* --PIA inits----------------------- */

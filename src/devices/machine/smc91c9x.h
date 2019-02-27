@@ -135,7 +135,7 @@ private:
 	enum control_mask : u8 {
 		EBUF_RX_ALWAYS = 0x40,   // Always set on receive buffer control byte
 		EBUF_ODD       = 0x20,   // Odd number of data payload bytes
-		EBUF_CRC       = 0x10		// Tx add CRC
+		EBUF_CRC       = 0x10       // Tx add CRC
 	};
 
 	// Receive buffer status
@@ -165,7 +165,7 @@ private:
 		LTX_MULT      = 0x0008, // Last transmit frame was a multicast
 		MULCOL        = 0x0004, // Multiple collisions detected
 		SNGLCOL       = 0x0002, // Single collision detected
-		TX_SUC        = 0x0001	// Last transmit frame was successful
+		TX_SUC        = 0x0001  // Last transmit frame was successful
 	};
 
 	// CTR register bits
@@ -179,7 +179,7 @@ private:
 		TE_ENABLE     = 0x0020, // Transmit Error enable
 		EEPROM_SEL    = 0x0004, // EEPROM address
 		RELOAD        = 0x0002, // Reload config from EEPROM
-		STORE         = 0x0001	// Store config to EEPROM
+		STORE         = 0x0001  // Store config to EEPROM
 	};
 
 	// Transmit Control Register bits

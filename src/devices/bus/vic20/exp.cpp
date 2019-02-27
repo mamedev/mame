@@ -178,11 +178,11 @@ std::string vic20_expansion_slot_device::get_default_card_software(get_default_c
 //  cd_r - cartridge data read
 //-------------------------------------------------
 
-uint8_t vic20_expansion_slot_device::cd_r(address_space &space, offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
+uint8_t vic20_expansion_slot_device::cd_r(offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
 {
 	if (m_card != nullptr)
 	{
-		data = m_card->vic20_cd_r(space, offset, data, ram1, ram2, ram3, blk1, blk2, blk3, blk5, io2, io3);
+		data = m_card->vic20_cd_r(offset, data, ram1, ram2, ram3, blk1, blk2, blk3, blk5, io2, io3);
 	}
 
 	return data;
@@ -193,11 +193,11 @@ uint8_t vic20_expansion_slot_device::cd_r(address_space &space, offs_t offset, u
 //  cd_w - cartridge data write
 //-------------------------------------------------
 
-void vic20_expansion_slot_device::cd_w(address_space &space, offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
+void vic20_expansion_slot_device::cd_w(offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
 {
 	if (m_card != nullptr)
 	{
-		m_card->vic20_cd_w(space, offset, data, ram1, ram2, ram3, blk1, blk2, blk3, blk5, io2, io3);
+		m_card->vic20_cd_w(offset, data, ram1, ram2, ram3, blk1, blk2, blk3, blk5, io2, io3);
 	}
 }
 

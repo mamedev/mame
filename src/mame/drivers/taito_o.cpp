@@ -233,21 +233,21 @@ void taitoo_state::machine_start()
 {
 }
 
-MACHINE_CONFIG_START(taitoo_state::parentj)
-
-	MCFG_DEVICE_ADD("maincpu", M68000,12000000 )       /*?? MHz */
-	MCFG_DEVICE_PROGRAM_MAP(parentj_map)
+void taitoo_state::parentj(machine_config &config)
+{
+	M68000(config, m_maincpu, 12000000);       /*?? MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &taitoo_state::parentj_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(taitoo_state::parentj_interrupt), "screen", 0, 1);
 
 	WATCHDOG_TIMER(config, m_watchdog);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*16, 64*16)
-	MCFG_SCREEN_VISIBLE_AREA(0*16, 32*16-1, 3*16, 31*16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(taitoo_state, screen_update_parentj)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*16, 64*16);
+	screen.set_visarea(0*16, 32*16-1, 3*16, 31*16-1);
+	screen.set_screen_update(FUNC(taitoo_state::screen_update_parentj));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_parentj);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 33*16);
@@ -265,7 +265,7 @@ MACHINE_CONFIG_START(taitoo_state::parentj)
 	ymsnd.port_a_read_callback().set_ioport("DSWA");
 	ymsnd.port_b_read_callback().set_ioport("DSWB");
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
-MACHINE_CONFIG_END
+}
 
 ROM_START( parentj )
 	ROM_REGION( 0x20000, "maincpu", 0 ) /* 68000 Code */

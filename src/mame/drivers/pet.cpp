@@ -530,10 +530,10 @@ void pet_state::update_speaker()
 READ8_MEMBER( pet_state::read )
 {
 	int sel = offset >> 12;
-	int norom = m_exp->norom_r(space, offset, sel);
+	int norom = m_exp->norom_r(offset, sel);
 	uint8_t data = 0;
 
-	data = m_exp->read(space, offset, data, sel);
+	data = m_exp->read(offset, data, sel);
 
 	switch (sel)
 	{
@@ -555,7 +555,7 @@ READ8_MEMBER( pet_state::read )
 		if (norom)
 		{
 			if (m_cart_9000 && m_cart_9000->exists())
-				data = m_cart_9000->read_rom(space, offset & 0xfff);
+				data = m_cart_9000->read_rom(offset & 0xfff);
 			else
 				data = m_rom->base()[offset - 0x9000];
 		}
@@ -565,7 +565,7 @@ READ8_MEMBER( pet_state::read )
 		if (norom)
 		{
 			if (m_cart_a000 && m_cart_a000->exists())
-				data = m_cart_a000->read_rom(space, offset & 0xfff);
+				data = m_cart_a000->read_rom(offset & 0xfff);
 			else
 				data = m_rom->base()[offset - 0x9000];
 		}
@@ -575,7 +575,7 @@ READ8_MEMBER( pet_state::read )
 		if (norom)
 		{
 			if (m_cart_b000 && m_cart_b000->exists())
-				data = m_cart_b000->read_rom(space, offset & 0xfff);
+				data = m_cart_b000->read_rom(offset & 0xfff);
 			else
 				data = m_rom->base()[offset - 0x9000];
 		}
@@ -595,11 +595,11 @@ READ8_MEMBER( pet_state::read )
 
 			if (BIT(offset, 4))
 			{
-				data &= m_pia1->read(space, offset & 0x03);
+				data &= m_pia1->read(offset & 0x03);
 			}
 			if (BIT(offset, 5))
 			{
-				data &= m_pia2->read(space, offset & 0x03);
+				data &= m_pia2->read(offset & 0x03);
 			}
 			if (BIT(offset, 6))
 			{
@@ -607,7 +607,7 @@ READ8_MEMBER( pet_state::read )
 			}
 			if (m_crtc && BIT(offset, 7) && BIT(offset, 0))
 			{
-				data &= m_crtc->register_r(space, 0);
+				data &= m_crtc->register_r();
 			}
 		}
 		else if (norom)
@@ -629,7 +629,7 @@ WRITE8_MEMBER( pet_state::write )
 {
 	int sel = offset >> 12;
 
-	m_exp->write(space, offset, data, sel);
+	m_exp->write(offset, data, sel);
 
 	switch (sel)
 	{
@@ -652,11 +652,11 @@ WRITE8_MEMBER( pet_state::write )
 		{
 			if (BIT(offset, 4))
 			{
-				m_pia1->write(space, offset & 0x03, data);
+				m_pia1->write(offset & 0x03, data);
 			}
 			if (BIT(offset, 5))
 			{
-				m_pia2->write(space, offset & 0x03, data);
+				m_pia2->write(offset & 0x03, data);
 			}
 			if (BIT(offset, 6))
 			{
@@ -666,11 +666,11 @@ WRITE8_MEMBER( pet_state::write )
 			{
 				if (BIT(offset, 0))
 				{
-					m_crtc->register_w(space, 0, data);
+					m_crtc->register_w(data);
 				}
 				else
 				{
-					m_crtc->address_w(space, 0, data);
+					m_crtc->address_w(data);
 				}
 			}
 		}
@@ -758,7 +758,7 @@ void cbm8296_state::read_pla2_eprom(offs_t offset, int phi2, int brw, int casena
 
 READ8_MEMBER( cbm8296_state::read )
 {
-	int norom = m_exp->norom_r(space, offset, offset >> 12) && !BIT(m_cr, 7);
+	int norom = m_exp->norom_r(offset, offset >> 12) && !BIT(m_cr, 7);
 	int phi2 = 1, brw = 1, noscreen = 1, noio = BIT(m_cr, 6);
 	int ramsela = BIT(m_via_pa, 0), ramsel9 = BIT(m_via_pa, 1), ramon = BIT(m_via_pa, 2);
 	int cswff = 1, cs9 = 1, csa = 1, csio = 1, cse = 1, cskb = 1, fa12 = 1, fa15 = 1, casena1 = 1, casena2 = 1, endra = 1;
@@ -788,14 +788,14 @@ READ8_MEMBER( cbm8296_state::read )
 	if (!cs9)
 	{
 		if (m_cart_9000 && m_cart_9000->exists())
-			data = m_cart_9000->read_rom(space, offset & 0xfff);
+			data = m_cart_9000->read_rom(offset & 0xfff);
 		else
 			data = m_rom->base()[offset & 0xfff];
 	}
 	if (!csa)
 	{
 		if (m_cart_a000 && m_cart_a000->exists())
-			data = m_cart_a000->read_rom(space, offset & 0xfff);
+			data = m_cart_a000->read_rom(offset & 0xfff);
 		else
 			data = m_rom->base()[0x1000 | (offset & 0xfff)];
 	}
@@ -813,11 +813,11 @@ READ8_MEMBER( cbm8296_state::read )
 
 		if (BIT(offset, 4))
 		{
-			data &= m_pia1->read(space, offset & 0x03);
+			data &= m_pia1->read(offset & 0x03);
 		}
 		if (BIT(offset, 5))
 		{
-			data &= m_pia2->read(space, offset & 0x03);
+			data &= m_pia2->read(offset & 0x03);
 		}
 		if (BIT(offset, 6))
 		{
@@ -825,7 +825,7 @@ READ8_MEMBER( cbm8296_state::read )
 		}
 		if (BIT(offset, 7) && BIT(offset, 0))
 		{
-			data &= m_crtc->register_r(space, 0);
+			data &= m_crtc->register_r();
 		}
 	}
 
@@ -839,7 +839,7 @@ READ8_MEMBER( cbm8296_state::read )
 
 WRITE8_MEMBER( cbm8296_state::write )
 {
-	int norom = m_exp->norom_r(space, offset, offset >> 12) && !BIT(m_cr, 7);
+	int norom = m_exp->norom_r(offset, offset >> 12) && !BIT(m_cr, 7);
 	int phi2 = 1, brw = 0, noscreen = 1, noio = BIT(m_cr, 6);
 	int ramsela = BIT(m_via_pa, 0), ramsel9 = BIT(m_via_pa, 1), ramon = BIT(m_via_pa, 2);
 	int cswff = 1, cs9 = 1, csa = 1, csio = 1, cse = 1, cskb = 1, fa12 = 1, fa15 = 1, casena1 = 1, casena2 = 1, endra = 1;
@@ -868,11 +868,11 @@ WRITE8_MEMBER( cbm8296_state::write )
 	{
 		if (BIT(offset, 4))
 		{
-			m_pia1->write(space, offset & 0x03, data);
+			m_pia1->write(offset & 0x03, data);
 		}
 		if (BIT(offset, 5))
 		{
-			m_pia2->write(space, offset & 0x03, data);
+			m_pia2->write(offset & 0x03, data);
 		}
 		if (BIT(offset, 6))
 		{
@@ -882,11 +882,11 @@ WRITE8_MEMBER( cbm8296_state::write )
 		{
 			if (BIT(offset, 0))
 			{
-				m_crtc->register_w(space, 0, data);
+				m_crtc->register_w(data);
 			}
 			else
 			{
-				m_crtc->address_w(space, 0, data);
+				m_crtc->address_w(data);
 			}
 		}
 	}
@@ -1783,8 +1783,8 @@ void pet_state::base_pet_devices(machine_config &config, const char *default_dri
 	m_user->pl_handler().set(m_via, FUNC(via6522_device::write_pa7));
 	m_user->pm_handler().set(m_via, FUNC(via6522_device::write_cb2));
 
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(pet_state, cbm_pet), this), "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS);
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
+	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(pet_state, cbm_pet), this), "p00,prg", CBM_QUICKLOAD_DELAY);
 	quickload.set_interface("cbm_quik");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("pet_cass");

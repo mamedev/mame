@@ -296,7 +296,8 @@ static const z80_daisy_config daisy_chain[] =
 	{ nullptr }
 };
 
-MACHINE_CONFIG_START(mc8020_state::mc8020)
+void mc8020_state::mc8020(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(2'457'600));
 	m_maincpu->set_addrmap(AS_PROGRAM, &mc8020_state::mem_map);
@@ -304,13 +305,13 @@ MACHINE_CONFIG_START(mc8020_state::mc8020)
 	m_maincpu->set_daisy_config(daisy_chain);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(32*6, 16*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 32*6-1, 0, 16*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mc8020_state, screen_update_mc8020)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(32*6, 16*8);
+	screen.set_visarea(0, 32*6-1, 0, 16*8-1);
+	screen.set_screen_update(FUNC(mc8020_state::screen_update_mc8020));
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
@@ -325,7 +326,7 @@ MACHINE_CONFIG_START(mc8020_state::mc8020)
 	ctc.set_clk<2>(XTAL(2'457'600) / 64); // guess
 	ctc.zc_callback<2>().set("ctc", FUNC(z80ctc_device::trg1));
 	ctc.zc_callback<2>().append("ctc", FUNC(z80ctc_device::trg0));
-MACHINE_CONFIG_END
+}
 
 
 /* ROM definition */

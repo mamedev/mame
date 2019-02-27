@@ -195,21 +195,22 @@ void decodmd_type1_device::decodmd1_io_map(address_map &map)
 	map(0x00, 0xff).rw(FUNC(decodmd_type1_device::dmd_port_r), FUNC(decodmd_type1_device::dmd_port_w));
 }
 
-MACHINE_CONFIG_START(decodmd_type1_device::device_add_mconfig)
+void decodmd_type1_device::device_add_mconfig(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("dmdcpu", Z80, XTAL(8'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(decodmd1_map)
-	MCFG_DEVICE_IO_MAP(decodmd1_io_map)
+	Z80(config, m_cpu, XTAL(8'000'000) / 2);
+	m_cpu->set_addrmap(AS_PROGRAM, &decodmd_type1_device::decodmd1_map);
+	m_cpu->set_addrmap(AS_IO, &decodmd_type1_device::decodmd1_io_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(50))
+	config.m_minimum_quantum = attotime::from_hz(50);
 
 	TIMER(config, "nmi_timer").configure_periodic(FUNC(decodmd_type1_device::dmd_nmi), attotime::from_hz(2000));  // seems a lot
 
-	MCFG_SCREEN_ADD("dmd", LCD)
-	MCFG_SCREEN_SIZE(128, 16)
-	MCFG_SCREEN_VISIBLE_AREA(0, 128-1, 0, 16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(decodmd_type1_device, screen_update)
-	MCFG_SCREEN_REFRESH_RATE(50)
+	screen_device &dmd(SCREEN(config, "dmd", SCREEN_TYPE_LCD));
+	dmd.set_size(128, 16);
+	dmd.set_visarea(0, 128-1, 0, 16-1);
+	dmd.set_screen_update(FUNC(decodmd_type1_device::screen_update));
+	dmd.set_refresh_hz(50);
 
 	RAM(config, RAM_TAG).set_default_size("8K");
 
@@ -220,7 +221,7 @@ MACHINE_CONFIG_START(decodmd_type1_device::device_add_mconfig)
 	m_bitlatch->q_out_cb<5>().set(FUNC(decodmd_type1_device::rowdata_w));
 	m_bitlatch->q_out_cb<6>().set(FUNC(decodmd_type1_device::rowclock_w));
 	m_bitlatch->q_out_cb<7>().set(FUNC(decodmd_type1_device::test_w));
-MACHINE_CONFIG_END
+}
 
 
 decodmd_type1_device::decodmd_type1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

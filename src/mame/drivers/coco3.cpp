@@ -247,9 +247,9 @@ MACHINE_CONFIG_START(coco3_state::coco3)
 	MCFG_DEVICE_CLOCK(XTAL(28'636'363) / 32)
 
 	// basic machine hardware
-	MCFG_DEVICE_ADD(MAINCPU_TAG, MC6809E, DERIVED_CLOCK(1, 1))
-	MCFG_DEVICE_PROGRAM_MAP(coco3_mem)
-	MCFG_DEVICE_DISASSEMBLE_OVERRIDE(coco_state, dasm_override)
+	MC6809E(config, m_maincpu, DERIVED_CLOCK(1, 1));
+	m_maincpu->set_addrmap(AS_PROGRAM, &coco3_state::coco3_mem);
+	m_maincpu->set_dasm_override(FUNC(coco_state::dasm_override));
 
 	// devices
 	pia6821_device &pia0(PIA6821(config, PIA0_TAG, 0));
@@ -271,11 +271,11 @@ MACHINE_CONFIG_START(coco3_state::coco3)
 	pia1.irqb_handler().set(FUNC(coco_state::pia1_firq_b));
 
 	// Becker Port device
-	MCFG_DEVICE_ADD(DWSOCK_TAG, COCO_DWSOCK, 0)
+	COCO_DWSOCK(config, DWSOCK_TAG, 0);
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_FORMATS(coco_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(coco_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED);
 
 	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, "printer"));
 	rs232.dcd_handler().set(PIA1_TAG, FUNC(pia6821_device::ca1_w));
@@ -286,8 +286,8 @@ MACHINE_CONFIG_START(coco3_state::coco3)
 	cartslot.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	cartslot.halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
 
-	COCO_VHD(config, m_vhd_0, 0);
-	COCO_VHD(config, m_vhd_1, 0);
+	COCO_VHD(config, m_vhd_0, 0, m_maincpu);
+	COCO_VHD(config, m_vhd_1, 0, m_maincpu);
 
 	// video hardware
 	config.set_default_layout(layout_coco3);
@@ -301,20 +301,20 @@ MACHINE_CONFIG_START(coco3_state::coco3)
 	m_gime->floating_bus_rd_callback().set(FUNC(coco3_state::floating_bus_r));
 
 	// composite monitor
-	MCFG_SCREEN_ADD(COMPOSITE_SCREEN_TAG, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_UPDATE_DRIVER(coco3_state, screen_update)
-	MCFG_SCREEN_SIZE(640, 243)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 1, 241-1)
-	MCFG_SCREEN_VBLANK_TIME(0)
+	screen_device &composite_screen(SCREEN(config, COMPOSITE_SCREEN_TAG, SCREEN_TYPE_RASTER));
+	composite_screen.set_refresh_hz(60);
+	composite_screen.set_screen_update(FUNC(coco3_state::screen_update));
+	composite_screen.set_size(640, 243);
+	composite_screen.set_visarea(0, 640-1, 1, 241-1);
+	composite_screen.set_vblank_time(0);
 
 	// RGB monitor
-	MCFG_SCREEN_ADD(RGB_SCREEN_TAG, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_UPDATE_DRIVER(coco3_state, screen_update)
-	MCFG_SCREEN_SIZE(640, 243)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 1, 241-1)
-	MCFG_SCREEN_VBLANK_TIME(0)
+	screen_device &rgb_screen(SCREEN(config, RGB_SCREEN_TAG, SCREEN_TYPE_RASTER));
+	rgb_screen.set_refresh_hz(60);
+	rgb_screen.set_screen_update(FUNC(coco3_state::screen_update));
+	rgb_screen.set_size(640, 243);
+	rgb_screen.set_visarea(0, 640-1, 1, 241-1);
+	rgb_screen.set_vblank_time(0);
 
 	// sound hardware
 	coco_sound(config);
@@ -326,11 +326,9 @@ MACHINE_CONFIG_START(coco3_state::coco3)
 	coco_floating(config);
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("cart_list","coco_cart")
-	MCFG_SOFTWARE_LIST_FILTER("cart_list","COCO3")
+	SOFTWARE_LIST(config, "cart_list").set_original("coco_cart").set_filter("COCO3");
 
-	MCFG_SOFTWARE_LIST_ADD("flop_list","coco_flop")
-	MCFG_SOFTWARE_LIST_FILTER("flop_list","COCO3")
+	SOFTWARE_LIST(config, "flop_list").set_original("coco_flop").set_filter("COCO3");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(coco3_state::coco3p)
@@ -348,11 +346,12 @@ MACHINE_CONFIG_START(coco3_state::coco3p)
 	m_gime->floating_bus_rd_callback().set(FUNC(coco3_state::floating_bus_r));
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(coco3_state::coco3h)
+void coco3_state::coco3h(machine_config &config)
+{
 	coco3(config);
-	MCFG_DEVICE_REPLACE(MAINCPU_TAG, HD6309E, DERIVED_CLOCK(1, 1))
-	MCFG_DEVICE_PROGRAM_MAP(coco3_mem)
-MACHINE_CONFIG_END
+	HD6309E(config.replace(), m_maincpu, DERIVED_CLOCK(1, 1));
+	m_maincpu->set_addrmap(AS_PROGRAM, &coco3_state::coco3_mem);
+}
 
 void coco3_state::coco3dw1(machine_config &config)
 {

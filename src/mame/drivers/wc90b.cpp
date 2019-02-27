@@ -389,8 +389,8 @@ void wc90b_state::wc90b(machine_config &config)
 	YM2203(config, "ymsnd2", YM2203_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.40);
 
 	MSM5205(config, m_msm, MSM5205_CLOCK);
-	m_msm->vck_legacy_callback().set(FUNC(wc90b_state::adpcm_int));	/* interrupt function */
-	m_msm->set_prescaler_selector(msm5205_device::S96_4B);	/* 4KHz 4-bit */
+	m_msm->vck_legacy_callback().set(FUNC(wc90b_state::adpcm_int)); /* interrupt function */
+	m_msm->set_prescaler_selector(msm5205_device::S96_4B);  /* 4KHz 4-bit */
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.20);
 }
 

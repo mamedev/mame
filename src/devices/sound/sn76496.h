@@ -24,9 +24,8 @@ class sn76496_base_device : public device_t, public device_sound_interface
 public:
 	auto ready_cb() { return m_ready_handler.bind(); }
 
-	DECLARE_WRITE8_MEMBER( stereo_w );
-	void write(uint8_t data);
-	DECLARE_WRITE8_MEMBER( command_w ) { write(data); }
+	void stereo_w(u8 data);
+	void write(u8 data);
 	DECLARE_READ_LINE_MEMBER( ready_r ) { return m_ready_state ? 1 : 0; }
 
 protected:

@@ -287,12 +287,12 @@ void md_boot_state::md_bootleg_map(address_map &map)
 	map(0xe00000, 0xe0ffff).ram().mirror(0x1f0000).share("megadrive_ram");
 }
 
-MACHINE_CONFIG_START(md_boot_state::md_bootleg)
+void md_boot_state::md_bootleg(machine_config &config)
+{
 	md_ntsc(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(md_bootleg_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &md_boot_state::md_bootleg_map);
+}
 
 /*************************************
  *
@@ -792,10 +792,11 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(md_boot_state::megadrvb)
+void md_boot_state::megadrvb(machine_config &config)
+{
 	md_ntsc(config);
 	MCFG_MACHINE_START_OVERRIDE(md_boot_state, md_bootleg)
-MACHINE_CONFIG_END
+}
 
 MACHINE_START_MEMBER(md_boot_state, md_6button)
 {
@@ -811,10 +812,11 @@ MACHINE_START_MEMBER(md_boot_state, md_6button)
 		m_io_timeout[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(md_base_state::io_timeout_timer_callback),this), (void*)(uintptr_t)i);
 }
 
-MACHINE_CONFIG_START(md_boot_state::megadrvb_6b)
+void md_boot_state::megadrvb_6b(machine_config &config)
+{
 	md_ntsc(config);
 	MCFG_MACHINE_START_OVERRIDE(md_boot_state, md_6button)
-MACHINE_CONFIG_END
+}
 
 
 /*************************************
@@ -1059,7 +1061,7 @@ void md_boot_state::init_barek3()
 
 void md_boot_state::init_sonic2mb()
 {
-	// 100000 = writes to unpopulated MCU? 
+	// 100000 = writes to unpopulated MCU?
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x100000, 0x100001, write16_delegate(FUNC(md_boot_state::aladmdb_w),this));
 	m_maincpu->space(AS_PROGRAM).install_read_port(0x300000, 0x300001, "DSW");
 

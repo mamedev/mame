@@ -454,26 +454,27 @@ static GFXDECODE_START( gfx_terracre )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(terracre_state::ym3526)
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)/2)   // 8mhz
-	MCFG_DEVICE_PROGRAM_MAP(terracre_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", terracre_state,  irq1_line_hold)
+void terracre_state::ym3526(machine_config &config)
+{
+	M68000(config, m_maincpu, XTAL(16'000'000)/2);   // 8mhz
+	m_maincpu->set_addrmap(AS_PROGRAM, &terracre_state::terracre_map);
+	m_maincpu->set_vblank_int("screen", FUNC(terracre_state::irq1_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(16'000'000)/4)     // 4.0mhz when compared to sound recordings, should be derived from XTAL(22'000'000)? how?
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(sound_3526_io_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(terracre_state, irq0_line_hold,  XTAL(16'000'000)/4/512) // ?
+	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(16'000'000)/4));     // 4.0mhz when compared to sound recordings, should be derived from XTAL(22'000'000)? how?
+	audiocpu.set_addrmap(AS_PROGRAM, &terracre_state::sound_map);
+	audiocpu.set_addrmap(AS_IO, &terracre_state::sound_3526_io_map);
+	audiocpu.set_periodic_int(FUNC(terracre_state::irq0_line_hold), attotime::from_hz(XTAL(16'000'000)/4/512)); // ?
 
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
+	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE( 60 )
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(terracre_state, screen_update_amazon)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(terracre_state::screen_update_amazon));
+	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_terracre);
 	PALETTE(config, m_palette, FUNC(terracre_state::terracre_palette), 1*16+16*16+16*256, 256);
@@ -482,43 +483,42 @@ MACHINE_CONFIG_START(terracre_state::ym3526)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ymsnd", YM3526, XTAL(16'000'000)/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	YM3526(config, "ymsnd", XTAL(16'000'000)/4).add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	MCFG_DEVICE_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
-	MCFG_DEVICE_ADD("dac2", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
+	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT);
+}
 
-MACHINE_CONFIG_START(terracre_state::ym2203)
+void terracre_state::ym2203(machine_config &config)
+{
 	ym3526(config);
-	MCFG_DEVICE_MODIFY("audiocpu")
-	MCFG_DEVICE_IO_MAP(sound_2203_io_map)
+	subdevice<z80_device>("audiocpu")->set_addrmap(AS_IO, &terracre_state::sound_2203_io_map);
 
-	MCFG_DEVICE_REMOVE("ymsnd")
+	config.device_remove("ymsnd");
 
-	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(16'000'000)/4)
-	MCFG_SOUND_ROUTE(0, "speaker", 0.2)
-	MCFG_SOUND_ROUTE(1, "speaker", 0.2)
-	MCFG_SOUND_ROUTE(2, "speaker", 0.2)
-	MCFG_SOUND_ROUTE(3, "speaker", 0.4)
-MACHINE_CONFIG_END
+	ym2203_device &ym1(YM2203(config, "ym1", XTAL(16'000'000)/4));
+	ym1.add_route(0, "speaker", 0.2);
+	ym1.add_route(1, "speaker", 0.2);
+	ym1.add_route(2, "speaker", 0.2);
+	ym1.add_route(3, "speaker", 0.4);
+}
 
-MACHINE_CONFIG_START(terracre_state::amazon_base)
+void terracre_state::amazon_base(machine_config &config)
+{
 	ym3526(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(amazon_base_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &terracre_state::amazon_base_map);
+}
 
-MACHINE_CONFIG_START(amazon_state::amazon_1412m2)
+void amazon_state::amazon_1412m2(machine_config &config)
+{
 	amazon_base(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(amazon_1412m2_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &amazon_state::amazon_1412m2_map);
 
 	NB1412M2(config, m_prot, XTAL(16'000'000)); // divided by 4 maybe
-MACHINE_CONFIG_END
+}
 
 
 /**************************************

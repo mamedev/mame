@@ -138,8 +138,9 @@ READ32_MEMBER( sms_rapid_fire_device::pixel_r )
 }
 
 
-MACHINE_CONFIG_START(sms_rapid_fire_device::device_add_mconfig)
-	MCFG_SMS_CONTROL_PORT_ADD("ctrl", sms_control_port_devices, "joypad")
-	MCFG_SMS_CONTROL_PORT_TH_INPUT_HANDLER(WRITELINE(*this, sms_rapid_fire_device, th_pin_w))
-	MCFG_SMS_CONTROL_PORT_PIXEL_HANDLER(READ32(*this, sms_rapid_fire_device, pixel_r))
-MACHINE_CONFIG_END
+void sms_rapid_fire_device::device_add_mconfig(machine_config &config)
+{
+	SMS_CONTROL_PORT(config, m_subctrl_port, sms_control_port_devices, "joypad");
+	m_subctrl_port->th_input_handler().set(FUNC(sms_rapid_fire_device::th_pin_w));
+	m_subctrl_port->pixel_handler().set(FUNC(sms_rapid_fire_device::pixel_r));
+}

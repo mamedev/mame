@@ -528,7 +528,6 @@ void vigilant_state::vigilant(machine_config &config)
 	dac.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	dac.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
@@ -541,7 +540,7 @@ void vigilant_state::buccanrs(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &vigilant_state::vigilant_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(vigilant_state::irq0_line_hold));
 
-	z80_device &soundcpu(Z80(config, "soundcpu", 18432000/6));	/* 3.072000 MHz */
+	z80_device &soundcpu(Z80(config, "soundcpu", 18432000/6));  /* 3.072000 MHz */
 	soundcpu.set_addrmap(AS_PROGRAM, &vigilant_state::sound_map);
 	soundcpu.set_addrmap(AS_IO, &vigilant_state::buccanrs_sound_io_map);
 	soundcpu.set_periodic_int(FUNC(vigilant_state::nmi_line_pulse), attotime::from_hz(128*55));    /* clocked by V1 */
@@ -597,7 +596,6 @@ void vigilant_state::buccanrs(machine_config &config)
 	dac.add_route(ALL_OUTPUTS, "lspeaker", 0.35);
 	dac.add_route(ALL_OUTPUTS, "rspeaker", 0.35);
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
@@ -650,7 +648,6 @@ void vigilant_state::kikcubic(machine_config &config)
 	dac.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	dac.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }

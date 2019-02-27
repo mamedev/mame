@@ -60,17 +60,6 @@
 #define PORTFOLIO_MEMORY_CARD_SLOT_B_TAG     "ccmb"
 
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_PORTFOLIO_MEMORY_CARD_SLOT_ADD(_tag, _slot_intf, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, PORTFOLIO_MEMORY_CARD_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -86,8 +75,8 @@ class device_portfolio_memory_card_slot_interface : public device_slot_card_inte
 public:
 	virtual bool cdet() { return 1; }
 
-	virtual uint8_t nrdi_r(address_space &space, offs_t offset) { return 0xff; }
-	virtual void nwri_w(address_space &space, offs_t offset, uint8_t data) { }
+	virtual uint8_t nrdi_r(offs_t offset) { return 0xff; }
+	virtual void nwri_w(offs_t offset, uint8_t data) { }
 
 protected:
 	// construction/destruction
@@ -108,13 +97,23 @@ class portfolio_memory_card_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	portfolio_memory_card_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T>
+	portfolio_memory_card_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
+		: portfolio_memory_card_slot_device(mconfig, tag, owner, 0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
+
+	portfolio_memory_card_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// computer interface
 	bool cdet_r() { return (m_card != nullptr) ? m_card->cdet() : 1; }
 
-	DECLARE_READ8_MEMBER( nrdi_r ) { return (m_card != nullptr) ? m_card->nrdi_r(space, offset) : 0xff; }
-	DECLARE_WRITE8_MEMBER( nwri_w ) { if (m_card != nullptr) m_card->nwri_w(space, offset, data); }
+	uint8_t nrdi_r(offs_t offset) { return (m_card != nullptr) ? m_card->nrdi_r(offset) : 0xff; }
+	void nwri_w(offs_t offset, uint8_t data) { if (m_card != nullptr) m_card->nwri_w(offset, data); }
 
 protected:
 	// device-level overrides

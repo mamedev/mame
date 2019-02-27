@@ -364,7 +364,7 @@ MACHINE_CONFIG_START(kcgd_state::kcgd)
 
 	PALETTE(config, m_palette, FUNC(kcgd_state::kcgd_palette), 16);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_kcgd)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_kcgd);
 #if 0
 	MS7004(config, m_ms7004, 0);
 	m_ms7004->tx_handler().set("i8251kbd", FUNC(i8251_device::write_rxd));

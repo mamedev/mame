@@ -264,25 +264,26 @@ static GFXDECODE_START( gfx_wrally )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(wrally_state::wrally)
+void wrally_state::wrally(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000,XTAL(24'000'000)/2)        /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(wrally_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", wrally_state,  irq6_line_hold)
+	M68000(config, m_maincpu, XTAL(24'000'000)/2);        /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &wrally_state::wrally_map);
+	m_maincpu->set_vblank_int("screen", FUNC(wrally_state::irq6_line_hold));
 
-	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL(24'000'000) / 2) /* verified on pcb */
-	MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
+	gaelco_ds5002fp_device &ds5002(GAELCO_DS5002FP(config, "gaelco_ds5002fp", XTAL(24'000'000) / 2)); /* verified on pcb */
+	ds5002.set_addrmap(0, &wrally_state::mcu_hostmem_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(64*16, 32*16)
-	MCFG_SCREEN_VISIBLE_AREA(8, 24*16-8-1, 16, 16*16-8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(wrally_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(64*16, 32*16);
+	screen.set_visarea(8, 24*16-8-1, 16, 16*16-8-1);
+	screen.set_screen_update(FUNC(wrally_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_wrally)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_wrally);
 	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 1024*8);
 
 	GAELCO_WRALLY_SPRITES(config, m_sprites, 0);
@@ -302,10 +303,10 @@ MACHINE_CONFIG_START(wrally_state::wrally)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(1'000'000), okim6295_device::PIN7_HIGH)                 /* verified on pcb */
-	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL(1'000'000), okim6295_device::PIN7_HIGH)); /* verified on pcb */
+	oki.set_addrmap(0, &wrally_state::oki_map);
+	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 ROM_START( wrally )

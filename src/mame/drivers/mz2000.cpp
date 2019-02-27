@@ -876,11 +876,12 @@ static void mz2000_floppies(device_slot_interface &device)
 }
 
 
-MACHINE_CONFIG_START(mz2000_state::mz2000)
+void mz2000_state::mz2000(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, MASTER_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(mz2000_map)
-	MCFG_DEVICE_IO_MAP(mz2000_io)
+	Z80(config, m_maincpu, MASTER_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mz2000_state::mz2000_map);
+	m_maincpu->set_addrmap(AS_IO, &mz2000_state::mz2000_io);
 
 	i8255_device &ppi(I8255(config, "i8255_0"));
 	ppi.in_pa_callback().set(FUNC(mz2000_state::mz2000_porta_r));
@@ -903,44 +904,44 @@ MACHINE_CONFIG_START(mz2000_state::mz2000)
 
 	MB8877(config, m_mb8877a, 1_MHz_XTAL);
 
-	MCFG_FLOPPY_DRIVE_ADD("mb8877a:0", mz2000_floppies, "dd", mz2000_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("mb8877a:1", mz2000_floppies, "dd", mz2000_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("mb8877a:2", mz2000_floppies, "dd", mz2000_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("mb8877a:3", mz2000_floppies, "dd", mz2000_state::floppy_formats)
+	FLOPPY_CONNECTOR(config, "mb8877a:0", mz2000_floppies, "dd", mz2000_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "mb8877a:1", mz2000_floppies, "dd", mz2000_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "mb8877a:2", mz2000_floppies, "dd", mz2000_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "mb8877a:3", mz2000_floppies, "dd", mz2000_state::floppy_formats);
 
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "mz2000_flop")
+	SOFTWARE_LIST(config, "flop_list").set_original("mz2000_flop");
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(mz700_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("mz_cass")
+	CASSETTE(config, m_cass);
+	m_cass->set_formats(mz700_cassette_formats);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cass->set_interface("mz_cass");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list","mz2000_cass")
+	SOFTWARE_LIST(config, "cass_list").set_original("mz2000_cass");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mz2000_state, screen_update_mz2000)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(640, 480);
+	m_screen->set_visarea(0, 640-1, 0, 400-1);
+	m_screen->set_screen_update(FUNC(mz2000_state::screen_update_mz2000));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mz2000)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_mz2000);
 	PALETTE(config, m_palette, palette_device::BRG_3BIT);
 
 	SPEAKER(config, "mono").front_center();
 
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	BEEP(config, "beeper", 4096).add_route(ALL_OUTPUTS,"mono",0.15);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(mz2000_state::mz80b)
+void mz2000_state::mz80b(machine_config &config)
+{
 	mz2000(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(mz80b_io)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_IO, &mz2000_state::mz80b_io);
+}
 
 
 

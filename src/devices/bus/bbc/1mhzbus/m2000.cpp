@@ -91,7 +91,7 @@ void bbc_m2000_device::device_start()
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ8_MEMBER(bbc_m2000_device::fred_r)
+uint8_t bbc_m2000_device::fred_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -100,59 +100,59 @@ READ8_MEMBER(bbc_m2000_device::fred_r)
 		switch (offset & 0x06)
 		{
 		case 0x00:
-			data = m_acia1->read(space, offset & 1);
+			data = m_acia1->read(offset & 1);
 			break;
 		case 0x02:
-			data = m_acia2->read(space, offset & 1);
+			data = m_acia2->read(offset & 1);
 			break;
 		case 0x04:
-			data = m_acia3->read(space, offset & 1);
+			data = m_acia3->read(offset & 1);
 			break;
 		case 0x06:
 			break;
 		}
 	}
 
-	data &= m_1mhzbus->fred_r(space, offset);
+	data &= m_1mhzbus->fred_r(offset);
 
 	return data;
 }
 
-WRITE8_MEMBER(bbc_m2000_device::fred_w)
+void bbc_m2000_device::fred_w(offs_t offset, uint8_t data)
 {
 	if (offset >= 0x08 && offset < 0x10)
 	{
 		switch (offset & 0x06)
 		{
 		case 0x00:
-			m_acia1->write(space, offset & 1, data);
+			m_acia1->write(offset & 1, data);
 			break;
 		case 0x02:
-			m_acia2->write(space, offset & 1, data);
+			m_acia2->write(offset & 1, data);
 			break;
 		case 0x04:
-			m_acia3->write(space, offset & 1, data);
+			m_acia3->write(offset & 1, data);
 			break;
 		case 0x06:
 			break;
 		}
 	}
 
-	m_1mhzbus->fred_w(space, offset, data);
+	m_1mhzbus->fred_w(offset, data);
 }
 
-READ8_MEMBER(bbc_m2000_device::jim_r)
+uint8_t bbc_m2000_device::jim_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
-	data &= m_1mhzbus->jim_r(space, offset);
+	data &= m_1mhzbus->jim_r(offset);
 
 	return data;
 }
 
-WRITE8_MEMBER(bbc_m2000_device::jim_w)
+void bbc_m2000_device::jim_w(offs_t offset, uint8_t data)
 {
-	m_1mhzbus->jim_w(space, offset, data);
+	m_1mhzbus->jim_w(offset, data);
 }
 
 WRITE_LINE_MEMBER(bbc_m2000_device::write_acia_clock)

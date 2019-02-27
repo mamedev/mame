@@ -662,7 +662,6 @@ void jpmimpct_state::tms_program_map(address_map &map)
 //  AM_RANGE(0x01000000, 0x0100003f) AM_MIRROR(0xf87fffc0) AM_READWRITE(jpmimpct_bt477_r, jpmimpct_bt477_w)
 	map(0x01000000, 0x017fffff).mirror(0xf8000000).mask(0x1f).rw(FUNC(jpmimpct_state::jpmimpct_bt477_r), FUNC(jpmimpct_state::jpmimpct_bt477_w));
 	map(0x07800000, 0x07bfffff).mirror(0xf8400000).ram();
-	map(0xc0000000, 0xc00001ff).rw(m_dsp, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 }
 
 
@@ -853,7 +852,7 @@ MACHINE_CONFIG_START(jpmimpct_state::jpmimpct)
 	m_dsp->set_shiftreg_in_callback(FUNC(jpmimpct_state::to_shiftreg));
 	m_dsp->set_shiftreg_out_callback(FUNC(jpmimpct_state::from_shiftreg));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(30000))
+	config.m_minimum_quantum = attotime::from_hz(30000);
 	MCFG_MACHINE_START_OVERRIDE(jpmimpct_state,jpmimpct)
 	MCFG_MACHINE_RESET_OVERRIDE(jpmimpct_state,jpmimpct)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -1314,7 +1313,7 @@ MACHINE_CONFIG_START(jpmimpct_state::impctawp)
 	MCFG_DEVICE_ADD("maincpu",M68000, 8000000)
 	MCFG_DEVICE_PROGRAM_MAP(awp68k_program_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(30000))
+	config.m_minimum_quantum = attotime::from_hz(30000);
 	S16LF01(config, m_vfd);
 
 	MCFG_MACHINE_START_OVERRIDE(jpmimpct_state,impctawp)

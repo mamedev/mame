@@ -472,7 +472,7 @@ MACHINE_CONFIG_START(_4roses_state::_4roses)
 	MCFG_SCREEN_UPDATE_DRIVER(_4roses_state, screen_update_funworld)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_4roses)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_4roses);
 
 	PALETTE(config, "palette", FUNC(_4roses_state::funworld_palette), 0x1000);
 

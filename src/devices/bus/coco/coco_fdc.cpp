@@ -180,6 +180,15 @@ uint8_t* coco_family_fdc_device_base::get_cart_base()
 	return memregion("eprom")->base();
 }
 
+//-------------------------------------------------
+//  coco_family_fdc_device_base::get_cart_memregion
+//-------------------------------------------------
+
+memory_region* coco_family_fdc_device_base::get_cart_memregion()
+{
+	return memregion("eprom");
+}
+
 
 //***************************************************************************
 //  COCO FDCs

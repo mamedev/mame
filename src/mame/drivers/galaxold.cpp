@@ -780,7 +780,7 @@ void galaxold_state::racknrol_map(address_map &map)
 
 void galaxold_state::racknrol_io(address_map &map)
 {
-	map(0x1d, 0x1d).w("snsnd", FUNC(sn76489a_device::command_w));
+	map(0x1d, 0x1d).w("snsnd", FUNC(sn76489a_device::write));
 //  AM_RANGE(0x1e, 0x1e) AM_WRITENOP
 //  AM_RANGE(0x1f, 0x1f) AM_WRITENOP
 	map(0x20, 0x3f).w(FUNC(galaxold_state::racknrol_tiles_bank_w)).share("racknrol_tbank");
@@ -808,7 +808,7 @@ void galaxold_state::hexpoola_io(address_map &map)
 
 void galaxold_state::hexpoola_data(address_map &map)
 {
-	map(S2650_DATA_PORT, S2650_DATA_PORT).r(FUNC(galaxold_state::hexpoola_data_port_r)).w("snsnd", FUNC(sn76496_device::command_w));
+	map(S2650_DATA_PORT, S2650_DATA_PORT).r(FUNC(galaxold_state::hexpoola_data_port_r)).w("snsnd", FUNC(sn76496_device::write));
 }
 
 READ8_MEMBER(galaxold_state::bullsdrtg_data_port_r)
@@ -834,7 +834,7 @@ READ8_MEMBER(galaxold_state::bullsdrtg_data_port_r)
 
 void galaxold_state::bullsdrtg_data_map(address_map &map)
 {
-	map(S2650_DATA_PORT, S2650_DATA_PORT).r(FUNC(galaxold_state::bullsdrtg_data_port_r)).w("snsnd", FUNC(sn76496_device::command_w));
+	map(S2650_DATA_PORT, S2650_DATA_PORT).r(FUNC(galaxold_state::bullsdrtg_data_port_r)).w("snsnd", FUNC(sn76496_device::write));
 }
 
 /* Lives Dips are spread across two input ports */

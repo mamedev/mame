@@ -258,7 +258,7 @@ WRITE16_MEMBER(hp9k3xx_state::led_w)
 void hp9k3xx_state::add_dio16_bus(machine_config &config)
 {
 	bus::hp_dio::dio16_device &dio16(DIO16(config, "diobus", 0));
-	dio16.set_cputag(m_maincpu);
+	dio16.set_program_space(m_maincpu, AS_PROGRAM);
 
 	dio16.irq1_out_cb().set(FUNC(hp9k3xx_state::dio_irq1_w));
 	dio16.irq2_out_cb().set(FUNC(hp9k3xx_state::dio_irq2_w));
@@ -272,7 +272,7 @@ void hp9k3xx_state::add_dio16_bus(machine_config &config)
 void hp9k3xx_state::add_dio32_bus(machine_config &config)
 {
 	bus::hp_dio::dio32_device &dio32(DIO32(config, "diobus", 0));
-	dio32.set_cputag(m_maincpu);
+	dio32.set_program_space(m_maincpu, AS_PROGRAM);
 
 	dio32.irq1_out_cb().set(FUNC(hp9k3xx_state::dio_irq1_w));
 	dio32.irq2_out_cb().set(FUNC(hp9k3xx_state::dio_irq2_w));
@@ -323,15 +323,16 @@ WRITE32_MEMBER(hp9k3xx_state::buserror_w)
 		set_bus_error(offset << 2, false, mem_mask);
 }
 
-MACHINE_CONFIG_START(hp9k3xx_state::hp9k300)
+void hp9k3xx_state::hp9k300(machine_config &config)
+{
 	ptm6840_device &ptm(PTM6840(config, PTM6840_TAG, 250000)); // from oscillator module next to the 6840
 	ptm.set_external_clocks(250000.0f, 0.0f, 250000.0f);
 	ptm.o3_callback().set(PTM6840_TAG, FUNC(ptm6840_device::set_c2));
 	ptm.irq_callback().set_inputline("maincpu", M68K_IRQ_6);
 
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "hp9k3xx_flop")
+	SOFTWARE_LIST(config, "flop_list").set_original("hp9k3xx_flop");
 	config.set_default_layout(layout_hp9k_3xx);
-MACHINE_CONFIG_END
+}
 
 MACHINE_CONFIG_START(hp9k3xx_state::hp9k310)
 

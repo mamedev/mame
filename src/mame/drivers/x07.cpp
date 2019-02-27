@@ -1437,9 +1437,9 @@ void x07_state::machine_start()
 	{
 		// 0x4000 - 0x4fff   4KB RAM
 		// 0x6000 - 0x7fff   8KB ROM
-		program.install_read_handler(ram_size, ram_size + 0xfff, read8_delegate(FUNC(generic_slot_device::read_ram),(generic_slot_device*)m_card));
-		program.install_write_handler(ram_size, ram_size + 0xfff, write8_delegate(FUNC(generic_slot_device::write_ram),(generic_slot_device*)m_card));
-		program.install_read_handler(0x6000, 0x7fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_card));
+		program.install_read_handler(ram_size, ram_size + 0xfff, read8sm_delegate(FUNC(generic_slot_device::read_ram),(generic_slot_device*)m_card));
+		program.install_write_handler(ram_size, ram_size + 0xfff, write8sm_delegate(FUNC(generic_slot_device::write_ram),(generic_slot_device*)m_card));
+		program.install_read_handler(0x6000, 0x7fff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_card));
 
 		m_card->save_ram();
 	}
@@ -1482,18 +1482,18 @@ void x07_state::machine_reset()
 MACHINE_CONFIG_START(x07_state::x07)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NSC800, 15.36_MHz_XTAL / 4)
-	MCFG_DEVICE_PROGRAM_MAP(x07_mem)
-	MCFG_DEVICE_IO_MAP(x07_io)
+	NSC800(config, m_maincpu, 15.36_MHz_XTAL / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &x07_state::x07_mem);
+	m_maincpu->set_addrmap(AS_IO, &x07_state::x07_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("lcd", LCD)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(x07_state, screen_update)
-	MCFG_SCREEN_SIZE(120, 32)
-	MCFG_SCREEN_VISIBLE_AREA(0, 120-1, 0, 32-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &lcd(SCREEN(config, "lcd", SCREEN_TYPE_LCD));
+	lcd.set_refresh_hz(60);
+	lcd.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	lcd.set_screen_update(FUNC(x07_state::screen_update));
+	lcd.set_size(120, 32);
+	lcd.set_visarea(0, 120-1, 0, 32-1);
+	lcd.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(x07_state::x07_palette), 2);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_x07);
@@ -1501,7 +1501,7 @@ MACHINE_CONFIG_START(x07_state::x07)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, "beeper", 0).add_route(ALL_OUTPUTS, "mono", 0.50);
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* printer */
 	PRINTER(config, m_printer, 0);
@@ -1525,14 +1525,14 @@ MACHINE_CONFIG_START(x07_state::x07)
 	MCFG_GENERIC_LOAD(x07_state, x07_card)
 
 	/* cassette */
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_FORMATS(x07_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("x07_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(x07_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_interface("x07_cass");
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("card_list", "x07_card")
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "x07_cass")
+	SOFTWARE_LIST(config, "card_list").set_original("x07_card");
+	SOFTWARE_LIST(config, "cass_list").set_original("x07_cass");
 MACHINE_CONFIG_END
 
 /* ROM definition */

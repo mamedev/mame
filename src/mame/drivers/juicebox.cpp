@@ -323,9 +323,10 @@ MACHINE_CONFIG_START(juicebox_state::juicebox)
 	MCFG_SCREEN_UPDATE_DEVICE("s3c44b0", s3c44b0_device, video_update)
 
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	S3C44B0(config, m_s3c44b0, 10000000);
 	m_s3c44b0->set_cpu("maincpu");
@@ -336,7 +337,7 @@ MACHINE_CONFIG_START(juicebox_state::juicebox)
 	SMARTMEDIA(config, m_smartmedia, 0);
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","juicebox")
+	SOFTWARE_LIST(config, "cart_list").set_original("juicebox");
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( juicebox )

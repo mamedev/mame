@@ -161,21 +161,22 @@ WRITE_LINE_MEMBER( tim100_state::irq_w )
 }
 
 
-MACHINE_CONFIG_START(tim100_state::tim100)
+void tim100_state::tim100(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",I8085A, XTAL(4'915'200)) // divider unknown
-	MCFG_DEVICE_PROGRAM_MAP(tim100_mem)
-	MCFG_DEVICE_IO_MAP(tim100_io)
+	I8085A(config, m_maincpu, XTAL(4'915'200)); // divider unknown
+	m_maincpu->set_addrmap(AS_PROGRAM, &tim100_state::tim100_mem);
+	m_maincpu->set_addrmap(AS_IO, &tim100_state::tim100_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", i8276_device, screen_update)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(600, 352)
-	MCFG_SCREEN_VISIBLE_AREA(0, 40*12-1, 0, 16*16-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_screen_update("crtc", FUNC(i8276_device::screen_update));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(600, 352);
+	screen.set_visarea(0, 40*12-1, 0, 16*16-1);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tim100 )
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_tim100);
 
 	I8276(config, m_crtc, XTAL(4'915'200));
 	m_crtc->set_character_width(12);
@@ -184,7 +185,7 @@ MACHINE_CONFIG_START(tim100_state::tim100)
 	m_crtc->irq_wr_callback().set(FUNC(tim100_state::irq_w));
 	m_crtc->set_screen("screen");
 
-	MCFG_PALETTE_ADD("palette", 3)
+	PALETTE(config, m_palette).set_entries(3);
 
 	i8251_device &uart_u17(I8251(config, "uart_u17", 0));
 	uart_u17.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
@@ -213,7 +214,7 @@ MACHINE_CONFIG_START(tim100_state::tim100)
 	uart_clock.signal_handler().append("uart_u17", FUNC(i8251_device::write_rxc));
 	uart_clock.signal_handler().append("uart_u18", FUNC(i8251_device::write_txc));
 	uart_clock.signal_handler().append("uart_u18", FUNC(i8251_device::write_rxc));
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( tim100 )

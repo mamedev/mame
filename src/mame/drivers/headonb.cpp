@@ -183,7 +183,7 @@ MACHINE_CONFIG_START(headonb_state::headonb)
 	MCFG_SCREEN_UPDATE_DRIVER(headonb_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_headonb)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_headonb);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */

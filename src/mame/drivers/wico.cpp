@@ -102,7 +102,7 @@ void wico_state::hcpu_map(address_map &map)
 	map(0x1fe2, 0x1fe2).w(FUNC(wico_state::muxen_w));
 	//AM_RANGE(0x1fe3, 0x1fe3) AM_WRITE(csols_w)
 	map(0x1fe4, 0x1fe4).noprw();
-	map(0x1fe5, 0x1fe5).w("sn76494", FUNC(sn76494_device::command_w));
+	map(0x1fe5, 0x1fe5).w("sn76494", FUNC(sn76494_device::write));
 	map(0x1fe6, 0x1fe6).w(FUNC(wico_state::wdogcl_w));
 	map(0x1fe7, 0x1fe7).w(FUNC(wico_state::zcres_w));
 	map(0x1fe8, 0x1fe8).w(FUNC(wico_state::dled0_w));
@@ -125,7 +125,7 @@ void wico_state::ccpu_map(address_map &map)
 	map(0x1fe2, 0x1fe2).w(FUNC(wico_state::muxen_w)); // digit to display on diagnostic LED; d0=L will disable main displays
 	map(0x1fe3, 0x1fe3).w(FUNC(wico_state::csols_w)); // solenoid column
 	map(0x1fe4, 0x1fe4).w(FUNC(wico_state::msols_w)); // solenoid row
-	map(0x1fe5, 0x1fe5).w("sn76494", FUNC(sn76494_device::command_w));
+	map(0x1fe5, 0x1fe5).w("sn76494", FUNC(sn76494_device::write));
 	map(0x1fe6, 0x1fe6).w(FUNC(wico_state::wdogcl_w)); // watchdog clear
 	map(0x1fe7, 0x1fe7).w(FUNC(wico_state::zcres_w)); // enable IRQ on hcpu
 	map(0x1fe8, 0x1fe8).w(FUNC(wico_state::dled0_w)); // turn off diagnostic LED
@@ -440,12 +440,15 @@ void wico_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(wico_state::wico)
+void wico_state::wico(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("ccpu", MC6809E, XTAL(10'000'000) / 8) // MC68A09EP @ U51
-	MCFG_DEVICE_PROGRAM_MAP(ccpu_map)
-	MCFG_DEVICE_ADD("hcpu", MC6809E, XTAL(10'000'000) / 8) // MC68A09EP @ U24
-	MCFG_DEVICE_PROGRAM_MAP(hcpu_map)
+	MC6809E(config, m_ccpu, XTAL(10'000'000) / 8); // MC68A09EP @ U51
+	m_ccpu->set_addrmap(AS_PROGRAM, &wico_state::ccpu_map);
+
+	MC6809E(config, m_hcpu, XTAL(10'000'000) / 8); // MC68A09EP @ U24
+	m_hcpu->set_addrmap(AS_PROGRAM, &wico_state::hcpu_map);
+
 	TIMER(config, "irq").configure_periodic(FUNC(wico_state::irq_housekeeping), attotime::from_hz(120)); // zero crossing
 	TIMER(config, "firq").configure_periodic(FUNC(wico_state::firq_housekeeping), attotime::from_hz(750)); // time generator
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -456,9 +459,8 @@ MACHINE_CONFIG_START(wico_state::wico)
 	/* Sound */
 	genpin_audio(config);
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("sn76494", SN76494, XTAL(10'000'000) / 64)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-MACHINE_CONFIG_END
+	SN76494(config, "sn76494", XTAL(10'000'000) / 64).add_route(ALL_OUTPUTS, "mono", 0.75);
+}
 
 /*-------------------------------------------------------------------
 / Af-Tor (1984)

@@ -323,7 +323,7 @@ MACHINE_CONFIG_START(alg_state::alg_r1)
 	m_laserdisc->set_overlay(512*2, 262, FUNC(amiga_state::screen_update_amiga));
 	m_laserdisc->set_overlay_clip((129-8)*2, (449+8-1)*2, 44-8, 244+8-1);
 	m_laserdisc->set_overlay_palette(m_palette);
-	
+
 
 	PALETTE(config, m_palette, FUNC(alg_state::amiga_palette), 4097);
 
@@ -375,7 +375,7 @@ MACHINE_CONFIG_START(alg_state::picmatic)
 	MCFG_DEVICE_REPLACE("maincpu", M68000, amiga_state::CLK_7M_PAL)
 	MCFG_DEVICE_PROGRAM_MAP(main_map_picmatic)
 
-	MCFG_DEVICE_REMOVE("screen")
+	config.device_remove("screen");
 	pal_video(config);
 
 	MCFG_DEVICE_MODIFY("amiga")

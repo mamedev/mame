@@ -223,7 +223,6 @@ void lethalj_state::lethalj_map(address_map &map)
 	map(0x04500010, 0x0450001f).portr("IN0");
 	map(0x04600000, 0x0460000f).portr("IN1");
 	map(0x04700000, 0x0470007f).w(FUNC(lethalj_state::blitter_w));
-	map(0xc0000000, 0xc00001ff).rw(m_maincpu, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xc0000240, 0xc000025f).nopw();    /* seems to be a bug in their code, one of many. */
 	map(0xff800000, 0xffffffff).rom().region("maincpu", 0);
 }

@@ -100,14 +100,6 @@ electron_cartslot_device::electron_cartslot_device(const machine_config &mconfig
 }
 
 //-------------------------------------------------
-//  electron_cartslot_device - destructor
-//-------------------------------------------------
-
-electron_cartslot_device::~electron_cartslot_device()
-{
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
@@ -237,13 +229,13 @@ std::string electron_cartslot_device::get_default_card_software(get_default_card
 //  read - cartridge read
 //-------------------------------------------------
 
-uint8_t electron_cartslot_device::read(address_space &space, offs_t offset, int infc, int infd, int romqa)
+uint8_t electron_cartslot_device::read(offs_t offset, int infc, int infd, int romqa, int oe, int oe2)
 {
 	uint8_t data = 0xff;
 
 	if (m_cart != nullptr)
 	{
-		data = m_cart->read(space, offset, infc, infd, romqa);
+		data = m_cart->read(offset, infc, infd, romqa, oe, oe2);
 	}
 
 	return data;
@@ -253,11 +245,11 @@ uint8_t electron_cartslot_device::read(address_space &space, offs_t offset, int 
 //  write - cartridge write
 //-------------------------------------------------
 
-void electron_cartslot_device::write(address_space &space, offs_t offset, uint8_t data, int infc, int infd, int romqa)
+void electron_cartslot_device::write(offs_t offset, uint8_t data, int infc, int infd, int romqa, int oe, int oe2)
 {
 	if (m_cart != nullptr)
 	{
-		m_cart->write(space, offset, data, infc, infd, romqa);
+		m_cart->write(offset, data, infc, infd, romqa, oe, oe2);
 	}
 }
 
@@ -268,15 +260,18 @@ void electron_cartslot_device::write(address_space &space, offs_t offset, uint8_
 
 #include "abr.h"
 #include "ap34.h"
+#include "ap5.h"
 #include "aqr.h"
 #include "click.h"
 #include "cumana.h"
 #include "mgc.h"
 #include "peg400.h"
+//#include "e2p.h"
 #include "sndexp.h"
 #include "sndexp3.h"
 #include "sp64.h"
 #include "stlefs.h"
+#include "tube.h"
 #include "std.h"
 
 
@@ -285,13 +280,16 @@ void electron_cart(device_slot_interface &device)
 	device.option_add_internal("std", ELECTRON_STDCART);
 	device.option_add_internal("abr", ELECTRON_ABR);
 	device.option_add_internal("ap34", ELECTRON_AP34);
+	device.option_add_internal("ap5", ELECTRON_AP5);
 	device.option_add_internal("aqr", ELECTRON_AQR);
 	device.option_add_internal("click", ELECTRON_CLICK);
 	device.option_add_internal("cumana", ELECTRON_CUMANA);
 	device.option_add_internal("mgc", ELECTRON_MGC);
 	device.option_add_internal("peg400", ELECTRON_PEG400);
+	//device.option_add_internal("e2p", ELECTRON_E2P);
 	device.option_add_internal("sndexp", ELECTRON_SNDEXP);
 	device.option_add_internal("sndexp3", ELECTRON_SNDEXP3);
 	device.option_add_internal("sp64", ELECTRON_SP64);
 	device.option_add_internal("stlefs", ELECTRON_STLEFS);
+	device.option_add_internal("tube", ELECTRON_TUBE);
 }

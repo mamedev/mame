@@ -86,11 +86,12 @@ void comx_pl80_device::comxpl80_mem(address_map &map)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(comx_pl80_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(CX005_TAG, M6805, 4000000) // CX005: some kind of MC6805/MC68HC05 clone
-	MCFG_DEVICE_PROGRAM_MAP(comxpl80_mem)
-	MCFG_DEVICE_DISABLE()
-MACHINE_CONFIG_END
+void comx_pl80_device::device_add_mconfig(machine_config &config)
+{
+	m6805_device &cx005(M6805(config, CX005_TAG, 4000000)); // CX005: some kind of MC6805/MC68HC05 clone
+	cx005.set_addrmap(AS_PROGRAM, &comx_pl80_device::comxpl80_mem);
+	cx005.set_disable();
+}
 
 
 //-------------------------------------------------

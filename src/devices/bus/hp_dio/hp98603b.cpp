@@ -34,8 +34,9 @@ ROM_START(hp98603b)
 	ROM_LOAD16_BYTE("u14.bin", 0xa0001, 65536, CRC(96527d4e) SHA1(6706ab97eab4465ea4fa2d6b07e8107468e83818))
 ROM_END
 
-MACHINE_CONFIG_START(dio16_98603b_device::device_add_mconfig)
-MACHINE_CONFIG_END
+void dio16_98603b_device::device_add_mconfig(machine_config &config)
+{
+}
 
 const tiny_rom_entry *dio16_98603b_device::device_rom_region() const
 {

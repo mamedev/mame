@@ -600,7 +600,7 @@ READ8_MEMBER( model1_state::dpram_r )
 {
 	// insert waitstate
 	m_maincpu->adjust_icount(-1);
-	return m_dpram->right_r(space, offset);
+	return m_dpram->right_r(offset);
 }
 
 WRITE8_MEMBER( model1_state::vf_outputs_w )

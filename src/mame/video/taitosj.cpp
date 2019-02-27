@@ -112,21 +112,21 @@ void taitosj_state::set_pens()
 		bit1 = (~val >> 7) & 0x01;
 		val = m_paletteram[(i << 1) | 0x00];
 		bit2 = (~val >> 0) & 0x01;
-		r = combine_3_weights(rweights, bit0, bit1, bit2);
+		r = combine_weights(rweights, bit0, bit1, bit2);
 
 		/* green component */
 		val = m_paletteram[(i << 1) | 0x01];
 		bit0 = (~val >> 3) & 0x01;
 		bit1 = (~val >> 4) & 0x01;
 		bit2 = (~val >> 5) & 0x01;
-		g = combine_3_weights(gweights, bit0, bit1, bit2);
+		g = combine_weights(gweights, bit0, bit1, bit2);
 
 		/* blue component */
 		val = m_paletteram[(i << 1) | 0x01];
 		bit0 = (~val >> 0) & 0x01;
 		bit1 = (~val >> 1) & 0x01;
 		bit2 = (~val >> 2) & 0x01;
-		b = combine_3_weights(bweights, bit0, bit1, bit2);
+		b = combine_weights(bweights, bit0, bit1, bit2);
 
 		m_palette->set_pen_color(i, rgb_t(r, g, b));
 	}

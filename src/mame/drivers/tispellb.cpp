@@ -317,7 +317,7 @@ static INPUT_PORTS_START( spellb )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_NAME("Missing Letter")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_NAME("Mystery Word")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_NAME("Scramble")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Spelling B/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispellb_state, power_button, (void *)true)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Spelling B/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispellb_state, power_button, true)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_NAME("Starts With")
 INPUT_PORTS_END
 
@@ -333,7 +333,7 @@ static INPUT_PORTS_START( mrchalgr )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_NAME("Crazy Letters")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_NAME("Letter Guesser")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_NAME("Word Challenge")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Mystery Word/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispellb_state, power_button, (void *)true)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Mystery Word/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispellb_state, power_button, true)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_NAME("Replay")
 INPUT_PORTS_END
 
@@ -345,8 +345,8 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-MACHINE_CONFIG_START(tispellb_state::rev1)
-
+void tispellb_state::rev1(machine_config &config)
+{
 	/* basic machine hardware */
 	tms0270_cpu_device &tms(TMS0270(config, m_maincpu, 350000)); // approximation
 	tms.k().set(FUNC(tispellb_state::main_read_k));
@@ -360,17 +360,17 @@ MACHINE_CONFIG_START(tispellb_state::rev1)
 	subcpu.o().set(FUNC(tispellb_state::sub_write_o));
 	subcpu.r().set(FUNC(tispellb_state::sub_write_r));
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_spellb);
 
 	/* no sound! */
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(tispellb_state::rev2)
-
+void tispellb_state::rev2(machine_config &config)
+{
 	/* basic machine hardware */
 	tms0270_cpu_device &tms(TMS0270(config, m_maincpu, 350000)); // approximation
 	tms.k().set(FUNC(tispellb_state::main_read_k));
@@ -387,9 +387,8 @@ MACHINE_CONFIG_START(tispellb_state::rev2)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 

@@ -331,13 +331,13 @@ WRITE_LINE_MEMBER(zaccaria_state::vblank_irq)
 }
 
 
-MACHINE_CONFIG_START(zaccaria_state::zaccaria)
-
+void zaccaria_state::zaccaria(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,XTAL(18'432'000)/6)   /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	Z80(config, m_maincpu, XTAL(18'432'000)/6);   /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &zaccaria_state::main_map);
 
-//  MCFG_QUANTUM_TIME(attotime::from_hz(1000000))
+//  config.m_minimum_quantum = attotime::from_hz(1000000);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -355,14 +355,14 @@ MACHINE_CONFIG_START(zaccaria_state::zaccaria)
 	ppi.out_pc_callback().set(FUNC(zaccaria_state::dsw_sel_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60.57) /* verified on pcb */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(zaccaria_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, zaccaria_state, vblank_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60.57); /* verified on pcb */
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(zaccaria_state::screen_update));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(zaccaria_state::vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_zaccaria);
 	PALETTE(config, m_palette, FUNC(zaccaria_state::zaccaria_palette), 32*8 + 32*8, 512);
@@ -370,7 +370,7 @@ MACHINE_CONFIG_START(zaccaria_state::zaccaria)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	ZACCARIA_1B11142(config, "audiopcb").add_route(ALL_OUTPUTS, "speaker", 1.0);
-MACHINE_CONFIG_END
+}
 
 
 

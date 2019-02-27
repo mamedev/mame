@@ -516,10 +516,12 @@ TIMER_DEVICE_CALLBACK_MEMBER ( sliver_state::obj_irq_cb )
 	m_maincpu->set_input_line(3, HOLD_LINE);
 }
 
-MACHINE_CONFIG_START(sliver_state::sliver)
-	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)
-	MCFG_DEVICE_PROGRAM_MAP(sliver_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sliver_state, irq4_line_hold)
+void sliver_state::sliver(machine_config &config)
+{
+	M68000(config, m_maincpu, 12000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sliver_state::sliver_map);
+	m_maincpu->set_vblank_int("screen", FUNC(sliver_state::irq4_line_hold));
+
 	TIMER(config, "obj_actel").configure_periodic(FUNC(sliver_state::obj_irq_cb), attotime::from_hz(60)); /* unknown clock, causes "obj actel ready error" without this */
 	// irq 2 valid but not used?
 
@@ -528,14 +530,14 @@ MACHINE_CONFIG_START(sliver_state::sliver)
 	m_audiocpu->set_addrmap(AS_IO, &sliver_state::soundmem_io);
 	m_audiocpu->port_out_cb<1>().set(FUNC(sliver_state::oki_setbank));
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 384-1-16, 0*8, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(sliver_state, screen_update)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(0*8, 384-1-16, 0*8, 240-1);
+	m_screen->set_screen_update(FUNC(sliver_state::screen_update));
 
-	MCFG_PALETTE_ADD("palette", 0x100)
+	PALETTE(config, "palette").set_entries(0x100);
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, "palette"));
 	ramdac.set_addrmap(0, &sliver_state::ramdac_map);
 
@@ -544,11 +546,11 @@ MACHINE_CONFIG_START(sliver_state::sliver)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
-	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.6)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.6)
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", 1000000, okim6295_device::PIN7_HIGH));
+	oki.set_addrmap(0, &sliver_state::oki_map);
+	oki.add_route(ALL_OUTPUTS, "lspeaker", 0.6);
+	oki.add_route(ALL_OUTPUTS, "rspeaker", 0.6);
+}
 
 ROM_START( sliver )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */

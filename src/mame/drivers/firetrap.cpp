@@ -618,11 +618,11 @@ void firetrap_state::machine_reset()
 void firetrap_state::firetrap(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, FIRETRAP_XTAL/2);	// 6 MHz
+	Z80(config, m_maincpu, FIRETRAP_XTAL/2);    // 6 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &firetrap_state::firetrap_map);
 	m_maincpu->set_vblank_int("screen", FUNC(firetrap_state::firetrap_irq));
 
-	M6502(config, m_audiocpu, FIRETRAP_XTAL/8);	// 1.5 MHz
+	M6502(config, m_audiocpu, FIRETRAP_XTAL/8); // 1.5 MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &firetrap_state::sound_map);
 	/* IRQs are caused by the ADPCM chip */
 	/* NMIs are caused by the main CPU */
@@ -655,20 +655,20 @@ void firetrap_state::firetrap(machine_config &config)
 	LS157(config, m_adpcm_select, 0);
 	m_adpcm_select->out_callback().set("msm", FUNC(msm5205_device::data_w));
 
-	MSM5205(config, m_msm, FIRETRAP_XTAL/32);	// 375 kHz
+	MSM5205(config, m_msm, FIRETRAP_XTAL/32);   // 375 kHz
 	m_msm->vck_callback().set(FUNC(firetrap_state::firetrap_adpcm_int));
-	m_msm->set_prescaler_selector(msm5205_device::S48_4B);	/* 7.8125kHz */
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  /* 7.8125kHz */
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.30);
 }
 
 void firetrap_state::firetrapbl(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, FIRETRAP_XTAL/2);	// 6 MHz
+	Z80(config, m_maincpu, FIRETRAP_XTAL/2);    // 6 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &firetrap_state::firetrap_bootleg_map);
 	m_maincpu->set_vblank_int("screen", FUNC(firetrap_state::firetrap_irq));
 
-	M6502(config, m_audiocpu, FIRETRAP_XTAL/8);	// 1.5 MHz
+	M6502(config, m_audiocpu, FIRETRAP_XTAL/8); // 1.5 MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &firetrap_state::sound_map);
 	/* IRQs are caused by the ADPCM chip */
 	/* NMIs are caused by the main CPU */
@@ -693,15 +693,15 @@ void firetrap_state::firetrapbl(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	ym3526_device &ymsnd(YM3526(config, "ymsnd", FIRETRAP_XTAL/4));	// 3 MHz
+	ym3526_device &ymsnd(YM3526(config, "ymsnd", FIRETRAP_XTAL/4)); // 3 MHz
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	LS157(config, m_adpcm_select, 0);
 	m_adpcm_select->out_callback().set("msm", FUNC(msm5205_device::data_w));
 
-	MSM5205(config, m_msm, FIRETRAP_XTAL/32);	// 375 kHz
+	MSM5205(config, m_msm, FIRETRAP_XTAL/32);   // 375 kHz
 	m_msm->vck_callback().set(FUNC(firetrap_state::firetrap_adpcm_int));
-	m_msm->set_prescaler_selector(msm5205_device::S48_4B);	/* 7.8125kHz */
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  /* 7.8125kHz */
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.30);
 }
 

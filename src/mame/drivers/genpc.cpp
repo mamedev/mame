@@ -61,7 +61,7 @@ MACHINE_CONFIG_START(genpc_state::pcmda)
 	MCFG_DEVICE_IO_MAP(pc8_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 
-	MCFG_IBM5160_MOTHERBOARD_ADD("mb","maincpu")
+	IBM5160_MOTHERBOARD(config, "mb", 0).set_cputag(m_maincpu);
 
 	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "mda", false) // FIXME: determine ISA bus clock
 	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "com", false)
@@ -71,13 +71,13 @@ MACHINE_CONFIG_START(genpc_state::pcmda)
 	MCFG_DEVICE_ADD("isa6", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
 
 	/* keyboard */
-	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83)
+	PC_KBDC_SLOT(config, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("640K").set_extra_options("64K, 128K, 256K, 512K");
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("disk_list","ibm5150")
+	SOFTWARE_LIST(config, "disk_list").set_original("ibm5150");
 MACHINE_CONFIG_END
 
 
@@ -90,8 +90,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(genpc_state::pccga)
 	pcmda(config);
-	MCFG_DEVICE_MODIFY("mb")
-	MCFG_DEVICE_INPUT_DEFAULTS(cga)
+	subdevice<ibm5160_mb_device>("mb")->set_input_default(DEVICE_INPUT_DEFAULTS_NAME(cga));
 	MCFG_DEVICE_MODIFY("isa1")
 	MCFG_DEVICE_SLOT_INTERFACE(pc_isa8_cards, "cga", false)
 MACHINE_CONFIG_END
@@ -101,8 +100,7 @@ MACHINE_CONFIG_START(genpc_state::pcega)
 	pccga(config);
 	MCFG_DEVICE_MODIFY("isa1")
 	MCFG_DEVICE_SLOT_INTERFACE(pc_isa8_cards, "ega", false)
-	MCFG_DEVICE_MODIFY("mb")
-	MCFG_DEVICE_INPUT_DEFAULTS(vga)
+	subdevice<ibm5160_mb_device>("mb")->set_input_default(DEVICE_INPUT_DEFAULTS_NAME(vga));
 MACHINE_CONFIG_END
 
 

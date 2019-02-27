@@ -31,12 +31,12 @@ DEFINE_DEVICE_TYPE(C64_REU1764, c64_reu1764_cartridge_device, "c64_1764reu", "17
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(c64_reu_cartridge_device::device_add_mconfig)
+void c64_reu_cartridge_device::device_add_mconfig(machine_config &config)
+{
 	MOS8726(config, m_dmac, 1000000); // dummy clock
 
-	MCFG_GENERIC_SOCKET_ADD("rom", generic_linear_slot, nullptr)
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-MACHINE_CONFIG_END
+	GENERIC_SOCKET(config, m_eprom, generic_linear_slot, nullptr, "bin,rom");
+}
 
 
 
@@ -99,15 +99,15 @@ void c64_reu_cartridge_device::device_reset()
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------
 
-uint8_t c64_reu_cartridge_device::c64_cd_r(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+uint8_t c64_reu_cartridge_device::c64_cd_r(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!m_dmac->romsel_r(roml, romh))
 	{
-		data = m_eprom->read_rom(space, offset & 0x7fff);
+		data = m_eprom->read_rom(offset & 0x7fff);
 	}
 	else if (!io2)
 	{
-		data = m_dmac->read(space, offset);
+		data = m_dmac->read(offset);
 	}
 
 	return data;
@@ -118,10 +118,10 @@ uint8_t c64_reu_cartridge_device::c64_cd_r(address_space &space, offs_t offset, 
 //  c64_cd_w - cartridge data write
 //-------------------------------------------------
 
-void c64_reu_cartridge_device::c64_cd_w(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+void c64_reu_cartridge_device::c64_cd_w(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!io2)
 	{
-		m_dmac->write(space, offset, data);
+		m_dmac->write(offset, data);
 	}
 }

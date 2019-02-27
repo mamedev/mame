@@ -291,23 +291,24 @@ uint32_t beehive_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-MACHINE_CONFIG_START(beehive_state::beehive)
+void beehive_state::beehive(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",I8085A, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(beehive_mem)
-	MCFG_DEVICE_IO_MAP(beehive_io)
+	I8085A(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &beehive_state::beehive_mem);
+	m_maincpu->set_addrmap(AS_IO, &beehive_state::beehive_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(beehive_state, screen_update)
-	MCFG_SCREEN_SIZE(640, 250)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 249)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(beehive_state::screen_update));
+	screen.set_size(640, 250);
+	screen.set_visarea(0, 639, 0, 249);
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( beehive )

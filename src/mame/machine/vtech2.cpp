@@ -43,9 +43,6 @@ void vtech2_state::init_laser()
 	// check ROM expansion
 	std::string region_tag;
 	m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
-
-	// setup expansion slot
-	m_ioexp->set_io_space(&m_maincpu->space(AS_IO));
 }
 
 
@@ -76,7 +73,7 @@ READ8_MEMBER( vtech2_state::cart_r )
 {
 	if (offset >= m_cart_size)
 		return 0xff;
-	return m_cart->read_rom(space, offset);
+	return m_cart->read_rom(offset);
 }
 
 

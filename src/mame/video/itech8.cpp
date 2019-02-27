@@ -165,7 +165,7 @@ void itech8_state::video_start()
 
 WRITE8_MEMBER(itech8_state::palette_w)
 {
-	m_tlc34076->write(space, offset/2, data);
+	m_tlc34076->write(offset/2, data);
 }
 
 

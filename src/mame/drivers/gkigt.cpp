@@ -623,7 +623,7 @@ MACHINE_CONFIG_START(igt_gameking_state::igt_gameking)
 	diag.rxd_handler().set("quart1", FUNC(sc28c94_device::rx_d_w));
 	diag.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_igt_gameking)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_igt_gameking);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

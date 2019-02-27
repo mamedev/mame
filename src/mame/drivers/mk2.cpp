@@ -200,11 +200,12 @@ WRITE8_MEMBER( mk2_state::mk2_write_b )
 }
 
 
-MACHINE_CONFIG_START(mk2_state::mk2)
+void mk2_state::mk2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6504, 1000000)
-	MCFG_DEVICE_PROGRAM_MAP(mk2_mem)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	M6504(config, m_maincpu, 1000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mk2_state::mk2_mem);
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	/* video hardware */
 	config.set_default_layout(layout_mk2);
@@ -217,11 +218,10 @@ MACHINE_CONFIG_START(mk2_state::mk2)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	TIMER(config, "led_timer").configure_periodic(FUNC(mk2_state::update_leds), attotime::from_hz(60));
-MACHINE_CONFIG_END
+}
 
 
 ROM_START(ccmk2)

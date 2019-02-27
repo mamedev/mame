@@ -2018,7 +2018,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( a400_state::a5200_interrupt )
 
 MACHINE_RESET_MEMBER( a400_state, a400 )
 {
-	m_pokey->write(machine().dummy_space(), 15, 0);
+	m_pokey->write(15, 0);
 }
 
 
@@ -2158,7 +2158,7 @@ void a400_state::atari_common(machine_config &config)
 	atari_common_nodac(config);
 
 	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.03);
-	VOLTAGE_REGULATOR(config, "vref", 0).set_output(5.0).add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	VOLTAGE_REGULATOR(config, "vref", 0).add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("48K");

@@ -3,10 +3,11 @@
 #include "emu.h"
 #include "machine/nscsi_cd.h"
 
-#define VERBOSE 1
+#define VERBOSE 0
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(NSCSI_CDROM, nscsi_cdrom_device, "scsi_cdrom", "SCSI CD-ROM")
+DEFINE_DEVICE_TYPE(NSCSI_CDROM_SGI, nscsi_cdrom_sgi_device, "scsi_cdrom_sgi", "SCSI CD-ROM SGI")
 DEFINE_DEVICE_TYPE(NSCSI_RRD45, nscsi_dec_rrd45_device, "nrrd45", "RRD45 CD-ROM (New)")
 DEFINE_DEVICE_TYPE(NSCSI_XM3301, nscsi_toshiba_xm3301_device, "nxm3301", "XM-3301TA CD-ROM (New)")
 DEFINE_DEVICE_TYPE(NSCSI_XM5301SUN, nscsi_toshiba_xm5301_sun_device, "nxm5301sun", "XM-5301B Sun 4x CD-ROM (New)")
@@ -16,6 +17,11 @@ DEFINE_DEVICE_TYPE(NSCSI_XM5701SUN, nscsi_toshiba_xm5701_sun_device, "nxm5701sun
 
 nscsi_cdrom_device::nscsi_cdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	nscsi_cdrom_device(mconfig, NSCSI_CDROM, tag, owner, "Sony", "CDU-76S", "1.0", 0x00, 0x05)
+{
+}
+
+nscsi_cdrom_sgi_device::nscsi_cdrom_sgi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	nscsi_cdrom_device(mconfig, NSCSI_CDROM_SGI, tag, owner, "Sony", "CDU-76S", "1.0", 0x00, 0x05)
 {
 }
 
@@ -202,21 +208,16 @@ void nscsi_cdrom_device::scsi_command()
 		 * is returned with sense data ILLEGAL REQUEST and LOGICAL UNIT NOT
 		 * SUPPORTED.
 		 */
-		if(lun) {
-			bad_lun();
-			return;
-		}
-
 		int page = scsi_cmdbuf[2];
 		int size = scsi_cmdbuf[4];
 		switch(page) {
 		case 0:
 			std::fill_n(scsi_cmdbuf, 36, 0);
 
-			// vendor and product information must be padded with spaces
-			std::fill_n(&scsi_cmdbuf[8], 28, 0x20);
-
-			scsi_cmdbuf[0] = 0x05; // device is present, device is CD/DVD (MMC-3)
+			if (lun != 0)
+				scsi_cmdbuf[0] = 0x7f;
+			else
+				scsi_cmdbuf[0] = 0x05; // device is present, device is CD/DVD (MMC-3)
 			scsi_cmdbuf[1] = 0x80; // media is removable
 			scsi_cmdbuf[2] = compliance; // device complies with SPC-3 standard
 			scsi_cmdbuf[3] = 0x02; // response data format = SPC-3 standard
@@ -225,6 +226,8 @@ void nscsi_cdrom_device::scsi_command()
 			strncpy((char *)&scsi_cmdbuf[8], manufacturer, 8);
 			strncpy((char *)&scsi_cmdbuf[16], product, 16);
 			strncpy((char *)&scsi_cmdbuf[32], revision, 4);
+
+			// vendor and product information must be padded with spaces
 			for(int i = 8; i < 36; i++)
 				if(scsi_cmdbuf[i] == 0)
 					scsi_cmdbuf[i] = 0x20;
@@ -253,6 +256,48 @@ void nscsi_cdrom_device::scsi_command()
 			(scsi_cmdbuf[4] & 0x2) ? (scsi_cmdbuf[4] & 0x1) ? " (LOAD)" : " (EJECT)" : "");
 		scsi_status_complete(SS_GOOD);
 		break;
+
+	case SC_RECIEVE_DIAG_RES: {
+		LOG("command RECIEVE DIAGNOSTICS RESULTS");
+		int size = (scsi_cmdbuf[3] << 8) | scsi_cmdbuf[4];
+		int pos = 0;
+		scsi_cmdbuf[pos++] = 0;
+		scsi_cmdbuf[pos++] = 6;
+		scsi_cmdbuf[pos++] = 0; // ROM is OK
+		scsi_cmdbuf[pos++] = 0; // RAM is OK
+		scsi_cmdbuf[pos++] = 0; // Data buffer is OK
+		scsi_cmdbuf[pos++] = 0; // Interface is OK
+		scsi_cmdbuf[pos++] = 0;
+		if(size > pos)
+			size = pos;
+		scsi_data_in(0, size);
+		scsi_status_complete(SS_GOOD);
+		break;
+	}
+
+	case SC_SEND_DIAGNOSTICS: {
+		LOG("command SEND DIAGNOSTICS");
+		int size = (scsi_cmdbuf[3] << 8) | scsi_cmdbuf[4];
+		if(scsi_cmdbuf[1] & 4) {
+			// Self-test
+			scsi_status_complete(SS_GOOD);
+			break;
+		}
+		int pos = 0;
+		scsi_cmdbuf[pos++] = 0;
+		scsi_cmdbuf[pos++] = 6;
+		scsi_cmdbuf[pos++] = 0; // ROM is OK
+		scsi_cmdbuf[pos++] = 0; // RAM is OK
+		scsi_cmdbuf[pos++] = 0; // Data buffer is OK
+		scsi_cmdbuf[pos++] = 0; // Interface is OK
+		scsi_cmdbuf[pos++] = 0;
+		scsi_cmdbuf[pos++] = 0;
+		if(size > pos)
+			size = pos;
+		scsi_data_in(0, size);
+		scsi_status_complete(SS_GOOD);
+		break;
+	}
 
 	case SC_READ_CAPACITY: {
 		if(!cdrom) {
@@ -321,10 +366,11 @@ void nscsi_cdrom_device::scsi_command()
 		scsi_cmdbuf[pos++] = (bytes_per_block>>8)&0xff;
 		scsi_cmdbuf[pos++] = (bytes_per_block & 0xff);
 
+		bool fail = false;
 		int pmax = page == 0x3f ? 0x3e : page;
 		int pmin = page == 0x3f ? 0x00 : page;
-		for(int page=pmax; page >= pmin; page--) {
-			switch(page) {
+		for(int p=pmax; p >= pmin; p--) {
+			switch(p) {
 			case 0x00: // Vendor specific (does not require page format)
 				scsi_cmdbuf[pos++] = 0x80; // PS, page id
 				scsi_cmdbuf[pos++] = 0x02; // Page length
@@ -352,7 +398,10 @@ void nscsi_cdrom_device::scsi_command()
 				break;
 
 			default:
-				LOG("mode sense page %02x unhandled\n", page);
+				if (page != 0x3f) {
+					LOG("mode sense page %02x unhandled\n", p);
+					fail = true;
+				}
 				break;
 			}
 		}
@@ -360,8 +409,13 @@ void nscsi_cdrom_device::scsi_command()
 		if(pos > size)
 			pos = size;
 
-		scsi_data_in(0, pos);
-		scsi_status_complete(SS_GOOD);
+		if (!fail) {
+			scsi_data_in(0, pos);
+			scsi_status_complete(SS_GOOD);
+		} else {
+			scsi_status_complete(SS_CHECK_CONDITION);
+			sense(false, SK_ILLEGAL_REQUEST, SK_ASC_INVALID_FIELD_IN_CDB);
+		}
 		break;
 	}
 
@@ -464,7 +518,6 @@ void nscsi_cdrom_device::scsi_command()
 		case 1: {
 			int len = 2 + (8 * 1);
 
-			int pos = 0;
 			scsi_cmdbuf[pos++] = (len>>8) & 0xff;
 			scsi_cmdbuf[pos++] = (len & 0xff);
 			scsi_cmdbuf[pos++] = 1;
@@ -510,5 +563,48 @@ void nscsi_cdrom_device::scsi_command()
 	default:
 		nscsi_full_device::scsi_command();
 		break;
+	}
+}
+
+enum sgi_scsi_command_e : uint8_t {
+	/*
+	 * The SGI supplied CD-ROM drives (and possibly those from some other vendors)
+	 * identify themselves as hard disk drives at poweron, and after SCSI bus resets,
+	 * until issued a vendor specific command (0xc9).  This is done because older
+	 * systems would otherwise be unable to boot and load miniroots from CD, due to
+	 * their design (they attempted to protect the user from booting from
+	 * "ridiculous" devices, long before CD-ROM drives existed).  The SGI drives are
+	 * sent a command to "revert" to CD-ROM inquiry information during boot if on
+	 * a SCSI bus handled by the PROM, but not all possible buses are handled by all
+	 * PROMs; additionally, a SCSI bus reset causes the CD-ROM drives to revert to
+	 * the poweron default, and this could happen before the hardware inventory code
+	 * in the kernel runs, if there are SCSI problems.
+	 */
+	SGI_HD2CDROM = 0xc9,
+};
+
+void nscsi_cdrom_sgi_device::scsi_command()
+{
+	switch (scsi_cmdbuf[0]) {
+	case SGI_HD2CDROM:
+		LOG("command SGI_HD2CDROM");
+		// No need to do anything (yet). Just acknowledge the command.
+		scsi_status_complete(SS_GOOD);
+		break;
+
+	default:
+		nscsi_cdrom_device::scsi_command();
+		break;
+	}
+}
+
+bool nscsi_cdrom_sgi_device::scsi_command_done(uint8_t command, uint8_t length)
+{
+	switch (command) {
+	case SGI_HD2CDROM:
+		return length == 10;
+
+	default:
+		return nscsi_full_device::scsi_command_done(command, length);
 	}
 }

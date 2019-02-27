@@ -41,8 +41,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	// device_compis_graphics_card_interface overrides
-	virtual uint8_t pcs6_6_r(address_space &space, offs_t offset) override;
-	virtual void pcs6_6_w(address_space &space, offs_t offset, uint8_t data) override;
+	virtual uint8_t pcs6_6_r(offs_t offset) override;
+	virtual void pcs6_6_w(offs_t offset, uint8_t data) override;
 
 	required_device<upd7220_device> m_crtc;
 	required_device<palette_device> m_palette;

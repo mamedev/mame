@@ -608,7 +608,7 @@ MACHINE_CONFIG_START(ddayjlc_state::ddayjlc)
 	MCFG_DEVICE_ADD("audiocpu", Z80, 12000000/4)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -620,7 +620,7 @@ MACHINE_CONFIG_START(ddayjlc_state::ddayjlc)
 	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ddayjlc_state, vblank_irq))
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_ddayjlc)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ddayjlc);
 	PALETTE(config, m_palette, FUNC(ddayjlc_state::ddayjlc_palette), 0x200+4);
 
 	SPEAKER(config, "mono").front_center();

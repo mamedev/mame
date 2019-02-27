@@ -59,6 +59,7 @@ public:
 		m_floppy0(*this, "ic68:0"),
 		m_floppy1(*this, "ic68:1"),
 		m_palette(*this, "palette"),
+		m_exp(*this, "exp"),
 		m_screen_buffer(*this, "screen_buffer"),
 		m_video_mode(0),
 		m_display_on(1),
@@ -113,6 +114,7 @@ private:
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_device<palette_device> m_palette;
+	required_device<apricot_expansion_bus_device> m_exp;
 	required_shared_ptr<uint16_t> m_screen_buffer;
 
 	bool m_video_mode;
@@ -339,7 +341,7 @@ void apricot_state::apricot_io(address_map &map)
 	map(0x00, 0x03).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
 	map(0x40, 0x47).rw(m_fdc, FUNC(wd2797_device::read), FUNC(wd2797_device::write)).umask16(0x00ff);
 	map(0x48, 0x4f).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
-	map(0x50, 0x50).mirror(0x06).w("ic7", FUNC(sn76489_device::command_w));
+	map(0x50, 0x50).mirror(0x06).w("ic7", FUNC(sn76489_device::write));
 	map(0x58, 0x5f).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
 	map(0x60, 0x60).r(FUNC(apricot_state::sio_da_r)).w(m_sio, FUNC(z80sio_device::da_w)).umask16(0x00ff);
 	map(0x62, 0x62).r(FUNC(apricot_state::sio_ca_r)).w(m_sio, FUNC(z80sio_device::ca_w)).umask16(0x00ff);
@@ -471,7 +473,13 @@ void apricot_state::apricot(machine_config &config)
 	SOFTWARE_LIST(config, "flop_list").set_original("apricot_flop");
 
 	// expansion bus
-	APRICOT_EXPANSION_BUS(config, "exp", m_cpu, m_iop);
+	APRICOT_EXPANSION_BUS(config, m_exp, 0);
+	m_exp->set_program_space(m_cpu, AS_PROGRAM);
+	m_exp->set_io_space(m_cpu, AS_IO);
+	m_exp->set_program_iop_space(m_iop, AS_PROGRAM);
+	m_exp->set_io_iop_space(m_iop, AS_IO);
+	m_exp->int2().set(m_pic, FUNC(pic8259_device::ir2_w));
+	m_exp->int3().set(m_pic, FUNC(pic8259_device::ir3_w));
 	APRICOT_EXPANSION_SLOT(config, "exp:1", apricot_expansion_cards, nullptr);
 	APRICOT_EXPANSION_SLOT(config, "exp:2", apricot_expansion_cards, nullptr);
 }

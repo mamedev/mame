@@ -187,8 +187,8 @@ static INPUT_PORTS_START( cmulti8 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(cmulti8_state::cmulti8)
-
+void cmulti8_state::cmulti8(machine_config &config)
+{
 	/* basic machine hardware */
 	TMS1070(config, m_maincpu, 250000); // approximation - RC osc. R=56K, C=68pf
 	m_maincpu->k().set(FUNC(cmulti8_state::read_k));
@@ -199,7 +199,7 @@ MACHINE_CONFIG_START(cmulti8_state::cmulti8)
 	config.set_default_layout(layout_cmulti8);
 
 	/* no sound! */
-MACHINE_CONFIG_END
+}
 
 
 
@@ -404,8 +404,8 @@ static INPUT_PORTS_START( tisr16ii )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(tisr16_state::tisr16)
-
+void tisr16_state::tisr16(machine_config &config)
+{
 	/* basic machine hardware */
 	TMS1000(config, m_maincpu, 300000); // approximation - RC osc. R=43K, C=68pf (note: tisr16ii MCU RC osc. is different: R=30K, C=100pf, same freq)
 	m_maincpu->k().set(FUNC(tisr16_state::read_k));
@@ -416,7 +416,7 @@ MACHINE_CONFIG_START(tisr16_state::tisr16)
 	config.set_default_layout(layout_tisr16);
 
 	/* no sound! */
-MACHINE_CONFIG_END
+}
 
 
 
@@ -546,8 +546,8 @@ static INPUT_PORTS_START( ti1270 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("+/-")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(ti1250_state::ti1250)
-
+void ti1250_state::ti1250(machine_config &config)
+{
 	/* basic machine hardware */
 	TMS0950(config, m_maincpu, 200000); // approximation - RC osc. R=68K, C=68pf
 	m_maincpu->k().set(FUNC(ti1250_state::read_k));
@@ -558,9 +558,10 @@ MACHINE_CONFIG_START(ti1250_state::ti1250)
 	config.set_default_layout(layout_ti1250);
 
 	/* no sound! */
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(ti1250_state::ti1270)
+void ti1250_state::ti1270(machine_config &config)
+{
 	ti1250(config);
 
 	/* basic machine hardware */
@@ -570,7 +571,7 @@ MACHINE_CONFIG_START(ti1250_state::ti1270)
 	m_maincpu->r().set(FUNC(ti1250_state::write_r));
 
 	config.set_default_layout(layout_ti1270);
-MACHINE_CONFIG_END
+}
 
 
 
@@ -676,8 +677,8 @@ static INPUT_PORTS_START( ti25503 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("1/x")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(ti25503_state::ti25503)
-
+void ti25503_state::ti25503(machine_config &config)
+{
 	/* basic machine hardware */
 	TMS1000(config, m_maincpu, 250000); // approximation
 	m_maincpu->k().set(FUNC(ti25503_state::read_k));
@@ -688,7 +689,7 @@ MACHINE_CONFIG_START(ti25503_state::ti25503)
 	config.set_default_layout(layout_ti25503);
 
 	/* no sound! */
-MACHINE_CONFIG_END
+}
 
 
 
@@ -767,20 +768,20 @@ static INPUT_PORTS_START( ti1000 )
 
 	// note: even though power buttons are on the matrix, they are not CPU-controlled
 	PORT_START("IN.3") // O3 or O4?
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)false)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, false)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("+/-")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("%")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
 
 	PORT_START("IN.4") // O5
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_DEL) PORT_NAME("On/C") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)true)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_DEL) PORT_NAME("On/C") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, true)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME(".")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("=")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(ti1000_state::ti1000)
-
+void ti1000_state::ti1000(machine_config &config)
+{
 	/* basic machine hardware */
 	TMS1990(config, m_maincpu, 250000); // approximation
 	m_maincpu->k().set(FUNC(ti1000_state::read_k));
@@ -791,7 +792,7 @@ MACHINE_CONFIG_START(ti1000_state::ti1000)
 	config.set_default_layout(layout_ti1270);
 
 	/* no sound! */
-MACHINE_CONFIG_END
+}
 
 
 
@@ -881,8 +882,8 @@ static INPUT_PORTS_START( wizatron )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(wizatron_state::wizatron)
-
+void wizatron_state::wizatron(machine_config &config)
+{
 	/* basic machine hardware */
 	TMS0970(config, m_maincpu, 250000); // approximation
 	m_maincpu->k().set(FUNC(wizatron_state::read_k));
@@ -893,7 +894,7 @@ MACHINE_CONFIG_START(wizatron_state::wizatron)
 	config.set_default_layout(layout_wizatron);
 
 	/* no sound! */
-MACHINE_CONFIG_END
+}
 
 
 
@@ -958,8 +959,8 @@ static INPUT_PORTS_START( lilprof )
 	PORT_CONFSETTING(    0x08, "4" )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(lilprof_state::lilprof)
-
+void lilprof_state::lilprof(machine_config &config)
+{
 	/* basic machine hardware */
 	TMS0970(config, m_maincpu, 250000); // approximation
 	m_maincpu->k().set(FUNC(lilprof_state::read_k));
@@ -970,7 +971,7 @@ MACHINE_CONFIG_START(lilprof_state::lilprof)
 	config.set_default_layout(layout_wizatron);
 
 	/* no sound! */
-MACHINE_CONFIG_END
+}
 
 
 
@@ -1059,20 +1060,20 @@ static INPUT_PORTS_START( lilprof78 )
 
 	// note: even though power buttons are on the matrix, they are not CPU-controlled
 	PORT_START("IN.3") // O3 or O4?
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)false)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, false)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("Set")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_L) PORT_NAME("Level")
 
 	PORT_START("IN.4") // O5
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_DEL) PORT_NAME("On") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)true)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_DEL) PORT_NAME("On") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, true)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Go")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(lilprof78_state::lilprof78)
-
+void lilprof78_state::lilprof78(machine_config &config)
+{
 	/* basic machine hardware */
 	TMS1990(config, m_maincpu, 250000); // approximation
 	m_maincpu->k().set(FUNC(lilprof78_state::read_k));
@@ -1083,7 +1084,7 @@ MACHINE_CONFIG_START(lilprof78_state::lilprof78)
 	config.set_default_layout(layout_wizatron);
 
 	/* no sound! */
-MACHINE_CONFIG_END
+}
 
 
 
@@ -1179,14 +1180,14 @@ static INPUT_PORTS_START( dataman )
 
 	// note: even though power buttons are on the matrix, they are not CPU-controlled
 	PORT_START("IN.5") // Vss!
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_U) PORT_NAME("On/User Entry") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)true)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)false)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_U) PORT_NAME("On/User Entry") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, true)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, false)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("?")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("Electro Flash")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(dataman_state::dataman)
-
+void dataman_state::dataman(machine_config &config)
+{
 	/* basic machine hardware */
 	TMS1980(config, m_maincpu, 300000); // patent says 300kHz
 	m_maincpu->k().set(FUNC(dataman_state::read_k));
@@ -1198,7 +1199,7 @@ MACHINE_CONFIG_START(dataman_state::dataman)
 	config.set_default_layout(layout_dataman);
 
 	/* no sound! */
-MACHINE_CONFIG_END
+}
 
 
 
@@ -1250,13 +1251,13 @@ static INPUT_PORTS_START( mathmarv )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("Review")
 
 	PORT_MODIFY("IN.5") // Vss!
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_N) PORT_NAME("On/Numberific") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)true)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_N) PORT_NAME("On/Numberific") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, true)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("Zap")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("Flash")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(mathmarv_state::mathmarv)
-
+void mathmarv_state::mathmarv(machine_config &config)
+{
 	/* basic machine hardware */
 	TMS1980(config, m_maincpu, 300000); // assume same as dataman
 	m_maincpu->k().set(FUNC(dataman_state::read_k));
@@ -1269,9 +1270,8 @@ MACHINE_CONFIG_START(mathmarv_state::mathmarv)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -1392,11 +1392,11 @@ static INPUT_PORTS_START( ti30 )
 
 	// note: even though power buttons are on the matrix, they are not CPU-controlled
 	PORT_START("IN.7") // Vss!
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_DEL) PORT_NAME("On/C") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)true)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_DEL) PORT_NAME("On/C") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, true)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_NAME("1/x")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_NAME(UTF8_SQUAREROOT"x")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_NAME("x" UTF8_POW_2)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)false)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, false)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tiprog )
@@ -1451,11 +1451,11 @@ static INPUT_PORTS_START( tiprog )
 
 	// note: even though power buttons are on the matrix, they are not CPU-controlled
 	PORT_START("IN.7") // Vss!
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_PGUP) PORT_NAME("C/ON") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)true)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_PGUP) PORT_NAME("C/ON") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, true)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_NAME("DEC")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_NAME("OCT")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H) PORT_NAME("HEX")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)false)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, false)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tibusan )
@@ -1511,15 +1511,15 @@ static INPUT_PORTS_START( tibusan )
 
 	// note: even though power buttons are on the matrix, they are not CPU-controlled
 	PORT_START("IN.7") // Vss!
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_DEL) PORT_NAME("On/C") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)true)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_DEL) PORT_NAME("On/C") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, true)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_NAME("2nd")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_NAME("x" UTF8_POW_2"  " UTF8_SQUAREROOT"x")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_NAME("ln(x)  e" UTF8_POW_X)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)false)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, false)
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(ti30_state::ti30)
-
+void ti30_state::ti30(machine_config &config)
+{
 	/* basic machine hardware */
 	TMS0980(config, m_maincpu, 400000); // guessed
 	m_maincpu->k().set(FUNC(ti30_state::read_k));
@@ -1531,7 +1531,7 @@ MACHINE_CONFIG_START(ti30_state::ti30)
 	config.set_default_layout(layout_ti30);
 
 	/* no sound! */
-MACHINE_CONFIG_END
+}
 
 
 

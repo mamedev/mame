@@ -206,34 +206,35 @@ MACHINE_CONFIG_START(kaypro_state::kayproii)
 	MCFG_MACHINE_RESET_OVERRIDE(kaypro_state, kaypro )
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(80*7, 24*10)
-	MCFG_SCREEN_VISIBLE_AREA(0,80*7-1,0,24*10-1)
-	MCFG_VIDEO_START_OVERRIDE(kaypro_state, kaypro )
-	MCFG_SCREEN_UPDATE_DRIVER(kaypro_state, screen_update_kayproii)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER, rgb_t::green());
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(80*7, 24*10);
+	m_screen->set_visarea(0, 80*7-1, 0, 24*10-1);
+	m_screen->set_screen_update(FUNC(kaypro_state::screen_update_kayproii));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_kayproii)
+	MCFG_VIDEO_START_OVERRIDE(kaypro_state, kaypro )
+
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_kayproii);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("beeper", BEEP, 950) /* piezo-device needs to be measured */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	BEEP(config, m_beep, 950).add_route(ALL_OUTPUTS, "mono", 1.00); /* piezo-device needs to be measured */
 
 	/* devices */
-	MCFG_QUICKLOAD_ADD("quickload", kaypro_state, kaypro, "com,cpm", 3)
+	MCFG_QUICKLOAD_ADD("quickload", kaypro_state, kaypro, "com,cpm", attotime::from_seconds(3))
 
 	kaypro_10_keyboard_device &kbd(KAYPRO_10_KEYBOARD(config, "kbd"));
 	kbd.rxd_cb().set("sio", FUNC(z80sio_device::rxb_w));
 	kbd.rxd_cb().append("sio", FUNC(z80sio_device::syncb_w));
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, kaypro_state, write_centronics_busy))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(kaypro_state::write_centronics_busy));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	output_latch_device &latch(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(latch);
 
 	rs232_port_device &serial(RS232_PORT(config, "serial", default_rs232_devices, nullptr));
 	serial.rxd_handler().set("sio", FUNC(z80sio_device::rxa_w));
@@ -266,23 +267,21 @@ MACHINE_CONFIG_START(kaypro_state::kayproii)
 	m_fdc->intrq_wr_callback().set(FUNC(kaypro_state::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(kaypro_state::fdc_drq_w));
 	m_fdc->set_force_ready(true);
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", kaypro_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", kaypro_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_SOFTWARE_LIST_ADD("flop_list","kayproii")
+	FLOPPY_CONNECTOR(config, "fdc:0", kaypro_floppies, "525ssdd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", kaypro_floppies, "525ssdd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	SOFTWARE_LIST(config, "flop_list").set_original("kayproii");
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(kaypro_state::kayproiv)
+void kaypro_state::kayproiv(machine_config &config)
+{
 	kayproii(config);
 	m_pio_s->set_clock(2500000);
 	m_pio_s->out_pa_callback().set(FUNC(kaypro_state::kayproiv_pio_system_w));
-	MCFG_DEVICE_REMOVE("fdc:0")
-	MCFG_DEVICE_REMOVE("fdc:1")
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", kaypro_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", kaypro_floppies, "525dd", floppy_image_device::default_floppy_formats)
-MACHINE_CONFIG_END
+	config.device_remove("fdc:0");
+	config.device_remove("fdc:1");
+	FLOPPY_CONNECTOR(config, "fdc:0", kaypro_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", kaypro_floppies, "525dd", floppy_image_device::default_floppy_formats);
+}
 
 MACHINE_CONFIG_START(kaypro_state::kaypro484)
 	/* basic machine hardware */
@@ -316,7 +315,7 @@ MACHINE_CONFIG_START(kaypro_state::kaypro484)
 	m_crtc->set_char_width(7);
 	m_crtc->set_update_row_callback(FUNC(kaypro_state::kaypro484_update_row), this);
 
-	MCFG_QUICKLOAD_ADD("quickload", kaypro_state, kaypro, "com,cpm", 3)
+	MCFG_QUICKLOAD_ADD("quickload", kaypro_state, kaypro, "com,cpm", attotime::from_seconds(3))
 
 	kaypro_10_keyboard_device &kbd(KAYPRO_10_KEYBOARD(config, "kbd"));
 	kbd.rxd_cb().set("sio_1", FUNC(z80sio_device::rxb_w));
@@ -324,10 +323,11 @@ MACHINE_CONFIG_START(kaypro_state::kaypro484)
 
 	CLOCK(config, "kbdtxrxc", 4800).signal_handler().set("sio_1", FUNC(z80sio_device::rxtxcb_w));
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, kaypro_state, write_centronics_busy))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(kaypro_state::write_centronics_busy));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	output_latch_device &latch(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(latch);
 
 	rs232_port_device &modem(RS232_PORT(config, "modem", default_rs232_devices, nullptr));
 	modem.rxd_handler().set("sio_1", FUNC(z80sio_device::rxa_w));
@@ -361,32 +361,31 @@ MACHINE_CONFIG_START(kaypro_state::kaypro484)
 	m_fdc->intrq_wr_callback().set(FUNC(kaypro_state::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(kaypro_state::fdc_drq_w));
 	m_fdc->set_force_ready(true);
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", kaypro_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", kaypro_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, "fdc:0", kaypro_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", kaypro_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(kaypro_state::kaypro10)
+void kaypro_state::kaypro10(machine_config &config)
+{
 	kaypro484(config);
-	MCFG_DEVICE_REMOVE("fdc:1")  // only has 1 floppy drive
+	config.device_remove("fdc:1");  // only has 1 floppy drive
 	// need to add hard drive & controller
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(kaypro_state::kaypronew2)
+void kaypro_state::kaypronew2(machine_config &config)
+{
 	kaypro484(config);
-	MCFG_DEVICE_REMOVE("fdc:1")  // only has 1 floppy drive
-MACHINE_CONFIG_END
+	config.device_remove("fdc:1");  // only has 1 floppy drive
+}
 
-MACHINE_CONFIG_START(kaypro_state::kaypro284)
+void kaypro_state::kaypro284(machine_config &config)
+{
 	kaypro484(config);
-	MCFG_DEVICE_REMOVE("fdc:0")
-	MCFG_DEVICE_REMOVE("fdc:1")
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", kaypro_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", kaypro_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-MACHINE_CONFIG_END
+	config.device_remove("fdc:0");
+	config.device_remove("fdc:1");
+	FLOPPY_CONNECTOR(config, "fdc:0", kaypro_floppies, "525ssdd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", kaypro_floppies, "525ssdd", floppy_image_device::default_floppy_formats).enable_sound(true);
+}
 
 MACHINE_CONFIG_START(kaypro_state::omni2)
 	kayproiv(config);

@@ -94,7 +94,8 @@ void intv_ecs_device::late_subslot_setup()
 //-------------------------------------------------
 
 
-MACHINE_CONFIG_START(intv_ecs_device::device_add_mconfig)
+void intv_ecs_device::device_add_mconfig(machine_config &config)
+{
 	SPEAKER(config, "mono_ecs").front_center();
 
 	AY8914(config, m_snd, XTAL(3'579'545)/2);
@@ -103,9 +104,9 @@ MACHINE_CONFIG_START(intv_ecs_device::device_add_mconfig)
 	m_snd->port_a_write_callback().set("ctrl_port", FUNC(intvecs_control_port_device::portA_w));
 	m_snd->add_route(ALL_OUTPUTS, "mono_ecs", 0.33);
 
-	MCFG_INTVECS_CONTROL_PORT_ADD("ctrl_port", intvecs_control_port_devices, "keybd")
-	MCFG_INTV_CARTRIDGE_ADD("subslot", intv_cart, nullptr)
-MACHINE_CONFIG_END
+	INTVECS_CONTROL_PORT(config, "ctrl_port", intvecs_control_port_devices, "keybd");
+	INTV_CART_SLOT(config, m_subslot, intv_cart, nullptr);
+}
 
 
 ROM_START( ecs )
@@ -166,7 +167,7 @@ READ16_MEMBER(intv_ecs_device::read_romf0)
 READ16_MEMBER(intv_ecs_device::read_ay)
 {
 	if (ACCESSING_BITS_0_7)
-		return m_snd->read(space, offset, mem_mask);
+		return m_snd->read(offset);
 	else
 		return 0xffff;
 }
@@ -178,7 +179,7 @@ READ16_MEMBER(intv_ecs_device::read_ay)
 WRITE16_MEMBER(intv_ecs_device::write_ay)
 {
 	if (ACCESSING_BITS_0_7)
-		return m_snd->write(space, offset, data, mem_mask);
+		return m_snd->write(offset, data);
 }
 
 

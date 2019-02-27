@@ -3245,7 +3245,7 @@ MACHINE_CONFIG_START(coolridr_state::coolridr)
 	io.an_port_callback<5>().set_ioport("AN5");
 	io.an_port_callback<6>().set_ioport("AN6");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_coolridr)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_coolridr);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

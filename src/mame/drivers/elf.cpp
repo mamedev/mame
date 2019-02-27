@@ -236,7 +236,8 @@ QUICKLOAD_LOAD_MEMBER( elf2_state, elf )
 	return image_init_result::PASS;
 }
 
-MACHINE_CONFIG_START(elf2_state::elf2)
+void elf2_state::elf2(machine_config &config)
+{
 	/* basic machine hardware */
 	CDP1802(config, m_maincpu, XTAL(3'579'545)/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &elf2_state::elf2_mem);
@@ -271,14 +272,14 @@ MACHINE_CONFIG_START(elf2_state::elf2)
 	DM9368(config, m_led_h, 0).update_cb().set(FUNC(elf2_state::digit_w<0>));
 	DM9368(config, m_led_l, 0).update_cb().set(FUNC(elf2_state::digit_w<1>));
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
 
-	MCFG_QUICKLOAD_ADD("quickload", elf2_state, elf, "bin", 0)
+	QUICKLOAD(config, "quickload").set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(elf2_state, elf), this), "bin");
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("256");
-MACHINE_CONFIG_END
+}
 
 /* ROMs */
 

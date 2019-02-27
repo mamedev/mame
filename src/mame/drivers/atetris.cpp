@@ -195,9 +195,9 @@ void atetris_state::atetrisb2_map(address_map &map)
 	map(0x1000, 0x1fff).ram().w(FUNC(atetris_state::videoram_w)).share("videoram");
 	map(0x2000, 0x20ff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
 	map(0x2400, 0x25ff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write));
-	map(0x2802, 0x2802).w("sn1", FUNC(sn76496_device::command_w));
-	map(0x2804, 0x2804).w("sn2", FUNC(sn76496_device::command_w));
-	map(0x2806, 0x2806).w("sn3", FUNC(sn76496_device::command_w));
+	map(0x2802, 0x2802).w("sn1", FUNC(sn76496_device::write));
+	map(0x2804, 0x2804).w("sn2", FUNC(sn76496_device::write));
+	map(0x2806, 0x2806).w("sn3", FUNC(sn76496_device::write));
 	map(0x2808, 0x2808).portr("IN0");
 	map(0x2808, 0x280f).nopw();
 	map(0x2818, 0x2818).portr("IN1");

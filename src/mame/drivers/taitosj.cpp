@@ -1770,33 +1770,33 @@ WRITE8_MEMBER(taitosj_state::taitosj_dacvol_w)
 	m_dacvol->write(NODE_01, data ^ 0xff); // 7416 hex inverter
 }
 
-MACHINE_CONFIG_START(taitosj_state::nomcu)
-
+void taitosj_state::nomcu(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80,XTAL(8'000'000)/2)      /* 8 MHz / 2, on CPU board */
-	MCFG_DEVICE_PROGRAM_MAP(taitosj_main_nomcu_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitosj_state,  irq0_line_hold)
+	Z80(config, m_maincpu, XTAL(8'000'000)/2);      /* 8 MHz / 2, on CPU board */
+	m_maincpu->set_addrmap(AS_PROGRAM, &taitosj_state::taitosj_main_nomcu_map);
+	m_maincpu->set_vblank_int("screen", FUNC(taitosj_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80,XTAL(6'000'000)/2)    /* 6 MHz / 2, on GAME board */
-	MCFG_DEVICE_PROGRAM_MAP(taitosj_audio_map)
+	Z80(config, m_audiocpu, XTAL(6'000'000)/2);    /* 6 MHz / 2, on GAME board */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &taitosj_state::taitosj_audio_map);
 			/* interrupts: */
 			/* - no interrupts synced with vblank */
 			/* - NMI triggered by the main CPU */
 			/* - periodic IRQ, with frequency 6000000/(4*16*16*10*16) = 36.621 Hz, */
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(taitosj_state, irq0_line_hold, XTAL(6'000'000)/(4*16*16*10*16))
+	m_audiocpu->set_periodic_int(FUNC(taitosj_state::irq0_line_hold), attotime::from_hz(XTAL(6'000'000)/(4*16*16*10*16)));
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(taitosj_state, screen_update_taitosj)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(taitosj_state::screen_update_taitosj));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taitosj)
-	MCFG_PALETTE_ADD("palette", 64)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_taitosj);
+	PALETTE(config, m_palette).set_entries(64);
 
 
 	/* sound hardware */
@@ -1835,19 +1835,20 @@ MACHINE_CONFIG_START(taitosj_state::nomcu)
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128); // 74LS393 on CPU board, counts 128 vblanks before firing watchdog
 
-	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15) // 30k r-2r network
-	MCFG_DEVICE_ADD("dacvol", DISCRETE, taitosj_dacvol_discrete)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.15); // 30k r-2r network
+	DISCRETE(config, m_dacvol, taitosj_dacvol_discrete);
+	m_dacvol->add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	m_dacvol->add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 
 /* same as above, but with additional 68705 MCU */
-MACHINE_CONFIG_START(taitosj_state::mcu)
+void taitosj_state::mcu(machine_config &config)
+{
 	nomcu(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(taitosj_main_mcu_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &taitosj_state::taitosj_main_mcu_map);
 
 	TAITO_SJ_SECURITY_MCU(config, m_mcu, XTAL(3'000'000));   /* xtal is 3MHz, divided by 4 internally */
 	m_mcu->set_int_mode(taito_sj_security_mcu_device::int_mode::LATCH);
@@ -1856,20 +1857,19 @@ MACHINE_CONFIG_START(taitosj_state::mcu)
 	m_mcu->m68intrq_cb().set(FUNC(taitosj_state::mcu_intrq_w));
 	m_mcu->busrq_cb().set(FUNC(taitosj_state::mcu_busrq_w));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
-MACHINE_CONFIG_END
+	config.m_minimum_quantum = attotime::from_hz(6000);
+}
 
 
-MACHINE_CONFIG_START(taitosj_state::kikstart)
+void taitosj_state::kikstart(machine_config &config)
+{
 	mcu(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(kikstart_main_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &taitosj_state::kikstart_main_map);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(taitosj_state, screen_update_kikstart)
-MACHINE_CONFIG_END
+	m_screen->set_screen_update(FUNC(taitosj_state::screen_update_kikstart));
+}
 
 
 

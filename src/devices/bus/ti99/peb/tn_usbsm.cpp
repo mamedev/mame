@@ -366,12 +366,13 @@ INPUT_PORTS_START( tn_usbsm )
 		PORT_DIPSETTING( 0x01, "Geneve mode")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(nouspikel_usb_smartmedia_device::device_add_mconfig)
+void nouspikel_usb_smartmedia_device::device_add_mconfig(machine_config &config)
+{
 	SMARTMEDIA(config, "smartmedia", 0);
 	STRATAFLASH(config, STRATA_TAG, 0);
 	RAM(config, RAM1_TAG).set_default_size("512K").set_default_value(0);
 	RAM(config, RAM2_TAG).set_default_size("512K").set_default_value(0);
-MACHINE_CONFIG_END
+}
 
 ioport_constructor nouspikel_usb_smartmedia_device::device_input_ports() const
 {

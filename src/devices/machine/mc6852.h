@@ -52,8 +52,8 @@ public:
 	auto sm_dtr_callback() { return m_write_sm_dtr.bind(); }
 	auto tuf_callback() { return m_write_tuf.bind(); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( rx_data_w ) { device_serial_interface::rx_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( rx_clk_w ) { rx_clock_w(state); }

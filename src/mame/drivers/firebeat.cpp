@@ -1175,8 +1175,8 @@ static void firebeat_ata_devices(device_slot_interface &device)
 	device.option_add("cdrom", ATAPI_FIXED_CDROM);
 }
 
-MACHINE_CONFIG_START(firebeat_state::firebeat)
-
+void firebeat_state::firebeat(machine_config &config)
+{
 	/* basic machine hardware */
 	PPC403GCX(config, m_maincpu, XTAL(64'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &firebeat_state::firebeat_map);

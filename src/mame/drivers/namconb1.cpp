@@ -1036,13 +1036,14 @@ void namconb1_state::machine_reset()
 
 /***************************************************************/
 
-MACHINE_CONFIG_START(namconb1_state::namconb1)
-	MCFG_DEVICE_ADD("maincpu", M68EC020, MASTER_CLOCK/2)
-	MCFG_DEVICE_PROGRAM_MAP(namconb1_am)
+void namconb1_state::namconb1(machine_config &config)
+{
+	M68EC020(config, m_maincpu, MASTER_CLOCK/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &namconb1_state::namconb1_am);
 
-	MCFG_DEVICE_ADD("mcu", NAMCO_C75, MASTER_CLOCK/3)
-	MCFG_DEVICE_PROGRAM_MAP(namcoc75_am)
-	MCFG_DEVICE_IO_MAP(namcoc75_io)
+	NAMCO_C75(config, m_mcu, MASTER_CLOCK/3);
+	m_mcu->set_addrmap(AS_PROGRAM, &namconb1_state::namcoc75_am);
+	m_mcu->set_addrmap(AS_IO, &namconb1_state::namcoc75_io);
 
 	EEPROM_2816(config, "eeprom");
 
@@ -1082,18 +1083,19 @@ MACHINE_CONFIG_START(namconb1_state::namconb1)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("c352", C352, MASTER_CLOCK/2, 288)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
-	//MCFG_SOUND_ROUTE(2, "lspeaker", 1.00) // Second DAC not present.
-	//MCFG_SOUND_ROUTE(3, "rspeaker", 1.00)
-MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(namconb1_state::namconb2)
+	c352_device &c352(C352(config, "c352", MASTER_CLOCK/2, 288));
+	c352.add_route(0, "lspeaker", 1.00);
+	c352.add_route(1, "rspeaker", 1.00);
+	//c352.add_route(2, "lspeaker", 1.00); // Second DAC not present.
+	//c352.add_route(3, "rspeaker", 1.00);
+}
+
+void namconb1_state::namconb2(machine_config &config)
+{
 	namconb1(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(namconb2_am)
+	m_maincpu->set_addrmap(AS_PROGRAM, &namconb1_state::namconb2_am);
 
 	m_screen->set_screen_update(FUNC(namconb1_state::screen_update_namconb2));
 
@@ -1102,9 +1104,10 @@ MACHINE_CONFIG_START(namconb1_state::namconb2)
 	m_c169roz->set_is_namcofl(false);
 	m_c169roz->set_ram_words(0x20000/2);
 	m_c169roz->set_color_base(0x1800);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(namconb1_state::machbrkr)
+void namconb1_state::machbrkr(machine_config &config)
+{
 	namconb2(config);
 
 	m_c123tmap->set_tile_callback(namco_c123tmap_device::c123_tilemap_delegate(&namconb1_state::NB2TilemapCB_machbrkr, this));
@@ -1114,9 +1117,10 @@ MACHINE_CONFIG_START(namconb1_state::machbrkr)
 	m_c355spr->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate(&namconb1_state::NB2objcode2tile_machbrkr, this));
 
 	MCFG_VIDEO_START_OVERRIDE(namconb1_state,machbrkr)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(namconb1_state::outfxies)
+void namconb1_state::outfxies(machine_config &config)
+{
 	namconb2(config);
 
 	m_c123tmap->set_tile_callback(namco_c123tmap_device::c123_tilemap_delegate(&namconb1_state::NB2TilemapCB_outfxies, this));
@@ -1126,7 +1130,7 @@ MACHINE_CONFIG_START(namconb1_state::outfxies)
 	m_c355spr->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate(&namconb1_state::NB2objcode2tile_outfxies, this));
 
 	MCFG_VIDEO_START_OVERRIDE(namconb1_state,outfxies)
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************/

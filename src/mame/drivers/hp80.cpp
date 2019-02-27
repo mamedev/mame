@@ -1331,17 +1331,18 @@ void hp85_state::rombank_mem_map(address_map &map)
 	map(0x0000, 0x1fff).rom();
 }
 
-MACHINE_CONFIG_START(hp85_state::hp85)
-	MCFG_DEVICE_ADD("cpu" , HP_CAPRICORN , MASTER_CLOCK / 16)
-	MCFG_DEVICE_PROGRAM_MAP(cpu_mem_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(hp85_state , irq_callback)
+void hp85_state::hp85(machine_config &config)
+{
+	HP_CAPRICORN(config, m_cpu, MASTER_CLOCK / 16);
+	m_cpu->set_addrmap(AS_PROGRAM, &hp85_state::cpu_mem_map);
+	m_cpu->set_irq_acknowledge_callback(FUNC(hp85_state::irq_callback));
 
 	ADDRESS_MAP_BANK(config, "rombank").set_map(&hp85_state::rombank_mem_map).set_options(ENDIANNESS_LITTLE, 8, 21, HP80_OPTROM_SIZE);
 
-	MCFG_SCREEN_ADD("screen" , RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK / 2 , 312 , 0 , 256 , 256 , 0 , 192)
-	MCFG_SCREEN_UPDATE_DRIVER(hp85_state , screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, hp85_state, vblank_w))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MASTER_CLOCK / 2 , 312 , 0 , 256 , 256 , 0 , 192);
+	m_screen->set_screen_update(FUNC(hp85_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(hp85_state::vblank_w));
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 	TIMER(config, m_vm_timer).configure_generic(FUNC(hp85_state::vm_timer));
 
@@ -1355,51 +1356,42 @@ MACHINE_CONFIG_START(hp85_state::hp85)
 
 	// Beeper
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("dac" , DAC_1BIT , 0)
-	MCFG_MIXER_ROUTE(ALL_OUTPUTS , "mono" , 0.5 , 0)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0)
-	MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_DEVICE_ADD("beeper" , BEEP , MASTER_CLOCK / 8192)
-	MCFG_MIXER_ROUTE(ALL_OUTPUTS , "mono" , 0.5 , 0)
+	DAC_1BIT(config, m_dac , 0).add_route(ALL_OUTPUTS, "mono", 0.5, AUTO_ALLOC_INPUT, 0);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	BEEP(config, m_beep, MASTER_CLOCK / 8192).add_route(ALL_OUTPUTS, "mono", 0.5, AUTO_ALLOC_INPUT, 0);
 
 	// Tape drive
-	MCFG_DEVICE_ADD("tape" , HP_1MA6 , 0)
+	HP_1MA6(config, "tape", 0);
 
 	// Optional ROMs
-	MCFG_DEVICE_ADD("drawer1", HP80_OPTROM_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(hp80_optrom_slot_devices, NULL, false)
-	MCFG_DEVICE_ADD("drawer2", HP80_OPTROM_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(hp80_optrom_slot_devices, NULL, false)
-	MCFG_DEVICE_ADD("drawer3", HP80_OPTROM_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(hp80_optrom_slot_devices, NULL, false)
-	MCFG_DEVICE_ADD("drawer4", HP80_OPTROM_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(hp80_optrom_slot_devices, NULL, false)
-	MCFG_DEVICE_ADD("drawer5", HP80_OPTROM_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(hp80_optrom_slot_devices, NULL, false)
-	MCFG_DEVICE_ADD("drawer6", HP80_OPTROM_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(hp80_optrom_slot_devices, NULL, false)
+	HP80_OPTROM_SLOT(config, m_rom_drawers[0]);
+	HP80_OPTROM_SLOT(config, m_rom_drawers[1]);
+	HP80_OPTROM_SLOT(config, m_rom_drawers[2]);
+	HP80_OPTROM_SLOT(config, m_rom_drawers[3]);
+	HP80_OPTROM_SLOT(config, m_rom_drawers[4]);
+	HP80_OPTROM_SLOT(config, m_rom_drawers[5]);
 
 	// I/O slots
-	MCFG_HP80_IO_SLOT_ADD("slot1" , 0)
-	MCFG_HP80_IO_IRL_CB(WRITE8(*this, hp85_state , irl_w))
-	MCFG_HP80_IO_HALT_CB(WRITE8(*this, hp85_state , halt_w))
-	MCFG_HP80_IO_SLOT_ADD("slot2" , 1)
-	MCFG_HP80_IO_IRL_CB(WRITE8(*this, hp85_state , irl_w))
-	MCFG_HP80_IO_HALT_CB(WRITE8(*this, hp85_state , halt_w))
-	MCFG_HP80_IO_SLOT_ADD("slot3" , 2)
-	MCFG_HP80_IO_IRL_CB(WRITE8(*this, hp85_state , irl_w))
-	MCFG_HP80_IO_HALT_CB(WRITE8(*this, hp85_state , halt_w))
-	MCFG_HP80_IO_SLOT_ADD("slot4" , 3)
-	MCFG_HP80_IO_IRL_CB(WRITE8(*this, hp85_state , irl_w))
-	MCFG_HP80_IO_HALT_CB(WRITE8(*this, hp85_state , halt_w))
+	HP80_IO_SLOT(config, m_io_slots[0]).set_slot_no(0);
+	m_io_slots[0]->irl_cb().set(FUNC(hp85_state::irl_w));
+	m_io_slots[0]->halt_cb().set(FUNC(hp85_state::halt_w));
+	HP80_IO_SLOT(config, m_io_slots[1]).set_slot_no(1);
+	m_io_slots[1]->irl_cb().set(FUNC(hp85_state::irl_w));
+	m_io_slots[1]->halt_cb().set(FUNC(hp85_state::halt_w));
+	HP80_IO_SLOT(config, m_io_slots[2]).set_slot_no(2);
+	m_io_slots[2]->irl_cb().set(FUNC(hp85_state::irl_w));
+	m_io_slots[2]->halt_cb().set(FUNC(hp85_state::halt_w));
+	HP80_IO_SLOT(config, m_io_slots[3]).set_slot_no(3);
+	m_io_slots[3]->irl_cb().set(FUNC(hp85_state::irl_w));
+	m_io_slots[3]->halt_cb().set(FUNC(hp85_state::halt_w));
 
 	// Printer output
 	BITBANGER(config, m_prt_graph_out, 0);
 	BITBANGER(config, m_prt_alpha_out, 0);
 
-	MCFG_SOFTWARE_LIST_ADD("optrom_list" , "hp85_rom")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "optrom_list").set_original("hp85_rom");
+}
 
 ROM_START(hp85)
 	ROM_REGION(0x6000 , "cpu" , 0)

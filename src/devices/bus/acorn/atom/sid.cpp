@@ -55,5 +55,5 @@ void atom_sid_device::device_start()
 {
 	address_space &space = m_bus->memspace();
 
-	space.install_readwrite_handler(0xbdc0, 0xbddf, read8_delegate(FUNC(mos6581_device::read), m_sid.target()), write8_delegate(FUNC(mos6581_device::write), m_sid.target()));
+	space.install_readwrite_handler(0xbdc0, 0xbddf, read8sm_delegate(FUNC(mos6581_device::read), m_sid.target()), write8sm_delegate(FUNC(mos6581_device::write), m_sid.target()));
 }

@@ -20,7 +20,7 @@ Removed now-unnecessary workarounds.
 Modifications by Bryan McPhail, June-November 2003:
 
 Correct video & interrupt timing derived from Xain schematics and confirmed on real DD board.
-Corrected interrupt handling, epecially to MCU (but one semi-hack remains).
+Corrected interrupt handling, especially to MCU (but one semi-hack remains).
 TStrike now boots but sprites don't appear (I had them working at one point, can't remember what broke them again).
 Dangerous Dungeons fixed.
 World version of Double Dragon added (actually same roms as the bootleg, but confirmed from real board)
@@ -944,14 +944,14 @@ GFXDECODE_END
 void ddragon_state::ddragon(machine_config &config)
 {
 	/* basic machine hardware */
-	HD6309E(config, m_maincpu, MAIN_CLOCK / 4);	/* HD63C09EP, 3 MHz */
+	HD6309E(config, m_maincpu, MAIN_CLOCK / 4); /* HD63C09EP, 3 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &ddragon_state::ddragon_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(ddragon_state::ddragon_scanline), "screen", 0, 1);
 
-	HD63701(config, m_subcpu, MAIN_CLOCK / 2);	/* HD63701YOP, 6 MHz / 4 internally */
+	HD63701(config, m_subcpu, MAIN_CLOCK / 2);  /* HD63701YOP, 6 MHz / 4 internally */
 	m_subcpu->set_addrmap(AS_PROGRAM, &ddragon_state::sub_map);
 
-	MC6809(config, m_soundcpu, MAIN_CLOCK / 2);	/* HD68A09P, 6 MHz / 4 internally */
+	MC6809(config, m_soundcpu, MAIN_CLOCK / 2); /* HD68A09P, 6 MHz / 4 internally */
 	m_soundcpu->set_addrmap(AS_PROGRAM, &ddragon_state::sound_map);
 
 	config.m_minimum_quantum = attotime::from_hz(60000); /* heavy interleaving to sync up sprite<->main CPUs */
@@ -1015,14 +1015,14 @@ void ddragon_state::ddragonba(machine_config &config)
 void ddragon_state::ddragon6809(machine_config &config)
 {
 	/* basic machine hardware */
-	MC6809E(config, m_maincpu, MAIN_CLOCK / 8);		/* 1.5 MHz */
+	MC6809E(config, m_maincpu, MAIN_CLOCK / 8);     /* 1.5 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &ddragon_state::ddragon_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(ddragon_state::ddragon_scanline), "screen", 0, 1);
 
-	MC6809E(config, m_subcpu, MAIN_CLOCK / 8);		/* 1.5 Mhz */
+	MC6809E(config, m_subcpu, MAIN_CLOCK / 8);      /* 1.5 Mhz */
 	m_subcpu->set_addrmap(AS_PROGRAM, &ddragon_state::sub_map);
 
-	MC6809E(config, m_soundcpu, MAIN_CLOCK / 8);	/* 1.5 MHz */
+	MC6809E(config, m_soundcpu, MAIN_CLOCK / 8);    /* 1.5 MHz */
 	m_soundcpu->set_addrmap(AS_PROGRAM, &ddragon_state::sound_map);
 
 	config.m_minimum_quantum = attotime::from_hz(60000); /* heavy interleaving to sync up sprite<->main CPUs */
@@ -1066,11 +1066,11 @@ void ddragon_state::ddragon6809(machine_config &config)
 void ddragon_state::ddragon2(machine_config &config)
 {
 	/* basic machine hardware */
-	HD6309E(config, m_maincpu, MAIN_CLOCK / 4);	/* HD63C09EP, 3 MHz */
+	HD6309E(config, m_maincpu, MAIN_CLOCK / 4); /* HD63C09EP, 3 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &ddragon_state::dd2_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(ddragon_state::ddragon_scanline), "screen", 0, 1);
 
-	Z80(config, m_subcpu, MAIN_CLOCK / 3);		/* 4 MHz */
+	Z80(config, m_subcpu, MAIN_CLOCK / 3);      /* 4 MHz */
 	m_subcpu->set_addrmap(AS_PROGRAM, &ddragon_state::dd2_sub_map);
 
 	Z80(config, m_soundcpu, 3579545);
@@ -1706,17 +1706,16 @@ ROM_START( ddragon2 )
 	ROM_LOAD( "prom.16",      0x0000, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* sprite timing (same as ddragon) */
 ROM_END
 
-// came from a dead board, 2 of the program roms were failing
-// if you attempt to use ROMs from another set it fails on Game Over due to code which should be different at 0x1800 in ic63
+
 ROM_START( ddragon2j )
 	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD( "26a9-0_j.ic38", 0x08000, 0x8000, CRC(5e4fcdff) SHA1(78bf79a0b4f248c3355fef40448c76eb028f9163) )
 	ROM_LOAD( "26aa-0_j.ic52", 0x10000, 0x8000, CRC(bfb4ee04) SHA1(3692bbdef7d5b7cc3eb76362945b91b4a0f6ad4b) )
-	ROM_LOAD( "26ab-0.ic53",   0x18000, 0x8000, NO_DUMP) // proper dump might match other sets
-	ROM_LOAD( "26ac-0_j.ic63", 0x20000, 0x8000, NO_DUMP) // should be different
+	ROM_LOAD( "26ab-0.ic53",   0x18000, 0x8000, CRC(49ddddcd) SHA1(91dc53718d04718b313f23d86e241027c89d1a03) )
+	ROM_LOAD( "26ac-0_j.ic63", 0x20000, 0x8000, CRC(165858c7) SHA1(a00953df924cff9e79d28061849070f5401014d7) )
 
 	ROM_REGION( 0x10000, "sub", 0 ) /* sprite CPU 64kb (Upper 16kb = 0) */
-	ROM_LOAD( "26ae-0.bin",   0x00000, 0x10000, CRC(ea437867) SHA1(cd910203af0565f981b9bdef51ea6e9c33ee82d3) )
+	ROM_LOAD( "26ae-0.ic37",   0x00000, 0x10000, CRC(ea437867) SHA1(cd910203af0565f981b9bdef51ea6e9c33ee82d3) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 ) /* music CPU, 64kb */
 	ROM_LOAD( "26ad-0.ic41",   0x00000, 0x8000, CRC(3788af3b) SHA1(7f8833b01522553c767c470a9c27d24e638f37b9) ) // why is this different, label was the same
@@ -2214,7 +2213,7 @@ GAME( 1987, ddragon6809a, ddragon,  ddragon6809, ddragon,  ddragon_state,  init_
 
 GAME( 1988, ddragon2,     0,        ddragon2,    ddragon2, ddragon_state,  init_ddragon2,    ROT0, "Technos Japan", "Double Dragon II - The Revenge (World)",       MACHINE_SUPPORTS_SAVE )
 GAME( 1988, ddragon2u,    ddragon2, ddragon2,    ddragon2, ddragon_state,  init_ddragon2,    ROT0, "Technos Japan", "Double Dragon II - The Revenge (US)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1988, ddragon2j,    ddragon2, ddragon2,    ddragon2, ddragon_state,  init_ddragon2,    ROT0, "Technos Japan", "Double Dragon II - The Revenge (Japan)",       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // bad dump
+GAME( 1988, ddragon2j,    ddragon2, ddragon2,    ddragon2, ddragon_state,  init_ddragon2,    ROT0, "Technos Japan", "Double Dragon II - The Revenge (Japan)",       MACHINE_SUPPORTS_SAVE )
 GAME( 1988, ddragon2b,    ddragon2, ddragon2,    ddragon2, ddragon_state,  init_ddragon2,    ROT0, "bootleg",       "Double Dragon II - The Revenge (US, bootleg)", MACHINE_SUPPORTS_SAVE )
 
 /* these were conversions of double dragon */

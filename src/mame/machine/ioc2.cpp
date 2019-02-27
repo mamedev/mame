@@ -21,7 +21,8 @@
 #define LOG_WRITE       (1 << 8)
 #define LOG_INT3        (1 << 9)
 #define LOG_PIT         (1 << 10)
-#define LOG_ALL         (LOG_PI1 | LOG_SERIAL | LOG_MOUSEKBD | LOG_PANEL | LOG_SYSID | LOG_READ | LOG_DMA_SEL | LOG_RESET | LOG_WRITE | LOG_INT3 | LOG_PIT)
+#define LOG_IRQS        (1 << 11)
+#define LOG_ALL         (LOG_PI1 | LOG_SERIAL | LOG_MOUSEKBD | LOG_PANEL | LOG_SYSID | LOG_READ | LOG_DMA_SEL | LOG_RESET | LOG_WRITE | LOG_INT3 | LOG_PIT | LOG_IRQS)
 #define LOG_DEFAULT     (LOG_ALL & ~(LOG_SYSID | LOG_MOUSEKBD))
 
 #define VERBOSE         (0)
@@ -172,26 +173,38 @@ void ioc2_device::device_reset()
 
 void ioc2_device::raise_local_irq(int channel, uint8_t mask)
 {
+	const uint8_t old = m_int3_local_status_reg[channel];
 	m_int3_local_status_reg[channel] |= mask;
-	m_maincpu->set_input_line(MIPS3_IRQ0 + channel, (m_int3_local_mask_reg[channel] & m_int3_local_status_reg[channel]) ? ASSERT_LINE : CLEAR_LINE);
+	LOGMASKED(LOG_IRQS, "Raising Local%d interrupt mask %02x, interrupt status was %02x, now %02x, %sing interrupt\n", channel, mask, old,
+		m_int3_local_status_reg[channel], (m_int3_local_mask_reg[channel] & m_int3_local_status_reg[channel]) ? "rais" : "lower");
+	m_maincpu->set_input_line(channel, (m_int3_local_mask_reg[channel] & m_int3_local_status_reg[channel]) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void ioc2_device::lower_local_irq(int channel, uint8_t mask)
 {
+	const uint8_t old = m_int3_local_status_reg[channel];
 	m_int3_local_status_reg[channel] &= ~mask;
-	m_maincpu->set_input_line(MIPS3_IRQ0 + channel, (m_int3_local_mask_reg[channel] & m_int3_local_status_reg[channel]) ? ASSERT_LINE : CLEAR_LINE);
+	LOGMASKED(LOG_IRQS, "Lowering Local%d interrupt mask %02x, interrupt status was %02x, now %02x, %sing interrupt\n", channel, mask, old,
+		m_int3_local_status_reg[channel], (m_int3_local_mask_reg[channel] & m_int3_local_status_reg[channel]) ? "rais" : "lower");
+	m_maincpu->set_input_line(channel, (m_int3_local_mask_reg[channel] & m_int3_local_status_reg[channel]) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER(ioc2_device::timer0_int)
 {
 	if (state)
-		m_maincpu->set_input_line(MIPS3_IRQ2, ASSERT_LINE);
+	{
+		LOGMASKED(LOG_IRQS, "Raising IRQ line 2\n");
+		m_maincpu->set_input_line(2, ASSERT_LINE);
+	}
 }
 
 WRITE_LINE_MEMBER(ioc2_device::timer1_int)
 {
 	if (state)
-		m_maincpu->set_input_line(MIPS3_IRQ3, ASSERT_LINE);
+	{
+		LOGMASKED(LOG_IRQS, "Raising IRQ line 3\n");
+		m_maincpu->set_input_line(3, ASSERT_LINE);
+	}
 }
 
 WRITE_LINE_MEMBER(ioc2_device::pit_clock2_out)
@@ -213,20 +226,36 @@ WRITE_LINE_MEMBER(ioc2_device::duart_int_w)
 
 void ioc2_device::set_mappable_int(uint8_t mask, bool state)
 {
+	const uint8_t old = m_int3_map_status_reg;
+	const uint8_t old0 = m_int3_map_mask_reg[0] & old;
+	const uint8_t old1 = m_int3_map_mask_reg[1] & old;
+
 	if (state)
 		m_int3_map_status_reg |= mask;
 	else
 		m_int3_map_status_reg &= ~mask;
 
-	if (m_int3_map_mask_reg[0] & m_int3_map_status_reg)
-		raise_local_irq(0, INT3_LOCAL0_MAPPABLE0);
-	else
-		lower_local_irq(0, INT3_LOCAL0_MAPPABLE0);
+	const uint8_t new0 = m_int3_map_mask_reg[0] & m_int3_map_status_reg;
+	if (old0 ^ new0)
+	{
+		LOGMASKED(LOG_IRQS, "%sing Mappable interrupt mask %02x, interrupt status was %02x, now %02x, %sing mappable0\n", state ? "Rais" : "Lower", mask, old,
+			m_int3_map_status_reg, (m_int3_map_mask_reg[0] & m_int3_map_status_reg) ? "rais" : "lower");
+		if (m_int3_map_mask_reg[0] & m_int3_map_status_reg)
+			raise_local_irq(0, INT3_LOCAL0_MAPPABLE0);
+		else
+			lower_local_irq(0, INT3_LOCAL0_MAPPABLE0);
+	}
 
-	if (m_int3_map_mask_reg[1] & m_int3_map_status_reg)
-		raise_local_irq(1, INT3_LOCAL1_MAPPABLE1);
-	else
-		lower_local_irq(1, INT3_LOCAL1_MAPPABLE1);
+	const uint8_t new1 = m_int3_map_mask_reg[1] & m_int3_map_status_reg;
+	if (old1 ^ new1)
+	{
+		LOGMASKED(LOG_IRQS, "%sing Mappable interrupt mask %02x, interrupt status was %02x, now %02x, %sing mappable1\n", state ? "Rais" : "Lower", mask, old,
+			m_int3_map_status_reg, (m_int3_map_mask_reg[0] & m_int3_map_status_reg) ? "rais" : "lower");
+		if (m_int3_map_mask_reg[1] & m_int3_map_status_reg)
+			raise_local_irq(1, INT3_LOCAL1_MAPPABLE1);
+		else
+			lower_local_irq(1, INT3_LOCAL1_MAPPABLE1);
+	}
 }
 
 READ32_MEMBER(ioc2_device::read)
@@ -624,7 +653,7 @@ void ioc2_device::set_local_int_mask(int channel, uint32_t mask)
 	if (old_line != new_line)
 	{
 		const uint32_t int_bits = (m_int3_local_mask_reg[channel] & m_int3_local_status_reg[channel]);
-		m_maincpu->set_input_line(MIPS3_IRQ0 + channel, int_bits != 0 ? ASSERT_LINE : CLEAR_LINE);
+		m_maincpu->set_input_line(channel, int_bits != 0 ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -636,9 +665,15 @@ void ioc2_device::set_map_int_mask(int channel, uint32_t mask)
 void ioc2_device::set_timer_int_clear(uint32_t data)
 {
 	if (BIT(data, 0))
-		m_maincpu->set_input_line(MIPS3_IRQ2, CLEAR_LINE);
+	{
+		LOGMASKED(LOG_IRQS, "Lowering IRQ line 2\n");
+		m_maincpu->set_input_line(2, CLEAR_LINE);
+	}
 	if (BIT(data, 1))
-		m_maincpu->set_input_line(MIPS3_IRQ3, CLEAR_LINE);
+	{
+		LOGMASKED(LOG_IRQS, "Lowering IRQ line 3\n");
+		m_maincpu->set_input_line(3, CLEAR_LINE);
+	}
 }
 
 void ioc2_device::handle_reset_reg_write(uint8_t data)

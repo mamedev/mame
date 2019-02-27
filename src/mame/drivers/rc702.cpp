@@ -331,7 +331,8 @@ static void floppies(device_slot_interface &device)
 	device.option_add("525qd", FLOPPY_525_QD);
 }
 
-MACHINE_CONFIG_START(rc702_state::rc702)
+void rc702_state::rc702(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(8'000'000) / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &rc702_state::rc702_mem);
@@ -367,8 +368,7 @@ MACHINE_CONFIG_START(rc702_state::rc702)
 	UPD765A(config, m_fdc, 8_MHz_XTAL, true, true);
 	m_fdc->intrq_wr_callback().set(m_ctc1, FUNC(z80ctc_device::trg3));
 	m_fdc->drq_wr_callback().set(m_dma, FUNC(am9517a_device::dreq1_w));
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, "fdc:0", floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
 
 	/* Keyboard */
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
@@ -379,11 +379,11 @@ MACHINE_CONFIG_START(rc702_state::rc702)
 	m_7474->comp_output_cb().set(FUNC(rc702_state::qbar_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(272*2, 200+4*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 272*2-1, 0, 200-1)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", i8275_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_size(272*2, 200+4*8);
+	screen.set_visarea(0, 272*2-1, 0, 200-1);
+	screen.set_screen_update("crtc", FUNC(i8275_device::screen_update));
 
 	i8275_device &crtc(I8275(config, "crtc", 11640000/7));
 	crtc.set_character_width(7);
@@ -397,7 +397,7 @@ MACHINE_CONFIG_START(rc702_state::rc702)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beep, 1000).add_route(ALL_OUTPUTS, "mono", 0.50);
-MACHINE_CONFIG_END
+}
 
 
 /* ROM definition */

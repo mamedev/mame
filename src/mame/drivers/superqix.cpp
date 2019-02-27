@@ -289,7 +289,7 @@ TIMER_CALLBACK_MEMBER(superqix_state::mcu_port3_w_cb)
 
 TIMER_CALLBACK_MEMBER(superqix_state::z80_ay1_sync_address_w_cb)
 {
-	m_ay1->address_w(m_maincpu->space(AS_PROGRAM), 0, param, 0xff);
+	m_ay1->address_w(param);
 }
 
 

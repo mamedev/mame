@@ -16,7 +16,7 @@ public:
 	// construction/destruction
 	nes_bandai_pt554_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE8_MEMBER(write_m) override;
+	virtual void write_m(offs_t offset, uint8_t data) override;
 
 protected:
 	// device-level overrides

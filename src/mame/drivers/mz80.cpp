@@ -277,22 +277,23 @@ TIMER_DEVICE_CALLBACK_MEMBER(mz80_state::ne555_tempo_callback)
 	m_mz80k_tempo_strobe ^= 1;
 }
 
-MACHINE_CONFIG_START(mz80_state::mz80k)
+void mz80_state::mz80k(machine_config &config)
+{
 	/* basic machine hardware */
 
 	/* main CPU */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(8'000'000) / 4)        /* 2 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(mz80k_mem)
-	MCFG_DEVICE_IO_MAP(mz80k_io)
+	Z80(config, m_maincpu, XTAL(8'000'000) / 4);        /* 2 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &mz80_state::mz80k_mem);
+	m_maincpu->set_addrmap(AS_IO, &mz80_state::mz80k_io);
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(320, 200)
-	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 199)
-	MCFG_SCREEN_UPDATE_DRIVER(mz80_state, screen_update_mz80k)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_size(320, 200);
+	screen.set_visarea(0, 319, 0, 199);
+	screen.set_screen_update(FUNC(mz80_state::screen_update_mz80k));
+	screen.set_palette("palette");
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_mz80k);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
@@ -318,10 +319,10 @@ MACHINE_CONFIG_START(mz80_state::mz80k)
 	m_pit->out_handler<2>().set(FUNC(mz80_state::pit_out2_changed));
 
 	TIMER(config, "tempo").configure_periodic(FUNC(mz80_state::ne555_tempo_callback), attotime::from_hz(34));
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(mz700_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
-MACHINE_CONFIG_END
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(mz700_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+}
 
 void mz80_state::mz80kj(machine_config &config)
 {

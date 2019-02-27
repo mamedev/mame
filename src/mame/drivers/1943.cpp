@@ -333,7 +333,7 @@ MACHINE_CONFIG_START(_1943_state::_1943)
 	MCFG_SCREEN_UPDATE_DRIVER(_1943_state, screen_update_1943)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_1943)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_1943);
 	PALETTE(config, m_palette, FUNC(_1943_state::_1943_palette), 32*4+16*16+16*16+16*16, 256);
 
 	// sound hardware

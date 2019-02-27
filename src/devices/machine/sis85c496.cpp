@@ -45,7 +45,8 @@ void sis85c496_host_device::internal_io_map(address_map &map)
 	map(0x00e0, 0x00ef).noprw();
 }
 
-MACHINE_CONFIG_START(sis85c496_host_device::device_add_mconfig)
+void sis85c496_host_device::device_add_mconfig(machine_config &config)
+{
 	PIT8254(config, m_pit8254, 0);
 	m_pit8254->set_clk<0>(4772720/4); // heartbeat IRQ
 	m_pit8254->out_handler<0>().set(FUNC(sis85c496_host_device::at_pit8254_out0_changed));
@@ -103,10 +104,10 @@ MACHINE_CONFIG_START(sis85c496_host_device::device_add_mconfig)
 	m_keybc->kbd_clk().set("pc_kbdc", FUNC(pc_kbdc_device::clock_write_from_mb));
 	m_keybc->kbd_data().set("pc_kbdc", FUNC(pc_kbdc_device::data_write_from_mb));
 
-	MCFG_DEVICE_ADD("pc_kbdc", PC_KBDC, 0)
-	MCFG_PC_KBDC_OUT_CLOCK_CB(WRITELINE("keybc", at_keyboard_controller_device, kbd_clk_w))
-	MCFG_PC_KBDC_OUT_DATA_CB(WRITELINE("keybc", at_keyboard_controller_device, kbd_data_w))
-	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL)
+	PC_KBDC(config, m_pc_kbdc, 0);
+	m_pc_kbdc->out_clock_cb().set("keybc", FUNC(at_keyboard_controller_device::kbd_clk_w));
+	m_pc_kbdc->out_data_cb().set("keybc", FUNC(at_keyboard_controller_device::kbd_data_w));
+	PC_KBDC_SLOT(config, "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL).set_pc_kbdc_slot(subdevice("pc_kbdc"));
 
 	DS12885(config, m_ds12885);
 	m_ds12885->irq().set(m_pic8259_slave, FUNC(pic8259_device::ir0_w));
@@ -115,7 +116,7 @@ MACHINE_CONFIG_START(sis85c496_host_device::device_add_mconfig)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
-MACHINE_CONFIG_END
+}
 
 
 sis85c496_host_device::sis85c496_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

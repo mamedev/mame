@@ -360,12 +360,12 @@ READ8_MEMBER(bbc_state::bbcm_tube_r)
 	if (m_acccon_itu)
 	{
 		/* internal Tube */
-		if (m_intube) data = m_intube->host_r(space, offset);
+		if (m_intube) data = m_intube->host_r(offset);
 	}
 	else
 	{
 		/* external Tube */
-		if (m_extube) data = m_extube->host_r(space, offset);
+		if (m_extube) data = m_extube->host_r(offset);
 	}
 
 	return data;
@@ -376,12 +376,12 @@ WRITE8_MEMBER(bbc_state::bbcm_tube_w)
 	if (m_acccon_itu)
 	{
 		/* internal Tube */
-		if (m_intube) m_intube->host_w(space, offset, data);
+		if (m_intube) m_intube->host_w(offset, data);
 	}
 	else
 	{
 		/* external Tube */
-		if (m_extube) m_extube->host_w(space, offset, data);
+		if (m_extube) m_extube->host_w(offset, data);
 	}
 }
 
@@ -1511,7 +1511,7 @@ void bbc_state::machine_reset()
 
 	/* install econet hardware */
 	if (m_bbcconfig.read_safe(0) & 0x04)
-		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfea0, 0xfebf, read8_delegate(FUNC(mc6854_device::read), m_adlc.target()), write8_delegate(FUNC(mc6854_device::write), m_adlc.target()));
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfea0, 0xfebf, read8sm_delegate(FUNC(mc6854_device::read), m_adlc.target()), write8sm_delegate(FUNC(mc6854_device::write), m_adlc.target()));
 	else
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0xfea0, 0xfebf, read8_delegate(FUNC(bbc_state::bbc_fe_r), this));
 

@@ -222,7 +222,8 @@ static void mbc55x_floppies(device_slot_interface &device)
 }
 
 
-MACHINE_CONFIG_START(mbc55x_state::mbc55x)
+void mbc55x_state::mbc55x(machine_config &config)
+{
 	/* basic machine hardware */
 	I8088(config, m_maincpu, 14.318181_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mbc55x_state::mbc55x_mem);
@@ -232,8 +233,7 @@ MACHINE_CONFIG_START(mbc55x_state::mbc55x)
 	m_maincpu->esc_data_handler().set("coproc", FUNC(i8087_device::addr_w));
 
 	i8087_device &i8087(I8087(config, "coproc", 14.318181_MHz_XTAL / 4));
-	i8087.set_addrmap(AS_PROGRAM, &mbc55x_state::mbc55x_mem);
-	i8087.set_data_width(8);
+	i8087.set_space_88(m_maincpu, AS_PROGRAM);
 	i8087.irq().set(m_pic, FUNC(pic8259_device::ir6_w));
 	i8087.busy().set_inputline("maincpu", INPUT_LINE_TEST);
 
@@ -265,7 +265,7 @@ MACHINE_CONFIG_START(mbc55x_state::mbc55x)
 	m_kb_uart->rts_handler().set(m_printer, FUNC(centronics_device::write_init)).invert();
 	m_kb_uart->rxrdy_handler().set(m_pic, FUNC(pic8259_device::ir3_w));
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->out_handler<0>().set(m_pic, FUNC(pic8259_device::ir0_w));
 	m_pit->out_handler<0>().append(m_pit, FUNC(pit8253_device::write_clk1));
 	m_pit->out_handler<1>().set(m_pic, FUNC(pic8259_device::ir1_w));
@@ -279,7 +279,7 @@ MACHINE_CONFIG_START(mbc55x_state::mbc55x)
 	clk_78_6khz.signal_handler().append(m_kb_uart, FUNC(i8251_device::write_txc));
 	clk_78_6khz.signal_handler().append(m_kb_uart, FUNC(i8251_device::write_rxc));
 
-	PIC8259(config, m_pic, 0);
+	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	I8255(config, m_ppi);
@@ -301,18 +301,19 @@ MACHINE_CONFIG_START(mbc55x_state::mbc55x)
 	FD1793(config, m_fdc, 14.318181_MHz_XTAL / 14); // M5W1793-02P (clock is nominally 1 MHz)
 	m_fdc->intrq_wr_callback().set(m_pic, FUNC(pic8259_device::ir5_w));
 
-	MCFG_FLOPPY_DRIVE_ADD(m_floppy[0], mbc55x_floppies, "qd", mbc55x_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(m_floppy[1], mbc55x_floppies, "qd", mbc55x_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(m_floppy[2], mbc55x_floppies, "", mbc55x_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(m_floppy[3], mbc55x_floppies, "", mbc55x_state::floppy_formats)
+	FLOPPY_CONNECTOR(config, m_floppy[0], mbc55x_floppies, "qd", mbc55x_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[1], mbc55x_floppies, "qd", mbc55x_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[2], mbc55x_floppies, "", mbc55x_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[3], mbc55x_floppies, "", mbc55x_state::floppy_formats);
 
 	/* Software list */
-	MCFG_SOFTWARE_LIST_ADD("disk_list","mbc55x")
+	SOFTWARE_LIST(config, "disk_list").set_original("mbc55x");
 
 	isa8_device &isa(ISA8(config, "isa", 14.318181_MHz_XTAL / 4));
-	isa.set_cputag(m_maincpu);
+	isa.set_memspace(m_maincpu, AS_PROGRAM);
+	isa.set_iospace(m_maincpu, AS_IO);
 	isa.irq7_callback().set(m_pic, FUNC(pic8259_device::ir7_w)); // all other IRQ and DRQ lines are NC
-	//isa.iochck_callback().set_inputline(m_maincpu, INPUT_LINE_NMI));
+	isa.iochck_callback().set_inputline(m_maincpu, INPUT_LINE_NMI).invert();
 
 	ISA8_SLOT(config, "external", 0, "isa", pc_isa8_cards, nullptr, false);
 
@@ -335,7 +336,7 @@ MACHINE_CONFIG_START(mbc55x_state::mbc55x)
 	m_printer->busy_handler().append(m_pic, FUNC(pic8259_device::ir4_w)).invert();
 	m_printer->perror_handler().set(FUNC(mbc55x_state::printer_paper_end_w));
 	m_printer->select_handler().set(FUNC(mbc55x_state::printer_select_w));
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( mbc55x )

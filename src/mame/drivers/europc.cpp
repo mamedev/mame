@@ -552,22 +552,21 @@ static void europc_fdc(device_slot_interface &device)
 }
 
 //Euro PC
-MACHINE_CONFIG_START(europc_pc_state::europc)
-	MCFG_DEVICE_ADD("maincpu", I8088, 4772720*2)
-	MCFG_DEVICE_PROGRAM_MAP(europc_map)
-	MCFG_DEVICE_IO_MAP(europc_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
+void europc_pc_state::europc(machine_config &config)
+{
+	I8088(config, m_maincpu, 4772720*2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &europc_pc_state::europc_map);
+	m_maincpu->set_addrmap(AS_IO, &europc_pc_state::europc_io);
+	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
-	MCFG_PCNOPPI_MOTHERBOARD_ADD("mb", "maincpu")
+	PCNOPPI_MOTHERBOARD(config, "mb", 0).set_cputag(m_maincpu);
 
-	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "aga", false) // FIXME: determine ISA bus clock
-	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "lpt", false)
-	MCFG_SLOT_FIXED(true)
-	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "com", false)
-	MCFG_SLOT_FIXED(true)
-	MCFG_DEVICE_ADD("isa4", ISA8_SLOT, 0, "mb:isa", europc_fdc, "fdc", false)
-	MCFG_SLOT_FIXED(true)
-	MCFG_PC_KEYB_ADD("pc_keyboard", WRITELINE("mb:pic8259", pic8259_device, ir1_w))
+	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, "aga", false); // FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, "lpt", true);
+	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, "com", true);
+	ISA8_SLOT(config, "isa4", 0, "mb:isa", europc_fdc, "fdc", true);
+	PC_KEYB(config, m_keyboard);
+	m_keyboard->keypress().set("mb:pic8259", FUNC(pic8259_device::ir1_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);;
 
@@ -576,8 +575,8 @@ MACHINE_CONFIG_START(europc_pc_state::europc)
 	RAM(config, m_ram).set_default_size("512K").set_extra_options("256K, 640K");
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("disk_list", "ibm5150")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "disk_list").set_original("ibm5150");
+}
 
 //Euro PC II
 void europc_pc_state::europc2(machine_config &config)

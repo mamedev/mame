@@ -532,7 +532,7 @@ MACHINE_CONFIG_START(kyugo_state::kyugo_base)
 	MCFG_DEVICE_IO_MAP(gyrodine_sub_portmap)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(kyugo_state, irq0_line_hold, 4*60)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	ls259_device &mainlatch(LS259(config, "mainlatch"));
 	mainlatch.q_out_cb<0>().set(FUNC(kyugo_state::nmi_mask_w));
@@ -548,7 +548,7 @@ MACHINE_CONFIG_START(kyugo_state::kyugo_base)
 	MCFG_SCREEN_UPDATE_DRIVER(kyugo_state, screen_update)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_kyugo)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_kyugo);
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 
 	/* sound hardware */

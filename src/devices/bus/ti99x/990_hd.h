@@ -23,6 +23,7 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( ti990_hd );
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( ti990_hd );
 
+	template <typename T> void set_memory_space(T &&tag, int spacenum) { m_memory_space.set_tag(std::forward<T>(tag), spacenum); }
 	auto int_cb() { return m_interrupt_callback.bind(); }
 
 protected:
@@ -71,6 +72,8 @@ private:
 	};
 
 	uint16_t m_w[8];
+
+	required_address_space m_memory_space;
 
 	devcb_write_line m_interrupt_callback;
 

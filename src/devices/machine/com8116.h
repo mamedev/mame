@@ -43,12 +43,10 @@ public:
 	auto fr_handler() { return m_fr_handler.bind(); }
 	auto ft_handler() { return m_ft_handler.bind(); }
 
-	void write_str(uint8_t data);
-	void write_stt(uint8_t data);
-	DECLARE_WRITE8_MEMBER(str_w) { write_str(data); }
-	DECLARE_WRITE8_MEMBER(stt_w) { write_stt(data); }
-	DECLARE_WRITE8_MEMBER(str_stt_w);
-	DECLARE_WRITE8_MEMBER(stt_str_w);
+	void str_w(uint8_t data);
+	void stt_w(uint8_t data);
+	void str_stt_w(uint8_t data);
+	void stt_str_w(uint8_t data);
 
 protected:
 	com8116_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const int *divisors);

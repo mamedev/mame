@@ -440,7 +440,7 @@ void super6_state::machine_reset()
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( super6 )
+//  machine_config( super6 )
 //-------------------------------------------------
 
 void super6_state::super6(machine_config &config)

@@ -32,6 +32,7 @@ extensions = [
     'sphinx.ext.mathjax',
     'sphinx.ext.viewcode',
 	'edit_on_github',
+    'sphinxcontrib.rsvgconverter'
 ]
 
 edit_on_github_project = 'mamedev/mame'

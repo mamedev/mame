@@ -39,37 +39,39 @@ DEFINE_DEVICE_TYPE(A2BUS_AESMS,  a2bus_aesms_device,  "a2aesms",  "Applied Engin
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(a2bus_sn76489_device::device_add_mconfig)
+void a2bus_sn76489_device::device_add_mconfig(machine_config &config)
+{
 	SPEAKER(config, "alf_l").front_left();
 	SPEAKER(config, "alf_r").front_right();
 
-	MCFG_DEVICE_ADD(SN1_TAG, SN76489, 1020484)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "alf_l", 0.50)
-	MCFG_DEVICE_ADD(SN2_TAG, SN76489, 1020484)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "alf_l", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "alf_r", 0.50)
-	MCFG_DEVICE_ADD(SN3_TAG, SN76489, 1020484)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "alf_r", 0.50)
-MACHINE_CONFIG_END
+	SN76489(config, m_sn1, 1020484);
+	m_sn1->add_route(ALL_OUTPUTS, "alf_l", 0.50);
+	SN76489(config, m_sn2, 1020484);
+	m_sn2->add_route(ALL_OUTPUTS, "alf_l", 0.50);
+	m_sn2->add_route(ALL_OUTPUTS, "alf_r", 0.50);
+	SN76489(config, m_sn3, 1020484);
+	m_sn3->add_route(ALL_OUTPUTS, "alf_r", 0.50);
+}
 
-MACHINE_CONFIG_START(a2bus_aesms_device::device_add_mconfig)
+void a2bus_aesms_device::device_add_mconfig(machine_config &config)
+{
 	SPEAKER(config, "alf_l").front_left();
 	SPEAKER(config, "alf_r").front_right();
 
-	MCFG_DEVICE_ADD(SN1_TAG, SN76489, 1020484)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "alf_l", 0.50)
+	SN76489(config, m_sn1, 1020484);
+	m_sn1->add_route(ALL_OUTPUTS, "alf_l", 0.50);
 
-	MCFG_DEVICE_ADD(SN2_TAG, SN76489, 1020484)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "alf_l", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "alf_r", 0.50)
+	SN76489(config, m_sn2, 1020484);
+	m_sn2->add_route(ALL_OUTPUTS, "alf_l", 0.50);
+	m_sn2->add_route(ALL_OUTPUTS, "alf_r", 0.50);
 
-	MCFG_DEVICE_ADD(SN3_TAG, SN76489, 1020484)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "alf_r", 0.50)
+	SN76489(config, m_sn3, 1020484);
+	m_sn3->add_route(ALL_OUTPUTS, "alf_r", 0.50);
 
-	MCFG_DEVICE_ADD(SN4_TAG, SN76489, 1020484)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "alf_l", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "alf_r", 0.50)
-MACHINE_CONFIG_END
+	SN76489(config, m_sn4, 1020484);
+	m_sn4->add_route(ALL_OUTPUTS, "alf_l", 0.50);
+	m_sn4->add_route(ALL_OUTPUTS, "alf_r", 0.50);
+}
 
 //**************************************************************************
 //  LIVE DEVICE

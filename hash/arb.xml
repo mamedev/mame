@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="arb" description="ARB Modules">
+
+<!-- AVE Micro Systems Auto Response Board (ARB) chess program modules -->
+
+	<software name="sargon25">
+		<description>Sargon 2.5</description>
+		<year>1980</year>
+		<publisher>AVE Micro Systems</publisher>
+		<part name="cart" interface="arb">
+			<dataarea name="rom" size="0x2000">
+				<rom name="4000-4800_ea_8332a161-1" size="0x1000" crc="00460848" sha1="ac4fe2232028bd42506a24457882296e7d3a8f54" offset="0x0000" />
+				<rom name="5000-5800_ea_8332a160-1" size="0x1000" crc="aac1dff2" sha1="9a7fc6dc98e53120e511d266304ad07f248f415a" offset="0x1000" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

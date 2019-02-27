@@ -14,11 +14,11 @@
         - HDL is also connected to WP/TS input where TS is used to detect motor status
         - 3 second motor off delay timer
     - video (video RAM is at memory top - 0x1400, i.e. 0x1ec00)
-    - keyboard ROM
-    - hires graphics board
+    - keyboard ROM, same as earlier tandy 1000
     - WD1010
     - hard disk
-    - mouse
+    - clock/mouse 8042 mcu ROM, probably same as tandy 1000 isa clock/mouse adapter
+    - sab3019 rtc
 
 */
 
@@ -213,33 +213,80 @@ READ8_MEMBER( tandy2k_state::kbint_clr_r )
 		m_kb->busy_w(1);
 		m_pic1->ir0_w(CLEAR_LINE);
 
-		m_pc_keyboard->read(space, 0);
+		return m_pc_keyboard->read(space, 0);
 	}
 
 	return 0xff;
 }
 
-READ16_MEMBER( tandy2k_state::vpac_r )
+READ8_MEMBER( tandy2k_state::clkmouse_r )
 {
-	if (ACCESSING_BITS_0_7)
+	uint8_t ret = 0;
+	switch (offset)
 	{
-		return m_vpac->read(space, offset);
+		case 0:
+			if (!m_clkmouse_cnt)
+				return 0;
+			ret = m_clkmouse_cmd[--m_clkmouse_cnt];
+			m_pic1->ir2_w(0);
+			if (m_clkmouse_cnt > 0)
+				m_mcu_delay->adjust(attotime::from_msec(1));
+			break;
+		case 2:
+			ret = m_buttons->read();
+			if (m_clkmouse_cnt)
+				ret |= 1;
+			break;
 	}
-	else
-	{
-		return 0xff00;
-	}
+	return ret;
 }
 
-WRITE16_MEMBER( tandy2k_state::vpac_w )
+WRITE8_MEMBER( tandy2k_state::clkmouse_w )
 {
-	if (ACCESSING_BITS_0_7)
+	switch (offset)
 	{
-		m_vpac->write(space, offset, data & 0xff);
-	}
-	else
-	{
-		addr_ctrl_w(space, offset, data >> 8);
+		case 0:
+			m_pic1->ir2_w(0);
+			if (m_clkmouse_cnt < 8)
+				m_clkmouse_cmd[m_clkmouse_cnt++] = data;
+			break;
+		case 1:
+			break;
+		case 2:
+			if (m_clkmouse_cnt < 8)
+				m_clkmouse_cmd[m_clkmouse_cnt++] = data;
+			switch (m_clkmouse_cmd[0])
+			{
+				case 0x01: //set time
+					break;
+				case 0x02: //read time
+					break;
+				case 0x08:
+					if(m_clkmouse_cmd[1] > 0)
+						m_clkmouse_irq |= MO_IRQ;
+					else
+						m_clkmouse_irq &= ~MO_IRQ;
+					if(m_clkmouse_cmd[2] > 0)
+						m_clkmouse_irq |= BT_IRQ;
+					else
+						m_clkmouse_irq &= ~BT_IRQ;
+					break;
+				case 0x20:
+					if(m_clkmouse_cmd[1] > 0)
+						m_mouse_timer->adjust(attotime::from_hz(40), 0, attotime::from_hz(40));
+					else
+						m_mouse_timer->adjust(attotime::never);
+					break;
+			}
+			m_clkmouse_cnt = 0;
+			break;
+		case 3:
+			m_pic1->ir2_w(0);
+			m_clkmouse_cnt = 0;
+			m_clkmouse_irq = 0;
+			m_mouse_x = m_x_axis->read();
+			m_mouse_y = m_y_axis->read();
+			break;
 	}
 }
 
@@ -306,11 +353,16 @@ WRITE8_MEMBER( tandy2k_state::addr_ctrl_w )
 
 // Memory Maps
 
+void tandy2k_state::vrambank_mem(address_map &map)
+{
+	map(0x00000, 0x17fff).ram().share("hires_ram");
+	map(0x18000, 0x1ffff).noprw();
+}
+
 void tandy2k_state::tandy2k_mem(address_map &map)
 {
 	map.unmap_value_high();
-//  AM_RANGE(0x00000, 0xdffff) AM_RAM
-	map(0xe0000, 0xf7fff).ram().share("hires_ram");
+	map(0xe0000, 0xe7fff).rw(m_vrambank, FUNC(address_map_bank_device::read16), FUNC(address_map_bank_device::write16));
 	map(0xf8000, 0xfbfff).rw(FUNC(tandy2k_state::char_ram_r), FUNC(tandy2k_state::char_ram_w)).umask16(0x00ff);
 	map(0xfc000, 0xfdfff).mirror(0x2000).rom().region(I80186_TAG, 0);
 }
@@ -329,12 +381,12 @@ void tandy2k_state::tandy2k_io(address_map &map)
 	map(0x00060, 0x00063).mirror(0xc).rw(m_pic0, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
 	map(0x00070, 0x00073).mirror(0xc).rw(m_pic1, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
 	map(0x00080, 0x00080).mirror(0xe).rw(m_fdc, FUNC(i8272a_device::mdma_r), FUNC(i8272a_device::mdma_w));
-//  AM_RANGE(0x00100, 0x0017f) AM_DEVREADWRITE8(CRT9007_TAG, crt9007_t, read, write, 0x00ff) AM_WRITE8(addr_ctrl_w, 0xff00)
-	map(0x00100, 0x0017f).rw(FUNC(tandy2k_state::vpac_r), FUNC(tandy2k_state::vpac_w));
-//  AM_RANGE(0x00180, 0x00180) AM_READ8(hires_status_r, 0x00ff)
-//  AM_RANGE(0x00180, 0x001bf) AM_WRITE(hires_palette_w)
-//  AM_RANGE(0x001a0, 0x001a0) AM_READ8(hires_plane_w, 0x00ff)
-//  AM_RANGE(0x0ff00, 0x0ffff) AM_READWRITE(i186_internal_port_r, i186_internal_port_w)
+	map(0x00100, 0x0017f).rw(m_vpac, FUNC(crt9007_device::read), FUNC(crt9007_device::write)).umask16(0x00ff);
+	map(0x00100, 0x0017f).w(FUNC(tandy2k_state::addr_ctrl_w)).umask16(0xff00);
+	map(0x00180, 0x00180).r(FUNC(tandy2k_state::hires_status_r)).umask16(0x00ff);
+	map(0x00180, 0x0018f).mirror(0x10).w(m_colpal, FUNC(palette_device::write8)).umask16(0x00ff).share("colpal");
+	map(0x001a0, 0x001a0).w(FUNC(tandy2k_state::hires_plane_w)).umask16(0x00ff);
+	map(0x002fc, 0x002ff).rw(FUNC(tandy2k_state::clkmouse_r), FUNC(tandy2k_state::clkmouse_w));
 }
 
 void tandy2k_state::tandy2k_hd_io(address_map &map)
@@ -355,13 +407,85 @@ void tandy2k_state::vpac_mem(address_map &map)
 static INPUT_PORTS_START( tandy2k )
 	// defined in machine/tandy2kb.c
 	PORT_INCLUDE(pc_keyboard)
+
+	PORT_MODIFY("pc_keyboard_2")
+	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Cursor Up") PORT_CODE(KEYCODE_UP) /*                             29  A9 */
+	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Cursor Left") PORT_CODE(KEYCODE_LEFT) /*                             2B  AB */
+
+	PORT_MODIFY("pc_keyboard_3")
+	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Caps") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE   /* Caps Lock                   3A  BA */
+
+	PORT_MODIFY("pc_keyboard_4")
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("NumLock") PORT_CODE(KEYCODE_NUMLOCK) PORT_TOGGLE /* Num Lock                    45  C5 */
+	/* Hold corresponds to Scroll Lock, but pauses the system when pressed - leaving unmapped by default to avoid conflicting with the UI Toggle key */
+	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Hold")     /*                            46  C6 */
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 7 \\") PORT_CODE(KEYCODE_7_PAD) /* Keypad 7                    47  C7 */
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 8 ~") PORT_CODE(KEYCODE_8_PAD) /* Keypad 8                    48  C8 */
+	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 9 (PgUp)") PORT_CODE(KEYCODE_9_PAD) /* Keypad 9  (PgUp)            49  C9 */
+	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Cursor Down") PORT_CODE(KEYCODE_DOWN) /*                             4A  CA */
+	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 4 |") PORT_CODE(KEYCODE_4_PAD) /* Keypad 4                    4B  CB */
+	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 6") PORT_CODE(KEYCODE_6_PAD) /* Keypad 6                    4D  CD */
+	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Cursor Right") PORT_CODE(KEYCODE_RIGHT) /*                             4E  CE */
+	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 1 (End)") PORT_CODE(KEYCODE_1_PAD) /* Keypad 1  (End)             4F  CF */
+
+	PORT_MODIFY("pc_keyboard_5")
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 2 `") PORT_CODE(KEYCODE_2_PAD) /* Keypad 2                    50  D0 */
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 3 (PgDn)") PORT_CODE(KEYCODE_3_PAD) /* Keypad 3  (PgDn)            51  D1 */
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 0") PORT_CODE(KEYCODE_0_PAD) /* Keypad 0                    52  D2 */
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP - (Del)") PORT_CODE(KEYCODE_MINUS_PAD) /* - Delete                    53  D3 */
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Break") PORT_CODE(KEYCODE_STOP) /* Break                       54  D4 */
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("+ Insert") PORT_CODE(KEYCODE_PLUS_PAD) /* + Insert                    55  D5 */
+	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(".") PORT_CODE(KEYCODE_DEL_PAD) /* .                           56  D6 */
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Enter") PORT_CODE(KEYCODE_ENTER_PAD) /* Enter                       57  D7 */
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Home") PORT_CODE(KEYCODE_HOME) /* HOME                        58  D8 */
+	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F11") PORT_CODE(KEYCODE_F11) /* F11                         59  D9 */
+	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F12") PORT_CODE(KEYCODE_F12) /* F12                         5a  Da */
+
+	PORT_START("MOUSEBTN")
+	PORT_BIT( 0xff8f, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(MOUSECODE_BUTTON1) PORT_CHANGED_MEMBER(DEVICE_SELF, tandy2k_state, input_changed, nullptr)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(MOUSECODE_BUTTON2) PORT_CHANGED_MEMBER(DEVICE_SELF, tandy2k_state, input_changed, nullptr)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )  /* this would be button three but AFAIK no tandy mouse ever had one */
+
+	PORT_START("MOUSEX")
+	PORT_BIT( 0xffff, 0x00, IPT_MOUSE_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(0) PORT_CHANGED_MEMBER(DEVICE_SELF, tandy2k_state, input_changed, nullptr)
+
+	PORT_START("MOUSEY")
+	PORT_BIT( 0xffff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(0) PORT_CHANGED_MEMBER(DEVICE_SELF, tandy2k_state, input_changed, nullptr)
 INPUT_PORTS_END
+
+INPUT_CHANGED_MEMBER(tandy2k_state::input_changed)
+{
+	if (m_clkmouse_cnt || !m_clkmouse_irq)
+		return;
+	if ((m_clkmouse_irq & BT_IRQ) && (field.name()[5] == 'B'))
+	{
+		m_clkmouse_cnt = 1;
+		m_clkmouse_cmd[0] = 'B';
+	}
+	else if ((m_clkmouse_irq & MO_IRQ))
+	{
+		uint16_t x = m_x_axis->read();
+		uint16_t y = m_y_axis->read();
+		uint16_t dx = x - m_mouse_x;
+		uint16_t dy = y - m_mouse_y;
+		m_mouse_x = x;
+		m_mouse_y = y;
+		m_clkmouse_cnt = 5;
+		m_clkmouse_cmd[4] = 'M';
+		m_clkmouse_cmd[3] = dx & 0xff;
+		m_clkmouse_cmd[2] = dx >> 8;
+		m_clkmouse_cmd[1] = dy & 0xff;
+		m_clkmouse_cmd[0] = dy >> 8;
+	}
+	m_pic1->ir2_w(1);
+}
 
 // Video
 
 uint32_t tandy2k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const pen_t *pen = m_palette->pens();
+	const pen_t *cpen = m_colpal->pens();
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	for (int y = 0; y < 400; y++)
@@ -370,18 +494,32 @@ uint32_t tandy2k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 		for (int sx = 0; sx < 80; sx++)
 		{
-			offs_t addr = m_ram->size() - 0x1400 + (((y / 16) * 80) + sx) * 2;
-			uint16_t vidla = program.read_word(addr);
-			uint8_t attr = vidla >> 8;
-			uint8_t data = m_char_ram[((vidla & 0xff) << 4) | cgra];
-			if(attr & 0x80)
-				data = ~data;
-
-			for (int x = 0; x < 8; x++)
+			if (m_hires_en & 2)
 			{
-				int color = BIT(data, 7);
-				bitmap.pix32(y, (sx * 8) + x) = pen[color];
-				data <<= 1;
+				uint8_t a = ((uint8_t *)m_hires_ram.target())[(y * 80) + sx];
+				uint8_t b = ((uint8_t *)m_hires_ram.target())[(y * 80) + sx + 0x8000];
+				uint8_t c = ((uint8_t *)m_hires_ram.target())[(y * 80) + sx + 0x8000 * 2];
+				for (int x = 0; x < 8; x++)
+				{
+					int color = BIT(a, x) | (BIT(b, x) << 1) | (BIT(c, x) << 2);
+					bitmap.pix32(y, (sx * 8) + (7 - x)) = cpen[color];
+				}
+			}
+			else
+			{
+				offs_t addr = m_ram->size() - 0x1400 + (((y / 16) * 80) + sx) * 2;
+				uint16_t vidla = program.read_word(addr);
+				uint8_t attr = vidla >> 8;
+				uint8_t data = m_char_ram[((vidla & 0xff) << 4) | cgra];
+				if(attr & 0x80)
+					data = ~data;
+
+				for (int x = 0; x < 8; x++)
+				{
+					int color = 4 | (BIT(attr, 6) << 1) | BIT(data, 7);
+					bitmap.pix32(y, (sx * 8) + x) = cpen[color];
+					data <<= 1;
+				}
 			}
 		}
 	}
@@ -429,6 +567,23 @@ WRITE_LINE_MEMBER( tandy2k_state::vpac_sld_w )
 	m_vac->sld_w(state);
 }
 
+WRITE8_MEMBER( tandy2k_state::hires_plane_w )
+{
+	int bank = 3;
+	if (((data & 1) + ((data >> 1) & 1) + ((data >> 2) & 1)) == 1)
+		bank = (data & 1) ? 0 : (data & 2) ? 1 : (data & 4) ? 2 : 0;
+	m_vrambank->set_bank(bank);
+	m_hires_en = (data >> 4) & 3;
+}
+
+// bit 0 - 0 = hires board installed
+// bit 1 - 0 = 1 plane, 1 = 3 planes
+// bit 2-4 - board rev
+READ8_MEMBER( tandy2k_state::hires_status_r )
+{
+	return 2;
+}
+
 WRITE8_MEMBER( tandy2k_state::vidla_w )
 {
 	m_vidla = data;
@@ -463,7 +618,7 @@ WRITE8_MEMBER( tandy2k_state::drb_attr_w )
 
 CRT9021_DRAW_CHARACTER_MEMBER( tandy2k_state::vac_draw_character )
 {
-	const pen_t *pen = m_palette->pens();
+	const pen_t *pen = m_colpal->pens();
 
 	for (int i = 0; i < 8; i++)
 	{
@@ -744,6 +899,8 @@ void tandy2k_state::machine_start()
 	program.install_ram(0x00000, ram_size - 1, ram);
 
 	m_char_ram.allocate(0x1000);
+	m_mouse_timer = timer_alloc(MOUS_TIMER);
+	m_mcu_delay = timer_alloc(MCU_DELAY);
 
 	// register for state saving
 	save_item(NAME(m_dma_mux));
@@ -759,11 +916,57 @@ void tandy2k_state::machine_start()
 	save_item(NAME(m_clkcnt));
 	save_item(NAME(m_outspkr));
 	save_item(NAME(m_spkrdata));
+	save_item(NAME(m_clkmouse_cmd));
+	save_item(NAME(m_clkmouse_cnt));
+	save_item(NAME(m_clkmouse_irq));
+	save_item(NAME(m_mouse_x));
+	save_item(NAME(m_mouse_y));
+	save_item(NAME(m_hires_en));
+}
+
+void tandy2k_state::machine_reset()
+{
+	m_hires_en = 0;
+	m_clkmouse_cnt = 0;
+	m_clkmouse_irq = 0;
 }
 
 void tandy2k_state::device_reset_after_children()
 {
 	m_pc_keyboard->enable(0);
+}
+
+void tandy2k_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+		case MOUS_TIMER:
+		{
+			uint16_t x = m_x_axis->read();
+			uint16_t y = m_y_axis->read();
+			uint16_t dx = x - m_mouse_x;
+			uint16_t dy = y - m_mouse_y;
+			m_mouse_x = x;
+			m_mouse_y = y;
+			m_clkmouse_cnt = 5;
+			m_clkmouse_cmd[4] = 'A';
+			m_clkmouse_cmd[3] = dx & 0xff;
+			m_clkmouse_cmd[2] = dx >> 8;
+			m_clkmouse_cmd[1] = dy & 0xff;
+			m_clkmouse_cmd[0] = dy >> 8;
+			m_pic1->ir2_w(1);
+			break;
+		}
+		case MCU_DELAY:
+			m_pic1->ir2_w(1);
+			break;
+	}
+}
+
+rgb_t tandy2k_state::IRGB(uint32_t raw)
+{
+	uint8_t i = (raw >> 3) & 1;
+	return rgb_t(pal2bit(((raw & 4) >> 1) | i), pal2bit((raw & 2) | i), pal2bit(((raw & 1) << 1) | i));
 }
 
 // Machine Driver
@@ -778,7 +981,6 @@ void tandy2k_state::tandy2k(machine_config &config)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
-	screen.set_color(rgb_t::green());
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(640, 400);
@@ -786,7 +988,7 @@ void tandy2k_state::tandy2k(machine_config &config)
 	//screen.set_screen_update(CRT9021B_TAG, FUNC(crt9021_device::screen_update));
 	screen.set_screen_update(FUNC(tandy2k_state::screen_update));
 
-	PALETTE(config, m_palette, palette_device::MONOCHROME);
+	PALETTE(config, m_colpal).set_format(1, &tandy2k_state::IRGB, 8);
 
 	crt9007_device &vpac(CRT9007(config, CRT9007_TAG, 16_MHz_XTAL * 28 / 20 / 8));
 	vpac.set_addrmap(0, &tandy2k_state::vpac_mem);
@@ -812,6 +1014,8 @@ void tandy2k_state::tandy2k(machine_config &config)
 
 	CRT9021(config, m_vac, 16_MHz_XTAL * 28 / 20);
 	m_vac->set_screen(SCREEN_TAG);
+
+	ADDRESS_MAP_BANK(config, m_vrambank).set_map(&tandy2k_state::vrambank_mem).set_options(ENDIANNESS_LITTLE, 16, 17, 0x8000);
 
 	TIMER(config, "vidldsh").configure_generic(FUNC(tandy2k_state::vidldsh_tick));
 

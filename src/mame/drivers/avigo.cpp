@@ -754,7 +754,7 @@ MACHINE_CONFIG_START(avigo_state::avigo)
 	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)
 	MCFG_DEVICE_PROGRAM_MAP(avigo_mem)
 	MCFG_DEVICE_IO_MAP(avigo_io)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	NS16550(config, m_uart, XTAL(1'843'200));
 	m_uart->out_tx_callback().set(m_serport, FUNC(rs232_port_device::write_txd));
@@ -811,7 +811,7 @@ MACHINE_CONFIG_START(avigo_state::avigo)
 	TIMER(config, "1hz_timer").configure_periodic(FUNC(avigo_state::avigo_1hz_timer), attotime::from_hz(1));
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", avigo_state, avigo, "app", 0)
+	MCFG_QUICKLOAD_ADD("quickload", avigo_state, avigo, "app")
 MACHINE_CONFIG_END
 
 

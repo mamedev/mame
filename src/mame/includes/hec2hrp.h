@@ -83,10 +83,10 @@ class hec2hrp_state : public driver_device
 public:
 	hec2hrp_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_cassette(*this, "cassette"),
 		m_printer(*this, "printer"),
 		m_maincpu(*this, "maincpu"),
 		m_disc2cpu(*this, "disc2cpu"),
-		m_cassette(*this, "cassette"),
 		m_discrete(*this, "discrete"),
 		m_sn(*this, "sn76477"),
 		m_palette(*this, "palette"),
@@ -123,6 +123,7 @@ protected:
 	DECLARE_WRITE8_MEMBER(color_a_w);
 	DECLARE_WRITE8_MEMBER(color_b_w);
 
+	required_device<cassette_image_device> m_cassette;
 	optional_device<printer_image_device> m_printer;
 
 private:
@@ -150,7 +151,6 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_disc2cpu;
-	required_device<cassette_image_device> m_cassette;
 	required_device<discrete_device> m_discrete;
 	required_device<sn76477_device> m_sn;
 	required_device<palette_device> m_palette;

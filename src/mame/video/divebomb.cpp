@@ -106,13 +106,13 @@ void divebomb_state::decode_proms(palette_device &palette, const uint8_t * rgn, 
 	for (uint32_t i = 0; i < size; ++i)
 	{
 		uint32_t const rdata = rgn[i + size*2] & 0x0f;
-		uint32_t const r = combine_4_weights(rweights, BIT(rdata, 0), BIT(rdata, 1), BIT(rdata, 2), BIT(rdata, 3));
+		uint32_t const r = combine_weights(rweights, BIT(rdata, 0), BIT(rdata, 1), BIT(rdata, 2), BIT(rdata, 3));
 
 		uint32_t const gdata = rgn[i + size] & 0x0f;
-		uint32_t const g = combine_4_weights(gweights, BIT(gdata, 0), BIT(gdata, 1), BIT(gdata, 2), BIT(gdata, 3));
+		uint32_t const g = combine_weights(gweights, BIT(gdata, 0), BIT(gdata, 1), BIT(gdata, 2), BIT(gdata, 3));
 
 		uint32_t const bdata = rgn[i] & 0x0f;
-		uint32_t const b = combine_4_weights(bweights, BIT(bdata, 0), BIT(bdata, 1), BIT(bdata, 2), BIT(bdata, 3));
+		uint32_t const b = combine_weights(bweights, BIT(bdata, 0), BIT(bdata, 1), BIT(bdata, 2), BIT(bdata, 3));
 
 		if (!inv)
 			palette.set_pen_color(index + i, rgb_t(r, g, b));

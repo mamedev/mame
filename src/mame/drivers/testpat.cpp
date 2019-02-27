@@ -5,11 +5,11 @@
 TV test pattern generators
 
 Radio, 1983, N5
-	http://radioway.ru/1983/05/generator_telesignalov.html
-	http://radioway.ru/1984/04/generator_telesignalov.html
+    http://radioway.ru/1983/05/generator_telesignalov.html
+    http://radioway.ru/1984/04/generator_telesignalov.html
 
 Radio, 1985, N6
-	http://radioway.ru/1985/06/generator_ispytatelnyh_signalov.html
+    http://radioway.ru/1985/06/generator_ispytatelnyh_signalov.html
 
 ***************************************************************************/
 
@@ -29,9 +29,11 @@ Radio, 1985, N6
 #include <cmath>
 
 
+namespace {
+
 #define MASTER_CLOCK    (4000000)
 #define V_TOTAL_PONG    315
-#define H_TOTAL_PONG    256		// tbc
+#define H_TOTAL_PONG    256     // tbc
 
 class tp1983_state : public driver_device
 {
@@ -51,10 +53,10 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start() override { };
-	virtual void machine_reset() override { };
+	virtual void machine_start() override { }
+	virtual void machine_reset() override { }
 
-	virtual void video_start() override { };
+	virtual void video_start() override { }
 
 private:
 };
@@ -78,10 +80,10 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start() override { };
-	virtual void machine_reset() override { };
+	virtual void machine_start() override { }
+	virtual void machine_reset() override { }
 
-	virtual void video_start() override { };
+	virtual void video_start() override { }
 
 private:
 	NETDEV_ANALOG_CALLBACK_MEMBER(video_out_cb);
@@ -101,8 +103,8 @@ INPUT_PORTS_END
 
 
 MACHINE_CONFIG_START(tp1983_state::tp1983)
-	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)
-	MCFG_NETLIST_SETUP(tp1983)
+	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK);
+	m_maincpu->set_constructor(netlist_tp1983);
 
 	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "vid0", "videomix", fixedfreq_device, update_composite_monochrome, "fixfreq")
 
@@ -117,8 +119,8 @@ MACHINE_CONFIG_START(tp1983_state::tp1983)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(tp1985_state::tp1985)
-	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)
-	MCFG_NETLIST_SETUP(tp1985)
+	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK);
+	m_maincpu->set_constructor(netlist_tp1985);
 
 	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "vid0", "videomix", tp1985_state, video_out_cb, "")
 
@@ -141,5 +143,8 @@ ROM_START( tp1985 ) /* dummy to satisfy game entry*/
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
 
-SYST(  1983, tp1983, 0, 0, tp1983,   tp1983,    tp1983_state,   empty_init, "Radio", "TV Test Pattern Generator 1983", MACHINE_NO_SOUND_HW)
+} // anonymous namespace
+
+
+SYST(  1983, tp1983, 0, 0, tp1983,   tp1983,    tp1983_state,   empty_init, "Radio", "TV Test Pattern Generator 1983", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
 SYST(  1985, tp1985, 0, 0, tp1985,   tp1985,    tp1985_state,   empty_init, "Radio", "TV Test Pattern Generator 1985", MACHINE_NO_SOUND_HW)

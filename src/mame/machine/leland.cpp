@@ -1103,10 +1103,10 @@ READ8_MEMBER(leland_state::leland_master_input_r)
 		case 0x03:  /* /IGID */
 		case 0x13:
 			if (m_ay8910)
-				result &= m_ay8910->data_r(space, 0);
+				result &= m_ay8910->data_r();
 
 			if (m_ay8912)
-				result &= m_ay8912->data_r(space, 0);
+				result &= m_ay8912->data_r();
 			break;
 
 		case 0x10:  /* /GIN0 */
@@ -1146,10 +1146,10 @@ WRITE8_MEMBER(leland_state::leland_master_output_w)
 		case 0x0a:  /* /OGIA */
 		case 0x0b:  /* /OGID */
 			if (m_ay8910)
-				m_ay8910->address_data_w(space, offset - 0x0a, data);
+				m_ay8910->address_data_w(offset - 0x0a, data);
 
 			if (m_ay8912)
-				m_ay8912->address_data_w(space, offset - 0x0a, data);
+				m_ay8912->address_data_w(offset - 0x0a, data);
 			break;
 
 		case 0x0c:  /* /BKXL */

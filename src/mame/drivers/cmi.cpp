@@ -1519,7 +1519,7 @@ READ8_MEMBER( cmi_state::cmi02_r )
 		{
 			if (ch_mask & (1 << i))
 			{
-				return m_channels[i]->read(space, offset & 0x1f, 0xff);
+				return m_channels[i]->read(offset & 0x1f);
 			}
 		}
 
@@ -1530,7 +1530,7 @@ READ8_MEMBER( cmi_state::cmi02_r )
 		switch (offset)
 		{
 			case 0x20: case 0x21: case 0x22: case 0x23:
-				return m_cmi02_pia[0]->read(space, offset & 3);
+				return m_cmi02_pia[0]->read(offset & 3);
 
 			case 0x26:
 				m_maincpu2->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
@@ -1543,10 +1543,10 @@ READ8_MEMBER( cmi_state::cmi02_r )
 				return 0xff;
 
 			case 0x28: case 0x29: case 0x2a: case 0x2b:
-				return m_cmi02_pia[1]->read(space, offset & 3);
+				return m_cmi02_pia[1]->read(offset & 3);
 
 			case 0x38: case 0x39: case 0x3a: case 0x3b: case 0x3c: case 0x3d: case 0x3e: case 0x3f:
-				return m_cmi02_ptm->read(space, offset & 7);
+				return m_cmi02_ptm->read(offset & 7);
 
 			default:
 				logerror("CMI02 R: %x\n", offset);
@@ -1564,7 +1564,7 @@ WRITE8_MEMBER( cmi_state::cmi02_w )
 		for (int i = 0; i < 8; ++i)
 		{
 			if (ch_mask & (1 << i))
-				m_channels[i]->write(space, offset & 0x1f, data, 0xff);
+				m_channels[i]->write(offset & 0x1f, data);
 		}
 	}
 	else
@@ -1572,11 +1572,11 @@ WRITE8_MEMBER( cmi_state::cmi02_w )
 		switch (offset)
 		{
 			case 0x20: case 0x21: case 0x22: case 0x23:
-				m_cmi02_pia[0]->write(space, offset & 3, data);
+				m_cmi02_pia[0]->write(offset & 3, data);
 				break;
 
 			case 0x28: case 0x29: case 0x2a: case 0x2b:
-				m_cmi02_pia[1]->write(space, offset & 3, data);
+				m_cmi02_pia[1]->write(offset & 3, data);
 				break;
 
 			case 0x30:
@@ -1595,7 +1595,7 @@ WRITE8_MEMBER( cmi_state::cmi02_w )
 				break;
 
 			case 0x38: case 0x39: case 0x3a: case 0x3b: case 0x3c: case 0x3d: case 0x3e: case 0x3f:
-				m_cmi02_ptm->write(space, offset & 7, data);
+				m_cmi02_ptm->write(offset & 7, data);
 				break;
 
 			default:
@@ -1674,22 +1674,22 @@ void cmi_state::install_peripherals(int cpunum)
 	else
 		space->install_readwrite_handler(0xfc5f, 0xfc5f, read8_delegate(FUNC(cmi_state::map_r<0>),this), write8_delegate(FUNC(cmi_state::map_w<0>),this));
 
-	space->install_readwrite_handler(0xfc80, 0xfc83, read8_delegate(FUNC(mos6551_device::read),m_q133_acia[0].target()), write8_delegate(FUNC(mos6551_device::write),m_q133_acia[0].target()));
-	space->install_readwrite_handler(0xfc84, 0xfc87, read8_delegate(FUNC(mos6551_device::read),m_q133_acia[1].target()), write8_delegate(FUNC(mos6551_device::write),m_q133_acia[1].target()));
-	space->install_readwrite_handler(0xfc88, 0xfc8b, read8_delegate(FUNC(mos6551_device::read),m_q133_acia[2].target()), write8_delegate(FUNC(mos6551_device::write),m_q133_acia[2].target()));
-	space->install_readwrite_handler(0xfc8c, 0xfc8f, read8_delegate(FUNC(mos6551_device::read),m_q133_acia[3].target()), write8_delegate(FUNC(mos6551_device::write),m_q133_acia[3].target()));
-	space->install_readwrite_handler(0xfc90, 0xfc97, read8_delegate(FUNC(ptm6840_device::read),m_q133_ptm.target()), write8_delegate(FUNC(ptm6840_device::write),m_q133_ptm.target()));
+	space->install_readwrite_handler(0xfc80, 0xfc83, read8sm_delegate(FUNC(mos6551_device::read),m_q133_acia[0].target()), write8sm_delegate(FUNC(mos6551_device::write),m_q133_acia[0].target()));
+	space->install_readwrite_handler(0xfc84, 0xfc87, read8sm_delegate(FUNC(mos6551_device::read),m_q133_acia[1].target()), write8sm_delegate(FUNC(mos6551_device::write),m_q133_acia[1].target()));
+	space->install_readwrite_handler(0xfc88, 0xfc8b, read8sm_delegate(FUNC(mos6551_device::read),m_q133_acia[2].target()), write8sm_delegate(FUNC(mos6551_device::write),m_q133_acia[2].target()));
+	space->install_readwrite_handler(0xfc8c, 0xfc8f, read8sm_delegate(FUNC(mos6551_device::read),m_q133_acia[3].target()), write8sm_delegate(FUNC(mos6551_device::write),m_q133_acia[3].target()));
+	space->install_readwrite_handler(0xfc90, 0xfc97, read8sm_delegate(FUNC(ptm6840_device::read),m_q133_ptm.target()), write8sm_delegate(FUNC(ptm6840_device::write),m_q133_ptm.target()));
 
 	space->install_readwrite_handler(0xfcbc, 0xfcbc, read8_delegate(FUNC(cmi_state::cmi07_r),this), write8_delegate(FUNC(cmi_state::cmi07_w),this));
 
 	space->install_read_handler(0xfcc0, 0xfcc3, read8_delegate(FUNC(cmi_state::lightpen_r),this));
-	space->install_readwrite_handler(0xfcc4, 0xfcc7, read8_delegate(FUNC(pia6821_device::read),m_q219_pia.target()), write8_delegate(FUNC(pia6821_device::write),m_q219_pia.target()));
-	space->install_readwrite_handler(0xfcc8, 0xfccf, read8_delegate(FUNC(ptm6840_device::read),m_q219_ptm.target()), write8_delegate(FUNC(ptm6840_device::write),m_q219_ptm.target()));
+	space->install_readwrite_handler(0xfcc4, 0xfcc7, read8sm_delegate(FUNC(pia6821_device::read),m_q219_pia.target()), write8sm_delegate(FUNC(pia6821_device::write),m_q219_pia.target()));
+	space->install_readwrite_handler(0xfcc8, 0xfccf, read8sm_delegate(FUNC(ptm6840_device::read),m_q219_ptm.target()), write8sm_delegate(FUNC(ptm6840_device::write),m_q219_ptm.target()));
 	space->install_readwrite_handler(0xfcd0, 0xfcdc, read8_delegate(FUNC(cmi_state::video_r),this), write8_delegate(FUNC(cmi_state::video_w),this));
 	space->install_readwrite_handler(0xfce0, 0xfce1, read8_delegate(FUNC(cmi_state::fdc_r),this), write8_delegate(FUNC(cmi_state::fdc_w),this));
 	space->nop_readwrite(0xfce2, 0xfcef); // Monitor ROM will attempt to detect floppy disk controller cards in this entire range
-	space->install_readwrite_handler(0xfcf0, 0xfcf7, read8_delegate(FUNC(pia6821_device::read),m_q133_pia[0].target()), write8_delegate(FUNC(pia6821_device::write),m_q133_pia[0].target()));
-	space->install_readwrite_handler(0xfcf8, 0xfcff, read8_delegate(FUNC(pia6821_device::read),m_q133_pia[1].target()), write8_delegate(FUNC(pia6821_device::write),m_q133_pia[1].target()));
+	space->install_readwrite_handler(0xfcf0, 0xfcf7, read8sm_delegate(FUNC(pia6821_device::read),m_q133_pia[0].target()), write8sm_delegate(FUNC(pia6821_device::write),m_q133_pia[0].target()));
+	space->install_readwrite_handler(0xfcf8, 0xfcff, read8sm_delegate(FUNC(pia6821_device::read),m_q133_pia[1].target()), write8sm_delegate(FUNC(pia6821_device::write),m_q133_pia[1].target()));
 
 	space->install_write_handler(0xfcfc, 0xfcfc, write8_delegate(FUNC(cmi_state::i8214_cpu1_w),this));
 	space->install_write_handler(0xfcfd, 0xfcfd, write8_delegate(FUNC(cmi_state::i8214_cpu2_w),this));
@@ -2162,12 +2162,12 @@ MACHINE_CONFIG_START(cmi_state::cmi2x)
 	MCFG_DEVICE_ADD("maincpu1", MC6809E, Q209_CPU_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(maincpu1_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(cmi_state, cpu1_interrupt_callback)
-	MCFG_QUANTUM_PERFECT_CPU("maincpu1")
+	config.m_perfect_cpu_quantum = subtag("maincpu1");
 
 	MCFG_DEVICE_ADD("maincpu2", MC6809E, Q209_CPU_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(maincpu2_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(cmi_state, cpu2_interrupt_callback)
-	MCFG_QUANTUM_PERFECT_CPU("maincpu2")
+	config.m_perfect_cpu_quantum = subtag("maincpu2");
 
 	MCFG_DEVICE_ADD("muskeys", M6802, 4_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(muskeys_map)
@@ -2191,10 +2191,10 @@ MACHINE_CONFIG_START(cmi_state::cmi2x)
 	m_dp3->update().set(FUNC(cmi_state::cmi_iix_update_dp<2>));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBLANK_END, HBLANK_START, VTOTAL, VBLANK_END, VBLANK_START)
-	MCFG_SCREEN_UPDATE_DRIVER(cmi_state, screen_update_cmi2x)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, cmi_state, cmi_iix_vblank))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER, rgb_t::green());
+	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBLANK_END, HBLANK_START, VTOTAL, VBLANK_END, VBLANK_START);
+	m_screen->set_screen_update(FUNC(cmi_state::screen_update_cmi2x));
+	m_screen->screen_vblank().set(FUNC(cmi_state::cmi_iix_vblank));
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
@@ -2283,8 +2283,8 @@ MACHINE_CONFIG_START(cmi_state::cmi2x)
 	FD1791(config, m_wd1791, 16_MHz_XTAL / 8); // wd1791_interface
 	m_wd1791->intrq_wr_callback().set(FUNC(cmi_state::wd1791_irq));
 	m_wd1791->drq_wr_callback().set(FUNC(cmi_state::wd1791_drq));
-	MCFG_FLOPPY_DRIVE_ADD("wd1791:0", cmi2x_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("wd1791:1", cmi2x_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, "wd1791:0", cmi2x_floppies, "8dsdd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "wd1791:1", cmi2x_floppies, "8dsdd", floppy_image_device::default_floppy_formats);
 
 	/* Musical keyboard */
 	PIA6821(config, m_cmi10_pia_u20, 0);

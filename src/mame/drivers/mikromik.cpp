@@ -123,7 +123,7 @@ READ8_MEMBER( mm1_state::read )
 			break;
 
 		case 7:
-			data = m_hgdc->read(space, offset & 0x01);
+			data = m_hgdc->read(offset & 0x01);
 			break;
 		}
 	}
@@ -192,7 +192,7 @@ WRITE8_MEMBER( mm1_state::write )
 			break;
 
 		case 7:
-			m_hgdc->write(space, offset & 0x01, data);
+			m_hgdc->write(offset & 0x01, data);
 			break;
 		}
 	}
@@ -456,7 +456,7 @@ void mm1_state::machine_reset()
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( mm1 )
+//  machine_config( mm1 )
 //-------------------------------------------------
 
 void mm1_state::mm1(machine_config &config)
@@ -525,7 +525,7 @@ void mm1_state::mm1(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( mm1m6 )
+//  machine_config( mm1m6 )
 //-------------------------------------------------
 
 void mm1_state::mm1m6(machine_config &config)
@@ -537,7 +537,7 @@ void mm1_state::mm1m6(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( mm1m7 )
+//  machine_config( mm1m7 )
 //-------------------------------------------------
 
 void mm1_state::mm1m7(machine_config &config)

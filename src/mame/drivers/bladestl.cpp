@@ -313,7 +313,7 @@ MACHINE_CONFIG_START(bladestl_state::bladestl)
 	MCFG_DEVICE_ADD(m_audiocpu, MC6809E, XTAL(24'000'000) / 16)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	config.m_minimum_quantum = attotime::from_hz(600);
 
 	WATCHDOG_TIMER(config, "watchdog");
 

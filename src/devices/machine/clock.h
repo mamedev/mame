@@ -10,6 +10,7 @@ class clock_device : public device_t
 {
 public:
 	auto signal_handler() { return m_signal_handler.bind(); }
+	DECLARE_READ_LINE_MEMBER(signal_r) { return m_signal; }
 
 	clock_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 

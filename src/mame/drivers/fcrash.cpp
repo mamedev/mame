@@ -1763,14 +1763,14 @@ void cps_state::fcrash(machine_config &config)
 	ym2.add_route(2, "mono", 0.10);
 	ym2.add_route(3, "mono", 1.0);
 
-	MSM5205(config, m_msm_1, 24000000/64);	/* ? */
+	MSM5205(config, m_msm_1, 24000000/64);  /* ? */
 	m_msm_1->vck_legacy_callback().set(FUNC(cps_state::m5205_int1)); /* interrupt function */
-	m_msm_1->set_prescaler_selector(msm5205_device::S96_4B);	/* 4KHz 4-bit */
+	m_msm_1->set_prescaler_selector(msm5205_device::S96_4B);    /* 4KHz 4-bit */
 	m_msm_1->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MSM5205(config, m_msm_2, 24000000/64);	/* ? */
+	MSM5205(config, m_msm_2, 24000000/64);  /* ? */
 	m_msm_2->vck_legacy_callback().set(FUNC(cps_state::m5205_int2)); /* interrupt function */
-	m_msm_2->set_prescaler_selector(msm5205_device::S96_4B);	/* 4KHz 4-bit */
+	m_msm_2->set_prescaler_selector(msm5205_device::S96_4B);    /* 4KHz 4-bit */
 	m_msm_2->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
@@ -1899,14 +1899,14 @@ void cps_state::sf2mdt(machine_config &config)
 	YM2151(config, "2151", XTAL(3'579'545)).add_route(0, "mono", 0.35).add_route(1, "mono", 0.35);
 
 	/* has 2x MSM5205 instead of OKI6295 */
-	MSM5205(config, m_msm_1, 24000000/64);	/* ? */
-	m_msm_1->vck_legacy_callback().set(FUNC(cps_state::m5205_int1));	/* interrupt function */
-	m_msm_1->set_prescaler_selector(msm5205_device::S96_4B);	/* 4KHz 4-bit */
+	MSM5205(config, m_msm_1, 24000000/64);  /* ? */
+	m_msm_1->vck_legacy_callback().set(FUNC(cps_state::m5205_int1));    /* interrupt function */
+	m_msm_1->set_prescaler_selector(msm5205_device::S96_4B);    /* 4KHz 4-bit */
 	m_msm_1->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MSM5205(config, m_msm_2, 24000000/64);	/* ? */
-	m_msm_2->vck_legacy_callback().set(FUNC(cps_state::m5205_int2));	/* interrupt function */
-	m_msm_2->set_prescaler_selector(msm5205_device::S96_4B);	/* 4KHz 4-bit */
+	MSM5205(config, m_msm_2, 24000000/64);  /* ? */
+	m_msm_2->vck_legacy_callback().set(FUNC(cps_state::m5205_int2));    /* interrupt function */
+	m_msm_2->set_prescaler_selector(msm5205_device::S96_4B);    /* 4KHz 4-bit */
 	m_msm_2->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
@@ -1953,14 +1953,14 @@ void cps_state::knightsb(machine_config &config)
 	ym2151.add_route(1, "mono", 0.35);
 
 	/* has 2x MSM5205 instead of OKI6295 */
-	MSM5205(config, m_msm_1, 24000000/64);	/* ? */
-	m_msm_1->vck_legacy_callback().set(FUNC(cps_state::m5205_int1));	/* interrupt function */
-	m_msm_1->set_prescaler_selector(msm5205_device::S96_4B);	/* 4KHz 4-bit */
+	MSM5205(config, m_msm_1, 24000000/64);  /* ? */
+	m_msm_1->vck_legacy_callback().set(FUNC(cps_state::m5205_int1));    /* interrupt function */
+	m_msm_1->set_prescaler_selector(msm5205_device::S96_4B);    /* 4KHz 4-bit */
 	m_msm_1->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MSM5205(config, m_msm_2, 24000000/64);	/* ? */
-	m_msm_1->vck_legacy_callback().set(FUNC(cps_state::m5205_int2));	/* interrupt function */
-	m_msm_2->set_prescaler_selector(msm5205_device::S96_4B);	/* 4KHz 4-bit */
+	MSM5205(config, m_msm_2, 24000000/64);  /* ? */
+	m_msm_2->vck_legacy_callback().set(FUNC(cps_state::m5205_int2));    /* interrupt function */
+	m_msm_2->set_prescaler_selector(msm5205_device::S96_4B);    /* 4KHz 4-bit */
 	m_msm_2->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
@@ -2322,7 +2322,7 @@ MACHINE_CONFIG_START(cps_state::dinopic)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, cps_state, screen_vblank_cps1))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cps1)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);
 	MCFG_PALETTE_ADD("palette", 0xc00)
 
 	/* sound hardware */
@@ -2509,7 +2509,7 @@ MACHINE_CONFIG_START(cps_state::sgyxz)
 	MCFG_SCREEN_UPDATE_DRIVER(cps_state, screen_update_fcrash)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, cps_state, screen_vblank_cps1))
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cps1)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);
 	MCFG_PALETTE_ADD("palette", 0xc00)
 
 	EEPROM_93C46_8BIT(config, "eeprom");
@@ -2636,7 +2636,7 @@ MACHINE_CONFIG_START(cps_state::punipic)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, cps_state, screen_vblank_cps1))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cps1)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);
 	MCFG_PALETTE_ADD("palette", 0xc00)
 
 	/* sound hardware */
@@ -2825,7 +2825,7 @@ MACHINE_CONFIG_START(cps_state::sf2m1)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, cps_state, screen_vblank_cps1))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cps1)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);
 	MCFG_PALETTE_ADD("palette", 0xc00)
 
 	/* sound hardware */
@@ -3206,7 +3206,7 @@ MACHINE_CONFIG_START(cps_state::slampic)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, cps_state, screen_vblank_cps1))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cps1)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);
 	MCFG_PALETTE_ADD("palette", 0xc00)
 
 	/* sound hardware */
@@ -3305,7 +3305,7 @@ MACHINE_CONFIG_START(cps_state::varthb)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, cps_state, screen_vblank_cps1))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cps1)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);
 	MCFG_PALETTE_ADD("palette", 0xc00)
 
 	/* sound hardware */
@@ -3371,7 +3371,7 @@ GAME( 1990, ffightbla, ffight,   fcrash,    fcrash,   cps_state, init_cps1,     
 
 GAME( 1991, kodb,      kod,      kodb,      kodb,     cps_state, init_kodb,     ROT0,   "bootleg (Playmark)", "The King of Dragons (bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 910731  "ETC"
 
-GAME( 1991, knightsb,  knights,  knightsb,  knights,  cps_state, init_dinopic,  ROT0,   "bootleg", "Knights of the Round (bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )    // 911127 - based on World version
+GAME( 1991, knightsb,  knights,  knightsb,  knights,  cps_state, init_dinopic,  ROT0,   "bootleg", "Knights of the Round (bootleg)", MACHINE_SUPPORTS_SAVE )    // 911127 - based on World version
 
 GAME( 1993, mtwinsb,   mtwins,   mtwinsb,   mtwins,   cps_state, init_mtwinsb,  ROT0,   "David Inc. (bootleg)", "Twins (Mega Twins bootleg)", MACHINE_SUPPORTS_SAVE ) // based on World version
 

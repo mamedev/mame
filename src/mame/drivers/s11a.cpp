@@ -174,10 +174,11 @@ void s11a_state::init_s11a()
 	s11_state::init_s11();
 }
 
-MACHINE_CONFIG_START(s11a_state::s11a)
+void s11a_state::s11a(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6808, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(s11a_main_map)
+	M6808(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &s11a_state::s11a_main_map);
 	MCFG_MACHINE_RESET_OVERRIDE(s11a_state, s11a)
 
 	/* Video */
@@ -235,46 +236,45 @@ MACHINE_CONFIG_START(s11a_state::s11a)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* Add the soundcard */
-	MCFG_DEVICE_ADD("audiocpu", M6802, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(s11a_audio_map)
+	M6802(config, m_audiocpu, XTAL(4'000'000));
+	m_audiocpu->set_addrmap(AS_PROGRAM, &s11a_state::s11a_audio_map);
 
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
+	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
 
 	SPEAKER(config, "speech").front_center();
-	MCFG_DEVICE_ADD("hc55516", HC55516, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speech", 0.50)
+	HC55516(config, m_hc55516, 0).add_route(ALL_OUTPUTS, "speech", 0.50);
 
 	PIA6821(config, m_pias, 0);
 	m_pias->readpa_handler().set(FUNC(s11_state::sound_r));
 	m_pias->writepa_handler().set(FUNC(s11_state::sound_w));
 	m_pias->writepb_handler().set("dac", FUNC(dac_byte_interface::data_w));
 	m_pias->cb2_handler().set(FUNC(s11_state::pia40_cb2_w));
-	m_pias->irqa_handler().set_inputline("audiocpu", M6802_IRQ_LINE);
-	m_pias->irqa_handler().set_inputline("audiocpu", M6802_IRQ_LINE);
+	m_pias->irqa_handler().set_inputline(m_audiocpu, M6802_IRQ_LINE);
+	m_pias->irqa_handler().set_inputline(m_audiocpu, M6802_IRQ_LINE);
 
 	/* Add the background music card */
-	MCFG_DEVICE_ADD("bgcpu", MC6809E, XTAL(8'000'000) / 4) // MC68B09E
-	MCFG_DEVICE_PROGRAM_MAP(s11a_bg_map)
+	MC6809E(config, m_bgcpu, XTAL(8'000'000) / 4); // MC68B09E
+	m_bgcpu->set_addrmap(AS_PROGRAM, &s11a_state::s11a_bg_map);
 
 	SPEAKER(config, "bg").front_center();
 	YM2151(config, m_ym, XTAL(3'579'545));
 	m_ym->irq_handler().set(FUNC(s11a_state::ym2151_irq_w));
 	m_ym->add_route(ALL_OUTPUTS, "bg", 0.50);
 
-	MCFG_DEVICE_ADD("dac1", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bg", 0.25)
+	MC1408(config, "dac1", 0).add_route(ALL_OUTPUTS, "bg", 0.25);
 
 	PIA6821(config, m_pia40, 0);
 	m_pia40->writepa_handler().set("dac1", FUNC(dac_byte_interface::data_w));
 	m_pia40->writepb_handler().set(FUNC(s11_state::pia40_pb_w));
 	m_pia40->ca2_handler().set(FUNC(s11_state::pias_ca2_w));
 	m_pia40->cb2_handler().set(FUNC(s11_state::pias_cb2_w));
-	m_pia40->irqa_handler().set_inputline("bgcpu", M6809_FIRQ_LINE);
-	m_pia40->irqb_handler().set_inputline("bgcpu", INPUT_LINE_NMI);
-MACHINE_CONFIG_END
+	m_pia40->irqa_handler().set_inputline(m_bgcpu, M6809_FIRQ_LINE);
+	m_pia40->irqb_handler().set_inputline(m_bgcpu, INPUT_LINE_NMI);
+}
 
 /*------------------------
 / F14 Tomcat 5/87 (#554)

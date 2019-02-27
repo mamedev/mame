@@ -227,7 +227,7 @@ void gberet_state::gberetb_map(address_map &map)
 	map(0xe900, 0xe9ff).ram().share("spriteram");
 	map(0xf000, 0xf000).nopw(); // coin counter not supported
 	map(0xf200, 0xf200).portr("DSW2");
-	map(0xf400, 0xf400).w(m_sn, FUNC(sn76489a_device::command_w));
+	map(0xf400, 0xf400).w(m_sn, FUNC(sn76489a_device::write));
 	map(0xf600, 0xf600).portr("P2");
 	map(0xf601, 0xf601).portr("DSW1");
 	map(0xf602, 0xf602).portr("P1");

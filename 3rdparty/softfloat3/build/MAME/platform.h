@@ -54,7 +54,7 @@ Softfloat 3 MAME modifications
 /*----------------------------------------------------------------------------
 *----------------------------------------------------------------------------*/
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && !defined(__clang__)
 
 #define _INC_MALLOC 0
 #include <intrin.h>

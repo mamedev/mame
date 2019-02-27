@@ -626,7 +626,7 @@ MACHINE_CONFIG_START(hyperscan_state::hyperscan)
 	MCFG_DEVICE_ADD("maincpu", SCORE7, XTAL(27'000'000) * 4)   // 108MHz S+core 7
 	MCFG_DEVICE_PROGRAM_MAP(spg290_mem)
 
-	MCFG_SOFTWARE_LIST_ADD("cd_list","hyperscan")
+	SOFTWARE_LIST(config, "cd_list").set_original("hyperscan");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

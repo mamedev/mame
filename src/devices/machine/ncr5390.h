@@ -212,7 +212,6 @@ protected:
 	void start_command();
 	void step(bool timeout);
 	virtual bool check_valid_command(uint8_t cmd);
-	int derive_msg_size(uint8_t msg_id);
 	void function_complete();
 	void function_bus_complete();
 	void bus_complete();
@@ -221,7 +220,6 @@ protected:
 	void command_pop_and_chain();
 	void check_irq();
 
-	virtual void reset_soft();
 	void reset_disconnect();
 
 	uint8_t fifo_pop();
@@ -257,7 +255,7 @@ protected:
 	ncr53c90a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override;
-	virtual void reset_soft() override;
+	virtual void device_reset() override;
 
 	virtual bool check_valid_command(uint8_t cmd) override;
 
@@ -317,7 +315,7 @@ protected:
 	};
 
 	virtual void device_start() override;
-	virtual void reset_soft() override;
+	virtual void device_reset() override;
 	virtual void check_drq() override;
 
 private:

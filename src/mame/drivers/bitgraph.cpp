@@ -75,17 +75,18 @@
 #define PSG_TAG "psg"
 #define EAROM_TAG "earom"
 
-#define VERBOSE_DBG 1       /* general debug messages */
 
-#define DBG_LOG(N,M,A) \
-	do { \
-		if(VERBOSE_DBG>=N) \
-		{ \
-			if( M ) \
-				logerror("%11.6f at %s: %-24s",machine().time().as_double(),machine().describe_context(),(char*)M ); \
-			logerror A; \
-		} \
-	} while (0)
+//#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
+#define LOG_PIA       (1U <<  1)
+#define LOG_DEBUG     (1U <<  2)
+
+//#define VERBOSE (LOG_DEBUG)
+//#define LOG_OUTPUT_FUNC printf
+#include "logmacro.h"
+
+#define LOGPIA(...) LOGMASKED(LOG_PIA, __VA_ARGS__)
+#define LOGDBG(...) LOGMASKED(LOG_DEBUG, __VA_ARGS__)
+
 
 class bitgraph_state : public driver_device
 {
@@ -222,14 +223,14 @@ DEVICE_INPUT_DEFAULTS_END
 
 READ8_MEMBER(bitgraph_state::pia_r)
 {
-	DBG_LOG(3, "PIA", ("R %d\n", offset));
-	return m_pia->read(space, 3 - offset);
+	LOGPIA("PIA R %d\n", offset);
+	return m_pia->read(3 - offset);
 }
 
 WRITE8_MEMBER(bitgraph_state::pia_w)
 {
-	DBG_LOG(3, "PIA", ("W %d < %02X\n", offset, data));
-	return m_pia->write(space, 3 - offset, data);
+	LOGPIA("PIA W %d < %02X\n", offset, data);
+	return m_pia->write(3 - offset, data);
 }
 
 READ_LINE_MEMBER(bitgraph_state::pia_ca1_r)
@@ -245,13 +246,13 @@ WRITE_LINE_MEMBER(bitgraph_state::pia_cb2_w)
 READ8_MEMBER(bitgraph_state::pia_pa_r)
 {
 	uint8_t data = BIT(m_pia_b, 3) ? m_earom->data() : m_pia_a;
-	DBG_LOG(2, "PIA", ("A == %02X (%s)\n", data, BIT(m_pia_b, 3) ? "earom" : "pia"));
+	LOGDBG("PIA A == %02X (%s)\n", data, BIT(m_pia_b, 3) ? "earom" : "pia");
 	return data;
 }
 
 WRITE8_MEMBER(bitgraph_state::pia_pa_w)
 {
-	DBG_LOG(2, "PIA", ("A <- %02X\n", data));
+	LOGDBG("PIA A <- %02X\n", data);
 	m_pia_a = data;
 }
 
@@ -267,28 +268,28 @@ WRITE8_MEMBER(bitgraph_state::pia_pa_w)
 */
 READ8_MEMBER(bitgraph_state::pia_pb_r)
 {
-	DBG_LOG(2, "PIA", ("B == %02X\n", m_pia_b));
+	LOGDBG("PIA B == %02X\n", m_pia_b);
 	return m_pia_b;
 }
 
 WRITE8_MEMBER(bitgraph_state::pia_pb_w)
 {
-	DBG_LOG(2, "PIA", ("B <- %02X\n", data));
+	LOGDBG("PIA B <- %02X\n", data);
 	m_pia_b = data;
 
 	switch (m_pia_b & 0x03)
 	{
 	case 2:
-		m_psg->data_w(space, 0, m_pia_a);
+		m_psg->data_w(m_pia_a);
 		break;
 	case 3:
-		m_psg->address_w(space, 0, m_pia_a);
+		m_psg->address_w(m_pia_a);
 		break;
 	}
 
 	if (BIT(m_pia_b, 3))
 	{
-		DBG_LOG(2, "EAROM", ("data <- %02X\n", m_pia_a));
+		LOGDBG("EAROM data <- %02X\n", m_pia_a);
 		m_earom->set_data(m_pia_a);
 	}
 	// CS1, ~CS2, C1, C2
@@ -303,14 +304,14 @@ WRITE8_MEMBER(bitgraph_state::pia_pb_w)
 
 WRITE8_MEMBER(bitgraph_state::earom_write)
 {
-	DBG_LOG(2, "EAROM", ("addr <- %02X (%02X)\n", data & 0x3f, data));
+	LOGDBG("EAROM addr <- %02X (%02X)\n", data & 0x3f, data);
 	m_earom->set_address(data & 0x3f);
 }
 
 // written once and never changed
 WRITE8_MEMBER(bitgraph_state::misccr_write)
 {
-	DBG_LOG(1, "MISCCR", ("<- %02X (DTR %d MAP %d)\n", data, BIT(data, 3), (data & 3)));
+	LOG("MISCCR <- %02X (DTR %d MAP %d)\n", data, BIT(data, 3), (data & 3));
 	m_misccr = data;
 }
 
@@ -335,11 +336,11 @@ WRITE_LINE_MEMBER(bitgraph_state::system_clock_write)
 // rev B writes EE5E -- 9600 HOST, 9600 PNT, 300 KBD, 9600 DBG
 WRITE16_MEMBER(bitgraph_state::baud_write)
 {
-	DBG_LOG(1,"Baud", ("%04X\n", data));
-	m_dbrgb->write_str(data & 15);      // 2 DBG
-	m_dbrga->write_stt((data >> 4) & 15);   // 1 KBD
-	m_dbrgb->write_stt((data >> 8) & 15);   // 3 PNT
-	m_dbrga->write_str((data >> 12) & 15);  // 0 HOST
+	LOG("Baud %04X\n", data);
+	m_dbrgb->str_w(data & 15);      // 2 DBG
+	m_dbrga->stt_w((data >> 4) & 15);   // 1 KBD
+	m_dbrgb->stt_w((data >> 8) & 15);   // 3 PNT
+	m_dbrga->str_w((data >> 12) & 15);  // 0 HOST
 }
 
 WRITE_LINE_MEMBER(bitgraph_state::com8116_a_fr_w)
@@ -362,7 +363,7 @@ WRITE_LINE_MEMBER(bitgraph_state::com8116_b_fr_w)
 
 WRITE_LINE_MEMBER(bitgraph_state::com8116_b_ft_w)
 {
-	if (m_acia3)
+	if (m_acia3.found())
 	{
 		m_acia3->write_txc(state);
 		m_acia3->write_rxc(state);
@@ -371,14 +372,14 @@ WRITE_LINE_MEMBER(bitgraph_state::com8116_b_ft_w)
 
 READ8_MEMBER(bitgraph_state::adlc_r)
 {
-	DBG_LOG(1, "ADLC", ("R %d\n", offset));
-	return m_adlc ? m_adlc->read(space, 3 - offset) : 0xff;
+	LOG("ADLC R %d\n", offset);
+	return m_adlc.found() ? m_adlc->read(3 - offset) : 0xff;
 }
 
 WRITE8_MEMBER(bitgraph_state::adlc_w)
 {
-	DBG_LOG(1, "ADLC", ("W %d < %02X\n", offset, data));
-	if (m_adlc) return m_adlc->write(space, 3 - offset, data);
+	LOG("ADLC W %d < %02X\n", offset, data);
+	if (m_adlc.found()) return m_adlc->write(3 - offset, data);
 }
 
 uint32_t bitgraph_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -421,13 +422,13 @@ uint32_t bitgraph_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 READ8_MEMBER(bitgraph_state::ppu_read)
 {
 	uint8_t data = m_ppu[offset];
-	DBG_LOG(2, "PPU", ("%d == %02X\n", offset, data));
+	LOGDBG("PPU %d == %02X\n", offset, data);
 	return data;
 }
 
 WRITE8_MEMBER(bitgraph_state::ppu_write)
 {
-	DBG_LOG(2, "PPU", ("%d <- %02X\n", offset, data));
+	LOGDBG("PPU %d <- %02X\n", offset, data);
 	m_ppu[offset] = data;
 }
 
@@ -446,7 +447,7 @@ void bitgraph_state::ppu_io(address_map &map)
 */
 WRITE8_MEMBER(bitgraph_state::ppu_i8243_w)
 {
-	DBG_LOG(1, "PPU", ("8243 %d <- %02X\n", offset + 4, data));
+	LOG("PPU 8243 %d <- %02X\n", offset + 4, data);
 	switch (offset)
 	{
 	case 0:
@@ -559,7 +560,8 @@ MACHINE_CONFIG_START(bitgraph_state::bg_motherboard)
 MACHINE_CONFIG_END
 
 #ifdef UNUSED_FUNCTION
-MACHINE_CONFIG_START(bitgraph_state::bg_ppu)
+void bitgraph_state::bg_ppu(machine_config &config)
+{
 	i8035_device &ppu(I8035(config, PPU_TAG, XTAL(6'900'000)));
 	ppu.set_addrmap(AS_IO, &bitgraph_state::ppu_io);
 //  ppu.t0_in_cb().set(FUNC(bitgraph_state::ppu_t0_r));
@@ -569,16 +571,17 @@ MACHINE_CONFIG_START(bitgraph_state::bg_ppu)
 	i8243.read_handler().set_nop();
 	i8243.write_handler().set(FUNC(bitgraph_state::ppu_i8243_w));
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit6))
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit7))
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit4))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit5))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->ack_handler().set("cent_status_in", FUNC(input_buffer_device::write_bit6));
+	m_centronics->busy_handler().set("cent_status_in", FUNC(input_buffer_device::write_bit7));
+	m_centronics->fault_handler().set("cent_status_in", FUNC(input_buffer_device::write_bit4));
+	m_centronics->perror_handler().set("cent_status_in", FUNC(input_buffer_device::write_bit5));
 
-	MCFG_DEVICE_ADD("cent_status_in", INPUT_BUFFER, 0)
+	INPUT_BUFFER(config, "cent_status_in");
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
-MACHINE_CONFIG_END
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
+}
 #endif
 
 void bitgraph_state::bitgrpha(machine_config &config)

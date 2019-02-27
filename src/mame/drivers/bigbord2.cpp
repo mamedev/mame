@@ -559,7 +559,7 @@ MACHINE_CONFIG_START(bigbord2_state::bigbord2)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(10.69425_MHz_XTAL, 700, 0, 560, 260, 0, 240)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_crt8002)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_crt8002);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	CLOCK(config, "ctc_clock", MAIN_CLOCK).signal_handler().set(FUNC(bigbord2_state::clock_w));
@@ -590,10 +590,8 @@ MACHINE_CONFIG_START(bigbord2_state::bigbord2)
 
 	MB8877(config, m_fdc, 16_MHz_XTAL / 8); // 2MHz for 8 inch, or 1MHz otherwise (jumper-selectable)
 	//m_fdc->intrq_wr_callback().set_inputline(m_maincpu, ??); // info missing from schematic
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", bigbord2_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", bigbord2_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, "fdc:0", bigbord2_floppies, "8dsdd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", bigbord2_floppies, "8dsdd", floppy_image_device::default_floppy_formats).enable_sound(true);
 
 	mc6845_device &crtc(MC6845(config, "crtc", 16_MHz_XTAL / 8));
 	crtc.set_screen("screen");

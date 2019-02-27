@@ -423,7 +423,7 @@ MACHINE_CONFIG_START(cultures_state::cultures)
 	MCFG_SCREEN_UPDATE_DRIVER(cultures_state, screen_update_cultures)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cultures)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_cultures);
 	MCFG_PALETTE_ADD("palette", 0x3000/2)
 	MCFG_PALETTE_FORMAT(xRGBRRRRGGGGBBBB_bit0)
 

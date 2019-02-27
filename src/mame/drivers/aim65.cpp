@@ -207,7 +207,7 @@ MACHINE_CONFIG_START(aim65_state::aim65)
 
 	/* Sound - wave sound only */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cassette1).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* other devices */
 	mos6532_new_device &riot(MOS6532_NEW(config, "riot", AIM65_CLOCK));
@@ -232,12 +232,12 @@ MACHINE_CONFIG_START(aim65_state::aim65)
 	pia.writepb_handler().set(FUNC(aim65_state::aim65_pia_b_w));
 
 	// Deck 1 can play and record
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
+	CASSETTE(config, m_cassette1);
+	m_cassette1->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 
 	// Deck 2 can only record
-	MCFG_CASSETTE_ADD( "cassette2" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_RECORD | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
+	CASSETTE(config, m_cassette2);
+	m_cassette2->set_default_state(CASSETTE_RECORD | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED);
 
 	MCFG_GENERIC_SOCKET_ADD("z26", generic_plain_slot, "aim65_z26_cart")
 	MCFG_GENERIC_EXTENSIONS("z26")
@@ -272,7 +272,7 @@ MACHINE_CONFIG_START(aim65_state::aim65)
 	RAM(config, RAM_TAG).set_default_size("4K").set_extra_options("1K,2K,3K");
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","aim65_cart")
+	SOFTWARE_LIST(config, "cart_list").set_original("aim65_cart");
 MACHINE_CONFIG_END
 
 
