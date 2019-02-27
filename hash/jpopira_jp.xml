@@ -18,7 +18,7 @@
 
 	-->
 
-	<software name="jp01">
+	<software name="jp01" supported="no">
 		<description>JP-01 (Japan)</description>
 		<year>2004</year>
 		<publisher>Takara</publisher>
@@ -30,7 +30,7 @@
 		</part>
 	</software>
 
-	<software name="jp02">
+	<software name="jp02" supported="no">
 		<description>JP-02 (Japan)</description>
 		<year>2004</year>
 		<publisher>Takara</publisher>

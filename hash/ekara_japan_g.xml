@@ -18,13 +18,13 @@
 	G-5   GC0005-TPJ  TV Pop Volume 1
 	G-6  *GC0006-BHT  BHT Volume 3 (Best Artists?)
 	G-7  *GC0007-BAT  BAT Volume 3 (Artist Selection?)
-	G-8  *GC0008-MIN? untranslated (no volume)
+	G-8  *GC0008-MIN  mini-moni Volume 1
 	G-9   GC0009-TPJ  TV Pop Volume 3 (Volume 2 is 'P-2' in 'P' series)
 	G-10 *GC0010-BAT  BAT Volume 4 (Artist Selection?)
 	G-11  GC0011-TPJ  TV Pop Volume 4
 	G-12  GC0012-BHT  BHT Volume 5 (Best Artists?) (Volume 4 is 'P-1' in 'P' series)
 	G-13  GC0013-     (unknown) Volume 6
-	G-14 *GC0014-MIN? (unknown) Volume 2
+	G-14 *GC0014-MIN  mini-moni Volume 2
 	G-15 *GC0015-BAT  BAT Volume 5 (Artist Selection?)
 	G-16 *GC0016-TPJ  TV Pop Volume 5
 	G-17 *GC0017-TPJ  TV Pop Volume 6
@@ -101,7 +101,7 @@
 	</software>
 
 	<software name="gc0008">
-		<description>Mini Moni Volume 1 (Japan) (GC0008-MIN) (set 1)</description>
+		<description>mini-moni Volume 1 (Japan) (GC0008-MIN) (set 1)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
@@ -112,7 +112,7 @@
 	</software>
 
 	<software name="gc0008a" cloneof="gc0008">
-		<description>MIN Volume 1 (Japan) (GC0008-MIN) (set 2)</description>
+		<description>mini-moni Volume 1 (Japan) (GC0008-MIN) (set 2)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
@@ -148,7 +148,7 @@
 
 
 	<software name="gc0014">
-		<description>Mini Moni Volume 2 (GC0014-MIN)</description>
+		<description>mini-moni Volume 2 (GC0014-MIN)</description>
 		<year>2002</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
