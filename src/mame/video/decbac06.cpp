@@ -315,7 +315,7 @@ void deco_bac06_device::custom_tilemap_draw(bitmap_ind16 &bitmap,
 
 	src_y += cliprect.top();
 	for (y=cliprect.top(); y<=cliprect.bottom(); y++)
-  {
+	{
 		if (row_scroll_enabled)
 			src_x=scrollx + rowscroll_ptr[(src_y >> (control1[3]&0xf))&(0x1ff>>(control1[3]&0xf))];
 		else
@@ -326,7 +326,7 @@ void deco_bac06_device::custom_tilemap_draw(bitmap_ind16 &bitmap,
 
 		src_x += cliprect.left();
 		for (x=cliprect.left(); x<=cliprect.right(); x++)
-    {
+		{
 			if (col_scroll_enabled)
 				column_offset=colscroll_ptr[((src_x >> 3) >> (control1[2]&0xf))&(0x3f>>(control1[2]&0xf))];
 
