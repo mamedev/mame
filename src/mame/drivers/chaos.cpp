@@ -110,10 +110,10 @@ WRITE8_MEMBER( chaos_state::port1f_w )
 	if (!data)
 		data = 0x24;
 
-	m_terminal->write(space, 0, data);
+	m_terminal->write(data);
 
 	if (data == 0x0d)
-		m_terminal->write(space, 0, 0x0a);
+		m_terminal->write(0x0a);
 }
 
 READ8_MEMBER( chaos_state::port90_r )

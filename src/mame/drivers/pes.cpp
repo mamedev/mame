@@ -110,7 +110,7 @@ READ8_MEMBER( pes_state::data_to_i8031)
 
 WRITE8_MEMBER(pes_state::data_from_i8031)
 {
-	m_terminal->write(space,0,data);
+	m_terminal->write(data);
 #ifdef DEBUG_SERIAL_CB
 	fprintf(stderr,"callback: output from i8031/pes to pc/terminal: %02X\n",data);
 #endif

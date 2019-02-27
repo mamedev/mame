@@ -46,7 +46,7 @@ private:
 
 WRITE16_MEMBER( dual68_state::terminal_w )
 {
-	m_terminal->write(space, 0, data >> 8);
+	m_terminal->write(data >> 8);
 }
 
 void dual68_state::dual68_mem(address_map &map)

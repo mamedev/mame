@@ -196,7 +196,7 @@ WRITE8_MEMBER( ravens_state::port1b_w )
 	else
 		data = m_term_char;
 
-	m_terminal->write(space, 0, data);
+	m_terminal->write(data);
 }
 
 WRITE8_MEMBER( ravens_state::port1c_w )

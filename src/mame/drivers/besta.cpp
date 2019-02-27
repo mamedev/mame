@@ -69,7 +69,7 @@ WRITE8_MEMBER( besta_state::mpcc_reg_w )
 			kbd_put(data);
 			break;
 		case 10:
-			m_terminal->write(generic_space(), 0, data);
+			m_terminal->write(data);
 		default:
 			m_mpcc_regs[offset] = data;
 			break;
