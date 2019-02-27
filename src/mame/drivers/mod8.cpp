@@ -94,7 +94,7 @@ WRITE8_MEMBER( mod8_state::out_w )
 
 	if (m_tty_cnt == 10)
 	{
-		m_teleprinter->write(space, 0, (m_tty_data >> 7) & 0x7f);
+		m_teleprinter->write((m_tty_data >> 7) & 0x7f);
 		m_tty_cnt = 0;
 	}
 }

@@ -167,7 +167,7 @@ READ32_MEMBER( cxhumax_state::cx_scratch_r )
 		int i = 0;
 		while ((temp=program.read_byte(m_maincpu->state_int(ARM7_R0)+i))) {
 			buf[i++]=temp;
-			//m_terminal->write(space, 0, temp);
+			//m_terminal->write(temp);
 		}
 		osd_printf_debug("%s", buf);
 		verboselog(*this, 9, "(DEBUG) %s", buf);
@@ -412,7 +412,7 @@ WRITE32_MEMBER( cxhumax_state::cx_uart2_w )
 		case UART_FIFO_REG:
 			if(!(m_uart2_regs[UART_FRMC_REG]&UART_FRMC_BDS_BIT)) {
 				/* Sending byte... add logging */
-				m_terminal->write(space, 0, data);
+				m_terminal->write(data);
 
 				/* Transmitter Idle Interrupt Enable */
 				if(m_uart2_regs[UART_IRQE_REG]&UART_IRQE_TIDE_BIT) {

@@ -156,7 +156,7 @@ WRITE16_MEMBER(pdp11_state::teletype_ctrl_w)
 	switch(offset)
 	{
 		case 3:
-			m_terminal->write(space, 0, data);
+			m_terminal->write(data);
 			break;
 	}
 }
