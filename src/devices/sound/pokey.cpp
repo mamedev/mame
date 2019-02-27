@@ -589,13 +589,13 @@ uint32_t pokey_device::step_one_clock(void)
 			}
 		}
 
-		if (++m_p4 >= 0x0000f)
+		if (++m_p4 == 0x0000f)
 			m_p4 = 0;
-		if (++m_p5 >= 0x0001f)
+		if (++m_p5 == 0x0001f)
 			m_p5 = 0;
-		if (++m_p9 >= 0x001ff)
+		if (++m_p9 == 0x001ff)
 			m_p9 = 0;
-		if (++m_p17 >= 0x1ffff)
+		if (++m_p17 == 0x1ffff)
 			m_p17 = 0;
 
 		clk = (m_AUDCTL & CH1_HICLK) ? CLK_1 : base_clock;
