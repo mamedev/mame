@@ -22,12 +22,12 @@
 DEFINE_DEVICE_TYPE(NES_MIRACLE, nes_miracle_device, "nes_miracle", "NES Miracle Piano Controller")
 
 
-MACHINE_CONFIG_START(nes_miracle_device::device_add_mconfig)
-	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_MIDI_RX_HANDLER(WRITELINE(*this, nes_miracle_device, rx_w))
+void nes_miracle_device::device_add_mconfig(machine_config &config)
+{
+	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set(FUNC(nes_miracle_device::rx_w));
 
-	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
-MACHINE_CONFIG_END
+	MIDI_PORT(config, "mdout", midiout_slot, "midiout");
+}
 
 
 //-------------------------------------------------

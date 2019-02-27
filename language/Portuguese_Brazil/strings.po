@@ -1,15 +1,15 @@
 # Brazilian Portuguese translations for MAME Project.
 # Traduções para o Português do Brasil para o Projeto MAME.
-# Copyright (C) 1997-2018  MAMEDev and contributors
+# Copyright (C) 1997-2019  MAMEDev and contributors
 # This file is distributed under the same license as the MAME Project.
-# Automatically generated, 2018.
+# Automatically generated, 2019.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-04-28 15:32+1000\n"
-"PO-Revision-Date: 2018-04-30 13:17-0300\n"
+"PO-Revision-Date: 2019-02-05 17:50-0300\n"
 "Last-Translator: Katananja, Ashura-X\n"
 "Language-Team: MAME Language Team\n"
 "Language: pt_BR\n"
@@ -257,7 +257,7 @@ msgstr "ROMs"
 
 #: src/frontend/mame/ui/dirmenu.cpp:36
 msgid "Software Media"
-msgstr "Mídia de Software"
+msgstr "Software em Mídia"
 
 #: src/frontend/mame/ui/dirmenu.cpp:37
 msgid "UI"
@@ -281,7 +281,7 @@ msgstr "INIs"
 
 #: src/frontend/mame/ui/dirmenu.cpp:42
 msgid "Category INIs"
-msgstr "Categoria INIs"
+msgstr "INIs de Categoria"
 
 #: src/frontend/mame/ui/dirmenu.cpp:43
 msgid "Icons"
@@ -313,34 +313,34 @@ msgstr "Fim do Jogo"
 
 #: src/frontend/mame/ui/dirmenu.cpp:116
 msgid "Folders Setup"
-msgstr "Configurar Pastas"
+msgstr "Configuração de Diretórios"
 
 #: src/frontend/mame/ui/dirmenu.cpp:167
 #, c-format
 msgid "Current %1$s Folders"
-msgstr "%1$s Pastas Atuais"
+msgstr "%1$s Diretórios Atuais"
 
 #: src/frontend/mame/ui/dirmenu.cpp:179
 msgid "Change Folder"
-msgstr "Mudar Pasta"
+msgstr "Mudar o Diretório"
 
 #: src/frontend/mame/ui/dirmenu.cpp:179
 msgid "Add Folder"
-msgstr "Adicionar Pasta"
+msgstr "Adicionar Diretório"
 
 #: src/frontend/mame/ui/dirmenu.cpp:182
 msgid "Remove Folder"
-msgstr "Remover Pasta"
+msgstr "Remover Diretório"
 
 #: src/frontend/mame/ui/dirmenu.cpp:418
 #, c-format
 msgid "Change %1$s Folder - Search: %2$s_"
-msgstr "Mudar %1$s Pasta(s) - Pesquisa: %2$s_"
+msgstr "Mudar %1$s Diretório(s) - Pesquisa: %2$s_"
 
 #: src/frontend/mame/ui/dirmenu.cpp:418
 #, c-format
 msgid "Add %1$s Folder - Search: %2$s_"
-msgstr "Adicionar %1$s Pasta(s) - Pesquisa: %2$s_"
+msgstr "Adicionar %1$s Diretório(s) - Pesquisa: %2$s_"
 
 #: src/frontend/mame/ui/dirmenu.cpp:429
 msgid "Press TAB to set"
@@ -349,7 +349,7 @@ msgstr "Pressione TAB para definir"
 #: src/frontend/mame/ui/dirmenu.cpp:513
 #, c-format
 msgid "Remove %1$s Folder"
-msgstr "Remover %1$s Pasta(s)"
+msgstr "Remover %1$s Diretório(s)"
 
 #: src/frontend/mame/ui/info.cpp:30
 msgid "protection"
@@ -920,7 +920,7 @@ msgstr "Atraso Visível"
 #: src/frontend/mame/ui/miscmenu.cpp:601
 #, c-format
 msgid "%s.xml saved under ui folder."
-msgstr "%s.xml foi salvo na pasta ui."
+msgstr "%s.xml foi salvo no diretório ui."
 
 #: src/frontend/mame/ui/miscmenu.cpp:627
 msgid "Name:             Description:\n"
@@ -929,7 +929,7 @@ msgstr "Nome:             Descrição:\n"
 #: src/frontend/mame/ui/miscmenu.cpp:638
 #, c-format
 msgid "%s.txt saved under ui folder."
-msgstr "%s.txt salvo na pasta ui."
+msgstr "%s.txt salvo no diretório ui."
 
 #: src/frontend/mame/ui/miscmenu.cpp:655
 msgid "Export list in XML format (like -listxml)"
@@ -2111,7 +2111,7 @@ msgstr "Adicionar filtro"
 
 #: src/frontend/mame/ui/utils.cpp:959
 msgid "Select category:"
-msgstr "Selecione a categoria"
+msgstr "Escolha uma categoria"
 
 #: src/frontend/mame/ui/utils.cpp:990
 msgid "[no category INI files]"
@@ -2123,7 +2123,7 @@ msgstr "[sem grupos no arquivo INI]"
 
 #: src/frontend/mame/ui/utils.cpp:1032
 msgid "No category INI files found"
-msgstr "arquivos INI sem categoria encontrada"
+msgstr "Nenhum arquivo INI contendo categorias foram encontrados"
 
 #: src/frontend/mame/ui/utils.cpp:1037
 msgid "File"
@@ -2825,7 +2825,7 @@ msgid ""
 "Ensure that cheatpath folder exists"
 msgstr ""
 "Não é possível escrever no arquivo\n"
-"Tenha certeza de que o caminho da pasta cheatpath existe"
+"Tenha certeza que o caminho para o diretório cheatpath exista"
 
 #: plugins/cheatfind/init.lua:451
 msgid "Cancel"

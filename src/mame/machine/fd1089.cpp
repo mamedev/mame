@@ -71,14 +71,14 @@
                 do
                 {
                     byteval = rnd();
-                } while (byteval == 0x40);
+                } while (byteval == 0x00);
 
                 opcode_key[i] = byteval;
 
                 do
                 {
                     byteval = rnd();
-                } while (byteval == 0x40);
+                } while (byteval == 0x00);
 
                 data_key[i] = byteval;
             }
@@ -93,10 +93,10 @@
                 do
                 {
                     byteval = rnd();
-                } while (byteval == 0x40);
+                } while (byteval == 0x00);
 
                 opcode_key[i] = byteval;
-                data_key[i] = 0x40;
+                data_key[i] = 0x00;
             }
         }
     }
@@ -107,24 +107,24 @@
 
     Known games that use this CPU:
 
-    CPU #     Type  Status   Game              Seed   Unencrypted data range
-    --------- ------- --- -------------------- ------ -----------------------------------
-    317-0013A FD1089B [1] Enduro Racer         400001 030000-04ffff + 100000-1fffff
-    317-0016  FD1089? ??? Fantasy Zone         400005 ?
-    317-0018  FD1089A [1] Action Fighter       400003 400000-4fffff + 840000-8dffff + c00000-c4ffff + ff0000-ffffff
-    317-0019  FD1089A [1] Outrun               400007 000000-03ffff
-    317-0021  FD1089A [2] Alex Kidd            40000b ?
-    317-0022  FD1089A [1] Dunk Shot            40000d 030000-ffffff
-    317-0024  FD1089B [1] Time Scanner         40000f 000000-02ffff
-    317-0027  FD1089B [1] SDI                  400011 000000-03ffff
-    317-0028  FD1089A [2] Defense              400011 ?
-    317-0033  FD1089A [1] Alien Syndrome       400013 030000-ffffff
-    317-0037  FD1089B [2] Alien Syndrome       400013 030000-ffffff
-    317-0034  FD1089B [1] Super Hang-On        400015 030000-06ffff + 100000-2fffff + ff0000-ffffff
-    317-0086  FD1089A [2] Wonder Boy III       400043 ?
-    317-0167  FD1089A [2] Aurail               400030 010000-ffffff
-    317-0168  FD1089B [1] Aurail               400030 010000-ffffff
-    317-5021  FD1089B [1] Sukeban Jansi Ryuko  40004b 000000-00ffff
+    CPU #     Type  Status   Game             Seed    Unencrypted data range
+    --------- ------- --- -------------------- -- -----------------------------------
+    317-0013A FD1089B [1] Enduro Racer         01 030000-04ffff + 100000-1fffff
+    317-0016  FD1089B [2] Fantasy Zone         05 ?
+    317-0018  FD1089A [1] Action Fighter       03 400000-4fffff + 840000-8dffff + c00000-c4ffff + ff0000-ffffff
+    317-0019  FD1089A [1] Outrun               07 000000-03ffff
+    317-0021  FD1089A [2] Alex Kidd            0b ?
+    317-0022  FD1089A [1] Dunk Shot            0d 030000-ffffff
+    317-0024  FD1089B [1] Time Scanner         0f 000000-02ffff
+    317-0027  FD1089B [1] SDI                  11 000000-03ffff
+    317-0028  FD1089A [2] Defense              11 ?
+    317-0033  FD1089A [1] Alien Syndrome       13 030000-ffffff
+    317-0037  FD1089B [2] Alien Syndrome       13 030000-ffffff
+    317-0034  FD1089B [1] Super Hang-On        15 030000-06ffff + 100000-2fffff + ff0000-ffffff
+    317-0086  FD1089A [2] Wonder Boy III       43 ?
+    317-0167  FD1089A [2] Aurail               30 010000-ffffff
+    317-0168  FD1089B [1] Aurail               30 010000-ffffff
+    317-5021  FD1089B [1] Sukeban Jansi Ryuko  4b 000000-00ffff
 
 
     [1] Complete
@@ -283,13 +283,9 @@ uint8_t fd1089_base_device::rearrange_key(uint8_t table, bool opcode)
 	{
 		table ^= (1<<4);
 		table ^= (1<<5);
-		table ^= (1<<6);
 
 		if (BIT(~table,3))
 			table ^= (1<<1);
-
-		if (BIT(table,6))
-			table ^= (1<<7);
 
 		table = bitswap<8>(table,1,0,6,4,3,5,2,7);
 
@@ -305,10 +301,10 @@ uint8_t fd1089_base_device::rearrange_key(uint8_t table, bool opcode)
 		if (BIT(~table,3))
 			table ^= (1<<5);
 
-		if (BIT(~table,7))
+		if (BIT(table,7))
 			table ^= (1<<6);
 
-		table = bitswap<8>(table,5,6,7,4,2,3,1,0);
+		table = bitswap<8>(table,5,7,6,4,2,3,1,0);
 
 		if (BIT(table,6))
 			table = bitswap<8>(table,7,6,5,3,2,4,1,0);
@@ -337,7 +333,7 @@ uint8_t fd1089_base_device::rearrange_key(uint8_t table, bool opcode)
 uint8_t fd1089a_device::decode(uint8_t val, uint8_t key, bool opcode)
 {
 	// special case - don't decrypt
-	if (key == 0x40)
+	if (key == 0x00)
 		return val;
 
 	uint8_t table = rearrange_key(key, opcode);
@@ -397,7 +393,7 @@ uint8_t fd1089a_device::decode(uint8_t val, uint8_t key, bool opcode)
 uint8_t fd1089b_device::decode(uint8_t val, uint8_t key, bool opcode)
 {
 	// special case - don't decrypt
-	if (key == 0x40)
+	if (key == 0x00)
 		return val;
 
 	uint8_t table = rearrange_key(key, opcode);

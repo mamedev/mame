@@ -659,14 +659,14 @@ MACHINE_CONFIG_START(mbee_state::mbee)
 	m_pio->in_pb_callback().set(FUNC(mbee_state::pio_port_b_r));
 	m_pio->out_pb_callback().set(FUNC(mbee_state::pio_port_b_w));
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(250)) /* not accurate */
-	MCFG_SCREEN_SIZE(64*8, 19*16)           /* need at least 17 lines for NET */
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0, 19*16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mbee_state, screen_update_mbee)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(50);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(250)); /* not accurate */
+	m_screen->set_size(64*8, 19*16);           /* need at least 17 lines for NET */
+	m_screen->set_visarea(0*8, 64*8-1, 0, 19*16-1);
+	m_screen->set_screen_update(FUNC(mbee_state::screen_update_mbee));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_mono)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_mono);
 
 	PALETTE(config, m_palette, FUNC(mbee_state::standard_palette), 100);
 
@@ -686,17 +686,18 @@ MACHINE_CONFIG_START(mbee_state::mbee)
 	m_crtc->set_on_update_addr_change_callback(FUNC(mbee_state::crtc_update_addr), this);
 	m_crtc->out_vsync_callback().set(FUNC(mbee_state::crtc_vs));
 
-	MCFG_QUICKLOAD_ADD("quickload", mbee_state, mbee, "mwb,com,bee", 3)
-	MCFG_QUICKLOAD_ADD("quickload2", mbee_state, mbee_z80bin, "bin", 3)
+	MCFG_QUICKLOAD_ADD("quickload", mbee_state, mbee, "mwb,com,bee", attotime::from_seconds(3))
+	MCFG_QUICKLOAD_ADD("quickload2", mbee_state, mbee_z80bin, "bin", attotime::from_seconds(3))
 
-	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE("z80pio", z80pio_device, strobe_a))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->ack_handler().set(m_pio, FUNC(z80pio_device::strobe_a));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	OUTPUT_LATCH(config, m_cent_data_out);
+	m_centronics->set_output_latch(*m_cent_data_out);
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(mbee_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(mbee_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 MACHINE_CONFIG_END
 
 
@@ -716,14 +717,14 @@ MACHINE_CONFIG_START(mbee_state::mbeeic)
 	m_pio->in_pb_callback().set(FUNC(mbee_state::pio_port_b_r));
 	m_pio->out_pb_callback().set(FUNC(mbee_state::pio_port_b_w));
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(250)) /* not accurate */
-	MCFG_SCREEN_SIZE(80*8, 310)
-	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 19*16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mbee_state, screen_update_mbee)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(50);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(250)); /* not accurate */
+	m_screen->set_size(80*8, 310);
+	m_screen->set_visarea(0, 80*8-1, 0, 19*16-1);
+	m_screen->set_screen_update(FUNC(mbee_state::screen_update_mbee));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_standard)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_standard);
 
 	PALETTE(config, m_palette, FUNC(mbee_state::standard_palette), 100);
 
@@ -743,109 +744,105 @@ MACHINE_CONFIG_START(mbee_state::mbeeic)
 	m_crtc->set_on_update_addr_change_callback(FUNC(mbee_state::crtc_update_addr), this);
 	m_crtc->out_vsync_callback().set(FUNC(mbee_state::crtc_vs));
 
-	MCFG_QUICKLOAD_ADD("quickload", mbee_state, mbee, "mwb,com,bee", 2)
-	MCFG_QUICKLOAD_ADD("quickload2", mbee_state, mbee_z80bin, "bin", 2)
+	MCFG_QUICKLOAD_ADD("quickload", mbee_state, mbee, "mwb,com,bee", attotime::from_seconds(2))
+	MCFG_QUICKLOAD_ADD("quickload2", mbee_state, mbee_z80bin, "bin", attotime::from_seconds(2))
 
-	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(m_pio, z80pio_device, strobe_a))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->ack_handler().set(m_pio, FUNC(z80pio_device::strobe_a));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	OUTPUT_LATCH(config, m_cent_data_out);
+	m_centronics->set_output_latch(*m_cent_data_out);
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(mbee_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(mbee_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(mbee_state::mbeepc)
+void mbee_state::mbeepc(machine_config &config)
+{
 	mbeeic(config);
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP(mbeepc_mem)
-	MCFG_DEVICE_IO_MAP(mbeepc_io)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &mbee_state::mbeepc_mem);
+	m_maincpu->set_addrmap(AS_IO, &mbee_state::mbeepc_io);
+}
 
-MACHINE_CONFIG_START(mbee_state::mbeeppc)
+void mbee_state::mbeeppc(machine_config &config)
+{
 	mbeeic(config);
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP(mbeeppc_mem)
-	MCFG_DEVICE_IO_MAP(mbeeppc_io)
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &mbee_state::mbeeppc_mem);
+	m_maincpu->set_addrmap(AS_IO, &mbee_state::mbeeppc_io);
 	MCFG_VIDEO_START_OVERRIDE(mbee_state, premium)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_premium)
+	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_premium);
 	m_palette->set_init(FUNC(mbee_state::premium_palette));
 
 	MC146818(config, m_rtc, 32.768_kHz_XTAL);
 	m_rtc->irq().set(FUNC(mbee_state::rtc_irq_w));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(mbee_state::mbee56)
+void mbee_state::mbee56(machine_config &config)
+{
 	mbeeic(config);
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP(mbee56_mem)
-	MCFG_DEVICE_IO_MAP(mbee56_io)
+	m_maincpu->set_addrmap(AS_PROGRAM, &mbee_state::mbee56_mem);
+	m_maincpu->set_addrmap(AS_IO, &mbee_state::mbee56_io);
 	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee56)
 
 	WD2793(config, m_fdc, 4_MHz_XTAL / 2);
 	m_fdc->intrq_wr_callback().set(FUNC(mbee_state::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(mbee_state::fdc_drq_w));
 	m_fdc->enmf_rd_callback().set_constant(0);
-	MCFG_FLOPPY_DRIVE_ADD(m_floppy0, mbee_floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD(m_floppy1, mbee_floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-MACHINE_CONFIG_END
+	FLOPPY_CONNECTOR(config, m_floppy0, mbee_floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy1, mbee_floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
+}
 
-MACHINE_CONFIG_START(mbee_state::mbee128)
+void mbee_state::mbee128(machine_config &config)
+{
 	mbee56(config);
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP(mbee256_mem)
-	MCFG_DEVICE_IO_MAP(mbee128_io)
+	m_maincpu->set_addrmap(AS_PROGRAM, &mbee_state::mbee256_mem);
+	m_maincpu->set_addrmap(AS_IO, &mbee_state::mbee128_io);
 	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee128)
 
 	MC146818(config, m_rtc, 32.768_kHz_XTAL);
 	m_rtc->irq().set(FUNC(mbee_state::rtc_irq_w));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(mbee_state::mbee128p)
+void mbee_state::mbee128p(machine_config &config)
+{
 	mbeeppc(config);
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP(mbee256_mem)
-	MCFG_DEVICE_IO_MAP(mbee128_io)
+	m_maincpu->set_addrmap(AS_PROGRAM, &mbee_state::mbee256_mem);
+	m_maincpu->set_addrmap(AS_IO, &mbee_state::mbee128_io);
 	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee128)
 
 	WD2793(config, m_fdc, 4_MHz_XTAL / 2);
 	m_fdc->intrq_wr_callback().set(FUNC(mbee_state::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(mbee_state::fdc_drq_w));
 	m_fdc->enmf_rd_callback().set_constant(0);
-	MCFG_FLOPPY_DRIVE_ADD(m_floppy0, mbee_floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD(m_floppy1, mbee_floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-MACHINE_CONFIG_END
+	FLOPPY_CONNECTOR(config, m_floppy0, mbee_floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy1, mbee_floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
+}
 
-MACHINE_CONFIG_START(mbee_state::mbee256)
+void mbee_state::mbee256(machine_config &config)
+{
 	mbee128p(config);
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP(mbee256_mem)
-	MCFG_DEVICE_IO_MAP(mbee256_io)
+	m_maincpu->set_addrmap(AS_PROGRAM, &mbee_state::mbee256_mem);
+	m_maincpu->set_addrmap(AS_IO, &mbee_state::mbee256_io);
 	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee256)
 
-	MCFG_DEVICE_REMOVE("fdc:0")
-	MCFG_DEVICE_REMOVE("fdc:1")
-	MCFG_FLOPPY_DRIVE_ADD(m_floppy0, mbee_floppies, "35dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD(m_floppy1, mbee_floppies, "35dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-MACHINE_CONFIG_END
+	config.device_remove("fdc:0");
+	config.device_remove("fdc:1");
+	FLOPPY_CONNECTOR(config, m_floppy0, mbee_floppies, "35dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy1, mbee_floppies, "35dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+}
 
-MACHINE_CONFIG_START(mbee_state::mbeett)
+void mbee_state::mbeett(machine_config &config)
+{
 	mbeeppc(config);
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP(mbeett_mem)
-	MCFG_DEVICE_IO_MAP(mbeett_io)
+	m_maincpu->set_addrmap(AS_PROGRAM, &mbee_state::mbeett_mem);
+	m_maincpu->set_addrmap(AS_IO, &mbee_state::mbeett_io);
 	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbeett)
-	MCFG_DEVICE_REMOVE("quickload")
-	MCFG_DEVICE_REMOVE("quickload2")
+	config.device_remove("quickload");
+	config.device_remove("quickload2");
 	SCC8530(config, "scc", 4000000); // clock unknown
-MACHINE_CONFIG_END
+}
 
 /* Unused roms:
     ROM_LOAD_OPTIONAL("net.rom", 0xe000,  0x1000, CRC(e14aac4c) SHA1(330902cf47f53c22c85003a620f7d7d3261ebb67) )

@@ -10,10 +10,18 @@
 #include "emu.h"
 #include "decioga.h"
 
+#define LOG_DMA         (1U << 0)
+#define LOG_LANCE_DMA   (1U << 1)
+
+#define VERBOSE (LOG_DMA|LOG_LANCE_DMA)
+
+#include "logmacro.h"
+
 DEFINE_DEVICE_TYPE(DECSTATION_IOGA, dec_ioga_device, "decioga", "DECstation I/O Gate Array")
 
 void dec_ioga_device::map(address_map &map)
 {
+	map(0x040000, 0x0400ff).rw(FUNC(dec_ioga_device::dmaptr_r), FUNC(dec_ioga_device::dmaptr_w));
 	map(0x040100, 0x040103).rw(FUNC(dec_ioga_device::csr_r), FUNC(dec_ioga_device::csr_w));
 	map(0x040110, 0x040113).rw(FUNC(dec_ioga_device::intr_r), FUNC(dec_ioga_device::intr_w));
 	map(0x040120, 0x040123).rw(FUNC(dec_ioga_device::imsk_r), FUNC(dec_ioga_device::imsk_w));
@@ -91,6 +99,17 @@ WRITE32_MEMBER(dec_ioga_device::imsk_w)
 	COMBINE_DATA(&m_imsk);
 }
 
+READ32_MEMBER(dec_ioga_device::dmaptr_r)
+{
+	return m_dmaptrs[offset/4];
+}
+
+WRITE32_MEMBER(dec_ioga_device::dmaptr_w)
+{
+	COMBINE_DATA(&m_dmaptrs[offset/4]);
+	LOGMASKED(LOG_DMA, "DECIOGA: %08x to DMA pointer %x (addr %x)\n", data, offset/4, offset*4);
+}
+
 WRITE_LINE_MEMBER(dec_ioga_device::rtc_irq_w)
 {
 	if (state == ASSERT_LINE)
@@ -137,4 +156,22 @@ WRITE_LINE_MEMBER(dec_ioga_device::scc1_irq_w)
 		m_intr &= ~0x80;
 	}
 	recalc_irq();
+}
+
+// DMA handlers
+void dec_ioga_device::set_dma_space(address_space *space)
+{
+	m_maincpu_space = space;
+}
+
+READ16_MEMBER(dec_ioga_device::lance_dma_r)
+{
+	LOGMASKED(LOG_LANCE_DMA, "lance_dma_r: %08x (phys %08x)\n", offset, (offset<<1) + (m_dmaptrs[2]>>3));
+	return m_maincpu_space->read_word((offset<<1) + (m_dmaptrs[2]>>3));
+}
+
+WRITE16_MEMBER(dec_ioga_device::lance_dma_w)
+{
+	LOGMASKED(LOG_LANCE_DMA, "lance_dma_w: %04x to %08x\n", data, offset);
+	m_maincpu_space->write_word((offset<<1) + (m_dmaptrs[2]>>3), data);
 }

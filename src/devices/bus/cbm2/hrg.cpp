@@ -88,37 +88,39 @@ void cbm2_hrg_b_device::hrg_b_map(address_map &map)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(cbm2_hrg_a_device::device_add_mconfig)
-	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
-	MCFG_SCREEN_UPDATE_DEVICE(EF9365_TAG, ef9365_device, screen_update)
-	MCFG_SCREEN_SIZE(512, 512)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 512-1)
-	MCFG_SCREEN_REFRESH_RATE(25)
+void cbm2_hrg_a_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen.set_screen_update(EF9365_TAG, FUNC(ef9365_device::screen_update));
+	screen.set_size(512, 512);
+	screen.set_visarea(0, 512-1, 0, 512-1);
+	screen.set_refresh_hz(25);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	MCFG_DEVICE_ADD(EF9365_TAG, EF9365, 1750000)
-	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
-	MCFG_DEVICE_ADDRESS_MAP(0, hrg_a_map)
-	MCFG_EF936X_PALETTE("palette")
-	MCFG_EF936X_BITPLANES_CNT(1);
-	MCFG_EF936X_DISPLAYMODE(DISPLAY_MODE_512x512);
-MACHINE_CONFIG_END
+	EF9365(config, m_gdc, 1750000);
+	m_gdc->set_screen(SCREEN_TAG);
+	m_gdc->set_addrmap(0, &cbm2_hrg_a_device::hrg_a_map);
+	m_gdc->set_palette_tag("palette");
+	m_gdc->set_nb_bitplanes(1);
+	m_gdc->set_display_mode(ef9365_device::DISPLAY_MODE_512x512);
+}
 
-MACHINE_CONFIG_START(cbm2_hrg_b_device::device_add_mconfig)
-	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
-	MCFG_SCREEN_UPDATE_DEVICE(EF9366_TAG, ef9365_device, screen_update)
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_REFRESH_RATE(50)
+void cbm2_hrg_b_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen.set_screen_update(EF9366_TAG, FUNC(ef9365_device::screen_update));
+	screen.set_size(512, 256);
+	screen.set_visarea(0, 512-1, 0, 256-1);
+	screen.set_refresh_hz(50);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	MCFG_DEVICE_ADD(EF9366_TAG, EF9365, 1750000)
-	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
-	MCFG_DEVICE_ADDRESS_MAP(0, hrg_b_map)
-	MCFG_EF936X_PALETTE("palette")
-	MCFG_EF936X_BITPLANES_CNT(1);
-	MCFG_EF936X_DISPLAYMODE(DISPLAY_MODE_512x256);
-MACHINE_CONFIG_END
+	EF9365(config, m_gdc, 1750000); //EF9366
+	m_gdc->set_screen(SCREEN_TAG);
+	m_gdc->set_addrmap(0, &cbm2_hrg_b_device::hrg_b_map);
+	m_gdc->set_palette_tag("palette");
+	m_gdc->set_nb_bitplanes(1);
+	m_gdc->set_display_mode(ef9365_device::DISPLAY_MODE_512x256);
+}
 
 
 
@@ -172,7 +174,7 @@ void cbm2_hrg_device::device_reset()
 //  cbm2_bd_r - cartridge data read
 //-------------------------------------------------
 
-uint8_t cbm2_hrg_device::cbm2_bd_r(address_space &space, offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3)
+uint8_t cbm2_hrg_device::cbm2_bd_r(offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3)
 {
 	if (!csbank3)
 	{
@@ -203,7 +205,7 @@ uint8_t cbm2_hrg_device::cbm2_bd_r(address_space &space, offs_t offset, uint8_t 
 		}
 		else if (offset >= 0x7ff0)
 		{
-			data = m_gdc->data_r(space, offset & 0x0f);
+			data = m_gdc->data_r(machine().dummy_space(), offset & 0x0f);
 		}
 	}
 
@@ -215,7 +217,7 @@ uint8_t cbm2_hrg_device::cbm2_bd_r(address_space &space, offs_t offset, uint8_t 
 //  cbm2_bd_w - cartridge data write
 //-------------------------------------------------
 
-void cbm2_hrg_device::cbm2_bd_w(address_space &space, offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3)
+void cbm2_hrg_device::cbm2_bd_w(offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3)
 {
 	if (!csbank3)
 	{
@@ -238,7 +240,7 @@ void cbm2_hrg_device::cbm2_bd_w(address_space &space, offs_t offset, uint8_t dat
 		}
 		else if (offset >= 0x7ff0)
 		{
-			m_gdc->data_w(space, offset & 0x0f, data);
+			m_gdc->data_w(machine().dummy_space(), offset & 0x0f, data);
 		}
 	}
 }

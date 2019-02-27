@@ -291,7 +291,8 @@ void ti990_4_state::init_ti990_4()
 	m_nmi_timer = timer_alloc(NMI_TIMER_ID);
 }
 
-MACHINE_CONFIG_START(ti990_4_state::ti990_4)
+void ti990_4_state::ti990_4(machine_config &config)
+{
 	/* basic machine hardware */
 	/* TMS9900 CPU @ 3.0(???) MHz */
 	TMS9900(config, m_maincpu, 3000000);
@@ -311,9 +312,10 @@ MACHINE_CONFIG_START(ti990_4_state::ti990_4)
 	TI99X_FD800(config, "fd800", 0).int_cb().set(FUNC(ti990_4_state::fd_interrupt));
 
 	//  TODO: Add floppy drives
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(ti990_4_state::ti990_4v)
+void ti990_4_state::ti990_4v(machine_config &config)
+{
 	/* basic machine hardware */
 	/* TMS9900 CPU @ 3.0(???) MHz */
 	TMS9900(config, m_maincpu, 3000000);
@@ -331,7 +333,7 @@ MACHINE_CONFIG_START(ti990_4_state::ti990_4v)
 	TI99X_FD800(config, "fd800", 0).int_cb().set(FUNC(ti990_4_state::fd_interrupt));
 
 	//  TODO: Add floppy drives
-MACHINE_CONFIG_END
+}
 
 /*
   ROM loading

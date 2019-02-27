@@ -238,38 +238,41 @@ void prof180x_state::machine_reset()
 	}
 }
 
-MACHINE_CONFIG_START(prof180x_state::prof180x)
+void prof180x_state::prof180x(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(HD64180_TAG, Z80, XTAL(9'216'000))
-	MCFG_DEVICE_PROGRAM_MAP(prof180x_mem)
-	MCFG_DEVICE_IO_MAP(prof180x_io)
+	z80_device &maincpu(Z80(config, HD64180_TAG, XTAL(9'216'000)));
+	maincpu.set_addrmap(AS_PROGRAM, &prof180x_state::prof180x_mem);
+	maincpu.set_addrmap(AS_IO, &prof180x_state::prof180x_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_UPDATE_DRIVER(prof180x_state, screen_update)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_screen_update(FUNC(prof180x_state::screen_update));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 640-1, 0, 480-1);
 
 	/* devices */
 	UPD765A(config, FDC9268_TAG, 8'000'000, false, true);
-	MCFG_FLOPPY_DRIVE_ADD(FDC9268_TAG ":0", prof180x_floppies, "35dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC9268_TAG ":1", prof180x_floppies, "35dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC9268_TAG ":2", prof180x_floppies, "35dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC9268_TAG ":3", prof180x_floppies, "35dd", floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, FDC9268_TAG ":0", prof180x_floppies, "35dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, FDC9268_TAG ":1", prof180x_floppies, "35dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, FDC9268_TAG ":2", prof180x_floppies, "35dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, FDC9268_TAG ":3", prof180x_floppies, "35dd", floppy_image_device::default_floppy_formats);
 
-	//MCFG_RTC8583_ADD(MK3835_TAG, rtc_intf)
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
+	//RTC8583(config, MK3835_TAG, rtc_intf);
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+
+	output_latch_device &latch(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(latch);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("128K").set_extra_options("256K,512K");
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "prof180")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "flop_list").set_original("prof180");
+}
 
 /* ROM definition */
 

@@ -85,38 +85,40 @@ uint32_t vt520_state::screen_update_vt520(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
-MACHINE_CONFIG_START(vt520_state::vt420)
+void vt520_state::vt420(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I80C31, XTAL(43'320'000) / 3) // SCN8031HCFN40 (divider not verified)
-	MCFG_DEVICE_PROGRAM_MAP(vt520_mem)
-	MCFG_DEVICE_IO_MAP(vt520_io)
+	I80C31(config, m_maincpu, XTAL(43'320'000) / 3); // SCN8031HCFN40 (divider not verified)
+	m_maincpu->set_addrmap(AS_PROGRAM, &vt520_state::vt520_mem);
+	m_maincpu->set_addrmap(AS_IO, &vt520_state::vt520_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(802, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 802-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DRIVER(vt520_state, screen_update_vt520)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(802, 480);
+	screen.set_visarea(0, 802-1, 0, 480-1);
+	screen.set_screen_update(FUNC(vt520_state::screen_update_vt520));
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(vt520_state::vt520)
+void vt520_state::vt520(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I80C32, XTAL(20'000'000)) // Philips P80C32IBPN
-	MCFG_DEVICE_PROGRAM_MAP(vt520_mem)
-	MCFG_DEVICE_IO_MAP(vt520_io)
+	I80C32(config, m_maincpu, XTAL(20'000'000)); // Philips P80C32IBPN
+	m_maincpu->set_addrmap(AS_PROGRAM, &vt520_state::vt520_mem);
+	m_maincpu->set_addrmap(AS_IO, &vt520_state::vt520_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(802, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 802-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DRIVER(vt520_state, screen_update_vt520)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(802, 480);
+	screen.set_visarea(0, 802-1, 0, 480-1);
+	screen.set_screen_update(FUNC(vt520_state::screen_update_vt520));
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
@@ -124,7 +126,7 @@ MACHINE_CONFIG_START(vt520_state::vt520)
 	// Which are DRAM 256K x 4bit
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("256K");
-MACHINE_CONFIG_END
+}
 
 /**************************************************************************************************************
 

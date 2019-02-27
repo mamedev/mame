@@ -16,6 +16,7 @@
 #include "video/decbac06.h"
 #include "video/decmxc06.h"
 #include "emupal.h"
+#include "screen.h"
 
 class dec0_state : public driver_device
 {
@@ -25,6 +26,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_soundlatch(*this, "soundlatch"),
+		m_screen(*this, "screen"),
+		m_gfxdecode(*this, "gfxdecode"),
 		m_tilegen(*this, "tilegen%u", 1U),
 		m_spritegen(*this, "spritegen"),
 		m_spriteram(*this, "spriteram"),
@@ -48,6 +51,7 @@ public:
 	void midresbj(machine_config &config);
 	void slyspy(machine_config &config);
 	void hbarrel(machine_config &config);
+	void bandit(machine_config &config);
 	void midresb(machine_config &config);
 	void ffantasybl(machine_config &config);
 	void drgninjab(machine_config &config);
@@ -69,6 +73,8 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<screen_device> m_screen;
+	required_device<gfxdecode_device> m_gfxdecode;
 	optional_device_array<deco_bac06_device, 3> m_tilegen;
 	optional_device<deco_mxc06_device> m_spritegen;
 	required_device<buffered_spriteram16_device> m_spriteram;
@@ -81,6 +87,8 @@ protected:
 	DECLARE_READ16_MEMBER(dec0_controls_r);
 	DECLARE_READ16_MEMBER(slyspy_controls_r);
 	DECLARE_WRITE16_MEMBER(priority_w);
+
+	void set_screen_raw_params_data_east(machine_config &config);
 
 private:
 	enum class mcu_type {
@@ -134,6 +142,7 @@ private:
 	DECLARE_VIDEO_START(dec0);
 
 	uint32_t screen_update_hbarrel(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_bandit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_baddudes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_birdtry(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_robocop(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -147,6 +156,7 @@ private:
 	void dec0_i8751_reset();
 	void h6280_decrypt(const char *cputag);
 	void dec0_map(address_map &map);
+	void dec0_tb_map(address_map &map);
 	void dec0_s_map(address_map &map);
 	void hippodrm_map(address_map &map);
 	void hippodrm_sub_map(address_map &map);

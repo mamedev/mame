@@ -28,11 +28,11 @@ UNIMPLEMENTED FEATURES :
  the intended instruction flow. Some loops were omitted!
 
  USAGE:  tie WF (write fault) to ground if not needed:
- MCFG_WD2010_IN_WF_CB(GND)
+ in_wf_callback().set_constant(0)
 
  Other signals should be set to VCC if not serviced:
- MCFG_WD2010_IN_DRDY_CB(VCC)  // DRIVE READY = VCC
- MCFG_WD2010_IN_SC_CB(VCC)    // SEEK COMPLETE = VCC
+ in_drdy_callback().set_constant(1)   // DRIVE READY = VCC
+ in_sc_callback().set_constant(1)     // SEEK COMPLETE = VCC
  **********************************************************************/
 
 #include "emu.h"
@@ -233,7 +233,7 @@ void wd2010_device::device_reset()
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER(wd2010_device::read)
+uint8_t wd2010_device::read(offs_t offset)
 {
 	uint8_t data;
 
@@ -273,7 +273,7 @@ READ8_MEMBER(wd2010_device::read)
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER(wd2010_device::write)
+void wd2010_device::write(offs_t offset, uint8_t data)
 {
 	m_task_file[offset] = data;
 

@@ -318,14 +318,14 @@ MACHINE_CONFIG_START(amu880_state::amu880)
 	m_maincpu->set_addrmap(AS_IO, &amu880_state::amu880_io);
 	m_maincpu->set_daisy_config(amu880_daisy_chain);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", amu880_state, keyboard_tick, attotime::from_hz(1500))
+	TIMER(config, "keyboard").configure_periodic(FUNC(amu880_state::keyboard_tick), attotime::from_hz(1500));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(amu880_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(9000000, 576, 0*6, 64*6, 320, 0*10, 24*10)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_amu880)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_amu880);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* devices */
@@ -345,10 +345,10 @@ MACHINE_CONFIG_START(amu880_state::amu880)
 	m_z80sio->out_txda_callback().set(FUNC(amu880_state::cassette_w));
 	m_z80sio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("tape", amu880_state, tape_tick, attotime::from_hz(44100))
+	TIMER(config, "tape").configure_periodic(FUNC(amu880_state::tape_tick), attotime::from_hz(44100));
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K");

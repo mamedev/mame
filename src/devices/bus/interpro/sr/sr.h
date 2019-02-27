@@ -9,6 +9,10 @@
 class interpro_bus_device : public device_t
 {
 public:
+	// space configuration
+	template <typename T> void set_main_space(T &&tag, int spacenum) { m_main_space.set_tag(std::forward<T>(tag), spacenum); }
+	template <typename T> void set_io_space(T &&tag, int spacenum) { m_io_space.set_tag(std::forward<T>(tag), spacenum); }
+
 	// callback configuration
 	auto out_irq0_cb() { return m_out_irq0_cb.bind(); }
 	auto out_irq1_cb() { return m_out_irq1_cb.bind(); }
@@ -24,9 +28,8 @@ protected:
 	// construction/destruction
 	interpro_bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 		: device_t(mconfig, type, tag, owner, clock)
-		, m_maincpu(*this, finder_base::DUMMY_TAG)
-		, m_main_space(nullptr)
-		, m_io_space(nullptr)
+		, m_main_space(*this, finder_base::DUMMY_TAG, -1)
+		, m_io_space(*this, finder_base::DUMMY_TAG, -1)
 		, m_out_irq0_cb(*this)
 		, m_out_irq1_cb(*this)
 		, m_out_irq2_cb(*this)
@@ -38,9 +41,8 @@ protected:
 	virtual void device_resolve_objects() override;
 
 	// internal state
-	required_device<cpu_device> m_maincpu;
-	address_space *m_main_space;
-	address_space *m_io_space;
+	required_address_space m_main_space;
+	required_address_space m_io_space;
 
 private:
 	devcb_write_line m_out_irq0_cb;
@@ -55,12 +57,6 @@ class cbus_bus_device : public interpro_bus_device
 {
 public:
 	// construction/destruction
-	template <typename T>
-	cbus_bus_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, T &&cpu_device)
-		: cbus_bus_device(mconfig, tag, owner, clock)
-	{
-		m_maincpu.set_tag(std::forward<T>(cpu_device));
-	}
 	cbus_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	static const u32 CBUS_BASE = 0x87000000;
@@ -158,12 +154,6 @@ class srx_bus_device : public interpro_bus_device
 {
 public:
 	// construction/destruction
-	template <typename T>
-	srx_bus_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, T &&cpu_device)
-		: srx_bus_device(mconfig, tag, owner, clock)
-	{
-		m_maincpu.set_tag(std::forward<T>(cpu_device));
-	}
 	srx_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	static const u32 SRX_BASE = 0x8f000000;

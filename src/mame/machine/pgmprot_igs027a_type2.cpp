@@ -132,18 +132,18 @@ MACHINE_START_MEMBER(pgm_arm_type2_state,pgm_arm_type2)
 
 /******* ARM 55857F *******/
 
-MACHINE_CONFIG_START(pgm_arm_type2_state::pgm_arm_type2)
+void pgm_arm_type2_state::pgm_arm_type2(machine_config &config)
+{
 	pgmbase(config);
 
 	MCFG_MACHINE_START_OVERRIDE(pgm_arm_type2_state, pgm_arm_type2 )
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(kov2_mem)
+	m_maincpu->set_addrmap(AS_PROGRAM, &pgm_arm_type2_state::kov2_mem);
 
 	/* protection CPU */
-	MCFG_DEVICE_ADD("prot", ARM7, 20000000)    // 55857F
-	MCFG_DEVICE_PROGRAM_MAP(_55857F_arm7_map)
-MACHINE_CONFIG_END
+	ARM7(config, m_prot, 20000000);    // 55857F
+	m_prot->set_addrmap(AS_PROGRAM, &pgm_arm_type2_state::_55857F_arm7_map);
+}
 
 
 

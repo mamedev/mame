@@ -590,7 +590,7 @@ READ8_MEMBER( portfolio_state::mem_r )
 		case CCM_A:
 			if (LOG) logerror("%s %s CCM0 read %05x\n", machine().time().as_string(), machine().describe_context(), offset & 0x1ffff);
 
-			data = m_ccm->nrdi_r(space, offset & 0x1ffff);
+			data = m_ccm->nrdi_r(offset & 0x1ffff);
 			break;
 
 		case CCM_B:
@@ -607,7 +607,7 @@ READ8_MEMBER( portfolio_state::mem_r )
 		data = m_rom[offset & 0x3ffff];
 	}
 
-	data = m_exp->nrdi_r(space, offset, data, iom, bcom, ncc1);
+	data = m_exp->nrdi_r(offset, data, iom, bcom, ncc1);
 
 	return data;
 }
@@ -638,7 +638,7 @@ WRITE8_MEMBER( portfolio_state::mem_w )
 		case CCM_A:
 			if (LOG) logerror("%s %s CCM0 write %05x:%02x\n", machine().time().as_string(), machine().describe_context(), offset & 0x1ffff, data);
 
-			m_ccm->nwri_w(space, offset & 0x1ffff, data);
+			m_ccm->nwri_w(offset & 0x1ffff, data);
 			break;
 
 		case CCM_B:
@@ -647,7 +647,7 @@ WRITE8_MEMBER( portfolio_state::mem_w )
 		}
 	}
 
-	m_exp->nwri_w(space, offset, data, iom, bcom, ncc1);
+	m_exp->nwri_w(offset, data, iom, bcom, ncc1);
 }
 
 
@@ -703,7 +703,7 @@ READ8_MEMBER( portfolio_state::io_r )
 		}
 	}
 
-	data = m_exp->nrdi_r(space, offset, data, iom, bcom, ncc1);
+	data = m_exp->nrdi_r(offset, data, iom, bcom, ncc1);
 
 	return data;
 }
@@ -767,7 +767,7 @@ WRITE8_MEMBER( portfolio_state::io_w )
 		}
 	}
 
-	m_exp->nwri_w(space, offset, data, iom, bcom, ncc1);
+	m_exp->nwri_w(offset, data, iom, bcom, ncc1);
 }
 
 
@@ -1011,60 +1011,60 @@ void portfolio_state::machine_reset()
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( portfolio )
+//  machine_config( portfolio )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(portfolio_state::portfolio)
+void portfolio_state::portfolio(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD(M80C88A_TAG, I8088, XTAL(4'915'200))
-	MCFG_DEVICE_PROGRAM_MAP(portfolio_mem)
-	MCFG_DEVICE_IO_MAP(portfolio_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(portfolio_state,portfolio_int_ack)
+	I8088(config, m_maincpu, XTAL(4'915'200));
+	m_maincpu->set_addrmap(AS_PROGRAM, &portfolio_state::portfolio_mem);
+	m_maincpu->set_addrmap(AS_IO, &portfolio_state::portfolio_io);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(portfolio_state::portfolio_int_ack));
 
 	// video hardware
-	MCFG_SCREEN_ADD(SCREEN_TAG, LCD)
-	MCFG_SCREEN_REFRESH_RATE(72)
-	MCFG_SCREEN_UPDATE_DEVICE(HD61830_TAG, hd61830_device, screen_update)
-	MCFG_SCREEN_SIZE(240, 64)
-	MCFG_SCREEN_VISIBLE_AREA(0, 240-1, 0, 64-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(72);
+	screen.set_screen_update(HD61830_TAG, FUNC(hd61830_device::screen_update));
+	screen.set_size(240, 64);
+	screen.set_visarea(0, 240-1, 0, 64-1);
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(portfolio_state::portfolio_palette), 2);
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_portfolio);
 
-	MCFG_DEVICE_ADD(HD61830_TAG, HD61830, XTAL(4'915'200)/2/2)
-	MCFG_DEVICE_ADDRESS_MAP(0, portfolio_lcdc)
-	MCFG_HD61830_RD_CALLBACK(READ8(*this, portfolio_state, hd61830_rd_r))
-	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
+	HD61830(config, m_lcdc, XTAL(4'915'200)/2/2);
+	m_lcdc->set_addrmap(0, &portfolio_state::portfolio_lcdc);
+	m_lcdc->rd_rd_callback().set(FUNC(portfolio_state::hd61830_rd_r));
+	m_lcdc->set_screen(SCREEN_TAG);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(PCD3311T_TAG, PCD3311, XTAL(3'578'640))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	PCD3311(config, m_dtmf, XTAL(3'578'640)).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	// devices
-	MCFG_PORTFOLIO_MEMORY_CARD_SLOT_ADD(PORTFOLIO_MEMORY_CARD_SLOT_A_TAG, portfolio_memory_cards, nullptr)
+	PORTFOLIO_MEMORY_CARD_SLOT(config, m_ccm, portfolio_memory_cards, nullptr);
 
-	MCFG_PORTFOLIO_EXPANSION_SLOT_ADD(PORTFOLIO_EXPANSION_SLOT_TAG, XTAL(4'915'200), portfolio_expansion_cards, nullptr)
-	MCFG_PORTFOLIO_EXPANSION_SLOT_EINT_CALLBACK(WRITELINE(*this, portfolio_state, eint_w))
-	MCFG_PORTFOLIO_EXPANSION_SLOT_NMIO_CALLBACK(INPUTLINE(M80C88A_TAG, INPUT_LINE_NMI))
-	MCFG_PORTFOLIO_EXPANSION_SLOT_WAKE_CALLBACK(WRITELINE(*this, portfolio_state, wake_w))
+	PORTFOLIO_EXPANSION_SLOT(config, m_exp, XTAL(4'915'200), portfolio_expansion_cards, nullptr);
+	m_exp->eint_wr_callback().set(FUNC(portfolio_state::eint_w));
+	m_exp->nmio_wr_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_exp->wake_wr_callback().set(FUNC(portfolio_state::wake_w));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("counter", portfolio_state, counter_tick, attotime::from_hz(XTAL(32'768)/16384))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC(TIMER_TICK_TAG, portfolio_state, system_tick, attotime::from_hz(XTAL(32'768)/32768))
+	TIMER(config, "counter").configure_periodic(FUNC(portfolio_state::counter_tick), attotime::from_hz(XTAL(32'768)/16384));
+	TIMER(config, TIMER_TICK_TAG).configure_periodic(FUNC(portfolio_state::system_tick), attotime::from_hz(XTAL(32'768)/32768));
 
 	// fake keyboard
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", portfolio_state, keyboard_tick, attotime::from_usec(2500))
+	TIMER(config, "keyboard").configure_periodic(FUNC(portfolio_state::keyboard_tick), attotime::from_usec(2500));
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "pofo")
+	SOFTWARE_LIST(config, "cart_list").set_original("pofo");
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("128K");
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_RANDOM);
-MACHINE_CONFIG_END
+}
 
 
 

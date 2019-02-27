@@ -41,12 +41,10 @@ protected:
 	virtual void device_reset() override;
 
 	// electron_cart_interface overrides
-	virtual uint8_t read(address_space &space, offs_t offset, int infc, int infd, int romqa) override;
-	virtual void write(address_space &space, offs_t offset, uint8_t data, int infc, int infd, int romqa) override;
+	virtual uint8_t read(offs_t offset, int infc, int infd, int romqa, int oe, int oe2) override;
+	virtual void write(offs_t offset, uint8_t data, int infc, int infd, int romqa, int oe, int oe2) override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
-
 	required_device<mc146818_device> m_rtc;
 
 	uint8_t m_page_register;

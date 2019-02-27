@@ -392,8 +392,8 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(cyberbal_state::cyberbal_base)
-
+void cyberbal_state::cyberbal_base(machine_config &config)
+{
 	/* basic machine hardware */
 	M68000(config, m_maincpu, ATARI_CLOCK_14MHz/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cyberbal_state::main_map);
@@ -405,9 +405,9 @@ MACHINE_CONFIG_START(cyberbal_state::cyberbal_base)
 	M68000(config, m_extracpu, ATARI_CLOCK_14MHz/2);
 	m_extracpu->set_addrmap(AS_PROGRAM, &cyberbal_state::extra_map);
 
-	MCFG_DEVICE_ADD("dac", M68000, ATARI_CLOCK_14MHz/2)
-	MCFG_DEVICE_PROGRAM_MAP(sound_68k_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(cyberbal_state, sound_68k_irq_gen,  10000)
+	M68000(config, m_daccpu, ATARI_CLOCK_14MHz/2);
+	m_daccpu->set_addrmap(AS_PROGRAM, &cyberbal_state::sound_68k_map);
+	m_daccpu->set_periodic_int(FUNC(cyberbal_state::sound_68k_irq_gen), attotime::from_hz(10000));
 
 	config.m_minimum_quantum = attotime::from_hz(600);
 
@@ -466,12 +466,11 @@ MACHINE_CONFIG_START(cyberbal_state::cyberbal_base)
 	AM6012(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 0.5); // AM6012.6j
 	AM6012(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 0.5); // AM6012.6j
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
 	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
 	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
-MACHINE_CONFIG_END
+}
 
 void cyberbal_state::cyberbal(machine_config &config)
 {

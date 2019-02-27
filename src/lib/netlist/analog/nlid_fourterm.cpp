@@ -5,8 +5,8 @@
  *
  */
 
-#include "../solver/nld_solver.h"
-#include "../nl_factory.h"
+#include "netlist/solver/nld_solver.h"
+#include "netlist/nl_factory.h"
 #include "nlid_fourterm.h"
 
 #include <cmath>
@@ -24,16 +24,16 @@ namespace netlist
 NETLIB_RESET(VCCS)
 {
 	const nl_double m_mult = m_G() * m_gfac; // 1.0 ==> 1V ==> 1A
-	const nl_double GI = NL_FCONST(1.0) / m_RI();
+	const nl_double GI = plib::constants<nl_double>::one() / m_RI();
 
-	m_IP.set(GI);
-	m_IN.set(GI);
+	m_IP.set_conductivity(GI);
+	m_IN.set_conductivity(GI);
 
-	m_OP.set(m_mult, NL_FCONST(0.0));
-	m_OP1.set(-m_mult, NL_FCONST(0.0));
+	m_OP.set_go_gt(-m_mult, plib::constants<nl_double>::zero());
+	m_OP1.set_go_gt(m_mult, plib::constants<nl_double>::zero());
 
-	m_ON.set(-m_mult, NL_FCONST(0.0));
-	m_ON1.set(m_mult, NL_FCONST(0.0));
+	m_ON.set_go_gt(m_mult, plib::constants<nl_double>::zero());
+	m_ON1.set_go_gt(-m_mult, plib::constants<nl_double>::zero());
 }
 
 NETLIB_UPDATE(VCCS)
@@ -63,11 +63,6 @@ NETLIB_UPDATE_PARAM(LVCCS)
 	NETLIB_NAME(VCCS)::update_param();
 }
 
-NETLIB_UPDATE(LVCCS)
-{
-	NETLIB_NAME(VCCS)::update();
-}
-
 NETLIB_UPDATE_TERMINALS(LVCCS)
 {
 	const nl_double m_mult = m_G() * m_gfac; // 1.0 ==> 1V ==> 1A
@@ -84,11 +79,11 @@ NETLIB_UPDATE_TERMINALS(LVCCS)
 	const nl_double beta = m_mult * (1.0 - X*X);
 	const nl_double I = m_cur_limit() * X - beta * m_vi;
 
-	m_OP.set(beta, NL_FCONST(0.0), I);
-	m_OP1.set(-beta, NL_FCONST(0.0));
+	m_OP.set_go_gt_I(-beta, plib::constants<nl_double>::zero(), I);
+	m_OP1.set_go_gt(beta, plib::constants<nl_double>::zero());
 
-	m_ON.set(-beta, NL_FCONST(0.0), -I);
-	m_ON1.set(beta, NL_FCONST(0.0));
+	m_ON.set_go_gt_I(beta, plib::constants<nl_double>::zero(), -I);
+	m_ON1.set_go_gt(-beta, plib::constants<nl_double>::zero());
 }
 
 // ----------------------------------------------------------------------------------------
@@ -105,30 +100,25 @@ NETLIB_UPDATE_PARAM(CCCS)
 	NETLIB_NAME(VCCS)::update_param();
 }
 
-NETLIB_UPDATE(CCCS)
-{
-	NETLIB_NAME(VCCS)::update();
-}
-
 // ----------------------------------------------------------------------------------------
 // nld_VCVS
 // ----------------------------------------------------------------------------------------
 
 NETLIB_RESET(VCVS)
 {
-	m_gfac = NL_FCONST(1.0) / m_RO();
+	m_gfac = plib::constants<nl_double>::one() / m_RO();
 	NETLIB_NAME(VCCS)::reset();
 
-	m_OP2.set(NL_FCONST(1.0) / m_RO());
-	m_ON2.set(NL_FCONST(1.0) / m_RO());
+	m_OP2.set_conductivity(plib::constants<nl_double>::one() / m_RO());
+	m_ON2.set_conductivity(plib::constants<nl_double>::one() / m_RO());
 }
 
 	} //namespace analog
 
 	namespace devices {
-		NETLIB_DEVICE_IMPL_NS(analog, VCVS)
-		NETLIB_DEVICE_IMPL_NS(analog, VCCS)
-		NETLIB_DEVICE_IMPL_NS(analog, CCCS)
-		NETLIB_DEVICE_IMPL_NS(analog, LVCCS)
-	}
+		NETLIB_DEVICE_IMPL_NS(analog, VCVS,  "VCVS",  "")
+		NETLIB_DEVICE_IMPL_NS(analog, VCCS,  "VCCS",  "")
+		NETLIB_DEVICE_IMPL_NS(analog, CCCS,  "CCCS",  "")
+		NETLIB_DEVICE_IMPL_NS(analog, LVCCS, "LVCCS", "")
+	} // namespace devices
 } // namespace netlist

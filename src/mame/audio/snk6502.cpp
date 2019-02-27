@@ -339,7 +339,6 @@ void snk6502_sound_device::mute_channel(int channel)
 void snk6502_sound_device::unmute_channel(int channel)
 {
 	m_tone_channels[channel].mute = 0;
-	m_tone_channels[channel].offset = 0;
 }
 
 

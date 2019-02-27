@@ -345,7 +345,7 @@ MACHINE_CONFIG_START(deco156_state::hvysmsh)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(deco156_state, screen_update)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hvysmsh)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_hvysmsh);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 1024);
 
 	DECO16IC(config, m_deco_tilegen, 0);
@@ -398,7 +398,7 @@ MACHINE_CONFIG_START(deco156_state::wcvol95)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(deco156_state, screen_update)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hvysmsh)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_hvysmsh);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
 
 	DECO16IC(config, m_deco_tilegen, 0);

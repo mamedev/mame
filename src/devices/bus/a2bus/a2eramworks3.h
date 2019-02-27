@@ -36,7 +36,7 @@ protected:
 	virtual uint8_t *get_vram_ptr() override;
 	virtual uint8_t *get_auxbank_ptr() override;
 	virtual bool allow_dhr() override { return true; }
-	virtual void write_c07x(address_space &space, uint8_t offset, uint8_t data) override;
+	virtual void write_c07x(uint8_t offset, uint8_t data) override;
 
 private:
 	uint8_t m_ram[8*1024*1024];

@@ -2622,6 +2622,8 @@ if (MACHINES["SPG2XX"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/spg2xx.cpp",
 		MAME_DIR .. "src/devices/machine/spg2xx.h",
+		MAME_DIR .. "src/devices/machine/spg110.cpp",
+		MAME_DIR .. "src/devices/machine/spg110.h",
 	}
 end
 
@@ -2912,6 +2914,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/wd1010.h,MACHINES["WD1010"] = true
+---------------------------------------------------
+
+if (MACHINES["WD1010"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/wd1010.cpp",
+		MAME_DIR .. "src/devices/machine/wd1010.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/wd11c00_17.h,MACHINES["WD11C00_17"] = true
 ---------------------------------------------------
 
@@ -2936,14 +2950,14 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/wd33c93.h,MACHINES["WD33C93"] = true
+--@src/devices/machine/wd33c9x.h,MACHINES["WD33C9X"] = true
 ---------------------------------------------------
 
-if (MACHINES["WD33C93"]~=null) then
+if (MACHINES["WD33C9X"]~=null) then
 	MACHINES["SCSI"] = true
 	files {
-		MAME_DIR .. "src/devices/machine/wd33c93.cpp",
-		MAME_DIR .. "src/devices/machine/wd33c93.h",
+		MAME_DIR .. "src/devices/machine/wd33c9x.cpp",
+		MAME_DIR .. "src/devices/machine/wd33c9x.h",
 	}
 end
 
@@ -3841,5 +3855,41 @@ if (MACHINES["AIC6250"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/aic6250.cpp",
 		MAME_DIR .. "src/devices/machine/aic6250.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/dc7085.h,MACHINES["DC7085"] = true
+---------------------------------------------------
+
+if (MACHINES["DC7085"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/dc7085.cpp",
+		MAME_DIR .. "src/devices/machine/dc7085.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/i82357.h,MACHINES["I82357"] = true
+---------------------------------------------------
+
+if (MACHINES["I82357"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/i82357.cpp",
+		MAME_DIR .. "src/devices/machine/i82357.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/xc1700e.h,MACHINES["XC1700E"] = true
+---------------------------------------------------
+
+if (MACHINES["XC1700E"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/xc1700e.cpp",
+		MAME_DIR .. "src/devices/machine/xc1700e.h",
 	}
 end

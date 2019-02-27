@@ -178,12 +178,12 @@ WRITE8_MEMBER(_4enraya_state::sound_control_w)
 	{
 		case 0: case 3:
 			// latch address
-			m_ay->address_w(space, 0, m_soundlatch);
+			m_ay->address_w(m_soundlatch);
 			break;
 
 		case 2:
 			// write to psg
-			m_ay->data_w(space, 0, m_soundlatch);
+			m_ay->data_w(m_soundlatch);
 			break;
 
 		default:
@@ -487,7 +487,7 @@ MACHINE_CONFIG_START(_4enraya_state::_4enraya )
 	MCFG_SCREEN_UPDATE_DRIVER(_4enraya_state, screen_update_4enraya)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_4enraya)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_4enraya);
 
 	PALETTE(config, m_palette, palette_device::RGB_3BIT);
 

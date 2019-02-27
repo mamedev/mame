@@ -290,7 +290,7 @@ MACHINE_CONFIG_START(borisdpl_state::borisdpl)
 	/* video hardware */
 	config.set_default_layout(layout_borisdpl);
 
-	//MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_interrupt", borisdpl_state, timer_interrupt, attotime::from_hz(40))
+	//TIMER(config, "timer_interrupt").configure_periodic(FUNC(borisdpl_state::timer_interrupt), attotime::from_hz(40));
 MACHINE_CONFIG_END
 
 

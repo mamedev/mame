@@ -77,8 +77,8 @@ READ8_MEMBER(drgnmst_state::snd_command_r)
 
 	switch (m_oki_control & 0x1f)
 	{
-		case 0x12:  data = (m_oki[1]->read(space, 0) & 0x0f); break;
-		case 0x16:  data = (m_oki[0]->read(space, 0) & 0x0f); break;
+		case 0x12:  data = (m_oki[1]->read() & 0x0f); break;
+		case 0x16:  data = (m_oki[0]->read() & 0x0f); break;
 		case 0x0b:
 		case 0x0f:  data = m_snd_command; break;
 		default:    break;
@@ -160,17 +160,17 @@ WRITE8_MEMBER(drgnmst_state::snd_control_w)
 
 	switch (m_oki_control & 0x1f)
 	{
-		case 0x11:
+	case 0x11:
 //                  logerror("Writing %02x to OKI1", m_oki_command);
 //                  logerror(", PortC=%02x, Code=%02x, Bank0=%01x, Bank1=%01x\n", m_oki_control, m_snd_command, m_oki_bank[0], m_oki_bank[1]);
-					m_oki[1]->write(space, 0, m_oki_command);
-					break;
-		case 0x15:
+		m_oki[1]->write(m_oki_command);
+		break;
+	case 0x15:
 //                  logerror("Writing %02x to OKI0", m_oki_command);
 //                  logerror(", PortC=%02x, Code=%02x, Bank0=%01x, Bank1=%01x\n", m_oki_control, m_snd_command, m_oki_bank[0], m_oki_bank[1]);
-					m_oki[0]->write(space, 0, m_oki_command);
-					break;
-		default:    break;
+		m_oki[0]->write(m_oki_command);
+		break;
+	default:    break;
 	}
 }
 

@@ -731,9 +731,9 @@ MACHINE_CONFIG_START(itt3030_state::itt3030)
 	m_fdc->intrq_wr_callback().set(FUNC(itt3030_state::fdcirq_w));
 	m_fdc->drq_wr_callback().set(FUNC(itt3030_state::fdcdrq_w));
 	m_fdc->hld_wr_callback().set(FUNC(itt3030_state::fdchld_w));
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", itt3030_floppies, "525qd", itt3030_state::itt3030_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", itt3030_floppies, "525qd", itt3030_state::itt3030_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:2", itt3030_floppies, "525qd", itt3030_state::itt3030_floppy_formats)
+	FLOPPY_CONNECTOR(config, "fdc:0", itt3030_floppies, "525qd", itt3030_state::itt3030_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", itt3030_floppies, "525qd", itt3030_state::itt3030_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:2", itt3030_floppies, "525qd", itt3030_state::itt3030_floppy_formats);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_itt3030);
 

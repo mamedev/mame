@@ -492,7 +492,7 @@ MACHINE_CONFIG_START(gyruss_state::gyruss)
 	m_audiocpu_2->p1_out_cb().set(FUNC(gyruss_state::gyruss_dac_w));
 	m_audiocpu_2->p2_out_cb().set(FUNC(gyruss_state::gyruss_irq_clear_w));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // 3C
 	mainlatch.q_out_cb<0>().set(FUNC(gyruss_state::master_nmi_mask_w));

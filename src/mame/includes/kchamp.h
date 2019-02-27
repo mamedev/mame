@@ -77,7 +77,7 @@ private:
 	DECLARE_WRITE8_MEMBER(kchamp_videoram_w);
 	DECLARE_WRITE8_MEMBER(kchamp_colorram_w);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
-	DECLARE_WRITE8_MEMBER(sound_control_w);
+	void sound_control_w(u8 data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_reset() override;
 	virtual void video_start() override;

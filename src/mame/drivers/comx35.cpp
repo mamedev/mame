@@ -209,7 +209,7 @@ READ8_MEMBER( comx35_state::mem_r )
 {
 	int extrom = 1;
 
-	uint8_t data = m_exp->mrd_r(space, offset, &extrom);
+	uint8_t data = m_exp->mrd_r(offset, &extrom);
 
 	if (offset < 0x4000)
 	{
@@ -234,7 +234,7 @@ READ8_MEMBER( comx35_state::mem_r )
 
 WRITE8_MEMBER( comx35_state::mem_w )
 {
-	m_exp->mwr_w(space, offset, data);
+	m_exp->mwr_w(offset, data);
 
 	if (offset >= 0x4000 && offset < 0xc000)
 	{
@@ -257,7 +257,7 @@ WRITE8_MEMBER( comx35_state::mem_w )
 
 READ8_MEMBER( comx35_state::io_r )
 {
-	uint8_t data = m_exp->io_r(space, offset);
+	uint8_t data = m_exp->io_r(offset);
 
 	if (offset == 3)
 	{
@@ -274,7 +274,7 @@ READ8_MEMBER( comx35_state::io_r )
 
 WRITE8_MEMBER( comx35_state::io_w )
 {
-	m_exp->io_w(space, offset, data);
+	m_exp->io_w(offset, data);
 
 	if (offset >= 3)
 	{
@@ -625,8 +625,8 @@ void comx35_state::base(machine_config &config, const XTAL clock)
 	m_kbe->d11_callback().set_ioport("D11");
 	m_kbe->da_callback().set_inputline(m_maincpu, COSMAC_INPUT_LINE_EF3);
 
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(comx35_state, comx), this), "comx", 0);
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
+	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(comx35_state, comx), this), "comx");
 
 	CASSETTE(config, m_cassette).set_default_state((cassette_state) (CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED));
 

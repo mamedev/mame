@@ -127,12 +127,13 @@ void mc68340_serial_module_device::write(offs_t offset, uint8_t data)
 		m_mcrl = data;
 		LOGSERIAL("PC: %08x %s %04x, %04x (MCRL - Module Configuration Register Low byte)\n", m_cpu->pcbase(), FUNCNAME, offset, data);
 		LOGSERIAL("- Supervisor registers %s - not implemented\n", data & REG_MCRL_SUPV ? "requries supervisor privileges" : "can be accessed by user privileged software");
-		LOGSERIAL("- Interrupt Arbitration level: %02x - not implemented\n", data & REG_MCRL_ARBLV);
+		LOGSERIAL("- Interrupt Arbitration level: %02x\n", data & REG_MCRL_ARBLV);
 		break;
 	case REG_ILR:
 		m_ilr = data;
 		LOGSERIAL("PC: %08x %s %04x, %04x (ILR - Interrupt Level Register)\n", m_cpu->pcbase(), FUNCNAME, offset, data);
 		LOGSERIAL("- Interrupt Level: %02x\n", data & REG_ILR_MASK);
+		m_cpu->update_ipl();
 		break;
 	case REG_IVR:
 		m_ivr = data;
@@ -148,24 +149,17 @@ void mc68340_serial_module_device::write(offs_t offset, uint8_t data)
 WRITE_LINE_MEMBER( mc68340_serial_module_device::irq_w )
 {
 	LOGINT("IRQ!\n%s\n", FUNCNAME);
-	if (m_ilr > 0)
-	{
-		if (((m_cpu->m_m68340SIM->m_avr_rsr >> (8 + m_ilr)) & 1) != 0) // use autovector ?
-		{
-			LOGINT("- Autovector level %d\n", m_ilr);
-			m_cpu->set_input_line(m_ilr, HOLD_LINE);
-		}
-		else // otherwise not...
-		{
-			LOGINT("- Vector %02x level %d\n", m_ivr, m_ilr);
-			m_cpu->set_input_line_and_vector(m_ilr, HOLD_LINE, m_ivr);
-		}
-	}
+	m_cpu->update_ipl();
 }
 
 mc68340_serial_module_device::mc68340_serial_module_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
   : mc68340_duart_device(mconfig, MC68340_SERIAL_MODULE, tag, owner, clock)
 {
+}
+
+void mc68340_serial_module_device::module_reset()
+{
+	mc68340_duart_device::device_reset();
 }
 
 DEFINE_DEVICE_TYPE(MC68340_SERIAL_MODULE, mc68340_serial_module_device, "mc68340sermod", "MC68340 Serial Module")

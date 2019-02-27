@@ -252,7 +252,7 @@ MACHINE_CONFIG_START(jeutel_state::jeutel)
 	//ppi2.in_pc_callback().set_ioport("EXTRA");
 	//ppi2.out_pc_callback().set(FUNC(jeutel_state::ppi2c_w));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_a", jeutel_state, timer_a, attotime::from_hz(120))
+	TIMER(config, "timer_a").configure_periodic(FUNC(jeutel_state::timer_a), attotime::from_hz(120));
 MACHINE_CONFIG_END
 
 /*--------------------------------

@@ -177,6 +177,18 @@ public:
 	{
 		set_type(type);
 	}
+	screen_device(const machine_config &mconfig, const char *tag, device_t *owner, screen_type_enum type, rgb_t color)
+		: screen_device(mconfig, tag, owner, u32(0))
+	{
+		set_type(type);
+		set_color(color);
+	}
+	screen_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *region)
+		: screen_device(mconfig, tag, owner, u32(0))
+	{
+		set_type(SCREEN_TYPE_SVG);
+		set_svg_region(region);
+	}
 	~screen_device();
 
 	// configuration readers
@@ -520,21 +532,11 @@ typedef device_type_iterator<screen_device> screen_device_iterator;
 #define MCFG_SCREEN_ADD(_tag, _type) \
 	MCFG_DEVICE_ADD(_tag, SCREEN, SCREEN_TYPE_##_type)
 
-#define MCFG_SCREEN_ADD_MONOCHROME(_tag, _type, _color) \
-	MCFG_DEVICE_ADD(_tag, SCREEN, 0) \
-	MCFG_SCREEN_TYPE(_type) \
-	MCFG_SCREEN_COLOR(_color)
-
 #define MCFG_SCREEN_MODIFY(_tag) \
 	MCFG_DEVICE_MODIFY(_tag)
 
 #define MCFG_SCREEN_TYPE(_type) \
 	downcast<screen_device &>(*device).set_type(SCREEN_TYPE_##_type);
-
-#define MCFG_SCREEN_SVG_ADD(_tag, _region) \
-	MCFG_DEVICE_ADD(_tag, SCREEN, 0) \
-	MCFG_SCREEN_TYPE(SVG) \
-	downcast<screen_device &>(*device).set_svg_region(_region);
 
 #define MCFG_SCREEN_RAW_PARAMS(_pixclock, _htotal, _hbend, _hbstart, _vtotal, _vbend, _vbstart) \
 	downcast<screen_device &>(*device).set_raw(_pixclock, _htotal, _hbend, _hbstart, _vtotal, _vbend, _vbstart);
@@ -550,8 +552,6 @@ typedef device_type_iterator<screen_device> screen_device_iterator;
 
 #define MCFG_SCREEN_VISIBLE_AREA(_minx, _maxx, _miny, _maxy) \
 	downcast<screen_device &>(*device).set_visarea(_minx, _maxx, _miny, _maxy);
-#define MCFG_SCREEN_DEFAULT_POSITION(_xscale, _xoffs, _yscale, _yoffs)  \
-	downcast<screen_device &>(*device).set_default_position(_xscale, _xoffs, _yscale, _yoffs);
 #define MCFG_SCREEN_UPDATE_DRIVER(_class, _method) \
 	downcast<screen_device &>(*device).set_screen_update(&_class::_method, #_class "::" #_method);
 #define MCFG_SCREEN_UPDATE_DEVICE(_device, _class, _method) \
@@ -564,7 +564,5 @@ typedef device_type_iterator<screen_device> screen_device_iterator;
 	downcast<screen_device &>(*device).set_palette(finder_base::DUMMY_TAG);
 #define MCFG_SCREEN_VIDEO_ATTRIBUTES(_flags) \
 	downcast<screen_device &>(*device).set_video_attributes(_flags);
-#define MCFG_SCREEN_COLOR(_color) \
-	downcast<screen_device &>(*device).set_color(_color);
 
 #endif // MAME_EMU_SCREEN_H

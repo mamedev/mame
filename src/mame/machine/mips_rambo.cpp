@@ -9,8 +9,9 @@
  *   https://github.com/NetBSD/src/blob/trunk/sys/arch/mipsco/obio/rambo.h
  *
  * TODO
- *   - interrupts
  *   - buzzer
+ *   - dma reload
+ *   - save state
  */
 
 #include "emu.h"
@@ -18,6 +19,7 @@
 
 #define LOG_GENERAL (1U << 0)
 #define LOG_REG     (1U << 1)
+#define LOG_DMA     (1U << 2)
 
 //#define VERBOSE (LOG_GENERAL|LOG_REG)
 #include "logmacro.h"
@@ -32,10 +34,8 @@ mips_rambo_device::mips_rambo_device(const machine_config &mconfig, const char *
 	, m_timer_out_cb(*this)
 	, m_buzzer_out_cb(*this)
 	, m_channel{{ 0,0,0,0,0,0, false, *this, *this }, { 0,0,0,0,0,0, false, *this, *this }}
-	, m_irq_out_state(0)
 	, m_buzzer_out_state(0)
 {
-	(void)m_irq_out_state;
 }
 
 void mips_rambo_device::map(address_map &map)
@@ -74,22 +74,58 @@ void mips_rambo_device::device_start()
 	}
 
 	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mips_rambo_device::timer), this));
-	m_buzzer_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mips_rambo_device::buzzer_toggle), this));
-
+	m_dma = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mips_rambo_device::dma), this));
+	m_buzzer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mips_rambo_device::buzzer), this));
 }
 
 void mips_rambo_device::device_reset()
 {
-	// TODO: update interrupts
-
 	m_tcount = machine().time();
+
+	for (dma_t &channel : m_channel)
+	{
+		if (channel.mode & MODE_DMA_INTR)
+			m_irq_out_cb(0);
+
+		channel.load_address = 0;
+		channel.diag = 0;
+		channel.mode = 0;
+		channel.block_count = 0;
+		channel.reload_count = 0;
+		channel.current_address = 0;
+	}
+
+	m_buzzer->enable(false);
+	if (m_buzzer_out_state)
+	{
+		m_buzzer_out_state = 0;
+		m_buzzer_out_cb(m_buzzer_out_state);
+	}
+}
+
+template <unsigned Channel> u16 mips_rambo_device::fifo_r()
+{
+	if (m_fifo[Channel].empty())
+		m_dma->adjust(attotime::zero, Channel);
+
+	return m_fifo[Channel].dequeue();
+}
+
+template <unsigned Channel> READ32_MEMBER(mips_rambo_device::mode_r)
+{
+	u32 data = m_channel[Channel].mode | m_fifo[Channel].queue_length();
+
+	if (m_fifo[Channel].full())
+		data |= MODE_FIFO_FULL;
+	else if (m_fifo[Channel].empty())
+		data |= MODE_FIFO_EMPTY;
+
+	return data;
 }
 
 READ32_MEMBER(mips_rambo_device::tcount_r)
 {
 	u32 const data = attotime_to_clocks(machine().time() - m_tcount);
-
-	LOGMASKED(LOG_REG, "tcount_r 0x%08x (%s)\n", data, machine().describe_context());
 
 	return data;
 }
@@ -115,7 +151,7 @@ WRITE32_MEMBER(mips_rambo_device::control_w)
 	LOGMASKED(LOG_REG, "control_w 0x%08x (%s)\n", data, machine().describe_context());
 
 	// stop the buzzer
-	m_buzzer_timer->enable(false);
+	m_buzzer->enable(false);
 	m_buzzer_out_state = 0;
 	m_buzzer_out_cb(m_buzzer_out_state);
 
@@ -124,7 +160,7 @@ WRITE32_MEMBER(mips_rambo_device::control_w)
 	{
 		attotime const period = attotime::from_ticks(1 << ((data & CONTROL_BUZZMASK) >> 4), 1524_Hz_XTAL);
 
-		m_buzzer_timer->adjust(period, 0, period);
+		m_buzzer->adjust(period, 0, period);
 	}
 }
 
@@ -135,28 +171,55 @@ template <unsigned Channel> WRITE32_MEMBER(mips_rambo_device::load_address_w)
 	COMBINE_DATA(&m_channel[Channel].load_address);
 }
 
-template <unsigned Channel> WRITE16_MEMBER(mips_rambo_device::fifo_w)
+template <unsigned Channel> void mips_rambo_device::fifo_w(u16 data)
 {
 	LOGMASKED(LOG_REG, "fifo_w<%d> 0x%04x (%s)\n", Channel, data, machine().describe_context());
+
+	m_fifo[Channel].enqueue(data);
+
+	if (m_fifo[Channel].full())
+		m_dma->adjust(attotime::zero, Channel);
 }
 
 template <unsigned Channel> WRITE32_MEMBER(mips_rambo_device::mode_w)
 {
 	LOGMASKED(LOG_REG, "mode_w<%d> 0x%08x (%s)\n", Channel, data, machine().describe_context());
 
+	dma_t &channel = m_channel[Channel];
+
 	if (data & MODE_CHANNEL_EN)
-		m_channel[Channel].current_address = m_channel[Channel].load_address;
+		channel.current_address = channel.load_address;
+
+	if (data & MODE_FLUSH_FIFO)
+		m_fifo[Channel].clear();
 
 	mem_mask &= MODE_WRITE_MASK;
-	COMBINE_DATA(&m_channel[Channel].mode);
+	COMBINE_DATA(&channel.mode);
+
+	// schedule dma transfer
+	if (channel.drq_asserted && (channel.block_count || !m_fifo[Channel].empty()))
+		m_dma->adjust(attotime::zero, Channel);
 }
 
 template <unsigned Channel> WRITE16_MEMBER(mips_rambo_device::block_count_w)
 {
 	LOGMASKED(LOG_REG, "block_count_w<%d> 0x%04x (%s)\n", Channel, data, machine().describe_context());
 
-	COMBINE_DATA(&m_channel[Channel].block_count);
-	COMBINE_DATA(&m_channel[Channel].reload_count);
+	dma_t &channel = m_channel[Channel];
+
+	COMBINE_DATA(&channel.block_count);
+	COMBINE_DATA(&channel.reload_count);
+
+	// FIXME: do this here?
+	if (channel.mode & MODE_DMA_INTR)
+	{
+		channel.mode &= ~MODE_DMA_INTR;
+		m_irq_out_cb(0);
+	}
+
+	// schedule dma transfer
+	if (channel.drq_asserted && (channel.block_count || !m_fifo[Channel].empty()))
+		m_dma->adjust(attotime::zero, Channel);
 }
 
 TIMER_CALLBACK_MEMBER(mips_rambo_device::timer)
@@ -166,7 +229,89 @@ TIMER_CALLBACK_MEMBER(mips_rambo_device::timer)
 	m_timer_out_cb(CLEAR_LINE);
 }
 
-TIMER_CALLBACK_MEMBER(mips_rambo_device::buzzer_toggle)
+TIMER_CALLBACK_MEMBER(mips_rambo_device::dma)
+{
+	dma_t &channel = m_channel[param];
+
+	// check channel enabled
+	if (!(channel.mode & MODE_CHANNEL_EN))
+		return;
+
+	if (channel.mode & MODE_TO_MEMORY)
+	{
+		// fill fifo from device
+		while (channel.drq_asserted && !m_fifo[param].full())
+		{
+			u16 const data = channel.read_cb();
+
+			m_fifo[param].enqueue(data);
+		}
+
+		// empty fifo to memory
+		if (m_fifo[param].full() && channel.block_count)
+		{
+			LOGMASKED(LOG_DMA, "dma transfer to memory 0x%08x\n", channel.current_address);
+			while (!m_fifo[param].empty())
+			{
+				u16 const data = m_fifo[param].dequeue();
+
+				m_ram->write(BYTE4_XOR_BE(channel.current_address++), data >> 8);
+				m_ram->write(BYTE4_XOR_BE(channel.current_address++), data);
+			}
+
+			channel.block_count--;
+		}
+	}
+	else
+	{
+		if (m_fifo[param].empty() && channel.block_count)
+		{
+			LOGMASKED(LOG_DMA, "dma transfer from memory 0x%08x\n", channel.current_address);
+
+			// fill fifo from memory
+			while (!m_fifo[param].full())
+			{
+				u8 const hi = m_ram->read(BYTE4_XOR_BE(channel.current_address++));
+				u8 const lo = m_ram->read(BYTE4_XOR_BE(channel.current_address++));
+
+				m_fifo[param].enqueue((hi << 8) | lo);
+			}
+
+			channel.block_count--;
+		}
+
+		// empty fifo to device
+		while (channel.drq_asserted && !m_fifo[param].empty())
+		{
+			u16 const data = m_fifo[param].dequeue();
+
+			channel.write_cb(data);
+		}
+	}
+
+	if (m_fifo[param].empty())
+	{
+		if (channel.block_count == 0)
+		{
+			LOGMASKED(LOG_DMA, "dma transfer complete\n");
+
+			// trigger interrupt
+			if ((channel.mode & MODE_INTR_EN) && !(channel.mode & MODE_DMA_INTR))
+			{
+				channel.mode |= MODE_DMA_INTR;
+				m_irq_out_cb(1);
+			}
+
+			// TODO: reload
+			if (channel.mode & MODE_AUTO_RELOAD)
+				logerror("auto reload not supported\n");
+		}
+		else if (channel.drq_asserted)
+			m_dma->adjust(attotime::zero, param);
+	}
+}
+
+TIMER_CALLBACK_MEMBER(mips_rambo_device::buzzer)
 {
 	m_buzzer_out_state = !m_buzzer_out_state;
 	m_buzzer_out_cb(m_buzzer_out_state);
@@ -174,22 +319,24 @@ TIMER_CALLBACK_MEMBER(mips_rambo_device::buzzer_toggle)
 
 u32 mips_rambo_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	dma_t &channel = m_channel[1];
+
 	// check if dma channel is configured
 	u32 const blocks_required = (screen.visible_area().height() * screen.visible_area().width()) >> 9;
-	if (!(m_channel[1].mode & MODE_CHANNEL_EN) || (m_channel[1].reload_count != blocks_required))
+	if (!(channel.mode & MODE_CHANNEL_EN) || (channel.reload_count != blocks_required))
 		return 1;
 
 	// screen is blanked unless auto reload is enabled
-	if (!(m_channel[1].mode & MODE_AUTO_RELOAD))
+	if (!(channel.mode & MODE_AUTO_RELOAD))
 	{
-		m_channel[1].block_count = 0;
+		channel.block_count = 0;
 
 		return 0;
 	}
 	else
-		m_channel[1].block_count = m_channel[1].reload_count;
+		channel.block_count = channel.reload_count;
 
-	u32 address = m_channel[1].load_address;
+	u32 address = channel.load_address;
 	for (int y = screen.visible_area().min_y; y <= screen.visible_area().max_y; y++)
 		for (int x = screen.visible_area().min_x; x <= screen.visible_area().max_x; x += 8)
 		{
@@ -215,29 +362,11 @@ template WRITE_LINE_MEMBER(mips_rambo_device::drq_w<1>);
 
 template <unsigned Channel> WRITE_LINE_MEMBER(mips_rambo_device::drq_w)
 {
-	m_channel[Channel].drq_asserted = bool(state == ASSERT_LINE);
+	dma_t &channel = m_channel[Channel];
 
-	while (m_channel[Channel].drq_asserted)
-	{
-		// check channel enabled
-		if (!(m_channel[Channel].mode & MODE_CHANNEL_EN))
-			break;
+	channel.drq_asserted = bool(state == ASSERT_LINE);
 
-		// TODO: check data remaining
-
-		// FIXME: 16 bit dma
-		if (m_channel[Channel].mode & MODE_TO_MEMORY)
-		{
-			u8 const data = m_channel[Channel].read_cb();
-
-			m_ram->write(BYTE4_XOR_BE(m_channel[Channel].current_address), data);
-		}
-		else
-		{
-			u8 const data = m_ram->read(BYTE4_XOR_BE(m_channel[Channel].current_address));
-			m_channel[Channel].write_cb(data);
-		}
-
-		m_channel[Channel].current_address++;
-	}
+	// schedule dma transfer
+	if (channel.drq_asserted && (channel.block_count || !m_fifo[Channel].empty()))
+		m_dma->adjust(attotime::zero, Channel);
 }

@@ -5,10 +5,10 @@
  *
  */
 
-#include "../nl_base.h"
-#include "../plib/pstream.h"
-#include "../plib/pfmtlog.h"
+#include "netlist/nl_base.h"
 #include "nld_log.h"
+#include "plib/pfmtlog.h"
+#include "plib/pstream.h"
 //#include "sound/wavwrite.h"
 
 namespace netlist
@@ -19,15 +19,15 @@ namespace netlist
 	{
 		NETLIB_CONSTRUCTOR(log)
 		, m_I(*this, "I")
-		, m_strm(plib::pfmt("{1}.log")(this->name()))
-		, m_writer(m_strm)
+		, m_strm(pstring(plib::pfmt("{1}.log")(this->name())))
+		, m_writer(&m_strm)
 		{
 		}
 
 		NETLIB_UPDATEI()
 		{
 			/* use pstring::sprintf, it is a LOT faster */
-			m_writer.writeline(plib::pfmt("{1:.9} {2}").e(netlist().time().as_double()).e(static_cast<double>(m_I())));
+			m_writer.writeline(plib::pfmt("{1:.9} {2}").e(exec().time().as_double()).e(static_cast<double>(m_I())));
 		}
 
 		NETLIB_RESETI() { }
@@ -46,7 +46,7 @@ namespace netlist
 
 		NETLIB_UPDATEI()
 		{
-			m_writer.writeline(plib::pfmt("{1:.9} {2}").e(netlist().time().as_double()).e(static_cast<double>(m_I() - m_I2())));
+			m_writer.writeline(plib::pfmt("{1:.9} {2}").e(exec().time().as_double()).e(static_cast<double>(m_I() - m_I2())));
 		}
 
 		NETLIB_RESETI() { }
@@ -89,8 +89,8 @@ namespace netlist
 	#endif
 
 
-	NETLIB_DEVICE_IMPL(log)
-	NETLIB_DEVICE_IMPL(logD)
+	NETLIB_DEVICE_IMPL(log,  "LOG",  "+I")
+	NETLIB_DEVICE_IMPL(logD, "LOGD", "+I,+I2")
 
 	} //namespace devices
 } // namespace netlist

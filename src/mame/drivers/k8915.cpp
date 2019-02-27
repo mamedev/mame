@@ -134,20 +134,21 @@ uint32_t k8915_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 }
 
 
-MACHINE_CONFIG_START(k8915_state::k8915)
+void k8915_state::k8915(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(4'915'200) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
+	Z80(config, m_maincpu, XTAL(4'915'200) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &k8915_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &k8915_state::io_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(k8915_state, screen_update)
-	MCFG_SCREEN_SIZE(640, 250)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 249)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(k8915_state::screen_update));
+	screen.set_size(640, 250);
+	screen.set_visarea(0, 639, 0, 249);
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
@@ -164,7 +165,7 @@ MACHINE_CONFIG_START(k8915_state::k8915)
 	rs232.rxd_handler().set("sio", FUNC(z80sio_device::rxb_w));
 	rs232.dcd_handler().set("sio", FUNC(z80sio_device::dcdb_w));
 	rs232.cts_handler().set("sio", FUNC(z80sio_device::ctsb_w));
-MACHINE_CONFIG_END
+}
 
 
 /* ROM definition */

@@ -58,7 +58,7 @@ private:
 	CRTC_EGA_ROW_UPDATE(ega_update_row);
 
 public:
-	crtc_ega_device *m_crtc_ega;
+	required_device<crtc_ega_device> m_crtc_ega;
 
 	void install_banks();
 	void change_mode();

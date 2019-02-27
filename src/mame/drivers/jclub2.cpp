@@ -1134,7 +1134,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(common_state::scanline_irq)
 MACHINE_CONFIG_START(jclub2o_state::jclub2o)
 	MCFG_DEVICE_ADD("maincpu", M68EC020, 12000000)
 	MCFG_DEVICE_PROGRAM_MAP(jclub2o_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", common_state, scanline_irq, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(common_state::scanline_irq), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD("soundcpu",ST0016_CPU, 8000000)
 	MCFG_DEVICE_PROGRAM_MAP(st0016_mem)
@@ -1145,8 +1145,8 @@ MACHINE_CONFIG_START(jclub2o_state::jclub2o)
 	EEPROM_S29290_16BIT(config, "eeprom");
 	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_TICKET_DISPENSER_ADD("hopper1", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
-	MCFG_TICKET_DISPENSER_ADD("hopper2", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
+	TICKET_DISPENSER(config, m_hopper1, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_hopper2, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1172,14 +1172,14 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(jclub2_state::jclub2)
 	MCFG_DEVICE_ADD("maincpu", M68EC020, 12000000)
 	MCFG_DEVICE_PROGRAM_MAP(jclub2_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", common_state, scanline_irq, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(common_state::scanline_irq), "screen", 0, 1);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	EEPROM_93C46_8BIT(config, "eeprom");
 	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_TICKET_DISPENSER_ADD("hopper1", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
-	MCFG_TICKET_DISPENSER_ADD("hopper2", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
+	TICKET_DISPENSER(config, m_hopper1, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_hopper2, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1206,14 +1206,14 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(darkhors_state::darkhors)
 	MCFG_DEVICE_ADD("maincpu", M68EC020, 12000000) // 36MHz/3 ??
 	MCFG_DEVICE_PROGRAM_MAP(darkhors_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", common_state, scanline_irq, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(common_state::scanline_irq), "screen", 0, 1);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	EEPROM_93C46_8BIT(config, "eeprom");
 	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_TICKET_DISPENSER_ADD("hopper1", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
-	MCFG_TICKET_DISPENSER_ADD("hopper2", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
+	TICKET_DISPENSER(config, m_hopper1, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_hopper2, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)

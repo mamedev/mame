@@ -24,7 +24,7 @@
 #ifndef NLD_2102A_H_
 #define NLD_2102A_H_
 
-#include "../nl_setup.h"
+#include "netlist/nl_setup.h"
 
 #define RAM_2102A(name, cCEQ, cA0, cA1, cA2, cA3, cA4, cA5, cA6, cA7, cA8, cA9, cRWQ, cDI)  \
 		NET_REGISTER_DEV(RAM_2102A, name)   \

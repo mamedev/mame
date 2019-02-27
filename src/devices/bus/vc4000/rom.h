@@ -16,7 +16,7 @@ public:
 	vc4000_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom) override;
+	virtual uint8_t read_rom(offs_t offset) override;
 
 protected:
 	vc4000_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -44,8 +44,8 @@ public:
 	vc4000_ram1k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_ram) override;
-	virtual DECLARE_WRITE8_MEMBER(write_ram) override;
+	virtual uint8_t read_ram(offs_t offset) override;
+	virtual void write_ram(offs_t offset, uint8_t data) override;
 };
 
 // ======================> vc4000_chess2_device
@@ -57,9 +57,9 @@ public:
 	vc4000_chess2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(extra_rom) override;
-	virtual DECLARE_READ8_MEMBER(read_ram) override;
-	virtual DECLARE_WRITE8_MEMBER(write_ram) override;
+	virtual uint8_t extra_rom(offs_t offset) override;
+	virtual uint8_t read_ram(offs_t offset) override;
+	virtual void write_ram(offs_t offset, uint8_t data) override;
 };
 
 

@@ -549,17 +549,17 @@ MACHINE_CONFIG_START(adp_state::quickjac)
 	MCFG_MACHINE_START_OVERRIDE(adp_state,skattv)
 	MCFG_MACHINE_RESET_OVERRIDE(adp_state,skattv)
 
-	MCFG_DEVICE_ADD( "duart", MC68681, XTAL(8'664'000) / 2 )
-	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_4))
-	MCFG_MC68681_A_TX_CALLBACK(WRITELINE("microtouch", microtouch_device, rx))
-	MCFG_MC68681_INPORT_CALLBACK(IOPORT("DSW1"))
+	MC68681(config, m_duart, XTAL(8'664'000) / 2);
+	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_4);
+	m_duart->a_tx_cb().set(m_microtouch, FUNC(microtouch_device::rx));
+	m_duart->inport_cb().set_ioport("DSW1");
 
-	MCFG_MICROTOUCH_ADD( "microtouch", 9600, WRITELINE("duart", mc68681_device, rx_a_w) )
+	MICROTOUCH(config, m_microtouch, 9600).stx().set(m_duart, FUNC(mc68681_device::rx_a_w));
 
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_NONE);
 
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
-	//MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(*this, adp_state, rtc_irq))
+	MSM6242(config, "rtc", XTAL(32'768));
+	//rtc.out_int_handler().set(FUNC(adp_state::rtc_irq));
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -604,19 +604,18 @@ void adp_state::ramdac_map(address_map &map)
 	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
 }
 
-MACHINE_CONFIG_START(adp_state::funland)
+void adp_state::funland(machine_config &config)
+{
 	quickjac(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(funland_mem)
+	m_maincpu->set_addrmap(AS_PROGRAM, &adp_state::funland_mem);
 
 	PALETTE(config.replace(), m_palette, palette_device::BLACK, 0x100);
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
 	ramdac.set_addrmap(0, &adp_state::ramdac_map);
 
-	MCFG_DEVICE_MODIFY("acrtc")
-	MCFG_HD63484_ADDRESS_MAP(fstation_hd63484_map)
-MACHINE_CONFIG_END
+	m_acrtc->set_addrmap(0, &adp_state::fstation_hd63484_map);
+}
 
 MACHINE_CONFIG_START(adp_state::fstation)
 	funland(config);

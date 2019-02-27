@@ -25,10 +25,13 @@ DEFINE_DEVICE_TYPE(MB90082, mb90082_device, "mb90082", "Fujitsu MB90082 OSD")
 
 void mb90082_device::mb90082_vram(address_map &map)
 {
-	map(0x0000, 0x023f).ram(); // main screen vram
-	map(0x0400, 0x063f).ram(); // main screen attr
+	if (!has_configured_map(0))
+	{
+		map(0x0000, 0x023f).ram(); // main screen vram
+		map(0x0400, 0x063f).ram(); // main screen attr
 //  AM_RANGE(0x0800, 0x0a3f) AM_RAM // sub screen vram
 //  AM_RANGE(0x0c00, 0x0e3f) AM_RAM // sub screen attr
+	}
 }
 
 /* charset is undumped, but apparently a normal ASCII one is enough for the time being (for example "fnt0808.x1" in Sharp X1) */
@@ -91,7 +94,7 @@ inline void mb90082_device::write_word(offs_t address, uint16_t data)
 mb90082_device::mb90082_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MB90082, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
-	, m_space_config("videoram", ENDIANNESS_LITTLE, 16, 16, 0, address_map_constructor(), address_map_constructor(FUNC(mb90082_device::mb90082_vram), this))
+	, m_space_config("videoram", ENDIANNESS_LITTLE, 16, 16, 0, address_map_constructor(FUNC(mb90082_device::mb90082_vram), this))
 {
 }
 

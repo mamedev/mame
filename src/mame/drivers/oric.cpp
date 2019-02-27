@@ -87,6 +87,7 @@ public:
 	TIMER_CALLBACK_MEMBER(update_tape);
 
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_oric(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_w);
@@ -306,11 +307,11 @@ void oric_state::update_psg(address_space &space)
 {
 	if(m_via_ca2)
 		if(m_via_cb2)
-			m_psg->address_w(space, 0, m_via_a);
+			m_psg->address_w(m_via_a);
 		else
-			m_via->write_pa(space, 0, m_psg->data_r(space, 0));
+			m_via->write_pa(space, 0, m_psg->data_r());
 	else if(m_via_cb2)
-		m_psg->data_w(space, 0, m_via_a);
+		m_psg->data_w(m_via_a);
 }
 
 void oric_state::update_irq()
@@ -411,6 +412,11 @@ void oric_state::machine_start()
 }
 
 
+void oric_state::machine_reset()
+{
+	m_tape_timer->adjust(attotime::from_hz(4800), 0, attotime::from_hz(4800));
+}
+
 void telestrat_state::machine_start()
 {
 	machine_start_common();
@@ -428,6 +434,7 @@ void telestrat_state::machine_start()
 
 void telestrat_state::machine_reset()
 {
+	m_tape_timer->adjust(attotime::from_hz(4800), 0, attotime::from_hz(4800));
 	m_port_314 = 0x00;
 	m_via2_a = 0xff;
 	remap();

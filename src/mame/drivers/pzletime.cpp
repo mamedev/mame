@@ -334,21 +334,21 @@ void pzletime_state::machine_reset()
 	m_ticket = 0;
 }
 
-MACHINE_CONFIG_START(pzletime_state::pzletime)
-
+void pzletime_state::pzletime(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",M68000,10000000)
-	MCFG_DEVICE_PROGRAM_MAP(pzletime_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pzletime_state, irq4_line_hold)
+	M68000(config, m_maincpu, 10000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pzletime_state::pzletime_map);
+	m_maincpu->set_vblank_int("screen", FUNC(pzletime_state::irq4_line_hold));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(pzletime_state, screen_update_pzletime)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(0*8, 48*8-1, 0*8, 28*8-1);
+	m_screen->set_screen_update(FUNC(pzletime_state::screen_update_pzletime));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pzletime);
 	PALETTE(config, m_palette, FUNC(pzletime_state::pzletime_palette));
@@ -360,7 +360,7 @@ MACHINE_CONFIG_START(pzletime_state::pzletime)
 	SPEAKER(config, "mono").front_center();
 	OKIM6295(config, m_oki, 937500, okim6295_device::PIN7_HIGH); //freq & pin7 taken from stlforce
 	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
-MACHINE_CONFIG_END
+}
 
 /***************************************************************************
 

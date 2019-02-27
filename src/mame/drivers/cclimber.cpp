@@ -1160,7 +1160,8 @@ void cclimber_state::ckongb(machine_config &config)
 }
 
 
-MACHINE_CONFIG_START(cclimber_state::cannonb)
+void cclimber_state::cannonb(machine_config &config)
+{
 	cclimber(config);
 
 	/* basic machine hardware */
@@ -1171,8 +1172,8 @@ MACHINE_CONFIG_START(cclimber_state::cannonb)
 	m_mainlatch->q_out_cb<2>().set_nop(); // not used
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_cannonb)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_cannonb);
+}
 
 void cclimber_state::bagmanf(machine_config &config)
 {
@@ -1229,13 +1230,12 @@ MACHINE_CONFIG_START(cclimber_state::toprollr)
 	m_mainlatch->q_out_cb<6>().set(FUNC(cclimber_state::toprollr_rombank_w));
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_toprollr)
+	m_gfxdecode->set_info(gfx_toprollr);
 	m_palette->set_entries(32*5);
 	m_palette->set_init(FUNC(cclimber_state::toprollr_palette));
 
 	MCFG_VIDEO_START_OVERRIDE(cclimber_state,toprollr)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(cclimber_state, screen_update_toprollr)
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(cclimber_state::screen_update_toprollr));
 MACHINE_CONFIG_END
 
 
@@ -1285,6 +1285,7 @@ MACHINE_CONFIG_END
 void cclimber_state::guzzler(machine_config &config)
 {
 	swimmer(config);
+
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &cclimber_state::guzzler_map);
 }

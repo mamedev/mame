@@ -14,13 +14,13 @@ Disabling and Enabling Shifter Toggle
 
 This example will use the game Spy Hunter (set *spyhunt*) to demonstrate the exact change needed:
 
-You will need to manually edit the game .CFG file in the CFG folder (e.g. *spyhunt.cfg*)
+You will need to manually edit the game .CFG file in the CFG folder (e.g. ``spyhunt.cfg``)
 
-Start by loading MAME with the game in question. In our case, that will be **mame64 spyhunt**.
+Start by loading MAME with the game in question. In our case, that will be **mame spyhunt**.
 
 Set up the controls as you would please, including mapping the shifter. Exit MAME, open the .cfg file in your text editor of choice.
 
-Inside the *spyhunt.cfg* file, you will find the following for the input. The actual input code in the middle can and will vary depending on the controller number and what input you have mapped.
+Inside the ``spyhunt.cfg`` file, you will find the following for the input. The actual input code in the middle can and will vary depending on the controller number and what input you have mapped.
 
 |             **<port tag=":ssio:IP0" type="P1_BUTTON2" mask="16" defvalue="16">**
 |                 <newseq type="standard">

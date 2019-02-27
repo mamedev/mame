@@ -479,99 +479,101 @@ void pc8001_state::machine_start()
 
 /* Machine Drivers */
 
-MACHINE_CONFIG_START(pc8001_state::pc8001)
+void pc8001_state::pc8001(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(pc8001_mem)
-	MCFG_DEVICE_IO_MAP(pc8001_io)
+	Z80(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc8001_state::pc8001_mem);
+	m_maincpu->set_addrmap(AS_IO, &pc8001_state::pc8001_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_UPDATE_DEVICE(UPD3301_TAG, upd3301_device, screen_update)
-	MCFG_SCREEN_SIZE(640, 220)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_screen_update(UPD3301_TAG, FUNC(upd3301_device::screen_update));
+	screen.set_size(640, 220);
+	screen.set_visarea(0, 640-1, 0, 200-1);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("beeper", BEEP, 2000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	BEEP(config, m_beep, 2000).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
-	MCFG_DEVICE_ADD(I8251_TAG, I8251, 0)
+	I8251(config, I8251_TAG, 0);
 
-	MCFG_DEVICE_ADD(I8255A_TAG, I8255A, 0)
+	I8255A(config, I8255A_TAG, 0);
 
 	I8257(config, m_dma, XTAL(4'000'000));
 	m_dma->out_hrq_cb().set(FUNC(pc8001_state::hrq_w));
 	m_dma->in_memr_cb().set(FUNC(pc8001_state::dma_mem_r));
-	m_dma->out_iow_cb<2>().set(UPD3301_TAG, FUNC(upd3301_device::dack_w));
+	m_dma->out_iow_cb<2>().set(m_crtc, FUNC(upd3301_device::dack_w));
 
 	UPD1990A(config, m_rtc);
 
-	MCFG_DEVICE_ADD(UPD3301_TAG, UPD3301, XTAL(14'318'181))
-	MCFG_UPD3301_CHARACTER_WIDTH(8)
-	MCFG_UPD3301_DRAW_CHARACTER_CALLBACK_OWNER(pc8001_state, pc8001_display_pixels)
-	MCFG_UPD3301_DRQ_CALLBACK(WRITELINE(m_dma, i8257_device, dreq2_w))
-	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
+	UPD3301(config, m_crtc, XTAL(14'318'181));
+	m_crtc->set_character_width(8);
+	m_crtc->set_display_callback(FUNC(pc8001_state::pc8001_display_pixels), this);
+	m_crtc->drq_wr_callback().set(m_dma, FUNC(i8257_device::dreq2_w));
+	m_crtc->set_screen(SCREEN_TAG);
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, pc8001_state, write_centronics_ack))
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, pc8001_state, write_centronics_busy))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->ack_handler().set(FUNC(pc8001_state::write_centronics_ack));
+	m_centronics->busy_handler().set(FUNC(pc8001_state::write_centronics_busy));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+	OUTPUT_LATCH(config, m_cent_data_out);
+	m_centronics->set_output_latch(*m_cent_data_out);
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
 
 	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("32K,64K");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(pc8001mk2_state::pc8001mk2)
+void pc8001mk2_state::pc8001mk2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(pc8001mk2_mem)
-	MCFG_DEVICE_IO_MAP(pc8001mk2_io)
+	Z80(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc8001mk2_state::pc8001mk2_mem);
+	m_maincpu->set_addrmap(AS_IO, &pc8001mk2_state::pc8001mk2_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_UPDATE_DEVICE(UPD3301_TAG, upd3301_device, screen_update)
-	MCFG_SCREEN_SIZE(640, 220)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_screen_update(UPD3301_TAG, FUNC(upd3301_device::screen_update));
+	screen.set_size(640, 220);
+	screen.set_visarea(0, 640-1, 0, 200-1);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("beeper", BEEP, 2000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	BEEP(config, m_beep, 2000).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
-	MCFG_DEVICE_ADD(I8251_TAG, I8251, 0)
+	I8251(config, I8251_TAG, 0);
 
-	MCFG_DEVICE_ADD(I8255A_TAG, I8255A, 0)
+	I8255A(config, I8255A_TAG, 0);
 
 	I8257(config, m_dma, XTAL(4'000'000));
 	m_dma->out_hrq_cb().set(FUNC(pc8001_state::hrq_w));
 	m_dma->in_memr_cb().set(FUNC(pc8001_state::dma_mem_r));
-	m_dma->out_iow_cb<2>().set(UPD3301_TAG, FUNC(upd3301_device::dack_w));
+	m_dma->out_iow_cb<2>().set(m_crtc, FUNC(upd3301_device::dack_w));
 
 	UPD1990A(config, m_rtc);
 
-	MCFG_DEVICE_ADD(UPD3301_TAG, UPD3301, XTAL(14'318'181))
-	MCFG_UPD3301_CHARACTER_WIDTH(8)
-	MCFG_UPD3301_DRAW_CHARACTER_CALLBACK_OWNER(pc8001_state, pc8001_display_pixels)
-	MCFG_UPD3301_DRQ_CALLBACK(WRITELINE(m_dma, i8257_device, dreq2_w))
-	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
+	UPD3301(config, m_crtc, XTAL(14'318'181));
+	m_crtc->set_character_width(8);
+	m_crtc->set_display_callback(FUNC(pc8001_state::pc8001_display_pixels), this);
+	m_crtc->drq_wr_callback().set(m_dma, FUNC(i8257_device::dreq2_w));
+	m_crtc->set_screen(SCREEN_TAG);
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+	OUTPUT_LATCH(config, m_cent_data_out);
+	m_centronics->set_output_latch(*m_cent_data_out);
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
 
 	RAM(config, RAM_TAG).set_default_size("64K");
-MACHINE_CONFIG_END
+}
 
 /* ROMs */
 

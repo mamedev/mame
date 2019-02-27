@@ -15,6 +15,7 @@
 
 #include "epson_sio.h"
 #include "cpu/m6800/m6801.h"
+#include "imagedev/floppy.h"
 #include "machine/upd765.h"
 
 
@@ -67,9 +68,9 @@ private:
 	required_device<hd6303y_cpu_device> m_cpu;
 	required_device<upd765a_device> m_fdc;
 	required_device<epson_sio_device> m_sio_output;
+	required_device<floppy_connector> m_floppy;
 
 	epson_sio_device *m_sio_input;
-	floppy_image_device *m_floppy;
 
 	emu_timer *m_timer;
 

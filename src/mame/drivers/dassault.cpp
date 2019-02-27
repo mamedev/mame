@@ -538,8 +538,8 @@ MACHINE_CONFIG_START(dassault_state::dassault)
 	m_audiocpu->add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
 	m_audiocpu->add_route(ALL_OUTPUTS, "rspeaker", 0);
 
-//  MCFG_QUANTUM_TIME(attotime::from_hz(8400)) /* 140 CPU slices per frame */
-	MCFG_QUANTUM_PERFECT_CPU("maincpu") // I was seeing random lockups.. let's see if this helps
+//  config.m_minimum_quantum = attotime::from_hz(8400); /* 140 CPU slices per frame */
+	config.m_perfect_cpu_quantum = subtag("maincpu"); // I was seeing random lockups.. let's see if this helps
 
 	mb8421_mb8431_16_device &sharedram(MB8421_MB8431_16BIT(config, "sharedram"));
 	sharedram.intl_callback().set_inputline("maincpu", M68K_IRQ_5);
@@ -550,7 +550,7 @@ MACHINE_CONFIG_START(dassault_state::dassault)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248)  // same as robocop2(cninja.cpp)? verify this from real pcb.
 	MCFG_SCREEN_UPDATE_DRIVER(dassault_state, screen_update_dassault)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dassault)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_dassault);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 4096);
 
 	MCFG_DEVICE_ADD("spriteram1", BUFFERED_SPRITERAM16)

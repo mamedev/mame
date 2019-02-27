@@ -265,27 +265,27 @@ GFXDECODE_END
 
 /****************************************************************************/
 
-MACHINE_CONFIG_START(xxmissio_state::xxmissio)
-
+void xxmissio_state::xxmissio(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,12000000/4) /* 3.0MHz */
-	MCFG_DEVICE_PROGRAM_MAP(map1)
+	Z80(config, m_maincpu, 12000000/4); /* 3.0MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &xxmissio_state::map1);
 
-	MCFG_DEVICE_ADD("sub", Z80,12000000/4) /* 3.0MHz */
-	MCFG_DEVICE_PROGRAM_MAP(map2)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(xxmissio_state, interrupt_s, 2*60)
+	Z80(config, m_subcpu, 12000000/4); /* 3.0MHz */
+	m_subcpu->set_addrmap(AS_PROGRAM, &xxmissio_state::map2);
+	m_subcpu->set_periodic_int(FUNC(xxmissio_state::interrupt_s), attotime::from_hz(2*60));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 4*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(xxmissio_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, xxmissio_state, interrupt_m))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 64*8-1, 4*8, 28*8-1);
+	screen.set_screen_update(FUNC(xxmissio_state::screen_update));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(xxmissio_state::interrupt_m));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_xxmissio);
 	PALETTE(config, m_palette).set_format(1, &xxmissio_state::BBGGRRII, 768);
@@ -308,7 +308,7 @@ MACHINE_CONFIG_START(xxmissio_state::xxmissio)
 	ym2.add_route(1, "mono", 0.15);
 	ym2.add_route(2, "mono", 0.15);
 	ym2.add_route(3, "mono", 0.40);
-MACHINE_CONFIG_END
+}
 
 /****************************************************************************/
 

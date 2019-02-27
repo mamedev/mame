@@ -53,9 +53,6 @@ private:
 DECLARE_DEVICE_TYPE(CPC_ROMSLOT, cpc_rom_image_device)
 
 
-#define MCFG_CPC_ROMSLOT_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, CPC_ROMSLOT, 0)
-
 /*** ROM box device ***/
 
 class cpc_rom_device  : public device_t,

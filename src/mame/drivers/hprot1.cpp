@@ -266,9 +266,9 @@ MACHINE_CONFIG_START(hprot1_state::hprot1)
 	PALETTE(config, "palette", FUNC(hprot1_state::hprot1_palette), 2);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_hprot1);
 
-	MCFG_HD44780_ADD("hd44780")
-	MCFG_HD44780_LCD_SIZE(2, 16)
-	MCFG_HD44780_PIXEL_UPDATE_CB(hprot1_state,hprot1_pixel_update)
+	HD44780(config, m_lcdc, 0);
+	m_lcdc->set_lcd_size(2, 16);
+	m_lcdc->set_pixel_update_cb(FUNC(hprot1_state::hprot1_pixel_update), this);
 
 	/* TODO: figure out which RTC chip is in use. */
 

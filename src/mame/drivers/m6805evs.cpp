@@ -102,13 +102,14 @@ void m6805evs_state::machine_reset()
 {
 }
 
-MACHINE_CONFIG_START(m6805evs_state::m6805evs)
+void m6805evs_state::m6805evs(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6805, XTAL(4'000'000))
+	M6805(config, m_maincpu, XTAL(4'000'000));
 
 //  Needs a 13-bits address bus wide version of the cpu
-//  MCFG_DEVICE_PROGRAM_MAP(mem_map)
-MACHINE_CONFIG_END
+//  m_maincpu->set_addrmap(AS_PROGRAM, &m6805evs_state::mem_map);
+}
 
 ROM_START(m6805evs)
 	ROM_REGION(0x2000, "eprom", 0)

@@ -340,8 +340,8 @@ void ampex_state::machine_start()
 	m_uart->write_swe(0);
 
 	// Are rates hardwired to DIP switches? They don't seem to be software-controlled...
-	m_dbrg->write_str(0xe);
-	m_dbrg->write_stt(0xe);
+	m_dbrg->str_w(0xe);
+	m_dbrg->stt_w(0xe);
 
 	// Make up some settings for the UART (probably also actually controlled by DIP switches)
 	m_uart->write_nb1(1);

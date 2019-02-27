@@ -7,8 +7,6 @@
 
 #include "bus/scsi/scsihle.h"
 
-#define MCFG_LEGACY_SCSI_PORT(_tag) \
-	downcast<legacy_scsi_host_adapter &>(*device).set_scsi_port(_tag);
 
 class legacy_scsi_host_adapter : public device_t
 {

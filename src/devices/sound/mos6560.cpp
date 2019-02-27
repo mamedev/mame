@@ -682,12 +682,14 @@ DEFINE_DEVICE_TYPE(MOS656X_ATTACK_UFO, mos656x_attack_ufo_device, "mos656x_attac
 // default address maps
 void mos6560_device::mos6560_videoram_map(address_map &map)
 {
-	map(0x0000, 0x3fff).ram();
+	if (!has_configured_map(0))
+		map(0x0000, 0x3fff).ram();
 }
 
 void mos6560_device::mos6560_colorram_map(address_map &map)
 {
-	map(0x000, 0x3ff).ram();
+	if (!has_configured_map(1))
+		map(0x000, 0x3ff).ram();
 }
 
 mos6560_device::mos6560_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant)
@@ -696,8 +698,8 @@ mos6560_device::mos6560_device(const machine_config &mconfig, device_type type, 
 		device_sound_interface(mconfig, *this),
 		device_video_interface(mconfig, *this),
 		m_variant(variant),
-		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, address_map_constructor(), address_map_constructor(FUNC(mos6560_device::mos6560_videoram_map), this)),
-		m_colorram_space_config("colorram", ENDIANNESS_LITTLE, 8, 10, 0, address_map_constructor(), address_map_constructor(FUNC(mos6560_device::mos6560_colorram_map), this)),
+		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, address_map_constructor(FUNC(mos6560_device::mos6560_videoram_map), this)),
+		m_colorram_space_config("colorram", ENDIANNESS_LITTLE, 8, 10, 0, address_map_constructor(FUNC(mos6560_device::mos6560_colorram_map), this)),
 		m_read_potx(*this),
 		m_read_poty(*this)
 {

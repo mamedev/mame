@@ -544,52 +544,53 @@ static GFXDECODE_START( gfx_pyl601a )
 	GFXDECODE_ENTRY( "chargen", 0x0000, pyl601a_charlayout, 0, 1 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(pyl601_state::pyl601)
+void pyl601_state::pyl601(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",M6800, XTAL(1'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(pyl601_mem)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pyl601_state,  pyl601_interrupt)
+	M6800(config, m_maincpu, 1_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pyl601_state::pyl601_mem);
+	m_maincpu->set_vblank_int("screen", FUNC(pyl601_state::pyl601_interrupt));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 200)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 200 - 1)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pyl601)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(640, 200);
+	screen.set_visarea(0, 640 - 1, 0, 200 - 1);
+	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_pyl601);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
-	mc6845_device &crtc(MC6845(config, "crtc", XTAL(2'000'000)));
+	mc6845_device &crtc(MC6845(config, "crtc", 2_MHz_XTAL));
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);   /* ? */
 	crtc.set_update_row_callback(FUNC(pyl601_state::pyl601_update_row), this);
 
 	UPD765A(config, m_fdc, 8'000'000, true, true);
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", pyl601_floppies, "525hd", pyl601_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", pyl601_floppies, "525hd", pyl601_state::floppy_formats)
-	MCFG_SOFTWARE_LIST_ADD("flop_list","pyl601")
+	FLOPPY_CONNECTOR(config, "upd765:0", pyl601_floppies, "525hd", pyl601_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765:1", pyl601_floppies, "525hd", pyl601_state::floppy_formats);
+	SOFTWARE_LIST(config, "flop_list").set_original("pyl601");
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("576K"); // 64 + 512
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(pyl601_state::pyl601a)
+void pyl601_state::pyl601a(machine_config &config)
+{
 	pyl601(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK( XTAL(2'000'000))
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_pyl601a)
+	m_maincpu->set_clock(2_MHz_XTAL);
+
+	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_pyl601a);
 
 	subdevice<mc6845_device>("crtc")->set_update_row_callback(FUNC(pyl601_state::pyl601a_update_row), this);
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( pyl601 )

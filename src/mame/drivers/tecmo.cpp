@@ -700,23 +700,23 @@ void tecmo_state::machine_reset()
 	m_adpcm_data = -1;
 }
 
-MACHINE_CONFIG_START(tecmo_state::rygar)
-
+void tecmo_state::rygar(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(24'000'000)/4) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(rygar_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tecmo_state,  irq0_line_hold)
+	Z80(config, m_maincpu, XTAL(24'000'000)/4); /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &tecmo_state::rygar_map);
+	m_maincpu->set_vblank_int("screen", FUNC(tecmo_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(4'000'000)) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(rygar_sound_map)
+	Z80(config, m_soundcpu, XTAL(4'000'000)); /* verified on pcb */
+	m_soundcpu->set_addrmap(AS_PROGRAM, &tecmo_state::rygar_sound_map);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000)/4, 384,0,256,264,16,240) // 59.18 Hz
-	MCFG_SCREEN_UPDATE_DRIVER(tecmo_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(XTAL(24'000'000)/4, 384,0,256,264,16,240); // 59.18 Hz
+	m_screen->set_screen_update(FUNC(tecmo_state::screen_update));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tecmo);
 	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 1024).set_endianness(ENDIANNESS_BIG);
@@ -730,67 +730,65 @@ MACHINE_CONFIG_START(tecmo_state::rygar)
 	soundlatch.data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 	soundlatch.set_separate_acknowledge(true);
 
-	MCFG_DEVICE_ADD("ymsnd", YM3526, XTAL(4'000'000)) /* verified on pcb */
-	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ym3526_device &ymsnd(YM3526(config, "ymsnd", XTAL(4'000'000))); /* verified on pcb */
+	ymsnd.irq_handler().set_inputline(m_soundcpu, 0);
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(400'000)) /* verified on pcb, even if schematics shows a 384khz resonator */
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, tecmo_state, adpcm_int))    /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8KHz               */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	MSM5205(config, m_msm, XTAL(400'000)); /* verified on pcb, even if schematics shows a 384khz resonator */
+	m_msm->vck_legacy_callback().set(FUNC(tecmo_state::adpcm_int));    /* interrupt function */
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);      /* 8KHz */
+	m_msm->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
-
-MACHINE_CONFIG_START(tecmo_state::gemini)
+void tecmo_state::gemini(machine_config &config)
+{
 	rygar(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
 	// xtal found on bootleg, to be confirmed on a real board
-	MCFG_DEVICE_CLOCK(XTAL(8'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(gemini_map)
+	m_maincpu->set_clock(XTAL(8'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &tecmo_state::gemini_map);
 
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_DEVICE_PROGRAM_MAP(tecmo_sound_map)
+	m_soundcpu->set_addrmap(AS_PROGRAM, &tecmo_state::tecmo_sound_map);
 
-	MCFG_DEVICE_REPLACE("ymsnd", YM3812, XTAL(4'000'000))
-	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	ym3812_device &ymsnd(YM3812(config.replace(), "ymsnd", XTAL(4'000'000)));
+	ymsnd.irq_handler().set_inputline(m_soundcpu, 0);
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-MACHINE_CONFIG_START(tecmo_state::geminib)
+void tecmo_state::geminib(machine_config &config)
+{
 	gemini(config);
 	// 24.18 MHz OSC / 59.62 Hz, bootleg only?
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_RAW_PARAMS(24180000/4, 384,0,256,264,16,240)
-MACHINE_CONFIG_END
+	m_screen->set_raw(24180000/4, 384,0,256,264,16,240);
+}
 
-MACHINE_CONFIG_START(tecmo_state::silkworm)
+void tecmo_state::silkworm(machine_config &config)
+{
 	gemini(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(6000000)
-	MCFG_DEVICE_PROGRAM_MAP(silkworm_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_clock(6000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tecmo_state::silkworm_map);
+}
 
-MACHINE_CONFIG_START(tecmo_state::backfirt)
+void tecmo_state::backfirt(machine_config &config)
+{
 	gemini(config);
 
 	/* this pcb has no MSM5205 */
-	MCFG_DEVICE_REMOVE("msm")
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_DEVICE_PROGRAM_MAP(backfirt_sound_map)
-MACHINE_CONFIG_END
+	config.device_remove("msm");
+	m_soundcpu->set_addrmap(AS_PROGRAM, &tecmo_state::backfirt_sound_map);
+}
 
-MACHINE_CONFIG_START(tecmo_state::silkwormp)
+void tecmo_state::silkwormp(machine_config &config)
+{
 	silkworm(config);
 
 	/* bootleg pcb doesn't have the MSM5205 populated */
-	MCFG_DEVICE_REMOVE("msm")
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_DEVICE_PROGRAM_MAP(silkwormp_sound_map)
-MACHINE_CONFIG_END
+	config.device_remove("msm");
+	m_soundcpu->set_addrmap(AS_PROGRAM, &tecmo_state::silkwormp_sound_map);
+}
 
 
 /***************************************************************************

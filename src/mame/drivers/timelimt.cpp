@@ -222,20 +222,20 @@ INTERRUPT_GEN_MEMBER(timelimt_state::irq)
 
 /***************************************************************************/
 
-MACHINE_CONFIG_START(timelimt_state::timelimt)
-
+void timelimt_state::timelimt(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 5000000)   /* 5.000 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_IO_MAP(main_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", timelimt_state,  irq)
+	Z80(config, m_maincpu, 5000000);   /* 5.000 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &timelimt_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &timelimt_state::main_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(timelimt_state::irq));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80,18432000/6)    /* 3.072 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(sound_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", timelimt_state,  irq0_line_hold) /* ? */
+	Z80(config, m_audiocpu, 18432000/6);    /* 3.072 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &timelimt_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &timelimt_state::sound_io_map);
+	m_audiocpu->set_vblank_int("screen", FUNC(timelimt_state::irq0_line_hold)); /* ? */
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(3000))
+	config.m_minimum_quantum = attotime::from_hz(3000);
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // IC15
 	mainlatch.q_out_cb<0>().set(FUNC(timelimt_state::nmi_enable_w));
@@ -247,13 +247,13 @@ MACHINE_CONFIG_START(timelimt_state::timelimt)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(timelimt_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(timelimt_state::screen_update));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_timelimt);
 	PALETTE(config, m_palette, FUNC(timelimt_state::timelimt_palette), 64+32);
@@ -268,7 +268,7 @@ MACHINE_CONFIG_START(timelimt_state::timelimt)
 	ay8910_device &ay2(AY8910(config, "ay2", 18432000/12));
 	ay2.port_a_read_callback().set("soundlatch", FUNC(generic_latch_8_device::read));
 	ay2.add_route(ALL_OUTPUTS, "mono", 0.25);
-MACHINE_CONFIG_END
+}
 
 /***************************************************************************
 

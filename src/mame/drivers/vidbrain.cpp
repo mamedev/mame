@@ -392,22 +392,23 @@ void vidbrain_state::machine_reset()
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( vidbrain )
+//  machine_config( vidbrain )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(vidbrain_state::vidbrain)
+void vidbrain_state::vidbrain(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD(F3850_TAG, F8, XTAL(4'000'000)/2)
-	MCFG_DEVICE_PROGRAM_MAP(vidbrain_mem)
-	MCFG_DEVICE_IO_MAP(vidbrain_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE(F3853_TAG, f3853_device, int_acknowledge)
+	F8(config, m_maincpu, XTAL(4'000'000)/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vidbrain_state::vidbrain_mem);
+	m_maincpu->set_addrmap(AS_IO, &vidbrain_state::vidbrain_io);
+	m_maincpu->set_irq_acknowledge_callback(F3853_TAG, FUNC(f3853_device::int_acknowledge));
 
 	// video hardware
 	config.set_default_layout(layout_vidbrain);
 
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_UPDATE_DEVICE(UV201_TAG, uv201_device, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(3636363, 232, 18, 232, 262, 21, 262)
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_screen_update(UV201_TAG, FUNC(uv201_device::screen_update));
+	screen.set_raw(3636363, 232, 18, 232, 262, 21, 262);
 	UV201(config, m_uv, 3636363);
 	m_uv->set_screen(SCREEN_TAG);
 	m_uv->ext_int_wr_callback().set(FUNC(vidbrain_state::ext_int_w));
@@ -416,23 +417,24 @@ MACHINE_CONFIG_START(vidbrain_state::vidbrain)
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", DAC_2BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.167) // 74ls74.u16 + 120k + 56k
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	DAC_2BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.167); // 74ls74.u16 + 120k + 56k
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	// devices
 	F3853(config, m_smi, XTAL(4'000'000)/2);
-	m_smi->int_req_callback().set_inputline(F3850_TAG, F8_INPUT_LINE_INT_REQ);
+	m_smi->int_req_callback().set_inputline(m_maincpu, F8_INPUT_LINE_INT_REQ);
 
 	// cartridge
-	MCFG_VIDEOBRAIN_EXPANSION_SLOT_ADD(VIDEOBRAIN_EXPANSION_SLOT_TAG, vidbrain_expansion_cards, nullptr)
+	VIDEOBRAIN_EXPANSION_SLOT(config, VIDEOBRAIN_EXPANSION_SLOT_TAG, vidbrain_expansion_cards, nullptr);
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "vidbrain")
+	SOFTWARE_LIST(config, "cart_list").set_original("vidbrain");
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("1K");
-MACHINE_CONFIG_END
+}
 
 
 

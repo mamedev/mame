@@ -6,7 +6,7 @@
  */
 
 #include "nld_7485.h"
-#include "../nl_base.h"
+#include "netlist/nl_base.h"
 
 namespace netlist
 {
@@ -101,8 +101,8 @@ namespace netlist
 			update_outputs(1, 1, 0);
 	}
 
-	NETLIB_DEVICE_IMPL(7485)
-	NETLIB_DEVICE_IMPL(7485_dip)
+	NETLIB_DEVICE_IMPL(7485, "TTL_7485", "+A0,+A1,+A2,+A3,+B0,+B1,+B2,+B3,+LTIN,+EQIN,+GTIN")
+	NETLIB_DEVICE_IMPL(7485_dip, "TTL_7485_DIP", "")
 
 	} //namespace devices
 } // namespace netlist

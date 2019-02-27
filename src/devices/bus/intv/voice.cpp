@@ -69,15 +69,16 @@ void intv_voice_device::late_subslot_setup()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(intv_voice_device::device_add_mconfig)
+void intv_voice_device::device_add_mconfig(machine_config &config)
+{
 	SPEAKER(config, "mono_voice").front_center();
 
 	SP0256(config, m_speech, 3120000);
 	/* The Intellivoice uses a speaker with its own volume control so the relative volumes to use are subjective */
 	m_speech->add_route(ALL_OUTPUTS, "mono_voice", 1.00);
 
-	MCFG_INTV_CARTRIDGE_ADD("subslot", intv_cart, nullptr)
-MACHINE_CONFIG_END
+	INTV_CART_SLOT(config, m_subslot, intv_cart, nullptr);
+}
 
 
 ROM_START( intellivoice )

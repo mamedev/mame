@@ -1,44 +1,13 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
+#include "plib/pstring.h"
+#include "netlist/nl_setup.h"
+#include "plib/plists.h"
+#include "plib/pmain.h"
+#include "plib/ppmf.h"
+#include "plib/pstream.h"
 #include <cstring>
-#include "../plib/pstring.h"
-#include "../plib/plists.h"
-#include "../plib/pstream.h"
-#include "../plib/pmain.h"
-#include "../plib/ppmf.h"
-#include "../nl_setup.h"
 
-class nlwav_app : public plib::app
-{
-public:
-	nlwav_app() :
-		plib::app(),
-		opt_inp(*this,  "i", "input",       "-",      "input file"),
-		opt_out(*this,  "o", "output",      "-",      "output file"),
-		opt_amp(*this,  "a", "amp",    10000.0,      "amplification after mean correction"),
-		opt_rate(*this, "r", "rate",   48000,        "sample rate of output file"),
-		opt_verb(*this, "v", "verbose",              "be verbose - this produces lots of output"),
-		opt_quiet(*this,"q", "quiet",                "be quiet - no warnings"),
-		opt_version(*this,  "",  "version",          "display version and exit"),
-		opt_help(*this, "h", "help",                 "display help and exit")
-	{}
-	plib::option_str    opt_inp;
-	plib::option_str    opt_out;
-	plib::option_double opt_amp;
-	plib::option_long   opt_rate;
-	plib::option_bool   opt_verb;
-	plib::option_bool   opt_quiet;
-	plib::option_bool   opt_version;
-	plib::option_bool   opt_help;
-
-	int execute();
-	pstring usage();
-
-	plib::pstdin pin_strm;
-private:
-	void convert1(long sample_rate);
-	void convert(long sample_rate);
-};
 
 
 /* From: https://ffmpeg.org/pipermail/ffmpeg-devel/2007-October/038122.html
@@ -51,38 +20,54 @@ private:
  * and data chunk length to the file.
  */
 /* http://de.wikipedia.org/wiki/RIFF_WAVE */
+
 class wav_t
 {
 public:
-	wav_t(plib::postream &strm, unsigned sr) : m_f(strm)
+	// FIXME: Initialized in intialize, need better c++ compliance
+	// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init)
+	wav_t(plib::postream &strm, std::size_t sr, std::size_t channels)
+	: m_f(strm)
 	{
-		initialize(sr);
-		m_f.write(&m_fh, sizeof(m_fh));
-		m_f.write(&m_fmt, sizeof(m_fmt));
-		m_f.write(&m_data, sizeof(m_data));
+		initialize(sr, channels);
+		write(m_fh);
+		write(m_fmt);
+		write(m_data);
 	}
+
+	COPYASSIGNMOVE(wav_t, delete)
+
 	~wav_t()
 	{
 		if (m_f.seekable())
 		{
 			m_fh.filelen = m_data.len + sizeof(m_data) + sizeof(m_fh) + sizeof(m_fmt) - 8;
-			m_f.seek(0);
-			m_f.write(&m_fh, sizeof(m_fh));
-			m_f.write(&m_fmt, sizeof(m_fmt));
+			m_f.seekp(0);
+			write(m_fh);
+			write(m_fmt);
 
 			//data.len = fmt.block_align * n;
-			m_f.write(&m_data, sizeof(m_data));
+			write(m_data);
 		}
 	}
 
-	unsigned channels() { return m_fmt.channels; }
-	unsigned sample_rate() { return m_fmt.sample_rate; }
+	std::size_t channels() { return m_fmt.channels; }
+	std::size_t sample_rate() { return m_fmt.sample_rate; }
 
-	void write_sample(int sample)
+	template <typename T>
+	void write(const T &val)
+	{
+		m_f.write(reinterpret_cast<const plib::postream::value_type *>(&val), sizeof(T));
+	}
+
+	void write_sample(int *sample)
 	{
 		m_data.len += m_fmt.block_align;
-		int16_t ps = static_cast<int16_t>(sample); /* 16 bit sample, FIXME: Endianess? */
-		m_f.write(&ps, sizeof(ps));
+		for (std::size_t i = 0; i < channels(); i++)
+		{
+			auto ps = static_cast<int16_t>(sample[i]); /* 16 bit sample, FIXME: Endianess? */
+			write(ps);
+		}
 	}
 
 private:
@@ -112,7 +97,7 @@ private:
 		// data follows
 	};
 
-	void initialize(unsigned sr)
+	void initialize(std::size_t sr, std::size_t channels)
 	{
 		std::memcpy(m_fh.group_id, "RIFF", 4);
 		m_fh.filelen = 0x0; // Fixme
@@ -121,8 +106,8 @@ private:
 		std::memcpy(m_fmt.signature, "fmt ", 4);
 		m_fmt.fmt_length = 16;
 		m_fmt.format_tag = 0x0001; //PCM
-		m_fmt.channels = 1;
-		m_fmt.sample_rate = sr;
+		m_fmt.channels = static_cast<std::uint16_t>(channels);
+		m_fmt.sample_rate = static_cast<std::uint32_t>(sr);
 		m_fmt.bits_sample = 16;
 		m_fmt.block_align = m_fmt.channels * ((m_fmt.bits_sample + 7) / 8);
 		m_fmt.bytes_per_second = m_fmt.sample_rate * m_fmt.block_align;
@@ -131,7 +116,6 @@ private:
 		//m_data.len = m_fmt.bytes_per_second * 2 * 0;
 		/* force "play" to play and warn about eof instead of being silent */
 		m_data.len = (m_f.seekable() ? 0 : 0xffffffff);
-
 	}
 
 	riff_chunk_t m_fh;
@@ -139,236 +123,377 @@ private:
 	riff_data_t m_data;
 
 	plib::postream &m_f;
-
 };
 
 class log_processor
 {
 public:
-	typedef plib::pmfp<void, double, double> callback_type;
-	log_processor(plib::pistream &is, callback_type cb) : m_is(is), m_cb(cb) { }
+	using callback_type = plib::pmfp<void, std::size_t, double, double>;
 
-	void process()
+	struct elem
 	{
-		plib::putf8_reader reader(m_is);
-		pstring line;
+		elem() : t(0), v(0), eof(false), need_more(true) { }
+		double t;
+		double v;
+		bool eof;
+		bool need_more;
+	};
 
-		while(reader.readline(line))
+	log_processor(std::size_t channels, callback_type &cb)
+	: m_cb(cb)
+	, m_e(channels)
+	{ }
+
+	bool readmore(std::vector<plib::putf8_reader> &r)
+	{
+		bool success = false;
+		for (std::size_t i = 0; i< r.size(); i++)
 		{
-			double t = 0.0; double v = 0.0;
-			sscanf(line.c_str(), "%lf %lf", &t, &v);
-			m_cb(t, v);
+			if (m_e[i].need_more)
+			{
+				pstring line;
+				m_e[i].eof = !r[i].readline(line);
+				if (!m_e[i].eof)
+				{
+					// sscanf is very fast ...
+					// NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
+					sscanf(line.c_str(), "%lf %lf", &m_e[i].t, &m_e[i].v);
+					m_e[i].need_more = false;
+				}
+			}
+			success |= !m_e[i].eof;
+		}
+		return success;
+	}
+
+	void process(std::vector<plib::unique_ptr<plib::pistream>> &is)
+	{
+		std::vector<plib::putf8_reader> readers;
+		for (auto &i : is)
+		{
+			plib::putf8_reader r(std::move(i));
+			readers.push_back(std::move(r));
+		}
+
+		pstring line;
+		bool more = readmore(readers);
+
+		while (more)
+		{
+			double mint = 1e200;
+			std::size_t mini = 0;
+			for (std::size_t i = 0; i<readers.size(); i++)
+				if (!m_e[i].need_more)
+				{
+					if (m_e[i].t < mint)
+					{
+						mint = m_e[i].t;
+						mini = i;
+					}
+				}
+
+			m_e[mini].need_more = true;
+			m_cb(mini, mint, m_e[mini].v);
+			more = readmore(readers);
 		}
 	}
 
 private:
-	plib::pistream &m_is;
 	callback_type m_cb;
+	std::vector<elem> m_e;
 };
 
 struct aggregator
 {
-	typedef plib::pmfp<void, double, double> callback_type;
+	using callback_type = plib::pmfp<void, std::size_t, double, double>;
 
-	aggregator(double quantum, callback_type cb)
-	: m_quantum(quantum)
+	aggregator(std::size_t channels, double quantum, callback_type cb)
+	: m_channels(channels)
+	, m_quantum(quantum)
 	, m_cb(cb)
 	, ct(0.0)
 	, lt(0.0)
-	, outsam(0.0)
-	, cursam(0.0)
+	, outsam(channels, 0.0)
+	, cursam(channels, 0.0)
 	{ }
-	void process(double time, double val)
+	void process(std::size_t chan, double time, double val)
 	{
-		while (time >= ct)
+		while (time >= ct + m_quantum)
 		{
-			outsam += (ct - lt) * cursam;
-			outsam = outsam / m_quantum;
-			m_cb(ct, outsam);
-			outsam = 0.0;
+			for (std::size_t i=0; i< m_channels; i++)
+			{
+				outsam[i] += (ct - lt) * cursam[i];
+				outsam[i] = outsam[i] / m_quantum;
+				m_cb(i, ct, outsam[i]);
+				outsam[i] = 0.0;
+			}
 			lt = ct;
 			ct += m_quantum;
 		}
-		outsam += (time-lt)*cursam;
+		for (std::size_t i=0; i< m_channels; i++)
+			outsam[i] += (time-lt)*cursam[i];
 		lt = time;
-		cursam = val;
+		cursam[chan] = val;
 	}
 
 private:
+	std::size_t m_channels;
 	double m_quantum;
 	callback_type m_cb;
 	double ct;
 	double lt;
-	double outsam;
-	double cursam;
+	std::vector<double> outsam;
+	std::vector<double> cursam;
 };
 
 class wavwriter
 {
 public:
-	wavwriter(plib::postream &fo, unsigned sample_rate, double ampa)
-	: mean(0.0)
-	, means(0.0)
-	, maxsam(-1e9)
-	, minsam(1e9)
-	, n(0)
+	wavwriter(plib::postream &fo, std::size_t channels, std::size_t sample_rate, double ampa)
+	: mean(channels, 0.0)
+	, means(channels, 0.0)
+	, maxsam(channels, -1e9)
+	, minsam(channels, 1e9)
+	, m_n(channels, 0)
+	, m_samples(channels, 0)
+	, m_last_time(0)
 	, m_fo(fo)
-	, amp(ampa)
-	, m_wo(m_fo, sample_rate)
+	, m_amp(ampa)
+	, m_wo(m_fo, sample_rate, channels)
 	{ }
 
-	void process(double time, double outsam)
+	void process(std::size_t chan, double time, double outsam)
 	{
-		means += outsam;
-		maxsam = std::max(maxsam, outsam);
-		minsam = std::min(minsam, outsam);
-		n++;
-		//mean = means / (double) n;
-		mean += 5.0 / static_cast<double>(m_wo.sample_rate()) * (outsam - mean);
+		if (time > m_last_time)
+			m_wo.write_sample(m_samples.data());
+		m_last_time = time;
+		means[chan] += outsam;
+		maxsam[chan] = std::max(maxsam[chan], outsam);
+		minsam[chan] = std::min(minsam[chan], outsam);
+		m_n[chan]++;
+		//mean = means / (double) m_n;
+		mean[chan] += 5.0 / static_cast<double>(m_wo.sample_rate()) * (outsam - mean[chan]);
 
-		outsam = (outsam - mean) * amp;
+		outsam = (outsam - mean[chan]) * m_amp;
 		outsam = std::max(-32000.0, outsam);
 		outsam = std::min(32000.0, outsam);
-		m_wo.write_sample(static_cast<int>(outsam));
+		m_samples[chan] = static_cast<int>(outsam);
 	}
 
-	double mean;
-	double means;
-	double maxsam;
-	double minsam;
-	std::size_t n;
+	std::vector<double> mean;
+	std::vector<double> means;
+	std::vector<double> maxsam;
+	std::vector<double> minsam;
+	std::vector<std::size_t> m_n;
+	std::vector<int> m_samples;
+	double m_last_time;
 
 private:
+
 	plib::postream &m_fo;
-	double amp;
+	double m_amp;
 	wav_t m_wo;
 };
 
-void nlwav_app::convert(long sample_rate)
+class vcdwriter
 {
-	plib::postream *fo = (opt_out() == "-" ? &pout_strm : plib::palloc<plib::pofilestream>(opt_out()));
-	plib::pistream *fin = (opt_inp() == "-" ? &pin_strm : plib::palloc<plib::pifilestream>(opt_inp()));
-	plib::putf8_reader reader(*fin);
-	wav_t *wo = plib::palloc<wav_t>(*fo, static_cast<unsigned>(sample_rate));
+public:
 
-	double dt = 1.0 / static_cast<double>(wo->sample_rate());
-	double ct = dt;
-	//double mean = 2.4;
-	double amp = opt_amp();
-	double mean = 0.0;
-	double means = 0.0;
-	double cursam = 0.0;
-	double outsam = 0.0;
-	double lt = 0.0;
-	double maxsam = -1e9;
-	double minsam = 1e9;
-	int n = 0;
-	//short sample = 0;
-	pstring line;
-
-	while(reader.readline(line))
+	enum format_e
 	{
-#if 1
-		double t = 0.0; double v = 0.0;
-		sscanf(line.c_str(), "%lf %lf", &t, &v);
-		while (t >= ct)
+		DIGITAL,
+		ANALOG
+	};
+
+	vcdwriter(plib::postream &fo, std::vector<pstring> channels,
+		format_e format, double high_level = 2.0, double low_level = 1.0)
+	: m_channels(channels.size())
+	, m_last_time(0)
+	, m_fo(fo)
+	, m_high_level(high_level)
+	, m_low_level(low_level)
+	, m_format(format)
+	{
+		for (pstring::value_type c = 64; c < 64+26; c++)
+			m_ids.emplace_back(pstring(c));
+		write("$date Sat Jan 19 14:14:17 2019\n");
+		write("$end\n");
+		write("$version Netlist nlwav 0.1\n");
+		write("$end\n");
+		write("$timescale 1 ns\n");
+		write("$end\n");
+		std::size_t i = 0;
+		for (const auto &ch : channels)
 		{
-			outsam += (ct - lt) * cursam;
-			outsam = outsam / dt;
-			if (t>0.0)
-			{
-				means += outsam;
-				maxsam = std::max(maxsam, outsam);
-				minsam = std::min(minsam, outsam);
-				n++;
-				//mean = means / (double) n;
-				mean += 5.0 / static_cast<double>(wo->sample_rate()) * (outsam - mean);
-			}
-			outsam = (outsam - mean) * amp;
-			outsam = std::max(-32000.0, outsam);
-			outsam = std::min(32000.0, outsam);
-			wo->write_sample(static_cast<int>(outsam));
-			outsam = 0.0;
-			lt = ct;
-			ct += dt;
+			//      $var real 64 N1X1 N1X1 $end
+			if (format == ANALOG)
+				write(pstring("$var real 64 ") + m_ids[i++] + " " + ch + " $end\n");
+			else if (format == DIGITAL)
+				write(pstring("$var wire 1 ") + m_ids[i++] + " " + ch + " $end\n");
 		}
-		outsam += (t-lt)*cursam;
-		lt = t;
-		cursam = v;
-#else
-		float t = 0.0; float v = 0.0;
-		fscanf(FIN, "%f %f", &t, &v);
-		while (ct <= t)
+		write("$enddefinitions $end\n");
+		if (format == ANALOG)
 		{
-			wo.write_sample(sample);
-			n++;
-			ct += dt;
+			write("$dumpvars\n");
+			//r0.0 N1X1
+			for (i = 0; i < channels.size(); i++)
+				write(pstring("r0.0 ") + m_ids[i] + "\n");
+			write("$end\n");
 		}
-		means += v;
-		mean = means / (double) n;
-		v = v - mean;
-		v = v * amp;
-		if (v>32000.0)
-			v = 32000.0;
-		else if (v<-32000.0)
-			v = -32000.0;
-		sample = v;
-		//printf("%f %f\n", t, v);
-#endif
+
 	}
-	plib::pfree(wo);
-	if (opt_inp() != "-")
-		plib::pfree(fin);
-	if (opt_out() != "-")
-		plib::pfree(fo);
+
+	void process(std::size_t chan, double time, double outsam)
+	{
+		if (time > m_last_time)
+		{
+			write(pstring("#") + plib::to_string(static_cast<std::int64_t>(m_last_time * 1e9)) + " ");
+			write(m_buf + "\n");
+			m_buf = "";
+			m_last_time = time;
+		}
+		if (m_format == ANALOG)
+			m_buf += "r" + plib::to_string(outsam)+ " " + m_ids[chan] + " ";
+		else
+		{
+			if (outsam >= m_high_level)
+				m_buf += pstring("1") + m_ids[chan] + " ";
+			else if (outsam <= m_low_level)
+				m_buf += pstring("0") + m_ids[chan] + " ";
+		}
+	}
+
+private:
+	void write(const pstring &line)
+	{
+		auto p = static_cast<const char *>(line.c_str());
+		std::size_t len = std::strlen(p);
+		m_fo.write(p, len);
+	}
+
+	std::size_t m_channels;
+	double m_last_time;
+
+	plib::postream &m_fo;
+	std::vector<pstring> m_ids;
+	pstring m_buf;
+	double m_high_level;
+	double m_low_level;
+	format_e m_format;
+};
+
+class nlwav_app : public plib::app
+{
+public:
+	nlwav_app() :
+		plib::app(),
+		opt_fmt(*this,  "f", "format",      0,       std::vector<pstring>({"wav","vcda","vcdd"}),
+			"output format. Available options are wav|vcda|vcdd."
+			" wav  : multichannel wav output"
+			" vcda : analog VCD output"
+			" vcdd : digital VCD output"
+			" Digital signals are created using the --high and --low options"
+			),
+		opt_out(*this,  "o", "output",      "-",     "output file"),
+		opt_rate(*this, "r", "rate",   48000,        "sample rate of output file"),
+		opt_amp(*this,  "a", "amp",    10000.0,      "amplification after mean correction (wav only)"),
+		opt_high(*this, "u", "high",   2.0,          "minimum input for high level (vcdd only)"),
+		opt_low(*this,  "l", "low",   1.0,           "maximum input for low level (vcdd only)"),
+		opt_verb(*this, "v", "verbose",              "be verbose - this produces lots of output"),
+		opt_quiet(*this,"q", "quiet",                "be quiet - no warnings"),
+		opt_args(*this,                              "input file(s)"),
+		opt_version(*this,  "",  "version",          "display version and exit"),
+		opt_help(*this, "h", "help",                 "display help and exit"),
+		opt_ex1(*this, "./nlwav -f vcdd -o x.vcd log_V*",
+			"convert all files starting with \"log_V\" into a digital vcd file"),
+		opt_ex2(*this, "./nlwav -f wav -o x.wav log_V*",
+			"convert all files starting with \"log_V\" into a multichannel wav file"),
+		m_outstrm(nullptr)
+	{}
+
+	int execute() override;
+	pstring usage() override;
+
+private:
+	void convert_wav();
+	void convert_vcd(vcdwriter::format_e format);
+
+	plib::option_str_limit<unsigned> opt_fmt;
+	plib::option_str    opt_out;
+	plib::option_num<std::size_t>   opt_rate;
+	plib::option_num<double> opt_amp;
+	plib::option_num<double> opt_high;
+	plib::option_num<double> opt_low;
+	plib::option_bool   opt_verb;
+	plib::option_bool   opt_quiet;
+	plib::option_args   opt_args;
+	plib::option_bool   opt_version;
+	plib::option_bool   opt_help;
+	plib::option_example   opt_ex1;
+	plib::option_example   opt_ex2;
+	plib::pstdin pin_strm;
+
+	std::vector<plib::unique_ptr<plib::pistream>> m_instrms;
+	plib::postream *m_outstrm;
+};
+
+void nlwav_app::convert_wav()
+{
+
+	double dt = 1.0 / static_cast<double>(opt_rate());
+
+	plib::unique_ptr<wavwriter> wo = plib::make_unique<wavwriter>(*m_outstrm, m_instrms.size(), opt_rate(), opt_amp());
+	plib::unique_ptr<aggregator> ago = plib::make_unique<aggregator>(m_instrms.size(), dt, aggregator::callback_type(&wavwriter::process, wo.get()));
+	aggregator::callback_type agcb = log_processor::callback_type(&aggregator::process, ago.get());
+
+	log_processor lp(m_instrms.size(), agcb);
+
+	lp.process(m_instrms);
 
 	if (!opt_quiet())
 	{
-		perr("Mean (low freq filter): {}\n", mean);
-		perr("Mean (static):          {}\n", means / static_cast<double>(n));
-		perr("Amp + {}\n", 32000.0 / (maxsam- mean));
-		perr("Amp - {}\n", -32000.0 / (minsam- mean));
+#if 0
+		perr("Mean (low freq filter): {}\n", wo->mean);
+		perr("Mean (static):          {}\n", wo->means / static_cast<double>(wo->m_n));
+		perr("Amp + {}\n", 32000.0 / (wo->maxsam - wo->mean));
+		perr("Amp - {}\n", -32000.0 / (wo->minsam - wo->mean));
+#endif
 	}
 }
 
-void nlwav_app::convert1(long sample_rate)
+void nlwav_app::convert_vcd(vcdwriter::format_e format)
 {
-	plib::postream *fo = (opt_out() == "-" ? &pout_strm : plib::palloc<plib::pofilestream>(opt_out()));
-	plib::pistream *fin = (opt_inp() == "-" ? &pin_strm : plib::palloc<plib::pifilestream>(opt_inp()));
 
-	double dt = 1.0 / static_cast<double>(sample_rate);
+	plib::unique_ptr<vcdwriter> wo = plib::make_unique<vcdwriter>(*m_outstrm, opt_args(),
+		format, opt_high(), opt_low());
+	log_processor::callback_type agcb = log_processor::callback_type(&vcdwriter::process, wo.get());
 
-	wavwriter *wo = plib::palloc<wavwriter>(*fo, static_cast<unsigned>(sample_rate), opt_amp());
-	aggregator ag(dt, aggregator::callback_type(&wavwriter::process, wo));
-	log_processor lp(*fin, log_processor::callback_type(&aggregator::process, &ag));
+	log_processor lp(m_instrms.size(), agcb);
 
-	lp.process();
+	lp.process(m_instrms);
 
 	if (!opt_quiet())
 	{
+#if 0
 		perr("Mean (low freq filter): {}\n", wo->mean);
-		perr("Mean (static):          {}\n", wo->means / static_cast<double>(wo->n));
+		perr("Mean (static):          {}\n", wo->means / static_cast<double>(wo->m_n));
 		perr("Amp + {}\n", 32000.0 / (wo->maxsam - wo->mean));
 		perr("Amp - {}\n", -32000.0 / (wo->minsam - wo->mean));
+#endif
 	}
-
-	plib::pfree(wo);
-	if (opt_inp() != "-")
-		plib::pfree(fin);
-	if (opt_out() != "-")
-		plib::pfree(fo);
-
 }
 
 pstring nlwav_app::usage()
 {
 	return help("Convert netlist log files into wav files.\n",
-			"nltool [options]");
+			"nlwav [OPTION] ... [FILE] ...");
 }
 
 
 int nlwav_app::execute()
 {
+	for (auto &i : opt_args())
+		pout(pstring("Hello : ") + i + "\n");
 	if (opt_help())
 	{
 		pout(usage());
@@ -379,7 +504,7 @@ int nlwav_app::execute()
 	{
 		pout(
 			"nlwav (netlist) 0.1\n"
-			"Copyright (C) 2018 Couriersud\n"
+			"Copyright (C) 2019 Couriersud\n"
 			"License GPLv2+: GNU GPL version 2 or later <http://gnu.org/licenses/gpl.html>.\n"
 			"This is free software: you are free to change and redistribute it.\n"
 			"There is NO WARRANTY, to the extent permitted by law.\n\n"
@@ -387,10 +512,31 @@ int nlwav_app::execute()
 		return 0;
 	}
 
-	if ((1))
-		convert1(opt_rate());
-	else
-		convert(opt_rate());
+	m_outstrm = (opt_out() == "-" ? &pout_strm : plib::pnew<plib::pofilestream>(opt_out()));
+
+	for (auto &oi: opt_args())
+	{
+		plib::unique_ptr<plib::pistream> fin = (oi == "-" ?
+			  plib::make_unique<plib::pstdin>()
+			: plib::make_unique<plib::pifilestream>(oi));
+		m_instrms.push_back(std::move(fin));
+	}
+
+	switch (opt_fmt())
+	{
+		case 0:
+			convert_wav(); break;
+		case 1:
+			convert_vcd(vcdwriter::ANALOG); break;
+		case 2:
+			convert_vcd(vcdwriter::DIGITAL); break;
+		default:
+			// tease compiler - can't happen
+			break;
+	}
+
+	if (opt_out() != "-")
+		plib::pdelete(m_outstrm);
 
 	return 0;
 }

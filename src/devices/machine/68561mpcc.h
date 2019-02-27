@@ -207,7 +207,7 @@ protected:
 	uint8_t m_rdr;
 	uint8_t do_rdr();
 	// TODO: investigate if 4 x 16 bit wide FIFO is needed for 16 bit mode
-	util::fifo<uint8_t, 8> m_rx_data_fifo;
+	util::fifo<uint16_t, 8> m_rx_data_fifo;
 
 	// RIVNR - Rx Interrupt Vector Number Register
 	uint8_t m_rivnr;

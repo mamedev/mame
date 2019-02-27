@@ -249,7 +249,4 @@ private:
 		downcast<vme_slot_device &>(*device).update_vme_chains(_slotnbr);      \
 	}
 
-#define MCFG_VME_SLOT_REMOVE(_tag)        \
-	MCFG_DEVICE_REMOVE(_tag)
-
 #endif // MAME_BUS_VME_VME_H

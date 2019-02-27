@@ -78,7 +78,7 @@ MACHINE_CONFIG_START(lynx_state::lynx)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M65SC02, 4000000)        /* vti core, integrated in vlsi, stz, but not bbr bbs */
 	MCFG_DEVICE_PROGRAM_MAP(lynx_mem)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	ADDRESS_MAP_BANK(config, "bank_fc00").set_map(&lynx_state::lynx_fc00_mem).set_options(ENDIANNESS_LITTLE, 8, 9, 0x100);
 	ADDRESS_MAP_BANK(config, "bank_fd00").set_map(&lynx_state::lynx_fd00_mem).set_options(ENDIANNESS_LITTLE, 8, 9, 0x100);
@@ -101,7 +101,7 @@ MACHINE_CONFIG_START(lynx_state::lynx)
 	m_sound->add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* devices */
-	MCFG_QUICKLOAD_ADD("quickload", lynx_state, lynx, "o", 0)
+	MCFG_QUICKLOAD_ADD("quickload", lynx_state, lynx, "o");
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "lynx_cart")
 	MCFG_GENERIC_EXTENSIONS("lnx,lyx")
@@ -109,7 +109,7 @@ MACHINE_CONFIG_START(lynx_state::lynx)
 	MCFG_GENERIC_LOAD(lynx_state, lynx_cart)
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","lynx")
+	SOFTWARE_LIST(config, "cart_list").set_original("lynx");
 MACHINE_CONFIG_END
 
 #if 0

@@ -295,13 +295,25 @@
 	<!-- Expansion Cartridges -->
 
 	<software name="abr">
-		<description>Advanced Battery-Backed RAM</description>
+		<description>Advanced Battery-Backed RAM v1.10</description>
 		<year>1987</year>
 		<publisher>Advanced Computer Products</publisher>
 		<part name="cart" interface="electron_cart">
 			<feature name="slot" value="abr" />
 			<dataarea name="nvram" size="32768">
 				<rom name="pres-abr-utils-1.10.rom" size="16360" crc="e5aec5c1" sha1="b0066d9ee83a9144eb5942f106776174ae5df0d9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="abr104" cloneof="abr">
+		<description>Advanced Battery-Backed RAM v1.04</description>
+		<year>1987</year>
+		<publisher>Advanced Computer Products</publisher>
+		<part name="cart" interface="electron_cart">
+			<feature name="slot" value="abr" />
+			<dataarea name="nvram" size="32768">
+				<rom name="pres-abr-utils-1.04.rom" size="16384" crc="2c009b06" sha1="be245a32bba1f18614963587a61bcb622f404c95" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -344,6 +356,18 @@
 				<rom name="pres-adfs-v1.15.rom" size="16384" crc="8f81edc3" sha1="32007425058a7b0f8bd5c17b3c22552aa3a03eca" offset="0" />
 			</dataarea>
 			<dataarea name="ram" size="8192" />
+		</part>
+	</software>
+
+	<software name="ap5">
+		<description>Advanced Plus 5</description>
+		<year>1985</year>
+		<publisher>Advanced Computer Products</publisher>
+		<part name="cart" interface="electron_cart">
+			<feature name="slot" value="ap5" />
+			<dataarea name="rom" size="8192">
+				<rom name="acp-tube-1.21.rom" size="8192" crc="63fb5a90" sha1="56c1f0ed4267ecd61f4e47ce9ac6954fc344bc3f" offset="0" />
+			</dataarea>
 		</part>
 	</software>
 
@@ -396,7 +420,7 @@
 		</part>
 	</software>
 
-	<software name="peg4001" cloneof="peg400">
+		<software name="peg4001" cloneof="peg400">
 		<description>Pegasus 400 v1.01</description>
 		<year>1987</year>
 		<publisher>Slogger</publisher>
@@ -500,12 +524,25 @@
 		</part>
 	</software>
 
+	<software name="tube">
+		<description>Acorn Tube Interface (prototype)</description>
+		<year>1984</year>
+		<publisher>Acorn Computers</publisher>
+		<part name="cart" interface="electron_cart">
+			<feature name="slot" value="tube" />
+			<dataarea name="rom" size="8192">
+				<rom name="elk-tube-1.21.rom" size="8192" crc="3f50b365" sha1="33f1ff07ba5feb8f6343de1db0d56f7adb2db856" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Mega Games Cartridge -->
 
 	<software name="mgc">
 		<description>Mega Games Cartridge</description>
 		<year>2017</year>
 		<publisher>Retro Hardware</publisher>
+		<info name="author" value="Dave Hitchins" />
 		<part name="cart" interface="electron_cart">
 			<feature name="slot" value="mgc" />
 			<dataarea name="nvram" size="4194304">

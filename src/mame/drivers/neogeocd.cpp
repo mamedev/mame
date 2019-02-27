@@ -1033,7 +1033,8 @@ uint32_t ngcd_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 }
 
 
-MACHINE_CONFIG_START(ngcd_state::neocd)
+void ngcd_state::neocd(machine_config &config)
+{
 	neogeo_base(config);
 	neogeo_stereo(config);
 
@@ -1045,8 +1046,7 @@ MACHINE_CONFIG_START(ngcd_state::neocd)
 
 	subdevice<hc259_device>("systemlatch")->q_out_cb<1>().set_log("NeoCD: write to regular vector change address?"); // what IS going on with "neocdz doubledr" and why do games write here if it's hooked up to nothing?
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(ngcd_state, screen_update)
+	m_screen->set_screen_update(FUNC(ngcd_state::screen_update));
 
 	// temporary until things are cleaned up
 	LC89510_TEMP(config, m_tempcdc, 0); // cd controller
@@ -1057,15 +1057,14 @@ MACHINE_CONFIG_START(ngcd_state::neocd)
 
 	NVRAM(config, "saveram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl1", neogeo_controls, "joy", false)
-	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl2", neogeo_controls, "joy", false)
+	NEOGEO_CONTROL_PORT(config, m_ctrl1, neogeo_controls, "joy", false);
+	NEOGEO_CONTROL_PORT(config, m_ctrl2, neogeo_controls, "joy", false);
 
-	MCFG_CDROM_ADD( "cdrom" )
-	MCFG_CDROM_INTERFACE("neocd_cdrom")
-	MCFG_SOFTWARE_LIST_ADD("cd_list","neocd")
+	CDROM(config, "cdrom").set_interface("neocd_cdrom");
+	SOFTWARE_LIST(config, "cd_list").set_type("neocd", SOFTWARE_LIST_ORIGINAL_SYSTEM);
 
 	m_ym->set_addrmap(0, &ngcd_state::neocd_ym_map);
-MACHINE_CONFIG_END
+}
 
 
 
@@ -1087,7 +1086,7 @@ ROM_START( neocd )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00 )
 	/* 2MB of 68K RAM */
 
-	ROM_REGION( 0x20000, "zoomy", 0 )
+	ROM_REGION( 0x20000, "spritegen:zoomy", 0 )
 	ROM_LOAD( "000-lo.lo", 0x00000, 0x20000, CRC(5a86cff2) SHA1(5992277debadeb64d1c1c64b0a92d9293eaf7e4a) )
 ROM_END
 
@@ -1101,7 +1100,7 @@ ROM_START( neocdz )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00 )
 	/* 2MB of 68K RAM */
 
-	ROM_REGION( 0x20000, "zoomy", 0 )
+	ROM_REGION( 0x20000, "spritegen:zoomy", 0 )
 	ROM_LOAD( "000-lo.lo", 0x00000, 0x20000, CRC(5a86cff2) SHA1(5992277debadeb64d1c1c64b0a92d9293eaf7e4a) )
 ROM_END
 

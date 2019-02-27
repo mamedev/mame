@@ -28,7 +28,7 @@
 #ifndef NLD_TMS4800_H_
 #define NLD_TMS4800_H_
 
-#include "../nl_setup.h"
+#include "netlist/nl_setup.h"
 
 #define ROM_TMS4800(name, cAR, cOE1, cOE2, cA0, cA1, cA2, cA3, cA4, cA5, cA6, cA7, cA8, cA9, cA10) \
 		NET_REGISTER_DEV(ROM_TMS4800, name) \

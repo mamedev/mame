@@ -155,24 +155,24 @@ void ti85_state::update_ti83p_memory ()
 {
 	//address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	m_membank1->set_bank(m_booting ? 0x1f : 0); //Always flash page 0, well almost
+	m_membank[0]->set_bank(m_booting ? 0x1f : 0); //Always flash page 0, well almost
 
 	if (m_ti83p_port4 & 1)
 	{
-		m_membank2->set_bank(m_ti8x_memory_page_1 & 0xfe);
+		m_membank[1]->set_bank(m_ti8x_memory_page_1 & 0xfe);
 
-		m_membank3->set_bank(m_ti8x_memory_page_1);
+		m_membank[2]->set_bank(m_ti8x_memory_page_1);
 
-		m_membank4->set_bank(m_ti8x_memory_page_2);
+		m_membank[3]->set_bank(m_ti8x_memory_page_2);
 
 	}
 	else
 	{
-		m_membank2->set_bank(m_ti8x_memory_page_1);
+		m_membank[1]->set_bank(m_ti8x_memory_page_1);
 
-		m_membank3->set_bank(m_ti8x_memory_page_2);
+		m_membank[2]->set_bank(m_ti8x_memory_page_2);
 
-		m_membank4->set_bank(0x40); //Always first ram page
+		m_membank[3]->set_bank(0x40); //Always first ram page
 
 	}
 }
@@ -181,25 +181,25 @@ void ti85_state::update_ti83pse_memory ()
 {
 	//address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	m_membank1->set_bank(m_booting ? (m_model==TI84P ? 0x3f : 0x7f) : 0);
+	m_membank[0]->set_bank(m_booting ? (m_model==TI84P ? 0x3f : 0x7f) : 0);
 
 	if (m_ti83p_port4 & 1)
 	{
-		m_membank2->set_bank(m_ti8x_memory_page_1 & 0xfe);
+		m_membank[1]->set_bank(m_ti8x_memory_page_1 & 0xfe);
 
-		m_membank3->set_bank(m_ti8x_memory_page_1 | 1);
+		m_membank[2]->set_bank(m_ti8x_memory_page_1 | 1);
 
-		m_membank4->set_bank(m_ti8x_memory_page_2);
+		m_membank[3]->set_bank(m_ti8x_memory_page_2);
 
 
 	}
 	else
 	{
-		m_membank2->set_bank(m_ti8x_memory_page_1);
+		m_membank[1]->set_bank(m_ti8x_memory_page_1);
 
-		m_membank3->set_bank(m_ti8x_memory_page_2);
+		m_membank[2]->set_bank(m_ti8x_memory_page_2);
 
-		m_membank4->set_bank(m_ti8x_memory_page_3 + 0x80);
+		m_membank[3]->set_bank(m_ti8x_memory_page_3 + 0x80);
 
 	}
 }
@@ -269,7 +269,7 @@ MACHINE_RESET_MEMBER(ti85_state,ti85)
 	m_PCR = 0xc0;
 }
 
-READ8_MEMBER(ti85_state::ti83p_membank2_r)
+uint8_t ti85_state::ti83p_membank2_r(offs_t offset)
 {
 	/// http://wikiti.brandonw.net/index.php?title=83Plus:State_of_the_calculator_at_boot
 	/// should only trigger when fetching opcodes
@@ -287,10 +287,10 @@ READ8_MEMBER(ti85_state::ti83p_membank2_r)
 		}
 	}
 
-	return m_membank2->read8(space, offset);
+	return m_membank[1]->read8(offset);
 }
 
-READ8_MEMBER(ti85_state::ti83p_membank3_r)
+uint8_t ti85_state::ti83p_membank3_r(offs_t offset)
 {
 	/// http://wikiti.brandonw.net/index.php?title=83Plus:State_of_the_calculator_at_boot
 	/// should only trigger when fetching opcodes
@@ -309,7 +309,7 @@ READ8_MEMBER(ti85_state::ti83p_membank3_r)
 		}
 	}
 
-	return m_membank3->read8(space, offset);
+	return m_membank[2]->read8(offset);
 }
 
 MACHINE_RESET_MEMBER(ti85_state,ti83p)

@@ -189,6 +189,7 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(atm_state::atm)
 	spectrum_128(config);
+
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(atm_mem)
 	MCFG_DEVICE_IO_MAP(atm_io)
@@ -197,15 +198,16 @@ MACHINE_CONFIG_START(atm_state::atm)
 
 	BETA_DISK(config, m_beta, 0);
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_atm)
+	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_atm);
 
-	MCFG_DEVICE_REMOVE("exp")
+	config.device_remove("exp");
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(atm_state::atmtb2)
+void atm_state::atmtb2(machine_config &config)
+{
 	atm(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_atmtb2)
-MACHINE_CONFIG_END
+	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_atmtb2);
+}
 
 
 /***************************************************************************

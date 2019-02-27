@@ -633,16 +633,16 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-MACHINE_CONFIG_START(bbusters_state::bbusters)
-
+void bbusters_state::bbusters(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)
-	MCFG_DEVICE_PROGRAM_MAP(bbusters_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bbusters_state,  irq6_line_hold)
+	M68000(config, m_maincpu, 12000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bbusters_state::bbusters_map);
+	m_maincpu->set_vblank_int("screen", FUNC(bbusters_state::irq6_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80,4000000) /* Accurate */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(sound_portmap)
+	Z80(config, m_audiocpu, 4000000); /* Accurate */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &bbusters_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &bbusters_state::sound_portmap);
 
 	NVRAM(config, "eeprom", nvram_device::DEFAULT_ALL_0);
 
@@ -669,24 +669,24 @@ MACHINE_CONFIG_START(bbusters_state::bbusters)
 	GENERIC_LATCH_8(config, m_soundlatch[0]);
 	GENERIC_LATCH_8(config, m_soundlatch[1]);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2610, 8000000)
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "lspeaker",  1.0)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
-	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", 8000000));
+	ymsnd.irq_handler().set_inputline("audiocpu", 0);
+	ymsnd.add_route(0, "lspeaker", 1.0);
+	ymsnd.add_route(0, "rspeaker", 1.0);
+	ymsnd.add_route(1, "lspeaker", 1.0);
+	ymsnd.add_route(2, "rspeaker", 1.0);
+}
 
-MACHINE_CONFIG_START(mechatt_state::mechatt)
-
+void mechatt_state::mechatt(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)
-	MCFG_DEVICE_PROGRAM_MAP(mechatt_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mechatt_state,  irq4_line_hold)
+	M68000(config, m_maincpu, 12000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mechatt_state::mechatt_map);
+	m_maincpu->set_vblank_int("screen", FUNC(mechatt_state::irq4_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80,4000000) /* Accurate */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(sounda_portmap)
+	Z80(config, m_audiocpu, 4000000); /* Accurate */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &mechatt_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &mechatt_state::sounda_portmap);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -709,13 +709,13 @@ MACHINE_CONFIG_START(mechatt_state::mechatt)
 	GENERIC_LATCH_8(config, m_soundlatch[0]);
 	GENERIC_LATCH_8(config, m_soundlatch[1]);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2608, 8000000)
-	MCFG_YM2608_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "lspeaker",  0.50)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.50)
-	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
-	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	ym2608_device &ymsnd(YM2608(config, "ymsnd", 8000000));
+	ymsnd.irq_handler().set_inputline("audiocpu", 0);
+	ymsnd.add_route(0, "lspeaker", 0.50);
+	ymsnd.add_route(0, "rspeaker", 0.50);
+	ymsnd.add_route(1, "lspeaker", 1.0);
+	ymsnd.add_route(2, "rspeaker", 1.0);
+}
 
 /******************************************************************************/
 

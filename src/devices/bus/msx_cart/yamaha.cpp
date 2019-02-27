@@ -146,7 +146,7 @@ READ8_MEMBER(msx_cart_sfg_device::read_cart)
 	{
 		case 0x3ff0:     // YM-2151 status read
 		case 0x3ff1:     // YM-2151 status read mirror?
-			return m_ym2151->status_r(space, 0);
+			return m_ym2151->status_r();
 
 		case 0x3ff2:     // YM-2148 keyboard column read
 		case 0x3ff3:     // YM-2148 --
@@ -172,11 +172,11 @@ WRITE8_MEMBER(msx_cart_sfg_device::write_cart)
 	switch (offset & 0x3fff)
 	{
 		case 0x3ff0:     // YM-2151 register
-			m_ym2151->register_w(space, 0, data);
+			m_ym2151->register_w(data);
 			break;
 
 		case 0x3ff1:    // YM-2151 data
-			m_ym2151->data_w(space, 0, data);
+			m_ym2151->data_w(data);
 			break;
 
 		case 0x3ff2:   // YM-2148 write keyboard row

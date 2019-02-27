@@ -122,7 +122,7 @@ Default is to use the pin category.
 #define PA_WDMKS_USE_CATEGORY_FOR_PIN_NAMES  1
 #endif
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || (defined(_MSC_VER) && defined(__clang__))
 #undef PA_LOGE_
 #define PA_LOGE_ PA_DEBUG(("%s {\n",__FUNCTION__))
 #undef PA_LOGL_
@@ -158,7 +158,7 @@ Default is to use the pin category.
 #define PA_THREAD_FUNC static DWORD WINAPI
 #endif
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && !defined(__clang__)
 #define NOMMIDS
 #define DYNAMIC_GUID(data) {data}
 #define _NTRTL_ /* Turn off default definition of DEFINE_GUIDEX */

@@ -351,7 +351,7 @@ MACHINE_CONFIG_START(caswin_state::vvillage)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vvillage)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_vvillage);
 	PALETTE(config, "palette", FUNC(caswin_state::caswin_palette), 0x40);
 
 	SPEAKER(config, "mono").front_center();

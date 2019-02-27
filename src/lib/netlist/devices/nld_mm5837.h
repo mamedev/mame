@@ -19,7 +19,7 @@
 #ifndef NLD_MM5837_H_
 #define NLD_MM5837_H_
 
-#include "../nl_setup.h"
+#include "netlist/nl_setup.h"
 
 #define MM5837_DIP(name)                                                        \
 		NET_REGISTER_DEV(MM5837_DIP, name)

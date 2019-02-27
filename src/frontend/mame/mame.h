@@ -15,26 +15,20 @@
 class plugin_options;
 class osd_interface;
 
-//**************************************************************************
-//    TYPE DEFINITIONS
-//**************************************************************************
 class lua_engine;
 class cheat_manager;
 class inifile_manager;
 class favorite_manager;
 class mame_ui_manager;
 
-namespace ui {
-} // namespace ui
+//**************************************************************************
+//    TYPE DEFINITIONS
+//**************************************************************************
 
 // ======================> machine_manager
 
 class mame_machine_manager : public machine_manager
 {
-	DISABLE_COPYING(mame_machine_manager);
-private:
-	// construction/destruction
-	mame_machine_manager(emu_options &options, osd_interface &osd);
 public:
 	static mame_machine_manager *instance(emu_options &options, osd_interface &osd);
 	static mame_machine_manager *instance();
@@ -64,7 +58,15 @@ public:
 	cheat_manager &cheat() const { assert(m_cheat != nullptr); return *m_cheat; }
 	inifile_manager &inifile() const { assert(m_inifile != nullptr); return *m_inifile; }
 	favorite_manager &favorite() const { assert(m_favorite != nullptr); return *m_favorite; }
+
 private:
+	// construction
+	mame_machine_manager(emu_options &options, osd_interface &osd);
+	mame_machine_manager(mame_machine_manager const &) = delete;
+	mame_machine_manager(mame_machine_manager &&) = delete;
+	mame_machine_manager &operator=(mame_machine_manager const &) = delete;
+	mame_machine_manager &operator=(mame_machine_manager &&) = delete;
+
 	std::unique_ptr<plugin_options> m_plugins;              // pointer to plugin options
 	lua_engine *            m_lua;
 

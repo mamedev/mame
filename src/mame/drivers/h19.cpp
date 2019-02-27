@@ -528,14 +528,14 @@ MACHINE_CONFIG_START(h19_state::h19)
 
 	/* video hardware */
 	// TODO: make configurable, Heath offered 3 different CRTs - White, Green, Amber.
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_REFRESH_RATE(60)   // TODO- this is adjustable by dipswitch.
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen.set_refresh_hz(60);   // TODO- this is adjustable by dipswitch.
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
+	screen.set_size(640, 250);
+	screen.set_visarea(0, 640 - 1, 0, 250 - 1);
 
-	MCFG_SCREEN_SIZE(640, 250)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 250 - 1)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_h19)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_h19);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	MC6845(config, m_crtc, MC6845_CLOCK);
@@ -548,19 +548,19 @@ MACHINE_CONFIG_START(h19_state::h19)
 	ins8250_device &uart(INS8250(config, "ins8250", INS8250_CLOCK));
 	uart.out_int_callback().set_inputline("maincpu", INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD(KBDC_TAG, MM5740, MM5740_CLOCK)
-	MCFG_MM5740_MATRIX_X1(IOPORT("X1"))
-	MCFG_MM5740_MATRIX_X2(IOPORT("X2"))
-	MCFG_MM5740_MATRIX_X3(IOPORT("X3"))
-	MCFG_MM5740_MATRIX_X4(IOPORT("X4"))
-	MCFG_MM5740_MATRIX_X5(IOPORT("X5"))
-	MCFG_MM5740_MATRIX_X6(IOPORT("X6"))
-	MCFG_MM5740_MATRIX_X7(IOPORT("X7"))
-	MCFG_MM5740_MATRIX_X8(IOPORT("X8"))
-	MCFG_MM5740_MATRIX_X9(IOPORT("X9"))
-	MCFG_MM5740_SHIFT_CB(READLINE(*this, h19_state, mm5740_shift_r))
-	MCFG_MM5740_CONTROL_CB(READLINE(*this, h19_state, mm5740_control_r))
-	MCFG_MM5740_DATA_READY_CB(WRITELINE(*this, h19_state, mm5740_data_ready_w))
+	MM5740(config, m_mm5740, MM5740_CLOCK);
+	m_mm5740->x_cb<0>().set_ioport("X1");
+	m_mm5740->x_cb<1>().set_ioport("X2");
+	m_mm5740->x_cb<2>().set_ioport("X3");
+	m_mm5740->x_cb<3>().set_ioport("X4");
+	m_mm5740->x_cb<4>().set_ioport("X5");
+	m_mm5740->x_cb<5>().set_ioport("X6");
+	m_mm5740->x_cb<6>().set_ioport("X7");
+	m_mm5740->x_cb<7>().set_ioport("X8");
+	m_mm5740->x_cb<8>().set_ioport("X9");
+	m_mm5740->shift_cb().set(FUNC(h19_state::mm5740_shift_r));
+	m_mm5740->control_cb().set(FUNC(h19_state::mm5740_control_r));
+	m_mm5740->data_ready_cb().set(FUNC(h19_state::mm5740_data_ready_w));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

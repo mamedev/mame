@@ -61,41 +61,6 @@
 #pragma once
 
 
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_MOS6526_TOD(_clock) \
-	downcast<mos6526_device &>(*device).set_tod_clock(_clock);
-
-#define MCFG_MOS6526_IRQ_CALLBACK(_write) \
-	downcast<mos6526_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
-
-#define MCFG_MOS6526_CNT_CALLBACK(_write) \
-	downcast<mos6526_device &>(*device).set_cnt_wr_callback(DEVCB_##_write);
-
-#define MCFG_MOS6526_SP_CALLBACK(_write) \
-	downcast<mos6526_device &>(*device).set_sp_wr_callback(DEVCB_##_write);
-
-#define MCFG_MOS6526_PA_INPUT_CALLBACK(_read) \
-	downcast<mos6526_device &>(*device).set_pa_rd_callback(DEVCB_##_read);
-
-#define MCFG_MOS6526_PA_OUTPUT_CALLBACK(_write) \
-	downcast<mos6526_device &>(*device).set_pa_wr_callback(DEVCB_##_write);
-
-#define MCFG_MOS6526_PB_INPUT_CALLBACK(_read) \
-	downcast<mos6526_device &>(*device).set_pb_rd_callback(DEVCB_##_read);
-
-#define MCFG_MOS6526_PB_OUTPUT_CALLBACK(_write) \
-	downcast<mos6526_device &>(*device).set_pb_wr_callback(DEVCB_##_write);
-
-#define MCFG_MOS6526_PC_CALLBACK(_write) \
-	downcast<mos6526_device &>(*device).set_pc_wr_callback(DEVCB_##_write);
-
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -111,14 +76,6 @@ public:
 
 	void set_tod_clock(int clock) { m_tod_clock = clock; }
 
-	template <class Object> devcb_base &set_irq_wr_callback(Object &&cb) { return m_write_irq.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_cnt_wr_callback(Object &&cb) { return m_write_cnt.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_sp_wr_callback(Object &&cb) { return m_write_sp.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_pa_rd_callback(Object &&cb) { return m_read_pa.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_pa_wr_callback(Object &&cb) { return m_write_pa.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_pb_rd_callback(Object &&cb) { return m_read_pb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_pb_wr_callback(Object &&cb) { return m_write_pb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_pc_wr_callback(Object &&cb) { return m_write_pc.set_callback(std::forward<Object>(cb)); }
 	auto irq_wr_callback() { return m_write_irq.bind(); }
 	auto cnt_wr_callback() { return m_write_cnt.bind(); }
 	auto sp_wr_callback() { return m_write_sp.bind(); }
@@ -128,13 +85,11 @@ public:
 	auto pb_wr_callback() { return m_write_pb.bind(); }
 	auto pc_wr_callback() { return m_write_pc.bind(); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
-	uint8_t read_pa() { return m_pa; }
-	DECLARE_READ8_MEMBER( pa_r ) { return m_pa; }
-	uint8_t read_pb() { return m_pb; }
-	DECLARE_READ8_MEMBER( pb_r ) { return m_pb; }
+	uint8_t pa_r() { return m_pa; }
+	uint8_t pb_r() { return m_pb; }
 
 	DECLARE_READ_LINE_MEMBER( sp_r ) { return m_sp; }
 	DECLARE_WRITE_LINE_MEMBER( sp_w );
@@ -273,8 +228,8 @@ class mos8520_device : public mos6526_device
 public:
 	mos8520_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 protected:
 	virtual inline void clock_tod() override;
@@ -288,8 +243,8 @@ class mos5710_device : public mos6526_device
 public:
 	mos5710_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	//DECLARE_READ8_MEMBER( read );
-	//DECLARE_WRITE8_MEMBER( write );
+	//uint8_t read(offs_t offset);
+	//void write(offs_t offset, uint8_t data);
 };
 
 

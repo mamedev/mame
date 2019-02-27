@@ -18,10 +18,10 @@
 #ifndef NLD_LOG_H_
 #define NLD_LOG_H_
 
-#include "../nl_setup.h"
+#include "netlist/nl_setup.h"
 
 #define LOG(name, cI)                                                        \
-		NET_REGISTER_DEV(??PG, name)                                         \
+		NET_REGISTER_DEV(LOG, name)                                         \
 		NET_CONNECT(name, I, cI)
 
 #define LOGD(name, cI, cI2)                                                 \

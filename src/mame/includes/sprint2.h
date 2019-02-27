@@ -96,7 +96,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<f9334_device> m_outlatch;
-	required_device<discrete_device> m_discrete;
+	required_device<discrete_sound_device> m_discrete;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;

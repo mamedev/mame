@@ -20,7 +20,7 @@
 #define LOG_PIT     (1U <<  8)
 #define LOG_CS      (1U <<  9)
 
-//#define VERBOSE  (LOG_CS)
+#define VERBOSE  (LOG_PIT)
 #define LOG_OUTPUT_FUNC printf // Needs always to be enabled as the default value 'logerror' is not available here
 
 #include "logmacro.h"
@@ -61,7 +61,7 @@ READ16_MEMBER( m68340_cpu_device::m68340_internal_sim_r )
 			val = sim.m_syncr;
 			break;
 
-		case m68340_sim::REG_AVR_RSR:
+		case m68340_sim::REG_AVR_RSR: // Manual seems to say that AVR only autovectors externally triggered interrupts (INT1-INT7)
 			LOGSIM("- %08x %s %04x, (%04x) (AVR, RSR - Auto Vector Register, Reset Status Register) - not implemented\n", m_ppc, FUNCNAME, offset*2,mem_mask);
 			val = sim.m_avr_rsr;
 			break;
@@ -165,6 +165,7 @@ WRITE16_MEMBER( m68340_cpu_device::m68340_internal_sim_w )
 			COMBINE_DATA(&sim.m_picr);
 			LOGPIT("- PIRQL: Periodic Interrupt Level  %d%s\n", (data & m68340_sim::REG_PICR_PIRQL) >> 8, (data & m68340_sim::REG_PICR_PIRQL) == 0 ? " (disabled)" : "");
 			LOGPIT("- PIV  : Periodic Interrupt Vector %02x\n", (data & m68340_sim::REG_PICR_PIVEC));
+			update_ipl();
 			break;
 
 		case m68340_sim::REG_PITR:
@@ -426,35 +427,6 @@ WRITE32_MEMBER( m68340_cpu_device::m68340_internal_sim_cs_w )
 	}
 }
 
-void m68340_cpu_device::do_pit_irq()
-{
-	assert(m_m68340SIM);
-	m68340_sim &sim = *m_m68340SIM;
-
-	//logerror("do_pit_irq\n");
-	int timer_irq_level  = (sim.m_picr & 0x0700) >> 8;
-	int timer_irq_vector = (sim.m_picr & 0x00ff) >> 0;
-
-	if (timer_irq_level) // 0 is irq disabled
-	{
-		int use_autovector = (sim.m_avr_rsr >> (8 + timer_irq_level)) & 1;
-
-		LOGPIT("PIT IRQ triggered, Lvl: %d using Vector: %d (0 = auto vector)\n", timer_irq_level, use_autovector ? 0 : timer_irq_vector);
-
-		if (use_autovector)
-		{
-			//logerror("irq with autovector\n");
-			set_input_line(timer_irq_level, HOLD_LINE);
-		}
-		else
-		{
-			//logerror("irq without autovector\n");
-			set_input_line_and_vector(timer_irq_level, HOLD_LINE, timer_irq_vector);
-		}
-
-	}
-}
-
 TIMER_CALLBACK_MEMBER(m68340_cpu_device::periodic_interrupt_timer_callback)
 {
 	do_tick_pit();
@@ -518,7 +490,13 @@ void m68340_sim::reset()
 	m_picr= 0x000f;
 	m_pitr= 0x0000; // TODO: read MODCK pin to set the clock modes for watch dog and periodic timer
 	m_swsr= 0x0000;
+	m_pit_irq = false;
+}
 
+void m68340_sim::module_reset()
+{
+	// SYS set in RSR, nothing else happens
+	m_avr_rsr = (m_avr_rsr & 0xff00) | 0x02;
 }
 
 /* do_tick_pit works on whole clock cycles, no flank support */
@@ -544,7 +522,8 @@ void m68340_cpu_device::do_tick_pit()
 	if (sim.m_pit_counter == 0) // Zero detect
 	{
 		LOGPIT("PIT timer reached zero!\n");
-		do_pit_irq();
+		sim.m_pit_irq = true;
+		update_ipl();
 	}
 }
 
@@ -556,4 +535,24 @@ WRITE_LINE_MEMBER( m68340_cpu_device::extal_w )
 	{
 		do_tick_pit();
 	}
+}
+
+uint8_t m68340_cpu_device::pit_irq_level() const
+{
+	return m_m68340SIM->m_pit_irq ? (m_m68340SIM->m_picr & m68340_sim::REG_PICR_PIRQL) >> 8 : 0;
+}
+
+uint8_t m68340_cpu_device::pit_arbitrate(uint8_t level) const
+{
+	if (pit_irq_level() == level)
+		return m_m68340SIM->m_mcr & m68340_sim::REG_MCR_ARBLV;
+	else
+		return 0;
+}
+
+uint8_t m68340_cpu_device::pit_iack()
+{
+	m_m68340SIM->m_pit_irq = false;
+	update_ipl();
+	return m_m68340SIM->m_picr & m68340_sim::REG_PICR_PIVEC;
 }

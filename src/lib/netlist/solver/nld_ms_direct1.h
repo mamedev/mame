@@ -13,37 +13,41 @@
 
 namespace netlist
 {
-	namespace devices
+namespace devices
+{
+	template <typename FT>
+	class matrix_solver_direct1_t: public matrix_solver_direct_t<FT, 1>
 	{
-class matrix_solver_direct1_t: public matrix_solver_direct_t<1,1>
-{
-public:
+	public:
 
-	matrix_solver_direct1_t(netlist_t &anetlist, const pstring &name, const solver_parameters_t *params)
-		: matrix_solver_direct_t<1, 1>(anetlist, name, params, 1)
-		{}
-	virtual unsigned vsolve_non_dynamic(const bool newton_raphson) override;
+		using float_type = FT;
+		using base_type = matrix_solver_direct_t<FT, 1>;
 
-};
+		matrix_solver_direct1_t(netlist_state_t &anetlist, const pstring &name, const solver_parameters_t *params)
+			: matrix_solver_direct_t<FT, 1>(anetlist, name, params, 1)
+			{}
 
-// ----------------------------------------------------------------------------------------
-// matrix_solver - Direct1
-// ----------------------------------------------------------------------------------------
+		// ----------------------------------------------------------------------------------------
+		// matrix_solver - Direct1
+		// ----------------------------------------------------------------------------------------
+		unsigned vsolve_non_dynamic(const bool newton_raphson) override
+		{
+			this->build_LE_A(*this);
+			this->build_LE_RHS(*this);
+			//NL_VERBOSE_OUT(("{1} {2}\n", new_val, m_RHS[0] / m_A[0][0]);
 
-inline unsigned matrix_solver_direct1_t::vsolve_non_dynamic(ATTR_UNUSED const bool newton_raphson)
-{
-	build_LE_A<matrix_solver_direct1_t>();
-	build_LE_RHS<matrix_solver_direct1_t>();
-	//NL_VERBOSE_OUT(("{1} {2}\n", new_val, m_RHS[0] / m_A[0][0]);
+			std::array<FT, 1> new_V = { this->RHS(0) / this->A(0,0) };
 
-	nl_double new_V[1] = { RHS(0) / A(0,0) };
+			const FT err = (newton_raphson ? this->delta(new_V) : 0.0);
+			this->store(new_V);
+			return (err > this->m_params.m_accuracy) ? 2 : 1;
+		}
 
-	const nl_double err = (newton_raphson ? delta(new_V) : 0.0);
-	store(new_V);
-	return (err > this->m_params.m_accuracy) ? 2 : 1;
-}
+	};
 
-	} //namespace devices
+
+
+} //namespace devices
 } // namespace netlist
 
 

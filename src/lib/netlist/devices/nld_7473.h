@@ -60,7 +60,7 @@
 #ifndef NLD_7473_H_
 #define NLD_7473_H_
 
-#include "../nl_setup.h"
+#include "netlist/nl_setup.h"
 
 #define TTL_7473(name, cCLK, cJ, cK, cCLRQ) \
 		NET_REGISTER_DEV(TTL_7473, name)        \

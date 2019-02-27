@@ -36,6 +36,7 @@ device_x68k_expansion_card_interface::~device_x68k_expansion_card_interface()
 x68k_expansion_slot_device::x68k_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, X68K_EXPANSION_SLOT, tag, owner, clock),
 	device_slot_interface(mconfig, *this),
+	m_space(*this, finder_base::DUMMY_TAG, -1),
 	m_out_irq2_cb(*this),
 	m_out_irq4_cb(*this),
 	m_out_nmi_cb(*this),

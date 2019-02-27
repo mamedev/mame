@@ -37,9 +37,9 @@ protected:
 	virtual void device_reset() override;
 
 	// device_bw2_expansion_slot_interface overrides
-	virtual uint8_t bw2_cd_r(address_space &space, offs_t offset, uint8_t data, int ram2, int ram3, int ram4, int ram5, int ram6) override;
-	virtual void bw2_cd_w(address_space &space, offs_t offset, uint8_t data, int ram2, int ram3, int ram4, int ram5, int ram6) override;
-	virtual void bw2_slot_w(address_space &space, offs_t offset, uint8_t data) override;
+	virtual uint8_t bw2_cd_r(offs_t offset, uint8_t data, int ram2, int ram3, int ram4, int ram5, int ram6) override;
+	virtual void bw2_cd_w(offs_t offset, uint8_t data, int ram2, int ram3, int ram4, int ram5, int ram6) override;
+	virtual void bw2_slot_w(offs_t offset, uint8_t data) override;
 
 private:
 	required_memory_region m_rom;

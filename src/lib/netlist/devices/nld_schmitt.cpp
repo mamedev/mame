@@ -7,10 +7,10 @@
 
 #include "nld_schmitt.h"
 
-#include "../nl_base.h"
-#include "../nl_errstr.h"
-#include "../analog/nlid_twoterm.h"
-#include "../solver/nld_solver.h"
+#include "netlist/analog/nlid_twoterm.h"
+#include "netlist/nl_base.h"
+#include "netlist/nl_errstr.h"
+#include "netlist/solver/nld_solver.h"
 
 #include <cmath>
 
@@ -82,11 +82,11 @@ namespace netlist
 			NETLIB_RESETI()
 			{
 				m_last_state = 1;
-				m_RVI.do_reset();
-				m_RVO.do_reset();
+				m_RVI.reset();
+				m_RVO.reset();
 				m_is_timestep = m_RVO.m_P.net().solver()->has_timestep_devices();
-				m_RVI.set(NL_FCONST(1.0) / m_model.m_RI, m_model.m_VI, 0.0);
-				m_RVO.set(NL_FCONST(1.0) / m_model.m_ROL, m_model.m_VOL, 0.0);
+				m_RVI.set_G_V_I(plib::constants<nl_double>::one() / m_model.m_RI, m_model.m_VI, 0.0);
+				m_RVO.set_G_V_I(plib::constants<nl_double>::one() / m_model.m_ROL, m_model.m_VOL, 0.0);
 			}
 
 			NETLIB_UPDATEI()
@@ -97,9 +97,9 @@ namespace netlist
 					{
 						m_last_state = 0;
 						if (m_is_timestep)
-							m_RVO.update_dev();
-						m_RVO.set(NL_FCONST(1.0) / m_model.m_ROH, m_model.m_VOH, 0.0);
-						m_RVO.m_P.schedule_solve_after(NLTIME_FROM_NS(1));
+							m_RVO.update();
+						m_RVO.set_G_V_I(plib::constants<nl_double>::one() / m_model.m_ROH, m_model.m_VOH, 0.0);
+						m_RVO.solve_later();
 					}
 				}
 				else
@@ -108,9 +108,9 @@ namespace netlist
 					{
 						m_last_state = 1;
 						if (m_is_timestep)
-							m_RVO.update_dev();
-						m_RVO.set(NL_FCONST(1.0) / m_model.m_ROL, m_model.m_VOL, 0.0);
-						m_RVO.m_P.schedule_solve_after(NLTIME_FROM_NS(1));
+							m_RVO.update();
+						m_RVO.set_G_V_I(plib::constants<nl_double>::one() / m_model.m_ROL, m_model.m_VOL, 0.0);
+						m_RVO.solve_later();
 					}
 				}
 			}
@@ -125,7 +125,7 @@ namespace netlist
 			bool m_is_timestep;
 		};
 
-		NETLIB_DEVICE_IMPL(schmitt_trigger)
+		NETLIB_DEVICE_IMPL(schmitt_trigger, "SCHMITT_TRIGGER", "MODEL")
 
 	} // namespace devices
 } // namespace netlist

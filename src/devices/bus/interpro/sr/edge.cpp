@@ -475,7 +475,7 @@ void mpcb828_device::device_add_mconfig(machine_config &config)
 	TMS32030(config, m_dsp, 30_MHz_XTAL);
 	m_dsp->holda().set(FUNC(mpcb828_device::holda));
 	m_dsp->set_disable();
-	//MCFG_DEVICE_ADDRESS_MAP(0, map_dynamic<2>)
+	//m_dsp->set_addrmap(0, map_dynamic<2>);
 
 	BT458(config, "ramdac", 83'020'800);
 
@@ -484,7 +484,7 @@ void mpcb828_device::device_add_mconfig(machine_config &config)
 	m_scc->out_txda_callback().set("kbd", FUNC(interpro_keyboard_port_device::write_txd));
 
 	INTERPRO_KEYBOARD_PORT(config, "kbd", interpro_keyboard_devices, "hle_en_us").rxd_handler_cb().set(m_scc, FUNC(z80scc_device::rxa_w));
-MACHINE_CONFIG_END
+}
 
 /*
  * MPCB849: EDGE-1 graphics, 2 megapixels, single screen, 60Hz refresh.

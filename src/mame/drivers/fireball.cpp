@@ -250,21 +250,21 @@ WRITE8_MEMBER(fireball_state::io_06_w)
 			//address_w
 			if (LOG_AY8912)
 				logerror("write to 0x06 bc1=1\n");
-			m_ay->address_w(space,0,to_ay_data );
+			m_ay->address_w(to_ay_data);
 			if (LOG_AY8912)
 				logerror("AY8912 address latch write=%02X\n",to_ay_data);
 		}else{
 			//data_w
 			if (LOG_AY8912)
 				logerror("write to 0x06 bc1=0\n");
-			m_ay->data_w(space,0,to_ay_data );
+			m_ay->data_w(to_ay_data);
 			if (LOG_AY8912)
 				logerror("AY8912 data write=%02X\n",to_ay_data);
 		}
 	}else{
 		if (LOG_AY8912)
 			logerror("write to 0x06 bdir=0\n");
-		ay_data=m_ay->data_r(space,0);
+		ay_data=m_ay->data_r();
 	}
 
 	m_p1_data=data;

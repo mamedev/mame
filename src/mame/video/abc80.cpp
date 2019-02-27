@@ -189,15 +189,15 @@ uint32_t abc80_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( abc80_video )
+//  machine_config( abc80_video )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(abc80_state::abc80_video)
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_UPDATE_DRIVER(abc80_state, screen_update)
+void abc80_state::abc80_video(machine_config &config)
+{
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_screen_update(FUNC(abc80_state::screen_update));
+	m_screen->set_raw(XTAL(11'980'800)/2, ABC80_HTOTAL, ABC80_HBEND, ABC80_HBSTART, ABC80_VTOTAL, ABC80_VBEND, ABC80_VBSTART);
 
-	MCFG_SCREEN_RAW_PARAMS(XTAL(11'980'800)/2, ABC80_HTOTAL, ABC80_HBEND, ABC80_HBSTART, ABC80_VTOTAL, ABC80_VBEND, ABC80_VBSTART)
-
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_abc80)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_abc80);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
-MACHINE_CONFIG_END
+}

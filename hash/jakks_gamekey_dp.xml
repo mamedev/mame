@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="jakks_gamekey_dp" description="JAKKS Pacific 'DP' Game Keys">
+
+	<!-- This list is for the 'DP' coded Game Keys, for Disney Princess -->
+
+	<software name="snowwhit">
+		<description>Snow White and the Seven Dwarfs - Memory Chase &amp; Rescue Race</description>
+		<year>2005</year>
+		<publisher>JAKKS Pacific / Taniko</publisher>
+		<part name="cart" interface="jakks_gamekey">
+			<dataarea name="rom" size="0x800000">
+				<rom name="jakksdisneyprincessmemorychaserescueracegk.bin" size="0x200000" crc="affca84b" sha1="f3b3a4c2db48c2c93cd616db18094470ec070068" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

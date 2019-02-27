@@ -327,7 +327,7 @@ MACHINE_CONFIG_START(cdc721_state::cdc721)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 	MCFG_SCREEN_PALETTE("palette")
 	PALETTE(config, "palette", FUNC(cdc721_state::cdc721_palette), 3);
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cdc721)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_cdc721);
 
 	CRT5037(config, m_crtc, 12.936_MHz_XTAL / 8).set_char_width(8);
 	m_crtc->set_screen("screen");
@@ -397,8 +397,7 @@ MACHINE_CONFIG_START(cdc721_state::cdc721)
 	chb.cts_handler().set("pbuart", FUNC(ins8250_device::cts_w));
 	chb.ri_handler().set("pbuart", FUNC(ins8250_device::ri_w));
 
-	MCFG_INPUT_MERGER_ANY_HIGH("int2") // 74S05 (open collector)
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(*this, cdc721_state, int_w<2>))
+	INPUT_MERGER_ANY_HIGH(config, "int2").output_handler().set(FUNC(cdc721_state::int_w<2>)); // 74S05 (open collector)
 MACHINE_CONFIG_END
 
 ROM_START( cdc721 )

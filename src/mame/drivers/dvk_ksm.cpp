@@ -78,17 +78,16 @@ ksm|DVK KSM,
 #define KSM_STATUSLINE_VRAM 0xF8B0
 
 
-#define VERBOSE_DBG 0       /* general debug messages */
+//#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
+#define LOG_KEYBOARD  (1U <<  1)
+#define LOG_DEBUG     (1U <<  2)
 
-#define DBG_LOG(N,M,A) \
-	do { \
-		if(VERBOSE_DBG>=N) \
-		{ \
-			if( M ) \
-				logerror("%11.6f at %s: %-24s",machine().time().as_double(),machine().describe_context(),(char*)M ); \
-			logerror A; \
-		} \
-	} while (0)
+//#define VERBOSE (LOG_DEBUG)
+//#define LOG_OUTPUT_FUNC printf
+#include "logmacro.h"
+
+#define LOGKBD(...) LOGMASKED(LOG_KEYBOARD, __VA_ARGS__)
+#define LOGDBG(...) LOGMASKED(LOG_DEBUG, __VA_ARGS__)
 
 
 class ksm_state : public driver_device
@@ -250,7 +249,7 @@ void ksm_state::video_start()
 
 WRITE8_MEMBER(ksm_state::ksm_ppi_porta_w)
 {
-	DBG_LOG(1, "PPI port A", ("line %d\n", data));
+	LOG("PPI port A line %d\n", data);
 	m_video.line = data;
 }
 
@@ -258,7 +257,7 @@ WRITE8_MEMBER(ksm_state::ksm_ppi_portc_w)
 {
 	brgc = (data >> 5) & 3;
 
-	DBG_LOG(1, "PPI port C", ("raw %02x blink %d speed %d\n", data, BIT(data, 7), brgc));
+	LOG("PPI port C raw %02x blink %d speed %d\n", data, BIT(data, 7), brgc);
 
 	update_brg(brga, brgb, brgc);
 }
@@ -283,7 +282,7 @@ WRITE_LINE_MEMBER(ksm_state::write_brgb)
 
 void ksm_state::update_brg(bool a, bool b, int c)
 {
-	DBG_LOG(2, "brg", ("%d %d %d\n", a, b, c));
+	LOGDBG("brg %d %d %d\n", a, b, c);
 
 	if (a && b) return;
 
@@ -371,9 +370,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(ksm_state::scanline_callback)
 	uint16_t y = m_screen->vpos();
 	uint16_t offset;
 
-	DBG_LOG(2,"scanline_cb",
-		("addr %02x frame %d x %.4d y %.3d row %.2d\n",
-		m_video.line, (int)m_screen->frame_number(), m_screen->hpos(), y, y%11));
+	LOGDBG("scanline_cb addr %02x frame %d x %.4d y %.3d row %.2d\n",
+		m_video.line, (int)m_screen->frame_number(), m_screen->hpos(), y, y%11);
 
 	if (y < KSM_VERT_START) return;
 	y -= KSM_VERT_START;
@@ -422,17 +420,16 @@ MACHINE_CONFIG_START(ksm_state::ksm)
 	MCFG_DEVICE_IO_MAP(ksm_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ksm_state, scanline_callback, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(ksm_state::scanline_callback), "screen", 0, 1);
 
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_UPDATE_DRIVER(ksm_state, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(15'400'000), KSM_TOTAL_HORZ, KSM_HORZ_START,
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER, rgb_t::green());
+	m_screen->set_screen_update(FUNC(ksm_state::screen_update));
+	m_screen->set_raw(XTAL(15'400'000), KSM_TOTAL_HORZ, KSM_HORZ_START,
 		KSM_HORZ_START+KSM_DISP_HORZ, KSM_TOTAL_VERT, KSM_VERT_START,
 		KSM_VERT_START+KSM_DISP_VERT);
+	m_screen->set_palette("palette");
 
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ksm)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_ksm);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	PIC8259(config, m_pic8259, 0);
@@ -465,8 +462,8 @@ MACHINE_CONFIG_START(ksm_state::ksm)
 	m_ms7004->tx_handler().set(m_i8251kbd, FUNC(i8251_device::write_rxd));
 
 	// baud rate is supposed to be 4800 but keyboard is slightly faster
-	MCFG_DEVICE_ADD("keyboard_clock", CLOCK, 4960*16)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, ksm_state, write_keyboard_clock))
+	clock_device &keyboard_clock(CLOCK(config, "keyboard_clock", 4960*16));
+	keyboard_clock.signal_handler().set(FUNC(ksm_state::write_keyboard_clock));
 MACHINE_CONFIG_END
 
 ROM_START( dvk_ksm )

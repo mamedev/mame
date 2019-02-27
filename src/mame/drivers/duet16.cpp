@@ -5,6 +5,7 @@
 #include "cpu/i86/i86.h"
 #include "cpu/mcs48/mcs48.h"
 #include "imagedev/floppy.h"
+#include "machine/i8087.h"
 #include "machine/i8251.h"
 #include "machine/input_merger.h"
 #include "machine/pit8253.h"
@@ -69,7 +70,7 @@ private:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	void duet16_io(address_map &map);
 	void duet16_mem(address_map &map);
-	required_device<cpu_device> m_maincpu;
+	required_device<i8086_cpu_device> m_maincpu;
 	required_device<pic8259_device> m_pic;
 	required_device<upd765a_device> m_fdc;
 	required_device<am9517a_device> m_dmac;
@@ -353,10 +354,17 @@ static DEVICE_INPUT_DEFAULTS_START(keyboard)
 DEVICE_INPUT_DEFAULTS_END
 
 MACHINE_CONFIG_START(duet16_state::duet16)
-	MCFG_DEVICE_ADD("maincpu", I8086, 24_MHz_XTAL / 3)
-	MCFG_DEVICE_PROGRAM_MAP(duet16_mem)
-	MCFG_DEVICE_IO_MAP(duet16_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic", pic8259_device, inta_cb)
+	I8086(config, m_maincpu, 24_MHz_XTAL / 3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &duet16_state::duet16_mem);
+	m_maincpu->set_addrmap(AS_IO, &duet16_state::duet16_io);
+	m_maincpu->set_irq_acknowledge_callback("pic", FUNC(pic8259_device::inta_cb));
+	m_maincpu->esc_opcode_handler().set("i8087", FUNC(i8087_device::insn_w));
+	m_maincpu->esc_data_handler().set("i8087", FUNC(i8087_device::addr_w));
+
+	i8087_device &i8087(I8087(config, "i8087", 24_MHz_XTAL / 3));
+	i8087.set_space_86(m_maincpu, AS_PROGRAM);
+	i8087.irq().set(m_pic, FUNC(pic8259_device::ir2_w)); // INT87
+	i8087.busy().set_inputline(m_maincpu, INPUT_LINE_TEST);
 
 	I8741(config, "i8741", 20_MHz_XTAL / 4);
 
@@ -401,19 +409,15 @@ MACHINE_CONFIG_START(duet16_state::duet16)
 	kbd.rxd_handler().set("kbusart", FUNC(i8251_device::write_rxd));
 	kbd.set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(keyboard));
 
-	MCFG_INPUT_MERGER_ANY_HIGH("kbint")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE("pic", pic8259_device, ir5_w)) // INT2
+	INPUT_MERGER_ANY_HIGH(config, "kbint").output_handler().set(m_pic, FUNC(pic8259_device::ir5_w)); // INT2
 
-	MCFG_INPUT_MERGER_ANY_HIGH("tmint")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE("pic", pic8259_device, ir0_w)) // INT6
+	INPUT_MERGER_ANY_HIGH(config, m_tmint).output_handler().set(m_pic, FUNC(pic8259_device::ir0_w)); // INT6
 
 	UPD765A(config, m_fdc, 8_MHz_XTAL, true, false);
 	m_fdc->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq0_w));
 	m_fdc->intrq_wr_callback().set(m_pic, FUNC(pic8259_device::ir3_w)); // INT4
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", duet16_floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_SLOT_FIXED(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", duet16_floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_SLOT_FIXED(true)
+	FLOPPY_CONNECTOR(config, "fdc:0", duet16_floppies, "525qd", floppy_image_device::default_floppy_formats, true);
+	FLOPPY_CONNECTOR(config, "fdc:1", duet16_floppies, "525qd", floppy_image_device::default_floppy_formats, true);
 
 	h46505_device &crtc(H46505(config, "crtc", 2000000));
 	crtc.set_char_width(8);
@@ -422,7 +426,7 @@ MACHINE_CONFIG_START(duet16_state::duet16)
 	MCFG_PALETTE_ADD("palette", 8)
 	PALETTE(config, m_chrpal, palette_device::BRG_3BIT);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "chrpal", gfx_duet16)
+	GFXDECODE(config, "gfxdecode", m_chrpal, gfx_duet16);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -430,14 +434,14 @@ MACHINE_CONFIG_START(duet16_state::duet16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", h46505_device, screen_update)
 
-	MCFG_DEVICE_ADD("rtc", MSM58321, 32768_Hz_XTAL)
-	MCFG_MSM58321_D0_HANDLER(WRITELINE(*this, duet16_state, rtc_d0_w))
-	MCFG_MSM58321_D1_HANDLER(WRITELINE(*this, duet16_state, rtc_d1_w))
-	MCFG_MSM58321_D2_HANDLER(WRITELINE(*this, duet16_state, rtc_d2_w))
-	MCFG_MSM58321_D3_HANDLER(WRITELINE(*this, duet16_state, rtc_d3_w))
-	MCFG_MSM58321_BUSY_HANDLER(WRITELINE(*this, duet16_state, rtc_busy_w))
-	MCFG_MSM58321_YEAR0(1980)
-	MCFG_MSM58321_DEFAULT_24H(true)
+	MSM58321(config, m_rtc, 32768_Hz_XTAL);
+	m_rtc->d0_handler().set(FUNC(duet16_state::rtc_d0_w));
+	m_rtc->d1_handler().set(FUNC(duet16_state::rtc_d1_w));
+	m_rtc->d2_handler().set(FUNC(duet16_state::rtc_d2_w));
+	m_rtc->d3_handler().set(FUNC(duet16_state::rtc_d3_w));
+	m_rtc->busy_handler().set(FUNC(duet16_state::rtc_busy_w));
+	m_rtc->set_year0(1980);
+	m_rtc->set_default_24h(true);
 MACHINE_CONFIG_END
 
 ROM_START(duet16)

@@ -169,9 +169,10 @@ void esqvfd_device::update_display()
 
 /* 2x40 VFD display used in the ESQ-1, VFX-SD, SD-1, and others */
 
-MACHINE_CONFIG_START(esq2x40_device::device_add_mconfig)
+void esq2x40_device::device_add_mconfig(machine_config &config)
+{
 	config.set_default_layout(layout_esq2by40);
-MACHINE_CONFIG_END
+}
 
 void esq2x40_device::write_char(int data)
 {
@@ -302,9 +303,10 @@ esq2x40_device::esq2x40_device(const machine_config &mconfig, const char *tag, d
 
 /* 1x22 display from the VFX (not right, but it'll do for now) */
 
-MACHINE_CONFIG_START(esq1x22_device::device_add_mconfig)
+void esq1x22_device::device_add_mconfig(machine_config &config)
+{
 	config.set_default_layout(layout_esq1by22);
-MACHINE_CONFIG_END
+}
 
 
 void esq1x22_device::write_char(int data)
@@ -349,9 +351,10 @@ esq1x22_device::esq1x22_device(const machine_config &mconfig, const char *tag, d
 }
 
 /* SQ-1 display, I think it's really an LCD but we'll deal with it for now */
-MACHINE_CONFIG_START(esq2x40_sq1_device::device_add_mconfig)
+void esq2x40_sq1_device::device_add_mconfig(machine_config &config)
+{
 	config.set_default_layout(layout_esq2by40);  // we use the normal 2x40 layout
-MACHINE_CONFIG_END
+}
 
 void esq2x40_sq1_device::write_char(int data)
 {

@@ -205,7 +205,7 @@ READ8_MEMBER(vectrex_base_state::vectrex_via_pa_r)
 	if ((!(m_via_out[PORTB] & 0x10)) && (m_via_out[PORTB] & 0x08))
 		/* BDIR inactive, we can read the PSG. BC1 has to be active. */
 	{
-		m_via_out[PORTA] = m_ay8912->data_r(space, 0)
+		m_via_out[PORTA] = m_ay8912->data_r()
 			& ~(m_imager_pinlevel & 0x80);
 	}
 	return m_via_out[PORTA];

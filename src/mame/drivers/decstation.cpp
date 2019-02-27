@@ -59,6 +59,7 @@
 #include "emu.h"
 #include "cpu/mips/mips1.h"
 #include "cpu/mips/mips3.h"
+#include "machine/timer.h"
 #include "machine/decioga.h"
 #include "machine/mc146818.h"
 #include "machine/z80scc.h"
@@ -68,9 +69,11 @@
 #include "machine/nscsi_hd.h"
 #include "machine/dec_lk201.h"
 #include "machine/am79c90.h"
+#include "machine/dc7085.h"
 #include "bus/rs232/rs232.h"
 #include "screen.h"
 #include "video/bt459.h"
+#include "video/decsfb.h"
 
 class decstation_state : public driver_device
 {
@@ -79,6 +82,8 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
+		m_scantimer(*this, "scantimer"),
+		m_sfb(*this, "sfb"),
 		m_lk201(*this, "lk201"),
 		m_ioga(*this, "ioga"),
 		m_rtc(*this, "rtc"),
@@ -88,7 +93,8 @@ public:
 		m_vrom(*this, "gfx"),
 		m_bt459(*this, "bt459"),
 		m_lance(*this, "am79c90"),
-		m_kn01vram(*this, "vram")
+		m_kn01vram(*this, "vram"),
+		m_dz(*this, "dc7085")
 		{ }
 
 	void kn01(machine_config &config);
@@ -99,6 +105,7 @@ public:
 protected:
 	DECLARE_READ_LINE_MEMBER(brcond0_r) { return ASSERT_LINE; }
 	DECLARE_WRITE_LINE_MEMBER(ioga_irq_w);
+	DECLARE_WRITE_LINE_MEMBER(dz_irq_w);
 
 	DECLARE_READ32_MEMBER(cfb_r);
 	DECLARE_WRITE32_MEMBER(cfb_w);
@@ -107,8 +114,14 @@ protected:
 	DECLARE_WRITE32_MEMBER(kn01_control_w);
 	DECLARE_READ32_MEMBER(bt478_palette_r);
 	DECLARE_WRITE32_MEMBER(bt478_palette_w);
+	DECLARE_READ32_MEMBER(pcc_r);
+	DECLARE_WRITE32_MEMBER(pcc_w);
+	DECLARE_WRITE32_MEMBER(planemask_w);
+	DECLARE_WRITE32_MEMBER(vram_w);
 
 	DECLARE_READ32_MEMBER(dz_r);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer);
 
 	void ncr5394(device_t *device);
 
@@ -120,8 +133,10 @@ private:
 	uint32_t kn01_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	required_device<mips1core_device_base> m_maincpu;
+	required_device<mips1_device_base> m_maincpu;
 	required_device<screen_device> m_screen;
+	optional_device<timer_device> m_scantimer;
+	optional_device<decsfb_device> m_sfb;
 	optional_device<lk201_device> m_lk201;
 	optional_device<dec_ioga_device> m_ioga;
 	required_device<mc146818_device> m_rtc;
@@ -131,18 +146,19 @@ private:
 	optional_device<bt459_device> m_bt459;
 	required_device<am79c90_device> m_lance;
 	optional_shared_ptr<uint32_t> m_kn01vram;
+	optional_device<dc7085_device> m_dz;
 
 	void kn01_map(address_map &map);
 	void threemin_map(address_map &map);
 
 	u8 *m_vrom_ptr;
-	u32 m_vram[0x200000/4];
-	u32 m_sfb[0x80];
-	int m_copy_src;
 
 	u32 m_kn01_control, m_kn01_status;
 	u32 m_palette[256], m_overlay[256];
 	u8 m_r, m_g, m_b, m_entry, m_stage;
+	u32 m_planemask;
+
+	u16 m_pcc_regs[0x40/4];
 };
 
 /***************************************************************************
@@ -175,69 +191,27 @@ uint32_t decstation_state::kn01_screen_update(screen_device &screen, bitmap_rgb3
 
 uint32_t decstation_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	m_bt459->screen_update(screen, bitmap, cliprect, (uint8_t *)&m_vram[0]);
+	m_bt459->screen_update(screen, bitmap, cliprect, (uint8_t *)m_sfb->get_vram());
 	return 0;
 }
-
-/*
-    0x100000 copy register 0
-    0x100004 copy register 1
-    0x100008 copy register 2
-    0x10000C copy register 3
-    0x100010 copy register 4
-    0x100014 copy register 5
-    0x100018 copy register 6
-    0x10001C copy register 7
-    0x100020 foreground register
-    0x100024 background register
-    0x100028 plane mask
-    0x10002C pixel mask
-    0x100030 cxt mode
-    0x100034 boolean operation
-    0x100038 pixel shift
-    0x10003C line address
-    0x100040 bresh 1
-    0x100044 bresh 2
-    0x100048 bresh 3
-    0x10004C bresh continue
-    0x100050 deep register
-    0x100054 start register
-    0x100058 Clear Interrupt
-    0x10005C reserved 2
-    0x100060 refresh count
-    0x100064 video horiz
-    0x100068 video vertical
-    0x10006C refresh base
-    0x100070 video valid
-    0x100074 Interrupt Enable
-*/
-
-#define MODE_SIMPLE     0
-#define MODE_OPAQUESTIPPLE  1
-#define MODE_OPAQUELINE     2
-#define MODE_TRANSPARENTSTIPPLE 5
-#define MODE_TRANSPARENTLINE    6
-#define MODE_COPY       7
 
 READ32_MEMBER(decstation_state::cfb_r)
 {
 	uint32_t addr = offset << 2;
 
-//  logerror("cfb_r: reading at %x\n", addr);
+	//logerror("cfb_r: reading at %x\n", addr);
 
-	if (addr < 0x800000)
+	if (addr < 0x80000)
 	{
 		return m_vrom_ptr[addr>>2] & 0xff;
 	}
 
 	if ((addr >= 0x100000) && (addr < 0x100200))
 	{
-		return m_sfb[offset-(0x100000/4)];
 	}
 
 	if ((addr >= 0x200000) && (addr < 0x400000))
 	{
-		return m_vram[offset-(0x200000/4)];
 	}
 
 	return 0xffffffff;
@@ -249,13 +223,6 @@ WRITE32_MEMBER(decstation_state::cfb_w)
 
 	if ((addr >= 0x100000) && (addr < 0x100200))
 	{
-		//printf("SFB: %08x (mask %08x) @ %x\n", data, mem_mask, offset<<2);
-		COMBINE_DATA(&m_sfb[offset-(0x100000/4)]);
-
-		if ((addr == 0x100030) && (data = 7))
-		{
-			m_copy_src = 1;
-		}
 		return;
 	}
 
@@ -267,70 +234,85 @@ WRITE32_MEMBER(decstation_state::cfb_w)
 
 	if ((addr >= 0x200000) && (addr < 0x400000))
 	{
-		//printf("FB: %08x (mask %08x) @ %x\n", data, mem_mask, offset<<2);
+	}
+}
 
-		switch (m_sfb[0x30/4])
+enum
+{
+	PCC_CMDR = 0,
+	PCC_XPOS,   // 04
+	PCC_YPOS,   // 08
+	PCC_XMIN1,  // 0c
+	PCC_XMAX1,  // 10
+	PCC_YMIN1,  // 14
+	PCC_YMAX1,  // 18
+	PCC_UNK1,   // 1c
+	PCC_UNK2,   // 20
+	PCC_UNK3,   // 24
+	PCC_UNK4,   // 28
+	PCC_XMIN2,  // 2c
+	PCC_XMAX2,  // 30
+	PCC_YMIN2,  // 34
+	PCC_YMAX2,  // 38
+	PCC_MEMORY  // 3c
+};
+
+READ32_MEMBER(decstation_state::pcc_r)
+{
+	return m_pcc_regs[offset];
+}
+
+WRITE32_MEMBER(decstation_state::pcc_w)
+{
+	m_pcc_regs[offset] = data & 0xffff;
+}
+
+WRITE32_MEMBER(decstation_state::planemask_w)
+{
+	// value written is smeared across all 4 byte lanes
+	data &= 0xff;
+	m_planemask = (data) || (data << 8) || (data << 16) || (data << 24);
+}
+
+WRITE32_MEMBER(decstation_state::vram_w)
+{
+	u32 *vram = (u32 *)m_kn01vram.target();
+//  u32 effective_planemask = (m_planemask & mem_mask);
+//  vram[offset] = (vram[offset] & ~effective_planemask) | (data & effective_planemask);
+	COMBINE_DATA(&vram[offset]);
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(decstation_state::scanline_timer)
+{
+	int scanline = m_screen->vpos();
+
+	if ((scanline == m_pcc_regs[PCC_YMIN2]) && (m_pcc_regs[PCC_CMDR] & 0x0400))
+	{
+		m_kn01_status |= 0x200;
+	}
+
+	if ((scanline == m_pcc_regs[PCC_YMIN1]) && (m_pcc_regs[PCC_CMDR] & 0x0100))
+	{
+		int x, y;
+		u8 *vram = (u8 *)m_kn01vram.target();
+		u32 rgba, r, g, b;
+
+		x = m_pcc_regs[PCC_XMIN1] - 212;
+		y = m_pcc_regs[PCC_YMIN1] - 34;
+		//printf("sampling for VRGTRB and friends at X=%d Y=%d\n", x, y);
+		m_kn01_status &= ~7;
+		if ((x >= 0) && (x <= 1023) && (y >= 0) && (y <= 863))
 		{
-			case MODE_SIMPLE:   // simple
-				COMBINE_DATA(&m_vram[offset-(0x200000/4)]);
-				break;
+			rgba = m_palette[vram[(y * 1024) + x]];
+			r = (rgba >> 16) & 0xff;
+			g = (rgba >> 8) & 0xff;
+			b = (rgba & 0xff);
 
-			case MODE_TRANSPARENTSTIPPLE:
-				{
-					uint8_t *pVRAM = (uint8_t *)&m_vram[offset-(0x200000/4)];
-					uint8_t fgs[4];
-
-					fgs[0] = m_sfb[0x20/4] >> 24;
-					fgs[1] = (m_sfb[0x20/4] >> 16) & 0xff;
-					fgs[2] = (m_sfb[0x20/4] >> 8) & 0xff;
-					fgs[3] = m_sfb[0x20/4] & 0xff;
-					for (int x = 0; x < 32; x++)
-					{
-						if (data & (1<<(31-x)))
-						{
-							pVRAM[x] = fgs[x & 3];
-						}
-					}
-				}
-				break;
-
-			case MODE_COPY:
-				{
-					uint8_t *pVRAM = (uint8_t *)&m_vram[offset-(0x200000/4)];
-					uint8_t *pBuffer = (uint8_t *)&m_sfb[0];    // first 8 32-bit regs are the copy buffer
-
-					if (m_copy_src)
-					{
-						m_copy_src = 0;
-
-						for (int x = 0; x < 32; x++)
-						{
-							if (data & (1<<(31-x)))
-							{
-								pBuffer[x] = pVRAM[x];
-							}
-						}
-					}
-					else
-					{
-						m_copy_src = 1;
-
-						for (int x = 0; x < 32; x++)
-						{
-							if (data & (1<<(31-x)))
-							{
-								pVRAM[x] = pBuffer[x];
-							}
-						}
-					}
-				}
-				break;
-
-			default:
-				logerror("SFB: Unsupported VRAM write %08x (mask %08x) at %08x in mode %x\n", data, mem_mask, offset<<2, m_sfb[0x30/4]);
-				break;
+			//printf("R=%d, G=%d, B=%d\n", r, g, b);
+			if (r > b) m_kn01_status |= 1;
+			if (r > g) m_kn01_status |= 2;
+			if (b > g) m_kn01_status |= 4;
 		}
-		return;
 	}
 }
 
@@ -386,6 +368,8 @@ READ32_MEMBER(decstation_state::bt478_palette_r)
 
 WRITE32_MEMBER(decstation_state::bt478_palette_w)
 {
+	//printf("VDAC_w: %08x at %08x (mask %08x)\n", data, offset, mem_mask);
+
 	if ((offset == 0) || (offset == 3) || (offset == 4) || (offset == 7))
 	{
 		m_entry = data & 0xff;
@@ -455,18 +439,24 @@ WRITE_LINE_MEMBER(decstation_state::ioga_irq_w)
 	m_maincpu->set_input_line(INPUT_LINE_IRQ3, state);
 }
 
+WRITE_LINE_MEMBER(decstation_state::dz_irq_w)
+{
+	m_maincpu->set_input_line(INPUT_LINE_IRQ2, state);
+}
+
 void decstation_state::machine_start()
 {
 	if (m_vrom)
 		m_vrom_ptr = m_vrom->base();
-	save_item(NAME(m_vram));
-	save_item(NAME(m_sfb));
-	save_item(NAME(m_copy_src));
 }
 
 void decstation_state::machine_reset()
 {
-	m_copy_src = 1;
+	if (m_ioga)
+	{
+		m_ioga->set_dma_space(&m_maincpu->space(AS_PROGRAM));
+	}
+
 	m_entry = 0;
 	m_stage = 0;
 	m_r = m_g = m_b = 0;
@@ -475,13 +465,19 @@ void decstation_state::machine_reset()
 
 READ32_MEMBER(decstation_state::kn01_status_r)
 {
-	m_kn01_status ^= 0x200; // fake vint for now
+	//m_kn01_status ^= 0x200; // fake vint for now
 	return m_kn01_status;
 }
 
 WRITE32_MEMBER(decstation_state::kn01_control_w)
 {
 	COMBINE_DATA(&m_kn01_control);
+
+	// clear VINT
+	if ((m_kn01_control & 0x200) && (m_kn01_status & 0x200))
+	{
+		m_kn01_status &= ~0x200;
+	}
 }
 
 READ32_MEMBER(decstation_state::dz_r)
@@ -496,10 +492,12 @@ READ32_MEMBER(decstation_state::dz_r)
 void decstation_state::kn01_map(address_map &map)
 {
 	map(0x00000000, 0x017fffff).ram();
-	map(0x0fc00000, 0x0fcfffff).ram().share("vram");
+	map(0x0fc00000, 0x0fcfffff).ram().share("vram").w(FUNC(decstation_state::vram_w));
+	map(0x10000000, 0x10000003).w(FUNC(decstation_state::planemask_w));
+	map(0x11000000, 0x1100003f).rw(FUNC(decstation_state::pcc_r), FUNC(decstation_state::pcc_w));
 	map(0x12000000, 0x1200001f).rw(FUNC(decstation_state::bt478_palette_r), FUNC(decstation_state::bt478_palette_w));
 	//map(0x18000000, 0x18000007).rw(m_lance, FUNC(am79c90_device::regs_r), FUNC(am79c90_device::regs_w)).umask32(0x0000ffff);
-	map(0x1c000000, 0x1c000003).r(FUNC(decstation_state::dz_r));
+	map(0x1c000000, 0x1c00001b).m(m_dz, FUNC(dc7085_device::map)).umask32(0xffff);
 	map(0x1d000000, 0x1d0000ff).rw(m_rtc, FUNC(mc146818_device::read_direct), FUNC(mc146818_device::write_direct)).umask32(0x000000ff);
 	map(0x1e000000, 0x1effffff).rw(FUNC(decstation_state::kn01_status_r), FUNC(decstation_state::kn01_control_w));
 	map(0x1fc00000, 0x1fc3ffff).rom().region("user1", 0);
@@ -508,8 +506,10 @@ void decstation_state::kn01_map(address_map &map)
 void decstation_state::threemin_map(address_map &map)
 {
 	map(0x00000000, 0x07ffffff).ram();  // full 128 MB
-	map(0x10000000, 0x13ffffff).rw(FUNC(decstation_state::cfb_r), FUNC(decstation_state::cfb_w));
+	map(0x10000000, 0x1007ffff).rw(FUNC(decstation_state::cfb_r), FUNC(decstation_state::cfb_w));
+	map(0x10100000, 0x101001ff).rw(m_sfb, FUNC(decsfb_device::read), FUNC(decsfb_device::write));
 	map(0x101c0000, 0x101c000f).m("bt459", FUNC(bt459_device::map)).umask32(0x000000ff);
+	map(0x10200000, 0x103fffff).rw(m_sfb, FUNC(decsfb_device::vram_r), FUNC(decsfb_device::vram_w));
 	map(0x1c000000, 0x1c07ffff).m(m_ioga, FUNC(dec_ioga_device::map));
 	map(0x1c0c0000, 0x1c0c0007).rw(m_lance, FUNC(am79c90_device::regs_r), FUNC(am79c90_device::regs_w)).umask32(0x0000ffff);
 	map(0x1c100000, 0x1c100003).rw(m_scc0, FUNC(z80scc_device::ca_r), FUNC(z80scc_device::ca_w)).umask32(0x0000ff00);
@@ -546,13 +546,20 @@ static void dec_scsi_devices(device_slot_interface &device)
 MACHINE_CONFIG_START(decstation_state::kn01)
 	R2000(config, m_maincpu, 16.67_MHz_XTAL, 65536, 131072);
 	m_maincpu->set_endianness(ENDIANNESS_LITTLE);
-	m_maincpu->set_fpurev(0x340);
+	m_maincpu->set_fpu(mips1_device_base::MIPS_R3010Av4);
 	m_maincpu->in_brcond<0>().set(FUNC(decstation_state::brcond0_r));
 	m_maincpu->set_addrmap(AS_PROGRAM, &decstation_state::kn01_map);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(69169800, 1280, 0, 1024, 901, 0, 864);
 	m_screen->set_screen_update(FUNC(decstation_state::kn01_screen_update));
+
+	TIMER(config, m_scantimer, 0);
+	m_scantimer->configure_scanline(FUNC(decstation_state::scanline_timer), "screen", 0, 1);
+
+	DC7085(config, m_dz, 0);
+	m_dz->int_cb().set(FUNC(decstation_state::dz_irq_w));
+	m_dz->ch1_tx_cb().set("dc7085:ch1", FUNC(dc7085_channel::rx_w));
 
 	AM79C90(config, m_lance, XTAL(12'500'000));
 
@@ -563,7 +570,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(decstation_state::kn02ba)
 	R3000A(config, m_maincpu, 33.333_MHz_XTAL, 65536, 131072);
 	m_maincpu->set_endianness(ENDIANNESS_LITTLE);
-	m_maincpu->set_fpurev(0x340); // should be R3010A v4.0
+	m_maincpu->set_fpu(mips1_device_base::MIPS_R3010Av4);
 	m_maincpu->in_brcond<0>().set(FUNC(decstation_state::brcond0_r));
 	m_maincpu->set_addrmap(AS_PROGRAM, &decstation_state::threemin_map);
 
@@ -571,10 +578,15 @@ MACHINE_CONFIG_START(decstation_state::kn02ba)
 	m_screen->set_raw(130000000, 1704, 32, (1280+32), 1064, 3, (1024+3));
 	m_screen->set_screen_update(FUNC(decstation_state::screen_update));
 
+	DECSFB(config, m_sfb, 25'000'000);  // clock based on white paper which quotes "40ns" gate array cycle times
+//  m_sfb->int_cb().set(FUNC(dec_ioga_device::slot0_irq_w));
+
 	BT459(config, m_bt459, 83'020'800);
 
 	AM79C90(config, m_lance, XTAL(12'500'000));
 	m_lance->intr_out().set("ioga", FUNC(dec_ioga_device::lance_irq_w));
+	m_lance->dma_in().set("ioga", FUNC(dec_ioga_device::lance_dma_r));
+	m_lance->dma_out().set("ioga", FUNC(dec_ioga_device::lance_dma_w));
 
 	DECSTATION_IOGA(config, m_ioga, XTAL(12'500'000));
 	m_ioga->irq_out().set(FUNC(decstation_state::ioga_irq_w));
@@ -605,16 +617,15 @@ MACHINE_CONFIG_START(decstation_state::kn02ba)
 	rs232b.dcd_handler().set(m_scc0, FUNC(z80scc_device::dcdb_w));
 	rs232b.cts_handler().set(m_scc0, FUNC(z80scc_device::ctsb_w));
 
-	MCFG_NSCSI_BUS_ADD("scsibus")
-	MCFG_NSCSI_ADD("scsibus:0", dec_scsi_devices, "harddisk", false)
-	MCFG_NSCSI_ADD("scsibus:1", dec_scsi_devices, "cdrom", false)
-	MCFG_NSCSI_ADD("scsibus:2", dec_scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:3", dec_scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:4", dec_scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:5", dec_scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:6", dec_scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:7", dec_scsi_devices, "asc", true)
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("asc", [this] (device_t *device) { ncr5394(device); })
+	NSCSI_BUS(config, "scsibus");
+	NSCSI_CONNECTOR(config, "scsibus:0", dec_scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "scsibus:1", dec_scsi_devices, "cdrom");
+	NSCSI_CONNECTOR(config, "scsibus:2", dec_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:3", dec_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:4", dec_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:5", dec_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:6", dec_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:7", dec_scsi_devices, "asc", true).set_option_machine_config("asc", [this] (device_t *device) { ncr5394(device); });
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( decstation )

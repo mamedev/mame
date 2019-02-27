@@ -142,13 +142,13 @@ READ16_MEMBER( b16_state::vblank_r )
 WRITE8_MEMBER( b16_state::b16_6845_address_w )
 {
 	m_crtc_index = data;
-	m_mc6845->address_w(space,offset, data);
+	m_mc6845->address_w(data);
 }
 
 WRITE8_MEMBER( b16_state::b16_6845_data_w )
 {
 	m_crtc_vreg[m_crtc_index] = data;
-	m_mc6845->register_w(space, offset, data);
+	m_mc6845->register_w(data);
 }
 
 /*
@@ -290,7 +290,7 @@ MACHINE_CONFIG_START(b16_state::b16)
 	m_dma8237->in_memr_callback().set(FUNC(b16_state::memory_read_byte));
 	m_dma8237->out_memw_callback().set(FUNC(b16_state::memory_write_byte));
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_b16)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_b16);
 	MCFG_PALETTE_ADD(m_palette, 8)
 //  MCFG_PALETTE_INIT_STANDARD(black_and_white) // TODO
 

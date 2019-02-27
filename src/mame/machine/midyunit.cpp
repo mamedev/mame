@@ -130,7 +130,7 @@ READ16_MEMBER(midyunit_state::term2_input_r)
 	if (offset != 2)
 		return m_ports[offset]->read();
 
-	return m_term2_adc->read(space, 0) | 0xff00;
+	return m_term2_adc->read() | 0xff00;
 }
 
 WRITE16_MEMBER(midyunit_state::term2_sound_w)
@@ -160,10 +160,10 @@ WRITE16_MEMBER(midyunit_state::term2_sound_w)
 	}
 
 	if (offset == 0)
-		m_term2_adc->write(space, 0, ((data >> 12) & 3) | 4);
+		m_term2_adc->write(((data >> 12) & 3) | 4);
 
 	m_adpcm_sound->reset_write((~data & 0x100) >> 1);
-	m_adpcm_sound->write(space, offset, data);
+	m_adpcm_sound->write(data);
 }
 
 
@@ -577,18 +577,18 @@ WRITE16_MEMBER(midyunit_state::midyunit_sound_w)
 		switch (m_chip_type)
 		{
 			case SOUND_NARC:
-				m_narc_sound->write(space, offset, data);
+				m_narc_sound->write(data);
 				break;
 
 			case SOUND_CVSD_SMALL:
 			case SOUND_CVSD:
 				m_cvsd_sound->reset_write((~data & 0x100) >> 8);
-				m_cvsd_sound->write(space, offset, (data & 0xff) | ((data & 0x200) >> 1));
+				m_cvsd_sound->write((data & 0xff) | ((data & 0x200) >> 1));
 				break;
 
 			case SOUND_ADPCM:
 				m_adpcm_sound->reset_write((~data & 0x100) >> 8);
-				m_adpcm_sound->write(space, offset, data);
+				m_adpcm_sound->write(data);
 				break;
 
 			case SOUND_YAWDIM:

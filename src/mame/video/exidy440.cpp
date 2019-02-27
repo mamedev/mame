@@ -460,22 +460,23 @@ uint32_t topsecex_state::screen_update_topsecex(screen_device &screen, bitmap_in
  *
  *************************************/
 
-MACHINE_CONFIG_START(exidy440_state::exidy440_video)
-	MCFG_PALETTE_ADD("palette", 256)
+void exidy440_state::exidy440_video(machine_config &config)
+{
+	PALETTE(config, m_palette). set_entries(256);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_video_attributes(VIDEO_ALWAYS_UPDATE);
-	screen.set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
-	screen.set_screen_update(FUNC(exidy440_state::screen_update_exidy440));
-	screen.set_palette(m_palette);
-	screen.screen_vblank().set(FUNC(exidy440_state::vblank_interrupt_w));
-	screen.screen_vblank().append(m_custom, FUNC(exidy440_sound_device::sound_interrupt_w));
-MACHINE_CONFIG_END
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
+	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
+	m_screen->set_screen_update(FUNC(exidy440_state::screen_update_exidy440));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(exidy440_state::vblank_interrupt_w));
+	m_screen->screen_vblank().append(m_custom, FUNC(exidy440_sound_device::sound_interrupt_w));
+}
 
 
-MACHINE_CONFIG_START(topsecex_state::topsecex_video)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(0)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, TOPSECEX_VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(topsecex_state, screen_update_topsecex)
-MACHINE_CONFIG_END
+void topsecex_state::topsecex_video(machine_config &config)
+{
+	m_screen->set_video_attributes(0);
+	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, TOPSECEX_VBSTART);
+	m_screen->set_screen_update(FUNC(topsecex_state::screen_update_topsecex));
+}

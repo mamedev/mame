@@ -262,7 +262,7 @@ MACHINE_CONFIG_START(canyon_state::canyon)
 	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", m6502_device::NMI_LINE))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_canyon)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_canyon);
 	PALETTE(config, m_palette, FUNC(canyon_state::canyon_palette), 4);
 
 	/* sound hardware */

@@ -173,6 +173,22 @@ void i80186_cpu_device::execute_run()
 {
 	while(m_icount > 0 )
 	{
+		if((m_dma[0].drq_state && (m_dma[0].control & ST_STOP)) || (m_dma[1].drq_state && (m_dma[1].control & ST_STOP)))
+		{
+			int channel = m_last_dma ? 0 : 1;
+			m_last_dma = !m_last_dma;
+			if(!(m_dma[1].drq_state && (m_dma[1].control & ST_STOP)))
+				channel = 0;
+			else if(!(m_dma[0].drq_state && (m_dma[0].control & ST_STOP)))
+				channel = 1;
+			else if((m_dma[0].control & CHANNEL_PRIORITY) && !(m_dma[1].control & CHANNEL_PRIORITY))
+				channel = 0;
+			else if((m_dma[1].control & CHANNEL_PRIORITY) && !(m_dma[0].control & CHANNEL_PRIORITY))
+				channel = 1;
+			m_icount--;
+			drq_callback(channel);
+			continue;
+		}
 		if ( m_seg_prefix_next )
 		{
 			m_seg_prefix = true;
@@ -627,6 +643,7 @@ void i80186_cpu_device::device_start()
 	save_item(NAME(m_mem.middle_size));
 	save_item(NAME(m_mem.peripheral));
 	save_item(NAME(m_reloc));
+	save_item(NAME(m_last_dma));
 
 	// zerofill
 	memset(m_timer, 0, sizeof(m_timer));

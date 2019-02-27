@@ -269,7 +269,7 @@ void spectra_state::spectra(machine_config &config)
 	m_snsnd->set_envelope_params(0, 0);
 	m_snsnd->set_enable(1);
 	m_snsnd->add_route(ALL_OUTPUTS, "mono", 0.30);
-MACHINE_CONFIG_END
+}
 
 /*--------------------------------
 / Spectra IV

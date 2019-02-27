@@ -21,9 +21,6 @@ class btoads_state : public driver_device
 public:
 	btoads_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_audiocpu(*this, "audiocpu"),
-		m_bsmt(*this, "bsmt"),
-		m_tlc34076(*this, "tlc34076"),
 		m_vram_fg0(*this, "vram_fg0", 16),
 		m_vram_fg1(*this, "vram_fg1", 16),
 		m_vram_fg_data(*this, "vram_fg_data"),
@@ -32,45 +29,16 @@ public:
 		m_sprite_scale(*this, "sprite_scale"),
 		m_sprite_control(*this, "sprite_control"),
 		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_bsmt(*this, "bsmt"),
+		m_tlc34076(*this, "tlc34076"),
 		m_screen(*this, "screen") { }
 
-	// in drivers/btoads
-	DECLARE_WRITE16_MEMBER( main_sound_w );
-	DECLARE_READ16_MEMBER( main_sound_r );
 	DECLARE_CUSTOM_INPUT_MEMBER( main_to_sound_r );
 	DECLARE_CUSTOM_INPUT_MEMBER( sound_to_main_r );
-	DECLARE_WRITE8_MEMBER( sound_data_w );
-	DECLARE_READ8_MEMBER( sound_data_r );
-	DECLARE_READ8_MEMBER( sound_ready_to_send_r );
-	DECLARE_READ8_MEMBER( sound_data_ready_r );
-	DECLARE_WRITE8_MEMBER( sound_int_state_w );
-	DECLARE_READ8_MEMBER( bsmt_ready_r );
-	DECLARE_WRITE8_MEMBER( bsmt2000_port_w );
-
-	// in video/btoads
-	DECLARE_WRITE16_MEMBER( misc_control_w );
-	DECLARE_WRITE16_MEMBER( display_control_w );
-	DECLARE_WRITE16_MEMBER( scroll0_w );
-	DECLARE_WRITE16_MEMBER( scroll1_w );
-	DECLARE_WRITE16_MEMBER( paletteram_w );
-	DECLARE_READ16_MEMBER( paletteram_r );
-	DECLARE_WRITE16_MEMBER( vram_bg0_w );
-	DECLARE_WRITE16_MEMBER( vram_bg1_w );
-	DECLARE_READ16_MEMBER( vram_bg0_r );
-	DECLARE_READ16_MEMBER( vram_bg1_r );
-	DECLARE_WRITE16_MEMBER( vram_fg_display_w );
-	DECLARE_WRITE16_MEMBER( vram_fg_draw_w );
-	DECLARE_READ16_MEMBER( vram_fg_display_r );
-	DECLARE_READ16_MEMBER( vram_fg_draw_r );
-	void render_sprite_row(uint16_t *sprite_source, uint32_t address);
-	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
-	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
-	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline_update);
 
 	void btoads(machine_config &config);
-	void main_map(address_map &map);
-	void sound_io_map(address_map &map);
-	void sound_map(address_map &map);
+
 protected:
 	// device overrides
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -79,17 +47,13 @@ protected:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
+private:
 	// timer IDs
 	enum
 	{
 		TIMER_ID_NOP,
 		TIMER_ID_DELAYED_SOUND
 	};
-
-	// devices
-	required_device<z80_device> m_audiocpu;
-	required_device<bsmt2000_device> m_bsmt;
-	required_device<tlc34076_device> m_tlc34076;
 
 	// shared pointers
 	required_shared_ptr<uint8_t> m_vram_fg0;
@@ -118,6 +82,46 @@ protected:
 	uint16_t m_sprite_dest_offs;
 	uint16_t m_misc_control;
 	int m_xcount;
+
+	// in drivers/btoads
+	DECLARE_WRITE16_MEMBER( main_sound_w );
+	DECLARE_READ16_MEMBER( main_sound_r );
+	DECLARE_WRITE8_MEMBER( sound_data_w );
+	DECLARE_READ8_MEMBER( sound_data_r );
+	DECLARE_READ8_MEMBER( sound_ready_to_send_r );
+	DECLARE_READ8_MEMBER( sound_data_ready_r );
+	DECLARE_WRITE8_MEMBER( sound_int_state_w );
+	DECLARE_READ8_MEMBER( bsmt_ready_r );
+	DECLARE_WRITE8_MEMBER( bsmt2000_port_w );
+
+	// in video/btoads
+	DECLARE_WRITE16_MEMBER( misc_control_w );
+	DECLARE_WRITE16_MEMBER( display_control_w );
+	DECLARE_WRITE16_MEMBER( scroll0_w );
+	DECLARE_WRITE16_MEMBER( scroll1_w );
+	DECLARE_WRITE16_MEMBER( paletteram_w );
+	DECLARE_READ16_MEMBER( paletteram_r );
+	DECLARE_WRITE16_MEMBER( vram_bg0_w );
+	DECLARE_WRITE16_MEMBER( vram_bg1_w );
+	DECLARE_READ16_MEMBER( vram_bg0_r );
+	DECLARE_READ16_MEMBER( vram_bg1_r );
+	DECLARE_WRITE16_MEMBER( vram_fg_display_w );
+	DECLARE_WRITE16_MEMBER( vram_fg_draw_w );
+	DECLARE_READ16_MEMBER( vram_fg_display_r );
+	DECLARE_READ16_MEMBER( vram_fg_draw_r );
+	void render_sprite_row(uint16_t *sprite_source, uint32_t address);
+	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
+	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
+	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline_update);
+
+	// devices
 	required_device<tms34020_device> m_maincpu;
+	required_device<z80_device> m_audiocpu;
+	required_device<bsmt2000_device> m_bsmt;
+	required_device<tlc34076_device> m_tlc34076;
 	required_device<screen_device> m_screen;
+
+	void main_map(address_map &map);
+	void sound_io_map(address_map &map);
+	void sound_map(address_map &map);
 };

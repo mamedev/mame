@@ -99,32 +99,32 @@ WRITE8_MEMBER(cpc_playcity_device::ctc_w)
 
 WRITE8_MEMBER(cpc_playcity_device::ymz1_address_w)
 {
-	m_ymz1->address_w(space,offset,data);
+	m_ymz1->address_w(data);
 }
 
 WRITE8_MEMBER(cpc_playcity_device::ymz2_address_w)
 {
-	m_ymz2->address_w(space,offset,data);
+	m_ymz2->address_w(data);
 }
 
 WRITE8_MEMBER(cpc_playcity_device::ymz1_data_w)
 {
-	m_ymz1->data_w(space,offset,data);
+	m_ymz1->data_w(data);
 }
 
 WRITE8_MEMBER(cpc_playcity_device::ymz2_data_w)
 {
-	m_ymz2->data_w(space,offset,data);
+	m_ymz2->data_w(data);
 }
 
 READ8_MEMBER(cpc_playcity_device::ymz1_data_r)
 {
-	return m_ymz1->data_r(space,offset);
+	return m_ymz1->data_r();
 }
 
 READ8_MEMBER(cpc_playcity_device::ymz2_data_r)
 {
-	return m_ymz2->data_r(space,offset);
+	return m_ymz2->data_r();
 }
 
 void cpc_playcity_device::update_ymz_clock()

@@ -257,13 +257,13 @@ READ8_MEMBER( kaypro_state::kaypro484_status_r )
 {
 /* Need bit 7 high or computer hangs */
 
-	return 0x80 | m_crtc->register_r(space, 0);
+	return 0x80 | m_crtc->register_r();
 }
 
 WRITE8_MEMBER( kaypro_state::kaypro484_index_w )
 {
 	m_mc6845_ind = data & 0x1f;
-	m_crtc->address_w( space, 0, data );
+	m_crtc->address_w(data);
 }
 
 WRITE8_MEMBER( kaypro_state::kaypro484_register_w )
@@ -275,7 +275,7 @@ WRITE8_MEMBER( kaypro_state::kaypro484_register_w )
 	else
 		m_mc6845_reg[m_mc6845_ind] = data;
 
-	m_crtc->register_w( space, 0, data );
+	m_crtc->register_w(data);
 
 	if ((m_mc6845_ind == 1) || (m_mc6845_ind == 6) || (m_mc6845_ind == 9))
 		mc6845_screen_configure();          /* adjust screen size */

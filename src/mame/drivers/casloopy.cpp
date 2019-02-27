@@ -421,7 +421,7 @@ WRITE8_MEMBER(casloopy_state::bitmap_w)
 
 READ32_MEMBER(casloopy_state::cart_r)
 {
-	return m_cart->read32_rom(space, offset, mem_mask);
+	return m_cart->read32_rom(offset, mem_mask);
 }
 
 
@@ -539,7 +539,7 @@ MACHINE_CONFIG_START(casloopy_state::casloopy)
 
 	MCFG_PALETTE_ADD("palette", 512)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfxdecode_device::empty);
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "loopy_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,ic1")
@@ -549,7 +549,7 @@ MACHINE_CONFIG_START(casloopy_state::casloopy)
 	MCFG_GENERIC_LOAD(casloopy_state, loopy_cart)
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","casloopy")
+	SOFTWARE_LIST(config, "cart_list").set_original("casloopy");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

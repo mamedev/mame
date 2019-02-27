@@ -284,7 +284,8 @@ static const z80_daisy_config rt1715_daisy_chain[] =
 	{ nullptr }
 };
 
-MACHINE_CONFIG_START(rt1715_state::rt1715)
+void rt1715_state::rt1715(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 9.832_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &rt1715_state::rt1715_mem);
@@ -292,21 +293,21 @@ MACHINE_CONFIG_START(rt1715_state::rt1715)
 	m_maincpu->set_daisy_config(rt1715_daisy_chain);
 
 	/* keyboard */
-	MCFG_DEVICE_ADD("keyboard", Z80, 683000)
-	MCFG_DEVICE_PROGRAM_MAP(k7658_mem)
-	MCFG_DEVICE_IO_MAP(k7658_io)
+	z80_device &keyboard(Z80(config, "keyboard", 683000));
+	keyboard.set_addrmap(AS_PROGRAM, &rt1715_state::k7658_mem);
+	keyboard.set_addrmap(AS_IO, &rt1715_state::k7658_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_UPDATE_DEVICE("a26", i8275_device, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(13.824_MHz_XTAL, 864, 0, 624, 320, 0, 300) // ?
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_screen_update("a26", FUNC(i8275_device::screen_update));
+	screen.set_raw(13.824_MHz_XTAL, 864, 0, 624, 320, 0, 300); // ?
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_rt1715);
 	PALETTE(config, "palette", FUNC(rt1715_state::rt1715_palette), 3);
 
-	MCFG_DEVICE_ADD("a26", I8275, 13.824_MHz_XTAL / 8)
-	MCFG_I8275_CHARACTER_WIDTH(8)
-	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(rt1715_state, crtc_display_pixels)
+	i8275_device &a26(I8275(config, "a26", 13.824_MHz_XTAL / 8));
+	a26.set_character_width(8);
+	a26.set_display_callback(FUNC(rt1715_state::crtc_display_pixels), this);
 
 	z80ctc_device& ctc(Z80CTC(config, "a30", 9.832_MHz_XTAL / 4));
 	ctc.zc_callback<0>().set("a29", FUNC(z80sio_device::txca_w));
@@ -320,11 +321,12 @@ MACHINE_CONFIG_START(rt1715_state::rt1715)
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K").set_default_value(0x00);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(rt1715_state::rt1715w)
+void rt1715_state::rt1715w(machine_config &config)
+{
 	rt1715(config);
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

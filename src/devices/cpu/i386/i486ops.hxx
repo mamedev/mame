@@ -44,13 +44,15 @@ void i386_device::i486_cpuid()             // Opcode 0x0F A2
 
 void i386_device::i486_invd()              // Opcode 0x0f 08
 {
-	// Nothing to do ?
+	// TODO: manage the cache if present
+	opcode_invd();
 	CYCLES(CYCLES_INVD);
 }
 
 void i386_device::i486_wbinvd()            // Opcode 0x0f 09
 {
-	// Nothing to do ?
+	// TODO: manage the cache if present
+	opcode_wbinvd();
 }
 
 void i386_device::i486_cmpxchg_rm8_r8()    // Opcode 0x0f b0
@@ -233,6 +235,8 @@ void i386_device::i486_group0F01_16()      // Opcode 0x0f 01
 					ea = GetEA(modrm,1);
 				}
 				WRITE16(ea, m_gdtr.limit);
+				// Win32s requires all 32 bits to be stored here, despite various Intel docs
+				// claiming that the upper 8 bits are either zeroed or undefined in 16-bit mode
 				WRITE32(ea + 2, m_gdtr.base);
 				CYCLES(CYCLES_SGDT);
 				break;

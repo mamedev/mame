@@ -248,26 +248,26 @@ void rockrage_state::machine_reset()
 	m_vreg = 0;
 }
 
-MACHINE_CONFIG_START(rockrage_state::rockrage)
-
+void rockrage_state::rockrage(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", HD6309E, XTAL(24'000'000) / 8)
-	MCFG_DEVICE_PROGRAM_MAP(rockrage_map)
+	HD6309E(config, m_maincpu, XTAL(24'000'000) / 8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &rockrage_state::rockrage_map);
 
-	MCFG_DEVICE_ADD("audiocpu", MC6809E, XTAL(24'000'000) / 16)
-	MCFG_DEVICE_PROGRAM_MAP(rockrage_sound_map)
+	MC6809E(config, m_audiocpu, XTAL(24'000'000) / 16);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &rockrage_state::rockrage_sound_map);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(rockrage_state, screen_update_rockrage)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, rockrage_state, vblank_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(rockrage_state::screen_update_rockrage));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(rockrage_state::vblank_irq));
 
 	K007342(config, m_k007342, 0);
 	m_k007342->set_gfxnum(0);
@@ -292,11 +292,11 @@ MACHINE_CONFIG_START(rockrage_state::rockrage)
 
 	YM2151(config, "ymsnd", 3579545).add_route(0, "lspeaker", 0.60).add_route(1, "rspeaker", 0.60);
 
-	MCFG_DEVICE_ADD("vlm", VLM5030, 3579545)
-	MCFG_DEVICE_ADDRESS_MAP(0, rockrage_vlm_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
-MACHINE_CONFIG_END
+	VLM5030(config, m_vlm, 3579545);
+	m_vlm->set_addrmap(0, &rockrage_state::rockrage_vlm_map);
+	m_vlm->add_route(ALL_OUTPUTS, "lspeaker", 0.60);
+	m_vlm->add_route(ALL_OUTPUTS, "rspeaker", 0.60);
+}
 
 
 /***************************************************************************

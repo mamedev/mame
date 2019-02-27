@@ -313,7 +313,7 @@ uint32_t gmaster_state::screen_update_gmaster(screen_device &screen, bitmap_ind1
 void gmaster_state::machine_start()
 {
 	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0xfeff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0xfeff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 
 	save_item(NAME(m_video.data));
 	save_item(NAME(m_video.index));
@@ -327,7 +327,8 @@ void gmaster_state::machine_start()
 }
 
 
-MACHINE_CONFIG_START(gmaster_state::gmaster)
+void gmaster_state::gmaster(machine_config &config)
+{
 	upd7810_device &upd(UPD7810(config, m_maincpu, 12_MHz_XTAL/2/*?*/)); // µPD78C11 in the unit
 	upd.set_addrmap(AS_PROGRAM, &gmaster_state::gmaster_mem);
 	upd.pa_in_cb().set_ioport("JOY");
@@ -353,11 +354,11 @@ MACHINE_CONFIG_START(gmaster_state::gmaster)
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(0, "mono", 0.50);
 
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "gmaster_cart")
-	MCFG_GENERIC_MANDATORY
+	GENERIC_CARTSLOT(config, m_cart, generic_linear_slot, "gmaster_cart").set_must_be_loaded(true);
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list","gmaster")
-MACHINE_CONFIG_END
+
+	SOFTWARE_LIST(config, "cart_list").set_original("gmaster");
+}
 
 
 ROM_START(gmaster)

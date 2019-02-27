@@ -1,6 +1,34 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
 // Commodore PC 10 / PC 20 / PC 30
+/***************************************************************************
+Commodore PC10 / PC20 / PC30
+Links: http://www.zimmers.net/cbmpics/cpcs.html , https://de.wikipedia.org/wiki/Commodore_PC-10_bis_PC-60 , http://mingos-commodorepage.tumblr.com/post/123656301482/commodore-pc-20-beim-pc-20-handelt-es-sich-um
+http://www.richardlagendijk.nl/cip/computer/item/pc20ii/de
+Form Factor: Desktop
+CPU: 8088 @ 4.77 MHz
+RAM: 256K / 512K / 640K
+BUS: 5x ISA
+Video: MDA
+Mass storage: PC10: 1 or 2x 5.25" 360K , PC20: 1x 360K + 10MB HD, PC30: 1x 360K + 20MB HD
+On board ports: Floppy, serial, parallel, speaker
+Options: 8087 FPU
+
+
+Commodore PC-10 III
+=============
+Links: http://dostalgie.de/downloads/pc10III-20III/PC10III_OM_COMMODORE_EN_DE.pdf ; ftp://ftp.zimmers.net/pub/cbm-pc/documents/PC-8088-Information.txt
+Info: PC10-III and PC20-III are the same machines - PC10 has two floppies, PC20 one floppy and one harddisk
+Form Factor: Desktop
+CPU: 8088 @ 4.77 MHz / 7.16 MHz / 9.54 MHz
+RAM: 640K
+Bus: 3x ISA
+Video: On board: MDA/CGA/Hercules/Plantronics
+Mass storage: 1x Floppy 5.25" 360K and (PC10) another 360K or (PC20) 3.5" harddisk
+On board ports: Floppy, XT-IDE Harddisk, Mouse, serial, parallel, RTC, Speaker
+Options: 8087 FPU
+***************************************************************************/
+
 #include "emu.h"
 
 #include "cpu/i86/i86.h"
@@ -192,14 +220,15 @@ void compc_state::compciii_io(address_map &map)
 	map(0x0060, 0x0063).rw(FUNC(compc_state::pioiii_r), FUNC(compc_state::pioiii_w));
 }
 
-MACHINE_CONFIG_START(compc_state::compc)
-	MCFG_DEVICE_ADD("maincpu", I8088, 4772720*2)
-	MCFG_DEVICE_PROGRAM_MAP(compc_map)
-	MCFG_DEVICE_IO_MAP(compc_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
+void compc_state::compc(machine_config &config)
+{
+	I8088(config, m_maincpu, 4772720*2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &compc_state::compc_map);
+	m_maincpu->set_addrmap(AS_IO, &compc_state::compc_io);
+	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
-	MCFG_PCNOPPI_MOTHERBOARD_ADD("mb", "maincpu")
-	MCFG_DEVICE_REMOVE("mb:pit8253")
+	PCNOPPI_MOTHERBOARD(config, "mb", 0).set_cputag(m_maincpu);
+	config.device_remove("mb:pit8253");
 	fe2010_pit_device &pit(FE2010_PIT(config, "mb:pit8253", 0));
 	pit.set_clk<0>(XTAL(14'318'181)/12.0); /* heartbeat IRQ */
 	pit.out_handler<0>().set("mb:pic8259", FUNC(pic8259_device::ir0_w));
@@ -209,25 +238,26 @@ MACHINE_CONFIG_START(compc_state::compc)
 	pit.out_handler<2>().set(m_mb, FUNC(ibm5160_mb_device::pc_pit8253_out2_changed));
 
 	// FIXME: determine ISA bus clock
-	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "mda", false)
-	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "lpt", false)
-	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "com", false)
-	MCFG_DEVICE_ADD("isa4", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "fdc_xt", false)
+	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, "mda", false);
+	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, "lpt", false);
+	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, "com", false);
+	ISA8_SLOT(config, "isa4", 0, "mb:isa", pc_isa8_cards, "fdc_xt", false);
 
-	MCFG_PC_KEYB_ADD("pc_keyboard", WRITELINE("mb:pic8259", pic8259_device, ir1_w))
+	PC_KEYB(config, m_keyboard);
+	m_keyboard->keypress().set("mb:pic8259", FUNC(pic8259_device::ir1_w));
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("256K").set_extra_options("512K, 640K");
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("disk_list", "ibm5150")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "disk_list").set_original("ibm5150");
+}
 
-MACHINE_CONFIG_START(compc_state::pc10iii)
+void compc_state::pc10iii(machine_config &config)
+{
 	compc(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(compciii_io)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_IO, &compc_state::compciii_io);
+}
 
 ROM_START(compc10)
 	ROM_REGION(0x10000, "bios", 0)

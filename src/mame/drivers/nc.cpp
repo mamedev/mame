@@ -1378,36 +1378,35 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(nc_state::nc_base)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, /*6000000*/ 4606000)        /* Russell Marks says this is more accurate */
-	MCFG_DEVICE_PROGRAM_MAP(nc_map)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	Z80(config, m_maincpu, /*6000000*/ 4606000);        /* Russell Marks says this is more accurate */
+	m_maincpu->set_addrmap(AS_PROGRAM, &nc_state::nc_map);
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(nc_state::nc_colours), NC_NUM_COLOURS);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("beep.1", BEEP, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_DEVICE_ADD("beep.2", BEEP, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	BEEP(config, m_beeper1, 0).add_route(ALL_OUTPUTS, "mono", 0.50);
+	BEEP(config, m_beeper2, 0).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* printer */
-	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, nc_state, write_centronics_busy))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(nc_state::write_centronics_busy));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
 
 	/* uart */
 	I8251(config, m_uart, 0);
 
-	MCFG_DEVICE_ADD("uart_clock", CLOCK, 19200)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, nc_state, write_uart_clock))
+	clock_device &uart_clock(CLOCK(config, "uart_clock", 19200));
+	uart_clock.signal_handler().set(FUNC(nc_state::write_uart_clock));
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cardslot", generic_plain_slot, nullptr)
@@ -1419,24 +1418,23 @@ MACHINE_CONFIG_START(nc_state::nc_base)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
 
 	/* dummy timer */
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("dummy_timer", nc_state, dummy_timer_callback, attotime::from_hz(50))
+	TIMER(config, "dummy_timer").configure_periodic(FUNC(nc_state::dummy_timer_callback), attotime::from_hz(50));
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(nc100_state::nc100)
+void nc100_state::nc100(machine_config &config)
+{
 	nc_base(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(nc100_io)
+	m_maincpu->set_addrmap(AS_IO, &nc100_state::nc100_io);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_SIZE(480, 64)
-	MCFG_SCREEN_VISIBLE_AREA(0, 480-1, 0, 64-1)
-	MCFG_SCREEN_UPDATE_DRIVER(nc100_state, screen_update_nc100)
+	screen_device &screen(*subdevice<screen_device>("screen"));
+	screen.set_size(480, 64);
+	screen.set_visarea(0, 480-1, 0, 64-1);
+	screen.set_screen_update(FUNC(nc100_state::screen_update_nc100));
 
 	/* printer */
-	MCFG_DEVICE_MODIFY("centronics")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, nc100_state, write_nc100_centronics_ack))
+	m_centronics->ack_handler().set(FUNC(nc100_state::write_nc100_centronics_ack));
 
 	/* uart */
 	m_uart->rxrdy_handler().set(FUNC(nc100_state::nc100_rxrdy_callback));
@@ -1445,7 +1443,7 @@ MACHINE_CONFIG_START(nc100_state::nc100)
 	/* rtc */
 	tc8521_device &rtc(TC8521(config, "rtc", XTAL(32'768)));
 	rtc.out_alarm_callback().set(FUNC(nc100_state::nc100_tc8521_alarm_callback));
-MACHINE_CONFIG_END
+}
 
 static const floppy_format_type ibmpc_floppy_formats[] = {
 	FLOPPY_PC_FORMAT,
@@ -1458,25 +1456,24 @@ static void ibmpc_floppies(device_slot_interface &device)
 	device.option_add("525dd", FLOPPY_525_DD);
 }
 
-MACHINE_CONFIG_START(nc200_state::nc200)
+void nc200_state::nc200(machine_config &config)
+{
 	nc_base(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(nc200_io)
+	m_maincpu->set_addrmap(AS_IO, &nc200_state::nc200_io);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_SIZE(NC200_SCREEN_WIDTH, NC200_SCREEN_HEIGHT)
-	MCFG_SCREEN_VISIBLE_AREA(0, NC200_SCREEN_WIDTH-1, 0, NC200_SCREEN_HEIGHT-1)
-	MCFG_SCREEN_UPDATE_DRIVER(nc200_state, screen_update_nc200)
+	screen_device &screen(*subdevice<screen_device>("screen"));
+	screen.set_size(NC200_SCREEN_WIDTH, NC200_SCREEN_HEIGHT);
+	screen.set_visarea(0, NC200_SCREEN_WIDTH-1, 0, NC200_SCREEN_HEIGHT-1);
+	screen.set_screen_update(FUNC(nc200_state::screen_update_nc200));
 
 	palette_device &palette(*subdevice<palette_device>("palette"));
 	palette.set_entries(NC200_NUM_COLOURS);
 	palette.set_init(FUNC(nc200_state::nc_colours));
 
 	/* printer */
-	MCFG_DEVICE_MODIFY("centronics")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, nc200_state, write_nc200_centronics_ack))
+	m_centronics->ack_handler().set(FUNC(nc200_state::write_nc200_centronics_ack));
 
 	/* uart */
 	m_uart->rxrdy_handler().set(FUNC(nc200_state::nc200_rxrdy_callback));
@@ -1484,14 +1481,14 @@ MACHINE_CONFIG_START(nc200_state::nc200)
 
 	UPD765A(config, m_fdc, 8'000'000, true, true);
 	m_fdc->intrq_wr_callback().set(FUNC(nc200_state::nc200_fdc_interrupt));
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", ibmpc_floppies, "525dd", ibmpc_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", ibmpc_floppies, "525dd", ibmpc_floppy_formats)
+	FLOPPY_CONNECTOR(config, "upd765:0", ibmpc_floppies, "525dd", ibmpc_floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765:1", ibmpc_floppies, "525dd", ibmpc_floppy_formats);
 
-	MCFG_DEVICE_ADD("mc", MC146818, 4.194304_MHz_XTAL)
+	MC146818(config, "mc", 4.194304_MHz_XTAL);
 
 	/* internal ram */
 	m_ram->set_default_size("128K");
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

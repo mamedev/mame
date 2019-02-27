@@ -104,7 +104,6 @@
 
 
 #include "emu.h"
-#include "includes/mcr.h"
 #include "includes/mcr3.h"
 
 #include "machine/nvram.h"
@@ -260,11 +259,11 @@ WRITE8_MEMBER(mcr3_state::maxrpm_op6_w)
 
 	/* when the read is toggled is when the ADC value is latched */
 	if (!(data & 0x80))
-		m_latched_input = m_maxrpm_adc->read(space, 0);
+		m_latched_input = m_maxrpm_adc->read();
 
 	/* when both the write and the enable are low, it's a write to the ADC0844 */
 	if (!(data & 0x40) && !(data & 0x20))
-		m_maxrpm_adc->write(space, 0, bitswap<4>(m_maxrpm_adc_control, 2, 3, 1, 0));
+		m_maxrpm_adc->write(bitswap<4>(m_maxrpm_adc_control, 2, 3, 1, 0));
 
 	/* low 5 bits control the turbo CS */
 	m_turbo_cheap_squeak->write(space, offset, data);
@@ -390,7 +389,7 @@ WRITE8_MEMBER(mcr3_state::stargrds_op6_w)
 
 READ8_MEMBER(mcr3_state::spyhunt_ip1_r)
 {
-	return ioport("ssio:IP1")->read() | (m_cheap_squeak_deluxe->stat_r(space, 0) << 5);
+	return ioport("ssio:IP1")->read() | (m_cheap_squeak_deluxe->stat_r() << 5);
 }
 
 
@@ -430,7 +429,7 @@ WRITE8_MEMBER(mcr3_state::spyhunt_op4_w)
 	m_last_op4 = data;
 
 	/* low 5 bits go to control the Cheap Squeak Deluxe */
-	m_cheap_squeak_deluxe->sr_w(space, offset, data & 0x0f);
+	m_cheap_squeak_deluxe->sr_w(data & 0x0f);
 	m_cheap_squeak_deluxe->sirq_w(BIT(data, 4));
 }
 
@@ -1078,15 +1077,15 @@ GFXDECODE_END
  *************************************/
 
 /* Core MCR monoboard system with no sound */
-MACHINE_CONFIG_START(mcr3_state::mcrmono)
-
+void mcr3_state::mcrmono(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, MASTER_CLOCK/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mcr3_state::mcrmono_map);
 	m_maincpu->set_addrmap(AS_IO, &mcr3_state::mcrmono_portmap);
 	m_maincpu->set_daisy_config(mcr_daisy_chain);
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mcr3_state, mcr_interrupt, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(mcr3_state::mcr_interrupt), "screen", 0, 1);
 
 	Z80CTC(config, m_ctc, MASTER_CLOCK/4 /* same as "maincpu" */);
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -1101,32 +1100,33 @@ MACHINE_CONFIG_START(mcr3_state::mcrmono)
 	SPEAKER(config, "rspeaker").front_right();
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(30)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*16, 30*16)
-	MCFG_SCREEN_VISIBLE_AREA(0*16, 32*16-1, 0*16, 30*16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mcr3_state, screen_update_mcr3)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	m_screen->set_refresh_hz(30);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	m_screen->set_size(32*16, 30*16);
+	m_screen->set_visarea(0*16, 32*16-1, 0*16, 30*16-1);
+	m_screen->set_screen_update(FUNC(mcr3_state::screen_update_mcr3));
+	m_screen->set_palette(m_palette);
 
-	GFXDECODE(config, "gfxdecode", "palette", gfx_mcr3);
-	PALETTE(config, "palette").set_entries(64);
-MACHINE_CONFIG_END
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mcr3);
+	PALETTE(config, m_palette).set_entries(64);
+}
 
 
 /*************************************/
 
 
 /* Sarge/Demolition Derby Mono/Max RPM = MCR monoboard with Turbo Cheap Squeak */
-MACHINE_CONFIG_START(mcr3_state::mono_tcs)
+void mcr3_state::mono_tcs(machine_config &config)
+{
 	mcrmono(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("tcs", MIDWAY_TURBO_CHEAP_SQUEAK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	MIDWAY_TURBO_CHEAP_SQUEAK(config, m_turbo_cheap_squeak);
+	m_turbo_cheap_squeak->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_turbo_cheap_squeak->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+}
 
 void mcr3_state::maxrpm(machine_config &config)
 {
@@ -1141,51 +1141,53 @@ void mcr3_state::maxrpm(machine_config &config)
 
 
 /* Rampage/Power Drive/Star Guards = MCR monoboard with Sounds Good */
-MACHINE_CONFIG_START(mcr3_state::mono_sg)
+void mcr3_state::mono_sg(machine_config &config)
+{
 	mcrmono(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("sg", MIDWAY_SOUNDS_GOOD)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	MIDWAY_SOUNDS_GOOD(config, m_sounds_good);
+	m_sounds_good->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_sounds_good->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+}
 
 
 /*************************************/
 
 
 /* Core scrolling system with SSIO sound */
-MACHINE_CONFIG_START(mcr3_state::mcrscroll)
+void mcr3_state::mcrscroll(machine_config &config)
+{
 	mcrmono(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("ssio", MIDWAY_SSIO)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MIDWAY_SSIO(config, m_ssio);
+	m_ssio->add_route(0, "lspeaker", 1.0);
+	m_ssio->add_route(1, "rspeaker", 1.0);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &mcr3_state::spyhunt_map);
 	m_maincpu->set_addrmap(AS_IO, &mcr3_state::spyhunt_portmap);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_SIZE(30*16, 30*16)
-	MCFG_SCREEN_VISIBLE_AREA(0, 30*16-1, 0, 30*16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mcr3_state, screen_update_spyhunt)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_spyhunt)
+	m_screen->set_size(30*16, 30*16);
+	m_screen->set_visarea(0, 30*16-1, 0, 30*16-1);
+	m_screen->set_screen_update(FUNC(mcr3_state::screen_update_spyhunt));
+	m_gfxdecode->set_info(gfx_spyhunt);
 	subdevice<palette_device>("palette")->set_entries(64 + 4).set_init(FUNC(mcr3_state::spyhunt_palette));
 
 	MCFG_VIDEO_START_OVERRIDE(mcr3_state,spyhunt)
-MACHINE_CONFIG_END
+}
 
 
 /* Spy Hunter = scrolling system with an SSIO and a cheap squeak deluxe */
-MACHINE_CONFIG_START(mcr3_state::mcrsc_csd)
+void mcr3_state::mcrsc_csd(machine_config &config)
+{
 	mcrscroll(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("csd", MIDWAY_CHEAP_SQUEAK_DELUXE)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MIDWAY_CHEAP_SQUEAK_DELUXE(config, m_cheap_squeak_deluxe);
+	m_cheap_squeak_deluxe->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_cheap_squeak_deluxe->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
 	CD4099(config, m_lamplatch); // U1 on Lamp Driver Board
 	m_lamplatch->q_out_cb<0>().set_output("lamp0");
@@ -1196,12 +1198,7 @@ MACHINE_CONFIG_START(mcr3_state::mcrsc_csd)
 	m_lamplatch->q_out_cb<5>().set_output("lamp5");
 	m_lamplatch->q_out_cb<6>().set_output("lamp6");
 	m_lamplatch->q_out_cb<7>().set_output("lamp7");
-MACHINE_CONFIG_END
-
-
-
-
-
+}
 
 
 /*************************************

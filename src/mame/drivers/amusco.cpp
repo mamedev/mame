@@ -139,8 +139,8 @@ private:
 	MC6845_UPDATE_ROW(update_row);
 	void amusco_palette(palette_device &palette) const;
 
-	void amusco_mem_map(address_map &map);
-	void amusco_io_map(address_map &map);
+	void mem_map(address_map &map);
+	void io_map(address_map &map);
 
 	std::unique_ptr<uint8_t []> m_videoram;
 	tilemap_t *m_bg_tilemap;
@@ -209,25 +209,25 @@ void amusco_state::machine_start()
 * Memory Map Information *
 *************************/
 
-void amusco_state::amusco_mem_map(address_map &map)
+void amusco_state::mem_map(address_map &map)
 {
 	map(0x00000, 0x0ffff).ram();
-	map(0xf8000, 0xfffff).rom();
+	map(0xf8000, 0xfffff).rom().region("maincpu", 0);
 }
 
 READ8_MEMBER( amusco_state::mc6845_r)
 {
 	if(offset & 1)
-		return m_crtc->register_r(space, 0);
+		return m_crtc->register_r();
 
-	return m_crtc->status_r(space,0); // not a plain 6845, requests update bit here ...
+	return m_crtc->status_r(); // not a plain 6845, requests update bit here ...
 }
 
 WRITE8_MEMBER( amusco_state::mc6845_w)
 {
 	if(offset & 1)
 	{
-		m_crtc->register_w(space, 0,data);
+		m_crtc->register_w(data);
 		if(m_mc6845_address == 0x12)
 			m_video_update_address = ((data & 0xff) << 8) | (m_video_update_address & 0x00ff);
 		if(m_mc6845_address == 0x13)
@@ -235,7 +235,7 @@ WRITE8_MEMBER( amusco_state::mc6845_w)
 	}
 	else
 	{
-		m_crtc->address_w(space,0,data);
+		m_crtc->address_w(data);
 		m_mc6845_address = data;
 	}
 }
@@ -365,14 +365,14 @@ WRITE8_MEMBER(amusco_state::rtc_control_w)
 	m_rtc->read_w(BIT(data, 4));
 }
 
-void amusco_state::amusco_io_map(address_map &map)
+void amusco_state::io_map(address_map &map)
 {
 	map(0x0000, 0x0001).rw(FUNC(amusco_state::mc6845_r), FUNC(amusco_state::mc6845_w));
 	map(0x0010, 0x0011).w(m_pic, FUNC(pic8259_device::write));
 	map(0x0020, 0x0023).w(m_pit, FUNC(pit8253_device::write));
 	map(0x0030, 0x0033).rw("ppi_outputs", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x0040, 0x0043).rw("ppi_inputs", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x0060, 0x0060).w("sn", FUNC(sn76489a_device::command_w));
+	map(0x0060, 0x0060).w("sn", FUNC(sn76489a_device::write));
 	map(0x0070, 0x0071).w(FUNC(amusco_state::vram_w));
 	map(0x0280, 0x0283).rw("lpt_interface", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
 	map(0x0380, 0x0383).rw("rtc_interface", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
@@ -536,8 +536,8 @@ MACHINE_CONFIG_START(amusco_state::amusco)
 
 	/* basic machine hardware */
 	I8088(config, m_maincpu, CPU_CLOCK);        // 5 MHz ?
-	m_maincpu->set_addrmap(AS_PROGRAM, &amusco_state::amusco_mem_map);
-	m_maincpu->set_addrmap(AS_IO, &amusco_state::amusco_io_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &amusco_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &amusco_state::io_map);
 	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
 
 	PIC8259(config, m_pic, 0);
@@ -571,7 +571,7 @@ MACHINE_CONFIG_START(amusco_state::amusco)
 	i8155b.in_pc_callback().set(m_rtc, FUNC(msm5832_device::data_r));
 	i8155b.out_pc_callback().set(m_rtc, FUNC(msm5832_device::data_w));
 
-	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(30), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH)
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(30), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -599,19 +599,19 @@ MACHINE_CONFIG_START(amusco_state::amusco)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(amusco_state::draw88pkr)
+void amusco_state::draw88pkr(machine_config &config)
+{
 	amusco(config);
 	//MCFG_DEVICE_MODIFY("ppi_outputs") // Some bits are definitely different
-MACHINE_CONFIG_END
-
+}
 
 /*************************
 *        Rom Load        *
 *************************/
 
 ROM_START( amusco )
-	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD( "pk_v1.4_u42.u42",  0xf8000, 0x08000, CRC(bf57d7b1) SHA1(fc8b062b12c241c6c096325f728305316b80be8b) )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "pk_v1.4_u42.u42",  0x0000, 0x8000, CRC(bf57d7b1) SHA1(fc8b062b12c241c6c096325f728305316b80be8b) )
 
 	ROM_REGION( 0xc000, "gfx1", 0 )
 	ROM_LOAD( "char_a_u35.u35",  0x0000, 0x4000, CRC(ded67ef6) SHA1(da7326c190211e956e5a5f763d5045615bb8ffb3) )
@@ -638,8 +638,8 @@ ROM_END
 
 */
 ROM_START( draw88pkr )
-	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD( "u42.bin",  0xf8000, 0x08000, CRC(e98a7cfd) SHA1(8dc581c3e0cfd78bd33fbbbafd40307cf66f154d) )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "u42.bin",  0x0000, 0x8000, CRC(e98a7cfd) SHA1(8dc581c3e0cfd78bd33fbbbafd40307cf66f154d) )
 
 	ROM_REGION( 0xc000, "gfx1", 0 )
 	ROM_LOAD( "u35.bin",  0x0000, 0x4000, CRC(f608019a) SHA1(f0c5e10a03f39976d9bc6e8bc9f78e30ffefa03e) )
@@ -647,11 +647,10 @@ ROM_START( draw88pkr )
 	ROM_LOAD( "u37.bin",  0x8000, 0x4000, CRC(6e23b9f2) SHA1(6916828d84d1ecb44dc454e6786f97801a8550c7) )
 ROM_END
 
-
 /*************************
 *      Game Drivers      *
 *************************/
 
-/*     YEAR  NAME       PARENT  MACHINE    INPUT      CLASS         INIT        ROT   COMPANY      FULLNAME                       FLAGS                                                LAYOUT    */
-GAMEL( 1987, amusco,    0,      amusco,    amusco,    amusco_state, empty_init, ROT0, "Amusco",    "American Music Poker (V1.4)", MACHINE_IMPERFECT_COLORS | MACHINE_NODEVICE_PRINTER, layout_amusco ) // palette totally wrong
-GAMEL( 1988, draw88pkr, 0,      draw88pkr, draw88pkr, amusco_state, empty_init, ROT0, "BTE, Inc.", "Draw 88 Poker (V2.0)",        MACHINE_IMPERFECT_COLORS | MACHINE_NODEVICE_PRINTER, layout_amusco ) // palette totally wrong
+/*     YEAR  NAME       PARENT  MACHINE    INPUT      CLASS         INIT        ROT   COMPANY            FULLNAME                       FLAGS                                                LAYOUT    */
+GAMEL( 1987, amusco,    0,      amusco,    amusco,    amusco_state, empty_init, ROT0, "Amusco",          "American Music Poker (V1.4)", MACHINE_IMPERFECT_COLORS | MACHINE_NODEVICE_PRINTER, layout_amusco ) // palette totally wrong
+GAMEL( 1988, draw88pkr, 0,      draw88pkr, draw88pkr, amusco_state, empty_init, ROT0, "BTE, Inc.",       "Draw 88 Poker (V2.0)",        MACHINE_IMPERFECT_COLORS | MACHINE_NODEVICE_PRINTER, layout_amusco ) // palette totally wrong

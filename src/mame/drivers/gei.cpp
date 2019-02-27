@@ -1006,13 +1006,13 @@ MACHINE_CONFIG_START(gei_state::getrivia)
 	m_ppi[1]->out_pb_callback().set(FUNC(gei_state::lamps_w));
 	m_ppi[1]->out_pc_callback().set(FUNC(gei_state::lamps2_w));
 
-	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
+	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gei_state::findout)
@@ -1039,7 +1039,7 @@ MACHINE_CONFIG_START(gei_state::gselect)
 
 	/* basic machine hardware */
 
-	MCFG_DEVICE_REMOVE("ticket")
+	config.device_remove("ticket");
 
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(gselect_map)
@@ -1055,7 +1055,7 @@ MACHINE_CONFIG_START(gei_state::jokpokera)
 
 	/* basic machine hardware */
 
-	MCFG_DEVICE_REMOVE("ticket")
+	config.device_remove("ticket");
 
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(gselect_map)
@@ -1743,11 +1743,11 @@ ROM_START( quizvid )
 	ROM_LOAD( "quiz.reva.attuale.5", 0x30000, 0x8000, CRC(a3642478) SHA1(57851aabc6d2f5acff426c09574559e141da5d13) )
 
 	ROM_REGION( 0x0104, "plds", 0 )
-	ROM_LOAD( "pal10l8cn.pal1",            0x0000, 0x002c, CRC(7f4499de) SHA1(74838150d0b71171f00f65e03748b262c2bb6e4c) )
-	ROM_LOAD( "pal10l8cn.pal4",            0x0000, 0x002c, CRC(f14a34ab) SHA1(78af7f5eafbf2d52ee7b01b497ad59448c986693) )
-	ROM_LOAD( "pal16l8a-2.bad.dump",       0x0000, 0x0104, BAD_DUMP CRC(e9cd78fb) SHA1(557d3e7ef3b25c1338b24722cac91bca788c02b8) )
-	ROM_LOAD( "pal16l8cn.pal3.bad.dump",   0x0000, 0x0104, BAD_DUMP CRC(e9cd78fb) SHA1(557d3e7ef3b25c1338b24722cac91bca788c02b8) )
-	ROM_LOAD( "pal16l8cn.pal5.bad.dump",   0x0000, 0x0104, BAD_DUMP CRC(e9cd78fb) SHA1(557d3e7ef3b25c1338b24722cac91bca788c02b8) )
+	ROM_LOAD( "pal10l8cn.pal1", 0x0000, 0x002c, CRC(7f4499de) SHA1(74838150d0b71171f00f65e03748b262c2bb6e4c) )
+	ROM_LOAD( "pal10l8cn.pal4", 0x0000, 0x002c, CRC(f14a34ab) SHA1(78af7f5eafbf2d52ee7b01b497ad59448c986693) )
+	ROM_LOAD( "pal16l8a-2.bin", 0x0000, 0x0104, NO_DUMP )
+	ROM_LOAD( "pal16l8cn.pal3", 0x0000, 0x0104, NO_DUMP )
+	ROM_LOAD( "pal16l8cn.pal5", 0x0000, 0x0104, NO_DUMP )
 ROM_END
 
 ROM_START( quiz211 )

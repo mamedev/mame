@@ -44,7 +44,7 @@ void peg400_floppies(device_slot_interface &device)
 void electron_peg400_device::device_add_mconfig(machine_config &config)
 {
 	/* fdc */
-	WD1770(config, m_fdc, 16_MHz_XTAL / 2);
+	WD1770(config, m_fdc, DERIVED_CLOCK(1, 2));
 	m_fdc->drq_wr_callback().set(FUNC(electron_peg400_device::fdc_drq_w));
 	FLOPPY_CONNECTOR(config, m_floppy0, peg400_floppies, "525qd", electron_peg400_device::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppy1, peg400_floppies, nullptr, electron_peg400_device::floppy_formats).enable_sound(true);
@@ -79,7 +79,7 @@ void electron_peg400_device::device_start()
 //  read - cartridge data read
 //-------------------------------------------------
 
-uint8_t electron_peg400_device::read(address_space &space, offs_t offset, int infc, int infd, int romqa)
+uint8_t electron_peg400_device::read(offs_t offset, int infc, int infd, int romqa, int oe, int oe2)
 {
 	uint8_t data = 0xff;
 
@@ -95,15 +95,14 @@ uint8_t electron_peg400_device::read(address_space &space, offs_t offset, int in
 			break;
 		}
 	}
-
-	if (!infc && !infd)
+	else if (oe)
 	{
 		switch (romqa)
 		{
 		case 0:
 			if (offset < 0x3800)
 			{
-				data = m_rom[(offset & 0x3fff) + (romqa * 0x4000)];
+				data = m_rom[(offset & 0x3fff) | (romqa << 14)];
 			}
 			else
 			{
@@ -111,7 +110,7 @@ uint8_t electron_peg400_device::read(address_space &space, offs_t offset, int in
 			}
 			break;
 		case 1:
-			data = m_rom[(offset & 0x3fff) + (romqa * 0x4000)];
+			data = m_rom[(offset & 0x3fff) | (romqa << 14)];
 			break;
 		}
 	}
@@ -123,14 +122,14 @@ uint8_t electron_peg400_device::read(address_space &space, offs_t offset, int in
 //  write - cartridge data write
 //-------------------------------------------------
 
-void electron_peg400_device::write(address_space &space, offs_t offset, uint8_t data, int infc, int infd, int romqa)
+void electron_peg400_device::write(offs_t offset, uint8_t data, int infc, int infd, int romqa, int oe, int oe2)
 {
 	if (infc)
 	{
 		switch (offset & 0xff)
 		{
 		case 0xc0:
-			wd1770_control_w(space, 0, data);
+			wd1770_control_w(data);
 			break;
 		case 0xc4:
 		case 0xc5:
@@ -140,8 +139,7 @@ void electron_peg400_device::write(address_space &space, offs_t offset, uint8_t 
 			break;
 		}
 	}
-
-	if (!infc && !infd)
+	else if (oe)
 	{
 		if (romqa == 0 && offset >= 0x3800)
 		{
@@ -155,7 +153,7 @@ void electron_peg400_device::write(address_space &space, offs_t offset, uint8_t 
 //  IMPLEMENTATION
 //**************************************************************************
 
-WRITE8_MEMBER(electron_peg400_device::wd1770_control_w)
+void electron_peg400_device::wd1770_control_w(uint8_t data)
 {
 	floppy_image_device *floppy = nullptr;
 

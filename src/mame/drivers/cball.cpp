@@ -279,7 +279,7 @@ MACHINE_CONFIG_START(cball_state::cball)
 	MCFG_SCREEN_UPDATE_DRIVER(cball_state, screen_update)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_cball)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cball);
 
 	PALETTE(config, m_palette, FUNC(cball_state::cball_palette), 6);
 

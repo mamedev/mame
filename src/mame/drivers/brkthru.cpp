@@ -457,27 +457,25 @@ WRITE_LINE_MEMBER(brkthru_state::vblank_irq)
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-MACHINE_CONFIG_START(brkthru_state::brkthru)
-
+void brkthru_state::brkthru(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809E, MASTER_CLOCK/8)        /* 1.5 MHz ? */
-	MCFG_DEVICE_PROGRAM_MAP(brkthru_map)
+	MC6809E(config, m_maincpu, MASTER_CLOCK/8);         /* 1.5 MHz ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &brkthru_state::brkthru_map);
 
-	MCFG_DEVICE_ADD("audiocpu", MC6809, MASTER_CLOCK/2)     /* 1.5 MHz ? */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-
+	MC6809(config, m_audiocpu, MASTER_CLOCK/2);         /* 1.5 MHz ? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &brkthru_state::sound_map);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_brkthru)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_brkthru);
 	PALETTE(config, m_palette, FUNC(brkthru_state::brkthru_palette), 256);
 
 	/* not sure; assuming to be the same as darwin */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 384, 8, 248, 272, 8, 248)
-	MCFG_SCREEN_UPDATE_DRIVER(brkthru_state, screen_update_brkthru)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, brkthru_state, vblank_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(MASTER_CLOCK/2, 384, 8, 248, 272, 8, 248);
+	screen.set_screen_update(FUNC(brkthru_state::screen_update_brkthru));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(brkthru_state::vblank_irq));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -485,35 +483,33 @@ MACHINE_CONFIG_START(brkthru_state::brkthru)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ym1", YM2203, MASTER_CLOCK/8)
-	MCFG_SOUND_ROUTE(0, "mono", 0.10)
-	MCFG_SOUND_ROUTE(1, "mono", 0.10)
-	MCFG_SOUND_ROUTE(2, "mono", 0.10)
-	MCFG_SOUND_ROUTE(3, "mono", 0.50)
+	ym2203_device &ym1(YM2203(config, "ym1", MASTER_CLOCK/8));
+	ym1.add_route(0, "mono", 0.10);
+	ym1.add_route(1, "mono", 0.10);
+	ym1.add_route(2, "mono", 0.10);
+	ym1.add_route(3, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("ym2", YM3526, MASTER_CLOCK/4)
-	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", M6809_IRQ_LINE))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	ym3526_device &ym2(YM3526(config, "ym2", MASTER_CLOCK/4));
+	ym2.irq_handler().set_inputline(m_audiocpu, M6809_IRQ_LINE);
+	ym2.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-
-MACHINE_CONFIG_START(brkthru_state::darwin)
-
+void brkthru_state::darwin(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809E, MASTER_CLOCK/8)        /* 1.5 MHz ? */
-	MCFG_DEVICE_PROGRAM_MAP(darwin_map)
+	MC6809E(config, m_maincpu, MASTER_CLOCK/8);         /* 1.5 MHz ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &brkthru_state::darwin_map);
 
-	MCFG_DEVICE_ADD("audiocpu", MC6809, MASTER_CLOCK/2)     /* 1.5 MHz ? */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-
+	MC6809(config, m_audiocpu, MASTER_CLOCK/2);         /* 1.5 MHz ? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &brkthru_state::sound_map);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_brkthru)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_brkthru);
 
 	PALETTE(config, m_palette, FUNC(brkthru_state::brkthru_palette), 256);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 384, 8, 248, 272, 8, 248)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(MASTER_CLOCK/2, 384, 8, 248, 272, 8, 248);
 	/* frames per second, vblank duration
 	    Horizontal video frequency:
 	        HSync = Dot Clock / Horizontal Frame Length
@@ -526,9 +522,9 @@ MACHINE_CONFIG_START(brkthru_state::darwin)
 	              = 15.625kHz / (240 + 32)
 	              = 57.444855Hz
 	    tuned by Shingo SUZUKI(VSyncMAME Project) 2000/10/19 */
-	MCFG_SCREEN_UPDATE_DRIVER(brkthru_state, screen_update_brkthru)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, brkthru_state, vblank_irq))
+	screen.set_screen_update(FUNC(brkthru_state::screen_update_brkthru));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(brkthru_state::vblank_irq));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -536,16 +532,16 @@ MACHINE_CONFIG_START(brkthru_state::darwin)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ym1", YM2203, MASTER_CLOCK/8)
-	MCFG_SOUND_ROUTE(0, "mono", 0.10)
-	MCFG_SOUND_ROUTE(1, "mono", 0.10)
-	MCFG_SOUND_ROUTE(2, "mono", 0.10)
-	MCFG_SOUND_ROUTE(3, "mono", 0.50)
+	ym2203_device &ym1(YM2203(config, "ym1", MASTER_CLOCK/8));
+	ym1.add_route(0, "mono", 0.10);
+	ym1.add_route(1, "mono", 0.10);
+	ym1.add_route(2, "mono", 0.10);
+	ym1.add_route(3, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("ym2", YM3526, MASTER_CLOCK/4)
-	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", M6809_IRQ_LINE))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	ym3526_device &ym2(YM3526(config, "ym2", MASTER_CLOCK/4));
+	ym2.irq_handler().set_inputline(m_audiocpu, M6809_IRQ_LINE);
+	ym2.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 

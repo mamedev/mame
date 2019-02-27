@@ -15,8 +15,6 @@
 
 #include "emupal.h"
 
-#define MCFG_EF9345_PALETTE(_palette_tag) \
-	downcast<ef9345_device &>(*device).set_palette_tag(_palette_tag);
 
 //**************************************************************************
 //  TYPE DEFINITIONS

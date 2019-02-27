@@ -119,7 +119,7 @@ void altair_state::altair(machine_config &config)
 	uart_clock.signal_handler().append("acia", FUNC(acia6850_device::write_rxc));
 
 	/* quickload */
-	QUICKLOAD(config, "quickload", 0).set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(altair_state, altair), this), "bin", 0);
+	QUICKLOAD(config, "quickload").set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(altair_state, altair), this), "bin");
 }
 
 /* ROM definition */

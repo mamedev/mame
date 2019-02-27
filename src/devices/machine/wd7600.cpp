@@ -401,6 +401,8 @@ WRITE_LINE_MEMBER( wd7600_device::dma1_eop_w )
 
 void wd7600_device::set_dma_channel(int channel, bool state)
 {
+	//m_write_dack(channel, state);
+
 	if (!state)
 	{
 		m_dma_channel = channel;

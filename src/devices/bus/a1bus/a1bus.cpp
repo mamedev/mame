@@ -82,7 +82,7 @@ a1bus_device::a1bus_device(const machine_config &mconfig, const char *tag, devic
 
 a1bus_device::a1bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, m_maincpu(*this, finder_base::DUMMY_TAG)
+	, m_space(*this, finder_base::DUMMY_TAG, -1)
 	, m_out_irq_cb(*this)
 	, m_out_nmi_cb(*this)
 	, m_device(nullptr)
@@ -136,13 +136,13 @@ void a1bus_device::set_nmi_line(int state)
 
 void a1bus_device::install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler)
 {
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(start, end, rhandler, whandler);
+	m_space->install_readwrite_handler(start, end, rhandler, whandler);
 }
 
 void a1bus_device::install_bank(offs_t start, offs_t end, const char *tag, uint8_t *data)
 {
 //  printf("install_bank: %s @ %x->%x\n", tag, start, end);
-	m_maincpu->space(AS_PROGRAM).install_readwrite_bank(start, end, tag);
+	m_space->install_readwrite_bank(start, end, tag);
 	machine().root_device().membank(siblingtag(tag).c_str())->set_base(data);
 }
 

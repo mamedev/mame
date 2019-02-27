@@ -43,13 +43,13 @@
  *   https://web.archive.org/web/20140518203135/http://no-l.org/pages/riscos.html
  *
  * TODO (rx2030)
- *   - remaining iop interface
- *   - figure out the brcond0 signal
  *   - keyboard controller and keyboard
  *   - buzzer
  *
  * TODO (rx3230)
  *   - verify/complete address maps
+ *   - keyboard controller and interrupts
+ *   - isa slot and colour graphics board
  *   - idprom
  *
  *   Ref   Part                      Function
@@ -133,7 +133,7 @@
 /*
  * Rx2030 WIP
  *
- *   status: loads RISC/os, but panics
+ *   status: boots RISC/os, requires unimplemented MIPS keyboard
  *
  * V50 internal peripherals:
  * base = 0xfe00
@@ -171,7 +171,7 @@
 /*
  * Rx3230 WIP
  *
- *   status: boots to monitor
+ *   status: boots RISC/os from network, panics during installation
  *
  * R3000 interrupts
  *  0 <- lance, scc, slot, keyboard
@@ -231,6 +231,28 @@ void rx2030_state::rx2030_init()
 
 	if (!m_vram)
 		m_iop_interface |= VID_ABSENT;
+
+	/*
+	 * HACK: the prom bfs code broadcasts to the network address (i.e. the
+	 * host portion is "all zeroes"), instead of to the standard "all ones".
+	 * This makes it very difficult to receive the bfs request in a modern host
+	 * OS; the patch changes the code to broadcast to the standard broadcast
+	 * address instead.
+	 *
+	 * Technique is identical to that described for the rx3230 below.
+	 */
+	switch (system_bios())
+	{
+	case 1:
+		m_rom[0x1ab68 >> 1] = 0x0624;
+		m_rom[0x1ab6a >> 1] = 0xffff;
+		break;
+
+	case 2:
+		m_rom[0x1a7f8 >> 1] = 0x0624;
+		m_rom[0x1a7fa >> 1] = 0xffff;
+		break;
+	}
 }
 
 u16 rx2030_state::mmu_r(offs_t offset, u16 mem_mask)
@@ -268,7 +290,7 @@ void rx2030_state::iop_program_map(address_map &map)
 	map(0x00000, 0x1ffff).ram();
 	map(0x20000, 0x3ffff).rw(FUNC(rx2030_state::mmu_r), FUNC(rx2030_state::mmu_w));
 
-	map(0x80000, 0xbffff).rom().region("v50_ipl", 0).mirror(0x40000);
+	map(0x80000, 0xbffff).rom().region("rx2030", 0).mirror(0x40000);
 }
 
 void rx2030_state::iop_io_map(address_map &map)
@@ -334,7 +356,7 @@ void rx2030_state::iop_io_map(address_map &map)
 			else
 				m_iop->set_input_line(INPUT_LINE_IRQ2, CLEAR_LINE);
 			m_iop_interface |= IOP_IACK;
-			m_iop_interface &= ~IOP_IRQ; // maybe?
+			m_iop_interface &= ~IOP_IRQ;
 			break;
 
 		default:
@@ -410,7 +432,7 @@ void rx2030_state::rx2030_map(address_map &map)
 							case 19: // keyboard
 								LOGMASKED(LOG_IOCB, "iocb %s command 0x%04x data 0x%02x (%s)\n",
 									iop_commands[iocb], iop_cmd,
-									m_ram->read(0x1000 + iocb_cmdparam + 6),
+									m_ram->read(0x1000 + iocb_cmdparam + 7),
 									machine().describe_context());
 								break;
 
@@ -426,7 +448,7 @@ void rx2030_state::rx2030_map(address_map &map)
 
 				// interrupt the iop
 				m_iop_interface &= ~IOP_IACK;
-				m_iop_interface |= IOP_IRQ; // maybe?
+				m_iop_interface |= IOP_IRQ;
 				m_iop->set_input_line(INPUT_LINE_IRQ2, ASSERT_LINE);
 				break;
 
@@ -477,12 +499,13 @@ static void mips_scsi_devices(device_slot_interface &device)
 void rx2030_state::rx2030(machine_config &config)
 {
 	R2000A(config, m_cpu, 33.333_MHz_XTAL / 2, 32768, 32768);
-	m_cpu->set_fpurev(mips1_device_base::MIPS_R2010A);
+	m_cpu->set_fpu(mips1_device_base::MIPS_R2010A);
 	m_cpu->in_brcond<0>().set([]() { return 1; }); // writeback complete
 
 	V50(config, m_iop, 20_MHz_XTAL / 2);
 	m_iop->set_addrmap(AS_PROGRAM, &rx2030_state::iop_program_map);
 	m_iop->set_addrmap(AS_IO, &rx2030_state::iop_io_map);
+	m_iop->out_handler<2>().set(m_buzzer, FUNC(speaker_sound_device::level_w));
 
 	// general dma configuration
 	m_iop->out_hreq_cb().set(m_iop, FUNC(v50_device::hack_w));
@@ -519,6 +542,7 @@ void rx2030_state::rx2030(machine_config &config)
 	//m_kbdc->hot_res().set_inputline(m_maincpu, INPUT_LINE_RESET);
 	m_kbdc->kbd_clk().set(kbdc, FUNC(pc_kbdc_device::clock_write_from_mb));
 	m_kbdc->kbd_data().set(kbdc, FUNC(pc_kbdc_device::data_write_from_mb));
+	m_kbdc->set_default_bios_tag("award15");
 
 	SCC85C30(config, m_scc, 1.8432_MHz_XTAL);
 	m_scc->configure_channels(m_scc->clock(), m_scc->clock(), m_scc->clock(), m_scc->clock());
@@ -547,33 +571,24 @@ void rx2030_state::rx2030(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:0", "35hd", FLOPPY_35_HD, true, mips_floppy_formats).enable_sound(false);
 
 	// scsi bus and devices
-	NSCSI_BUS(config, m_scsibus, 0);
+	NSCSI_BUS(config, m_scsibus);
+	NSCSI_CONNECTOR(config, "scsi:0", mips_scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "scsi:1", mips_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:2", mips_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:3", mips_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:4", mips_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:5", mips_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:6", mips_scsi_devices, nullptr);
 
-	nscsi_connector &harddisk(NSCSI_CONNECTOR(config, "scsi:0", 0));
-	mips_scsi_devices(harddisk);
-	harddisk.set_default_option("harddisk");
+	// scsi host adapter (clock assumed)
+	NSCSI_CONNECTOR(config, "scsi:7").option_set("aic6250", AIC6250).clock(10_MHz_XTAL).machine_config(
+		[this](device_t *device)
+		{
+			aic6250_device &adapter = downcast<aic6250_device &>(*device);
 
-	mips_scsi_devices(NSCSI_CONNECTOR(config, "scsi:1", 0));
-	mips_scsi_devices(NSCSI_CONNECTOR(config, "scsi:2", 0));
-	mips_scsi_devices(NSCSI_CONNECTOR(config, "scsi:3", 0));
-	mips_scsi_devices(NSCSI_CONNECTOR(config, "scsi:4", 0));
-	mips_scsi_devices(NSCSI_CONNECTOR(config, "scsi:5", 0));
-	mips_scsi_devices(NSCSI_CONNECTOR(config, "scsi:6", 0));
-
-	// scsi host adapter
-	nscsi_connector &adapter(NSCSI_CONNECTOR(config, "scsi:7", 0));
-	adapter.option_add_internal("aic6250", AIC6250);
-	adapter.set_default_option("aic6250");
-	adapter.set_fixed(true);
-	adapter.set_option_machine_config("aic6250", [this](device_t *device)
-	{
-		aic6250_device &adapter = downcast<aic6250_device &>(*device);
-
-		adapter.set_clock(10_MHz_XTAL); // clock assumed
-
-		adapter.int_cb().set_inputline(m_iop, INPUT_LINE_IRQ7).invert();
-		adapter.breq_cb().set(m_iop, FUNC(v50_device::dreq_w<1>));
-	});
+			adapter.int_cb().set_inputline(m_iop, INPUT_LINE_IRQ7).invert();
+			adapter.breq_cb().set(m_iop, FUNC(v50_device::dreq_w<1>));
+		});
 
 	// ethernet
 	AM7990(config, m_net);
@@ -756,7 +771,7 @@ void rx3230_state::rx3230(machine_config &config)
 {
 	R3000A(config, m_cpu, 50_MHz_XTAL / 2, 32768, 32768);
 	m_cpu->set_addrmap(AS_PROGRAM, &rx3230_state::rx3230_map);
-	m_cpu->set_fpurev(mips1_device_base::MIPS_R3010A);
+	m_cpu->set_fpu(mips1_device_base::MIPS_R3010A);
 	m_cpu->in_brcond<0>().set([]() { return 1; }); // writeback complete
 
 	// 32 SIMM slots, 8-128MB memory, banks of 8 1MB or 4MB SIMMs
@@ -767,40 +782,33 @@ void rx3230_state::rx3230(machine_config &config)
 
 	MIPS_RAMBO(config, m_rambo, 25_MHz_XTAL / 4);
 	m_rambo->timer_out().set_inputline(m_cpu, INPUT_LINE_IRQ2);
+	m_rambo->irq_out().set_inputline(m_cpu, INPUT_LINE_IRQ1);
 	m_rambo->parity_out().set_inputline(m_cpu, INPUT_LINE_IRQ5);
 	//m_rambo->buzzer_out().set(m_buzzer, FUNC(speaker_sound_device::level_w));
 	m_rambo->set_ram(m_ram);
-	m_rambo->dma_r<0>().set("scsi:7:ncr53c94", FUNC(ncr53c94_device::dma_r));
-	m_rambo->dma_w<0>().set("scsi:7:ncr53c94", FUNC(ncr53c94_device::dma_w));
+	m_rambo->dma_r<0>().set("scsi:7:ncr53c94", FUNC(ncr53c94_device::dma16_r));
+	m_rambo->dma_w<0>().set("scsi:7:ncr53c94", FUNC(ncr53c94_device::dma16_w));
 
 	// scsi bus and devices
-	NSCSI_BUS(config, m_scsibus, 0);
-
-	nscsi_connector &harddisk(NSCSI_CONNECTOR(config, "scsi:0", 0));
-	mips_scsi_devices(harddisk);
-	harddisk.set_default_option("harddisk");
-
-	mips_scsi_devices(NSCSI_CONNECTOR(config, "scsi:1", 0));
-	mips_scsi_devices(NSCSI_CONNECTOR(config, "scsi:2", 0));
-	mips_scsi_devices(NSCSI_CONNECTOR(config, "scsi:3", 0));
-	mips_scsi_devices(NSCSI_CONNECTOR(config, "scsi:4", 0));
-	mips_scsi_devices(NSCSI_CONNECTOR(config, "scsi:5", 0));
-	mips_scsi_devices(NSCSI_CONNECTOR(config, "scsi:6", 0));
+	NSCSI_BUS(config, m_scsibus);
+	NSCSI_CONNECTOR(config, "scsi:0", mips_scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "scsi:1", mips_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:2", mips_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:3", mips_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:4", mips_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:5", mips_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:6", mips_scsi_devices, nullptr);
 
 	// scsi host adapter
-	nscsi_connector &adapter(NSCSI_CONNECTOR(config, "scsi:7", 0));
-	adapter.option_add_internal("ncr53c94", NCR53C94);
-	adapter.set_default_option("ncr53c94");
-	adapter.set_fixed(true);
-	adapter.set_option_machine_config("ncr53c94", [this](device_t *device)
-	{
-		ncr53c94_device &adapter = downcast<ncr53c94_device &>(*device);
+	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr53c94", NCR53C94).clock(24_MHz_XTAL).machine_config(
+		[this](device_t *device)
+		{
+			ncr53c94_device &adapter = downcast<ncr53c94_device &>(*device);
 
-		adapter.set_clock(24_MHz_XTAL);
-
-		adapter.irq_handler_cb().set(*this, FUNC(rx3230_state::irq_w<INT_SCSI>)).invert();
-		adapter.drq_handler_cb().set(m_rambo, FUNC(mips_rambo_device::drq_w<0>));
-	});
+			adapter.set_busmd(ncr53c94_device::busmd_t::BUSMD_1);
+			adapter.irq_handler_cb().set(*this, FUNC(rx3230_state::irq_w<INT_SCSI>)).invert();
+			adapter.drq_handler_cb().set(m_rambo, FUNC(mips_rambo_device::drq_w<0>));
+		});
 
 	// ethernet
 	AM7990(config, m_net);
@@ -847,7 +855,7 @@ void rx3230_state::rx3230(machine_config &config)
 	AT_KEYBOARD_CONTROLLER(config, m_kbdc, 12_MHz_XTAL); // TODO: confirm
 	m_kbdc->kbd_clk().set(kbdc, FUNC(pc_kbdc_device::clock_write_from_mb));
 	m_kbdc->kbd_data().set(kbdc, FUNC(pc_kbdc_device::data_write_from_mb));
-	m_kbdc->kbd_irq().set(FUNC(rx3230_state::irq_w<INT_KBD>));
+	//m_kbdc->kbd_irq().set(FUNC(rx3230_state::irq_w<INT_KBD>));
 
 	// buzzer
 	SPEAKER(config, "mono").front_center();
@@ -958,7 +966,7 @@ void rx3230_state::lance_w(offs_t offset, u16 data, u16 mem_mask)
 }
 
 ROM_START(rx2030)
-	ROM_REGION16_LE(0x40000, "v50_ipl", 0)
+	ROM_REGION16_LE(0x40000, "rx2030", 0)
 	ROM_SYSTEM_BIOS(0, "v4.32", "Rx2030 v4.32, Jan 1991")
 	ROMX_LOAD("50-00121__005.u139", 0x00000, 0x10000, CRC(b2f42665) SHA1(81c83aa6b8865338fda5c03733ede91749997648), ROM_BIOS(0) | ROM_SKIP(1))
 	ROMX_LOAD("50-00120__005.u140", 0x00001, 0x10000, CRC(0ffa485e) SHA1(7cdfb81d1a547c5ccc88e1e0ef73d447cd03e9e2), ROM_BIOS(0) | ROM_SKIP(1))
@@ -970,9 +978,6 @@ ROM_START(rx2030)
 	ROMX_LOAD("50-00120__003.u140", 0x00001, 0x10000, CRC(e1991721) SHA1(028d33be271c95f198473b650f7800f9ca4a60b2), ROM_BIOS(1) | ROM_SKIP(1))
 	ROMX_LOAD("50-00119__003.u141", 0x20001, 0x10000, CRC(c8469906) SHA1(69bbf4b5c415b2e2156a4467bf9cb30e79f586ef), ROM_BIOS(1) | ROM_SKIP(1))
 	ROMX_LOAD("50-00118__003.u142", 0x20000, 0x10000, CRC(18cc001a) SHA1(198023e92e1e3ba2fc8637f5dd6f370e7e023fdd), ROM_BIOS(1) | ROM_SKIP(1))
-
-	ROM_REGION(0x800, "i8742_eprom", 0)
-	ROM_LOAD("keyboard_1.5.bin", 0x000, 0x800, CRC(f86ba0f7) SHA1(1ad475451db35a76d929824c035d582279fbe3a3))
 
 	/*
 	 * The following isn't a real dump, but a hand-made nvram image that allows

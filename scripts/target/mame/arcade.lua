@@ -285,6 +285,7 @@ VIDEOS["BUFSPRITE"] = true
 VIDEOS["CESBLIT"] = true
 --VIDEOS["CRT9007"] = true
 --VIDEOS["CRT9021"] = true
+--VIDEOS["CRT9028"] = true
 --VIDEOS["CRT9212"] = true
 VIDEOS["CRTC_EGA"] = true
 --VIDEOS["DL1416"] = true
@@ -605,9 +606,10 @@ MACHINES["UPD765"] = true
 MACHINES["FDC_PLL"] = true
 MACHINES["V3021"] = true
 MACHINES["WD_FDC"] = true
+--MACHINES["WD1010"] = true
 MACHINES["WD11C00_17"] = true
 MACHINES["WD2010"] = true
-MACHINES["WD33C93"] = true
+MACHINES["WD33C9X"] = true
 MACHINES["X2212"] = true
 MACHINES["X76F041"] = true
 MACHINES["X76F100"] = true
@@ -741,6 +743,7 @@ BUSES["VECTREX"] = true
 --BUSES["VIDBRAIN"] = true
 --BUSES["VIP"] = true
 --BUSES["VME"] = true
+--BUSES["VSMILE"] = true
 --BUSES["VTECH_IOEXP"] = true
 --BUSES["VTECH_MEMEXP"] = true
 --BUSES["WANGPC"] = true
@@ -2778,6 +2781,7 @@ files {
 	MAME_DIR .. "src/mame/includes/namcos1.h",
 	MAME_DIR .. "src/mame/machine/namcos1.cpp",
 	MAME_DIR .. "src/mame/video/namcos1.cpp",
+	MAME_DIR .. "src/mame/drivers/namcos1b.cpp",
 	MAME_DIR .. "src/mame/drivers/namcos10.cpp",
 	MAME_DIR .. "src/mame/machine/ns10crypt.cpp",
 	MAME_DIR .. "src/mame/machine/ns10crypt.h",
@@ -4648,6 +4652,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/freekick.cpp",
 	MAME_DIR .. "src/mame/includes/freekick.h",
 	MAME_DIR .. "src/mame/video/freekick.cpp",
+	MAME_DIR .. "src/mame/drivers/freeway.cpp",
 	MAME_DIR .. "src/mame/drivers/fungames.cpp",
 	MAME_DIR .. "src/mame/drivers/funkball.cpp",
 	MAME_DIR .. "src/mame/drivers/gambl186.cpp",
@@ -4742,6 +4747,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/miniboy7.cpp",
 	MAME_DIR .. "src/mame/drivers/minivideo.cpp",
 	MAME_DIR .. "src/mame/drivers/mirax.cpp",
+	MAME_DIR .. "src/mame/drivers/missbamby.cpp",
 	MAME_DIR .. "src/mame/drivers/mjsenpu.cpp",
 	MAME_DIR .. "src/mame/drivers/mole.cpp",
 	MAME_DIR .. "src/mame/drivers/mosaic.cpp",

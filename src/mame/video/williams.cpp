@@ -330,9 +330,9 @@ void williams_state::williams_palette(palette_device &palette) const
 	// build a palette lookup
 	for (int i = 0; i < 256; i++)
 	{
-		int const r = combine_3_weights(weights_r, BIT(i, 0), BIT(i, 1), BIT(i, 2));
-		int const g = combine_3_weights(weights_g, BIT(i, 3), BIT(i, 4), BIT(i, 5));
-		int const b = combine_2_weights(weights_b, BIT(i, 6), BIT(i, 7));
+		int const r = combine_weights(weights_r, BIT(i, 0), BIT(i, 1), BIT(i, 2));
+		int const g = combine_weights(weights_g, BIT(i, 3), BIT(i, 4), BIT(i, 5));
+		int const b = combine_weights(weights_b, BIT(i, 6), BIT(i, 7));
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}

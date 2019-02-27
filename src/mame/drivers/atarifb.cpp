@@ -575,7 +575,7 @@ MACHINE_CONFIG_START(atarifb_state::atarifb)
 	MCFG_SCREEN_UPDATE_DRIVER(atarifb_state, screen_update_atarifb)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_atarifb)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_atarifb);
 	PALETTE(config, m_palette, FUNC(atarifb_state::atarifb_palette), 12);
 
 	/* sound hardware */
@@ -623,7 +623,7 @@ MACHINE_CONFIG_START(atarifb_state::soccer)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 38*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(atarifb_state, screen_update_soccer)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_soccer)
+	m_gfxdecode->set_info(gfx_soccer);
 MACHINE_CONFIG_END
 
 

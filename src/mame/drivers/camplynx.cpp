@@ -856,8 +856,7 @@ void camplynx_state::lynx_common(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_6BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.375); // unknown DAC
-	VOLTAGE_REGULATOR(config, "vref").set_output(5.0)
-			.add_route(0, m_dac, 1.0, DAC_VREF_POS_INPUT).add_route(0, m_dac, -1.0, DAC_VREF_NEG_INPUT);
+	VOLTAGE_REGULATOR(config, "vref").add_route(0, m_dac, 1.0, DAC_VREF_POS_INPUT).add_route(0, m_dac, -1.0, DAC_VREF_NEG_INPUT);
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "speaker", 0.02);
 }
 
@@ -886,10 +885,10 @@ MACHINE_CONFIG_START(camplynx_state::lynx48k)
 
 	lynx_common(config);
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_FORMATS(lynx48k_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED)
-	MCFG_CASSETTE_INTERFACE("camplynx_cass")
+	CASSETTE(config, m_cass);
+	m_cass->set_formats(lynx48k_cassette_formats);
+	m_cass->set_default_state(CASSETTE_PLAY | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED);
+	m_cass->set_interface("camplynx_cass");
 
 	/* devices */
 	MC6845(config, m_crtc, 12_MHz_XTAL / 8);
@@ -933,10 +932,10 @@ MACHINE_CONFIG_START(camplynx_state::lynx128k)
 
 	lynx_common(config);
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_FORMATS(lynx128k_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED)
-	MCFG_CASSETTE_INTERFACE("camplynx_cass")
+	CASSETTE(config, m_cass);
+	m_cass->set_formats(lynx128k_cassette_formats);
+	m_cass->set_default_state(CASSETTE_PLAY | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED);
+	m_cass->set_interface("camplynx_cass");
 
 	/* devices */
 	MC6845(config, m_crtc, 12_MHz_XTAL / 8);

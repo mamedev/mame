@@ -242,9 +242,9 @@ void tp84_state::audio_map(address_map &map)
 	map(0x8000, 0x8000).r(FUNC(tp84_state::tp84_sh_timer_r));
 	map(0xa000, 0xa1ff).w(FUNC(tp84_state::tp84_filter_w));
 	map(0xc000, 0xc000).nopw();
-	map(0xc001, 0xc001).w("y2404_1", FUNC(y2404_device::command_w));
-	map(0xc003, 0xc003).w("y2404_2", FUNC(y2404_device::command_w));
-	map(0xc004, 0xc004).w("y2404_3", FUNC(y2404_device::command_w));
+	map(0xc001, 0xc001).w("y2404_1", FUNC(y2404_device::write));
+	map(0xc003, 0xc003).w("y2404_2", FUNC(y2404_device::write));
+	map(0xc004, 0xc004).w("y2404_3", FUNC(y2404_device::write));
 }
 
 
@@ -329,19 +329,19 @@ static GFXDECODE_START( gfx_tp84 )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(tp84_state::tp84)
-
+void tp84_state::tp84(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("cpu1", MC6809E, XTAL(18'432'000)/12) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(tp84_cpu1_map)
+	MC6809E(config, m_maincpu, XTAL(18'432'000)/12); /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &tp84_state::tp84_cpu1_map);
 
-	MCFG_DEVICE_ADD("sub", MC6809E, XTAL(18'432'000)/12)   /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(cpu2_map)
+	MC6809E(config, m_subcpu, XTAL(18'432'000)/12);   /* verified on pcb */
+	m_subcpu->set_addrmap(AS_PROGRAM, &tp84_state::cpu2_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80,XTAL(14'318'181)/4) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(audio_map)
+	Z80(config, m_audiocpu, XTAL(14'318'181)/4); /* verified on pcb */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &tp84_state::audio_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - an high value to ensure proper */
+	config.m_minimum_quantum = attotime::from_hz(6000);  /* 100 CPU slices per frame - a high value to ensure proper */
 							/* synchronization of the CPUs */
 
 	ls259_device &mainlatch(LS259(config, "mainlatch", 0)); // 3B
@@ -354,14 +354,14 @@ MACHINE_CONFIG_START(tp84_state::tp84)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tp84_state, screen_update_tp84)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tp84_state, vblank_irq))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(tp84_state::screen_update_tp84));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(tp84_state::vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tp84);
 	PALETTE(config, m_palette, FUNC(tp84_state::tp84_palette), 4096, 256);
@@ -371,24 +371,21 @@ MACHINE_CONFIG_START(tp84_state::tp84)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("y2404_1", Y2404, XTAL(14'318'181)/8) /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter1", 0.75)
+	Y2404(config, "y2404_1", XTAL(14'318'181)/8).add_route(ALL_OUTPUTS, "filter1", 0.75); /* verified on pcb */
 
-	MCFG_DEVICE_ADD("y2404_2", Y2404, XTAL(14'318'181)/8) /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter2", 0.75)
+	Y2404(config, "y2404_2", XTAL(14'318'181)/8).add_route(ALL_OUTPUTS, "filter2", 0.75); /* verified on pcb */
 
-	MCFG_DEVICE_ADD("y2404_3", Y2404, XTAL(14'318'181)/8) /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter3", 0.75)
+	Y2404(config, "y2404_3", XTAL(14'318'181)/8).add_route(ALL_OUTPUTS, "filter3", 0.75); /* verified on pcb */
 
 	for (auto &filter : m_filter)
 		FILTER_RC(config, filter).add_route(ALL_OUTPUTS, "mono", 1.0);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(tp84_state::tp84b)
+void tp84_state::tp84b(machine_config &config)
+{
 	tp84(config);
-	MCFG_DEVICE_MODIFY("cpu1")
-	MCFG_DEVICE_PROGRAM_MAP(tp84b_cpu1_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &tp84_state::tp84b_cpu1_map);
+}
 
 /***************************************************************************
 

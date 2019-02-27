@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Barry Rodewald
 /*
- * x68k_midi.c
+ * x68k_midi.cpp
  *
  * X68000 MIDI interface - YM3802
  *
@@ -17,16 +17,16 @@
 
 DEFINE_DEVICE_TYPE(X68K_MIDI, x68k_midi_device, "x68k_midi", "X68000 MIDI Interface")
 
-MACHINE_CONFIG_START(x68k_midi_device::device_add_mconfig)
+void x68k_midi_device::device_add_mconfig(machine_config &config)
+{
 	YM3802(config, m_midi, XTAL(1'000'000));  // clock is unknown
 	m_midi->txd_handler().set("mdout", FUNC(midi_port_device::write_txd));
 	m_midi->irq_handler().set(FUNC(x68k_midi_device::irq_w));
-	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
-//  MCFG_MIDI_PORT_ADD("mdthru", midiout_slot, "midiout")
+	MIDI_PORT(config, "mdin", midiin_slot, "midiin");
+	MIDI_PORT(config, "mdout", midiout_slot, "midiout");
+//  MIDI_PORT(config, "mdthru", midiout_slot, "midiout");
 	// TODO: Add serial data handlers
-
-MACHINE_CONFIG_END
+}
 
 
 x68k_midi_device::x68k_midi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -39,10 +39,8 @@ x68k_midi_device::x68k_midi_device(const machine_config &mconfig, const char *ta
 
 void x68k_midi_device::device_start()
 {
-	device_t* cpu = machine().device("maincpu");
-	address_space& space = cpu->memory().space(AS_PROGRAM);
 	m_slot = dynamic_cast<x68k_expansion_slot_device *>(owner());
-	space.install_readwrite_handler(0xeafa00,0xeafa0f,read8_delegate(FUNC(x68k_midi_device::x68k_midi_reg_r),this),write8_delegate(FUNC(x68k_midi_device::x68k_midi_reg_w),this),0x00ff00ff);
+	m_slot->space().install_readwrite_handler(0xeafa00,0xeafa0f,read8_delegate(FUNC(x68k_midi_device::x68k_midi_reg_r),this),write8_delegate(FUNC(x68k_midi_device::x68k_midi_reg_w),this),0x00ff00ff);
 }
 
 void x68k_midi_device::device_reset()

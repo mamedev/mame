@@ -274,7 +274,7 @@ MACHINE_CONFIG_START(commando_state::commando)
 	screen.screen_vblank().append(FUNC(commando_state::vblank_irq));
 	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_commando)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_commando);
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 
 	BUFFERED_SPRITERAM8(config, m_spriteram);

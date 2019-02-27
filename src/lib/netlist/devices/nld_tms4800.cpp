@@ -6,7 +6,7 @@
  */
 
 #include "nld_tms4800.h"
-#include "../nl_base.h"
+#include "netlist/nl_base.h"
 
 namespace netlist
 {
@@ -39,9 +39,9 @@ namespace netlist
 		param_rom_t<uint8_t, 11, 8> m_ROM; // 16 Kbits, used as 2 Kbit x 8
 	};
 
-	NETLIB_OBJECT_DERIVED(tms4800_dip, TMS4800)
+	NETLIB_OBJECT_DERIVED(TMS4800_dip, TMS4800)
 	{
-		NETLIB_CONSTRUCTOR_DERIVED(tms4800_dip, TMS4800)
+		NETLIB_CONSTRUCTOR_DERIVED(TMS4800_dip, TMS4800)
 		{
 			register_subalias("2",     m_A[0]);
 			register_subalias("3",     m_A[1]);
@@ -97,8 +97,8 @@ namespace netlist
 		}
 	}
 
-	NETLIB_DEVICE_IMPL(TMS4800)
-	NETLIB_DEVICE_IMPL(tms4800_dip)
+	NETLIB_DEVICE_IMPL(TMS4800,     "ROM_TMS4800",     "+AR,+OE1,+OE2,+A0,+A1,+A2,+A3,+A4,+A5,+A6,+A7,+A8,+A9,+A10")
+	NETLIB_DEVICE_IMPL(TMS4800_dip, "ROM_TMS4800_DIP", "")
 
 	} //namespace devices
 } // namespace netlist

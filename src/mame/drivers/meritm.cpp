@@ -1154,15 +1154,17 @@ void meritm_state::crt250(machine_config &config)
 	aysnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
-MACHINE_CONFIG_START(meritm_state::crt250_questions)
+void meritm_state::crt250_questions(machine_config &config)
+{
 	crt250(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &meritm_state::crt250_questions_map);
 
 	MCFG_MACHINE_START_OVERRIDE(meritm_state, crt250_questions)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(meritm_state::crt250_crt252_crt258)
+void meritm_state::crt250_crt252_crt258(machine_config &config)
+{
 	crt250_questions(config);
 
 	m_maincpu->set_addrmap(AS_IO, &meritm_state::crt250_crt258_io_map);
@@ -1172,11 +1174,12 @@ MACHINE_CONFIG_START(meritm_state::crt250_crt252_crt258)
 	NS16550(config, m_uart, UART_CLK);
 	m_uart->out_tx_callback().set(m_microtouch, FUNC(microtouch_device::rx));
 
-	MCFG_MICROTOUCH_ADD(m_microtouch, 9600, WRITELINE(m_uart, ins8250_uart_device, rx_w))
-	MCFG_MICROTOUCH_TOUCH_CB(meritm_state, touch_coord_transform)
-MACHINE_CONFIG_END
+	MICROTOUCH(config, m_microtouch, 9600).stx().set(m_uart, FUNC(ins8250_uart_device::rx_w));
+	m_microtouch->set_touch_callback(FUNC(meritm_state::touch_coord_transform), this);
+}
 
-MACHINE_CONFIG_START(meritm_state::crt260)
+void meritm_state::crt260(machine_config &config)
+{
 	crt250(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &meritm_state::map);
@@ -1190,9 +1193,9 @@ MACHINE_CONFIG_START(meritm_state::crt260)
 	NS16550(config, m_uart, UART_CLK);
 	m_uart->out_tx_callback().set(m_microtouch, FUNC(microtouch_device::rx));
 
-	MCFG_MICROTOUCH_ADD(m_microtouch, 9600, WRITELINE(m_uart, ins8250_uart_device, rx_w))
-	MCFG_MICROTOUCH_TOUCH_CB(meritm_state, touch_coord_transform)
-MACHINE_CONFIG_END
+	MICROTOUCH(config, m_microtouch, 9600).stx().set(m_uart, FUNC(ins8250_uart_device::rx_w));
+	m_microtouch->set_touch_callback(FUNC(meritm_state::touch_coord_transform), this);
+}
 
 
 /*
