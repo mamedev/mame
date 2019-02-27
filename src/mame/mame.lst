@@ -1286,6 +1286,9 @@ spcpostn                        // (c) 1986 Sega / Nasco"
 @source:anzterm.cpp
 anzterm                         // Burroughs EF315-I220
 
+@source:apbeena.cpp
+apb_frpc
+
 @source:apc.cpp
 apc                             //
 
