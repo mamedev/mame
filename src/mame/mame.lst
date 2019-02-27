@@ -12862,6 +12862,7 @@ feleg                           //
 @source:fidel_card.cpp
 bridgec3                        //
 bridgeca                        //
+gincribc                        //
 vbrc                            //
 
 @source:fidel_cc10.cpp
