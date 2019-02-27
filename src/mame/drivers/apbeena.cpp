@@ -60,7 +60,7 @@ void beena_state::beena(machine_config &config)
 }
 
 ROM_START( apb_frpc )
-	ROM_REGION32_BE( 0x80000k "bios", 0 )   // SoC internal BIOS
+	ROM_REGION32_BE( 0x80000, "bios", 0 )   // SoC internal BIOS
 	ROM_LOAD16_WORD_SWAP( "beenabios.bin", 0x000000, 0x080000, NO_DUMP )
 
 	ROM_REGION32_BE( 0x800000, "cart", 0 )  // cartridge ROM
@@ -82,4 +82,4 @@ ROM_START( apb_frpc )
 ROM_END
 
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY     FULLNAME  FLAGS
-CONS( 2005, apb_frpc,  0,      0,      beena,     beena,   beena_state, empty_init, "Sega", "Advanced Pico BEENA: Issho ni Henshin Fresh Pretty Cure", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+CONS( 2009, apb_frpc,  0,      0,      beena,     beena,   beena_state, empty_init, "Sega", "Advanced Pico BEENA: Issho ni Henshin Fresh Pretty Cure", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
