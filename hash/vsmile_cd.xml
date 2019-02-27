@@ -594,7 +594,7 @@ ________________________________________________________________________________
 	Ring 2: "*59-93040-000-000*", "IFPI LQ24", "IFPI 9QH8", "59-93040-000"
 	-->
 	<software name="spongeisr2" cloneof="spongeis" supported="no">
-		<description>Nickelodeon SpongeBob Squarepants - Idea Sponge (USA, Rev. 1)</description>
+		<description>Nickelodeon SpongeBob Squarepants - Idea Sponge (USA, Rev. 2)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-093040" />
