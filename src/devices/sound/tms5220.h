@@ -48,7 +48,7 @@ public:
 	WRITE_LINE_MEMBER( rsq_w );
 	WRITE_LINE_MEMBER( wsq_w );
 
-	DECLARE_WRITE8_MEMBER( combined_rsq_wsq_w );
+	void combined_rsq_wsq_w(u8 data);
 	/* this combined_rsq_wsq_w hack is necessary for specific systems such as
 	the TI 99/8 since the 5220c and cd2501ecd do specific things if both lines
 	go active or inactive at slightly different times by separate write_line

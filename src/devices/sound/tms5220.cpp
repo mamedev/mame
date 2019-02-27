@@ -1890,7 +1890,7 @@ WRITE_LINE_MEMBER( tms5220_device::wsq_w )
  * /RS is bit 1, /WS is bit 0
  * Note this is a hack and probably can be removed later, once the 'real' line handlers above defer by at least 4 clock cycles before taking effect
  */
-WRITE8_MEMBER( tms5220_device::combined_rsq_wsq_w )
+void tms5220_device::combined_rsq_wsq_w(u8 data)
 {
 	uint8_t falling_edges;
 	m_true_timing = true;
