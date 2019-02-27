@@ -16,67 +16,70 @@ Language:
 ********6 = Portugal
 ********7 = Spain
 
-80-093000(US)   | Disney Princess - The Crystal Ball Adventure
-80-093004(GE)   | Disney Princess - Das zauberhafte Märchen-Abenteuer
-80-093005(FR)   | Disney Princess - L'aventure enchantée
-80-093007(SP)   | Disney Princess - El Castillo de las Princesas
--
-80-093020(US)   | The Incredibles - Mission Incredible
-80-093023(UK)   | The Incredibles - Mission Incredible
-80-093024(GE)   | Die Unglaublichen - In unglaublicher Mission
-80-093025(FR)   | Les Indestructibles - Les Indestructibles à la Rescousse
-80-093027(SP)   | Los Increíbles - Misión Increíble
--
-80-093040(US)   | SpongeBob - Idea Sponge
-80-093044(GE)   | SpongeBob - Ein Schwamm voller Ideen
-80-093045(FR)   | Bob L'éponge - Une Idée Spongieuse
--
-80-093060(US)   | The Amazing Spider-Man - Countdown to Doom
-80-093064(GE)   | Spider-Man - Angriff der Super-Schurken
-80-093065(FR)   | Spider-Man - Course-poursuite A Manhattan
-80-093067(SP)   | El Asombroso Spider-Man - Persecución en la Ciudad
--
-80-093080(US)   | Scooby-Doo! - Ancient Adventure
-80-093083(UK)   | Scooby-Doo! - Ancient Adventure
-80-093084(GE)   | Scooby-Doo! - ????? (no EAN found, but should have been released)
-80-093085(FR)   | Scooby-Doo! - Les Civilisations Perdues
-80-093087(SP)   | Scooby-Doo - Viaje al Pasado
--
-80-093100(US)   | Cars - In The Fast Lane
-80-093104(GE)   | Cars - Auf der Aeberholspur
-80-093105(FR)   | Cars - À Fond la Caisse!
-80-093107(SP)   | Cars - El Carril Rápido
--
-80-093120(US)   | Wacky Race on Jumpin' Bean Island
-80-093124(GE)   | Das verrückte Rennen der Hüpf-Bohnel Insel
-80-093127(SP)   | Carrera Loca - En La Isla de las Vainas Fritas  (real# unknown)
--
-80-093140(US)   | Shrek The Third - The Search for Arthur
-80-093143(UK)   | Shrek The Third - The Search for Arthur
-80-093144(GE)   | Shrek Der Dritte - Die Suche nach Arthus
-80-093145(FR)   | Shrek Le Troisième - L'aventure D'Arthur
-80-093147(SP)   | Shrek Tercero - ¿Dónde está Arturo?
--
-80-093160(US)   | Bratz - The Secret Necklace
-80-093165(FR)   | Bratz
--
-80-093180(US)   | Marvel Heroes (according to VTech site, can't confirm)
--
-80-093200(US)   | Ratatouille (according to VTech site, can't confirm)
-80-093204(GE)   | Multisports
--
-80-093220(US)   | National Geographic Kids
--
-80-093600(US)   | <Unknown>
-80-093604(GE)   | Multisports
-80-093605(FR)   | Defis Sports
-
+DUMP | SERIAL          | TITLE
+__________________________________________________________________________________________
+ *** | 80-093000(US)   | Disney Princess - The Crystal Ball Adventure
+ *** | 80-093004(GE)   | Disney Princess - Das zauberhafte Märchen-Abenteuer
+     | 80-093005(FR)   | Disney Princess - L'aventure enchantée
+ *** | 80-093007(SP)   | Disney Princess - El Castillo de las Princesas
+__________________________________________________________________________________________
+ *** | 80-093020(US)   | The Incredibles - Mission Incredible
+     | 80-093023(UK)   | The Incredibles - Mission Incredible
+ *** | 80-093024(GE)   | Die Unglaublichen - In unglaublicher Mission
+     | 80-093025(FR)   | Les Indestructibles - Les Indestructibles à la Rescousse
+ *** | 80-093027(SP)   | Los Increíbles - Misión Increíble
+__________________________________________________________________________________________
+ *** | 80-093040(US)   | Nickelodeon SpongeBob Squarepants - Idea Sponge
+     | 80-093044(GE)   | Nickelodeon SpongeBob - Ein Schwamm voller Ideen
+     | 80-093045(FR)   | Nickelodeon Bob L'éponge - Une Idée Spongieuse
+ *** | 80-093047(SP)   | Nickelodeon Bob Esponja - Misión Esponja
+__________________________________________________________________________________________
+ *** | 80-093060(US)   | The Amazing Spider-Man - Countdown to Doom
+ *** | 80-093064(GE)   | Spider-Man - Angriff der Super-Schurken
+     | 80-093065(FR)   | Spider-Man - Course-poursuite A Manhattan
+ *** | 80-093067(SP)   | El Asombroso Spider-Man - Persecución en la Ciudad
+__________________________________________________________________________________________
+ *** | 80-093080(US)   | Scooby-Doo! - Ancient Adventure
+     | 80-093083(UK)   | Scooby-Doo! - Ancient Adventure
+     | 80-093084(GE)   | Scooby-Doo! - ????? (no EAN found, but should have been released)
+     | 80-093085(FR)   | Scooby-Doo! - Les Civilisations Perdues
+ *** | 80-093087(SP)   | Scooby-Doo: Viaje al Pasado
+__________________________________________________________________________________________
+ *** | 80-093100(US)   | Cars - In The Fast Lane
+ *** | 80-093104(GE)   | Cars - Auf der Aeberholspur
+     | 80-093105(FR)   | Cars - À Fond la Caisse!
+ *** | 80-093107(SP)   | Cars - El Carril Rápido
+__________________________________________________________________________________________
+ *** | 80-093120(US)   | Wacky Race on Jumpin' Bean Island
+ *** | 80-093124(GE)   | Das verrückte Rennen der Hüpf-Bohnel Insel
+ *** | 80-093127(SP)   | Carrera Loca - En La Isla de las Vainas Fritas
+__________________________________________________________________________________________
+ *** | 80-093140(US)   | Shrek The Third - The Search for Arthur
+     | 80-093143(UK)   | Shrek The Third - The Search for Arthur
+ *** | 80-093144(GE)   | Shrek Der Dritte - Die Suche nach Arthus
+     | 80-093145(FR)   | Shrek Le Troisième - L'aventure D'Arthur
+ *** | 80-093147(SP)   | Shrek Tercero - ¿Dónde está Arturo?
+__________________________________________________________________________________________
+ *** | 80-093160(US)   | Bratz - The Secret Necklace
+     | 80-093165(FR)   | Bratz
+ *** | 80-093167(SP)   | Bratz - El Misterio del Collar
+__________________________________________________________________________________________
+     | 80-093180(US)   | Marvel Heroes (according to VTech site, can't confirm)
+__________________________________________________________________________________________
+     | 80-093200(US)   | Ratatouille (according to VTech site, can't confirm)
+     | 80-093204(GE)   | Multisports
+__________________________________________________________________________________________
+     | 80-093220(US)   | National Geographic Kids
+__________________________________________________________________________________________
+     | 80-093600(US)   | <Unknown>
+     | 80-093604(GE)   | Multisports
+     | 80-093605(FR)   | Defis Sports
+__________________________________________________________________________________________
 -->
 
 <!-- CloneCD images are not fully supported by CHDMAN, thus the following US images might need to be recreated at a later stage from the original disks -->
 
 <softwarelist name="vsmile_cd" description="VTech V.Flash/V.Smile Pro V.Disc images">
-
 
 	<!-- disk mounted as 93060_001 -->
 	<software name="spidermn" supported="no">
@@ -93,7 +96,7 @@ Language:
 		<info name="serial" value="80-093060" />
 		<part name="cdrom" interface="vsmile_vdisk">
 			<diskarea name="cdrom">
-				<disk name="093060_001"  sha1="89f5072904114211890604dd6693ee70d787996b"/>
+				<disk name="093060_001" sha1="89f5072904114211890604dd6693ee70d787996b"/>
 			</diskarea>
 		</part>
 	</software>
@@ -110,7 +113,7 @@ Language:
 		<info name="serial" value="80-093064" />
 		<part name="cdrom" interface="vsmile_vdisk">
 			<diskarea name="cdrom">
-				<disk name="093064_000"  sha1="b0455f89a4ca9abd0351b7307a9b0702cc1344c3"/>
+				<disk name="093064_000" sha1="b0455f89a4ca9abd0351b7307a9b0702cc1344c3"/>
 			</diskarea>
 		</part>
 	</software>
@@ -131,7 +134,7 @@ Language:
 		<info name="serial" value="80-093067" />
 		<part name="cdrom" interface="vsmile_vdisk">
 			<diskarea name="cdrom">
-				<disk name="093067_000"  sha1="083d2808f46f7e9d8a6f7f419241356d1f8405ea"/>
+				<disk name="093067_000" sha1="083d2808f46f7e9d8a6f7f419241356d1f8405ea"/>
 			</diskarea>
 		</part>
 	</software>
@@ -149,7 +152,27 @@ Language:
 		<publisher>VTech</publisher>
 		<part name="cdrom" interface="vsmile_vdisk">
 			<diskarea name="cdrom">
-				<disk name="093160"  sha1="3e7de8679810e35ae2d449aaef9117639c268d16"/>
+				<disk name="093160" sha1="3e7de8679810e35ae2d449aaef9117639c268d16"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!--
+	Internal Serial: 0ID_93167_000
+	Volume Label: 93167_000
+	Orange cartridge
+	Sticker on the cartridge: P ○○○○
+	Ring 1: "59-093147-000-001*",  "IFPI 0926",  "59-93167-000-001"
+	Ring 2: "03/17/08 &minus;&minus; 157050 &minus;&minus; A", "IFPI LQ35"
+	-->
+	<software name="bratzs" cloneof="bratz" supported="no">
+		<description>Bratz - El Misterio del Collar (Spa)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-093167" />
+		<part name="cdrom" interface="vsmile_vdisk">
+			<diskarea name="cdrom">
+				<disk name="093167_000" sha1="371369ad911912be3cf82129bfe105b071b342d0"/>
 			</diskarea>
 		</part>
 	</software>
@@ -167,7 +190,7 @@ Language:
 		<publisher>VTech</publisher>
 		<part name="cdrom" interface="vsmile_vdisk">
 			<diskarea name="cdrom">
-				<disk name="093100"  sha1="b90f3a4752d3326639ba95c1c38fd7ac161e9a1a"/>
+				<disk name="093100" sha1="b90f3a4752d3326639ba95c1c38fd7ac161e9a1a"/>
 			</diskarea>
 		</part>
 	</software>
@@ -184,7 +207,28 @@ Language:
 		<info name="serial" value="80-093104" />
 		<part name="cdrom" interface="vsmile_vdisk">
 			<diskarea name="cdrom">
-				<disk name="093104_000"  sha1="7347c93144f06648973a60f0fef74c74db69ddf9" />
+				<disk name="093104_000" sha1="7347c93144f06648973a60f0fef74c74db69ddf9" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!--
+	Internal Serial: 0ID_93107_000
+	Volume Label: 93107_000
+	Orange cartridge
+	Sticker on the cartridge: 735 ○○○○
+	Barcode: 3417768931076
+	Ring 1: "59-93107-000-001*", "IFPI 0931", "59-93-107-000-001"
+	Ring 2: "08/15/07 &minus;&minus; 150750 &minus;&minus; A", "IFPI LQ35"
+	-->
+	<software name="carss" cloneof="cars" supported="no">
+		<description>Cars - El Carril Rápido (Spa)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-093107" />
+		<part name="cdrom" interface="vsmile_vdisk">
+			<diskarea name="cdrom">
+				<disk name="093107_000" sha1="af1261e0e309e144b4a5f335c368fae12c2d7034" />
 			</diskarea>
 		</part>
 	</software>
@@ -202,7 +246,7 @@ Language:
 		<publisher>VTech</publisher>
 		<part name="cdrom" interface="vsmile_vdisk">
 			<diskarea name="cdrom">
-				<disk name="093000"  sha1="c4e6c5a24cda03c721577ccb4f304932ed7486c6"/>
+				<disk name="093000" sha1="c4e6c5a24cda03c721577ccb4f304932ed7486c6"/>
 			</diskarea>
 		</part>
 	</software>
@@ -219,7 +263,28 @@ Language:
 		<info name="serial" value="80-093004" />
 		<part name="cdrom" interface="vsmile_vdisk">
 			<diskarea name="cdrom">
-				<disk name="093004"  sha1="62d5ed13ddf7ccb2b32613e4ef44399957535355"/>
+				<disk name="093004" sha1="62d5ed13ddf7ccb2b32613e4ef44399957535355"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!--
+	Internal Serial: 0ID_93007_000
+	Volume Label: 93007
+	Orange cartridge
+	Sticker on the cartridge: 730 ○○○○
+	Barcode: 3417768930079
+	Ring 1: "59-93007-000-001*", "IFPI 0907", "59-93007-000-001"
+	Ring 2: "07/07/07 &minus;&minus; 149549 &minus;&minus; A", "IFPI LQ35"
+	-->
+	<software name="princesss" cloneof="princess" supported="no">
+		<description>Disney Princess - El Castillo de las Princesas (Spa)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-093007" />
+		<part name="cdrom" interface="vsmile_vdisk">
+			<diskarea name="cdrom">
+				<disk name="093007_000" sha1="eaf2998e561fe238a07d9410ab320c63af0673fd"/>
 			</diskarea>
 		</part>
 	</software>
@@ -239,7 +304,7 @@ Language:
 		<info name="serial" value="80-093020" />
 		<part name="cdrom" interface="vsmile_vdisk">
 			<diskarea name="cdrom">
-				<disk name="093020"  sha1="84ba80f67d136cd742989dceebda1c8881d0f393"/>
+				<disk name="093020" sha1="84ba80f67d136cd742989dceebda1c8881d0f393"/>
 			</diskarea>
 		</part>
 	</software>
@@ -256,7 +321,7 @@ Language:
 		<info name="serial" value="80-093024" />
 		<part name="cdrom" interface="vsmile_vdisk">
 			<diskarea name="cdrom">
-				<disk name="093024"  sha1="09b80c8899a3c18776626225d662d7f084a44d2d"/>
+				<disk name="093024" sha1="09b80c8899a3c18776626225d662d7f084a44d2d"/>
 			</diskarea>
 		</part>
 	</software>
@@ -277,7 +342,7 @@ Language:
 		<info name="serial" value="80-093027" />
 		<part name="cdrom" interface="vsmile_vdisk">
 			<diskarea name="cdrom">
-				<disk name="093027_000"  sha1="f804204b4b7ce7ba111a3099c4f8a3f821ea53a6"/>
+				<disk name="093027_000" sha1="f804204b4b7ce7ba111a3099c4f8a3f821ea53a6"/>
 			</diskarea>
 		</part>
 	</software>
@@ -294,7 +359,7 @@ Language:
 		<info name="serial" value="80-093204" />
 		<part name="cdrom" interface="vsmile_vdisk">
 			<diskarea name="cdrom">
-				<disk name="093204_000"  sha1="eb89c8b5cacb619c1fbcb700b971ad2791f1c5b6" />
+				<disk name="093204_000" sha1="eb89c8b5cacb619c1fbcb700b971ad2791f1c5b6" />
 			</diskarea>
 		</part>
 	</software>
@@ -314,7 +379,28 @@ Language:
 		<info name="serial" value="80-093080" />
 		<part name="cdrom" interface="vsmile_vdisk">
 			<diskarea name="cdrom">
-				<disk name="093080"  sha1="3ec7e1ac4435666c3cc1b1844eac5f271b5357e8"/>
+				<disk name="093080_001" sha1="3ec7e1ac4435666c3cc1b1844eac5f271b5357e8"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!--
+	Internal Serial: 0ID_93087_000
+	Volume Label: 93087_000
+	Orange cartridge
+	Sticker on the cartridge: 729 ○○○○
+	Barcode: 3417768930871
+	Ring 1: "59-93087-000-001*", "IFPI 0946", "59-93027-000-001"
+	Ring 2: "07/10/07 &minus;&minus; 049620 &minus;&minus; A", "IFPI LQ35"
+	-->
+	<software name="scoobys" cloneof="scooby" supported="no">
+		<description>Scooby-Doo: Viaje al Pasado (Spa)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-093087" />
+		<part name="cdrom" interface="vsmile_vdisk">
+			<diskarea name="cdrom">
+				<disk name="093087_000" sha1="1b8f4e54ec2cfb709e82212275f5efc7075a34c0"/>
 			</diskarea>
 		</part>
 	</software>
@@ -332,7 +418,7 @@ Language:
 		<publisher>VTech</publisher>
 		<part name="cdrom" interface="vsmile_vdisk">
 			<diskarea name="cdrom">
-				<disk name="093140"  sha1="be3d6ed22526dbbfc7cc781c8d6f1443d62560ad"/>
+				<disk name="093140" sha1="be3d6ed22526dbbfc7cc781c8d6f1443d62560ad"/>
 			</diskarea>
 		</part>
 	</software>
@@ -349,7 +435,27 @@ Language:
 		<info name="serial" value="80-093144" />
 		<part name="cdrom" interface="vsmile_vdisk">
 			<diskarea name="cdrom">
-				<disk name="093144_000"  sha1="ab7f8d57e235a12c23cc2e72dc263530d0deb016" />
+				<disk name="093144_000" sha1="ab7f8d57e235a12c23cc2e72dc263530d0deb016" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!--
+	Internal Serial: 0ID_93147_000
+	Volume Label: 93147_000
+	Orange cartridge
+	Sticker on the cartridge: 748 ○○○○
+	Ring 1: "59-93147-000-001*", "IFPI 0907", "59-93147-000-001"
+	Ring 2: "11/15/07 &minus;&minus; 153583 &minus;&minus; A", "IFPI LQ35"
+	-->
+	<software name="shrek3s" cloneof="shrek3" supported="no">
+		<description>Shrek Tercero - ¿Dónde Está Arturo? (Spa)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-093147" />
+		<part name="cdrom" interface="vsmile_vdisk">
+			<diskarea name="cdrom">
+				<disk name="093147_000" sha1="2a310736185336e93e8cf5e3a2d0a6e4949e11d3" />
 			</diskarea>
 		</part>
 	</software>
@@ -362,29 +468,34 @@ Language:
 		 <rom name="spongebob squarepants - idea sponge (us).img" size="373038960" crc="f3dcd059" sha1="bc70d3a4017b6282bea065e4ed8a05c601471069" />
 		 <rom name="spongebob squarepants - idea sponge (us).sub" size="15226080" crc="f8ef603f" sha1="84515fb53c4de9a0072dc051d365b1cbc1065b0f" />
 		 -->
-		<description>SpongeBob Squarepants - Idea Sponge (USA)</description>
+		<description>Nickelodeon SpongeBob Squarepants - Idea Sponge (USA)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<part name="cdrom" interface="vsmile_vdisk">
 			<diskarea name="cdrom">
-				<disk name="093040"  sha1="2ede68aa9df7712a1060e8f3b1be3307c38abd80"/>
+				<disk name="093040" sha1="2ede68aa9df7712a1060e8f3b1be3307c38abd80"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="hupfbohn" supported="no">
-		<!--
-		Original files (from TeamEurope)
-		<rom name="93124_000.bin" size="457901472" crc="92a0ebe0" sha1="a3a8e54d5f12094bfc0c89954987cc793d83d3f9" />
-		<rom name="93124_000.cue" size="75" crc="13c741b0" sha1="7a5b6a928922cee744fc579a7f8a785c0537a5ac" />
-		-->
-		<description>Das verrückte Rennen der Hüpf-Bohnel Insel (Ger)</description>
+
+	<!--
+	Internal Serial: 0ID_93047_000
+	Volume Label: 93047
+	Orange cartridge
+	Sticker on the cartridge: 809 ○○○○
+	Barcode: 3417768930475
+	Ring 1: "59-93047-000-001*", "IFPI 0999", "59-93047-000-001"
+	Ring 2: "02/01/06 &minus;&minus; 155691 &minus;&minus; A", "IFPI LQ35"
+	-->
+	<software name="spongeiss" cloneof="spongeis" supported="no">
+		<description>Nickelodeon Bob Esponja - Misión Esponja (Spa)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
-		<info name="serial" value="80-093124" />
+		<info name="serial" value="80-093047" />
 		<part name="cdrom" interface="vsmile_vdisk">
 			<diskarea name="cdrom">
-				<disk name="93124_000"  sha1="90b2723c68da81de677b82d565c7e0364a7cbb53"/>
+				<disk name="093047_000" sha1="37dd91c9321f8a631e269034569958d400dd7b98"/>
 			</diskarea>
 		</part>
 	</software>
@@ -404,10 +515,45 @@ Language:
 		<info name="serial" value="093120_003" />
 		<part name="cdrom" interface="vsmile_vdisk">
 			<diskarea name="cdrom">
-				<disk name="093120"  sha1="dbc128608e64d40aaf3456aac2c0dd07e0f73ef4"/>
+				<disk name="093120_003" sha1="dbc128608e64d40aaf3456aac2c0dd07e0f73ef4"/>
 			</diskarea>
 		</part>
 	</software>
 
+	<software name="wackyracg" cloneof="wackyrac" supported="no">
+		<!--
+		Original files (from TeamEurope)
+		<rom name="93124_000.bin" size="457901472" crc="92a0ebe0" sha1="a3a8e54d5f12094bfc0c89954987cc793d83d3f9" />
+		<rom name="93124_000.cue" size="75" crc="13c741b0" sha1="7a5b6a928922cee744fc579a7f8a785c0537a5ac" />
+		-->
+		<description>Das verrückte Rennen der Hüpf-Bohnel Insel (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-093124" />
+		<part name="cdrom" interface="vsmile_vdisk">
+			<diskarea name="cdrom">
+				<disk name="093124_000" sha1="90b2723c68da81de677b82d565c7e0364a7cbb53"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!--
+	Internal Serial: 0ID_93127_000
+	Volume Label: 80_93127_022_001
+	Barcode: 3417768931274
+	Ring 1: "59-93127-000-001*", "IFPI 0946", "59-93-107-000-001"
+	Ring 2: "07/12/07 &minus;&minus; 149610 &minus;&minus; A", "IFPI LQ35"
+	-->
+	<software name="wackyracs" cloneof="wackyrac" supported="no">
+		<description>Carrera Loca en la Isla de las Vainas Fritas (Spa)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-93127" />
+		<part name="cdrom" interface="vsmile_vdisk">
+			<diskarea name="cdrom">
+				<disk name="093127_000" sha1="c3c98b37c6d235815698aaf67e796a34fb7ab577"/>
+			</diskarea>
+		</part>
+	</software>
 
 </softwarelist>
