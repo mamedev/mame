@@ -2623,10 +2623,14 @@ if (BUSES["SG1000_EXP"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/sg1000_exp/sg1000exp.cpp",
 		MAME_DIR .. "src/devices/bus/sg1000_exp/sg1000exp.h",
-		MAME_DIR .. "src/devices/bus/sg1000_exp/sk1100.cpp",
-		MAME_DIR .. "src/devices/bus/sg1000_exp/sk1100.h",
 		MAME_DIR .. "src/devices/bus/sg1000_exp/fm_unit.cpp",
 		MAME_DIR .. "src/devices/bus/sg1000_exp/fm_unit.h",
+		MAME_DIR .. "src/devices/bus/sg1000_exp/sk1100.cpp",
+		MAME_DIR .. "src/devices/bus/sg1000_exp/sk1100.h",
+		MAME_DIR .. "src/devices/bus/sg1000_exp/sk1100prn.cpp",
+		MAME_DIR .. "src/devices/bus/sg1000_exp/sk1100prn.h",
+		MAME_DIR .. "src/devices/bus/sg1000_exp/kblink.cpp",
+		MAME_DIR .. "src/devices/bus/sg1000_exp/kblink.h",
 	}
 end
 
