@@ -255,8 +255,7 @@ void deco_bac06_device::custom_tilemap_draw(bitmap_ind16 &bitmap,
 		uint16_t colprimask,
 		uint16_t colpricondition,
 		uint8_t bppmult,
-		uint8_t bppmask
-    )
+		uint8_t bppmask)
 {
 	const bitmap_ind16 &src_bitmap = tilemap_ptr->pixmap();
 	const bitmap_ind8 &flags_bitmap = tilemap_ptr->flagsmap();
