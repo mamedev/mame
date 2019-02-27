@@ -104,15 +104,15 @@ DEVICE_IMAGE_LOAD_MEMBER(arb_state, cartridge)
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
+	// extra ram (optional)
+	if (image.get_feature("ram"))
+		m_maincpu->space(AS_PROGRAM).install_ram(0x0800, 0x0fff, 0x1000, nullptr);
+
 	return image_init_result::PASS;
 }
 
 READ8_MEMBER(arb_state::cartridge_r)
 {
-	// range is 0x4000-0x7fff + 0xc000-0xffff
-	if (offset >= 0x8000)
-		offset -= 0x4000;
-
 	return m_cart->read_rom(offset & m_cart_mask);
 }
 
@@ -165,9 +165,10 @@ READ8_MEMBER(arb_state::input_r)
 
 void arb_state::main_map(address_map &map)
 {
-	map(0x0000, 0x07ff).mirror(0x3800).ram().share("nvram");
-	map(0x4000, 0xffff).r(FUNC(arb_state::cartridge_r)); // gap in 0x8000-0xbfff
-	map(0x8000, 0x800f).mirror(0x3ff0).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	// external slot is A0-A14, potential bus conflict with RAM/VIA
+	map(0x0000, 0x7fff).mirror(0x8000).r(FUNC(arb_state::cartridge_r));
+	map(0x0000, 0x07ff).mirror(0x1000).ram().share("nvram");
+	map(0x8000, 0x800f).mirror(0x1ff0).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write));
 }
 
 
