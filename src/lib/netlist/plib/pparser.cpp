@@ -381,7 +381,7 @@ pstring ppreprocessor::replace_macros(const pstring &line)
 	return ret;
 }
 
-static pstring catremainder(const std::vector<pstring> &elems, std::size_t start, pstring sep)
+static pstring catremainder(const std::vector<pstring> &elems, std::size_t start, const pstring &sep)
 {
 	pstring ret("");
 	for (std::size_t i = start; i < elems.size(); i++)
