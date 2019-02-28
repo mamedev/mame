@@ -662,6 +662,7 @@ WRITE16_MEMBER(tispeak_state::snspellc_write_o)
 {
 	// O3210: TMS5100 CTL8124
 	m_tms5100->ctl_w(space, 0, bitswap<4>(data,3,0,1,2));
+	m_o = data;
 }
 
 READ8_MEMBER(tispeak_state::snspellc_read_k)
