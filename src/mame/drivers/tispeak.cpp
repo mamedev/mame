@@ -435,7 +435,8 @@ public:
 		hh_tms1k_state(mconfig, type, tag),
 		m_tms5100(*this, "tms5100"),
 		m_tms6100(*this, "tms6100"),
-		m_cart(*this, "cartslot")
+		m_cart(*this, "cartslot"),
+		m_ol_out(*this, "ol%u", 1U)
 	{ }
 
 	virtual DECLARE_INPUT_CHANGED_MEMBER(power_button) override;
@@ -495,6 +496,8 @@ private:
 	required_device<tms6100_device> m_tms6100;
 	optional_device<generic_slot_device> m_cart;
 
+	output_finder<5> m_ol_out;
+
 	// cartridge
 	u32 m_cart_max_size;
 	u8* m_cart_base;
@@ -506,6 +509,9 @@ private:
 void tispeak_state::machine_start()
 {
 	hh_tms1k_state::machine_start();
+
+	m_ol_out.resolve();
+
 	init_cartridge();
 }
 
@@ -711,6 +717,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(tispeak_state::tntell_get_overlay)
 			if (name[i] == '$' && strlen(&name[i]) > 2)
 				m_overlay = tntell_get_hexchar(name[i + 1]) << 4 | tntell_get_hexchar(name[i + 2]);
 	}
+
+	// overlay holes
+	for (int i = 0; i < 5; i++)
+		m_ol_out[i] = BIT(m_overlay, i);
 }
 
 
@@ -1180,7 +1190,7 @@ static INPUT_PORTS_START( tntell )
 
 	PORT_START("IN.10")
 	PORT_CONFNAME( 0x3f, 0x20, "Overlay Code" )
-	PORT_CONFSETTING(    0x20, "From artwork view" )
+	PORT_CONFSETTING(    0x20, "From Artwork View" )
 	PORT_CONFSETTING(    0x00, "$00 (None)" )
 	PORT_CONFSETTING(    0x01, "$01" )
 	PORT_CONFSETTING(    0x02, "$02" )
