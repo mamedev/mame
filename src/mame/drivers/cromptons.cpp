@@ -4,7 +4,7 @@
     Skeleton driver for Cromptons Leisure Machines' Frantic Fruits redemption game.
 
     Hardware overview:
-    Main CPU: TS80C3X2-MCA
+    Main CPU: TS80C32X2-MCA
     Sound: CD sound?
     Other: M48T08 timekeeper RAM
     OSC: 11.0592 MHz
@@ -81,7 +81,7 @@ INPUT_PORTS_END
 void cromptons_state::cromptons(machine_config &config)
 {
 	/* basic machine hardware */
-	I80C32(config, m_maincpu, 11.004_MHz_XTAL); // TS80C3X2-MCA
+	I80C32(config, m_maincpu, 11.0592_MHz_XTAL); // TS80C32X2-MCA
 	m_maincpu->set_addrmap(AS_PROGRAM, &cromptons_state::prg_map);
 	m_maincpu->set_addrmap(AS_IO, &cromptons_state::io_map);
 
