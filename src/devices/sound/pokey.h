@@ -284,10 +284,10 @@ private:
 
 	pokey_channel m_channel[POKEY_CHANNELS];
 
-	uint32_t m_output;        /* raw output */
-	double m_out_filter;    /* filtered output */
+	uint32_t m_out_raw;         /* raw output */
+	double m_out_filter;        /* filtered output */
 
-	int32_t m_clock_cnt[3];       /* clock counters */
+	int32_t m_clock_cnt[3];     /* clock counters */
 	uint32_t m_p4;              /* poly4 index */
 	uint32_t m_p5;              /* poly5 index */
 	uint32_t m_p9;              /* poly9 index */

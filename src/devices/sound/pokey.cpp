@@ -253,7 +253,7 @@ void pokey_device::device_start()
 	m_pot_counter = 0;
 	m_kbd_cnt = 0;
 	m_out_filter = 0;
-	m_output = 0;
+	m_out_raw = 0;
 	m_kbd_state = 0;
 
 	/* reset more internal state */
@@ -436,11 +436,11 @@ void pokey_device::execute_run()
 	do
 	{
 		uint32_t new_out = step_one_clock();
-		if (m_output != new_out)
+		if (m_out_raw != new_out)
 		{
-			//printf("forced update %08d %08x\n", m_icount, m_output);
+			//printf("forced update %08d %08x\n", m_icount, m_out_raw);
 			m_stream->update();
-			m_output = new_out;
+			m_out_raw = new_out;
 		}
 
 		m_icount--;
@@ -704,7 +704,7 @@ void pokey_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 	{
 		int32_t out = 0;
 		for (int i = 0; i < 4; i++)
-			out += ((m_output >> (4*i)) & 0x0f);
+			out += ((m_out_raw >> (4*i)) & 0x0f);
 		out *= POKEY_DEFAULT_GAIN;
 		out = (out > 0x7fff) ? 0x7fff : out;
 		while( samples > 0 )
@@ -715,7 +715,7 @@ void pokey_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 	}
 	else if (m_output_type == RC_LOWPASS)
 	{
-		double rTot = m_voltab[m_output];
+		double rTot = m_voltab[m_out_raw];
 
 		double V0 = rTot / (rTot+m_r_pullup) * m_v_ref / 5.0 * 32767.0;
 		double mult = (m_cap == 0.0) ? 1.0 : 1.0 - exp(-(rTot + m_r_pullup) / (m_cap * m_r_pullup * rTot) * m_clock_period.as_double());
@@ -731,7 +731,7 @@ void pokey_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 	}
 	else if (m_output_type == OPAMP_C_TO_GROUND)
 	{
-		double rTot = m_voltab[m_output];
+		double rTot = m_voltab[m_out_raw];
 		/* In this configuration there is a capacitor in parallel to the pokey output to ground.
 		 * With a LM324 in LTSpice this causes the opamp circuit to oscillate at around 100 kHz.
 		 * We are ignoring the capacitor here, since this oscillation would not be audible.
@@ -753,7 +753,7 @@ void pokey_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 	}
 	else if (m_output_type == OPAMP_LOW_PASS)
 	{
-		double rTot = m_voltab[m_output];
+		double rTot = m_voltab[m_out_raw];
 		/* This post-pokey stage usually has a low-pass filter behind it
 		 * It is approximated by not adding in VRef below.
 		 */
@@ -771,7 +771,7 @@ void pokey_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 	}
 	else if (m_output_type == DISCRETE_VAR_R)
 	{
-		int32_t out = m_voltab[m_output];
+		int32_t out = m_voltab[m_out_raw];
 		while( samples > 0 )
 		{
 			*buffer++ = out;
