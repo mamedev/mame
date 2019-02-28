@@ -978,17 +978,17 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(leland_state::leland)
-
+void leland_state::leland(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_master, Z80, MASTER_CLOCK/2)
-	MCFG_DEVICE_PROGRAM_MAP(master_map_program)
-	MCFG_DEVICE_IO_MAP(master_map_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", leland_state,  leland_master_interrupt)
+	Z80(config, m_master, MASTER_CLOCK/2);
+	m_master->set_addrmap(AS_PROGRAM, &leland_state::master_map_program);
+	m_master->set_addrmap(AS_IO, &leland_state::master_map_io);
+	m_master->set_vblank_int("screen", FUNC(leland_state::leland_master_interrupt));
 
-	MCFG_DEVICE_ADD(m_slave, Z80, MASTER_CLOCK/2)
-	MCFG_DEVICE_PROGRAM_MAP(slave_small_map_program)
-	MCFG_DEVICE_IO_MAP(slave_map_io)
+	Z80(config, m_slave, MASTER_CLOCK/2);
+	m_slave->set_addrmap(AS_PROGRAM, &leland_state::slave_small_map_program);
+	m_slave->set_addrmap(AS_IO, &leland_state::slave_map_io);
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
 	NVRAM(config, "battery", nvram_device::DEFAULT_ALL_0);
@@ -1018,48 +1018,49 @@ MACHINE_CONFIG_START(leland_state::leland)
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.add_route(0, "dac0", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac0", -1.0, DAC_VREF_NEG_INPUT);
 	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(redline_state::redline)
+void redline_state::redline(machine_config &config)
+{
 	leland(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("master")
-	MCFG_DEVICE_IO_MAP(master_redline_map_io)
+	m_master->set_addrmap(AS_IO, &redline_state::master_redline_map_io);
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD(m_sound, REDLINE_80186, 0)
-MACHINE_CONFIG_END
+	REDLINE_80186(config, m_sound, 0);
+}
 
 
-MACHINE_CONFIG_START(redline_state::quarterb)
+void redline_state::quarterb(machine_config &config)
+{
 	redline(config);
 
 	/* sound hardware */
-	MCFG_DEVICE_REPLACE(m_sound, LELAND_80186, 0)
-MACHINE_CONFIG_END
+	LELAND_80186(config.replace(), m_sound, 0);
+}
 
 
-MACHINE_CONFIG_START(redline_state::lelandi)
+void redline_state::lelandi(machine_config &config)
+{
 	quarterb(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("slave")
-	MCFG_DEVICE_PROGRAM_MAP(slave_large_map_program)
-MACHINE_CONFIG_END
+	m_slave->set_addrmap(AS_PROGRAM, &redline_state::slave_large_map_program);
+}
 
 
-MACHINE_CONFIG_START(ataxx_state::ataxx)
-
+void ataxx_state::ataxx(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_master, Z80, 6000000)
-	MCFG_DEVICE_PROGRAM_MAP(master_map_program_2)
-	MCFG_DEVICE_IO_MAP(master_map_io_2)
+	Z80(config, m_master, 6000000);
+	m_master->set_addrmap(AS_PROGRAM, &ataxx_state::master_map_program_2);
+	m_master->set_addrmap(AS_IO, &ataxx_state::master_map_io_2);
 
-	MCFG_DEVICE_ADD(m_slave, Z80, 6000000)
-	MCFG_DEVICE_PROGRAM_MAP(slave_map_program)
-	MCFG_DEVICE_IO_MAP(slave_map_io_2)
+	Z80(config, m_slave, 6000000);
+	m_slave->set_addrmap(AS_PROGRAM, &ataxx_state::slave_map_program);
+	m_slave->set_addrmap(AS_IO, &ataxx_state::slave_map_io_2);
 
 	EEPROM_93C56_16BIT(config, m_eeprom, eeprom_serial_streaming::ENABLE);
 
@@ -1069,15 +1070,16 @@ MACHINE_CONFIG_START(ataxx_state::ataxx)
 	ataxx_video(config);
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD(m_sound, ATAXX_80186, 0)
-MACHINE_CONFIG_END
+	ATAXX_80186(config, m_sound, 0);
+}
 
 
-MACHINE_CONFIG_START(ataxx_state::wsf)
+void ataxx_state::wsf(machine_config &config)
+{
 	ataxx(config);
 
-	MCFG_DEVICE_REPLACE(m_sound, WSF_80186, 0)
-MACHINE_CONFIG_END
+	WSF_80186(config.replace(), m_sound, 0);
+}
 
 
 

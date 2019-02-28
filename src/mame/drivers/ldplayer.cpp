@@ -627,8 +627,9 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(ldplayer_state::ldplayer_ntsc)
-MACHINE_CONFIG_END
+void ldplayer_state::ldplayer_ntsc(machine_config &config)
+{
+}
 
 
 MACHINE_CONFIG_START(ldv1000_state::ldv1000)

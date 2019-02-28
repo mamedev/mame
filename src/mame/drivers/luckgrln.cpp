@@ -861,11 +861,12 @@ INTERRUPT_GEN_MEMBER(luckgrln_state::irq)
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-MACHINE_CONFIG_START(luckgrln_state::luckgrln)
-	MCFG_DEVICE_ADD(m_maincpu, Z180,8000000)
-	MCFG_DEVICE_PROGRAM_MAP(mainmap)
-	MCFG_DEVICE_IO_MAP(luckgrln_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", luckgrln_state, irq)
+void luckgrln_state::luckgrln(machine_config &config)
+{
+	Z180(config, m_maincpu, 8000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &luckgrln_state::mainmap);
+	m_maincpu->set_addrmap(AS_IO, &luckgrln_state::luckgrln_io);
+	m_maincpu->set_vblank_int("screen", FUNC(luckgrln_state::irq));
 
 	h46505_device &crtc(H46505(config, "crtc", 6000000/4)); /* unknown clock, hand tuned to get ~60 fps */
 	crtc.set_screen("screen");
@@ -874,29 +875,28 @@ MACHINE_CONFIG_START(luckgrln_state::luckgrln)
 
 	MSM6242(config, "rtc", 0);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(luckgrln_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 256);
+	screen.set_visarea(0, 512-1, 0, 256-1);
+	screen.set_screen_update(FUNC(luckgrln_state::screen_update));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_luckgrln);
-	MCFG_PALETTE_ADD("palette", 0x8000)
+	PALETTE(config, m_palette).set_entries(0x8000);
 
 	SPEAKER(config, "mono").front_center();
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(luckgrln_state::_7smash)
+void luckgrln_state::_7smash(machine_config &config)
+{
 	luckgrln(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(_7smash_map)
-	MCFG_DEVICE_IO_MAP(_7smash_io)
+	m_maincpu->set_addrmap(AS_PROGRAM, &luckgrln_state::_7smash_map);
+	m_maincpu->set_addrmap(AS_IO, &luckgrln_state::_7smash_io);
 
 	config.device_remove("rtc");
-MACHINE_CONFIG_END
+}
 
 void luckgrln_state::init_luckgrln()
 {

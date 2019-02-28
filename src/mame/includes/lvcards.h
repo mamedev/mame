@@ -12,9 +12,9 @@ class lvcards_state : public driver_device
 public:
 	lvcards_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
-		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
@@ -26,6 +26,8 @@ protected:
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(colorram_w);
 
+	required_device<cpu_device> m_maincpu;
+
 private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
@@ -33,7 +35,6 @@ private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void lvcards_palette(palette_device &palette) const;
 	uint32_t screen_update_lvcards(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	void lvcards_io_map(address_map &map);
 	void lvcards_map(address_map &map);

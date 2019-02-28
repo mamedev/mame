@@ -543,15 +543,16 @@ static void fccpu1_vme_cards(device_slot_interface &device)
 /*
  * Machine configuration
  */
-MACHINE_CONFIG_START(force68k_state::fccpu1)
+void force68k_state::fccpu1(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(force68k_mem)
+	M68000(config, m_maincpu, XTAL(16'000'000) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &force68k_state::force68k_mem);
 
 	/* P3/Host Port config
 	 * LO command causes ROM monitor to expect S-records on HOST port by default
 	 * Implementation through nullmodem currently does not support handshakes so
-	 * the ROM momitor is over-run while checking for checksums etc if used with
+	 * the ROM monitor is over-run while checking for checksums etc if used with
 	 * UI mount <file> feature.
 	 */
 	ACIA6850(config, m_aciahost, 0);
@@ -608,9 +609,9 @@ MACHINE_CONFIG_START(force68k_state::fccpu1)
 	fccpu1_eprom_sockets(config);
 
 	// VME interface
-	MCFG_VME_DEVICE_ADD("vme")
-	MCFG_VME_SLOT_ADD("vme", 1, fccpu1_vme_cards, nullptr)
-MACHINE_CONFIG_END
+	VME(config, "vme", 0);
+	VME_SLOT(config, "slot1", fccpu1_vme_cards, nullptr, 1, "vme");
+}
 
 #if 0 /*
        * CPU-6 family is device and adressmap compatible with CPU-1 but with additions

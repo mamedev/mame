@@ -512,18 +512,18 @@ TIMER_DEVICE_CALLBACK_MEMBER(lastbank_state::irq_scanline)
 	}
 }
 
-MACHINE_CONFIG_START(lastbank_state::lastbank)
-
+void lastbank_state::lastbank(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80,MASTER_CLOCK/4) //!!! TC0091LVC !!!
-	MCFG_DEVICE_PROGRAM_MAP(lastbank_map)
+	Z80(config, m_maincpu, MASTER_CLOCK/4); //!!! TC0091LVC !!!
+	m_maincpu->set_addrmap(AS_PROGRAM, &lastbank_state::lastbank_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(lastbank_state::irq_scanline), "screen", 0, 1);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("audiocpu",Z80,MASTER_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(lastbank_audio_map)
-	MCFG_DEVICE_IO_MAP(lastbank_audio_io)
+	z80_device &audiocpu(Z80(config, "audiocpu", MASTER_CLOCK/4));
+	audiocpu.set_addrmap(AS_PROGRAM, &lastbank_state::lastbank_audio_map);
+	audiocpu.set_addrmap(AS_IO, &lastbank_state::lastbank_audio_io);
 	// yes, we have no interrupts
 
 	config.m_perfect_cpu_quantum = subtag("maincpu");
@@ -532,17 +532,17 @@ MACHINE_CONFIG_START(lastbank_state::lastbank)
 	//MCFG_MACHINE_RESET_OVERRIDE(lastbank_state,lastbank)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(lastbank_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, lastbank_state, screen_vblank))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(lastbank_state::screen_update));
+	screen.screen_vblank().set(FUNC(lastbank_state::screen_vblank));
+	screen.set_palette("palette");
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_lastbank );
-	MCFG_PALETTE_ADD("palette", 0x100)
+	PALETTE(config, "palette").set_entries(0x100);
 
 	TC0091LVC(config, m_vdp, 0);
 	m_vdp->set_gfxdecode_tag("gfxdecode");
@@ -555,8 +555,7 @@ MACHINE_CONFIG_START(lastbank_state::lastbank)
 	GENERIC_LATCH_8(config, "soundlatch1");
 	GENERIC_LATCH_8(config, "soundlatch2");
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	OKIM6295(config, m_oki, 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.75);
 
 	ES8712(config, m_essnd, 0);
 	m_essnd->msm_write_handler().set("msm", FUNC(msm6585_device::data_w));
@@ -570,7 +569,7 @@ MACHINE_CONFIG_START(lastbank_state::lastbank)
 	// A RTC-62421 is present on the Last Bank PCB. However, the code
 	// that tries to read from it is broken and nonfunctional. The RTC
 	// is also absent from some other games on the same hardware.
-MACHINE_CONFIG_END
+}
 
 /***************************************************************************
 

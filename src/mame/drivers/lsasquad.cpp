@@ -555,17 +555,17 @@ MACHINE_RESET_MEMBER(lsasquad_state,lsasquad)
 }
 
 /* Note: lsasquad clock values are not verified */
-MACHINE_CONFIG_START(lsasquad_state::lsasquad)
-
+void lsasquad_state::lsasquad(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK / 4)
-	MCFG_DEVICE_PROGRAM_MAP(lsasquad_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lsasquad_state,  irq0_line_hold)
+	Z80(config, m_maincpu, MASTER_CLOCK / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &lsasquad_state::lsasquad_map);
+	m_maincpu->set_vblank_int("screen", FUNC(lsasquad_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, MASTER_CLOCK / 8)
-	MCFG_DEVICE_PROGRAM_MAP(lsasquad_sound_map)
+	Z80(config, m_audiocpu, MASTER_CLOCK / 8);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &lsasquad_state::lsasquad_sound_map);
 								/* IRQs are triggered by the YM2203 */
-	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, MASTER_CLOCK / 8)
+	TAITO68705_MCU(config, m_bmcu, MASTER_CLOCK / 8);
 
 
 	config.m_minimum_quantum = attotime::from_hz(30000); /* 500 CPU slices per frame - a high value to ensure proper */
@@ -583,13 +583,13 @@ MACHINE_CONFIG_START(lsasquad_state::lsasquad)
 	GENERIC_LATCH_8(config, m_soundlatch2);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(lsasquad_state, screen_update_lsasquad)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(lsasquad_state::screen_update_lsasquad));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lsasquad);
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 512);
@@ -607,31 +607,31 @@ MACHINE_CONFIG_START(lsasquad_state::lsasquad)
 	ymsnd.add_route(1, "mono", 0.12);
 	ymsnd.add_route(2, "mono", 0.12);
 	ymsnd.add_route(3, "mono", 0.63);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(lsasquad_state::storming)
+void lsasquad_state::storming(machine_config &config)
+{
 	lsasquad(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(storming_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &lsasquad_state::storming_map);
 
 	config.device_remove("bmcu");
 
 	AY8910(config.replace(), "aysnd", MASTER_CLOCK / 8).add_route(ALL_OUTPUTS, "mono", 0.12); // AY-3-8910A
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(lsasquad_state::daikaiju)
-
+void lsasquad_state::daikaiju(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK / 4)
-	MCFG_DEVICE_PROGRAM_MAP(daikaiju_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lsasquad_state,  irq0_line_hold)
+	Z80(config, m_maincpu, MASTER_CLOCK / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &lsasquad_state::daikaiju_map);
+	m_maincpu->set_vblank_int("screen", FUNC(lsasquad_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, MASTER_CLOCK / 8)
-	MCFG_DEVICE_PROGRAM_MAP(daikaiju_sound_map)
+	Z80(config, m_audiocpu, MASTER_CLOCK / 8);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &lsasquad_state::daikaiju_sound_map);
 	/* IRQs are triggered by the YM2203 */
 
-	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, MASTER_CLOCK / 8)
+	TAITO68705_MCU(config, m_bmcu, MASTER_CLOCK / 8);
 
 	config.m_minimum_quantum = attotime::from_hz(30000); /* 500 CPU slices per frame - a high value to ensure proper */
 							/* synchronization of the CPUs */
@@ -646,13 +646,13 @@ MACHINE_CONFIG_START(lsasquad_state::daikaiju)
 	INPUT_MERGER_ALL_HIGH(config, "soundnmi").output_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(lsasquad_state, screen_update_daikaiju)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(lsasquad_state::screen_update_daikaiju));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lsasquad);
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 512);
@@ -670,7 +670,7 @@ MACHINE_CONFIG_START(lsasquad_state::daikaiju)
 	ymsnd.add_route(1, "mono", 0.12);
 	ymsnd.add_route(2, "mono", 0.12);
 	ymsnd.add_route(3, "mono", 0.63);
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

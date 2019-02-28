@@ -208,13 +208,13 @@ static void mzr8105_vme_cards(device_slot_interface &device)
 /*
  * Machine configuration
  */
-MACHINE_CONFIG_START(mzr8105_state::mzr8105)
-	MCFG_DEVICE_ADD ("maincpu", M68000, XTAL(10'000'000))
-	MCFG_DEVICE_PROGRAM_MAP (mzr8105_mem)
-	MCFG_VME_DEVICE_ADD("vme")
-	MCFG_VME_BUS_OWNER_SPACES()
-	MCFG_VME_SLOT_ADD ("vme", 1, mzr8105_vme_cards, "mzr8300")
-MACHINE_CONFIG_END
+void mzr8105_state::mzr8105(machine_config &config)
+{
+	M68000(config, m_maincpu, XTAL(10'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &mzr8105_state::mzr8105_mem);
+	VME(config, "vme", 0).use_owner_spaces();
+	VME_SLOT(config, "slot1", mzr8105_vme_cards, "mzr8300", 1, "vme");
+}
 
 /* ROM definitions */
 /* mzr8300 UPD7201 init sequence

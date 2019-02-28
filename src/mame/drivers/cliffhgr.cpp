@@ -689,17 +689,18 @@ INPUT_PORTS_END
  *************************************/
 
 MACHINE_CONFIG_START(cliffhgr_state::cliffhgr)
-
-	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)       /* 4MHz */
-	MCFG_DEVICE_PROGRAM_MAP(mainmem)
-	MCFG_DEVICE_IO_MAP(mainport)
+	Z80(config, m_maincpu, 4000000);       /* 4MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &cliffhgr_state::mainmem);
+	m_maincpu->set_addrmap(AS_IO, &cliffhgr_state::mainport);
 
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_LASERDISC_PR8210_ADD("laserdisc")
-	MCFG_LASERDISC_OVERLAY_DEVICE(tms9928a_device::TOTAL_HORZ, tms9928a_device::TOTAL_VERT_NTSC, "tms9928a", tms9928a_device, screen_update)
-	MCFG_LASERDISC_OVERLAY_CLIP(tms9928a_device::HORZ_DISPLAY_START-12, tms9928a_device::HORZ_DISPLAY_START+32*8+12-1, tms9928a_device::VERT_DISPLAY_START_NTSC - 12, tms9928a_device::VERT_DISPLAY_START_NTSC+24*8+12-1)
+	PIONEER_PR8210(config, m_laserdisc, 0);
+	m_laserdisc->set_overlay(tms9928a_device::TOTAL_HORZ, tms9928a_device::TOTAL_VERT_NTSC, "tms9928a", FUNC(tms9928a_device::screen_update));
+	m_laserdisc->set_overlay_clip(tms9928a_device::HORZ_DISPLAY_START-12, tms9928a_device::HORZ_DISPLAY_START+32*8+12-1, tms9928a_device::VERT_DISPLAY_START_NTSC - 12, tms9928a_device::VERT_DISPLAY_START_NTSC+24*8+12-1);
+	m_laserdisc->add_route(0, "lspeaker", 1.0);
+	m_laserdisc->add_route(1, "rspeaker", 1.0);
 
 	/* start with the TMS9928a video configuration */
 	tms9128_device &vdp(TMS9128(config, "tms9928a", XTAL(10'738'635)));   /* TMS9128NL on the board */
@@ -713,12 +714,7 @@ MACHINE_CONFIG_START(cliffhgr_state::cliffhgr)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_MODIFY("laserdisc")
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-
-	MCFG_DEVICE_ADD("discrete", DISCRETE, cliffhgr_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	DISCRETE(config, m_discrete, cliffhgr_discrete).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 MACHINE_CONFIG_END
 
 

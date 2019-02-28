@@ -491,26 +491,26 @@ MACHINE_RESET_MEMBER(lasso_state,wwjgtin)
 	m_track_enable = 0;
 }
 
-MACHINE_CONFIG_START(lasso_state::base)
-
+void lasso_state::base(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, 11289000/16) /* guess */
-	MCFG_DEVICE_PROGRAM_MAP(lasso_main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lasso_state,  irq0_line_hold)
+	M6502(config, m_maincpu, 11289000/16); /* guess */
+	m_maincpu->set_addrmap(AS_PROGRAM, &lasso_state::lasso_main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(lasso_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", M6502, 600000)
-	MCFG_DEVICE_PROGRAM_MAP(lasso_audio_map)
+	M6502(config, m_audiocpu, 600000);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &lasso_state::lasso_audio_map);
 
 	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57)    /* guess, but avoids glitching of Chameleon's high score table */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(lasso_state, screen_update_lasso)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(57);    /* guess, but avoids glitching of Chameleon's high score table */
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(lasso_state::screen_update_lasso));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lasso);
 
@@ -521,52 +521,49 @@ MACHINE_CONFIG_START(lasso_state::base)
 
 	SN76489(config, m_sn_1, 2000000).add_route(ALL_OUTPUTS, "speaker", 1.0);
 	SN76489(config, m_sn_2, 2000000).add_route(ALL_OUTPUTS, "speaker", 1.0);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(lasso_state::lasso)
+void lasso_state::lasso(machine_config &config)
+{
 	base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("blitter", M6502, 11289000/16) /* guess */
-	MCFG_DEVICE_PROGRAM_MAP(lasso_coprocessor_map)
+	m6502_device & blitter(M6502(config, "blitter", 11289000/16)); /* guess */
+	blitter.set_addrmap(AS_PROGRAM, &lasso_state::lasso_coprocessor_map);
 
 	PALETTE(config, m_palette, FUNC(lasso_state::lasso_palette), 0x40);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(lasso_state::chameleo)
+void lasso_state::chameleo(machine_config &config)
+{
 	base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(chameleo_main_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &lasso_state::chameleo_main_map);
 
-	MCFG_DEVICE_MODIFY("audiocpu")
-	MCFG_DEVICE_PROGRAM_MAP(chameleo_audio_map)
+	m_audiocpu->set_addrmap(AS_PROGRAM, &lasso_state::chameleo_audio_map);
 
 	/* video hardware */
 	PALETTE(config, m_palette, FUNC(lasso_state::lasso_palette), 0x40);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(lasso_state, screen_update_chameleo)
-MACHINE_CONFIG_END
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(lasso_state::screen_update_chameleo));
+}
 
-MACHINE_CONFIG_START(lasso_state::wwjgtin)
+void lasso_state::wwjgtin(machine_config &config)
+{
 	base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(wwjgtin_main_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &lasso_state::wwjgtin_main_map);
 
-	MCFG_DEVICE_MODIFY("audiocpu")
-	MCFG_DEVICE_PROGRAM_MAP(wwjgtin_audio_map)
+	m_audiocpu->set_addrmap(AS_PROGRAM, &lasso_state::wwjgtin_audio_map);
 
 	MCFG_MACHINE_START_OVERRIDE(lasso_state,wwjgtin)
 	MCFG_MACHINE_RESET_OVERRIDE(lasso_state,wwjgtin)
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(lasso_state, screen_update_wwjgtin)
+	subdevice<screen_device>("screen")->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(lasso_state::screen_update_wwjgtin));
 	m_gfxdecode->set_info(gfx_wwjgtin); // Has 1 additional layer
 
 	PALETTE(config, m_palette, FUNC(lasso_state::wwjgtin_palette), 0x40 + 16*16, 64);
@@ -577,27 +574,27 @@ MACHINE_CONFIG_START(lasso_state::wwjgtin)
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(lasso_state::pinbo)
+void lasso_state::pinbo(machine_config &config)
+{
 	base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REPLACE("maincpu", M6502, XTAL(18'000'000)/24)
-	MCFG_DEVICE_PROGRAM_MAP(pinbo_main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lasso_state,  irq0_line_hold)
+	M6502(config.replace(), m_maincpu, XTAL(18'000'000)/24);
+	m_maincpu->set_addrmap(AS_PROGRAM, &lasso_state::pinbo_main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(lasso_state::irq0_line_hold));
 
-	MCFG_DEVICE_REPLACE("audiocpu", Z80, XTAL(18'000'000)/6)
-	MCFG_DEVICE_PROGRAM_MAP(pinbo_audio_map)
-	MCFG_DEVICE_IO_MAP(pinbo_audio_io_map)
+	Z80(config.replace(), m_audiocpu, XTAL(18'000'000)/6);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &lasso_state::pinbo_audio_map);
+	m_audiocpu->set_addrmap(AS_IO, &lasso_state::pinbo_audio_io_map);
 
 	/* video hardware */
 	m_gfxdecode->set_info(gfx_pinbo);
 
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 	MCFG_VIDEO_START_OVERRIDE(lasso_state,pinbo)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(lasso_state, screen_update_chameleo)
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(lasso_state::screen_update_chameleo));
 
 	/* sound hardware */
 	config.device_remove("sn76489.1");
@@ -605,7 +602,7 @@ MACHINE_CONFIG_START(lasso_state::pinbo)
 
 	AY8910(config, "ay1", XTAL(18'000'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.55);
 	AY8910(config, "ay2", XTAL(18'000'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.55);
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( lasso )
