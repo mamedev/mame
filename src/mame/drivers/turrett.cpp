@@ -80,7 +80,7 @@ void turrett_state::machine_reset()
 
 void turrett_state::cpu_map(address_map &map)
 {
-	map(0x00000000, 0x0007ffff).ram();
+	map(0x00000000, 0x0007ffff).ram().mirror(0x40000000);
 	map(0x02000010, 0x02000013).ram();
 	map(0x02000040, 0x02000043).ram();
 	map(0x02000050, 0x02000053).ram();
