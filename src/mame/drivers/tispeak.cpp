@@ -243,68 +243,70 @@ Touch & Tell modules:
 Touch & Tell/Vocaid overlay reference:
 
     tntell CD2610:
-    - 04: a - Colors
-    - 01: b - Objects
-    - 05: c - Shapes
-    - 09: d - Home Scene
+    - $04: a - Colors
+    - $01: b - Objects
+    - $05: c - Shapes
+    - $09: d - Home Scene
     tntelluk CD62170, tntellfr CD62171:
     - see tntell
     - see numfun(not A)
     - see animalfr
-    - 08: ? - Clown Face
-    - 0B: ? - Body Parts
+    - $08: ? - Clown Face
+    - $0B: ? - Body Parts
     vocaid CD2357:
-    - 1C: 1 - Leisure
-    - 1E: 2 - Telephone
-    - 1B: 3 - Bedside
-    - 1D: 4 - Alphabet
+    - $1C: 1 - Leisure
+    - $1E: 2 - Telephone
+    - $1B: 3 - Bedside
+    - $1D: 4 - Alphabet
     alphabet CD2611:
-    - 0E: 1a - Alphabet A-M
-    - 0D: 1b - Alphabet N-Z
-    - 0C: 1c - Letter Jumble A-M
-    - 0B: 1d - Letter Jumble N-Z
+    - $0E: 1a - Alphabet A-M
+    - $0D: 1b - Alphabet N-Z
+    - $0C: 1c - Letter Jumble A-M
+    - $0B: 1d - Letter Jumble N-Z
     animalfr CD2355:
-    - 0A: 2a - Farm Animals
-    - 0F: 2b - At The Farm
-    - 0E: 2c - Animal Babies
-    - 0D: 2d - In The Jungle
+    - $0A: 2a - Farm Animals
+    - $0F: 2b - At The Farm
+    - $0E: 2c - Animal Babies
+    - $0D: 2d - In The Jungle
     numfun CD2612:
-    - 02/0A(rev.A): 3a - Numbers 1-10
-    - 03/0F(rev.A): 3b - Numbers 11-30
-    - 07/0D(rev.A): 3c - How Many?
-    - 06/0E(rev.A): 3d - Hidden Numbers
+    - $02/$0A(rev.A): 3a - Numbers 1-10
+    - $03/$0F(rev.A): 3b - Numbers 11-30
+    - $07/$0D(rev.A): 3c - How Many?
+    - $06/$0E(rev.A): 3d - Hidden Numbers
     aboutme CD2613:
-    - 0E: 4a - Clown Face
-    - 0B: 4b - Body Parts
-    - 0D: 4c - Things to Wear
-    - 0C: 4d - Just For Me
+    - $0E: 4a - Clown Face
+    - $0B: 4b - Body Parts
+    - $0D: 4c - Things to Wear
+    - $0C: 4d - Just For Me
     wot CD2361:
-    - 0A: 5a - On Land
-    - 0B: 5b - In The Air
-    - 0C: 5c - On The Water
-    - 0D: 5d - In Space
-    - 10: 5e - What Belongs Here?
-    - 11: 5f - How It Used To Be
-    - 12: 5g - Word Fun
-    - 13: 5h - In the Surprise Garage
+    - $0A: 5a - On Land
+    - $0B: 5b - In The Air
+    - $0C: 5c - On The Water
+    - $0D: 5d - In Space
+    - $10: 5e - What Belongs Here?
+    - $11: 5f - How It Used To Be
+    - $12: 5g - Word Fun
+    - $13: 5h - In the Surprise Garage
     lilcreat CD2362:
-    - 14: 6a - In The Park
-    - 15: 6b - In The Sea
-    - 16: 6c - In The Woods
-    - 17: 6d - Whose House?
-    - 18: 6e - Hide & Seek
-    - 1A: 6f - Who Is It?
-    - 19: 6g - But It's Not
-    - 1B: 6h - Word Fun
+    - $14: 6a - In The Park
+    - $15: 6b - In The Sea
+    - $16: 6c - In The Woods
+    - $17: 6d - Whose House?
+    - $18: 6e - Hide & Seek
+    - $1A: 6f - Who Is It?
+    - $19: 6g - But It's Not
+    - $1B: 6h - Word Fun
     et CD2363:
-    - 0F: 7a - The Adventure On Earth I
-    - 10: 7b - The Adventure On Earth II
-    - 11: 7c - Fun And Friendship I
-    - 12: 7d - Fun And Friendship II
-    - 13: 7e - E.T. The Star I
-    - 14: 7f - E.T. The Star II
-    - 15: 7g - Do You Remember? I
-    - 16: 7h - Do You Remember? II
+    - $0F: 7a - The Adventure On Earth I
+    - $10: 7b - The Adventure On Earth II
+    - $11: 7c - Fun And Friendship I
+    - $12: 7d - Fun And Friendship II
+    - $13: 7e - E.T. The Star I
+    - $14: 7f - E.T. The Star II
+    - $15: 7g - Do You Remember? I
+    - $16: 7h - Do You Remember? II
+
+    $00: none inserted, and $1F is for diagnostics
 
 
 Magic Wand "Speaking Reader" or "Speak & Learn":
@@ -405,9 +407,9 @@ K28 modules:
 #include "bus/generic/slot.h"
 #include "machine/tms6100.h"
 #include "sound/tms5110.h"
-
 #include "softlist.h"
 #include "speaker.h"
+#include "render.h"
 
 // internal artwork
 #include "k28m2.lh"
@@ -433,8 +435,7 @@ public:
 		hh_tms1k_state(mconfig, type, tag),
 		m_tms5100(*this, "tms5100"),
 		m_tms6100(*this, "tms6100"),
-		m_cart(*this, "cartslot"),
-		m_ol_out(*this, "ol%u", 1U)
+		m_cart(*this, "cartslot")
 	{ }
 
 	virtual DECLARE_INPUT_CHANGED_MEMBER(power_button) override;
@@ -482,6 +483,7 @@ private:
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(tispeak_cartridge);
 
+	u8 tntell_get_hexchar(const char c);
 	TIMER_DEVICE_CALLBACK_MEMBER(tntell_get_overlay);
 
 	void init_cartridge();
@@ -492,8 +494,6 @@ private:
 	required_device<tms5110_device> m_tms5100;
 	required_device<tms6100_device> m_tms6100;
 	optional_device<generic_slot_device> m_cart;
-
-	output_finder<5> m_ol_out;
 
 	// cartridge
 	u32 m_cart_max_size;
@@ -506,9 +506,6 @@ private:
 void tispeak_state::machine_start()
 {
 	hh_tms1k_state::machine_start();
-
-	m_ol_out.resolve();
-
 	init_cartridge();
 }
 
@@ -686,21 +683,34 @@ READ8_MEMBER(tispeak_state::tntell_read_k)
 	return k8 | snspellc_read_k(space, offset);
 }
 
+u8 tispeak_state::tntell_get_hexchar(const char c)
+{
+	if (c >= '0' && c <= '9') return c - '0';
+	if (c >= 'A' && c <= 'F') return c - 'A' + 10;
+	if (c >= 'a' && c <= 'f') return c - 'a' + 10;
+
+	return 0;
+}
+
 TIMER_DEVICE_CALLBACK_MEMBER(tispeak_state::tntell_get_overlay)
 {
 	// Each keyboard overlay insert has 5 holes, used by the game to determine
 	// which one is active(if any). If it matches with the internal ROM or
 	// external module, the game continues.
-	// 00 for none, 1F for diagnostics, see comment section above for a list
 
-	// try to get overlay code from artwork file(in decimal), otherwise pick the
-	// one that was selected in machine configuration
-	m_overlay = output().get_value("overlay_code") & 0x1f;
-	if (m_overlay == 0)
-		m_overlay = m_inp_matrix[10]->read();
+	// pick overlay code from machine config, see comment section above for reference
+	m_overlay = m_inp_matrix[10]->read();
 
-	for (int i = 0; i < 5; i++)
-		m_ol_out[i] = BIT(m_overlay, i);
+	// try to get from artwork current view name ($ + 2 hex digits)
+	if (m_overlay == 0x20)
+	{
+		render_target *target = machine().render().first_target();
+		const char *name = target->view_name(target->view());
+
+		for (int i = 0; name && i < strlen(name); i++)
+			if (name[i] == '$' && strlen(&name[i]) > 2)
+				m_overlay = tntell_get_hexchar(name[i + 1]) << 4 | tntell_get_hexchar(name[i + 2]);
+	}
 }
 
 
@@ -1169,39 +1179,40 @@ static INPUT_PORTS_START( tntell )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.10")
-	PORT_CONFNAME( 0x1f, 0x04, "Overlay Code" ) // only if not provided by external artwork
-	PORT_CONFSETTING(    0x00, "00 (None)" )
-	PORT_CONFSETTING(    0x01, "01" )
-	PORT_CONFSETTING(    0x02, "02" )
-	PORT_CONFSETTING(    0x03, "03" )
-	PORT_CONFSETTING(    0x04, "04" )
-	PORT_CONFSETTING(    0x05, "05" )
-	PORT_CONFSETTING(    0x06, "06" )
-	PORT_CONFSETTING(    0x07, "07" )
-	PORT_CONFSETTING(    0x08, "08" )
-	PORT_CONFSETTING(    0x09, "09" )
-	PORT_CONFSETTING(    0x0a, "0A" )
-	PORT_CONFSETTING(    0x0b, "0B" )
-	PORT_CONFSETTING(    0x0c, "0C" )
-	PORT_CONFSETTING(    0x0d, "0D" )
-	PORT_CONFSETTING(    0x0e, "0E" )
-	PORT_CONFSETTING(    0x0f, "0F" )
-	PORT_CONFSETTING(    0x10, "10" )
-	PORT_CONFSETTING(    0x11, "11" )
-	PORT_CONFSETTING(    0x12, "12" )
-	PORT_CONFSETTING(    0x13, "13" )
-	PORT_CONFSETTING(    0x14, "14" )
-	PORT_CONFSETTING(    0x15, "15" )
-	PORT_CONFSETTING(    0x16, "16" )
-	PORT_CONFSETTING(    0x17, "17" )
-	PORT_CONFSETTING(    0x18, "18" )
-	PORT_CONFSETTING(    0x19, "19" )
-	PORT_CONFSETTING(    0x1a, "1A" )
-	PORT_CONFSETTING(    0x1b, "1B" )
-	PORT_CONFSETTING(    0x1c, "1C" )
-	PORT_CONFSETTING(    0x1d, "1D" )
-	PORT_CONFSETTING(    0x1e, "1E" )
-	PORT_CONFSETTING(    0x1f, "1F (Diagnostic)" )
+	PORT_CONFNAME( 0x3f, 0x20, "Overlay Code" )
+	PORT_CONFSETTING(    0x20, "From artwork view" )
+	PORT_CONFSETTING(    0x00, "$00 (None)" )
+	PORT_CONFSETTING(    0x01, "$01" )
+	PORT_CONFSETTING(    0x02, "$02" )
+	PORT_CONFSETTING(    0x03, "$03" )
+	PORT_CONFSETTING(    0x04, "$04" )
+	PORT_CONFSETTING(    0x05, "$05" )
+	PORT_CONFSETTING(    0x06, "$06" )
+	PORT_CONFSETTING(    0x07, "$07" )
+	PORT_CONFSETTING(    0x08, "$08" )
+	PORT_CONFSETTING(    0x09, "$09" )
+	PORT_CONFSETTING(    0x0a, "$0A" )
+	PORT_CONFSETTING(    0x0b, "$0B" )
+	PORT_CONFSETTING(    0x0c, "$0C" )
+	PORT_CONFSETTING(    0x0d, "$0D" )
+	PORT_CONFSETTING(    0x0e, "$0E" )
+	PORT_CONFSETTING(    0x0f, "$0F" )
+	PORT_CONFSETTING(    0x10, "$10" )
+	PORT_CONFSETTING(    0x11, "$11" )
+	PORT_CONFSETTING(    0x12, "$12" )
+	PORT_CONFSETTING(    0x13, "$13" )
+	PORT_CONFSETTING(    0x14, "$14" )
+	PORT_CONFSETTING(    0x15, "$15" )
+	PORT_CONFSETTING(    0x16, "$16" )
+	PORT_CONFSETTING(    0x17, "$17" )
+	PORT_CONFSETTING(    0x18, "$18" )
+	PORT_CONFSETTING(    0x19, "$19" )
+	PORT_CONFSETTING(    0x1a, "$1A" )
+	PORT_CONFSETTING(    0x1b, "$1B" )
+	PORT_CONFSETTING(    0x1c, "$1C" )
+	PORT_CONFSETTING(    0x1d, "$1D" )
+	PORT_CONFSETTING(    0x1e, "$1E" )
+	PORT_CONFSETTING(    0x1f, "$1F (Diagnostic)" )
 INPUT_PORTS_END
 
 
