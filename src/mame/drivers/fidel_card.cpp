@@ -154,10 +154,12 @@ A detailed description of the hardware can be found also in the patent 4,373,719
 
 cards:
 ------
-Playing cards have a 9-bit barcode at the edge. Swipe them along the card scanner
-and the game will detect the card.
+Playing cards have a 9-bit barcode on the face side near the edge. Swipe them downward
+against the card scanner and the game will detect the card.
+Barcode sync bits(msb and lsb) are the same for each card so that leaves 7 bits of data:
+2 for suit, 4 for value, and 1 for parity so the card can't be scanned backwards.
 
-2 card decks exist (red and blue), each has the same set of barcodes.
+Two card decks exist (red and blue), each has the same set of barcodes.
 
 ******************************************************************************/
 

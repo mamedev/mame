@@ -21,7 +21,6 @@
 #include "includes/hh_sm510.h"
 
 #include "cpu/sm510/sm500.h"
-#include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
 

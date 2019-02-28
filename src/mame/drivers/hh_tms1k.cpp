@@ -69,7 +69,7 @@
  *MP3232   TMS1000   1979, Fonas 2-Player Baseball (no "MP" on chip label)
  @MP3300   TMS1000   1979, Milton Bradley Simon (Rev F)
  @MP3301A  TMS1000   1979, Milton Bradley Big Trak
- *MP3320A  TMS1000   1979, Coleco Head to Head: Electronic Basketball
+ @MP3320A  TMS1000   1979, Coleco Head to Head: Electronic Basketball
  @MP3321A  TMS1000   1979, Coleco Head to Head: Electronic Hockey
  *MP3352   TMS1200   1979, Tiger Sub Wars (model 7-490)
  @M32001   TMS1000   1981, Coleco Quiz Wiz Challenger (note: MP3398, MP3399, M3200x?)
@@ -198,6 +198,7 @@
 #include "gjackpot.lh"
 #include "gpoker.lh"
 #include "h2hbaseb.lh"
+#include "h2hbaskb.lh"
 #include "h2hboxing.lh"
 #include "h2hfootb.lh"
 #include "h2hhockey.lh"
@@ -1475,18 +1476,22 @@ void h2hfootb_state::h2hfootb(machine_config &config)
 
 /***************************************************************************
 
+  Coleco Head to Head: Electronic Basketball (model 2150)
+  * TMS1000NLL MP3320A (die label 1000E MP3320A)
+  * 2-digit 7seg LED display, LED grid display, 1-bit sound
+
   Coleco Head to Head: Electronic Hockey (model 2160)
   * TMS1000NLL E MP3321A (die label 1000E MP3321A)
-  * 2-digit 7seg LED display, LED grid display, 1-bit sound
+  * same PCB/hardware as above
 
   Unlike the COP420 version(see hh_cop400.cpp driver), each game has its own MCU.
 
 ***************************************************************************/
 
-class h2hhockey_state : public hh_tms1k_state
+class h2hbaskb_state : public hh_tms1k_state
 {
 public:
-	h2hhockey_state(const machine_config &mconfig, device_type type, const char *tag)
+	h2hbaskb_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_tms1k_state(mconfig, type, tag),
 		m_cap_empty_timer(*this, "cap_empty")
 	{ }
@@ -1500,6 +1505,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
+	void h2hbaskb(machine_config &config);
 	void h2hhockey(machine_config &config);
 
 protected:
@@ -1508,13 +1514,13 @@ protected:
 
 // handlers
 
-TIMER_DEVICE_CALLBACK_MEMBER(h2hhockey_state::cap_empty_callback)
+TIMER_DEVICE_CALLBACK_MEMBER(h2hbaskb_state::cap_empty_callback)
 {
 	if (~m_r & 0x200)
 		m_cap_state = false;
 }
 
-void h2hhockey_state::prepare_display()
+void h2hbaskb_state::prepare_display()
 {
 	// R6,R7 are commons for R0-R5
 	u16 sel = 0;
@@ -1525,7 +1531,7 @@ void h2hhockey_state::prepare_display()
 	display_matrix(7, 6+6, m_o, sel);
 }
 
-WRITE16_MEMBER(h2hhockey_state::write_r)
+WRITE16_MEMBER(h2hbaskb_state::write_r)
 {
 	// R0-R3: input mux
 	m_inp_mux = (data & 0xf);
@@ -1558,14 +1564,14 @@ WRITE16_MEMBER(h2hhockey_state::write_r)
 	prepare_display();
 }
 
-WRITE16_MEMBER(h2hhockey_state::write_o)
+WRITE16_MEMBER(h2hbaskb_state::write_o)
 {
 	// O1-O7: led data
 	m_o = data >> 1 & 0x7f;
 	prepare_display();
 }
 
-READ8_MEMBER(h2hhockey_state::read_k)
+READ8_MEMBER(h2hbaskb_state::read_k)
 {
 	// K1-K4: multiplexed inputs, K8: R9 and capacitor
 	return (read_inputs(4) & 7) | (m_cap_state ? 8 : 0);
@@ -1573,7 +1579,7 @@ READ8_MEMBER(h2hhockey_state::read_k)
 
 // config
 
-static INPUT_PORTS_START( h2hhockey )
+static INPUT_PORTS_START( h2hbaskb )
 	PORT_START("IN.0") // R0
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY PORT_NAME("P1 Pass CW") // clockwise
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY PORT_NAME("P1 Pass CCW") // counter-clockwise
@@ -1594,12 +1600,20 @@ static INPUT_PORTS_START( h2hhockey )
 	PORT_CONFSETTING(    0x04, "2" )
 
 	PORT_START("IN.3") // R3
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL PORT_NAME("P2 Goalie Right")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Goalie Left")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-void h2hhockey_state::machine_start()
+static INPUT_PORTS_START( h2hhockey )
+	PORT_INCLUDE( h2hbaskb )
+
+	PORT_MODIFY("IN.3") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL PORT_NAME("P2 Goalie Right")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Goalie Left")
+INPUT_PORTS_END
+
+void h2hbaskb_state::machine_start()
 {
 	hh_tms1k_state::machine_start();
 
@@ -1611,23 +1625,29 @@ void h2hhockey_state::machine_start()
 	save_item(NAME(m_cap_charge));
 }
 
-void h2hhockey_state::h2hhockey(machine_config &config)
+void h2hbaskb_state::h2hbaskb(machine_config &config)
 {
 	/* basic machine hardware */
 	TMS1000(config, m_maincpu, 375000); // approximation - RC osc. R=43K, C=100pF
-	m_maincpu->k().set(FUNC(h2hhockey_state::read_k));
-	m_maincpu->r().set(FUNC(h2hhockey_state::write_r));
-	m_maincpu->o().set(FUNC(h2hhockey_state::write_o));
+	m_maincpu->k().set(FUNC(h2hbaskb_state::read_k));
+	m_maincpu->r().set(FUNC(h2hbaskb_state::write_r));
+	m_maincpu->o().set(FUNC(h2hbaskb_state::write_o));
 
-	TIMER(config, "cap_empty").configure_generic(FUNC(h2hhockey_state::cap_empty_callback));
+	TIMER(config, "cap_empty").configure_generic(FUNC(h2hbaskb_state::cap_empty_callback));
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_h2hhockey);
+	config.set_default_layout(layout_h2hbaskb);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+void h2hbaskb_state::h2hhockey(machine_config &config)
+{
+	h2hbaskb(config);
+	config.set_default_layout(layout_h2hhockey);
 }
 
 
@@ -9586,6 +9606,17 @@ ROM_START( h2hfootb )
 ROM_END
 
 
+ROM_START( h2hbaskb )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp3320a", 0x0000, 0x0400, CRC(39a63f43) SHA1(14a765e42a39f8d3a465c990e09dd651e595a1c5) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common1_micro.pla", 0, 867, CRC(4becec19) SHA1(3c8a9be0f00c88c81f378b76886c39b10304f330) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_h2hbaskb_output.pla", 0, 365, CRC(9d1a91e1) SHA1(96303eb22375129b0dfbfcd823c8ca5b919511bc) )
+ROM_END
+
+
 ROM_START( h2hhockey )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "mp3321a", 0x0000, 0x0400, CRC(e974e604) SHA1(ed740c98ce96ad70ee5237eccae1f54a75ad8100) )
@@ -10340,7 +10371,8 @@ CONS( 1978, amaztron,   0,         0, amaztron,  amaztron,  amaztron_state,  emp
 COMP( 1979, zodiac,     0,         0, zodiac,    zodiac,    zodiac_state,    empty_init, "Coleco", "Zodiac - The Astrology Computer", MACHINE_SUPPORTS_SAVE )
 CONS( 1978, cqback,     0,         0, cqback,    cqback,    cqback_state,    empty_init, "Coleco", "Electronic Quarterback", MACHINE_SUPPORTS_SAVE )
 CONS( 1979, h2hfootb,   0,         0, h2hfootb,  h2hfootb,  h2hfootb_state,  empty_init, "Coleco", "Head to Head: Electronic Football", MACHINE_SUPPORTS_SAVE )
-CONS( 1979, h2hhockey,  0,         0, h2hhockey, h2hhockey, h2hhockey_state, empty_init, "Coleco", "Head to Head: Electronic Hockey (TMS1000 version)", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, h2hbaskb,   0,         0, h2hbaskb,  h2hbaskb,  h2hbaskb_state,  empty_init, "Coleco", "Head to Head: Electronic Basketball (TMS1000 version)", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, h2hhockey,  0,         0, h2hhockey, h2hhockey, h2hbaskb_state,  empty_init, "Coleco", "Head to Head: Electronic Hockey (TMS1000 version)", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, h2hbaseb,   0,         0, h2hbaseb,  h2hbaseb,  h2hbaseb_state,  empty_init, "Coleco", "Head to Head: Electronic Baseball", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, h2hboxing,  0,         0, h2hboxing, h2hboxing, h2hboxing_state, empty_init, "Coleco", "Head to Head: Electronic Boxing", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, quizwizc,   0,         0, quizwizc,  quizwizc,  quizwizc_state,  empty_init, "Coleco", "Quiz Wiz Challenger", MACHINE_SUPPORTS_SAVE ) // ***
