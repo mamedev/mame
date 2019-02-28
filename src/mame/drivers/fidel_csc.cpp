@@ -12,7 +12,7 @@ Fidelity CSC(and derived) hardware
 - Reversi Sensory Challenger
 
 TODO:
-- is the original csce the same program+bookrom as the upgraded one?
+- verify csce original roms (current set came from an overclock mod)
 - hook up csce I/O properly, it doesn't have PIAs
 
 *******************************************************************************
@@ -159,7 +159,7 @@ Elite Champion Challenger
 This is a limited-release chess computer based on the CSC. They removed the PIAs
 and did the I/O with TTL instead (PIAs will still work from software point of view).
 ---------------------------------
-R6502 CPU @ 4MHz
+R6502B? CPU @ 4MHz
 32KB ROMs total size, 4KB RAM(8*HM6147P)
 
 In the 90s, Wilfried Bucke provided an upgrade to make it more similar to the one
@@ -197,7 +197,6 @@ PCB label 510-1035A01
 #include "includes/fidelbase.h"
 
 #include "cpu/m6502/m6502.h"
-#include "cpu/m6502/r65c02.h"
 #include "machine/6821pia.h"
 #include "sound/volt_reg.h"
 #include "speaker.h"
@@ -220,7 +219,7 @@ public:
 
 	// machine drivers
 	void csc(machine_config &config);
-	void cscetr(machine_config &config);
+	void csce(machine_config &config);
 	void su9(machine_config &config);
 	void rsc(machine_config &config);
 
@@ -273,7 +272,7 @@ void su9_state::su9_set_cpu_freq()
 {
 	// SU9 CPU is clocked 1.95MHz, DS9 is 2.5MHz, SCC is 3MHz
 	u8 inp = ioport("FAKE")->read();
-	m_maincpu->set_unscaled_clock((inp & 2) ? (6_MHz_XTAL/2) : ((inp & 1) ? (5_MHz_XTAL/2) : (3.9_MHz_XTAL/2)));
+	m_maincpu->set_unscaled_clock((inp & 2) ? (3_MHz_XTAL) : ((inp & 1) ? (5_MHz_XTAL/2) : (3.9_MHz_XTAL/2)));
 }
 
 
@@ -483,9 +482,9 @@ static INPUT_PORTS_START( su9 )
 
 	PORT_START("FAKE")
 	PORT_CONFNAME( 0x03, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, su9_state, su9_cpu_freq, nullptr) // factory set
-	PORT_CONFSETTING(    0x00, "1.95MHz (SU9)" )
-	PORT_CONFSETTING(    0x01, "2.5MHz (DS9)" )
-	PORT_CONFSETTING(    0x02, "3MHz (SCC)" )
+	PORT_CONFSETTING(    0x00, "1.95MHz (original)" )
+	PORT_CONFSETTING(    0x01, "2.5MHz (Deluxe)" )
+	PORT_CONFSETTING(    0x02, "3MHz (Septennial)" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( rsc )
@@ -547,12 +546,12 @@ void csc_state::csc(machine_config &config)
 	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
-void csc_state::cscetr(machine_config &config)
+void csc_state::csce(machine_config &config)
 {
 	csc(config);
 
 	/* basic machine hardware */
-	R65C02(config.replace(), m_maincpu, 5_MHz_XTAL); // R65C02P4
+	m_maincpu->set_clock(4_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &csc_state::su9_map);
 }
 
@@ -629,7 +628,7 @@ ROM_START( csc )
 	ROMX_LOAD("101-64106", 0x0000, 0x2000, CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9), ROM_BIOS(3) )
 ROM_END
 
-ROM_START( cscetr )
+ROM_START( csce )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("03", 0x2000, 0x2000, CRC(22e43531) SHA1(696dc019bea3812ae6cf9c2b2c4d3a7b9017807d) )
 	ROM_LOAD("02", 0xa000, 0x2000, CRC(e593f114) SHA1(4dc5a2456a87c128235958f046cee9502cb3ac65) )
@@ -706,7 +705,7 @@ ROM_END
 
 //    YEAR  NAME      PARENT CMP MACHINE  INPUT  STATE      INIT        COMPANY, FULLNAME, FLAGS
 CONS( 1981, csc,      0,      0, csc,      csc,  csc_state, empty_init, "Fidelity Electronics", "Champion Sensory Chess Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 199?, cscetr,   0,      0, cscetr,   csc,  csc_state, empty_init, "hack (Wilfried Bucke)", "Elite Champion Challenger (Travemünde upgrade)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1981, csce,     0,      0, csce,     csc,  csc_state, empty_init, "Fidelity Electronics", "Elite Champion Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 
 CONS( 1983, super9cc, 0,      0, su9,      su9,  su9_state, empty_init, "Fidelity Electronics", "Super 9 Sensory Chess Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 
