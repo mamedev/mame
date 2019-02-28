@@ -2,7 +2,7 @@
 // copyright-holders:Tim Schuerewegen
 /**************************************************************************
  *
- * gp32.c - Game Park GP32
+ * gp32.cpp - Game Park GP32
  * Driver by Tim Schuerewegen
  *
  * CPU: Samsung S3C2400X01 SoC
@@ -1609,7 +1609,7 @@ void gp32_state::s3c240x_machine_start()
 	m_s3c240x_iic_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_iic_timer_exp),this), (void *)(uintptr_t)0);
 	m_s3c240x_iis_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_iis_timer_exp),this), (void *)(uintptr_t)0);
 	m_s3c240x_lcd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_lcd_timer_exp),this), (void *)(uintptr_t)0);
-	m_eeprom_data = std::make_unique<uint8_t[]>(0x2000);
+	m_eeprom_data = std::make_unique<uint8_t[]>(0x2000); // a dump of the EEPROM (S524AB0X91) resulted to be 0x1000
 	m_nvram->set_base(m_eeprom_data.get(), 0x2000);
 	smc_init();
 	i2s_init();
@@ -1673,18 +1673,19 @@ void gp32_state::machine_reset()
 	s3c240x_machine_reset();
 }
 
-MACHINE_CONFIG_START(gp32_state::gp32)
-	MCFG_DEVICE_ADD("maincpu", ARM9, 40000000)
-	MCFG_DEVICE_PROGRAM_MAP(gp32_map)
+void gp32_state::gp32(machine_config &config)
+{
+	ARM9(config, m_maincpu, 40000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gp32_state::gp32_map);
 
-	MCFG_PALETTE_ADD("palette", 32768)
+	PALETTE(config, m_palette).set_entries(32768);
 
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(240, 320)
-	MCFG_SCREEN_VISIBLE_AREA(0, 239, 0, 319)
-	MCFG_SCREEN_UPDATE_DRIVER(gp32_state, screen_update_gp32)
+	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(240, 320);
+	m_screen->set_visarea(0, 239, 0, 319);
+	m_screen->set_screen_update(FUNC(gp32_state::screen_update_gp32));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -1699,7 +1700,7 @@ MACHINE_CONFIG_START(gp32_state::gp32)
 	SMARTMEDIA(config, m_smartmedia, 0);
 
 	SOFTWARE_LIST(config, "memc_list").set_original("gp32");
-MACHINE_CONFIG_END
+}
 
 ROM_START( gp32 )
 	ROM_REGION( 0x80000, "maincpu", 0 )
@@ -1717,6 +1718,9 @@ ROM_START( gp32 )
 	ROM_SYSTEM_BIOS( 5, "test", "test" )
 	ROMX_LOAD( "test.bin", 0x000000, 0x080000, CRC(00000000) SHA1(0000000000000000000000000000000000000000), ROM_BIOS(5) )
 #endif
+
+	ROM_REGION( 0x4000, "plds", ROMREGION_ERASEFF )
+	ROM_LOAD( "x2c32.jed", 0, 0x3bbb, CRC(eeec10d8) SHA1(34c4b1b865511517a5de1fa352228d95cda387c5) ) // JEDEC format for the time being. X2C32: 32 Macrocell CoolRunner-II CPLD
 ROM_END
 
 CONS(2001, gp32, 0, 0, gp32, gp32, gp32_state, empty_init, "Game Park Holdings", "GP32", ROT270|MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
