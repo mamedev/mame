@@ -103,14 +103,14 @@ private:
 	uint32_t screen_update_firefox(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(video_timer_callback);
 	void set_rgba( int start, int index, unsigned char *palette_ram );
-	void firq_gen(phillips_22vp931_device &laserdisc, int state);
+	void firq_gen(philips_22vp931_device &laserdisc, int state);
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	void audio_map(address_map &map);
 	void main_map(address_map &map);
 
-	required_device<phillips_22vp931_device> m_laserdisc;
+	required_device<philips_22vp931_device> m_laserdisc;
 	required_shared_ptr<unsigned char> m_tileram;
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<unsigned char> m_sprite_palette;
@@ -445,7 +445,7 @@ WRITE_LINE_MEMBER(firefox_state::coin_counter_left_w)
 }
 
 
-void firefox_state::firq_gen(phillips_22vp931_device &laserdisc, int state)
+void firefox_state::firq_gen(philips_22vp931_device &laserdisc, int state)
 {
 	if (state)
 		m_maincpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE );
@@ -456,7 +456,7 @@ void firefox_state::machine_start()
 {
 	m_mainbank->configure_entries(0, 32, memregion("maincpu")->base() + 0x10000, 0x1000);
 
-	m_laserdisc->set_data_ready_callback(phillips_22vp931_device::data_ready_delegate(&firefox_state::firq_gen, this));
+	m_laserdisc->set_data_ready_callback(philips_22vp931_device::data_ready_delegate(&firefox_state::firq_gen, this));
 
 	m_sprite_bank = 0;
 }
@@ -690,7 +690,7 @@ MACHINE_CONFIG_START(firefox_state::firefox)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_firefox);
 	PALETTE(config, m_palette).set_entries(512);
 
-	PHILLIPS_22VP931(config, m_laserdisc, 0);
+	PHILIPS_22VP931(config, m_laserdisc, 0);
 	m_laserdisc->set_overlay(64*8, 525, FUNC(firefox_state::screen_update_firefox));
 	m_laserdisc->set_overlay_clip(7*8, 53*8-1, 44, 480+44);
 	m_laserdisc->set_overlay_palette(m_palette);

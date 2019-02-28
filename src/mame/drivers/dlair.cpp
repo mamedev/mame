@@ -141,7 +141,7 @@ private:
 	optional_device<palette_device> m_palette;
 	optional_device<pioneer_ldv1000_device> m_ldv1000;
 	optional_device<pioneer_pr7820_device> m_pr7820;
-	optional_device<phillips_22vp932_device> m_22vp932;
+	optional_device<philips_22vp932_device> m_22vp932;
 	optional_shared_ptr<uint8_t> m_videoram;
 	output_finder<16> m_digits;
 
@@ -778,7 +778,7 @@ MACHINE_CONFIG_START(dlair_state::dleuro)
 
 	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_hz(MASTER_CLOCK_EURO/(16*16*16*16*16*8)));
 
-	PHILLIPS_22VP932(config, m_22vp932, 0);
+	PHILIPS_22VP932(config, m_22vp932, 0);
 	m_22vp932->set_overlay(256, 256, FUNC(dlair_state::screen_update_dleuro));
 	m_22vp932->set_overlay_palette(m_palette);
 	m_22vp932->add_route(0, "lspeaker", 1.0);

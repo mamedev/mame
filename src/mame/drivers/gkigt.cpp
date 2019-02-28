@@ -86,7 +86,7 @@ PCB board that connects to 044 boards via J6 & J7
     or 039 EPROM + SIMM software
 
 More chips (from eBay auction):
-    2x Phillips / NXT 28C94 quad UART (8 serial channels total)
+    2x Philips / NXT 28C94 quad UART (8 serial channels total)
     ADV476 256 color RAMDAC
 */
 

@@ -119,7 +119,7 @@ void tecnbras_state::tecnbras(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &tecnbras_state::i80c31_io);
 	m_maincpu->port_out_cb<1>().set_nop(); // buzzer ?
 
-/* TODO: Add an I2C RTC (Phillips PCF8583P)
+/* TODO: Add an I2C RTC (Philips PCF8583P)
    pin 6 (SCL): cpu T0/P3.4 (pin 14)
    pin 5 (SDA): cpu T1/P3.5 (pin 15)
 */
