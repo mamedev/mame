@@ -61,8 +61,9 @@ public:
 	{ }
 
 	// halt button is tied to NMI, reset button to RESET(but only if halt button is held)
-	DECLARE_INPUT_CHANGED_MEMBER(reset_button) { m_maincpu->set_input_line(INPUT_LINE_RESET, (newval && m_inp_matrix[9]->read() & 2) ? ASSERT_LINE : CLEAR_LINE); }
-	DECLARE_INPUT_CHANGED_MEMBER(halt_button) { m_maincpu->set_input_line(M6502_NMI_LINE, newval ? ASSERT_LINE : CLEAR_LINE); }
+	void update_reset() { m_maincpu->set_input_line(INPUT_LINE_RESET, (m_inp_matrix[9]->read() == 3) ? ASSERT_LINE : CLEAR_LINE); }
+	DECLARE_INPUT_CHANGED_MEMBER(reset_button) { update_reset(); }
+	DECLARE_INPUT_CHANGED_MEMBER(halt_button) { m_maincpu->set_input_line(M6502_NMI_LINE, newval ? ASSERT_LINE : CLEAR_LINE); update_reset(); }
 
 	// machine drivers
 	void arb(machine_config &config);
@@ -191,8 +192,8 @@ static INPUT_PORTS_START( arb )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_CODE(KEYCODE_0) PORT_NAME("New Game / Options / Pawn / 0")
 
 	PORT_START("IN.9")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, arb_state, reset_button, nullptr)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("Halt") PORT_CHANGED_MEMBER(DEVICE_SELF, arb_state, halt_button, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_CODE(KEYCODE_F2) PORT_NAME("Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, arb_state, reset_button, nullptr)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_CODE(KEYCODE_F2) PORT_NAME("Halt") PORT_CHANGED_MEMBER(DEVICE_SELF, arb_state, halt_button, nullptr)
 INPUT_PORTS_END
 
 

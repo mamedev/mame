@@ -11,7 +11,7 @@
   - vidchal: Add screen and gun cursor with brightness detection callback,
     and softwarelist for the video tapes. We'd also need a VHS player device.
     The emulated lightgun itself appears to be working fine(eg. add a 30hz
-    timer to IN3 to score +100)
+    timer to IN.3 to score +100)
 
 ***************************************************************************/
 
@@ -47,8 +47,8 @@
 class hh_cop400_state : public driver_device
 {
 public:
-	hh_cop400_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	hh_cop400_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_inp_matrix(*this, "IN.%u", 0),
 		m_out_x(*this, "%u.%u", 0U, 0U),
@@ -347,7 +347,7 @@ void ctstein_state::ctstein(machine_config &config)
   An earlier revision of this runs on TMS1000, see hh_tms1k.cpp driver. Model
   numbers are the same. From the outside, an easy way to spot the difference is
   the Start/Display button: TMS1000 version button label is D, COP420 one is a *.
-  This version also plays much slower.
+  The COP420 version also plays much slower.
 
 ***************************************************************************/
 
