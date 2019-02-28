@@ -538,12 +538,12 @@ WRITE_LINE_MEMBER(marineb_state::wanted_vblank_irq)
 }
 
 
-MACHINE_CONFIG_START(marineb_state::marineb)
-
+void marineb_state::marineb(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)   /* 3 MHz? */
-	MCFG_DEVICE_PROGRAM_MAP(marineb_map)
-	MCFG_DEVICE_IO_MAP(marineb_io_map)
+	Z80(config, m_maincpu, CPU_CLOCK);   /* 3 MHz? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &marineb_state::marineb_map);
+	m_maincpu->set_addrmap(AS_IO, &marineb_state::marineb_io_map);
 
 	LS259(config, m_outlatch);
 	m_outlatch->q_out_cb<0>().set(FUNC(marineb_state::nmi_mask_w));
@@ -551,14 +551,14 @@ MACHINE_CONFIG_START(marineb_state::marineb)
 	m_outlatch->q_out_cb<2>().set(FUNC(marineb_state::flipscreen_x_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(5000)   /* frames per second, vblank duration */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(marineb_state, screen_update_marineb)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, marineb_state, marineb_vblank_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(5000)   /* frames per second, vblank duration */);
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(marineb_state::screen_update_marineb));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(marineb_state::marineb_vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_marineb);
 	PALETTE(config, m_palette, FUNC(marineb_state::marineb_palette), 256);
@@ -566,7 +566,7 @@ MACHINE_CONFIG_START(marineb_state::marineb)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	AY8910(config, "ay1", SOUND_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.50);
-MACHINE_CONFIG_END
+}
 
 
 void marineb_state::changes(machine_config &config)
@@ -600,26 +600,25 @@ void marineb_state::hoccer(machine_config &config)
 }
 
 
-MACHINE_CONFIG_START(marineb_state::wanted)
+void marineb_state::wanted(machine_config &config)
+{
 	marineb(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(wanted_io_map)
+	m_maincpu->set_addrmap(AS_IO, &marineb_state::wanted_io_map);
 
 	m_outlatch->q_out_cb<0>().set(FUNC(marineb_state::irq_mask_w));
 
 	/* video hardware */
 	m_gfxdecode->set_info(gfx_wanted);
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(marineb_state, screen_update_springer)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, marineb_state, wanted_vblank_irq))
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(marineb_state::screen_update_springer));
+	subdevice<screen_device>("screen")->screen_vblank().set(FUNC(marineb_state::wanted_vblank_irq));
 
 	// sound hardware (PSG type verified only for bcruzm12)
 	AY8912(config.replace(), "ay1", SOUND_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	AY8912(config, "ay2", SOUND_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.25);
-MACHINE_CONFIG_END
+}
 
 
 void marineb_state::hopprobo(machine_config &config)

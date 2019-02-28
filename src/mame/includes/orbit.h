@@ -71,7 +71,7 @@ private:
 	required_shared_ptr<uint8_t> m_playfield_ram;
 	required_shared_ptr<uint8_t> m_sprite_ram;
 
-	required_device<discrete_device> m_discrete;
+	required_device<discrete_sound_device> m_discrete;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;

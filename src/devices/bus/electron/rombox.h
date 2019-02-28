@@ -35,8 +35,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 
-	virtual uint8_t expbus_r(address_space &space, offs_t offset) override;
-	virtual void expbus_w(address_space &space, offs_t offset, uint8_t data) override;
+	virtual uint8_t expbus_r(offs_t offset) override;
+	virtual void expbus_w(offs_t offset, uint8_t data) override;
 
 private:
 	image_init_result load_rom(device_image_interface &image, generic_slot_device *slot);

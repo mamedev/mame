@@ -171,19 +171,20 @@ static INPUT_PORTS_START( orao )
 INPUT_PORTS_END
 
 /* Machine driver */
-MACHINE_CONFIG_START(orao_state::orao)
+void orao_state::orao(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, 1000000)
-	MCFG_DEVICE_PROGRAM_MAP(orao_mem)
+	M6502(config, m_maincpu, 1000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &orao_state::orao_mem);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(orao_state, screen_update_orao)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 256-1, 0, 256-1);
+	screen.set_screen_update(FUNC(orao_state::screen_update_orao));
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
@@ -199,7 +200,7 @@ MACHINE_CONFIG_START(orao_state::orao)
 	m_cassette->set_interface("orao_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("orao");
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( orao )

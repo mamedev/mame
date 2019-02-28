@@ -48,9 +48,6 @@ Driver's Eyes works,
 #include "sound/c140.h"
 #include "emupal.h"
 
-// TODO: basic parameters to get 60.606060 Hz, x2 is for interlace
-#define MCFG_SCREEN_RAW_PARAMS_NAMCO480I \
-	MCFG_SCREEN_RAW_PARAMS(12288000*2, 768, 0, 496, 264*2,0,480)
 
 #define ENABLE_LOGGING      0
 
@@ -183,18 +180,19 @@ static GFXDECODE_START( gfx_namcos21 )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(namco_de_pcbstack_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("maincpu", M68000,12288000) /* Master */
-	MCFG_DEVICE_PROGRAM_MAP(driveyes_master_map)
+void namco_de_pcbstack_device::device_add_mconfig(machine_config &config)
+{
+	M68000(config, m_maincpu, 12288000); /* Master */
+	m_maincpu->set_addrmap(AS_PROGRAM, &namco_de_pcbstack_device::driveyes_master_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(namco_de_pcbstack_device::screen_scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("slave", M68000,12288000) /* Slave */
-	MCFG_DEVICE_PROGRAM_MAP(driveyes_slave_map)
+	M68000(config, m_slave, 12288000); /* Slave */
+	m_slave->set_addrmap(AS_PROGRAM, &namco_de_pcbstack_device::driveyes_slave_map);
 
-	MCFG_DEVICE_ADD("audiocpu", MC6809E, 3072000) /* Sound */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(namco_de_pcbstack_device, irq0_line_hold, 2*60)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(namco_de_pcbstack_device, irq1_line_hold, 120)
+	MC6809E(config, m_audiocpu, 3072000); /* Sound */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &namco_de_pcbstack_device::sound_map);
+	m_audiocpu->set_periodic_int(FUNC(namco_de_pcbstack_device::irq0_line_hold), attotime::from_hz(2*60));
+	m_audiocpu->set_periodic_int(FUNC(namco_de_pcbstack_device::irq1_line_hold), attotime::from_hz(120));
 
 	configure_c68_namcos21(config);
 
@@ -208,10 +206,11 @@ MACHINE_CONFIG_START(namco_de_pcbstack_device::device_add_mconfig)
 	configure_c148_standard(config);
 	NAMCO_C139(config, m_sci, 0);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS_NAMCO480I
-	MCFG_SCREEN_UPDATE_DRIVER(namco_de_pcbstack_device, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	// TODO: basic parameters to get 60.606060 Hz, x2 is for interlace
+	m_screen->set_raw(12288000*2, 768, 0, 496, 264*2, 0, 480);
+	m_screen->set_screen_update(FUNC(namco_de_pcbstack_device::screen_update));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_namcos21);
 	PALETTE(config, m_palette).set_format(palette_device::xBRG_888, NAMCOS21_NUM_COLORS);
@@ -239,7 +238,7 @@ MACHINE_CONFIG_START(namco_de_pcbstack_device::device_add_mconfig)
 	m_c140->add_route(1, "rspeaker", 0.50);
 
 	YM2151(config, "ymsnd", 3579580).add_route(0, "lspeaker", 0.30).add_route(1, "rspeaker", 0.30);
-MACHINE_CONFIG_END
+}
 
 
 uint32_t namco_de_pcbstack_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

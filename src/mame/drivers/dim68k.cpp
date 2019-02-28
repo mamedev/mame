@@ -324,7 +324,7 @@ MACHINE_CONFIG_START(dim68k_state::dim68k)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 250-1)
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dim68k)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_dim68k);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

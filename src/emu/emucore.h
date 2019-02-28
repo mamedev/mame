@@ -224,11 +224,11 @@ inline TYPE &operator|=(TYPE &a, TYPE b) { return a = a | b; }
 #undef assert_always
 
 #if defined(MAME_DEBUG_FAST)
-#define assert_always(x, msg)   do { if (!(x)) throw emu_fatalerror("Fatal error: %s\nCaused by assert: %s:%d: %s", msg, __FILE__, __LINE__, #x); } while (0)
+#define assert_always(x, msg)   do { if (!(x)) throw emu_fatalerror("%s\nCaused by assert: %s:%d: %s", msg, __FILE__, __LINE__, #x); } while (0)
 #elif defined(MAME_DEBUG)
-#define assert_always(x, msg)   do { if (!(x)) throw emu_fatalerror("Fatal error: %s\nCaused by assert: %s:%d: %s", msg, __FILE__, __LINE__, #x); } while (0)
+#define assert_always(x, msg)   do { if (!(x)) throw emu_fatalerror("%s\nCaused by assert: %s:%d: %s", msg, __FILE__, __LINE__, #x); } while (0)
 #else
-#define assert_always(x, msg)   do { if (!(x)) throw emu_fatalerror("Fatal error: %s (%s:%d)", msg, __FILE__, __LINE__); } while (0)
+#define assert_always(x, msg)   do { if (!(x)) throw emu_fatalerror("%s (%s:%d)", msg, __FILE__, __LINE__); } while (0)
 #endif
 
 

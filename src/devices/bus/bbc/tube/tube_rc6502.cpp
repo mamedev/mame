@@ -233,23 +233,23 @@ void bbc_tube_rc6502_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ8_MEMBER(bbc_tube_rc6502_device::host_r)
+uint8_t bbc_tube_rc6502_device::host_r(offs_t offset)
 {
-	return m_ula->host_r(space, offset);
+	return m_ula->host_r(offset);
 }
 
-WRITE8_MEMBER(bbc_tube_rc6502_device::host_w)
+void bbc_tube_rc6502_device::host_w(offs_t offset, uint8_t data)
 {
-	m_ula->host_w(space, offset, data);
+	m_ula->host_w(offset, data);
 }
 
 
-READ8_MEMBER(bbc_tube_rc6502_device::config_r)
+uint8_t bbc_tube_rc6502_device::config_r()
 {
 	return m_banknum;
 }
 
-WRITE8_MEMBER(bbc_tube_rc6502_device::register_w)
+void bbc_tube_rc6502_device::register_w(uint8_t data)
 {
 	switch (data & 0x06)
 	{

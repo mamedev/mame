@@ -1465,12 +1465,13 @@ TIMER_CALLBACK_MEMBER(socrates_state::kbmcu_sim_cb)
 	}
 }
 
-MACHINE_CONFIG_START(socrates_state::socrates)
+void socrates_state::socrates(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(21'477'272)/6)  /* Toshiba TMPZ84C00AP @ 3.579545 MHz, verified, xtal is divided by 6 */
-	MCFG_DEVICE_PROGRAM_MAP(z80_mem)
-	MCFG_DEVICE_IO_MAP(z80_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", socrates_state,  assert_irq)
+	Z80(config, m_maincpu, XTAL(21'477'272)/6);  /* Toshiba TMPZ84C00AP @ 3.579545 MHz, verified, xtal is divided by 6 */
+	m_maincpu->set_addrmap(AS_PROGRAM, &socrates_state::z80_mem);
+	m_maincpu->set_addrmap(AS_IO, &socrates_state::z80_io);
+	m_maincpu->set_vblank_int("screen", FUNC(socrates_state::assert_irq));
 	config.m_minimum_quantum = attotime::from_hz(60);
 
 	ADDRESS_MAP_BANK(config, "rombank1").set_map(&socrates_state::socrates_rombank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
@@ -1478,53 +1479,50 @@ MACHINE_CONFIG_START(socrates_state::socrates)
 	ADDRESS_MAP_BANK(config, "rambank2").set_map(&socrates_state::socrates_rambank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(264, 228) // technically the screen size is 256x228 but super painter abuses what I suspect is a hardware bug to display repeated pixels of the very last pixel beyond this horizontal space, well into hblank
-	MCFG_SCREEN_VISIBLE_AREA(0, 263, 0, 219) // the last few rows are usually cut off by the screen bottom but are indeed displayed if you mess with v-hold
-	MCFG_SCREEN_UPDATE_DRIVER(socrates_state, screen_update_socrates)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(264, 228); // technically the screen size is 256x228 but super painter abuses what I suspect is a hardware bug to display repeated pixels of the very last pixel beyond this horizontal space, well into hblank
+	m_screen->set_visarea(0, 263, 0, 219); // the last few rows are usually cut off by the screen bottom but are indeed displayed if you mess with v-hold
+	m_screen->set_screen_update(FUNC(socrates_state::screen_update_socrates));
+	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(socrates_state::socrates_palette), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("soc_snd", SOCRATES_SOUND, XTAL(21'477'272)/(512+256)) // this is correct, as strange as it sounds.
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SOCRATES_SOUND(config, m_sound, XTAL(21'477'272)/(512+256)).add_route(ALL_OUTPUTS, "mono", 0.25); // this is correct, as strange as it sounds.
 
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "socrates_cart")
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "socrates_cart");
 
 	/* Software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("socrates");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(socrates_state::socrates_pal)
+void socrates_state::socrates_pal(machine_config &config)
+{
 	socrates(config);
 
-	MCFG_DEVICE_REPLACE("maincpu", Z80, XTAL(26'601'712)/8)
-	MCFG_DEVICE_PROGRAM_MAP(z80_mem)
-	MCFG_DEVICE_IO_MAP(z80_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", socrates_state,  assert_irq)
+	m_maincpu->set_clock(XTAL(26'601'712)/8);
+
 	config.m_minimum_quantum = attotime::from_hz(50);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
-	MCFG_SCREEN_SIZE(264, 238) // technically the screen size is 256x228 but super painter abuses what I suspect is a hardware bug to display repeated pixels of the very last pixel beyond this horizontal space, well into hblank
-	MCFG_SCREEN_VISIBLE_AREA(0, 263, 0, 229) // the last few rows are usually cut off by the screen bottom but are indeed displayed if you mess with v-hold
-	MCFG_SCREEN_UPDATE_DRIVER(socrates_state, screen_update_socrates)
+	m_screen->set_refresh_hz(50);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
+	m_screen->set_size(264, 238); // technically the screen size is 256x228 but super painter abuses what I suspect is a hardware bug to display repeated pixels of the very last pixel beyond this horizontal space, well into hblank
+	m_screen->set_visarea(0, 263, 0, 229); // the last few rows are usually cut off by the screen bottom but are indeed displayed if you mess with v-hold
+	m_screen->set_screen_update(FUNC(socrates_state::screen_update_socrates));
 
-	MCFG_DEVICE_REPLACE("soc_snd", SOCRATES_SOUND, XTAL(26'601'712)/(512+256)) // this is correct, as strange as it sounds.
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	m_sound->set_clock(XTAL(26'601'712)/(512+256)); // this is correct, as strange as it sounds.
+}
 
-MACHINE_CONFIG_START(iqunlimz_state::iqunlimz)
+void iqunlimz_state::iqunlimz(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(4'000'000)) /* not accurate */
-	MCFG_DEVICE_PROGRAM_MAP(iqunlimz_mem)
-	MCFG_DEVICE_IO_MAP(iqunlimz_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", iqunlimz_state,  assert_irq)
+	Z80(config, m_maincpu, XTAL(4'000'000)); /* not accurate */
+	m_maincpu->set_addrmap(AS_PROGRAM, &iqunlimz_state::iqunlimz_mem);
+	m_maincpu->set_addrmap(AS_IO, &iqunlimz_state::iqunlimz_io);
+	m_maincpu->set_vblank_int("screen", FUNC(iqunlimz_state::assert_irq));
 
 	ADDRESS_MAP_BANK(config, "rombank1").set_map(&iqunlimz_state::iqunlimz_rombank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
 	ADDRESS_MAP_BANK(config, "rombank2").set_map(&iqunlimz_state::iqunlimz_rombank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
@@ -1532,23 +1530,22 @@ MACHINE_CONFIG_START(iqunlimz_state::iqunlimz)
 	ADDRESS_MAP_BANK(config, "rambank2").set_map(&iqunlimz_state::iqunlimz_rambank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(iqunlimz_state, screen_update)
-	MCFG_SCREEN_SIZE(256, 224)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 224-1)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_screen_update(FUNC(iqunlimz_state::screen_update));
+	m_screen->set_size(256, 224);
+	m_screen->set_visarea(0, 256-1, 0, 224-1);
+	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(iqunlimz_state::socrates_palette), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("soc_snd", SOCRATES_SOUND, XTAL(21'477'272)/(512+256))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SOCRATES_SOUND(config, m_sound, XTAL(21'477'272)/(512+256)).add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, nullptr)
-MACHINE_CONFIG_END
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, nullptr);
+}
 
 /******************************************************************************
  ROM Definitions

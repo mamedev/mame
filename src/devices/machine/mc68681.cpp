@@ -268,22 +268,25 @@ void xr68c681_device::device_reset()
 	m_XTXA = m_XRXA = m_XTXB = m_XRXB = false;
 }
 
-MACHINE_CONFIG_START(duart_base_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(CHANA_TAG, DUART_CHANNEL, 0)
-	MCFG_DEVICE_ADD(CHANB_TAG, DUART_CHANNEL, 0)
-MACHINE_CONFIG_END
+void duart_base_device::device_add_mconfig(machine_config &config)
+{
+	DUART_CHANNEL(config, CHANA_TAG, 0);
+	DUART_CHANNEL(config, CHANB_TAG, 0);
+}
 
-MACHINE_CONFIG_START(sc28c94_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(CHANA_TAG, DUART_CHANNEL, 0)
-	MCFG_DEVICE_ADD(CHANB_TAG, DUART_CHANNEL, 0)
-	MCFG_DEVICE_ADD(CHANC_TAG, DUART_CHANNEL, 0)
-	MCFG_DEVICE_ADD(CHAND_TAG, DUART_CHANNEL, 0)
-MACHINE_CONFIG_END
+void sc28c94_device::device_add_mconfig(machine_config &config)
+{
+	DUART_CHANNEL(config, CHANA_TAG, 0);
+	DUART_CHANNEL(config, CHANB_TAG, 0);
+	DUART_CHANNEL(config, CHANC_TAG, 0);
+	DUART_CHANNEL(config, CHAND_TAG, 0);
+}
 
-MACHINE_CONFIG_START(mc68340_duart_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(CHANA_TAG, DUART_CHANNEL, 0)
-	MCFG_DEVICE_ADD(CHANB_TAG, DUART_CHANNEL, 0)
-MACHINE_CONFIG_END
+void mc68340_duart_device::device_add_mconfig(machine_config &config)
+{
+	DUART_CHANNEL(config, CHANA_TAG, 0);
+	DUART_CHANNEL(config, CHANB_TAG, 0);
+}
 
 void duart_base_device::update_interrupts()
 {

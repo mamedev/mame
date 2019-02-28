@@ -6,7 +6,7 @@
  */
 
 #include "nld_7490.h"
-#include "../nl_base.h"
+#include "netlist/nl_base.h"
 
 namespace netlist
 {
@@ -78,7 +78,7 @@ namespace netlist
 		m_last_B = 0;
 	}
 
-	static C14CONSTEXPR const netlist_time delay[4] =
+	static constexpr const netlist_time delay[4] =
 	{
 			NLTIME_FROM_NS(18),
 			NLTIME_FROM_NS(36) - NLTIME_FROM_NS(18),
@@ -120,7 +120,7 @@ namespace netlist
 		m_last_B = new_B;
 	}
 
-	NETLIB_FUNC_VOID(7490, update_outputs, (void))
+	NETLIB_FUNC_VOID(7490, update_outputs, ())
 	{
 		for (std::size_t i=0; i<4; i++)
 			m_Q[i].push((m_cnt >> i) & 1, delay[i]);

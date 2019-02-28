@@ -291,7 +291,7 @@ MACHINE_CONFIG_START(dragrace_state::dragrace)
 	MCFG_SCREEN_UPDATE_DRIVER(dragrace_state, screen_update_dragrace)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dragrace)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_dragrace);
 	PALETTE(config, "palette", FUNC(dragrace_state::dragrace_palette), 16);
 
 	/* sound hardware */

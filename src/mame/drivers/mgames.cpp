@@ -23,7 +23,7 @@
   FOR AMUSEMENT ONLY.
 
   The ingenious Match Games offers something for everyone. Four captivating themes
-  with brillant graphics, challenging play action, an enticing bonus feature and a
+  with brilliant graphics, challenging play action, an enticing bonus feature and a
   host of options to tailor the game to any location.
 
   Match Games is today's perfect alternative in adult video skill games...
@@ -36,19 +36,19 @@
   and number combinations. Play appeal stays high as new characters are introduced.
 
   "Wild" characters liven the action even more and build special bonus points, co-
-  llected on a 5-way number match. The appeal is irresistable... Players stay hoo-
+  llected on a 5-way number match. The appeal is irresistible... Players stay hoo-
   ked in for lot more action (and more earnings) for you!.
 
 
   GAME THEMES:
 
-  Match Games aknowledges every scoring combination by displaying its own special
+  Match Games acknowledges every scoring combination by displaying its own special
   name keyed to each game theme.
 
   Every time 2 "Wild" characters pop up together, special bonus symbols appear,
   increasing bonus by 5 points.
 
-  * "THE WHITE KNIGHT" features knights in armor with colores plumes and wild
+  * "THE WHITE KNIGHT" features knights in armor with colored plumes and wild
                        'White Knights'.
 
   * "THE FROG POND" stars colorful and humorous frogs perched on top of mushrooms.
@@ -639,30 +639,30 @@ static GFXDECODE_START( gfx_mgames )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(mgames_state::mgames)
+void mgames_state::mgames(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,MASTER_CLOCK/6)      /* 3 MHz? */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mgames_state, irq0_line_hold)
+	Z80(config, m_maincpu, MASTER_CLOCK/6);      /* 3 MHz? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &mgames_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(mgames_state::irq0_line_hold));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mgames_state, screen_update_mgames)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 256);
+	screen.set_visarea(0, 512-1, 0, 256-1);
+	screen.set_screen_update(FUNC(mgames_state::screen_update_mgames));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mgames);
 	PALETTE(config, m_palette, FUNC(mgames_state::mgames_palette), 0x200);
 
 	/* sound hardware */
 	//  to do...
-
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( mgames )

@@ -214,7 +214,7 @@ MACHINE_CONFIG_START(dai_state::dai)
 	MCFG_SCREEN_UPDATE_DRIVER(dai_state, screen_update_dai)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_dai)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_dai);
 	PALETTE(config, m_palette, FUNC(dai_state::dai_palette), ARRAY_LENGTH(s_palette));
 
 

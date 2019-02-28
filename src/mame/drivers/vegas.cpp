@@ -570,13 +570,13 @@ WRITE32_MEMBER( vegas_state::timekeeper_w )
 	if (m_cmos_unlocked)
 	{
 		if (ACCESSING_BITS_0_7)
-			m_timekeeper->write(space, offset * 4 + 0, data >> 0, 0xff);
+			m_timekeeper->write(offset * 4 + 0, data >> 0);
 		if (ACCESSING_BITS_8_15)
-			m_timekeeper->write(space, offset * 4 + 1, data >> 8, 0xff);
+			m_timekeeper->write(offset * 4 + 1, data >> 8);
 		if (ACCESSING_BITS_16_23)
-			m_timekeeper->write(space, offset * 4 + 2, data >> 16, 0xff);
+			m_timekeeper->write(offset * 4 + 2, data >> 16);
 		if (ACCESSING_BITS_24_31)
-			m_timekeeper->write(space, offset * 4 + 3, data >> 24, 0xff);
+			m_timekeeper->write(offset * 4 + 3, data >> 24);
 		if (offset*4 >= 0x7ff0)
 			if (LOG_TIMEKEEPER) logerror("%s timekeeper_w(%04X & %08X) = %08X\n", machine().describe_context(), offset*4, mem_mask, data);
 		m_cmos_unlocked = 0;
@@ -590,13 +590,13 @@ READ32_MEMBER( vegas_state::timekeeper_r )
 {
 	uint32_t result = 0xffffffff;
 	if (ACCESSING_BITS_0_7)
-		result = (result & ~0x000000ff) | (m_timekeeper->read(space, offset * 4 + 0, 0xff) << 0);
+		result = (result & ~0x000000ff) | (m_timekeeper->read(offset * 4 + 0) << 0);
 	if (ACCESSING_BITS_8_15)
-		result = (result & ~0x0000ff00) | (m_timekeeper->read(space, offset * 4 + 1, 0xff) << 8);
+		result = (result & ~0x0000ff00) | (m_timekeeper->read(offset * 4 + 1) << 8);
 	if (ACCESSING_BITS_16_23)
-		result = (result & ~0x00ff0000) | (m_timekeeper->read(space, offset * 4 + 2, 0xff) << 16);
+		result = (result & ~0x00ff0000) | (m_timekeeper->read(offset * 4 + 2) << 16);
 	if (ACCESSING_BITS_24_31)
-		result = (result & ~0xff000000) | (m_timekeeper->read(space, offset * 4 + 3, 0xff) << 24);
+		result = (result & ~0xff000000) | (m_timekeeper->read(offset * 4 + 3) << 24);
 	if (offset * 4 >= 0x7ff0) {
 		// Initial RTC check expects reads to the RTC to take some time
 		m_maincpu->eat_cycles(30);
@@ -822,7 +822,7 @@ WRITE8_MEMBER(vegas_state::sio_w)
 			break;
 		case 7:
 			// Watchdog
-			m_timekeeper->watchdog_write(space, offset, data);
+			m_timekeeper->watchdog_write();
 			if (0 && LOG_SIO)
 				logerror("sio_w: Watchdog: %08x index: %d data: %02X\n", offset, index, data);
 			//m_maincpu->eat_cycles(100);
@@ -1739,7 +1739,8 @@ void vegas_state::vegas_cs8_map(address_map &map)
  *
  *************************************/
 
-MACHINE_CONFIG_START(vegas_state::vegascore)
+void vegas_state::vegascore(machine_config &config)
+{
 	/* basic machine hardware */
 	R5000LE(config, m_maincpu, vegas_state::SYSTEM_CLOCK * 2);
 	m_maincpu->set_icache_size(16384);
@@ -1782,35 +1783,40 @@ MACHINE_CONFIG_START(vegas_state::vegascore)
 	screen.set_size(640, 480);
 	screen.set_visarea(0, 640 - 1, 0, 480 - 1);
 	screen.set_screen_update(PCI_ID_VIDEO, FUNC(voodoo_pci_device::screen_update));
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(vegas_state::vegas)
+void vegas_state::vegas(machine_config &config)
+{
 	vegascore(config);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(vegas_state::vegas250)
+void vegas_state::vegas250(machine_config &config)
+{
 	vegascore(config);
 	m_maincpu->set_clock(vegas_state::SYSTEM_CLOCK*2.5);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(vegas_state::vegas32m)
+void vegas_state::vegas32m(machine_config &config)
+{
 	vegas250(config);
 	m_nile->set_sdram_size(0, 0x02000000);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(vegas_state::vegasban)
+void vegas_state::vegasban(machine_config &config)
+{
 	vegas32m(config);
 	voodoo_banshee_pci_device &voodoo(VOODOO_BANSHEE_PCI(config.replace(), PCI_ID_VIDEO, 0, m_maincpu, "screen"));
 	voodoo.set_fbmem(16);
 	subdevice<voodoo_device>(PCI_ID_VIDEO":voodoo")->vblank_callback().set(FUNC(vegas_state::vblank_assert));
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(vegas_state::vegasv3)
+void vegas_state::vegasv3(machine_config &config)
+{
 	vegas32m(config);
 	RM7000LE(config.replace(), m_maincpu, vegas_state::SYSTEM_CLOCK * 2.5);
 	m_maincpu->set_icache_size(16384);
@@ -1820,10 +1826,11 @@ MACHINE_CONFIG_START(vegas_state::vegasv3)
 	voodoo_3_pci_device &voodoo(VOODOO_3_PCI(config.replace(), PCI_ID_VIDEO, 0, m_maincpu, "screen"));
 	voodoo.set_fbmem(16);
 	subdevice<voodoo_device>(PCI_ID_VIDEO":voodoo")->vblank_callback().set(FUNC(vegas_state::vblank_assert));
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(vegas_state::denver)
+void vegas_state::denver(machine_config &config)
+{
 	vegascore(config);
 	RM7000LE(config.replace(), m_maincpu, vegas_state::SYSTEM_CLOCK * 2.5);
 
@@ -1864,11 +1871,12 @@ MACHINE_CONFIG_START(vegas_state::denver)
 	ttys02.ri_handler().set(m_uart2, FUNC(ins8250_uart_device::ri_w));
 	ttys02.cts_handler().set(m_uart2, FUNC(ins8250_uart_device::cts_w));
 
-MACHINE_CONFIG_END
+}
 
 // Per driver configs
 
-MACHINE_CONFIG_START(vegas_state::gauntleg)
+void vegas_state::gauntleg(machine_config &config)
+{
 	vegas(config);
 	dcs2_audio_2104_device &dcs(DCS2_AUDIO_2104(config, "dcs", 0));
 	dcs.set_dram_in_mb(4);
@@ -1880,9 +1888,10 @@ MACHINE_CONFIG_START(vegas_state::gauntleg)
 	m_ioasic->set_yearoffs(80);
 	m_ioasic->irq_handler().set(FUNC(vegas_state::ioasic_irq));
 	m_ioasic->set_auto_ack(1);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(vegas_state::gauntdl)
+void vegas_state::gauntdl(machine_config &config)
+{
 	vegas(config);
 	dcs2_audio_2104_device &dcs(DCS2_AUDIO_2104(config, "dcs", 0));
 	dcs.set_dram_in_mb(4);
@@ -1894,9 +1903,10 @@ MACHINE_CONFIG_START(vegas_state::gauntdl)
 	m_ioasic->set_yearoffs(80);
 	m_ioasic->irq_handler().set(FUNC(vegas_state::ioasic_irq));
 	m_ioasic->set_auto_ack(1);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(vegas_state::warfa)
+void vegas_state::warfa(machine_config &config)
+{
 	vegas250(config);
 	dcs2_audio_2104_device &dcs(DCS2_AUDIO_2104(config, "dcs", 0));
 	dcs.set_dram_in_mb(4);
@@ -1908,9 +1918,10 @@ MACHINE_CONFIG_START(vegas_state::warfa)
 	m_ioasic->set_yearoffs(80);
 	m_ioasic->irq_handler().set(FUNC(vegas_state::ioasic_irq));
 	m_ioasic->set_auto_ack(1);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(vegas_state::tenthdeg)
+void vegas_state::tenthdeg(machine_config &config)
+{
 	vegas(config);
 	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
 	dcs.set_dram_in_mb(4);
@@ -1922,9 +1933,10 @@ MACHINE_CONFIG_START(vegas_state::tenthdeg)
 	m_ioasic->set_yearoffs(80);
 	m_ioasic->irq_handler().set(FUNC(vegas_state::ioasic_irq));
 	m_ioasic->set_auto_ack(1);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(vegas_state::roadburn)
+void vegas_state::roadburn(machine_config &config)
+{
 	vegas32m(config);
 	dcs2_audio_dsio_device &dcs(DCS2_AUDIO_DSIO(config, "dcs", 0));
 	dcs.set_dram_in_mb(4);
@@ -1936,9 +1948,10 @@ MACHINE_CONFIG_START(vegas_state::roadburn)
 	m_ioasic->set_yearoffs(80);
 	m_ioasic->irq_handler().set(FUNC(vegas_state::ioasic_irq));
 	m_ioasic->set_auto_ack(1);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(vegas_state::nbashowt)
+void vegas_state::nbashowt(machine_config &config)
+{
 	vegasban(config);
 	dcs2_audio_2104_device &dcs(DCS2_AUDIO_2104(config, "dcs", 0));
 	dcs.set_dram_in_mb(4);
@@ -1952,9 +1965,10 @@ MACHINE_CONFIG_START(vegas_state::nbashowt)
 	m_ioasic->irq_handler().set(FUNC(vegas_state::ioasic_irq));
 	//m_ioasic->set_auto_ack(1)
 	m_ioasic->aux_output_handler().set(FUNC(vegas_state::i40_w));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(vegas_state::nbanfl)
+void vegas_state::nbanfl(machine_config &config)
+{
 	vegasban(config);
 	dcs2_audio_2104_device &dcs(DCS2_AUDIO_2104(config, "dcs", 0));
 	dcs.set_dram_in_mb(4);
@@ -1967,9 +1981,10 @@ MACHINE_CONFIG_START(vegas_state::nbanfl)
 	m_ioasic->irq_handler().set(FUNC(vegas_state::ioasic_irq));
 	//m_ioasic->set_auto_ack(1)
 	m_ioasic->aux_output_handler().set(FUNC(vegas_state::i40_w));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(vegas_state::nbagold)
+void vegas_state::nbagold(machine_config &config)
+{
 	vegasban(config);
 	QED5271LE(config.replace(), m_maincpu, vegas_state::SYSTEM_CLOCK * 2.5);
 	m_maincpu->set_icache_size(32768);
@@ -1987,9 +2002,10 @@ MACHINE_CONFIG_START(vegas_state::nbagold)
 	m_ioasic->irq_handler().set(FUNC(vegas_state::ioasic_irq));
 	//m_ioasic->set_auto_ack(1)
 	 m_ioasic->aux_output_handler().set(FUNC(vegas_state::i40_w));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(vegas_state::sf2049)
+void vegas_state::sf2049(machine_config &config)
+{
 	denver(config);
 	dcs2_audio_denver_5ch_device &dcs(DCS2_AUDIO_DENVER_5CH(config, "dcs", 0));
 	dcs.set_dram_in_mb(8);
@@ -2002,9 +2018,10 @@ MACHINE_CONFIG_START(vegas_state::sf2049)
 	m_ioasic->irq_handler().set(FUNC(vegas_state::ioasic_irq));
 	m_ioasic->set_auto_ack(1);
 	m_ioasic->aux_output_handler().set(FUNC(vegas_state::wheel_board_w));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(vegas_state::sf2049se)
+void vegas_state::sf2049se(machine_config &config)
+{
 	denver(config);
 	dcs2_audio_denver_5ch_device &dcs(DCS2_AUDIO_DENVER_5CH(config, "dcs", 0));
 	dcs.set_dram_in_mb(8);
@@ -2017,9 +2034,10 @@ MACHINE_CONFIG_START(vegas_state::sf2049se)
 	m_ioasic->irq_handler().set(FUNC(vegas_state::ioasic_irq));
 	m_ioasic->set_auto_ack(1);
 	m_ioasic->aux_output_handler().set(FUNC(vegas_state::wheel_board_w));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(vegas_state::sf2049te)
+void vegas_state::sf2049te(machine_config &config)
+{
 	denver(config);
 	dcs2_audio_denver_5ch_device &dcs(DCS2_AUDIO_DENVER_5CH(config, "dcs", 0));
 	dcs.set_dram_in_mb(8);
@@ -2032,9 +2050,10 @@ MACHINE_CONFIG_START(vegas_state::sf2049te)
 	m_ioasic->irq_handler().set(FUNC(vegas_state::ioasic_irq));
 	m_ioasic->set_auto_ack(1);
 	m_ioasic->aux_output_handler().set(FUNC(vegas_state::wheel_board_w));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(vegas_state::cartfury)
+void vegas_state::cartfury(machine_config &config)
+{
 	vegasv3(config);
 	dcs2_audio_2104_device &dcs(DCS2_AUDIO_2104(config, "dcs", 0));
 	dcs.set_dram_in_mb(4);
@@ -2047,7 +2066,7 @@ MACHINE_CONFIG_START(vegas_state::cartfury)
 	m_ioasic->set_yearoffs(80);
 	m_ioasic->irq_handler().set(FUNC(vegas_state::ioasic_irq));
 	//m_ioasic->set_auto_ack(1)
-MACHINE_CONFIG_END
+}
 
 
 /*************************************

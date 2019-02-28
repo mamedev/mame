@@ -275,7 +275,7 @@ void elf2_state::elf2(machine_config &config)
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
 
-	QUICKLOAD(config, "quickload", 0).set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(elf2_state, elf), this), "bin", 0);
+	QUICKLOAD(config, "quickload").set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(elf2_state, elf), this), "bin");
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("256");

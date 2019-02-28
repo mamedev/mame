@@ -811,7 +811,7 @@ MACHINE_CONFIG_START(avigo_state::avigo)
 	TIMER(config, "1hz_timer").configure_periodic(FUNC(avigo_state::avigo_1hz_timer), attotime::from_hz(1));
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", avigo_state, avigo, "app", 0)
+	MCFG_QUICKLOAD_ADD("quickload", avigo_state, avigo, "app")
 MACHINE_CONFIG_END
 
 

@@ -394,8 +394,8 @@ WRITE8_MEMBER(tenpindx_state::lights_w)
 
 WRITE8_MEMBER(astrocde_state::votrax_speech_w)
 {
-	m_votrax->inflection_w(space, 0, data >> 6);
-	m_votrax->write(space, 0, data);
+	m_votrax->inflection_w(data >> 6);
+	m_votrax->write(data & 0x3f);
 
 	/* Note : We should really also use volume in this as well as frequency */
 }

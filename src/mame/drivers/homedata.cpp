@@ -353,10 +353,10 @@ WRITE8_MEMBER(homedata_state::reikaids_upd7807_portc_w)
 	machine().bookkeeping().coin_counter_w(0, ~data & 0x80);
 
 	if (BIT(m_upd7807_portc, 5) && !BIT(data, 5))   /* write clock 1->0 */
-		m_ymsnd->write(space, BIT(data, 3), m_upd7807_porta);
+		m_ymsnd->write(BIT(data, 3), m_upd7807_porta);
 
 	if (BIT(m_upd7807_portc, 4) && !BIT(data, 4))   /* read clock 1->0 */
-		m_upd7807_porta = m_ymsnd->read(space, BIT(data, 3));
+		m_upd7807_porta = m_ymsnd->read(BIT(data, 3));
 
 	m_upd7807_portc = data;
 }
@@ -501,7 +501,7 @@ void homedata_state::mrokumei_map(address_map &map)
 	map(0x8000, 0x8000).w(FUNC(homedata_state::mrokumei_blitter_start_w)); // in some games also ROM bank switch to access service ROM
 	map(0x8001, 0x8001).w(FUNC(homedata_state::mrokumei_keyboard_select_w));
 	map(0x8002, 0x8002).w(FUNC(homedata_state::mrokumei_sound_cmd_w));
-	map(0x8003, 0x8003).w(m_sn, FUNC(sn76489a_device::command_w));
+	map(0x8003, 0x8003).w(m_sn, FUNC(sn76489a_device::write));
 	map(0x8006, 0x8006).w(FUNC(homedata_state::homedata_blitter_param_w));
 	map(0x8007, 0x8007).w(FUNC(homedata_state::mrokumei_blitter_bank_w));
 	map(0x8000, 0xffff).rom();
@@ -1254,7 +1254,6 @@ void homedata_state::mrokumei(machine_config &config)
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
@@ -1313,7 +1312,6 @@ void homedata_state::reikaids(machine_config &config)
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // unknown DAC
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
@@ -1370,7 +1368,6 @@ void homedata_state::pteacher(machine_config &config)
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }

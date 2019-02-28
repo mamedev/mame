@@ -32,6 +32,7 @@ project "netlist"
 
 	includedirs {
 		MAME_DIR .. "src/lib",
+    MAME_DIR .. "src/lib/netlist",
 	}
 
 	files {
@@ -47,9 +48,8 @@ project "netlist"
 		MAME_DIR .. "src/lib/netlist/nl_parser.h",
 		MAME_DIR .. "src/lib/netlist/nl_setup.cpp",
 		MAME_DIR .. "src/lib/netlist/nl_setup.h",
-		MAME_DIR .. "src/lib/netlist/nl_time.h",
+    MAME_DIR .. "src/lib/netlist/nl_types.h",
 		MAME_DIR .. "src/lib/netlist/plib/pconfig.h",
-		MAME_DIR .. "src/lib/netlist/plib/palloc.cpp",
 		MAME_DIR .. "src/lib/netlist/plib/palloc.h",
 		MAME_DIR .. "src/lib/netlist/plib/pchrono.cpp",
 		MAME_DIR .. "src/lib/netlist/plib/pchrono.h",
@@ -64,6 +64,7 @@ project "netlist"
 		MAME_DIR .. "src/lib/netlist/plib/pdynlib.h",
 		MAME_DIR .. "src/lib/netlist/plib/pmain.cpp",
 		MAME_DIR .. "src/lib/netlist/plib/pmain.h",
+		MAME_DIR .. "src/lib/netlist/plib/pmempool.h",
 		MAME_DIR .. "src/lib/netlist/plib/pomp.h",
 		MAME_DIR .. "src/lib/netlist/plib/poptions.cpp",
 		MAME_DIR .. "src/lib/netlist/plib/poptions.h",
@@ -74,10 +75,9 @@ project "netlist"
 		MAME_DIR .. "src/lib/netlist/plib/pstate.h",
 		MAME_DIR .. "src/lib/netlist/plib/pstring.cpp",
 		MAME_DIR .. "src/lib/netlist/plib/pstring.h",
-		MAME_DIR .. "src/lib/netlist/plib/pstring.cpp",
-		MAME_DIR .. "src/lib/netlist/plib/pstring.h",
 		MAME_DIR .. "src/lib/netlist/plib/pstream.cpp",
 		MAME_DIR .. "src/lib/netlist/plib/pstream.h",
+    MAME_DIR .. "src/lib/netlist/plib/ptime.h",
 		MAME_DIR .. "src/lib/netlist/plib/ptypes.h",
 		MAME_DIR .. "src/lib/netlist/plib/putil.cpp",
 		MAME_DIR .. "src/lib/netlist/plib/putil.h",

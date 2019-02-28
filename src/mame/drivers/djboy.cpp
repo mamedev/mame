@@ -522,7 +522,7 @@ MACHINE_CONFIG_START(djboy_state::djboy)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, djboy_state, screen_vblank_djboy))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_djboy)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_djboy);
 	MCFG_PALETTE_ADD("palette", 0x200)
 
 	KANEKO_PANDORA(config, m_pandora, 0);

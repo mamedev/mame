@@ -31,14 +31,15 @@ DEFINE_DEVICE_TYPE(POFO_HPC104_2, pofo_hpc104_2_device, "pofo_hpc104_2", "Atari 
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(pofo_hpc104_device::device_add_mconfig)
-	MCFG_PORTFOLIO_MEMORY_CARD_SLOT_ADD(PORTFOLIO_MEMORY_CARD_SLOT_B_TAG, portfolio_memory_cards, nullptr)
+void pofo_hpc104_device::device_add_mconfig(machine_config &config)
+{
+	PORTFOLIO_MEMORY_CARD_SLOT(config, m_ccm, portfolio_memory_cards, nullptr);
 
-	MCFG_PORTFOLIO_EXPANSION_SLOT_ADD(PORTFOLIO_EXPANSION_SLOT_TAG, XTAL(4'915'200), portfolio_expansion_cards, nullptr)
-	MCFG_PORTFOLIO_EXPANSION_SLOT_EINT_CALLBACK(WRITELINE(DEVICE_SELF_OWNER, portfolio_expansion_slot_device, eint_w))
-	MCFG_PORTFOLIO_EXPANSION_SLOT_NMIO_CALLBACK(WRITELINE(DEVICE_SELF_OWNER, portfolio_expansion_slot_device, nmio_w))
-	MCFG_PORTFOLIO_EXPANSION_SLOT_WAKE_CALLBACK(WRITELINE(DEVICE_SELF_OWNER, portfolio_expansion_slot_device, wake_w))
-MACHINE_CONFIG_END
+	PORTFOLIO_EXPANSION_SLOT(config, m_exp, XTAL(4'915'200), portfolio_expansion_cards, nullptr);
+	m_exp->eint_wr_callback().set(DEVICE_SELF_OWNER, FUNC(portfolio_expansion_slot_device::eint_w));
+	m_exp->nmio_wr_callback().set(DEVICE_SELF_OWNER, FUNC(portfolio_expansion_slot_device::nmio_w));
+	m_exp->wake_wr_callback().set(DEVICE_SELF_OWNER, FUNC(portfolio_expansion_slot_device::wake_w));
+}
 
 
 //-------------------------------------------------
@@ -146,15 +147,15 @@ void pofo_hpc104_device::device_reset()
 //  nrdi_r - read
 //-------------------------------------------------
 
-uint8_t pofo_hpc104_device::nrdi_r(address_space &space, offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1)
+uint8_t pofo_hpc104_device::nrdi_r(offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1)
 {
-	data = m_exp->nrdi_r(space, offset, data, iom, bcom, m_ncc1_out || ncc1);
+	data = m_exp->nrdi_r(offset, data, iom, bcom, m_ncc1_out || ncc1);
 
 	if (!iom)
 	{
 		if (!(!m_ncc1_out || ncc1))
 		{
-			data = m_ccm->nrdi_r(space, offset & 0x1ffff);
+			data = m_ccm->nrdi_r(offset & 0x1ffff);
 
 			if (LOG) logerror("%s %s CCM1 read %05x:%02x\n", machine().time().as_string(), machine().describe_context(), offset & 0x1ffff, data);
 		}
@@ -183,9 +184,9 @@ uint8_t pofo_hpc104_device::nrdi_r(address_space &space, offs_t offset, uint8_t 
 //  nwri_w - write
 //-------------------------------------------------
 
-void pofo_hpc104_device::nwri_w(address_space &space, offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1)
+void pofo_hpc104_device::nwri_w(offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1)
 {
-	m_exp->nwri_w(space, offset, data, iom, bcom, m_ncc1_out || ncc1);
+	m_exp->nwri_w(offset, data, iom, bcom, m_ncc1_out || ncc1);
 
 	if (!iom)
 	{
@@ -193,7 +194,7 @@ void pofo_hpc104_device::nwri_w(address_space &space, offs_t offset, uint8_t dat
 		{
 			if (LOG) logerror("%s %s CCM1 write %05x:%02x\n", machine().time().as_string(), machine().describe_context(), offset & 0x1ffff, data);
 
-			m_ccm->nwri_w(space, offset & 0x1ffff, data);
+			m_ccm->nwri_w(offset & 0x1ffff, data);
 		}
 
 		if (m_sw1)

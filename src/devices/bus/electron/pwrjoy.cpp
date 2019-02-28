@@ -78,7 +78,7 @@ void electron_pwrjoy_device::device_start()
 //  expbus_r - expansion data read
 //-------------------------------------------------
 
-uint8_t electron_pwrjoy_device::expbus_r(address_space &space, offs_t offset)
+uint8_t electron_pwrjoy_device::expbus_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -102,7 +102,7 @@ uint8_t electron_pwrjoy_device::expbus_r(address_space &space, offs_t offset)
 //  expbus_w - expansion data write
 //-------------------------------------------------
 
-void electron_pwrjoy_device::expbus_w(address_space &space, offs_t offset, uint8_t data)
+void electron_pwrjoy_device::expbus_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0xfe05)
 	{

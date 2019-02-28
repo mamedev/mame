@@ -81,10 +81,10 @@ void a2052_device::autoconfig_base_address(offs_t address)
 		logerror("-> installing a2052\n");
 
 	// stop responding to default autoconfig
-	m_slot->m_space->unmap_readwrite(0xe80000, 0xe8007f);
+	m_slot->space().unmap_readwrite(0xe80000, 0xe8007f);
 
 	// install access to the rom space
-	m_slot->m_space->install_ram(address, address + m_ram.size()*2 - 1, &m_ram[0]);
+	m_slot->space().install_ram(address, address + m_ram.size()*2 - 1, &m_ram[0]);
 
 	// we're done
 	m_slot->cfgout_w(0);
@@ -128,7 +128,7 @@ WRITE_LINE_MEMBER( a2052_device::cfgin_w )
 		autoconfig_can_shutup(true); // ?
 
 		// install autoconfig handler
-		m_slot->m_space->install_readwrite_handler(0xe80000, 0xe8007f,
+		m_slot->space().install_readwrite_handler(0xe80000, 0xe8007f,
 			read16_delegate(FUNC(amiga_autoconfig::autoconfig_read), static_cast<amiga_autoconfig *>(this)),
 			write16_delegate(FUNC(amiga_autoconfig::autoconfig_write), static_cast<amiga_autoconfig *>(this)), 0xffff);
 	}

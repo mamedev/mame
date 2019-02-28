@@ -292,13 +292,13 @@ static GFXDECODE_START( gfx_quorum )
 	GFXDECODE_ENTRY( "maincpu", 0x1fb00, quorum_charlayout, 0, 8 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(scorpion_state::scorpion)
+void scorpion_state::scorpion(machine_config &config)
+{
 	spectrum_128(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(scorpion_mem)
-	MCFG_DEVICE_IO_MAP(scorpion_io)
-	MCFG_DEVICE_OPCODES_MAP(scorpion_switch)
+	m_maincpu->set_addrmap(AS_PROGRAM, &scorpion_state::scorpion_mem);
+	m_maincpu->set_addrmap(AS_IO, &scorpion_state::scorpion_io);
+	m_maincpu->set_addrmap(AS_OPCODES, &scorpion_state::scorpion_switch);
 
 	MCFG_MACHINE_START_OVERRIDE(scorpion_state, scorpion )
 	MCFG_MACHINE_RESET_OVERRIDE(scorpion_state, scorpion )
@@ -312,7 +312,7 @@ MACHINE_CONFIG_START(scorpion_state::scorpion)
 	TIMER(config, "nmi_timer").configure_periodic(FUNC(scorpion_state::nmi_check_callback), attotime::from_hz(50));
 
 	config.device_remove("exp");
-MACHINE_CONFIG_END
+}
 
 void scorpion_state::profi(machine_config &config)
 {

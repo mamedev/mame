@@ -1747,7 +1747,7 @@ MACHINE_CONFIG_START(rshark_state::dooyong_68k)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(m_spriteram, buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rshark)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rshark);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
 	RSHARK_ROM_TILEMAP(config, m_bg[0], m_gfxdecode, 4, "gfx5", 0x00000, "gfx6", 0x60000);
@@ -1798,7 +1798,7 @@ MACHINE_CONFIG_START(popbingo_state::popbingo)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(m_spriteram, buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_popbingo)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_popbingo);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
 	DOOYONG_ROM_TILEMAP(config, m_bg[0], m_gfxdecode, 1, "gfx2", 0x00000);

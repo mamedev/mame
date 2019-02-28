@@ -87,13 +87,13 @@ uint8_t aquarium_state::aquarium_snd_bitswap( uint8_t scrambled_data )
 
 READ8_MEMBER(aquarium_state::aquarium_oki_r)
 {
-	return aquarium_snd_bitswap(m_oki->read(space, offset));
+	return aquarium_snd_bitswap(m_oki->read());
 }
 
 WRITE8_MEMBER(aquarium_state::aquarium_oki_w)
 {
 	logerror("%s:Writing %04x to the OKI M6295\n", machine().describe_context(), aquarium_snd_bitswap(data));
-	m_oki->write(space, offset, (aquarium_snd_bitswap(data)));
+	m_oki->write(aquarium_snd_bitswap(data));
 }
 
 
@@ -310,7 +310,7 @@ MACHINE_CONFIG_START(aquarium_state::aquarium)
 	MCFG_SCREEN_UPDATE_DRIVER(aquarium_state, screen_update_aquarium)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_aquarium)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_aquarium);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 0x1000/2);
 
 	MCFG_DEVICE_ADD("spritegen", EXCELLENT_SPRITE, 0)

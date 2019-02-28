@@ -398,22 +398,22 @@ void shanghai_state::hd63484_map(address_map &map)
 	map(0x00000, 0x3ffff).ram();
 }
 
-MACHINE_CONFIG_START(shanghai_state::shanghai)
-
+void shanghai_state::shanghai(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", V30, XTAL(16'000'000)/2) /* NEC D70116C-8 */
-	MCFG_DEVICE_PROGRAM_MAP(shanghai_map)
-	MCFG_DEVICE_IO_MAP(shanghai_portmap)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", shanghai_state, half_vblank_irq)
+	V30(config, m_maincpu, XTAL(16'000'000)/2); /* NEC D70116C-8 */
+	m_maincpu->set_addrmap(AS_PROGRAM, &shanghai_state::shanghai_map);
+	m_maincpu->set_addrmap(AS_IO, &shanghai_state::shanghai_portmap);
+	m_maincpu->set_vblank_int("screen", FUNC(shanghai_state::half_vblank_irq));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57)
-	//MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(384, 280)
-	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1)
-	MCFG_SCREEN_UPDATE_DEVICE("hd63484", hd63484_device, update_screen)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(57);
+	//m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_size(384, 280);
+	m_screen->set_visarea(0, 384-1, 0, 280-1);
+	m_screen->set_screen_update("hd63484", FUNC(hd63484_device::update_screen));
+	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(shanghai_state::shanghai_palette)).set_format(palette_device::xBGR_444, 256);
 
@@ -429,25 +429,25 @@ MACHINE_CONFIG_START(shanghai_state::shanghai)
 	ymsnd.add_route(1, "mono", 0.15);
 	ymsnd.add_route(2, "mono", 0.15);
 	ymsnd.add_route(3, "mono", 0.80);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(shanghai_state::shangha2)
-
+void shanghai_state::shangha2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", V30, XTAL(16'000'000)/2) /* ? */
-	MCFG_DEVICE_PROGRAM_MAP(shangha2_map)
-	MCFG_DEVICE_IO_MAP(shangha2_portmap)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", shanghai_state, half_vblank_irq)
+	V30(config, m_maincpu, XTAL(16'000'000)/2); /* ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &shanghai_state::shangha2_map);
+	m_maincpu->set_addrmap(AS_IO, &shanghai_state::shangha2_portmap);
+	m_maincpu->set_vblank_int("screen", FUNC(shanghai_state::half_vblank_irq));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57)
-	//MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(384, 280)
-	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1)
-	MCFG_SCREEN_UPDATE_DEVICE("hd63484", hd63484_device, update_screen)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(57);
+	//m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_size(384, 280);
+	m_screen->set_visarea(0, 384-1, 0, 280-1);
+	m_screen->set_screen_update("hd63484", FUNC(hd63484_device::update_screen));
+	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 256);
 
@@ -463,30 +463,30 @@ MACHINE_CONFIG_START(shanghai_state::shangha2)
 	ymsnd.add_route(1, "mono", 0.15);
 	ymsnd.add_route(2, "mono", 0.15);
 	ymsnd.add_route(3, "mono", 0.80);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(shanghai_state::kothello)
-
+void shanghai_state::kothello(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", V30, XTAL(16'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(kothello_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", shanghai_state, half_vblank_irq)
+	V30(config, m_maincpu, XTAL(16'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &shanghai_state::kothello_map);
+	m_maincpu->set_vblank_int("screen", FUNC(shanghai_state::half_vblank_irq));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(16'000'000)/4)
-	MCFG_DEVICE_PROGRAM_MAP(kothello_sound_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
+	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(16'000'000)/4));
+	audiocpu.set_addrmap(AS_PROGRAM, &shanghai_state::kothello_sound_map);
+	audiocpu.set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
 
 	config.m_minimum_quantum = attotime::from_hz(12000);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57)
-	//MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(384, 280)
-	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1)
-	MCFG_SCREEN_UPDATE_DEVICE("hd63484", hd63484_device, update_screen)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(57);
+	//m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_size(384, 280);
+	m_screen->set_visarea(0, 384-1, 0, 280-1);
+	m_screen->set_screen_update("hd63484", FUNC(hd63484_device::update_screen));
+	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 256);
 
@@ -512,7 +512,7 @@ MACHINE_CONFIG_START(shanghai_state::kothello)
 	seibu_sound.ym_write_callback().set("ymsnd", FUNC(ym2203_device::write));
 
 	SEIBU_ADPCM(config, "adpcm", 8000).add_route(ALL_OUTPUTS, "mono", 0.80); // actually MSM5205
-MACHINE_CONFIG_END
+}
 
 /***************************************************************************
 

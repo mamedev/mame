@@ -380,7 +380,6 @@ void skimaxx_state::tms_program_map(address_map &map)
 	map(0x02000000, 0x0200000f).ram();
 	map(0x02100000, 0x0210000f).ram();
 	map(0x04000000, 0x047fffff).rom().region("tmsgfx", 0);
-	map(0xc0000000, 0xc00001ff).rw(m_tms, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xff800000, 0xffffffff).rom().region("tms", 0);
 }
 
@@ -503,13 +502,14 @@ void skimaxx_state::machine_reset()
  *
  *************************************/
 
-MACHINE_CONFIG_START(skimaxx_state::skimaxx)
-	MCFG_DEVICE_ADD("maincpu", M68EC030, XTAL(40'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(m68030_1_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", skimaxx_state,  irq3_line_hold)    // 1,3,7 are identical, rest is RTE
+void skimaxx_state::skimaxx(machine_config &config)
+{
+	M68EC030(config, m_maincpu, XTAL(40'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &skimaxx_state::m68030_1_map);
+	m_maincpu->set_vblank_int("screen", FUNC(skimaxx_state::irq3_line_hold));    // 1,3,7 are identical, rest is RTE
 
-	MCFG_DEVICE_ADD("subcpu", M68EC030, XTAL(40'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(m68030_2_map)
+	M68EC030(config, m_subcpu, XTAL(40'000'000));
+	m_subcpu->set_addrmap(AS_PROGRAM, &skimaxx_state::m68030_2_map);
 
 
 	/* video hardware */
@@ -523,16 +523,16 @@ MACHINE_CONFIG_START(skimaxx_state::skimaxx)
 	m_tms->set_shiftreg_in_callback(FUNC(skimaxx_state::to_shiftreg));
 	m_tms->set_shiftreg_out_callback(FUNC(skimaxx_state::from_shiftreg));
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-//  MCFG_SCREEN_RAW_PARAMS(40000000/4, 156*4, 0, 100*4, 328, 0, 300) // TODO - Wrong but TMS overrides it anyway
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(0x400, 0x100)
-	MCFG_SCREEN_VISIBLE_AREA(0, 0x280-1, 0, 0xf0-1)
-	MCFG_SCREEN_UPDATE_DEVICE("tms", tms34010_device, tms340x0_ind16)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+//  screen.set_raw(40000000/4, 156*4, 0, 100*4, 328, 0, 300); // TODO - Wrong but TMS overrides it anyway
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_size(0x400, 0x100);
+	screen.set_visarea(0, 0x280-1, 0, 0xf0-1);
+	screen.set_screen_update("tms", FUNC(tms34010_device::tms340x0_ind16));
+	screen.set_palette("palette");
 
-//  MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_skimaxx)
+//  GFXDECODE(config, "gfxdecode", "palette", gfx_skimaxx);
 
 	PALETTE(config, "palette", palette_device::RGB_555);
 
@@ -540,18 +540,14 @@ MACHINE_CONFIG_START(skimaxx_state::skimaxx)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(4'000'000), okim6295_device::PIN7_LOW)     // ?
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	OKIM6295(config, "oki1", XTAL(4'000'000), okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "lspeaker", 1.0);     // ?
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, XTAL(4'000'000)/2, okim6295_device::PIN7_HIGH)  // ?
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	OKIM6295(config, "oki2", XTAL(4'000'000)/2, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "lspeaker", 1.0);  // ?
 
-	MCFG_DEVICE_ADD("oki3", OKIM6295, XTAL(4'000'000), okim6295_device::PIN7_LOW)     // ?
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	OKIM6295(config, "oki3", XTAL(4'000'000), okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "rspeaker", 1.0);     // ?
 
-	MCFG_DEVICE_ADD("oki4", OKIM6295, XTAL(4'000'000)/2, okim6295_device::PIN7_HIGH)  // ?
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki4", XTAL(4'000'000)/2, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "rspeaker", 1.0);  // ?
+}
 
 
 /*************************************

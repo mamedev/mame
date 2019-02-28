@@ -768,17 +768,17 @@ void tvc_exp(device_slot_interface &device)
 
 MACHINE_CONFIG_START(tvc_state::tvc)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, 3125000)
-	MCFG_DEVICE_PROGRAM_MAP(tvc_mem)
-	MCFG_DEVICE_IO_MAP(tvc_io)
+	Z80(config, m_maincpu, 3125000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tvc_state::tvc_mem);
+	m_maincpu->set_addrmap(AS_IO, &tvc_state::tvc_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(512, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512 - 1, 0, 240 - 1)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(512, 240);
+	screen.set_visarea(0, 512 - 1, 0, 240 - 1);
+	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
 	PALETTE(config, m_palette, FUNC(tvc_state::tvc_palette), 16);
 
@@ -805,26 +805,21 @@ MACHINE_CONFIG_START(tvc_state::tvc)
 	m_centronics->set_output_latch(cent_data_out);
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "tvc_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,rom,crt")
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "tvc_cart", "bin,rom,crt");
 
 	/* expansion interface */
-	MCFG_DEVICE_ADD("exp1", TVCEXP_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(tvc_exp , nullptr, false)
-	MCFG_TVCEXP_SLOT_OUT_IRQ_CB(INPUTLINE("maincpu", 0))
-	MCFG_TVCEXP_SLOT_OUT_NMI_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
-	MCFG_DEVICE_ADD("exp2", TVCEXP_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(tvc_exp , nullptr, false)
-	MCFG_TVCEXP_SLOT_OUT_IRQ_CB(INPUTLINE("maincpu", 0))
-	MCFG_TVCEXP_SLOT_OUT_NMI_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
-	MCFG_DEVICE_ADD("exp3", TVCEXP_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(tvc_exp , nullptr, false)
-	MCFG_TVCEXP_SLOT_OUT_IRQ_CB(INPUTLINE("maincpu", 0))
-	MCFG_TVCEXP_SLOT_OUT_NMI_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
-	MCFG_DEVICE_ADD("exp4", TVCEXP_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(tvc_exp , nullptr, false)
-	MCFG_TVCEXP_SLOT_OUT_IRQ_CB(INPUTLINE("maincpu", 0))
-	MCFG_TVCEXP_SLOT_OUT_NMI_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	TVCEXP_SLOT(config, m_expansions[0], tvc_exp , nullptr);
+	m_expansions[0]->out_irq_callback().set_inputline(m_maincpu, 0);
+	m_expansions[0]->out_nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	TVCEXP_SLOT(config, m_expansions[1], tvc_exp , nullptr);
+	m_expansions[1]->out_irq_callback().set_inputline(m_maincpu, 0);
+	m_expansions[1]->out_nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	TVCEXP_SLOT(config, m_expansions[2], tvc_exp , nullptr);
+	m_expansions[2]->out_irq_callback().set_inputline(m_maincpu, 0);
+	m_expansions[2]->out_nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	TVCEXP_SLOT(config, m_expansions[3], tvc_exp , nullptr);
+	m_expansions[3]->out_irq_callback().set_inputline(m_maincpu, 0);
+	m_expansions[3]->out_nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	/* cassette */
 	CASSETTE(config, m_cassette);
@@ -833,7 +828,7 @@ MACHINE_CONFIG_START(tvc_state::tvc)
 	m_cassette->set_interface("tvc_cass");
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", tvc_state, tvc64, "cas", 6)
+	MCFG_QUICKLOAD_ADD("quickload", tvc_state, tvc64, "cas", attotime::from_seconds(6))
 
 	/* Software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("tvc_cart");

@@ -37,6 +37,7 @@ ZPS stands for "Základní Počítačová Sestava" (basic computer system).
 //#include "cpu/z80/z80.h"
 #include "bus/rs232/rs232.h"
 #include "machine/ay31015.h"
+#include "machine/clock.h"
 #include "machine/keyboard.h"
 #include "machine/ram.h"
 #include "video/mc6845.h"
@@ -57,6 +58,7 @@ public:
 		m_line4(*this, "LINE4"),
 		m_maincpu(*this, "maincpu"),
 		m_uart(*this, "uart"),
+		m_uart_clock(*this, "uart_clock"),
 		m_v24(*this, "v24"),
 		m_palette(*this, "palette")
 	{
@@ -115,6 +117,7 @@ private:
 	required_ioport m_line4;
 	required_device<cpu_device> m_maincpu;
 	optional_device<ay31015_device> m_uart;
+	optional_device<clock_device> m_uart_clock;
 	optional_device<rs232_port_device> m_v24;
 
 	optional_device<palette_device> m_palette;
@@ -623,26 +626,27 @@ void sapi1_state::init_sapizps3b()
 
 
 /* Machine driver */
-MACHINE_CONFIG_START(sapi1_state::sapi1)
+void sapi1_state::sapi1(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, I8080A, XTAL(18'000'000) / 9) // Tesla MHB8080A + MHB8224 + MHB8228
-	MCFG_DEVICE_PROGRAM_MAP(sapi1_mem)
+	I8080A(config, m_maincpu, 18_MHz_XTAL / 9); // Tesla MHB8080A + MHB8224 + MHB8228
+	m_maincpu->set_addrmap(AS_PROGRAM, &sapi1_state::sapi1_mem);
 	MCFG_MACHINE_RESET_OVERRIDE(sapi1_state, sapi1)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(40*6, 24*9)
-	MCFG_SCREEN_VISIBLE_AREA(0, 40*6-1, 0, 24*9-1)
-	MCFG_SCREEN_UPDATE_DRIVER(sapi1_state, screen_update_sapi1)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(40*6, 24*9);
+	screen.set_visarea(0, 40*6-1, 0, 24*9-1);
+	screen.set_screen_update(FUNC(sapi1_state::screen_update_sapi1));
+	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K");
-MACHINE_CONFIG_END
+}
 
 void sapi1_state::sapi2(machine_config &config)
 {
@@ -654,25 +658,26 @@ void sapi1_state::sapi2(machine_config &config)
 	keyboard.set_keyboard_callback(FUNC(sapi1_state::kbd_put));
 }
 
-MACHINE_CONFIG_START(sapi1_state::sapi3)
+void sapi1_state::sapi3(machine_config &config)
+{
 	sapi2(config);
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(sapi3_mem)
-	MCFG_DEVICE_IO_MAP(sapi3_io)
+	m_maincpu->set_addrmap(AS_PROGRAM, &sapi1_state::sapi3_mem);
+	m_maincpu->set_addrmap(AS_IO, &sapi1_state::sapi3_io);
 	MCFG_MACHINE_RESET_OVERRIDE(sapi1_state, sapizps3 )
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_SIZE(40*6, 20*9)
-	MCFG_SCREEN_VISIBLE_AREA(0, 40*6-1, 0, 20*9-1)
-	MCFG_SCREEN_UPDATE_DRIVER(sapi1_state, screen_update_sapi3)
-MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(sapi1_state::sapi3b)
+	screen_device &screen(*subdevice<screen_device>("screen"));
+	screen.set_size(40*6, 20*9);
+	screen.set_visarea(0, 40*6-1, 0, 20*9-1);
+	screen.set_screen_update(FUNC(sapi1_state::screen_update_sapi3));
+}
+
+void sapi1_state::sapi3b(machine_config &config)
+{
 	sapi3(config);
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(sapi3b_mem)
-	MCFG_DEVICE_IO_MAP(sapi3b_io)
+	m_maincpu->set_addrmap(AS_PROGRAM, &sapi1_state::sapi3b_mem);
+	m_maincpu->set_addrmap(AS_IO, &sapi1_state::sapi3b_io);
 
 	mc6845_device &crtc(MC6845(config, "crtc", 1008000)); // guess
 	crtc.set_screen("screen");
@@ -680,10 +685,9 @@ MACHINE_CONFIG_START(sapi1_state::sapi3b)
 	crtc.set_char_width(6);
 	crtc.set_update_row_callback(FUNC(sapi1_state::crtc_update_row), this);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
-	MCFG_SCREEN_NO_PALETTE
-MACHINE_CONFIG_END
+	subdevice<screen_device>("screen")->set_screen_update("crtc", FUNC(mc6845_device::screen_update));
+	subdevice<screen_device>("screen")->set_palette(finder_base::DUMMY_TAG);
+}
 
 static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9600 )
@@ -694,28 +698,29 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 DEVICE_INPUT_DEFAULTS_END
 
-MACHINE_CONFIG_START(sapi1_state::sapi3a)
+void sapi1_state::sapi3a(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8080A, XTAL(18'000'000) / 9) // Tesla MHB8080A + MHB8224 + MHB8228
-	MCFG_DEVICE_PROGRAM_MAP(sapi3a_mem)
-	MCFG_DEVICE_IO_MAP(sapi3a_io)
+	I8080A(config, m_maincpu, 18_MHz_XTAL / 9); // Tesla MHB8080A + MHB8224 + MHB8228
+	m_maincpu->set_addrmap(AS_PROGRAM, &sapi1_state::sapi3a_mem);
+	m_maincpu->set_addrmap(AS_IO, &sapi1_state::sapi3a_io);
 	MCFG_MACHINE_RESET_OVERRIDE(sapi1_state, sapizps3 )
 
 	/* video hardware */
 	AY51013(config, m_uart); // Tesla MHB1012
-	m_uart->set_tx_clock(XTAL(12'288'000) / 80); // not actual rate?
-	m_uart->set_rx_clock(XTAL(12'288'000) / 80); // not actual rate?
 	m_uart->read_si_callback().set(m_v24, FUNC(rs232_port_device::rxd_r));
 	m_uart->write_so_callback().set(m_v24, FUNC(rs232_port_device::write_txd));
 	m_uart->set_auto_rdav(true); // RDAV not actually tied to RDE, but pulsed by K155AG3 (=74123N): R25=22k, C14=220
+
+	CLOCK(config, m_uart_clock, 12.288_MHz_XTAL / 80); // TODO: divider selectable by jumpers
+	m_uart_clock->signal_handler().set(m_uart, FUNC(ay51013_device::write_tcp));
+	m_uart_clock->signal_handler().append(m_uart, FUNC(ay51013_device::write_rcp));
 
 	RS232_PORT(config, m_v24, default_rs232_devices, "terminal").set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K");
-MACHINE_CONFIG_END
-
-
+}
 
 
 /**************************************

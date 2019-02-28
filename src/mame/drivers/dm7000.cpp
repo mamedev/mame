@@ -107,7 +107,7 @@ WRITE8_MEMBER( dm7000_state::dm7000_scc0_w )
 	switch(offset) {
 		case UART_THR:
 			if(!(m_scc0_lcr & UART_LCR_DLAB)) {
-				m_terminal->write(space, 0, data);
+				m_terminal->write(data);
 				m_scc0_lsr = 1;
 			}
 			break;

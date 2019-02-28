@@ -36,7 +36,7 @@ READ8_MEMBER( tiki100_state::mrq_r )
 {
 	bool mdis = 1;
 
-	uint8_t data = m_exp->mrq_r(space, offset, 0xff, mdis);
+	uint8_t data = m_exp->mrq_r(offset, 0xff, mdis);
 
 	offs_t prom_addr = mdis << 5 | m_vire << 4 | m_rome << 3 | (offset >> 13);
 	uint8_t prom = m_prom->base()[prom_addr] ^ 0xff;
@@ -84,12 +84,12 @@ WRITE8_MEMBER( tiki100_state::mrq_w )
 		m_ram->pointer()[offset] = data;
 	}
 
-	m_exp->mrq_w(space, offset, data);
+	m_exp->mrq_w(offset, data);
 }
 
 READ8_MEMBER( tiki100_state::iorq_r )
 {
-	uint8_t data = m_exp->iorq_r(space, offset, 0xff);
+	uint8_t data = m_exp->iorq_r(offset, 0xff);
 
 	switch ((offset & 0xff) >> 2)
 	{
@@ -113,7 +113,7 @@ READ8_MEMBER( tiki100_state::iorq_r )
 		switch (offset & 0x03)
 		{
 		case 3:
-			data = m_psg->data_r(space, 0);
+			data = m_psg->data_r();
 			break;
 		}
 		break;
@@ -128,7 +128,7 @@ READ8_MEMBER( tiki100_state::iorq_r )
 
 WRITE8_MEMBER( tiki100_state::iorq_w )
 {
-	m_exp->iorq_w(space, offset, data);
+	m_exp->iorq_w(offset, data);
 
 	switch ((offset & 0xff) >> 2)
 	{
@@ -160,11 +160,11 @@ WRITE8_MEMBER( tiki100_state::iorq_w )
 			break;
 
 		case 2:
-			m_psg->address_w(space, 0, data);
+			m_psg->address_w(data);
 			break;
 
 		case 3:
-			m_psg->data_w(space, 0, data);
+			m_psg->data_w(data);
 			break;
 		}
 		break;
@@ -700,7 +700,8 @@ void tiki100_state::machine_reset()
 
 /* Machine Driver */
 
-MACHINE_CONFIG_START(tiki100_state::tiki100)
+void tiki100_state::tiki100(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 8_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tiki100_state::tiki100_mem);
@@ -708,20 +709,20 @@ MACHINE_CONFIG_START(tiki100_state::tiki100)
 	m_maincpu->set_daisy_config(tiki100_daisy_chain);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_RAW_PARAMS(20_MHz_XTAL, 1280, 0, 1024, 312, 0, 256)
-	MCFG_SCREEN_UPDATE_DRIVER(tiki100_state, screen_update)
-	MCFG_PALETTE_ADD("palette", 16)
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_raw(20_MHz_XTAL, 1280, 0, 1024, 312, 0, 256);
+	screen.set_screen_update(FUNC(tiki100_state::screen_update));
+	PALETTE(config, m_palette).set_entries(16);
 
-	MCFG_TIKI100_BUS_ADD()
-	MCFG_TIKI100_BUS_IRQ_CALLBACK(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_TIKI100_BUS_NMI_CALLBACK(INPUTLINE(Z80_TAG, INPUT_LINE_NMI))
-	MCFG_TIKI100_BUS_BUSRQ_CALLBACK(WRITELINE(*this, tiki100_state, busrq_w))
-	MCFG_TIKI100_BUS_IN_MREQ_CALLBACK(READ8(*this, tiki100_state, mrq_r))
-	MCFG_TIKI100_BUS_OUT_MREQ_CALLBACK(WRITE8(*this, tiki100_state, mrq_w))
-	MCFG_TIKI100_BUS_SLOT_ADD("slot1", "8088")
-	MCFG_TIKI100_BUS_SLOT_ADD("slot2", "hdc")
-	MCFG_TIKI100_BUS_SLOT_ADD("slot3", nullptr)
+	TIKI100_BUS(config, m_exp, 0);
+	m_exp->irq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_exp->nmi_wr_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_exp->busrq_wr_callback().set(FUNC(tiki100_state::busrq_w));
+	m_exp->mrq_rd_callback().set(FUNC(tiki100_state::mrq_r));
+	m_exp->mrq_wr_callback().set(FUNC(tiki100_state::mrq_w));
+	TIKI100_BUS_SLOT(config, "slot1", tiki100_cards, "8088");
+	TIKI100_BUS_SLOT(config, "slot2", tiki100_cards, "hdc");
+	TIKI100_BUS_SLOT(config, "slot3", tiki100_cards, nullptr);
 
 	/* devices */
 	Z80DART(config, m_dart, 8_MHz_XTAL / 4);
@@ -786,7 +787,7 @@ MACHINE_CONFIG_START(tiki100_state::tiki100)
 
 	// software list
 	SOFTWARE_LIST(config, "flop_list").set_original("tiki100");
-MACHINE_CONFIG_END
+}
 
 /* ROMs */
 

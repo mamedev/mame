@@ -534,7 +534,8 @@ MACHINE_CONFIG_START(amstrad_pc_state::pc200)
 
 	PC_JOY(config, "pc_joy");
 
-	MCFG_PC_KEYB_ADD("pc_keyboard", WRITELINE("mb:pic8259", pic8259_device, ir1_w))
+	PC_KEYB(config, m_keyboard);
+	m_keyboard->keypress().set("mb:pic8259", FUNC(pic8259_device::ir1_w));
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("640K").set_extra_options("512K");

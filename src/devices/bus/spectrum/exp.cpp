@@ -43,13 +43,30 @@ device_spectrum_expansion_interface::device_spectrum_expansion_interface(const m
 spectrum_expansion_slot_device::spectrum_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SPECTRUM_EXPANSION_SLOT, tag, owner, clock),
 	device_slot_interface(mconfig, *this),
-	m_io(nullptr),
+	m_io(*this, finder_base::DUMMY_TAG, -1),
 	m_card(nullptr),
 	m_irq_handler(*this),
 	m_nmi_handler(*this)
 {
 }
 
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void spectrum_expansion_slot_device::device_config_complete()
+{
+	// for passthrough connectors, use the parent slot's I/O space
+	if (m_io.finder_tag() == finder_base::DUMMY_TAG && dynamic_cast<device_spectrum_expansion_interface *>(owner()) != nullptr)
+	{
+		auto parent = dynamic_cast<spectrum_expansion_slot_device *>(owner()->owner());
+		if (parent != nullptr)
+			m_io.set_tag(parent->m_io, parent->m_io.spacenum());
+	}
+}
 
 //-------------------------------------------------
 //  device_validity_check - device-specific checks
@@ -84,15 +101,6 @@ void spectrum_expansion_slot_device::device_start()
 
 void spectrum_expansion_slot_device::device_reset()
 {
-}
-
-//-------------------------------------------------
-//  set_io_space - set address space we are attached to
-//-------------------------------------------------
-
-void spectrum_expansion_slot_device::set_io_space(address_space *io)
-{
-	m_io = io;
 }
 
 //-------------------------------------------------

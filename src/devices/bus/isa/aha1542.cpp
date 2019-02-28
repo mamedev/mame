@@ -175,10 +175,11 @@ const tiny_rom_entry *aha1542_device::device_rom_region() const
 	return ROM_NAME( aha1542 );
 }
 
-MACHINE_CONFIG_START(aha1542_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(Z84C0010_TAG, Z80, XTAL(12'000'000))
-	MCFG_DEVICE_PROGRAM_MAP( z84c0010_mem )
-MACHINE_CONFIG_END
+void aha1542_device::device_add_mconfig(machine_config &config)
+{
+	z80_device &cpu(Z80(config, Z84C0010_TAG, XTAL(12'000'000)));
+	cpu.set_addrmap(AS_PROGRAM, &aha1542_device::z84c0010_mem);
+}
 
 aha1542_device::aha1542_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, AHA1542, tag, owner, clock),

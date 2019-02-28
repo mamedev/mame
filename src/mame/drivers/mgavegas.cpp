@@ -292,7 +292,7 @@ uint8_t ret=0;
 	switch (offset&0x03)
 	{
 		case 1: //bdir=0    BC1=1
-				ret=m_ay->data_r(space,0);
+				ret=m_ay->data_r();
 				break;
 		default:
 				if (LOG_AY8910)
@@ -313,10 +313,10 @@ WRITE8_MEMBER(mgavegas_state::w_a0)
 	switch (offset&0x03)
 	{
 		case 0: //bdir=1    bc1=1
-				m_ay->address_w(space,0,data );
+				m_ay->address_w(data);
 				break;
 		case 2: //bdir=1    bc1=0
-				m_ay->data_w(space,0,data );
+				m_ay->data_w(data);
 				break;
 /*
         case 1: //bdir=0    bc1=1

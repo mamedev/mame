@@ -611,11 +611,10 @@ MACHINE_CONFIG_START(apple1_state::apple1)
 	m_pia->writepb_handler().set(FUNC(apple1_state::pia_display_w));
 	m_pia->cb2_handler().set(FUNC(apple1_state::pia_display_gate_w));
 
-	MCFG_DEVICE_ADD(A1_BUS_TAG, A1BUS, 0)
-	MCFG_A1BUS_CPU(m_maincpu)
-	MCFG_DEVICE_ADD("exp", A1BUS_SLOT, 0, A1_BUS_TAG, apple1_cards, "cassette")
+	A1BUS(config, A1_BUS_TAG, 0).set_space(m_maincpu, AS_PROGRAM);
+	A1BUS_SLOT(config, "exp", 0, A1_BUS_TAG, apple1_cards, "cassette");
 
-	MCFG_SNAPSHOT_ADD("snapshot", apple1_state, apple1, "snp", 0)
+	MCFG_SNAPSHOT_ADD("snapshot", apple1_state, apple1, "snp")
 
 	SOFTWARE_LIST(config, "cass_list").set_original("apple1");
 

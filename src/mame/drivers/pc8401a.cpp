@@ -267,7 +267,7 @@ WRITE8_MEMBER( pc8401a_state::rtc_ctrl_w )
 READ8_MEMBER( pc8401a_state::io_rom_data_r )
 {
 	//logerror("I/O ROM read from %05x\n", m_io_addr);
-	return m_io_cart->read_rom(space, m_io_addr);
+	return m_io_cart->read_rom(m_io_addr);
 }
 
 WRITE8_MEMBER( pc8401a_state::io_rom_addr_w )
@@ -570,11 +570,12 @@ WRITE8_MEMBER( pc8401a_state::ppi_pc_w )
 
 /* Machine Drivers */
 
-MACHINE_CONFIG_START(pc8401a_state::pc8401a)
+void pc8401a_state::pc8401a(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, 4000000) // NEC uPD70008C
-	MCFG_DEVICE_PROGRAM_MAP(pc8401a_mem)
-	MCFG_DEVICE_IO_MAP(pc8401a_io)
+	Z80(config, m_maincpu, 4000000); // NEC uPD70008C
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc8401a_state::pc8401a_mem);
+	m_maincpu->set_addrmap(AS_IO, &pc8401a_state::pc8401a_io);
 
 	/* fake keyboard */
 	TIMER(config, "keyboard").configure_periodic(FUNC(pc8401a_state::pc8401a_keyboard_tick), attotime::from_hz(64));
@@ -599,22 +600,21 @@ MACHINE_CONFIG_START(pc8401a_state::pc8401a)
 	pc8401a_video(config);
 
 	/* option ROM cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, nullptr)
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, nullptr, "bin,rom");
 
 	/* I/O ROM cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("io_cart", generic_linear_slot, nullptr)
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
+	GENERIC_CARTSLOT(config, m_io_cart, generic_linear_slot, nullptr, "bin,rom");
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K").set_extra_options("96K");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(pc8500_state::pc8500)
+void pc8500_state::pc8500(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, 4000000) // NEC uPD70008C
-	MCFG_DEVICE_PROGRAM_MAP(pc8401a_mem)
-	MCFG_DEVICE_IO_MAP(pc8500_io)
+	Z80(config, m_maincpu, 4000000); // NEC uPD70008C
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc8500_state::pc8401a_mem);
+	m_maincpu->set_addrmap(AS_IO, &pc8500_state::pc8500_io);
 
 	/* fake keyboard */
 	TIMER(config, "keyboard").configure_periodic(FUNC(pc8401a_state::pc8401a_keyboard_tick), attotime::from_hz(64));
@@ -639,16 +639,14 @@ MACHINE_CONFIG_START(pc8500_state::pc8500)
 	pc8500_video(config);
 
 	/* option ROM cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, nullptr)
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, nullptr, "bin,rom");
 
 	/* I/O ROM cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("io_cart", generic_linear_slot, nullptr)
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
+	GENERIC_CARTSLOT(config, m_io_cart, generic_linear_slot, nullptr, "bin,rom");
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K").set_extra_options("96K");
-MACHINE_CONFIG_END
+}
 
 /* ROMs */
 

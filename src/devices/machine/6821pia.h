@@ -55,13 +55,10 @@ public:
 	auto irqa_handler() { return m_irqa_handler.bind(); }
 	auto irqb_handler() { return m_irqb_handler.bind(); }
 
-	uint8_t reg_r(uint8_t offset);
-	void reg_w(uint8_t offset, uint8_t data);
-
-	DECLARE_READ8_MEMBER( read ) { return reg_r(offset); }
-	DECLARE_WRITE8_MEMBER( write ) { reg_w(offset, data); }
-	DECLARE_READ8_MEMBER( read_alt ) { return reg_r(((offset << 1) & 0x02) | ((offset >> 1) & 0x01)); }
-	DECLARE_WRITE8_MEMBER( write_alt ) { reg_w(((offset << 1) & 0x02) | ((offset >> 1) & 0x01), data); }
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
+	uint8_t read_alt(offs_t offset) { return read(((offset << 1) & 0x02) | ((offset >> 1) & 0x01)); }
+	void write_alt(offs_t offset, uint8_t data) { write(((offset << 1) & 0x02) | ((offset >> 1) & 0x01), data); }
 
 	uint8_t port_b_z_mask() const { return ~m_ddr_b; }          // see first note in .c
 	void set_port_a_z_mask(uint8_t data) { m_port_a_z_mask = data; }// see second note in .c

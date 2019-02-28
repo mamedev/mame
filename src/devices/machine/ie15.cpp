@@ -568,25 +568,25 @@ static GFXDECODE_START( gfx_ie15 )
 	GFXDECODE_ENTRY("chargen", 0x0000, ie15_charlayout, 0, 1)
 GFXDECODE_END
 
-MACHINE_CONFIG_START(ie15_device::ie15core)
+void ie15_device::ie15core(machine_config &config)
+{
 	/* Basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", IE15_CPU, XTAL(30'800'000)/10)
-	MCFG_DEVICE_PROGRAM_MAP(ie15_mem)
-	MCFG_DEVICE_IO_MAP(ie15_io)
+	IE15_CPU(config, m_maincpu, XTAL(30'800'000)/10);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ie15_device::ie15_mem);
+	m_maincpu->set_addrmap(AS_IO, &ie15_device::ie15_io);
 
 	config.set_default_layout(layout_ie15);
 
 	/* Devices */
-	IE15_KEYBOARD(config, m_keyboard, 0)
-			.keyboard_cb().set(FUNC(ie15_device::kbd_put));
+	IE15_KEYBOARD(config, m_keyboard, 0).keyboard_cb().set(FUNC(ie15_device::kbd_put));
 
 	RS232_PORT(config, m_rs232, default_rs232_devices, "null_modem");
 	m_rs232->rxd_handler().set(FUNC(ie15_device::serial_rx_callback));
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("beeper", BEEP, 2400)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
-MACHINE_CONFIG_END
+	BEEP(config, m_beeper, 2400);
+	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.15);
+}
 
 /* ROM definition */
 ROM_START( ie15 )
@@ -603,18 +603,20 @@ ROM_START( ie15 )
 	ROM_LOAD("chargen-15ie.bin", 0x0000, 0x0800, CRC(ed16bf6b) SHA1(6af9fb75f5375943d5c0ce9ed408e0fb4621b17e))
 ROM_END
 
-MACHINE_CONFIG_START(ie15_device::device_add_mconfig)
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_UPDATE_DRIVER(ie15_device, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(30'800'000)/2,
+void ie15_device::device_add_mconfig(machine_config &config)
+{
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_color(rgb_t::green());
+	m_screen->set_screen_update(FUNC(ie15_device::screen_update));
+	m_screen->set_raw(XTAL(30'800'000)/2,
 			IE15_TOTAL_HORZ, IE15_HORZ_START, IE15_HORZ_START+IE15_DISP_HORZ,
 			IE15_TOTAL_VERT, IE15_VERT_START, IE15_VERT_START+IE15_DISP_VERT);
 
 	ie15core(config);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ie15)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_ie15);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
-MACHINE_CONFIG_END
+}
 
 ioport_constructor ie15_device::device_input_ports() const
 {

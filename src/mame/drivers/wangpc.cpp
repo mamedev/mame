@@ -876,7 +876,7 @@ WRITE8_MEMBER( wangpc_state::memw_w )
 READ8_MEMBER( wangpc_state::ior2_r )
 {
 	if (m_disable_dreq2)
-		return m_bus->dack_r(space, 2);
+		return m_bus->dack_r(2);
 	else
 		return m_fdc->dma_r();
 }
@@ -884,7 +884,7 @@ READ8_MEMBER( wangpc_state::ior2_r )
 WRITE8_MEMBER( wangpc_state::iow2_w )
 {
 	if (m_disable_dreq2)
-		m_bus->dack_w(space, 2, data);
+		m_bus->dack_w(2, data);
 	else
 		m_fdc->dma_w(data);
 }
@@ -1272,14 +1272,15 @@ void wangpc_state::on_disk1_unload(floppy_image_device *image)
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( wangpc )
+//  machine_config( wangpc )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(wangpc_state::wangpc)
-	MCFG_DEVICE_ADD(I8086_TAG, I8086, 8000000)
-	MCFG_DEVICE_PROGRAM_MAP(wangpc_mem)
-	MCFG_DEVICE_IO_MAP(wangpc_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE(I8259A_TAG, pic8259_device, inta_cb)
+void wangpc_state::wangpc(machine_config &config)
+{
+	I8086(config, m_maincpu, 8000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &wangpc_state::wangpc_mem);
+	m_maincpu->set_addrmap(AS_IO, &wangpc_state::wangpc_io);
+	m_maincpu->set_irq_acknowledge_callback(I8259A_TAG, FUNC(pic8259_device::inta_cb));
 	//config.m_perfect_cpu_quantum = subtag(I8086_TAG);
 
 	// devices
@@ -1351,29 +1352,29 @@ MACHINE_CONFIG_START(wangpc_state::wangpc)
 	WANGPC_KEYBOARD(config, "wangpckb").txd_handler().set(m_uart, FUNC(im6402_device::write_rri));
 
 	// bus
-	MCFG_WANGPC_BUS_ADD()
-	MCFG_WANGPC_BUS_IRQ2_CALLBACK(WRITELINE(*this, wangpc_state, bus_irq2_w))
-	MCFG_WANGPC_BUS_IRQ3_CALLBACK(WRITELINE(I8259A_TAG, pic8259_device, ir3_w))
-	MCFG_WANGPC_BUS_IRQ4_CALLBACK(WRITELINE(I8259A_TAG, pic8259_device, ir4_w))
-	MCFG_WANGPC_BUS_IRQ5_CALLBACK(WRITELINE(I8259A_TAG, pic8259_device, ir5_w))
-	MCFG_WANGPC_BUS_IRQ6_CALLBACK(WRITELINE(I8259A_TAG, pic8259_device, ir6_w))
-	MCFG_WANGPC_BUS_IRQ7_CALLBACK(WRITELINE(I8259A_TAG, pic8259_device, ir7_w))
-	MCFG_WANGPC_BUS_DRQ1_CALLBACK(WRITELINE(AM9517A_TAG, am9517a_device, dreq1_w))
-	MCFG_WANGPC_BUS_DRQ2_CALLBACK(WRITELINE(AM9517A_TAG, am9517a_device, dreq2_w))
-	MCFG_WANGPC_BUS_DRQ3_CALLBACK(WRITELINE(AM9517A_TAG, am9517a_device, dreq3_w))
-	MCFG_WANGPC_BUS_IOERROR_CALLBACK(INPUTLINE(I8086_TAG, INPUT_LINE_NMI))
-	MCFG_WANGPC_BUS_SLOT_ADD("slot1", 1, wangpc_cards, nullptr)
-	MCFG_WANGPC_BUS_SLOT_ADD("slot2", 2, wangpc_cards, "mvc")
-	MCFG_WANGPC_BUS_SLOT_ADD("slot3", 3, wangpc_cards, nullptr)
-	MCFG_WANGPC_BUS_SLOT_ADD("slot4", 4, wangpc_cards, nullptr)
-	MCFG_WANGPC_BUS_SLOT_ADD("slot5", 5, wangpc_cards, nullptr)
+	WANGPC_BUS(config, m_bus, 0);
+	m_bus->irq2_wr_callback().set(FUNC(wangpc_state::bus_irq2_w));
+	m_bus->irq3_wr_callback().set(m_pic, FUNC(pic8259_device::ir3_w));
+	m_bus->irq4_wr_callback().set(m_pic, FUNC(pic8259_device::ir4_w));
+	m_bus->irq5_wr_callback().set(m_pic, FUNC(pic8259_device::ir5_w));
+	m_bus->irq6_wr_callback().set(m_pic, FUNC(pic8259_device::ir6_w));
+	m_bus->irq7_wr_callback().set(m_pic, FUNC(pic8259_device::ir7_w));
+	m_bus->drq1_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq1_w));
+	m_bus->drq2_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq2_w));
+	m_bus->drq3_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq3_w));
+	m_bus->ioerror_wr_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	WANGPC_BUS_SLOT(config, "slot1", wangpc_cards, nullptr, 1);
+	WANGPC_BUS_SLOT(config, "slot2", wangpc_cards, "mvc", 2);
+	WANGPC_BUS_SLOT(config, "slot3", wangpc_cards, nullptr, 3);
+	WANGPC_BUS_SLOT(config, "slot4", wangpc_cards, nullptr, 4);
+	WANGPC_BUS_SLOT(config, "slot5", wangpc_cards, nullptr, 5);
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("128K");
 
 	// software list
 	SOFTWARE_LIST(config, "flop_list").set_original("wangpc");
-MACHINE_CONFIG_END
+}
 
 
 

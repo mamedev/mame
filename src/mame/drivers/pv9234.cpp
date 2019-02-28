@@ -149,23 +149,23 @@ uint32_t pv9234_state::screen_update_pv9234(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-MACHINE_CONFIG_START(pv9234_state::pv9234)
+void pv9234_state::pv9234(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", ARM7, 4915000) //probably a more powerful clone.
-	MCFG_DEVICE_PROGRAM_MAP(pv9234_map)
-
+	ARM7(config, m_maincpu, 4915000); //probably a more powerful clone.
+	m_maincpu->set_addrmap(AS_PROGRAM, &pv9234_state::pv9234_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DRIVER(pv9234_state, screen_update_pv9234)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 640-1, 0, 480-1);
+	screen.set_screen_update(FUNC(pv9234_state::screen_update_pv9234));
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( pv9234 )

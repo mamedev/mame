@@ -6,7 +6,7 @@
  */
 
 #include "nld_7493.h"
-#include "../nl_base.h"
+#include "netlist/nl_base.h"
 
 namespace netlist
 {
@@ -119,10 +119,10 @@ namespace netlist
 		{
 			m_CLKA.inactivate();
 			m_CLKB.inactivate();
-			m_QA.push_force(0, NLTIME_FROM_NS(40));
-			m_QB.push_force(0, NLTIME_FROM_NS(40));
-			m_QC.push_force(0, NLTIME_FROM_NS(40));
-			m_QD.push_force(0, NLTIME_FROM_NS(40));
+			m_QA.push(0, NLTIME_FROM_NS(40));
+			m_QB.push(0, NLTIME_FROM_NS(40));
+			m_QC.push(0, NLTIME_FROM_NS(40));
+			m_QD.push(0, NLTIME_FROM_NS(40));
 			m_a = m_bcd = 0;
 		}
 	}

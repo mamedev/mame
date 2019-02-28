@@ -204,7 +204,7 @@ void com8116_device::device_timer(emu_timer &timer, device_timer_id id, int para
 //  str_w -
 //-------------------------------------------------
 
-void com8116_device::write_str(uint8_t data)
+void com8116_device::str_w(uint8_t data)
 {
 	int fr_divider = data & 0x0f;
 	int fr_clock = clock() / m_divisors[fr_divider];
@@ -219,7 +219,7 @@ void com8116_device::write_str(uint8_t data)
 //  stt_w -
 //-------------------------------------------------
 
-void com8116_device::write_stt(uint8_t data)
+void com8116_device::stt_w(uint8_t data)
 {
 	int ft_divider = data & 0x0f;
 	int ft_clock = clock() / m_divisors[ft_divider];
@@ -234,10 +234,10 @@ void com8116_device::write_stt(uint8_t data)
 //  str_stt_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER(com8116_device::str_stt_w)
+void com8116_device::str_stt_w(uint8_t data)
 {
-	write_str(data >> 4);
-	write_stt(data & 0x0f);
+	str_w(data >> 4);
+	stt_w(data & 0x0f);
 }
 
 
@@ -245,8 +245,8 @@ WRITE8_MEMBER(com8116_device::str_stt_w)
 //  stt_str_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER(com8116_device::stt_str_w)
+void com8116_device::stt_str_w(uint8_t data)
 {
-	write_stt(data >> 4);
-	write_str(data & 0x0f);
+	stt_w(data >> 4);
+	str_w(data & 0x0f);
 }

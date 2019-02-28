@@ -658,15 +658,16 @@ static void fccpu30_vme_cards(device_slot_interface &device)
 /*
  * Machine configuration
  */
-MACHINE_CONFIG_START(cpu30_state::cpu30)
+void cpu30_state::cpu30(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68030, XTAL(25'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(cpu30_mem)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("fga002", fga002_device, iack)
+	M68030(config, m_maincpu, XTAL(25'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &cpu30_state::cpu30_mem);
+	m_maincpu->set_irq_acknowledge_callback("fga002", FUNC(fga002_device::iack));
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_VME_DEVICE_ADD("vme")
-	MCFG_VME_SLOT_ADD("vme", 1, fccpu30_vme_cards, nullptr)
+	VME(config, "vme", 0);
+	VME_SLOT(config, "slot1", fccpu30_vme_cards, nullptr, 1, "vme");
 	/* Terminal Port config */
 	/* Force CPU30 series of boards has up to four serial ports, p1-p4, the FGA boot uses p4 as console and subsequent
 	   firmware uses p1 as console and in an operating system environment there may be user login shells on the other.
@@ -760,7 +761,7 @@ MACHINE_CONFIG_START(cpu30_state::cpu30)
 
 	// dual ported ram
 	RAM(config, m_ram).set_default_size("4M").set_extra_options("8M, 16M, 32M");
-MACHINE_CONFIG_END
+}
 
 /* SYS68K/CPU-30X Part No.1 01300: 16.7 MHz 68030 based CPU board with 68882 FPCP, DMAC, 1 Mbyte Dual Ported RAM capacity and VMEPROM. */
 MACHINE_CONFIG_START(cpu30_state::cpu30x)

@@ -209,6 +209,8 @@ if (BUSES["APRICOT_EXPANSION"]~=null) then
 		MAME_DIR .. "src/devices/bus/apricot/expansion/cards.h",
 		MAME_DIR .. "src/devices/bus/apricot/expansion/ram.cpp",
 		MAME_DIR .. "src/devices/bus/apricot/expansion/ram.h",
+		MAME_DIR .. "src/devices/bus/apricot/expansion/winchester.cpp",
+		MAME_DIR .. "src/devices/bus/apricot/expansion/winchester.h",
 	}
 end
 
@@ -1305,6 +1307,19 @@ if (BUSES["ISBX"]~=null) then
 	}
 end
 
+---------------------------------------------------
+--
+--@src/devices/bus/jakks_gamekey/slot.h,BUSES["JAKKS_GAMEKEY"] = true
+---------------------------------------------------
+
+if (BUSES["JAKKS_GAMEKEY"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/jakks_gamekey/slot.cpp",
+		MAME_DIR .. "src/devices/bus/jakks_gamekey/slot.h",
+		MAME_DIR .. "src/devices/bus/jakks_gamekey/rom.cpp",
+		MAME_DIR .. "src/devices/bus/jakks_gamekey/rom.h",
+	}
+end
 
 ---------------------------------------------------
 --
@@ -2608,10 +2623,14 @@ if (BUSES["SG1000_EXP"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/sg1000_exp/sg1000exp.cpp",
 		MAME_DIR .. "src/devices/bus/sg1000_exp/sg1000exp.h",
-		MAME_DIR .. "src/devices/bus/sg1000_exp/sk1100.cpp",
-		MAME_DIR .. "src/devices/bus/sg1000_exp/sk1100.h",
 		MAME_DIR .. "src/devices/bus/sg1000_exp/fm_unit.cpp",
 		MAME_DIR .. "src/devices/bus/sg1000_exp/fm_unit.h",
+		MAME_DIR .. "src/devices/bus/sg1000_exp/sk1100.cpp",
+		MAME_DIR .. "src/devices/bus/sg1000_exp/sk1100.h",
+		MAME_DIR .. "src/devices/bus/sg1000_exp/sk1100prn.cpp",
+		MAME_DIR .. "src/devices/bus/sg1000_exp/sk1100prn.h",
+		MAME_DIR .. "src/devices/bus/sg1000_exp/kblink.cpp",
+		MAME_DIR .. "src/devices/bus/sg1000_exp/kblink.h",
 	}
 end
 

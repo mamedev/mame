@@ -40,13 +40,13 @@ public:
 	void config_set_hpixels_per_column(int hpixels_per_column) { m_hpixels_per_column = hpixels_per_column; }
 
 	/* select one of the registers for reading or writing */
-	DECLARE_WRITE8_MEMBER( address_w );
+	void address_w(uint8_t data);
 
 	/* read from the currently selected register */
-	DECLARE_READ8_MEMBER( register_r );
+	uint8_t register_r();
 
 	/* write to the currently selected register */
-	DECLARE_WRITE8_MEMBER( register_w );
+	void register_w(uint8_t data);
 
 	/* return the current value on the MA0-MA15 pins */
 	uint16_t get_ma();

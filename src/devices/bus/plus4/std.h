@@ -33,7 +33,7 @@ protected:
 	virtual void device_start() override;
 
 	// device_plus4_expansion_card_interface overrides
-	virtual uint8_t plus4_cd_r(address_space &space, offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h) override;
+	virtual uint8_t plus4_cd_r(offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h) override;
 };
 
 

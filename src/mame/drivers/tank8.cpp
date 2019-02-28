@@ -328,33 +328,31 @@ static GFXDECODE_START( gfx_tank8 )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(tank8_state::tank8)
-
+void tank8_state::tank8(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6800, 11055000 / 10) /* ? */
-	MCFG_DEVICE_PROGRAM_MAP(tank8_cpu_map)
-
+	M6800(config, m_maincpu, 11055000 / 10); /* ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &tank8_state::tank8_cpu_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(30 * 1000000 / 15681))
-	MCFG_SCREEN_SIZE(512, 524)
-	MCFG_SCREEN_VISIBLE_AREA(16, 495, 0, 463)
-	MCFG_SCREEN_UPDATE_DRIVER(tank8_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tank8_state, screen_vblank))
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(30 * 1000000 / 15681));
+	m_screen->set_size(512, 524);
+	m_screen->set_visarea(16, 495, 0, 463);
+	m_screen->set_screen_update(FUNC(tank8_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(tank8_state::screen_vblank));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_tank8)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tank8);
 	PALETTE(config, m_palette, FUNC(tank8_state::tank8_palette), 20, 10);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE, tank8_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_CONFIG_END
+	DISCRETE(config, m_discrete, tank8_discrete).add_route(ALL_OUTPUTS, "mono", 0.80);
+}
 
 
 ROM_START( tank8a )

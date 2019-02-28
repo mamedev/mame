@@ -306,10 +306,6 @@ void cgenie_state::machine_start()
 {
 	// setup ram
 	m_maincpu->space(AS_PROGRAM).install_ram(0x4000, 0x4000 + m_ram->size() - 1, m_ram->pointer());
-
-	// setup expansion bus
-	m_exp->set_program_space(&m_maincpu->space(AS_PROGRAM));
-	m_exp->set_io_space(&m_maincpu->space(AS_IO));
 }
 
 
@@ -438,16 +434,17 @@ const rgb_t cgenie_state::m_palette_nz[] =
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
-MACHINE_CONFIG_START(cgenie_state::cgenie)
+void cgenie_state::cgenie(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(17'734'470) / 8)  // 2.2168 MHz
-	MCFG_DEVICE_PROGRAM_MAP(cgenie_mem)
-	MCFG_DEVICE_IO_MAP(cgenie_io)
+	Z80(config, m_maincpu, XTAL(17'734'470) / 8); // 2.2168 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &cgenie_state::cgenie_mem);
+	m_maincpu->set_addrmap(AS_IO, &cgenie_state::cgenie_io);
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(17'734'470) / 2, 568, 32, 416, 312, 28, 284)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", hd6845_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(17'734'470) / 2, 568, 32, 416, 312, 28, 284);
+	screen.set_screen_update("crtc", FUNC(hd6845_device::screen_update));
 
 	HD6845(config, m_crtc, XTAL(17'734'470) / 16);
 	m_crtc->set_screen("screen");
@@ -478,15 +475,17 @@ MACHINE_CONFIG_START(cgenie_state::cgenie)
 	rs232.dcd_handler().set(FUNC(cgenie_state::rs232_dcd_w));
 
 	// cartridge expansion slot
-	MCFG_CG_EXP_SLOT_ADD("exp")
-	MCFG_CG_EXP_SLOT_INT_HANDLER(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	CG_EXP_SLOT(config, m_exp);
+	m_exp->set_program_space(m_maincpu, AS_PROGRAM);
+	m_exp->set_io_space(m_maincpu, AS_IO);
+	m_exp->int_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	// parallel slot
-	MCFG_CG_PARALLEL_SLOT_ADD("par")
+	CG_PARALLEL_SLOT(config, "par");
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("32K");
-MACHINE_CONFIG_END
+}
 
 
 //**************************************************************************

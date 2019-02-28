@@ -93,8 +93,6 @@ void spectrum_intf1_device::device_start()
 
 void spectrum_intf1_device::device_reset()
 {
-	m_exp->set_io_space(&io_space());
-
 	m_romcs = 0;
 }
 

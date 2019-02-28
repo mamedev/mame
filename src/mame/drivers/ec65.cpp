@@ -185,7 +185,7 @@ MACHINE_CONFIG_START(ec65_state::ec65)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 200 - 1)
 	MCFG_SCREEN_UPDATE_DEVICE(MC6845_TAG, mc6845_device, screen_update)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ec65)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_ec65);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	mc6845_device &crtc(MC6845(config, MC6845_TAG, XTAL(16'000'000) / 8));
@@ -224,7 +224,7 @@ MACHINE_CONFIG_START(ec65k_state::ec65k)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 200 - 1)
 	MCFG_SCREEN_UPDATE_DEVICE(MC6845_TAG, mc6845_device, screen_update)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ec65)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_ec65);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	mc6845_device &crtc(MC6845(config, MC6845_TAG, XTAL(16'000'000) / 8));

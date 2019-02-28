@@ -7,14 +7,7 @@
 *  Known Issues:
 *  - The proper hookup for the MAC address is unknown, requiring
 *    a fake MAC to be set up before any IRIX installers will proceed.
-*  - The IRIX 6.5.x installer kernel-panics on startup.
-*  - The IRIX 5.3 installer hangs after loading.
 *  - The Gentoo Linux live CD hangs on starting the kernel.
-*  - The disk formatting/partitioning utility for IRIX, fx, has
-*    various issues, from the disk formatting too quickly to hanging
-*    when exercising the disk.
-*  - Disk accesses frequently result in a "SYNC negotiation error"
-*    message.
 *
 *  Memory map:
 *
@@ -61,7 +54,7 @@
 
 #include "emu.h"
 
-#include "cpu/mips/mips3.h"
+#include "cpu/mips/r4000.h"
 
 #include "machine/hpc3.h"
 #include "machine/nscsi_bus.h"
@@ -107,7 +100,7 @@ protected:
 
 	static void scsi_devices(device_slot_interface &device);
 
-	required_device<mips3_device> m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint64_t> m_mainram;
 	required_device<sgi_mc_device> m_mem_ctrl;
 	required_device<wd33c93b_device> m_scsi_ctrl;
@@ -173,7 +166,7 @@ void ip22_state::machine_reset()
 	// set up low RAM mirror
 	membank("bank1")->set_base(m_mainram);
 
-	m_maincpu->mips3drc_set_options(MIPS3DRC_COMPATIBLE_OPTIONS | MIPS3DRC_CHECK_OVERFLOWS);
+	//m_maincpu->mips3drc_set_options(MIPS3DRC_COMPATIBLE_OPTIONS | MIPS3DRC_CHECK_OVERFLOWS);
 }
 
 static INPUT_PORTS_START( ip225015 )
@@ -200,7 +193,7 @@ void ip22_state::wd33c93(device_t *device)
 
 void ip22_state::scsi_devices(device_slot_interface &device)
 {
-	device.option_add("cdrom", NSCSI_CDROM);
+	device.option_add("cdrom", NSCSI_CDROM_SGI);
 	device.option_add("harddisk", NSCSI_HARDDISK);
 	//device.set_option_machine_config("cdrom", cdrom_config);
 }
@@ -220,7 +213,7 @@ void ip22_state::ip22_base(machine_config &config)
 
 	NEWPORT_VIDEO(config, m_newport, m_maincpu, m_hpc3);
 
-	SGI_MC(config, m_mem_ctrl, m_maincpu, ":hpc3:eeprom");
+	SGI_MC(config, m_mem_ctrl, m_maincpu, ":hpc3:eeprom", m_hpc3);
 
 	NSCSI_BUS(config, "scsibus", 0);
 	NSCSI_CONNECTOR(config, "scsibus:0").option_set("wd33c93", WD33C93B)
@@ -238,9 +231,9 @@ void ip22_state::ip225015(machine_config &config)
 {
 	ip22_base(config);
 
-	R5000BE(config, m_maincpu, 50000000*3);
-	m_maincpu->set_icache_size(32768);
-	m_maincpu->set_dcache_size(32768);
+	R4000(config, m_maincpu, 50000000*3);
+	//m_maincpu->set_icache_size(32768);
+	//m_maincpu->set_dcache_size(32768);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ip22_state::ip22_map);
 
 	SGI_HPC3(config, m_hpc3, m_maincpu, m_scsi_ctrl);
@@ -250,9 +243,9 @@ void ip22_state::ip224613(machine_config &config)
 {
 	ip22_base(config);
 
-	R4600BE(config, m_maincpu, 33333333*4);
-	m_maincpu->set_icache_size(32768);
-	m_maincpu->set_dcache_size(32768);
+	R4600(config, m_maincpu, 33333333*4);
+	//m_maincpu->set_icache_size(32768);
+	//m_maincpu->set_dcache_size(32768);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ip22_state::ip22_map);
 
 	SGI_HPC3(config, m_hpc3, m_maincpu, m_scsi_ctrl);
@@ -269,9 +262,9 @@ void ip24_state::ip244415(machine_config &config)
 {
 	ip22_base(config);
 
-	R4400BE(config, m_maincpu, 50000000*3);
-	m_maincpu->set_icache_size(32768);
-	m_maincpu->set_dcache_size(32768);
+	R4400(config, m_maincpu, 50000000*3);
+	//m_maincpu->set_icache_size(32768);
+	//m_maincpu->set_dcache_size(32768);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ip24_state::ip22_map);
 
 	NSCSI_BUS(config, "scsibus2", 0);

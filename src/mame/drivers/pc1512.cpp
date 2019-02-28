@@ -1152,14 +1152,15 @@ void pc1640_state::machine_start()
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( pc1512 )
+//  machine_config( pc1512 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(pc1512_state::pc1512)
-	MCFG_DEVICE_ADD(I8086_TAG, I8086, 24_MHz_XTAL / 3)
-	MCFG_DEVICE_PROGRAM_MAP(pc1512_mem)
-	MCFG_DEVICE_IO_MAP(pc1512_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE(I8259A2_TAG, pic8259_device, inta_cb)
+void pc1512_state::pc1512(machine_config &config)
+{
+	I8086(config, m_maincpu, 24_MHz_XTAL / 3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc1512_state::pc1512_mem);
+	m_maincpu->set_addrmap(AS_IO, &pc1512_state::pc1512_io);
+	m_maincpu->set_irq_acknowledge_callback(I8259A2_TAG, FUNC(pic8259_device::inta_cb));
 
 	// video
 	pc1512_video(config);
@@ -1173,11 +1174,11 @@ MACHINE_CONFIG_START(pc1512_state::pc1512)
 	m_kb->clock_wr_callback().set(FUNC(pc1512_state::kbclk_w));
 	m_kb->data_wr_callback().set(FUNC(pc1512_state::kbdata_w));
 
-	MCFG_PC1512_MOUSE_PORT_ADD(PC1512_MOUSE_PORT_TAG, pc1512_mouse_port_devices, "mouse")
-	MCFG_PC1512_MOUSE_PORT_X_CB(WRITE8(*this, pc1512_state, mouse_x_w))
-	MCFG_PC1512_MOUSE_PORT_Y_CB(WRITE8(*this, pc1512_state, mouse_y_w))
-	MCFG_PC1512_MOUSE_PORT_M1_CB(WRITELINE(PC1512_KEYBOARD_TAG, pc1512_keyboard_device, m1_w))
-	MCFG_PC1512_MOUSE_PORT_M2_CB(WRITELINE(PC1512_KEYBOARD_TAG, pc1512_keyboard_device, m2_w))
+	pc1512_mouse_port_device &mouse(PC1512_MOUSE_PORT(config, PC1512_MOUSE_PORT_TAG, pc1512_mouse_port_devices, "mouse"));
+	mouse.x_wr_callback().set(FUNC(pc1512_base_state::mouse_x_w));
+	mouse.y_wr_callback().set(FUNC(pc1512_base_state::mouse_y_w));
+	mouse.m1_wr_callback().set(m_kb, FUNC(pc1512_keyboard_device::m1_w));
+	mouse.m2_wr_callback().set(m_kb, FUNC(pc1512_keyboard_device::m2_w));
 
 	AM9517A(config, m_dmac, 24_MHz_XTAL / 6);
 	m_dmac->out_hreq_callback().set(FUNC(pc1512_state::hrq_w));
@@ -1252,9 +1253,9 @@ MACHINE_CONFIG_START(pc1512_state::pc1512)
 	isa.drq1_callback().set(I8237A5_TAG, FUNC(am9517a_device::dreq1_w));
 	isa.drq2_callback().set(I8237A5_TAG, FUNC(am9517a_device::dreq2_w));
 	isa.drq3_callback().set(I8237A5_TAG, FUNC(am9517a_device::dreq3_w));
-	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false) // FIXME: determine ISA clock
-	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false)
+	ISA8_SLOT(config, "isa1", 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false); // FIXME: determine ISA clock
+	ISA8_SLOT(config, "isa2", 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa3", 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false);
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("512K").set_extra_options("544K,576K,608K,640K");
@@ -1262,41 +1263,42 @@ MACHINE_CONFIG_START(pc1512_state::pc1512)
 	// software list
 	SOFTWARE_LIST(config, "flop_list").set_original("pc1512_flop");
 	SOFTWARE_LIST(config, "hdd_list").set_original("pc1512_hdd");
-MACHINE_CONFIG_END
+}
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( pc1512dd )
+//  machine_config( pc1512dd )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(pc1512_state::pc1512dd)
+void pc1512_state::pc1512dd(machine_config &config)
+{
 	pc1512(config);
-	MCFG_DEVICE_MODIFY(PC_FDC_XT_TAG ":1")
-	MCFG_SLOT_DEFAULT_OPTION("525dd")
-MACHINE_CONFIG_END
+	subdevice<floppy_connector>(PC_FDC_XT_TAG ":1")->set_default_option("525dd");
+}
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( pc1512hd )
+//  machine_config( pc1512hd )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(pc1512_state::pc1512hd)
+void pc1512_state::pc1512hd(machine_config &config)
+{
 	pc1512(config);
-	MCFG_DEVICE_MODIFY("isa1")
-	//MCFG_SLOT_DEFAULT_OPTION("wdxt_gen")
-	MCFG_SLOT_DEFAULT_OPTION("hdc")
-MACHINE_CONFIG_END
+	//subdevice<isa8_slot_device>("isa1")->set_default_option("wdxt_gen");
+	subdevice<isa8_slot_device>("isa1")->set_default_option("hdc");
+}
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( pc1640 )
+//  machine_config( pc1640 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(pc1640_state::pc1640)
-	MCFG_DEVICE_ADD(I8086_TAG, I8086, 24_MHz_XTAL / 3)
-	MCFG_DEVICE_PROGRAM_MAP(pc1640_mem)
-	MCFG_DEVICE_IO_MAP(pc1640_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE(I8259A2_TAG, pic8259_device, inta_cb)
+void pc1640_state::pc1640(machine_config &config)
+{
+	I8086(config, m_maincpu, 24_MHz_XTAL / 3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc1640_state::pc1640_mem);
+	m_maincpu->set_addrmap(AS_IO, &pc1640_state::pc1640_io);
+	m_maincpu->set_irq_acknowledge_callback(I8259A2_TAG, FUNC(pic8259_device::inta_cb));
 
 	// sound
 	SPEAKER(config, "mono").front_center();
@@ -1307,11 +1309,11 @@ MACHINE_CONFIG_START(pc1640_state::pc1640)
 	m_kb->clock_wr_callback().set(FUNC(pc1512_base_state::kbclk_w));
 	m_kb->data_wr_callback().set(FUNC(pc1512_base_state::kbdata_w));
 
-	MCFG_PC1512_MOUSE_PORT_ADD(PC1512_MOUSE_PORT_TAG, pc1512_mouse_port_devices, "mouse")
-	MCFG_PC1512_MOUSE_PORT_X_CB(WRITE8(*this, pc1512_base_state, mouse_x_w))
-	MCFG_PC1512_MOUSE_PORT_Y_CB(WRITE8(*this, pc1512_base_state, mouse_y_w))
-	MCFG_PC1512_MOUSE_PORT_M1_CB(WRITELINE(PC1512_KEYBOARD_TAG, pc1512_keyboard_device, m1_w))
-	MCFG_PC1512_MOUSE_PORT_M2_CB(WRITELINE(PC1512_KEYBOARD_TAG, pc1512_keyboard_device, m2_w))
+	pc1512_mouse_port_device &mouse(PC1512_MOUSE_PORT(config, PC1512_MOUSE_PORT_TAG, pc1512_mouse_port_devices, "mouse"));
+	mouse.x_wr_callback().set(FUNC(pc1512_base_state::mouse_x_w));
+	mouse.y_wr_callback().set(FUNC(pc1512_base_state::mouse_y_w));
+	mouse.m1_wr_callback().set(m_kb, FUNC(pc1512_keyboard_device::m1_w));
+	mouse.m2_wr_callback().set(m_kb, FUNC(pc1512_keyboard_device::m2_w));
 
 	AM9517A(config, m_dmac, 24_MHz_XTAL / 6);
 	m_dmac->out_hreq_callback().set(FUNC(pc1640_state::hrq_w));
@@ -1386,11 +1388,11 @@ MACHINE_CONFIG_START(pc1640_state::pc1640)
 	isa.drq1_callback().set(I8237A5_TAG, FUNC(am9517a_device::dreq1_w));
 	isa.drq2_callback().set(I8237A5_TAG, FUNC(am9517a_device::dreq2_w));
 	isa.drq3_callback().set(I8237A5_TAG, FUNC(am9517a_device::dreq3_w));
-	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false) // FIXME: determine ISA bus clock
-	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa4", ISA8_SLOT, 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa5", ISA8_SLOT, 0, ISA_BUS_TAG, pc1640_isa8_cards, "iga", false)
+	ISA8_SLOT(config, "isa1", 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false); // FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "isa2", 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa3", 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa4", 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa5", 0, ISA_BUS_TAG, pc1640_isa8_cards, "iga", false);
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("640K");
@@ -1398,30 +1400,30 @@ MACHINE_CONFIG_START(pc1640_state::pc1640)
 	// software list
 	SOFTWARE_LIST(config, "flop_list").set_original("pc1640_flop");
 	SOFTWARE_LIST(config, "hdd_list").set_original("pc1640_hdd");
-MACHINE_CONFIG_END
+}
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( pc1640dd )
+//  machine_config( pc1640dd )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(pc1640_state::pc1640dd)
+void pc1640_state::pc1640dd(machine_config &config)
+{
 	pc1640(config);
-	MCFG_DEVICE_MODIFY(PC_FDC_XT_TAG ":1")
-	MCFG_SLOT_DEFAULT_OPTION("525dd")
-MACHINE_CONFIG_END
+	subdevice<floppy_connector>(PC_FDC_XT_TAG ":1")->set_default_option("525dd");
+}
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( pc1640hd )
+//  machine_config( pc1640hd )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(pc1640_state::pc1640hd)
+void pc1640_state::pc1640hd(machine_config &config)
+{
 	pc1640(config);
-	MCFG_DEVICE_MODIFY("isa1")
-	//MCFG_SLOT_DEFAULT_OPTION("wdxt_gen")
-	MCFG_SLOT_DEFAULT_OPTION("hdc")
-MACHINE_CONFIG_END
+	//subdevice<isa8_slot_device>("isa1")->set_default_option("wdxt_gen");
+	subdevice<isa8_slot_device>("isa1")->set_default_option("hdc");
+}
 
 
 

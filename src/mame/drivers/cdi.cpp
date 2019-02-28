@@ -748,86 +748,88 @@ WRITE8_MEMBER( cdi_state::slave_io_w )
 *************************/
 
 // CD-i Mono-I system base
-MACHINE_CONFIG_START(cdi_state::cdimono1_base)
-	MCFG_DEVICE_ADD("maincpu", SCC68070, CLOCK_A/2)
-	MCFG_DEVICE_PROGRAM_MAP(cdimono1_mem)
+void cdi_state::cdimono1_base(machine_config &config)
+{
+	SCC68070(config, m_maincpu, CLOCK_A/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cdi_state::cdimono1_mem);
 
-	MCFG_DEVICE_ADD("mcd212", MCD212, 0)
-	MCFG_VIDEO_SET_SCREEN("screen")
+	MCD212(config, m_mcd212, 0);
+	m_mcd212->set_screen("screen");
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(384, 302)
-	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 22, 302-1) // TODO: dynamic resolution
-	MCFG_SCREEN_UPDATE_DRIVER(cdi_state, screen_update_cdimono1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(384, 302);
+	screen.set_visarea(0, 384-1, 22, 302-1); // TODO: dynamic resolution
+	screen.set_screen_update(FUNC(cdi_state::screen_update_cdimono1));
 
-	MCFG_SCREEN_ADD("lcd", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(192, 22)
-	MCFG_SCREEN_VISIBLE_AREA(0, 192-1, 0, 22-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cdi_state, screen_update_cdimono1_lcd)
+	SCREEN(config, m_lcd, SCREEN_TYPE_RASTER);
+	m_lcd->set_refresh_hz(60);
+	m_lcd->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_lcd->set_size(192, 22);
+	m_lcd->set_visarea(0, 192-1, 0, 22-1);
+	m_lcd->set_screen_update(FUNC(cdi_state::screen_update_cdimono1_lcd));
 
-	MCFG_PALETTE_ADD("palette", 0x100)
+	PALETTE(config, "palette").set_entries(0x100);
 
 	config.set_default_layout(layout_cdi);
 
-	MCFG_DEVICE_ADD("scc68070", CDI_68070, 0, "maincpu")
+	CDI_68070(config, m_scc, 0, "maincpu");
 
-	MCFG_DEVICE_ADD("cdic", CDI_CDIC, 0)
-	MCFG_DEVICE_ADD("slave_hle", CDI_SLAVE, 0)
+	CDI_CDIC(config, m_cdic, 0);
+	CDI_SLAVE(config, m_slave_hle, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD( "dac1", DMADAC )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "lspeaker", 1.0 )
+	DMADAC(config, m_dmadac[0]);
+	m_dmadac[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 
-	MCFG_DEVICE_ADD( "dac2", DMADAC )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "rspeaker", 1.0 )
+	DMADAC(config, m_dmadac[1]);
+	m_dmadac[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD( "cdda", CDDA )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "lspeaker", 1.0 )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "rspeaker", 1.0 )
+	CDDA(config, m_cdda);
+	m_cdda->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_cdda->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("mk48t08", MK48T08, 0)
-MACHINE_CONFIG_END
+	MK48T08(config, "mk48t08", 0);
+}
 
 // CD-i model 220 (Mono-II, NTSC)
-MACHINE_CONFIG_START(cdi_state::cdimono2)
-	MCFG_DEVICE_ADD("maincpu", SCC68070, CLOCK_A/2)
-	MCFG_DEVICE_PROGRAM_MAP(cdimono2_mem)
+void cdi_state::cdimono2(machine_config &config)
+{
+	SCC68070(config, m_maincpu, CLOCK_A/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cdi_state::cdimono2_mem);
 
-	MCFG_DEVICE_ADD("mcd212", MCD212, 0)
-	MCFG_VIDEO_SET_SCREEN("screen")
+	MCD212(config, m_mcd212, 0);
+	m_mcd212->set_screen("screen");
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(384, 302)
-	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 22, 302-1) // TODO: dynamic resolution
-	MCFG_SCREEN_UPDATE_DRIVER(cdi_state, screen_update_cdimono1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(384, 302);
+	screen.set_visarea(0, 384-1, 22, 302-1); // TODO: dynamic resolution
+	screen.set_screen_update(FUNC(cdi_state::screen_update_cdimono1));
 
-	MCFG_SCREEN_ADD("lcd", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(192, 22)
-	MCFG_SCREEN_VISIBLE_AREA(0, 192-1, 0, 22-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cdi_state, screen_update_cdimono1_lcd)
+	SCREEN(config, m_lcd, SCREEN_TYPE_RASTER);
+	m_lcd->set_refresh_hz(60);
+	m_lcd->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_lcd->set_size(192, 22);
+	m_lcd->set_visarea(0, 192-1, 0, 22-1);
+	m_lcd->set_screen_update(FUNC(cdi_state::screen_update_cdimono1_lcd));
 
-	MCFG_PALETTE_ADD("palette", 0x100)
+	PALETTE(config, "palette").set_entries(0x100);
 
 	config.set_default_layout(layout_cdi);
 
 	MCFG_MACHINE_RESET_OVERRIDE( cdi_state, cdimono2 )
 
-	MCFG_DEVICE_ADD("scc68070", CDI_68070, 0, "maincpu")
-	MCFG_DEVICE_ADD("servo", M68HC05EG, 2000000) /* Unknown clock speed, docs say 2MHz internal clock */
-	MCFG_DEVICE_PROGRAM_MAP(cdimono2_servo_mem)
-	MCFG_DEVICE_ADD("slave", M68HC05EG, 2000000) /* Unknown clock speed, docs say 2MHz internal clock */
-	MCFG_DEVICE_PROGRAM_MAP(cdimono2_slave_mem)
+	CDI_68070(config, m_scc, 0, "maincpu");
+	M68HC05EG(config, m_servo, 2000000); /* Unknown clock speed, docs say 2MHz internal clock */
+	m_servo->set_addrmap(AS_PROGRAM, &cdi_state::cdimono2_servo_mem);
+	M68HC05EG(config, m_slave, 2000000); /* Unknown clock speed, docs say 2MHz internal clock */
+	m_slave->set_addrmap(AS_PROGRAM, &cdi_state::cdimono2_slave_mem);
 
 	CDROM(config, "cdrom").set_interface("cdi_cdrom");
 	SOFTWARE_LIST(config, "cd_list").set_original("cdi").set_filter("!DVC");
@@ -836,51 +838,52 @@ MACHINE_CONFIG_START(cdi_state::cdimono2)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD( "dac1", DMADAC )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "lspeaker", 1.0 )
+	DMADAC(config, m_dmadac[0]);
+	m_dmadac[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 
-	MCFG_DEVICE_ADD( "dac2", DMADAC )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "rspeaker", 1.0 )
+	DMADAC(config, m_dmadac[1]);
+	m_dmadac[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD( "cdda", CDDA )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "lspeaker", 1.0 )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "rspeaker", 1.0 )
+	CDDA(config, m_cdda);
+	m_cdda->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_cdda->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("mk48t08", MK48T08, 0)
-MACHINE_CONFIG_END
+	MK48T08(config, "mk48t08", 0);
+}
 
-MACHINE_CONFIG_START(cdi_state::cdi910)
-	MCFG_DEVICE_ADD("maincpu", SCC68070, CLOCK_A/2)
-	MCFG_DEVICE_PROGRAM_MAP(cdi910_mem)
+void cdi_state::cdi910(machine_config &config)
+{
+	SCC68070(config, m_maincpu, CLOCK_A/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cdi_state::cdi910_mem);
 
-	MCFG_DEVICE_ADD("mcd212", MCD212, 0)
-	MCFG_VIDEO_SET_SCREEN("screen")
+	MCD212(config, m_mcd212, 0);
+	m_mcd212->set_screen("screen");
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(384, 302)
-	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 22, 302-1) // TODO: dynamic resolution
-	MCFG_SCREEN_UPDATE_DRIVER(cdi_state, screen_update_cdimono1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(384, 302);
+	screen.set_visarea(0, 384-1, 22, 302-1); // TODO: dynamic resolution
+	screen.set_screen_update(FUNC(cdi_state::screen_update_cdimono1));
 
-	MCFG_SCREEN_ADD("lcd", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(192, 22)
-	MCFG_SCREEN_VISIBLE_AREA(0, 192-1, 0, 22-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cdi_state, screen_update_cdimono1_lcd)
+	SCREEN(config, m_lcd, SCREEN_TYPE_RASTER);
+	m_lcd->set_refresh_hz(60);
+	m_lcd->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_lcd->set_size(192, 22);
+	m_lcd->set_visarea(0, 192-1, 0, 22-1);
+	m_lcd->set_screen_update(FUNC(cdi_state::screen_update_cdimono1_lcd));
 
-	MCFG_PALETTE_ADD("palette", 0x100)
+	PALETTE(config, "palette").set_entries(0x100);
 
 	config.set_default_layout(layout_cdi);
 
 	MCFG_MACHINE_RESET_OVERRIDE( cdi_state, cdimono2 )
 
-	MCFG_DEVICE_ADD("scc68070", CDI_68070, 0, "maincpu")
-	MCFG_DEVICE_ADD("servo", M68HC05EG, 2000000) /* Unknown clock speed, docs say 2MHz internal clock */
-	MCFG_DEVICE_PROGRAM_MAP(cdimono2_servo_mem)
-	MCFG_DEVICE_ADD("slave", M68HC05EG, 2000000) /* Unknown clock speed, docs say 2MHz internal clock */
-	MCFG_DEVICE_PROGRAM_MAP(cdimono2_slave_mem)
+	CDI_68070(config, m_scc, 0, "maincpu");
+	M68HC05EG(config, m_servo, 2000000); /* Unknown clock speed, docs say 2MHz internal clock */
+	m_servo->set_addrmap(AS_PROGRAM, &cdi_state::cdimono2_servo_mem);
+	M68HC05EG(config, m_slave, 2000000); /* Unknown clock speed, docs say 2MHz internal clock */
+	m_slave->set_addrmap(AS_PROGRAM, &cdi_state::cdimono2_slave_mem);
 
 	CDROM(config, "cdrom").set_interface("cdi_cdrom");
 	SOFTWARE_LIST(config, "cd_list").set_original("cdi").set_filter("!DVC");
@@ -889,34 +892,35 @@ MACHINE_CONFIG_START(cdi_state::cdi910)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD( "dac1", DMADAC )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "lspeaker", 1.0 )
+	DMADAC(config, m_dmadac[0]);
+	m_dmadac[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 
-	MCFG_DEVICE_ADD( "dac2", DMADAC )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "rspeaker", 1.0 )
+	DMADAC(config, m_dmadac[1]);
+	m_dmadac[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD( "cdda", CDDA )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "lspeaker", 1.0 )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "rspeaker", 1.0 )
+	CDDA(config, m_cdda);
+	m_cdda->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_cdda->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("mk48t08", MK48T08, 0)
-MACHINE_CONFIG_END
+	MK48T08(config, "mk48t08", 0);
+}
 
 // CD-i Mono-I, with CD-ROM image device (MESS) and Software List (MESS)
-MACHINE_CONFIG_START(cdi_state::cdimono1)
+void cdi_state::cdimono1(machine_config &config)
+{
 	cdimono1_base(config);
 	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, cdimono1)
 
 	CDROM(config, "cdrom").set_interface("cdi_cdrom");
 	SOFTWARE_LIST(config, "cd_list").set_original("cdi").set_filter("!DVC");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(cdi_state::quizard)
+void cdi_state::quizard(machine_config &config)
+{
 	cdimono1_base(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(cdimono1_mem)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cdi_state, mcu_frame)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &cdi_state::cdimono1_mem);
+	m_maincpu->set_vblank_int("screen", FUNC(cdi_state::mcu_frame));
+}
 
 
 READ8_MEMBER( cdi_state::quizard_mcu_p1_r )

@@ -143,8 +143,6 @@ protected:
 
 	//nl_double m_A[storage_N][((storage_N + 7) / 8) * 8];
 	nl_double m_RHS[storage_N];
-	nl_double m_last_RHS[storage_N]; // right hand side - contains currents
-	nl_double m_last_V[storage_N];
 
 	terms_for_net_t *m_rails_temp;
 
@@ -355,7 +353,6 @@ void matrix_solver_direct_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 	 * save states
 	 */
 	save(NLNAME(m_RHS));
-	save(NLNAME(m_last_RHS));
 	save(NLNAME(m_last_V));
 
 	for (unsigned k = 0; k < N(); k++)
@@ -593,10 +590,7 @@ template <unsigned m_N, unsigned storage_N>
 int matrix_solver_direct_t<m_N, storage_N>::vsolve_non_dynamic(const bool newton_raphson)
 {
 	this->build_LE_A();
-	this->build_LE_RHS(m_last_RHS);
-
-	for (unsigned i=0, iN=N(); i < iN; i++)
-		m_RHS[i] = m_last_RHS[i];
+	this->build_LE_RHS(m_RHS);
 
 	return this->solve_non_dynamic(newton_raphson);
 }
@@ -608,11 +602,6 @@ matrix_solver_direct_t<m_N, storage_N>::matrix_solver_direct_t(const solver_para
 , m_lp_fact(0)
 {
 	m_rails_temp = palloc_array(terms_for_net_t, N());
-
-	for (unsigned k = 0; k < N(); k++)
-	{
-		m_last_RHS[k] = 0.0;
-	}
 }
 
 template <unsigned m_N, unsigned storage_N>
@@ -626,7 +615,6 @@ matrix_solver_direct_t<m_N, storage_N>::matrix_solver_direct_t(const eSolverType
 	for (unsigned k = 0; k < N(); k++)
 	{
 		m_terms[k] = palloc(terms_for_net_t);
-		m_last_RHS[k] = 0.0;
 	}
 }
 

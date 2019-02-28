@@ -94,8 +94,8 @@ void mjkjidai_state::mjkjidai_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x03).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x10, 0x13).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x20, 0x20).w("sn1", FUNC(sn76489_device::command_w));
-	map(0x30, 0x30).w("sn2", FUNC(sn76489_device::command_w));
+	map(0x20, 0x20).w("sn1", FUNC(sn76489_device::write));
+	map(0x30, 0x30).w("sn2", FUNC(sn76489_device::write));
 	map(0x40, 0x40).w(FUNC(mjkjidai_state::adpcm_w));
 }
 
@@ -296,8 +296,8 @@ void mjkjidai_state::machine_reset()
 	m_adpcm_pos = m_adpcm_end = 0;
 }
 
-MACHINE_CONFIG_START(mjkjidai_state::mjkjidai)
-
+void mjkjidai_state::mjkjidai(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 10000000/2); /* 5 MHz ??? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &mjkjidai_state::mjkjidai_map);

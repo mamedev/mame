@@ -344,9 +344,9 @@ READ8_MEMBER(apc_state::apc_gdc_r)
 	uint8_t res;
 
 	if(offset & 1)
-		res = m_hgdc2->read(space, (offset & 2) >> 1); // upd7220 bitmap port
+		res = m_hgdc2->read((offset & 2) >> 1); // upd7220 bitmap port
 	else
-		res = m_hgdc1->read(space, (offset & 2) >> 1); // upd7220 character port
+		res = m_hgdc1->read((offset & 2) >> 1); // upd7220 character port
 
 	return res;
 }
@@ -354,9 +354,9 @@ READ8_MEMBER(apc_state::apc_gdc_r)
 WRITE8_MEMBER(apc_state::apc_gdc_w)
 {
 	if(offset & 1)
-		m_hgdc2->write(space, (offset & 2) >> 1,data); // upd7220 bitmap port
+		m_hgdc2->write((offset & 2) >> 1,data); // upd7220 bitmap port
 	else
-		m_hgdc1->write(space, (offset & 2) >> 1,data); // upd7220 character port
+		m_hgdc1->write((offset & 2) >> 1,data); // upd7220 character port
 }
 
 READ8_MEMBER(apc_state::apc_kbd_r)
@@ -991,15 +991,15 @@ MACHINE_CONFIG_START(apc_state::apc)
 
 	PALETTE(config, m_palette, palette_device::BRG_3BIT);
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_apc)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_apc);
 
 	UPD7220(config, m_hgdc1, 3579545); // unk clock
 	m_hgdc1->set_addrmap(0, &apc_state::upd7220_1_map);
-	m_hgdc1->set_draw_text_callback(FUNC(apc_state::hgdc_draw_text), this);
+	m_hgdc1->set_draw_text(FUNC(apc_state::hgdc_draw_text));
 
 	UPD7220(config, m_hgdc2, 3579545); // unk clock
 	m_hgdc2->set_addrmap(0, &apc_state::upd7220_2_map);
-	m_hgdc2->set_display_pixels_callback(FUNC(apc_state::hgdc_display_pixels), this);
+	m_hgdc2->set_display_pixels(FUNC(apc_state::hgdc_display_pixels));
 
 	/* sound hardware */
 	SPEAKER(config, m_speaker).front_center();

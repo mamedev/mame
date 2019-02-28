@@ -62,11 +62,11 @@ public:
 	template <class Object> devcb_base &set_irq_wr_callback(Object &&cb) { return m_write_irq.set_callback(std::forward<Object>(cb)); }
 	auto irq_callback() { return m_write_irq.bind(); }
 
-	uint8_t mrd_r(address_space &space, offs_t offset, int *extrom);
-	void mwr_w(address_space &space, offs_t offset, uint8_t data);
+	uint8_t mrd_r(offs_t offset, int *extrom);
+	void mwr_w(offs_t offset, uint8_t data);
 
-	uint8_t io_r(address_space &space, offs_t offset);
-	void io_w(address_space &space, offs_t offset, uint8_t data);
+	uint8_t io_r(offs_t offset);
+	void io_w(offs_t offset, uint8_t data);
 
 	DECLARE_READ_LINE_MEMBER(ef4_r);
 
@@ -107,12 +107,12 @@ protected:
 	virtual void comx_tpb_w(int state) { }
 
 	// memory access
-	virtual uint8_t comx_mrd_r(address_space &space, offs_t offset, int *extrom) { return 0; }
-	virtual void comx_mwr_w(address_space &space, offs_t offset, uint8_t data) { }
+	virtual uint8_t comx_mrd_r(offs_t offset, int *extrom) { return 0; }
+	virtual void comx_mwr_w(offs_t offset, uint8_t data) { }
 
 	// I/O access
-	virtual uint8_t comx_io_r(address_space &space, offs_t offset) { return 0; }
-	virtual void comx_io_w(address_space &space, offs_t offset, uint8_t data) { }
+	virtual uint8_t comx_io_r(offs_t offset) { return 0; }
+	virtual void comx_io_w(offs_t offset, uint8_t data) { }
 
 	comx_expansion_slot_device *m_slot;
 

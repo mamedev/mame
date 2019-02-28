@@ -53,7 +53,8 @@ static INPUT_PORTS_START( system_board_y2 )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(system_board_y2_state::system_board_y2)
+void system_board_y2_state::system_board_y2(machine_config &config)
+{
 	/*
 	SH4LE(config, m_maincpu, 266666666);
 	m_maincpu->set_md(0, 1);
@@ -68,18 +69,18 @@ MACHINE_CONFIG_START(system_board_y2_state::system_board_y2)
 	m_maincpu->set_sh4_clock(CPU_CLOCK);
 	*/
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DRIVER(system_board_y2_state, screen_update_system_board_y2)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 640-1, 0, 480-1);
+	screen.set_screen_update(FUNC(system_board_y2_state::screen_update_system_board_y2));
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 0x1000)
+	PALETTE(config, "palette").set_entries(0x1000);
 
 	SPEAKER(config, "mono").front_center();
-MACHINE_CONFIG_END
+}
 
 ROM_START( kof2002um ) // The King of Fighters 复仇之路/Fùchóu zhī lù/Road to Revenge
 	ROM_REGION( 0x8000000, "boot", 0 ) // sound program only? or boot too?

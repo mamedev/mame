@@ -159,8 +159,8 @@ template<int Chip>
 READ16_MEMBER(kaneko16_state::kaneko16_ay_YM2149_r)
 {
 	/* Each 2149 register is mapped to a different address */
-	m_ym2149[Chip]->address_w(space,0,offset);
-	return m_ym2149[Chip]->data_r(space,0);
+	m_ym2149[Chip]->address_w(offset);
+	return m_ym2149[Chip]->data_r();
 }
 
 
@@ -168,10 +168,10 @@ template<int Chip>
 WRITE16_MEMBER(kaneko16_state::kaneko16_ay_YM2149_w)
 {
 	/* Each 2149 register is mapped to a different address */
-	m_ym2149[Chip]->address_w(space,0,offset);
+	m_ym2149[Chip]->address_w(offset);
 	/* The registers are mapped to odd addresses, except one! */
-	if (ACCESSING_BITS_0_7) m_ym2149[Chip]->data_w(space,0, data       & 0xff);
-	else                m_ym2149[Chip]->data_w(space,0,(data >> 8) & 0xff);
+	if (ACCESSING_BITS_0_7) m_ym2149[Chip]->data_w( data       & 0xff);
+	else                m_ym2149[Chip]->data_w((data >> 8) & 0xff);
 }
 
 template<int Mask>
@@ -243,7 +243,7 @@ READ16_MEMBER(kaneko16_berlwall_state::berlwall_oki_r)
 		mem_mask >>= 8;
 	}
 
-	ret = m_oki[0]->read(space, offset, mem_mask);
+	ret = m_oki[0]->read();
 	ret = ret | ret << 8;
 
 	return ret;
@@ -257,7 +257,7 @@ WRITE16_MEMBER(kaneko16_berlwall_state::berlwall_oki_w)
 		mem_mask >>= 8;
 	}
 
-	m_oki[0]->write(space, offset, data, mem_mask);
+	m_oki[0]->write(data);
 }
 
 READ16_MEMBER(kaneko16_berlwall_state::berlwall_spriteram_r)

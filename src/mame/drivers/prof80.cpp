@@ -447,14 +447,15 @@ void prof80_state::machine_start()
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( prof80 )
+//  machine_config( prof80 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(prof80_state::prof80)
+void prof80_state::prof80(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(6'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(prof80_mem)
-	MCFG_DEVICE_IO_MAP(prof80_io)
+	Z80(config, m_maincpu, XTAL(6'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &prof80_state::prof80_mem);
+	m_maincpu->set_addrmap(AS_IO, &prof80_state::prof80_io);
 
 	// MMU
 	PROF80_MMU(config, m_mmu, 0);
@@ -492,12 +493,12 @@ MACHINE_CONFIG_START(prof80_state::prof80)
 	m_flrb->q_out_cb<7>().set(m_mmu, FUNC(prof80_mmu_device::mme_w)); // MME
 
 	// ECB bus
-	MCFG_ECBBUS_ADD()
-	MCFG_ECBBUS_SLOT_ADD(1, "ecb_1", ecbbus_cards, "grip21")
-	MCFG_ECBBUS_SLOT_ADD(2, "ecb_2", ecbbus_cards, nullptr)
-	MCFG_ECBBUS_SLOT_ADD(3, "ecb_3", ecbbus_cards, nullptr)
-	MCFG_ECBBUS_SLOT_ADD(4, "ecb_4", ecbbus_cards, nullptr)
-	MCFG_ECBBUS_SLOT_ADD(5, "ecb_5", ecbbus_cards, nullptr)
+	ECBBUS(config, m_ecb);
+	ECBBUS_SLOT(config, "ecb_1", 1, ecbbus_cards, "grip21");
+	ECBBUS_SLOT(config, "ecb_2", 2, ecbbus_cards, nullptr);
+	ECBBUS_SLOT(config, "ecb_3", 3, ecbbus_cards, nullptr);
+	ECBBUS_SLOT(config, "ecb_4", 4, ecbbus_cards, nullptr);
+	ECBBUS_SLOT(config, "ecb_5", 5, ecbbus_cards, nullptr);
 
 	// V24
 	RS232_PORT(config, m_rs232a, default_rs232_devices, nullptr);
@@ -508,7 +509,7 @@ MACHINE_CONFIG_START(prof80_state::prof80)
 
 	// software lists
 	SOFTWARE_LIST(config, "flop_list").set_original("prof80");
-MACHINE_CONFIG_END
+}
 
 
 

@@ -689,7 +689,7 @@ MACHINE_CONFIG_START(jubilee_state::jubileep)
 	MCFG_SCREEN_UPDATE_DRIVER(jubilee_state, screen_update_jubileep)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jubileep)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_jubileep);
 	MCFG_PALETTE_ADD("palette",8)
 
 	mc6845_device &crtc(MC6845(config, "crtc", CRTC_CLOCK));

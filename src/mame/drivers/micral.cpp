@@ -57,6 +57,7 @@ Other things...
 #include "screen.h"
 #include "speaker.h"
 #include "machine/ay31015.h"
+#include "machine/clock.h"
 #include "bus/rs232/rs232.h"
 
 
@@ -377,27 +378,28 @@ MACHINE_RESET_MEMBER( micral_state, micral )
 	m_uart->write_cs(0);
 }
 
-MACHINE_CONFIG_START(micral_state::micral)
+void micral_state::micral(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD( "maincpu", Z80, XTAL(4'000'000) )
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	Z80(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &micral_state::mem_map);
 	// no i/o ports on main cpu
-	MCFG_DEVICE_ADD( "keyboard", Z80, XTAL(1'000'000) ) // freq unknown
-	MCFG_DEVICE_PROGRAM_MAP(mem_kbd)
-	MCFG_DEVICE_IO_MAP(io_kbd)
+	z80_device &keyboard(Z80(config, "keyboard", XTAL(1'000'000))); // freq unknown
+	keyboard.set_addrmap(AS_PROGRAM, &micral_state::mem_kbd);
+	keyboard.set_addrmap(AS_IO, &micral_state::io_kbd);
 
 	MCFG_MACHINE_RESET_OVERRIDE(micral_state, micral)
 
 	// video hardware
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(250))
-	MCFG_SCREEN_UPDATE_DRIVER(micral_state, screen_update)
-	MCFG_SCREEN_SIZE(640, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 239)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(250));
+	screen.set_screen_update(FUNC(micral_state::screen_update));
+	screen.set_size(640, 240);
+	screen.set_visarea(0, 639, 0, 239);
+	screen.set_palette("palette");
 	PALETTE(config, "palette", palette_device::MONOCHROME);
-	//MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_micral)
+	//GFXDECODE(config, "gfxdecode", "palette", gfx_micral);
 
 	CRT5037(config, m_crtc, 4000000 / 8);  // xtal freq unknown
 	m_crtc->set_char_width(8);  // unknown
@@ -405,17 +407,19 @@ MACHINE_CONFIG_START(micral_state::micral)
 	m_crtc->set_screen("screen");
 
 	/* sound hardware */
-	//MCFG_SPEAKER_STANDARD_MONO("mono")
-	//MCFG_DEVICE_ADD("beeper", BEEP, 2000)
-	//MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	//SPEAKER(config, "mono").front_center();
+	//BEEP(config, m_beep, 2000).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	AY31015(config, m_uart); // CDP6402
-	m_uart->set_tx_clock(153600);
-	m_uart->set_rx_clock(153600);
 	m_uart->read_si_callback().set("rs232", FUNC(rs232_port_device::rxd_r));
 	m_uart->write_so_callback().set("rs232", FUNC(rs232_port_device::write_txd));
+
+	clock_device &uart_clock(CLOCK(config, "uart_clock", 153600));
+	uart_clock.signal_handler().set(m_uart, FUNC(ay31015_device::write_tcp));
+	uart_clock.signal_handler().append(m_uart, FUNC(ay31015_device::write_rcp));
+
 	RS232_PORT(config, "rs232", default_rs232_devices, "keyboard");
-MACHINE_CONFIG_END
+}
 
 ROM_START( micral )
 	ROM_REGION( 0x10000, "maincpu", 0 )

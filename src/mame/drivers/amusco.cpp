@@ -218,16 +218,16 @@ void amusco_state::mem_map(address_map &map)
 READ8_MEMBER( amusco_state::mc6845_r)
 {
 	if(offset & 1)
-		return m_crtc->register_r(space, 0);
+		return m_crtc->register_r();
 
-	return m_crtc->status_r(space,0); // not a plain 6845, requests update bit here ...
+	return m_crtc->status_r(); // not a plain 6845, requests update bit here ...
 }
 
 WRITE8_MEMBER( amusco_state::mc6845_w)
 {
 	if(offset & 1)
 	{
-		m_crtc->register_w(space, 0,data);
+		m_crtc->register_w(data);
 		if(m_mc6845_address == 0x12)
 			m_video_update_address = ((data & 0xff) << 8) | (m_video_update_address & 0x00ff);
 		if(m_mc6845_address == 0x13)
@@ -235,7 +235,7 @@ WRITE8_MEMBER( amusco_state::mc6845_w)
 	}
 	else
 	{
-		m_crtc->address_w(space,0,data);
+		m_crtc->address_w(data);
 		m_mc6845_address = data;
 	}
 }
@@ -372,7 +372,7 @@ void amusco_state::io_map(address_map &map)
 	map(0x0020, 0x0023).w(m_pit, FUNC(pit8253_device::write));
 	map(0x0030, 0x0033).rw("ppi_outputs", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x0040, 0x0043).rw("ppi_inputs", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x0060, 0x0060).w("sn", FUNC(sn76489a_device::command_w));
+	map(0x0060, 0x0060).w("sn", FUNC(sn76489a_device::write));
 	map(0x0070, 0x0071).w(FUNC(amusco_state::vram_w));
 	map(0x0280, 0x0283).rw("lpt_interface", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
 	map(0x0380, 0x0383).rw("rtc_interface", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));

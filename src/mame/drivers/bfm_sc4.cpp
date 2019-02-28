@@ -402,10 +402,10 @@ READ16_MEMBER(sc4_state::sc4_mem_r)
 							return ioport("IN-20")->read();
 
 						case 0x1244:
-							return m_ymz->read(space,0);
+							return m_ymz->read(0);
 
 						case 0x1246:
-							return m_ymz->read(space,1);
+							return m_ymz->read(1);
 
 						default:
 							logerror("%08x maincpu read access offset %08x mem_mask %04x cs %d (LAMPS etc.)\n", pc, offset*2, mem_mask, cs);
@@ -563,11 +563,11 @@ WRITE16_MEMBER(sc4_state::sc4_mem_w)
 							break;
 
 						case 0x1248:
-							m_ymz->write(space,0, data & 0xff);
+							m_ymz->write(0, data & 0xff);
 							break;
 
 						case 0x124a:
-							m_ymz->write(space,1, data & 0xff);
+							m_ymz->write(1, data & 0xff);
 							break;
 
 						case 0x1330:

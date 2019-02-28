@@ -2412,7 +2412,8 @@ Core Misc Options
 
     Save the NVRAM contents when exiting machine emulation. By turning this off,
     you can retain your previous NVRAM contents as any current changes made will
-    not be saved.
+    not be saved. Turning this option off will also unconditionally suppress the
+    saving of .nv files associated with some types of software cartridges.
 
     The default is ON (**-nvram_save**).
 

@@ -206,10 +206,10 @@ void freekick_state::omega_map(address_map &map)
 	map(0xe800, 0xe800).portr("IN1");
 	map(0xf000, 0xf000).portr("DSW1").nopw(); //bankswitch ?
 	map(0xf800, 0xf800).portr("DSW2");
-	map(0xfc00, 0xfc00).w("sn1", FUNC(sn76489a_device::command_w));
-	map(0xfc01, 0xfc01).w("sn2", FUNC(sn76489a_device::command_w));
-	map(0xfc02, 0xfc02).w("sn3", FUNC(sn76489a_device::command_w));
-	map(0xfc03, 0xfc03).w("sn4", FUNC(sn76489a_device::command_w));
+	map(0xfc00, 0xfc00).w("sn1", FUNC(sn76489a_device::write));
+	map(0xfc01, 0xfc01).w("sn2", FUNC(sn76489a_device::write));
+	map(0xfc02, 0xfc02).w("sn3", FUNC(sn76489a_device::write));
+	map(0xfc03, 0xfc03).w("sn4", FUNC(sn76489a_device::write));
 }
 
 void freekick_state::pbillrd_map(address_map &map)
@@ -225,10 +225,10 @@ void freekick_state::pbillrd_map(address_map &map)
 	map(0xe800, 0xe800).portr("IN1");
 	map(0xf000, 0xf000).portr("DSW1").w(FUNC(freekick_state::pbillrd_bankswitch_w));
 	map(0xf800, 0xf800).portr("DSW2");
-	map(0xfc00, 0xfc00).w("sn1", FUNC(sn76489a_device::command_w));
-	map(0xfc01, 0xfc01).w("sn2", FUNC(sn76489a_device::command_w));
-	map(0xfc02, 0xfc02).w("sn3", FUNC(sn76489a_device::command_w));
-	map(0xfc03, 0xfc03).w("sn4", FUNC(sn76489a_device::command_w));
+	map(0xfc00, 0xfc00).w("sn1", FUNC(sn76489a_device::write));
+	map(0xfc01, 0xfc01).w("sn2", FUNC(sn76489a_device::write));
+	map(0xfc02, 0xfc02).w("sn3", FUNC(sn76489a_device::write));
+	map(0xfc03, 0xfc03).w("sn4", FUNC(sn76489a_device::write));
 }
 
 void freekick_state::decrypted_opcodes_map(address_map &map)
@@ -250,10 +250,10 @@ void freekick_state::freekick_map(address_map &map)
 	map(0xf802, 0xf802).nopr(); //MUST return bit 0 = 0, otherwise game resets
 	map(0xf803, 0xf803).r(FUNC(freekick_state::spinner_r));
 	map(0xf800, 0xf807).w(m_outlatch, FUNC(ls259_device::write_d0));
-	map(0xfc00, 0xfc00).w("sn1", FUNC(sn76489a_device::command_w));
-	map(0xfc01, 0xfc01).w("sn2", FUNC(sn76489a_device::command_w));
-	map(0xfc02, 0xfc02).w("sn3", FUNC(sn76489a_device::command_w));
-	map(0xfc03, 0xfc03).w("sn4", FUNC(sn76489a_device::command_w));
+	map(0xfc00, 0xfc00).w("sn1", FUNC(sn76489a_device::write));
+	map(0xfc01, 0xfc01).w("sn2", FUNC(sn76489a_device::write));
+	map(0xfc02, 0xfc02).w("sn3", FUNC(sn76489a_device::write));
+	map(0xfc03, 0xfc03).w("sn4", FUNC(sn76489a_device::write));
 }
 
 void freekick_state::gigas_map(address_map &map)
@@ -268,10 +268,10 @@ void freekick_state::gigas_map(address_map &map)
 	map(0xe800, 0xe800).portr("IN1");
 	map(0xf000, 0xf000).portr("DSW1").nopw(); //bankswitch ?
 	map(0xf800, 0xf800).portr("DSW2");
-	map(0xfc00, 0xfc00).w("sn1", FUNC(sn76489a_device::command_w));
-	map(0xfc01, 0xfc01).w("sn2", FUNC(sn76489a_device::command_w));
-	map(0xfc02, 0xfc02).w("sn3", FUNC(sn76489a_device::command_w));
-	map(0xfc03, 0xfc03).w("sn4", FUNC(sn76489a_device::command_w));
+	map(0xfc00, 0xfc00).w("sn1", FUNC(sn76489a_device::write));
+	map(0xfc01, 0xfc01).w("sn2", FUNC(sn76489a_device::write));
+	map(0xfc02, 0xfc02).w("sn3", FUNC(sn76489a_device::write));
+	map(0xfc03, 0xfc03).w("sn4", FUNC(sn76489a_device::write));
 }
 
 void freekick_state::omega_io_map(address_map &map)
@@ -751,7 +751,7 @@ MACHINE_CONFIG_START(freekick_state::omega)
 	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, freekick_state, vblank_irq))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_freekick)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_freekick);
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 0x200);
 
 	// sound hardware
@@ -789,7 +789,7 @@ MACHINE_CONFIG_START(freekick_state::base)
 	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, freekick_state, vblank_irq))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_freekick)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_freekick);
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 0x200);
 
 	/* sound hardware */

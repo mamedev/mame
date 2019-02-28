@@ -1187,7 +1187,8 @@ void bullet_state::bullet(machine_config &config)
 //  MACHINE_CONFIG( bulletf )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(bulletf_state::bulletf)
+void bulletf_state::bulletf(machine_config &config)
+{
 	// basic machine hardware
 	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &bulletf_state::bulletf_mem);
@@ -1263,20 +1264,19 @@ MACHINE_CONFIG_START(bulletf_state::bulletf)
 	m_scsibus->req_handler().set(FUNC(bulletf_state::req_w));
 	m_scsibus->io_handler().set(m_scsi_ctrl_in, FUNC(input_buffer_device::write_bit7));
 	m_scsibus->set_data_input_buffer(m_scsi_data_in);
+	m_scsibus->set_slot_device(1, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
 
 	OUTPUT_LATCH(config, m_scsi_data_out);
 	m_scsibus->set_output_latch(*m_scsi_data_out);
 	INPUT_BUFFER(config, m_scsi_data_in);
 	INPUT_BUFFER(config, m_scsi_ctrl_in);
 
-	MCFG_SCSIDEV_ADD(SCSIBUS_TAG ":" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_0)
-
 	// software lists
 	SOFTWARE_LIST(config, "flop_list").set_original("wmbullet");
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("128K");
-MACHINE_CONFIG_END
+}
 
 
 

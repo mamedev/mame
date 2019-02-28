@@ -24,12 +24,12 @@ public:
 	auto rts_handler() { return m_rts_handler.bind(); }
 	auto irq_handler() { return m_irq_handler.bind(); }
 
-	DECLARE_WRITE8_MEMBER( control_w );
-	DECLARE_READ8_MEMBER( status_r );
-	DECLARE_WRITE8_MEMBER( data_w );
-	DECLARE_READ8_MEMBER( data_r );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( read );
+	void control_w(uint8_t data);
+	uint8_t status_r();
+	void data_w(uint8_t data);
+	uint8_t data_r();
+	void write(offs_t offset, uint8_t data);
+	uint8_t read(offs_t offset);
 
 	DECLARE_WRITE_LINE_MEMBER( write_cts );
 	DECLARE_WRITE_LINE_MEMBER( write_dcd );

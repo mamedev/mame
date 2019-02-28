@@ -129,24 +129,25 @@ void bbc_tube_80286_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ8_MEMBER(bbc_tube_80286_device::host_r)
+uint8_t bbc_tube_80286_device::host_r(offs_t offset)
 {
-	return m_ula->host_r(space, offset);
+	return m_ula->host_r(offset);
 }
 
-WRITE8_MEMBER(bbc_tube_80286_device::host_w)
+void bbc_tube_80286_device::host_w(offs_t offset, uint8_t data)
 {
-	m_ula->host_w(space, offset, data);
+	m_ula->host_w(offset, data);
 }
 
-READ8_MEMBER(bbc_tube_80286_device::disable_boot_rom)
+uint8_t bbc_tube_80286_device::disable_boot_rom()
 {
-	m_i80286->space(AS_PROGRAM).install_ram(0xc0000, 0xfffff, m_ram->pointer() + 0xc0000);
+	if (!machine().side_effects_disabled())
+		m_i80286->space(AS_PROGRAM).install_ram(0xc0000, 0xfffff, m_ram->pointer() + 0xc0000);
 
 	return 0xff;
 }
 
-WRITE8_MEMBER(bbc_tube_80286_device::irq_latch_w)
+void bbc_tube_80286_device::irq_latch_w(uint8_t data)
 {
 	m_irq_latch = data;
 }

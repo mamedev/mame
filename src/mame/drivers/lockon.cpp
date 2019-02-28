@@ -470,20 +470,20 @@ void lockon_state::machine_reset()
 	m_main_inten = 0;
 }
 
-MACHINE_CONFIG_START(lockon_state::lockon)
+void lockon_state::lockon(machine_config &config)
+{
+	V30(config, m_maincpu, 16_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &lockon_state::main_v30);
 
-	MCFG_DEVICE_ADD("maincpu", V30, 16_MHz_XTAL / 2)
-	MCFG_DEVICE_PROGRAM_MAP(main_v30)
+	V30(config, m_ground, 16_MHz_XTAL / 2);
+	m_ground->set_addrmap(AS_PROGRAM, &lockon_state::ground_v30);
 
-	MCFG_DEVICE_ADD("ground", V30, 16_MHz_XTAL / 2)
-	MCFG_DEVICE_PROGRAM_MAP(ground_v30)
+	V30(config, m_object, 16_MHz_XTAL / 2);
+	m_object->set_addrmap(AS_PROGRAM, &lockon_state::object_v30);
 
-	MCFG_DEVICE_ADD("object", V30, 16_MHz_XTAL / 2)
-	MCFG_DEVICE_PROGRAM_MAP(object_v30)
-
-	MCFG_DEVICE_ADD("audiocpu", Z80, 16_MHz_XTAL / 4)
-	MCFG_DEVICE_PROGRAM_MAP(sound_prg)
-	MCFG_DEVICE_IO_MAP(sound_io)
+	Z80(config, m_audiocpu, 16_MHz_XTAL / 4);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &lockon_state::sound_prg);
+	m_audiocpu->set_addrmap(AS_IO, &lockon_state::sound_io);
 
 	WATCHDOG_TIMER(config, m_watchdog).set_time(PERIOD_OF_555_ASTABLE(10000, 4700, 10000e-12) * 4096);
 	config.m_minimum_quantum = attotime::from_hz(600);
@@ -494,12 +494,12 @@ MACHINE_CONFIG_START(lockon_state::lockon)
 	adc.in_callback<2>().set_ioport("ADC_MISSILE");
 	adc.in_callback<3>().set_ioport("ADC_HOVER");
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(lockon_state, screen_update_lockon)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, lockon_state, screen_vblank_lockon))
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
+	m_screen->set_screen_update(FUNC(lockon_state::screen_update_lockon));
+	m_screen->screen_vblank().set(FUNC(lockon_state::screen_vblank_lockon));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lockon);
 	PALETTE(config, m_palette, FUNC(lockon_state::lockon_palette), 1024 + 2048);
@@ -526,7 +526,7 @@ MACHINE_CONFIG_START(lockon_state::lockon)
 	FILTER_VOLUME(config, "f2203.2r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 	FILTER_VOLUME(config, "f2203.3l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	FILTER_VOLUME(config, "f2203.3r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-MACHINE_CONFIG_END
+}
 
 
 /*************************************

@@ -252,11 +252,12 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
 DEVICE_INPUT_DEFAULTS_END
 
-MACHINE_CONFIG_START(vme_fccpu20_device::device_add_mconfig)
+void vme_fccpu20_device::device_add_mconfig(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68020, CLOCK50 / 3) /* Crytstal verified from picture HCI */
-	MCFG_DEVICE_PROGRAM_MAP (cpu20_mem)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("bim", bim68153_device, iack)
+	M68020(config, m_maincpu, CLOCK50 / 3); /* Crytstal verified from picture HCI */
+	m_maincpu->set_addrmap(AS_PROGRAM, &vme_fccpu20_device::cpu20_mem);
+	m_maincpu->set_irq_acknowledge_callback("bim", FUNC(bim68153_device::iack));
 
 	/* PIT Parallel Interface and Timer device, assumed strapped for on board clock */
 	PIT68230(config, m_pit, CLOCK32 / 4); /* Crystal not verified */
@@ -312,59 +313,60 @@ MACHINE_CONFIG_START(vme_fccpu20_device::device_add_mconfig)
 	rs232_port_device &rs232p3(RS232_PORT(config, RS232P3_TAG, default_rs232_devices, nullptr));
 	rs232p3.rxd_handler().set(m_mpcc3, FUNC(mpcc68561_device::write_rx));
 	rs232p3.cts_handler().set(m_mpcc3, FUNC(mpcc68561_device::cts_w));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(vme_fccpu20_card_device::device_add_mconfig)
+void vme_fccpu20_card_device::device_add_mconfig(machine_config &config)
+{
 	vme_fccpu20_device::device_add_mconfig(config);
-MACHINE_CONFIG_END
+}
 
 // SYS68K/CPU-21S Part No.1 01 041 - 68020 CPU board + FPU 68881 at 12.5 MHz, 512 KB RAM
-MACHINE_CONFIG_START(vme_fccpu21s_card_device::device_add_mconfig)
+void vme_fccpu21s_card_device::device_add_mconfig(machine_config &config)
+{
 	vme_fccpu20_device::device_add_mconfig(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(CLOCK50 / 4)
-MACHINE_CONFIG_END
+	m_maincpu->set_clock(CLOCK50 / 4);
+}
 
 // SYS68K/CPU-21 Part No.1 01 001 - 68020 CPU board (CPU-20) + FPU 68881 at 16.7 MHz, 512 KB RAM
-MACHINE_CONFIG_START(vme_fccpu21_card_device::device_add_mconfig)
+void vme_fccpu21_card_device::device_add_mconfig(machine_config &config)
+{
 	vme_fccpu20_device::device_add_mconfig(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(CLOCK50 / 3)
-MACHINE_CONFIG_END
+	m_maincpu->set_clock(CLOCK50 / 3);
+}
 
 // SYS68K/CPU-21A Part No.1 01 011 - 68020 CPU board + FPU 68881 at 20 MHz, 512 KB RAM
-MACHINE_CONFIG_START(vme_fccpu21a_card_device::device_add_mconfig)
+void vme_fccpu21a_card_device::device_add_mconfig(machine_config &config)
+{
 	vme_fccpu20_device::device_add_mconfig(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(CLOCK40 / 2)
-MACHINE_CONFIG_END
+	m_maincpu->set_clock(CLOCK40 / 2);
+}
 
 // SYS68K/CPU-21YA Part No.1 01 061 - 68020 CPU board + FPU 68881 at 20 MHz, 2048 KB RAM
-MACHINE_CONFIG_START(vme_fccpu21ya_card_device::device_add_mconfig)
+void vme_fccpu21ya_card_device::device_add_mconfig(machine_config &config)
+{
 	vme_fccpu20_device::device_add_mconfig(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(CLOCK40 / 2)
-MACHINE_CONFIG_END
+	m_maincpu->set_clock(CLOCK40 / 2);
+}
 
 // SYS68K/CPU-21B Part No.1 01 021 - 68020 CPU board + FPU 68881 at 25 MHz, 512 KB RAM
-MACHINE_CONFIG_START(vme_fccpu21b_card_device::device_add_mconfig)
+void vme_fccpu21b_card_device::device_add_mconfig(machine_config &config)
+{
 	vme_fccpu20_device::device_add_mconfig(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(CLOCK50 / 2)
-MACHINE_CONFIG_END
+	m_maincpu->set_clock(CLOCK50 / 2);
+}
 
 // SYS68K/CPU-21YB Part No.1 01 071 - 68020 CPU board + FPU 68881 at 25 MHz, 2048 KB RAM
-MACHINE_CONFIG_START(vme_fccpu21yb_card_device::device_add_mconfig)
+void vme_fccpu21yb_card_device::device_add_mconfig(machine_config &config)
+{
 	vme_fccpu20_device::device_add_mconfig(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(CLOCK50 / 2)
-MACHINE_CONFIG_END
+	m_maincpu->set_clock(CLOCK50 / 2);
+}
 
 
 //**************************************************************************

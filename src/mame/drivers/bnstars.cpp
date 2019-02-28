@@ -823,7 +823,7 @@ MACHINE_CONFIG_START(bnstars_state::bnstars)
 
 	config.m_minimum_quantum = attotime::from_hz(60000);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bnstars)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bnstars);
 
 	auto &palette(PALETTE(config, "palette"));
 	palette.set_format(palette_device::xBRG_888, 0x8000);

@@ -194,7 +194,7 @@ template<int Layer> WRITE32_MEMBER(backfire_state::pf_rowscroll_w){ data &= 0x00
 READ32_MEMBER(backfire_state::pot_select_r)
 {
 	if (!machine().side_effects_disabled())
-		m_adc->address_offset_start_w(space, offset, 0);
+		m_adc->address_offset_start_w(offset, 0);
 	return 0;
 }
 
@@ -377,7 +377,7 @@ MACHINE_CONFIG_START(backfire_state::backfire)
 	/* video hardware */
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_backfire)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_backfire);
 	config.set_default_layout(layout_dualhsxs);
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)

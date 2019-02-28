@@ -29,7 +29,7 @@
 #define LOG_REGS        (LOG_READS | LOG_WRITES)
 #define LOG_ALL         (LOG_REGS | LOG_COMMANDS | LOG_ERRORS | LOG_MISC | LOG_LINES | LOG_STATE | LOG_STEP)
 
-#define VERBOSE         (LOG_COMMANDS | LOG_ERRORS)
+#define VERBOSE         (0)
 #include "logmacro.h"
 
 enum register_addresses_e : uint8_t {

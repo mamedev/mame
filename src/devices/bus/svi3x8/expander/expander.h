@@ -40,36 +40,6 @@
 #pragma once
 
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_SVI_EXPANDER_BUS_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, SVI_EXPANDER, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(svi_expander_modules, nullptr, false)
-#define MCFG_SVI_EXPANDER_INT_HANDLER(_devcb) \
-	downcast<svi_expander_device &>(*device).set_int_handler(DEVCB_##_devcb);
-
-#define MCFG_SVI_EXPANDER_ROMDIS_HANDLER(_devcb) \
-	downcast<svi_expander_device &>(*device).set_romdis_handler(DEVCB_##_devcb);
-
-#define MCFG_SVI_EXPANDER_RAMDIS_HANDLER(_devcb) \
-	downcast<svi_expander_device &>(*device).set_ramdis_handler(DEVCB_##_devcb);
-
-#define MCFG_SVI_EXPANDER_CTRL1_HANDLER(_devcb) \
-	downcast<svi_expander_device &>(*device).set_ctrl1_handler(DEVCB_##_devcb);
-
-#define MCFG_SVI_EXPANDER_CTRL2_HANDLER(_devcb) \
-	downcast<svi_expander_device &>(*device).set_ctrl2_handler(DEVCB_##_devcb);
-
-#define MCFG_SVI_EXPANDER_EXCSR_HANDLER(_devcb) \
-	downcast<svi_expander_device &>(*device).set_excsr_handler(DEVCB_##_devcb);
-
-#define MCFG_SVI_EXPANDER_EXCSW_HANDLER(_devcb) \
-	downcast<svi_expander_device &>(*device).set_excsw_handler(DEVCB_##_devcb);
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -82,17 +52,27 @@ class svi_expander_device : public device_t, public device_slot_interface
 {
 public:
 	// construction/destruction
+	template <typename T>
+	svi_expander_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts)
+		: svi_expander_device(mconfig, tag, owner, uint32_t(0))
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(nullptr);
+		set_fixed(false);
+	}
+
 	svi_expander_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~svi_expander_device();
 
 	// callbacks
-	template <class Object> devcb_base &set_int_handler(Object &&cb) { return m_int_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_romdis_handler(Object &&cb) { return m_romdis_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_ramdis_handler(Object &&cb) { return m_ramdis_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_ctrl1_handler(Object &&cb) { return m_ctrl1_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_ctrl2_handler(Object &&cb) { return m_ctrl2_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_excsr_handler(Object &&cb) { return m_excsr_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_excsw_handler(Object &&cb) { return m_excsw_handler.set_callback(std::forward<Object>(cb)); }
+	auto int_handler() { return m_int_handler.bind(); }
+	auto romdis_handler() { return m_romdis_handler.bind(); }
+	auto ramdis_handler() { return m_ramdis_handler.bind(); }
+	auto ctrl1_handler() { return m_ctrl1_handler.bind(); }
+	auto ctrl2_handler() { return m_ctrl2_handler.bind(); }
+	auto excsr_handler() { return m_excsr_handler.bind(); }
+	auto excsw_handler() { return m_excsw_handler.bind(); }
 
 	// called from cart device
 	DECLARE_WRITE_LINE_MEMBER( int_w ) { m_int_handler(state); }

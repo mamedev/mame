@@ -42,7 +42,7 @@ The keyboard of the KC is driven by a remote control circuit that is
 originally designed for infrared remote control. This one was named
 U807 and I learned there should be a similar chip called SAB 3021
 available but I never found the specs on the web. The SAB 3021 was
-produced by Valvo which doesn't exist anymore (bought by Phillips
+produced by Valvo which doesn't exist anymore (bought by Philips
 if I remember correctly). If you have more luck finding the specs
 I'm still interested.
 There also was a complementary chip for the receiving side but that

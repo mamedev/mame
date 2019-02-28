@@ -134,7 +134,7 @@ void aftrshok_state::sound_data_w(u8 data)
 void aftrshok_state::mcu_p3_w(u8 data)
 {
 	if (!BIT(data, 1) && !BIT(data, 2))
-		m_oki->write(machine().dummy_space(), 0, m_sound_data);
+		m_oki->write(m_sound_data);
 }
 
 void aftrshok_state::prog_map(address_map &map)

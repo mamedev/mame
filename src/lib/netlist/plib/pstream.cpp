@@ -8,9 +8,9 @@
 #include "pstream.h"
 #include "palloc.h"
 
+#include <algorithm>
 #include <cstdio>
 #include <cstdlib>
-#include <algorithm>
 
 // VS2015 prefers _dup
 #ifdef _WIN32
@@ -20,10 +20,6 @@
 #endif
 
 namespace plib {
-
-pstream::~pstream()
-{
-}
 
 // -----------------------------------------------------------------------------
 // pistream: input stream
@@ -124,10 +120,6 @@ pstdin::pstdin()
 	/* nothing to do */
 }
 
-pstdin::~pstdin()
-{
-}
-
 // -----------------------------------------------------------------------------
 // Output file stream
 // -----------------------------------------------------------------------------
@@ -169,7 +161,6 @@ void pofilestream::vwrite(const value_type *buf, const pos_type n)
 	std::size_t r = fwrite(buf, 1, n, static_cast<FILE *>(m_file));
 	if (r < n)
 	{
-		//printf("%ld %ld %s\n", r, n, strerror(errno));
 		if (ferror(static_cast<FILE *>(m_file)))
 			throw file_write_e(m_filename);
 	}
@@ -199,11 +190,6 @@ pstream::pos_type pofilestream::vtell() const
 		return static_cast<pos_type>(ret);
 }
 
-postringstream::~postringstream()
-{
-}
-
-
 // -----------------------------------------------------------------------------
 // pstderr: write to stderr
 // -----------------------------------------------------------------------------
@@ -217,10 +203,6 @@ pstderr::pstderr()
 {
 }
 
-pstderr::~pstderr()
-{
-}
-
 // -----------------------------------------------------------------------------
 // pstdout: write to stdout
 // -----------------------------------------------------------------------------
@@ -231,10 +213,6 @@ pstdout::pstdout()
 #else
 : pofilestream(fdopen(dup(fileno(stdout)), "wb"), "<stdout>", true)
 #endif
-{
-}
-
-pstdout::~pstdout()
 {
 }
 
@@ -254,10 +232,6 @@ pimemstream::pimemstream()
 
 pimemstream::pimemstream(const pomemstream &ostrm)
 : pistream(FLAG_SEEKABLE), m_pos(0), m_len(ostrm.size()), m_mem(reinterpret_cast<const char *>(ostrm.memory()))
-{
-}
-
-pimemstream::~pimemstream()
 {
 }
 
@@ -289,10 +263,6 @@ pimemstream::pos_type pimemstream::vtell() const
 	return m_pos;
 }
 
-pistringstream::~pistringstream()
-{
-}
-
 // -----------------------------------------------------------------------------
 // Output memory stream
 // -----------------------------------------------------------------------------
@@ -300,13 +270,13 @@ pistringstream::~pistringstream()
 pomemstream::pomemstream()
 : postream(FLAG_SEEKABLE), m_pos(0), m_capacity(1024), m_size(0)
 {
-	m_mem = palloc_array<char>(m_capacity);
+	m_mem = pnew_array<char>(m_capacity);
 }
 
 pomemstream::~pomemstream()
 {
 	if (m_mem != nullptr)
-		pfree_array(m_mem);
+		pdelete_array(m_mem);
 }
 
 void pomemstream::vwrite(const value_type *buf, const pos_type n)
@@ -316,13 +286,13 @@ void pomemstream::vwrite(const value_type *buf, const pos_type n)
 		while (m_pos + n >= m_capacity)
 			m_capacity *= 2;
 		char *o = m_mem;
-		m_mem = palloc_array<char>(m_capacity);
+		m_mem = pnew_array<char>(m_capacity);
 		if (m_mem == nullptr)
 		{
 			throw out_of_mem_e("pomemstream::vwrite");
 		}
 		std::copy(o, o + m_pos, m_mem);
-		pfree_array(o);
+		pdelete_array(o);
 	}
 
 	std::copy(buf, buf + n, m_mem + m_pos);
@@ -339,13 +309,13 @@ void pomemstream::vseek(const pos_type n)
 		while (m_size >= m_capacity)
 			m_capacity *= 2;
 		char *o = m_mem;
-		m_mem = palloc_array<char>(m_capacity);
+		m_mem = pnew_array<char>(m_capacity);
 		if (m_mem == nullptr)
 		{
 			throw out_of_mem_e("pomemstream::vseek");
 		}
 		std::copy(o, o + m_pos, m_mem);
-		pfree_array(o);
+		pdelete_array(o);
 	}
 }
 
@@ -377,10 +347,6 @@ bool putf8_reader::readline(pstring &line)
 }
 
 
-putf8_fmt_writer::~putf8_fmt_writer()
-{
-}
-
 void putf8_fmt_writer::vdowrite(const pstring &ls) const
 {
 	write(ls);
@@ -388,4 +354,4 @@ void putf8_fmt_writer::vdowrite(const pstring &ls) const
 
 
 
-}
+} // namespace plib

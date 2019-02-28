@@ -10,8 +10,8 @@
 #include "plists.h"
 
 #include <algorithm>
-#include <stack>
 #include <atomic>
+#include <stack>
 
 template <typename T>
 std::size_t strlen_mem(const T *s)

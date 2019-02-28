@@ -845,7 +845,7 @@ MACHINE_CONFIG_START(exidy_state::base)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", exidy_state,  exidy_vblank_interrupt)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_exidy)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_exidy);
 	MCFG_PALETTE_ADD("palette", 8)
 
 	MCFG_SCREEN_ADD("screen", RASTER)

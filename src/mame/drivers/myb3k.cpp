@@ -930,7 +930,8 @@ static void stepone_isa_cards(device_slot_interface &device)
 	device.option_add("myb3k_fdc4711", ISA8_MYB3K_FDC4711);
 }
 
-MACHINE_CONFIG_START(myb3k_state::myb3k)
+void myb3k_state::myb3k(machine_config &config)
+{
 	/* basic machine hardware */
 	I8088(config, m_maincpu, XTAL(14'318'181) / 3); /* 14.3182 main crystal divided by three through a 8284A */
 	m_maincpu->set_addrmap(AS_PROGRAM, &myb3k_state::myb3k_map);
@@ -1000,9 +1001,9 @@ MACHINE_CONFIG_START(myb3k_state::myb3k)
 	m_isabus->drq2_callback().set("dma", FUNC(i8257_device::dreq2_w));
 	m_isabus->drq3_callback().set("dma", FUNC(i8257_device::dreq3_w));
 
-	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "isa", stepone_isa_cards, "myb3k_fdc4711", false) // FIXME: determine ISA bus clock
-	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "isa", stepone_isa_cards, "myb3k_com", false)
-	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "isa", stepone_isa_cards, nullptr, false)
+	ISA8_SLOT(config, "isa1", 0, m_isabus, stepone_isa_cards, "myb3k_fdc4711", false); // FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "isa2", 0, m_isabus, stepone_isa_cards, "myb3k_com", false);
+	ISA8_SLOT(config, "isa3", 0, m_isabus, stepone_isa_cards, nullptr, false);
 
 	/* Centronics */
 
@@ -1017,18 +1018,17 @@ MACHINE_CONFIG_START(myb3k_state::myb3k)
 
 	/* Sound */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* Keyboard */
 	MYB3K_KEYBOARD(config, m_kb, 0);
 	m_kb->set_keyboard_callback(FUNC(myb3k_state::kbd_set_data_and_interrupt));
 
 	/* Monitor */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(14'318'181) / 3, 600, 0, 600, 400, 0, 400)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", h46505_device, screen_update)
-MACHINE_CONFIG_END
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(XTAL(14'318'181) / 3, 600, 0, 600, 400, 0, 400);
+	m_screen->set_screen_update("crtc", FUNC(h46505_device::screen_update));
+}
 
 void myb3k_state::jb3000(machine_config &config)
 {

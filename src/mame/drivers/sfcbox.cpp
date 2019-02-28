@@ -456,22 +456,22 @@ void sfcbox_state::machine_reset()
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-MACHINE_CONFIG_START(sfcbox_state::sfcbox)
-
+void sfcbox_state::sfcbox(machine_config &config)
+{
 	/* base snes hardware */
-	MCFG_DEVICE_ADD("maincpu", _5A22, 3580000*6)   /* 2.68Mhz, also 3.58Mhz */
-	MCFG_DEVICE_PROGRAM_MAP(snes_map)
+	_5A22(config, m_maincpu, 3580000*6);   /* 2.68Mhz, also 3.58Mhz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &sfcbox_state::snes_map);
 
 	// runs at 24.576 MHz / 12 = 2.048 MHz
-	MCFG_DEVICE_ADD("soundcpu", SPC700, XTAL(24'576'000) / 12)
-	MCFG_DEVICE_PROGRAM_MAP(spc_mem)
+	SPC700(config, m_soundcpu, XTAL(24'576'000) / 12);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &sfcbox_state::spc_mem);
 
 	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	/* sfcbox hardware */
-	MCFG_DEVICE_ADD("bios", Z180, XTAL(12'000'000) / 2)  /* HD64180RF6X */
-	MCFG_DEVICE_PROGRAM_MAP(sfcbox_map)
-	MCFG_DEVICE_IO_MAP(sfcbox_io)
+	Z180(config, m_bios, XTAL(12'000'000) / 2);  /* HD64180RF6X */
+	m_bios->set_addrmap(AS_PROGRAM, &sfcbox_state::sfcbox_map);
+	m_bios->set_addrmap(AS_IO, &sfcbox_state::sfcbox_io);
 
 	MB90082(config, m_mb90082, XTAL(12'000'000) / 2); /* TODO: correct clock */
 	S3520CF(config, m_s3520cf); /* RTC */
@@ -479,33 +479,33 @@ MACHINE_CONFIG_START(sfcbox_state::sfcbox)
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("spc700", SNES_SOUND)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
+	SNES_SOUND(config, m_spc700);
+	m_spc700->add_route(0, "lspeaker", 1.00);
+	m_spc700->add_route(1, "rspeaker", 1.00);
 
 	/* video hardware */
 	/* TODO: the screen should actually superimpose, but for the time being let's just separate outputs */
 	config.set_default_layout(layout_dualhsxs);
 
 	// SNES PPU
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(DOTCLK_NTSC, SNES_HTOTAL, 0, SNES_SCR_WIDTH, SNES_VTOTAL_NTSC, 0, SNES_SCR_HEIGHT_NTSC)
-	MCFG_SCREEN_UPDATE_DRIVER( snes_state, screen_update )
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(DOTCLK_NTSC, SNES_HTOTAL, 0, SNES_SCR_WIDTH, SNES_VTOTAL_NTSC, 0, SNES_SCR_HEIGHT_NTSC);
+	screen.set_screen_update(FUNC(snes_state::screen_update));
 
 	SNES_PPU(config, m_ppu, MCLK_NTSC);
 	m_ppu->open_bus_callback().set([this] { return snes_open_bus_r(); }); // lambda because overloaded function name
 	m_ppu->set_screen("screen");
 
 	// SFCBOX
-	MCFG_SCREEN_ADD("osd", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-//  MCFG_SCREEN_SIZE(24*12+22, 12*18+22)
-//  MCFG_SCREEN_VISIBLE_AREA(0*8, 24*12-1, 0*8, 12*18-1)
-	MCFG_SCREEN_SIZE(24*16+22, 12*16+22)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 24*16-1, 0*8, 12*16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(sfcbox_state,screen_update)
-MACHINE_CONFIG_END
+	screen_device &osd(SCREEN(config, "osd", SCREEN_TYPE_RASTER));
+	osd.set_refresh_hz(60);
+	osd.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+//  osd.set_size(24*12+22, 12*18+22);
+//  osd.set_visarea(0*8, 24*12-1, 0*8, 12*18-1);
+	osd.set_size(24*16+22, 12*16+22);
+	osd.set_visarea(0*8, 24*16-1, 0*8, 12*16-1);
+	osd.set_screen_update(FUNC(sfcbox_state::screen_update));
+}
 
 /***************************************************************************
 

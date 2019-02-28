@@ -375,24 +375,24 @@ GFXDECODE_END
 
 
 
-MACHINE_CONFIG_START(mainsnk_state::mainsnk)
+void mainsnk_state::mainsnk(machine_config &config)
+{
+	Z80(config, m_maincpu, 3360000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mainsnk_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(mainsnk_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("maincpu", Z80, 3360000)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mainsnk_state,  irq0_line_hold)
-
-	MCFG_DEVICE_ADD("audiocpu", Z80,4000000)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(sound_portmap)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(mainsnk_state, irq0_line_assert,  244)
+	Z80(config, m_audiocpu, 4000000);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &mainsnk_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &mainsnk_state::sound_portmap);
+	m_audiocpu->set_periodic_int(FUNC(mainsnk_state::irq0_line_assert), attotime::from_hz(244));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(36*8, 28*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 1*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mainsnk_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_size(36*8, 28*8);
+	screen.set_visarea(0*8, 36*8-1, 1*8, 28*8-1);
+	screen.set_screen_update(FUNC(mainsnk_state::screen_update));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mainsnk);
 	PALETTE(config, m_palette, FUNC(mainsnk_state::mainsnk_palette), 0x400);
@@ -406,7 +406,7 @@ MACHINE_CONFIG_START(mainsnk_state::mainsnk)
 
 	AY8910(config, "ay1", 2000000).add_route(ALL_OUTPUTS, "mono", 0.35);
 	AY8910(config, "ay2", 2000000).add_route(ALL_OUTPUTS, "mono", 0.35);
-MACHINE_CONFIG_END
+}
 
 
 ROM_START(mainsnk)

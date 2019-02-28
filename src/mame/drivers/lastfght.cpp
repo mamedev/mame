@@ -553,28 +553,28 @@ void lastfght_state::machine_reset()
 	m_c00006 = 0;
 }
 
-MACHINE_CONFIG_START(lastfght_state::lastfght)
-
+void lastfght_state::lastfght(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", H83044, 32000000/2)
-	MCFG_DEVICE_PROGRAM_MAP( lastfght_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lastfght_state, irq0_line_hold)
+	H83044(config, m_maincpu, 32000000/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &lastfght_state::lastfght_map);
+	m_maincpu->set_vblank_int("screen", FUNC(lastfght_state::irq0_line_hold));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_PALETTE_ADD( "palette", 256 )
+	PALETTE(config, m_palette).set_entries(256);
 
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // HMC HM86171 VGA 256 colour RAMDAC
 	ramdac.set_addrmap(0, &lastfght_state::ramdac_map);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SIZE( 512, 256 )
-	MCFG_SCREEN_VISIBLE_AREA( 0, 512-1, 0, 256-16-1 )
-	MCFG_SCREEN_REFRESH_RATE( 60 )
-	MCFG_SCREEN_UPDATE_DRIVER(lastfght_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-MACHINE_CONFIG_END
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_size(512, 256);
+	m_screen->set_visarea(0, 512-1, 0, 256-16-1);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_screen_update(FUNC(lastfght_state::screen_update));
+	m_screen->set_palette(m_palette);
+}
 
 
 /***************************************************************************

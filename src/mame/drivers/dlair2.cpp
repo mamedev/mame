@@ -200,7 +200,7 @@ MACHINE_CONFIG_START(dlair2_state::dlair2)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-//  MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dlair2)
+//  GFXDECODE(config, "gfxdecode", "palette", gfx_dlair2);
 
 	PALETTE(config, "palette", FUNC(dlair2_state::dlair2_palette), 256);
 

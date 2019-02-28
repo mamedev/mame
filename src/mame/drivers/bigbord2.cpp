@@ -559,7 +559,7 @@ MACHINE_CONFIG_START(bigbord2_state::bigbord2)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(10.69425_MHz_XTAL, 700, 0, 560, 260, 0, 240)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_crt8002)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_crt8002);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	CLOCK(config, "ctc_clock", MAIN_CLOCK).signal_handler().set(FUNC(bigbord2_state::clock_w));

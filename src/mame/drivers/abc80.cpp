@@ -531,7 +531,7 @@ MACHINE_CONFIG_START(abc80_state::abc80)
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, KEYBOARD_TAG, 0));
 	keyboard.set_keyboard_callback(FUNC(abc80_state::kbd_w));
 
-	MCFG_QUICKLOAD_ADD("quickload", abc80_state, bac, "bac", 2)
+	MCFG_QUICKLOAD_ADD("quickload", abc80_state, bac, "bac", attotime::from_seconds(2))
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("16K");

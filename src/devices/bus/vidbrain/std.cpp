@@ -47,7 +47,7 @@ void videobrain_standard_cartridge_device::device_start()
 //  videobrain_bo_r - cartridge data read
 //-------------------------------------------------
 
-uint8_t videobrain_standard_cartridge_device::videobrain_bo_r(address_space &space, offs_t offset, int cs1, int cs2)
+uint8_t videobrain_standard_cartridge_device::videobrain_bo_r(offs_t offset, int cs1, int cs2)
 {
 	uint8_t data = 0;
 

@@ -258,7 +258,7 @@ WRITE16_MEMBER(hp9k3xx_state::led_w)
 void hp9k3xx_state::add_dio16_bus(machine_config &config)
 {
 	bus::hp_dio::dio16_device &dio16(DIO16(config, "diobus", 0));
-	dio16.set_cputag(m_maincpu);
+	dio16.set_program_space(m_maincpu, AS_PROGRAM);
 
 	dio16.irq1_out_cb().set(FUNC(hp9k3xx_state::dio_irq1_w));
 	dio16.irq2_out_cb().set(FUNC(hp9k3xx_state::dio_irq2_w));
@@ -272,7 +272,7 @@ void hp9k3xx_state::add_dio16_bus(machine_config &config)
 void hp9k3xx_state::add_dio32_bus(machine_config &config)
 {
 	bus::hp_dio::dio32_device &dio32(DIO32(config, "diobus", 0));
-	dio32.set_cputag(m_maincpu);
+	dio32.set_program_space(m_maincpu, AS_PROGRAM);
 
 	dio32.irq1_out_cb().set(FUNC(hp9k3xx_state::dio_irq1_w));
 	dio32.irq2_out_cb().set(FUNC(hp9k3xx_state::dio_irq2_w));

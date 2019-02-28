@@ -482,7 +482,7 @@ void rc759_state::rc759_io(address_map &map)
 	map(0x000, 0x003).mirror(0x0c).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
 	map(0x020, 0x020).r(FUNC(rc759_state::keyboard_r));
 	map(0x056, 0x057).noprw(); // in reality, access to sound and rtc is a bit more involved
-	map(0x05a, 0x05a).w(m_snd, FUNC(sn76489a_device::command_w));
+	map(0x05a, 0x05a).w(m_snd, FUNC(sn76489a_device::write));
 	map(0x05c, 0x05c).rw(FUNC(rc759_state::rtc_r), FUNC(rc759_state::rtc_w));
 //  AM_RANGE(0x060, 0x06f) AM_WRITE8(crt_control_w, 0x00ff)
 	map(0x070, 0x077).mirror(0x08).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);

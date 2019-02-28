@@ -35,12 +35,12 @@ Interpol (USA)
 
 <softwarelist name="g7400" description="Philips Videopac Plus G7400 cartridges">
 
-<!-- Phillips Videopac+ G7400 carts -->
+<!-- Philips Videopac+ G7400 carts -->
 
 	<software name="airbattl" supported="no">
 		<description>Air Battle (Euro)</description>
 		<year>1983</year>
-		<publisher>Phillips</publisher>
+		<publisher>Philips</publisher>
 		<info name="serial" value="58"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom12" />
@@ -81,7 +81,7 @@ Interpol (USA)
 	<software name="billiard" cloneof="billard" supported="no">
 		<description>Billiard (Euro, Prototype)</description>
 		<year>198?</year>
-		<publisher>Phillips</publisher>
+		<publisher>Philips</publisher>
 		<info name="programmer" value="Ed Averett"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
@@ -118,7 +118,7 @@ Interpol (USA)
 	<software name="claypig" supported="no">
 		<description>Clay Pigeon (Euro, Prototype)</description>
 		<year>198?</year>
-		<publisher>Phillips</publisher>
+		<publisher>Philips</publisher>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
@@ -130,7 +130,7 @@ Interpol (USA)
 	<software name="cosmic" supported="no">
 		<description>Cosmic Conflict (Euro)</description>
 		<year>1983</year>
-		<publisher>Phillips</publisher>
+		<publisher>Philips</publisher>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
@@ -179,7 +179,7 @@ Interpol (USA)
 	<software name="flashp" supported="no">
 		<description>Flashpoint (USA, Prototype, PAL Conversion)</description>
 		<year>2004</year>
-		<publisher>Phillips</publisher>
+		<publisher>Philips</publisher>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
@@ -191,7 +191,7 @@ Interpol (USA)
 	<software name="freedom" supported="no">
 		<description>Freedom Fighters (Euro)</description>
 		<year>198?</year>
-		<publisher>Phillips</publisher>
+		<publisher>Philips</publisher>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
@@ -215,7 +215,7 @@ Interpol (USA)
 	<software name="helicopt" supported="no">
 		<description>Helicopter Rescue (Euro)</description>
 		<year>1983</year>
-		<publisher>Phillips</publisher>
+		<publisher>Philips</publisher>
 		<info name="serial" value="59"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom16" />
@@ -239,7 +239,7 @@ Interpol (USA)
 	<software name="2bwlbskt" cloneof="2bsktbwl" supported="no">
 		<description>Tenpin Bowling/Basketball (Euro, Prototype)</description>
 		<year>198?</year>
-		<publisher>Phillips</publisher>
+		<publisher>Philips</publisher>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
@@ -251,7 +251,7 @@ Interpol (USA)
 	<software name="bees" supported="no">
 		<description>Killer Bees (Euro)</description>
 		<year>198?</year>
-		<publisher>Phillips</publisher>
+		<publisher>Philips</publisher>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
@@ -263,7 +263,7 @@ Interpol (USA)
 	<software name="loony" supported="no">
 		<description>Loony Balloon (Euro)</description>
 		<year>198?</year>
-		<publisher>Phillips</publisher>
+		<publisher>Philips</publisher>
 		<info name="serial" value="54"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
@@ -288,7 +288,7 @@ Interpol (USA)
 	<software name="neutron" supported="no">
 		<description>Neutron Star (Euro)</description>
 		<year>198?</year>
-		<publisher>Phillips</publisher>
+		<publisher>Philips</publisher>
 		<info name="serial" value="55"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom12" />
@@ -301,7 +301,7 @@ Interpol (USA)
 	<software name="nightmar" supported="no">
 		<description>Nightmare (Euro)</description>
 		<year>198?</year>
-		<publisher>Phillips</publisher>
+		<publisher>Philips</publisher>
 		<info name="serial" value="53"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
@@ -328,7 +328,7 @@ Interpol (USA)
 	<software name="pickaxe" supported="no">
 		<description>Pickaxe Pete (Euro)</description>
 		<year>198?</year>
-		<publisher>Phillips</publisher>
+		<publisher>Philips</publisher>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
@@ -340,7 +340,7 @@ Interpol (USA)
 	<software name="3rcsocpt" supported="no">
 		<description>Race/Spin-out/Cryptogram (Euro)</description>
 		<year>1983</year>
-		<publisher>Phillips</publisher>
+		<publisher>Philips</publisher>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
@@ -364,7 +364,7 @@ Interpol (USA)
 	<software name="satellit" supported="no">
 		<description>Satellite Attack (Euro)</description>
 		<year>198?</year>
-		<publisher>Phillips</publisher>
+		<publisher>Philips</publisher>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
@@ -376,7 +376,7 @@ Interpol (USA)
 	<software name="stone" supported="no">
 		<description>Stone Sling (Euro)</description>
 		<year>198?</year>
-		<publisher>Phillips</publisher>
+		<publisher>Philips</publisher>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
@@ -388,7 +388,7 @@ Interpol (USA)
 	<software name="hawks" supported="no">
 		<description>Terrahawks (Euro)</description>
 		<year>198?</year>
-		<publisher>Phillips</publisher>
+		<publisher>Philips</publisher>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
@@ -400,7 +400,7 @@ Interpol (USA)
 	<software name="rally" supported="no">
 		<description>Trans American Rally (Euro)</description>
 		<year>198?</year>
-		<publisher>Phillips</publisher>
+		<publisher>Philips</publisher>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom16" />
 			<dataarea name="rom" size="16384">

@@ -68,7 +68,7 @@ READ8_MEMBER(amspdwy_state::amspdwy_wheel_1_r)
 
 READ8_MEMBER(amspdwy_state::amspdwy_sound_r)
 {
-	return (m_ym2151->status_r(space, 0) & ~0x30) | ioport("IN0")->read();
+	return (m_ym2151->status_r() & ~0x30) | ioport("IN0")->read();
 }
 
 void amspdwy_state::amspdwy_map(address_map &map)

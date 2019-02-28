@@ -1,12 +1,12 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
+#include "plib/pstring.h"
+#include "netlist/nl_setup.h"
+#include "plib/plists.h"
+#include "plib/pmain.h"
+#include "plib/ppmf.h"
+#include "plib/pstream.h"
 #include <cstring>
-#include "../plib/pstring.h"
-#include "../plib/plists.h"
-#include "../plib/pstream.h"
-#include "../plib/pmain.h"
-#include "../plib/ppmf.h"
-#include "../nl_setup.h"
 
 
 
@@ -24,6 +24,8 @@
 class wav_t
 {
 public:
+	// FIXME: Initialized in intialize, need better c++ compliance
+	// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init)
 	wav_t(plib::postream &strm, std::size_t sr, std::size_t channels)
 	: m_f(strm)
 	{
@@ -32,6 +34,9 @@ public:
 		write(m_fmt);
 		write(m_data);
 	}
+
+	COPYASSIGNMOVE(wav_t, delete)
+
 	~wav_t()
 	{
 		if (m_f.seekable())
@@ -60,7 +65,7 @@ public:
 		m_data.len += m_fmt.block_align;
 		for (std::size_t i = 0; i < channels(); i++)
 		{
-			int16_t ps = static_cast<int16_t>(sample[i]); /* 16 bit sample, FIXME: Endianess? */
+			auto ps = static_cast<int16_t>(sample[i]); /* 16 bit sample, FIXME: Endianess? */
 			write(ps);
 		}
 	}
@@ -123,7 +128,7 @@ private:
 class log_processor
 {
 public:
-	typedef plib::pmfp<void, std::size_t, double, double> callback_type;
+	using callback_type = plib::pmfp<void, std::size_t, double, double>;
 
 	struct elem
 	{
@@ -150,6 +155,8 @@ public:
 				m_e[i].eof = !r[i].readline(line);
 				if (!m_e[i].eof)
 				{
+					// sscanf is very fast ...
+					// NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
 					sscanf(line.c_str(), "%lf %lf", &m_e[i].t, &m_e[i].v);
 					m_e[i].need_more = false;
 				}
@@ -159,12 +166,12 @@ public:
 		return success;
 	}
 
-	void process(std::vector<std::unique_ptr<plib::pistream>> &is)
+	void process(std::vector<plib::unique_ptr<plib::pistream>> &is)
 	{
 		std::vector<plib::putf8_reader> readers;
-		for (std::size_t i = 0; i < is.size(); i++)
+		for (auto &i : is)
 		{
-			plib::putf8_reader r(std::move(is[i]));
+			plib::putf8_reader r(std::move(i));
 			readers.push_back(std::move(r));
 		}
 
@@ -198,7 +205,7 @@ private:
 
 struct aggregator
 {
-	typedef plib::pmfp<void, std::size_t, double, double> callback_type;
+	using callback_type = plib::pmfp<void, std::size_t, double, double>;
 
 	aggregator(std::size_t channels, double quantum, callback_type cb)
 	: m_channels(channels)
@@ -308,7 +315,7 @@ public:
 	, m_format(format)
 	{
 		for (pstring::value_type c = 64; c < 64+26; c++)
-			m_ids.push_back(pstring(c));
+			m_ids.emplace_back(pstring(c));
 		write("$date Sat Jan 19 14:14:17 2019\n");
 		write("$end\n");
 		write("$version Netlist nlwav 0.1\n");
@@ -316,7 +323,7 @@ public:
 		write("$timescale 1 ns\n");
 		write("$end\n");
 		std::size_t i = 0;
-		for (auto ch : channels)
+		for (const auto &ch : channels)
 		{
 			//      $var real 64 N1X1 N1X1 $end
 			if (format == ANALOG)
@@ -356,16 +363,16 @@ public:
 		}
 	}
 
-	std::size_t m_channels;
-	double m_last_time;
-
 private:
-	void write(pstring line)
+	void write(const pstring &line)
 	{
 		auto p = static_cast<const char *>(line.c_str());
 		std::size_t len = std::strlen(p);
 		m_fo.write(p, len);
 	}
+
+	std::size_t m_channels;
+	double m_last_time;
 
 	plib::postream &m_fo;
 	std::vector<pstring> m_ids;
@@ -381,11 +388,11 @@ public:
 	nlwav_app() :
 		plib::app(),
 		opt_fmt(*this,  "f", "format",      0,       std::vector<pstring>({"wav","vcda","vcdd"}),
-			"output format. Available options are wav|vcda|vcdd.\n"
-			"wav  : multichannel wav output\n"
-			"vcda : analog VCD output\n"
-			"vcdd : digital VCD output\n"
-			"Digital signals are created using the high and low options"
+			"output format. Available options are wav|vcda|vcdd."
+			" wav  : multichannel wav output"
+			" vcda : analog VCD output"
+			" vcdd : digital VCD output"
+			" Digital signals are created using the --high and --low options"
 			),
 		opt_out(*this,  "o", "output",      "-",     "output file"),
 		opt_rate(*this, "r", "rate",   48000,        "sample rate of output file"),
@@ -403,6 +410,14 @@ public:
 			"convert all files starting with \"log_V\" into a multichannel wav file"),
 		m_outstrm(nullptr)
 	{}
+
+	int execute() override;
+	pstring usage() override;
+
+private:
+	void convert_wav();
+	void convert_vcd(vcdwriter::format_e format);
+
 	plib::option_str_limit<unsigned> opt_fmt;
 	plib::option_str    opt_out;
 	plib::option_num<std::size_t>   opt_rate;
@@ -416,15 +431,9 @@ public:
 	plib::option_bool   opt_help;
 	plib::option_example   opt_ex1;
 	plib::option_example   opt_ex2;
-
-	int execute();
-	pstring usage();
-
 	plib::pstdin pin_strm;
-private:
-	void convert_wav();
-	void convert_vcd(vcdwriter::format_e format);
-	std::vector<std::unique_ptr<plib::pistream>> m_instrms;
+
+	std::vector<plib::unique_ptr<plib::pistream>> m_instrms;
 	plib::postream *m_outstrm;
 };
 
@@ -433,8 +442,8 @@ void nlwav_app::convert_wav()
 
 	double dt = 1.0 / static_cast<double>(opt_rate());
 
-	std::unique_ptr<wavwriter> wo = plib::make_unique<wavwriter>(*m_outstrm, m_instrms.size(), opt_rate(), opt_amp());
-	std::unique_ptr<aggregator> ago = plib::make_unique<aggregator>(m_instrms.size(), dt, aggregator::callback_type(&wavwriter::process, wo.get()));
+	plib::unique_ptr<wavwriter> wo = plib::make_unique<wavwriter>(*m_outstrm, m_instrms.size(), opt_rate(), opt_amp());
+	plib::unique_ptr<aggregator> ago = plib::make_unique<aggregator>(m_instrms.size(), dt, aggregator::callback_type(&wavwriter::process, wo.get()));
 	aggregator::callback_type agcb = log_processor::callback_type(&aggregator::process, ago.get());
 
 	log_processor lp(m_instrms.size(), agcb);
@@ -455,7 +464,7 @@ void nlwav_app::convert_wav()
 void nlwav_app::convert_vcd(vcdwriter::format_e format)
 {
 
-	std::unique_ptr<vcdwriter> wo = plib::make_unique<vcdwriter>(*m_outstrm, opt_args(),
+	plib::unique_ptr<vcdwriter> wo = plib::make_unique<vcdwriter>(*m_outstrm, opt_args(),
 		format, opt_high(), opt_low());
 	log_processor::callback_type agcb = log_processor::callback_type(&vcdwriter::process, wo.get());
 
@@ -503,11 +512,11 @@ int nlwav_app::execute()
 		return 0;
 	}
 
-	m_outstrm = (opt_out() == "-" ? &pout_strm : plib::palloc<plib::pofilestream>(opt_out()));
+	m_outstrm = (opt_out() == "-" ? &pout_strm : plib::pnew<plib::pofilestream>(opt_out()));
 
 	for (auto &oi: opt_args())
 	{
-		std::unique_ptr<plib::pistream> fin = (oi == "-" ?
+		plib::unique_ptr<plib::pistream> fin = (oi == "-" ?
 			  plib::make_unique<plib::pstdin>()
 			: plib::make_unique<plib::pifilestream>(oi));
 		m_instrms.push_back(std::move(fin));
@@ -527,7 +536,7 @@ int nlwav_app::execute()
 	}
 
 	if (opt_out() != "-")
-		plib::pfree(m_outstrm);
+		plib::pdelete(m_outstrm);
 
 	return 0;
 }

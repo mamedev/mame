@@ -408,11 +408,11 @@ INPUT_CHANGED_MEMBER(cc40_state::sysram_size_changed)
 
 static INPUT_PORTS_START( cc40 )
 	PORT_START("RAMSIZE")
-	PORT_CONFNAME( 0x07, 0x01, "RAM Chip 1") PORT_CHANGED_MEMBER(DEVICE_SELF, cc40_state, sysram_size_changed, (void *)0)
+	PORT_CONFNAME( 0x07, 0x01, "RAM Chip 1") PORT_CHANGED_MEMBER(DEVICE_SELF, cc40_state, sysram_size_changed, 0)
 	PORT_CONFSETTING(    0x00, "None" )
 	PORT_CONFSETTING(    0x01, "2KB" )
 	PORT_CONFSETTING(    0x04, "8KB" )
-	PORT_CONFNAME( 0x70, 0x10, "RAM Chip 2") PORT_CHANGED_MEMBER(DEVICE_SELF, cc40_state, sysram_size_changed, (void *)1)
+	PORT_CONFNAME( 0x70, 0x10, "RAM Chip 2") PORT_CHANGED_MEMBER(DEVICE_SELF, cc40_state, sysram_size_changed, 1)
 	PORT_CONFSETTING(    0x00, "None" ) // note: invalid configuration, unless Chip 1 is also 0x00
 	PORT_CONFSETTING(    0x10, "2KB" )
 	PORT_CONFSETTING(    0x40, "8KB" )
@@ -615,9 +615,9 @@ MACHINE_CONFIG_START(cc40_state::cc40)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "cc40_cart")

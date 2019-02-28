@@ -442,7 +442,7 @@ void nscsi_full_device::step(bool timeout)
 			break;
 		}
 
-		if(command_done()) {
+		if(scsi_command_done(scsi_cmdbuf[0], data_buffer_pos)) {
 			scsi_cmdsize = data_buffer_pos;
 			scsi_bus->ctrl_wait(scsi_refid, 0, S_ACK);
 			scsi_command();
@@ -509,18 +509,17 @@ void nscsi_full_device::target_send_buffer_byte()
 	target_send_byte(scsi_get_data(data_buffer_id, data_buffer_pos++));
 }
 
-bool nscsi_full_device::command_done()
+bool nscsi_full_device::scsi_command_done(uint8_t command, uint8_t length)
 {
-	if(!data_buffer_pos)
+	if(!length)
 		return false;
-	uint8_t h = scsi_cmdbuf[0];
-	switch(h >> 5) {
-	case 0: return data_buffer_pos == 6;
-	case 1: return data_buffer_pos == 10;
-	case 2: return data_buffer_pos == 10;
+	switch(command >> 5) {
+	case 0: return length == 6;
+	case 1: return length == 10;
+	case 2: return length == 10;
 	case 3: return true;
 	case 4: return true;
-	case 5: return data_buffer_pos == 12;
+	case 5: return length == 12;
 	case 6: return true;
 	case 7: return true;
 	}

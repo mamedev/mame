@@ -53,7 +53,8 @@ READ_LINE_MEMBER( vp590_device::gd_r )
 //  MACHINE_CONFIG_START( vp590 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(vp590_device::device_add_mconfig)
+void vp590_device::device_add_mconfig(machine_config &config)
+{
 	CDP1862(config, m_cgc, 7.15909_MHz_XTAL);
 	m_cgc->rdata_cb().set(FUNC(vp590_device::rd_r));
 	m_cgc->bdata_cb().set(FUNC(vp590_device::bd_r));
@@ -61,7 +62,7 @@ MACHINE_CONFIG_START(vp590_device::device_add_mconfig)
 	m_cgc->set_luminance(RES_R(510), RES_R(360), RES_K(1), RES_K(1.5)); // R3, R4, R5, R6
 	m_cgc->set_chrominance(RES_K(3.9), RES_K(10), RES_K(2), RES_K(3.3)); // R7, R8, R9, R10
 	m_cgc->set_screen(SCREEN_TAG);
-MACHINE_CONFIG_END
+}
 
 
 //-------------------------------------------------
@@ -158,7 +159,7 @@ void vp590_device::device_start()
 //  vip_program_w - program write
 //-------------------------------------------------
 
-void vp590_device::vip_program_w(address_space &space, offs_t offset, uint8_t data, int cdef, int *minh)
+void vp590_device::vip_program_w(offs_t offset, uint8_t data, int cdef, int *minh)
 {
 	if (offset >= 0xc000 && offset < 0xe000)
 	{
@@ -184,7 +185,7 @@ void vp590_device::vip_program_w(address_space &space, offs_t offset, uint8_t da
 //  vip_io_w - I/O write
 //-------------------------------------------------
 
-void vp590_device::vip_io_w(address_space &space, offs_t offset, uint8_t data)
+void vp590_device::vip_io_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -204,7 +205,7 @@ void vp590_device::vip_io_w(address_space &space, offs_t offset, uint8_t data)
 //  vip_dma_w - DMA write
 //-------------------------------------------------
 
-void vp590_device::vip_dma_w(address_space &space, offs_t offset, uint8_t data)
+void vp590_device::vip_dma_w(offs_t offset, uint8_t data)
 {
 	uint8_t mask = 0xff;
 
@@ -216,7 +217,7 @@ void vp590_device::vip_dma_w(address_space &space, offs_t offset, uint8_t data)
 
 	m_color = m_color_ram[offset & mask];
 
-	m_cgc->dma_w(space, offset, data);
+	m_cgc->dma_w(data);
 }
 
 

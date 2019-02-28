@@ -535,7 +535,7 @@ WRITE8_MEMBER( pasopia7_state::pasopia7_6845_w )
 	if(offset == 0)
 	{
 		m_addr_latch = data;
-		m_crtc->address_w(space, offset, data);
+		m_crtc->address_w(data);
 	}
 	else
 	{
@@ -547,7 +547,7 @@ WRITE8_MEMBER( pasopia7_state::pasopia7_6845_w )
 		else if(m_addr_latch == 0x0f)
 			m_cursor_addr = (m_cursor_addr & 0x3f00) | (data & 0xff);
 
-		m_crtc->register_w(space, offset, data);
+		m_crtc->register_w(data);
 
 		/* double pump the pixel clock if we are in 640 x 200 mode */
 		if(m_screen_type == 1) // raster
@@ -968,46 +968,50 @@ void pasopia7_state::p7_base(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:1", pasopia7_floppies, "525hd", floppy_image_device::default_floppy_formats);
 }
 
-MACHINE_CONFIG_START(pasopia7_state::p7_raster)
+void pasopia7_state::p7_raster(machine_config &config)
+{
 	p7_base(config);
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 32-1)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(640, 480);
+	m_screen->set_visarea(0, 640-1, 0, 32-1);
+	m_screen->set_palette(m_palette);
+	m_screen->set_screen_update(FUNC(pasopia7_state::screen_update_pasopia7));
 
 	MCFG_VIDEO_START_OVERRIDE(pasopia7_state,pasopia7)
-	MCFG_SCREEN_UPDATE_DRIVER(pasopia7_state, screen_update_pasopia7)
+
 	PALETTE(config, m_palette, palette_device::BRG_3BIT);
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_pasopia7);
 
 	H46505(config, m_crtc, VDP_CLOCK); /* unknown clock, hand tuned to get ~60 fps */
-	m_crtc->set_screen("screen");
+	m_crtc->set_screen(m_screen);
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(pasopia7_state::p7_lcd)
+void pasopia7_state::p7_lcd(machine_config &config)
+{
 	p7_base(config);
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
+	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(640, 480);
+	m_screen->set_visarea(0, 640-1, 0, 200-1);
+	m_screen->set_screen_update(FUNC(pasopia7_state::screen_update_pasopia7));
+	m_screen->set_palette(m_palette);
+
 	MCFG_VIDEO_START_OVERRIDE(pasopia7_state,pasopia7)
-	MCFG_SCREEN_UPDATE_DRIVER(pasopia7_state, screen_update_pasopia7)
-	MCFG_SCREEN_PALETTE(m_palette)
 
 	PALETTE(config, m_palette, FUNC(pasopia7_state::p7_lcd_palette), 8);
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_pasopia7);
 
 	H46505(config, m_crtc, LCD_CLOCK); /* unknown clock, hand tuned to get ~60 fps */
-	m_crtc->set_screen("screen");
+	m_crtc->set_screen(m_screen);
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( pasopia7 )

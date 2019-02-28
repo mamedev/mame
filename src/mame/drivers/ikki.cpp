@@ -82,8 +82,8 @@ void ikki_state::ikki_cpu2(address_map &map)
 	map(0x0000, 0x1fff).rom();
 	map(0xc000, 0xc7ff).ram().share("spriteram");
 	map(0xc800, 0xcfff).ram().share("share1");
-	map(0xd801, 0xd801).w("sn1", FUNC(sn76496_device::command_w));
-	map(0xd802, 0xd802).w("sn2", FUNC(sn76496_device::command_w));
+	map(0xd801, 0xd801).w("sn1", FUNC(sn76496_device::write));
+	map(0xd802, 0xd802).w("sn2", FUNC(sn76496_device::write));
 }
 
 

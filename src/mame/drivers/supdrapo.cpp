@@ -451,24 +451,24 @@ WRITE8_MEMBER(supdrapo_state::ay8910_outputb_w)
                            Machine Driver
 **********************************************************************/
 
-MACHINE_CONFIG_START(supdrapo_state::supdrapo)
-
-	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK) /* guess */
-	MCFG_DEVICE_PROGRAM_MAP(sdpoker_mem)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", supdrapo_state,  irq0_line_hold)
+void supdrapo_state::supdrapo(machine_config &config)
+{
+	Z80(config, m_maincpu, CPU_CLOCK); /* guess */
+	m_maincpu->set_addrmap(AS_PROGRAM, &supdrapo_state::sdpoker_mem);
+	m_maincpu->set_vblank_int("screen", FUNC(supdrapo_state::irq0_line_hold));
 
 	WATCHDOG_TIMER(config, m_watchdog);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(supdrapo_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(256, 256);
+	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
+	screen.set_screen_update(FUNC(supdrapo_state::screen_update));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_supdrapo);
 	PALETTE(config, m_palette, FUNC(supdrapo_state::supdrapo_palette), 0x100);
@@ -479,7 +479,7 @@ MACHINE_CONFIG_START(supdrapo_state::supdrapo)
 	aysnd.port_a_write_callback().set(FUNC(supdrapo_state::ay8910_outputa_w));
 	aysnd.port_b_write_callback().set(FUNC(supdrapo_state::ay8910_outputb_w));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
-MACHINE_CONFIG_END
+}
 
 
 /*********************************************************************

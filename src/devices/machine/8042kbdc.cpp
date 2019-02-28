@@ -45,9 +45,11 @@ kbdc8042_device::kbdc8042_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-MACHINE_CONFIG_START(kbdc8042_device::device_add_mconfig)
-	MCFG_AT_KEYB_ADD("at_keyboard", 1, WRITELINE(*this, kbdc8042_device, keyboard_w))
-MACHINE_CONFIG_END
+void kbdc8042_device::device_add_mconfig(machine_config &config)
+{
+	AT_KEYB(config, m_keyboard_dev, pc_keyboard_device::KEYBOARD_TYPE::AT, 1);
+	m_keyboard_dev->keypress().set(FUNC(kbdc8042_device::keyboard_w));
+}
 
 
 /*-------------------------------------------------
@@ -69,6 +71,9 @@ void kbdc8042_device::device_start()
 	m_sending = 0;
 	m_last_write_to_control = 0;
 	m_status_read_mode = 0;
+
+	m_update_timer = timer_alloc(TIMER_UPDATE);
+	m_update_timer->adjust(attotime::never);
 }
 
 /*-------------------------------------------------
@@ -86,6 +91,8 @@ void kbdc8042_device::device_reset()
 	m_mouse_x = 0;
 	m_mouse_y = 0;
 	m_mouse_btn = 0;
+
+	m_update_timer->adjust(attotime::from_hz(100), 0, attotime::from_hz(100));
 }
 
 void kbdc8042_device::at_8042_set_outport(uint8_t data, int initial)
@@ -195,7 +202,14 @@ void kbdc8042_device::at_8042_clear_keyboard_received()
 	m_mouse.received = 0;
 }
 
-
+void kbdc8042_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	if (id == TIMER_UPDATE)
+	{
+		at_8042_check_keyboard();
+		at_8042_check_mouse();
+	}
+}
 
 /* **************************************************************************
  * Port 0x60 Input and Output Buffer (keyboard and mouse data)

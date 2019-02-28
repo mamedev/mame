@@ -528,14 +528,14 @@ MACHINE_CONFIG_START(h19_state::h19)
 
 	/* video hardware */
 	// TODO: make configurable, Heath offered 3 different CRTs - White, Green, Amber.
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_REFRESH_RATE(60)   // TODO- this is adjustable by dipswitch.
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen.set_refresh_hz(60);   // TODO- this is adjustable by dipswitch.
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
+	screen.set_size(640, 250);
+	screen.set_visarea(0, 640 - 1, 0, 250 - 1);
 
-	MCFG_SCREEN_SIZE(640, 250)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 250 - 1)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_h19)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_h19);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	MC6845(config, m_crtc, MC6845_CLOCK);

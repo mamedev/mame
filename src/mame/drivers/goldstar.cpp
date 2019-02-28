@@ -628,7 +628,7 @@ void cb3_state::ncb3_map(address_map &map)
 	map(0xf840, 0xf840).w("aysnd", FUNC(ay8910_device::address_w));
 	map(0xf850, 0xf850).w(FUNC(cb3_state::p1_lamps_w));       /* Control Set 1 lamps */
 	map(0xf860, 0xf860).w(FUNC(cb3_state::p2_lamps_w));       /* Control Set 2 lamps */
-	map(0xf870, 0xf870).w("snsnd", FUNC(sn76489_device::command_w));    /* guess... device is initialized, but doesn't seems to be used.*/
+	map(0xf870, 0xf870).w("snsnd", FUNC(sn76489_device::write));    /* guess... device is initialized, but doesn't seems to be used.*/
 }
 
 void goldstar_state::ncb3_readwriteport(address_map &map)
@@ -700,7 +700,7 @@ void goldstar_state::wcherry_map(address_map &map)
 	map(0xf640, 0xf640).w("aysnd", FUNC(ay8910_device::address_w));
 	map(0xf650, 0xf650).nopw();    // AM_WRITE(output_w)  // unknown register: 0x3e
 	map(0xf660, 0xf660).nopw();    // AM_WRITE(output_w)  // unknown register: 0x3e
-	map(0xf670, 0xf670).w("snsnd", FUNC(sn76489_device::command_w));    /* guess... device is initialized, but doesn't seems to be used.*/
+	map(0xf670, 0xf670).w("snsnd", FUNC(sn76489_device::write));    /* guess... device is initialized, but doesn't seems to be used.*/
 
 	map(0xf800, 0xffff).ram();
 }
@@ -900,7 +900,7 @@ void goldstar_state::lucky8_map(address_map &map)
 	map(0xb840, 0xb840).w("aysnd", FUNC(ay8910_device::address_w));  /* no sound... only use both ports for DSWs */
 	map(0xb850, 0xb850).w(FUNC(goldstar_state::p1_lamps_w));
 	map(0xb860, 0xb860).w(FUNC(goldstar_state::p2_lamps_w));
-	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489_device::command_w));    /* sound */
+	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489_device::write));    /* sound */
 	map(0xc000, 0xf7ff).rom();  // could be used by some sets like super972.
 	map(0xf800, 0xffff).ram();
 }
@@ -933,7 +933,7 @@ void goldstar_state::flaming7_map(address_map &map)
 	map(0xb840, 0xb840).w("aysnd", FUNC(ay8910_device::address_w));  /* no sound... only use both ports for DSWs */
 	map(0xb850, 0xb850).w(FUNC(goldstar_state::p1_lamps_w));
 	map(0xb860, 0xb860).w(FUNC(goldstar_state::p2_lamps_w));
-	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489_device::command_w));    /* sound */
+	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489_device::write));    /* sound */
 //  AM_RANGE(0xc000, 0xd3ff) AM_RAM
 	map(0xf800, 0xffff).ram();
 }
@@ -985,7 +985,7 @@ void goldstar_state::mbstar_map(address_map &map)
 	map(0xb840, 0xb840).w("aysnd", FUNC(ay8910_device::address_w));  /* no sound... only use both ports for DSWs */
 	map(0xb850, 0xb850).w(FUNC(goldstar_state::p1_lamps_w));
 	map(0xb860, 0xb860).w(FUNC(goldstar_state::p2_lamps_w));
-	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489_device::command_w));    /* sound */
+	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489_device::write));    /* sound */
 	map(0xc000, 0xf7ff).rom();
 	map(0xf800, 0xffff).ram();
 }
@@ -1038,7 +1038,7 @@ void wingco_state::magodds_map(address_map &map)
 	map(0xb840, 0xb840).w("aysnd", FUNC(ay8910_device::address_w));             /* no sound... only use both ports for DSWs */
 	map(0xb850, 0xb850).w(FUNC(wingco_state::magodds_outb850_w));                                /* lamps */
 	map(0xb860, 0xb860).w(FUNC(wingco_state::magodds_outb860_w));                                /* watchdog */
-	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489_device::command_w));                /* sound */
+	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489_device::write));                /* sound */
 	map(0xc000, 0xffff).rom().region("maincpu", 0xc000);
 }
 
@@ -1061,7 +1061,7 @@ void goldstar_state::kkotnoli_map(address_map &map)
 	map(0xb830, 0xb830).nopw();                                                /* no ay8910 */
 	map(0xb840, 0xb840).nopw();                                                /* no ay8910 */
 	map(0xb850, 0xb850).w(FUNC(goldstar_state::p1_lamps_w));
-	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489_device::command_w));                /* sound */
+	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489_device::write));                /* sound */
 	map(0xf800, 0xffff).ram();
 }
 
@@ -1100,7 +1100,7 @@ void goldstar_state::ladylinr_map(address_map &map)
 	map(0xb830, 0xb830).w("aysnd", FUNC(ay8910_device::address_w));             /* no sound... unused? */
 	map(0xb840, 0xb840).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
 	map(0xb850, 0xb850).nopw();                                                /* just turn off the lamps, if exist */
-	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489_device::command_w));                /* sound */
+	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489_device::write));                /* sound */
 	map(0xf800, 0xffff).ram();
 }
 
@@ -1123,7 +1123,7 @@ void goldstar_state::wcat3_map(address_map &map)
 	map(0xb830, 0xb830).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
 	map(0xb840, 0xb840).w("aysnd", FUNC(ay8910_device::address_w));             /* no sound... only use both ports for DSWs */
 	map(0xb850, 0xb850).w(FUNC(goldstar_state::p1_lamps_w));
-	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489_device::command_w));                /* sound */
+	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489_device::write));                /* sound */
 //  AM_RANGE(0xc000, 0xc003) AM_DEVREADWRITE("ppi8255_3", i8255_device, read, write)    /* Other PPI initialized? */
 	map(0xd000, 0xefff).rom();
 	map(0xf000, 0xffff).ram();
@@ -1273,9 +1273,9 @@ void unkch_state::megaline_map(address_map &map)
 void goldstar_state::megaline_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0xa0, 0xa0).w("sn1", FUNC(sn76489_device::command_w));                      /* SN76489 #1 */
-	map(0xc0, 0xc0).w("sn2", FUNC(sn76489_device::command_w));                      /* SN76489 #2 */
-	map(0xe0, 0xe0).w("sn3", FUNC(sn76489_device::command_w));                      /* SN76489 #3 */
+	map(0xa0, 0xa0).w("sn1", FUNC(sn76489_device::write));                      /* SN76489 #1 */
+	map(0xc0, 0xc0).w("sn2", FUNC(sn76489_device::write));                      /* SN76489 #2 */
+	map(0xe0, 0xe0).w("sn3", FUNC(sn76489_device::write));                      /* SN76489 #3 */
 	map(0x60, 0x60).w("aysnd", FUNC(ay8910_device::address_w));                 /* AY8910 control? */
 	map(0x80, 0x80).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));        /* AY8910 Input? */
 //  AM_RANGE(0x01, 0x01) AM_DEVREAD("aysnd", ay8910_device, data_r)
@@ -1330,10 +1330,10 @@ void goldstar_state::bonusch_portmap(address_map &map)
 	map.global_mask(0xff);
 	map(0x10, 0x10).portr("IN0");
 	map(0x20, 0x20).portr("IN1");
-	map(0x50, 0x50).w("sn1", FUNC(sn76489_device::command_w));      /* SN76489 #1 */
-	map(0x51, 0x51).w("sn2", FUNC(sn76489_device::command_w));      /* SN76489 #2 */
-	map(0x52, 0x52).w("sn3", FUNC(sn76489_device::command_w));      /* SN76489 #3 */
-	map(0x53, 0x53).w("sn4", FUNC(sn76489_device::command_w));      /* SN76489 #4 */
+	map(0x50, 0x50).w("sn1", FUNC(sn76489_device::write));      /* SN76489 #1 */
+	map(0x51, 0x51).w("sn2", FUNC(sn76489_device::write));      /* SN76489 #2 */
+	map(0x52, 0x52).w("sn3", FUNC(sn76489_device::write));      /* SN76489 #3 */
+	map(0x53, 0x53).w("sn4", FUNC(sn76489_device::write));      /* SN76489 #4 */
 	map(0x60, 0x60).portr("IN3");
 }
 
@@ -1369,9 +1369,9 @@ void goldstar_state::feverch_portmap(address_map &map)
 	map(0x00, 0x03).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x08, 0x0b).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x10, 0x13).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x20, 0x20).w("sn1", FUNC(sn76489_device::command_w));
-	map(0x28, 0x28).w("sn2", FUNC(sn76489_device::command_w));
-	map(0x30, 0x30).w("sn3", FUNC(sn76489_device::command_w));
+	map(0x20, 0x20).w("sn1", FUNC(sn76489_device::write));
+	map(0x28, 0x28).w("sn2", FUNC(sn76489_device::write));
+	map(0x30, 0x30).w("sn3", FUNC(sn76489_device::write));
 	//map(0x38, 0x3b)
 }
 

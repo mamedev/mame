@@ -51,7 +51,7 @@
 #ifndef NLD_9316_H_
 #define NLD_9316_H_
 
-#include "../nl_setup.h"
+#include "netlist/nl_setup.h"
 
 #define TTL_9316(name, cCLK, cENP, cENT, cCLRQ, cLOADQ, cA, cB, cC, cD)         \
 		NET_REGISTER_DEV(TTL_9316, name)                                        \

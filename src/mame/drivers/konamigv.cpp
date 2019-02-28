@@ -466,8 +466,8 @@ READ16_MEMBER(simpbowl_state::flash_r)
 	{
 		int chip = (m_flash_address >= 0x200000) ? 2 : 0;
 
-		int ret = ( m_flash8[chip]->read(space, m_flash_address & 0x1fffff) & 0xff ) |
-			( m_flash8[chip+1]->read(space, m_flash_address & 0x1fffff) << 8 );
+		int ret = ( m_flash8[chip]->read(m_flash_address & 0x1fffff) & 0xff ) |
+			( m_flash8[chip+1]->read(m_flash_address & 0x1fffff) << 8 );
 
 		m_flash_address++;
 
@@ -485,8 +485,8 @@ WRITE16_MEMBER(simpbowl_state::flash_w)
 	{
 		case 0:
 			chip = (m_flash_address >= 0x200000) ? 2 : 0;
-			m_flash8[chip]->write(space, m_flash_address & 0x1fffff, data&0xff);
-			m_flash8[chip+1]->write(space, m_flash_address & 0x1fffff, (data>>8)&0xff);
+			m_flash8[chip]->write(m_flash_address & 0x1fffff, data&0xff);
+			m_flash8[chip+1]->write(m_flash_address & 0x1fffff, (data>>8)&0xff);
 			break;
 
 		case 1:

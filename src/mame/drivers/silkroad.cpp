@@ -280,21 +280,21 @@ void silkroad_state::machine_start()
 	m_okibank->configure_entries(0, 4, memregion("oki1")->base() + 0x20000, 0x20000);
 }
 
-MACHINE_CONFIG_START(silkroad_state::silkroad)
-
+void silkroad_state::silkroad(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68EC020, XTAL(32'000'000)/2) /* 16MHz */
-	MCFG_DEVICE_PROGRAM_MAP(cpu_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", silkroad_state,  irq4_line_hold)
+	M68EC020(config, m_maincpu, XTAL(32'000'000)/2); /* 16MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &silkroad_state::cpu_map);
+	m_maincpu->set_vblank_int("screen", FUNC(silkroad_state::irq4_line_hold));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(6*8+2, 64*8-1-(10*8)-2, 2*8, 32*8-1-(2*8))
-	MCFG_SCREEN_UPDATE_DRIVER(silkroad_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(6*8+2, 64*8-1-(10*8)-2, 2*8, 32*8-1-(2*8));
+	screen.set_screen_update(FUNC(silkroad_state::screen_update));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_silkroad);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x2000).set_membits(16);
@@ -305,15 +305,15 @@ MACHINE_CONFIG_START(silkroad_state::silkroad)
 
 	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(32'000'000)/32, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified (was 1056000)
-	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.45)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.45)
+	okim6295_device &oki1(OKIM6295(config, "oki1", XTAL(32'000'000)/32, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified (was 1056000)
+	oki1.set_addrmap(0, &silkroad_state::oki_map);
+	oki1.add_route(ALL_OUTPUTS, "lspeaker", 0.45);
+	oki1.add_route(ALL_OUTPUTS, "rspeaker", 0.45);
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, XTAL(32'000'000)/16, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified (was 2112000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.45)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.45)
-MACHINE_CONFIG_END
+	okim6295_device &oki2(OKIM6295(config, "oki2", XTAL(32'000'000)/16, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified (was 2112000)
+	oki2.add_route(ALL_OUTPUTS, "lspeaker", 0.45);
+	oki2.add_route(ALL_OUTPUTS, "rspeaker", 0.45);
+}
 
 
 /***************************************************************************

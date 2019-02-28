@@ -43,45 +43,37 @@ protected:
 	address_space_config        m_space_config;
 
 private:
+	enum
+	{
+		PAGE_ENABLE_MASK        = 0x0008,
+		PAGE_WALLPAPER_MASK     = 0x0004,
+
+		PAGE_DEPTH_FLAG_MASK    = 0x3000,
+		PAGE_DEPTH_FLAG_SHIFT   = 12,
+		PAGE_TILE_HEIGHT_MASK   = 0x00c0,
+		PAGE_TILE_HEIGHT_SHIFT  = 6,
+		PAGE_TILE_WIDTH_MASK    = 0x0030,
+		PAGE_TILE_WIDTH_SHIFT   = 4,
+
+		TILE_X_FLIP             = 0x0004,
+		TILE_Y_FLIP             = 0x0008
+	};
+
+	enum flipx_t : bool
+	{
+		FlipXOff = false,
+		FlipXOn = true
+	};
+
 	required_device<unsp_device> m_cpu;
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
-	required_shared_ptr<uint16_t> m_bg_videoram;
-	required_shared_ptr<uint16_t> m_fg_videoram;
-	required_shared_ptr<uint16_t> m_bg_attrram;
-	required_shared_ptr<uint16_t> m_fg_attrram;
 	required_shared_ptr<uint16_t> m_palram;
-
-	tilemap_t    *m_bg_tilemap;
-	tilemap_t    *m_fg_tilemap;
 
 	//TIMER_CALLBACK_MEMBER(test_timer);
 	//emu_timer *m_test_timer;
 
-	DECLARE_WRITE16_MEMBER(bg_videoram_w);
-	DECLARE_WRITE16_MEMBER(bg_attrram_w);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
-	DECLARE_WRITE16_MEMBER(fg_videoram_w);
-	DECLARE_WRITE16_MEMBER(fg_attrram_w);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-
-
-	DECLARE_READ16_MEMBER(spg110_2013_r);
-	DECLARE_READ16_MEMBER(spg110_2019_r);
-
-	DECLARE_WRITE16_MEMBER(spg110_bg_scrollx_w);
-	DECLARE_WRITE16_MEMBER(spg110_bg_scrolly_w);
-	DECLARE_WRITE16_MEMBER(spg110_2012_w);
-	DECLARE_WRITE16_MEMBER(spg110_2013_w);
-	DECLARE_WRITE16_MEMBER(spg110_2014_w);
-	DECLARE_WRITE16_MEMBER(spg110_2015_w);
-	DECLARE_WRITE16_MEMBER(spg110_2016_w);
-	DECLARE_WRITE16_MEMBER(spg110_2017_w);
-	DECLARE_WRITE16_MEMBER(spg110_2018_w);
-	DECLARE_WRITE16_MEMBER(spg110_2019_w);
-	DECLARE_WRITE16_MEMBER(spg110_201a_w);
-	DECLARE_WRITE16_MEMBER(spg110_201b_w);
 	DECLARE_WRITE16_MEMBER(spg110_201c_w);
 	DECLARE_WRITE16_MEMBER(spg110_2020_w);
 
@@ -128,16 +120,16 @@ private:
 	DECLARE_READ16_MEMBER(spg110_2037_r);
 	DECLARE_READ16_MEMBER(spg110_2042_r);
 
-	DECLARE_WRITE16_MEMBER(spg110_2060_w);
-	DECLARE_WRITE16_MEMBER(spg110_2061_w);
-	DECLARE_WRITE16_MEMBER(spg110_2062_w);
+	DECLARE_WRITE16_MEMBER(dma_dst_w);
+	DECLARE_WRITE16_MEMBER(dma_unk_2061_w);
+	DECLARE_WRITE16_MEMBER(dma_len_trigger_w);
 	DECLARE_WRITE16_MEMBER(spg110_2063_w);
-	DECLARE_WRITE16_MEMBER(spg110_2064_w);
-	DECLARE_WRITE16_MEMBER(spg110_2066_w);
-	DECLARE_WRITE16_MEMBER(spg110_2067_w);
-	DECLARE_WRITE16_MEMBER(spg110_2068_w);
+	DECLARE_WRITE16_MEMBER(dma_dst_step_w);
+	DECLARE_WRITE16_MEMBER(dma_src_w);
+	DECLARE_WRITE16_MEMBER(dma_unk_2067_w);
+	DECLARE_WRITE16_MEMBER(dma_src_step_w);
 
-	DECLARE_READ16_MEMBER(spg110_2062_r);
+	DECLARE_READ16_MEMBER(dma_len_status_r);
 	DECLARE_READ16_MEMBER(spg110_2063_r);
 
 	DECLARE_WRITE16_MEMBER(spg110_3200_w);
@@ -177,18 +169,32 @@ private:
 
 	DECLARE_READ16_MEMBER(spg110_310f_r);
 
+	DECLARE_READ16_MEMBER(tmap0_regs_r);
+	DECLARE_READ16_MEMBER(tmap1_regs_r);
+	DECLARE_WRITE16_MEMBER(tmap0_regs_w);
+	DECLARE_WRITE16_MEMBER(tmap1_regs_w);
 
-	uint16_t m_2068_outer;
-	uint16_t m_2064_outer;
-	uint16_t m_2061_outer;
-	uint16_t m_2067_outer;
+	uint16_t tmap0_regs[0x6];
+	uint16_t tmap1_regs[0x6];
 
-	uint16_t m_2060_inner;
-	uint16_t m_2066_inner;
+	uint16_t m_dma_src_step;
+	uint16_t m_dma_dst_step;
+	uint16_t m_dma_unk_2061;
+	uint16_t m_dma_unk_2067;
+
+	uint16_t m_dma_dst;
+	uint16_t m_dma_src;
 
 	uint16_t m_bg_scrollx;
 	uint16_t m_bg_scrolly;
 	uint16_t m_2036_scroll;
+
+	void tilemap_write_regs(int which, uint16_t* regs, int regno, uint16_t data);
+
+	template<flipx_t FlipX>
+	void blit(const rectangle &cliprect, uint32_t line, uint32_t xoff, uint32_t yoff, uint32_t attr, uint32_t ctrl, uint32_t bitmap_addr, uint16_t tile);
+	void blit_page(const rectangle &cliprect, uint32_t scanline, int depth, uint32_t bitmap_addr, uint16_t *regs);
+	uint32_t m_screenbuf[320 * 240];
 };
 
 DECLARE_DEVICE_TYPE(SPG110, spg110_device)

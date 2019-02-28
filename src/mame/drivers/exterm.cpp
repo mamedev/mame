@@ -92,13 +92,13 @@ void exterm_state::machine_start()
 
 WRITE16_MEMBER(exterm_state::host_data_w)
 {
-	m_slave->host_w(space,offset / 0x0010000, data, 0xffff);
+	m_slave->host_w(offset / 0x0010000, data);
 }
 
 
 READ16_MEMBER(exterm_state::host_data_r)
 {
-	return m_slave->host_r(space,offset / 0x0010000, 0xffff);
+	return m_slave->host_r(offset / 0x0010000);
 }
 
 
@@ -197,7 +197,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(exterm_state::master_sound_nmi_callback)
 WRITE8_MEMBER(exterm_state::ym2151_data_latch_w)
 {
 	/* bit 7 of the sound control selects which port */
-	m_ym2151->write(space, m_sound_control >> 7, data);
+	m_ym2151->write(m_sound_control >> 7, data);
 }
 
 
@@ -253,7 +253,6 @@ void exterm_state::master_map(address_map &map)
 	map(0x01800000, 0x01807fff).mirror(0xfc7f8000).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x02800000, 0x02807fff).mirror(0xfc7f8000).ram().share("nvram");
 	map(0x03000000, 0x03ffffff).mirror(0xfc000000).rom().region("maincpu", 0);
-	map(0xc0000000, 0xc00001ff).rw(m_maincpu, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 }
 
 
@@ -261,7 +260,6 @@ void exterm_state::slave_map(address_map &map)
 {
 	map(0x00000000, 0x000fffff).mirror(0xfbf00000).ram().share("slave_videoram");
 	map(0x04000000, 0x047fffff).mirror(0xfb800000).ram();
-	map(0xc0000000, 0xc00001ff).rw(m_slave, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 }
 
 
@@ -371,8 +369,8 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(exterm_state::exterm)
-
+void exterm_state::exterm(machine_config &config)
+{
 	/* basic machine hardware */
 	TMS34010(config, m_maincpu, 40000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &exterm_state::master_map);
@@ -408,23 +406,22 @@ MACHINE_CONFIG_START(exterm_state::exterm)
 	/* video hardware */
 	PALETTE(config, "palette", FUNC(exterm_state::exterm_palette)).set_format(palette_device::xRGB_555, 2048+32768);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(40000000/8, 318, 0, 256, 264, 0, 240)
-	MCFG_SCREEN_UPDATE_DEVICE("maincpu", tms34010_device, tms340x0_ind16)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(40000000/8, 318, 0, 256, 264, 0, 240);
+	screen.set_screen_update("maincpu", FUNC(tms34010_device::tms340x0_ind16));
+	screen.set_palette("palette");
 
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_DEVICE_ADD("dac", AD7528, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // ad7528j.e2
-	MCFG_DEVICE_ADD("dacvol", AD7528, 0) // ad7528j.e2
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dacvol", 1.0, DAC_VREF_POS_INPUT)
+	AD7528(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // ad7528j.e2
+	AD7528(config, "dacvol", 0).add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT).add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT); // ad7528j.e2
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dacvol", 1.0, DAC_VREF_POS_INPUT);
 
 	YM2151(config, m_ym2151, 4000000).add_route(ALL_OUTPUTS, "speaker", 1.0);
-MACHINE_CONFIG_END
+}
 
 
 

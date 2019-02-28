@@ -16,8 +16,8 @@ public:
 	// construction/destruction
 	nes_namcot3433_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE8_MEMBER(dxrom_write);
-	virtual DECLARE_WRITE8_MEMBER(write_h) override { dxrom_write(space, offset, data, mem_mask); }
+	void dxrom_write(offs_t offset, uint8_t data);
+	virtual void write_h(offs_t offset, uint8_t data) override { dxrom_write(offset, data); }
 
 	virtual void pcb_reset() override;
 
@@ -40,7 +40,7 @@ public:
 	// construction/destruction
 	nes_namcot3446_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+	virtual void write_h(offs_t offset, uint8_t data) override;
 
 	virtual void pcb_reset() override;
 
@@ -61,7 +61,7 @@ public:
 	// construction/destruction
 	nes_namcot3425_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+	virtual void write_h(offs_t offset, uint8_t data) override;
 
 	virtual void pcb_reset() override;
 
@@ -83,12 +83,12 @@ public:
 	// construction/destruction
 	nes_namcot340_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ8_MEMBER(n340_loread);
-	virtual DECLARE_WRITE8_MEMBER(n340_lowrite);
-	virtual DECLARE_WRITE8_MEMBER(n340_hiwrite);
-	virtual DECLARE_READ8_MEMBER(read_l) override { return n340_loread(space, offset, mem_mask); }
-	virtual DECLARE_WRITE8_MEMBER(write_l) override { n340_lowrite(space, offset, data, mem_mask); }
-	virtual DECLARE_WRITE8_MEMBER(write_h) override { n340_hiwrite(space, offset, data, mem_mask); }
+	uint8_t n340_loread(offs_t offset);
+	void n340_lowrite(offs_t offset, uint8_t data);
+	void n340_hiwrite(offs_t offset, uint8_t data);
+	virtual uint8_t read_l(offs_t offset) override { return n340_loread(offset); }
+	virtual void write_l(offs_t offset, uint8_t data) override { n340_lowrite(offset, data); }
+	virtual void write_h(offs_t offset, uint8_t data) override { n340_hiwrite(offset, data); }
 
 	virtual void pcb_reset() override;
 
@@ -122,9 +122,9 @@ public:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual DECLARE_READ8_MEMBER(read_m) override;
-	virtual DECLARE_WRITE8_MEMBER(write_m) override;
-	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+	virtual uint8_t read_m(offs_t offset) override;
+	virtual void write_m(offs_t offset, uint8_t data) override;
+	virtual void write_h(offs_t offset, uint8_t data) override;
 
 	virtual void pcb_reset() override;
 
@@ -141,15 +141,15 @@ public:
 	// construction/destruction
 	nes_namcot163_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ8_MEMBER(read_l) override;
-	virtual DECLARE_READ8_MEMBER(read_m) override;
-	virtual DECLARE_WRITE8_MEMBER(write_l) override;
-	virtual DECLARE_WRITE8_MEMBER(write_m) override;
-	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+	virtual uint8_t read_l(offs_t offset) override;
+	virtual uint8_t read_m(offs_t offset) override;
+	virtual void write_l(offs_t offset, uint8_t data) override;
+	virtual void write_m(offs_t offset, uint8_t data) override;
+	virtual void write_h(offs_t offset, uint8_t data) override;
 
 	// we have to overwrite these to allow CIRAM to be used for VRAM, even if it's not clear which game(s) use this
-	virtual DECLARE_READ8_MEMBER(chr_r) override;
-	virtual DECLARE_WRITE8_MEMBER(chr_w) override;
+	virtual uint8_t chr_r(offs_t offset) override;
+	virtual void chr_w(offs_t offset, uint8_t data) override;
 
 	virtual void pcb_reset() override;
 

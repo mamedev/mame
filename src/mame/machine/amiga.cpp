@@ -1052,10 +1052,10 @@ READ16_MEMBER( amiga_state::cia_r )
 	uint16_t data = 0;
 
 	if ((offset & 0x1000/2) == 0 && ACCESSING_BITS_0_7)
-		data |= m_cia_0->read(space, offset >> 7);
+		data |= m_cia_0->read(offset >> 7);
 
 	if ((offset & 0x2000/2) == 0 && ACCESSING_BITS_8_15)
-		data |= m_cia_1->read(space, offset >> 7) << 8;
+		data |= m_cia_1->read(offset >> 7) << 8;
 
 	if (LOG_CIA)
 		logerror("%s: cia_r(%06x) = %04x & %04x\n", machine().describe_context(), offset, data, mem_mask);
@@ -1069,10 +1069,10 @@ WRITE16_MEMBER( amiga_state::cia_w )
 		logerror("%s: cia_w(%06x) = %04x & %04x\n", machine().describe_context(), offset, data, mem_mask);
 
 	if ((offset & 0x1000/2) == 0 && ACCESSING_BITS_0_7)
-		m_cia_0->write(space, offset >> 7, data & 0xff);
+		m_cia_0->write(offset >> 7, data & 0xff);
 
 	if ((offset & 0x2000/2) == 0 && ACCESSING_BITS_8_15)
-		m_cia_1->write(space, offset >> 7, data >> 8);
+		m_cia_1->write(offset >> 7, data >> 8);
 }
 
 WRITE16_MEMBER( amiga_state::gayle_cia_w )

@@ -294,8 +294,8 @@ static INPUT_PORTS_START( cfrogger )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_melps4_state, reset_button, nullptr)
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(cfrogger_state::cfrogger)
-
+void cfrogger_state::cfrogger(machine_config &config)
+{
 	/* basic machine hardware */
 	M58846(config, m_maincpu, 600_kHz_XTAL);
 	m_maincpu->read_k().set(FUNC(cfrogger_state::input_r));
@@ -306,17 +306,16 @@ MACHINE_CONFIG_START(cfrogger_state::cfrogger)
 	m_maincpu->write_t().set(FUNC(cfrogger_state::speaker_w));
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(500, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 500-1, 0, 1080-1)
+	screen_device &screen(SCREEN(config, "screen", "svg"));
+	screen.set_refresh_hz(50);
+	screen.set_size(500, 1080);
+	screen.set_visarea(0, 500-1, 0, 1080-1);
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_melps4_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -409,8 +408,8 @@ static INPUT_PORTS_START( gjungler )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_melps4_state, reset_button, nullptr)
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(gjungler_state::gjungler)
-
+void gjungler_state::gjungler(machine_config &config)
+{
 	/* basic machine hardware */
 	M58846(config, m_maincpu, 600_kHz_XTAL);
 	m_maincpu->read_k().set(FUNC(gjungler_state::input_r));
@@ -422,17 +421,16 @@ MACHINE_CONFIG_START(gjungler_state::gjungler)
 	m_maincpu->write_t().set(FUNC(gjungler_state::speaker_w));
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(481, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 481-1, 0, 1080-1)
+	screen_device &screen(SCREEN(config, "screen", "svg"));
+	screen.set_refresh_hz(50);
+	screen.set_size(481, 1080);
+	screen.set_visarea(0, 481-1, 0, 1080-1);
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_melps4_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 

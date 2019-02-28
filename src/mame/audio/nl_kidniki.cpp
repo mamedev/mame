@@ -2,8 +2,17 @@
 // copyright-holders:Andrew Gardner, Couriersud
 #include "netlist/devices/net_lib.h"
 
+#ifdef NLBASE_H_
+#error Somehow nl_base.h made it into the include chain.
+#endif
+
+#ifndef NLTOOL_VERSION
 #define USE_FRONTIERS 1
 #define USE_FIXED_STV 1
+#else
+#define USE_FRONTIERS 0
+#define USE_FIXED_STV 1
+#endif
 
 /* ----------------------------------------------------------------------------
  *  Library section header START
@@ -317,7 +326,7 @@ NETLIST_START(kidniki)
 	PARAM(Solver.METHOD, "MAT_CR")
 	//PARAM(Solver.METHOD, "MAT")
 	//PARAM(Solver.METHOD, "GMRES")
-	PARAM(Solver.SOR_FACTOR, 1.0)
+	PARAM(Solver.SOR_FACTOR, 1.313)
 	PARAM(Solver.DYNAMIC_TS, 0)
 	PARAM(Solver.DYNAMIC_LTE, 5e-4)
 	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 20e-6)
@@ -325,9 +334,11 @@ NETLIST_START(kidniki)
 	SOLVER(Solver, 18000)
 	PARAM(Solver.ACCURACY, 1e-7)
 	PARAM(Solver.NR_LOOPS, 100)
-	PARAM(Solver.GS_LOOPS, 20)
+	PARAM(Solver.GS_LOOPS, 300)
 	//PARAM(Solver.METHOD, "MAT_CR")
 	PARAM(Solver.METHOD, "GMRES")
+	//PARAM(Solver.SOR_FACTOR, 1.73)
+	//PARAM(Solver.METHOD, "SOR")
 #endif
 
 #if (USE_FRONTIERS)

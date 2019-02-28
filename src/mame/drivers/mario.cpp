@@ -335,12 +335,12 @@ WRITE_LINE_MEMBER(mario_state::vblank_irq)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-MACHINE_CONFIG_START(mario_state::mario_base)
-
+void mario_state::mario_base(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, Z80_CLOCK) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(mario_map)
-	MCFG_DEVICE_IO_MAP(mario_io_map)
+	Z80(config, m_maincpu, Z80_CLOCK); /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &mario_state::mario_map);
+	m_maincpu->set_addrmap(AS_IO, &mario_state::mario_io_map);
 
 	/* devices */
 	Z80DMA(config, m_z80dma, Z80_CLOCK);
@@ -359,16 +359,15 @@ MACHINE_CONFIG_START(mario_state::mario_base)
 	mainlatch.q_out_cb<7>().set(FUNC(mario_state::coin_counter_2_w));   // COUNTER 1 (misnumbered on schematic)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(mario_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mario_state, vblank_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
+	screen.set_screen_update(FUNC(mario_state::screen_update));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(mario_state::vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mario);
 	PALETTE(config, m_palette, FUNC(mario_state::mario_palette), 256);
-
-MACHINE_CONFIG_END
+}
 
 void mario_state::mario(machine_config &config)
 {
@@ -376,15 +375,15 @@ void mario_state::mario(machine_config &config)
 	mario_audio(config);
 }
 
-MACHINE_CONFIG_START(mario_state::masao)
+void mario_state::masao(machine_config &config)
+{
 	mario_base(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(4000000)        /* 4.000 MHz (?) */
-	MCFG_DEVICE_PROGRAM_MAP(masao_map)
+	m_maincpu->set_clock(4000000);        /* 4.000 MHz (?) */
+	m_maincpu->set_addrmap(AS_PROGRAM, &mario_state::masao_map);
 
 	/* sound hardware */
 	masao_audio(config);
-MACHINE_CONFIG_END
+}
 
 
 /*************************************

@@ -42,13 +42,13 @@ void turbo_state::turbo_palette(palette_device &palette) const
 	for (int i = 0; i < 256; i++)
 	{
 		// red component
-		int const r = combine_3_weights(rweights, BIT(i, 0), BIT(i, 1), BIT(i, 2));
+		int const r = combine_weights(rweights, BIT(i, 0), BIT(i, 1), BIT(i, 2));
 
 		// green component
-		int const g = combine_3_weights(gweights, BIT(i, 3), BIT(i, 4), BIT(i, 5));
+		int const g = combine_weights(gweights, BIT(i, 3), BIT(i, 4), BIT(i, 5));
 
 		// blue component
-		int const b = combine_2_weights(bweights, BIT(i, 6), BIT(i, 7));
+		int const b = combine_weights(bweights, BIT(i, 6), BIT(i, 7));
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -70,13 +70,13 @@ void turbo_state::subroc3d_palette(palette_device &palette) const
 	for (int i = 0; i < 256; i++)
 	{
 		// red component
-		int const r = combine_3_weights(rweights, BIT(i, 0), BIT(i, 1), BIT(i, 2));
+		int const r = combine_weights(rweights, BIT(i, 0), BIT(i, 1), BIT(i, 2));
 
 		// green component
-		int const g = combine_3_weights(gweights, BIT(i, 3), BIT(i, 4), BIT(i, 5));
+		int const g = combine_weights(gweights, BIT(i, 3), BIT(i, 4), BIT(i, 5));
 
 		// blue component
-		int const b = combine_2_weights(bweights, BIT(i, 6), BIT(i, 7));
+		int const b = combine_weights(bweights, BIT(i, 6), BIT(i, 7));
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -98,13 +98,13 @@ void turbo_state::buckrog_palette(palette_device &palette) const
 	for (int i = 0; i < 1024; i++)
 	{
 		// red component
-		int const r = combine_3_weights(rweights, BIT(i, 0), BIT(i, 1), BIT(i, 2));
+		int const r = combine_weights(rweights, BIT(i, 0), BIT(i, 1), BIT(i, 2));
 
 		// green component
-		int const g = combine_3_weights(gweights, BIT(i, 3), BIT(i, 4), BIT(i, 5));
+		int const g = combine_weights(gweights, BIT(i, 3), BIT(i, 4), BIT(i, 5));
 
 		// blue component - note the shuffled bits
-		int const b = combine_4_weights(bweights, BIT(i, 8), BIT(i, 9), BIT(i, 6), BIT(i, 7));
+		int const b = combine_weights(bweights, BIT(i, 8), BIT(i, 9), BIT(i, 6), BIT(i, 7));
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}

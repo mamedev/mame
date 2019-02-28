@@ -150,7 +150,7 @@ void jailbrek_state::jailbrek_map(address_map &map)
 	map(0x2043, 0x2043).nopw(); /* ??? */
 	map(0x2044, 0x2044).w(FUNC(jailbrek_state::ctrl_w)); /* irq, nmi enable, screen flip */
 	map(0x3000, 0x3000).w(FUNC(jailbrek_state::coin_w));
-	map(0x3100, 0x3100).portr("DSW2").w("snsnd", FUNC(sn76489a_device::command_w));
+	map(0x3100, 0x3100).portr("DSW2").w("snsnd", FUNC(sn76489a_device::write));
 	map(0x3200, 0x3200).portr("DSW3").nopw(); /* mirror of the previous? */
 	map(0x3300, 0x3300).portr("SYSTEM").w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x3301, 0x3301).portr("P1");

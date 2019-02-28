@@ -2,13 +2,15 @@
 // copyright-holders:Joakim Larsson Edstrom
 /*
  *
- * History of Didact
- *------------------
+ * History of Didact and Esselte Studium
+ *--------------------------------------
  * Didact Laromedelsproduktion was started in Linkoping in Sweden by Anders Andersson, Arne Kullbjer and
  * Lars Bjorklund. They constructed a series of microcomputers for educational purposes such as "Mikrodator 6802",
  * Esselte 100 and the Candela computer for the swedish schools to educate the students in assembly programming
  * and BASIC for electro mechanical applications such as stepper motors, simple process control, buttons
- * and LED:s. Didact designs were marketed by Esselte Studium to the swedish schools.
+ * and LED:s. Didact designs were marketed by Esselte Studium to the swedish schools. Late designs like the
+ * "Modulab v2" appears to have been owned or licensed to Esselte and enhanced with more modular monitor routines
+ * in a project driven by Alf Karlsson.
  *
  * The Esselte 1000 was an educational package based on Apple II plus software and litterature
  * but the relation to Didact is at this point unknown so it is probably a pure Esselte software production.
@@ -21,28 +23,30 @@
  * http://elektronikforumet.com/forum/viewtopic.php?f=2&t=79576&start=150#p1203915
  *
  *  TODO:
- *  Didact designs:    mp68a, md6802, Modulab, Esselte 100
- * -------------------------------------------------------
- *  - Add PCB layouts   OK     OK                OK
- *  - Dump ROM:s,       OK     OK                rev2
- *  - Keyboard          OK     OK                rev2
- *  - Display/CRT       OK     OK                OK
- *  - Clickable Artwork RQ     RQ
+ *  Didact designs:    mp68a, md6802, Modulab
+ * ------------------------------------------
+ *  - Add PCB layouts   OK     OK     OK
+ *  - Dump ROM:s,       OK     OK     OK
+ *  - Keyboard          OK     OK     OK
+ *  - Display/CRT       OK     OK     OK
+ *  - Clickable Artwork RQ     RQ     OK
  *  - Sound             NA     NA
- *  - Cassette i/f                               OK
+ *  - Cassette i/f
  *  - Expansion bus
  *  - Expansion overlay
- *  - Interrupts        OK                       OK
- *  - Serial                   XX                XX
+ *  - Interrupts        OK
+ *  - Serial                   XX
  *   XX = needs debug
- ****************************************************************************/
+ *********************************************/
 
 #include "emu.h"
-#include "cpu/m6800/m6800.h" // For mp68a, md6802
+#include "cpu/m6800/m6800.h" // For all boards
 #include "machine/6821pia.h" // For all boards
 #include "machine/74145.h"   // For the md6802
-#include "machine/timer.h"
 #include "video/dm9368.h"    // For the mp68a
+#include "machine/ins8154.h" // For the modulab
+#include "machine/mm74c922.h"// For the modulab
+#include "machine/rescap.h"  // For the modulab
 
 // Features
 #include "imagedev/cassette.h"
@@ -52,32 +56,25 @@
 // Generated artwork includes
 #include "mp68a.lh"
 #include "md6802.lh"
+#include "modulab.lh"
 
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define LOG_SETUP   (1U <<  1)
-#define LOG_SCAN    (1U <<  2)
-#define LOG_BANK    (1U <<  3)
-#define LOG_SCREEN  (1U <<  4)
-#define LOG_READ    (1U <<  5)
-#define LOG_CS      (1U <<  6)
-#define LOG_PLA     (1U <<  7)
-#define LOG_PROM    (1U <<  8)
+#define LOG_SETUP    (1U <<  1)
+#define LOG_READ     (1U <<  2)
+#define LOG_DISPLAY  (1U <<  3)
+#define LOG_KEYBOARD (1U <<  4)
 
-//#define VERBOSE (LOG_READ | LOG_GENERAL | LOG_SETUP | LOG_PLA | LOG_BANK)
+//#define VERBOSE (LOG_KEYBOARD)
 //#define LOG_OUTPUT_FUNC printf
 #include "logmacro.h"
 
-#define LOGSETUP(...)   LOGMASKED(LOG_SETUP,   __VA_ARGS__)
-#define LOGSCAN(...)    LOGMASKED(LOG_SCAN,    __VA_ARGS__)
-#define LOGBANK(...)    LOGMASKED(LOG_BANK,    __VA_ARGS__)
-#define LOGSCREEN(...)  LOGMASKED(LOG_SCREEN,  __VA_ARGS__)
-#define LOGR(...)       LOGMASKED(LOG_READ,    __VA_ARGS__)
-#define LOGCS(...)      LOGMASKED(LOG_CS,      __VA_ARGS__)
-#define LOGPLA(...)     LOGMASKED(LOG_PLA,     __VA_ARGS__)
-#define LOGPROM(...)    LOGMASKED(LOG_PROM,    __VA_ARGS__)
+#define LOGSETUP(...)   LOGMASKED(LOG_SETUP,    __VA_ARGS__)
+#define LOGREAD(...)    LOGMASKED(LOG_READ,     __VA_ARGS__)
+#define LOGDISPLAY(...) LOGMASKED(LOG_DISPLAY,  __VA_ARGS__)
+#define LOGKBD(...)     LOGMASKED(LOG_KEYBOARD, __VA_ARGS__)
 
 #ifdef _MSC_VER
 #define FUNCNAME __func__
@@ -89,6 +86,7 @@
 #define PIA2_TAG "pia2"
 #define PIA3_TAG "pia3"
 #define PIA4_TAG "pia4"
+#define MM74C923_TAG "74c923"
 
 /* Didact base class */
 class didact_state : public driver_device
@@ -98,23 +96,21 @@ class didact_state : public driver_device
 		: driver_device(mconfig, type, tag)
 		, m_io_lines(*this, "LINE%u", 0U)
 		, m_lines{ 0, 0, 0, 0 }
-		, m_led(0)
 		, m_rs232(*this, "rs232")
-		, m_leds(*this, "led%u", 0U)
+		, m_led(*this, "led1")
 	{ }
 
-	TIMER_DEVICE_CALLBACK_MEMBER(scan_artwork);
-
+	DECLARE_INPUT_CHANGED_MEMBER(trigger_reset);
+	DECLARE_INPUT_CHANGED_MEMBER(trigger_shift);
 protected:
-	virtual void machine_start() override { m_leds.resolve(); }
+	virtual void machine_start() override { m_led.resolve(); }
 
 	required_ioport_array<5> m_io_lines;
 	uint8_t m_lines[4];
 	uint8_t m_reset;
 	uint8_t m_shift;
-	uint8_t m_led;
 	optional_device<rs232_port_device> m_rs232;
-	output_finder<2> m_leds;
+	output_finder<> m_led;
 };
 
 
@@ -175,7 +171,7 @@ protected:
 	DECLARE_WRITE8_MEMBER( pia2_kbA_w );
 	DECLARE_READ8_MEMBER( pia2_kbB_r );
 	DECLARE_WRITE8_MEMBER( pia2_kbB_w );
-	DECLARE_WRITE_LINE_MEMBER( pia2_ca2_w);
+	DECLARE_WRITE_LINE_MEMBER( pia2_ca2_w );
 
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
@@ -212,7 +208,7 @@ READ8_MEMBER( md6802_state::pia2_kbA_r )
 	if (m_shift)
 	{
 		pa &= 0x7f;   // Clear shift bit if button being pressed (PA7) to ground (internal pullup)
-		LOG("SHIFT is pressed\n");
+		LOGKBD("SHIFT is pressed\n");
 	}
 
 	// Serial IN - needs debug/verification
@@ -251,8 +247,8 @@ WRITE8_MEMBER( md6802_state::pia2_kbB_w )
 
 WRITE_LINE_MEMBER( md6802_state::pia2_ca2_w )
 {
-	LOG("--->%s(%02x) LED is connected through resisitor to +5v so logical 0 will lit it\n", FUNCNAME, state);
-	m_leds[m_led] = state ? 0 :1;
+	LOGKBD("--->%s(%02x) LED is connected through resisitor to +5v so logical 0 will lit it\n", FUNCNAME, state);
+	m_led = state ? 0 :1;
 
 	// Serial Out - needs debug/verification
 	m_rs232->write_txd(state);
@@ -269,13 +265,11 @@ void md6802_state::machine_start()
 
 	save_item(NAME(m_reset));
 	save_item(NAME(m_shift));
-	save_item(NAME(m_led));
 }
 
 void md6802_state::machine_reset()
 {
 	LOG("--->%s()\n", FUNCNAME);
-	m_led = 1;
 	m_maincpu->reset();
 }
 
@@ -365,6 +359,20 @@ protected:
 	required_device<pia6820_device> m_pia2;
 };
 
+INPUT_CHANGED_MEMBER(didact_state::trigger_shift)
+{
+	if (newval == CLEAR_LINE)
+	{
+		LOGKBD("SHIFT is released\n");
+	}
+	else
+	{
+		LOGKBD("SHIFT is pressed\n");
+		m_shift = 1;
+		m_led = 1;
+	}
+}
+
 READ8_MEMBER( mp68a_state::pia2_kbA_r )
 {
 	LOG("--->%s\n", FUNCNAME);
@@ -401,7 +409,7 @@ READ8_MEMBER( mp68a_state::pia2_kbB_r )
 {
 	uint8_t a012, line, pb;
 
-	LOG("--->%s %02x %02x %02x %02x %02x => ", FUNCNAME, m_lines[0], m_lines[1], m_lines[2], m_lines[3], m_shift);
+	LOGKBD("--->%s %02x %02x %02x %02x %02x => ", FUNCNAME, m_lines[0], m_lines[1], m_lines[2], m_lines[3], m_shift);
 
 	a012 = 0;
 	if ((line = (m_lines[0] | m_lines[1])) != 0)
@@ -422,11 +430,11 @@ READ8_MEMBER( mp68a_state::pia2_kbB_r )
 	{
 		pb |= 0x80;   // Set shift bit (PB7)
 		m_shift = 0;  // Reset flip flop
-		m_leds[m_led] = m_shift ? 1 : 0;
-		LOG("SHIFT is released\n");
+		m_led = 0;
+		LOGKBD(" SHIFT is released\n");
 	}
 
-	LOG("%02x\n", pb);
+	LOGKBD("%02x\n", pb);
 
 	return pb;
 }
@@ -441,10 +449,8 @@ READ_LINE_MEMBER( mp68a_state::pia2_cb1_r )
 	for (unsigned i = 0U; 4U > i; ++i)
 		m_lines[i] = m_io_lines[i]->read();
 
-#if VERBOSE
-	if (m_lines[0] | m_lines[1] | m_lines[2] | m_lines[3])
+	if ((VERBOSE & LOG_GENERAL) && (m_lines[0] | m_lines[1] | m_lines[2] | m_lines[3]))
 		LOG("%s()-->%02x %02x %02x %02x\n", FUNCNAME, m_lines[0], m_lines[1], m_lines[2], m_lines[3]);
-#endif
 
 	return (m_lines[0] | m_lines[1] | m_lines[2] | m_lines[3]) ? 0 : 1;
 }
@@ -464,7 +470,6 @@ void mp68a_state::machine_start()
 
 	/* register for state saving */
 	save_item(NAME(m_shift));
-	save_item(NAME(m_led));
 	save_item(NAME(m_reset));
 }
 
@@ -477,6 +482,213 @@ void mp68a_state::mp68a_map(address_map &map)
 	map(0x0700, 0x07ff).ram().mirror(0xf000);
 	map(0x0800, 0x0bff).rom().mirror(0xf400).region("maincpu", 0x0800);
 }
+
+//===================
+
+/*   The Modulab CPU board, by Didact/Esselte ca 1984
+ *  __________________________________________________________________________________________
+ * |                                                    ADRESS               DATA             |
+ * |              PORT A                      +-_--++-_--++-_--++-_--+   +-_--++-_--+   VCC   |
+ * |    o   o   o   o   o   o   o   o         || | ||| | ||| | ||| | |   || | ||| | |    O    |
+ * |    7   6   5   4   3   2   1   0         | -  || -  || -  || -  |   | -  || -  |         |
+ * |    o   o   o   o   o   o   o   o         ||_|.|||_|.|||_|.|||_|.|   ||_|.|||_|.|   GND   |
+ * |              PORT B                      +----++----++----++----+   +----++----+    O    |
+ * |  o VCC                                    +--+  +--+  +--+  +--+     +--+  +--+          |
+ * |                                           |LS|  |LS|  |LS|  |LS|     |LS|  |LS|          |
+ * |  o GND                                    |164  |164  |164  |164     |164  |164          |
+ * \\                                          |-5|<-|-4|<-|-3|<-|-2| <-  |-1|<-|-0|<- DB0    |
+ * |\\ ____                                    +--+  +--+  +--+  +--+     +--+  +--+          |
+ * | \/o  O|                                          +-------+-------+-------+-------+-------+
+ * | |     |E           +--------------------+ +--+   |       |       |       |       |       |
+ * | |     |X   +----+  |  PIA + 128x8 SRAM  | |LS|   |  RUN  |  ADS  |  FWD  | C/B   | RESET |
+ * | |     |P   |4MHz|  |  INS8154N          | |14|   |       |       |       |       |       |
+ * | |     |A   |XTAL|  +--------------------+ |  |   +-------+-------+-------+-------+-------+
+ * | |     |N   |____|                         +--+   |       |       |       |       |       |
+ * | |__   |S    |  |   +--------------------+ +--+   |   C   |   D   |   E   |   F   |       |
+ * |  __|  |I           |  CPU               | |LS|   |       |       |       |       |       |
+ * | |     |O           |  MC6802P           | |138   +-------+-------+-------+-------+       |
+ * | |     |N           +--------------------+ |  |   |       |       |       |       |       |
+ * | |     |B                                  +--+   |   8   |   9   |   A   |   B   |       |
+ * | |     |U    IRQ    +-------------+        +--+   |       |       |       |       |       |
+ * | |     |S    o      |  EPROM      |        |74|   +-------+-------+-------+-------+       |
+ * | /\o  O|            |  2764       |        |C |   |       |       |       |       |       |
+ * |// ----             +-------------+        |923   |   4   |   5   |   6   |   7   |       |
+ * //                     +-----------+        |  |   |       |       |       |       |       |
+ * |                      | 2KB SRAM  |        +--+   +-------+-------+-------+-------+       |
+ * |                      | 6116      |        +--+   |       |       |       |       |       |
+ * |                      +-----------+        |LS|   |   0   |   1   |   2   |   3   |       |
+ * | ESSELTE       +-------+ +---+ +--------+  |138   |       |       |       |       |       |
+ * | STUDIUM       |74LS123| |TRM| |SN74367 |  |  |   +-------+-------+-------+-------+       |
+ * |               +-------+ +---+ +--------+  +--+
+ * |__________________________________________________________________________________________|
+ *
+ */
+
+/* Didact modulab driver class */
+class modulab_state : public didact_state
+{
+	public:
+	modulab_state(const machine_config &mconfig, device_type type, const char * tag)
+		: didact_state(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_7segs(*this, "digit%u", 0U)
+		, m_pia1(*this, PIA1_TAG)
+		, m_kb(*this, MM74C923_TAG)
+		, m_da(0)
+	{ }
+
+	required_device<m6802_cpu_device> m_maincpu;
+
+	output_finder<6> m_7segs;
+
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
+	void modulab(machine_config &config);
+protected:
+	DECLARE_READ8_MEMBER( io_r );
+	DECLARE_WRITE8_MEMBER( io_w );
+	DECLARE_WRITE_LINE_MEMBER( da_w );
+private:
+	void modulab_map(address_map &map);
+	// Offsets for display and keyboard i/o
+	enum
+	{
+		DISPLAY = 0,
+		KEY_DATA = 2,
+		KEY_STROBE = 3
+	};
+
+	// Simple emulation of 6 cascaded 74164 that drives the AAAADD BCD display elements, right to left
+	class shift8
+	{
+	public:
+		shift8(){ byte = 0; }
+		void shiftIn(uint8_t in){ byte = ((byte << 1) & 0xfe) | (in & 1 ? 1 : 0); }
+		uint8_t byte;
+	};
+	shift8 m_74164[6];
+
+	required_device<ins8154_device> m_pia1;
+	required_device<mm74c922_device> m_kb;
+	uint8_t m_da;
+};
+
+WRITE_LINE_MEMBER( modulab_state::da_w )
+{
+	LOG("--->%s()\n", FUNCNAME);
+	m_da = state == CLEAR_LINE ? 0 : 1; // Capture data available signal
+}
+
+READ8_MEMBER(modulab_state::io_r)
+{
+	switch (offset)
+	{
+	case 3: // Poll Data available signal
+		return m_da & 0x01; // Data Available signal gated by an 8097 hexbuffer to DB0
+		break;
+	case 2:
+		LOG("--->%s Read Keyboard @ %04x\n", FUNCNAME, offset);
+		return m_kb->read();
+		break;
+	default:
+		LOG("--->%s BAD access @ %04x\n", FUNCNAME, offset);
+		break;
+	}
+	return 0;
+}
+
+WRITE8_MEMBER(modulab_state::io_w)
+{
+	LOG("--->%s()\n", FUNCNAME);
+	uint8_t b = data & 1;
+	switch (offset)
+	{
+	case DISPLAY:
+		// Update the BCD elements with a data bit b shifted in right to left, CS is used as clock for all 164's
+		for (int i = 0; i < 6; i++)
+		{
+			uint8_t c = (m_74164[i].byte & 0x80) ? 1 : 0; // Bit 7 is connected to the next BCD right to left
+			m_74164[i].shiftIn(b);
+			m_7segs[i] = ~m_74164[i].byte & 0x7f;  // Bit 0 to 6 drives the 7 seg display
+			b = c; // bit 7 prior shift will be shifted in next (simultaneous in real life)
+		}
+		LOGDISPLAY("Shifted: %02x %02x %02x %02x %02x %02x\n",
+				~m_74164[0].byte & 0x7f, ~m_74164[1].byte & 0x7f, ~m_74164[2].byte & 0x7f,
+				~m_74164[3].byte & 0x7f, ~m_74164[4].byte & 0x7f, ~m_74164[5].byte & 0x7f);
+		break;
+	default:
+		break;
+	};
+}
+
+void modulab_state::machine_reset()
+{
+	LOG("--->%s()\n", FUNCNAME);
+
+	m_maincpu->reset();
+}
+
+void modulab_state::machine_start()
+{
+	LOG("--->%s()\n", FUNCNAME);
+
+	didact_state::machine_start();
+	m_7segs.resolve();
+
+	/* register for state saving */
+	save_item(NAME(m_shift));
+	save_item(NAME(m_reset));
+}
+
+// This address map is traced from pcb
+void modulab_state::modulab_map(address_map &map)
+{
+	//map(0x0000, 0x007f).ram() // Schematics holds RAM enable low so that the M6802 internal RAM is disabled.
+	map(0x0000, 0x03ff).ram().mirror(0xe000); // RAM0 always present 2114
+	map(0x0400, 0x07ff).ram().mirror(0xe000); // RAM1 optional 2114
+	// map(0x0800, 0x13ff).ram().mirror(0xe000); // expansion port area consisting of 3 chip selects each selecting 0x3ff byte addresses
+	map(0x1400, 0x17ff).rom().mirror(0xe000).region("maincpu", 0x0000);
+	map(0x1800, 0x187f).rw(FUNC(modulab_state::io_r), FUNC(modulab_state::io_w)).mirror(0xe200);
+	map(0x1900, 0x197f).rw(m_pia1, FUNC(ins8154_device::ins8154_r), FUNC(ins8154_device::ins8154_w)).mirror(0xe200);
+	map(0x1980, 0x19ff).ram().mirror(0xe200); // 8154 internal RAM
+	map(0x1c00, 0x1fff).rom().mirror(0xe000).region("maincpu", 0x0400);
+}
+
+//===================
+
+static INPUT_PORTS_START( modulab )
+	PORT_START("LINE0") // X1
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('C')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RUN") PORT_CODE(KEYCODE_R) PORT_CHAR('R')
+
+	PORT_START("LINE1") // X2
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CHAR('9')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('D')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("ADS") PORT_CODE(KEYCODE_Z) PORT_CHAR('Z')
+
+	PORT_START("LINE2") // X3
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('E')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("FWD") PORT_CODE(KEYCODE_W) PORT_CHAR('W')
+
+	PORT_START("LINE3") // X4
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('B')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("C/B") PORT_CODE(KEYCODE_X) PORT_CHAR('X')
+
+	PORT_START("LINE4") /* Special KEY ROW for reset key */
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_F12) PORT_CHANGED_MEMBER(DEVICE_SELF, modulab_state, trigger_reset, nullptr)
+	PORT_BIT(0xfb, 0x00, IPT_UNUSED )
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( md6802 )
 	PORT_START("LINE0") /* KEY ROW 0 */
@@ -508,8 +720,8 @@ static INPUT_PORTS_START( md6802 )
 	PORT_BIT(0xf0, 0x00, IPT_UNUSED )
 
 	PORT_START("LINE4") /* Special KEY ROW for reset and Shift/'*' keys */
-	PORT_BIT(0x08, 0x00, IPT_KEYBOARD) PORT_NAME("*") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR('*')
-	PORT_BIT(0x04, 0x00, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_F12)
+	PORT_BIT(0x08, 0x00, IPT_KEYBOARD) PORT_NAME("*") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR('*') PORT_CHANGED_MEMBER(DEVICE_SELF, md6802_state, trigger_shift, nullptr)
+	PORT_BIT(0x04, 0x00, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_F12) PORT_CHANGED_MEMBER(DEVICE_SELF, md6802_state, trigger_reset, nullptr)
 	PORT_BIT(0xf3, 0x00, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -542,43 +754,47 @@ static INPUT_PORTS_START( mp68a )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("3") PORT_CODE(KEYCODE_3)    PORT_CHAR('3')
 	PORT_BIT(0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("LINE4") /* Special KEY ROW for reset and Shift/'*' keys */
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("*") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR('*')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_F12)
+	PORT_START("LINE4") /* Special KEY ROW for reset and Shift/'*' keys, they are hard wired */
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("*") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR('*') PORT_CHANGED_MEMBER(DEVICE_SELF, mp68a_state, trigger_shift, nullptr)
+	//PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_F12)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_F12) PORT_CHANGED_MEMBER(DEVICE_SELF, mp68a_state, trigger_reset, nullptr)
 	PORT_BIT(0xf3, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-// TODO: Fix shift led for mp68a correctly, workaround doesn't work anymore! Shift works though...
-TIMER_DEVICE_CALLBACK_MEMBER(didact_state::scan_artwork)
+INPUT_CHANGED_MEMBER(didact_state::trigger_reset)
 {
-	//  LOG("--->%s()\n", FUNCNAME);
-
-	// Poll the artwork Reset key
-	if (m_io_lines[4]->read() & 0x04)
+	if (newval == CLEAR_LINE)
 	{
-		LOG("RESET is pressed, resetting the CPU\n");
+		LOGKBD("RESET is released, resetting the CPU\n");
+		machine_reset();
 		m_shift = 0;
-		m_leds[m_led] = m_shift ? 1 : 0; // For mp68a only
-		if (m_reset == 0)
-		{
-			machine_reset();
-		}
-		m_reset = 1; // Inhibit multiple resets
+		m_led = 0;
 	}
-	else if (m_io_lines[4]->read() & 0x08)
-	{
-		// Poll the artwork SHIFT/* key
-		LOG("%s", !m_shift ? "SHIFT is set\n" : "");
-		m_shift = 1;
-		m_leds[m_led] = m_shift ? 1 : 0; // For mp68a only
-	}
-	else
-	{
-		if (m_reset == 1)
-		{
-			m_reset = 0; // Enable reset again
-		}
-	}
+}
+
+
+void modulab_state::modulab(machine_config &config)
+{
+	M6802(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &modulab_state::modulab_map);
+	config.set_default_layout(layout_modulab);
+
+	/* Devices */
+	MM74C923(config, m_kb, 0);
+	m_kb->set_cap_osc(CAP_U(0.10));
+	m_kb->set_cap_debounce(CAP_U(1));
+	m_kb->da_wr_callback().set(FUNC(modulab_state::da_w));
+	m_kb->x1_rd_callback().set_ioport("LINE0");
+	m_kb->x2_rd_callback().set_ioport("LINE1");
+	m_kb->x3_rd_callback().set_ioport("LINE2");
+	m_kb->x4_rd_callback().set_ioport("LINE3");
+
+	/* PIA #1 0x????-0x??? -  */
+	INS8154(config, m_pia1);
+	//m_ins8154->in_a().set(FUNC(modulab_state::ins8154_pa_r));
+	//m_ins8154->out_a().set(FUNC(modulab_state::ins8154_pa_w));
+
+	//RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
 }
 
 void md6802_state::md6802(machine_config &config)
@@ -611,10 +827,8 @@ void md6802_state::md6802(machine_config &config)
 	m_pia2->readpb_handler().set(FUNC(md6802_state::pia2_kbB_r));
 	m_pia2->ca2_handler().set(FUNC(md6802_state::pia2_ca2_w));
 
-	TIMER(config, "artwork_timer").configure_periodic(FUNC(md6802_state::scan_artwork), attotime::from_hz(10));
-
 	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
-MACHINE_CONFIG_END
+}
 
 void mp68a_state::mp68a(machine_config &config)
 {
@@ -668,9 +882,21 @@ void mp68a_state::mp68a(machine_config &config)
 	DM9368(config, m_digits[3], 0).update_cb().set(FUNC(mp68a_state::digit_w<3>));
 	DM9368(config, m_digits[4], 0).update_cb().set(FUNC(mp68a_state::digit_w<4>));
 	DM9368(config, m_digits[5], 0).update_cb().set(FUNC(mp68a_state::digit_w<5>));
-
-	TIMER(config, "artwork_timer").configure_periodic(FUNC(mp68a_state::scan_artwork), attotime::from_hz(10));
 }
+
+ROM_START( modulab )
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_DEFAULT_BIOS("modulabvl")
+
+	ROM_SYSTEM_BIOS(0, "modulabv1", "Modulab Version 1")
+	ROMX_LOAD( "mlab1_00.bin", 0x0000, 0x0800, NO_DUMP, ROM_BIOS(0) )
+
+	ROM_SYSTEM_BIOS(1, "modulabv2", "Modulab Version 2")
+	ROMX_LOAD( "mlab2_00.bin", 0x0000, 0x0800, NO_DUMP, ROM_BIOS(1) )
+
+	ROM_SYSTEM_BIOS(2, "modulabvl", "Modulab Prototype")
+	ROMX_LOAD( "modulab_levererad.bin", 0x0000, 0x0800, CRC(40774ef4) SHA1(9cf188342993fbcff13dbbecc62d1ee49010d6f4), ROM_BIOS(2) )
+ROM_END
 
 // TODO split ROM image into proper ROM set
 ROM_START( md6802 ) // ROM image from http://elektronikforumet.com/forum/viewtopic.php?f=2&t=79576&start=135#p1203640
@@ -684,6 +910,7 @@ ROM_START( mp68a ) // ROM image from http://elektronikforumet.com/forum/viewtopi
 	ROM_LOAD( "didactb.bin", 0x0a00, 0x0200, CRC(592898dc) SHA1(2962f4817712cae97f3ab37b088fc73e66535ff8) )
 ROM_END
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY      FULLNAME           FLAGS
-COMP( 1979, mp68a,  0,      0,      mp68a,   mp68a,  mp68a_state,  empty_init, "Didact AB", "mp68a",           MACHINE_NO_SOUND_HW )
-COMP( 1983, md6802, 0,      0,      md6802,  md6802, md6802_state, empty_init, "Didact AB", "Mikrodator 6802", MACHINE_NO_SOUND_HW )
+//    YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT    CLASS          INIT        COMPANY               FULLNAME           FLAGS
+COMP( 1979, mp68a,   0,      0,      mp68a,   mp68a,   mp68a_state,   empty_init, "Didact AB",          "mp68a",           MACHINE_NO_SOUND_HW )
+COMP( 1983, md6802,  0,      0,      md6802,  md6802,  md6802_state,  empty_init, "Didact AB",          "Mikrodator 6802", MACHINE_NO_SOUND_HW )
+COMP( 1984, modulab, 0,      0,      modulab, modulab, modulab_state, empty_init, "Esselte Studium AB", "Modulab",         MACHINE_NO_SOUND_HW )

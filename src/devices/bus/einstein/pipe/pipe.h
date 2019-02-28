@@ -68,8 +68,8 @@ public:
 	}
 	virtual ~tatung_pipe_device();
 
-	void set_program_space(address_space *program);
-	void set_io_space(address_space *io);
+	template <typename T> void set_program_space(T &&tag, int spacenum) { m_program.set_tag(std::forward<T>(tag), spacenum); }
+	template <typename T> void set_io_space(T &&tag, int spacenum) { m_io.set_tag(std::forward<T>(tag), spacenum); }
 
 	// callbacks
 	auto int_handler() { return m_int_handler.bind(); }
@@ -86,11 +86,12 @@ public:
 
 protected:
 	// device-level overrides
+	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	address_space *m_program;
-	address_space *m_io;
+	required_address_space m_program;
+	required_address_space m_io;
 
 	device_tatung_pipe_interface *m_card;
 

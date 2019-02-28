@@ -263,7 +263,7 @@ MACHINE_CONFIG_START(bsktball_state::bsktball)
 	MCFG_SCREEN_UPDATE_DRIVER(bsktball_state, screen_update_bsktball)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_bsktball)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bsktball);
 	PALETTE(config, m_palette, FUNC(bsktball_state::bsktball_palette), 2*4 + 4*4*4*4, 4);
 
 	/* sound hardware */

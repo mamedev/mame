@@ -148,11 +148,12 @@ READ8_MEMBER( sdk85_state::kbd_r )
 	return data;
 }
 
-MACHINE_CONFIG_START(sdk85_state::sdk85)
+void sdk85_state::sdk85(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8085A, 6.144_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(sdk85_mem)
-	MCFG_DEVICE_IO_MAP(sdk85_io)
+	I8085A(config, m_maincpu, 6.144_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sdk85_state::sdk85_mem);
+	m_maincpu->set_addrmap(AS_IO, &sdk85_state::sdk85_io);
 
 	I8355(config, "romio", 6.144_MHz_XTAL / 2); // Monitor ROM (A14)
 
@@ -174,7 +175,7 @@ MACHINE_CONFIG_START(sdk85_state::sdk85)
 	kdc.in_rl_callback().set(FUNC(sdk85_state::kbd_r));                 // kbd RL lines
 	kdc.in_shift_callback().set_constant(1);                            // Shift key
 	kdc.in_ctrl_callback().set_constant(1);
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( sdk85 )

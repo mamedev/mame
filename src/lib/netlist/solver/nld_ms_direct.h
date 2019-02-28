@@ -8,13 +8,13 @@
 #ifndef NLD_MS_DIRECT_H_
 #define NLD_MS_DIRECT_H_
 
+#include "plib/mat_cr.h"
+#include "plib/vector_ops.h"
 #include <algorithm>
 #include <cmath>
 
-#include "nld_solver.h"
 #include "nld_matrix_solver.h"
-#include "vector_base.h"
-#include "mat_cr.h"
+#include "nld_solver.h"
 
 namespace netlist
 {
@@ -27,30 +27,27 @@ class matrix_solver_direct_t: public matrix_solver_t
 	friend class matrix_solver_t;
 public:
 
-	typedef FT float_type;
+	using float_type = FT;
 
-	matrix_solver_direct_t(netlist_base_t &anetlist, const pstring &name, const solver_parameters_t *params, const std::size_t size);
-	matrix_solver_direct_t(netlist_base_t &anetlist, const pstring &name, const eSortType sort, const solver_parameters_t *params, const std::size_t size);
+	matrix_solver_direct_t(netlist_state_t &anetlist, const pstring &name, const solver_parameters_t *params, const std::size_t size);
+	matrix_solver_direct_t(netlist_state_t &anetlist, const pstring &name, const eSortType sort, const solver_parameters_t *params, const std::size_t size);
 
-	virtual ~matrix_solver_direct_t() override;
-
-	virtual void vsetup(analog_net_t::list_t &nets) override;
-	virtual void reset() override { matrix_solver_t::reset(); }
+	void vsetup(analog_net_t::list_t &nets) override;
+	void reset() override { matrix_solver_t::reset(); }
 
 protected:
-	virtual unsigned vsolve_non_dynamic(const bool newton_raphson) override;
+	unsigned vsolve_non_dynamic(const bool newton_raphson) override;
 	unsigned solve_non_dynamic(const bool newton_raphson);
 
-	constexpr std::size_t N() const { return (SIZE > 0) ? static_cast<std::size_t>(SIZE) : m_dim; }
+	constexpr std::size_t size() const { return (SIZE > 0) ? static_cast<std::size_t>(SIZE) : m_dim; }
 
 	void LE_solve();
 
 	template <typename T>
-	void LE_back_subst(T & RESTRICT x);
+	void LE_back_subst(T & x);
 
 	FT &A(std::size_t r, std::size_t c) { return m_A[r * m_pitch + c]; }
-	FT &RHS(std::size_t r) { return m_A[r * m_pitch + N()]; }
-	plib::parray<FT, SIZE> m_last_RHS;
+	FT &RHS(std::size_t r) { return m_A[r * m_pitch + size()]; }
 	plib::parray<FT, SIZE>  m_new_V;
 
 private:
@@ -68,35 +65,29 @@ private:
 // ----------------------------------------------------------------------------------------
 
 template <typename FT, int SIZE>
-matrix_solver_direct_t<FT, SIZE>::~matrix_solver_direct_t()
-{
-}
-
-template <typename FT, int SIZE>
 void matrix_solver_direct_t<FT, SIZE>::vsetup(analog_net_t::list_t &nets)
 {
 	matrix_solver_t::setup_base(nets);
 
 	/* add RHS element */
-	for (std::size_t k = 0; k < N(); k++)
+	for (std::size_t k = 0; k < size(); k++)
 	{
 		terms_for_net_t * t = m_terms[k].get();
 
-		if (!plib::container::contains(t->m_nzrd, static_cast<unsigned>(N())))
-			t->m_nzrd.push_back(static_cast<unsigned>(N()));
+		if (!plib::container::contains(t->m_nzrd, static_cast<unsigned>(size())))
+			t->m_nzrd.push_back(static_cast<unsigned>(size()));
 	}
 
-	state().save(*this, m_last_RHS.data(), "m_last_RHS", m_last_RHS.size());
-
-	for (std::size_t k = 0; k < N(); k++)
-		state().save(*this, RHS(k), plib::pfmt("RHS.{1}")(k));
+	// FIXME: This shouldn't be necessary ...
+	for (std::size_t k = 0; k < size(); k++)
+		state().save(*this, RHS(k), this->name(), plib::pfmt("RHS.{1}")(k));
 }
 
 
 template <typename FT, int SIZE>
 void matrix_solver_direct_t<FT, SIZE>::LE_solve()
 {
-	const std::size_t kN = N();
+	const std::size_t kN = size();
 	if (!m_params.m_pivot)
 	{
 		for (std::size_t i = 0; i < kN; i++)
@@ -144,12 +135,12 @@ void matrix_solver_direct_t<FT, SIZE>::LE_solve()
 			for (std::size_t j = i + 1; j < kN; j++)
 			{
 				const FT f1 = - A(j,i) * f;
-				if (f1 != NL_FCONST(0.0))
+				if (f1 != plib::constants<FT>::zero())
 				{
-					const FT * RESTRICT pi = &A(i,i+1);
-					FT * RESTRICT pj = &A(j,i+1);
+					const FT * pi = &A(i,i+1);
+					FT * pj = &A(j,i+1);
 #if 1
-					vec_add_mult_scalar_p(kN-i,pi,f1,pj);
+					plib::vec_add_mult_scalar_p(kN-i,pi,f1,pj);
 #else
 					vec_add_mult_scalar_p(kN-i-1,pj,f1,pi);
 					//for (unsigned k = i+1; k < kN; k++)
@@ -167,9 +158,9 @@ void matrix_solver_direct_t<FT, SIZE>::LE_solve()
 template <typename FT, int SIZE>
 template <typename T>
 void matrix_solver_direct_t<FT, SIZE>::LE_back_subst(
-		T & RESTRICT x)
+		T & x)
 {
-	const std::size_t kN = N();
+	const std::size_t kN = size();
 
 	/* back substitution */
 	if (m_params.m_pivot)
@@ -214,43 +205,30 @@ unsigned matrix_solver_direct_t<FT, SIZE>::vsolve_non_dynamic(const bool newton_
 	this->build_LE_A(*this);
 	this->build_LE_RHS(*this);
 
-	for (std::size_t i=0, iN=N(); i < iN; i++)
-		m_last_RHS[i] = RHS(i);
-
 	this->m_stat_calculations++;
 	return this->solve_non_dynamic(newton_raphson);
 }
 
 template <typename FT, int SIZE>
-matrix_solver_direct_t<FT, SIZE>::matrix_solver_direct_t(netlist_base_t &anetlist, const pstring &name,
+matrix_solver_direct_t<FT, SIZE>::matrix_solver_direct_t(netlist_state_t &anetlist, const pstring &name,
 		const solver_parameters_t *params, const std::size_t size)
 : matrix_solver_t(anetlist, name, ASCENDING, params)
-, m_last_RHS(size)
 , m_new_V(size)
 , m_dim(size)
 , m_pitch(m_pitch_ABS ? m_pitch_ABS : (((m_dim + 1) + 7) / 8) * 8)
 , m_A(size * m_pitch)
 {
-	for (unsigned k = 0; k < N(); k++)
-	{
-		m_last_RHS[k] = 0.0;
-	}
 }
 
 template <typename FT, int SIZE>
-matrix_solver_direct_t<FT, SIZE>::matrix_solver_direct_t(netlist_base_t &anetlist, const pstring &name,
+matrix_solver_direct_t<FT, SIZE>::matrix_solver_direct_t(netlist_state_t &anetlist, const pstring &name,
 		const eSortType sort, const solver_parameters_t *params, const std::size_t size)
 : matrix_solver_t(anetlist, name, sort, params)
-, m_last_RHS(size)
 , m_new_V(size)
 , m_dim(size)
 , m_pitch(m_pitch_ABS ? m_pitch_ABS : (((m_dim + 1) + 7) / 8) * 8)
 , m_A(size * m_pitch)
 {
-	for (std::size_t k = 0; k < N(); k++)
-	{
-		m_last_RHS[k] = 0.0;
-	}
 }
 
 	} //namespace devices

@@ -14,6 +14,7 @@
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
 #include "machine/ay31015.h"
+#include "machine/clock.h"
 #include "machine/ram.h"
 #include "machine/z80pio.h"
 
@@ -110,7 +111,7 @@ class nascom2_state : public nascom_state
 public:
 	nascom2_state(const machine_config &mconfig, device_type type, const char *tag) :
 		nascom_state(mconfig, type, tag),
-		m_nasbus(*this, "nasbus"),
+		m_nasbus(*this, NASBUS_TAG),
 		m_socket1(*this, "socket1"),
 		m_socket2(*this, "socket2"),
 		m_lsw1(*this, "lsw1")
@@ -119,7 +120,6 @@ public:
 	void nascom2(machine_config &config);
 	void nascom2c(machine_config &config);
 
-	void init_nascom2();
 	void init_nascom2c();
 
 private:
@@ -393,15 +393,6 @@ void nascom2_state::machine_reset()
 	m_maincpu->set_state_int(Z80_PC, m_lsw1->read() << 12);
 }
 
-void nascom2_state::init_nascom2()
-{
-	init_nascom();
-
-	// setup nasbus
-	m_nasbus->set_program_space(&m_maincpu->space(AS_PROGRAM));
-	m_nasbus->set_io_space(&m_maincpu->space(AS_IO));
-}
-
 // since we don't know for which regions we should disable ram, we just let other devices
 // overwrite the region they need, and re-install our ram when they are disabled
 WRITE_LINE_MEMBER( nascom2_state::ram_disable_w )
@@ -417,10 +408,6 @@ void nascom2_state::init_nascom2c()
 {
 	// install memory
 	m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x0000 + m_ram->size() - 1, m_ram->pointer());
-
-	// setup nasbus
-	m_nasbus->set_program_space(&m_maincpu->space(AS_PROGRAM));
-	m_nasbus->set_io_space(&m_maincpu->space(AS_IO));
 }
 
 WRITE_LINE_MEMBER( nascom2_state::ram_disable_cpm_w )
@@ -701,10 +688,12 @@ void nascom_state::nascom(machine_config &config)
 
 	// uart
 	AY31015(config, m_hd6402);
-	m_hd6402->set_tx_clock((16_MHz_XTAL / 16) / 256);
-	m_hd6402->set_rx_clock((16_MHz_XTAL / 16) / 256);
 	m_hd6402->read_si_callback().set(FUNC(nascom_state::nascom1_hd6402_si));
 	m_hd6402->write_so_callback().set(FUNC(nascom_state::nascom1_hd6402_so));
+
+	clock_device &uart_clock(CLOCK(config, "uart_clock", (16_MHz_XTAL / 16) / 256));
+	uart_clock.signal_handler().set(m_hd6402, FUNC(ay31015_device::write_tcp));
+	uart_clock.signal_handler().append(m_hd6402, FUNC(ay31015_device::write_rcp));
 
 	// cassette is connected to the uart
 	CASSETTE(config, m_cassette);
@@ -717,11 +706,11 @@ void nascom_state::nascom(machine_config &config)
 	RAM(config, m_ram).set_default_size("48K").set_extra_options("8K,16K,32K");
 
 	// devices
-	snapshot_image_device &snapshot(SNAPSHOT(config, "snapshot", 0));
-	snapshot.set_handler(snapquick_load_delegate(&SNAPSHOT_LOAD_NAME(nascom_state, nascom1), this), "nas", 0.5);
+	snapshot_image_device &snapshot(SNAPSHOT(config, "snapshot"));
+	snapshot.set_handler(snapquick_load_delegate(&SNAPSHOT_LOAD_NAME(nascom_state, nascom1), this), "nas", attotime::from_msec(500));
 	snapshot.set_interface("nascom_snap");
-	snapshot_image_device &snapchar(SNAPSHOT(config, "snapchar", 0));
-	snapchar.set_handler(snapquick_load_delegate(&SNAPSHOT_LOAD_NAME(nascom_state, charrom), this), "chr", 0.5);
+	snapshot_image_device &snapchar(SNAPSHOT(config, "snapchar"));
+	snapchar.set_handler(snapquick_load_delegate(&SNAPSHOT_LOAD_NAME(nascom_state, charrom), this), "chr", attotime::from_msec(500));
 	snapchar.set_interface("nascom_char");
 }
 
@@ -737,7 +726,8 @@ void nascom1_state::nascom1(machine_config &config)
 	SOFTWARE_LIST(config, "snap_list").set_original("nascom_snap").set_filter("NASCOM1");
 }
 
-MACHINE_CONFIG_START(nascom2_state::nascom2)
+void nascom2_state::nascom2(machine_config &config)
+{
 	nascom(config);
 
 	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
@@ -758,31 +748,32 @@ MACHINE_CONFIG_START(nascom2_state::nascom2)
 	m_socket2->set_device_load(device_image_load_delegate(&nascom2_state::device_image_load_socket2, this));
 
 	// nasbus expansion bus
-	MCFG_NASBUS_ADD(NASBUS_TAG)
-	MCFG_NASBUS_RAM_DISABLE_HANDLER(WRITELINE(*this, nascom2_state, ram_disable_w))
-	MCFG_NASBUS_SLOT_ADD("nasbus1", nasbus_slot_cards, nullptr)
-	MCFG_NASBUS_SLOT_ADD("nasbus2", nasbus_slot_cards, nullptr)
-	MCFG_NASBUS_SLOT_ADD("nasbus3", nasbus_slot_cards, nullptr)
-	MCFG_NASBUS_SLOT_ADD("nasbus4", nasbus_slot_cards, nullptr)
+	nasbus_device &nasbus(NASBUS(config, NASBUS_TAG));
+	nasbus.ram_disable().set(FUNC(nascom2_state::ram_disable_w));
+	nasbus.set_program_space(m_maincpu, AS_PROGRAM);
+	nasbus.set_io_space(m_maincpu, AS_IO);
+	NASBUS_SLOT(config, "nasbus1", nasbus_slot_cards, nullptr);
+	NASBUS_SLOT(config, "nasbus2", nasbus_slot_cards, nullptr);
+	NASBUS_SLOT(config, "nasbus3", nasbus_slot_cards, nullptr);
+	NASBUS_SLOT(config, "nasbus4", nasbus_slot_cards, nullptr);
 
 	// software
 	SOFTWARE_LIST(config, "snap_list").set_original("nascom_snap").set_filter("NASCOM2");
 	SOFTWARE_LIST(config, "socket_list").set_original("nascom_socket");
 	SOFTWARE_LIST(config, "floppy_list").set_original("nascom_flop");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(nascom2_state::nascom2c)
+void nascom2_state::nascom2c(machine_config &config)
+{
 	nascom2(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &nascom2_state::nascom2c_mem);
 
 	m_ram->set_default_size("60K");
 
-	MCFG_DEVICE_MODIFY(NASBUS_TAG)
-	MCFG_NASBUS_RAM_DISABLE_HANDLER(WRITELINE(*this, nascom2_state, ram_disable_cpm_w))
-	MCFG_DEVICE_MODIFY("nasbus1")
-	MCFG_SLOT_DEFAULT_OPTION("floppy")
-MACHINE_CONFIG_END
+	subdevice<nasbus_device>(NASBUS_TAG)->ram_disable().set(FUNC(nascom2_state::ram_disable_cpm_w));
+	subdevice<nasbus_slot_device>("nasbus1")->set_default_option("floppy");
+}
 
 
 //**************************************************************************
@@ -845,5 +836,5 @@ ROM_END
 
 //    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT     CLASS          INIT           COMPANY                  FULLNAME           FLAGS
 COMP( 1978, nascom1,  0,       0,      nascom1,  nascom1,  nascom1_state, init_nascom,   "Nascom Microcomputers", "Nascom 1",        MACHINE_NO_SOUND_HW )
-COMP( 1979, nascom2,  0,       0,      nascom2,  nascom2,  nascom2_state, init_nascom2,  "Nascom Microcomputers", "Nascom 2",        MACHINE_NO_SOUND_HW )
+COMP( 1979, nascom2,  0,       0,      nascom2,  nascom2,  nascom2_state, init_nascom,   "Nascom Microcomputers", "Nascom 2",        MACHINE_NO_SOUND_HW )
 COMP( 1980, nascom2c, nascom2, 0,      nascom2c, nascom2c, nascom2_state, init_nascom2c, "Nascom Microcomputers", "Nascom 2 (CP/M)", MACHINE_NO_SOUND_HW )

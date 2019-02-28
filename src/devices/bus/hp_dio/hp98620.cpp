@@ -74,7 +74,7 @@ void dio16_98620_device::device_reset()
 {
 	if (!m_installed_io)
 	{
-		program_space()->install_readwrite_handler(0x500000, 0x50020f,
+		program_space().install_readwrite_handler(0x500000, 0x50020f,
 				read16_delegate(FUNC(dio16_98620_device::dma_r), this),
 				write16_delegate(FUNC(dio16_98620_device::dma_w), this));
 		m_installed_io = true;
@@ -343,9 +343,9 @@ void dio16_98620_device::dma_transfer(int channel)
 
 
 	if (m_regs[channel].dma_out) {
-			dmack_w_out(channel, program_space()->read_byte(m_regs[channel].address++));
+			dmack_w_out(channel, program_space().read_byte(m_regs[channel].address++));
 	} else {
-			program_space()->write_byte(m_regs[channel].address++, dmack_r_out(channel));
+			program_space().write_byte(m_regs[channel].address++, dmack_r_out(channel));
 
 	}
 

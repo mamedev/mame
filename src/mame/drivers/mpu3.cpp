@@ -803,12 +803,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(mpu3_state::ic10_callback)
 }
 WRITE8_MEMBER(mpu3_state::mpu3ptm_w)
 {
-	m_ptm2->write(space, offset >>2,data);//((offset & 0x1f) >>2),data);
+	m_ptm2->write(offset >>2,data);//((offset & 0x1f) >>2),data);
 }
 
 READ8_MEMBER(mpu3_state::mpu3ptm_r)
 {
-	return m_ptm2->read(space, offset >>2);
+	return m_ptm2->read(offset >>2);
 }
 
 void mpu3_state::mpu3_basemap(address_map &map)

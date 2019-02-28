@@ -121,7 +121,7 @@ READ32_MEMBER(midvunit_state::port0_r)
 READ32_MEMBER( midvunit_state::adc_r )
 {
 	if (!(m_control_data & 0x40))
-		return m_adc->read(space, 0) << m_adc_shift;
+		return m_adc->read() << m_adc_shift;
 	else
 		logerror("adc_r without enabling reads!\n");
 
@@ -131,7 +131,7 @@ READ32_MEMBER( midvunit_state::adc_r )
 WRITE32_MEMBER( midvunit_state::adc_w )
 {
 	if (!(m_control_data & 0x20))
-		m_adc->write(space, 0, data >> m_adc_shift);
+		m_adc->write(data >> m_adc_shift);
 	else
 		logerror("adc_w without enabling writes!\n");
 }
@@ -280,14 +280,14 @@ WRITE32_MEMBER(midvunit_state::tms32031_control_w)
 
 READ32_MEMBER(midvunit_state::crusnwld_serial_status_r)
 {
-	uint16_t in1 = (m_in1->read() & 0x7fff) | (m_midway_serial_pic->status_r(space,0) << 15);
+	uint16_t in1 = (m_in1->read() & 0x7fff) | (m_midway_serial_pic->status_r() << 15);
 	return in1 | in1 << 16;
 }
 
 
 READ32_MEMBER(midvunit_state::crusnwld_serial_data_r)
 {
-	return m_midway_serial_pic->read(space,0) << 16;
+	return m_midway_serial_pic->read() << 16;
 }
 
 
@@ -298,7 +298,7 @@ WRITE32_MEMBER(midvunit_state::crusnwld_serial_data_w)
 		m_midway_serial_pic->reset_w(1);
 		m_midway_serial_pic->reset_w(0);
 	}
-	m_midway_serial_pic->write(space,0,data >> 16);
+	m_midway_serial_pic->write(data >> 16);
 }
 
 
@@ -342,20 +342,20 @@ WRITE32_MEMBER(midvunit_state::bit_reset_w)
 
 READ32_MEMBER(midvunit_state::offroadc_serial_status_r)
 {
-	uint16_t in1 = (m_in1->read() & 0x7fff) | (m_midway_serial_pic2->status_r(space,0) << 15);
+	uint16_t in1 = (m_in1->read() & 0x7fff) | (m_midway_serial_pic2->status_r() << 15);
 	return in1 | in1 << 16;
 }
 
 
 READ32_MEMBER(midvunit_state::offroadc_serial_data_r)
 {
-	return m_midway_serial_pic2->read(space, 0) << 16;
+	return m_midway_serial_pic2->read() << 16;
 }
 
 
 WRITE32_MEMBER(midvunit_state::offroadc_serial_data_w)
 {
-	m_midway_serial_pic2->write(space, 0, data >> 16);
+	m_midway_serial_pic2->write(data >> 16);
 }
 
 READ32_MEMBER(midvunit_state::midvunit_wheel_board_r)
@@ -1055,8 +1055,8 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(midvunit_state::midvcommon)
-
+void midvunit_state::midvcommon(machine_config &config)
+{
 	/* basic machine hardware */
 	TMS32031(config, m_maincpu, CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &midvunit_state::midvunit_map);
@@ -1069,13 +1069,13 @@ MACHINE_CONFIG_START(midvunit_state::midvcommon)
 	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
-	MCFG_PALETTE_ADD("palette", 32768)
+	PALETTE(config, m_palette).set_entries(32768);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MIDVUNIT_VIDEO_CLOCK/2, 666, 0, 512, 432, 0, 400)
-	MCFG_SCREEN_UPDATE_DRIVER(midvunit_state, screen_update_midvunit)
-	MCFG_SCREEN_PALETTE("palette")
-MACHINE_CONFIG_END
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MIDVUNIT_VIDEO_CLOCK/2, 666, 0, 512, 432, 0, 400);
+	m_screen->set_screen_update(FUNC(midvunit_state::screen_update_midvunit));
+	m_screen->set_palette(m_palette);
+}
 
 
 void midvunit_state::midvunit(machine_config &config)
@@ -1110,7 +1110,8 @@ void midvunit_state::offroadc(machine_config &config)
 	m_midway_serial_pic2->set_yearoffs(94);
 }
 
-MACHINE_CONFIG_START(midvunit_state::midvplus)
+void midvunit_state::midvplus(machine_config &config)
+{
 	midvcommon(config);
 
 	/* basic machine hardware */
@@ -1131,7 +1132,7 @@ MACHINE_CONFIG_START(midvunit_state::midvplus)
 	DCS2_AUDIO_2115(config, m_dcs, 0);
 	m_dcs->set_dram_in_mb(2);
 	m_dcs->set_polling_offset(0x3839);
-MACHINE_CONFIG_END
+}
 
 
 

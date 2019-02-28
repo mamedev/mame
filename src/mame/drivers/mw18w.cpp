@@ -279,13 +279,13 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-MACHINE_CONFIG_START(mw18w_state::mw18w)
-
+void mw18w_state::mw18w(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(19'968'000)/8)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(mw18w_state, irq0_line_assert, 960.516) // 555 IC
-	MCFG_DEVICE_PROGRAM_MAP(mw18w_map)
-	MCFG_DEVICE_IO_MAP(mw18w_portmap)
+	Z80(config, m_maincpu, XTAL(19'968'000)/8);
+	m_maincpu->set_periodic_int(FUNC(mw18w_state::irq0_line_assert), attotime::from_hz(960.516)); // 555 IC
+	m_maincpu->set_addrmap(AS_PROGRAM, &mw18w_state::mw18w_map);
+	m_maincpu->set_addrmap(AS_IO, &mw18w_state::mw18w_portmap);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -293,7 +293,7 @@ MACHINE_CONFIG_START(mw18w_state::mw18w)
 
 	/* sound hardware */
 	//...
-MACHINE_CONFIG_END
+}
 
 
 

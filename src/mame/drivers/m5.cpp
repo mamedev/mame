@@ -720,7 +720,7 @@ void m5_state::m5_io(address_map &map)
 	map(0x00, 0x03).mirror(0x0c).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x10, 0x10).mirror(0x0e).rw("tms9928a", FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));
 	map(0x11, 0x11).mirror(0x0e).rw("tms9928a", FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));
-	map(0x20, 0x20).mirror(0x0f).w(SN76489AN_TAG, FUNC(sn76489a_device::command_w));
+	map(0x20, 0x20).mirror(0x0f).w(SN76489AN_TAG, FUNC(sn76489a_device::write));
 	map(0x30, 0x30).mirror(0x08).portr("Y0").w(FUNC(m5_state::mem64KBF_w)); // 64KBF paging
 	map(0x31, 0x31).mirror(0x08).portr("Y1");
 	map(0x32, 0x32).mirror(0x08).portr("Y2");
@@ -1042,7 +1042,7 @@ void brno_state::brno_io(address_map &map)
 	map(0x00, 0x03).mirror(0x0c).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x10, 0x10).mirror(0x0e).rw("tms9928a", FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));
 	map(0x11, 0x11).mirror(0x0e).rw("tms9928a", FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));
-	map(0x20, 0x20).mirror(0x0f).w(SN76489AN_TAG, FUNC(sn76489a_device::command_w));
+	map(0x20, 0x20).mirror(0x0f).w(SN76489AN_TAG, FUNC(sn76489a_device::write));
 	map(0x30, 0x30).portr("Y0");
 	map(0x31, 0x31).portr("Y1");
 	map(0x32, 0x32).portr("Y2");
@@ -1401,24 +1401,24 @@ void brno_state::machine_reset()
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( m5 )
+//  machine_config( m5 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(m5_state::m5)
+void m5_state::m5(machine_config &config)
+{
 	// basic machine hardware
 	Z80(config, m_maincpu, 14.318181_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &m5_state::m5_mem);
 	m_maincpu->set_addrmap(AS_IO, &m5_state::m5_io);
 	m_maincpu->set_daisy_config(m5_daisy_chain);
 
-	MCFG_DEVICE_ADD(m_fd5cpu, Z80, 14.318181_MHz_XTAL / 4)
-	MCFG_DEVICE_PROGRAM_MAP(fd5_mem)
-	MCFG_DEVICE_IO_MAP(fd5_io)
+	Z80(config, m_fd5cpu, 14.318181_MHz_XTAL / 4);
+	m_fd5cpu->set_addrmap(AS_PROGRAM, &m5_state::fd5_mem);
+	m_fd5cpu->set_addrmap(AS_IO, &m5_state::fd5_io);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(SN76489AN_TAG, SN76489A, 14.318181_MHz_XTAL / 4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	SN76489A(config, SN76489AN_TAG, 14.318181_MHz_XTAL / 4).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	// devices
 	Z80CTC(config, m_ctc, 14.318181_MHz_XTAL / 4);
@@ -1449,8 +1449,8 @@ MACHINE_CONFIG_START(m5_state::m5)
 	FLOPPY_CONNECTOR(config, UPD765_TAG ":0", m5_floppies, "525dd", m5_state::floppy_formats);
 
 	// cartridge
-	MCFG_M5_CARTRIDGE_ADD("cartslot1", m5_cart, nullptr)
-	MCFG_M5_CARTRIDGE_ADD("cartslot2", m5_cart, nullptr)
+	M5_CART_SLOT(config, m_cart1, m5_cart, nullptr);
+	M5_CART_SLOT(config, m_cart2, m5_cart, nullptr);
 
 	// software lists
 	SOFTWARE_LIST(config, "cart_list").set_original("m5_cart");
@@ -1460,11 +1460,11 @@ MACHINE_CONFIG_START(m5_state::m5)
 	// internal ram
 	//68K is not possible, 'cos internal ram always overlays any expansion memory in that area
 	RAM(config, RAM_TAG).set_default_size("4K").set_extra_options("36K,64K");
-MACHINE_CONFIG_END
+}
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( ntsc )
+//  machine_config( ntsc )
 //-------------------------------------------------
 
 void m5_state::ntsc(machine_config &config)
@@ -1480,7 +1480,7 @@ void m5_state::ntsc(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( pal )
+//  machine_config( pal )
 //-------------------------------------------------
 
 void m5_state::pal(machine_config &config)
@@ -1495,7 +1495,7 @@ void m5_state::pal(machine_config &config)
 }
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( m5p_brno )
+//  machine_config( m5p_brno )
 //-------------------------------------------------
 
 

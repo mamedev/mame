@@ -557,28 +557,28 @@ static GFXDECODE_START( gfx_seicupbl_csb )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(seicupbl_state::cupsocbl)
-
+void seicupbl_state::cupsocbl(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000,12000000)
-	MCFG_DEVICE_PROGRAM_MAP(cupsocbl_mem)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seicupbl_state,  irq4_line_hold) /* VBL */
+	M68000(config, m_maincpu, 12000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &seicupbl_state::cupsocbl_mem);
+	m_maincpu->set_vblank_int("screen", FUNC(seicupbl_state::irq4_line_hold)); /* VBL */
 
-	MCFG_DEVICE_ADD("seibucop_boot", SEIBU_COP_BOOTLEG, "maincpu")
+	SEIBU_COP_BOOTLEG(config, "seibucop_boot", m_maincpu);
 
 	/*Different Sound hardware*/
-	MCFG_DEVICE_ADD("audiocpu", Z80,14318180/4)
-	MCFG_DEVICE_PROGRAM_MAP(cupsocbl_sound_mem)
-	//MCFG_PERIODIC_INT("screen", nmi_line_pulse)
+	Z80(config, m_audiocpu, 14318180/4);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &seicupbl_state::cupsocbl_sound_mem);
+	//m_audiocpu->set_periodic_int("screen", FUNC(seicupbl_state::nmi_line_pulse));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(42*8, 36*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seicupbl_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(42*8, 36*8);
+	screen.set_visarea(0*8, 40*8-1, 0*8, 30*8-1);
+	screen.set_screen_update(FUNC(seicupbl_state::screen_update));
+	screen.set_palette(m_palette);
 
 	//seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
 	//crtc.layer_en_callback().set(FUNC(seicupbl_state::tilemap_enable_w));
@@ -597,9 +597,8 @@ MACHINE_CONFIG_START(seicupbl_state::cupsocbl)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 

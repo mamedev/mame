@@ -120,9 +120,9 @@ WRITE32_MEMBER ( cxhumax_state::flash_w )
 {
 	offset *= 2;
 	if(ACCESSING_BITS_0_15)
-		m_flash->write(space, offset, data);
+		m_flash->write(offset, data);
 	if(ACCESSING_BITS_16_31)
-		m_flash->write(space, offset+1, data >> 16);
+		m_flash->write(offset+1, data >> 16);
 	verboselog(*this, 9, "(FLASH) %08X <- %08X\n", 0xF0000000 + (offset << 2), data);
 }
 
@@ -131,9 +131,9 @@ READ32_MEMBER ( cxhumax_state::flash_r )
 	uint32_t res = 0;
 	offset *= 2;
 	if(ACCESSING_BITS_0_15)
-		res |= m_flash->read(space, offset);
+		res |= m_flash->read(offset);
 	if(ACCESSING_BITS_16_31)
-		res |= m_flash->read(space, offset+1) << 16;
+		res |= m_flash->read(offset+1) << 16;
 	//if(m_flash->m_flash_mode!=FM_NORMAL) verboselog(*this, 9, "(FLASH) %08X -> %08X\n", 0xF0000000 + (offset << 2), res);
 	return res;
 }
@@ -167,7 +167,7 @@ READ32_MEMBER( cxhumax_state::cx_scratch_r )
 		int i = 0;
 		while ((temp=program.read_byte(m_maincpu->state_int(ARM7_R0)+i))) {
 			buf[i++]=temp;
-			//m_terminal->write(space, 0, temp);
+			//m_terminal->write(temp);
 		}
 		osd_printf_debug("%s", buf);
 		verboselog(*this, 9, "(DEBUG) %s", buf);
@@ -412,7 +412,7 @@ WRITE32_MEMBER( cxhumax_state::cx_uart2_w )
 		case UART_FIFO_REG:
 			if(!(m_uart2_regs[UART_FRMC_REG]&UART_FRMC_BDS_BIT)) {
 				/* Sending byte... add logging */
-				m_terminal->write(space, 0, data);
+				m_terminal->write(data);
 
 				/* Transmitter Idle Interrupt Enable */
 				if(m_uart2_regs[UART_IRQE_REG]&UART_IRQE_TIDE_BIT) {

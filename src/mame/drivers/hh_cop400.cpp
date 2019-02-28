@@ -11,7 +11,7 @@
   - vidchal: Add screen and gun cursor with brightness detection callback,
     and softwarelist for the video tapes. We'd also need a VHS player device.
     The emulated lightgun itself appears to be working fine(eg. add a 30hz
-    timer to IN3 to score +100)
+    timer to IN.3 to score +100)
 
 ***************************************************************************/
 
@@ -22,7 +22,6 @@
 #include "sound/spkrdev.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
-//#include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -48,8 +47,8 @@
 class hh_cop400_state : public driver_device
 {
 public:
-	hh_cop400_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	hh_cop400_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_inp_matrix(*this, "IN.%u", 0),
 		m_out_x(*this, "%u.%u", 0U, 0U),
@@ -348,6 +347,7 @@ void ctstein_state::ctstein(machine_config &config)
   An earlier revision of this runs on TMS1000, see hh_tms1k.cpp driver. Model
   numbers are the same. From the outside, an easy way to spot the difference is
   the Start/Display button: TMS1000 version button label is D, COP420 one is a *.
+  The COP420 version also plays much slower.
 
 ***************************************************************************/
 
@@ -457,8 +457,8 @@ INPUT_PORTS_END
 void h2hbaskbc_state::h2hbaskbc(machine_config &config)
 {
 	/* basic machine hardware */
-	COP420(config, m_maincpu, 850000); // approximation - RC osc. R=43K, C=101pF
-	m_maincpu->set_config(COP400_CKI_DIVISOR_8, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
+	COP420(config, m_maincpu, 1000000); // approximation - RC osc. R=43K, C=101pF
+	m_maincpu->set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_maincpu->write_d().set(FUNC(h2hbaskbc_state::write_d));
 	m_maincpu->write_g().set(FUNC(h2hbaskbc_state::write_g));
 	m_maincpu->write_l().set(FUNC(h2hbaskbc_state::write_l));
@@ -1580,9 +1580,8 @@ void bship82_state::bship82(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	DAC_4BIT_BINARY_WEIGHTED_SIGN_MAGNITUDE(config, "dac", 0).add_route(ALL_OUTPUTS, "mono", 0.125); // see above
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
+	DAC_4BIT_BINARY_WEIGHTED_SIGN_MAGNITUDE(config, "dac").add_route(ALL_OUTPUTS, "mono", 0.125); // see above
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
@@ -1785,7 +1784,7 @@ static INPUT_PORTS_START( vidchal )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) // TODO: light sensor
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_NAME("Light Sensor")
 INPUT_PORTS_END
 
 void vidchal_state::vidchal(machine_config &config)
@@ -1804,9 +1803,8 @@ void vidchal_state::vidchal(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	DAC_4BIT_BINARY_WEIGHTED_SIGN_MAGNITUDE(config, "dac", 0).add_route(ALL_OUTPUTS, "mono", 0.125); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
+	DAC_4BIT_BINARY_WEIGHTED_SIGN_MAGNITUDE(config, "dac").add_route(ALL_OUTPUTS, "mono", 0.125); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
@@ -1916,7 +1914,7 @@ ROM_END
 //    YEAR  NAME        PARENT    CMP MACHINE     INPUT       CLASS            INIT        COMPANY, FULLNAME, FLAGS
 CONS( 1979, ctstein,    0,         0, ctstein,    ctstein,    ctstein_state,   empty_init, "Castle Toy", "Einstein (Castle Toy)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1980, h2hbaskbc,  0,         0, h2hbaskbc,  h2hbaskbc,  h2hbaskbc_state, empty_init, "Coleco", "Head to Head: Electronic Basketball (COP420L version)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, h2hbaskbc,  h2hbaskb,  0, h2hbaskbc,  h2hbaskbc,  h2hbaskbc_state, empty_init, "Coleco", "Head to Head: Electronic Basketball (COP420L version)", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, h2hhockeyc, h2hhockey, 0, h2hhockeyc, h2hhockeyc, h2hbaskbc_state, empty_init, "Coleco", "Head to Head: Electronic Hockey (COP420L version)", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, h2hsoccerc, 0,         0, h2hsoccerc, h2hsoccerc, h2hbaskbc_state, empty_init, "Coleco", "Head to Head: Electronic Soccer (COP420L version)", MACHINE_SUPPORTS_SAVE )
 

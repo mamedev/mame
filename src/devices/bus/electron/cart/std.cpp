@@ -43,7 +43,7 @@ void electron_stdcart_device::device_start()
 //  read - cartridge data read
 //-------------------------------------------------
 
-uint8_t electron_stdcart_device::read(address_space &space, offs_t offset, int infc, int infd, int romqa, int oe, int oe2)
+uint8_t electron_stdcart_device::read(offs_t offset, int infc, int infd, int romqa, int oe, int oe2)
 {
 	uint8_t data = 0xff;
 

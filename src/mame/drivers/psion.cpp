@@ -569,18 +569,19 @@ static GFXDECODE_START( gfx_psion )
 GFXDECODE_END
 
 /* basic configuration for 2 lines display */
-MACHINE_CONFIG_START(psion_state::psion_2lines)
+void psion_state::psion_2lines(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", HD63701, 980000) // should be HD6303 at 0.98MHz
+	HD63701(config, m_maincpu, 980000); // should be HD6303 at 0.98MHz
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
-	MCFG_SCREEN_SIZE(6*16, 9*2)
-	MCFG_SCREEN_VISIBLE_AREA(0, 6*16-1, 0, 9*2-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update("hd44780", FUNC(hd44780_device::screen_update));
+	screen.set_size(6*16, 9*2);
+	screen.set_visarea(0, 6*16-1, 0, 9*2-1);
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(psion_state::psion_palette), 2);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_psion);
@@ -603,76 +604,75 @@ MACHINE_CONFIG_START(psion_state::psion_2lines)
 
 	/* Software lists */
 	SOFTWARE_LIST(config, "pack_list").set_original("psion2");
-MACHINE_CONFIG_END
+}
 
 /* basic configuration for 4 lines display */
-MACHINE_CONFIG_START(psion_state::psion_4lines)
+void psion_state::psion_4lines(machine_config &config)
+{
 	psion_2lines(config);
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_SIZE(6*20, 9*4)
-	MCFG_SCREEN_VISIBLE_AREA(0, 6*20-1, 0, 9*4-1)
+	subdevice<screen_device>("screen")->set_size(6*20, 9*4);
+	subdevice<screen_device>("screen")->set_visarea(0, 6*20-1, 0, 9*4-1);
 
 	m_lcdc->set_lcd_size(4, 20);
 	m_lcdc->set_pixel_update_cb(FUNC(psion_state::lz_pixel_update), this);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(psion1_state::psion1)
+void psion1_state::psion1(machine_config &config)
+{
 	psion_2lines(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(psion1_mem)
+	m_maincpu->set_addrmap(AS_PROGRAM, &psion1_state::psion1_mem);
 
 	subdevice<timer_device>("nmi_timer")->set_start_delay(attotime::from_seconds(1));
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_SIZE(6*16, 1*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 6*16-1, 0, 8*1-1)
+	subdevice<screen_device>("screen")->set_size(6*16, 1*8);
+	subdevice<screen_device>("screen")->set_visarea(0, 6*16-1, 0, 8*1-1);
 
 	m_lcdc->set_lcd_size(1, 16);
 	m_lcdc->set_pixel_update_cb(FUNC(psion1_state::psion1_pixel_update), this);
 
 	/* Software lists */
 	SOFTWARE_LIST(config.replace(), "pack_list").set_original("psion1");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(psion_state::psioncm)
+void psion_state::psioncm(machine_config &config)
+{
 	psion_2lines(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(psioncm_mem)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &psion_state::psioncm_mem);
+}
 
-MACHINE_CONFIG_START(psion_state::psionla)
+void psion_state::psionla(machine_config &config)
+{
 	psion_2lines(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(psionla_mem)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &psion_state::psionla_mem);
+}
 
-MACHINE_CONFIG_START(psion_state::psionlam)
+void psion_state::psionlam(machine_config &config)
+{
 	psion_2lines(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(psionlam_mem)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &psion_state::psionlam_mem);
+}
 
-MACHINE_CONFIG_START(psion_state::psionp350)
+void psion_state::psionp350(machine_config &config)
+{
 	psion_2lines(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(psionp350_mem)
+	m_maincpu->set_addrmap(AS_PROGRAM, &psion_state::psionp350_mem);
 
 	NVRAM(config, "nvram3", nvram_device::DEFAULT_ALL_0); // paged RAM
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(psion_state::psionlz)
+void psion_state::psionlz(machine_config &config)
+{
 	psion_4lines(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(psionlz_mem)
+	m_maincpu->set_addrmap(AS_PROGRAM, &psion_state::psionlz_mem);
 
 	NVRAM(config, "nvram3", nvram_device::DEFAULT_ALL_0); // paged RAM
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 

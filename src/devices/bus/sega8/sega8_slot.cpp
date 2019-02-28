@@ -40,6 +40,16 @@
 DEFINE_DEVICE_TYPE(SEGA8_CART_SLOT, sega8_cart_slot_device, "sega8_cart_slot", "Sega Master System / Game Gear / SG-1000 Cartridge Slot")
 DEFINE_DEVICE_TYPE(SEGA8_CARD_SLOT, sega8_card_slot_device, "sega8_card_slot", "Sega Master System / Game Gear / SG-1000 Card Slot")
 
+DEFINE_DEVICE_TYPE(SG1000_CART_SLOT,    sg1000_cart_slot_device,    "sg1000_cart_slot",    "Sega SG-1000 Cartridge Slot")
+DEFINE_DEVICE_TYPE(OMV_CART_SLOT,       omv_cart_slot_device,       "omv_cart_slot",       "Tsukuda Original Othello Multivision FG-1000 / FG-2000 Cartridge Slot")
+DEFINE_DEVICE_TYPE(SC3000_CART_SLOT,    sc3000_cart_slot_device,    "sc3000_cart_slot",    "Sega SC-3000 Cartridge Slot")
+DEFINE_DEVICE_TYPE(SG1000MK3_CART_SLOT, sg1000mk3_cart_slot_device, "sg1000mk3_cart_slot", "Sega SG-1000 Mark III Cartridge Slot")
+DEFINE_DEVICE_TYPE(SMS_CART_SLOT,       sms_cart_slot_device,       "sms_cart_slot",       "Sega Master System Cartridge Slot")
+DEFINE_DEVICE_TYPE(GAMEGEAR_CART_SLOT,  gamegear_cart_slot_device,  "gamegear_cart_slot",  "Sega Game Gear Cartridge Slot")
+
+DEFINE_DEVICE_TYPE(SMS_CARD_SLOT,       sms_card_slot_device,       "sms_card_slot",       "Sega Master System Card Slot")
+DEFINE_DEVICE_TYPE(SG1000_CARD_SLOT,    sg1000_card_slot_device,    "sg1000_card_slot",    "Sega SG-1000 Card Slot")
+
 
 //**************************************************************************
 //    SMS cartridges Interface
@@ -112,10 +122,7 @@ sega8_cart_slot_device::sega8_cart_slot_device(const machine_config &mconfig, de
 	, device_image_interface(mconfig, *this)
 	, device_slot_interface(mconfig, *this)
 	, m_type(SEGA8_BASE_ROM)
-	, m_must_be_loaded(false)
 	, m_is_card(is_card)
-	, m_interface("sms_cart")
-	, m_extensions("bin")
 	, m_cart(nullptr)
 {
 }
@@ -125,11 +132,57 @@ sega8_cart_slot_device::sega8_cart_slot_device(const machine_config &mconfig, co
 {
 }
 
-sega8_card_slot_device::sega8_card_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sega8_cart_slot_device(mconfig, SEGA8_CARD_SLOT, tag, owner, clock, true)
+sega8_card_slot_device::sega8_card_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: sega8_cart_slot_device(mconfig, type, tag, owner, clock, true)
 {
 }
 
+sega8_card_slot_device::sega8_card_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: sega8_card_slot_device(mconfig, SEGA8_CARD_SLOT, tag, owner, clock)
+{
+}
+
+
+sg1000_cart_slot_device::sg1000_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: sega8_cart_slot_device(mconfig, SG1000_CART_SLOT, tag, owner, clock)
+{
+}
+
+omv_cart_slot_device::omv_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: sega8_cart_slot_device(mconfig, OMV_CART_SLOT, tag, owner, clock)
+{
+}
+
+sc3000_cart_slot_device::sc3000_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: sega8_cart_slot_device(mconfig, SC3000_CART_SLOT, tag, owner, clock)
+{
+}
+
+sg1000mk3_cart_slot_device::sg1000mk3_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: sega8_cart_slot_device(mconfig, SG1000MK3_CART_SLOT, tag, owner, clock)
+{
+}
+
+sms_cart_slot_device::sms_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: sega8_cart_slot_device(mconfig, SMS_CART_SLOT, tag, owner, clock)
+{
+}
+
+gamegear_cart_slot_device::gamegear_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: sega8_cart_slot_device(mconfig, GAMEGEAR_CART_SLOT, tag, owner, clock)
+{
+}
+
+
+sms_card_slot_device::sms_card_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: sega8_card_slot_device(mconfig, SMS_CARD_SLOT, tag, owner, clock)
+{
+}
+
+sg1000_card_slot_device::sg1000_card_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: sega8_card_slot_device(mconfig, SG1000_CARD_SLOT, tag, owner, clock)
+{
+}
 
 //-------------------------------------------------
 //  sega8_cart_slot_device - destructor

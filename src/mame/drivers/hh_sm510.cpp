@@ -21,7 +21,6 @@
 #include "includes/hh_sm510.h"
 
 #include "cpu/sm510/sm500.h"
-#include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -1019,6 +1018,87 @@ void kgarfld_state::kgarfld(machine_config &config)
 
 /***************************************************************************
 
+  Nintendo Game & Watch: Octopus (model OC-22)
+  * PCB label OC-22Y A
+  * Sharp SM5A label OC-22 204A (no decap)
+  * lcd screen with custom segments, 1-bit sound
+
+***************************************************************************/
+
+class gnw_octopus_state : public hh_sm510_state
+{
+public:
+	gnw_octopus_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_sm510_state(mconfig, type, tag)
+	{
+		m_inp_lines = 3;
+	}
+
+	void gnw_octopus(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( gnw_octopus )
+	PORT_START("IN.0") // R2
+	PORT_CONFNAME( 0x01, 0x00, "Invincibility (Cheat)")
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // same as 0x01?
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) // same as 0x01?
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED ) // same as 0x01?
+
+	PORT_START("IN.1") // R3
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED ) // alarm test?
+
+	PORT_START("IN.2") // R4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Alarm")
+
+	PORT_START("BA")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_16WAY
+
+	PORT_START("B")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_16WAY
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
+INPUT_PORTS_END
+
+void gnw_octopus_state::gnw_octopus(machine_config &config)
+{
+	/* basic machine hardware */
+	SM5A(config, m_maincpu);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT); // confirmed
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm500_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_input_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
+
+	/* video hardware */
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1586, 1080);
+	screen.set_visarea(0, 1586-1, 0, 1080-1);
+
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+
+
+
+
+/***************************************************************************
+
   Nintendo Game & Watch: Mickey Mouse (model MC-25), Egg (model EG-26)
   * Sharp SM5A label ?
   * lcd screen with custom segments, 1-bit sound
@@ -1141,6 +1221,170 @@ void gnw_mmouse_state::exospace(machine_config &config)
 	/* video hardware */
 	subdevice<screen_device>("screen")->set_size(1756, 1080);
 	subdevice<screen_device>("screen")->set_visarea(0, 1756-1, 0, 1080-1);
+}
+
+
+
+
+
+/***************************************************************************
+
+  Nintendo Game & Watch: Fire (model FR-27)
+  * PCB label FR-27
+  * Sharp SM5A label FR-27 523B (no decap)
+  * lcd screen with custom segments, 1-bit sound
+
+  This is the wide screen version, there's also a silver version.
+
+***************************************************************************/
+
+class gnw_fire_state : public hh_sm510_state
+{
+public:
+	gnw_fire_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_sm510_state(mconfig, type, tag)
+	{
+		m_inp_lines = 3;
+	}
+
+	void gnw_fire(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( gnw_fire )
+	PORT_START("IN.0") // R2
+	PORT_CONFNAME( 0x01, 0x00, "Infinite Lives (Cheat)")
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // same as 0x01?
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) // reset?
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED ) // piezo test?
+
+	PORT_START("IN.1") // R3
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED ) // lcd test?
+
+	PORT_START("IN.2") // R4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Alarm")
+
+	PORT_START("BA")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_16WAY
+
+	PORT_START("B")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_16WAY
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
+INPUT_PORTS_END
+
+void gnw_fire_state::gnw_fire(machine_config &config)
+{
+	/* basic machine hardware */
+	SM5A(config, m_maincpu);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT); // confirmed
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm500_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_input_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
+
+	/* video hardware */
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1624, 1080);
+	screen.set_visarea(0, 1624-1, 0, 1080-1);
+
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+
+
+
+
+/***************************************************************************
+
+  Nintendo Game & Watch: Snoopy Tennis (model SP-30)
+  * PCB label SP-30
+  * Sharp SM510 label SP-30 525B (no decap)
+  * lcd screen with custom segments, 1-bit sound
+
+***************************************************************************/
+
+class gnw_stennis_state : public hh_sm510_state
+{
+public:
+	gnw_stennis_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_sm510_state(mconfig, type, tag)
+	{
+		m_inp_lines = 2;
+	}
+
+	void gnw_stennis(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( gnw_stennis )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) // Hit
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Alarm")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
+
+	PORT_START("BA") // MCU BA(alpha) pin pulled to GND
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)")
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("B") // MCU B(beta) pin pulled to GND
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+void gnw_stennis_state::gnw_stennis(machine_config &config)
+{
+	/* basic machine hardware */
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(2); // confirmed
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
+
+	/* video hardware */
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1581, 1080);
+	screen.set_visarea(0, 1581-1, 0, 1080-1);
+
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 
@@ -7446,6 +7690,15 @@ ROM_START( kgarfld )
 ROM_END
 
 
+ROM_START( gnw_octopus )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "oc-22", 0x0000, 0x0740, CRC(bd27781d) SHA1(07b4feb9265c83b159f96c7e8ee1c61a2cc17dc5) )
+
+	ROM_REGION( 119681, "svg", 0)
+	ROM_LOAD( "gnw_octopus.svg", 0, 119681, CRC(39900430) SHA1(61b71c475365966257f5479eab992538ec235c11) )
+ROM_END
+
+
 ROM_START( gnw_mmouse )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "mc-25", 0x0000, 0x0740, BAD_DUMP CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) ) // dumped from Soviet clone
@@ -7478,6 +7731,25 @@ ROM_START( exospace )
 	ROM_LOAD( "exospace.svg", 0, 66790, BAD_DUMP CRC(df31043a) SHA1(2d8caf42894df699e469652e5f448beaebbcc1ae) )
 ROM_END
 
+
+ROM_START( gnw_fire )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "fr-27", 0x0000, 0x0740, CRC(f4c53ef0) SHA1(6b57120a0f9d2fd4dcd65ad57a5f32def71d905f) )
+
+	ROM_REGION( 163753, "svg", 0)
+	ROM_LOAD( "gnw_fire.svg", 0, 163753, CRC(d546fa42) SHA1(492c785aa0ed33ff1ac8c84066e5b6d7cb7d1566) )
+ROM_END
+
+
+ROM_START( gnw_stennis )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "sp-30", 0x0000, 0x1000, CRC(ba1d9504) SHA1(ff601765d88564b1570a59f5b1a4005c7b0fd66c) )
+
+	ROM_REGION( 227964, "svg", 0)
+	ROM_LOAD( "gnw_stennis.svg", 0, 227964, CRC(1bb5f99a) SHA1(2e999c75598448e3502e7bab16e987d80d6a301f) )
+ROM_END
+
+
 ROM_START( gnw_opanic )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "op-51", 0x0000, 0x1000, CRC(31c288c9) SHA1(4bfd0fba94a9927cefc925db8196b063c5dd9b19) )
@@ -7488,6 +7760,7 @@ ROM_START( gnw_opanic )
 	ROM_REGION( 112809, "svg_bottom", 0)
 	ROM_LOAD( "gnw_opanic_bottom.svg", 0, 112809, CRC(919b9649) SHA1(f3d3c8ca3fed81782a1fcb5a7aff07faea86db07) )
 ROM_END
+
 
 ROM_START( gnw_dkong )
 	ROM_REGION( 0x1000, "maincpu", 0 )
@@ -7500,6 +7773,7 @@ ROM_START( gnw_dkong )
 	ROM_LOAD( "gnw_dkong_bottom.svg", 0, 145397, CRC(2c8c9d08) SHA1(658fd0bbccaabb0645b02e5cb81709c4b2a4250e) )
 ROM_END
 
+
 ROM_START( gnw_mickdon )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "dm-53_565", 0x0000, 0x1000, CRC(e21fc0f5) SHA1(3b65ccf9f98813319410414e11a3231b787cdee6) )
@@ -7511,6 +7785,7 @@ ROM_START( gnw_mickdon )
 	ROM_LOAD( "gnw_mickdon_bottom.svg", 0, 122870, CRC(8f06ddf1) SHA1(69d4b785781600abcdfc01b3902df1d0ae3608cf) )
 ROM_END
 
+
 ROM_START( gnw_ghouse )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "gh-54", 0x0000, 0x1000, CRC(4df12b4d) SHA1(708be5fef8dbd9337f5ab35baaca5bdf21e1f36c) )
@@ -7521,6 +7796,7 @@ ROM_START( gnw_ghouse )
 	ROM_REGION( 149757, "svg_bottom", 0)
 	ROM_LOAD( "gnw_ghouse_bottom.svg", 0, 149757, CRC(d66ee72c) SHA1(dcbe1c81ee0c7ddb9692858749ce6934f4dd7f30) )
 ROM_END
+
 
 ROM_START( gnw_dkong2 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
@@ -8157,10 +8433,13 @@ CONS( 1991, kbucky,      0,          0, kbucky,      kbucky,      kbucky_state, 
 CONS( 1991, kgarfld,     0,          0, kgarfld,     kgarfld,     kgarfld_state,     empty_init, "Konami", "Garfield (handheld)", MACHINE_SUPPORTS_SAVE )
 
 // Nintendo G&W: wide screen
+CONS( 1981, gnw_octopus, 0,          0, gnw_octopus, gnw_octopus, gnw_octopus_state, empty_init, "Nintendo", "Game & Watch: Octopus", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, gnw_mmouse,  0,          0, gnw_mmouse,  gnw_mmouse,  gnw_mmouse_state,  empty_init, "Nintendo", "Game & Watch: Mickey Mouse", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, gnw_egg,     gnw_mmouse, 0, gnw_egg,     gnw_mmouse,  gnw_mmouse_state,  empty_init, "Nintendo", "Game & Watch: Egg", MACHINE_SUPPORTS_SAVE )
 CONS( 1984, nupogodi,    gnw_mmouse, 0, nupogodi,    gnw_mmouse,  gnw_mmouse_state,  empty_init, "Elektronika", "Nu, pogodi!", MACHINE_SUPPORTS_SAVE )
 CONS( 1989, exospace,    gnw_mmouse, 0, exospace,    exospace,    gnw_mmouse_state,  empty_init, "Elektronika", "Explorers of Space", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, gnw_fire,    0,          0, gnw_fire,    gnw_fire,    gnw_fire_state,    empty_init, "Nintendo", "Game & Watch: Fire (wide screen)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, gnw_stennis, 0,          0, gnw_stennis, gnw_stennis, gnw_stennis_state, empty_init, "Nintendo", "Game & Watch: Snoopy Tennis", MACHINE_SUPPORTS_SAVE )
 
 // Nintendo G&W: multi screen
 CONS( 1982, gnw_opanic,  0,          0, gnw_opanic,  gnw_opanic,  gnw_opanic_state,  empty_init, "Nintendo", "Game & Watch: Oil Panic", MACHINE_SUPPORTS_SAVE)

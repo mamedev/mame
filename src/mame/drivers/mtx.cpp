@@ -280,7 +280,7 @@ WRITE_LINE_MEMBER(mtx_state::mtx_tms9929a_interrupt)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    MACHINE_CONFIG_START( mtx512 )
+    machine_config( mtx512 )
 -------------------------------------------------*/
 
 MACHINE_CONFIG_START(mtx_state::mtx512)
@@ -303,8 +303,7 @@ MACHINE_CONFIG_START(mtx_state::mtx512)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(SN76489A_TAG, SN76489A, XTAL(4'000'000))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	SN76489A(config, SN76489A_TAG, XTAL(4'000'000)).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* devices */
 	Z80CTC(config, m_z80ctc, XTAL(4'000'000));
@@ -323,7 +322,7 @@ MACHINE_CONFIG_START(mtx_state::mtx512)
 	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
 	m_centronics->set_output_latch(cent_data_out);
 
-	MCFG_SNAPSHOT_ADD("snapshot", mtx_state, mtx, "mtx", 1)
+	MCFG_SNAPSHOT_ADD("snapshot", mtx_state, mtx, "mtx", attotime::from_seconds(1))
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED);
 	m_cassette->set_interface("mtx_cass");
@@ -358,7 +357,7 @@ void mtx_state::mtx500(machine_config &config)
 }
 
 /*-------------------------------------------------
-    MACHINE_CONFIG_START( rs128 )
+    machine_config( rs128 )
 -------------------------------------------------*/
 
 void mtx_state::rs128(machine_config &config)

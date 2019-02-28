@@ -95,6 +95,7 @@ static const ekara_slot slot_list[] =
 {
 	{ EKARA_PLAIN,       "plain" },
 	{ EKARA_I2C_BASE,    "i2c_base" },
+	{ EKARA_I2C_24C08,   "rom_24c08" },
 	{ EKARA_I2C_24LC04,  "rom_24lc04" },
 	{ EKARA_I2C_24LC02,  "rom_24lc02" },
 };
@@ -237,3 +238,40 @@ WRITE8_MEMBER(ekara_cart_slot_device::write_extra)
 	m_cart->write_extra(space, offset, data);
 }
 
+/*-------------------------------------------------
+ write control
+ -------------------------------------------------*/
+
+WRITE8_MEMBER(ekara_cart_slot_device::write_bus_control)
+{
+	m_cart->write_bus_control(space, offset, data);
+}
+
+bool ekara_cart_slot_device::is_read_access_not_rom(void)
+{
+	return m_cart->is_read_access_not_rom();
+}
+
+bool ekara_cart_slot_device::is_write_access_not_rom(void)
+{
+	return m_cart->is_write_access_not_rom();
+}
+
+/*-------------------------------------------------
+ direct seeprom access (popira2, gc0010)
+ -------------------------------------------------*/
+
+WRITE_LINE_MEMBER(ekara_cart_slot_device::write_sda)
+{
+	m_cart->write_sda(state);
+}
+
+WRITE_LINE_MEMBER(ekara_cart_slot_device::write_scl)
+{
+	m_cart->write_scl(state);
+}
+
+READ_LINE_MEMBER(ekara_cart_slot_device::read_sda )
+{
+	return  m_cart->read_sda();
+}

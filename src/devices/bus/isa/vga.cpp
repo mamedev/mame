@@ -27,14 +27,14 @@ DEFINE_DEVICE_TYPE(ISA8_VGA, isa8_vga_device, "ibm_vga", "IBM VGA Graphics Card"
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(isa8_vga_device::device_add_mconfig)
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(25'174'800),900,0,640,526,0,480)
-	MCFG_SCREEN_UPDATE_DEVICE("vga", vga_device, screen_update)
+void isa8_vga_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
+	screen.set_screen_update("vga", FUNC(vga_device::screen_update));
 
-	MCFG_DEVICE_ADD("vga", VGA, 0)
-	MCFG_VIDEO_SET_SCREEN("screen")
-MACHINE_CONFIG_END
+	VGA(config, "vga", 0).set_screen("screen");
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

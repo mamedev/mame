@@ -92,10 +92,10 @@ void bbc_tube_slot_device::device_reset()
 //  host_r
 //-------------------------------------------------
 
-READ8_MEMBER(bbc_tube_slot_device::host_r)
+uint8_t bbc_tube_slot_device::host_r(offs_t offset)
 {
 	if (m_card)
-		return m_card->host_r(space, offset);
+		return m_card->host_r(offset);
 	else
 		return 0xfe;
 }
@@ -104,10 +104,10 @@ READ8_MEMBER(bbc_tube_slot_device::host_r)
 //  host_w
 //-------------------------------------------------
 
-WRITE8_MEMBER(bbc_tube_slot_device::host_w)
+void bbc_tube_slot_device::host_w(offs_t offset, uint8_t data)
 {
 	if (m_card)
-		m_card->host_w(space, offset, data);
+		m_card->host_w(offset, data);
 }
 
 

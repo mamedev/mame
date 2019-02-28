@@ -16,10 +16,10 @@ public:
 	// construction/destruction
 	nes_rex_dbz5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ8_MEMBER(read_l) override;
-	virtual DECLARE_READ8_MEMBER(read_m) override { return read_l(space, offset, mem_mask); }
-	virtual DECLARE_WRITE8_MEMBER(write_l) override;
-	virtual void chr_cb( int start, int bank, int source ) override;
+	virtual uint8_t read_l(offs_t offset) override;
+	virtual uint8_t read_m(offs_t offset) override { return read_l(offset); }
+	virtual void write_l(offs_t offset, uint8_t data) override;
+	virtual void chr_cb(int start, int bank, int source) override;
 
 	virtual void pcb_reset() override;
 
@@ -40,7 +40,7 @@ public:
 	// construction/destruction
 	nes_rex_sl1632_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+	virtual void write_h(offs_t offset, uint8_t data) override;
 
 	virtual void pcb_reset() override;
 

@@ -268,28 +268,28 @@ static INPUT_PORTS_START( targeth )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(targeth_state::targeth)
-
+void targeth_state::targeth(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/2)          /* 12 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", targeth_state, irq2_line_hold)
+	M68000(config, m_maincpu, XTAL(24'000'000)/2);          /* 12 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &targeth_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(targeth_state::irq2_line_hold));
 
-	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL(24'000'000) / 2)
-	MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
+	gaelco_ds5002fp_device &ds5002fp(GAELCO_DS5002FP(config, "gaelco_ds5002fp", XTAL(24'000'000) / 2));
+	ds5002fp.set_addrmap(0, &targeth_state::mcu_hostmem_map);
 
 	LS259(config, m_outlatch);
 	m_outlatch->q_out_cb<2>().set(FUNC(targeth_state::coin1_counter_w));
 	m_outlatch->q_out_cb<3>().set(FUNC(targeth_state::coin2_counter_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*16, 16*16)
-	MCFG_SCREEN_VISIBLE_AREA(3*8, 23*16-8-1, 16, 16*16-8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(targeth_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	m_screen->set_size(64*16, 16*16);
+	m_screen->set_visarea(3*8, 23*16-8-1, 16, 16*16-8-1);
+	m_screen->set_screen_update(FUNC(targeth_state::screen_update));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_targeth);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
@@ -297,10 +297,10 @@ MACHINE_CONFIG_START(targeth_state::targeth)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(1'000'000), okim6295_device::PIN7_HIGH) // 1MHz resonator - pin 7 not verified
-	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL(1'000'000), okim6295_device::PIN7_HIGH)); // 1MHz resonator - pin 7 not verified
+	oki.set_addrmap(0, &targeth_state::oki_map);
+	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 ROM_START( targeth )
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */

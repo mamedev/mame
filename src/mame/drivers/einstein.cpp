@@ -390,10 +390,6 @@ void einstein_state::machine_start()
 	m_bank1->configure_entry(1, m_bios->base());
 	m_bank2->set_base(m_ram->pointer());
 	m_bank3->set_base(m_ram->pointer() + 0x8000);
-
-	// setup expansion slot
-	m_pipe->set_program_space(&m_maincpu->space(AS_PROGRAM));
-	m_pipe->set_io_space(&m_maincpu->space(AS_IO));
 }
 
 void einstein_state::machine_reset()
@@ -576,7 +572,8 @@ static void einstein_floppies(device_slot_interface &device)
 	device.option_add("35dd", FLOPPY_35_DD);
 }
 
-MACHINE_CONFIG_START(einstein_state::einstein)
+void einstein_state::einstein(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL_X002 / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &einstein_state::einstein_mem);
@@ -673,12 +670,13 @@ MACHINE_CONFIG_START(einstein_state::einstein)
 
 	// tatung pipe connector
 	TATUNG_PIPE(config, m_pipe, XTAL_X002 / 2, tatung_pipe_cards, nullptr);
+	m_pipe->set_program_space(m_maincpu, AS_PROGRAM);
+	m_pipe->set_io_space(m_maincpu, AS_IO);
 	m_pipe->nmi_handler().set_inputline(IC_I001, INPUT_LINE_NMI);
 
 	// user port
-	MCFG_EINSTEIN_USERPORT_ADD("user")
-	MCFG_EINSTEIN_USERPORT_BSTB_HANDLER(WRITELINE(IC_I063, z80pio_device, strobe_b))
-MACHINE_CONFIG_END
+	EINSTEIN_USERPORT(config, "user").bstb_handler().set(IC_I063, FUNC(z80pio_device::strobe_b));
+}
 
 
 /***************************************************************************
