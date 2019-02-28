@@ -759,6 +759,26 @@ ROM_START( nprsp ) // STAFYAMA19980925 string
 	// 8bpp might be possible with another ROM?
 ROM_END
 
+ROM_START( npssr2 ) // STAFYAMA19980925 string
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "s038a-ep1 nps-prg1.ep1", 0x000000, 0x080000, CRC(529fb4fa) SHA1(f31ba8998bb01458f43df1934222995f22d590a1) ) // program ROM, same as nprsp
+	ROM_LOAD16_WORD_SWAP( "s072-ep2 nps-prg1.ep2",  0x080000, 0x080000, CRC(5514e29f) SHA1(fd508b6b4b2ed587b5dfd4a186865c72181612e6) ) // data ROM
+
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 program */
+	ROM_LOAD( "s001-m1 neo-pstm cha64c.m1", 0x00000, 0x20000, CRC(ea8111c1) SHA1(69e6bb7ad9a8d61db4513a762c0ce9e9da2a1785) )
+
+	ROM_REGION( 0x200000, "ymsnd", 0 ) /* Samples */
+	ROM_LOAD( "s001-v1 nps-prg1.v1", 0x000000, 0x100000, CRC(13d63625) SHA1(4a9e3b1192a4a7e405becfd5d2a95ffc14ae6e79)  )
+
+	ROM_REGION( 0x800000, "gfx1", ROMREGION_ERASE00 )
+	ROM_LOAD32_BYTE( "s072-c1 neo-pstm cha64c.c1", 0x000000, 0x200000, CRC(c5f72b00) SHA1(b81a9d6025e79f98bdfd55d630ede181ef821132) )
+	ROM_LOAD32_BYTE( "s072-c2 neo-pstm cha64c.c2", 0x000001, 0x200000, CRC(3153db5a) SHA1(2166f452131f64e3806d177b5c5a6ddcd312adfd) )
+	ROM_LOAD32_BYTE( "s072-c3 neo-pstm cha64c.c3", 0x000002, 0x200000, CRC(57e8888f) SHA1(59acb22b2744bb798dd4779d9413d01bee79b43e) )
+
+	ROM_REGION( 0x100, "eeprom", ROMREGION_ERASE00 )
+	ROM_LOAD( "br9020 nps-prg1.u5", 0x000, 0x100, NO_DUMP ) // dump provided was 0xff filled
+ROM_END
+
 ROM_START( npmillen ) // NP 1.30 19990225 string
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "p093-ep1.bin", 0x000000, 0x080000, CRC(47783f56) SHA1(1845e90b05a58010054c4158ef08e167e61ea370) )
@@ -789,6 +809,21 @@ ROM_START( npscv1 ) // NP 1.10 19961015 string
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_ERASE00 )
 	ROM_LOAD32_BYTE( "np-jc1 pstm-romc.c1", 0x000000, 0x080000, CRC(a729d3d4) SHA1(b0a8dfd2fc5c6707e5dd2a6d702a5d43a927c716) )
 	ROM_LOAD32_BYTE( "np-jc2 pstm-romc.c2", 0x000001, 0x080000, CRC(c9687cd8) SHA1(809d9efd7ea76de0884ad76effb71217e9068f89) )
+ROM_END
+
+ROM_START( npcramen ) // ? string
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "l009-ep1 neo-mvs progbk1.ep1", 0x000000, 0x080000, BAD_DUMP CRC(ff470ded) SHA1(d33dd90f9ac1cc7f2dcadb6a855d9cd5f3260d00) ) // 111111111xxxxxxxxxx = 0xFF, reads were consistent, but..
+
+	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* Z80 program */
+	// empty (removed or never populated)?
+
+	ROM_REGION( 0x80000, "ymsnd", ROMREGION_ERASEFF ) /* Samples */
+	// empty (removed or never populated)?
+
+	ROM_REGION( 0x200000, "gfx1", ROMREGION_ERASE00 )
+	ROM_LOAD32_BYTE( "l009-c1 pstm-romc.c1", 0x000000, 0x080000, CRC(d6b44550) SHA1(d402ffe372646b93344f7e36d29e4fe913f2479a) )
+	ROM_LOAD32_BYTE( "l009-c2 pstm-romc.c2", 0x000001, 0x080000, CRC(d63dea34) SHA1(cf2dbf982ed955fe5a4c737d1752cdb66ab5f84a) )
 ROM_END
 
 /* FIXME: get rid of these two, probably something to do with irq3 and camera / printer devices */
@@ -873,6 +908,7 @@ void neoprint_state::init_npotogib()
 GAME( 1996, neoprint,    0,        neoprint,    neoprint, neoprint_state, init_unkneo,   ROT0, "SNK", "Neo Print (Japan) (T2d)",                                       MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 GAME( 1996, npcartv1,    0,        neoprint,    neoprint, neoprint_state, init_npcartv1, ROT0, "SNK", "Neo Print V1 (World) (E1a)",                                    MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 GAME( 1996, npscv1,      0,        neoprint,    neoprint, neoprint_state, init_npscv1,   ROT0, "SNK", "Neo Print - Senyou Cassette Ver. 1 (Japan)",                    MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1996, npcramen,    0,        neoprint,    neoprint, neoprint_state, empty_init,    ROT0, "SNK", "Neo Print - Chicken Ramen (Japan)",                             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 GAME( 1997, npsprgv4,    0,        neoprint,    neoprint, neoprint_state, init_npsprgv4, ROT0, "SNK", "Neo Print - Spring Ver. 4 (Japan) (T4f 1.00)",                  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 GAME( 1997, npskv,       0,        neoprint,    neoprint, neoprint_state, init_npskv,    ROT0, "SNK", "Neo Print - Suizokukan Version (Japan) (T4i 2.00)",             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 GAME( 1997, npotogib,    0,        neoprint,    neoprint, neoprint_state, init_npotogib, ROT0, "SNK", "Neo Print - Otogibanashi (Japan) (T4i 3.00)",                   MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
@@ -882,3 +918,4 @@ GAME( 1998, npsprg98,    0,        neoprint,    neoprint, neoprint_state, init_n
 GAME( 1999, npmillen,    0,        neoprint,    neoprint, neoprint_state, init_npmillen, ROT0, "SNK", "Neo Print - Millennium Multi Shot Edition (World) (T4i 3.07)",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 GAME( 1999, npfpit,      0,        neoprint,    neoprint, neoprint_state, init_npmillen, ROT0, "SNK", "Neo Print - Fuyo Pri Iitoko Tori (Japan) (T4i 3.07)",           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 GAME( 1996, nprsp,       0,        nprsp,       neoprint, neoprint_state, init_nprsp,    ROT0, "SNK", "NeopriSP Retro Collection (Japan)",                             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1996, npssr2,      0,        nprsp,       neoprint, neoprint_state, init_nprsp,    ROT0, "SNK", "Neo Print Special: Sekai Ryokou 2 (Japan)",                     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
