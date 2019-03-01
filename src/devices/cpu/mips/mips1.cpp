@@ -955,13 +955,75 @@ void mips1core_device_base::handle_cop1(u32 const op)
 
 void mips1core_device_base::handle_cop2(u32 const op)
 {
-	if (!(SR & SR_COP2))
+	if (SR & SR_COP2)
+	{
+		switch (RSREG)
+		{
+		case 0x08: // BC2
+			switch (RTREG)
+			{
+			case 0x00: // BC2F
+				if (!m_in_brcond[2]())
+				{
+					m_branch_state = BRANCH;
+					m_branch_target = m_pc + 4 + (s32(SIMMVAL) << 2);
+				}
+				break;
+			case 0x01: // BC2T
+				if (m_in_brcond[2]())
+				{
+					m_branch_state = BRANCH;
+					m_branch_target = m_pc + 4 + (s32(SIMMVAL) << 2);
+				}
+				break;
+			default:
+				generate_exception(EXCEPTION_INVALIDOP);
+				break;
+			}
+			break;
+		default:
+			generate_exception(EXCEPTION_INVALIDOP);
+			break;
+		}
+	}
+	else
 		generate_exception(EXCEPTION_BADCOP2);
 }
 
 void mips1core_device_base::handle_cop3(u32 const op)
 {
-	if (!(SR & SR_COP3))
+	if (SR & SR_COP3)
+	{
+		switch (RSREG)
+		{
+		case 0x08: // BC3
+			switch (RTREG)
+			{
+			case 0x00: // BC3F
+				if (!m_in_brcond[3]())
+				{
+					m_branch_state = BRANCH;
+					m_branch_target = m_pc + 4 + (s32(SIMMVAL) << 2);
+				}
+				break;
+			case 0x01: // BC3T
+				if (m_in_brcond[3]())
+				{
+					m_branch_state = BRANCH;
+					m_branch_target = m_pc + 4 + (s32(SIMMVAL) << 2);
+				}
+				break;
+			default:
+				generate_exception(EXCEPTION_INVALIDOP);
+				break;
+			}
+			break;
+		default:
+			generate_exception(EXCEPTION_INVALIDOP);
+			break;
+		}
+	}
+	else
 		generate_exception(EXCEPTION_BADCOP3);
 }
 
