@@ -139,9 +139,9 @@ namespace devices
 						const FT * pi = &A(i,i+1);
 						FT * pj = &A(j,i+1);
 	#if 1
-						plib::vec_add_mult_scalar_p(kN-i,pi,f1,pj);
+						plib::vec_add_mult_scalar_p(kN-i,pj, pi,f1);
 	#else
-						vec_add_mult_scalar_p(kN-i-1,pj,f1,pi);
+						vec_add_mult_scalar_p1(kN-i-1,pj,pi,f1);
 						//for (unsigned k = i+1; k < kN; k++)
 						//  pj[k] = pj[k] + pi[k] * f1;
 						//for (unsigned k = i+1; k < kN; k++)

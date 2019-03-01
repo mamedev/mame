@@ -198,7 +198,8 @@ namespace netlist
 		mutex_type      m_lock;
 		PALIGNAS_CACHELINE()
 		T             * m_end;
-		std::vector<T>  m_list;
+		//std::vector<T>  m_list;
+		plib::aligned_vector<T>  m_list;
 
 	public:
 		// profiling

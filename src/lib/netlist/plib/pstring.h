@@ -75,7 +75,7 @@ public:
 	using string_type = typename traits_type::string_type;
 
 	// FIXME: this is ugly
-	class ref_value_type final
+	struct ref_value_type final
 	{
 	public:
 		ref_value_type() = delete;
@@ -202,11 +202,9 @@ public:
 
 	size_type mem_t_size() const { return m_str.size(); }
 
-	pstring_t rpad(const pstring_t &ws, const size_type cnt) const;
-
 	const string_type &cpp_string() const { return m_str; }
 
-	static const size_type npos = static_cast<size_type>(-1);
+	static constexpr const size_type npos = static_cast<size_type>(-1);
 
 private:
 	string_type m_str;

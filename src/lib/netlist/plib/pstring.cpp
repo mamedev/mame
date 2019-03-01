@@ -13,15 +13,6 @@
 #include <atomic>
 #include <stack>
 
-template <typename T>
-std::size_t strlen_mem(const T *s)
-{
-	std::size_t len(0);
-	while (*s++)
-		++len;
-	return len;
-}
-
 template<typename F>
 int pstring_t<F>::compare(const pstring_t &right) const
 {

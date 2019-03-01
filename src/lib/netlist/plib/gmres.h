@@ -239,7 +239,7 @@ namespace plib
 
 				ops.calc_rhs(Ax, x);
 
-				vec_sub(n, rhs, Ax, residual);
+				vec_sub(n, residual, rhs, Ax);
 
 				ops.solve_LU_inplace(residual);
 
@@ -258,7 +258,7 @@ namespace plib
 				//for (std::size_t i = 0; i < mr + 1; i++)
 				//  vec_set_scalar(mr, m_ht[i], NL_FCONST(0.0));
 
-				vec_mult_scalar(n, residual, constants<FT>::one() / rho, m_v[0]);
+				vec_mult_scalar(n, m_v[0], residual, constants<FT>::one() / rho);
 
 				for (std::size_t k = 0; k < RESTART; k++)
 				{
@@ -270,7 +270,7 @@ namespace plib
 					for (std::size_t j = 0; j <= k; j++)
 					{
 						m_ht[j][k] = vec_mult<FT>(n, m_v[kp1], m_v[j]);
-						vec_add_mult_scalar(n, m_v[j], -m_ht[j][k], m_v[kp1]);
+						vec_add_mult_scalar(n, m_v[kp1], m_v[j], -m_ht[j][k]);
 					}
 					m_ht[kp1][k] = std::sqrt(vec_mult2<FT>(n, m_v[kp1]));
 
@@ -315,7 +315,7 @@ namespace plib
 				}
 
 				for (std::size_t i = 0; i <= last_k; i++)
-					vec_add_mult_scalar(n, m_v[i], m_y[i], x);
+					vec_add_mult_scalar(n, x, m_v[i], m_y[i]);
 
 				if (rho <= rho_delta)
 					break;

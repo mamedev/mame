@@ -182,59 +182,6 @@ namespace plib {
 
 	};
 
-#if 0
-	class mempool_default
-	{
-	private:
-
-		size_t m_min_alloc;
-		size_t m_min_align;
-
-	public:
-
-		static constexpr const bool is_stateless = true;
-		template <class T, std::size_t ALIGN = alignof(T)>
-		using allocator_type = arena_allocator<mempool_default, T, ALIGN>;
-
-		mempool_default(size_t min_alloc = 16, size_t min_align = (1 << 21))
-		: m_min_alloc(min_alloc), m_min_align(min_align)
-		{
-		}
-
-		COPYASSIGNMOVE(mempool_default, delete)
-
-		~mempool_default() = default;
-
-		void *allocate(size_t alignment, size_t size)
-		{
-			plib::unused_var(m_min_alloc); // -Wunused-private-field fires without
-			plib::unused_var(m_min_align);
-			plib::unused_var(alignment);
-
-			return ::operator new(size);
-		}
-
-		static void deallocate(void *ptr)
-		{
-			::operator delete(ptr);
-		}
-
-		template <typename T>
-		using poolptr = plib::owned_ptr<T, arena_deleter<mempool_default, T>>;
-
-		template<typename T, typename... Args>
-		poolptr<T> make_poolptr(Args&&... args)
-		{
-			plib::unused_var(m_min_alloc); // -Wunused-private-field fires without
-			plib::unused_var(m_min_align);
-
-			auto *obj = plib::pnew<T>(std::forward<Args>(args)...);
-			poolptr<T> a(obj, true);
-			return std::move(a);
-		}
-	};
-#endif
-
 } // namespace plib
 
 #endif /* PMEMPOOL_H_ */

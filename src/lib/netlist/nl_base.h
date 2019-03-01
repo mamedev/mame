@@ -192,13 +192,8 @@ namespace netlist
 	} // namespace devices
 
 	namespace detail {
-		class object_t;
-		class device_object_t;
-		struct netlist_ref;
-		class core_terminal_t;
 		struct family_setter_t;
 		class queue_t;
-		class net_t;
 	} // namespace detail
 
 	class logic_output_t;
@@ -359,17 +354,17 @@ namespace netlist
 				const T &value          //!< Initial value after construction
 				);
 		//! Copy Constructor.
-		state_array(const state_array &rhs) NL_NOEXCEPT = default;
+		state_array(const state_array &rhs) noexcept = default;
 		//! Destructor.
 		~state_array() noexcept = default;
 		//! Move Constructor.
-		state_array(state_array &&rhs) NL_NOEXCEPT = default;
-		state_array &operator=(const state_array &rhs) NL_NOEXCEPT = default;
-		state_array &operator=(state_array &&rhs) NL_NOEXCEPT = default;
+		state_array(state_array &&rhs) noexcept = default;
+		state_array &operator=(const state_array &rhs) noexcept = default;
+		state_array &operator=(state_array &&rhs) noexcept = default;
 
-		state_array &operator=(const T &rhs) NL_NOEXCEPT { m_value = rhs; return *this; }
-		T & operator[](const std::size_t i) NL_NOEXCEPT { return m_value[i]; }
-		constexpr const T & operator[](const std::size_t i) const NL_NOEXCEPT { return m_value[i]; }
+		state_array &operator=(const T &rhs) noexcept { m_value = rhs; return *this; }
+		T & operator[](const std::size_t i) noexcept { return m_value[i]; }
+		constexpr const T & operator[](const std::size_t i) const noexcept { return m_value[i]; }
 	private:
 		std::array<T, N> m_value;
 	};
@@ -390,190 +385,324 @@ namespace netlist
 	/*! predefined state variable type for sig_t */
 	using state_var_sig = state_var<netlist_sig_t>;
 
-	// -----------------------------------------------------------------------------
-	// object_t
-	// -----------------------------------------------------------------------------
+	namespace detail {
 
-	/*! The base class for netlist devices, terminals and parameters.
-	 *
-	 *  This class serves as the base class for all device, terminal and
-	 *  objects. It provides new and delete operators to support e.g. pooled
-	 *  memory allocation to enhance locality. Please refer to \ref USE_MEMPOOL as
-	 *  well.
-	 */
-	class detail::object_t
-	{
-	public:
+		// -----------------------------------------------------------------------------
+		// object_t
+		// -----------------------------------------------------------------------------
 
-		/*! Constructor.
+		/*! The base class for netlist devices, terminals and parameters.
 		 *
-		 *  Every class derived from the object_t class must have a name.
+		 *  This class serves as the base class for all device, terminal and
+		 *  objects. It provides new and delete operators to support e.g. pooled
+		 *  memory allocation to enhance locality. Please refer to \ref USE_MEMPOOL as
+		 *  well.
 		 */
-		explicit object_t(const pstring &aname /*!< string containing name of the object */);
-
-		COPYASSIGNMOVE(object_t, delete)
-		/*! return name of the object
-		 *
-		 *  \returns name of the object.
-		 */
-		pstring name() const;
-
-#if 0
-		void * operator new (size_t size, void *ptr) { plib::unused_var(size); return ptr; }
-		void operator delete (void *ptr, void *) { plib::unused_var(ptr); }
-		void * operator new (size_t size) = delete;
-		void operator delete (void * mem) = delete;
-#endif
-	protected:
-		~object_t() noexcept = default; // only childs should be destructible
-
-	private:
-		//pstring m_name;
-		static std::unordered_map<const object_t *, pstring> &name_hash()
+		class object_t
 		{
-			static std::unordered_map<const object_t *, pstring> lhash;
-			return lhash;
-		}
-	};
+		public:
 
-	struct detail::netlist_ref
-	{
-		explicit netlist_ref(netlist_state_t &nl);
+			/*! Constructor.
+			 *
+			 *  Every class derived from the object_t class must have a name.
+			 */
+			explicit object_t(const pstring &aname /*!< string containing name of the object */);
 
-		COPYASSIGNMOVE(netlist_ref, delete)
+			COPYASSIGNMOVE(object_t, delete)
+			/*! return name of the object
+			 *
+			 *  \returns name of the object.
+			 */
+			pstring name() const;
 
-		netlist_state_t & state() noexcept;
-		const netlist_state_t & state() const noexcept;
+	#if 0
+			void * operator new (size_t size, void *ptr) { plib::unused_var(size); return ptr; }
+			void operator delete (void *ptr, void *) { plib::unused_var(ptr); }
+			void * operator new (size_t size) = delete;
+			void operator delete (void * mem) = delete;
+	#endif
+		protected:
+			~object_t() noexcept = default; // only childs should be destructible
 
-		setup_t & setup() noexcept;
-		const setup_t & setup() const noexcept;
-
-		netlist_t & exec() noexcept { return m_netlist; }
-		const netlist_t & exec() const noexcept { return m_netlist; }
-
-	protected:
-		~netlist_ref() noexcept = default; // prohibit polymorphic destruction
-
-	private:
-		netlist_t & m_netlist;
-
-	};
-
-	// -----------------------------------------------------------------------------
-	// device_object_t
-	// -----------------------------------------------------------------------------
-
-	/*! Base class for all objects being owned by a device.
-	 *
-	 * Serves as the base class of all objects being owned by a device.
-	 *
-	 */
-	class detail::device_object_t : public detail::object_t
-	{
-	public:
-		/*! Constructor.
-		 *
-		 * \param dev  device owning the object.
-		 * \param name string holding the name of the device
-		 */
-		device_object_t(core_device_t &dev, const pstring &name);
-
-		/*! returns reference to owning device.
-		 * \returns reference to owning device.
-		 */
-		core_device_t &device() noexcept { return m_device; }
-		const core_device_t &device() const noexcept { return m_device; }
-
-		/*! The netlist owning the owner of this object.
-		 * \returns reference to netlist object.
-		 */
-		netlist_state_t &state() NL_NOEXCEPT;
-		const netlist_state_t &state() const NL_NOEXCEPT;
-
-		netlist_t &exec() NL_NOEXCEPT;
-		const netlist_t &exec() const NL_NOEXCEPT;
-
-	private:
-		core_device_t & m_device;
-};
-
-	// -----------------------------------------------------------------------------
-	// core_terminal_t
-	// -----------------------------------------------------------------------------
-
-	/*! Base class for all terminals.
-	 *
-	 * All terminals are derived from this class.
-	 *
-	 */
-	class detail::core_terminal_t : public device_object_t,
-									public plib::linkedlist_t<core_terminal_t>::element_t
-	{
-	public:
-
-		using list_t = std::vector<core_terminal_t *>;
-
-		static constexpr const auto INP_HL_SHIFT = 0;
-		static constexpr const auto INP_LH_SHIFT = 1;
-		static constexpr const auto INP_ACTIVE_SHIFT = 2;
-
-		enum state_e {
-			STATE_INP_PASSIVE = 0,
-			STATE_INP_HL      = (1 << INP_HL_SHIFT),
-			STATE_INP_LH      = (1 << INP_LH_SHIFT),
-			STATE_INP_ACTIVE  = (1 << INP_ACTIVE_SHIFT),
-			STATE_OUT = 128,
-			STATE_BIDIR = 256
+		private:
+			//pstring m_name;
+			static std::unordered_map<const object_t *, pstring> &name_hash()
+			{
+				static std::unordered_map<const object_t *, pstring> lhash;
+				return lhash;
+			}
 		};
 
-		core_terminal_t(core_device_t &dev, const pstring &aname,
-				const state_e state, nldelegate delegate = nldelegate());
-		virtual ~core_terminal_t() noexcept = default;
-
-		COPYASSIGNMOVE(core_terminal_t, delete)
-
-		/*! The object type.
-		 * \returns type of the object
-		 */
-		terminal_type type() const;
-		/*! Checks if object is of specified type.
-		 * \param atype type to check object against.
-		 * \returns true if object is of specified type else false.
-		 */
-		bool is_type(const terminal_type atype) const noexcept { return (type() == atype); }
-
-		void set_net(net_t *anet) noexcept { m_net = anet; }
-		void clear_net() noexcept { m_net = nullptr; }
-		bool has_net() const noexcept { return (m_net != nullptr); }
-
-		const net_t & net() const noexcept { return *m_net;}
-		net_t & net() noexcept { return *m_net;}
-
-		bool is_logic() const NL_NOEXCEPT;
-		bool is_analog() const NL_NOEXCEPT;
-
-		bool is_state(state_e astate) const noexcept { return (m_state == astate); }
-		state_e terminal_state() const noexcept { return m_state; }
-		void set_state(state_e astate) noexcept { m_state = astate; }
-
-		void reset() noexcept { set_state(is_type(OUTPUT) ? STATE_OUT : STATE_INP_ACTIVE); }
-
-		nldelegate m_delegate;
-#if USE_COPY_INSTEAD_OF_REFERENCE
-		void set_copied_input(netlist_sig_t val)
+		struct netlist_ref
 		{
-			m_Q = val;
-		}
+			explicit netlist_ref(netlist_state_t &nl);
 
-		state_var_sig m_Q;
-#else
-		void set_copied_input(netlist_sig_t val) const { plib::unused_var(val); }
-#endif
+			COPYASSIGNMOVE(netlist_ref, delete)
 
-	private:
-		net_t * m_net;
-		state_var<state_e> m_state;
-	};
+			netlist_state_t & state() noexcept;
+			const netlist_state_t & state() const noexcept;
+
+			setup_t & setup() noexcept;
+			const setup_t & setup() const noexcept;
+
+			netlist_t & exec() noexcept { return m_netlist; }
+			const netlist_t & exec() const noexcept { return m_netlist; }
+
+		protected:
+			~netlist_ref() noexcept = default; // prohibit polymorphic destruction
+
+		private:
+			netlist_t & m_netlist;
+
+		};
+
+		// -----------------------------------------------------------------------------
+		// device_object_t
+		// -----------------------------------------------------------------------------
+
+		/*! Base class for all objects being owned by a device.
+		 *
+		 * Serves as the base class of all objects being owned by a device.
+		 *
+		 */
+		class device_object_t : public object_t
+		{
+		public:
+			/*! Constructor.
+			 *
+			 * \param dev  device owning the object.
+			 * \param name string holding the name of the device
+			 */
+			device_object_t(core_device_t &dev, const pstring &name);
+
+			/*! returns reference to owning device.
+			 * \returns reference to owning device.
+			 */
+			core_device_t &device() noexcept { return m_device; }
+			const core_device_t &device() const noexcept { return m_device; }
+
+			/*! The netlist owning the owner of this object.
+			 * \returns reference to netlist object.
+			 */
+			netlist_state_t &state() NL_NOEXCEPT;
+			const netlist_state_t &state() const NL_NOEXCEPT;
+
+			netlist_t &exec() NL_NOEXCEPT;
+			const netlist_t &exec() const NL_NOEXCEPT;
+
+		private:
+			core_device_t & m_device;
+		};
+
+		// -----------------------------------------------------------------------------
+		// core_terminal_t
+		// -----------------------------------------------------------------------------
+
+		/*! Base class for all terminals.
+		 *
+		 * All terminals are derived from this class.
+		 *
+		 */
+
+		class net_t;
+
+		class core_terminal_t : public device_object_t,
+								public plib::linkedlist_t<core_terminal_t>::element_t
+		{
+		public:
+
+			using list_t = std::vector<core_terminal_t *>;
+
+			static constexpr const auto INP_HL_SHIFT = 0;
+			static constexpr const auto INP_LH_SHIFT = 1;
+			static constexpr const auto INP_ACTIVE_SHIFT = 2;
+
+			enum state_e {
+				STATE_INP_PASSIVE = 0,
+				STATE_INP_HL      = (1 << INP_HL_SHIFT),
+				STATE_INP_LH      = (1 << INP_LH_SHIFT),
+				STATE_INP_ACTIVE  = (1 << INP_ACTIVE_SHIFT),
+				STATE_OUT = 128,
+				STATE_BIDIR = 256
+			};
+
+			core_terminal_t(core_device_t &dev, const pstring &aname,
+					const state_e state, nldelegate delegate = nldelegate());
+			virtual ~core_terminal_t() noexcept = default;
+
+			COPYASSIGNMOVE(core_terminal_t, delete)
+
+			/*! The object type.
+			 * \returns type of the object
+			 */
+			terminal_type type() const;
+			/*! Checks if object is of specified type.
+			 * \param atype type to check object against.
+			 * \returns true if object is of specified type else false.
+			 */
+			bool is_type(const terminal_type atype) const noexcept { return (type() == atype); }
+
+			void set_net(net_t *anet) noexcept { m_net = anet; }
+			void clear_net() noexcept { m_net = nullptr; }
+			bool has_net() const noexcept { return (m_net != nullptr); }
+
+			const net_t & net() const noexcept { return *m_net;}
+			net_t & net() noexcept { return *m_net;}
+
+			bool is_logic() const NL_NOEXCEPT;
+			bool is_analog() const NL_NOEXCEPT;
+
+			bool is_state(state_e astate) const noexcept { return (m_state == astate); }
+			state_e terminal_state() const noexcept { return m_state; }
+			void set_state(state_e astate) noexcept { m_state = astate; }
+
+			void reset() noexcept { set_state(is_type(OUTPUT) ? STATE_OUT : STATE_INP_ACTIVE); }
+
+			nldelegate m_delegate;
+	#if USE_COPY_INSTEAD_OF_REFERENCE
+			void set_copied_input(netlist_sig_t val)
+			{
+				m_Q = val;
+			}
+
+			state_var_sig m_Q;
+	#else
+			void set_copied_input(netlist_sig_t val) const { plib::unused_var(val); }
+	#endif
+
+		private:
+			net_t * m_net;
+			state_var<state_e> m_state;
+		};
+
+		// -----------------------------------------------------------------------------
+		// net_t
+		// -----------------------------------------------------------------------------
+
+		class net_t :
+				public object_t,
+				public netlist_ref
+		{
+		public:
+
+			enum class queue_status
+			{
+				DELAYED_DUE_TO_INACTIVE = 0,
+				QUEUED,
+				DELIVERED
+			};
+
+			net_t(netlist_state_t &nl, const pstring &aname, core_terminal_t *mr = nullptr);
+
+			COPYASSIGNMOVE(net_t, delete)
+
+			virtual ~net_t() noexcept = default;
+
+			void reset();
+
+			void toggle_new_Q() noexcept { m_new_Q = (m_cur_Q ^ 1);   }
+
+			void toggle_and_push_to_queue(netlist_time delay) NL_NOEXCEPT
+			{
+				toggle_new_Q();
+				push_to_queue(delay);
+			}
+
+			void push_to_queue(netlist_time delay) NL_NOEXCEPT;
+			bool is_queued() const noexcept { return m_in_queue == queue_status::QUEUED; }
+
+			void update_devs() NL_NOEXCEPT;
+
+			netlist_time next_scheduled_time() const noexcept { return m_next_scheduled_time; }
+			void set_next_scheduled_time(netlist_time ntime) noexcept { m_next_scheduled_time = ntime; }
+
+			bool isRailNet() const noexcept { return !(m_railterminal == nullptr); }
+			core_terminal_t & railterminal() const noexcept { return *m_railterminal; }
+
+			std::size_t num_cons() const noexcept { return m_core_terms.size(); }
+
+			void add_to_active_list(core_terminal_t &term) NL_NOEXCEPT;
+			void remove_from_active_list(core_terminal_t &term) NL_NOEXCEPT;
+
+			/* setup stuff */
+
+			void add_terminal(core_terminal_t &terminal);
+			void remove_terminal(core_terminal_t &terminal);
+
+			bool is_logic() const NL_NOEXCEPT;
+			bool is_analog() const NL_NOEXCEPT;
+
+			void rebuild_list();     /* rebuild m_list after a load */
+			void move_connections(net_t &dest_net);
+
+			std::vector<core_terminal_t *> &core_terms() { return m_core_terms; }
+	#if USE_COPY_INSTEAD_OF_REFERENCE
+			void update_inputs()
+			{
+				for (auto & term : m_core_terms)
+					term->m_Q = m_cur_Q;
+			}
+	#else
+			void update_inputs() const
+			{
+				/* nothing needs to be done */
+			}
+	#endif
+
+		protected:
+
+			/* only used for logic nets */
+			netlist_sig_t Q() const noexcept { return m_cur_Q; }
+
+			/* only used for logic nets */
+			void initial(const netlist_sig_t val) noexcept
+			{
+				m_cur_Q = m_new_Q = val;
+				update_inputs();
+			}
+
+			/* only used for logic nets */
+			void set_Q_and_push(const netlist_sig_t newQ, const netlist_time delay) NL_NOEXCEPT
+			{
+				if (newQ != m_new_Q)
+				{
+					m_new_Q = newQ;
+					push_to_queue(delay);
+				}
+			}
+
+			/* only used for logic nets */
+			void set_Q_time(const netlist_sig_t newQ, const netlist_time at) NL_NOEXCEPT
+			{
+				if (newQ != m_new_Q)
+				{
+					m_in_queue = queue_status::DELAYED_DUE_TO_INACTIVE;
+					m_next_scheduled_time = at;
+				}
+				m_cur_Q = m_new_Q = newQ;
+				update_inputs();
+			}
+
+			/* internal state support
+			 * FIXME: get rid of this and implement export/import in MAME
+			 */
+			/* only used for logic nets */
+			netlist_sig_t *Q_state_ptr() { return m_cur_Q.ptr(); }
+
+		private:
+			state_var<netlist_sig_t> m_new_Q;
+			state_var<netlist_sig_t> m_cur_Q;
+			state_var<queue_status>  m_in_queue;    /* 0: not in queue, 1: in queue, 2: last was taken */
+			state_var<netlist_time>  m_next_scheduled_time;
+
+			core_terminal_t * m_railterminal;
+			plib::linkedlist_t<core_terminal_t> m_list_active;
+			std::vector<core_terminal_t *> m_core_terms; // save post-start m_list ...
+
+			template <typename T>
+			void process(const T mask, netlist_sig_t sig);
+		};
+	} // detail
 
 	// -----------------------------------------------------------------------------
 	// analog_t
@@ -713,133 +842,6 @@ namespace netlist
 
 	};
 
-	// -----------------------------------------------------------------------------
-	// net_t
-	// -----------------------------------------------------------------------------
-
-	class detail::net_t :
-			public detail::object_t,
-			public detail::netlist_ref
-	{
-	public:
-
-		enum class queue_status
-		{
-			DELAYED_DUE_TO_INACTIVE = 0,
-			QUEUED,
-			DELIVERED
-		};
-
-		net_t(netlist_state_t &nl, const pstring &aname, core_terminal_t *mr = nullptr);
-
-		COPYASSIGNMOVE(net_t, delete)
-
-		virtual ~net_t() noexcept = default;
-
-		void reset();
-
-		void toggle_new_Q() noexcept { m_new_Q = (m_cur_Q ^ 1);   }
-
-		void toggle_and_push_to_queue(netlist_time delay) NL_NOEXCEPT
-		{
-			toggle_new_Q();
-			push_to_queue(delay);
-		}
-
-		void push_to_queue(netlist_time delay) NL_NOEXCEPT;
-		bool is_queued() const noexcept { return m_in_queue == queue_status::QUEUED; }
-
-		void update_devs() NL_NOEXCEPT;
-
-		netlist_time next_scheduled_time() const noexcept { return m_next_scheduled_time; }
-		void set_next_scheduled_time(netlist_time ntime) noexcept { m_next_scheduled_time = ntime; }
-
-		bool isRailNet() const noexcept { return !(m_railterminal == nullptr); }
-		core_terminal_t & railterminal() const noexcept { return *m_railterminal; }
-
-		std::size_t num_cons() const noexcept { return m_core_terms.size(); }
-
-		void add_to_active_list(core_terminal_t &term) NL_NOEXCEPT;
-		void remove_from_active_list(core_terminal_t &term) NL_NOEXCEPT;
-
-		/* setup stuff */
-
-		void add_terminal(core_terminal_t &terminal);
-		void remove_terminal(core_terminal_t &terminal);
-
-		bool is_logic() const NL_NOEXCEPT;
-		bool is_analog() const NL_NOEXCEPT;
-
-		void rebuild_list();     /* rebuild m_list after a load */
-		void move_connections(net_t &dest_net);
-
-		std::vector<core_terminal_t *> &core_terms() { return m_core_terms; }
-#if USE_COPY_INSTEAD_OF_REFERENCE
-		void update_inputs()
-		{
-			for (auto & term : m_core_terms)
-				term->m_Q = m_cur_Q;
-		}
-#else
-		void update_inputs() const
-		{
-			/* nothing needs to be done */
-		}
-#endif
-
-	protected:
-
-		/* only used for logic nets */
-		netlist_sig_t Q() const noexcept { return m_cur_Q; }
-
-		/* only used for logic nets */
-		void initial(const netlist_sig_t val) noexcept
-		{
-			m_cur_Q = m_new_Q = val;
-			update_inputs();
-		}
-
-		/* only used for logic nets */
-		void set_Q_and_push(const netlist_sig_t newQ, const netlist_time delay) NL_NOEXCEPT
-		{
-			if (newQ != m_new_Q)
-			{
-				m_new_Q = newQ;
-				push_to_queue(delay);
-			}
-		}
-
-		/* only used for logic nets */
-		void set_Q_time(const netlist_sig_t newQ, const netlist_time at) NL_NOEXCEPT
-		{
-			if (newQ != m_new_Q)
-			{
-				m_in_queue = queue_status::DELAYED_DUE_TO_INACTIVE;
-				m_next_scheduled_time = at;
-			}
-			m_cur_Q = m_new_Q = newQ;
-			update_inputs();
-		}
-
-		/* internal state support
-		 * FIXME: get rid of this and implement export/import in MAME
-		 */
-		/* only used for logic nets */
-		netlist_sig_t *Q_state_ptr() { return m_cur_Q.ptr(); }
-
-	private:
-		state_var<netlist_sig_t> m_new_Q;
-		state_var<netlist_sig_t> m_cur_Q;
-		state_var<queue_status>  m_in_queue;    /* 0: not in queue, 1: in queue, 2: last was taken */
-		state_var<netlist_time>  m_next_scheduled_time;
-
-		core_terminal_t * m_railterminal;
-		plib::linkedlist_t<core_terminal_t> m_list_active;
-		std::vector<core_terminal_t *> m_core_terms; // save post-start m_list ...
-
-		template <typename T>
-		void process(const T mask, netlist_sig_t sig);
-	};
 
 	class logic_net_t : public detail::net_t
 	{

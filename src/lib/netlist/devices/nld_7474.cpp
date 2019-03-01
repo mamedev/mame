@@ -27,11 +27,11 @@ namespace netlist
 		{
 		}
 
+	private:
 		NETLIB_RESETI();
 		NETLIB_UPDATEI();
 		NETLIB_HANDLERI(clk);
 
-	public:
 		logic_input_t m_D;
 		logic_input_t m_CLRQ;
 		logic_input_t m_PREQ;
@@ -39,7 +39,6 @@ namespace netlist
 		logic_output_t m_Q;
 		logic_output_t m_QQ;
 
-	private:
 		state_var<netlist_sig_t> m_nextD;
 
 		void newstate(const netlist_sig_t stateQ, const netlist_sig_t stateQQ)
@@ -57,20 +56,20 @@ namespace netlist
 		, m_1(*this, "1")
 		, m_2(*this, "2")
 		{
-			register_subalias("1", m_1.m_CLRQ);
-			register_subalias("2", m_1.m_D);
-			register_subalias("3", m_1.m_CLK);
-			register_subalias("4", m_1.m_PREQ);
-			register_subalias("5", m_1.m_Q);
-			register_subalias("6", m_1.m_QQ);
+			register_subalias("1", "1.CLRQ");
+			register_subalias("2", "1.D");
+			register_subalias("3", "1.CLK");
+			register_subalias("4", "1.PREQ");
+			register_subalias("5", "1.Q");
+			register_subalias("6", "1.QQ");
 			// register_subalias("7", ); ==> GND
 
-			register_subalias("8", m_2.m_QQ);
-			register_subalias("9", m_2.m_Q);
-			register_subalias("10", m_2.m_PREQ);
-			register_subalias("11", m_2.m_CLK);
-			register_subalias("12", m_2.m_D);
-			register_subalias("13", m_2.m_CLRQ);
+			register_subalias("8", "2.QQ");
+			register_subalias("9", "2.Q");
+			register_subalias("10", "2.PREQ");
+			register_subalias("11", "2.CLK");
+			register_subalias("12", "2.D");
+			register_subalias("13", "2.CLRQ");
 			// register_subalias("14", ); ==> VCC
 		}
 		NETLIB_UPDATEI();
@@ -83,11 +82,8 @@ namespace netlist
 
 	NETLIB_HANDLER(7474, clk)
 	{
-		//if (INP_LH(m_CLK))
-		{
-			newstate(m_nextD, !m_nextD);
-			m_CLK.inactivate();
-		}
+		newstate(m_nextD, !m_nextD);
+		m_CLK.inactivate();
 	}
 
 	NETLIB_UPDATE(7474)
