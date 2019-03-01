@@ -254,6 +254,7 @@ void pokey_device::device_start()
 	m_kbd_cnt = 0;
 	m_out_filter = 0;
 	m_out_raw = 0;
+	m_old_raw_inval = true;
 	m_kbd_state = 0;
 
 	/* reset more internal state */
@@ -435,14 +436,7 @@ void pokey_device::execute_run()
 {
 	do
 	{
-		uint32_t new_out = step_one_clock();
-		if (m_out_raw != new_out)
-		{
-			//printf("forced update %08d %08x\n", m_icount, m_out_raw);
-			m_stream->update();
-			m_out_raw = new_out;
-		}
-
+		step_one_clock();
 		m_icount--;
 	} while (m_icount > 0);
 
@@ -570,7 +564,7 @@ void pokey_device::step_pot()
  *
  */
 
-uint32_t pokey_device::step_one_clock(void)
+void pokey_device::step_one_clock(void)
 {
 	int const base_clock = (m_AUDCTL & CLK_15KHZ) ? CLK_114 : CLK_28;
 
@@ -682,12 +676,23 @@ uint32_t pokey_device::step_one_clock(void)
 			m_channel[CHAN1].m_filter_sample = 1;
 	}
 
-	uint32_t sum = 0;
-	for (int ch = 0; ch < 4; ch++)
+	if (m_old_raw_inval)
 	{
-		sum |= (((((m_channel[ch].m_output ^ m_channel[ch].m_filter_sample) || (m_channel[ch].m_AUDC & VOLUME_ONLY)) ? (m_channel[ch].m_AUDC & VOLUME_MASK) : 0 )) << (ch * 4));
+		uint32_t sum = 0;
+		for (int ch = 0; ch < 4; ch++)
+		{
+			sum |= (((m_channel[ch].m_output ^ m_channel[ch].m_filter_sample) || (m_channel[ch].m_AUDC & VOLUME_ONLY)) ?
+				((m_channel[ch].m_AUDC & VOLUME_MASK) << (ch * 4)) : 0);
+		}
+
+		if (m_out_raw != sum)
+		{
+			//printf("forced update %08d %08x\n", m_icount, m_out_raw);
+			m_stream->update();
+		}
+		m_old_raw_inval = false;
+		m_out_raw = sum;
 	}
-	return sum;
 }
 
 //-------------------------------------------------
@@ -898,6 +903,7 @@ void pokey_device::write_internal(offs_t offset, uint8_t data)
 	case AUDC1_C:
 		LOG_SOUND(("POKEY '%s' AUDC1  $%02x (%s)\n", tag(), data, audc2str(data)));
 		m_channel[CHAN1].m_AUDC = data;
+		m_old_raw_inval = true;
 		break;
 
 	case AUDF2_C:
@@ -908,6 +914,7 @@ void pokey_device::write_internal(offs_t offset, uint8_t data)
 	case AUDC2_C:
 		LOG_SOUND(("POKEY '%s' AUDC2  $%02x (%s)\n", tag(), data, audc2str(data)));
 		m_channel[CHAN2].m_AUDC = data;
+		m_old_raw_inval = true;
 		break;
 
 	case AUDF3_C:
@@ -918,6 +925,7 @@ void pokey_device::write_internal(offs_t offset, uint8_t data)
 	case AUDC3_C:
 		LOG_SOUND(("POKEY '%s' AUDC3  $%02x (%s)\n", tag(), data, audc2str(data)));
 		m_channel[CHAN3].m_AUDC = data;
+		m_old_raw_inval = true;
 		break;
 
 	case AUDF4_C:
@@ -928,6 +936,7 @@ void pokey_device::write_internal(offs_t offset, uint8_t data)
 	case AUDC4_C:
 		LOG_SOUND(("POKEY '%s' AUDC4  $%02x (%s)\n", tag(), data, audc2str(data)));
 		m_channel[CHAN4].m_AUDC = data;
+		m_old_raw_inval = true;
 		break;
 
 	case AUDCTL_C:
@@ -952,7 +961,7 @@ void pokey_device::write_internal(offs_t offset, uint8_t data)
 			m_channel[i].m_output = 0;
 			m_channel[i].m_filter_sample = (i<2 ? 1 : 0);
 		}
-
+		m_old_raw_inval = true;
 		break;
 
 	case SKREST_C:
@@ -1070,6 +1079,7 @@ inline void pokey_device::process_channel(int ch)
 			m_channel[ch].m_output = (m_poly9[m_p9] & 1);
 		else
 			m_channel[ch].m_output = (m_poly17[m_p17] & 1);
+		m_old_raw_inval = true;
 	}
 }
 
