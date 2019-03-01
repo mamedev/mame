@@ -2228,7 +2228,9 @@ void pc9801_state::pc9801_mouse(machine_config &config)
 
 void pc9801_state::pc9801_cbus(machine_config &config)
 {
-	pc9801_slot_device &cbus0(PC9801CBUS_SLOT(config, "cbus0", m_maincpu, pc9801_cbus_devices, "pc9801_26"));
+	pc9801_slot_device &cbus0(PC9801CBUS_SLOT(config, "cbus0", pc9801_cbus_devices, "pc9801_26"));
+	cbus0.set_memspace(m_maincpu, AS_PROGRAM);
+	cbus0.set_iospace(m_maincpu, AS_IO);
 	cbus0.int_cb<0>().set("ir3", FUNC(input_merger_device::in_w<0>));
 	cbus0.int_cb<1>().set("ir5", FUNC(input_merger_device::in_w<0>));
 	cbus0.int_cb<2>().set("ir6", FUNC(input_merger_device::in_w<0>));
@@ -2237,7 +2239,9 @@ void pc9801_state::pc9801_cbus(machine_config &config)
 	cbus0.int_cb<5>().set("ir12", FUNC(input_merger_device::in_w<0>));
 	cbus0.int_cb<6>().set("ir13", FUNC(input_merger_device::in_w<0>));
 
-	pc9801_slot_device &cbus1(PC9801CBUS_SLOT(config, "cbus1", m_maincpu, pc9801_cbus_devices, nullptr));
+	pc9801_slot_device &cbus1(PC9801CBUS_SLOT(config, "cbus1", pc9801_cbus_devices, nullptr));
+	cbus1.set_memspace(m_maincpu, AS_PROGRAM);
+	cbus1.set_iospace(m_maincpu, AS_IO);
 	cbus1.int_cb<0>().set("ir3", FUNC(input_merger_device::in_w<1>));
 	cbus1.int_cb<1>().set("ir5", FUNC(input_merger_device::in_w<1>));
 	cbus1.int_cb<2>().set("ir6", FUNC(input_merger_device::in_w<1>));
