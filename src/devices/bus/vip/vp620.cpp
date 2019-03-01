@@ -33,7 +33,7 @@ void vp620_device::kb_w(uint8_t data)
 }
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( vp620 )
+//  machine_config( vp620 )
 //-------------------------------------------------
 
 void vp620_device::device_add_mconfig(machine_config &config)

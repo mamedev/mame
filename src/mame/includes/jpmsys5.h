@@ -59,6 +59,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device_array<acia6850_device, 3> m_acia6850;
 	optional_device<s16lf01_device> m_vfd;
+	required_device<upd7759_device> m_upd7759;
 
 	void jpm_sys5_common_map(address_map &map);
 
@@ -76,7 +77,6 @@ private:
 	void m68000_awp_map(address_map &map);
 	void m68000_awp_map_saa(address_map &map);
 
-	required_device<upd7759_device> m_upd7759;
 	required_ioport m_direct_port;
 	optional_device<meters_device> m_meters; //jpmsys5v doesn't use this
 	output_finder<16 * 16> m_lamps;

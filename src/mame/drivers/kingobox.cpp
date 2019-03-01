@@ -462,8 +462,8 @@ void kingofb_state::machine_reset()
 	kingofb_f800_w(0); // LS174 reset
 }
 
-MACHINE_CONFIG_START(kingofb_state::kingofb)
-
+void kingofb_state::kingofb(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 4000000);        // 4.0 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &kingofb_state::kingobox_map);
@@ -489,14 +489,14 @@ MACHINE_CONFIG_START(kingofb_state::kingofb)
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(kingofb_state, screen_update_kingofb)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("nmigate", input_merger_device, in_w<0>))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(kingofb_state::screen_update_kingofb));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(m_nmigate, FUNC(input_merger_device::in_w<0>));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_kingobox);
 	PALETTE(config, m_palette, FUNC(kingofb_state::kingofb_palette), 256+8*2, 256+8);
@@ -515,12 +515,12 @@ MACHINE_CONFIG_START(kingofb_state::kingofb)
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
-MACHINE_CONFIG_END
+}
 
 
 /* Ring King */
-MACHINE_CONFIG_START(kingofb_state::ringking)
-
+void kingofb_state::ringking(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 4000000);        // 4.0 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &kingofb_state::ringking_map);
@@ -546,14 +546,14 @@ MACHINE_CONFIG_START(kingofb_state::ringking)
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(kingofb_state, screen_update_ringking)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("nmigate", input_merger_device, in_w<0>))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(kingofb_state::screen_update_ringking));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(m_nmigate, FUNC(input_merger_device::in_w<0>));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rk);
 	PALETTE(config, m_palette, FUNC(kingofb_state::ringking_palette), 256+8*2, 256+8);
@@ -572,7 +572,7 @@ MACHINE_CONFIG_START(kingofb_state::ringking)
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

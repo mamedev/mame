@@ -47,7 +47,7 @@ DEFINE_DEVICE_TYPE(VP550, vp550_device, "vp550", "VP-550 Super Sound")
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( vp550 )
+//  machine_config( vp550 )
 //-------------------------------------------------
 
 void vp550_device::device_add_mconfig(machine_config &config)

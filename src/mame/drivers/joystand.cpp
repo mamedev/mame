@@ -587,13 +587,13 @@ INTERRUPT_GEN_MEMBER(joystand_state::joystand_interrupt)
 	m_tmp68301->external_interrupt_1();
 }
 
-MACHINE_CONFIG_START(joystand_state::joystand)
-
+void joystand_state::joystand(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD(m_maincpu, M68000, XTAL(16'000'000)) // !! TMP68301 !!
-	MCFG_DEVICE_PROGRAM_MAP(joystand_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", joystand_state, joystand_interrupt)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("tmp68301",tmp68301_device,irq_callback)
+	M68000(config, m_maincpu, XTAL(16'000'000)); // !! TMP68301 !!
+	m_maincpu->set_addrmap(AS_PROGRAM, &joystand_state::joystand_map);
+	m_maincpu->set_vblank_int("screen", FUNC(joystand_state::joystand_interrupt));
+	m_maincpu->set_irq_acknowledge_callback("tmp68301", FUNC(tmp68301_device::irq_callback));
 
 	TMP68301(config, m_tmp68301, 0);
 	m_tmp68301->set_cputag(m_maincpu);
@@ -601,11 +601,11 @@ MACHINE_CONFIG_START(joystand_state::joystand)
 	m_tmp68301->out_parallel_callback().set(FUNC(joystand_state::eeprom_w));
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_UPDATE_DRIVER(joystand_state, screen_update)
-	MCFG_SCREEN_SIZE(0x200, 0x100)
-	MCFG_SCREEN_VISIBLE_AREA(0x40, 0x40+0x178-1, 0x10, 0x100-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_screen_update(FUNC(joystand_state::screen_update));
+	screen.set_size(0x200, 0x100);
+	screen.set_visarea(0x40, 0x40+0x178-1, 0x10, 0x100-1);
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x1000);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_joystand);
@@ -615,11 +615,9 @@ MACHINE_CONFIG_START(joystand_state::joystand)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ym2413", YM2413, XTAL(3'579'545))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	YM2413(config, "ym2413", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000) / 16, okim6295_device::PIN7_HIGH) // pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	OKIM6295(config, m_oki, XTAL(16'000'000) / 16, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.50); // pin 7 not verified
 
 	// cart
 	TMS_29F040(config, "cart.u1");
@@ -638,7 +636,7 @@ MACHINE_CONFIG_START(joystand_state::joystand)
 	// devices
 	EEPROM_93C46_16BIT(config, "eeprom");
 	MSM6242(config, "rtc", XTAL(32'768));
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

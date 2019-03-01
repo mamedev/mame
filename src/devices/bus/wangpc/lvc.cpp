@@ -113,7 +113,7 @@ WRITE_LINE_MEMBER( wangpc_lvc_device::vsync_w )
 }
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( wangpc_lvc )
+//  machine_config( wangpc_lvc )
 //-------------------------------------------------
 
 void wangpc_lvc_device::device_add_mconfig(machine_config &config)

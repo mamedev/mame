@@ -280,7 +280,7 @@ void jupiter3_state::machine_reset()
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( jupiter )
+//  machine_config( jupiter )
 //-------------------------------------------------
 
 void jupiter2_state::jupiter2(machine_config &config)
@@ -316,23 +316,24 @@ void jupiter2_state::jupiter2(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( jupiter3 )
+//  machine_config( jupiter3 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(jupiter3_state::jupiter3)
+void jupiter3_state::jupiter3(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, 4000000)
-	MCFG_DEVICE_PROGRAM_MAP(jupiter3_mem)
-	MCFG_DEVICE_IO_MAP(jupiter3_io)
+	Z80(config, m_maincpu, 4000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &jupiter3_state::jupiter3_mem);
+	m_maincpu->set_addrmap(AS_IO, &jupiter3_state::jupiter3_io);
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(jupiter3_state, screen_update)
-	MCFG_SCREEN_SIZE(512, 320)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 320-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(jupiter3_state::screen_update));
+	screen.set_size(512, 320);
+	screen.set_visarea(0, 512-1, 0, 320-1);
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
@@ -346,7 +347,7 @@ MACHINE_CONFIG_START(jupiter3_state::jupiter3)
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("64K");
-MACHINE_CONFIG_END
+}
 
 
 

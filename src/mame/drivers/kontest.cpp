@@ -254,21 +254,21 @@ void kontest_state::machine_reset()
 	m_control = 0;
 }
 
-MACHINE_CONFIG_START(kontest_state::kontest)
-
+void kontest_state::kontest(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,MAIN_CLOCK/8)
-	MCFG_DEVICE_PROGRAM_MAP(kontest_map)
-	MCFG_DEVICE_IO_MAP(kontest_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", kontest_state,  kontest_interrupt)
+	Z80(config, m_maincpu, MAIN_CLOCK/8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &kontest_state::kontest_map);
+	m_maincpu->set_addrmap(AS_IO, &kontest_state::kontest_io);
+	m_maincpu->set_vblank_int("screen", FUNC(kontest_state::kontest_interrupt));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_UPDATE_DRIVER(kontest_state, screen_update)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_screen_update(FUNC(kontest_state::screen_update));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
 
 	PALETTE(config, m_palette, FUNC(kontest_state::kontest_palette), 32);
 
@@ -276,12 +276,10 @@ MACHINE_CONFIG_START(kontest_state::kontest)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("sn1", SN76489A, MAIN_CLOCK/16)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	SN76489A(config, "sn1", MAIN_CLOCK/16).add_route(ALL_OUTPUTS, "rspeaker", 0.50);
 
-	MCFG_DEVICE_ADD("sn2", SN76489A, MAIN_CLOCK/16)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-MACHINE_CONFIG_END
+	SN76489A(config, "sn2", MAIN_CLOCK/16).add_route(ALL_OUTPUTS, "lspeaker", 0.50);
+}
 
 
 /***************************************************************************

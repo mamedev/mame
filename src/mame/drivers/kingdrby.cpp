@@ -964,21 +964,22 @@ void kingdrby_state::kingdrbb_palette(palette_device &palette) const
 	}
 }
 
-MACHINE_CONFIG_START(kingdrby_state::kingdrby)
-	MCFG_DEVICE_ADD("master", Z80, CLK_2)
-	MCFG_DEVICE_PROGRAM_MAP(master_map)
-	MCFG_DEVICE_IO_MAP(master_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", kingdrby_state,  irq0_line_hold)
+void kingdrby_state::kingdrby(machine_config &config)
+{
+	z80_device &master(Z80(config, "master", CLK_2));
+	master.set_addrmap(AS_PROGRAM, &kingdrby_state::master_map);
+	master.set_addrmap(AS_IO, &kingdrby_state::master_io_map);
+	master.set_vblank_int("screen", FUNC(kingdrby_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("slave", Z80, CLK_2)
-	MCFG_DEVICE_PROGRAM_MAP(slave_map)
-	MCFG_DEVICE_IO_MAP(slave_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", kingdrby_state,  irq0_line_hold)
+	z80_device &slave(Z80(config, "slave", CLK_2));
+	slave.set_addrmap(AS_PROGRAM, &kingdrby_state::slave_map);
+	slave.set_addrmap(AS_IO, &kingdrby_state::slave_io_map);
+	slave.set_vblank_int("screen", FUNC(kingdrby_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("soundcpu", Z80, CLK_2)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(sound_io_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(kingdrby_state, irq0_line_hold, 1000) /* guess, controls ay8910 tempo.*/
+	Z80(config, m_soundcpu, CLK_2);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &kingdrby_state::sound_map);
+	m_soundcpu->set_addrmap(AS_IO, &kingdrby_state::sound_io_map);
+	m_soundcpu->set_periodic_int(FUNC(kingdrby_state::irq0_line_hold), attotime::from_hz(1000)); /* guess, controls ay8910 tempo.*/
 
 	config.m_perfect_cpu_quantum = subtag("master");
 
@@ -1000,13 +1001,13 @@ MACHINE_CONFIG_START(kingdrby_state::kingdrby)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_kingdrby);
 	PALETTE(config, m_palette, FUNC(kingdrby_state::kingdrby_palette), 0x200);
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 224-1)    /* controlled by CRTC */
-	MCFG_SCREEN_UPDATE_DRIVER(kingdrby_state, screen_update_kingdrby)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 256-1, 0, 224-1);    /* controlled by CRTC */
+	screen.set_screen_update(FUNC(kingdrby_state::screen_update_kingdrby));
+	screen.set_palette(m_palette);
 
 	mc6845_device &crtc(MC6845(config, "crtc", CLK_1/32));  /* 53.333 Hz. guess */
 	crtc.set_screen("screen");
@@ -1018,13 +1019,13 @@ MACHINE_CONFIG_START(kingdrby_state::kingdrby)
 	ay8910_device &aysnd(AY8910(config, "aysnd", CLK_1/8));    /* guess */
 	aysnd.port_a_read_callback().set(FUNC(kingdrby_state::sound_cmd_r));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.25);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(kingdrby_state::kingdrbb)
+void kingdrby_state::kingdrbb(machine_config &config)
+{
 	kingdrby(config);
 
-	MCFG_DEVICE_MODIFY("slave")
-	MCFG_DEVICE_PROGRAM_MAP(slave_1986_map)
+	subdevice<z80_device>("slave")->set_addrmap(AS_PROGRAM, &kingdrby_state::slave_1986_map);
 
 	m_palette->set_init(FUNC(kingdrby_state::kingdrbb_palette));
 
@@ -1044,26 +1045,26 @@ MACHINE_CONFIG_START(kingdrby_state::kingdrbb)
 	m_ppi[1]->out_pa_callback().set_nop();
 	m_ppi[1]->out_pb_callback().set_nop();
 	m_ppi[1]->out_pc_callback().set_nop();
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(kingdrby_state::cowrace)
+void kingdrby_state::cowrace(machine_config &config)
+{
 	kingdrbb(config);
 
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_DEVICE_PROGRAM_MAP(cowrace_sound_map)
-	MCFG_DEVICE_IO_MAP(cowrace_sound_io)
+	m_soundcpu->set_addrmap(AS_PROGRAM, &kingdrby_state::cowrace_sound_map);
+	m_soundcpu->set_addrmap(AS_IO, &kingdrby_state::cowrace_sound_io);
 
 	m_gfxdecode->set_info(gfx_cowrace);
 	m_palette->set_init(FUNC(kingdrby_state::kingdrby_palette));
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+
+	OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.80); // clock frequency & pin 7 not verified
 
 	ym2203_device &aysnd(YM2203(config.replace(), "aysnd", 3000000));
 	aysnd.port_a_read_callback().set(FUNC(kingdrby_state::sound_cmd_r));
 	aysnd.port_b_read_callback().set("oki", FUNC(okim6295_device::read));
 	aysnd.port_b_write_callback().set("oki", FUNC(okim6295_device::write));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.80);
-MACHINE_CONFIG_END
+}
 
 ROM_START( kingdrby )
 	ROM_REGION( 0x3000, "master", 0 )

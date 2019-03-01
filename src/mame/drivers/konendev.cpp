@@ -304,22 +304,23 @@ INTERRUPT_GEN_MEMBER(konendev_state::vbl_interrupt)
 	device.execute().set_input_line(INPUT_LINE_IRQ3, ASSERT_LINE);
 }
 
-MACHINE_CONFIG_START(konendev_state::konendev)
+void konendev_state::konendev(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", PPC403GCX, 32000000) // Clock unknown
-	MCFG_DEVICE_PROGRAM_MAP(konendev_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", konendev_state, vbl_interrupt)
+	PPC403GCX(config, m_maincpu, 32000000); // Clock unknown
+	m_maincpu->set_addrmap(AS_PROGRAM, &konendev_state::konendev_map);
+	m_maincpu->set_vblank_int("screen", FUNC(konendev_state::vbl_interrupt));
 
 	/* video hardware */
 	PALETTE(config, "palette", palette_device::RGB_555);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // Not accurate
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
-	MCFG_SCREEN_UPDATE_DRIVER(konendev_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // Not accurate
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 639, 0, 479);
+	screen.set_screen_update(FUNC(konendev_state::screen_update));
+	screen.set_palette("palette");
 
 	K057714(config, m_gcu, 0);
 	m_gcu->irq_callback().set(FUNC(konendev_state::gcu_interrupt));
@@ -333,10 +334,10 @@ MACHINE_CONFIG_START(konendev_state::konendev)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymz", YMZ280B, 16934400) // Clock unknown
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	ymz280b_device &ymz(YMZ280B(config, "ymz", 16934400)); // Clock unknown
+	ymz.add_route(0, "lspeaker", 1.0);
+	ymz.add_route(1, "rspeaker", 1.0);
+}
 
 
 /* Interesting sets */

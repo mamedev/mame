@@ -539,21 +539,22 @@ void jr200_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(jr200_state::jr200)
+void jr200_state::jr200(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6802, XTAL(14'318'181) / 4) /* MN1800A, ? Mhz assumption that it is same as JR-100*/
-	MCFG_DEVICE_PROGRAM_MAP(jr200_mem)
+	M6802(config, m_maincpu, XTAL(14'318'181) / 4); /* MN1800A, ? MHz assumption that it is same as JR-100*/
+	m_maincpu->set_addrmap(AS_PROGRAM, &jr200_state::jr200_mem);
 
-//  MCFG_DEVICE_ADD("mn1544", MN1544, ?)
+//  MN1544(config, "mn1544", ?);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(16 + 256 + 16, 16 + 192 + 16) /* border size not accurate */
-	MCFG_SCREEN_VISIBLE_AREA(0, 16 + 256 + 16 - 1, 0, 16 + 192 + 16 - 1)
-	MCFG_SCREEN_UPDATE_DRIVER(jr200_state, screen_update_jr200)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(16 + 256 + 16, 16 + 192 + 16); /* border size not accurate */
+	screen.set_visarea(0, 16 + 256 + 16 - 1, 0, 16 + 192 + 16 - 1);
+	screen.set_screen_update(FUNC(jr200_state::screen_update_jr200));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jr200);
 	PALETTE(config, m_palette, palette_device::BRG_3BIT);
@@ -562,9 +563,8 @@ MACHINE_CONFIG_START(jr200_state::jr200)
 
 	// AY-8910 ?
 
-	MCFG_DEVICE_ADD("beeper", BEEP, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
-MACHINE_CONFIG_END
+	BEEP(config, m_beeper, 0).add_route(ALL_OUTPUTS,"mono",0.50);
+}
 
 
 

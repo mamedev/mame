@@ -418,12 +418,12 @@ WRITE16_MEMBER(kickgoal_state::to_pic_w)
 
 
 
-MACHINE_CONFIG_START(kickgoal_state::kickgoal)
-
+void kickgoal_state::kickgoal(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(12'000'000))   /* 12 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(kickgoal_program_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", kickgoal_state,  irq6_line_hold)
+	M68000(config, m_maincpu, XTAL(12'000'000));   /* 12 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &kickgoal_state::kickgoal_program_map);
+	m_maincpu->set_vblank_int("screen", FUNC(kickgoal_state::irq6_line_hold));
 
 	PIC16C57(config, m_audiocpu, XTAL(12'000'000)/3);  /* 4MHz ? */
 	m_audiocpu->write_a().set(FUNC(kickgoal_state::soundio_port_a_w));
@@ -437,13 +437,13 @@ MACHINE_CONFIG_START(kickgoal_state::kickgoal)
 	EEPROM_93C46_16BIT(config, "eeprom").default_data(kickgoal_default_eeprom_type1, 128);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(9*8, 55*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(kickgoal_state, screen_update_kickgoal)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(9*8, 55*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(kickgoal_state::screen_update_kickgoal));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_kickgoal);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 1024);
@@ -455,32 +455,32 @@ MACHINE_CONFIG_START(kickgoal_state::kickgoal)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(12'000'000)/12, okim6295_device::PIN7_LOW)
-	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, XTAL(12'000'000)/12, okim6295_device::PIN7_LOW);
+	m_oki->set_addrmap(0, &kickgoal_state::oki_map);
+	m_oki->add_route(ALL_OUTPUTS, "mono", 0.80);
+}
 
-MACHINE_CONFIG_START(kickgoal_state::actionhw)
-
+void kickgoal_state::actionhw(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(12'000'000)) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(kickgoal_program_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", kickgoal_state,  irq6_line_hold)
+	M68000(config, m_maincpu, XTAL(12'000'000)); /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &kickgoal_state::kickgoal_program_map);
+	m_maincpu->set_vblank_int("screen", FUNC(kickgoal_state::irq6_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", PIC16C57, XTAL(12'000'000)/3)    /* verified on pcb */
-	MCFG_DEVICE_DISABLE() /* Disabled since the internal rom isn't dumped */
+	PIC16C57(config, m_audiocpu, XTAL(12'000'000)/3);    /* verified on pcb */
+	m_audiocpu->set_disable(); /* Disabled since the internal rom isn't dumped */
 	/* Program and Data Maps are internal to the MCU */
 
 	EEPROM_93C46_16BIT(config, "eeprom").default_data(kickgoal_default_eeprom_type1, 128);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(10*8+2, 54*8-1+2, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(kickgoal_state, screen_update_kickgoal)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(10*8+2, 54*8-1+2, 0*8, 30*8-1);
+	screen.set_screen_update(FUNC(kickgoal_state::screen_update_kickgoal));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_actionhw);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 1024);
@@ -492,10 +492,10 @@ MACHINE_CONFIG_START(kickgoal_state::actionhw)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(12'000'000)/12, okim6295_device::PIN7_HIGH) /* verified on pcb */
-	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, XTAL(12'000'000)/12, okim6295_device::PIN7_HIGH); /* verified on pcb */
+	m_oki->set_addrmap(0, &kickgoal_state::oki_map);
+	m_oki->add_route(ALL_OUTPUTS, "mono", 0.80);
+}
 
 
 
