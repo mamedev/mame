@@ -707,15 +707,19 @@ TIMER_DEVICE_CALLBACK_MEMBER(tispeak_state::tntell_get_overlay)
 	// pick overlay code from machine config, see comment section above for reference
 	m_overlay = m_inp_matrix[10]->read();
 
-	// try to get from artwork current view name ($ + 2 hex digits)
+	// try to get it from (external) layout
 	if (m_overlay == 0x20)
 	{
+		// as output value, eg. with defstate
+		m_overlay = output().get_value("overlay_code") & 0x1f;
+
+		// and from current view name ($ + 2 hex digits)
 		render_target *target = machine().render().first_target();
 		const char *name = target->view_name(target->view());
 
 		for (int i = 0; name && i < strlen(name); i++)
 			if (name[i] == '$' && strlen(&name[i]) > 2)
-				m_overlay = tntell_get_hexchar(name[i + 1]) << 4 | tntell_get_hexchar(name[i + 2]);
+				m_overlay = (tntell_get_hexchar(name[i + 1]) << 4 | tntell_get_hexchar(name[i + 2])) & 0x1f;
 	}
 
 	// overlay holes
