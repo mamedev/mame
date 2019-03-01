@@ -159,7 +159,7 @@ private:
 	netlist::netlist_time        m_rem;
 	netlist::netlist_time        m_old;
 
-	netlist::poolptr<netlist_mame_t> m_netlist;
+	netlist::pool_owned_ptr<netlist_mame_t> m_netlist;
 
 	func_type m_setup_func;
 };

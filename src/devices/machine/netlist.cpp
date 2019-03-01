@@ -422,11 +422,11 @@ public:
 
 	struct channel
 	{
-		netlist::poolptr<netlist::param_str_t> m_param_name;
+		netlist::pool_owned_ptr<netlist::param_str_t> m_param_name;
 		netlist::param_double_t *m_param;
 		stream_sample_t *m_buffer;
-		netlist::poolptr<netlist::param_double_t> m_param_mult;
-		netlist::poolptr<netlist::param_double_t> m_param_offset;
+		netlist::pool_owned_ptr<netlist::param_double_t> m_param_mult;
+		netlist::pool_owned_ptr<netlist::param_double_t> m_param_offset;
 	};
 	channel m_channels[MAX_INPUT_CHANNELS];
 	netlist::netlist_time m_inc;

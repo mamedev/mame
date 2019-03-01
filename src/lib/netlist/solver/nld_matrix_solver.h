@@ -254,7 +254,7 @@ namespace devices
 
 		std::vector<plib::unique_ptr<terms_for_net_t>> m_terms;
 		std::vector<analog_net_t *> m_nets;
-		std::vector<poolptr<proxied_analog_output_t>> m_inps;
+		std::vector<pool_owned_ptr<proxied_analog_output_t>> m_inps;
 
 		std::vector<plib::unique_ptr<terms_for_net_t>> m_rails_temp;
 

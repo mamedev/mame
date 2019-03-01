@@ -935,17 +935,17 @@ class logic_family_std_proxy_t : public logic_family_desc_t
 {
 public:
 	logic_family_std_proxy_t() = default;
-	poolptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_state_t &anetlist,
+	pool_owned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_state_t &anetlist,
 			const pstring &name, logic_output_t *proxied) const override;
-	poolptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, logic_input_t *proxied) const override;
+	pool_owned_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, logic_input_t *proxied) const override;
 };
 
-poolptr<devices::nld_base_d_to_a_proxy> logic_family_std_proxy_t::create_d_a_proxy(netlist_state_t &anetlist,
+pool_owned_ptr<devices::nld_base_d_to_a_proxy> logic_family_std_proxy_t::create_d_a_proxy(netlist_state_t &anetlist,
 		const pstring &name, logic_output_t *proxied) const
 {
 	return pool().make_poolptr<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
 }
-poolptr<devices::nld_base_a_to_d_proxy> logic_family_std_proxy_t::create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, logic_input_t *proxied) const
+pool_owned_ptr<devices::nld_base_a_to_d_proxy> logic_family_std_proxy_t::create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, logic_input_t *proxied) const
 {
 	return pool().make_poolptr<devices::nld_a_to_d_proxy>(anetlist, name, proxied);
 }
@@ -1010,7 +1010,7 @@ void setup_t::delete_empty_nets()
 {
 	netlist().nets().erase(
 		std::remove_if(netlist().nets().begin(), netlist().nets().end(),
-			[](poolptr<detail::net_t> &x)
+			[](pool_owned_ptr<detail::net_t> &x)
 			{
 				if (x->num_cons() == 0)
 				{
@@ -1038,7 +1038,7 @@ void setup_t::prepare_to_run()
 		if ( factory().is_class<devices::NETLIB_NAME(solver)>(e.second)
 				|| factory().is_class<devices::NETLIB_NAME(netlistparams)>(e.second))
 		{
-			m_netlist.nlstate().add_dev(e.first, poolptr<device_t>(e.second->Create(netlist(), e.first)));
+			m_netlist.nlstate().add_dev(e.first, pool_owned_ptr<device_t>(e.second->Create(netlist(), e.first)));
 		}
 	}
 
@@ -1055,7 +1055,7 @@ void setup_t::prepare_to_run()
 		if ( !factory().is_class<devices::NETLIB_NAME(solver)>(e.second)
 				&& !factory().is_class<devices::NETLIB_NAME(netlistparams)>(e.second))
 		{
-			auto dev = poolptr<device_t>(e.second->Create(netlist(), e.first));
+			auto dev = pool_owned_ptr<device_t>(e.second->Create(netlist(), e.first));
 			m_netlist.nlstate().add_dev(dev->name(), std::move(dev));
 		}
 	}

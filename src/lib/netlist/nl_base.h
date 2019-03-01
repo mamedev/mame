@@ -139,7 +139,7 @@ class NETLIB_NAME(name) : public device_t
 #define NETLIB_TIMESTEP(chip) void NETLIB_NAME(chip) :: timestep(const nl_double step)
 
 #define NETLIB_SUB(chip) nld_ ## chip
-#define NETLIB_SUBXX(ns, chip) poolptr< ns :: nld_ ## chip >
+#define NETLIB_SUBXX(ns, chip) pool_owned_ptr< ns :: nld_ ## chip >
 
 #define NETLIB_HANDLER(chip, name) void NETLIB_NAME(chip) :: name() NL_NOEXCEPT
 #define NETLIB_UPDATE(chip) NETLIB_HANDLER(chip, update)
@@ -243,9 +243,9 @@ namespace netlist
 
 		virtual ~logic_family_desc_t() noexcept = default;
 
-		virtual poolptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_state_t &anetlist, const pstring &name,
+		virtual pool_owned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_state_t &anetlist, const pstring &name,
 				logic_output_t *proxied) const = 0;
-		virtual poolptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_state_t &anetlist, const pstring &name,
+		virtual pool_owned_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_state_t &anetlist, const pstring &name,
 				logic_input_t *proxied) const = 0;
 
 		double fixed_V() const { return m_fixed_V; }
@@ -1187,7 +1187,7 @@ namespace netlist
 		const setup_t &setup() const;
 
 		template<class C, typename... Args>
-		void register_sub(const pstring &name, poolptr<C> &dev, const Args&... args)
+		void register_sub(const pstring &name, pool_owned_ptr<C> &dev, const Args&... args)
 		{
 			//dev.reset(plib::palloc<C>(*this, name, args...));
 			dev = pool().make_poolptr<C>(*this, name, args...);
@@ -1275,10 +1275,10 @@ namespace netlist
 	{
 	public:
 
-		using nets_collection_type = std::vector<poolptr<detail::net_t>>;
+		using nets_collection_type = std::vector<pool_owned_ptr<detail::net_t>>;
 
 		/* need to preserve order of device creation ... */
-		using devices_collection_type = std::vector<std::pair<pstring, poolptr<core_device_t>>>;
+		using devices_collection_type = std::vector<std::pair<pstring, pool_owned_ptr<core_device_t>>>;
 		netlist_state_t(const pstring &aname,
 			plib::unique_ptr<callbacks_t> &&callbacks,
 			plib::unique_ptr<setup_t> &&setup);
@@ -1330,7 +1330,7 @@ namespace netlist
 		std::size_t find_net_id(const detail::net_t *net) const;
 
 		template <typename T>
-		void register_net(poolptr<T> &&net) { m_nets.push_back(std::move(net)); }
+		void register_net(pool_owned_ptr<T> &&net) { m_nets.push_back(std::move(net)); }
 
 		template<class device_class>
 		inline std::vector<device_class *> get_device_list()
@@ -1346,7 +1346,7 @@ namespace netlist
 		}
 
 		template <typename T>
-		void add_dev(const pstring &name, poolptr<T> &&dev)
+		void add_dev(const pstring &name, pool_owned_ptr<T> &&dev)
 		{
 			for (auto & d : m_devices)
 				if (d.first == name)

@@ -179,18 +179,15 @@ public:
 	pomemstream(pomemstream &&src) noexcept
 	: postream(std::move(src))
 	, m_pos(src.m_pos)
-	, m_capacity(src.m_capacity)
-	, m_size(src.m_size)
-	, m_mem(src.m_mem)
+	, m_mem(std::move(src.m_mem))
 	{
-		src.m_mem = nullptr;
 	}
 	pomemstream &operator=(pomemstream &&src) = delete;
 
-	~pomemstream() override;
+	~pomemstream() override = default;
 
-	char *memory() const { return m_mem; }
-	pos_type size() const { return m_size; }
+	const char *memory() const { return m_mem.data(); }
+	pos_type size() const { return m_mem.size(); }
 
 protected:
 	/* write n bytes to stream */
@@ -200,9 +197,7 @@ protected:
 
 private:
 	pos_type m_pos;
-	pos_type m_capacity;
-	pos_type m_size;
-	char *m_mem;
+	std::vector<char> m_mem;
 };
 
 class postringstream : public postream
@@ -626,11 +621,10 @@ public:
 	{
 		std::size_t sz = 0;
 		read(sz);
-		auto buf = plib::pnew_array<plib::string_info<pstring>::mem_t>(sz+1);
-		m_strm.read(reinterpret_cast<pistream::value_type *>(buf), sz);
+		std::vector<plib::string_info<pstring>::mem_t> buf(sz+1);
+		m_strm.read(buf.data(), sz);
 		buf[sz] = 0;
-		s = pstring(buf);
-		plib::pdelete_array(buf);
+		s = pstring(buf.data());
 	}
 
 	template <typename T>

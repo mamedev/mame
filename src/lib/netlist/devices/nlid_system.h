@@ -335,7 +335,7 @@ namespace netlist
 		param_int_t m_N;
 		param_str_t m_func;
 		analog_output_t m_Q;
-		std::vector<poolptr<analog_input_t>> m_I;
+		std::vector<pool_owned_ptr<analog_input_t>> m_I;
 
 		std::vector<double> m_vals;
 		plib::pfunction m_compiled;

@@ -111,13 +111,13 @@ namespace devices
 	}
 
 	template <class C>
-	poolptr<matrix_solver_t> create_it(netlist_state_t &nl, pstring name, solver_parameters_t &params, std::size_t size)
+	pool_owned_ptr<matrix_solver_t> create_it(netlist_state_t &nl, pstring name, solver_parameters_t &params, std::size_t size)
 	{
 		return pool().make_poolptr<C>(nl, name, &params, size);
 	}
 
 	template <typename FT, int SIZE>
-	poolptr<matrix_solver_t> NETLIB_NAME(solver)::create_solver(std::size_t size, const pstring &solvername)
+	pool_owned_ptr<matrix_solver_t> NETLIB_NAME(solver)::create_solver(std::size_t size, const pstring &solvername)
 	{
 		if (m_method() == "SOR_MAT")
 		{
@@ -161,12 +161,12 @@ namespace devices
 		else
 		{
 			log().fatal(MF_1_UNKNOWN_SOLVER_TYPE, m_method());
-			return poolptr<matrix_solver_t>();
+			return pool_owned_ptr<matrix_solver_t>();
 		}
 	}
 
 	template <typename FT, int SIZE>
-	poolptr<matrix_solver_t> NETLIB_NAME(solver)::create_solver_x(std::size_t size, const pstring &solvername)
+	pool_owned_ptr<matrix_solver_t> NETLIB_NAME(solver)::create_solver_x(std::size_t size, const pstring &solvername)
 	{
 		if (SIZE > 0)
 		{
@@ -291,7 +291,7 @@ namespace devices
 		log().verbose("Found {1} net groups in {2} nets\n", splitter.groups.size(), state().nets().size());
 		for (auto & grp : splitter.groups)
 		{
-			poolptr<matrix_solver_t> ms;
+			pool_owned_ptr<matrix_solver_t> ms;
 			std::size_t net_count = grp.size();
 			pstring sname = plib::pfmt("Solver_{1}")(m_mat_solvers.size());
 

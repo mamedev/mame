@@ -25,7 +25,7 @@ CHAR *astring_from_utf8(const char *utf8string)
 
 	// convert UTF-16 to "ANSI code page" string
 	char_count = WideCharToMultiByte(CP_ACP, 0, wstring, -1, nullptr, 0, nullptr, nullptr);
-	result = pnew_array<CHAR>(char_count);
+	result = new CHAR[char_count];
 	if (result != nullptr)
 		WideCharToMultiByte(CP_ACP, 0, wstring, -1, result, char_count, nullptr, nullptr);
 
@@ -39,7 +39,7 @@ WCHAR *wstring_from_utf8(const char *utf8string)
 
 	// convert MAME string (UTF-8) to UTF-16
 	char_count = MultiByteToWideChar(CP_UTF8, 0, utf8string, -1, nullptr, 0);
-	result = pnew_array<WCHAR>(char_count);
+	result = new WCHAR[char_count];
 	if (result != nullptr)
 		MultiByteToWideChar(CP_UTF8, 0, utf8string, -1, result, char_count);
 
@@ -72,7 +72,7 @@ dynlib::dynlib(const pstring &libname)
 		m_isLoaded = true;
 	//else
 	//  fprintf(stderr, "win: library <%s> not found!\n", libname.c_str());
-	pdelete_array(buffer);
+	delete [] buffer;
 #elif defined(EMSCRIPTEN)
 	//no-op
 #else
@@ -106,7 +106,7 @@ dynlib::dynlib(const pstring &path, const pstring &libname)
 	{
 		//printf("win: library <%s> not found!\n", libname.c_str());
 	}
-	pdelete_array(buffer);
+	delete [] buffer;
 #elif defined(EMSCRIPTEN)
 	//no-op
 #else

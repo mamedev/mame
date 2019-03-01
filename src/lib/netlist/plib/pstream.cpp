@@ -268,55 +268,25 @@ pimemstream::pos_type pimemstream::vtell() const
 // -----------------------------------------------------------------------------
 
 pomemstream::pomemstream()
-: postream(FLAG_SEEKABLE), m_pos(0), m_capacity(1024), m_size(0)
+: postream(FLAG_SEEKABLE), m_pos(0), m_mem(1024)
 {
-	m_mem = pnew_array<char>(m_capacity);
-}
-
-pomemstream::~pomemstream()
-{
-	if (m_mem != nullptr)
-		pdelete_array(m_mem);
+	m_mem.clear();
 }
 
 void pomemstream::vwrite(const value_type *buf, const pos_type n)
 {
-	if (m_pos + n >= m_capacity)
-	{
-		while (m_pos + n >= m_capacity)
-			m_capacity *= 2;
-		char *o = m_mem;
-		m_mem = pnew_array<char>(m_capacity);
-		if (m_mem == nullptr)
-		{
-			throw out_of_mem_e("pomemstream::vwrite");
-		}
-		std::copy(o, o + m_pos, m_mem);
-		pdelete_array(o);
-	}
+	if (m_pos + n >= m_mem.size())
+		m_mem.resize(m_pos + n);
 
-	std::copy(buf, buf + n, m_mem + m_pos);
+	std::copy(buf, buf + n, &m_mem[0] + m_pos);
 	m_pos += n;
-	m_size = std::max(m_pos, m_size);
 }
 
 void pomemstream::vseek(const pos_type n)
 {
 	m_pos = n;
-	m_size = std::max(m_pos, m_size);
-	if (m_size >= m_capacity)
-	{
-		while (m_size >= m_capacity)
-			m_capacity *= 2;
-		char *o = m_mem;
-		m_mem = pnew_array<char>(m_capacity);
-		if (m_mem == nullptr)
-		{
-			throw out_of_mem_e("pomemstream::vseek");
-		}
-		std::copy(o, o + m_pos, m_mem);
-		pdelete_array(o);
-	}
+	if (m_pos>=m_mem.size())
+		m_mem.resize(m_pos);
 }
 
 pstream::pos_type pomemstream::vtell() const

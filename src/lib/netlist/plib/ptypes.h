@@ -120,8 +120,8 @@ namespace plib
 		static_assert(std::is_integral<N>::value, "gcd: N must be an integer");
 
 		return m == 0 ? plib::abs(n)
-		     : n == 0 ? plib::abs(m)
-		     : gcd(n, m % n);
+			 : n == 0 ? plib::abs(m)
+			 : gcd(n, m % n);
 	}
 
 	template<typename M, typename N>
