@@ -9380,7 +9380,7 @@ void xl25_state::update_halt()
 {
 	// O5+K4 go to HALT pin (used when pressing store/recall button)
 	bool halt = !((m_o & 0x20) || (read_k(machine().dummy_space(), 0) & 4));
-	m_maincpu->set_input_line(TMS1XXX_INPUT_LINE_HALT, halt ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_HALT, halt ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void xl25_state::prepare_display()

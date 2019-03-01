@@ -500,7 +500,7 @@ private:
 
 	// cartridge
 	u32 m_cart_max_size;
-	u8* m_cart_base;
+	u8 *m_cart_base;
 
 	u8 m_overlay;
 };
@@ -710,7 +710,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(tispeak_state::tntell_get_overlay)
 	// try to get it from (external) layout
 	if (m_overlay == 0x20)
 	{
-		// as output value, eg. with defstate
+		// as output value, eg. with defstate (in decimal)
 		m_overlay = output().get_value("overlay_code") & 0x1f;
 
 		// and from current view name ($ + 2 hex digits)
@@ -1308,14 +1308,14 @@ void tispeak_state::tms5110_route(machine_config &config)
 void tispeak_state::snmath(machine_config &config)
 {
 	/* basic machine hardware */
-	tms0270_cpu_device &tms(TMS0270(config, m_maincpu, MASTER_CLOCK/2));
-	tms.k().set(FUNC(tispeak_state::snspell_read_k));
-	tms.o().set(FUNC(tispeak_state::snmath_write_o));
-	tms.r().set(FUNC(tispeak_state::snspell_write_r));
+	TMS0270(config, m_maincpu, MASTER_CLOCK/2);
+	m_maincpu->k().set(FUNC(tispeak_state::snspell_read_k));
+	m_maincpu->o().set(FUNC(tispeak_state::snmath_write_o));
+	m_maincpu->r().set(FUNC(tispeak_state::snspell_write_r));
 
-	tms.read_ctl().set("tms5100", FUNC(tms5110_device::ctl_r));
-	tms.write_ctl().set("tms5100", FUNC(tms5110_device::ctl_w));
-	tms.write_pdc().set("tms5100", FUNC(tms5110_device::pdc_w));
+	m_maincpu->read_ctl().set("tms5100", FUNC(tms5110_device::ctl_r));
+	m_maincpu->write_ctl().set("tms5100", FUNC(tms5110_device::ctl_w));
+	m_maincpu->write_pdc().set("tms5100", FUNC(tms5110_device::pdc_w));
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_snmath);

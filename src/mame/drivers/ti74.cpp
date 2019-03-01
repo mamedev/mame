@@ -280,7 +280,7 @@ void ti74_state::main_map(address_map &map)
 	map.unmap_value_high();
 	map(0x1000, 0x1001).rw("hd44780", FUNC(hd44780_device::read), FUNC(hd44780_device::write));
 	map(0x2000, 0x3fff).ram().share("sysram.ic3");
-	//AM_RANGE(0x4000, 0xbfff) // mapped by the cartslot
+	//map(0x4000, 0xbfff) // mapped by the cartslot
 	map(0xc000, 0xdfff).bankr("sysbank");
 }
 
