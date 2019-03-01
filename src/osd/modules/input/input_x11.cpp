@@ -401,7 +401,23 @@ public:
 		else if (xevent.type == button_press_type || xevent.type == button_release_type)
 		{
 			XDeviceButtonEvent *button = reinterpret_cast<XDeviceButtonEvent *>(&xevent);
-			lightgun.buttons[button->button] = (xevent.type == button_press_type) ? 0x80 : 0;
+
+			/*
+			 * SDL/X11 Number the buttons 1,2,3, while windows and other parts of MAME
+			 * like offscreen_reload expect 0,2,1. Transpose buttons 2 and 3, and then
+			 * -1 the button number to align the numbering schemes.
+			*/
+			int button_number = button->button;
+			switch (button_number)
+			{
+				case 2:
+					button_number = 3;
+					break;
+				case 3:
+					button_number = 2;
+					break;
+			}
+			lightgun.buttons[button_number - 1] = (xevent.type == button_press_type) ? 0x80 : 0;
 		}
 	}
 
