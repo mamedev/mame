@@ -360,7 +360,6 @@ WRITE16_MEMBER(cps_state::punipic_layer_w)
 				break;
 			}
 
-			m_cps_a_regs[0x08 / 2] = m_mainram[0xdb90 / 2]; // fixes split objects
 			break;
 	case 0x07:
 		// unknown
@@ -481,7 +480,6 @@ WRITE16_MEMBER(cps_state::sf2mdta_layer_w)
 	case 0x09:
 		m_cps_a_regs[0x12 / 2] = data; /* scroll 2y */
 		m_cps_a_regs[CPS1_ROWSCROLL_OFFS] = data; /* row scroll start */
-		m_cps_a_regs[0x08 / 2] = m_mainram[0x802e / 2];
 		break;
 	case 0x0a:
 		m_cps_a_regs[0x10 / 2] = 0xffce; /* scroll 2x */
@@ -3375,8 +3373,8 @@ GAME( 1991, knightsb,  knights,  knightsb,  knights,  cps_state, init_dinopic,  
 
 GAME( 1993, mtwinsb,   mtwins,   mtwinsb,   mtwins,   cps_state, init_mtwinsb,  ROT0,   "David Inc. (bootleg)", "Twins (Mega Twins bootleg)", MACHINE_SUPPORTS_SAVE ) // based on World version
 
-GAME( 1993, punipic,   punisher, punipic,   punisher, cps_state, init_punipic,  ROT0,   "bootleg", "The Punisher (bootleg with PIC16c57, set 1)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // 930422 ETC
-GAME( 1993, punipic2,  punisher, punipic,   punisher, cps_state, init_punipic,  ROT0,   "bootleg", "The Punisher (bootleg with PIC16c57, set 2)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // 930422 ETC
+GAME( 1993, punipic,   punisher, punipic,   punisher, cps_state, init_punipic,  ROT0,   "bootleg", "The Punisher (bootleg with PIC16c57, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // 930422 ETC
+GAME( 1993, punipic2,  punisher, punipic,   punisher, cps_state, init_punipic,  ROT0,   "bootleg", "The Punisher (bootleg with PIC16c57, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // 930422 ETC
 GAME( 1993, punipic3,  punisher, punipic,   punisher, cps_state, init_punipic3, ROT0,   "bootleg", "The Punisher (bootleg with PIC16c57, set 3)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // 930422 ETC
 
 GAME( 1992, sf2m1,     sf2ce,    sf2m1,     sf2,      cps_state, init_sf2m1,    ROT0,   "bootleg", "Street Fighter II': Champion Edition (M1, bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 920313 ETC
