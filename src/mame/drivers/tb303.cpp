@@ -23,8 +23,8 @@
 class tb303_state : public hh_ucom4_state
 {
 public:
-	tb303_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_ucom4_state(mconfig, type, tag)
+	tb303_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
 	void tb303(machine_config &config);
