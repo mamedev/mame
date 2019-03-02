@@ -98,12 +98,14 @@
 #include "screen.h"
 #include "speaker.h"
 
-// internal artwork
+// internal artwork (complete)
 #include "pairmtch.lh"
 #include "sag.lh"
 
+// internal artwork (bezel overlay)
 #include "bambball.lh"
 #include "gckong.lh"
+#include "mwcbaseb.lh"
 #include "msthawk.lh"
 #include "packmon.lh"
 
@@ -3913,7 +3915,9 @@ void mwcbaseb_state::mwcbaseb(machine_config &config)
 	screen.set_refresh_hz(50);
 	screen.set_size(1920, 478);
 	screen.set_visarea(0, 1920-1, 0, 478-1);
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
+	config.set_default_layout(layout_mwcbaseb);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

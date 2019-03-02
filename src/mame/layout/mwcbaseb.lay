@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="gray"><disk><color red="0.3" green="0.3" blue="0.3" /></disk></element>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<screen index="0"><bounds x="0" y="0" width="96" height="23.9" /></screen>
+
+	<!-- draw the baseball diamond -->
+
+		<repeat count="200">
+			<param name="x" start="21" increment="0.145" />
+			<param name="y" start="16" increment="-0.0475" />
+			<backdrop element="gray"><bounds x="~x~" y="~y~" width="0.7" height="0.7" /></backdrop>
+		</repeat>
+
+		<repeat count="200">
+			<param name="x" start="21" increment="0.145" />
+			<param name="y" start="16" increment="0.0475" />
+			<backdrop element="gray"><bounds x="~x~" y="~y~" width="0.7" height="0.7" /></backdrop>
+		</repeat>
+
+		<repeat count="200">
+			<param name="x" start="50" increment="0.145" />
+			<param name="y" start="6.5" increment="0.0475" />
+			<backdrop element="gray"><bounds x="~x~" y="~y~" width="0.7" height="0.7" /></backdrop>
+		</repeat>
+
+		<repeat count="200">
+			<param name="x" start="50" increment="0.145" />
+			<param name="y" start="25.5" increment="-0.0475" />
+			<backdrop element="gray"><bounds x="~x~" y="~y~" width="0.7" height="0.7" /></backdrop>
+		</repeat>
+
+	</view>
+</mamelayout>
