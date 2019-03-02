@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="intellect02" description="Intellect-02 Cartridges">
+
+<!-- Intellect-02 Cartridges -->
+
+	<software name="chess">
+		<description>Chess</description>
+		<year>1985</year>
+		<publisher>BREA Research Institute</publisher>
+		<part name="cart" interface="intellect02">
+			<dataarea name="rom" size="0x2000">
+				<rom name="chess.bin" size="0x2000" crc="81691aac" sha1="2f358fd8f1f1b0d886a728155a01ce61f0d6c39b" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

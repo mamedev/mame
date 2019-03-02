@@ -58,23 +58,23 @@ INPUT_PORTS_END
 
 
 
-MACHINE_CONFIG_START(segapm_state::segapm)
-
-	MCFG_DEVICE_ADD("maincpu", M68000, 8000000) // ??
-	MCFG_DEVICE_PROGRAM_MAP(segapm_map)
+void segapm_state::segapm(machine_config &config)
+{
+	M68000(config, m_maincpu, 8000000); // ??
+	m_maincpu->set_addrmap(AS_PROGRAM, &segapm_state::segapm_map);
 
 	// + 2 sh2s on 32x board
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(segapm_state, screen_update_segapm)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(segapm_state::screen_update_segapm));
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x200);
-MACHINE_CONFIG_END
+}
 
 
 

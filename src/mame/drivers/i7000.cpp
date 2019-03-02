@@ -237,7 +237,7 @@ void i7000_state::machine_start()
 	if (m_card->exists())
 	{
 		// 0x4000 - 0xbfff   32KB ROM
-		program.install_read_handler(0x4000, 0xbfff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_card));
+		program.install_read_handler(0x4000, 0xbfff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_card));
 	}
 }
 
@@ -392,7 +392,7 @@ MACHINE_CONFIG_START(i7000_state::i7000)
 	MCFG_GENERIC_LOAD(i7000_state, i7000_card)
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("card_list", "i7000_card")
+	SOFTWARE_LIST(config, "card_list").set_original("i7000_card");
 MACHINE_CONFIG_END
 
 ROM_START( i7000 )

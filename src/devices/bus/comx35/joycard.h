@@ -37,7 +37,7 @@ protected:
 	virtual void device_reset() override;
 
 	// device_comx_expansion_card_interface overrides
-	virtual uint8_t comx_io_r(address_space &space, offs_t offset) override;
+	virtual uint8_t comx_io_r(offs_t offset) override;
 
 private:
 	required_ioport m_joy1;

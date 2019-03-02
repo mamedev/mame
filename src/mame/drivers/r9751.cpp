@@ -976,11 +976,12 @@ void r9751_state::wd33c93(device_t *device)
 	//  downcast<wd33c93a_device *>(device)->drq_cb().set(*this, FUNC(r9751_state::scsi_drq_w));
 }
 
-MACHINE_CONFIG_START(r9751_state::r9751)
+void r9751_state::r9751(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68030, 20000000)
-	MCFG_DEVICE_PROGRAM_MAP(r9751_mem)
-	MCFG_QUANTUM_TIME(attotime::from_hz(1000))
+	M68030(config, m_maincpu, 20000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &r9751_state::r9751_mem);
+	config.m_minimum_quantum = attotime::from_hz(1000);
 
 	/* i/o hardware */
 	SMIOC(config, m_smioc, 0);
@@ -1003,8 +1004,8 @@ MACHINE_CONFIG_START(r9751_state::r9751)
 		.machine_config([this](device_t *device) { wd33c93(device); });
 
 	/* software list */
-	MCFG_SOFTWARE_LIST_ADD("flop_list","r9751")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "flop_list").set_original("r9751");
+}
 
 
 

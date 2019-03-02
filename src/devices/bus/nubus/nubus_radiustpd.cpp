@@ -37,13 +37,12 @@ DEFINE_DEVICE_TYPE(NUBUS_RADIUSTPD, nubus_radiustpd_device, "nb_rtpd", "Radius T
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(nubus_radiustpd_device::device_add_mconfig)
-	MCFG_SCREEN_ADD( RADIUSTPD_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, nubus_radiustpd_device, screen_update)
-	MCFG_SCREEN_SIZE(1280, 960)
-	MCFG_SCREEN_REFRESH_RATE(70)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1152-1, 0, 880-1)
-MACHINE_CONFIG_END
+void nubus_radiustpd_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, RADIUSTPD_SCREEN_NAME, SCREEN_TYPE_RASTER));
+	screen.set_screen_update(FUNC(nubus_radiustpd_device::screen_update));
+	screen.set_raw(99.522_MHz_XTAL, 1536, 0, 1152, 900, 0, 880); // 64.79 kHz horizontal, 72 Hz refresh
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

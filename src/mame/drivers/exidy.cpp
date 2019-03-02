@@ -845,7 +845,7 @@ MACHINE_CONFIG_START(exidy_state::base)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", exidy_state,  exidy_vblank_interrupt)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_exidy)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_exidy);
 	MCFG_PALETTE_ADD("palette", 8)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -909,7 +909,7 @@ MACHINE_CONFIG_START(exidy_state::venture)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(venture_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	config.m_minimum_quantum = attotime::from_hz(600);
 
 	/* audio hardware */
 	pia6821_device &pia(PIA6821(config, "pia", 0));
@@ -945,7 +945,7 @@ MACHINE_CONFIG_START(exidy_state::mtrap)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(mtrap_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(1920))
+	config.m_minimum_quantum = attotime::from_hz(1920);
 
 	/* audio hardware */
 	pia6821_device &pia(PIA6821(config, "pia", 0));

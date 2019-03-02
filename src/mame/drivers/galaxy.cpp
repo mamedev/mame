@@ -194,11 +194,11 @@ MACHINE_CONFIG_START(galaxy_state::galaxy)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 208-1)
 	MCFG_SCREEN_UPDATE_DRIVER(galaxy_state, screen_update_galaxy)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_galaxy)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_galaxy);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* snapshot */
-	MCFG_SNAPSHOT_ADD("snapshot", galaxy_state, galaxy, "gal", 0)
+	MCFG_SNAPSHOT_ADD("snapshot", galaxy_state, galaxy, "gal")
 
 	SPEAKER(config, "mono").front_center();
 	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -208,7 +208,7 @@ MACHINE_CONFIG_START(galaxy_state::galaxy)
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
 	m_cassette->set_interface("galaxy_cass");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list","galaxy")
+	SOFTWARE_LIST(config, "cass_list").set_original("galaxy");
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("6K").set_extra_options("2K,22K,38K,54K");
@@ -237,7 +237,7 @@ MACHINE_CONFIG_START(galaxy_state::galaxyp)
 
 
 	/* snapshot */
-	MCFG_SNAPSHOT_ADD("snapshot", galaxy_state, galaxy, "gal", 0)
+	MCFG_SNAPSHOT_ADD("snapshot", galaxy_state, galaxy, "gal")
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -249,7 +249,7 @@ MACHINE_CONFIG_START(galaxy_state::galaxyp)
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
 	m_cassette->set_interface("galaxy_cass");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list","galaxy")
+	SOFTWARE_LIST(config, "cass_list").set_original("galaxy");
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("38K");

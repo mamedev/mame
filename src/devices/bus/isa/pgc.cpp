@@ -151,30 +151,31 @@ DEFINE_DEVICE_TYPE(ISA8_PGC, isa8_pgc_device, "isa_ibm_pgc", "IBM Professional G
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(isa8_pgc_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("maincpu", I8088, XTAL(24'000'000)/3)
-	MCFG_DEVICE_PROGRAM_MAP(pgc_map)
+void isa8_pgc_device::device_add_mconfig(machine_config &config)
+{
+	I8088(config, m_cpu, XTAL(24'000'000)/3);
+	m_cpu->set_addrmap(AS_PROGRAM, &isa8_pgc_device::pgc_map);
 #if 0
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(isa8_pgc_device, irq_callback)
+	m_cpu->set_irq_acknowledge_callback(FUNC(isa8_pgc_device::irq_callback));
 #endif
 
 	timer_device &scantimer(TIMER(config, "scantimer"));
 	scantimer.configure_periodic(FUNC(isa8_pgc_device::scanline_callback), attotime::from_hz(60*PGC_TOTAL_VERT));
 	scantimer.set_start_delay(attotime::from_hz(XTAL(50'000'000)/(2*PGC_HORZ_START)));
 
-	MCFG_SCREEN_ADD(PGC_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(50'000'000)/2,
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(XTAL(50'000'000)/2,
 		PGC_TOTAL_HORZ, PGC_HORZ_START, PGC_HORZ_START+PGC_DISP_HORZ,
-		PGC_TOTAL_VERT, PGC_VERT_START, PGC_VERT_START+PGC_DISP_VERT)
-	MCFG_SCREEN_UPDATE_DRIVER(isa8_pgc_device, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+		PGC_TOTAL_VERT, PGC_VERT_START, PGC_VERT_START+PGC_DISP_VERT);
+	m_screen->set_screen_update(FUNC(isa8_pgc_device::screen_update));
+	m_screen->set_palette(m_palette);
 #if 0
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, isa8_pgc_device, vblank_irq))
+	m_screen->screen_vblank().set(FUNC(isa8_pgc_device::vblank_irq));
 #endif
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pgc)
-	MCFG_PALETTE_ADD( "palette", 256 )
-MACHINE_CONFIG_END
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_pgc);
+	PALETTE(config, m_palette).set_entries(256);
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

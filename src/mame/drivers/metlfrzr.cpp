@@ -366,28 +366,28 @@ TIMER_DEVICE_CALLBACK_MEMBER(metlfrzr_state::scanline)
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0x08); /* RST 08h */
 }
 
-MACHINE_CONFIG_START(metlfrzr_state::metlfrzr)
-
+void metlfrzr_state::metlfrzr(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(metlfrzr_map)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
+	Z80(config, m_maincpu, XTAL(12'000'000) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &metlfrzr_state::metlfrzr_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &metlfrzr_state::decrypted_opcodes_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(metlfrzr_state::scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("t5182", T5182, 0)
+	T5182(config, "t5182", 0);
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 0x200).set_indirect_entries(256 * 2);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_metlfrzr);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256 - 1, 16, 256 - 16 - 1)
-	MCFG_SCREEN_UPDATE_DRIVER(metlfrzr_state, screen_update_metlfrzr)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 256 - 1, 16, 256 - 16 - 1);
+	screen.set_screen_update(FUNC(metlfrzr_state::screen_update_metlfrzr));
+	screen.set_palette(m_palette);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -396,7 +396,7 @@ MACHINE_CONFIG_START(metlfrzr_state::metlfrzr)
 	ymsnd.irq_handler().set("t5182", FUNC(t5182_device::ym2151_irq_handler));
 	ymsnd.add_route(0, "mono", 1.0);
 	ymsnd.add_route(1, "mono", 1.0);
-MACHINE_CONFIG_END
+}
 
 
 

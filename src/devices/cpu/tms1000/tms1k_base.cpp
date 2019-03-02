@@ -90,6 +90,9 @@ tms1k_base_device::tms1k_base_device(const machine_config &mconfig, device_type 
 	, m_write_o(*this)
 	, m_write_r(*this)
 	, m_power_off(*this)
+	, m_read_ctl(*this)
+	, m_write_ctl(*this)
+	, m_write_pdc(*this)
 {
 }
 
@@ -131,6 +134,9 @@ void tms1k_base_device::device_start()
 	m_write_o.resolve_safe();
 	m_write_r.resolve_safe();
 	m_power_off.resolve_safe();
+	m_read_ctl.resolve_safe(0);
+	m_write_ctl.resolve_safe();
+	m_write_pdc.resolve_safe();
 
 	// zerofill
 	m_pc = 0;
@@ -147,7 +153,6 @@ void tms1k_base_device::device_start()
 	m_r = 0;
 	m_o = 0;
 	m_o_index = 0;
-	m_halt_pin = false;
 	m_cki_bus = 0;
 	m_c4 = 0;
 	m_p = 0;
@@ -187,7 +192,6 @@ void tms1k_base_device::device_start()
 	save_item(NAME(m_r));
 	save_item(NAME(m_o));
 	save_item(NAME(m_o_index));
-	save_item(NAME(m_halt_pin));
 	save_item(NAME(m_cki_bus));
 	save_item(NAME(m_c4));
 	save_item(NAME(m_p));
@@ -310,15 +314,6 @@ void tms1k_base_device::read_opcode()
 //-------------------------------------------------
 //  i/o handling
 //-------------------------------------------------
-
-void tms1k_base_device::execute_set_input(int line, int state)
-{
-	if (line != TMS1XXX_INPUT_LINE_HALT)
-		return;
-
-	// HALT pin (CMOS only)
-	m_halt_pin = bool(state);
-}
 
 void tms1k_base_device::write_o_output(u8 index)
 {

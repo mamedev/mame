@@ -813,7 +813,7 @@ MACHINE_CONFIG_START(amstrad_state::cpcplus_cartslot)
 	MCFG_GENERIC_MANDATORY
 	MCFG_GENERIC_LOAD(amstrad_state, amstrad_plus_cartridge)
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "gx4000")
+	SOFTWARE_LIST(config, "cart_list").set_original("gx4000");
 MACHINE_CONFIG_END
 
 void cpc464_exp_cards(device_slot_interface &device)
@@ -910,7 +910,7 @@ MACHINE_CONFIG_START(amstrad_state::amstrad_base)
 	MCFG_DEVICE_IO_MAP(amstrad_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(amstrad_state,amstrad_cpu_acknowledge_int)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	MCFG_MACHINE_START_OVERRIDE(amstrad_state, amstrad )
 	MCFG_MACHINE_RESET_OVERRIDE(amstrad_state, amstrad )
@@ -950,18 +950,18 @@ MACHINE_CONFIG_START(amstrad_state::amstrad_base)
 	m_ay->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* printer */
-	MCFG_DEVICE_ADD("centronics", CENTRONICS, amstrad_centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, amstrad_state, write_centronics_busy))
+	CENTRONICS(config, m_centronics, amstrad_centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(amstrad_state::write_centronics_busy));
 
 	/* snapshot */
-	MCFG_SNAPSHOT_ADD("snapshot", amstrad_state, amstrad, "sna", 0)
+	MCFG_SNAPSHOT_ADD("snapshot", amstrad_state, amstrad, "sna")
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(cdt_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->set_interface("cpc_cass");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list","cpc_cass")
+	SOFTWARE_LIST(config, "cass_list").set_original("cpc_cass");
 
 MACHINE_CONFIG_END
 
@@ -979,12 +979,13 @@ MACHINE_CONFIG_START(amstrad_state::cpc464)
 	RAM(config, m_ram).set_default_size("64K").set_extra_options("128K,320K,576K");
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(amstrad_state::cpc664)
+void amstrad_state::cpc664(machine_config &config)
+{
 	amstrad_base(config);
 	UPD765A(config, m_fdc, 16_MHz_XTAL / 4, true, true);
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", amstrad_floppies, "3ssdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", amstrad_floppies, "35ssdd", floppy_image_device::default_floppy_formats)
-	MCFG_SOFTWARE_LIST_ADD("flop_list","cpc_flop")
+	FLOPPY_CONNECTOR(config, "upd765:0", amstrad_floppies, "3ssdd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765:1", amstrad_floppies, "35ssdd", floppy_image_device::default_floppy_formats);
+	SOFTWARE_LIST(config, "flop_list").set_original("cpc_flop");
 
 	cpc_expansion_slot_device &exp(CPC_EXPANSION_SLOT(config, "exp", 16_MHz_XTAL / 4, cpc_exp_cards, nullptr));
 	exp.set_cpu_tag(m_maincpu);
@@ -995,14 +996,15 @@ MACHINE_CONFIG_START(amstrad_state::cpc664)
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("64K").set_extra_options("128K,320K,576K");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(amstrad_state::cpc6128)
+void amstrad_state::cpc6128(machine_config &config)
+{
 	amstrad_base(config);
 	UPD765A(config, m_fdc, 16_MHz_XTAL / 4, true, true);
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", amstrad_floppies, "3ssdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", amstrad_floppies, "35ssdd", floppy_image_device::default_floppy_formats)
-	MCFG_SOFTWARE_LIST_ADD("flop_list","cpc_flop")
+	FLOPPY_CONNECTOR(config, "upd765:0", amstrad_floppies, "3ssdd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765:1", amstrad_floppies, "35ssdd", floppy_image_device::default_floppy_formats);
+	SOFTWARE_LIST(config, "flop_list").set_original("cpc_flop");
 
 	cpc_expansion_slot_device &exp(CPC_EXPANSION_SLOT(config, "exp", 16_MHz_XTAL / 4, cpc_exp_cards, nullptr));
 	exp.set_cpu_tag(m_maincpu);
@@ -1013,7 +1015,7 @@ MACHINE_CONFIG_START(amstrad_state::cpc6128)
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("128K").set_extra_options("320K,576K");
-MACHINE_CONFIG_END
+}
 
 
 MACHINE_CONFIG_START(amstrad_state::kccomp)
@@ -1032,7 +1034,7 @@ MACHINE_CONFIG_START(amstrad_state::cpcplus)
 	MCFG_DEVICE_IO_MAP(amstrad_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(amstrad_state,amstrad_cpu_acknowledge_int)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	MCFG_MACHINE_START_OVERRIDE(amstrad_state, plus )
 	MCFG_MACHINE_RESET_OVERRIDE(amstrad_state, plus )
@@ -1071,25 +1073,25 @@ MACHINE_CONFIG_START(amstrad_state::cpcplus)
 	m_ay->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* printer */
-	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, amstrad_state, write_centronics_busy))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(amstrad_state::write_centronics_busy));
 
 	/* snapshot */
-	MCFG_SNAPSHOT_ADD("snapshot", amstrad_state, amstrad, "sna", 0)
+	MCFG_SNAPSHOT_ADD("snapshot", amstrad_state, amstrad, "sna")
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(cdt_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->set_interface("cpc_cass");
-	MCFG_SOFTWARE_LIST_ADD("cass_list","cpc_cass")
+	SOFTWARE_LIST(config, "cass_list").set_original("cpc_cass");
 
 	UPD765A(config, m_fdc, 40_MHz_XTAL / 10, true, true);
 
 	cpcplus_cartslot(config);
 
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", amstrad_floppies, "3ssdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", amstrad_floppies, "35ssdd", floppy_image_device::default_floppy_formats)
-	MCFG_SOFTWARE_LIST_ADD("flop_list","cpc_flop")
+	FLOPPY_CONNECTOR(config, "upd765:0", amstrad_floppies, "3ssdd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765:1", amstrad_floppies, "35ssdd", floppy_image_device::default_floppy_formats);
+	SOFTWARE_LIST(config, "flop_list").set_original("cpc_flop");
 
 	cpc_expansion_slot_device &exp(CPC_EXPANSION_SLOT(config, "exp", 40_MHz_XTAL / 10, cpcplus_exp_cards, nullptr));
 	exp.set_cpu_tag(m_maincpu);
@@ -1110,7 +1112,7 @@ MACHINE_CONFIG_START(amstrad_state::gx4000)
 	MCFG_DEVICE_IO_MAP(amstrad_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(amstrad_state,amstrad_cpu_acknowledge_int)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	MCFG_MACHINE_START_OVERRIDE(amstrad_state, gx4000 )
 	MCFG_MACHINE_RESET_OVERRIDE(amstrad_state, gx4000 )
@@ -1166,7 +1168,7 @@ MACHINE_CONFIG_START(amstrad_state::aleste)
 	m_palette->set_entries(32+64);
 	m_palette->set_init(FUNC(amstrad_state::aleste_palette));
 
-	MCFG_DEVICE_ADD("rtc", MC146818, 4.194304_MHz_XTAL)
+	MC146818(config, m_rtc, 4.194304_MHz_XTAL);
 
 	I8272A(config.replace(), m_fdc, 16_MHz_XTAL / 4, true);
 
@@ -1177,12 +1179,11 @@ MACHINE_CONFIG_START(amstrad_state::aleste)
 	exp.romdis_callback().set(FUNC(amstrad_state::cpc_romdis));  // ROMDIS
 	exp.rom_select_callback().set(FUNC(amstrad_state::rom_select));
 
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", aleste_floppies, "35dd", amstrad_state::aleste_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", aleste_floppies, "35dd", amstrad_state::aleste_floppy_formats)
+	FLOPPY_CONNECTOR(config, "upd765:0", aleste_floppies, "35dd", amstrad_state::aleste_floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765:1", aleste_floppies, "35dd", amstrad_state::aleste_floppy_formats);
 
-	MCFG_DEVICE_REMOVE("flop_list")
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "aleste")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("cpc_list", "cpc_flop")
+	SOFTWARE_LIST(config.replace(), "flop_list").set_original("aleste");
+	SOFTWARE_LIST(config, "cpc_list").set_compatible("cpc_flop");
 
 	/* internal ram */
 	m_ram->set_default_size("2M");

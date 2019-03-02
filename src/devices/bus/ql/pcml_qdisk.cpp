@@ -69,7 +69,7 @@ void pcml_q_disk_interface_device::device_start()
 //  read -
 //-------------------------------------------------
 
-uint8_t pcml_q_disk_interface_device::read(address_space &space, offs_t offset, uint8_t data)
+uint8_t pcml_q_disk_interface_device::read(offs_t offset, uint8_t data)
 {
 	return data;
 }
@@ -79,6 +79,6 @@ uint8_t pcml_q_disk_interface_device::read(address_space &space, offs_t offset, 
 //  write -
 //-------------------------------------------------
 
-void pcml_q_disk_interface_device::write(address_space &space, offs_t offset, uint8_t data)
+void pcml_q_disk_interface_device::write(offs_t offset, uint8_t data)
 {
 }

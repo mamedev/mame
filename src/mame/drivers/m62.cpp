@@ -965,22 +965,23 @@ void m62_state::machine_reset()
 	m_bankcontrol[1] = 0;
 }
 
-MACHINE_CONFIG_START(m62_state::ldrun)
+void m62_state::ldrun(machine_config &config)
+{
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 24000000/6)
-	MCFG_DEVICE_PROGRAM_MAP(ldrun_map)
-	MCFG_DEVICE_IO_MAP(kungfum_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", m62_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 24000000/6);
+	m_maincpu->set_addrmap(AS_PROGRAM, &m62_state::ldrun_map);
+	m_maincpu->set_addrmap(AS_IO, &m62_state::kungfum_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(m62_state::irq0_line_hold));
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(55)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1790) /* frames per second and vblank duration from the Lode Runner manual */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA((64*8-384)/2, 64*8-(64*8-384)/2-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(m62_state, screen_update_ldrun)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(55);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(1790) /* frames per second and vblank duration from the Lode Runner manual */);
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea((64*8-384)/2, 64*8-(64*8-384)/2-1, 0*8, 32*8-1);
+	screen.set_screen_update(FUNC(m62_state::screen_update_ldrun));
 
 	GFXDECODE(config, m_spr_decode, m_spr_palette, gfx_m62_sprites);
 	GFXDECODE(config, m_chr_decode, m_chr_palette, gfx_m62_tiles);
@@ -990,103 +991,98 @@ MACHINE_CONFIG_START(m62_state::ldrun)
 
 	/* sound hardware */
 	//m62_audio(config);
-	MCFG_DEVICE_ADD("irem_audio", IREM_M62_AUDIO, 0)
+	IREM_M62_AUDIO(config, m_audio, 0);
 
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(m62_state::kungfum)
+void m62_state::kungfum(machine_config &config)
+{
 	ldrun(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(18432000/6)
-	MCFG_DEVICE_PROGRAM_MAP(kungfum_map)
-	MCFG_DEVICE_IO_MAP(kungfum_io_map)
+	m_maincpu->set_clock(18432000/6);
+	m_maincpu->set_addrmap(AS_PROGRAM, &m62_state::kungfum_map);
+	m_maincpu->set_addrmap(AS_IO, &m62_state::kungfum_io_map);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(m62_state, screen_update_kungfum)
+	subdevice<screen_device>("screen")->set_visarea((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1);
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(m62_state::screen_update_kungfum));
 
 	MCFG_VIDEO_START_OVERRIDE(m62_state,kungfum)
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(m62_state::battroad)
+void m62_state::battroad(machine_config &config)
+{
 	ldrun(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(18432000/6)
-	MCFG_DEVICE_PROGRAM_MAP(battroad_map)
-	MCFG_DEVICE_IO_MAP(battroad_io_map)
+	m_maincpu->set_clock(18432000/6);
+	m_maincpu->set_addrmap(AS_PROGRAM, &m62_state::battroad_map);
+	m_maincpu->set_addrmap(AS_IO, &m62_state::battroad_io_map);
 
 	MCFG_MACHINE_START_OVERRIDE(m62_state,battroad)
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(m62_state, screen_update_battroad)
+	subdevice<screen_device>("screen")->set_visarea((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1);
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(m62_state::screen_update_battroad));
 
 	GFXDECODE(config, m_fg_decode, m_fg_palette, gfx_m62_fg_battroad);
 
 	PALETTE(config, m_fg_palette, FUNC(m62_state::m62_battroad_fg), 32);
 
 	MCFG_VIDEO_START_OVERRIDE(m62_state,battroad)
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(m62_state::ldrun2)
+void m62_state::ldrun2(machine_config &config)
+{
 	ldrun(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(ldrun2_map)
-	MCFG_DEVICE_IO_MAP(ldrun2_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &m62_state::ldrun2_map);
+	m_maincpu->set_addrmap(AS_IO, &m62_state::ldrun2_io_map);
 
 	MCFG_VIDEO_START_OVERRIDE(m62_state,ldrun2)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(m62_state, screen_update_ldrun)
-MACHINE_CONFIG_END
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(m62_state::screen_update_ldrun));
+}
 
 
-MACHINE_CONFIG_START(m62_state::ldrun3)
+void m62_state::ldrun3(machine_config &config)
+{
 	ldrun(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(ldrun3_map)
-	MCFG_DEVICE_IO_MAP(ldrun3_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &m62_state::ldrun3_map);
+	m_maincpu->set_addrmap(AS_IO, &m62_state::ldrun3_io_map);
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(m62_state,ldrun2)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(m62_state, screen_update_ldrun3)
-MACHINE_CONFIG_END
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(m62_state::screen_update_ldrun3));
+}
 
 
-MACHINE_CONFIG_START(m62_state::ldrun4)
+void m62_state::ldrun4(machine_config &config)
+{
 	ldrun(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(ldrun4_map)
-	MCFG_DEVICE_IO_MAP(ldrun4_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &m62_state::ldrun4_map);
+	m_maincpu->set_addrmap(AS_IO, &m62_state::ldrun4_io_map);
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(m62_state,ldrun4)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(m62_state, screen_update_ldrun4)
-MACHINE_CONFIG_END
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(m62_state::screen_update_ldrun4));
+}
 
 
-MACHINE_CONFIG_START(m62_state::lotlot)
+void m62_state::lotlot(machine_config &config)
+{
 	ldrun(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(lotlot_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &m62_state::lotlot_map);
 
 	/* video hardware */
 	GFXDECODE(config, m_fg_decode, m_fg_palette, gfx_m62_fg_lotlot);
@@ -1096,50 +1092,47 @@ MACHINE_CONFIG_START(m62_state::lotlot)
 
 
 	MCFG_VIDEO_START_OVERRIDE(m62_state,lotlot)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(m62_state, screen_update_lotlot)
-MACHINE_CONFIG_END
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(m62_state::screen_update_lotlot));
+}
 
 
-MACHINE_CONFIG_START(m62_state::kidniki)
+void m62_state::kidniki(machine_config &config)
+{
 	ldrun(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(kidniki_map)
-	MCFG_DEVICE_IO_MAP(kidniki_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &m62_state::kidniki_map);
+	m_maincpu->set_addrmap(AS_IO, &m62_state::kidniki_io_map);
 
 	/* video hardware */
 	GFXDECODE(config, m_fg_decode, m_chr_palette, gfx_m62_fg_kidniki);
 
 	MCFG_VIDEO_START_OVERRIDE(m62_state,kidniki)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(m62_state, screen_update_kidniki)
-MACHINE_CONFIG_END
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(m62_state::screen_update_kidniki));
+}
 
 
-MACHINE_CONFIG_START(m62_state::spelunkr)
+void m62_state::spelunkr(machine_config &config)
+{
 	ldrun(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(spelunkr_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &m62_state::spelunkr_map);
 
 	/* video hardware */
 	GFXDECODE(config, m_fg_decode, m_chr_palette, gfx_m62_fg_spelunkr);
 
 	MCFG_VIDEO_START_OVERRIDE(m62_state,spelunkr)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(m62_state, screen_update_spelunkr)
-MACHINE_CONFIG_END
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(m62_state::screen_update_spelunkr));
+}
 
 
-MACHINE_CONFIG_START(m62_state::spelunk2)
+void m62_state::spelunk2(machine_config &config)
+{
 	ldrun(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(spelunk2_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &m62_state::spelunk2_map);
 
 	/* video hardware */
 	m_chr_decode->set_info(gfx_m62_tiles_spelunk2);
@@ -1149,46 +1142,43 @@ MACHINE_CONFIG_START(m62_state::spelunk2)
 	m_chr_palette->set_init(FUNC(m62_state::spelunk2_palette));
 
 	MCFG_VIDEO_START_OVERRIDE(m62_state,spelunk2)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(m62_state, screen_update_spelunk2)
-MACHINE_CONFIG_END
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(m62_state::screen_update_spelunk2));
+}
 
 
-MACHINE_CONFIG_START(m62_state::youjyudn)
+void m62_state::youjyudn(machine_config &config)
+{
 	ldrun(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(18432000/6)
-	MCFG_DEVICE_PROGRAM_MAP(youjyudn_map)
-	MCFG_DEVICE_IO_MAP(youjyudn_io_map)
+	m_maincpu->set_clock(18432000/6);
+	m_maincpu->set_addrmap(AS_PROGRAM, &m62_state::youjyudn_map);
+	m_maincpu->set_addrmap(AS_IO, &m62_state::youjyudn_io_map);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(m62_state, screen_update_youjyudn)
+	subdevice<screen_device>("screen")->set_visarea((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1);
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(m62_state::screen_update_youjyudn));
 
 	m_chr_decode->set_info(gfx_m62_tiles_youjyudn);
 	GFXDECODE(config, m_fg_decode, m_chr_palette, gfx_m62_fg_youjyudn);
 
 	MCFG_VIDEO_START_OVERRIDE(m62_state,youjyudn)
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(m62_state::horizon)
+void m62_state::horizon(machine_config &config)
+{
 	ldrun(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(horizon_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &m62_state::horizon_map);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(m62_state, screen_update_horizon)
+	subdevice<screen_device>("screen")->set_visarea((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1);
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(m62_state::screen_update_horizon));
 
 	MCFG_VIDEO_START_OVERRIDE(m62_state,horizon)
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

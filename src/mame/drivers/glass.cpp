@@ -243,7 +243,7 @@ MACHINE_CONFIG_START(glass_state::glass)
 	MCFG_SCREEN_UPDATE_DRIVER(glass_state, screen_update)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_glass)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_glass);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
 
 	/* sound hardware */

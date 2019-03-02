@@ -16,10 +16,13 @@ public:
 	vsmile_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(bank0_r) override { return m_rom[0x000000 + offset]; }
-	virtual DECLARE_READ16_MEMBER(bank1_r) override { return m_rom[0x100000 + offset]; }
-	virtual DECLARE_READ16_MEMBER(bank2_r) override { return m_rom[0x200000 + offset]; }
-	virtual DECLARE_READ16_MEMBER(bank3_r) override { return m_rom[0x300000 + offset]; }
+	virtual DECLARE_READ16_MEMBER(bank0_r) override { return m_rom[m_bank_offset + 0x000000 + offset]; }
+	virtual DECLARE_READ16_MEMBER(bank1_r) override { return m_rom[m_bank_offset + 0x100000 + offset]; }
+	virtual DECLARE_READ16_MEMBER(bank2_r) override { return m_rom[m_bank_offset + 0x200000 + offset]; }
+	virtual DECLARE_READ16_MEMBER(bank3_r) override { return m_rom[m_bank_offset + 0x300000 + offset]; }
+
+	// banking
+	virtual void set_cs2(bool cs2) override;
 
 protected:
 	vsmile_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -27,6 +30,8 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	uint32_t m_bank_offset;
 };
 
 

@@ -50,7 +50,6 @@ public:
 		, m_scsi_data_out(*this, "scsi_data_out")
 		, m_scsi_data_in(*this, "scsi_data_in")
 		, m_ram(*this, "ram")
-		, m_req_hack(nullptr)
 	{ }
 
 	void pcx(machine_config &config);
@@ -93,7 +92,6 @@ private:
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	required_device<i80186_cpu_device> m_maincpu;
 	required_device<pic8259_device> m_pic1;
@@ -108,7 +106,6 @@ private:
 	required_device<ram_device> m_ram;
 	uint8_t m_stat, m_led;
 	int m_msg, m_bsy, m_io, m_cd, m_req, m_rst;
-	emu_timer *m_req_hack;
 	uint16_t m_dskctl;
 	struct {
 		uint16_t ctl;
@@ -125,16 +122,8 @@ private:
 //  MACHINE EMULATION
 //**************************************************************************
 
-void pcd_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	// TODO: remove this hack
-	if(m_req)
-		m_maincpu->drq0_w(1);
-}
-
 void pcd_state::machine_start()
 {
-	m_req_hack = timer_alloc();
 	save_item(NAME(m_mmu.ctl));
 	save_item(NAME(m_mmu.regs));
 }
@@ -377,7 +366,6 @@ WRITE_LINE_MEMBER(pcd_state::write_scsi_req)
 		if(!m_cd)
 		{
 			m_maincpu->drq0_w(1);
-			m_req_hack->adjust(attotime::from_msec(10)); // poke the dmac
 		}
 		else if(m_msg)
 		{
@@ -387,8 +375,6 @@ WRITE_LINE_MEMBER(pcd_state::write_scsi_req)
 	}
 	else
 	{
-		if(m_req_hack) // this might be called before machine_start
-			m_req_hack->adjust(attotime::never);
 		m_scsi->write_ack(0);
 	}
 	check_scsi_irq();
@@ -595,6 +581,8 @@ void pcd_state::pcx(machine_config &config)
 	subdevice<pcd_keyboard_device>("keyboard")->out_tx_handler().set("video", FUNC(pcx_video_device::rx_w));
 
 	m_usart[1]->txd_handler().set_nop();
+
+	SOFTWARE_LIST(config, "flop_ls").set_original("pcx_flop");
 }
 
 //**************************************************************************

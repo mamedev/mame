@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="fidel_sc6" description="Fidelity SC6 Modules">
+
+<!-- Sensory Chess Challenger 6 -->
+
+	<software name="sc6">
+		<description>SC6: original program</description>
+		<year>1982</year>
+		<publisher>Fidelity Electronics</publisher>
+		<part name="cart" interface="fidel_sc6">
+			<dataarea name="rom" size="0x1000">
+				<rom name="101-1035a01" size="0x1000" crc="0024971f" sha1="76b16364913ada2fb94b9e6a8524b924e6832ddf" offset="0x0000" /> <!-- 2332 -->
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

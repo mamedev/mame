@@ -140,7 +140,7 @@ INPUT_PORTS_END
 void myvision_state::machine_start()
 {
 	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x5fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x5fff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 
 	save_item(NAME(m_column));
 }
@@ -216,9 +216,9 @@ WRITE8_MEMBER( myvision_state::ay_port_b_w )
 
 MACHINE_CONFIG_START(myvision_state::myvision)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(10'738'635)/3)  /* Not verified */
-	MCFG_DEVICE_PROGRAM_MAP(myvision_mem)
-	MCFG_DEVICE_IO_MAP(myvision_io)
+	Z80(config, m_maincpu, XTAL(10'738'635)/3);  /* Not verified */
+	m_maincpu->set_addrmap(AS_PROGRAM, &myvision_state::myvision_mem);
+	m_maincpu->set_addrmap(AS_IO, &myvision_state::myvision_io);
 
 	/* video hardware */
 	tms9918a_device &vdp(TMS9918A(config, "tms9918", XTAL(10'738'635)));  /* Exact model not verified */
@@ -242,7 +242,7 @@ MACHINE_CONFIG_START(myvision_state::myvision)
 	//MCFG_GENERIC_MANDATORY
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","myvision")
+	SOFTWARE_LIST(config, "cart_list").set_original("myvision");
 MACHINE_CONFIG_END
 
 /* ROM definition */

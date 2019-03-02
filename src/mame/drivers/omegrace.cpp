@@ -513,26 +513,26 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(omegrace_state::omegrace)
-
+void omegrace_state::omegrace(machine_config &config)
+{
 	/* basic machine hardware */
 
 	/* main CPU */
 	/* XTAL101 Crystal @ 12mhz */
 	/* through 74LS161, Pin 13 = divide by 4 */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/4)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_IO_MAP(port_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(omegrace_state, irq0_line_hold, 250)
+	Z80(config, m_maincpu, XTAL(12'000'000)/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &omegrace_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &omegrace_state::port_map);
+	m_maincpu->set_periodic_int(FUNC(omegrace_state::irq0_line_hold), attotime::from_hz(250));
 
 	/* audio CPU */
 	/* XTAL101 Crystal @ 12mhz */
 	/* through 74LS161, Pin 12 = divide by 8 */
 	/* Fed to CPU as 1.5mhz though line J4-D */
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(12'000'000)/8)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(sound_port)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(omegrace_state, nmi_line_pulse, 250)
+	Z80(config, m_audiocpu, XTAL(12'000'000)/8);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &omegrace_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &omegrace_state::sound_port);
+	m_audiocpu->set_periodic_int(FUNC(omegrace_state::nmi_line_pulse), attotime::from_hz(250));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -540,11 +540,11 @@ MACHINE_CONFIG_START(omegrace_state::omegrace)
 
 	/* video hardware */
 	VECTOR(config, "vector", 0);
-	MCFG_SCREEN_ADD("screen", VECTOR)
-	MCFG_SCREEN_REFRESH_RATE(40)
-	MCFG_SCREEN_SIZE(400, 300)
-	MCFG_SCREEN_VISIBLE_AREA(522, 1566, 522, 1566)
-	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_VECTOR));
+	screen.set_refresh_hz(40);
+	screen.set_size(400, 300);
+	screen.set_visarea(522, 1566, 522, 1566);
+	screen.set_screen_update("vector", FUNC(vector_device::screen_update));
 
 	DVG(config, m_dvg, 0);
 	m_dvg->set_vector_tag("vector");
@@ -559,7 +559,7 @@ MACHINE_CONFIG_START(omegrace_state::omegrace)
 	AY8912(config, "ay1", XTAL(12'000'000)/12).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	AY8912(config, "ay2", XTAL(12'000'000)/12).add_route(ALL_OUTPUTS, "mono", 0.25);
-MACHINE_CONFIG_END
+}
 
 
 

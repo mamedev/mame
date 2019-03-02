@@ -1238,36 +1238,42 @@ WRITE_LINE_MEMBER(msx2_state::turbo_w)
 #define MSX_VISIBLE_YBORDER_PIXELS  24
 
 
-MACHINE_CONFIG_START(msx_state::msx1_cartlist)
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "msx1_cart")
-MACHINE_CONFIG_END
+void msx_state::msx1_cartlist(machine_config &config)
+{
+	SOFTWARE_LIST(config, "cart_list").set_original("msx1_cart");
+}
 
-MACHINE_CONFIG_START(msx_state::msx1_floplist)
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "msx1_flop")
-MACHINE_CONFIG_END
+void msx_state::msx1_floplist(machine_config &config)
+{
+	SOFTWARE_LIST(config, "flop_list").set_original("msx1_flop");
+}
 
-MACHINE_CONFIG_START(msx2_state::msx2_cartlist)
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "msx2_cart")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("msx1_crt_l", "msx1_cart")
-MACHINE_CONFIG_END
+void msx2_state::msx2_cartlist(machine_config &config)
+{
+	SOFTWARE_LIST(config, "cart_list").set_original("msx2_cart");
+	SOFTWARE_LIST(config, "msx1_crt_l").set_compatible("msx1_cart");
+}
 
-MACHINE_CONFIG_START(msx2_state::msx2_floplist)
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "msx2_flop")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("msx1_flp_l", "msx1_flop")
-MACHINE_CONFIG_END
+void msx2_state::msx2_floplist(machine_config &config)
+{
+	SOFTWARE_LIST(config, "flop_list").set_original("msx2_flop");
+	SOFTWARE_LIST(config, "msx1_flp_l").set_compatible("msx1_flop");
+}
 
-MACHINE_CONFIG_START(msx2_state::msx2p_floplist)
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "msx2p_flop")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("msx2_flp_l", "msx2_flop")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("msx1_flp_l", "msx1_flop")    // maybe not?
-MACHINE_CONFIG_END
+void msx2_state::msx2p_floplist(machine_config &config)
+{
+	SOFTWARE_LIST(config, "flop_list").set_original("msx2p_flop");
+	SOFTWARE_LIST(config, "msx2_flp_l").set_compatible("msx2_flop");
+	SOFTWARE_LIST(config, "msx1_flp_l").set_compatible("msx1_flop");    // maybe not?
+}
 
-MACHINE_CONFIG_START(msx2_state::msxr_floplist)
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "msxr_flop")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("msx2p_flp_l", "msx2p_flop")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("msx2_flp_l", "msx2_flop")    // maybe not?
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("msx1_flp_l", "msx1_flop")    // maybe not?
-MACHINE_CONFIG_END
+void msx2_state::msxr_floplist(machine_config &config)
+{
+	SOFTWARE_LIST(config, "flop_list").set_original("msxr_flop");
+	SOFTWARE_LIST(config, "msx2p_flp_l").set_compatible("msx2p_flop");
+	SOFTWARE_LIST(config, "msx2_flp_l").set_compatible("msx2_flop");    // maybe not?
+	SOFTWARE_LIST(config, "msx1_flp_l").set_compatible("msx1_flop");    // maybe not?
+}
 
 FLOPPY_FORMATS_MEMBER( msx_state::floppy_formats )
 	FLOPPY_MSX_FORMAT,
@@ -1320,36 +1326,40 @@ void msx_state::msx_microsol(machine_config &config)
 	fdc.set_force_ready(true);
 }
 
-MACHINE_CONFIG_START(msx_state::msx_1_35_ssdd_drive)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", msx_floppies, "35ssdd", msx_state::floppy_formats)
-MACHINE_CONFIG_END
+void msx_state::msx_1_35_ssdd_drive(machine_config &config)
+{
+	FLOPPY_CONNECTOR(config, "fdc:0", msx_floppies, "35ssdd", msx_state::floppy_formats);
+}
 
-MACHINE_CONFIG_START(msx_state::msx_1_35_dd_drive)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", msx_floppies, "35dd", msx_state::floppy_formats)
-MACHINE_CONFIG_END
+void msx_state::msx_1_35_dd_drive(machine_config &config)
+{
+	FLOPPY_CONNECTOR(config, "fdc:0", msx_floppies, "35dd", msx_state::floppy_formats);
+}
 
-MACHINE_CONFIG_START(msx_state::msx_2_35_dd_drive)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", msx_floppies, "35dd", msx_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", msx_floppies, "35dd", msx_state::floppy_formats)
-MACHINE_CONFIG_END
+void msx_state::msx_2_35_dd_drive(machine_config &config)
+{
+	FLOPPY_CONNECTOR(config, "fdc:0", msx_floppies, "35dd", msx_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", msx_floppies, "35dd", msx_state::floppy_formats);
+}
 
-MACHINE_CONFIG_START(msx2_state::msx_ym2413)
-	MCFG_DEVICE_ADD("ym2413", YM2413, 21.477272_MHz_XTAL / 6)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4)
-MACHINE_CONFIG_END
+void msx2_state::msx_ym2413(machine_config &config)
+{
+	YM2413(config, "ym2413", 21.477272_MHz_XTAL / 6).add_route(ALL_OUTPUTS, "speaker", 0.4);
+}
 
-MACHINE_CONFIG_START(msx2_state::msx2_64kb_vram)
-	MCFG_DEVICE_MODIFY("v9938")
-	downcast<v99x8_device &>(*device).set_vram_size(0x10000);
-MACHINE_CONFIG_END
+void msx2_state::msx2_64kb_vram(machine_config &config)
+{
+	m_v9938->set_vram_size(0x10000);
+}
 
-MACHINE_CONFIG_START(msx_state::msx)
+void msx_state::msx(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 10.738635_MHz_XTAL / 3)         /* 3.579545 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(msx_memory_map)
-	MCFG_DEVICE_IO_MAP(msx_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", msx_state,  msx_interrupt) /* Needed for mouse updates */
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	Z80(config, m_maincpu, 10.738635_MHz_XTAL / 3);         /* 3.579545 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &msx_state::msx_memory_map);
+	m_maincpu->set_addrmap(AS_IO, &msx_state::msx_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(msx_state::msx_interrupt)); /* Needed for mouse updates */
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline("maincpu", INPUT_LINE_IRQ0);
 
@@ -1360,9 +1370,9 @@ MACHINE_CONFIG_START(msx_state::msx)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.1);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
 	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "speaker", 0.25);
 	AY8910(config, m_ay8910, 10.738635_MHz_XTAL / 3 / 2);
@@ -1374,14 +1384,15 @@ MACHINE_CONFIG_START(msx_state::msx)
 	m_ay8910->add_route(ALL_OUTPUTS, "speaker", 0.3);
 
 	/* printer */
-	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit1))
+	centronics_device &centronics(CENTRONICS(config, "centronics", centronics_devices, "printer"));
+	centronics.busy_handler().set("cent_status_in", FUNC(input_buffer_device::write_bit1));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
-	MCFG_DEVICE_ADD("cent_status_in", INPUT_BUFFER, 0)
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	centronics.set_output_latch(cent_data_out);
+	INPUT_BUFFER(config, "cent_status_in");
 
-	MCFG_DEVICE_ADD("cent_ctrl_out", OUTPUT_LATCH, 0)
-	MCFG_OUTPUT_LATCH_BIT1_HANDLER(WRITELINE("centronics", centronics_device, write_strobe))
+	output_latch_device &cent_ctrl_out(OUTPUT_LATCH(config, "cent_ctrl_out"));
+	cent_ctrl_out.bit_handler<1>().set(centronics, FUNC(centronics_device::write_strobe));
 
 	/* cassette */
 	CASSETTE(config, m_cassette);
@@ -1390,8 +1401,8 @@ MACHINE_CONFIG_START(msx_state::msx)
 	m_cassette->set_interface("msx_cass");
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cass_list","msx1_cass")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cass_list").set_original("msx1_cass");
+}
 
 
 template<typename VDPType>
@@ -1407,12 +1418,13 @@ void msx_state::msx1(VDPType &vdp_type, machine_config &config)
 }
 
 
-MACHINE_CONFIG_START(msx2_state::msx2)
+void msx2_state::msx2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 21.477272_MHz_XTAL / 6)       /* 3.579545 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(msx_memory_map)
-	MCFG_DEVICE_IO_MAP(msx2_io_map)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	Z80(config, m_maincpu, 21.477272_MHz_XTAL / 6);       /* 3.579545 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &msx2_state::msx_memory_map);
+	m_maincpu->set_addrmap(AS_IO, &msx2_state::msx2_io_map);
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline("maincpu", INPUT_LINE_IRQ0);
 
@@ -1430,9 +1442,9 @@ MACHINE_CONFIG_START(msx2_state::msx2)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.1);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
 	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "speaker", 0.25);
 	AY8910(config, m_ay8910, 21.477272_MHz_XTAL / 6 / 2);
@@ -1444,14 +1456,15 @@ MACHINE_CONFIG_START(msx2_state::msx2)
 	m_ay8910->add_route(ALL_OUTPUTS, "speaker", 0.3);
 
 	/* printer */
-	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit1))
+	centronics_device &centronics(CENTRONICS(config, "centronics", centronics_devices, "printer"));
+	centronics.busy_handler().set("cent_status_in", FUNC(input_buffer_device::write_bit1));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
-	MCFG_DEVICE_ADD("cent_status_in", INPUT_BUFFER, 0)
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	centronics.set_output_latch(cent_data_out);
+	INPUT_BUFFER(config, "cent_status_in");
 
-	MCFG_DEVICE_ADD("cent_ctrl_out", OUTPUT_LATCH, 0)
-	MCFG_OUTPUT_LATCH_BIT1_HANDLER(WRITELINE("centronics", centronics_device, write_strobe))
+	output_latch_device &cent_ctrl_out(OUTPUT_LATCH(config, "cent_ctrl_out"));
+	cent_ctrl_out.bit_handler<1>().set(centronics, FUNC(centronics_device::write_strobe));
 
 	/* cassette */
 	CASSETTE(config, m_cassette);
@@ -1463,17 +1476,18 @@ MACHINE_CONFIG_START(msx2_state::msx2)
 	RP5C01(config, m_rtc, 32.768_kHz_XTAL);
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "msx2_cass")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("msx1_cas_l", "msx1_cass")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cass_list").set_original("msx2_cass");
+	SOFTWARE_LIST(config, "msx1_cas_l").set_compatible("msx1_cass");
+}
 
 
-MACHINE_CONFIG_START(msx2_state::msx2p)
+void msx2_state::msx2p(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 21.477272_MHz_XTAL / 6)       /* 3.579545 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(msx_memory_map)
-	MCFG_DEVICE_IO_MAP(msx2p_io_map)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	Z80(config, m_maincpu, 21.477272_MHz_XTAL / 6);       /* 3.579545 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &msx2_state::msx_memory_map);
+	m_maincpu->set_addrmap(AS_IO, &msx2_state::msx2p_io_map);
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline("maincpu", INPUT_LINE_IRQ0);
 
@@ -1491,9 +1505,9 @@ MACHINE_CONFIG_START(msx2_state::msx2p)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.1);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
 	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "speaker", 0.25);
 	AY8910(config, m_ay8910, 21.477272_MHz_XTAL / 6 / 2);
@@ -1505,14 +1519,15 @@ MACHINE_CONFIG_START(msx2_state::msx2p)
 	m_ay8910->add_route(ALL_OUTPUTS, "speaker", 0.3);
 
 	/* printer */
-	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit1))
+	centronics_device &centronics(CENTRONICS(config, "centronics", centronics_devices, "printer"));
+	centronics.busy_handler().set("cent_status_in", FUNC(input_buffer_device::write_bit1));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
-	MCFG_DEVICE_ADD("cent_status_in", INPUT_BUFFER, 0)
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	centronics.set_output_latch(cent_data_out);
+	INPUT_BUFFER(config, "cent_status_in");
 
-	MCFG_DEVICE_ADD("cent_ctrl_out", OUTPUT_LATCH, 0)
-	MCFG_OUTPUT_LATCH_BIT1_HANDLER(WRITELINE("centronics", centronics_device, write_strobe))
+	output_latch_device &cent_ctrl_out(OUTPUT_LATCH(config, "cent_ctrl_out"));
+	cent_ctrl_out.bit_handler<1>().set(centronics, FUNC(centronics_device::write_strobe));
 
 	/* cassette */
 	CASSETTE(config, m_cassette);
@@ -1524,9 +1539,9 @@ MACHINE_CONFIG_START(msx2_state::msx2p)
 	RP5C01(config, m_rtc, 32.768_kHz_XTAL);
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "msx2_cass")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("msx1_cas_l", "msx1_cass")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cass_list").set_original("msx2_cass");
+	SOFTWARE_LIST(config, "msx1_cas_l").set_compatible("msx1_cass");
+	}
 
 
 void msx2_state::msx2_pal(machine_config &config)

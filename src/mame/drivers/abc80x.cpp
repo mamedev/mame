@@ -1097,24 +1097,23 @@ MACHINE_CONFIG_START(abc800_state::common)
 	rs232b.dcd_handler().set(m_sio, FUNC(z80sio_device::dcda_w));
 	rs232b.cts_handler().set(m_sio, FUNC(z80sio_device::ctsa_w));
 
-	MCFG_ABC_KEYBOARD_PORT_ADD(ABC_KEYBOARD_PORT_TAG, nullptr)
-	MCFG_ABC_KEYBOARD_OUT_RX_HANDLER(WRITELINE(m_dart, z80dart_device, rxb_w))
-	MCFG_ABC_KEYBOARD_OUT_TRXC_HANDLER(WRITELINE(m_dart, z80dart_device, rxtxcb_w))
-	MCFG_ABC_KEYBOARD_OUT_KEYDOWN_HANDLER(WRITELINE(m_dart, z80dart_device, dcdb_w))
+	abc_keyboard_port_device &kb(ABC_KEYBOARD_PORT(config, ABC_KEYBOARD_PORT_TAG, abc_keyboard_devices, nullptr));
+	kb.out_rx_handler().set(m_dart, FUNC(z80dart_device::rxb_w));
+	kb.out_trxc_handler().set(m_dart, FUNC(z80dart_device::rxtxcb_w));
+	kb.out_keydown_handler().set(m_dart, FUNC(z80dart_device::dcdb_w));
 
 	ABCBUS_SLOT(config, ABCBUS_TAG, ABC800_X01/2/2, abcbus_cards, nullptr);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(DISCRETE_TAG, DISCRETE, abc800_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	DISCRETE(config, m_discrete, abc800_discrete).add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "abc800")
-	MCFG_SOFTWARE_LIST_ADD("hdd_list", "abc800_hdd")
+	SOFTWARE_LIST(config, "flop_list").set_original("abc800");
+	SOFTWARE_LIST(config, "hdd_list").set_original("abc800_hdd");
 
 	// quickload
-	MCFG_QUICKLOAD_ADD("quickload", abc800_state, bac, "bac", 2)
+	MCFG_QUICKLOAD_ADD("quickload", abc800_state, bac, "bac", attotime::from_seconds(2))
 MACHINE_CONFIG_END
 
 
@@ -1230,7 +1229,7 @@ MACHINE_CONFIG_START(abc806_state::abc806)
 	RAM(config, RAM_TAG).set_default_size("160K").set_extra_options("544K");
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("flop_list2", "abc806")
+	SOFTWARE_LIST(config, "flop_list2").set_original("abc806");
 MACHINE_CONFIG_END
 
 

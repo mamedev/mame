@@ -271,7 +271,8 @@ void mos6551_device::update_divider()
 
 uint8_t mos6551_device::read_rdr()
 {
-	m_status &= ~(SR_PARITY_ERROR | SR_FRAMING_ERROR | SR_OVERRUN | SR_RDRF);
+	if (!machine().side_effects_disabled())
+		m_status &= ~(SR_PARITY_ERROR | SR_FRAMING_ERROR | SR_OVERRUN | SR_RDRF);
 	return m_rdr;
 }
 
@@ -279,15 +280,18 @@ uint8_t mos6551_device::read_status()
 {
 	uint8_t status = m_status;
 
-	if (m_cts)
+	if (!machine().side_effects_disabled())
 	{
-		status &= ~SR_TDRE;
-	}
+		if (m_cts)
+		{
+			status &= ~SR_TDRE;
+		}
 
-	if (m_irq_state != 0)
-	{
-		m_irq_state = 0;
-		update_irq();
+		if (m_irq_state != 0)
+		{
+			m_irq_state = 0;
+			update_irq();
+		}
 	}
 
 	return status;
@@ -375,11 +379,8 @@ void mos6551_device::write_command(uint8_t data)
 	update_divider();
 }
 
-READ8_MEMBER( mos6551_device::read )
+uint8_t mos6551_device::read(offs_t offset)
 {
-	if (machine().side_effects_disabled())
-		return 0xff;
-
 	switch (offset & 0x03)
 	{
 	case 0:
@@ -397,7 +398,7 @@ READ8_MEMBER( mos6551_device::read )
 	}
 }
 
-WRITE8_MEMBER( mos6551_device::write )
+void mos6551_device::write(offs_t offset, uint8_t data)
 {
 	switch (offset & 0x03)
 	{

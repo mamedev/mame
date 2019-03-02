@@ -108,7 +108,7 @@ READ8_MEMBER( bw2_state::read )
 		data = m_ram->pointer()[offset];
 	}
 
-	return m_exp->cd_r(space, offset, data, ram2, ram3, ram4, ram5, ram6);
+	return m_exp->cd_r(offset, data, ram2, ram3, ram4, ram5, ram6);
 }
 
 
@@ -159,7 +159,7 @@ WRITE8_MEMBER( bw2_state::write )
 		m_ram->pointer()[offset] = data;
 	}
 
-	m_exp->cd_w(space, offset, data, ram2, ram3, ram4, ram5, ram6);
+	m_exp->cd_w(offset, data, ram2, ram3, ram4, ram5, ram6);
 }
 
 
@@ -542,19 +542,21 @@ void bw2_state::machine_start()
 //  MACHINE_CONFIG( bw2 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(bw2_state::bw2)
+void bw2_state::bw2(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, 16_MHz_XTAL / 4)
-	MCFG_DEVICE_PROGRAM_MAP(bw2_mem)
-	MCFG_DEVICE_IO_MAP(bw2_io)
+	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bw2_state::bw2_mem);
+	m_maincpu->set_addrmap(AS_IO, &bw2_state::bw2_io);
 
 	// video hardware
-	MCFG_SCREEN_ADD(SCREEN_TAG, LCD)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_UPDATE_DEVICE( MSM6255_TAG, msm6255_device, screen_update )
-	MCFG_SCREEN_SIZE(640, 200)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(60);
+	screen.set_screen_update(MSM6255_TAG, FUNC(msm6255_device::screen_update));
+	screen.set_size(640, 200);
+	screen.set_visarea(0, 640-1, 0, 200-1);
+	screen.set_palette("palette");
+
 	PALETTE(config, "palette", FUNC(bw2_state::bw2_palette), 2);
 
 	// devices
@@ -573,14 +575,15 @@ MACHINE_CONFIG_START(bw2_state::bw2)
 	ppi.in_pc_callback().set(FUNC(bw2_state::ppi_pc_r));
 	ppi.out_pc_callback().set(FUNC(bw2_state::ppi_pc_w));
 
-	MCFG_DEVICE_ADD(MSM6255_TAG, MSM6255, 16_MHz_XTAL)
-	MCFG_DEVICE_ADDRESS_MAP(0, lcdc_map)
-	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
+	MSM6255(config, m_lcdc, 16_MHz_XTAL);
+	m_lcdc->set_addrmap(0, &bw2_state::lcdc_map);
+	m_lcdc->set_screen(SCREEN_TAG);
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, bw2_state, write_centronics_busy))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(bw2_state::write_centronics_busy));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+	output_latch_device &latch(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(latch);
 
 	I8251(config, m_uart, 0);
 	m_uart->txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
@@ -595,16 +598,16 @@ MACHINE_CONFIG_START(bw2_state::bw2)
 	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_fdc->drq_wr_callback().set(FUNC(bw2_state::fdc_drq_w));
 
-	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG":0", bw2_floppies, "35dd", bw2_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG":1", bw2_floppies, nullptr,   bw2_state::floppy_formats)
-	MCFG_BW2_EXPANSION_SLOT_ADD(BW2_EXPANSION_SLOT_TAG, 16_MHz_XTAL, bw2_expansion_cards, nullptr)
+	FLOPPY_CONNECTOR(config, WD2797_TAG":0", bw2_floppies, "35dd", bw2_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, WD2797_TAG":1", bw2_floppies, nullptr, bw2_state::floppy_formats);
+	BW2_EXPANSION_SLOT(config, m_exp, 16_MHz_XTAL, bw2_expansion_cards, nullptr);
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("flop_list","bw2")
+	SOFTWARE_LIST(config, "flop_list").set_original("bw2");
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("64K").set_extra_options("96K,128K,160K,192K,224K");
-MACHINE_CONFIG_END
+}
 
 
 

@@ -32,8 +32,8 @@ public:
 	// configuration
 	void set_bank_type(C140_TYPE bank) { m_banking_type = bank; }
 
-	DECLARE_READ8_MEMBER( c140_r );
-	DECLARE_WRITE8_MEMBER( c140_w );
+	u8 c140_r(offs_t offset);
+	void c140_w(offs_t offset, u8 data);
 
 protected:
 	// device-level overrides

@@ -746,13 +746,14 @@ uint32_t by133_state::screen_update_granny(screen_device &screen, bitmap_rgb32 &
 	return 0;
 }
 
-MACHINE_CONFIG_START(by133_state::babypac)
+void by133_state::babypac(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6800, XTAL(3'579'545)/4) // no xtal, just 2 chips
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	M6800(config, m_maincpu, XTAL(3'579'545)/4); // no xtal, just 2 chips
+	m_maincpu->set_addrmap(AS_PROGRAM, &by133_state::main_map);
 
-	MCFG_DEVICE_ADD("videocpu", MC6809, XTAL(3'579'545))
-	MCFG_DEVICE_PROGRAM_MAP(video_map)
+	MC6809(config, m_videocpu, XTAL(3'579'545));
+	m_videocpu->set_addrmap(AS_PROGRAM, &by133_state::video_map);
 
 	M6803(config, m_audiocpu, XTAL(3'579'545));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &by133_state::sound_map);
@@ -802,28 +803,28 @@ MACHINE_CONFIG_START(by133_state::babypac)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", ZN429E, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // U32 (Vidiot) or U6 (Cheap Squeak)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	ZN429E(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // U32 (Vidiot) or U6 (Cheap Squeak)
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	SPEAKER(config, "beee").front_center();
-	MCFG_DEVICE_ADD("beeper", BEEP, 600)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "beee", 0.10)
-MACHINE_CONFIG_END
+	BEEP(config, m_beep, 600).add_route(ALL_OUTPUTS, "beee", 0.10);
+}
 
-MACHINE_CONFIG_START(by133_state::granny)
+void by133_state::granny(machine_config &config)
+{
 	babypac(config);
-	MCFG_DEVICE_REMOVE("videocpu")
-	MCFG_DEVICE_ADD("videocpu", MC6809, XTAL(8'000'000)) // MC68B09P (XTAL value hard to read)
-	MCFG_DEVICE_PROGRAM_MAP(granny_map)
+
+	MC6809(config.replace(), m_videocpu, XTAL(8'000'000)); // MC68B09P (XTAL value hard to read)
+	m_videocpu->set_addrmap(AS_PROGRAM, &by133_state::granny_map);
 
 	TMS9928A(config, m_crtc2, XTAL(10'738'635)).set_screen("screen");
 	m_crtc2->set_vram_size(0x4000);
 	m_crtc2->int_callback().set_inputline(m_videocpu, M6809_IRQ_LINE);
 
-	MCFG_DEVICE_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(by133_state, screen_update_granny)
-MACHINE_CONFIG_END
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(by133_state::screen_update_granny));
+}
 
 
 /*-----------------------------------------------------

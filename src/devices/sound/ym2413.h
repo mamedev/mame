@@ -11,10 +11,10 @@ class ym2413_device : public device_t, public device_sound_interface
 public:
 	ym2413_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER( write );
+	void write(offs_t offset, u8 data);
 
-	DECLARE_WRITE8_MEMBER( register_port_w );
-	DECLARE_WRITE8_MEMBER( data_port_w );
+	void register_port_w(u8 data);
+	void data_port_w(u8 data);
 
 protected:
 	// device-level overrides

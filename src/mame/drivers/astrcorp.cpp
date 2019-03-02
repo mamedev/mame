@@ -78,6 +78,23 @@ protected:
 	virtual void video_start() override;
 
 private:
+	struct decryption_info {
+		struct {
+			// Address bits used for bitswap/xor selection
+			u8 bits[3];
+			struct {
+				// 8-8 Bitswap
+				u8 bits[8];
+				// Xor
+				u8 xor_mask;
+			} entries[8];
+		} rom[2];
+		// Global address bitswap (src -> dest, bits 12-8 only)
+		u8 bits[5];
+	};
+
+	static const decryption_info astoneag_table;
+
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
@@ -113,6 +130,8 @@ private:
 	void showhand_map(address_map &map);
 	void skilldrp_map(address_map &map);
 	void speeddrp_map(address_map &map);
+
+	void decrypt_rom(const decryption_info &table);
 };
 
 /***************************************************************************
@@ -1238,155 +1257,93 @@ void astrocorp_state::init_showhanc()
 #endif
 }
 
+void astrocorp_state::decrypt_rom(const decryption_info &table)
+{
+	u32 size = memregion("maincpu")->bytes();
+	u16 *rom = (u16 *)memregion("maincpu")->base();
+	std::unique_ptr<u16[]> tmp = std::make_unique<u16[]>(size/2);
+
+	// Pass 1: decrypt high and low byte independently.  They go
+	// trough a bitswap and an xor, choosing between 8 possibilities
+	// through address bits.
+
+	for(u32 i = 0; i != size; i += 2) {
+		u16 orig = rom[i >> 1];
+		u16 result = 0;
+		for(u32 rb = 0; rb < 2; rb ++) {
+			u8 val = orig >> (rb ? 0 : 8);
+			u32 index =
+				(BIT(i, table.rom[rb].bits[0]) << 2) |
+				(BIT(i, table.rom[rb].bits[1]) << 1) |
+				BIT(i, table.rom[rb].bits[2]);
+			val = bitswap(val,
+						  table.rom[rb].entries[index].bits[0],
+						  table.rom[rb].entries[index].bits[1],
+						  table.rom[rb].entries[index].bits[2],
+						  table.rom[rb].entries[index].bits[3],
+						  table.rom[rb].entries[index].bits[4],
+						  table.rom[rb].entries[index].bits[5],
+						  table.rom[rb].entries[index].bits[6],
+						  table.rom[rb].entries[index].bits[7]);
+			val = val ^ table.rom[rb].entries[index].xor_mask;
+
+			result |= val << (rb ? 0 : 8);
+		}
+		tmp[i >> 1] = result;
+	}
+
+	// Pass 2: copy back the decrypted data following the address
+	// scrambling
+	for(u32 i = 0; i != size; i += 2) {
+		u32 dest =
+			(i & 0xffffe0ff) |
+			(BIT(i, table.bits[0]) << 12) |
+			(BIT(i, table.bits[1]) << 11) |
+			(BIT(i, table.bits[2]) << 10) |
+			(BIT(i, table.bits[3]) <<  9) |
+			(BIT(i, table.bits[4]) <<  8);
+		rom[dest >> 1] = tmp[i >> 1];
+	}
+
+	// There's more stuff happening for addresses < 0x400...
+
+}
+
+const astrocorp_state::decryption_info astrocorp_state::astoneag_table = {
+	{
+		{
+			{ 11, 10, 9 },
+			{
+				{ { 7, 5, 4, 6,  0, 3, 2, 1 }, 0x00 },
+				{ { 1, 4, 6, 0,  2, 5, 3, 7 }, 0xd0 },
+				{ { 1, 7, 4, 3,  6, 5, 0, 2 }, 0x88 },
+				{ { 6, 5, 2, 3,  7, 1, 0, 4 }, 0xd1 },
+				{ { 6, 1, 7, 2,  4, 0, 3, 5 }, 0x64 },
+				{ { 1, 7, 2, 6,  5, 4, 3, 0 }, 0x83 },
+				{ { 6, 7, 4, 2,  5, 0, 1, 3 }, 0x81 },
+				{ { 7, 5, 1, 0,  2, 4, 6, 3 }, 0xea },
+			}
+		},
+		{
+			{ 12, 10, 8 },
+			{
+				{ { 6, 5, 4, 3,  2, 1, 0, 7 }, 0x90 },
+				{ { 2, 4, 0, 7,  5, 6, 3, 1 }, 0x32 },
+				{ { 7, 1, 0, 6,  5, 2, 3, 4 }, 0xa9 },
+				{ { 2, 0, 3, 5,  1, 4, 6, 7 }, 0xa2 },
+				{ { 3, 0, 6, 5,  2, 1, 4, 7 }, 0x02 },
+				{ { 0, 1, 6, 4,  5, 2, 7, 3 }, 0x30 },
+				{ { 3, 5, 2, 7,  6, 1, 4, 0 }, 0x0a },
+				{ { 0, 6, 4, 2,  7, 3, 1, 5 }, 0x81 },
+			}
+		},
+	},
+	{ 12, 9, 11, 8, 10 }
+};
+
 void astrocorp_state::init_astoneag()
 {
-#if 0
-	uint16_t *rom = (uint16_t*)memregion("maincpu")->base();
-	uint16_t x;
-	int i;
-
-	for (i = 0x25100/2; i < 0x25200/2; i++)
-	{
-		x = 0x0000;
-		if (  (i & 0x0001) )                    x |= 0x0200;
-		if (  (i & 0x0004) && !(i & 0x0001) )   x |= 0x0080;
-		if (  (i & 0x0040) ||  (i & 0x0001) )   x |= 0x0040;
-		if (  (i & 0x0010) && !(i & 0x0001) )   x |= 0x0020;
-		if ( !(i & 0x0020) ||  (i & 0x0001) )   x |= 0x0010;
-		if (  (i & 0x0002) ||  (i & 0x0001) )   x |= 0x0008;
-		if (  (i & 0x0008) && !(i & 0x0001) )   x |= 0x0004;
-		if ( !(i & 0x0040) && !(i & 0x0001) )   x |= 0x0002;
-		if (  (i & 0x0040) && !(i & 0x0001) )   x |= 0x0001;
-		rom[i] ^= x;
-	}
-
-/*
-    for (i = 0x25300/2; i < 0x25400/2; i++)
-    {
-        x = 0x1300;
-        rom[i] ^= x;
-    }
-*/
-
-	for (i = 0x25400/2; i < 0x25500/2; i++)
-	{
-		x = 0x4200;
-		if (  (i & 0x0001) )                    x |= 0x0400;
-		if (  (i & 0x0020) && !(i & 0x0001) )   x |= 0x0080;
-		if ( !(i & 0x0010) ||  (i & 0x0001) )   x |= 0x0040;
-		if (  (i & 0x0040) && !(i & 0x0001) )   x |= 0x0020;
-		if ( !(i & 0x0004) ||  (i & 0x0001) )   x |= 0x0010;
-		if ( !(i & 0x0040) && !(i & 0x0001) )   x |= 0x0004;
-		if (  (i & 0x0008) && !(i & 0x0001) )   x |= 0x0002;
-		if (  (i & 0x0002) ||  (i & 0x0001) )   x |= 0x0001;
-		rom[i] ^= x;
-	}
-
-	for (i = 0x25500/2; i < 0x25600/2; i++)
-	{
-		x = 0x4200;
-		if (  (i & 0x0001) )                    x |= 0x0400;
-		if (  (i & 0x0010) && !(i & 0x0001) )   x |= 0x0080;
-		if (  (i & 0x0040) && !(i & 0x0001) )   x |= 0x0040;
-		if ( !(i & 0x0002) && !(i & 0x0001) )   x |= 0x0020;
-		if ( !(i & 0x0040) && !(i & 0x0001) )   x |= 0x0010;
-		if (  (i & 0x0008) && !(i & 0x0001) )   x |= 0x0008;
-		if (  (i & 0x0020) && !(i & 0x0001) )   x |= 0x0004;
-		if (  (i & 0x0004) && !(i & 0x0001) )   x |= 0x0002;
-		if (  (i & 0x0001) )                    x |= 0x0001;
-		rom[i] ^= x;
-	}
-
-/*
-    for (i = 0x25700/2; i < 0x25800/2; i++)
-    {
-        x = 0x6800;
-        if ( !(i & 0x0001) )                    x |= 0x8000;
-
-        if ( !(i & 0x0040) || ((i & 0x0001) || !(i & 0x0001)) )                 x |= 0x0100;
-
-        rom[i] ^= x;
-    }
-*/
-
-	for (i = 0x25800/2; i < 0x25900/2; i++)
-	{
-		x = 0x8300;
-		if (  (i & 0x0040) ||  (i & 0x0001) )   x |= 0x2000;
-		if (  (i & 0x0002) ||  (i & 0x0001) )   x |= 0x0080;
-		if ( !(i & 0x0040) && !(i & 0x0001) )   x |= 0x0040;
-		if (  (i & 0x0020) && !(i & 0x0001) )   x |= 0x0020;
-		if ( !(i & 0x0004) ||  (i & 0x0001) )   x |= 0x0010;
-		if ( !(i & 0x0040) && !(i & 0x0001) )   x |= 0x0008;
-		if (  (i & 0x0010) && !(i & 0x0001) )   x |= 0x0004;
-		if (  (i & 0x0008) && !(i & 0x0001) )   x |= 0x0002;
-		if ( !(i & 0x0040) && !(i & 0x0001) )   x |= 0x0001;
-		rom[i] ^= x;
-	}
-
-//  for (i = 0x25900/2; i < 0x25a00/2; i++)
-
-	for (i = 0x25c00/2; i < 0x25d00/2; i++)
-	{
-		// changed from 25400
-//      x = 0x4200;
-		x = 0x4000;
-//      if (  (i & 0x0001) )                    x |= 0x0400;
-		if (  (i & 0x0020) && !(i & 0x0001) )   x |= 0x0080;
-		if ( !(i & 0x0010) ||  (i & 0x0001) )   x |= 0x0040;
-		if (  (i & 0x0040) && !(i & 0x0001) )   x |= 0x0020;
-		if ( !(i & 0x0004) ||  (i & 0x0001) )   x |= 0x0010;
-		if ( !(i & 0x0040) && !(i & 0x0001) )   x |= 0x0004;
-		if (  (i & 0x0008) && !(i & 0x0001) )   x |= 0x0002;
-		if (  (i & 0x0002) ||  (i & 0x0001) )   x |= 0x0001;
-		rom[i] ^= x;
-	}
-
-/*
-    for (i = 0x25d00/2; i < 0x25e00/2; i++)
-    {
-        x = 0x4000;
-        if ( !(i & 0x0040) )                                    x |= 0x0800;
-
-        if ( !(i & 0x0040) && !(i & 0x0001) )   x |= 0x0100;    // almost!!
-
-        if ( ((i & 0x0040)&&((i & 0x0020)||(i & 0x0010))) || !(i & 0x0001) )    x |= 0x0200;    // almost!!
-        if ( (!(i & 0x0040) || !(i & 0x0008)) && !(i & 0x0001) )    x |= 0x0008;
-        if (  (i & 0x0040) || !(i & 0x0020) ||  (i & 0x0001) )  x |= 0x0001;    // almost!!
-        rom[i] ^= x;
-    }
-*/
-
-/*
-    for (i = 0x25e00/2; i < 0x25f00/2; i++)
-    {
-        x = 0xa600;
-
-        if (  (i & 0x0040) &&  (i & 0x0001) )   x |= 0x4000;
-        if (  (i & 0x0040) &&  (i & 0x0001) )   x |= 0x0800;
-        if ( !(i & 0x0001) )                    x |= 0x0100;
-
-        if ( (  (i & 0x0040) &&  (i & 0x0008) && !(i & 0x0001)) ||
-             ( !(i & 0x0040) && ((i & 0x0004) ^ (i & 0x0002)) && !(i & 0x0001) ) )  x |= 0x0002;    // almost!!
-
-        if ( !(i & 0x0040) || !(i & 0x0002) ||  (i & 0x0001) )  x |= 0x0001;
-        rom[i] ^= x;
-    }
-*/
-
-	for (i = 0x26f00/2; i < 0x27000/2; i++)
-	{
-		x = 0xb94c;
-		rom[i] ^= x;
-	}
-
-	for (i = 0x27000/2; i < 0x27100/2; i++)
-	{
-		x = 0x5f10;
-		rom[i] ^= x;
-	}
-
-#endif
+	decrypt_rom(astoneag_table);
 }
 
 GAME( 2000,  showhand,  0,        showhand, showhand, astrocorp_state, init_showhand, ROT0, "Astro Corp.",        "Show Hand (Italy)",                MACHINE_SUPPORTS_SAVE )

@@ -239,10 +239,10 @@ MACHINE_CONFIG_START(dragon_state::dragon_base)
 	coco_floating(config);
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("dragon_cart_list", "dragon_cart")
-	MCFG_SOFTWARE_LIST_ADD("dragon_cass_list", "dragon_cass")
-	MCFG_SOFTWARE_LIST_ADD("dragon_flop_list", "dragon_flop")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("coco_cart_list", "coco_cart")
+	SOFTWARE_LIST(config, "dragon_cart_list").set_original("dragon_cart");
+	SOFTWARE_LIST(config, "dragon_cass_list").set_original("dragon_cass");
+	SOFTWARE_LIST(config, "dragon_flop_list").set_original("dragon_flop");
+	SOFTWARE_LIST(config, "coco_cart_list").set_compatible("coco_cart");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dragon_state::dragon32)
@@ -257,7 +257,8 @@ MACHINE_CONFIG_START(dragon_state::dragon32)
 	cartslot.halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(dragon64_state::dragon64)
+void dragon64_state::dragon64(machine_config &config)
+{
 	dragon_base(config);
 	// internal ram
 	RAM(config, m_ram).set_default_size("64K");
@@ -273,9 +274,9 @@ MACHINE_CONFIG_START(dragon64_state::dragon64)
 	acia.set_xtal(1.8432_MHz_XTAL);
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("dragon_flex_list", "dragon_flex")
-	MCFG_SOFTWARE_LIST_ADD("dragon_os9_list", "dragon_os9")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "dragon_flex_list").set_original("dragon_flex");
+	SOFTWARE_LIST(config, "dragon_os9_list").set_original("dragon_os9");
+}
 
 MACHINE_CONFIG_START(dragon64_state::dragon64h)
 	dragon64(config);
@@ -311,7 +312,8 @@ MACHINE_CONFIG_START(d64plus_state::d64plus)
 	m_crtc->set_update_row_callback(FUNC(d64plus_state::crtc_update_row), this);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(dragon_alpha_state::dgnalpha)
+void dragon_alpha_state::dgnalpha(machine_config &config)
+{
 	dragon_base(config);
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("64K");
@@ -331,14 +333,10 @@ MACHINE_CONFIG_START(dragon_alpha_state::dgnalpha)
 	m_fdc->intrq_wr_callback().set(FUNC(dragon_alpha_state::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(dragon_alpha_state::fdc_drq_w));
 
-	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":0", dragon_alpha_floppies, "dd", dragon_alpha_state::dragon_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":1", dragon_alpha_floppies, "dd", dragon_alpha_state::dragon_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":2", dragon_alpha_floppies, nullptr, dragon_alpha_state::dragon_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":3", dragon_alpha_floppies, nullptr, dragon_alpha_state::dragon_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, WD2797_TAG ":0", dragon_alpha_floppies, "dd", dragon_alpha_state::dragon_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, WD2797_TAG ":1", dragon_alpha_floppies, "dd", dragon_alpha_state::dragon_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, WD2797_TAG ":2", dragon_alpha_floppies, nullptr, dragon_alpha_state::dragon_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, WD2797_TAG ":3", dragon_alpha_floppies, nullptr, dragon_alpha_state::dragon_formats).enable_sound(true);
 
 	// sound hardware
 	ay8912_device &ay8912(AY8912(config, AY8912_TAG, 1000000));
@@ -353,10 +351,10 @@ MACHINE_CONFIG_START(dragon_alpha_state::dgnalpha)
 	pia2.irqb_handler().set(FUNC(dragon_alpha_state::pia2_firq_b));
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("dgnalpha_flop_list", "dgnalpha_flop")
-	MCFG_SOFTWARE_LIST_ADD("dragon_flex_list", "dragon_flex")
-	MCFG_SOFTWARE_LIST_ADD("dragon_os9_list", "dragon_os9")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "dgnalpha_flop_list").set_original("dgnalpha_flop");
+	SOFTWARE_LIST(config, "dragon_flex_list").set_original("dragon_flex");
+	SOFTWARE_LIST(config, "dragon_os9_list").set_original("dragon_os9");
+}
 
 MACHINE_CONFIG_START(dragon64_state::tanodr64)
 	dragon64(config);

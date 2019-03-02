@@ -61,11 +61,12 @@ void vic1515_device::vic1515_io(address_map &map)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(vic1515_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("maincpu", I8039, XTAL(6'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(vic1515_mem)
-	MCFG_DEVICE_IO_MAP(vic1515_io)
-MACHINE_CONFIG_END
+void vic1515_device::device_add_mconfig(machine_config &config)
+{
+	i8039_device &maincpu(I8039(config, "maincpu", XTAL(6'000'000)));
+	maincpu.set_addrmap(AS_PROGRAM, &vic1515_device::vic1515_mem);
+	maincpu.set_addrmap(AS_IO, &vic1515_device::vic1515_io);
+}
 
 
 //-------------------------------------------------

@@ -229,20 +229,21 @@ static GFXDECODE_START( gfx_lcmate2 )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(lcmate2_state::lcmate2)
+void lcmate2_state::lcmate2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(3'579'545)) // confirmed
-	MCFG_DEVICE_PROGRAM_MAP(lcmate2_mem)
-	MCFG_DEVICE_IO_MAP(lcmate2_io)
+	Z80(config, m_maincpu, XTAL(3'579'545)); // confirmed
+	m_maincpu->set_addrmap(AS_PROGRAM, &lcmate2_state::lcmate2_mem);
+	m_maincpu->set_addrmap(AS_IO, &lcmate2_state::lcmate2_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
-	MCFG_SCREEN_SIZE(120, 18)
-	MCFG_SCREEN_VISIBLE_AREA(0, 120-1, 0, 18-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update("hd44780", FUNC(hd44780_device::screen_update));
+	screen.set_size(120, 18);
+	screen.set_visarea(0, 120-1, 0, 18-1);
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(lcmate2_state::lcmate2_palette), 2);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_lcmate2);
@@ -258,7 +259,7 @@ MACHINE_CONFIG_START(lcmate2_state::lcmate2)
 
 	/* Devices */
 	RP5C15(config, m_rtc, XTAL(32'768));
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( lcmate2 )

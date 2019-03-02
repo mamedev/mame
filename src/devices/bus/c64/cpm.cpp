@@ -161,7 +161,7 @@ void c64_cpm_cartridge_device::device_reset()
 //  c64_cd_w - cartridge data write
 //-------------------------------------------------
 
-void c64_cpm_cartridge_device::c64_cd_w(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+void c64_cpm_cartridge_device::c64_cd_w(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!io1)
 	{
@@ -201,7 +201,7 @@ READ8_MEMBER( c64_cpm_cartridge_device::dma_r )
 	{
 		offs_t addr = (offset + 0x1000) & 0xffff;
 
-		data = m_slot->dma_cd_r(space, addr);
+		data = m_slot->dma_cd_r(addr);
 	}
 
 	return data;
@@ -218,6 +218,6 @@ WRITE8_MEMBER( c64_cpm_cartridge_device::dma_w )
 	{
 		offs_t addr = (offset + 0x1000) & 0xffff;
 
-		m_slot->dma_cd_w(space, addr, data);
+		m_slot->dma_cd_w(addr, data);
 	}
 }

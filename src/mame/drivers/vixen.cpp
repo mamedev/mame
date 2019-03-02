@@ -65,10 +65,6 @@ Notes:
 //  INTERRUPTS
 //**************************************************************************
 
-//-------------------------------------------------
-//  update_interrupt -
-//-------------------------------------------------
-
 void vixen_state::update_interrupt()
 {
 	int state = (m_cmd_d1 && m_fdint) || m_vsync;// || (!m_enb_srq_int && !m_srq) || (!m_enb_atn_int && !m_atn) || (!m_enb_xmt_int && m_txrdy) || (!m_enb_rcv_int && m_rxrdy);
@@ -90,10 +86,6 @@ READ8_MEMBER( vixen_state::oprom_r )
 		membank("bank3")->set_entry(1); // read rom
 	return m_rom[offset];
 }
-
-//-------------------------------------------------
-//  status_r - status read
-//-------------------------------------------------
 
 READ8_MEMBER( vixen_state::status_r )
 {
@@ -125,11 +117,6 @@ READ8_MEMBER( vixen_state::status_r )
 
 	return data;
 }
-
-
-//-------------------------------------------------
-//  cmd_w - command write
-//-------------------------------------------------
 
 WRITE8_MEMBER( vixen_state::cmd_w )
 {
@@ -164,11 +151,6 @@ WRITE8_MEMBER( vixen_state::cmd_w )
 
 	update_interrupt();
 }
-
-
-//-------------------------------------------------
-//  ieee488_r - IEEE488 bus read
-//-------------------------------------------------
 
 READ8_MEMBER( vixen_state::ieee488_r )
 {
@@ -255,10 +237,6 @@ READ8_MEMBER( vixen_state::port3_r )
 //  ADDRESS MAPS
 //**************************************************************************
 
-//-------------------------------------------------
-//  ADDRESS_MAP( vixen_mem )
-//-------------------------------------------------
-
 // when M1 is inactive: read and write of data
 void vixen_state::vixen_mem(address_map &map)
 {
@@ -274,11 +252,6 @@ void vixen_state::bios_mem(address_map &map)
 	map(0x0000, 0xefff).r(FUNC(vixen_state::opram_r));
 	map(0xf000, 0xffff).r(FUNC(vixen_state::oprom_r));
 }
-
-
-//-------------------------------------------------
-//  ADDRESS_MAP( vixen_io )
-//-------------------------------------------------
 
 void vixen_state::vixen_io(address_map &map)
 {
@@ -302,10 +275,6 @@ void vixen_state::vixen_io(address_map &map)
 //**************************************************************************
 //  INPUT PORTS
 //**************************************************************************
-
-//-------------------------------------------------
-//  INPUT_PORTS( vixen )
-//-------------------------------------------------
 
 INPUT_PORTS_START( vixen )
 	PORT_START("KEY.0")
@@ -395,10 +364,6 @@ INPUT_PORTS_END
 //  VIDEO
 //**************************************************************************
 
-//-------------------------------------------------
-//  TIMER_DEVICE_CALLBACK_MEMBER( vsync_tick )
-//-------------------------------------------------
-
 TIMER_DEVICE_CALLBACK_MEMBER(vixen_state::vsync_tick)
 {
 	if (m_cmd_d0)
@@ -408,7 +373,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(vixen_state::vsync_tick)
 	}
 }
 
-
 void vixen_state::video_start()
 {
 	// register for state saving
@@ -416,11 +380,6 @@ void vixen_state::video_start()
 	save_item(NAME(m_256));
 	save_item(NAME(m_vsync));
 }
-
-
-//-------------------------------------------------
-//  SCREEN_UPDATE( vixen )
-//-------------------------------------------------
 
 uint32_t vixen_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
@@ -480,10 +439,6 @@ uint32_t vixen_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 //**************************************************************************
 //  SOUND
 //**************************************************************************
-
-//-------------------------------------------------
-//  DISCRETE_SOUND( vixen )
-//-------------------------------------------------
 
 static DISCRETE_SOUND_START( vixen_discrete )
 	DISCRETE_INPUT_LOGIC(NODE_01)
@@ -651,7 +606,7 @@ WRITE_LINE_MEMBER( vixen_state::txrdy_w )
 }
 
 //-------------------------------------------------
-//  IEEE488_INTERFACE( ieee488_intf )
+//  IEEE488 interface
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( vixen_state::srq_w )
@@ -683,20 +638,11 @@ WRITE_LINE_MEMBER( vixen_state::fdc_intrq_w )
 //  MACHINE INITIALIZATION
 //**************************************************************************
 
-//-------------------------------------------------
-//  IRQ_CALLBACK_MEMBER( vixen_int_ack )
-//-------------------------------------------------
-
 IRQ_CALLBACK_MEMBER(vixen_state::vixen_int_ack)
 {
 	// D0 is pulled low
 	return 0xfe;
 }
-
-
-//-------------------------------------------------
-//  MACHINE_START( vixen )
-//-------------------------------------------------
 
 void vixen_state::machine_start()
 {
@@ -713,7 +659,6 @@ void vixen_state::machine_start()
 	save_item(NAME(m_cmd_d1));
 	save_item(NAME(m_fdint));
 }
-
 
 void vixen_state::machine_reset()
 {
@@ -736,22 +681,20 @@ void vixen_state::machine_reset()
 //  MACHINE CONFIGURATION
 //**************************************************************************
 
-//-------------------------------------------------
-//  MACHINE_CONFIG( vixen )
-//-------------------------------------------------
-
-MACHINE_CONFIG_START(vixen_state::vixen)
+void vixen_state::vixen(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD(m_maincpu, Z80, 23.9616_MHz_XTAL / 6)
-	MCFG_DEVICE_PROGRAM_MAP(vixen_mem)
-	MCFG_DEVICE_OPCODES_MAP(bios_mem)
-	MCFG_DEVICE_IO_MAP(vixen_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(vixen_state,vixen_int_ack)
+	Z80(config, m_maincpu, 23.9616_MHz_XTAL / 6);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vixen_state::vixen_mem);
+	m_maincpu->set_addrmap(AS_OPCODES, &vixen_state::bios_mem);
+	m_maincpu->set_addrmap(AS_IO, &vixen_state::vixen_io);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(vixen_state::vixen_int_ack));
 
 	// video hardware
-	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::amber())
-	MCFG_SCREEN_UPDATE_DRIVER(vixen_state, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(23.9616_MHz_XTAL / 2, 96*8, 0*8, 81*8, 27*10, 0*10, 26*10)
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_color(rgb_t::amber());
+	screen.set_screen_update(FUNC(vixen_state::screen_update));
+	screen.set_raw(23.9616_MHz_XTAL / 2, 96*8, 0*8, 81*8, 27*10, 0*10, 26*10);
 
 	TIMER(config, "vsync").configure_scanline(FUNC(vixen_state::vsync_tick), SCREEN_TAG, 26*10, 27*10);
 
@@ -759,8 +702,7 @@ MACHINE_CONFIG_START(vixen_state::vixen)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(DISCRETE_TAG, DISCRETE, vixen_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	DISCRETE(config, DISCRETE_TAG, vixen_discrete).add_route(ALL_OUTPUTS, "mono", 0.20);
 
 	// devices
 	i8155_device &i8155(I8155(config, P8155H_TAG, 23.9616_MHz_XTAL / 6));
@@ -787,30 +729,24 @@ MACHINE_CONFIG_START(vixen_state::vixen)
 
 	FD1797(config, m_fdc, 23.9616_MHz_XTAL / 24);
 	m_fdc->intrq_wr_callback().set(FUNC(vixen_state::fdc_intrq_w));
-	MCFG_FLOPPY_DRIVE_ADD(FDC1797_TAG":0", vixen_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD(FDC1797_TAG":1", vixen_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_IEEE488_BUS_ADD()
-	MCFG_IEEE488_SRQ_CALLBACK(WRITELINE(*this, vixen_state, srq_w))
-	MCFG_IEEE488_ATN_CALLBACK(WRITELINE(*this, vixen_state, atn_w))
+	FLOPPY_CONNECTOR(config, FDC1797_TAG":0", vixen_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, FDC1797_TAG":1", vixen_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	IEEE488(config, m_ieee488);
+	m_ieee488->srq_callback().set(FUNC(vixen_state::srq_w));
+	m_ieee488->atn_callback().set(FUNC(vixen_state::atn_w));
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("disk_list", "vixen")
+	SOFTWARE_LIST(config, "disk_list").set_original("vixen");
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("64K");
-MACHINE_CONFIG_END
+}
 
 
 
 //**************************************************************************
 //  ROMS
 //**************************************************************************
-
-//-------------------------------------------------
-//  ROM( vixen )
-//-------------------------------------------------
 
 ROM_START( vixen )
 	ROM_REGION( 0x1000, Z8400A_TAG, 0 )
@@ -828,11 +764,6 @@ ROM_END
 //**************************************************************************
 //  DRIVER INITIALIZATION
 //**************************************************************************
-
-//-------------------------------------------------
-//  DRIVER_INIT( vixen )
-//-------------------------------------------------
-
 
 void vixen_state::init_vixen()
 {

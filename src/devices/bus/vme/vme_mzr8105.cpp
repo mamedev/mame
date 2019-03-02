@@ -36,13 +36,13 @@ DEFINE_DEVICE_TYPE(VME_MZR8105, vme_mzr8105_card_device, "mzr8105", "Mizar 8105 
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(vme_mzr8105_card_device::device_add_mconfig)
+void vme_mzr8105_card_device::device_add_mconfig(machine_config &config)
 {
-	MCFG_DEVICE_ADD ("maincpu", M68000, XTAL(10'000'000))
-	MCFG_DEVICE_PROGRAM_MAP (mzr8105_mem)
-	MCFG_VME_DEVICE_ADD("vme")
-	MCFG_VME_BUS_OWNER_SPACES()
-	MCFG_VME_SLOT_ADD ("vme", 1, mzr8105_vme_cards, "mzr8300")
+	M68000(config, m_maincpu, XTAL(10'000'000))
+	m_maincpu->set_addrmap(AS_PROGRAM, &vme_mzr8105_card_device::mzr8105_mem);
+
+	VME(config, "vme", 0).use_owner_spaces();
+	VME_SLOT(config, "slot1", mzr8105_vme_cards, "mzr8300", 1, "vme");
 }
 
 vme_mzr8105_card_device::vme_mzr8105_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :

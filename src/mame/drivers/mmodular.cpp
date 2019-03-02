@@ -255,68 +255,72 @@ void mmodular_state::init_gen32()
 		rom[0x870] = 0x38;
 }
 
-MACHINE_CONFIG_START(mmodular_state::alm16)
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(12'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(alm16_mem)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(mmodular_state, irq2_line_hold, 600)
+void mmodular_state::alm16(machine_config &config)
+{
+	m68000_device &maincpu(M68000(config, "maincpu", XTAL(12'000'000)));
+	maincpu.set_addrmap(AS_PROGRAM, &mmodular_state::alm16_mem);
+	maincpu.set_periodic_int(FUNC(mmodular_state::irq2_line_hold), attotime::from_hz(600));
 
 	MEPHISTO_SENSORS_BOARD(config, "board", 0);
 	MEPHISTO_DISPLAY_MODUL(config, "display", 0);
 	config.set_default_layout(layout_mmodular);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(mmodular_state::van16)
+void mmodular_state::van16(machine_config &config)
+{
 	alm16(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(van16_mem)
-MACHINE_CONFIG_END
+	subdevice<m68000_device>("maincpu")->set_addrmap(AS_PROGRAM, &mmodular_state::van16_mem);
+}
 
 
-MACHINE_CONFIG_START(mmodular_state::alm32)
-	MCFG_DEVICE_ADD("maincpu", M68020, XTAL(12'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(alm32_mem)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(mmodular_state, irq6_line_hold, 750)
+void mmodular_state::alm32(machine_config &config)
+{
+	m68020_device &maincpu(M68020(config, "maincpu", XTAL(12'000'000)));
+	maincpu.set_addrmap(AS_PROGRAM, &mmodular_state::alm32_mem);
+	maincpu.set_periodic_int(FUNC(mmodular_state::irq6_line_hold), attotime::from_hz(750));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MEPHISTO_SENSORS_BOARD(config, "board", 0);
 	MEPHISTO_DISPLAY_MODUL(config, "display", 0);
 	config.set_default_layout(layout_mmodular);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(mmodular_state::van32)
+void mmodular_state::van32(machine_config &config)
+{
 	alm32(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(van32_mem)
-MACHINE_CONFIG_END
+	subdevice<m68020_device>("maincpu")->set_addrmap(AS_PROGRAM, &mmodular_state::van32_mem);
+}
 
 
-MACHINE_CONFIG_START(mmodular_state::gen32)
-	MCFG_DEVICE_ADD("maincpu", M68030, XTAL(33'333'000))
-	MCFG_DEVICE_PROGRAM_MAP(gen32_mem)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(mmodular_state, irq2_line_hold, 375)
+void mmodular_state::gen32(machine_config &config)
+{
+	m68030_device &maincpu(M68030(config, "maincpu", XTAL(33'333'000)));
+	maincpu.set_addrmap(AS_PROGRAM, &mmodular_state::gen32_mem);
+	maincpu.set_periodic_int(FUNC(mmodular_state::irq2_line_hold), attotime::from_hz(375));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MEPHISTO_SENSORS_BOARD(config, "board", 0);
 	MEPHISTO_DISPLAY_MODUL(config, "display", 0);
 	config.set_default_layout(layout_mmodular);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(berlinp_state::berlinp)
-	MCFG_DEVICE_ADD("maincpu", M68020, XTAL(24'576'000))
-	MCFG_DEVICE_PROGRAM_MAP(berlinp_mem)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(berlinp_state, irq2_line_hold, 750)
+void berlinp_state::berlinp(machine_config &config)
+{
+	m68020_device &maincpu(M68020(config, "maincpu", XTAL(24'576'000)));
+	maincpu.set_addrmap(AS_PROGRAM, &berlinp_state::berlinp_mem);
+	maincpu.set_periodic_int(FUNC(berlinp_state::irq2_line_hold), attotime::from_hz(750));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MEPHISTO_BUTTONS_BOARD(config, m_board, 0);
 	MEPHISTO_DISPLAY_MODUL(config, "display", 0);
 	config.set_default_layout(layout_mmodular);
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( alm16 )

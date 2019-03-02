@@ -531,14 +531,14 @@ MACHINE_CONFIG_START(abc80_state::abc80)
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, KEYBOARD_TAG, 0));
 	keyboard.set_keyboard_callback(FUNC(abc80_state::kbd_w));
 
-	MCFG_QUICKLOAD_ADD("quickload", abc80_state, bac, "bac", 2)
+	MCFG_QUICKLOAD_ADD("quickload", abc80_state, bac, "bac", attotime::from_seconds(2))
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("16K");
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "abc80_cass")
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "abc80_flop")
+	SOFTWARE_LIST(config, "cass_list").set_original("abc80_cass");
+	SOFTWARE_LIST(config, "flop_list").set_original("abc80_flop");
 MACHINE_CONFIG_END
 
 

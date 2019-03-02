@@ -471,28 +471,29 @@ void xain_state::machine_start()
 	save_item(NAME(m_vblank));
 }
 
-MACHINE_CONFIG_START(xain_state::xsleena)
-
+void xain_state::xsleena(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD(m_maincpu, MC6809E, CPU_CLOCK) // 68B09E
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MC6809E(config, m_maincpu, CPU_CLOCK); // 68B09E
+	m_maincpu->set_addrmap(AS_PROGRAM, &xain_state::main_map);
+
 	TIMER(config, "scantimer").configure_scanline(FUNC(xain_state::scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD(m_subcpu, MC6809E, CPU_CLOCK) // 68B09E
-	MCFG_DEVICE_PROGRAM_MAP(cpu_map_B)
+	MC6809E(config, m_subcpu, CPU_CLOCK); // 68B09E
+	m_subcpu->set_addrmap(AS_PROGRAM, &xain_state::cpu_map_B);
 
-	MCFG_DEVICE_ADD(m_audiocpu, MC6809, PIXEL_CLOCK) // 68A09
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MC6809(config, m_audiocpu, PIXEL_CLOCK); // 68A09
+	m_audiocpu->set_addrmap(AS_PROGRAM, &xain_state::sound_map);
 
 	TAITO68705_MCU(config, m_mcu, MCU_CLOCK);
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	// video hardware
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 8, 248)   // based on ddragon driver
-	MCFG_SCREEN_UPDATE_DRIVER(xain_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(PIXEL_CLOCK, 384, 0, 256, 272, 8, 248);   // based on ddragon driver
+	m_screen->set_screen_update(FUNC(xain_state::screen_update));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_xain);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 512);
@@ -514,17 +515,17 @@ MACHINE_CONFIG_START(xain_state::xsleena)
 	ym2.add_route(1, "mono", 0.50);
 	ym2.add_route(2, "mono", 0.50);
 	ym2.add_route(3, "mono", 0.40);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(xain_state::xsleenab)
+void xain_state::xsleenab(machine_config &config)
+{
 	xsleena(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(bootleg_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &xain_state::bootleg_map);
 
-	MCFG_DEVICE_REMOVE("mcu")
-MACHINE_CONFIG_END
+	config.device_remove("mcu");
+}
 
 
 /***************************************************************************

@@ -10618,7 +10618,7 @@
 		-->
 		<description>Super Mario's Wacky Worlds (Prototype v0.11, 19930303)</description>
 		<year>1993</year>
-		<publisher>Phillips</publisher>
+		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
 				<disk name="super mario wacky worlds (prototype)" sha1="a3178428ed39f7a461e693d9a1a927b4daaa677f"/>

@@ -222,13 +222,13 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-MACHINE_CONFIG_START(submar_state::submar)
-
+void submar_state::submar(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(19'968'000)/8)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(submar_state, irq0_line_assert, 124.675) // 555 IC
-	MCFG_DEVICE_PROGRAM_MAP(submar_map)
-	MCFG_DEVICE_IO_MAP(submar_portmap)
+	Z80(config, m_maincpu, XTAL(19'968'000)/8);
+	m_maincpu->set_periodic_int(FUNC(submar_state::irq0_line_assert), attotime::from_hz(124.675)); // 555 IC
+	m_maincpu->set_addrmap(AS_PROGRAM, &submar_state::submar_map);
+	m_maincpu->set_addrmap(AS_IO, &submar_state::submar_portmap);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -236,7 +236,7 @@ MACHINE_CONFIG_START(submar_state::submar)
 
 	/* sound hardware */
 	//...
-MACHINE_CONFIG_END
+}
 
 
 

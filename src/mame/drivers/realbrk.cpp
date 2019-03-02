@@ -767,26 +767,26 @@ WRITE_LINE_MEMBER(realbrk_state::vblank_irq)
 		m_tmp68301->external_interrupt_1();
 }
 
-MACHINE_CONFIG_START(realbrk_state::realbrk)
-
+void realbrk_state::realbrk(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, M68000, XTAL(32'000'000) / 2)          /* !! TMP68301 !! */
-	MCFG_DEVICE_PROGRAM_MAP(realbrk_mem)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("tmp68301",tmp68301_device,irq_callback)
+	M68000(config, m_maincpu, XTAL(32'000'000) / 2);          /* !! TMP68301 !! */
+	m_maincpu->set_addrmap(AS_PROGRAM, &realbrk_state::realbrk_mem);
+	m_maincpu->set_irq_acknowledge_callback("tmp68301", FUNC(tmp68301_device::irq_callback));
 
 	TMP68301(config, m_tmp68301, 0);
 	m_tmp68301->set_cputag(m_maincpu);
 	m_tmp68301->out_parallel_callback().set(FUNC(realbrk_state::realbrk_flipscreen_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(0x140, 0xe0)
-	MCFG_SCREEN_VISIBLE_AREA(0, 0x140-1, 0, 0xe0-1)
-	MCFG_SCREEN_UPDATE_DRIVER(realbrk_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, realbrk_state, vblank_irq))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(0x140, 0xe0);
+	m_screen->set_visarea(0, 0x140-1, 0, 0xe0-1);
+	m_screen->set_screen_update(FUNC(realbrk_state::screen_update));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(realbrk_state::vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_realbrk);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x8000);
@@ -795,40 +795,40 @@ MACHINE_CONFIG_START(realbrk_state::realbrk)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymz", YMZ280B, XTAL(33'868'800) / 2)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
+	ymz280b_device &ymz(YMZ280B(config, "ymz", XTAL(33'868'800) / 2));
+	ymz.add_route(0, "lspeaker", 0.50);
+	ymz.add_route(1, "rspeaker", 0.50);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(3'579'545))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-MACHINE_CONFIG_END
+	ym2413_device &ymsnd(YM2413(config, "ymsnd", XTAL(3'579'545)));
+	ymsnd.add_route(ALL_OUTPUTS, "lspeaker", 0.50);
+	ymsnd.add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+}
 
-MACHINE_CONFIG_START(realbrk_state::pkgnsh)
+void realbrk_state::pkgnsh(machine_config &config)
+{
 	realbrk(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(pkgnsh_mem)
+	m_maincpu->set_addrmap(AS_PROGRAM, &realbrk_state::pkgnsh_mem);
 
 	m_tmp68301->out_parallel_callback().set_nop();
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(realbrk_state::pkgnshdx)
+void realbrk_state::pkgnshdx(machine_config &config)
+{
 	pkgnsh(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(pkgnshdx_mem)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &realbrk_state::pkgnshdx_mem);
+}
 
-MACHINE_CONFIG_START(realbrk_state::dai2kaku)
+void realbrk_state::dai2kaku(machine_config &config)
+{
 	realbrk(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(dai2kaku_mem)
+	m_maincpu->set_addrmap(AS_PROGRAM, &realbrk_state::dai2kaku_mem);
 
 	m_gfxdecode->set_info(gfx_dai2kaku);
 	m_screen->set_screen_update(FUNC(realbrk_state::screen_update_dai2kaku));
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

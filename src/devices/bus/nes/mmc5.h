@@ -20,16 +20,16 @@ public:
 	nes_exrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~nes_exrom_device();
 
-	virtual DECLARE_READ8_MEMBER(read_l) override;
-	virtual DECLARE_READ8_MEMBER(read_m) override;
-	virtual DECLARE_READ8_MEMBER(read_h) override;
-	virtual DECLARE_WRITE8_MEMBER(write_l) override;
-	virtual DECLARE_WRITE8_MEMBER(write_m) override;
-	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+	virtual uint8_t read_l(offs_t offset) override;
+	virtual uint8_t read_m(offs_t offset) override;
+	virtual uint8_t read_h(offs_t offset) override;
+	virtual void write_l(offs_t offset, uint8_t data) override;
+	virtual void write_m(offs_t offset, uint8_t data) override;
+	virtual void write_h(offs_t offset, uint8_t data) override;
 
-	virtual DECLARE_READ8_MEMBER(chr_r) override;
-	virtual DECLARE_READ8_MEMBER(nt_r) override;
-	virtual DECLARE_WRITE8_MEMBER(nt_w) override;
+	virtual uint8_t chr_r(offs_t offset) override;
+	virtual uint8_t nt_r(offs_t offset) override;
+	virtual void nt_w(offs_t offset, uint8_t data) override;
 
 	virtual void hblank_irq(int scanline, int vblank, int blanked) override;
 	virtual void pcb_reset() override;

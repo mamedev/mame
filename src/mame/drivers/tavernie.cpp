@@ -297,10 +297,11 @@ void tavernie_state::kbd_put(u8 data)
 	m_pia_ivg->cb1_w(1);
 }
 
-MACHINE_CONFIG_START(tavernie_state::cpu09)
+void tavernie_state::cpu09(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809, 4_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(cpu09_mem)
+	MC6809(config, m_maincpu, 4_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tavernie_state::cpu09_mem);
 	MCFG_MACHINE_RESET_OVERRIDE(tavernie_state, cpu09)
 
 	/* sound hardware */
@@ -335,28 +336,27 @@ MACHINE_CONFIG_START(tavernie_state::cpu09)
 	clock_device &acia_clock(CLOCK(config, "acia_clock", 153600));
 	acia_clock.signal_handler().set("acia", FUNC(acia6850_device::write_txc));
 	acia_clock.signal_handler().append("acia", FUNC(acia6850_device::write_rxc));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(tavernie_state::ivg09)
+void tavernie_state::ivg09(machine_config &config)
+{
 	cpu09(config);
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(ivg09_mem)
+	m_maincpu->set_addrmap(AS_PROGRAM, &tavernie_state::ivg09_mem);
 	MCFG_MACHINE_RESET_OVERRIDE(tavernie_state, ivg09)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(80*8, 25*10)
-	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 25*10-1)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(80*8, 25*10);
+	screen.set_visarea(0, 80*8-1, 0, 25*10-1);
+	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 	config.set_default_layout(layout_tavernie);
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("beeper", BEEP, 950) // guess
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	BEEP(config, m_beep, 950).add_route(ALL_OUTPUTS, "mono", 0.50); // guess
 
 	/* Devices */
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
@@ -371,12 +371,11 @@ MACHINE_CONFIG_START(tavernie_state::ivg09)
 	PIA6821(config, m_pia_ivg, 0);
 	m_pia_ivg->readpb_handler().set(FUNC(tavernie_state::pb_ivg_r));
 	m_pia_ivg->writepa_handler().set(FUNC(tavernie_state::pa_ivg_w));
-	m_pia_ivg->cb2_handler().set("beeper", FUNC(beep_device::set_state));
+	m_pia_ivg->cb2_handler().set(m_beep, FUNC(beep_device::set_state));
 
 	FD1795(config, m_fdc, 8_MHz_XTAL / 8);
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ifd09_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-MACHINE_CONFIG_END
+	FLOPPY_CONNECTOR(config, "fdc:0", ifd09_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+}
 
 /* ROM definition */
 ROM_START( cpu09 )

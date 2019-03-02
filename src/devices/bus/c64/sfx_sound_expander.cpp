@@ -206,9 +206,9 @@ void c64_sfx_sound_expander_cartridge_device::device_reset()
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------
 
-uint8_t c64_sfx_sound_expander_cartridge_device::c64_cd_r(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+uint8_t c64_sfx_sound_expander_cartridge_device::c64_cd_r(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
-	data = m_exp->cd_r(space, get_offset(offset, 1), data, sphi2, ba, roml, romh, io1, io2);
+	data = m_exp->cd_r(get_offset(offset, 1), data, sphi2, ba, roml, romh, io1, io2);
 
 	if (!io2 && sphi2)
 	{
@@ -219,7 +219,7 @@ uint8_t c64_sfx_sound_expander_cartridge_device::c64_cd_r(address_space &space, 
 
 		if (BIT(offset, 5))
 		{
-			data = m_opl->read(space, BIT(offset, 4));
+			data = m_opl->read(BIT(offset, 4));
 		}
 	}
 
@@ -231,14 +231,14 @@ uint8_t c64_sfx_sound_expander_cartridge_device::c64_cd_r(address_space &space, 
 //  c64_cd_w - cartridge data write
 //-------------------------------------------------
 
-void c64_sfx_sound_expander_cartridge_device::c64_cd_w(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+void c64_sfx_sound_expander_cartridge_device::c64_cd_w(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!io2 && sphi2)
 	{
-		m_opl->write(space, BIT(offset, 4), data);
+		m_opl->write(BIT(offset, 4), data);
 	}
 
-	m_exp->cd_w(space, get_offset(offset, 0), data, sphi2, ba, roml, romh, io1, io2);
+	m_exp->cd_w(get_offset(offset, 0), data, sphi2, ba, roml, romh, io1, io2);
 }
 
 

@@ -269,21 +269,21 @@ MACHINE_RESET_MEMBER(scregg_state,scregg)
 	m_btime_tilemap[3] = 0;
 }
 
-MACHINE_CONFIG_START(scregg_state::dommy)
-
+void scregg_state::dommy(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(12'000'000)/8)
-	MCFG_DEVICE_PROGRAM_MAP(dommy_map)
+	M6502(config, m_maincpu, XTAL(12'000'000)/8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &scregg_state::dommy_map);
 	TIMER(config, "irq").configure_scanline(FUNC(scregg_state::scregg_interrupt), "screen", 0, 8);
 
 	MCFG_MACHINE_START_OVERRIDE(scregg_state,scregg)
 	MCFG_MACHINE_RESET_OVERRIDE(scregg_state,scregg)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2, 384, 8, 248, 272, 8, 248)
-	MCFG_SCREEN_UPDATE_DRIVER(scregg_state, screen_update_eggs)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(XTAL(12'000'000)/2, 384, 8, 248, 272, 8, 248);
+	m_screen->set_screen_update(FUNC(scregg_state::screen_update_eggs));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_scregg);
 	PALETTE(config, m_palette, FUNC(scregg_state::btime_palette), 8);
@@ -294,24 +294,24 @@ MACHINE_CONFIG_START(scregg_state::dommy)
 	AY8910(config, "ay1", XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.23);
 
 	AY8910(config, "ay2", XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.23);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(scregg_state::scregg)
-
+void scregg_state::scregg(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(12'000'000)/8)
-	MCFG_DEVICE_PROGRAM_MAP(eggs_map)
+	M6502(config, m_maincpu, XTAL(12'000'000)/8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &scregg_state::eggs_map);
 	TIMER(config, "irq").configure_scanline(FUNC(scregg_state::scregg_interrupt), "screen", 0, 8);
 
 	MCFG_MACHINE_START_OVERRIDE(scregg_state,scregg)
 	MCFG_MACHINE_RESET_OVERRIDE(scregg_state,scregg)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2, 384, 8, 248, 272, 8, 248)
-	MCFG_SCREEN_UPDATE_DRIVER(scregg_state, screen_update_eggs)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(XTAL(12'000'000)/2, 384, 8, 248, 272, 8, 248);
+	m_screen->set_screen_update(FUNC(scregg_state::screen_update_eggs));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_scregg);
 	PALETTE(config, m_palette, FUNC(scregg_state::btime_palette), 8);
@@ -322,7 +322,7 @@ MACHINE_CONFIG_START(scregg_state::scregg)
 	AY8910(config, "ay1", XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.23);
 
 	AY8910(config, "ay2", XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.23);
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( dommy )

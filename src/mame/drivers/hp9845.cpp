@@ -3544,7 +3544,7 @@ MACHINE_CONFIG_START(hp9845_state::hp9845a)
 	MCFG_SCREEN_SIZE(560, 455)
 	MCFG_SCREEN_VISIBLE_AREA(0, 560-1, 0, 455-1)
 
-	MCFG_SOFTWARE_LIST_ADD("optrom_list", "hp9845a_rom")
+	SOFTWARE_LIST(config, "optrom_list").set_original("hp9845a_rom");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp9845_state::hp9835a)
@@ -3559,7 +3559,7 @@ MACHINE_CONFIG_START(hp9845_state::hp9835a)
 	MCFG_SCREEN_SIZE(560, 455)
 	MCFG_SCREEN_VISIBLE_AREA(0, 560-1, 0, 455-1)
 
-	MCFG_SOFTWARE_LIST_ADD("optrom_list", "hp9835a_rom")
+	SOFTWARE_LIST(config, "optrom_list").set_original("hp9835a_rom");
 MACHINE_CONFIG_END
 
 /*
@@ -3646,7 +3646,7 @@ MACHINE_CONFIG_START(hp9845_base_state::hp9845_base)
 	m_io_sys->dmar().set(m_ppu , FUNC(hp_5061_3001_cpu_device::dmar_w));
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 
 	TIMER(config, m_gv_timer).configure_generic(FUNC(hp9845_base_state::gv_timer));
 
@@ -3711,23 +3711,22 @@ MACHINE_CONFIG_START(hp9845_base_state::hp9845_base)
 	prt.sts().set([this](int state) { m_io_sys->set_sts(PRINTER_PA , state); });
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(hp9845b_state::hp9845b)
+void hp9845b_state::hp9845b(machine_config &config)
+{
 	hp9845_base(config);
 	// video hardware
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(hp9845b_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, hp9845b_state, vblank_w))
-	MCFG_SCREEN_COLOR(rgb_t::green())
+	m_screen->set_screen_update(FUNC(hp9845b_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(hp9845b_state::vblank_w));
+	m_screen->set_color(rgb_t::green());
 	// These parameters are for alpha video
-	MCFG_SCREEN_RAW_PARAMS(VIDEO_PIXEL_CLOCK , VIDEO_HTOTAL , 0 , VIDEO_HBSTART , VIDEO_VTOTAL , 0 , VIDEO_ACTIVE_SCANLINES)
-	MCFG_PALETTE_ADD("palette", 4)
+	m_screen->set_raw(VIDEO_PIXEL_CLOCK , VIDEO_HTOTAL , 0 , VIDEO_HBSTART , VIDEO_VTOTAL , 0 , VIDEO_ACTIVE_SCANLINES);
+	PALETTE(config, m_palette).set_entries(4);
 	TIMER(config, "scantimer").configure_scanline(FUNC(hp9845b_state::scanline_timer), "screen", 0, 1);
 
 	config.set_default_layout(layout_hp9845b);
 
-	MCFG_SOFTWARE_LIST_ADD("optrom_list", "hp9845b_rom")
-
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "optrom_list").set_original("hp9845b_rom");
+}
 
 MACHINE_CONFIG_START(hp9845c_state::hp9845c)
 	hp9845_base(config);
@@ -3739,24 +3738,23 @@ MACHINE_CONFIG_START(hp9845c_state::hp9845c)
 	MCFG_PALETTE_ADD("palette", 24)
 	TIMER(config, "scantimer").configure_scanline(FUNC(hp9845c_state::scanline_timer), "screen", 0, 1);
 
-	MCFG_SOFTWARE_LIST_ADD("optrom_list", "hp9845b_rom")
+	SOFTWARE_LIST(config, "optrom_list").set_original("hp9845b_rom");
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(hp9845t_state::hp9845t)
+void hp9845t_state::hp9845t(machine_config &config)
+{
 	hp9845_base(config);
 	// video hardware
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(hp9845t_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, hp9845t_state, vblank_w))
-	MCFG_SCREEN_COLOR(rgb_t::green())
-	MCFG_SCREEN_RAW_PARAMS(VIDEO_780_PIXEL_CLOCK , VIDEO_780_HTOTAL , VIDEO_780_HBEND , VIDEO_780_HBSTART , VIDEO_780_VTOTAL , VIDEO_780_VBEND , VIDEO_780_VBSTART)
-	MCFG_PALETTE_ADD("palette", 5)
+	m_screen->set_screen_update(FUNC(hp9845t_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(hp9845t_state::vblank_w));
+	m_screen->set_color(rgb_t::green());
+	m_screen->set_raw(VIDEO_780_PIXEL_CLOCK , VIDEO_780_HTOTAL , VIDEO_780_HBEND , VIDEO_780_HBSTART , VIDEO_780_VTOTAL , VIDEO_780_VBEND , VIDEO_780_VBSTART);
+	PALETTE(config, m_palette).set_entries(5);
 	TIMER(config, "scantimer").configure_scanline(FUNC(hp9845t_state::scanline_timer), "screen", 0, 1);
 
-	MCFG_SOFTWARE_LIST_ADD("optrom_list", "hp9845b_rom")
-
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "optrom_list").set_original("hp9845b_rom");
+}
 
 	ROM_START( hp9845a )
 	ROM_REGION( 0200000, "lpu", ROMREGION_16BIT | ROMREGION_BE )

@@ -519,17 +519,17 @@ static void apf_cart(device_slot_interface &device)
 }
 
 
-MACHINE_CONFIG_START(apf_state::apfm1000)
-
+void apf_state::apfm1000(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6800, 3.579545_MHz_XTAL / 4)  // divided by 4 in external clock circuit
-	MCFG_DEVICE_PROGRAM_MAP(apfm1000_map)
+	M6800(config, m_maincpu, 3.579545_MHz_XTAL / 4);  // divided by 4 in external clock circuit
+	m_maincpu->set_addrmap(AS_PROGRAM, &apf_state::apfm1000_map);
 
 	/* video hardware */
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	MC6847_NTSC(config, m_crtc, 3.579545_MHz_XTAL);
-	m_crtc->fsync_wr_callback().set("pia0", FUNC(pia6821_device::cb1_w));
+	m_crtc->fsync_wr_callback().set(m_pia0, FUNC(pia6821_device::cb1_w));
 	m_crtc->input_callback().set(FUNC(apf_state::videoram_r));
 	m_crtc->set_get_fixed_mode(mc6847_ntsc_device::MODE_GM2 | mc6847_ntsc_device::MODE_GM1);
 	m_crtc->set_screen("screen");
@@ -538,28 +538,27 @@ MACHINE_CONFIG_START(apf_state::apfm1000)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
 	PIA6821(config, m_pia0, 0);
 	m_pia0->readpa_handler().set(FUNC(apf_state::pia0_porta_r));
 	m_pia0->writepb_handler().set(FUNC(apf_state::pia0_portb_w));
 	m_pia0->ca2_handler().set(FUNC(apf_state::pia0_ca2_w));
-	m_pia0->cb2_handler().set("speaker", FUNC(speaker_sound_device::level_w));
-	m_pia0->irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE);
-	m_pia0->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
+	m_pia0->cb2_handler().set(m_speaker, FUNC(speaker_sound_device::level_w));
+	m_pia0->irqa_handler().set_inputline(m_maincpu, M6800_IRQ_LINE);
+	m_pia0->irqb_handler().set_inputline(m_maincpu, M6800_IRQ_LINE);
 
-	MCFG_APF_CARTRIDGE_ADD("cartslot", apf_cart, nullptr)
+	APF_CART_SLOT(config, m_cart, apf_cart, nullptr);
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "apfm1000")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_original("apfm1000");
+}
 
-MACHINE_CONFIG_START(apf_state::apfimag)
+void apf_state::apfimag(machine_config &config)
+{
 	apfm1000(config);
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP( apfimag_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &apf_state::apfimag_map);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("8K").set_extra_options("16K");
@@ -577,13 +576,11 @@ MACHINE_CONFIG_START(apf_state::apfimag)
 	m_cass->set_interface("apf_cass");
 
 	FD1771(config, m_fdc, 1000000); // guess
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", apf_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", apf_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, "fdc:0", apf_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", apf_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "apfimag_cass")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cass_list").set_original("apfimag_cass");
+}
 
 
 /***************************************************************************

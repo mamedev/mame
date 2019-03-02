@@ -173,31 +173,31 @@ void ultraman_state::machine_reset()
 	m_soundnmi->in_w<0>(0);
 }
 
-MACHINE_CONFIG_START(ultraman_state::ultraman)
-
+void ultraman_state::ultraman(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000,24000000/2)      /* 12 MHz? */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ultraman_state,  irq4_line_hold)
+	M68000(config, m_maincpu, 24000000/2);      /* 12 MHz? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &ultraman_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(ultraman_state::irq4_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80,24000000/6)    /* 4 MHz? */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(sound_io_map)
+	Z80(config, m_audiocpu, 24000000/6);    /* 4 MHz? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &ultraman_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &ultraman_state::sound_io_map);
 
 	INPUT_MERGER_ALL_HIGH(config, "soundnmi").output_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	config.m_minimum_quantum = attotime::from_hz(600);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(ultraman_state, screen_update_ultraman)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(14*8, (64-14)*8-1, 2*8, 30*8-1 );
+	screen.set_screen_update(FUNC(ultraman_state::screen_update_ultraman));
+	screen.set_palette("palette");
 
 	auto &palette(PALETTE(config, "palette"));
 	palette.set_format(palette_device::xRGB_555, 8192);
@@ -231,10 +231,10 @@ MACHINE_CONFIG_START(ultraman_state::ultraman)
 
 	YM2151(config, "ymsnd", 24000000/6).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
+	oki.add_route(ALL_OUTPUTS, "lspeaker", 0.50);
+	oki.add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+}
 
 
 

@@ -142,21 +142,21 @@ void astrocde_state::profpac_palette(palette_device &palette) const
 		bit1 = BIT(i, 1);
 		bit2 = BIT(i, 2);
 		bit3 = BIT(i, 3);
-		int const b = combine_4_weights(weights, bit0, bit1, bit2, bit3);
+		int const b = combine_weights(weights, bit0, bit1, bit2, bit3);
 
 		// green component
 		bit0 = BIT(i, 4);
 		bit1 = BIT(i, 5);
 		bit2 = BIT(i, 6);
 		bit3 = BIT(i, 7);
-		int const g = combine_4_weights(weights, bit0, bit1, bit2, bit3);
+		int const g = combine_weights(weights, bit0, bit1, bit2, bit3);
 
 		// red component
 		bit0 = BIT(i, 8);
 		bit1 = BIT(i, 9);
 		bit2 = BIT(i, 10);
 		bit3 = BIT(i, 11);
-		int const r = combine_4_weights(weights, bit0, bit1, bit2, bit3);
+		int const r = combine_weights(weights, bit0, bit1, bit2, bit3);
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}

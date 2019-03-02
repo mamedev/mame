@@ -1305,12 +1305,12 @@ static void vboy_cart(device_slot_interface &device)
 	device.option_add_internal("vb_eeprom", VBOY_ROM_EEPROM);
 }
 
-MACHINE_CONFIG_START(vboy_state::vboy)
-
+void vboy_state::vboy(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD( "maincpu", V810, XTAL(20'000'000) )
-	MCFG_DEVICE_PROGRAM_MAP(vboy_mem)
-	MCFG_DEVICE_IO_MAP(vboy_io)
+	V810(config, m_maincpu, XTAL(20'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &vboy_state::vboy_mem);
+	m_maincpu->set_addrmap(AS_IO, &vboy_state::vboy_io);
 	TIMER(config, "scantimer_l").configure_scanline(FUNC(vboy_state::vboy_scanlineL), "3dleft", 0, 1);
 	//TIMER(config, "scantimer_r").configure_scanline(FUNC(vboy_state::vboy_scanlineR), "3dright", 0, 1);
 
@@ -1325,30 +1325,30 @@ MACHINE_CONFIG_START(vboy_state::vboy)
 	PALETTE(config, m_palette, FUNC(vboy_state::vboy_palette), 4);
 
 	/* Left screen */
-	MCFG_SCREEN_ADD("3dleft", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(20'000'000)/2,757,0,384,264,0,224)
-	MCFG_SCREEN_UPDATE_DRIVER(vboy_state, screen_update_vboy_left)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &lscreen(SCREEN(config, "3dleft", SCREEN_TYPE_RASTER));
+	lscreen.set_raw(XTAL(20'000'000)/2,757,0,384,264,0,224);
+	lscreen.set_screen_update(FUNC(vboy_state::screen_update_vboy_left));
+	lscreen.set_palette(m_palette);
 
 	/* Right screen */
-	MCFG_SCREEN_ADD("3dright", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(20'000'000)/2,757,0,384,264,0,224)
-	MCFG_SCREEN_UPDATE_DRIVER(vboy_state, screen_update_vboy_right)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &rscreen(SCREEN(config, "3dright", SCREEN_TYPE_RASTER));
+	rscreen.set_raw(XTAL(20'000'000)/2,757,0,384,264,0,224);
+	rscreen.set_screen_update(FUNC(vboy_state::screen_update_vboy_right));
+	rscreen.set_palette(m_palette);
 
 	/* cartridge */
-	MCFG_VBOY_CARTRIDGE_ADD("cartslot", vboy_cart, nullptr)
+	VBOY_CART_SLOT(config, m_cart, vboy_cart, nullptr);
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","vboy")
+	SOFTWARE_LIST(config, "cart_list").set_original("vboy");
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("vbsnd", VBOYSND)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	vboysnd_device &vbsnd(VBOYSND(config, "vbsnd"));
+	vbsnd.add_route(0, "lspeaker", 1.0);
+	vbsnd.add_route(1, "rspeaker", 1.0);
+}
 
 /* ROM definition */
 ROM_START( vboy )

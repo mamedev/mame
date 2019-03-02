@@ -173,8 +173,8 @@ void xyonix_state::main_map(address_map &map)
 void xyonix_state::port_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x20, 0x20).nopr().w("sn1", FUNC(sn76496_device::command_w));   /* SN76496 ready signal */
-	map(0x21, 0x21).nopr().w("sn2", FUNC(sn76496_device::command_w));
+	map(0x20, 0x20).nopr().w("sn1", FUNC(sn76496_device::write));   /* SN76496 ready signal */
+	map(0x21, 0x21).nopr().w("sn2", FUNC(sn76496_device::write));
 	map(0x40, 0x40).w(FUNC(xyonix_state::nmiack_w));
 	map(0x50, 0x50).w(FUNC(xyonix_state::irqack_w));
 	map(0x60, 0x61).nopw();        /* mc6845 */
@@ -246,23 +246,23 @@ GFXDECODE_END
 
 /* MACHINE driver *************************************************************/
 
-MACHINE_CONFIG_START(xyonix_state::xyonix)
-
+void xyonix_state::xyonix(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,16000000 / 4)        /* 4 MHz ? */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_IO_MAP(port_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(xyonix_state, irq0_line_assert, 4*60)  /* ?? controls music tempo */
+	Z80(config, m_maincpu, 16000000 / 4);        /* 4 MHz ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &xyonix_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &xyonix_state::port_map);
+	m_maincpu->set_periodic_int(FUNC(xyonix_state::irq0_line_assert), attotime::from_hz(4*60));  /* ?? controls music tempo */
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(80*4, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 80*4-1, 0, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(xyonix_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, xyonix_state, nmiclk_w))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(80*4, 32*8);
+	screen.set_visarea(0, 80*4-1, 0, 28*8-1);
+	screen.set_screen_update(FUNC(xyonix_state::screen_update));
+	screen.set_palette("palette");
+	screen.screen_vblank().set(FUNC(xyonix_state::nmiclk_w));
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_xyonix);
 	PALETTE(config, "palette", FUNC(xyonix_state::xyonix_palette), 256);
@@ -272,7 +272,7 @@ MACHINE_CONFIG_START(xyonix_state::xyonix)
 
 	SN76496(config, "sn1", 16000000/4).add_route(ALL_OUTPUTS, "mono", 1.0);
 	SN76496(config, "sn2", 16000000/4).add_route(ALL_OUTPUTS, "mono", 1.0);
-MACHINE_CONFIG_END
+}
 
 /* ROM Loading ***************************************************************/
 

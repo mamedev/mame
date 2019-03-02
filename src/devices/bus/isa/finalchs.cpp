@@ -71,10 +71,11 @@ DEFINE_DEVICE_TYPE(ISA8_FINALCHS, isa8_finalchs_device, "isa_finalchs", "Final C
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(isa8_finalchs_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("maincpu",M65C02,5000000)
-	MCFG_DEVICE_PROGRAM_MAP(finalchs_mem)
-MACHINE_CONFIG_END
+void isa8_finalchs_device::device_add_mconfig(machine_config &config)
+{
+	m65c02_device &cpu(M65C02(config, "maincpu", 5000000));
+	cpu.set_addrmap(AS_PROGRAM, &isa8_finalchs_device::finalchs_mem);
+}
 
 //**************************************************************************
 //  LIVE DEVICE

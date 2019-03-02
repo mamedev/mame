@@ -212,7 +212,7 @@ MACHINE_CONFIG_START(isbc8010_state::isbc8010)
 //  MCFG_SCREEN_UPDATE_DRIVER(sdk80_state, screen_update)
 //  MCFG_SCREEN_PALETTE("palette")
 
-//  MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sdk80)
+//  GFXDECODE(config, "gfxdecode", "palette", gfx_sdk80);
 
 //  MCFG_PALETTE_ADD_MONOCHROME("palette")
 

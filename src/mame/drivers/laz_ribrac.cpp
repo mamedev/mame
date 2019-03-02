@@ -49,19 +49,18 @@ void laz_ribrac_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(laz_ribrac_state::laz_ribrac)
-
+void laz_ribrac_state::laz_ribrac(machine_config &config)
+{
 	/* basic machine hardware */
-//  MCFG_DEVICE_ADD("maincpu", ??, 8000000) // unknown
-//  MCFG_DEVICE_PROGRAM_MAP(laz_ribrac_map)
-//  MCFG_DEVICE_IO_MAP(laz_ribrac_io)
+//  ??_device &maincpu(??(config, "maincpu", 8000000)); // unknown
+//  maincpu.set_addrmap(AS_PROGRAM, &laz_ribrac_state::laz_ribrac_map);
+//  maincpu.set_addrmap(AS_IO, &laz_ribrac_state::laz_ribrac_io);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH) // maybe
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki", 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // maybe
+}
 
 
 

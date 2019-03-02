@@ -220,7 +220,7 @@ WRITE8_MEMBER( atomeb_state::eprom_w )
 READ8_MEMBER( atomeb_state::ext_r )
 {
 	if (m_ext[m_eprom & 0x0f]->exists())
-		return m_ext[m_eprom & 0x0f]->read_rom(space, offset);
+		return m_ext[m_eprom & 0x0f]->read_rom(offset);
 	else
 		return 0xff;
 }
@@ -232,9 +232,9 @@ READ8_MEMBER( atomeb_state::ext_r )
 READ8_MEMBER( atomeb_state::dos_r )
 {
 	if (m_e0->exists() && !BIT(m_eprom, 7))
-		return m_e0->read_rom(space, offset);
+		return m_e0->read_rom(offset);
 	else if (m_e1->exists() && BIT(m_eprom, 7))
-		return m_e1->read_rom(space, offset);
+		return m_e1->read_rom(offset);
 	else
 		return 0xff;
 }
@@ -663,7 +663,7 @@ void atom_state::machine_start()
 	m_baseram[0x0b] = machine().rand() & 0x0ff;
 
 	if (m_cart.found() && m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0xa000, 0xafff, read8_delegate(FUNC(generic_slot_device::read_rom), &*m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xa000, 0xafff, read8sm_delegate(FUNC(generic_slot_device::read_rom), &*m_cart));
 }
 
 /*-------------------------------------------------
@@ -742,23 +742,22 @@ MACHINE_CONFIG_START(atom_state::atom)
 	I8271(config, m_fdc, 0);
 	m_fdc->intrq_wr_callback().set(FUNC(atom_state::atom_8271_interrupt_callback));
 	m_fdc->hdl_wr_callback().set(FUNC(atom_state::motor_w));
-	MCFG_FLOPPY_DRIVE_ADD(I8271_TAG ":0", atom_floppies, "525sssd", atom_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD(I8271_TAG ":1", atom_floppies, "525sssd", atom_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, I8271_TAG ":0", atom_floppies, "525sssd", atom_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, I8271_TAG ":1", atom_floppies, "525sssd", atom_state::floppy_formats).enable_sound(true);
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(R6522_TAG, via6522_device, write_ca1))
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(R6522_TAG, via6522_device, write_pa7))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->ack_handler().set(R6522_TAG, FUNC(via6522_device::write_ca1));
+	m_centronics->busy_handler().set(R6522_TAG, FUNC(via6522_device::write_pa7));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(atom_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
 	m_cassette->set_interface("atom_cass");
 
-	MCFG_QUICKLOAD_ADD("quickload", atom_state, atom_atm, "atm", 0)
+	MCFG_QUICKLOAD_ADD("quickload", atom_state, atom_atm, "atm")
 
 	/* utility rom slot */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "atom_cart")
@@ -769,9 +768,9 @@ MACHINE_CONFIG_START(atom_state::atom)
 	RAM(config, RAM_TAG).set_default_size("32K").set_extra_options("2K,4K,6K,8K,10K,12K").set_default_value(0x00);
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("rom_list","atom_rom")
-	MCFG_SOFTWARE_LIST_ADD("cass_list","atom_cass")
-	MCFG_SOFTWARE_LIST_ADD("flop_list","atom_flop")
+	SOFTWARE_LIST(config, "rom_list").set_original("atom_rom");
+	SOFTWARE_LIST(config, "cass_list").set_original("atom_cass");
+	SOFTWARE_LIST(config, "flop_list").set_original("atom_flop");
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
@@ -789,7 +788,7 @@ MACHINE_CONFIG_START(atomeb_state::atomeb)
 	MCFG_DEVICE_PROGRAM_MAP(atomeb_mem)
 
 	/* cartridges */
-	MCFG_DEVICE_REMOVE("cartslot")
+	config.device_remove("cartslot");
 
 	MCFG_ATOM_ROM_ADD("rom_a0", ext_load<0x0>)
 	MCFG_ATOM_ROM_ADD("rom_a1", ext_load<0x1>)
@@ -816,10 +815,11 @@ MACHINE_CONFIG_END
     MACHINE_DRIVER( atombb )
 -------------------------------------------------*/
 
-MACHINE_CONFIG_START(atom_state::atombb)
+void atom_state::atombb(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(SY6502_TAG, M6502, X2/4)
-	MCFG_DEVICE_PROGRAM_MAP(atombb_mem)
+	M6502(config, m_maincpu, X2/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &atom_state::atombb_mem);
 
 	/* video hardware */
 	SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER);
@@ -830,8 +830,7 @@ MACHINE_CONFIG_START(atom_state::atombb)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* devices */
 	TIMER(config, "hz2400").configure_periodic(FUNC(atom_state::cassette_output_tick), attotime::from_hz(4806));
@@ -847,11 +846,12 @@ MACHINE_CONFIG_START(atom_state::atombb)
 	ppi.in_pc_callback().set(FUNC(atom_state::ppi_pc_r));
 	ppi.out_pc_callback().set(FUNC(atom_state::ppi_pc_w));
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(R6522_TAG, via6522_device, write_ca1))
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(R6522_TAG, via6522_device, write_pa7))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->ack_handler().set(R6522_TAG, FUNC(via6522_device::write_ca1));
+	m_centronics->busy_handler().set(R6522_TAG, FUNC(via6522_device::write_pa7));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(atom_cassette_formats);
@@ -860,7 +860,7 @@ MACHINE_CONFIG_START(atom_state::atombb)
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("8K,12K");
-MACHINE_CONFIG_END
+}
 
 /*-------------------------------------------------
     MACHINE_DRIVER( prophet2 )
@@ -873,17 +873,17 @@ MACHINE_CONFIG_END
 //  MCFG_DEVICE_PROGRAM_MAP(prophet_mem)
 //
 //  /* fdc */
-//  MCFG_DEVICE_REMOVE(I8271_TAG)
-//  MCFG_DEVICE_REMOVE(I8271_TAG ":0")
-//  MCFG_DEVICE_REMOVE(I8271_TAG ":1")
+//  config.device_remove(I8271_TAG);
+//  config.device_remove(I8271_TAG ":0");
+//  config.device_remove(I8271_TAG ":1");
 //
 //  /* internal ram */
 //  MCFG_RAM_MODIFY(RAM_TAG)
 //  MCFG_RAM_DEFAULT_SIZE("32K")
 
 //  /* Software lists */
-//  MCFG_SOFTWARE_LIST_REMOVE("rom_list")
-//  MCFG_SOFTWARE_LIST_REMOVE("flop_list")
+//  config.device_remove("rom_list");
+//  config.device_remove("flop_list");
 //MACHINE_CONFIG_END
 
 /*-------------------------------------------------
@@ -901,19 +901,20 @@ MACHINE_CONFIG_END
 //  MCFG_RAM_DEFAULT_SIZE("32K")
 
 //  /* Software lists */
-//  MCFG_SOFTWARE_LIST_REMOVE("rom_list")
+//  config.device_remove("rom_list");
 //MACHINE_CONFIG_END
 
 /*-------------------------------------------------
     MACHINE_DRIVER( atommc )
 -------------------------------------------------*/
 
-//static MACHINE_CONFIG_START( atommc )
+//void atom_state::atommc(machine_config &config)
+//{
 //  atom(config);
 //  /* Software lists */
-//  MCFG_SOFTWARE_LIST_ADD("mmc_list","atom_mmc")
-//  MCFG_SOFTWARE_LIST_REMOVE("flop_list")
-//MACHINE_CONFIG_END
+//  SOFTWARE_LIST(config, "mmc_list").set_original("atom_mmc");
+//  config.device_remove("flop_list");
+//}
 
 /***************************************************************************
     ROMS

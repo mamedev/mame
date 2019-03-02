@@ -477,26 +477,25 @@ void superwng_state::machine_reset()
 	m_nmi_enable = 0;
 }
 
-MACHINE_CONFIG_START(superwng_state::superwng)
-
+void superwng_state::superwng(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(superwng_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", superwng_state,  superwng_nmi_interrupt)
+	Z80(config, m_maincpu, MASTER_CLOCK/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &superwng_state::superwng_map);
+	m_maincpu->set_vblank_int("screen", FUNC(superwng_state::superwng_nmi_interrupt));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, MASTER_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(superwng_sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(superwng_state, superwng_sound_nmi_assert,  4*60)
-
+	Z80(config, m_audiocpu, MASTER_CLOCK/4);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &superwng_state::superwng_sound_map);
+	m_audiocpu->set_periodic_int(FUNC(superwng_state::superwng_sound_nmi_assert), attotime::from_hz(4*60));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(superwng_state, screen_update_superwng)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(superwng_state::screen_update_superwng));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_superwng);
 
@@ -509,7 +508,7 @@ MACHINE_CONFIG_START(superwng_state::superwng)
 	ay1.add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	AY8910(config, "ay2", MASTER_CLOCK/12).add_route(ALL_OUTPUTS, "mono", 0.50);
-MACHINE_CONFIG_END
+}
 
 ROM_START( superwng )
 	ROM_REGION( 0x20000, "maincpu", 0 )

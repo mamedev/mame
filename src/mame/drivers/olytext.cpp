@@ -148,32 +148,31 @@ static void olytext_floppies(device_slot_interface &device)
 //  MACHINE CONFIGURATION
 //**************************************************************************
 
-MACHINE_CONFIG_START( olytext_state::olytext )
-	MCFG_DEVICE_ADD("maincpu", Z80, 16_MHz_XTAL / 4)
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
+void olytext_state::olytext(machine_config &config)
+{
+	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &olytext_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &olytext_state::io_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(80*8, 28*11)
-	MCFG_SCREEN_VISIBLE_AREA(0, (80*8)-1, 0, (28*11)-1)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(olytext_state, screen_update)
-	//MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_size(80*8, 28*11);
+	screen.set_visarea(0, (80*8)-1, 0, (28*11)-1);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(olytext_state::screen_update));
+	//screen.set_palette("palette");
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* devices */
 	WD1772(config, "fdc", 16_MHz_XTAL / 8); // divisor guess
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", olytext_floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", olytext_floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, "fdc:0", olytext_floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", olytext_floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
 
 	/* keyboard */
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
 	keyboard.set_keyboard_callback(FUNC(olytext_state::keyboard_put));
-MACHINE_CONFIG_END
+}
 
 
 //**************************************************************************

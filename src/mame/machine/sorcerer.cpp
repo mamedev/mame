@@ -272,8 +272,7 @@ WRITE8_MEMBER(sorcerer_state::port_fe_w)
 	// bit 6 baud rate */
 	if (BIT(changed_bits, 6))
 	{
-		m_uart->set_receiver_clock(BIT(data, 6) ? ES_UART_CLOCK*4 : ES_UART_CLOCK);
-		m_uart->set_transmitter_clock(BIT(data, 6) ? ES_UART_CLOCK*4 : ES_UART_CLOCK);
+		m_uart_clock->set_unscaled_clock(BIT(data, 6) ? ES_UART_CLOCK*4 : ES_UART_CLOCK);
 	}
 }
 
@@ -418,7 +417,7 @@ void sorcerer_state::machine_start()
 	}
 
 	if (m_cart->exists())
-		space.install_read_handler(0xc000, 0xdfff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+		space.install_read_handler(0xc000, 0xdfff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 }
 
 MACHINE_START_MEMBER(sorcerer_state,sorcererd)
@@ -446,7 +445,7 @@ MACHINE_START_MEMBER(sorcerer_state,sorcererd)
 	}
 
 	if (m_cart->exists())
-		space.install_read_handler(0xc000, 0xdfff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+		space.install_read_handler(0xc000, 0xdfff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 }
 
 void sorcerer_state::machine_reset()

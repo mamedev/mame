@@ -139,7 +139,7 @@ void nes_txc_commandos_device::pcb_reset()
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_txc_22211_device::write_l)
+void nes_txc_22211_device::write_l(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("TXC 22111 write_l, offset: %04x, data: %02x\n", offset, data));
 
@@ -147,7 +147,7 @@ WRITE8_MEMBER(nes_txc_22211_device::write_l)
 		m_reg[offset & 0x03] = data;
 }
 
-READ8_MEMBER(nes_txc_22211_device::read_l)
+uint8_t nes_txc_22211_device::read_l(offs_t offset)
 {
 	LOG_MMC(("TXC 22111 read_l, offset: %04x\n", offset));
 
@@ -157,7 +157,7 @@ READ8_MEMBER(nes_txc_22211_device::read_l)
 		return 0x00;
 }
 
-WRITE8_MEMBER(nes_txc_22211_device::write_h)
+void nes_txc_22211_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("TXC 22111 write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -180,7 +180,7 @@ WRITE8_MEMBER(nes_txc_22211_device::write_h)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_txc_dumarc_device::write_h)
+void nes_txc_dumarc_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("TXC Du Ma Racing write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -203,7 +203,7 @@ WRITE8_MEMBER(nes_txc_dumarc_device::write_h)
 
  -------------------------------------------------*/
 
-READ8_MEMBER(nes_txc_mjblock_device::read_l)
+uint8_t nes_txc_mjblock_device::read_l(offs_t offset)
 {
 	LOG_MMC(("TXC mjblock read_l, offset: %04x\n", offset));
 
@@ -226,7 +226,7 @@ READ8_MEMBER(nes_txc_mjblock_device::read_l)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_txc_strikew_device::write_h)
+void nes_txc_strikew_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("TXC Strike Wolf write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -256,12 +256,12 @@ WRITE8_MEMBER(nes_txc_strikew_device::write_h)
 
  -------------------------------------------------*/
 
-READ8_MEMBER(nes_txc_commandos_device::read_l)
+uint8_t nes_txc_commandos_device::read_l(offs_t offset)
 {
 	return 0x50;
 }
 
-WRITE8_MEMBER(nes_txc_commandos_device::write_h)
+void nes_txc_commandos_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("TXC Commandos write_h, offset: %04x, data: %02x\n", offset, data));
 

@@ -420,7 +420,7 @@ void clickstart_state::clickstart(machine_config &config)
 	m_spg->porta_in().set(FUNC(clickstart_state::porta_r));
 	m_spg->portb_in().set(FUNC(clickstart_state::portb_r));
 	m_spg->portc_in().set(FUNC(clickstart_state::portc_r));
-	m_spg->adc_in().set_constant(0x0fff);
+	m_spg->adc_in<0>().set_constant(0x0fff);
 	m_spg->chip_select().set(FUNC(clickstart_state::chip_sel_w));
 	m_spg->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
 	m_spg->add_route(ALL_OUTPUTS, "rspeaker", 0.5);

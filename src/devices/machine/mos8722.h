@@ -57,7 +57,7 @@ public:
 	auto sense40() { return m_read_sense40.bind(); }
 
 	uint8_t read(offs_t offset, uint8_t data);
-	DECLARE_WRITE8_MEMBER( write );
+	void write(offs_t offset, uint8_t data);
 
 	DECLARE_READ_LINE_MEMBER( fsdir_r );
 

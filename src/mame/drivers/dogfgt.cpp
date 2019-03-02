@@ -37,11 +37,11 @@ WRITE8_MEMBER(dogfgt_state::soundcontrol_w)
 {
 	/* bit 5 goes to 8910 #0 BDIR pin  */
 	if ((m_last_snd_ctrl & 0x20) == 0x20 && (data & 0x20) == 0x00)
-		m_ay[0]->data_address_w(space, m_last_snd_ctrl >> 4, m_soundlatch);
+		m_ay[0]->data_address_w(m_last_snd_ctrl >> 4, m_soundlatch);
 
 	/* bit 7 goes to 8910 #1 BDIR pin  */
 	if ((m_last_snd_ctrl & 0x80) == 0x80 && (data & 0x80) == 0x00)
-		m_ay[1]->data_address_w(space, m_last_snd_ctrl >> 6, m_soundlatch);
+		m_ay[1]->data_address_w(m_last_snd_ctrl >> 6, m_soundlatch);
 
 	m_last_snd_ctrl = data;
 }
@@ -237,7 +237,7 @@ MACHINE_CONFIG_START(dogfgt_state::dogfgt)
 	MCFG_DEVICE_ADD(m_subcpu, M6502, 1500000) /* 1.5 MHz ???? */
 	MCFG_DEVICE_PROGRAM_MAP(sub_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(m_screen, RASTER)

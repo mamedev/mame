@@ -876,10 +876,11 @@ TIMER_CALLBACK_MEMBER(dectalk_state::outfifo_read_cb)
 	    m_duart->duart_rx_break(1, 0);*/
 }
 
-MACHINE_CONFIG_START(dectalk_state::dectalk)
+void dectalk_state::dectalk(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(20'000'000)/2) /* E74 20MHz OSC (/2) */
-	MCFG_DEVICE_PROGRAM_MAP(m68k_mem)
+	M68000(config, m_maincpu, XTAL(20'000'000)/2); /* E74 20MHz OSC (/2) */
+	m_maincpu->set_addrmap(AS_PROGRAM, &dectalk_state::m68k_mem);
 
 	SCN2681(config, m_duart, XTAL(3'686'400)); // MC2681 DUART ; Y3 3.6864MHz xtal */
 	m_duart->irq_cb().set(FUNC(dectalk_state::duart_irq_handler));
@@ -894,9 +895,9 @@ MACHINE_CONFIG_START(dectalk_state::dectalk)
 	m_dsp->bio().set(FUNC(dectalk_state::spc_semaphore_r)); //read infifo-has-data-in-it fifo readable status
 
 #ifdef USE_LOOSE_TIMING
-	MCFG_QUANTUM_TIME(attotime::from_hz(100))
+	config.m_minimum_quantum = attotime::from_hz(100);
 #else
-	MCFG_QUANTUM_PERFECT_CPU("dsp")
+	config.m_perfect_cpu_quantum = subtag("dsp");
 #endif
 
 	X2212(config, "x2212");
@@ -905,15 +906,16 @@ MACHINE_CONFIG_START(dectalk_state::dectalk)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", AD7541, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.9) // ad7541.e107 (E88 10KHz OSC, handled by timer)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	AD7541(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.9); // ad7541.e107 (E88 10KHz OSC, handled by timer)
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	/* Y2 is a 3.579545 MHz xtal for the dtmf decoder chip */
 
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
 	rs232.rxd_handler().set(m_duart, FUNC(scn2681_device::rx_b_w));
-MACHINE_CONFIG_END
+}
 
 
 

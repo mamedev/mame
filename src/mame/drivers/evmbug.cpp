@@ -93,7 +93,7 @@ WRITE8_MEMBER( evmbug_state::rs232_w )
 		m_term_out |= (data << offset);
 
 		if (offset == 7)
-			m_terminal->write(space, 0, m_term_out & 0x7f);
+			m_terminal->write(m_term_out & 0x7f);
 	}
 	else
 	if (offset == 18)

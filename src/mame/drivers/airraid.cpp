@@ -401,7 +401,7 @@ MACHINE_CONFIG_START(airraid_state::airraid)
 	MCFG_DEVICE_OPCODES_MAP(airraid_sound_decrypted_opcodes_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 0x100);
 

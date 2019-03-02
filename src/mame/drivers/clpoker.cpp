@@ -286,7 +286,7 @@ MACHINE_CONFIG_START(clpoker_state::clpoker)
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, "palette")); // HM86171
 	ramdac.set_addrmap(0, &clpoker_state::ramdac_map);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_clpoker)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_clpoker);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -51,8 +51,8 @@ protected:
 	virtual void device_start() override;
 
 	// S-100 memory access handlers
-	virtual u8 s100_smemr_r(address_space &space, offs_t offset) override;
-	virtual void s100_mwrt_w(address_space &space, offs_t offset, u8 data) override;
+	virtual u8 s100_smemr_r(offs_t offset) override;
+	virtual void s100_mwrt_w(offs_t offset, u8 data) override;
 
 	// internal state
 	std::unique_ptr<u8[]> m_ram;
@@ -203,7 +203,7 @@ bool s100_8k_sc_device::board_selected(offs_t offset) const
 //  s100_smemr_r - memory read
 //-------------------------------------------------
 
-u8 s100_8k_sc_device::s100_smemr_r(address_space &space, offs_t offset)
+u8 s100_8k_sc_device::s100_smemr_r(offs_t offset)
 {
 	if (board_selected(offset))
 		return m_ram[offset & 0x1fff];
@@ -216,7 +216,7 @@ u8 s100_8k_sc_device::s100_smemr_r(address_space &space, offs_t offset)
 //  s100_mwrt_w - memory write
 //-------------------------------------------------
 
-void s100_8k_sc_device::s100_mwrt_w(address_space &space, offs_t offset, u8 data)
+void s100_8k_sc_device::s100_mwrt_w(offs_t offset, u8 data)
 {
 	if (board_selected(offset))
 		m_ram[offset & 0x1fff] = data;

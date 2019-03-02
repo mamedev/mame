@@ -191,7 +191,6 @@ void btoads_state::main_map(address_map &map)
 	map(0xa8800000, 0xa8ffffff).nopw();
 	map(0xb0000000, 0xb03fffff).rw(FUNC(btoads_state::vram_bg0_r), FUNC(btoads_state::vram_bg0_w)).share("vram_bg0");
 	map(0xb4000000, 0xb43fffff).rw(FUNC(btoads_state::vram_bg1_r), FUNC(btoads_state::vram_bg1_w)).share("vram_bg1");
-	map(0xc0000000, 0xc00003ff).rw(m_maincpu, FUNC(tms34020_device::io_register_r), FUNC(tms34020_device::io_register_w));
 	map(0xfc000000, 0xffffffff).rom().region("user1", 0);
 }
 

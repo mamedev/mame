@@ -114,6 +114,7 @@ Address bus A0-A11 is Y0-Y11
 #include "machine/sonydriv.h"
 #include "machine/timer.h"
 #include "machine/ds1315.h"
+#include "machine/apple2common.h"
 
 #include "bus/a2bus/a2bus.h"
 #include "bus/a2bus/a2diskii.h"
@@ -211,6 +212,7 @@ public:
 		m_scantimer(*this, "scantimer"),
 		m_ram(*this, RAM_TAG),
 		m_rom(*this, "maincpu"),
+		m_a2common(*this, "a2common"),
 		m_cecbanks(*this, "cecexp"),
 		m_ay3600(*this, A2_KBDC_TAG),
 		m_video(*this, A2_VIDEO_TAG),
@@ -253,6 +255,7 @@ public:
 	required_device<timer_device> m_scantimer;
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
+	required_device<apple2_common_device> m_a2common;
 	optional_memory_region m_cecbanks;
 	required_device<ay3600_device> m_ay3600;
 	required_device<a2_video_device> m_video;
@@ -481,6 +484,8 @@ private:
 
 	uint8_t mig_r(uint16_t offset);
 	void mig_w(uint16_t offset, uint8_t data);
+
+	offs_t dasm_trampoline(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
 };
 
 /***************************************************************************
@@ -490,6 +495,11 @@ private:
 #define JOYSTICK_DELTA          80
 #define JOYSTICK_SENSITIVITY    50
 #define JOYSTICK_AUTOCENTER     80
+
+offs_t apple2e_state::dasm_trampoline(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params)
+{
+	return m_a2common->dasm_override(stream, pc, opcodes, params);
+}
 
 uint8_t apple2e_state::mig_r(uint16_t offset)
 {
@@ -780,8 +790,8 @@ void apple2e_state::machine_start()
 	}
 
 	// precalculate joystick time constants
-	m_x_calibration = attotime::from_usec(12).as_double();
-	m_y_calibration = attotime::from_usec(13).as_double();
+	m_x_calibration = attotime::from_nsec(10800).as_double();
+	m_y_calibration = attotime::from_nsec(10800).as_double();
 
 	// cache slot devices
 	for (int i = 0; i <= 7; i++)
@@ -817,6 +827,24 @@ void apple2e_state::machine_start()
 	m_video->m_aux_ptr = m_aux_ptr;
 	m_video->m_char_ptr = memregion("gfx1")->base();
 	m_video->m_char_size = memregion("gfx1")->bytes();
+
+	int ram_size = 0x10000;
+	if (m_ram_size < 0x10000)
+	{
+		ram_size = m_ram_size;
+	}
+
+	for (int adr = 0; adr < ram_size; adr += 2)
+	{
+		m_ram_ptr[adr] = 0;
+		m_ram_ptr[adr+1] = 0xff;
+
+		if (m_ram_size >= (128*1024))
+		{
+			m_aux_ptr[adr] = 0;
+			m_aux_ptr[adr+1] = 0xff;
+		}
+	}
 
 	m_inh_slot = -1;
 	m_cnxx_slot = CNXX_UNCLAIMED;
@@ -1592,6 +1620,7 @@ void apple2e_state::do_io(address_space &space, int offset, bool is_iic)
 READ8_MEMBER(apple2e_state::c000_r)
 {
 	if(machine().side_effects_disabled()) return read_floatingbus();
+	u8 uFloatingBus7 = read_floatingbus() & 0x7f;
 
 	if ((offset & 0xf0) == 0x00) // keyboard latch, $C000 is really 00-0F
 	{
@@ -1656,43 +1685,43 @@ READ8_MEMBER(apple2e_state::c000_r)
 		case 0x68:
 			if (m_cassette)
 			{
-				return m_cassette->input() > 0.0 ? 0x80 : 0;
+				return (m_cassette->input() > 0.0 ? 0x80 : 0) | uFloatingBus7;
 			}
-			return 0;
+			return uFloatingBus7;
 
 		case 0x61:  // button 0 or Open Apple
 		case 0x69:
-			return ((m_joybuttons->read() & 0x10) || (m_kbspecial->read() & 0x10)) ? 0x80 : 0;
+			return (((m_joybuttons->read() & 0x10) || (m_kbspecial->read() & 0x10)) ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x62:  // button 1 or Solid Apple
 		case 0x6a:
-			return ((m_joybuttons->read() & 0x20) || (m_kbspecial->read() & 0x20)) ? 0x80 : 0;
+			return (((m_joybuttons->read() & 0x20) || (m_kbspecial->read() & 0x20)) ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x63:  // button 2 or SHIFT key
 		case 0x6b:
-			return ((m_joybuttons->read() & 0x40) || (m_kbspecial->read() & 0x06)) ? 0x80 : 0;
+			return (((m_joybuttons->read() & 0x40) || (m_kbspecial->read() & 0x06)) ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x64:  // joy 1 X axis
 		case 0x6c:
-			return (machine().time().as_double() < m_joystick_x1_time) ? 0x80 : 0;
+			return ((machine().time().as_double() < m_joystick_x1_time) ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x65:  // joy 1 Y axis
 		case 0x6d:
-			return (machine().time().as_double() < m_joystick_y1_time) ? 0x80 : 0;
+			return ((machine().time().as_double() < m_joystick_y1_time) ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x66: // joy 2 X axis
 		case 0x6e:
-			return (machine().time().as_double() < m_joystick_x2_time) ? 0x80 : 0;
+			return ((machine().time().as_double() < m_joystick_x2_time) ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x67: // joy 2 Y axis
 		case 0x6f:
-			return (machine().time().as_double() < m_joystick_y2_time) ? 0x80 : 0;
+			return ((machine().time().as_double() < m_joystick_y2_time) ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x7e:  // read IOUDIS
-			return m_ioudis ? 0x80 : 0x00;
+			return (m_ioudis ? 0x80 : 0x00) | uFloatingBus7;
 
 		case 0x7f:  // read DHIRES
-			return m_video->m_dhires ? 0x00 : 0x80;
+			return (m_video->m_dhires ? 0x00 : 0x80) | uFloatingBus7;
 
 		default:
 			do_io(space, offset, false);
@@ -1810,7 +1839,7 @@ WRITE8_MEMBER(apple2e_state::c000_w)
 		case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d:
 			if (m_auxslotdevice)
 			{
-				m_auxslotdevice->write_c07x(space, offset & 0xf, data);
+				m_auxslotdevice->write_c07x(offset & 0xf, data);
 
 				// card may have banked auxram; get a new bank pointer
 				m_aux_bank_ptr = m_auxslotdevice->get_auxbank_ptr();
@@ -1833,6 +1862,7 @@ WRITE8_MEMBER(apple2e_state::c000_w)
 READ8_MEMBER(apple2e_state::c000_iic_r)
 {
 	if(machine().side_effects_disabled()) return read_floatingbus();
+	u8 uFloatingBus7 = read_floatingbus() & 0x7f;
 
 	if ((offset & 0xf0) == 0x00) // keyboard latch, $C000 is really 00-0F
 	{
@@ -1908,43 +1938,43 @@ READ8_MEMBER(apple2e_state::c000_iic_r)
 			return m_y0edge ? 0x80 : 0x00;
 
 		case 0x60: // 40/80 column switch (IIc only)
-			return (m_sysconfig->read() & 0x04) ? 0x80 : 0;
+			return ((m_sysconfig->read() & 0x04) ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x61:  // button 0 or Open Apple or mouse button 1
 		case 0x69:
-			return ((m_joybuttons->read() & 0x10) || (m_kbspecial->read() & 0x10)) ? 0x80 : 0;
+			return (((m_joybuttons->read() & 0x10) || (m_kbspecial->read() & 0x10)) ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x62:  // button 1 or Solid Apple
 		case 0x6a:
-			return ((m_joybuttons->read() & 0x20) || (m_kbspecial->read() & 0x20)) ? 0x80 : 0;
+			return (((m_joybuttons->read() & 0x20) || (m_kbspecial->read() & 0x20)) ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x63:  // mouse button 2 (no other function on IIc)
 		case 0x6b:
-			return m_mouseb->read() ? 0 : 0x80;
+			return (m_mouseb->read() ? 0 : 0x80) | uFloatingBus7;
 
 		case 0x64:  // joy 1 X axis
 		case 0x6c:
-			return (machine().time().as_double() < m_joystick_x1_time) ? 0x80 : 0;
+			return ((machine().time().as_double() < m_joystick_x1_time) ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x65:  // joy 1 Y axis
 		case 0x6d:
-			return (machine().time().as_double() < m_joystick_y1_time) ? 0x80 : 0;
+			return ((machine().time().as_double() < m_joystick_y1_time) ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x66: // mouse X1 (IIc only)
 		case 0x6e:
-			return m_x1 ? 0x80 : 0;
+			return (m_x1 ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x67: // mouse Y1 (IIc only)
 		case 0x6f:
-			return m_y1 ? 0x80 : 0;
+			return (m_y1 ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x7e:  // read IOUDIS
 			m_vbl = false;
 			lower_irq(IRQ_VBL);
-			return m_ioudis ? 0x80 : 0x00;
+			return (m_ioudis ? 0x80 : 0x00) | uFloatingBus7;
 
 		case 0x7f:  // read DHIRES
-			return m_video->m_dhires ? 0x00 : 0x80;
+			return (m_video->m_dhires ? 0x00 : 0x80) | uFloatingBus7;
 
 		default:
 			do_io(space, offset, true);
@@ -3956,15 +3986,19 @@ static void apple2eaux_cards(device_slot_interface &device)
 	device.option_add("rw3", A2EAUX_RAMWORKS3);  /* Applied Engineering RamWorks III */
 }
 
-MACHINE_CONFIG_START(apple2e_state::apple2e)
+void apple2e_state::apple2e(machine_config &config)
+{
 	/* basic machine hardware */
 	M6502(config, m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::apple2e_map);
+	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
+
 	TIMER(config, m_scantimer, 0);
 	m_scantimer->configure_scanline(FUNC(apple2e_state::apple2_interrupt), "screen", 0, 1);
 	config.m_minimum_quantum = attotime::from_hz(60);
 
 	APPLE2_VIDEO(config, m_video, XTAL(14'318'181));
+	APPLE2_COMMON(config, m_a2common, XTAL(14'318'181));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(1021800*14, (65*7)*2, 0, (40*7)*2, 262, 0, 192);
@@ -4052,20 +4086,21 @@ MACHINE_CONFIG_START(apple2e_state::apple2e)
 	A2BUS_SLOT(config, "sl6", m_a2bus, apple2_cards, "diskiing");
 	A2BUS_SLOT(config, "sl7", m_a2bus, apple2_cards, nullptr);
 
-	MCFG_DEVICE_ADD(A2_AUXSLOT_TAG, A2EAUXSLOT, 0)
-	MCFG_A2EAUXSLOT_CPU("maincpu")
-	MCFG_A2EAUXSLOT_OUT_IRQ_CB(WRITELINE(*this, apple2e_state, a2bus_irq_w))
-	MCFG_A2EAUXSLOT_OUT_NMI_CB(WRITELINE(*this, apple2e_state, a2bus_nmi_w))
-	MCFG_A2EAUXSLOT_SLOT_ADD(A2_AUXSLOT_TAG, "aux", apple2eaux_cards, "ext80")   // default to an extended 80-column card
+	A2EAUXSLOT(config, m_a2eauxslot, 0);
+	m_a2eauxslot->set_space(m_maincpu, AS_PROGRAM);
+	m_a2eauxslot->out_irq_callback().set(FUNC(apple2e_state::a2bus_irq_w));
+	m_a2eauxslot->out_nmi_callback().set(FUNC(apple2e_state::a2bus_nmi_w));
+	A2EAUXSLOT_SLOT(config, "aux", m_a2eauxslot, apple2eaux_cards, "ext80");
 
-	MCFG_SOFTWARE_LIST_ADD("flop525_list","apple2")
+	/* softlist config for baseline A2E
+	By default, filter lists where possible to compatible disks for A2E */
+	SOFTWARE_LIST(config, "flop525_clean").set_original("apple2_flop_clcracked");
+	SOFTWARE_LIST(config, "flop525_orig").set_compatible("apple2_flop_orig").set_filter("A2E");
+	SOFTWARE_LIST(config, "flop525_misc").set_compatible("apple2_flop_misc");
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED);
-
-	/* softlist config for baseline A2E */
-	SOFTWARE_LIST(config, "flop525_orig").set_compatible("apple2_flop_orig").set_filter("A2E");  // By default, filter list to compatible disks for A2E
-MACHINE_CONFIG_END
+}
 
 void apple2e_state::mprof3(machine_config &config)
 {
@@ -4074,39 +4109,45 @@ void apple2e_state::mprof3(machine_config &config)
 	m_ram->set_default_size("128K");
 }
 
-MACHINE_CONFIG_START(apple2e_state::apple2ee)
+void apple2e_state::apple2ee(machine_config &config)
+{
 	apple2e(config);
 	subdevice<software_list_device>("flop525_orig")->set_filter("A2EE");  // Filter list to compatible disks for this machine.
 
 	M65C02(config.replace(), m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::apple2e_map);
-MACHINE_CONFIG_END
+	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
+}
 
-MACHINE_CONFIG_START(apple2e_state::spectred)
+void apple2e_state::spectred(machine_config &config)
+{
 	apple2e(config);
-	MCFG_DEVICE_ADD("keyb_mcu", I8035, XTAL(4'000'000)) /* guessed frequency */
-	MCFG_DEVICE_PROGRAM_MAP(spectred_keyb_map)
+	i8035_device &keyb_mcu(I8035(config, "keyb_mcu", XTAL(4'000'000))); /* guessed frequency */
+	keyb_mcu.set_addrmap(AS_PROGRAM, &apple2e_state::spectred_keyb_map);
 
 		//TODO: implement the actual interfacing to this 8035 MCU and
 		//      and then remove the keyb CPU inherited from apple2e
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(apple2e_state::tk3000)
+void apple2e_state::tk3000(machine_config &config)
+{
 	apple2e(config);
 	M65C02(config.replace(), m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::apple2e_map);
 
-//  MCFG_DEVICE_ADD("subcpu", Z80, 1021800)    // schematics are illegible on where the clock comes from, but it *seems* to be the same as the 65C02 clock
-//  MCFG_DEVICE_PROGRAM_MAP(tk3000_kbd_map)
-MACHINE_CONFIG_END
+//  z80_device &subcpu(Z80(config, "subcpu", 1021800));    // schematics are illegible on where the clock comes from, but it *seems* to be the same as the 65C02 clock
+//  subcpu.set_addrmap(AS_PROGRAM, &apple2e_state::tk3000_kbd_map);
+}
 
-MACHINE_CONFIG_START(apple2e_state::apple2ep)
+void apple2e_state::apple2ep(machine_config &config)
+{
 	apple2e(config);
 	M65C02(config.replace(), m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::apple2e_map);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(apple2e_state::apple2c)
+void apple2e_state::apple2c(machine_config &config)
+{
 	apple2ee(config);
 	subdevice<software_list_device>("flop525_orig")->set_filter("A2C");  // Filter list to compatible disks for this machine.
 
@@ -4152,7 +4193,7 @@ MACHINE_CONFIG_START(apple2e_state::apple2c)
 	config.device_remove(A2_AUXSLOT_TAG);
 
 	m_ram->set_default_size("128K").set_extra_options("128K");
-MACHINE_CONFIG_END
+}
 
 static void apple2cp_set_lines(device_t *device, uint8_t lines)
 {
@@ -4256,37 +4297,44 @@ static const floppy_interface floppy_interface =
 	"floppy_5_25"
 };
 
-MACHINE_CONFIG_START(apple2e_state::apple2cp)
+void apple2e_state::apple2cp(machine_config &config)
+{
 	apple2c(config);
 	M65C02(config.replace(), m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::apple2c_memexp_map);
+	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
 
 	config.device_remove("sl4");
 	config.device_remove("sl6");
-	MCFG_IWM_ADD(IICP_IWM_TAG, a2cp_interface)
-	MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(floppy_interface,15,16)
-	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADDITIONAL_ADD(apple2cp_floppy35_floppy_interface)
+	IWM(config, m_iicpiwm, &a2cp_interface);
+	FLOPPY_APPLE(config, FLOPPY_0, &floppy_interface, 15, 16);
+	FLOPPY_APPLE(config, FLOPPY_1, &floppy_interface, 15, 16);
+	FLOPPY_SONY(config, FLOPPY_2, &apple2cp_floppy35_floppy_interface);
+	FLOPPY_SONY(config, FLOPPY_3, &apple2cp_floppy35_floppy_interface);
 
 	m_ram->set_default_size("128K").set_extra_options("128K, 384K, 640K, 896K, 1152K");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(apple2e_state::apple2c_iwm)
+void apple2e_state::apple2c_iwm(machine_config &config)
+{
 	apple2c(config);
 
 	config.device_remove("sl6");
 	A2BUS_IWM_FDC(config, "sl6", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(apple2e_state::apple2c_mem)
+void apple2e_state::apple2c_mem(machine_config &config)
+{
 	apple2c(config);
 	M65C02(config.replace(), m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::apple2c_memexp_map);
+	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
 
 	config.device_remove("sl6");
 	A2BUS_IWM_FDC(config, "sl6", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
 
 	m_ram->set_default_size("128K").set_extra_options("128K, 384K, 640K, 896K, 1152K");
-MACHINE_CONFIG_END
+}
 
 const applefdc_interface fdc_interface =
 {
@@ -4298,13 +4346,15 @@ const applefdc_interface fdc_interface =
 	apple525_read_status    /* read_status */
 };
 
-MACHINE_CONFIG_START(apple2e_state::laser128)
+void apple2e_state::laser128(machine_config &config)
+{
 	apple2c(config);
 	M65C02(config.replace(), m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::laser128_map);
 
-	MCFG_APPLEFDC_ADD(LASER128_UDC_TAG, fdc_interface)
-	MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(floppy_interface,15,16)
+	APPLEFDC(config, m_laserudc, &fdc_interface);
+	FLOPPY_APPLE(config, FLOPPY_0, &floppy_interface, 15, 16);
+	FLOPPY_APPLE(config, FLOPPY_1, &floppy_interface, 15, 16);
 
 	config.device_remove("sl4");
 	config.device_remove("sl6");
@@ -4318,15 +4368,17 @@ MACHINE_CONFIG_START(apple2e_state::laser128)
 	A2BUS_SLOT(config, "sl7", m_a2bus, apple2_cards, nullptr);
 
 	m_ram->set_default_size("128K").set_extra_options("128K, 384K, 640K, 896K, 1152K");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(apple2e_state::laser128ex2)
+void apple2e_state::laser128ex2(machine_config &config)
+{
 	apple2c(config);
 	M65C02(config.replace(), m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::laser128_map);
 
-	MCFG_APPLEFDC_ADD(LASER128_UDC_TAG, fdc_interface)
-	MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(floppy_interface,15,16)
+	APPLEFDC(config, m_laserudc, &fdc_interface);
+	FLOPPY_APPLE(config, FLOPPY_0, &floppy_interface, 15, 16);
+	FLOPPY_APPLE(config, FLOPPY_1, &floppy_interface, 15, 16);
 
 	config.device_remove("sl4");
 	config.device_remove("sl6");
@@ -4340,9 +4392,10 @@ MACHINE_CONFIG_START(apple2e_state::laser128ex2)
 	A2BUS_LASER128(config, "sl7", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
 
 	m_ram->set_default_size("128K").set_extra_options("128K, 384K, 640K, 896K, 1152K");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(apple2e_state::ceci)
+void apple2e_state::ceci(machine_config &config)
+{
 	apple2e(config);
 	config.device_remove("sl1");
 	config.device_remove("sl2");
@@ -4359,7 +4412,7 @@ MACHINE_CONFIG_START(apple2e_state::ceci)
 	config.device_remove(A2_AUXSLOT_TAG);
 
 	m_ram->set_default_size("64K");
-MACHINE_CONFIG_END
+}
 
 /***************************************************************************
 

@@ -59,18 +59,16 @@ DEFINE_DEVICE_TYPE(APRICOT_EXPANSION_BUS, apricot_expansion_bus_device, "apricot
 
 apricot_expansion_bus_device::apricot_expansion_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, APRICOT_EXPANSION_BUS, tag, owner, clock),
-	m_program(nullptr),
-	m_io(nullptr),
-	m_program_iop(nullptr),
-	m_io_iop(nullptr),
+	m_program(*this, finder_base::DUMMY_TAG, -1),
+	m_io(*this, finder_base::DUMMY_TAG, -1),
+	m_program_iop(*this, finder_base::DUMMY_TAG, -1),
+	m_io_iop(*this, finder_base::DUMMY_TAG, -1),
 	m_dma1_handler(*this),
 	m_dma2_handler(*this),
 	m_ext1_handler(*this),
 	m_ext2_handler(*this),
 	m_int2_handler(*this),
-	m_int3_handler(*this),
-	m_cpu(*this, finder_base::DUMMY_TAG),
-	m_iop(*this, finder_base::DUMMY_TAG)
+	m_int3_handler(*this)
 {
 }
 
@@ -96,19 +94,6 @@ void apricot_expansion_bus_device::device_start()
 	m_ext2_handler.resolve_safe();
 	m_int2_handler.resolve_safe();
 	m_int3_handler.resolve_safe();
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void apricot_expansion_bus_device::device_reset()
-{
-	m_program = &m_cpu->space(AS_PROGRAM);
-	m_io = &m_cpu->space(AS_IO);
-
-	m_program_iop = &m_iop->space(AS_PROGRAM);
-	m_io_iop = &m_iop->space(AS_IO);
 }
 
 //-------------------------------------------------

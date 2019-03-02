@@ -101,7 +101,7 @@ WRITE8_MEMBER( microkit_state::ram_w )
 {
 	m_ram_data = data;
 	if (data > 0 && data < 0x80)
-		m_terminal->write(space, 0, data);
+		m_terminal->write(data);
 }
 
 void microkit_state::machine_reset()

@@ -972,18 +972,19 @@ void laser3k_state::laser3k_palette(palette_device &palette) const
 	palette.set_pen_colors(0, laser3k_pens);
 }
 
-MACHINE_CONFIG_START(laser3k_state::laser3k)
+void laser3k_state::laser3k(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, 1021800)
-	MCFG_DEVICE_PROGRAM_MAP(laser3k_map)
+	M6502(config, m_maincpu, 1021800);
+	m_maincpu->set_addrmap(AS_PROGRAM, &laser3k_state::laser3k_map);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(300*2, 192)
-	MCFG_SCREEN_VISIBLE_AREA(0, (280*2)-1,0,192-1)
-	MCFG_SCREEN_UPDATE_DRIVER(laser3k_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(50);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(300*2, 192);
+	m_screen->set_visarea(0, (280*2)-1,0,192-1);
+	m_screen->set_screen_update(FUNC(laser3k_state::screen_update));
+	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(laser3k_state::laser3k_palette), ARRAY_LENGTH(laser3k_pens));
 
@@ -1012,11 +1013,9 @@ MACHINE_CONFIG_START(laser3k_state::laser3k)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_DEVICE_ADD("sn76489", SN76489, 1020484)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
+	SN76489(config, m_sn, 1020484).add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 ROM_START(las3000)
 	ROM_REGION(0x0800,"gfx1",0)

@@ -49,5 +49,5 @@ exact_ticks::type exact_ticks::per_second()
 
 #endif
 
-}
-}
+} // namespace chrono
+} // namespace plib

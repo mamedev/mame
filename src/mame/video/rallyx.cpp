@@ -80,18 +80,18 @@ void rallyx_state::rallyx_palette(palette_device &palette) const
 		bit0 = BIT(color_prom[i], 0);
 		bit1 = BIT(color_prom[i], 1);
 		bit2 = BIT(color_prom[i], 2);
-		int const r = combine_3_weights(rweights, bit0, bit1, bit2);
+		int const r = combine_weights(rweights, bit0, bit1, bit2);
 
 		// green component
 		bit0 = BIT(color_prom[i], 3);
 		bit1 = BIT(color_prom[i], 4);
 		bit2 = BIT(color_prom[i], 5);
-		int const g = combine_3_weights(gweights, bit0, bit1, bit2);
+		int const g = combine_weights(gweights, bit0, bit1, bit2);
 
 		// blue component
 		bit0 = BIT(color_prom[i], 6);
 		bit1 = BIT(color_prom[i], 7);
-		int const b = combine_2_weights(bweights, bit0, bit1);
+		int const b = combine_weights(bweights, bit0, bit1);
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
@@ -141,18 +141,18 @@ void rallyx_state::jungler_palette(palette_device &palette) const
 		bit0 = BIT(color_prom[i], 0);
 		bit1 = BIT(color_prom[i], 1);
 		bit2 = BIT(color_prom[i], 2);
-		int const r = combine_3_weights(rweights, bit0, bit1, bit2);
+		int const r = combine_weights(rweights, bit0, bit1, bit2);
 
 		// green component
 		bit0 = BIT(color_prom[i], 3);
 		bit1 = BIT(color_prom[i], 4);
 		bit2 = BIT(color_prom[i], 5);
-		int const g = combine_3_weights(gweights, bit0, bit1, bit2);
+		int const g = combine_weights(gweights, bit0, bit1, bit2);
 
 		// blue component
 		bit0 = BIT(color_prom[i], 6);
 		bit1 = BIT(color_prom[i], 7);
-		int const b = combine_2_weights(bweights, bit0, bit1);
+		int const b = combine_weights(bweights, bit0, bit1);
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
@@ -165,17 +165,17 @@ void rallyx_state::jungler_palette(palette_device &palette) const
 		// red component
 		bit0 = BIT((i - 0x20), 0);
 		bit1 = BIT((i - 0x20), 1);
-		int const r = combine_2_weights(rweights_star, bit0, bit1);
+		int const r = combine_weights(rweights_star, bit0, bit1);
 
 		// green component
 		bit0 = BIT(i - 0x20, 2);
 		bit1 = BIT(i - 0x20, 3);
-		int const g = combine_2_weights(gweights_star, bit0, bit1);
+		int const g = combine_weights(gweights_star, bit0, bit1);
 
 		// blue component
 		bit0 = BIT(i - 0x20, 4);
 		bit1 = BIT(i - 0x20, 5);
-		int const b = combine_2_weights(bweights_star, bit0, bit1);
+		int const b = combine_weights(bweights_star, bit0, bit1);
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}

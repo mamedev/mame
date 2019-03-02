@@ -23,6 +23,9 @@ public:
 	// static configuration
 	auto intr_callback() { return m_intr_cb.bind(); }
 	auto breq_callback() { return m_breq_cb.bind(); }
+	auto mbc_callback() { return m_mbc_cb.bind(); }
+	auto mbc_char_callback() { return m_mbc_char_cb.bind(); }
+	auto mbc_attr_callback() { return m_mbc_attr_cb.bind(); }
 	void set_character_width(int value) { m_hpixels_per_column = value; }
 
 	template <class FunctionClass>
@@ -54,14 +57,20 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	virtual space_config_vector memory_space_config() const override;
+
+	TIMER_CALLBACK_MEMBER(scanline_timer);
+	TIMER_CALLBACK_MEMBER(breq_timer);
+	TIMER_CALLBACK_MEMBER(vblank_timer);
 
 //protected:
 	bitmap_rgb32 m_bitmap;
 	devcb_write_line m_intr_cb;
 	devcb_write_line m_breq_cb;
+	devcb_write_line m_mbc_cb;
+	devcb_read8 m_mbc_char_cb;
+	devcb_read8 m_mbc_attr_cb;
 
 	uint8_t m_IR_pointer;
 	uint16_t m_screen1_address;
@@ -72,6 +81,7 @@ protected:
 	uint8_t m_irq_mask;
 	bool m_gfx_enabled;
 	bool m_display_enabled;
+	bool m_dadd_enabled;
 	bool m_display_enabled_field;
 	bool m_display_enabled_scanline;
 	bool m_cursor_enabled;
@@ -129,14 +139,12 @@ protected:
 
 	draw_character_delegate m_display_cb;
 	emu_timer *m_scanline_timer;
+	emu_timer *m_breq_timer;
+	emu_timer *m_vblank_timer;
 	address_space *m_char_space;
 	address_space *m_attr_space;
 	const address_space_config m_char_space_config;
 	const address_space_config m_attr_space_config;
-	enum
-	{
-		TIMER_SCANLINE
-	};
 };
 
 class scn2672_device : public scn2674_device

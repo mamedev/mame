@@ -89,7 +89,7 @@ void wangpc_wdc_device::wangpc_wdc_io(address_map &map)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( wangpc_wdc )
+//  machine_config( wangpc_wdc )
 //-------------------------------------------------
 
 void wangpc_wdc_device::device_add_mconfig(machine_config &config)
@@ -173,7 +173,7 @@ void wangpc_wdc_device::device_reset()
 //  wangpcbus_mrdc_r - memory read
 //-------------------------------------------------
 
-uint16_t wangpc_wdc_device::wangpcbus_mrdc_r(address_space &space, offs_t offset, uint16_t mem_mask)
+uint16_t wangpc_wdc_device::wangpcbus_mrdc_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = 0xffff;
 
@@ -185,7 +185,7 @@ uint16_t wangpc_wdc_device::wangpcbus_mrdc_r(address_space &space, offs_t offset
 //  wangpcbus_amwc_w - memory write
 //-------------------------------------------------
 
-void wangpc_wdc_device::wangpcbus_amwc_w(address_space &space, offs_t offset, uint16_t mem_mask, uint16_t data)
+void wangpc_wdc_device::wangpcbus_amwc_w(offs_t offset, uint16_t mem_mask, uint16_t data)
 {
 }
 
@@ -194,7 +194,7 @@ void wangpc_wdc_device::wangpcbus_amwc_w(address_space &space, offs_t offset, ui
 //  wangpcbus_iorc_r - I/O read
 //-------------------------------------------------
 
-uint16_t wangpc_wdc_device::wangpcbus_iorc_r(address_space &space, offs_t offset, uint16_t mem_mask)
+uint16_t wangpc_wdc_device::wangpcbus_iorc_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = 0xffff;
 
@@ -228,7 +228,7 @@ uint16_t wangpc_wdc_device::wangpcbus_iorc_r(address_space &space, offs_t offset
 //  wangpcbus_aiowc_w - I/O write
 //-------------------------------------------------
 
-void wangpc_wdc_device::wangpcbus_aiowc_w(address_space &space, offs_t offset, uint16_t mem_mask, uint16_t data)
+void wangpc_wdc_device::wangpcbus_aiowc_w(offs_t offset, uint16_t mem_mask, uint16_t data)
 {
 	if (sad(offset) && ACCESSING_BITS_0_7)
 	{
@@ -263,7 +263,7 @@ void wangpc_wdc_device::wangpcbus_aiowc_w(address_space &space, offs_t offset, u
 //  wangpcbus_dack_r - DMA acknowledge read
 //-------------------------------------------------
 
-uint8_t wangpc_wdc_device::wangpcbus_dack_r(address_space &space, int line)
+uint8_t wangpc_wdc_device::wangpcbus_dack_r(int line)
 {
 	return 0;
 }
@@ -273,7 +273,7 @@ uint8_t wangpc_wdc_device::wangpcbus_dack_r(address_space &space, int line)
 //  wangpcbus_dack_r - DMA acknowledge write
 //-------------------------------------------------
 
-void wangpc_wdc_device::wangpcbus_dack_w(address_space &space, int line, uint8_t data)
+void wangpc_wdc_device::wangpcbus_dack_w(int line, uint8_t data)
 {
 }
 
@@ -325,11 +325,11 @@ WRITE8_MEMBER( wangpc_wdc_device::status_w )
 }
 
 
-READ8_MEMBER( wangpc_wdc_device::ctc_ch0_r ) { return m_ctc->read(space, 0); }
-WRITE8_MEMBER( wangpc_wdc_device::ctc_ch0_w ) { m_ctc->write(space, 0, data); }
-READ8_MEMBER( wangpc_wdc_device::ctc_ch1_r ) { return m_ctc->read(space, 1); }
-WRITE8_MEMBER( wangpc_wdc_device::ctc_ch1_w ) { m_ctc->write(space, 1, data); }
-READ8_MEMBER( wangpc_wdc_device::ctc_ch2_r ) { return m_ctc->read(space, 2); }
-WRITE8_MEMBER( wangpc_wdc_device::ctc_ch2_w ) { m_ctc->write(space, 2, data); }
-READ8_MEMBER( wangpc_wdc_device::ctc_ch3_r ) { return m_ctc->read(space, 3); }
-WRITE8_MEMBER( wangpc_wdc_device::ctc_ch3_w ) { m_ctc->write(space, 3, data); }
+READ8_MEMBER( wangpc_wdc_device::ctc_ch0_r ) { return m_ctc->read(machine().dummy_space(), 0); }
+WRITE8_MEMBER( wangpc_wdc_device::ctc_ch0_w ) { m_ctc->write(machine().dummy_space(), 0, data); }
+READ8_MEMBER( wangpc_wdc_device::ctc_ch1_r ) { return m_ctc->read(machine().dummy_space(), 1); }
+WRITE8_MEMBER( wangpc_wdc_device::ctc_ch1_w ) { m_ctc->write(machine().dummy_space(), 1, data); }
+READ8_MEMBER( wangpc_wdc_device::ctc_ch2_r ) { return m_ctc->read(machine().dummy_space(), 2); }
+WRITE8_MEMBER( wangpc_wdc_device::ctc_ch2_w ) { m_ctc->write(machine().dummy_space(), 2, data); }
+READ8_MEMBER( wangpc_wdc_device::ctc_ch3_r ) { return m_ctc->read(machine().dummy_space(), 3); }
+WRITE8_MEMBER( wangpc_wdc_device::ctc_ch3_w ) { m_ctc->write(machine().dummy_space(), 3, data); }

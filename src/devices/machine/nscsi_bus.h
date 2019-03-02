@@ -6,13 +6,6 @@
 #pragma once
 
 
-#define MCFG_NSCSI_BUS_ADD(_tag)        \
-	MCFG_DEVICE_ADD(_tag, NSCSI_BUS, 0)
-
-#define MCFG_NSCSI_ADD(_tag, _slot_intf, _def_slot, _fixed) \
-	MCFG_DEVICE_ADD(_tag, NSCSI_CONNECTOR, 0)                   \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _fixed)
-
 class nscsi_device;
 
 class nscsi_bus_device : public device_t
@@ -315,6 +308,7 @@ protected:
 
 	virtual void scsi_message();
 	virtual void scsi_command();
+	virtual bool scsi_command_done(uint8_t command, uint8_t length);
 
 	void scsi_unknown_command();
 	void scsi_status_complete(uint8_t st);
@@ -455,7 +449,6 @@ private:
 	void target_recv_byte();
 	void target_send_byte(uint8_t val);
 	void target_send_buffer_byte();
-	bool command_done();
 };
 
 

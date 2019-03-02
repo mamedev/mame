@@ -165,11 +165,12 @@ static GFXDECODE_START( gfx_mikro80 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, mikro80_charlayout, 0, 1 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(mikro80_state::mikro80)
+void mikro80_state::mikro80(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",I8080, 2000000)
-	MCFG_DEVICE_PROGRAM_MAP(mikro80_mem)
-	MCFG_DEVICE_IO_MAP(mikro80_io)
+	I8080(config, m_maincpu, 2000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mikro80_state::mikro80_mem);
+	m_maincpu->set_addrmap(AS_IO, &mikro80_state::mikro80_io);
 
 	I8255(config, m_ppi8255);
 	m_ppi8255->out_pa_callback().set(FUNC(mikro80_state::mikro80_8255_porta_w));
@@ -177,15 +178,15 @@ MACHINE_CONFIG_START(mikro80_state::mikro80)
 	m_ppi8255->in_pc_callback().set(FUNC(mikro80_state::mikro80_8255_portc_r));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mikro80_state, screen_update_mikro80)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0, 64*8-1, 0, 32*8-1);
+	screen.set_screen_update(FUNC(mikro80_state::screen_update_mikro80));
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mikro80)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_mikro80);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	SPEAKER(config, "speaker").front_center();
@@ -196,26 +197,26 @@ MACHINE_CONFIG_START(mikro80_state::mikro80)
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
 	m_cassette->set_interface("mikro80_cass");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "mikro80")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cass_list").set_original("mikro80");
+}
 
-MACHINE_CONFIG_START(mikro80_state::radio99)
+void mikro80_state::radio99(machine_config &config)
+{
 	mikro80(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(radio99_io)
+	m_maincpu->set_addrmap(AS_IO, &mikro80_state::radio99_io);
 
-	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.12)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
-MACHINE_CONFIG_END
+	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.12);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+}
 
-MACHINE_CONFIG_START(mikro80_state::kristall)
+void mikro80_state::kristall(machine_config &config)
+{
 	mikro80(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(kristall_io)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_IO, &mikro80_state::kristall_io);
+}
 
 
 /* ROM definition */

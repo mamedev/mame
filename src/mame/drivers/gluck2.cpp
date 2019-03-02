@@ -505,7 +505,7 @@ MACHINE_CONFIG_START(gluck2_state::gluck2)
 	MCFG_SCREEN_UPDATE_DRIVER(gluck2_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gluck2)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_gluck2);
 	PALETTE(config, "palette", palette_device::RGB_444_PROMS, "proms", 256);
 
 	mc6845_device &crtc(MC6845(config, "crtc", MASTER_CLOCK/16));    /* guess */

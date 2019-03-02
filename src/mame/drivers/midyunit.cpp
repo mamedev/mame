@@ -155,13 +155,13 @@ WRITE8_MEMBER(midyunit_state::yawdim_oki_bank_w)
 
 CUSTOM_INPUT_MEMBER(midyunit_state::narc_talkback_strobe_r)
 {
-	return (m_narc_sound->read(machine().dummy_space(), 0) >> 8) & 1;
+	return (m_narc_sound->read() >> 8) & 1;
 }
 
 
 CUSTOM_INPUT_MEMBER(midyunit_state::narc_talkback_data_r)
 {
-	return m_narc_sound->read(machine().dummy_space(), 0) & 0xff;
+	return m_narc_sound->read() & 0xff;
 }
 
 
@@ -190,7 +190,6 @@ void midyunit_state::main_map(address_map &map)
 	map(0x01e00000, 0x01e0001f).w(FUNC(midyunit_state::midyunit_sound_w));
 	map(0x01f00000, 0x01f0001f).w(FUNC(midyunit_state::midyunit_control_w));
 	map(0x02000000, 0x05ffffff).r(FUNC(midyunit_state::midyunit_gfxrom_r)).share("gfx_rom");
-	map(0xc0000000, 0xc00001ff).rw("maincpu", FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xff800000, 0xffffffff).rom().region("user1", 0);
 }
 
@@ -1099,8 +1098,8 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(midyunit_state::zunit)
-
+void midyunit_state::zunit(machine_config &config)
+{
 	/* basic machine hardware */
 	TMS34010(config, m_maincpu, FAST_MASTER_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &midyunit_state::main_map);
@@ -1117,12 +1116,12 @@ MACHINE_CONFIG_START(midyunit_state::zunit)
 	/* video hardware */
 	PALETTE(config, m_palette).set_entries(8192);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	// from TMS340 registers
-	MCFG_SCREEN_RAW_PARAMS(MEDRES_PIXEL_CLOCK*2, 674, 122, 634, 433, 27, 427)
-	MCFG_SCREEN_UPDATE_DEVICE("maincpu", tms34010_device, tms340x0_ind16)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen.set_raw(MEDRES_PIXEL_CLOCK*2, 674, 122, 634, 433, 27, 427);
+	screen.set_screen_update("maincpu", FUNC(tms34010_device::tms340x0_ind16));
+	screen.set_palette(m_palette);
 
 	MCFG_VIDEO_START_OVERRIDE(midyunit_state,midzunit)
 
@@ -1132,7 +1131,7 @@ MACHINE_CONFIG_START(midyunit_state::zunit)
 	WILLIAMS_NARC_SOUND(config, m_narc_sound);
 	m_narc_sound->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_narc_sound->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-MACHINE_CONFIG_END
+}
 
 
 
@@ -1142,8 +1141,8 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(midyunit_state::yunit_core)
-
+void midyunit_state::yunit_core(machine_config &config)
+{
 	/* basic machine hardware */
 	TMS34010(config, m_maincpu, SLOW_MASTER_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &midyunit_state::main_map);
@@ -1160,20 +1159,21 @@ MACHINE_CONFIG_START(midyunit_state::yunit_core)
 	/* video hardware */
 	PALETTE(config, m_palette).set_entries(256);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	// from TMS340 registers - visible area varies slightly between games
 	// we use the largest visarea (smashtv's) here so that aviwrite will work nicely
-	MCFG_SCREEN_RAW_PARAMS(STDRES_PIXEL_CLOCK*2, 506, 90, 500, 289, 20, 276)
-	MCFG_SCREEN_UPDATE_DEVICE("maincpu", tms34010_device, tms340x0_ind16)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen.set_raw(STDRES_PIXEL_CLOCK*2, 506, 90, 500, 289, 20, 276);
+	screen.set_screen_update("maincpu", FUNC(tms34010_device::tms340x0_ind16));
+	screen.set_palette(m_palette);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(midyunit_state::yunit_cvsd_4bit_slow)
+void midyunit_state::yunit_cvsd_4bit_slow(machine_config &config)
+{
 	yunit_core(config);
 
 	/* basic machine hardware */
@@ -1182,10 +1182,11 @@ MACHINE_CONFIG_START(midyunit_state::yunit_cvsd_4bit_slow)
 	/* video hardware */
 	m_palette->set_entries(256);
 	MCFG_VIDEO_START_OVERRIDE(midyunit_state,midyunit_4bit)
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(midyunit_state::yunit_cvsd_4bit_fast)
+void midyunit_state::yunit_cvsd_4bit_fast(machine_config &config)
+{
 	yunit_core(config);
 
 	/* basic machine hardware */
@@ -1196,10 +1197,11 @@ MACHINE_CONFIG_START(midyunit_state::yunit_cvsd_4bit_fast)
 	/* video hardware */
 	m_palette->set_entries(256);
 	MCFG_VIDEO_START_OVERRIDE(midyunit_state,midyunit_4bit)
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(midyunit_state::yunit_cvsd_6bit_slow)
+void midyunit_state::yunit_cvsd_6bit_slow(machine_config &config)
+{
 	yunit_core(config);
 
 	/* basic machine hardware */
@@ -1208,10 +1210,11 @@ MACHINE_CONFIG_START(midyunit_state::yunit_cvsd_6bit_slow)
 	/* video hardware */
 	m_palette->set_entries(4096);
 	MCFG_VIDEO_START_OVERRIDE(midyunit_state,midyunit_6bit)
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(midyunit_state::yunit_adpcm_6bit_fast)
+void midyunit_state::yunit_adpcm_6bit_fast(machine_config &config)
+{
 	yunit_core(config);
 
 	/* basic machine hardware */
@@ -1222,10 +1225,11 @@ MACHINE_CONFIG_START(midyunit_state::yunit_adpcm_6bit_fast)
 	/* video hardware */
 	m_palette->set_entries(4096);
 	MCFG_VIDEO_START_OVERRIDE(midyunit_state,midyunit_6bit)
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(midyunit_state::yunit_adpcm_6bit_faster)
+void midyunit_state::yunit_adpcm_6bit_faster(machine_config &config)
+{
 	yunit_core(config);
 
 	/* basic machine hardware */
@@ -1236,7 +1240,7 @@ MACHINE_CONFIG_START(midyunit_state::yunit_adpcm_6bit_faster)
 	/* video hardware */
 	m_palette->set_entries(4096);
 	MCFG_VIDEO_START_OVERRIDE(midyunit_state,midyunit_6bit)
-MACHINE_CONFIG_END
+}
 
 
 void midyunit_state::term2(machine_config &config)
@@ -1251,13 +1255,14 @@ void midyunit_state::term2(machine_config &config)
 }
 
 
-MACHINE_CONFIG_START(midyunit_state::mkyawdim)
+void midyunit_state::mkyawdim(machine_config &config)
+{
 	yunit_core(config);
 
 	/* basic machine hardware */
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(8'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(yawdim_sound_map)
+	Z80(config, m_audiocpu, XTAL(8'000'000) / 2);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &midyunit_state::yawdim_sound_map);
 
 	/* video hardware */
 	m_palette->set_entries(4096);
@@ -1267,9 +1272,8 @@ MACHINE_CONFIG_START(midyunit_state::mkyawdim)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(8'000'000) / 8, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, XTAL(8'000'000) / 8, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
 
 
 

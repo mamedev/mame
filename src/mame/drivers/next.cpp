@@ -1002,19 +1002,19 @@ void next_state::ncr5390(device_t *device)
 	adapter.drq_handler_cb().set(*this, FUNC(next_state::scsi_drq));
 }
 
-MACHINE_CONFIG_START(next_state::next_base)
-
+void next_state::next_base(machine_config &config)
+{
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(next_state, screen_update)
-	MCFG_SCREEN_SIZE(1120, 900)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1120-1, 0, 832-1)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, next_state, vblank_w))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(next_state::screen_update));
+	screen.set_size(1120, 900);
+	screen.set_visarea(0, 1120-1, 0, 832-1);
+	screen.screen_vblank().set(FUNC(next_state::vblank_w));
 
 	// devices
-	MCFG_NSCSI_BUS_ADD("scsibus")
+	NSCSI_BUS(config, "scsibus");
 
 	MCCS1850(config, rtc, XTAL(32'768));
 
@@ -1026,15 +1026,14 @@ MACHINE_CONFIG_START(next_state::next_base)
 	keyboard->int_power_wr_callback().set(FUNC(next_state::power_irq));
 	keyboard->int_nmi_wr_callback().set(FUNC(next_state::nmi_irq));
 
-	MCFG_NSCSI_ADD("scsibus:0", next_scsi_devices, "harddisk", false)
-	MCFG_NSCSI_ADD("scsibus:1", next_scsi_devices, "cdrom", false)
-	MCFG_NSCSI_ADD("scsibus:2", next_scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:3", next_scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:4", next_scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:5", next_scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:6", next_scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:7", next_scsi_devices, "ncr5390", true)
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("ncr5390", [this] (device_t *device) { ncr5390(device); })
+	NSCSI_CONNECTOR(config, "scsibus:0", next_scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "scsibus:1", next_scsi_devices, "cdrom");
+	NSCSI_CONNECTOR(config, "scsibus:2", next_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:3", next_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:4", next_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:5", next_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:6", next_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:7", next_scsi_devices, "ncr5390", true).set_option_machine_config("ncr5390", [this] (device_t *device) { ncr5390(device); });
 
 	MB8795(config, net, 0);
 	net->tx_irq().set(FUNC(next_state::net_tx_irq));
@@ -1045,70 +1044,77 @@ MACHINE_CONFIG_START(next_state::next_base)
 	NEXTMO(config, mo, 0);
 	mo->irq_wr_callback().set(FUNC(next_state::mo_irq));
 	mo->drq_wr_callback().set(FUNC(next_state::mo_drq));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(next_state::next)
+void next_state::next(machine_config &config)
+{
 	next_base(config);
-	MCFG_DEVICE_ADD("maincpu", M68030, XTAL(25'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(next_0b_m_nofdc_mem)
-MACHINE_CONFIG_END
+	M68030(config, maincpu, XTAL(25'000'000));
+	maincpu->set_addrmap(AS_PROGRAM, &next_state::next_0b_m_nofdc_mem);
+}
 
-MACHINE_CONFIG_START(next_state::next_fdc_base)
+void next_state::next_fdc_base(machine_config &config)
+{
 	next_base(config);
 	N82077AA(config, fdc, n82077aa_device::MODE_PS2);
 	fdc->intrq_wr_callback().set(FUNC(next_state::fdc_irq));
 	fdc->drq_wr_callback().set(FUNC(next_state::fdc_drq));
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", next_floppies, "35ed", next_state::floppy_formats)
+	FLOPPY_CONNECTOR(config, "fdc:0", next_floppies, "35ed", next_state::floppy_formats);
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "next")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "flop_list").set_original("next");
+}
 
-MACHINE_CONFIG_START(next_state::nexts)
+void next_state::nexts(machine_config &config)
+{
 	next_fdc_base(config);
-	MCFG_DEVICE_ADD("maincpu", M68040, XTAL(25'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(next_0b_m_mem)
-MACHINE_CONFIG_END
+	M68040(config, maincpu, XTAL(25'000'000));
+	maincpu->set_addrmap(AS_PROGRAM, &next_state::next_0b_m_mem);
+}
 
-MACHINE_CONFIG_START(next_state::nexts2)
+void next_state::nexts2(machine_config &config)
+{
 	next_fdc_base(config);
-	MCFG_DEVICE_ADD("maincpu", M68040, XTAL(25'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(next_0b_m_mem)
-MACHINE_CONFIG_END
+	M68040(config, maincpu, XTAL(25'000'000));
+	maincpu->set_addrmap(AS_PROGRAM, &next_state::next_0b_m_mem);
+}
 
-MACHINE_CONFIG_START(next_state::nextsc)
+void next_state::nextsc(machine_config &config)
+{
 	next_fdc_base(config);
-	MCFG_DEVICE_ADD("maincpu", M68040, XTAL(25'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(next_2c_c_mem)
-MACHINE_CONFIG_END
+	M68040(config, maincpu, XTAL(25'000'000));
+	maincpu->set_addrmap(AS_PROGRAM, &next_state::next_2c_c_mem);
+}
 
-MACHINE_CONFIG_START(next_state::nextst)
+void next_state::nextst(machine_config &config)
+{
 	next_fdc_base(config);
-	MCFG_DEVICE_ADD("maincpu", M68040, XTAL(33'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(next_0b_m_mem)
-MACHINE_CONFIG_END
+	M68040(config, maincpu, XTAL(33'000'000));
+	maincpu->set_addrmap(AS_PROGRAM, &next_state::next_0b_m_mem);
+}
 
-MACHINE_CONFIG_START(next_state::nextstc)
+void next_state::nextstc(machine_config &config)
+{
 	next_fdc_base(config);
-	MCFG_DEVICE_ADD("maincpu", M68040, XTAL(33'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(next_0c_c_mem)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, 832-1, 0, 624-1)
-MACHINE_CONFIG_END
+	M68040(config, maincpu, XTAL(33'000'000));
+	maincpu->set_addrmap(AS_PROGRAM, &next_state::next_0c_c_mem);
+	subdevice<screen_device>("screen")->set_visarea(0, 832-1, 0, 624-1);
+}
 
-MACHINE_CONFIG_START(next_state::nextct)
+void next_state::nextct(machine_config &config)
+{
 	next_fdc_base(config);
-	MCFG_DEVICE_ADD("maincpu", M68040, XTAL(33'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(next_0c_m_mem)
-MACHINE_CONFIG_END
+	M68040(config, maincpu, XTAL(33'000'000));
+	maincpu->set_addrmap(AS_PROGRAM, &next_state::next_0c_m_mem);
+}
 
-MACHINE_CONFIG_START(next_state::nextctc)
+void next_state::nextctc(machine_config &config)
+{
 	next_fdc_base(config);
-	MCFG_DEVICE_ADD("maincpu", M68040, XTAL(33'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(next_0c_c_mem)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, 832-1, 0, 624-1)
-MACHINE_CONFIG_END
+	M68040(config, maincpu, XTAL(33'000'000));
+	maincpu->set_addrmap(AS_PROGRAM, &next_state::next_0c_c_mem);
+	subdevice<screen_device>("screen")->set_visarea(0, 832-1, 0, 624-1);
+}
 
 /* ROM definition */
 #define ROM_NEXT_V1 \

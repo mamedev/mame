@@ -32,13 +32,14 @@ DEFINE_DEVICE_TYPE(PDS030_LVIEW, nubus_lview_device, "pd3_lviw", "Sigma Designs 
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(nubus_lview_device::device_add_mconfig)
-	MCFG_SCREEN_ADD( LVIEW_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, nubus_lview_device, screen_update)
-	MCFG_SCREEN_SIZE(832,600)
-	MCFG_SCREEN_REFRESH_RATE(70)
-	MCFG_SCREEN_VISIBLE_AREA(0, 832-1, 0, 600-1)
-MACHINE_CONFIG_END
+void nubus_lview_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, LVIEW_SCREEN_NAME, SCREEN_TYPE_RASTER));
+	screen.set_screen_update(FUNC(nubus_lview_device::screen_update));
+	screen.set_size(832, 600);
+	screen.set_refresh_hz(70);
+	screen.set_visarea(0, 832-1, 0, 600-1);
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

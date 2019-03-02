@@ -131,12 +131,12 @@ static INPUT_PORTS_START( maygayew )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(maygayew_state::maygayew)
-
+void maygayew_state::maygayew(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000,8000000) // MC68306FC16 - standard 68000 core + peripherals
-	MCFG_DEVICE_PROGRAM_MAP(maygayew_map)
-MACHINE_CONFIG_END
+	M68000(config, m_maincpu, 8000000); // MC68306FC16 - standard 68000 core + peripherals
+	m_maincpu->set_addrmap(AS_PROGRAM, &maygayew_state::maygayew_map);
+}
 
 ROM_START( mg_gbr )
 	ROM_REGION( 0x040000, "mainrom", 0 )

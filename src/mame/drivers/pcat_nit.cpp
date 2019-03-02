@@ -231,12 +231,13 @@ void pcat_nit_state::machine_start()
 	membank("rombank")->set_entry(0);
 }
 
-MACHINE_CONFIG_START(pcat_nit_state::pcat_nit)
+void pcat_nit_state::pcat_nit(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I386, 14318180*2)   /* I386 ?? Mhz */
-	MCFG_DEVICE_PROGRAM_MAP(pcat_map)
-	MCFG_DEVICE_IO_MAP(pcat_nit_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+	I386(config, m_maincpu, 14318180*2);   /* I386 ?? Mhz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &pcat_nit_state::pcat_map);
+	m_maincpu->set_addrmap(AS_IO, &pcat_nit_state::pcat_nit_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
 
 	/* video hardware */
 	pcvideo_vga(config);
@@ -250,14 +251,15 @@ MACHINE_CONFIG_START(pcat_nit_state::pcat_nit)
 	MICROTOUCH(config, m_microtouch, 9600).stx().set(uart, FUNC(ins8250_uart_device::rx_w)); // rate?
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(pcat_nit_state::bonanza)
+void pcat_nit_state::bonanza(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I386, 14318180*2)   /* I386 ?? Mhz */
-	MCFG_DEVICE_PROGRAM_MAP(bonanza_map)
-	MCFG_DEVICE_IO_MAP(bonanza_io_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+	I386(config, m_maincpu, 14318180*2);   /* I386 ?? Mhz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &pcat_nit_state::bonanza_map);
+	m_maincpu->set_addrmap(AS_IO, &pcat_nit_state::bonanza_io_map);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
 
 	/* video hardware */
 	pcvideo_cirrus_gd5428(config);
@@ -270,7 +272,7 @@ MACHINE_CONFIG_START(pcat_nit_state::bonanza)
 	MICROTOUCH(config, m_microtouch, 9600).stx().set(uart, FUNC(ins8250_uart_device::rx_w)); // rate?
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-MACHINE_CONFIG_END
+}
 
 /***************************************
 *

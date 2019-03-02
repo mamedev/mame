@@ -2281,7 +2281,7 @@ MACHINE_CONFIG_START(bfm_sc2_vid_state::scorpion2_vid)
 	MCFG_DEVICE_ADD("maincpu", M6809, MASTER_CLOCK/4 ) // 6809 CPU at 2 Mhz
 	MCFG_DEVICE_PROGRAM_MAP(memmap_vid)                    // setup scorpion2 board memorymap
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(bfm_sc2_vid_state, timer_irq,  1000)           // generate 1000 IRQ's per second
-	MCFG_QUANTUM_TIME(attotime::from_hz(960))                                   // needed for serial communication !!
+	config.m_minimum_quantum = attotime::from_hz(960);                                   // needed for serial communication !!
 
 	WATCHDOG_TIMER(config, "watchdog").set_time(PERIOD_OF_555_MONOSTABLE(120000,100e-9));
 
@@ -3787,26 +3787,28 @@ MACHINE_CONFIG_START(bfm_sc2_awp_state::scorpion2)
 MACHINE_CONFIG_END
 
 #if 0
-MACHINE_CONFIG_START(bfm_sc2_awp_state::scorpion2_3m)
+void bfm_sc2_awp_state::scorpion2_3m(machine_config &config)
+{
 	scorpion2(config);
 
-	MCFG_DEVICE_REMOVE("meters")
+	config.device_remove("meters");
 	_3meters(config);
-MACHINE_CONFIG_END
+}
 #endif
 
 /* machine driver for scorpion3 board */
-MACHINE_CONFIG_START(bfm_sc2_awp_state::scorpion3)
+void bfm_sc2_awp_state::scorpion3(machine_config &config)
+{
 	scorpion2(config);
 
-	MCFG_DEVICE_REMOVE("meters")
+	config.device_remove("meters");
 	_5meters(config);
-MACHINE_CONFIG_END
+}
 
 
 /* machine driver for scorpion2 board + matrix board */
 MACHINE_CONFIG_START(bfm_sc2_dmd_state::scorpion2_dm01)
-	MCFG_QUANTUM_TIME(attotime::from_hz(960))                                   // needed for serial communication !!
+	config.m_minimum_quantum = attotime::from_hz(960);                                   // needed for serial communication !!
 	MCFG_DEVICE_ADD("maincpu", M6809, MASTER_CLOCK/4 )
 	MCFG_DEVICE_PROGRAM_MAP(memmap_no_vid)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(bfm_sc2_dmd_state, timer_irq,  1000)
@@ -3844,17 +3846,19 @@ MACHINE_CONFIG_START(bfm_sc2_dmd_state::scorpion2_dm01)
 	_8meters(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(bfm_sc2_dmd_state::scorpion2_dm01_3m)
+void bfm_sc2_dmd_state::scorpion2_dm01_3m(machine_config &config)
+{
 	scorpion2_dm01(config);
-	MCFG_DEVICE_REMOVE("meters")
+	config.device_remove("meters");
 	_3meters(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(bfm_sc2_dmd_state::scorpion2_dm01_5m)
+void bfm_sc2_dmd_state::scorpion2_dm01_5m(machine_config &config)
+{
 	scorpion2_dm01(config);
-	MCFG_DEVICE_REMOVE("meters")
+	config.device_remove("meters");
 	_5meters(config);
-MACHINE_CONFIG_END
+}
 
 void bfm_sc2_novid_state::sc2awp_common_init(int reels, int decrypt)
 {

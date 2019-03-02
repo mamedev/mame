@@ -24,12 +24,6 @@
 	MCFG_DEVICE_ADD(_tag, BML3BUS_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
 	downcast<bml3bus_slot_device &>(*device).set_bml3bus_slot(_nbtag, _tag);
-#define MCFG_BML3BUS_SLOT_REMOVE(_tag)    \
-	MCFG_DEVICE_REMOVE(_tag)
-
-#define MCFG_BML3BUS_ONBOARD_ADD(_nbtag, _tag, _dev_type) \
-	MCFG_DEVICE_ADD(_tag, _dev_type, 0) \
-	downcast<device_bml3bus_card_interface &>(*device).set_bml3bus_tag(_nbtag, _tag);
 
 
 //**************************************************************************

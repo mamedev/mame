@@ -2159,12 +2159,13 @@ Debugging Options
 
 **-[no]oslog**
 
-    Output ``error.log`` data to the system diagnostic output, if one is
+    Output ``error.log`` messages to the system diagnostic output, if one is
     present.
 
-    On Windows, the ``error.log`` data goes nowhere if no debugger is present.
-    On other operating systems, the ``error.log`` data will go to standard
-    error output, which typically goes to the console or terminal window.
+    By default messages are sent to the standard error output (this is typically
+    displayed in the terminal or command prompt window, or saved to a system log
+    file).  On Windows, if a debugger is attached (e.g. the Visual Studio
+    debugger or WinDbg), messages will be sent to the debugger instead.
 
     The default is OFF (**-nooslog**).
 
@@ -2411,7 +2412,8 @@ Core Misc Options
 
     Save the NVRAM contents when exiting machine emulation. By turning this off,
     you can retain your previous NVRAM contents as any current changes made will
-    not be saved.
+    not be saved. Turning this option off will also unconditionally suppress the
+    saving of .nv files associated with some types of software cartridges.
 
     The default is ON (**-nvram_save**).
 

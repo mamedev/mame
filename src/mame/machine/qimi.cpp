@@ -139,7 +139,7 @@ void qimi_device::device_reset()
 //  read -
 //-------------------------------------------------
 
-uint8_t qimi_device::read(address_space &space, offs_t offset, uint8_t data)
+uint8_t qimi_device::read(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -169,8 +169,10 @@ uint8_t qimi_device::read(address_space &space, offs_t offset, uint8_t data)
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( qimi_device::write )
+void qimi_device::write(offs_t offset, uint8_t data)
 {
+	(void)data;
+
 	// write to 0x1bfbe resets int status
 	if (offset == 0x1bfbe)
 	{

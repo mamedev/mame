@@ -221,7 +221,7 @@ MACHINE_CONFIG_START(darkseal_state::darkseal)
 	MCFG_SCREEN_UPDATE_DRIVER(darkseal_state, screen_update)
 	MCFG_SCREEN_PALETTE("colors")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_darkseal)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_darkseal);
 	MCFG_PALETTE_ADD(m_palette, 2048)
 
 	MCFG_DEVICE_ADD(m_spriteram, BUFFERED_SPRITERAM16)

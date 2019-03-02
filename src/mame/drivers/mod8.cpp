@@ -94,7 +94,7 @@ WRITE8_MEMBER( mod8_state::out_w )
 
 	if (m_tty_cnt == 10)
 	{
-		m_teleprinter->write(space, 0, (m_tty_data >> 7) & 0x7f);
+		m_teleprinter->write((m_tty_data >> 7) & 0x7f);
 		m_tty_cnt = 0;
 	}
 }
@@ -146,17 +146,18 @@ void mod8_state::kbd_put(u8 data)
 	m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
-MACHINE_CONFIG_START(mod8_state::mod8)
+void mod8_state::mod8(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",I8008, 800000)
-	MCFG_DEVICE_PROGRAM_MAP(mod8_mem)
-	MCFG_DEVICE_IO_MAP(mod8_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(mod8_state,mod8_irq_callback)
+	I8008(config, m_maincpu, 800000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mod8_state::mod8_mem);
+	m_maincpu->set_addrmap(AS_IO, &mod8_state::mod8_io);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(mod8_state::mod8_irq_callback));
 
 	/* video hardware */
 	TELEPRINTER(config, m_teleprinter, 0);
 	m_teleprinter->set_keyboard_callback(FUNC(mod8_state::kbd_put));
-MACHINE_CONFIG_END
+}
 
 
 /* ROM definition */

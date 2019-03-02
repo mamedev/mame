@@ -158,6 +158,7 @@ lnw80:     works
 #include "emu.h"
 #include "includes/trs80.h"
 
+#include "machine/com8116.h"
 #include "sound/ay8910.h"
 #include "screen.h"
 #include "speaker.h"
@@ -204,7 +205,7 @@ void trs80_state::m1_io(address_map &map)
 	map.global_mask(0xff);
 	map.unmap_value_high();
 	map(0xe8, 0xe8).rw(FUNC(trs80_state::port_e8_r), FUNC(trs80_state::port_e8_w));
-	map(0xe9, 0xe9).portr("E9").w(m_brg, FUNC(com8116_device::stt_str_w));
+	map(0xe9, 0xe9).portr("E9").w("brg", FUNC(com8116_device::stt_str_w));
 	map(0xea, 0xea).rw(FUNC(trs80_state::port_ea_r), FUNC(trs80_state::port_ea_w));
 	map(0xeb, 0xeb).rw(m_uart, FUNC(ay31015_device::receive), FUNC(ay31015_device::transmit));
 	map(0xff, 0xff).rw(FUNC(trs80_state::port_ff_r), FUNC(trs80_state::port_ff_w));
@@ -255,9 +256,12 @@ void trs80_state::lnw80_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
-	m1_io(map);
-	map(0xe9, 0xe9).nopw();
+	map(0xe8, 0xe8).rw(FUNC(trs80_state::port_e8_r), FUNC(trs80_state::port_e8_w));
+	map(0xe9, 0xe9).portr("E9");
+	map(0xea, 0xea).rw(FUNC(trs80_state::port_ea_r), FUNC(trs80_state::port_ea_w));
+	map(0xeb, 0xeb).rw(m_uart, FUNC(ay31015_device::receive), FUNC(ay31015_device::transmit));
 	map(0xfe, 0xfe).rw(FUNC(trs80_state::lnw80_fe_r), FUNC(trs80_state::lnw80_fe_w));
+	map(0xff, 0xff).rw(FUNC(trs80_state::port_ff_r), FUNC(trs80_state::port_ff_w));
 }
 
 void trs80_state::radionic_mem(address_map &map)
@@ -498,17 +502,18 @@ static void trs80_floppies(device_slot_interface &device)
 }
 
 
-MACHINE_CONFIG_START(trs80_state::trs80)       // the original model I, level I, with no extras
+void trs80_state::trs80(machine_config &config)       // the original model I, level I, with no extras
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 10.6445_MHz_XTAL / 6)
-	MCFG_DEVICE_PROGRAM_MAP(trs80_mem)
-	MCFG_DEVICE_IO_MAP(trs80_io)
+	Z80(config, m_maincpu, 10.6445_MHz_XTAL / 6);
+	m_maincpu->set_addrmap(AS_PROGRAM, &trs80_state::trs80_mem);
+	m_maincpu->set_addrmap(AS_IO, &trs80_state::trs80_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(10.6445_MHz_XTAL, 672, 0, 384, 264, 0, 192)
-	MCFG_SCREEN_UPDATE_DRIVER(trs80_state, screen_update_trs80)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(10.6445_MHz_XTAL, 672, 0, 384, 264, 0, 192);
+	screen.set_screen_update(FUNC(trs80_state::screen_update_trs80));
+	screen.set_palette("palette");
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_trs80);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
@@ -520,47 +525,43 @@ MACHINE_CONFIG_START(trs80_state::trs80)       // the original model I, level I,
 
 	/* devices */
 	CASSETTE(config, m_cassette);
-MACHINE_CONFIG_END
+}
 
 MACHINE_CONFIG_START(trs80_state::model1)      // model I, level II
 	trs80(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(m1_mem)
-	MCFG_DEVICE_IO_MAP(m1_io)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(trs80_state, rtc_interrupt, 40)
+	m_maincpu->set_addrmap(AS_PROGRAM, &trs80_state::m1_mem);
+	m_maincpu->set_addrmap(AS_IO, &trs80_state::m1_io);
+	m_maincpu->set_periodic_int(FUNC(trs80_state::rtc_interrupt), attotime::from_hz(40));
 
 	/* devices */
 	m_cassette->set_formats(trs80l2_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_PLAY);
 
-	MCFG_QUICKLOAD_ADD("quickload", trs80_state, trs80_cmd, "cmd", 1.0)
+	MCFG_QUICKLOAD_ADD("quickload", trs80_state, trs80_cmd, "cmd", attotime::from_seconds(1))
 
 	FD1793(config, m_fdc, 4_MHz_XTAL / 4); // todo: should be fd1771
 	m_fdc->intrq_wr_callback().set(FUNC(trs80_state::intrq_w));
 
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", trs80_floppies, "sssd", trs80_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", trs80_floppies, "sssd", trs80_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:2", trs80_floppies, "", trs80_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:3", trs80_floppies, "", trs80_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, "fdc:0", trs80_floppies, "sssd", trs80_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", trs80_floppies, "sssd", trs80_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:2", trs80_floppies, "", trs80_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:3", trs80_floppies, "", trs80_state::floppy_formats).enable_sound(true);
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit7))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit6))
-	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit5))
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit4))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(m_cent_status_in, FUNC(input_buffer_device::write_bit7));
+	m_centronics->perror_handler().set(m_cent_status_in, FUNC(input_buffer_device::write_bit6));
+	m_centronics->select_handler().set(m_cent_status_in, FUNC(input_buffer_device::write_bit5));
+	m_centronics->fault_handler().set(m_cent_status_in, FUNC(input_buffer_device::write_bit4));
 
-	MCFG_DEVICE_ADD("cent_status_in", INPUT_BUFFER, 0)
+	INPUT_BUFFER(config, m_cent_status_in);
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	OUTPUT_LATCH(config, m_cent_data_out);
+	m_centronics->set_output_latch(*m_cent_data_out);
 
-	COM8116(config, m_brg, 5.0688_MHz_XTAL);   // BR1941L
-	m_brg->fr_handler().set(m_uart, FUNC(ay31015_device::write_rcp));
-	m_brg->ft_handler().set(m_uart, FUNC(ay31015_device::write_tcp));
+	com8116_device &brg(COM8116(config, "brg", 5.0688_MHz_XTAL));   // BR1941L
+	brg.fr_handler().set(m_uart, FUNC(ay31015_device::write_rcp));
+	brg.ft_handler().set(m_uart, FUNC(ay31015_device::write_tcp));
 
 	AY31015(config, m_uart);
 	m_uart->read_si_callback().set("rs232", FUNC(rs232_port_device::rxd_r));
@@ -570,34 +571,44 @@ MACHINE_CONFIG_START(trs80_state::model1)      // model I, level II
 	RS232_PORT(config, "rs232", default_rs232_devices, nullptr);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(trs80_state::sys80)
+void trs80_state::sys80(machine_config &config)
+{
 	model1(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(sys80_io)
-	MCFG_DEVICE_REMOVE("brg")
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_IO, &trs80_state::sys80_io);
 
-MACHINE_CONFIG_START(trs80_state::ht1080z)
+	config.device_remove("brg");
+	CLOCK(config, m_uart_clock, 19200 * 16);
+	m_uart_clock->signal_handler().set(m_uart, FUNC(ay31015_device::write_rcp));
+	m_uart_clock->signal_handler().append(m_uart, FUNC(ay31015_device::write_tcp));
+}
+
+void trs80_state::sys80p(machine_config &config)
+{
 	sys80(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(ht1080z_io)
+	m_maincpu->set_clock(10.48_MHz_XTAL / 6);
+	subdevice<screen_device>("screen")->set_raw(10.48_MHz_XTAL, 672, 0, 384, 312, 0, 192);
+}
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(trs80_state, screen_update_ht1080z)
+void trs80_state::ht1080z(machine_config &config)
+{
+	sys80p(config);
+	m_maincpu->set_addrmap(AS_IO, &trs80_state::ht1080z_io);
+
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(trs80_state::screen_update_ht1080z));
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_ht1080z);
 
 	AY8910(config, "ay1", 1'500'000).add_route(ALL_OUTPUTS, "mono", 0.25); // guess of clock
 	//ay1.port_a_read_callback(FUNC(trs80_state::...);  // ports are some kind of expansion slot
 	//ay1.port_b_read_callback(FUNC(trs80_state::...);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(trs80_state::lnw80)
+void trs80_state::lnw80(machine_config &config)
+{
 	model1(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	//MCFG_DEVICE_CLOCK(16_MHz_XTAL / 4) // or 16MHz / 9; 4MHz or 1.77MHz operation selected by HI/LO switch
-	MCFG_DEVICE_CLOCK(16_MHz_XTAL / 9) // need this so cassette can work
-	MCFG_DEVICE_PROGRAM_MAP(lnw80_mem)
-	MCFG_DEVICE_IO_MAP(lnw80_io)
+	//m_maincpu->set_clock(16_MHz_XTAL / 4); // or 16MHz / 9; 4MHz or 1.77MHz operation selected by HI/LO switch
+	m_maincpu->set_clock(16_MHz_XTAL / 9); // need this so cassette can work
+	m_maincpu->set_addrmap(AS_PROGRAM, &trs80_state::lnw80_mem);
+	m_maincpu->set_addrmap(AS_IO, &trs80_state::lnw80_io);
 
 	ADDRESS_MAP_BANK(config, m_lnw_bank, 0);
 	m_lnw_bank->set_addrmap(0, &trs80_state::lnw_banked_mem);
@@ -610,25 +621,28 @@ MACHINE_CONFIG_START(trs80_state::lnw80)
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_lnw80);
 
 	subdevice<palette_device>("palette")->set_entries(8).set_init(FUNC(trs80_state::lnw80_palette));
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_RAW_PARAMS(3.579545_MHz_XTAL * 3, 682, 0, 480, 264, 0, 192) // 10.738MHz generated by tank circuit (top left of page 2 of schematics)
+	subdevice<screen_device>("screen")->set_raw(3.579545_MHz_XTAL * 3, 682, 0, 480, 264, 0, 192); // 10.738MHz generated by tank circuit (top left of page 2 of schematics)
 	// LNW80 Theory of Operations gives H and V periods as 15.750kHz and 59.66Hz, probably due to rounding the calculated ~15.7468kHz to 4 figures
-	MCFG_SCREEN_UPDATE_DRIVER(trs80_state, screen_update_lnw80)
-MACHINE_CONFIG_END
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(trs80_state::screen_update_lnw80));
 
-MACHINE_CONFIG_START(trs80_state::radionic)
+	config.device_remove("brg");
+	CLOCK(config, m_uart_clock, 19200 * 16);
+	m_uart_clock->signal_handler().set(m_uart, FUNC(ay31015_device::write_rcp));
+	m_uart_clock->signal_handler().append(m_uart, FUNC(ay31015_device::write_tcp));
+}
+
+void trs80_state::radionic(machine_config &config)
+{
 	model1(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(12_MHz_XTAL / 6) // or 3.579MHz / 2 (selectable?)
+	m_maincpu->set_clock(12_MHz_XTAL / 6); // or 3.579MHz / 2 (selectable?)
 	// Komtek I "User Friendly Manual" calls for "Z80 running at 1.97 MHz." This likely refers to an alternate NTSC version
 	// whose master clock was approximately 11.8005 MHz (6 times ~1.966 MHz and 750 times 15.734 kHz). Though the schematics
 	// provide the main XTAL frequency as 12 MHz, that they also include a 3.579 MHz XTAL suggests this possibility.
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(trs80_state, nmi_line_pulse, 12_MHz_XTAL / 12 / 16384)
-	MCFG_DEVICE_PROGRAM_MAP(radionic_mem)
+	m_maincpu->set_periodic_int(FUNC(trs80_state::nmi_line_pulse), attotime::from_hz(12_MHz_XTAL / 12 / 16384));
+	m_maincpu->set_addrmap(AS_PROGRAM, &trs80_state::radionic_mem);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_RAW_PARAMS(12_MHz_XTAL, 768, 0, 512, 312, 0, 256)
-	MCFG_SCREEN_UPDATE_DRIVER(trs80_state, screen_update_radionic)
+	subdevice<screen_device>("screen")->set_raw(12_MHz_XTAL, 768, 0, 512, 312, 0, 256);
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(trs80_state::screen_update_radionic));
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_radionic);
 
 	// Interface to external circuits
@@ -637,7 +651,7 @@ MACHINE_CONFIG_START(trs80_state::radionic)
 	//m_ppi->out_pa_callback().set(FUNC(pulsar_state::ppi_pa_w));    // Data for external plugin printer module
 	//m_ppi->out_pb_callback().set(FUNC(pulsar_state::ppi_pb_w));    // Control data to external
 	//m_ppi->out_pc_callback().set(FUNC(pulsar_state::ppi_pc_w));    // Printer strobe
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************
@@ -695,6 +709,8 @@ ROM_START(sys80)
 	ROM_REGION(0x0400, "chargen",0)
 	ROM_LOAD("trs80m1.chr",  0x0000, 0x0400, CRC(0033f2b9) SHA1(0d2cd4197d54e2e872b515bbfdaa98efe502eda7))
 ROM_END
+
+#define rom_sys80p rom_sys80
 
 
 ROM_START(lnw80)
@@ -758,7 +774,8 @@ void trs80_state::init_trs80l2()
 COMP( 1977, trs80,       0,        0,      trs80,    trs80,   trs80_state, init_trs80,    "Tandy Radio Shack",           "TRS-80 Model I (Level I Basic)",  0 )
 COMP( 1978, trs80l2,     0,        0,      model1,   trs80l2, trs80_state, init_trs80l2,  "Tandy Radio Shack",           "TRS-80 Model I (Level II Basic)", 0 )
 COMP( 1983, radionic,    trs80l2,  0,      radionic, trs80l2, trs80_state, init_trs80,    "Komtek",                      "Radionic",                        0 )
-COMP( 1980, sys80,       trs80l2,  0,      sys80,    sys80,   trs80_state, init_trs80l2,  "EACA Computers Ltd",          "System-80",                       0 )
+COMP( 1980, sys80,       trs80l2,  0,      sys80,    sys80,   trs80_state, init_trs80l2,  "EACA Computers Ltd",          "System-80 (60 Hz)",               0 )
+COMP( 1980, sys80p,      trs80l2,  0,      sys80p,   sys80,   trs80_state, init_trs80l2,  "EACA Computers Ltd",          "System-80 (50 Hz)",               0 )
 COMP( 1981, lnw80,       trs80l2,  0,      lnw80,    sys80,   trs80_state, init_trs80,    "LNW Research",                "LNW-80",                          0 )
 COMP( 1983, ht1080z,     trs80l2,  0,      ht1080z,  sys80,   trs80_state, init_trs80l2,  "Hiradastechnika Szovetkezet", "HT-1080Z Series I",               0 )
 COMP( 1984, ht1080z2,    trs80l2,  0,      ht1080z,  sys80,   trs80_state, init_trs80l2,  "Hiradastechnika Szovetkezet", "HT-1080Z Series II",              0 )

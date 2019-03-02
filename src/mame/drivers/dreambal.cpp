@@ -328,7 +328,7 @@ MACHINE_CONFIG_START(dreambal_state::dreambal)
 	MCFG_SCREEN_PALETTE("palette")
 
 	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 0x400/2);
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dreambal)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_dreambal);
 
 	EEPROM_93C46_16BIT(config, "eeprom");  // 93lc46b
 

@@ -267,7 +267,7 @@ WRITE8_MEMBER(c65_state::vic4567_dummy_w)
 			m_VIC3_ControlB = data;
 			break;
 		default:
-			printf("%02x %02x\n",offset,data);
+			printf("%02x %02x\n", offset, data);
 			break;
 	}
 
@@ -402,9 +402,9 @@ READ8_MEMBER(c65_state::CIASelect_r)
 		switch((offset & 0x700) | 0x800)
 		{
 			case 0xc00:
-				return m_cia0->read(space,offset);
+				return m_cia0->read(offset);
 			case 0xd00:
-				return m_cia1->read(space,offset);
+				return m_cia1->read(offset);
 			default:
 				printf("Unknown I/O access read to offset %04x\n",offset);
 				break;
@@ -425,14 +425,14 @@ WRITE8_MEMBER(c65_state::CIASelect_w)
 		switch((offset & 0x700) | 0x800)
 		{
 			case 0xc00:
-				m_cia0->write(space,offset,data);
+				m_cia0->write(offset, data);
 				break;
 
 			case 0xd00:
-				m_cia1->write(space,offset,data);
+				m_cia1->write(offset, data);
 				break;
 			default:
-				printf("Unknown I/O access write to offset %04x data = %02x\n",offset,data);
+				printf("Unknown I/O access write to offset %04x data = %02x\n", offset, data);
 				break;
 		}
 	}
@@ -716,7 +716,7 @@ MACHINE_CONFIG_START(c65_state::c65)
 	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK*4, 910, 0, 640, 262, 0, 200) // mods needed
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_c65)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_c65);
 
 	PALETTE(config, m_palette, FUNC(c65_state::c65_palette), 0x100);
 
@@ -726,7 +726,7 @@ MACHINE_CONFIG_START(c65_state::c65)
 	// 2x 8580 SID
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "c65_flop")
+	SOFTWARE_LIST(config, "flop_list").set_original("c65_flop");
 MACHINE_CONFIG_END
 
 

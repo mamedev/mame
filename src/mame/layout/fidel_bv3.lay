@@ -1,0 +1,461 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="button" defstate="0">
+		<rect state="0"><color red="0.8" green="0.8" blue="0.7" /></rect>
+		<rect state="1"><color red="0.6" green="0.6" blue="0.5" /></rect>
+	</element>
+
+	<element name="digit" defstate="0">
+		<led14seg><color red="0.2" green="1.0" blue="0.85" /></led14seg>
+	</element>
+
+	<element name="text_b1"><text string="RESET"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_b2"><text string="spk"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_b3"><text string="CLEAR"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_b4"><text string="YES/ENTER"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_b5"><text string="REVIEW"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_b6"><text string="AUTO"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_b7"><text string="DOUBLE"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_b8"><text string="NO/PASS"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_b9"><text string="DEALER"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_b10"><text string="CONV"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_b11"><text string="SCORE"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_b12"><text string="PLAYER"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_b13"><text string="&#x2663;"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_b14"><text string="&#x2666;"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_b15"><text string="&#x2665;"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_b16"><text string="&#x2660;"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_b17"><text string="JACK"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_b18"><text string="QUEEN"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_b19"><text string="KING"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_b20"><text string="ACE"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_b21"><text string="7"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_b22"><text string="8"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_b23"><text string="9"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_b24"><text string="10"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_b25"><text string="3"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_b26"><text string="4"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_b27"><text string="5"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_b28"><text string="6"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_b29"><text string="NOTRUMP"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_b30"><text string="QUIT"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_b31"><text string="1"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_b32"><text string="2"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+
+	<element name="white"><rect><color red="0.9" green="0.9" blue="0.9" /></rect></element>
+	<element name="edge1"><rect><color red="0.15" green="0.15" blue="0.15" /></rect></element>
+	<element name="edge2"><rect><color red="0.35" green="0.35" blue="0.35" /></rect></element>
+	<element name="gray"><rect><color red="0.4" green="0.4" blue="0.4" /></rect></element>
+	<element name="blackb"><rect><color red="0" green="0" blue="0" /></rect></element>
+
+	<element name="text_scan">
+		<rect><color red="0.0" green="0.0" blue="0.0" /></rect>
+		<text string="card scanner"><color red="0.4" green="0.4" blue="0.4" /></text>
+	</element>
+
+	<element name="nothing" defstate="0">
+		<text string=" "><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+
+	<element name="cba">
+		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<text string="A" align="1"><color red="0.1" green="0.1" blue="0.1" /></text>
+	</element>
+	<element name="cb2">
+		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<text string="2" align="1"><color red="0.1" green="0.1" blue="0.1" /></text>
+	</element>
+	<element name="cb3">
+		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<text string="3" align="1"><color red="0.1" green="0.1" blue="0.1" /></text>
+	</element>
+	<element name="cb4">
+		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<text string="4" align="1"><color red="0.1" green="0.1" blue="0.1" /></text>
+	</element>
+	<element name="cb5">
+		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<text string="5" align="1"><color red="0.1" green="0.1" blue="0.1" /></text>
+	</element>
+	<element name="cb6">
+		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<text string="6" align="1"><color red="0.1" green="0.1" blue="0.1" /></text>
+	</element>
+	<element name="cb7">
+		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<text string="7" align="1"><color red="0.1" green="0.1" blue="0.1" /></text>
+	</element>
+	<element name="cb8">
+		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<text string="8" align="1"><color red="0.1" green="0.1" blue="0.1" /></text>
+	</element>
+	<element name="cb9">
+		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<text string="9" align="1"><color red="0.1" green="0.1" blue="0.1" /></text>
+	</element>
+	<element name="cb0">
+		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<text string="10" align="1"><color red="0.1" green="0.1" blue="0.1" /></text>
+	</element>
+	<element name="cbj">
+		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<text string="J" align="1"><color red="0.1" green="0.1" blue="0.1" /></text>
+	</element>
+	<element name="cbq">
+		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<text string="Q" align="1"><color red="0.1" green="0.1" blue="0.1" /></text>
+	</element>
+	<element name="cbk">
+		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<text string="K" align="1"><color red="0.1" green="0.1" blue="0.1" /></text>
+	</element>
+
+	<element name="cra">
+		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<text string="A" align="1"><color red="0.8" green="0.1" blue="0.1" /></text>
+	</element>
+	<element name="cr2">
+		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<text string="2" align="1"><color red="0.8" green="0.1" blue="0.1" /></text>
+	</element>
+	<element name="cr3">
+		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<text string="3" align="1"><color red="0.8" green="0.1" blue="0.1" /></text>
+	</element>
+	<element name="cr4">
+		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<text string="4" align="1"><color red="0.8" green="0.1" blue="0.1" /></text>
+	</element>
+	<element name="cr5">
+		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<text string="5" align="1"><color red="0.8" green="0.1" blue="0.1" /></text>
+	</element>
+	<element name="cr6">
+		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<text string="6" align="1"><color red="0.8" green="0.1" blue="0.1" /></text>
+	</element>
+	<element name="cr7">
+		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<text string="7" align="1"><color red="0.8" green="0.1" blue="0.1" /></text>
+	</element>
+	<element name="cr8">
+		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<text string="8" align="1"><color red="0.8" green="0.1" blue="0.1" /></text>
+	</element>
+	<element name="cr9">
+		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<text string="9" align="1"><color red="0.8" green="0.1" blue="0.1" /></text>
+	</element>
+	<element name="cr0">
+		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<text string="10" align="1"><color red="0.8" green="0.1" blue="0.1" /></text>
+	</element>
+	<element name="crj">
+		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<text string="J" align="1"><color red="0.8" green="0.1" blue="0.1" /></text>
+	</element>
+	<element name="crq">
+		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<text string="Q" align="1"><color red="0.8" green="0.1" blue="0.1" /></text>
+	</element>
+	<element name="crk">
+		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<text string="K" align="1"><color red="0.8" green="0.1" blue="0.1" /></text>
+	</element>
+
+	<element name="csh">
+		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<text align="2" string="&#x2665;"><color red="0.8" green="0.1" blue="0.1" /></text>
+	</element>
+	<element name="csd">
+		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<text align="2" string="&#x2666;"><color red="0.8" green="0.1" blue="0.1" /></text>
+	</element>
+	<element name="csc">
+		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<text align="2" string="&#x2663;"><color red="0.1" green="0.1" blue="0.1" /></text>
+	</element>
+	<element name="css">
+		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<text align="2" string="&#x2660;"><color red="0.1" green="0.1" blue="0.1" /></text>
+	</element>
+
+	<element name="cbjk">
+		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<text string="&#x263a;"><color red="0.1" green="0.1" blue="0.1" /></text>
+	</element>
+	<element name="crjk">
+		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<text string="&#x263a;"><color red="0.8" green="0.1" blue="0.1" /></text>
+	</element>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="-1" right="53" top="11" bottom="54" />
+
+	<!-- vfd -->
+
+		<bezel name="digit0" element="digit"><bounds x="0" y="12" width="2.75" height="4.125" /></bezel>
+		<bezel name="digit1" element="digit"><bounds x="2.75" y="12" width="2.75" height="4.125" /></bezel>
+		<bezel name="digit2" element="digit"><bounds x="5.50" y="12" width="2.75" height="4.125" /></bezel>
+		<bezel name="digit3" element="digit"><bounds x="8.25" y="12" width="2.75" height="4.125" /></bezel>
+		<bezel name="digit4" element="digit"><bounds x="11.00" y="12" width="2.75" height="4.125" /></bezel>
+		<bezel name="digit5" element="digit"><bounds x="13.75" y="12" width="2.75" height="4.125" /></bezel>
+		<bezel name="digit6" element="digit"><bounds x="16.50" y="12" width="2.75" height="4.125" /></bezel>
+		<bezel name="digit7" element="digit"><bounds x="19.25" y="12" width="2.75" height="4.125" /></bezel>
+
+	<!-- button panel -->
+
+		<bezel element="button" inputtag="RESET" inputmask="0x01"><bounds x="0" y="20" width="4" height="3" /></bezel>
+		<bezel element="button" inputtag="IN.6" inputmask="0x01"><bounds x="6" y="20" width="4" height="3" /></bezel>
+		<bezel element="button" inputtag="IN.5" inputmask="0x01"><bounds x="12" y="20" width="4" height="3" /></bezel>
+		<bezel element="button" inputtag="IN.4" inputmask="0x01"><bounds x="18" y="20" width="4" height="3" /></bezel>
+
+		<bezel element="button" inputtag="IN.7" inputmask="0x02"><bounds x="0" y="25" width="4" height="3" /></bezel>
+		<bezel element="button" inputtag="IN.6" inputmask="0x02"><bounds x="6" y="25" width="4" height="3" /></bezel>
+		<bezel element="button" inputtag="IN.5" inputmask="0x02"><bounds x="12" y="25" width="4" height="3" /></bezel>
+		<bezel element="button" inputtag="IN.4" inputmask="0x02"><bounds x="18" y="25" width="4" height="3" /></bezel>
+
+		<bezel element="button" inputtag="IN.7" inputmask="0x04"><bounds x="0" y="30" width="4" height="3" /></bezel>
+		<bezel element="button" inputtag="IN.6" inputmask="0x04"><bounds x="6" y="30" width="4" height="3" /></bezel>
+		<bezel element="button" inputtag="IN.5" inputmask="0x04"><bounds x="12" y="30" width="4" height="3" /></bezel>
+		<bezel element="button" inputtag="IN.4" inputmask="0x04"><bounds x="18" y="30" width="4" height="3" /></bezel>
+
+		<bezel element="button" inputtag="IN.7" inputmask="0x08"><bounds x="0" y="35" width="4" height="3" /></bezel>
+		<bezel element="button" inputtag="IN.6" inputmask="0x08"><bounds x="6" y="35" width="4" height="3" /></bezel>
+		<bezel element="button" inputtag="IN.5" inputmask="0x08"><bounds x="12" y="35" width="4" height="3" /></bezel>
+		<bezel element="button" inputtag="IN.4" inputmask="0x08"><bounds x="18" y="35" width="4" height="3" /></bezel>
+
+		<bezel element="text_b1"><bounds x="-2" y="18.45" width="8" height="1.4" /></bezel>
+		<bezel element="text_b2"><bounds x="4" y="18.45" width="8" height="1.4" /></bezel>
+		<bezel element="text_b3"><bounds x="10" y="18.45" width="8" height="1.4" /></bezel>
+		<bezel element="text_b4"><bounds x="16" y="18.45" width="8" height="1.4" /></bezel>
+
+		<bezel element="text_b5"><bounds x="-2" y="23.45" width="8" height="1.4" /></bezel>
+		<bezel element="text_b6"><bounds x="4" y="23.45" width="8" height="1.4" /></bezel>
+		<bezel element="text_b7"><bounds x="10" y="23.45" width="8" height="1.4" /></bezel>
+		<bezel element="text_b8"><bounds x="16" y="23.45" width="8" height="1.4" /></bezel>
+
+		<bezel element="text_b9"><bounds x="-2" y="28.45" width="8" height="1.4" /></bezel>
+		<bezel element="text_b10"><bounds x="4" y="28.45" width="8" height="1.4" /></bezel>
+		<bezel element="text_b11"><bounds x="10" y="28.45" width="8" height="1.4" /></bezel>
+		<bezel element="text_b12"><bounds x="16" y="28.45" width="8" height="1.4" /></bezel>
+
+		<bezel element="text_b13"><bounds x="-2" y="33.3" width="8" height="1.6" /></bezel>
+		<bezel element="text_b14"><bounds x="4" y="33.3" width="8" height="1.6" /></bezel>
+		<bezel element="text_b15"><bounds x="10" y="33.3" width="8" height="1.6" /></bezel>
+		<bezel element="text_b16"><bounds x="16" y="33.3" width="8" height="1.6" /></bezel>
+
+		<bezel element="button" inputtag="IN.3" inputmask="0x01"><bounds x="30" y="20" width="4" height="3" /></bezel>
+		<bezel element="button" inputtag="IN.2" inputmask="0x01"><bounds x="36" y="20" width="4" height="3" /></bezel>
+		<bezel element="button" inputtag="IN.1" inputmask="0x01"><bounds x="42" y="20" width="4" height="3" /></bezel>
+		<bezel element="button" inputtag="IN.0" inputmask="0x01"><bounds x="48" y="20" width="4" height="3" /></bezel>
+
+		<bezel element="button" inputtag="IN.3" inputmask="0x02"><bounds x="30" y="25" width="4" height="3" /></bezel>
+		<bezel element="button" inputtag="IN.2" inputmask="0x02"><bounds x="36" y="25" width="4" height="3" /></bezel>
+		<bezel element="button" inputtag="IN.1" inputmask="0x02"><bounds x="42" y="25" width="4" height="3" /></bezel>
+		<bezel element="button" inputtag="IN.0" inputmask="0x02"><bounds x="48" y="25" width="4" height="3" /></bezel>
+
+		<bezel element="button" inputtag="IN.3" inputmask="0x04"><bounds x="30" y="30" width="4" height="3" /></bezel>
+		<bezel element="button" inputtag="IN.2" inputmask="0x04"><bounds x="36" y="30" width="4" height="3" /></bezel>
+		<bezel element="button" inputtag="IN.1" inputmask="0x04"><bounds x="42" y="30" width="4" height="3" /></bezel>
+		<bezel element="button" inputtag="IN.0" inputmask="0x04"><bounds x="48" y="30" width="4" height="3" /></bezel>
+
+		<bezel element="button" inputtag="IN.3" inputmask="0x08"><bounds x="30" y="35" width="4" height="3" /></bezel>
+		<bezel element="button" inputtag="IN.2" inputmask="0x08"><bounds x="36" y="35" width="4" height="3" /></bezel>
+		<bezel element="button" inputtag="IN.1" inputmask="0x08"><bounds x="42" y="35" width="4" height="3" /></bezel>
+		<bezel element="button" inputtag="IN.0" inputmask="0x08"><bounds x="48" y="35" width="4" height="3" /></bezel>
+
+		<bezel element="text_b17"><bounds x="28" y="18.45" width="8" height="1.4" /></bezel>
+		<bezel element="text_b18"><bounds x="34" y="18.45" width="8" height="1.4" /></bezel>
+		<bezel element="text_b19"><bounds x="40" y="18.45" width="8" height="1.4" /></bezel>
+		<bezel element="text_b20"><bounds x="46" y="18.45" width="8" height="1.4" /></bezel>
+
+		<bezel element="text_b21"><bounds x="28" y="23.45" width="8" height="1.4" /></bezel>
+		<bezel element="text_b22"><bounds x="34" y="23.45" width="8" height="1.4" /></bezel>
+		<bezel element="text_b23"><bounds x="40" y="23.45" width="8" height="1.4" /></bezel>
+		<bezel element="text_b24"><bounds x="46" y="23.45" width="8" height="1.4" /></bezel>
+
+		<bezel element="text_b25"><bounds x="28" y="28.45" width="8" height="1.4" /></bezel>
+		<bezel element="text_b26"><bounds x="34" y="28.45" width="8" height="1.4" /></bezel>
+		<bezel element="text_b27"><bounds x="40" y="28.45" width="8" height="1.4" /></bezel>
+		<bezel element="text_b28"><bounds x="46" y="28.45" width="8" height="1.4" /></bezel>
+
+		<bezel element="text_b29"><bounds x="28" y="33.45" width="8" height="1.4" /></bezel>
+		<bezel element="text_b30"><bounds x="34" y="33.45" width="8" height="1.4" /></bezel>
+		<bezel element="text_b31"><bounds x="40" y="33.45" width="8" height="1.4" /></bezel>
+		<bezel element="text_b32"><bounds x="46" y="33.45" width="8" height="1.4" /></bezel>
+
+	<!-- cards (common ordering, even though in in bridge the ace is the highest) -->
+
+		<bezel element="gray"><bounds x="-0.5" y="39.7" width="18" height="0.2" /></bezel>
+		<bezel element="text_scan"><bounds x="4" y="39" width="8" height="1.4" /></bezel>
+
+		<bezel element="white"><bounds x="0" y="41" width="14" height="15" /></bezel>
+		<bezel element="white"><bounds x="15"  y="41" width="2" height="15" /></bezel>
+
+		<bezel element="cba"><bounds x="0.15"  y="41.5" width="1.8" height="1.3" /></bezel>
+		<bezel element="cb2"><bounds x="1.15"  y="41.5" width="1.8" height="1.3" /></bezel>
+		<bezel element="cb3"><bounds x="2.15"  y="41.5" width="1.8" height="1.3" /></bezel>
+		<bezel element="cb4"><bounds x="3.15"  y="41.5" width="1.8" height="1.3" /></bezel>
+		<bezel element="cb5"><bounds x="4.08"  y="41.5" width="1.8" height="1.3" /></bezel>
+		<bezel element="cb6"><bounds x="5.15"  y="41.5" width="1.8" height="1.3" /></bezel>
+		<bezel element="cb7"><bounds x="6.15"  y="41.5" width="1.8" height="1.3" /></bezel>
+		<bezel element="cb8"><bounds x="7.15"  y="41.5" width="1.8" height="1.3" /></bezel>
+		<bezel element="cb9"><bounds x="8.15"  y="41.5" width="1.8" height="1.3" /></bezel>
+		<bezel element="cb0"><bounds x="9.15"  y="41.5" width="1.8" height="1.3" /></bezel>
+		<bezel element="white"><bounds x="10"  y="41.5" width="2" height="2" /></bezel>
+		<bezel element="cbj"><bounds x="10.15" y="41.5" width="1.8" height="1.3" /></bezel>
+		<bezel element="cbq"><bounds x="11.15" y="41.5" width="1.8" height="1.3" /></bezel>
+		<bezel element="cbk"><bounds x="12.15" y="41.5" width="1.8" height="1.3" /></bezel>
+		<bezel element="css"><bounds x="12.05" y="42.81" width="1.8" height="1.5" /></bezel>
+
+		<bezel element="cra"><bounds x="0.15"  y="44.5" width="1.8" height="1.3" /></bezel>
+		<bezel element="cr2"><bounds x="1.15"  y="44.5" width="1.8" height="1.3" /></bezel>
+		<bezel element="cr3"><bounds x="2.15"  y="44.5" width="1.8" height="1.3" /></bezel>
+		<bezel element="cr4"><bounds x="3.15"  y="44.5" width="1.8" height="1.3" /></bezel>
+		<bezel element="cr5"><bounds x="4.08"  y="44.5" width="1.8" height="1.3" /></bezel>
+		<bezel element="cr6"><bounds x="5.15"  y="44.5" width="1.8" height="1.3" /></bezel>
+		<bezel element="cr7"><bounds x="6.15"  y="44.5" width="1.8" height="1.3" /></bezel>
+		<bezel element="cr8"><bounds x="7.15"  y="44.5" width="1.8" height="1.3" /></bezel>
+		<bezel element="cr9"><bounds x="8.15"  y="44.5" width="1.8" height="1.3" /></bezel>
+		<bezel element="cr0"><bounds x="9.15"  y="44.5" width="1.8" height="1.3" /></bezel>
+		<bezel element="white"><bounds x="10"  y="44.5" width="2" height="2" /></bezel>
+		<bezel element="crj"><bounds x="10.15" y="44.5" width="1.8" height="1.3" /></bezel>
+		<bezel element="crq"><bounds x="11.15" y="44.5" width="1.8" height="1.3" /></bezel>
+		<bezel element="crk"><bounds x="12.15" y="44.5" width="1.8" height="1.3" /></bezel>
+		<bezel element="csh"><bounds x="12.05" y="45.81" width="1.8" height="1.5" /></bezel>
+
+		<bezel element="cba"><bounds x="0.15"  y="47.5" width="1.8" height="1.3" /></bezel>
+		<bezel element="cb2"><bounds x="1.15"  y="47.5" width="1.8" height="1.3" /></bezel>
+		<bezel element="cb3"><bounds x="2.15"  y="47.5" width="1.8" height="1.3" /></bezel>
+		<bezel element="cb4"><bounds x="3.15"  y="47.5" width="1.8" height="1.3" /></bezel>
+		<bezel element="cb5"><bounds x="4.08"  y="47.5" width="1.8" height="1.3" /></bezel>
+		<bezel element="cb6"><bounds x="5.15"  y="47.5" width="1.8" height="1.3" /></bezel>
+		<bezel element="cb7"><bounds x="6.15"  y="47.5" width="1.8" height="1.3" /></bezel>
+		<bezel element="cb8"><bounds x="7.15"  y="47.5" width="1.8" height="1.3" /></bezel>
+		<bezel element="cb9"><bounds x="8.15"  y="47.5" width="1.8" height="1.3" /></bezel>
+		<bezel element="cb0"><bounds x="9.15"  y="47.5" width="1.8" height="1.3" /></bezel>
+		<bezel element="white"><bounds x="10"   y="47.5" width="2" height="2" /></bezel>
+		<bezel element="cbj"><bounds x="10.15" y="47.5" width="1.8" height="1.3" /></bezel>
+		<bezel element="cbq"><bounds x="11.15" y="47.5" width="1.8" height="1.3" /></bezel>
+		<bezel element="cbk"><bounds x="12.15" y="47.5" width="1.8" height="1.3" /></bezel>
+		<bezel element="csc"><bounds x="12.05" y="48.81" width="1.8" height="1.5" /></bezel>
+
+		<bezel element="cra"><bounds x="0.15"  y="50.5" width="1.8" height="1.3" /></bezel>
+		<bezel element="cr2"><bounds x="1.15"  y="50.5" width="1.8" height="1.3" /></bezel>
+		<bezel element="cr3"><bounds x="2.15"  y="50.5" width="1.8" height="1.3" /></bezel>
+		<bezel element="cr4"><bounds x="3.15"  y="50.5" width="1.8" height="1.3" /></bezel>
+		<bezel element="cr5"><bounds x="4.08"  y="50.5" width="1.8" height="1.3" /></bezel>
+		<bezel element="cr6"><bounds x="5.15"  y="50.5" width="1.8" height="1.3" /></bezel>
+		<bezel element="cr7"><bounds x="6.15"  y="50.5" width="1.8" height="1.3" /></bezel>
+		<bezel element="cr8"><bounds x="7.15"  y="50.5" width="1.8" height="1.3" /></bezel>
+		<bezel element="cr9"><bounds x="8.15"  y="50.5" width="1.8" height="1.3" /></bezel>
+		<bezel element="cr0"><bounds x="9.15"  y="50.5" width="1.8" height="1.3" /></bezel>
+		<bezel element="white"><bounds x="10"  y="50.5" width="2" height="2" /></bezel>
+		<bezel element="crj"><bounds x="10.15" y="50.5" width="1.8" height="1.3" /></bezel>
+		<bezel element="crq"><bounds x="11.15" y="50.5" width="1.8" height="1.3" /></bezel>
+		<bezel element="crk"><bounds x="12.15" y="50.5" width="1.8" height="1.3" /></bezel>
+		<bezel element="csd"><bounds x="12.05" y="51.81" width="1.8" height="1.5" /></bezel>
+
+		<bezel element="cbjk"><bounds x="15.1" y="42" width="1.8" height="1.5" /></bezel>
+		<bezel element="crjk"><bounds x="15.1" y="45" width="1.8" height="1.5" /></bezel>
+
+		<bezel element="edge1"><bounds x="0.95"  y="41" width="0.08" height="15" /></bezel>
+		<bezel element="edge2"><bounds x="1.00"  y="41" width="0.06" height="15" /></bezel>
+		<bezel element="edge1"><bounds x="1.95"  y="41" width="0.08" height="15" /></bezel>
+		<bezel element="edge2"><bounds x="2.00"  y="41" width="0.06" height="15" /></bezel>
+		<bezel element="edge1"><bounds x="2.95"  y="41" width="0.08" height="15" /></bezel>
+		<bezel element="edge2"><bounds x="3.00"  y="41" width="0.06" height="15" /></bezel>
+		<bezel element="edge1"><bounds x="3.95"  y="41" width="0.08" height="15" /></bezel>
+		<bezel element="edge2"><bounds x="4.00"  y="41" width="0.06" height="15" /></bezel>
+		<bezel element="edge1"><bounds x="4.95"  y="41" width="0.08" height="15" /></bezel>
+		<bezel element="edge2"><bounds x="5.00"  y="41" width="0.06" height="15" /></bezel>
+		<bezel element="edge1"><bounds x="5.95"  y="41" width="0.08" height="15" /></bezel>
+		<bezel element="edge2"><bounds x="6.00"  y="41" width="0.06" height="15" /></bezel>
+		<bezel element="edge1"><bounds x="6.95"  y="41" width="0.08" height="15" /></bezel>
+		<bezel element="edge2"><bounds x="7.00"  y="41" width="0.06" height="15" /></bezel>
+		<bezel element="edge1"><bounds x="7.95"  y="41" width="0.08" height="15" /></bezel>
+		<bezel element="edge2"><bounds x="8.00"  y="41" width="0.06" height="15" /></bezel>
+		<bezel element="edge1"><bounds x="8.95"  y="41" width="0.08" height="15" /></bezel>
+		<bezel element="edge2"><bounds x="9.00"  y="41" width="0.06" height="15" /></bezel>
+		<bezel element="edge1"><bounds x="9.95"  y="41" width="0.08" height="15" /></bezel>
+		<bezel element="edge2"><bounds x="10.00" y="41" width="0.06" height="15" /></bezel>
+		<bezel element="edge1"><bounds x="10.95" y="41" width="0.08" height="15" /></bezel>
+		<bezel element="edge2"><bounds x="11.00" y="41" width="0.06" height="15" /></bezel>
+		<bezel element="edge1"><bounds x="11.95" y="41" width="0.08" height="15" /></bezel>
+		<bezel element="edge2"><bounds x="12.00" y="41" width="0.06" height="15" /></bezel>
+
+		<bezel element="nothing" inputtag="CARDS.0" inputmask="0x0001"><bounds x="0"  y="41.5" width="1" height="2.7" /></bezel>
+		<bezel element="nothing" inputtag="CARDS.0" inputmask="0x0002"><bounds x="1"  y="41.5" width="1" height="2.7" /></bezel>
+		<bezel element="nothing" inputtag="CARDS.0" inputmask="0x0004"><bounds x="2"  y="41.5" width="1" height="2.7" /></bezel>
+		<bezel element="nothing" inputtag="CARDS.0" inputmask="0x0008"><bounds x="3"  y="41.5" width="1" height="2.7" /></bezel>
+		<bezel element="nothing" inputtag="CARDS.0" inputmask="0x0010"><bounds x="4"  y="41.5" width="1" height="2.7" /></bezel>
+		<bezel element="nothing" inputtag="CARDS.0" inputmask="0x0020"><bounds x="5"  y="41.5" width="1" height="2.7" /></bezel>
+		<bezel element="nothing" inputtag="CARDS.0" inputmask="0x0040"><bounds x="6"  y="41.5" width="1" height="2.7" /></bezel>
+		<bezel element="nothing" inputtag="CARDS.0" inputmask="0x0080"><bounds x="7"  y="41.5" width="1" height="2.7" /></bezel>
+		<bezel element="nothing" inputtag="CARDS.0" inputmask="0x0100"><bounds x="8"  y="41.5" width="1" height="2.7" /></bezel>
+		<bezel element="nothing" inputtag="CARDS.0" inputmask="0x0200"><bounds x="9"  y="41.5" width="1" height="2.7" /></bezel>
+		<bezel element="nothing" inputtag="CARDS.0" inputmask="0x0400"><bounds x="10" y="41.5" width="1" height="2.7" /></bezel>
+		<bezel element="nothing" inputtag="CARDS.0" inputmask="0x0800"><bounds x="11" y="41.5" width="1" height="2.7" /></bezel>
+		<bezel element="nothing" inputtag="CARDS.0" inputmask="0x1000"><bounds x="12" y="41.5" width="2" height="2.7" /></bezel>
+
+		<bezel element="nothing" inputtag="CARDS.1" inputmask="0x0001"><bounds x="0"  y="44.5" width="1" height="2.7" /></bezel>
+		<bezel element="nothing" inputtag="CARDS.1" inputmask="0x0002"><bounds x="1"  y="44.5" width="1" height="2.7" /></bezel>
+		<bezel element="nothing" inputtag="CARDS.1" inputmask="0x0004"><bounds x="2"  y="44.5" width="1" height="2.7" /></bezel>
+		<bezel element="nothing" inputtag="CARDS.1" inputmask="0x0008"><bounds x="3"  y="44.5" width="1" height="2.7" /></bezel>
+		<bezel element="nothing" inputtag="CARDS.1" inputmask="0x0010"><bounds x="4"  y="44.5" width="1" height="2.7" /></bezel>
+		<bezel element="nothing" inputtag="CARDS.1" inputmask="0x0020"><bounds x="5"  y="44.5" width="1" height="2.7" /></bezel>
+		<bezel element="nothing" inputtag="CARDS.1" inputmask="0x0040"><bounds x="6"  y="44.5" width="1" height="2.7" /></bezel>
+		<bezel element="nothing" inputtag="CARDS.1" inputmask="0x0080"><bounds x="7"  y="44.5" width="1" height="2.7" /></bezel>
+		<bezel element="nothing" inputtag="CARDS.1" inputmask="0x0100"><bounds x="8"  y="44.5" width="1" height="2.7" /></bezel>
+		<bezel element="nothing" inputtag="CARDS.1" inputmask="0x0200"><bounds x="9"  y="44.5" width="1" height="2.7" /></bezel>
+		<bezel element="nothing" inputtag="CARDS.1" inputmask="0x0400"><bounds x="10" y="44.5" width="1" height="2.7" /></bezel>
+		<bezel element="nothing" inputtag="CARDS.1" inputmask="0x0800"><bounds x="11" y="44.5" width="1" height="2.7" /></bezel>
+		<bezel element="nothing" inputtag="CARDS.1" inputmask="0x1000"><bounds x="12" y="44.5" width="2" height="2.7" /></bezel>
+
+		<bezel element="nothing" inputtag="CARDS.2" inputmask="0x0001"><bounds x="0"  y="47.5" width="1" height="2.7" /></bezel>
+		<bezel element="nothing" inputtag="CARDS.2" inputmask="0x0002"><bounds x="1"  y="47.5" width="1" height="2.7" /></bezel>
+		<bezel element="nothing" inputtag="CARDS.2" inputmask="0x0004"><bounds x="2"  y="47.5" width="1" height="2.7" /></bezel>
+		<bezel element="nothing" inputtag="CARDS.2" inputmask="0x0008"><bounds x="3"  y="47.5" width="1" height="2.7" /></bezel>
+		<bezel element="nothing" inputtag="CARDS.2" inputmask="0x0010"><bounds x="4"  y="47.5" width="1" height="2.7" /></bezel>
+		<bezel element="nothing" inputtag="CARDS.2" inputmask="0x0020"><bounds x="5"  y="47.5" width="1" height="2.7" /></bezel>
+		<bezel element="nothing" inputtag="CARDS.2" inputmask="0x0040"><bounds x="6"  y="47.5" width="1" height="2.7" /></bezel>
+		<bezel element="nothing" inputtag="CARDS.2" inputmask="0x0080"><bounds x="7"  y="47.5" width="1" height="2.7" /></bezel>
+		<bezel element="nothing" inputtag="CARDS.2" inputmask="0x0100"><bounds x="8"  y="47.5" width="1" height="2.7" /></bezel>
+		<bezel element="nothing" inputtag="CARDS.2" inputmask="0x0200"><bounds x="9"  y="47.5" width="1" height="2.7" /></bezel>
+		<bezel element="nothing" inputtag="CARDS.2" inputmask="0x0400"><bounds x="10" y="47.5" width="1" height="2.7" /></bezel>
+		<bezel element="nothing" inputtag="CARDS.2" inputmask="0x0800"><bounds x="11" y="47.5" width="1" height="2.7" /></bezel>
+		<bezel element="nothing" inputtag="CARDS.2" inputmask="0x1000"><bounds x="12" y="47.5" width="2" height="2.7" /></bezel>
+
+		<bezel element="nothing" inputtag="CARDS.3" inputmask="0x0001"><bounds x="0"  y="50.5" width="1" height="2.7" /></bezel>
+		<bezel element="nothing" inputtag="CARDS.3" inputmask="0x0002"><bounds x="1"  y="50.5" width="1" height="2.7" /></bezel>
+		<bezel element="nothing" inputtag="CARDS.3" inputmask="0x0004"><bounds x="2"  y="50.5" width="1" height="2.7" /></bezel>
+		<bezel element="nothing" inputtag="CARDS.3" inputmask="0x0008"><bounds x="3"  y="50.5" width="1" height="2.7" /></bezel>
+		<bezel element="nothing" inputtag="CARDS.3" inputmask="0x0010"><bounds x="4"  y="50.5" width="1" height="2.7" /></bezel>
+		<bezel element="nothing" inputtag="CARDS.3" inputmask="0x0020"><bounds x="5"  y="50.5" width="1" height="2.7" /></bezel>
+		<bezel element="nothing" inputtag="CARDS.3" inputmask="0x0040"><bounds x="6"  y="50.5" width="1" height="2.7" /></bezel>
+		<bezel element="nothing" inputtag="CARDS.3" inputmask="0x0080"><bounds x="7"  y="50.5" width="1" height="2.7" /></bezel>
+		<bezel element="nothing" inputtag="CARDS.3" inputmask="0x0100"><bounds x="8"  y="50.5" width="1" height="2.7" /></bezel>
+		<bezel element="nothing" inputtag="CARDS.3" inputmask="0x0200"><bounds x="9"  y="50.5" width="1" height="2.7" /></bezel>
+		<bezel element="nothing" inputtag="CARDS.3" inputmask="0x0400"><bounds x="10" y="50.5" width="1" height="2.7" /></bezel>
+		<bezel element="nothing" inputtag="CARDS.3" inputmask="0x0800"><bounds x="11" y="50.5" width="1" height="2.7" /></bezel>
+		<bezel element="nothing" inputtag="CARDS.3" inputmask="0x1000"><bounds x="12" y="50.5" width="2" height="2.7" /></bezel>
+
+		<bezel element="nothing" inputtag="CARDS.0" inputmask="0x2000"><bounds x="15" y="41.5" width="2" height="2.7" /></bezel>
+		<bezel element="nothing" inputtag="CARDS.0" inputmask="0x4000"><bounds x="15" y="44.5" width="2" height="2.7" /></bezel>
+
+		<bezel element="blackb"><bounds x="0" y="40.5" width="50" height="1" /></bezel>
+		<bezel element="blackb"><bounds x="0" y="44.2" width="50" height="0.3" /></bezel>
+		<bezel element="blackb"><bounds x="0" y="47.2" width="50" height="0.3" /></bezel>
+		<bezel element="blackb"><bounds x="14.9" y="47.3" width="50" height="15" /></bezel>
+		<bezel element="blackb"><bounds x="0" y="50.2" width="50" height="0.3" /></bezel>
+		<bezel element="blackb"><bounds x="0" y="53.2" width="50" height="15" /></bezel>
+
+	</view>
+</mamelayout>

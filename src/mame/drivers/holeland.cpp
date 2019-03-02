@@ -299,7 +299,7 @@ MACHINE_CONFIG_START(holeland_state::holeland)
 	MCFG_SCREEN_UPDATE_DRIVER(holeland_state, screen_update_holeland)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_holeland)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_holeland);
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 	MCFG_VIDEO_START_OVERRIDE(holeland_state,holeland)
 
@@ -380,7 +380,7 @@ MACHINE_CONFIG_START(holeland_state::crzrally)
 	MCFG_SCREEN_UPDATE_DRIVER(holeland_state, screen_update_crzrally)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_crzrally)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_crzrally);
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 	MCFG_VIDEO_START_OVERRIDE(holeland_state,crzrally)
 

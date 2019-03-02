@@ -194,7 +194,7 @@ WRITE8_MEMBER(vega_state::extern_w)
 		case 1: /* 04-07 */
 		{
 			/* AY 3-8910 */
-			m_ay8910->address_w(space, 0, offset);
+			m_ay8910->address_w(offset);
 		}
 		break;
 
@@ -322,7 +322,7 @@ READ8_MEMBER(vega_state::extern_r)
 		case 1: /* 04-07 */
 		{
 			/* AY 3-8910 */
-			m_ay8910->data_w(space, 0, offset);
+			m_ay8910->data_w(offset);
 			return 0xff;//mame_rand(machine);
 		}
 

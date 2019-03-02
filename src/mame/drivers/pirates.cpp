@@ -252,30 +252,30 @@ GFXDECODE_END
 
 /* Machine Driver + Related bits */
 
-MACHINE_CONFIG_START(pirates_state::pirates)
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000) /* 16mhz */
-	MCFG_DEVICE_PROGRAM_MAP(pirates_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pirates_state,  irq1_line_hold)
+void pirates_state::pirates(machine_config &config)
+{
+	M68000(config, m_maincpu, 16000000); /* 16mhz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &pirates_state::pirates_map);
+	m_maincpu->set_vblank_int("screen", FUNC(pirates_state::irq1_line_hold));
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pirates);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(36*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(pirates_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(36*8, 32*8);
+	screen.set_visarea(0*8, 36*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(pirates_state::screen_update));
+	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x2000);
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1333333, okim6295_device::PIN7_LOW)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, 1333333, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 

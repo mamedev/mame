@@ -292,18 +292,17 @@ static GFXDECODE_START( gfx_segacd )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(sega_segacd_device::device_add_mconfig)
+void sega_segacd_device::device_add_mconfig(machine_config &config)
+{
+	M68000(config, m_scdcpu, SEGACD_CLOCK); /* 12.5 MHz */
+	m_scdcpu->set_addrmap(AS_PROGRAM, &sega_segacd_device::segacd_map);
+	m_scdcpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(sega_segacd_device::segacd_sub_int_callback),this));
 
-	MCFG_DEVICE_ADD("segacd_68k", M68000, SEGACD_CLOCK ) /* 12.5 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(segacd_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE(DEVICE_SELF, sega_segacd_device, segacd_sub_int_callback)
-
-	MCFG_DEVICE_ADD("cdc", LC89510, 0) // cd controller
+	LC89510(config, "cdc", 0); // cd controller
 
 	// temporary until things are cleaned up
 	LC89510_TEMP(config, m_lc89510_temp, 0); // cd controller
 	m_lc89510_temp->set_cdc_do_dma_callback(FUNC(sega_segacd_device::SegaCD_CDC_Do_DMA), this); // hack
-
 
 	TIMER(config, m_stopwatch_timer).configure_generic(timer_device::expired_delegate()); //stopwatch timer
 	TIMER(config, m_stamp_timer).configure_generic(FUNC(sega_segacd_device::stamp_timer_callback));
@@ -312,30 +311,31 @@ MACHINE_CONFIG_START(sega_segacd_device::device_add_mconfig)
 
 	config.set_default_layout(layout_megacd);
 
-	MCFG_DEVICE_ADD("rfsnd", RF5C68, SEGACD_CLOCK) // RF5C164!
-	MCFG_SOUND_ROUTE( 0, ":lspeaker", 0.50 )
-	MCFG_SOUND_ROUTE( 1, ":rspeaker", 0.50 )
-	MCFG_DEVICE_ADDRESS_MAP(0, segacd_pcm_map)
+	RF5C68(config, m_rfsnd, SEGACD_CLOCK); // RF5C164!
+	m_rfsnd->add_route( 0, ":lspeaker", 0.50 );
+	m_rfsnd->add_route( 1, ":rspeaker", 0.50 );
+	m_rfsnd->set_addrmap(0, &sega_segacd_device::segacd_pcm_map);
 
 	NVRAM(config, "backupram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_QUANTUM_PERFECT_CPU("segacd_68k") // perfect sync to the fastest cpu
-MACHINE_CONFIG_END
+	config.m_perfect_cpu_quantum = subtag("segacd_68k"); // perfect sync to the fastest cpu
+}
 
 
 sega_segacd_device::sega_segacd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock),
-		device_gfx_interface(mconfig, *this, gfx_segacd),
-		m_scdcpu(*this, "segacd_68k"),
-		m_rfsnd(*this, "rfsnd"),
-		m_lc89510_temp(*this, "tempcdc"),
-		m_stopwatch_timer(*this, "sw_timer"),
-		m_stamp_timer(*this, "stamp_timer"),
-		m_irq3_timer(*this, "irq3_timer"),
-		m_dma_timer(*this, "dma_timer"),
-		m_prgram(*this, "prgram"),
-		m_dataram(*this, "dataram"),
-		m_font_bits(*this, "font_bits")
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_gfx_interface(mconfig, *this, gfx_segacd)
+	, m_scdcpu(*this, "segacd_68k")
+	, m_hostcpu(*this, finder_base::DUMMY_TAG)
+	, m_rfsnd(*this, "rfsnd")
+	, m_lc89510_temp(*this, "tempcdc")
+	, m_stopwatch_timer(*this, "sw_timer")
+	, m_stamp_timer(*this, "stamp_timer")
+	, m_irq3_timer(*this, "irq3_timer")
+	, m_dma_timer(*this, "dma_timer")
+	, m_prgram(*this, "prgram")
+	, m_dataram(*this, "dataram")
+	, m_font_bits(*this, "font_bits")
 {
 }
 
@@ -568,7 +568,7 @@ READ16_MEMBER( sega_segacd_device::scd_a12002_memory_mode_r )
 // RET = Return access (bit 1)
 
 
-WRITE8_MEMBER( sega_segacd_device::scd_a12002_memory_mode_w_8_15 )
+void sega_segacd_device::scd_a12002_memory_mode_w_8_15(u8 data)
 {
 	if (data & 0xff00)
 	{
@@ -579,7 +579,7 @@ WRITE8_MEMBER( sega_segacd_device::scd_a12002_memory_mode_w_8_15 )
 }
 
 
-WRITE8_MEMBER( sega_segacd_device::scd_a12002_memory_mode_w_0_7 )
+void sega_segacd_device::scd_a12002_memory_mode_w_0_7(u8 data)
 {
 	//printf("scd_a12002_memory_mode_w_0_7 %04x\n",data);
 
@@ -605,10 +605,10 @@ WRITE8_MEMBER( sega_segacd_device::scd_a12002_memory_mode_w_0_7 )
 WRITE16_MEMBER( sega_segacd_device::scd_a12002_memory_mode_w )
 {
 	if (ACCESSING_BITS_8_15)
-		scd_a12002_memory_mode_w_8_15(space, 0, data>>8, mem_mask>>8);
+		scd_a12002_memory_mode_w_8_15(data>>8);
 
 	if (ACCESSING_BITS_0_7)
-		scd_a12002_memory_mode_w_0_7(space, 0, data&0xff, mem_mask&0xff);
+		scd_a12002_memory_mode_w_0_7(data&0xff);
 }
 
 
@@ -627,14 +627,14 @@ READ16_MEMBER( sega_segacd_device::segacd_sub_memory_mode_r )
 }
 
 
-WRITE8_MEMBER( sega_segacd_device::segacd_sub_memory_mode_w_8_15 )
+void sega_segacd_device::segacd_sub_memory_mode_w_8_15(u8 data)
 {
 	/* setting write protect bits from sub-cpu has no effect? */
 }
 
 
 
-WRITE8_MEMBER( sega_segacd_device::segacd_sub_memory_mode_w_0_7 )
+void sega_segacd_device::segacd_sub_memory_mode_w_0_7(u8 data)
 {
 	segacd_memory_priority_mode = (data&0x0018)>>3;
 
@@ -696,10 +696,10 @@ WRITE16_MEMBER( sega_segacd_device::segacd_sub_memory_mode_w )
 
 
 	if (ACCESSING_BITS_8_15)
-		segacd_sub_memory_mode_w_8_15(space, 0, data>>8, mem_mask>>8);
+		segacd_sub_memory_mode_w_8_15(data>>8);
 
 	if (ACCESSING_BITS_0_7)
-		segacd_sub_memory_mode_w_0_7(space, 0, data&0xff, mem_mask&0xff);
+		segacd_sub_memory_mode_w_0_7(data&0xff);
 }
 
 
@@ -1724,7 +1724,7 @@ READ16_MEMBER( sega_segacd_device::font_converted_r )
 
 void sega_segacd_device::device_start()
 {
-	address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = m_hostcpu->space(AS_PROGRAM);
 
 	m_backupram.resize(0x2000);
 	subdevice<nvram_device>("backupram")->set_base(&m_backupram[0], 0x2000);
@@ -1852,7 +1852,6 @@ void sega_segacd_device::SegaCD_CDC_Do_DMA(int &dmacount, uint8_t *CDC_BUFFER, u
 	uint16_t *dest;
 	int srcoffset = 0;
 	int dstoffset = 0;
-	address_space& space = m_scdcpu->space(AS_PROGRAM);
 
 	bool PCM_DMA = false;
 
@@ -1890,8 +1889,8 @@ void sega_segacd_device::SegaCD_CDC_Do_DMA(int &dmacount, uint8_t *CDC_BUFFER, u
 
 		if (PCM_DMA)
 		{
-			m_rfsnd->rf5c68_mem_w(space, dstoffset & 0xfff, data >> 8);
-			m_rfsnd->rf5c68_mem_w(space, (dstoffset+1) & 0xfff, data);
+			m_rfsnd->rf5c68_mem_w(dstoffset & 0xfff, data >> 8);
+			m_rfsnd->rf5c68_mem_w((dstoffset+1) & 0xfff, data);
 		//  printf("PCM_DMA writing %04x %04x\n",0xff2000+(dstoffset*2), data);
 		}
 		else

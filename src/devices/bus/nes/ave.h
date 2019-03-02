@@ -16,7 +16,7 @@ public:
 	// construction/destruction
 	nes_nina001_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE8_MEMBER(write_m) override;
+	virtual void write_m(offs_t offset, uint8_t data) override;
 
 	virtual void pcb_reset() override;
 
@@ -34,7 +34,7 @@ public:
 	// construction/destruction
 	nes_nina006_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE8_MEMBER(write_l) override;
+	virtual void write_l(offs_t offset, uint8_t data) override;
 
 	virtual void pcb_reset() override;
 
@@ -52,7 +52,7 @@ public:
 	// construction/destruction
 	nes_maxi15_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ8_MEMBER(read_h) override;
+	virtual uint8_t read_h(offs_t offset) override;
 
 	virtual void pcb_reset() override;
 

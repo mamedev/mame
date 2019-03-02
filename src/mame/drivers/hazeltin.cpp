@@ -698,7 +698,7 @@ MACHINE_CONFIG_START(hazl1500_state::hazl1500)
 	MCFG_DEVICE_ADD(CPU_TAG, I8080, XTAL(18'000'000)/9) // 18MHz crystal on schematics, using an i8224 clock gen/driver IC
 	MCFG_DEVICE_PROGRAM_MAP(hazl1500_mem)
 	MCFG_DEVICE_IO_MAP(hazl1500_io)
-	MCFG_QUANTUM_PERFECT_CPU(CPU_TAG)
+	config.m_perfect_cpu_quantum = subtag(CPU_TAG);
 
 	INPUT_MERGER_ANY_HIGH(config, "mainint").output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
@@ -713,7 +713,7 @@ MACHINE_CONFIG_START(hazl1500_state::hazl1500)
 		SCREEN_VTOTAL, 0, SCREEN_VTOTAL);
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hazl1500)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_hazl1500);
 
 	com8116_device &baudgen(COM8116(config, BAUDGEN_TAG, XTAL(5'068'800)));
 	baudgen.fr_handler().set(m_uart, FUNC(ay51013_device::write_tcp));

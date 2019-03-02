@@ -1101,7 +1101,8 @@ INPUT_PORTS_START( ti_rs232 )
 		PORT_CONFSETTING(    0x02, "5-20" )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(ti_rs232_pio_device::device_add_mconfig)
+void ti_rs232_pio_device::device_add_mconfig(machine_config &config)
+{
 	TMS9902(config, m_uart0, 3000000);
 	m_uart0->int_cb().set(FUNC(ti_rs232_pio_device::int0_callback));
 	m_uart0->rcv_cb().set(FUNC(ti_rs232_pio_device::rcv0_callback));
@@ -1128,7 +1129,7 @@ MACHINE_CONFIG_START(ti_rs232_pio_device::device_add_mconfig)
 	m_crulatch->q_out_cb<5>().set(FUNC(ti_rs232_pio_device::cts0_w));
 	m_crulatch->q_out_cb<6>().set(FUNC(ti_rs232_pio_device::cts1_w));
 	m_crulatch->q_out_cb<7>().set(FUNC(ti_rs232_pio_device::led_w));
-MACHINE_CONFIG_END
+}
 
 const tiny_rom_entry *ti_rs232_pio_device::device_rom_region() const
 {

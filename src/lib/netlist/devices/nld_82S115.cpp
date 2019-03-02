@@ -6,7 +6,7 @@
  */
 
 #include "nld_82S115.h"
-#include "../nl_base.h"
+#include "netlist/nl_base.h"
 
 namespace netlist
 {
@@ -106,8 +106,8 @@ namespace netlist
 			m_O[i].push((o >> i) & 1, NLTIME_FROM_NS(40)); // FIXME: Timing
 	}
 
-	NETLIB_DEVICE_IMPL_DEPRECATED(82S115)
-	NETLIB_DEVICE_IMPL_DEPRECATED(82S115_dip)
+	NETLIB_DEVICE_IMPL(82S115,     "PROM_82S115",     "+CE1Q,+CE2,+A0,+A1,+A2,+A3,+A4,+A5,+A6,+A7,+A8,+STROBE")
+	NETLIB_DEVICE_IMPL(82S115_dip, "PROM_82S115_DIP", "")
 
 	} //namespace devices
 } // namespace netlist

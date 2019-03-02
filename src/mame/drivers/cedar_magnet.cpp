@@ -811,7 +811,7 @@ MACHINE_CONFIG_START(cedar_magnet_state::cedar_magnet)
 
 	CEDAR_MAGNET_FLOP(config, "flop", 0);
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 MACHINE_CONFIG_END
 
 

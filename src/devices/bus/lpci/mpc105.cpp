@@ -32,11 +32,10 @@ DEFINE_DEVICE_TYPE(MPC105, mpc105_device, "mpc105", "Motorola MPC105")
 mpc105_device::mpc105_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MPC105, tag, owner, clock),
 	pci_device_interface( mconfig, *this ),
-	m_cpu_tag(nullptr),
 	m_bank_base_default(0),
 	m_bank_base(0),
 	m_bank_enable(0),
-	m_maincpu(nullptr)
+	m_maincpu(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -46,7 +45,6 @@ mpc105_device::mpc105_device(const machine_config &mconfig, const char *tag, dev
 
 void mpc105_device::device_start()
 {
-	m_maincpu = machine().device<cpu_device>(m_cpu_tag);
 }
 
 //-------------------------------------------------

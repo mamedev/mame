@@ -40,11 +40,10 @@ void scm_500_state::machine_reset()
 {
 }
 
-MACHINE_CONFIG_START(scm_500_state::scm_500)
-
+void scm_500_state::scm_500(machine_config &config)
+{
 	// unknown CPU
-
-MACHINE_CONFIG_END
+}
 
 /*
 

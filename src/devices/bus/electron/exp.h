@@ -117,8 +117,8 @@ public:
 	auto irq_handler() { return m_irq_handler.bind(); }
 	auto nmi_handler() { return m_nmi_handler.bind(); }
 
-	uint8_t expbus_r(address_space &space, offs_t offset);
-	void expbus_w(address_space &space, offs_t offset, uint8_t data);
+	uint8_t expbus_r(offs_t offset);
+	void expbus_w(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_irq_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_nmi_handler(state); }
@@ -141,8 +141,8 @@ private:
 class device_electron_expansion_interface : public device_slot_card_interface
 {
 public:
-	virtual uint8_t expbus_r(address_space &space, offs_t offset) { return 0xff; }
-	virtual void expbus_w(address_space &space, offs_t offset, uint8_t data) { }
+	virtual uint8_t expbus_r(offs_t offset) { return 0xff; }
+	virtual void expbus_w(offs_t offset, uint8_t data) { }
 
 protected:
 	device_electron_expansion_interface(const machine_config &mconfig, device_t &device);

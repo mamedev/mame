@@ -8,48 +8,20 @@
 #include "machine/nscsi_bus.h"
 
 
-#define MCFG_NSCSICB_RST_HANDLER(_line) \
-	downcast<nscsi_callback_device *>(device)->set_rst_callback(DEVCB_##_line);
-
-#define MCFG_NSCSICB_ATN_HANDLER(_line) \
-	downcast<nscsi_callback_device *>(device)->set_atn_callback(DEVCB_##_line);
-
-#define MCFG_NSCSICB_ACK_HANDLER(_line) \
-	downcast<nscsi_callback_device *>(device)->set_ack_callback(DEVCB_##_line);
-
-#define MCFG_NSCSICB_REQ_HANDLER(_line) \
-	downcast<nscsi_callback_device *>(device)->set_req_callback(DEVCB_##_line);
-
-#define MCFG_NSCSICB_MSG_HANDLER(_line) \
-	downcast<nscsi_callback_device *>(device)->set_msg_callback(DEVCB_##_line);
-
-#define MCFG_NSCSICB_IO_HANDLER(_line) \
-	downcast<nscsi_callback_device *>(device)->set_io_callback(DEVCB_##_line);
-
-#define MCFG_NSCSICB_CD_HANDLER(_line) \
-	downcast<nscsi_callback_device *>(device)->set_cd_callback(DEVCB_##_line);
-
-#define MCFG_NSCSICB_SEL_HANDLER(_line) \
-	downcast<nscsi_callback_device *>(device)->set_sel_callback(DEVCB_##_line);
-
-#define MCFG_NSCSICB_BSY_HANDLER(_line) \
-	downcast<nscsi_callback_device *>(device)->set_bsy_callback(DEVCB_##_line);
-
-
 class nscsi_callback_device : public nscsi_device
 {
 public:
 	nscsi_callback_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Line> devcb_base &set_rst_callback(Line &&cb) { return m_write_rst.set_callback(std::forward<Line>(cb)); }
-	template <class Line> devcb_base &set_atn_callback(Line &&cb) { return m_write_atn.set_callback(std::forward<Line>(cb)); }
-	template <class Line> devcb_base &set_ack_callback(Line &&cb) { return m_write_ack.set_callback(std::forward<Line>(cb)); }
-	template <class Line> devcb_base &set_req_callback(Line &&cb) { return m_write_req.set_callback(std::forward<Line>(cb)); }
-	template <class Line> devcb_base &set_msg_callback(Line &&cb) { return m_write_msg.set_callback(std::forward<Line>(cb)); }
-	template <class Line> devcb_base &set_io_callback(Line &&cb)  { return m_write_io.set_callback(std::forward<Line>(cb)); }
-	template <class Line> devcb_base &set_cd_callback(Line &&cb)  { return m_write_cd.set_callback(std::forward<Line>(cb)); }
-	template <class Line> devcb_base &set_sel_callback(Line &&cb) { return m_write_sel.set_callback(std::forward<Line>(cb)); }
-	template <class Line> devcb_base &set_bsy_callback(Line &&cb) { return m_write_bsy.set_callback(std::forward<Line>(cb)); }
+	auto rst_callback() { return m_write_rst.bind(); }
+	auto atn_callback() { return m_write_atn.bind(); }
+	auto ack_callback() { return m_write_ack.bind(); }
+	auto req_callback() { return m_write_req.bind(); }
+	auto msg_callback() { return m_write_msg.bind(); }
+	auto io_callback()  { return m_write_io.bind(); }
+	auto cd_callback()  { return m_write_cd.bind(); }
+	auto sel_callback() { return m_write_sel.bind(); }
+	auto bsy_callback() { return m_write_bsy.bind(); }
 
 	virtual void scsi_ctrl_changed() override;
 

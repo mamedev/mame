@@ -414,18 +414,21 @@ static void z80ne_floppies(device_slot_interface &device)
 	device.option_add("sssd", FLOPPY_525_SSSD);
 }
 
-MACHINE_CONFIG_START(z80ne_state::z80ne)
+void z80ne_state::z80ne(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("z80ne", Z80, Z80NE_CPU_SPEED_HZ)
-	MCFG_DEVICE_PROGRAM_MAP(z80ne_mem)
-	MCFG_DEVICE_IO_MAP(z80ne_io)
+	Z80(config, m_maincpu, Z80NE_CPU_SPEED_HZ);
+	m_maincpu->set_addrmap(AS_PROGRAM, &z80ne_state::z80ne_mem);
+	m_maincpu->set_addrmap(AS_IO, &z80ne_state::z80ne_io);
 
 	MCFG_MACHINE_START_OVERRIDE(z80ne_state,z80ne)
 	MCFG_MACHINE_RESET_OVERRIDE(z80ne_state,z80ne)
 
 	AY31015(config, m_uart);
-	m_uart->set_tx_clock(4800.0);
-	m_uart->set_rx_clock(4800.0);
+
+	CLOCK(config, m_uart_clock, 4800);
+	m_uart_clock->signal_handler().set(FUNC(z80ne_state::lx385_uart_tx_clock_w));
+	m_uart_clock->signal_handler().append(m_uart, FUNC(ay31015_device::write_rcp));
 
 	CASSETTE(config, m_cassette1);
 	m_cassette1->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
@@ -441,15 +444,15 @@ MACHINE_CONFIG_START(z80ne_state::z80ne)
 	RAM(config, m_ram).set_default_size("32K");
 
 	// all known tapes require LX.388 expansion
-	//MCFG_SOFTWARE_LIST_ADD("cass_list","z80ne_cass")
-MACHINE_CONFIG_END
+	//SOFTWARE_LIST(config, "cass_list").set_original("z80ne_cass");
+}
 
-MACHINE_CONFIG_START(z80ne_state::z80net)
+void z80ne_state::z80net(machine_config &config)
+{
 	z80ne(config);
 
-	MCFG_DEVICE_MODIFY("z80ne")
-	MCFG_DEVICE_PROGRAM_MAP(z80net_mem)
-	MCFG_DEVICE_IO_MAP(z80net_io)
+	m_maincpu->set_addrmap(AS_PROGRAM, &z80ne_state::z80net_mem);
+	m_maincpu->set_addrmap(AS_IO, &z80ne_state::z80net_io);
 
 	MCFG_MACHINE_START_OVERRIDE(z80ne_state, z80net )
 	MCFG_MACHINE_RESET_OVERRIDE(z80ne_state, z80net )
@@ -480,21 +483,24 @@ MACHINE_CONFIG_START(z80ne_state::z80net)
 	/* internal ram */
 	m_ram->set_default_size("32K").set_extra_options("1K");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list","z80ne_cass")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cass_list").set_original("z80ne_cass");
+}
 
-MACHINE_CONFIG_START(z80ne_state::z80netb)
+void z80ne_state::z80netb(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("z80ne", Z80, Z80NE_CPU_SPEED_HZ)
-	MCFG_DEVICE_PROGRAM_MAP(z80netb_mem)
-	MCFG_DEVICE_IO_MAP(z80net_io)
+	Z80(config, m_maincpu, Z80NE_CPU_SPEED_HZ);
+	m_maincpu->set_addrmap(AS_PROGRAM, &z80ne_state::z80netb_mem);
+	m_maincpu->set_addrmap(AS_IO, &z80ne_state::z80net_io);
 
 	MCFG_MACHINE_START_OVERRIDE(z80ne_state,z80netb)
 	MCFG_MACHINE_RESET_OVERRIDE(z80ne_state,z80netb)
 
 	AY31015(config, m_uart);
-	m_uart->set_tx_clock(4800.0);
-	m_uart->set_rx_clock(4800.0);
+
+	CLOCK(config, m_uart_clock, 4800);
+	m_uart_clock->signal_handler().set(FUNC(z80ne_state::lx385_uart_tx_clock_w));
+	m_uart_clock->signal_handler().append(m_uart, FUNC(ay31015_device::write_rcp));
 
 	CASSETTE(config, m_cassette1);
 	m_cassette1->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
@@ -530,21 +536,24 @@ MACHINE_CONFIG_START(z80ne_state::z80netb)
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("32K").set_extra_options("1K");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list","z80ne_cass")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cass_list").set_original("z80ne_cass");
+}
 
-MACHINE_CONFIG_START(z80netf_state::z80netf)
+void z80netf_state::z80netf(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("z80ne", Z80, Z80NE_CPU_SPEED_HZ)
-	MCFG_DEVICE_PROGRAM_MAP(z80netf_mem)
-	MCFG_DEVICE_IO_MAP(z80netf_io)
+	Z80(config, m_maincpu, Z80NE_CPU_SPEED_HZ);
+	m_maincpu->set_addrmap(AS_PROGRAM, &z80netf_state::z80netf_mem);
+	m_maincpu->set_addrmap(AS_IO, &z80netf_state::z80netf_io);
 
 	MCFG_MACHINE_START_OVERRIDE(z80netf_state,z80netf)
 	MCFG_MACHINE_RESET_OVERRIDE(z80netf_state,z80netf)
 
 	AY31015(config, m_uart);
-	m_uart->set_tx_clock(4800.0);
-	m_uart->set_rx_clock(4800.0);
+
+	CLOCK(config, m_uart_clock, 4800);
+	m_uart_clock->signal_handler().set(FUNC(z80netf_state::lx385_uart_tx_clock_w));
+	m_uart_clock->signal_handler().append(m_uart, FUNC(ay31015_device::write_rcp));
 
 	CASSETTE(config, m_cassette1);
 	m_cassette1->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
@@ -566,19 +575,19 @@ MACHINE_CONFIG_START(z80netf_state::z80netf)
 	// other lines not connected
 
 	FD1771(config, m_wd1771, 2_MHz_XTAL / 2);
-	MCFG_FLOPPY_DRIVE_ADD("wd1771:0", z80ne_floppies, "sssd", z80ne_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("wd1771:1", z80ne_floppies, "sssd", z80ne_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("wd1771:2", z80ne_floppies, nullptr,   z80ne_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("wd1771:3", z80ne_floppies, nullptr,   z80ne_state::floppy_formats)
+	FLOPPY_CONNECTOR(config, "wd1771:0", z80ne_floppies, "sssd", z80ne_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "wd1771:1", z80ne_floppies, "sssd", z80ne_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "wd1771:2", z80ne_floppies, nullptr,   z80ne_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "wd1771:3", z80ne_floppies, nullptr,   z80ne_state::floppy_formats);
 
 	config.set_default_layout(layout_z80netf);
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("56K");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list","z80ne_cass")
-	MCFG_SOFTWARE_LIST_ADD("flop_list","z80ne_flop")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cass_list").set_original("z80ne_cass");
+	SOFTWARE_LIST(config, "flop_list").set_original("z80ne_flop");
+}
 
 /******************************************************************************
  ROM Definitions

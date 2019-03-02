@@ -8,7 +8,7 @@
 
 	Japanese cart listing (by SP code)  * = dumped
 
-	These don't seem to have a secondary numbering scheme (eg SPxxxx-xxx)
+	A secondary 4-digit naming scheme SPxxxx (no extension) appears on a sticker on the cartridge PCB only
 
 	These are for use with 5 different units
 	1. e-Kara
@@ -21,13 +21,10 @@
 
 	 "please play this cartridge on e-kara series, popira, popira 2, taiko de popira or jumping popira"
 
-	gives 'memory error' if plugged into Popira (needs cartridge SEEPROM emulating)
-	gives 'eep-rom error' if plugged into Taiko de Popira (same reason)
-
 	 SP-01  (unknown)
 	*SP-02  'Super Cartridge' SP-2
-	 SP-03  (unknown)
-	 SP-04  (unknown)
+	*SP-03  'Super Cartridge' SP-3
+	*SP-04  'Super Cartridge' SP-4
 	 SP-05
 	 SP-06  (seen)
 	 SP-07  (seen)
@@ -36,9 +33,9 @@
 
 	-->
 
-	<software name="sp02"> <!-- also has SEEPROM inside -->
+	<software name="sp02">
 		<description>SP-02 Super Cartridge (Japan)</description>
-		<year>2000</year>
+		<year>2004</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<feature name="slot" value="rom_24lc04"/>
@@ -47,4 +44,29 @@
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="sp03">
+		<description>SP-03 Super Cartridge (Japan)</description>
+		<year>2004</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24lc04"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="sp03.u1" size="0x200000" crc="cd7dbbaf" sha1="cc62c10f8f83015e4c472bc41e9a1fd7ac497655" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sp04">
+		<description>SP-04 Super Cartridge (Japan)</description>
+		<year>2004</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24lc04"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="sp04.u1" size="0x200000" crc="77818ddb" sha1="708980b1ae30864bd3395ef663de1c57ecbc113c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

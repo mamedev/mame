@@ -3,7 +3,6 @@
 #include "emu.h"
 #include "crsshair.h"
 #include "video/315_5124.h"
-#include "sound/sn76496.h"
 #include "sound/ym2413.h"
 #include "includes/sms.h"
 
@@ -203,9 +202,9 @@ WRITE8_MEMBER(sms_state::sms_io_control_w)
 READ8_MEMBER(sms_state::sms_count_r)
 {
 	if (offset & 0x01)
-		return m_vdp->hcount_read(*m_space, offset);
+		return m_vdp->hcount_read();
 	else
-		return m_vdp->vcount_read(*m_space, offset);
+		return m_vdp->vcount_read();
 }
 
 
@@ -467,9 +466,9 @@ void sms_state::smsj_set_audio_control(uint8_t data)
 	    1,1 : Both PSG and FM enabled
 	*/
 	if (m_smsj_audio_control == 0x00 || m_smsj_audio_control == 0x03)
-		m_psg_sms->set_output_gain(ALL_OUTPUTS, 1.0);
+		m_vdp->set_output_gain(ALL_OUTPUTS, 1.0);
 	else
-		m_psg_sms->set_output_gain(ALL_OUTPUTS, 0.0);
+		m_vdp->set_output_gain(ALL_OUTPUTS, 0.0);
 
 	if (m_smsj_audio_control == 0x01 || m_smsj_audio_control == 0x03)
 		m_ym->set_output_gain(ALL_OUTPUTS, 1.0);
@@ -515,26 +514,14 @@ READ8_MEMBER(sms_state::smsj_audio_control_r)
 
 WRITE8_MEMBER(sms_state::smsj_ym2413_register_port_w)
 {
-	m_ym->write(space, 0, data & 0x3f);
+	m_ym->write(0, data & 0x3f);
 }
 
 
 WRITE8_MEMBER(sms_state::smsj_ym2413_data_port_w)
 {
 	//logerror("data_port_w %x %x\n", offset, data);
-	m_ym->write(space, 1, data);
-}
-
-
-WRITE8_MEMBER(sms_state::sms_psg_w)
-{
-	m_psg_sms->write(data);
-}
-
-
-WRITE8_MEMBER(sms_state::gg_psg_w)
-{
-	m_psg_gg->write(data);
+	m_ym->write(1, data);
 }
 
 
@@ -543,7 +530,7 @@ WRITE8_MEMBER(sms_state::gg_psg_stereo_w)
 	if (m_cartslot->exists() && m_cartslot->get_sms_mode())
 		return;
 
-	m_psg_gg->stereo_w(space, offset, data, mem_mask);
+	m_vdp->psg_stereo_w(data);
 }
 
 
@@ -1033,12 +1020,7 @@ void sms_state::machine_start()
 		m_led_pwr = 1;
 	}
 
-	char str[7];
-
-	m_cartslot = machine().device<sega8_cart_slot_device>("slot");
-	m_cardslot = machine().device<sega8_card_slot_device>("mycard");
-	m_smsexpslot = machine().device<sms_expansion_slot_device>("smsexp");
-	m_sgexpslot = machine().device<sg1000_expansion_slot_device>("sgexp");
+	m_cartslot = m_slot.target();
 	m_space = &m_maincpu->space(AS_PROGRAM);
 
 	if (m_mainram == nullptr)
@@ -1101,28 +1083,16 @@ void sms_state::machine_start()
 		save_item(NAME(m_gg_sio));
 	}
 
-	if (m_is_sdisp)
-	{
-		machine().save().register_postload(save_prepost_delegate(FUNC(sms_state::store_post_load), this));
-
-		save_item(NAME(m_store_control));
-		save_item(NAME(m_store_cart_selection_data));
-
-		m_slots[0] = m_cartslot;
-		for (int i = 1; i < 16; i++)
-		{
-			sprintf(str,"slot%i",i + 1);
-			m_slots[i] = machine().device<sega8_cart_slot_device>(str);
-		}
-		for (int i = 0; i < 16; i++)
-		{
-			sprintf(str,"slot%i",i + 16 + 1);
-			m_cards[i] = machine().device<sega8_card_slot_device>(str);
-		}
-	}
-
 	if (m_cartslot)
 		m_cartslot->save_ram();
+}
+
+void smssdisp_state::machine_start()
+{
+	sms_state::machine_start();
+
+	save_item(NAME(m_store_control));
+	save_item(NAME(m_store_cart_selection_data));
 }
 
 void sms_state::machine_reset()
@@ -1166,15 +1136,17 @@ void sms_state::machine_reset()
 		m_gg_sio[4] = 0x00;
 	}
 
-	if (m_is_sdisp)
-	{
-		m_store_control = 0;
-		m_store_cart_selection_data = 0;
-		store_select_cart(m_store_cart_selection_data);
-	}
-
 	setup_bios();
 	setup_media_slots();
+}
+
+void smssdisp_state::machine_reset()
+{
+	m_store_control = 0;
+	m_store_cart_selection_data = 0;
+	store_select_cart(m_store_cart_selection_data);
+
+	sms_state::machine_reset();
 }
 
 READ8_MEMBER(smssdisp_state::sms_store_cart_select_r)
@@ -1191,7 +1163,7 @@ WRITE8_MEMBER(smssdisp_state::sms_store_cart_select_w)
 }
 
 
-void sms_state::store_post_load()
+void smssdisp_state::device_post_load()
 {
 	store_select_cart(m_store_cart_selection_data);
 }
@@ -1206,7 +1178,7 @@ void sms_state::store_post_load()
 // that seems to change the active cart/card slot pair or, for the 4th
 // game switch onward of the 16-3 model, the active cart slot only.
 
-void sms_state::store_select_cart(uint8_t data)
+void smssdisp_state::store_select_cart(uint8_t data)
 {
 	uint8_t slot = data >> 4;
 	uint8_t slottype = data & 0x08;
@@ -1214,9 +1186,9 @@ void sms_state::store_select_cart(uint8_t data)
 	// The SMS Store Display Unit only uses the logical cartridge slot to
 	// map the active cartridge or card slot, of its multiple ones.
 	if (slottype == 0)
-		m_cartslot = m_slots[slot];
+		m_cartslot = m_slots[slot].target();
 	else
-		m_cartslot = m_cards[slot];
+		m_cartslot = m_cards[slot].target();
 
 	logerror("switching in part of %s slot #%d\n", slottype ? "card" : "cartridge", slot);
 }

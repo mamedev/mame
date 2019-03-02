@@ -270,7 +270,7 @@ void pcktgal_state::bootleg(machine_config &config)
 	pcktgal(config);
 	m_gfxdecode->set_info(gfx_bootleg);
 	subdevice<screen_device>("screen")->set_screen_update(FUNC(pcktgal_state::screen_update_pcktgalb));
-MACHINE_CONFIG_END
+}
 
 void pcktgal_state::pcktgal2(machine_config &config)
 {

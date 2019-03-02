@@ -6,7 +6,7 @@
  */
 
 #include "nlid_system.h"
-#include "../analog/nlid_twoterm.h"
+#include "netlist/analog/nlid_twoterm.h"
 
 #include <cmath>
 
@@ -257,8 +257,8 @@ namespace netlist
 	{
 		m_KP = 1.0 / (1.0 + exp(m_K()));
 
-		m_RP.do_reset();
-		m_RN.do_reset();
+		m_RP.reset();
+		m_RN.reset();
 
 		//m_RP.set_R(R_OFF);
 		//m_RN.set_R(R_OFF);
@@ -276,8 +276,8 @@ namespace netlist
 
 	NETLIB_RESET(74123_dip)
 	{
-		//m_1.do_reset();
-		//m_2.do_reset();
+		//m_1.reset();
+		//m_2.reset();
 	}
 
 	NETLIB_UPDATE(9602_dip)
@@ -289,8 +289,8 @@ namespace netlist
 
 	NETLIB_RESET(9602_dip)
 	{
-		//m_1.do_reset();
-		//m_2.do_reset();
+		//m_1.reset();
+		//m_2.reset();
 	}
 
 	NETLIB_UPDATE(4538_dip)
@@ -302,14 +302,14 @@ namespace netlist
 
 	NETLIB_RESET(4538_dip)
 	{
-		m_1.do_reset();
-		m_2.do_reset();
+		m_1.reset();
+		m_2.reset();
 	}
 
-	NETLIB_DEVICE_IMPL_DEPRECATED(74123)
-	NETLIB_DEVICE_IMPL_DEPRECATED(74123_dip)
-	NETLIB_DEVICE_IMPL_DEPRECATED(4538_dip)
-	NETLIB_DEVICE_IMPL_DEPRECATED(9602_dip)
+	NETLIB_DEVICE_IMPL(74123, "TTL_74123", "")
+	NETLIB_DEVICE_IMPL(74123_dip, "TTL_74123_DIP", "")
+	NETLIB_DEVICE_IMPL(4538_dip, "CD4538_DIP", "")
+	NETLIB_DEVICE_IMPL(9602_dip, "TTL_9602_DIP",           "")
 
 	} //namespace devices
 } // namespace netlist

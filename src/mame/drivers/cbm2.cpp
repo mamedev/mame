@@ -285,8 +285,8 @@ public:
 		int *csbank1, int *csbank2, int *csbank3, int *basiclocs, int *basichics, int *kernalcs,
 		int *cs1, int *sidcs, int *extprtcs, int *ciacs, int *aciacs, int *tript1cs, int *tript2cs, int *aec, int *vsysaden);
 
-	uint8_t read_memory(address_space &space, offs_t offset, offs_t va, int ba, int ae);
-	void write_memory(address_space &space, offs_t offset, uint8_t data, int ba, int ae);
+	uint8_t read_memory(offs_t offset, offs_t va, int ba, int ae);
+	void write_memory(offs_t offset, uint8_t data, int ba, int ae);
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -521,39 +521,39 @@ READ8_MEMBER( cbm2_state::read )
 		{
 			if (A0)
 			{
-				data = m_crtc->register_r(space, 0);
+				data = m_crtc->register_r();
 			}
 			else
 			{
-				data = m_crtc->status_r(space, 0);
+				data = m_crtc->status_r();
 			}
 		}
 		if (!sidcs)
 		{
-			data = m_sid->read(space, offset & 0x1f);
+			data = m_sid->read(offset & 0x1f);
 		}
 		if (!extprtcs && m_ext_cia)
 		{
-			data = m_ext_cia->read(space, offset & 0x0f);
+			data = m_ext_cia->read(offset & 0x0f);
 		}
 		if (!ciacs)
 		{
-			data = m_cia->read(space, offset & 0x0f);
+			data = m_cia->read(offset & 0x0f);
 		}
 		if (!aciacs)
 		{
-			data = m_acia->read(space, offset & 0x03);
+			data = m_acia->read(offset & 0x03);
 		}
 		if (!tript1cs)
 		{
-			data = m_tpi1->read(space, offset & 0x07);
+			data = m_tpi1->read(offset & 0x07);
 		}
 		if (!tript2cs)
 		{
-			data = m_tpi2->read(space, offset & 0x07);
+			data = m_tpi2->read(offset & 0x07);
 		}
 
-		data = m_exp->read(space, offset & 0x1fff, data, csbank1, csbank2, csbank3);
+		data = m_exp->read(offset & 0x1fff, data, csbank1, csbank2, csbank3);
 	}
 
 	return data;
@@ -614,39 +614,39 @@ WRITE8_MEMBER( cbm2_state::write )
 		{
 			if (A0)
 			{
-				m_crtc->register_w(space, 0, data);
+				m_crtc->register_w(data);
 			}
 			else
 			{
-				m_crtc->address_w(space, 0, data);
+				m_crtc->address_w(data);
 			}
 		}
 		if (!sidcs)
 		{
-			m_sid->write(space, offset & 0x1f, data);
+			m_sid->write(offset & 0x1f, data);
 		}
 		if (!extprtcs && m_ext_cia)
 		{
-			m_ext_cia->write(space, offset & 0x0f, data);
+			m_ext_cia->write(offset & 0x0f, data);
 		}
 		if (!ciacs)
 		{
-			m_cia->write(space, offset & 0x0f, data);
+			m_cia->write(offset & 0x0f, data);
 		}
 		if (!aciacs)
 		{
-			m_acia->write(space, offset & 0x03, data);
+			m_acia->write(offset & 0x03, data);
 		}
 		if (!tript1cs)
 		{
-			m_tpi1->write(space, offset & 0x07, data);
+			m_tpi1->write(offset & 0x07, data);
 		}
 		if (!tript2cs)
 		{
-			m_tpi2->write(space, offset & 0x07, data);
+			m_tpi2->write(offset & 0x07, data);
 		}
 
-		m_exp->write(space, offset & 0x1fff, data, csbank1, csbank2, csbank3);
+		m_exp->write(offset & 0x1fff, data, csbank1, csbank2, csbank3);
 	}
 }
 
@@ -850,7 +850,7 @@ void p500_state::bankswitch(offs_t offset, offs_t va, int srw, int ba, int ae, i
 //  read_memory -
 //-------------------------------------------------
 
-uint8_t p500_state::read_memory(address_space &space, offs_t offset, offs_t va, int ba, int ae)
+uint8_t p500_state::read_memory(offs_t offset, offs_t va, int ba, int ae)
 {
 	int srw = 1, busy2 = 1, refen = 0;
 
@@ -917,30 +917,30 @@ uint8_t p500_state::read_memory(address_space &space, offs_t offset, offs_t va, 
 		}
 		if (!viccs && !viddaten && viddat_tr)
 		{
-			data = m_vic->read(space, offset & 0x3f);
+			data = m_vic->read(offset & 0x3f);
 		}
 		if (!sidcs)
 		{
-			data = m_sid->read(space, offset & 0x1f);
+			data = m_sid->read(offset & 0x1f);
 		}
 		if (!ciacs)
 		{
-			data = m_cia->read(space, offset & 0x0f);
+			data = m_cia->read(offset & 0x0f);
 		}
 		if (!aciacs)
 		{
-			data = m_acia->read(space, offset & 0x03);
+			data = m_acia->read(offset & 0x03);
 		}
 		if (!tript1cs)
 		{
-			data = m_tpi1->read(space, offset & 0x07);
+			data = m_tpi1->read(offset & 0x07);
 		}
 		if (!tript2cs)
 		{
-			data = m_tpi2->read(space, offset & 0x07);
+			data = m_tpi2->read(offset & 0x07);
 		}
 
-		data = m_exp->read(space, offset & 0x1fff, data, csbank1, csbank2, csbank3);
+		data = m_exp->read(offset & 0x1fff, data, csbank1, csbank2, csbank3);
 	}
 
 	return data;
@@ -951,7 +951,7 @@ uint8_t p500_state::read_memory(address_space &space, offs_t offset, offs_t va, 
 //  write_memory -
 //-------------------------------------------------
 
-void p500_state::write_memory(address_space &space, offs_t offset, uint8_t data, int ba, int ae)
+void p500_state::write_memory(offs_t offset, uint8_t data, int ba, int ae)
 {
 	int srw = 0, busy2 = 1, refen = 0;
 	offs_t va = 0xffff;
@@ -1005,30 +1005,30 @@ void p500_state::write_memory(address_space &space, offs_t offset, uint8_t data,
 		}
 		if (!viccs && !viddaten && !viddat_tr)
 		{
-			m_vic->write(space, offset & 0x3f, data);
+			m_vic->write(offset & 0x3f, data);
 		}
 		if (!sidcs)
 		{
-			m_sid->write(space, offset & 0x1f, data);
+			m_sid->write(offset & 0x1f, data);
 		}
 		if (!ciacs)
 		{
-			m_cia->write(space, offset & 0x0f, data);
+			m_cia->write(offset & 0x0f, data);
 		}
 		if (!aciacs)
 		{
-			m_acia->write(space, offset & 0x03, data);
+			m_acia->write(offset & 0x03, data);
 		}
 		if (!tript1cs)
 		{
-			m_tpi1->write(space, offset & 0x07, data);
+			m_tpi1->write(offset & 0x07, data);
 		}
 		if (!tript2cs)
 		{
-			m_tpi2->write(space, offset & 0x07, data);
+			m_tpi2->write(offset & 0x07, data);
 		}
 
-		m_exp->write(space, offset & 0x1fff, data, csbank1, csbank2, csbank3);
+		m_exp->write(offset & 0x1fff, data, csbank1, csbank2, csbank3);
 	}
 }
 
@@ -1042,7 +1042,7 @@ READ8_MEMBER( p500_state::read )
 	int ba = 0, ae = 1;
 	offs_t va = 0xffff;
 
-	return read_memory(space, offset, va, ba, ae);
+	return read_memory(offset, va, ba, ae);
 }
 
 
@@ -1054,7 +1054,7 @@ WRITE8_MEMBER( p500_state::write )
 {
 	int ba = 0, ae = 1;
 
-	write_memory(space, offset, data, ba, ae);
+	write_memory(offset, data, ba, ae);
 }
 
 
@@ -1789,7 +1789,7 @@ READ8_MEMBER( cbm2_state::cia_pa_r )
 	data |= m_ieee1->read(space, 0);
 
 	// user port
-	data &= m_user->d1_r(space, 0);
+	data &= m_user->d1_r();
 
 	// joystick
 	data &= ~(!BIT(m_joy1->read_joy(), 5) << 6);
@@ -1819,7 +1819,7 @@ WRITE8_MEMBER( cbm2_state::cia_pa_w )
 	m_ieee1->write(space, 0, data);
 
 	// user port
-	m_user->d1_w(space, 0, data);
+	m_user->d1_w(data);
 
 	// joystick
 	m_cia_pa = data;
@@ -1849,7 +1849,7 @@ READ8_MEMBER( cbm2_state::cia_pb_r )
 	data |= (m_joy2->read_joy() & 0x0f) << 4;
 
 	// user port
-	data &= m_user->d2_r(space, 0);
+	data &= m_user->d2_r();
 
 	return data;
 }
@@ -2361,8 +2361,8 @@ void p500_state::p500_ntsc(machine_config &config)
 	rs232.dsr_handler().set(m_acia, FUNC(mos6551_device::write_dsr));
 	rs232.cts_handler().set(m_acia, FUNC(mos6551_device::write_cts));
 
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(p500_state, p500), this), "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS);
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
+	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(p500_state, p500), this), "p00,prg", CBM_QUICKLOAD_DELAY);
 
 	// internal ram
 	_128k(config);
@@ -2495,8 +2495,8 @@ void p500_state::p500_pal(machine_config &config)
 	rs232.dsr_handler().set(m_acia, FUNC(mos6551_device::write_dsr));
 	rs232.cts_handler().set(m_acia, FUNC(mos6551_device::write_cts));
 
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(p500_state, p500), this), "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS);
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
+	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(p500_state, p500), this), "p00,prg", CBM_QUICKLOAD_DELAY);
 
 	// internal ram
 	_128k(config);
@@ -2628,8 +2628,8 @@ void cbm2_state::cbm2lp_ntsc(machine_config &config)
 	rs232.dsr_handler().set(m_acia, FUNC(mos6551_device::write_dsr));
 	rs232.cts_handler().set(m_acia, FUNC(mos6551_device::write_cts));
 
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(cbm2_state, cbmb), this), "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS);
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
+	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(cbm2_state, cbmb), this), "p00,prg,t64", CBM_QUICKLOAD_DELAY);
 
 	// software list
 	SOFTWARE_LIST(config, "cart_list").set_original("cbm2_cart");

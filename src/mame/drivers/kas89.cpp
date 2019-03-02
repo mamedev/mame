@@ -767,17 +767,17 @@ INPUT_PORTS_END
 *           Machine Driver            *
 **************************************/
 
-MACHINE_CONFIG_START(kas89_state::kas89)
-
+void kas89_state::kas89(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/6)    /* Confirmed */
-	MCFG_DEVICE_PROGRAM_MAP(kas89_map)
-	MCFG_DEVICE_IO_MAP(kas89_io)
+	Z80(config, m_maincpu, MASTER_CLOCK/6);    /* Confirmed */
+	m_maincpu->set_addrmap(AS_PROGRAM, &kas89_state::kas89_map);
+	m_maincpu->set_addrmap(AS_IO, &kas89_state::kas89_io);
 	TIMER(config, "kas89_nmi").configure_periodic(FUNC(kas89_state::kas89_nmi_cb), attotime::from_hz(138));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, MASTER_CLOCK/6)   /* Confirmed */
-	MCFG_DEVICE_PROGRAM_MAP(audio_map)
-	MCFG_DEVICE_IO_MAP(audio_io)
+	Z80(config, m_audiocpu, MASTER_CLOCK/6);   /* Confirmed */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &kas89_state::audio_map);
+	m_audiocpu->set_addrmap(AS_IO, &kas89_state::audio_io);
 	TIMER(config, "kas89_snmi").configure_periodic(FUNC(kas89_state::kas89_sound_nmi_cb), attotime::from_hz(138));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -795,7 +795,7 @@ MACHINE_CONFIG_START(kas89_state::kas89)
 	GENERIC_LATCH_8(config, m_soundlatch);
 
 	AY8910(config, "aysnd", MASTER_CLOCK/12).add_route(ALL_OUTPUTS, "mono", 1.0);    /* Confirmed */
-MACHINE_CONFIG_END
+}
 
 
 /**************************************

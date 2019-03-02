@@ -55,12 +55,12 @@ public:
 	auto port_write_handler() { return m_portwritehandler.bind(); }
 
 	// read/write
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
 
-	DECLARE_READ8_MEMBER(status_r);
-	DECLARE_WRITE8_MEMBER(register_w);
-	DECLARE_WRITE8_MEMBER(data_w);
+	u8 status_r();
+	void register_w(u8 data);
+	void data_w(u8 data);
 
 	DECLARE_WRITE_LINE_MEMBER(reset_w);
 

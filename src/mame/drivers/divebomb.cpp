@@ -114,12 +114,12 @@ void divebomb_state::divebomb_fgcpu_map(address_map &map)
 void divebomb_state::divebomb_fgcpu_iomap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w("sn0", FUNC(sn76489_device::command_w));
-	map(0x01, 0x01).w("sn1", FUNC(sn76489_device::command_w));
-	map(0x02, 0x02).w("sn2", FUNC(sn76489_device::command_w));
-	map(0x03, 0x03).w("sn3", FUNC(sn76489_device::command_w));
-	map(0x04, 0x04).w("sn4", FUNC(sn76489_device::command_w));
-	map(0x05, 0x05).w("sn5", FUNC(sn76489_device::command_w));
+	map(0x00, 0x00).w("sn0", FUNC(sn76489_device::write));
+	map(0x01, 0x01).w("sn1", FUNC(sn76489_device::write));
+	map(0x02, 0x02).w("sn2", FUNC(sn76489_device::write));
+	map(0x03, 0x03).w("sn3", FUNC(sn76489_device::write));
+	map(0x04, 0x04).w("sn4", FUNC(sn76489_device::write));
+	map(0x05, 0x05).w("sn5", FUNC(sn76489_device::write));
 	map(0x10, 0x10).r(m_roz2fg_latch, FUNC(generic_latch_8_device::read)).w("fg2roz", FUNC(generic_latch_8_device::write));
 	map(0x20, 0x20).r(m_spr2fg_latch, FUNC(generic_latch_8_device::read)).w("fg2spr", FUNC(generic_latch_8_device::write));
 	map(0x30, 0x30).portr("IN0");
@@ -400,7 +400,7 @@ MACHINE_CONFIG_START(divebomb_state::divebomb)
 	MCFG_DEVICE_PROGRAM_MAP(divebomb_rozcpu_map)
 	MCFG_DEVICE_IO_MAP(divebomb_rozcpu_iomap)
 
-	MCFG_QUANTUM_PERFECT_CPU("fgcpu")
+	config.m_perfect_cpu_quantum = subtag("fgcpu");
 
 	INPUT_MERGER_ANY_HIGH(config, m_fgcpu_irq).output_handler().set_inputline(m_fgcpu, INPUT_LINE_IRQ0);
 

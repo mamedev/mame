@@ -345,9 +345,9 @@ WRITE8_MEMBER(vectrex_base_state::v_via_pb_w)
 	if (data & 0x10)
 	{
 		if (data & 0x08) /* BC1 (do we select a reg or write it ?) */
-			m_ay8912->address_w(space, 0, m_via_out[PORTA]);
+			m_ay8912->address_w(m_via_out[PORTA]);
 		else
-			m_ay8912->data_w(space, 0, m_via_out[PORTA]);
+			m_ay8912->data_w(m_via_out[PORTA]);
 	}
 
 	if (!(data & 0x1) && (m_via_out[PORTB] & 0x1))

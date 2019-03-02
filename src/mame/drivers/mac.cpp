@@ -1055,7 +1055,6 @@ void mac_state::mac512ke_base(machine_config &config)
 	DAC_8BIT_PWM(config, m_dac, 0);
 	m_dac->add_route(ALL_OUTPUTS, "speaker", 0.25); // 2 x ls161
 	voltage_regulator_device &vreg(VOLTAGE_REGULATOR(config, "vref", 0));
-	vreg.set_output(5.0);
 	vreg.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vreg.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
@@ -1096,7 +1095,7 @@ void mac_state::add_macplus_additions(machine_config &config)
 void mac_state::add_nubus(machine_config &config, bool bank1, bool bank2)
 {
 	nubus_device &nubus(NUBUS(config, "nubus", 0));
-	nubus.set_cputag("maincpu");
+	nubus.set_space(m_maincpu, AS_PROGRAM);
 	nubus.out_irq9_callback().set(FUNC(mac_state::nubus_irq_9_w));
 	nubus.out_irqa_callback().set(FUNC(mac_state::nubus_irq_a_w));
 	nubus.out_irqb_callback().set(FUNC(mac_state::nubus_irq_b_w));
@@ -1120,7 +1119,7 @@ void mac_state::add_nubus(machine_config &config, bool bank1, bool bank2)
 template <typename T> void mac_state::add_nubus_pds(machine_config &config, const char *slot_tag, T &&opts)
 {
 	nubus_device &nubus(NUBUS(config, "pds", 0));
-	nubus.set_cputag("maincpu");
+	nubus.set_space(m_maincpu, AS_PROGRAM);
 	nubus.out_irq9_callback().set(FUNC(mac_state::nubus_irq_9_w));
 	nubus.out_irqa_callback().set(FUNC(mac_state::nubus_irq_a_w));
 	nubus.out_irqb_callback().set(FUNC(mac_state::nubus_irq_b_w));

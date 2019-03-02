@@ -45,38 +45,6 @@
 #include "isa.h"
 #include "machine/6850acia.h"
 
-#define MCFG_GF1_TXIRQ_HANDLER(_devcb) \
-	downcast<gf1_device &>(*device).set_txirq_handler(DEVCB_##_devcb);
-
-#define MCFG_GF1_RXIRQ_HANDLER(_devcb) \
-	downcast<gf1_device &>(*device).set_rxirq_handler(DEVCB_##_devcb);
-
-#define MCFG_GF1_WAVE_IRQ_HANDLER(_devcb) \
-	downcast<gf1_device &>(*device).set_wave_irq_handler(DEVCB_##_devcb);
-
-#define MCFG_GF1_RAMP_IRQ_HANDLER(_devcb) \
-	downcast<gf1_device &>(*device).set_ramp_irq_handler(DEVCB_##_devcb);
-
-#define MCFG_GF1_TIMER1_IRQ_HANDLER(_devcb) \
-	downcast<gf1_device &>(*device).set_timer1_irq_handler(DEVCB_##_devcb);
-
-#define MCFG_GF1_TIMER2_IRQ_HANDLER(_devcb) \
-	downcast<gf1_device &>(*device).set_timer2_irq_handler(DEVCB_##_devcb);
-
-#define MCFG_GF1_SB_IRQ_HANDLER(_devcb) \
-	downcast<gf1_device &>(*device).set_sb_irq_handler(DEVCB_##_devcb);
-
-#define MCFG_GF1_DMA_IRQ_HANDLER(_devcb) \
-	downcast<gf1_device &>(*device).set_dma_irq_handler(DEVCB_##_devcb);
-
-#define MCFG_GF1_DRQ1_HANDLER(_devcb) \
-	downcast<gf1_device &>(*device).set_drq1_handler(DEVCB_##_devcb);
-
-#define MCFG_GF1_DRQ2_HANDLER(_devcb) \
-	downcast<gf1_device &>(*device).set_drq2_handler(DEVCB_##_devcb);
-
-#define MCFG_GF1_NMI_HANDLER(_devcb) \
-	downcast<gf1_device &>(*device).set_nmi_handler(DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -112,17 +80,6 @@ public:
 	// construction/destruction
 	gf1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_txirq_handler(Object &&cb) { return m_txirq_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_rxirq_handler(Object &&cb) { return m_rxirq_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_wave_irq_handler(Object &&cb) { return m_wave_irq_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_ramp_irq_handler(Object &&cb) { return m_ramp_irq_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_timer1_irq_handler(Object &&cb) { return m_timer1_irq_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_timer2_irq_handler(Object &&cb) { return m_timer2_irq_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_sb_irq_handler(Object &&cb) { return m_sb_irq_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_dma_irq_handler(Object &&cb) { return m_dma_irq_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_drq1_handler(Object &&cb) { return m_drq1_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_drq2_handler(Object &&cb) { return m_drq2_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_nmi_handler(Object &&cb) { return m_nmi_handler.set_callback(std::forward<Object>(cb)); }
 	auto txirq_handler() { return m_txirq_handler.bind(); }
 	auto rxirq_handler() { return m_rxirq_handler.bind(); }
 	auto wave_irq_handler() { return m_wave_irq_handler.bind(); }

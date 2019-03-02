@@ -2022,7 +2022,6 @@ void segas16a_state::system16a(machine_config &config)
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // unknown DAC
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
@@ -2096,15 +2095,15 @@ void segas16a_state::system16a_no7751p(machine_config &config)
 }
 
 /*
-static MACHINE_CONFIG_START( system16a_i8751_no7751 )
+void segas16a_state::system16a_i8751_no7751(machine_config &config)
+{
     system16a_i8751(config);
-    MCFG_DEVICE_REMOVE("n7751")
-    MCFG_DEVICE_REMOVE("dac")
-    MCFG_DEVICE_REMOVE("vref")
+    config.device_remove("n7751");
+    config.device_remove("dac");
+    config.device_remove("vref");
 
-    MCFG_DEVICE_REPLACE("ymsnd", YM2151, 4000000)
-    MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-MACHINE_CONFIG_END
+    YM2151(config.replace(), "ymsnd", 4000000).add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
 */
 
 void segas16a_state::system16a_fd1089a_no7751(machine_config &config)
@@ -2779,7 +2778,7 @@ ROM_START( fantzonee )
 	ROM_LOAD( "epr-7535a.12", 0x0000, 0x8000, CRC(bc1374fa) SHA1(ed2c87ae024dc251e175239f1bccc728fc096548) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-0016.key", 0x0000, 0x2000, BAD_DUMP CRC(16869a2c) SHA1(112b044d0b1b76620a7d75d6f4c4a16eca37e343) ) // hand-crafted needs a propper redump
+	ROM_LOAD( "317-0016.key", 0x0000, 0x2000, BAD_DUMP CRC(16869a2c) SHA1(112b044d0b1b76620a7d75d6f4c4a16eca37e343) ) // hand-crafted needs a proper redump
 ROM_END
 
 //*************************************************************************************************************************

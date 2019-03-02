@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="c2color_cart" description="C2 Color cartridges">
+
+	<!--
+	Chinese name        Pinyin                            English Translation                         Released?   Dumped? Year Released   Cartridge #     Publisher           Notes                                                       Note 2:
+	带龙王封印          Dài Lóngwáng Fēngyìn              The Agreement with the Dragon King          Y           N       2015            1               Baiyi Animation     Not a separate game, an extension for the built in game
+	之翼王的试炼        Zhī Yìwáng De Shì Liàn            The Trials of King Wing                     Y           N       2015            2               Baiyi Animation     Not a separate game, an extension for the built in game
+	之英雄岛之烈焰魔    Zhī Yīngxióng Dǎo Zhī Lièyàn Mó   The Fire Devil of Hero Island               Y           N       2015            3               Baiyi Animation     Not a separate game, an extension for the built in game
+	暗黑势力再临        Ànhēi Shìlì Zài Lín               The Dark Ones Come Again                    Y           Y       2015            4               Baiyi Animation     Not a separate game, an extension for the built in game
+	神秘的龙族之王      Shénmì De Lóngzú Zhī Wáng         The Mysterious King of the Dragon Land      Y           Y       2015            5               Baiyi Animation     Not a separate game, an extension for the built in game
+	植物大战僵尸２      Zhíwù Dàzhàn Jiāngshī 2           Plants vs. Zombies 2                        N           N       N/A             6               PopCap Games        Supposed to be the only standalone game for the C2          Supposed to be released Q1 2016, but never was
+	?                   ?                                 Locke Kingdom search                        N           N       N/A             7               Baiyi Animation     Not a separate game, an extension for the built in game     Mentioned as coming soon in a promotional booklet
+	-->
+
+	<software name="darkones" supported="no">
+		<description>Dì 4 dàn: Ànhēi Shìlì Zài Lín</description>
+		<year>2015</year>
+		<publisher>Baiyi Animation</publisher>
+		<info name="alt_title" value="第４弹：暗黑势力再临"/>
+		<part name="cart" interface="c2color_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="darkones.bin" size="0x800000" crc="d2735c91" sha1="f71c1cd300893a22e52d046bc9c489e0236c6b88" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kingdlnd" supported="no">
+		<description>Dì 5 dàn: Shénmì De Lóngzú Zhī Wáng</description>
+		<year>2015</year>
+		<publisher>Baiyi Animation</publisher>
+		<info name="alt_title" value="第５弹：神秘的龙族之王"/>
+		<part name="cart" interface="c2color_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="kingdlnd.bin" size="0x800000" crc="1e20d906" sha1="323df1ce05ff4fc1aaefe3e0e2b929aec40cc230" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
+
+

@@ -313,8 +313,7 @@ WRITE8_MEMBER( taito_state::io_w )
 
 WRITE_LINE_MEMBER( taito_state::pia_cb2_w )
 {
-	address_space& space = m_maincpu->space(AS_PROGRAM);
-	m_votrax->write(space, 0, m_votrax_cmd);
+	m_votrax->write(m_votrax_cmd);
 }
 
 READ8_MEMBER( taito_state::pia_pb_r )
@@ -350,13 +349,14 @@ TIMER_DEVICE_CALLBACK_MEMBER( taito_state::timer_a )
 	m_digits[++digit] = patterns[m_p_ram[m_out_offs++]&15];
 }
 
-MACHINE_CONFIG_START(taito_state::taito)
+void taito_state::taito(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, I8080, 19000000/9)
-	MCFG_DEVICE_PROGRAM_MAP(taito_map)
+	I8080(config, m_maincpu, 19000000/9);
+	m_maincpu->set_addrmap(AS_PROGRAM, &taito_state::taito_map);
 
-	MCFG_DEVICE_ADD(m_cpu2, M6802, 1000000) // cpu & clock are a guess
-	MCFG_DEVICE_PROGRAM_MAP(taito_sub_map)
+	M6802(config, m_cpu2, 1000000); // cpu & clock are a guess
+	m_cpu2->set_addrmap(AS_PROGRAM, &taito_state::taito_sub_map);
 
 	/* Video */
 	config.set_default_layout(layout_taito);
@@ -365,9 +365,10 @@ MACHINE_CONFIG_START(taito_state::taito)
 	genpin_audio(config);
 
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.475) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.475); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	PIA6821(config, m_pia);
 	//m_pia->readpa_handler().set(FUNC(taito_state::pia_pa_r));
@@ -380,7 +381,7 @@ MACHINE_CONFIG_START(taito_state::taito)
 	m_pia->irqb_handler().set_inputline(m_cpu2, M6802_IRQ_LINE);
 
 	TIMER(config, "timer_a").configure_periodic(FUNC(taito_state::timer_a), attotime::from_hz(200));
-MACHINE_CONFIG_END
+}
 
 void taito_state::shock(machine_config &config)
 {

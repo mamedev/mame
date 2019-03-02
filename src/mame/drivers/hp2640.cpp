@@ -62,6 +62,7 @@
 #include "machine/timer.h"
 #include "bus/rs232/rs232.h"
 #include "machine/ay31015.h"
+#include "machine/clock.h"
 #include "sound/beep.h"
 #include "emupal.h"
 #include "speaker.h"
@@ -170,6 +171,7 @@ private:
 	required_device<timer_device> m_timer_cursor_blink_inh;
 	required_device<rs232_port_device> m_rs232;
 	required_device<ay51013_device> m_uart;
+	required_device<clock_device> m_uart_clock;
 	required_device<beep_device> m_beep;
 	required_device<timer_device> m_timer_beep;
 
@@ -231,6 +233,7 @@ hp2645_state::hp2645_state(const machine_config &mconfig, device_type type, cons
 	  m_timer_cursor_blink_inh(*this , "timer_cursor_blink_inh"),
 	  m_rs232(*this , "rs232"),
 	  m_uart(*this , "uart"),
+	  m_uart_clock(*this , "uart_clock"),
 	  m_beep(*this , "beep"),
 	  m_timer_beep(*this , "timer_beep"),
 	  m_chargen(*this , "chargen%u" , 0)
@@ -262,8 +265,7 @@ void hp2645_state::machine_reset()
 	m_uart->write_cs(1);
 	m_uart->write_nb2(1);
 	m_async_control = 0;
-	m_uart->set_receiver_clock(0);
-	m_uart->set_transmitter_clock(0);
+	m_uart_clock->set_unscaled_clock(0);
 	update_async_control(0x00);
 	m_rs232->write_dtr(0);
 	async_txd_w(0);
@@ -699,8 +701,7 @@ void hp2645_state::update_async_control(uint8_t new_control)
 		} else {
 			rxc_txc_freq = SYS_CLOCK.dvalue() / baud_rate_divisors[ new_rate_idx ];
 		}
-		m_uart->set_receiver_clock(rxc_txc_freq);
-		m_uart->set_transmitter_clock(rxc_txc_freq);
+		m_uart_clock->set_unscaled_clock(rxc_txc_freq);
 		m_uart->write_tsb(new_rate_idx == 1);
 		LOG("ASYNC freq=%f\n" , rxc_txc_freq);
 	}
@@ -974,14 +975,14 @@ MACHINE_CONFIG_START(hp2645_state::hp2645)
 	TIMER(config, m_timer_10ms).configure_generic(FUNC(hp2645_state::timer_10ms_exp));
 	TIMER(config, m_timer_cursor_blink_inh).configure_generic(FUNC(hp2645_state::timer_cursor_blink_inh));
 
-	MCFG_SCREEN_ADD_MONOCHROME("screen" , RASTER , rgb_t::white())
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER, rgb_t::white());
 	// Actual pixel clock is half this value: 21.06 MHz
 	// We use the doubled value to be able to emulate the half-pixel shifting of the real hw
 	// Each real-world half pixel is a whole MAME pixel
-	MCFG_SCREEN_RAW_PARAMS(VIDEO_DOT_CLOCK * 2 ,
+	m_screen->set_raw(VIDEO_DOT_CLOCK * 2 ,
 						   VIDEO_TOT_COLS * VIDEO_CHAR_WIDTH * 2 , 0 , VIDEO_VIS_COLS * VIDEO_CHAR_WIDTH * 2 ,
-						   VIDEO_TOT_ROWS * VIDEO_CHAR_HEIGHT , 0 , VIDEO_VIS_ROWS * VIDEO_CHAR_HEIGHT)
-	MCFG_SCREEN_UPDATE_DRIVER(hp2645_state , screen_update)
+						   VIDEO_TOT_ROWS * VIDEO_CHAR_HEIGHT , 0 , VIDEO_VIS_ROWS * VIDEO_CHAR_HEIGHT);
+	m_screen->set_screen_update(FUNC(hp2645_state::screen_update));
 	TIMER(config, "scantimer").configure_scanline(FUNC(hp2645_state::scanline_timer), "screen", 0, 1);
 	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
 	config.set_default_layout(layout_hp2640);
@@ -995,6 +996,10 @@ MACHINE_CONFIG_START(hp2645_state::hp2645)
 	m_uart->write_so_callback().set(FUNC(hp2645_state::async_txd_w));
 	m_uart->write_dav_callback().set(FUNC(hp2645_state::async_dav_w));
 	m_uart->set_auto_rdav(true);
+
+	CLOCK(config, m_uart_clock, 19200 * 16);
+	m_uart_clock->signal_handler().set(m_uart, FUNC(ay51013_device::write_rcp));
+	m_uart_clock->signal_handler().append(m_uart, FUNC(ay51013_device::write_tcp));
 
 	// Beep
 	SPEAKER(config, "mono").front_center();

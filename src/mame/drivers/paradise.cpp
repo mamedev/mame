@@ -731,23 +731,23 @@ INTERRUPT_GEN_MEMBER(paradise_state::irq)
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);
 }
 
-MACHINE_CONFIG_START(paradise_state::paradise)
-
+void paradise_state::paradise(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/2)          /* Z8400B - 6mhz Verified */
-	MCFG_DEVICE_PROGRAM_MAP(paradise_map)
-	MCFG_DEVICE_IO_MAP(paradise_io_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(paradise_state, irq, 4*54)    /* No nmi routine, timing is confirmed (i.e. three timing irqs for each vblank irq */
+	Z80(config, m_maincpu, XTAL(12'000'000)/2);          /* Z8400B - 6mhz Verified */
+	m_maincpu->set_addrmap(AS_PROGRAM, &paradise_state::paradise_map);
+	m_maincpu->set_addrmap(AS_IO, &paradise_state::paradise_io_map);
+	m_maincpu->set_periodic_int(FUNC(paradise_state::irq), attotime::from_hz(4*54));    /* No nmi routine, timing is confirmed (i.e. three timing irqs for each vblank irq */
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(54) /* 54 verified */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */    /* we're using PORT_VBLANK */)
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-1-16)
-	MCFG_SCREEN_UPDATE_DRIVER(paradise_state, screen_update_paradise)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(54); /* 54 verified */
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */    /* we're using PORT_VBLANK */);
+	m_screen->set_size(256, 256);
+	m_screen->set_visarea(0, 256-1, 0+16, 256-1-16);
+	m_screen->set_screen_update(FUNC(paradise_state::screen_update_paradise));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_paradise);
 	PALETTE(config, m_palette).set_entries(0x800 + 16);
@@ -756,34 +756,32 @@ MACHINE_CONFIG_START(paradise_state::paradise)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(12'000'000)/12, okim6295_device::PIN7_HIGH)    /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	OKIM6295(config, "oki1", XTAL(12'000'000)/12, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.50);    /* verified on pcb */
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, XTAL(12'000'000)/12, okim6295_device::PIN7_HIGH) /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki2, XTAL(12'000'000)/12, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.50); /* verified on pcb */
+}
 
-MACHINE_CONFIG_START(paradise_state::tgtball)
+void paradise_state::tgtball(machine_config &config)
+{
 	paradise(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(tgtball_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &paradise_state::tgtball_map);
+}
 
-MACHINE_CONFIG_START(paradise_state::torus)
+void paradise_state::torus(machine_config &config)
+{
 	paradise(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(torus_map)
-	MCFG_DEVICE_IO_MAP(torus_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &paradise_state::torus_map);
+	m_maincpu->set_addrmap(AS_IO, &paradise_state::torus_io_map);
 
 	m_gfxdecode->set_info(gfx_torus);
 	m_screen->set_screen_update(FUNC(paradise_state::screen_update_torus));
 
 	config.device_remove("oki2");
-MACHINE_CONFIG_END
+}
 
 void paradise_state::madball(machine_config &config)
 {
@@ -794,14 +792,14 @@ void paradise_state::madball(machine_config &config)
 	m_screen->set_screen_update(FUNC(paradise_state::screen_update_madball));
 }
 
-MACHINE_CONFIG_START(paradise_state::penky)
+void paradise_state::penky(machine_config &config)
+{
 	paradise(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(torus_map)
-	MCFG_DEVICE_IO_MAP(torus_io_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &paradise_state::torus_map);
+	m_maincpu->set_addrmap(AS_IO, &paradise_state::torus_io_map);
+}
 
 
 void paradise_state::penkyi(machine_config &config)

@@ -378,7 +378,7 @@ READ8_MEMBER( svi3x8_state::mreq_r )
 		offset ^= 0x8000;
 
 	if (CCS1 || CCS2 || CCS3 || CCS4)
-		return m_cart_rom->read_rom(space, offset);
+		return m_cart_rom->read_rom(offset);
 
 	uint8_t data = m_expander->mreq_r(space, offset);
 
@@ -532,9 +532,9 @@ DEVICE_IMAGE_LOAD_MEMBER( svi3x8_state, cartridge )
 
 MACHINE_CONFIG_START(svi3x8_state::svi318)
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(10'738'635) / 3)
-	MCFG_DEVICE_PROGRAM_MAP(svi3x8_mem)
-	MCFG_DEVICE_IO_MAP(svi3x8_io)
+	Z80(config, m_maincpu, XTAL(10'738'635) / 3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &svi3x8_state::svi3x8_mem);
+	m_maincpu->set_addrmap(AS_IO, &svi3x8_state::svi3x8_io);
 
 	RAM(config, m_ram).set_default_size("16K");
 
@@ -559,22 +559,22 @@ MACHINE_CONFIG_START(svi3x8_state::svi318)
 	m_cassette->set_formats(svi_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED);
 	m_cassette->set_interface("svi318_cass");
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "svi318_cass")
+	SOFTWARE_LIST(config, "cass_list").set_original("svi318_cass");
 
 	// cartridge slot
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "svi318_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 	MCFG_GENERIC_LOAD(svi3x8_state, cartridge)
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "svi318_cart")
+	SOFTWARE_LIST(config, "cart_list").set_original("svi318_cart");
 
 	// expander bus
-	MCFG_SVI_EXPANDER_BUS_ADD("exp")
-	MCFG_SVI_EXPANDER_INT_HANDLER(WRITELINE(*this, svi3x8_state, intexp_w))
-	MCFG_SVI_EXPANDER_ROMDIS_HANDLER(WRITELINE(*this, svi3x8_state, romdis_w))
-	MCFG_SVI_EXPANDER_RAMDIS_HANDLER(WRITELINE(*this, svi3x8_state, ramdis_w))
-	MCFG_SVI_EXPANDER_CTRL1_HANDLER(WRITELINE(*this, svi3x8_state, ctrl1_w))
-	MCFG_SVI_EXPANDER_EXCSR_HANDLER(READ8(*this, svi3x8_state, excs_r))
-	MCFG_SVI_EXPANDER_EXCSW_HANDLER(WRITE8(*this, svi3x8_state, excs_w))
+	SVI_EXPANDER(config, m_expander, svi_expander_modules);
+	m_expander->int_handler().set(FUNC(svi3x8_state::intexp_w));
+	m_expander->romdis_handler().set(FUNC(svi3x8_state::romdis_w));
+	m_expander->ramdis_handler().set(FUNC(svi3x8_state::ramdis_w));
+	m_expander->ctrl1_handler().set(FUNC(svi3x8_state::ctrl1_w));
+	m_expander->excsr_handler().set(FUNC(svi3x8_state::excs_r));
+	m_expander->excsw_handler().set(FUNC(svi3x8_state::excs_w));
 MACHINE_CONFIG_END
 
 void svi3x8_state::svi318p(machine_config &config)

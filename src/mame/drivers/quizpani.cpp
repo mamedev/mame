@@ -195,32 +195,31 @@ static GFXDECODE_START( gfx_quizpani )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(quizpani_state::quizpani)
-	MCFG_DEVICE_ADD("maincpu", M68000, 10000000)
-	MCFG_DEVICE_PROGRAM_MAP(quizpani_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", quizpani_state,  irq4_line_hold)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(quizpani_state, irq1_line_hold, 164) // music tempo
+void quizpani_state::quizpani(machine_config &config)
+{
+	M68000(config, m_maincpu, 10000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &quizpani_state::quizpani_map);
+	m_maincpu->set_vblank_int("screen", FUNC(quizpani_state::irq4_line_hold));
+	m_maincpu->set_periodic_int(FUNC(quizpani_state::irq1_line_hold), attotime::from_hz(164)); // music tempo
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_quizpani);
 	PALETTE(config, "palette").set_format(palette_device::RRRRGGGGBBBBRGBx, 0x200);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(quizpani_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 0*8, 28*8-1);
+	screen.set_screen_update(FUNC(quizpani_state::screen_update));
+	screen.set_palette("palette");
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 16000000/4, okim6295_device::PIN7_LOW)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	OKIM6295(config, "oki", 16000000/4, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
 	nmk112.set_rom0_tag("oki");
-MACHINE_CONFIG_END
+}
 
 ROM_START( quizpani )
 	ROM_REGION( 0x340000, "maincpu", 0 ) /* 68000 Code */

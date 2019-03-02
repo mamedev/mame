@@ -256,7 +256,7 @@ MACHINE_CONFIG_START(comquest_state::comquest)
 	MCFG_SCREEN_UPDATE_DRIVER(comquest_state, screen_update_comquest)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_comquest )
+	GFXDECODE(config, "gfxdecode", "palette", gfx_comquest );
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 

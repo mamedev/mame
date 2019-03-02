@@ -544,19 +544,20 @@ static GFXDECODE_START( gfx_pyl601a )
 	GFXDECODE_ENTRY( "chargen", 0x0000, pyl601a_charlayout, 0, 1 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(pyl601_state::pyl601)
+void pyl601_state::pyl601(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, M6800, 1_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(pyl601_mem)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pyl601_state,  pyl601_interrupt)
+	M6800(config, m_maincpu, 1_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pyl601_state::pyl601_mem);
+	m_maincpu->set_vblank_int("screen", FUNC(pyl601_state::pyl601_interrupt));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 200)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 200 - 1)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(640, 200);
+	screen.set_visarea(0, 640 - 1, 0, 200 - 1);
+	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_pyl601);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
@@ -572,13 +573,13 @@ MACHINE_CONFIG_START(pyl601_state::pyl601)
 	crtc.set_update_row_callback(FUNC(pyl601_state::pyl601_update_row), this);
 
 	UPD765A(config, m_fdc, 8'000'000, true, true);
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", pyl601_floppies, "525hd", pyl601_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", pyl601_floppies, "525hd", pyl601_state::floppy_formats)
-	MCFG_SOFTWARE_LIST_ADD("flop_list","pyl601")
+	FLOPPY_CONNECTOR(config, "upd765:0", pyl601_floppies, "525hd", pyl601_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765:1", pyl601_floppies, "525hd", pyl601_state::floppy_formats);
+	SOFTWARE_LIST(config, "flop_list").set_original("pyl601");
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("576K"); // 64 + 512
-MACHINE_CONFIG_END
+}
 
 void pyl601_state::pyl601a(machine_config &config)
 {

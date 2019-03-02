@@ -45,7 +45,7 @@
 //**************************************************************************
 
 // devices
-DEFINE_DEVICE_TYPE(PHILLIPS_22VP931, phillips_22vp931_device, "22vp931", "Phillips 22VP931")
+DEFINE_DEVICE_TYPE(PHILIPS_22VP931, philips_22vp931_device, "22vp931", "Philips 22VP931")
 
 
 
@@ -53,12 +53,12 @@ DEFINE_DEVICE_TYPE(PHILLIPS_22VP931, phillips_22vp931_device, "22vp931", "Philli
 //  22VP931 ROM AND MACHINE INTERFACES
 //**************************************************************************
 
-void phillips_22vp931_device::vp931_portmap(address_map &map)
+void philips_22vp931_device::vp931_portmap(address_map &map)
 {
-	map(0x00, 0x00).mirror(0xcf).rw(FUNC(phillips_22vp931_device::i8049_keypad_r), FUNC(phillips_22vp931_device::i8049_output0_w));
-	map(0x10, 0x10).mirror(0xcf).rw(FUNC(phillips_22vp931_device::i8049_unknown_r), FUNC(phillips_22vp931_device::i8049_output1_w));
-	map(0x20, 0x20).mirror(0xcf).rw(FUNC(phillips_22vp931_device::i8049_datic_r), FUNC(phillips_22vp931_device::i8049_lcd_w));
-	map(0x30, 0x30).mirror(0xcf).rw(FUNC(phillips_22vp931_device::i8049_from_controller_r), FUNC(phillips_22vp931_device::i8049_to_controller_w));
+	map(0x00, 0x00).mirror(0xcf).rw(FUNC(philips_22vp931_device::i8049_keypad_r), FUNC(philips_22vp931_device::i8049_output0_w));
+	map(0x10, 0x10).mirror(0xcf).rw(FUNC(philips_22vp931_device::i8049_unknown_r), FUNC(philips_22vp931_device::i8049_output1_w));
+	map(0x20, 0x20).mirror(0xcf).rw(FUNC(philips_22vp931_device::i8049_datic_r), FUNC(philips_22vp931_device::i8049_lcd_w));
+	map(0x30, 0x30).mirror(0xcf).rw(FUNC(philips_22vp931_device::i8049_from_controller_r), FUNC(philips_22vp931_device::i8049_to_controller_w));
 }
 
 
@@ -70,15 +70,15 @@ ROM_END
 
 
 //**************************************************************************
-//  PHILLIPS 22VP931 IMPLEMENTATION
+//  PHILIPS 22VP931 IMPLEMENTATION
 //**************************************************************************
 
 //-------------------------------------------------
-//  phillips_22vp931_device - constructor
+//  philips_22vp931_device - constructor
 //-------------------------------------------------
 
-phillips_22vp931_device::phillips_22vp931_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: laserdisc_device(mconfig, PHILLIPS_22VP931, tag, owner, clock),
+philips_22vp931_device::philips_22vp931_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: laserdisc_device(mconfig, PHILIPS_22VP931, tag, owner, clock),
 		m_i8049_cpu(*this, "vp931"),
 		m_tracktimer(nullptr),
 		m_i8049_out0(0),
@@ -103,7 +103,7 @@ phillips_22vp931_device::phillips_22vp931_device(const machine_config &mconfig, 
 //  reset_w - write to the reset line
 //-------------------------------------------------
 
-void phillips_22vp931_device::reset_w(uint8_t data)
+void philips_22vp931_device::reset_w(uint8_t data)
 {
 	// control the CPU state
 	m_i8049_cpu->set_input_line(INPUT_LINE_RESET, data);
@@ -119,7 +119,7 @@ void phillips_22vp931_device::reset_w(uint8_t data)
 //  22VP931
 //-------------------------------------------------
 
-uint8_t phillips_22vp931_device::data_r()
+uint8_t philips_22vp931_device::data_r()
 {
 	// if data is pending, clear the pending flag and notify any callbacks
 	if (m_tocontroller_pending)
@@ -139,7 +139,7 @@ uint8_t phillips_22vp931_device::data_r()
 //  device_start - device initialization
 //-------------------------------------------------
 
-void phillips_22vp931_device::device_start()
+void philips_22vp931_device::device_start()
 {
 	// pass through to the parent
 	laserdisc_device::device_start();
@@ -153,7 +153,7 @@ void phillips_22vp931_device::device_start()
 //  device_reset - device reset
 //-------------------------------------------------
 
-void phillips_22vp931_device::device_reset()
+void philips_22vp931_device::device_reset()
 {
 	// pass through to the parent
 	laserdisc_device::device_reset();
@@ -185,7 +185,7 @@ void phillips_22vp931_device::device_reset()
 //  device
 //-------------------------------------------------
 
-void phillips_22vp931_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void philips_22vp931_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{
@@ -276,7 +276,7 @@ void phillips_22vp931_device::device_timer(emu_timer &timer, device_timer_id id,
 //  ROM region definitions
 //-------------------------------------------------
 
-const tiny_rom_entry *phillips_22vp931_device::device_rom_region() const
+const tiny_rom_entry *philips_22vp931_device::device_rom_region() const
 {
 	return ROM_NAME(vp931);
 }
@@ -286,16 +286,16 @@ const tiny_rom_entry *phillips_22vp931_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void phillips_22vp931_device::device_add_mconfig(machine_config &config)
+void philips_22vp931_device::device_add_mconfig(machine_config &config)
 {
 	I8049(config, m_i8049_cpu, XTAL(11'000'000));
-	m_i8049_cpu->set_addrmap(AS_IO, &phillips_22vp931_device::vp931_portmap);
-	m_i8049_cpu->p1_in_cb().set(FUNC(phillips_22vp931_device::i8049_port1_r));
-	m_i8049_cpu->p1_out_cb().set(FUNC(phillips_22vp931_device::i8049_port1_w));
-	m_i8049_cpu->p2_in_cb().set(FUNC(phillips_22vp931_device::i8049_port2_r));
-	m_i8049_cpu->p2_out_cb().set(FUNC(phillips_22vp931_device::i8049_port2_w));
-	m_i8049_cpu->t0_in_cb().set(FUNC(phillips_22vp931_device::i8049_t0_r));
-	m_i8049_cpu->t1_in_cb().set(FUNC(phillips_22vp931_device::i8049_t1_r));
+	m_i8049_cpu->set_addrmap(AS_IO, &philips_22vp931_device::vp931_portmap);
+	m_i8049_cpu->p1_in_cb().set(FUNC(philips_22vp931_device::i8049_port1_r));
+	m_i8049_cpu->p1_out_cb().set(FUNC(philips_22vp931_device::i8049_port1_w));
+	m_i8049_cpu->p2_in_cb().set(FUNC(philips_22vp931_device::i8049_port2_r));
+	m_i8049_cpu->p2_out_cb().set(FUNC(philips_22vp931_device::i8049_port2_w));
+	m_i8049_cpu->t0_in_cb().set(FUNC(philips_22vp931_device::i8049_t0_r));
+	m_i8049_cpu->t1_in_cb().set(FUNC(philips_22vp931_device::i8049_t1_r));
 }
 
 
@@ -304,7 +304,7 @@ void phillips_22vp931_device::device_add_mconfig(machine_config &config)
 //  start of the blanking period
 //-------------------------------------------------
 
-void phillips_22vp931_device::player_vsync(const vbi_metadata &vbi, int fieldnum, const attotime &curtime)
+void philips_22vp931_device::player_vsync(const vbi_metadata &vbi, int fieldnum, const attotime &curtime)
 {
 	// reset our command counter (debugging only)
 	m_cmdcount = 0;
@@ -320,7 +320,7 @@ void phillips_22vp931_device::player_vsync(const vbi_metadata &vbi, int fieldnum
 //  the first visible line of the frame
 //-------------------------------------------------
 
-int32_t phillips_22vp931_device::player_update(const vbi_metadata &vbi, int fieldnum, const attotime &curtime)
+int32_t philips_22vp931_device::player_update(const vbi_metadata &vbi, int fieldnum, const attotime &curtime)
 {
 	// set the first VBI timer to go at the start of line 16
 	timer_set(screen().time_until_pos(16*2), TID_VBI_DATA_FETCH, LASERDISC_CODE_LINE16 << 2);
@@ -335,7 +335,7 @@ int32_t phillips_22vp931_device::player_update(const vbi_metadata &vbi, int fiel
 //  and other bits
 //-------------------------------------------------
 
-WRITE8_MEMBER( phillips_22vp931_device::i8049_output0_w )
+WRITE8_MEMBER( philips_22vp931_device::i8049_output0_w )
 {
 	/*
 	    $80 = n/c
@@ -374,7 +374,7 @@ WRITE8_MEMBER( phillips_22vp931_device::i8049_output0_w )
 //  i8049_output1_w - controls scanning behaviors
 //-------------------------------------------------
 
-WRITE8_MEMBER( phillips_22vp931_device::i8049_output1_w )
+WRITE8_MEMBER( philips_22vp931_device::i8049_output1_w )
 {
 	/*
 	    $80 = n/c
@@ -418,7 +418,7 @@ WRITE8_MEMBER( phillips_22vp931_device::i8049_output1_w )
 //  i8049_lcd_w - vestigial LCD frame display
 //-------------------------------------------------
 
-WRITE8_MEMBER( phillips_22vp931_device::i8049_lcd_w )
+WRITE8_MEMBER( philips_22vp931_device::i8049_lcd_w )
 {
 	/*
 	    Frame number is written as 5 digits here; however, it is not actually
@@ -431,7 +431,7 @@ WRITE8_MEMBER( phillips_22vp931_device::i8049_lcd_w )
 //  i8049_unknown_r - unknown input port
 //-------------------------------------------------
 
-READ8_MEMBER( phillips_22vp931_device::i8049_unknown_r )
+READ8_MEMBER( philips_22vp931_device::i8049_unknown_r )
 {
 	// only bit $80 is checked and its effects are minor
 	return 0x00;
@@ -443,7 +443,7 @@ READ8_MEMBER( phillips_22vp931_device::i8049_unknown_r )
 //  controls
 //-------------------------------------------------
 
-READ8_MEMBER( phillips_22vp931_device::i8049_keypad_r )
+READ8_MEMBER( philips_22vp931_device::i8049_keypad_r )
 {
 	/*
 	    From the code, this is apparently a vestigial keypad with basic controls:
@@ -465,7 +465,7 @@ READ8_MEMBER( phillips_22vp931_device::i8049_keypad_r )
 //  DATIC circuit
 //-------------------------------------------------
 
-READ8_MEMBER( phillips_22vp931_device::i8049_datic_r )
+READ8_MEMBER( philips_22vp931_device::i8049_datic_r )
 {
 	return m_daticval;
 }
@@ -476,7 +476,7 @@ READ8_MEMBER( phillips_22vp931_device::i8049_datic_r )
 //  external controller wrote
 //-------------------------------------------------
 
-READ8_MEMBER( phillips_22vp931_device::i8049_from_controller_r )
+READ8_MEMBER( philips_22vp931_device::i8049_from_controller_r )
 {
 	// clear the pending flag and return the data
 	m_fromcontroller_pending = false;
@@ -489,7 +489,7 @@ READ8_MEMBER( phillips_22vp931_device::i8049_from_controller_r )
 //  the external controller
 //-------------------------------------------------
 
-WRITE8_MEMBER( phillips_22vp931_device::i8049_to_controller_w )
+WRITE8_MEMBER( philips_22vp931_device::i8049_to_controller_w )
 {
 	// set the pending flag and stash the data
 	m_tocontroller_pending = true;
@@ -508,7 +508,7 @@ WRITE8_MEMBER( phillips_22vp931_device::i8049_to_controller_w )
 //  i8049_port1_r - read the 8048 I/O port 1
 //-------------------------------------------------
 
-READ8_MEMBER( phillips_22vp931_device::i8049_port1_r )
+READ8_MEMBER( philips_22vp931_device::i8049_port1_r )
 {
 	/*
 	    $80 = P17 = (in) unsure
@@ -527,7 +527,7 @@ READ8_MEMBER( phillips_22vp931_device::i8049_port1_r )
 //  i8049_port1_w - write the 8048 I/O port 1
 //-------------------------------------------------
 
-WRITE8_MEMBER( phillips_22vp931_device::i8049_port1_w )
+WRITE8_MEMBER( philips_22vp931_device::i8049_port1_w )
 {
 	/*
 	    $10 = P14 = (out) D104 -> /SPEED
@@ -598,7 +598,7 @@ WRITE8_MEMBER( phillips_22vp931_device::i8049_port1_w )
 //  i8049_port2_r - read from the 8048 I/O port 2
 //-------------------------------------------------
 
-READ8_MEMBER( phillips_22vp931_device::i8049_port2_r )
+READ8_MEMBER( philips_22vp931_device::i8049_port2_r )
 {
 	/*
 	    $80 = P27 = (in) set/reset latch; set by FOC LS, reset by IGR
@@ -619,7 +619,7 @@ READ8_MEMBER( phillips_22vp931_device::i8049_port2_r )
 //  i8049_port2_w - write the 8048 I/O port 2
 //-------------------------------------------------
 
-WRITE8_MEMBER( phillips_22vp931_device::i8049_port2_w )
+WRITE8_MEMBER( philips_22vp931_device::i8049_port2_w )
 {
 	/*
 	    $40 = P26 = (out) cleared while data is sent back & forth; set afterwards
@@ -633,7 +633,7 @@ WRITE8_MEMBER( phillips_22vp931_device::i8049_port2_w )
 //  connected to the DATIC's data strobe line
 //-------------------------------------------------
 
-READ_LINE_MEMBER( phillips_22vp931_device::i8049_t0_r )
+READ_LINE_MEMBER( philips_22vp931_device::i8049_t0_r )
 {
 	return m_datastrobe;
 }
@@ -645,7 +645,7 @@ READ_LINE_MEMBER( phillips_22vp931_device::i8049_t0_r )
 //  to count the number of tracks advanced
 //-------------------------------------------------
 
-READ_LINE_MEMBER( phillips_22vp931_device::i8049_t1_r )
+READ_LINE_MEMBER( philips_22vp931_device::i8049_t1_r )
 {
 	return m_trackstate;
 }

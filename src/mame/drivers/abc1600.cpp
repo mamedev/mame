@@ -876,11 +876,12 @@ void abc1600_state::machine_reset()
 //  MACHINE_CONFIG( abc1600 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(abc1600_state::abc1600)
+void abc1600_state::abc1600(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD(MC68008P8_TAG, M68008, 64_MHz_XTAL / 8)
-	MCFG_DEVICE_PROGRAM_MAP(abc1600_mem)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(abc1600_state,abc1600_int_ack)
+	M68008(config, m_maincpu, 64_MHz_XTAL / 8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &abc1600_state::abc1600_mem);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(abc1600_state::abc1600_int_ack));
 
 	// video hardware
 	ABC1600_MOVER(config, ABC1600_MOVER_TAG, 0);
@@ -939,19 +940,19 @@ MACHINE_CONFIG_START(abc1600_state::abc1600)
 	m_fdc->intrq_wr_callback().set(m_cio, FUNC(z8536_device::pb7_w));
 	m_fdc->drq_wr_callback().set(FUNC(abc1600_state::fdc_drq_w));
 
-	MCFG_FLOPPY_DRIVE_ADD(SAB1797_02P_TAG":0", abc1600_floppies, nullptr,    floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(SAB1797_02P_TAG":1", abc1600_floppies, nullptr,    floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(SAB1797_02P_TAG":2", abc1600_floppies, "525qd", floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, SAB1797_02P_TAG":0", abc1600_floppies, nullptr, floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, SAB1797_02P_TAG":1", abc1600_floppies, nullptr, floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, SAB1797_02P_TAG":2", abc1600_floppies, "525qd", floppy_image_device::default_floppy_formats);
 
 	RS232_PORT(config, RS232_A_TAG, default_rs232_devices, nullptr);
 
 	rs232_port_device &rs232b(RS232_PORT(config, RS232_B_TAG, default_rs232_devices, nullptr));
 	rs232b.rxd_handler().set(m_dart, FUNC(z80dart_device::rxa_w));
 
-	MCFG_ABC_KEYBOARD_PORT_ADD(ABC_KEYBOARD_PORT_TAG, "abc99")
-	MCFG_ABC_KEYBOARD_OUT_RX_HANDLER(WRITELINE(m_dart, z80dart_device, rxb_w))
-	MCFG_ABC_KEYBOARD_OUT_TRXC_HANDLER(WRITELINE(m_dart, z80dart_device, rxtxcb_w))
-	MCFG_ABC_KEYBOARD_OUT_KEYDOWN_HANDLER(WRITELINE(m_dart, z80dart_device, dcdb_w))
+	abc_keyboard_port_device &kb(ABC_KEYBOARD_PORT(config, ABC_KEYBOARD_PORT_TAG, abc_keyboard_devices, "abc99"));
+	kb.out_rx_handler().set(m_dart, FUNC(z80dart_device::rxb_w));
+	kb.out_trxc_handler().set(m_dart, FUNC(z80dart_device::rxtxcb_w));
+	kb.out_keydown_handler().set(m_dart, FUNC(z80dart_device::dcdb_w));
 
 	abcbus_slot_device &bus0i(ABCBUS_SLOT(config, "bus0i", 64_MHz_XTAL / 16, abc1600bus_cards, nullptr));
 	bus0i.irq_callback().set(m_cio, FUNC(z8536_device::pa7_w));
@@ -973,8 +974,8 @@ MACHINE_CONFIG_START(abc1600_state::abc1600)
 	RAM(config, RAM_TAG).set_default_size("1M");
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "abc1600")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "flop_list").set_original("abc1600");
+}
 
 
 

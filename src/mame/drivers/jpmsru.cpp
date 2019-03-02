@@ -73,17 +73,19 @@ void jpmsru_state::jpmsru_io(address_map &map)
 static INPUT_PORTS_START( jpmsru )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(jpmsru_state::jpmsru)
+void jpmsru_state::jpmsru(machine_config &config)
+{
 	TMS9980A(config, m_maincpu, MAIN_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &jpmsru_state::jpmsru_map);
 	m_maincpu->set_addrmap(AS_IO, &jpmsru_state::jpmsru_io);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(jpmsru_state::jpmsru_4)
+void jpmsru_state::jpmsru_4(machine_config &config)
+{
 	TMS9980A(config, m_maincpu, MAIN_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &jpmsru_state::jpmsru_4_map);
 	m_maincpu->set_addrmap(AS_IO, &jpmsru_state::jpmsru_io);
-MACHINE_CONFIG_END
+}
 
 void jpmsru_state::init_jpmsru()
 {

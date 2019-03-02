@@ -261,7 +261,7 @@ void pdc_device::device_add_mconfig(machine_config &config)
 	Z80(config, m_pdccpu, XTAL(10'000'000) / 2);
 	m_pdccpu->set_addrmap(AS_PROGRAM, &pdc_device::pdc_mem);
 	m_pdccpu->set_addrmap(AS_IO, &pdc_device::pdc_io);
-	//MCFG_QUANTUM_PERFECT_CPU(M6502_TAG)
+	//config.m_perfect_cpu_quantum = subtag(M6502_TAG);
 
 	/* Floppy Disk Controller - uPD765a - NEC D765AC-2 */
 	UPD765A(config, m_fdc, 4'000'000, true, true);

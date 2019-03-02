@@ -505,7 +505,7 @@ MACHINE_CONFIG_START(djboy_state::djboy)
 	m_beast->port_in_cb<3>().set(FUNC(djboy_state::beast_p3_r));
 	m_beast->port_out_cb<3>().set(FUNC(djboy_state::beast_p3_w));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	GENERIC_LATCH_8(config, m_slavelatch);
 
@@ -522,7 +522,7 @@ MACHINE_CONFIG_START(djboy_state::djboy)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, djboy_state, screen_vblank_djboy))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_djboy)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_djboy);
 	MCFG_PALETTE_ADD("palette", 0x200)
 
 	KANEKO_PANDORA(config, m_pandora, 0);

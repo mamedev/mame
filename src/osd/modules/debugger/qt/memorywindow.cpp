@@ -329,7 +329,7 @@ void DebuggerMemView::mousePressEvent(QMouseEvent* event)
 	{
 		QFontMetrics actualFont = fontMetrics();
 		const double fontWidth = actualFont.width(QString(100, '_')) / 100.;
-		const int fontHeight = std::max(1, actualFont.height());
+		const int fontHeight = std::max(1, actualFont.lineSpacing());
 
 		debug_view_xy topLeft = view()->visible_position();
 		debug_view_xy clickViewPosition;

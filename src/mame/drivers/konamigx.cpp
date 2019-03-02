@@ -1645,7 +1645,7 @@ void konamigx_state::konamigx(machine_config &config)
 	/* These parameters are actual value written to the CCU.
 	tbyahhoo attract mode desync is caused by another matter. */
 
-	//MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(600))
+	//MCFG_SCREEN_vblank_time(ATTOSECONDS_IN_USEC(600))
 	// TODO: WTF, without these most games crashes? Some legacy call in video code???
 	m_screen->set_size(1024, 1024);
 	m_screen->set_visarea(24, 24+288-1, 16, 16+224-1);

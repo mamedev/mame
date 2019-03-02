@@ -580,10 +580,11 @@ TIMER_DEVICE_CALLBACK_MEMBER( st_mp200_state::u11_timer )
 	m_pia_u11->ca1_w(m_u11_timer);
 }
 
-MACHINE_CONFIG_START(st_mp200_state::st_mp200)
+void st_mp200_state::st_mp200(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6800, 1000000) // no xtal, just 2 chips forming a random oscillator
-	MCFG_DEVICE_PROGRAM_MAP(st_mp200_map)
+	M6800(config, m_maincpu, 1000000); // no xtal, just 2 chips forming a random oscillator
+	m_maincpu->set_addrmap(AS_PROGRAM, &st_mp200_state::st_mp200_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -614,14 +615,14 @@ MACHINE_CONFIG_START(st_mp200_state::st_mp200)
 	m_pia_u11->irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 	m_pia_u11->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 	TIMER(config, "timer_d").configure_periodic(FUNC(st_mp200_state::u11_timer), attotime::from_hz(634)); // 555 timer*2
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(st_mp200_state::st_mp201)
+void st_mp200_state::st_mp201(machine_config &config)
+{
 	st_mp200(config);
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speech", S14001A, S14001_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_CONFIG_END
+	S14001A(config, m_s14001a, S14001_CLOCK).add_route(ALL_OUTPUTS, "mono", 1.00);
+}
 
 
 /*--------------------------------

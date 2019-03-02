@@ -80,7 +80,7 @@ DEFINE_DEVICE_TYPE(ACORN_BUS, acorn_bus_device, "acorn_bus", "Acorn Bus")
 
 acorn_bus_device::acorn_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ACORN_BUS, tag, owner, clock)
-	, m_maincpu(*this, finder_base::DUMMY_TAG)
+	, m_space(*this, finder_base::DUMMY_TAG, -1)
 	, m_out_irq_cb(*this)
 	, m_out_nmi_cb(*this)
 {

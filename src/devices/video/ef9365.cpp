@@ -168,7 +168,8 @@ const tiny_rom_entry *ef9365_device::device_rom_region() const
 //-------------------------------------------------
 void ef9365_device::ef9365(address_map &map)
 {
-	map(0x00000, ef9365_device::BITPLANE_MAX_SIZE * ef9365_device::MAX_BITPLANES - 1).ram();
+	if (!has_configured_map(0))
+		map(0x00000, ef9365_device::BITPLANE_MAX_SIZE * ef9365_device::MAX_BITPLANES - 1).ram();
 }
 
 //-------------------------------------------------
@@ -200,7 +201,7 @@ ef9365_device::ef9365_device(const machine_config &mconfig, const char *tag, dev
 	device_t(mconfig, EF9365, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
-	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 18, 0, address_map_constructor(), address_map_constructor(FUNC(ef9365_device::ef9365), this)),
+	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 18, 0, address_map_constructor(FUNC(ef9365_device::ef9365), this)),
 	m_charset(*this, "ef9365"),
 	m_palette(*this, finder_base::DUMMY_TAG),
 	m_irq_handler(*this)

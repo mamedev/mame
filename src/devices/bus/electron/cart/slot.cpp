@@ -229,13 +229,13 @@ std::string electron_cartslot_device::get_default_card_software(get_default_card
 //  read - cartridge read
 //-------------------------------------------------
 
-uint8_t electron_cartslot_device::read(address_space &space, offs_t offset, int infc, int infd, int romqa, int oe, int oe2)
+uint8_t electron_cartslot_device::read(offs_t offset, int infc, int infd, int romqa, int oe, int oe2)
 {
 	uint8_t data = 0xff;
 
 	if (m_cart != nullptr)
 	{
-		data = m_cart->read(space, offset, infc, infd, romqa, oe, oe2);
+		data = m_cart->read(offset, infc, infd, romqa, oe, oe2);
 	}
 
 	return data;
@@ -245,11 +245,11 @@ uint8_t electron_cartslot_device::read(address_space &space, offs_t offset, int 
 //  write - cartridge write
 //-------------------------------------------------
 
-void electron_cartslot_device::write(address_space &space, offs_t offset, uint8_t data, int infc, int infd, int romqa, int oe, int oe2)
+void electron_cartslot_device::write(offs_t offset, uint8_t data, int infc, int infd, int romqa, int oe, int oe2)
 {
 	if (m_cart != nullptr)
 	{
-		m_cart->write(space, offset, data, infc, infd, romqa, oe, oe2);
+		m_cart->write(offset, data, infc, infd, romqa, oe, oe2);
 	}
 }
 

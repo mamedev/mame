@@ -265,11 +265,11 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(upscope_state::upscope)
-
+void upscope_state::upscope(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, amiga_state::CLK_7M_NTSC)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	M68000(config, m_maincpu, amiga_state::CLK_7M_NTSC);
+	m_maincpu->set_addrmap(AS_PROGRAM, &upscope_state::main_map);
 
 	ADDRESS_MAP_BANK(config, "overlay").set_map(&amiga_state::overlay_512kb_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
 
@@ -319,7 +319,7 @@ MACHINE_CONFIG_START(upscope_state::upscope)
 	m_ppi->in_pa_callback().set_ioport("IO0");
 	m_ppi->out_pb_callback().set(FUNC(upscope_state::lamps_w));
 	m_ppi->out_pc_callback().set(FUNC(upscope_state::coin_counter_w));
-MACHINE_CONFIG_END
+}
 
 
 

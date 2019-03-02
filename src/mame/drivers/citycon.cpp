@@ -215,7 +215,7 @@ MACHINE_CONFIG_START(citycon_state::citycon)
 	MCFG_SCREEN_UPDATE_DRIVER(citycon_state, screen_update_citycon)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_citycon)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_citycon);
 	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::RGBx_444, 640+1024);   // 640 real palette + 1024 virtual palette
 
 	/* sound hardware */
