@@ -191,7 +191,7 @@ namespace plib {
 
 		~arena_allocator() noexcept = default;
 
-		arena_allocator(const arena_allocator &rhs) noexcept : m_a(rhs.m_a) { printf("copy called\n"); }//= default;
+		arena_allocator(const arena_allocator &rhs) noexcept = default;
 		arena_allocator& operator=(const arena_allocator&) noexcept = delete;
 
 		arena_allocator(arena_allocator&&) noexcept = default;
