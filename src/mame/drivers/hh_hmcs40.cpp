@@ -102,6 +102,11 @@
 #include "pairmtch.lh"
 #include "sag.lh"
 
+#include "bambball.lh"
+#include "gckong.lh"
+#include "msthawk.lh"
+#include "packmon.lh"
+
 //#include "hh_hmcs40_test.lh" // common test-layout - no svg artwork(yet), use external artwork
 
 
@@ -443,6 +448,7 @@ void bambball_state::bambball(machine_config &config)
 	screen.set_visarea(0, 1920-1, 0, 478-1);
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
+	config.set_default_layout(layout_bambball);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -837,9 +843,11 @@ void packmon_state::packmon(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
-	screen.set_size(1920, 766);
-	screen.set_visarea(0, 1920-1, 0, 766-1);
+	screen.set_size(1920, 680);
+	screen.set_visarea(0, 1920-1, 0, 680-1);
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
+	config.set_default_layout(layout_packmon);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -853,8 +861,8 @@ ROM_START( packmon )
 	ROM_LOAD( "hd38800a27", 0x0000, 0x1000, CRC(86e09e84) SHA1(ac7d3c43667d5720ca513f8ff51d146d9f2af124) )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
-	ROM_REGION( 246356, "svg", 0)
-	ROM_LOAD( "packmon.svg", 0, 246356, CRC(991eea96) SHA1(bf42765aea838e9c26453642b01a962399b3e74c) )
+	ROM_REGION( 224386, "svg", 0)
+	ROM_LOAD( "packmon.svg", 0, 224386, CRC(b2ee5b6b) SHA1(e53b4d5a4118cc5fbec4656580c2aab76af8f8d7) )
 ROM_END
 
 
@@ -978,7 +986,9 @@ void msthawk_state::msthawk(machine_config &config)
 	screen.set_refresh_hz(50);
 	screen.set_size(1920, 696);
 	screen.set_visarea(0, 1920-1, 0, 696-1);
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
+	config.set_default_layout(layout_msthawk);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -992,8 +1002,8 @@ ROM_START( msthawk )
 	ROM_LOAD( "hd38800a73", 0x0000, 0x1000, CRC(a4f9a523) SHA1(465f06b02e2e7d2277218fd447830725790a816c) )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
-	ROM_REGION( 197907, "svg", 0)
-	ROM_LOAD( "msthawk.svg", 0, 197907, CRC(b54efcb9) SHA1(76db2ca156d556bf578995196eca1170b39988bb) )
+	ROM_REGION( 191888, "svg", 0)
+	ROM_LOAD( "msthawk.svg", 0, 191888, CRC(a607fc0f) SHA1(282a412f6462128e09ee8bd18d682dda01297611) )
 ROM_END
 
 
@@ -3602,9 +3612,11 @@ void gckong_state::gckong(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
-	screen.set_size(506, 1080);
-	screen.set_visarea(0, 506-1, 0, 1080-1);
+	screen.set_size(479, 1080);
+	screen.set_visarea(0, 479-1, 0, 1080-1);
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
+	config.set_default_layout(layout_gckong);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3618,8 +3630,8 @@ ROM_START( gckong )
 	ROM_LOAD( "hd38800b01", 0x0000, 0x1000, CRC(d5a2cca3) SHA1(37bb5784383daab672ed1e0e2362c7a40d8d9b3f) )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
-	ROM_REGION( 356769, "svg", 0)
-	ROM_LOAD( "gckong.svg", 0, 356769, CRC(e2559b53) SHA1(519309c3a88b5d7f4c0ac5ae05dcdc1153377765) )
+	ROM_REGION( 346588, "svg", 0)
+	ROM_LOAD( "gckong.svg", 0, 346588, CRC(317af984) SHA1(ff6323526d1f5e46eccf8fa8d979175895be75de) )
 ROM_END
 
 

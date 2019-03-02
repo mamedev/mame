@@ -35,17 +35,19 @@
  @054     uPD552C  1980, Epoch Invader From Space
 
  @031     uPD553C  1979, Bambino Superstar Football (ET-03)
- @049     uPD553C  1979, Mego Mini-Vid Break Free
+ @049     uPD553C  1979, Mego Mini-Vid: Break Free
  @055     uPD553C  1980, Bambino Space Laser Fight (ET-12)
  *073     uPD553C  1980, Sony ST-J75 FM Stereo Tuner
  @080     uPD553C  1980, Epoch Electronic Football
  *102     uPD553C  1981, Bandai Block Out
  @153     uPD553C  1981, Epoch Galaxy II
  @160     uPD553C  1982, Tomy Pac Man (TN-08)
+ *167     uPD553C  1982, Sony SL models (betamax) (have dump)
  @170     uPD553C  1982, Bandai Crazy Climber
  @192     uPD553C  1982, Tomy Scramble (TN-10)
  @202     uPD553C  1982, Epoch Astro Command
  @206     uPD553C  1982, Epoch Dracula
+ *207     uPD553C  1982, Sony SL-J30 (tape/cd deck)
  @209     uPD553C  1982, Tomy Caveman (TN-12)
  @258     uPD553C  1984, Tomy Alien Chase (TN-16)
  *296     uPD553C  1984, Epoch Computer Beam Gun Professional
@@ -1864,7 +1866,7 @@ ROM_END
 
 /***************************************************************************
 
-  Mego Mini-Vid Break Free (manufactured in Japan)
+  Mego Mini-Vid: Break Free (manufactured in Japan)
   * PCB label Mego 79 rev F
   * NEC uCOM-43 MCU, label D553C 049
   * cyan VFD display Futaba DM-4.5 91
@@ -2876,7 +2878,7 @@ CONS( 1982, edracula, 0,        0, edracula, edracula, edracula_state, empty_ini
 
 CONS( 1979, mcompgin, 0,        0, mcompgin, mcompgin, mcompgin_state, empty_init, "Mattel", "Computer Gin", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
-CONS( 1979, mvbfree,  0,        0, mvbfree,  mvbfree,  mvbfree_state,  empty_init, "Mego", "Mini-Vid Break Free", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, mvbfree,  0,        0, mvbfree,  mvbfree,  mvbfree_state,  empty_init, "Mego", "Mini-Vid: Break Free", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1980, grobot9,  0,        0, grobot9,  grobot9,  grobot9_state,  empty_init, "Takatoku Toys", "Game Robot 9", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // some of the minigames: ***
 
