@@ -120,7 +120,7 @@ int spbactn_state::draw_video(screen_device &screen, bitmap_rgb32 &bitmap, const
 	m_sprite_bitmap.fill(0, cliprect);
 	bitmap.fill(0, cliprect);
 
-	m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode, cliprect, &m_spvideoram[0], 0, 0, flip_screen(), m_sprite_bitmap);
+	m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode->gfx(2), cliprect, &m_spvideoram[0], 0, 0, flip_screen(), m_sprite_bitmap);
 	m_bg_tilemap->draw(screen, m_tile_bitmap_bg, cliprect, 0, 0);
 	m_fg_tilemap->draw(screen, m_tile_bitmap_fg, cliprect, 0, 0);
 

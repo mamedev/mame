@@ -19,8 +19,7 @@ DEFINE_DEVICE_TYPE(TECMO_SPRITE, tecmo_spr_device, "tecmo_spr", "Tecmo Chained S
 
 tecmo_spr_device::tecmo_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TECMO_SPRITE, tag, owner, clock)
-	, m_gfxregion(0)
-	, m_bootleg(0)
+	, m_bootleg(false)
 	, m_yoffset(0)
 {
 }
@@ -69,19 +68,13 @@ static const uint8_t layout[8][8] =
 
 #define NUM_SPRITES 256
 
-void tecmo_spr_device::gaiden_draw_sprites(screen_device &screen, gfxdecode_device *gfxdecode, const rectangle &cliprect, uint16_t* spriteram, int sprite_sizey, int spr_offset_y, int flip_screen, bitmap_ind16 &sprite_bitmap)
+void tecmo_spr_device::gaiden_draw_sprites(screen_device &screen, gfx_element *gfx, const rectangle &cliprect, uint16_t* spriteram, int sprite_sizey, int spr_offset_y, int flip_screen, bitmap_ind16 &sprite_bitmap)
 {
-	gfx_element *gfx = gfxdecode->gfx(m_gfxregion);
-	uint16_t *source;
-	int sourceinc;
-
-
-	source = spriteram;
-	sourceinc = 8;
+	uint16_t *source = spriteram;
+	int sourceinc = 8;
 
 	int count = NUM_SPRITES;
 	int screenwidth = screen.width();
-
 
 	int attributes_word = 0;
 	int tilenumber_word = 1;
@@ -100,13 +93,12 @@ void tecmo_spr_device::gaiden_draw_sprites(screen_device &screen, gfxdecode_devi
 	while (count--)
 	{
 		uint32_t attributes = source[attributes_word];
-		int col, row;
 
 		int enabled = source[attributes_word] & 0x04;
 
 		if (enabled)
 		{
-			if (m_bootleg == 1)
+			if (m_bootleg)
 			{
 				// I don't think the galspinbl / hotpinbl bootlegs have blending, instead they use this bit to flicker sprites on/off each frame, so handle it here (we can't handle it in the mixing)
 				// alternatively these sprites could just be disabled like the tiles marked with the 'mix' bit appear to be (they're only used for ball / flipper trails afaik)
@@ -164,20 +156,13 @@ void tecmo_spr_device::gaiden_draw_sprites(screen_device &screen, gfxdecode_devi
 					ypos += 512;
 			}
 
-
-			bitmap_ind16* bitmap;
-
-
-
-
 			// this contains the blend bit and the priority bits, the spbactn proto uses 0x0300 for priority, spbactn uses 0x0030, others use 0x00c0
 			color |= (source[attributes_word] & 0x03f0);
-			bitmap = &sprite_bitmap;
+			bitmap_ind16* bitmap = &sprite_bitmap;
 
-
-			for (row = 0; row < sizey; row++)
+			for (int row = 0; row < sizey; row++)
 			{
-				for (col = 0; col < sizex; col++)
+				for (int col = 0; col < sizex; col++)
 				{
 					int sx = xpos + 8 * (flipx ? (sizex - 1 - col) : col);
 					int sy = ypos + 8 * (flipy ? (sizey - 1 - row) : row);
@@ -199,7 +184,7 @@ void tecmo_spr_device::gaiden_draw_sprites(screen_device &screen, gfxdecode_devi
 
 /* NOT identical to the version above */
 
-/* sprite format (tecmo.c):
+/* sprite format (tecmo.cpp):
  *
  *  byte     bit        usage
  * --------+-76543210-+----------------
@@ -222,11 +207,9 @@ void tecmo_spr_device::gaiden_draw_sprites(screen_device &screen, gfxdecode_devi
 
 
 
-void tecmo_spr_device::draw_sprites_8bit(screen_device &screen, bitmap_ind16 &bitmap, gfxdecode_device *gfxdecode, const rectangle &cliprect, uint8_t* spriteram, int size, int video_type, int flip_screen)
+void tecmo_spr_device::draw_sprites_8bit(screen_device &screen, bitmap_ind16 &bitmap, gfx_element *gfx, const rectangle &cliprect, uint8_t* spriteram, int size, int video_type, int flip_screen)
 {
-	int offs;
-
-	for (offs = size-8;offs >= 0;offs -= 8)
+	for (int offs = size-8; offs >= 0; offs -= 8)
 	{
 		int flags = spriteram[offs+3];
 		int priority = flags>>6;
@@ -234,7 +217,7 @@ void tecmo_spr_device::draw_sprites_8bit(screen_device &screen, bitmap_ind16 &bi
 		if (bank & 4)
 		{ /* visible */
 			int which = spriteram[offs+1];
-			int code,xpos,ypos,flipx,flipy,priority_mask,x,y;
+			int code,priority_mask;
 			int size = spriteram[offs + 2] & 3;
 
 			if (video_type != 0)   /* gemini, silkworm */
@@ -245,10 +228,10 @@ void tecmo_spr_device::draw_sprites_8bit(screen_device &screen, bitmap_ind16 &bi
 			code &= ~((1 << (size*2)) - 1);
 			size = 1 << size;
 
-			xpos = spriteram[offs + 5] - ((flags & 0x10) << 4);
-			ypos = spriteram[offs + 4] - ((flags & 0x20) << 3);
-			flipx = bank & 1;
-			flipy = bank & 2;
+			int xpos = spriteram[offs + 5] - ((flags & 0x10) << 4);
+			int ypos = spriteram[offs + 4] - ((flags & 0x20) << 3);
+			int flipx = bank & 1;
+			int flipy = bank & 2;
 
 			if (flip_screen)
 			{
@@ -268,13 +251,13 @@ void tecmo_spr_device::draw_sprites_8bit(screen_device &screen, bitmap_ind16 &bi
 				case 0x3: priority_mask = 0xf0|0xcc|0xaa; break; /* obscured by bg and fg */
 			}
 
-			for (y = 0;y < size;y++)
+			for (int y = 0; y < size; y++)
 			{
-				for (x = 0;x < size;x++)
+				for (int x = 0; x < size; x++)
 				{
 					int sx = xpos + 8*(flipx?(size-1-x):x);
 					int sy = ypos + 8*(flipy?(size-1-y):y);
-					gfxdecode->gfx(1)->prio_transpen(bitmap,cliprect,
+					gfx->prio_transpen(bitmap,cliprect,
 							code + layout[y][x],
 							flags & 0xf,
 							flipx,flipy,
@@ -288,7 +271,7 @@ void tecmo_spr_device::draw_sprites_8bit(screen_device &screen, bitmap_ind16 &bi
 }
 
 
-/* sprite format (wc90.c):  - similar to the 16-bit one
+/* sprite format (wc90.cpp):  - similar to the 16-bit one
  *
  *  byte     bit        usage
  * --------+-76543210-+----------------
@@ -298,17 +281,18 @@ void tecmo_spr_device::draw_sprites_8bit(screen_device &screen, bitmap_ind16 &bi
 */
 
 
-void tecmo_spr_device::draw_wc90_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, gfxdecode_device *gfxdecode, uint8_t* spriteram, int size, int priority )
+void tecmo_spr_device::draw_wc90_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx, uint8_t* spriteram, int size, int priority)
 {
-	int offs, flags, code;
-
 	/* draw all visible sprites of specified priority */
-	for (offs = 0;offs < size;offs += 16){
+	for (int offs = 0; offs < size; offs += 16)
+	{
 		int bank = spriteram[offs+0];
 
-		if ( ( bank >> 4 ) == priority ) {
-			if ( bank & 4 ) { /* visible */
-				code = ( spriteram[offs+2] ) + ( spriteram[offs+3] << 8 );
+		if ((bank >> 4) == priority)
+		{
+			if (bank & 4)
+			{ /* visible */
+				int code = ( spriteram[offs+2] ) + ( spriteram[offs+3] << 8 );
 
 				int xpos = spriteram[offs + 8] + ( (spriteram[offs + 9] & 3 ) << 8 );
 				int ypos = spriteram[offs + 6] + m_yoffset;
@@ -317,22 +301,21 @@ void tecmo_spr_device::draw_wc90_sprites(bitmap_ind16 &bitmap, const rectangle &
 
 				if (xpos >= 0x0300) xpos -= 0x0400;
 
-				flags = spriteram[offs+4];
+				int flags = spriteram[offs+4];
 
 				int sizex = 1 << ((flags >> 0) & 3);
 				int sizey = 1 << ((flags >> 2) & 3);
 
-
 				int flipx = bank & 1;
 				int flipy = bank & 2;
 
-				for (int y = 0;y < sizey;y++)
+				for (int y = 0; y < sizey; y++)
 				{
-					for (int x = 0;x < sizex;x++)
+					for (int x = 0; x < sizex; x++)
 					{
 						int sx = xpos + 8*(flipx?(sizex-1-x):x);
 						int sy = ypos + 8*(flipy?(sizey-1-y):y);
-						gfxdecode->gfx(3)->transpen(bitmap,cliprect,
+						gfx->transpen(bitmap,cliprect,
 								code + layout[y][x],
 								(flags>>4) & 0xf,
 								flipx,flipy,
@@ -340,8 +323,6 @@ void tecmo_spr_device::draw_wc90_sprites(bitmap_ind16 &bitmap, const rectangle &
 								0);
 					}
 				}
-
-
 			}
 		}
 	}
@@ -349,66 +330,59 @@ void tecmo_spr_device::draw_wc90_sprites(bitmap_ind16 &bitmap, const rectangle &
 
 
 
-void tecmo_spr_device::tbowl_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect, gfxdecode_device *gfxdecode, int xscroll, uint8_t* spriteram)
+void tecmo_spr_device::tbowl_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect, gfx_element *gfx, int xscroll, uint8_t* spriteram)
 {
-	int offs;
-
-	for (offs = 0;offs < 0x800;offs += 8)
+	for (int offs = 0; offs < 0x800; offs += 8)
 	{
 		if (spriteram[offs+0] & 0x80)  /* enable */
 		{
-			int code,color,sizex,sizey,flipx,flipy,xpos,ypos;
-			int x,y;//,priority,priority_mask;
+			int code = (spriteram[offs+2])+(spriteram[offs+1]<<8);
+			int color = (spriteram[offs+3])&0x1f;
+			int sizex = 1 << ((spriteram[offs+0] & 0x03) >> 0);
+			int sizey = 1 << ((spriteram[offs+0] & 0x0c) >> 2);
 
-			code = (spriteram[offs+2])+(spriteram[offs+1]<<8);
-			color = (spriteram[offs+3])&0x1f;
-			sizex = 1 << ((spriteram[offs+0] & 0x03) >> 0);
-			sizey = 1 << ((spriteram[offs+0] & 0x0c) >> 2);
-
-			flipx = (spriteram[offs+0])&0x20;
-			flipy = 0;
-			xpos = (spriteram[offs+6])+((spriteram[offs+4]&0x03)<<8);
-			ypos = (spriteram[offs+5])+((spriteram[offs+4]&0x10)<<4);
+			int flipx = (spriteram[offs+0])&0x20;
+			int flipy = 0;
+			int xpos = (spriteram[offs+6])+((spriteram[offs+4]&0x03)<<8);
+			int ypos = (spriteram[offs+5])+((spriteram[offs+4]&0x10)<<4);
 
 			/* bg: 1; fg:2; text: 4 */
 
-			for (y = 0;y < sizey;y++)
+			for (int y = 0; y < sizey; y++)
 			{
-				for (x = 0;x < sizex;x++)
+				for (int x = 0; x < sizex; x++)
 				{
 					int sx = xpos + 8*(flipx?(sizex-1-x):x);
 					int sy = ypos + 8*(flipy?(sizey-1-y):y);
 
 					sx -= xscroll;
 
-					gfxdecode->gfx(3)->transpen(bitmap,cliprect,
+					gfx->transpen(bitmap,cliprect,
 							code + layout[y][x],
 							color,
 							flipx,flipy,
 							sx,sy,0 );
 
 					/* wraparound */
-					gfxdecode->gfx(3)->transpen(bitmap,cliprect,
+					gfx->transpen(bitmap,cliprect,
 							code + layout[y][x],
 							color,
 							flipx,flipy,
 							sx,sy-0x200,0 );
 
 					/* wraparound */
-					gfxdecode->gfx(3)->transpen(bitmap,cliprect,
+					gfx->transpen(bitmap,cliprect,
 							code + layout[y][x],
 							color,
 							flipx,flipy,
 							sx-0x400,sy,0 );
 
 					/* wraparound */
-					gfxdecode->gfx(3)->transpen(bitmap,cliprect,
+					gfx->transpen(bitmap,cliprect,
 							code + layout[y][x],
 							color,
 							flipx,flipy,
 							sx-0x400,sy-0x200,0 );
-
-
 
 				}
 			}

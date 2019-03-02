@@ -381,7 +381,6 @@ void tecmo16_state::fstarfrc(machine_config &config)
 	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::xBGR_444, 4096);
 
 	TECMO_SPRITE(config, m_sprgen, 0);
-	m_sprgen->set_gfx_region(2);
 
 	TECMO_MIXER(config, m_mixer, 0);
 	m_mixer->set_mixer_shifts(10,9,4);
