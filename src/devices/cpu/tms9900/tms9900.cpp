@@ -1625,11 +1625,24 @@ void tms99xx_device::register_write()
     idempotent (i.e. they must not change the state of the queried device).
 
     Read returns the number of consecutive CRU bits, with increasing CRU address
-    from the least significant to the most significant bit; right-aligned
+    from the least significant to the most significant bit; right-aligned (in
+    other words, little-endian as opposed to the big-endian order of memory words).
 
     There seems to be no handling of wait states during CRU operations on the
     TMS9900. The TMS9995, in contrast, respects wait states during the transmission
     of each single bit.
+
+    The current emulation of the CRU space involves a 1-bit address shift,
+    reflecting the one-to-one correspondence between CRU bits and words (not
+    bytes) in the lower part of the memory space. (On the TMS9980A and TMS9995,
+    CRUOUT is multiplexed with the least significant address line.) Thus, what
+    TI's documentation calls the software address (the R12 base value plus the
+    bit offset multiplied by 2) is used in address maps and CPU-side operations.
+    MAME's memory architecture automatically translates these to right-justified
+    hardware addresses in the process of decoding offsets for read/write handlers,
+    which is more typical of what peripheral devices expect. (Note also that
+    address spaces do not support data widths narrower than 8 bits, so these
+    handlers must specify 8-bit types despite only one bit being useful.)
 
     Usage of this method:
        CRU write: First bit is at rightmost position of m_value.
