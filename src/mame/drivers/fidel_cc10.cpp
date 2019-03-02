@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Jonathan Gevaryahu,Sandro Ronco,hap
+// copyright-holders:Jonathan Gevaryahu, Sandro Ronco, hap
 // thanks-to:Berger
 /******************************************************************************
 *

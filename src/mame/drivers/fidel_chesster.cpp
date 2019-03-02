@@ -1,9 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
-// thanks-to:yoyo_chessboard
+// thanks-to:yoyo_chessboard, Berger
 /******************************************************************************
 *
 * fidel_chesster.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
+
+These were made after Hegener & Glaser took over Fidelity(design phase started
+before that). Kishon Chesster was released under both Fidelity, and Mephisto brands.
 
 *******************************************************************************
 
@@ -147,7 +150,7 @@ void chesster_state::chesster(machine_config &config)
 	R65C02(config, m_maincpu, 5_MHz_XTAL); // RP65C02G
 	m_maincpu->set_addrmap(AS_PROGRAM, &chesster_state::main_map);
 
-	const attotime irq_period = attotime::from_hz(9615); // R/C circuit, measured
+	const attotime irq_period = attotime::from_hz(9500); // from 555 timer, measured (9.6kHz on a Chesster, 9.3kHz on a Kishon)
 	TIMER(config, m_irq_on).configure_periodic(FUNC(chesster_state::irq_on<M6502_IRQ_LINE>), irq_period);
 	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(2600)); // active for 2.6us
 	TIMER(config, "irq_off").configure_periodic(FUNC(chesster_state::irq_off<M6502_IRQ_LINE>), irq_period);
@@ -168,7 +171,7 @@ void chesster_state::kishon(machine_config &config)
 	chesster(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_clock(3.579545_MHz_XTAL);
+	m_maincpu->set_clock(3.579545_MHz_XTAL); // same CPU
 }
 
 
@@ -193,12 +196,20 @@ ROM_START( chesstera ) // model 6120, PCB label 510.1141C01
 	ROM_LOAD("101-1091a02.ic10", 0x0000, 0x20000, CRC(2b4d243c) SHA1(921e51978facb502b207b4f64a73b1e74127e826) ) // AMI, 27C010 or equivalent
 ROM_END
 
-ROM_START( kishon ) // model 6120G or 6127(same), PCB label 510.1141C01
+ROM_START( kishon ) // possibly Mephisto brand?, PCB label 510.1141C01
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("kishon.ic9", 0x8000, 0x8000, CRC(121c007f) SHA1(652e9ea47b6bb1632d10eb0fcd7f98cdba22fce7) ) // 27C256
+	ROM_LOAD("german_chesster_v2.2.ic9", 0x8000, 0x8000, CRC(43e0cfcd) SHA1(961c7335f562b19fa96324c429ab70e8ab4d7647) ) // 27C256, 15.1.91
 
 	ROM_REGION( 0x80000, "rombank", 0 )
-	ROM_LOAD("kishon_v2.6_1-14-91.ic10", 0x0000, 0x80000, CRC(50598869) SHA1(2087e0c2f40a2408fe217a6502c8c3a247bdd063) ) // Toshiba TC544000P-12, aka 101-1094A01
+	ROM_LOAD("kishon_chesster_v2.6.ic10", 0x0000, 0x80000, CRC(50598869) SHA1(2087e0c2f40a2408fe217a6502c8c3a247bdd063) ) // Toshiba TC544000P-12
+ROM_END
+
+ROM_START( kishona ) // model 6120G or 6127(same), PCB label 510.1141C01
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("kishon.ic9", 0x8000, 0x8000, CRC(121c007f) SHA1(652e9ea47b6bb1632d10eb0fcd7f98cdba22fce7) ) // 27C256, no label
+
+	ROM_REGION( 0x80000, "rombank", 0 )
+	ROM_LOAD("kishon_chesster_v2.6.ic10", 0x0000, 0x80000, CRC(50598869) SHA1(2087e0c2f40a2408fe217a6502c8c3a247bdd063) ) // Toshiba TC544000P-12, 1-14-91, aka 101-1094A01 on 6127
 ROM_END
 
 } // anonymous namespace
@@ -210,6 +221,7 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME       PARENT   CMP MACHINE   INPUT     STATE           INIT           COMPANY, FULLNAME, FLAGS
-CONS( 1990, chesster,  0,        0, chesster, chesster, chesster_state, init_chesster, "Fidelity Electronics", "Chesster Challenger (V1.3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1990, chesster,  0,        0, chesster, chesster, chesster_state, init_chesster, "Fidelity Electronics", "Chesster Challenger (v1.3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 CONS( 1990, chesstera, chesster, 0, chesster, chesster, chesster_state, init_chesster, "Fidelity Electronics", "Chesster Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1991, kishon,    chesster, 0, kishon,   chesster, chesster_state, init_chesster, "Fidelity Electronics", "Kishon Chesster", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1991, kishon,    chesster, 0, kishon,   chesster, chesster_state, init_chesster, "Fidelity Electronics", "Kishon Chesster (v2.2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1991, kishona,   chesster, 0, kishon,   chesster, chesster_state, init_chesster, "Fidelity Electronics", "Kishon Chesster", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
