@@ -68,8 +68,6 @@ dinopic2: no sound, one bad graphics ROM. Copying 8.bin from dinopic fixes it.
 
 fcrash, kodb: old sprites show on next screen. Patch used.
 
-knightsb: sprites are entangled with the front layer.
-
 punipic, punipic2: no sound. Problems in Central Park. Patches used.
 
 punipic3: same as punipic, and doors are missing.
@@ -322,6 +320,8 @@ WRITE16_MEMBER(cps_state::mtwinsb_layer_w)
 
 WRITE16_MEMBER(cps_state::punipic_layer_w)
 {
+	m_cps_a_regs[0x08/2] = 0;
+
 	switch (offset)
 	{
 	case 0x00:
@@ -366,7 +366,6 @@ WRITE16_MEMBER(cps_state::punipic_layer_w)
 		break;
 	default:
 		logerror("%s: Unknown layer cmd %X %X\n",machine().describe_context(),offset<<1,data);
-
 	}
 }
 
