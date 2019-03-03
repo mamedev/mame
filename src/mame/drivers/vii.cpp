@@ -7,38 +7,53 @@
         Systems which run on the SPG243 SoC
 
         die markings show
-        "SunPlus QL8041" ( known as Sunplus SPG240? )
-        JAKKS WWE
-        Fantastic 4
-        Justice League
-        Dora the Explorer
-        Mattel Classic Sports
+        "SunPlus QL8041" ( also known as Sunplus SPG240 & PAC300 )
+
+        (all GameKeyReady units?)
         Disney Princess (GKR)
         Wheel of Fortune (GKR)
-        (all GameKeyReady units?)
+        JAKKS WWE (GKR)
+        Fantastic 4 (GKR)
+        Justice League (GKR)
+        Dora the Explorer Nursery Rhyme (GKR)
+        Dora the Explorer Play Park (GKR)
+		Spiderman 5-in-1 (GKR)
+		etc.
 
-        "SunPlus QL8041C" ( known as Sunplus SPG2?? )
+		(other non GKR JAKKS games)
+		X-Men (Wolverine pad)
+		Avatar: The Last Airbender
+
+		(other games)
+		Mattel Classic Sports
+
+        "SunPlus QL8041C" ( known as Sunplus SPG2??, seems to be compatible with above, so probably just a chip revision )
         Clickstart ( see clickstart.cpp instead)
         Wheel of Fortune 2nd Edition
-
+		Spider-man - Villain Roundup
 
         "SunPlus PA7801" ( known as Sunplus SPG110? ) see spg110.cpp instead
         Classic Arcade Pinball
         EA Sports (NHL95 + Madden 95)
+		(possibly original Spiderman 5-in-1 model)
 
         It is unknown if the following are close to this architecture or not (no dumps yet)
 
         "SunPlus QU7073-P69A"
         Mortal Kombat
 
+		"Sunplus PU7799-P680?" (difficult to read)
+		Mission Paintball
+
         "Sunplus QL8167"
-        Disney Princess (older)
+        Disney Princess (newer?)
         Go Diego Go
+		Shrek - Over the Hedge (this unit shows a GameKey Unlock More Games' on startup, but has no port, not even on the internal PCB)
+		Marvel Heroes (Spider-man)
+		Spiderman 3 (Movie - black) 
 
 
-Disney Princess non-GKR is Sunplus QL8167.
-
-    Status:
+	Status:
 
         Mostly working
 
