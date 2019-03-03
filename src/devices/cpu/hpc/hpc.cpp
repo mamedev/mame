@@ -93,6 +93,9 @@ void hpc_device::psw_w(u8 data)
 
 void hpc_device::execute_run()
 {
+	m_core_regs[1] = m_program->read_word(0xfffe);
+	debugger_instruction_hook(m_core_regs[1]);
+
 	m_icount = 0;
 }
 
