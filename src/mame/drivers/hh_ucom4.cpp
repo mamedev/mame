@@ -78,12 +78,15 @@ TODO:
 #include "screen.h"
 #include "speaker.h"
 
-// internal artwork
+// internal artwork (complete)
 #include "efball.lh"
 #include "grobot9.lh" // clickable
 #include "mcompgin.lh"
 #include "mvbfree.lh"
 #include "tactix.lh" // clickable
+
+// internal artwork (bezel overlay)
+#include "tmtennis.lh"
 
 //#include "hh_ucom4_test.lh" // common test-layout - no svg artwork(yet), use external artwork
 
@@ -2345,7 +2348,9 @@ void tmtennis_state::tmtennis(machine_config &config)
 	screen.set_refresh_hz(50);
 	screen.set_size(1920, 417);
 	screen.set_visarea(0, 1920-1, 0, 417-1);
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_ucom4_state::display_decay_tick), attotime::from_msec(1));
+	config.set_default_layout(layout_tmtennis);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

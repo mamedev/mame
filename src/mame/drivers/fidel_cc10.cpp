@@ -304,7 +304,7 @@ ROM_START( cc10 ) // model CCX, PCB label P241C-1
 ROM_END
 
 
-ROM_START( checkerc4 ) // model ACR, PCB label P241C
+ROM_START( checkc4 ) // model ACR, PCB label P241C
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "d2332c_043", 0x0000, 0x1000, CRC(4c251d90) SHA1(474d54b05971f2a3208bab56dc6e27f03781c541) ) // no custom label
 ROM_END
@@ -317,7 +317,7 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME       PARENT CMP MACHINE  INPUT  STATE      INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1978, cc10,      0,      0, ccx,     ccx,   ccx_state, empty_init, "Fidelity Electronics", "Chess Challenger 10 (model CCX, rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME     PARENT CMP MACHINE  INPUT  STATE      INIT        COMPANY, FULLNAME, FLAGS
+CONS( 1978, cc10,    0,      0, ccx,     ccx,   ccx_state, empty_init, "Fidelity Electronics", "Chess Challenger 10 (model CCX, rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1978, checkerc4, 0,      0, acr,     acr,   ccx_state, empty_init, "Fidelity Electronics", "Checker Challenger 4", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )
+CONS( 1978, checkc4, 0,      0, acr,     acr,   ccx_state, empty_init, "Fidelity Electronics", "Checker Challenger 4", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )

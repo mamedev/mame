@@ -12870,7 +12870,7 @@ vbrc                            //
 
 @source:fidel_cc10.cpp
 cc10                            //
-checkerc4                       //
+checkc4                         //
 
 @source:fidel_cc7.cpp
 backgamc                        //
