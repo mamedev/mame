@@ -172,7 +172,7 @@ MACHINE_CONFIG_START(anes_state::anes)
 	MCFG_SCREEN_UPDATE_DRIVER(anes_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 0x100)
+	PALETTE(config, "palette").set_entries(0x100);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -2,7 +2,7 @@
 // copyright-holders:R. Belmont
 /***************************************************************************
 
-    invqix.c
+    invqix.cpp
 
 Space Invaders / Qix Silver Anniversary Edition
 Taito/Namco America inc.
@@ -348,7 +348,7 @@ MACHINE_CONFIG_START(invqix_state::invqix)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256, 0, 240)
 
-	MCFG_PALETTE_ADD("palette", 65536)
+	PALETTE(config, "palette").set_entries(65536);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

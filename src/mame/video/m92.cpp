@@ -140,7 +140,7 @@ READ16_MEMBER(m92_state::paletteram_r)
 
 WRITE16_MEMBER(m92_state::paletteram_w)
 {
-	m_palette->write16(space, offset | (m_palette_bank << 10), data, mem_mask);
+	m_palette->write16(offset | (m_palette_bank << 10), data, mem_mask);
 }
 
 /*****************************************************************************/

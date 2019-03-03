@@ -322,8 +322,7 @@ MACHINE_CONFIG_START(blockout_state::blockout)
 	MCFG_SCREEN_UPDATE_DRIVER(blockout_state, screen_update_blockout)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 513)
-
+	PALETTE(config, m_palette).set_entries(513);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

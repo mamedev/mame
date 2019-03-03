@@ -1674,7 +1674,7 @@ WRITE8_MEMBER(sigmab98_state::gocowboy_4400_w)
 			}
 			else if ((offset >= 0x2000) && (offset < 0x2200))
 			{
-				m_palette->write8(space, offset-0x2000, data);
+				m_palette->write8(offset-0x2000, data);
 				return;
 			}
 			else if ((offset >= 0x2800) && (offset < 0x2880))
@@ -1765,7 +1765,7 @@ WRITE8_MEMBER(sigmab98_state::gocowboy_dc00_w)
 			return;
 
 		case 0x64: // (72000) PALETTERAM
-			m_palette->write8(space, offset, data);
+			m_palette->write8(offset, data);
 			return;
 	}
 
@@ -1992,7 +1992,7 @@ WRITE8_MEMBER(sigmab98_state::haekaka_b000_w)
 		case 0x67:  // PALETTERAM + VTABLE + VREGS
 			if (offset < 0x200)
 			{
-				m_palette->write8(space, offset, data);
+				m_palette->write8(offset, data);
 				return;
 			}
 			else if ((offset >= 0x800) && (offset < 0x880))
@@ -2248,7 +2248,7 @@ WRITE8_MEMBER(sigmab98_state::itazuram_nvram_palette_w)
 {
 	if (m_rambank == 0x64)
 	{
-		m_palette->write8(space, offset, data);
+		m_palette->write8(offset, data);
 	}
 	else if (m_rambank == 0x52)
 	{
@@ -2265,7 +2265,7 @@ WRITE8_MEMBER(sigmab98_state::itazuram_palette_w)
 	if (m_rombank == 0x6c)
 	{
 		if (offset < 0x200)
-			m_palette->write8(space, offset, data);
+			m_palette->write8(offset, data);
 	}
 	else
 	{
@@ -2497,7 +2497,7 @@ WRITE8_MEMBER(sigmab98_state::tdoboon_c000_w)
 		case 0x66:  // PALETTERAM + VTABLE
 			if (offset < 0x200)
 			{
-				m_palette->write8(space, offset, data);
+				m_palette->write8(offset, data);
 				return;
 			}
 			else if ((offset >= 0x800) && (offset < 0x880))

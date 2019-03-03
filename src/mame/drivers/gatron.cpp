@@ -588,7 +588,7 @@ MACHINE_CONFIG_START(gatron_state::gat)
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_gat);
-	MCFG_PALETTE_ADD("palette", 8)
+	PALETTE(config, "palette").set_entries(8);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

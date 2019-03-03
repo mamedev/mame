@@ -276,7 +276,7 @@ MACHINE_CONFIG_START(cswat_state::cswat)
 	MCFG_SCREEN_UPDATE_DRIVER(cswat_state, screen_update_cswat)
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_cswat);
-	MCFG_PALETTE_ADD("palette", 4*256)
+	PALETTE(config, "palette").set_entries(4*256);
 
 	/* sound hardware */
 	// TODO

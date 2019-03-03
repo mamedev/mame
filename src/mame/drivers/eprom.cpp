@@ -403,7 +403,7 @@ MACHINE_CONFIG_START(eprom_state::eprom)
 
 	/* video hardware */
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_eprom);
-	MCFG_PALETTE_ADD("palette", 2048)
+	PALETTE(config, m_palette).set_entries(2048);
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, eprom_state, get_playfield_tile_info, 8,8, SCAN_COLS, 64,64)
 	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", "gfxdecode", 2, eprom_state, get_alpha_tile_info, 8,8, SCAN_ROWS, 64,32, 0)
@@ -447,7 +447,7 @@ MACHINE_CONFIG_START(eprom_state::klaxp)
 
 	/* video hardware */
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_eprom);
-	MCFG_PALETTE_ADD("palette", 2048)
+	PALETTE(config, m_palette).set_entries(2048);
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, eprom_state, get_playfield_tile_info, 8,8, SCAN_COLS, 64,64)
 	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", "gfxdecode", 2, eprom_state, get_alpha_tile_info, 8,8, SCAN_ROWS, 64,32, 0)
@@ -496,7 +496,7 @@ MACHINE_CONFIG_START(eprom_state::guts)
 
 	/* video hardware */
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_guts);
-	MCFG_PALETTE_ADD("palette", 2048)
+	PALETTE(config, m_palette).set_entries(2048);
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, eprom_state, guts_get_playfield_tile_info, 8,8, SCAN_COLS, 64,64)
 	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", "gfxdecode", 2, eprom_state, get_alpha_tile_info, 8,8, SCAN_ROWS, 64,32, 0)

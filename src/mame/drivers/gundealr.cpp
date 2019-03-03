@@ -456,7 +456,7 @@ MACHINE_CONFIG_START(gundealr_state::gundealr)
 	MCFG_SCREEN_PALETTE("palette")
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gundealr);
-	MCFG_PALETTE_ADD("palette", 512)
+	PALETTE(config, m_palette).set_entries(512);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

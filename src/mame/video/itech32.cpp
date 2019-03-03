@@ -319,7 +319,7 @@ WRITE16_MEMBER(itech32_state::bloodstm_paletteram_w)
 		mem_mask >>= 8;
 	}
 
-	m_palette->write16(space, offset, data, mem_mask);
+	m_palette->write16(offset, data, mem_mask);
 }
 
 

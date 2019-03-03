@@ -146,7 +146,7 @@ MACHINE_CONFIG_START(interact_state::interact)
 	MCFG_SCREEN_UPDATE_DRIVER(interact_state, screen_update_interact)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 16)             /* 8 colours, but only 4 at a time*/
+	PALETTE(config, "palette").set_entries(16);             /* 8 colours, but only 4 at a time*/
 
 	MCFG_VIDEO_START_OVERRIDE(interact_state,hec2hrp)
 
@@ -183,7 +183,7 @@ MACHINE_CONFIG_START(interact_state::hector1)
 	MCFG_SCREEN_UPDATE_DRIVER(interact_state, screen_update_interact)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 16)             /* 8 colours, but only 4 at a time*/
+	PALETTE(config, "palette").set_entries(16);             /* 8 colours, but only 4 at a time*/
 
 	MCFG_VIDEO_START_OVERRIDE(interact_state,hec2hrp)
 

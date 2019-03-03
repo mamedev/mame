@@ -291,7 +291,7 @@ MACHINE_CONFIG_START(b16_state::b16)
 	m_dma8237->out_memw_callback().set(FUNC(b16_state::memory_write_byte));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_b16);
-	MCFG_PALETTE_ADD(m_palette, 8)
+	PALETTE(config, m_palette).set_entries(8);
 //  MCFG_PALETTE_INIT_STANDARD(black_and_white) // TODO
 
 MACHINE_CONFIG_END

@@ -392,7 +392,7 @@ MACHINE_CONFIG_START(dfruit_state::dfruit)
 	MCFG_SCREEN_PALETTE("palette")
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_dfruit);
-	MCFG_PALETTE_ADD("palette", 0x100)
+	PALETTE(config, "palette").set_entries(0x100);
 
 	TC0091LVC(config, m_vdp, 0);
 	m_vdp->set_gfxdecode_tag("gfxdecode");

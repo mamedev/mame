@@ -287,7 +287,7 @@ MACHINE_CONFIG_START(hp49gp_state::hp49gp)
 	MCFG_DEVICE_ADD("maincpu", ARM9, 400000000)
 	MCFG_DEVICE_PROGRAM_MAP(hp49gp_map)
 
-	MCFG_PALETTE_ADD("palette", 32768)
+	PALETTE(config, "palette").set_entries(32768);
 
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(60)

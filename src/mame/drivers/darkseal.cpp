@@ -222,7 +222,7 @@ MACHINE_CONFIG_START(darkseal_state::darkseal)
 	MCFG_SCREEN_PALETTE("colors")
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_darkseal);
-	MCFG_PALETTE_ADD(m_palette, 2048)
+	PALETTE(config, m_palette).set_entries(2048);
 
 	MCFG_DEVICE_ADD(m_spriteram, BUFFERED_SPRITERAM16)
 

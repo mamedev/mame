@@ -514,7 +514,7 @@ MACHINE_CONFIG_START(gpworld_state::gpworld)
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gpworld);
-	MCFG_PALETTE_ADD("palette", 1024)
+	PALETTE(config, m_palette).set_entries(1024);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

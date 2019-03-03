@@ -317,7 +317,7 @@ MACHINE_CONFIG_START(fp6000_state::fp6000)
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
 
-	MCFG_PALETTE_ADD("palette", 8)
+	PALETTE(config, m_palette).set_entries(8);
 //  MCFG_PALETTE_INIT(black_and_white)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fp6000);
 

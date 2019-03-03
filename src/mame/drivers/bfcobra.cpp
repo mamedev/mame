@@ -1659,7 +1659,7 @@ MACHINE_CONFIG_START(bfcobra_state::bfcobra)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512 - 1, 0, 256 - 1)
 	MCFG_SCREEN_UPDATE_DRIVER(bfcobra_state, screen_update_bfcobra)
 
-	MCFG_PALETTE_ADD("palette", 256)
+	PALETTE(config, m_palette).set_entries(256);
 
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // MUSIC Semiconductor TR9C1710 RAMDAC or equivalent
 	ramdac.set_addrmap(0, &bfcobra_state::ramdac_map);

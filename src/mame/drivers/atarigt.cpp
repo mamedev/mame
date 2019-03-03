@@ -816,7 +816,7 @@ MACHINE_CONFIG_START(atarigt_state::atarigt)
 
 	/* video hardware */
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_atarigt);
-	MCFG_PALETTE_ADD("palette", MRAM_ENTRIES)
+	PALETTE(config, m_palette).set_entries(MRAM_ENTRIES);
 
 	MCFG_TILEMAP_ADD_CUSTOM("playfield", "gfxdecode", 2, atarigt_state, get_playfield_tile_info, 8,8, atarigt_playfield_scan, 128,64)
 	MCFG_TILEMAP_ADD_STANDARD("alpha", "gfxdecode", 2, atarigt_state, get_alpha_tile_info, 8,8, SCAN_ROWS, 64, 32)

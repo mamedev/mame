@@ -424,8 +424,7 @@ MACHINE_CONFIG_START(cultures_state::cultures)
 	MCFG_SCREEN_PALETTE("palette")
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_cultures);
-	MCFG_PALETTE_ADD("palette", 0x3000/2)
-	MCFG_PALETTE_FORMAT(xRGBRRRRGGGGBBBB_bit0)
+	PALETTE(config, "palette").set_format(palette_device::xRGBRRRRGGGGBBBB_bit0, 0x3000/2);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

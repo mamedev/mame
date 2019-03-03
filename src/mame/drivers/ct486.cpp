@@ -182,7 +182,7 @@ MACHINE_CONFIG_START(ct486_state::ct486)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	// video hardware
-	MCFG_PALETTE_ADD("palette", 256) // todo: really needed?
+	PALETTE(config, "palette").set_entries(256); // todo: really needed?
 
 	/* software lists */
 	SOFTWARE_LIST(config, "pc_disk_list").set_original("ibm5150");

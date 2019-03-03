@@ -132,7 +132,7 @@ MACHINE_CONFIG_START(dkmb_state::dkmb)
 	MCFG_SCREEN_SIZE(1024, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 256-1)
 
-	MCFG_PALETTE_ADD("palette", 65536)
+	PALETTE(config, "palette").set_entries(65536);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

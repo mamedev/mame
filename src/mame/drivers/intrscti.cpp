@@ -211,7 +211,7 @@ MACHINE_CONFIG_START(intrscti_state::intrscti)
 	MCFG_SCREEN_PALETTE("palette")
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_intrscti);
-	MCFG_PALETTE_ADD("palette", 0x100)
+	PALETTE(config, m_palette).set_entries(0x100);
 MACHINE_CONFIG_END
 
 

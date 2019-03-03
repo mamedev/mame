@@ -3310,7 +3310,7 @@ MACHINE_CONFIG_START(cobra_state::cobra)
 	MCFG_SCREEN_SIZE(512, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 399)
 	MCFG_SCREEN_UPDATE_DRIVER(cobra_state, screen_update_cobra)
-	MCFG_PALETTE_ADD("palette", 65536)
+	PALETTE(config, m_palette).set_entries(65536);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

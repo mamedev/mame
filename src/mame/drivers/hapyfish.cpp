@@ -245,7 +245,7 @@ MACHINE_CONFIG_START(hapyfish_state::hapyfish)
 	MCFG_DEVICE_ADD("maincpu", ARM920T, 100000000)
 	MCFG_DEVICE_PROGRAM_MAP(hapyfish_map)
 
-	MCFG_PALETTE_ADD("palette", 32768)
+	PALETTE(config, "palette").set_entries(32768);
 
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(60)

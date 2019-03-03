@@ -3735,7 +3735,7 @@ MACHINE_CONFIG_START(hp9845c_state::hp9845c)
 	MCFG_SCREEN_UPDATE_DRIVER(hp9845c_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, hp9845c_state, vblank_w))
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_770_PIXEL_CLOCK , VIDEO_770_HTOTAL , VIDEO_770_HBEND , VIDEO_770_HBSTART , VIDEO_770_VTOTAL , VIDEO_770_VBEND , VIDEO_770_VBSTART)
-	MCFG_PALETTE_ADD("palette", 24)
+	PALETTE(config, "palette").set_entries(24);
 	TIMER(config, "scantimer").configure_scanline(FUNC(hp9845c_state::scanline_timer), "screen", 0, 1);
 
 	SOFTWARE_LIST(config, "optrom_list").set_original("hp9845b_rom");

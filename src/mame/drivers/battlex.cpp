@@ -310,7 +310,7 @@ MACHINE_CONFIG_START(battlex_state::battlex)
 	MCFG_SCREEN_PALETTE("palette")
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_battlex);
-	MCFG_PALETTE_ADD("palette", 64 + 128)
+	PALETTE(config, m_palette).set_entries(64 + 128);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

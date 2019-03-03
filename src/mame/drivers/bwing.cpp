@@ -392,7 +392,7 @@ MACHINE_CONFIG_START(bwing_state::bwing)
 	MCFG_SCREEN_PALETTE("palette")
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bwing);
-	MCFG_PALETTE_ADD("palette", 64)
+	PALETTE(config, m_palette).set_entries(64);
 
 
 	// sound hardware

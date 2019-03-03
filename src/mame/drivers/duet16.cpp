@@ -423,7 +423,7 @@ MACHINE_CONFIG_START(duet16_state::duet16)
 	crtc.set_char_width(8);
 	crtc.set_update_row_callback(FUNC(duet16_state::crtc_update_row), this);
 
-	MCFG_PALETTE_ADD("palette", 8)
+	PALETTE(config, m_pal).set_entries(8);
 	PALETTE(config, m_chrpal, palette_device::BRG_3BIT);
 
 	GFXDECODE(config, "gfxdecode", m_chrpal, gfx_duet16);

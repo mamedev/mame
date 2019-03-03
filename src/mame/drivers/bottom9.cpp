@@ -90,7 +90,7 @@ WRITE8_MEMBER(bottom9_state::bottom9_bankedram2_w)
 	if (m_k052109_selected)
 		k052109_051960_w(space, offset + 0x2000, data);
 	else
-		m_palette->write8(space, offset, data);
+		m_palette->write8(offset, data);
 }
 
 WRITE8_MEMBER(bottom9_state::bankswitch_w)

@@ -2165,7 +2165,7 @@ MACHINE_CONFIG_START(fm7_state::fm77av)
 	MCFG_SCREEN_UPDATE_DRIVER(fm7_state, screen_update_fm7)
 
 	PALETTE(config, m_palette, palette_device::BRG_3BIT);
-	MCFG_PALETTE_ADD("av_palette", 4096)
+	PALETTE(config, m_av_palette).set_entries(4096);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(fm7_cassette_formats);

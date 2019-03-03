@@ -470,7 +470,7 @@ MACHINE_CONFIG_START(gamecstl_state::gamecstl)
 	MCFG_SCREEN_PALETTE("palette")
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cga);
-	MCFG_PALETTE_ADD("palette", 16)
+	PALETTE(config, m_palette).set_entries(16);
 
 
 MACHINE_CONFIG_END

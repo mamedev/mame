@@ -115,7 +115,7 @@ MACHINE_CONFIG_START(cupidon_state::cupidon)
 	MCFG_SCREEN_UPDATE_DRIVER(cupidon_state, screen_update_cupidon)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 0x10000)
+	PALETTE(config, "palette").set_entries(0x10000);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

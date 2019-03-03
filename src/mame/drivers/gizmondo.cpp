@@ -193,7 +193,7 @@ MACHINE_CONFIG_START(gizmondo_state::gizmondo)
 	MCFG_DEVICE_ADD("maincpu", ARM9, 40000000)
 	MCFG_DEVICE_PROGRAM_MAP(gizmondo_map)
 
-	MCFG_PALETTE_ADD("palette", 32768)
+	PALETTE(config, "palette").set_entries(32768);
 
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(60)

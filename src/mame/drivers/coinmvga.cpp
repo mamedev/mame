@@ -658,11 +658,11 @@ MACHINE_CONFIG_START(coinmvga_state::coinmvga)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_coinmvga);
 	GFXDECODE(config, "gfxdecode2", m_palette2, gfx_coinmvga2);
 
-	MCFG_PALETTE_ADD("palette", 256)
+	PALETTE(config, m_palette).set_entries(256);
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
 	ramdac.set_addrmap(0, &coinmvga_state::ramdac_map);
 
-	MCFG_PALETTE_ADD("palette2", 16)
+	PALETTE(config, m_palette2).set_entries(16);
 	ramdac_device &ramdac2(RAMDAC(config, "ramdac2", 0, m_palette2));
 	ramdac2.set_addrmap(0, &coinmvga_state::ramdac2_map);
 

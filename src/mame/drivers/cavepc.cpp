@@ -127,7 +127,7 @@ MACHINE_CONFIG_START(cavepc_state::cavepc)
 	MCFG_SCREEN_UPDATE_DRIVER(cavepc_state, screen_update_cavepc)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 16)
+	PALETTE(config, "palette").set_entries(16);
 MACHINE_CONFIG_END
 
 

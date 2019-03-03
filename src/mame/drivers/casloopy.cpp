@@ -537,7 +537,7 @@ MACHINE_CONFIG_START(casloopy_state::casloopy)
 	MCFG_SCREEN_UPDATE_DRIVER(casloopy_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 512)
+	PALETTE(config, m_palette).set_entries(512);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfxdecode_device::empty);
 

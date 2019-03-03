@@ -64,7 +64,7 @@ WRITE8_MEMBER(spy_state::spy_bankedram1_w)
 {
 	if (m_rambank & 1)
 	{
-		m_palette->write8(space,offset,data);
+		m_palette->write8(offset,data);
 	}
 	else if (m_rambank & 2)
 	{

@@ -477,7 +477,7 @@ MACHINE_CONFIG_START(caveman_state::caveman)
 	MCFG_SCREEN_UPDATE_DRIVER(caveman_state, screen_update_caveman)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 16)
+	PALETTE(config, "palette").set_entries(16);
 
 	config.set_default_layout(layout_gts80a_caveman);
 

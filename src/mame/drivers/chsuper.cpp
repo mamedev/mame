@@ -384,7 +384,7 @@ MACHINE_CONFIG_START(chsuper_state::chsuper)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_chsuper);
-	MCFG_PALETTE_ADD("palette", 0x100)
+	PALETTE(config, m_palette).set_entries(0x100);
 
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
 	ramdac.set_addrmap(0, &chsuper_state::ramdac_map);

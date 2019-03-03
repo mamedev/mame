@@ -201,7 +201,7 @@ MACHINE_CONFIG_START(bingoc_state::bingoc)
 	MCFG_SCREEN_UPDATE_DRIVER(bingoc_state, screen_update_bingoc)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 0x100)
+	PALETTE(config, "palette").set_entries(0x100);
 
 
 	SPEAKER(config, "lspeaker").front_left(); //might just be mono...

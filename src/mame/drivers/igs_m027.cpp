@@ -343,8 +343,8 @@ MACHINE_CONFIG_START(igs_m027_state::igs_majhong)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, igs_m027_state, vblank_irq))
 
-	MCFG_PALETTE_ADD("palette", 0x200)
-//  MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
+	PALETTE(config, "palette").set_entries(0x200);
+//  PALETTE(config, "palette").set_format(palette_device::xGRB_555, 0x200);
 
 	IGS017_IGS031(config, m_igs017_igs031, 0);
 	m_igs017_igs031->set_text_reverse_bits();
@@ -377,8 +377,8 @@ MACHINE_CONFIG_START(igs_m027_state::amazonia)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, igs_m027_state, vblank_irq))
 
-	MCFG_PALETTE_ADD("palette", 0x200)
-//  MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
+	PALETTE(config, "palette").set_entries(0x200);
+//  PALETTE(config, "palette").set_format(palette_device::xGRB_555, 0x200);
 
 	IGS017_IGS031(config, m_igs017_igs031, 0);
 	m_igs017_igs031->set_text_reverse_bits();

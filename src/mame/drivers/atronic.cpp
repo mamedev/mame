@@ -80,7 +80,7 @@ MACHINE_CONFIG_START(atronic_state::atronic)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 8)
+	PALETTE(config, "palette").set_entries(8);
 
 MACHINE_CONFIG_END
 

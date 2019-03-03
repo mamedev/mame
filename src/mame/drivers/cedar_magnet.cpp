@@ -802,7 +802,7 @@ MACHINE_CONFIG_START(cedar_magnet_state::cedar_magnet)
 	MCFG_SCREEN_UPDATE_DRIVER(cedar_magnet_state, screen_update_cedar_magnet)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 0x400)
+	PALETTE(config, m_palette).set_entries(0x400);
 
 	CEDAR_MAGNET_SOUND(config, m_cedsound, 0);
 	CEDAR_MAGNET_PLANE(config, m_cedplane0, 0);

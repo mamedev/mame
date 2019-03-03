@@ -1282,7 +1282,7 @@ MACHINE_CONFIG_START(coinmstr_state::coinmstr)
 	MCFG_SCREEN_PALETTE("palette")
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_coinmstr);
-	MCFG_PALETTE_ADD("palette", 46*32*4)
+	PALETTE(config, m_palette).set_entries(46*32*4);
 
 	h46505_device &crtc(H46505(config, "crtc", 14000000 / 16));
 	crtc.set_screen("screen");

@@ -113,7 +113,7 @@ MACHINE_CONFIG_START(hotstuff_state::hotstuff)
 	MCFG_SCREEN_VISIBLE_AREA((0x10*4)+8, 101*8-1, 0*8, 33*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(hotstuff_state, screen_update_hotstuff)
 
-	MCFG_PALETTE_ADD("palette", 0x200)
+	PALETTE(config, "palette").set_entries(0x200);
 
 	scc8530_device& scc1(SCC8530N(config, "scc1", 4915200));
 	scc1.out_int_callback().set_inputline(m_maincpu, M68K_IRQ_4);

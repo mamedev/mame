@@ -846,7 +846,7 @@ MACHINE_CONFIG_START(exidy_state::base)
 
 	/* video hardware */
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_exidy);
-	MCFG_PALETTE_ADD("palette", 8)
+	PALETTE(config, m_palette).set_entries(8);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)

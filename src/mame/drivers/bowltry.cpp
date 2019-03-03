@@ -112,7 +112,7 @@ MACHINE_CONFIG_START(bowltry_state::bowltry)
 	MCFG_SCREEN_UPDATE_DRIVER(bowltry_state, screen_update_bowltry)
 	//MCFG_SCREEN_PALETTE("palette")
 
-	//MCFG_PALETTE_ADD("palette", 65536)
+	//PALETTE(config, "palette").set_entries(65536);
 
 	/* tt5665 sound */
 

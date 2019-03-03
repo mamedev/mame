@@ -366,7 +366,7 @@ MACHINE_CONFIG_START(gp2x_state::gp2x)
 	MCFG_DEVICE_ADD("maincpu", ARM9, 80000000)
 	MCFG_DEVICE_PROGRAM_MAP(gp2x_map)
 
-	MCFG_PALETTE_ADD("palette", 32768)
+	PALETTE(config, "palette").set_entries(32768);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

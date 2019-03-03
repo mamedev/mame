@@ -151,7 +151,7 @@ MACHINE_CONFIG_START(alien_state::alien)
 	MCFG_SCREEN_SIZE((32)*8, (32)*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 
-	MCFG_PALETTE_ADD("palette", 0x1000)
+	PALETTE(config, "palette").set_entries(0x1000);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

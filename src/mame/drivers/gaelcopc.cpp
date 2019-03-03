@@ -85,7 +85,7 @@ MACHINE_CONFIG_START(gaelcopc_state::gaelcopc)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 0x100)
+	PALETTE(config, "palette").set_entries(0x100);
 MACHINE_CONFIG_END
 
 
