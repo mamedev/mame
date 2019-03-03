@@ -568,7 +568,7 @@ MACHINE_CONFIG_START(lsasquad_state::lsasquad)
 	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, MASTER_CLOCK / 8)
 
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(30000)) /* 500 CPU slices per frame - an high value to ensure proper */
+	config.m_minimum_quantum = attotime::from_hz(30000); /* 500 CPU slices per frame - a high value to ensure proper */
 							/* synchronization of the CPUs */
 							/* main<->sound synchronization depends on this */
 
@@ -591,7 +591,7 @@ MACHINE_CONFIG_START(lsasquad_state::lsasquad)
 	MCFG_SCREEN_UPDATE_DRIVER(lsasquad_state, screen_update_lsasquad)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lsasquad)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lsasquad);
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 512);
 
 	/* sound hardware */
@@ -615,7 +615,7 @@ MACHINE_CONFIG_START(lsasquad_state::storming)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(storming_map)
 
-	MCFG_DEVICE_REMOVE("bmcu")
+	config.device_remove("bmcu");
 
 	AY8910(config.replace(), "aysnd", MASTER_CLOCK / 8).add_route(ALL_OUTPUTS, "mono", 0.12); // AY-3-8910A
 MACHINE_CONFIG_END
@@ -633,7 +633,7 @@ MACHINE_CONFIG_START(lsasquad_state::daikaiju)
 
 	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, MASTER_CLOCK / 8)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(30000)) /* 500 CPU slices per frame - an high value to ensure proper */
+	config.m_minimum_quantum = attotime::from_hz(30000); /* 500 CPU slices per frame - a high value to ensure proper */
 							/* synchronization of the CPUs */
 							/* main<->sound synchronization depends on this */
 
@@ -654,7 +654,7 @@ MACHINE_CONFIG_START(lsasquad_state::daikaiju)
 	MCFG_SCREEN_UPDATE_DRIVER(lsasquad_state, screen_update_daikaiju)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lsasquad)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lsasquad);
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 512);
 
 	/* sound hardware */

@@ -67,7 +67,8 @@ const tiny_rom_entry *newbrain_eim_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(newbrain_eim_device::device_add_mconfig)
+void newbrain_eim_device::device_add_mconfig(machine_config &config)
+{
 	// devices
 	Z80CTC(config, m_ctc, XTAL(16'000'000)/8);
 	m_ctc->zc_callback<0>().set(m_acia, FUNC(acia6850_device::write_rxc));
@@ -92,11 +93,11 @@ MACHINE_CONFIG_START(newbrain_eim_device::device_add_mconfig)
 
 	RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr);
 
-	MCFG_NEWBRAIN_EXPANSION_SLOT_ADD(NEWBRAIN_EXPANSION_SLOT_TAG, XTAL(16'000'000)/8, newbrain_expansion_cards, "fdc")
+	NEWBRAIN_EXPANSION_SLOT(config, m_exp, XTAL(16'000'000)/8, newbrain_expansion_cards, "fdc");
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("96K");
-MACHINE_CONFIG_END
+}
 
 
 //**************************************************************************
@@ -144,9 +145,9 @@ void newbrain_eim_device::device_reset()
 //  mreq_r - memory request read
 //-------------------------------------------------
 
-uint8_t newbrain_eim_device::mreq_r(address_space &space, offs_t offset, uint8_t data, bool &romov, int &exrm, bool &raminh)
+uint8_t newbrain_eim_device::mreq_r(offs_t offset, uint8_t data, bool &romov, int &exrm, bool &raminh)
 {
-	return m_exp->mreq_r(space, offset, data, romov, exrm, raminh);
+	return m_exp->mreq_r(offset, data, romov, exrm, raminh);
 }
 
 
@@ -154,9 +155,9 @@ uint8_t newbrain_eim_device::mreq_r(address_space &space, offs_t offset, uint8_t
 //  mreq_w - memory request write
 //-------------------------------------------------
 
-void newbrain_eim_device::mreq_w(address_space &space, offs_t offset, uint8_t data, bool &romov, int &exrm, bool &raminh)
+void newbrain_eim_device::mreq_w(offs_t offset, uint8_t data, bool &romov, int &exrm, bool &raminh)
 {
-	m_exp->mreq_w(space, offset, data, romov, exrm, raminh);
+	m_exp->mreq_w(offset, data, romov, exrm, raminh);
 }
 
 
@@ -164,9 +165,9 @@ void newbrain_eim_device::mreq_w(address_space &space, offs_t offset, uint8_t da
 //  iorq_r - I/O request read
 //-------------------------------------------------
 
-uint8_t newbrain_eim_device::iorq_r(address_space &space, offs_t offset, uint8_t data, bool &prtov)
+uint8_t newbrain_eim_device::iorq_r(offs_t offset, uint8_t data, bool &prtov)
 {
-	return m_exp->iorq_r(space, offset, data, prtov);
+	return m_exp->iorq_r(offset, data, prtov);
 }
 
 
@@ -174,9 +175,9 @@ uint8_t newbrain_eim_device::iorq_r(address_space &space, offs_t offset, uint8_t
 //  iorq_w - I/O request write
 //-------------------------------------------------
 
-void newbrain_eim_device::iorq_w(address_space &space, offs_t offset, uint8_t data, bool &prtov)
+void newbrain_eim_device::iorq_w(offs_t offset, uint8_t data, bool &prtov)
 {
-	m_exp->iorq_w(space, offset, data, prtov);
+	m_exp->iorq_w(offset, data, prtov);
 }
 
 

@@ -8,8 +8,6 @@
 
 class psx_controller_port_device;
 
-#define MCFG_PSXCARD_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, PSXCARD, 0)
 
 class psxcard_device :  public device_t,
 						public device_image_interface

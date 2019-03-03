@@ -222,7 +222,7 @@ WRITE8_MEMBER(bloodbro_state::weststry_opl_w)
 {
 	// NMI cannot be accepted between address and data writes, or else registers get corrupted
 	m_weststry_soundnmi_mask = BIT(offset, 0);
-	m_ymsnd->write(space, offset, data);
+	m_ymsnd->write(offset, data);
 	weststry_soundnmi_update();
 }
 

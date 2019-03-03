@@ -541,6 +541,9 @@ ROM_START( dinokior )
 
 	ROM_REGION( 0x08000000, "rom_board", ROMREGION_ERASEFF)
 
+	// DINOSAUR KING
+	// Operation:Dinosaur Rescue
+	// MDA-C0021
 	DISK_REGION( "cflash" )
 	DISK_IMAGE( "mda-c0021", 0, SHA1(947c987fb93a32c5acf7839e0186de91b5a9facc) )
 
@@ -558,6 +561,9 @@ ROM_START( dinoki25 )
 
 	ROM_REGION( 0x08000000, "rom_board", ROMREGION_ERASEFF)
 
+	// DINOSAUR KING
+	// VER2.5 ENG_ASIA
+	// MDA-C0047
 	DISK_REGION( "cflash" )
 	DISK_IMAGE( "mda-c0047", 0, SHA1(0f97291d9c5dbe3e66a5220da05aebdfaa78b35d) )
 
@@ -582,8 +588,30 @@ ROM_START( loveber3 )
 
 	ROM_REGION( 0x08000000, "rom_board", ROMREGION_ERASEFF)
 
+	// LOVE AND BERRY III ENG
+	// MDA-C0042
 	DISK_REGION( "cflash" )
 	DISK_IMAGE( "mda-c0042", 0, SHA1(9992d90dae8ce7636e4153e02b779c27931b3be6) )
+
+	ROM_PARAMETER( ":rom_board:id", "5508" )  // 8x 512Mbit FlashROMs
+
+	ROM_REGION( 0x800, "pic_readout", 0 )
+	ROM_LOAD( "317-0446-com.ic15", 0, 0x800, BAD_DUMP CRC(60f56bf2) SHA1(35e697aca7213e3fb1ebe75bb8991b1b992af6d9) )
+ROM_END
+
+// This game's protection uses contact IC card reader made by Hirocon, with 2 IC card slots, cards probably SLE4428 or SLE5528.
+ROM_START( loveber3cn )
+	SEGASP_BIOS
+	ROM_DEFAULT_BIOS( "v201" )
+	SEGASP_EXP
+	SEGASP_MISC
+
+	ROM_REGION( 0x08000000, "rom_board", ROMREGION_ERASEFF)
+
+	// LOVE AND BERRY III CHN
+	// MDA-C0071
+	DISK_REGION( "cflash" )
+	DISK_IMAGE( "mda-c0071", 0, SHA1(ea65def6d97dc76c08654fae3c89b80a0492575b) ) // unused space contain leftovers from "Disney Magical Dream Dance" game, encrypted, key is 1ffbc9f0
 
 	ROM_PARAMETER( ":rom_board:id", "5508" )  // 8x 512Mbit FlashROMs
 
@@ -599,6 +627,9 @@ ROM_START( tetgiano )
 
 	ROM_REGION( 0x08000000, "rom_board", ROMREGION_ERASEFF)
 
+	// TETRIS - DEKARIS (romaji)
+	// / TETRIS® - GIANT
+	// MDA-C0076
 	DISK_REGION( "cflash" )
 	DISK_IMAGE( "mda-c0076", 0, SHA1(6987c888d2a3ada2d07f6396d47fdba507ca859d) )
 
@@ -625,4 +656,5 @@ GAME( 2009, tetgiant,segasp,     segasp,    segasp, segasp_state, init_segasp, R
 GAME( 2006, dinokior,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Dinosaur King - Operation: Dinosaur Rescue (USA, Export) (MDA-C0021)", GAME_FLAGS )
 GAME( 2008, dinoki25,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Dinosaur King - D-Team VS. the Alpha Fortress (Export, Ver 2.500) (MDA-C0047)", GAME_FLAGS )
 GAME( 2007, loveber3,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Love And Berry - 3rd-5th Collection (USA, Export, Ver 1.002) (MDA-C0042)", GAME_FLAGS )
+GAME( 2010, loveber3cn,loveber3, segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Love And Berry - 3rd-5th Collection (China, Ver 1.001) (MDA-C0071)", GAME_FLAGS )
 GAME( 2009, tetgiano,tetgiant,   segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Tetris Giant / Tetris Dekaris (MDA-C0076)", GAME_FLAGS )

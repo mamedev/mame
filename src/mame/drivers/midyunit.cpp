@@ -155,13 +155,13 @@ WRITE8_MEMBER(midyunit_state::yawdim_oki_bank_w)
 
 CUSTOM_INPUT_MEMBER(midyunit_state::narc_talkback_strobe_r)
 {
-	return (m_narc_sound->read(machine().dummy_space(), 0) >> 8) & 1;
+	return (m_narc_sound->read() >> 8) & 1;
 }
 
 
 CUSTOM_INPUT_MEMBER(midyunit_state::narc_talkback_data_r)
 {
-	return m_narc_sound->read(machine().dummy_space(), 0) & 0xff;
+	return m_narc_sound->read() & 0xff;
 }
 
 
@@ -190,7 +190,6 @@ void midyunit_state::main_map(address_map &map)
 	map(0x01e00000, 0x01e0001f).w(FUNC(midyunit_state::midyunit_sound_w));
 	map(0x01f00000, 0x01f0001f).w(FUNC(midyunit_state::midyunit_control_w));
 	map(0x02000000, 0x05ffffff).r(FUNC(midyunit_state::midyunit_gfxrom_r)).share("gfx_rom");
-	map(0xc0000000, 0xc00001ff).rw("maincpu", FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xff800000, 0xffffffff).rom().region("user1", 0);
 }
 

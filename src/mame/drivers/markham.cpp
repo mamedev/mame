@@ -242,8 +242,8 @@ void markham_state::markham_slave_map(address_map &map)
 	map(0x0000, 0x5fff).rom();
 	map(0x8000, 0x87ff).ram().share("share1");
 
-	map(0xc000, 0xc000).w("sn1", FUNC(sn76496_device::command_w));
-	map(0xc001, 0xc001).w("sn2", FUNC(sn76496_device::command_w));
+	map(0xc000, 0xc000).w("sn1", FUNC(sn76496_device::write));
+	map(0xc001, 0xc001).w("sn2", FUNC(sn76496_device::write));
 
 	map(0xc002, 0xc002).nopw(); /* unknown */
 	map(0xc003, 0xc003).nopw(); /* unknown */
@@ -255,8 +255,8 @@ void markham_state::strnskil_slave_map(address_map &map)
 	map(0xc000, 0xc7ff).ram().share("spriteram");
 	map(0xc800, 0xcfff).ram().share("share1");
 
-	map(0xd801, 0xd801).w("sn1", FUNC(sn76496_device::command_w));
-	map(0xd802, 0xd802).w("sn2", FUNC(sn76496_device::command_w));
+	map(0xd801, 0xd801).w("sn1", FUNC(sn76496_device::write));
+	map(0xd802, 0xd802).w("sn2", FUNC(sn76496_device::write));
 }
 
 /****************************************************************************/
@@ -554,7 +554,7 @@ MACHINE_CONFIG_START(markham_state::markham)
 	MCFG_DEVICE_PROGRAM_MAP(markham_slave_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", markham_state, irq0_line_hold)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -579,12 +579,12 @@ MACHINE_CONFIG_START(markham_state::strnskil)
 
 	markham(config);
 	/* basic machine hardware */
-	MCFG_DEVICE_REMOVE("maincpu")
+	config.device_remove("maincpu");
 	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK/2) /* 4.000MHz */
 	MCFG_DEVICE_PROGRAM_MAP(strnskil_master_map)
 	TIMER(config, "scantimer").configure_scanline(FUNC(markham_state::strnskil_scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_REMOVE("subcpu")
+	config.device_remove("subcpu");
 	MCFG_DEVICE_ADD("subcpu", Z80, CPU_CLOCK/2) /* 4.000MHz */
 	MCFG_DEVICE_PROGRAM_MAP(strnskil_slave_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(markham_state, irq0_line_hold, 2*(PIXEL_CLOCK/HTOTAL/VTOTAL))

@@ -41,8 +41,8 @@ public:
 	void set_bits(tlc34076_bits bits) { m_dacbits = bits; }
 
 	// public interface
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
 
 protected:
 	// device-level overrides

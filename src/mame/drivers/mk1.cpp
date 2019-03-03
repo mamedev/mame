@@ -2,12 +2,14 @@
 // copyright-holders:Peter Trauner
 /******************************************************************************
 
-  mk1.c
-
-Driver file to handle emulation of the Novag/Videomaster Chess Champion MK 1
+Driver file to handle emulation of the Novag/Videomaster Chess Champion MK I
 by PeT mess@utanet.at 2000,2001.
 
 Minor updates by Wilbert Pol - 2007
+
+The MK I was a clone of Data Cash Systems's Compuchess (1977, one of the first
+chess computers). The ROM is identical. DCS sued Novag Industries for copyright
+infringement and somehow didn't manage to win the case.
 
 Hardware descriptions:
 - An F8 3850 CPU accompanied by a 3853 memory interface
@@ -75,9 +77,6 @@ private:
 	output_finder<4> m_digits;
 	output_finder<4> m_leds;
 };
-
-
-#define MAIN_CLOCK  1000000
 
 
 READ8_MEMBER( mk1_state::mk1_f8_r )
@@ -186,13 +185,12 @@ void mk1_state::machine_start()
 
 MACHINE_CONFIG_START(mk1_state::mk1)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD( "maincpu", F8, MAIN_CLOCK )        /* MK3850 */
+	MCFG_DEVICE_ADD( "maincpu", F8, 2000000 ) // MK3850
 	MCFG_DEVICE_PROGRAM_MAP(mk1_mem)
 	MCFG_DEVICE_IO_MAP(mk1_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("f3853", f3853_device, int_acknowledge)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	f3853_device &f3853(F3853(config, "f3853", MAIN_CLOCK));
+	f3853_device &f3853(F3853(config, "f3853", 2000000));
 	f3853.int_req_callback().set_inputline("maincpu", F8_INPUT_LINE_INT_REQ);
 
 	/* video hardware */
@@ -214,6 +212,5 @@ ROM_END
 
 ***************************************************************************/
 
-// seams to be developed by mostek (MK)
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  STATE      INIT        COMPANY  FULLNAME                FLAGS
 CONS( 1979, ccmk1, 0,      0,      mk1,     mk1,   mk1_state, empty_init, "Novag", "Chess Champion: MK I", MACHINE_NO_SOUND_HW )

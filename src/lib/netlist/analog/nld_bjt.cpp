@@ -5,9 +5,9 @@
  *
  */
 
-#include "../solver/nld_solver.h"
+#include "netlist/solver/nld_solver.h"
+#include "netlist/nl_setup.h"
 #include "nlid_twoterm.h"
-#include "../nl_setup.h"
 
 #include <cmath>
 
@@ -209,15 +209,13 @@ NETLIB_OBJECT_DERIVED(QBJT_switch, QBJT)
 	NETLIB_UPDATE_PARAMI();
 	NETLIB_UPDATE_TERMINALSI();
 
+private:
 	nld_twoterm m_RB;
 	nld_twoterm m_RC;
 
 	// FIXME: this is needed so we have all terminals belong to one net list
 
 	nld_twoterm m_BC_dummy;
-
-protected:
-
 
 	nl_double m_gB; // base conductance / switch on
 	nl_double m_gC; // collector conductance / switch on
@@ -248,10 +246,6 @@ public:
 		register_subalias("B", m_D_EB.m_N);   // Anode
 
 		register_subalias("C", m_D_CB.m_P);   // Cathode
-		//register_term("_B1", m_D_CB.m_N); // Anode
-
-		//register_term("_E1", m_D_EC.m_P);
-		//register_term("_C1", m_D_EC.m_N);
 
 		connect(m_D_EB.m_P, m_D_EC.m_P);
 		connect(m_D_EB.m_N, m_D_CB.m_N);
@@ -265,10 +259,10 @@ protected:
 	NETLIB_UPDATE_PARAMI();
 	NETLIB_UPDATE_TERMINALSI();
 
+private:
 	generic_diode m_gD_BC;
 	generic_diode m_gD_BE;
 
-private:
 	nld_twoterm m_D_CB;  // gcc, gce - gcc, gec - gcc, gcc - gce | Ic
 	nld_twoterm m_D_EB;  // gee, gec - gee, gce - gee, gee - gec | Ie
 	nld_twoterm m_D_EC;  // 0, -gec, -gcc, 0 | 0
@@ -430,8 +424,8 @@ NETLIB_UPDATE_PARAM(QBJT_EB)
 	} //namespace analog
 
 	namespace devices {
-		NETLIB_DEVICE_IMPL_NS(analog, QBJT_EB)
-		NETLIB_DEVICE_IMPL_NS(analog, QBJT_switch)
-	}
+		NETLIB_DEVICE_IMPL_NS(analog, QBJT_EB, "QBJT_EB", "MODEL")
+		NETLIB_DEVICE_IMPL_NS(analog, QBJT_switch, "QBJT_SW", "MODEL")
+	} // namespace devices
 
 } // namespace netlist

@@ -8414,7 +8414,7 @@ void seta_state::daioh(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(57.42);   /* verified on PCB */;
+	screen.set_refresh_hz(57.42);   /* verified on PCB */
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
@@ -8451,7 +8451,7 @@ void seta_state::daiohp(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(57.42);   /* verified on PCB */;
+	screen.set_refresh_hz(57.42);   /* verified on PCB */
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
@@ -10836,8 +10836,7 @@ ROM_START( msgundamb ) // 2 PCB stack, one has a 'Tecnoval - tecnologia valencia
 
 	ROM_REGION( 0x200000, "gfx2", 0 )   /* Layer 1, on lower board */
 	ROM_LOAD16_BYTE( "27c8001-6.bin", 0x000000, 0x100000, CRC(8fbb5478) SHA1(247fd080f0ee18282c4d8b918171cfeab4b40d23) ) // 1ST AND 2ND HALF IDENTICAL, fa001006.u23 [even] IDENTICAL
-	ROM_LOAD16_BYTE( "27c8001-5.bin", 0x000001, 0x100000, BAD_DUMP CRC(9e10c071) SHA1(2ec1cee04433b30c908548642e7c19862151c8a2) ) // 1ST AND 2ND HALF IDENTICAL, fa001006.u23 [odd]  77.495193% - bad, causes GFX glitches
-	// ROM_LOAD16_BYTE( "5_handcrafted.bin", 0x000001, 0x100000, CRC(c83ae34a) SHA1(d7bf49843c443c5b7cb9187404a3518eaed577a6) ) // this was de-interleaved from the original, left here to easily verify an eventual redump
+	ROM_LOAD16_BYTE( "27c8001-5.bin", 0x000001, 0x100000, CRC(c83ae34a) SHA1(d7bf49843c443c5b7cb9187404a3518eaed577a6) ) // 1ST AND 2ND HALF IDENTICAL, fa001006.u23 [odd]  IDENTICAL
 
 	ROM_REGION( 0x080000, "gfx3", 0 )   /* Layer 2, on lower board, identical to the original but split */
 	ROM_LOAD16_BYTE( "d-8.bin", 0x000000, 0x040000, CRC(a03c8345) SHA1(d3c3f0045ebb3d82d82432c212db4a801cb53b60) ) // 27c020
@@ -12202,7 +12201,7 @@ GAME( 1993, madshark,  0,        madshark,  madshark,  seta_state,     empty_ini
 // end credits shows Allumer as developer.
 GAME( 1993, msgundam,  0,        msgundam,  msgundam,  seta_state,     empty_init,     ROT0,   "Banpresto / Allumer",       "Mobile Suit Gundam", 0 )
 GAME( 1993, msgundam1, msgundam, msgundam,  msgundam1, seta_state,     empty_init,     ROT0,   "Banpresto / Allumer",       "Mobile Suit Gundam (Japan)", 0 )
-GAME( 1993, msgundamb, msgundam, msgundamb, msgundam,  seta_state,     empty_init,     ROT0,   "bootleg",                   "Mobile Suit Gundam (bootleg)", MACHINE_IMPERFECT_GRAPHICS ) // GFX glitches due to bad dump
+GAME( 1993, msgundamb, msgundam, msgundamb, msgundam,  seta_state,     empty_init,     ROT0,   "bootleg",                   "Mobile Suit Gundam (bootleg)", 0 )
 
 GAME( 1993, oisipuzl,  0,        oisipuzl,  oisipuzl,  seta_state,     empty_init,     ROT0,   "Sunsoft / Atlus",           "Oishii Puzzle Ha Irimasenka", 0 )
 GAME( 1993, triplfun,  oisipuzl, triplfun,  oisipuzl,  seta_state,     empty_init,     ROT0,   "bootleg",                   "Triple Fun", 0 )

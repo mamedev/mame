@@ -381,20 +381,21 @@ void t4426_cart(device_slot_interface &device)
 //  MACHINE_CONFIG_START( coco_sound )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(coco_state::coco_sound)
+void coco_state::coco_sound(machine_config &config)
+{
 	SPEAKER(config, "speaker").front_center();
 
 	// 6-bit D/A: R10-15 = 10K, 20K, 40.2K, 80.6K, 162K, 324K (according to parts list); output also controls joysticks
-	MCFG_DEVICE_ADD("dac", DAC_6BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.125)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "sbs", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "sbs", -1.0, DAC_VREF_NEG_INPUT)
+	DAC_6BIT_BINARY_WEIGHTED(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.125);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "sbs", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "sbs", -1.0, DAC_VREF_NEG_INPUT);
 
 	// Single-bit sound: R22 = 10K
 	DAC_1BIT(config, "sbs", 0).add_route(ALL_OUTPUTS, "speaker", 0.125);
 
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "speaker", 0.25);
-MACHINE_CONFIG_END
+}
 
 
 //-------------------------------------------------
@@ -434,9 +435,9 @@ MACHINE_CONFIG_START(coco12_state::coco)
 	MCFG_DEVICE_CLOCK(XTAL(14'318'181) / 16)
 
 	// basic machine hardware
-	MCFG_DEVICE_ADD(MAINCPU_TAG, MC6809E, DERIVED_CLOCK(1, 1))
-	MCFG_DEVICE_PROGRAM_MAP(coco_mem)
-	MCFG_DEVICE_DISASSEMBLE_OVERRIDE(coco_state, dasm_override)
+	MC6809E(config, m_maincpu, DERIVED_CLOCK(1, 1));
+	m_maincpu->set_addrmap(AS_PROGRAM, &coco12_state::coco_mem);
+	m_maincpu->set_dasm_override(FUNC(coco_state::dasm_override));
 
 	// devices
 	pia6821_device &pia0(PIA6821(config, PIA0_TAG, 0));
@@ -461,7 +462,7 @@ MACHINE_CONFIG_START(coco12_state::coco)
 	m_sam->res_rd_callback().set(FUNC(coco12_state::sam_read));
 
 	// Becker Port device
-	MCFG_DEVICE_ADD(DWSOCK_TAG, COCO_DWSOCK, 0)
+	COCO_DWSOCK(config, DWSOCK_TAG, 0);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(coco_cassette_formats);
@@ -495,19 +496,18 @@ MACHINE_CONFIG_START(coco12_state::coco)
 	coco_floating(config);
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("coco_cart_list", "coco_cart")
-	MCFG_SOFTWARE_LIST_FILTER("coco_cart_list", "COCO")
-	MCFG_SOFTWARE_LIST_ADD("coco_flop_list", "coco_flop")
-	MCFG_SOFTWARE_LIST_FILTER("coco_flop_list", "COCO")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("dragon_cart_list", "dragon_cart")
+	SOFTWARE_LIST(config, "coco_cart_list").set_original("coco_cart").set_filter("COCO");
+	SOFTWARE_LIST(config, "coco_flop_list").set_original("coco_flop").set_filter("COCO");
+	SOFTWARE_LIST(config, "dragon_cart_list").set_compatible("dragon_cart");
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(coco12_state::cocoh)
+void coco12_state::cocoh(machine_config &config)
+{
 	coco(config);
-	MCFG_DEVICE_REPLACE(MAINCPU_TAG, HD6309E, DERIVED_CLOCK(1, 1))
-	MCFG_DEVICE_PROGRAM_MAP(coco_mem)
+	HD6309E(config.replace(), m_maincpu, DERIVED_CLOCK(1, 1));
+	m_maincpu->set_addrmap(AS_PROGRAM, &coco12_state::coco_mem);
 	m_ram->set_default_size("64K");
-MACHINE_CONFIG_END
+}
 
 void coco12_state::cocoe(machine_config &config)
 {
@@ -520,12 +520,13 @@ void coco12_state::cocoe(machine_config &config)
 	COCO_VHD(config, m_vhd_1, 0, m_maincpu);
 }
 
-MACHINE_CONFIG_START(coco12_state::cocoeh)
+void coco12_state::cocoeh(machine_config &config)
+{
 	cocoe(config);
-	MCFG_DEVICE_REPLACE(MAINCPU_TAG, HD6309E, DERIVED_CLOCK(1, 1))
-	MCFG_DEVICE_PROGRAM_MAP(coco_mem)
+	HD6309E(config.replace(), m_maincpu, DERIVED_CLOCK(1, 1));
+	m_maincpu->set_addrmap(AS_PROGRAM, &coco12_state::coco_mem);
 	m_ram->set_default_size("64K");
-MACHINE_CONFIG_END
+}
 
 void coco12_state::coco2(machine_config &config)
 {
@@ -538,12 +539,13 @@ void coco12_state::coco2(machine_config &config)
 	COCO_VHD(config, m_vhd_1, 0, m_maincpu);
 }
 
-MACHINE_CONFIG_START(coco12_state::coco2h)
+void coco12_state::coco2h(machine_config &config)
+{
 	coco2(config);
-	MCFG_DEVICE_REPLACE(MAINCPU_TAG, HD6309E, DERIVED_CLOCK(1, 1))
-	MCFG_DEVICE_PROGRAM_MAP(coco_mem)
+	HD6309E(config.replace(), m_maincpu, DERIVED_CLOCK(1, 1));
+	m_maincpu->set_addrmap(AS_PROGRAM, &coco12_state::coco_mem);
 	m_ram->set_default_size("64K");
-MACHINE_CONFIG_END
+}
 
 void coco12_state::coco2b(machine_config &config)
 {
@@ -555,12 +557,13 @@ void coco12_state::coco2b(machine_config &config)
 	m_vdg->input_callback().set(m_sam, FUNC(sam6883_device::display_read));
 }
 
-MACHINE_CONFIG_START(coco12_state::coco2bh)
+void coco12_state::coco2bh(machine_config &config)
+{
 	coco2b(config);
-	MCFG_DEVICE_REPLACE(MAINCPU_TAG, HD6309E, DERIVED_CLOCK(1, 1))
-	MCFG_DEVICE_PROGRAM_MAP(coco_mem)
+	HD6309E(config.replace(), m_maincpu, DERIVED_CLOCK(1, 1));
+	m_maincpu->set_addrmap(AS_PROGRAM, &coco12_state::coco_mem);
 	m_ram->set_default_size("64K");
-MACHINE_CONFIG_END
+}
 
 void coco12_state::cp400(machine_config &config)
 {

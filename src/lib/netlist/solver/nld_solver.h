@@ -8,11 +8,13 @@
 #ifndef NLD_SOLVER_H_
 #define NLD_SOLVER_H_
 
-#include <map>
-
-#include "../nl_base.h"
-#include "../plib/pstream.h"
+#include "netlist/nl_base.h"
+#include "plib/pstream.h"
 #include "nld_matrix_solver.h"
+
+#include <map>
+#include <memory>
+#include <vector>
 
 //#define ATTR_ALIGNED(N) __attribute__((aligned(N)))
 #define ATTR_ALIGNED(N) ATTR_ALIGN
@@ -41,29 +43,31 @@ NETLIB_OBJECT(solver)
 	, m_gs_sor(*this, "SOR_FACTOR", 1.059)
 	, m_method(*this, "METHOD", "MAT_CR")
 	, m_accuracy(*this, "ACCURACY", 1e-7)
-	, m_gs_loops(*this, "GS_LOOPS",9)              // Gauss-Seidel loops
+	, m_gs_loops(*this, "GS_LOOPS", 9)              // Gauss-Seidel loops
 
 	/* general parameters */
-	, m_gmin(*this, "GMIN", NETLIST_GMIN_DEFAULT)
-	, m_pivot(*this, "PIVOT", 0)                    // use pivoting - on supported solvers
+	, m_gmin(*this, "GMIN", 1e-9)
+	, m_pivot(*this, "PIVOT", false)                    // use pivoting - on supported solvers
 	, m_nr_loops(*this, "NR_LOOPS", 250)            // Newton-Raphson loops
 	, m_nr_recalc_delay(*this, "NR_RECALC_DELAY", NLTIME_FROM_NS(10).as_double()) // Delay to next solve attempt if nr loops exceeded
 	, m_parallel(*this, "PARALLEL", 0)
 
 	/* automatic time step */
-	, m_dynamic_ts(*this, "DYNAMIC_TS", 0)
+	, m_dynamic_ts(*this, "DYNAMIC_TS", false)
 	, m_dynamic_lte(*this, "DYNAMIC_LTE", 1e-5)                     // diff/timestep
 	, m_dynamic_min_ts(*this, "DYNAMIC_MIN_TIMESTEP", 1e-6)   // nl_double timestep resolution
 
-	, m_log_stats(*this, "LOG_STATS", 1)   // log statistics on shutdown
+	/* special */
+	, m_use_gabs(*this, "USE_GABS", true)
+	, m_use_linear_prediction(*this, "USE_LINEAR_PREDICTION", false) // // savings are eaten up by effort
+
+	, m_log_stats(*this, "LOG_STATS", true)   // log statistics on shutdown
 	, m_params()
 	{
 		// internal staff
 
 		connect(m_fb_step, m_Q_step);
 	}
-
-	virtual ~NETLIB_NAME(solver)() override;
 
 	void post_start();
 	void stop();
@@ -76,7 +80,7 @@ NETLIB_OBJECT(solver)
 	NETLIB_RESETI();
 	// NETLIB_UPDATE_PARAMI();
 
-protected:
+private:
 	logic_input_t m_fb_step;
 	logic_output_t m_Q_step;
 
@@ -94,16 +98,22 @@ protected:
 	param_double_t m_dynamic_lte;
 	param_double_t m_dynamic_min_ts;
 
+	param_logic_t m_use_gabs;
+	param_logic_t m_use_linear_prediction;
+
 	param_logic_t  m_log_stats;
 
-private:
-	std::vector<matrix_solver_t *> m_mat_solvers;
+	std::vector<poolptr<matrix_solver_t>> m_mat_solvers;
+	std::vector<matrix_solver_t *> m_mat_solvers_all;
 	std::vector<matrix_solver_t *> m_mat_solvers_timestepping;
 
 	solver_parameters_t m_params;
 
 	template <typename FT, int SIZE>
-	matrix_solver_t * create_solver(std::size_t size, const pstring &solvername);
+	poolptr<matrix_solver_t> create_solver(std::size_t size, const pstring &solvername);
+
+	template <typename FT, int SIZE>
+	poolptr<matrix_solver_t> create_solver_x(std::size_t size, const pstring &solvername);
 };
 
 	} //namespace devices

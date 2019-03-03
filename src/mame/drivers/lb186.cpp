@@ -132,10 +132,11 @@ FLOPPY_FORMATS_MEMBER( lb186_state::floppy_formats )
 	FLOPPY_NASLITE_FORMAT
 FLOPPY_FORMATS_END
 
-MACHINE_CONFIG_START(lb186_state::lb186)
-	MCFG_DEVICE_ADD("maincpu", I80186, 16_MHz_XTAL / 2)
-	MCFG_DEVICE_PROGRAM_MAP(lb186_map)
-	MCFG_DEVICE_IO_MAP(lb186_io)
+void lb186_state::lb186(machine_config &config)
+{
+	I80186(config, m_maincpu, 16_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &lb186_state::lb186_map);
+	m_maincpu->set_addrmap(AS_IO, &lb186_state::lb186_io);
 
 	scn2681_device &duart(SCN2681(config, "duart", 3.6864_MHz_XTAL));
 	duart.irq_cb().set(m_maincpu, FUNC(i80186_cpu_device::int0_w));
@@ -151,22 +152,21 @@ MACHINE_CONFIG_START(lb186_state::lb186)
 	WD1772(config, m_fdc, 16_MHz_XTAL / 2);
 	m_fdc->intrq_wr_callback().set(m_maincpu, FUNC(i80186_cpu_device::int2_w));
 	m_fdc->drq_wr_callback().set(m_maincpu, FUNC(i80186_cpu_device::drq0_w));
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", lb186_floppies, "525dd", lb186_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", lb186_floppies, nullptr, lb186_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:2", lb186_floppies, nullptr, lb186_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:3", lb186_floppies, nullptr, lb186_state::floppy_formats)
+	FLOPPY_CONNECTOR(config, "fdc:0", lb186_floppies, "525dd", lb186_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", lb186_floppies, nullptr, lb186_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:2", lb186_floppies, nullptr, lb186_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:3", lb186_floppies, nullptr, lb186_state::floppy_formats);
 
-	MCFG_NSCSI_BUS_ADD("scsibus")
-	MCFG_NSCSI_ADD("scsibus:0", scsi_devices, "harddisk", false)
-	MCFG_NSCSI_ADD("scsibus:1", scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:2", scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:3", scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:4", scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:5", scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:6", scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:7", scsi_devices, "ncr5380", true)
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("ncr5380", lb186_state::ncr5380)
-MACHINE_CONFIG_END
+	NSCSI_BUS(config, "scsibus");
+	NSCSI_CONNECTOR(config, "scsibus:0", scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "scsibus:1", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:2", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:3", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:4", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:5", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:6", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:7", scsi_devices, "ncr5380", true).set_option_machine_config("ncr5380", lb186_state::ncr5380);
+}
 
 ROM_START( lb186 )
 	ROM_REGION(0x4000, "bios", 0)

@@ -556,8 +556,8 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(sbrkout_state::sbrkout)
-
+void sbrkout_state::sbrkout(machine_config &config)
+{
 	/* basic machine hardware */
 	M6502(config, m_maincpu, MAIN_CLOCK/16); // 375 KHz? Should be 750KHz?
 	m_maincpu->set_addrmap(AS_PROGRAM, &sbrkout_state::main_map);
@@ -576,7 +576,7 @@ MACHINE_CONFIG_START(sbrkout_state::sbrkout)
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 8);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sbrkout)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sbrkout);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(MAIN_CLOCK/2, 384, 0, 256, 262, 0, 224);
@@ -588,8 +588,8 @@ MACHINE_CONFIG_START(sbrkout_state::sbrkout)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
-	VOLTAGE_REGULATOR(config, "vref").set_output(5.0).add_route(0, m_dac, 1.0, DAC_VREF_POS_INPUT);
-MACHINE_CONFIG_END
+	VOLTAGE_REGULATOR(config, "vref").add_route(0, m_dac, 1.0, DAC_VREF_POS_INPUT);
+}
 
 
 void sbrkoutct_state::sbrkoutct(machine_config &config)

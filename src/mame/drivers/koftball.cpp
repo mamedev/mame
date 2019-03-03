@@ -255,7 +255,7 @@ MACHINE_CONFIG_START(koftball_state::koftball)
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
 	ramdac.set_addrmap(0, &koftball_state::ramdac_map);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_koftball)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_koftball);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

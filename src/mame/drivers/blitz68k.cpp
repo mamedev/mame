@@ -925,17 +925,17 @@ WRITE16_MEMBER(blitz68k_state::cjffruit_leds3_w)
 READ8_MEMBER(blitz68k_state::crtc_r)
 {
 	if (offset)
-		return m_crtc->register_r(space, 0);
+		return m_crtc->register_r();
 	else
-		return m_crtc->status_r(space, 0);
+		return m_crtc->status_r();
 }
 
 WRITE8_MEMBER(blitz68k_state::crtc_w)
 {
 	if (offset)
-		m_crtc->register_w(space, 0, data);
+		m_crtc->register_w(data);
 	else
-		m_crtc->address_w(space, 0, data);
+		m_crtc->address_w(data);
 }
 
 WRITE16_MEMBER(blitz68k_state::crtc_lpen_w)

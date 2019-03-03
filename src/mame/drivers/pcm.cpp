@@ -272,7 +272,7 @@ MACHINE_CONFIG_START(pcm_state::pcm)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 16*8-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pcm)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_pcm);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* Sound */

@@ -459,7 +459,7 @@ WRITE8_MEMBER(peplus_state::crtc_display_w)
 	m_bg_tilemap->mark_tile_dirty(m_vid_address);
 
 	/* An access here triggers a device read !*/
-	m_crtc->register_r(space, 0);
+	m_crtc->register_r();
 }
 
 WRITE8_MEMBER(peplus_state::duart_w)
@@ -1371,7 +1371,8 @@ void peplus_state::machine_start()
 *     Machine Driver     *
 *************************/
 
-MACHINE_CONFIG_START(peplus_state::peplus)
+void peplus_state::peplus(machine_config &config)
+{
 	// basic machine hardware
 	I80C32(config, m_maincpu, XTAL(20'000'000)/2); // 10MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &peplus_state::main_map);
@@ -1399,7 +1400,7 @@ MACHINE_CONFIG_START(peplus_state::peplus)
 	m_crtc->set_on_update_addr_change_callback(FUNC(peplus_state::crtc_addr), this);
 	m_crtc->out_vsync_callback().set(FUNC(peplus_state::crtc_vsync));
 
-	X2404P(config, m_i2cmem);
+	I2C_X2404P(config, m_i2cmem);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

@@ -78,7 +78,6 @@ Sonic Hedgehog 2           171-6215A   837-6963-62       610-0239-62         MPR
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/cxd1095.h"
-#include "sound/sn76496.h"
 #include "rendlay.h"
 
 #include "includes/megadriv.h"
@@ -134,8 +133,7 @@ private:
 	DECLARE_READ8_MEMBER(bios_joypad_r);
 	DECLARE_WRITE8_MEMBER(bios_port_7f_w);
 	DECLARE_READ8_MEMBER(vdp1_count_r);
-	DECLARE_READ8_MEMBER(sms_count_r);
-	DECLARE_WRITE8_MEMBER(sms_sn_w);
+	u8 sms_count_r(offs_t offset);
 	DECLARE_READ8_MEMBER(sms_ioport_dc_r);
 	DECLARE_READ8_MEMBER(sms_ioport_dd_r);
 	DECLARE_WRITE8_MEMBER(mt_sms_standard_rom_bank_w);
@@ -161,7 +159,7 @@ private:
 
 	uint8_t m_mt_cart_select_reg;
 	uint32_t m_bios_port_ctrl;
-	int m_current_MACHINE_IS_sms; // is the current game SMS based (running on genesis z80, in VDP compatibility mode)
+	int m_current_machine_is_sms; // is the current game SMS based (running on genesis z80, in VDP compatibility mode)
 	uint32_t m_bios_ctrl_inputs;
 	uint8_t m_bios_ctrl[6];
 	int m_mt_bank_addr;
@@ -322,19 +320,12 @@ INPUT_PORTS_END
 
 /* MEGATECH specific */
 
-READ8_MEMBER(mtech_state::sms_count_r)
+u8 mtech_state::sms_count_r(offs_t offset)
 {
-	address_space &prg = m_z80snd->space(AS_PROGRAM);
 	if (offset & 0x01)
-		return m_vdp->hcount_read(prg, offset);
+		return m_vdp->hcount_read();
 	else
-		return m_vdp->vcount_read(prg, offset);
-}
-
-WRITE8_MEMBER(mtech_state::sms_sn_w)
-{
-	address_space &prg = m_z80snd->space(AS_PROGRAM);
-	m_vdp->vdp_w(prg, 0x10 >> 1, data, 0x00ff);
+		return m_vdp->vcount_read();
 }
 
 READ8_MEMBER (mtech_state::sms_ioport_dc_r)
@@ -398,10 +389,10 @@ void mtech_state::set_genz80_as_sms()
 	prg.install_write_handler(0xfffc, 0xffff, write8_delegate(FUNC(mtech_state::mt_sms_standard_rom_bank_w),this));
 
 	// ports
-	io.install_read_handler      (0x40, 0x41, 0, 0x3e, 0, read8_delegate(FUNC(mtech_state::sms_count_r),this));
-	io.install_write_handler     (0x40, 0x41, 0, 0x3e, 0, write8_delegate(FUNC(mtech_state::sms_sn_w),this));
-	io.install_readwrite_handler (0x80, 0x80, 0, 0x3e, 0, read8_delegate(FUNC(sega315_5124_device::data_read),(sega315_5124_device *)m_vdp), write8_delegate(FUNC(sega315_5124_device::data_write),(sega315_5124_device *)m_vdp));
-	io.install_readwrite_handler (0x81, 0x81, 0, 0x3e, 0, read8_delegate(FUNC(sega315_5124_device::control_read),(sega315_5124_device *)m_vdp), write8_delegate(FUNC(sega315_5124_device::control_write),(sega315_5124_device *)m_vdp));
+	io.install_read_handler      (0x40, 0x41, 0, 0x3e, 0, read8sm_delegate(FUNC(mtech_state::sms_count_r),this));
+	io.install_write_handler     (0x40, 0x41, 0, 0x3e, 0, write8smo_delegate(FUNC(sega315_5124_device::psg_w),(sega315_5124_device *)m_vdp));
+	io.install_readwrite_handler (0x80, 0x80, 0, 0x3e, 0, read8smo_delegate(FUNC(sega315_5124_device::data_read),(sega315_5124_device *)m_vdp), write8smo_delegate(FUNC(sega315_5124_device::data_write),(sega315_5124_device *)m_vdp));
+	io.install_readwrite_handler (0x81, 0x81, 0, 0x3e, 0, read8smo_delegate(FUNC(sega315_5124_device::control_read),(sega315_5124_device *)m_vdp), write8smo_delegate(FUNC(sega315_5124_device::control_write),(sega315_5124_device *)m_vdp));
 
 	io.install_read_handler      (0x10, 0x10, read8_delegate(FUNC(mtech_state::sms_ioport_dd_r),this)); // super tetris
 
@@ -422,7 +413,7 @@ void mtech_state::set_genz80_as_md()
 
 	prg.install_ram(0x0000, 0x1fff, m_genz80.z80_prgram.get());
 
-	prg.install_readwrite_handler(0x4000, 0x4003, read8_delegate(FUNC(ym2612_device::read), (ym2612_device *)m_ymsnd), write8_delegate(FUNC(ym2612_device::write), (ym2612_device *)m_ymsnd));
+	prg.install_readwrite_handler(0x4000, 0x4003, read8sm_delegate(FUNC(ym2612_device::read), (ym2612_device *)m_ymsnd), write8sm_delegate(FUNC(ym2612_device::write), (ym2612_device *)m_ymsnd));
 	prg.install_write_handler    (0x6000, 0x6000, write8_delegate(FUNC(mtech_state::megadriv_z80_z80_bank_w),this));
 	prg.install_write_handler    (0x6001, 0x6001, write8_delegate(FUNC(mtech_state::megadriv_z80_z80_bank_w),this));
 	prg.install_read_handler     (0x6100, 0x7eff, read8_delegate(FUNC(mtech_state::megadriv_z80_unmapped_read),this));
@@ -452,7 +443,7 @@ void mtech_state::switch_cart(int gameno)
 		if (!m_cart_is_genesis[gameno])
 		{
 			logerror("enabling SMS Z80\n");
-			m_current_MACHINE_IS_sms = 1;
+			m_current_machine_is_sms = 1;
 			set_genz80_as_sms();
 			//m_z80snd->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 			m_z80snd->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
@@ -460,7 +451,7 @@ void mtech_state::switch_cart(int gameno)
 		else
 		{
 			logerror("disabling SMS Z80\n");
-			m_current_MACHINE_IS_sms = 0;
+			m_current_machine_is_sms = 0;
 			set_genz80_as_md();
 			m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 			//m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
@@ -586,18 +577,17 @@ WRITE8_MEMBER(mtech_state::bios_port_7f_w)
 
 READ8_MEMBER(mtech_state::vdp1_count_r)
 {
-	address_space &prg = m_bioscpu->space(AS_PROGRAM);
 	if (offset & 0x01)
-		return m_vdp1->hcount_read(prg, offset);
+		return m_vdp1->hcount_read();
 	else
-		return m_vdp1->vcount_read(prg, offset);
+		return m_vdp1->vcount_read();
 }
 
 void mtech_state::megatech_bios_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x3f, 0x3f).w(FUNC(mtech_state::bios_port_ctrl_w));
-	map(0x7f, 0x7f).w(FUNC(mtech_state::bios_port_7f_w));
+	map(0x7f, 0x7f).w(FUNC(mtech_state::bios_port_7f_w)); // PSG?
 
 	map(0x40, 0x41).mirror(0x3e).r(FUNC(mtech_state::vdp1_count_r));
 	map(0x80, 0x80).mirror(0x3e).rw(m_vdp1, FUNC(sega315_5124_device::data_read), FUNC(sega315_5124_device::data_write));
@@ -630,7 +620,7 @@ void mtech_state::init_mt_crt()
 uint32_t mtech_state::screen_update_main(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// if we're running an sms game then use the SMS update.. maybe this should be moved to the megadrive emulation core as compatibility mode is a feature of the chip
-	if (!m_current_MACHINE_IS_sms)
+	if (!m_current_machine_is_sms)
 		screen_update_megadriv(screen, bitmap, cliprect);
 	else
 	{
@@ -652,7 +642,7 @@ uint32_t mtech_state::screen_update_main(screen_device &screen, bitmap_rgb32 &bi
 
 WRITE_LINE_MEMBER(mtech_state::screen_vblank_main)
 {
-	if (!m_current_MACHINE_IS_sms)
+	if (!m_current_machine_is_sms)
 		screen_vblank_megadriv(state);
 }
 
@@ -696,9 +686,9 @@ MACHINE_CONFIG_START(mtech_state::megatech)
 	md_ntsc(config);
 
 	/* Megatech has an extra SMS based bios *and* an additional screen */
-	MCFG_DEVICE_ADD("mtbios", Z80, MASTER_CLOCK / 15) /* ?? */
-	MCFG_DEVICE_PROGRAM_MAP(megatech_bios_map)
-	MCFG_DEVICE_IO_MAP(megatech_bios_portmap)
+	Z80(config, m_bioscpu, MASTER_CLOCK / 15); /* ?? */
+	m_bioscpu->set_addrmap(AS_PROGRAM, &mtech_state::megatech_bios_map);
+	m_bioscpu->set_addrmap(AS_IO, &mtech_state::megatech_bios_portmap);
 
 	cxd1095_device &io1(CXD1095(config, "io1", 0));
 	io1.in_porta_cb().set_ioport("BIOS_DSW0");
@@ -733,15 +723,12 @@ MACHINE_CONFIG_START(mtech_state::megatech)
 			sega315_5124_device::HEIGHT_NTSC, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT + 224)
 	MCFG_SCREEN_UPDATE_DRIVER(mtech_state, screen_update_menu)
 
-	SEGA315_5246(config, m_vdp1, 0);
+	SEGA315_5246(config, m_vdp1, MASTER_CLOCK / 5); /* ?? */
 	m_vdp1->set_screen("menu");
 	m_vdp1->set_is_pal(false);
 	m_vdp1->irq().set_inputline(m_bioscpu, 0);
-
-	/* sound hardware */
-	MCFG_DEVICE_ADD("sn2", SN76496, MASTER_CLOCK/15)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
+	m_vdp1->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
+	m_vdp1->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
 MACHINE_CONFIG_END
 
 
@@ -796,7 +783,7 @@ MACHINE_CONFIG_START(mtech_state::megatech_multislot)
 	MCFG_MEGATECH_CARTSLOT_ADD("mt_slot7", mt_cart7)
 	MCFG_MEGATECH_CARTSLOT_ADD("mt_slot8", mt_cart8)
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list","megatech")
+	SOFTWARE_LIST(config, "cart_list").set_original("megatech");
 MACHINE_CONFIG_END
 
 

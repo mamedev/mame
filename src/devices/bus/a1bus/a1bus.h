@@ -13,19 +13,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_A1BUS_CPU(_cputag) \
-	downcast<a1bus_device &>(*device).set_cputag(_cputag);
-
-#define MCFG_A1BUS_OUT_IRQ_CB(_devcb) \
-	downcast<a1bus_device &>(*device).set_out_irq_callback(DEVCB_##_devcb);
-
-#define MCFG_A1BUS_OUT_NMI_CB(_devcb) \
-	downcast<a1bus_device &>(*device).set_out_nmi_callback(DEVCB_##_devcb);
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -73,8 +60,8 @@ public:
 
 	// inline configuration
 	template <typename T> void set_cputag(T &&tag) { m_maincpu.set_tag(std::forward<T>(tag)); }
-	template <class Object> devcb_base &set_out_irq_callback(Object &&cb) { return m_out_irq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_nmi_callback(Object &&cb) { return m_out_nmi_cb.set_callback(std::forward<Object>(cb)); }
+	auto out_irq_callback() { return m_out_irq_cb.bind(); }
+	auto out_nmi_callback() { return m_out_nmi_cb.bind(); }
 
 	void add_a1bus_card(device_a1bus_card_interface *card);
 	device_a1bus_card_interface *get_a1bus_card();

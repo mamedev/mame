@@ -6,9 +6,9 @@
  */
 
 #include "nl_parser.h"
-#include "nl_factory.h"
-#include "nl_errstr.h"
 #include "nl_base.h"
+#include "nl_errstr.h"
+#include "nl_factory.h"
 
 namespace netlist
 {
@@ -357,7 +357,7 @@ void parser_t::device(const pstring &dev_type)
 	m_setup.register_dev(dev_type, devname);
 	m_setup.log().debug("Parser: IC: {1}\n", devname);
 
-	for (pstring tp : paramlist)
+	for (const pstring &tp : paramlist)
 	{
 		require_token(m_tok_comma);
 		if (plib::startsWith(tp, "+"))
@@ -395,15 +395,14 @@ void parser_t::device(const pstring &dev_type)
 // ----------------------------------------------------------------------------------------
 
 
-nl_double parser_t::eval_param(const token_t tok)
+nl_double parser_t::eval_param(const token_t &tok)
 {
-	static pstring macs[6] = {"", "RES_K", "RES_M", "CAP_U", "CAP_N", "CAP_P"};
-	static nl_double facs[6] = {1, 1e3, 1e6, 1e-6, 1e-9, 1e-12};
-	int i;
-	int f=0;
+	static std::array<pstring, 6> macs = {"", "RES_K", "RES_M", "CAP_U", "CAP_N", "CAP_P"};
+	static std::array<nl_double, 6> facs = {1, 1e3, 1e6, 1e-6, 1e-9, 1e-12};
+	std::size_t f=0;
 	nl_double ret;
 
-	for (i=1; i<6;i++)
+	for (std::size_t i=1; i<macs.size();i++)
 		if (tok.str() == macs[i])
 			f = i;
 	if (f>0)
@@ -423,4 +422,4 @@ nl_double parser_t::eval_param(const token_t tok)
 
 }
 
-}
+} // namespace netlist

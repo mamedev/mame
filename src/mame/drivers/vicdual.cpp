@@ -346,22 +346,22 @@ static INPUT_PORTS_START( depthch )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(vicdual_state::depthch)
+void vicdual_state::depthch(machine_config &config)
+{
 	vicdual_root(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REPLACE("maincpu", I8080, VICDUAL_MAIN_CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(depthch_map)
-	MCFG_DEVICE_IO_MAP(depthch_io_map)
+	I8080(config.replace(), m_maincpu, VICDUAL_MAIN_CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vicdual_state::depthch_map);
+	m_maincpu->set_addrmap(AS_IO, &vicdual_state::depthch_io_map);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(vicdual_state, screen_update_bw)
+	m_screen->set_screen_update(FUNC(vicdual_state::screen_update_bw));
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
 	depthch_audio(config);
-MACHINE_CONFIG_END
+}
 
 
 
@@ -436,18 +436,17 @@ static INPUT_PORTS_START( safari )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(vicdual_state::safari)
+void vicdual_state::safari(machine_config &config)
+{
 	vicdual_root(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(safari_map)
-	MCFG_DEVICE_IO_MAP(safari_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &vicdual_state::safari_map);
+	m_maincpu->set_addrmap(AS_IO, &vicdual_state::safari_io_map);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(vicdual_state, screen_update_bw)
-MACHINE_CONFIG_END
+	m_screen->set_screen_update(FUNC(vicdual_state::screen_update_bw));
+}
 
 
 
@@ -543,24 +542,23 @@ static INPUT_PORTS_START( frogs )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(vicdual_state::frogs)
+void vicdual_state::frogs(machine_config &config)
+{
 	vicdual_root(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(frogs_map)
-	MCFG_DEVICE_IO_MAP(frogs_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &vicdual_state::frogs_map);
+	m_maincpu->set_addrmap(AS_IO, &vicdual_state::frogs_io_map);
 
 	MCFG_MACHINE_START_OVERRIDE(vicdual_state,frogs_audio)
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(vicdual_state, screen_update_bw)
+	m_screen->set_screen_update(FUNC(vicdual_state::screen_update_bw));
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
 	frogs_audio(config);
-MACHINE_CONFIG_END
+}
 
 
 
@@ -815,44 +813,42 @@ static INPUT_PORTS_START( sspaceat )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(vicdual_state::headon)
+void vicdual_state::headon(machine_config &config)
+{
 	vicdual_root(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(headon_map)
-	MCFG_DEVICE_IO_MAP(headon_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &vicdual_state::headon_map);
+	m_maincpu->set_addrmap(AS_IO, &vicdual_state::headon_io_map);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(vicdual_state, screen_update_bw_or_color)
+	m_screen->set_screen_update(FUNC(vicdual_state::screen_update_bw_or_color));
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
 	headon_audio(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(vicdual_state::headons)
+void vicdual_state::headons(machine_config &config)
+{
 	headon(config);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(vicdual_state, screen_update_bw)
-MACHINE_CONFIG_END
+	m_screen->set_screen_update(FUNC(vicdual_state::screen_update_bw));
+}
 
 
-MACHINE_CONFIG_START(vicdual_state::sspaceat)
+void vicdual_state::sspaceat(machine_config &config)
+{
 	vicdual_root(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(headon_map)
-	MCFG_DEVICE_IO_MAP(sspaceat_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &vicdual_state::headon_map);
+	m_maincpu->set_addrmap(AS_IO, &vicdual_state::sspaceat_io_map);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(vicdual_state, screen_update_bw_or_color)
-MACHINE_CONFIG_END
+	m_screen->set_screen_update(FUNC(vicdual_state::screen_update_bw_or_color));
+}
 
 
 
@@ -1046,47 +1042,44 @@ MACHINE_RESET_MEMBER( vicdual_state, headon2 )
 }
 
 
-MACHINE_CONFIG_START(vicdual_state::headon2)
+void vicdual_state::headon2(machine_config &config)
+{
 	vicdual_root(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(headon2_map)
-	MCFG_DEVICE_IO_MAP(headon2_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &vicdual_state::headon2_map);
+	m_maincpu->set_addrmap(AS_IO, &vicdual_state::headon2_io_map);
 
 	MCFG_MACHINE_RESET_OVERRIDE(vicdual_state, headon2)
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(vicdual_state, screen_update_color)
+	m_screen->set_screen_update(FUNC(vicdual_state::screen_update_color));
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
 	headon_audio(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(vicdual_state::headon2bw)
+void vicdual_state::headon2bw(machine_config &config)
+{
 	headon2(config);
 
-	/* basic machine hardware */
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(vicdual_state, screen_update_bw)
-MACHINE_CONFIG_END
+	m_screen->set_screen_update(FUNC(vicdual_state::screen_update_bw));
+}
 
 
-MACHINE_CONFIG_START(vicdual_state::digger)
+void vicdual_state::digger(machine_config &config)
+{
 	vicdual_root(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(headon2_map)
-	MCFG_DEVICE_IO_MAP(digger_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &vicdual_state::headon2_map);
+	m_maincpu->set_addrmap(AS_IO, &vicdual_state::digger_io_map);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(vicdual_state, screen_update_color)
-MACHINE_CONFIG_END
+	m_screen->set_screen_update(FUNC(vicdual_state::screen_update_color));
+}
 
 
 
@@ -2121,170 +2114,169 @@ static INPUT_PORTS_START( headonn )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(vicdual_state::vicdual_dualgame_root)
+void vicdual_state::vicdual_dualgame_root(machine_config &config)
+{
 	vicdual_root(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(vicdual_dualgame_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &vicdual_state::vicdual_dualgame_map);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(vicdual_state, screen_update_color)
-MACHINE_CONFIG_END
+	m_screen->set_screen_update(FUNC(vicdual_state::screen_update_color));
+}
 
 
 
-MACHINE_CONFIG_START(vicdual_state::invho2)
+void vicdual_state::invho2(machine_config &config)
+{
 	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(invho2_io_map)
+	m_maincpu->set_addrmap(AS_IO, &vicdual_state::invho2_io_map);
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
 	invinco_audio(config);
 	headon_audio(config);
-MACHINE_CONFIG_END
+}
 
 
 
-MACHINE_CONFIG_START(vicdual_state::invds)
+void vicdual_state::invds(machine_config &config)
+{
 	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(invds_io_map)
+	m_maincpu->set_addrmap(AS_IO, &vicdual_state::invds_io_map);
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
 	invinco_audio(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(vicdual_state::carhntds)
+void vicdual_state::carhntds(machine_config &config)
+{
 	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(carhntds_dualgame_map)
-	MCFG_DEVICE_IO_MAP(carhntds_io_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &vicdual_state::carhntds_dualgame_map);
+	m_maincpu->set_addrmap(AS_IO, &vicdual_state::carhntds_io_map);
+}
 
 
-MACHINE_CONFIG_START(vicdual_state::sspacaho)
+void vicdual_state::sspacaho(machine_config &config)
+{
 	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(sspacaho_io_map)
+	m_maincpu->set_addrmap(AS_IO, &vicdual_state::sspacaho_io_map);
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
 	headon_audio(config);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(vicdual_state::spacetrk)
+void vicdual_state::spacetrk(machine_config &config)
+{
 	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(spacetrk_io_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_IO, &vicdual_state::spacetrk_io_map);
+}
 
 
-MACHINE_CONFIG_START(vicdual_state::carnival)
+void vicdual_state::carnival(machine_config &config)
+{
 	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(carnival_io_map)
+	m_maincpu->set_addrmap(AS_IO, &vicdual_state::carnival_io_map);
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
 	carnival_audio(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(vicdual_state::carnivalh)
+void vicdual_state::carnivalh(machine_config &config)
+{
 	carnival(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(headon_io_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_IO, &vicdual_state::headon_io_map);
+}
 
 
-MACHINE_CONFIG_START(vicdual_state::tranqgun)
+void vicdual_state::tranqgun(machine_config &config)
+{
 	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(tranqgun_io_map)
+	m_maincpu->set_addrmap(AS_IO, &vicdual_state::tranqgun_io_map);
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
 	tranqgun_audio(config);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(vicdual_state::brdrline)
+void vicdual_state::brdrline(machine_config &config)
+{
 	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(brdrline_io_map)
+	m_maincpu->set_addrmap(AS_IO, &vicdual_state::brdrline_io_map);
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
 	brdrline_audio(config);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(vicdual_state::pulsar)
+void vicdual_state::pulsar(machine_config &config)
+{
 	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(pulsar_io_map)
+	m_maincpu->set_addrmap(AS_IO, &vicdual_state::pulsar_io_map);
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
 	pulsar_audio(config);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(vicdual_state::heiankyo)
+void vicdual_state::heiankyo(machine_config &config)
+{
 	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(heiankyo_io_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_IO, &vicdual_state::heiankyo_io_map);
+}
 
 
-MACHINE_CONFIG_START(vicdual_state::alphaho)
+void vicdual_state::alphaho(machine_config &config)
+{
 	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(alphaho_io_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_IO, &vicdual_state::alphaho_io_map);
+}
 
 
-MACHINE_CONFIG_START(vicdual_state::headonn)
+void vicdual_state::headonn(machine_config &config)
+{
 	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(headonn_io_map)
+	m_maincpu->set_addrmap(AS_IO, &vicdual_state::headonn_io_map);
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
 	headon_audio(config);
-MACHINE_CONFIG_END
+}
 
 
 /*************************************
@@ -2405,20 +2397,19 @@ MACHINE_START_MEMBER(vicdual_state,samurai)
 	machine_start();
 }
 
-MACHINE_CONFIG_START(vicdual_state::samurai)
+void vicdual_state::samurai(machine_config &config)
+{
 	vicdual_root(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(samurai_map)
-	MCFG_DEVICE_IO_MAP(samurai_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &vicdual_state::samurai_map);
+	m_maincpu->set_addrmap(AS_IO, &vicdual_state::samurai_io_map);
 
 	MCFG_MACHINE_START_OVERRIDE(vicdual_state,samurai)
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(vicdual_state, screen_update_color)
-MACHINE_CONFIG_END
+	m_screen->set_screen_update(FUNC(vicdual_state::screen_update_color));
+}
 
 
 
@@ -2593,28 +2584,29 @@ MACHINE_RESET_MEMBER(nsub_state, nsub)
 	machine_reset();
 }
 
-MACHINE_CONFIG_START(nsub_state::nsub)
+void nsub_state::nsub(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, VICDUAL_MAIN_CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(nsub_map)
-	MCFG_DEVICE_IO_MAP(nsub_io_map)
+	Z80(config, m_maincpu, VICDUAL_MAIN_CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nsub_state::nsub_map);
+	m_maincpu->set_addrmap(AS_IO, &nsub_state::nsub_io_map);
 
 	TIMER(config, m_coinstate_timer).configure_generic(FUNC(nsub_state::clear_coin_status));
 	TIMER(config, m_nsub_coinage_timer).configure_generic(FUNC(nsub_state::nsub_coin_pulse));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(VICDUAL_PIXEL_CLOCK, VICDUAL_HTOTAL, VICDUAL_HBEND, VICDUAL_HBSTART, VICDUAL_VTOTAL, VICDUAL_VBEND, VICDUAL_VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(nsub_state, screen_update_color)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(VICDUAL_PIXEL_CLOCK, VICDUAL_HTOTAL, VICDUAL_HBEND, VICDUAL_HBSTART, VICDUAL_VTOTAL, VICDUAL_VBEND, VICDUAL_VBSTART);
+	m_screen->set_screen_update(FUNC(nsub_state::screen_update_color));
 
-	MCFG_DEVICE_ADD("s97269pb", S97269PB, 0)
+	S97269PB(config, m_s97269pb, 0);
 
 	MCFG_MACHINE_START_OVERRIDE(nsub_state, nsub)
 	MCFG_MACHINE_RESET_OVERRIDE(nsub_state, nsub)
 
 	/* audio hardware */
 	S97271P(config, m_s97271p, 0);
-MACHINE_CONFIG_END
+}
 
 
 
@@ -2704,22 +2696,21 @@ static INPUT_PORTS_START( invinco )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(vicdual_state::invinco)
+void vicdual_state::invinco(machine_config &config)
+{
 	vicdual_root(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(invinco_map)
-	MCFG_DEVICE_IO_MAP(invinco_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &vicdual_state::invinco_map);
+	m_maincpu->set_addrmap(AS_IO, &vicdual_state::invinco_io_map);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(vicdual_state, screen_update_color)
+	m_screen->set_screen_update(FUNC(vicdual_state::screen_update_color));
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
 	invinco_audio(config);
-MACHINE_CONFIG_END
+}
 
 
 

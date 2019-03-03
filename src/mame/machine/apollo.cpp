@@ -1047,7 +1047,8 @@ static void apollo_isa_cards(device_slot_interface &device)
 	device.option_add("3c505", ISA16_3C505);            // 3Com 3C505 Ethernet card
 }
 
-MACHINE_CONFIG_START(apollo_state::common)
+void apollo_state::common(machine_config &config)
+{
 	// configuration MUST be reset first !
 	APOLLO_CONF(config, APOLLO_CONF_TAG, 0);
 
@@ -1134,16 +1135,16 @@ MACHINE_CONFIG_START(apollo_state::common)
 	m_isa->drq6_callback().set(m_dma8237_2, FUNC(am9517a_device::dreq2_w));
 	m_isa->drq7_callback().set(m_dma8237_2, FUNC(am9517a_device::dreq3_w));
 
-	MCFG_DEVICE_ADD("isa1", ISA16_SLOT, 0, APOLLO_ISA_TAG, apollo_isa_cards, "wdc", false) // FIXME: determine ISA bus clock
-	MCFG_DEVICE_ADD("isa2", ISA16_SLOT, 0, APOLLO_ISA_TAG, apollo_isa_cards, "ctape", false)
-	MCFG_DEVICE_ADD("isa3", ISA16_SLOT, 0, APOLLO_ISA_TAG, apollo_isa_cards, "3c505", false)
-	MCFG_DEVICE_ADD("isa4", ISA16_SLOT, 0, APOLLO_ISA_TAG, apollo_isa_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa5", ISA16_SLOT, 0, APOLLO_ISA_TAG, apollo_isa_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa6", ISA16_SLOT, 0, APOLLO_ISA_TAG, apollo_isa_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa7", ISA16_SLOT, 0, APOLLO_ISA_TAG, apollo_isa_cards, nullptr, false)
+	ISA16_SLOT(config, "isa1", 0, APOLLO_ISA_TAG, apollo_isa_cards, "wdc", false); // FIXME: determine ISA bus clock
+	ISA16_SLOT(config, "isa2", 0, APOLLO_ISA_TAG, apollo_isa_cards, "ctape", false);
+	ISA16_SLOT(config, "isa3", 0, APOLLO_ISA_TAG, apollo_isa_cards, "3c505", false);
+	ISA16_SLOT(config, "isa4", 0, APOLLO_ISA_TAG, apollo_isa_cards, nullptr, false);
+	ISA16_SLOT(config, "isa5", 0, APOLLO_ISA_TAG, apollo_isa_cards, nullptr, false);
+	ISA16_SLOT(config, "isa6", 0, APOLLO_ISA_TAG, apollo_isa_cards, nullptr, false);
+	ISA16_SLOT(config, "isa7", 0, APOLLO_ISA_TAG, apollo_isa_cards, nullptr, false);
 
-	MCFG_SOFTWARE_LIST_ADD("ctape_list", "apollo_ctape")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "ctape_list").set_original("apollo_ctape");
+}
 
 // for machines with the keyboard and a graphics head
 void apollo_state::apollo(machine_config &config)

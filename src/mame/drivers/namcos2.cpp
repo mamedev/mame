@@ -1790,7 +1790,7 @@ MACHINE_CONFIG_START(namcos2_state::base_noio)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos2_state, irq0_line_hold, 2*60)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos2_state, irq1_line_hold,  120)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(12000)) /* CPU slices per frame */
+	config.m_minimum_quantum = attotime::from_hz(12000); /* CPU slices per frame */
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -1815,7 +1815,7 @@ MACHINE_CONFIG_START(namcos2_state::base_noio)
 
 	configure_c116_standard(config);
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_c116, gfx_namcos2)
+	GFXDECODE(config, m_gfxdecode, m_c116, gfx_namcos2);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -1829,31 +1829,33 @@ MACHINE_CONFIG_START(namcos2_state::base_noio)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(namcos2_state::base)
+void namcos2_state::base(machine_config &config)
+{
 	base_noio(config);
 	configure_c65_standard(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(namcos2_state::base_c68)
+void namcos2_state::base_c68(machine_config &config)
+{
 	base_noio(config);
 	configure_c68_standard(config);
-MACHINE_CONFIG_END
+}
 
-/* adjusted machine driver start */
-MACHINE_CONFIG_START(namcos2_state::base2)
+void namcos2_state::base2(machine_config &config)
+{
 	base(config);
 
 	m_c140->reset_routes();
 	m_c140->add_route(0, "lspeaker", 1.0);
 	m_c140->add_route(1, "rspeaker", 1.0);
-MACHINE_CONFIG_END
-/* end */
+}
 
-MACHINE_CONFIG_START(namcos2_state::assaultp)
+void namcos2_state::assaultp(machine_config &config)
+{
 	base2(config);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(12000*8)) /* CPU slices per frame - boosted (along with MCU speed) so that the Mode Select works */
-MACHINE_CONFIG_END
+	config.m_minimum_quantum = attotime::from_hz(12000*8); /* CPU slices per frame - boosted (along with MCU speed) so that the Mode Select works */
+}
 
 void namcos2_state::base3(machine_config &config)
 {
@@ -1881,7 +1883,7 @@ MACHINE_CONFIG_START(namcos2_state::gollygho)
 
 	configure_c65_standard(config);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* CPU slices per frame */
+	config.m_minimum_quantum = attotime::from_hz(6000); /* CPU slices per frame */
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -1893,7 +1895,7 @@ MACHINE_CONFIG_START(namcos2_state::gollygho)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update)
 	MCFG_SCREEN_PALETTE(m_c116)
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_c116, gfx_namcos2)
+	GFXDECODE(config, m_gfxdecode, m_c116, gfx_namcos2);
 
 	configure_c123tmap_standard(config);
 
@@ -1933,7 +1935,7 @@ MACHINE_CONFIG_START(namcos2_state::finallap_noio)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos2_state, irq0_line_hold,  2*60)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos2_state, irq1_line_hold,  120)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* CPU slices per frame */
+	config.m_minimum_quantum = attotime::from_hz(6000); /* CPU slices per frame */
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -1945,7 +1947,7 @@ MACHINE_CONFIG_START(namcos2_state::finallap_noio)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_finallap)
 	MCFG_SCREEN_PALETTE(m_c116)
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_c116, gfx_namcos2)
+	GFXDECODE(config, m_gfxdecode, m_c116, gfx_namcos2);
 
 	configure_c123tmap_standard(config);
 
@@ -2009,7 +2011,7 @@ MACHINE_CONFIG_START(namcos2_state::sgunner)
 
 	configure_c65_standard(config);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* CPU slices per frame */
+	config.m_minimum_quantum = attotime::from_hz(6000); /* CPU slices per frame */
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -2021,7 +2023,7 @@ MACHINE_CONFIG_START(namcos2_state::sgunner)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_sgunner)
 	MCFG_SCREEN_PALETTE(m_c116)
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_c116, gfx_c355)
+	GFXDECODE(config, m_gfxdecode, m_c116, gfx_c355);
 
 	NAMCO_C355SPR(config, m_c355spr, 0);
 	m_c355spr->set_screen(m_screen);
@@ -2063,7 +2065,7 @@ MACHINE_CONFIG_START(namcos2_state::sgunner2)
 
 	configure_c68_standard(config);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* CPU slices per frame */
+	config.m_minimum_quantum = attotime::from_hz(6000); /* CPU slices per frame */
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -2075,7 +2077,7 @@ MACHINE_CONFIG_START(namcos2_state::sgunner2)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_sgunner)
 	MCFG_SCREEN_PALETTE(m_c116)
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_c116, gfx_c355)
+	GFXDECODE(config, m_gfxdecode, m_c116, gfx_c355);
 
 	NAMCO_C355SPR(config, m_c355spr, 0);
 	m_c355spr->set_screen(m_screen);
@@ -2117,7 +2119,7 @@ MACHINE_CONFIG_START(namcos2_state::suzuka8h)
 
 	configure_c68_standard(config);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* CPU slices per frame */
+	config.m_minimum_quantum = attotime::from_hz(6000); /* CPU slices per frame */
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -2129,7 +2131,7 @@ MACHINE_CONFIG_START(namcos2_state::suzuka8h)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_luckywld)
 	MCFG_SCREEN_PALETTE(m_c116)
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_c116, gfx_c355)
+	GFXDECODE(config, m_gfxdecode, m_c116, gfx_c355);
 
 	NAMCO_C355SPR(config, m_c355spr, 0);
 	m_c355spr->set_screen(m_screen);
@@ -2192,7 +2194,7 @@ MACHINE_CONFIG_START(namcos2_state::metlhawk)
 
 	configure_c65_standard(config);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* CPU slices per frame */
+	config.m_minimum_quantum = attotime::from_hz(6000); /* CPU slices per frame */
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -2204,7 +2206,7 @@ MACHINE_CONFIG_START(namcos2_state::metlhawk)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_metlhawk)
 	MCFG_SCREEN_PALETTE(m_c116)
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_c116, gfx_metlhawk)
+	GFXDECODE(config, m_gfxdecode, m_c116, gfx_metlhawk);
 
 	NAMCO_C169ROZ(config, m_c169roz, 0);
 	m_c169roz->set_palette(m_c116);

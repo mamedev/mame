@@ -252,15 +252,27 @@ IGNORE_GIT
    revision description in the version string.
 
 Tool locations
-~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~
 
 OVERRIDE_CC
-   Set the C/Objective-C compiler command.
+   Set the C/Objective-C compiler command.  (This sets the target C compiler
+   command when cross-compiling.)
 OVERRIDE_CXX
-   Set the C++/Objective-C++ compiler command.
+   Set the C++/Objective-C++ compiler command.  (This sets the target C++
+   compiler command when cross-compiling.)
+OVERRIDE_LD
+   Set the linker command.  This is often not necessary or useful because the C
+   or C++ compiler command is used to invoke the linker.  (This sets the target
+   linker command when cross-compiling.)
 PYTHON_EXECUTABLE
    Set the Python interpreter command.  You need Python 2.7 or Python 3 to build
    MAME.
+CROSS_BUILD
+   Set to **1** to use separate host and target compilers and linkers, as
+   required for cross-compilation.  In this case, **OVERRIDE_CC**,
+   **OVERRIDE_CXX** and **OVERRIDE_LD** set the target C compiler, C++ compiler
+   and linker commands, while **CC**, **CXX** and **LD** set the host C
+   compiler, C++ compiler and linker commands.
 
 Optional features
 ~~~~~~~~~~~~~~~~~
@@ -392,8 +404,8 @@ Issues with specific compiler versions
   Adding **DEPRECATED=0** to your build options works around this by disabling
   deprecation warnings.
 * MinGW GCC 7 for Windows i386 produces spurious out-of-bounds access warnings.
-  Adding **NOWERROR=1** to your build options works around this by disabling
-  deprecation warnings.
+  Adding **NOWERROR=1** to your build options works around this by not treating
+  warnings as errors.
 * Initial versions of GNU libstdc++ 6 have a broken ``std::unique_ptr``
   implementation.  If you encounter errors with ``std::unique_ptr`` you need to
   upgrade to a newer version of libstdc++ that fixes the issue.
@@ -426,7 +438,7 @@ a **CFLAGS** or **CXXFLAGS** environment variable).  You can check to see
 whether the ``_FORTIFY_SOURCE`` macro is a built-in macro with your version of
 GCC with a command like this:
 
-**gcc -dM -E - | grep _FORTIFY_SOURCE**
+**gcc -dM -E - < /dev/null | grep _FORTIFY_SOURCE**
 
 If ``_FORTIFY_SOURCE`` is defined to a non-zero value by default, you can work
 around it by adding **-U_FORTIFY_SOURCE** to the compiler flags (e.g. by using
@@ -438,6 +450,23 @@ variables.
 
 Unusual Build Configurations
 ----------------------------
+
+Cross-compiling MAME
+~~~~~~~~~~~~~~~~~~~~
+
+MAME's build system has basic support for cross-compilation.  Set
+**CROSS_BUILD=1** to enable separate host and target compilers, set
+**OVERRIDE_CC** and **OVERRIDE_CXX** to the target C/C++ compiler commands, and
+if necessary set **CC** and **CXX** to the host C/C++ compiler commands.  If the
+target OS is different to the host OS, set it with **TARGETOS**.  For example it
+may be possible to build a MinGW32 x64 build on a Linux host using a command
+like this:
+
+**make TARGETOS=windows PTR64=1 OVERRIDE_CC=x86_64-w64-mingw32-gcc OVERRIDE_CXX=x86_64-w64-mingw32-g++ OVERRIDE_LD=x86_64-w64-mingw32-ld MINGW64=/usr**
+
+(The additional packages required for producing a standard MinGW32 x64 build on
+a Fedora Linux host are ``mingw64-gcc-c++``, ``mingw64-winpthreads-static`` and
+their dependencies.  Non-standard builds may require additional packages.)
 
 Using libc++ on Linux
 ~~~~~~~~~~~~~~~~~~~~~

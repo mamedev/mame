@@ -1417,10 +1417,10 @@ WRITE_LINE_MEMBER(rainbow_state::mpsc_irq)
 // PORT 0x06 : Communication bit rates (see page 21 of PC 100 SPEC)
 WRITE8_MEMBER(rainbow_state::comm_bitrate_w)
 {
-	m_dbrg->write_str(data & 0x0f);  // PDF is wrong, low nibble is RECEIVE clock (verified in SETUP).
+	m_dbrg->str_w(data & 0x0f);  // PDF is wrong, low nibble is RECEIVE clock (verified in SETUP).
 	logerror("\n(COMM.) receive bitrate = %d ($%02x)\n", comm_rates[data & 0x0f] , data & 0x0f);
 
-	m_dbrg->write_stt( ((data & 0xf0) >> 4) );
+	m_dbrg->stt_w( ((data & 0xf0) >> 4) );
 	logerror("(COMM.) transmit bitrate = %d ($%02x)\n", comm_rates[((data & 0xf0) >> 4)] ,(data & 0xf0) >> 4);
 }
 
@@ -1741,7 +1741,7 @@ WRITE_LINE_MEMBER(rainbow_state::hdc_read_sector)
 
 	if (!m_hdc_write_gate) // do not read when WRITE GATE is on
 	{
-		uint8_t sdh = (m_hdc->read(generic_space(), 0x06));
+		uint8_t sdh = (m_hdc->read(0x06));
 		int drv = (sdh & (8 + 16)) >> 3; // get DRIVE from SDH register
 
 		if ((state == 0) && (last_state == 1) && (drv == 0))
@@ -1750,9 +1750,9 @@ WRITE_LINE_MEMBER(rainbow_state::hdc_read_sector)
 			output().set_value("led1", 0);
 			switch_off_timer->adjust(attotime::from_msec(500));
 
-			int hi = (m_hdc->read(generic_space(), 0x05)) & 0x07;
-			uint16_t cylinder = (m_hdc->read(generic_space(), 0x04)) | (hi << 8);
-			uint8_t sector_number = m_hdc->read(generic_space(), 0x03);
+			int hi = (m_hdc->read(0x05)) & 0x07;
+			uint16_t cylinder = (m_hdc->read(0x04)) | (hi << 8);
+			uint8_t sector_number = m_hdc->read(0x03);
 
 			hard_disk_file *local_hard_disk;
 			local_hard_disk = rainbow_hdc_file(0); // one hard disk for now.
@@ -1812,7 +1812,7 @@ WRITE_LINE_MEMBER(rainbow_state::hdc_write_sector)
 	else
 		m_hdc_write_gate = true;
 
-	int drv = ((m_hdc->read(generic_space(), 0x06)) & (8 + 16)) >> 3; // get DRIVE from SDH register
+	int drv = ((m_hdc->read(0x06)) & (8 + 16)) >> 3; // get DRIVE from SDH register
 
 	if (state == 0 && wg_last == 1 && drv == 0)  // Check correct state transition and DRIVE 0 ....
 	{
@@ -1866,13 +1866,13 @@ int rainbow_state::do_write_sector()
 			feedback = 10;
 			output().set_value("led1", 1); // OFF
 
-			uint8_t sdh = (m_hdc->read(generic_space(), 0x06));
+			uint8_t sdh = (m_hdc->read(0x06));
 
-			int hi = (m_hdc->read(generic_space(), 0x05)) & 0x07;
-			uint16_t cylinder = (m_hdc->read(generic_space(), 0x04)) | (hi << 8);
+			int hi = (m_hdc->read(0x05)) & 0x07;
+			uint16_t cylinder = (m_hdc->read(0x04)) | (hi << 8);
 
-			int sector_number = m_hdc->read(generic_space(), 0x03);
-			int sector_count = m_hdc->read(generic_space(), 0x02); // (1 = single sector)
+			int sector_number = m_hdc->read(0x03);
+			int sector_count = m_hdc->read(0x02); // (1 = single sector)
 
 			if (!(cylinder <= info->cylinders &&                     // filter invalid cylinders
 				SECTOR_SIZES[(sdh >> 5) & 0x03] == info->sectorbytes // 512, may not vary
@@ -1943,7 +1943,7 @@ READ8_MEMBER(rainbow_state::hd_status_68_r)
 		data = 0xa0; // A0 : OK, DRIVE IS READY (!)
 
 	int my_offset = 0x07;
-	int stat = m_hdc->read(space, my_offset);
+	int stat = m_hdc->read(my_offset);
 //  logerror("(x68) WD1010 register %04x (STATUS) read, result : %04x\n", my_offset, stat);
 
 	// NOTE: SEEK COMPLETE IS CURRENTLY HARD WIRED / NOT FULLY EMULATED -
@@ -2043,14 +2043,14 @@ positioned over cylinder 0 (the data track furthest away from the spindle).
 */
 READ8_MEMBER(rainbow_state::hd_status_69_r)
 {
-	int hs = m_hdc->read(space, 0x06) & (1 + 2 + 4); // SDH bits 0-2 = HEAD #
+	int hs = m_hdc->read(0x06) & (1 + 2 + 4); // SDH bits 0-2 = HEAD #
 //  logerror("(x69 READ) %i = HEAD SELECT WD1010\n", hs);
 
 	uint8_t data = (hs << 1);
 
 	// DRIVE SELECT: 2 bits in SDH register of WDx010 could address 4 drives.
 	// External circuit supports 1 drive here (DRIVE 0 selected or deselected)
-	int drv = ((m_hdc->read(space, 0x06) >> 3) & 0x01);  // 0x03 gives error R6 with DIAG.DISK
+	int drv = ((m_hdc->read(0x06) >> 3) & 0x01);  // 0x03 gives error R6 with DIAG.DISK
 	if (drv == 0)
 		data |= 1; //      logerror("(x69 READ) %i = _DRIVE # 0_ SELECT! \n", drv);
 
@@ -2064,7 +2064,7 @@ READ8_MEMBER(rainbow_state::hd_status_69_r)
 		data |= 64;
 
 	// Fake TRACK 0 signal  (normally FROM DRIVE)
-	if ((m_hdc->read(space, 0x04) == 0) && (m_hdc->read(space, 0x05) == 0)) // CYL.LO - CYL.HI
+	if ((m_hdc->read(0x04) == 0) && (m_hdc->read(0x05) == 0)) // CYL.LO - CYL.HI
 		data |= 128; //      logerror("(x69 READ) TRACK 00 detected\n");
 
 	return data;
@@ -3219,7 +3219,7 @@ MACHINE_CONFIG_START(rainbow_state::rainbow)
 
 	MCFG_SCREEN_UPDATE_DRIVER(rainbow_state, screen_update_rainbow)
 	MCFG_SCREEN_PALETTE("vt100_video:palette")
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "vt100_video:palette", gfx_rainbow)
+	GFXDECODE(config, "gfxdecode", "vt100_video:palette", gfx_rainbow);
 
 	RAINBOW_VIDEO(config, m_crtc, 24.0734_MHz_XTAL);
 	m_crtc->set_screen("screen");
@@ -3233,7 +3233,7 @@ MACHINE_CONFIG_START(rainbow_state::rainbow)
 	m_hgdc->vsync_wr_callback().set(FUNC(rainbow_state::GDC_vblank_irq)); // "The vsync callback line needs to be below the 7220 DEVICE_ADD line."
 
 	m_hgdc->set_addrmap(0, &rainbow_state::upd7220_map);
-	m_hgdc->set_display_pixels_callback(FUNC(rainbow_state::hgdc_display_pixels), this);
+	m_hgdc->set_display_pixels(FUNC(rainbow_state::hgdc_display_pixels));
 	m_hgdc->set_screen(m_screen2); // set_screen needs to be added after 7720 device in the machine config, not after the screen.
 
 	MCFG_PALETTE_ADD("palette2", 32)
@@ -3251,13 +3251,13 @@ MACHINE_CONFIG_START(rainbow_state::rainbow)
 	MCFG_SCREEN_UPDATE_DEVICE("upd7220", upd7220_device, screen_update)
 
 	FD1793(config, m_fdc, 24.0734_MHz_XTAL / 24); // no separate 1 Mhz quartz
-	MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":0", rainbow_floppies, "525qd", rainbow_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":1", rainbow_floppies, "525qd", rainbow_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":2", rainbow_floppies, "525qd", rainbow_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":3", rainbow_floppies, "525qd", rainbow_state::floppy_formats)
-	//MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":2", rainbow_floppies, "525dd", rainbow_state::floppy_formats)
-	//MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":3", rainbow_floppies, "35dd", rainbow_state::floppy_formats)
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "rainbow")
+	FLOPPY_CONNECTOR(config, FD1793_TAG ":0", rainbow_floppies, "525qd", rainbow_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, FD1793_TAG ":1", rainbow_floppies, "525qd", rainbow_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, FD1793_TAG ":2", rainbow_floppies, "525qd", rainbow_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, FD1793_TAG ":3", rainbow_floppies, "525qd", rainbow_state::floppy_formats);
+	//FLOPPY_CONNECTOR(config, FD1793_TAG ":2", rainbow_floppies, "525dd", rainbow_state::floppy_formats);
+	//FLOPPY_CONNECTOR(config, FD1793_TAG ":3", rainbow_floppies, "35dd", rainbow_state::floppy_formats);
+	SOFTWARE_LIST(config, "flop_list").set_original("rainbow");
 
 	/// ********************************* HARD DISK CONTROLLER *****************************************
 	WD2010(config, m_hdc, 5000000); // 10 Mhz quartz on controller (divided by 2 for WCLK)

@@ -58,8 +58,14 @@ static inline void ATTR_PRINTF( 3, 4 ) verboselog( device_t *device, int n_level
 //**************************************************************************
 
 // device type definition
-DEFINE_DEVICE_TYPE(I2CMEM, i2cmem_device, "i2cmem", "I2C Memory")
-DEFINE_DEVICE_TYPE(X2404P, x2404p_device, "x2404p", "X2404P I2C Memory")
+DEFINE_DEVICE_TYPE(I2CMEM,     i2cmem_device,     "i2cmem", "I2C Memory")
+DEFINE_DEVICE_TYPE(I2C_X2404P, i2c_x2404p_device, "x2404p", "X2404P I2C Memory")
+DEFINE_DEVICE_TYPE(I2C_24C01,  i2c_24c01_device,  "24c01",  "24C01 I2C Memory")
+DEFINE_DEVICE_TYPE(I2C_24C02,  i2c_24c02_device,  "24c02",  "24C02 I2C Memory")
+DEFINE_DEVICE_TYPE(I2C_24C08,  i2c_24c08_device,  "24c08",  "24C08 I2C Memory")
+DEFINE_DEVICE_TYPE(I2C_24C16,  i2c_24c16_device,  "24c16",  "24C16 I2C Memory")
+DEFINE_DEVICE_TYPE(I2C_24C16A, i2c_24c16a_device, "24c16a", "24C16A I2C Memory")
+DEFINE_DEVICE_TYPE(I2C_24C64,  i2c_24c64_device,  "24c64",  "24C64 I2C Memory")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -69,36 +75,73 @@ DEFINE_DEVICE_TYPE(X2404P, x2404p_device, "x2404p", "X2404P I2C Memory")
 //  i2cmem_device - constructor
 //-------------------------------------------------
 
-i2cmem_device::i2cmem_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock),
+i2cmem_device::i2cmem_device(
+		const machine_config &mconfig,
+		device_type type,
+		const char *tag,
+		device_t *owner,
+		uint32_t clock,
+		int page_size,
+		int data_size) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_nvram_interface(mconfig, *this),
 	m_region(*this, DEVICE_SELF),
-	m_slave_address( I2CMEM_SLAVE_ADDRESS ),
-	m_page_size( 0 ),
-	m_data_size( 0 ),
-	m_scl( 0 ),
-	m_sdaw( 0 ),
-	m_e0( 0 ),
-	m_e1( 0 ),
-	m_e2( 0 ),
-	m_wc( 0 ),
-	m_sdar( 1 ),
-	m_state( STATE_IDLE ),
-	m_shift( 0 ),
-	m_byteaddr( 0 )
+	m_slave_address(I2CMEM_SLAVE_ADDRESS),
+	m_page_size(page_size),
+	m_data_size(data_size),
+	m_scl(0),
+	m_sdaw(0),
+	m_e0(0),
+	m_e1(0),
+	m_e2(0),
+	m_wc(0),
+	m_sdar(1),
+	m_state(STATE_IDLE),
+	m_shift(0),
+	m_byteaddr(0)
+{
+	// these memories work off the I2C clock only
+	assert(!clock);
+}
+
+i2cmem_device::i2cmem_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	i2cmem_device(mconfig, I2CMEM, tag, owner, clock, 0, 0)
 {
 }
 
-i2cmem_device::i2cmem_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: i2cmem_device(mconfig, I2CMEM, tag, owner, clock)
+i2c_x2404p_device::i2c_x2404p_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	i2cmem_device(mconfig, I2C_X2404P, tag, owner, clock, 8, 0x200)
 {
 }
 
-x2404p_device::x2404p_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: i2cmem_device(mconfig, X2404P, tag, owner, clock)
+i2c_24c01_device::i2c_24c01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	i2cmem_device(mconfig, I2C_24C01, tag, owner, clock, 4, 0x80)
 {
-	set_page_size(8);
-	set_data_size(0x200);
+}
+
+i2c_24c02_device::i2c_24c02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	i2cmem_device(mconfig, I2C_24C02, tag, owner, clock, 4, 0x100)
+{
+}
+
+i2c_24c08_device::i2c_24c08_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	i2cmem_device(mconfig, I2C_24C08, tag, owner, clock, 0, 0x400)
+{
+}
+
+i2c_24c16_device::i2c_24c16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	i2cmem_device(mconfig, I2C_24C16, tag, owner, clock, 8, 0x800)
+{
+}
+
+i2c_24c16a_device::i2c_24c16a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	i2cmem_device(mconfig, I2C_24C16A, tag, owner, clock, 0, 0x800)
+{
+}
+
+i2c_24c64_device::i2c_24c64_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	i2cmem_device(mconfig, I2C_24C64, tag, owner, clock, 8, 0x2000)
+{
 }
 
 //-------------------------------------------------

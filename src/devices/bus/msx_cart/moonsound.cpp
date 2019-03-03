@@ -92,28 +92,28 @@ WRITE_LINE_MEMBER(msx_cart_moonsound_device::irq_w)
 WRITE8_MEMBER(msx_cart_moonsound_device::write_ymf278b_fm)
 {
 	LOG("moonsound: write 0x%02x, data 0x%02x\n", 0xc4 + offset, data);
-	m_ymf278b->write(space, offset, data);
+	m_ymf278b->write(offset, data);
 }
 
 
 READ8_MEMBER(msx_cart_moonsound_device::read_ymf278b_fm)
 {
 	LOG("moonsound: read 0x%02x\n", 0xc4 + offset);
-	return m_ymf278b->read(space, offset);
+	return m_ymf278b->read(offset);
 }
 
 
 WRITE8_MEMBER(msx_cart_moonsound_device::write_ymf278b_pcm)
 {
 	LOG("moonsound: write 0x%02x, data 0x%02x\n", 0x7e + offset, data);
-	m_ymf278b->write(space, 4 + offset, data);
+	m_ymf278b->write(4 + offset, data);
 }
 
 
 READ8_MEMBER(msx_cart_moonsound_device::read_ymf278b_pcm)
 {
 	LOG("moonsound: read 0x%02x\n", 0x7e + offset);
-	return m_ymf278b->read(space, 4 + offset);
+	return m_ymf278b->read(4 + offset);
 }
 
 

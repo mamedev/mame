@@ -71,10 +71,11 @@
 #define ES_PCI_READ 0
 #define ES_PCI_WRITE 1
 
-MACHINE_CONFIG_START(es1373_device::device_add_mconfig)
+void es1373_device::device_add_mconfig(machine_config &config)
+{
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-MACHINE_CONFIG_END
+}
 
 DEFINE_DEVICE_TYPE(ES1373, es1373_device, "es1373", "Creative Labs Ensoniq AudioPCI97 ES1373")
 

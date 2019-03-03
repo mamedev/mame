@@ -77,18 +77,18 @@ MACHINE_CONFIG_START(cgenie_fdc_device::device_add_mconfig)
 	FD1793(config, m_fdc, 1_MHz_XTAL);
 	m_fdc->intrq_wr_callback().set(FUNC(cgenie_fdc_device::intrq_w));
 
-	MCFG_FLOPPY_DRIVE_ADD("fd1793:0", cgenie_floppies, "ssdd", cgenie_fdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd1793:1", cgenie_floppies, "ssdd", cgenie_fdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd1793:2", cgenie_floppies, nullptr,   cgenie_fdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd1793:3", cgenie_floppies, nullptr,   cgenie_fdc_device::floppy_formats)
+	FLOPPY_CONNECTOR(config, "fd1793:0", cgenie_floppies, "ssdd", cgenie_fdc_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fd1793:1", cgenie_floppies, "ssdd", cgenie_fdc_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fd1793:2", cgenie_floppies, nullptr, cgenie_fdc_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fd1793:3", cgenie_floppies, nullptr, cgenie_fdc_device::floppy_formats);
 
-//  MCFG_SOFTWARE_LIST_ADD("floppy_list", "cgenie_flop")
+//  SOFTWARE_LIST(config, "floppy_list").set_original("cgenie_flop");
 
 	MCFG_GENERIC_SOCKET_ADD("socket", generic_plain_slot, "cgenie_flop_rom")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 	MCFG_GENERIC_LOAD(cgenie_fdc_device, socket_load)
 
-	MCFG_SOFTWARE_LIST_ADD("rom_list", "cgenie_flop_rom")
+	SOFTWARE_LIST(config, "rom_list").set_original("cgenie_flop_rom");
 MACHINE_CONFIG_END
 
 
@@ -137,7 +137,7 @@ void cgenie_fdc_device::device_reset()
 	// map extra socket
 	if (m_socket->exists())
 	{
-		m_slot->m_program->install_read_handler(0xe000, 0xefff, read8_delegate(FUNC(generic_slot_device::read_rom), (generic_slot_device *) m_socket));
+		m_slot->m_program->install_read_handler(0xe000, 0xefff, read8sm_delegate(FUNC(generic_slot_device::read_rom), (generic_slot_device *) m_socket));
 	}
 }
 

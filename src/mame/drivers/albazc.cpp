@@ -295,9 +295,9 @@ MACHINE_CONFIG_START(albazc_state::hanaroku)
 	MCFG_SCREEN_UPDATE_DRIVER(albazc_state, screen_update_hanaroku)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_hanaroku)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_hanaroku);
 
-	PALETTE(config, "palette", FUNC(albazc_state::albazc_palette), 0x200);
+	PALETTE(config, m_palette, FUNC(albazc_state::albazc_palette), 0x200);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

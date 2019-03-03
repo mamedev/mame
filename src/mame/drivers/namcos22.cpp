@@ -3924,7 +3924,7 @@ MACHINE_CONFIG_START(namcos22_state::namcos22)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, namcos22_state, screen_vblank))
 
 	MCFG_PALETTE_ADD("palette", 0x8000)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namcos22)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_namcos22);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -3959,9 +3959,9 @@ MACHINE_CONFIG_START(namcos22_state::namcos22s)
 	MCFG_DEVICE_PROGRAM_MAP(mcu_program)
 	MCFG_DEVICE_IO_MAP(mcu_io)
 	TIMER(config, "mcu_irq").configure_scanline(FUNC(namcos22_state::mcu_irq), "screen", 0, 240);
-	MCFG_QUANTUM_TIME(attotime::from_hz(9000)) // erratic inputs otherwise, probably mcu vs maincpu shareram
+	config.m_minimum_quantum = attotime::from_hz(9000); // erratic inputs otherwise, probably mcu vs maincpu shareram
 
-	MCFG_DEVICE_REMOVE("iomcu")
+	config.device_remove("iomcu");
 
 	MB87078(config, m_mb87078);
 	m_mb87078->gain_changed().set(FUNC(namcos22_state::mb87078_gain_changed));
@@ -3970,7 +3970,7 @@ MACHINE_CONFIG_START(namcos22_state::namcos22s)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(namcos22_state, screen_update_namcos22s)
 
-	MCFG_DEVICE_REPLACE("gfxdecode", GFXDECODE, "palette", gfx_super)
+	GFXDECODE(config.replace(), m_gfxdecode, m_palette, gfx_super);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos22_state::airco22b)

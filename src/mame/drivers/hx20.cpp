@@ -801,7 +801,7 @@ DEVICE_IMAGE_LOAD_MEMBER(hx20_state, optrom_load)
 READ8_MEMBER(hx20_state::optrom_r)
 {
 	if (m_optrom->exists())
-		return m_optrom->read_rom(space, offset);
+		return m_optrom->read_rom(offset);
 	else
 		return 0;
 }
@@ -883,9 +883,10 @@ MACHINE_CONFIG_START(hx20_state::hx20)
 
 	RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr);
 	CASSETTE(config, m_cassette);
-	MCFG_EPSON_SIO_ADD("sio", "tf20")
-	MCFG_EPSON_SIO_RX(WRITELINE(*this, hx20_state, sio_rx_w))
-	MCFG_EPSON_SIO_PIN(WRITELINE(*this, hx20_state, sio_pin_w))
+
+	EPSON_SIO(config, m_sio, "tf20");
+	m_sio->rx_callback().set(FUNC(hx20_state::sio_rx_w));
+	m_sio->pin_callback().set(FUNC(hx20_state::sio_pin_w));
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("32K");
@@ -896,8 +897,8 @@ MACHINE_CONFIG_START(hx20_state::hx20)
 	MCFG_GENERIC_LOAD(hx20_state, optrom_load)
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("hx20_opt_list", "hx20_rom")
-	MCFG_SOFTWARE_LIST_ADD("epson_cpm_list", "epson_cpm")
+	SOFTWARE_LIST(config, "hx20_opt_list").set_original("hx20_rom");
+	SOFTWARE_LIST(config, "epson_cpm_list").set_original("epson_cpm");
 MACHINE_CONFIG_END
 
 
@@ -905,18 +906,19 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( hx20 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(hx20_state::cm6000)
+void hx20_state::cm6000(machine_config &config)
+{
 	hx20(config);
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &hx20_state::cm6000_mem);
 
 	// optional rom
-	MCFG_DEVICE_REMOVE("optrom")
+	config.device_remove("optrom");
 
 	// software lists
-	MCFG_SOFTWARE_LIST_REMOVE("epson_cpm_list")
-	MCFG_SOFTWARE_LIST_REMOVE("hx20_opt_list")
-MACHINE_CONFIG_END
+	config.device_remove("epson_cpm_list");
+	config.device_remove("hx20_opt_list");
+}
 
 
 //**************************************************************************

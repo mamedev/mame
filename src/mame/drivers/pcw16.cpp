@@ -167,11 +167,11 @@ uint8_t pcw16_state::read_bank_data(uint8_t type, uint16_t offset)
 		}
 		if(type < 0x40)  // first flash
 		{
-			return m_flash0->read(machine().dummy_space(), ((type & 0x3f)*0x4000)+offset);
+			return m_flash0->read(((type & 0x3f)*0x4000)+offset);
 		}
 		else  // second flash
 		{
-			return m_flash1->read(machine().dummy_space(), ((type & 0x3f)*0x4000)+offset);
+			return m_flash1->read(((type & 0x3f)*0x4000)+offset);
 		}
 	}
 }
@@ -188,11 +188,11 @@ void pcw16_state::write_bank_data(uint8_t type, uint16_t offset, uint8_t data)
 			return;  // first four sectors are write protected
 		if(type < 0x40)  // first flash
 		{
-			m_flash0->write(machine().dummy_space(), ((type & 0x3f)*0x4000)+offset, data);
+			m_flash0->write(((type & 0x3f)*0x4000)+offset, data);
 		}
 		else  // second flash
 		{
-			m_flash1->write(machine().dummy_space(), ((type & 0x3f)*0x4000)+offset, data);
+			m_flash1->write(((type & 0x3f)*0x4000)+offset, data);
 		}
 	}
 }
@@ -1015,7 +1015,7 @@ MACHINE_CONFIG_START(pcw16_state::pcw16)
 	MCFG_DEVICE_ADD("maincpu", Z80, 16000000)
 	MCFG_DEVICE_PROGRAM_MAP(pcw16_map)
 	MCFG_DEVICE_IO_MAP(pcw16_io)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	ns16550_device &uart1(NS16550(config, "ns16550_1", XTAL(1'843'200)));     /* TODO: Verify uart model */
 	uart1.out_tx_callback().set("serport1", FUNC(rs232_port_device::write_txd));
@@ -1063,10 +1063,10 @@ MACHINE_CONFIG_START(pcw16_state::pcw16)
 
 	PC_FDC_SUPERIO(config, m_fdc, 48_MHz_XTAL / 2);
 	m_fdc->intrq_wr_callback().set(FUNC(pcw16_state::fdc_interrupt));
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pcw16_floppies, "35hd", pcw16_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pcw16_floppies, "35hd", pcw16_state::floppy_formats)
+	FLOPPY_CONNECTOR(config, "fdc:0", pcw16_floppies, "35hd", pcw16_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", pcw16_floppies, "35hd", pcw16_state::floppy_formats);
 
-	MCFG_SOFTWARE_LIST_ADD("disk_list","pcw16")
+	SOFTWARE_LIST(config, "disk_list").set_original("pcw16");
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("2M");
@@ -1074,7 +1074,8 @@ MACHINE_CONFIG_START(pcw16_state::pcw16)
 	INTEL_E28F008SA(config, "flash0");
 	INTEL_E28F008SA(config, "flash1");
 
-	MCFG_AT_KEYB_ADD("at_keyboard", 3, WRITELINE(*this, pcw16_state, pcw16_keyboard_callback))
+	AT_KEYB(config, m_keyboard, pc_keyboard_device::KEYBOARD_TYPE::AT, 3);
+	m_keyboard->keypress().set(FUNC(pcw16_state::pcw16_keyboard_callback));
 
 	/* video ints */
 	TIMER(config, "video_timer").configure_periodic(FUNC(pcw16_state::pcw16_timer_callback), attotime::from_usec(5830));

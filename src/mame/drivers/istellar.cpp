@@ -306,7 +306,7 @@ MACHINE_CONFIG_START(istellar_state::istellar)
 	// Daphne says "TODO: get the real interstellar resistor values"
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_istellar)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_istellar);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

@@ -282,7 +282,7 @@ MACHINE_CONFIG_START(cbasebal_state::cbasebal)
 	MCFG_SCREEN_UPDATE_DRIVER(cbasebal_state, screen_update_cbasebal)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cbasebal)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cbasebal);
 
 	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 1024);
 

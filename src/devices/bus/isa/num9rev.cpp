@@ -53,19 +53,20 @@ UPD7220_DISPLAY_PIXELS_MEMBER( isa8_number_9_rev_device::hgdc_display_pixels )
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(isa8_number_9_rev_device::device_add_mconfig)
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SIZE(512, 448)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 448-1)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_UPDATE_DRIVER(isa8_number_9_rev_device, screen_update)
-	MCFG_PALETTE_ADD("palette", 4096)
+void isa8_number_9_rev_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_size(512, 448);
+	screen.set_visarea(0, 512-1, 0, 448-1);
+	screen.set_refresh_hz(60);
+	screen.set_screen_update(FUNC(isa8_number_9_rev_device::screen_update));
+	PALETTE(config, m_palette).set_entries(4096);
 
 	UPD7220(config, m_upd7220, XTAL(4'433'619)/2); // unknown clock
 	m_upd7220->set_addrmap(0, &isa8_number_9_rev_device::upd7220_map);
-	m_upd7220->set_display_pixels_callback(FUNC(isa8_number_9_rev_device::hgdc_display_pixels), this);
+	m_upd7220->set_display_pixels(FUNC(isa8_number_9_rev_device::hgdc_display_pixels));
 	m_upd7220->set_screen("screen");
-MACHINE_CONFIG_END
+}
 
 //**************************************************************************
 //  LIVE DEVICE

@@ -39,7 +39,8 @@ public:
 		m_sndprotect(*this, "sndprotect"),
 		m_ram(*this, "ram"),
 		m_robocop_shared_ram(*this, "robocop_shared"),
-		m_hippodrm_shared_ram(*this, "hippodrm_shared")
+		m_hippodrm_shared_ram(*this, "hippodrm_shared"),
+		m_in_trackball(*this, "track_%u", 0)
 	{ }
 
 	void dec0_base(machine_config &config);
@@ -51,6 +52,7 @@ public:
 	void midresbj(machine_config &config);
 	void slyspy(machine_config &config);
 	void hbarrel(machine_config &config);
+	void bandit(machine_config &config);
 	void midresb(machine_config &config);
 	void ffantasybl(machine_config &config);
 	void drgninjab(machine_config &config);
@@ -103,6 +105,7 @@ private:
 	required_shared_ptr<uint16_t> m_ram;
 	optional_shared_ptr<uint8_t> m_robocop_shared_ram;
 	optional_shared_ptr<uint8_t> m_hippodrm_shared_ram;
+	optional_ioport_array<4> m_in_trackball;
 
 	mcu_type m_game;
 	uint16_t m_i8751_return;
@@ -113,6 +116,7 @@ private:
 	int m_hippodrm_lsb;
 	uint8_t m_i8751_ports[4];
 
+	DECLARE_READ8_MEMBER(trackball_r);
 	DECLARE_WRITE16_MEMBER(dec0_control_w);
 	DECLARE_WRITE16_MEMBER(midres_sound_w);
 	DECLARE_READ16_MEMBER(slyspy_protection_r);
@@ -141,6 +145,7 @@ private:
 	DECLARE_VIDEO_START(dec0);
 
 	uint32_t screen_update_hbarrel(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_bandit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_baddudes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_birdtry(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_robocop(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

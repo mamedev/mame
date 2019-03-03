@@ -27,14 +27,17 @@ DEFINE_DEVICE_TYPE(CGENIE_PRINTER, cgenie_printer_device, "cgenie_printer", "Pri
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(cgenie_printer_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, cgenie_printer_device, busy_w))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, cgenie_printer_device, perror_w))
-	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(*this, cgenie_printer_device, select_w))
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, cgenie_printer_device, fault_w))
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("latch", "centronics")
-MACHINE_CONFIG_END
+void cgenie_printer_device::device_add_mconfig(machine_config &config)
+{
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(cgenie_printer_device::busy_w));
+	m_centronics->perror_handler().set(FUNC(cgenie_printer_device::perror_w));
+	m_centronics->select_handler().set(FUNC(cgenie_printer_device::select_w));
+	m_centronics->fault_handler().set(FUNC(cgenie_printer_device::fault_w));
+
+	OUTPUT_LATCH(config, m_latch);
+	m_centronics->set_output_latch(*m_latch);
+}
 
 
 //**************************************************************************

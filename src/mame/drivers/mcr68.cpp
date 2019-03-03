@@ -107,7 +107,7 @@ WRITE16_MEMBER(mcr68_state::blasted_control_w)
 READ16_MEMBER(mcr68_state::spyhunt2_port_0_r)
 {
 	int result = ioport("IN0")->read();
-	int analog = m_adc->read(space, 0);
+	int analog = m_adc->read();
 
 	return result | ((m_sounds_good->read(space, 0) & 1) << 5) | (analog << 8);
 }
@@ -130,7 +130,7 @@ WRITE16_MEMBER(mcr68_state::spyhunt2_control_w)
 	m_sounds_good->reset_write(~m_control_word & 0x2000);
 	m_sounds_good->write(space, offset, (m_control_word >> 8) & 0x001f);
 
-	m_adc->write(space, 0, (m_control_word >> 3) & 0x0f);
+	m_adc->write((m_control_word >> 3) & 0x0f);
 }
 
 
@@ -181,7 +181,7 @@ WRITE16_MEMBER(mcr68_state::archrivl_control_w)
 {
 	COMBINE_DATA(&m_control_word);
 	m_cvsd_sound->reset_write(~m_control_word & 0x0400);
-	m_cvsd_sound->write(space, 0, m_control_word & 0x3ff);
+	m_cvsd_sound->write(m_control_word & 0x3ff);
 }
 
 

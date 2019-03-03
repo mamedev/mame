@@ -360,13 +360,13 @@ WRITE8_MEMBER( z100_state::z100_6845_address_w )
 {
 	data &= 0x1f;
 	m_crtc_index = data;
-	m_crtc->address_w( space, offset, data );
+	m_crtc->address_w(data);
 }
 
 WRITE8_MEMBER( z100_state::z100_6845_data_w )
 {
 	m_crtc_vreg[m_crtc_index] = data;
-	m_crtc->register_w(space, offset, data);
+	m_crtc->register_w(data);
 }
 
 // todo: side select?
@@ -664,7 +664,8 @@ static void z100_floppies(device_slot_interface &device)
 	device.option_add("dd", FLOPPY_525_DD);
 }
 
-MACHINE_CONFIG_START(z100_state::z100)
+void z100_state::z100(machine_config &config)
+{
 	/* basic machine hardware */
 	I8088(config, m_maincpu, 14.318181_MHz_XTAL / 3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &z100_state::z100_mem);
@@ -672,15 +673,15 @@ MACHINE_CONFIG_START(z100_state::z100)
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DRIVER(z100_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 640-1, 0, 480-1);
+	screen.set_screen_update(FUNC(z100_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 8)
+	PALETTE(config, m_palette).set_entries(8);
 
 	/* devices */
 	MC6845(config, m_crtc, 14.318181_MHz_XTAL / 8);    /* unknown clock, hand tuned to get ~50/~60 fps */
@@ -725,7 +726,7 @@ MACHINE_CONFIG_START(z100_state::z100)
 
 	input_merger_device &epci1int(INPUT_MERGER_ANY_HIGH(config, "epci1int"));
 	epci1int.output_handler().set(m_picm, FUNC(pic8259_device::ir5_w));
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( z100 )

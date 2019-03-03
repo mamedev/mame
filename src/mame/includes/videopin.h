@@ -45,13 +45,13 @@ private:
 		TIMER_INTERRUPT
 	};
 
-	DECLARE_READ8_MEMBER(misc_r);
-	DECLARE_WRITE8_MEMBER(led_w);
-	DECLARE_WRITE8_MEMBER(ball_w);
-	DECLARE_WRITE8_MEMBER(video_ram_w);
-	DECLARE_WRITE8_MEMBER(out1_w);
-	DECLARE_WRITE8_MEMBER(out2_w);
-	DECLARE_WRITE8_MEMBER(note_dvsr_w);
+	uint8_t misc_r();
+	void led_w(uint8_t data);
+	void ball_w(uint8_t data);
+	void video_ram_w(offs_t offset, uint8_t data);
+	void out1_w(uint8_t data);
+	void out2_w(uint8_t data);
+	void note_dvsr_w(uint8_t data);
 
 	TILEMAP_MAPPER_MEMBER(get_memory_offset);
 	TILE_GET_INFO_MEMBER(get_tile_info);

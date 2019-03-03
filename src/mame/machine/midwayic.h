@@ -25,9 +25,9 @@ public:
 
 	void set_upper(int upper) { m_upper = upper; }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( status_r );
+	u8 read();
+	void write(u8 data);
+	u8 status_r();
 	DECLARE_WRITE_LINE_MEMBER( reset_w );
 
 protected:
@@ -100,9 +100,9 @@ public:
 
 	void set_yearoffs(int yearoffs) { m_yearoffs = yearoffs; }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( status_r );
+	u8 read();
+	void write(u8 data);
+	u8 status_r();
 
 	void set_default_nvram(const uint8_t *nvram);
 

@@ -1281,7 +1281,7 @@ MACHINE_CONFIG_START(coinmstr_state::coinmstr)
 	MCFG_SCREEN_UPDATE_DRIVER(coinmstr_state, screen_update_coinmstr)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_coinmstr)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_coinmstr);
 	MCFG_PALETTE_ADD("palette", 46*32*4)
 
 	h46505_device &crtc(H46505(config, "crtc", 14000000 / 16));

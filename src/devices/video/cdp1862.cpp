@@ -126,7 +126,7 @@ void cdp1862_device::device_reset()
 //  dma_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( cdp1862_device::dma_w )
+void cdp1862_device::dma_w(uint8_t data)
 {
 	int rd = 1, bd = 1, gd = 1;
 	int sx = screen().hpos() + 4;

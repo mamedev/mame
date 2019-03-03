@@ -17,6 +17,7 @@ hardware, since no schematics or manuals have been found.
 #include "cpu/i8085/i8085.h"
 #include "bus/rs232/rs232.h"
 #include "machine/ay31015.h"
+#include "machine/clock.h"
 #include "screen.h"
 
 class zms8085_state : public driver_device
@@ -26,6 +27,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_uart(*this, "uart")
+		, m_uart_clock(*this, "uart_clock")
 		, m_rs232(*this, "rs232")
 		, m_screen(*this, "screen")
 		, m_mainram(*this, "mainram")
@@ -51,6 +53,7 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ay51013_device> m_uart;
+	required_device<clock_device> m_uart_clock;
 	required_device<rs232_port_device> m_rs232;
 	required_device<screen_device> m_screen;
 	required_shared_ptr<u8> m_mainram;
@@ -335,12 +338,14 @@ void zms8085_state::zephyr(machine_config &config)
 	screen.screen_vblank().set_inputline(m_maincpu, I8085_RST55_LINE, ASSERT_LINE);
 
 	AY51013(config, m_uart); // SMC COM2017
-	m_uart->set_tx_clock(153600); // should actually be configurable somehow
-	m_uart->set_rx_clock(153600);
 	m_uart->read_si_callback().set("rs232", FUNC(rs232_port_device::rxd_r));
 	m_uart->write_so_callback().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_uart->write_dav_callback().set_inputline("maincpu", I8085_RST65_LINE);
 	m_uart->set_auto_rdav(true);
+
+	CLOCK(config, m_uart_clock, 153600); // should actually be configurable somehow
+	m_uart_clock->signal_handler().set(m_uart, FUNC(ay51013_device::write_tcp));
+	m_uart_clock->signal_handler().append(m_uart, FUNC(ay51013_device::write_rcp));
 
 	RS232_PORT(config, "rs232", default_rs232_devices, nullptr);
 }

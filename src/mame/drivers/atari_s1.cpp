@@ -450,10 +450,11 @@ void atari_s1_state::machine_reset()
 	m_audiores = 0;
 }
 
-MACHINE_CONFIG_START(atari_s1_state::atari_s1)
+void atari_s1_state::atari_s1(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6800, MASTER_CLK)
-	MCFG_DEVICE_PROGRAM_MAP(atari_s1_map)
+	M6800(config, m_maincpu, MASTER_CLK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &atari_s1_state::atari_s1_map);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -461,28 +462,29 @@ MACHINE_CONFIG_START(atari_s1_state::atari_s1)
 	genpin_audio(config);
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_DEVICE_ADD("dac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	DAC_4BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.3); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	/* Video */
 	config.set_default_layout(layout_atari_s1);
 
 	TIMER(config, "nmi").configure_periodic(FUNC(atari_s1_state::nmi), attotime::from_hz(NMI_INT));
 	TIMER(config, "timer_s").configure_periodic(FUNC(atari_s1_state::timer_s), attotime::from_hz(AUDIO_CLK));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(atari_s1_state::atarians)
+void atari_s1_state::atarians(machine_config &config)
+{
 	atari_s1(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(atarians_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &atari_s1_state::atarians_map);
+}
 
-MACHINE_CONFIG_START(atari_s1_state::midearth)
+void atari_s1_state::midearth(machine_config &config)
+{
 	atari_s1(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(midearth_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &atari_s1_state::midearth_map);
+}
 
 /*-------------------------------------------------------------------
 / The Atarians (11/1976)

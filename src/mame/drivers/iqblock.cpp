@@ -363,7 +363,7 @@ MACHINE_CONFIG_START(iqblock_state::iqblock)
 	MCFG_SCREEN_UPDATE_DRIVER(iqblock_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_iqblock)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_iqblock);
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 1024);
 
 	/* sound hardware */

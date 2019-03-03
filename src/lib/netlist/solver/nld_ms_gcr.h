@@ -10,14 +10,15 @@
 #ifndef NLD_MS_GCR_H_
 #define NLD_MS_GCR_H_
 
-#include <algorithm>
+#include "plib/mat_cr.h"
 
-#include "../plib/pdynlib.h"
-#include "mat_cr.h"
+#include "plib/pdynlib.h"
+#include "plib/pstream.h"
+#include "plib/vector_ops.h"
 #include "nld_ms_direct.h"
 #include "nld_solver.h"
-#include "vector_base.h"
-#include "../plib/pstream.h"
+
+#include <algorithm>
 
 namespace netlist
 {
@@ -29,39 +30,35 @@ class matrix_solver_GCR_t: public matrix_solver_t
 {
 public:
 
+	using mat_type = plib::matrix_compressed_rows_t<FT, SIZE>;
 	// FIXME: dirty hack to make this compile
 	static constexpr const std::size_t storage_N = 100;
 
-	matrix_solver_GCR_t(netlist_base_t &anetlist, const pstring &name,
+	matrix_solver_GCR_t(netlist_state_t &anetlist, const pstring &name,
 			const solver_parameters_t *params, const std::size_t size)
-		: matrix_solver_t(anetlist, name, matrix_solver_t::ASCENDING, params)
+		: matrix_solver_t(anetlist, name, matrix_solver_t::PREFER_IDENTITY_TOP_LEFT, params)
 		, m_dim(size)
 		, RHS(size)
 		, new_V(size)
-		, mat(size)
+		, mat(static_cast<typename mat_type::index_type>(size))
 		, m_proc()
 		{
 		}
 
-	virtual ~matrix_solver_GCR_t() override
-	{
-	}
-
 	constexpr std::size_t N() const { return m_dim; }
 
-	virtual void vsetup(analog_net_t::list_t &nets) override;
-	virtual unsigned vsolve_non_dynamic(const bool newton_raphson) override;
+	void vsetup(analog_net_t::list_t &nets) override;
+	unsigned vsolve_non_dynamic(const bool newton_raphson) override;
 
-	virtual std::pair<pstring, pstring> create_solver_code() override;
+	std::pair<pstring, pstring> create_solver_code() override;
 
 private:
 
-	//typedef typename mat_cr_t<storage_N>::type mattype;
-	typedef typename plib::mat_cr_t<FT, SIZE>::index_type mat_index_type;
+	using mat_index_type = typename plib::matrix_compressed_rows_t<FT, SIZE>::index_type;
 
 	void csc_private(plib::putf8_fmt_writer &strm);
 
-	using extsolver = void (*)(double * RESTRICT m_A, double * RESTRICT RHS, double * RESTRICT V);
+	using extsolver = void (*)(double * m_A, double * RHS, double * V);
 
 	pstring static_compile_name();
 
@@ -69,18 +66,29 @@ private:
 	plib::parray<FT, SIZE> RHS;
 	plib::parray<FT, SIZE> new_V;
 
-	std::vector<FT *> m_term_cr[storage_N];
+	std::array<plib::aligned_vector<FT *, PALIGN_VECTOROPT>, storage_N> m_term_cr;
+//  std::array<std::vector<FT *>, storage_N> m_term_cr;
 
-	plib::mat_cr_t<FT, SIZE> mat;
+	mat_type mat;
 
 	//extsolver m_proc;
-	plib::dynproc<void, double * RESTRICT, double * RESTRICT, double * RESTRICT> m_proc;
+	plib::dynproc<void, double * , double * , double * > m_proc;
 
 };
 
 // ----------------------------------------------------------------------------------------
 // matrix_solver - GCR
 // ----------------------------------------------------------------------------------------
+
+// FIXME: namespace or static class member
+template <typename V>
+std::size_t inline get_level(const V &v, std::size_t k)
+{
+	for (std::size_t i = 0; i < v.size(); i++)
+		if (plib::container::contains(v[i], k))
+			return i;
+	throw plib::pexception("Error in get_level");
+}
 
 template <typename FT, int SIZE>
 void matrix_solver_GCR_t<FT, SIZE>::vsetup(analog_net_t::list_t &nets)
@@ -108,18 +116,46 @@ void matrix_solver_GCR_t<FT, SIZE>::vsetup(analog_net_t::list_t &nets)
 
 	auto gr = mat.gaussian_extend_fill_mat(fill);
 
+	/* FIXME: move this to the cr matrix class and use computed
+	 * parallel ordering once it makes sense.
+	 */
+
+	std::vector<unsigned> levL(iN, 0);
+	std::vector<unsigned> levU(iN, 0);
+
+	// parallel scheme for L x = y
+	for (std::size_t k = 0; k < iN; k++)
+	{
+		unsigned lm=0;
+		for (std::size_t j = 0; j<k; j++)
+			if (fill[k][j] < decltype(mat)::FILL_INFINITY)
+				lm = std::max(lm, levL[j]);
+		levL[k] = 1+lm;
+	}
+
+	// parallel scheme for U x = y
+	for (std::size_t k = iN; k-- > 0; )
+	{
+		unsigned lm=0;
+		for (std::size_t j = iN; --j > k; )
+			if (fill[k][j] < decltype(mat)::FILL_INFINITY)
+				lm = std::max(lm, levU[j]);
+		levU[k] = 1+lm;
+	}
+
+
 	for (std::size_t k = 0; k < iN; k++)
 	{
 		unsigned fm = 0;
 		pstring ml = "";
 		for (std::size_t j = 0; j < iN; j++)
 		{
-			ml += fill[k][j] < decltype(mat)::FILL_INFINITY ? "X" : "_";
+			ml += fill[k][j] == 0 ? "X" : fill[k][j] < decltype(mat)::FILL_INFINITY ? "+" : ".";
 			if (fill[k][j] < decltype(mat)::FILL_INFINITY)
 				if (fill[k][j] > fm)
 					fm = fill[k][j];
 		}
-		this->log().verbose("{1:4} {2} {3:4}", k, ml, fm);
+		this->log().verbose("{1:4} {2} {3:4} {4:4} {5:4} {6:4}", k, ml, levL[k], levU[k], get_level(mat.m_ge_par, k), fm);
 	}
 
 
@@ -273,6 +309,7 @@ unsigned matrix_solver_GCR_t<FT, SIZE>::vsolve_non_dynamic(const bool newton_rap
 	}
 	else
 	{
+		// mat.gaussian_elimination_parallel(RHS);
 		mat.gaussian_elimination(RHS);
 		/* backward substitution */
 		mat.gaussian_back_substitution(new_V, RHS);

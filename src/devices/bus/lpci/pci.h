@@ -114,20 +114,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(PCI_BUS, pci_bus_device)
 
-
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_PCI_BUS_ADD(_tag, _busnum) \
-	MCFG_DEVICE_ADD(_tag, PCI_BUS, 0) \
-	downcast<pci_bus_device *>(device)->set_busnum(_busnum);
-#define MCFG_PCI_BUS_DEVICE(_tag, _slot_intf, _def_slot, _fixed) \
-	MCFG_DEVICE_ADD(_tag, PCI_CONNECTOR, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _fixed)
-
-#define MCFG_PCI_BUS_SIBLING(_father_tag) \
-	downcast<pci_bus_device *>(device)->set_father(_father_tag);
-
-
 #endif // MAME_BUS_LPCI_PCI_H

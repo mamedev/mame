@@ -395,7 +395,7 @@ void pv1000_state::machine_start()
 
 	if (m_cart->exists())
 	{
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x7fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x7fff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 
 		// FIXME: this is needed for gfx decoding, but there is probably a cleaner solution!
 		std::string region_tag;
@@ -455,7 +455,7 @@ MACHINE_CONFIG_START(pv1000_state::pv1000)
 
 	PALETTE(config, m_palette, palette_device::BGR_3BIT);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pv1000)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pv1000);
 
 	SPEAKER(config, "mono").front_center();
 	PV1000(config, m_sound, 17897725).add_route(ALL_OUTPUTS, "mono", 1.00);
@@ -466,7 +466,7 @@ MACHINE_CONFIG_START(pv1000_state::pv1000)
 	MCFG_GENERIC_LOAD(pv1000_state, pv1000_cart)
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","pv1000")
+	SOFTWARE_LIST(config, "cart_list").set_original("pv1000");
 MACHINE_CONFIG_END
 
 

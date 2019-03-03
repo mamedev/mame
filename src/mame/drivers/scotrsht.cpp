@@ -187,27 +187,27 @@ static GFXDECODE_START( gfx_scotrsht )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 16*16*8, 16*8 ) /* sprites */
 GFXDECODE_END
 
-MACHINE_CONFIG_START(scotrsht_state::scotrsht)
-
+void scotrsht_state::scotrsht(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809E, 18432000/6)        /* 3.072 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(scotrsht_map)
+	MC6809E(config, m_maincpu, 18432000/6);        /* 3.072 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &scotrsht_state::scotrsht_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 18432000/6)        /* 3.072 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(scotrsht_sound_map)
-	MCFG_DEVICE_IO_MAP(scotrsht_sound_port)
+	Z80(config, m_audiocpu, 18432000/6);        /* 3.072 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &scotrsht_state::scotrsht_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &scotrsht_state::scotrsht_sound_port);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(scotrsht_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, scotrsht_state, vblank_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(scotrsht_state::screen_update));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(scotrsht_state::vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_scotrsht);
 	PALETTE(config, m_palette, FUNC(scotrsht_state::scotrsht_palette), 16*8*16+16*8*16, 256);
@@ -217,9 +217,8 @@ MACHINE_CONFIG_START(scotrsht_state::scotrsht)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, 18432000/6)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-MACHINE_CONFIG_END
+	YM2203(config, "ymsnd", 18432000/6).add_route(ALL_OUTPUTS, "mono", 0.40);
+}
 
 
 /***************************************************************************

@@ -25,12 +25,13 @@ DEFINE_DEVICE_TYPE(ACORN_VDU40, acorn_vdu40_device, "acorn_vdu40", "Acorn 40 Col
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(acorn_vdu40_device::device_add_mconfig)
-	device = &SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+void acorn_vdu40_device::device_add_mconfig(machine_config &config)
+{
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(12_MHz_XTAL, 768, 132, 612, 311, 20, 270);
-	MCFG_SCREEN_UPDATE_DEVICE("mc6845", mc6845_device, screen_update)
+	m_screen->set_screen_update("mc6845", FUNC(mc6845_device::screen_update));
 
-	MCFG_PALETTE_ADD("palette", 8)
+	PALETTE(config, "palette").set_entries(8);
 
 	HD6845(config, m_crtc, 12_MHz_XTAL / 6);
 	m_crtc->set_screen("screen");
@@ -41,7 +42,7 @@ MACHINE_CONFIG_START(acorn_vdu40_device::device_add_mconfig)
 
 	SAA5050(config, m_trom, 12_MHz_XTAL / 2);
 	m_trom->set_screen_size(40, 25, 40);
-MACHINE_CONFIG_END
+}
 
 
 //**************************************************************************
@@ -81,8 +82,8 @@ void acorn_vdu40_device::device_reset()
 	address_space &space = m_bus->memspace();
 
 	space.install_ram(0x0400, 0x07ff, m_videoram.get());
-	space.install_readwrite_handler(0x0800, 0x0800, read8_delegate(FUNC(mc6845_device::status_r), m_crtc.target()), write8_delegate(FUNC(mc6845_device::address_w), m_crtc.target()));
-	space.install_readwrite_handler(0x0801, 0x0801, read8_delegate(FUNC(mc6845_device::register_r), m_crtc.target()), write8_delegate(FUNC(mc6845_device::register_w), m_crtc.target()));
+	space.install_readwrite_handler(0x0800, 0x0800, read8smo_delegate(FUNC(mc6845_device::status_r), m_crtc.target()), write8smo_delegate(FUNC(mc6845_device::address_w), m_crtc.target()));
+	space.install_readwrite_handler(0x0801, 0x0801, read8smo_delegate(FUNC(mc6845_device::register_r), m_crtc.target()), write8smo_delegate(FUNC(mc6845_device::register_w), m_crtc.target()));
 }
 
 

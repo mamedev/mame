@@ -214,7 +214,7 @@ READ8_MEMBER(rbmk_state::mcu_io_r)
 {
 	if(m_mux_data & 8)
 	{
-		return m_ymsnd->read(space, offset & 1);
+		return m_ymsnd->read(offset & 1);
 	}
 	else if(m_mux_data & 4)
 	{
@@ -230,7 +230,7 @@ READ8_MEMBER(rbmk_state::mcu_io_r)
 
 WRITE8_MEMBER(rbmk_state::mcu_io_w)
 {
-	if(m_mux_data & 8) { m_ymsnd->write(space, offset & 1, data); }
+	if(m_mux_data & 8) { m_ymsnd->write(offset & 1, data); }
 	else if(m_mux_data & 4)
 	{
 		//printf("%02x %02x W\n",offset,data);

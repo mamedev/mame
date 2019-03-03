@@ -64,7 +64,8 @@ void adam_spi_device::adam_spi_mem(address_map &map)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(adam_spi_device::device_add_mconfig)
+void adam_spi_device::device_add_mconfig(machine_config &config)
+{
 	M6801(config, m_maincpu, XTAL(4'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &adam_spi_device::adam_spi_mem);
 	m_maincpu->in_p2_cb().set(FUNC(adam_spi_device::p2_r));
@@ -78,8 +79,9 @@ MACHINE_CONFIG_START(adam_spi_device::device_add_mconfig)
 	centronics_device &centronics(CENTRONICS(config, "centronics", centronics_devices, "printer"));
 	centronics.set_data_input_buffer("cent_data_in");
 	INPUT_BUFFER(config, "cent_data_in");
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
-MACHINE_CONFIG_END
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	centronics.set_output_latch(cent_data_out);
+}
 
 
 

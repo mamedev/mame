@@ -50,21 +50,22 @@ const tiny_rom_entry *cst_q_plus4_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(cst_q_plus4_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(MC6821_TAG, PIA6821, 0)
+void cst_q_plus4_device::device_add_mconfig(machine_config &config)
+{
+	PIA6821(config, MC6821_TAG, 0);
 
-	MCFG_DEVICE_ADD("exp1", QL_EXPANSION_SLOT, DERIVED_CLOCK(1, 1), ql_expansion_cards, nullptr)
-	MCFG_QL_EXPANSION_SLOT_EXTINTL_CALLBACK(WRITELINE(*this, cst_q_plus4_device, exp1_extintl_w))
+	QL_EXPANSION_SLOT(config, m_exp1, DERIVED_CLOCK(1, 1), ql_expansion_cards, nullptr);
+	m_exp1->extintl_wr_callback().set(FUNC(cst_q_plus4_device::exp1_extintl_w));
 
-	MCFG_DEVICE_ADD("exp2", QL_EXPANSION_SLOT, DERIVED_CLOCK(1, 1), ql_expansion_cards, nullptr)
-	MCFG_QL_EXPANSION_SLOT_EXTINTL_CALLBACK(WRITELINE(*this, cst_q_plus4_device, exp2_extintl_w))
+	QL_EXPANSION_SLOT(config, m_exp2, DERIVED_CLOCK(1, 1), ql_expansion_cards, nullptr);
+	m_exp2->extintl_wr_callback().set(FUNC(cst_q_plus4_device::exp2_extintl_w));
 
-	MCFG_DEVICE_ADD("exp3", QL_EXPANSION_SLOT, DERIVED_CLOCK(1, 1), ql_expansion_cards, nullptr)
-	MCFG_QL_EXPANSION_SLOT_EXTINTL_CALLBACK(WRITELINE(*this, cst_q_plus4_device, exp3_extintl_w))
+	QL_EXPANSION_SLOT(config, m_exp3, DERIVED_CLOCK(1, 1), ql_expansion_cards, nullptr);
+	m_exp3->extintl_wr_callback().set(FUNC(cst_q_plus4_device::exp3_extintl_w));
 
-	MCFG_DEVICE_ADD("exp4", QL_EXPANSION_SLOT, DERIVED_CLOCK(1, 1), ql_expansion_cards, nullptr)
-	MCFG_QL_EXPANSION_SLOT_EXTINTL_CALLBACK(WRITELINE(*this, cst_q_plus4_device, exp4_extintl_w))
-MACHINE_CONFIG_END
+	QL_EXPANSION_SLOT(config, m_exp4, DERIVED_CLOCK(1, 1), ql_expansion_cards, nullptr);
+	m_exp4->extintl_wr_callback().set(FUNC(cst_q_plus4_device::exp4_extintl_w));
+}
 
 
 

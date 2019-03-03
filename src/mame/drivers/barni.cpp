@@ -1,18 +1,18 @@
 // license:BSD-3-Clause
 // copyright-holders:Ivan Vangelista
 // PINBALL
-// Skeleton driver for Barni pinballs. At this time only Red Baron is dumped.
+// Skeleton driver for Barni pinballs.
 // Known pinballs to be dumped: Shield (1985)
 // Hardware listing and ROM definitions from PinMAME.
 
 /*
-   Hardware:
-CPU:     2 x 6809E, optional MC6802 which may replace second 6809E
+    Hardware:
+    CPU: 2 x 6809E, optional MC6802 which may replace second 6809E
     INT: IRQ on CPU 0, FIRQ on CPU 1
-IO:      2x PIA 6821
-         1x VIA 6522
-DISPLAY: 5x6 digit 7 or 16 segment display
-SOUND:   basically the same as Bally's Squalk & Talk -61 board but missing AY8912 synth chip
+    IO: 2x PIA 6821
+        1x VIA 6522
+    DISPLAY: 5x6 digit 7 or 16 segment display
+    SOUND: basically the same as Bally's Squalk & Talk -61 board but missing AY8912 synth chip
 */
 
 #include "emu.h"
@@ -62,19 +62,20 @@ void barni_state::audiocpu_map(address_map &map)
 static INPUT_PORTS_START( barni )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(barni_state::barni)
+void barni_state::barni(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809E, XTAL(4'000'000) / 4)
-	MCFG_DEVICE_PROGRAM_MAP(maincpu_map)
+	MC6809E(config, m_maincpu, XTAL(4'000'000) / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &barni_state::maincpu_map);
 
-	MCFG_DEVICE_ADD("subcpu", MC6809E, XTAL(4'000'000) / 4)
-	MCFG_DEVICE_PROGRAM_MAP(subcpu_map)
+	mc6809e_device &subcpu(MC6809E(config, "subcpu", XTAL(4'000'000) / 4));
+	subcpu.set_addrmap(AS_PROGRAM, &barni_state::subcpu_map);
 
-	MCFG_DEVICE_ADD("audiocpu", M6802, 4000000) // uses own XTAL, but what is the value?
-	MCFG_DEVICE_PROGRAM_MAP(audiocpu_map)
+	m6802_cpu_device &audiocpu(M6802(config, "audiocpu", 4000000)); // uses own XTAL, but what is the value?
+	audiocpu.set_addrmap(AS_PROGRAM, &barni_state::audiocpu_map);
 
 	/* video hardware */
-	//MCFG_DEFAULT_LAYOUT()
+	//config.set_default_layout();
 
 	//6522via
 	//6821pia
@@ -83,7 +84,26 @@ MACHINE_CONFIG_START(barni_state::barni)
 	//tmms5220
 	//dac
 	genpin_audio(config);
-MACHINE_CONFIG_END
+}
+
+
+/*--------------------------------
+/ Champion 85
+/-------------------------------*/
+ROM_START(champion)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("che.bin", 0xe000, 0x2000, CRC(c5dc9228) SHA1(5306980a9c73118cfb843dbce0d56f516d054220))
+	ROM_LOAD("chc.bin", 0xc000, 0x2000, CRC(6ab0f232) SHA1(0638d33f86c62ee93dff924a16a5b9309392d9e8))
+
+	ROM_REGION(0x10000, "subcpu", 0)
+	ROM_LOAD("chan.bin", 0xe000, 0x2000, CRC(3f148587) SHA1(e44dc9cce15830f522dc781aaa13c659a43371f3))
+
+	ROM_REGION(0x10000, "audiocpu", 0)
+	ROM_LOAD("voz1.bin", 0xf000, 0x1000, CRC(48665778) SHA1(c295dfe7f4a98756f508391eb326f37a5aac37ff))
+	ROM_LOAD("voz2.bin", 0xe000, 0x1000, CRC(30e7da5e) SHA1(3054cf9b09e0f89c242e1ad35bb31d9bd77248e4))
+	ROM_LOAD("voz3.bin", 0xd000, 0x1000, CRC(3cd8058e) SHA1(fa4fd0cf4124263d4021c5a86033af9e5aa66eed))
+	ROM_LOAD("voz4.bin", 0xc000, 0x1000, CRC(0d00d8cc) SHA1(10f64d2fc3fc3e276bbd0e108815a3b395dcf0c9))
+ROM_END
 
 
 /*--------------------------------
@@ -105,4 +125,5 @@ ROM_START(redbarnp)
 ROM_END
 
 
+GAME( 1985, champion, 0, barni, barni, barni_state, empty_init, ROT0, "Barni", "Champion 85",         MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1985, redbarnp, 0, barni, barni, barni_state, empty_init, ROT0, "Barni", "Red Baron (Pinball)", MACHINE_IS_SKELETON_MECHANICAL )

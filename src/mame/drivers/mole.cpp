@@ -339,7 +339,7 @@ MACHINE_CONFIG_START(mole_state::mole)
 	MCFG_SCREEN_UPDATE_DRIVER(mole_state, screen_update_mole)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mole)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_mole);
 	PALETTE(config, "palette", palette_device::RBG_3BIT);
 
 	/* sound hardware */

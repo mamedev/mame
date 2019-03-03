@@ -463,15 +463,15 @@ image_init_result pegasus_state::load_cart(device_image_interface &image, generi
 void pegasus_state::machine_start()
 {
 	if (m_exp_00->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x0fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_exp_00));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x0fff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_exp_00));
 	if (m_exp_01->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000, 0x1fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_exp_01));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000, 0x1fff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_exp_01));
 	if (m_exp_02->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x2000, 0x2fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_exp_02));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x2000, 0x2fff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_exp_02));
 	if (m_exp_0c->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000, 0xcfff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_exp_0c));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000, 0xcfff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_exp_0c));
 	if (m_exp_0d->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0xd000, 0xdfff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_exp_0d));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xd000, 0xdfff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_exp_0d));
 }
 
 void pegasus_state::machine_reset()
@@ -503,7 +503,7 @@ MACHINE_CONFIG_START(pegasus_state::pegasus)
 	MCFG_SCREEN_SIZE(32*8, 16*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 16*16-1)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pegasus)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_pegasus);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
@@ -545,7 +545,7 @@ MACHINE_CONFIG_START(pegasus_state::pegasus)
 	m_cass->set_default_state(CASSETTE_STOPPED|CASSETTE_MOTOR_ENABLED);
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "pegasus_cart")
+	SOFTWARE_LIST(config, "cart_list").set_original("pegasus_cart");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pegasus_state::pegasusm)

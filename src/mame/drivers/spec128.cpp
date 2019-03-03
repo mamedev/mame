@@ -296,22 +296,20 @@ static GFXDECODE_START( spec128 )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(spectrum_state::spectrum_128)
+void spectrum_state::spectrum_128(machine_config &config)
+{
 	spectrum(config);
 
-	MCFG_DEVICE_REMOVE("maincpu")
-
-	MCFG_DEVICE_ADD("maincpu", Z80, X1_128_SINCLAIR / 5)
-	MCFG_DEVICE_PROGRAM_MAP(spectrum_128_mem)
-	MCFG_DEVICE_IO_MAP(spectrum_128_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", spectrum_state, spec_interrupt)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	Z80(config.replace(), m_maincpu, X1_128_SINCLAIR / 5);
+	m_maincpu->set_addrmap(AS_PROGRAM, &spectrum_state::spectrum_128_mem);
+	m_maincpu->set_addrmap(AS_IO, &spectrum_state::spectrum_128_io);
+	m_maincpu->set_vblank_int("screen", FUNC(spectrum_state::spec_interrupt));
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	MCFG_MACHINE_RESET_OVERRIDE(spectrum_state, spectrum_128 )
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_RAW_PARAMS(X1_128_SINCLAIR / 2.5f, 456, 0, 352,  311, 0, 296)
+	m_screen->set_raw(X1_128_SINCLAIR / 2.5f, 456, 0, 352,  311, 0, 296);
 
 	MCFG_VIDEO_START_OVERRIDE(spectrum_state, spectrum_128 )
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(spec128);
@@ -320,12 +318,13 @@ MACHINE_CONFIG_START(spectrum_state::spectrum_128)
 	AY8912(config, "ay8912", X1_128_SINCLAIR / 10).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* expansion port */
-	MCFG_DEVICE_MODIFY("exp")
-	MCFG_DEVICE_SLOT_INTERFACE(spec128_expansion_devices, nullptr, false)
+	SPECTRUM_EXPANSION_SLOT(config.replace(), m_exp, spec128_expansion_devices, nullptr);
+	m_exp->irq_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_exp->nmi_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	/* internal ram */
 	m_ram->set_default_size("128K");
-MACHINE_CONFIG_END
+}
 
 
 

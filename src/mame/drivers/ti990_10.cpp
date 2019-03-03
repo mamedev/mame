@@ -317,7 +317,8 @@ WRITE_LINE_MEMBER(ti990_10_state::tape_interrupt)
 	// set_int9(state);
 }
 
-MACHINE_CONFIG_START(ti990_10_state::ti990_10)
+void ti990_10_state::ti990_10(machine_config &config)
+{
 	/* basic machine hardware */
 	/* TI990/10 CPU @ 4.0(???) MHz */
 	TI990_10(config, m_maincpu, 4000000);
@@ -330,11 +331,15 @@ MACHINE_CONFIG_START(ti990_10_state::ti990_10)
 	m_terminal->lineint_cb().set(FUNC(ti990_10_state::line_interrupt));
 
 	// Hard disk
-	TI990_HDC(config, "hdc", 0).int_cb().set(FUNC(ti990_10_state::ti990_set_int13));
+	ti990_hdc_device &hdc(TI990_HDC(config, "hdc", 0));
+	hdc.set_memory_space(m_maincpu, AS_PROGRAM);
+	hdc.int_cb().set(FUNC(ti990_10_state::ti990_set_int13));
 
 	// Tape controller
-	TI990_TAPE_CTRL(config, "tpc", 0).int_cb().set(FUNC(ti990_10_state::tape_interrupt));
-MACHINE_CONFIG_END
+	tap_990_device &tpc(TI990_TAPE_CTRL(config, "tpc", 0));
+	tpc.set_memory_space(m_maincpu, AS_PROGRAM);
+	tpc.int_cb().set(FUNC(ti990_10_state::tape_interrupt));
+}
 
 
 /*

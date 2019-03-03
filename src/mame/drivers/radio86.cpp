@@ -462,7 +462,8 @@ GFXDECODE_END
 
 
 /* Machine driver */
-MACHINE_CONFIG_START(radio86_state::radio86)
+void radio86_state::radio86(machine_config &config)
+{
 	/* basic machine hardware */
 	I8080(config, m_maincpu, XTAL(16'000'000) / 9);
 	m_maincpu->set_addrmap(AS_PROGRAM, &radio86_state::radio86_mem);
@@ -480,9 +481,9 @@ MACHINE_CONFIG_START(radio86_state::radio86)
 	crtc.drq_wr_callback().set(m_dma8257, FUNC(i8257_device::dreq2_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_UPDATE_DEVICE("i8275", i8275_device, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(16'000'000) / 2, 516, 0, 78*6, 310, 0, 30*10)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_screen_update("i8275", FUNC(i8275_device::screen_update));
+	screen.set_raw(XTAL(16'000'000) / 2, 516, 0, 78*6, 310, 0, 30*10);
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_radio86);
 	PALETTE(config, m_palette, FUNC(radio86_state::radio86_palette), 3);
 
@@ -501,8 +502,8 @@ MACHINE_CONFIG_START(radio86_state::radio86)
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
 	m_cassette->set_interface("radio86_cass");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "radio86_cass")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cass_list").set_original("radio86_cass");
+}
 
 
 void radio86_state::kr03(machine_config &config)
@@ -537,7 +538,7 @@ MACHINE_CONFIG_START(radio86_state::radiorom)
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "radio86_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "radio86_cart")
+	SOFTWARE_LIST(config, "cart_list").set_original("radio86_cart");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(radio86_state::radioram)

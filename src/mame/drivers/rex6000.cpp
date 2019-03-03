@@ -934,7 +934,7 @@ MACHINE_CONFIG_START(rex6000_state::rex6000)
 	serport.cts_handler().set(m_uart, FUNC(ins8250_uart_device::cts_w));
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", rex6000_state, rex6000, "rex,ds2", 0)
+	MCFG_QUICKLOAD_ADD("quickload", rex6000_state, rex6000, "rex,ds2")
 
 	tc8521_device &rtc(TC8521(config, TC8521_TAG, XTAL(32'768)));
 	rtc.out_alarm_callback().set(FUNC(rex6000_state::alarm_irq));
@@ -998,7 +998,7 @@ MACHINE_CONFIG_START(oz750_state::oz750)
 	ADDRESS_MAP_BANK(config, "bank1").set_map(&oz750_state::oz750_banked_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x2000);
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", oz750_state, oz750, "wzd", 0)
+	MCFG_QUICKLOAD_ADD("quickload", oz750_state, oz750, "wzd")
 
 	tc8521_device &rtc(TC8521(config, TC8521_TAG, XTAL(32'768)));
 	rtc.out_alarm_callback().set(FUNC(rex6000_state::alarm_irq));

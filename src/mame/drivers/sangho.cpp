@@ -477,10 +477,11 @@ void sexyboom_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(pzlestar_state::pzlestar)
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(21'477'272)/6) // ?
-	MCFG_DEVICE_PROGRAM_MAP(sangho_map)
-	MCFG_DEVICE_IO_MAP(pzlestar_io_map)
+void pzlestar_state::pzlestar(machine_config &config)
+{
+	Z80(config, m_maincpu, XTAL(21'477'272)/6); // ?
+	m_maincpu->set_addrmap(AS_PROGRAM, &pzlestar_state::sangho_map);
+	m_maincpu->set_addrmap(AS_IO, &pzlestar_state::pzlestar_io_map);
 
 	v9958_device &v9958(V9958(config, "v9958", XTAL(21'477'272))); // typical 9958 clock, not verified
 	v9958.set_screen_ntsc("screen");
@@ -489,16 +490,15 @@ MACHINE_CONFIG_START(pzlestar_state::pzlestar)
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ymsnd", YM2413,  XTAL(21'477'272)/6)
-
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	YM2413(config, "ymsnd", XTAL(21'477'272)/6).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
-MACHINE_CONFIG_START(sexyboom_state::sexyboom)
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(21'477'272)/6)
-	MCFG_DEVICE_PROGRAM_MAP(sangho_map)
-	MCFG_DEVICE_IO_MAP(sexyboom_io_map)
+void sexyboom_state::sexyboom(machine_config &config)
+{
+	Z80(config, m_maincpu, XTAL(21'477'272)/6);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sexyboom_state::sangho_map);
+	m_maincpu->set_addrmap(AS_IO, &sexyboom_state::sexyboom_io_map);
 
 	v9958_device &v9958(V9958(config, "v9958", XTAL(21'477'272)));
 	v9958.set_screen_ntsc("screen");
@@ -506,13 +506,11 @@ MACHINE_CONFIG_START(sexyboom_state::sexyboom)
 	v9958.int_cb().set_inputline("maincpu", 0);
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
-	MCFG_PALETTE_ADD("palette", 19780)
+	PALETTE(config, "palette").set_entries(19780);
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(21'477'272)/6)
-
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	YM2413(config, "ymsnd", XTAL(21'477'272)/6).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 ROM_START( pzlestar )
 	ROM_REGION( 0x20000*16, "user1", 0 ) // 15 sockets, 13 used

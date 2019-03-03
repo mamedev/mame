@@ -1072,23 +1072,14 @@ void tmnt_state::thndrx2_audio_map(address_map &map)
 }
 
 
-READ8_MEMBER(tmnt_state::k054539_ctrl_r)
-{
-	return m_k054539->read(space, 0x200 + offset, 0xff);
-}
-
-WRITE8_MEMBER(tmnt_state::k054539_ctrl_w)
-{
-	m_k054539->write(space, 0x200 + offset, data, 0xff);
-}
-
 void tmnt_state::prmrsocr_audio_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xdfff).ram();
-	map(0xe000, 0xe0ff).rw(m_k054539, FUNC(k054539_device::read), FUNC(k054539_device::write));
-	map(0xe100, 0xe12f).rw(FUNC(tmnt_state::k054539_ctrl_r), FUNC(tmnt_state::k054539_ctrl_w));
+	map(0xe000, 0xe12f).lrw8("k054539_rw",
+		[this](offs_t offset) { return m_k054539->read(((offset & 0x100) << 1) | (offset & 0xff)); },
+		[this](offs_t offset, u8 data) { m_k054539->write(((offset & 0x100) << 1) | (offset & 0xff), data); });
 	map(0xf000, 0xf000).w("soundlatch3", FUNC(generic_latch_8_device::write));
 	map(0xf002, 0xf002).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0xf003, 0xf003).r("soundlatch2", FUNC(generic_latch_8_device::read));

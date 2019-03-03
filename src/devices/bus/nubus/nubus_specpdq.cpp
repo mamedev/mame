@@ -54,15 +54,16 @@ DEFINE_DEVICE_TYPE(NUBUS_SPECPDQ, nubus_specpdq_device, "nb_spdq", "SuperMac Spe
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(nubus_specpdq_device::device_add_mconfig)
-	MCFG_SCREEN_ADD( SPECPDQ_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, nubus_specpdq_device, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
-	MCFG_SCREEN_SIZE(1280,1024)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1152-1, 0, 844-1)
+void nubus_specpdq_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, SPECPDQ_SCREEN_NAME, SCREEN_TYPE_RASTER));
+	screen.set_screen_update(FUNC(nubus_specpdq_device::screen_update));
+	screen.set_raw(25175000, 800, 0, 640, 525, 0, 480);
+	screen.set_size(1280, 1024);
+	screen.set_visarea(0, 1152-1, 0, 844-1);
 
-	MCFG_PALETTE_ADD("palette", 256)
-MACHINE_CONFIG_END
+	PALETTE(config, m_palette).set_entries(256);
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

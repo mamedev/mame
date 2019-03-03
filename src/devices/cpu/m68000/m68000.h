@@ -349,6 +349,8 @@ protected:
 #include "m68kops.h"
 #include "m68kfpu.hxx"
 #include "m68kmmu.h"
+
+	virtual void m68k_reset_peripherals() { }
 };
 
 

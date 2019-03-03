@@ -52,6 +52,15 @@ class nes_datach_slot_device : public device_t,
 	friend class nes_datach_device;
 public:
 	// construction/destruction
+	template <typename T>
+	nes_datach_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock, T &&opts)
+		: nes_datach_slot_device(mconfig, tag, owner, clock)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(nullptr);
+		set_fixed(false);
+	}
 	nes_datach_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~nes_datach_slot_device();
 
@@ -83,11 +92,6 @@ protected:
 
 // device type definition
 DECLARE_DEVICE_TYPE(NES_DATACH_SLOT, nes_datach_slot_device)
-
-
-#define MCFG_DATACH_MINICART_ADD(_tag, _slot_intf) \
-		MCFG_DEVICE_ADD(_tag, NES_DATACH_SLOT, 0) \
-		MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, nullptr, false)
 
 
 //--------------------------------

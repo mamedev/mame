@@ -720,7 +720,7 @@ void m5_state::m5_io(address_map &map)
 	map(0x00, 0x03).mirror(0x0c).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x10, 0x10).mirror(0x0e).rw("tms9928a", FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));
 	map(0x11, 0x11).mirror(0x0e).rw("tms9928a", FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));
-	map(0x20, 0x20).mirror(0x0f).w(SN76489AN_TAG, FUNC(sn76489a_device::command_w));
+	map(0x20, 0x20).mirror(0x0f).w(SN76489AN_TAG, FUNC(sn76489a_device::write));
 	map(0x30, 0x30).mirror(0x08).portr("Y0").w(FUNC(m5_state::mem64KBF_w)); // 64KBF paging
 	map(0x31, 0x31).mirror(0x08).portr("Y1");
 	map(0x32, 0x32).mirror(0x08).portr("Y2");
@@ -1042,7 +1042,7 @@ void brno_state::brno_io(address_map &map)
 	map(0x00, 0x03).mirror(0x0c).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x10, 0x10).mirror(0x0e).rw("tms9928a", FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));
 	map(0x11, 0x11).mirror(0x0e).rw("tms9928a", FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));
-	map(0x20, 0x20).mirror(0x0f).w(SN76489AN_TAG, FUNC(sn76489a_device::command_w));
+	map(0x20, 0x20).mirror(0x0f).w(SN76489AN_TAG, FUNC(sn76489a_device::write));
 	map(0x30, 0x30).portr("Y0");
 	map(0x31, 0x31).portr("Y1");
 	map(0x32, 0x32).portr("Y2");
@@ -1404,21 +1404,21 @@ void brno_state::machine_reset()
 //  MACHINE_CONFIG( m5 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(m5_state::m5)
+void m5_state::m5(machine_config &config)
+{
 	// basic machine hardware
 	Z80(config, m_maincpu, 14.318181_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &m5_state::m5_mem);
 	m_maincpu->set_addrmap(AS_IO, &m5_state::m5_io);
 	m_maincpu->set_daisy_config(m5_daisy_chain);
 
-	MCFG_DEVICE_ADD(m_fd5cpu, Z80, 14.318181_MHz_XTAL / 4)
-	MCFG_DEVICE_PROGRAM_MAP(fd5_mem)
-	MCFG_DEVICE_IO_MAP(fd5_io)
+	Z80(config, m_fd5cpu, 14.318181_MHz_XTAL / 4);
+	m_fd5cpu->set_addrmap(AS_PROGRAM, &m5_state::fd5_mem);
+	m_fd5cpu->set_addrmap(AS_IO, &m5_state::fd5_io);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(SN76489AN_TAG, SN76489A, 14.318181_MHz_XTAL / 4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	SN76489A(config, SN76489AN_TAG, 14.318181_MHz_XTAL / 4).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	// devices
 	Z80CTC(config, m_ctc, 14.318181_MHz_XTAL / 4);
@@ -1426,10 +1426,11 @@ MACHINE_CONFIG_START(m5_state::m5)
 	// CK0 = EXINT, CK1 = GND, CK2 = TCK, CK3 = VDP INT
 	// ZC2 = EXCLK
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, m5_state, write_centronics_busy))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(m5_state::write_centronics_busy));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(sordm5_cassette_formats);
@@ -1445,21 +1446,21 @@ MACHINE_CONFIG_START(m5_state::m5)
 
 	UPD765A(config, m_fdc, 8'000'000, true, true);
 	m_fdc->intrq_wr_callback().set_inputline(m_fd5cpu, INPUT_LINE_IRQ0);
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", m5_floppies, "525dd", m5_state::floppy_formats)
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":0", m5_floppies, "525dd", m5_state::floppy_formats);
 
 	// cartridge
-	MCFG_M5_CARTRIDGE_ADD("cartslot1", m5_cart, nullptr)
-	MCFG_M5_CARTRIDGE_ADD("cartslot2", m5_cart, nullptr)
+	M5_CART_SLOT(config, m_cart1, m5_cart, nullptr);
+	M5_CART_SLOT(config, m_cart2, m5_cart, nullptr);
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "m5_cart")
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "m5_cass")
-	//MCFG_SOFTWARE_LIST_ADD("flop_list", "m5_flop")
+	SOFTWARE_LIST(config, "cart_list").set_original("m5_cart");
+	SOFTWARE_LIST(config, "cass_list").set_original("m5_cass");
+	//SOFTWARE_LIST(config, "flop_list").set_original("m5_flop");
 
 	// internal ram
 	//68K is not possible, 'cos internal ram always overlays any expansion memory in that area
 	RAM(config, RAM_TAG).set_default_size("4K").set_extra_options("36K,64K");
-MACHINE_CONFIG_END
+}
 
 
 //-------------------------------------------------
@@ -1498,7 +1499,8 @@ void m5_state::pal(machine_config &config)
 //-------------------------------------------------
 
 
-MACHINE_CONFIG_START(brno_state::brno)
+void brno_state::brno(machine_config &config)
+{
 	m5(config);
 
 	// basic machine hardware
@@ -1520,19 +1522,16 @@ MACHINE_CONFIG_START(brno_state::brno)
 
 	// floppy
 	WD2797(config, m_fdc, 1_MHz_XTAL);
-	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG":0", brno_floppies, "35hd", brno_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG":1", brno_floppies, "35hd", brno_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, WD2797_TAG":0", brno_floppies, "35hd", brno_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, WD2797_TAG":1", brno_floppies, "35hd", brno_state::floppy_formats).enable_sound(true);
 	// only one floppy drive
-	//MCFG_DEVICE_REMOVE(WD2797_TAG":1")
+	//config.device_remove(WD2797_TAG":1");
 
 	//MCFG_SNAPSHOT_ADD("snapshot", brno_state, brno, "rmd", 0)
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("flop_list","m5_flop")
-
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "flop_list").set_original("m5_flop");
+}
 
 
 //**************************************************************************

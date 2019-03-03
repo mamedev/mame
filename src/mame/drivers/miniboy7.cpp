@@ -536,7 +536,7 @@ MACHINE_CONFIG_START(miniboy7_state::miniboy7)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 37*8-1, 0*8, 37*8-1)    /* Taken from MC6845, registers 01 & 06 */
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_miniboy7)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_miniboy7);
 
 	PALETTE(config, m_palette, FUNC(miniboy7_state::miniboy7_palette), 256);
 

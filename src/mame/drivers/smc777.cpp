@@ -310,12 +310,12 @@ WRITE8_MEMBER(smc777_state::mc6845_w)
 	if(offset == 0)
 	{
 		m_crtc_addr = data;
-		m_crtc->address_w(space, 0,data);
+		m_crtc->address_w(data);
 	}
 	else
 	{
 		m_crtc_vreg[m_crtc_addr] = data;
-		m_crtc->register_w(space, 0,data);
+		m_crtc->register_w(data);
 	}
 }
 
@@ -755,7 +755,7 @@ void smc777_state::smc777_io(address_map &map)
 	// TODO: address bit 8 selects joy port 2
 	map(0x51, 0x51).mirror(0xff00).portr("JOY_1P").w(FUNC(smc777_state::color_mode_w));
 	map(0x52, 0x52).select(0xff00).w(FUNC(smc777_state::ramdac_w));
-	map(0x53, 0x53).mirror(0xff00).w("sn1", FUNC(sn76489a_device::command_w));
+	map(0x53, 0x53).mirror(0xff00).w("sn1", FUNC(sn76489a_device::write));
 //  map(0x54, 0x59) vrt controller
 //  map(0x5a, 0x5b) ram banking
 //  map(0x70, 0x70) auto-start ROM (ext-ROM)
@@ -1110,19 +1110,19 @@ static void smc777_floppies(device_slot_interface &device)
 
 MACHINE_CONFIG_START(smc777_state::smc777)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, MASTER_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(smc777_mem)
-	MCFG_DEVICE_IO_MAP(smc777_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", smc777_state, vblank_irq)
+	Z80(config, m_maincpu, MASTER_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &smc777_state::smc777_mem);
+	m_maincpu->set_addrmap(AS_IO, &smc777_state::smc777_io);
+	m_maincpu->set_vblank_int("screen", FUNC(smc777_state::vblank_irq));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(0x400, 400)
-	MCFG_SCREEN_VISIBLE_AREA(0, 660-1, 0, 220-1) //normal 640 x 200 + 20 pixels for border color
-	MCFG_SCREEN_UPDATE_DRIVER(smc777_state, screen_update_smc777)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(0x400, 400);
+	m_screen->set_visarea(0, 660-1, 0, 220-1); //normal 640 x 200 + 20 pixels for border color
+	m_screen->set_screen_update(FUNC(smc777_state::screen_update_smc777));
+	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette, FUNC(smc777_state::smc777_palette), 0x20); // 16 + 8 colors (SMC-777 + SMC-70) + 8 empty entries (SMC-70)
 
@@ -1139,17 +1139,16 @@ MACHINE_CONFIG_START(smc777_state::smc777)
 	m_fdc->drq_wr_callback().set(FUNC(smc777_state::fdc_drq_w));
 
 	// does it really support 16 of them?
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", smc777_floppies, "ssdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", smc777_floppies, "ssdd", floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, "fdc:0", smc777_floppies, "ssdd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", smc777_floppies, "ssdd", floppy_image_device::default_floppy_formats);
 
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "smc777")
-	MCFG_QUICKLOAD_ADD("quickload", smc777_state, smc777, "com,cpm", 3)
+	SOFTWARE_LIST(config, "flop_list").set_original("smc777");
+	MCFG_QUICKLOAD_ADD("quickload", smc777_state, smc777, "com,cpm", attotime::from_seconds(3))
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("sn1", SN76489A, MASTER_CLOCK) // unknown clock / divider
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SN76489A(config, "sn1", MASTER_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.50); // unknown clock / divider
 
 	BEEP(config, m_beeper, 300); // TODO: correct frequency
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.50);

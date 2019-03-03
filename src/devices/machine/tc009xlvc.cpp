@@ -171,7 +171,7 @@ void tc0091lvc_device::tc0091lvc_map8(address_map &map)
 tc0091lvc_device::tc0091lvc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TC0091LVC, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
-	, m_space_config("tc0091lvc", ENDIANNESS_LITTLE, 8,20, 0, address_map_constructor(), address_map_constructor(FUNC(tc0091lvc_device::tc0091lvc_map8), this))
+	, m_space_config("tc0091lvc", ENDIANNESS_LITTLE, 8,20, 0, address_map_constructor(FUNC(tc0091lvc_device::tc0091lvc_map8), this))
 	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
 {
 }

@@ -123,7 +123,7 @@ uint8_t electron_plus2_device::expbus_r(address_space &space, offs_t offset)
 			data &= m_cart[1]->read(space, offset & 0x3fff, 0, 0, m_romsel & 0x01, 0, 1);
 		case 14:
 		case 15:
-			data &= m_rom[m_romsel - 13]->read_rom(space, offset & 0x3fff);
+			data &= m_rom[m_romsel - 13]->read_rom(offset & 0x3fff);
 			break;
 		}
 		break;

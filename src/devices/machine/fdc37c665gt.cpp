@@ -49,9 +49,10 @@ void fdc37c665gt_device::device_start()
 {
 }
 
-MACHINE_CONFIG_START(fdc37c665gt_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("uart1", NS16550, XTAL(24'000'000)/13)
-	MCFG_DEVICE_ADD("uart2", NS16550, XTAL(24'000'000)/13)
-MACHINE_CONFIG_END
+void fdc37c665gt_device::device_add_mconfig(machine_config &config)
+{
+	NS16550(config, m_uart1, XTAL(24'000'000)/13);
+	NS16550(config, m_uart2, XTAL(24'000'000)/13);
+}
 
 DEFINE_DEVICE_TYPE(FDC37C665GT, fdc37c665gt_device, "fdc37c665gt", "FDC37C665GT")

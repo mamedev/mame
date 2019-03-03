@@ -1,0 +1,198 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="pcx_flop" description="Siemens PC-X disk images">
+
+	<software name="ces10">
+		<description>CES-BD V1.0/PC-X</description>
+		<year>1986</year>
+		<publisher>Siemens</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="CES1"/>
+			<dataarea name="flop" size="525775">
+				<rom name="Sinix_10-CES1.td0" size="525775" crc="da289811" sha1="093131163138c4e91d50fede595de4bae53969e0" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="CES2"/>
+			<dataarea name="flop" size="416700">
+				<rom name="Sinix_10-CES2.td0" size="416700" crc="4f48fbbf" sha1="1105eef4de1d856e94379c0f77fe1c868f0d044b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ces12">
+		<description>CES-BD V1.2/PC-X10</description>
+		<year>1987</year>
+		<publisher>Siemens</publisher>
+		<info name="release" value="10653-C34"/>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="CES1"/>
+			<dataarea name="flop" size="525852">
+				<rom name="Sinix_12-CES1.td0" size="525852" crc="116d4617" sha1="baf3d30c743219b2224eb4fe4f982aa50b1683f6" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="CES2"/>
+			<dataarea name="flop" size="414306">
+				<rom name="Sinix_12-CES2.td0" size="414306" crc="dbf895ce" sha1="cc887fbf246bbe84b36b5e0778aad2079328722f" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="CES3"/>
+			<dataarea name="flop" size="514022">
+				<rom name="Sinix_12-CES3.td0" size="514022" crc="0541033d" sha1="4de08c7022e1c8b2640286798918962485b89140" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="CES4"/>
+			<dataarea name="flop" size="292378">
+				<rom name="Sinix_12-CES4.td0" size="292378" crc="3dcc4702" sha1="3f61f6556e993b44b28b1985dca1c7a808c4e5b4" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hit10">
+		<description>HIT-BD-2 V1.0/PC-X</description>
+		<year>1985</year>
+		<publisher>Siemens</publisher>
+		<info name="release" value="10809-C9"/>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="HIT1"/>
+			<dataarea name="flop" size="513241">
+				<rom name="Sinix_10_HIT1.td0" size="513241" crc="2aade2cd" sha1="193caac77435368ddb9cfbfc1e327e9fe2aa05b8" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="HIT2"/>
+			<dataarea name="flop" size="174313">
+				<rom name="Sinix_10_HIT2.td0" size="174313" crc="73387727" sha1="b7104459d4b69127a92eaead640dedfa48172df3" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="infrmx10">
+		<description>INFORMIX-D-B-2 V1.0/PC-X</description>
+		<year>1986</year>
+		<publisher>Siemens</publisher>
+		<info name="release" value="10654-C13"/>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="INFDE1"/>
+			<dataarea name="flop" size="561242">
+				<rom name="Sinix_10_INFDE1.td0" size="561242" crc="065a849b" sha1="f7489c2133a5e14b82aee20bd77a403324bfcd5c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="INFDE2"/>
+			<dataarea name="flop" size="135114">
+				<rom name="Sinix_10_INFDE2.td0" size="135114" crc="c3a206a6" sha1="6ab6c460a8eb4399528f0ffddb90f0808ded2307" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mplan10">
+		<description>MULTIPLAN-BD-2 V1.0/PC-X</description>
+		<year>1985</year>
+		<publisher>Siemens</publisher>
+		<info name="release" value="10706-C7"/>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="MP-BD"/>
+			<dataarea name="flop" size="189877">
+				<rom name="Sinix_10_MP-BD.td0" size="189877" crc="f37a0b88" sha1="0465062b8f6a7eab6df43e6a15bf5cfca51977b1" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sinix10">
+		<description>SINIX-B V1.0/PC-X</description>
+		<year>1985</year>
+		<publisher>Siemens</publisher>
+		<info name="release" value="10651-C1"/>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="SINIX1"/>
+			<dataarea name="flop" size="549399">
+				<rom name="Sinix_10_SINIX1.td0" size="549399" crc="65e193a6" sha1="a7c90eb9f6418dc65008a5d469abf03befa3f363" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="SINIX2"/>
+			<dataarea name="flop" size="473847">
+				<rom name="Sinix_10_SINIX2.td0" size="473847" crc="8b4b9906" sha1="62b3937f9e6ce3ca0e865680d31fb2a842062c0f" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="SINIX3"/>
+			<dataarea name="flop" size="564646">
+				<rom name="Sinix_10_SINIX3.td0" size="564646" crc="4f14dd1a" sha1="96f119a81191ba9db32f0bbc95e4ff77d41ffe85" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="SINIX4"/>
+			<dataarea name="flop" size="229071">
+				<rom name="Sinix_10_SINIX4.td0" size="229071" crc="cf6bb2ad" sha1="e95df5a2825824afbb574a14dee3958ab83f14ff" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="SINIE0"/>
+			<dataarea name="flop" size="431605">
+				<rom name="Sinix_10_SINIE0.td0" size="431605" crc="0de50dcd" sha1="1a047ed67b2a7c5eb6d8cfe1af5464a60723f111" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sinix12">
+		<description>SINIX-UP-BD V1.2/PC-X</description>
+		<year>1987</year>
+		<publisher>Siemens</publisher>
+		<info name="release" value="10651-C4"/>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="SINIX1"/>
+			<dataarea name="flop" size="541063">
+				<rom name="Sinix_12_SINIX1.td0" size="541063" crc="6c7029ff" sha1="4c80d148df29fda371bfafe34fa28db3b9c1d1b2" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="SINIX2"/>
+			<dataarea name="flop" size="513119">
+				<rom name="Sinix_12_SINIX2.td0" size="513119" crc="73e8a523" sha1="cd95e21de9baf600a00874244dc234de9b3e3668" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="SINIX3"/>
+			<dataarea name="flop" size="559491">
+				<rom name="Sinix_12_SINIX3.td0" size="559491" crc="fe574766" sha1="3f2ccc1483437ac28052099b6a7a2cde2b88e4fd" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="SINIX4"/>
+			<dataarea name="flop" size="555860">
+				<rom name="Sinix_12_SINIX4.td0" size="555860" crc="54499d44" sha1="cd237c46ce8c3b1d51def577b15def765fdb63aa" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="SINIX5"/>
+			<dataarea name="flop" size="337424">
+				<rom name="Sinix_12_SINIX5.td0" size="337424" crc="bae5075a" sha1="8ff0dcd30e85b3878d1034a5cdf718fc6939557c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="SINIX6"/>
+			<dataarea name="flop" size="327577">
+				<rom name="Sinix_12_SINIX6.td0" size="327577" crc="474439a3" sha1="4a9b78d4777156f420ba821c906574ac655e9d76" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="SINIX7"/>
+			<dataarea name="flop" size="459074">
+				<rom name="Sinix_12_SINIX7.td0" size="459074" crc="4087cdad" sha1="2b37ee21bac349ce1137cbed0aa1ce8c697d9ba2" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="SINIU0"/>
+			<dataarea name="flop" size="469261">
+				<rom name="Sinix_12_SINIU0.td0" size="469261" crc="4151d9c9" sha1="d0e6e408f4652d9bb7089d1f79c500f8e1943ed0" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	</softwarelist>

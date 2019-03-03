@@ -50,18 +50,6 @@ READ16_MEMBER(vsmile_base_state::bank3_r)
 	return ((uint16_t*)m_system_region->base())[offset];
 }
 
-void vsmile_base_state::mem_map(address_map &map)
-{
-	map(0x000000, 0x3fffff).rw(m_bankdev, FUNC(address_map_bank_device::read16), FUNC(address_map_bank_device::write16));
-	map(0x000000, 0x003fff).m(m_spg, FUNC(spg2xx_device::map));
-}
-
-/************************************
- *
- *  V.Smile
- *
- ************************************/
-
 void vsmile_state::machine_start()
 {
 	vsmile_base_state::machine_start();
@@ -101,6 +89,12 @@ READ16_MEMBER(vsmile_state::portb_r)
 	return VSMILE_PORTB_OFF_SW | VSMILE_PORTB_ON_SW | VSMILE_PORTB_RESET;
 }
 
+WRITE16_MEMBER(vsmile_state::portb_w)
+{
+	if (BIT(mem_mask, 4))
+		m_cart->set_cs2(BIT(data, 4));
+}
+
 READ16_MEMBER(vsmile_state::portc_r)
 {
 	uint16_t data = m_dsw_region->read();
@@ -126,6 +120,36 @@ WRITE16_MEMBER(vsmile_state::portc_w)
 		m_ctrl_select[1] = BIT(data, 9);
 		m_ctrl[1]->select_w(m_ctrl_select[1]);
 	}
+}
+
+/************************************
+ *
+ *  V.Smile Motion-specific
+ *
+ ************************************/
+
+WRITE16_MEMBER(vsmilem_state::porta_w)
+{
+	//printf("Port A write: %04x & %04x\n", data, mem_mask);
+}
+
+READ16_MEMBER(vsmilem_state::porta_r)
+{
+	const uint16_t data = 0xc000;
+	//printf("Port A read: %04x & %04x\n", data, mem_mask);
+	return data;
+}
+
+/************************************
+ *
+ *  Address Maps
+ *
+ ************************************/
+
+void vsmile_base_state::mem_map(address_map &map)
+{
+	map(0x000000, 0x3fffff).rw(m_bankdev, FUNC(address_map_bank_device::read16), FUNC(address_map_bank_device::write16));
+	map(0x000000, 0x003fff).m(m_spg, FUNC(spg2xx_device::map));
 }
 
 void vsmile_state::banked_map(address_map &map)
@@ -249,6 +273,13 @@ void vsmile_state::vsmilep(machine_config &config)
 	m_spg->set_pal(true);
 }
 
+void vsmilem_state::vsmilem(machine_config &config)
+{
+	vsmile(config);
+	m_spg->porta_out().set(FUNC(vsmilem_state::porta_w));
+	m_spg->porta_in().set(FUNC(vsmilem_state::porta_r));
+}
+
 /************************************
  *
  *  ROM Loading
@@ -271,7 +302,13 @@ ROM_START( vsmilef )
 	ROM_LOAD16_WORD_SWAP( "sysrom_france", 0x000000, 0x200000, CRC(0cd0bdf5) SHA1(5c8d1eada1b6b545555b8d2b09325d7127681af8) )
 ROM_END
 
-//    year, name,    parent, compat, machine, input,   class,         init,       company, fullname,            flags
-CONS( 2005, vsmile,  0,      0,      vsmile,  vsmile,  vsmile_state,  empty_init, "VTech", "V.Smile (US)",      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2005, vsmileg, vsmile, 0,      vsmilep, vsmile,  vsmile_state,  empty_init, "VTech", "V.Smile (Germany)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2005, vsmilef, vsmile, 0,      vsmilep, vsmile,  vsmile_state,  empty_init, "VTech", "V.Smile (France)",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+ROM_START( vsmilem )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "vsmilebios.bin", 0x000000, 0x200000, BAD_DUMP CRC(11f1b416) SHA1(11f77c4973d29c962567390e41879c86a759c93b) )
+ROM_END
+
+//    year, name,    parent, compat, machine, input,   class,         init,       company, fullname,              flags
+CONS( 2005, vsmile,  0,      0,      vsmile,  vsmile,  vsmile_state,  empty_init, "VTech", "V.Smile (US)",        MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2005, vsmileg, vsmile, 0,      vsmilep, vsmile,  vsmile_state,  empty_init, "VTech", "V.Smile (Germany)",   MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2005, vsmilef, vsmile, 0,      vsmilep, vsmile,  vsmile_state,  empty_init, "VTech", "V.Smile (France)",    MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2008, vsmilem, vsmile, 0,      vsmilem, vsmile,  vsmilem_state, empty_init, "VTech", "V.Smile Motion (US)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

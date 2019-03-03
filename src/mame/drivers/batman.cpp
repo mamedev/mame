@@ -194,7 +194,7 @@ MACHINE_CONFIG_START(batman_state::batman)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_batman)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_batman);
 	PALETTE(config, "palette").set_format(palette_device::IRGB_1555, 2048);
 
 	ATARI_VAD(config, m_vad, 0, m_screen);

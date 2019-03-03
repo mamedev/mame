@@ -712,12 +712,12 @@ GFXDECODE_END
 
 
 
-MACHINE_CONFIG_START(warpwarp_state::geebee)
-
+void warpwarp_state::geebee(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8080, MASTER_CLOCK/9) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(geebee_map)
-	MCFG_DEVICE_IO_MAP(geebee_port_map)
+	I8080(config, m_maincpu, MASTER_CLOCK/9); /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &warpwarp_state::geebee_map);
+	m_maincpu->set_addrmap(AS_IO, &warpwarp_state::geebee_port_map);
 
 	LS259(config, m_latch); // 5N
 	m_latch->q_out_cb<0>().set_output("led0"); // LAMP 1
@@ -730,11 +730,11 @@ MACHINE_CONFIG_START(warpwarp_state::geebee)
 	m_latch->q_out_cb<7>().set(FUNC(warpwarp_state::inv_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 0, 272, 264, 0, 224)
-	MCFG_SCREEN_UPDATE_DRIVER(warpwarp_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, warpwarp_state, vblank_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(MASTER_CLOCK/3, 384, 0, 272, 264, 0, 224);
+	screen.set_screen_update(FUNC(warpwarp_state::screen_update));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(warpwarp_state::vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_1k);
 	PALETTE(config, m_palette, FUNC(warpwarp_state::geebee_palette), 4*2);
@@ -744,9 +744,8 @@ MACHINE_CONFIG_START(warpwarp_state::geebee)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("geebee_custom", GEEBEE_SOUND, MASTER_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	GEEBEE_SOUND(config, m_geebee_sound, MASTER_CLOCK).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 void warpwarp_state::geebeeb(machine_config &config)
 {
@@ -754,7 +753,8 @@ void warpwarp_state::geebeeb(machine_config &config)
 	m_latch->q_out_cb<4>().set_nop(); // remove coin lockout
 }
 
-MACHINE_CONFIG_START(warpwarp_state::navarone)
+void warpwarp_state::navarone(machine_config &config)
+{
 	geebee(config);
 
 	/* basic machine hardware */
@@ -763,9 +763,10 @@ MACHINE_CONFIG_START(warpwarp_state::navarone)
 	m_palette->set_init(FUNC(warpwarp_state::navarone_palette));
 
 	MCFG_VIDEO_START_OVERRIDE(warpwarp_state,navarone)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(warpwarp_state::kaitei)
+void warpwarp_state::kaitei(machine_config &config)
+{
 	geebee(config);
 
 	/* basic machine hardware */
@@ -773,14 +774,14 @@ MACHINE_CONFIG_START(warpwarp_state::kaitei)
 	m_palette->set_entries(4*2+1);
 
 	MCFG_MACHINE_RESET_OVERRIDE(warpwarp_state,kaitei)
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(warpwarp_state::bombbee)
-
+void warpwarp_state::bombbee(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8080, MASTER_CLOCK/9)
-	MCFG_DEVICE_PROGRAM_MAP(bombbee_map)
+	I8080(config, m_maincpu, MASTER_CLOCK/9);
+	m_maincpu->set_addrmap(AS_PROGRAM, &warpwarp_state::bombbee_map);
 
 	LS259(config, m_latch); // 6L on Warp Warp
 	m_latch->q_out_cb<0>().set_output("led0"); // LAMP 1
@@ -795,11 +796,11 @@ MACHINE_CONFIG_START(warpwarp_state::bombbee)
 	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 0, 272, 264, 0, 224)
-	MCFG_SCREEN_UPDATE_DRIVER(warpwarp_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, warpwarp_state, vblank_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(MASTER_CLOCK/3, 384, 0, 272, 264, 0, 224);
+	screen.set_screen_update(FUNC(warpwarp_state::screen_update));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(warpwarp_state::vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_color);
 
@@ -809,17 +810,16 @@ MACHINE_CONFIG_START(warpwarp_state::bombbee)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("warpwarp_custom", WARPWARP_SOUND, MASTER_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	WARPWARP_SOUND(config, m_warpwarp_sound, MASTER_CLOCK).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-MACHINE_CONFIG_START(warpwarp_state::warpwarp)
+void warpwarp_state::warpwarp(machine_config &config)
+{
 	bombbee(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(warpwarp_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &warpwarp_state::warpwarp_map);
+}
 
 
 /***************************************************************************

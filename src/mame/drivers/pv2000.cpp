@@ -205,7 +205,7 @@ void pv2000_state::pv2000_io_map(address_map &map)
 	map(0x20, 0x20).rw(FUNC(pv2000_state::keys_lo_r), FUNC(pv2000_state::keys_w));
 
 	//sn76489a
-	map(0x40, 0x40).r(FUNC(pv2000_state::keys_mod_r)).w("sn76489a", FUNC(sn76489a_device::command_w));
+	map(0x40, 0x40).r(FUNC(pv2000_state::keys_mod_r)).w("sn76489a", FUNC(sn76489a_device::write));
 
 	/* Cassette input. Gets hit a lot after a GLOAD command */
 	map(0x60, 0x60).rw(FUNC(pv2000_state::cass_in), FUNC(pv2000_state::cass_out));
@@ -356,7 +356,7 @@ WRITE_LINE_MEMBER( pv2000_state::pv2000_vdp_interrupt )
 void pv2000_state::machine_start()
 {
 	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000, 0xffff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000, 0xffff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 }
 
 void pv2000_state::machine_reset()
@@ -418,7 +418,7 @@ MACHINE_CONFIG_START(pv2000_state::pv2000)
 	MCFG_GENERIC_LOAD(pv2000_state, pv2000_cart)
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","pv2000")
+	SOFTWARE_LIST(config, "cart_list").set_original("pv2000");
 MACHINE_CONFIG_END
 
 

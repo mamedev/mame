@@ -147,14 +147,14 @@ WRITE16_MEMBER ( ti68k_state::flash_w )
 {
 	// verification if it is flash memory
 	if (m_flash_mem)
-		m_flash->write(space, offset, data);
+		m_flash->write(offset, data);
 }
 
 READ16_MEMBER ( ti68k_state::flash_r )
 {
 	if (m_flash_mem)
 	{
-		return m_flash->read(space, offset);
+		return m_flash->read(offset);
 	}
 	else
 	{
@@ -519,60 +519,63 @@ void ti68k_state::ti68k_palette(palette_device &palette) const
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
 }
 
-MACHINE_CONFIG_START(ti68k_state::ti89)
+void ti68k_state::ti89(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(10'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(ti89_mem)
+	M68000(config, m_maincpu, XTAL(10'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &ti68k_state::ti89_mem);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(ti68k_state, screen_update)
-	MCFG_SCREEN_SIZE(240, 128)
-	MCFG_SCREEN_VISIBLE_AREA(0, 160-1, 0, 100-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(ti68k_state::screen_update));
+	screen.set_size(240, 128);
+	screen.set_visarea(0, 160-1, 0, 100-1);
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(ti68k_state::ti68k_palette), 2);
 
 	SHARP_UNK128MBIT(config, "flash");  //should be LH28F320 for ti89t and v200 and LH28F160S3T for other models
 
 	TIMER(config, "ti68k_timer").configure_periodic(FUNC(ti68k_state::ti68k_timer_callback), attotime::from_hz(1<<14));
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(ti68k_state::ti92)
+void ti68k_state::ti92(machine_config &config)
+{
 	ti89(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(ti92_mem)
+	m_maincpu->set_addrmap(AS_PROGRAM, &ti68k_state::ti92_mem);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, 240-1, 0, 128-1)
-MACHINE_CONFIG_END
+	subdevice<screen_device>("screen")->set_visarea(0, 240-1, 0, 128-1);
+}
 
 
-MACHINE_CONFIG_START(ti68k_state::ti92p)
+void ti68k_state::ti92p(machine_config &config)
+{
 	ti92(config);
-	MCFG_DEVICE_REPLACE("maincpu", M68000, XTAL(12'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(ti92p_mem)
-MACHINE_CONFIG_END
+	m_maincpu->set_clock(XTAL(12'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &ti68k_state::ti92p_mem);
+}
 
 
-MACHINE_CONFIG_START(ti68k_state::v200)
+void ti68k_state::v200(machine_config &config)
+{
 	ti92(config);
-	MCFG_DEVICE_REPLACE("maincpu", M68000, XTAL(12'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(v200_mem)
-MACHINE_CONFIG_END
+	m_maincpu->set_clock(XTAL(12'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &ti68k_state::v200_mem);
+}
 
 
-MACHINE_CONFIG_START(ti68k_state::ti89t)
+void ti68k_state::ti89t(machine_config &config)
+{
 	ti89(config);
-	MCFG_DEVICE_REPLACE("maincpu", M68000, XTAL(16'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(ti89t_mem)
-MACHINE_CONFIG_END
+	m_maincpu->set_clock(XTAL(16'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &ti68k_state::ti89t_mem);
+}
 
 
 /* ROM definition */

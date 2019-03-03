@@ -226,11 +226,11 @@ void tutankhm_state::machine_reset()
 	m_irq_toggle = 0;
 }
 
-MACHINE_CONFIG_START(tutankhm_state::tutankhm)
-
+void tutankhm_state::tutankhm(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809E, XTAL(18'432'000)/12)   /* 1.5 MHz ??? */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MC6809E(config, m_maincpu, XTAL(18'432'000)/12);   /* 1.5 MHz ??? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &tutankhm_state::main_map);
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // C3
 	mainlatch.q_out_cb<0>().set(FUNC(tutankhm_state::irq_enable_w));
@@ -245,19 +245,19 @@ MACHINE_CONFIG_START(tutankhm_state::tutankhm)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)  /* not sure about the visible area */
-	MCFG_SCREEN_UPDATE_DRIVER(tutankhm_state, screen_update_tutankhm)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tutankhm_state, vblank_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);  /* not sure about the visible area */
+	screen.set_screen_update(FUNC(tutankhm_state::screen_update_tutankhm));
+	screen.screen_vblank().set(FUNC(tutankhm_state::vblank_irq));
 
 	PALETTE(config, m_palette).set_format(palette_device::BGR_233, 16);
 
 	/* sound hardware */
 	TIMEPLT_AUDIO(config, "timeplt_audio");
-MACHINE_CONFIG_END
+}
 
 
 /*************************************

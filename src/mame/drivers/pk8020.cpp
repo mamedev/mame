@@ -206,7 +206,7 @@ MACHINE_CONFIG_START(pk8020_state::pk8020)
 	MCFG_SCREEN_UPDATE_DRIVER(pk8020_state, screen_update_pk8020)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_pk8020)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_pk8020);
 	PALETTE(config, m_palette, FUNC(pk8020_state::pk8020_palette), 16);
 
 	I8255(config, m_ppi8255_1);
@@ -246,12 +246,12 @@ MACHINE_CONFIG_START(pk8020_state::pk8020)
 	FD1793(config, m_wd1793, 20_MHz_XTAL / 20);
 	m_wd1793->intrq_wr_callback().set(m_pic8259, FUNC(pic8259_device::ir7_w));
 
-	MCFG_FLOPPY_DRIVE_ADD("wd1793:0", pk8020_floppies, "qd", pk8020_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("wd1793:1", pk8020_floppies, "qd", pk8020_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("wd1793:2", pk8020_floppies, "qd", pk8020_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("wd1793:3", pk8020_floppies, "qd", pk8020_state::floppy_formats)
+	FLOPPY_CONNECTOR(config, "wd1793:0", pk8020_floppies, "qd", pk8020_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "wd1793:1", pk8020_floppies, "qd", pk8020_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "wd1793:2", pk8020_floppies, "qd", pk8020_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "wd1793:3", pk8020_floppies, "qd", pk8020_state::floppy_formats);
 
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "korvet_flop")
+	SOFTWARE_LIST(config, "flop_list").set_original("korvet_flop");
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();

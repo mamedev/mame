@@ -14,17 +14,14 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define VERBOSE_DBG 1
+//#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
+#define LOG_DEBUG     (1U <<  1)
 
-#define DBG_LOG(N,M,A) \
-	do { \
-		if(VERBOSE_DBG>=N) \
-		{ \
-			if( M ) \
-				logerror("%11.6f: %-24s",machine().time().as_double(),(char*)M ); \
-			logerror A; \
-		} \
-	} while (0)
+//#define VERBOSE (LOG_DEBUG)
+//#define LOG_OUTPUT_FUNC printf
+#include "logmacro.h"
+
+#define LOGDBG(...) LOGMASKED(LOG_DEBUG, __VA_ARGS__)
 
 
 //**************************************************************************
@@ -92,20 +89,21 @@ READ8_MEMBER(p1_hdc_device::p1_HDC_r)
 	switch (offset >> 8)
 	{
 	case 8:
-		data = m_hdc->read(space, offset & 255);
+		data = m_hdc->read(offset & 255);
 	}
-	DBG_LOG(1, "hdc", ("R $%04x == $%02x\n", offset, data));
+	LOG("hdc R $%04x == $%02x\n", offset, data);
 
 	return data;
 }
 
 WRITE8_MEMBER(p1_hdc_device::p1_HDC_w)
 {
-	DBG_LOG(1, "hdc", ("W $%04x <- $%02x\n", offset, data));
+	LOG("hdc W $%04x <- $%02x\n", offset, data);
+
 	switch (offset >> 8)
 	{
 	case 8:
-		m_hdc->write(space, offset & 255, data, 0);
+		m_hdc->write(offset & 255, data);
 	}
 }
 

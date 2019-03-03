@@ -177,12 +177,12 @@ INPUT_PORTS_END
 
 READ8_MEMBER( micropin_state::pia51_r )
 {
-	return m_pia51->read(space, offset) ^ 0xff;
+	return m_pia51->read(offset) ^ 0xff;
 }
 
 WRITE8_MEMBER( micropin_state::pia51_w )
 {
-	m_pia51->write(space, offset, data ^ 0xff);
+	m_pia51->write(offset, data ^ 0xff);
 }
 
 // lamps and disp strobes

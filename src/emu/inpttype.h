@@ -25,7 +25,7 @@
 #pragma GCC push_options
 #pragma GCC optimize ("O1")
 #endif
-#elif defined(_MSC_VER)
+#elif defined(_MSC_VER) && !defined(__clang__)
 #pragma optimize("", off)
 #endif
 
@@ -954,6 +954,6 @@ inline void construct_core_types(simple_list<input_type_entry> &typelist)
 #if not(defined(__arm__) || defined(__ARMEL__))
 #pragma GCC pop_options
 #endif
-#elif defined(_MSC_VER)
+#elif defined(_MSC_VER) && !defined(__clang__)
 #pragma optimize("", on)
 #endif

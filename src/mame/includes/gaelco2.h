@@ -18,6 +18,7 @@ public:
 		m_eeprom(*this, "eeprom"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_global_spritexoff(0),
 		m_vregs(*this, "vregs"),
 		m_snowboar_protection(*this, "snowboar_prot"),
 		m_generic_paletteram_16(*this, "paletteram"),
@@ -39,6 +40,7 @@ public:
 	void init_snowboar();
 	void init_alighunt();
 	void init_wrally2();
+	void init_play2000();
 
 	DECLARE_WRITE_LINE_MEMBER(coin1_counter_w);
 	DECLARE_WRITE_LINE_MEMBER(coin2_counter_w);
@@ -73,13 +75,11 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(coin4_counter_w);
 	DECLARE_READ16_MEMBER(snowboar_protection_r);
 	DECLARE_WRITE16_MEMBER(snowboar_protection_w);
-	DECLARE_READ16_MEMBER(play2000_shareram_68k_r);
-	DECLARE_WRITE16_MEMBER(play2000_shareram_68k_w);
 	TILE_GET_INFO_MEMBER(get_tile_info_gaelco2_screen0);
 	TILE_GET_INFO_MEMBER(get_tile_info_gaelco2_screen1);
 	TILE_GET_INFO_MEMBER(get_tile_info_gaelco2_screen0_dual);
 	TILE_GET_INFO_MEMBER(get_tile_info_gaelco2_screen1_dual);
-	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int mask, int xoffs);
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int mask);
 	uint32_t dual_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int index);
 	void gaelco2_ROM16_split_gfx(const char *src_reg, const char *dst_reg, int start, int length, int dest1, int dest2);
 
@@ -95,6 +95,7 @@ private:
 	uint16_t *m_videoram;
 	tilemap_t *m_pant[2];
 	int m_dual_monitor;
+	int m_global_spritexoff;
 
 	required_shared_ptr<uint16_t> m_vregs;
 	optional_shared_ptr<uint16_t> m_snowboar_protection;

@@ -524,7 +524,7 @@ MACHINE_CONFIG_START(imolagp_state::imolagp)
 	MCFG_DEVICE_PROGRAM_MAP(imolagp_slave_map)
 	MCFG_DEVICE_IO_MAP(imolagp_slave_io)
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	i8255_device &ppi(I8255A(config, "ppi8255", 0));
 	// mode $91 - ports A & C-lower as input, ports B & C-upper as output

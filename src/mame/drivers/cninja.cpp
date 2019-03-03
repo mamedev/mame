@@ -813,7 +813,7 @@ MACHINE_CONFIG_START(cninja_state::cninja)
 	MCFG_SCREEN_UPDATE_DRIVER(cninja_state, screen_update_cninja)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cninja)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cninja);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 2048);
 
 	MCFG_DEVICE_ADD("spriteram1", BUFFERED_SPRITERAM16)
@@ -901,7 +901,7 @@ MACHINE_CONFIG_START(cninja_state::stoneage)
 	MCFG_SCREEN_UPDATE_DRIVER(cninja_state, screen_update_cninja)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cninja)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cninja);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 2048);
 
 	MCFG_VIDEO_START_OVERRIDE(cninja_state,stoneage)
@@ -972,7 +972,7 @@ MACHINE_CONFIG_START(cninja_state::cninjabl2)
 
 	m_ioprot->soundlatch_irq_cb().set_inputline(m_audiocpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_REMOVE("ymsnd")
+	config.device_remove("ymsnd");
 
 	MCFG_DEVICE_REPLACE("oki1", OKIM6295, XTAL(32'220'000) / 32, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -1000,7 +1000,7 @@ MACHINE_CONFIG_START(cninja_state::cninjabl)
 	MCFG_SCREEN_UPDATE_DRIVER(cninja_state, screen_update_cninjabl)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cninjabl)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cninjabl);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 2048);
 
 	MCFG_DEVICE_ADD("spriteram1", BUFFERED_SPRITERAM16)
@@ -1073,7 +1073,7 @@ MACHINE_CONFIG_START(cninja_state::edrandy)
 	MCFG_SCREEN_UPDATE_DRIVER(cninja_state, screen_update_edrandy)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cninja)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cninja);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 2048);
 
 	MCFG_DEVICE_ADD("spriteram1", BUFFERED_SPRITERAM16)
@@ -1165,7 +1165,7 @@ MACHINE_CONFIG_START(cninja_state::robocop2)
 	MCFG_MACHINE_START_OVERRIDE(cninja_state,robocop2)
 	MCFG_MACHINE_RESET_OVERRIDE(cninja_state,robocop2)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_robocop2)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_robocop2);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 2048);
 
 	MCFG_DEVICE_ADD("spriteram1", BUFFERED_SPRITERAM16)
@@ -1258,7 +1258,7 @@ MACHINE_CONFIG_START(cninja_state::mutantf)
 	MCFG_MACHINE_RESET_OVERRIDE(cninja_state,robocop2)
 	MCFG_VIDEO_START_OVERRIDE(cninja_state,mutantf)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mutantf)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mutantf);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 2048);
 
 	MCFG_DEVICE_ADD("spriteram1", BUFFERED_SPRITERAM16)

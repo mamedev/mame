@@ -5,8 +5,6 @@
 Ichi Ban Jyan
 Excel, 199?
 
-TODO: code is encrypted (data, not opcodes)
-
 PCB Layout
 ----------
 
@@ -38,6 +36,7 @@ HSync - 15.510kHz
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/ym2413.h"
 #include "emupal.h"
@@ -67,8 +66,9 @@ private:
 
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void ichibanjyan_io(address_map &map);
-	void ichibanjyan_map(address_map &map);
+	void mem_map(address_map &map);
+	void io_map(address_map &map);
+	void opcodes_map(address_map &map);
 };
 
 void ichibanjyan_state::video_start()
@@ -81,14 +81,24 @@ uint32_t ichibanjyan_state::screen_update( screen_device &screen, bitmap_ind16 &
 }
 
 
-void ichibanjyan_state::ichibanjyan_map(address_map &map)
+void ichibanjyan_state::mem_map(address_map &map)
 {
-	map(0x0000, 0x7fff).bankr("bank1");
+	map(0x0000, 0x6fff).rom().region("code", 0x10000);
+	map(0x7000, 0x7fff).ram().share("nvram");
+	map(0x8000, 0xffff).ram();
 }
 
-void ichibanjyan_state::ichibanjyan_io(address_map &map)
+void ichibanjyan_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
+	map(0x01, 0x01).r("aysnd", FUNC(ym2149_device::data_r));
+	map(0x02, 0x03).w("aysnd", FUNC(ym2149_device::data_address_w));
+	map(0x16, 0x17).w("ymsnd", FUNC(ym2413_device::write));
+}
+
+void ichibanjyan_state::opcodes_map(address_map &map)
+{
+	map(0x0000, 0x6fff).rom().region("code", 0);
 }
 
 static INPUT_PORTS_START( ichibanjyan )
@@ -113,9 +123,6 @@ GFXDECODE_END
 
 void ichibanjyan_state::machine_start()
 {
-	uint8_t *ROM = memregion("code")->base();
-
-	membank("bank1")->configure_entries(0, 4, ROM, 0x8000);
 }
 
 void ichibanjyan_state::machine_reset()
@@ -126,20 +133,20 @@ void ichibanjyan_state::machine_reset()
 MACHINE_CONFIG_START(ichibanjyan_state::ichibanjyan)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80,MAIN_CLOCK/3)
-	MCFG_DEVICE_PROGRAM_MAP(ichibanjyan_map)
-	MCFG_DEVICE_IO_MAP(ichibanjyan_io)
+	Z80(config, m_maincpu, MAIN_CLOCK/3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ichibanjyan_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &ichibanjyan_state::io_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &ichibanjyan_state::opcodes_map);
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_UPDATE_DRIVER(ichibanjyan_state, screen_update)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(MAIN_CLOCK/3, 396, 0, 320, 256, 0, 224); // dimensions guessed
+	screen.set_screen_update(FUNC(ichibanjyan_state::screen_update));
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ichibanjyan)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_ichibanjyan);
 
 	PALETTE(config, "palette", palette_device::RGB_444_PROMS, "proms", 512);
 
@@ -159,7 +166,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( ichiban )
-	ROM_REGION( 0x20000, "code", 0 )
+	ROM_REGION( 0x20000, "code", 0 ) // opcodes in first half are mixed with pseudo-random garbage
 	ROM_LOAD( "3.u15", 0, 0x20000, CRC(76240568) SHA1(cf055d1eaae25661a49ec4722a2c7caca862e66a) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )

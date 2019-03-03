@@ -212,7 +212,7 @@ MACHINE_CONFIG_START(poly88_state::poly88)
 	MCFG_SCREEN_UPDATE_DRIVER(poly88_state, screen_update_poly88)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_poly88)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_poly88);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 
@@ -231,7 +231,7 @@ MACHINE_CONFIG_START(poly88_state::poly88)
 	m_uart->rxrdy_handler().set(FUNC(poly88_state::poly88_usart_rxready));
 
 	/* snapshot */
-	MCFG_SNAPSHOT_ADD("snapshot", poly88_state, poly88, "img", 2)
+	MCFG_SNAPSHOT_ADD("snapshot", poly88_state, poly88, "img", attotime::from_seconds(2))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(poly88_state::poly8813)

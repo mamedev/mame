@@ -45,7 +45,7 @@
 #ifndef NLD_74153_H_
 #define NLD_74153_H_
 
-#include "../nl_setup.h"
+#include "netlist/nl_setup.h"
 
 #define TTL_74153(name, cC0, cC1, cC2, cC3, cA, cB, cG)                         \
 		NET_REGISTER_DEV(TTL_74153, name)                                       \

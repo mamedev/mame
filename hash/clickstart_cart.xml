@@ -48,7 +48,7 @@
 	</software>
 
 	<software name="cars" supported="no">
-		<description>The World of Cars (UK)</description>
+		<description>Disney/Pixar The World of Cars - The Road to Learning! (UK)</description>
 		<year>2008</year>
 		<publisher>LeapFrog / Disney / Pixar</publisher>
 		<part name="cart" interface="clickstart_cart">
@@ -62,7 +62,7 @@
 	</software>
 
 	<software name="disneyprincess" supported="no">
-		<description>Disney Princess (UK)</description>
+		<description>Disney Princess - The Love of Letters (UK)</description>
 		<year>2008</year>
 		<publisher>LeapFrog / Disney</publisher>
 		<part name="cart" interface="clickstart_cart">
@@ -104,7 +104,7 @@
 	</software>
 
 	<software name="nemo" supported="no">
-		<description>Finding Nemo (UK)</description>
+		<description>Disney/Pixar Finding Nemo - Sea of Keys (UK)</description>
 		<year>2007</year>
 		<publisher>LeapFrog / Disney / Pixar</publisher>
 		<part name="cart" interface="clickstart_cart">
@@ -119,7 +119,7 @@
 
 	<software name="nihaokailan" supported="no">
 		<description>Nickelodeon Ni Hao, Kai-Lan (UK)</description>
-		<year>2009</year>
+		<year>2008</year>
 		<publisher>LeapFrog / VIACOM</publisher>
 		<part name="cart" interface="clickstart_cart">
 			<feature name="u1" value="OKI MR27V3202L" /> <!-- Behind a epoxy blob, but ROM type silkscreened on the PCB -->
@@ -133,7 +133,7 @@
 
 	<software name="puppypals" supported="no">
 		<description>Scout's Puppy Pals (UK)</description>
-		<year>2007</year>
+		<year>2008</year>
 		<publisher>LeapFrog</publisher>
 		<part name="cart" interface="clickstart_cart">
 			<feature name="u1" value="MX23L3210" /> <!-- Behind a epoxy blob, but ROM type silkscreened on the PCB -->
@@ -146,7 +146,7 @@
 	</software>
 
 	<software name="toystor" supported="no">
-		<description>Toy Story (UK)</description>
+		<description>Disney/Pixar Toy Story - To 100 and Beyond! (UK)</description>
 		<year>2007</year>
 		<publisher>LeapFrog / Disney / Pixar</publisher>
 		<part name="cart" interface="clickstart_cart">
@@ -160,7 +160,7 @@
 	</software>
 
 	<software name="toystors" cloneof="toystor" supported="no">
-		<description>Toy Story (SP)</description>
+		<description>Disney/Pixar Toy Story - ¡Al 100 y más allá! (SP)</description>
 		<year>2007</year>
 		<publisher>LeapFrog</publisher>
 		<part name="cart" interface="clickstart_cart">
@@ -174,8 +174,8 @@
 	</software>
 
 	<software name="bobbuild" supported="no">
-		<description>Bob the Builder (UK)</description>
-		<year>2007</year>
+		<description>Bob the Builder - Project: Learn It! (UK)</description>
+		<year>2008</year>
 		<publisher>LeapFrog</publisher>
 		<part name="cart" interface="clickstart_cart">
 			<feature name="u1" value="MX23L3210" /> <!-- Behind a epoxy blob, but ROM type silkscreened on the PCB -->
@@ -188,7 +188,7 @@
 	</software>
 
 	<software name="thomas" supported="no">
-		<description>Thomas &amp; Friends (UK)</description>
+		<description>Thomas &amp; Friends - Learning Destinations (UK)</description>
 		<year>2007</year>
 		<publisher>LeapFrog</publisher>
 		<part name="cart" interface="clickstart_cart">
@@ -202,7 +202,7 @@
 	</software>
 
 	<software name="dora" supported="no">
-		<description>Dora the Explorer (UK)</description>
+		<description>Nick Jr. Dora the Explorer - Friends! ¡Amigos! (UK)</description>
 		<year>2007</year>
 		<publisher>LeapFrog</publisher>
 		<part name="cart" interface="clickstart_cart">

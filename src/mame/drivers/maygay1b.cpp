@@ -439,7 +439,7 @@ WRITE_LINE_MEMBER(maygay1b_state::srsel_w)
 
 WRITE8_MEMBER(maygay1b_state::latch_ch2_w)
 {
-	m_msm6376->write(space, 0, data&0x7f);
+	m_msm6376->write(data&0x7f);
 	m_msm6376->ch2_w(data&0x80);
 }
 

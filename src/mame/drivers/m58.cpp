@@ -200,7 +200,7 @@ MACHINE_CONFIG_START(m58_state::yard)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", m58_state,  irq0_line_hold)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_yard)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_yard);
 	PALETTE(config, m_palette, FUNC(m58_state::m58_palette), 256+256+256, 256+256+16);
 
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -189,7 +189,7 @@ MACHINE_CONFIG_START(jonos_state::jonos)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 287)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jonos)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_jonos);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));

@@ -192,9 +192,9 @@ private:
 READ8_MEMBER( bml3_state::bml3_6845_r )
 {
 	if (offset)
-		return m_crtc->register_r(space, 0);
+		return m_crtc->register_r();
 	else
-		return m_crtc->status_r(space, 0);
+		return m_crtc->status_r();
 }
 
 WRITE8_MEMBER( bml3_state::bml3_6845_w )
@@ -202,12 +202,12 @@ WRITE8_MEMBER( bml3_state::bml3_6845_w )
 	if(offset == 0)
 	{
 		m_crtc_index = data;
-		m_crtc->address_w(space, 0, data);
+		m_crtc->address_w(data);
 	}
 	else
 	{
 		m_crtc_vreg[m_crtc_index] = data;
-		m_crtc->register_w(space, 0, data);
+		m_crtc->register_w(data);
 	}
 }
 
@@ -302,14 +302,14 @@ READ8_MEMBER(bml3_state::bml3_ym2203_r)
 {
 	u8 dev_offs = ((m_psg_latch & 3) != 3);
 
-	return m_ym2203->read(space, dev_offs);
+	return m_ym2203->read(dev_offs);
 }
 
 WRITE8_MEMBER(bml3_state::bml3_ym2203_w)
 {
 	u8 dev_offs = ((m_psg_latch & 3) != 3);
 
-	m_ym2203->write(space, dev_offs, data);
+	m_ym2203->write(dev_offs, data);
 }
 
 READ8_MEMBER( bml3_state::bml3_vram_attr_r)

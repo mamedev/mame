@@ -69,17 +69,17 @@ IRQ_CALLBACK_MEMBER(dcheese_state::irq_callback)
 }
 
 
-void dcheese_state::dcheese_signal_irq(int which )
+void dcheese_state::signal_irq(u8 which)
 {
 	m_irq_state[which] = 1;
 	update_irq_state();
 }
 
 
-INTERRUPT_GEN_MEMBER(dcheese_state::dcheese_vblank)
+INTERRUPT_GEN_MEMBER(dcheese_state::vblank)
 {
 	logerror("---- VBLANK ----\n");
-	dcheese_signal_irq(4);
+	signal_irq(4);
 }
 
 
@@ -117,7 +117,7 @@ WRITE16_MEMBER(dcheese_state::eeprom_control_w)
 	/* bits $0080-$0010 are probably lamps */
 	if (ACCESSING_BITS_0_7)
 	{
-		ioport("EEPROMOUT")->write(data, 0xff);
+		m_eepromout_io->write(data, 0xff);
 	}
 }
 
@@ -138,7 +138,7 @@ READ8_MEMBER(dcheese_state::sound_status_r)
 
 WRITE8_MEMBER(dcheese_state::sound_control_w)
 {
-	uint8_t diff = data ^ m_sound_control;
+	u8 const diff = data ^ m_sound_control;
 	m_sound_control = data;
 
 	/* bit 0x20 = LED */
@@ -173,7 +173,7 @@ WRITE8_MEMBER(dcheese_state::bsmt_data_w)
 void dcheese_state::main_cpu_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x000000, 0x03ffff).rom();
+	map(0x000000, 0x03ffff).rom().region("maincpu", 0);
 	map(0x100000, 0x10ffff).ram();
 	map(0x200000, 0x200001).portr("200000").w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0x220000, 0x220001).portr("220000").w(FUNC(dcheese_state::blitter_color_w));
@@ -200,7 +200,7 @@ void dcheese_state::sound_cpu_map(address_map &map)
 	map(0x0800, 0x0800).mirror(0x07ff).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x1000, 0x10ff).mirror(0x0700).w(FUNC(dcheese_state::bsmt_data_w));
 	map(0x1800, 0x1fff).ram();
-	map(0x2000, 0xffff).rom();
+	map(0x2000, 0xffff).rom().region("audiocpu", 0x2000);
 }
 
 
@@ -371,17 +371,17 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(dcheese_state::dcheese)
-
+void dcheese_state::dcheese(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, MAIN_OSC)
-	MCFG_DEVICE_PROGRAM_MAP(main_cpu_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dcheese_state,  dcheese_vblank)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(dcheese_state,irq_callback)
+	M68000(config, m_maincpu, MAIN_OSC);
+	m_maincpu->set_addrmap(AS_PROGRAM, &dcheese_state::main_cpu_map);
+	m_maincpu->set_vblank_int("screen", FUNC(dcheese_state::vblank));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(dcheese_state::irq_callback));
 
-	MCFG_DEVICE_ADD("audiocpu", M6809, SOUND_OSC/16)
-	MCFG_DEVICE_PROGRAM_MAP(sound_cpu_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(dcheese_state, irq1_line_hold,  480)   /* accurate for fredmem */
+	M6809(config, m_audiocpu, SOUND_OSC/16); // TODO : Unknown CPU type
+	m_audiocpu->set_addrmap(AS_PROGRAM, &dcheese_state::sound_cpu_map);
+	m_audiocpu->set_periodic_int(FUNC(dcheese_state::irq1_line_hold), attotime::from_hz(480));   /* accurate for fredmem */
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
@@ -390,12 +390,12 @@ MACHINE_CONFIG_START(dcheese_state::dcheese)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(360, 262)  /* guess, need to see what the games write to the vid registers */
-	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(dcheese_state, screen_update_dcheese)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(360, 262);  /* guess, need to see what the games write to the vid registers */
+	m_screen->set_visarea(0, 319, 0, 239);
+	m_screen->set_screen_update(FUNC(dcheese_state::screen_update));
+	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(dcheese_state::dcheese_palette), 65536);
 
@@ -406,17 +406,18 @@ MACHINE_CONFIG_START(dcheese_state::dcheese)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
-	MCFG_DEVICE_ADD("bsmt", BSMT2000, SOUND_OSC)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.2)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.2)
-MACHINE_CONFIG_END
+	BSMT2000(config, m_bsmt, SOUND_OSC);
+	m_bsmt->add_route(0, "lspeaker", 1.2);
+	m_bsmt->add_route(1, "rspeaker", 1.2);
+}
 
 
-MACHINE_CONFIG_START(dcheese_state::fredmem)
+void dcheese_state::fredmem(machine_config &config)
+{
 	dcheese(config);
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, 359, 0, 239)
-MACHINE_CONFIG_END
+
+	m_screen->set_visarea(0, 359, 0, 239);
+}
 
 
 
@@ -760,7 +761,7 @@ ROM_START( cecmatch )
 	ROM_RELOAD(        0x3c0000, 0x40000 )
 
 	ROM_REGION16_LE( 0x20000, "palrom", 0 )
-	ROM_LOAD16_BYTE( "0.144", 0x00000, 0x10000, CRC(69b3cc85) SHA1(05f7204ac961274b5d2f42cc6c0d06e5fa146aef)) /* Palette - 0 at U144 */
+	ROM_LOAD16_BYTE( "0.144", 0x00000, 0x10000, CRC(69b3cc85) SHA1(05f7204ac961274b5d2f42cc6c0d06e5fa146aef) ) /* Palette - 0 at U144 */
 	ROM_LOAD16_BYTE( "1.145", 0x00001, 0x10000, CRC(e64a8511) SHA1(0e3a1fe936c841b8acfb150bf63e564b1dec2363) ) /* Palette - 1 at U145 */
 ROM_END
 

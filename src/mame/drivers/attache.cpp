@@ -506,7 +506,7 @@ READ8_MEMBER(attache_state::pio_portA_r)
 	switch(m_pio_select)
 	{
 	case PIO_SEL_8910_DATA:
-		ret = m_psg->data_r(space,0);
+		ret = m_psg->data_r();
 		logerror("PSG: data read %02x\n",ret);
 		break;
 	case PIO_SEL_5832_WRITE:
@@ -560,10 +560,10 @@ void attache_state::operation_strobe(address_space& space, uint8_t data)
 	switch(m_pio_select)
 	{
 	case PIO_SEL_8910_ADDR:
-		m_psg->address_w(space,0,data);
+		m_psg->address_w(data);
 		break;
 	case PIO_SEL_8910_DATA:
-		m_psg->data_w(space,0,data);
+		m_psg->data_w(data);
 		break;
 	case PIO_SEL_5832_WRITE:
 		m_rtc->cs_w(1);
@@ -1121,17 +1121,18 @@ void attache816_state::machine_reset()
 	attache_state::machine_reset();
 }
 
-MACHINE_CONFIG_START(attache_state::attache)
+void attache_state::attache(machine_config &config)
+{
 	Z80(config, m_maincpu, 8_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &attache_state::attache_map);
 	m_maincpu->set_addrmap(AS_IO, &attache_state::attache_io);
 	m_maincpu->set_daisy_config(attache_daisy_chain);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_RAW_PARAMS(12.324_MHz_XTAL, 784, 0, 640, 262, 0, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(attache_state, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen.set_raw(12.324_MHz_XTAL, 784, 0, 640, 262, 0, 240);
+	screen.set_screen_update(FUNC(attache_state::screen_update));
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
 
@@ -1194,25 +1195,26 @@ MACHINE_CONFIG_START(attache_state::attache)
 
 	RAM(config, RAM_TAG).set_default_size("64K");
 
-	MCFG_SOFTWARE_LIST_ADD("disk_list","attache")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "disk_list").set_original("attache");
+}
 
-MACHINE_CONFIG_START(attache816_state::attache816)
+void attache816_state::attache816(machine_config &config)
+{
 	Z80(config, m_maincpu, 8_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &attache816_state::attache_map);
 	m_maincpu->set_addrmap(AS_IO, &attache816_state::attache_io);
 	m_maincpu->set_daisy_config(attache_daisy_chain);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
-	MCFG_DEVICE_ADD("extcpu", I8086, 24_MHz_XTAL / 3)
-	MCFG_DEVICE_PROGRAM_MAP(attache_x86_map)
-	MCFG_DEVICE_IO_MAP(attache_x86_io)
-	MCFG_QUANTUM_PERFECT_CPU("extcpu")
+	I8086(config, m_extcpu, 24_MHz_XTAL / 3);
+	m_extcpu->set_addrmap(AS_PROGRAM, &attache816_state::attache_x86_map);
+	m_extcpu->set_addrmap(AS_IO, &attache816_state::attache_x86_io);
+	config.m_perfect_cpu_quantum = subtag("extcpu");
 
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_RAW_PARAMS(12.324_MHz_XTAL, 784, 0, 640, 262, 0, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(attache_state, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen.set_raw(12.324_MHz_XTAL, 784, 0, 640, 262, 0, 240);
+	screen.set_screen_update(FUNC(attache_state::screen_update));
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
 
@@ -1282,8 +1284,8 @@ MACHINE_CONFIG_START(attache816_state::attache816)
 
 	RAM(config, RAM_TAG).set_default_size("64K");
 
-	MCFG_SOFTWARE_LIST_ADD("disk_list","attache")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "disk_list").set_original("attache");
+}
 
 ROM_START( attache )
 	ROM_REGION(0x10000, "maincpu", 0)

@@ -157,7 +157,7 @@ MACHINE_CONFIG_START(interact_state::interact)
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MASK_SPEAKER);
 	m_cassette->set_interface("interact_cass");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list","interact")
+	SOFTWARE_LIST(config, "cass_list").set_original("interact");
 
 	/* printer */
 	PRINTER(config, m_printer, 0);

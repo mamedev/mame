@@ -227,17 +227,18 @@ GFXDECODE_END
     MACHINE_DRIVER( cgc7900_video )
 -------------------------------------------------*/
 
-MACHINE_CONFIG_START(cgc7900_state::cgc7900_video)
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(cgc7900_state, screen_update)
-	MCFG_SCREEN_SIZE(1024, 768)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 768-1)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, cgc7900_state, irq<0xc>))
+void cgc7900_state::cgc7900_video(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(cgc7900_state::screen_update));
+	screen.set_size(1024, 768);
+	screen.set_visarea(0, 1024-1, 0, 768-1);
+	screen.screen_vblank().set(FUNC(cgc7900_state::irq<0xc>));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_cgc7900)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_cgc7900);
 	PALETTE(config, m_palette, FUNC(cgc7900_state::cgc7900_palette), 8);
 
 	TIMER(config, "blink").configure_periodic(FUNC(cgc7900_state::blink_tick), attotime::from_hz(XTAL(28'480'000)/7500000));
-MACHINE_CONFIG_END
+}

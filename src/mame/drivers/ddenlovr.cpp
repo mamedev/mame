@@ -10442,7 +10442,7 @@ MACHINE_CONFIG_START(ddenlovr_state::hparadis)
 	maincpu.out_pb_callback().set(FUNC(ddenlovr_state::hparadis_select_w));
 
 	// the RTC seems unused
-	MCFG_DEVICE_REMOVE("rtc")
+	config.device_remove("rtc");
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,hparadis)
 MACHINE_CONFIG_END

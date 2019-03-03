@@ -278,8 +278,8 @@ WRITE8_MEMBER( multi8_state::pal_w )
 	}
 }
 
-READ8_MEMBER(multi8_state::ay8912_0_r){ return m_aysnd->data_r(space, 0); }
-READ8_MEMBER(multi8_state::ay8912_1_r){ return m_aysnd->data_r(space, 1); }
+READ8_MEMBER(multi8_state::ay8912_0_r){ return m_aysnd->data_r(); }
+READ8_MEMBER(multi8_state::ay8912_1_r){ return m_aysnd->data_r(); }
 
 READ8_MEMBER( multi8_state::kanji_r )
 {
@@ -581,7 +581,7 @@ MACHINE_CONFIG_START(multi8_state::multi8)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
 	PALETTE(config, m_palette, palette_device::BRG_3BIT);
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_multi8)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_multi8);
 
 	/* Audio */
 	SPEAKER(config, "mono").front_center();
@@ -614,7 +614,7 @@ MACHINE_CONFIG_START(multi8_state::multi8)
 	PIC8259(config, "pic", 0);
 
 	//UPD765A(config, "fdc", false, true);
-	//MCFG_FLOPPY_DRIVE_ADD("fdc:0", multi8_floppies, "525hd", floppy_image_device::default_floppy_formats)
+	//FLOPPY_CONNECTOR(config, "fdc:0", multi8_floppies, "525hd", floppy_image_device::default_floppy_formats);
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -333,7 +333,7 @@ WRITE32_MEMBER(atlantis_state::board_ctrl_w)
 		m_cmos_write_enabled = true;
 		break;
 	case WDOG:
-		m_rtc->watchdog_write(space, offset, data);
+		m_rtc->watchdog_write();
 		break;
 	default:
 		if (LOG_IRQ)
@@ -345,7 +345,7 @@ WRITE32_MEMBER(atlantis_state::board_ctrl_w)
 
 READ8_MEMBER(atlantis_state::cmos_r)
 {
-	uint8_t result = m_rtc->read(space, offset);
+	uint8_t result = m_rtc->read(offset);
 	// Initial RTC check expects reads to the RTC to take some time
 	if (offset == 0x7ff9)
 		m_maincpu->eat_cycles(30);
@@ -367,7 +367,7 @@ WRITE8_MEMBER(atlantis_state::cmos_w)
 			m_serial_count = 0;
 	}
 	else if (m_cmos_write_enabled) {
-		m_rtc->write(space, offset, data);
+		m_rtc->write(offset, data);
 		m_cmos_write_enabled = false;
 		if (LOG_RTC || offset >= 0x7ff0)
 			logerror("%s:RTC write to offset %04X = %08X & %08X\n", machine().describe_context(), offset, data, mem_mask);

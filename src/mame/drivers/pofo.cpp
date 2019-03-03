@@ -1044,12 +1044,12 @@ MACHINE_CONFIG_START(portfolio_state::portfolio)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
-	MCFG_PORTFOLIO_MEMORY_CARD_SLOT_ADD(PORTFOLIO_MEMORY_CARD_SLOT_A_TAG, portfolio_memory_cards, nullptr)
+	PORTFOLIO_MEMORY_CARD_SLOT(config, m_ccm, portfolio_memory_cards, nullptr);
 
-	MCFG_PORTFOLIO_EXPANSION_SLOT_ADD(PORTFOLIO_EXPANSION_SLOT_TAG, XTAL(4'915'200), portfolio_expansion_cards, nullptr)
-	MCFG_PORTFOLIO_EXPANSION_SLOT_EINT_CALLBACK(WRITELINE(*this, portfolio_state, eint_w))
-	MCFG_PORTFOLIO_EXPANSION_SLOT_NMIO_CALLBACK(INPUTLINE(M80C88A_TAG, INPUT_LINE_NMI))
-	MCFG_PORTFOLIO_EXPANSION_SLOT_WAKE_CALLBACK(WRITELINE(*this, portfolio_state, wake_w))
+	PORTFOLIO_EXPANSION_SLOT(config, m_exp, XTAL(4'915'200), portfolio_expansion_cards, nullptr);
+	m_exp->eint_wr_callback().set(FUNC(portfolio_state::eint_w));
+	m_exp->nmio_wr_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_exp->wake_wr_callback().set(FUNC(portfolio_state::wake_w));
 
 	TIMER(config, "counter").configure_periodic(FUNC(portfolio_state::counter_tick), attotime::from_hz(XTAL(32'768)/16384));
 	TIMER(config, TIMER_TICK_TAG).configure_periodic(FUNC(portfolio_state::system_tick), attotime::from_hz(XTAL(32'768)/32768));
@@ -1058,7 +1058,7 @@ MACHINE_CONFIG_START(portfolio_state::portfolio)
 	TIMER(config, "keyboard").configure_periodic(FUNC(portfolio_state::keyboard_tick), attotime::from_usec(2500));
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "pofo")
+	SOFTWARE_LIST(config, "cart_list").set_original("pofo");
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("128K");

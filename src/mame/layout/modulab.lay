@@ -1,0 +1,429 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+copyright-holders:Joakim Larsson Edstrom
+Esselte Studium Modulab layout
+-->
+<mamelayout version="2">
+	<element name="text_0"><text string="0"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_1"><text string="1"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_2"><text string="2"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_3"><text string="3"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_4"><text string="4"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_5"><text string="5"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_6"><text string="6"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_7"><text string="7"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_8"><text string="8"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_9"><text string="9"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_10"><text string="A"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_11"><text string="B"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_12"><text string="C"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_13"><text string="D"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_14"><text string="E"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_15"><text string="F"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_run"><text string="RUN"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_ads"><text string="ADS"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_fwd"><text string="FWD"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_cb"><text string="C/B"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_rst"><text string="RST"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_esselte"><text string="ESSELTE"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_studium"><text string="STUDIUM"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_adress"><text string="ADRESS"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_data"><text string="DATA"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="pcb_blue"> <rect><color red="0.0" green="0.0" blue="0.49" /></rect></element>
+	<element name="silver"> <rect><color red="0.75" green="0.75" blue="0.75" /></rect></element>
+	<element name="black"> <rect><color red="0.0" green="0.0" blue="0.0" /></rect></element>
+	<element name="brown"> <rect><color red="0.18" green="0.08" blue="0.03" /></rect></element>
+	<element name="text_164"><text string="'164"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_ls14"><text string="'14"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_138"><text string="'138"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_123"><text string="'123"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_367"><text string="'367"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_923"><text string="C923"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_6116"><text string="RAM HM6116P"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_2764"><text string="ROM M2764AFI"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_6802"><text string="CPU MC6802P"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_8154"><text string="PIO INS8154N"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_4mhz"><text string="4.000"><color red="0.6" green="0.6" blue="0.6" /></text></element>
+	<element name="text_sunny"><text string="SUNNY"><color red="0.6" green="0.6" blue="0.6" /></text></element>
+	<element name="text_irq"><text string="IRQ"><color red="0.6" green="0.6" blue="0.6" /></text></element>
+	<element name="text_porta"><text string="PORT   A"><color red="0.6" green="0.6" blue="0.6" /></text></element>
+	<element name="text_portb"><text string="PORT   B"><color red="0.6" green="0.6" blue="0.6" /></text></element>
+	<element name="text_vcc"><text string="VCC"><color red="0.6" green="0.6" blue="0.6" /></text></element>
+	<element name="text_gnd"><text string="GND"><color red="0.6" green="0.6" blue="0.6" /></text></element>
+	<element name="text_r"><text string="R"><color red="0.6" green="0.6" blue="0.6" /></text></element>
+
+	<element name="brownkey">
+		<rect><bounds x="0" y="0" width="10" height="10" />  <color red="0.43" green="0.33" blue="0.23" /></rect>
+		<disk><bounds x="0.5" y="0.5" width="9" height="9" /><color red="0.23" green="0.13" blue="0.03" /></disk>
+		<disk><bounds x="1" y="1" width="8" height="8" />    <color red="0.33" green="0.23" blue="0.13" /></disk>
+		<rect><bounds x="2" y="0.5" width="6" height="1.5" /><color red="0.23" green="0.13" blue="0.03" /></rect>
+		<rect><bounds x="1" y="0.5" width="8" height="1.0" /><color red="0.43" green="0.33" blue="0.23" /></rect>
+		<!-- Rounded corners -->
+		<rect><bounds x="0" y="0" width="1" height="1" /><color red="0" green="0" blue="0" /></rect>
+		<disk><bounds x="0" y="0" width="2" height="2" /><color red="0.43" green="0.33" blue="0.23" /></disk>
+		<rect><bounds x="9" y="0" width="1" height="1" /><color red="0" green="0" blue="0" /></rect>
+		<disk><bounds x="8" y="0" width="2" height="2" /><color red="0.43" green="0.33" blue="0.23" /></disk>
+		<rect><bounds x="9" y="9" width="1" height="1" /><color red="0" green="0" blue="0" /></rect>
+		<disk><bounds x="8" y="8" width="2" height="2" /><color red="0.43" green="0.33" blue="0.23" /></disk>
+		<rect><bounds x="0" y="9" width="1" height="1" /><color red="0" green="0" blue="0" /></rect>
+		<disk><bounds x="0" y="8" width="2" height="2" /><color red="0.43" green="0.33" blue="0.23" /></disk>
+	</element>
+
+	<element name="redkey">
+		<rect><bounds x="0" y="0" width="10" height="10" />  <color red="0.85" green="0.18" blue="0.16" /></rect>
+		<disk><bounds x="0.5" y="0.5" width="9" height="9" /><color red="0.65" green="0.00" blue="0.00" /></disk>
+		<disk><bounds x="1" y="1" width="8" height="8" />    <color red="0.75" green="0.08" blue="0.06" /></disk>
+		<rect><bounds x="2" y="0.5" width="6" height="1.5" /><color red="0.65" green="0.00" blue="0.00" /></rect>
+		<rect><bounds x="1" y="0.5" width="8" height="1.0" /><color red="0.85" green="0.18" blue="0.16" /></rect>
+		<!-- Rounded corners -->
+		<rect><bounds x="0" y="0" width="1" height="1" /><color red="0" green="0" blue="0" /></rect>
+		<disk><bounds x="0" y="0" width="2" height="2" /><color red="0.85" green="0.18" blue="0.16" /></disk>
+		<rect><bounds x="9" y="0" width="1" height="1" /><color red="0" green="0" blue="0" /></rect>
+		<disk><bounds x="8" y="0" width="2" height="2" /><color red="0.85" green="0.18" blue="0.16" /></disk>
+		<rect><bounds x="9" y="9" width="1" height="1" /><color red="0" green="0" blue="0" /></rect>
+		<disk><bounds x="8" y="8" width="2" height="2" /><color red="0.85" green="0.18" blue="0.16" /></disk>
+		<rect><bounds x="0" y="9" width="1" height="1" /><color red="0" green="0" blue="0" /></rect>
+		<disk><bounds x="0" y="8" width="2" height="2" /><color red="0.85" green="0.18" blue="0.16" /></disk>
+	</element>
+
+	<element name="greenkey">
+		<rect><bounds x="0" y="0" width="10" height="10" />  <color red="0.24" green="0.64" blue="0.28" /></rect>
+		<disk><bounds x="0.5" y="0.5" width="9" height="9" /><color red="0.04" green="0.44" blue="0.08" /></disk>
+		<disk><bounds x="1" y="1" width="8" height="8" />    <color red="0.14" green="0.54" blue="0.18" /></disk>
+		<rect><bounds x="2" y="0.5" width="6" height="1.5" /><color red="0.04" green="0.44" blue="0.08" /></rect>
+		<rect><bounds x="1" y="0.5" width="8" height="1.0" /><color red="0.24" green="0.64" blue="0.28" /></rect>
+		<!-- Rounded corners -->
+		<rect><bounds x="0" y="0" width="1" height="1" /><color red="0" green="0" blue="0" /></rect>
+		<disk><bounds x="0" y="0" width="2" height="2" /><color red="0.24" green="0.64" blue="0.28" /></disk>
+		<rect><bounds x="9" y="0" width="1" height="1" /><color red="0" green="0" blue="0" /></rect>
+		<disk><bounds x="8" y="0" width="2" height="2" /><color red="0.24" green="0.64" blue="0.28" /></disk>
+		<rect><bounds x="9" y="9" width="1" height="1" /><color red="0" green="0" blue="0" /></rect>
+		<disk><bounds x="8" y="8" width="2" height="2" /><color red="0.24" green="0.64" blue="0.28" /></disk>
+		<rect><bounds x="0" y="9" width="1" height="1" /><color red="0" green="0" blue="0" /></rect>
+		<disk><bounds x="0" y="8" width="2" height="2" /><color red="0.24" green="0.64" blue="0.28" /></disk>
+	</element>
+
+	<element name="mount">
+		<disk><bounds x="0" y="0" width="100" height="100" /><color red="0.64" green="0.64" blue="0.64" /></disk>
+		<disk><bounds x="22" y="22" width="56" height="56" /><color red="0.54" green="0.54" blue="0.54" /></disk>
+		<disk><bounds x="30" y="30" width="40" height="40" /><color red="0.0" green="0.0" blue="0.0" /></disk>
+	</element>
+
+	<element name="screwhead">
+		<disk><bounds x="0" y="0" width="100" height="100" /><color red="1" green="1" blue="1" /></disk>
+		<disk><bounds x="2" y="2" width="96"  height="96" /> <color red="0" green="0" blue="0" /></disk>
+		<disk><bounds x="5" y="5" width="90"  height="90" /> <color red="0.8" green="0.8" blue="0.8" /></disk>
+	</element>
+
+	<element name="hole">
+		<disk><bounds x="0" y="0" width="100" height="100" /><color red="0" green="0" blue="0" /></disk>
+	</element>
+
+	<group name="screw">
+		<bezel element="screwhead"><bounds x="0" y="0" width="100" height="100" /></bezel>
+		<repeat count="50">
+			<param name="x1" start="25" increment="1" />
+			<param name="x2" start="75" increment="-1" />
+			<param name="y" start="25" increment="1" />
+			<bezel element="hole"><bounds x="~x1~" y="~y~" width="8" height="8" /></bezel>
+			<bezel element="hole"><bounds x="~x2~" y="~y~" width="8" height="8" /></bezel>
+		</repeat>
+	</group>
+
+	<element name="pin">
+		<disk><bounds x="0" y="0" width="100" height="100" /><color red="0.64" green="0.64" blue="0.64" /></disk>
+		<disk><bounds x="23" y="23" width="54" height="54" /><color red="0.0" green="0.0" blue="0.0" /></disk>
+		<disk><bounds x="30" y="30" width="38" height="38" /><color red="0.84" green="0.84" blue="0.84" /></disk>
+	</element>
+
+	<element name="trim">
+		<rect><bounds x="0" y="0" width="100" height="100" /><color red="0.0" green="0.0" blue="0.0" /></rect>
+		<disk><bounds x="30" y="30" width="40" height="40" /><color red="0.9" green="0.9" blue="0.9" /></disk>
+		<rect><bounds x="47" y="0" width="6" height="100" /><color red="0.0" green="0.0" blue="0.0" /></rect>
+	</element>
+
+	<element name="amp">
+		<rect><bounds x="115" y="0" width="175" height="905" /><color red="0.1" green="0.1" blue="0.1" /></rect> <!-- body -->
+
+		<rect><bounds x="0" y="0" width="125" height="50" /><color red="0.1" green="0.1" blue="0.1" /></rect>    <!-- upper jaw -->
+
+		<rect><bounds x="90" y="0" width="25" height="155" /><color red="0.1" green="0.1" blue="0.1" /></rect>   <!-- upper parts -->
+		<rect><bounds x="90" y="200" width="25" height="230" /><color red="0.1" green="0.1" blue="0.1" /></rect>
+
+		<rect><bounds x="115" y="430" width="100" height="55" /><color red="0.3" green="0.3" blue="0.3" /></rect><!-- mid gap -->
+		<rect><bounds x="100" y="453" width="115" height="7" /><color red="0.9" green="0.9" blue="0.9" /></rect> <!-- pin -->
+
+		<rect><bounds x="90" y="485" width="25" height="230" /><color red="0.1" green="0.1" blue="0.1" /></rect> <!-- lower parts -->
+		<rect><bounds x="90" y="750" width="25" height="155" /><color red="0.1" green="0.1" blue="0.1" /></rect>
+
+		<rect><bounds x="0" y="855" width="125" height="50" /><color red="0.1" green="0.1" blue="0.1" /></rect>  <!-- lower jaw -->
+	</element>
+
+	<element name="xtal">
+		<rect><bounds x="4" y="0" width="143" height="185" /><color red="0.8" green="0.78" blue="0.63" /></rect>
+		<rect><bounds x="0" y="185" width="151" height="4" /><color red="0.6" green="0.58" blue="0.43" /></rect>
+		<rect><bounds x="45" y="189" width="3" height="45" /><color red="0.6" green="0.58" blue="0.43" /></rect>
+		<rect><bounds x="106" y="189" width="3" height="45" /><color red="0.6" green="0.58" blue="0.43" /></rect>
+	</element>
+
+	<group name="hdip">
+		<bezel element="~col~"><bounds x="10" y="20" width="~w~" height="~h~" /></bezel>
+		<bezel element="~t~"><bounds x="30" y="30" width="~tw~" height="~th~" /></bezel>
+		<repeat count="~c~">
+			<param name="x" start="15" increment="35" />
+			<bezel element="silver"><bounds y="10" x="~x~" width="25" height="10" /></bezel>
+			<bezel element="silver"><bounds y="~b~" x="~x~" width="25" height="10" /></bezel>
+		</repeat>
+	</group>
+
+	<group name="vdip">
+		<bezel element="~col~"><bounds x="20" y="10" width="80" height="~h~" /></bezel>
+		<bezel element="~t~"><bounds x="30" y="30" width="60" height="30" /></bezel>
+		<repeat count="~c~">
+			<param name="y" start="15" increment="35" />
+			<bezel element="silver"><bounds x="10" y="~y~" width="10" height="25" /></bezel>
+			<bezel element="silver"><bounds x="100" y="~y~" width="10" height="25" /></bezel>
+		</repeat>
+	</group>
+
+	<group name="key">
+		<bezel element="~keycol~" inputtag="LINE~line~" inputmask="~mask~">
+			<bounds x="~x~" y="~y~" width="262" height="262" />
+		</bezel>
+		<bezel element="text_~bname~">
+			<bounds x="~xt~" y="~yt~" width="150" height="150" />
+		</bezel>
+	</group>
+
+	<element name="digit" defstate="1">
+			<led7seg>
+					<color red="0.75" green="0.0" blue="0.0" />
+			</led7seg>
+	</element>
+
+	<group name="digit">
+		<bezel name="digit~dno~" element="digit">
+			<bounds x="~x~" y="~y~" width="188" height="276" />
+		</bezel>
+	</group>
+
+	<element name="plexi">
+		<rect><bounds x="0"    y="1784" width="300" height="596" /></rect>  <!-- below side connector -->
+		<rect><bounds x="300"  y="500" width="1040" height="1880" /></rect> <!-- below port pins -->
+		<rect><bounds x="1340" y="0" width="388" height="2380" /></rect>    <!-- between CPU and keyboard -->
+		<rect><bounds x="1728" y="0" width="1402" height="810" /></rect>    <!-- Above keyboard -->
+		<rect><bounds x="1728" y="2200" width="1402" height="180" /></rect> <!-- Below keyboard -->
+		<rect><bounds x="2830" y="1096" width="300" height="1280" /></rect> <!-- Right of keyboard -->
+		<rect><bounds x="3100" y="810" width="30" height="286" /></rect>    <!-- Right of RST key -->
+	</element>
+
+	<group name="hood">
+		<bezel element="plexi" />
+	</group>
+
+	<group name="pcb">
+		<backdrop element="pcb_blue"><bounds left="0" top="0" right="3200" bottom="2400"/></backdrop>
+		<bezel element="text_esselte"><bounds x="164" y="2044" width="264" height="52" /></bezel>
+		<bezel element="text_studium"><bounds x="164" y="2110" width="264" height="52" /></bezel>
+
+		<!-- Key pad -->
+		<bezel element="black"><bounds x="1780" y="818" width="1110" height="1395" /></bezel>
+		<bezel element="black"><bounds x="1780" y="818" width="1390" height="280" /></bezel>
+		<param name="keycol" value="brownkey" />
+		<repeat count="4">
+			<param name="bname" start="0" increment="1" />
+			<param name="line" start="0" increment="1" />
+			<param name="x" start="1780" increment="280" />
+			<param name="xt" start="1835" increment="280" />
+			<repeat count="4">
+				<param name="bname" start="~bname~" increment="4" />
+				<param name="mask" start="1" lshift="1" />
+				<param name="y" start="1950" increment="-280" />
+				<param name="yt" start="2020" increment="-280" />
+				<group ref="key"/>
+			</repeat>
+		</repeat>
+		<!-- Special Keys -->
+		<!-- RUN key -->
+		<param name="keycol" value="greenkey" />
+		<param name="bname" value="run" />
+		<param name="line" value="0" />
+		<param name="x" value="1780" />
+		<param name="xt" value="1835" />
+		<param name="mask" value="0x10" />
+		<param name="y" value="824" />
+		<param name="yt" value="888" />
+		<group ref="key"/>
+		<!-- ADS key -->
+		<param name="keycol" value="brownkey" />
+		<param name="bname" value="ads" />
+		<param name="line" value="1" />
+		<param name="x" value="2060" />
+		<param name="xt" value="2115" />
+		<group ref="key"/>
+		<!-- FWD key -->
+		<param name="bname" value="fwd" />
+		<param name="line" value="2" />
+		<param name="x" value="2340" />
+		<param name="xt" value="2395" />
+		<group ref="key"/>
+		<!-- C/B key -->
+		<param name="bname" value="cb" />
+		<param name="line" value="3" />
+		<param name="x" value="2620" />
+		<param name="xt" value="2675" />
+		<group ref="key"/>
+		<!-- RESET key -->
+		<param name="keycol" value="redkey" />
+		<param name="bname" value="rst" />
+		<param name="line" value="4" />
+		<param name="x" value="2900" />
+		<param name="xt" value="2955" />
+		<param name="mask" value="0x04" />
+		<group ref="key"/>
+
+		<!-- BCD 7seg display -->
+		<!--Adress-->
+		<bezel element="text_adress"><bounds x="1820" y="44" width="228" height="52" /></bezel>
+		<param name="y" value="222" />
+		<param name="h" value="240" />
+		<param name="c" value="7" />
+		<param name="col" value="brown"/>
+		<param name="t" value="text_164"/>
+		<repeat count="4">
+			<param name="dno" start="5" increment="-1" />
+			<param name="x" start="1472" increment="224" />
+			<group ref="digit" />
+			<param name="xdip" start="1512" increment="224" />
+			<group ref="vdip"><bounds x="~xdip~" y="528" width="100" height="270" /></group>
+		</repeat>
+		<!--Data-->
+		<bezel element="text_data"><bounds x="2532" y="44" width="156" height="52" /></bezel>
+		<repeat count="2">
+			<param name="dno" start="1" increment="-1" />
+			<param name="x" start="2428" increment="224" />
+			<param name="xdip" start="2468" increment="224" />
+			<param name="xdipt" start="2489" increment="224" />
+			<group ref="digit" />
+			<group ref="vdip"><bounds x="~xdip~" y="528" width="100" height="270" /></group>
+		</repeat>
+
+		<!--scattered IC:s -->
+		<param name="t" value="text_ls14"/>
+		<group ref="vdip"><bounds x="1512" y="890" width="100" height="270" /></group>
+		<param name="c" value="8"/>
+		<param name="h" value="280"/>
+		<param name="t" value="text_138"/>
+		<group ref="vdip"><bounds x="1512" y="1236" width="100" height="320" /></group>
+		<group ref="vdip"><bounds x="1512" y="2040" width="100" height="320" /></group>
+		<param name="w" value="280"/>
+		<param name="h" value="80"/>
+		<param name="b" value="100"/>
+		<param name="t" value="text_367"/>
+		<param name="th" value="30"/>
+		<param name="tw" value="60"/>
+		<group ref="hdip"><bounds x="1110" y="2160" width="320" height="100" /></group>
+		<param name="t" value="text_123"/>
+		<group ref="hdip"><bounds x="600" y="2160" width="320" height="100" /></group>
+		<param name="c" value="10" />
+		<param name="h" value="350" />
+		<param name="t" value="text_923"/>
+		<group ref="vdip"><bounds x="1512" y="1590" width="100" height="400" /></group>
+
+		<!-- larger IC:s -->
+		<param name="h" value="260"/>
+		<param name="b" value="280"/>
+		<param name="col" value="black"/>
+		<param name="c" value="12"/>
+		<param name="w" value="420"/>
+		<param name="t" value="text_6116"/>
+		<param name="th" value="40"/>
+		<param name="tw" value="240"/>
+		<group ref="hdip"><bounds x="725" y="1875" width="~w~" height="~h~" /></group> <!-- RAM -->
+		<param name="col" value="brown"/>
+		<param name="c" value="14"/>
+		<param name="w" value="490"/>
+		<param name="t" value="text_2764"/>
+		<group ref="hdip"><bounds x="655" y="1600" width="~w~" height="~h~" /></group> <!-- ROM -->
+		<param name="c" value="20"/>
+		<param name="w" value="700"/>
+		<param name="t" value="text_6802"/>
+		<group ref="hdip"><bounds x="655" y="1240" width="~w~" height="~h~" /></group> <!-- CPU -->
+		<param name="t" value="text_8154"/>
+		<group ref="hdip"><bounds x="655" y="900" width="~w~" height="~h~" /></group>  <!-- INS8154 -->
+
+
+		<!-- descrete components -->
+		<bezel element="xtal"><bounds x="410" y="995" width="160" height="240" /></bezel>
+		<bezel element="text_4mhz"><bounds x="420" y="1025" width="140" height="40" /></bezel>
+		<bezel element="text_sunny"><bounds x="420" y="1075" width="140" height="40" /></bezel>
+
+		<!-- mount holes -->
+		<bezel element="mount"><bounds x="250"  y="2300" width="75" height="75" /></bezel>
+		<bezel element="mount"><bounds x="1700" y="2300" width="75" height="75" /></bezel>
+		<bezel element="mount"><bounds x="2860" y="2300" width="75" height="75" /></bezel>
+		<bezel element="mount"><bounds x="250"  y="30"   width="75" height="75" /></bezel>
+		<bezel element="mount"><bounds x="1700" y="30"   width="75" height="75" /></bezel>
+		<bezel element="mount"><bounds x="2860" y="30"   width="75" height="75" /></bezel>
+		<bezel element="mount"><bounds x="1170" y="630"  width="75" height="75" /></bezel>
+
+		<!-- pins -->
+		<!-- IRQ -->
+		<bezel element="pin"><bounds x="440" y="1450"  width="30" height="30" /></bezel>
+		<bezel element="text_irq"><bounds x="400" y="1395" width="120" height="50" /></bezel>
+		<!-- Ports -->
+		<repeat count="8">
+			<param name="tid" start="7" increment="-1" />
+			<param name="xp" start="180" increment="150" />
+			<param name="txp" start="100" increment="150" />
+			<repeat count="2">
+		<param name="yp" start="280" increment="140" />
+		<param name="typ" start="275" increment="140" />
+		<bezel element="pin"><bounds x="~xp~" y="~yp~"  width="30" height="30" /></bezel>
+		<bezel element="text_~tid~"><bounds x="~txp~" y="~typ~" width="120" height="50" /></bezel>
+			</repeat>
+		</repeat>
+		<bezel element="text_porta"><bounds x="350" y="200" width="500" height="75" /></bezel>
+		<bezel element="text_portb"><bounds x="350" y="340" width="500" height="75" /></bezel>
+		<!-- power feed -->
+		<bezel element="pin"><bounds x="150" y="575"  width="30" height="30" /></bezel>
+		<bezel element="text_vcc"><bounds x="150" y="615" width="100" height="50" /></bezel>
+		<bezel element="pin"><bounds x="150" y="710"  width="30" height="30" /></bezel>
+		<bezel element="text_gnd"><bounds x="150" y="660" width="100" height="50" /></bezel>
+		<!-- R pins -->
+		<bezel element="pin"><bounds x="3050" y="1740"  width="30" height="30" /></bezel>
+		<bezel element="text_r"><bounds x="2950" y="1735" width="100" height="50" /></bezel>
+		<bezel element="pin"><bounds x="3050" y="1890"  width="30" height="30" /></bezel>
+		<bezel element="text_r"><bounds x="2950" y="1885" width="100" height="50" /></bezel>
+		<!-- trim pot -->
+		<bezel element="trim"><bounds x="950" y="2160"  width="120" height="120" /></bezel>
+		<!-- side connector -->
+		<bezel element="amp"><bounds x="0" y="850"  width="250" height="925" /></bezel>
+	</group>
+
+	<group name="screws">
+		<!-- max size -->
+		<bezel element="pcb_blue"><bounds x="0" y="0" width="1" height="1" /></bezel>
+		<bezel element="pcb_blue"><bounds x="3200" y="2400" width="1" height="1" /></bezel>
+		<!-- screws -->
+		<group ref="screw"><bounds x="250"  y="2300" width="75" height="75" /></group>
+		<group ref="screw"><bounds x="1700" y="2300" width="75" height="75" /></group>
+		<group ref="screw"><bounds x="2860" y="2300" width="75" height="75" /></group>
+		<group ref="screw"><bounds x="1700" y="30"   width="75" height="75" /></group>
+		<group ref="screw"><bounds x="2860" y="30"   width="75" height="75" /></group>
+		<group ref="screw"><bounds x="1170" y="630"  width="75" height="75" /></group>
+	</group>
+
+	<view name="Base Artwork">
+		<group ref="pcb"><bounds x="0" y="0" width="800" height="600" /></group>
+		<group ref="hood"><bounds x="0" y="0" width="800" height="600"/> <color alpha="0.2" /></group>
+		<group ref="screws"><bounds x="0" y="0" width="800" height="600"/></group>
+	</view>
+
+	<view name="Leds and Buttons Artwork">
+		<group ref="pcb"><bounds x="0" y="0" width="800" height="600" /></group>
+		<!-- group ref="hood"><bounds x="0" y="0" width="800" height="600"/> <color alpha="0.2" /></group>
+		<group ref="screws"><bounds x="0" y="0" width="800" height="600"/></group -->
+	</view>
+</mamelayout>

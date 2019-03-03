@@ -357,7 +357,7 @@ MACHINE_CONFIG_START(pktgaldx_state::pktgaldx)
 
 	PALETTE(config, "palette").set_format(palette_device::xBGR_888, 4096);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pktgaldx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pktgaldx);
 
 	DECO16IC(config, m_deco_tilegen, 0);
 	m_deco_tilegen->set_split(0);
@@ -417,7 +417,7 @@ MACHINE_CONFIG_START(pktgaldx_state::pktgaldb)
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 4096);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_bootleg)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bootleg);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

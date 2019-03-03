@@ -455,7 +455,7 @@ void ssv_state::drifto94_map(address_map &map)
 
 READ16_MEMBER(ssv_state::gdfs_eeprom_r)
 {
-	return m_adc->data_r(space, 0) | (m_eeprom->do_read() << 8);
+	return m_adc->data_r() | (m_eeprom->do_read() << 8);
 }
 
 WRITE16_MEMBER(ssv_state::gdfs_eeprom_w)
@@ -477,7 +477,7 @@ WRITE16_MEMBER(ssv_state::gdfs_eeprom_w)
 		// clock line asserted: write latch or select next bit to read
 		m_eeprom->clk_write(BIT(data, 13) ? ASSERT_LINE : CLEAR_LINE);
 
-		m_adc->address_w(space, 0, (data & 0x0700) >> 8);
+		m_adc->address_w((data & 0x0700) >> 8);
 		m_adc->start_w(BIT(data, 11));
 	}
 }

@@ -768,7 +768,7 @@ MACHINE_CONFIG_START(cpu30_state::cpu30x)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(XTAL(16'777'216)) /* 16.7 MHz  from description, crystal needs verification */
 
-//  MCFG_DEVICE_REMOVE("")
+//  config.device_remove("");
 
 	// dual ported ram
 	m_ram->set_default_size("1M").set_extra_options("1M, 2M, 4M");
@@ -832,10 +832,10 @@ void cpu30_state::cpu30lite4(machine_config &config)
 {
 	cpu30zbe(config);
 // Enable these when added to main config
-//  MCFG_DEVICE_REMOVE("fpu")
-//  MCFG_DEVICE_REMOVE("scsi")
-//  MCFG_DEVICE_REMOVE("eth")
-//  MCFG_DEVICE_REMOVE("fdc")
+//  config.device_remove("fpu");
+//  config.device_remove("scsi");
+//  config.device_remove("eth");
+//  config.device_remove("fdc");
 	// dual ported ram
 	m_ram->set_default_size("4M").set_extra_options("256K, 512K, 1M, 2M, 4M, 8M, 16M, 32M");
 }

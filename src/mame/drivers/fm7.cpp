@@ -851,8 +851,6 @@ READ8_MEMBER(fm7_state::fm77av_boot_mode_r)
  */
 void fm7_state::fm7_update_psg()
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
 	if(m_type == SYS_FM7)
 	{
 		switch(m_psg_regsel)
@@ -862,15 +860,15 @@ void fm7_state::fm7_update_psg()
 				break;
 			case 0x01:
 				// Data read
-				m_psg_data = m_psg->data_r(space, 0);
+				m_psg_data = m_psg->data_r();
 				break;
 			case 0x02:
 				// Data write
-				m_psg->data_w(space, 0,m_psg_data);
+				m_psg->data_w(m_psg_data);
 				break;
 			case 0x03:
 				// Address latch
-				m_psg->address_w(space, 0,m_psg_data);
+				m_psg->address_w(m_psg_data);
 				break;
 		}
 	}
@@ -883,21 +881,21 @@ void fm7_state::fm7_update_psg()
 				break;
 			case 0x01:
 				// Data read
-				m_psg_data = m_ym->read(space, 1);
+				m_psg_data = m_ym->read(1);
 				break;
 			case 0x02:
 				// Data write
-				m_ym->write(space, 1,m_psg_data);
+				m_ym->write(1,m_psg_data);
 				logerror("YM: data write 0x%02x\n",m_psg_data);
 				break;
 			case 0x03:
 				// Address latch
-				m_ym->write(space, 0,m_psg_data);
+				m_ym->write(0,m_psg_data);
 				logerror("YM: address latch 0x%02x\n",m_psg_data);
 				break;
 			case 0x04:
 				// Status register
-				m_psg_data = m_ym->read(space, 0);
+				m_psg_data = m_ym->read(0);
 				break;
 			case 0x09:
 				// Joystick port read
@@ -2038,12 +2036,12 @@ MACHINE_CONFIG_START(fm7_state::fm7)
 	MCFG_DEVICE_ADD("maincpu", MC6809, 16.128_MHz_XTAL / 2)
 	MCFG_DEVICE_PROGRAM_MAP(fm7_mem)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_irq_ack)
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	MCFG_DEVICE_ADD("sub", MC6809, 16.128_MHz_XTAL / 2)
 	MCFG_DEVICE_PROGRAM_MAP(fm7_sub_mem)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_sub_irq_ack)
-	MCFG_QUANTUM_PERFECT_CPU("sub")
+	config.m_perfect_cpu_quantum = subtag("sub");
 
 	SPEAKER(config, "mono").front_center();
 	AY8910(config, m_psg, 4.9152_MHz_XTAL / 4).add_route(ALL_OUTPUTS,"mono", 1.00);
@@ -2064,7 +2062,7 @@ MACHINE_CONFIG_START(fm7_state::fm7)
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->set_interface("fm7_cass");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list","fm7_cass")
+	SOFTWARE_LIST(config, "cass_list").set_original("fm7_cass");
 
 	MB8877(config, m_fdc, 8_MHz_XTAL / 8);
 	m_fdc->intrq_wr_callback().set(FUNC(fm7_state::fm7_fdc_intrq_w));
@@ -2073,16 +2071,17 @@ MACHINE_CONFIG_START(fm7_state::fm7)
 	FLOPPY_CONNECTOR(config, m_floppy0, fm7_floppies, "qd", floppy_image_device::default_floppy_formats);
 	FLOPPY_CONNECTOR(config, m_floppy1, fm7_floppies, "qd", floppy_image_device::default_floppy_formats);
 
-	MCFG_SOFTWARE_LIST_ADD("flop_list","fm7_disk")
+	SOFTWARE_LIST(config, "flop_list").set_original("fm7_disk");
 
-	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
-	MCFG_SLOT_OPTION_ADD( "dsjoy", DEMPA_SHINBUNSHA_JOYSTICK )
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, fm7_state, write_centronics_busy))
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, fm7_state, write_centronics_fault))
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, fm7_state, write_centronics_ack))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, fm7_state, write_centronics_perror))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->option_add("dsjoy", DEMPA_SHINBUNSHA_JOYSTICK);
+	m_centronics->busy_handler().set(FUNC(fm7_state::write_centronics_busy));
+	m_centronics->fault_handler().set(FUNC(fm7_state::write_centronics_fault));
+	m_centronics->ack_handler().set(FUNC(fm7_state::write_centronics_ack));
+	m_centronics->perror_handler().set(FUNC(fm7_state::write_centronics_perror));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	OUTPUT_LATCH(config, m_cent_data_out);
+	m_centronics->set_output_latch(*m_cent_data_out);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fm7_state::fm8)
@@ -2090,12 +2089,12 @@ MACHINE_CONFIG_START(fm7_state::fm8)
 	MCFG_DEVICE_ADD("maincpu", MC6809, 4.9152_MHz_XTAL)  // 1.2MHz 68A09
 	MCFG_DEVICE_PROGRAM_MAP(fm8_mem)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_irq_ack)
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	MCFG_DEVICE_ADD("sub", MC6809, 16.128_MHz_XTAL / 2)
 	MCFG_DEVICE_PROGRAM_MAP(fm7_sub_mem)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_sub_irq_ack)
-	MCFG_QUANTUM_PERFECT_CPU("sub")
+	config.m_perfect_cpu_quantum = subtag("sub");
 
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beeper, 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
@@ -2122,13 +2121,14 @@ MACHINE_CONFIG_START(fm7_state::fm8)
 	FLOPPY_CONNECTOR(config, m_floppy0, fm7_floppies, "qd", floppy_image_device::default_floppy_formats);
 	FLOPPY_CONNECTOR(config, m_floppy1, fm7_floppies, "qd", floppy_image_device::default_floppy_formats);
 
-	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, fm7_state, write_centronics_busy))
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, fm7_state, write_centronics_fault))
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, fm7_state, write_centronics_ack))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, fm7_state, write_centronics_perror))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(fm7_state::write_centronics_busy));
+	m_centronics->fault_handler().set(FUNC(fm7_state::write_centronics_fault));
+	m_centronics->ack_handler().set(FUNC(fm7_state::write_centronics_ack));
+	m_centronics->perror_handler().set(FUNC(fm7_state::write_centronics_perror));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	OUTPUT_LATCH(config, m_cent_data_out);
+	m_centronics->set_output_latch(*m_cent_data_out);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fm7_state::fm77av)
@@ -2136,12 +2136,12 @@ MACHINE_CONFIG_START(fm7_state::fm77av)
 	MCFG_DEVICE_ADD("maincpu", MC6809E, 16.128_MHz_XTAL / 8)
 	MCFG_DEVICE_PROGRAM_MAP(fm77av_mem)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_irq_ack)
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	MCFG_DEVICE_ADD("sub", MC6809E, 16.128_MHz_XTAL / 8)
 	MCFG_DEVICE_PROGRAM_MAP(fm77av_sub_mem)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_sub_irq_ack)
-	MCFG_QUANTUM_PERFECT_CPU("sub")
+	config.m_perfect_cpu_quantum = subtag("sub");
 
 	SPEAKER(config, "mono").front_center();
 	YM2203(config, m_ym, 4.9152_MHz_XTAL / 4);
@@ -2172,7 +2172,7 @@ MACHINE_CONFIG_START(fm7_state::fm77av)
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->set_interface("fm7_cass");
 
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("cass_list", "fm7_cass")
+	SOFTWARE_LIST(config, "cass_list").set_compatible("fm7_cass");
 
 	MB8877(config, m_fdc, 8_MHz_XTAL / 8);
 	m_fdc->intrq_wr_callback().set(FUNC(fm7_state::fm7_fdc_intrq_w));
@@ -2181,16 +2181,17 @@ MACHINE_CONFIG_START(fm7_state::fm77av)
 	FLOPPY_CONNECTOR(config, m_floppy0, fm7_floppies, "qd", floppy_image_device::default_floppy_formats);
 	FLOPPY_CONNECTOR(config, m_floppy1, fm7_floppies, "qd", floppy_image_device::default_floppy_formats);
 
-	MCFG_SOFTWARE_LIST_ADD("av_flop_list", "fm77av")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("flop_list", "fm7_disk")
+	SOFTWARE_LIST(config, "av_flop_list").set_original("fm77av");
+	SOFTWARE_LIST(config, "flop_list").set_compatible("fm7_disk");
 
-	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, fm7_state, write_centronics_busy))
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, fm7_state, write_centronics_fault))
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, fm7_state, write_centronics_ack))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, fm7_state, write_centronics_perror))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(fm7_state::write_centronics_busy));
+	m_centronics->fault_handler().set(FUNC(fm7_state::write_centronics_fault));
+	m_centronics->ack_handler().set(FUNC(fm7_state::write_centronics_ack));
+	m_centronics->perror_handler().set(FUNC(fm7_state::write_centronics_perror));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	OUTPUT_LATCH(config, m_cent_data_out);
+	m_centronics->set_output_latch(*m_cent_data_out);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fm7_state::fm11)
@@ -2198,12 +2199,12 @@ MACHINE_CONFIG_START(fm7_state::fm11)
 	MCFG_DEVICE_ADD("maincpu", MC6809E, 2000000)  // 2MHz 68B09E
 	MCFG_DEVICE_PROGRAM_MAP(fm11_mem)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_irq_ack)
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	MCFG_DEVICE_ADD("sub", MC6809, 8000000)  // 2MHz 68B09
 	MCFG_DEVICE_PROGRAM_MAP(fm11_sub_mem)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_sub_irq_ack)
-	MCFG_QUANTUM_PERFECT_CPU("sub")
+	config.m_perfect_cpu_quantum = subtag("sub");
 
 	MCFG_DEVICE_ADD("x86", I8088, 8000000)  // 8MHz i8088
 	MCFG_DEVICE_PROGRAM_MAP(fm11_x86_mem)
@@ -2239,13 +2240,14 @@ MACHINE_CONFIG_START(fm7_state::fm11)
 	FLOPPY_CONNECTOR(config, m_floppy0, fm7_floppies, "qd", floppy_image_device::default_floppy_formats);
 	FLOPPY_CONNECTOR(config, m_floppy1, fm7_floppies, "qd", floppy_image_device::default_floppy_formats);
 
-	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, fm7_state, write_centronics_busy))
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, fm7_state, write_centronics_fault))
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, fm7_state, write_centronics_ack))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, fm7_state, write_centronics_perror))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(fm7_state::write_centronics_busy));
+	m_centronics->fault_handler().set(FUNC(fm7_state::write_centronics_fault));
+	m_centronics->ack_handler().set(FUNC(fm7_state::write_centronics_ack));
+	m_centronics->perror_handler().set(FUNC(fm7_state::write_centronics_perror));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	OUTPUT_LATCH(config, m_cent_data_out);
+	m_centronics->set_output_latch(*m_cent_data_out);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fm7_state::fm16beta)
@@ -2253,12 +2255,12 @@ MACHINE_CONFIG_START(fm7_state::fm16beta)
 	MCFG_DEVICE_ADD("maincpu", I8086, 8000000)  // 8MHz i8086
 	MCFG_DEVICE_PROGRAM_MAP(fm16_mem)
 	MCFG_DEVICE_IO_MAP(fm16_io)
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	MCFG_DEVICE_ADD("sub", MC6809, 8000000)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_sub_irq_ack)
 	MCFG_DEVICE_PROGRAM_MAP(fm16_sub_mem)
-	MCFG_QUANTUM_PERFECT_CPU("sub")
+	config.m_perfect_cpu_quantum = subtag("sub");
 
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beeper, 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
@@ -2285,13 +2287,14 @@ MACHINE_CONFIG_START(fm7_state::fm16beta)
 	FLOPPY_CONNECTOR(config, m_floppy0, fm7_floppies, "qd", floppy_image_device::default_floppy_formats);
 	FLOPPY_CONNECTOR(config, m_floppy1, fm7_floppies, "qd", floppy_image_device::default_floppy_formats);
 
-	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, fm7_state, write_centronics_busy))
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, fm7_state, write_centronics_fault))
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, fm7_state, write_centronics_ack))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, fm7_state, write_centronics_perror))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(fm7_state::write_centronics_busy));
+	m_centronics->fault_handler().set(FUNC(fm7_state::write_centronics_fault));
+	m_centronics->ack_handler().set(FUNC(fm7_state::write_centronics_ack));
+	m_centronics->perror_handler().set(FUNC(fm7_state::write_centronics_perror));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	OUTPUT_LATCH(config, m_cent_data_out);
+	m_centronics->set_output_latch(*m_cent_data_out);
 MACHINE_CONFIG_END
 
 /* ROM definition */

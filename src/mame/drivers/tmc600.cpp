@@ -253,7 +253,8 @@ WRITE8_MEMBER( tmc600_state::sc_w )
 
 /* Machine Drivers */
 
-MACHINE_CONFIG_START(tmc600_state::tmc600)
+void tmc600_state::tmc600(machine_config &config)
+{
 	// CPU
 	cdp1802_device &cpu(CDP1802(config, CDP1802_TAG, 3.57_MHz_XTAL));
 	cpu.set_addrmap(AS_PROGRAM, &tmc600_state::tmc600_map);
@@ -293,11 +294,11 @@ MACHINE_CONFIG_START(tmc600_state::tmc600)
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
 
 	// expansion bus connector
-	MCFG_TMC600_EURO_BUS_SLOT_ADD(TMC600_EURO_BUS_TAG, tmc600_euro_bus_cards, nullptr)
+	TMC600_EURO_BUS_SLOT(config, m_bus, tmc600_euro_bus_cards, nullptr);
 
 	// internal RAM
 	RAM(config, RAM_TAG).set_default_size("8K");
-MACHINE_CONFIG_END
+}
 
 /* ROMs */
 

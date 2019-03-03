@@ -335,7 +335,7 @@ VIDEO_START_MEMBER(gaelco2_state,gaelco2_dual)
 
 ***************************************************************************/
 
-void gaelco2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int mask, int xoffs)
+void gaelco2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int mask)
 {
 	uint16_t *buffered_spriteram16 = m_spriteram->buffer();
 	int j, x, y, ex, ey, px, py;
@@ -345,8 +345,8 @@ void gaelco2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 	int start_offset = (m_vregs[1] & 0x10)*0x100;
 	int end_offset = start_offset + 0x1000;
 
-	/* sprite offset is based on the visible area */
-	int spr_x_adjust = (screen.visible_area().max_x - 320 + 1) - (511 - 320 - 1) - ((m_vregs[0] >> 4) & 0x01) + xoffs;
+	/* sprite offset is based on the visible area - this seems very kludgy */
+	int spr_x_adjust = (screen.visible_area().max_x - 320 + 1) - (511 - 320 - 1) - ((m_vregs[0] >> 4) & 0x01) + m_global_spritexoff;
 
 	for (j = start_offset; j < end_offset; j += 8){
 		int data = buffered_spriteram16[(j/2) + 0];
@@ -461,7 +461,7 @@ uint32_t gaelco2_state::screen_update_gaelco2(screen_device &screen, bitmap_ind1
 
 	m_pant[1]->draw(screen, bitmap, cliprect, 0, 0);
 	m_pant[0]->draw(screen, bitmap, cliprect, 0, 0);
-	draw_sprites(screen, bitmap, cliprect, 0, 0);
+	draw_sprites(screen, bitmap, cliprect, 0);
 	return 0;
 }
 
@@ -509,7 +509,7 @@ uint32_t gaelco2_state::dual_update(screen_device &screen, bitmap_ind16 &bitmap,
 	bitmap.fill(0, cliprect);
 
 	m_pant[index]->draw(screen, bitmap, cliprect, 0, 0);
-	draw_sprites(screen,bitmap,cliprect, 0x8000 * index, 0);
+	draw_sprites(screen,bitmap,cliprect, 0x8000 * index);
 
 	return 0;
 }

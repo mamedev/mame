@@ -380,7 +380,7 @@ MACHINE_CONFIG_START(namcond1_state::namcond1)
 	MCFG_DEVICE_IO_MAP( nd1h8iomap)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcond1_state,  mcu_interrupt)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	YGV608(config, m_ygv608, 0);
 	m_ygv608->set_palette("palette");

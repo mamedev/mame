@@ -1380,7 +1380,7 @@ MACHINE_CONFIG_START(nc_state::nc_base)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", Z80, /*6000000*/ 4606000)        /* Russell Marks says this is more accurate */
 	MCFG_DEVICE_PROGRAM_MAP(nc_map)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -1398,10 +1398,11 @@ MACHINE_CONFIG_START(nc_state::nc_base)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* printer */
-	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, nc_state, write_centronics_busy))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(nc_state::write_centronics_busy));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
 
 	/* uart */
 	I8251(config, m_uart, 0);
@@ -1435,8 +1436,7 @@ MACHINE_CONFIG_START(nc100_state::nc100)
 	MCFG_SCREEN_UPDATE_DRIVER(nc100_state, screen_update_nc100)
 
 	/* printer */
-	MCFG_DEVICE_MODIFY("centronics")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, nc100_state, write_nc100_centronics_ack))
+	m_centronics->ack_handler().set(FUNC(nc100_state::write_nc100_centronics_ack));
 
 	/* uart */
 	m_uart->rxrdy_handler().set(FUNC(nc100_state::nc100_rxrdy_callback));
@@ -1475,8 +1475,7 @@ MACHINE_CONFIG_START(nc200_state::nc200)
 	palette.set_init(FUNC(nc200_state::nc_colours));
 
 	/* printer */
-	MCFG_DEVICE_MODIFY("centronics")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, nc200_state, write_nc200_centronics_ack))
+	m_centronics->ack_handler().set(FUNC(nc200_state::write_nc200_centronics_ack));
 
 	/* uart */
 	m_uart->rxrdy_handler().set(FUNC(nc200_state::nc200_rxrdy_callback));
@@ -1484,10 +1483,10 @@ MACHINE_CONFIG_START(nc200_state::nc200)
 
 	UPD765A(config, m_fdc, 8'000'000, true, true);
 	m_fdc->intrq_wr_callback().set(FUNC(nc200_state::nc200_fdc_interrupt));
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", ibmpc_floppies, "525dd", ibmpc_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", ibmpc_floppies, "525dd", ibmpc_floppy_formats)
+	FLOPPY_CONNECTOR(config, "upd765:0", ibmpc_floppies, "525dd", ibmpc_floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765:1", ibmpc_floppies, "525dd", ibmpc_floppy_formats);
 
-	MCFG_DEVICE_ADD("mc", MC146818, 4.194304_MHz_XTAL)
+	MC146818(config, "mc", 4.194304_MHz_XTAL);
 
 	/* internal ram */
 	m_ram->set_default_size("128K");

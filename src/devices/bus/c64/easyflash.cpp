@@ -114,17 +114,17 @@ void c64_easyflash_cartridge_device::device_reset()
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------
 
-uint8_t c64_easyflash_cartridge_device::c64_cd_r(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+uint8_t c64_easyflash_cartridge_device::c64_cd_r(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!roml)
 	{
 		offs_t addr = (m_bank << 13) | (offset & 0x1fff);
-		data = m_flash_roml->read(space, addr);
+		data = m_flash_roml->read(addr);
 	}
 	else if (!romh)
 	{
 		offs_t addr = (m_bank << 13) | (offset & 0x1fff);
-		data = m_flash_romh->read(space, addr);
+		data = m_flash_romh->read(addr);
 	}
 	else if (!io2)
 	{
@@ -139,17 +139,17 @@ uint8_t c64_easyflash_cartridge_device::c64_cd_r(address_space &space, offs_t of
 //  c64_cd_w - cartridge data write
 //-------------------------------------------------
 
-void c64_easyflash_cartridge_device::c64_cd_w(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+void c64_easyflash_cartridge_device::c64_cd_w(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!roml)
 	{
 		offs_t addr = (m_bank << 13) | (offset & 0x1fff);
-		m_flash_roml->write(space, addr, data);
+		m_flash_roml->write(addr, data);
 	}
 	else if (!romh)
 	{
 		offs_t addr = (m_bank << 13) | (offset & 0x1fff);
-		m_flash_romh->write(space, addr, data);
+		m_flash_romh->write(addr, data);
 	}
 	else if (!io1)
 	{

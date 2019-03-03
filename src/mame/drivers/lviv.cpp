@@ -426,7 +426,7 @@ MACHINE_CONFIG_START(lviv_state::lviv)
 	MCFG_DEVICE_ADD(m_maincpu, I8080, 2500000)
 	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	I8255(config, m_ppi[0]);
 	m_ppi[0]->in_pa_callback().set(FUNC(lviv_state::ppi_0_porta_r));
@@ -462,14 +462,14 @@ MACHINE_CONFIG_START(lviv_state::lviv)
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* snapshot */
-	MCFG_SNAPSHOT_ADD("snapshot", lviv_state, lviv, "sav", 0)
+	MCFG_SNAPSHOT_ADD("snapshot", lviv_state, lviv, "sav")
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(lviv_lvt_format);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->set_interface("lviv_cass");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list","lviv")
+	SOFTWARE_LIST(config, "cass_list").set_original("lviv");
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K");

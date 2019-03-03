@@ -284,7 +284,7 @@ MACHINE_CONFIG_START(diverboy_state::diverboy)
 	MCFG_DEVICE_PROGRAM_MAP(snd_map)
 
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_diverboy)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_diverboy);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

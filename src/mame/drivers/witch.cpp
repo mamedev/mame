@@ -954,18 +954,19 @@ void witch_state::machine_reset()
 	m_motor_active = (ioport("YM_PortB")->read() & 0x08) ? 0 : 1;
 }
 
-MACHINE_CONFIG_START(witch_state::witch)
+void witch_state::witch(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)    /* 3 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(witch_main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", witch_state,  irq0_line_assert)
+	Z80(config, m_maincpu, CPU_CLOCK);    /* 3 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &witch_state::witch_main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(witch_state::irq0_line_assert));
 
 	/* 2nd z80 */
-	MCFG_DEVICE_ADD("sub", Z80, CPU_CLOCK)    /* 3 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(witch_sub_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", witch_state,  irq0_line_assert)
+	Z80(config, m_subcpu, CPU_CLOCK);    /* 3 MHz */
+	m_subcpu->set_addrmap(AS_PROGRAM, &witch_state::witch_sub_map);
+	m_subcpu->set_vblank_int("screen", FUNC(witch_state::irq0_line_assert));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -983,13 +984,13 @@ MACHINE_CONFIG_START(witch_state::witch)
 	m_ppi[1]->out_pc_callback().set(FUNC(witch_state::write_a006));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(8, 256-1-8, 8*4, 256-8*4-1)
-	MCFG_SCREEN_UPDATE_DRIVER(witch_state, screen_update_witch)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(256, 256);
+	screen.set_visarea(8, 256-1-8, 8*4, 256-8*4-1);
+	screen.set_screen_update(FUNC(witch_state::screen_update_witch));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_witch);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x800);
@@ -1015,16 +1016,15 @@ MACHINE_CONFIG_START(witch_state::witch)
 	ym2.port_a_write_callback().set(FUNC(witch_state::xscroll_w));
 	ym2.port_b_write_callback().set(FUNC(witch_state::yscroll_w));
 	ym2.add_route(ALL_OUTPUTS, "mono", 0.5);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(keirinou_state::keirinou)
+void keirinou_state::keirinou(machine_config &config)
+{
 	witch(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(keirinou_main_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &keirinou_state::keirinou_main_map);
 
-	MCFG_DEVICE_MODIFY("sub")
-	MCFG_DEVICE_PROGRAM_MAP(keirinou_sub_map)
+	m_subcpu->set_addrmap(AS_PROGRAM, &keirinou_state::keirinou_sub_map);
 
 	PALETTE(config.replace(), m_palette).set_entries(0x200+0x80);
 	m_gfxdecode->set_info(gfx_keirinou);
@@ -1044,11 +1044,11 @@ MACHINE_CONFIG_START(keirinou_state::keirinou)
 	ay2.port_b_write_callback().set(FUNC(witch_state::yscroll_w));
 	ay2.add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	MCFG_DEVICE_REMOVE("essnd")
-	MCFG_DEVICE_REMOVE("msm")
-	MCFG_DEVICE_REMOVE("ym1")
-	MCFG_DEVICE_REMOVE("ym2")
-MACHINE_CONFIG_END
+	config.device_remove("essnd");
+	config.device_remove("msm");
+	config.device_remove("ym1");
+	config.device_remove("ym2");
+}
 
 ROM_START( witch )
 	ROM_REGION( 0x30000, "maincpu", 0 )

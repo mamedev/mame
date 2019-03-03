@@ -298,7 +298,7 @@ void rx78_state::rx78_io(address_map &map)
 	map(0xf5, 0xfb).w(FUNC(rx78_state::vdp_reg_w)); //vdp
 	map(0xfc, 0xfc).w(FUNC(rx78_state::vdp_bg_reg_w)); //vdp
 	map(0xfe, 0xfe).w(FUNC(rx78_state::vdp_pri_mask_w));
-	map(0xff, 0xff).w("sn1", FUNC(sn76489a_device::command_w)); //psg
+	map(0xff, 0xff).w("sn1", FUNC(sn76489a_device::write)); //psg
 }
 
 /* Input ports */
@@ -432,7 +432,7 @@ void rx78_state::machine_reset()
 {
 	address_space &prg = m_maincpu->space(AS_PROGRAM);
 	if (m_cart->exists())
-		prg.install_read_handler(0x2000, 0x5fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+		prg.install_read_handler(0x2000, 0x5fff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 }
 
 DEVICE_IMAGE_LOAD_MEMBER( rx78_state, rx78_cart )
@@ -490,7 +490,7 @@ MACHINE_CONFIG_START(rx78_state::rx78)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 16+1) //+1 for the background color
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rx78)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_rx78);
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "rx78_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
@@ -508,7 +508,7 @@ MACHINE_CONFIG_START(rx78_state::rx78)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","rx78")
+	SOFTWARE_LIST(config, "cart_list").set_original("rx78");
 MACHINE_CONFIG_END
 
 /* ROM definition */

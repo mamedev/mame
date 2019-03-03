@@ -104,21 +104,22 @@ static void newbrain_floppies(device_slot_interface &device)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(newbrain_fdc_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(newbrain_fdc_mem)
-	MCFG_DEVICE_IO_MAP(newbrain_fdc_io)
+void newbrain_fdc_device::device_add_mconfig(machine_config &config)
+{
+	Z80(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &newbrain_fdc_device::newbrain_fdc_mem);
+	m_maincpu->set_addrmap(AS_IO, &newbrain_fdc_device::newbrain_fdc_io);
 
 	UPD765A(config, m_fdc, 8'000'000, false, true);
 	m_fdc->intrq_wr_callback().set(FUNC(newbrain_fdc_device::fdc_int_w));
 
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", newbrain_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", newbrain_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":2", newbrain_floppies, nullptr, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":3", newbrain_floppies, nullptr, floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":0", newbrain_floppies, "525dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":1", newbrain_floppies, "525dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":2", newbrain_floppies, nullptr, floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":3", newbrain_floppies, nullptr, floppy_image_device::default_floppy_formats);
 
-	MCFG_NEWBRAIN_EXPANSION_SLOT_ADD(NEWBRAIN_EXPANSION_SLOT_TAG, XTAL(16'000'000)/8, newbrain_expansion_cards, nullptr)
-MACHINE_CONFIG_END
+	NEWBRAIN_EXPANSION_SLOT(config, m_exp, XTAL(16'000'000)/8, newbrain_expansion_cards, nullptr);
+}
 
 
 //**************************************************************************
@@ -176,9 +177,9 @@ void newbrain_fdc_device::device_reset()
 //  mreq_r - memory request read
 //-------------------------------------------------
 
-uint8_t newbrain_fdc_device::mreq_r(address_space &space, offs_t offset, uint8_t data, bool &romov, int &exrm, bool &raminh)
+uint8_t newbrain_fdc_device::mreq_r(offs_t offset, uint8_t data, bool &romov, int &exrm, bool &raminh)
 {
-	return m_exp->mreq_r(space, offset, data, romov, exrm, raminh);
+	return m_exp->mreq_r(offset, data, romov, exrm, raminh);
 }
 
 
@@ -186,9 +187,9 @@ uint8_t newbrain_fdc_device::mreq_r(address_space &space, offs_t offset, uint8_t
 //  mreq_w - memory request write
 //-------------------------------------------------
 
-void newbrain_fdc_device::mreq_w(address_space &space, offs_t offset, uint8_t data, bool &romov, int &exrm, bool &raminh)
+void newbrain_fdc_device::mreq_w(offs_t offset, uint8_t data, bool &romov, int &exrm, bool &raminh)
 {
-	m_exp->mreq_w(space, offset, data, romov, exrm, raminh);
+	m_exp->mreq_w(offset, data, romov, exrm, raminh);
 }
 
 
@@ -196,9 +197,9 @@ void newbrain_fdc_device::mreq_w(address_space &space, offs_t offset, uint8_t da
 //  iorq_r - I/O request read
 //-------------------------------------------------
 
-uint8_t newbrain_fdc_device::iorq_r(address_space &space, offs_t offset, uint8_t data, bool &prtov)
+uint8_t newbrain_fdc_device::iorq_r(offs_t offset, uint8_t data, bool &prtov)
 {
-	return m_exp->iorq_r(space, offset, data, prtov);
+	return m_exp->iorq_r(offset, data, prtov);
 }
 
 
@@ -206,13 +207,13 @@ uint8_t newbrain_fdc_device::iorq_r(address_space &space, offs_t offset, uint8_t
 //  iorq_w - I/O request write
 //-------------------------------------------------
 
-void newbrain_fdc_device::iorq_w(address_space &space, offs_t offset, uint8_t data, bool &prtov)
+void newbrain_fdc_device::iorq_w(offs_t offset, uint8_t data, bool &prtov)
 {
-	m_exp->iorq_w(space, offset, data, prtov);
+	m_exp->iorq_w(offset, data, prtov);
 
 	if ((offset & 0x20f) == 0x20f)
 	{
-		io_dec_w(space, 0, data);
+		io_dec_w(data);
 	}
 }
 
@@ -244,7 +245,7 @@ WRITE_LINE_MEMBER( newbrain_fdc_device::fdc_int_w )
 //  fdc_auxiliary_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( newbrain_fdc_device::fdc_auxiliary_w )
+void newbrain_fdc_device::fdc_auxiliary_w(uint8_t data)
 {
 	/*
 
@@ -278,7 +279,7 @@ WRITE8_MEMBER( newbrain_fdc_device::fdc_auxiliary_w )
 //  fdc_control_r -
 //-------------------------------------------------
 
-READ8_MEMBER( newbrain_fdc_device::fdc_control_r )
+uint8_t newbrain_fdc_device::fdc_control_r()
 {
 	/*
 
@@ -303,7 +304,7 @@ READ8_MEMBER( newbrain_fdc_device::fdc_control_r )
 //  io_dec_w - 0x20f
 //-------------------------------------------------
 
-WRITE8_MEMBER( newbrain_fdc_device::io_dec_w )
+void newbrain_fdc_device::io_dec_w(uint8_t data)
 {
 	/*
 

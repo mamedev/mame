@@ -189,7 +189,7 @@ void mz_state::mz800_io(address_map &map)
 	map(0xeb, 0xeb).w(FUNC(mz_state::mz800_ramaddr_w));
 	map(0xf0, 0xf0).portr("atari_joy1").w(FUNC(mz_state::mz800_palette_w));
 	map(0xf1, 0xf1).portr("atari_joy2");
-	map(0xf2, 0xf2).w("sn76489n", FUNC(sn76489_device::command_w));
+	map(0xf2, 0xf2).w("sn76489n", FUNC(sn76489_device::write));
 	map(0xfc, 0xff).rw("z80pio", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 }
 
@@ -422,7 +422,7 @@ MACHINE_CONFIG_START(mz_state::mz700)
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->set_interface("mz_cass");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list","mz700_cass")
+	SOFTWARE_LIST(config, "cass_list").set_original("mz700_cass");
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K");
@@ -431,7 +431,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mz_state::mz800)
 	mz700(config);
-	MCFG_DEVICE_REMOVE("banke")
+	config.device_remove("banke");
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
@@ -449,8 +449,8 @@ MACHINE_CONFIG_START(mz_state::mz800)
 	MCFG_DEVICE_ADD("sn76489n", SN76489, XTAL(17'734'470)/5)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_DEVICE_REMOVE("cass_list")
-	MCFG_SOFTWARE_LIST_ADD("cass_list","mz800_cass")
+	config.device_remove("cass_list");
+	SOFTWARE_LIST(config, "cass_list").set_original("mz800_cass");
 
 	/* devices */
 	m_pit->set_clk<0>(XTAL(17'734'470)/16);
@@ -461,9 +461,10 @@ MACHINE_CONFIG_START(mz_state::mz800)
 	pio.out_pa_callback().set(FUNC(mz_state::mz800_z80pio_port_a_w));
 	pio.out_pb_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
 MACHINE_CONFIG_END
 
 

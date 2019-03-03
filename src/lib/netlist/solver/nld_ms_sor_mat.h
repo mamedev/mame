@@ -14,8 +14,8 @@
 
 #include <algorithm>
 
-#include "nld_ms_direct.h"
 #include "nld_matrix_solver.h"
+#include "nld_ms_direct.h"
 #include "nld_solver.h"
 
 namespace netlist
@@ -30,24 +30,19 @@ class matrix_solver_SOR_mat_t: public matrix_solver_direct_t<FT, SIZE>
 
 public:
 
-	typedef FT float_type;
+	using float_type = FT;
 
-	matrix_solver_SOR_mat_t(netlist_base_t &anetlist, const pstring &name, const solver_parameters_t *params, std::size_t size)
-		: matrix_solver_direct_t<FT, SIZE>(anetlist, name, matrix_solver_t::DESCENDING, params, size)
+	matrix_solver_SOR_mat_t(netlist_state_t &anetlist, const pstring &name, const solver_parameters_t *params, std::size_t size)
+		: matrix_solver_direct_t<FT, SIZE>(anetlist, name, matrix_solver_t::ASCENDING, params, size)
 		, m_Vdelta(*this, "m_Vdelta", std::vector<float_type>(size))
 		, m_omega(*this, "m_omega", params->m_gs_sor)
 		, m_lp_fact(*this, "m_lp_fact", 0)
-		, m_gs_fail(*this, "m_gs_fail", 0)
-		, m_gs_total(*this, "m_gs_total", 0)
-		, new_V(size, 0.0)
 		{
 		}
 
-	virtual ~matrix_solver_SOR_mat_t() override {}
+	void vsetup(analog_net_t::list_t &nets) override;
 
-	virtual void vsetup(analog_net_t::list_t &nets) override;
-
-	virtual unsigned vsolve_non_dynamic(const bool newton_raphson) override;
+	unsigned vsolve_non_dynamic(const bool newton_raphson) override;
 
 private:
 	//state_var<float_type[storage_N]> m_Vdelta;
@@ -55,10 +50,7 @@ private:
 
 	state_var<float_type> m_omega;
 	state_var<float_type> m_lp_fact;
-	state_var<int> m_gs_fail;
-	state_var<int> m_gs_total;
 
-	std::vector<float_type> new_V;
 };
 
 // ----------------------------------------------------------------------------------------
@@ -80,26 +72,26 @@ float_type matrix_solver_SOR_mat_t<m_N, storage_N>::vsolve()
 	 * enable linear prediction on first newton pass
 	 */
 
-	if (USE_LINEAR_PREDICTION)
-		for (unsigned k = 0; k < this->N(); k++)
+	if (this->m_params->use_linear_prediction)
+		for (unsigned k = 0; k < this->size(); k++)
 		{
 			this->m_last_V[k] = this->m_nets[k]->m_cur_Analog;
 			this->m_nets[k]->m_cur_Analog = this->m_nets[k]->m_cur_Analog + this->m_Vdelta[k] * this->current_timestep() * m_lp_fact;
 		}
 	else
-		for (unsigned k = 0; k < this->N(); k++)
+		for (unsigned k = 0; k < this->size(); k++)
 		{
 			this->m_last_V[k] = this->m_nets[k]->m_cur_Analog;
 		}
 
 	this->solve_base(this);
 
-	if (USE_LINEAR_PREDICTION)
+	if (this->m_params->use_linear_prediction)
 	{
 		float_type sq = 0;
 		float_type sqo = 0;
 		const float_type rez_cts = 1.0 / this->current_timestep();
-		for (unsigned k = 0; k < this->N(); k++)
+		for (unsigned k = 0; k < this->size(); k++)
 		{
 			const analog_net_t *n = this->m_nets[k];
 			const float_type nv = (n->Q_Analog() - this->m_last_V[k]) * rez_cts ;
@@ -129,7 +121,7 @@ unsigned matrix_solver_SOR_mat_t<FT, SIZE>::vsolve_non_dynamic(const bool newton
 	 */
 
 
-	const std::size_t iN = this->N();
+	const std::size_t iN = this->size();
 
 	this->build_LE_A(*this);
 	this->build_LE_RHS(*this);
@@ -167,16 +159,14 @@ unsigned matrix_solver_SOR_mat_t<FT, SIZE>::vsolve_non_dynamic(const bool newton
 				lambda1 = akk;
 	#endif
 		}
-		//printf("lambda: %f %f\n", lambda, 2.0 / (1.0 + 2 * sqrt(lambda)) );
 
 		//ws = 2.0 / (2.0 - lambdaN - lambda1);
 		m_omega = 2.0 / (2.0 - lambda1);
-		//printf("%f %f %f\n", m_omega, lambda1, lambdaN);
 	}
 #endif
 
 	for (std::size_t k = 0; k < iN; k++)
-		new_V[k] = this->m_nets[k]->Q_Analog();
+		this->m_new_V[k] = this->m_nets[k]->Q_Analog();
 
 	do {
 		resched = false;
@@ -190,11 +180,26 @@ unsigned matrix_solver_SOR_mat_t<FT, SIZE>::vsolve_non_dynamic(const bool newton
 			const std::size_t e = this->m_terms[k]->m_nz.size();
 
 			for (std::size_t i = 0; i < e; i++)
-				Idrive = Idrive + this->A(k,p[i]) * new_V[p[i]];
+				Idrive = Idrive + this->A(k,p[i]) * this->m_new_V[p[i]];
 
-			const float_type delta = m_omega * (this->RHS(k) - Idrive) / this->A(k,k);
+			FT w = m_omega / this->A(k,k);
+			if (this->m_params.m_use_gabs)
+			{
+				FT gabs_t = 0.0;
+				for (std::size_t i = 0; i < e; i++)
+					if (p[i] != k)
+						gabs_t = gabs_t + std::abs(this->A(k,p[i]));
+
+				gabs_t *= plib::constants<FT>::one(); // derived by try and error
+				if (gabs_t > this->A(k,k))
+				{
+					w = plib::constants<FT>::one() / (this->A(k,k) + gabs_t);
+				}
+			}
+
+			const float_type delta = w * (this->RHS(k) - Idrive) ;
 			cerr = std::max(cerr, std::abs(delta));
-			new_V[k] += delta;
+			this->m_new_V[k] += delta;
 		}
 
 		if (cerr > this->m_params.m_accuracy)
@@ -206,20 +211,17 @@ unsigned matrix_solver_SOR_mat_t<FT, SIZE>::vsolve_non_dynamic(const bool newton
 
 	this->m_stat_calculations++;
 	this->m_iterative_total += resched_cnt;
-	this->m_gs_total += resched_cnt;
 
 	if (resched)
 	{
 		this->m_iterative_fail++;
 		//this->netlist().warning("Falling back to direct solver .. Consider increasing RESCHED_LOOPS");
-		this->m_gs_fail++;
-
 		return matrix_solver_direct_t<FT, SIZE>::solve_non_dynamic(newton_raphson);
 	}
-	else {
-		this->store(new_V.data());
-		return resched_cnt;
-	}
+
+	const float_type err = (newton_raphson ? this->delta(this->m_new_V) : 0.0);
+	this->store(this->m_new_V);
+	return (err > this->m_params.m_accuracy) ? 2 : 1;
 
 }
 

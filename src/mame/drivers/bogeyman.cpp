@@ -37,11 +37,11 @@ WRITE8_MEMBER(bogeyman_state::ay8910_control_w)
 
 	// bit 5 goes to 8910 #0 BDIR pin
 	if ((m_last_write & 0x20) == 0x20 && (data & 0x20) == 0x00)
-		m_ay1->data_address_w(space, m_last_write >> 4, m_psg_latch);
+		m_ay1->data_address_w(m_last_write >> 4, m_psg_latch);
 
 	// bit 7 goes to 8910 #1 BDIR pin
 	if ((m_last_write & 0x80) == 0x80 && (data & 0x80) == 0x00)
-		m_ay2->data_address_w(space, m_last_write >> 6, m_psg_latch);
+		m_ay2->data_address_w(m_last_write >> 6, m_psg_latch);
 
 	m_last_write = data;
 }

@@ -633,6 +633,12 @@ end
 			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
 		}
 
+	configuration { "vsllvm" }
+		buildoptions {
+			"-Wno-unused-function",
+			"-Wno-enum-conversion",
+		}
+
 	configuration { }
 		defines {
 			"WORDS_BIGENDIAN=0",
@@ -970,6 +976,12 @@ end
 			"SQLITE_OS_WINRT",
 		}
 
+	configuration { "vsllvm" }
+		buildoptions {
+			"-Wno-deprecated-declarations",
+			"-Wno-unused-variable",
+		}
+
 	configuration { }
 
 	files {
@@ -1216,6 +1228,13 @@ project "bgfx"
 			"/wd4611", -- warning C4611: interaction between '_setjmp' and C++ object destruction is non-portable
 			"/wd4310", -- warning C4310: cast truncates constant value
 		}
+
+	configuration { "vsllvm" }
+		buildoptions {
+			"-Wno-unneeded-internal-declaration",
+			"-Wno-unused-const-variable",
+		}
+
 if _OPTIONS["vs"]=="intel-15" then
 		buildoptions {
 			"/Qwd906",              -- message #906: effect of this "#pragma pack" directive is local to function "xxx"
@@ -1387,6 +1406,15 @@ project "portaudio"
 	configuration { "vs2015*" }
 		buildoptions {
 			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
+		}
+
+	configuration { "vsllvm" }
+		buildoptions {
+			"-Wno-deprecated-declarations",
+			"-Wno-missing-braces",
+			"-Wno-unused-variable",
+			"-Wno-switch",
+			"-Wno-unused-function",
 		}
 
 	configuration { "gmake or ninja" }

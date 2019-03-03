@@ -131,8 +131,8 @@ public:
 
 	inline void check_interrupts();
 	int read_pla(offs_t offset, offs_t ca, offs_t vma, int ba, int rw, int aec, int z80io, int ms3, int ms2, int ms1, int ms0);
-	uint8_t read_memory(address_space &space, offs_t offset, offs_t vma, int ba, int aec, int z80io);
-	void write_memory(address_space &space, offs_t offset, offs_t vma, uint8_t data, int ba, int aec, int z80io);
+	uint8_t read_memory(offs_t offset, offs_t vma, int ba, int aec, int z80io);
+	void write_memory(offs_t offset, offs_t vma, uint8_t data, int ba, int aec, int z80io);
 	inline void update_iec();
 
 	DECLARE_READ8_MEMBER( z80_r );
@@ -335,7 +335,7 @@ int c128_state::read_pla(offs_t offset, offs_t ca, offs_t vma, int ba, int rw, i
 //  read_memory -
 //-------------------------------------------------
 
-uint8_t c128_state::read_memory(address_space &space, offs_t offset, offs_t vma, int ba, int aec, int z80io)
+uint8_t c128_state::read_memory(offs_t offset, offs_t vma, int ba, int aec, int z80io)
 {
 	int rw = 1, ms0 = 1, ms1 = 1, ms2 = 1, ms3 = 1, cas0 = 1, cas1 = 1;
 	int io1 = 1, io2 = 1;
@@ -406,37 +406,37 @@ uint8_t c128_state::read_memory(address_space &space, offs_t offset, offs_t vma,
 	}
 	if (!BIT(plaout, PLA_OUT_VIC))
 	{
-		data = m_vic->read(space, offset & 0x3f);
+		data = m_vic->read(offset & 0x3f);
 	}
 	if (!BIT(plaout, PLA_OUT_FROM1) && m_from->exists())
 	{
-		data = m_from->read_rom(space, offset & 0x7fff);
+		data = m_from->read_rom(offset & 0x7fff);
 	}
 	if (!BIT(plaout, PLA_OUT_IOCS) && BIT(offset, 10))
 	{
 		switch ((BIT(offset, 11) << 2) | ((offset >> 8) & 0x03))
 		{
 		case 0: // SID
-			data = m_sid->read(space, offset & 0x1f);
+			data = m_sid->read(offset & 0x1f);
 			break;
 
 		case 2: // CS8563
 			if (BIT(offset, 0))
 			{
-				data = m_vdc->register_r(space, 0);
+				data = m_vdc->register_r();
 			}
 			else
 			{
-				data = m_vdc->status_r(space, 0);
+				data = m_vdc->status_r();
 			}
 			break;
 
 		case 4: // CIA1
-			data = m_cia1->read(space, offset & 0x0f);
+			data = m_cia1->read(offset & 0x0f);
 			break;
 
 		case 5: // CIA2
-			data = m_cia2->read(space, offset & 0x0f);
+			data = m_cia2->read(offset & 0x0f);
 			break;
 
 		case 6: // I/O1
@@ -452,7 +452,7 @@ uint8_t c128_state::read_memory(address_space &space, offs_t offset, offs_t vma,
 	int roml = BIT(plaout, PLA_OUT_ROML);
 	int romh = BIT(plaout, PLA_OUT_ROMH);
 
-	data = m_exp->cd_r(space, ca, data, sphi2, ba, roml, romh, io1, io2);
+	data = m_exp->cd_r(ca, data, sphi2, ba, roml, romh, io1, io2);
 
 	return m_mmu->read(offset, data);
 }
@@ -462,7 +462,7 @@ uint8_t c128_state::read_memory(address_space &space, offs_t offset, offs_t vma,
 //  write_memory -
 //-------------------------------------------------
 
-void c128_state::write_memory(address_space &space, offs_t offset, offs_t vma, uint8_t data, int ba, int aec, int z80io)
+void c128_state::write_memory(offs_t offset, offs_t vma, uint8_t data, int ba, int aec, int z80io)
 {
 	int rw = 0, ms0 = 1, ms1 = 1, ms2 = 1, ms3 = 1, cas0 = 1, cas1 = 1;
 	int io1 = 1, io2 = 1;
@@ -494,33 +494,33 @@ void c128_state::write_memory(address_space &space, offs_t offset, offs_t vma, u
 	}
 	if (!BIT(plaout, PLA_OUT_VIC))
 	{
-		m_vic->write(space, offset & 0x3f, data);
+		m_vic->write(offset & 0x3f, data);
 	}
 	if (!BIT(plaout, PLA_OUT_IOCS) && BIT(offset, 10))
 	{
 		switch ((BIT(offset, 11) << 2) | ((offset >> 8) & 0x03))
 		{
 		case 0: // SID
-			m_sid->write(space, offset & 0x1f, data);
+			m_sid->write(offset & 0x1f, data);
 			break;
 
 		case 2: // CS8563
 			if (BIT(offset, 0))
 			{
-				m_vdc->register_w(space, 0, data);
+				m_vdc->register_w(data);
 			}
 			else
 			{
-				m_vdc->address_w(space, 0, data);
+				m_vdc->address_w(data);
 			}
 			break;
 
 		case 4: // CIA1
-			m_cia1->write(space, offset & 0x0f, data);
+			m_cia1->write(offset & 0x0f, data);
 			break;
 
 		case 5: // CIA2
-			m_cia2->write(space, offset & 0x0f, data);
+			m_cia2->write(offset & 0x0f, data);
 			break;
 
 		case 6: // I/O1
@@ -536,9 +536,9 @@ void c128_state::write_memory(address_space &space, offs_t offset, offs_t vma, u
 	int roml = BIT(plaout, PLA_OUT_ROML);
 	int romh = BIT(plaout, PLA_OUT_ROMH);
 
-	m_exp->cd_w(space, ca, data, sphi2, ba, roml, romh, io1, io2);
+	m_exp->cd_w(ca, data, sphi2, ba, roml, romh, io1, io2);
 
-	m_mmu->write(space, offset, data);
+	m_mmu->write(offset, data);
 }
 
 
@@ -551,7 +551,7 @@ READ8_MEMBER( c128_state::z80_r )
 	int ba = 1, aec = 1, z80io = 1;
 	offs_t vma = 0;
 
-	return read_memory(space, offset, vma, ba, aec, z80io);
+	return read_memory(offset, vma, ba, aec, z80io);
 }
 
 
@@ -564,7 +564,7 @@ WRITE8_MEMBER( c128_state::z80_w )
 	int ba = 1, aec = 1, z80io = 1;
 	offs_t vma = 0;
 
-	write_memory(space, offset, vma, data, ba, aec, z80io);
+	write_memory(offset, vma, data, ba, aec, z80io);
 }
 
 
@@ -577,7 +577,7 @@ READ8_MEMBER( c128_state::z80_io_r )
 	int ba = 1, aec = 1, z80io = 0;
 	offs_t vma = 0;
 
-	return read_memory(space, offset, vma, ba, aec, z80io);
+	return read_memory(offset, vma, ba, aec, z80io);
 }
 
 
@@ -590,7 +590,7 @@ WRITE8_MEMBER( c128_state::z80_io_w )
 	int ba = 1, aec = 1, z80io = 0;
 	offs_t vma = 0;
 
-	write_memory(space, offset, vma, data, ba, aec, z80io);
+	write_memory(offset, vma, data, ba, aec, z80io);
 }
 
 
@@ -603,7 +603,7 @@ READ8_MEMBER( c128_state::read )
 	int ba = 1, aec = 1, z80io = 1;
 	offs_t vma = 0;
 
-	return read_memory(space, offset, vma, ba, aec, z80io);
+	return read_memory(offset, vma, ba, aec, z80io);
 }
 
 
@@ -616,7 +616,7 @@ WRITE8_MEMBER( c128_state::write )
 	int ba = 1, aec = 1, z80io = 1;
 	offs_t vma = 0;
 
-	write_memory(space, offset, vma, data, ba, aec, z80io);
+	write_memory(offset, vma, data, ba, aec, z80io);
 }
 
 
@@ -628,7 +628,7 @@ READ8_MEMBER( c128_state::vic_videoram_r )
 {
 	int ba = 0, aec = 0, z80io = 1;
 
-	return read_memory(space, 0, offset, ba, aec, z80io);
+	return read_memory(0, offset, ba, aec, z80io);
 }
 
 
@@ -1111,7 +1111,7 @@ READ8_MEMBER( c128_state::sid_potx_r )
 {
 	uint8_t data = 0xff;
 
-	switch (m_cia1->read_pa() >> 6)
+	switch (m_cia1->pa_r() >> 6)
 	{
 	case 1: data = m_joy1->read_pot_x(); break;
 	case 2: data = m_joy2->read_pot_x(); break;
@@ -1138,7 +1138,7 @@ READ8_MEMBER( c128_state::sid_poty_r )
 {
 	uint8_t data = 0xff;
 
-	switch (m_cia1->read_pa() >> 6)
+	switch (m_cia1->pa_r() >> 6)
 	{
 	case 1: data = m_joy1->read_pot_y(); break;
 	case 2: data = m_joy2->read_pot_y(); break;
@@ -1192,7 +1192,7 @@ READ8_MEMBER( c128_state::cia1_pa_r )
 	data &= ~(!BIT(joy_b, 5) << 4);
 
 	// keyboard
-	uint8_t cia1_pb = m_cia1->read_pb();
+	uint8_t cia1_pb = m_cia1->pb_r();
 	uint32_t row[8] = { m_row[0]->read(), m_row[1]->read() & m_lock->read(), m_row[2]->read(), m_row[3]->read(),
 						m_row[4]->read(), m_row[5]->read(), m_row[6]->read(), m_row[7]->read() };
 
@@ -1260,7 +1260,7 @@ READ8_MEMBER( c128_state::cia1_pb_r )
 	data &= ~(!BIT(joy_a, 5) << 4);
 
 	// keyboard
-	uint8_t cia1_pa = m_cia1->read_pa();
+	uint8_t cia1_pa = m_cia1->pa_r();
 
 	if (!BIT(cia1_pa, 7)) data &= m_row[7]->read();
 	if (!BIT(cia1_pa, 6)) data &= m_row[6]->read();
@@ -1512,7 +1512,7 @@ READ8_MEMBER( c128_state::exp_dma_cd_r )
 	int ba = 0, aec = 1, z80io = 1;
 	offs_t vma = 0;
 
-	return read_memory(space, offset, vma, ba, aec, z80io);
+	return read_memory(offset, vma, ba, aec, z80io);
 }
 
 WRITE8_MEMBER( c128_state::exp_dma_cd_w )
@@ -1520,7 +1520,7 @@ WRITE8_MEMBER( c128_state::exp_dma_cd_w )
 	int ba = 0, aec = 1, z80io = 1;
 	offs_t vma = 0;
 
-	return write_memory(space, offset, data, vma, ba, aec, z80io);
+	return write_memory(offset, data, vma, ba, aec, z80io);
 }
 
 WRITE_LINE_MEMBER( c128_state::exp_dma_w )
@@ -1755,8 +1755,8 @@ void c128_state::ntsc(machine_config &config)
 	m_user->pl_handler().set(FUNC(c128_state::write_user_pb7));
 	m_user->pm_handler().set(FUNC(c128_state::write_user_pa2));
 
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(c128_state, cbm_c64), this), "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS);
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
+	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(c128_state, cbm_c64), this), "p00,prg", CBM_QUICKLOAD_DELAY);
 
 	// software list
 	SOFTWARE_LIST(config, "cart_list_vic10").set_original("vic10");
@@ -1950,8 +1950,8 @@ void c128_state::pal(machine_config &config)
 	m_user->pl_handler().set(FUNC(c128_state::write_user_pb7));
 	m_user->pm_handler().set(FUNC(c128_state::write_user_pa2));
 
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(c128_state, cbm_c64), this), "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS);
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
+	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(c128_state, cbm_c64), this), "p00,prg", CBM_QUICKLOAD_DELAY);
 
 	// software list
 	SOFTWARE_LIST(config, "cart_list_vic10").set_original("vic10");

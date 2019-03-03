@@ -3530,47 +3530,13 @@ void mips3_device::handle_special(uint32_t op)
 			m_core->icount -= 35;
 			break;
 		case 0x1c:  /* DMULT */
-		{
-			uint64_t a_hi = (uint32_t)(RSVAL64 >> 32);
-			uint64_t b_hi = (uint32_t)(RTVAL64 >> 32);
-			uint64_t a_lo = (uint32_t)RSVAL64;
-			uint64_t b_lo = (uint32_t)RTVAL64;
-			uint64_t p1 = a_lo * b_lo;
-			uint64_t p2 = a_hi * b_lo;
-			uint64_t p3 = a_lo * b_hi;
-			uint64_t p4 = a_hi * b_hi;
-			uint64_t carry = (uint32_t)(((p1 >> 32) + (uint32_t)p2 + (uint32_t)p3) >> 32);
-
-			LOVAL64 = p1 + (p2 << 32) + (p3 << 32);
-			HIVAL64 = p4 + (p2 >> 32) + (p3 >> 32) + carry;
-
-			// Adjust for sign
-			if (RSVAL64 < 0)
-				HIVAL64 -= RTVAL64;
-			if (RTVAL64 < 0)
-				HIVAL64 -= RSVAL64;
-
+			LOVAL64 = mul_64x64(RSVAL64, RTVAL64, reinterpret_cast<s64 *>(&HIVAL64));
 			m_core->icount -= 7;
 			break;
-		}
 		case 0x1d:  /* DMULTU */
-		{
-			uint64_t a_hi = (uint32_t)(RSVAL64 >> 32);
-			uint64_t b_hi = (uint32_t)(RTVAL64 >> 32);
-			uint64_t a_lo = (uint32_t)RSVAL64;
-			uint64_t b_lo = (uint32_t)RTVAL64;
-			uint64_t p1 = a_lo * b_lo;
-			uint64_t p2 = a_hi * b_lo;
-			uint64_t p3 = a_lo * b_hi;
-			uint64_t p4 = a_hi * b_hi;
-			uint64_t carry = (uint32_t)(((p1 >> 32) + (uint32_t)p2 + (uint32_t)p3) >> 32);
-
-			LOVAL64 = p1 + (p2 << 32) + (p3 << 32);
-			HIVAL64 = p4 + (p2 >> 32) + (p3 >> 32) + carry;
-
+			LOVAL64 = mulu_64x64(RSVAL64, RTVAL64, &HIVAL64);
 			m_core->icount -= 7;
 			break;
-		}
 		case 0x1e:  /* DDIV */
 			if (RTVAL64)
 			{

@@ -24,6 +24,7 @@ public:
 
 	// xaviv opcodes
 	O(callf_xa3);
+	O(jmp_xa3);
 	O(retf_imp);
 	O(brk_xav_imp);
 	O(rti_xav_imp);

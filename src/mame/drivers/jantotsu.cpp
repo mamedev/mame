@@ -348,8 +348,8 @@ void jantotsu_state::jantotsu_map(address_map &map)
 void jantotsu_state::jantotsu_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).portr("DSW1").w("sn1", FUNC(sn76489a_device::command_w));
-	map(0x01, 0x01).r(FUNC(jantotsu_state::jantotsu_dsw2_r)).w("sn2", FUNC(sn76489a_device::command_w));
+	map(0x00, 0x00).portr("DSW1").w("sn1", FUNC(sn76489a_device::write));
+	map(0x01, 0x01).r(FUNC(jantotsu_state::jantotsu_dsw2_r)).w("sn2", FUNC(sn76489a_device::write));
 	map(0x02, 0x03).w(FUNC(jantotsu_state::jan_adpcm_w));
 	map(0x04, 0x04).rw(FUNC(jantotsu_state::jantotsu_mux_r), FUNC(jantotsu_state::jantotsu_mux_w));
 	map(0x07, 0x07).w(FUNC(jantotsu_state::bankaddr_w));

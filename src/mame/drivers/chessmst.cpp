@@ -378,8 +378,8 @@ static const z80_daisy_config chessmstdm_daisy_chain[] =
 	{ nullptr }
 };
 
-MACHINE_CONFIG_START(chessmst_state::chessmst)
-
+void chessmst_state::chessmst(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 9.8304_MHz_XTAL/4); // U880 Z80 clone
 	m_maincpu->set_addrmap(AS_PROGRAM, &chessmst_state::chessmst_mem);
@@ -399,12 +399,11 @@ MACHINE_CONFIG_START(chessmst_state::chessmst)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
-MACHINE_CONFIG_START(chessmst_state::chessmsta)
-
+void chessmst_state::chessmsta(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 8_MHz_XTAL/4); // U880 Z80 clone
 	m_maincpu->set_addrmap(AS_PROGRAM, &chessmst_state::chessmst_mem);
@@ -424,12 +423,11 @@ MACHINE_CONFIG_START(chessmst_state::chessmsta)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
-MACHINE_CONFIG_START(chessmst_state::chessmstdm)
-
+void chessmst_state::chessmstdm(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 8_MHz_XTAL/2); // U880 Z80 clone
 	m_maincpu->set_addrmap(AS_PROGRAM, &chessmst_state::chessmstdm_mem);
@@ -453,12 +451,11 @@ MACHINE_CONFIG_START(chessmst_state::chessmstdm)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("beeper", BEEP, 1000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	BEEP(config, m_beeper, 1000).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "chessmstdm_cart")
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "chessmstdm")
-MACHINE_CONFIG_END
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "chessmstdm_cart");
+	SOFTWARE_LIST(config, "cart_list").set_original("chessmstdm");
+}
 
 
 /* ROM definition */

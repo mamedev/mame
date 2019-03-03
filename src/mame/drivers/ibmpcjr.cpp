@@ -571,7 +571,7 @@ void pcjr_state::ibmpcjr_io(address_map &map)
 	map(0x0040, 0x0043).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x0060, 0x0063).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x00a0, 0x00a0).rw(FUNC(pcjr_state::pcjr_nmi_enable_r), FUNC(pcjr_state::pc_nmi_enable_w));
-	map(0x00c0, 0x00c0).w("sn76496", FUNC(sn76496_device::command_w));
+	map(0x00c0, 0x00c0).w("sn76496", FUNC(sn76496_device::write));
 	map(0x00f2, 0x00f2).w(FUNC(pcjr_state::pcjr_fdc_dor_w));
 	map(0x00f4, 0x00f5).m(m_fdc, FUNC(upd765a_device::map));
 	map(0x0200, 0x0207).rw("pc_joy", FUNC(pc_joy_device::joy_port_r), FUNC(pc_joy_device::joy_port_w));
@@ -662,10 +662,10 @@ MACHINE_CONFIG_START(pcjr_state::ibmpcjr)
 
 	UPD765A(config, m_fdc, 8'000'000, false, false);
 
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pcjr_floppies, "525dd", isa8_fdc_device::floppy_formats)
-	MCFG_SLOT_FIXED(true)
+	FLOPPY_CONNECTOR(config, "fdc:0", pcjr_floppies, "525dd", isa8_fdc_device::floppy_formats, true);
 
-	MCFG_PC_KEYB_ADD("pc_keyboard", WRITELINE(*this, pcjr_state, keyb_interrupt))
+	PC_KEYB(config, m_keyboard);
+	m_keyboard->keypress().set(FUNC(pcjr_state::keyb_interrupt));
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot1", generic_plain_slot, "ibmpcjr_cart")
@@ -680,9 +680,9 @@ MACHINE_CONFIG_START(pcjr_state::ibmpcjr)
 	RAM(config, m_ram).set_default_size("640K").set_extra_options("128K, 256K, 512K");
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","ibmpcjr_cart")
-	MCFG_SOFTWARE_LIST_ADD("flop_list","ibmpcjr_flop")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("pc_list","ibm5150")
+	SOFTWARE_LIST(config, "cart_list").set_original("ibmpcjr_cart");
+	SOFTWARE_LIST(config, "flop_list").set_original("ibmpcjr_flop");
+	SOFTWARE_LIST(config, "pc_list").set_compatible("ibm5150");
 MACHINE_CONFIG_END
 
 static GFXDECODE_START( gfx_ibmpcjx )
@@ -690,24 +690,22 @@ static GFXDECODE_START( gfx_ibmpcjx )
 	GFXDECODE_ENTRY( "kanji", 0x0000, kanji_layout, 3, 1 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(pcjr_state::ibmpcjx)
+void pcjr_state::ibmpcjx(machine_config &config)
+{
 	ibmpcjr(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(ibmpcjx_map)
-	MCFG_DEVICE_IO_MAP(ibmpcjx_io)
+	m_maincpu->set_addrmap(AS_PROGRAM, &pcjr_state::ibmpcjx_map);
+	m_maincpu->set_addrmap(AS_IO, &pcjr_state::ibmpcjx_io);
 
-	MCFG_DEVICE_REMOVE("fdc:0");
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pcjr_floppies, "35dd", isa8_fdc_device::floppy_formats)
-	MCFG_SLOT_FIXED(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pcjr_floppies, "35dd", isa8_fdc_device::floppy_formats)
-	MCFG_SLOT_FIXED(true)
+	config.device_remove("fdc:0");
+	FLOPPY_CONNECTOR(config, "fdc:0", pcjr_floppies, "35dd", isa8_fdc_device::floppy_formats, true);
+	FLOPPY_CONNECTOR(config, "fdc:1", pcjr_floppies, "35dd", isa8_fdc_device::floppy_formats, true);
 
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_ibmpcjx);
 
 	/* internal ram */
 	m_ram->set_default_size("512K").set_extra_options(""); // only boots with 512k currently
-MACHINE_CONFIG_END
+}
 
 
 

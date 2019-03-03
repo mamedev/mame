@@ -31,17 +31,14 @@
 #pragma GCC optimize "ivopts"
 #endif
 
-#include <algorithm>
-#include <cmath>  // <<= needed by windows build
+#include "netlist/nl_lists.h"
 
-#include "../nl_lists.h"
+#include "plib/pomp.h"
 
-#include "../plib/pomp.h"
+#include "netlist/nl_factory.h"
 
-#include "../nl_factory.h"
-
-#include "nld_solver.h"
 #include "nld_matrix_solver.h"
+#include "nld_solver.h"
 
 #if 1
 #include "nld_ms_direct.h"
@@ -49,13 +46,16 @@
 #else
 #include "nld_ms_direct_lu.h"
 #endif
-#include "nld_ms_w.h"
-#include "nld_ms_sm.h"
 #include "nld_ms_direct1.h"
 #include "nld_ms_direct2.h"
+#include "nld_ms_gmres.h"
+#include "nld_ms_sm.h"
 #include "nld_ms_sor.h"
 #include "nld_ms_sor_mat.h"
-#include "nld_ms_gmres.h"
+#include "nld_ms_w.h"
+
+#include <algorithm>
+#include <cmath>
 
 namespace netlist
 {
@@ -70,22 +70,14 @@ namespace netlist
 
 NETLIB_RESET(solver)
 {
-	for (std::size_t i = 0; i < m_mat_solvers.size(); i++)
-		m_mat_solvers[i]->do_reset();
+	for (auto &s : m_mat_solvers)
+		s->reset();
 }
 
 void NETLIB_NAME(solver)::stop()
 {
-	for (std::size_t i = 0; i < m_mat_solvers.size(); i++)
-		m_mat_solvers[i]->log_stats();
-}
-
-NETLIB_NAME(solver)::~NETLIB_NAME(solver)()
-{
 	for (auto &s : m_mat_solvers)
-	{
-		plib::pfree(s);
-	}
+		s->log_stats();
 }
 
 NETLIB_UPDATE(solver)
@@ -93,27 +85,28 @@ NETLIB_UPDATE(solver)
 	if (m_params.m_dynamic_ts)
 		return;
 
+	netlist_time now(exec().time());
 	/* force solving during start up if there are no time-step devices */
 	/* FIXME: Needs a more elegant solution */
-	bool force_solve = (exec().time() < netlist_time::from_double(2 * m_params.m_max_timestep));
+	bool force_solve = (now < netlist_time::from_double(2 * m_params.m_max_timestep));
 
 	std::size_t nthreads = std::min(static_cast<std::size_t>(m_parallel()), plib::omp::get_max_threads());
 
-	std::vector<matrix_solver_t *> &solvers = (force_solve ? m_mat_solvers : m_mat_solvers_timestepping);
+	std::vector<matrix_solver_t *> &solvers = (force_solve ? m_mat_solvers_all : m_mat_solvers_timestepping);
 
 	if (nthreads > 1 && solvers.size() > 1)
 	{
 		plib::omp::set_num_threads(nthreads);
-		plib::omp::for_static(static_cast<std::size_t>(0), solvers.size(), [&solvers](std::size_t i)
+		plib::omp::for_static(static_cast<std::size_t>(0), solvers.size(), [&solvers, now](std::size_t i)
 			{
-				const netlist_time ts = solvers[i]->solve();
+				const netlist_time ts = solvers[i]->solve(now);
 				plib::unused_var(ts);
 			});
 	}
 	else
 		for (auto & solver : solvers)
 		{
-			const netlist_time ts = solver->solve();
+			const netlist_time ts = solver->solve(now);
 			plib::unused_var(ts);
 		}
 
@@ -128,13 +121,13 @@ NETLIB_UPDATE(solver)
 }
 
 template <class C>
-matrix_solver_t * create_it(netlist_base_t &nl, pstring name, solver_parameters_t &params, std::size_t size)
+poolptr<matrix_solver_t> create_it(netlist_state_t &nl, pstring name, solver_parameters_t &params, std::size_t size)
 {
-	return plib::palloc<C>(nl, name, &params, size);
+	return pool().make_poolptr<C>(nl, name, &params, size);
 }
 
 template <typename FT, int SIZE>
-matrix_solver_t * NETLIB_NAME(solver)::create_solver(std::size_t size, const pstring &solvername)
+poolptr<matrix_solver_t> NETLIB_NAME(solver)::create_solver(std::size_t size, const pstring &solvername)
 {
 	if (m_method() == "SOR_MAT")
 	{
@@ -178,9 +171,28 @@ matrix_solver_t * NETLIB_NAME(solver)::create_solver(std::size_t size, const pst
 	else
 	{
 		log().fatal(MF_1_UNKNOWN_SOLVER_TYPE, m_method());
-		return nullptr;
+		return poolptr<matrix_solver_t>();
 	}
 }
+
+template <typename FT, int SIZE>
+poolptr<matrix_solver_t> NETLIB_NAME(solver)::create_solver_x(std::size_t size, const pstring &solvername)
+{
+	if (SIZE > 0)
+	{
+		if (size == SIZE)
+			return create_solver<FT, SIZE>(size, solvername);
+		else
+			return this->create_solver_x<FT, SIZE-1>(size, solvername);
+	}
+	else
+	{
+		if (size * 2 > -SIZE )
+			return create_solver<FT, SIZE>(size, solvername);
+		else
+			return this->create_solver_x<FT, SIZE / 2>(size, solvername);
+	}
+};
 
 struct net_splitter
 {
@@ -201,19 +213,19 @@ struct net_splitter
 			return;
 		/* add the net */
 		groups.back().push_back(n);
-		for (auto &p : n->m_core_terms)
+		for (auto &p : n->core_terms())
 		{
 			if (p->is_type(detail::terminal_type::TERMINAL))
 			{
-				terminal_t *pt = static_cast<terminal_t *>(p);
-				analog_net_t *other_net = &pt->m_otherterm->net();
+				auto *pt = static_cast<terminal_t *>(p);
+				analog_net_t *other_net = &pt->otherterm()->net();
 				if (!already_processed(other_net))
 					process_net(other_net);
 			}
 		}
 	}
 
-	void run(netlist_base_t &netlist)
+	void run(netlist_state_t &netlist)
 	{
 		for (auto & net : netlist.nets())
 		{
@@ -222,10 +234,10 @@ struct net_splitter
 			{
 				netlist.log().debug("   ==> not a rail net\n");
 				/* Must be an analog net */
-				analog_net_t *n = static_cast<analog_net_t *>(net.get());
+				auto *n = static_cast<analog_net_t *>(net.get());
 				if (!already_processed(n))
 				{
-					groups.push_back(analog_net_t::list_t());
+					groups.emplace_back(analog_net_t::list_t());
 					process_net(n);
 				}
 			}
@@ -237,9 +249,6 @@ struct net_splitter
 
 void NETLIB_NAME(solver)::post_start()
 {
-	const bool use_specific = true;
-	plib::unused_var(use_specific);
-
 	m_params.m_pivot = m_pivot();
 	m_params.m_accuracy = m_accuracy();
 	/* FIXME: Throw when negative */
@@ -252,6 +261,10 @@ void NETLIB_NAME(solver)::post_start()
 	m_params.m_min_timestep = m_dynamic_min_ts();
 	m_params.m_dynamic_ts = (m_dynamic_ts() == 1 ? true : false);
 	m_params.m_max_timestep = netlist_time::from_double(1.0 / m_freq()).as_double();
+
+	m_params.m_use_gabs = m_use_gabs();
+	m_params.m_use_linear_prediction = m_use_linear_prediction();
+
 
 	if (m_params.m_dynamic_ts)
 	{
@@ -282,7 +295,7 @@ void NETLIB_NAME(solver)::post_start()
 	log().verbose("Found {1} net groups in {2} nets\n", splitter.groups.size(), state().nets().size());
 	for (auto & grp : splitter.groups)
 	{
-		matrix_solver_t *ms;
+		poolptr<matrix_solver_t> ms;
 		std::size_t net_count = grp.size();
 		pstring sname = plib::pfmt("Solver_{1}")(m_mat_solvers.size());
 
@@ -290,18 +303,11 @@ void NETLIB_NAME(solver)::post_start()
 		{
 #if 1
 			case 1:
-				if (use_specific)
-					ms = plib::palloc<matrix_solver_direct1_t<double>>(state(), sname, &m_params);
-				else
-					ms = create_solver<double, 1>(1, sname);
+				ms = pool().make_poolptr<matrix_solver_direct1_t<double>>(state(), sname, &m_params);
 				break;
 			case 2:
-				if (use_specific)
-					ms =  plib::palloc<matrix_solver_direct2_t<double>>(state(), sname, &m_params);
-				else
-					ms = create_solver<double, 2>(2, sname);
+				ms = pool().make_poolptr<matrix_solver_direct2_t<double>>(state(), sname, &m_params);
 				break;
-#if 1
 			case 3:
 				ms = create_solver<double, 3>(3, sname);
 				break;
@@ -326,6 +332,7 @@ void NETLIB_NAME(solver)::post_start()
 			case 10:
 				ms = create_solver<double, 10>(10, sname);
 				break;
+#if 0
 			case 11:
 				ms = create_solver<double, 11>(11, sname);
 				break;
@@ -348,9 +355,9 @@ void NETLIB_NAME(solver)::post_start()
 				ms = create_solver<double, 49>(49, sname);
 				break;
 #endif
-#if 0
-			case 87:
-				ms = create_solver<87,87>(87, sname);
+#if 1
+			case 86:
+				ms = create_solver<double,86>(86, sname);
 				break;
 #endif
 #endif
@@ -381,7 +388,7 @@ void NETLIB_NAME(solver)::post_start()
 				else
 				{
 					log().fatal(MF_1_NETGROUP_SIZE_EXCEEDED_1, 128);
-					ms = nullptr; /* tease compilers */
+					return; /* tease compilers */
 				}
 				break;
 		}
@@ -396,15 +403,17 @@ void NETLIB_NAME(solver)::post_start()
 		for (auto &n : grp)
 		{
 			log().verbose("Net {1}", n->name());
-			for (const auto &pcore : n->m_core_terms)
+			for (const auto &pcore : n->core_terms())
 			{
 				log().verbose("   {1}", pcore->name());
 			}
 		}
 
-		m_mat_solvers.push_back(ms);
+		m_mat_solvers_all.push_back(ms.get());
 		if (ms->has_timestep_devices())
-			m_mat_solvers_timestepping.push_back(ms);
+			m_mat_solvers_timestepping.push_back(ms.get());
+
+		m_mat_solvers.emplace_back(std::move(ms));
 	}
 }
 
@@ -417,7 +426,7 @@ void NETLIB_NAME(solver)::create_solver_code(std::map<pstring, pstring> &mp)
 	}
 }
 
-	NETLIB_DEVICE_IMPL_DEPRECATED(solver)
+	NETLIB_DEVICE_IMPL(solver, "SOLVER", "FREQ")
 
 	} //namespace devices
 } // namespace netlist

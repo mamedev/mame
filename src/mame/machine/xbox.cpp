@@ -838,14 +838,15 @@ void xbox_base_state::xbox_base_map_io(address_map &map)
 #endif
 }
 
-MACHINE_CONFIG_START(xbox_base_state::xbox_base)
+void xbox_base_state::xbox_base(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, PENTIUM3, 733333333) /* Wrong! family 6 model 8 stepping 10 */
-	MCFG_DEVICE_PROGRAM_MAP(xbox_base_map)
-	MCFG_DEVICE_IO_MAP(xbox_base_map_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(xbox_base_state, irq_callback)
+	PENTIUM3(config, m_maincpu, 733333333); /* Wrong! family 6 model 8 stepping 10 */
+	m_maincpu->set_addrmap(AS_PROGRAM, &xbox_base_state::xbox_base_map);
+	m_maincpu->set_addrmap(AS_IO, &xbox_base_state::xbox_base_map_io);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(xbox_base_state::irq_callback));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	PCI_ROOT(config,        ":pci", 0);
 	NV2A_HOST(config,       ":pci:00.0", 0, m_maincpu);
@@ -867,11 +868,11 @@ MACHINE_CONFIG_START(xbox_base_state::xbox_base)
 	NV2A_GPU(config,        ":pci:1e.0:00.0", 0, m_maincpu).interrupt_handler().set(FUNC(xbox_base_state::nv2a_interrupt_changed));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))  /* not accurate */
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
-	MCFG_SCREEN_UPDATE_DRIVER(xbox_base_state, screen_update_callback)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, xbox_base_state, vblank_callback))
-MACHINE_CONFIG_END
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));  /* not accurate */
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 639, 0, 479);
+	screen.set_screen_update(FUNC(xbox_base_state::screen_update_callback));
+	screen.screen_vblank().set(FUNC(xbox_base_state::vblank_callback));
+}

@@ -308,11 +308,12 @@ void phc25_state::video_start()
 
 /* Machine Driver */
 
-MACHINE_CONFIG_START(phc25_state::phc25)
+void phc25_state::phc25(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(phc25_mem)
-	MCFG_DEVICE_IO_MAP(phc25_io)
+	Z80(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &phc25_state::phc25_mem);
+	m_maincpu->set_addrmap(AS_IO, &phc25_state::phc25_io);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -328,17 +329,18 @@ MACHINE_CONFIG_START(phc25_state::phc25)
 	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->set_interface("phc25_cass");
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, phc25_state, write_centronics_busy))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(phc25_state::write_centronics_busy));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("16K");
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "phc25_cass")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cass_list").set_original("phc25_cass");
+}
 
 void phc25_state::pal(machine_config &config)
 {

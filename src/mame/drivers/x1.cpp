@@ -700,7 +700,7 @@ READ8_MEMBER( x1_state::x1_rom_r )
 {
 //  logerror("%06x\n",m_rom_index[0]<<16|m_rom_index[1]<<8|m_rom_index[2]<<0);
 	if (m_cart->exists())
-		return m_cart->read_rom(space, (m_rom_index[0] << 16) | (m_rom_index[1] << 8) | (m_rom_index[2] << 0));
+		return m_cart->read_rom((m_rom_index[0] << 16) | (m_rom_index[1] << 8) | (m_rom_index[2] << 0));
 	else
 		return 0;
 }
@@ -1069,12 +1069,12 @@ WRITE8_MEMBER( x1_state::x1_6845_w )
 	if(offset == 0)
 	{
 		m_crtc_index = data & 31;
-		m_crtc->address_w(space, offset, data);
+		m_crtc->address_w(data);
 	}
 	else
 	{
 		m_crtc_vreg[m_crtc_index] = data;
-		m_crtc->register_w(space, offset, data);
+		m_crtc->register_w(data);
 	}
 }
 
@@ -1547,7 +1547,7 @@ WRITE8_MEMBER(x1_state::io_write_byte)
 
 READ8_MEMBER(x1_state::ym_r)
 {
-	uint8_t result = m_ym->read(space, offset);
+	uint8_t result = m_ym->read(offset);
 	if (!BIT(offset, 0))
 		result = (result & 0x7f) | (m_sound_sw->read() & 0x80);
 	return result;
@@ -2191,14 +2191,15 @@ static void x1_floppies(device_slot_interface &device)
 	device.option_add("dd", FLOPPY_525_DD);
 }
 
-MACHINE_CONFIG_START(x1_state::x1)
+void x1_state::x1(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, MAIN_CLOCK/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &x1_state::x1_mem);
 	m_maincpu->set_addrmap(AS_IO, &x1_state::x1_io);
 	m_maincpu->set_daisy_config(x1_daisy);
 
-	ADDRESS_MAP_BANK(config, "iobank").set_map(&x1_state::x1_io_banks).set_options(ENDIANNESS_LITTLE, 8, 17, 0x10000);
+	ADDRESS_MAP_BANK(config, m_iobank).set_map(&x1_state::x1_io_banks).set_options(ENDIANNESS_LITTLE, 8, 17, 0x10000);
 
 	z80ctc_device& ctc(Z80CTC(config, "ctc", MAIN_CLOCK/4));
 	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -2206,7 +2207,7 @@ MACHINE_CONFIG_START(x1_state::x1)
 	ctc.zc_callback<1>().set("ctc", FUNC(z80ctc_device::trg1));
 	ctc.zc_callback<2>().set("ctc", FUNC(z80ctc_device::trg2));
 
-	MCFG_DEVICE_ADD("x1kb", X1_KEYBOARD, 0)
+	X1_KEYBOARD(config, "x1kb", 0);
 
 	i8255_device &ppi(I8255A(config, "ppi8255_0"));
 	ppi.in_pa_callback().set(FUNC(x1_state::x1_porta_r));
@@ -2220,12 +2221,12 @@ MACHINE_CONFIG_START(x1_state::x1)
 	MCFG_MACHINE_RESET_OVERRIDE(x1_state,x1)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DRIVER(x1_state, screen_update_x1)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(640, 480);
+	m_screen->set_visarea(0, 640-1, 0, 480-1);
+	m_screen->set_screen_update(FUNC(x1_state::screen_update_x1));
 
 	H46505(config, m_crtc, (VDP_CLOCK/48)); //unknown divider
 	m_crtc->set_screen(m_screen);
@@ -2242,15 +2243,14 @@ MACHINE_CONFIG_START(x1_state::x1)
 	// TODO: guesswork, try to implicitly start the motor
 	m_fdc->hld_wr_callback().set(FUNC(x1_state::hdl_w));
 
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", x1_floppies, "dd", x1_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", x1_floppies, "dd", x1_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:2", x1_floppies, "dd", x1_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:3", x1_floppies, "dd", x1_state::floppy_formats)
+	FLOPPY_CONNECTOR(config, "fdc:0", x1_floppies, "dd", x1_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", x1_floppies, "dd", x1_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:2", x1_floppies, "dd", x1_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:3", x1_floppies, "dd", x1_state::floppy_formats);
 
-	MCFG_SOFTWARE_LIST_ADD("flop_list","x1_flop")
+	SOFTWARE_LIST(config, "flop_list").set_original("x1_flop");
 
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "x1_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "x1_cart", "bin,rom");
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -2270,13 +2270,14 @@ MACHINE_CONFIG_START(x1_state::x1)
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->set_interface("x1_cass");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list","x1_cass")
+	SOFTWARE_LIST(config, "cass_list").set_original("x1_cass");
 
 	TIMER(config, "keyboard_timer").configure_periodic(FUNC(x1_state::x1_keyboard_callback), attotime::from_hz(250));
 	TIMER(config, "cmt_wind_timer").configure_periodic(FUNC(x1_state::x1_cmt_wind_timer), attotime::from_hz(16));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(x1_state::x1turbo)
+void x1_state::x1turbo(machine_config &config)
+{
 	x1(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &x1_state::x1turbo_mem);
@@ -2284,8 +2285,7 @@ MACHINE_CONFIG_START(x1_state::x1turbo)
 
 	MCFG_MACHINE_RESET_OVERRIDE(x1_state,x1turbo)
 
-	MCFG_DEVICE_MODIFY("iobank")
-	MCFG_DEVICE_PROGRAM_MAP(x1turbo_io_banks)
+	m_iobank->set_map(&x1_state::x1turbo_io_banks);
 
 	z80sio0_device& sio(Z80SIO0(config, "sio", MAIN_CLOCK/4));
 	sio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -2303,7 +2303,7 @@ MACHINE_CONFIG_START(x1_state::x1turbo)
 	YM2151(config, m_ym, MAIN_CLOCK/8); //option board
 	m_ym->add_route(0, "lspeaker", 0.50);
 	m_ym->add_route(1, "rspeaker", 0.50);
-MACHINE_CONFIG_END
+}
 
 /*************************************
  *

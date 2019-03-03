@@ -8,14 +8,15 @@
 #ifndef PARRAY_H_
 #define PARRAY_H_
 
+#include "palloc.h"
 #include "pconfig.h"
 #include "pexception.h"
 
+#include <array>
 #include <memory>
+#include <type_traits>
 #include <utility>
 #include <vector>
-#include <array>
-#include <type_traits>
 
 namespace plib {
 
@@ -23,14 +24,14 @@ namespace plib {
 	struct sizeabs
 	{
 		static constexpr std::size_t ABS() { return (SIZE < 0) ? static_cast<std::size_t>(0 - SIZE) : static_cast<std::size_t>(SIZE); }
-		typedef typename std::array<FT, ABS()> container;
+		using container = typename std::array<FT, ABS()> ;
 	};
 
 	template <typename FT>
 	struct sizeabs<FT, 0>
 	{
 		static constexpr const std::size_t ABS = 0;
-		typedef typename std::vector<FT> container;
+		using container = typename std::vector<FT, aligned_allocator<FT, PALIGN_VECTOROPT>>;
 	};
 
 	/**
@@ -55,10 +56,10 @@ namespace plib {
 	public:
 		static constexpr std::size_t SIZEABS() { return sizeabs<FT, SIZE>::ABS(); }
 
-		typedef typename sizeabs<FT, SIZE>::container base_type;
-		typedef typename base_type::size_type size_type;
-		typedef typename base_type::reference reference;
-		typedef typename base_type::const_reference const_reference;
+		using base_type = typename sizeabs<FT, SIZE>::container;
+		using size_type = typename base_type::size_type;
+		using reference = typename base_type::reference;
+		using const_reference = typename base_type::const_reference;
 
 		template <int X = SIZE >
 		parray(size_type size, typename std::enable_if<X==0, int>::type = 0)
@@ -66,11 +67,11 @@ namespace plib {
 		{
 		}
 
-#if 0
+#if 1
 		/* allow construction in fixed size arrays */
 		template <int X = SIZE >
-		parray(typename std::enable_if<X==0, int>::type = 0)
-		: m_size(0)
+		parray(typename std::enable_if<(X > 0), int>::type = 0)
+		: m_size(X)
 		{
 		}
 #endif
@@ -102,16 +103,23 @@ namespace plib {
 			return m_a[i];
 		}
 #else
-		reference operator[](size_type i) noexcept { return m_a[i]; }
-		constexpr const_reference operator[](size_type i) const noexcept { return m_a[i]; }
+		reference operator[](size_type i) noexcept
+		{
+			return assume_aligned_ptr<FT, PALIGN_VECTOROPT>(&m_a[0])[i];
+		}
+		constexpr const_reference operator[](size_type i) const noexcept
+		{
+			return assume_aligned_ptr<FT, PALIGN_VECTOROPT>(&m_a[0])[i];
+		}
 #endif
-		FT * data() noexcept { return m_a.data(); }
-		const FT * data() const noexcept { return m_a.data(); }
+		FT * data() noexcept { return assume_aligned_ptr<FT, PALIGN_VECTOROPT>(m_a.data()); }
+		const FT * data() const noexcept { return assume_aligned_ptr<FT, PALIGN_VECTOROPT>(m_a.data()); }
 
 	private:
-		base_type m_a;
-		size_type m_size;
+		PALIGNAS_VECTOROPT()
+		base_type               m_a;
+		size_type               m_size;
 	};
-}
+} // namespace plib
 
 #endif /* PARRAY_H_ */

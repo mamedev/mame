@@ -685,7 +685,7 @@ MACHINE_CONFIG_START(dc_cons_state::dc)
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("gdrom", gdrom_config)
 	MCFG_SLOT_DEFAULT_OPTION("gdrom")
 
-	MCFG_SOFTWARE_LIST_ADD("cd_list","dc")
+	SOFTWARE_LIST(config, "cd_list").set_original("dc");
 MACHINE_CONFIG_END
 
 
@@ -784,8 +784,8 @@ ROM_START( dctream )
 	ROM_LOAD( "dc_flash.bin", 0x000000, 0x020000, CRC(9d5515c4) SHA1(78a86fd4e8b58fc9d3535eef6591178f1b97ecf9) ) // VA1 NTSC-US
 ROM_END
 
-// normally, with DIP switch 4 off, HKT-100/110/120 AKA "Katana Set 5.xx", will be booted from flash ROM IC507 (first 2 dumps below)
-// otherwise it boots from EPROM which contain system checker software (last dump)
+// normally, with DIP switch 4 off, HKT-0100/0110/0120 AKA "Katana Set 5.xx", will be booted from flash ROM IC507 (first 2 dumps below)
+// otherwise it boots from EPROM which contain system checker software (last 2 dumps)
 ROM_START( dcdev )
 	ROM_REGION(0x200000, "maincpu", 0)
 	ROM_SYSTEM_BIOS(0, "1011", "Katana Set5 v1.011 (World)")    // BOOT flash rom update from Katana SDK R9-R11, WinCE SDK v2.1
@@ -794,11 +794,14 @@ ROM_START( dcdev )
 	ROM_LOAD_BIOS(1, "set5v1.001.ic507", 0x000000, 0x200000, CRC(5702d38f) SHA1(ea7a3ae1de73683008dd795c252941a4fc81b42e) )
 
 	// 27C160 EPROM (DIP42) IC??? labeled
+	// SET5 7676
+	// V0.71 98/11/13
+	ROM_SYSTEM_BIOS(2, "071", "Katana Set5 Checker v0.71")
+	ROM_LOAD_BIOS(2, "set5v0.71.bin", 0x000000, 0x200000, CRC(52d01969) SHA1(28aec4a01419d2d2a664c540bef30ea289ca0644) )
 	// SET5 FC52
 	// V0.41 98/08/27
-	// also known to exists v0.71 98/11/13
-	ROM_SYSTEM_BIOS(2, "041", "Katana Set5 Checker v0.41")
-	ROM_LOAD_BIOS(2, "set5v0.41.bin", 0x000000, 0x200000, CRC(485877bd) SHA1(dc1af1f1248ffa87d57bc5ef2ea41aac95ecfc5e) )
+	ROM_SYSTEM_BIOS(3, "041", "Katana Set5 Checker v0.41")
+	ROM_LOAD_BIOS(3, "set5v0.41.bin", 0x000000, 0x200000, CRC(485877bd) SHA1(dc1af1f1248ffa87d57bc5ef2ea41aac95ecfc5e) )
 
 	ROM_REGION(0x020000, "dcflash", 0)
 	ROM_LOAD( "hkt-0120-flash.bin", 0x000000, 0x020000, CRC(7784c304) SHA1(31ef57f550d8cd13e40263cbc657253089e53034) ) // Dev.Boxes have empty (FF filled) flash ROM

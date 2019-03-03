@@ -300,7 +300,7 @@ T9000 (1980)
 Early TO7 prototype.
 The hardware seems to be the exactly same. Only the BIOS is different.
 It has some bug that were corrected later for the TO7.
-Actually, the two computers are undistinguishable, except for the different
+Actually, the two computers are indistinguishable, except for the different
 startup screen, and a couple BIOS addresses.
 They can run the same software and accept the same devices and extensions.
 
@@ -309,7 +309,7 @@ They can run the same software and accept the same devices and extensions.
 
 /* ------------ address maps ------------ */
 
-void thomson_state::to7(address_map &map)
+void thomson_state::to7_map(address_map &map)
 {
 
 	map(0x0000, 0x3fff).bankr(THOM_CART_BANK).w(FUNC(thomson_state::to7_cartridge_w)); /* 4 * 16 KB */
@@ -625,37 +625,36 @@ MACHINE_CONFIG_START(thomson_state::to7_base)
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, to7 )
 
 /* cpu */
-	MCFG_DEVICE_ADD("maincpu", MC6809E, 16_MHz_XTAL / 16)
-	MCFG_DEVICE_PROGRAM_MAP(to7)
+	MC6809E(config, m_maincpu, 16_MHz_XTAL / 16);
+	m_maincpu->set_addrmap(AS_PROGRAM, &thomson_state::to7_map);
 
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 
 	INPUT_MERGER_ANY_HIGH(config, "mainfirq").output_handler().set_inputline(m_maincpu, M6809_FIRQ_LINE);
 
 /* video */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE ( /*50*/ 1./0.019968 )
-	MCFG_SCREEN_SIZE ( THOM_TOTAL_WIDTH * 2, THOM_TOTAL_HEIGHT )
-	MCFG_SCREEN_VISIBLE_AREA ( 0, THOM_TOTAL_WIDTH * 2 - 1,
-				0, THOM_TOTAL_HEIGHT - 1 )
-	MCFG_SCREEN_UPDATE_DRIVER( thomson_state, screen_update_thom )
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, thomson_state, thom_vblank))
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(/*50*/ 1./0.019968);
+	m_screen->set_size(THOM_TOTAL_WIDTH * 2, THOM_TOTAL_HEIGHT);
+	m_screen->set_visarea(0, THOM_TOTAL_WIDTH * 2 - 1, 0, THOM_TOTAL_HEIGHT - 1);
+	m_screen->set_screen_update(FUNC(thomson_state::screen_update_thom));
+	m_screen->screen_vblank().set(FUNC(thomson_state::thom_vblank));
+	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(thomson_state::thom_palette), 4097); // 12-bit color + transparency
 	MCFG_VIDEO_START_OVERRIDE( thomson_state, thom )
 
 /* sound */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("buzzer", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
-	MCFG_DEVICE_ADD("dac", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // 6-bit game extension R-2R DAC (R=10K)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "buzzer", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	DAC_1BIT(config, "buzzer", 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	DAC_6BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // 6-bit game extension R-2R DAC (R=10K)
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "buzzer", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 /* speech synthesis */
-	MCFG_DEVICE_ADD("mea8000", MEA8000, 3840000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	MEA8000(config, m_mea8000, 3840000).add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 /* cassette */
 	CASSETTE(config, m_cassette);
@@ -664,24 +663,20 @@ MACHINE_CONFIG_START(thomson_state::to7_base)
 	m_cassette->set_interface("to_cass");
 
 /* floppy */
-	MCFG_DEVICE_ADD("mc6843", MC6843, 16_MHz_XTAL / 16 / 2)
+	MC6843(config, m_mc6843, 16_MHz_XTAL / 16 / 2);
 
-	MCFG_DEVICE_ADD(m_floppy_image[0], LEGACY_FLOPPY, 0)
-	MCFG_LEGACY_FLOPPY_CONFIG(thomson_floppy_interface)
-	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(*this, thomson_state, fdc_index_0_w))
-	MCFG_DEVICE_ADD(m_floppy_image[1], LEGACY_FLOPPY, 0)
-	MCFG_LEGACY_FLOPPY_CONFIG(thomson_floppy_interface)
-	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(*this, thomson_state, fdc_index_1_w))
-	MCFG_DEVICE_ADD(m_floppy_image[2], LEGACY_FLOPPY, 0)
-	MCFG_LEGACY_FLOPPY_CONFIG(thomson_floppy_interface)
-	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(*this, thomson_state, fdc_index_2_w))
-	MCFG_DEVICE_ADD(m_floppy_image[3], LEGACY_FLOPPY, 0)
-	MCFG_LEGACY_FLOPPY_CONFIG(thomson_floppy_interface)
-	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(*this, thomson_state, fdc_index_3_w))
+	LEGACY_FLOPPY(config, m_floppy_image[0], 0, &thomson_floppy_interface);
+	m_floppy_image[0]->out_idx_cb().set(FUNC(thomson_state::fdc_index_0_w));
+	LEGACY_FLOPPY(config, m_floppy_image[1], 0, &thomson_floppy_interface);
+	m_floppy_image[1]->out_idx_cb().set(FUNC(thomson_state::fdc_index_1_w));
+	LEGACY_FLOPPY(config, m_floppy_image[2], 0, &thomson_floppy_interface);
+	m_floppy_image[2]->out_idx_cb().set(FUNC(thomson_state::fdc_index_2_w));
+	LEGACY_FLOPPY(config, m_floppy_image[3], 0, &thomson_floppy_interface);
+	m_floppy_image[3]->out_idx_cb().set(FUNC(thomson_state::fdc_index_3_w));
 
 	WD2793(config, m_wd2793_fdc, 16_MHz_XTAL / 16);
-	MCFG_FLOPPY_DRIVE_ADD("wd2793:0", cd90_640_floppies, "dd", thomson_state::cd90_640_formats)
-	MCFG_FLOPPY_DRIVE_ADD("wd2793:1", cd90_640_floppies, "dd", thomson_state::cd90_640_formats)
+	FLOPPY_CONNECTOR(config, "wd2793:0", cd90_640_floppies, "dd", thomson_state::cd90_640_formats);
+	FLOPPY_CONNECTOR(config, "wd2793:1", cd90_640_floppies, "dd", thomson_state::cd90_640_formats);
 
 
 /* network */
@@ -743,10 +738,10 @@ MACHINE_CONFIG_START(thomson_state::to7_base)
 	RAM(config, m_ram).set_default_size("40K").set_extra_options("24K,48K");
 
 /* software lists */
-	MCFG_SOFTWARE_LIST_ADD("to7_cart_list","to7_cart")
-	MCFG_SOFTWARE_LIST_ADD("to7_cass_list","to7_cass")
-	MCFG_SOFTWARE_LIST_ADD("to_flop_list","to_flop")
-	MCFG_SOFTWARE_LIST_ADD("to7_qd_list","to7_qd")
+	SOFTWARE_LIST(config, "to7_cart_list").set_original("to7_cart");
+	SOFTWARE_LIST(config, "to7_cass_list").set_original("to7_cass");
+	SOFTWARE_LIST(config, "to_flop_list").set_original("to_flop");
+	SOFTWARE_LIST(config, "to7_qd_list").set_original("to7_qd");
 MACHINE_CONFIG_END
 
 void thomson_state::to7(machine_config &config)
@@ -822,7 +817,7 @@ In arabic mode, Ctrl+E / Ctrl+X to start / stop typing in-line latin.
 
 **********************************************************************/
 
-void thomson_state::to770(address_map &map)
+void thomson_state::to770_map(address_map &map)
 {
 
 	map(0x0000, 0x3fff).bankr(THOM_CART_BANK).w(FUNC(thomson_state::to7_cartridge_w)); /* 4 * 16 KB */
@@ -927,13 +922,13 @@ INPUT_PORTS_END
 
 /* ------------ driver ------------ */
 
-MACHINE_CONFIG_START(thomson_state::to770)
+void thomson_state::to770(machine_config &config)
+{
 	to7(config);
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, to770 )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, to770 )
 
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP ( to770)
+	m_maincpu->set_addrmap(AS_PROGRAM, &thomson_state::to770_map);
 
 	m_pia_sys->readpa_handler().set(FUNC(thomson_state::to770_sys_porta_in));
 	m_pia_sys->readpb_handler().set_constant(0);
@@ -945,16 +940,16 @@ MACHINE_CONFIG_START(thomson_state::to770)
 	/* internal ram */
 	m_ram->set_default_size("128K").set_extra_options("64K");
 
-	config.device_remove("to7_cart_list");
-	MCFG_SOFTWARE_LIST_ADD("t770_cart_list","to770_cart")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("to7_cart_list","to7_cart")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "t770_cart_list").set_original("to770_cart");
+	SOFTWARE_LIST(config.replace(), "to7_cart_list").set_compatible("to7_cart");
+}
 
-MACHINE_CONFIG_START(thomson_state::to770a)
+void thomson_state::to770a(machine_config &config)
+{
 	to770(config);
 	config.device_remove("t770_cart_list");
-	MCFG_SOFTWARE_LIST_ADD("t770a_cart_list","to770a_cart")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "t770a_cart_list").set_original("to770a_cart");
+}
 
 COMP( 1984, to770, 0, 0, to770, to770, thomson_state, empty_init, "Thomson", "TO7/70", 0 )
 
@@ -1020,7 +1015,7 @@ Differences include:
 
 **********************************************************************/
 
-void thomson_state::mo5(address_map &map)
+void thomson_state::mo5_map(address_map &map)
 {
 
 	map(0x0000, 0x1fff).bankr(THOM_VRAM_BANK).w(FUNC(thomson_state::to770_vram_w));
@@ -1121,8 +1116,7 @@ MACHINE_CONFIG_START(thomson_state::mo5)
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, mo5 )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, mo5 )
 
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP ( mo5)
+	m_maincpu->set_addrmap(AS_PROGRAM, &thomson_state::mo5_map);
 
 	m_cassette->set_formats(mo5_cassette_formats);
 	m_cassette->set_interface("mo_cass");
@@ -1147,18 +1141,19 @@ MACHINE_CONFIG_START(thomson_state::mo5)
 	config.device_remove("to_flop_list");
 	config.device_remove("to7_qd_list");
 
-	MCFG_SOFTWARE_LIST_ADD("mo5_cart_list","mo5_cart")
-	MCFG_SOFTWARE_LIST_ADD("mo5_cass_list","mo5_cass")
-	MCFG_SOFTWARE_LIST_ADD("mo5_flop_list","mo5_flop")
-	MCFG_SOFTWARE_LIST_ADD("mo5_qd_list","mo5_qd")
+	SOFTWARE_LIST(config, "mo5_cart_list").set_original("mo5_cart");
+	SOFTWARE_LIST(config, "mo5_cass_list").set_original("mo5_cass");
+	SOFTWARE_LIST(config, "mo5_flop_list").set_original("mo5_flop");
+	SOFTWARE_LIST(config, "mo5_qd_list").set_original("mo5_qd");
 
 	/* internal ram */
 	m_ram->set_default_size("112K");
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(thomson_state::mo5e)
+void thomson_state::mo5e(machine_config &config)
+{
 	mo5(config);
-MACHINE_CONFIG_END
+}
 
 
 COMP( 1984, mo5, 0, 0, mo5, mo5, thomson_state, empty_init, "Thomson", "MO5", 0 )
@@ -1238,7 +1233,7 @@ It was replaced quickly with the improved TO9+.
 
 **********************************************************************/
 
-void thomson_state::to9(address_map &map)
+void thomson_state::to9_map(address_map &map)
 {
 
 	map(0x0000, 0x3fff).bankr(THOM_CART_BANK).w(FUNC(thomson_state::to9_cartridge_w));/* 4 * 16 KB */
@@ -1473,14 +1468,14 @@ INPUT_PORTS_END
 
 /* ------------ driver ------------ */
 
-MACHINE_CONFIG_START(thomson_state::to9)
+void thomson_state::to9(machine_config &config)
+{
 	to7(config);
 
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, to9 )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, to9 )
 
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP ( to9)
+	m_maincpu->set_addrmap(AS_PROGRAM, &thomson_state::to9_map);
 
 	m_pia_sys->readpa_handler().set(FUNC(thomson_state::to9_sys_porta_in));
 	m_pia_sys->readpb_handler().set_constant(0);
@@ -1496,7 +1491,7 @@ MACHINE_CONFIG_START(thomson_state::to9)
 
 	/* internal ram */
 	m_ram->set_default_size("192K").set_extra_options("128K");
-MACHINE_CONFIG_END
+}
 
 
 COMP( 1985, to9, 0, 0, to9, to9, thomson_state, empty_init, "Thomson", "TO9", MACHINE_IMPERFECT_COLORS )
@@ -1565,7 +1560,7 @@ The TO8D is simply a TO8 with an integrated 3"1/2 floppy drive.
 **********************************************************************/
 
 
-void thomson_state::to8(address_map &map)
+void thomson_state::to8_map(address_map &map)
 {
 
 	map(0x0000, 0x3fff).bankr(THOM_CART_BANK).w(FUNC(thomson_state::to8_cartridge_w)); /* 4 * 16 KB */
@@ -1694,15 +1689,15 @@ INPUT_PORTS_END
 
 /* ------------ driver ------------ */
 
-MACHINE_CONFIG_START(thomson_state::to8)
+void thomson_state::to8(machine_config &config)
+{
 	to7(config);
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, to8 )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, to8 )
 
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP ( to8)
+	m_maincpu->set_addrmap(AS_PROGRAM, &thomson_state::to8_map);
 
-	//MCFG_DEVICE_ADD("kbdmcu", MC6804, 11_MHz_XTAL)
+	//MC6804(config, "kbdmcu", 11_MHz_XTAL);
 
 	m_pia_sys->readpa_handler().set(FUNC(thomson_state::to8_sys_porta_in));
 	m_pia_sys->readpb_handler().set_constant(0);
@@ -1721,18 +1716,16 @@ MACHINE_CONFIG_START(thomson_state::to8)
 	/* internal ram */
 	m_ram->set_default_size("512K").set_extra_options("256K");
 
-	config.device_remove("to7_cass_list");
-	config.device_remove("to7_qd_list");
+	SOFTWARE_LIST(config, "to8_cass_list").set_original("to8_cass");
+	SOFTWARE_LIST(config, "to8_qd_list").set_original("to8_qd");
+	SOFTWARE_LIST(config.replace(), "to7_cass_list").set_compatible("to7_cass");
+	SOFTWARE_LIST(config.replace(), "to7_qd_list").set_compatible("to7_qd");
+}
 
-	MCFG_SOFTWARE_LIST_ADD("to8_cass_list", "to8_cass")
-	MCFG_SOFTWARE_LIST_ADD("to8_qd_list", "to8_qd")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("to7_cass_list", "to7_cass")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("to7_qd_list", "to7_qd")
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(thomson_state::to8d)
+void thomson_state::to8d(machine_config &config)
+{
 	to8(config);
-MACHINE_CONFIG_END
+}
 
 
 COMP( 1986, to8, 0, 0, to8, to8, thomson_state, empty_init, "Thomson", "TO8", 0 )
@@ -1777,7 +1770,7 @@ The differences with the TO8 are:
 
 **********************************************************************/
 
-void thomson_state::to9p(address_map &map)
+void thomson_state::to9p_map(address_map &map)
 {
 
 	map(0x0000, 0x3fff).bankr(THOM_CART_BANK).w(FUNC(thomson_state::to8_cartridge_w)); /* 4 * 16 KB */
@@ -1858,13 +1851,13 @@ INPUT_PORTS_END
 
 /* ------------ driver ------------ */
 
-MACHINE_CONFIG_START(thomson_state::to9p)
+void thomson_state::to9p(machine_config &config)
+{
 	to7(config);
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, to9p )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, to9p )
 
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP ( to9p)
+	m_maincpu->set_addrmap(AS_PROGRAM, &thomson_state::to9p_map);
 
 	m_pia_sys->readpa_handler().set(FUNC(thomson_state::to8_sys_porta_in));
 	m_pia_sys->readpb_handler().set_constant(0);
@@ -1884,14 +1877,11 @@ MACHINE_CONFIG_START(thomson_state::to9p)
 	/* internal ram */
 	m_ram->set_default_size("512K");
 
-	config.device_remove("to7_cass_list");
-	config.device_remove("to7_qd_list");
-
-	MCFG_SOFTWARE_LIST_ADD("to8_cass_list", "to8_cass")
-	MCFG_SOFTWARE_LIST_ADD("to8_qd_list", "to8_qd")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("to7_cass_list", "to7_cass")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("to7_qd_list", "to7_qd")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "to8_cass_list").set_original("to8_cass");
+	SOFTWARE_LIST(config, "to8_qd_list").set_original("to8_qd");
+	SOFTWARE_LIST(config.replace(), "to7_cass_list").set_compatible("to7_cass");
+	SOFTWARE_LIST(config.replace(), "to7_qd_list").set_compatible("to7_qd");
+}
 
 COMP( 1986, to9p, 0, 0, to9p, to9p, thomson_state, empty_init, "Thomson", "TO9+", 0 )
 
@@ -1955,7 +1945,7 @@ a PC XT.
 
 **********************************************************************/
 
-void thomson_state::mo6(address_map &map)
+void thomson_state::mo6_map(address_map &map)
 {
 
 	map(0x0000, 0x1fff).bankr(THOM_VRAM_BANK).w(FUNC(thomson_state::to770_vram_w));
@@ -2209,8 +2199,7 @@ MACHINE_CONFIG_START(thomson_state::mo6)
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, mo6 )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, mo6 )
 
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP ( mo6)
+	m_maincpu->set_addrmap(AS_PROGRAM, &thomson_state::mo6_map);
 
 	m_cassette->set_formats(mo5_cassette_formats);
 	m_cassette->set_interface("mo_cass");
@@ -2229,7 +2218,8 @@ MACHINE_CONFIG_START(thomson_state::mo6)
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->busy_handler().set(FUNC(thomson_state::write_centronics_busy));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	OUTPUT_LATCH(config, m_cent_data_out);
+	m_centronics->set_output_latch(*m_cent_data_out);
 
 	config.device_remove("cartslot");
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "mo_cart")
@@ -2244,16 +2234,17 @@ MACHINE_CONFIG_START(thomson_state::mo6)
 	config.device_remove("to_flop_list");
 	config.device_remove("to7_qd_list");
 
-	MCFG_SOFTWARE_LIST_ADD("mo6_cass_list","mo6_cass")
-	MCFG_SOFTWARE_LIST_ADD("mo6_flop_list","mo6_flop")
+	SOFTWARE_LIST(config, "mo6_cass_list").set_original("mo6_cass");
+	SOFTWARE_LIST(config, "mo6_flop_list").set_original("mo6_flop");
 
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("mo5_cart_list","mo5_cart")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("mo5_cass_list","mo5_cass")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("mo5_flop_list","mo5_flop")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("mo5_qd_list","mo5_qd")
+	SOFTWARE_LIST(config, "mo5_cart_list").set_compatible("mo5_cart");
+	SOFTWARE_LIST(config, "mo5_cass_list").set_compatible("mo5_cass");
+	SOFTWARE_LIST(config, "mo5_flop_list").set_compatible("mo5_flop");
+	SOFTWARE_LIST(config, "mo5_qd_list").set_compatible("mo5_qd");
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(thomson_state::pro128)
+void thomson_state::pro128(machine_config &config)
+{
 	mo6(config);
 	config.device_remove("mo6_cass_list");
 	config.device_remove("mo6_flop_list");
@@ -2263,10 +2254,10 @@ MACHINE_CONFIG_START(thomson_state::pro128)
 	config.device_remove("mo5_flop_list");
 	config.device_remove("mo5_qd_list");
 
-	MCFG_SOFTWARE_LIST_ADD("p128_cart_list","pro128_cart")
-	MCFG_SOFTWARE_LIST_ADD("p128_cass_list","pro128_cass")
-	MCFG_SOFTWARE_LIST_ADD("p128_flop_list","pro128_flop")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "p128_cart_list").set_original("pro128_cart");
+	SOFTWARE_LIST(config, "p128_cass_list").set_original("pro128_cass");
+	SOFTWARE_LIST(config, "p128_flop_list").set_original("pro128_flop");
+}
 
 COMP( 1986, mo6, 0, 0, mo6, mo6, thomson_state, empty_init, "Thomson", "MO6", 0 )
 
@@ -2303,7 +2294,7 @@ Here are the differences between the MO6 and MO5NR:
 
 **********************************************************************/
 
-void thomson_state::mo5nr(address_map &map)
+void thomson_state::mo5nr_map(address_map &map)
 {
 
 	map(0x0000, 0x1fff).bankr(THOM_VRAM_BANK).w(FUNC(thomson_state::to770_vram_w));
@@ -2473,8 +2464,7 @@ MACHINE_CONFIG_START(thomson_state::mo5nr)
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, mo5nr )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, mo5nr )
 
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP ( mo5nr)
+	m_maincpu->set_addrmap(AS_PROGRAM, &thomson_state::mo5nr_map);
 
 	m_cassette->set_formats(mo5_cassette_formats);
 	m_cassette->set_interface("mo_cass");
@@ -2494,7 +2484,9 @@ MACHINE_CONFIG_START(thomson_state::mo5nr)
 	m_centronics->busy_handler().set(FUNC(thomson_state::write_centronics_busy));
 
 	INPUT_BUFFER(config, "cent_data_in");
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+
+	OUTPUT_LATCH(config, m_cent_data_out);
+	m_centronics->set_output_latch(*m_cent_data_out);
 
 	config.device_remove("cartslot");
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "mo_cart")
@@ -2509,13 +2501,13 @@ MACHINE_CONFIG_START(thomson_state::mo5nr)
 	config.device_remove("to_flop_list");
 	config.device_remove("to7_qd_list");
 
-	MCFG_SOFTWARE_LIST_ADD("mo6_cass_list","mo6_cass")
-	MCFG_SOFTWARE_LIST_ADD("mo6_flop_list","mo6_flop")
+	SOFTWARE_LIST(config, "mo6_cass_list").set_original("mo6_cass");
+	SOFTWARE_LIST(config, "mo6_flop_list").set_original("mo6_flop");
 
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("mo5_cart_list","mo5_cart")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("mo5_cass_list","mo5_cass")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("mo5_flop_list","mo5_flop")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("mo5_qd_list","mo5_qd")
+	SOFTWARE_LIST(config, "mo5_cart_list").set_compatible("mo5_cart");
+	SOFTWARE_LIST(config, "mo5_cass_list").set_compatible("mo5_cass");
+	SOFTWARE_LIST(config, "mo5_flop_list").set_compatible("mo5_flop");
+	SOFTWARE_LIST(config, "mo5_qd_list").set_compatible("mo5_qd");
 MACHINE_CONFIG_END
 
 COMP( 1986, mo5nr, 0, 0, mo5nr, mo5nr, thomson_state, empty_init, "Thomson", "MO5 NR", 0 )

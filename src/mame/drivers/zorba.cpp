@@ -132,17 +132,19 @@ GFXDECODE_END
 } // anonymous namespace
 
 
-MACHINE_CONFIG_START(zorba_state::zorba)
+void zorba_state::zorba(machine_config &config)
+{
 	// basic machine hardware
 	Z80(config, m_maincpu, 24_MHz_XTAL / 6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &zorba_state::zorba_mem);
 	m_maincpu->set_addrmap(AS_IO, &zorba_state::zorba_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", i8275_device, screen_update)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_zorba)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_color(rgb_t::green());
+	screen.set_refresh_hz(50);
+	screen.set_screen_update("crtc", FUNC(i8275_device::screen_update));
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_zorba);
 	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
 
 	/* sound hardware */
@@ -223,14 +225,12 @@ MACHINE_CONFIG_START(zorba_state::zorba)
 	FD1793(config, m_fdc, 24_MHz_XTAL / 24);
 	m_fdc->intrq_wr_callback().set("irq2", FUNC(input_merger_device::in_w<0>));
 	m_fdc->drq_wr_callback().set("irq2", FUNC(input_merger_device::in_w<1>));
-	MCFG_FLOPPY_DRIVE_ADD(m_floppy0, zorba_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD(m_floppy1, zorba_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, m_floppy0, zorba_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy1, zorba_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
 
 	// J1 IEEE-488
-	MCFG_IEEE488_BUS_ADD()
-	MCFG_IEEE488_SRQ_CALLBACK(WRITELINE(m_pia1, pia6821_device, ca2_w)) // TODO: gated with PB1 from PIA
+	IEEE488(config, m_ieee);
+	m_ieee->srq_callback().set(m_pia1, FUNC(pia6821_device::ca2_w)); // TODO: gated with PB1 from PIA
 
 	// J2 EIA RS232/internal modem
 	// TODO: this has additional lines compared to a regular RS232 port (TxC in, RxC in, RxC out, speaker in, power)
@@ -240,12 +240,14 @@ MACHINE_CONFIG_START(zorba_state::zorba)
 	rs232.dsr_handler().set(m_uart0, FUNC(i8251_device::write_dsr));
 
 	// J3 Parallel printer
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("parprndata", "parprn")
 	centronics_device &parprn(CENTRONICS(config, "parprn", centronics_devices, "printer"));
 	parprn.busy_handler().set(m_uart1, FUNC(i8251_device::write_cts));
 	parprn.busy_handler().append(m_uart1, FUNC(i8251_device::write_dsr)); // TODO: shared with serial CTS
 	parprn.fault_handler().set(FUNC(zorba_state::printer_fault_w));
 	parprn.select_handler().set(FUNC(zorba_state::printer_select_w));
+
+	output_latch_device &parprndata(OUTPUT_LATCH(config, "parprndata"));
+	parprn.set_output_latch(parprndata);
 
 	// J3 Serial printer
 	rs232_port_device &serprn(RS232_PORT(config, "serprn", default_rs232_devices, nullptr));
@@ -255,7 +257,7 @@ MACHINE_CONFIG_START(zorba_state::zorba)
 	ZORBA_KEYBOARD(config, "keyboard").rxd_cb().set(m_uart2, FUNC(i8251_device::write_rxd));
 
 	SOFTWARE_LIST(config, "flop_list").set_original("zorba");
-MACHINE_CONFIG_END
+}
 
 
 //-------------------------------------------------

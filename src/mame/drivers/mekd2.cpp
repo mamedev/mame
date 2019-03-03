@@ -415,7 +415,7 @@ void mekd2_state::mekd2(machine_config &config)
 	TIMER(config, "mekd2_c").configure_periodic(FUNC(mekd2_state::mekd2_c), attotime::from_hz(4800));
 	TIMER(config, "mekd2_p").configure_periodic(FUNC(mekd2_state::mekd2_p), attotime::from_hz(40000));
 
-	QUICKLOAD(config, "quickload", 0).set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(mekd2_state, mekd2_quik), this), "d2", 1);
+	QUICKLOAD(config, "quickload").set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(mekd2_state, mekd2_quik), this), "d2", attotime::from_seconds(1));
 }
 
 /***********************************************************

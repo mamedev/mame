@@ -635,7 +635,7 @@ MACHINE_CONFIG_START(gal3_state::gal3)
     MCFG_DEVICE_ADD("psn_b3_cpu", M68000, 12000000) // ??
     MCFG_DEVICE_PROGRAM_MAP(psn_b1_cpu_map,0)
 */
-	MCFG_QUANTUM_TIME(attotime::from_hz(60*8000)) /* 8000 CPU slices per frame */
+	config.m_minimum_quantum = attotime::from_hz(60*8000); /* 8000 CPU slices per frame */
 
 	NVRAM(config, "nvmem", nvram_device::DEFAULT_ALL_0);
 

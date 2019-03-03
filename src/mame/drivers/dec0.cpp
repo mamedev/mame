@@ -26,10 +26,15 @@
     * Midnight Resistance                     (USA set)
     * Midnight Resistance                     (Japanese set)
     * Boulderdash                             (World set)
+    * Bandit                                  (USA set)
 
     Heavy Barrel, Bad Dudes, Robocop, Birdie Try & Hippodrome use the 'MEC-M1'
 motherboard and varying game boards.  Sly Spy, Midnight Resistance and
 Boulderdash use the same graphics chips but are different pcbs.
+
+    Bandit (USA) is almost certainly a field test prototype, the software runs
+    on a Heavy Barrel board including the original Heavy Barrel MCU (which is effectively
+    not used).  There is also Japanese version known to run on a DE-0321-1 top board.
 
     There are Secret Agent (bootleg) and Robocop (bootleg) sets to add.
 
@@ -386,6 +391,16 @@ WRITE16_MEMBER(dec0_state::dec0_control_w)
 	}
 }
 
+// Bandit tests P1 Y axis only
+// Hookup comes from Birdie Try service mode
+READ8_MEMBER(dec0_state::trackball_r)
+{
+	uint8_t port_num = offset >> 1;
+	if (offset & 1)
+		return m_in_trackball[port_num]->read() >> 8;
+
+	return m_in_trackball[port_num]->read() & 0xff;
+}
 
 WRITE16_MEMBER(dec0_automat_state::automat_control_w)
 {
@@ -449,14 +464,19 @@ void dec0_state::dec0_map(address_map &map)
 
 	map(0x300000, 0x300001).portr("AN0");
 	map(0x300008, 0x300009).portr("AN1");
+	map(0x300010, 0x30001f).r(FUNC(dec0_state::trackball_r)).umask16(0x00ff);
 	map(0x30c000, 0x30c00b).r(FUNC(dec0_state::dec0_controls_r));
 	map(0x30c010, 0x30c01f).w(FUNC(dec0_state::dec0_control_w));                                   /* Priority, sound, etc. */
 	map(0x30c012, 0x30c013).nopr(); // clr.w for sprite DMA
 	map(0x30c018, 0x30c019).nopr(); // clr.w for irq ack
 	map(0x310000, 0x3107ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x314000, 0x3147ff).ram().w(m_palette, FUNC(palette_device::write16_ext)).share("palette_ext");
+
+	map(0x318000, 0x31bfff).ram().share("ram");         // Bandit uses 318000/31c000 which are mirrors but exact mirror patten is unclear
+	map(0x31c000, 0x31c7ff).ram().share("spriteram");
+
 	map(0xff8000, 0xffbfff).ram().share("ram");                                 /* Main ram */
-	map(0xffc000, 0xffc7ff).ram().share("spriteram");                               /* Sprites */
+	map(0xffc000, 0xffc7ff).ram().share("spriteram");
 }
 
 void dec0_state::robocop_map(address_map &map)
@@ -676,9 +696,9 @@ void dec0_state::midresb_map(address_map &map)
 
 void dec0_state::dec0_s_map(address_map &map)
 {
-	map(0x0000, 0x05ff).ram();
-	map(0x0800, 0x0801).w("ym1", FUNC(ym2203_device::write));
-	map(0x1000, 0x1001).w("ym2", FUNC(ym3812_device::write));
+	map(0x0000, 0x07ff).ram();
+	map(0x0800, 0x0801).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x1000, 0x1001).rw("ym2", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
 	map(0x3000, 0x3000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x3800, 0x3800).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x8000, 0xffff).rom();
@@ -964,11 +984,40 @@ static INPUT_PORTS_START( rotary_ports )
 	PORT_BIT( 0xffff, 0x0000, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(10) PORT_KEYDELTA(1) PORT_REMAP_TABLE(rotary_table) PORT_PLAYER(2) PORT_REVERSE PORT_FULL_TURN_COUNT(12)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( trackball_ports )
+	PORT_START("track_0")
+	PORT_BIT( 0x0fff, 0, IPT_TRACKBALL_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(24) PORT_REVERSE PORT_PLAYER(1)
+
+	PORT_START("track_1")
+	PORT_BIT( 0x0fff, 0, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(24) PORT_PLAYER(1)
+
+	PORT_START("track_2")
+	PORT_BIT( 0x0fff, 0, IPT_TRACKBALL_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(24) PORT_REVERSE PORT_PLAYER(2)
+
+	PORT_START("track_3")
+	PORT_BIT( 0x0fff, 0, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(24) PORT_PLAYER(2)
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( rotary_null )
 	PORT_START("AN0")
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("AN1")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( trackball_null )
+	PORT_START("P1_TRACKX")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P1_TRACKY")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P2_TRACKX")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P2_TRACKY")
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
@@ -1027,6 +1076,102 @@ static INPUT_PORTS_START( hbarrel )
 	PORT_DIPUNUSED_DIPLOC( 0x8000, IP_ACTIVE_LOW, "SW1:8" ) // Always OFF
 
 	PORT_INCLUDE( rotary_ports )
+	PORT_INCLUDE( trackball_null )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( bandit )
+	PORT_INCLUDE( dec0 )
+
+	PORT_MODIFY("INPUTS")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Fire")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Bomb")
+	PORT_BIT( 0x00c0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Fire")
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL PORT_NAME("P2 Bomb")
+	PORT_BIT( 0xc000, IP_ACTIVE_LOW, IPT_UNUSED )
+
+#if 0
+	PORT_DIPNAME( 0x0001, 0x0001, "UNK_0" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x0002, 0x0002, "UNK_1" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x0004, 0x0004, "UNK_2" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x0008, 0x0008, "UNK_3" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x0010, 0x0010, "UNK_4" ) // Gun
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x0020, 0x0020, "UNK_5" ) // Missile
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x0040, 0x0040, "UNK_6" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x0080, 0x0080, "UNK_7" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+#endif
+	PORT_MODIFY("SYSTEM")
+	PORT_BIT( 0x0003, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x0001, 0x0001, "Analog controls?" ) // ?
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x0002, 0x0002, "L/R control related (keep off)" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x0004, 0x0004, "DSUNK_2" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x0008, 0x0000, "Road select (debug)" ) // Debug mode
+	PORT_DIPSETTING(      0x0008, DEF_STR( On ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x0020, 0x0020, "DSUNK_5" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x0040, 0x0040, "DSUNK_6" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x0080, 0x0000, "Enable enemies" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+
+	PORT_DIPNAME( 0x0100, 0x0100, "DSUNK_8" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x0200, 0x0200, "DSUNK_9" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x0400, 0x0400, "DSUNK_A" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x0800, 0x0800, "DSUNK_B" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x1000, 0x1000, "DSUNK_C" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x2000, 0x2000, "DSUNK_D" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x4000, 0x4000, "DSUNK_E" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x8000, 0x8000, "DSUNK_F" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+
+	PORT_INCLUDE( rotary_null )
+	PORT_INCLUDE( trackball_ports )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( birdtry )
@@ -1092,7 +1237,7 @@ static INPUT_PORTS_START( birdtry )
 	*/
 
 	PORT_INCLUDE( rotary_null )
-//  TODO: trackball inputs
+	PORT_INCLUDE( trackball_ports )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( baddudes )
@@ -1142,6 +1287,7 @@ static INPUT_PORTS_START( baddudes )
 	PORT_DIPUNUSED_DIPLOC( 0x8000, IP_ACTIVE_LOW, "SW2:8" ) // Always OFF
 
 	PORT_INCLUDE( rotary_null )
+	PORT_INCLUDE( trackball_null )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( drgninja )
@@ -1209,6 +1355,7 @@ static INPUT_PORTS_START( robocop )
 	PORT_DIPUNUSED_DIPLOC( 0x8000, IP_ACTIVE_LOW, "SW2:8" ) // Always OFF
 
 	PORT_INCLUDE( rotary_null )
+	PORT_INCLUDE( trackball_null )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( hippodrm )
@@ -1257,6 +1404,7 @@ static INPUT_PORTS_START( hippodrm )
 	PORT_DIPUNUSED_DIPLOC( 0x8000, IP_ACTIVE_LOW, "SW2:8" ) // Always OFF
 
 	PORT_INCLUDE( rotary_null )
+	PORT_INCLUDE( trackball_null )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ffantasy )
@@ -1326,6 +1474,7 @@ static INPUT_PORTS_START( slyspy )
 	PORT_DIPUNUSED_DIPLOC( 0x8000, IP_ACTIVE_LOW, "SW2:8" ) // Always OFF
 
 	PORT_INCLUDE( rotary_null )
+	PORT_INCLUDE( trackball_null )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( midres )
@@ -1372,6 +1521,7 @@ static INPUT_PORTS_START( midres )
 	PORT_DIPUNUSED_DIPLOC( 0x8000, IP_ACTIVE_LOW, "SW2:8" ) // Always OFF
 
 	PORT_INCLUDE( rotary_ports )
+	PORT_INCLUDE( trackball_null )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( midresu )
@@ -1428,6 +1578,7 @@ static INPUT_PORTS_START( midresb )
 	PORT_DIPUNUSED_DIPLOC( 0x8000, IP_ACTIVE_LOW, "SW2:8" ) // Always OFF
 
 	PORT_INCLUDE( rotary_ports )
+	PORT_INCLUDE( trackball_null )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( bouldash )
@@ -1504,6 +1655,7 @@ static INPUT_PORTS_START( bouldash )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 	PORT_INCLUDE( rotary_null )
+	PORT_INCLUDE( trackball_null )
 INPUT_PORTS_END
 
 /******************************************************************************/
@@ -1665,6 +1817,7 @@ void dec0_state::dec0(machine_config &config)
 	ym1.add_route(1, "mono", 0.90);
 	ym1.add_route(2, "mono", 0.90);
 	ym1.add_route(3, "mono", 0.35);
+	ym1.irq_handler().set_inputline(m_audiocpu, 0); // Schematics show both ym2203 and ym3812 can trigger IRQ, but Bandit is only game to program 2203 to do so
 
 	ym3812_device &ym2(YM3812(config, "ym2", XTAL(12'000'000) / 4));
 	ym2.irq_handler().set_inputline(m_audiocpu, 0);
@@ -1896,6 +2049,21 @@ void dec0_state::hbarrel(machine_config &config)
 
 	/* video hardware */
 	m_screen->set_screen_update(FUNC(dec0_state::screen_update_hbarrel));
+}
+
+void dec0_state::bandit(machine_config &config)
+{
+	dec0(config);
+
+	i8751_device &mcu(I8751(config, m_mcu, XTAL(8'000'000)));
+	mcu.port_in_cb<0>().set(FUNC(dec0_state::dec0_mcu_port0_r));
+	mcu.port_out_cb<0>().set(FUNC(dec0_state::dec0_mcu_port0_w));
+	mcu.port_out_cb<1>().set(FUNC(dec0_state::dec0_mcu_port1_w));
+	mcu.port_out_cb<2>().set(FUNC(dec0_state::dec0_mcu_port2_w));
+	mcu.port_out_cb<3>().set(FUNC(dec0_state::dec0_mcu_port3_w));
+
+	/* video hardware */
+	m_screen->set_screen_update(FUNC(dec0_state::screen_update_bandit));
 }
 
 void dec0_state::baddudes(machine_config &config)
@@ -2836,6 +3004,51 @@ ROM_START( automat )
 	ROM_LOAD( "19.bin", 0x70000, 0x08000, CRC(118e7fc7) SHA1(fa6d8eef9da873579e19a9bf982643e061b8ca26) )
 ROM_END
 
+ROM_START( bandit )
+	ROM_REGION( 0x60000, "maincpu", 0 ) /* 6*64k for 68000 code */
+	ROM_LOAD16_BYTE( "4.4",     0x00000, 0x10000, CRC(01a29133) SHA1(6a8e9b959828f82333ca17dbc751a9fbafae6935) )
+	ROM_LOAD16_BYTE( "1.1",     0x00001, 0x10000, CRC(dc61b11f) SHA1(3178a1247d2ef4d30f9c6c55b53db658214d2861) )
+	ROM_LOAD16_BYTE( "5.5",     0x20000, 0x10000, CRC(7dbfa088) SHA1(7046d84f0a00f86cfa0c4d77e43118adda111001) )
+	ROM_LOAD16_BYTE( "2.2",     0x20001, 0x10000, CRC(3e81e138) SHA1(b2eb57900fe110d64852a5c4c9d12c060ecb54e5) )
+	ROM_LOAD16_BYTE( "6.6",     0x40000, 0x10000, CRC(b12e33cc) SHA1(b551cc09d25bb8ae198415f75ac2a150f2789849) )
+	ROM_LOAD16_BYTE( "3.3",     0x40001, 0x10000, CRC(30bf52cf) SHA1(f45d3028d0e4e8c8f2c5968b52399a4e7eb9255f) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 6502 Sound */
+	ROM_LOAD( "7.7",     0x8000, 0x8000, CRC(69259ca4) SHA1(ce014836c71e269569279a09abef20cf03d46e31) )
+
+	ROM_REGION( 0x1000, "mcu", 0 )  /* i8751 microcontroller */
+	ROM_LOAD( "hb31.9a",      0x0000, 0x1000, CRC(239d726f) SHA1(969f38ae981ffde6053ece93cc51614d492edbbb) )
+
+	ROM_REGION( 0x20000, "gfx1", 0 ) /* chars */
+	ROM_LOAD( "25.25",     0x00000, 0x10000, CRC(4047ff81) SHA1(56a82c7694e6dbbdb9b42ed134120a76f848f7a5) )
+	ROM_LOAD( "26.26",     0x10000, 0x10000, CRC(3a0a2f1e) SHA1(f06b44e4a8c29ee2c0a6e8f786fbee144138ba72) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 ) /* tiles */
+	ROM_LOAD( "18.18",     0x00000, 0x10000, CRC(ac38e585) SHA1(c1a6fb083c096d119351883dea121ee6358d9298) )
+	ROM_LOAD( "20.20",     0x20000, 0x10000, CRC(2194f737) SHA1(fbe2f7d0d6b80bf62fb9c38f9f2a001a728f3b7c) )
+	ROM_LOAD( "22.22",     0x40000, 0x10000, CRC(fcc6cb4d) SHA1(548bd8688b255cdd1eef82e4fbec3d88e1d0ab53) )
+	ROM_LOAD( "24.24",     0x60000, 0x10000, CRC(aa3c33b6) SHA1(f7770daedb5c1d5dd5099f1378c5c292c68a6a12) )
+
+	ROM_REGION( 0x40000, "gfx3", 0 ) /* tiles */
+	ROM_LOAD( "29.29",     0x00000, 0x10000, CRC(32218c8a) SHA1(33e922ffd7000a03a8fa8bbe61483cd8e916ebd6) )
+	ROM_LOAD( "30.30",     0x10000, 0x10000, CRC(6a5fe9a9) SHA1(a750373e9fb1a0ad81d63a19bbac7a6079d3372f) )
+	ROM_LOAD( "27.27",     0x20000, 0x10000, CRC(62970304) SHA1(57606bedfd83429629593bbea50fb25db1f2d874) )
+	ROM_LOAD( "28.28",     0x30000, 0x10000, CRC(e018459f) SHA1(136ce96523988173425fa791742dab62ecaef5c9) )
+
+	ROM_REGION( 0x80000, "gfx4", 0 ) /* sprites */
+	ROM_LOAD( "15.15",     0x00000, 0x10000, CRC(84c03235) SHA1(3b5a8e24dd0aba1d1530d37685aaa46a35b0249a) )
+	ROM_LOAD( "16.16",     0x10000, 0x10000, CRC(eaa35477) SHA1(08763d7937a6fa76f6029974d5b909ba05c69d81) )
+	ROM_LOAD( "11.11",     0x20000, 0x10000, CRC(c9e6b57f) SHA1(9c12e0e7e25d48c7679ea65c3dfeaca9fdfdcbb3) )
+	ROM_LOAD( "12.12",     0x30000, 0x10000, CRC(317f7e4a) SHA1(7d20722e75d69ef4f408e1995a29338c452b63c9) )
+
+	ROM_LOAD( "13.13",     0x40000, 0x10000, CRC(0c063bec) SHA1(e9808d20dc9e450c6a880ca1d8383246aff1ab36) )
+	ROM_LOAD( "14.14",     0x50000, 0x10000, CRC(2ebf06d3) SHA1(6381f978c0e719bf80d2c16a8355a0892473720a) )
+	ROM_LOAD( "9.9",       0x60000, 0x10000, CRC(046f9d58) SHA1(a3078c13d27f365f900be3b55d1a917a8cd712f8) )
+	ROM_LOAD( "10.10",     0x70000, 0x10000, CRC(3d2d704e) SHA1(3dcf3dd8cc91c5629e014bc6e2ccce234cf549a5) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
+	ROM_LOAD( "8.8",     0x0000, 0x10000, CRC(b0e79b9f) SHA1(6613c41234b8305d8959d06d6b4e9127bfc5eebe) )
+ROM_END
 
 ROM_START( hippodrm )
 	ROM_REGION( 0x60000, "maincpu", 0 ) /* 4*64k for 68000 code */
@@ -3769,6 +3982,7 @@ GAME( 1988, robocop,    0,        robocop,    robocop,    dec0_state, empty_init
 GAME( 1988, robocopw,   robocop,  robocop,    robocop,    dec0_state, empty_init,      ROT0,   "Data East Corporation", "Robocop (World revision 3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, robocopj,   robocop,  robocop,    robocop,    dec0_state, empty_init,      ROT0,   "Data East Corporation", "Robocop (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, robocopu,   robocop,  robocop,    robocop,    dec0_state, empty_init,      ROT0,   "Data East USA",         "Robocop (US revision 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bandit,     0,        bandit,     bandit,     dec0_state, init_hbarrel,    ROT90,  "Data East USA",         "Bandit (US)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1988, robocopu0,  robocop,  robocop,    robocop,    dec0_state, empty_init,      ROT0,   "Data East USA",         "Robocop (US revision 0)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, hippodrm,   0,        hippodrm,   hippodrm,   dec0_state, init_hippodrm,   ROT0,   "Data East USA",         "Hippodrome (US)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, ffantasy,   hippodrm, hippodrm,   ffantasy,   dec0_state, init_hippodrm,   ROT0,   "Data East Corporation", "Fighting Fantasy (Japan revision 3)", MACHINE_SUPPORTS_SAVE )

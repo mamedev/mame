@@ -634,24 +634,24 @@ WRITE_LINE_MEMBER(vpoker_state::ptm_irq)
 	m_maincpu->set_input_line(M6809_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-MACHINE_CONFIG_START(vpoker_state::vpoker)
-
+void vpoker_state::vpoker(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vpoker_state, irq0_line_hold) //irq0 valid too
+	MC6809(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &vpoker_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(vpoker_state::irq0_line_hold));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 480-1, 0*8, 240-1)
-//  MCFG_SCREEN_VISIBLE_AREA(0*8, 512-1, 0*8, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(vpoker_state, screen_update_vpoker)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
+	screen.set_size(512, 256);
+	screen.set_visarea(0*8, 480-1, 0*8, 240-1);
+//  screen.set_visarea(0*8, 512-1, 0*8, 256-1);
+	screen.set_screen_update(FUNC(vpoker_state::screen_update_vpoker));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vpoker)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_vpoker);
 
 	PALETTE(config, m_palette, palette_device::GBR_3BIT);
 
@@ -663,7 +663,7 @@ MACHINE_CONFIG_START(vpoker_state::vpoker)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 //  AY8910(config, "aysnd", 8000000/4 /* guess */).add_route(ALL_OUTPUTS, "mono", 0.30);
-MACHINE_CONFIG_END
+}
 
 /***************************************************************************
 

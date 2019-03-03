@@ -422,7 +422,7 @@ void spbactn_state::spbactn(machine_config &config)
 	// actual blanking frequencies unknown, but should be close to NTSC
 	m_screen->set_raw(XTAL(22'656'000) / 2, 720, 0, 512, 262, 16, 240);
 #else
-	// MCFG_SCREEN_RAW_PARAMS breaks sprites; keeping this in for now
+	// set_raw breaks sprites; keeping this in for now
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(64*8, 32*8);

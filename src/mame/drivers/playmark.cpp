@@ -186,7 +186,7 @@ READ8_MEMBER(playmark_state::playmark_snd_command_r)
 	}
 	else if ((m_oki_control & 0x38) == 0x28)
 	{
-		data = (m_oki->read(space, 0) & 0x0f);
+		data = (m_oki->read() & 0x0f);
 //      logerror("PC$%03x PortB reading %02x from the OKI status port\n", m_maincpu->pcbase(), data);
 	}
 
@@ -238,7 +238,7 @@ WRITE8_MEMBER(playmark_state::playmark_snd_control_w)
 	if ((data & 0x38) == 0x18)
 	{
 //      logerror("PC$%03x Writing %02x to OKI1, PortC=%02x, Code=%02x\n",m_maincpu->pcbase(),m_oki_command,m_oki_control,m_snd_command);
-		m_oki->write(space, 0, m_oki_command);
+		m_oki->write(m_oki_command);
 	}
 }
 
@@ -254,7 +254,7 @@ WRITE8_MEMBER(playmark_state::hrdtimes_snd_control_w)
 	if ((data & 0x38) == 0x18)
 	{
 //      logerror("PC$%03x Writing %02x to OKI1, PortC=%02x, Code=%02x\n",m_maincpu->pcbase(),m_oki_command,m_oki_control,m_snd_command);
-		m_oki->write(space, 0, m_oki_command);
+		m_oki->write(m_oki_command);
 	}
 }
 

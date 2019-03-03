@@ -270,8 +270,8 @@ MACHINE_CONFIG_START(primo_state::primoa32)
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* snapshot/quickload */
-	MCFG_SNAPSHOT_ADD("snapshot", primo_state, primo, "pss", 0)
-	MCFG_QUICKLOAD_ADD("quickload", primo_state, primo, "pp", 0)
+	MCFG_SNAPSHOT_ADD("snapshot", primo_state, primo, "pss")
+	MCFG_QUICKLOAD_ADD("quickload", primo_state, primo, "pp")
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(primo_ptp_format);
@@ -279,13 +279,11 @@ MACHINE_CONFIG_START(primo_state::primoa32)
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED);
 
 	/* floppy from serial bus */
-	MCFG_CBM_IEC_ADD(nullptr)
+	cbm_iec_slot_device::add(config, m_iec, nullptr);
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot1", generic_plain_slot, nullptr)
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot2", generic_plain_slot, nullptr)
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
+	GENERIC_CARTSLOT(config, m_cart1, generic_plain_slot, nullptr, "bin,rom");
+	GENERIC_CARTSLOT(config, m_cart2, generic_plain_slot, nullptr, "bin,rom");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(primo_state::primoa48)

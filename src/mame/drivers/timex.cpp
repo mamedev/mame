@@ -695,21 +695,20 @@ GFXDECODE_END
 MACHINE_CONFIG_START(spectrum_state::ts2068)
 	spectrum_128(config);
 
-	MCFG_DEVICE_REPLACE("maincpu", Z80, XTAL(14'112'000)/4)        /* From Schematic; 3.528 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(ts2068_mem)
-	MCFG_DEVICE_IO_MAP(ts2068_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", spectrum_state,  spec_interrupt)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	Z80(config.replace(), m_maincpu, XTAL(14'112'000)/4);        /* From Schematic; 3.528 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &spectrum_state::ts2068_mem);
+	m_maincpu->set_addrmap(AS_IO, &spectrum_state::ts2068_io);
+	m_maincpu->set_vblank_int("screen", FUNC(spectrum_state::spec_interrupt));
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	MCFG_MACHINE_RESET_OVERRIDE(spectrum_state, ts2068 )
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(TS2068_SCREEN_WIDTH, TS2068_SCREEN_HEIGHT)
-	MCFG_SCREEN_VISIBLE_AREA(0, TS2068_SCREEN_WIDTH-1, 0, TS2068_SCREEN_HEIGHT-1)
-	MCFG_SCREEN_UPDATE_DRIVER(spectrum_state, screen_update_ts2068)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, spectrum_state, screen_vblank_timex))
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(TS2068_SCREEN_WIDTH, TS2068_SCREEN_HEIGHT);
+	m_screen->set_visarea(0, TS2068_SCREEN_WIDTH-1, 0, TS2068_SCREEN_HEIGHT-1);
+	m_screen->set_screen_update(FUNC(spectrum_state::screen_update_ts2068));
+	m_screen->screen_vblank().set(FUNC(spectrum_state::screen_vblank_timex));
 
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_ts2068);
 
@@ -724,41 +723,40 @@ MACHINE_CONFIG_START(spectrum_state::ts2068)
 	MCFG_GENERIC_LOAD(spectrum_state, timex_cart)
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "timex_dock")
+	SOFTWARE_LIST(config, "cart_list").set_original("timex_dock");
 
 	/* internal ram */
 	m_ram->set_default_size("48K");
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(spectrum_state::uk2086)
+void spectrum_state::uk2086(machine_config &config)
+{
 	ts2068(config);
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(50)
-MACHINE_CONFIG_END
+	m_screen->set_refresh_hz(50);
+}
 
 
-MACHINE_CONFIG_START(spectrum_state::tc2048)
+void spectrum_state::tc2048(machine_config &config)
+{
 	spectrum(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(tc2048_mem)
-	MCFG_DEVICE_IO_MAP(tc2048_io)
+	m_maincpu->set_addrmap(AS_PROGRAM, &spectrum_state::tc2048_mem);
+	m_maincpu->set_addrmap(AS_IO, &spectrum_state::tc2048_io);
 
 	MCFG_MACHINE_RESET_OVERRIDE(spectrum_state, tc2048 )
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(TS2068_SCREEN_WIDTH, SPEC_SCREEN_HEIGHT)
-	MCFG_SCREEN_VISIBLE_AREA(0, TS2068_SCREEN_WIDTH-1, 0, SPEC_SCREEN_HEIGHT-1)
-	MCFG_SCREEN_UPDATE_DRIVER(spectrum_state, screen_update_tc2048)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, spectrum_state, screen_vblank_timex))
+	m_screen->set_refresh_hz(50);
+	m_screen->set_size(TS2068_SCREEN_WIDTH, SPEC_SCREEN_HEIGHT);
+	m_screen->set_visarea(0, TS2068_SCREEN_WIDTH-1, 0, SPEC_SCREEN_HEIGHT-1);
+	m_screen->set_screen_update(FUNC(spectrum_state::screen_update_tc2048));
+	m_screen->screen_vblank().set(FUNC(spectrum_state::screen_vblank_timex));
 
 	MCFG_VIDEO_START_OVERRIDE(spectrum_state, spectrum_128 )
 
 	/* internal ram */
 	m_ram->set_default_size("48K");
-MACHINE_CONFIG_END
+}
 
 
 

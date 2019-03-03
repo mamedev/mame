@@ -29,6 +29,14 @@
 
 
 //**************************************************************************
+//  CONSTANTS / MACROS
+//**************************************************************************
+
+#define EXP_SLOT_TAG "exp"
+#define ZORROBUS_TAG "zorrobus"
+
+
+//**************************************************************************
 //  PRIVATE DEVICES
 //**************************************************************************
 
@@ -609,7 +617,7 @@ WRITE16_MEMBER( a500p_state::clock_w )
 READ8_MEMBER( cdtv_state::dmac_scsi_data_read )
 {
 	if (offset >= 0xb0 && offset <= 0xbf)
-		return m_tpi->read(space, offset);
+		return m_tpi->read(offset);
 
 	return 0xff;
 }
@@ -617,7 +625,7 @@ READ8_MEMBER( cdtv_state::dmac_scsi_data_read )
 WRITE8_MEMBER( cdtv_state::dmac_scsi_data_write )
 {
 	if (offset >= 0xb0 && offset <= 0xbf)
-		m_tpi->write(space, offset, data);
+		m_tpi->write(offset, data);
 }
 
 READ8_MEMBER( cdtv_state::dmac_io_read )
@@ -1152,7 +1160,7 @@ WRITE8_MEMBER( cd32_state::akiko_cia_0_port_a_write )
 	// bit 1, power led
 	m_power_led = BIT(~data, 1);
 
-	handle_joystick_cia(data, m_cia_0->read(space, 2));
+	handle_joystick_cia(data, m_cia_0->read(2));
 }
 
 
@@ -1597,14 +1605,10 @@ MACHINE_CONFIG_START(amiga_state::amiga_base)
 	m_fdc->write_dma_callback().set(FUNC(amiga_state::chip_ram_w));
 	m_fdc->dskblk_callback().set(FUNC(amiga_state::fdc_dskblk_w));
 	m_fdc->dsksyn_callback().set(FUNC(amiga_state::fdc_dsksyn_w));
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", amiga_floppies, "35dd", amiga_fdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", amiga_floppies, nullptr, amiga_fdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:2", amiga_floppies, nullptr, amiga_fdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:3", amiga_floppies, nullptr, amiga_fdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, "fdc:0", amiga_floppies, "35dd", amiga_fdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", amiga_floppies, nullptr, amiga_fdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:2", amiga_floppies, nullptr, amiga_fdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:3", amiga_floppies, nullptr, amiga_fdc_device::floppy_formats).enable_sound(true);
 
 	// rs232
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
@@ -1615,19 +1619,21 @@ MACHINE_CONFIG_START(amiga_state::amiga_base)
 	rs232.cts_handler().set(FUNC(amiga_state::rs232_cts_w));
 
 	// centronics
-	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, amiga_state, centronics_ack_w))
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, amiga_state, centronics_busy_w))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, amiga_state, centronics_perror_w))
-	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(*this, amiga_state, centronics_select_w))
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->ack_handler().set(FUNC(amiga_state::centronics_ack_w));
+	m_centronics->busy_handler().set(FUNC(amiga_state::centronics_busy_w));
+	m_centronics->perror_handler().set(FUNC(amiga_state::centronics_perror_w));
+	m_centronics->select_handler().set(FUNC(amiga_state::centronics_select_w));
+
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
 
 	// software
-	MCFG_SOFTWARE_LIST_ADD("wb_list", "amiga_workbench")
-	MCFG_SOFTWARE_LIST_ADD("hardware_list", "amiga_hardware")
-	MCFG_SOFTWARE_LIST_ADD("apps_list", "amiga_apps")
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "amiga_flop")
-	MCFG_SOFTWARE_LIST_ADD("ocs_list", "amigaocs_flop")
+	SOFTWARE_LIST(config, "wb_list").set_original("amiga_workbench");
+	SOFTWARE_LIST(config, "hardware_list").set_original("amiga_hardware");
+	SOFTWARE_LIST(config, "apps_list").set_original("amiga_apps");
+	SOFTWARE_LIST(config, "flop_list").set_original("amiga_flop");
+	SOFTWARE_LIST(config, "ocs_list").set_original("amigaocs_flop");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(a1000_state::a1000)
@@ -1649,7 +1655,7 @@ MACHINE_CONFIG_START(a1000_state::a1000)
 	ADDRESS_MAP_BANK(config, "overlay").set_map(&a1000_state::a1000_overlay_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
 	ADDRESS_MAP_BANK(config, "bootrom").set_map(&a1000_state::a1000_bootrom_map).set_options(ENDIANNESS_BIG, 16, 19, 0x40000);
 
-	MCFG_SOFTWARE_LIST_ADD("a1000_list", "amiga_a1000")
+	SOFTWARE_LIST(config, "a1000_list").set_original("amiga_a1000");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(a1000_state::a1000n)
@@ -1657,7 +1663,7 @@ MACHINE_CONFIG_START(a1000_state::a1000n)
 
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_NTSC)
-	MCFG_DEVICE_REMOVE("screen")
+	config.device_remove("screen");
 	ntsc_video(config);
 	MCFG_DEVICE_MODIFY("amiga")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_C1_NTSC)
@@ -1689,17 +1695,19 @@ MACHINE_CONFIG_START(a2000_state::a2000)
 	MSM6242(config, m_rtc, XTAL(32'768));
 
 	// cpu slot
-	MCFG_EXPANSION_SLOT_ADD("maincpu", a2000_expansion_cards, nullptr)
+	EXP_SLOT(config, EXP_SLOT_TAG, 0).set_space(m_maincpu, AS_PROGRAM);
+	ZORRO_SLOT(config, "slot", EXP_SLOT_TAG, a2000_expansion_cards, nullptr);
 
 	// zorro slots
-	MCFG_ZORRO2_ADD("maincpu")
-	MCFG_ZORRO2_INT2_HANDLER(WRITELINE(*this, a2000_state, zorro2_int2_w))
-	MCFG_ZORRO2_INT6_HANDLER(WRITELINE(*this, a2000_state, zorro2_int6_w))
-	MCFG_ZORRO2_SLOT_ADD("zorro1", zorro2_cards, nullptr)
-	MCFG_ZORRO2_SLOT_ADD("zorro2", zorro2_cards, nullptr)
-	MCFG_ZORRO2_SLOT_ADD("zorro3", zorro2_cards, nullptr)
-	MCFG_ZORRO2_SLOT_ADD("zorro4", zorro2_cards, nullptr)
-	MCFG_ZORRO2_SLOT_ADD("zorro5", zorro2_cards, nullptr)
+	ZORRO2(config, m_zorro, 0);
+	m_zorro->set_space(m_maincpu, AS_PROGRAM);
+	m_zorro->int2_handler().set(FUNC(a2000_state::zorro2_int2_w));
+	m_zorro->int6_handler().set(FUNC(a2000_state::zorro2_int6_w));
+	ZORRO_SLOT(config, "zorro1", m_zorro, zorro2_cards, nullptr);
+	ZORRO_SLOT(config, "zorro2", m_zorro, zorro2_cards, nullptr);
+	ZORRO_SLOT(config, "zorro3", m_zorro, zorro2_cards, nullptr);
+	ZORRO_SLOT(config, "zorro4", m_zorro, zorro2_cards, nullptr);
+	ZORRO_SLOT(config, "zorro5", m_zorro, zorro2_cards, nullptr);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(a2000_state::a2000n)
@@ -1707,7 +1715,7 @@ MACHINE_CONFIG_START(a2000_state::a2000n)
 
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_NTSC)
-	MCFG_DEVICE_REMOVE("screen")
+	config.device_remove("screen");
 	ntsc_video(config);
 	MCFG_DEVICE_MODIFY("amiga")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_C1_NTSC)
@@ -1733,16 +1741,17 @@ MACHINE_CONFIG_START(a500_state::a500)
 	ADDRESS_MAP_BANK(config, "overlay").set_map(&amiga_state::overlay_1mb_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
 
 	// cpu slot
-	MCFG_EXPANSION_SLOT_ADD("maincpu", a500_expansion_cards, nullptr)
-	MCFG_EXPANSION_SLOT_INT2_HANDLER(WRITELINE(*this, a500_state, side_int2_w))
-	MCFG_EXPANSION_SLOT_INT6_HANDLER(WRITELINE(*this, a500_state, side_int6_w))
+	EXP_SLOT(config, m_side, 0).set_space(m_maincpu, AS_PROGRAM);
+	m_side->int2_handler().set(FUNC(a500_state::side_int2_w));
+	m_side->int6_handler().set(FUNC(a500_state::side_int6_w));
+	ZORRO_SLOT(config, "slot", m_side, a500_expansion_cards, nullptr);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(a500_state::a500n)
 	a500(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_NTSC)
-	MCFG_DEVICE_REMOVE("screen")
+	config.device_remove("screen");
 	ntsc_video(config);
 	MCFG_DEVICE_MODIFY("amiga")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_C1_NTSC)
@@ -1812,14 +1821,14 @@ MACHINE_CONFIG_START(cdtv_state::cdtv)
 	m_cdrom->dten_handler().set("u36", FUNC(amiga_dmac_device::xdreq_w));
 
 	// software
-	MCFG_SOFTWARE_LIST_ADD("cd_list", "cdtv")
+	SOFTWARE_LIST(config, "cd_list").set_original("cdtv");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cdtv_state::cdtvn)
 	cdtv(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_NTSC)
-	MCFG_DEVICE_REMOVE("screen")
+	config.device_remove("screen");
 	ntsc_video(config);
 	MCFG_DEVICE_MODIFY("amiga")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_C1_NTSC)
@@ -1851,13 +1860,13 @@ MACHINE_CONFIG_START(a3000_state::a3000)
 	// todo: zorro3 slots, super dmac, scsi
 
 	// software
-	MCFG_SOFTWARE_LIST_ADD("a3000_list", "amiga_a3000")
-	MCFG_SOFTWARE_LIST_ADD("ecs_list", "amigaecs_flop")
+	SOFTWARE_LIST(config, "a3000_list").set_original("amiga_a3000");
+	SOFTWARE_LIST(config, "ecs_list").set_original("amigaecs_flop");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(a3000_state::a3000n)
 	a3000(config);
-	MCFG_DEVICE_REMOVE("screen")
+	config.device_remove("screen");
 	ntsc_video(config);
 	m_cia_0->set_clock(amiga_state::CLK_E_NTSC);
 	m_cia_1->set_clock(amiga_state::CLK_E_NTSC);
@@ -1884,17 +1893,18 @@ MACHINE_CONFIG_START(a500p_state::a500p)
 	MSM6242(config, m_rtc, XTAL(32'768));
 
 	// cpu slot
-	MCFG_EXPANSION_SLOT_ADD("maincpu", a500_expansion_cards, nullptr)
+	EXP_SLOT(config, m_side, 0).set_space(m_maincpu, AS_PROGRAM);
+	ZORRO_SLOT(config, "slot", m_side, a500_expansion_cards, nullptr);
 
 	// software
-	MCFG_SOFTWARE_LIST_ADD("ecs_list", "amigaecs_flop")
+	SOFTWARE_LIST(config, "ecs_list").set_original("amigaecs_flop");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(a500p_state::a500pn)
 	a500p(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_NTSC)
-	MCFG_DEVICE_REMOVE("screen")
+	config.device_remove("screen");
 	ntsc_video(config);
 	MCFG_DEVICE_MODIFY("amiga")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_C1_NTSC)
@@ -1933,7 +1943,7 @@ MACHINE_CONFIG_START(a600_state::a600)
 	// todo: pcmcia
 
 	// software
-	MCFG_SOFTWARE_LIST_ADD("ecs_list", "amigaecs_flop")
+	SOFTWARE_LIST(config, "ecs_list").set_original("amigaecs_flop");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(a600_state::a600n)
@@ -1942,7 +1952,7 @@ MACHINE_CONFIG_START(a600_state::a600n)
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_NTSC)
 	MCFG_DEVICE_MODIFY("gayle")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_28M_NTSC / 2)
-	MCFG_DEVICE_REMOVE("screen")
+	config.device_remove("screen");
 	ntsc_video(config);
 	MCFG_DEVICE_MODIFY("amiga")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_C1_NTSC)
@@ -1971,7 +1981,7 @@ MACHINE_CONFIG_START(a1200_state::a1200)
 	MCFG_SCREEN_UPDATE_DRIVER(amiga_state, screen_update_amiga_aga)
 	MCFG_SCREEN_NO_PALETTE
 
-	MCFG_DEVICE_REMOVE("palette")
+	config.device_remove("palette");
 
 	MCFG_VIDEO_START_OVERRIDE(amiga_state, amiga_aga)
 
@@ -1995,8 +2005,8 @@ MACHINE_CONFIG_START(a1200_state::a1200)
 	// todo: pcmcia
 
 	// software
-	MCFG_SOFTWARE_LIST_ADD("aga_list", "amigaaga_flop")
-	MCFG_SOFTWARE_LIST_ADD("ecs_list", "amigaecs_flop")
+	SOFTWARE_LIST(config, "aga_list").set_original("amigaaga_flop");
+	SOFTWARE_LIST(config, "ecs_list").set_original("amigaecs_flop");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(a1200_state::a1200n)
@@ -2005,7 +2015,7 @@ MACHINE_CONFIG_START(a1200_state::a1200n)
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_28M_NTSC / 2)
 	MCFG_DEVICE_MODIFY("gayle")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_28M_NTSC / 2)
-	MCFG_DEVICE_REMOVE("screen")
+	config.device_remove("screen");
 	ntsc_video(config);
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(amiga_state, screen_update_amiga_aga)
@@ -2036,7 +2046,7 @@ MACHINE_CONFIG_START(a4000_state::a4000)
 	MCFG_SCREEN_UPDATE_DRIVER(amiga_state, screen_update_amiga_aga)
 	MCFG_SCREEN_NO_PALETTE
 
-	MCFG_DEVICE_REMOVE("palette")
+	config.device_remove("palette");
 
 	MCFG_VIDEO_START_OVERRIDE(amiga_state, amiga_aga)
 
@@ -2050,14 +2060,14 @@ MACHINE_CONFIG_START(a4000_state::a4000)
 	// todo: zorro3
 
 	// software
-	MCFG_SOFTWARE_LIST_ADD("aga_list", "amigaaga_flop")
-	MCFG_SOFTWARE_LIST_ADD("ecs_list", "amigaecs_flop")
+	SOFTWARE_LIST(config, "aga_list").set_original("amigaaga_flop");
+	SOFTWARE_LIST(config, "ecs_list").set_original("amigaecs_flop");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(a4000_state::a4000n)
 	a4000(config);
 
-	MCFG_DEVICE_REMOVE("screen")
+	config.device_remove("screen");
 	ntsc_video(config);
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(amiga_state, screen_update_amiga_aga)
@@ -2073,7 +2083,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(a4000_state::a400030)
 	a4000(config);
 	// main cpu
-	MCFG_DEVICE_REMOVE("maincpu")
+	config.device_remove("maincpu");
 	MCFG_DEVICE_ADD("maincpu", M68EC030, XTAL(50'000'000) / 2)
 	MCFG_DEVICE_PROGRAM_MAP(a400030_mem)
 
@@ -2082,7 +2092,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(a4000_state::a400030n)
 	a400030(config);
-	MCFG_DEVICE_REMOVE("screen")
+	config.device_remove("screen");
 	ntsc_video(config);
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(amiga_state, screen_update_amiga_aga)
@@ -2118,7 +2128,7 @@ MACHINE_CONFIG_START(cd32_state::cd32)
 	MCFG_SCREEN_UPDATE_DRIVER(amiga_state, screen_update_amiga_aga)
 	MCFG_SCREEN_NO_PALETTE
 
-	MCFG_DEVICE_REMOVE("palette")
+	config.device_remove("palette");
 
 	MCFG_VIDEO_START_OVERRIDE(amiga_state, amiga_aga)
 
@@ -2130,7 +2140,7 @@ MACHINE_CONFIG_START(cd32_state::cd32)
 	m_cia_0->sp_wr_callback().set_nop();
 
 	CDROM(config, "cdrom").set_interface("cd32_cdrom");
-	MCFG_SOFTWARE_LIST_ADD("cd_list", "cd32")
+	SOFTWARE_LIST(config, "cd_list").set_original("cd32");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cd32_state::cd32n)
@@ -2138,7 +2148,7 @@ MACHINE_CONFIG_START(cd32_state::cd32n)
 
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_28M_NTSC / 2)
-	MCFG_DEVICE_REMOVE("screen")
+	config.device_remove("screen");
 	ntsc_video(config);
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(amiga_state, screen_update_amiga_aga)
@@ -2154,7 +2164,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(a4000_state::a4000t)
 	a4000(config);
 	// main cpu
-	MCFG_DEVICE_REMOVE("maincpu")
+	config.device_remove("maincpu");
 	MCFG_DEVICE_ADD("maincpu", M68040, XTAL(50'000'000) / 2)
 	MCFG_DEVICE_PROGRAM_MAP(a4000t_mem)
 
@@ -2164,7 +2174,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(a4000_state::a4000tn)
 	a4000(config);
 
-	MCFG_DEVICE_REMOVE("screen")
+	config.device_remove("screen");
 	ntsc_video(config);
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(amiga_state, screen_update_amiga_aga)

@@ -319,7 +319,7 @@ MACHINE_CONFIG_START(mbc200_state::mbc200)
 	MCFG_SCREEN_SIZE(640, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", h46505_device, screen_update)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mbc200)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_mbc200);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	H46505(config, m_crtc, 8_MHz_XTAL / 4); // HD46505SP
@@ -347,17 +347,15 @@ MACHINE_CONFIG_START(mbc200_state::mbc200)
 	I8251(config, "uart2", 0); // INS8251A
 
 	MB8876(config, m_fdc, 8_MHz_XTAL / 8); // guess
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", mbc200_floppies, "qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", mbc200_floppies, "qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, "fdc:0", mbc200_floppies, "qd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", mbc200_floppies, "qd", floppy_image_device::default_floppy_formats).enable_sound(true);
 
 	/* Keyboard */
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
 	keyboard.set_keyboard_callback(FUNC(mbc200_state::kbd_put));
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "mbc200")
+	SOFTWARE_LIST(config, "flop_list").set_original("mbc200");
 MACHINE_CONFIG_END
 
 /* ROM definition */

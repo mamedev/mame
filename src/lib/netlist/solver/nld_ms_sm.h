@@ -35,9 +35,9 @@
 
 #include <algorithm>
 
-#include "nld_solver.h"
+#include "plib/vector_ops.h"
 #include "nld_matrix_solver.h"
-#include "vector_base.h"
+#include "nld_solver.h"
 
 namespace netlist
 {
@@ -51,29 +51,27 @@ class matrix_solver_sm_t: public matrix_solver_t
 
 public:
 
-	typedef FT float_ext_type;
-	typedef FT float_type;
+	using float_ext_type = FT;
+	using float_type = FT;
 	// FIXME: dirty hack to make this compile
 	static constexpr const std::size_t storage_N = 100;
 
-	matrix_solver_sm_t(netlist_base_t &anetlist, const pstring &name,
+	matrix_solver_sm_t(netlist_state_t &anetlist, const pstring &name,
 			const solver_parameters_t *params, const std::size_t size);
 
-	virtual ~matrix_solver_sm_t() override;
-
-	virtual void vsetup(analog_net_t::list_t &nets) override;
-	virtual void reset() override { matrix_solver_t::reset(); }
+	void vsetup(analog_net_t::list_t &nets) override;
+	void reset() override { matrix_solver_t::reset(); }
 
 protected:
-	virtual unsigned vsolve_non_dynamic(const bool newton_raphson) override;
+	unsigned vsolve_non_dynamic(const bool newton_raphson) override;
 	unsigned solve_non_dynamic(const bool newton_raphson);
 
-	constexpr std::size_t N() const { return m_dim; }
+	constexpr std::size_t size() const { return m_dim; }
 
 	void LE_invert();
 
 	template <typename T>
-	void LE_compute_x(T * RESTRICT x);
+	void LE_compute_x(T * x);
 
 
 	template <typename T1, typename T2>
@@ -90,8 +88,6 @@ protected:
 	float_ext_type &lA(const T1 &r, const T2 &c) { return m_lA[r][c]; }
 	template <typename T1, typename T2>
 	float_ext_type &lAinv(const T1 &r, const T2 &c) { return m_lAinv[r][c]; }
-
-	float_type m_last_RHS[storage_N]; // right hand side - contains currents
 
 private:
 	static constexpr std::size_t m_pitch  = (((  storage_N) + 7) / 8) * 8;
@@ -115,19 +111,13 @@ private:
 // ----------------------------------------------------------------------------------------
 
 template <typename FT, int SIZE>
-matrix_solver_sm_t<FT, SIZE>::~matrix_solver_sm_t()
-{
-}
-
-template <typename FT, int SIZE>
 void matrix_solver_sm_t<FT, SIZE>::vsetup(analog_net_t::list_t &nets)
 {
 	matrix_solver_t::setup_base(nets);
 
-	state().save(*this, m_last_RHS, "m_last_RHS");
-
-	for (unsigned k = 0; k < N(); k++)
-		state().save(*this, RHS(k), plib::pfmt("RHS.{1}")(k));
+	/* FIXME: Shouldn't be necessary */
+	for (std::size_t k = 0; k < size(); k++)
+		state().save(*this, RHS(k), this->name(), plib::pfmt("RHS.{1}")(k));
 }
 
 
@@ -135,7 +125,7 @@ void matrix_solver_sm_t<FT, SIZE>::vsetup(analog_net_t::list_t &nets)
 template <typename FT, int SIZE>
 void matrix_solver_sm_t<FT, SIZE>::LE_invert()
 {
-	const std::size_t kN = N();
+	const std::size_t kN = size();
 
 	for (std::size_t i = 0; i < kN; i++)
 	{
@@ -151,12 +141,12 @@ void matrix_solver_sm_t<FT, SIZE>::LE_invert()
 	{
 		/* FIXME: Singular matrix? */
 		const float_type f = 1.0 / W(i,i);
-		const auto * RESTRICT const p = m_terms[i]->m_nzrd.data();
+		const auto * const p = m_terms[i]->m_nzrd.data();
 		const std::size_t e = m_terms[i]->m_nzrd.size();
 
 		/* Eliminate column i from row j */
 
-		const auto * RESTRICT const pb = m_terms[i]->m_nzbd.data();
+		const auto * const pb = m_terms[i]->m_nzbd.data();
 		const std::size_t eb = m_terms[i]->m_nzbd.size();
 		for (std::size_t jb = 0; jb < eb; jb++)
 		{
@@ -198,9 +188,9 @@ void matrix_solver_sm_t<FT, SIZE>::LE_invert()
 template <typename FT, int SIZE>
 template <typename T>
 void matrix_solver_sm_t<FT, SIZE>::LE_compute_x(
-		T * RESTRICT x)
+		T * x)
 {
-	const std::size_t kN = N();
+	const std::size_t kN = size();
 
 	for (std::size_t i=0; i<kN; i++)
 		x[i] = 0.0;
@@ -219,7 +209,7 @@ template <typename FT, int SIZE>
 unsigned matrix_solver_sm_t<FT, SIZE>::solve_non_dynamic(const bool newton_raphson)
 {
 	static constexpr const bool incremental = true;
-	const std::size_t iN = N();
+	const std::size_t iN = size();
 
 	float_type new_V[storage_N]; // = { 0.0 };
 
@@ -301,24 +291,17 @@ unsigned matrix_solver_sm_t<FT, SIZE>::vsolve_non_dynamic(const bool newton_raph
 	this->build_LE_A(*this);
 	this->build_LE_RHS(*this);
 
-	for (std::size_t i=0, iN=N(); i < iN; i++)
-		m_last_RHS[i] = RHS(i);
-
 	this->m_stat_calculations++;
 	return this->solve_non_dynamic(newton_raphson);
 }
 
 template <typename FT, int SIZE>
-matrix_solver_sm_t<FT, SIZE>::matrix_solver_sm_t(netlist_base_t &anetlist, const pstring &name,
+matrix_solver_sm_t<FT, SIZE>::matrix_solver_sm_t(netlist_state_t &anetlist, const pstring &name,
 		const solver_parameters_t *params, const std::size_t size)
 : matrix_solver_t(anetlist, name, NOSORT, params)
 , m_dim(size)
 , m_cnt(0)
 {
-	for (std::size_t k = 0; k < N(); k++)
-	{
-		m_last_RHS[k] = 0.0;
-	}
 }
 
 	} //namespace devices

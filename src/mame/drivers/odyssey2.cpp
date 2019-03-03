@@ -673,11 +673,12 @@ GFXDECODE_END
 
 
 
-MACHINE_CONFIG_START(odyssey2_state::odyssey2_cartslot)
-	MCFG_O2_CARTRIDGE_ADD("cartslot", o2_cart, nullptr)
+void odyssey2_state::odyssey2_cartslot(machine_config &config)
+{
+	O2_CART_SLOT(config, m_cart, o2_cart, nullptr);
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list","odyssey2")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_original("odyssey2");
+}
 
 
 MACHINE_CONFIG_START(odyssey2_state::odyssey2)
@@ -694,7 +695,7 @@ MACHINE_CONFIG_START(odyssey2_state::odyssey2)
 	m_maincpu->t0_in_cb().set("cartslot", FUNC(o2_cart_slot_device::t0_read));
 	m_maincpu->t1_in_cb().set(FUNC(odyssey2_state::t1_read));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -722,7 +723,7 @@ MACHINE_CONFIG_START(odyssey2_state::videopac)
 	m_maincpu->set_addrmap(AS_PROGRAM, &odyssey2_state::odyssey2_mem);
 	m_maincpu->set_addrmap(AS_IO, &odyssey2_state::odyssey2_io);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -759,7 +760,7 @@ MACHINE_CONFIG_START(g7400_state::g7400)
 	m_maincpu->t1_in_cb().set(FUNC(g7400_state::t1_read));
 	m_maincpu->prog_out_cb().set(m_i8243, FUNC(i8243_device::prog_w));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -785,9 +786,8 @@ MACHINE_CONFIG_START(g7400_state::g7400)
 	m_i8244->add_route(ALL_OUTPUTS, "mono", 0.40);
 
 	odyssey2_cartslot(config);
-	MCFG_DEVICE_REMOVE("cart_list")
-	MCFG_SOFTWARE_LIST_ADD("cart_list","g7400")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("ody2_list","odyssey2")
+	SOFTWARE_LIST(config.replace(), "cart_list").set_original("g7400");
+	SOFTWARE_LIST(config, "ody2_list").set_compatible("odyssey2");
 MACHINE_CONFIG_END
 
 
@@ -806,7 +806,7 @@ MACHINE_CONFIG_START(g7400_state::odyssey3)
 	m_maincpu->t1_in_cb().set(FUNC(g7400_state::t1_read));
 	m_maincpu->prog_out_cb().set(m_i8243, FUNC(i8243_device::prog_w));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -832,9 +832,8 @@ MACHINE_CONFIG_START(g7400_state::odyssey3)
 	m_i8244->add_route(ALL_OUTPUTS, "mono", 0.40);
 
 	odyssey2_cartslot(config);
-	MCFG_DEVICE_REMOVE("cart_list")
-	MCFG_SOFTWARE_LIST_ADD("cart_list","g7400")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("ody2_list","odyssey2")
+	SOFTWARE_LIST(config.replace(), "cart_list").set_original("g7400");
+	SOFTWARE_LIST(config, "ody2_list").set_compatible("odyssey2");
 MACHINE_CONFIG_END
 
 

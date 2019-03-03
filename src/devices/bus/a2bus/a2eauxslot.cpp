@@ -70,11 +70,10 @@ a2eauxslot_device::a2eauxslot_device(const machine_config &mconfig, const char *
 
 a2eauxslot_device::a2eauxslot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, m_maincpu(nullptr)
+	, m_maincpu(*this, finder_base::DUMMY_TAG)
 	, m_out_irq_cb(*this)
 	, m_out_nmi_cb(*this)
 	, m_device(nullptr)
-	, m_cputag(nullptr)
 {
 }
 //-------------------------------------------------
@@ -83,8 +82,6 @@ a2eauxslot_device::a2eauxslot_device(const machine_config &mconfig, device_type 
 
 void a2eauxslot_device::device_start()
 {
-	m_maincpu = machine().device<cpu_device>(m_cputag);
-
 	// resolve callbacks
 	m_out_irq_cb.resolve_safe();
 	m_out_nmi_cb.resolve_safe();

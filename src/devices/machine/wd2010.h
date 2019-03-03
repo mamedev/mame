@@ -40,8 +40,8 @@ public:
 	auto in_tk000_callback() { return m_in_tk000_cb.bind(); }
 	auto in_sc_callback() { return m_in_sc_cb.bind(); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 	void buffer_ready(bool state);
 

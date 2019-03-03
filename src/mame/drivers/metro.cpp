@@ -367,7 +367,7 @@ WRITE8_MEMBER(metro_state::upd7810_portb_w)
 	{
 		if (!BIT(data, 2))
 		{
-			downcast<ym2413_device *>(m_ymsnd.target())->write(space, BIT(data, 1), m_porta);
+			downcast<ym2413_device *>(m_ymsnd.target())->write(BIT(data, 1), m_porta);
 		}
 		m_portb = data;
 		return;
@@ -377,7 +377,7 @@ WRITE8_MEMBER(metro_state::upd7810_portb_w)
 	{
 		/* write */
 		if (!BIT(data, 4))
-			m_oki->write(space, 0, m_porta);
+			m_oki->write(m_porta);
 	}
 
 	m_portb = data;
@@ -409,13 +409,13 @@ WRITE8_MEMBER(metro_state::daitorid_portb_w)
 		if (!BIT(data, 2))
 		{
 			/* write */
-			downcast<ym2151_device *>(m_ymsnd.target())->write(space, BIT(data, 1), m_porta);
+			downcast<ym2151_device *>(m_ymsnd.target())->write(BIT(data, 1), m_porta);
 		}
 
 		if (!BIT(data, 3))
 		{
 			/* read */
-			m_porta = downcast<ym2151_device *>(m_ymsnd.target())->read(space, BIT(data, 1));
+			m_porta = downcast<ym2151_device *>(m_ymsnd.target())->read(BIT(data, 1));
 		}
 
 		m_portb = data;
@@ -426,14 +426,14 @@ WRITE8_MEMBER(metro_state::daitorid_portb_w)
 	{
 		/* write */
 		if (!BIT(data, 4))
-			m_oki->write(space, 0, m_porta);
+			m_oki->write(m_porta);
 	}
 
 	if (BIT(m_portb, 3) && !BIT(data, 3))   /* clock 1->0 */
 	{
 		/* read */
 		if (!BIT(data, 4))
-			m_porta = m_oki->read(space, 0);
+			m_porta = m_oki->read();
 	}
 
 	m_portb = data;

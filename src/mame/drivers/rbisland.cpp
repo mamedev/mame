@@ -672,7 +672,7 @@ MACHINE_CONFIG_START(rbisland_state::rbisland)
 
 	TIMER(config, m_cchip_irq_clear).configure_generic(FUNC(rbisland_state::cchip_irq_clear_cb));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
+	config.m_minimum_quantum = attotime::from_hz(600);   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -720,7 +720,7 @@ MACHINE_CONFIG_START(rbisland_state::jumping)
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(24'000'000)/4) /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(jumping_sound_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - enough unless otherwise */
+	config.m_minimum_quantum = attotime::from_hz(600);   /* 10 CPU slices per frame - enough unless otherwise */
 
 
 	/* video hardware */

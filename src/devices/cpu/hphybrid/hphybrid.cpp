@@ -175,6 +175,8 @@ uint8_t hp_hybrid_cpu_device::pa_r() const
 hp_hybrid_cpu_device::hp_hybrid_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t addrwidth)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_pa_changed_func(*this)
+	, m_opcode_func(*this)
+	, m_stm_func(*this)
 	, m_addr_mask((1U << addrwidth) - 1)
 	, m_relative_mode(true)
 	, m_r_cycles(DEF_MEM_R_CYCLES)
@@ -241,6 +243,8 @@ void hp_hybrid_cpu_device::device_start()
 	set_icountptr(m_icount);
 
 	m_pa_changed_func.resolve_safe();
+	m_opcode_func.resolve_safe();
+	m_stm_func.resolve();
 }
 
 void hp_hybrid_cpu_device::device_reset()
@@ -260,6 +264,7 @@ void hp_hybrid_cpu_device::device_reset()
 	m_dmapa = 0;
 	m_dmama = 0;
 	m_dmac = 0;
+	m_curr_cycle = 0;
 	m_forced_bsc_25 = m_boot_mode;
 
 	m_last_pa = ~0;
@@ -312,7 +317,7 @@ uint16_t hp_hybrid_cpu_device::execute_one(uint16_t opcode)
 		}
 		// Indirect addressing in EXE instruction seems to use AEC case A instead of case C
 		// (because it's an opcode fetch)
-		return RM(add_mae(AEC_CASE_A , fetch_addr));
+		return fetch_at(add_mae(AEC_CASE_A , fetch_addr));
 	} else {
 		uint16_t next_P;
 		if (!execute_one_bpc(opcode , next_P) &&
@@ -952,6 +957,11 @@ uint16_t hp_hybrid_cpu_device::RM(uint32_t addr)
 		// Any access to internal registers removes forcing of BSC 2x
 		m_forced_bsc_25 = false;
 
+		if (m_stm_func) {
+			m_stm_func(m_curr_cycle | CYCLE_RAL_MASK | CYCLE_RD_MASK);
+			m_curr_cycle = 0;
+		}
+
 		// Memory mapped BPC registers
 		uint16_t tmp;
 		switch (addr_wo_bsc) {
@@ -1016,6 +1026,10 @@ uint16_t hp_hybrid_cpu_device::RM(uint32_t addr)
 		return tmp;
 	} else {
 		m_icount -= m_r_cycles;
+		if (m_stm_func) {
+			m_stm_func(m_curr_cycle | CYCLE_RD_MASK);
+			m_curr_cycle = 0;
+		}
 		return m_cache->read_word(addr);
 	}
 }
@@ -1064,6 +1078,11 @@ void hp_hybrid_cpu_device::WM(uint32_t addr , uint16_t v)
 	if (addr_wo_bsc <= HP_REG_LAST_ADDR) {
 		// Any access to internal registers removes forcing of BSC 2x
 		m_forced_bsc_25 = false;
+
+		if (m_stm_func) {
+			m_stm_func(m_curr_cycle | CYCLE_RAL_MASK | CYCLE_WR_MASK);
+			m_curr_cycle = 0;
+		}
 
 		// Memory mapped BPC registers
 		switch (addr_wo_bsc) {
@@ -1130,6 +1149,10 @@ void hp_hybrid_cpu_device::WM(uint32_t addr , uint16_t v)
 		m_icount -= REGISTER_RW_CYCLES;
 	} else {
 		m_icount -= m_w_cycles;
+		if (m_stm_func) {
+			m_stm_func(m_curr_cycle | CYCLE_WR_MASK);
+			m_curr_cycle = 0;
+		}
 		m_program->write_word(addr , v);
 	}
 }
@@ -1168,7 +1191,15 @@ bool hp_hybrid_cpu_device::write_emc_reg(uint16_t addr , uint16_t v)
 uint16_t hp_hybrid_cpu_device::fetch()
 {
 	m_genpc = add_mae(AEC_CASE_A , m_reg_P);
-	return RM(m_genpc);
+	return fetch_at(m_genpc);
+}
+
+uint16_t hp_hybrid_cpu_device::fetch_at(uint32_t addr)
+{
+	m_curr_cycle |= CYCLE_IFETCH_MASK;
+	uint16_t opcode = RM(addr);
+	m_opcode_func(opcode);
+	return opcode;
 }
 
 uint16_t hp_hybrid_cpu_device::get_indirect_target(uint32_t addr)
@@ -1586,6 +1617,10 @@ bool hp_5061_3011_cpu_device::execute_no_bpc(uint16_t opcode , uint16_t& next_pc
 					// 16 bits units.
 					WM(tmp_addr >> 1 , tmp);
 				} else {
+					if (m_stm_func) {
+						m_stm_func(m_curr_cycle | CYCLE_WR_MASK);
+						m_curr_cycle = 0;
+					}
 					// Extend address, form byte address
 					uint16_t mask = BIT(tmp_addr , 0) ? 0x00ff : 0xff00;
 					tmp_addr = add_mae(AEC_CASE_C , tmp_addr >> 1);
@@ -1674,6 +1709,7 @@ void hp_5061_3011_cpu_device::handle_dma()
 	bool tc = BIT(--m_dmac , 15) != 0;
 	uint16_t tmp;
 
+	m_curr_cycle |= CYCLE_DMA_MASK;
 	// Timing here assumes that DMA transfers are isolated and not done in bursts
 	if (BIT(m_flags , HPHYBRID_DMADIR_BIT)) {
 		// "Outward" DMA: memory -> peripheral
@@ -1955,6 +1991,10 @@ bool hp_09825_67907_cpu_device::execute_no_bpc(uint16_t opcode , uint16_t& next_
 					// 16 bits units.
 					WM(tmp_addr , tmp);
 				} else {
+					if (m_stm_func) {
+						m_stm_func(m_curr_cycle | CYCLE_WR_MASK);
+						m_curr_cycle = 0;
+					}
 					uint16_t mask = BIT(*ptr_reg , 15) ? 0xff00 : 0x00ff;
 					m_program->write_word(tmp_addr , tmp , mask);
 					m_icount -= m_w_cycles;
@@ -2037,6 +2077,7 @@ void hp_09825_67907_cpu_device::handle_dma()
 	uint16_t tmp;
 
 	// Timing here assumes that DMA transfers are isolated and not done in bursts
+	m_curr_cycle |= CYCLE_DMA_MASK;
 	if (BIT(m_dmama , 15)) {
 		// "Outward" DMA: memory -> peripheral
 		tmp = RM(AEC_CASE_D , m_dmama);

@@ -29,12 +29,12 @@ msx_cart_fmpac_device::msx_cart_fmpac_device(const machine_config &mconfig, cons
 }
 
 
-MACHINE_CONFIG_START(msx_cart_fmpac_device::device_add_mconfig)
+void msx_cart_fmpac_device::device_add_mconfig(machine_config &config)
+{
 	// This is actually incorrect. The sound output is passed back into the MSX machine where it is mixed internally and output through the system 'speaker'.
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ym2413", YM2413, XTAL(10'738'635)/3)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-MACHINE_CONFIG_END
+	YM2413(config, m_ym2413, XTAL(10'738'635)/3).add_route(ALL_OUTPUTS, "mono", 0.40);
+}
 
 
 void msx_cart_fmpac_device::device_start()
@@ -141,7 +141,7 @@ WRITE8_MEMBER(msx_cart_fmpac_device::write_cart)
 		case 0x7ff5:
 			if (m_opll_active)
 			{
-				m_ym2413->write(space, offset & 1, data);
+				m_ym2413->write(offset & 1, data);
 			}
 			break;
 
@@ -163,6 +163,6 @@ WRITE8_MEMBER(msx_cart_fmpac_device::write_ym2413)
 {
 	if (m_opll_active)
 	{
-		m_ym2413->write(space, offset & 1, data);
+		m_ym2413->write(offset & 1, data);
 	}
 }

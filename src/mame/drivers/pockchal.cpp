@@ -92,7 +92,7 @@ void pockchalv1_state::machine_start()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	if (m_cart->exists())
-		space.install_read_handler(0x0000, 0x7fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+		space.install_read_handler(0x0000, 0x7fff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 }
 
 void pockchalv1_state::machine_reset()
@@ -124,7 +124,7 @@ MACHINE_CONFIG_START(pockchalv1_state::pockchalv1)
 	MCFG_GENERIC_LOAD(pockchalv1_state, pockchalv1_cart)
 	MCFG_GENERIC_MANDATORY
 
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("pc1_list","pockchalw")
+	SOFTWARE_LIST(config, "pc1_list").set_compatible("pockchalw");
 
 MACHINE_CONFIG_END
 

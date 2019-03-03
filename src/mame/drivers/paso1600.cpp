@@ -188,23 +188,23 @@ WRITE8_MEMBER( paso1600_state::paso1600_pcg_w )
 WRITE8_MEMBER( paso1600_state::paso1600_6845_address_w )
 {
 	m_crtc_index = data;
-	m_crtc->address_w(space, offset, data);
+	m_crtc->address_w(data);
 }
 
 WRITE8_MEMBER( paso1600_state::paso1600_6845_data_w )
 {
 	m_crtc_vreg[m_crtc_index] = data;
-	m_crtc->register_w(space, offset, data);
+	m_crtc->register_w(data);
 }
 
 READ8_MEMBER( paso1600_state::paso1600_6845_data_r )
 {
-	return m_crtc->register_r(space, offset);
+	return m_crtc->register_r();
 }
 
 READ8_MEMBER( paso1600_state::paso1600_6845_status_r )
 {
-	return m_crtc->status_r(space, offset);
+	return m_crtc->status_r();
 }
 
 READ8_MEMBER( paso1600_state::key_r )
@@ -320,7 +320,7 @@ MACHINE_CONFIG_START(paso1600_state::paso1600)
 	MCFG_SCREEN_UPDATE_DRIVER(paso1600_state, screen_update_paso1600)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_paso1600)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_paso1600);
 	MCFG_PALETTE_ADD("palette", 8)
 //  MCFG_PALETTE_INIT(black_and_white)
 
