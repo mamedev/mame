@@ -161,8 +161,6 @@
 #define CLK_28 1
 #define CLK_114 2
 
-static const int clock_divisors[3] = {1, DIV_64, DIV_15};
-
 constexpr unsigned pokey_device::FREQ_17_EXACT;
 
 
@@ -566,23 +564,10 @@ void pokey_device::step_pot()
 
 void pokey_device::step_one_clock(void)
 {
-	int const base_clock = (m_AUDCTL & CLK_15KHZ) ? CLK_114 : CLK_28;
-
+	/* Clocks only count if we are not in a reset */
 	if (m_SKCTL & SK_RESET)
 	{
-		/* Clocks only count if we are not in a reset */
-		int clock_triggered[3] = {0,0,0};
-		int clk;
-		for (clk = 0; clk < 3; clk++)
-		{
-			m_clock_cnt[clk]++;
-			if (m_clock_cnt[clk] >= clock_divisors[clk])
-			{
-				m_clock_cnt[clk] = 0;
-				clock_triggered[clk] = 1;
-			}
-		}
-
+		/* polynom pointers */
 		if (++m_p4 == 0x0000f)
 			m_p4 = 0;
 		if (++m_p5 == 0x0001f)
@@ -592,7 +577,23 @@ void pokey_device::step_one_clock(void)
 		if (++m_p17 == 0x1ffff)
 			m_p17 = 0;
 
-		clk = (m_AUDCTL & CH1_HICLK) ? CLK_1 : base_clock;
+		/* CLK_1: no presacler */
+		int clock_triggered[3] = {1,0,0};
+		/* CLK_28: prescaler 63.9211 kHz */
+		if (++m_clock_cnt[CLK_28] >= DIV_64)
+		{
+			m_clock_cnt[CLK_28] = 0;
+			clock_triggered[CLK_28] = 1;
+		}
+		/* CLK_114 prescaler 15.6999 kHz */
+		if (++m_clock_cnt[CLK_114] >= DIV_15)
+		{
+			m_clock_cnt[CLK_114] = 0;
+			clock_triggered[CLK_114] = 1;
+		}
+
+		int const base_clock = (m_AUDCTL & CLK_15KHZ) ? CLK_114 : CLK_28;
+		int clk = (m_AUDCTL & CH1_HICLK) ? CLK_1 : base_clock;
 		if (clock_triggered[clk])
 			m_channel[CHAN1].inc_chan();
 
