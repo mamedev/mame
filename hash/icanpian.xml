@@ -1,5 +1,25 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!--
+    Known cartridges (*=dumped)
+	there could be more
+
+    *Piano Favourites
+	Jammin Jungle Safari (Disney The Lion King, Disney The Jungle Book, Disney Tarzan)
+	Jungle Boogie
+	Scooby-Doo! Monster Mayhem
+	Rockin' Dance Party
+	Nicktoons Show Tunes
+	Holiday Wonderland
+	Barbie Princess Enchanted Sounds
+	Pop Hits
+	Dora the Explorer Musical Adventure
+	American Idol - Take The Stage
+	Disney Princess Magical Melodies
+	The Wizard of Oz - We're Off to Play the Piano
+-->
+
 <softwarelist name="icanpian_cart" description="Fisher-Price / Mattel I Can Play Piano cartridges">
 	<software name="pianfav" supported="no">
 		<description>Piano Favorites</description>
