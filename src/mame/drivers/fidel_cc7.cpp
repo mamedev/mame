@@ -29,8 +29,8 @@ Memory map:
 Port map (Write):
 ---------
 D0-D3: digit select and keypad mux
-D4: LOSE led
-D5: CHECK led
+D4: CHECK led
+D5: LOSE led
 A0-A2: NE591 A0-A2
 D7: NE591 D (_C not used)
 NE591 Q0-Q6: digit segments A-G
