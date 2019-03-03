@@ -753,7 +753,7 @@ ROM_START( deadeye )
 	/* empty */
 
 	ROM_REGION( 0x08000, "audiocpu", 0 )
-	ROM_LOAD( "de_snd",       0x0000, 0x0400, CRC(c10a1b1a) SHA1(779ea261d23360634081295a164cacbd819d8719) )
+	ROM_LOAD( "de_sound_099c_m2-a1.0.4a", 0x0000, 0x0400, CRC(c10a1b1a) SHA1(779ea261d23360634081295a164cacbd819d8719) )
 ROM_END
 
 
