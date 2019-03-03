@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="icanpian_cart" description="Fisher-Price / Mattel I Can Play Piano cartridges">
+	<software name="pianfav">
+		<description>Piano Favorites</description>
+		<year>2007</year>
+		<publisher>Fisher-Price / Mattel</publisher>
+		<part name="cart" interface="icanpian_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="icpppianofavorites.bin" size="0x800000" crc="cca31d78" sha1="4724df29c008e9518345ec4fc77288b7ec138c29" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>
