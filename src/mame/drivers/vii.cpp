@@ -35,7 +35,7 @@
         "SunPlus PA7801" ( known as Sunplus SPG110? ) see spg110.cpp instead
         Classic Arcade Pinball
         EA Sports (NHL95 + Madden 95)
-		Spiderman 5-in-1 model (original release)
+		Spiderman 5-in-1 (original release)
 
         It is unknown if the following are close to this architecture or not (no dumps yet)
 

@@ -9,7 +9,7 @@
         "SunPlus PA7801" ( known as Sunplus SPG110? )
         Classic Arcade Pinball
         EA Sports (NHL95 + Madden 95)
-		Spiderman 5-in-1 model (original release)
+		Spiderman 5-in-1 (original release)
 
 *******************************************************************************/
 
