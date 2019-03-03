@@ -5026,7 +5026,7 @@ ROM_START( srally2pa ) // prototype 1997/12/08
 	ROM_LOAD( "epr-20512.bin", 0x000000, 0x010000, CRC(cf64350d) SHA1(f30c8c7b65fb38f7dd63845f12b81388ff3b946d) )
 ROM_END
 
-ROM_START( srally2x )   /* Step 2.0 */
+ROM_START( srally2x )   /* Step 2.0, Sega game ID# is 833-13371, ROM board ID# 834-13372 SRT DX */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-20502.17",  0x000006, 0x200000, CRC(af16846d) SHA1(a0babc4dc3809ca1e71eaad4dc2f8c1597575e8b) )
