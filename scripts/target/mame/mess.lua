@@ -138,6 +138,7 @@ CPUS["CLIPPER"] = true
 CPUS["CAPRICORN"] = true
 CPUS["ALPHA"] = true
 --CPUS["DSPP"] = true
+--CPUS["HPC"] = true
 
 --------------------------------------------------
 -- specify available sound cores; some of these are
