@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="icanguit_cart" description="Fisher-Price / Mattel I Can Play Guitar cartridges">
-	<software name="guitfav">
+	<software name="guitfav" supported="no">
 		<description>Guitar Favorites</description>
 		<year>2007</year>
 		<publisher>Fisher-Price / Mattel</publisher>

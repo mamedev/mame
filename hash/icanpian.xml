@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="icanpian_cart" description="Fisher-Price / Mattel I Can Play Piano cartridges">
-	<software name="pianfav">
+	<software name="pianfav" supported="no">
 		<description>Piano Favorites</description>
 		<year>2007</year>
 		<publisher>Fisher-Price / Mattel</publisher>
