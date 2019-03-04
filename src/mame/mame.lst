@@ -12870,7 +12870,7 @@ vbrc                            //
 
 @source:fidel_cc10.cpp
 cc10                            //
-checkerc4                       //
+checkc4                         //
 
 @source:fidel_cc7.cpp
 backgamc                        //
@@ -15077,6 +15077,7 @@ gnw_dkong                       // Nintendo
 gnw_dkong2                      // Nintendo
 gnw_egg                         // Nintendo
 gnw_fire                        // Nintendo
+gnw_fireatk                     // Nintendo
 gnw_ghouse                      // Nintendo
 gnw_lboat                       // Nintendo
 gnw_manhole                     // Nintendo
