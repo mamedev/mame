@@ -44,10 +44,7 @@
 		<bezel element="green"><bounds x="16.5" y="6.1" width="51" height="0.3" /></bezel>
 		<bezel element="green"><bounds x="15.7" y="8" width="52.6" height="0.3" /></bezel>
 
-		<bezel element="greena"><bounds x="23.2" y="16.4" width="37.6" height="0.3" /><color alpha="0.5" /></bezel>
-		<bezel element="green"><bounds x="23.2" y="16.4" width="1" height="0.3" /></bezel>
-		<bezel element="green"><bounds x="59.9" y="16.4" width="1" height="0.3" /></bezel>
-		<bezel element="green"><bounds x="41.85" y="16.4" width="0.3" height="0.3" /></bezel>
+		<bezel element="green"><bounds x="23.35" y="15.9" width="37.3" height="0.3" /></bezel>
 
 		<bezel element="green"><bounds x="8.1" y="24.8" width="67.8" height="0.3" /></bezel>
 		<bezel element="green"><bounds x="7" y="27" width="70" height="0.3" /></bezel>
