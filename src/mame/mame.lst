@@ -18186,8 +18186,9 @@ lckydraw                        // (c) 1979 Mirco
 lcmate2                         //
 
 @source:leapfrog_leappad.cpp
-leappad
-mfleappad
+leappad                         // (c) 2001 LeapFrog / Knowledge Kids Enterprises, Inc.
+mfleappad                       // (c) 2002 LeapFrog
+mfleappadus                     // (c) 2004 LeapFrog
 
 @source:leapster.cpp
 leapster                        //
