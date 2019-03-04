@@ -211,6 +211,7 @@
 #include "merlin.lh" // clickable
 #include "mmerlin.lh" // clickable
 #include "monkeysee.lh"
+#include "phpball.lh"
 #include "quizwizc.lh"
 #include "raisedvl.lh"
 #include "simon.lh" // clickable
@@ -229,7 +230,7 @@
 #include "xl25.lh" // clickable
 #include "zodiac.lh"
 
-#include "hh_tms1k_test.lh" // common test-layout - use external artwork
+//#include "hh_tms1k_test.lh" // common test-layout - use external artwork
 
 
 // machine_start/reset
@@ -10033,7 +10034,7 @@ void phpball_state::phpball(machine_config &config)
 	m_maincpu->o().set(FUNC(phpball_state::write_o));
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_hh_tms1k_test);
+	config.set_default_layout(layout_phpball);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
