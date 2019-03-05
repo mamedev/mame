@@ -483,18 +483,15 @@ offs_t hpc_disassembler::disassemble(std::ostream &stream, offs_t pc, const hpc_
 		break;
 
 	case 0x38:
-		util::stream_format(stream, "%-8sX,", "rbit");
-		format_register(stream, reg);
+		util::stream_format(stream, "%-8sX,[B]", "rbit");
 		break;
 
 	case 0x39:
-		util::stream_format(stream, "%-8sX,", "sbit");
-		format_register(stream, reg);
+		util::stream_format(stream, "%-8sX,[B]", "sbit");
 		break;
 
 	case 0x3a:
-		util::stream_format(stream, "%-8sX,", "ifbit");
-		format_register(stream, reg);
+		util::stream_format(stream, "%-8sX,[B]", "ifbit");
 		break;
 
 	case 0x3b:
