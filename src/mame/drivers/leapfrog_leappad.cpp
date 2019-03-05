@@ -119,8 +119,13 @@ void leapfrog_leappad_state::leapfrog_mfleappad(machine_config &config)
 // All of these contain the string "Have you copied our ROM?" near the date codes
 
 ROM_START( leappad )
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "leappadbios.bin", 0x000000, 0x100000, CRC(c886cddc) SHA1(f8a83b156feb28315d2321758678e141600a0d4e) ) // contains "Aug 06 2001.16:33:16.155-00450.LeapPad ILA2 Universal Base ROM" and "Copyright (c) 1998-2001 Knowledge Kids Enterprises, Inc."
+ROM_END
+
+ROM_START( leappadca )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "leappadbioscanada.bin", 0x000000, 0x200000, CRC(cc12e3db) SHA1(adf52232adcfd4de5d8e31c0e0c09be61718a9d4) ) // contains "Jan 23 2004 11:28:40 152-10620 2MB Canada Full Base ROM" and "Copyright (c) 2000-2004 LeapFrog Enterprises, Inc."
 ROM_END
 
 ROM_START( mfleappad )
@@ -135,5 +140,6 @@ ROM_END
 
 //    year, name,        parent,    compat, machine,            input,            class,                  init,       company,    fullname,                         flags
 CONS( 2001, leappad,     0,         0,      leapfrog_leappad,   leapfrog_leappad, leapfrog_leappad_state, empty_init, "LeapFrog", "LeapPad (World)",                MACHINE_IS_SKELETON )
+CONS( 2001, leappadca,   leappad,   0,      leapfrog_leappad,   leapfrog_leappad, leapfrog_leappad_state, empty_init, "LeapFrog", "LeapPad (Canada)",               MACHINE_IS_SKELETON )
 CONS( 2002, mfleappad,   0,         0,      leapfrog_mfleappad, leapfrog_leappad, leapfrog_leappad_state, empty_init, "LeapFrog", "My First LeapPad (World, V1.3)", MACHINE_IS_SKELETON )
 CONS( 2004, mfleappadus, mfleappad, 0,      leapfrog_mfleappad, leapfrog_leappad, leapfrog_leappad_state, empty_init, "LeapFrog", "My First LeapPad (US)",          MACHINE_IS_SKELETON )
