@@ -140,6 +140,6 @@ ROM_END
 
 //    year, name,        parent,    compat, machine,            input,            class,                  init,       company,    fullname,                         flags
 CONS( 2001, leappad,     0,         0,      leapfrog_leappad,   leapfrog_leappad, leapfrog_leappad_state, empty_init, "LeapFrog", "LeapPad (World)",                MACHINE_IS_SKELETON )
-CONS( 2001, leappadca,   leappad,   0,      leapfrog_leappad,   leapfrog_leappad, leapfrog_leappad_state, empty_init, "LeapFrog", "LeapPad (Canada)",               MACHINE_IS_SKELETON )
+CONS( 2004, leappadca,   leappad,   0,      leapfrog_leappad,   leapfrog_leappad, leapfrog_leappad_state, empty_init, "LeapFrog", "LeapPad (Canada)",               MACHINE_IS_SKELETON )
 CONS( 2002, mfleappad,   0,         0,      leapfrog_mfleappad, leapfrog_leappad, leapfrog_leappad_state, empty_init, "LeapFrog", "My First LeapPad (World, V1.3)", MACHINE_IS_SKELETON )
 CONS( 2004, mfleappadus, mfleappad, 0,      leapfrog_mfleappad, leapfrog_leappad, leapfrog_leappad_state, empty_init, "LeapFrog", "My First LeapPad (US)",          MACHINE_IS_SKELETON )
