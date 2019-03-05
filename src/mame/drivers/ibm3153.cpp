@@ -103,23 +103,24 @@ void ibm3153_state::machine_reset()
 {
 }
 
-MACHINE_CONFIG_START(ibm3153_state::ibm3153)
+void ibm3153_state::ibm3153(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I80C32, XTAL(16'000'000)) // no idea of clock
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
+	I80C32(config, m_maincpu, XTAL(16'000'000)); // no idea of clock
+	m_maincpu->set_addrmap(AS_PROGRAM, &ibm3153_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &ibm3153_state::io_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(ibm3153_state, screen_update)
-	MCFG_SCREEN_SIZE(640, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 239)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(ibm3153_state::screen_update));
+	screen.set_size(640, 240);
+	screen.set_visarea(0, 639, 0, 239);
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(ibm3153_state::ibm3153_palette), 3);
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( ibm3153 )

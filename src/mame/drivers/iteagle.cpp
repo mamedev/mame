@@ -165,7 +165,8 @@ void iteagle_state::machine_reset()
 {
 }
 
-MACHINE_CONFIG_START(iteagle_state::iteagle)
+void iteagle_state::iteagle(machine_config &config)
+{
 	/* basic machine hardware */
 	VR4310LE(config, m_maincpu, 166666666);
 	m_maincpu->set_icache_size(16384);
@@ -206,77 +207,89 @@ MACHINE_CONFIG_START(iteagle_state::iteagle)
 	screen.set_size(512, 384);
 	screen.set_visarea(0, 512 - 1, 0, 384 - 1);
 	screen.set_screen_update(PCI_ID_VIDEO, FUNC(voodoo_pci_device::screen_update));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(iteagle_state::gtfore01)
+void iteagle_state::gtfore01(machine_config &config)
+{
 	iteagle(config);
 	m_fpga->set_init_info(0x01000401, 0x0b0b0b);
 	m_eeprom->set_info(0x0401, 0x7);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(iteagle_state::gtfore02)
+void iteagle_state::gtfore02(machine_config &config)
+{
 	iteagle(config);
 	m_fpga->set_init_info(0x01000402, 0x020201);
 	m_eeprom->set_info(0x0402, 0x7);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(iteagle_state::gtfore03)
+void iteagle_state::gtfore03(machine_config &config)
+{
 	iteagle(config);
 	m_fpga->set_init_info(0x01000403, 0x0a0b0a);
 	m_eeprom->set_info(0x0403, 0x7);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(iteagle_state::gtfore04)
+void iteagle_state::gtfore04(machine_config &config)
+{
 	iteagle(config);
 	m_fpga->set_init_info(0x01000404, 0x0a020b);
 	m_eeprom->set_info(0x0404, 0x7);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(iteagle_state::gtfore05)
+void iteagle_state::gtfore05(machine_config &config)
+{
 	iteagle(config);
 	m_fpga->set_init_info(0x01000405, 0x0b0a0c);
 	m_eeprom->set_info(0x0405, 0x7);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(iteagle_state::gtfore06)
+void iteagle_state::gtfore06(machine_config &config)
+{
 	iteagle(config);
 	m_fpga->set_init_info(0x01000406, 0x0c0b0d);
 	m_eeprom->set_info(0x0406, 0x9);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(iteagle_state::carnking)
+void iteagle_state::carnking(machine_config &config)
+{
 	iteagle(config);
 	m_fpga->set_init_info(0x01000a01, 0x0e0a0a);
 	m_eeprom->set_info(0x0a01, 0x9);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(iteagle_state::bbh)
+void iteagle_state::bbh(machine_config &config)
+{
 	iteagle(config);
 	// 0xXX01XXXX = tournament board
 	m_fpga->set_init_info(0x02010600, 0x0b0a0a);
 	m_eeprom->set_info(0x0000, 0x7);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(iteagle_state::bbhsc)
+void iteagle_state::bbhsc(machine_config &config)
+{
 	iteagle(config);
 	// 0xXX01XXXX = tournament board
 	m_fpga->set_init_info(0x02010600, 0x0c0a0a);
 	m_eeprom->set_info(0x0000, 0x7);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(iteagle_state::bbh2sp)
+void iteagle_state::bbh2sp(machine_config &config)
+{
 	iteagle(config);
 	m_fpga->set_init_info(0x02010602, 0x0d0a0a);
 	m_eeprom->set_info(0x0000, 0x7);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(iteagle_state::bbhcotw)
+void iteagle_state::bbhcotw(machine_config &config)
+{
 	iteagle(config);
 	m_fpga->set_init_info(0x02010603, 0x080704);
 	m_eeprom->set_info(0x0603, 0x9);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(iteagle_state::virtpool)
+void iteagle_state::virtpool(machine_config &config)
+{
 	iteagle(config);
 	// Not sure what the actual value should be
 	// Setting a lower frequency helps delay the tutorial screen premature cut-out
@@ -289,7 +302,7 @@ MACHINE_CONFIG_START(iteagle_state::virtpool)
 
 	m_fpga->set_init_info(0x01000202, 0x080808);
 	m_eeprom->set_info(0x0202, 0x7);
-MACHINE_CONFIG_END
+}
 
 
 /*************************************

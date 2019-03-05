@@ -512,17 +512,17 @@ void imolagp_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(imolagp_state::imolagp)
-
+void imolagp_state::imolagp(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 3000000) // ? (assume slower than slave)
-	MCFG_DEVICE_PROGRAM_MAP(imolagp_master_map)
-	MCFG_DEVICE_IO_MAP(imolagp_master_io)
+	Z80(config, m_maincpu, 3000000); // ? (assume slower than slave)
+	m_maincpu->set_addrmap(AS_PROGRAM, &imolagp_state::imolagp_master_map);
+	m_maincpu->set_addrmap(AS_IO, &imolagp_state::imolagp_master_io);
 	TIMER(config, m_steer_pot_timer).configure_generic(FUNC(imolagp_state::imolagp_pot_callback)); // maincpu nmi
 
-	MCFG_DEVICE_ADD("slave", Z80, 4000000) // ?
-	MCFG_DEVICE_PROGRAM_MAP(imolagp_slave_map)
-	MCFG_DEVICE_IO_MAP(imolagp_slave_io)
+	Z80(config, m_slavecpu, 4000000); // ?
+	m_slavecpu->set_addrmap(AS_PROGRAM, &imolagp_state::imolagp_slave_map);
+	m_slavecpu->set_addrmap(AS_IO, &imolagp_state::imolagp_slave_io);
 
 	config.m_perfect_cpu_quantum = subtag("maincpu");
 
@@ -534,22 +534,22 @@ MACHINE_CONFIG_START(imolagp_state::imolagp)
 	ppi.in_pc_callback().set_ioport("IN1");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256,256)
-	MCFG_SCREEN_VISIBLE_AREA(0+48,255,0+16,255)
-	MCFG_SCREEN_UPDATE_DRIVER(imolagp_state, screen_update_imolagp)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, imolagp_state, vblank_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(256,256);
+	screen.set_visarea(0+48,255,0+16,255);
+	screen.set_screen_update(FUNC(imolagp_state::screen_update_imolagp));
+	screen.set_video_attributes(VIDEO_UPDATE_SCANLINE);
+	screen.set_palette("palette");
+	screen.screen_vblank().set(FUNC(imolagp_state::vblank_irq));
 
 	PALETTE(config, "palette", FUNC(imolagp_state::imolagp_palette), 0x20);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	AY8910(config, "aysnd", 2000000).add_route(ALL_OUTPUTS, "mono", 0.5); // ?
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( imolagp ) // same hardware, but larger video roms
