@@ -12,8 +12,11 @@
 
     MY FIRST LEAPPAD:
     Basically the same as the LEAPPAD, but for even younger kids! (Cartridge
-    internal PCB's are identical to LEAPPAD)
+    internal PCB's are identical to LEAPPAD).
     Example Video: https://www.youtube.com/watch?v=gsf8XYV1Tpg
+
+    LITTLE TOUCH LEAPPAD:
+    Same as the other LEAPPAD models, but aimed at babies.
 
     Don't get confused by the name "LEAPPAD", as it looks like Leapfrog
     also released some kind of Tablet with this name, and they even released
@@ -113,18 +116,30 @@ void leapfrog_leappad_state::leapfrog_mfleappad(machine_config &config)
 	SOFTWARE_LIST(config, "cart_list").set_original("leapfrog_mfleappad_cart");
 }
 
-// both of these contain the string "Have you copied our ROM?" near the date codes
+// All of these contain the string "Have you copied our ROM?" near the date codes
 
 ROM_START( leappad )
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "leappadbios.bin", 0x000000, 0x100000, CRC(c886cddc) SHA1(f8a83b156feb28315d2321758678e141600a0d4e) ) // contains "Aug 06 2001.16:33:16.155-00450.LeapPad ILA2 Universal Base ROM" and "Copyright (c) 1998-2001 Knowledge Kids Enterprises, Inc."
 ROM_END
 
+ROM_START( leappadca )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "leappadbioscanada.bin", 0x000000, 0x200000, CRC(cc12e3db) SHA1(adf52232adcfd4de5d8e31c0e0c09be61718a9d4) ) // contains "Jan 23 2004 11:28:40 152-10620 2MB Canada Full Base ROM" and "Copyright (c) 2000-2004 LeapFrog Enterprises, Inc."
+ROM_END
+
 ROM_START( mfleappad )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "myfirstleappadinternational.bin", 0x000000, 0x100000, CRC(4dc0c4d5) SHA1(573ecf2efaccf70e619cf54d63be9169e469ee6f) ) // contains "May 07 2002 10:53:14 152-00932 MFLP International base ROM V1.3" and "Copyright (c) 2002 LeapFrog Enterprises, Inc."
+ROM_END
+
+ROM_START( mfleappadus )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "myfirstleappadbios.bin", 0x000000, 0x400000, CRC(19174c16) SHA1(e0ba644fdf38fd5f91ab8c4b673c4a658cc3e612) ) // contains "Feb 13 2004.10:58:53.152-10573.MFLP US Base ROM - 2004" and "Copyright (c) 2004 LeapFrog Enterprises, Inc."
 ROM_END
 
-//    year, name,      parent,  compat, machine,            input,            class,                  init,       company,    fullname,                flags
-CONS( 2001, leappad,   0,       0,      leapfrog_leappad,   leapfrog_leappad, leapfrog_leappad_state, empty_init, "LeapFrog", "LeapPad (Germany)",     MACHINE_IS_SKELETON )
-CONS( 2004, mfleappad, 0,       0,      leapfrog_mfleappad, leapfrog_leappad, leapfrog_leappad_state, empty_init, "LeapFrog", "My First LeapPad (UK)", MACHINE_IS_SKELETON )
+//    year, name,        parent,    compat, machine,            input,            class,                  init,       company,    fullname,                         flags
+CONS( 2001, leappad,     0,         0,      leapfrog_leappad,   leapfrog_leappad, leapfrog_leappad_state, empty_init, "LeapFrog", "LeapPad (World)",                MACHINE_IS_SKELETON )
+CONS( 2004, leappadca,   leappad,   0,      leapfrog_leappad,   leapfrog_leappad, leapfrog_leappad_state, empty_init, "LeapFrog", "LeapPad (Canada)",               MACHINE_IS_SKELETON )
+CONS( 2002, mfleappad,   0,         0,      leapfrog_mfleappad, leapfrog_leappad, leapfrog_leappad_state, empty_init, "LeapFrog", "My First LeapPad (World, V1.3)", MACHINE_IS_SKELETON )
+CONS( 2004, mfleappadus, mfleappad, 0,      leapfrog_mfleappad, leapfrog_leappad, leapfrog_leappad_state, empty_init, "LeapFrog", "My First LeapPad (US)",          MACHINE_IS_SKELETON )
