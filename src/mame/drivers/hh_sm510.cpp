@@ -33,6 +33,7 @@
 // internal artwork
 #include "gnw_dualv.lh"
 #include "gnw_dualh.lh"
+
 //#include "hh_sm510_test.lh" // common test-layout - use external artwork
 //#include "hh_sm500_test.lh" // "
 
