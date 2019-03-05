@@ -246,7 +246,7 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 		<description>Action Mania (US, Rev. 4?)</description>
 		<year>201?</year>
 		<publisher>VTech</publisher>
-		<info name="serial" value="80-084000(SP)" />
+		<info name="serial" value="80-084000(US)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="pcb" value="708201" />
 			<feature name="pcb_model" value="708201-4" />
@@ -261,7 +261,7 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 		<description>Action Mania (US, Rev. 6?)</description>
 		<year>201?</year>
 		<publisher>VTech</publisher>
-		<info name="serial" value="80-084000(SP)" />
+		<info name="serial" value="80-084000(US)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
