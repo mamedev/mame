@@ -89,6 +89,21 @@
 		</part>
 	</software>
 
+	<software name="crokis" supported="no">
+		<description>El gran día de Croki (Spa)</description>
+		<year>2004</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-11074"/>
+		<part name="cart" interface="leapfrog_mfleappad_cart">
+			<feature name="pcb" value="04173+003-7011"/>
+			<feature name="pcb_rev" value="REV.00"/>
+			<feature name="u1" value="Matronix 16M"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-11074 - El gran dia de Croki (SP).bin" size="0x200000" crc="7939e721" sha1="886e85bdfc56587ef48c94f7bfed055c931b4d3e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="vroom" supported="no">
 		<description>Vroom! Vroom! - On the Go (UK)</description>
 		<year>2003</year>
@@ -100,6 +115,36 @@
 			<feature name="u1" value="OKI 32(J)"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x400000">
 				<rom name="500-11282 UBL - Vroom! Vroom! - On the Go (UK).bin" size="0x400000" crc="88c24bd7" sha1="723a4c6d10d1a5205330c7401594cdc3217a137d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="princess" supported="no">
+		<description>Disney Princesas - Las Princesas Disney (Spa)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-11436"/>
+		<part name="cart" interface="leapfrog_mfleappad_cart">
+			<feature name="pcb" value="57000-003-7011"/>
+			<feature name="pcb_rev" value="REV.01"/>
+			<feature name="u1" value="Matronix 16M"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-11436 - Las Princesas Disney (SP).bin" size="0x200000" crc="21a50739" sha1="ad39c8e899edc427fec01aaa07cf8aacf7bd246f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="schools" supported="no">
+		<description>Mi Primer Día de Escuela (Spa)</description>
+		<year>2005</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-12049"/>
+		<part name="cart" interface="leapfrog_mfleappad_cart">
+			<feature name="pcb" value="57000+003+7223"/>
+			<feature name="pcb_rev" value="Rev:00"/>
+			<feature name="u1" value="OKI 32(J)"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-12049 - Mi Primer Dia de Escuela (SP).bin" size="0x400000" crc="878e3d34" sha1="b5893b2c852e472312a3f49320cec765fd1e4045" offset="0" />
 			</dataarea>
 		</part>
 	</software>
