@@ -6,6 +6,25 @@
 
     Currently this device is just a stub with no actual execution core.
 
+****************************************************************************
+
+    HPC feature options by part number
+
+    HPC16xxx    Military temperature range (-55°C to +125°C)
+    HPC26xxx    Automotive temperature range (-40°C to +105°C)
+    HPC36xxx    Industrial temperature range (-40°C to +85°C)
+    HPC46xxx    Commercial temperature range (0°C to +75°C)
+
+    HPCxx1xx    8-channel A/D converter
+    HPCxx0xx    No A/D converter
+
+    HPCxxx6x    16k bytes of on-chip ROM
+    HPCxxx8x    8k bytes of on-chip ROM
+    HPCxxx0x    No on-chip ROM
+
+    HPCxxxx4    512 bytes of on-chip RAM
+    HPCxxxx3    256 bytes of on-chip RAM
+
 ***************************************************************************/
 
 #include "emu.h"
