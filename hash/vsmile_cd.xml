@@ -730,7 +730,7 @@ ________________________________________________________________________________
 	Ring 1: "59-93127-000-001*", "IFPI 0946", "59-93-107-000-001"
 	Ring 2: "07/12/07 &minus;&minus; 149610 &minus;&minus; A", "IFPI LQ35"
 	-->
-	<software name="wackyracs" cloneof="wackyracr2" supported="no">
+	<software name="wackyracs" cloneof="wackyracr3" supported="no">
 		<description>Carrera Loca en la Isla de las Vainas Fritas (Spa)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
