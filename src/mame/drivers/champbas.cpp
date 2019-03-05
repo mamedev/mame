@@ -512,13 +512,6 @@ void champbas_state::machine_start()
 	save_item(NAME(m_gfx_bank));
 }
 
-void champbas_state::machine_reset()
-{
-	// 74LS259 is auto CLR on reset
-	for (int i = 0; i < 8; i++)
-		m_maincpu->space(AS_PROGRAM).write_byte(0xa000 + i, 0);
-}
-
 INTERRUPT_GEN_MEMBER(champbas_state::vblank_irq)
 {
 	if (m_irq_mask)
