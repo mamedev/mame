@@ -799,41 +799,13 @@ static INPUT_PORTS_START( mathmagi )
 	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-// output PLA is not decapped
+// output PLA is not decapped, this was made by hand
 static const u16 mathmagi_output_pla[0x20] =
 {
-	lA+lB+lC+lD+lE+lF,      // 0
-	lB+lC,                  // 1
-	lA+lB+lG+lE+lD,         // 2
-	lA+lB+lG+lC+lD,         // 3
-	lF+lB+lG+lC,            // 4
-	lA+lF+lG+lC+lD,         // 5
-	lA+lF+lG+lC+lD+lE,      // 6
-	lA+lB+lC,               // 7
-	lA+lB+lC+lD+lE+lF+lG,   // 8
-	lA+lB+lG+lF+lC+lD,      // 9
-	lA+lB+lG+lE,            // question mark
-	lE+lG,                  // r
-	lD,                     // underscore?
-	lA+lF+lG+lE+lD,         // E
-	lG,                     // -
-	0,                      // empty
-	0,                      // empty
-	lG,                     // lamp 4 or MATH -
-	lD,                     // lamp 3
-	lF+lE+lD+lC+lG,         // b
-	lB,                     // lamp 2
-	lB+lG,                  // MATH +
-	lB+lC,                  // MATH mul
-	lF+lG+lB+lC+lD,         // y
-	lA,                     // lamp 1
-	lA+lG,                  // MATH div
-	lA+lD,                  // EQUALS
-	0,                      // ?
-	0,                      // ?
-	lE+lD+lC+lG,            // o
-	0,                      // ?
-	lA+lF+lE+lD+lC          // G
+	0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, // 0, 1, 2, 3, 4, 5, 6, 7
+	0x7f, 0x6f, 0x53, 0x50, 0x08, 0x79, 0x40, 0x00, // 8, 9, questionmark, r, underscore?, E, -(negative), empty
+	0x00, 0x40, 0x08, 0x7c, 0x02, 0x42, 0x06, 0x6e, // empty, led4/-, led3, b, led2, +, ×, y
+	0x01, 0x41, 0x09, 0,    0,    0x5c, 0,    0x3d  // led1, ÷, =, ?, ?, o, ?, G
 };
 
 void mathmagi_state::mathmagi(machine_config &config)
@@ -1176,7 +1148,7 @@ WRITE16_MEMBER(zodiac_state::write_r)
 WRITE16_MEMBER(zodiac_state::write_o)
 {
 	// O0-O7: digit segment/led data
-	m_o = data;
+	m_o = bitswap<8>(data,0,7,6,5,4,3,2,1);
 	prepare_display();
 }
 
@@ -1245,41 +1217,11 @@ static INPUT_PORTS_START( zodiac )
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-// output PLA is not decapped
+// output PLA is not decapped, dumped electronically
 static const u16 zodiac_output_pla[0x20] =
 {
-	0x80,                   // empty/led 1/7
-	lC,                     // i/led 2/8
-	lE+lG,                  // r/led 3/9
-	lC+lE+lG,               // n
-	lF,                     // seg F/led 4/10
-	0,                      // ?
-	0,                      // ?
-	lC+lE+lF+lG,            // h
-	lB,                     // seg B/led 5/11
-	lD,                     // seg D/led 6/12
-	0,                      // ?
-	0,                      // ?
-	0,                      // ?
-	0,                      // ?
-	lA+lB+lE+lF+lG,         // P
-	0,                      // ?
-	lA+lB+lC+lD+lE+lF,      // 0
-	lB+lC,                  // 1
-	lA+lB+lD+lE+lG,         // 2
-	lA+lB+lC+lD+lG,         // 3
-	lB+lC+lF+lG,            // 4
-	lA+lC+lD+lF+lG,         // 5
-	lA+lC+lD+lE+lF+lG,      // 6
-	lA+lB+lC,               // 7
-	lA+lB+lC+lD+lE+lF+lG,   // 8
-	lA+lB+lC+lD+lF+lG,      // 9
-	lA+lB+lC+lE+lF+lG,      // A
-	lB+lC+lD+lE+lG,         // d
-	lA+lD+lE+lF+lG,         // E
-	lB+lC+lD+lE,            // J
-	lD+lE+lF,               // L
-	lB+lC+lD+lE+lF          // U
+	0x01, 0x08, 0xa0, 0xa8, 0x40, 0x48, 0xe0, 0xe8, 0x06, 0x10, 0xa6, 0xb0, 0x46, 0x50, 0xe6, 0xf0,
+	0x7e, 0x0c, 0xb6, 0x9e, 0xcc, 0xda, 0xfa, 0x0e, 0xfe, 0xce, 0xee, 0xbc, 0xf2, 0x3c, 0x70, 0x7c
 };
 
 void zodiac_state::zodiac(machine_config &config)
@@ -2907,7 +2849,7 @@ static const u16 cnfball2_output_pla[0x20] =
 	// first half was dumped electronically
 	0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x40, 0x01, 0x08, 0x02, 0x04, 0x00,
 
-	// rest is unknown
+	// rest is unused, game only outputs with status bit clear
 	0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0
 };
@@ -5891,23 +5833,13 @@ static INPUT_PORTS_START( elecbowl )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_V) // 2 players sw?
 INPUT_PORTS_END
 
-// output PLA is not decapped
+// output PLA is not decapped, this was made by hand
 static const u16 elecbowl_output_pla[0x20] =
 {
-	lA+lB+lC+lD+lE+lF,      // 0
-	lB+lC,                  // 1
-	lA+lB+lG+lE+lD,         // 2
-	lA+lB+lG+lC+lD,         // 3
-	lF+lB+lG+lC,            // 4
-	lA+lF+lG+lC+lD,         // 5
-	lA+lF+lG+lC+lD+lE,      // 6
-	lA+lB+lC,               // 7
-	lA+lB+lC+lD+lE+lF+lG,   // 8
-	lA+lB+lG+lF+lC+lD,      // 9
-
-	0x8a, 0x8b, 0x8c, 0x8d, 0x8e, 0x8f,
-	0,1,2,3,4,5,6,7,        // lamp muxes select
-	0x98, 0x99, 0x9a, 0x9b, 0x9c, 0x9d, 0x9e, 0x9f
+	0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, // 0-9
+	0x8a, 0x8b, 0x8c, 0x8d, 0x8e, 0x8f, // ?
+	0, 1, 2, 3, 4, 5, 6, 7, // lamp muxes select
+	0x98, 0x99, 0x9a, 0x9b, 0x9c, 0x9d, 0x9e, 0x9f // ?
 };
 
 void elecbowl_state::elecbowl(machine_config &config)
@@ -8880,7 +8812,7 @@ static INPUT_PORTS_START( tandy12 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("Button 5")
 INPUT_PORTS_END
 
-// output PLA is not decapped
+// output PLA is not decapped, this was made by hand
 static const u16 tandy12_output_pla[0x20] =
 {
 	// these are certain
