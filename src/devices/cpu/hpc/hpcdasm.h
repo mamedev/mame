@@ -37,6 +37,15 @@ private:
 	const char *const *m_regs;
 };
 
+class hpc16083_disassembler : public hpc_disassembler
+{
+public:
+	hpc16083_disassembler() : hpc_disassembler(s_regs) { }
+
+private:
+	static const char *const s_regs[128];
+};
+
 class hpc16164_disassembler : public hpc_disassembler
 {
 public:
