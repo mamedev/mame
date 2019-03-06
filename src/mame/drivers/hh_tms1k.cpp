@@ -394,6 +394,12 @@ u8 hh_tms1k_state::read_rotated_inputs(int columns, u8 rowmask)
 	return ret;
 }
 
+INPUT_CHANGED_MEMBER(hh_tms1k_state::reset_button)
+{
+	// when an input is directly wired to MCU INIT pin
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
+}
+
 INPUT_CHANGED_MEMBER(hh_tms1k_state::power_button)
 {
 	m_power_on = (bool)(uintptr_t)param;
@@ -2915,8 +2921,6 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
-
-	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 	void eleciq(machine_config &config);
 };
 
@@ -2999,14 +3003,8 @@ static INPUT_PORTS_START( eleciq )
 	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("RESET")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, eleciq_state, reset_button, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, reset_button, nullptr)
 INPUT_PORTS_END
-
-INPUT_CHANGED_MEMBER(eleciq_state::reset_button)
-{
-	// reset button is directly wired to TMS1000 INIT pin
-	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
-}
 
 void eleciq_state::eleciq(machine_config &config)
 {
@@ -4317,8 +4315,6 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
-
-	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 	void f2pbball(machine_config &config);
 };
 
@@ -4381,14 +4377,8 @@ static INPUT_PORTS_START( f2pbball )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_COCKTAIL PORT_NAME("P2 Fast")
 
 	PORT_START("RESET")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("P1 Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, f2pbball_state, reset_button, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("P1 Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, reset_button, nullptr)
 INPUT_PORTS_END
-
-INPUT_CHANGED_MEMBER(f2pbball_state::reset_button)
-{
-	// reset button is directly wired to TMS1000 INIT pin
-	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
-}
 
 void f2pbball_state::f2pbball(machine_config &config)
 {
@@ -4671,7 +4661,7 @@ static INPUT_PORTS_START( gpoker )
 
 	PORT_START("IN.3") // R3
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_CODE(KEYCODE_D) PORT_NAME("9/Deal") // DL, shares pad with 9
+	PORT_BIT( 0x02, 0x02, IPT_CUSTOM ) PORT_CONDITION("FAKE", 0x03, NOTEQUALS, 0x00) // 9/DL
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("Clear Entry") // CE
 
@@ -4689,6 +4679,10 @@ static INPUT_PORTS_START( gpoker )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("Total") // T
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("Bet") // BT
+
+	PORT_START("FAKE") // 9/DL are electronically the same button
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("Deal") // DL
 INPUT_PORTS_END
 
 void gpoker_state::gpoker(machine_config &config)
@@ -4770,7 +4764,7 @@ WRITE16_MEMBER(gjackpot_state::write_r)
                           DB]    SP]
     [1]    [2]    [3]    [DS]   [DR]
                           BT]    HT]
-    [10/1] [T]    [MD    [CH    [AC]
+    [10/0] [T]    [MD    [CH    [AC]
                    GO]    ST]
 */
 

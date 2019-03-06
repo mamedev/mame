@@ -70,7 +70,6 @@
 
 
   TODO:
-  - cdkong discrete sound (simple volume decay, simulated for now)
   - cgalaxn discrete sound (alien attacking sound effect)
   - gckong random lockups (tap the jump button repeatedly): mcu stack overflow,
     works ok if stack levels is increased, 38800 B rev. has more stack levels?
@@ -2149,7 +2148,7 @@ public:
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
 
-	void speaker_decay_reset();
+	void speaker_update();
 	TIMER_DEVICE_CALLBACK_MEMBER(speaker_decay_sim);
 	double m_speaker_volume;
 	void cdkong(machine_config &config);
@@ -2169,19 +2168,20 @@ void cdkong_state::machine_start()
 
 // handlers
 
-void cdkong_state::speaker_decay_reset()
+void cdkong_state::speaker_update()
 {
 	if (m_r[1] & 8)
 		m_speaker_volume = 1.0;
 
-	m_speaker->set_output_gain(0, m_speaker_volume);
+	int level = (m_d & 8) ? 0x7fff : 0;
+	m_speaker->level_w(level * m_speaker_volume);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(cdkong_state::speaker_decay_sim)
 {
 	// volume decays when speaker is off (divisor and timer period determine duration)
-	speaker_decay_reset();
-	m_speaker_volume /= 1.015;
+	speaker_update();
+	m_speaker_volume /= 1.02;
 }
 
 void cdkong_state::prepare_display()
@@ -2194,7 +2194,7 @@ WRITE8_MEMBER(cdkong_state::plate_w)
 {
 	// R13: speaker on
 	m_r[offset] = data;
-	speaker_decay_reset();
+	speaker_update();
 
 	// R0x-R6x: vfd plate
 	int shift = offset * 4;
@@ -2205,7 +2205,8 @@ WRITE8_MEMBER(cdkong_state::plate_w)
 WRITE16_MEMBER(cdkong_state::grid_w)
 {
 	// D3: speaker out
-	m_speaker->level_w(data >> 3 & 1);
+	m_d = data;
+	speaker_update();
 
 	// D4-D14: vfd grid
 	m_grid = data >> 4 & 0x7ff;
@@ -2225,6 +2226,8 @@ static INPUT_PORTS_START( cdkong )
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x7ff8, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+static s16 cdkong_speaker_levels[0x8000];
 
 void cdkong_state::cdkong(machine_config &config)
 {
@@ -2251,7 +2254,13 @@ void cdkong_state::cdkong(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+
 	TIMER(config, "speaker_decay").configure_periodic(FUNC(cdkong_state::speaker_decay_sim), attotime::from_msec(1));
+
+	// set volume levels (set_output_gain is too slow for sub-frame intervals)
+	for (int i = 0; i < 0x8000; i++)
+		cdkong_speaker_levels[i] = i;
+	m_speaker->set_levels(0x8000, cdkong_speaker_levels);
 }
 
 // roms
@@ -4419,7 +4428,7 @@ CONS( 1984, machiman,  0,        0, machiman, machiman, machiman_state, empty_in
 CONS( 1984, pairmtch,  0,        0, pairmtch, pairmtch, pairmtch_state, empty_init, "Bandai", "Pair Match", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1981, alnattck,  0,        0, alnattck, alnattck, alnattck_state, empty_init, "Coleco", "Alien Attack", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, cdkong,    0,        0, cdkong,   cdkong,   cdkong_state,   empty_init, "Coleco", "Donkey Kong (Coleco)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+CONS( 1982, cdkong,    0,        0, cdkong,   cdkong,   cdkong_state,   empty_init, "Coleco", "Donkey Kong (Coleco)", MACHINE_SUPPORTS_SAVE )
 CONS( 1982, cgalaxn,   0,        0, cgalaxn,  cgalaxn,  cgalaxn_state,  empty_init, "Coleco", "Galaxian (Coleco)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 CONS( 1981, cpacman,   0,        0, cpacman,  cpacman,  cpacman_state,  empty_init, "Coleco", "Pac-Man (Coleco, Rev. 29)", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, cpacmanr1, cpacman,  0, cpacman,  cpacman,  cpacman_state,  empty_init, "Coleco", "Pac-Man (Coleco, Rev. 28)", MACHINE_SUPPORTS_SAVE )
