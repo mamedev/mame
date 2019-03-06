@@ -1282,8 +1282,8 @@ namespace netlist
 		/* need to preserve order of device creation ... */
 		using devices_collection_type = std::vector<std::pair<pstring, pool_owned_ptr<core_device_t>>>;
 		netlist_state_t(const pstring &aname,
-			plib::unique_ptr<callbacks_t> &&callbacks,
-			plib::unique_ptr<setup_t> &&setup);
+			netlist_t & anetlist,
+			plib::unique_ptr<callbacks_t> &&callbacks);
 
 		COPYASSIGNMOVE(netlist_state_t, delete)
 
@@ -1311,6 +1311,9 @@ namespace netlist
 		const log_type &log() const { return m_log; }
 
 		plib::dynlib &lib() { return *m_lib; }
+
+		netlist_t &exec() { return m_netlist; }
+		const netlist_t &exec() const { return m_netlist; }
 
 		/* state handling */
 		plib::state_manager_t &run_state_manager() { return m_state; }
@@ -1393,6 +1396,7 @@ namespace netlist
 		void reset();
 
 		pstring                             m_name;
+		netlist_t							&m_netlist;
 		plib::unique_ptr<plib::dynlib>      m_lib; // external lib needs to be loaded as long as netlist exists
 		plib::state_manager_t               m_state;
 		plib::unique_ptr<callbacks_t>       m_callbacks;
