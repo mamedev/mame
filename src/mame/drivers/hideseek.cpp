@@ -2,7 +2,7 @@
 // copyright-holders:Guru
 /* Hide & Seek
 
-the AG-2 AX51201 should be the follow-up to the AG-1 AX51101 in gunpey.c
+the AG-2 AX51201 should be the follow-up to the AG-1 AX51101 in gunpey.cpp
 
 AS:
 Current ROM code barely contains some valid SH-2 opcodes but not enough for a HD64F7045F28. i.e. It doesn't contain VBR set-up, valid irq routines,
@@ -103,21 +103,21 @@ void hideseek_state::hideseek_palette(palette_device &palette) const
 
 
 
-MACHINE_CONFIG_START(hideseek_state::hideseek)
-
+void hideseek_state::hideseek(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SH2, 7372800 * 4 )
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	SH2(config, m_maincpu, 7372800 * 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &hideseek_state::mem_map);
 //  TIMER(config, "scantimer").configure_scanline(FUNC(hideseek_state::hideseek_scanline), "screen", 0, 1);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(hideseek_state, screen_update_hideseek)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 64*8-1, 0*8, 32*8-1);
+	screen.set_screen_update(FUNC(hideseek_state::screen_update_hideseek));
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(hideseek_state::hideseek_palette), 0x10000);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_hideseek);
@@ -126,7 +126,7 @@ MACHINE_CONFIG_START(hideseek_state::hideseek)
 	SPEAKER(config, "rspeaker").front_right();
 
 	/* sound : M9810 */
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( hideseek )

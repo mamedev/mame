@@ -520,11 +520,12 @@ static GFXDECODE_START( gfx_h19 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, h19_charlayout, 0, 1 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(h19_state::h19)
+void h19_state::h19(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, H19_CLOCK) // From schematics
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
+	Z80(config, m_maincpu, H19_CLOCK); // From schematics
+	m_maincpu->set_addrmap(AS_PROGRAM, &h19_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &h19_state::io_map);
 
 	/* video hardware */
 	// TODO: make configurable, Heath offered 3 different CRTs - White, Green, Amber.
@@ -564,9 +565,8 @@ MACHINE_CONFIG_START(h19_state::h19)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("beeper", BEEP, H19_BEEP_FRQ)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_CONFIG_END
+	BEEP(config, m_beep, H19_BEEP_FRQ).add_route(ALL_OUTPUTS, "mono", 1.00);
+}
 
 /* ROM definition */
 ROM_START( h19 )
