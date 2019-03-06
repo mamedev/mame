@@ -249,25 +249,11 @@ void ti99_4x_state::memmap_setoffset(address_map &map)
     The TMS9901 is incompletely decoded
     ---0 00xx xxcc ccc0
     causing 16 mirrors (0000, 0040, 0080, 00c0, ... , 03c0)
-
-    Reading is done by transfering 8 successive bits, so addresses refer to
-    8 bit groups; writing, however, is done using output lines. The CRU base
-    address in the ti99 systems is twice the bit address:
-
-    (base=0, bit=0x10) == (base=0x20,bit=0)
-
-    Read: 0000 - 003f translates to base addresses 0000 - 03fe
-          0000 - 01ff is the complete CRU address space 0000 - 1ffe (for TMS9900)
-
-    Write:0000 - 01ff corresponds to bit 0 of base address 0000 - 03fe
 */
 void ti99_4x_state::crumap(address_map &map)
 {
-	map(0x0000, 0x01ff).r(FUNC(ti99_4x_state::cruread));
-	map(0x0000, 0x0003).mirror(0x003c).r(m_tms9901, FUNC(tms9901_device::read));
-
-	map(0x0000, 0x0fff).w(FUNC(ti99_4x_state::cruwrite));
-	map(0x0000, 0x001f).mirror(0x01e0).w(m_tms9901, FUNC(tms9901_device::write));
+	map(0x0000, 0x1fff).rw(FUNC(ti99_4x_state::cruread), FUNC(ti99_4x_state::cruwrite));
+	map(0x0000, 0x003f).mirror(0x03c0).rw(m_tms9901, FUNC(tms9901_device::read), FUNC(tms9901_device::write));
 }
 
 
@@ -419,15 +405,14 @@ INPUT_PORTS_END
 
 READ8_MEMBER( ti99_4x_state::cruread )
 {
-	LOGMASKED(LOG_CRUREAD, "read access to CRU address %04x\n", offset << 4);
+	LOGMASKED(LOG_CRUREAD, "read access to CRU address %04x\n", offset << 1);
 	uint8_t value = 0;
 
 	// Let the gromport (not in the QI version) and the p-box behind the I/O port
 	// decide whether they want to change the value at the CRU address
-	// Also, we translate the bit addresses to base addresses
 
-	if (m_model != MODEL_4QI) m_gromport->crureadz(space, offset<<4, &value);
-	m_ioport->crureadz(space, offset<<4, &value);
+	if (m_model != MODEL_4QI) m_gromport->crureadz(space, offset<<1, &value);
+	m_ioport->crureadz(space, offset<<1, &value);
 
 	return value;
 }

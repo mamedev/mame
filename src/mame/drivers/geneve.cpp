@@ -306,11 +306,8 @@ void geneve_state::memmap_setoffset(address_map &map)
 */
 void geneve_state::crumap(address_map &map)
 {
-	map(0x0000, 0x0fff).r(FUNC(geneve_state::cruread));
-	map(0x0000, 0x0003).r(m_tms9901, FUNC(tms9901_device::read));
-
-	map(0x0000, 0x7fff).w(FUNC(geneve_state::cruwrite));
-	map(0x0000, 0x001f).w(m_tms9901, FUNC(tms9901_device::write));
+	map(0x0000, 0xffff).rw(FUNC(geneve_state::cruread), FUNC(geneve_state::cruwrite));
+	map(0x0000, 0x003f).rw(m_tms9901, FUNC(tms9901_device::read), FUNC(tms9901_device::write));
 }
 
 static INPUT_PORTS_START(geneve_common)
@@ -434,7 +431,7 @@ WRITE8_MEMBER ( geneve_state::cruwrite )
 READ8_MEMBER( geneve_state::cruread )
 {
 	uint8_t value = 0;
-	int addroff = offset << 4;
+	uint16_t addroff = offset << 1;
 
 	// Single step
 	// 13c0 - 13fe: 0001 0011 11xx xxx0

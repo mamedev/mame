@@ -101,21 +101,21 @@ void jpms80_state::jpms80_map(address_map &map)
 
 void jpms80_state::jpms80_io_map(address_map &map)
 {
-	map.global_mask(0x1ff);
+	map.global_mask(0x3ff);
 //  AM_RANGE(0x0000, 0x001f) // I/O & Optic (in)
-	map(0x0000, 0x0007).w("outlatch0", FUNC(ls259_device::write_d0));
-	map(0x0008, 0x000f).w("outlatch1", FUNC(ls259_device::write_d0));
-	map(0x0010, 0x0017).w("outlatch2", FUNC(ls259_device::write_d0));
-	map(0x0018, 0x001f).w("outlatch3", FUNC(ls259_device::write_d0));
-	map(0x0020, 0x0027).w("outlatch4", FUNC(ls259_device::write_d0));
-	map(0x0028, 0x002f).w("outlatch5", FUNC(ls259_device::write_d0));
-	map(0x0030, 0x0037).w("outlatch6", FUNC(ls259_device::write_d0));
-	map(0x0038, 0x003f).w("outlatch7", FUNC(ls259_device::write_d0));
-	map(0x0040, 0x0047).w("outlatch8", FUNC(ls259_device::write_d0));
-	map(0x0048, 0x004f).w("outlatch9", FUNC(ls259_device::write_d0));
-	map(0x0050, 0x0057).w("outlatch10", FUNC(ls259_device::write_d0));
-//  AM_RANGE(0x0140, 0x015f) // AY
-	map(0x01e0, 0x01ff).rw(m_acc, FUNC(tms9902_device::cruread), FUNC(tms9902_device::cruwrite));
+	map(0x0000, 0x000f).w("outlatch0", FUNC(ls259_device::write_d0));
+	map(0x0010, 0x001f).w("outlatch1", FUNC(ls259_device::write_d0));
+	map(0x0020, 0x002f).w("outlatch2", FUNC(ls259_device::write_d0));
+	map(0x0030, 0x003f).w("outlatch3", FUNC(ls259_device::write_d0));
+	map(0x0040, 0x004f).w("outlatch4", FUNC(ls259_device::write_d0));
+	map(0x0050, 0x005f).w("outlatch5", FUNC(ls259_device::write_d0));
+	map(0x0060, 0x006f).w("outlatch6", FUNC(ls259_device::write_d0));
+	map(0x0070, 0x007f).w("outlatch7", FUNC(ls259_device::write_d0));
+	map(0x0080, 0x008f).w("outlatch8", FUNC(ls259_device::write_d0));
+	map(0x0090, 0x009f).w("outlatch9", FUNC(ls259_device::write_d0));
+	map(0x00a0, 0x00af).w("outlatch10", FUNC(ls259_device::write_d0));
+//  AM_RANGE(0x0380, 0x03bf) // AY
+	map(0x03c0, 0x03ff).rw(m_acc, FUNC(tms9902_device::cruread), FUNC(tms9902_device::cruwrite));
 //  Lamps, Meters etc. can move around
 }
 

@@ -458,13 +458,13 @@ void io992_device::device_start()
 
 READ8_MEMBER(io992_device::cruread)
 {
-	int address = offset << 4;
+	int address = offset << 1;
 	uint8_t value = 0x7f;  // All Hexbus lines high
 	double inp = 0;
 	int i;
 	uint8_t bit = 1;
 
-	switch (address)
+	switch (address & 0xf800)
 	{
 	case 0xe000:
 		// CRU E000-E7fE: Keyboard
@@ -494,7 +494,7 @@ READ8_MEMBER(io992_device::cruread)
 
 	LOGMASKED(LOG_CRU, "CRU %04x ->  %02x\n", address, value);
 
-	return value;
+	return BIT(value, offset & 7);
 }
 
 WRITE8_MEMBER(io992_device::cruwrite)
