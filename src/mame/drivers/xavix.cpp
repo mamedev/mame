@@ -1159,6 +1159,30 @@ static INPUT_PORTS_START( nostalgia )
 
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( tak_geig )
+	PORT_INCLUDE(xavix)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1) // pause
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2) // pause
+
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( rad_bb )
 	PORT_INCLUDE(xavix)
 
@@ -1776,6 +1800,10 @@ ROM_START( ltv_tam )
 ROM_END
 
 
+ROM_START( tak_geig )
+	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("geigeki.bin", 0x000000, 0x400000, CRC(bd0c3576) SHA1(06f614dbec0225ce4ed866b98450912986d72faf) )
+ROM_END
 
 /*
     The e-kara cartridges require the BIOS rom to map into 2nd external bus space as they fetch palette data from
@@ -1817,6 +1845,13 @@ ROM_START( epitch )
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "ekarajapan.bin", 0x600000, 0x100000, CRC(e459e43b) SHA1(58b7f36a81571a2df5e812c118fdf68812a05abc) )
 	ROM_RELOAD(0x000000, 0x100000)
+ROM_END
+
+ROM_START( ekaramix )
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
+	// also has a MX87L100C 28-pin chip in the unit, possibly the USB controller.  Part of the ROM contains a FAT filesystem that could possibly appear as a USB drive on the PC?
+	ROM_LOAD( "ekaramix.bin", 0x600000, 0x200000, CRC(ee71576e) SHA1(26f8c9edcbbed77e86a1cb5a0b91c92a16fef433) )
+	ROM_RELOAD(0x000000, 0x200000)
 ROM_END
 
 ROM_START( ddrfammt )
@@ -1924,6 +1959,7 @@ CONS( 2002, epo_dmon, 0,           0,  xavix_i2c_24c02,  xavix_i2c,xavix_i2c_sta
 
 CONS( 200?, has_wamg,  0,          0,  xavix,            has_wamg, xavix_state,          init_xavix,    "Hasbro / Milton Bradley / SSD Company LTD",    "TV Wild Adventure Mini Golf (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
+CONS( 2002, tak_geig,  0,          0,  xavix_nv,         tak_geig, xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Geigeki Go Go Shooting (Japan)", MACHINE_IMPERFECT_SOUND )
 
 /* Music titles: Emulation note:
    SEEPROM write appears to work (save NVRAM file looks valid) but game fails to read it back properly, fails backup data checksum, and blanks it again.
@@ -1939,6 +1975,9 @@ CONS( 2002, ekaraphs, ekara,       0,  xavix_cart_ekara, ekara,    xavix_ekara_s
 // epitch (at least the pichi pichi pitch mermaid starter pack) uses the same internal rom as the Japanese ekara, but has less buttons, so some features aren't available (some games also seem to expect to read it with a different layout eg 'a7' cart, but 'a5' cart doesn't, so must be a way to enable that mode, or bug in code?)
 CONS( 2003, epitch,   0,           0,  xavix_cart_ekara, ekara,    xavix_ekara_state,    init_xavix,    "Takara / SSD Company LTD",                     "e-pitch (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ ) // shows Japanese message without cart
 
+// e-kara mix was another unit that allowed you to connect to a PC, unlike e-kara web it also functions as a regular device
+CONS( 200?, ekaramix, 0,           0,  xavix_cart_ekara, ekara,    xavix_ekara_state,    init_xavix,    "Takara / SSD Company LTD",                     "e-kara Mix (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ )
+
 
 CONS( 2001, ddrfammt, 0,           0,  xavix_cart_ddrfammt,ddrfammt, xavix_cart_state,   init_xavix,    "Takara / Konami / SSD Company LTD",            "Dance Dance Revolution Family Mat (Japan)", MACHINE_IMPERFECT_SOUND/*|MACHINE_IS_BIOS_ROOT*/ )
 
@@ -1950,7 +1989,6 @@ CONS( 2003, taikodp,  0,           0,  xavix_i2c_taiko,  taikodp,  xavix_i2c_car
 
 // Let’s!TVプレイ 超にんきスポット!ころがしほーだい たまごっちりぞーと   (Let's! TV Play Chou Ninki Spot! Korogashi-Houdai Tamagotchi Resort) (only on the Japanese list? http://test.shinsedai.co.jp/english/products/Applied/list.html )   This also allows you to use an IR reciever to import a Tamagotchi from compatible games
 CONS( 2006, ltv_tam,  0,           0,  xavix_i2c_24lc04,  ltv_tam,xavix_i2c_ltv_tam_state,      init_xavix,    "Bandai / SSD Company LTD",                      "Let's! TV Play Chou Ninki Spot! Korogashi-Houdai Tamagotchi Resort (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-
 
 
 /* SuperXaviX(?) (XaviX 2000 type CPU) hardware titles (2nd XaviX generation?)

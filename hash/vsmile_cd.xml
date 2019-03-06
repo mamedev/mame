@@ -90,26 +90,6 @@ ________________________________________________________________________________
 <softwarelist name="vsmile_cd" description="VTech V.Flash/V.Smile Pro V.Disc images">
 
 	<!--
-	Internal Serial: 0ID_93060_001
-	Volume Label: 93060_001
-	Blue cartridge
-	Sticker on the cartridge: 633 ○●○○
-	Barcode: 0 50803 93060 8
-	Ring 1: "*59-93060-000-000", "IFPI LQ50", "IFPI 9QK3", "59-93060-000"
-	-->
-	<software name="spidermnr1" supported="no">
-		<description>The Amazing Spider-Man - Countdown to Doom (USA, Rev. 1)</description>
-		<year>200?</year>
-		<publisher>VTech</publisher>
-		<info name="serial" value="80-093060" />
-		<part name="cdrom" interface="vsmile_vdisk">
-			<diskarea name="cdrom">
-				<disk name="093060_001" sha1="b41bfab381ec4e1a2ceab56aa10d71b17c8a31bb"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<!--
 	Internal Serial: 0ID_93060_002
 	Volume Label: 93060_002
 	Blue cartridge
@@ -117,7 +97,7 @@ ________________________________________________________________________________
 	Barcode: 0 50803 93060 8
 	Ring 1: "* 59-93060-000-000 *", "ifpi LQ24", "IFPI 9QK3", "59-93060-000"
 	-->
-	<software name="spidermnr2" cloneof="spidermnr1" supported="no">
+	<software name="spidermnr2" supported="no">
 		<description>The Amazing Spider-Man - Countdown to Doom (USA, Rev. 2)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -129,7 +109,27 @@ ________________________________________________________________________________
 		</part>
 	</software>
 
-	<software name="spidermng" cloneof="spidermnr1" supported="no">
+	<!--
+	Internal Serial: 0ID_93060_001
+	Volume Label: 93060_001
+	Blue cartridge
+	Sticker on the cartridge: 633 ○●○○
+	Barcode: 0 50803 93060 8
+	Ring 1: "*59-93060-000-000", "IFPI LQ50", "IFPI 9QK3", "59-93060-000"
+	-->
+	<software name="spidermnr1" cloneof="spidermnr2" supported="no">
+		<description>The Amazing Spider-Man - Countdown to Doom (USA, Rev. 1)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-093060" />
+		<part name="cdrom" interface="vsmile_vdisk">
+			<diskarea name="cdrom">
+				<disk name="093060_001" sha1="b41bfab381ec4e1a2ceab56aa10d71b17c8a31bb"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="spidermng" cloneof="spidermnr2" supported="no">
 		<!--
 		Original files (from TeamEurope)
 		<rom name="93064_000.bin" size="378956592" crc="5039f062" sha1="80a0ae321273a4b7190ba79854b21fdfb96b75f4" />
@@ -155,7 +155,7 @@ ________________________________________________________________________________
 	Ring 1: "59-93067-000-001*", "IFPI 0949", "59-93067-000-001"
 	Ring 2: "07/07/07 &minus;&minus; 149550 &minus;&minus; A", "IFPI LQ35"
 	-->
-	<software name="spidermns" cloneof="spidermnr1" supported="no">
+	<software name="spidermns" cloneof="spidermnr2" supported="no">
 		<description>El Asombroso Spider-Man - Persecución en la Ciudad (Spa)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -208,26 +208,6 @@ ________________________________________________________________________________
 	</software>
 
 	<!--
-	Internal Serial: 0ID_93100_000
-	Volume Label: 93100_000
-	Orange cartridge
-	Sticker on the cartridge: 646 ○○○○
-	Barcode: 0 50803 93100 1
-	Ring 1: "59-93100-000-000*", "ifpi LQ24", "IFPI 9QK3, IFPI 9QM3", "59-93100-000-000"
-	-->
-	<software name="cars" supported="no">
-		<description>Disney/Pixar Cars - In the Fast Lane (USA)</description>
-		<year>200?</year>
-		<publisher>VTech</publisher>
-		<info name="serial" value="80-093100" />
-		<part name="cdrom" interface="vsmile_vdisk">
-			<diskarea name="cdrom">
-				<disk name="093100_000" sha1="47edbad81f59bc0cebd51bc7e51137ca949890de"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<!--
 	Internal Serial: 0ID_93100_001
 	Volume Label: 93100_001
 	Orange cartridge
@@ -235,7 +215,7 @@ ________________________________________________________________________________
 	Barcode: 0 50803 93100 1
 	Ring 1: "*59-93100-001-000", "ifpi LQ24", "IFPI 9QH8", "59-93100-000-000"
 	-->
-	<software name="carsr1" cloneof="cars" supported="no">
+	<software name="carsr1" supported="no">
 		<description>Disney/Pixar Cars - In the Fast Lane (USA, Rev. 1)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -248,6 +228,26 @@ ________________________________________________________________________________
 	</software>
 
 	<!--
+	Internal Serial: 0ID_93100_000
+	Volume Label: 93100_000
+	Orange cartridge
+	Sticker on the cartridge: 646 ○○○○
+	Barcode: 0 50803 93100 1
+	Ring 1: "59-93100-000-000*", "ifpi LQ24", "IFPI 9QK3, IFPI 9QM3", "59-93100-000-000"
+	-->
+	<software name="cars" cloneof="carsr1" supported="no">
+		<description>Disney/Pixar Cars - In the Fast Lane (USA)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-093100" />
+		<part name="cdrom" interface="vsmile_vdisk">
+			<diskarea name="cdrom">
+				<disk name="093100_000" sha1="47edbad81f59bc0cebd51bc7e51137ca949890de"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!--
 	Internal Serial: 0ID_93100_003
 	Volume Label: 93100_003
 	Orange cartridge
@@ -255,7 +255,7 @@ ________________________________________________________________________________
 	Barcode: 0 50803 93100 1
 	Ring 1: "*59-93100-000-000*", "ifpi LQ24", "IFPI 9QK3", "59-93100-000-000"
 	-->
-	<software name="carsr3" cloneof="cars" supported="no">
+	<software name="carsr3" cloneof="carsr1" supported="no">
 		<description>Disney/Pixar Cars - In the Fast Lane (USA, Rev. 3)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -267,7 +267,7 @@ ________________________________________________________________________________
 		</part>
 	</software>
 
-	<software name="carsg" cloneof="cars" supported="no">
+	<software name="carsg" cloneof="carsr1" supported="no">
 		<!--
 		 Original files (from TeamEurope)
 		 <rom name="93104_000.bin" size="562353792" crc="e487ef85" sha1="2794bb37d03435c1318ee632d067d64aaecbbebf" />
@@ -293,7 +293,7 @@ ________________________________________________________________________________
 	Ring 1: "59-93107-000-001*", "IFPI 0931", "59-93-107-000-001"
 	Ring 2: "08/15/07 &minus;&minus; 150750 &minus;&minus; A", "IFPI LQ35"
 	-->
-	<software name="carss" cloneof="cars" supported="no">
+	<software name="carss" cloneof="carsr1" supported="no">
 		<description>Cars - El Carril Rápido (Spa)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -551,8 +551,47 @@ ________________________________________________________________________________
 		</part>
 	</software>
 
+	<!--
+	Internal Serial: 0ID_93040_000
+	Volume Label: 93040_002
+	Blue cartridge
+	Sticker on the cartridge: 637 ○○●○, 644 ○○●○
+	Ring 1: "*59-93040-000-000*", "IFPI LQ17", "IFPI 9QH8", "59-93040-000"
+	Ring 2: "*59-93040-000-000*", "IFPI LQ24", "IFPI 9QH8", "59-93040-000"
+	-->
+	<software name="spongeisr2" supported="no">
+		<description>Nickelodeon SpongeBob Squarepants - Idea Sponge (USA, Rev. 2)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-093040" />
+		<part name="cdrom" interface="vsmile_vdisk">
+			<diskarea name="cdrom">
+				<disk name="093040_002" sha1="22e5d08eeb01d660e9662c3663c5b1b26a2e57fb"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!--
+	Internal Serial: 0ID_93040_000
+	Volume Label: 93040_001
+	Blue cartridge
+	Sticker on the cartridge: 633 ○●○○
+	Ring 1: "*59-93040-000-000", "IFPI LQ50", "IFPI 9QH8", "59-93040-000"
+	-->
+	<software name="spongeisr1" cloneof="spongeisr2" supported="no">
+		<description>Nickelodeon SpongeBob Squarepants - Idea Sponge (USA, Rev. 1)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-093040" />
+		<part name="cdrom" interface="vsmile_vdisk">
+			<diskarea name="cdrom">
+				<disk name="093040_001" sha1="feabc1d3eac7045fb4c0ef29c1a137d7a5c07619"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Needs checking what revision it is. -->
-	<software name="spongeis" supported="no">
+	<software name="spongeis" cloneof="spongeisr2" supported="no">
 		<!--
 		 Original files:
 		 <rom name="spongebob squarepants - idea sponge (us).ccd" size="754" crc="51c96a38" sha1="bbd5f937a3a358d0db724492d265018911cc05ad" />
@@ -571,51 +610,12 @@ ________________________________________________________________________________
 	</software>
 
 	<!--
-	Internal Serial: 0ID_93040_000
-	Volume Label: 93040_001
-	Blue cartridge
-	Sticker on the cartridge: 633 ○●○○
-	Ring 1: "*59-93040-000-000", "IFPI LQ50", "IFPI 9QH8", "59-93040-000"
-	-->
-	<software name="spongeisr1" cloneof="spongeis" supported="no">
-		<description>Nickelodeon SpongeBob Squarepants - Idea Sponge (USA, Rev. 1)</description>
-		<year>200?</year>
-		<publisher>VTech</publisher>
-		<info name="serial" value="80-093040" />
-		<part name="cdrom" interface="vsmile_vdisk">
-			<diskarea name="cdrom">
-				<disk name="093040_001" sha1="feabc1d3eac7045fb4c0ef29c1a137d7a5c07619"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<!--
-	Internal Serial: 0ID_93040_000
-	Volume Label: 93040_002
-	Blue cartridge
-	Sticker on the cartridge: 637 ○○●○, 644 ○○●○
-	Ring 1: "*59-93040-000-000*", "IFPI LQ17", "IFPI 9QH8", "59-93040-000"
-	Ring 2: "*59-93040-000-000*", "IFPI LQ24", "IFPI 9QH8", "59-93040-000"
-	-->
-	<software name="spongeisr2" cloneof="spongeis" supported="no">
-		<description>Nickelodeon SpongeBob Squarepants - Idea Sponge (USA, Rev. 2)</description>
-		<year>200?</year>
-		<publisher>VTech</publisher>
-		<info name="serial" value="80-093040" />
-		<part name="cdrom" interface="vsmile_vdisk">
-			<diskarea name="cdrom">
-				<disk name="093040_002" sha1="22e5d08eeb01d660e9662c3663c5b1b26a2e57fb"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<!--
 	Internal Serial: 0ID_93044_000
 	Volume Label: 93044_000
 	Ring 1: "59-93044-000-001*", "IFPI 0907", "59-93044-000-001"
 	Ring 2: "07/07/07 &minus;&minus; 149551 &minus;&minus; A", "IFPI LQ35"
 	-->
-	<software name="spongeisg" cloneof="spongeis" supported="no">
+	<software name="spongeisg" cloneof="spongeisr2" supported="no">
 		<description>Nick SpongeBob Schwammkopf: Ein Schwamm voller Ideen (Ger)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -636,7 +636,7 @@ ________________________________________________________________________________
 	Ring 1: "59-93047-000-001*", "IFPI 0999", "59-93047-000-001"
 	Ring 2: "02/01/06 &minus;&minus; 155691 &minus;&minus; A", "IFPI LQ35"
 	-->
-	<software name="spongeiss" cloneof="spongeis" supported="no">
+	<software name="spongeiss" cloneof="spongeisr2" supported="no">
 		<description>Nickelodeon Bob Esponja - Misión Esponja (Spa)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -648,24 +648,6 @@ ________________________________________________________________________________
 		</part>
 	</software>
 
-	<!--
-	Internal Serial: 0ID_93120_002
-	Volume Label: 93120_002
-	Blue cartridge
-	Sticker on the cartridge: 634 ○○●○
-	Ring 1: "*59-93120-000-000*", "IFPI LQ50", "IFPI 9QH8", "59-93120-000"
-	-->
-	<software name="wackyracr2" supported="no">
-		<description>Wacky Race on Jumpin' Bean Island (USA, Rev. 2)</description>
-		<year>200?</year>
-		<publisher>VTech</publisher>
-		<info name="serial" value="80-93120" />
-		<part name="cdrom" interface="vsmile_vdisk">
-			<diskarea name="cdrom">
-				<disk name="093120_002" sha1="84f658c990f6c69754092aa4d9314ebee7026c6a"/>
-			</diskarea>
-		</part>
-	</software>
 
 	<!--
 	Internal Serial: 0ID_93120_003
@@ -674,7 +656,7 @@ ________________________________________________________________________________
 	Sticker on the cartridge: 636 ○○○●, 638 ○○○●
 	Ring 1: "59-93120-000-000**", "IFPI LQ17", "IFPI 9QH8, IFPI 9QK3", "59-93120-000"
 	-->
-	<software name="wackyracr3" cloneof="wackyracr2" supported="no">
+	<software name="wackyracr3" supported="no">
 		<description>Wacky Race on Jumpin' Bean Island (USA, Rev. 3)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -687,13 +669,32 @@ ________________________________________________________________________________
 	</software>
 
 	<!--
+	Internal Serial: 0ID_93120_002
+	Volume Label: 93120_002
+	Blue cartridge
+	Sticker on the cartridge: 634 ○○●○
+	Ring 1: "*59-93120-000-000*", "IFPI LQ50", "IFPI 9QH8", "59-93120-000"
+	-->
+	<software name="wackyracr2" cloneof="wackyracr3" supported="no">
+		<description>Wacky Race on Jumpin' Bean Island (USA, Rev. 2)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-93120" />
+		<part name="cdrom" interface="vsmile_vdisk">
+			<diskarea name="cdrom">
+				<disk name="093120_002" sha1="84f658c990f6c69754092aa4d9314ebee7026c6a"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!--
 	Internal Serial: 0ID_93123_000
 	Volume Label: 93123_000
 	Purple cartridge
 	Sticker on the cartridge: 717 ○○○○
 	Ring 1: "59-93123-000-000*", "IFPI LQ17", "IFPI 9QK3", "59-93123-000-000"
 	-->
-	<software name="wackyracuk" cloneof="wackyracr2" supported="no">
+	<software name="wackyracuk" cloneof="wackyracr3" supported="no">
 		<description>Wacky Race on Jumpin' Bean Island (UK)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -705,7 +706,7 @@ ________________________________________________________________________________
 		</part>
 	</software>
 
-	<software name="wackyracg" cloneof="wackyracr2" supported="no">
+	<software name="wackyracg" cloneof="wackyracr3" supported="no">
 		<!--
 		Original files (from TeamEurope)
 		<rom name="93124_000.bin" size="457901472" crc="92a0ebe0" sha1="a3a8e54d5f12094bfc0c89954987cc793d83d3f9" />
@@ -729,7 +730,7 @@ ________________________________________________________________________________
 	Ring 1: "59-93127-000-001*", "IFPI 0946", "59-93-107-000-001"
 	Ring 2: "07/12/07 &minus;&minus; 149610 &minus;&minus; A", "IFPI LQ35"
 	-->
-	<software name="wackyracs" cloneof="wackyracr2" supported="no">
+	<software name="wackyracs" cloneof="wackyracr3" supported="no">
 		<description>Carrera Loca en la Isla de las Vainas Fritas (Spa)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>

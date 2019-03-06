@@ -55,6 +55,7 @@ using util::BIT;
 #include "cpu/hcd62121/hcd62121d.h"
 #include "cpu/hd61700/hd61700d.h"
 #include "cpu/hmcs40/hmcs40d.h"
+#include "cpu/hpc/hpcdasm.h"
 #include "cpu/hphybrid/hphybrid_dasm.h"
 #include "cpu/i386/i386dasm.h"
 #include "cpu/i8008/8008dasm.h"
@@ -360,6 +361,8 @@ static const dasm_table_entry dasm_table[] =
 	{ "hp_5061_3001",    be, -1, []() -> util::disasm_interface * { return new hp_5061_3001_disassembler; } },
 	{ "hp_5061_3011",    be, -1, []() -> util::disasm_interface * { return new hp_5061_3011_disassembler; } },
 	{ "hp_09825_67907",  be, -1, []() -> util::disasm_interface * { return new hp_09825_67907_disassembler; } },
+	{ "hpc16083",        le,  0, []() -> util::disasm_interface * { return new hpc16083_disassembler; } },
+	{ "hpc16164",        le,  0, []() -> util::disasm_interface * { return new hpc16164_disassembler; } },
 	{ "hyperstone",      be,  0, []() -> util::disasm_interface * { return new hyperstone_disassembler(&hyperstone_unidasm); } },
 	{ "i4004",           le,  0, []() -> util::disasm_interface * { return new i4004_disassembler; } },
 	{ "i4040",           le,  0, []() -> util::disasm_interface * { return new i4040_disassembler; } },

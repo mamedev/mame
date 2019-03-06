@@ -19,6 +19,7 @@
 #include "cpu/tms1000/tms0980.h"
 #include "cpu/tms1000/tms0270.h"
 #include "cpu/tms1000/tp0320.h"
+
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
 
@@ -83,18 +84,5 @@ protected:
 	virtual void machine_reset() override;
 };
 
-
-// LED segments
-enum
-{
-	lA = 0x01,
-	lB = 0x02,
-	lC = 0x04,
-	lD = 0x08,
-	lE = 0x10,
-	lF = 0x20,
-	lG = 0x40,
-	lDP = 0x80
-};
 
 #endif // MAME_INCLUDES_HH_TMS1K_H

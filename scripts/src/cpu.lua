@@ -2800,3 +2800,20 @@ if (CPUS["ALPHA"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/alpha/alphad.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/alpha/alphad.h")
 end
+
+--------------------------------------------------
+-- National Semiconductor HPC
+--@src/devices/cpu/hpc/hpc.h,CPUS["HPC"] = true
+--------------------------------------------------
+
+if (CPUS["HPC"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/cpu/hpc/hpc.cpp",
+		MAME_DIR .. "src/devices/cpu/hpc/hpc.h",
+	}
+end
+
+if (CPUS["HPC"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/hpc/hpcdasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/hpc/hpcdasm.h")
+end

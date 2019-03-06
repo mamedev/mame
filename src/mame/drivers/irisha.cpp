@@ -364,28 +364,28 @@ void irisha_state::machine_reset()
 }
 
 /* Machine driver */
-MACHINE_CONFIG_START(irisha_state::irisha)
+void irisha_state::irisha(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8080, XTAL(16'000'000) / 9)
-	MCFG_DEVICE_PROGRAM_MAP(irisha_mem)
-	MCFG_DEVICE_IO_MAP(irisha_io)
+	I8080(config, m_maincpu, XTAL(16'000'000) / 9);
+	m_maincpu->set_addrmap(AS_PROGRAM, &irisha_state::irisha_mem);
+	m_maincpu->set_addrmap(AS_IO, &irisha_state::irisha_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(320, 200)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
-	MCFG_SCREEN_UPDATE_DRIVER(irisha_state, screen_update_irisha)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(320, 200);
+	screen.set_visarea(0, 320-1, 0, 200-1);
+	screen.set_screen_update(FUNC(irisha_state::screen_update_irisha));
+	screen.set_palette("palette");
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_irisha);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
 	I8251(config, "uart", 0);
@@ -408,7 +408,7 @@ MACHINE_CONFIG_START(irisha_state::irisha)
 
 	pic8259_device &pic8259(PIC8259(config, "pic8259", 0));
 	pic8259.out_int_callback().set_inputline(m_maincpu, 0);
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 

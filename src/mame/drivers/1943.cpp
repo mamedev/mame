@@ -311,27 +311,27 @@ void _1943_state::machine_reset()
 	m_prot_value = 0;
 }
 
-MACHINE_CONFIG_START(_1943_state::_1943)
-
+void _1943_state::_1943(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(24'000'000)/4) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(c1943_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", _1943_state,  irq0_line_hold)
+	Z80(config, m_maincpu, XTAL(24'000'000)/4); /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &_1943_state::c1943_map);
+	m_maincpu->set_vblank_int("screen", FUNC(_1943_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(24'000'000)/8) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(_1943_state, irq0_line_hold, 4*60)
+	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(24'000'000)/8)); /* verified on pcb */
+	audiocpu.set_addrmap(AS_PROGRAM, &_1943_state::sound_map);
+	audiocpu.set_periodic_int(FUNC(_1943_state::irq0_line_hold), attotime::from_hz(4*60));
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(_1943_state, screen_update_1943)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(_1943_state::screen_update_1943));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_1943);
 	PALETTE(config, m_palette, FUNC(_1943_state::_1943_palette), 32*4+16*16+16*16+16*16, 256);
@@ -341,18 +341,18 @@ MACHINE_CONFIG_START(_1943_state::_1943)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(24'000'000)/16) /* verified on pcb */
-	MCFG_SOUND_ROUTE(0, "mono", 0.15)
-	MCFG_SOUND_ROUTE(1, "mono", 0.15)
-	MCFG_SOUND_ROUTE(2, "mono", 0.15)
-	MCFG_SOUND_ROUTE(3, "mono", 0.10)
+	ym2203_device &ym1(YM2203(config, "ym1", XTAL(24'000'000)/16)); /* verified on pcb */
+	ym1.add_route(0, "mono", 0.15);
+	ym1.add_route(1, "mono", 0.15);
+	ym1.add_route(2, "mono", 0.15);
+	ym1.add_route(3, "mono", 0.10);
 
-	MCFG_DEVICE_ADD("ym2", YM2203, XTAL(24'000'000)/16) /* verified on pcb */
-	MCFG_SOUND_ROUTE(0, "mono", 0.15)
-	MCFG_SOUND_ROUTE(1, "mono", 0.15)
-	MCFG_SOUND_ROUTE(2, "mono", 0.15)
-	MCFG_SOUND_ROUTE(3, "mono", 0.10)
-MACHINE_CONFIG_END
+	ym2203_device &ym2(YM2203(config, "ym2", XTAL(24'000'000)/16)); /* verified on pcb */
+	ym2.add_route(0, "mono", 0.15);
+	ym2.add_route(1, "mono", 0.15);
+	ym2.add_route(2, "mono", 0.15);
+	ym2.add_route(3, "mono", 0.10);
+}
 
 /* ROMs */
 

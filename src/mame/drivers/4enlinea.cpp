@@ -500,26 +500,26 @@ INTERRUPT_GEN_MEMBER(_4enlinea_state::_4enlinea_audio_irq)
 	device.execute().set_input_line(0, HOLD_LINE);
 }
 
-MACHINE_CONFIG_START(_4enlinea_state::_4enlinea)
-
+void _4enlinea_state::_4enlinea(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, PRG_CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_IO_MAP(main_portmap)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(_4enlinea_state, _4enlinea_irq, 60) //TODO
-//  MCFG_DEVICE_PERIODIC_INT_DRIVER(_4enlinea_state, irq0_line_hold, 4*35)
+	Z80(config, m_maincpu, PRG_CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &_4enlinea_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &_4enlinea_state::main_portmap);
+	m_maincpu->set_periodic_int(FUNC(_4enlinea_state::_4enlinea_irq), attotime::from_hz(60)); //TODO
+//  m_maincpu->set_periodic_int(FUNC(_4enlinea_state::irq0_line_hold), attotime::from_hz(4*35));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, SND_CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(audio_map)
-	MCFG_DEVICE_IO_MAP(audio_portmap)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(_4enlinea_state, _4enlinea_audio_irq, 60) //TODO
+	z80_device &audiocpu(Z80(config, "audiocpu", SND_CPU_CLOCK));
+	audiocpu.set_addrmap(AS_PROGRAM, &_4enlinea_state::audio_map);
+	audiocpu.set_addrmap(AS_IO, &_4enlinea_state::audio_portmap);
+	audiocpu.set_periodic_int(FUNC(_4enlinea_state::_4enlinea_audio_irq), attotime::from_hz(60)); //TODO
 
 	// FIXME: determine ISA bus clock
 	isa8_device &isa(ISA8(config, "isa", 0));
 	isa.set_memspace("maincpu", AS_PROGRAM);
 	isa.set_iospace("maincpu", AS_IO);
 
-	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "isa", _4enlinea_isa8_cards, "4enlinea", true)
+	ISA8_SLOT(config, "isa1", 0, "isa", _4enlinea_isa8_cards, "4enlinea", true);
 
 
 /*  6845 clock is a guess, since it's a UM6845R embedded in the UM487F.
@@ -537,7 +537,7 @@ MACHINE_CONFIG_START(_4enlinea_state::_4enlinea)
 	m_ay->port_a_read_callback().set_ioport("IN-P2");
 	m_ay->port_b_read_callback().set_ioport("IN-P1");
 	m_ay->add_route(ALL_OUTPUTS, "mono", 0.50);
-MACHINE_CONFIG_END
+}
 
 
 /***********************************

@@ -253,25 +253,25 @@ TIMER_DEVICE_CALLBACK_MEMBER(ikki_state::ikki_irq)
 
 
 
-MACHINE_CONFIG_START(ikki_state::ikki)
-
+void ikki_state::ikki(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,CPU_CLOCK/2) /* 4.000MHz */
-	MCFG_DEVICE_PROGRAM_MAP(ikki_cpu1)
+	Z80(config, m_maincpu, CPU_CLOCK/2); /* 4.000MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &ikki_state::ikki_cpu1);
 	TIMER(config, "scantimer").configure_scanline(FUNC(ikki_state::ikki_irq), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("sub", Z80,CPU_CLOCK/2) /* 4.000MHz */
-	MCFG_DEVICE_PROGRAM_MAP(ikki_cpu2)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(ikki_state, irq0_line_hold, 2*(PIXEL_CLOCK/HTOTAL/VTOTAL))
+	Z80(config, m_subcpu, CPU_CLOCK/2); /* 4.000MHz */
+	m_subcpu->set_addrmap(AS_PROGRAM, &ikki_state::ikki_cpu2);
+	m_subcpu->set_periodic_int(FUNC(ikki_state::irq0_line_hold), attotime::from_hz(2*(PIXEL_CLOCK/HTOTAL/VTOTAL)));
 
 	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(ikki_state, screen_update_ikki)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
+	m_screen->set_screen_update(FUNC(ikki_state::screen_update_ikki));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ikki);
 	PALETTE(config, m_palette, FUNC(ikki_state::ikki_palette), 1024, 256 + 1);
@@ -279,12 +279,10 @@ MACHINE_CONFIG_START(ikki_state::ikki)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("sn1", SN76496, CPU_CLOCK/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	SN76496(config, "sn1", CPU_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 0.75);
 
-	MCFG_DEVICE_ADD("sn2", SN76496, CPU_CLOCK/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-MACHINE_CONFIG_END
+	SN76496(config, "sn2", CPU_CLOCK/2).add_route(ALL_OUTPUTS, "mono", 0.75);
+}
 
 
 /*************************************

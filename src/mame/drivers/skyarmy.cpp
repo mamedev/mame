@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Tomasz Slanina,Ryan Holtz
+// copyright-holders:Tomasz Slanina, Ryan Holtz
 /*
  2010.04.05. stephh
 
@@ -13,15 +13,20 @@
  2003.01.01. Tomasz Slanina
 
   changes :
-    - nmi generation ( incorrect freq probably)
+    - nmi generation (incorrect freq probably)
     - music/sfx (partially)
     - more sprite tiles (twice than before)
     - fixed sprites flips
     - scrolling (2nd game level)
     - better colors (weird 'hack' .. but works in most cases ( comparing with screens from emustatus ))
     - dips - lives
-    - visible area .. a bit smaller (at least bg 'generation' is not visible for scrolling levels )
+    - visible area .. a bit smaller (at least bg 'generation' is not visible for scrolling levels)
     - cpu clock .. now 4 mhz
+
+  TODO :
+    - Bridgepiece helicopters joining from the right side don't fly forward, this is especially a problem
+      on the 3rd level making it impossible to complete it.
+      What is it not caused by: memory map mirrors, spriteram writeonly, power-on ram contents
 */
 
 #include "emu.h"
@@ -214,10 +219,10 @@ void skyarmy_state::skyarmy_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0x8800, 0x8fff).ram().w(FUNC(skyarmy_state::videoram_w)).share("videoram"); /* Video RAM */
-	map(0x9000, 0x93ff).ram().w(FUNC(skyarmy_state::colorram_w)).share("colorram"); /* Color RAM */
-	map(0x9800, 0x983f).ram().share("spriteram"); /* Sprites */
-	map(0x9840, 0x985f).ram().share("scrollram");  /* Scroll RAM */
+	map(0x8800, 0x8fff).ram().w(FUNC(skyarmy_state::videoram_w)).share("videoram");
+	map(0x9000, 0x93ff).ram().w(FUNC(skyarmy_state::colorram_w)).share("colorram");
+	map(0x9800, 0x983f).ram().share("spriteram");
+	map(0x9840, 0x985f).ram().share("scrollram");
 	map(0xa000, 0xa000).portr("DSW");
 	map(0xa001, 0xa001).portr("P1");
 	map(0xa002, 0xa002).portr("P2");
@@ -326,7 +331,7 @@ void skyarmy_state::skyarmy(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &skyarmy_state::skyarmy_map);
 	m_maincpu->set_addrmap(AS_IO, &skyarmy_state::skyarmy_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(skyarmy_state::irq0_line_hold));
-	m_maincpu->set_periodic_int(FUNC(skyarmy_state::nmi_source), attotime::from_hz(650));    /* Hz */
+	m_maincpu->set_periodic_int(FUNC(skyarmy_state::nmi_source), attotime::from_hz(650));
 
 	ls259_device &latch(LS259(config, "latch")); // 11C
 	latch.q_out_cb<0>().set(FUNC(skyarmy_state::coin_counter_w));

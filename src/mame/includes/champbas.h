@@ -70,7 +70,6 @@ protected:
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	virtual void machine_reset() override;
 
 	void champbas_map(address_map &map);
 	void champbasj_map(address_map &map);

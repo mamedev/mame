@@ -9,6 +9,7 @@
   serial  device  etc.
 -----------------------------------------------------------
  *020     1650    19??, GI Economega IV TV PPL Tuning System Control
+ *021     1650    1978, GI AY-3-8910 demo board
  @024     1655    1979, Toytronic? Football
  @033     1655A   1979, Toytronic Football (newer)
  @036     1655A   1979, Ideal Maniac

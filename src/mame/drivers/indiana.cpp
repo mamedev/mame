@@ -94,19 +94,20 @@ static DEVICE_INPUT_DEFAULTS_START( keyboard )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 DEVICE_INPUT_DEFAULTS_END
 
-MACHINE_CONFIG_START(indiana_state::indiana)
+void indiana_state::indiana(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(M68K_TAG, M68030, XTAL(16'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(indiana_mem)
+	M68030(config, m_maincpu, XTAL(16'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &indiana_state::indiana_mem);
 
 	// FIXME: determine ISA bus clock
 	isa16_device &isa(ISA16(config, ISABUS_TAG, 0));
 	isa.set_custom_spaces();
 
-	MCFG_DEVICE_ADD("isa1", ISA16_SLOT, 0, ISABUS_TAG, indiana_isa_cards, "vga", false)
-	MCFG_DEVICE_ADD("isa2", ISA16_SLOT, 0, ISABUS_TAG, indiana_isa_cards, "fdc_at", false)
-	MCFG_DEVICE_ADD("isa3", ISA16_SLOT, 0, ISABUS_TAG, indiana_isa_cards, "comat", false)
-	MCFG_DEVICE_ADD("isa4", ISA16_SLOT, 0, ISABUS_TAG, indiana_isa_cards, "ide", false)
+	ISA16_SLOT(config, "isa1", 0, ISABUS_TAG, indiana_isa_cards, "vga", false);
+	ISA16_SLOT(config, "isa2", 0, ISABUS_TAG, indiana_isa_cards, "fdc_at", false);
+	ISA16_SLOT(config, "isa3", 0, ISABUS_TAG, indiana_isa_cards, "comat", false);
+	ISA16_SLOT(config, "isa4", 0, ISABUS_TAG, indiana_isa_cards, "ide", false);
 
 	mc68901_device &mfp(MC68901(config, MFP_TAG, XTAL(16'000'000)/4));
 	mfp.set_timer_clock(XTAL(16'000'000)/4);
@@ -117,7 +118,7 @@ MACHINE_CONFIG_START(indiana_state::indiana)
 	rs232_port_device &keyboard(RS232_PORT(config, "keyboard", default_rs232_devices, "keyboard"));
 	keyboard.rxd_handler().set(MFP_TAG, FUNC(mc68901_device::write_rx));
 	keyboard.set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(keyboard));
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( indiana )
