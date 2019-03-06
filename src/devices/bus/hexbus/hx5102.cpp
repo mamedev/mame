@@ -121,8 +121,7 @@ void hx5102_device::memmap(address_map &map)
 */
 void hx5102_device::crumap(address_map &map)
 {
-	map(0x17e0>>4, 0x17fe>>4).r(FUNC(hx5102_device::cruread));
-	map(0x17e0>>1, 0x17fe>>1).w(FUNC(hx5102_device::cruwrite));
+	map(0x17e0, 0x17ff).rw(FUNC(hx5102_device::cruread), FUNC(hx5102_device::cruwrite));
 }
 
 hx5102_device::hx5102_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock):
@@ -475,7 +474,7 @@ READ8_MEMBER(hx5102_device::cruread)
 
 	crubits |= ((ioport("HXDIP")->read())<<4);
 
-	return crubits;
+	return BIT(crubits, offset);
 }
 
 /*

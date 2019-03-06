@@ -314,22 +314,22 @@ void hitme_state::machine_reset()
 	m_timeout_time = attotime::zero;
 }
 
-MACHINE_CONFIG_START(hitme_state::hitme)
-
+void hitme_state::hitme(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8080, MASTER_CLOCK/16)
-	MCFG_DEVICE_PROGRAM_MAP(hitme_map)
-	MCFG_DEVICE_IO_MAP(hitme_portmap)
+	I8080(config, m_maincpu, MASTER_CLOCK/16);
+	m_maincpu->set_addrmap(AS_PROGRAM, &hitme_state::hitme_map);
+	m_maincpu->set_addrmap(AS_IO, &hitme_state::hitme_portmap);
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 19*10)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 19*10-1)
-	MCFG_SCREEN_UPDATE_DRIVER(hitme_state, screen_update_hitme)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(40*8, 19*10);
+	m_screen->set_visarea(0*8, 40*8-1, 0*8, 19*10-1);
+	m_screen->set_screen_update(FUNC(hitme_state::screen_update_hitme));
+	m_screen->set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_hitme);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
@@ -337,7 +337,7 @@ MACHINE_CONFIG_START(hitme_state::hitme)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	DISCRETE(config, m_discrete, hitme_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
-MACHINE_CONFIG_END
+}
 
 
 
@@ -348,19 +348,19 @@ MACHINE_CONFIG_END
     Barricade or is the resolution set by a dip switch?
 */
 
-MACHINE_CONFIG_START(hitme_state::barricad)
+void hitme_state::barricad(machine_config &config)
+{
 	hitme(config);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_SIZE(32*8, 24*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 24*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(hitme_state, screen_update_barricad)
+	m_screen->set_size(32*8, 24*8);
+	m_screen->set_visarea(0*8, 32*8-1, 0*8, 24*8-1);
+	m_screen->set_screen_update(FUNC(hitme_state::screen_update_barricad));
 
 	m_gfxdecode->set_info(gfx_barricad);
 
 	MCFG_VIDEO_START_OVERRIDE(hitme_state,barricad)
-MACHINE_CONFIG_END
+}
 
 
 

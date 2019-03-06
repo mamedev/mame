@@ -376,7 +376,7 @@ READ8Z_MEMBER(myarc_hfdc_device::crureadz)
 	uint8_t reply;
 	if ((offset & 0xff00)==m_cru_base)
 	{
-		if ((offset & 0x00ff)==0)  // CRU bits 0-7
+		if ((offset & 0x00f0)==0)  // CRU bits 0-7
 		{
 			if (m_see_switches)
 			{
@@ -390,7 +390,7 @@ READ8Z_MEMBER(myarc_hfdc_device::crureadz)
 				if (!m_motor_running) reply |= 0x04;
 				if (m_wait_for_hd1) reply |= 0x08;
 			}
-			*value = reply;
+			*value = BIT(reply, (offset >> 1) & 7);
 		}
 		else   // CRU bits 8+
 		{

@@ -167,7 +167,7 @@ void pachifev_state::pachifev_map(address_map &map)
 
 void pachifev_state::pachifev_cru(address_map &map)
 {
-	map(0x000, 0x000).r(FUNC(pachifev_state::controls_r));
+	map(0x0000, 0x0001).r(FUNC(pachifev_state::controls_r));
 }
 
 

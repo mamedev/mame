@@ -40,7 +40,6 @@
   - tweak MCU frequency for games when video/audio recording surfaces(YouTube etc.)
   - some of the games rely on the fact that faster/longer strobed leds appear brighter,
     eg. hccbaskb(player led), ..
-  - leboom discrete sound for volume decay (simulated for now)
   - ttfball: discrete sound part, for volume gating?
   - what's the relation between hccbaskb and tbaskb? Is one the bootleg
     of the other? Or are they both made by the same subcontractor?
@@ -101,6 +100,7 @@ public:
 
 	u16 read_inputs(int columns, u16 colmask = ~0);
 	u8 read_rotated_inputs(int columns, u8 rowmask = ~0);
+	virtual DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 
 	// display common
 	int m_display_wait;             // led/lamp off-delay in milliseconds (default 33ms)
@@ -274,6 +274,12 @@ u8 hh_pic16_state::read_rotated_inputs(int columns, u8 rowmask)
 	return ~ret & rowmask;
 }
 
+INPUT_CHANGED_MEMBER(hh_pic16_state::reset_button)
+{
+	// when an input is directly wired to MCU MCLR pin
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
+}
+
 
 
 /***************************************************************************
@@ -432,8 +438,6 @@ public:
 	void prepare_display();
 	DECLARE_WRITE8_MEMBER(write_b);
 	DECLARE_WRITE8_MEMBER(write_c);
-
-	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 	void pabball(machine_config &config);
 };
 
@@ -488,14 +492,8 @@ static INPUT_PORTS_START( pabball )
 	PORT_CONFSETTING(    0x20, "2" )
 
 	PORT_START("RESET")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, pabball_state, reset_button, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_pic16_state, reset_button, nullptr)
 INPUT_PORTS_END
-
-INPUT_CHANGED_MEMBER(pabball_state::reset_button)
-{
-	// reset button is directly tied to MCLR pin
-	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
-}
 
 void pabball_state::pabball(machine_config &config)
 {
@@ -1859,7 +1857,7 @@ CONS( 1979, maniac,    0,       0, maniac,    maniac,    maniac_state,    empty_
 
 CONS( 1980, matchme,   0,       0, matchme,   matchme,   matchme_state,   empty_init, "Kingsford", "Match Me", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1980, leboom,    0,       0, leboom,    leboom,    leboom_state,    empty_init, "Lakeside", "Le Boom", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1980, leboom,    0,       0, leboom,    leboom,    leboom_state,    empty_init, "Lakeside", "Le Boom", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1979, tbaskb,    0,       0, tbaskb,    tbaskb,    tbaskb_state,    empty_init, "Tandy Radio Shack", "Electronic Basketball (Tandy)", MACHINE_SUPPORTS_SAVE )
 

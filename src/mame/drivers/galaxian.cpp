@@ -5988,8 +5988,8 @@ DISCRETE_SOUND_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(galaxian_state::galaxian_base)
-
+void galaxian_state::galaxian_base(machine_config &config)
+{
 	// basic machine hardware
 	Z80(config, m_maincpu, GALAXIAN_PIXEL_CLOCK/3/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &galaxian_state::galaxian_map);
@@ -6000,18 +6000,18 @@ MACHINE_CONFIG_START(galaxian_state::galaxian_base)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_galaxian);
 	PALETTE(config, m_palette, FUNC(galaxian_state::galaxian_palette), 32);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(GALAXIAN_PIXEL_CLOCK, GALAXIAN_HTOTAL, GALAXIAN_HBEND, GALAXIAN_HBSTART, GALAXIAN_VTOTAL, GALAXIAN_VBEND, GALAXIAN_VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(galaxian_state, screen_update_galaxian)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, galaxian_state, vblank_interrupt_w))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(GALAXIAN_PIXEL_CLOCK, GALAXIAN_HTOTAL, GALAXIAN_HBEND, GALAXIAN_HBSTART, GALAXIAN_VTOTAL, GALAXIAN_VBEND, GALAXIAN_VBSTART);
+	m_screen->set_screen_update(FUNC(galaxian_state::screen_update_galaxian));
+	m_screen->screen_vblank().set(FUNC(galaxian_state::vblank_interrupt_w));
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
-MACHINE_CONFIG_END
+}
 
 
-
-MACHINE_CONFIG_START(galaxian_state::sidam_bootleg_base)
+void galaxian_state::sidam_bootleg_base(machine_config &config)
+{
 	galaxian_base(config);
 
 	/* basic machine hardware */
@@ -6020,9 +6020,8 @@ MACHINE_CONFIG_START(galaxian_state::sidam_bootleg_base)
 	/* video hardware */
 	m_gfxdecode->set_info(gfx_sidam);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_RAW_PARAMS(12_MHz_XTAL, SIDAM_HTOTAL, SIDAM_HBEND, SIDAM_HBSTART, GALAXIAN_VTOTAL, GALAXIAN_VBEND, GALAXIAN_VBSTART)
-MACHINE_CONFIG_END
+	m_screen->set_raw(12_MHz_XTAL, SIDAM_HTOTAL, SIDAM_HBEND, SIDAM_HBSTART, GALAXIAN_VTOTAL, GALAXIAN_VBEND, GALAXIAN_VBSTART);
+}
 
 
 void galaxian_state::konami_base(machine_config &config)
@@ -6043,12 +6042,12 @@ void galaxian_state::konami_base(machine_config &config)
 }
 
 
-MACHINE_CONFIG_START(galaxian_state::konami_sound_1x_ay8910)
-
+void galaxian_state::konami_sound_1x_ay8910(machine_config &config)
+{
 	/* 2nd CPU to drive sound */
-	MCFG_DEVICE_ADD("audiocpu", Z80, KONAMI_SOUND_CLOCK/8)
-	MCFG_DEVICE_PROGRAM_MAP(frogger_sound_map)
-	MCFG_DEVICE_IO_MAP(frogger_sound_portmap)
+	Z80(config, m_audiocpu, KONAMI_SOUND_CLOCK/8);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &galaxian_state::frogger_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &galaxian_state::frogger_sound_portmap);
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
@@ -6062,17 +6061,16 @@ MACHINE_CONFIG_START(galaxian_state::konami_sound_1x_ay8910)
 	m_ay8910[0]->add_route(1, "konami", 1.0, 1);
 	m_ay8910[0]->add_route(2, "konami", 1.0, 2);
 
-	MCFG_DEVICE_ADD("konami", DISCRETE, konami_sound_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75)
-MACHINE_CONFIG_END
+	DISCRETE(config, m_discrete, konami_sound_discrete).add_route(ALL_OUTPUTS, "speaker", 0.75);
+}
 
 
-MACHINE_CONFIG_START(galaxian_state::konami_sound_2x_ay8910)
-
+void galaxian_state::konami_sound_2x_ay8910(machine_config &config)
+{
 	/* 2nd CPU to drive sound */
-	MCFG_DEVICE_ADD("audiocpu", Z80, KONAMI_SOUND_CLOCK/8)
-	MCFG_DEVICE_PROGRAM_MAP(konami_sound_map)
-	MCFG_DEVICE_IO_MAP(konami_sound_portmap)
+	Z80(config, m_audiocpu, KONAMI_SOUND_CLOCK/8);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &galaxian_state::konami_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &galaxian_state::konami_sound_portmap);
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
@@ -6093,9 +6091,8 @@ MACHINE_CONFIG_START(galaxian_state::konami_sound_2x_ay8910)
 	m_ay8910[1]->add_route(1, "konami", 1.0, 4);
 	m_ay8910[1]->add_route(2, "konami", 1.0, 5);
 
-	MCFG_DEVICE_ADD("konami", DISCRETE, konami_sound_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
-MACHINE_CONFIG_END
+	DISCRETE(config, m_discrete, konami_sound_discrete).add_route(ALL_OUTPUTS, "speaker", 0.5);
+}
 
 
 void galaxian_state::scramble_base(machine_config &config)
@@ -6157,22 +6154,21 @@ void galaxian_state::pacmanbl(machine_config &config)
 	m_gfxdecode->set_info(gfx_pacmanbl);
 }
 
-MACHINE_CONFIG_START(galaxian_state::tenspot)
+void galaxian_state::tenspot(machine_config &config)
+{
 	galaxian(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("selectcpu", Z80, GALAXIAN_PIXEL_CLOCK/3/2) // ?? mhz
-	MCFG_DEVICE_PROGRAM_MAP(tenspot_select_map)
-	//MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	z80_device &selectcpu(Z80(config, "selectcpu", GALAXIAN_PIXEL_CLOCK/3/2)); // ?? mhz
+	selectcpu.set_addrmap(AS_PROGRAM, &galaxian_state::tenspot_select_map);
+	//selectcpu.set_vblank_int("screen", FUNC(galaxian_state::nmi_line_pulse));
 
 	/* separate tile/sprite ROMs */
 	m_gfxdecode->set_info(gfx_tenspot);
-	// MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, galaxian_state, tenspot_interrupt_w))
-MACHINE_CONFIG_END
+	m_screen->screen_vblank().set(FUNC(galaxian_state::tenspot_interrupt_w));
+}
 
 void galaxian_state::zigzag(machine_config &config)
 {
@@ -6298,30 +6294,32 @@ void galaxian_state::jumpbug(machine_config &config)
 }
 
 
-MACHINE_CONFIG_START(galaxian_state::checkman)
+void galaxian_state::checkman(machine_config &config)
+{
 	mooncrst(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("audiocpu", Z80, 1620000)  /* 1.62 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(checkman_sound_map)
-	MCFG_DEVICE_IO_MAP(checkman_sound_portmap)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", galaxian_state,  irq0_line_hold)   /* NMIs are triggered by the main CPU */
+	Z80(config, m_audiocpu, 1620000);  /* 1.62 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &galaxian_state::checkman_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &galaxian_state::checkman_sound_portmap);
+	m_audiocpu->set_vblank_int("screen", FUNC(galaxian_state::irq0_line_hold));   /* NMIs are triggered by the main CPU */
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
 	/* sound hardware */
 	AY8910(config, m_ay8910[0], 1789750).add_route(ALL_OUTPUTS, "speaker", 0.5);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(galaxian_state::checkmaj)
+void galaxian_state::checkmaj(machine_config &config)
+{
 	galaxian_base(config);
 
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &galaxian_state::galaxian_map_base); // no discrete sound
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 1620000)
-	MCFG_DEVICE_PROGRAM_MAP(checkmaj_sound_map)
+	Z80(config, m_audiocpu, 1620000);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &galaxian_state::checkmaj_sound_map);
 
 	TIMER(config, "irq0").configure_scanline(FUNC(galaxian_state::checkmaj_irq0_gen), "screen", 0, 8);
 
@@ -6331,7 +6329,7 @@ MACHINE_CONFIG_START(galaxian_state::checkmaj)
 	AY8910(config, m_ay8910[0], 1620000);
 	m_ay8910[0]->port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
 	m_ay8910[0]->add_route(ALL_OUTPUTS, "speaker", 2);
-MACHINE_CONFIG_END
+}
 
 
 void galaxian_state::mshuttle(machine_config &config)
@@ -6377,16 +6375,16 @@ void galaxian_state::frogger(machine_config &config)
 }
 
 
-MACHINE_CONFIG_START(galaxian_state::froggermc)
+void galaxian_state::froggermc(machine_config &config)
+{
 	galaxian_base(config);
 	konami_sound_1x_ay8910(config);
 
 	// alternate memory map
 	m_maincpu->set_addrmap(AS_PROGRAM, &galaxian_state::froggermc_map);
 
-	MCFG_DEVICE_MODIFY("audiocpu")
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE(DEVICE_SELF, galaxian_state, froggermc_audiocpu_irq_ack)
-MACHINE_CONFIG_END
+	m_audiocpu->set_irq_acknowledge_callback(FUNC(galaxian_state::froggermc_audiocpu_irq_ack));
+}
 
 
 void galaxian_state::froggers(machine_config &config)
@@ -6456,35 +6454,37 @@ void galaxian_state::scramble(machine_config &config)
 	m_ppi8255[1]->out_pc_callback().set(FUNC(galaxian_state::theend_protection_w));
 }
 
-MACHINE_CONFIG_START(galaxian_state::jungsub)
+void galaxian_state::jungsub(machine_config &config)
+{
 	galaxian_base(config);
 
 	// alternate memory map
 	m_maincpu->set_addrmap(AS_PROGRAM, &galaxian_state::jungsub_map);
 	m_maincpu->set_addrmap(AS_IO, &galaxian_state::jungsub_io_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, GALAXIAN_PIXEL_CLOCK / 3 / 2) // clock not verified
-	MCFG_DEVICE_PROGRAM_MAP(checkman_sound_map)
-	MCFG_DEVICE_IO_MAP(checkman_sound_portmap)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", galaxian_state, irq0_line_hold)
+	Z80(config, m_audiocpu, GALAXIAN_PIXEL_CLOCK / 3 / 2); // clock not verified
+	m_audiocpu->set_addrmap(AS_PROGRAM, &galaxian_state::checkman_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &galaxian_state::checkman_sound_portmap);
+	m_audiocpu->set_vblank_int("screen", FUNC(galaxian_state::irq0_line_hold));
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	/* sound hardware */
 	AY8910(config, m_ay8910[0], GALAXIAN_PIXEL_CLOCK / 3 / 2 / 2).add_route(ALL_OUTPUTS, "speaker", 0.5); // clock not verified
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(galaxian_state::explorer) // Sidam 10800
+void galaxian_state::explorer(machine_config &config) // Sidam 10800
+{
 	sidam_bootleg_base(config);
 
 	// alternate memory map
 	m_maincpu->set_addrmap(AS_PROGRAM, &galaxian_state::explorer_map);
 
 	/* 2nd CPU to drive sound */
-	MCFG_DEVICE_ADD("audiocpu", Z80, 12_MHz_XTAL / 2 / 2 / 2) /* clock not verified */
-	MCFG_DEVICE_PROGRAM_MAP(konami_sound_map)
-	MCFG_DEVICE_IO_MAP(konami_sound_portmap)
+	Z80(config, m_audiocpu, 12_MHz_XTAL / 2 / 2 / 2); /* clock not verified */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &galaxian_state::konami_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &galaxian_state::konami_sound_portmap);
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
@@ -6496,15 +6496,15 @@ MACHINE_CONFIG_START(galaxian_state::explorer) // Sidam 10800
 	AY8912(config, m_ay8910[1], 12_MHz_XTAL / 2 / 2 / 2); /* matches PCB, needs verification */
 	m_ay8910[0]->port_a_read_callback().set(FUNC(galaxian_state::konami_sound_timer_r));
 	m_ay8910[0]->add_route(ALL_OUTPUTS, "speaker", 0.25);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(galaxian_state::takeoff) // Sidam 10900, with 1 x AY-3-8912
+void galaxian_state::takeoff(machine_config &config) // Sidam 10900, with 1 x AY-3-8912
+{
 	explorer(config);
 
 	/* 2nd CPU to drive sound */
-	MCFG_DEVICE_MODIFY("audiocpu")
-	MCFG_DEVICE_PROGRAM_MAP(takeoff_sound_map)
-	MCFG_DEVICE_IO_MAP(takeoff_sound_portmap)
+	m_audiocpu->set_addrmap(AS_PROGRAM, &galaxian_state::takeoff_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &galaxian_state::takeoff_sound_portmap);
 
 	/* sound hardware */
 	config.device_remove("8910.0");
@@ -6513,18 +6513,20 @@ MACHINE_CONFIG_START(galaxian_state::takeoff) // Sidam 10900, with 1 x AY-3-8912
 	ay8912_device &ay8912(AY8912(config, "8912", XTAL(12'000'000) / 8));
 	ay8912.port_a_read_callback().set(FUNC(galaxian_state::explorer_sound_latch_r));
 	ay8912.add_route(ALL_OUTPUTS, "speaker", 0.25);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(galaxian_state::amigo2) // marked "AMI", but similar to above
+void galaxian_state::amigo2(machine_config &config) // marked "AMI", but similar to above
+{
 	sidam_bootleg_base(config);
 
 	// alternate memory map
 	m_maincpu->set_addrmap(AS_PROGRAM, &galaxian_state::amigo2_map);
 
 	// 2nd CPU to drive sound
-	MCFG_DEVICE_ADD("audiocpu", Z80, 12_MHz_XTAL / 2 / 2 / 2) // clock not verified
-	MCFG_DEVICE_PROGRAM_MAP(konami_sound_map)
-	MCFG_DEVICE_IO_MAP(konami_sound_portmap)
+	Z80(config, m_audiocpu, 12_MHz_XTAL / 2 / 2 / 2); // clock not verified
+	m_audiocpu->set_addrmap(AS_PROGRAM, &galaxian_state::konami_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &galaxian_state::konami_sound_portmap);
+
 	GENERIC_LATCH_8(config, m_soundlatch);
 
 	/* sound hardware */
@@ -6534,17 +6536,17 @@ MACHINE_CONFIG_START(galaxian_state::amigo2) // marked "AMI", but similar to abo
 	m_ay8910[0]->add_route(ALL_OUTPUTS, "speaker", 0.25);
 
 	AY8910(config, m_ay8910[1], 12_MHz_XTAL / 2 / 2 / 2).add_route(ALL_OUTPUTS, "speaker", 0.25); /* matches PCB, needs verification */
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(galaxian_state::scorpion)
+void galaxian_state::scorpion(machine_config &config)
+{
 	scramble_base(config);
 
 	// alternate memory map
 	m_maincpu->set_addrmap(AS_PROGRAM, &galaxian_state::scorpion_map);
 
-	MCFG_DEVICE_MODIFY("audiocpu")
-	MCFG_DEVICE_PROGRAM_MAP(scorpion_sound_map)
-	MCFG_DEVICE_IO_MAP(scorpion_sound_portmap)
+	m_audiocpu->set_addrmap(AS_PROGRAM, &galaxian_state::scorpion_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &galaxian_state::scorpion_sound_portmap);
 
 	m_ppi8255[1]->in_pc_callback().set(FUNC(galaxian_state::scorpion_protection_r));
 	m_ppi8255[1]->out_pc_callback().set(FUNC(galaxian_state::scorpion_protection_w));
@@ -6556,7 +6558,7 @@ MACHINE_CONFIG_START(galaxian_state::scorpion)
 	m_ay8910[2]->add_route(ALL_OUTPUTS, "speaker", 0.25);
 
 	DIGITALKER(config, m_digitalker, 4_MHz_XTAL).add_route(ALL_OUTPUTS, "speaker", 0.16);
-MACHINE_CONFIG_END
+}
 
 
 void galaxian_state::sfx(machine_config &config)
@@ -6689,25 +6691,25 @@ void galaxian_state::froggeram(machine_config &config)
 }
 
 
-MACHINE_CONFIG_START(galaxian_state::turpins) // the ROMs came from a blister, so there aren't PCB infos available. Chip types and clocks are guessed.
+void galaxian_state::turpins(machine_config &config) // the ROMs came from a blister, so there aren't PCB infos available. Chip types and clocks are guessed.
+{
 	scobra(config);
 
 	// alternate memory map
 	m_maincpu->set_addrmap(AS_PROGRAM, &galaxian_state::turpins_map);
 
-	MCFG_DEVICE_MODIFY("audiocpu")
-	MCFG_DEVICE_PROGRAM_MAP(turpins_sound_map)
-MACHINE_CONFIG_END
+	m_audiocpu->set_addrmap(AS_PROGRAM, &galaxian_state::turpins_sound_map);
+}
 
 
-MACHINE_CONFIG_START(galaxian_state::anteater)
+void galaxian_state::anteater(machine_config &config)
+{
 	scobra(config);
 
 	/* quiet down the sounds */
-	MCFG_DEVICE_MODIFY("konami")
-	MCFG_SOUND_ROUTES_RESET()
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-MACHINE_CONFIG_END
+	m_discrete->reset_routes();
+	m_discrete->add_route(ALL_OUTPUTS, "speaker", 0.25);
+}
 
 
 void galaxian_state::anteateruk(machine_config &config)

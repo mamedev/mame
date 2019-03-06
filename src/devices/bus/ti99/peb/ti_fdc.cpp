@@ -201,7 +201,7 @@ READ8Z_MEMBER(ti_fdc_device::crureadz)
 	if ((offset & 0xff00)==m_cru_base)
 	{
 		uint8_t reply = 0;
-		if ((offset & 0x07) == 0)
+		if ((offset & 0x0070) == 0)
 		{
 			// Selected drive
 			reply |= ((m_DSEL)<<1);
@@ -212,7 +212,7 @@ READ8Z_MEMBER(ti_fdc_device::crureadz)
 			// Selected side
 			if (m_SIDSEL==ASSERT_LINE) reply |= 0x80;
 		}
-		*value = reply;
+		*value = BIT(reply, (offset >> 1) & 0x07);
 		LOGMASKED(LOG_CRU, "Read CRU = %02x\n", *value);
 	}
 }

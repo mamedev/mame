@@ -296,17 +296,17 @@ READ8_MEMBER( tutor_state::key_r )
 	char port[12];
 	uint8_t value;
 
-	snprintf(port, ARRAY_LENGTH(port), "LINE%d", offset);
+	snprintf(port, ARRAY_LENGTH(port), "LINE%d", offset >> 3);
 	value = ioport(port)->read();
 
 	/* hack for ports overlapping with joystick */
-	if (offset == 4 || offset == 5)
+	if (offset >= 32 && offset < 48)
 	{
-		snprintf(port, ARRAY_LENGTH(port), "LINE%d_alt", offset);
+		snprintf(port, ARRAY_LENGTH(port), "LINE%d_alt", offset >> 3);
 		value |= ioport(port)->read();
 	}
 
-	return value;
+	return BIT(value, offset & 7);
 }
 
 
@@ -600,8 +600,8 @@ void tutor_state::pyuutajr_mem(address_map &map)
 
 void tutor_state::tutor_io(address_map &map)
 {
-	map(0xec0, 0xec7).r(FUNC(tutor_state::key_r));               /*keyboard interface*/
-	map(0xed0, 0xed0).r(FUNC(tutor_state::tutor_cassette_r));        /*cassette interface*/
+	map(0xec00, 0xec7f).r(FUNC(tutor_state::key_r));               /*keyboard interface*/
+	map(0xed00, 0xed01).r(FUNC(tutor_state::tutor_cassette_r));        /*cassette interface*/
 }
 
 /* tutor keyboard: 56 keys

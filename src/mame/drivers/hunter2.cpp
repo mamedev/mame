@@ -378,19 +378,20 @@ WRITE_LINE_MEMBER(hunter2_state::rxd_w)
 		m_maincpu->set_input_line(NSC800_RSTB, ASSERT_LINE);
 }
 
-MACHINE_CONFIG_START(hunter2_state::hunter2)
+void hunter2_state::hunter2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NSC800, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(hunter2_mem)
-	MCFG_DEVICE_IO_MAP(hunter2_io)
+	NSC800(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &hunter2_state::hunter2_mem);
+	m_maincpu->set_addrmap(AS_IO, &hunter2_state::hunter2_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(80)
-	MCFG_SCREEN_UPDATE_DEVICE("lcdc", hd61830_device, screen_update)
-	MCFG_SCREEN_SIZE(240, 128)
-	MCFG_SCREEN_VISIBLE_AREA(0, 239, 0, 63)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(80);
+	screen.set_screen_update("lcdc", FUNC(hd61830_device::screen_update));
+	screen.set_size(240, 128);
+	screen.set_visarea(0, 239, 0, 63);
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(hunter2_state::hunter2_palette), 2);
 	hd61830_device &hd61830(HD61830(config, "lcdc", XTAL(4'915'200)/2/2)); // unknown clock
@@ -398,8 +399,7 @@ MACHINE_CONFIG_START(hunter2_state::hunter2)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
 	mm58274c_device &rtc(MM58274C(config, "rtc", 0));
@@ -425,7 +425,7 @@ MACHINE_CONFIG_START(hunter2_state::hunter2)
 	ADDRESS_MAP_BANK(config, "bank2").set_map(&hunter2_state::hunter2_banked_mem).set_endianness(ENDIANNESS_LITTLE).set_data_width(8).set_stride(0x4000);
 	ADDRESS_MAP_BANK(config, "bank3").set_map(&hunter2_state::hunter2_banked_mem).set_endianness(ENDIANNESS_LITTLE).set_data_width(8).set_stride(0x4000);
 	ADDRESS_MAP_BANK(config, "bank4").set_map(&hunter2_state::hunter2_banked_mem).set_endianness(ENDIANNESS_LITTLE).set_data_width(8).set_stride(0x4000);
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( hunter2 )

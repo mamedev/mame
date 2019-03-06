@@ -38717,6 +38717,7 @@ vigilanto                       // (c) 1988 (US)
 
 @source:spg110.cpp
 jak_capb                        //
+jak_spdmo                       //
 
 @source:vii.cpp
 jak_batm                        // The Batman, 2004
@@ -38752,6 +38753,7 @@ rad_fb2                         //
 mattelcs                        //
 dreamlif                        //
 icanguit                        //
+icanpian                        //
 
 @source:vsmile.cpp
 vsmile                          //
@@ -39924,6 +39926,7 @@ rad_sbw                         //
 rad_bdp                         //
 has_wamg                        //
 ltv_tam                         //
+tak_geig                        //
 ban_onep                        //
 ekara                           //
 ekaraa                          //
@@ -39931,6 +39934,7 @@ ekaraj                          //
 ekarag                          //
 ekaraphs                        //
 epitch                          //
+ekaramix                        //
 ddrfammt                        //
 popira                          //
 popira2                         //

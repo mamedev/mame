@@ -432,30 +432,32 @@ MACHINE_START_MEMBER(hyprduel_state,hyprduel)
 	m_vblank_end_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hyprduel_state::vblank_end_callback), this));
 }
 
-MACHINE_CONFIG_START(hyprduel_state::i4220_config)
+void hyprduel_state::i4220_config(machine_config &config)
+{
 	I4220(config, m_vdp, XTAL(26'666'000));
 	m_vdp->blit_irq_cb().set(FUNC(hyprduel_state::vdp_blit_end_w));
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
-	MCFG_SCREEN_REFRESH_RATE(60) // Unknown/Unverified
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 224)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, FIRST_VISIBLE_LINE, LAST_VISIBLE_LINE)
-	MCFG_SCREEN_UPDATE_DEVICE("vdp", imagetek_i4100_device, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("vdp", imagetek_i4100_device, screen_eof))
-	MCFG_SCREEN_PALETTE(":vdp:palette")
-MACHINE_CONFIG_END
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_UPDATE_SCANLINE);
+	screen.set_refresh_hz(60); // Unknown/Unverified
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(320, 224);
+	screen.set_visarea(0, 320-1, FIRST_VISIBLE_LINE, LAST_VISIBLE_LINE);
+	screen.set_screen_update("vdp", FUNC(imagetek_i4100_device::screen_update));
+	screen.screen_vblank().set("vdp", FUNC(imagetek_i4100_device::screen_eof));
+	screen.set_palette(":vdp:palette");
+}
 
-MACHINE_CONFIG_START(hyprduel_state::hyprduel)
-
+void hyprduel_state::hyprduel(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000,20000000/2)      /* 10MHz */
-	MCFG_DEVICE_PROGRAM_MAP(hyprduel_map)
+	M68000(config, m_maincpu, 20000000/2);      /* 10MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &hyprduel_state::hyprduel_map);
+
 	TIMER(config, "scantimer").configure_scanline(FUNC(hyprduel_state::interrupt), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("sub", M68000,20000000/2)      /* 10MHz */
-	MCFG_DEVICE_PROGRAM_MAP(hyprduel_map2)
+	M68000(config, m_subcpu, 20000000/2);      /* 10MHz */
+	m_subcpu->set_addrmap(AS_PROGRAM, &hyprduel_state::hyprduel_map2);
 
 	MCFG_MACHINE_START_OVERRIDE(hyprduel_state,hyprduel)
 
@@ -469,21 +471,21 @@ MACHINE_CONFIG_START(hyprduel_state::hyprduel)
 	ymsnd.irq_handler().set_inputline(m_subcpu, 1);
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 4000000/16/16*132, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.57)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki", 4000000/16/16*132, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.57); // clock frequency & pin 7 not verified
+}
 
 
-MACHINE_CONFIG_START(hyprduel_state::magerror)
-
+void hyprduel_state::magerror(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000,20000000/2)      /* 10MHz */
-	MCFG_DEVICE_PROGRAM_MAP(magerror_map)
+	M68000(config, m_maincpu, 20000000/2);      /* 10MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &hyprduel_state::magerror_map);
+
 	TIMER(config, "scantimer").configure_scanline(FUNC(hyprduel_state::interrupt), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("sub", M68000,20000000/2)      /* 10MHz */
-	MCFG_DEVICE_PROGRAM_MAP(magerror_map2)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(hyprduel_state, irq1_line_hold, 968)        /* tempo? */
+	M68000(config, m_subcpu, 20000000/2);      /* 10MHz */
+	m_subcpu->set_addrmap(AS_PROGRAM, &hyprduel_state::magerror_map2);
+	m_subcpu->set_periodic_int(FUNC(hyprduel_state::irq1_line_hold), attotime::from_hz(968));        /* tempo? */
 
 	MCFG_MACHINE_START_OVERRIDE(hyprduel_state,hyprduel)
 
@@ -493,12 +495,10 @@ MACHINE_CONFIG_START(hyprduel_state::magerror)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2413, 3579545)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	YM2413(config, "ymsnd", 3579545).add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 4000000/16/16*132, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.57)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki", 4000000/16/16*132, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.57); // clock frequency & pin 7 not verified
+}
 
 /***************************************************************************
                                 ROMs Loading

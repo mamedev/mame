@@ -338,7 +338,7 @@ READ8Z_MEMBER(snug_bwg_device::crureadz)
 
 	if ((offset & 0xff00)==m_cru_base)
 	{
-		if ((offset & 0x00ff)==0)
+		if ((offset & 0x00f0)==0)
 		{
 			// Check what drives are not connected
 			reply = ((m_floppy[0] != nullptr)? 0 : 0x02)       // DSK1
@@ -355,7 +355,7 @@ READ8Z_MEMBER(snug_bwg_device::crureadz)
 			reply |= (m_dip34 << 6);
 
 			// Invert all
-			*value = ~reply;
+			*value = ~BIT(reply, (offset >> 1) & 7);
 		}
 		else
 			*value = 0;
