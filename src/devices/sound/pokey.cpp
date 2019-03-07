@@ -1031,6 +1031,7 @@ void pokey_device::write_internal(offs_t offset, uint8_t data)
 			m_clock_cnt[0] = 0;
 			m_clock_cnt[1] = 0;
 			m_clock_cnt[2] = 0;
+			m_old_raw_inval = true;
 			/* FIXME: Serial port reset ! */
 		}
 		break;
