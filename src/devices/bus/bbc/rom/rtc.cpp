@@ -82,20 +82,20 @@ READ8_MEMBER(bbc_stlrtc_device::read)
 	switch (offset & 0x3fc0)
 	{
 	case 0x3e00:
-		data = m_rtc->read(space, 1);
+		data = m_rtc->read(1);
 		break;
 	case 0x3e40:
-		m_rtc->write(space, 0, data);
+		m_rtc->write(0, data);
 		break;
 	case 0x3e80:
 	case 0x3ec0:
-		data = m_rtc->read(space, 0);
+		data = m_rtc->read(0);
 		break;
 	case 0x3f00:
 	case 0x3f40:
 	case 0x3f80:
 	case 0x3fc0:
-		m_rtc->write(space, 1, data);
+		m_rtc->write(1, data);
 		break;
 	}
 	return data;

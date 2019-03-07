@@ -62,8 +62,6 @@ private:
 
 	DECLARE_READ8_MEMBER( nmi_io_r );
 	DECLARE_WRITE8_MEMBER( nmi_io_w );
-	DECLARE_READ8_MEMBER( rtc_r );
-	DECLARE_WRITE8_MEMBER( rtc_w );
 	DECLARE_READ8_MEMBER( stat_r );
 	DECLARE_WRITE8_MEMBER( stat_w );
 	DECLARE_READ8_MEMBER( led_r );
@@ -176,18 +174,6 @@ WRITE8_MEMBER( pcd_state::nmi_io_w )
 	logerror("%s: unmapped %s %04x\n", machine().describe_context(), space.name(), offset);
 	m_stat |= 0xfd;
 	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-}
-
-READ8_MEMBER( pcd_state::rtc_r )
-{
-	m_rtc->write(space, 0, offset);
-	return m_rtc->read(space, 1);
-}
-
-WRITE8_MEMBER( pcd_state::rtc_w )
-{
-	m_rtc->write(space, 0, offset);
-	m_rtc->write(space, 1, data);
 }
 
 READ8_MEMBER( pcd_state::stat_r )
@@ -443,7 +429,7 @@ void pcd_state::pcd_io(address_map &map)
 	map(0xf820, 0xf821).rw(m_pic2, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0xf840, 0xf840).rw(FUNC(pcd_state::stat_r), FUNC(pcd_state::stat_w));
 	map(0xf841, 0xf841).rw(FUNC(pcd_state::led_r), FUNC(pcd_state::led_w));
-	map(0xf880, 0xf8bf).rw(FUNC(pcd_state::rtc_r), FUNC(pcd_state::rtc_w));
+	map(0xf880, 0xf8bf).rw(m_rtc, FUNC(mc146818_device::read_direct), FUNC(mc146818_device::write_direct));
 	map(0xf900, 0xf903).rw(m_fdc, FUNC(wd2793_device::read), FUNC(wd2793_device::write));
 	map(0xf904, 0xf905).rw(FUNC(pcd_state::dskctl_r), FUNC(pcd_state::dskctl_w));
 	map(0xf940, 0xf943).rw(FUNC(pcd_state::scsi_r), FUNC(pcd_state::scsi_w));

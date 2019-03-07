@@ -647,7 +647,7 @@ WRITE8_MEMBER( econet_e01_device::hdc_irq_enable_w )
 
 READ8_MEMBER( econet_e01_device::rtc_address_r )
 {
-	return m_rtc->read(space, 0);
+	return m_rtc->read(0);
 }
 
 
@@ -657,7 +657,7 @@ READ8_MEMBER( econet_e01_device::rtc_address_r )
 
 WRITE8_MEMBER( econet_e01_device::rtc_address_w )
 {
-	m_rtc->write(space, 0, data);
+	m_rtc->write(0, data);
 }
 
 
@@ -667,7 +667,7 @@ WRITE8_MEMBER( econet_e01_device::rtc_address_w )
 
 READ8_MEMBER( econet_e01_device::rtc_data_r )
 {
-	return m_rtc->read(space, 1);
+	return m_rtc->read(1);
 }
 
 
@@ -677,7 +677,7 @@ READ8_MEMBER( econet_e01_device::rtc_data_r )
 
 WRITE8_MEMBER( econet_e01_device::rtc_data_w )
 {
-	m_rtc->write(space, 1, data);
+	m_rtc->write(1, data);
 }
 
 

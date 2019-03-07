@@ -198,7 +198,7 @@ READ8_MEMBER(orion_state::orionz80_floppy_rtc_r)
 {
 	if ((offset >= 0x60) && (offset <= 0x6f))
 	{
-		return m_rtc->read(space,offset-0x60);
+		return m_rtc->read(offset-0x60);
 	}
 	else
 	{
@@ -210,7 +210,7 @@ WRITE8_MEMBER(orion_state::orionz80_floppy_rtc_w)
 {
 	if ((offset >= 0x60) && (offset <= 0x6f))
 	{
-		m_rtc->write(space,offset-0x60,data);
+		m_rtc->write(offset-0x60,data);
 	}
 	else
 	{

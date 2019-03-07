@@ -723,7 +723,7 @@ void am9517a_device::execute_run()
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( am9517a_device::read )
+uint8_t am9517a_device::read(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -787,7 +787,7 @@ READ8_MEMBER( am9517a_device::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( am9517a_device::write )
+void am9517a_device::write(offs_t offset, uint8_t data)
 {
 	if (!BIT(offset, 3))
 	{
@@ -1024,7 +1024,7 @@ void v5x_dmau_device::device_reset()
 }
 
 
-READ8_MEMBER(v5x_dmau_device::read)
+uint8_t v5x_dmau_device::read(offs_t offset)
 {
 	uint8_t ret = 0;
 	int channel = m_selected_channel;
@@ -1108,7 +1108,7 @@ READ8_MEMBER(v5x_dmau_device::read)
 	return ret;
 }
 
-WRITE8_MEMBER(v5x_dmau_device::write)
+void v5x_dmau_device::write(offs_t offset, uint8_t data)
 {
 	int channel = m_selected_channel;
 

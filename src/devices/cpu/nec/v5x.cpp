@@ -199,8 +199,8 @@ void v53_device::install_peripheral_io()
 		}
 		else // uPD71071 mode
 			space(AS_IO).install_readwrite_handler(base + 0x00, base + 0x0f,
-				read8_delegate(FUNC(v5x_dmau_device::read), m_dmau.target()),
-				write8_delegate(FUNC(v5x_dmau_device::write), m_dmau.target()), 0xffff);
+				read8sm_delegate(FUNC(v5x_dmau_device::read), m_dmau.target()),
+				write8sm_delegate(FUNC(v5x_dmau_device::write), m_dmau.target()), 0xffff);
 	}
 
 	if (m_OPSEL & OPSEL_IS)
@@ -264,8 +264,8 @@ void v50_device::install_peripheral_io()
 		u16 const base = ((m_OPHA << 8) | m_DULA) & 0xfffe;
 
 		space(AS_IO).install_readwrite_handler(base + 0x00, base + 0x0f,
-			read8_delegate(FUNC(v5x_dmau_device::read), m_dmau.target()),
-			write8_delegate(FUNC(v5x_dmau_device::write), m_dmau.target()), 0xffff);
+			read8sm_delegate(FUNC(v5x_dmau_device::read), m_dmau.target()),
+			write8sm_delegate(FUNC(v5x_dmau_device::write), m_dmau.target()), 0xffff);
 	}
 
 	if (m_OPSEL & OPSEL_IS)

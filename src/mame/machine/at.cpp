@@ -369,10 +369,10 @@ WRITE8_MEMBER( at_mb_device::write_rtc )
 		m_nmi_enabled = BIT(data,7);
 		if (!m_nmi_enabled)
 			m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-		m_mc146818->write(space,0,data);
+		m_mc146818->write(0,data);
 	}
 	else {
-		m_mc146818->write(space,offset,data);
+		m_mc146818->write(offset,data);
 	}
 }
 

@@ -416,12 +416,12 @@ CH3_EXA ==      0X3E                      ; CH-3 extended address (W)
 
 READ8_MEMBER(apc_state::apc_dma_r)
 {
-	return m_dmac->read(space, bitswap<8>(offset,7,6,5,4,2,1,0,3), 0xff);
+	return m_dmac->read(bitswap<4>(offset,2,1,0,3));
 }
 
 WRITE8_MEMBER(apc_state::apc_dma_w)
 {
-	m_dmac->write(space, bitswap<8>(offset,7,6,5,4,2,1,0,3), data, 0xff);
+	m_dmac->write(bitswap<4>(offset,2,1,0,3), data);
 }
 
 WRITE8_MEMBER(apc_state::apc_irq_ack_w)

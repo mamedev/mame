@@ -59,23 +59,23 @@ public:
 	auto spkr() { return m_write_spkr.bind(); }
 
 	// internal io
-	DECLARE_WRITE8_MEMBER( config_address_w );
-	DECLARE_READ8_MEMBER( config_data_r );
-	DECLARE_WRITE8_MEMBER( config_data_w );
-	DECLARE_READ8_MEMBER( portb_r );
-	DECLARE_WRITE8_MEMBER( portb_w );
-	DECLARE_WRITE8_MEMBER( rtc_w );
-	DECLARE_WRITE8_MEMBER( sysctrl_w );
-	DECLARE_READ8_MEMBER( sysctrl_r );
-	DECLARE_READ8_MEMBER( dma_page_r ) { return m_dma_page[offset]; }
-	DECLARE_WRITE8_MEMBER( dma_page_w ) { m_dma_page[offset] = data; }
-	DECLARE_READ8_MEMBER( dma2_r ) { return m_dma2->read(space, offset / 2); }
-	DECLARE_WRITE8_MEMBER( dma2_w ) { m_dma2->write(space, offset / 2, data); }
-	DECLARE_READ8_MEMBER( keyb_data_r );
-	DECLARE_WRITE8_MEMBER( keyb_data_w );
-	DECLARE_READ8_MEMBER( keyb_status_r );
-	DECLARE_WRITE8_MEMBER( keyb_command_w );
-	DECLARE_WRITE8_MEMBER( keyb_command_blocked_w );
+	void config_address_w(uint8_t data);
+	uint8_t config_data_r();
+	void config_data_w(uint8_t data);
+	uint8_t portb_r();
+	void portb_w(uint8_t data);
+	void rtc_w(offs_t offset, uint8_t data);
+	void sysctrl_w(uint8_t data);
+	uint8_t sysctrl_r();
+	uint8_t dma_page_r(offs_t offset) { return m_dma_page[offset]; }
+	void dma_page_w(offs_t offset, uint8_t data) { m_dma_page[offset] = data; }
+	uint8_t dma2_r(offs_t offset) { return m_dma2->read(offset / 2); }
+	void dma2_w(offs_t offset, uint8_t data) { m_dma2->write(offset / 2, data); }
+	uint8_t keyb_data_r();
+	void keyb_data_w(uint8_t data);
+	uint8_t keyb_status_r();
+	void keyb_command_w(uint8_t data);
+	void keyb_command_blocked_w(uint8_t data);
 
 	// input lines
 	DECLARE_WRITE_LINE_MEMBER( irq01_w ) { m_intc1->ir1_w(state); }
@@ -205,25 +205,25 @@ private:
 
 	uint8_t m_registers[0x20];
 
-	DECLARE_READ8_MEMBER( dma_read_byte );
-	DECLARE_WRITE8_MEMBER( dma_write_byte );
-	DECLARE_READ8_MEMBER( dma_read_word );
-	DECLARE_WRITE8_MEMBER( dma_write_word );
+	uint8_t dma_read_byte(offs_t offset);
+	void dma_write_byte(offs_t offset, uint8_t data);
+	uint8_t dma_read_word(offs_t offset);
+	void dma_write_word(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( dma1_eop_w );
-	DECLARE_READ8_MEMBER( dma1_ior0_r ) { return m_read_ior(0); }
-	DECLARE_READ8_MEMBER( dma1_ior1_r ) { return m_read_ior(1); }
-	DECLARE_READ8_MEMBER( dma1_ior2_r ) { return m_read_ior(2); }
-	DECLARE_READ8_MEMBER( dma1_ior3_r ) { return m_read_ior(3); }
-	DECLARE_READ8_MEMBER( dma2_ior1_r ) { uint16_t const result = m_read_ior(5); m_dma_high_byte = result >> 8; return result; }
-	DECLARE_READ8_MEMBER( dma2_ior2_r ) { uint16_t const result = m_read_ior(6); m_dma_high_byte = result >> 8; return result; }
-	DECLARE_READ8_MEMBER( dma2_ior3_r ) { uint16_t const result = m_read_ior(7); m_dma_high_byte = result >> 8; return result; }
-	DECLARE_WRITE8_MEMBER( dma1_iow0_w ) { m_write_iow(0, data, 0xffff); }
-	DECLARE_WRITE8_MEMBER( dma1_iow1_w ) { m_write_iow(1, data, 0xffff); }
-	DECLARE_WRITE8_MEMBER( dma1_iow2_w ) { m_write_iow(2, data, 0xffff); }
-	DECLARE_WRITE8_MEMBER( dma1_iow3_w ) { m_write_iow(3, data, 0xffff); }
-	DECLARE_WRITE8_MEMBER( dma2_iow1_w ) { m_write_iow(5, (m_dma_high_byte << 8) | data, 0xffff); }
-	DECLARE_WRITE8_MEMBER( dma2_iow2_w ) { m_write_iow(6, (m_dma_high_byte << 8) | data, 0xffff); }
-	DECLARE_WRITE8_MEMBER( dma2_iow3_w ) { m_write_iow(7, (m_dma_high_byte << 8) | data, 0xffff); }
+	uint8_t dma1_ior0_r() { return m_read_ior(0); }
+	uint8_t dma1_ior1_r() { return m_read_ior(1); }
+	uint8_t dma1_ior2_r() { return m_read_ior(2); }
+	uint8_t dma1_ior3_r() { return m_read_ior(3); }
+	uint8_t dma2_ior1_r() { uint16_t const result = m_read_ior(5); m_dma_high_byte = result >> 8; return result; }
+	uint8_t dma2_ior2_r() { uint16_t const result = m_read_ior(6); m_dma_high_byte = result >> 8; return result; }
+	uint8_t dma2_ior3_r() { uint16_t const result = m_read_ior(7); m_dma_high_byte = result >> 8; return result; }
+	void dma1_iow0_w(uint8_t data) { m_write_iow(0, data, 0xffff); }
+	void dma1_iow1_w(uint8_t data) { m_write_iow(1, data, 0xffff); }
+	void dma1_iow2_w(uint8_t data) { m_write_iow(2, data, 0xffff); }
+	void dma1_iow3_w(uint8_t data) { m_write_iow(3, data, 0xffff); }
+	void dma2_iow1_w(uint8_t data) { m_write_iow(5, (m_dma_high_byte << 8) | data, 0xffff); }
+	void dma2_iow2_w(uint8_t data) { m_write_iow(6, (m_dma_high_byte << 8) | data, 0xffff); }
+	void dma2_iow3_w(uint8_t data) { m_write_iow(7, (m_dma_high_byte << 8) | data, 0xffff); }
 	DECLARE_WRITE_LINE_MEMBER( dma1_dack0_w ) { set_dma_channel(0, state); }
 	DECLARE_WRITE_LINE_MEMBER( dma1_dack1_w ) { set_dma_channel(1, state); }
 	DECLARE_WRITE_LINE_MEMBER( dma1_dack2_w ) { set_dma_channel(2, state); }
@@ -234,7 +234,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( dma2_dack3_w ) { set_dma_channel(7, state); }
 	DECLARE_WRITE_LINE_MEMBER( dma2_hreq_w ) { m_write_hold(state); }
 	DECLARE_WRITE_LINE_MEMBER( intc1_int_w ) { m_write_intr(state); }
-	DECLARE_READ8_MEMBER( intc1_slave_ack_r );
+	uint8_t intc1_slave_ack_r(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER( ctc_out1_w );
 	DECLARE_WRITE_LINE_MEMBER( ctc_out2_w );
 };
