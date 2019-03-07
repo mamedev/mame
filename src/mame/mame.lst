@@ -40025,6 +40025,7 @@ yiear                           // GX407 (c) 1985
 yiear2                          // GX407 (c) 1985
 
 @source:ymmu100.cpp
+mu80                            // 1994 MU-80
 mu100                           // 1997 MU-100
 mu100r                          // 1997 MU-100 Rackable version
 
