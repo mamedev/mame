@@ -150,6 +150,35 @@
 		</part>
 	</software>
 
+	<software name="lpbooks" supported="no">
+		<description>LeapPad - Libro Interactivo (Spain)</description>
+		<year>2002</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-10478 UBL"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="30004+003+37"/>
+			<feature name="u1" value="OKI 32M(L)-XXWE"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-10478 UBL - LeapPad - Libro Interactivo (SP).bin" size="0x400000" crc="6a85ec74" sha1="024927d8eae8c4327079dd7d752f483445b51f3e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lionkings" supported="no">
+		<description>El Rey León (Spain)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-10597 UBL"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000+003+7211"/>
+			<feature name="pcb_rev" value="REV.00"/>
+			<feature name="u1" value="OKi 16M(F)"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-10597 UBL - El Rey Leon (SP).bin" size="0x200000" crc="83f0e011" sha1="f543849090eedb8bec9d227e3634c9f5ee7f585c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dinosaurg" supported="no">
 		<description>Leap und die Welt der Dinosaurier (Germany)</description>
 		<year>2004</year>
@@ -225,6 +254,35 @@
 		</part>
 	</software>
 
+	<software name="princesss" cloneof="princessg" supported="no">
+		<description>Disney Princesas - Cuentos de las Princesas (Spain)</description>
+		<year>2002</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-10848 UBL"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000+003+7011"/>
+			<feature name="pcb_rev" value="REV:00"/>
+			<feature name="u1" value="Matronix 16M"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-10848 UBL - Cuentos de las Princesas (SP).bin" size="0x200000" crc="fc6ed25b" sha1="6bd357dca86a37fe1646d010d8bcf150e8d0a95e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fiestahses" supported="no">
+		<description>Fiesta in the House! - ¡Party en la Casa! (Spain)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-10875 UBL"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="30004+003+38"/>
+			<feature name="u1" value="OKI 32M(L)-XXWE"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-10875 UBL - Fiesta in the House! - Party en la Casa!.bin" size="0x400000" crc="0b058df5" sha1="06931683c181c04b967da63e9fab160f6596c5e3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="angelg" supported="no">
 		<description>Das Angel-Abenteuer (Germany)</description>
 		<year>2002</year>
@@ -238,7 +296,7 @@
 		</part>
 	</software>
 
-	<software name="tigerg" supported="no">
+	<software name="tiggerbncg" cloneof="tiggerbnc" supported="no">
 		<description>Disney H&#252;pf, Tigger, h&#252;pf! (Germany)</description>
 		<year>1999</year>
 		<publisher>LeapFrog</publisher>
@@ -324,6 +382,19 @@
 			<feature name="u1" value="OKI 32M(J)"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x400000">
 				<rom name="500-11973 - Little Amadeus (GER).bin" size="0x400000" crc="bbb84550" sha1="2513a369cc08c6b9ffd118f095018a152994b14d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ileanrnens" supported="no">
+		<description>¡Yo aprendo inglés! - Mis Primeras 500 Palabras en Inglés (Spain)</description>
+		<year>2006</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-12153"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="u1" value="MR27V3202L (WE)"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-12153 - Yo aprendo ingles! - Mis Primeras 500 Palabras en Ingles (SP).bin" size="0x400000" crc="67602011" sha1="492304abf2670f4388d7e38b8d7a95c98e77f15d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
