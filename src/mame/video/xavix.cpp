@@ -120,7 +120,7 @@ void xavix_state::update_pen(int pen, uint8_t shval, uint8_t lval)
 	int h_raw = (dat & 0x001f) >> 0;
 
 	// The dividers may be dynamic
-	double y = y_raw / 16.0;
+	double y = y_raw / 20.0;
 	double c = c_raw /  5.0;
 
 	// These weights may be dynamic too.  They're standard NTSC values, would they change on PAL?
